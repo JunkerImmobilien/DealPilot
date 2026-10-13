@@ -246,7 +246,7 @@
   function css() {
     if (el('bwk-profil-css')) return;
     var st = document.createElement('style'); st.id = 'bwk-profil-css';
-    st.textContent = '.bwk-std{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:0 0 14px;padding:12px 14px;border-radius:12px;border:1px solid rgba(201,168,76,.4);background:rgba(201,168,76,.07);font-size:13px}'
+    st.textContent = '.bwk-std{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:0 0 14px;padding:12px 14px;border-radius:12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);font-size:13px}'
       + '.bwk-std-t{font-size:12px;color:var(--muted,#7a7368);margin-top:3px}'
       + '.bwkp-block{margin:0 0 10px}.bwkp-titel{font:600 12px/1.4 Inter,system-ui,sans-serif;margin:6px 0 6px}';
     document.head.appendChild(st);

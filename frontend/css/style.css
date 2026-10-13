@@ -33282,7 +33282,7 @@ body.hdr-banner-only .hdr-v61-row2 {
    nicht: er ordnet ein. Die Fussnote traegt die ImmoWertV-Einordnung
    und darf nie wegfallen. */
 .dp-pa-herk{font:400 11.5px/1.5 'JetBrains Mono',monospace;color:var(--ink3);opacity:.9}
-.dp-pa-abgl{border-color:var(--wl-c9a84c,#C9A84C);background:rgba(201,168,76,.055)}
+.dp-pa-abgl{border-color:var(--wl-c9a84c,#C9A84C);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 5.5%, transparent)}
 .dp-pa-fuss{margin-top:9px;padding-top:8px;border-top:1px solid rgba(140,134,120,.26);font:400 11.5px/1.5 'JetBrains Mono',monospace;color:var(--ink3)}
 /* v2157 · Lage-Gegenueberstellung (N62.4). Status-Farben bewusst NICHT tokenisiert. */
 .dp-pa-ggs-row{padding:10px 0;border-top:1px solid rgba(140,134,120,.20)}
@@ -38206,7 +38206,7 @@ button.btn-brw.brw-veraltet::after {
   color: var(--wl-b8932f, #b8932f);
 }
 .plan-einzel-row .pm-menge-b:hover:not(:disabled),
-.plan-menge-zeile .pm-menge-b:hover:not(:disabled) { background: var(--wl-c9a84c, rgba(201,168,76,.22)); }
+.plan-menge-zeile .pm-menge-b:hover:not(:disabled) { background: var(--wl-c9a84c, color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent)); }
 .plan-einzel-row .pm-menge-b:disabled,
 .plan-menge-zeile .pm-menge-b:disabled { opacity: .3; cursor: default; }
 .plan-einzel-row .pm-menge-n,
@@ -39428,7 +39428,7 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
   .dp-pf-scroll::-webkit-scrollbar-thumb {
     background: var(--wl-c9a84c, #C9A84C); border-radius: 99px;
   }
-  /* v1892b · Hier stand `rgba(201, 168, 76, .14)`. Das ist Gold in ZAHLENFORM und faerbt sich
+  /* v1892b · Hier stand `color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent)`. Das ist Gold in ZAHLENFORM und faerbt sich
      beim Mandanten genauso wenig um wie ein Hex - gold-audit.py hat es sofort gemeldet
      ("css/style.css 0 -> 1, Datei war sauber"). Derselbe Griff danebenn wie in v1699e. */
   .dp-pf-scroll::-webkit-scrollbar-track {
@@ -40821,7 +40821,7 @@ html[data-dp-verify="1"] .body{
    Gemessen: inaktiver Text var(--dp-ink-30) ist im hellen Skin hellgrau auf Creme.
    Der Schalter traegt jetzt seinen EIGENEN dunklen Grund - lesbar in jedem Skin. */
 .ank-wahl{display:inline-flex;gap:3px;padding:3px;border-radius:9px;
-  background:#141210;border:1px solid rgba(201,168,76,.35)}
+  background:#141210;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent)}
 .ank-seg{border:0;background:transparent;padding:6px 12px;border-radius:7px;cursor:pointer;
   font:600 12px/1.2 Inter,system-ui,sans-serif;color:#D6CFBF;white-space:nowrap}
 .ank-seg:hover{color:#FDFCFA}
@@ -40841,3 +40841,70 @@ body.dp-ankauf-frei .ank-seg.aktiv{background:#ffffff;color:#8E4A45}
 /* v2178 · Kachel „Freigeben“ in der Reihe „Daten einlesen“ statt eigener Hinweiszeile (object-actions.js _riegelHinweis).
    Ein <button> erbt keine Tile-Schrift; ausgegraut wird sie nie - sie ist der Ausweg. */
 .dp-pfbar .dp-pf-tile.dp-pf-freigeben{font:inherit;cursor:pointer;opacity:1 !important;filter:none !important;pointer-events:auto}
+
+/* v2189 · „Freigeben" liegt ÜBER den ausgegrauten Quellen, nicht in der
+   Reihe (Marcel, Bild datenaufnahme.png: der Knopf in der Reihe brach sie
+   um und schob „Abrufen" nach unten). Absolut positioniert = kein Platz im
+   Fluss, die Karte bleibt so breit und hoch wie ohne Sperre. */
+.dp-pf-row.dp-pf-riegel-row { position: relative; }
+.dp-pf-freigeben-ueber {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  z-index: 3; display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 16px; border-radius: 10px; white-space: nowrap; cursor: pointer;
+  font: 600 13px/1.2 Inter, system-ui, sans-serif;
+  background: #FDFCFA; color: #1a1714; border: 1px solid #2A2727;
+  box-shadow: 0 6px 18px rgba(0,0,0,.18);
+}
+.dp-pf-freigeben-ueber:hover { background: #fff; box-shadow: 0 8px 22px rgba(0,0,0,.24); }
+.dp-pf-freigeben-ueber .dp-pf-ic { display: inline-flex; }
+body:not(.dp-neue-karte-stil) .dp-pf-freigeben-ueber {
+  background: #141210; color: #f3ead0; border-color: var(--wl-c9a84c, #C9A84C);
+}
+
+/* v2189 · Hilfe-Fenster auf dem Handy (Messkabine 390 px gemessen):
+   das Gitter „280px 1fr" blieb stehen - Themenliste 280 px, Inhalt 32 px.
+   Die Handy-Regel der Einstellungen (v638, oben) greift nur an
+   .settings-modal, und #help-modal .help-modal-inner.global-view-modal
+   haelt das Gitter mit ID-Spezifitaet fest. Hier dieselbe Bauart wie bei
+   den Einstellungen: gestapelt, Themen als waagerechte Leiste, Inhalt
+   volle Breite, Fragezeile unten. html-Praefix = eine Stufe mehr. */
+@media (max-width: 768px) {
+  html body #help-modal.help-modal.global-view-overlay { padding: 0 !important; align-items: stretch !important; justify-content: stretch !important; }
+  html body #help-modal.help-modal.global-view-overlay .help-modal-inner.global-view-modal {
+    display: flex !important; flex-direction: column !important;
+    width: 100vw !important; max-width: 100vw !important;
+    height: 100dvh !important; max-height: 100dvh !important;
+    border-radius: 0 !important; margin: 0 !important;
+  }
+  html body #help-modal.help-modal.global-view-overlay .dp-mtb-hero { height: 48px !important; }
+  html body #help-modal.help-modal.global-view-overlay .dp-mtb-h-title { font-size: 19px !important; }
+  html body #help-modal.help-modal.global-view-overlay .help-modal-side {
+    flex: 0 0 auto !important; width: 100% !important; height: auto !important;
+    max-height: none !important; overflow: visible !important; border-right: 0 !important;
+  }
+  html body #help-modal.help-modal.global-view-overlay .help-modal-search { padding: 10px 12px 8px !important; }
+  html body #help-modal.help-modal.global-view-overlay #help-search-input { font-size: 16px !important; }
+  html body #help-modal.help-modal.global-view-overlay #help-sidebar {
+    flex-direction: row !important; flex-wrap: nowrap !important; height: auto !important;
+    overflow-x: auto !important; overflow-y: hidden !important; gap: 6px !important;
+    padding: 0 12px 10px !important;
+  }
+  html body #help-modal.help-modal.global-view-overlay #help-sidebar .help-sidebar-item {
+    flex: 0 0 auto !important; width: auto !important; height: auto !important; min-height: 0 !important;
+    padding: 8px 12px !important; margin: 0 !important; white-space: nowrap !important;
+  }
+  html body #help-modal.help-modal.global-view-overlay #help-sidebar .help-sidebar-item-desc { display: none !important; }
+  html body #help-modal.help-modal.global-view-overlay .help-modal-content {
+    flex: 1 1 auto !important; width: 100% !important; min-height: 0 !important;
+    display: flex !important; flex-direction: column !important; overflow: hidden !important;
+  }
+  html body #help-modal.help-modal.global-view-overlay .help-content-wrap { flex: 1 1 auto !important; width: 100% !important; min-height: 0 !important; overflow-y: auto !important; }
+  html body #help-modal.help-modal.global-view-overlay #help-content { padding: 14px 14px 24px !important; width: auto !important; }
+  html body #help-modal.help-modal.global-view-overlay .help-ai-foot { flex: 0 0 auto !important; width: 100% !important; padding: 8px 10px !important; }
+  html body #help-modal.help-modal.global-view-overlay .help-ai-bar { flex-wrap: nowrap !important; gap: 6px !important; align-items: center !important; }
+  html body #help-modal.help-modal.global-view-overlay .help-ai-web-toggle { display: none !important; }
+  html body #help-modal.help-modal.global-view-overlay #help-ai-btn { flex: 0 0 auto !important; width: auto !important; padding: 10px 14px !important; }
+  html body #help-modal.help-modal.global-view-overlay #help-ai-input { flex: 1 1 auto !important; min-width: 0 !important; font-size: 16px !important; }
+  html body #help-modal.help-modal.global-view-overlay .help-ai-response { max-height: 40vh; overflow-y: auto; }
+  html body #help-modal.help-modal.global-view-overlay .hab { padding: 12px !important; }
+}

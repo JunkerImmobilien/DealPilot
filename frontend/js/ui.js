@@ -344,6 +344,18 @@ function enterQuickCheckMode() {
   if (document.body.classList.contains('dp-dash-fullscreen') && window.DealPilotDashboard && typeof window.DealPilotDashboard.close === 'function') {
     try { window.DealPilotDashboard.close(); } catch (e) {}
   }
+  /* v2189: dasselbe für die Marktbericht-Ansicht. Marcel, 13.10.2026: „der
+     Absprung vom Prozess in den Quick-Check ging nicht, wenn vorher der
+     Marktbericht offen war." Der Marktbericht schließt beim Öffnen den
+     Quick-Check (marktbericht-view.js), umgekehrt fehlte es: die Klasse
+     mb-standalone-active blieb, der Quick-Check lag darunter. Leise
+     geschlossen — closeMarktberichtView() schaltet zusätzlich einen Reiter
+     an, und genau den will der Quick-Check nicht. */
+  if (document.body.classList.contains('mb-standalone-active')) {
+    var _mbv = document.getElementById('s-marktbericht');
+    if (_mbv) { _mbv.classList.remove('active'); _mbv.innerHTML = ''; }
+    document.body.classList.remove('mb-standalone-active');
+  }
   // Body-Klasse setzt CSS, das Tab-Bar + Workflow-Bar versteckt
   document.body.classList.add('qc-standalone-active');
 

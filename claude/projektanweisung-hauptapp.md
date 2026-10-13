@@ -38620,6 +38620,55 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Commit:** `e2ec2ed2`
 - **Nachweis:** im Container: MFH 420 m²/6 WE/4 Stp., Stichtag 2026 → Verwaltung 6 × 367 + 4 × 48 = 2.394 €, Instandhaltung 420 × 14,40 + 4 × 108 = 6.480 €, BWK 9.738 € (vorher 6.416 €); ETW 2026 Verwaltung 439 €; 2023 meldet „Verwaltung je Eigentumswohnung aus 2021, Instandhaltung je Garage aus 2021"; 2020 warnt. Probelauf Haupt-App 8/8; Endpunkt über die App ok, Faktor 1,60.
 - **Rest:** 2022 fehlt ganz, 2023 teilweise (Rückgriff auf 2021 wird angezeigt). Gewerbe-Verwaltung (Anteil am Rohertrag) und Gewerbe-Instandhaltung je Nutzung sind nicht abgebildet — nur der Gewerbe-Mietausfall. Prod nach Freigabe (Rebuild backend + mb).
+- **Prod (11)** `4d494bef`: v2186 ausgerollt. Beide DBs vorher gesichert (Haupt 11 MB / 71 Tabellen, mb 25 MB / 30), Rebuild backend + mb-backend. Im Container `bwkAnsaetze(2026)` = Verwaltung 367 / ETW 439 / Garage 48, Instandhaltung 14,40 / Garage 108.
+
+### v2187–v2188b · Neue Hilfe: Pilot auf F1, Prozess-Atlas (13.10.2026, Staging)
+
+- **Was:** Marcel wollte die Prozesse unter Hilfe als animierten Netzplan, dazu einen Piloten auf Hotkey, der Felder erklärt und Fragen beantwortet. Demo v2187 (`hilfe-demo.html`), nach Abnahme („granularer, Wow-Effekt, Pilot-Männchen“) v2188. `pilot-tower.js` (F1/?, Feldtext aus `DealPilotFeldHilfe.textFuer`, Sofort-Suche über Feld-Erklärungen, Hilfe, Atlas und Aktionen, KI über `/ai/copilot` mit `payload.hilfe`, Brücke in beiden iframes). `prozess-atlas.js` (7 Abläufe, 47 Stationen, jede mit Code-Beleg). Inhalte aus `design/Messe/prozesskarte*.html` und einer Messung von Quick-Check, Deal-Aktion, Überführung, Steuer, Cockpit und Marktbericht. `help.js` überarbeitet (zwei neue Themen, Score-Stufen 85/70/50/35, keine Anbieternamen). `openaiService.copilotChat` liest den Hilfe-Auszug.
+- **Commit:** `f68259c3` (Demo), `49d5e942`, `7f863e66`, `08c00feb`, `54b012ad`, `fe24f5bb`
+- **Nachweis:**
+  - `tools/prozess-atlas-pruefen.mjs`: 7 Abläufe, 47 Stationen, 48 Kanten, 47/47 Belege; DealScore 30/25/15/15/15, Investor 35/25/20/10/10, Schwellen 85/70/50/35, 8 Etappen, RC=0.
+  - Feld Wohnfläche → Tower mit „§ WoFlV“, Spot gesetzt.
+  - KI-Frage „Wie friere ich den Ankauf-Stand ein …“ beantwortet aus der Hilfe in 3,0 s (Deal-Aktion → Gewonnen, ohne Datum wird nichts eingefroren).
+  - gold-audit RC=0, buster-ebenen SAUBER.
+- **Befunde:**
+  - Mein erster Befund, Sprengnetter und PriceHubble seien im Quick-Check sichtbar, war falsch. Das Markup steht noch, aber `quickcheck-app.html:7266` blendet beide aus.
+  - Ein „Zielkaufpreis“-Feld gibt es im Quick-Check nicht. Der Zielpreis steckt in der Verhandlungs-Empfehlung (`qc-heuristik.js:zielKaufpreis`), so will es Marcel auch.
+  - gold-audit war seit v2174 rot: `rgba(201,168,76,…)` in Paketen dieser Sitzung. Behoben in v2188a.
+- **Rest:** Sichtabnahme bei sichtbarem Fenster und am Handy. Soll/Ist-Umschalter im Quick-Check nicht gefunden, Marcel muss zeigen, wo. Quick-Check auf die eigenen Tabellen (N62.22). Prod.
+
+### v2189–v2189f · Kapitän als Figur, Ort einstellbar, Hilfe vertieft, Handy (13.10.2026, Staging)
+
+- **Was:**
+  - `pilot-figur.js`: eigene Kapitäns-Figur nach Marcels Vorlage (die Vorlage selbst ist ein iStock-Bild mit Wasserzeichen und wird nicht verwendet). Sie winkt, zeigt mit dem Arm, schiebt beim Erklären die Brille hoch und läuft.
+  - Der Atlas-Kapitän rollt seinen Koffer zur gewählten Station.
+  - Ort des Piloten unter Einstellungen → Darstellung: Seitenleiste (Standard), Kopfleiste, Hauptbereich, nur F1. Auf dem Handy ein runder Knopf.
+  - Sofort-Antwort beim Tippen. Fragen gehen nach einer Tipp-Pause von selbst an die KI, im Tower und im Hilfe-Fenster.
+  - Hilfe-Suche nach Wörtern, mit Stamm und Synonymen.
+  - Acht vertiefte Themen (20 Themen, 152 Abschnitte, Belege in `docs/hilfe/hilfe-belege-v2189.md`).
+  - Hilfe-Fenster, Tower, Atlas und Pilot-Wahl auf 390 px umgebaut.
+  - `ui.js` `enterQuickCheckMode` schließt die Marktbericht-Ansicht.
+  - Datenaufnahme: „Freigeben“ liegt über den ausgegrauten Quellen statt in der Reihe.
+- **Commit:** `31e603c8` (Demo), `dc8bb10f`, `4239081a`, `be1df9ed`, `6af049ca`, `03c4db47`, `9bf08fe8`, `02664089`
+- **Nachweis:**
+  - Ruheplatz Seitenleiste gemessen (frei zwischen y 491 und 832).
+  - Marktbericht → Quick-Check: danach `mb-standalone-active` weg, `#s-quick` block.
+  - Freigeben-Leiste bleibt 78 px hoch, „Abrufen“ in derselben Zeile.
+  - Messkabine 390 px:
+    - Hilfe-Fenster gestapelt (Inhalt 352 px statt 32 px).
+    - Tower als Bodenblatt mit Sofort-Antwort, Pilot-Wahl 2×2 ohne Überlauf.
+    - Atlas-Leiste 52 px statt 8 px, Kapitän bei x 13 statt 363.
+  - Suche: „ankauf einfrieren“ → „Warum ist der Ankauf-Stand nicht eingefroren?“, „steuerzeitraum anlegen“ → passende FAQ.
+  - Automatische KI-Antwort auf „Wie lege ich einen Steuerzeitraum an?“ mit den echten Knopfnamen.
+  - gold-audit RC=0, buster-ebenen SAUBER, prozess-atlas-pruefen sauber.
+- **Zurückgenommen:**
+  - „Die Pilot-Analyse zählt auf dein Kontingent“ (v2188) war falsch. Sie ist im Plan enthalten (`ai.js:254` seit v1183).
+  - „Sprengnetter/PriceHubble im Quick-Check sichtbar“ war falsch: nur Markup, `display:none`.
+- **Rest:**
+  - Straße und Hausnummer im Quick-Check waren nie Pflicht (`required:false` seit V326). Marcel entscheidet.
+  - Zehn Fehlerverdachte aus der Hilfe-Erhebung stehen im Backlog (N62.22).
+  - Animationen nur bei sichtbarem Fenster abnehmbar.
+  - Prod.
 
 ### Prod (9/10) v2184–v2185 · Fortschreibungsfaktor recherchiert (13.10.2026)
 

@@ -76,9 +76,9 @@
       '.dp-cpp-q{color:#6b6660;border-color:rgba(138,130,121,.45)}' +
       '.dp-cpp-q:hover{background:rgba(138,130,121,.15);color:#2A2727}' +
       '.dp-cpp-spr{display:inline-block;margin:3px 4px 0 0;padding:2px 8px;' +
-        'border:1px solid rgba(201,168,76,.45);border-radius:999px;background:transparent;' +
+        'border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);border-radius:999px;background:transparent;' +
         'color:var(--wl-c9a84c, #C9A84C);font:11px/1.4 "Space Grotesk",sans-serif;cursor:pointer}' +
-      '.dp-cpp-spr:hover{background:rgba(201,168,76,.15)}' +
+      '.dp-cpp-spr:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent)}' +
       '@media(max-width:560px){.dp-cpp{padding:7px 10px 2px}.dp-cpp-lbl{display:none}}';
     document.head.appendChild(st);
   }

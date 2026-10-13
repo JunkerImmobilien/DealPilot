@@ -939,6 +939,9 @@ function showSettings(initialTab) {
         '</div>' +
         '<p class="hint" style="margin-top:8px;color:var(--muted)">Anfänger-Modus zeigt alle Tooltips (Default). Profi-Modus blendet Anfänger-Erklärungen aus, behält aber kritische Hinweise (§ 7b, 15%-Regel etc.). Aus = komplett aus.</p>' +
         /* === V228 tooltip-mode-toggle END === */
+        /* v2189: wo der Pilot wartet — die Knöpfe baut pilot-tower.js selbst,
+           damit die Liste der Orte an EINER Stelle steht. */
+        ((window.DealPilotPilot && typeof window.DealPilotPilot.einstellungenHtml === 'function') ? window.DealPilotPilot.einstellungenHtml() : '') +
         /* === v648-mb-theme START === */
         '<hr class="dvd">' +
         '<h3 class="set-section-h">Marktbericht-Design</h3>' +

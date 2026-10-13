@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tower · Demo der neuen Hilfe</title>
+<!-- v2187 · Demo fuer die neue Hilfe (Marcel, 13.10.2026: „Prozesse ... unter
+     Hilfe abbilden. So ein Netzplan, aber animiert ... etwas total Abgefahrenes.
+     Vielleicht auch einen kleinen animierten Piloten, den wir immer rufen koennen
+     ... ueber einen Hotkey, und dann werden die Fragen beantwortet oder das Feld
+     erklaert.") Reine Anschauung - gehoert nicht zur App, rechnet nichts, ruft
+     keine KI (die Antworten sind Beispiele). -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--ob:#050505;--ob2:#141210;--gold:#C9A84C;--gold-hi:#E8CC7A;--gold-lo:#b8932f;--creme:#FDFCFA;--ink:#2A2727;--mut:#8b8678;
+    --linie:rgba(140,134,120,.28);--gruen:#3FA56C;--rot:#B8625C}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--creme);color:var(--ink);font:400 14px/1.55 Inter,system-ui,sans-serif}
+  .kopf{background:var(--ob);color:var(--creme);padding:18px 16px}
+  .kopf .in{max-width:1180px;margin:0 auto;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .ue{font:500 11px/1.4 "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-hi)}
+  h1{font:600 22px/1.25 "Space Grotesk",sans-serif;margin:4px 0}
+  .kopf p{margin:0;color:#cfc8b8;max-width:720px}
+  kbd{font:600 12px "JetBrains Mono",monospace;background:#fff;color:#1a1407;border-radius:6px;padding:2px 7px;border:1px solid #cdbf98;box-shadow:0 2px 0 #b8932f}
+  main{max-width:1180px;margin:0 auto;padding:18px 16px 70px}
+  h2{font:600 17px/1.3 "Space Grotesk",sans-serif;margin:26px 0 4px}
+  .sub{color:var(--mut);margin:0 0 12px;font-size:13px}
+  .karte{background:#fff;border:1px solid var(--linie);border-radius:14px;padding:16px 18px}
+  /* — nachgebaute App-Flaeche — */
+  .app{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .f label{display:block;font:500 11px/1.4 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:4px}
+  .f input{width:100%;padding:9px 10px;border:1px solid var(--linie);border-radius:9px;font:500 14px Inter,sans-serif;background:var(--creme)}
+  .f input:focus{outline:2px solid var(--gold);outline-offset:1px}
+  .kpi{border:1px solid var(--linie);border-radius:12px;padding:10px 12px;background:var(--creme)}
+  .kpi b{font:600 22px "Space Grotesk",sans-serif}
+  .kpi span{display:block;font:500 11px "JetBrains Mono",monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+  .spot{box-shadow:0 0 0 3px var(--gold),0 0 0 9px rgba(201,168,76,.25) !important;transition:box-shadow .3s}
+  /* — der Pilot — */
+  #pilot{position:fixed;width:58px;height:58px;z-index:50;left:calc(100vw - 90px);top:calc(100vh - 100px);transition:left .7s cubic-bezier(.3,1.4,.5,1),top .7s cubic-bezier(.3,1.4,.5,1);cursor:pointer;filter:drop-shadow(0 8px 14px rgba(0,0,0,.35))}
+  #pilot svg{width:100%;height:100%;animation:schweben 2.6s ease-in-out infinite}
+  @keyframes schweben{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+  #pilot .blink{animation:blink 4s infinite}
+  @keyframes blink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+  /* — Tower-Panel — */
+  #tower{position:fixed;z-index:49;width:min(440px,calc(100vw - 32px));background:var(--ob2);color:var(--creme);border:1px solid rgba(201,168,76,.45);border-radius:16px;box-shadow:0 30px 80px -20px rgba(0,0,0,.6);padding:14px;display:none}
+  #tower.an{display:block;animation:auf .25s ease}
+  @keyframes auf{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+  #tower .t-kopf{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  #tower .t-kopf .ue{flex:1}
+  #tower input{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rgba(201,168,76,.4);background:#0b0a09;color:var(--creme);font:500 14px Inter,sans-serif}
+  #tower input:focus{outline:2px solid var(--gold)}
+  .feldkarte{margin:10px 0;padding:11px 12px;border-radius:11px;background:rgba(201,168,76,.10);border:1px solid rgba(201,168,76,.3)}
+  .feldkarte .tt{font:600 14px "Space Grotesk",sans-serif;color:var(--gold-hi)}
+  .feldkarte p{margin:5px 0 0;font-size:13px;color:#e4dccb}
+  .feldkarte .fluss{margin-top:8px;font:500 11.5px "JetBrains Mono",monospace;color:#b9ad8f}
+  .treffer{list-style:none;margin:8px 0 0;padding:0;max-height:220px;overflow:auto}
+  .treffer li{padding:8px 10px;border-radius:9px;cursor:pointer;display:flex;gap:9px;align-items:flex-start}
+  .treffer li:hover,.treffer li.sel{background:rgba(201,168,76,.14)}
+  .treffer .art{flex:0 0 auto;font:600 10px/1.6 "JetBrains Mono",monospace;padding:1px 6px;border-radius:5px;background:#2a251d;color:var(--gold-hi);text-transform:uppercase;letter-spacing:.05em}
+  .treffer .tx b{display:block;font-weight:600;font-size:13px}.treffer .tx span{font-size:12px;color:#b9ad8f}
+  .frag{margin-top:10px;width:100%;padding:10px;border:0;border-radius:10px;background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));color:#1a1407;font:600 13px "Space Grotesk",sans-serif;cursor:pointer}
+  .antwort{margin-top:10px;padding:11px 12px;border-radius:11px;background:#0b0a09;border:1px solid #2c2720;font-size:13px;color:#e8e2d4;display:none}
+  .antwort .zeig{margin-top:8px;border:1px solid var(--gold);background:transparent;color:var(--gold-hi);border-radius:8px;padding:6px 11px;font:600 12px Inter,sans-serif;cursor:pointer}
+  .tipp{font-size:11.5px;color:#9a917e;margin-top:8px}
+  /* — Prozess-Atlas — */
+  .atlas-wahl{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .atlas-wahl button{border:1px solid var(--linie);background:#fff;border-radius:999px;padding:7px 13px;font:600 12.5px Inter,sans-serif;cursor:pointer}
+  .atlas-wahl button.an{background:var(--ob2);color:var(--gold-hi);border-color:var(--ob2)}
+  .atlas{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px}
+  @media (max-width:860px){.atlas{grid-template-columns:1fr}}
+  .netz{background:var(--ob2);border-radius:14px;padding:8px;min-height:340px}
+  .netz svg{width:100%;height:auto;display:block}
+  .knoten{cursor:pointer}
+  .knoten rect{fill:#1f1b16;stroke:rgba(201,168,76,.55);stroke-width:1.3;transition:fill .2s}
+  .knoten:hover rect,.knoten.an rect{fill:#2e271c;stroke:var(--gold-hi)}
+  .knoten text{fill:#efe7d4;font:600 12.5px "Space Grotesk",sans-serif}
+  .knoten .k2{fill:#a99d84;font:500 10px "JetBrains Mono",monospace}
+  .kante{stroke:rgba(201,168,76,.35);stroke-width:2;fill:none;stroke-dasharray:6 6;animation:fluss 1.2s linear infinite}
+  @keyframes fluss{to{stroke-dashoffset:-12}}
+  .kante.nein{stroke:rgba(184,98,92,.55)}
+  .hier rect{stroke:var(--gruen) !important;stroke-width:2.4 !important}
+  .hier-tag{fill:var(--gruen);font:600 10px "JetBrains Mono",monospace}
+  .erkl{padding:14px 16px}
+  .erkl h3{font:600 16px "Space Grotesk",sans-serif;margin:0 0 6px}
+  .erkl .was{font:500 11px "JetBrains Mono",monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin-top:10px}
+  .erkl ul{margin:4px 0 0;padding-left:18px}
+  .erkl .hin{margin-top:12px;border:1px solid var(--gold);background:var(--ob2);color:var(--gold-hi);border-radius:9px;padding:8px 12px;font:600 12.5px Inter,sans-serif;cursor:pointer}
+  .leiste{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .pille{padding:8px 12px;border-radius:10px;border:1px solid var(--linie);background:#fff;font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="kopf"><div class="in">
+  <div>
+    <div class="ue">Demo · neue Hilfe</div>
+    <h1>Tower — die Hilfe, die zu dir kommt</h1>
+    <p>Drück <kbd>?</kbd> oder <kbd>F1</kbd> — überall in der App. Der Pilot fliegt zu dem Feld, auf dem du gerade bist, erklärt es und beantwortet jede Frage. Darunter der Prozess-Atlas: alle Abläufe als animierter Netzplan.</p>
+  </div>
+</div></div>
+
+<main>
+  <h2>1 · Der Pilot auf Tastendruck</h2>
+  <p class="sub">Klick in ein Feld (oder fahr drüber) und drück <kbd>?</kbd>. Ohne Feld öffnet sich nur die Frage. Alles hier ist nachgebaut.</p>
+  <div class="karte">
+    <div class="app">
+      <div class="f"><label for="kp">Kaufpreis (€)</label><input id="kp" data-erkl="kp" value="250.000"></div>
+      <div class="f"><label for="hg_ul">Hausgeld umlagefähig / Jahr</label><input id="hg_ul" data-erkl="hg_ul" value="2.285"></div>
+      <div class="f"><label for="eigen_r">Eigene Instandhaltungsrücklage</label><input id="eigen_r" data-erkl="eigen_r" value="408"></div>
+      <div class="kpi" id="dscr" data-erkl="dscr" tabindex="0"><span>DSCR</span><b>1,18</b></div>
+    </div>
+  </div>
+
+  <h2>2 · Prozess-Atlas</h2>
+  <p class="sub">Jeder Ablauf als Netzplan. Klick eine Station — rechts steht, was man dort tut, was herauskommt und wie es weitergeht. Grün markiert: wo das geöffnete Beispielobjekt gerade steht.</p>
+  <div class="atlas-wahl" id="atlas-wahl"></div>
+  <div class="atlas">
+    <div class="netz"><svg id="netz" viewBox="0 0 760 360" role="img" aria-label="Netzplan"></svg></div>
+    <div class="karte erkl" id="erkl"></div>
+  </div>
+  <div class="leiste">
+    <div class="pille">Jede Station trägt ihre Quelle im Code — der Atlas wird von <b>prozesskarte-pruefen.mjs</b> gegengeprüft wie die Messe-Karte.</div>
+  </div>
+</main>
+
+<div id="pilot" title="Pilot rufen (? oder F1)">
+  <svg viewBox="0 0 64 64" aria-hidden="true">
+    <circle cx="32" cy="36" r="20" fill="#141210" stroke="#C9A84C" stroke-width="2"/>
+    <path d="M14 30c3-12 33-12 36 0" fill="#C9A84C"/>
+    <rect x="22" y="24" width="20" height="5" rx="2.5" fill="#E8CC7A"/>
+    <g class="blink" style="transform-origin:32px 37px"><circle cx="25.5" cy="37" r="2.6" fill="#FDFCFA"/><circle cx="38.5" cy="37" r="2.6" fill="#FDFCFA"/></g>
+    <path d="M26 45c3.5 3 8.5 3 12 0" stroke="#E8CC7A" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M6 40l10-3M58 40l-10-3" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+</div>
+<div id="tower" role="dialog" aria-label="Tower">
+  <div class="t-kopf"><span class="ue">Tower · Was liegt an?</span><kbd>Esc</kbd></div>
+  <div id="t-feld"></div>
+  <input id="t-frage" placeholder="Frag etwas — z. B. „wie friere ich den Ankauf ein?“" autocomplete="off">
+  <ul class="treffer" id="t-treffer"></ul>
+  <button class="frag" id="t-frag">Den Piloten fragen</button>
+  <div class="antwort" id="t-antwort"></div>
+  <div class="tipp">Sofort-Antworten kommen aus Hilfe, Feld-Erklärungen und Prozessen — ohne KI. „Den Piloten fragen“ nimmt die KI dazu.</div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  /* ── Wissensbasis (Ausschnitt) ─────────────────────────────────────── */
+  var FELDER = {
+    kp: { t: 'Kaufpreis', b: 'Der vereinbarte Preis ohne Nebenkosten. Grundlage für Rendite, Faktor, Beleihung und Grunderwerbsteuer.', fluss: 'fließt in → Bruttorendite · Faktor · LTV · Kaufnebenkosten' },
+    hg_ul: { t: 'Hausgeld umlagefähig', b: 'Der Teil des Hausgelds, den du über die Nebenkosten an den Mieter weitergibst — er belastet deinen Cashflow nicht. Ohne Wirtschaftsplan schlägt DealPilot ihn aus den Standardwerten je Objektart vor.', fluss: 'kommt aus → Standardwerte je Objektart · fließt in → Bewirtschaftung, Cashflow' },
+    eigen_r: { t: 'Eigene Instandhaltungsrücklage', b: 'Was du zusätzlich für das Sondereigentum zurücklegst — Bad, Küche, Böden. Bei Häusern steht hier die Instandhaltung nach ImmoWertV.', fluss: 'fließt in → nicht umlagefähige Kosten · Cashflow · DSCR' },
+    dscr: { t: 'DSCR — Schuldendienstdeckung', b: 'Jahresreinertrag geteilt durch Zins und Tilgung. 1,18 heißt: die Miete deckt den Kapitaldienst mit 18 % Luft. Banken verlangen meist 1,1 bis 1,3; deine Grenze steht im Investment-Profil.', fluss: 'kommt aus → Miete, Bewirtschaftung, Finanzierung' }
+  };
+  var WISSEN = [
+    { art: 'Ablauf', t: 'Ankauf einfrieren', b: 'Passiert von selbst, wenn du den Deal auf „gewonnen“ setzt und ein Nutzen-/Lastenwechsel eingetragen ist.', ziel: 'status' },
+    { art: 'Ablauf', t: 'Ist und Soll vergleichen', b: 'Oben im Objekt: Ist · heute | Soll · Ankauf-Stand. Das Soll ist gesperrt; der Haken gibt es frei.', ziel: null },
+    { art: 'Feld', t: 'Hausgeld umlagefähig', b: FELDER.hg_ul.b, ziel: 'hg_ul' },
+    { art: 'Feld', t: 'DSCR', b: FELDER.dscr.b, ziel: 'dscr' },
+    { art: 'Ablauf', t: 'Marktbericht Stufe 3 abrufen', b: 'Reiter Objekt → Box „Marktbericht abrufen“ → Ausgiebig · Stufe 3. Läuft im Hintergrund weiter, unten erscheint die Meldung.', ziel: null },
+    { art: 'Hilfe', t: 'Bewirtschaftung je Objektart', b: 'Einstellungen → Investment-Profil → Bewirtschaftung je Objektart. Werte nach ImmoWertV Anlage 3, zum Stichtag fortgeschrieben.', ziel: null },
+    { art: 'Ablauf', t: 'Steuerjahr abschließen', b: 'Steuerzeitraum anlegen → Belege einlesen → Werbungskosten prüfen → Anlage V erzeugen.', ziel: null },
+    { art: 'Glossar', t: 'LTV — Beleihungsauslauf', b: 'Darlehen geteilt durch Kaufpreis. 90 % heißt: 10 % Eigenkapital.', ziel: null }
+  ];
+  var pilot = document.getElementById('pilot'), tower = document.getElementById('tower');
+  var frage = document.getElementById('t-frage'), treffer = document.getElementById('t-treffer');
+  var feldBox = document.getElementById('t-feld'), antwort = document.getElementById('t-antwort');
+  var zuletzt = null;
+  document.addEventListener('mouseover', function (e) { var x = e.target.closest && e.target.closest('[data-erkl]'); if (x) zuletzt = x; });
+  document.addEventListener('focusin', function (e) { var x = e.target.closest && e.target.closest('[data-erkl]'); if (x) zuletzt = x; });
+
+  function fliegeZu(el) {
+    var r = el ? el.getBoundingClientRect() : { right: innerWidth - 120, top: innerHeight - 160, bottom: innerHeight - 100 };
+    var x = Math.min(innerWidth - 70, r.right + 10), y = Math.max(10, r.top - 64);
+    pilot.style.left = x + 'px'; pilot.style.top = y + 'px';
+    var tx = Math.min(innerWidth - tower.offsetWidth - 16, Math.max(16, x - 380)), ty = Math.min(innerHeight - 420, y + 70);
+    tower.style.left = Math.max(16, tx) + 'px'; tower.style.top = Math.max(16, ty) + 'px';
+  }
+  function oeffnen() {
+    document.querySelectorAll('.spot').forEach(function (x) { x.classList.remove('spot'); });
+    var el = zuletzt, f = el && FELDER[el.getAttribute('data-erkl')];
+    feldBox.innerHTML = f ? '<div class="feldkarte"><div class="tt">' + f.t + '</div><p>' + f.b + '</p><div class="fluss">' + f.fluss + '</div></div>' : '';
+    if (el && f) el.classList.add('spot');
+    tower.classList.add('an'); antwort.style.display = 'none'; frage.value = ''; suchen('');
+    fliegeZu(f ? el : null);
+    setTimeout(function () { frage.focus(); }, 60);
+  }
+  function schliessen() { tower.classList.remove('an'); document.querySelectorAll('.spot').forEach(function (x) { x.classList.remove('spot'); });
+    pilot.style.left = 'calc(100vw - 90px)'; pilot.style.top = 'calc(100vh - 100px)'; }
+  function suchen(q) {
+    q = q.trim().toLowerCase();
+    var liste = q.length < 2 ? WISSEN.slice(0, 4) : WISSEN.filter(function (w) { return (w.t + ' ' + w.b).toLowerCase().indexOf(q) >= 0 || q.split(/\s+/).every(function (s) { return (w.t + ' ' + w.b).toLowerCase().indexOf(s) >= 0; }); });
+    treffer.innerHTML = liste.map(function (w, i) { return '<li data-i="' + WISSEN.indexOf(w) + '"><span class="art">' + w.art + '</span><span class="tx"><b>' + w.t + '</b><span>' + w.b + '</span></span></li>'; }).join('')
+      || '<li><span class="tx"><span>Nichts Passendes in Hilfe, Feldern und Abläufen — frag den Piloten.</span></span></li>';
+  }
+  document.addEventListener('keydown', function (e) {
+    var tippt = /INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || '') && document.activeElement !== frage;
+    if (e.key === 'F1' || (e.key === '?' && !tippt)) { e.preventDefault(); oeffnen(); }
+    else if (e.key === 'Escape' && tower.classList.contains('an')) schliessen();
+  });
+  pilot.addEventListener('click', oeffnen);
+  frage.addEventListener('input', function () { suchen(frage.value); antwort.style.display = 'none'; });
+  treffer.addEventListener('click', function (e) {
+    var li = e.target.closest('li[data-i]'); if (!li) return;
+    var w = WISSEN[+li.getAttribute('data-i')];
+    antwort.style.display = 'block';
+    antwort.innerHTML = '<b>' + w.t + '</b><br>' + w.b + (w.ziel ? '<br><button class="zeig" data-ziel="' + w.ziel + '">Zeig’s mir →</button>' : '');
+  });
+  document.getElementById('t-frag').addEventListener('click', function () {
+    var q = frage.value.trim() || 'Was ist hier wichtig?';
+    antwort.style.display = 'block';
+    antwort.innerHTML = '<span style="color:#9a917e">Pilot denkt …</span>';
+    setTimeout(function () {
+      antwort.innerHTML = '<b>Beispielantwort</b> (in der App beantwortet die KI mit Hilfe, Feld-Erklärungen und Abläufen als Wissen):<br>'
+        + 'Zu „' + q.replace(/</g, '&lt;') + '“: Den Ankauf-Stand friert DealPilot ein, sobald das Objekt auf „gewonnen“ steht und der Nutzen-/Lastenwechsel eingetragen ist. Danach findest du ihn oben im Objekt unter „Soll · Ankauf-Stand“.'
+        + '<br><button class="zeig" data-ziel="dscr">Zeig’s mir →</button>';
+    }, 900);
+  });
+  antwort.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-ziel]'); if (!b) return;
+    var z = b.getAttribute('data-ziel');
+    if (z === 'status') { schliessen(); waehle('deal'); markiere('gewonnen'); document.getElementById('netz').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    var el = document.querySelector('[data-erkl="' + z + '"]'); if (!el) return;
+    document.querySelectorAll('.spot').forEach(function (x) { x.classList.remove('spot'); });
+    el.classList.add('spot'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); fliegeZu(el);
+  });
+
+  /* ── Prozess-Atlas ─────────────────────────────────────────────────── */
+  var ATLAS = {
+    haupt: { name: 'Von der Adresse zum Bestand', hier: 'bestand2', knoten: [
+      ['qc1', 30, 40, 'Adresse eintragen', 'Quick-Check', 'Objekt, Preis und Miete — die Adresse genügt, um die Lage zu holen.', ['Bodenrichtwert', 'Lagebewertung', 'erste Kennzahlen']],
+      ['qc2', 280, 40, 'Marktpreis einholen', 'Stufe 1', 'Marktpreisindikation mit Ober- und Untergrenze, dazu die Miete je m².', ['Marktwert mit Spanne', 'Miete je m²', 'Vertrauensgrad']],
+      ['qc3', 530, 40, 'Score lesen', 'Entscheidung', 'Investor Deal Score: Sehr gut ab 85 · Gut ab 70 · Solide ab 50 · Schwach ab 35 · Kritisch darunter.', ['weiterverfolgen?']],
+      ['an1', 30, 160, 'Datenaufnahme', 'Etappen 1–6', 'Vom Groben zum Feinen — je nach Eingabetiefe 6, 13 oder bis 20 Pflichtangaben.', ['DSCR', 'Cashflow n. St.', 'LTV', 'Rendite']],
+      ['an2', 280, 160, 'Wert ermitteln', 'Stufe 3', 'Wertermittlung nach ImmoWertV mit den Zahlen des zuständigen Gutachterausschusses.', ['Bodenwert', 'Ertragswert', 'Sachwert']],
+      ['an3', 530, 160, 'Bereit für die Bank', 'Bankexport', 'Readiness-Ring, Bank-PDF, Selbstauskunft.', ['Bank-PDF', 'Finanzierungsanfrage']],
+      ['bestand1', 30, 280, 'Ankauf einfrieren', 'bei „gewonnen“', 'Der Stand zum Nutzen-/Lastenwechsel wird festgeschrieben — das Soll.', ['Ankauf-Stand mit Datum']],
+      ['bestand2', 280, 280, 'Wert fortschreiben', 'Ist · heute', 'Im Bestand pflegst du Mieten, Kosten und Verträge — das Ist. Soll/Ist zeigt die Abweichung.', ['Soll/Ist-Abgleich']],
+      ['bestand3', 530, 280, 'Portfolio steuern', 'Cockpit', 'Alle Objekte zusammen: Cashflow, Vermögen, Pilot-Analyse des Portfolios.', ['Portfolio-Cockpit']]],
+      kanten: [['qc1', 'qc2'], ['qc2', 'qc3'], ['qc3', 'an1'], ['an1', 'an2'], ['an2', 'an3'], ['an3', 'bestand1'], ['bestand1', 'bestand2'], ['bestand2', 'bestand3']] },
+    deal: { name: 'Deal-Status bis gewonnen', hier: 'gewonnen', knoten: [
+      ['offen', 40, 150, 'Offen', 'in der Akquise', 'Jedes neue Objekt startet offen — es steht unter „Ankauf“ in der Liste.', ['Liste: Ankauf']],
+      ['angebot', 270, 70, 'Angebot / Verhandlung', 'Deal-Aktion', 'Pilot-Analyse, Verhandlungsspanne, Offerte per Mail.', ['Offerte', 'Zielkaufpreis']],
+      ['gewonnen', 500, 70, 'Gewonnen', 'Zuschlag', 'Setzt den Ankauf-Stand zum Nutzen-/Lastenwechsel — das Objekt wandert in den Bestand.', ['Ankauf-Stand', 'Liste: Bestand']],
+      ['verloren', 500, 230, 'Verloren', 'abgesagt', 'Bleibt ausgegraut am Ende der Ankauf-Liste — mit allen Zahlen für später.', ['ausgegraut in Ankauf']]],
+      kanten: [['offen', 'angebot'], ['angebot', 'gewonnen'], ['angebot', 'verloren', 'nein']] },
+    steuer: { name: 'Das Steuerjahr', hier: null, knoten: [
+      ['s1', 30, 150, 'Ankauf einfrieren', 'Basis', 'Kaufpreisaufteilung Boden/Gebäude und AfA-Basis stehen fest.', ['AfA-Bemessungsgrundlage']],
+      ['s2', 210, 150, 'Steuerzeitraum anlegen', 'Reiter Steuer', 'Ein Jahr je Objekt, mit Einnahmen und Kosten.', ['Steuerzeitraum']],
+      ['s3', 390, 150, 'Belege einlesen', 'Werbungskosten', 'Hausgeld- und Nebenkostenabrechnung, Rechnungen — automatisch zugeordnet.', ['Werbungskosten je Kategorie']],
+      ['s4', 570, 150, 'Anlage V', 'Abschluss', 'Anlage V und Werbungskosten-PDF für den Steuerberater.', ['Anlage V', 'Werbungskosten-PDF']]],
+      kanten: [['s1', 's2'], ['s2', 's3'], ['s3', 's4']] },
+    mb: { name: 'Marktbericht-Stufen', hier: null, knoten: [
+      ['m1', 40, 150, 'Stufe 1', 'Marktpreisindikation', 'Adresse, Objektart, Fläche, Baujahr → Marktwert mit Spanne, Lage-Scores.', ['Marktwert', 'Mikro-/Makrolage']],
+      ['m2', 290, 150, 'Stufe 2', 'erweiterte Indikation', 'Dazu Kaufpreis, Miete, Zustand, Energie, Ausstattung → Rendite, Abschlag zum Markt.', ['Rendite', 'Abschlag']],
+      ['m3', 540, 150, 'Stufe 3', 'Wertermittlung', 'Boden-, Ertrags- und Sachwert mit amtlichem Zins und Sachwertfaktor, Quellennachweis.', ['Verkehrswert-Indikation', 'Quellennachweis']]],
+      kanten: [['m1', 'm2'], ['m2', 'm3']] }
+  };
+  var aktuell = 'haupt', auswahl = null;
+  function waehle(id) {
+    aktuell = id; auswahl = null;
+    document.getElementById('atlas-wahl').innerHTML = Object.keys(ATLAS).map(function (k) { return '<button data-a="' + k + '"' + (k === id ? ' class="an"' : '') + '>' + ATLAS[k].name + '</button>'; }).join('');
+    zeichne();
+  }
+  function zeichne() {
+    var A = ATLAS[aktuell], byId = {}; A.knoten.forEach(function (k) { byId[k[0]] = k; });
+    var W = 200, H = 58, svg = '';
+    A.kanten.forEach(function (k, i) {
+      var a = byId[k[0]], b = byId[k[1]];
+      var x1 = a[1] + W, y1 = a[2] + H / 2, x2 = b[1], y2 = b[2] + H / 2;
+      if (b[1] <= a[1]) { x1 = a[1] + W / 2; y1 = a[2] + H; x2 = b[1] + W / 2; y2 = b[2]; }
+      var d = 'M' + x1 + ' ' + y1 + ' C' + (x1 + 40) + ' ' + y1 + ',' + (x2 - 40) + ' ' + y2 + ',' + x2 + ' ' + y2;
+      svg += '<path id="kante' + i + '" class="kante' + (k[2] ? ' nein' : '') + '" d="' + d + '"/>';
+    });
+    A.knoten.forEach(function (k) {
+      var hier = A.hier === k[0];
+      svg += '<g class="knoten' + (hier ? ' hier' : '') + (auswahl === k[0] ? ' an' : '') + '" data-k="' + k[0] + '" transform="translate(' + k[1] + ',' + k[2] + ')">'
+        + '<rect width="' + W + '" height="' + H + '" rx="12"/>'
+        + '<text x="14" y="25">' + k[3] + '</text><text class="k2" x="14" y="43">' + k[4] + '</text>'
+        + (hier ? '<text class="hier-tag" x="' + (W - 12) + '" y="-6" text-anchor="end">DU BIST HIER</text>' : '') + '</g>';
+    });
+    /* das Flugzeug fliegt die Kanten nacheinander ab */
+    var pfad = A.kanten.filter(function (k) { return !k[2]; }).map(function (k, i) { return A.kanten.indexOf(k); });
+    svg += '<g id="flieger"><path d="M-10 -4 L10 0 L-10 4 L-6 0 Z" fill="#E8CC7A"/>'
+      + '<animateMotion dur="' + (pfad.length * 1.6) + 's" repeatCount="indefinite" rotate="auto" path="' + pfad.map(function (i) {
+        var k = A.kanten[i], a = byId[k[0]], b = byId[k[1]];
+        var x1 = a[1] + W, y1 = a[2] + H / 2, x2 = b[1], y2 = b[2] + H / 2;
+        if (b[1] <= a[1]) { x1 = a[1] + W / 2; y1 = a[2] + H; x2 = b[1] + W / 2; y2 = b[2]; }
+        return 'M' + x1 + ' ' + y1 + ' C' + (x1 + 40) + ' ' + y1 + ',' + (x2 - 40) + ' ' + y2 + ',' + x2 + ' ' + y2;
+      }).join(' ') + '"/></g>';
+    document.getElementById('netz').innerHTML = svg;
+    erklaere(auswahl || A.hier || A.knoten[0][0]);
+  }
+  function erklaere(id) {
+    var A = ATLAS[aktuell], k = A.knoten.filter(function (x) { return x[0] === id; })[0]; if (!k) return;
+    var i = A.knoten.indexOf(k), next = A.kanten.filter(function (e) { return e[0] === id; }).map(function (e) { return A.knoten.filter(function (x) { return x[0] === e[1]; })[0][3]; });
+    document.getElementById('erkl').innerHTML = '<div class="ue" style="color:#b8932f">' + A.name + ' · Station ' + (i + 1) + '</div><h3>' + k[3] + '</h3><div>' + k[5] + '</div>'
+      + '<div class="was">Was dabei herauskommt</div><ul>' + k[6].map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>'
+      + (next.length ? '<div class="was">Wie es weitergeht</div><div>' + next.join(' · ') + '</div>' : '')
+      + '<button class="hin">Hinfliegen — in der App öffnen</button>';
+  }
+  function markiere(id) { auswahl = id; zeichne(); }
+  document.getElementById('atlas-wahl').addEventListener('click', function (e) { var b = e.target.closest('[data-a]'); if (b) waehle(b.getAttribute('data-a')); });
+  document.getElementById('netz').addEventListener('click', function (e) { var g = e.target.closest('[data-k]'); if (g) markiere(g.getAttribute('data-k')); });
+  waehle('haupt');
+})();
+</script>
+</body>
+</html>

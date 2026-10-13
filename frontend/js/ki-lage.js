@@ -58,7 +58,7 @@ function _lageVergleichHtml(m, ki) {
 function _lageCss() {
   if (document.getElementById('ki-lage-v2175-css')) return;
   var st = document.createElement('style'); st.id = 'ki-lage-v2175-css';
-  st.textContent = '.ki-lage-vergleich{margin:0 0 14px;padding:12px 14px;border:1px solid rgba(201,168,76,.35);border-radius:12px}'
+  st.textContent = '.ki-lage-vergleich{margin:0 0 14px;padding:12px 14px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);border-radius:12px}'
     + '.lv-kopf{font:600 11px/1.4 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);margin-bottom:8px}'
     + '.lv-tab{width:100%;border-collapse:collapse;font-size:12.5px}.lv-tab th{text-align:left;font:500 10.5px/1.3 "JetBrains Mono",monospace;color:#8b8678;padding:4px 6px;border-bottom:1px solid rgba(140,134,120,.3)}'
     + '.lv-tab td{padding:6px;border-bottom:1px solid rgba(140,134,120,.15);vertical-align:top}.lv-tab tr{cursor:help}'
@@ -440,11 +440,11 @@ window.runKiLage = runKiLage;
       borderColor = 'rgba(63, 165, 108, 0.35)';
       textColor = '#2a6e48';
     } else if (cls === 'medium') {
-      bgColor = 'rgba(201, 168, 76, 0.08)';
-      borderColor = 'rgba(201, 168, 76, 0.35)';
+      bgColor = 'color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent)';
+      borderColor = 'color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent)';
       textColor = '#8b7330';
     } else {
-      bgColor = 'rgba(201, 168, 76, 0.06)';
+      bgColor = 'color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 6%, transparent)';
       borderColor = 'rgba(0, 0, 0, 0.10)';
       textColor = '#5f5e5a';
     }

@@ -64,6 +64,8 @@ zehn Punkten standen überhaupt nicht drin, vier nur teilweise.**
 
 #### N62.1 · Die Tour muss in allen vier Ansichten laufen
 
+> **✅ laut Commit gebaut: v2154 (6c7ecb51)** — im Backlog nicht abgehakt gewesen (Aufräumen 13.10.2026). Abnahme bei sichtbarem Fenster steht in N62.20.
+
 **Marcel:** *„prinzipiell möchte ich einmal, dass die Tour, die hier
 gemacht wird, wenn man sich neu anmeldet, auch bei der Aktenmappe, beim
 Tower und auch bei der Kanzleiansicht funktioniert. Das müssten wir einmal
@@ -75,6 +77,8 @@ in der Kanzlei (Schritt 6) ist mit `v1774` behoben, offen sind B1 (Spot
 außerhalb des Bildschirms), B2 (kein Spot) und Schritt 24.
 
 #### N62.2 · Kanzlei: der Bestand/Ankauf-Schalter gehört höher und sieht fremd aus
+
+> **✅ laut Commit gebaut: v2154 (6c7ecb51)** — Stand-Schalter über der Suche (Aufräumen 13.10.2026).
 
 **Marcel:** *„Wir haben den Buchschalter in die App gepackt bei der
 Kanzlei. Der sollte aber bitte über die Suche, also zwischen dann der
@@ -90,6 +94,8 @@ Bauen im Browser messen**, was die Suche und die Aktionsknöpfe dort
 wirklich tragen (Rahmenfarbe, Höhe, Schriftgröße, Ausrichtung).
 
 #### N62.3 · Pilot-Analyse: alles muss einfließen, und die Kategorien müssen tragen
+
+> **✅ laut Commit gebaut: v2156 (75e9c6c0)** — MFH-Felder, Rohcodes, Liegenschaftszins in der Pilot-Analyse (Aufräumen 13.10.2026).
 
 **Marcel:** *„dass wir einmal schauen, ob generell alle Daten, also auch
 aus den Mehrfamilienhäusern, aus dem Konfigurator, die Daten aus dem
@@ -150,6 +156,45 @@ gegenübergestellt werden sie nirgends.
 > Konto anlegen; danach lässt sich die Kreisdatei (~400 Kreise:
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
+
+#### N62.22 · Neue Hilfe: Pilot auf F1/?, Prozess-Atlas, Hilfe überarbeitet
+
+
+**✅ v2189–v2189f (Staging):**
+- Kapitäns-Figur (`pilot-figur.js`) in Tower und Atlas, der Atlas-Kapitän mit Koffer.
+- Ort des Piloten unter Einstellungen → Darstellung.
+- Sofort-Antwort beim Tippen, Fragen gehen automatisch an die KI.
+- Wortsuche mit Synonymen.
+- Hilfe vertieft (20 Themen, 152 Abschnitte).
+- Handy umgebaut, in der Messkabine gemessen.
+- Quick-Check-Sprung nach offenem Marktbericht behoben.
+- Freigeben liegt über den Quellen.
+
+**Offen, neu:**
+- Straße und Hausnummer im Quick-Check waren NIE Pflicht (`quickcheck-app.html:3803`, `required:false` seit V326). Marcel entscheidet. Achtung: Inserate ohne veröffentlichte Hausnummer gibt es (v1999 ImmoMetrica).
+- Fehlerverdacht aus der Hilfe-Erhebung, nicht nachgemessen:
+  1. Quick-Check-Balken lesen `sub-sicherheit`/`sub-finanzierung`/`sub-effizienz`, die es nicht gibt (`quickcheck-app.html:6901/6972`).
+  2. Eigene Score-Regler wirken nur beim Profil „custom“, Starter erreichen es nicht (`dealscore.js:61-77`).
+  3. Marktbericht aus dem Reiter Objekt ohne `bwk_modus: 'normiert'` nimmt die 23-%-Pauschale (`CrossCheckService.js:971`).
+  4. Der Hinweis nach „als Verkehrswert übernehmen“ zeigt `h.market_value` statt `h.wert` (`objekt-reiter.js:953`).
+  5. Der Export schreibt `.dpkt`, der JSON-Import nimmt nur `.json` an (`storage.js:2580`).
+  6. „TOP“ in `dashboard.js:452`.
+  7. „wird in Stufe 2 aktiv“ in `mandanten.js:705`.
+  8. Kein sichtbarer Speichern-Knopf, die Anzeige sagt englisch „Auto-saved“.
+  9. Der Hinweis nach dem Wechsel in den Hintergrund sagt „unten links“, die Pille sitzt unten mittig (`mb-auftrag.js:247`).
+  10. Liegenschaftszins ohne amtlichen Wert → gesetzlicher Auffangwert § 256 BewG als Stufe D, Sachwertfaktor 1,0 vorläufig (`WertParameterService.js:434-449`). Verträgt sich das mit „kein Treffer heißt kein Wert“? Bewertungsfrage an Marcel. **Entschieden 13.10.2026: C — so lassen** („es steht ja dran und gibt eine Orientierung“).
+
+**✅ GEBAUT 13.10.2026 · v2187 Demo, v2188–v2188b · 49d5e942 / 08c00feb / fe24f5bb (Staging, Prod offen).** Marcel: „etwas total Abgefahrenes … einen kleinen animierten Piloten … über einen Hotkey“, danach „granularer, besser animiert, Wow-Effekt … der Pilot muss ein kleines Pilot-Männchen sein“.
+- `js/pilot-tower.js`: Pilot-Männchen (Kappe, Fliegerbrille, Schal), F1 überall bzw. ? außerhalb von Feldern. Er erklärt das Feld unter dem Cursor mit dem Text der Hover-Hilfe. Sofort-Treffer ohne KI aus 89 Feld-Erklärungen, Hilfe-Themen, 47 Atlas-Stationen und Aktionen. „Den Piloten fragen“ an `/ai/copilot` mit Hilfe-Auszug (`payload.hilfe`). Brücke im Quick-Check- und Marktbericht-iframe.
+- `js/prozess-atlas.js`: 7 Abläufe (Reise, Quick-Check, Netzplan Datenaufnahme, Deal bis gewonnen, Steuerjahr, Marktbericht, Scores). Klick auf eine Station klappt die Schritte auf, Eingaben und Ergebnisse fliegen ein, Gewichte wachsen; dazu „Ablauf abspielen“, „Du bist hier“ und „Hinfliegen“. `tools/prozess-atlas-pruefen.mjs`: 47/47 Belege im Code, Gewichte, Schwellen und Etappen gegen die Kerne, RC=0.
+- `help.js`: Themen „Abläufe & Pilot“ und „Bestand: Soll und Ist“. Score-Stufen 85/70/50/35 statt 80/60/40, keine Anbieternamen, „Kontingent“, Schnellstart neu.
+- v2188a: gold-audit war rot (`rgba(201,168,76,…)` färbt sich beim Mandanten nicht um) — neun Dateien auf `color-mix(… var(--wl-c9a84c …))`, RC=0.
+
+**Offen:**
+1. Sichtabnahme bei SICHTBAREM Fenster (Animationen laufen im Hintergrund-Tab nicht), Handy 390 px (Tower als Bodenblatt, Atlas einspaltig).
+2. Marcel: „im Quickcheck ist unten ein Soll/Ist-Umschalter“. Gemessen ohne geöffnetes Objekt: im Quick-Check-Dokument steht weder „Soll“ noch „Ist“. Sichtbar ist links „Stand: Bestand | Ankauf“. Welche Stelle gemeint ist, muss Marcel zeigen.
+3. Quick-Check soll die eigenen Tabellen nutzen (Makro, Zensus, Register), wo direkter Zugriff besteht — Marcel 13.10.2026. Erst messen, was der QC-Abruf heute liest.
+4. Prod nach Freigabe (Frontend + Backend-Rebuild wegen `openaiService`).
 
 #### N62.21 · Marktbericht: Bewirtschaftungskosten im Ertragswert nicht fortgeschrieben (Bewertungsfrage an Marcel)
 
@@ -348,6 +393,8 @@ Berichte → Marktbericht-Strang, vor dem Bauen mit Marcel abstimmen.**
 In die Pilot-Analyse gehen die Teilwerte seit `v2157` bewusst **nicht**.
 
 #### N62.5 · Ein eigener Reiter „Quellen" in der Pilot-Analyse
+
+> **ÜBERHOLT:** gebaut in v2155, danach auf Marcels Wunsch (13.10.2026: „nur unter der Pilot-Analyse fällt der Reiter Quellen weg“) in v2171 wieder herausgenommen.
 
 **Marcel:** *„Wir brauchen dann extra Reiter auch nochmal für die Quellen,
 dass wir wirklich nochmal alle Quellen, die wir gesagt, die wir angeben,

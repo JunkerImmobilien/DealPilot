@@ -80,7 +80,7 @@
       '#dp-mba li{font-size:12.5px;color:#7d776c;display:flex;gap:7px;align-items:center}',
       '#dp-mba li.ok{color:#E8E2D4}#dp-mba li .p{width:14px;flex:0 0 14px;text-align:center}',
       '#dp-mba li.ok .p{color:#3FA56C}#dp-mba li.jetzt .p{color:var(--wl-c9a84c, #C9A84C)}',
-      '#dp-mba .warte{margin:-4px 0 12px;padding:8px 11px;border-radius:9px;background:rgba(201,168,76,.12);color:var(--wl-e8cc7a, #E8CC7A);font-size:12.5px}',
+      '#dp-mba .warte{margin:-4px 0 12px;padding:8px 11px;border-radius:9px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);color:var(--wl-e8cc7a, #E8CC7A);font-size:12.5px}',
       '#dp-mba .fe{margin:0 0 12px;padding:9px 12px;border-radius:9px;background:rgba(184,98,92,.18);color:#F0B4AE;font-size:12.5px}',
       '#dp-mba .fu{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}',
       '#dp-mba .hi{color:#8b8678;font-size:11.5px;flex:1 1 180px}',
@@ -92,7 +92,7 @@
       '#dp-mba-pille button b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '#dp-mba-pille button.fertig{border-color:#3FA56C}',
       '#dp-mba-pille button.fehler{border-color:#B8625C}',
-      '#dp-mba-pille .dreh{width:12px;height:12px;flex:0 0 12px;border:2px solid rgba(201,168,76,.3);border-top-color:var(--wl-c9a84c, #C9A84C);border-radius:50%;animation:dpmbadreh .8s linear infinite}',
+      '#dp-mba-pille .dreh{width:12px;height:12px;flex:0 0 12px;border:2px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);border-top-color:var(--wl-c9a84c, #C9A84C);border-radius:50%;animation:dpmbadreh .8s linear infinite}',
       '@keyframes dpmbadreh{to{transform:rotate(360deg)}}'
     ].join('');
     document.head.appendChild(st);
