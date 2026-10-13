@@ -733,7 +733,8 @@ router.get('/zensus/objekt', async (req, res) => {
 router.get('/lage/gemessen', async (req, res) => {
   try {
     const plz = String(req.query.plz || '').trim();
-    if (!/^d{5}$/.test(plz) && !req.query.adresse) return res.status(400).json({ error: 'plz_fehlt' });
+    /* v2175b: hier stand /^d{5}$/ - der Backslash ging im Erzeugerskript verloren */
+    if (!/^\d{5}$/.test(plz) && !req.query.adresse) return res.status(400).json({ error: 'plz_fehlt' });
     res.json(await messeLage({ adresse: req.query.adresse || null, plz: plz || null, ort: req.query.ort || null }));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
