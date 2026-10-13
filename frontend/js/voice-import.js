@@ -2315,6 +2315,8 @@
      mitten im Satz der Puffer verloren. */
   function _fsHoeren(neu) {
     if (!_fs.an || !_fs.stream || !_fs.rec) return;
+    /* v2204 · N63.9: auf kleinen Bildschirmen nur, solange gedrueckt wird */
+    if (_fsPtt() && !_fs.halten) { _fsPttRuhe(); return; }
     if (_fs.pause) return;   /* v1381: angehalten heisst angehalten */
     if (!neu && (_fs.phase === 'warte' || _fs.phase === 'spricht' || _fs.phase === 'rauschen')) return;
     if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; }
@@ -2376,6 +2378,104 @@
     }, 80);
   }
 
+  /* ═══════════════════════════════════════════════════════
+     v2204 · N63.9 · HALTEN ZUM SPRECHEN AUF KLEINEN BILDSCHIRMEN
+     ═══════════════════════════════════════════════════════
+     Marcel, 13.10.2026: „den Lautsprecher [= das Mikrofon] … so darstellen
+     wie bei WhatsApp … dass man dann den Lautsprecher halten muss. Dann
+     koennen wir uns dieses ganze Kaestchen ‚Ich höre nichts, du kannst auch
+     tippen' und das Anhalten sparen." Gemeint: die geführte Eingabe auf dem
+     Handy / kleinen Bildschirmen (Messkabine). Am Schreibtisch bleibt das
+     automatische Zuhören.
+
+     Unter 769 px ist der ganze Mikrofonkasten eine Halte-Flaeche. Gebaut auf
+     der Pause-Mechanik aus v1381: in Ruhe steht `_fs.pause` — damit hoert
+     weder `_fsHoeren` (30 Aufrufstellen) noch der Waechter (v1121) von
+     selbst zu. Druecken hebt die Pause auf und beginnt einen Abschnitt,
+     Loslassen schliesst ihn ueber `_fsAbschnittFertig` ab (dieselbe
+     Auswertung wie beim Freisprechen); deren `_fsHoeren(true)` fuehrt
+     zurueck in die Ruhe. Die Sprechzeit ist die Haltezeit — eine
+     Pegel-Erkennung braucht es nicht, wer haelt, spricht. */
+  function _fsPtt() {
+    try { return window.matchMedia('(max-width: 768px)').matches; } catch (e) { return false; }
+  }
+  function _fsPttRuhe() {
+    if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; }
+    _fs.phase = '';
+    _fs.pause = true;
+    try { if (_fs.rec && _fs.rec.state === 'recording') _fs.rec.pause(); } catch (e) {}
+    try { (_fs.stream ? _fs.stream.getAudioTracks() : []).forEach(function (t) { t.enabled = false; }); } catch (e) {}
+    try { _fsPegelZeigen(0); } catch (e) {}
+    try { _rfZustandSetzen(null); } catch (e) {}
+    var k = $('vi-rf-mikro'); if (k) { k.classList.remove('taub'); k.classList.remove('halt'); k.classList.remove('haelt'); }
+    _fsHinweis(_fs.rest ? 'Halte noch einmal gedrückt und sag den Rest.' : 'Halte gedrückt und sprich.');
+    var sub = $('vi-rf-mikro-sub'); if (sub) sub.textContent = 'Loslassen schickt ab — oder tipp unten.';
+  }
+  function _fsPttDruck(ev) {
+    if (!_fsPtt() || !_fs.an || !_rf) return;
+    try { if (ev) ev.preventDefault(); } catch (e) {}
+    _fs.halten = true;
+    var los = function () {
+      if (!_fs.halten || !_fs.rec) return;
+      _fs.pause = false;
+      try { (_fs.stream ? _fs.stream.getAudioTracks() : []).forEach(function (t) { t.enabled = true; }); } catch (e) {}
+      try {
+        if (_fs.rec.state === 'paused') _fs.rec.resume();
+        else if (_fs.rec.state === 'inactive') { _fs.kopf = null; _fs.rec.start(FS_SCHEIBE_MS); _fs.aufnahme = true; }
+      } catch (e) {}
+      try { if (_fs.ctx && _fs.ctx.state === 'suspended') _fs.ctx.resume(); } catch (e) {}
+      _fs.chunks = [];
+      _fs.phase = 'spricht'; _fs.t0 = Date.now(); _fs.tPtt = _fs.t0; _fs.sprechMs = 0;
+      var k = $('vi-rf-mikro'); if (k) k.classList.add('haelt');
+      _fsHinweis('Ich höre dich …');
+      var sub = $('vi-rf-mikro-sub'); if (sub) sub.textContent = 'Loslassen, wenn du fertig bist.';
+      if (_fs.uhr) clearInterval(_fs.uhr);
+      _fs.uhr = setInterval(function () {
+        try { _fsPegelZeigen(_fsPegel()); _rfZustandSetzen(null); } catch (e) {}
+        if (Date.now() - _fs.t0 > FS_MAX_MS) _fsPttLos();   /* Notbremse wie beim Freisprechen */
+      }, 80);
+    };
+    if (_fs.stream) los();
+    else _fsStart().then(function (ok) { if (ok) los(); else _fs.halten = false; });
+  }
+  function _fsPttLos() {
+    if (!_fs.halten) return;
+    _fs.halten = false;
+    var k = $('vi-rf-mikro'); if (k) k.classList.remove('haelt');
+    if (_fs.phase !== 'spricht') { _fsPttRuhe(); return; }
+    _fs.sprechMs = Date.now() - (_fs.tPtt || Date.now());
+    _fsAbschnittFertig();   /* wertet aus; ihr _fsHoeren(true) fuehrt in die Ruhe */
+    if (!_fs.rec || _fs.rec.state !== 'recording') _fsPttRuhe();
+  }
+  /* Einmal je Dialog: Klasse + Halte-Handler am Mikrofonkasten. */
+  function _fsPttEinrichten() {
+    var k = $('vi-rf-mikro'); if (!k) return;
+    if (!document.getElementById('vi-ptt-css')) {
+      var st = document.createElement('style'); st.id = 'vi-ptt-css';
+      st.textContent = '@media (max-width:768px){'
+        + '#vi-rf-mikro.ptt{cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;min-height:56px}'
+        + '#vi-rf-mikro.ptt .vi-rf-halt{display:none !important}'
+        + '#vi-rf-mikro.ptt .vi-rf-mikro-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;'
+        +   'background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));flex:0 0 auto;transition:transform .15s}'
+        + '#vi-rf-mikro.ptt.haelt .vi-rf-mikro-icon{transform:scale(1.18);background:#3FA56C;box-shadow:0 0 0 6px rgba(63,165,108,.25)}'
+        + '#vi-rf-mikro.ptt.haelt{border-color:#3FA56C !important}'
+        + '}';
+      document.head.appendChild(st);
+    }
+    k.classList.toggle('ptt', _fsPtt());
+    if (k._ptt) return;
+    k._ptt = 1;
+    k.addEventListener('pointerdown', function (ev) {
+      if (!_fsPtt() || (ev.target && ev.target.closest && ev.target.closest('.vi-rf-halt'))) return;
+      try { k.setPointerCapture(ev.pointerId); } catch (e) {}
+      _fsPttDruck(ev);
+    });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (n) {
+      k.addEventListener(n, function () { if (_fsPtt()) _fsPttLos(); });
+    });
+    k.addEventListener('contextmenu', function (ev) { if (_fsPtt()) ev.preventDefault(); });
+    if (_fsPtt() && _fs.stream) _fsPttRuhe();
+  }
   function _fsStopHoeren() {
     if (_fs.uhr) { clearInterval(_fs.uhr); _fs.uhr = null; }
     _fs.phase = '';
@@ -7401,8 +7501,16 @@
               return a.art === 'markt' || a.art === 'markt2'
                   || a.art === 'brw' || a.art === 'lage';
             }).length;
-            if (!holbar) return '';
-            return '<button type="button" class="vi-dran-btn nein" data-akt="ueberspringen"' +
+            /* v2204 · N63.7 · Marcel: „Erklär mir das … würde ich gerne auch
+               wegxen können … ‚Nicht mehr anzeigen'". × blendet es für diese
+               Frage aus, „Nicht mehr anzeigen“ merkt es sich im Konto. */
+            var erkl = akt.some(function (a) { return a.art === 'erklaer'; });
+            var wegHtml = erkl
+              ? '<button type="button" class="vi-dran-btn nein" data-akt="erklaer_weg" title="Für diese Frage ausblenden" aria-label="Ausblenden"><b>×</b></button>'
+                + '<button type="button" class="vi-dran-btn nein" data-akt="erklaer_nie" title="Ich biete die Erklärung nicht mehr an. Fragen kannst du trotzdem jederzeit — oder in den Einstellungen wieder einschalten.">Nicht mehr anzeigen</button>'
+              : '';
+            if (!holbar) return wegHtml;
+            return wegHtml + '<button type="button" class="vi-dran-btn nein" data-akt="ueberspringen"' +
                    ' title="Ich frage im Lauf nicht noch einmal danach — holen kannst du es später jederzeit.">' +
                    '<b>×</b>Nein, überspringen</button>';
           })() +
@@ -7457,6 +7565,16 @@
     }
     /* v1115-WERK: die Erklaerung auf Abruf. */
     if (art === 'erklaer') { _rfErklaerZeigen(); return; }
+    /* v2204 · N63.7 */
+    if (art === 'erklaer_weg') { _rfAktionWeg('erklaer'); _rfDranZeichnen(); return; }
+    if (art === 'erklaer_nie') {
+      try { if (window.DpHinweise) DpHinweise.setze('erklaer', true); } catch (x) {}
+      _rfAktionWeg('erklaer');
+      _rfBlase('co', 'Alles klar — ich biete die Erklärung nicht mehr an. '
+        + 'Frag einfach „Erklär mir das“, wenn du sie doch brauchst; einschalten kannst du sie unter Einstellungen → Darstellung.');
+      _rfDranZeichnen();
+      return;
+    }
     if (art === 'adresse') {
       _rf.adresseFrage = 0;
       _rfBlase('ich', 'Ja, stimmt.');
@@ -9420,6 +9538,7 @@
     /* v1381 · Anhalten und Weiter. */
     $('vi-rf-halt').addEventListener('click', function () { _fsPauseUm(); });
     _fsPauseKnopf();
+    _fsPttEinrichten();   /* v2204 · N63.9 */
     /* v2049 - `#vi-rf-nix` gibt es nicht mehr; ein nacktes $() darauf
        waere ein Absturz beim Aufbau. Ueberspringen laeuft ueber die
        Sprache (`RF_NEIN`, Z. 4855) und `_rf.aktionen`. */
@@ -9578,6 +9697,8 @@
       (function () {
         if (_rfModus() === 'lernen') return '';
         if (!_rfWozu(e)) return '';
+        /* v2204 · N63.7: „Nicht mehr anzeigen“ gilt dauerhaft (js/hinweise.js) */
+        if (window.DpHinweise && DpHinweise.aus('erklaer')) return '';
         try { _rfAktion('erklaer',
           'Was die Angabe bedeutet und wozu DealPilot sie braucht.',
           'Erklär mir das'); } catch (x) {}
