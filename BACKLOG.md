@@ -157,6 +157,10 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N62.23 · Frage an Marcel: vw-modul (Junker Gutachten-Modul V4.2)
+
+Dateien/vw-modul-v4-2-2.zip und -v4-2-5.zip (08./10.10.2026) stehen in keiner Backlog-Zeile. Inhalt (nur gelesen, README): eigenständige Web-App für Verkehrswert-, RND- und Kaufpreisaufteilungs-Gutachten mit Word-Vorlagen und PDF über LibreOffice/PHP, gedacht für die **Junker-Homepage / das Portal** (/modules/vw/), nicht für DealPilot. Nicht angefasst. **Zu klären:** gehört das in DealPilot (z. B. als Modul neben dem BMF-Rechner und dem RND-Assistenten) oder bleibt es auf der Homepage?
+
 #### N62.22 · Neue Hilfe: Pilot auf F1/?, Prozess-Atlas, Hilfe überarbeitet
 
 
@@ -251,6 +255,7 @@ Agents (`.claude/agents/`): Register-Ernte (zuerst BY/SL/HB), Nachernte aus
 `mb.gaa_documents` (78 PDFs auf „neu"), Datenwächter Makro/Zensus, Ämter.
 
 #### N62.18 · NÄCHSTES PAKET (Marcel, 13.10.2026: „ja mach das als nächstes Paket") — eigene Datenhaltung, Warteschlange, Laufzeiten
+> **Stand 13.10.2026:** 1, 2, 6, 7 erledigt (mb.makro_werte, mb.plz_orte — gemessen 152 ms live gegen 2 ms aus der Tabelle —, mb.laufzeiten). Offen: 3 Bodenrichtwerte ablegen (Zonengrenzen!), 4 GeoMap (Lizenzfrage an Marcel), 5 Warteschlange in der DB für Bericht und Pilot-Analyse (eigenes Paket).
 
 **Marcel:** *„können wir die kritischen Anfragen, die zeitintensiv sind, nicht in
 unsere eigene Datenbank schreiben … und gleichen sie in regelmäßigen Abständen
@@ -264,7 +269,7 @@ Bauplan, in dieser Reihenfolge:
    (12411-01-01-4, 82000-07-01-4 inkl. DG, AI008-1 Sp.3, AI002-1 Sp.9 je Kreis,
    max. 10 parallel, Protokolltabelle). Monatlicher Lauf. `DestatisConnector.macro`
    liest zuerst die Tabelle, Live-Abruf nur als Rückfall.
-2. **PLZ → Gemeinde/Kreis:** Tabelle aus OpenPLZ (einmal komplett, monatlich
+2. **✅ v2197 (13.10.2026)** — **PLZ → Gemeinde/Kreis:** Tabelle aus OpenPLZ (einmal komplett, monatlich
    abgleichen); `AgsResolver` liest sie zuerst (heute je Bericht ein Live-Abruf).
 3. **Bodenrichtwerte:** Treffer je Abfragepunkt mit Stichtag speichern,
    Wiederverwendung im Umkreis nur bei gleicher Zone; nach Stichtag erneuern.
@@ -273,9 +278,9 @@ Bauplan, in dieser Reihenfolge:
 5. **Warteschlange in der DB** für Marktbericht UND Pilot-Analyse (heute nur
    Marktbericht, im Arbeitsspeicher, MAX 6, beim Neustart weg), mit Status für
    den Kunden.
-6. **Laufzeiten mitschreiben** (Bericht, Analyse, je externer Dienst) — heute
+6. **✅ v2197 (13.10.2026)** — **Laufzeiten mitschreiben** (Bericht, Analyse, je externer Dienst) — heute
    wird keine Dauer gespeichert.
-7. **Lasttest** auf Staging (z. B. 20 Berichte gleichzeitig; kostet GeoMap-Abrufe
+7. **✅ 13.10.2026 (Sitzung v2172 ff.)** — **Lasttest** auf Staging (z. B. 20 Berichte gleichzeitig; kostet GeoMap-Abrufe
    — vorher mit Marcel).
 OpenAI ist kein Engpass (Stufe „Launch", gpt-4.1 2 Mio. TPM).
 
