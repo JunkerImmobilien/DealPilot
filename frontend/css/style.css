@@ -40941,3 +40941,20 @@ html:not([data-ui-theme]) body .main-col .bc-footer-sub {
 html:not([data-ui-theme]) body .main-col .bc-matrix-cell-label {
   color: #4f4542 !important;
 }
+
+/* v2198a · Responsive-Check: #dp-sb-toggle (Seitenleiste einklappen, Desktop)
+   lag unter 900 px ausserhalb des Schirms - gemessen „unerreichbar, kein
+   Scroller" in Einstellungen, Hilfe, Atlas und Tower bei 320/375 px. Auf dem
+   Handy ist die Seitenleiste eine Schublade hinter dem Menue-Knopf; der
+   Einklapp-Knopf hat dort keine Aufgabe. */
+@media (max-width: 900px) {
+  #dp-sb-toggle { display: none !important; }
+}
+
+/* v2198a · Touch-Geraete ohne Mauszeiger (Tablets ab 1024 px): Duplizieren und
+   Loeschen auf der Objektkarte erscheinen nur beim Ueberfahren (opacity 0,
+   pointer-events none) - ohne Maus also nie. Gemessen im Responsive-Check:
+   je Reiter 6 verdeckte/unerreichbare Kartenknoepfe ab 1024 px. */
+@media (hover: none) {
+  aside.sidebar .sb-card .sbc-actions { opacity: 1 !important; pointer-events: auto !important; }
+}

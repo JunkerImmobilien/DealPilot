@@ -122,7 +122,7 @@
       '#dp-tower .punkte span{display:inline-block;width:6px;height:6px;border-radius:50%;background:' + G + ';margin-right:4px;animation:dpt-p 1s infinite}',
       '#dp-tower .punkte span:nth-child(2){animation-delay:.15s}#dp-tower .punkte span:nth-child(3){animation-delay:.3s}',
       '@keyframes dpt-p{0%,100%{opacity:.25}50%{opacity:1}}',
-      '@media (max-width:640px){#dp-tower{left:8px !important;right:8px;width:auto;top:auto !important;bottom:8px;max-height:min(74vh,calc(100vh - 110px))}#dp-tower input.frage{font-size:16px !important}#dp-tower .fuss .h{display:none}}',
+      '@media (max-width:640px){#dp-tower{left:8px !important;right:8px;width:auto;top:auto !important;bottom:8px;max-height:min(74vh,calc(100vh - 110px))}#dp-tower input.frage{font-size:16px !important}#dp-tower .fuss .h{display:none}#dp-tower .k{padding-left:58px}}',
       '#dp-tower ul.tr li{text-align:left}#dp-tower .tx{flex:1 1 auto;min-width:0}',
       '@media (prefers-reduced-motion:reduce){#dp-pilot{transition:none}}'
     ].join('\n');
@@ -393,8 +393,17 @@
     var r = zielEl ? zielEl.getBoundingClientRect() : null;
     var sichtbar = !!(r && r.width && r.bottom > 0 && r.top < innerHeight);
     var px, py;
-    /* Handy: er steht AUF der Oberkante des Bodenblatts, links - nicht auf dem Kopf der App. */
-    if (mobil) { var tb = tower.getBoundingClientRect(); px = 18; py = Math.max(8, (tb.top || innerHeight * 0.3) - 82); }
+    /* Handy (v2198a): als Bueste IM Kopf des Bodenblatts. Auf der Oberkante
+       stehend verdeckte er den aktiven Reiter (Responsive-Check 320-390 px). */
+    if (mobil) {
+      var tb = tower.getBoundingClientRect();
+      pilot.classList.remove('ruht');
+      pilot.style.transition = 'none';
+      pilot.classList.add('buste');
+      pilot.style.left = (tb.left + 10) + 'px'; pilot.style.top = (tb.top + 6) + 'px'; pilot.style.bottom = 'auto';
+      void pilot.offsetWidth; pilot.style.transition = '';
+      return;
+    }
     else if (sichtbar) { px = r.right + 8; py = r.top - 30; if (px > innerWidth - 70) px = r.left - 62; }
     else { px = innerWidth - 530; py = 80; }
     pilot.classList.remove('ruht');

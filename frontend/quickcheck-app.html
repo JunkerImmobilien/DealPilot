@@ -3287,6 +3287,13 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 })();</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v1881c">
+<style id="v2198a-lange-woerter">
+/* v2198a · Responsive-Check 320 px: „Bewirtschaftungskosten“ (22 Zeichen, ein Wort) im
+   Kartentitel war 191 px breit bei 152 px Platz und schob die Seite 20 px quer
+   (Flex-Kind schrumpft nicht unter seine Inhaltsbreite). Silbentrennung nach
+   lang=de, notfalls Umbruch im Wort. */
+.card-title > span { min-width: 0; overflow-wrap: anywhere; -webkit-hyphens: auto; hyphens: auto; }
+</style>
 </head>
 <body class="dp-neue-karte"><!-- qb-rename-v699 · v1645: die Marke fest - dieses Dokument ist IMMER hell -->
 
@@ -7443,6 +7450,6 @@ html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !i
 })();
 </script>
 
-<script src="js/pilot-tower.js?v=v2189f"></script><!-- v2188: Bruecke F1/? zum Piloten im Elternfenster -->
+<script src="js/pilot-tower.js?v=v2198a"></script><!-- v2188: Bruecke F1/? zum Piloten im Elternfenster -->
 </body>
 </html>
