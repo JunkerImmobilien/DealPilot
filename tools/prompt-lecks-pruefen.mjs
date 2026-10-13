@@ -169,7 +169,11 @@ const auftrag = {
       verteilung_jahre: '4'
     },
     sonder_afa_7b: true,                      /* ui.js:908 — war stumm */
-    erbbaurecht: { ja: true, erbbauzins_eur_jahr: 19876 }  /* ui.js:909-911 */
+    erbbaurecht: { ja: true, erbbauzins_eur_jahr: 19876 },  /* ui.js:909-911 */
+    /* v2166: Werbungskosten, Wende, Jahresverlauf */
+    werbungskosten_jahr1: { schuldzinsen_eur: 13579, afa_eur: 8642, bewirtschaftung_steuerlich_eur: 2468, summe_eur: 24689, mieteinnahmen_eur: 21357 },
+    wende: { erstes_jahr_steuerlich_positiv: 2034, steuerwirkung_bis_dahin_eur: -11223, steuerlast_danach_bis_jahr15_eur: 9988, gerechnet_ueber_jahre: 30 },
+    verlauf: [{ jahr: 2027, miete_eur: 21357, zinsen_eur: 13579, afa_eur: 8642, bwk_steuerlich_eur: 2468, ergebnis_vuv_eur: -3332, steuer_eur: -1389, cashflow_nach_steuer_eur: 777 }]
   },
 
   bewirtschaftung: {
@@ -499,7 +503,7 @@ const ERWARTET = [
   ['GND der Rechnung',             'v2156', 'Gesamtnutzungsdauer der Rechnung: 70 Jahre'],
   ['BWK-Quote der Rechnung',       'v2156', 'Bewirtschaftungskostenquote der Rechnung: 22,0 %'],
   /* Staerken und Risiken: echte Vorgabe je Eintrag */
-  ['Staerken: Satzvorgabe',        'v2156', 'je Eintrag 2-3 Sätze MIT der Zahl'],
+  ['Staerken: Satzvorgabe',        'v2156', 'je Eintrag 3-4 Sätze MIT der Zahl'],
   ['Risiken: Folge verlangt',      'v2156', 'mit der Folge für den Investor'],
   /* v2157 · N62.4 */
   ['objekt.lageklasse',            'ui.js v2157', 'PRUEF-B-Lage'],
@@ -519,6 +523,10 @@ const ERWARTET = [
   ['Zensus: Leerstandsdauer',       'v2162', 'PRUEF-DAUER 61,7 %'],
   ['Zensus: Bestandsmiete-Hinweis', 'v2162', 'BESTANDSMIETE aller laufenden Vertraege'],
   ['Aufgabe 15 + Zielfeld',        'v2157', '"lage_gegenueberstellung": ['],
+  ['Steuer: Werbungskosten Jahr 1', 'v2166', 'Werbungskosten gesamt 24.689 EUR = Schuldzinsen 13.579 + AfA 8.642'],
+  ['Steuer: Jahr der Wende',        'v2166', 'Erstes Jahr mit positivem Ergebnis aus Vermietung: 2034'],
+  ['Steuer: Steuerlast danach',     'v2166', 'Steuerlast danach bis Jahr 15: 9.988 EUR'],
+  ['Steuer: Jahresverlauf',         'v2166', '2027 | 21357 | 13579 | 8642 | 2468 | -3332 | -1389 | 777'],
   ['Aufgabe 16 Steuer',             'v2160', '16. Steuerliche Zusammenfassung'],
   ['Zielfeld steuer_zusammenfassung', 'v2160', '"steuer_zusammenfassung":'],
   ['Zielfeld soll_ist_steuer (Ankauf)', 'v2160', '"soll_ist_steuer":']

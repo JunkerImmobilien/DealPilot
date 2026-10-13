@@ -984,6 +984,45 @@ function _buildAIPayload() {
       if (an('erbpacht')) {
         s.erbbaurecht = { ja: true, erbbauzins_eur_jahr: parseDe(g('erbbauzins')) || null };
       }
+      /* ══ v2166 · DER STEUERVERLAUF ═════════════════════════════════════
+         Marcel am 13.10.2026: „auch bei Steuern ist die Aussage gering …
+         da auch auf Werbungskosten eingehen und wann das Objekt steuerlich
+         positiv wird und was das an Abgaben bedeutet."
+         Das Modell bekam bisher EINE Zahl (Steuerwirkung Jahr 1). Die
+         App rechnet aber jedes Jahr (State.cfRows: Miete, Zins, BWK, AfA,
+         Ergebnis, Steuer) - hier geht diese Reihe mit, FERTIG gerechnet.
+         Das Modell soll erklaeren, nicht nachrechnen. */
+      try {
+        var R = (window.State && Array.isArray(State.cfRows)) ? State.cfRows : [];
+        var z = function (v) { return (typeof v === 'number' && isFinite(v)) ? Math.round(v) : null; };
+        if (R.length) {
+          var r1 = R[0];
+          s.werbungskosten_jahr1 = {
+            schuldzinsen_eur: z(r1.zy), afa_eur: z(r1.afa_y),
+            bewirtschaftung_steuerlich_eur: z(r1.bwk_st_y),
+            summe_eur: z((r1.zy || 0) + (r1.afa_y || 0) + (r1.bwk_st_y || 0)),
+            mieteinnahmen_eur: z(r1.nkm_y)
+          };
+          s.verlauf = R.slice(0, 15).map(function (r) {
+            return { jahr: r.cal || r.y, miete_eur: z(r.nkm_y), zinsen_eur: z(r.zy), afa_eur: z(r.afa_y),
+                     bwk_steuerlich_eur: z(r.bwk_st_y), ergebnis_vuv_eur: z(r.zve_y),
+                     steuer_eur: z(r.tax_y), cashflow_nach_steuer_eur: z(r.cfns_y) };
+          });
+          var wende = null, erstattBis = 0, lastAb = 0;
+          for (var i = 0; i < R.length; i++) {
+            var e = R[i].zve_y, t = R[i].tax_y;
+            if (wende === null && typeof e === 'number' && e > 0) wende = R[i].cal || R[i].y;
+            if (wende === null && typeof t === 'number') erstattBis += t;
+            else if (typeof t === 'number' && i < 15) lastAb += t;
+          }
+          s.wende = {
+            erstes_jahr_steuerlich_positiv: wende,
+            steuerwirkung_bis_dahin_eur: z(erstattBis),          /* negativ = Erstattung */
+            steuerlast_danach_bis_jahr15_eur: wende ? z(lastAb) : null,
+            gerechnet_ueber_jahre: R.length
+          };
+        }
+      } catch (e) {}
       return s;
     })(),
     bewirtschaftung: {

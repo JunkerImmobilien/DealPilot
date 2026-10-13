@@ -579,6 +579,37 @@ function buildPrompt(payload, opts) {
         ? ('ja' + (_st.erbbaurecht.erbbauzins_eur_jahr != null
             ? ', Erbbauzins ' + _z(_st.erbbaurecht.erbbauzins_eur_jahr) + ' EUR/Jahr' : '')) : null]
     ]) : '',
+    /* v2166 · Werbungskosten, Jahresverlauf und das Jahr der Wende -
+       fertig gerechnet von der App (calc.js, State.cfRows). */
+    (_st && (_st.werbungskosten_jahr1 || _st.verlauf || _st.wende)) ? (function () {
+      var o = [''];
+      var wk = _st.werbungskosten_jahr1;
+      if (wk) {
+        o.push('## STEUER: WERBUNGSKOSTEN JAHR 1 (von der App gerechnet)');
+        o.push('- Mieteinnahmen ' + _z(wk.mieteinnahmen_eur) + ' EUR; Werbungskosten gesamt ' + _z(wk.summe_eur)
+          + ' EUR = Schuldzinsen ' + _z(wk.schuldzinsen_eur) + ' + AfA ' + _z(wk.afa_eur)
+          + ' + Bewirtschaftung (steuerlich) ' + _z(wk.bewirtschaftung_steuerlich_eur) + ' EUR');
+      }
+      var w = _st.wende;
+      if (w) {
+        o.push('## STEUER: WANN WIRD DAS OBJEKT STEUERLICH POSITIV');
+        o.push(w.erstes_jahr_steuerlich_positiv
+          ? ('- Erstes Jahr mit positivem Ergebnis aus Vermietung: ' + w.erstes_jahr_steuerlich_positiv
+             + '. Steuerwirkung bis dahin: ' + _z(w.steuerwirkung_bis_dahin_eur) + ' EUR (negativ = Erstattung).'
+             + ' Steuerlast danach bis Jahr 15: ' + _z(w.steuerlast_danach_bis_jahr15_eur) + ' EUR.')
+          : ('- In den gerechneten ' + w.gerechnet_ueber_jahre + ' Jahren bleibt das Ergebnis negativ.'
+             + ' Steuerwirkung gesamt: ' + _z(w.steuerwirkung_bis_dahin_eur) + ' EUR (negativ = Erstattung).'));
+      }
+      if (Array.isArray(_st.verlauf) && _st.verlauf.length) {
+        o.push('## STEUER: JAHRESVERLAUF (EUR; Ergebnis = Miete - Zinsen - AfA - BWK; Steuer negativ = Erstattung)');
+        o.push('Jahr | Miete | Zinsen | AfA | BWK | Ergebnis V+V | Steuer | Cashflow n. St.');
+        _st.verlauf.forEach(function (r) {
+          o.push([r.jahr, r.miete_eur, r.zinsen_eur, r.afa_eur, r.bwk_steuerlich_eur, r.ergebnis_vuv_eur,
+                  r.steuer_eur, r.cashflow_nach_steuer_eur].map(function (x) { return x == null ? '-' : x; }).join(' | '));
+        });
+      }
+      return o.join('\n');
+    })() : '',
     _bw ? _zeilen('## BEWIRTSCHAFTUNG (Struktur, nicht nur die Summe)', [
       ['Hausgeld umlagefaehig', _bw.hausgeld_umlagefaehig != null ? _z(_bw.hausgeld_umlagefaehig) + ' EUR' : null],
       ['Hausgeld NICHT umlagefaehig', _bw.hausgeld_nicht_umlagefaehig != null ? _z(_bw.hausgeld_nicht_umlagefaehig) + ' EUR' : null],
@@ -1431,6 +1462,16 @@ function buildPrompt(payload, opts) {
        eigenes Feld (Lehre v2013b: ohne Zielfeld kein Text). */
     '',
     '16. Steuerliche Zusammenfassung — was die Investition steuerlich bewirkt, NUR aus',
+    /* v2166: gegliedert - Marcel: „auf Werbungskosten eingehen und wann das Objekt
+       steuerlich positiv wird und was das an Abgaben bedeutet." Die Zahlen stehen
+       oben fertig (STEUER: WERBUNGSKOSTEN / WANN POSITIV / JAHRESVERLAUF). */
+    '   Gliederung, in dieser Reihenfolge: (1) Werbungskosten Jahr 1 nach Art mit EUR -',
+    '   Schuldzinsen, AfA, Bewirtschaftung - und ihr Verhaeltnis zur Miete; (2) Ergebnis aus',
+    '   Vermietung und Steuerwirkung im ersten Jahr; (3) in welchem Jahr das Ergebnis positiv',
+    '   wird und WARUM (Zinsanteil sinkt, Miete steigt, AfA bleibt) - mit den Zahlen dieses',
+    '   Jahres; (4) was danach an Steuer anfaellt, je Jahr und kumuliert bis Jahr 15, und wie',
+    '   das den Cashflow nach Steuer veraendert; (5) Sanierung: wie sie steuerlich wirkt (falls',
+    '   angegeben); (6) Hinweis auf den Steuerberater. Zahlen NUR aus den Steuer-Bloecken oben.',
     '   dem Block STEUER und den Kennzahlen (Steuerwirkung p.a., Cashflow vor/nach Steuer).',
     '   Nenne: AfA-Basis und -Satz bzw. Restnutzungsdauer, ob Sanierung als',
     '   Erhaltungsaufwand verteilt wird, die Steuerwirkung im ersten Jahr in EUR und',
@@ -1462,7 +1503,7 @@ function buildPrompt(payload, opts) {
     '## ANTWORTFORMAT — strikt JSON, keine Markdown-Codeblöcke',
     'Antworte AUSSCHLIESSLICH mit folgendem JSON-Objekt:',
     '{',
-    '  "gesamtbewertung": "4-6 Sätze, mit Zahlen",',
+    '  "gesamtbewertung": "8-10 Sätze, mit Zahlen: Rendite, Cashflow vor/nach Steuer, DSCR/LTV, Lage, Hauptrisiko, Urteil",',
     '  "fazit_kurz": "Kaufen | Prüfen | Nicht kaufen",',
     /* ══ v2156 · JEDER EINTRAG BRAUCHT EINE VORGABE ═══════════════════
        Marcel am 12.10.2026: „dass wir da wirklich vernuenftige
@@ -1482,16 +1523,16 @@ function buildPrompt(payload, opts) {
        MIT der Zahl, auf die sich die Aussage stuetzt. Das ist dieselbe
        Strenge wie im uebrigen Format und der Grund, warum die
        Investmentbewertung heute brauchbar ist. */
-    '  "staerken":   ["je Eintrag 2-3 Sätze MIT der Zahl, auf die sich die Aussage stützt (z.B. \\"DSCR 1,34 liegt über der Bankschwelle 1,2 …\\"). Kein Stichwort, kein Allgemeinplatz. Fünf Einträge, der erste der stärkste.", "Stärke 2 — gleiche Anforderung", "Stärke 3", "Stärke 4", "Stärke 5"],',
-    '  "risiken":    ["je Eintrag 2-3 Sätze MIT Zahl und mit der Folge für den Investor (was passiert, wenn es eintritt). Fünf Einträge, der erste der schwerste.", "Risiko 2 — gleiche Anforderung", "Risiko 3", "Risiko 4", "Risiko 5"],',
+    '  "staerken":   ["je Eintrag 3-4 Sätze MIT der Zahl, auf die sich die Aussage stützt (z.B. \\"DSCR 1,34 liegt über der Bankschwelle 1,2 …\\"). Kein Stichwort, kein Allgemeinplatz. Fünf Einträge, der erste der stärkste.", "Stärke 2 — gleiche Anforderung", "Stärke 3", "Stärke 4", "Stärke 5"],',
+    '  "risiken":    ["je Eintrag 3-4 Sätze MIT Zahl und mit der Folge für den Investor (was passiert, wenn es eintritt). Fünf Einträge, der erste der schwerste.", "Risiko 2 — gleiche Anforderung", "Risiko 3", "Risiko 4", "Risiko 5"],',
     '  "risikoanalyse": {',
-    '    "finanzierungsrisiko": "Ausführliche Bewertung von LTV+DSCR, 4-5 Sätze",',
-    '    "cashflow_stabilitaet": "Ausführliche Bewertung Cashflow-Stabilität, 4-5 Sätze",',
-    '    "annahmen_abhaengigkeit": "Welche Annahmen sind kritisch? 4-5 Sätze"',
+    '    "finanzierungsrisiko": "Ausführliche Bewertung von LTV+DSCR mit beiden Zahlen, Bankschwellen und Entwicklung über die Jahre, 6-8 Sätze",',
+    '    "cashflow_stabilitaet": "Cashflow-Stabilität: Cashflow vor UND nach Steuer, wie er sich über den Jahresverlauf entwickelt, was ihn trägt und was ihn kippen kann, 6-8 Sätze",',
+    '    "annahmen_abhaengigkeit": "Welche Annahmen sind kritisch (Miete, Leerstand, Zins nach Bindung, Instandhaltung)? Je Annahme: was passiert, wenn sie nicht eintritt, 6-8 Sätze"',
     '  },',
     '  "szenarien": {',
-    '    "worst_case": "Miete -10%, Zins +1% — Folgen ausführlich qualitativ und quantitativ, 4-6 Sätze",',
-    '    "best_case":  "Miete +5%, Wertsteigerung über Erwartung — Folgen ausführlich, 4-6 Sätze"',
+    '    "worst_case": "Miete -10%, Zins +1% — Folgen ausführlich qualitativ und quantitativ (Cashflow, DSCR, Steuer), 6-8 Sätze",',
+    '    "best_case":  "Miete +5%, Wertsteigerung über Erwartung — Folgen ausführlich mit Zahlen, 6-8 Sätze"',
     '  },',
     '  "investor_fit": {',
     '    "cashflow_investor":     "ja/nein/teilweise — Begründung mit Zahlen, 2-3 Sätze",',
@@ -1499,10 +1540,10 @@ function buildPrompt(payload, opts) {
     '    "sicherheitsorientiert": "ja/nein/teilweise — Begründung mit Zahlen, 2-3 Sätze"',
     '  },',
     '  "empfehlung": "Kaufen | Prüfen | Nicht kaufen",',
-    '  "empfehlung_begruendung": "Ausführliche Begründung, 4-6 Sätze",',
-    '  "dealpilot_insight": "Tool-Voice, 4-5 Sätze, fundiert",',
-    '  "investmentbewertung": "Holistische Bewertung — 8-12 Sätze, mit Zahlen, Lage, Marktumfeld, Risiko, langfristige Perspektive",',
-    '  "verhandlungsempfehlung": "Konkrete Verhandlungsstrategie — 8-12 Sätze: Argumente, Hebel, Zielpreis, Kompromisse",',
+    '  "empfehlung_begruendung": "Ausführliche Begründung: die drei Gründe, die das Urteil tragen, je mit Zahl, und was es ändern würde, 8-10 Sätze",',
+    '  "dealpilot_insight": "Tool-Voice, 6-8 Sätze, fundiert — die eine Erkenntnis, die in den Zahlen steckt und die man auf den ersten Blick nicht sieht",',
+    '  "investmentbewertung": "Holistische Bewertung — 12-16 Sätze, mit Zahlen, Lage, Marktumfeld, Risiko, langfristige Perspektive",',
+    '  "verhandlungsempfehlung": "Konkrete Verhandlungsstrategie — 12-16 Sätze: Argumente, Hebel, Zielpreis, Kompromisse",',
     '  "kaufpreis_offerte": {',
     '    "empfohlen": "Empfohlener Kaufpreis als Zahl mit € — z.B. 175.000 €",',
     '    "begruendung": "Warum dieser Preis? 5-7 Sätze mit Bezug auf Vergleichswerte und Marktlage",',
@@ -1519,8 +1560,8 @@ function buildPrompt(payload, opts) {
     '    "Argument 4",',
     '    "Argument 5"',
     '  ],',
-    '  "makrolage_recherche": "Ausführlich recherchierte Fakten zur Makrolage, 4-6 Sätze",',
-    '  "mikrolage_recherche": "Ausführlich recherchierte Fakten zur Mikrolage, 4-6 Sätze",',
+    '  "makrolage_recherche": "Ausführlich recherchierte Fakten zur Makrolage (Bevölkerung, Wirtschaft, Arbeitsmarkt, Wohnungsmarkt) mit Zahlen und Jahr, 8-10 Sätze",',
+    '  "mikrolage_recherche": "Ausführlich recherchierte Fakten zur Mikrolage (Quartier, Infrastruktur, Verkehr, Nachfrage, Lärm/Umfeld) mit Zahlen, 8-10 Sätze",',
     /* v2150 · Marcel: „man kann die werte der KI gerne mit den daten aus
        der schnittstelle abgleichen." Das Feld hiess „Recherchierter Wert" —
        und genau das hat das Modell getan, auch wenn der Marktbericht eine
@@ -1531,14 +1572,14 @@ function buildPrompt(payload, opts) {
        Prompt-Auftrag lautlos — der Auftrag unten in Aufgabe 14 braucht
        eine Stelle, an der die Antwort landen kann. */
     '  "berichts_abgleich":   "Wenn ein Marktbericht vorliegt: 2-4 Sätze, wie deine Einordnung zu seinen gemessenen Werten steht (Marktwert, Marktmiete, Sach-/Ertragswert, führendes Verfahren). Weichen sie ab, nenne BEIDE Zahlen und sage, welche woher kommt. null ohne Bericht",',
-    '  "kaufpreisniveau":     "Einordnung des Kaufpreises mit Vergleichswerten, 3-4 Sätze",',
+    '  "kaufpreisniveau":     "Einordnung des Kaufpreises mit Vergleichswerten (EUR/m², Faktor, Bodenrichtwert, Marktbericht), 6-8 Sätze",',
     /* v2157 · Zielfeld fuer Aufgabe 15 (N62.4) */
     '  "lage_gegenueberstellung": [',
     '    { "merkmal": "Makrolage", "objektfeld": "Angabe des Investors oder null", "bericht": "Wert laut Marktbericht oder null", "recherche": "dein Befund, kurz, mit Zahl wo moeglich", "quelle": "URL der Recherchequelle oder null", "urteil": "stimmt | weicht ab | offen", "kommentar": "1-2 Saetze: was das fuer die Investition heisst" },',
     '    "... je eine Zeile fuer Mikrolage, Bevoelkerungsentwicklung, Nachfrage, Wertsteigerung, Entwicklung, Mietniveau, Kaufpreisniveau"',
     '  ],',
-    /* v2160 · Zielfelder fuer Aufgabe 16 (N62.6) */
-    '  "steuer_zusammenfassung": "5-8 Saetze: AfA, Sanierung, Steuerwirkung im ersten Jahr in EUR, Folge fuer den Cashflow nach Steuer; fehlende Angaben benennen; Hinweis auf Steuerberater",',
+    /* v2160 · Zielfelder fuer Aufgabe 16 (N62.6, vertieft v2166) */
+    '  "steuer_zusammenfassung": "14-20 Saetze in der Gliederung von Aufgabe 16: Werbungskosten nach Art, Ergebnis und Steuerwirkung Jahr 1, Jahr der Wende und warum, Steuerlast danach in EUR, Folge fuer den Cashflow nach Steuer, Sanierung, Hinweis auf Steuerberater",',
     _ak ? '  "soll_ist_steuer": "2-4 Saetze: steuerliche Lage beim Ankauf gegen heute, mit beiden Zahlen; null, wenn keine Steuerzahl zu beiden Zeitpunkten vorliegt",' : '',
     '  "anschlussfinanzierung": "Restschuld nach Zinsbindung + noetiger EK-Einsatz/Sondertilgung damit die Anschlussfinanzierung traegt, 4-6 Saetze mit Zahlen soweit ableitbar",',
     '  "score_vergleich": "Falls DealPilot-Score UND Investor Deal Score vorliegen und sich unterscheiden: erklaere Konvergenz/Divergenz und welche Zusatz-KPIs (Lage/Substanz/Upside) den Unterschied treiben, 4-6 Saetze. Sonst leer lassen.",',
@@ -1610,7 +1651,7 @@ async function callOpenAI(prompt, opts) {
 
        12000 statt 8000. Die Kappe bleibt eine Kappe — sie soll nur nicht
        vor dem Ende der Aufgabenliste greifen. */
-    max_output_tokens: 12000,
+    max_output_tokens: 16000,   /* v2166: laengere Texte; gpt-4o-mini erlaubt 16.384 */
     /* v1264: Web-Suche abschaltbar. Additiv — wer die Option nicht setzt,
        bekommt sie weiter, also ändert sich für alle bestehenden Aufrufer
        nichts. Gebraucht wird das für Nachbearbeitungs-Aufrufe, die einen
