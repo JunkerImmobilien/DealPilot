@@ -161,7 +161,7 @@ ab?"* und: *„wichtig ist immer, dass wir unsere Quellen angeben."*
 Stichtag, Abrufdatum, Lizenz (Muster: `mb.zensus_werte`, v2162).
 
 Bauplan, in dieser Reihenfolge:
-1. **Makro (N62.16):** `mb.makro_werte` + Import wie `ZensusImportService`
+1. **✅ ERLEDIGT 13.10.2026 · v2172–v2172c (Staging, Prod offen)** — **Makro (N62.16):** `mb.makro_werte` + Import wie `ZensusImportService`
    (12411-01-01-4, 82000-07-01-4 inkl. DG, AI008-1 Sp.3, AI002-1 Sp.9 je Kreis,
    max. 10 parallel, Protokolltabelle). Monatlicher Lauf. `DestatisConnector.macro`
    liest zuerst die Tabelle, Live-Abruf nur als Rückfall.
@@ -188,6 +188,8 @@ neuere — die Ursache (welcher Speicherweg nur die Spalte schreibt) ist offen.
 Jeder andere Leser von `data._ai` sieht weiter die alte.
 
 #### N62.16 · Makro-Kennzahlen vorab holen und speichern (wie der Zensus)
+
+**✅ ERLEDIGT 13.10.2026 · v2172–v2172c · `768ae809` … `8c6aa0fa` (Staging).** Je Land ein Abruf (`regionalkey "05*"`), 3 parallel (Limit 10 je Konto, abgebrochene Abrufe laufen dort 15 min weiter), Takt 12 h / 30 Tage. Bericht liest die Tabelle in 2–38 ms. Deckung gegen die 400 heutigen Kreise. Prod: Migration 017 + Rebuild, nach Freigabe.
 
 **Gemessen 13.10.2026 nach Marcels neuem Regionaldatenbank-Passwort:** die
 vier Kennzahlen (v2165) kommen an, aber die Regionaldatenbank braucht heute
