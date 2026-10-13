@@ -1199,7 +1199,7 @@
         await _mbEnginePdf(rid);
         return;   /* echte Engine hat geliefert */
       } catch (e) {
-        try { console.warn('[dab] Engine-PDF fehlgeschlagen, Rueckfall auf Kurzfassung:', e.message); } catch (x) {}
+        try { console.warn('[dab] Engine-PDF fehlgeschlagen, Rückfall auf Kurzfassung:', e.message); } catch (x) {}
       }
       /* Rueckfall: die alte Textabschrift. Der Nutzer MUSS erfahren, dass er
        * nicht den vollen Bericht hat — sonst legt er die Kurzfassung der Bank vor. */

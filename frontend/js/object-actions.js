@@ -789,7 +789,7 @@
   function riegelFreigeben() {
     _riegelFrei = window._currentObjKey || null;
     riegelNachziehen();
-    try { toast('Quellen freigegeben - sie koennen jetzt Felder ueberschreiben'); } catch (e) {}
+    try { toast('Quellen freigegeben - sie können jetzt Felder überschreiben'); } catch (e) {}
   }
   window.DealPilotRiegel = {
     greift: _riegelGreift, kernZahl: _riegelKernZahl,

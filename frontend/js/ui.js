@@ -683,7 +683,7 @@ async function runAI() {
    * Ursache ist eine Kruecke — ein Riegel gegen die ganze Klasse ist eine Regel.
    */
   if (window._aiRunning) {
-    try { console.warn('[v950] Pilot-Analyse laeuft bereits — zweiter Aufruf verworfen (haette 1 L gekostet).'); } catch (e) {}
+    try { console.warn('[v950] Pilot-Analyse läuft bereits — zweiter Aufruf verworfen (hätte 1 L gekostet).'); } catch (e) {}
     return;
   }
   window._aiRunning = true;
@@ -1044,7 +1044,7 @@ function _buildAIPayload() {
       var aus = {
         modus: m,
         herkunft: m === 'einheiten'
-          ? 'Aus den Mietvertraegen der einzelnen Wohnungen'
+          ? 'Aus den Mietverträgen der einzelnen Wohnungen'
           : (m === 'detail' ? 'Stufenplan von Hand' : 'Gleichmaessige Steigerung je Jahr'),
         mietspiegel_eur_qm: parseDe(g('mietspiegel')),
         leerstand_pct: parseDe(g('leerstand')), umlagefaehig: parseDe(g('umlagef'))
@@ -2210,7 +2210,7 @@ async function runMiniAI() {
    * Beide Knoepfe teilen sich das Flag: waehrend die grosse Analyse laeuft,
    * kann die Mini-Analyse nicht danebenfeuern und umgekehrt. */
   if (window._aiRunning) {
-    try { console.warn('[v950] Pilot-Analyse laeuft bereits — zweiter Aufruf verworfen.'); } catch (e) {}
+    try { console.warn('[v950] Pilot-Analyse läuft bereits — zweiter Aufruf verworfen.'); } catch (e) {}
     return;
   }
   window._aiRunning = true;

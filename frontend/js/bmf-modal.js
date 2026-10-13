@@ -2101,7 +2101,7 @@ function openBMFModal(){
   //               'BMF-Rechner & Export' verspricht. Jetzt bmf_calc_export.
   if(!_hasBmfCalc()){
     toast('🔒 BMF-Rechner ist Teil des Investor-Plans oder höher');
-    console.warn('[bmf-modal] bmf_calc_export nicht verfuegbar — Plan unter Investor?');
+    console.warn('[bmf-modal] bmf_calc_export nicht verfügbar — Plan unter Investor?');
     return;
   }
 

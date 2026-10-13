@@ -28,7 +28,7 @@
   var VERGLEICHSFELDER = {
     rnd_jahre: 'Restnutzungsdauer laut Gutachten',
     verkehrswert_eur: 'Verkehrswert laut Gutachten',
-    gebaeudeanteil_pct_laut_gutachten: 'Gebaeudeanteil laut Gutachten',
+    gebaeudeanteil_pct_laut_gutachten: 'Gebäudeanteil laut Gutachten',
     bodenwert_eur_laut_gutachten: 'Bodenwert laut Gutachten'
   };
 
@@ -78,7 +78,7 @@
       +     'Kaufpreisaufteilung oder Marktbericht. Die Art wird erkannt.</p>'
       +   '<label class="dpdi-drop" for="dpdi-file">'
       +     '<span class="dpdi-drop-icon">&#128196;</span>'
-      +     '<span class="dpdi-drop-text">PDF auswaehlen</span>'
+      +     '<span class="dpdi-drop-text">PDF auswählen</span>'
       +     '<input type="file" id="dpdi-file" accept="application/pdf,.pdf" hidden>'
       +   '</label>'
       +   '<div class="dpdi-status" id="dpdi-status" hidden></div>'
@@ -125,7 +125,7 @@
          sonst sucht der Nutzer den Fehler bei sich.                  */
       if (!text || text.replace(/\s/g, '').length < 120) {
         _status('Aus diesem PDF kommt kaum Text — vermutlich ein Scan. '
-              + 'Texterkennung ist fuer diesen Weg noch nicht eingebaut.', 'warn');
+              + 'Texterkennung ist für diesen Weg noch nicht eingebaut.', 'warn');
         return;
       }
 
@@ -149,7 +149,7 @@
   }
 
   function _zeigeAuswahl(antwort, file) {
-    _status('Die Art liess sich nicht sicher bestimmen — bitte auswaehlen.', 'warn');
+    _status('Die Art liess sich nicht sicher bestimmen — bitte auswählen.', 'warn');
     var res = document.getElementById('dpdi-result');
     if (!res) return;
     var liste = (antwort.auswahl || []).filter(function (a) { return a.extrahierbar; });
@@ -194,7 +194,7 @@
       html += '<div class="dpdi-warn"><strong>Fehlende Pflichtangaben:</strong> '
             + _esc(a.fehlende_pflichtfelder.join(', '))
             + '. Ohne sie wird nicht gerechnet — eine Zahl aus Standardwerten '
-            + 'saehe richtig aus und waere es nicht.</div>';
+            + 'saehe richtig aus und wäre es nicht.</div>';
     }
 
     if ((a.verworfene_werte || []).length) {
@@ -213,8 +213,8 @@
     if (vergleich.length) {
       html += '<h3 class="dpdi-h3">Ergebnis des fremden Gutachtens</h3>'
             + '<table class="dpdi-table dpdi-table-vgl">' + vergleich.join('') + '</table>'
-            + '<p class="dpdi-hinweis">Diese Werte werden <strong>nicht uebernommen</strong>. '
-            + 'DealPilot rechnet selbst — sie dienen dem Abgleich. Eine uebernommene Zahl, '
+            + '<p class="dpdi-hinweis">Diese Werte werden <strong>nicht übernommen</strong>. '
+            + 'DealPilot rechnet selbst — sie dienen dem Abgleich. Eine übernommene Zahl, '
             + 'die niemand gegenprueft, ist eine Behauptung.</p>';
     }
 

@@ -141,7 +141,7 @@
     if (!isPro()) return;
     loadCats(function (cats) {
       var sel = pane.querySelector('#dpne-kat');
-      if (sel) sel.innerHTML = (cats.length ? cats : [{ key: 'finanzierung', label: 'Finanzierung & Banken' }, { key: 'gutachter', label: 'Gutachter & Sachverstaendige' }])
+      if (sel) sel.innerHTML = (cats.length ? cats : [{ key: 'finanzierung', label: 'Finanzierung & Banken' }, { key: 'gutachter', label: 'Gutachter & Sachverständige' }])
         .map(function (c) { return '<option value="' + esc(c.key) + '">' + esc(c.label) + '</option>'; }).join('');
     });
     renderPreview(pane);

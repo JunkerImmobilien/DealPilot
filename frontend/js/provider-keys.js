@@ -107,7 +107,7 @@
         .catch(function () { alert('Kopieren fehlgeschlagen.'); });
     },
     del: function () {
-      if (!confirm('ImmoMetrica-Zugang wirklich loeschen?')) return;
+      if (!confirm('ImmoMetrica-Zugang wirklich löschen?')) return;
       fetch(API + '/credentials', { method: 'DELETE', headers: hdr() })
         .then(function () { load(); if (window.toast) toast('Zugang geloescht'); })
         .catch(function () { alert('Löschen fehlgeschlagen.'); });

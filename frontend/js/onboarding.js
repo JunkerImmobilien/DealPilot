@@ -1335,7 +1335,7 @@ window.DealPilotOnboarding = (function () {
       _ov = null;
       _wahl = { aussehen: _aussehenStandard(), typ: _typDefault() };   /* v1770, v2083 */
       zeige(0);
-      return 'Setup neu gestartet' + (auchTour ? ' (Rundgang-Marker ebenfalls geloescht)' : '');
+      return 'Setup neu gestartet' + (auchTour ? ' (Rundgang-Marker ebenfalls gelöscht)' : '');
     },
     _grenzsatz: _grenzsatz,
     _blAusPlz: _blAusPlz

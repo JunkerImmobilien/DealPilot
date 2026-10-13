@@ -63,10 +63,10 @@
 
   function plaus(faktor) {
     var p = CONFIG.plausibilitaet, key, label, hint = null;
-    if (faktor < p.niedrigUnter)      { key = 'niedrig'; label = 'ungewoehnlich niedrig'; hint = 'Ungewoehnlich niedriges Hausgeld \u2014 bitte pruefen.'; }
+    if (faktor < p.niedrigUnter)      { key = 'niedrig'; label = 'ungewoehnlich niedrig'; hint = 'Ungewoehnlich niedriges Hausgeld \u2014 bitte prüfen.'; }
     else if (faktor <= p.normalBis)   { key = 'normal';  label = 'normaler Bereich'; }
     else if (faktor <= p.erhoehtBis)  { key = 'erhoeht'; label = 'erhoehter Bereich'; }
-    else                              { key = 'hoch';    label = 'aussergewoehnlich hoch'; hint = 'Aussergewoehnlich hohe Kosten moeglich (z. B. hohe Ruecklagenbildung oder besondere Ausstattung).'; }
+    else                              { key = 'hoch';    label = 'aussergewoehnlich hoch'; hint = 'Aussergewoehnlich hohe Kosten möglich (z. B. hohe Ruecklagenbildung oder besondere Ausstattung).'; }
     return { key: key, label: label, faktor: round2(faktor), hint: hint };
   }
 
@@ -156,8 +156,8 @@
       var r = basisErgebnis(m, NaN, 'kaufpreis', true);
       r.ungenau = true;
       r.grundlageText = 'Hausgeld gesch\u00e4tzt anhand des Kaufpreises, da keine Fl\u00e4chenangabe vorhanden war.';
-      r.plausibilitaet = { key: 'kaufpreis', label: 'kaufpreisbasierte Schaetzung (ungenau)', faktor: null,
-        hint: 'Hausgeld haengt normalerweise nicht vom Kaufpreis ab \u2014 nur grobe Annaeherung.' };
+      r.plausibilitaet = { key: 'kaufpreis', label: 'kaufpreisbasierte Schätzung (ungenau)', faktor: null,
+        hint: 'Hausgeld hängt normalerweise nicht vom Kaufpreis ab \u2014 nur grobe Annäherung.' };
       return r;
     }
 

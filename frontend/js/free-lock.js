@@ -82,7 +82,7 @@
           }
         }
       } catch (e) {
-        console.warn('[free-lock v495] Check uebersprungen (fail-open):', e);
+        console.warn('[free-lock v495] Check übersprungen (fail-open):', e);
       }
       return _orig.apply(this, arguments);
     };

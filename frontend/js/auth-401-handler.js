@@ -175,7 +175,7 @@
       /* v950-guard: kostenpflichtig -> Re-Login ja, Wiederholung NEIN. */
       if (isPaidEndpoint(path)) {
         console.warn('[401-handler] 401 bei kostenpflichtigem Aufruf', path,
-                     '— kein automatischer Retry (haette Kerosin gekostet). Nutzer muss erneut klicken.');
+                     '— kein automatischer Retry (hätte Kerosin gekostet). Nutzer muss erneut klicken.');
         throw err;
       }
       // Anti-Doppel-Retry: einmal ist genug

@@ -45,7 +45,7 @@
            und Zustimmung (copilot-aenderungen.js, ABRUFE). */
       '</div>' +
       '<div class="dp-cp-log" id="dp-cp-log">' +
-        '<div class="dp-cp-hint">Frag mich zu Lage, Verhandlung, Finanzierung oder Bank \u2014 ich arbeite mit den Daten dieses Objekts. Fuer aktuelle Marktdaten aus dem Web aktiviere oben die Web-Recherche.</div>' +
+        '<div class="dp-cp-hint">Frag mich zu Lage, Verhandlung, Finanzierung oder Bank \u2014 ich arbeite mit den Daten dieses Objekts. Für aktuelle Marktdaten aus dem Web aktiviere oben die Web-Recherche.</div>' +
       '</div>' +
       '<div class="dp-cp-bar">' +
         '<textarea id="dp-cp-in" class="dp-cp-in" rows="1" placeholder="Frage zum Deal\u2026"></textarea>' +
@@ -389,7 +389,7 @@
       if (thinking && thinking.parentNode) thinking.parentNode.removeChild(thinking);
       var m = (err && err.data && (err.data.message || err.data.error)) || (err && err.message) || 'Fehler';
       if (err && err.status === 429) m = 'Co-Pilot-Tageslimit erreicht. Morgen wieder verfügbar.';
-      if (err && err.status === 503) m = 'KI ist gerade nicht verfuegbar (kein Server-Key).';
+      if (err && err.status === 503) m = 'KI ist gerade nicht verfügbar (kein Server-Key).';
       addMsg('assistant', '\u26a0 ' + m);
     }).then(function () {
       busy = false;

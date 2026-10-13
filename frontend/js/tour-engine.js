@@ -178,7 +178,7 @@
       if (typeof window.showQuickCheck === 'function') {
         try { window.showQuickCheck(); return true; } catch(e) {}
       }
-      console.warn('[DpTour V239.2] Quick-Check konnte nicht geoeffnet werden');
+      console.warn('[DpTour V239.2] Quick-Check konnte nicht geöffnet werden');
       return false;
     }
     if (targetSec === 'sidebar' || targetSec === 'header' || targetSec === 'settings') {
@@ -1819,7 +1819,7 @@
       // oder wenn URL einen ?token=/?verify=/?register=-Param hat
       var qs = window.location.search || '';
       if (/[?&](token|verify|verify_error|register)=/.test(qs)) {
-        console.log('[DpTour V247] Auto-Start unterdrueckt: URL-Param signalisiert Auth-Flow');
+        console.log('[DpTour V247] Auto-Start unterdrückt: URL-Param signalisiert Auth-Flow');
         return;
       }
       // v427: persistenter Marker (URL wird vom register-Handler bereinigt)
@@ -1866,12 +1866,12 @@
         if (Tour.isComplete()) return;
         // V247: Modal-Check direkt vor Start (nicht nur beim DOMContentLoaded)
         if (document.getElementById('auth-modal') || document.getElementById('dp-register-modal')) {
-          console.log('[DpTour V247/v427] Auto-Start unterdrueckt: Auth-/Register-Modal noch offen');
+          console.log('[DpTour V247/v427] Auto-Start unterdrückt: Auth-/Register-Modal noch offen');
           return;
         }
         // V247: Session muss aktiv sein
         if (typeof Auth !== 'undefined' && typeof Auth.isLoggedIn === 'function' && !Auth.isLoggedIn()) {
-          console.log('[DpTour V247] Auto-Start unterdrueckt: User nicht eingeloggt');
+          console.log('[DpTour V247] Auto-Start unterdrückt: User nicht eingeloggt');
           return;
         }
         /* v1239 · Nicht mehr starten, sondern fragen.

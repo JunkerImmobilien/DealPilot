@@ -674,7 +674,7 @@
     L.push(_csvCell('Zusammenfassung'));
     Object.keys(a.byField).forEach(function (f) { L.push([_csvCell(_beschrift()[f] || f), _csvNum(a.byField[f])].join(D)); });
     if (a.sanierung > 0) L.push([_csvCell('Instandsetzung/Modernisierung'), _csvNum(a.sanierung)].join(D));
-    L.push([_csvCell('Uebernahme gesamt (ohne Sanierung)'), _csvNum(a.uebernahme)].join(D));
+    L.push([_csvCell('Übernahme gesamt (ohne Sanierung)'), _csvNum(a.uebernahme)].join(D));
     L.push([_csvCell('Belege ausgewählt'), a.count].join(D));
     L.push([_csvCell('15-Prozent-Ampel'), _csvCell(a.ampel.text)].join(D));
     _download('dealpilot-belege-' + _stamp() + '.csv', L.join('\r\n'));

@@ -1545,7 +1545,7 @@ function _calcImmediate(){
       _d2warn.style.cssText = 'margin-top:8px;color:#B8625C;font-weight:600';
       _d2tadHint.appendChild(_d2warn);
     }
-    _d2warn.textContent = 'Hinweis: Darlehen 2 als Tilgungsaussetzung wird ohne Tilgungstraeger als reines Zinsdarlehen gerechnet (Restschuld bleibt konstant). Fuer eine vollstaendige Bausparvertrags-Abbildung Darlehen 1 nutzen.';
+    _d2warn.textContent = 'Hinweis: Darlehen 2 als Tilgungsaussetzung wird ohne Tilgungsträger als reines Zinsdarlehen gerechnet (Restschuld bleibt konstant). Für eine vollständige Bausparvertrags-Abbildung Darlehen 1 nutzen.';
   }
 
   // ═════ Gesamtfinanzierung: gewichtete Zinsen/Tilgung ═════

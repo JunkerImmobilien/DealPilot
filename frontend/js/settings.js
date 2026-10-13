@@ -3464,7 +3464,7 @@ function _v213ResetCards() {
     var current = getMode();
     return '<div class="dp-bg-toggle-wrap">' +
       '<div class="dp-bg-toggle-title">Hintergrund</div>' +
-      '<div class="dp-bg-toggle-desc">Waehle das visuelle Theme der App.</div>' +
+      '<div class="dp-bg-toggle-desc">Wähle das visuelle Theme der App.</div>' +
       '<div class="dp-bg-toggle">' +
       modes.map(function(m) {
         return '<div class="dp-bg-option' + (m.key === current ? ' active' : '') + '" ' +

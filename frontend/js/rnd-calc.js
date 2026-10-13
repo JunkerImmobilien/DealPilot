@@ -262,14 +262,14 @@
       hinweis = 'Ohne Gesamtnutzungsdauer keine Rechnung.';
     } else if (alter >= gnd) {
       rnd = 0; anwendbar = false; grenze = 'ueber_gnd';
-      hinweis = 'Das Alter erreicht oder ueberschreitet die Gesamtnutzungsdauer. '
+      hinweis = 'Das Alter erreicht oder überschreitet die Gesamtnutzungsdauer. '
               + 'Die Kurve der Anlage 2 liegt hier hinter ihrem Scheitel (Alter '
-              + round2(k.b * gnd / (2 * k.a)) + ' Jahre) und wuerde wieder steigen. '
+              + round2(k.b * gnd / (2 * k.a)) + ' Jahre) und würde wieder steigen. '
               + 'Es wird nicht extrapoliert.';
     } else if (relAlter < k.rel) {
       rnd = Math.max(0, gnd - alter); anwendbar = false; grenze = 'unter_schwelle';
       hinweis = 'Relatives Alter ' + round2(relAlter) + ' % liegt unter der Schwelle von '
-              + k.rel + ' % fuer ' + punkte + ' Modernisierungspunkte. '
+              + k.rel + ' % für ' + punkte + ' Modernisierungspunkte. '
               + 'Modernisierungen wirken sich erst ab dieser Schwelle aus; '
               + 'bis dahin gilt RND = GND - Alter.';
     } else {
@@ -596,13 +596,13 @@
                 + round2(abw) + ' Jahre (' + round2(abwPct) + ' %) vom Modellergebnis ab. '
                 + (abw < 0
                    ? 'Der bauliche Zustand ist schlechter, als das Modell unterstellt - '
-                   + 'Erneuerungsbedarf und Instandhaltungsrueckstand pruefen.'
+                   + 'Erneuerungsbedarf und Instandhaltungsrückstand prüfen.'
                    : 'Der bauliche Zustand ist besser, als das Modell unterstellt - '
-                   + 'pruefen, ob zeitgemaesse Bauteile als Modernisierungspunkte '
-                   + 'anzusetzen sind (Anlage 2 laesst das zu).')
-                + ' Eine Abweichung wird sachverstaendig gewuerdigt und begruendet, '
-                + 'nicht automatisch uebernommen.',
-            quelle: 'Fachliche Festlegung 10.10.2026, Schritt 5 - Plausibilitaetspruefung'
+                   + 'prüfen, ob zeitgemäße Bauteile als Modernisierungspunkte '
+                   + 'anzusetzen sind (Anlage 2 lässt das zu).')
+                + ' Eine Abweichung wird sachverständig gewürdigt und begründet, '
+                + 'nicht automatisch übernommen.',
+            quelle: 'Fachliche Festlegung 10.10.2026, Schritt 5 - Plausibilitätsprüfung'
           });
         }
       }
@@ -657,19 +657,19 @@
          nach dokumentierter fachlicher Beurteilung.                    */
       final = 0;
       verfahren = 'keines';
-      finalSource = 'rechnerische Basis 0 Jahre - tatsaechliche Restnutzungsdauer '
-                  + 'sachverstaendig zu beurteilen';
+      finalSource = 'rechnerische Basis 0 Jahre - tatsächliche Restnutzungsdauer '
+                  + 'sachverständig zu beurteilen';
       grenzen.push({
         greift: true, art: 'pruefung_erforderlich',
         text: 'Das Alter (' + alter + ' J.) erreicht die Gesamtnutzungsdauer (' + gnd + ' J.). '
-            + 'Die rechnerische Basis betraegt damit 0 Jahre. Daraus folgt NICHT, dass die '
-            + 'wirtschaftliche Restnutzungsdauer 0 ist: ein genutztes Gebaeude hat eine. '
+            + 'Die rechnerische Basis beträgt damit 0 Jahre. Daraus folgt NICHT, dass die '
+            + 'wirtschaftliche Restnutzungsdauer 0 ist: ein genutztes Gebäude hat eine. '
             + 'Die Formel der Anlage 2 wird hier NICHT fortgerechnet - sie liegt hinter '
-            + 'ihrem Scheitelpunkt und steigt dort wieder an, was fachlich nicht tragfaehig ist. '
+            + 'ihrem Scheitelpunkt und steigt dort wieder an, was fachlich nicht tragfähig ist. '
             + 'Zu beurteilen sind Modernisierung, Sanierung, baulicher Zustand und '
             + 'wirtschaftliche Nutzbarkeit; bei Kernsanierung ist ein fiktives Baujahr zu '
-            + 'pruefen. Ein positiver Wert wird erst nach dokumentierter Beurteilung '
-            + 'uebernommen (reelle Restnutzungsdauer).',
+            + 'prüfen. Ein positiver Wert wird erst nach dokumentierter Beurteilung '
+            + 'übernommen (reelle Restnutzungsdauer).',
         quelle: 'Fachliche Festlegung 10.10.2026 - Grenze des Modellbereichs der Anlage 2, '
               + 'kein gesetzlicher Ausschluss'
       });
@@ -696,10 +696,10 @@
       grenzen.push({
         greift: true, art: 'unter_30_prozent',
         text: 'Ergebnis ' + round2(final) + ' Jahre liegt unter 30 % der Gesamtnutzungsdauer ('
-            + mindest30 + ' Jahre) und entspraeche einem AfA-Satz von '
-            + round2(100 / final) + ' % gegenueber 2 % im gesetzlichen Normalfall. '
-            + 'Sachverstaendig wuerdigen, bevor der Wert uebernommen wird.',
-        quelle: 'Paragraf 185 Abs. 3 Satz 5 BewG - dort bindend, hier Plausibilitaetsanker'
+            + mindest30 + ' Jahre) und entspräche einem AfA-Satz von '
+            + round2(100 / final) + ' % gegenüber 2 % im gesetzlichen Normalfall. '
+            + 'Sachverständig würdigen, bevor der Wert übernommen wird.',
+        quelle: 'Paragraf 185 Abs. 3 Satz 5 BewG - dort bindend, hier Plausibilitätsanker'
       });
     }
 
@@ -708,7 +708,7 @@
       reell = round2(Number(input.reelleRND));
       final = Number(input.reelleRND);
       verfahren = 'reell';
-      finalSource = 'reelle Restnutzungsdauer - sachverstaendige Korrektur';
+      finalSource = 'reelle Restnutzungsdauer - sachverständige Korrektur';
     }
 
     return {
@@ -761,11 +761,11 @@
         /* Darf das Ergebnis ohne Beurteilung uebernommen werden? */
         uebernahme_gesperrt: basisTechnisch <= 0 && reell == null,
         /* Was die Sperre loest: eine dokumentierte reelle RND. */
-        loest_die_sperre: 'input.reelleRND (sachverstaendig, mit Begruendung)',
+        loest_die_sperre: 'input.reelleRND (sachverständig, mit Begründung)',
         basis_rnd_jahre: round2(Math.max(0, gnd - alter)),
         hinweis: basisTechnisch <= 0
           ? 'Rechnerische Basis 0 Jahre. Das ist KEINE Aussage, dass die wirtschaftliche '
-          + 'Restnutzungsdauer 0 ist - sie ist sachverstaendig zu beurteilen.'
+          + 'Restnutzungsdauer 0 ist - sie ist sachverständig zu beurteilen.'
           : null
       }
     };
@@ -1241,8 +1241,8 @@
     } else if (zweck === 'afa') {
       stichtag = d.wirtschaftlicher_uebergang || d.kaufdat || d._at || null;
       stichtagHerkunft = d.wirtschaftlicher_uebergang
-        ? 'wirtschaftlicher Uebergang (steuerlicher Betrachtungsbeginn)'
-        : (d.kaufdat ? 'Kaufdatum - wirtschaftlicher Uebergang fehlt' : 'nicht bestimmbar');
+        ? 'wirtschaftlicher Übergang (steuerlicher Betrachtungsbeginn)'
+        : (d.kaufdat ? 'Kaufdatum - wirtschaftlicher Übergang fehlt' : 'nicht bestimmbar');
     } else {
       stichtag = new Date().toISOString().slice(0, 10);
       stichtagHerkunft = 'heute (Verkehrswert-Stichtag)';

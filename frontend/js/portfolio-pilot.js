@@ -72,10 +72,10 @@
       lang: 'Welche meiner Objekte belasten den Cashflow, welche tragen ihn? '
           + 'Nenne sie mit Namen und Zahl, sortiert vom schlechtesten zum besten.' },
     { kurz: 'Zinsbindungen',
-      lang: 'Wo laeuft als Naechstes eine Zinsbindung aus, und welche Restschuld haengt jeweils daran? '
+      lang: 'Wo läuft als Nächstes eine Zinsbindung aus, und welche Restschuld hängt jeweils daran? '
           + 'Sag mir, worauf ich mich einstellen muss. Steht bei einem Objekt keine Zinsbindung in den Daten, sag das.' },
     { kurz: 'Eigenkapital in 10 Jahren',
-      lang: 'Wie entwickelt sich mein Eigenkapital ueber die naechsten zehn Jahre? '
+      lang: 'Wie entwickelt sich mein Eigenkapital über die nächsten zehn Jahre? '
           + 'Nimm die Projektion und sag klar dazu, welche Annahmen darin stecken.' },
     { kurz: 'Klumpenrisiken',
       lang: 'Welche Klumpenrisiken habe ich - Lage, Objektart, Finanzierung, einzelne Objekte mit zu viel Gewicht? '
@@ -99,7 +99,7 @@
         '<span class="dp-pp-ic">' + PLANE + '</span>' +
         '<div class="dp-pp-tt">' +
           '<span class="dp-pp-t">Portfolio-Pilot</span>' +
-          '<span class="dp-pp-s">Analyse ueber alle Objekte — und Fragen zu jedem einzelnen</span>' +
+          '<span class="dp-pp-s">Analyse über alle Objekte — und Fragen zu jedem einzelnen</span>' +
         '</div>' +
         '<label class="dp-pp-web" title="Erlaubt dem Portfolio-Piloten, für aktuelle Marktdaten im Web zu recherchieren">' +
           '<input type="checkbox" id="dp-pp-web"><span>Web-Recherche</span></label>' +
@@ -109,8 +109,8 @@
          gefuellt (standZeigen); leer ist er unsichtbar. */
       '<div class="dp-pp-stand" id="dp-pp-stand" style="display:none"></div>' +
       '<div class="dp-pp-log" id="dp-pp-log">' +
-        '<div class="dp-pp-hint">Ich kenne deine Vermoegensbilanz — Gesamtinvestition, Eigenkapital, Restschuld, ' +
-        'Cashflow und die Entwicklung der naechsten zehn Jahre — und jedes einzelne Objekt darin. ' +
+        '<div class="dp-pp-hint">Ich kenne deine Vermögensbilanz — Gesamtinvestition, Eigenkapital, Restschuld, ' +
+        'Cashflow und die Entwicklung der nächsten zehn Jahre — und jedes einzelne Objekt darin. ' +
         'Starte die Analyse oder frag direkt.</div>' +
       '</div>' +
       /* v1705d: Schnellfragen. Ein leeres Eingabefeld ist eine Huerde -
@@ -301,8 +301,8 @@
     }).catch(function (err) {
       if (denkt && denkt.parentNode) denkt.parentNode.removeChild(denkt);
       var m = (err && err.data && (err.data.message || err.data.error)) || (err && err.message) || 'Fehler';
-      if (err && err.status === 429) m = 'Tageslimit erreicht. Morgen wieder verfuegbar.';
-      if (err && err.status === 503) m = 'KI ist gerade nicht verfuegbar (kein Server-Key).';
+      if (err && err.status === 429) m = 'Tageslimit erreicht. Morgen wieder verfügbar.';
+      if (err && err.status === 503) m = 'KI ist gerade nicht verfügbar (kein Server-Key).';
       addMsg('assistant', '⚠ ' + m);
     }).then(function () {
       laeuft = false;
@@ -316,12 +316,12 @@
   var ANALYSE_AUFTRAG = [
     'Analysiere mein GESAMTES Portfolio. Gliedere so:',
     '',
-    '1. Vermoegensbilanz heute - was steckt drin, was gehoert mir davon, was ist Fremdkapital.',
+    '1. Vermögensbilanz heute - was steckt drin, was gehört mir davon, was ist Fremdkapital.',
     '2. Ertragslage - Mieteinnahmen, Cashflow vor und nach Steuer, Renditen, Kapitaldienstdeckung.',
     '3. Die einzelnen Objekte - welche tragen, welche belasten. Nenne sie beim Namen und mit Zahl.',
     '4. Klumpenrisiken - Lage, Objektart, Finanzierung, auslaufende Zinsbindungen.',
-    '5. Entwicklung - was die Projektion ueber Restschuld und Eigenkapital sagt.',
-    '6. Was ich als Naechstes tun sollte - drei konkrete Schritte, priorisiert.',
+    '5. Entwicklung - was die Projektion über Restschuld und Eigenkapital sagt.',
+    '6. Was ich als Nächstes tun sollte - drei konkrete Schritte, priorisiert.',
     '',
     'Rechne mit den gegebenen Zahlen. Erfinde nichts. Fehlt etwas, sag es.'
   ].join('\n');
