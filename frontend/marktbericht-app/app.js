@@ -2152,6 +2152,9 @@ function _mbEnsureReportsPanel(){
        bleibt unangetastet. */
     st.textContent='#mbReportsPanel{background:#fff}'
      +'#mbReportsPanel .mbrep-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}'
+     /* v2198c · Responsive-Check 320 px: die Umschaltgruppe (Dieses Objekt | Alle | Zuklappen, 228 px)
+        war breiter als die Zeile (151 px) und wurde abgeschnitten - sie bricht jetzt selbst um. */
+     +'#mbReportsPanel .mbrep-top>span{display:flex;flex-wrap:wrap;gap:6px;max-width:100%;min-width:0}'
      +'#mbReportsPanel .mbrep-h{font-family:"Space Grotesk",sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33)}'
      +'#mbReportsPanel .mbrep-h b{color:#2A2727;font-family:"JetBrains Mono",monospace}'
      +'#mbReportsPanel .mbrep-f{display:inline-flex;border:1.5px solid rgba(42,39,39,.12);border-radius:9px;overflow:hidden;background:#fff}'
