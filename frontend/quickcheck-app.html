@@ -7303,6 +7303,21 @@ html[data-dp-kartenstil="buetten"] #qc7-sources .dp-pf-tile .dp-pf-ic svg{ color
   #qc7-sources.dp-pfbar .dp-pf-rz{ min-width:112px !important; padding:7px 10px !important; gap:5px !important; }
   #qc7-sources.dp-pfbar .dp-pf-rz .dp-pf-bc{ height:18px !important; }
 }
+/* v2199c · Handy: der Ausblender aus v636 (.dp-pf-bc display:none) verliert
+   gegen die Buetten-Regel mit display:block - gemessen bei 390 px lag der
+   Strichcode 239x48 HINTER dem 251x44-Knopf, sichtbar nur als duenner
+   Streifen. Jetzt auch hier ueber dem Knopf, flacher. */
+@media (max-width:640px){
+  #qc7-sources.dp-pfbar .dp-pf-rz{
+    display:flex !important; flex-direction:column !important; align-items:stretch !important;
+    gap:6px !important; padding:8px 10px !important;
+  }
+  #qc7-sources.dp-pfbar .dp-pf-rz .dp-pf-bc{
+    position:static !important; inset:auto !important; display:block !important;
+    width:100% !important; height:16px !important; flex:0 0 auto !important; opacity:.8 !important;
+  }
+  #qc7-sources.dp-pfbar .dp-pf-rz .dp-pf-launch{ margin:0 !important; }
+}
 
 /* ── v1685 · BEI „HEUTE" ZEIGT DAS QUICKBOARDING DASSELBE ───────────
    Gemessen bei Layout „Heute", beide Leisten nebeneinander:
