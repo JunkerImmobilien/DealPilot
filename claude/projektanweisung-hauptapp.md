@@ -38671,6 +38671,48 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod.
 - **Prod (12)** `ce9ad097`: v2187–v2190 ausgerollt (Freigabe Marcel 13.10.2026). Beide DBs vorher gesichert (Haupt 11 MB / 71 Tabellen, mb 25 MB / 30), Backend-Rebuild (openaiService: Hilfe-Auszug, im Container 2 Treffer `hilfeBlock`). `app.dealpilot.immo` liefert pilot-tower/pilot-figur als text/javascript, index lädt help.js v2190. **Entscheidung Marcel:** Auffangwerte (§ 256 BewG, Sachwertfaktor 1,0) bleiben wie sie sind (C) — „es steht ja dran und gibt eine Orientierung“.
 
+### v2191–v2197 · Backlog abgearbeitet (13.10.2026, Staging; Prod (12) davor)
+
+- **Was:** Marcel: „ja dann los, alles abarbeiten und vorher ausrollen".
+  - Prod (12) `ce9ad097` mit v2187–v2190.
+  - **v2191:** sechs Fehler aus der Hilfe-Erhebung behoben.
+    - Quick-Check-Balken lasen falsche Teilnoten.
+    - Eigene DealScore-Regler wirkten nie, außer bei der Vorlage „custom".
+    - Marktbericht Stufe 3 aus dem Reiter Objekt nahm die 23-%-Pauschale.
+    - Der Übernahme-Hinweis nannte den falschen Betrag.
+    - `.dpkt` war nicht importierbar.
+    - Kleinigkeiten: „TOP", „Auto-saved", „unten links".
+  - **v2192/a:** Der Quick-Check nutzt die eigenen Tabellen.
+    - Makrolage aus `mb.makro_werte` jetzt auch im Schnell-Modus (nur Tabelle, nie live).
+    - Karte zeigt Leerstand (Zensus) und Bodenrichtwert mit Quelle.
+    - Bewertung bekommt Zensus-Leerstand, Zensus-Miete und Makrolage als Pro/Contra.
+    - Hinweis ohne „Liter".
+    - Umlaute in der Hausgeld-Bewertung.
+  - **v2193:** `data._ai` = `ai_analysis` beim Speichern (N62.17).
+    - Ursache: `collectData()` trägt `_ai` vom Laden mit.
+    - Zurückgenommen: meine erste Vermutung „nur alte Reste" war falsch, 32 Objekte hatten die Kopie in den letzten zwei Tagen bekommen.
+  - **v2194:** Werte aus dem Vorjahr übernehmen, nur wiederkehrende Posten (N62.10).
+  - **v2195:** Bewirtschaftungskosten 2022–2026 aus der amtlichen Tabelle des Oberen Gutachterausschusses Brandenburg.
+    - 2022 neu, 2023 vollständig, 2024 ETW 421.
+    - Die Quelle 2025 nannte einen Anbieternamen im Kundentext.
+    - Gewerbe im Ertragswert: Verwaltung 3 %, Mietausfall getrennt 2 % / 4 %.
+  - **v2196:** Marktbericht-Kapitel D „Entwicklung, Ableitung & Prognose" (N62.14). Fakten aus `kapitelD()`, Prognose als Modellfortschreibung.
+  - **v2197:** `mb.plz_orte` und `mb.laufzeiten` (N62.18 Punkte 2 und 6).
+  - Aufgeräumt, weil laut Code längst erledigt: N62.1, N62.2, N62.3, N62.5 (überholt), N61.1, N61.3, N61.4, N61.6/N51.
+- **Commit:** `ad26710b`, `abc2933e`, `285c7ef1`, `ae640c48`, `d4bf5647`, `d0150c40`, `f8a42348`, `c74eb3a5` (v2197)
+- **Nachweis:**
+  - Score-Ketten 115 gleich, RND-Kerne RC=0. Die gespiegelte `rnd-calc.js` war veraltet (Umlaut-Stand v2180), jetzt gleich.
+  - Echter Quick-Check-Abruf Detmold: Makro 4/4 aus der Tabelle in 6 s, Zensus Gemeinde, BRW 1.500 €/m² BORIS-NRW, Contra „Miete über Zensus-Mittel" erscheint.
+  - Vorjahr-Übernahme: Hausverwaltung und Steuerberater kopiert, Schuldzinsen nicht.
+  - Ertragswert-Kern: Gewerbe 12.000 € ergibt Verwaltung 727 € und Mietausfall 1.080 €; ohne Gewerbe unverändert.
+  - Kapitel D echt erzeugt.
+  - PLZ 152 ms live gegen 2 ms aus der Tabelle.
+- **Rest:**
+  - Offen sind nur noch Entscheidungen: N62.7 Landingpage, N62.8 Preise, N62.9 F&E-Seite, N62.15 Datenschutz-Texte, N61.5 Demo-Objekte, N62.23 Gutachten-Modul.
+  - Größere Pakete: N62.18 Punkte 3–5 (BRW-Ablage, GeoMap-Lizenz, DB-Warteschlange), N62.12 (GeoMap-Lage-Endpunkte prüfen).
+  - Abnahmen bei sichtbarem Fenster.
+  - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
+
 ### Prod (9/10) v2184–v2185 · Fortschreibungsfaktor recherchiert (13.10.2026)
 
 - **Prod (9)** `aff213f6`: v2183/v2184, Haupt-DB gesichert (11 MB, 71), Backend-Rebuild; im Container `bwk_profil` erlaubt, `bwk-profil.js?v=v2184` per curl (200, text/javascript).
