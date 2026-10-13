@@ -187,7 +187,7 @@ gegenübergestellt werden sie nirgends.
 - Am Handy dieselbe Kritik wie bei der Hilfe.
 
 **N63.5 · Einstellungen → Standardwerte: als Karten statt Scrollliste — DEMO ZUERST**
-> ⏳ Demo steht: design/Vorschläge/standardwerte-karten-demo.html (A Karten · B Unter-Reiter · C Set zuerst). Wartet auf Marcels Wahl und die Werte der Sets.
+> ✅ v2206, Prod (16) — Marcels Wahl A (Karten) mit drei Sets gebaut (js/standardwerte-karten.js). Demo war: design/Vorschläge/standardwerte-karten-demo.html (A Karten · B Unter-Reiter · C Set zuerst). Wartet auf Marcels Wahl und die Werte der Sets.
 - Marcel: *„unübersichtlich … mit so Standardkarten arbeiten, dass man nicht so viel runterscrollen muss"*
 - Ein Reiter mit den Lageklassen (A/B/C/D), ein Reiter mit den Standardwerten, je eine kurze Erklärung.
 - **Ein Standardset auswählbar**, also ein vorbelegter Satz.
