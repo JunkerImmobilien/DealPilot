@@ -201,11 +201,7 @@ gegenübergestellt werden sie nirgends.
 - Prüfen, ob sie überall sauber dargestellt wird: Desktop, Tablet, Handy in der Messkabine.
 - Dazu Eingabe und Lautsprecher.
 
-**N63.9 · Sprechen wie bei WhatsApp: halten zum Sprechen**
-- Marcel: im Fenster der geführten Eingabe den **Mikrofon-Knopf gedrückt halten**, um zu sprechen, statt dass er von selbst zuhört.
-- Damit entfallen das Kästchen „Ich höre nichts, du kannst auch tippen" und der Anhalten-Knopf.
-- In der App-Fassung darf er wie heute automatisch zuhören. Klären, ob „App-Version" die installierte PWA meint oder den Telegram-Bot.
-- Marcel sagt „Lautsprecher" und meint das Mikrofon. Abgrenzen gegen die Sprachausgabe der Piloten.
+**N63.9 · Geführte Eingabe: Mikrofon auf kleinen Bildschirmen „halten zum Sprechen“** — Marcel (13.10. abends, präzisiert): gemeint ist das Mikrofon-Symbol der GEFÜHRTEN EINGABE und die Handy-Darstellung (Messkabine, kleine Breiten). Dort: Mikrofon gedrückt halten = zuhören, loslassen = fertig (wie WhatsApp); das Kästchen „Ich höre nichts, du kannst auch tippen“ und der Anhalten-Knopf entfallen dort. Auf großen Bildschirmen bleibt das automatische Zuhören wie heute.
 
 #### N62.24 · Rest aus dem Responsive-Check (13.10.2026, v2198–v2198c)
 
