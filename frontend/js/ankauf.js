@@ -148,6 +148,9 @@
   function festschreiben(stichtag) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(stichtag || '')))
       throw new Error('Kein gültiger Stichtag');
+    /* v2164: Bestand heisst gewonnen (Marcel, 13.10.2026). */
+    if ((document.getElementById('_deal_won_state') || {}).value !== 'true')
+      throw new Error('Einen Ankauf-Stand gibt es nur für gewonnene Objekte');
     var daten = _datensatzJetzt();
     var neu = {
       stichtag: stichtag,

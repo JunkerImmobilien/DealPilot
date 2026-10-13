@@ -3040,7 +3040,14 @@ async function copilotChat(payload, opts) {
           '  Klumpenrisiken: Lage ueber lageklasse und bodenrichtwert (nicht nur ueber den Ort),',
           '  Substanz ueber zustand und energieklasse, Ertragssicherheit ueber leerstand_pct.',
           '- Haeufen sich schlechte Energieklassen oder renovierungsbeduerftige Objekte, ist das',
-          '  ein Sanierungs-Klumpen - benenne ihn mit Namen und Anzahl.'
+          '  ein Sanierungs-Klumpen - benenne ihn mit Namen und Anzahl.',
+          /* v2164 - der Auszug der Einzel-Analysen. Ohne diese Zeile waere er
+             nur weiterer Text im Kontext (Lehre v2014). */
+          '- Je Objekt steht "pilot_analyse": ein AUSZUG der Pilot-Analyse dieses Objekts (Empfehlung,',
+          '  Fazit, Top-Risiken/-Staerken, Steuer) mit ihrem Stand. Nutze ihn fuer "welche tragen, welche',
+          '  belasten" und fuer Klumpenrisiken (gleiche Risiken bei mehreren Objekten). Ist er null, gibt es',
+          '  fuer das Objekt keine Analyse - sage das. Ist der Stand alt, sage, dass die Einschaetzung aelter ist',
+          '  als die Zahlen. Die Zahlen im Objekt gehen vor, wenn sie dem Auszug widersprechen.'
         ].join('\n')
       : '',
 
