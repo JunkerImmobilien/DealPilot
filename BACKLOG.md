@@ -600,6 +600,8 @@ hier. Ein Punkt, der nur in einem Chat lebt, fehlt beim nächsten Mal.
 
 #### N61.1 · Der Aussehen-Schritt: die App soll sich im Hintergrund mitändern
 
+> **✅ laut Code gebaut (Aufräumen 13.10.2026): v2096** — ein Klick auf eine Aussehen-Kachel setzt das Layout sofort um (_aussehenAnwenden → DealPilotLayout.setze), und im Schritt Aussehen ist der dunkle Schleier weg (dpo-ov-schau), weil er Hell gegen Dunkel um 60 % verfälschte. Offen nur die Sichtabnahme mit einem frischen Testkonto (ohne Objekte ist der Hintergrund leer).
+
 **Marcel:** *„wenn man nach der neuanmeldung das aussehen der app auswählen
 kann dass die bilder dort nichts sagend sind und es gut wäre wenn sich im
 hintergrund die app direkt ändert und das bild das layout besser wieder
