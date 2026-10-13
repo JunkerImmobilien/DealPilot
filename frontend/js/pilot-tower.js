@@ -122,7 +122,8 @@
       '#dp-tower .punkte span{display:inline-block;width:6px;height:6px;border-radius:50%;background:' + G + ';margin-right:4px;animation:dpt-p 1s infinite}',
       '#dp-tower .punkte span:nth-child(2){animation-delay:.15s}#dp-tower .punkte span:nth-child(3){animation-delay:.3s}',
       '@keyframes dpt-p{0%,100%{opacity:.25}50%{opacity:1}}',
-      '@media (max-width:640px){#dp-tower{left:8px !important;right:8px;width:auto;top:auto !important;bottom:8px;max-height:min(74vh,calc(100vh - 110px))}#dp-tower input.frage{font-size:16px}}',
+      '@media (max-width:640px){#dp-tower{left:8px !important;right:8px;width:auto;top:auto !important;bottom:8px;max-height:min(74vh,calc(100vh - 110px))}#dp-tower input.frage{font-size:16px !important}#dp-tower .fuss .h{display:none}}',
+      '#dp-tower ul.tr li{text-align:left}#dp-tower .tx{flex:1 1 auto;min-width:0}',
       '@media (prefers-reduced-motion:reduce){#dp-pilot{transition:none}}'
     ].join('\n');
     document.head.appendChild(st);
@@ -338,6 +339,15 @@
   }
   function heimSetzen(sofort) {
     if (!pilot || !pilot.classList.contains('ruht')) return;
+    /* Handy: liegt ein Fenster über seinem Platz (Hilfe, Einstellungen,
+       Atlas), tritt er zurück - gemessen lag er in den Einstellungen auf
+       390 px über der Zeile „Auto-Save" neben „Abbrechen". */
+    if (innerWidth <= 640) {
+      var pr = pilot.getBoundingClientRect(), unter = null;
+      try { unter = document.elementsFromPoint(pr.left + pr.width / 2, pr.top + pr.height / 2).filter(function (x) { return !pilot.contains(x); })[0]; } catch (e) {}
+      var deck = unter && unter.closest && unter.closest('.global-view-overlay, .modal-backdrop, #dp-atlas, [role="dialog"]');
+      pilot.style.visibility = deck ? 'hidden' : '';
+    } else pilot.style.visibility = '';
     var p = ruhePlatz();
     var x = Math.round(p.x) + 'px', y = Math.round(p.y) + 'px';
     if (pilot.style.left === x && pilot.style.top === y && pilot.classList.contains('buste') === p.buste) return;
@@ -379,7 +389,8 @@
     var r = zielEl ? zielEl.getBoundingClientRect() : null;
     var sichtbar = !!(r && r.width && r.bottom > 0 && r.top < innerHeight);
     var px, py;
-    if (mobil) { px = innerWidth - 64; py = 8; }
+    /* Handy: er steht AUF der Oberkante des Bodenblatts, links - nicht auf dem Kopf der App. */
+    if (mobil) { var tb = tower.getBoundingClientRect(); px = 18; py = Math.max(8, (tb.top || innerHeight * 0.3) - 82); }
     else if (sichtbar) { px = r.right + 8; py = r.top - 30; if (px > innerWidth - 70) px = r.left - 62; }
     else { px = innerWidth - 530; py = 80; }
     pilot.classList.remove('ruht');
@@ -597,7 +608,7 @@
     setTimeout(function () { heimSetzen(true); }, 1500);
     /* Die Seitenleiste baut sich nach dem Laden noch um (Objekte, Score) —
        der Ruheplatz wird deshalb nachgemessen, nicht einmal gesetzt. */
-    setInterval(function () { heimSetzen(false); }, 2500);
+    setInterval(function () { heimSetzen(false); }, 1200);
     var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { heimSetzen(true); }, 200); });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();

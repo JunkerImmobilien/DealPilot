@@ -40860,3 +40860,49 @@ body.dp-ankauf-frei .ank-seg.aktiv{background:#ffffff;color:#8E4A45}
 body:not(.dp-neue-karte-stil) .dp-pf-freigeben-ueber {
   background: #141210; color: #f3ead0; border-color: var(--wl-c9a84c, #C9A84C);
 }
+
+/* v2189 · Hilfe-Fenster auf dem Handy (Messkabine 390 px gemessen):
+   das Gitter „280px 1fr" blieb stehen - Themenliste 280 px, Inhalt 32 px.
+   Die Handy-Regel der Einstellungen (v638, oben) greift nur an
+   .settings-modal, und #help-modal .help-modal-inner.global-view-modal
+   haelt das Gitter mit ID-Spezifitaet fest. Hier dieselbe Bauart wie bei
+   den Einstellungen: gestapelt, Themen als waagerechte Leiste, Inhalt
+   volle Breite, Fragezeile unten. html-Praefix = eine Stufe mehr. */
+@media (max-width: 768px) {
+  html #help-modal.global-view-overlay { padding: 0 !important; align-items: stretch !important; justify-content: stretch !important; }
+  html #help-modal .help-modal-inner.global-view-modal {
+    display: flex !important; flex-direction: column !important;
+    width: 100vw !important; max-width: 100vw !important;
+    height: 100dvh !important; max-height: 100dvh !important;
+    border-radius: 0 !important; margin: 0 !important;
+  }
+  html #help-modal .dp-mtb-hero { height: 48px !important; }
+  html #help-modal .dp-mtb-h-title { font-size: 19px !important; }
+  html #help-modal .help-modal-side {
+    flex: 0 0 auto !important; width: 100% !important; height: auto !important;
+    max-height: none !important; overflow: visible !important; border-right: 0 !important;
+  }
+  html #help-modal .help-modal-search { padding: 10px 12px 8px !important; }
+  html #help-modal #help-search-input { font-size: 16px !important; }
+  html #help-modal #help-sidebar {
+    flex-direction: row !important; flex-wrap: nowrap !important; height: auto !important;
+    overflow-x: auto !important; overflow-y: hidden !important; gap: 6px !important;
+    padding: 0 12px 10px !important;
+  }
+  html #help-modal #help-sidebar .help-sidebar-item {
+    flex: 0 0 auto !important; width: auto !important; height: auto !important; min-height: 0 !important;
+    padding: 8px 12px !important; margin: 0 !important; white-space: nowrap !important;
+  }
+  html #help-modal #help-sidebar .help-sidebar-item-desc { display: none !important; }
+  html #help-modal .help-modal-content {
+    flex: 1 1 auto !important; width: 100% !important; min-height: 0 !important;
+    display: flex !important; flex-direction: column !important; overflow: hidden !important;
+  }
+  html #help-modal .help-content-wrap { flex: 1 1 auto !important; width: 100% !important; min-height: 0 !important; overflow-y: auto !important; }
+  html #help-modal #help-content { padding: 14px 14px 24px !important; width: auto !important; }
+  html #help-modal .help-ai-foot { flex: 0 0 auto !important; width: 100% !important; padding: 8px 10px !important; }
+  html #help-modal .help-ai-bar { flex-wrap: wrap !important; gap: 6px !important; }
+  html #help-modal #help-ai-input { flex: 1 1 100% !important; min-width: 0 !important; font-size: 16px !important; }
+  html #help-modal .help-ai-response { max-height: 40vh; overflow-y: auto; }
+  html #help-modal .hab { padding: 12px !important; }
+}
