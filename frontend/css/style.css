@@ -40908,3 +40908,36 @@ body:not(.dp-neue-karte-stil) .dp-pf-freigeben-ueber {
   html body #help-modal.help-modal.global-view-overlay .help-ai-response { max-height: 40vh; overflow-y: auto; }
   html body #help-modal.help-modal.global-view-overlay .hab { padding: 12px !important; }
 }
+
+/* ==============================================================================
+   v2198 · Lesbarkeit im hellen Hauptbereich (Responsive-/Kontrast-Check)
+   Gemessen in der Messkabine (390 px, alle 9 Reiter, Kontrast nach WCAG gegen
+   den EFFEKTIVEN Grund): die meisten Funde hingen an wenigen Werten -
+     #7A7370 (--muted) auf Creme/Rosa   4,0-4,5   86 Stellen
+     Gold #C9A84C als Kartentitel       2,3       12
+     Gold-3 (Abschnittstitel .ct-pro)   4,0       49
+     #888684 / #868483 (Bank-Cockpit)   3,4-3,5   29
+     Matrix-Beschriftung 9 px auf Rosa  3,1       24
+   Die Token gelten auch auf dem DUNKLEN Grund (Seitenleiste, dunkle Themes).
+   Deshalb NUR im hellen Hauptbereich der Standardansicht und als eigene
+   Variablen, die sich dort vererben - die Marke bleibt Gold, nur dunkler
+   abgemischt, wo Gold Schrift ist (Memory: akzent-ist-nicht-textfarbe).
+   Statusfarben (Gruen/Rot) bleiben unangetastet.
+   ============================================================================== */
+html:not([data-ui-theme]) body .main-col {
+  --muted: #625c59;
+}
+html:not([data-ui-theme]) body .main-col .card .card-title,
+html:not([data-ui-theme]) body .main-col .ct.ct-pro,
+html:not([data-ui-theme]) body .main-col .kv-v.c-gold {
+  color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 60%, #120e05) !important;
+}
+html:not([data-ui-theme]) body .main-col .bc-kpi-trend-bench-la,
+html:not([data-ui-theme]) body .main-col .bc-head-sub,
+html:not([data-ui-theme]) body .main-col .bc-footer-label,
+html:not([data-ui-theme]) body .main-col .bc-footer-sub {
+  color: #625f5c !important;
+}
+html:not([data-ui-theme]) body .main-col .bc-matrix-cell-label {
+  color: #4f4542 !important;
+}
