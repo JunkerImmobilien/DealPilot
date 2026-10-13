@@ -1565,6 +1565,27 @@
              beendet ist, wenn die naechste Zeile laeuft — und der Spot
              wird danach NACHGEZOGEN (unten in `_applySubHl`). */
           if (fr.top < 70 || fr.bottom > vh - 70) first.scrollIntoView({ behavior: 'auto', block: 'center' });
+          /* v2182 · Marcel: „Im Quick Boarding springt die Tour nicht zum Button
+             ‚Als Objekt speichern'." GEMESSEN: der Knopf wird markiert, liegt aber
+             bei y 2.226 in einem 828 px hohen Fenster. Er steckt im iframe, das
+             auf Inhaltshoehe gezogen ist - scrollIntoView im iframe-Dokument
+             bewegt die Hauptseite (Scroller .main-col) nicht. Fuer Ziele in
+             einem iframe wird deshalb der Scroller der Hauptseite selbst
+             verschoben. */
+          if (first.ownerDocument !== document) {
+            var _ifr = null;
+            var _alle = document.querySelectorAll('iframe');
+            for (var _i = 0; _i < _alle.length; _i++) {
+              try { if (_alle[_i].contentDocument === first.ownerDocument) { _ifr = _alle[_i]; break; } } catch (e) {}
+            }
+            if (_ifr) {
+              var _y = _ifr.getBoundingClientRect().top + first.getBoundingClientRect().top;
+              if (_y < 90 || _y > window.innerHeight - 90) {
+                var _sc = document.querySelector('.main-col') || document.scrollingElement;
+                if (_sc) _sc.scrollTop += _y - window.innerHeight / 2;
+              }
+            }
+          }
         } catch (e) {}
       }
       /* ═══ v1782b · DAS NACHZIEHEN IST ZURUECKGENOMMEN ═══════════════
