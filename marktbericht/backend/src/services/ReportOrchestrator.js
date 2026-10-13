@@ -291,6 +291,13 @@ export const ReportOrchestrator = {
     //   Jeder Strang meldet sich per step(), sobald er fertig ist -> Live-Fortschritt.
     step('Marktdaten werden geladen …');
 
+    /* v2197 · N62.18 Punkt 6 · Laufzeiten je externem Dienst. Alle Abrufe starten
+       hier parallel; gemessen wird die Zeit vom Start bis zum Ergebnis. */
+    const _lzStart = Date.now();
+    const _lz = [];
+    const _zeit = (name, p) => Promise.resolve(p).then(
+      (v) => { _lz.push({ name, ms: Date.now() - _lzStart, ok: !!v && v.available !== false }); return v; },
+      (e) => { _lz.push({ name, ms: Date.now() - _lzStart, ok: false }); throw e; });
     const balanceBeforeP = GeoMapConnector.getBalance().catch(() => null);
 
     const saleP = MarketAnalysisService.saleLevel(ref)
@@ -386,7 +393,9 @@ export const ReportOrchestrator = {
     })().catch((e) => { step('boris: fehler ' + e.message); return null; });
 
     const [balanceBefore, sale, rent, micro, insights, macroBundle, zensus, landValue, marktkontext] =
-      await Promise.all([balanceBeforeP, saleP, rentP, microP, insightsP, macroP, zensusP, borisP, kontextP]);
+      await Promise.all([balanceBeforeP, _zeit('sale', saleP), _zeit('rent', rentP), _zeit('micro', microP),
+        _zeit('insights', insightsP), _zeit('macro', macroP.then((m) => m && m.macroRaw)).then(() => macroP), _zeit('zensus', zensusP),
+        _zeit('boris', borisP), _zeit('kontext', kontextP)]);
 
     const macroRaw = macroBundle.macroRaw;
     const macro = ScoringService.macroScore(macroRaw.metrics || null);
@@ -1491,6 +1500,16 @@ export const ReportOrchestrator = {
       );
     } catch (e) { step('snapshot: ' + e.message); /* Snapshot ist optional, Bericht nicht blockieren */ }
     step('DONE');
+
+    /* v2197 · Laufzeiten ablegen - nie den Bericht aufhalten (kein await auf Fehler). */
+    try {
+      const _st = Number(input.wert_stufe) || 1, _sn = !!FAST;
+      const _rows = _lz.concat([{ name: 'bericht_gesamt', ms: Date.now() - t0, ok: true, art: 'bericht' }]);
+      for (const r of _rows) {
+        q('INSERT INTO mb.laufzeiten (art, name, ms, ok, schnell, stufe, bericht_id) VALUES ($1,$2,$3,$4,$5,$6,$7)',
+          [r.art || 'dienst', r.name, Math.round(r.ms), r.ok !== false, _sn, _st, rep.id]).catch(() => {});
+      }
+    } catch (e) { /* Messung ist optional */ }
 
     return {
       report_id: rep.id,

@@ -4,6 +4,27 @@
 // Kreise ueber den 5-stelligen AGS (z. B. 05758 = Kreis Herford).
 import { httpJson } from '../lib/http.js';
 import { cacheGet, cacheSet } from '../lib/cache.js';
+import { q } from '../lib/db.js';
+
+/* v2197 · N62.18 Punkt 2 · Die OpenPLZ-Antwort je PLZ liegt in mb.plz_orte
+   (Migration 018) und wird nach 90 Tagen neu geholt. Fehlt die Tabelle oder
+   haengt die DB, bleibt alles beim Live-Abruf wie vorher. */
+const PLZ_ALTER_TAGE = 90;
+async function orteFuerPlz(plz) {
+  try {
+    const r = await q('SELECT antwort FROM mb.plz_orte WHERE plz = $1 AND abgerufen_am > now() - ($2 || \' days\')::interval', [plz, String(PLZ_ALTER_TAGE)]);
+    if (r && r[0] && r[0].antwort) return r[0].antwort;
+  } catch (e) { /* Tabelle fehlt -> live */ }
+  const data = await httpJson('https://openplzapi.org/de/Localities?postalCode=' + plz, { timeoutMs: 10000, retries: 1 });
+  try {
+    const liste = Array.isArray(data) ? data : (data && data.content) || [];
+    if (liste.length) {
+      await q('INSERT INTO mb.plz_orte (plz, antwort, abgerufen_am) VALUES ($1, $2, now()) '
+        + 'ON CONFLICT (plz) DO UPDATE SET antwort = EXCLUDED.antwort, abgerufen_am = now()', [plz, JSON.stringify(data)]);
+    }
+  } catch (e) { /* Ablegen ist Bequemlichkeit, kein Muss */ }
+  return data;
+}
 
 const TTL_MS = 30 * 24 * 60 * 60 * 1000; // AGS aendert sich praktisch nie -> 30 Tage cachen
 
@@ -26,7 +47,7 @@ export const AgsResolver = {
     const plz = (postcode || '').toString().trim();
     if (!/^\d{5}$/.test(plz)) return null;
     let data;
-    try { data = await httpJson('https://openplzapi.org/de/Localities?postalCode=' + plz, { timeoutMs: 10000, retries: 1 }); }
+    try { data = await orteFuerPlz(plz); }   /* v2197: eigene Tabelle zuerst */
     catch { return null; }
     const liste = Array.isArray(data) ? data : (data && data.content) || [];
     const gem = new Map();
@@ -52,7 +73,7 @@ export const AgsResolver = {
 
     let out = null;
     try {
-      const data = await httpJson(`https://openplzapi.org/de/Localities?postalCode=${plz}`, { timeoutMs: 10000, retries: 1 });
+      const data = await orteFuerPlz(plz);   /* v2197: eigene Tabelle zuerst */
       const loc = Array.isArray(data) ? data[0] : (data && data.content ? data.content[0] : null);
       if (loc) {
         // district = Kreis (bei kreisfreien Staedten ggf. null -> dann aus Gemeinde-AGS ableiten)
