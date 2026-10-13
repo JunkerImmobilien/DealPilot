@@ -509,7 +509,10 @@ const ERWARTET = [
   ['Bevoelkerungstrend',           'v2157', '+0,30 % pro Jahr'],
   ['Zensus: Leerstand',            'v2157', 'Leerstandsquote 3,7 %'],
   ['Zensus: Kreis + Stichtag',     'v2157', 'Stichtag 15.05.2022, PRUEFKREIS'],
-  ['Aufgabe 15 + Zielfeld',        'v2157', '"lage_gegenueberstellung": [']
+  ['Aufgabe 15 + Zielfeld',        'v2157', '"lage_gegenueberstellung": ['],
+  ['Aufgabe 16 Steuer',             'v2160', '16. Steuerliche Zusammenfassung'],
+  ['Zielfeld steuer_zusammenfassung', 'v2160', '"steuer_zusammenfassung":'],
+  ['Zielfeld soll_ist_steuer (Ankauf)', 'v2160', '"soll_ist_steuer":']
 ];
 
 /* ══ LAUF ════════════════════════════════════════════════════════════ */

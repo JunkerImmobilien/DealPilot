@@ -1402,6 +1402,23 @@ function buildPrompt(payload, opts) {
     '   Investition bedeutet. Wo das Objektfeld vom Bericht abweicht, sage',
     '   deutlich, dass die Angabe des Investors nicht gemessen ist.',
     '   Gehoert nach "lage_gegenueberstellung".',
+    /* v2160 · N62.6 — die steuerliche Zusammenfassung. Marcel: „bei der
+       Pilotanalyse natuerlich auch eine steuerliche Zusammenfassung machen.
+       Das soll natuerlich auch mit in den Soll-Ist-Abgleich einfliessen."
+       Bis hier stand die Steuer nur als Nebensatz in Aufgabe 8 - ohne
+       eigenes Feld (Lehre v2013b: ohne Zielfeld kein Text). */
+    '',
+    '16. Steuerliche Zusammenfassung — was die Investition steuerlich bewirkt, NUR aus',
+    '   dem Block STEUER und den Kennzahlen (Steuerwirkung p.a., Cashflow vor/nach Steuer).',
+    '   Nenne: AfA-Basis und -Satz bzw. Restnutzungsdauer, ob Sanierung als',
+    '   Erhaltungsaufwand verteilt wird, die Steuerwirkung im ersten Jahr in EUR und',
+    '   was sie fuer den Cashflow nach Steuer heisst. Fehlt eine Angabe (z. B. kein',
+    '   Grenzsteuersatz), sage das und rechne NICHT mit einem angenommenen Satz.',
+    '   Keine Steuerberatung: schliesse mit dem Hinweis, dass ein Steuerberater die',
+    '   Einordnung bestaetigen sollte. Gehoert nach "steuer_zusammenfassung".',
+    (_ak ? '   Liegt oben ein ANKAUF-STAND vor: vergleiche zusaetzlich die steuerliche Lage\n'
+      + '   beim Ankauf mit heute (Zeile "Steuerwirkung p. a." und Cashflow n. Steuer der\n'
+      + '   Abweichungstabelle) und erklaere die Bewegung. Gehoert nach "soll_ist_steuer".' : ''),
     '## STIL',
     '- Klar, professionell, wie ein ausführlicher Investment-Report',
     '- Mit Zahlen aus dem Deal arbeiten — konkret werden',
@@ -1492,6 +1509,9 @@ function buildPrompt(payload, opts) {
     '    { "merkmal": "Makrolage", "objektfeld": "Angabe des Investors oder null", "bericht": "Wert laut Marktbericht oder null", "recherche": "dein Befund, kurz, mit Zahl wo moeglich", "quelle": "URL der Recherchequelle oder null", "urteil": "stimmt | weicht ab | offen", "kommentar": "1-2 Saetze: was das fuer die Investition heisst" },',
     '    "... je eine Zeile fuer Mikrolage, Bevoelkerungsentwicklung, Nachfrage, Wertsteigerung, Entwicklung, Mietniveau, Kaufpreisniveau"',
     '  ],',
+    /* v2160 · Zielfelder fuer Aufgabe 16 (N62.6) */
+    '  "steuer_zusammenfassung": "5-8 Saetze: AfA, Sanierung, Steuerwirkung im ersten Jahr in EUR, Folge fuer den Cashflow nach Steuer; fehlende Angaben benennen; Hinweis auf Steuerberater",',
+    _ak ? '  "soll_ist_steuer": "2-4 Saetze: steuerliche Lage beim Ankauf gegen heute, mit beiden Zahlen; null, wenn keine Steuerzahl zu beiden Zeitpunkten vorliegt",' : '',
     '  "anschlussfinanzierung": "Restschuld nach Zinsbindung + noetiger EK-Einsatz/Sondertilgung damit die Anschlussfinanzierung traegt, 4-6 Saetze mit Zahlen soweit ableitbar",',
     '  "score_vergleich": "Falls DealPilot-Score UND Investor Deal Score vorliegen und sich unterscheiden: erklaere Konvergenz/Divergenz und welche Zusatz-KPIs (Lage/Substanz/Upside) den Unterschied treiben, 4-6 Saetze. Sonst leer lassen.",',
     /* v2013b - GEMESSEN am echten Lauf: die Fotos gingen durch (22 von

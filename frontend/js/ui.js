@@ -2127,6 +2127,20 @@ function _renderAIServerAnalysis(a) {
       + '</div></div>';
   }
   var _siHtml = _sollIstHtml();
+  /* v2160 · N62.6 — der Steuer-Text des Modells gehoert AN die Tafel:
+     die Tafel zeigt die Zahlen, der Text erklaert ihre Bewegung. */
+  if (_siHtml && has(a.soll_ist_steuer)) {
+    _siHtml += '<div class="dp-pa-card" style="margin-top:12px">' + sec('', I.bank, 'STEUERLICH: ANKAUF GEGEN HEUTE') + p(a.soll_ist_steuer) + '</div>';
+  }
+  /* v2160 · N62.6 — der Steuer-Reiter. Er steht immer: eine Analyse von
+     vor v2160 hat das Feld nicht, und dann sagt er das, statt zu fehlen. */
+  var pSt = sec('', I.bank, 'STEUERLICHE ZUSAMMENFASSUNG');
+  pSt += has(a.steuer_zusammenfassung)
+    ? '<div class="dp-pa-card">' + p(a.steuer_zusammenfassung)
+      + '<div class="dp-pa-fuss">Eine Einordnung aus deinen Eingaben im Reiter Steuer — keine Steuerberatung. '
+      + 'Lass sie von deinem Steuerberater bestätigen.</div></div>'
+    : '<div class="dp-pa-card"><div class="dp-pa-fuss" style="margin-top:0">Diese Analyse wurde vor der steuerlichen '
+      + 'Zusammenfassung erstellt. Beim nächsten Abruf steht sie hier.</div></div>';
 
   try { setTimeout(window._dpLoadVerlauf, 0); } catch (e) {} /* v972a */
   /* v2017 - DER KOPF: Stand und Gueltigkeit, bevor irgendein Text kommt. */
@@ -2177,6 +2191,7 @@ function _renderAIServerAnalysis(a) {
       tab('loc', 'Lage &amp; Markt', false) +
       tab('verh', 'Verhandlung &amp; Offerte', false) +
       tab('bank', 'Bank', false) +
+      tab('steuer', 'Steuer', false) +   /* v2160 */
       /* v2042 - nur wenn ein Ankauf-Stand vorliegt: ohne ihn gibt es
          nichts abzugleichen, und ein leerer Reiter verspricht etwas. */
       (_siHtml ? tab('si', 'Soll/Ist-Abgleich', false) : '') +
@@ -2203,6 +2218,7 @@ function _renderAIServerAnalysis(a) {
       panel('loc', pL, false) +
       panel('verh', pV, false) +
       panel('bank', pK, false) +
+      panel('steuer', pSt, false) +
       (_siHtml ? panel('si', _siHtml, false) : '') +
       panel('quellen', _quellenHtml(a), false) +
       panel('verlauf', '<div class="dp-pa-card" id="dp-pa-verlauf-body"><p class="dp-pa-p" style="color:#8b8678">Lade Marktbericht-Verlauf \u2026</p></div>', false) +
