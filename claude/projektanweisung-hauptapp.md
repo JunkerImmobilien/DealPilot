@@ -38622,6 +38622,21 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Rest:** 2022 fehlt ganz, 2023 teilweise (Rückgriff auf 2021 wird angezeigt). Gewerbe-Verwaltung (Anteil am Rohertrag) und Gewerbe-Instandhaltung je Nutzung sind nicht abgebildet — nur der Gewerbe-Mietausfall. Prod nach Freigabe (Rebuild backend + mb).
 - **Prod (11)** `4d494bef`: v2186 ausgerollt. Beide DBs vorher gesichert (Haupt 11 MB / 71 Tabellen, mb 25 MB / 30), Rebuild backend + mb-backend. Im Container `bwkAnsaetze(2026)` = Verwaltung 367 / ETW 439 / Garage 48, Instandhaltung 14,40 / Garage 108.
 
+### v2187–v2188b · Neue Hilfe: Pilot auf F1, Prozess-Atlas (13.10.2026, Staging)
+
+- **Was:** Marcel wollte die Prozesse unter Hilfe als animierten Netzplan, dazu einen Piloten auf Hotkey, der Felder erklärt und Fragen beantwortet. Demo v2187 (`hilfe-demo.html`), nach Abnahme („granularer, Wow-Effekt, Pilot-Männchen“) v2188. `pilot-tower.js` (F1/?, Feldtext aus `DealPilotFeldHilfe.textFuer`, Sofort-Suche über Feld-Erklärungen, Hilfe, Atlas und Aktionen, KI über `/ai/copilot` mit `payload.hilfe`, Brücke in beiden iframes). `prozess-atlas.js` (7 Abläufe, 47 Stationen, jede mit Code-Beleg). Inhalte aus `design/Messe/prozesskarte*.html` und einer Messung von Quick-Check, Deal-Aktion, Überführung, Steuer, Cockpit und Marktbericht. `help.js` überarbeitet (zwei neue Themen, Score-Stufen 85/70/50/35, keine Anbieternamen). `openaiService.copilotChat` liest den Hilfe-Auszug.
+- **Commit:** `f68259c3` (Demo), `49d5e942`, `7f863e66`, `08c00feb`, `54b012ad`, `fe24f5bb`
+- **Nachweis:**
+  - `tools/prozess-atlas-pruefen.mjs`: 7 Abläufe, 47 Stationen, 48 Kanten, 47/47 Belege; DealScore 30/25/15/15/15, Investor 35/25/20/10/10, Schwellen 85/70/50/35, 8 Etappen, RC=0.
+  - Feld Wohnfläche → Tower mit „§ WoFlV“, Spot gesetzt.
+  - KI-Frage „Wie friere ich den Ankauf-Stand ein …“ beantwortet aus der Hilfe in 3,0 s (Deal-Aktion → Gewonnen, ohne Datum wird nichts eingefroren).
+  - gold-audit RC=0, buster-ebenen SAUBER.
+- **Befunde:**
+  - Mein erster Befund, Sprengnetter und PriceHubble seien im Quick-Check sichtbar, war falsch. Das Markup steht noch, aber `quickcheck-app.html:7266` blendet beide aus.
+  - Ein „Zielkaufpreis“-Feld gibt es im Quick-Check nicht. Der Zielpreis steckt in der Verhandlungs-Empfehlung (`qc-heuristik.js:zielKaufpreis`), so will es Marcel auch.
+  - gold-audit war seit v2174 rot: `rgba(201,168,76,…)` in Paketen dieser Sitzung. Behoben in v2188a.
+- **Rest:** Sichtabnahme bei sichtbarem Fenster und am Handy. Soll/Ist-Umschalter im Quick-Check nicht gefunden, Marcel muss zeigen, wo. Quick-Check auf die eigenen Tabellen (N62.22). Prod.
+
 ### Prod (9/10) v2184–v2185 · Fortschreibungsfaktor recherchiert (13.10.2026)
 
 - **Prod (9)** `aff213f6`: v2183/v2184, Haupt-DB gesichert (11 MB, 71), Backend-Rebuild; im Container `bwk_profil` erlaubt, `bwk-profil.js?v=v2184` per curl (200, text/javascript).

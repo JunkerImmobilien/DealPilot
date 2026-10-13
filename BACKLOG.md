@@ -151,6 +151,20 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N62.22 · Neue Hilfe: Pilot auf F1/?, Prozess-Atlas, Hilfe überarbeitet
+
+**✅ GEBAUT 13.10.2026 · v2187 Demo, v2188–v2188b · 49d5e942 / 08c00feb / fe24f5bb (Staging, Prod offen).** Marcel: „etwas total Abgefahrenes … einen kleinen animierten Piloten … über einen Hotkey“, danach „granularer, besser animiert, Wow-Effekt … der Pilot muss ein kleines Pilot-Männchen sein“.
+- `js/pilot-tower.js`: Pilot-Männchen (Kappe, Fliegerbrille, Schal), F1 überall bzw. ? außerhalb von Feldern. Er erklärt das Feld unter dem Cursor mit dem Text der Hover-Hilfe. Sofort-Treffer ohne KI aus 89 Feld-Erklärungen, Hilfe-Themen, 47 Atlas-Stationen und Aktionen. „Den Piloten fragen“ an `/ai/copilot` mit Hilfe-Auszug (`payload.hilfe`). Brücke im Quick-Check- und Marktbericht-iframe.
+- `js/prozess-atlas.js`: 7 Abläufe (Reise, Quick-Check, Netzplan Datenaufnahme, Deal bis gewonnen, Steuerjahr, Marktbericht, Scores). Klick auf eine Station klappt die Schritte auf, Eingaben und Ergebnisse fliegen ein, Gewichte wachsen; dazu „Ablauf abspielen“, „Du bist hier“ und „Hinfliegen“. `tools/prozess-atlas-pruefen.mjs`: 47/47 Belege im Code, Gewichte, Schwellen und Etappen gegen die Kerne, RC=0.
+- `help.js`: Themen „Abläufe & Pilot“ und „Bestand: Soll und Ist“. Score-Stufen 85/70/50/35 statt 80/60/40, keine Anbieternamen, „Kontingent“, Schnellstart neu.
+- v2188a: gold-audit war rot (`rgba(201,168,76,…)` färbt sich beim Mandanten nicht um) — neun Dateien auf `color-mix(… var(--wl-c9a84c …))`, RC=0.
+
+**Offen:**
+1. Sichtabnahme bei SICHTBAREM Fenster (Animationen laufen im Hintergrund-Tab nicht), Handy 390 px (Tower als Bodenblatt, Atlas einspaltig).
+2. Marcel: „im Quickcheck ist unten ein Soll/Ist-Umschalter“. Gemessen ohne geöffnetes Objekt: im Quick-Check-Dokument steht weder „Soll“ noch „Ist“. Sichtbar ist links „Stand: Bestand | Ankauf“. Welche Stelle gemeint ist, muss Marcel zeigen.
+3. Quick-Check soll die eigenen Tabellen nutzen (Makro, Zensus, Register), wo direkter Zugriff besteht — Marcel 13.10.2026. Erst messen, was der QC-Abruf heute liest.
+4. Prod nach Freigabe (Frontend + Backend-Rebuild wegen `openaiService`).
+
 #### N62.21 · Marktbericht: Bewirtschaftungskosten im Ertragswert nicht fortgeschrieben (Bewertungsfrage an Marcel)
 
 **✅ GEBAUT 13.10.2026 · v2186 · e2ec2ed2 (Staging):** Marcel: „das soll schon passen“. Jahrestabelle BWK_JAHRE + bwkAnsaetze(jahr), Ertragswert zum Stichtag je Objektart. Offen: 2022/2023 lückenhaft, Gewerbe-Verwaltung/-Instandhaltung, Prod.
