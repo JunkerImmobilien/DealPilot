@@ -62,7 +62,24 @@ let rc = 0;
    Ohne Argument nimmt er jetzt den GANZEN Registerordner, und er nennt
    in jedem Fall seine DECKUNG — Dateien und Saetze. Eine Null dort ist
    ab sofort RC=1, nicht gruen. */
-const _ARGV = process.argv.slice(2);
+/* ══ v2176 · DER PFLICHTFELD-VERTRAG UND SEINE BASISLINIE ═══════════════
+   Marcel am 13.10.2026: „Ich moechte sicherstellen, dass wir immer die
+   notwendigen Felder ausfuellen und auch mit Quellen."
+   GEMESSEN: dieser Pruefer stand auf RC=1 (49 Altbefunde), lief nur von
+   Hand und prueft Stichtag, Gesamtnutzungsdauer und Baupreisindex nicht -
+   81 LZS-Werte ohne Stichtag, kein einziger Satz mit Index als Zahl.
+   Ein Rot, das immer rot ist, liest niemand (Lehre gold-audit, v1259).
+   Deshalb wie dort: --basislinie vergleicht je Datei und Regel gegen
+   tools/saat-basislinie.json. Mehr als dort = rot, eine neue Datei mit
+   Befund = rot, weniger = gruen mit Hinweis zum Senken
+   (--basislinie-schreiben). Der Deckel darf sinken, nie steigen.
+   deploy-staging.ps1 ruft --basislinie bei jedem Ausrollen. */
+const _ALLE_ARGV = process.argv.slice(2);
+const _BASIS = _ALLE_ARGV.includes('--basislinie') || _ALLE_ARGV.includes('--basislinie-schreiben');
+const _BASIS_SCHREIBEN = _ALLE_ARGV.includes('--basislinie-schreiben');
+const _BASIS_DATEI = 'tools/saat-basislinie.json';
+const _zaehler = {};   /* datei -> regel -> anzahl */
+const _ARGV = _ALLE_ARGV.filter((a) => !a.startsWith('--'));
 let _dateien = _ARGV;
 let _quelle = "Argumente";
 if (!_ARGV.length) {
@@ -185,6 +202,20 @@ for (const f of _dateien) {
        und eine Zahl in einem Satz ist keine Seitenangabe. Nimmt man ihn
        mit, besteht fast jeder Beleg die Pruefung - dann ist der Waechter
        zwar nie rot, prueft aber auch nichts mehr. */
+    /* v2176 · Vertrag fuer WERTE (Sperren nennen nur den Weg):
+       Stichtag immer; beim Sachwertfaktor die Gesamtnutzungsdauer und der
+       Baupreisindex als ZAHL - sonst rechnet der Kern mit 80 Jahren und
+       der Konstanten 1,91, und nichts widerspricht (CLAUDE.md B1). */
+    if (!sperre) {
+      if (!s.stichtag) fehler.push(`${wo}: stichtag fehlt`);
+      if (s.kennzahl === 'sachwertfaktor') {
+        const ma = s.modellansaetze || {};
+        const gnd = ma.gnd_jahre ?? ma.gesamtnutzungsdauer_jahre ?? ma.gnd;
+        if (!(typeof gnd === 'number' && isFinite(gnd))) fehler.push(`${wo}: modellansaetze.gnd_jahre fehlt als Zahl`);
+        const bpi = ma.baupreisindex ?? ma.baupreisindex_stichtag ?? ma.baupreisindex_wert;
+        if (!(typeof bpi === 'number' && isFinite(bpi))) fehler.push(`${wo}: modellansaetze.baupreisindex fehlt als Zahl`);
+      }
+    }
     const _FUNDSTELLE_DATEI = /\.(csv|xlsx?|json|txt|zip|gpkg|shp)\b/i;
     (s.belege || []).forEach((b, j) => {
       const txt = (b && typeof b === 'object')
@@ -226,7 +257,14 @@ for (const f of _dateien) {
   const laender = [...new Set(arr.map(s => s.land_code))].join(',');
   const kz = {}; arr.forEach(s => { kz[s.kennzahl + '/' + s.zweig] = (kz[s.kennzahl + '/' + s.zweig] || 0) + 1; });
   console.log(`${f}: ${arr.length} Sätze gelesen · Länder ${laender} · Stufen ${[...new Set(arr.map(s => s.stufe))].join('')} · ${Object.entries(kz).map(([k, v]) => k + '=' + v).join(' ')}`);
-  if (fehler.length) { rc = 1; console.log('  ' + fehler.slice(0, 40).join('\n  ')); if (fehler.length > 40) console.log(`  … ${fehler.length - 40} weitere`); }
+  const _datei = String(f).replace(/^.*[\\/]/, '');
+  _zaehler[_datei] = {};
+  for (const m of fehler) {
+    const regel = m.replace(/^.*?: /, '').replace(/\d+([.,]\d+)?/g, '#').replace(/'[^']*'/g, "'…'").slice(0, 80);
+    _zaehler[_datei][regel] = (_zaehler[_datei][regel] || 0) + 1;
+  }
+  if (_BASIS) { /* Ausgabe folgt gesammelt unten */ }
+  else if (fehler.length) { rc = 1; console.log('  ' + fehler.slice(0, 40).join('\n  ')); if (fehler.length > 40) console.log(`  … ${fehler.length - 40} weitere`); }
   else console.log('  alle Pflichtfelder vorhanden, keine Dublette');
 }
 /* ══ v1975 · DER WAECHTER STAND DA UND WAR NICHT AUFGESTELLT ═══════════
@@ -271,6 +309,32 @@ try {
   console.log('  -> dieser Abgleich darf nicht ausfallen; ohne ihn rutscht eine Ernte durch');
 }
 
+if (_BASIS) {
+  if (_BASIS_SCHREIBEN) {
+    fs.writeFileSync(_BASIS_DATEI, JSON.stringify({ stand: new Date().toISOString().slice(0, 10), saetze: _saetzeGelesen, dateien: _dateien.length, befunde: _zaehler }, null, 1) + '\n');
+    const n = Object.values(_zaehler).reduce((a, r) => a + Object.values(r).reduce((x, y) => x + y, 0), 0);
+    console.log(`BASISLINIE geschrieben: ${n} Befunde in ${Object.keys(_zaehler).filter((d) => Object.keys(_zaehler[d]).length).length} Dateien`);
+  } else {
+    let basis = null;
+    try { basis = JSON.parse(fs.readFileSync(_BASIS_DATEI, 'utf8')); } catch (e) { console.log('KEINE BASISLINIE (' + _BASIS_DATEI + ') — erst mit --basislinie-schreiben anlegen'); rc = 1; }
+    if (basis) {
+      let mehr = 0, weniger = 0;
+      for (const [d, regeln] of Object.entries(_zaehler)) {
+        for (const [r, n] of Object.entries(regeln)) {
+          const alt = (basis.befunde[d] && basis.befunde[d][r]) || 0;
+          if (n > alt) { mehr++; rc = 1; console.log(`  NEU  ${d}: ${r} — ${n} statt ${alt}`); }
+          else if (n < alt) weniger++;
+        }
+      }
+      /* die Saetze eines Basislinien-Laufs ohne Befunde zaehlen nicht als
+         Fehler - aber eine GESCHRUMPFTE Deckung schon: wer Dateien nicht
+         mehr liest, wird sonst gruen (Lehre gold-audit 6 statt 181) */
+      if (basis.saetze && _saetzeGelesen < basis.saetze * 0.9) { rc = 1; console.log(`  DECKUNG GESUNKEN: ${_saetzeGelesen} Saetze statt ${basis.saetze}`); }
+      console.log(`BASISLINIE ${basis.stand}: ${mehr ? mehr + ' Regel(n) ueber dem Deckel — ROT' : 'nichts ueber dem Deckel'}`
+        + (weniger ? ` · ${weniger} Regel(n) darunter — Deckel senken: node tools/saat-pruefen.mjs --basislinie-schreiben` : ''));
+    }
+  }
+}
 /* v1981c · DIE DECKUNG IST TEIL DES BEFUNDES, NICHT EIN ZUSATZ */
 console.log(`DECKUNG: ${_dateien.length} Datei(en) aus ${_quelle} · ${_saetzeGelesen} Sätze gelesen`);
 if (!_saetzeGelesen) {
