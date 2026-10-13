@@ -378,7 +378,13 @@ export const ReportOrchestrator = {
 
     // Bewertungen aus ECHTEN Quellen zusammenfuehren (keine Nutzereingabe).
     let assessment = (insights && insights.assessment) ? { ...insights.assessment } : null;
-    if (macroRaw.available && macro && macro.estimated === false && macro.score != null) {
+    /* v2158 · Die Makrolage-Wertung braucht mindestens ZWEI gemessene
+       Kennzahlen. Bis v2157 entstand sie aus einem Score, der fehlende
+       Kennzahlen mit Platzhaltern auffuellte (Bericht 176: 5 von 6) — und
+       stand dann als gemessene Lage neben der Angabe des Investors. Aus
+       dem Bevoelkerungstrend allein wird keine Makrolage. */
+    if (macroRaw.available && macro && macro.estimated === false && macro.score != null
+        && (macro.gemessen ?? 0) >= 2) {
       assessment = assessment || {};
       assessment.makrolage = macro.score >= 60 ? 'gut' : macro.score >= 45 ? 'durchschnittlich' : 'schwach';
     }

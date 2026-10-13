@@ -1,6 +1,6 @@
 // ScoringService.js — Makro-Score + Deal-Score.
 // Mikro-Score kommt aus MicroLocationService. Makro nutzt vorhandene Metriken
-// (falls vorhanden), sonst neutral 50 + Note "geschätzt".
+// (nur gemessene, v2158), ohne jede Kennzahl kein Score (null).
 import { round } from '../lib/stats.js';
 
 function clamp01(x) { return Math.max(0, Math.min(1, x)); }
@@ -8,22 +8,51 @@ function clamp01(x) { return Math.max(0, Math.min(1, x)); }
 export const ScoringService = {
   // metrics optional: {bevoelkerung_trend, kaufkraft_idx, arbeitslosenquote, wanderungssaldo,
   //                    leerstand, neubau, miet_trend, kaufpreis_trend}
+  // ── v2158 · NUR GEMESSENE KENNZAHLEN (N62.4a) ─────────────────────────
+  // Bis hierher stand fuer jede der sechs Kennzahlen ein Ersatzwert:
+  //
+  //     add('kaufkraft', clamp01((metrics.kaufkraft_idx ?? 100) / 200));
+  //     add('arbeitslosigkeit', clamp01(1 - (metrics.arbeitslosenquote ?? 6) / 15));
+  //
+  // Fehlte die Zahl, rechnete die Formel mit 100, 6 oder 0 weiter, und
+  // `typeof val === 'number'` war danach IMMER wahr — jeder Platzhalter
+  // ging als Teilwert in den Mittelwert, und das Ergebnis trug
+  // estimated:false. Gemessen an Bericht 176 (Huellhorst): fuenf von
+  // sechs Teilwerten waren Platzhalter, nur der Bevoelkerungstrend echt.
+  // Der Makro-Score zaehlt 20 % in den Deal-Score und setzte ausserdem
+  // die Bericht-Makrolage (gut / durchschnittlich / schwach).
+  //
+  // Jetzt: ein Teilwert entsteht NUR aus einer vorhandenen Zahl. Gemittelt
+  // wird ueber die gemessenen, und das Ergebnis nennt, aus wie vielen.
+  // Ohne eine einzige Kennzahl gibt es KEINEN Score (null) — dealScore()
+  // behandelt das als fehlend und vermerkt 'makro' in `geschaetzt`.
+  // Marcels Entscheidung vom 13.10.2026: „Den Makroscore muessen wir auf
+  // jeden Fall anpassen."
   macroScore(metrics) {
-    if (!metrics || Object.keys(metrics).length === 0) {
-      return { score: 50, breakdown: {}, estimated: true,
-               note: 'Keine Makro-Daten (Destatis/Regionalstatistik nicht angebunden) – neutraler Default 50.' };
-    }
+    const MOEGLICH = 6;
     const parts = {};
-    const add = (k, val) => { if (typeof val === 'number') parts[k] = round(val * 100, 0); };
-    add('bevoelkerung', clamp01((metrics.bevoelkerung_trend ?? 0) / 2 + 0.5));
-    add('kaufkraft', clamp01((metrics.kaufkraft_idx ?? 100) / 200));
-    add('arbeitslosigkeit', clamp01(1 - (metrics.arbeitslosenquote ?? 6) / 15));
-    add('wanderung', clamp01((metrics.wanderungssaldo ?? 0) / 2 + 0.5));
-    add('miet_trend', clamp01((metrics.miet_trend ?? 0) / 0.1 / 2 + 0.5));
-    add('kaufpreis_trend', clamp01((metrics.kaufpreis_trend ?? 0) / 0.1 / 2 + 0.5));
+    const zahl = (v) => (typeof v === 'number' && Number.isFinite(v)) ? v : null;
+    const add = (k, roh, formel) => {
+      const v = zahl(roh);
+      if (v != null) parts[k] = round(clamp01(formel(v)) * 100, 0);
+    };
+    const m = metrics || {};
+    add('bevoelkerung', m.bevoelkerung_trend, (v) => v / 2 + 0.5);
+    add('kaufkraft', m.kaufkraft_idx, (v) => v / 200);
+    add('arbeitslosigkeit', m.arbeitslosenquote, (v) => 1 - v / 15);
+    add('wanderung', m.wanderungssaldo, (v) => v / 2 + 0.5);
+    add('miet_trend', m.miet_trend, (v) => v / 0.1 / 2 + 0.5);
+    add('kaufpreis_trend', m.kaufpreis_trend, (v) => v / 0.1 / 2 + 0.5);
     const vals = Object.values(parts);
-    const score = vals.length ? round(vals.reduce((a, b) => a + b, 0) / vals.length, 0) : 50;
-    return { score, breakdown: parts, estimated: false };
+    const fehlend = ['bevoelkerung', 'kaufkraft', 'arbeitslosigkeit', 'wanderung', 'miet_trend', 'kaufpreis_trend']
+      .filter((k) => !(k in parts));
+    if (!vals.length) {
+      return { score: null, breakdown: {}, estimated: true, gemessen: 0, moeglich: MOEGLICH, fehlend,
+               note: 'Keine Makro-Kennzahl gemessen – kein Makro-Score.' };
+    }
+    const score = round(vals.reduce((a, b) => a + b, 0) / vals.length, 0);
+    return { score, breakdown: parts, estimated: false, gemessen: vals.length, moeglich: MOEGLICH, fehlend,
+             note: `Makro-Score aus ${vals.length} von ${MOEGLICH} Kennzahlen.` };
   },
 
   // Deal-Score nach Auftrag:

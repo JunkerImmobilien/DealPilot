@@ -1185,7 +1185,11 @@ function render(out) {
       ? `Kaufpreis ${mvv.discount_to_market_pct >= 0 ? mvv.discount_to_market_pct + ' % unter' : Math.abs(mvv.discount_to_market_pct) + ' % über'} Marktwert`
       : null,
     bruttorendite: yld.gross_yield_pct != null ? `${yld.gross_yield_pct} % Rendite · Faktor ${yld.rent_multiplier ?? '–'}` : null,
-    makrolage: (d.macro && d.macro.score != null) ? `Makro-Score ${d.macro.score}/100` : null,
+    /* v2158 · Seit N62.4a mittelt der Makro-Score nur gemessene Kennzahlen;
+       wie viele es sind, gehoert an die Zahl. Alte Berichte kennen das Feld nicht. */
+    makrolage: (d.macro && d.macro.score != null)
+      ? `Makro-Score ${d.macro.score}/100` + (d.macro.gemessen != null ? ` · aus ${d.macro.gemessen} von ${d.macro.moeglich || 6} Kennzahlen` : '')
+      : null,
     mikrolage: (d.micro && d.micro.score != null) ? `Mikro-Score ${d.micro.score}/100` : null,
     mietentwicklung: (d.insights && d.insights.series && d.insights.series.rent_cagr_pct != null)
       ? `Miet-Zeitreihe: ${d.insights.series.rent_cagr_pct} % p. a.`
