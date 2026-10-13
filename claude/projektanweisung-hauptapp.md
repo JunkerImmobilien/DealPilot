@@ -38614,6 +38614,15 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 ---
 
+### v2160 · Steuerliche Zusammenfassung, auch im Soll/Ist (N62.6)
+
+**Was:** Aufgabe 16 + Zielfelder `steuer_zusammenfassung`/`soll_ist_steuer`,
+Reiter Steuer, Steuertext an der Soll/Ist-Tafel, Ankauf-Kennzahl
+Steuerwirkung p. a. **Commit:** `8abf834b`. **Nachweis:** Prüfer 103
+Stellen, Render mit/ohne Feld im Browser. **Rest:** echter Analyselauf.
+**Zensus:** GENESIS-Online (Destatis) führt den Zensus 2022 NICHT — nur
+ergebnisse.zensus2022.de; das ist ein eigenes Konto.
+
 ### v2159/v2159a · Standard-Lageklasse, diktierbar (N62.11)
 
 **Was:** Standardklasse im Lage-Profil, Auswahl in Onboarding und

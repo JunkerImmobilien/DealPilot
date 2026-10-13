@@ -140,7 +140,7 @@ gegenübergestellt werden sie nirgends.
 > **Rest:** ob das Modell die Zeilen sinnvoll füllt, zeigt nur ein echter
 > Analyselauf.
 >
-> **⚠ OFFEN — der Zensus selbst: die Datei ist leer.** (13.10.: das Destatis-Konto in der `.env` ist die REGIONALDATENBANK — dort nur Zensus 2011; die Zensus-2022-Datenbank lehnt es ab, Code 2. Marcel legt ein Konto auf ergebnisse.zensus2022.de an → `ZENSUS_USER`/`ZENSUS_PASSWORD`)
+> **⚠ OFFEN — der Zensus selbst: die Datei ist leer.** (13.10., später: Marcel hat sich bei GENESIS-Online/Destatis angemeldet — dort gemessen 331 Statistiken, KEIN Zensus 2022, nur Mikrozensus. Der Zensus 2022 liegt NUR auf ergebnisse.zensus2022.de.) (13.10.: das Destatis-Konto in der `.env` ist die REGIONALDATENBANK — dort nur Zensus 2011; die Zensus-2022-Datenbank lehnt es ab, Code 2. Marcel legt ein Konto auf ergebnisse.zensus2022.de an → `ZENSUS_USER`/`ZENSUS_PASSWORD`)
 > `marktbericht/backend/data/zensus2022_kreise.csv` trägt nur die
 > Beispielzeile. **0 von 162 Berichten auf Staging haben Zensus-Werte**
 > (159× `kreis_nicht_in_datei`, 3× `kein_ags`). Der „Zensus-Abruf" lief
@@ -194,6 +194,17 @@ Pilot-Analyse **nicht verknüpft** — und die des Marktberichts
 (`quellen_nachweis`) auch nicht.
 
 #### N62.6 · Steuerliche Zusammenfassung in der Pilot-Analyse — und im Soll/Ist
+
+> **✅ Erledigt 13.10.2026 · v2160 · `8abf834b`.** Aufgabe 16 mit Zielfeld
+> `steuer_zusammenfassung` (nur aus Block STEUER + Kennzahlen, kein
+> angenommener Satz, Hinweis auf Steuerberater); mit Ankauf-Stand zusätzlich
+> `soll_ist_steuer`. Neuer Reiter **Steuer** (steht immer, alte Analysen
+> sagen, dass das Feld fehlt); die Soll/Ist-Tafel trägt den Steuer-Text.
+> `ankauf.js` führt die Kennzahl **Steuerwirkung p. a.** (cf_ns − cf_vs),
+> für alte Stände aus dem eingefrorenen Datensatz abgeleitet.
+> Prüfer `prompt-lecks-pruefen` 103 Stellen grün; Reiter im Browser mit
+> gestelltem Ergebnis gerendert. **Abnahme offen:** ein echter Analyselauf.
+
 
 **Marcel:** *„Dann bei der Pilotanalyse natürlich auch eine steuerliche
 Zusammenfassung machen. Das soll natürlich auch mit in den Soll-Ist-Abgleich
