@@ -337,8 +337,14 @@ export const ReportOrchestrator = {
 
     const zensusP = (async () => {
       const agsInfo = await agsP;
-      const z = ZensusConnector.lookup(agsInfo?.kreis_ags);
-      step(`Strukturdaten: ${z.available ? 'ausgewertet' : 'keine Daten'}`);
+      /* v2162 · Datenbank (Kreis + Gemeinde, nach Baujahr und Flaeche).
+         Die Gemeinde nur, wenn sie EINDEUTIG ist - sonst bleibt es beim
+         Kreiswert, und der heisst so. */
+      const gem = await AgsResolver.gemeindeEindeutig(geo?.components?.postcode, geo?.components?.city).catch(() => null);
+      const z = await ZensusConnector.lookupDb({
+        kreisAgs: agsInfo?.kreis_ags, gemeindeAgs: gem?.gemeinde_ags,
+        baujahr: ref.build_year, wohnflaeche: ref.living_area });
+      step(`Strukturdaten: ${z.available ? 'ausgewertet' + (z.gemeinde ? ' (Gemeinde ' + z.gemeinde.name + ')' : ' (Kreis)') : 'keine Daten'}`);
       return z;
     })().catch((e) => { step('zensus: fehler ' + e.message); return { available: false, source: 'zensus2022', reason: e.message }; });
 

@@ -17,6 +17,31 @@ const LAND_AUS_AGS = {
 };
 
 export const AgsResolver = {
+  /* v2162 · Die Gemeinde EINDEUTIG. fromPostcode() nimmt die ERSTE Ortschaft
+     der Postleitzahl - bei einer PLZ ueber mehrere Gemeinden waere ein
+     Gemeindewert damit still falsch. Hier gilt: eine Gemeinde je PLZ, oder
+     die, deren Name zum Ort der Adresse passt. Sonst null - dann zeigt der
+     Bericht den Kreiswert, als Kreiswert beschriftet. */
+  async gemeindeEindeutig(postcode, ort) {
+    const plz = (postcode || '').toString().trim();
+    if (!/^\d{5}$/.test(plz)) return null;
+    let data;
+    try { data = await httpJson('https://openplzapi.org/de/Localities?postalCode=' + plz, { timeoutMs: 10000, retries: 1 }); }
+    catch { return null; }
+    const liste = Array.isArray(data) ? data : (data && data.content) || [];
+    const gem = new Map();
+    for (const l of liste) {
+      if (l && l.municipality && l.municipality.key) gem.set(String(l.municipality.key), { name: l.municipality.name || '', orte: [] });
+    }
+    for (const l of liste) { if (l && l.municipality && gem.has(String(l.municipality.key))) gem.get(String(l.municipality.key)).orte.push(String(l.name || '')); }
+    if (gem.size === 1) return { gemeinde_ags: [...gem.keys()][0], eindeutig: 'plz' };
+    const o = String(ort || '').toLowerCase().trim();
+    if (!o) return null;
+    const passt = [...gem.entries()].filter(([, g]) =>
+      g.name.toLowerCase().startsWith(o) || o.startsWith(g.name.toLowerCase().split(',')[0]) || g.orte.some((n) => n.toLowerCase() === o));
+    return passt.length === 1 ? { gemeinde_ags: passt[0][0], eindeutig: 'ort' } : null;
+  },
+
   // postcode -> { kreis_ags, kreis_name, bundesland, gemeinde_ags } | null
   async fromPostcode(postcode) {
     const plz = (postcode || '').toString().trim();
