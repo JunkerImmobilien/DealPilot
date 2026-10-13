@@ -205,7 +205,7 @@ gegenübergestellt werden sie nirgends.
 - Der Hinweis braucht ein **×** zum Schließen und **„Nicht mehr anzeigen"**, das gemerkt wird (Einstellungsspeicher, nicht nur der Browser).
 
 **N63.8 · Geführte Tour komplett durchgehen**
-> 🟡 v2205/v2205a — Reiter Steuer fehlte (ergänzt, 39 Schritte); Inhalte gegen den Code korrigiert (46 Stellen: Plan-Limits 1/5/25, Score-Skala 85/70/50/35 und Gewichte, 5 Kategorien, Stress-Test 5×5, Fundorte, Logo ab Investor, Anbieternamen raus). Darstellung nur Schritt 1–2 bei 1280 geprüft (verdecktes Fenster drosselt) → Abnahme am Gerät.
+> ✅ v2205/v2205a, Prod (15) — alle 39 Schritte bei 1280 und 390 gemessen (Blase im Bild; Handy bewusst mittig ohne Spot). Reiter Steuer fehlte (ergänzt, 39 Schritte); Inhalte gegen den Code korrigiert (46 Stellen: Plan-Limits 1/5/25, Score-Skala 85/70/50/35 und Gewichte, 5 Kategorien, Stress-Test 5×5, Fundorte, Logo ab Investor, Anbieternamen raus). Darstellung nur Schritt 1–2 bei 1280 geprüft (verdecktes Fenster drosselt) → Abnahme am Gerät.
 - Prüfen, ob sie überall sauber dargestellt wird: Desktop, Tablet, Handy in der Messkabine.
 - Dazu Eingabe und Lautsprecher.
 
