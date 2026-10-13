@@ -381,6 +381,13 @@ router.post('/reports/generate-stream', async (req, res) => {
   const send = (obj) => { try { res.write(JSON.stringify(obj) + '\n'); } catch {} };
   const onStep = (msg) => send({ type: 'step', msg, t: Date.now() });
   onStep('Anfrage angenommen…');
+  /* v2174 · Lasttest 13.10.2026: ab dem 7. gleichzeitigen Bericht wartet
+     man (REPORT_CONCURRENCY 6) - bis zu 37 s ohne jedes Zeichen. Jetzt
+     sagt der Stream den Platz in der Schlange. */
+  try {
+    const ls = limiterStats();
+    if (ls.active >= ls.max) onStep('Warteschlange: Platz ' + (ls.waiting + 1));
+  } catch {}
   try {
     const out = await runLimited(() => ReportOrchestrator.generate(req.body || {}, { onStep }));
     console.log(`[req] /reports/generate-stream OK in ${out.took_ms}ms (ai_mode=${out.ai_mode})`);
