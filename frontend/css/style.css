@@ -40973,3 +40973,77 @@ html:not([data-ui-theme]) body .main-col .bc-matrix-cell-label {
 @media (hover: none) {
   aside.sidebar .sb-card .sbc-actions { opacity: 1 !important; pointer-events: auto !important; }
 }
+
+/* ==============================================================================
+   v2201 · N63.3 / N63.4 · Hilfe und Einstellungen auf dem Handy: Liste -> Inhalt
+   Steuerung: js/modal-handy.js setzt data-mob="liste"|"inhalt" am Overlay
+   (#help-modal / #settings-modal). Ohne das Attribut (Desktop, oder Modul nicht
+   geladen) gilt alles wie bisher. Die goldene Titelflaeche (.dp-mtb-hero) faellt
+   am Handy weg - das schwarze Band nennt schon HILFE / EINSTELLUNGEN, und der
+   Titel des Bereichs steht in der Zurueck-Zeile.
+   ============================================================================== */
+@media (max-width: 768px) {
+  html body #help-modal[data-mob] .dp-mtb-hero,
+  html body #settings-modal[data-mob] .dp-mtb-hero { display: none !important; }
+
+  /* ── LISTE: Themen untereinander, mit Beschreibung; Inhalt weg ── */
+  html body #help-modal[data-mob="liste"] .help-modal-side,
+  html body #settings-modal[data-mob="liste"] .modal-side {
+    flex: 1 1 auto !important; min-height: 0 !important; overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  html body #help-modal[data-mob="liste"] .help-modal-content,
+  html body #settings-modal[data-mob="liste"] .set-modal-content { display: none !important; }
+  html body #help-modal.help-modal.global-view-overlay[data-mob="liste"] #help-sidebar,
+  html body #settings-modal[data-mob="liste"] .settings-tabs.ms-tabs {
+    flex-direction: column !important; flex-wrap: nowrap !important;
+    overflow: visible !important; height: auto !important; max-height: none !important;
+    gap: 6px !important; padding: 6px 12px 18px !important;
+  }
+  html body #help-modal.help-modal.global-view-overlay[data-mob="liste"] #help-sidebar .help-sidebar-item,
+  html body #settings-modal[data-mob="liste"] .settings-tabs.ms-tabs .st-tab {
+    flex: 0 0 auto !important; width: 100% !important; white-space: normal !important;
+    min-height: 54px !important; padding: 11px 14px !important; margin: 0 !important;
+    display: flex !important; flex-direction: column !important; align-items: flex-start !important;
+    justify-content: center !important; gap: 3px !important; text-align: left !important;
+    border-radius: 10px !important; font-size: 14px !important;
+  }
+  html body #help-modal.help-modal.global-view-overlay[data-mob="liste"] #help-sidebar .help-sidebar-item-desc,
+  html body #settings-modal[data-mob="liste"] .settings-tabs.ms-tabs .help-sidebar-item-desc {
+    display: block !important; white-space: normal !important; font-size: 12px !important; opacity: .85 !important;
+  }
+  /* aktiver Eintrag in der Liste: dezent, nicht als „ausgewaehlt" laut */
+  html body #help-modal.help-modal.global-view-overlay[data-mob="liste"] #help-sidebar .help-sidebar-item.active::after,
+  html body #settings-modal[data-mob="liste"] .settings-tabs.ms-tabs .st-tab.active::after { display: none !important; }
+
+  /* ── INHALT: Liste und Suche weg, Zurueck-Zeile oben ── */
+  html body #help-modal[data-mob="inhalt"] .help-modal-side,
+  html body #settings-modal[data-mob="inhalt"] .modal-side { display: none !important; }
+  html body #help-modal[data-mob="inhalt"] .help-modal-content,
+  html body #settings-modal[data-mob="inhalt"] .set-modal-content {
+    display: flex !important; flex-direction: column !important; flex: 1 1 auto !important; min-height: 0 !important;
+  }
+  html body #help-modal[data-mob] .mh-zurueck,
+  html body #settings-modal[data-mob] .mh-zurueck {
+    flex: 0 0 auto !important; display: flex !important; align-items: center !important; gap: 8px !important;
+    width: 100% !important; min-height: 48px !important; padding: 8px 14px !important; margin: 0 !important;
+    border: 0 !important; border-bottom: 1px solid rgba(0,0,0,.09) !important; border-radius: 0 !important;
+    background: #FDFCFA !important; color: #1a1714 !important; text-align: left !important; cursor: pointer !important;
+    font: 600 14px/1.25 Inter, system-ui, sans-serif !important; position: sticky !important; top: 0 !important; z-index: 2 !important;
+    transform: none !important;
+  }
+  html body #help-modal[data-mob] .mh-zurueck .mh-pfeil,
+  html body #settings-modal[data-mob] .mh-zurueck .mh-pfeil { font-size: 24px !important; line-height: 1 !important; color: #8a6d1f !important; margin-top: -2px !important; }
+  html body #help-modal[data-mob] .mh-zurueck .mh-wohin,
+  html body #settings-modal[data-mob] .mh-zurueck .mh-wohin { font-weight: 500 !important; color: #625c59 !important; white-space: nowrap !important; }
+  html body #help-modal[data-mob] .mh-zurueck .mh-titel,
+  html body #settings-modal[data-mob] .mh-zurueck .mh-titel {
+    margin-left: auto !important; min-width: 0 !important; overflow: hidden !important;
+    text-overflow: ellipsis !important; white-space: nowrap !important; color: #1a1714 !important;
+  }
+  html body #help-modal[data-mob="liste"] .mh-zurueck,
+  html body #settings-modal[data-mob="liste"] .mh-zurueck { display: none !important; }
+}
+@media (min-width: 769px) {
+  .mh-zurueck { display: none !important; }
+}
