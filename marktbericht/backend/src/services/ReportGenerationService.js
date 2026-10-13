@@ -416,22 +416,61 @@ export async function openaiSelfCheck() {
   }
 }
 
-/* v972b: kurzer, EHRLICHER Trend-Text aus den Verlaufsdaten. Reused rawCompletion(). */
+/* v972b: EHRLICHER Trend-Text aus den Verlaufsdaten. Reused rawCompletion().
+   v2171: ausfuehrlich statt drei bis fuenf Saetze, und von selbst statt
+   per Knopf. Marcel am 13.10.2026: „das sollte schon neu erstellt werden
+   und auch ausfuehrlich". Mitgeliefert werden jetzt alle Felder je Bericht
+   (felder) und die heutigen Objektdaten (objekt). Ohne Wohnflaeche und
+   Baujahr JE BERICHT kann der Text nicht unterscheiden, ob sich der Markt
+   bewegt hat oder nur die Eingabe - genau das soll er aber sagen. */
+const VTXT_NAMEN = {
+  market_value: 'Marktwert (EUR)', market_value_low: 'Marktwert untere Spanne (EUR)',
+  market_value_high: 'Marktwert obere Spanne (EUR)', median_sqm: 'Vergleichsmedian (EUR/m2)',
+  deal_score: 'DealPilot-Score (0-100)', micro_score: 'Mikrolage (0-100)', macro_score: 'Makrolage (0-100)',
+  price_cagr_pct: 'Wertentwicklung Markt (% p.a.)', gross_yield_pct: 'Bruttorendite (%)',
+  rent_multiplier: 'Kaufpreisfaktor', confidence: 'Konfidenz', comparable_group: 'Vergleichsgruppe',
+  living_area: 'Wohnflaeche im Bericht (m2)', build_year: 'Baujahr im Bericht',
+  sachwert_eur: 'Sachwert ImmoWertV (EUR)', ertragswert_eur: 'Ertragswert ImmoWertV (EUR)',
+  lzs_pct: 'Liegenschaftszins (%)', lzs_stufe: 'Herkunftsstufe Zins', fuehrend: 'fuehrendes Verfahren',
+  bevoelkerung_trend_pct: 'Bevoelkerungstrend (% p.a.)'
+};
 export async function generateVerlaufText(payload) {
   if (!aiEnabled()) return { text: '', error: 'KI im mb-Backend nicht aktiv.' };
   const p = payload || {};
   const labels = p.labels || {};
   const series = Array.isArray(p.series) ? p.series : [];
   const metrics = Array.isArray(p.metrics) ? p.metrics : [];
+  const felder = (Array.isArray(p.felder) && p.felder.length) ? p.felder : metrics;
   if (series.length < 2) return { text: '', error: 'Zu wenig Berichte.' };
   const lines = series.map((row, i) => {
-    const parts = metrics.map((k) => (labels[k] || k) + '=' + (row[k] == null ? '-' : row[k]));
-    return `Bericht ${i + 1} (${row.date || '?'}): ` + parts.join(', ');
+    const parts = felder.filter((k) => row[k] != null && row[k] !== '')
+      .map((k) => (VTXT_NAMEN[k] || labels[k] || k) + '=' + row[k]);
+    return 'Bericht ' + (i + 1) + ' (' + (row.date || '?') + '): ' + parts.join(', ');
   }).join('\n');
-  const sys = 'Du bist ein nuechterner Immobilien-Analyst. Fasse die Entwicklung der Marktberichte eines Objekts in 3-5 Saetzen ehrlich zusammen. '
-    + 'Sage klar, ob Kennzahlen STEIGEN, FALLEN, SCHWANKEN oder STABIL sind - erfinde keinen Trend, wenn die Werte nur schwanken. '
-    + 'Nenne konkrete Zahlen (Marktwert, Score). Keine Anlageberatung, keine Ueberschrift, nur Fliesstext auf Deutsch.';
-  const messages = [{ role: 'system', content: sys }, { role: 'user', content: 'Verlaufsdaten:\n' + lines }];
+  const o = p.objekt || {};
+  const objekt = [
+    o.adresse ? 'Adresse: ' + o.adresse : null,
+    o.objektart ? 'Objektart: ' + o.objektart : null,
+    o.wohnflaeche_heute != null ? 'Wohnflaeche heute laut Objekt: ' + o.wohnflaeche_heute + ' m2' : null,
+    o.baujahr_heute != null ? 'Baujahr heute laut Objekt: ' + o.baujahr_heute : null,
+    o.kaufpreis_heute != null ? 'Kaufpreis heute laut Objekt: ' + o.kaufpreis_heute + ' EUR' : null
+  ].filter(Boolean).join('\n');
+  const sys = 'Du bist ein nuechterner Immobilien-Analyst und ordnest die Marktberichte EINES Objekts im Zeitverlauf ein. '
+    + 'Schreibe ausfuehrlich, sachlich und auf Deutsch, insgesamt etwa 350 bis 550 Woerter, gegliedert mit Zwischenueberschriften, '
+    + 'die jeweils in einer eigenen Zeile mit "## " beginnen. Gliederung: '
+    + '## Gesamtbild (zwei bis drei Saetze: was ist ueber alle Berichte passiert); '
+    + '## Marktwert und Spanne (Entwicklung mit konkreten Zahlen und Prozent, Breite der Spanne, Vergleichsmedian); '
+    + '## Sach- und Ertragswert (nur wenn Werte vorliegen: Abstand zum Marktwert, fuehrendes Verfahren, Liegenschaftszins); '
+    + '## Lage und Score (DealPilot-Score, Mikro- und Makrolage, Bevoelkerungstrend); '
+    + '## Rendite und Kaufpreis (Bruttorendite, Faktor, Abstand des heutigen Kaufpreises zum letzten Marktwert); '
+    + '## Woher die Bewegung kommt (Aendern sich Wohnflaeche, Baujahr oder Vergleichsgruppe zwischen den Berichten, liegt die Bewegung an der EINGABE, nicht am Markt - das klar benennen); '
+    + '## Einordnung (was der Verlauf fuer die Belastbarkeit der Zahlen bedeutet). '
+    + 'Regeln: Sage klar, ob Kennzahlen STEIGEN, FALLEN, SCHWANKEN oder STABIL sind - erfinde keinen Trend, wenn die Werte nur schwanken. '
+    + 'Nenne konkrete Zahlen mit Datum. Verwende NUR die gelieferten Werte; fehlt ein Wert, lass den Abschnitt weg oder sage, dass er fehlt - '
+    + 'nie schaetzen, nie einen Wert aus anderer Quelle ergaenzen. Keine Anlageberatung, keine Kaufempfehlung. '
+    + 'Score-Stufen: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch.';
+  const messages = [{ role: 'system', content: sys },
+    { role: 'user', content: (objekt ? 'Objekt:\n' + objekt + '\n\n' : '') + 'Verlaufsdaten (aelteste zuerst):\n' + lines }];
   const isNewModel = /^(gpt-5|o\d|gpt-4\.1)/.test(cfg.ai.model || '');
   const isReasoning = /^(gpt-5|o\d)/.test(cfg.ai.model || '');
   const effort = (process.env.OPENAI_REASONING_EFFORT || 'low').trim().toLowerCase();
