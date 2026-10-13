@@ -305,7 +305,7 @@
     var W = Math.floor((breite - 2 * pad - (spN - 1) * gapX) / spN);
     var L = { pos: {}, sp: [], vertikal: W < 165 };
     if (!L.vertikal) {
-      W = Math.min(W, 270);
+      W = Math.min(W, 300);
       var gesamt = spN * W + (spN - 1) * gapX, x0 = Math.max(pad, (breite - gesamt) / 2);
       P.spalten.forEach(function (s, i) { L.sp.push({ t: s, x: x0 + i * (W + gapX), w: W }); });
       P.knoten.forEach(function (k) { L.pos[k.id] = { x: x0 + k.s * (W + gapX), y: kopf + k.z * (H + gapY), w: W, h: H }; });

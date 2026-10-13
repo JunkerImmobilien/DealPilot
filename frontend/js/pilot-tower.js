@@ -184,6 +184,7 @@
     { t: 'App-Tour starten', b: 'Schritt für Schritt durch alle Reiter.', ziel: { fn: 'helpStartTour' }, w: 'tour einfuehrung rundgang' },
     { t: 'Ganze Hilfe öffnen', b: 'Kennzahlen, Finanzierung, Steuer, Glossar, Häufige Fragen.', ziel: { fn: 'showHelp' }, w: 'hilfe handbuch glossar faq' }
   ];
+  var FUELL = ' ich du er sie es wir ihr man der die das den dem des ein eine einen einem einer und oder aber wie was wo wann warum wer ist sind bin war wird werden kann koennen muss soll mit von zu zum zur im in an am auf fuer bei aus ob wenn dann dass nicht kein keine mir mich mein meine dein deine hier da so auch noch schon nur mal bitte gibt habe hat haben ';
   var _index = null;
   function index() {
     if (_index) return _index;
@@ -219,7 +220,10 @@
   function suche(q, n) {
     var L = index(), nq = norm(q);
     if (nq.length < 2) return [];
-    var w = nq.split(' ').filter(function (x) { return x.length >= 2; });
+    /* Fuellwoerter tragen nichts: gemessen zog „was“ EK-Rendite und
+       Zinsrisiko vor die richtigen Treffer. */
+    var w = nq.split(' ').filter(function (x) { return x.length >= 2 && FUELL.indexOf(' ' + x + ' ') < 0; });
+    if (!w.length) return [];
     var res = [];
     L.forEach(function (e) {
       var tn = norm(e.t), p = 0, alle = true;
@@ -323,13 +327,27 @@
     pilot.style.left = Math.max(6, Math.min(innerWidth - 70, x)) + 'px';
     pilot.style.top = Math.max(6, Math.min(innerHeight - 84, y)) + 'px';
   }
+  /* Ruheplatz: unten am linken Rand des HAUPTBEREICHS, nicht der Seite.
+     Gemessen am 13.10.2026: links unten auf der Seite lag er über dem
+     Nutzerfeld der Seitenleiste (Name, Abmelden). Rechts unten liegen
+     die Ausgaben (Track Record, Export). Am linken Rand von .main-col ist
+     bei 2133 px Breite 180 px frei. */
+  function heimX() {
+    var mc = document.querySelector('.main-col');
+    var r = mc && mc.getBoundingClientRect();
+    return (r && r.width > 300 && innerWidth > 640) ? Math.round(r.left + 10) : 14;
+  }
+  function heimSetzen() {
+    if (!pilot || !pilot.classList.contains('ruht')) return;
+    pilot.style.left = heimX() + 'px'; pilot.style.top = ''; pilot.style.bottom = '';
+  }
   function heim() {
     if (!pilot) return;
     pilot.classList.add('ruht'); pilot.classList.remove('zeigt', 'denkt');
-    var r = pilot.getBoundingClientRect();
-    spur(r.left, r.top, 14, innerHeight - 70);
-    pilot.style.left = '14px'; pilot.style.top = (innerHeight - (innerWidth <= 640 ? 128 : 70)) + 'px';
-    setTimeout(function () { if (pilot.classList.contains('ruht')) { pilot.style.top = ''; pilot.style.bottom = ''; pilot.style.left = ''; } }, 800);
+    var r = pilot.getBoundingClientRect(), hx = heimX();
+    spur(r.left, r.top, hx, innerHeight - 70);
+    pilot.style.left = hx + 'px'; pilot.style.top = (innerHeight - (innerWidth <= 640 ? 128 : 70)) + 'px';
+    setTimeout(function () { if (pilot.classList.contains('ruht')) { pilot.style.top = ''; pilot.style.bottom = ''; } }, 800);
   }
   function platziere(zielEl) {
     var mobil = innerWidth <= 640;
@@ -526,7 +544,11 @@
     if (tower && tower.classList.contains('an') && !tower.contains(e.target) && !pilot.contains(e.target)) schliessen();
   }, true);
 
-  function start() { bauen(); }
+  function start() {
+    bauen(); heimSetzen();
+    setTimeout(heimSetzen, 1500);
+    var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(heimSetzen, 200); });
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
   window.DealPilotPilot = { rufen: rufen, schliessen: schliessen, suche: suche, fliegeNach: fliegeNach, neuIndex: function () { _index = null; } };
