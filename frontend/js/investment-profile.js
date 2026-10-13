@@ -220,11 +220,11 @@ window.DealPilotInvestmentProfile = (function() {
       var bls = [
         ['BW','Baden-Württemberg (5,0 %)'], ['BY','Bayern (3,5 %)'],
         ['BE','Berlin (6,0 %)'], ['BB','Brandenburg (6,5 %)'],
-        ['HB','Bremen (5,0 %)'], ['HH','Hamburg (5,5 %)'],
+        ['HB','Bremen (5,5 %)'], ['HH','Hamburg (5,5 %)'],
         ['HE','Hessen (6,0 %)'], ['MV','Mecklenburg-Vorpommern (6,0 %)'],
         ['NI','Niedersachsen (5,0 %)'], ['NW','Nordrhein-Westfalen (6,5 %)'],
         ['RP','Rheinland-Pfalz (5,0 %)'], ['SL','Saarland (6,5 %)'],
-        ['SN','Sachsen (3,5 %)'], ['ST','Sachsen-Anhalt (5,0 %)'],
+        ['SN','Sachsen (5,5 %)'], ['ST','Sachsen-Anhalt (5,0 %)'],
         ['SH','Schleswig-Holstein (6,5 %)'], ['TH','Thüringen (5,0 %)']
       ];
       var current = p.bundesland || 'NW';

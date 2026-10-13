@@ -125,7 +125,7 @@
     'BAY': 3.5,   // Bayern (niedrigster Satz)
     'BLN': 6.0,   // Berlin
     'BRB': 6.5,   // Brandenburg
-    'BRE': 5.0,   // Bremen
+    'BRE': 5.5,   // Bremen (seit 01.07.2025; v2207)
     'HAM': 5.5,   // Hamburg
     'HES': 6.0,   // Hessen
     'MVP': 6.0,   // Mecklenburg-Vorpommern
@@ -137,7 +137,7 @@
     'SAC': 5.5,   // Sachsen
     'SAH': 5.0,   // Sachsen-Anhalt
     'SHL': 6.5,   // Schleswig-Holstein
-    'THÜ': 6.5    // Thüringen
+    'THÜ': 5.0    // Thüringen (seit 01.01.2024; v2207)
   };
 
   // V197: KNK aus PLZ ermitteln — GrESt + Notar/Grundbuch (~1,5-2%) + Makler (~3,57%)

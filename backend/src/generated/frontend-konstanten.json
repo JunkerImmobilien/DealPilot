@@ -1,11 +1,11 @@
 {
- "erzeugt_am": "2026-10-13T19:52:17.062Z",
+ "erzeugt_am": "2026-10-13T19:56:30.250Z",
  "quellen": {
   "voice-import": "98ddf9509c0ea2c2",
   "objektart-felder": "b1481ff1f7c0b04d",
   "storage": "6094b9228cb6ed40",
-  "index-html": "78a4e5a2eebf382f",
-  "grest": "9c0a4587759b4148"
+  "index-html": "f7b164ba570953e3",
+  "grest": "114ed6834357a806"
  },
  "daten": {
   "objektarten": {
@@ -2810,7 +2810,7 @@
     "BY": 3.5,
     "BE": 6,
     "BB": 6.5,
-    "HB": 5,
+    "HB": 5.5,
     "HH": 5.5,
     "HE": 6,
     "MV": 6,
@@ -2821,7 +2821,7 @@
     "SN": 5.5,
     "ST": 5,
     "SH": 6.5,
-    "TH": 6.5
+    "TH": 5
    },
    "namen": {
     "BW": "Baden-Württemberg",
