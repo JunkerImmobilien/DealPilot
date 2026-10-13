@@ -28,8 +28,16 @@ export const LIZENZ = '© Statistische Ämter des Bundes und der Länder, Region
   + 'Datenlizenz Deutschland – Namensnennung – 2.0';
 const QUELLE = 'https://www.regionalstatistik.de/genesis/online?operation=table&code=';
 const LAENDER = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16'];
-const PARALLEL = 6;
-const ZEIT_MS = 240000;   /* ein Landesabruf brauchte bis 104 s */
+/* v2172b · Gemessen im zweiten Lauf: die Regionaldatenbank erlaubt hoechstens
+   10 parallele Abrufe JE KONTO (Code 6), und ein Abruf, den WIR abbrechen,
+   laeuft dort bis zu 15 Minuten weiter und belegt seinen Platz. Unsere
+   eigenen Zeitgrenzen haben das Limit also gefuellt. Deshalb: 3 parallel
+   (der Live-Rueckfall der Berichte teilt sich dasselbe Konto), 10 Minuten
+   Geduld statt 4, vor dem Lauf logincheck (raeumt Haenger ab) und vor dem
+   zweiten Versuch eine Pause. */
+const PARALLEL = 3;
+const ZEIT_MS = 600000;
+const PAUSE_MS = 60000;
 
 /* Die vier Kennzahlen. `spalte` wie in DestatisConnector.macro (v2165 gemessen). */
 export const KENNZAHLEN = {
@@ -185,6 +193,7 @@ export async function importiere({ log = console.log, kennzahlen = Object.keys(K
     if (k === 'bevoelkerung' || k === 'einkommen_je_ew') auftraege.push({ kennzahl: k, filter: null });
     else for (const l of LAENDER) auftraege.push({ kennzahl: k, filter: l + '*' });
   }
+  try { await DestatisConnector.logincheck(); } catch (e) { /* nur Aufraeumen */ }
   const t0 = Date.now();
   const ergebnis = [];
   let i = 0;
@@ -192,7 +201,10 @@ export async function importiere({ log = console.log, kennzahlen = Object.keys(K
     while (i < auftraege.length) {
       const a = auftraege[i++];
       let r = await einAbruf(a, log);
-      if (!r.ok) r = await einAbruf(a, log);   /* ein zweiter Versuch je Auftrag */
+      if (!r.ok) {   /* ein zweiter Versuch je Auftrag, nach einer Pause */
+        await new Promise((ok) => setTimeout(ok, PAUSE_MS));
+        r = await einAbruf(a, log);
+      }
       ergebnis.push(r);
     }
   }
