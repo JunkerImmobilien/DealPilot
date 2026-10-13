@@ -245,7 +245,7 @@ window.DealPilotWorkflow = (function() {
         var el = document.getElementById(id);
         var lb = el && (el.closest('.f') || el.parentElement);
         lb = lb && lb.querySelector('label');
-        var t = lb ? lb.textContent.replace(/s+/g, ' ').replace(/(OPTIONAL|optional|Pflicht)/g, '').replace(/[*?ⓘ]/g, '').trim() : '';
+        var t = lb ? lb.textContent.replace(/\s+/g, ' ').replace(/\b(OPTIONAL|optional|Pflicht)\b/g, '').replace(/[*?ⓘ]/g, '').trim() : '';
         return t || id;
       }).join(', ');
     }
