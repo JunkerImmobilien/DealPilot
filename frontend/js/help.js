@@ -693,7 +693,7 @@
         },
         {
           h: 'GrESt (Grunderwerbsteuer)',
-          body: 'Vom Bundesland abhängige Steuer beim Immobilienkauf. DealPilot belegt den Satz über die PLZ vor (Stand 05/2026):\n\n• Bayern: 3,5 %\n• Baden-Württemberg, Bremen, Niedersachsen, Rheinland-Pfalz, Sachsen-Anhalt: 5,0 %\n• Hamburg, Sachsen: 5,5 %\n• Berlin, Hessen, Mecklenburg-Vorpommern: 6,0 %\n• Brandenburg, NRW, Saarland, Schleswig-Holstein, Thüringen: 6,5 %\n\nDie Sätze ändern sich gelegentlich — prüf vor dem Kauf den aktuellen Satz deines Landes.\n\nFällig direkt nach Notarvertrag. Wird vom Finanzamt per Bescheid eingefordert. Kein Recht auf Ratenzahlung — am besten von Anfang in Eigenkapital einplanen.'
+          body: 'Vom Bundesland abhängige Steuer beim Immobilienkauf. DealPilot belegt den Satz über die PLZ vor (Stand 10/2026):\n\n• Bayern: 3,5 %\n• Baden-Württemberg, Niedersachsen, Rheinland-Pfalz, Sachsen-Anhalt, Thüringen: 5,0 %\n• Bremen, Hamburg, Sachsen: 5,5 %\n• Berlin, Hessen, Mecklenburg-Vorpommern: 6,0 %\n• Brandenburg, NRW, Saarland, Schleswig-Holstein: 6,5 %\n\nDie Sätze ändern sich gelegentlich — prüf vor dem Kauf den aktuellen Satz deines Landes.\n\nFällig direkt nach Notarvertrag. Wird vom Finanzamt per Bescheid eingefordert. Kein Recht auf Ratenzahlung — am besten von Anfang in Eigenkapital einplanen.'
         },
         {
           h: 'Hausgeld',

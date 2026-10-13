@@ -11,13 +11,13 @@
 (function () {
   'use strict';
 
-  // GrESt-Sätze pro Bundesland (Stand 05/2026)
+  // GrESt-Sätze pro Bundesland (Stand 05/2026; v2207: HB 5,5 seit 07/2025, TH 5,0 seit 01/2024 - beide waren falsch)
   const GREST_RATES = {
     'BW': 5.0,   // Baden-Württemberg
     'BY': 3.5,   // Bayern
     'BE': 6.0,   // Berlin
     'BB': 6.5,   // Brandenburg
-    'HB': 5.0,   // Bremen
+    'HB': 5.5,   // Bremen (seit 01.07.2025; v2207)
     'HH': 5.5,   // Hamburg (seit 2023)
     'HE': 6.0,   // Hessen
     'MV': 6.0,   // Mecklenburg-Vorpommern
@@ -28,7 +28,7 @@
     'SN': 5.5,   // Sachsen (seit 2023)
     'ST': 5.0,   // Sachsen-Anhalt
     'SH': 6.5,   // Schleswig-Holstein
-    'TH': 6.5,   // Thüringen
+    'TH': 5.0,   // Thüringen (seit 01.01.2024; v2207)
   };
 
   const BL_NAMES = {

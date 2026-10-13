@@ -38714,6 +38714,29 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2206 · Prod (16) · Standardwerte als Karten (N63.5, 13.10.2026)
+
+- **Was:** Marcel hat aus der Demo **A · Karten-Übersicht** mit **drei Sets wie in der Demo** gewählt.
+  - Neues Modul `js/standardwerte-karten.js`, aufgerufen in `settings.js` nach dem Verdrahten des Formulars.
+  - Jeder Abschnitt (`h3.ip-section` bis zur nächsten Überschrift) wird in einen `.swk-teil` verschoben. Verdrahtung und Speichern bleiben unverändert.
+  - Oben stehen die Sets und sieben Karten mit den aktuellen Werten. „Anpassen" öffnet einen Teil, „‹ Alle Karten" führt zurück.
+  - Sets:
+    - DealPilot-Standard: 1,5 / 10 / 1 / 1,2
+    - Vorsichtig: 2 / 20 / 3 / 1,3
+    - Renditeorientiert: 1 / 5 / 1 / 1,1
+  - Die Sets setzen Tilgung, EK, Mietausfall und Mindest-DSCR in die Felder, übernommen wird mit „Speichern".
+- **Commit:** `28b2f8a2`, Prod (16) `e03da0a7`
+- **Nachweis:**
+  - Staging, Browser: 7 Karten mit Werten, DealPilot-Standard als aktiv erkannt.
+  - Höhe 922 statt etwa 3.160 px.
+  - Anpassen → Finanzierung mit 5 Feldern, zurück ok.
+  - Set „Vorsichtig" setzt 2/20/3/1,3 und die Karte zieht nach, zurück auf Standard ergibt 1,5/10/1/1,2. Nicht gespeichert.
+  - Messkabine 390 px: 7 Karten, Überlauf 0.
+  - Prod liefert `standardwerte-karten.js?v=v2206`, Sicherungen 11 MB / 25 MB.
+- **Rest:**
+  - Die Fußzeile der Einstellungen sagt „Auto-Save aktiv", es gibt aber auch „Speichern" und eine Rückfrage beim Schließen: ein Widerspruch im Bestand, nicht angefasst.
+  - Halten zum Sprechen am Gerät abnehmen; GrESt Thüringen prüfen.
+
 ### Prod (15) v2200–v2205a · und Tour-Abnahme in der Messkabine (13.10.2026)
 
 - **Prod (15)** `7843709b`:
