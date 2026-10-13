@@ -228,6 +228,11 @@ if (!window._wlc) {
       _el.dispatchEvent(new Event('input',{ bubbles:true }));
     } catch (e) {}
     try { if (typeof window._oabFeedTrigger === 'function') window._oabFeedTrigger(); } catch (e) {}
+    /* v2192a · Die Bewertung (Pro/Contra) liest jetzt auch Zensus und Makro aus
+       diesem Snapshot - sie rechnet aber nur bei einer Eingabe neu. Gemessen:
+       nach dem Abruf stand die Zensus-Zeile erst beim naechsten Tippen da. Ein
+       input am Kaufpreis loest die Neuberechnung aus, ohne einen Wert zu aendern. */
+    try { var _kp = document.getElementById('qc_kp'); if (_kp) _kp.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
   }
 
   function spanLabel() { return mode === 'low' ? 'Unten' : mode === 'high' ? 'Oben' : 'Ø'; }
