@@ -29,7 +29,10 @@ export const ScoringService = {
   // Marcels Entscheidung vom 13.10.2026: „Den Makroscore muessen wir auf
   // jeden Fall anpassen."
   macroScore(metrics) {
-    const MOEGLICH = 6;
+    /* v2165: angebunden sind vier (Bevoelkerung, Kaufkraft, Arbeitslosigkeit,
+       Wanderung). Miet- und Kaufpreistrend haben KEINE Quelle im Makro-Strang -
+       die Mietentwicklung zaehlt im Deal-Score separat (rentTrendPct). */
+    const MOEGLICH = 4;
     const parts = {};
     const zahl = (v) => (typeof v === 'number' && Number.isFinite(v)) ? v : null;
     const add = (k, roh, formel) => {
@@ -44,7 +47,7 @@ export const ScoringService = {
     add('miet_trend', m.miet_trend, (v) => v / 0.1 / 2 + 0.5);
     add('kaufpreis_trend', m.kaufpreis_trend, (v) => v / 0.1 / 2 + 0.5);
     const vals = Object.values(parts);
-    const fehlend = ['bevoelkerung', 'kaufkraft', 'arbeitslosigkeit', 'wanderung', 'miet_trend', 'kaufpreis_trend']
+    const fehlend = ['bevoelkerung', 'kaufkraft', 'arbeitslosigkeit', 'wanderung']
       .filter((k) => !(k in parts));
     if (!vals.length) {
       return { score: null, breakdown: {}, estimated: true, gemessen: 0, moeglich: MOEGLICH, fehlend,
