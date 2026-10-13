@@ -151,6 +151,37 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N62.4b · Zensus in der Datenbank — ✅ v2162–v2162c, 13.10.2026
+
+**Marcel:** *„nicht in eine Datei schreiben, sondern direkt in eine Datenbank,
+wo wir das vielleicht jährlich oder alle zwei Jahre einmal abgleichen … ich
+brauche das ja für ganz Deutschland."* Commits `65c28743`, `cae6bc16`,
+`f7bbefc0`, `708be31c`.
+
+- `mb.zensus_werte` (Migration 016): **894.880 Werte, 400 Kreise, 10.786
+  Gemeinden**, 10 Tabellen (Leerstand/Eigentum, marktaktiv, Miete gesamt/
+  Baujahr/Fläche, Leerstand Baujahr/Fläche, marktaktiv Baujahr/Fläche,
+  Leerstandsdauer). Import `npm run zensus` im mb-Container, ~2½ min,
+  Protokoll in `mb.zensus_abrufe`. Zugang per `docker exec -e ZENSUS_USER… `
+  (nicht in der compose-Datei).
+- **Abgleich:** der Zensus ist eine Stichtagserhebung (15.05.2022), neue
+  Zahlen erst mit dem nächsten Zensus. Jährlich lohnt nur das Nachziehen
+  von Korrekturen — der Import ist ein UPSERT.
+- Leser `ZensusConnector.lookupDb`: Gemeinde nur EINDEUTIG
+  (`AgsResolver.gemeindeEindeutig` — `fromPostcode` nahm die ERSTE Ortschaft),
+  Kreis daneben, Miete/Leerstand passend zu Baujahr und Größe **je Wohnung**
+  (bei MFH Fläche/Einheiten — gemessen: 852 m²/12 WE landete sonst bei
+  „200 m² und mehr").
+- Anzeige: Reiter Miete (Bestandsmiete unter Marktmiete), Investitionen
+  (Leerstand unter „Leerstand p.a." mit Abgrenzung), Marktbericht Web+PDF
+  (`_zensusZeilen()`), Pilot-Prompt (Gemeinde, Klassen, Dauer,
+  Bestandsmiete-Hinweis). prompt-lecks 108 grün.
+- **Offen:** Tabellengröße 430 MB (Lizenz/URL je Zeile) — vor Prod den Platz
+  dort messen, ggf. Lizenz je Tabelle auslagern. Einmal nach dem Seitenaufruf
+  fehlten die Hinweise (nach einem Ladeversuch mit leerem Schlüssel), nicht
+  nachstellbar. Optik bei 390 px nicht im Bild abgenommen. Prod braucht die
+  Migration, den Import und die Sicherung vorher.
+
 #### N62.4a · Makro-Score: Ersatzwerte gelten als gemessen
 
 > **✅ Erledigt 13.10.2026 · v2158 · `33bca6d9`** (Marcels Freigabe: „Den

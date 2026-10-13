@@ -38614,6 +38614,19 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 ---
 
+### v2161–v2162c · Zensus 2022: Datei, dann Datenbank (N62.4)
+
+**Was:** v2161 Kreisdatei aus der amtlichen Quelle (`tools/zensus-kreise-holen.mjs`);
+v2162 `mb.zensus_werte` mit Kreis + Gemeinde nach Baujahr/Fläche, Import
+`npm run zensus`, `GET /zensus/objekt`, `zensus-info.js` (Miete, Leerstand),
+Marktbericht und Pilot-Prompt. **Commits:** `e8a320a9`, `65c28743`, `cae6bc16`,
+`f7bbefc0`, `708be31c`. **Nachweis:** Import 894.880 Werte (400/10.786),
+Leser im Container an Hiddenhausen/Hüllhorst/Berlin, Hinweise im Browser an
+echten Objekten (Leipzig MFH: Ø Wohnung 71 m² → 60–79 m²). **Rest:** siehe
+Backlog N62.4b. **Fallen:** Zensus-Anmeldung NUR per Header; Tabelle 4000W-1022
+liefert jeden Wert als % UND Anzahl; Gemeinde-ARS 12 → AGS 8 =
+ARS[0..5]+ARS[9..12]; Zensus-Größenklassen gelten je Wohnung.
+
 ### v2160 · Steuerliche Zusammenfassung, auch im Soll/Ist (N62.6)
 
 **Was:** Aufgabe 16 + Zielfelder `steuer_zusammenfassung`/`soll_ist_steuer`,
