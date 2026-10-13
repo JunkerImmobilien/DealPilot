@@ -343,7 +343,10 @@ export const ReportOrchestrator = {
       const gem = await AgsResolver.gemeindeEindeutig(geo?.components?.postcode, geo?.components?.city).catch(() => null);
       const z = await ZensusConnector.lookupDb({
         kreisAgs: agsInfo?.kreis_ags, gemeindeAgs: gem?.gemeinde_ags,
-        baujahr: ref.build_year, wohnflaeche: ref.living_area });
+        baujahr: ref.build_year,
+        /* v2162c: die Zensus-Groessenklassen gelten JE WOHNUNG. Bei mehreren
+           Einheiten zaehlt die mittlere Wohnungsgroesse, nicht das Haus. */
+        wohnflaeche: (ref.living_area && ref.units > 1) ? ref.living_area / ref.units : ref.living_area });
       step(`Strukturdaten: ${z.available ? 'ausgewertet' + (z.gemeinde ? ' (Gemeinde ' + z.gemeinde.name + ')' : ' (Kreis)') : 'keine Daten'}`);
       return z;
     })().catch((e) => { step('zensus: fehler ' + e.message); return { available: false, source: 'zensus2022', reason: e.message }; });

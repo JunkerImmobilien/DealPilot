@@ -56,7 +56,8 @@
   function mieteHtml(z) {
     var g = z.gemeinde, k = z.kreis, o = '';
     if (g && g.nettokaltmiete_qm != null) o += zeile('Gemeinde ' + g.name, eur(g.nettokaltmiete_qm));
-    if (k) o += zeile('Kreis ' + k.name, eur(k.nettokaltmiete_qm));
+    /* kreisfreie Stadt: Gemeinde = Kreis, die Zeile stuende doppelt da */
+    if (k && !(g && g.name === k.name && g.nettokaltmiete_qm === k.nettokaltmiete_qm)) o += zeile('Kreis ' + k.name, eur(k.nettokaltmiete_qm));
     function stufe(feld, wort) {
       var a = g && g[feld] && g[feld].wert != null ? g[feld] : null;
       var b = k && k[feld] && k[feld].wert != null ? k[feld] : null;
@@ -65,7 +66,8 @@
       return zeile(wort + ' ' + kl + (a ? ' (Gemeinde)' : ' (Kreis)'), eur((a || b).wert));
     }
     o += stufe('miete_baujahr', 'Baujahr');
-    o += stufe('miete_flaeche', 'Größe');
+    var n = parseInt(v('einheiten'), 10);
+    o += stufe('miete_flaeche', n > 1 ? 'Ø Wohnung' : 'Größe');
     if (!o) return '';
     return '<div class="dp-zi" id="dp-zi-miete"><div class="dp-zi-k">Zensus 2022 · Bestandsmiete</div>' + o
       + '<div class="dp-zi-f">Durchschnitt aller laufenden Mietverträge am Stichtag — keine Angebots- '
@@ -110,7 +112,7 @@
     var plz = v('plz');
     if (!/^\d{5}$/.test(plz) || !window.Auth || !Auth.apiCall) { _daten = null; zeichnen(); return; }
     var q = 'plz=' + encodeURIComponent(plz) + '&ort=' + encodeURIComponent(v('ort'))
-      + '&baujahr=' + encodeURIComponent(v('baujahr')) + '&wfl=' + encodeURIComponent(v('wfl'));
+      + '&baujahr=' + encodeURIComponent(v('baujahr')) + '&wfl=' + encodeURIComponent(wflJeWohnung());
     if (q === _letzt && _daten) { zeichnen(); return; }
     _letzt = q;
     Auth.apiCall('/marktbericht/zensus/objekt?' + q, { method: 'GET' })
@@ -118,12 +120,22 @@
       .catch(function () { if (q === _letzt) { _daten = null; zeichnen(); } });
   }
 
+  /* v2162c · Die Zensus-Groessenklassen gelten JE WOHNUNG. Gemessen an einem
+     MFH mit 12 Einheiten und 852 m²: es landete in „200 m² und mehr". Bei
+     mehreren Einheiten zaehlt die mittlere Wohnungsgroesse. */
+  function wflJeWohnung() {
+    var w = Number(String(v('wfl')).replace(/\./g, '').replace(',', '.'));
+    var n = parseInt(v('einheiten'), 10);
+    if (!isFinite(w) || w <= 0) return '';
+    return String(Math.round((n > 1 ? w / n : w) * 10) / 10);
+  }
+
   function spaeter() { clearTimeout(_timer); _timer = setTimeout(laden, 700); }
 
   window.addEventListener('dp:object-ready', spaeter);
   document.addEventListener('change', function (e) {
     var id = e.target && e.target.id;
-    if (id === 'plz' || id === 'ort' || id === 'baujahr' || id === 'wfl') spaeter();
+    if (id === 'plz' || id === 'ort' || id === 'baujahr' || id === 'wfl' || id === 'einheiten') spaeter();
   });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', spaeter); else spaeter();
 

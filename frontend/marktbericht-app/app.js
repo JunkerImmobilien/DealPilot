@@ -99,7 +99,9 @@ function _zensusZeilen(z) {
   const g = z.gemeinde, k = z.kreis;
   const kn = (k && k.name) || z.kreis_name || 'Kreis';
   if (g && g.nettokaltmiete_qm != null) out.push(['Ø Nettokaltmiete Gemeinde ' + g.name + ' (Zensus 2022)', de(g.nettokaltmiete_qm, 2) + ' €/m²']);
-  if (z.nettokaltmiete_qm != null) out.push(['Ø Nettokaltmiete Kreis ' + kn + ' (Zensus 2022)', de(z.nettokaltmiete_qm, 2) + ' €/m²']);
+  /* kreisfreie Stadt: Gemeinde = Kreis -> nur eine Zeile */
+  if (z.nettokaltmiete_qm != null && !(g && g.name === kn && g.nettokaltmiete_qm === z.nettokaltmiete_qm))
+    out.push(['Ø Nettokaltmiete Kreis ' + kn + ' (Zensus 2022)', de(z.nettokaltmiete_qm, 2) + ' €/m²']);
   for (const [feld, wort] of [['miete_baujahr', 'Baujahr'], ['miete_flaeche', 'Größe']]) {
     const a = g && g[feld] && g[feld].wert != null ? [g[feld], 'Gemeinde'] : (k && k[feld] && k[feld].wert != null ? [k[feld], 'Kreis'] : null);
     if (a) out.push(['Ø Nettokaltmiete ' + wort + ' ' + a[0].klasse + ' (' + a[1] + ', Zensus 2022)', de(a[0].wert, 2) + ' €/m²']);
