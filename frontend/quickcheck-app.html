@@ -6661,7 +6661,12 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
     function los() {
       vorbelegen();
       var s = el(); if (s) s.addEventListener('change', hinweis);
-      window.addEventListener('message', function () { setTimeout(hinweis, 0); });
+      window.addEventListener('message', function (ev) {
+        /* Ein Diktat ist eine ausdrueckliche Angabe - auch wenn es dieselbe Klasse nennt. */
+        var d = ev && ev.data, s2 = el();
+        if (s2 && d && d.type === 'qc-import-result' && d.data && d.data.qc_lageklasse) delete s2.dataset.lkVorgabe;
+        setTimeout(hinweis, 0);
+      });
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los); else los();
   })();
