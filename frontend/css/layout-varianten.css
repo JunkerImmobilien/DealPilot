@@ -9469,3 +9469,16 @@ html[data-dp-layout][data-dp-objkarte="kennzahlen"] .dpl-schiene .sb-card.is-act
   padding:0 !important;
   background:transparent !important;
 }
+
+/* ==============================================================================
+   v2198 · Kartenknoepfe NEBEN den Score-Ring, nicht darauf.
+   Gemessen im Responsive-Check (Messkabine, 1024-2560 px, alle Reiter):
+   v1943 zentriert Score-Ring UND .sbc-actions auf halbe Hoehe (Regel
+   darueber) - beide rechts, also uebereinander. Beim Ueberfahren erschienen
+   Duplizieren/Loeschen mitten auf dem Ring (Ring 276-341 px, Knoepfe
+   300-348 px). Oben rechts ist kein Platz: der Ring ist 80 px hoch bei
+   104 px Karte. Deshalb links daneben: Ring 65 px + 12 px Rand + Abstand.
+   ============================================================================== */
+html:not([data-dp-layout]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-actions {
+  right: 84px !important;
+}

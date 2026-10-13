@@ -855,6 +855,8 @@ window.DealScore2 = (function() {
       // load die reine Preset-Config gezogen wird
       if (presetKey !== 'custom') {
         localStorage.removeItem(STORAGE_KEY);
+        /* v2191: eine gewaehlte Vorlage gilt auch fuer den DealScore wieder (dealscore.js _getWeights) */
+        localStorage.removeItem('dp_dealscore_eigen');
       }
       return true;
     } catch (e) { return false; }

@@ -3287,6 +3287,13 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 })();</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v1881c">
+<style id="v2198a-lange-woerter">
+/* v2198a · Responsive-Check 320 px: „Bewirtschaftungskosten“ (22 Zeichen, ein Wort) im
+   Kartentitel war 191 px breit bei 152 px Platz und schob die Seite 20 px quer
+   (Flex-Kind schrumpft nicht unter seine Inhaltsbreite). Silbentrennung nach
+   lang=de, notfalls Umbruch im Wort. */
+.card-title > span { min-width: 0; overflow-wrap: anywhere; -webkit-hyphens: auto; hyphens: auto; }
+</style>
 </head>
 <body class="dp-neue-karte"><!-- qb-rename-v699 · v1645: die Marke fest - dieses Dokument ist IMMER hell -->
 
@@ -5186,6 +5193,34 @@ const QcApp = (function() {
       }
     }
 
+    /* v2192 · Die eigenen Tabellen fliessen in die Bewertung ein - aus dem
+       Snapshot der DealPilot-Marktbewertung (#_mb_state, dealpilot-mb-qc.js).
+       Jede Zeile nennt ihre Quelle; ohne Abruf bleibt alles wie vorher. */
+    try {
+      const _ms = document.getElementById('_mb_state');
+      const _c = (_ms && _ms.value) ? (JSON.parse(_ms.value).card || null) : null;
+      if (_c) {
+        const _de = (x, n) => Number(x).toFixed(n).replace('.', ',');
+        const zs = _c.zensus;
+        if (zs && zs.leer != null) {
+          const wo = zs.ebene + (zs.name ? ' ' + zs.name : '');
+          if (zs.leer >= 7)        cons.push(`Leerstand <strong>${_de(zs.leer, 1)} %</strong> (Zensus 2022, ${wo}) — erhöhtes Vermietungsrisiko`);
+          else if (zs.leer <= 2.5) pros.push(`Leerstand nur <strong>${_de(zs.leer, 1)} %</strong> (Zensus 2022, ${wo}) — angespannter Mietmarkt`);
+        }
+        const _nkmQ = QcEngine.num(inputs.nkm), _wflQ = QcEngine.num(inputs.wfl);
+        if (zs && zs.miete && _nkmQ && _wflQ) {
+          const ist = _nkmQ / _wflQ;
+          if (ist > zs.miete * 1.3)       cons.push(`Miete <strong>${_de(ist, 2)} €/m²</strong> liegt deutlich über dem Zensus-Mittel (${_de(zs.miete, 2)} €/m², Bestandsmieten) — Risiko bei Mieterwechsel`);
+          else if (ist < zs.miete * 0.85) pros.push(`Miete <strong>${_de(ist, 2)} €/m²</strong> unter dem Zensus-Mittel (${_de(zs.miete, 2)} €/m²) — Luft nach oben`);
+        }
+        if (_c.macroRaw != null && _c.makroGemessen) {
+          const m10 = _de(_c.macroRaw / 10, 1);
+          if (_c.macroRaw >= 60)      pros.push(`Makrolage <strong>${m10}/10</strong> aus amtlichen Kreisdaten (${_c.makroGemessen} von 4 Kennzahlen)`);
+          else if (_c.macroRaw < 45)  cons.push(`Makrolage <strong>${m10}/10</strong> aus amtlichen Kreisdaten (${_c.makroGemessen} von 4 Kennzahlen) — schwache Region`);
+        }
+      }
+    } catch (e) { /* ohne Snapshot keine Zusatzzeilen */ }
+
     // Verhandlungs-Empfehlung
     const verdict = document.getElementById('ai-verdict');
     const verdictEmoji = document.getElementById('ai-verdict-emoji');
@@ -6677,7 +6712,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
   <script src="js/qc-heuristik.js?v=v2148c"></script>
-  <script src="js/dealscore.js?v=v2141"></script>
+  <script src="js/dealscore.js?v=v2191"></script>
   <script src="js/avm-section.js?v=v2149"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->
   <!-- W18-qcwl: der QC laeuft in einem IFRAME — der Sweeper des Elterndokuments
@@ -6685,7 +6720,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
      und holt sein Branding ueber ji_token (same-origin). -->
   <script src="js/whitelabel-override.js?v=v2149"></script>
   <script src="js/qc-whitelabel.js?v=W33"></script>
-  <script src="js/dealpilot-mb-qc.js?v=953"></script>
+  <script src="js/dealpilot-mb-qc.js?v=v2192a"></script>
   <script src="js/immometrica-qc.js?v=v2149"></script>
 <!-- qc-embedded-decouple (v683): Auto-Hoehen-Rueckkopplung kappen, wenn im iframe -->
 <style id="qc-embedded-decouple-style">
@@ -6899,8 +6934,9 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 <script id="qb-reskin4-js">
 (function(){
   'use strict';
-  var CATS=['rendite','cashflow','sicherheit','finanzierung','effizienz'];
-  var CATL={rendite:'Rendite',cashflow:'Cashflow',sicherheit:'Sicherheit',finanzierung:'Finanz.',effizienz:'Effizienz'};
+  /* v2191: die Teilnoten heissen sub-rendite/-cashflow/-ltv/-risiko/-potenzial (Z. 3320-3352). Hier standen sicherheit/finanzierung/effizienz - drei Balken zeigten immer einen Strich. */
+  var CATS=['rendite','cashflow','ltv','risiko','potenzial'];
+  var CATL={rendite:'Rendite',cashflow:'Cashflow',ltv:'LTV',risiko:'Risiko',potenzial:'Potenzial'};
   var KPI=[['kpi-bmr','Bruttomietr.','\u22655%'],['kpi-nmr','Nettomietr.','\u22653%'],['kpi-ekr','EK-Rendite','\u22657%'],
            ['kpi-cf','Cashflow/Mo','\u22650\u20ac'],['kpi-dscr','DSCR','\u22651,2'],['kpi-ltv','LTV','<90%'],['kpi-bwk','Bewirtsch.','18\u201335%']];
   function tc(s){return s>=70?'#3FA56C':s>=50?window._qcGold('--gold', '#C9A84C'):'#B8625C';}
@@ -7414,6 +7450,6 @@ html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !i
 })();
 </script>
 
-<script src="js/pilot-tower.js?v=v2189f"></script><!-- v2188: Bruecke F1/? zum Piloten im Elternfenster -->
+<script src="js/pilot-tower.js?v=v2198a"></script><!-- v2188: Bruecke F1/? zum Piloten im Elternfenster -->
 </body>
 </html>

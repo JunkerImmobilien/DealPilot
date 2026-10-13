@@ -12,7 +12,7 @@
  * Syntaxfehler, sondern ein fehlender Bezeichner. */
 import { bewirtschaftungskosten as nrwBwk } from '../lib/nrw_modell.js';
 import {
-  BWK_TABELLE, bwkAnsaetze, GND_TABELLE, MODELL,
+  BWK_TABELLE, bwkAnsaetze, BWK_JAHRE, GND_TABELLE, MODELL,
   barwertfaktor, abzinsungsfaktor, gnd, rnd, lzsNach256,
   istNeubau, istErstbezugNachSanierung, round0, round2,
 } from '../lib/immowertv.js';
@@ -384,26 +384,51 @@ export const ErtragswertService = {
       if (maPct == null && pos(ein.leerstand_pct)) {
         maPct = pos(ein.leerstand_pct); maHerkunft = 'eigene Leerstandsannahme';
       }
+      /* v2195 · Gewerbe nach Anlage 3: Mietausfall GETRENNT - 2 % auf den
+         Wohn- und Stellplatzanteil, 4 % auf den gewerblichen Rohertrag. Bis
+         hier galt EIN Satz fuer alles, je nachdem welcher Teil groesser war. */
+      let _maGetrennt = null;
       if (maPct == null) {
-        maPct = gewerbe > mieteMarkt
-          ? BWK_TABELLE.mietausfall_gewerbe_pct : BWK_TABELLE.mietausfall_wohnen_pct;
+        if (gewerbe > 0 && rohertrag > gewerbe) {
+          _maGetrennt = { wohnen: BWK_TABELLE.mietausfall_wohnen_pct, gewerbe: BWK_TABELLE.mietausfall_gewerbe_pct };
+          maPct = round2(((rohertrag - gewerbe) * _maGetrennt.wohnen + gewerbe * _maGetrennt.gewerbe) / rohertrag);
+        } else {
+          maPct = gewerbe > mieteMarkt
+            ? BWK_TABELLE.mietausfall_gewerbe_pct : BWK_TABELLE.mietausfall_wohnen_pct;
+        }
       }
       out.bwk_herkunft = { instandhaltung: iHerkunft, mietausfall: maHerkunft };
 
-      const verwaltung = round0(we * vJeWe + spAnz * vJeStp);
+      /* v2195 · Verwaltung Gewerbe: 3 % des gewerblichen Rohertrags (Anlage 3;
+         Oberer Gutachterausschuss Brandenburg 2022-2026). Fehlte bis hier ganz. */
+      const _gewJahr = Object.keys(BWK_JAHRE).map(Number).sort((a, b) => a - b)
+        .filter((x) => x <= (Number(ein.stichtag_jahr) || new Date().getFullYear()) && BWK_JAHRE[x].gew_verw_pct != null).pop();
+      const _gewVerwPct = _gewJahr != null ? BWK_JAHRE[_gewJahr].gew_verw_pct : 3;
+      const verwGewerbe = gewerbe > 0 ? round0(gewerbe * _gewVerwPct / 100) : 0;
+      const verwaltung = round0(we * vJeWe + spAnz * vJeStp) + verwGewerbe;
       const instand = round0(wfl * iJeQm + spAnz * iJeStp);
-      const mietausfall = round0(rohertrag * maPct / 100);
+      /* getrennt exakt rechnen, nicht ueber den gerundeten Mischsatz (1.079 statt 1.080 EUR) */
+      const mietausfall = _maGetrennt
+        ? round0((rohertrag - gewerbe) * _maGetrennt.wohnen / 100 + gewerbe * _maGetrennt.gewerbe / 100)
+        : round0(rohertrag * maPct / 100);
+      if (gewerbe > 0) {
+        out.hinweise.push('Gewerbe: Verwaltung mit ' + _gewVerwPct + ' % des gewerblichen Rohertrags angesetzt'
+          + (_maGetrennt ? ', Mietausfallwagnis 4 % auf Gewerbe und 2 % auf Wohnen' : '')
+          + '. Die Instandhaltung der Gewerbeflächen ist NICHT angesetzt - dafür fehlen Nutzfläche und Nutzungsart'
+          + ' (Anlage 3: Lager 30 %, SB-Markt 50 %, Büro/Praxen/Geschäfte 100 % der Wohn-Instandhaltung je m²).');
+      }
       const betriebNul = round0(pos(ein.bwk_betrieb_nul_jahr) || 0);
 
       bwkDetail.push({
         pos: `Verwaltungskosten (${we} WE × ${vJeWe} €`
              + (spAnz ? ` + ${spAnz} Stellpl. × ${vJeStp} €` : '')
+             + (verwGewerbe ? ` + Gewerbe ${_gewVerwPct} % vom Rohertrag` : '')
              + ')',
         wert: verwaltung });
       bwkDetail.push({ pos: `Instandhaltung (${wfl} m² × ${deZahl(iJeQm)} €)`,
         detail: iHerkunft === 'Anlage 3' ? null : 'aus deiner Rücklage',
         wert: instand });
-      bwkDetail.push({ pos: `Mietausfallwagnis (${deZahl(maPct)} % vom Rohertrag)`,
+      bwkDetail.push({ pos: _maGetrennt ? `Mietausfallwagnis (Wohnen ${_maGetrennt.wohnen} %, Gewerbe ${_maGetrennt.gewerbe} % - zusammen ${deZahl(maPct)} %)` : `Mietausfallwagnis (${deZahl(maPct)} % vom Rohertrag)`,
         detail: maHerkunft === 'Anlage 3' ? null : 'aus deiner Leerstandsannahme',
         wert: mietausfall });
       if (betriebNul) bwkDetail.push({ pos: 'Nicht umlagefähige Betriebskosten', wert: betriebNul });

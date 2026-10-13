@@ -242,7 +242,7 @@
       a.gesehen = a.angewandt; modalZeichnen();
       if (a.angewandt) setTimeout(function () { if (offen === id) schliessen(); }, 1400);
     } else if (typeof global.toast === 'function') {
-      toast('✓ Marktbericht fertig: ' + a.label + ' — unten links öffnen');
+      toast('✓ Marktbericht fertig: ' + a.label + ' — unten in der Leiste öffnen');   /* v2191: die Pille sitzt unten mittig, nicht links */
     }
     sichern(); pilleZeichnen();
   }

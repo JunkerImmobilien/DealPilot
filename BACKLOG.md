@@ -157,6 +157,17 @@ gegenübergestellt werden sie nirgends.
 > Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
 > Quelle erzeugen statt abtippen.
 
+#### N62.24 · Rest aus dem Responsive-Check (13.10.2026, v2198–v2198c)
+
+Gemessen in der Messkabine (11 Breiten × 9 Reiter + 8 Ansichten). Überlauf, Herausragen und Unerreichbar stehen nach v2198c überall auf 0. Offen, weil Gestaltungsfragen und nicht Fehler:
+1. **Kontrast:** 288 Stellen auf dem Handy, 433 auf Tablet/Desktop. Meist Grautöne knapp unter 4,5:1 (Steuertabelle, Bank-Cockpit, Hilfstexte), dazu Status-Grün/-Rot auf Creme. Grün/Rot sind laut Markenregel unantastbar — Marcel entscheidet, ob für kleine Zahlen eine dunklere Statusvariante erlaubt ist.
+2. **Touch-Flächen unter 40 px:** vor allem die Kartenknöpfe der Objektliste (26 px) und die i-Knöpfe (18 px sichtbar, mit 44-px-Trefferfläche seit v1441 — die zählt die Messung nicht).
+3. **Nicht geprüft:** Anmeldung und Registrierung (Abmelden nötig), öffentliche Startseite (andere Domain), Bildschirmtastatur und echte Touch-Geräte, andere Rollen als Pro, leeres Konto. → Abnahme durch Marcel am Gerät.
+
+#### N62.23 · Frage an Marcel: vw-modul (Junker Gutachten-Modul V4.2)
+
+Dateien/vw-modul-v4-2-2.zip und -v4-2-5.zip (08./10.10.2026) stehen in keiner Backlog-Zeile. Inhalt (nur gelesen, README): eigenständige Web-App für Verkehrswert-, RND- und Kaufpreisaufteilungs-Gutachten mit Word-Vorlagen und PDF über LibreOffice/PHP, gedacht für die **Junker-Homepage / das Portal** (/modules/vw/), nicht für DealPilot. Nicht angefasst. **Zu klären:** gehört das in DealPilot (z. B. als Modul neben dem BMF-Rechner und dem RND-Assistenten) oder bleibt es auf der Homepage?
+
 #### N62.22 · Neue Hilfe: Pilot auf F1/?, Prozess-Atlas, Hilfe überarbeitet
 
 
@@ -197,6 +208,8 @@ gegenübergestellt werden sie nirgends.
 4. Prod nach Freigabe (Frontend + Backend-Rebuild wegen `openaiService`).
 
 #### N62.21 · Marktbericht: Bewirtschaftungskosten im Ertragswert nicht fortgeschrieben (Bewertungsfrage an Marcel)
+
+> **✅ v2195 (13.10.2026): Rest erledigt.** 2022/2023 vollständig aus der amtlichen Tabelle des Oberen Gutachterausschusses Brandenburg (2022–2026, eine Seite); Gewerbe: Verwaltung 3 % und getrennter Mietausfall im Ertragswert. Offen nur: Gewerbe-Instandhaltung braucht Nutzfläche und Nutzungsart als Eingabe (heute nur gewerbe_jahr).
 
 **✅ GEBAUT 13.10.2026 · v2186 · e2ec2ed2 (Staging):** Marcel: „das soll schon passen“. Jahrestabelle BWK_JAHRE + bwkAnsaetze(jahr), Ertragswert zum Stichtag je Objektart. Offen: 2022/2023 lückenhaft, Gewerbe-Verwaltung/-Instandhaltung, Prod.
 
@@ -249,6 +262,7 @@ Agents (`.claude/agents/`): Register-Ernte (zuerst BY/SL/HB), Nachernte aus
 `mb.gaa_documents` (78 PDFs auf „neu"), Datenwächter Makro/Zensus, Ämter.
 
 #### N62.18 · NÄCHSTES PAKET (Marcel, 13.10.2026: „ja mach das als nächstes Paket") — eigene Datenhaltung, Warteschlange, Laufzeiten
+> **Stand 13.10.2026:** 1, 2, 6, 7 erledigt (mb.makro_werte, mb.plz_orte — gemessen 152 ms live gegen 2 ms aus der Tabelle —, mb.laufzeiten). Offen: 3 Bodenrichtwerte ablegen (Zonengrenzen!), 4 GeoMap (Lizenzfrage an Marcel), 5 Warteschlange in der DB für Bericht und Pilot-Analyse (eigenes Paket).
 
 **Marcel:** *„können wir die kritischen Anfragen, die zeitintensiv sind, nicht in
 unsere eigene Datenbank schreiben … und gleichen sie in regelmäßigen Abständen
@@ -262,7 +276,7 @@ Bauplan, in dieser Reihenfolge:
    (12411-01-01-4, 82000-07-01-4 inkl. DG, AI008-1 Sp.3, AI002-1 Sp.9 je Kreis,
    max. 10 parallel, Protokolltabelle). Monatlicher Lauf. `DestatisConnector.macro`
    liest zuerst die Tabelle, Live-Abruf nur als Rückfall.
-2. **PLZ → Gemeinde/Kreis:** Tabelle aus OpenPLZ (einmal komplett, monatlich
+2. **✅ v2197 (13.10.2026)** — **PLZ → Gemeinde/Kreis:** Tabelle aus OpenPLZ (einmal komplett, monatlich
    abgleichen); `AgsResolver` liest sie zuerst (heute je Bericht ein Live-Abruf).
 3. **Bodenrichtwerte:** Treffer je Abfragepunkt mit Stichtag speichern,
    Wiederverwendung im Umkreis nur bei gleicher Zone; nach Stichtag erneuern.
@@ -271,13 +285,15 @@ Bauplan, in dieser Reihenfolge:
 5. **Warteschlange in der DB** für Marktbericht UND Pilot-Analyse (heute nur
    Marktbericht, im Arbeitsspeicher, MAX 6, beim Neustart weg), mit Status für
    den Kunden.
-6. **Laufzeiten mitschreiben** (Bericht, Analyse, je externer Dienst) — heute
+6. **✅ v2197 (13.10.2026)** — **Laufzeiten mitschreiben** (Bericht, Analyse, je externer Dienst) — heute
    wird keine Dauer gespeichert.
-7. **Lasttest** auf Staging (z. B. 20 Berichte gleichzeitig; kostet GeoMap-Abrufe
+7. **✅ 13.10.2026 (Sitzung v2172 ff.)** — **Lasttest** auf Staging (z. B. 20 Berichte gleichzeitig; kostet GeoMap-Abrufe
    — vorher mit Marcel).
 OpenAI ist kein Engpass (Stufe „Launch", gpt-4.1 2 Mio. TPM).
 
 #### N62.17 · Warum bleibt data._ai hinter der Spalte ai_analysis zurück?
+
+> **✅ v2193 (13.10.2026):** Ursache: collectData() trägt _ai aus _currentObjData mit (Stand beim Laden). Nach einer neuen Analyse ging der neue Text in die Spalte, der alte in data._ai — im Browser nachgestellt (_aiText geändert, collectData()._ai unverändert). saveObj setzt jetzt beide gleich. Alte Kopien in nicht wieder gespeicherten Objekten bleiben; der einzige Leser (dashboard.js) nimmt seit v2170b die neuere.
 
 Gemessen 13.10.2026: bei 4 von 8 gewonnenen Objekten trug `ai_analysis` die
 Analyse vom 13.10., `data._ai` die vom 09.10. v2170b liest beide und nimmt die
@@ -298,6 +314,8 @@ der die 400 Kreise einmal im Monat langsam nachzieht (max. 10 parallel —
 GENESIS-Grenze). Der Bericht liest nur noch die Tabelle.
 
 #### N62.14 · Marktbericht in Worten: bewerten, Entwicklung, Ableitung, Prognose
+
+> **✅ v2196 (13.10.2026):** Kapitel „D) Entwicklung, Ableitung & Prognose“ als vierte Gruppe. kapitelD() rechnet die Fakten (Preis-/Miet-/Bevölkerungstrend, Ableitung aus Median × Fläche, Spanne, Abstand Kaufpreis, Ertrags-/Sachwert falls da, Prognose als Modellfortschreibung über 3/5 Jahre). Echter Lauf auf Staging: Kapitel kam mit genau diesen Zahlen und der Kennzeichnung „keine Vorhersage, kein Gutachten“. Kosten: ein vierter paralleler KI-Aufruf je Bericht.
 
 **Marcel am 13.10.2026:** *„wenn wir die Pilot-Analyse anpassen, können wir
 auch den Marktbericht nicht nur grafisch darstellen, sondern vielleicht auch
@@ -469,6 +487,8 @@ BSFZ-Siegel auf der Landing (N14, `v1873`).
 
 #### N62.10 · Tab Steuern: das Vorjahr duplizieren
 
+> **✅ v2194 (13.10.2026):** Detail-Modus, neben dem Veranlagungsjahr: „⧉ Werte aus VORJAHR übernehmen“. Kopiert nur EIGENE Werte wiederkehrender Posten (Hausverwaltung, NK umlagefähig/nicht, Umlagen, Kontoführung, Steuerberater, Telefon, Porto, Fahrten, Verpflegung, Hotel, sonstige Betriebs-/Verwaltungs-/Finanzierungskosten) und nur in leere Felder. Fest, nie kopiert: Schuldzinsen, AfA, bewegliche WG, anschaffungsnah, Erhaltungsaufwand, Notar/Grundschuld, Vermittlung, Bereitstellung, Kaltmiete, Inserat, Gericht. Abnahme: Liste der wiederkehrenden Posten mit Marcel.
+
 **Marcel:** *„bei der im Tab Steuern wäre das gut, wenn wir auch immer so
 das Vorjahr duplizieren können. Manche Sachen wiederholen sich ja. So
 können dann die Sachen übernommen werden. Außer jetzt die, die fest sind.
@@ -587,6 +607,8 @@ hier. Ein Punkt, der nur in einem Chat lebt, fehlt beim nächsten Mal.
 
 #### N61.1 · Der Aussehen-Schritt: die App soll sich im Hintergrund mitändern
 
+> **✅ laut Code gebaut (Aufräumen 13.10.2026): v2096** — ein Klick auf eine Aussehen-Kachel setzt das Layout sofort um (_aussehenAnwenden → DealPilotLayout.setze), und im Schritt Aussehen ist der dunkle Schleier weg (dpo-ov-schau), weil er Hell gegen Dunkel um 60 % verfälschte. Offen nur die Sichtabnahme mit einem frischen Testkonto (ohne Objekte ist der Hintergrund leer).
+
 **Marcel:** *„wenn man nach der neuanmeldung das aussehen der app auswählen
 kann dass die bilder dort nichts sagend sind und es gut wäre wenn sich im
 hintergrund die app direkt ändert und das bild das layout besser wieder
@@ -627,6 +649,8 @@ ausbauen" heißt, ist offen und gehört vor dem Bauen geklärt.
 
 #### N61.3 · Lageklassen in die Pilot-Analyse UND in die Quick-Check-Bewertung
 
+> **✅ laut Code erledigt (Aufräumen 13.10.2026):** Ampel v2143, Quick-Check-Fazit mit Zielrendite der Lageklasse v2148 (qc-heuristik.js:668), Prompt der Pilot-Analyse v2157 (openaiService.js:479).
+
 **Marcel:** *„Das muss auch mit in die Bewertung im Quick Check unten weil
 der Investor ja lesen möchte und bewerten möchte ob der deal passt."*
 
@@ -636,6 +660,8 @@ ob sie auch **im Prompt der Pilot-Analyse** und **im Fazit unten im
 Quick-Check** ankommt.
 
 #### N61.4 · Lage & Markt: die Werte aus den Marktberichten holen, nicht recherchieren
+
+> **✅ laut Code erledigt (Aufräumen 13.10.2026):** die fehlenden Stufe-3-Werte (Sachwert, Ertragswert, führendes Verfahren mit Grund und Rechtsgrundlage) stehen seit v2150 (c73c0c6c) im Prompt (openaiService.js:1103-1128); Mietspiegel mit Vorrang des Berichtswerts (:1569).
 
 **Marcel:** *„in der Pilot Analyse woher kommen die werte und daten im reiter
 Lage & Markt? wenn wir einen marktbericht haben oder mehrere können wir die
@@ -668,6 +694,8 @@ erzählen keine Geschichte"), dort steht der Punkt mit Messung. Er hängt an
 einer Entscheidung von Marcel und ist nicht blockiert, sondern **unbeantwortet**.
 
 #### N61.6 · Das Unterlagen-Modul ergänzen — Marcel meint N51
+
+> **✅ laut Code erledigt (Aufräumen 13.10.2026):** N51 ist mit v2151 (Beleg je Seite, seiten.pro_seite), v2152 (Ansprechpartner 1 und 2 je Amt, Kopie-Haken) und v2153 (Amtsweg oder zwei Ansprechpartner, Telefon) gebaut. Offen bleibt nur der Hinweis unten: vw-modul-v4-2-2/-v4-2-5.zip stehen in keiner Backlog-Zeile.
 
 **Marcel:** *„und ich hatte auch ein paket reingegeben um die unterlagen
 prüfung. steht das auch noch im backlog?"* — und auf die Rückfrage:
@@ -7155,6 +7183,8 @@ belegten Einstiege:
 ---
 
 ### N51 · ⚠ TEILS ERLEDIGT — am Code nachgemessen 12.10.2026
+
+> **✅ Nachtrag 13.10.2026:** beide offenen Dinge sind seit v2151–v2153 gebaut (Ansprechpartner 1/2 mit Beleg je Person, Belegprüfung je Seite, Kopie-Haken).
 
 > **Erledigt ist der Link-Teil:** `frontend/js/unterlagen-modal.js:294-298`
 > rendert `antrag_url` immer als Verweis, kein `else if` mehr (v1971c).

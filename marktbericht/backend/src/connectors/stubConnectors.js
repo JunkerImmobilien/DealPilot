@@ -82,7 +82,7 @@ export const DestatisConnector = {
   // {ags, city} -> { available, source, metrics:{...}, tables, reason? }
   // Ruft die regionalen GENESIS-Tabellen (Bevoelkerung, Einkommen, Arbeitslosenquote) im
   // flachen ffcsv-Format ab und leitet daraus die Metriken fuer den Makro-Score ab.
-  async macro({ ags, city } = {}) {
+  async macro({ ags, city, nurDb = false } = {}) {
     if (!destatisEnabled()) {
       return { available: false, source: 'destatis', reason: 'kein_token', metrics: null,
                note: 'Sozioökonomie nicht angebunden – kostenlosen Token bei regionalstatistik.de hinterlegen.' };
@@ -105,6 +105,11 @@ export const DestatisConnector = {
       const db = await this._macroAusDb(krs, now);
       if (db) return db;
     } catch (e) { /* Tabelle fehlt oder DB haengt -> Live-Abruf */ }
+    /* v2192 · nurDb: der Schnell-Abruf (Quick-Check) will die eigene Tabelle,
+       aber nie den Live-Abruf (der haengt Sekunden). Kein Kreis in der
+       Tabelle -> keine Makrolage, ehrlich als solche gemeldet. */
+    if (nurDb) return { available: false, source: 'destatis', reason: 'nicht_in_tabelle', metrics: null,
+      note: 'Kreis noch nicht in der eigenen Makro-Tabelle - im Schnell-Abruf kein Live-Abruf.' };
     // Veralteten Destatis-Bundescode (Format NNNNN-NNNN, z.B. 12411-0014 aus alter .env)
     // automatisch auf den regionalstatistik-Kreis-Code mappen -> robust gegen stale .env.
     const popRaw = cfg.destatis.tablePopulation || '12411-01-01-4';

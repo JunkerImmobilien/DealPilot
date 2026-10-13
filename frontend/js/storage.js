@@ -868,6 +868,15 @@ async function saveObj(opts) {
 
   var data = collectData();
   var aiText = window._aiText || null;
+  /* v2193 · N62.17 - URSACHE gefunden: collectData() traegt `_ai` aus
+     _currentObjData mit, also den Text vom LADEN des Objekts. Nach einer
+     neuen Analyse ging der neue Text in die Spalte ai_analysis, der alte
+     in data._ai (gemessen: _aiText geaendert, collectData()._ai unveraendert).
+     Ab hier bekommen beide denselben Text. */
+  if (aiText && data && typeof data === 'object') {
+    data._ai = aiText;
+    try { if (window._currentObjData) window._currentObjData._ai = aiText; } catch (e) {}
+  }
   var photos = (typeof imgs !== 'undefined') ? imgs.map(function(i){ return i.src; }) : [];
   /* v734-resize-on-save: grosse (Alt-)Fotos vor dem Upload verkleinern. v725 resized nur beim
      Upload; Altfotos liegen unkomprimiert (gemessen 3MB) und liessen den PUT timeouten.
@@ -2577,7 +2586,7 @@ window.triggerImportJson = function() {
   }
   var input = document.createElement('input');
   input.type = 'file';
-  input.accept = '.json';
+  input.accept = '.json,.dpkt';   /* v2191: die Sicherung heisst .dpkt (Inhalt JSON) - nur .json liess sie im Dialog nicht auswaehlen */
   input.style.display = 'none';
   input.onchange = function() {
     if (typeof importJSON === 'function' && input.files.length) {
@@ -4242,7 +4251,7 @@ function _showAutoSavedIndicator() {
   var el = document.getElementById('hdr-autosave');
   if (!el) return;
   var textEl = el.querySelector('.hdr-autosave-text');
-  if (textEl) textEl.textContent = 'Auto-saved · gerade eben';
+  if (textEl) textEl.textContent = 'Gespeichert · gerade eben';   /* v2191: war englisch */
   el.style.display = 'inline-flex';
   // Nach 4 Sekunden Text auf "vor X s" updaten + nach 30s ganz ausblenden
   var startTime = Date.now();
@@ -4258,7 +4267,7 @@ function _showAutoSavedIndicator() {
       var t = seconds < 5 ? 'gerade eben' :
               seconds < 60 ? 'vor ' + seconds + ' s' :
               'vor ' + Math.round(seconds/60) + ' min';
-      textEl.textContent = 'Auto-saved · ' + t;
+      textEl.textContent = 'Gespeichert · ' + t;
     }
   }, 1000);
 }

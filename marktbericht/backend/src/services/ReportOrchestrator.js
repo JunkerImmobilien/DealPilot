@@ -169,7 +169,11 @@ export const ReportOrchestrator = {
       gfz_koeff: input.gfz_koeff ? Number(input.gfz_koeff) : null,
       beitrag_abzug_eur: input.beitrag_abzug_eur ? Number(input.beitrag_abzug_eur) : null,
       stellplatz_miete_monat: input.stellplatz_miete_monat ? Number(input.stellplatz_miete_monat) : null,
-      bwk_modus: input.bwk_modus || null,
+      /* v2191 · Stufe 3 rechnet die Bewirtschaftung nach Anlage 3 (normiert, zum Stichtag).
+         Die Marktbericht-App schickte das ausdruecklich (wertermittlung.js:1030), der Abruf
+         aus dem Reiter Objekt (dealpilot-mb.js) nicht - dort fiel der Ertragswert auf die
+         23-%-Pauschale (CrossCheckService BWK_QUOTE). Jetzt gilt es fuer jeden Aufrufer. */
+      bwk_modus: input.bwk_modus || (Number(input.wert_stufe) >= 3 ? 'normiert' : null),
       /* === v1338c - EIN FELDPAAR, BEIDE VERFAHREN ======================
          `bog_eur` und `bog_grund` gibt es hier und im ErtragswertService
          seit jeher - und im Formular gab es dafuer KEIN Feld. Sie waren
@@ -287,6 +291,13 @@ export const ReportOrchestrator = {
     //   Jeder Strang meldet sich per step(), sobald er fertig ist -> Live-Fortschritt.
     step('Marktdaten werden geladen …');
 
+    /* v2197 · N62.18 Punkt 6 · Laufzeiten je externem Dienst. Alle Abrufe starten
+       hier parallel; gemessen wird die Zeit vom Start bis zum Ergebnis. */
+    const _lzStart = Date.now();
+    const _lz = [];
+    const _zeit = (name, p) => Promise.resolve(p).then(
+      (v) => { _lz.push({ name, ms: Date.now() - _lzStart, ok: !!v && v.available !== false }); return v; },
+      (e) => { _lz.push({ name, ms: Date.now() - _lzStart, ok: false }); throw e; });
     const balanceBeforeP = GeoMapConnector.getBalance().catch(() => null);
 
     const saleP = MarketAnalysisService.saleLevel(ref)
@@ -313,11 +324,13 @@ export const ReportOrchestrator = {
 
     // Makro-Kette (Destatis) als eigener paralleler Strang:
     // v784-fast-macro: im Schnell-Modus ueberspringen (Destatis haengt ~5,6s, liefert hier eh keine Daten).
-    const macroP = FAST
-      ? Promise.resolve({ agsInfo: null, macroRaw: { available: false, reason: 'schnell-modus' } })
-      : (async () => {
+    /* v2192 · Seit v2172 liegt die Makrolage in der eigenen Tabelle (mb.makro_werte,
+       Millisekunden). Der Schnell-Modus (Quick-Check) liest sie deshalb mit - nur aus
+       der Tabelle, nie live. Marcel 13.10.2026: die neuen Tabellen nutzen, wo wir
+       direkten Zugriff haben. */
+    const macroP = (async () => {
       const agsInfo = await agsP;
-      const macroRaw = await DestatisConnector.macro({ ags: agsInfo?.kreis_ags, city: geo?.components?.city });
+      const macroRaw = await DestatisConnector.macro({ ags: agsInfo?.kreis_ags, city: geo?.components?.city, nurDb: FAST });
       step(`Makrolage: ${macroRaw.available ? 'ausgewertet' : 'keine Daten'}`);
       return { agsInfo, macroRaw };
     })().catch((e) => { step('macro: fehler ' + e.message); return { agsInfo: null, macroRaw: { available: false, reason: e.message } }; });
@@ -380,7 +393,9 @@ export const ReportOrchestrator = {
     })().catch((e) => { step('boris: fehler ' + e.message); return null; });
 
     const [balanceBefore, sale, rent, micro, insights, macroBundle, zensus, landValue, marktkontext] =
-      await Promise.all([balanceBeforeP, saleP, rentP, microP, insightsP, macroP, zensusP, borisP, kontextP]);
+      await Promise.all([balanceBeforeP, _zeit('sale', saleP), _zeit('rent', rentP), _zeit('micro', microP),
+        _zeit('insights', insightsP), _zeit('macro', macroP.then((m) => m && m.macroRaw)).then(() => macroP), _zeit('zensus', zensusP),
+        _zeit('boris', borisP), _zeit('kontext', kontextP)]);
 
     const macroRaw = macroBundle.macroRaw;
     const macro = ScoringService.macroScore(macroRaw.metrics || null);
@@ -1485,6 +1500,16 @@ export const ReportOrchestrator = {
       );
     } catch (e) { step('snapshot: ' + e.message); /* Snapshot ist optional, Bericht nicht blockieren */ }
     step('DONE');
+
+    /* v2197 · Laufzeiten ablegen - nie den Bericht aufhalten (kein await auf Fehler). */
+    try {
+      const _st = Number(input.wert_stufe) || 1, _sn = !!FAST;
+      const _rows = _lz.concat([{ name: 'bericht_gesamt', ms: Date.now() - t0, ok: true, art: 'bericht' }]);
+      for (const r of _rows) {
+        q('INSERT INTO mb.laufzeiten (art, name, ms, ok, schnell, stufe, bericht_id) VALUES ($1,$2,$3,$4,$5,$6,$7)',
+          [r.art || 'dienst', r.name, Math.round(r.ms), r.ok !== false, _sn, _st, rep.id]).catch(() => {});
+      }
+    } catch (e) { /* Messung ist optional */ }
 
     return {
       report_id: rep.id,

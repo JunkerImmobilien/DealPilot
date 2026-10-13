@@ -395,6 +395,9 @@
       '.mbst-leer{color:#D8564C;font-size:10.5px;margin-left:6px;white-space:nowrap;font-weight:600}' +
       '.mbst-kero{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:11px;',
         'font-weight:600;color:var(--wl-c9a84c,#C9A84C);white-space:nowrap}',
+      /* v2198b · Responsive-Check 320-390 px: der Kostenhinweis „1 × MPI · noch 16 frei“ lief ohne Umbruch bis 353 px
+         (Zeile endet bei 201, Schirm bei 263) und wurde abgeschnitten. Schmal: eigene Zeile darunter. */
+      '@media (max-width:480px){.mbst-zeile{flex-wrap:wrap;row-gap:2px}.mbst-kero{margin-left:0;white-space:normal}}',
       '.mbst-was{font-size:10.5px;line-height:1.45;opacity:.6;margin-top:2px}',
       '.mbst-fehlt{font-size:10.5px;line-height:1.45;margin-top:2px;color:var(--wl-b8625c,#B8625C)}',
       /* v1139-VORRAT: kein Rot — das ist kein Mangel, sondern ein Klick. */

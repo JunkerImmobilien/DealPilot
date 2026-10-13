@@ -328,10 +328,23 @@
       '<div class="dab-cap"><b>Grundfelder f\u00fcr die Bank-Bewertung</b> \u2014 nur diese Felder z\u00e4hlen in die Readiness. Weitere Angaben (Ausstattung, Historie, Fotos) sind hilfreich, flie\u00dfen aber <b>nicht</b> in diese Bewertung ein.</div>' +
       chips;
     // v857: Chip-Styles per setProperty('important') erzwingen (schlaegt JEDE CSS-Regel)
+    /* v2198 · Lesbarkeit: #6fd6a0 ist fuer die DUNKLE Cockpit-Karte gewaehlt. In der
+       hellen Fassung stand es auf Mint - gemessen 1,66:1 (Messkabine, 25 Chips). Der
+       Chip liest jetzt seinen echten Grund (erster Vorfahr mit Flaeche) und nimmt auf
+       hellem Grund Dunkelgruen (#1f7a4a, auf Mint rund 5:1). Memory: grund-ist-struktur. */
+    var _hell = (function () {
+      var e = host;
+      while (e && e.nodeType === 1) {
+        var bg = getComputedStyle(e).backgroundColor, m = bg && bg.match(/rgba?\(([^)]+)\)/);
+        if (m) { var p = m[1].split(',').map(Number); if (p.length < 4 || p[3] > 0.5) return (0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2]) / 255 > 0.55; }
+        e = e.parentElement;
+      }
+      return false;
+    })();
     try {
       host.querySelectorAll('.dab-chip').forEach(function (b) {
         b.style.setProperty('background', 'rgba(111,214,160,.12)', 'important');
-        b.style.setProperty('color', '#6fd6a0', 'important');
+        b.style.setProperty('color', _hell ? '#1f7a4a' : '#6fd6a0', 'important');
         b.style.setProperty('border', '1px solid rgba(111,214,160,.45)', 'important');
         b.style.setProperty('font-size', '10px', 'important');
         b.style.setProperty('padding', '3px 10px', 'important');

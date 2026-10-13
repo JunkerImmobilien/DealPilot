@@ -38669,7 +38669,87 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Zehn Fehlerverdachte aus der Hilfe-Erhebung stehen im Backlog (N62.22).
   - Animationen nur bei sichtbarem Fenster abnehmbar.
   - Prod.
+- **Prod (12)** `ce9ad097`: v2187–v2190 ausgerollt (Freigabe Marcel 13.10.2026). Beide DBs vorher gesichert (Haupt 11 MB / 71 Tabellen, mb 25 MB / 30), Backend-Rebuild (openaiService: Hilfe-Auszug, im Container 2 Treffer `hilfeBlock`). `app.dealpilot.immo` liefert pilot-tower/pilot-figur als text/javascript, index lädt help.js v2190. **Entscheidung Marcel:** Auffangwerte (§ 256 BewG, Sachwertfaktor 1,0) bleiben wie sie sind (C) — „es steht ja dran und gibt eine Orientierung“.
 
+### v2191–v2197 · Backlog abgearbeitet (13.10.2026, Staging; Prod (12) davor)
+
+- **Was:** Marcel: „ja dann los, alles abarbeiten und vorher ausrollen".
+  - Prod (12) `ce9ad097` mit v2187–v2190.
+  - **v2191:** sechs Fehler aus der Hilfe-Erhebung behoben.
+    - Quick-Check-Balken lasen falsche Teilnoten.
+    - Eigene DealScore-Regler wirkten nie, außer bei der Vorlage „custom".
+    - Marktbericht Stufe 3 aus dem Reiter Objekt nahm die 23-%-Pauschale.
+    - Der Übernahme-Hinweis nannte den falschen Betrag.
+    - `.dpkt` war nicht importierbar.
+    - Kleinigkeiten: „TOP", „Auto-saved", „unten links".
+  - **v2192/a:** Der Quick-Check nutzt die eigenen Tabellen.
+    - Makrolage aus `mb.makro_werte` jetzt auch im Schnell-Modus (nur Tabelle, nie live).
+    - Karte zeigt Leerstand (Zensus) und Bodenrichtwert mit Quelle.
+    - Bewertung bekommt Zensus-Leerstand, Zensus-Miete und Makrolage als Pro/Contra.
+    - Hinweis ohne „Liter".
+    - Umlaute in der Hausgeld-Bewertung.
+  - **v2193:** `data._ai` = `ai_analysis` beim Speichern (N62.17).
+    - Ursache: `collectData()` trägt `_ai` vom Laden mit.
+    - Zurückgenommen: meine erste Vermutung „nur alte Reste" war falsch, 32 Objekte hatten die Kopie in den letzten zwei Tagen bekommen.
+  - **v2194:** Werte aus dem Vorjahr übernehmen, nur wiederkehrende Posten (N62.10).
+  - **v2195:** Bewirtschaftungskosten 2022–2026 aus der amtlichen Tabelle des Oberen Gutachterausschusses Brandenburg.
+    - 2022 neu, 2023 vollständig, 2024 ETW 421.
+    - Die Quelle 2025 nannte einen Anbieternamen im Kundentext.
+    - Gewerbe im Ertragswert: Verwaltung 3 %, Mietausfall getrennt 2 % / 4 %.
+  - **v2196:** Marktbericht-Kapitel D „Entwicklung, Ableitung & Prognose" (N62.14). Fakten aus `kapitelD()`, Prognose als Modellfortschreibung.
+  - **v2197:** `mb.plz_orte` und `mb.laufzeiten` (N62.18 Punkte 2 und 6).
+  - Aufgeräumt, weil laut Code längst erledigt: N62.1, N62.2, N62.3, N62.5 (überholt), N61.1, N61.3, N61.4, N61.6/N51.
+- **Commit:** `ad26710b`, `abc2933e`, `285c7ef1`, `ae640c48`, `d4bf5647`, `d0150c40`, `f8a42348`, `c74eb3a5` (v2197)
+- **Nachweis:**
+  - Score-Ketten 115 gleich, RND-Kerne RC=0. Die gespiegelte `rnd-calc.js` war veraltet (Umlaut-Stand v2180), jetzt gleich.
+  - Echter Quick-Check-Abruf Detmold: Makro 4/4 aus der Tabelle in 6 s, Zensus Gemeinde, BRW 1.500 €/m² BORIS-NRW, Contra „Miete über Zensus-Mittel" erscheint.
+  - Vorjahr-Übernahme: Hausverwaltung und Steuerberater kopiert, Schuldzinsen nicht.
+  - Ertragswert-Kern: Gewerbe 12.000 € ergibt Verwaltung 727 € und Mietausfall 1.080 €; ohne Gewerbe unverändert.
+  - Kapitel D echt erzeugt.
+  - PLZ 152 ms live gegen 2 ms aus der Tabelle.
+- **Rest:**
+  - Offen sind nur noch Entscheidungen: N62.7 Landingpage, N62.8 Preise, N62.9 F&E-Seite, N62.15 Datenschutz-Texte, N61.5 Demo-Objekte, N62.23 Gutachten-Modul.
+  - Größere Pakete: N62.18 Punkte 3–5 (BRW-Ablage, GeoMap-Lizenz, DB-Warteschlange), N62.12 (GeoMap-Lage-Endpunkte prüfen).
+  - Abnahmen bei sichtbarem Fenster.
+  - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
+
+
+### v2198–v2198c · Kompletter Responsive-Check (13.10.2026, Staging)
+
+- **Was:** Marcels Master-Prompt „vollständiger Responsive-, UI-/UX- und Funktionalitätscheck".
+  - Messkabine (gleich-origin-iframe) über 15 Breiten (320, 360, 375, 390, 430, 667 quer, 768, 820, 932 quer, 1024, 1180, 1280, 1440, 1920, 2560).
+  - Alle 9 Reiter, dazu Cockpit, Alle Objekte, Quick-Check (eigenes Dokument), Marktbericht (eigenes Dokument), Einstellungen, Hilfe, Atlas, Tower.
+  - Gemessen: Überlauf, Herausragen, unerreichbar, verdeckt, Touch-Flächen unter 40 px, Kontrast gegen den effektiven Grund.
+- **Behoben:**
+  1. Kartenknöpfe Duplizieren/Löschen erschienen beim Überfahren auf dem Score-Ring. Jetzt links daneben.
+  2. Auf Touch-Geräten ohne Maus erschienen sie nie. Jetzt dauerhaft sichtbar (`hover:none`).
+  3. Quick-Check bei 320 px: „Bewirtschaftungskosten" schob die Seite 20 px quer. Jetzt Silbentrennung.
+  4. Marktbericht 320–390 px: Kostenhinweis und Umschaltgruppe abgeschnitten (bis 90 px Überlauf). Jetzt mit Umbruch.
+  5. `#dp-sb-toggle` lag unter 900 px außerhalb des Schirms. Jetzt ausgeblendet.
+  6. Tower am Handy: Der Pilot verdeckte den aktiven Reiter. Jetzt als Büste im Kopf.
+  7. Chips im Bankgespräch: 1,66:1. Lesen jetzt ihren Grund.
+  8. Kontrast im hellen Hauptbereich: `--muted`, Gold als Titel, Bank-Cockpit, Matrix.
+- **Commit:** `d8e0e1ee`, `e1be19cc`, `5b105408`, `9ac28f4f`
+- **Nachweis (Abschlussdurchgang, 11 Breiten × 9 Reiter + 8 Ansichten):**
+  - Reiter überall Überlauf, Herausragen und unerreichbar 0.
+  - Unerreichbar in allen Ansichten 0.
+  - Quick-Check 320 px 0, Marktbericht 320 px 0.
+  - Kontrastfunde 525 → 288 (Handy) und 670 → 433 (Desktop).
+  - gold-audit RC=0, buster-ebenen SAUBER.
+- **Als Messartefakt zurückgenommen:**
+  - „Text auf Grün/Gold" bei Kennzahl- und Phasenkacheln: nur ein Randstreifen, der Grund ist weiß.
+  - Je 1 px Überlauf bei 667/768/375: Browserzoom 90 %.
+  - „verdeckt" bei Hover-Knöpfen (Deckkraft 0).
+  - Gewerke-Tabelle unter `/landing/`: der Server liefert dort die App ohne Stylesheet. Im richtigen Pfad scrollt die Karte in sich.
+- **Rest:**
+  - 288 / 433 Kontraststellen, meist Grautöne knapp unter 4,5 und Status-Grün/-Rot (Markenregel: nicht anfassen).
+  - Touch-Flächen unter 40 px (vor allem i-Knöpfe mit eigener 44-px-Trefferfläche und Kartenknöpfe mit 26 px).
+  - Nicht geprüft:
+    - Anmeldung/Registrierung (dafür hätte ich abmelden müssen)
+    - die öffentliche Startseite (andere Domain)
+    - eingeblendete Bildschirmtastatur und echte Touch-Geräte
+    - Rollen außer Pro
+    - leere Konten
 ### Prod (9/10) v2184–v2185 · Fortschreibungsfaktor recherchiert (13.10.2026)
 
 - **Prod (9)** `aff213f6`: v2183/v2184, Haupt-DB gesichert (11 MB, 71), Backend-Rebuild; im Container `bwk_profil` erlaubt, `bwk-profil.js?v=v2184` per curl (200, text/javascript).
