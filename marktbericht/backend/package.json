@@ -8,7 +8,8 @@
     "start": "node src/server.js",
     "migrate": "node src/lib/migrate.js",
     "seed": "node src/lib/seed.js",
-    "zensus": "node src/services/ZensusImportService.js"
+    "zensus": "node src/services/ZensusImportService.js",
+    "makro": "node src/services/MakroImportService.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

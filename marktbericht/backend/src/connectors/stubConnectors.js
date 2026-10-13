@@ -3,6 +3,7 @@
 import { httpJson, httpText } from '../lib/http.js';
 import { cfg, destatisEnabled } from '../lib/config.js';
 import { cacheGet, cacheSet } from '../lib/cache.js';   /* v2169 */
+import { q } from '../lib/db.js';                       /* v2172: mb.makro_werte */
 
 // Destatis / Regionalstatistik (GENESIS-Online, regionalstatistik.de)
 // REST/JSON, POST. Auth: username (= persoenlicher Token 32 Z. ODER Kennung) + password
@@ -92,6 +93,18 @@ export const DestatisConnector = {
     }
     const krs = String(ags).slice(0, 5);
     const now = new Date().getFullYear();
+    /* ══ v2172 · ERST UNSERE DATENBANK ═════════════════════════════════════
+       Marcel am 13.10.2026: „Warum warten wir 20 Sekunden auf die
+       Regionaldatenbank, wenn wir direkt aus unserer Datenbank die Werte
+       holen koennen?" Die vier Kennzahlen liegen je Kreis und Jahr in
+       mb.makro_werte (MakroImportService, alle 30 Tage). Steht der Kreis
+       dort, fragt der Bericht die Regionaldatenbank gar nicht mehr. Der
+       Live-Abruf darunter bleibt nur als Rueckfall fuer einen Kreis, der
+       (noch) nicht in der Tabelle steht. */
+    try {
+      const db = await this._macroAusDb(krs, now);
+      if (db) return db;
+    } catch (e) { /* Tabelle fehlt oder DB haengt -> Live-Abruf */ }
     // Veralteten Destatis-Bundescode (Format NNNNN-NNNN, z.B. 12411-0014 aus alter .env)
     // automatisch auf den regionalstatistik-Kreis-Code mappen -> robust gegen stale .env.
     const popRaw = cfg.destatis.tablePopulation || '12411-01-01-4';
@@ -212,6 +225,43 @@ export const DestatisConnector = {
     };
   },
 
+  /* v2172 · Die Makro-Kennzahlen aus mb.makro_werte, gerechnet wie der
+     Live-Abruf oben (Trend ueber die letzten 12 Jahre, Kaufkraft gegen DG
+     desselben Jahres, Wanderung je 10.000 -> %). null = Kreis nicht da. */
+  async _macroAusDb(krs, now) {
+    const rows = await q(
+      'SELECT kennzahl, ags, jahr, wert::float8 AS wert, tabelle, lizenz, abgerufen_am '
+      + 'FROM mb.makro_werte WHERE ags = ANY($1) AND wert IS NOT NULL ORDER BY jahr',
+      [[krs, 'DG']]);
+    const eigen = rows.filter((r) => r.ags === krs);
+    if (!eigen.length) return null;
+    const reihe = (k) => eigen.filter((r) => r.kennzahl === k);
+    const neueste = (k) => { const r = reihe(k); return r.length ? r[r.length - 1] : null; };
+    const metrics = {}, jahre = {};
+    const bev = reihe('bevoelkerung').filter((r) => r.jahr >= now - 12);
+    if (bev.length >= 2) {
+      const a = bev[0], b = bev[bev.length - 1], yrs = (b.jahr - a.jahr) || 1;
+      if (a.wert > 0 && b.wert > 0) { metrics.bevoelkerung_trend = ((b.wert / a.wert) ** (1 / yrs) - 1) * 100; jahre.bevoelkerung = b.jahr; }
+    }
+    const ein = neueste('einkommen_je_ew');
+    if (ein && ein.wert > 0) {
+      const de = rows.find((r) => r.ags === 'DG' && r.kennzahl === 'einkommen_je_ew' && r.jahr === ein.jahr);
+      if (de && de.wert > 0) { metrics.kaufkraft_idx = (ein.wert / de.wert) * 100; jahre.kaufkraft = ein.jahr; }
+    }
+    const alq = neueste('arbeitslosenquote');
+    if (alq && alq.wert >= 0) { metrics.arbeitslosenquote = alq.wert; jahre.arbeitslosenquote = alq.jahr; }
+    const wan = neueste('wanderungssaldo_je_10000');
+    if (wan && Number.isFinite(wan.wert)) { metrics.wanderungssaldo = wan.wert / 100; jahre.wanderung = wan.jahr; }
+    if (!Object.keys(metrics).length) return null;
+    const quellen = [...new Map(eigen.map((r) => [r.tabelle, { tabelle: r.tabelle, lizenz: r.lizenz,
+      abgerufen_am: r.abgerufen_am }])).values()];
+    return {
+      available: true, source: 'destatis', herkunft: 'mb.makro_werte', metrics, kreis_ags: krs, jahre, quellen,
+      tables_used: { bevoelkerung: '12411-01-01-4', einkommen: '82000-07-01-4', arbeitslosenquote: 'AI008-1', wanderung: 'AI002-1' },
+      note: 'Sozioökonomie aus GENESIS-Regionalstatistik (Kreisebene), aus der DealPilot-Datenbank.',
+    };
+  },
+
   // 18-30-Anteil (%) aus der Destatis-Altersgruppen-Tabelle. Best-effort + defensiv.
   // Tabellencode via env DESTATIS_TABLE_AGE (Standardvermutung als Fallback).
   async ageShare18_30({ ags } = {}) {
@@ -312,7 +362,7 @@ export const DestatisConnector = {
     return out.length ? out : null;
   },
 
-  async _fetchTableFfcsv(name, krs, now, kreisFilter) {
+  async _fetchTableFfcsv(name, krs, now, kreisFilter, opts = {}) {
     // KEIN regionalvariable/regionalkey: regionalstatistik liefert sonst Code 104
     // "keine Objekte zum Selektionskriterium", weil die Tabelle die Variable "KREISE"
     // so nicht kennt. Wir holen die (Kreis-)Tabelle komplett und filtern den Ziel-Kreis
@@ -327,7 +377,7 @@ export const DestatisConnector = {
        antworten mit Filter Code 0 und ohne ihn Code 98 (gemessen). */
     if (kreisFilter) { body.regionalvariable = 'KREISE'; body.regionalkey = kreisFilter; }
     const base = await resolveBase(); // genesisws/genesisWS-robust
-    const r = await httpText(`${base}/data/table`, { method: 'POST', headers: authHeaders(), form: body, timeoutMs: 60000, retries: 2 });   /* v2169: die Regionaldatenbank braucht teils ueber 30 s */
+    const r = await httpText(`${base}/data/table`, { method: 'POST', headers: authHeaders(), form: body, timeoutMs: opts.timeoutMs || 60000, retries: opts.timeoutMs ? 0 : 2 });   /* v2169: die Regionaldatenbank braucht teils ueber 30 s */
     return r.text || '';
   },
 
