@@ -168,7 +168,7 @@ gegenübergestellt werden sie nirgends.
 - Beim Öffnen der Hilfe direkt „Abläufe & Pilot" zeigen. Den Piloten-Knopf in den schwarzen Kopf neben „Atlas öffnen" stellen.
 
 **N63.2 · Hilfe: Inhalte gegen den Code abgleichen**
-> ✅ v2200/v2202/v2202a — 17 Themen, FAQ nach Ablauf, Glossar alphabetisch, 33 Korrekturen nach Prüfbericht, 5 neue Fragen, Fuß-KI raus. Offen: GrESt Thüringen im Code (6,5 % vs. vermutlich 5,0 % seit 2024) prüfen.
+> ✅ v2200/v2202/v2202a — 17 Themen, FAQ nach Ablauf, Glossar alphabetisch, 33 Korrekturen nach Prüfbericht, 5 neue Fragen, Fuß-KI raus. GrESt erledigt v2207/Prod (17): TH 5,0 seit 01/2024, HB 5,5 seit 07/2025.
 - Glossar und häufige Fragen: Stimmen alle Zahlen, die die Hilfe nennt?
   - DSCR-Schwellen, LTV-Stufen, Pilot-Skala, Score-Stufen
   - jede Zahl mit Beleg aus dem Code, so wie `docs/hilfe/hilfe-belege-v2189.md`

@@ -38714,6 +38714,19 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2207 · Prod (17) · Grunderwerbsteuer Thüringen und Bremen (13.10.2026)
+
+- **Was:** Mit Quellen geprüft: Thüringen **5,0 %** seit 01.01.2024 (vorher 6,5), Bremen **5,5 %** seit 01.07.2025 (vorher 5,0). Korrigiert in beiden rechnenden Tabellen und in der Anzeige:
+  - `grest-plz-lookup.js` (Objekt)
+  - `quick-check.js` `_qcGrEStByLand` (Quick-Check)
+  - Beschriftung der Bundesland-Auswahl in den Standardwerten (`investment-profile.js`: dort stand Sachsen 3,5 statt 5,5 und Bremen 5,0)
+  - Hilfe-Glossar
+- **Commit:** `342c6f62`, Prod (17) `9a7e1f5c`, Backend neu gebaut (`frontend-konstanten.json`).
+- **Nachweis:**
+  - `DealPilotGrest.forPlz`: 99084 und 07743 → TH 5, 28195 → HB 5,5, 01067 → SN 5,5, 80331 → BY 3,5, 40210 → NW 6,5.
+  - Prod liefert `'HB': 5.5`, `'TH': 5.0`.
+- **Rest:** Es gibt zwei rechnende Tabellen (Objekt, Quick-Check) mit eigenen Schlüsseln. Bei der nächsten Änderung eines Satzes beide anfassen; besser wäre eine gemeinsame Quelle.
+
 ### v2206 · Prod (16) · Standardwerte als Karten (N63.5, 13.10.2026)
 
 - **Was:** Marcel hat aus der Demo **A · Karten-Übersicht** mit **drei Sets wie in der Demo** gewählt.
