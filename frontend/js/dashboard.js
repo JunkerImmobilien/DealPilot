@@ -2896,7 +2896,7 @@
     return {
       stand: f.stand ? String(f.stand).slice(0, 10) : null,
       empfehlung: k(a.empfehlung, 40),
-      fazit: k(a.fazit_kurz || a.gesamtbewertung, 320),
+      fazit: k(a.gesamtbewertung || a.fazit_kurz, 420),   /* v2170: fazit_kurz ist nur das Urteilswort */
       risiken: liste(a.risiken, 3, 140),
       staerken: liste(a.staerken, 3, 140),
       steuer: k(a.steuer_zusammenfassung, 260),
@@ -3050,6 +3050,10 @@
   window.DealPilotDashboard = {
     /* v1704: der Portfolio-Pilot liest hier - er rechnet nichts nach. */
     portfolioPayload: portfolioPayload,
+    /* v2170: die Detailkopien werden sonst nur beim LOESCHEN erneuert - eine
+       Pilot-Analyse aus derselben Sitzung kam beim Portfolio-Piloten nie an
+       (gemessen: Stand 09.10. statt 13.10.). Vor jeder Pilot-Anfrage frisch. */
+    frisch: function () { _details = {}; _detailsLoaded = false; return loadDetails(); },
     /* v1793 · GEMESSEN: portfolioPayload() gibt 0 Objekte zurueck, solange
        das Dashboard nicht einmal offen war. Grund ist `_details` - ein
        Cache, den nur `loadDetails()` fuellt, und das lief bisher
