@@ -38614,6 +38614,14 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 ---
 
+### Prod-Rollout (7) v2177–v2181b · v2182 Tour im sichtbaren Fenster (13.10.2026)
+
+- **Prod (7)** `01893c88` (Marcel: „1. freigabe"): Haupt-DB gesichert (11 MB, 71 Tabellen), Pull, nur Frontend. `workflow.js?v=v2181b` per curl geprüft.
+- **Tour gemessen bei sichtbarem Fenster (1707×828):** vorher „Neues Objekt", nach 3 s Bismarckstr. 27 geladen, Schritt 1 von 38 — **das Standardobjekt kommt jetzt.** Quick Boarding Schritt 6: `#save-btn` markiert, lag aber bei y 2.226 (Knopf im iframe, scrollIntoView bewegt `.main-col` nicht).
+- **v2182** `21f579e1`: für Ziele im iframe verschiebt die Tour den Scroller der Hauptseite. **Nachweis:** Knopf bei y 553–595 von 828, rot gerahmt, im Bild abgenommen.
+- **Zurückgenommen:** „die Tour hängt bei Schritt 6" — mein Läufer hat sich mit dem Weiter-Takt der Tour überschnitten; die Blase trägt einen normalen Weiter-Knopf.
+- **Rest:** ein lückenloser Lauf über alle 38 Schritte fehlt noch (der Läufer muss auf den Schrittwechsel warten, nicht auf eine Uhr); Schritt 27 „Bereit für die Bank?" lag einmal bei top −40; Handy-Tour wie in N62.20. Prod für v2182 offen.
+
 ### Prod-Rollout (6/6b) v2174–v2175b · v2177–v2181b Marcels Liste (13.10.2026, Staging)
 
 - **Prod (6)** `62a86eec`, **(6b)** `12ac319b`: beide DBs gesichert (11 MB/71, 25 MB/30), Rebuild backend + mb. Danach `/lage/gemessen` auf Prod nachgemessen — reine PLZ wurde abgewiesen (`/^d{5}$/`, Backslash verloren), behoben in **v2175b**, auf beiden Servern geprüft.
