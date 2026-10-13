@@ -633,6 +633,8 @@ ausbauen" heißt, ist offen und gehört vor dem Bauen geklärt.
 
 #### N61.3 · Lageklassen in die Pilot-Analyse UND in die Quick-Check-Bewertung
 
+> **✅ laut Code erledigt (Aufräumen 13.10.2026):** Ampel v2143, Quick-Check-Fazit mit Zielrendite der Lageklasse v2148 (qc-heuristik.js:668), Prompt der Pilot-Analyse v2157 (openaiService.js:479).
+
 **Marcel:** *„Das muss auch mit in die Bewertung im Quick Check unten weil
 der Investor ja lesen möchte und bewerten möchte ob der deal passt."*
 
@@ -642,6 +644,8 @@ ob sie auch **im Prompt der Pilot-Analyse** und **im Fazit unten im
 Quick-Check** ankommt.
 
 #### N61.4 · Lage & Markt: die Werte aus den Marktberichten holen, nicht recherchieren
+
+> **✅ laut Code erledigt (Aufräumen 13.10.2026):** die fehlenden Stufe-3-Werte (Sachwert, Ertragswert, führendes Verfahren mit Grund und Rechtsgrundlage) stehen seit v2150 (c73c0c6c) im Prompt (openaiService.js:1103-1128); Mietspiegel mit Vorrang des Berichtswerts (:1569).
 
 **Marcel:** *„in der Pilot Analyse woher kommen die werte und daten im reiter
 Lage & Markt? wenn wir einen marktbericht haben oder mehrere können wir die
