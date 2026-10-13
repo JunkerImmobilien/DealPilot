@@ -622,7 +622,7 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
     if (!body) return;
     var D = bericht();
     if (!D) {
-      if (btn) btn.style.display = '';
+      if (btn) btn.style.removeProperty('display');
       if (tag) tag.textContent = '4 gemessen · 2 KI';
       if (body.getAttribute('data-aus-bericht')) {
         body.removeAttribute('data-aus-bericht');
@@ -630,8 +630,31 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
       }
       return;
     }
-    if (btn) btn.style.display = 'none';
+    /* !important: eine Regel setzt .btn auf display:flex !important (gemessen) */
+    if (btn) btn.style.setProperty('display', 'none', 'important');
     if (tag) tag.textContent = 'aus dem Marktbericht';
+    /* v2177a · Ein Stufe-1-Bericht misst nur die Mikrolage (gemessen an
+       Bismarckstr.: Makro, Bevoelkerung, Nachfrage fehlten). Was er nicht
+       hat, kommt aus unserer eigenen Messung (/lage/gemessen, ohne KI) -
+       einmal je Objekt, und nur in LEERE Felder, wie autoLage. */
+    var k = window._currentObjKey || '';
+    var fehlt = (D.macroRaw == null || D.bevRaw == null || D.tageRaw == null);
+    if (fehlt && !messungen[k] && !laeuft[k]) {
+      laeuft[k] = true;
+      var v = function (id) { return (document.getElementById(id) || {}).value || ''; };
+      _lageMessen(v('str'), v('hnr'), v('plz'), v('ort')).then(function (m) {
+        messungen[k] = m || { felder: {} }; laeuft[k] = false;
+        var ff = messungen[k].felder || {}, gesetzt = 0;
+        [['makrolage', D.macroRaw], ['ds2_bevoelkerung', D.bevRaw], ['ds2_nachfrage', D.tageRaw]].forEach(function (p) {
+          var el = document.getElementById(p[0]);
+          if (p[1] == null && ff[p[0]] && el && !el.value && el.querySelector('option[value="' + ff[p[0]].stufe + '"]')) {
+            el.value = ff[p[0]].stufe; el.dispatchEvent(new Event('change')); gesetzt++;
+          }
+        });
+        if (gesetzt && typeof dpUpdateAll === 'function') dpUpdateAll();
+        zeichnen();
+      });
+    }
     if (window._kiLageErgaenzt === (window._currentObjKey || '')) return;   /* KI-Ergaenzung steht gerade da */
     var rows = zeilen(D).map(function (r) {
       var feld = document.getElementById(r[0]);
@@ -641,6 +664,16 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
       return '<tr><td>' + r[1] + '</td><td><b>' + _escKi(jetzt) + '</b><span class="lv-w">' + _escKi(r[3]) + '</span></td>'
         + '<td class="lv-u">' + (anders ? '<span class="lv-ab" title="Im Feld steht ein anderer Wert als die Messung des Berichts (' + _escKi(soll) + ') — von Hand geändert?">≠</span>' : '<span class="lv-ok">✓</span>') + '</td></tr>';
     }).join('');
+    var M = (messungen[window._currentObjKey || ''] || {}).felder || {};
+    [['makrolage', 'Makrolage', D.macroRaw], ['ds2_bevoelkerung', 'Bevölkerung', D.bevRaw], ['ds2_nachfrage', 'Nachfrage', D.tageRaw]].forEach(function (p) {
+      var g = M[p[0]];
+      if (p[2] != null || !g) return;
+      var el = document.getElementById(p[0]);
+      var anders = el && el.value && el.value !== g.stufe;
+      rows += '<tr title="' + _escKi(g.quelle + String.fromCharCode(10) + 'Schwelle: ' + g.schwelle) + '"><td>' + p[1] + '</td><td><b>' + _escKi(_lageOptText(p[0], el && el.value ? el.value : g.stufe)) + '</b><span class="lv-w">'
+        + _escKi(String(g.wert).replace('.', ',') + ' ' + g.einheit) + ' · Regionaldaten (nicht im Bericht)</span></td><td class="lv-u">'
+        + (anders ? '<span class="lv-ab" title="Im Feld steht ein anderer Wert als die Messung (' + _escKi(_lageOptText(p[0], g.stufe)) + ')">≠</span>' : '<span class="lv-ok">✓</span>') + '</td></tr>';
+    });
     var E = (window._kiLageErgaenzung || {})[window._currentObjKey || ''] || {};
     [['ds2_entwicklung', 'Entwicklung', E.entwicklung], ['ds2_wertsteigerung', 'Wertsteigerung', E.wertsteigerung]].forEach(function (p) {
       if (!p[2] || !p[2].value) return;
@@ -659,6 +692,7 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
     if (body.innerHTML !== html) body.innerHTML = html;
   }
   window._kiLageBerichtZeichnen = zeichnen;
+  var messungen = {}, laeuft = {};
   var letzterKey = null;
   function takt() {
     var k = window._currentObjKey || '';
