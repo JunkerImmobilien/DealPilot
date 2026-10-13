@@ -40,10 +40,10 @@
     { t: 'Vergleichspreise',     m: /^Vergleichspreise/ },
     { t: 'Vergleichsmieten',     m: /^Vergleichsmieten/ },
     { t: 'Mikrolage',            m: /^Mikrolage/ },
-    { t: 'Makrolage',            m: /^Makrolage/ },
+    { t: 'Makrolage',            m: /^(Makrolage|macro:)/ },
     { t: 'Strukturdaten (Zensus)', m: /^Strukturdaten/ },
     { t: 'Bodenrichtwert',       m: /^Bodenrichtwert/ },
-    { t: 'Bewertung und Bericht', m: /^__fertig__$/ }
+    { t: 'Bewertung und Bericht', m: /^(persist|Marktdaten verrechnet|DONE)/ }
   ];
   var STUFE = { 1: 'Marktpreisindikation', 2: 'Erweiterte Marktpreisindikation', 3: 'Wertermittlung nach ImmoWertV' };
 
@@ -132,7 +132,8 @@
       + '<ul>' + ETAPPEN.map(function (e, i) {
           var ok = a.status === 'fertig' || a.erledigt.indexOf(i) >= 0;
           var jetzt = lauf && !ok && i === naechste(a);
-          return '<li class="' + (ok ? 'ok' : jetzt ? 'jetzt' : '') + '"><span class="p">' + (ok ? '✓' : jetzt ? '●' : '○') + '</span>' + esc(e.t) + '</li>';
+          var ohne = a.ohne && a.ohne[i];
+          return '<li class="' + (ohne ? '' : ok ? 'ok' : jetzt ? 'jetzt' : '') + '"><span class="p">' + (ohne ? '–' : ok ? '✓' : jetzt ? '●' : '○') + '</span>' + esc(e.t) + (ohne ? ' · nicht im Umfang' : '') + '</li>';
         }).join('') + '</ul>'
       + '<div class="fu">'
       + (lauf ? '<span class="hi">Du kannst weiterarbeiten — der Bericht wird im Hintergrund fertig, und du bekommst eine Meldung.</span>'
@@ -222,6 +223,9 @@
     msg = String(msg || '');
     var w = msg.match(/^Warteschlange[^\d]*(\d+)/);
     if (w) a.warte = 'In der Warteschlange — Platz ' + w[1] + '. Gleich geht es los.';
+    /* v2174: im Schnellmodus (Stufe 1) gibt es keine Makrolage - gemessen,
+       der Stream meldet sie dort nicht. Sie zaehlt dann als „nicht im Umfang". */
+    if (/^SCHNELL-MODUS/.test(msg)) { a.ohne = a.ohne || {}; a.ohne[4] = true; if (a.erledigt.indexOf(4) < 0) a.erledigt.push(4); }
     for (var i = 0; i < ETAPPEN.length; i++) {
       if (a.erledigt.indexOf(i) < 0 && ETAPPEN[i].m.test(msg)) { a.erledigt.push(i); a.warte = null; }
     }
