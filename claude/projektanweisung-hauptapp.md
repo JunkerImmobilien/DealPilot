@@ -38761,6 +38761,21 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### Prod-Rollout (21) · v2234–v2238a auf Produktion (14.10.2026)
+- **Was:** Freigabe von Marcel („ja dann Prod-Rollout“). `main` per `--no-ff` mit `origin/staging` zusammengeführt (28 Commits, keine Migration). Auf Prod `git pull` und Rebuild `backend`; das mb-backend ist unverändert.
+- **Commit:** `1fc4be87`
+- **Nachweis:**
+  - Sicherung vorher, Kopf gelesen: `/root/backups/haupt-20261014-1728.sql.gz` (11 MB, 71 Tabellen) und `mb-20261014-1728.sql.gz` (25 MB, 32 Tabellen).
+  - Backend `healthy`, „No new migrations“. Im Image stehen „Bewerte in ZWEI Sichten“ (Prompt) und `WERT_SCHWELLE` (Kern). Gold-Audit RC=0.
+  - Live mit Inhalt geprüft (nicht nur Status 200): `marktwert-abschlag.js?v=v2237d` enthält das Modul, `qc-bridge` zeigt auf `quickcheck-app.html?v=v2238a`, darin steht der Überschrift-Zusatz; `messe-studio.html` ist da; `/auth/me` ohne Token 401.
+- **Rest:** Abnahme im Browser auf Prod: Quick-Check mit DealPilot-Abruf und C-Lage, Überschrift „· aber … % unter Marktwert“.
+
+### v2238–v2238a · Wertpuffer in der Überschrift, gleiche Zahl wie die Karte (14.10.2026)
+- **Was:** Marcel: „ja das wäre gut“. Die Überschrift bekommt ab `e.wert` (qc-heuristik) einen Halbsatz: „Nicht kaufen — Rendite unter deinem Ziel für die C-Lage · aber 28 % unter Marktwert“; bei einem positiven Urteil ohne „aber“. **v2238a:** Das Urteil rechnete den Abschlag selbst auf den ungerundeten Angebotswert (178.038 €), die Karte zeigte 178.000 €. Jetzt übernimmt das Urteil den Wert der Karte.
+- **Commit:** `b8b3e901`, `ff37db56`
+- **Nachweis:** Staging, Wohnung mit Mitschnitt: ohne Lage „Nur mit Nachbesserung tragfähig · aber 28 % unter Marktwert“, 20 % EK „Kauf möglich — verhandeln nötig · 28 % unter Marktwert“, C-Lage wie oben; im Rat „178.000 € — +39.000 € (+28 %)“.
+- **Rest:** Das Messe-Video wurde vor v2238 aufgenommen; Kapitel 12 zeigt die Überschrift noch ohne den Zusatz. Bei Bedarf neu aufnehmen.
+
 ### v2237–v2237d · Angebotsabschlag als Einstellung, Marktwert im Urteil und in der Pilot-Analyse (14.10.2026)
 - **Was:** Marcel: „Die Abschläge kann man im Set angeben … wir recherchieren immer den aktuellen Durchschnitt … der Marktwert, je nachdem was ich von der Spanne nehme, soll mitkommen … nach eigenen Kriterien und auch darüber“.
   - `config.js angebotAbschlagMarkt`: 5,8 %, Stand Dezember 2025, Quelle und Link stehen **nur intern**. Beim Nachrecherchieren wird nur dieser Block geändert.
