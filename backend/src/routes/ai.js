@@ -1160,7 +1160,7 @@ router.post('/copilot-frage', authenticate, dialogLimiter, async (req, res, next
     const r = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + config.openai.apiKey, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: modell, input: [{ role: 'user', content: prompt }], max_output_tokens: 700 })
+      body: JSON.stringify({ store: false, model: modell, input: [{ role: 'user', content: prompt }], max_output_tokens: 700 })
     });
     const data = await r.json().catch(() => null);
     if (!r.ok) {

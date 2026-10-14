@@ -429,6 +429,7 @@ async function extractFields(transcript, catalog, apiKey, sammler, zusatz) {
       method: 'POST',
       headers: { Authorization: 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        store: false,   /* v2209 */
         model: EXTRACT_MODEL,
         input: [{ role: 'user', content: buildPrompt(transcript, catalog, zusatz) }],
         max_output_tokens: 5000,
@@ -596,6 +597,7 @@ async function quickMatch(transcript, catalog, apiKey) {
       method: 'POST',
       headers: { Authorization: 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        store: false,   /* v2209 */
         model: QUICKMATCH_MODEL,
         input: [{ role: 'user', content: buildQuickPrompt(transcript, cat) }],
         max_output_tokens: 400,
@@ -692,6 +694,7 @@ async function verifyFields(transcript, prev, catalog, apiKey, sammler) {
       method: 'POST',
       headers: { Authorization: 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        store: false,   /* v2209 */
         model: VERIFY_MODEL,
         input: [{ role: 'user', content: buildVerifyPrompt(transcript, seed, catalog) }],
         max_output_tokens: 5000,

@@ -91,7 +91,7 @@ export const KiGegenrechnungService = {
       const res = await httpText(cfg.ai.base + '/responses', {
         method: 'POST', timeoutMs: 90000, retries: 0,
         headers: { Authorization: 'Bearer ' + cfg.ai.openaiKey, 'Content-Type': 'application/json' },
-        body: { model: cfg.ai.model, input: anweisung, temperature: 0 },
+        body: { store: false, model: cfg.ai.model, input: anweisung, temperature: 0 },   /* v2209 */
       });
       roh = res.text;
     } catch (e) {

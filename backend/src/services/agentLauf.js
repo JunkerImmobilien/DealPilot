@@ -212,7 +212,7 @@ async function _ruf(body, apiKey) {
     const r = await fetch(OPENAI_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-      body: JSON.stringify(body),
+      body: JSON.stringify(Object.assign({ store: false }, body)),   /* v2209 */
       signal: ctrl.signal
     });
     if (!r.ok) {

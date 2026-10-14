@@ -3097,12 +3097,16 @@ function _calcImmediate(){
       try {
         var _v269_startISO = window.DealPilotAnteilig.getFinanzierungStartDate
           ? window.DealPilotAnteilig.getFinanzierungStartDate() : null;
-        var _v269_baseY = window.DealPilotAnteilig.getFinanzierungBaseYear
-          ? window.DealPilotAnteilig.getFinanzierungBaseYear() : null;
-        // Fallback: WU/kaufdat-Basisjahr (= _v268_baseYear bereits berechnet)
-        if (!_v269_baseY && typeof _v268_baseYear === 'number') {
-          _v269_baseY = _v268_baseYear;
-        }
+        /* v2209 · Die Monate zaehlen gegen das Jahr, mit dem die Projektion
+           BEGINNT (_v268_baseYear = WU, sonst Kaufdatum) - nicht gegen das
+           Jahr der Auszahlung selbst. So wurde die Auszahlung immer mit
+           ihrem eigenen Jahr verglichen: gemessen an 2026-1052 (WU
+           23.12.2024, d1_auszahl 01.2025) stand Jahr 1 = 2024 mit EINEM
+           Monat Miete (7.930 EUR) gegen VOLLE 56.800 EUR Zinsen. Richtig
+           ist 0 - vor der Auszahlung faellt kein Zins an. */
+        var _v269_baseY = (typeof _v268_baseYear === 'number') ? _v268_baseYear
+          : (window.DealPilotAnteilig.getFinanzierungBaseYear
+              ? window.DealPilotAnteilig.getFinanzierungBaseYear() : null);
         var _v269_monthsY1 = window.DealPilotAnteilig.getFinanzierungMonths
           ? window.DealPilotAnteilig.getFinanzierungMonths(_v269_startISO, _v269_baseY) : 12;
 
@@ -3193,9 +3197,10 @@ function _calcImmediate(){
         try {
           var _d2_startISO = window.DealPilotAnteilig.getFinanzierungStartDate
             ? window.DealPilotAnteilig.getFinanzierungStartDate('d2_auszahl') : null;
-          var _d2_baseY = window.DealPilotAnteilig.getFinanzierungBaseYear
-            ? window.DealPilotAnteilig.getFinanzierungBaseYear('d2_auszahl') : null;
-          if (!_d2_baseY && typeof _v268_baseYear === 'number') _d2_baseY = _v268_baseYear;
+          /* v2209 · wie D1: gegen das Projektionsjahr 1, nicht gegen das eigene Auszahlungsjahr */
+          var _d2_baseY = (typeof _v268_baseYear === 'number') ? _v268_baseYear
+            : (window.DealPilotAnteilig.getFinanzierungBaseYear
+                ? window.DealPilotAnteilig.getFinanzierungBaseYear('d2_auszahl') : null);
           var _d2_months = window.DealPilotAnteilig.getFinanzierungMonths
             ? window.DealPilotAnteilig.getFinanzierungMonths(_d2_startISO, _d2_baseY) : 12;
           if (_d2_months === 0) {

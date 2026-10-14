@@ -369,6 +369,7 @@ export const HarvestService = {
         method: 'POST', timeoutMs: 90000, retries: 0,
         headers: { Authorization: 'Bearer ' + cfg.ai.openaiKey, 'Content-Type': 'application/json' },
         body: {
+          store: false,   /* v2209 */
           model: cfg.ai.model,
           input: frage,
           tools: [{ type: 'web_search' }],       // ohne Suche keine Recherche

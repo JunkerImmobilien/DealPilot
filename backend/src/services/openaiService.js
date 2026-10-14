@@ -1678,7 +1678,8 @@ async function callOpenAI(prompt, opts) {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + apiKey
     },
-    body: JSON.stringify(body)
+    /* v2209: store:false - nichts liest eine gespeicherte Antwort wieder ein (kein previous_response_id). */
+    body: JSON.stringify(Object.assign({ store: false }, body))
   });
 
   if (!resp.ok) {
@@ -3338,7 +3339,7 @@ async function _callOpenAIVision(contentParts, opts) {
   const resp = await fetch(OPENAI_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-    body: JSON.stringify(body)
+    body: JSON.stringify(Object.assign({ store: false }, body))   /* v2209 */
   });
   if (!resp.ok) {
     const txt = await resp.text();
