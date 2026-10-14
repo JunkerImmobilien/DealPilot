@@ -41106,6 +41106,11 @@ html body .sb-user-icons .sb-user-icon-btn svg {
     width: 40px !important; height: 40px !important; min-width: 40px !important; min-height: 40px !important;
     flex: 0 0 40px !important; padding: 0 !important;
     display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    /* v2220a · Marcel: „in der Aktenmappe in Gold, sollte eigentlich weiß sein".
+       auth.js schreibt color:#C9A84C inline; am Desktop überdeckt das die Regel
+       an .dpl-schiene (layout-varianten.css), die Handy-Mappe ist keine Schiene.
+       Gemessen am Desktop: Creme auf #171512, Rand #2A2622 - dasselbe hier. */
+    color: #E9E3D6 !important; background: #171512 !important; border: 1px solid #2A2622 !important;
   }
 }
 
