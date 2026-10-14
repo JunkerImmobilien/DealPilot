@@ -880,6 +880,53 @@ zurückgesetzt** · SN/PH-Logos nicht vom Sweeper überschreiben (W23).
 
 ---
 
+## EIGENE DATENHALTUNG — MAKRO, ZENSUS, ORTE, LAUFZEITEN (Stand 14.10.2026)
+
+**Der Marktbericht fragt Makro- und Zensus-Kennzahlen nicht mehr live ab.
+Er liest sie aus eigenen Tabellen in `dealpilot-mb-db` (Schema `mb.`).**
+Hier stand bis zum 14.10.2026 nichts dazu, nur verstreut in der Chronik
+(v2161–v2172c, v2197). Marcel: *„das mit der Regionaldatenbank haben wir
+gelöst und zusätzlich eine eigene Datenbank angelegt. Das muss auch in der
+Projektanweisung bzw. dem Wissen stehen."*
+
+| Tabelle | Inhalt | Quelle | Füllung | Staging 14.10. |
+|---|---|---|---|---|
+| `mb.makro_werte` (+ `mb.makro_abrufe` als Protokoll) | vier Kennzahlen je Kreis: Bevölkerung/Trend, Arbeitslosenquote, Wanderung, Einkommen/Kaufkraft | Regionaldatenbank (regionalstatistik.de, GENESIS), Konto in `.env` (`DESTATIS_TOKEN`) | `MakroImportService`, Takt alle 12 h prüfen / alle 30 Tage holen, `MAKRO_IMPORT=0` schaltet ab | 22.573 Werte, 118 Abrufe |
+| `mb.zensus_werte` | Leerstand, Eigentümerquote, Nettokaltmiete; Kreis UND Gemeinde, Miete nach Baujahr/Fläche | Zensus-2022-Datenbank `ergebnisse.zensus2022.de`, eigenes Konto `ZENSUS_USER`/`ZENSUS_PASSWORD` | einmalig `npm run zensus` im mb-Container (~2,5 min) | 894.880 Werte |
+| `mb.plz_orte` | PLZ → Ort/Koordinaten (Ersatz für den Live-Dienst: 152 ms gegen 2 ms) | erster Abruf je PLZ | füllt sich mit jedem Bericht | 3 |
+| `mb.laufzeiten` | Dauer je Berichtsschritt | eigene Messung | füllt sich mit jedem Bericht | 9 |
+
+**Auf Produktion:** Migration 016 und der Zensus-Import (894.880 Werte) liefen
+mit Rollout 1 (`b62eb9d2`). Migration 017 und der erste Makro-Takt (627 s,
+400/400 Kreise, 16/16 Länder) liefen mit Rollout 4 (`c7a4c482`). Migration 018
+lief mit Prod (13).
+
+**Was man wissen muss, wenn man hier etwas anfasst:**
+- **Zwei Konten, zwei Datenbanken, nicht verwechseln.** `DESTATIS_TOKEN` ist
+  die **Regionaldatenbank**: dort gibt es nur den Zensus 2011. GENESIS-Online
+  (Destatis) hat **keinen** Zensus 2022. Den gibt es nur auf
+  `ergebnisse.zensus2022.de`, mit eigenem Konto. Anmeldung dort **nur per
+  Header** `username`/`password`; Formulardaten werden als Gast behandelt
+  (Code 15).
+- **Ein Land je Abruf:** `regionalkey: "05*"` holt ein ganzes Bundesland.
+  Deutschland braucht damit 34 Abrufe statt über 800. Ohne Filter: Code 98
+  „zu groß".
+- **Höchstens 10 parallele Abrufe je Konto (Code 6).** Ein von uns
+  abgebrochener Abruf läuft dort bis zu 15 min weiter. Deshalb 3 parallel,
+  10 min Frist, `logincheck` vorweg, Pause vor dem zweiten Versuch (v2172b).
+- **Schlüssel umschlüsseln:** Die Atlas-Tabellen führen Hamburg als `02`,
+  Berlin als `11` und Region Hannover, StädteRegion Aachen und
+  Regionalverband Saarbrücken achtstellig; der Bericht fragt fünfstellig
+  (`MakroImportService.kreisSchluessel()`). Sie führen auch Altkreise (472
+  statt 400) → Deckung gegen die **heutigen** Kreise messen, nicht zählen.
+- **Zensus-Miete ist Bestandsmiete** aller Verträge zum 15.05.2022, keine
+  Angebotsmiete. Neue Zahlen gibt es erst mit dem nächsten Zensus.
+  Größenklassen gelten **je Wohnung** (MFH: Wohnfläche durch Einheiten).
+- **Der Bericht liest nur die Tabelle** (2–38 ms), nie live. Fehlt ein Kreis,
+  fehlt der Wert — kein Nachbarkreis, kein Landesmittel.
+- **Prüfen:** der Agent `datenwaechter` misst Deckung und Stand von Makro,
+  Zensus und Register.
+
 ## AMTLICHE DATEN — WOHER SIE KOMMEN
 
 **Alle NRW-Grundstücksmarktberichte liegen kostenfrei bei `gars.nrw` und

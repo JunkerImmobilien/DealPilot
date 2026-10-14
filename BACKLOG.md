@@ -36,6 +36,28 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N64 · Marcels Antworten vom 14.10.2026 — Entscheidungen zu den offenen Fragen
+
+| Punkt | Entscheidung |
+|---|---|
+| N62.8 Preise Integrationsservice / Bestandsmigration | **„auf Anfrage"** — kein Festpreis |
+| N62.15 Datenschutz | Marcel glaubt nicht, dass Kaufverträge, Grundbuch, Geburtsdaten, Fotos an OpenAI gehen, und nicht, dass Daten Dritter weitergereicht werden („außer man würde sie explizit in die Felder eintragen"). **Erst im Code nachweisen, was wirklich hinausgeht**, dann entscheiden, was in den Text gehört. |
+| N61.2 Soll/Ist in der Pilot-Analyse | **ausbauen:** genauer beschreiben, ggf. mehr Felder |
+| N62.21 Gewerbe im Ertragswert | **Nutzfläche und Nutzungsart** im passenden Reiter im Tab Objekt, nur sichtbar, wenn wirklich Gewerbe da ist; Ort in Stufe 3 suchen |
+| N62.24 Kontrast | **dunkleres Grün und Rot für kleine Zahlen erlaubt** |
+| Tour am Handy | **bleibt so** — Hauptsache sie funktioniert und wird vernünftig angezeigt |
+| Quick-Check Hausnummer | **keine Pflicht** — die Regel kam aus einem früheren Chat, nicht von Marcel |
+| „Soll/Ist-Umschalter im Quick-Check" | **erledigt**, der ist weg |
+| N62.7 Landing Leistungsumfang | ja — dazu die abgelegte **Prozesskarte** verwenden |
+| N62.9 Subpage F&E | ja — Quelle `E:\Portfolio Strategie` (Marcel gibt den Ordner frei) |
+| N62.12 Geführte Datenaufnahme | durchgehen, mit allen Stufen |
+| N62.13 Rumpfjahr | **erst prüfen**; Marcel: „wird beides anteilig gerechnet" |
+| N62.13 Regionaldatenbank | **gelöst**, dazu eine **eigene Datenbank** angelegt → muss in Projektanweisung / Wissen stehen |
+| N60.19 Demo-Objekte | Marcel fragt, was er entscheiden soll → Frage konkret stellen |
+| Einstellungen-Demo | „irgendwo eine Demo abgelegt, ich glaube für die Einstellungen" → nachsehen |
+
+Alles andere: abarbeiten.
+
 ### N62 · Marcels Paket vom 12.10.2026 (abends) — zwölf Punkte, abgeglichen
 
 **Marcel hat ausdrücklich darum gebeten:** *„Also das müsstest du einmal
