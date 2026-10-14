@@ -78,11 +78,27 @@
   }
   function zeileWeg() { var z = q('#dpm-zeile'); if (z) z.classList.remove('an'); }
   function karte(html) { var k = el('dpm-karte'); if (html == null) { k.classList.remove('an'); return; } k.innerHTML = '<div>' + html + '</div>'; k.classList.add('an'); }
+  /* v2219b · Der Kegel FOLGT seinem Ziel: über einen Selektor, alle 200 ms neu
+     aufgelöst. GEMESSEN: der Umschalter Ist/Soll baut sich beim Klick neu (der
+     alte Knoten ist ausgehängt, Rechteck 0 x 0), und Reiter rendern nach - ein
+     einmal gemessenes Rechteck war in vier von fünf Szenen 16 x 16 px. */
+  var _ziel = null, _pad = 10, _folge = null;
+  function zielEl() {
+    if (!_ziel) return null;
+    if (typeof _ziel === 'string') return qs(_ziel);
+    return (_ziel.isConnected && _ziel.getBoundingClientRect().width > 0) ? _ziel : null;
+  }
+  function folgen() {
+    if (_folge) return;
+    _folge = setInterval(function () { var z = zielEl(); if (z) kegel(z, _pad); else kegel(null); }, 200);
+  }
   async function zeige(ziel, pad) {
-    if (!ziel) { kegel(null); return; }
-    try { ziel.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+    _ziel = ziel || null; _pad = pad == null ? 10 : pad;
+    if (!_ziel) { kegel(null); return; }
+    var z = zielEl();
+    if (z) { try { z.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} }
+    folgen();
     await warte(750);
-    kegel(ziel, pad);
   }
   function reiter(sec) { var t = q('.tab[data-target-sec="' + sec + '"]'); if (t) t.click(); }
   async function warteAuf(fn, ms) { var t0 = Date.now(); while (Date.now() - t0 < (ms || 6000)) { var v = fn(); if (v) return v; await warte(150); } return null; }
@@ -104,7 +120,8 @@
       objekt: /Parkstr(\.|aße|asse) ?9/i,
       szenen: [
         async function (s) {
-          await zeige(await warteAuf(function () { return q('.sb-card.active'); }), 6);
+          reiter('s0'); await warte(600);
+          await zeige('.ank-ansicht-kopf', 8);
           var A = window.DealPilotAnkauf && DealPilotAnkauf.stand();
           var kp = A && A.kurz ? eur(A.kurz.kp) : null;
           s.zeile('Gekauft', 'Gekauft am <b>' + datum(A && A.stichtag) + '</b>' + (kp ? ' für <b>' + kp + '</b>' : '') + ' — im Bestand.');
@@ -114,7 +131,7 @@
           reiter('s0'); await warte(700);
           var seg = await warteAuf(function () { return [].filter.call(document.querySelectorAll('.ank-wahl .ank-seg'), function (b) { return /Soll/.test(b.textContent); })[0]; });
           if (seg) seg.click();
-          await zeige(q('.ank-wahl'), 8);
+          await zeige('.ank-wahl', 8);
           var K = (DealPilotAnkauf.stand() || {}).kurz || {};
           var teile = [];
           if (K.nkm != null) teile.push('<b>' + eur(K.nkm) + '</b> Nettokaltmiete');
@@ -134,7 +151,7 @@
           await warte(5500);
         },
         async function (s) {
-          kegel(null); reiter('s5'); await warte(1200);
+          await zeige(null); reiter('s5'); await warte(1200);
           var tab = await warteAuf(function () { return [].filter.call(document.querySelectorAll('#ai-content .dp-pa-tab'), function (b) { return /Soll\/Ist/.test(b.textContent) && b.getBoundingClientRect().width > 0; })[0]; });
           if (tab) tab.click();
           await warte(600);
@@ -144,12 +161,12 @@
           if (d) teile.push('DSCR <b>' + de(d.ankauf, 2) + ' → ' + de(d.bestand, 2) + '</b>');
           if (c) teile.push('Cashflow n. St. <b>' + eur(c.ankauf) + ' → ' + eur(c.bestand) + '</b>');
           if (sc) teile.push('DealScore <b>' + de(sc.ankauf) + ' → ' + de(sc.bestand) + '</b>');
-          await zeige(qs('#ai-content .abw-bewegt') || qs('#ai-content .abw-tafel'), 10);
+          await zeige(qs('#ai-content .abw-bewegt') ? '#ai-content .abw-bewegt' : '#ai-content .abw-tafel', 10);
           s.zeile('Soll gegen Ist · automatisch', teile.join(' · ') || 'Plan gegen heute, Kennzahl für Kennzahl.');
           await warte(7500);
         },
         async function (s) {
-          kegel(null); reiter('s3-tax'); await warte(1400);
+          await zeige(null); reiter('s3-tax'); await warte(1400);
           var bar = await warteAuf(function () { return [].filter.call(document.querySelectorAll('#s3-tax .tax-tl-bar'), function (b) { return /^\s*2025/.test(b.textContent); })[0]; });
           var betrag = bar ? (bar.querySelector('.tax-tl-amount') || {}).textContent : null;
           await zeige(bar || q('#s3-tax .tax-timeline-card'), 8);
@@ -164,7 +181,7 @@
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0;
   function stopp() {
-    lauf = 0; kegel(null); zeileWeg(); karte(null);
+    lauf = 0; _ziel = null; if (_folge) { clearInterval(_folge); _folge = null; } kegel(null); zeileWeg(); karte(null);
     var s = q('#dpm-stopp'); if (s) s.remove();
     document.removeEventListener('keydown', esc, true);
   }
@@ -188,7 +205,7 @@
           var ii = i;
           await D.szenen[i]({ zeile: function (k, t) { zeile(k, t, ii, n); } });
         }
-        kegel(null); zeileWeg(); reiter('s0');
+        _ziel = null; kegel(null); zeileWeg(); reiter('s0');
         karte(D.schluss); await warte(5500);
         karte(null); await warte(600);
       } while (opts && opts.schleife && g === lauf);
