@@ -38761,6 +38761,29 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2218a–v2218f · Staging · Handy-Menü, Pilot erst nach Anmeldung, Mikrofon neben Senden, Atlas am Handy (14.10.2026)
+- **Was:** Marcels siebte Runde (N70).
+  - **Pilot-Analyse Parkstraße neu abgerufen** (Stand 14.10., 09:08, gespeichert). Sie sagt weiter „Nicht kaufen“: Sie rechnet gegen den Marktbericht vom 08.10. mit 482.000 € Marktwert bei 780.000 € Kaufpreis. Die Analyse vom Ankauf bleibt im Ankauf-Stand eingefroren.
+  - **Menü am Handy (v2218b):** In der Aktenmappe klappt eine Aktion das Register zu wie am Schreibtisch, `layout-varianten.css:7009` setzt das zugeklappte Register auf `pointer-events:none`. Es blieb sichtbar, war aber nicht mehr klickbar: `elementFromPoint` traf `aside.sidebar`. `registerOffenHalten()` hört jetzt auf die Klasse.
+  - **Pilot erst nach der Anmeldung (v2218b):** kein Pilot und kein F1, solange `#auth-modal` offen ist oder keine Sitzung besteht.
+  - **Mikrofon wie bei WhatsApp (v2218b/c):** Am Handy ist der Kasten „Halte gedrückt …“ ausgeblendet. Ein runder Halte-Knopf `#vi-rf-ptt` sitzt neben dem Senden-Pfeil, das Eingabefeld wächst von 134 auf 191 px, der Platzhalter sagt „Ich höre dich …“.
+  - **Atlas am Handy (v2218a/d/e/f):**
+    - Gesamtnetz: Linien untereinander, Stationen je Linie wischbar (`--dpm-schiene`).
+    - Karten sind ohne Animation sichtbar. In der Messkabine „Standbild“ blieben sie vorher bei opacity 0.
+    - Wer den Atlas mit Ziel öffnet, verlässt den Modus jetzt zuerst. Vorher nahm der Reiter-Beobachter dem Ziel die Markierung, die Seitenleiste blieb leer, und ein gemerkter Titel überschrieb den richtigen.
+    - Sprechlauf und Beispielflug laufen nicht mehr über (`1fr` → `minmax(0,1fr)`).
+    - Eingebettete Seiten ohne Demo-Kopf und mit Bustern. `basis.css` kam vorher alt aus dem Cache.
+- **Nachweis (Messkabine 390, echte Treffer per `elementFromPoint`):**
+  - Menü: 4 Aktionen nacheinander, jede getroffen.
+  - Pilot: bei Anmeldefenster `display:none`, F1 ohne Wirkung, danach wieder da.
+  - Geführte Eingabe: Kasten `none`, Eingabe 191 / Pfeil 44 / Mikro 44, kein Überlauf.
+  - Atlas: Gesamtnetz Karten opacity 1. Ziel Quick-Check zeigt Titel und Seitenleiste mit Erweiterung. Unterkarte 345/362, Flug 337/354, Zusammenspiel 337/354.
+  - `buster-ebenen` SAUBER.
+- **Rest:**
+  - Halten und Aufnehmen auf einem echten Handy abnehmen. In der Messkabine würde das Mikrofon eine Berechtigung anfragen.
+  - Der Parkstraße fehlt ein aktueller Marktbericht. Mit 482.000 € bleibt jede Analyse bei „Nicht kaufen“ (kostet ein Kontingent, Marcels Entscheidung).
+  - `buster-ebenen-pruefen` kennt die Seiten unter `frontend/atlas/` nicht.
+
 ### v2217–v2218 · Staging · Soll/Ist mit Ankauf-Analyse, Dokumente mit Abgleich, Bot Soll/Ist, Gesamt-Atlas in der App (14.10.2026)
 - **Was:** Marcels Auftrag (N69): Pilot-Analyse für den Soll-Stand, Reiter Soll/Ist und Marktbericht nur, wenn es etwas gibt, Datenbank Ankauf/Bestand, Prozess nach dem Quick-Check, Abweichungen bei PDFs, Telegram-Bot und Atlas.
   - **v2217** `cc6809e8`:

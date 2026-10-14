@@ -36,6 +36,12 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N70 · Marcel 14.10.2026 (siebte Runde) — erledigt bis auf Abnahmen (`v2218a`–`v2218f`)
+> Pilot-Analyse Parkstraße neu · Atlas am Handy gemessen und repariert · Pilot erst nach Anmeldung · Mikrofon neben Senden (WhatsApp) · Handy-Menü nach der ersten Aktion wieder klickbar.
+1. **Offen:** Halten zum Sprechen auf echtem Handy abnehmen.
+2. **Offen:** Marktbericht Parkstraße neu (482.000 € Marktwert gegen 780.000 € Kaufpreis) — Kontingent, Marcels Entscheidung.
+3. **Offen:** Messe-Videos — Vorschlag liegt bei Marcel.
+
 ### N69 · Marcel 14.10.2026 (sechste Runde) — erledigt bis auf Abnahmen
 > Pilot-Analyse beim Ankauf gegenübergestellt, Soll/Ist nur im Bestand, Marktbericht ab erstem Bericht (`v2217`/`v2217b`) · Dokumente in der Datenaufnahme mit Abgleich, Abweichungen beim Exposé-Import (`v2217`–`v2217d`) · geführte Eingabe nach dem Quick-Check frei (`v2217c`) · Bot `soll_ist_lesen`, UUID- und Tilgungsfehler (`v2217a`) · Gesamt-Atlas in der App mit Telegram-Bot (`v2218`).
 1. **Offen:** Pilot-Analyse Parkstraße neu abrufen (veraltet, DSCR 0,30) — Marcels Entscheidung, kostet Kontingent.
