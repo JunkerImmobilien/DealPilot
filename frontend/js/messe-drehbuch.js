@@ -111,8 +111,13 @@
      wird der Rahmen jeder Ebene dazugerechnet. */
   function rect(e) {
     var r = e.getBoundingClientRect(), x = r.left, y = r.top;
-    for (var fe = e.ownerDocument.defaultView.frameElement; fe; fe = fe.ownerDocument.defaultView.frameElement) {
+    /* v2235e · nur bis zum EIGENEN Dokument hochrechnen. Im Studio liegt die
+       App selbst in einem iframe - gemessen (Marcel: „der nicht ausgegraute
+       Bereich ist verschoben") kam dessen Lage im Studio noch einmal dazu. */
+    for (var d = e.ownerDocument; d && d !== document; ) {
+      var fe = d.defaultView.frameElement; if (!fe) break;
       var fr = fe.getBoundingClientRect(); x += fr.left + fe.clientLeft; y += fr.top + fe.clientTop;
+      d = fe.ownerDocument;
     }
     return { left: x, top: y, width: r.width, height: r.height, bottom: y + r.height, right: x + r.width };
   }
@@ -229,7 +234,7 @@
   function scroller(e) {
     /* v2221 · durch iframes hindurch: das Quick-Check-Dokument scrollt nicht
        selbst (es ist so hoch wie sein Inhalt), gescrollt wird .main-col */
-    for (var a = e; a; a = a.ownerDocument.defaultView.frameElement) {
+    for (var a = e; a; a = a.ownerDocument === document ? null : a.ownerDocument.defaultView.frameElement) {   /* v2235e: nicht ins Studio hinauf */
       var w = a.ownerDocument.defaultView;
       for (var s = a.parentElement; s && s !== a.ownerDocument.body; s = s.parentElement) {
         /* v2222b · nur SENKRECHTE Scroller: die Spannen-Kacheln liegen in einem
