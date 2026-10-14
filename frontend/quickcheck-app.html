@@ -5804,7 +5804,17 @@ const QcApp = (function() {
 
          Überschrift, Ton und Stufe behält die Heuristik. Die KI füllt
          Verhandlungsrat, Pro, Contra und Meinung. */
-      document.getElementById('ai-negotiate-v').innerHTML = result.negotiate || '\u2014';
+      /* v2227 \u00b7 Bei KAUFEN braucht der Verhandlungsrat eine Bruecke - sonst
+         steht \u201eStarker Kauf" ueber \u201eEine Verhandlungsstrategie von 3-5 %"
+         (Marcel 14.10.2026). Die KI soll sie selbst schreiben (Prompt);
+         tut sie es nicht, kommt sie hier dazu. */
+      var _neg = result.negotiate || '';
+      if (_neg && _uFuerKi && _uFuerKi.verdict === 'KAUFEN'
+          && !/guter Deal|gerechtfertigt|\u00fcberzeug|ueberzeug|empfehlenswert/i.test(_neg.slice(0, 120))) {
+        _neg = '<strong>Ein guter Deal</strong> \u2014 die Kennzahlen tragen den Kaufpreis. '
+             + 'Verhandeln lohnt sich trotzdem: ' + _neg.charAt(0).toLowerCase() + _neg.slice(1);
+      }
+      document.getElementById('ai-negotiate-v').innerHTML = _neg || '\u2014';
       document.getElementById('ai-pros').innerHTML =
         (result.pros || []).map(function (p) { return '<li>' + p + '</li>'; }).join('');
       document.getElementById('ai-cons').innerHTML =

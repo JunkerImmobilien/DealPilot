@@ -626,6 +626,17 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
       '  "opinion": "Sachliche Experten-Meinung in 3-4 Saetzen"',
       '}',
       '',
+      /* v2227 · Marcel 14.10.2026: oben stand „Starker Kauf", und der
+         Verhandlungsrat begann direkt mit „Eine Verhandlungsstrategie von
+         3-5 % Nachlass" - ohne Bruecke wirkt das wie ein Widerspruch. */
+      'Zum Feld "negotiate":',
+      '- Lautet das gerechnete Urteil "Starker Kauf", beginnt "negotiate" mit der',
+      '  Bestaetigung, dass es ein guter Deal ist, und nennt dann den GRUND,',
+      '  warum Verhandeln trotzdem sinnvoll ist (z. B. Zins ueber Marktzins,',
+      '  hohes Hausgeld) - erst danach die Prozent-Empfehlung.',
+      '- Beginnt das Urteil mit "Nicht kaufen", empfiehlst du keinen Kauf zum jetzigen',
+      '  Preis, sondern nennst den Preis aus der Begruendung oben.',
+      '',
       /* v1946 · DIESELBEN VERBOTE WIE IN services/bewertungsText.js.
          Jedes hat einen gemessenen Vorfall hinter sich; der erste und
          der letzte sind der Grund fuer dieses Paket. */
