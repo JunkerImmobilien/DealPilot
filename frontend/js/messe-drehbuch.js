@@ -953,7 +953,17 @@
      nach v2224/v2227b: angezeigter Score (76 · Gut), Brücke „guter Deal - trotzdem verhandeln, weil …“, im Du. */
   var KI_ANALYSE = {"negotiate":"Dies ist ein guter Deal, da die Bruttomietrendite mit 8,7 % und die Eigenkapitalrendite mit 10,1 % beide überdurchschnittlich stark ausfallen und damit klar über deiner Zielvorgabe von 7 % liegen. Obwohl die Kennzahlen insgesamt sehr gut passen, liegt dein Zinssatz mit 4,22 % leicht über dem aktuellen Marktzins von 3,81 % (laut Bundesbank, Stand 08.2026), und das Hausgeld ist mit 415 EUR/Monat relativ hoch. Daher solltest du versuchen, beim Kaufpreis um mindestens 3-5 % zu verhandeln.","pros":["Sehr hohe Bruttomietrendite von 8,7 %, deutlich über Zielwert","Nettomietrendite mit 6,9 % solide für eine C-Lage","Eigenkapitalrendite mit 10,1 % überdurchschnittlich attraktiv","Positiver monatlicher Cashflow von 357 EUR"],"cons":["Zinssatz liegt über dem aktuellen Marktzins","Hausgeld im Verhältnis zur Miete hoch","Objekt erfordert noch Prüfungen (Bonität, Hausgeld, Protokolle, Energieausweis)"],"opinion":"Die Investitionskennzahlen sprechen für einen starken Kauf: Rendite und Cashflow sind überdurchschnittlich, insbesondere im Vergleich zur C-Lage und deiner Zielsetzung. Ein leicht erhöhter Zinssatz und ein hohes Hausgeld bieten jedoch Potenzial für Kaufpreisverhandlungen. Insgesamt ein überzeugender Deal, die noch offenen Prüfpunkte solltest du vor Abschluss klären."};
   var QC_IMPORT = {"files":[{"name":"Expose.pdf","type":"expose","userType":null,"cache":{"expose":{"adresse":"Hölderlinstr. 1, 32547 Bad Oeynhausen","plz":"32547","ort":"Bad Oeynhausen","objektart":"Eigentumswohnung","energieklasse":"D","heizungsart":"Gas-Zentralheizung","stellplatz":"Tiefgarage","kaufpreis":139000,"wohnflaeche":73.31,"baujahr":1983,"zimmer":2,"hausgeld":415,"energieverbrauch":117.7,"balkon":true,"keller":true}}},{"name":"Marktbericht.pdf","type":"market","userType":null,"cache":{"market":{"adresse":"Sachsenstraße 16, 32052 Herford","plz":"32052","ort":"Herford","objektart":"Wohnung","bewertungsdatum":"2025-10-15","konfidenz":"Gut","makrolage":"gut","mikrolage":"gut","bevoelkerung_entwicklung":"stabil","nachfrage":"mittel","wertsteigerung":"mittel","entwicklung":"begrenzt","kueche_qualitaet":"Gehoben","bad_qualitaet":"Normal","boden_qualitaet":"Standard","fenster_qualitaet":"Gehoben","kueche_zustand":"Neu / kürzlich modernisiert","bad_zustand":"Gut in Stand gehalten","boden_zustand":"Gut in Stand gehalten","fenster_zustand":"Gut in Stand gehalten","badezimmer":"1","etage":"1","etagen":"3","modernisierungsjahr":"2025","garagen":"1","balkon_flaeche":"10","energie_label":"B","wohnflaeche":96,"baujahr":1994,"sanierungsjahr":2025,"zimmer":3,"verkehrswert":215200,"verkehrswert_min":196000,"verkehrswert_max":233000,"preis_pro_qm":2242,"lage_geraeusch":5,"lage_einkaufen":4.7,"lage_bildung":4.3,"lage_gastronomie":4.2,"lage_gesundheit":4.6,"lage_freizeit":2.8,"wertentwicklung_3jahre_pct":14.1,"wertentwicklung_1jahr_pct":4.17,"prognose_naechstes_jahr_pct":3.49,"markt_durchschnittspreis":279000,"markt_tage_auf_dem_markt":139}}}]};
-  var MB_KARTE = {"area":96,"rating":"Attraktiv","conf":{"label":"Niedrig","pct":43},"mikro":"Sehr gut · 8,2","makro":"Gut · 6,0","microRaw":82,"macroRaw":60,"trendRaw":null,"trend":"–","zensus":{"ebene":"Gemeinde","name":"Bad Oeynhausen, Stadt","leer":3.6,"eig":47.3,"miete":5.73},"brw":{"wert":200,"quelle":"BORIS-NRW","stichtag":"2026-01-01"},"makroGemessen":4,"mw":{"low":199000,"med":251000,"high":351000,"sqm":"2.615 €/m²"},"mm":{"low":766,"med":881,"high":1012,"sqm":"9,18 €/m² kalt"}};
+  /* v2236 · Marcel: „die Bewertung ist viel zu hoch". Der alte Mitschnitt
+     rechnete 96 m² / Bj 1994 aus dem Marktbericht der ANDEREN Wohnung. Neu
+     einmal echt abgerufen (14.10.2026, Staging) für Hölderlinstr. 1, 73,31 m²,
+     Bj 1983, Eigentumswohnung: Ø 189.000 €, Spanne 153.000–277.000 €. */
+  var MB_KARTE = {"area":73.31,"rating":"Attraktiv","conf":{"label":"Niedrig","pct":39},"mikro":"Sehr gut · 8,2","makro":"Gut · 6,0","microRaw":82,"macroRaw":60,"trendRaw":null,"trend":"–","zensus":{"ebene":"Gemeinde","name":"Bad Oeynhausen, Stadt","leer":3.6,"eig":47.3,"miete":5.84},"brw":{"wert":200,"quelle":"BORIS-NRW","stichtag":"2026-01-01"},"makroGemessen":4,"mw":{"low":153000,"med":189000,"high":277000,"sqm":"2.580 €/m²"},"mm":{"low":597,"med":683,"high":776,"sqm":"9,32 €/m² kalt"}};
+  /* v2236 · Pilot-Analyse einmal echt für den Endstand des Rundgangs:
+     Miete Ø 683 €, 20 % EK, C-Lage, Score 60 (zwei weitere Abrufe beim Messen gesperrt). */
+  var KI_RUNDGANG = {"negotiate":"Zum aktuellen Preis empfehle ich keinen Kauf. Um deine Ziel-Bruttomietrendite von 7 % zu erreichen, solltest du höchstens 117.086 € zahlen.","pros":["Solider Cashflow von 28 € pro Monat trotz hoher Nebenkosten","Bruttomietrendite mit 5,9 % für diese Objektgröße akzeptabel","Score von 60/100 bestätigt rechnerisch tragfähigen Deal","DSCR von 1,29 sorgt für ausreichende Schuldendienstdeckung"],"cons":["Deine Zielrendite wird klar verfehlt (5,9 % statt 7 % nach Vorgabe)","Hohes Hausgeld von 415 € pro Monat drückt Nettoergebnis","Eigenkapitalrendite sehr niedrig mit nur 0,8 %"],"opinion":"Das Objekt rechnet sich zwar mit kleinem positiven Cashflow und solider Schuldendienstdeckung, bleibt aber unter deiner Zielsetzung für die C-Lage. Die Bruttomietrendite liegt mit 5,9 % spürbar unter deinem Mindestwert. Preislich müsste es rund 22.000 € günstiger sein, damit es zu deinem Renditeziel passt."};
+  /* v2236 · Abschlag Angebot -> Kaufpreis: ImmoScout24/Sprengnetter, ETW bundesweit
+     Dezember 2025: Kaufpreise 5,8 % unter Angebot (Mitte 2025: 6,8 %). */
+  var ABSCHLAG = 0.06;
 
   /* ═══ DREHBUCH 6 · QUICK BOARDING — DER RUNDGANG (v2235) ═══════════════
      Marcel 14.10.2026: „oben bei der Datenaufnahme die Methoden vorstellen,
@@ -1008,15 +1018,50 @@
         await warte(4600);
       },
       QC[2],   /* 7 · Weiter mit den PDFs (Exposé + Marktbericht) */
-      QC[3],   /* 8 · Marktwertindikation */
-      QC[4],   /* 9 · Spanne Unten -> Einschätzung */
-      QC[5],   /* 10 · Mehr Eigenkapital */
-      QC[6],   /* 11 · Gegen deine Lage */
-      QC[7],   /* 12 · Oben -> Gut */
-      QC[8],   /* 13 · Pilot-Analyse */
-      async function (s) {   /* 14 · Als Objekt speichern - gezeigt, nicht geklickt */
+      QC[3],   /* 8 · Marktwertindikation (echter Mitschnitt, richtige Wohnung) */
+      async function (s) {   /* 9 · Angebotspreise -> realistischer Wert */
+        await zeige(function () { return qcEl('oab-results'); }, 6);
+        var real = Math.round(MB_KARTE.mw.med * (1 - ABSCHLAG) / 1000) * 1000;
+        s.zeile('Achtung: Angebotspreise', 'Die Vergleichswerte sind <b>Angebotspreise</b>. Gezahlt wird im Schnitt rund 6 % weniger (ImmoScout24/Sprengnetter, 12/2025) — realistisch also eher <b>' + eur(real) + '</b>.');
+        await warte(7000);
+      },
+      async function (s) {   /* 10 · Miete Ø -> erste Einschätzung */
+        await zeige(function () { return qcSel('.avs-spanne'); }, 8);
+        var t = qcSel('.avs-spanne [data-spanne="mid"]'); if (t) t.click();
+        s.zeile('Die Miete', 'Für die Rechnung die mittlere Marktmiete: <b>' + eur(MB_KARTE.mm.med) + '</b> kalt …');
+        await warte(2600);
+        await zeige(function () { return qcEl('score-block'); }, 4);
+        await warte(900);
+        var sc = qcScore();
+        s.zeile('Sofort eine Einschätzung', 'Voll finanziert: Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+        await warte(4800);
+      },
+      QC[5],   /* 11 · Mehr Eigenkapital */
+      QC[6],   /* 12 · Gegen deine Lage (B passt, C kippt das Urteil) */
+      async function (s) {   /* 13 · Pilot-Analyse (einmal echt für diesen Stand) */
+        _kiFrei = KI_RUNDGANG;
+        qcSetze('qc_lageklasse', 'C');   /* neu rechnen -> die Automatik fragt nach 1,8 s */
+        await zeige(function () { return qcEl('ai-card'); }, 6);
+        s.zeile('Die Pilot-Analyse', 'Zum Schluss liest der Pilot alles zusammen …');
+        await warteAuf(function () { return /KI-Analyse/.test(qcText('ai-source')) && qcText('ai-pros').length > 20; }, 9000);
+        await warte(800);
+        await zeige(function () { var n = qcEl('ai-negotiate-v'); return n && (n.parentElement || n); }, 8);
+        s.zeile('Die Pilot-Analyse', 'Der Pilot bleibt ehrlich: für deine <b>C-Lage</b> zu wenig Rendite — dein Ziel gäbe es erst bei <b>117.086 €</b>.');
+        await warte(6500);
+        await zeige(function () { return qcEl('ai-card'); }, 6);
+        s.zeile('Die Pilot-Analyse', 'Dazu Pro und Contra: Cashflow positiv, DSCR 1,29 — aber Hausgeld hoch und die Zielrendite verfehlt.');
+        await warte(5500);
+        _kiFrei = null;
+      },
+      async function (s) {   /* 14 · Wertpuffer ab Tag 1 */
+        await zeige(function () { return qcEl('oab-results'); }, 6);
+        var real = Math.round(MB_KARTE.mw.med * (1 - ABSCHLAG) / 1000) * 1000, kp = Number((qcEl('qc_kp') || {}).value) || 0;   /* Kaufpreis live */
+        s.zeile('Und trotzdem spannend', 'Nicht deine Lage-Rendite — aber gekauft für <b>' + eur(kp) + '</b>, realistisch wert rund <b>' + eur(real) + '</b>: <b>+' + eur(real - kp) + '</b> Wertpuffer ab dem ersten Tag.');
+        await warte(7500);
+      },
+      async function (s) {   /* 15 · Als Objekt speichern - gezeigt, nicht geklickt */
         await zeige(function () { var b = qcEl('save-btn'); return b && b.getBoundingClientRect().width ? b : null; }, 12);
-        s.zeile('Als Objekt speichern', 'Passt der Deal? <b>Ein Klick</b> — als Objekt gespeichert, mit allen Werten, Quellen und der Pilot-Analyse.');
+        s.zeile('Als Objekt speichern', 'Passt er zu dir? <b>Ein Klick</b> — als Objekt gespeichert, mit allen Werten, Quellen und der Pilot-Analyse.');
         await warte(6000);
       }
     ]
