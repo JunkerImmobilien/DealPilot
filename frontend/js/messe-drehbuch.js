@@ -553,7 +553,7 @@
           if (r) r.click();
           await warte(1300);
           await zeige(function () { return q('#oabi-ov .oabi-body') || q('#oabi-result'); }, 4);
-          s.zeile('Jeder Wert mit Quelle', 'Kaufpreis und Hausgeld aus dem Exposé, Fläche, Baujahr und Lage aus dem Marktbericht — ein Klick übernimmt.');
+          s.zeile('Jeder Wert mit Quelle', 'Das Exposé gilt — die Werte der anderen Wohnung bleiben draußen. Jeder Wert mit Quelle, ein Klick übernimmt.');   /* v2236 */
           await warte(4400);
           var ap = q('#oabi-apply'); if (ap) ap.click();
           await warte(1300);
