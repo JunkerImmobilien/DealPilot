@@ -38761,6 +38761,36 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2223–v2225a · Staging · Fotos je PDF, KI-Score im Quick-Check, Quick-Boarding-Drehbuch neu (14.10.2026)
+- **Was:**
+  - **v2223 · Fotos je PDF getrennt** (Marcel: „bei 2 unterschiedlichen PDFs werden die Fotos des einen Objektes nicht richtig zugeordnet"):
+    - Fotos merken sich ihre Datei. Je PDF eine Fotozeile mit Datei und Adresse.
+    - Bei Adresskonflikt ist nur die Zeile der gewählten Adresse vorgehakt, die andere trägt „(andere Adresse)".
+    - Übernahme nur aus angehakten Zeilen (`_gewaehlteFotos`).
+    - Text „&uebernehmen;" repariert.
+  - **v2224 · KI-Bewertung im Quick-Check bekam einen anderen Score als die Anzeige.** `runRealAi` nahm den Rückfall `QcEngine.computeScore` (92), angezeigt wird `_dpPilotScore` (76). Die KI schrieb „Score von 92/100 und Stufe 'Sehr gut'". Jetzt dieselbe Wahl wie `updateAll`. **Auf Prod im selben Code.**
+  - **v2225 · Drehbuch `?messe=quickcheck` neu** (Marcel):
+    - Einstellungen: aktives Standardwerte-Set und Lageklassen A/B/C
+    - vorbelegte Felder (Zins, Tilgung)
+    - zwei PDFs mit Adresskonflikt
+    - Marktwertindikation
+    - Spanne Unten mit sofortiger Einschätzung
+    - Lage B/C mit Verhandlungsziel
+    - Oben + 20 % EK (76 · Gut)
+    - Pilot-Analyse unten
+
+    Die Pilot-Analyse wurde einmal echt für genau diesen Endstand erzeugt. Während des Laufs gibt `qc-ai-bridge` sie über `DealPilotMesse.kiAntwort()` zurück, ohne Abruf.
+  - **„Ausgewählte übernehmen geht nicht" (Quick-Check):** auf Staging fünfmal nicht nachstellbar (Mitschnitt und echte PDFs, Quick-Check und Objekt, echte Mausklicks, `elementFromPoint` trifft den Knopf, keine Fehler). Offen, Rückfrage an Marcel.
+- **Commit:** `790194fa`, `97b168eb`, `1df93bbf`, `d8a876ca`
+- **Nachweis:**
+  - Echtes Einlesen beider PDFs: Fotos „aus Expose.PDF (Hölderlinstr. 1)", bei Sachsenstraße nicht angehakt; nach Übernahme 6 Fotos im Quick-Check.
+  - KI-Anfrage sendet „76 Gut", die Antwort nennt 76/100.
+  - Drehbuch-Lauf rund 103 s, Kegel bei jeder Zeile im Bild, kein KI-/Marktbericht-/Pass-Aufruf.
+- **Rest:**
+  - Videos als Dateien: auf dem Rechner kein ffmpeg; Ordner `Dateien/Messe/Videos` mit Liste angelegt.
+  - Drehbücher Sprache und ImmoMetrica offen.
+  - Lage in der Score-Zahl: Marcels Entscheidung.
+
 ### v2222–v2222b · Staging · Messe-Drehbuch Quick Boarding mit Datenaufnahme (14.10.2026)
 - **Was:** `?messe=quickcheck` ist neu, das bisherige heißt jetzt `quickcheck-tippen`.
   - Ablauf: Zwei PDFs aus Marcels Ordner (Exposé Hölderlinstr. + Marktwerteinschätzung Sachsenstr.) → Adresskonflikt → Exposé-Adresse gewählt → übernehmen → DealPilot-Marktwertindikation → Zensus-Bestandsmiete 550 € (22 · Kritisch) → Spanne Unten 766 € (54 · Solide) → Bewertung mit Lage B, dann C (Ziel 5,0 → 7,0 %, Verhandlungsziel 131.314 €) → Oben + 20 % EK (76 · Gut, „Starker Kauf").
