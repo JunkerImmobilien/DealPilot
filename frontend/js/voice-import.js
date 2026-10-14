@@ -12133,11 +12133,18 @@
   /* Einstieg: nach der Auswertung (Lücken) oder von Anfang an (geführt). */
   function rueckfragen(OA, data, catalog, alle) {
     var fields = (data && data.fields) || {};
-    var luecken = alle
-      ? _rfZugeschnitten(fields).filter(function (e) { return _rfFehlt(e, fields); })   /* v1437 */
-      : _rfLuecken(fields);
-    /* v1293g: Was der Katalog nicht kennt, wird nicht gefragt. */
-    luecken = _rfAufKatalog(luecken, catalog);
+    /* v2229 · ERST auf den Katalog kürzen, DANN prüfen, was fehlt. Bis hier
+       wurde geprüft und danach gekürzt: im Quick-Check gibt es keine
+       Zinsbindung (d1_bindj), also galt der Finanzierungsblock dort IMMER
+       als Lücke - und der Co-Pilot fragte Eigenkapital, Zins und Tilgung
+       nach, auch wenn sie gesprochen waren. v1293g bleibt: was der Katalog
+       nicht kennt, wird nicht gefragt - und zählt jetzt auch nicht als fehlend. */
+    var luecken = _rfAufKatalog(_rfZugeschnitten(fields), catalog)
+      .filter(function (e) { return _rfFehlt(e, fields); });   /* v1437: alle */
+    if (!alle) {
+      luecken.sort(function (a, b) { return (a.rang || 99) - (b.rang || 99); });
+      luecken = luecken.slice(0, RF_MAX);
+    }
     if (!luecken.length) return showResults(OA, data, catalog);   /* nichts offen */
     _rf = { offen: luecken, i: 0, data: data, catalog: catalog, OA: OA, alle: !!alle,
             quelle: {}, halte: {}, abrufGetan: {} };   /* v1288 */
