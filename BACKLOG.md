@@ -55,6 +55,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 7. **KI-Icons auf den Karten: grundsätzlich weg.**
 8. Die Ansicht nach dem Klick auf eine Karte: schöner, einfacher, verständlicher visualisieren.
 
+> **✅ 1–8 gebaut 14.10.2026 · v2211/v2211a (`45917195`, `c1fef5c1`, Staging), im Browser geprüft** — Einzelheiten im Journal. Dazu ✅ Schwärzen v2210, ✅ Gewerbe v2210b (Rest: LZS-Zweig nach Gewerbeanteil nur als Hinweis), ✅ Rumpfjahr v2209.
+> **Offen aus N64/N65:** Demo-Objekte (Konto info@junker-immobilien.io), Landing: Leistungsumfang mit Prozesskarte + F&E-Unterseite (mit Kanzlei-Zusammenarbeit), Soll/Ist in der Pilot-Analyse ausbauen, dunkleres Grün/Rot für kleine Zahlen, geführte Datenaufnahme durchgehen.
+
 ### N64 · Marcels Antworten vom 14.10.2026 — Entscheidungen zu den offenen Fragen
 
 | Punkt | Entscheidung |
