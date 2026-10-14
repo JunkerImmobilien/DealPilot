@@ -5422,10 +5422,31 @@ const QcApp = (function() {
     }
     /* Marcels Bewertungsvorgabe vom 07.10.2026 gilt auch hier: der
        Angebotsabschlag steckt in `QcHeuristik`, nicht in diesem Dokument. */
+    /* v2237 · Ohne externen Bewertungspartner zählt die DealPilot-Marktbewertung -
+       an der GEWÄHLTEN Stelle der Spanne, auf Angebotsniveau (card.abschlag.roh),
+       damit der Kern den Abschlag genau einmal abzieht. Der Satz kommt aus den
+       Einstellungen (DealPilotAbschlag), sonst gilt der Marktdurchschnitt. */
+    var mwArt = 'unbekannt', _mcAkt = null, _mkAkt = 'med';
+    if (!(mwRoh > 0)) {
+      try {
+        var _ms = JSON.parse((document.getElementById('_mb_state') || {}).value || 'null');
+        var _mc = _ms && _ms.card;
+        if (_mc && _mc.mw) {
+          var _mk = _spanConfig === 'low' ? 'low' : _spanConfig === 'high' ? 'high' : 'med';
+          mwRoh = (_mc.abschlag && _mc.abschlag.roh && _mc.abschlag.roh[_mk]) || _mc.mw[_mk] || 0;
+          _mcAkt = _mc; _mkAkt = _mk;
+          mwArt = 'angebot';   /* auch alte Schnappschüsse ohne Abschlag: Angebotsniveau */
+        }
+      } catch (e) {}
+    }
+    var _ab = window.DealPilotAbschlag;
     var mw = null, mwGrund = null;
     if (mwRoh > 0 && window.QcHeuristik && QcHeuristik.marktwertBereinigt) {
-      var b = QcHeuristik.marktwertBereinigt(mwRoh, 'unbekannt');
+      var b = QcHeuristik.marktwertBereinigt(mwRoh, mwArt, _ab ? _ab.satz() : null, _ab ? _ab.quelle() : null);
       if (b) { mw = b.bereinigt; mwGrund = b.abschlag_pct > 0 ? b.grund : null; }
+      /* v2238a · dieselbe Zahl wie auf der Karte: dort ist der bereinigte Wert
+         auf volle 1.000 € gerundet (gemessen: Karte 178.000 €, Urteil 178.038 €) */
+      if (_mcAkt && _mcAkt.abschlag && _mcAkt.mw && _mcAkt.mw[_mkAkt] > 0) mw = _mcAkt.mw[_mkAkt];
     }
 
     var daten = {
@@ -5499,9 +5520,18 @@ const QcApp = (function() {
       ? cons.slice(0, 2).map(function (c) { return c.replace(/<\/?strong>/g, '"'); }).join(' · ')
       : '';
 
+    /* v2238 · Marcel 14.10.2026: der Wertpuffer gehört auch in die Überschrift.
+       Das Urteil nach dem eigenen Maßstab bleibt vorne stehen; liegt der Preis
+       deutlich unter dem bereinigten Marktwert (qc-heuristik: e.wert), kommt
+       die zweite Sicht in einem Halbsatz dazu - bei „nicht kaufen" als „aber". */
+    var kopf = w.kopf;
+    if (e.wert && e.wert.pct > 0) {
+      var neg = (e.verdict === 'NICHT KAUFEN' || e.verdict === 'KRITISCH' || e.verdict === 'PASS');
+      kopf += (neg ? ' · aber ' : ' · ') + e.wert.pct + ' % unter Marktwert';
+    }
     return {
       ton: w.ton, zeichen: w.zeichen, verdict: e.verdict,
-      ueberschrift: w.kopf, ueberschrift_kurz: w.kurz,
+      ueberschrift: kopf, ueberschrift_kurz: w.kurz,
       rat: e.text + (argumente && (e.verdict === 'VERHANDELN' || e.verdict === 'KRITISCH')
         ? ' Argumente für das Gespräch: ' + argumente + '.' : ''),
       ziel_kp: e.ziel_kp,
@@ -5837,6 +5867,22 @@ const QcApp = (function() {
         urteil: (_uFuerKi && _uFuerKi.ueberschrift) || null,
         urteil_text: (_uFuerKi && String(_uFuerKi.rat).replace(/<\/?strong>/g, '')) || null,
         avm: avmData,
+        /* v2237 · Marcel: „der Marktwert, je nachdem was ich nehme der Spanne,
+           soll mitkommen". Bis hierher kannte die KI ihn nicht: `avm` ist
+           nur der externe Bewertungspartner (_avmResults[0]), die DealPilot-
+           Bewertung stand nie darin. */
+        markt: (function () {
+          try {
+            var ms = JSON.parse((document.getElementById('_mb_state') || {}).value || 'null'), c = ms && ms.card;
+            if (!c || !c.mw) return null;
+            var k = _spanConfig === 'low' ? 'low' : _spanConfig === 'high' ? 'high' : 'med';
+            return { marktwert: c.mw[k], spanne: ({ low: 'Unten', med: 'Ø', high: 'Oben' })[k],
+              low: c.mw.low, high: c.mw.high, marktmiete: c.mm ? c.mm[k] : null,
+              abschlag_pct: c.abschlag ? c.abschlag.pct : null,
+              angebot: (c.abschlag && c.abschlag.roh) ? c.abschlag.roh[k] : null,
+              abschlag_quelle: c.abschlag ? c.abschlag.quelle : null };
+          } catch (e) { return null; }
+        })(),
         /* v1959: die Zielrendite der gewaehlten Lageklasse geht MIT.
            Die Lageklasse selbst steckt schon in `inputs`; die Zahl dazu
            liegt im Lage-Profil und kennt nur der Browser. Ohne sie
@@ -6759,7 +6805,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
-  <script src="js/qc-heuristik.js?v=v2232"></script>
+  <script src="js/qc-heuristik.js?v=v2237"></script>
   <script src="js/dealscore.js?v=v2191"></script>
   <script src="js/avm-section.js?v=v2149"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->
@@ -6768,7 +6814,8 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
      und holt sein Branding ueber ji_token (same-origin). -->
   <script src="js/whitelabel-override.js?v=v2149"></script>
   <script src="js/qc-whitelabel.js?v=W33"></script>
-  <script src="js/dealpilot-mb-qc.js?v=v2192a"></script>
+  <script src="js/marktwert-abschlag.js?v=v2237d"></script><!-- v2237 -->
+  <script src="js/dealpilot-mb-qc.js?v=v2237"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
 <!-- qc-embedded-decouple (v683): Auto-Hoehen-Rueckkopplung kappen, wenn im iframe -->
 <style id="qc-embedded-decouple-style">

@@ -1838,10 +1838,21 @@
     try { toast('ImmoMetrica-Daten \u00fcbernommen'); } catch (e) {}
   }
 
+  /* v2236 · Marcel 14.10.2026: „die Wohnung liegt über 80 % über Markt".
+     Gemessen: bei „Unterschiedliche Adressen" galt die Wahl nur für Straße,
+     PLZ und Ort - Fläche (96 statt 73 m²), Baujahr (1994 statt 1983) und
+     Zimmer kamen weiter aus dem Marktbericht der ANDEREN Wohnung und waren
+     vorgehakt; die Marktbewertung rechnete die falsche Wohnung. Jetzt zählen
+     nur Dokumente der gewählten Adresse (und solche ohne Adresse). */
+  function _giltFuerWahl(f) {
+    if (!_addrChoice || addressOptions().length < 2) return true;
+    var a = _fileAddr(f); if (!a) return true;
+    return (_norm(a.str) + '|' + _norm(a.plz) + '|' + _norm(a.ort)) === _addrChoice;
+  }
   function recompute() {
     _merged = {};
-    _files.filter(function (f) { return f.type === 'expose' && f.cache.expose; }).forEach(function (f) { mergeExpose(f.cache.expose); });
-    _files.filter(function (f) { return f.type === 'market' && f.cache.market; }).forEach(function (f) { mergeMarket(f.cache.market); });
+    _files.filter(function (f) { return f.type === 'expose' && f.cache.expose && _giltFuerWahl(f); }).forEach(function (f) { mergeExpose(f.cache.expose); });
+    _files.filter(function (f) { return f.type === 'market' && f.cache.market && _giltFuerWahl(f); }).forEach(function (f) { mergeMarket(f.cache.market); });
     /* v2218h · amtliche Dokumente zuletzt: Grundbuch und Vertrag gehen vor dem Exposé */
     _vergleich = [];
     _files.filter(function (f) { return f.type === 'dokument' && f.cache.dokument && f.cache.dokument.success; }).forEach(function (f) { mergeDokument(f.cache.dokument); });
@@ -1961,6 +1972,8 @@
         var pref = addrOpts.filter(function (o) { return o.source === 'Marktbericht'; })[0] || addrOpts[0];
         _addrChoice = pref.key;
       }
+      /* v2236 · erst die Werte der gewählten Adresse, dann die Adresse darüber */
+      recompute();
       var ch = addrOpts.filter(function (o) { return o.key === _addrChoice; })[0];
       if (ch) {
         if (ch.str) _merged['str'] = { label: 'Straße', value: ch.str, raw: ch.str, source: ch.source, kind: 'input' };
@@ -1971,7 +1984,7 @@
       addrHtml = '<div class="oabi-addr"><div class="oabi-addr-h">\u26A0 Unterschiedliche Adressen erkannt — welche gilt?</div>' +
         addrOpts.map(function (o) {
           return '<label class="oabi-addr-opt"><input type="radio" name="oabi-addr" value="' + escH(o.key) + '"' + (o.key === _addrChoice ? ' checked' : '') + '> ' + escH(o.label) + ' <span class="src">(' + escH(o.source) + ')</span></label>';
-        }).join('') + '</div>';
+        }).join('') + '<div class="oabi-addr-hinweis" style="font-size:12px;margin-top:4px;opacity:.8">Übernommen werden nur Werte aus dem Dokument der gewählten Adresse.</div></div>';
     }
     var keys = Object.keys(_merged);
     var hasPhotos = !!(_importPhotos && _importPhotos.length);

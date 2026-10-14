@@ -119,6 +119,9 @@ window.QcHeuristik = (function () {
    * ausgewiesen. Eine bereinigte Zahl ohne ihren Abschlag sieht aus wie
    * eine gemessene. */
   var ANGEBOTSABSCHLAG = 0.10;
+  /* v2237 · ab so viel Prozent unter dem bereinigten Marktwert nennt das
+     Urteil den Wertpuffer („deutlich unter Markt") */
+  var WERT_SCHWELLE = 10;
 
   /** Welcher Abschlag gilt für diese Preisart?
    *  'wert'        — Verkehrswert, Gutachten: kein Abschlag
@@ -126,21 +129,29 @@ window.QcHeuristik = (function () {
    *  'angebot'     — Portal, Exposé, Vermarktung: voller Abschlag
    *  'unbekannt'   — Art nicht feststellbar: Abschlag, und es steht dabei
    */
-  function abschlagFuer(preisart) {
+  /* v2237 · Marcel 14.10.2026: „die Abschläge kann man im Set angeben unter
+     Einstellungen, und wir recherchieren immer den aktuellen Durchschnitt."
+     Der Kern liest KEINE Einstellung (er läuft auch im Backend): der Satz
+     kommt als Parameter (`satz` in Prozent, `quelle` als Text). Ohne ihn
+     gilt wie bisher ANGEBOTSABSCHLAG - der Telegram-Bot rechnet unverändert. */
+  function abschlagFuer(preisart, satz) {
     if (preisart === 'wert' || preisart === 'transaktion') return 0;
-    return ANGEBOTSABSCHLAG;
+    var s = (satz == null || satz === '') ? NaN : Number(String(satz).replace(',', '.'));
+    return (isFinite(s) && s >= 0 && s < 50) ? s / 100 : ANGEBOTSABSCHLAG;
   }
+  function _pctTxt(a) { return String(Math.round(a * 1000) / 10).replace('.', ',') + ' %'; }
 
-  function _abschlagGrund(preisart) {
+  function _abschlagGrund(preisart, a, quelle) {
     if (preisart === 'wert') return 'Verkehrswert — kein Angebotsabschlag, das ist bereits ein Wert.';
     if (preisart === 'transaktion') return 'belegter Transaktionspreis — kein Angebotsabschlag nötig.';
+    var wie = quelle ? ' (' + quelle + ')' : '';
     if (preisart === 'angebot') {
-      return 'Angebotspreis — ' + Math.round(ANGEBOTSABSCHLAG * 100) + ' % Abschlag angesetzt, '
-        + 'weil erfahrungsgemäß darunter verkauft wird. Das ist eine ANNAHME, keine Messung.';
+      return 'Angebotspreise — ' + _pctTxt(a) + ' Abschlag angesetzt' + wie + ', '
+        + 'weil erfahrungsgemäß darunter verkauft wird.' + (quelle ? '' : ' Das ist eine ANNAHME, keine Messung.');
     }
     return 'Die Art dieser Quelle ist nicht feststellbar (Angebot oder Transaktion). '
-      + 'Vorsichtshalber wie ein Angebotspreis behandelt: ' + Math.round(ANGEBOTSABSCHLAG * 100)
-      + ' % Abschlag. Das ist eine ANNAHME, keine Messung.';
+      + 'Vorsichtshalber wie ein Angebotspreis behandelt: ' + _pctTxt(a) + ' Abschlag' + wie + '.'
+      + (quelle ? '' : ' Das ist eine ANNAHME, keine Messung.');
   }
 
   /**
@@ -150,16 +161,16 @@ window.QcHeuristik = (function () {
    * @param {string} preisart  'wert' | 'transaktion' | 'angebot' | 'unbekannt'
    * @returns {object|null}    { roh, bereinigt, abschlag_pct, preisart, grund }
    */
-  function marktwertBereinigt(wert, preisart) {
+  function marktwertBereinigt(wert, preisart, satz, quelle) {
     var w = +wert;
     if (!isFinite(w) || w <= 0) return null;
-    var a = abschlagFuer(preisart);
+    var a = abschlagFuer(preisart, satz);
     return {
       roh: w,
       bereinigt: Math.round(w * (1 - a)),
       abschlag_pct: Math.round(a * 1000) / 10,
       preisart: preisart || 'unbekannt',
-      grund: _abschlagGrund(preisart)
+      grund: _abschlagGrund(preisart, a, quelle)
     };
   }
 
@@ -504,7 +515,32 @@ window.QcHeuristik = (function () {
       }
     }
 
-    return { verdict: verdict, farbklasse: farbklasse, text: advice, ziel_kp: ziel, lage: lage };
+    /* ── v2237 · ÜBER DEN EIGENEN MASSSTAB HINAUS ─────────────────────────
+     *
+     * Marcel 14.10.2026: „die Bewertung soll aussagekräftig sein — nach
+     * eigenen Kriterien und auch darüber. Die Wohnung, bei der die Lageklasse
+     * nicht passte, aber der Kauf trotzdem sinnvoll ist."
+     *
+     * Gemessen am Rundgang-Objekt (139.000 €, DealPilot Ø 189.000 €): das
+     * Urteil sagte nur „Nicht kaufen — Rendite unter deinem Ziel"; dass der
+     * Preis rund 28 % unter dem realistischen Marktwert lag, kam nirgends
+     * vor. Das Urteil nach dem eigenen Maßstab BLEIBT (oben, unverändert),
+     * die zweite Sicht kommt dazu: liegt der Kaufpreis deutlich (ab
+     * WERT_SCHWELLE) unter dem bereinigten Marktwert, steht der Wertpuffer
+     * dabei - und bei verfehlter Lage-Rendite das ausdrückliche „trotzdem".
+     * `d.marktwert` ist schon bereinigt (Angebotsabschlag drin). */
+    var wert = null;
+    if (isFinite(markt) && markt > 0 && kp > 0 && (markt - kp) / kp * 100 >= WERT_SCHWELLE) {
+      var puffer = markt - kp, pp = Math.round((markt - kp) / kp * 100);
+      wert = { marktwert: markt, puffer: puffer, pct: pp };
+      advice = String(advice || '').replace(/\s*$/, ' ') + 'Über deinen Maßstab hinaus: gekauft für ' + _fmtEur(kp) + ', realistisch wert rund ' + b(_fmtEur(markt)) +
+        ' — ' + b('+' + _fmtEur(puffer)) + ' (+' + pp + ' %) Wertpuffer ab dem ersten Tag. ' +
+        ((lage && !lage.passt)
+          ? 'Als Renditeobjekt passt er nicht zu deiner ' + lage.klasse + '-Lage, als Substanzkauf kann er sich trotzdem lohnen.'
+          : 'Ein Preis klar unter Markt ist ein zusätzliches Argument für den Kauf.');
+    }
+
+    return { verdict: verdict, farbklasse: farbklasse, text: advice, ziel_kp: ziel, lage: lage, wert: wert };
   }
 
   /* ── 4 · DER SATZ ZUR STUFE ─────────────────────────────────────────────

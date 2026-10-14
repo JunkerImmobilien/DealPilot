@@ -36,7 +36,8 @@ const DOKUMENTE = [
   'frontend/quickcheck-app.html',
   'frontend/marktbericht-app/index.html',
   'frontend/messkabine.html',
-  'frontend/landing/index.html'
+  'frontend/landing/index.html',
+  'frontend/messe-studio.html'   /* v2235 · Messe-Studio laedt whitelabel-override */
 ].filter(function (p) { return fs.existsSync(path.join(process.cwd(), p)); });
 
 /* Je Dokument: welche js-Datei mit welchem Buster? */

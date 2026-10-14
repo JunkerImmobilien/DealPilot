@@ -30,6 +30,18 @@
   function eur(n) { return (n == null || !isFinite(n)) ? null : de(Math.round(n)) + ' €'; }
   function datum(iso) { var t = String(iso || '').split('-'); return t.length === 3 ? t[2] + '.' + t[1] + '.' + t[0] : ''; }
   /* v2233 · TEMPO: Marcel 14.10.2026 - die Kunden muessen Zeit haben zu sehen, was passiert. Steh- und Lesezeiten (ab 600 ms) werden gestreckt; ?tempo=1.6 o. ae. ueberschreibt. Kurze Takte (Tippen, Nachfuehren) bleiben. */
+  /* v2234 · Marcel 14.10.2026: der Erklaertext soll nicht immer unten stehen,
+     sondern als Karte am Feld, mit Linie und Pfeil dorthin. ?zeile=unten
+     holt den alten Untertitel zurueck. */
+  var HAFT = (function () { try { return new URLSearchParams(location.search).get('zeile') !== 'unten'; } catch (e) { return true; } })();
+  /* v2235 · Studio: läuft die App im Rahmen von messe-studio.html (?studio=1),
+     gehen die Zeilen als Kapitel ans Studio (Band unten), Titelkarte und
+     Abspann übernimmt das Studio (Intro/Outro aus dem Baukasten). */
+  var STUDIO = (function () { try { return new URLSearchParams(location.search).has('studio') && window.parent !== window; } catch (e) { return false; } })();
+  /* v2235d · Marcel: „den Pilot musst du ausblenden!" - im Studio ab dem
+     ersten Laden, nicht erst ab start() (vorher stand er gemessen links unten) */
+  if (STUDIO) { try { document.documentElement.classList.add('dpm-studio', 'dpm-laeuft'); var _ps = document.createElement('style'); _ps.textContent = 'html.dpm-studio #dp-pilot,html.dpm-studio #dp-tower,html.dpm-studio .dp-pilot-fab{display:none!important}'; document.head.appendChild(_ps); } catch (e) {} }
+  function anStudio(m) { try { m.source = 'dp-messe-studio'; window.parent.postMessage(m, location.origin); } catch (e) {} }
   var TEMPO = (function () { try { var t = parseFloat(new URLSearchParams(location.search).get('tempo')); return (t > 0.3 && t < 4) ? t : 1.4; } catch (e) { return 1.4; } })();
   function warte(ms) { if (ms >= 600) ms = Math.round(ms * TEMPO); return new Promise(function (r, x) { var l = lauf; setTimeout(function () { l === lauf ? r() : x('stopp'); }, ms); }); }
   function q(sel) { return document.querySelector(sel); }
@@ -46,6 +58,16 @@
       '#dpm-kegel.an{opacity:1}',
       '#dpm-zeile{position:fixed;z-index:10072;left:50%;bottom:34px;transform:translate(-50%,20px);max-width:min(980px,92vw);padding:16px 26px 18px;border-radius:16px;background:rgba(10,9,7,.94);border:1px solid ' + mix(G, 60) + ';box-shadow:0 20px 60px rgba(0,0,0,.6);opacity:0;transition:opacity .4s,transform .4s;text-align:center}',
       '#dpm-zeile.an{opacity:1;transform:translate(-50%,0)}',
+      /* v2234 · Karte am Feld */
+      '#dpm-zeile.haft{left:0;top:0;bottom:auto;transform:none;max-width:440px;width:max-content;text-align:left;padding:14px 20px 16px;border-color:' + mix(GH, 80) + ';transition:opacity .4s,left .6s cubic-bezier(.5,0,.2,1),top .6s cubic-bezier(.5,0,.2,1)}',
+      '#dpm-zeile.haft.an{transform:none}',
+      '#dpm-zeile.haft .t{font-size:21px;line-height:1.35}',
+      '#dpm-zeile.haft .p{justify-content:flex-start}',
+      '#dpm-linie{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:10071;pointer-events:none;opacity:0;transition:opacity .35s;overflow:visible}',
+      '#dpm-linie.an{opacity:1}',
+      '#dpm-linie line{stroke:' + GH + ';stroke-width:2.5;stroke-linecap:round;filter:drop-shadow(0 0 6px ' + mix(GH, 70) + ')}',
+      '#dpm-linie circle{fill:' + GH + '}',
+      '#dpm-linie path{fill:' + GH + '}',
       '#dpm-zeile .k{font:600 11px "JetBrains Mono",monospace;letter-spacing:.2em;text-transform:uppercase;color:' + G + '}',
       '#dpm-zeile .t{font:600 26px/1.3 "Space Grotesk",sans-serif;color:#FDFCFA;margin-top:4px}',
       '#dpm-zeile .t b{color:' + GH + '}',
@@ -76,6 +98,7 @@
       '@media (max-width:640px){#dpm-logo .w{font-size:56px}#dpm-logo{padding:14px 26px 16px}}',
       '#dpm-stopp{position:fixed;z-index:10076;right:14px;bottom:14px;border:1px solid ' + mix(G, 50) + ';background:rgba(10,9,7,.8);color:' + GH + ';border-radius:8px;padding:4px 10px;font:600 12px "JetBrains Mono",monospace;cursor:pointer;opacity:.35}',
       '#dpm-stopp:hover{opacity:1}',
+      'html.dpm-studio #dpm-stopp{display:none}',
       /* v2233 · die Pilot-Hilfe stoert im Video - waehrend eines Laufs ausgeblendet */
       'html.dpm-laeuft #dp-pilot,html.dpm-laeuft #dp-tower{display:none!important}',
       '@media (max-width:640px){#dpm-zeile .t{font-size:18px}#dpm-karte h1{font-size:40px}#dpm-karte p{font-size:16px}}'
@@ -88,8 +111,13 @@
      wird der Rahmen jeder Ebene dazugerechnet. */
   function rect(e) {
     var r = e.getBoundingClientRect(), x = r.left, y = r.top;
-    for (var fe = e.ownerDocument.defaultView.frameElement; fe; fe = fe.ownerDocument.defaultView.frameElement) {
+    /* v2235e · nur bis zum EIGENEN Dokument hochrechnen. Im Studio liegt die
+       App selbst in einem iframe - gemessen (Marcel: „der nicht ausgegraute
+       Bereich ist verschoben") kam dessen Lage im Studio noch einmal dazu. */
+    for (var d = e.ownerDocument; d && d !== document; ) {
+      var fe = d.defaultView.frameElement; if (!fe) break;
       var fr = fe.getBoundingClientRect(); x += fr.left + fe.clientLeft; y += fr.top + fe.clientTop;
+      d = fe.ownerDocument;
     }
     return { left: x, top: y, width: r.width, height: r.height, bottom: y + r.height, right: x + r.width };
   }
@@ -102,12 +130,82 @@
     k.classList.add('an');
   }
   function zeile(kick, text, i, n) {
+    if (STUDIO) { anStudio({ type: 'kapitel', kick: (_aktiv && _aktiv.titel) || 'DealPilot', titel: kick, text: text, i: i, n: n }); return; }
     var z = el('dpm-zeile');
     z.innerHTML = '<div class="k">' + kick + '</div><div class="t">' + text + '</div><div class="p">'
       + Array.apply(null, { length: n }).map(function (_, j) { return '<i class="' + (j <= i ? 'an' : '') + '"></i>'; }).join('') + '</div>';
     z.classList.add('an');
+    z.removeAttribute('data-seite');   /* jede neue Zeile waehlt ihre Seite neu */
+    platziere();
   }
-  function zeileWeg() { var z = q('#dpm-zeile'); if (z) z.classList.remove('an'); }
+  function zeileWeg() { var z = q('#dpm-zeile'); if (z) z.classList.remove('an'); linie(null); }
+  /* v2234 · die Zeile als Karte neben dem Ziel: rechts, links, darunter oder
+     darüber - die erste Seite, auf der sie ganz ins Fenster passt, ohne das
+     Ziel zu verdecken. Passt keine, steht sie wie früher unten. Die Linie geht
+     von der Kartenkante zur Zielkante, der Pfeil zeigt aufs Ziel. Gerechnet
+     wird gegen innerWidth/innerHeight (Zoom 90 %: Bildrahmen ist kleiner). */
+  var ABST = 64, RAND = 18;
+  function linie(a, b) {
+    var sv = q('#dpm-linie');
+    if (!a) { if (sv) sv.classList.remove('an'); return; }
+    if (!sv) {
+      sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.id = 'dpm-linie';
+      sv.innerHTML = '<line/><circle r="5"/><path/>'; document.body.appendChild(sv);
+    }
+    var l = sv.querySelector('line'), c = sv.querySelector('circle'), pf = sv.querySelector('path');
+    var dx = b.x - a.x, dy = b.y - a.y, len = Math.sqrt(dx * dx + dy * dy) || 1, ux = dx / len, uy = dy / len;
+    var sx = b.x - ux * 14, sy = b.y - uy * 14;   /* Linie endet am Pfeilfuss */
+    l.setAttribute('x1', a.x); l.setAttribute('y1', a.y); l.setAttribute('x2', sx); l.setAttribute('y2', sy);
+    c.setAttribute('cx', a.x); c.setAttribute('cy', a.y);
+    pf.setAttribute('d', 'M' + b.x + ' ' + b.y + ' L' + (sx - uy * 8) + ' ' + (sy + ux * 8) + ' L' + (sx + uy * 8) + ' ' + (sy - ux * 8) + ' Z');
+    sv.classList.add('an');
+  }
+  function platziere() {
+    var z = q('#dpm-zeile'); if (!z || !z.classList.contains('an')) return;
+    var t = HAFT && zielEl();
+    if (!t) { if (z.classList.contains('haft')) { z.classList.remove('haft'); z.style.left = z.style.top = ''; } linie(null); return; }
+    var r = rect(t), pad = _pad, W = innerWidth, H = innerHeight;
+    r = { left: r.left - pad, top: r.top - pad, right: r.right + pad, bottom: r.bottom + pad };
+    var neu = !z.classList.contains('haft');
+    z.classList.add('haft');
+    var w = z.offsetWidth, h = z.offsetHeight, cy = (r.top + r.bottom) / 2, cx = (r.left + r.right) / 2;
+    function klemm(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+    var seiten = [
+      { x: r.right + ABST, y: klemm(cy - h / 2, RAND, H - h - RAND), ok: r.right + ABST + w <= W - RAND, k: 'l' },
+      { x: r.left - ABST - w, y: klemm(cy - h / 2, RAND, H - h - RAND), ok: r.left - ABST - w >= RAND, k: 'r' },
+      { x: klemm(cx - w / 2, RAND, W - w - RAND), y: r.bottom + ABST, ok: r.bottom + ABST + h <= H - RAND, k: 'o' },
+      { x: klemm(cx - w / 2, RAND, W - w - RAND), y: r.top - ABST - h, ok: r.top - ABST - h >= RAND, k: 'u' }
+    ].filter(function (o) { return o.ok; });
+    if (!seiten.length) { z.classList.remove('haft'); z.style.left = z.style.top = ''; linie(null); return; }
+    /* dieselbe Seite behalten, solange sie passt - sonst springt die Karte */
+    var o = seiten.filter(function (x) { return x.k === z.getAttribute('data-seite'); })[0] || seiten[0];
+    z.setAttribute('data-seite', o.k);
+    /* v2234c · Seitenwechsel: springen statt gleiten - gemessen lief die Karte
+       sonst 0,15-0,3 s quer ueber das Feld, das sie erklaert */
+    var spring = neu || (_lz && _lz.k !== o.k);
+    if (spring) { z.style.transition = 'opacity .4s'; }
+    z.style.left = Math.round(o.x) + 'px'; z.style.top = Math.round(o.y) + 'px';
+    if (spring) { void z.offsetWidth; z.style.transition = ''; }
+    /* v2234b · die Linie wird aus dem AKTUELLEN Kartenrechteck gezogen und
+       waehrend des Gleitens (0,6 s) in jedem Bild nachgefuehrt. GEMESSEN: aus
+       der Zielposition gerechnet hing sie beim Szenenwechsel lose neben der
+       Karte, die noch unterwegs war. */
+    _lz = { k: o.k, r: r }; linieNach();
+    var bis = Date.now() + 750;
+    (function nach() { linieNach(); if (Date.now() < bis) requestAnimationFrame(nach); })();
+  }
+  var _lz = null;
+  function linieNach() {
+    var z = q('#dpm-zeile'); if (!_lz || !z || !z.classList.contains('haft')) return;
+    var c = z.getBoundingClientRect(), r = _lz.r, k = _lz.k, a, b;
+    function klemm(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+    var my = c.top + c.height / 2, mx = c.left + c.width / 2;
+    if (k === 'l') { a = { x: c.left, y: my }; b = { x: r.right, y: klemm(my, r.top + 8, r.bottom - 8) }; }
+    else if (k === 'r') { a = { x: c.right, y: my }; b = { x: r.left, y: klemm(my, r.top + 8, r.bottom - 8) }; }
+    else if (k === 'o') { a = { x: mx, y: c.top }; b = { x: klemm(mx, r.left + 8, r.right - 8), y: r.bottom }; }
+    else { a = { x: mx, y: c.bottom }; b = { x: klemm(mx, r.left + 8, r.right - 8), y: r.top }; }
+    linie(a, b);
+  }
   function karte(html) { var k = el('dpm-karte'); if (html == null) { k.classList.remove('an'); return; } k.innerHTML = '<div>' + html + '</div>'; k.classList.add('an'); }
   /* v2219b · Der Kegel FOLGT seinem Ziel: über einen Selektor, alle 200 ms neu
      aufgelöst. GEMESSEN: der Umschalter Ist/Soll baut sich beim Klick neu (der
@@ -127,14 +225,16 @@
      CSS-Pixel gegen die Höhe des Bildschirmfotos (726) verglichen; das Fenster
      hat bei 90 % Zoom 987 CSS-px, der Kasten lag frei. Immer innerHeight messen. */
   var _nachScroll = 0, _letzterScroll = 0;
-  function frei(r) { return r.top >= 70 && r.bottom <= innerHeight - 170; }
+  /* v2235c · im Studio steht die Zeile ausserhalb der App: unten nichts freihalten */
+  function unten() { return STUDIO ? 24 : 170; }
+  function frei(r) { return r.top >= 70 && r.bottom <= innerHeight - unten(); }
   /* v2219f · scrollIntoView(smooth) kam im Drehbuch gemessen NIE an (Kasten blieb
      bei 572-736 stehen; dieselbe Zeile ohne smooth scrollte sofort). Gescrollt wird
      deshalb der Container selbst (.main-col), mittig in den freien Bereich. */
   function scroller(e) {
     /* v2221 · durch iframes hindurch: das Quick-Check-Dokument scrollt nicht
        selbst (es ist so hoch wie sein Inhalt), gescrollt wird .main-col */
-    for (var a = e; a; a = a.ownerDocument.defaultView.frameElement) {
+    for (var a = e; a; a = a.ownerDocument === document ? null : a.ownerDocument.defaultView.frameElement) {   /* v2235e: nicht ins Studio hinauf */
       var w = a.ownerDocument.defaultView;
       for (var s = a.parentElement; s && s !== a.ownerDocument.body; s = s.parentElement) {
         /* v2222b · nur SENKRECHTE Scroller: die Spannen-Kacheln liegen in einem
@@ -147,7 +247,7 @@
     return document.scrollingElement;
   }
   function holen(e, sanft) {
-    var r = rect(e), s = scroller(e), mitte = (70 + innerHeight - 170) / 2;
+    var r = rect(e), s = scroller(e), mitte = (70 + innerHeight - unten()) / 2;
     var d = r.height > innerHeight - 260 ? r.top - 80 : (r.top + r.height / 2) - mitte;
     /* v2222b · immer sofort: sanftes Scrollen brauchte gemessen bis zu 3 s,
        so lange stand der Kegel außerhalb des Bildes. Die Bewegung liefert der
@@ -157,13 +257,14 @@
   function folgen() {
     if (_folge) return;
     _folge = setInterval(function () {
-      var z = zielEl(); if (!z) { kegel(null); return; }
+      var z = zielEl(); if (!z) { kegel(null); platziere(); return; }
       var r = rect(z);
       if (!frei(r) && _nachScroll < 3 && Date.now() - _letzterScroll > 1200) {
         _nachScroll++; _letzterScroll = Date.now();
         holen(z, false);
       }
       kegel(z, _pad);
+      platziere();
     }, 200);
   }
   async function zeige(ziel, pad) {
@@ -452,7 +553,7 @@
           if (r) r.click();
           await warte(1300);
           await zeige(function () { return q('#oabi-ov .oabi-body') || q('#oabi-result'); }, 4);
-          s.zeile('Jeder Wert mit Quelle', 'Kaufpreis und Hausgeld aus dem Exposé, Fläche, Baujahr und Lage aus dem Marktbericht — ein Klick übernimmt.');
+          s.zeile('Jeder Wert mit Quelle', 'Das Exposé gilt — die Werte der anderen Wohnung bleiben draußen. Jeder Wert mit Quelle, ein Klick übernimmt.');   /* v2236 */
           await warte(4400);
           var ap = q('#oabi-apply'); if (ap) ap.click();
           await warte(1300);
@@ -461,11 +562,11 @@
           await zeige(function () { return qcEl('qc7-sources'); }, 6);
           var st = qcEl('_mb_state');
           if (!st) { var d = qcDoc(); st = d.createElement('input'); st.type = 'hidden'; st.id = '_mb_state'; d.body.appendChild(st); }
-          st.value = JSON.stringify({ ts: Date.now(), card: MB_KARTE, mode: 'med', collapsed: false });
+          _mbAkt = mbKarte(); st.value = JSON.stringify({ ts: Date.now(), card: _mbAkt, mode: 'med', collapsed: false });   /* v2237: mit Abschlag wie ein echter Abruf */
           try { qcWin()._oabFeedTrigger(); } catch (e) {}
           await warte(900);
           await zeige(function () { return qcEl('oab-results'); }, 6);
-          var mw = MB_KARTE.mw, mm = MB_KARTE.mm;
+          var mw = _mbAkt.mw, mm = _mbAkt.mm;
           s.zeile('Marktwertindikation', 'Die Wohnung ist leer — DealPilot schätzt den Markt: Marktwert <b>' + eur(mw.low) + ' – ' + eur(mw.high) + '</b>, Miete <b>' + eur(mm.low) + ' – ' + eur(mm.high) + '</b> kalt.');
           await warte(5200);
         },
@@ -852,7 +953,126 @@
      nach v2224/v2227b: angezeigter Score (76 · Gut), Brücke „guter Deal - trotzdem verhandeln, weil …“, im Du. */
   var KI_ANALYSE = {"negotiate":"Dies ist ein guter Deal, da die Bruttomietrendite mit 8,7 % und die Eigenkapitalrendite mit 10,1 % beide überdurchschnittlich stark ausfallen und damit klar über deiner Zielvorgabe von 7 % liegen. Obwohl die Kennzahlen insgesamt sehr gut passen, liegt dein Zinssatz mit 4,22 % leicht über dem aktuellen Marktzins von 3,81 % (laut Bundesbank, Stand 08.2026), und das Hausgeld ist mit 415 EUR/Monat relativ hoch. Daher solltest du versuchen, beim Kaufpreis um mindestens 3-5 % zu verhandeln.","pros":["Sehr hohe Bruttomietrendite von 8,7 %, deutlich über Zielwert","Nettomietrendite mit 6,9 % solide für eine C-Lage","Eigenkapitalrendite mit 10,1 % überdurchschnittlich attraktiv","Positiver monatlicher Cashflow von 357 EUR"],"cons":["Zinssatz liegt über dem aktuellen Marktzins","Hausgeld im Verhältnis zur Miete hoch","Objekt erfordert noch Prüfungen (Bonität, Hausgeld, Protokolle, Energieausweis)"],"opinion":"Die Investitionskennzahlen sprechen für einen starken Kauf: Rendite und Cashflow sind überdurchschnittlich, insbesondere im Vergleich zur C-Lage und deiner Zielsetzung. Ein leicht erhöhter Zinssatz und ein hohes Hausgeld bieten jedoch Potenzial für Kaufpreisverhandlungen. Insgesamt ein überzeugender Deal, die noch offenen Prüfpunkte solltest du vor Abschluss klären."};
   var QC_IMPORT = {"files":[{"name":"Expose.pdf","type":"expose","userType":null,"cache":{"expose":{"adresse":"Hölderlinstr. 1, 32547 Bad Oeynhausen","plz":"32547","ort":"Bad Oeynhausen","objektart":"Eigentumswohnung","energieklasse":"D","heizungsart":"Gas-Zentralheizung","stellplatz":"Tiefgarage","kaufpreis":139000,"wohnflaeche":73.31,"baujahr":1983,"zimmer":2,"hausgeld":415,"energieverbrauch":117.7,"balkon":true,"keller":true}}},{"name":"Marktbericht.pdf","type":"market","userType":null,"cache":{"market":{"adresse":"Sachsenstraße 16, 32052 Herford","plz":"32052","ort":"Herford","objektart":"Wohnung","bewertungsdatum":"2025-10-15","konfidenz":"Gut","makrolage":"gut","mikrolage":"gut","bevoelkerung_entwicklung":"stabil","nachfrage":"mittel","wertsteigerung":"mittel","entwicklung":"begrenzt","kueche_qualitaet":"Gehoben","bad_qualitaet":"Normal","boden_qualitaet":"Standard","fenster_qualitaet":"Gehoben","kueche_zustand":"Neu / kürzlich modernisiert","bad_zustand":"Gut in Stand gehalten","boden_zustand":"Gut in Stand gehalten","fenster_zustand":"Gut in Stand gehalten","badezimmer":"1","etage":"1","etagen":"3","modernisierungsjahr":"2025","garagen":"1","balkon_flaeche":"10","energie_label":"B","wohnflaeche":96,"baujahr":1994,"sanierungsjahr":2025,"zimmer":3,"verkehrswert":215200,"verkehrswert_min":196000,"verkehrswert_max":233000,"preis_pro_qm":2242,"lage_geraeusch":5,"lage_einkaufen":4.7,"lage_bildung":4.3,"lage_gastronomie":4.2,"lage_gesundheit":4.6,"lage_freizeit":2.8,"wertentwicklung_3jahre_pct":14.1,"wertentwicklung_1jahr_pct":4.17,"prognose_naechstes_jahr_pct":3.49,"markt_durchschnittspreis":279000,"markt_tage_auf_dem_markt":139}}}]};
-  var MB_KARTE = {"area":96,"rating":"Attraktiv","conf":{"label":"Niedrig","pct":43},"mikro":"Sehr gut · 8,2","makro":"Gut · 6,0","microRaw":82,"macroRaw":60,"trendRaw":null,"trend":"–","zensus":{"ebene":"Gemeinde","name":"Bad Oeynhausen, Stadt","leer":3.6,"eig":47.3,"miete":5.73},"brw":{"wert":200,"quelle":"BORIS-NRW","stichtag":"2026-01-01"},"makroGemessen":4,"mw":{"low":199000,"med":251000,"high":351000,"sqm":"2.615 €/m²"},"mm":{"low":766,"med":881,"high":1012,"sqm":"9,18 €/m² kalt"}};
+  /* v2236 · Marcel: „die Bewertung ist viel zu hoch". Der alte Mitschnitt
+     rechnete 96 m² / Bj 1994 aus dem Marktbericht der ANDEREN Wohnung. Neu
+     einmal echt abgerufen (14.10.2026, Staging) für Hölderlinstr. 1, 73,31 m²,
+     Bj 1983, Eigentumswohnung: Ø 189.000 €, Spanne 153.000–277.000 €. */
+  var MB_KARTE = {"area":73.31,"rating":"Attraktiv","conf":{"label":"Niedrig","pct":39},"mikro":"Sehr gut · 8,2","makro":"Gut · 6,0","microRaw":82,"macroRaw":60,"trendRaw":null,"trend":"–","zensus":{"ebene":"Gemeinde","name":"Bad Oeynhausen, Stadt","leer":3.6,"eig":47.3,"miete":5.84},"brw":{"wert":200,"quelle":"BORIS-NRW","stichtag":"2026-01-01"},"makroGemessen":4,"mw":{"low":153000,"med":189000,"high":277000,"sqm":"2.580 €/m²"},"mm":{"low":597,"med":683,"high":776,"sqm":"9,32 €/m² kalt"}};
+  /* v2237 · Pilot-Analyse einmal echt für den Endstand des Rundgangs (Miete Ø,
+     20 % EK, C-Lage, Score 60) - MIT DealPilot-Marktwert (178.000 € nach 5,8 %
+     Abschlag) und dem Zwei-Sichten-Prompt. */
+  var KI_RUNDGANG = {"negotiate": "Du solltest zu diesem Preis nicht kaufen, da die Bruttomietrendite mit 5,9 % deutlich unter deinem Zielwert von 7 % für eine C-Lage liegt. Rechnerisch erreichst du deine Zielrendite erst bei einem Kaufpreis von 117.086 €. Das wäre der Betrag, den du konkret anstreben solltest – also rund 16 % unter dem aktuellen Angebotspreis.", "pros": ["Cashflow mit +28 €/Monat ist positiv, das Objekt trägt sich rechnerisch selbst.", "DSCR von 1,29 sorgt für ausreichend Schuldendienstdeckung.", "Score von 60/100 zeigt eine solide Ausgangslage.", "DealPilot-Marktbewertung: Der Kaufpreis liegt 39.000 € (28 %) unter dem geschätzten Marktwert – Wertpuffer ab dem ersten Tag."], "cons": ["Bruttomietrendite liegt mit 5,9 % klar unter deinem Zielwert von 7 % für diese Lageklasse.", "Eigenkapitalrendite mit nur 0,8 % ist niedrig.", "Hausgeld mit 415 €/Monat belastet die Rendite zusätzlich."], "opinion": "Nach deiner Zielvorgabe für C-Lagen ist das Objekt aktuell kein Kauf, weil die gewünschte Rendite nicht erreicht wird. Die Kennzahlen zeigen aber, dass der Deal sich selbst trägt und im Marktvergleich ein Wertpuffer vorhanden ist – der Kaufpreis liegt 39.000 € unter der DealPilot-Marktbewertung. Als klassisches Renditeobjekt passt die Wohnung nicht zu deinen Anforderungen, als wertgesicherter Substanzkauf bleibt sie jedoch interessant."};
+  /* v2237 · Der Mitschnitt ist die ROHE Antwort (Angebotsniveau). Wie bei einem
+     echten Abruf geht er durch DealPilotAbschlag.anwenden (Satz aus den
+     Einstellungen, sonst Marktdurchschnitt) - im Quick-Check-Fenster. */
+  var _mbAkt = MB_KARTE;
+  function mbKarte() {
+    var c = JSON.parse(JSON.stringify(MB_KARTE));
+    try { var A = (qcWin() && qcWin().DealPilotAbschlag) || window.DealPilotAbschlag; if (A) A.anwenden(c); } catch (e) {}
+    return c;
+  }
+
+  /* ═══ DREHBUCH 6 · QUICK BOARDING — DER RUNDGANG (v2235) ═══════════════
+     Marcel 14.10.2026: „oben bei der Datenaufnahme die Methoden vorstellen,
+     nacheinander, dann mit einer weitermachen und weiter erklären … bis zum
+     ‚Als Objekt speichern'". Gedacht fürs Studio (messe-studio.html, Intro 03
+     Boarding Pass, Outro 02 Am Stand), läuft aber auch allein. Ab dem PDF-Weg
+     dieselben Szenen wie 'quickcheck' - dieselben Mitschnitte, kein Abruf.
+     Gespeichert wird NICHT: die letzte Szene zeigt den Knopf. */
+  function qcTile(src) { return function () { return qcSel('.qc7-src[data-src="' + src + '"]'); }; }
+  var QC = DREHBUECHER.quickcheck.szenen;
+  DREHBUECHER['quickcheck-rundgang'] = {
+    titel: 'Quick Boarding',
+    unterzeile: 'Fünf Wege zu den Daten · ein Urteil · ein Objekt',
+    objekt: null,
+    aufraeumen: DREHBUECHER.quickcheck.aufraeumen,
+    abspann: DREHBUECHER.quickcheck.abspann,
+    szenen: [
+      async function (s) {   /* 1 · Quick Boarding öffnen - vorbelegt */
+        try { _spanVorher = localStorage.getItem('qc_span_config'); } catch (e) { _spanVorher = undefined; }
+        if (typeof window.sbActionsAction === 'function') sbActionsAction('quickcheck');
+        await warteAuf(function () { var d = qcDoc(); return d && d.readyState === 'complete' && qcEl('qc_kp') && !qcEl('qc_kp').value && qcEl('qc7-sources'); }, 10000);
+        await warteAuf(function () { return qcEl('qc_zins') && qcEl('qc_zins').value; }, 4000);
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await warte(600);
+        await zeige(function () { return qcEl('qc7-sources'); }, 6);
+        s.zeile('Die Datenaufnahme', 'Oben die Datenaufnahme: <b>fünf Wege</b>, wie ein Objekt in DealPilot kommt — einer reicht.');
+        await warte(4600);
+      },
+      async function (s) {   /* 2 · Exposé / Marktbericht */
+        await zeige(qcTile('expose'), 8);
+        s.zeile('Exposé & Marktbericht', 'PDFs hineinziehen — Exposé, Marktbericht, Mietaufstellung. DealPilot liest jeden Wert <b>mit Quelle</b>.');
+        await warte(5000);
+      },
+      async function (s) {   /* 3 · Sprache */
+        await zeige(qcTile('voice'), 8);
+        s.zeile('Sprache', 'Bei der Besichtigung einfach <b>erzählen</b> — Fläche, Miete, Zustand. DealPilot schreibt mit und füllt die Felder.');
+        await warte(5000);
+      },
+      async function (s) {   /* 4 · ImmoMetrica */
+        await zeige(function () { return qcEl('qc-imo-tile'); }, 8);
+        s.zeile('ImmoMetrica', 'Direkt aus dem Inserat: deine gespeicherte Suche öffnen, Objekt wählen, <b>übernehmen</b>.');
+        await warte(5000);
+      },
+      async function (s) {   /* 5 · DealPilot-Marktbewertung */
+        await zeige(qcTile('dpmb'), 8);
+        s.zeile('DealPilot-Marktbewertung', 'Kein Exposé zur Hand? <b>Abrufen</b> — Marktwert und Marktmiete für die Adresse, aus DealPilots eigener Bewertung.');
+        await warte(5200);
+      },
+      async function (s) {   /* 6 · Von Hand */
+        await zeige(function () { return qcGruppe('obj'); }, 6);
+        s.zeile('Oder von Hand', 'Oder einfach <b>tippen</b> — jedes Feld rechnet sofort mit, Score und Urteil laufen mit.');
+        await warte(4600);
+      },
+      QC[2],   /* 7 · Weiter mit den PDFs (Exposé + Marktbericht) */
+      QC[3],   /* 8 · Marktwertindikation (echter Mitschnitt, richtige Wohnung) */
+      async function (s) {   /* 9 · Angebotspreise -> realistischer Wert */
+        await zeige(function () { return qcEl('oab-results'); }, 6);
+        var ab = _mbAkt.abschlag || {}, pz = String(ab.pct || '').replace('.', ',');
+        s.zeile('Achtung: Angebotspreise', 'Vergleichswerte aus Inseraten sind <b>Angebotspreise</b>. DealPilot zieht deinen Abschlag gleich ab: <b>' + pz + ' %</b>, den aktuellen Marktdurchschnitt — Ø ' + eur(ab.roh && ab.roh.med) + ' → realistisch <b>' + eur(_mbAkt.mw.med) + '</b>.');
+        await warte(7000);
+      },
+      async function (s) {   /* 10 · Miete Ø -> erste Einschätzung */
+        await zeige(function () { return qcSel('.avs-spanne'); }, 8);
+        var t = qcSel('.avs-spanne [data-spanne="mid"]'); if (t) t.click();
+        s.zeile('Die Miete', 'Für die Rechnung die mittlere Marktmiete: <b>' + eur(_mbAkt.mm.med) + '</b> kalt …');
+        await warte(2600);
+        await zeige(function () { return qcEl('score-block'); }, 4);
+        await warte(900);
+        var sc = qcScore();
+        s.zeile('Sofort eine Einschätzung', 'Voll finanziert: Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+        await warte(4800);
+      },
+      QC[5],   /* 11 · Mehr Eigenkapital */
+      QC[6],   /* 12 · Gegen deine Lage (B passt, C kippt das Urteil) */
+      async function (s) {   /* 13 · Pilot-Analyse (einmal echt für diesen Stand) */
+        _kiFrei = KI_RUNDGANG;
+        qcSetze('qc_lageklasse', 'C');   /* neu rechnen -> die Automatik fragt nach 1,8 s */
+        await zeige(function () { return qcEl('ai-card'); }, 6);
+        s.zeile('Die Pilot-Analyse', 'Zum Schluss liest der Pilot alles zusammen …');
+        await warteAuf(function () { return /KI-Analyse/.test(qcText('ai-source')) && qcText('ai-pros').length > 20; }, 9000);
+        await warte(800);
+        await zeige(function () { var n = qcEl('ai-negotiate-v'); return n && (n.parentElement || n); }, 8);
+        s.zeile('Die Pilot-Analyse', 'Der Pilot bleibt ehrlich: für deine <b>C-Lage</b> zu wenig Rendite — dein Ziel gäbe es erst bei <b>117.086 €</b>.');
+        await warte(6500);
+        await zeige(function () { return qcEl('ai-card'); }, 6);
+        s.zeile('Die Pilot-Analyse', 'Und er sieht mehr: <b>39.000 € unter Marktwert</b> — als Renditeobjekt nein, als <b>Substanzkauf</b> interessant.');
+        await warte(5500);
+        _kiFrei = null;
+      },
+      async function (s) {   /* 14 · Wertpuffer ab Tag 1 - steht seit v2237 im Urteil selbst */
+        await zeige(function () { var n = qcEl('ai-negotiate-v'); return n && /Wertpuffer/.test(n.textContent) ? (n.parentElement || n) : qcEl('oab-results'); }, 8);
+        var real = _mbAkt.mw.med, kp = Number((qcEl('qc_kp') || {}).value) || 0;   /* v2237: Marktwert nach Abschlag, Kaufpreis live */
+        s.zeile('Und trotzdem spannend', 'Nicht deine Lage-Rendite — aber gekauft für <b>' + eur(kp) + '</b>, realistisch wert rund <b>' + eur(real) + '</b>: <b>+' + eur(real - kp) + '</b> Wertpuffer ab dem ersten Tag.');
+        await warte(7500);
+      },
+      async function (s) {   /* 15 · Als Objekt speichern - gezeigt, nicht geklickt */
+        await zeige(function () { var b = qcEl('save-btn'); return b && b.getBoundingClientRect().width ? b : null; }, 12);
+        s.zeile('Als Objekt speichern', 'Passt er zu dir? <b>Ein Klick</b> — als Objekt gespeichert, mit allen Werten, Quellen und der Pilot-Analyse.');
+        await warte(6000);
+      }
+    ]
+  };
 
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0, _aktiv = null;
@@ -869,27 +1089,38 @@
   async function start(name, opts) {
     var D = DREHBUECHER[name]; if (!D) { console.warn('[messe] unbekanntes Drehbuch: ' + name); return; }
     css(); stopp();
-    try { document.documentElement.classList.add('dpm-laeuft'); } catch (e) {}
+    try { document.documentElement.classList.add('dpm-laeuft'); if (STUDIO) document.documentElement.classList.add('dpm-studio'); } catch (e) {}
     var g = lauf = Date.now(); _aktiv = D;
     var b = el('dpm-stopp', 'button'); b.type = 'button'; b.textContent = '■'; b.title = 'Drehbuch beenden (Esc)'; b.onclick = stopp;
     document.addEventListener('keydown', esc, true);
     var n = D.szenen.length;
     try {
       do {
-        karte('<div class="k">DealPilot · Geschichte</div><h1>' + D.titel + '</h1><p>' + D.unterzeile + '</p>');
+        if (!STUDIO) karte('<div class="k">DealPilot · Geschichte</div><h1>' + D.titel + '</h1><p>' + D.unterzeile + '</p>');
         if (D.objekt) {   /* v2221: der Quick-Check braucht kein Objekt */
           var id = await objektFinden(D.objekt);
           if (!id) { karte('<h1>Objekt fehlt</h1><p>Für dieses Drehbuch fehlt das Demo-Objekt in diesem Konto.</p>'); await warte(4000); break; }
           if (window._currentObjKey !== id && typeof window.loadSaved === 'function') await window.loadSaved(id);
         }
-        await warte(3200);
-        karte(null); await warte(700);
+        if (STUDIO) {
+          /* das Studio spielt das Intro; los geht es auf sein Zeichen */
+          anStudio({ type: 'bereit', titel: D.titel, n: n });
+          await new Promise(function (ok, x) {
+            var l = lauf, t = setInterval(function () { if (l !== lauf) { clearInterval(t); x('stopp'); } }, 300);
+            addEventListener('message', function h(e) {
+              if (e.origin === location.origin && e.data && e.data.source === 'dp-messe-studio' && e.data.type === 'los') { removeEventListener('message', h); clearInterval(t); ok(); }
+            });
+          });
+        } else { await warte(3200); karte(null); await warte(700); }
         for (var i = 0; i < n; i++) {
           var ii = i;
           await D.szenen[i]({ zeile: function (k, t) { zeile(k, t, ii, n); } });
         }
+        /* v2235 · im Studio erst das Outro, dann aufräumen (es deckt den Rahmen) */
+        if (STUDIO) { anStudio({ type: 'ende' }); await warte(1400); }
         _ziel = null; kegel(null); zeileWeg();
         if (D.aufraeumen) D.aufraeumen(); else reiter('s0');
+        if (STUDIO) break;
         if (D.abspann && D.abspann.length) {
           for (var ai = 0; ai < D.abspann.length; ai++) { karte(null); await warte(120); karte(D.abspann[ai].html); await warte(D.abspann[ai].ms); }
         } else { karte(D.schluss); await warte(5500); }

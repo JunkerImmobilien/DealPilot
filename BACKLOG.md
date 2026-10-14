@@ -36,6 +36,16 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N74 · DealPilot-Marktbewertung: Abschlag auf Angebotspreise — ERLEDIGT 14.10.2026 (v2237: Einstellung, Ø Markt 5,8 %, im Urteil)
+> 14.10.2026: Die Spanne der DealPilot-Marktbewertung beruht auf Angebotspreisen. ImmoScout24/Sprengnetter (ETW, bundesweit, 12/2025): Kaufpreise 5,8 % unter Angebot (Mitte 2025: 6,8 %; Köln 9,2 %, Hamburg 7,8 %, Leipzig 0 %). Hamburger Studie: 6,7 %. Im Messe-Video wird der Abschlag nur im Text gezeigt (6 %, Ø 189.000 € → rund 178.000 €). Offen: soll die App den Abschlag selbst abziehen oder ausweisen (pauschal, regional, mit Quelle)?
+
+### N75 · Pilot-Analyse kennt den Marktwert nicht — ERLEDIGT 14.10.2026 (v2237: `markt` im Aufruf, zwei Sichten im Prompt)
+> 14.10.2026, Rundgang-Wohnung (Kaufpreis 139.000 €, DealPilot Ø 189.000 €, realistisch ~178.000 €): Die Analyse sagt nur „kein Kauf, höchstens 117.086 €" (Zielrendite C-Lage). Den Wertpuffer gegenüber dem Marktwert erwähnt sie nicht. Zu prüfen: geht `_mb_state` (Marktwert/Spanne) in `/ai/quickcheck-analyse` mit? Marcel: „nicht in meiner Lageklasse, aber mega, weil direkte Wertsteigerung möglich".
+
+### N73 · Quick-Check-Score gegen Investor Deal Score — ENTSCHIEDEN 14.10.2026: bleibt getrennt
+> Marcel: Der Investor Deal Score bleibt gesondert, weil er mehr Kennzahlen hat, deutlich genauere Aussagen trifft und die Lage eingeht. Quick-Check = DealScore (gemessen gleich), DS2 eigenständig.
+> Gemessen 14.10.2026 (Testobjekt Musterweg 7, Bielefeld, Staging): Quick-Check 46 = Objekt-DealScore 46 (alle Teilwerte gleich). Der Investor Deal Score (DS2, 24 Kennzahlen inkl. Lage/Markt) zeigt am selben Objekt 63. Zwei Zahlen für dasselbe Objekt. Offen: welcher Score wo führt, oder ob DS2 im Quick-Check mitgezeigt bzw. angeglichen wird.
+
 ### N72 · Quick-Check: DealPilot-Marktwert erreicht den Score nicht — offen, Entscheidung Marcel
 > Gefunden beim Messe-Drehbuch (v2222). `QcApp.registerDpmb` füllt `_avmResults` (Potenzial-Teilscore, Pro/Contra „Preis vs. Marktwert"). Der einzige Aufruf steht in `frontend/js/dealpilot-mb-qc.js:298` hinter dem `return` aus v832c und nutzt `global.QcApp`, das als `const` nicht am window hängt.
 > Gemessen: Potenzial 30 bei Marktwert 199–351 T€ und Kaufpreis 139 T€. Eine Korrektur ändert Quick-Check-Scores, deshalb erst nach Freigabe.

@@ -22,14 +22,24 @@
 
   var SETS = [
     { id: 'dp',  name: 'DealPilot-Standard', txt: 'Die heutigen Vorbelegungen.',
-      werte: { ip_tilgung_default: '1.5', ip_ek_quote_default: '10', ip_mietausfall_pct: '1', ip_min_dscr: '1.2' } },
+      werte: { ip_tilgung_default: '1.5', ip_ek_quote_default: '10', ip_mietausfall_pct: '1', ip_min_dscr: '1.2', ip_angebot_abschlag_pct: '' } },
     { id: 'vor', name: 'Vorsichtig', txt: 'Mehr Puffer, strengere Grenzen.',
-      werte: { ip_tilgung_default: '2', ip_ek_quote_default: '20', ip_mietausfall_pct: '3', ip_min_dscr: '1.3' } },
+      werte: { ip_tilgung_default: '2', ip_ek_quote_default: '20', ip_mietausfall_pct: '3', ip_min_dscr: '1.3', ip_angebot_abschlag_pct: '9' } },
     { id: 'ren', name: 'Renditeorientiert', txt: 'Mehr Hebel, weniger Puffer.',
-      werte: { ip_tilgung_default: '1', ip_ek_quote_default: '5', ip_mietausfall_pct: '1', ip_min_dscr: '1.1' } }
+      werte: { ip_tilgung_default: '1', ip_ek_quote_default: '5', ip_mietausfall_pct: '1', ip_min_dscr: '1.1', ip_angebot_abschlag_pct: '' } }
   ];
+  /* v2237 · Abschlag auf Angebotspreise im Set: '' = recherchierter Marktdurchschnitt
+     (config.js angebotAbschlagMarkt). „Vorsichtig" nimmt 9 % - so viel lagen die
+     Großstädte mit dem größten Spielraum (Köln 9,2 %, Hamburg Mitte 2025 10 %). */
+  function gleichWert(a, b) {
+    var sa = String(a == null ? '' : a).trim(), sb = String(b == null ? '' : b).trim();
+    if (sa === '' || sb === '') return sa === sb;
+    var x = parseFloat(sa.replace(',', '.')), y = parseFloat(sb.replace(',', '.'));
+    return isFinite(x) && isFinite(y) && Math.abs(x - y) < 1e-9;
+  }
+  function abschlagMarkt() { var m = window.DealPilotConfig && DealPilotConfig.angebotAbschlagMarkt; return m ? String(m.pct).replace('.', ',') + ' %' : ''; }
   var SET_ZEILEN = [['ip_tilgung_default', 'Tilgung', ' %'], ['ip_ek_quote_default', 'Eigenkapital', ' %'],
-                    ['ip_mietausfall_pct', 'Mietausfall', ' %'], ['ip_min_dscr', 'Min-DSCR', '']];
+                    ['ip_mietausfall_pct', 'Mietausfall', ' %'], ['ip_min_dscr', 'Min-DSCR', ''], ['ip_angebot_abschlag_pct', 'Angebotsabschlag', ' %']];
 
   /* Je Abschnitt: Symbol, Kurztext und welche Felder die Karte zeigt.
      Zuordnung über den Überschrift-Text (Anfang), nicht über die Position. */
@@ -45,13 +55,15 @@
     { an: 'Lageklassen', txt: 'Zielrendite brutto je Lage — der Maßstab der Ampel im Quick-Check.', lage: true },
     { an: 'Persönliche Mindest', txt: 'Deine persönlichen Kaufgrenzen.',
       felder: [['ip_min_dscr', 'DSCR', ''], ['ip_min_cashflow_vor_st', 'Cashflow', ' €/Monat'], ['ip_max_ltv', 'max. LTV', ' %']] },
+    { an: 'Marktbewertung', txt: 'Abschlag auf Angebotspreise — so viel unter dem Inseratspreis wird im Schnitt verkauft.',
+      felder: [['ip_angebot_abschlag_pct', 'Angebotsabschlag', ' %']] },
     { an: 'Steuer', txt: 'Dein persönlicher Grenzsteuersatz. Gesellschaften rechnen mit dem Satz aus Mandanten.',
       felder: [['ip_grenzsteuersatz', 'Grenzsteuersatz', ' %']] },
     { an: 'Standort', txt: 'Bundesland und Kaufnebenkosten.',
       felder: [['ip_bundesland', 'Bundesland', ''], ['ip_notar_grundbuch', 'Notar/Grundbuch', ' %'], ['ip_maklerkosten', 'Makler', ' %']] }
   ];
   /* Welche Felder ein Set setzt - in den Karten als „Set" bzw. „eigen" markiert. */
-  var SET_FELDER = { ip_tilgung_default: 1, ip_ek_quote_default: 1, ip_mietausfall_pct: 1, ip_min_dscr: 1 };
+  var SET_FELDER = { ip_tilgung_default: 1, ip_ek_quote_default: 1, ip_mietausfall_pct: 1, ip_min_dscr: 1, ip_angebot_abschlag_pct: 1 };
   var LS_SET = 'dp_std_set';
   function setGemerkt() { try { return localStorage.getItem(LS_SET) || 'dp'; } catch (e) { return 'dp'; } }
   function setMerken(id) { try { localStorage.setItem(LS_SET, id); } catch (e) {} }
@@ -70,6 +82,7 @@
       return (b && b.value === 'percent') ? '% der Miete' : 'Euro je Objektart';
     }
     var e = document.getElementById(id); if (!e) return null;
+    if (id === 'ip_angebot_abschlag_pct' && !String(e.value || '').trim()) return 'Ø Markt · ' + abschlagMarkt();
     if (e.tagName === 'SELECT') { var o = e.selectedOptions && e.selectedOptions[0]; return o ? o.text.replace(/\s*\(.*$/, '') : '—'; }
     var v = String(e.value || '').trim();
     if (!v) return '—';
@@ -175,12 +188,13 @@
     SETS.forEach(function (st) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'swk-set'; b.setAttribute('data-set', st.id);
       b.innerHTML = '<b>' + esc(st.name) + '</b><p>' + esc(st.txt) + '</p><ul>' + SET_ZEILEN.map(function (z) {
-        return '<li><span>' + esc(z[1]) + '</span> ' + esc(zahl(st.werte[z[0]]) + z[2]) + '</li>'; }).join('') + '</ul>';
+        var sw = st.werte[z[0]];
+        return '<li><span>' + esc(z[1]) + '</span> ' + esc(sw === '' ? 'Ø Markt' : zahl(sw) + z[2]) + '</li>'; }).join('') + '</ul>';
       b.addEventListener('click', function () { setAnwenden(host, st); });
       sets.appendChild(b);
     });
     var hin = document.createElement('p'); hin.className = 'swk-hinweis';
-    hin.textContent = 'Ein Set setzt Tilgung, Eigenkapital, Mietausfall und Mindest-DSCR. Übernommen wird mit „Speichern“ unten.';
+    hin.textContent = 'Ein Set setzt Tilgung, Eigenkapital, Mietausfall, Mindest-DSCR und den Abschlag auf Angebotspreise. Übernommen wird mit „Speichern“ unten.';
     var band = document.createElement('div'); band.className = 'swk-band';   /* v2211 */
     oben.appendChild(sets); oben.appendChild(hin); oben.appendChild(band); oben.appendChild(karten);
     host.insertBefore(oben, teile[0] ? teile[0].el : null);
@@ -214,8 +228,7 @@
           var tag = '';
           if (SET_FELDER[f[0]]) {
             var e = document.getElementById(f[0]);
-            var a = e ? parseFloat(String(e.value).replace(',', '.')) : NaN, s = parseFloat(set.werte[f[0]]);
-            tag = (isFinite(a) && Math.abs(a - s) < 1e-9) ? '<i class="swk-tag">Set</i>' : '<i class="swk-tag eigen">eigen</i>';
+            tag = (e && gleichWert(e.value, set.werte[f[0]])) ? '<i class="swk-tag">Set</i>' : '<i class="swk-tag eigen">eigen</i>';
           }
           zeilen += '<span>' + esc(f[1]) + tag + '</span><b>' + esc(v) + '</b>';
         });
@@ -236,7 +249,7 @@
     if (band) {
       var st = setVon(setGemerkt()), eigen = 0;
       Object.keys(SET_FELDER).forEach(function (id) { var e = document.getElementById(id); if (!e) return;
-        var a = parseFloat(String(e.value).replace(',', '.')); if (!(isFinite(a) && Math.abs(a - parseFloat(st.werte[id])) < 1e-9)) eigen++; });
+        if (!gleichWert(e.value, st.werte[id])) eigen++; });
       band.innerHTML = 'Grundlage: <b>' + esc(st.name) + '</b> — die mit <i class="swk-tag">Set</i> markierten Werte kommen aus diesem Set'
         + (eigen ? ', <b>' + eigen + '</b> davon hast du angepasst (<i class="swk-tag eigen">eigen</i>).' : '.')
         + ' Alle anderen Werte gelten für jedes Set.';
@@ -265,8 +278,7 @@
     var gleich = function (st) {
       return Object.keys(st.werte).every(function (id) {
         var e = document.getElementById(id); if (!e) return false;
-        var a = parseFloat(String(e.value).replace(',', '.')), b = parseFloat(st.werte[id]);
-        return isFinite(a) && Math.abs(a - b) < 1e-9;
+        return gleichWert(e.value, st.werte[id]);
       });
     };
     /* v2211 · Aktiv ist das GEWÄHLTE Set (gemerkt), nicht nur eines, dessen vier Werte

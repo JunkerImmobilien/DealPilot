@@ -203,6 +203,9 @@ if (!window._wlc) {
       var hi = rent.q75_per_sqm != null ? rent.q75_per_sqm : rsqm * 1.1;
       out.mm = { low: Math.round(lo * area), med: Math.round(rsqm * area), high: Math.round(hi * area), sqm: deNum(rsqm, 2) + ' €/m² kalt' };
     }
+    /* v2237 · Angebotspreise -> realistischer Marktwert (Satz aus den Einstellungen,
+       sonst recherchierter Marktdurchschnitt). Zwilling: dealpilot-mb.js / -qc.js */
+    try { if (global.DealPilotAbschlag) global.DealPilotAbschlag.anwenden(out); } catch (e) {}
     return out;
   }
 

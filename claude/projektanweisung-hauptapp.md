@@ -38761,6 +38761,78 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2237–v2237d · Angebotsabschlag als Einstellung, Marktwert im Urteil und in der Pilot-Analyse (14.10.2026)
+- **Was:** Marcel: „Die Abschläge kann man im Set angeben … wir recherchieren immer den aktuellen Durchschnitt … der Marktwert, je nachdem was ich von der Spanne nehme, soll mitkommen … nach eigenen Kriterien und auch darüber“.
+  - `config.js angebotAbschlagMarkt`: 5,8 %, Stand Dezember 2025, Quelle und Link stehen **nur intern**. Beim Nachrecherchieren wird nur dieser Block geändert.
+  - Profilfeld `angebot_abschlag_pct`: leer bedeutet Marktdurchschnitt. Neue Karte „Marktbewertung“ in den Standardwerten. Sets: Standard und Rendite = Ø Markt, Vorsichtig = 9 %.
+  - `marktwert-abschlag.js` (neu): `satz()`, `quelle()`, `anwenden(card)`. `mapCard` in beiden Zwillingen (`dealpilot-mb.js`, `-qc.js`) mindert die Marktwert-Spanne und rundet auf volle 1.000 €; die Angebotswerte liegen in `card.abschlag.roh`, die Miete bleibt unverändert. Der Hinweis „· inkl. 5,8 % Abschlag auf Angebotspreise“ hängt an der Fußzeile `.legal` der Karte. `avm-section.js` ist unberührt.
+  - Kern `qc-heuristik.js` (gespiegelt): `marktwertBereinigt(wert, art, satz, quelle)`, ohne Satz wie bisher 10 % (Telegram-Bot unverändert). Neu in `empfehlung()` ist die zweite Sicht: ab 10 % unter dem bereinigten Marktwert der Satz „Über deinen Maßstab hinaus … Wertpuffer … als Substanzkauf kann er sich trotzdem lohnen“ und das Rückgabefeld `wert`. Das Urteil nach dem eigenen Maßstab bleibt oben stehen.
+  - Quick-Check: Ohne externen Bewertungspartner zählt die DealPilot-Marktbewertung an der gewählten Stelle der Spanne. `/ai/quickcheck-analyse` bekommt `markt` (Marktwert, Spanne, Abschlag, Angebotsniveau). Der Prompt bildet den Abstand auf dem Server, verlangt zwei Sichten und den Namen „DealPilot-Marktbewertung“ (nicht „unabhängige Experten“).
+  - **v2237d:** keine Quelle nach außen (Marcel: „bitte auch keine Quelle wie ImmobilienScout angeben“). Außerdem stand im Video- und Quellentext zuvor der Name des Bewertungspartners; das verstieß gegen die Anbieter-Neutralität und ist entfernt.
+- **Commit:** `dd8ac14b`, `9d783673`, `19a2a633`, `b0b231ac`, `73936155`. Das Prompt-Nachschärfen steckt im Commit „v2237b: Prompt …“. Der Commit `f840c44f` (Fensterskript) behauptet in seiner Botschaft auch die Hinweis-Korrektur; die steckt tatsächlich erst in `b0b231ac`.
+- **Nachweis:**
+  - Echter Lauf des Kerns: 139.000 € gegen Ø 189.000 € (Angebot) ergibt NICHT KAUFEN plus „+50.000 € (+36 %) Wertpuffer“ bzw. mit Abschlag „+39.000 € (+28 %)“. `score-ketten-pruefen` 216 gleich, `prompt-lecks` sauber, Buster sauber, Gold-Audit RC=0.
+  - Quick-Check im Browser: Karte 144.000 / 178.000 / 261.000 €, „Deutlich unter Markt“, Fußzeile mit Abschlag. Die Pilot-Analyse wurde dreimal echt abgerufen; die letzte nennt unter Pro „39.000 € (28 %) unter dem geschätzten Marktwert – Wertpuffer“ und in der Meinung „als wertgesicherter Substanzkauf … interessant“. Sie steht als `KI_RUNDGANG` im Drehbuch.
+  - Video `quickcheck-rundgang-studio_2026-10-14.mp4` neu aufgenommen (Kontaktabzug geprüft, Karte im Ausschnitt geprüft).
+- **Fehler dieser Runde:**
+  - `messe-fenster.ps1` (alte Fassung im scratchpad) nahm über `Get-Process … MainWindowHandle` ein beliebiges Chrome-Fenster. Getroffen wurde Marcels Fenster „PM-Werkstatt“ während einer Videokonferenz: Vollbild und verschoben. Jetzt sucht das Skript per EnumWindows nach dem Titel und bricht sonst ohne Tastendruck ab.
+  - Das Hinweisfeld der Erweiterung („Claude is active in this tab group“) stand nach dem Öffnen eines neuen Tabs rund 25 s im Video; die Aufnahme wurde wiederholt.
+- **Rest:** Die Überschrift bleibt „Nicht kaufen“ (eigener Maßstab), der Wertpuffer steht darunter. Ob die Überschrift bei großem Puffer selbst etwas sagen soll, entscheidet Marcel. Alte `_mb_state`-Schnappschüsse an gespeicherten Objekten tragen keinen Abschlag (Urteil rechnet ihn dann selbst ab, die Karte zeigt Angebotsniveau, bis neu abgerufen wird). Nicht auf Produktion.
+
+### v2236–v2236b · Import nach gewählter Adresse, realistischer Marktwert im Rundgang (14.10.2026)
+- **Was:** Marcel: „Die Wohnung liegt deutlich mit über 80 % über Markt … vielleicht 160.000 € … der Hinweis, dass es Angebotspreise sind“.
+  - **v2236 · Ursache im Import** (`object-actions.js`): Bei „Unterschiedliche Adressen“ galt die Wahl nur für Straße, PLZ und Ort. Fläche (96 statt 73,31 m²), Baujahr (1994 statt 1983) und Zimmer kamen aus dem Marktbericht der ANDEREN Wohnung und waren vorgehakt. Die Marktbewertung rechnete also eine fremde Wohnung (Ø 251.000 €). `recompute()` nimmt jetzt nur Dokumente der gewählten Adresse, der Adresskasten sagt das. Nachgemessen: nur noch Exposé-Werte (73,31 m², Bj 1983, 2 Zi., 139.000 €, Hausgeld 415 €).
+  - **v2236b · Rundgang mit echten Zahlen:** DealPilot-Marktbewertung einmal echt für die richtige Wohnung: 153.000 / 189.000 / 277.000 €, Miete 597 / 683 / 776 €. Neues Kapitel „Achtung: Angebotspreise“ mit Abschlag 6 % (ImmoScout24/Sprengnetter, ETW bundesweit 12/2025: 5,8 %; Mitte 2025: 6,8 %), also realistisch rund 178.000 €. Die Miete wird mit Ø gerechnet (Score 43 → mit 20 % EK 60 · Solide). Lage B „Kauf möglich“, C „Nicht kaufen“. Die Pilot-Analyse ist einmal echt für diesen Stand aufgezeichnet (`KI_RUNDGANG`); zwei weitere Abrufe beim Messen waren gesperrt. Neues Kapitel „Und trotzdem spannend“: 139.000 € gegen rund 178.000 € = +39.000 € Wertpuffer. Die Szene „Oben“ entfällt.
+- **Commit:** `d3097e87`, `fb422197`
+- **Nachweis:** Probelauf im Studio, 15 Kapitel, alle Zahlen live gelesen (siehe oben). Video `Dateien/Messe/Videos/quickcheck-rundgang-studio_2026-10-14.mp4` neu: 221,3 s, 8,0 MB, Kontaktabzug geprüft (Intro, Kapitel 1–15, Outro mit QR, Outro auf 9 s gekürzt).
+- **Rest:** N74 (soll die App den Abschlag selbst abziehen?) und N75 (die Pilot-Analyse kennt den Marktwert nicht und erwähnt den Wertpuffer nicht) sind Entscheidungen für Marcel. Das alte Drehbuch `quickcheck` nutzt jetzt die neue `MB_KARTE`, aber noch die alte `KI_ANALYSE` (Miete 1.012 €, Score 76). Es muss neu aufgezeichnet oder durch den Rundgang ersetzt werden.
+
+### v2235–v2235e · Messe-Studio und Drehbuch „quickcheck-rundgang" (14.10.2026)
+- **Was:** Marcel wollte es wie in den beiden Referenzvideos (`Dateien/Messe/mediation.mp4`, `werkstatt.mp4`): die App im Rahmen, darunter ein Kapitelband mit dem Text, im DealPilot-Design. Inhalt: erst die Methoden der Datenaufnahme nacheinander, dann mit einer weiter bis „Als Objekt speichern“. Intro 03, Outro 02.
+  - `frontend/messe-studio.html` zeigt die App als iframe im Goldrahmen. Ihr Viewport ist 1.700 px breit und wird auf den Rahmen gestreckt. Darunter liegt das Kapitelband: goldene Nummernkachel, Titel, Erklärung, Punkte, Fortschrittslinie. Intro und Outro kommen aus `js/messe-effekte.js` (Baukasten, Gold über `--wl`-Tokens). Parameter: `?messe=&intro=&outro=&qr=&breite=&auto`.
+  - `messe-drehbuch.js` mit `?studio=1` im iframe: Die Zeilen gehen per postMessage als Kapitel ans Studio. Titelkarte und Abspann entfallen, der Start kommt auf das Zeichen `los`, `ende` vor dem Aufräumen. Unten wird nichts freigehalten. Die Pilot-Figur ist ab dem ersten Laden aus (Marcel: „den Pilot musst du ausblenden!“).
+  - Drehbuch `quickcheck-rundgang`, 14 Kapitel: Datenaufnahme, Exposé/Marktbericht, Sprache, ImmoMetrica, DealPilot-Marktbewertung, von Hand. Dann die Szenen aus `quickcheck` (Mitschnitte) und als Schluss der Knopf „Als Objekt speichern“, gezeigt, nicht geklickt.
+  - `buster-ebenen-pruefen.mjs` prüft `messe-studio.html` als sechstes Dokument.
+- **v2235e · Ursache verschobener Kegel** (Marcel: „der nicht ausgegraute Bereich ist verschoben“): `rect()` und `scroller()` liefen über `frameElement` bis ganz nach oben. Im Studio ist die App selbst ein iframe, und dessen Lage kam noch einmal dazu. Jetzt wird nur bis zum Dokument gerechnet, in dem der Kegel liegt. Nachgemessen: Kegel 886/393/124×50 gegen die Sprache-Kachel +8 px, ebenfalls 886/393/124×50.
+- **Commit:** `0d6ec6e8`, `28ef1ca0`, `be145abc`, `ce71dd42`, `a23d58c1`, `cf2a3f88`
+- **Nachweis:** Gold-Audit auf Staging RC=0. Buster sauber über sechs Dokumente. Drei volle Läufe; der dritte ist das Video `Dateien/Messe/Videos/quickcheck-rundgang-studio_2026-10-14.mp4`: 224,8 s, 1920×1022, 8,8 MB. Kontaktabzug geprüft: Intro, Kapitel 1–14, Outro mit QR.
+  - Aufnahme 1 hatte den verschobenen Kegel, Aufnahme 2 zeigte 7 s den Desktop (Abriss der Browser-Verbindung beim Abfragen). Lehre: während der Aufnahme den Browser nicht abfragen, nur in PowerShell auf ffmpeg warten.
+  - Der Chrome-Hinweisbalken nimmt im Vollbild PLATZ ein (innerHeight 1137 statt 1200 CSS-px), er liegt nicht über der Seite. `oben=` bleibt deshalb 0, der Zuschnitt von 58 px reicht.
+- **Rest:** Kurz nach dem Intro ist die App etwa 1 s ohne Band zu sehen, bevor Quick Boarding öffnet. Ob das Video so passt, entscheidet Marcel. Für andere Drehbücher fehlen noch die Intro-/Outro-Texte in `TEXTE` des Studios.
+
+### v2234–v2234c · Erklärtext als Karte am Feld · Messe-Baukasten (14.10.2026)
+- **Was:**
+  - **Baukasten** `design/Vorschläge/messe-video/messe-effekte.js`: 10 Intros, 10 Info-Karten, 10 Outros. Alle Texte sind Felder mit Vorgabe, sechs Outros tragen einen echten QR-Code. Vorschau mit Video dahinter: https://claude.ai/artifact/BANFkS1maT5MhjhGGNooLe. Skill und Agent `messe-video` kennen ihn.
+  - **v2234:** Marcel: „nicht immer nur der Text unten, sondern als Karte mit Pfeil oder Linie dort dran". `platziere()` in `messe-drehbuch.js` setzt die Zeile als Karte neben das Kegel-Ziel, auf die erste passende Seite (rechts, links, darunter, darüber). Eine SVG-Linie mit Pfeil (`#dpm-linie`) führt von der Kartenkante zum Ziel. Ohne Ziel oder ohne Platz steht die Zeile wie bisher unten. `?zeile=unten` holt den alten Untertitel zurück.
+  - **v2234a:** Jede neue Zeile wählt ihre Seite neu (vorher blieb die Seite der ersten Szene stehen).
+  - **v2234b:** Die Linie wird aus dem aktuellen Kartenrechteck gezogen und läuft beim Gleiten in jedem Bild mit (vorher hing sie lose daneben).
+  - **v2234c:** Wechselt die Karte die Seite, springt sie, statt zu gleiten.
+- **Commit:** `bfd2a4d3` (Baukasten), `11c0aeb6`, `d4bb8089`, `b7779ee3`, `913704a7`
+- **Nachweis:**
+  - Baukasten: alle 30 Stücke im Bild geprüft, acht Bildfehler behoben. 6 von 6 QR-Codes mit jsQR zurückgelesen, die URL traf jedes Mal genau.
+  - Parkstraße (v2234): 5 Zeilen, alle als Karte am Ziel, Linie da, 0 über dem Ziel, 0 außerhalb des Fensters.
+  - Quick-Check (v2234c, 1.065 Proben je 150 ms): Alle 1.032 Proben mit Ziel als Karte am Feld. Linie 0-mal lose, 0 außerhalb des Fensters.
+  - **Zurückgenommen:** „Die Karte gleitet 0,15–0,3 s quer über das Feld" (Begründung für v2234c) war nicht die ganze Ursache. Die verbliebenen 21 „über dem Ziel"-Proben sind Messartefakte: Gemessen wurde gegen den **Kegel**, und der zieht bis zu 0,6 s hinter dem neuen Ziel her. Die Karte stand sofort richtig (Ziel 852–1189 px, Karte ab 1253 px). Das Springen bleibt trotzdem drin.
+- **Rest:** Marcel wählt Intros, Karten und Outros; danach Einbau in die Drehbücher und Neuaufnahme der Videos. Das QR-Ziel ist offen. Nicht auf Prod (nur für Messe-Videos auf Staging nötig).
+
+### Prod-Rollout (20) · v2220–v2233 auf Produktion (14.10.2026)
+- **Was:** Marcels Freigabe („bitte auch Prod-Rollout machen"). Lokal `main` + Merge `origin/staging` (--no-ff), Push → `f652e4cc` (44 Commits, 19 Dateien, keine Migration). Auf Prod `git pull` und Rebuild `backend`; mb-backend unverändert.
+- **Commit:** `f652e4cc`
+- **Nachweis:**
+  - Sicherung vorher: `/root/backups/haupt-20261014-1434.sql.gz` (11 MB, 71 Tabellen) und `mb-20261014-1434.sql.gz` (25 MB, 32 Tabellen), Kopf gelesen.
+  - Backend `healthy`, „No new migrations". Im Image `kaufen: 70` (Kern) und der Prompt mit „Starker Kauf".
+  - Live: `qc-heuristik.js?v=v2232`, `qc-bridge.js?v=v2232`, `messe-drehbuch.js?v=v2233`; vier Dateien 200 mit richtigem Typ; `/auth/me` ohne Token 401; Gold-Audit RC=0.
+- **Rest:** Abnahme im Browser auf Prod: Quick-Check mit C-Lage → „Nicht kaufen".
+
+### v2232–v2233 · Urteil = Stufe, Drehbuch-Tempo, Video-Agent (14.10.2026)
+- **Was:**
+  - **v2232:** `QcHeuristik.SCHWELLE` 75/60/40 → **70/50/35**, also dieselben Grenzen wie die Score-Stufen (Gut+ = KAUFEN, Solide = VERHANDELN/PRUEFEN, Schwach = KRITISCH, Kritisch = PASS). Marcel: „das muss passen". `score-ketten-pruefen.mjs` prüft jetzt zusätzlich Urteil gegen Stufe für Score 0..100 (216 Punkte, gleich). Gespiegelt, Backend neu gebaut.
+  - **Quick-Check-Score gegen DealScore** gemessen: Quick-Check 46 → „Als Objekt speichern" → Objekt 46 · Schwach, alle fünf Teilwerte gleich (Cashflow 32, Rendite 72, LTV 49, Risiko 58, Potenzial 30). Der **Investor Deal Score** (DS2, 24 Kennzahlen) desselben Objekts zeigt aber **63**. Das ist die offene Frage an Marcel (Backlog N73).
+  - **v2233:** Drehbuch-`TEMPO` 1,4 (Wartezeiten ab 600 ms gestreckt, `?tempo=` überschreibt), langsameres Tippen, Pilot-Hilfe (`#dp-pilot`, `#dp-tower`) im Lauf ausgeblendet.
+  - **Video-Agent `messe-video`** (`.claude/agents/`) und **Skill `messe-video`** (`.claude/skills/`): Regeln (Zahlen live, kein Abruf je Durchgang, Mitschnitte, Aufräumen, Tempo, Pilot aus), Ablauf, ffmpeg-Aufnahme.
+- **Commit:** `13d3daef`, `5d5ef646`, `95d0fa78`
+- **Rest:** Videos mit Tempo 1,4 und ohne Pilot neu aufnehmen (Agent). Score-Frage N73.
+
 ### Messe-Videos aufgenommen (14.10.2026)
 - **Was:** Mit ffmpeg (gdigrab, Hauptbildschirm 1920x1080, Chrome im Vollbild) habe ich fünf MP4 nach `Dateien/Messe/Videos/` aufgenommen. Oben sind 58 px abgeschnitten (Chrome-Leiste „Claude hat die Fehlerbehebung gestartet"), das ergibt 1920x1022, 30 fps, x264 crf 20.
   - quickcheck-datenaufnahme 158 s · 6,3 MB
