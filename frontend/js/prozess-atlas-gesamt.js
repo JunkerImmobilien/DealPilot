@@ -151,6 +151,21 @@
       '@keyframes ag-pk{50%{opacity:.25}}#ag-band span{color:#f3ead0;font-weight:500}',
       '#ag-band button{border:1px solid ' + mix(G, 55) + ';background:transparent;color:' + GH + ';border-radius:7px;padding:2px 9px;cursor:pointer}',
       '@media (max-width:900px){#dp-atlas .ag{grid-template-columns:1fr;grid-template-rows:minmax(300px,1fr) auto;overflow:auto;inset:0 12px 14px}#dp-atlas .ag-kopf{flex-basis:150px;margin-right:46px}#dp-atlas .ag-kap{left:166px}}',
+      /* v2218a · GEMESSEN bei 390 px: Netzflaeche 359 x 331 px, Inhalt 1.692 px breit -
+         man sah die Namen der Ablaeufe, die Stationen lagen rechts ausserhalb.
+         Am Handy steht jede Linie untereinander: Name oben, Stationen darunter
+         einzeln wischbar; alles scrollt in EINER Flaeche nach unten. */
+      '@media (max-width:640px){#dp-atlas .ag.an{display:block;overflow-y:auto}'
+        + '#dp-atlas .ag > .atl-netz{overflow:visible;max-height:none;height:auto;margin-bottom:12px}'
+        + '#dp-atlas .ag-fl{min-width:0;padding:10px 10px 16px}'
+        + '#dp-atlas .ag-bahn{display:block;padding:6px 0}'
+        + '#dp-atlas .ag-kopf{margin:0 0 6px;padding:4px 6px}'
+        + '#dp-atlas .ag-kopf b{font-size:14px}'
+        + '#dp-atlas .ag-reihe{overflow-x:auto;padding:4px 2px 8px;gap:10px;scroll-snap-type:x proximity;--dpm-schiene:1}'
+        + '#dp-atlas .ag-reihe::before{display:none}'
+        + '#dp-atlas .ag-k{flex:0 0 132px;width:132px;scroll-snap-align:start}'
+        + '#dp-atlas .ag-kap{display:none}'
+        + '#dp-atlas .ag-phase::after{min-width:0}}',
       '@media (prefers-reduced-motion:reduce){#dp-atlas .ag-k{animation:none;opacity:1;transform:none}#dp-atlas .ag-reihe::before{animation:none}}'
     ].join('\n');
     document.head.appendChild(st);
