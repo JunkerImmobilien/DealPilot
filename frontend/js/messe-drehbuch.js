@@ -89,12 +89,26 @@
     if (typeof _ziel === 'function') { var f = _ziel(); return (f && f.getBoundingClientRect().width > 0) ? f : null; }
     return (_ziel.isConnected && _ziel.getBoundingClientRect().width > 0) ? _ziel : null;
   }
-  /* v2219e · Ein Ziel, das nach dem Scrollen noch wächst (Soll/Ist-Kasten: 89 ->
+  /* v2219e/f · Ein Ziel, das nach dem Scrollen noch wächst (Soll/Ist-Kasten: 89 ->
      163 px), lag gemessen mit der Unterkante 9 px unter dem Fensterrand und unter
      der Zeile. Rutscht es aus dem freien Bereich, wird nachgescrollt - höchstens
-     dreimal je Ziel, frühestens alle 1,2 s (smooth braucht so lange). */
+     dreimal je Ziel, frühestens alle 1,2 s, dann ohne Animation. */
   var _nachScroll = 0, _letzterScroll = 0;
   function frei(r) { return r.top >= 70 && r.bottom <= innerHeight - 170; }
+  /* v2219f · scrollIntoView(smooth) kam im Drehbuch gemessen NIE an (Kasten blieb
+     bei 572-736 stehen; dieselbe Zeile ohne smooth scrollte sofort). Gescrollt wird
+     deshalb der Container selbst (.main-col), mittig in den freien Bereich. */
+  function scroller(e) {
+    for (var s = e.parentElement; s && s !== document.body; s = s.parentElement) {
+      if (/auto|scroll/.test(getComputedStyle(s).overflowY) && s.scrollHeight > s.clientHeight + 5) return s;
+    }
+    return document.scrollingElement;
+  }
+  function holen(e, sanft) {
+    var r = e.getBoundingClientRect(), s = scroller(e), mitte = (70 + innerHeight - 170) / 2;
+    var d = r.height > innerHeight - 260 ? r.top - 80 : (r.top + r.height / 2) - mitte;
+    try { s.scrollTo({ top: s.scrollTop + d, behavior: sanft ? 'smooth' : 'auto' }); } catch (x) { s.scrollTop += d; }
+  }
   function folgen() {
     if (_folge) return;
     _folge = setInterval(function () {
@@ -102,7 +116,7 @@
       var r = z.getBoundingClientRect();
       if (!frei(r) && _nachScroll < 3 && Date.now() - _letzterScroll > 1200) {
         _nachScroll++; _letzterScroll = Date.now();
-        try { z.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+        holen(z, false);
       }
       kegel(z, _pad);
     }, 200);
@@ -116,11 +130,13 @@
     /* nur scrollen, wenn das Ziel nicht frei sichtbar ist - sonst schiebt es den
        Umschalter oben aus dem Bild; unten liegt die Zeile (rund 160 px) */
     _nachScroll = 0; _letzterScroll = 0;
-    if (z && !frei(z.getBoundingClientRect())) { _letzterScroll = Date.now(); try { z.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} }
+    if (z && !frei(z.getBoundingClientRect())) { _letzterScroll = Date.now(); holen(z, true); }
     folgen();
     await warte(750);
   }
-  function reiter(sec) { var t = q('.tab[data-target-sec="' + sec + '"]'); if (t) t.click(); }
+  /* v2219f · jeder Reiter beginnt oben: die Scrollposition des vorigen blieb
+     stehen, der kürzere Steuer-Reiter zeigte gemessen eine leere Fläche */
+  function reiter(sec) { var t = q('.tab[data-target-sec="' + sec + '"]'); if (t) t.click(); var m = q('.main-col'); if (m) m.scrollTop = 0; }
   function nkmFeld() { var n = q('#nkm'); return n && n.closest('.f'); }
   async function warteAuf(fn, ms) { var t0 = Date.now(); while (Date.now() - t0 < (ms || 6000)) { var v = fn(); if (v) return v; await warte(150); } return null; }
 
