@@ -8,7 +8,8 @@
    auf die Stelle und schreibt eine Untertitelzeile darunter. Aufnehmen mit
    OBS oder Win+Alt+R; am Stand kann es auch live in Schleife laufen.
 
-   Drehbücher: parkstrasse (v2219), quickcheck (v2221)
+   Drehbücher: parkstrasse (v2219), quickcheck (v2222: Datenaufnahme mit zwei
+   PDFs, Marktwertindikation, Spanne, Bewertung, Lage), quickcheck-tippen (v2221)
    Start:  ?messe=parkstrasse            einmal
            ?messe=parkstrasse&schleife   immer wieder (Messebildschirm)
            DealPilotMesse.start('parkstrasse')
@@ -171,6 +172,13 @@
   function qcText(id) { var e = qcEl(id); return e ? e.innerText.replace(/\s+/g, ' ').trim() : ''; }
   /* KPI-Kachel: "Cashflow/Mo-147€Ziel ≥0€" -> der Wert zwischen Titel und "Ziel" */
   function qcKpi(id, titel) { var t = qcText(id); var m = t.replace(titel, '').split('Ziel')[0].trim(); return m || null; }
+  function qcWin() { var f = q('#qc-v17-frame'); return f && f.contentWindow; }
+  function qcSetze(id, v) {
+    var e = qcEl(id); if (!e) return; var w = e.ownerDocument.defaultView;
+    e.value = v; e.dispatchEvent(new w.Event('input', { bubbles: true })); e.dispatchEvent(new w.Event('change', { bubbles: true }));
+  }
+  function qcSel(sel) { var d = qcDoc(); return d && d.querySelector(sel); }
+  function qcScore() { return { n: qcText('sb-num'), stufe: qcText('sb-tier'), urteil: qcText('ai-verdict-headline') }; }
   function qcAufraeumen() {
     /* „Neuer Vorgang": löscht den Boarding-Pass, den der Quick-Check beim ersten
        Score selbst anlegt, und leert das Fenster - sonst hinterlässt jede
@@ -275,7 +283,7 @@
        getippten Eingaben stehen fest; Score und Kennzahlen rechnet der echte
        Quick-Check und das Drehbuch liest sie ab. Kein „Abrufen" - das kostet
        Kontingent. Am Ende „Neuer Vorgang" (räumt den Boarding-Pass ab). */
-    quickcheck: {
+    'quickcheck-tippen': {
       titel: 'Lohnt sich das Exposé?',
       unterzeile: 'Quick Boarding · eine Wohnung, eine Minute, ein Urteil',
       objekt: null,
@@ -321,8 +329,162 @@
         }
       ],
       schluss: '<div class="k">DealPilot</div><h1>Erst rechnen, dann besichtigen.</h1><p>Quick Boarding prüft ein Exposé, bevor du ins Auto steigst.</p><div class="m">Deal<b>Pilot</b> · dealpilot.immo</div>'
+    },
+
+    /* ═══ DREHBUCH 3 · QUICK BOARDING MIT DATENAUFNAHME (v2222) ════════════
+       Marcel 14.10.2026: „mit der Datenaufnahme … ein Exposé laden und auch
+       die Marktwertindikation abrufen … wo dann auch Spanne reingeht … den
+       Score zeigen mit schwach, solide und gut, unten die Bewertung und wie
+       der Lagewert eingeht" - mit seinen zwei PDFs aus Dokumente/Expose.
+
+       ZWEI MITSCHNITTE, beide am 14.10.2026 echt erzeugt und hier nur
+       wiedergegeben (kein KI-, kein Marktbericht-Abruf je Durchgang):
+       QC_IMPORT  = ObjectActions._voice.mitschnitt() nach dem echten Einlesen
+                    beider PDFs (Typ-Erkennung und KI-Auslese wie im Betrieb).
+                    Dateinamen neutral; die Auslesewerte sind unverändert -
+                    auch der Fehler „wertentwicklung_3jahre_pct 14,1" (im PDF
+                    steht -1,65 %), er erscheint im Quick-Check nicht.
+       MB_KARTE   = #_mb_state.card nach DealPilotMBQc.run() für dieses Objekt.
+       Alles danach rechnet der echte Quick-Check; Score, Urteil, Zielpreis
+       und Lagesatz liest das Drehbuch ab. Die Klicks auf die Spanne ändern
+       qc_span_config im Browser - der Wert wird vorher gesichert und beim
+       Aufräumen zurückgeschrieben. */
+    quickcheck: {
+      titel: 'Exposé rein, Urteil raus',
+      unterzeile: 'Quick Boarding · zwei PDFs, eine Marktwertindikation, ein Urteil',
+      objekt: null,
+      aufraeumen: function () {
+        var ov = q('#oabi-ov'); if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+        try { if (_spanVorher === null) localStorage.removeItem('qc_span_config'); else if (_spanVorher !== undefined) localStorage.setItem('qc_span_config', _spanVorher); } catch (e) {}
+        _spanVorher = undefined;
+        qcAufraeumen(); reiter('s0');
+      },
+      szenen: [
+        async function (s) {   /* 1 · Datenaufnahme: zwei PDFs */
+          try { _spanVorher = localStorage.getItem('qc_span_config'); } catch (e) { _spanVorher = undefined; }
+          if (typeof window.sbActionsAction === 'function') sbActionsAction('quickcheck');
+          await warteAuf(function () { var d = qcDoc(); return d && d.readyState === 'complete' && qcEl('qc_kp') && !qcEl('qc_kp').value && qcEl('qc7-sources'); }, 10000);
+          await warte(900);
+          var m = q('.main-col'); if (m) m.scrollTop = 0;
+          await zeige(function () { return qcEl('qc7-sources'); }, 6);
+          s.zeile('Datenaufnahme', 'Zwei PDFs zur Wohnung: das Exposé vom Makler und ein Marktbericht.');
+          await warte(2600);
+          window.postMessage({ source: 'dp-qc', type: 'qc-import-pdf' }, '*');
+          await warteAuf(function () { return q('#oabi-files'); }, 5000);
+          await warte(700);
+          ObjectActions._voice.wiedergabe(QC_IMPORT);
+          await zeige('#oabi-files', 8);
+          s.zeile('Datenaufnahme', 'Beide auf einmal eingelesen — DealPilot erkennt selbst, was Exposé und was Marktbericht ist.');
+          await warte(3600);
+        },
+        async function (s) {   /* 2 · Adresskonflikt */
+          var kasten = function () {
+            return [].filter.call(document.querySelectorAll('#oabi-result div'), function (d) {
+              return /Unterschiedliche Adressen/.test(d.textContent) && d.querySelector('input[type=radio]');
+            }).sort(function (a, b) { return a.getBoundingClientRect().height - b.getBoundingClientRect().height; })[0] || null;
+          };
+          await zeige(kasten, 8);
+          s.zeile('Zwei Adressen?', 'Die PDFs nennen zwei verschiedene Adressen — DealPilot merkt es und fragt, welche gilt.');
+          await warte(3200);
+          var r = [].filter.call(document.querySelectorAll('#oabi-result input[type=radio]'), function (x) { return /Exposé/.test(x.parentElement.textContent); })[0];
+          if (r) r.click();
+          await warte(1500);
+        },
+        async function (s) {   /* 3 · Tabelle, übernehmen */
+          await zeige(function () { return q('#oabi-result .oabi-tbl'); }, 6);
+          s.zeile('Jeder Wert mit Quelle', 'Kaufpreis und Hausgeld aus dem Exposé, Fläche, Baujahr und Lage aus dem Marktbericht — ein Klick übernimmt.');
+          await warte(4600);
+          var ap = q('#oabi-apply'); if (ap) ap.click();
+          await warte(1400);
+          await zeige(function () { return qcGruppe('obj'); }, 6);
+          s.zeile('Übernommen', 'Alles steht im Quick-Check. Nur die Miete fehlt — die Wohnung ist leer.');
+          await warte(3600);
+        },
+        async function (s) {   /* 4 · Marktwertindikation (Mitschnitt) */
+          await zeige(function () { return qcEl('qc7-sources'); }, 6);
+          var st = qcEl('_mb_state');
+          if (!st) { var d = qcDoc(); st = d.createElement('input'); st.type = 'hidden'; st.id = '_mb_state'; d.body.appendChild(st); }
+          st.value = JSON.stringify({ ts: Date.now(), card: MB_KARTE, mode: 'med', collapsed: false });
+          try { qcWin()._oabFeedTrigger(); } catch (e) {}
+          await warte(900);
+          await zeige(function () { return qcEl('oab-results'); }, 6);
+          var mw = MB_KARTE.mw, mm = MB_KARTE.mm;
+          s.zeile('Marktwertindikation', 'DealPilot schätzt den Markt: Marktwert <b>' + eur(mw.low) + ' – ' + eur(mw.high) + '</b>, Miete <b>' + eur(mm.low) + ' – ' + eur(mm.high) + '</b> kalt.');
+          await warte(5200);
+        },
+        async function (s) {   /* 5 · vorsichtig: Zensus-Bestandsmiete -> Kritisch */
+          var wfl = parseFloat(String((qcEl('qc_wfl') || {}).value || '').replace(',', '.'));
+          var z = MB_KARTE.zensus && MB_KARTE.zensus.miete;
+          var miete = (z && isFinite(wfl)) ? Math.round(z * wfl) : null;
+          if (!miete) return;
+          await zeige(function () { return qcGruppe('miete'); }, 6);
+          s.zeile('Erst vorsichtig', 'Mit der Bestandsmiete laut Zensus — ' + de(z, 2) + ' €/m² — wären es <b>' + eur(miete) + '</b> …');
+          await tippe('qc_nkm_grund', String(miete), 110);
+          await warte(900);
+          await zeige(function () { return qcEl('score-block'); }, 4);
+          await warte(900);
+          var sc = qcScore();
+          s.zeile('Erst vorsichtig', 'Bestandsmiete ' + eur(miete) + ': Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+          await warte(4600);
+        },
+        async function (s) {   /* 6 · Spanne Unten -> Solide */
+          await zeige(function () { return qcSel('.avs-spanne'); }, 8);
+          s.zeile('Die Spanne', 'Ein Klick auf „Unten“ — die vorsichtige Marktmiete geht in die Rechnung.');
+          await warte(2000);
+          var t = qcSel('.avs-spanne [data-spanne="low"]'); if (t) t.click();
+          await warte(700);
+          await zeige(function () { return qcEl('score-block'); }, 4);
+          await warte(900);
+          var sc = qcScore();
+          s.zeile('Die Spanne', 'Unten: Miete <b>' + eur(MB_KARTE.mm.low) + '</b> → Score <b>' + sc.n + '</b> · ' + sc.stufe + '.');
+          await warte(4200);
+        },
+        async function (s) {   /* 7 · Bewertung und Lage */
+          qcSetze('qc_lageklasse', 'B');
+          await warte(700);
+          await zeige(function () { return qcEl('ai-card'); }, 6);
+          function lagesatz() { var m = qcText('ai-opinion').match(/Bruttomietrendite von ([\d,]+ ?%) liegt ([^.]*?) deinem Ziel von ([\d,]+ ?%) für die ([ABC])-Lage/); return m; }
+          var a = lagesatz();
+          s.zeile('Die Bewertung', 'Urteil, Verhandlungsrat, Pro und Contra — gerechnet. ' + (a ? 'In der <b>B-Lage</b> (Ziel ' + a[3] + ') liegt die Rendite von ' + a[1] + ' ' + a[2] + ' dem Ziel.' : ''));
+          await warte(5200);
+          var lf = function () { var e = qcEl('qc_lageklasse'); return e && (e.closest('.field,.f,.fg') || e.parentElement); };
+          await zeige(lf, 8);
+          s.zeile('Und die Lage?', 'Dieselbe Wohnung in der <b>C-Lage</b> …');
+          await warte(1200);
+          qcSetze('qc_lageklasse', 'C');
+          await warte(1000);
+          await zeige(function () { return qcEl('ai-card'); }, 6);
+          var b = lagesatz(), ziel = (qcText('ai-negotiate-v').match(/auf ([\d.]+ €)/) || [])[1];
+          s.zeile('Und die Lage?', 'C-Lage: Ziel ' + (b ? b[3] : '–') + ' — ' + (b ? b[2] + ' dem Ziel' : '') + '. Verhandlungsziel jetzt <b>' + (ziel || '–') + '</b>.');
+          await warte(5600);
+        },
+        async function (s) {   /* 8 · Oben + Eigenkapital -> Gut */
+          await zeige(function () { return qcSel('.avs-spanne'); }, 8);
+          s.zeile('Und wenn es gut läuft?', 'Marktmiete „Oben“ …');
+          await warte(1400);
+          var t = qcSel('.avs-spanne [data-spanne="high"]'); if (t) t.click();
+          await warte(900);
+          await zeige(function () { return qcGruppe('fin'); }, 6);
+          s.zeile('Und wenn es gut läuft?', 'Marktmiete „Oben“ und 20 % Eigenkapital …');
+          await warte(1400);
+          var b80 = [].filter.call((qcDoc() || document).querySelectorAll('.ltv-btn'), function (x) { return /^80/.test(x.textContent.trim()); })[0];
+          if (b80) b80.click();
+          await warte(900);
+          await zeige(function () { return qcEl('score-block'); }, 4);
+          await warte(900);
+          var sc = qcScore();
+          s.zeile('Und wenn es gut läuft?', 'Miete ' + eur(MB_KARTE.mm.high) + ', 20 % Eigenkapital: Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+          await warte(6000);
+        }
+      ],
+      schluss: '<div class="k">DealPilot</div><h1>Exposé rein. Urteil raus.</h1><p>Quick Boarding liest, schätzt und bewertet — bevor du ins Auto steigst.</p><div class="m">Deal<b>Pilot</b> · dealpilot.immo</div>'
     }
   };
+
+  /* v2222 · die beiden Mitschnitte (siehe Drehbuch 3) */
+  var _spanVorher;
+  var QC_IMPORT = {"files":[{"name":"Expose.pdf","type":"expose","userType":null,"cache":{"expose":{"adresse":"Hölderlinstr. 1, 32547 Bad Oeynhausen","plz":"32547","ort":"Bad Oeynhausen","objektart":"Eigentumswohnung","energieklasse":"D","heizungsart":"Gas-Zentralheizung","stellplatz":"Tiefgarage","kaufpreis":139000,"wohnflaeche":73.31,"baujahr":1983,"zimmer":2,"hausgeld":415,"energieverbrauch":117.7,"balkon":true,"keller":true}}},{"name":"Marktbericht.pdf","type":"market","userType":null,"cache":{"market":{"adresse":"Sachsenstraße 16, 32052 Herford","plz":"32052","ort":"Herford","objektart":"Wohnung","bewertungsdatum":"2025-10-15","konfidenz":"Gut","makrolage":"gut","mikrolage":"gut","bevoelkerung_entwicklung":"stabil","nachfrage":"mittel","wertsteigerung":"mittel","entwicklung":"begrenzt","kueche_qualitaet":"Gehoben","bad_qualitaet":"Normal","boden_qualitaet":"Standard","fenster_qualitaet":"Gehoben","kueche_zustand":"Neu / kürzlich modernisiert","bad_zustand":"Gut in Stand gehalten","boden_zustand":"Gut in Stand gehalten","fenster_zustand":"Gut in Stand gehalten","badezimmer":"1","etage":"1","etagen":"3","modernisierungsjahr":"2025","garagen":"1","balkon_flaeche":"10","energie_label":"B","wohnflaeche":96,"baujahr":1994,"sanierungsjahr":2025,"zimmer":3,"verkehrswert":215200,"verkehrswert_min":196000,"verkehrswert_max":233000,"preis_pro_qm":2242,"lage_geraeusch":5,"lage_einkaufen":4.7,"lage_bildung":4.3,"lage_gastronomie":4.2,"lage_gesundheit":4.6,"lage_freizeit":2.8,"wertentwicklung_3jahre_pct":14.1,"wertentwicklung_1jahr_pct":4.17,"prognose_naechstes_jahr_pct":3.49,"markt_durchschnittspreis":279000,"markt_tage_auf_dem_markt":139}}}]};
+  var MB_KARTE = {"area":96,"rating":"Attraktiv","conf":{"label":"Niedrig","pct":43},"mikro":"Sehr gut · 8,2","makro":"Gut · 6,0","microRaw":82,"macroRaw":60,"trendRaw":null,"trend":"–","zensus":{"ebene":"Gemeinde","name":"Bad Oeynhausen, Stadt","leer":3.6,"eig":47.3,"miete":5.73},"brw":{"wert":200,"quelle":"BORIS-NRW","stichtag":"2026-01-01"},"makroGemessen":4,"mw":{"low":199000,"med":251000,"high":351000,"sqm":"2.615 €/m²"},"mm":{"low":766,"med":881,"high":1012,"sqm":"9,18 €/m² kalt"}};
 
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0, _aktiv = null;
