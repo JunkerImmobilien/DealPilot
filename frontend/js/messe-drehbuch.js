@@ -165,9 +165,12 @@
     /* dieselbe Seite behalten, solange sie passt - sonst springt die Karte */
     var o = seiten.filter(function (x) { return x.k === z.getAttribute('data-seite'); })[0] || seiten[0];
     z.setAttribute('data-seite', o.k);
-    if (neu) { z.style.transition = 'none'; }
+    /* v2234c · Seitenwechsel: springen statt gleiten - gemessen lief die Karte
+       sonst 0,15-0,3 s quer ueber das Feld, das sie erklaert */
+    var spring = neu || (_lz && _lz.k !== o.k);
+    if (spring) { z.style.transition = 'opacity .4s'; }
     z.style.left = Math.round(o.x) + 'px'; z.style.top = Math.round(o.y) + 'px';
-    if (neu) { void z.offsetWidth; z.style.transition = ''; }
+    if (spring) { void z.offsetWidth; z.style.transition = ''; }
     /* v2234b · die Linie wird aus dem AKTUELLEN Kartenrechteck gezogen und
        waehrend des Gleitens (0,6 s) in jedem Bild nachgefuehrt. GEMESSEN: aus
        der Zielposition gerechnet hing sie beim Szenenwechsel lose neben der
