@@ -41154,6 +41154,6 @@ html body .sb-user-icons .sb-user-icon-btn svg {
    über der hellen Fläche: unlesbar. Dieselbe Tinte wie in der Pilot-Analyse
    (.dp-pa-wrap). */
 #dp-abweichung .abw-wort { color: var(--ink, #2A2826) !important; }
-#dp-abweichung .abw-zahl { color: var(--ink2, #5C554E) !important; }
+#dp-abweichung .abw-zahl:not(.abw-diff) { color: var(--ink2, #5C554E) !important; }
 #dp-abweichung .abw-tafel th { color: var(--ink3, #6f685e) !important; }
 #dp-abweichung .abw-kopf h4, #dp-abweichung .abw-stand, #dp-abweichung .abw-deckung { color: var(--ink2, #5C554E) !important; }

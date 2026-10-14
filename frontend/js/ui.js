@@ -2000,6 +2000,8 @@ function _renderAIServerAnalysis(a) {
     }
     function d(z) {
       var vz = z.diff > 0 ? '+' : '';
+      if (z.einheit === 'stk') return vz + Math.round(z.diff);   /* v2216h */
+      if (z.einheit === 'eurqm') return vz + f(z.diff, 'zahl') + ' \u20ac/m\u00b2';
       if (z.einheit === 'eur') return vz + Math.round(z.diff).toLocaleString('de-DE') + ' \u20ac';
       if (z.einheit === 'pct') return vz + f(z.diff, 'zahl') + ' %-Punkte';
       return vz + f(z.diff, 'zahl');

@@ -63,6 +63,8 @@
      man die Richtung ohne Nachdenken sieht. */
   function diffText(z) {
     var vz = z.diff > 0 ? '+' : '';
+    if (z.einheit === 'stk') return vz + Math.round(z.diff);   /* v2216h: Einheiten sind ganze Zahlen */
+    if (z.einheit === 'eurqm') return vz + zahl(z.diff, 2) + ' €/m²';
     if (z.einheit === 'eur') return vz + Math.round(z.diff).toLocaleString('de-DE') + ' €';
     if (z.einheit === 'pct') return vz + zahl(z.diff, 2) + ' %-Punkte';
     return vz + zahl(z.diff, 2);
