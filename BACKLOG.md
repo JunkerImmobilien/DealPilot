@@ -36,10 +36,10 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N74 · DealPilot-Marktbewertung: Abschlag auf Angebotspreise? — Entscheidung Marcel
+### N74 · DealPilot-Marktbewertung: Abschlag auf Angebotspreise — ERLEDIGT 14.10.2026 (v2237: Einstellung, Ø Markt 5,8 %, im Urteil)
 > 14.10.2026: Die Spanne der DealPilot-Marktbewertung beruht auf Angebotspreisen. ImmoScout24/Sprengnetter (ETW, bundesweit, 12/2025): Kaufpreise 5,8 % unter Angebot (Mitte 2025: 6,8 %; Köln 9,2 %, Hamburg 7,8 %, Leipzig 0 %). Hamburger Studie: 6,7 %. Im Messe-Video wird der Abschlag nur im Text gezeigt (6 %, Ø 189.000 € → rund 178.000 €). Offen: soll die App den Abschlag selbst abziehen oder ausweisen (pauschal, regional, mit Quelle)?
 
-### N75 · Pilot-Analyse kennt den Marktwert nicht
+### N75 · Pilot-Analyse kennt den Marktwert nicht — ERLEDIGT 14.10.2026 (v2237: `markt` im Aufruf, zwei Sichten im Prompt)
 > 14.10.2026, Rundgang-Wohnung (Kaufpreis 139.000 €, DealPilot Ø 189.000 €, realistisch ~178.000 €): Die Analyse sagt nur „kein Kauf, höchstens 117.086 €" (Zielrendite C-Lage). Den Wertpuffer gegenüber dem Marktwert erwähnt sie nicht. Zu prüfen: geht `_mb_state` (Marktwert/Spanne) in `/ai/quickcheck-analyse` mit? Marcel: „nicht in meiner Lageklasse, aber mega, weil direkte Wertsteigerung möglich".
 
 ### N73 · Quick-Check-Score gegen Investor Deal Score — ENTSCHIEDEN 14.10.2026: bleibt getrennt

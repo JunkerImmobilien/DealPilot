@@ -60,7 +60,7 @@ Vorhandene Drehbücher: `parkstrasse`, `quickcheck`, `quickcheck-tippen`,
 - Jede `s.zeile(titel, text)` wird ein Kapitel: Nummer = Szene, der Titel steht groß, der Text darunter (höchstens 2 Zeilen, kurz halten). Die Intro- und Outro-Texte je Drehbuch stehen in `TEXTE` im Studio.
 - Die App bekommt einen Viewport von 1.700 px (`&breite=`) und wird auf den Rahmen gestreckt. Die Pilot-Figur ist im Studio aus.
 - **Rahmen-Rechnung:** `rect()`/`scroller()` rechnen nur bis zum eigenen Dokument hoch. Nie über `frameElement` bis ganz nach oben, sonst kommt die Lage des Studio-Rahmens doppelt dazu (v2235e).
-- **Aufnahme:** ffmpeg starten, 1 s warten, `DPM_STUDIO.los()`, dann NUR in PowerShell auf das Ende von ffmpeg warten. Browser-Abfragen während der Aufnahme rissen die Verbindung ab, und das Video zeigte 7 s den Desktop. Danach die erste Sekunde abschneiden (`-ss 1.2`). Fenster: `tools/messe-fenster.ps1 -Was vor|zurueck`, Aufnahme: `tools/messe-aufnahme.ps1 -Name <datei>.mp4 -Sekunden <s>`.
+- **Aufnahme:** ffmpeg starten, 1 s warten, `DPM_STUDIO.los()`, dann NUR in PowerShell auf das Ende von ffmpeg warten. Browser-Abfragen während der Aufnahme rissen die Verbindung ab, und das Video zeigte 7 s den Desktop. Danach die erste Sekunde abschneiden (`-ss 1.2`). Fenster: `tools/messe-fenster.ps1 -Was vor|zurueck` (sucht per Titel „Messe-Studio“ - der Studio-Tab muss der AKTIVE Tab seines Fensters sein; neuer Tab per tabs_create_mcp macht ihn aktiv, zeigt aber kurz das Hinweisfeld der Erweiterung), Aufnahme: `tools/messe-aufnahme.ps1 -Name <datei>.mp4 -Sekunden <s>`.
 - Der Chrome-Hinweisbalken nimmt im Vollbild Platz ein, er liegt nicht über der Seite. Kein `oben=`, der Zuschnitt `crop=1920:1022:0:58` reicht.
 
 ## Baukasten: Intros, Info-Karten, Outros

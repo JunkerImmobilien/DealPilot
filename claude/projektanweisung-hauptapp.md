@@ -38761,6 +38761,24 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2237–v2237d · Angebotsabschlag als Einstellung, Marktwert im Urteil und in der Pilot-Analyse (14.10.2026)
+- **Was:** Marcel: „Die Abschläge kann man im Set angeben … wir recherchieren immer den aktuellen Durchschnitt … der Marktwert, je nachdem was ich von der Spanne nehme, soll mitkommen … nach eigenen Kriterien und auch darüber“.
+  - `config.js angebotAbschlagMarkt`: 5,8 %, Stand Dezember 2025, Quelle und Link stehen **nur intern**. Beim Nachrecherchieren wird nur dieser Block geändert.
+  - Profilfeld `angebot_abschlag_pct`: leer bedeutet Marktdurchschnitt. Neue Karte „Marktbewertung“ in den Standardwerten. Sets: Standard und Rendite = Ø Markt, Vorsichtig = 9 %.
+  - `marktwert-abschlag.js` (neu): `satz()`, `quelle()`, `anwenden(card)`. `mapCard` in beiden Zwillingen (`dealpilot-mb.js`, `-qc.js`) mindert die Marktwert-Spanne und rundet auf volle 1.000 €; die Angebotswerte liegen in `card.abschlag.roh`, die Miete bleibt unverändert. Der Hinweis „· inkl. 5,8 % Abschlag auf Angebotspreise“ hängt an der Fußzeile `.legal` der Karte. `avm-section.js` ist unberührt.
+  - Kern `qc-heuristik.js` (gespiegelt): `marktwertBereinigt(wert, art, satz, quelle)`, ohne Satz wie bisher 10 % (Telegram-Bot unverändert). Neu in `empfehlung()` ist die zweite Sicht: ab 10 % unter dem bereinigten Marktwert der Satz „Über deinen Maßstab hinaus … Wertpuffer … als Substanzkauf kann er sich trotzdem lohnen“ und das Rückgabefeld `wert`. Das Urteil nach dem eigenen Maßstab bleibt oben stehen.
+  - Quick-Check: Ohne externen Bewertungspartner zählt die DealPilot-Marktbewertung an der gewählten Stelle der Spanne. `/ai/quickcheck-analyse` bekommt `markt` (Marktwert, Spanne, Abschlag, Angebotsniveau). Der Prompt bildet den Abstand auf dem Server, verlangt zwei Sichten und den Namen „DealPilot-Marktbewertung“ (nicht „unabhängige Experten“).
+  - **v2237d:** keine Quelle nach außen (Marcel: „bitte auch keine Quelle wie ImmobilienScout angeben“). Außerdem stand im Video- und Quellentext zuvor der Name des Bewertungspartners; das verstieß gegen die Anbieter-Neutralität und ist entfernt.
+- **Commit:** `dd8ac14b`, `9d783673`, `19a2a633`, `b0b231ac`, `73936155`. Das Prompt-Nachschärfen steckt im Commit „v2237b: Prompt …“. Der Commit `f840c44f` (Fensterskript) behauptet in seiner Botschaft auch die Hinweis-Korrektur; die steckt tatsächlich erst in `b0b231ac`.
+- **Nachweis:**
+  - Echter Lauf des Kerns: 139.000 € gegen Ø 189.000 € (Angebot) ergibt NICHT KAUFEN plus „+50.000 € (+36 %) Wertpuffer“ bzw. mit Abschlag „+39.000 € (+28 %)“. `score-ketten-pruefen` 216 gleich, `prompt-lecks` sauber, Buster sauber, Gold-Audit RC=0.
+  - Quick-Check im Browser: Karte 144.000 / 178.000 / 261.000 €, „Deutlich unter Markt“, Fußzeile mit Abschlag. Die Pilot-Analyse wurde dreimal echt abgerufen; die letzte nennt unter Pro „39.000 € (28 %) unter dem geschätzten Marktwert – Wertpuffer“ und in der Meinung „als wertgesicherter Substanzkauf … interessant“. Sie steht als `KI_RUNDGANG` im Drehbuch.
+  - Video `quickcheck-rundgang-studio_2026-10-14.mp4` neu aufgenommen (Kontaktabzug geprüft, Karte im Ausschnitt geprüft).
+- **Fehler dieser Runde:**
+  - `messe-fenster.ps1` (alte Fassung im scratchpad) nahm über `Get-Process … MainWindowHandle` ein beliebiges Chrome-Fenster. Getroffen wurde Marcels Fenster „PM-Werkstatt“ während einer Videokonferenz: Vollbild und verschoben. Jetzt sucht das Skript per EnumWindows nach dem Titel und bricht sonst ohne Tastendruck ab.
+  - Das Hinweisfeld der Erweiterung („Claude is active in this tab group“) stand nach dem Öffnen eines neuen Tabs rund 25 s im Video; die Aufnahme wurde wiederholt.
+- **Rest:** Die Überschrift bleibt „Nicht kaufen“ (eigener Maßstab), der Wertpuffer steht darunter. Ob die Überschrift bei großem Puffer selbst etwas sagen soll, entscheidet Marcel. Alte `_mb_state`-Schnappschüsse an gespeicherten Objekten tragen keinen Abschlag (Urteil rechnet ihn dann selbst ab, die Karte zeigt Angebotsniveau, bis neu abgerufen wird). Nicht auf Produktion.
+
 ### v2236–v2236b · Import nach gewählter Adresse, realistischer Marktwert im Rundgang (14.10.2026)
 - **Was:** Marcel: „Die Wohnung liegt deutlich mit über 80 % über Markt … vielleicht 160.000 € … der Hinweis, dass es Angebotspreise sind“.
   - **v2236 · Ursache im Import** (`object-actions.js`): Bei „Unterschiedliche Adressen“ galt die Wahl nur für Straße, PLZ und Ort. Fläche (96 statt 73,31 m²), Baujahr (1994 statt 1983) und Zimmer kamen aus dem Marktbericht der ANDEREN Wohnung und waren vorgehakt. Die Marktbewertung rechnete also eine fremde Wohnung (Ø 251.000 €). `recompute()` nimmt jetzt nur Dokumente der gewählten Adresse, der Adresskasten sagt das. Nachgemessen: nur noch Exposé-Werte (73,31 m², Bj 1983, 2 Zi., 139.000 €, Hausgeld 415 €).
