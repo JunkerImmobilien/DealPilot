@@ -739,6 +739,13 @@
     var selected = st.selectedVariant;
     var v = st.response.phase5_varianten[selected];
     var afa = st.response.phase10_afa[selected];
+    /* v2213 · Ein Gebaeudeanteil ausserhalb 0-100 % wird NIE uebernommen
+       (gemessen: -96,6 % an 2026-1056 landete im Objekt). */
+    if (!v || !(v.gebaeude_pct > 0 && v.gebaeude_pct < 100)) {
+      var _w = (st.response.phase4_bmf && st.response.phase4_bmf.warnings || []).filter(function (x) { return /nicht plausibel/.test(String(x)); })[0];
+      if (typeof toast === 'function') toast('⚠ Nicht übernommen: Gebäudeanteil ' + (v ? String(v.gebaeude_pct).replace('.', ',') : '–') + ' % ist nicht plausibel. ' + (_w ? 'Miete, Baujahr und Bodenrichtwert prüfen.' : ''));
+      return;
+    }
 
     // Gebäudeanteil-% ins Steuermodul schreiben
     var gebAntEl = document.getElementById('geb_ant');

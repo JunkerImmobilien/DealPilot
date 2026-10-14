@@ -282,7 +282,21 @@ async function _phase4_bmf(inputs, phase3) {
   try { jacoby = await _jacobyBlock(objekt, Number(bmfInputs.kaufpreis), Number(bodenwert)); }
   catch (e) { jacoby = { verfuegbar: false, grund: 'Jacoby nicht gerechnet: ' + (e.message || e) }; }
 
+  /* v2213 · Ein Gebaeudeanteil ausserhalb 0-100 % ist kein Ergebnis. Gemessen
+     14.10.2026 an 2026-1056 (MFH Bj 1905, NKM "710 Euro" fuer 5 WE): der
+     Gebaeudeertrag wird negativ, die Arbeitshilfe meldete -96,6 %, und die
+     Uebernahme schrieb ihn ins Objekt. Der Kern bleibt unangetastet - hier
+     wird es nur benannt; die Uebernahme sperrt (bmf-modal-v292.js). */
+  const unplausibel = !(gebaeude_pct > 0 && gebaeude_pct < 100);
+  const _warnungen = (bmfResult.warnings || []).slice();
+  if (unplausibel) {
+    _warnungen.push('Gebäudeanteil ' + Number(gebaeude_pct).toFixed(1) + ' % ist nicht plausibel: Der Bodenwert ('
+      + Math.round(bodenwert).toLocaleString('de-DE') + ' €) übersteigt den Wert des bebauten Grundstücks oder der Gebäudeertrag ist negativ. '
+      + 'Miete, Baujahr und Bodenrichtwert prüfen; sonst ist ein Gutachten zur Kaufpreisaufteilung nötig.');
+  }
+
   return {
+    unplausibel,
     bodenwert,
     gebaeudewert,
     bodenanteil_prozent: boden_pct,
@@ -291,7 +305,7 @@ async function _phase4_bmf(inputs, phase3) {
     jacoby,
     massgebender_verkehrswert: massgebend,
     fiktives_baujahr: r.fiktives_baujahr?.value ?? null,
-    warnings: bmfResult.warnings || []
+    warnings: _warnungen
   };
 }
 

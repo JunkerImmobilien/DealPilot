@@ -36,6 +36,13 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N66 · Marcel 14.10.2026 (dritte Runde) — Messe-Geschichten, BMF, RND-Abgleich, Werbungskosten
+1. **Messe-Geschichten als Dokument ablegen** — was Marcel an jedem Demo-Objekt erklären kann.
+2. **BMF-Kaufpreisaufteilung** bei den Demo-Objekten nachziehen.
+3. **RND-Abgleich als Beispiele:** wie man die Restnutzungsdauer heben könnte, und ein Beispiel, wo es so bleibt. **Westerfeldstraße 140** als Hauptbeispiel: von wo auf wo, und was es steuerlich gebracht hat (echtes RND-Gutachten unter `Dateien/`).
+4. **Werbungskosten im Detail** bei den Demo-Objekten plausibel füllen (Fahrten, Material …) — recherchiert.
+5. Danach: Landingpage, Leistungsumfang, F&E-Seite.
+
 ### N65 · Marcel 14.10.2026 (zweite Runde) — Antworten und Einstellungen → Standardwerte
 
 **Antworten:**
