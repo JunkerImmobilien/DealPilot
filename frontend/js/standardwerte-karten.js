@@ -33,25 +33,42 @@
 
   /* Je Abschnitt: Symbol, Kurztext und welche Felder die Karte zeigt.
      Zuordnung über den Überschrift-Text (Anfang), nicht über die Position. */
+  /* v2211 · Marcel 14.10.: „alle diese Karten mit so komischen KI-Icons. Die müssen
+     grundsätzlich weg." Keine Symbole mehr. Und: „Bewirtschaftung und Bewirtschaftung
+     je Objektart … das kann keiner verstehen" - EINE Karte, die € je Objektart und
+     den Prozent-Rückfall zusammen zeigt (die Abschnitte werden in aufbauen() vereint). */
   var KARTEN = [
-    { an: 'Finanzierung', ic: '🏦', txt: 'Startwerte für Darlehen und Eigenkapital.',
-      felder: [['ip_tilgung_default', 'Tilgung', ' %'], ['ip_zinsbindung_default', 'Zinsbindung', ''], ['ip_zins_override', 'Marktzins', ' %'], ['ip_ek_quote_default', 'Eigenkapital', ' % v. KP']] },
-    { an: 'Bewirtschaftung je', ic: '🏠', txt: 'Verwaltung und Instandhaltung für ETW, EFH, MFH.',
-      felder: [['bwkp_etw_hg_qm', 'ETW Hausgeld', ' €/m²'], ['bwkp_efh_verw', 'EFH Verwaltung', ' €'], ['bwkp_mfh_inst_qm', 'MFH Instandh.', ' €/m²'], ['bwkp_faktor', 'Faktor', '']] },
-    { an: 'Bewirtschaftung', ic: '🧾', txt: 'Kostenanteile, wenn nichts Eigenes eingegeben ist.',
-      felder: [['ip_bwk_ul_pct_default', 'umlagefähig', ' %'], ['ip_bwk_anteil_default', 'nicht umlagefähig', ' %'], ['ip_mietausfall_pct', 'Mietausfall', ' %']] },
-    { an: 'Lageklassen', ic: '📍', txt: 'Zielrendite brutto je Lage — der Maßstab der Ampel.', lage: true },
-    { an: 'Persönliche Mindest', ic: '🛡️', txt: 'Deine persönlichen Kaufgrenzen.',
+    { an: 'Finanzierung', txt: 'Startwerte für Darlehen und Eigenkapital.',
+      felder: [['_zins', 'Zinssatz', ''], ['ip_tilgung_default', 'Tilgung', ' %'], ['ip_zinsbindung_default', 'Zinsbindung', ''], ['ip_ek_quote_default', 'Eigenkapital', ' % v. KP']] },
+    { an: 'Bewirtschaftung', txt: 'Verwaltung, Instandhaltung und Mietausfall — in Euro je Objektart oder als Prozent der Miete.',
+      felder: [['_bwk', 'Rechenweg', ''], ['bwkp_mfh_verw', 'Verwaltung je Wohnung', ' €/Jahr'], ['bwkp_mfh_inst_qm', 'Instandhaltung', ' €/m² · Jahr'], ['bwkp_etw_hg_qm', 'ETW-Hausgeld', ' €/m² · Monat'], ['ip_mietausfall_pct', 'Mietausfall', ' % der Miete']] },
+    { an: 'Lageklassen', txt: 'Zielrendite brutto je Lage — der Maßstab der Ampel im Quick-Check.', lage: true },
+    { an: 'Persönliche Mindest', txt: 'Deine persönlichen Kaufgrenzen.',
       felder: [['ip_min_dscr', 'DSCR', ''], ['ip_min_cashflow_vor_st', 'Cashflow', ' €/Monat'], ['ip_max_ltv', 'max. LTV', ' %']] },
-    { an: 'Steuer', ic: '📑', txt: 'Dein Grenzsteuersatz für die Steuerwirkung.',
+    { an: 'Steuer', txt: 'Dein persönlicher Grenzsteuersatz. Gesellschaften rechnen mit dem Satz aus Mandanten.',
       felder: [['ip_grenzsteuersatz', 'Grenzsteuersatz', ' %']] },
-    { an: 'Standort', ic: '🧭', txt: 'Bundesland und Kaufnebenkosten.',
+    { an: 'Standort', txt: 'Bundesland und Kaufnebenkosten.',
       felder: [['ip_bundesland', 'Bundesland', ''], ['ip_notar_grundbuch', 'Notar/Grundbuch', ' %'], ['ip_maklerkosten', 'Makler', ' %']] }
   ];
+  /* Welche Felder ein Set setzt - in den Karten als „Set" bzw. „eigen" markiert. */
+  var SET_FELDER = { ip_tilgung_default: 1, ip_ek_quote_default: 1, ip_mietausfall_pct: 1, ip_min_dscr: 1 };
+  var LS_SET = 'dp_std_set';
+  function setGemerkt() { try { return localStorage.getItem(LS_SET) || 'dp'; } catch (e) { return 'dp'; } }
+  function setMerken(id) { try { localStorage.setItem(LS_SET, id); } catch (e) {} }
+  function setVon(id) { return SETS.filter(function (s) { return s.id === id; })[0] || SETS[0]; }
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function zahl(v) { return String(v).replace('.', ','); }
   function wert(id, einheit) {
+    if (id === '_zins') {   /* v2211: Entweder-oder sichtbar */
+      var r = document.querySelector('input[name="ip_zins_modus"]:checked'), z = document.getElementById('ip_zins_override');
+      var zv = z && String(z.value || '').trim() ? zahl(z.value) + ' %' : '';
+      return (r && r.value === 'eigen') ? 'eigener · ' + (zv || '—') : 'Marktzins' + (zv ? ' · ' + zv : '');
+    }
+    if (id === '_bwk') {
+      var b = document.querySelector('input[name="ip_bwk_modus"]:checked');
+      return (b && b.value === 'percent') ? '% der Miete' : 'Euro je Objektart';
+    }
     var e = document.getElementById(id); if (!e) return null;
     if (e.tagName === 'SELECT') { var o = e.selectedOptions && e.selectedOptions[0]; return o ? o.text.replace(/\s*\(.*$/, '') : '—'; }
     var v = String(e.value || '').trim();
@@ -90,6 +107,22 @@
       '#settings-modal [data-swk="teil"] .swk-oben{display:none}',
       '#settings-modal [data-swk="teil"] .swk-teil{display:none}',
       '#settings-modal [data-swk="teil"] .swk-teil.offen{display:block}',
+      /* v2211 · Set-Zuordnung, klickbare Karte, ruhigere Detailansicht, Entweder-oder-Wahlen */
+      '#settings-modal .swk-set.an.angepasst::after{content:"✓ aktiv · angepasst"}',
+      '#settings-modal .swk-band{font-size:12.5px;color:#3a3532;background:#FBF6E9;border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 35%,transparent);border-radius:10px;padding:9px 12px;margin:0 0 14px;line-height:1.5}',
+      '#settings-modal .swk-tag{font-style:normal;font:600 9.5px/1 Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase;padding:2px 5px;border-radius:4px;margin-left:6px;vertical-align:1px;background:color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 22%,#fff);color:#6b5417}',
+      '#settings-modal .swk-tag.eigen{background:#EEF2F7;color:#3f4b5c}',
+      '#settings-modal .swk-karte{cursor:pointer;transition:border-color .15s,box-shadow .15s}',
+      '#settings-modal .swk-karte:hover,#settings-modal .swk-karte:focus-visible{border-color:var(--wl-c9a84c,#C9A84C);box-shadow:0 2px 10px rgba(26,23,20,.07);outline:none}',
+      '#settings-modal span.swk-anpassen{border:0;padding:0;min-height:0;margin-top:2px;font:600 12px Inter,sans-serif;color:#8a6d1f}',
+      '#settings-modal .swk-teil{background:#fff;border:1px solid #e6e1d6;border-radius:12px;padding:6px 18px 18px}',
+      '#settings-modal .swk-teil h3.ip-section{font:600 18px "Space Grotesk",sans-serif;margin:4px 0 6px;border:0;padding:0}',
+      '#settings-modal .swk-teil .ip-unter{font:600 13px Inter,sans-serif;color:#1a1714;margin:18px 0 8px;padding-top:12px;border-top:1px solid #efeae0}',
+      '#settings-modal .ip-zins-modi{display:flex;flex-wrap:wrap;gap:8px 18px;margin:6px 0 4px}',
+      '#settings-modal .ip-zins-modi label{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;cursor:pointer}',
+      '#settings-modal .ip-zins-modi small{color:#625c59;font-weight:400}',
+      '#settings-modal .ip-zins-wahl,#settings-modal .ip-bwk-wahl{grid-column:1/-1}',
+      '#settings-modal input[readonly]#ip_zins_override{background:#f6f3ec;color:#625c59}',
       '@media (max-width:640px){#settings-modal .swk-sets{grid-template-columns:1fr}}'
     ].join('\n');
     document.head.appendChild(st);
@@ -102,9 +135,25 @@
     css();
     /* 1 · Abschnitte einsammeln */
     var teile = [], akt = null, vorne = [];
+    var bwkTeil = null;
     kinder.forEach(function (k) {
-      if (k.matches('h3.ip-section')) { akt = { titel: k.textContent.trim(), knoten: [k] }; teile.push(akt); }
-      else if (akt) akt.knoten.push(k);
+      if (k.matches('h3.ip-section')) {
+        var titel = k.textContent.trim();
+        /* v2211: „Bewirtschaftung je Objektart" wird Teil der Karte Bewirtschaftung -
+           als Unterabschnitt „Euro-Werte je Objektart", direkt unter dem Umschalter. */
+        if (bwkTeil && titel.indexOf('Bewirtschaftung je') === 0) {
+          var h = document.createElement('h4'); h.className = 'ip-unter'; h.textContent = 'Euro-Werte je Objektart';
+          k.style.display = 'none';
+          var stelle = 1 + bwkTeil.knoten.findIndex(function (n) { return n.classList && n.classList.contains('ip-bwk-wahl'); });
+          if (stelle < 1) stelle = bwkTeil.knoten.length;
+          bwkTeil.einschub = stelle; bwkTeil.knoten.splice(stelle, 0, k, h);
+          akt = { titel: titel, knoten: null, an: bwkTeil, pos: stelle + 2 }; return;
+        }
+        akt = { titel: titel, knoten: [k] }; teile.push(akt);
+        if (titel.indexOf('Bewirtschaftung') === 0) bwkTeil = akt;
+      }
+      else if (akt && akt.knoten) akt.knoten.push(k);
+      else if (akt && akt.an) { akt.an.knoten.splice(akt.pos, 0, k); akt.pos++; }
       else vorne.push(k);
     });
     var oben = document.createElement('div'); oben.className = 'swk-oben';
@@ -129,8 +178,9 @@
       sets.appendChild(b);
     });
     var hin = document.createElement('p'); hin.className = 'swk-hinweis';
-    hin.textContent = 'Ein Set setzt Tilgung, Eigenkapital, Mietausfall und Mindest-DSCR. Alles andere passt du in den Karten an. Übernommen wird mit „Speichern“ unten.';
-    oben.appendChild(sets); oben.appendChild(hin); oben.appendChild(karten);
+    hin.textContent = 'Ein Set setzt Tilgung, Eigenkapital, Mietausfall und Mindest-DSCR. Übernommen wird mit „Speichern“ unten.';
+    var band = document.createElement('div'); band.className = 'swk-band';   /* v2211 */
+    oben.appendChild(sets); oben.appendChild(hin); oben.appendChild(band); oben.appendChild(karten);
     host.insertBefore(oben, teile[0] ? teile[0].el : null);
     host._swkTeile = teile; host._swkKarten = karten;
     karteneZeichnen(host);
@@ -153,17 +203,42 @@
           if (inp && n) zeilen += '<span>' + esc(n[0]) + '</span><b>' + esc(inp.value ? zahl(inp.value) + ' %' : '—') + '</b>';
         });
       } else {
-        (k.felder || []).forEach(function (f) { var v = wert(f[0], f[2]); if (v != null) zeilen += '<span>' + esc(f[1]) + '</span><b>' + esc(v) + '</b>'; });
+        var set = setVon(setGemerkt());
+        (k.felder || []).forEach(function (f) {
+          var v = wert(f[0], f[2]); if (v == null) return;
+          /* v2211 · Marcel: „dass die jetzt auch für den DealPilot Standard dann sind. Das kann
+             man nicht ganz auseinanderhalten." Felder, die das Set setzt, tragen ein Etikett:
+             „Set" solange der Wert dem gewählten Set entspricht, sonst „eigen". */
+          var tag = '';
+          if (SET_FELDER[f[0]]) {
+            var e = document.getElementById(f[0]);
+            var a = e ? parseFloat(String(e.value).replace(',', '.')) : NaN, s = parseFloat(set.werte[f[0]]);
+            tag = (isFinite(a) && Math.abs(a - s) < 1e-9) ? '<i class="swk-tag">Set</i>' : '<i class="swk-tag eigen">eigen</i>';
+          }
+          zeilen += '<span>' + esc(f[1]) + tag + '</span><b>' + esc(v) + '</b>';
+        });
       }
-      var c = document.createElement('div'); c.className = 'swk-karte';
-      c.innerHTML = '<h4><span class="swk-ic">' + k.ic + '</span>' + esc(t.titel) + '</h4>'
+      var c = document.createElement('div'); c.className = 'swk-karte'; c.tabIndex = 0;
+      c.setAttribute('role', 'button');
+      c.innerHTML = '<h4>' + esc(k.titel || t.titel) + '</h4>'
         + (k.txt ? '<p>' + esc(k.txt) + '</p>' : '')
-        + (zeilen ? '<div class="swk-werte">' + zeilen + '</div>' : '');
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'swk-anpassen'; b.textContent = 'Anpassen';
-      b.addEventListener('click', function () { oeffne(host, i); });
-      c.appendChild(b);
+        + (zeilen ? '<div class="swk-werte">' + zeilen + '</div>' : '')
+        + '<span class="swk-anpassen">Anpassen ›</span>';
+      /* v2211: die ganze Karte öffnet - nicht nur der Knopf */
+      c.addEventListener('click', function () { oeffne(host, i); });
+      c.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); oeffne(host, i); } });
       karten.appendChild(c);
     });
+    /* Band: welches Set gilt, wie viele Werte weichen ab */
+    var band = host.querySelector('.swk-band');
+    if (band) {
+      var st = setVon(setGemerkt()), eigen = 0;
+      Object.keys(SET_FELDER).forEach(function (id) { var e = document.getElementById(id); if (!e) return;
+        var a = parseFloat(String(e.value).replace(',', '.')); if (!(isFinite(a) && Math.abs(a - parseFloat(st.werte[id])) < 1e-9)) eigen++; });
+      band.innerHTML = 'Grundlage: <b>' + esc(st.name) + '</b> — die mit <i class="swk-tag">Set</i> markierten Werte kommen aus diesem Set'
+        + (eigen ? ', <b>' + eigen + '</b> davon hast du angepasst (<i class="swk-tag eigen">eigen</i>).' : '.')
+        + ' Alle anderen Werte gelten für jedes Set.';
+    }
   }
   function oeffne(host, i) {
     (host._swkTeile || []).forEach(function (t, j) { t.el.classList.toggle('offen', j === i); });
@@ -176,6 +251,7 @@
     try { host.scrollIntoView({ block: 'start' }); } catch (e) {}
   }
   function setAnwenden(host, st) {
+    setMerken(st.id);   /* v2211: das gewählte Set bleibt gemerkt */
     Object.keys(st.werte).forEach(function (id) {
       var e = document.getElementById(id); if (!e) return;
       e.value = st.werte[id];
@@ -191,9 +267,13 @@
         return isFinite(a) && Math.abs(a - b) < 1e-9;
       });
     };
+    /* v2211 · Aktiv ist das GEWÄHLTE Set (gemerkt), nicht nur eines, dessen vier Werte
+       zufällig passen. Weicht ein Wert ab, steht „aktiv · angepasst". */
+    var g = setGemerkt();
     [].slice.call(host.querySelectorAll('.swk-set')).forEach(function (b) {
-      var st = SETS.filter(function (s) { return s.id === b.getAttribute('data-set'); })[0];
-      b.classList.toggle('an', !!st && gleich(st));
+      var id = b.getAttribute('data-set'), st = setVon(id), an = id === g;
+      b.classList.toggle('an', an);
+      b.classList.toggle('angepasst', an && !gleich(st));
     });
   }
 
