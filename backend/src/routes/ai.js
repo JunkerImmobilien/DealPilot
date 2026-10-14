@@ -523,7 +523,9 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
 
     /* Der Prompt. Frueher stand er in quickcheck-app.html ab Zeile 5299. */
     const prompt = [
-      'Du bist ein Immobilien-Investment-Experte. Analysiere diesen Deal auf Deutsch.',
+      /* v2227b · „im Du": gemessen schrieb die Analyse „Ihrer Zielvorgabe",
+         die App duzt überall */
+      'Du bist ein Immobilien-Investment-Experte. Analysiere diesen Deal auf Deutsch und sprich den Nutzer mit "du" an (nie "Sie"/"Ihr").',
       '',
       'Eingaben:',
       '- Objekt: ' + (i.objektart || '?') + ' in ' + (i.plz || '?') + ' ' + (i.ort || '')
@@ -625,6 +627,18 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
       '  "cons": ["Punkt 1", "Punkt 2", "Punkt 3"],',
       '  "opinion": "Sachliche Experten-Meinung in 3-4 Saetzen"',
       '}',
+      '',
+      /* v2227 · Marcel 14.10.2026: oben stand „Starker Kauf", und der
+         Verhandlungsrat begann direkt mit „Eine Verhandlungsstrategie von
+         3-5 % Nachlass" - ohne Bruecke wirkt das wie ein Widerspruch. */
+      'Zum Feld "negotiate":',
+      '- Lautet das gerechnete Urteil "Starker Kauf", beginnt "negotiate" mit der',
+      '  Bestaetigung, dass es ein guter Deal ist, und nennt dann den GRUND,',
+      '  warum Verhandeln trotzdem sinnvoll ist (z. B. Zins ueber Marktzins,',
+      '  hohes Hausgeld) - erst danach die Prozent-Empfehlung. Begruende den',
+      '  guten Deal mit den Kennzahlen, nicht mit "dem Urteil" oder "dem Score".',
+      '- Beginnt das Urteil mit "Nicht kaufen", empfiehlst du keinen Kauf zum jetzigen',
+      '  Preis, sondern nennst den Preis aus der Begruendung oben.',
       '',
       /* v1946 · DIESELBEN VERBOTE WIE IN services/bewertungsText.js.
          Jedes hat einen gemessenen Vorfall hinter sich; der erste und

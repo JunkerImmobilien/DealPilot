@@ -38761,6 +38761,176 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### Messe-Videos aufgenommen (14.10.2026)
+- **Was:** Mit ffmpeg (gdigrab, Hauptbildschirm 1920x1080, Chrome im Vollbild) habe ich fünf MP4 nach `Dateien/Messe/Videos/` aufgenommen. Oben sind 58 px abgeschnitten (Chrome-Leiste „Claude hat die Fehlerbehebung gestartet"), das ergibt 1920x1022, 30 fps, x264 crf 20.
+  - quickcheck-datenaufnahme 158 s · 6,3 MB
+  - immometrica 116 s · 4,6 MB
+  - sprache 128 s · 4,6 MB
+  - parkstrasse 68 s · 4,0 MB
+  - quickcheck-kurz 56 s · 2,6 MB
+- **Nachweis:** Stichbilder je Video gelesen (Kegel, Untertitel, Mitschrift sichtbar, keine Leiste, kein Mauszeiger). Parkstraße danach NKM 3195 / DSCR 1,231875 (Sicherung `/root/backups/parkstr-objekt-video.json`). Das Chrome-Fenster ist danach wieder minimiert.
+- **Rest:** Parkstraße und Quick-Check kurz haben noch die alte Schlusskarte statt Abspann mit Wortmarke. Videos sind nicht im Repo (Dateien/ ist untracked).
+
+### v2229–v2231b · Staging · Sprache: Rückfragen am Katalog, Spanne/Beleihung gewinnen, Drehbuch Sprache (14.10.2026)
+- **Was:**
+  - **v2229 · Sprache, Rückfragen** (`voice-import.js rueckfragen`): erst auf den Katalog kürzen, dann Lücken prüfen. Vorher geprüft und danach gekürzt. Im Quick-Check gibt es keine Zinsbindung (`d1_bindj`), also galt der Finanzierungsblock dort IMMER als Lücke, und der Co-Pilot fragte Eigenkapital, Zins und Tilgung nach, auch gesprochene. Gefunden beim Vermessen für das Drehbuch.
+  - **v2230 · Quick-Check:** Der Klick auf die Spanne bzw. auf einen Beleihungsknopf hebt `dataset.userSet` von `qc_nkm` bzw. `qc_ek` auf. Gemessen: nach gesprochener/importierter Miete stand Grundmiete 831, Gesamt blieb 680, der Score rührte sich bei keiner Stufe. 80 % Beleihung ließ das EK bei 32.000 €. Ursache: Der Import löst `input` aus, und das setzt den Schutz für Getipptes.
+  - **v2231–v2231b · Drehbuch `?messe=sprache`:**
+    - Echtes Sprachfenster mit stummem Ton statt Mikrofon (`_mikroAn`). Die drei Sprach-Abrufe kommen im Lauf aus dem Mitschnitt (`_fetchAn(_sprAntwort)`, Abruf-Ersatz jetzt allgemein).
+    - Der Sprechtext erscheint Satz für Satz als Mitschrift (aufgeklappt), die Chips leuchten. Die Felder sind die ECHTE Auslese des Textes über `/ai/extract-text` mit dem abgefangenen Quick-Check-Katalog (16 Werte).
+    - Ablauf: Gesprochen 46 · Schwach → Marktbewertung Bielefeld (echt: 186–267 T€, Miete 646–831 €) → Ø 52 · Solide → Oben 63 · Solide → 20 % EK 72 · Gut → Abspann.
+- **Commit:** `ed476792`, `ac735073`, `4d11ebc2`, `d491c105`, `267ff7c9`
+- **Nachweis:** Lauf rund 110 s ohne Co-Pilot-Nachfrage (erster Lauf ohne Lage/Energie fragte zu Recht nach Lageklasse und Zustand & Energie). Danach `fetch` und `getUserMedia` echt, Spannen-Vorgabe zurück. Kein kostenpflichtiger Abruf im Lauf.
+- **Befund für Marcel:** Urteilsschwellen 40/60/75 gegen Score-Stufen 35/50/70/85: Score 39 heißt „Schwach", das Urteil „Finger weg". Nicht geändert.
+- **Rest:**
+  - ffmpeg installiert (winget Gyan.FFmpeg 9.0.2). Aufnahme braucht das Chrome-Fenster sichtbar im Vordergrund (es war minimiert).
+  - Prod: v2224–v2231 offen.
+
+### v2227–v2228b · Staging · Verhandlungsrat mit Brücke, Analyse im Du, Drehbuch ImmoMetrica (14.10.2026)
+- **Was:**
+  - **v2227/a/b · Verhandlungsrat** (Marcel: „am Schluss eine Bewertung mit kaufen und danach kommt im Satz direkt, dass man handeln soll"):
+    - Prompt `/ai/quickcheck-analyse`: Bei „Starker Kauf" beginnt `negotiate` mit „guter Deal" und dem Grund, warum Verhandeln trotzdem sinnvoll ist, begründet mit Kennzahlen, nicht mit „dem Urteil". Bei „Nicht kaufen" keine Kaufempfehlung zum jetzigen Preis.
+    - Die Analyse duzt (gemessen vorher: „Ihrer Zielvorgabe").
+    - Absicherung im Quick-Check: Fehlt bei KAUFEN die Brücke, wird sie vorangestellt.
+    - Drehbuch: neue Pilot-Analyse aufgenommen, die Schlussszene zeigt die Brücke.
+  - **v2228 · Drehbuch `?messe=immometrica`:** echtes Inserat aus Marcels Suche „Haus" (2,5-Familienhaus Herford, 3 WE, 210 m², Bj 1963, 350.000 €, leer, ohne Straße).
+    - Ablauf: Quellen → Suche 1.527 Treffer → Inserat → Ortskern-Hinweis → DealPilot-Marktbewertung (361–461 T€, Miete 1.499–2.327 €) → Spanne Unten 25 · Kritisch, Ø 40 · Schwach, Oben 68 · Solide → 20 % EK 76 · Gut → Abspann mit Wortmarke.
+    - Alle fünf ImmoMetrica-Wege beantwortet `_imoFetchAn()` nur im Lauf aus dem Mitschnitt; danach ist `fetch` wieder das echte.
+- **Commit:** `c93997f5`, `1ac7db6a`, `da4aa2a5`, `61ce55ca`, `46ef06d0`, `18f84111`, `40269875`
+- **Nachweis:**
+  - Echter Lauf mit neuem Prompt: „Dies ist ein guter Deal, da die Bruttomietrendite … Obwohl …, liegt dein Zinssatz … Daher solltest du …".
+  - ImmoMetrica-Drehbuch rund 100 s: alle Stufen wie gemessen, Abspann beide Karten (85,5 s / 90,9 s). Danach `fetch` echt, `#imo-ov` weg, Spannen-Vorgabe zurück, nur `PUT /portfolio-spiegel`.
+  - Vorbereitung: 1 DealPilot-Marktbewertung, ImmoMetrica-Listen einmal live.
+- **Rest:**
+  - Sprach-Drehbuch in Arbeit.
+  - Videos als Dateien offen (ffmpeg).
+  - v2224/v2226/v2227 nicht auf Prod.
+
+### v2226 · Staging · Lage ins Urteil, nicht in den Score; Abspann im Quick-Boarding-Drehbuch (14.10.2026)
+- **Was:**
+  - Marcel: „nicht in den Score [nicht mehr vergleichbar], aber in die Gesamtbewertung … ganz oben … nicht kaufen … aber auch sagen, warum der Deal trotzdem gut ist".
+  - `QcHeuristik.empfehlung` (Rechenkern, gespiegelt): Mit gewählter Lageklasse und Bruttomietrendite unter deren Zielrendite (Ampel gelb/rot aus `zielUrteil`) wird KAUFEN/VERHANDELN/PRUEFEN zu **NICHT KAUFEN**. Dazu kommen Grund (Ist gegen Ziel), Preis für die Zielrendite und – bei Score ≥ 60 – „Rechnerisch trägt der Deal trotzdem: Score, Cashflow, DSCR". Bei KRITISCH/PASS wird der Lage-Satz vorangestellt. Rückgabe `lage {passt, klasse, ziel, ist, wort, kp_ziel}`. Score unverändert.
+  - Quick-Check-Überschrift: „Nicht kaufen — Rendite unter deinem Ziel für die C-Lage".
+  - Drehbuch: Lage-Teil länger und neu geordnet (20 % EK → B passt → C „Nicht kaufen" + „trotzdem"), danach Oben → Starker Kauf. Abspann „30 Sekunden. Eine fundierte Einschätzung …" und animierte Wortmarke (Zoom, Goldkante, Glanz, Runway-Linie).
+- **Commit:** `771f2644`
+- **Nachweis:**
+  - Funktionslauf am echten Kern: Unten 80 %/C → NICHT KAUFEN mit „trotzdem: Score 66"; Unten/B → passt; Oben/C → KAUFEN; ohne Klasse unverändert.
+  - Prüfer: zielurteil SAUBER, score-ketten 115 Punkte gleich, Spiegelung nachgerechnet. Staging-Backend neu gebaut (Bot), Kern im Image.
+  - Drehbuch-Lauf 135 s: „Nicht kaufen — Rendite unter deinem Ziel für die C-Lage", Score 71 (Gut), „Rechnerisch trägt der Deal trotzdem: Score 71, Cashflow +111 €/Monat, DSCR 1,45", Zielpreis 131.314 €. Kein KI-Aufruf, Spannen-Vorgabe zurück.
+- **Rest:** v2224 (KI-Score) und v2226 nicht auf Prod.
+
+### v2223–v2225a · Staging · Fotos je PDF, KI-Score im Quick-Check, Quick-Boarding-Drehbuch neu (14.10.2026)
+- **Was:**
+  - **v2223 · Fotos je PDF getrennt** (Marcel: „bei 2 unterschiedlichen PDFs werden die Fotos des einen Objektes nicht richtig zugeordnet"):
+    - Fotos merken sich ihre Datei. Je PDF eine Fotozeile mit Datei und Adresse.
+    - Bei Adresskonflikt ist nur die Zeile der gewählten Adresse vorgehakt, die andere trägt „(andere Adresse)".
+    - Übernahme nur aus angehakten Zeilen (`_gewaehlteFotos`).
+    - Text „&uebernehmen;" repariert.
+  - **v2224 · KI-Bewertung im Quick-Check bekam einen anderen Score als die Anzeige.** `runRealAi` nahm den Rückfall `QcEngine.computeScore` (92), angezeigt wird `_dpPilotScore` (76). Die KI schrieb „Score von 92/100 und Stufe 'Sehr gut'". Jetzt dieselbe Wahl wie `updateAll`. **Auf Prod im selben Code.**
+  - **v2225 · Drehbuch `?messe=quickcheck` neu** (Marcel):
+    - Einstellungen: aktives Standardwerte-Set und Lageklassen A/B/C
+    - vorbelegte Felder (Zins, Tilgung)
+    - zwei PDFs mit Adresskonflikt
+    - Marktwertindikation
+    - Spanne Unten mit sofortiger Einschätzung
+    - Lage B/C mit Verhandlungsziel
+    - Oben + 20 % EK (76 · Gut)
+    - Pilot-Analyse unten
+
+    Die Pilot-Analyse wurde einmal echt für genau diesen Endstand erzeugt. Während des Laufs gibt `qc-ai-bridge` sie über `DealPilotMesse.kiAntwort()` zurück, ohne Abruf.
+  - **„Ausgewählte übernehmen geht nicht" (Quick-Check):** auf Staging fünfmal nicht nachstellbar (Mitschnitt und echte PDFs, Quick-Check und Objekt, echte Mausklicks, `elementFromPoint` trifft den Knopf, keine Fehler). Offen, Rückfrage an Marcel.
+- **Commit:** `790194fa`, `97b168eb`, `1df93bbf`, `d8a876ca`
+- **Nachweis:**
+  - Echtes Einlesen beider PDFs: Fotos „aus Expose.PDF (Hölderlinstr. 1)", bei Sachsenstraße nicht angehakt; nach Übernahme 6 Fotos im Quick-Check.
+  - KI-Anfrage sendet „76 Gut", die Antwort nennt 76/100.
+  - Drehbuch-Lauf rund 103 s, Kegel bei jeder Zeile im Bild, kein KI-/Marktbericht-/Pass-Aufruf.
+- **Rest:**
+  - Videos als Dateien: auf dem Rechner kein ffmpeg; Ordner `Dateien/Messe/Videos` mit Liste angelegt.
+  - Drehbücher Sprache und ImmoMetrica offen.
+  - Lage in der Score-Zahl: Marcels Entscheidung.
+
+### v2222–v2222b · Staging · Messe-Drehbuch Quick Boarding mit Datenaufnahme (14.10.2026)
+- **Was:** `?messe=quickcheck` ist neu, das bisherige heißt jetzt `quickcheck-tippen`.
+  - Ablauf: Zwei PDFs aus Marcels Ordner (Exposé Hölderlinstr. + Marktwerteinschätzung Sachsenstr.) → Adresskonflikt → Exposé-Adresse gewählt → übernehmen → DealPilot-Marktwertindikation → Zensus-Bestandsmiete 550 € (22 · Kritisch) → Spanne Unten 766 € (54 · Solide) → Bewertung mit Lage B, dann C (Ziel 5,0 → 7,0 %, Verhandlungsziel 131.314 €) → Oben + 20 % EK (76 · Gut, „Starker Kauf").
+  - **Mitschnitt statt Abruf:** `ObjectActions._voice.mitschnitt()/wiedergabe()` (neu in object-actions.js). Die echten KI-Ausleseergebnisse beider PDFs (einmal echt eingelesen) und die echte `#_mb_state`-Karte nach `DealPilotMBQc.run()` stehen im Drehbuch und werden je Durchgang ohne Abruf wiedergegeben.
+  - Quick-Check: Die KI-Automatik startet während eines Drehbuchs nicht (kein Absage-Toast im Video).
+  - `qc_span_config` wird gesichert und zurückgeschrieben.
+  - Scrollen jetzt sofort statt sanft (gemessen bis 3 s außer Bild). Waagerechte Rollstreifen gelten nicht mehr als Scroller.
+- **Befunde für Marcel:**
+  - **Marktwert erreicht den Quick-Check-Score nicht:** `registerDpmb` steht in dealpilot-mb-qc.js:298 hinter dem `return` aus v832c. „Potenzial" blieb in allen Läufen bei 30, obwohl der Marktwert 199–351 T€ über dem Kaufpreis von 139 T€ lag. Nicht behoben, weil das Scores ändert.
+  - Die KI-Auslese der Marktwert-PDF ergab `wertentwicklung_3jahre_pct 14,1`, im PDF steht −1,65 %.
+  - Lageklasse geht nicht in die Score-Zahl ein, nur in Zielrendite und Verhandlungsrat (so gebaut).
+- **Commit:** `f9d64d6f`, `5afd875d`, `dd5b4563`
+- **Nachweis:**
+  - Letzter Lauf rund 92 s, Kegel bei jeder Zeile im Bild (Protokoll).
+  - Schreibaufrufe nur `PUT /portfolio-spiegel` beim Laden. Kein KI-, kein Pass-, kein Marktbericht-Abruf.
+  - Kosten der Vorbereitung: 2 echte KI-Auslesungen und 1 DealPilot-Marktwertindikation auf Staging.
+- **Rest:**
+  - Datenschutz vor öffentlicher Nutzung: echte Adressen (Exposé einer Privatverkäuferin, Marktwert-PDF eines Privatkunden) stehen im Video. Marcel entscheidet.
+  - `qc_span_config` in Marcels Browser durch meine Handtests verstellt, auf Vorgabe zurückgesetzt (Eintrag entfernt = Ø).
+
+### v2221–v2221c · Staging · Messe-Drehbuch 2 Quick-Check, Prüfung Co-Pilot-Einstellungen (14.10.2026)
+- **Was:**
+  - **Drehbuch `?messe=quickcheck`:** ETW Musterweg 7, Bielefeld, als Beispiel erkennbar. 72 m², Bj 1994, NKM 680, Hausgeld 230.
+    - Es öffnet Quick Boarding und tippt die Felder Zeichen für Zeichen. Der Kegel zeigt die jeweilige Karte, durch das iframe hindurch (`rect()` addiert den Rahmen, `scroller()` geht über `frameElement`).
+    - Urteil bei 159.000 €: Score 31 · Kritisch, DSCR 0,9, Cashflow −147 €.
+    - Danach „verhandelt" auf 129.000 €: 54 · Solide, DSCR 1,11, Cashflow −4 €.
+    - Alle Zahlen liest das Drehbuch aus dem echten Quick-Check. Kein „Abrufen" (Kontingent). Am Ende „Neuer Vorgang" und Reiter Objekt, auch bei Esc.
+  - **Gemessen, was der Quick-Check beim Score selbst schreibt:** `POST /ai/quickcheck-analyse` (2× je Lauf, OpenAI-Kosten, Marcels Entscheidung v1946) und `POST /passes/from-snapshot` (Boarding-Pass; „Neuer Vorgang" setzt nur `revoked_at`).
+    - Beides ist ausgesetzt, solange `DealPilotMesse.laeuft()`: in `qc-ai-bridge.js` mit einer ehrlichen Absage, in `qc-bridge.js` an der Weiche `qc-autopass`.
+    - **Zurückgenommen (v2221b):** Ein Erfassungs-Empfänger im Drehbuch griff nicht, weil am window die Anmeldereihenfolge gilt.
+  - **Co-Pilot (KI) in den Einstellungen geprüft, nicht übrig:**
+    - Detailgrad, Tonalität, Fokus und eigene Anweisungen gehen als `aiOptions` in den Pilot-Prompt (`openaiService.js:1845/1996`), dazu in KI-Lage, KI-Miete und DS2-KI.
+    - Eigenes Wissen geht über `projektwissen.js` an alle Piloten.
+    - Strategie, Risiko, Verkäuferdruck und Marktlage gehen als `investor_profil` in die Pilot-Analyse. Der Reiter ist ihr einziger Eingabeweg (`ip_ai_strat` wird gelesen, aber nirgends gezeichnet).
+  - **Eigener Fehler:** Ein globales `var g` aus meinem Messskript überschrieb `g()` aus calc.js. `saveObj` brach in `updHeader` ab, vor `collectData`, also ohne Schreibzugriff. Der Tab wurde verworfen. Der neue Marktwert 487.000 € war schon um 11:37 gespeichert.
+- **Commit:** `2cc7b3e3`, `129bbe23`, `f3de0771`, `6fb897ca`
+- **Nachweis:** Letzter Lauf über `?messe=quickcheck`: Schreibaufrufe nur `PUT /portfolio-spiegel` (beim Laden der App), kein KI-Aufruf, kein Pass. Kegel auf dem Score-Block 16,8–23,8 s stabil. Gold-Audit RC=0.
+- **Rest:**
+  - Vier widerrufene Test-Pässe in `shared_passes` (ESECY3A8MW, TN4HYX440Q, 6WND7CC064, RYMT3S14DH), ungültig. Löschen ist Marcels Sache.
+  - Der Score-Block zeigt im Drehbuch ein leeres QR-Feld.
+
+### v2220–v2220a · Staging · Zensus-Leerstand am Mietausfall-Risiko, Handy-Knöpfe weiß, neuer Marktbericht Parkstraße (14.10.2026)
+- **Was:**
+  - **v2220:** Der Zensus-Leerstand-Kasten wandert von „Leerstand p.a." unter das Dropdown „Mietausfall-Risiko". Marcel nennt den Gesamtleerstand „nichtssagend".
+    - Gezeigt wird jetzt der marktaktive Leerstand mit einem Anhalt für die Stufe: unter 1,5 / 3 / 5 / 8 % → sehr niedrig / niedrig / mittel / erhöht / hoch. Die Schwellen sind ein VORSCHLAG an der Fluktuationsreserve und stehen sichtbar im Kasten.
+    - Abgleich mit der Wahl, „übernehmen" per Klick (löst das change des Dropdowns aus).
+    - Gesamtleerstand und Dauerleerstand nur noch in der Fußzeile, die Dauer-Liste entfällt.
+  - **v2220a:** „Plan" und „Abmelden" waren in der Handy-Aktenmappe gold. `auth.js` schreibt Gold inline, und die Desktop-Regel hängt an `.dpl-schiene`. Jetzt Creme `#E9E3D6` auf `#171512`, wie am Desktop gemessen.
+  - **Marktbericht Parkstraße neu (Stufe 3):** Marktwert 487.000 € (416.000–570.000), −37,6 % zum Kaufpreis, Marktmiete 6,32 €/m². Vorher 08.10.: 482.000 €.
+- **Commit:** `9fc2dd1a`, `a3c83e1c`
+- **Nachweis:**
+  - Parkstraße: Kasten direkt unter `#ds2_mietausfall`, „2,0 % → Niedrig", Wahl „Mittel" wird als Abweichung erkannt. Nicht übernommen, das entscheidet Marcel.
+  - Messkabine 390 px: beide Knöpfe `rgb(233,227,214)` auf `rgb(23,21,18)`, 40 px.
+  - Gold-Audit Staging RC=0.
+- **Rest:**
+  - Schwellen der Leerstand-Stufen von Marcel abnehmen lassen.
+  - Messe-Szene 1 zeigt neben „780.000 €" weiter „487.000 € · Deutlich über Markt".
+
+### v2219d–v2219g · Staging · Drehbuch Parkstraße selbst abgenommen (14.10.2026)
+- **Was:** Marcel: „schau es dir selber an". Drei Läufe mit Zeitprotokoll (Zeile, Kegel-Rechteck, NKM-Wert alle 250 ms) und Bildern je Szene.
+  - Soll und Ist: Der Kegel zeigt erst den Umschalter, dann das Feld „Nettokaltmiete / Monat" im Reiter Miete. Dort springt 2.321 auf 3.195. Vorher stand die Zahl nur in der Zeile.
+  - Gemessen: Das Zurückladen des Ist springt auf den Reiter Objekt. Die Ist-Szene holt den Reiter Miete zurück.
+  - Die alte Zeile stand 2–3 s über dem nächsten Reiter und geht jetzt mit dem Szenenwechsel.
+  - Die Soll-gegen-Ist-Zeile ist kürzer („Cashflow", „Score") und bricht nicht mehr um.
+  - Jeder Reiter beginnt oben. Vorher zeigte der kürzere Steuer-Reiter eine leere Fläche und der Balken 2025 lag 2,4 s außerhalb. Gescrollt wird der Container selbst, weil `scrollIntoView(smooth)` dort nie ankam.
+  - **Zurückgenommen:** „Kasten 9 px unter dem Fensterrand" (v2219e) war ein Messfehler. Ich hatte CSS-Pixel gegen die Screenshot-Höhe 726 gemessen, das Fenster hat bei 90 % Zoom 987 CSS-px.
+- **Commit:** `1c7bb914`, `2768d4cc`, `fe77d2cb`, `c102f69c`
+- **Nachweis:** Letzter Lauf: Soll-Kegel auf dem Feld (NKM 2321), Ist auf dem Feld (3195), Soll-gegen-Ist-Kasten, Steuer-Balken 2025 „+16.329 €". DB Parkstraße danach NKM 3195 / DSCR 1,231875. Vorher gesichert: `/root/backups/parkstr-objekt-1120.json`.
+- **Rest:** Nur auf Staging. Der Prod-Rollout lohnt sich erst mit dem nächsten Paket.
+
+### Prod-Rollout (19) · v2217–v2219c auf Produktion (14.10.2026)
+- **Was:** Freigabe Marcel. Der Anlass war v2219a: Die Soll-Ansicht konnte das Ist überschreiben. Lokal `main` + Merge `origin/staging` (`--no-ff`), Push → `b11f88b4`. Auf Prod `git pull` und Rebuild `backend`. Das mb-backend ist unverändert, kein Rebuild.
+- **Commit:** `b11f88b4` (22 Commits, 40 Dateien, keine Migration)
+- **Nachweis:**
+  - Sicherung vorher: `/root/backups/haupt-20261014-1102.sql.gz` (11 MB, 71 Tabellen) und `mb-20261014-1102.sql.gz` (25 MB, 32 Tabellen), Kopf gelesen.
+  - Backend `healthy`, „No new migrations“. Im Image: `MAX_CATALOG = 320` und `soll_ist_lesen` (3 Stellen).
+  - Live: `storage.js` trägt `_vorAnkauf`, `ankauf-ansicht.js` und `messe-drehbuch.js` antworten mit 200 und `text/javascript`. `index.html` hat `storage.js?v=v2219` (in v2219a gesetzt) und `messe-drehbuch.js?v=v2219c`.
+  - Gold-Audit auf Prod RC=0. `buster-ebenen-pruefen` SAUBER.
+- **Rest:**
+  - Die Soll-Ansicht auf Prod ist im Browser nicht abgenommen. Getestet ist sie auf Staging.
+  - Freisprechen und Halten-zum-Sprechen fehlen noch am echten Handy.
+
 ### v2218g–v2219c · Staging · Geführte Eingabe randlos, Dokumente im PDF-Import, Sprache direkt, Sprechkatalog, Soll-Ansicht überschrieb das Ist, Messe-Drehbuch (14.10.2026)
 - **Was:** Marcels achte Runde (N71).
   - **v2218g:** Geführte Eingabe am Handy randlos über `100dvh`. Gemessen: Fenster vorher 352×686, Verlauf 168 → 242 px.

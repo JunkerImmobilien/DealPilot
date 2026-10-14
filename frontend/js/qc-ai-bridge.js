@@ -46,6 +46,19 @@
     var rahmen = document.querySelector('iframe[src*="quickcheck"]');
     if (!rahmen || ev.source !== rahmen.contentWindow) return;
 
+    /* v2221 · Während eines Messe-Drehbuchs keine KI-Bewertung: gemessen
+       zwei Aufrufe je Durchgang, in der Messeschleife (45 s) über tausend
+       am Tag - jeder mit echten OpenAI-Kosten. Die Szenen zeigen die
+       Bewertung nicht; der Quick-Check bekommt eine ehrliche Absage. */
+    if (window.DealPilotMesse && typeof DealPilotMesse.laeuft === 'function' && DealPilotMesse.laeuft()) {
+      /* v2225 · gibt das Drehbuch eine AUFGENOMMENE Analyse frei (einmal echt
+         für genau diesen Endstand erzeugt), kommt sie zurück - ohne Abruf. */
+      var mit = (typeof DealPilotMesse.kiAntwort === 'function') ? DealPilotMesse.kiAntwort() : null;
+      if (mit) { antwort(ev.source, { ok: true, analyse: mit }); return; }
+      antwort(ev.source, { ok: false, fehler: 'Im Messe-Drehbuch ausgesetzt' });
+      return;
+    }
+
     try {
       var r = await window.Auth.apiCall('/ai/quickcheck-analyse', {
         method: 'POST',

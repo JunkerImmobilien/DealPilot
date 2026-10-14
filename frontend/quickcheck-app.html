@@ -4143,6 +4143,10 @@ const QcApp = (function() {
     const kp = QcEngine.num(inputs.kp);
     if (kp) {
       const ekInp = document.getElementById('qc_ek');
+      /* v2230 · der Beleihungsknopf ist eine ausdrückliche Wahl - er setzt
+         das Eigenkapital neu, auch wenn es vorher importiert/gesprochen war
+         (gemessen: 80 % geklickt, EK blieb 32.000 €, Score unverändert) */
+      if (btnEl) delete ekInp.dataset.userSet;
       if (!ekInp.dataset.userSet) {
         const knkPct = 10.5;
         const ekKpPart = kp * (1 - pct / 100);
@@ -5481,7 +5485,11 @@ const QcApp = (function() {
       KRITISCH:   { ton: 'bad',  zeichen: '⚠️', kopf: 'Nur mit Nachbesserung tragfähig',
                     kurz: 'so noch nicht tragfähig' },
       PASS:       { ton: 'bad',  zeichen: '🔴', kopf: 'Finger weg — weitersuchen',
-                    kurz: 'nicht empfehlenswert' }
+                    kurz: 'nicht empfehlenswert' },
+      /* v2226 · die Lage kippt das Urteil, nicht den Score (qc-heuristik) */
+      'NICHT KAUFEN': { ton: 'bad', zeichen: '📍',
+                    kopf: 'Nicht kaufen — Rendite unter deinem Ziel für die ' + ((e.lage && e.lage.klasse) || '') + '-Lage',
+                    kurz: 'passt nicht zu deiner Lage-Vorgabe' }
     };
     var w = WORTE[e.verdict] || WORTE.PRUEFEN;
 
@@ -5718,6 +5726,12 @@ const QcApp = (function() {
     if (!window.parent || window.parent === window) return;
     if (!score || score.score == null) return;
     if (!QcEngine.completeness(inputs).hasAllRequired) return;
+    /* v2222 · Während eines Messe-Drehbuchs gar nicht erst anfangen: die
+       Brücke sagt ohnehin ab (Kosten), und Absage-Toast samt Vermerk in der
+       Meinung stünden im Video. Die Bewertung bleibt die gerechnete. */
+    try { var _dm = window.parent.DealPilotMesse;
+      /* v2225: außer das Drehbuch gibt eine aufgenommene Analyse frei */
+      if (_dm && _dm.laeuft() && !(_dm.kiAntwort && _dm.kiAntwort())) return; } catch (e) {}
 
     var stand = _kiFingerabdruck(inputs, score);
     if (stand === _kiStand) return;     /* dieser Stand ist schon analysiert */
@@ -5746,7 +5760,14 @@ const QcApp = (function() {
     document.getElementById('ai-source').textContent = 'DealPilot \u00b7 KI-Analyse';
 
     const inputs = QcEngine.getInputs();
-    const score = QcEngine.computeScore(inputs, (_avmResults[0]||null));
+    /* v2224 · DIESELBE ZAHL WIE AUF DEM SCHIRM. Hier stand nur
+       QcEngine.computeScore - der Rueckfall aus v1365. Angezeigt wird aber
+       window._dpPilotScore (updateAll). Gemessen am 14.10.2026: Anzeige
+       76 · Gut, die KI bekam 92 und schrieb „Score von 92/100 und Stufe
+       'Sehr gut'". Jetzt dieselbe Wahl wie in updateAll. */
+    let score = null;
+    try { if (window._dpPilotScore) score = window._dpPilotScore(inputs, (_avmResults[0]||null)); } catch (_e) { score = null; }
+    if (!score) score = QcEngine.computeScore(inputs, (_avmResults[0]||null));
     const avmData = _avmResults.length > 0 ? _avmResults[0] : null;
     var _uFuerKi = null;
     try { _uFuerKi = _qcUrteil(score, inputs, score.kpi || {}, null); } catch (_e) {}
@@ -5787,7 +5808,17 @@ const QcApp = (function() {
 
          Überschrift, Ton und Stufe behält die Heuristik. Die KI füllt
          Verhandlungsrat, Pro, Contra und Meinung. */
-      document.getElementById('ai-negotiate-v').innerHTML = result.negotiate || '\u2014';
+      /* v2227 \u00b7 Bei KAUFEN braucht der Verhandlungsrat eine Bruecke - sonst
+         steht \u201eStarker Kauf" ueber \u201eEine Verhandlungsstrategie von 3-5 %"
+         (Marcel 14.10.2026). Die KI soll sie selbst schreiben (Prompt);
+         tut sie es nicht, kommt sie hier dazu. */
+      var _neg = result.negotiate || '';
+      if (_neg && _uFuerKi && _uFuerKi.verdict === 'KAUFEN'
+          && !/guter Deal|gerechtfertigt|\u00fcberzeug|ueberzeug|empfehlenswert/i.test(_neg.slice(0, 120))) {
+        _neg = '<strong>Ein guter Deal</strong> \u2014 die Kennzahlen tragen den Kaufpreis. '
+             + 'Verhandeln lohnt sich trotzdem: ' + _neg.charAt(0).toLowerCase() + _neg.slice(1);
+      }
+      document.getElementById('ai-negotiate-v').innerHTML = _neg || '\u2014';
       document.getElementById('ai-pros').innerHTML =
         (result.pros || []).map(function (p) { return '<li>' + p + '</li>'; }).join('');
       document.getElementById('ai-cons').innerHTML =
@@ -6417,7 +6448,13 @@ function renderTransferList() {
             try {
               var sn = _oabDpSnap(); var cc = sn ? sn.card : null;
               var mm = (cc && cc.mm) ? cc.mm[_oabDpMode] : null;
-              if (mm) { setVal('qc_nkm_grund', String(Math.round(mm))); if (typeof mieteAddUp === 'function') mieteAddUp(); }
+              /* v2230 · Der Klick auf die Spanne IST die Entscheidung des Nutzers.
+                 Gemessen: nach gesprochener Kaltmiete (Import -> input-Ereignis ->
+                 qc_nkm.dataset.userSet) stand Grundmiete 831, Gesamt blieb 680,
+                 der Score rührte sich nicht. Der Schutz gilt Getipptem, nicht
+                 einem ausdrücklichen Klick. */
+              if (mm) { var _nk = document.getElementById('qc_nkm'); if (_nk) delete _nk.dataset.userSet;
+                setVal('qc_nkm_grund', String(Math.round(mm))); if (typeof mieteAddUp === 'function') mieteAddUp(); }
               if (typeof scheduleUpdate === 'function') scheduleUpdate();
             } catch (e) {}
           },
@@ -6722,7 +6759,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
-  <script src="js/qc-heuristik.js?v=v2148c"></script>
+  <script src="js/qc-heuristik.js?v=v2232"></script>
   <script src="js/dealscore.js?v=v2191"></script>
   <script src="js/avm-section.js?v=v2149"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->

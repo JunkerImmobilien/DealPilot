@@ -64,7 +64,17 @@ window.QcHeuristik = (function () {
      Aussage als eine Note, und sie stand hier seit V54 auf 75/60/40.
      Wer sie angleichen will, entscheidet das fachlich; stillschweigend
      verschieben waere eine Produktaenderung ohne Ansage. */
-  var SCHWELLE = { kaufen: 75, verhandeln: 60, kritisch: 40 };
+  /* v2232 · URTEIL UND STUFE AUF DENSELBEN GRENZEN. Marcel 14.10.2026:
+     „das müssen wir angleichen mit dem Urteil und Stufe. Das muss passen."
+     Hier standen 75/60/40, die Score-Stufen (score-tiers.js) brechen bei
+     85/70/50/35. Gemessen: Score 39 hieß „Schwach" und „Finger weg", Score 71
+     hieß „Gut" und „Kauf möglich — genauer prüfen". Jetzt:
+       Gut und Sehr gut (>= 70) -> KAUFEN (bzw. VERHANDELN über Markt)
+       Solide (>= 50)           -> VERHANDELN / PRUEFEN
+       Schwach (>= 35)          -> KRITISCH
+       Kritisch (< 35)          -> PASS
+     tools/score-ketten-pruefen.mjs prüft die Gleichheit mit ScoreTier. */
+  var SCHWELLE = { kaufen: 70, verhandeln: 50, kritisch: 35 };
 
   /* ── v1939 · DER ANGEBOTSABSCHLAG ───────────────────────────────────────
    *
@@ -445,7 +455,56 @@ window.QcHeuristik = (function () {
                'Empfehlung: Such ein anderes Objekt mit besserer Substanz.';
     }
 
-    return { verdict: verdict, farbklasse: farbklasse, text: advice, ziel_kp: ziel };
+    /* ── v2226 · DIE LAGE GEHÖRT INS URTEIL, NICHT IN DEN SCORE ──────────
+     *
+     * Marcel 14.10.2026: „nicht in den Score [dann ist es nicht mehr
+     * vergleichbar], aber in die Gesamtbewertung. Wenn der Kauf aufgrund
+     * der Lage nicht passt, muss drauf hingewiesen werden ganz oben und
+     * nicht kaufen gesagt werden, aber auch gesagt werden, warum der Deal
+     * trotzdem gut ist, falls das so ist."
+     *
+     * Gemessen vorher: die Lage stand nur in der „Meinung" unten („knapp
+     * unter deinem Ziel von 7,0 % für die C-Lage"), das Urteil oben blieb
+     * davon unberührt. Jetzt: liegt die Bruttomietrendite UNTER der
+     * Zielrendite der gewählten Lageklasse (Ampel gelb oder rot aus
+     * zielUrteil - dieselbe Entscheidung wie dort), heißt das Urteil
+     * NICHT KAUFEN, mit Grund, Preis und - wenn die Rechnung sonst trägt -
+     * dem ausdrücklichen „trotzdem". Der Score bleibt unverändert.
+     * Nur mit gewählter Klasse: ohne Klasse gibt es keinen Maßstab. */
+    var lage = null;
+    if (d.lageklasse && d.zielBmr != null && d.zielBmr !== '' && +d.nkm > 0 && kp > 0) {
+      var bmrIst = (+d.bmr > 0) ? +d.bmr : (+d.nkm * 12 / kp * 100);
+      var zu = zielUrteil(bmrIst, d.zielBmr, d.lageklasse);
+      if (zu && (zu.ampel === 'rot' || zu.ampel === 'gelb')) {
+        /* ungerundet: derselbe Wert wie kpForBmr in zielKaufpreis - sonst
+           stünden 131.000 € und 131.314 € im selben Absatz */
+        var kpLage = Math.round((+d.nkm * 12) / (zu.ziel / 100));
+        var pct = function (x) { return (Math.round(x * 10) / 10).toFixed(1).replace('.', ',') + ' %'; };
+        var lageSatz = 'Für die ' + zu.klasse + '-Lage zu wenig Rendite: ' + b(pct(bmrIst)) + ' brutto statt deiner ' +
+                       pct(zu.ziel) + ' (' + zu.wort + '). ';
+        var preisSatz = (kpLage > 0 && kpLage < kp)
+          ? 'Deine Zielrendite erreicht er erst bei einem Kaufpreis von ' + b(_fmtEur(kpLage)) + ' oder darunter. ' : '';
+        var trotzdem = '';
+        if (score >= SCHWELLE.verhandeln) {
+          trotzdem = 'Rechnerisch trägt der Deal trotzdem' + (score >= SCHWELLE.kaufen ? ' gut' : '') + ': Score ' + Math.round(score) +
+                     (cfMon >= 0 ? ', Cashflow +' + Math.round(cfMon) + ' €/Monat' : '') +
+                     ((+d.dscr > 0) ? ', DSCR ' + (+d.dscr).toFixed(2).replace('.', ',') : '') +
+                     ' — er passt nur nicht zu deinem Maßstab für diese Lage. ';
+        }
+        lage = { passt: false, klasse: zu.klasse, ziel: zu.ziel, ist: bmrIst, wort: zu.wort, kp_ziel: kpLage };
+        if (verdict === 'KAUFEN' || verdict === 'VERHANDELN' || verdict === 'PRUEFEN') {
+          verdict = 'NICHT KAUFEN';
+          farbklasse = 'qc-rec-red';
+          advice = lageSatz + preisSatz + trotzdem;
+        } else {
+          advice = lageSatz + preisSatz + advice;
+        }
+      } else if (zu) {
+        lage = { passt: true, klasse: zu.klasse, ziel: zu.ziel, ist: bmrIst, wort: zu.wort };
+      }
+    }
+
+    return { verdict: verdict, farbklasse: farbklasse, text: advice, ziel_kp: ziel, lage: lage };
   }
 
   /* ── 4 · DER SATZ ZUR STUFE ─────────────────────────────────────────────

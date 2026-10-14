@@ -1929,6 +1929,28 @@
     });
     return out;
   }
+  /* v2223 · Fotogruppen je PDF: Herkunft (Dateiname + Adresse) und ob sie zur
+     gewählten Adresse passt. Ohne Fotoliste je Datei (Mitschnitt, alter Weg)
+     eine Gruppe aus _importPhotos wie bisher. */
+  function _fotoGruppen(konflikt) {
+    var g = [];
+    _files.forEach(function (f) {
+      if (!f.photos || !f.photos.length) return;
+      var a = _fileAddr(f), key = a ? _norm(a.str) + '|' + _norm(a.plz) + '|' + _norm(a.ort) : '';
+      var wo = f.name + (a && a.str ? ' (' + a.str + (a.hnr ? ' ' + a.hnr : '') + ')' : '');
+      g.push({ fotos: f.photos, wo: wo, an: !konflikt || !key || key === _addrChoice });
+    });
+    if (!g.length && _importPhotos && _importPhotos.length) g.push({ fotos: _importPhotos.slice(0, 6), wo: 'PDF', an: true });
+    return g;
+  }
+  function _gewaehlteFotos(ov) {
+    var g = _fotoGruppen(addressOptions().length > 1), out = [];
+    ov.querySelectorAll('.oabi-tbl input[data-photos="1"]:checked').forEach(function (cb) {
+      var i = parseInt(cb.getAttribute('data-fotogruppe') || '0', 10);
+      if (g[i]) out = out.concat(g[i].fotos);
+    });
+    return out.slice(0, 6);
+  }
   function renderMergedTable() {
     var host = $('oabi-result'); if (!host) return;
     var ab = $('oabi-apply');
@@ -1956,8 +1978,14 @@
     if (!keys.length && !hasPhotos) { host.innerHTML = '<p style="color:var(--muted,#7A7370);font-style:italic;margin-top:10px">Noch keine Werte erkannt.</p>'; if (ab) ab.disabled = true; return; }
     var photoRow = '';
     if (hasPhotos) {
-      var thumbs = _importPhotos.slice(0, 6).map(function (src) { return '<img src="' + src + '" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:4px;margin-right:3px;vertical-align:middle">'; }).join('');
-      photoRow = '<tr><td style="width:34px"><input type="checkbox" data-photos="1" checked></td><td>\uD83D\uDDBC Bilder</td><td><b>' + _importPhotos.length + '</b> aus PDF \u2014 in Objektfotos &uebernehmen; ' + thumbs + '</td><td class="src">Expos\u00e9</td></tr>';
+      /* v2223 · eine Zeile je PDF. Bei einem Adresskonflikt ist nur die Zeile
+         der GEWÄHLTEN Adresse vorgehakt; Dateien ohne eigene Fotoliste (alter
+         Weg) laufen als eine Zeile wie bisher. */
+      var gruppen = _fotoGruppen(addrOpts.length > 1);
+      photoRow = gruppen.map(function (g, gi) {
+        var thumbs = g.fotos.map(function (src) { return '<img src="' + src + '" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:4px;margin-right:3px;vertical-align:middle">'; }).join('');
+        return '<tr' + (g.an ? '' : ' class="oabi-abw"') + '><td style="width:34px"><input type="checkbox" data-photos="1" data-fotogruppe="' + gi + '"' + (g.an ? ' checked' : '') + '></td><td>\uD83D\uDDBC Bilder</td><td><b>' + g.fotos.length + '</b> aus ' + escH(g.wo) + ' \u2014 in Objektfotos \u00fcbernehmen' + (g.an ? '' : ' <i>(andere Adresse)</i>') + ' ' + thumbs + '</td><td class="src">Expos\u00e9</td>';
+      }).join('</tr>') + '</tr>';
     }
     /* v2217 · Marcel 14.10.2026: „Werden Abweichungen bei PDFs gemeldet?"
        Gemessen: nein - applyMerged schrieb jeden angehakten Wert, auch über
@@ -2172,7 +2200,10 @@
     if (!expFiles.length) { if (_importPhotos.length) { _importPhotos = []; renderMergedTable(); } return; }
     var all = [];
     for (var i = 0; i < expFiles.length && all.length < 6; i++) {
-      try { var imgs = await window.PdfImport.extractImages(expFiles[i].file); if (imgs && imgs.length) all = all.concat(imgs); } catch (e) {}
+      /* v2223 · je Datei merken: bei zwei PDFs zu zwei Objekten gehören die
+         Fotos zur Adresse IHRES PDFs (Marcel 14.10.2026: „die Fotos des einen
+         Objektes werden nicht richtig zugeordnet … da muss auch getrennt werden") */
+      try { var imgs = await window.PdfImport.extractImages(expFiles[i].file); if (imgs && imgs.length) { expFiles[i].photos = imgs.slice(0, 6 - all.length); all = all.concat(expFiles[i].photos); } } catch (e) {}
     }
     _importPhotos = all.slice(0, 6);
     renderMergedTable();
@@ -2257,9 +2288,9 @@
       }
     });
     try {
-      var pcb = ov.querySelector('.oabi-tbl input[data-photos="1"]:checked');
-      if (pcb && _importPhotos && _importPhotos.length && typeof window.dpSetImgs === 'function') {
-        var photoObjs = _importPhotos.slice(0, 6).map(function (src, i) { return { src: src, name: 'expose_' + (i + 1) + '.jpg' }; });
+      var _fw = _gewaehlteFotos(ov);   /* v2223: nur angehakte Gruppen */
+      if (_fw.length && typeof window.dpSetImgs === 'function') {
+        var photoObjs = _fw.map(function (src, i) { return { src: src, name: 'expose_' + (i + 1) + '.jpg' }; });
         window.dpSetImgs(photoObjs); n += photoObjs.length;
       }
     } catch (e) {}
@@ -2363,8 +2394,7 @@
     } catch (e) {}
     var photos = [];
     try {
-      var pcb = ov.querySelector('.oabi-tbl input[data-photos="1"]:checked');
-      if (pcb && _importPhotos && _importPhotos.length) photos = _importPhotos.slice(0, 6);
+      photos = _gewaehlteFotos(ov);   /* v2223: nur angehakte Gruppen */
     } catch (e) {}
     var done = _oabiDone; _oabiDone = null;
     ov.remove();
@@ -2499,7 +2529,24 @@
       setMode: function (qc, done) { _qcMode = !!qc; _qcPendingMerged = {}; _oabiDone = (typeof done === 'function') ? done : null; },
       addRow: addRow,
       render: renderMergedTable,
-      apply: applyMerged
+      apply: applyMerged,
+      /* v2222 · Mitschnitt und Wiedergabe für das Messe-Drehbuch: die echten
+         Ausleseergebnisse (cache je PDF) einmal festhalten und später ohne
+         erneuten KI-Aufruf wieder einsetzen. Danach läuft der echte Weg:
+         recompute (Zusammenführen, Adresskonflikt, Spannen) und die Tabelle. */
+      mitschnitt: function () {
+        return { files: _files.map(function (f) { return { name: f.name, type: f.type, userType: f.userType, cache: f.cache }; }) };
+      },
+      wiedergabe: function (m) {
+        var host = $('oabi-files'); if (!host || !m || !m.files) return false;
+        m.files.forEach(function (x) {
+          var row = document.createElement('div'); row.className = 'oabi-file'; host.appendChild(row);
+          var f = { name: x.name, file: null, text: '', type: x.type, userType: x.userType || null, cache: JSON.parse(JSON.stringify(x.cache || {})), status: 'ok', row: row };
+          _files.push(f); renderFileRow(f);
+        });
+        recompute(); renderMergedTable();
+        return true;
+      }
     } };
 })();
 
