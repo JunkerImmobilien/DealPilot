@@ -57,6 +57,21 @@
       '#dpm-karte p{font:400 20px/1.5 Inter,sans-serif;color:#d9cfb8;margin:0}',
       '#dpm-karte .m{margin-top:34px;font:700 18px "Space Grotesk",sans-serif;color:#FDFCFA}',
       '#dpm-karte .m b{background:linear-gradient(110deg,' + GH + ',' + G + ' 55%,' + GL + ');-webkit-background-clip:text;background-clip:text;color:transparent}',
+      /* v2226 · Abspann: Zeilen nacheinander, dann die Wortmarke groß */
+      '@keyframes dpmAuf{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}',
+      '@keyframes dpmLogo{0%{opacity:0;transform:scale(.55);filter:blur(10px)}60%{opacity:1;filter:blur(0)}100%{opacity:1;transform:scale(1)}}',
+      '@keyframes dpmGlanz{0%{background-position:-160% 0}100%{background-position:260% 0}}',
+      '@keyframes dpmBahn{from{width:0}to{width:100%}}',
+      '@keyframes dpmKante{from{box-shadow:0 0 0 0 ' + mix(GH, 0) + '}to{box-shadow:0 0 0 2px ' + G + ',0 0 70px 6px ' + mix(GH, 35) + '}}',
+      '#dpm-karte .ab{opacity:0;animation:dpmAuf .8s cubic-bezier(.2,.7,.2,1) forwards}',
+      '#dpm-karte .ab.z2{animation-delay:.9s}#dpm-karte .ab.z3{animation-delay:1.8s}#dpm-karte .ab.z4{animation-delay:2.7s}',
+      '#dpm-logo{display:inline-block;padding:26px 54px 30px;border-radius:28px;background:#050505;opacity:0;animation:dpmLogo 1.3s cubic-bezier(.2,.7,.2,1) forwards,dpmKante 1.2s .9s forwards}',
+      '#dpm-logo .w{font:700 132px/1 "Space Grotesk",sans-serif;letter-spacing:-.03em;color:#FDFCFA}',
+      '#dpm-logo .w b{font-weight:700;background:linear-gradient(110deg,' + G + ' 0%,' + G + ' 40%,#FFF6D8 50%,' + G + ' 60%,' + G + ' 100%);background-size:260% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:dpmGlanz 2.4s 1.2s ease-in-out 2}',
+      '#dpm-bahn{height:3px;margin:22px auto 0;max-width:620px;border-radius:2px;overflow:hidden}',
+      '#dpm-bahn i{display:block;height:100%;width:0;background:linear-gradient(110deg,' + GH + ',' + G + ' 55%,' + GL + ');animation:dpmBahn 1.4s 1.6s cubic-bezier(.6,0,.2,1) forwards}',
+      '#dpm-karte .unter{margin-top:20px;font:600 14px "JetBrains Mono",monospace;letter-spacing:.3em;text-transform:uppercase;color:' + G + ';opacity:0;animation:dpmAuf .8s 2.6s forwards}',
+      '@media (max-width:640px){#dpm-logo .w{font-size:56px}#dpm-logo{padding:14px 26px 16px}}',
       '#dpm-stopp{position:fixed;z-index:10076;right:14px;bottom:14px;border:1px solid ' + mix(G, 50) + ';background:rgba(10,9,7,.8);color:' + GH + ';border-radius:8px;padding:4px 10px;font:600 12px "JetBrains Mono",monospace;cursor:pointer;opacity:.35}',
       '#dpm-stopp:hover{opacity:1}',
       '@media (max-width:640px){#dpm-zeile .t{font-size:18px}#dpm-karte h1{font-size:40px}#dpm-karte p{font-size:16px}}'
@@ -461,42 +476,54 @@
           s.zeile('Sofort eine Einschätzung', 'Miete <b>' + eur(MB_KARTE.mm.low) + '</b> → Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
           await warte(4600);
         },
-        async function (s) {   /* 6 · Bewertung und Lage */
-          qcSetze('qc_lageklasse', 'B');
-          await warte(700);
-          await zeige(function () { return qcEl('ai-card'); }, 6);
-          function lagesatz() { return qcText('ai-opinion').match(/Bruttomietrendite von ([\d,]+ ?%) liegt ([^.]*?) deinem Ziel von ([\d,]+ ?%) für die ([ABC])-Lage/); }
-          var a = lagesatz();
-          s.zeile('Gegen deine Lage', 'Die Bewertung misst gegen deine Zielrendite. ' + (a ? '<b>B-Lage</b> (Ziel ' + a[3] + '): die Rendite von ' + a[1] + ' liegt ' + a[2] + ' dem Ziel.' : ''));
-          await warte(5000);
-          var lf = function () { var e = qcEl('qc_lageklasse'); return e && (e.closest('.field,.f,.fg') || e.parentElement); };
-          await zeige(lf, 8);
-          s.zeile('Gegen deine Lage', 'Dieselbe Wohnung in der <b>C-Lage</b> …');
-          await warte(1200);
-          qcSetze('qc_lageklasse', 'C');
-          await warte(1000);
-          await zeige(function () { return qcEl('ai-card'); }, 6);
-          var b = lagesatz(), ziel = (qcText('ai-negotiate-v').match(/auf ([\d.]+ €)/) || [])[1];
-          s.zeile('Gegen deine Lage', 'C-Lage: Ziel ' + (b ? b[3] : '–') + ' — ' + (b ? b[2] + ' dem Ziel' : '') + '. Verhandlungsziel jetzt <b>' + (ziel || '–') + '</b>.');
-          await warte(5400);
-        },
-        async function (s) {   /* 7 · Oben + Eigenkapital -> Gut */
-          await zeige(function () { return qcSel('.avs-spanne'); }, 8);
-          s.zeile('Und wenn es gut läuft?', 'Marktmiete „Oben“ …');
-          await warte(1300);
-          var t = qcSel('.avs-spanne [data-spanne="high"]'); if (t) t.click();
-          await warte(900);
+        async function (s) {   /* 6 · Mehr Eigenkapital */
           await zeige(function () { return qcGruppe('fin'); }, 6);
-          s.zeile('Und wenn es gut läuft?', 'Marktmiete „Oben“ und 20 % Eigenkapital …');
-          await warte(1300);
+          s.zeile('Mehr Eigenkapital', '20 % Eigenkapital statt Vollfinanzierung …');
+          await warte(1500);
           var b80 = [].filter.call((qcDoc() || document).querySelectorAll('.ltv-btn'), function (x) { return /^80/.test(x.textContent.trim()); })[0];
           if (b80) b80.click();
           await warte(900);
           await zeige(function () { return qcEl('score-block'); }, 4);
           await warte(900);
           var sc = qcScore();
-          s.zeile('Und wenn es gut läuft?', 'Miete ' + eur(MB_KARTE.mm.high) + ', 20 % Eigenkapital: Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+          s.zeile('Mehr Eigenkapital', 'Mit 20 % Eigenkapital: Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+          await warte(4600);
+        },
+        async function (s) {   /* 7 · Gegen deine Lage: B passt, C kippt das Urteil (v2226) */
+          function lagesatz() { return qcText('ai-opinion').match(/Bruttomietrendite von ([\d,]+ ?%) liegt ([^.]*?) deinem Ziel von ([\d,]+ ?%) für die ([ABC])-Lage/); }
+          qcSetze('qc_lageklasse', 'B');
+          await warte(800);
+          await zeige(function () { return qcEl('ai-verdict'); }, 10);
+          var lb = lagesatz();
+          s.zeile('Gegen deine Lage', 'In der <b>B-Lage</b> verlangst du ' + (lb ? lb[3] : '–') + ' — die Wohnung bringt ' + (lb ? lb[1] : '–') + ': „' + qcText('ai-verdict-headline') + '“.');
           await warte(5200);
+          var lf = function () { var e = qcEl('qc_lageklasse'); return e && (e.closest('.field,.f,.fg') || e.parentElement); };
+          await zeige(lf, 8);
+          s.zeile('Gegen deine Lage', 'Dieselbe Wohnung — aber du stufst die Lage als <b>C</b> ein …');
+          await warte(1800);
+          qcSetze('qc_lageklasse', 'C');
+          await warte(1100);
+          await zeige(function () { return qcEl('ai-verdict'); }, 10);
+          var lc = lagesatz();
+          s.zeile('Gegen deine Lage', 'Ganz oben: <b>„' + qcText('ai-verdict-headline') + '“</b>' + (lc ? ' — ' + lc[1] + ' statt deiner ' + lc[3] : '') + '. Der Score bleibt, das Urteil nicht.');
+          await warte(6500);
+          await zeige(function () { var n = qcEl('ai-negotiate-v'); return n && (n.closest('.ai-negotiate,.ai-box,div') || n); }, 8);
+          var tz = (qcText('ai-negotiate-v').match(/Rechnerisch trägt[^—]*/) || [''])[0].trim();
+          var preis = (qcText('ai-negotiate-v').match(/Kaufpreis von ([\d.]+ €)/) || [])[1];
+          s.zeile('Und warum er trotzdem gut ist', (tz ? tz + '. ' : '') + (preis ? 'Deine Zielrendite gäbe es bei <b>' + preis + '</b>.' : ''));
+          await warte(7500);
+        },
+        async function (s) {   /* 8 · Oben -> Gut, auch in der C-Lage */
+          await zeige(function () { return qcSel('.avs-spanne'); }, 8);
+          s.zeile('Und wenn die Miete stimmt?', 'Marktmiete „Oben“ …');
+          await warte(1500);
+          var t = qcSel('.avs-spanne [data-spanne="high"]'); if (t) t.click();
+          await warte(900);
+          await zeige(function () { return qcEl('score-block'); }, 4);
+          await warte(900);
+          var sc = qcScore();
+          s.zeile('Und wenn die Miete stimmt?', 'Miete ' + eur(MB_KARTE.mm.high) + ': Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — und auch in der C-Lage „' + sc.urteil + '“.');
+          await warte(5600);
         },
         async function (s) {   /* 8 · Pilot-Analyse (Mitschnitt für genau diesen Stand) */
           _kiFrei = KI_ANALYSE;
@@ -511,7 +538,13 @@
           _kiFrei = null;
         }
       ],
-      schluss: '<div class="k">DealPilot</div><h1>Exposé rein. Urteil raus.</h1><p>Quick Boarding liest, schätzt und bewertet — bevor du ins Auto steigst.</p><div class="m">Deal<b>Pilot</b> · dealpilot.immo</div>'
+      schluss: '<div class="k">DealPilot</div><h1>Exposé rein. Urteil raus.</h1><p>Quick Boarding liest, schätzt und bewertet — bevor du ins Auto steigst.</p><div class="m">Deal<b>Pilot</b> · dealpilot.immo</div>',
+      /* v2226 · Marcel: „am Schluss irgendwas animieren … 30 Sekunden eine
+         fundierte Einschätzung … und dann das DealPilot-Logo groß animiert" */
+      abspann: [
+        { ms: 5200, html: '<div class="k ab">Quick Boarding</div><h1 class="ab z2">30 Sekunden.</h1><p class="ab z3">Eine fundierte Einschätzung — mit Marktwert, deiner Lage und der Pilot-Analyse.</p>' },
+        { ms: 6200, html: '<div id="dpm-logo"><span class="w">Deal<b>Pilot</b></span></div><div id="dpm-bahn"><i></i></div><div class="unter">dealpilot.immo</div>' }
+      ]
     }
   };
 
@@ -558,7 +591,9 @@
         }
         _ziel = null; kegel(null); zeileWeg();
         if (D.aufraeumen) D.aufraeumen(); else reiter('s0');
-        karte(D.schluss); await warte(5500);
+        if (D.abspann && D.abspann.length) {
+          for (var ai = 0; ai < D.abspann.length; ai++) { karte(null); await warte(120); karte(D.abspann[ai].html); await warte(D.abspann[ai].ms); }
+        } else { karte(D.schluss); await warte(5500); }
         karte(null); await warte(600);
       } while (opts && opts.schleife && g === lauf);
     } catch (e) { if (e !== 'stopp') console.warn('[messe]', e); }

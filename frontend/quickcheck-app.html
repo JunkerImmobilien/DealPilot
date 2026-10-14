@@ -5481,7 +5481,11 @@ const QcApp = (function() {
       KRITISCH:   { ton: 'bad',  zeichen: '⚠️', kopf: 'Nur mit Nachbesserung tragfähig',
                     kurz: 'so noch nicht tragfähig' },
       PASS:       { ton: 'bad',  zeichen: '🔴', kopf: 'Finger weg — weitersuchen',
-                    kurz: 'nicht empfehlenswert' }
+                    kurz: 'nicht empfehlenswert' },
+      /* v2226 · die Lage kippt das Urteil, nicht den Score (qc-heuristik) */
+      'NICHT KAUFEN': { ton: 'bad', zeichen: '📍',
+                    kopf: 'Nicht kaufen — Rendite unter deinem Ziel für die ' + ((e.lage && e.lage.klasse) || '') + '-Lage',
+                    kurz: 'passt nicht zu deiner Lage-Vorgabe' }
     };
     var w = WORTE[e.verdict] || WORTE.PRUEFEN;
 
@@ -6735,7 +6739,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
-  <script src="js/qc-heuristik.js?v=v2148c"></script>
+  <script src="js/qc-heuristik.js?v=v2226"></script>
   <script src="js/dealscore.js?v=v2191"></script>
   <script src="js/avm-section.js?v=v2149"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->
