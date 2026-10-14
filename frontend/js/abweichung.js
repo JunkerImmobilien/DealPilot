@@ -53,6 +53,9 @@
                                        maximumFractionDigits: stellen === undefined ? 2 : stellen });
   }
   function wert(v, einheit) {
+    /* v2216e · neue Einheiten aus ankauf.js */
+    if (einheit === 'eurqm') return zahl(v, 2) + ' €/m²';
+    if (einheit === 'stk') return (v === null || v === undefined || !isFinite(v)) ? '–' : String(Math.round(v));
     return einheit === 'eur' ? eur(v) : einheit === 'pct' ? pct(v) : zahl(v);
   }
 
@@ -90,7 +93,15 @@
     host.style.display = '';
 
     var gesamt = (A.KENNZAHLEN || []).length;
-    var reihen = a.zeilen.map(function (z) {
+    /* v2216e · gruppiert wie im Pilot-Reiter Soll/Ist */
+    var GRUPPEN = ['Ertrag', 'Kosten', 'Finanzierung', 'Steuer', 'Ergebnis'];
+    var reihen = GRUPPEN.map(function (g) {
+      var zz = a.zeilen.filter(function (z) { return (z.gruppe || 'Ergebnis') === g; });
+      if (!zz.length) return '';
+      return '<tr class="abw-gruppe"><td colspan="4" style="font:600 10.5px/1.2 \'JetBrains Mono\',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8a6d1f;padding:12px 6px 4px">' + g + '</td></tr>'
+        + zz.map(zeile).join('');
+    }).join('');
+    function zeile(z) {
       var p = pctText(z);
       return '<tr class="abw-' + z.richtung + '">'
         + '<td class="abw-wort">' + z.wort + '</td>'
@@ -99,7 +110,7 @@
         + '<td class="abw-zahl abw-diff">' + diffText(z)
         + (p ? '<span class="abw-pct">' + p + '</span>' : '') + '</td>'
         + '</tr>';
-    }).join('');
+    }
 
     host.innerHTML =
       '<div class="abw-kopf">'
