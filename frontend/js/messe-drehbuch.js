@@ -8,6 +8,7 @@
    auf die Stelle und schreibt eine Untertitelzeile darunter. Aufnehmen mit
    OBS oder Win+Alt+R; am Stand kann es auch live in Schleife laufen.
 
+   Drehbücher: parkstrasse (v2219), quickcheck (v2221)
    Start:  ?messe=parkstrasse            einmal
            ?messe=parkstrasse&schleife   immer wieder (Messebildschirm)
            DealPilotMesse.start('parkstrasse')
@@ -62,10 +63,20 @@
     document.head.appendChild(st);
   }
   function el(id, tag) { var e = document.getElementById(id); if (!e) { e = document.createElement(tag || 'div'); e.id = id; document.body.appendChild(e); } return e; }
+  /* v2221 · Ziele im Quick-Check liegen in einem iframe (eigenes Dokument):
+     ihr Rechteck ist relativ zum iframe - für den Kegel im Hauptdokument
+     wird der Rahmen jeder Ebene dazugerechnet. */
+  function rect(e) {
+    var r = e.getBoundingClientRect(), x = r.left, y = r.top;
+    for (var fe = e.ownerDocument.defaultView.frameElement; fe; fe = fe.ownerDocument.defaultView.frameElement) {
+      var fr = fe.getBoundingClientRect(); x += fr.left + fe.clientLeft; y += fr.top + fe.clientTop;
+    }
+    return { left: x, top: y, width: r.width, height: r.height, bottom: y + r.height, right: x + r.width };
+  }
   function kegel(ziel, pad) {
     var k = el('dpm-kegel');
     if (!ziel) { k.classList.remove('an'); return; }
-    var r = ziel.getBoundingClientRect(); pad = pad == null ? 10 : pad;
+    var r = rect(ziel); pad = pad == null ? 10 : pad;
     k.style.left = (r.left - pad) + 'px'; k.style.top = (r.top - pad) + 'px';
     k.style.width = (r.width + pad * 2) + 'px'; k.style.height = (r.height + pad * 2) + 'px';
     k.classList.add('an');
@@ -101,13 +112,18 @@
      bei 572-736 stehen; dieselbe Zeile ohne smooth scrollte sofort). Gescrollt wird
      deshalb der Container selbst (.main-col), mittig in den freien Bereich. */
   function scroller(e) {
-    for (var s = e.parentElement; s && s !== document.body; s = s.parentElement) {
-      if (/auto|scroll/.test(getComputedStyle(s).overflowY) && s.scrollHeight > s.clientHeight + 5) return s;
+    /* v2221 · durch iframes hindurch: das Quick-Check-Dokument scrollt nicht
+       selbst (es ist so hoch wie sein Inhalt), gescrollt wird .main-col */
+    for (var a = e; a; a = a.ownerDocument.defaultView.frameElement) {
+      var w = a.ownerDocument.defaultView;
+      for (var s = a.parentElement; s && s !== a.ownerDocument.body; s = s.parentElement) {
+        if (/auto|scroll/.test(w.getComputedStyle(s).overflowY) && s.scrollHeight > s.clientHeight + 5) return s;
+      }
     }
     return document.scrollingElement;
   }
   function holen(e, sanft) {
-    var r = e.getBoundingClientRect(), s = scroller(e), mitte = (70 + innerHeight - 170) / 2;
+    var r = rect(e), s = scroller(e), mitte = (70 + innerHeight - 170) / 2;
     var d = r.height > innerHeight - 260 ? r.top - 80 : (r.top + r.height / 2) - mitte;
     try { s.scrollTo({ top: s.scrollTop + d, behavior: sanft ? 'smooth' : 'auto' }); } catch (x) { s.scrollTop += d; }
   }
@@ -115,7 +131,7 @@
     if (_folge) return;
     _folge = setInterval(function () {
       var z = zielEl(); if (!z) { kegel(null); return; }
-      var r = z.getBoundingClientRect();
+      var r = rect(z);
       if (!frei(r) && _nachScroll < 3 && Date.now() - _letzterScroll > 1200) {
         _nachScroll++; _letzterScroll = Date.now();
         holen(z, false);
@@ -132,13 +148,35 @@
     /* nur scrollen, wenn das Ziel nicht frei sichtbar ist - sonst schiebt es den
        Umschalter oben aus dem Bild; unten liegt die Zeile (rund 160 px) */
     _nachScroll = 0; _letzterScroll = 0;
-    if (z && !frei(z.getBoundingClientRect())) { _letzterScroll = Date.now(); holen(z, true); }
+    if (z && !frei(rect(z))) { _letzterScroll = Date.now(); holen(z, true); }
     folgen();
     await warte(750);
   }
   /* v2219f · jeder Reiter beginnt oben: die Scrollposition des vorigen blieb
      stehen, der kürzere Steuer-Reiter zeigte gemessen eine leere Fläche */
   function reiter(sec) { var t = q('.tab[data-target-sec="' + sec + '"]'); if (t) t.click(); var m = q('.main-col'); if (m) m.scrollTop = 0; }
+  /* v2221 · Quick-Check: Dokument, Feld, Tippen wie von Hand (Zeichen für
+     Zeichen mit input-Ereignis - der Quick-Check rechnet bei jedem Zeichen) */
+  function qcDoc() { var f = q('#qc-v17-frame'); try { return f && f.contentDocument; } catch (e) { return null; } }
+  function qcEl(id) { var d = qcDoc(); return d && d.getElementById(id); }
+  function qcGruppe(k) { var i = qcEl('ico-grp-' + k); return i && i.closest('.card'); }
+  async function tippe(id, text, ms) {
+    var e = qcEl(id); if (!e) return; var w = e.ownerDocument.defaultView;
+    function los(typ) { e.dispatchEvent(new w.Event(typ, { bubbles: true })); }
+    if (e.tagName === 'SELECT') { e.value = text; los('input'); los('change'); await warte(ms || 300); return; }
+    e.value = ''; los('input');
+    for (var i = 0; i < text.length; i++) { e.value = text.slice(0, i + 1); los('input'); await warte(ms || 70); }
+    los('change');
+  }
+  function qcText(id) { var e = qcEl(id); return e ? e.innerText.replace(/\s+/g, ' ').trim() : ''; }
+  /* KPI-Kachel: "Cashflow/Mo-147€Ziel ≥0€" -> der Wert zwischen Titel und "Ziel" */
+  function qcKpi(id, titel) { var t = qcText(id); var m = t.replace(titel, '').split('Ziel')[0].trim(); return m || null; }
+  function qcAufraeumen() {
+    /* „Neuer Vorgang": löscht den Boarding-Pass, den der Quick-Check beim ersten
+       Score selbst anlegt, und leert das Fenster - sonst hinterlässt jede
+       Schleife einen Pass (gemessen: DELETE /passes/<code>) */
+    try { window.postMessage({ source: 'dp-qc', type: 'qc-reset-buffer' }, '*'); } catch (e) {}
+  }
   function nkmFeld() { var n = q('#nkm'); return n && n.closest('.f'); }
   async function warteAuf(fn, ms) { var t0 = Date.now(); while (Date.now() - t0 < (ms || 6000)) { var v = fn(); if (v) return v; await warte(150); } return null; }
 
@@ -230,12 +268,68 @@
         }
       ],
       schluss: '<div class="k">DealPilot</div><h1>Plan gegen Ist.</h1><p>Der Ankauf bleibt stehen — jedes Jahr misst sich daran.</p><div class="m">Deal<b>Pilot</b> · dealpilot.immo</div>'
+    },
+
+    /* ═══ DREHBUCH 2 · QUICK-CHECK — LOHNT SICH DAS EXPOSÉ? (v2221) ════════
+       Beispielwohnung, bewusst als solche erkennbar (Musterweg). Nur die
+       getippten Eingaben stehen fest; Score und Kennzahlen rechnet der echte
+       Quick-Check und das Drehbuch liest sie ab. Kein „Abrufen" - das kostet
+       Kontingent. Am Ende „Neuer Vorgang" (räumt den Boarding-Pass ab). */
+    quickcheck: {
+      titel: 'Lohnt sich das Exposé?',
+      unterzeile: 'Quick Boarding · eine Wohnung, eine Minute, ein Urteil',
+      objekt: null,
+      aufraeumen: function () { qcAufraeumen(); reiter('s0'); },
+      szenen: [
+        async function (s) {
+          if (typeof window.sbActionsAction === 'function') sbActionsAction('quickcheck');
+          await warteAuf(function () { var d = qcDoc(); return d && d.readyState === 'complete' && qcEl('qc_kp') && !qcEl('qc_kp').value; }, 10000);
+          await warte(900);
+          var m = q('.main-col'); if (m) m.scrollTop = 0;
+          await zeige(function () { return qcGruppe('adr'); }, 6);
+          s.zeile('Exposé auf dem Tisch', 'Eine Eigentumswohnung in Bielefeld — die Eckdaten aus dem Exposé.');
+          await tippe('qc_str', 'Musterweg'); await tippe('qc_hnr', '7'); await tippe('qc_plz', '33602'); await tippe('qc_ort', 'Bielefeld');
+          await zeige(function () { return qcGruppe('obj'); }, 6);
+          await tippe('qc_objektart', 'ETW'); await tippe('qc_wfl', '72'); await tippe('qc_bj', '1994');
+          await zeige(function () { return qcGruppe('miete'); }, 6);
+          await tippe('qc_nkm_grund', '680');
+          await zeige(function () { return qcGruppe('bewirt'); }, 6);
+          await tippe('qc_hg', '230');
+          await zeige(function () { return qcGruppe('fin'); }, 6);
+          s.zeile('Exposé auf dem Tisch', 'Kaufpreis laut Exposé: <b>159.000 €</b>. Eigenkapital, Zins und Tilgung kommen aus deinen Standardwerten.');
+          await tippe('qc_kp', '159000', 90);
+          await warte(1800);
+        },
+        async function (s) {
+          await zeige(function () { return qcEl('score-block'); }, 4);
+          await warteAuf(function () { return /\d/.test(qcText('sb-num')); }, 5000);
+          await warte(900);
+          var sc = qcText('sb-num'), st = qcText('sb-tier'), dscr = qcKpi('kpi-dscr', 'DSCR'), cf = qcKpi('kpi-cf', 'Cashflow/Mo');
+          s.zeile('Das Urteil · in Sekunden', 'Score <b>' + sc + '</b> · ' + st + (dscr ? ' — DSCR <b>' + dscr + '</b>' : '') + (cf ? ', Cashflow <b>' + cf + '</b> im Monat' : '') + '.');
+          await warte(6500);
+        },
+        async function (s) {
+          await zeige(function () { return qcGruppe('fin'); }, 6);
+          s.zeile('Und wenn der Preis fällt?', 'Verhandelt auf <b>129.000 €</b> …');
+          await tippe('qc_kp', '129000', 110);
+          await warte(1200);
+          await zeige(function () { return qcEl('score-block'); }, 4);
+          await warte(1200);
+          var sc = qcText('sb-num'), st = qcText('sb-tier'), dscr = qcKpi('kpi-dscr', 'DSCR'), cf = qcKpi('kpi-cf', 'Cashflow/Mo');
+          s.zeile('Und wenn der Preis fällt?', 'Bei 129.000 €: Score <b>' + sc + '</b> · ' + st + (dscr ? ' — DSCR <b>' + dscr + '</b>' : '') + (cf ? ', Cashflow <b>' + cf + '</b>' : '') + '. Jetzt lohnt die Besichtigung.');
+          await warte(7500);
+        }
+      ],
+      schluss: '<div class="k">DealPilot</div><h1>Erst rechnen, dann besichtigen.</h1><p>Quick Boarding prüft ein Exposé, bevor du ins Auto steigst.</p><div class="m">Deal<b>Pilot</b> · dealpilot.immo</div>'
     }
   };
 
   /* ── Ablauf ───────────────────────────────────────────────────── */
-  var lauf = 0;
+  var lauf = 0, _aktiv = null;
   function stopp() {
+    /* v2221 · auch bei Esc mitten im Lauf aufräumen (Boarding-Pass) */
+    if (_aktiv && _aktiv.aufraeumen) { try { _aktiv.aufraeumen(); } catch (e) {} }
+    _aktiv = null;
     lauf = 0; _ziel = null; if (_folge) { clearInterval(_folge); _folge = null; } kegel(null); zeileWeg(); karte(null);
     var s = q('#dpm-stopp'); if (s) s.remove();
     document.removeEventListener('keydown', esc, true);
@@ -244,23 +338,26 @@
   async function start(name, opts) {
     var D = DREHBUECHER[name]; if (!D) { console.warn('[messe] unbekanntes Drehbuch: ' + name); return; }
     css(); stopp();
-    var g = lauf = Date.now();
+    var g = lauf = Date.now(); _aktiv = D;
     var b = el('dpm-stopp', 'button'); b.type = 'button'; b.textContent = '■'; b.title = 'Drehbuch beenden (Esc)'; b.onclick = stopp;
     document.addEventListener('keydown', esc, true);
     var n = D.szenen.length;
     try {
       do {
         karte('<div class="k">DealPilot · Geschichte</div><h1>' + D.titel + '</h1><p>' + D.unterzeile + '</p>');
-        var id = await objektFinden(D.objekt);
-        if (!id) { karte('<h1>Objekt fehlt</h1><p>Für dieses Drehbuch fehlt das Demo-Objekt in diesem Konto.</p>'); await warte(4000); break; }
-        if (window._currentObjKey !== id && typeof window.loadSaved === 'function') await window.loadSaved(id);
+        if (D.objekt) {   /* v2221: der Quick-Check braucht kein Objekt */
+          var id = await objektFinden(D.objekt);
+          if (!id) { karte('<h1>Objekt fehlt</h1><p>Für dieses Drehbuch fehlt das Demo-Objekt in diesem Konto.</p>'); await warte(4000); break; }
+          if (window._currentObjKey !== id && typeof window.loadSaved === 'function') await window.loadSaved(id);
+        }
         await warte(3200);
         karte(null); await warte(700);
         for (var i = 0; i < n; i++) {
           var ii = i;
           await D.szenen[i]({ zeile: function (k, t) { zeile(k, t, ii, n); } });
         }
-        _ziel = null; kegel(null); zeileWeg(); reiter('s0');
+        _ziel = null; kegel(null); zeileWeg();
+        if (D.aufraeumen) D.aufraeumen(); else reiter('s0');
         karte(D.schluss); await warte(5500);
         karte(null); await warte(600);
       } while (opts && opts.schleife && g === lauf);
