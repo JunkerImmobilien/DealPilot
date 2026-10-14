@@ -85,12 +85,16 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
   var QR = P.get('qr') || 'https://dealpilot.immo';
   var OBEN = parseInt(P.get('oben'), 10) || 0;
   document.documentElement.style.setProperty('--oben', OBEN + 'px');
-  var SKALA = 0.8;   /* die App sieht einen 1/0,8 so großen Viewport - Desktop-Fassung */
+  /* v2235b · die App bekommt einen Viewport von BREITE CSS-px und wird auf den
+     Rahmen gestreckt. Gemessen bei 0,8 (2.606 px App-Breite): Kacheln und
+     Kegel im Video kaum lesbar. 1.700 bleibt Desktop-Fassung, Schrift x1,23. */
+  var BREITE = parseInt(P.get('breite'), 10) || 1700, SKALA = 1;
   var app = document.getElementById('app'), rahmen = document.getElementById('rahmen'), vorhang = document.getElementById('vorhang');
   var band = document.getElementById('band'), nr = document.getElementById('nr'), txt = document.getElementById('txt');
 
   function passe() {
     var w = rahmen.clientWidth, h = rahmen.clientHeight;
+    SKALA = w / BREITE;
     app.style.width = Math.round(w / SKALA) + 'px'; app.style.height = Math.round(h / SKALA) + 'px';
     app.style.transform = 'scale(' + SKALA + ')';
   }
