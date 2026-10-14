@@ -168,12 +168,24 @@
     if (neu) { z.style.transition = 'none'; }
     z.style.left = Math.round(o.x) + 'px'; z.style.top = Math.round(o.y) + 'px';
     if (neu) { void z.offsetWidth; z.style.transition = ''; }
-    /* Anfang an der Kartenkante, Ende an der Zielkante (zur Karte hin) */
-    var a, b;
-    if (o.k === 'l') { a = { x: o.x, y: o.y + h / 2 }; b = { x: r.right, y: klemm(o.y + h / 2, r.top + 8, r.bottom - 8) }; }
-    else if (o.k === 'r') { a = { x: o.x + w, y: o.y + h / 2 }; b = { x: r.left, y: klemm(o.y + h / 2, r.top + 8, r.bottom - 8) }; }
-    else if (o.k === 'o') { a = { x: o.x + w / 2, y: o.y }; b = { x: klemm(o.x + w / 2, r.left + 8, r.right - 8), y: r.bottom }; }
-    else { a = { x: o.x + w / 2, y: o.y + h }; b = { x: klemm(o.x + w / 2, r.left + 8, r.right - 8), y: r.top }; }
+    /* v2234b · die Linie wird aus dem AKTUELLEN Kartenrechteck gezogen und
+       waehrend des Gleitens (0,6 s) in jedem Bild nachgefuehrt. GEMESSEN: aus
+       der Zielposition gerechnet hing sie beim Szenenwechsel lose neben der
+       Karte, die noch unterwegs war. */
+    _lz = { k: o.k, r: r }; linieNach();
+    var bis = Date.now() + 750;
+    (function nach() { linieNach(); if (Date.now() < bis) requestAnimationFrame(nach); })();
+  }
+  var _lz = null;
+  function linieNach() {
+    var z = q('#dpm-zeile'); if (!_lz || !z || !z.classList.contains('haft')) return;
+    var c = z.getBoundingClientRect(), r = _lz.r, k = _lz.k, a, b;
+    function klemm(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+    var my = c.top + c.height / 2, mx = c.left + c.width / 2;
+    if (k === 'l') { a = { x: c.left, y: my }; b = { x: r.right, y: klemm(my, r.top + 8, r.bottom - 8) }; }
+    else if (k === 'r') { a = { x: c.right, y: my }; b = { x: r.left, y: klemm(my, r.top + 8, r.bottom - 8) }; }
+    else if (k === 'o') { a = { x: mx, y: c.top }; b = { x: klemm(mx, r.left + 8, r.right - 8), y: r.bottom }; }
+    else { a = { x: mx, y: c.bottom }; b = { x: klemm(mx, r.left + 8, r.right - 8), y: r.top }; }
     linie(a, b);
   }
   function karte(html) { var k = el('dpm-karte'); if (html == null) { k.classList.remove('an'); return; } k.innerHTML = '<div>' + html + '</div>'; k.classList.add('an'); }
