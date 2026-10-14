@@ -108,14 +108,16 @@
       '#dp-atlas .ag-reihe{display:flex;gap:16px;position:relative}',
       '#dp-atlas .ag-reihe::before{content:"";position:absolute;left:10px;right:10px;top:50%;height:2px;background:repeating-linear-gradient(90deg,' + mix(G, 55) + ' 0 6px,transparent 6px 14px);animation:ag-lauf 1.2s linear infinite}',
       '@keyframes ag-lauf{to{background-position:14px 0}}',
-      '#dp-atlas .ag-k{position:relative;width:148px;height:62px;box-sizing:border-box;padding:8px 10px;border-radius:12px;background:linear-gradient(160deg,#1f1b16,#15120f);border:1px solid ' + mix(G, 42) + ';cursor:pointer;opacity:0;transform:scale(.6);animation:ag-pop .5s cubic-bezier(.2,1.4,.4,1) forwards;transition:border-color .2s,box-shadow .25s,opacity .3s}',
+      '#dp-atlas .ag-k{position:relative;width:148px;height:62px;box-sizing:border-box;padding:8px 10px;border-radius:12px;background:linear-gradient(160deg,#1f1b16,#15120f);border:1px solid ' + mix(G, 42) + ';cursor:pointer;animation:ag-pop .5s cubic-bezier(.2,1.4,.4,1) both;transition:border-color .2s,box-shadow .25s,opacity .3s}',
       '#dp-atlas .ag-k:hover{border-color:' + GH + ';box-shadow:0 12px 30px -12px ' + mix(G, 45) + '}',
       '#dp-atlas .ag-k.opt{border-style:dashed}',
       '#dp-atlas .ag-k .kk{font:500 8.5px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:#a99d84;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '#dp-atlas .ag-k .tt{font:600 12.5px/1.2 "Space Grotesk",sans-serif;color:#fdfcfa;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
       '#dp-atlas .ag-k.treffer{border-color:' + GH + ';background:linear-gradient(160deg,#3a301c,#1f1a10);box-shadow:0 0 0 2px ' + mix(GH, 55) + ',0 0 24px -4px ' + mix(GH, 50) + '}',
       '#dp-atlas .ag-k.leise{opacity:.28!important}',
-      '@keyframes ag-pop{to{opacity:1;transform:scale(1)}}',
+      /* v2218a · sichtbar von sich aus, die Animation blendet nur EIN: ohne Animation
+         (Messkabine „Standbild“, Energiesparen) blieben die Karten sonst bei opacity 0 */
+      '@keyframes ag-pop{from{opacity:0;transform:scale(.6)}}',
       '#dp-atlas .ag-kap{position:absolute;left:224px;top:0;width:40px;height:64px;z-index:3;pointer-events:none;transition:top .9s cubic-bezier(.45,0,.3,1)}',
       '#dp-atlas .ag-kap .pf-wrap{display:block;width:100%;height:100%}#dp-atlas .ag-kap svg.pf{width:100%;height:100%}',
       '#dp-atlas .ag-zahl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}',
@@ -161,7 +163,7 @@
         + '#dp-atlas .ag-bahn{display:block;padding:6px 0}'
         + '#dp-atlas .ag-kopf{margin:0 0 6px;padding:4px 6px}'
         + '#dp-atlas .ag-kopf b{font-size:14px}'
-        + '#dp-atlas .ag-reihe{overflow-x:auto;padding:4px 2px 8px;gap:10px;scroll-snap-type:x proximity;--dpm-schiene:1}'
+        + '#dp-atlas .ag-reihe{overflow-x:auto;padding:4px 2px 8px;gap:10px;scroll-snap-type:x proximity;scrollbar-width:none;--dpm-schiene:1}'
         + '#dp-atlas .ag-reihe::before{display:none}'
         + '#dp-atlas .ag-k{flex:0 0 132px;width:132px;scroll-snap-align:start}'
         + '#dp-atlas .ag-kap{display:none}'

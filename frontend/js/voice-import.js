@@ -2410,6 +2410,7 @@
     var k = $('vi-rf-mikro'); if (k) { k.classList.remove('taub'); k.classList.remove('halt'); k.classList.remove('haelt'); }
     _fsHinweis(_fs.rest ? 'Halte noch einmal gedrückt und sag den Rest.' : 'Halte gedrückt und sprich.');
     var sub = $('vi-rf-mikro-sub'); if (sub) sub.textContent = 'Loslassen schickt ab — oder tipp unten.';
+    var inp = $('vi-rf-in'); if (inp && _fsPtt()) inp.placeholder = inp.getAttribute('data-ph') || inp.placeholder;
   }
   function _fsPttDruck(ev) {
     if (!_fsPtt() || !_fs.an || !_rf) return;
@@ -2427,6 +2428,8 @@
       _fs.chunks = [];
       _fs.phase = 'spricht'; _fs.t0 = Date.now(); _fs.tPtt = _fs.t0; _fs.sprechMs = 0;
       var k = $('vi-rf-mikro'); if (k) k.classList.add('haelt');
+      var inp = $('vi-rf-in');
+      if (inp) { if (!inp.getAttribute('data-ph')) inp.setAttribute('data-ph', inp.placeholder); inp.placeholder = '● Ich höre dich … loslassen zum Senden'; }
       _fsHinweis('Ich höre dich …');
       var sub = $('vi-rf-mikro-sub'); if (sub) sub.textContent = 'Loslassen, wenn du fertig bist.';
       if (_fs.uhr) clearInterval(_fs.uhr);
@@ -2459,21 +2462,46 @@
         +   'background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));flex:0 0 auto;transition:transform .15s}'
         + '#vi-rf-mikro.ptt.haelt .vi-rf-mikro-icon{transform:scale(1.18);background:#3FA56C;box-shadow:0 0 0 6px rgba(63,165,108,.25)}'
         + '#vi-rf-mikro.ptt.haelt{border-color:#3FA56C !important}'
-        + '}';
+        /* v2218b · Marcel 14.10.2026: „oberhalb der Eingabe ein großer Mikrofon-
+           Button mit Text ‚halte gedrückt …' - der kann weg. Der Aufnahmebutton
+           bitte so wie bei Telegram oder WhatsApp neben Senden. Es ist vollkommen
+           klar, dass man darauf halten muss." Der Kasten bleibt im DOM (Pegel und
+           Hinweise schreiben hinein), ist am Handy aber unsichtbar. */
+        + '#vi-rf-mikro.ptt{display:none !important}'
+        + '#vi-rf-ptt{display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;width:44px;height:44px;border:0;border-radius:50%;margin-left:6px;'
+        +   'background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1407;cursor:pointer;'
+        +   'user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;transition:transform .15s,box-shadow .15s}'
+        + '#vi-rf-ptt svg{width:20px;height:20px;pointer-events:none}'
+        + '#vi-rf-ptt.haelt{transform:scale(1.25);background:#3FA56C;color:#fff;box-shadow:0 0 0 7px rgba(63,165,108,.25)}'
+        + '}'
+        + '@media (min-width:769px){#vi-rf-ptt{display:none}}';
       document.head.appendChild(st);
     }
     k.classList.toggle('ptt', _fsPtt());
-    if (k._ptt) return;
-    k._ptt = 1;
-    k.addEventListener('pointerdown', function (ev) {
-      if (!_fsPtt() || (ev.target && ev.target.closest && ev.target.closest('.vi-rf-halt'))) return;
-      try { k.setPointerCapture(ev.pointerId); } catch (e) {}
+    /* v2218b · der Halte-Knopf neben „Übernehmen" */
+    var b = $('vi-rf-ptt');
+    if (!b) {
+      var ok = $('vi-rf-ok');
+      if (ok && ok.parentNode) {
+        b = document.createElement('button');
+        b.type = 'button'; b.id = 'vi-rf-ptt';
+        b.setAttribute('aria-label', 'Zum Sprechen gedrückt halten'); b.title = 'Zum Sprechen gedrückt halten';
+        b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+        ok.parentNode.insertBefore(b, ok.nextSibling);
+      }
+    }
+    if (!b || b._ptt) return;
+    b._ptt = 1;
+    b.addEventListener('pointerdown', function (ev) {
+      if (!_fsPtt()) return;
+      try { b.setPointerCapture(ev.pointerId); } catch (e) {}
+      b.classList.add('haelt');
       _fsPttDruck(ev);
     });
     ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (n) {
-      k.addEventListener(n, function () { if (_fsPtt()) _fsPttLos(); });
+      b.addEventListener(n, function () { b.classList.remove('haelt'); if (_fsPtt()) _fsPttLos(); });
     });
-    k.addEventListener('contextmenu', function (ev) { if (_fsPtt()) ev.preventDefault(); });
+    b.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
     if (_fsPtt() && _fs.stream) _fsPttRuhe();
   }
   function _fsStopHoeren() {
