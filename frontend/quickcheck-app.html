@@ -5721,7 +5721,9 @@ const QcApp = (function() {
     /* v2222 · Während eines Messe-Drehbuchs gar nicht erst anfangen: die
        Brücke sagt ohnehin ab (Kosten), und Absage-Toast samt Vermerk in der
        Meinung stünden im Video. Die Bewertung bleibt die gerechnete. */
-    try { if (window.parent.DealPilotMesse && window.parent.DealPilotMesse.laeuft()) return; } catch (e) {}
+    try { var _dm = window.parent.DealPilotMesse;
+      /* v2225: außer das Drehbuch gibt eine aufgenommene Analyse frei */
+      if (_dm && _dm.laeuft() && !(_dm.kiAntwort && _dm.kiAntwort())) return; } catch (e) {}
 
     var stand = _kiFingerabdruck(inputs, score);
     if (stand === _kiStand) return;     /* dieser Stand ist schon analysiert */
