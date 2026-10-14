@@ -1993,6 +1993,8 @@ function _renderAIServerAnalysis(a) {
     function f(v, e) {
       if (v === null || v === undefined || !isFinite(v)) return '\u2013';
       if (e === 'eur') return Math.round(v).toLocaleString('de-DE') + ' \u20ac';
+      if (e === 'eurqm') return v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' \u20ac/m\u00b2';   /* v2216e */
+      if (e === 'stk') return String(Math.round(v));
       if (e === 'pct') return v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' %';
       return v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
@@ -2003,12 +2005,36 @@ function _renderAIServerAnalysis(a) {
       return vz + f(z.diff, 'zahl');
     }
     var t = a.stichtag ? a.stichtag.split('-').reverse().join('.') : '';
-    var reihen = a.zeilen.map(function (z) {
-      return '<tr class="abw-' + z.richtung + '"><td class="abw-wort">' + z.wort + '</td>'
-        + '<td class="abw-zahl">' + f(z.ankauf, z.einheit) + '</td>'
-        + '<td class="abw-zahl">' + f(z.bestand, z.einheit) + '</td>'
-        + '<td class="abw-zahl abw-diff">' + d(z) + '</td></tr>';
+    /* v2216e · Marcel 14.10.2026: „genauer beschrieben, vielleicht auch mehr
+       Felder." Die Zeilen stehen jetzt in Gruppen - Ertrag, Kosten,
+       Finanzierung, Steuer, Ergebnis -, damit man sieht, WO sich etwas bewegt. */
+    var GRUPPEN = ['Ertrag', 'Kosten', 'Finanzierung', 'Steuer', 'Ergebnis'];
+    var reihen = GRUPPEN.map(function (g) {
+      var zz = a.zeilen.filter(function (z) { return (z.gruppe || 'Ergebnis') === g; });
+      if (!zz.length) return '';
+      return '<tr class="abw-gruppe"><td colspan="4">' + g + '</td></tr>' + zz.map(function (z) {
+        return '<tr class="abw-' + z.richtung + '"><td class="abw-wort">' + z.wort + '</td>'
+          + '<td class="abw-zahl">' + f(z.ankauf, z.einheit) + '</td>'
+          + '<td class="abw-zahl">' + f(z.bestand, z.einheit) + '</td>'
+          + '<td class="abw-zahl abw-diff">' + (z.richtung === 'gleich' ? '–' : d(z)) + '</td></tr>';
+      }).join('');
     }).join('');
+    /* Die drei größten Bewegungen in Worten - nur Zeilen, die sich bewegt
+       haben; der DealScore steht ohnehin als Urteil im Satz darunter. */
+    var bewegt = a.zeilen.filter(function (z) { return z.richtung !== 'gleich' && z.wort !== 'DealScore' && z.pct !== null && isFinite(z.pct); })
+      .sort(function (x, y) { return Math.abs(y.pct) - Math.abs(x.pct); }).slice(0, 3);
+    var satz = bewegt.map(function (z) {
+      var wie = z.richtung === 'besser' ? '<span class="abw-pfeil besser">besser</span>' : '<span class="abw-pfeil schlechter">schlechter</span>';
+      return '<li><b>' + z.wort + '</b>: ' + f(z.ankauf, z.einheit) + ' → ' + f(z.bestand, z.einheit)
+        + ' (' + (z.pct > 0 ? '+' : '') + Math.round(z.pct) + ' %) — ' + wie + '</li>';
+    }).join('');
+    var sc = a.zeilen.filter(function (z) { return z.wort === 'DealScore'; })[0];
+    var bewegtHtml = bewegt.length
+      ? '<div class="abw-bewegt"><b>Was sich bewegt hat</b><ul>' + satz + '</ul>'
+        + (sc && sc.richtung !== 'gleich' ? '<div>Unterm Strich: DealScore ' + f(sc.ankauf, 'zahl').replace(',00', '') + ' → ' + f(sc.bestand, 'zahl').replace(',00', '')
+            + ' — das Objekt steht ' + (sc.richtung === 'besser' ? '<b>über</b>' : '<b>unter</b>') + ' Plan.</div>' : '')
+        + '</div>'
+      : '';
     var schlechter = a.zeilen.filter(function (z) { return z.richtung === 'schlechter'; }).length;
     var besser = a.zeilen.filter(function (z) { return z.richtung === 'besser'; }).length;
     return '<div class="abw-tafel-host" style="margin:0">'
@@ -2022,6 +2048,10 @@ function _renderAIServerAnalysis(a) {
              + '</b> besser und <b>' + schlechter + '</b> schlechter als beim Ankauf.')
           : 'Es hat sich nichts bewegt.')
       + '</p>'
+      + bewegtHtml
+      + '<style>.abw-tafel tr.abw-gruppe td{font:600 10.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#8a6d1f;padding:12px 6px 4px;border-bottom:1px solid rgba(138,109,31,.25)}'
+      + '.abw-bewegt{margin:0 0 14px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 8%,transparent);font:400 12.5px/1.55 Inter,system-ui,sans-serif}'
+      + '.abw-bewegt ul{margin:6px 0 4px;padding-left:18px}.abw-pfeil.besser{color:#3FA56C;font-weight:600}.abw-pfeil.schlechter{color:#B8625C;font-weight:600}</style>'
       + '<table class="abw-tafel"><thead><tr><th>Kennzahl</th><th>Ankauf</th><th>Bestand</th><th>Abweichung</th></tr></thead>'
       + '<tbody>' + reihen + '</tbody></table>'
       + '<div class="abw-deckung">' + a.zeilen.length + ' von ' + gesamt + ' Kennzahlen vergleichbar'

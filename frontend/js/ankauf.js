@@ -70,8 +70,38 @@
        Steuer (positiv = Erstattung). ABGELEITET aus zwei gespeicherten
        Kennzahlen, nicht neu gerechnet; alte Ankauf-Staende bekommen sie
        aus ihrem eingefrorenen Datensatz (`a.daten`). */
-    { schluessel: '_steuerwirkung', wort: 'Steuerwirkung p. a.', einheit: 'eur', besser: 'groesser' }
+    { schluessel: '_steuerwirkung', wort: 'Steuerwirkung p. a.', einheit: 'eur', besser: 'groesser' },
+    /* v2216e · Marcel 14.10.2026: „Soll/Ist … genauer beschrieben, vielleicht
+       auch mehr Felder." Abgeleitet aus dem Datensatz, nicht neu gerechnet;
+       alte Ankauf-Stände bekommen sie aus `a.daten` (siehe _vergleich). */
+    { schluessel: '_nkm_qm',        wort: 'Miete je m²',          einheit: 'eurqm', besser: 'groesser' },
+    { schluessel: '_leer_einheiten', wort: 'Leere Einheiten',     einheit: 'stk',  besser: 'kleiner' },
+    { schluessel: '_kpis_bwk_nul_y', wort: 'Nicht umlagefähige Kosten p. a.', einheit: 'eur', besser: 'kleiner' },
+    { schluessel: 'eigen_r',        wort: 'Instandhaltung p. a.',  einheit: 'eur',  besser: 'kleiner' },
+    { schluessel: 'd1z',            wort: 'Zinssatz',             einheit: 'pct',  besser: 'kleiner' },
+    { schluessel: '_kpis_cf_vs',    wort: 'Cashflow v. Steuer',   einheit: 'eur',  besser: 'groesser' },
+    { schluessel: 'geb_ant',        wort: 'Gebäudeanteil (AfA-Basis)', einheit: 'pct', besser: 'groesser' },
+    { schluessel: 'afa_satz',       wort: 'AfA-Satz',             einheit: 'pct',  besser: 'groesser' }
   ];
+  /* v2216e · Gruppen für die Tafel - die Reihenfolge der Liste oben bleibt. */
+  var GRUPPE = {
+    nkm: 'Ertrag', _kpis_miete_j: 'Ertrag', _nkm_qm: 'Ertrag', _leer_einheiten: 'Ertrag',
+    _kpis_bwk_nul_y: 'Kosten', eigen_r: 'Kosten',
+    kp: 'Finanzierung', d1z: 'Finanzierung', _kpis_dscr: 'Finanzierung', _kpis_ltv: 'Finanzierung',
+    geb_ant: 'Steuer', afa_satz: 'Steuer', _steuerwirkung: 'Steuer',
+    _kpis_cf_vs: 'Ergebnis', _kpis_cf_ns: 'Ergebnis', _kpis_bmy: 'Ergebnis', _kpis_nmy: 'Ergebnis', _ds2_score: 'Ergebnis'
+  };
+  /* Zinssatz und AfA-Satz stehen mal als „4,0", mal als „3.5" oder „6.25" im
+     Datensatz. zahl() streicht jeden Punkt (Tausender) - aus 6.25 würde 625.
+     Ein einzelner Punkt mit 1-2 Nachkommastellen ist hier ein Dezimalpunkt. */
+  function zahlSatz(v) {
+    if (v === null || v === undefined || v === '') return null;
+    if (typeof v === 'number') return isFinite(v) ? v : null;
+    var s = String(v).trim();
+    var m = s.match(/^(\d+)\.(\d{1,2})(?:_.*)?$/);
+    if (m) return parseFloat(m[1] + '.' + m[2]);
+    return zahl(s);
+  }
 
   /* ── Zahlen ───────────────────────────────────────────────────────
      `Number(null)` ist 0 und besteht `Number.isFinite` - deshalb wird
@@ -123,6 +153,15 @@
     if (k._ds2_score == null) k._ds2_score = zahl(daten._dealpilot_score);
     var _ns = zahl(daten._kpis_cf_ns), _vs = zahl(daten._kpis_cf_vs);
     k._steuerwirkung = (_ns !== null && _vs !== null) ? Math.round((_ns - _vs) * 100) / 100 : null;
+    /* v2216e · abgeleitete Felder */
+    k.d1z = zahlSatz(daten.d1z);
+    k.afa_satz = (String(daten.afa_satz || '') === 'eigen') ? zahlSatz(daten.afa_eigen) : zahlSatz(daten.afa_satz);
+    var _nkm = zahl(daten.nkm), _wfl = zahl(daten.wfl);
+    k._nkm_qm = (_nkm !== null && _wfl) ? Math.round(_nkm / _wfl * 100) / 100 : null;
+    try {
+      var _e = daten._mfh && Array.isArray(daten._mfh.einheiten) ? daten._mfh.einheiten : null;
+      k._leer_einheiten = _e && _e.length ? _e.filter(function (x) { return String(x.status || '') === 'leer'; }).length : null;
+    } catch (e) { k._leer_einheiten = null; }
     return k;
   }
 
@@ -233,15 +272,16 @@
       var vorher = zahl(a.kurz[k.schluessel]);
       /* v2160: eine spaeter dazugekommene Kennzahl fehlt in alten Kurzfassungen -
          sie kommt dann aus dem eingefrorenen Datensatz desselben Stichtags. */
-      if (vorher === null && k.schluessel === '_steuerwirkung' && a.daten) {
-        try { vorher = zahl(_kurzfassung(a.daten)._steuerwirkung); } catch (e) {}
+      /* v2216e · für JEDE später dazugekommene Kennzahl, nicht nur die Steuerwirkung */
+      if (vorher === null && a.daten) {
+        try { vorher = zahl(_kurzfassung(a.daten)[k.schluessel]); } catch (e) {}
       }
       var nachher = zahl(jetzt[k.schluessel]);
       if (vorher === null || nachher === null) continue;
       var diff = nachher - vorher;
       var pct = (vorher !== 0) ? (diff / Math.abs(vorher)) * 100 : null;
       zeilen.push({
-        wort: k.wort, einheit: k.einheit,
+        wort: k.wort, einheit: k.einheit, schluessel: k.schluessel, gruppe: GRUPPE[k.schluessel] || 'Ergebnis',   /* v2216e */
         ankauf: vorher, bestand: nachher, diff: diff, pct: pct,
         richtung: diff === 0 ? 'gleich'
                 : ((diff > 0) === (k.besser === 'groesser') ? 'besser' : 'schlechter')
