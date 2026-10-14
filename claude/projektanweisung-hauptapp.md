@@ -38761,6 +38761,21 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2234–v2234c · Erklärtext als Karte am Feld · Messe-Baukasten (14.10.2026)
+- **Was:**
+  - **Baukasten** `design/Vorschläge/messe-video/messe-effekte.js`: 10 Intros, 10 Info-Karten, 10 Outros. Alle Texte sind Felder mit Vorgabe, sechs Outros tragen einen echten QR-Code. Vorschau mit Video dahinter: https://claude.ai/artifact/BANFkS1maT5MhjhGGNooLe. Skill und Agent `messe-video` kennen ihn.
+  - **v2234:** Marcel: „nicht immer nur der Text unten, sondern als Karte mit Pfeil oder Linie dort dran". `platziere()` in `messe-drehbuch.js` setzt die Zeile als Karte neben das Kegel-Ziel, auf die erste passende Seite (rechts, links, darunter, darüber). Eine SVG-Linie mit Pfeil (`#dpm-linie`) führt von der Kartenkante zum Ziel. Ohne Ziel oder ohne Platz steht die Zeile wie bisher unten. `?zeile=unten` holt den alten Untertitel zurück.
+  - **v2234a:** Jede neue Zeile wählt ihre Seite neu (vorher blieb die Seite der ersten Szene stehen).
+  - **v2234b:** Die Linie wird aus dem aktuellen Kartenrechteck gezogen und läuft beim Gleiten in jedem Bild mit (vorher hing sie lose daneben).
+  - **v2234c:** Wechselt die Karte die Seite, springt sie, statt zu gleiten.
+- **Commit:** `bfd2a4d3` (Baukasten), `11c0aeb6`, `d4bb8089`, `b7779ee3`, `913704a7`
+- **Nachweis:**
+  - Baukasten: alle 30 Stücke im Bild geprüft, acht Bildfehler behoben. 6 von 6 QR-Codes mit jsQR zurückgelesen, die URL traf jedes Mal genau.
+  - Parkstraße (v2234): 5 Zeilen, alle als Karte am Ziel, Linie da, 0 über dem Ziel, 0 außerhalb des Fensters.
+  - Quick-Check (v2234c, 1.065 Proben je 150 ms): Alle 1.032 Proben mit Ziel als Karte am Feld. Linie 0-mal lose, 0 außerhalb des Fensters.
+  - **Zurückgenommen:** „Die Karte gleitet 0,15–0,3 s quer über das Feld" (Begründung für v2234c) war nicht die ganze Ursache. Die verbliebenen 21 „über dem Ziel"-Proben sind Messartefakte: Gemessen wurde gegen den **Kegel**, und der zieht bis zu 0,6 s hinter dem neuen Ziel her. Die Karte stand sofort richtig (Ziel 852–1189 px, Karte ab 1253 px). Das Springen bleibt trotzdem drin.
+- **Rest:** Marcel wählt Intros, Karten und Outros; danach Einbau in die Drehbücher und Neuaufnahme der Videos. Das QR-Ziel ist offen. Nicht auf Prod (nur für Messe-Videos auf Staging nötig).
+
 ### Prod-Rollout (20) · v2220–v2233 auf Produktion (14.10.2026)
 - **Was:** Marcels Freigabe („bitte auch Prod-Rollout machen"). Lokal `main` + Merge `origin/staging` (--no-ff), Push → `f652e4cc` (44 Commits, 19 Dateien, keine Migration). Auf Prod `git pull` und Rebuild `backend`; mb-backend unverändert.
 - **Commit:** `f652e4cc`

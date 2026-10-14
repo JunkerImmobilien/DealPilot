@@ -38,7 +38,8 @@ Vorhandene Drehbücher: `parkstrasse`, `quickcheck`, `quickcheck-tippen`,
 6. **Tempo für Zuschauer:** `TEMPO` (Vorgabe 1,4) streckt alle Wartezeiten ab 600 ms. Faustregel je Untertitel: mindestens 4 s plus 1 s je 15 Zeichen. Zahlenwechsel (Score) erst zeigen, wenn der Kegel steht.
 7. **Die Pilot-Hilfe ist im Lauf ausgeblendet** (`html.dpm-laeuft #dp-pilot, #dp-tower`). Neue störende Einblendungen dort ergänzen.
 8. **Kegel:** `zeige(ziel)` nimmt ein Element, einen Selektor oder eine Funktion (bei Elementen, die neu gerendert werden, immer eine Funktion). Ziele im Quick-Check-iframe gehen über `qcEl`/`qcGruppe`/`qcSel`; `rect()` rechnet den Rahmen dazu. Gescrollt wird sofort, nie `smooth` (kam nie an).
-9. **Messen gegen `innerHeight`, nie gegen den Bildrahmen** (Zoom 90 %: 987 CSS-px Höhe, Screenshot 726).
+9. **Die Zeile ist eine Karte am Feld** (seit v2234): `s.zeile()` nach `zeige(ziel)`. Die Karte setzt sich selbst neben das Ziel, mit Linie und Pfeil. Ohne Ziel steht sie unten, `?zeile=unten` erzwingt den alten Untertitel. Kurze Texte wirken besser, die Karte ist höchstens 440 px breit. Prüft man die Überdeckung, dann gegen das ZIEL-Element, nicht gegen `#dpm-kegel`: Der Kegel zieht bis 0,6 s nach.
+10. **Messen gegen `innerHeight`, nie gegen den Bildrahmen** (Zoom 90 %: 987 CSS-px Höhe, Screenshot 726).
 
 ## Ablauf für ein neues oder geändertes Drehbuch
 
