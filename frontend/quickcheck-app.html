@@ -5426,7 +5426,7 @@ const QcApp = (function() {
        an der GEWÄHLTEN Stelle der Spanne, auf Angebotsniveau (card.abschlag.roh),
        damit der Kern den Abschlag genau einmal abzieht. Der Satz kommt aus den
        Einstellungen (DealPilotAbschlag), sonst gilt der Marktdurchschnitt. */
-    var mwArt = 'unbekannt';
+    var mwArt = 'unbekannt', _mcAkt = null, _mkAkt = 'med';
     if (!(mwRoh > 0)) {
       try {
         var _ms = JSON.parse((document.getElementById('_mb_state') || {}).value || 'null');
@@ -5434,6 +5434,7 @@ const QcApp = (function() {
         if (_mc && _mc.mw) {
           var _mk = _spanConfig === 'low' ? 'low' : _spanConfig === 'high' ? 'high' : 'med';
           mwRoh = (_mc.abschlag && _mc.abschlag.roh && _mc.abschlag.roh[_mk]) || _mc.mw[_mk] || 0;
+          _mcAkt = _mc; _mkAkt = _mk;
           mwArt = 'angebot';   /* auch alte Schnappschüsse ohne Abschlag: Angebotsniveau */
         }
       } catch (e) {}
@@ -5443,6 +5444,9 @@ const QcApp = (function() {
     if (mwRoh > 0 && window.QcHeuristik && QcHeuristik.marktwertBereinigt) {
       var b = QcHeuristik.marktwertBereinigt(mwRoh, mwArt, _ab ? _ab.satz() : null, _ab ? _ab.quelle() : null);
       if (b) { mw = b.bereinigt; mwGrund = b.abschlag_pct > 0 ? b.grund : null; }
+      /* v2238a · dieselbe Zahl wie auf der Karte: dort ist der bereinigte Wert
+         auf volle 1.000 € gerundet (gemessen: Karte 178.000 €, Urteil 178.038 €) */
+      if (_mcAkt && _mcAkt.abschlag && _mcAkt.mw && _mcAkt.mw[_mkAkt] > 0) mw = _mcAkt.mw[_mkAkt];
     }
 
     var daten = {
