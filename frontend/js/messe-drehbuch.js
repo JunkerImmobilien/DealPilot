@@ -958,11 +958,10 @@
      einmal echt abgerufen (14.10.2026, Staging) für Hölderlinstr. 1, 73,31 m²,
      Bj 1983, Eigentumswohnung: Ø 189.000 €, Spanne 153.000–277.000 €. */
   var MB_KARTE = {"area":73.31,"rating":"Attraktiv","conf":{"label":"Niedrig","pct":39},"mikro":"Sehr gut · 8,2","makro":"Gut · 6,0","microRaw":82,"macroRaw":60,"trendRaw":null,"trend":"–","zensus":{"ebene":"Gemeinde","name":"Bad Oeynhausen, Stadt","leer":3.6,"eig":47.3,"miete":5.84},"brw":{"wert":200,"quelle":"BORIS-NRW","stichtag":"2026-01-01"},"makroGemessen":4,"mw":{"low":153000,"med":189000,"high":277000,"sqm":"2.580 €/m²"},"mm":{"low":597,"med":683,"high":776,"sqm":"9,32 €/m² kalt"}};
-  /* v2236 · Pilot-Analyse einmal echt für den Endstand des Rundgangs:
-     Miete Ø 683 €, 20 % EK, C-Lage, Score 60 (zwei weitere Abrufe beim Messen gesperrt). */
-  var KI_RUNDGANG = {"negotiate":"Zum aktuellen Preis empfehle ich keinen Kauf. Um deine Ziel-Bruttomietrendite von 7 % zu erreichen, solltest du höchstens 117.086 € zahlen.","pros":["Solider Cashflow von 28 € pro Monat trotz hoher Nebenkosten","Bruttomietrendite mit 5,9 % für diese Objektgröße akzeptabel","Score von 60/100 bestätigt rechnerisch tragfähigen Deal","DSCR von 1,29 sorgt für ausreichende Schuldendienstdeckung"],"cons":["Deine Zielrendite wird klar verfehlt (5,9 % statt 7 % nach Vorgabe)","Hohes Hausgeld von 415 € pro Monat drückt Nettoergebnis","Eigenkapitalrendite sehr niedrig mit nur 0,8 %"],"opinion":"Das Objekt rechnet sich zwar mit kleinem positiven Cashflow und solider Schuldendienstdeckung, bleibt aber unter deiner Zielsetzung für die C-Lage. Die Bruttomietrendite liegt mit 5,9 % spürbar unter deinem Mindestwert. Preislich müsste es rund 22.000 € günstiger sein, damit es zu deinem Renditeziel passt."};
-  /* v2236 · Abschlag Angebot -> Kaufpreis: ImmoScout24/Sprengnetter, ETW bundesweit
-     Dezember 2025: Kaufpreise 5,8 % unter Angebot (Mitte 2025: 6,8 %). */
+  /* v2237 · Pilot-Analyse einmal echt für den Endstand des Rundgangs (Miete Ø,
+     20 % EK, C-Lage, Score 60) - MIT DealPilot-Marktwert (178.000 € nach 5,8 %
+     Abschlag) und dem Zwei-Sichten-Prompt. */
+  var KI_RUNDGANG = {"negotiate": "Du solltest zu diesem Preis nicht kaufen, da die Bruttomietrendite mit 5,9 % deutlich unter deinem Zielwert von 7 % für eine C-Lage liegt. Rechnerisch erreichst du deine Zielrendite erst bei einem Kaufpreis von 117.086 €. Das wäre der Betrag, den du konkret anstreben solltest – also rund 16 % unter dem aktuellen Angebotspreis.", "pros": ["Cashflow mit +28 €/Monat ist positiv, das Objekt trägt sich rechnerisch selbst.", "DSCR von 1,29 sorgt für ausreichend Schuldendienstdeckung.", "Score von 60/100 zeigt eine solide Ausgangslage.", "DealPilot-Marktbewertung: Der Kaufpreis liegt 39.000 € (28 %) unter dem geschätzten Marktwert – Wertpuffer ab dem ersten Tag."], "cons": ["Bruttomietrendite liegt mit 5,9 % klar unter deinem Zielwert von 7 % für diese Lageklasse.", "Eigenkapitalrendite mit nur 0,8 % ist niedrig.", "Hausgeld mit 415 €/Monat belastet die Rendite zusätzlich."], "opinion": "Nach deiner Zielvorgabe für C-Lagen ist das Objekt aktuell kein Kauf, weil die gewünschte Rendite nicht erreicht wird. Die Kennzahlen zeigen aber, dass der Deal sich selbst trägt und im Marktvergleich ein Wertpuffer vorhanden ist – der Kaufpreis liegt 39.000 € unter der DealPilot-Marktbewertung. Als klassisches Renditeobjekt passt die Wohnung nicht zu deinen Anforderungen, als wertgesicherter Substanzkauf bleibt sie jedoch interessant."};
   /* v2237 · Der Mitschnitt ist die ROHE Antwort (Angebotsniveau). Wie bei einem
      echten Abruf geht er durch DealPilotAbschlag.anwenden (Satz aus den
      Einstellungen, sonst Marktdurchschnitt) - im Quick-Check-Fenster. */
@@ -1057,7 +1056,7 @@
         s.zeile('Die Pilot-Analyse', 'Der Pilot bleibt ehrlich: für deine <b>C-Lage</b> zu wenig Rendite — dein Ziel gäbe es erst bei <b>117.086 €</b>.');
         await warte(6500);
         await zeige(function () { return qcEl('ai-card'); }, 6);
-        s.zeile('Die Pilot-Analyse', 'Dazu Pro und Contra: Cashflow positiv, DSCR 1,29 — aber Hausgeld hoch und die Zielrendite verfehlt.');
+        s.zeile('Die Pilot-Analyse', 'Und er sieht mehr: <b>39.000 € unter Marktwert</b> — als Renditeobjekt nein, als <b>Substanzkauf</b> interessant.');
         await warte(5500);
         _kiFrei = null;
       },
