@@ -38761,6 +38761,32 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2218g–v2219c · Staging · Geführte Eingabe randlos, Dokumente im PDF-Import, Sprache direkt, Sprechkatalog, Soll-Ansicht überschrieb das Ist, Messe-Drehbuch (14.10.2026)
+- **Was:** Marcels achte Runde (N71).
+  - **v2218g:** Geführte Eingabe am Handy randlos über `100dvh`. Gemessen: Fenster vorher 352×686, Verlauf 168 → 242 px.
+  - **v2218h/i, Dokumente im PDF-Import:**
+    - Die Kachel „Dokumente“ ist entfernt. „Exposé / Marktbericht“ erkennt jetzt auch amtliche Dokumente (Leitbegriffe, nie in DealPilot-Berichten) und liest sie mit `DokumentImport.lesenText`.
+    - Die Werte laufen in dieselbe Tabelle mit „im Objekt“. Gutachten-Ergebnisse stehen als Vergleich darunter.
+    - Gemessen: Der Import kürzte den Text vor der Erkennung auf 12.000 Zeichen, „Punktrastermethode“ stand dahinter. Jetzt wird auf dem vollen Text erkannt und erst beim Senden gekürzt.
+  - **Sprache:** Das Wahlfenster „frei / geführt“ entfällt, es geht direkt ins Freisprechen. `_startkarte()` hat damit keinen Aufrufer mehr.
+  - **Sprechkatalog:** 259 von 267 Formularfeldern waren drin. Ergänzt sind die Kaufnebenkosten in Euro (5), die Darlehensschalter (3), „EK = Nebenkosten“ und „Wert inkl. Erbbaurecht“. Das Backend kappte still bei `MAX_CATALOG = 250` bei rund 240 Einträgen; jetzt 320 mit Log.
+  - **v2219a · ECHTER DATENFEHLER:**
+    - Die Ansicht „Soll · Ankauf-Stand“ konnte das Ist überschreiben. `saveObj` prüfte die Sperre beim Aufruf, las das Formular aber erst nach `await _checkObjIdConflict`. Der „erst sichern“-Save des Umschalters und kurz vorher gestartete Auto-Saves schrieben so den Ankauf als Ist.
+    - Ausgelöst durch mein Drehbuch an der Parkstraße (NKM 3.195 → 2.321, DSCR 1,23 → 0,90, 09:43). **Auf Prod im selben Code vorhanden.**
+    - Behoben: In `saveObj` gilt die Sperre nach dem await erneut (nur der markierte Save `_vorAnkauf` darf durch). Der Umschalter wartet auf diesen Save und lädt erst danach den Ankauf (`ankaufLaden`).
+    - Parkstraße wiederhergestellt aus dem Ableitungs-Skript von heute früh: Einheit „1. OG links“ vermietet 874 €, Maßnahme und 45.000 € Kosten, NKM 3.195, Erhaltungsaufwand 2025 46.200. Vorher gesichert: `/root/backups/parkstr-objekt-0945.json`.
+  - **v2219–v2219c · Messe-Drehbuch** `messe-drehbuch.js`:
+    - `?messe=parkstrasse[&schleife]`, fünf Szenen plus Titel- und Schlusskarte, rund 45 s.
+    - Jede Zahl wird live gelesen (Ankauf-Stand, Abweichung, Steuerverlauf). Der Lichtkegel folgt seinem Ziel per Selektor bzw. Suchfunktion, weil Umschalter und Steuerverlauf sich neu bauen.
+- **Nachweis:**
+  - Echter Upload Westerfeld-RND über den PDF-Import: automatisch „Restnutzungsdauergutachten“, Baujahr in der Tabelle, „RND laut Gutachten 16 · DealPilot 23,6 Jahre“.
+  - Gegenprobe Soll-Ansicht (Reiterwechsel direkt vor „Soll“, zwei Wechsel darin): 1 PUT mit NKM 3.195, keiner während Soll, DB unverändert.
+  - Drehbuch dreimal komplett gelaufen: Zahlen 2.321 € / 1 leer / DSCR 0,90 → 3.195 € → DSCR 0,90→1,23, CF −6.193→775, Score 49→59 → Erstattung 16.329 €. Kegel 1296×51, 293×51, 293×51, 996×163, Balken 2025. DB danach NKM 3.195 / DSCR 1,23.
+- **Rest:**
+  - **Prod-Rollout von v2219a ist dringend.** Dort kann jeder Klick auf „Soll“ das Ist eines Objekts mit Unterschied überschreiben.
+  - Freisprechen-Start nur im Code geprüft (Mikrofon-Freigabe).
+  - Weitere Drehbücher (Westerfeld, Quick-Check, Steuer …) nach Marcels Abnahme des ersten.
+
 ### v2218a–v2218f · Staging · Handy-Menü, Pilot erst nach Anmeldung, Mikrofon neben Senden, Atlas am Handy (14.10.2026)
 - **Was:** Marcels siebte Runde (N70).
   - **Pilot-Analyse Parkstraße neu abgerufen** (Stand 14.10., 09:08, gespeichert). Sie sagt weiter „Nicht kaufen“: Sie rechnet gegen den Marktbericht vom 08.10. mit 482.000 € Marktwert bei 780.000 € Kaufpreis. Die Analyse vom Ankauf bleibt im Ankauf-Stand eingefroren.
