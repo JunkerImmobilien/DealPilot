@@ -34,6 +34,11 @@
      sondern als Karte am Feld, mit Linie und Pfeil dorthin. ?zeile=unten
      holt den alten Untertitel zurueck. */
   var HAFT = (function () { try { return new URLSearchParams(location.search).get('zeile') !== 'unten'; } catch (e) { return true; } })();
+  /* v2235 · Studio: läuft die App im Rahmen von messe-studio.html (?studio=1),
+     gehen die Zeilen als Kapitel ans Studio (Band unten), Titelkarte und
+     Abspann übernimmt das Studio (Intro/Outro aus dem Baukasten). */
+  var STUDIO = (function () { try { return new URLSearchParams(location.search).has('studio') && window.parent !== window; } catch (e) { return false; } })();
+  function anStudio(m) { try { m.source = 'dp-messe-studio'; window.parent.postMessage(m, location.origin); } catch (e) {} }
   var TEMPO = (function () { try { var t = parseFloat(new URLSearchParams(location.search).get('tempo')); return (t > 0.3 && t < 4) ? t : 1.4; } catch (e) { return 1.4; } })();
   function warte(ms) { if (ms >= 600) ms = Math.round(ms * TEMPO); return new Promise(function (r, x) { var l = lauf; setTimeout(function () { l === lauf ? r() : x('stopp'); }, ms); }); }
   function q(sel) { return document.querySelector(sel); }
@@ -90,6 +95,7 @@
       '@media (max-width:640px){#dpm-logo .w{font-size:56px}#dpm-logo{padding:14px 26px 16px}}',
       '#dpm-stopp{position:fixed;z-index:10076;right:14px;bottom:14px;border:1px solid ' + mix(G, 50) + ';background:rgba(10,9,7,.8);color:' + GH + ';border-radius:8px;padding:4px 10px;font:600 12px "JetBrains Mono",monospace;cursor:pointer;opacity:.35}',
       '#dpm-stopp:hover{opacity:1}',
+      'html.dpm-studio #dpm-stopp{display:none}',
       /* v2233 · die Pilot-Hilfe stoert im Video - waehrend eines Laufs ausgeblendet */
       'html.dpm-laeuft #dp-pilot,html.dpm-laeuft #dp-tower{display:none!important}',
       '@media (max-width:640px){#dpm-zeile .t{font-size:18px}#dpm-karte h1{font-size:40px}#dpm-karte p{font-size:16px}}'
@@ -116,6 +122,7 @@
     k.classList.add('an');
   }
   function zeile(kick, text, i, n) {
+    if (STUDIO) { anStudio({ type: 'kapitel', kick: (_aktiv && _aktiv.titel) || 'DealPilot', titel: kick, text: text, i: i, n: n }); return; }
     var z = el('dpm-zeile');
     z.innerHTML = '<div class="k">' + kick + '</div><div class="t">' + text + '</div><div class="p">'
       + Array.apply(null, { length: n }).map(function (_, j) { return '<i class="' + (j <= i ? 'an' : '') + '"></i>'; }).join('') + '</div>';
@@ -938,6 +945,73 @@
   var QC_IMPORT = {"files":[{"name":"Expose.pdf","type":"expose","userType":null,"cache":{"expose":{"adresse":"Hölderlinstr. 1, 32547 Bad Oeynhausen","plz":"32547","ort":"Bad Oeynhausen","objektart":"Eigentumswohnung","energieklasse":"D","heizungsart":"Gas-Zentralheizung","stellplatz":"Tiefgarage","kaufpreis":139000,"wohnflaeche":73.31,"baujahr":1983,"zimmer":2,"hausgeld":415,"energieverbrauch":117.7,"balkon":true,"keller":true}}},{"name":"Marktbericht.pdf","type":"market","userType":null,"cache":{"market":{"adresse":"Sachsenstraße 16, 32052 Herford","plz":"32052","ort":"Herford","objektart":"Wohnung","bewertungsdatum":"2025-10-15","konfidenz":"Gut","makrolage":"gut","mikrolage":"gut","bevoelkerung_entwicklung":"stabil","nachfrage":"mittel","wertsteigerung":"mittel","entwicklung":"begrenzt","kueche_qualitaet":"Gehoben","bad_qualitaet":"Normal","boden_qualitaet":"Standard","fenster_qualitaet":"Gehoben","kueche_zustand":"Neu / kürzlich modernisiert","bad_zustand":"Gut in Stand gehalten","boden_zustand":"Gut in Stand gehalten","fenster_zustand":"Gut in Stand gehalten","badezimmer":"1","etage":"1","etagen":"3","modernisierungsjahr":"2025","garagen":"1","balkon_flaeche":"10","energie_label":"B","wohnflaeche":96,"baujahr":1994,"sanierungsjahr":2025,"zimmer":3,"verkehrswert":215200,"verkehrswert_min":196000,"verkehrswert_max":233000,"preis_pro_qm":2242,"lage_geraeusch":5,"lage_einkaufen":4.7,"lage_bildung":4.3,"lage_gastronomie":4.2,"lage_gesundheit":4.6,"lage_freizeit":2.8,"wertentwicklung_3jahre_pct":14.1,"wertentwicklung_1jahr_pct":4.17,"prognose_naechstes_jahr_pct":3.49,"markt_durchschnittspreis":279000,"markt_tage_auf_dem_markt":139}}}]};
   var MB_KARTE = {"area":96,"rating":"Attraktiv","conf":{"label":"Niedrig","pct":43},"mikro":"Sehr gut · 8,2","makro":"Gut · 6,0","microRaw":82,"macroRaw":60,"trendRaw":null,"trend":"–","zensus":{"ebene":"Gemeinde","name":"Bad Oeynhausen, Stadt","leer":3.6,"eig":47.3,"miete":5.73},"brw":{"wert":200,"quelle":"BORIS-NRW","stichtag":"2026-01-01"},"makroGemessen":4,"mw":{"low":199000,"med":251000,"high":351000,"sqm":"2.615 €/m²"},"mm":{"low":766,"med":881,"high":1012,"sqm":"9,18 €/m² kalt"}};
 
+  /* ═══ DREHBUCH 6 · QUICK BOARDING — DER RUNDGANG (v2235) ═══════════════
+     Marcel 14.10.2026: „oben bei der Datenaufnahme die Methoden vorstellen,
+     nacheinander, dann mit einer weitermachen und weiter erklären … bis zum
+     ‚Als Objekt speichern'". Gedacht fürs Studio (messe-studio.html, Intro 03
+     Boarding Pass, Outro 02 Am Stand), läuft aber auch allein. Ab dem PDF-Weg
+     dieselben Szenen wie 'quickcheck' - dieselben Mitschnitte, kein Abruf.
+     Gespeichert wird NICHT: die letzte Szene zeigt den Knopf. */
+  function qcTile(src) { return function () { return qcSel('.qc7-src[data-src="' + src + '"]'); }; }
+  var QC = DREHBUECHER.quickcheck.szenen;
+  DREHBUECHER['quickcheck-rundgang'] = {
+    titel: 'Quick Boarding',
+    unterzeile: 'Fünf Wege zu den Daten · ein Urteil · ein Objekt',
+    objekt: null,
+    aufraeumen: DREHBUECHER.quickcheck.aufraeumen,
+    abspann: DREHBUECHER.quickcheck.abspann,
+    szenen: [
+      async function (s) {   /* 1 · Quick Boarding öffnen - vorbelegt */
+        try { _spanVorher = localStorage.getItem('qc_span_config'); } catch (e) { _spanVorher = undefined; }
+        if (typeof window.sbActionsAction === 'function') sbActionsAction('quickcheck');
+        await warteAuf(function () { var d = qcDoc(); return d && d.readyState === 'complete' && qcEl('qc_kp') && !qcEl('qc_kp').value && qcEl('qc7-sources'); }, 10000);
+        await warteAuf(function () { return qcEl('qc_zins') && qcEl('qc_zins').value; }, 4000);
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await warte(600);
+        await zeige(function () { return qcEl('qc7-sources'); }, 6);
+        s.zeile('Die Datenaufnahme', 'Oben die Datenaufnahme: <b>fünf Wege</b>, wie ein Objekt in DealPilot kommt — einer reicht.');
+        await warte(4600);
+      },
+      async function (s) {   /* 2 · Exposé / Marktbericht */
+        await zeige(qcTile('expose'), 8);
+        s.zeile('Exposé & Marktbericht', 'PDFs hineinziehen — Exposé, Marktbericht, Mietaufstellung. DealPilot liest jeden Wert <b>mit Quelle</b>.');
+        await warte(5000);
+      },
+      async function (s) {   /* 3 · Sprache */
+        await zeige(qcTile('voice'), 8);
+        s.zeile('Sprache', 'Bei der Besichtigung einfach <b>erzählen</b> — Fläche, Miete, Zustand. DealPilot schreibt mit und füllt die Felder.');
+        await warte(5000);
+      },
+      async function (s) {   /* 4 · ImmoMetrica */
+        await zeige(function () { return qcEl('qc-imo-tile'); }, 8);
+        s.zeile('ImmoMetrica', 'Direkt aus dem Inserat: deine gespeicherte Suche öffnen, Objekt wählen, <b>übernehmen</b>.');
+        await warte(5000);
+      },
+      async function (s) {   /* 5 · DealPilot-Marktbewertung */
+        await zeige(qcTile('dpmb'), 8);
+        s.zeile('DealPilot-Marktbewertung', 'Kein Exposé zur Hand? <b>Abrufen</b> — Marktwert und Marktmiete für die Adresse, aus DealPilots eigener Bewertung.');
+        await warte(5200);
+      },
+      async function (s) {   /* 6 · Von Hand */
+        await zeige(function () { return qcGruppe('obj'); }, 6);
+        s.zeile('Oder von Hand', 'Oder einfach <b>tippen</b> — jedes Feld rechnet sofort mit, Score und Urteil laufen mit.');
+        await warte(4600);
+      },
+      QC[2],   /* 7 · Weiter mit den PDFs (Exposé + Marktbericht) */
+      QC[3],   /* 8 · Marktwertindikation */
+      QC[4],   /* 9 · Spanne Unten -> Einschätzung */
+      QC[5],   /* 10 · Mehr Eigenkapital */
+      QC[6],   /* 11 · Gegen deine Lage */
+      QC[7],   /* 12 · Oben -> Gut */
+      QC[8],   /* 13 · Pilot-Analyse */
+      async function (s) {   /* 14 · Als Objekt speichern - gezeigt, nicht geklickt */
+        await zeige(function () { var b = qcEl('save-btn'); return b && b.getBoundingClientRect().width ? b : null; }, 12);
+        s.zeile('Als Objekt speichern', 'Passt der Deal? <b>Ein Klick</b> — als Objekt gespeichert, mit allen Werten, Quellen und der Pilot-Analyse.');
+        await warte(6000);
+      }
+    ]
+  };
+
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0, _aktiv = null;
   function stopp() {
@@ -953,27 +1027,38 @@
   async function start(name, opts) {
     var D = DREHBUECHER[name]; if (!D) { console.warn('[messe] unbekanntes Drehbuch: ' + name); return; }
     css(); stopp();
-    try { document.documentElement.classList.add('dpm-laeuft'); } catch (e) {}
+    try { document.documentElement.classList.add('dpm-laeuft'); if (STUDIO) document.documentElement.classList.add('dpm-studio'); } catch (e) {}
     var g = lauf = Date.now(); _aktiv = D;
     var b = el('dpm-stopp', 'button'); b.type = 'button'; b.textContent = '■'; b.title = 'Drehbuch beenden (Esc)'; b.onclick = stopp;
     document.addEventListener('keydown', esc, true);
     var n = D.szenen.length;
     try {
       do {
-        karte('<div class="k">DealPilot · Geschichte</div><h1>' + D.titel + '</h1><p>' + D.unterzeile + '</p>');
+        if (!STUDIO) karte('<div class="k">DealPilot · Geschichte</div><h1>' + D.titel + '</h1><p>' + D.unterzeile + '</p>');
         if (D.objekt) {   /* v2221: der Quick-Check braucht kein Objekt */
           var id = await objektFinden(D.objekt);
           if (!id) { karte('<h1>Objekt fehlt</h1><p>Für dieses Drehbuch fehlt das Demo-Objekt in diesem Konto.</p>'); await warte(4000); break; }
           if (window._currentObjKey !== id && typeof window.loadSaved === 'function') await window.loadSaved(id);
         }
-        await warte(3200);
-        karte(null); await warte(700);
+        if (STUDIO) {
+          /* das Studio spielt das Intro; los geht es auf sein Zeichen */
+          anStudio({ type: 'bereit', titel: D.titel, n: n });
+          await new Promise(function (ok, x) {
+            var l = lauf, t = setInterval(function () { if (l !== lauf) { clearInterval(t); x('stopp'); } }, 300);
+            addEventListener('message', function h(e) {
+              if (e.origin === location.origin && e.data && e.data.source === 'dp-messe-studio' && e.data.type === 'los') { removeEventListener('message', h); clearInterval(t); ok(); }
+            });
+          });
+        } else { await warte(3200); karte(null); await warte(700); }
         for (var i = 0; i < n; i++) {
           var ii = i;
           await D.szenen[i]({ zeile: function (k, t) { zeile(k, t, ii, n); } });
         }
+        /* v2235 · im Studio erst das Outro, dann aufräumen (es deckt den Rahmen) */
+        if (STUDIO) { anStudio({ type: 'ende' }); await warte(1400); }
         _ziel = null; kegel(null); zeileWeg();
         if (D.aufraeumen) D.aufraeumen(); else reiter('s0');
+        if (STUDIO) break;
         if (D.abspann && D.abspann.length) {
           for (var ai = 0; ai < D.abspann.length; ai++) { karte(null); await warte(120); karte(D.abspann[ai].html); await warte(D.abspann[ai].ms); }
         } else { karte(D.schluss); await warte(5500); }

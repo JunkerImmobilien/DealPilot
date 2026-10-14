@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Messe-Studio · DealPilot</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!--
+  v2235 · Messe-Studio. Marcel 14.10.2026: „ähnlich wie die zwei Videos … die
+  Darstellung des Textes im unteren Bereich … ein tolles DealPilot-Design".
+  Die App läuft im Rahmen oben (eigenes Dokument, gleiche Herkunft, eigener
+  Viewport - Kegel und Ziele bleiben unverändert). Das Drehbuch schickt seine
+  Zeilen als Kapitel hierher (postMessage, source 'dp-messe-studio'); das Band
+  unten zeigt Nummer, Titel und Erklärung. Intro und Outro kommen aus dem
+  Baukasten (js/messe-effekte.js).
+  Aufruf: messe-studio.html?messe=<drehbuch>&intro=<id>&outro=<id>[&qr=<url>][&oben=58]
+  oben = Höhe, die die Aufnahme oben abschneidet (Chrome-Leiste im Vollbild).
+-->
+<style>
+:root{--g:var(--wl-c9a84c,#C9A84C);--gh:var(--wl-e8cc7a,#E8CC7A);--gl:var(--wl-b8932f,#b8932f);--obs:#050505;--creme:#FDFCFA;--text:#d9cfb8;--oben:0px;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--obs);color:var(--creme);font-family:Inter,system-ui,sans-serif}
+body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%,transparent),transparent 70%),radial-gradient(60% 50% at 92% 100%,color-mix(in srgb,var(--g) 10%,transparent),transparent 70%),var(--obs)}
+#buehne{position:fixed;left:0;right:0;bottom:0;top:var(--oben)}
+#rahmen{position:absolute;left:24px;right:24px;top:22px;bottom:172px;border-radius:16px;overflow:hidden;background:#0b0a08;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--g) 45%,transparent),0 30px 80px rgba(0,0,0,.65),0 0 60px color-mix(in srgb,var(--g) 10%,transparent)}
+#app{position:absolute;left:0;top:0;border:0;transform-origin:0 0;background:#0b0a08}
+#hinweis{position:absolute;right:30px;top:4px;font:500 11px "JetBrains Mono",monospace;letter-spacing:.08em;color:#8c8578}
+/* Kapitelband */
+#band{position:absolute;left:24px;right:24px;bottom:22px;height:128px;border-radius:16px;display:flex;align-items:center;gap:28px;padding:0 34px 0 22px;overflow:hidden;
+  background:linear-gradient(100deg,rgba(18,15,9,.97),rgba(8,7,5,.97) 60%);box-shadow:0 0 0 1px color-mix(in srgb,var(--g) 50%,transparent),0 20px 60px rgba(0,0,0,.6);
+  opacity:0;transform:translateY(26px);transition:opacity .6s,transform .6s cubic-bezier(.2,.8,.2,1)}
+#band.an{opacity:1;transform:none}
+#band::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 140% at 0% 50%,color-mix(in srgb,var(--g) 20%,transparent),transparent 60%);pointer-events:none}
+#nr{position:relative;flex:none;width:84px;height:84px;border-radius:14px;display:grid;place-items:center;font:700 44px/1 "Space Grotesk",sans-serif;color:#1a1407;
+  background:linear-gradient(110deg,var(--gh),var(--g) 55%,var(--gl));box-shadow:0 8px 26px color-mix(in srgb,var(--g) 35%,transparent),inset 0 1px 0 rgba(255,255,255,.35)}
+#txt{position:relative;flex:1;min-width:0}
+#kick{font:700 12px "JetBrains Mono",monospace;letter-spacing:.26em;text-transform:uppercase;color:var(--g)}
+#titel{font:700 34px/1.15 "Space Grotesk",sans-serif;letter-spacing:-.01em;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#zeile{font:400 21px/1.4 Inter,sans-serif;color:var(--text);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#zeile b{color:var(--gh);font-weight:600}
+#txt.wechsel{animation:bandWechsel .55s cubic-bezier(.2,.8,.2,1)}
+@keyframes bandWechsel{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+#nr.wechsel{animation:nrWechsel .5s cubic-bezier(.3,1.5,.5,1)}
+@keyframes nrWechsel{from{transform:scale(.6) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
+#rechts{position:relative;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+#marke{font:700 26px/1 "Space Grotesk",sans-serif;letter-spacing:-.03em}
+#marke b{background:linear-gradient(110deg,var(--gh),var(--g) 55%,var(--gl));-webkit-background-clip:text;background-clip:text;color:transparent}
+#punkte{display:flex;gap:6px}
+#punkte i{width:26px;height:4px;border-radius:2px;background:#3a3324;transition:background .4s}
+#punkte i.an{background:var(--gh)}
+#fort{position:absolute;left:0;bottom:0;height:3px;width:0;background:linear-gradient(90deg,var(--gl),var(--gh));transition:width .8s cubic-bezier(.3,0,.2,1);box-shadow:0 0 12px var(--g)}
+/* Vorhang über allem (Intro/Outro) */
+#vorhang{position:absolute;inset:0;z-index:30;pointer-events:none}
+#start{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--obs);text-align:center}
+#start button{font:700 18px "Space Grotesk",sans-serif;padding:16px 30px;border-radius:12px;border:0;cursor:pointer;color:#1a1407;background:linear-gradient(110deg,var(--gh),var(--g) 55%,var(--gl))}
+#start p{color:#8c8578;font-size:14px;margin-top:14px}
+</style>
+</head>
+<body>
+<div id="buehne">
+  <div id="hinweis">Vorführung · Beispieldaten · aufgezeichnete Pilot-Analyse</div>
+  <div id="rahmen"><iframe id="app" title="DealPilot" allow="clipboard-write"></iframe></div>
+  <div id="band">
+    <div id="nr">1</div>
+    <div id="txt"><div id="kick"></div><div id="titel"></div><div id="zeile"></div></div>
+    <div id="rechts"><div id="marke">Deal<b>Pilot</b></div><div id="punkte"></div></div>
+    <div id="fort"></div>
+  </div>
+  <div id="vorhang"></div>
+</div>
+<div id="start" hidden><div><button type="button" id="los">Aufnahme starten</button><p>Leertaste startet ebenfalls · Esc beendet</p></div></div>
+
+<script src="js/whitelabel-override.js?v=v2149"></script>
+<script src="js/messe-effekte.js?v=v2235"></script>
+<script>
+(function () {
+  'use strict';
+  var P = new URLSearchParams(location.search);
+  var NAME = P.get('messe') || 'quickcheck-rundgang';
+  var INTRO = P.get('intro') || 'boardingpass', OUTRO = P.get('outro') || 'amstand';
+  var QR = P.get('qr') || 'https://dealpilot.immo';
+  var OBEN = parseInt(P.get('oben'), 10) || 0;
+  document.documentElement.style.setProperty('--oben', OBEN + 'px');
+  var SKALA = 0.8;   /* die App sieht einen 1/0,8 so großen Viewport - Desktop-Fassung */
+  var app = document.getElementById('app'), rahmen = document.getElementById('rahmen'), vorhang = document.getElementById('vorhang');
+  var band = document.getElementById('band'), nr = document.getElementById('nr'), txt = document.getElementById('txt');
+
+  function passe() {
+    var w = rahmen.clientWidth, h = rahmen.clientHeight;
+    app.style.width = Math.round(w / SKALA) + 'px'; app.style.height = Math.round(h / SKALA) + 'px';
+    app.style.transform = 'scale(' + SKALA + ')';
+  }
+  addEventListener('resize', passe); passe();
+
+  /* Texte für Intro/Outro je Drehbuch - der Agent passt sie an */
+  var TEXTE = {
+    'quickcheck-rundgang': {
+      intro: { von: 'EXPOSÉ', vonK: 'PDF · SPRACHE · INSERAT', nach: 'URTEIL', nachK: 'MARKTWERT · LAGE · PILOT', gate: 'Quick', zeit: '2 Min.', sitz: 'Boarding', stempel: 'CLEARED', claim: 'Quick Boarding — vom Exposé zum Objekt' },
+      outro: { titel: 'Dein nächstes Objekt —', titel2: 'in 30 Sekunden geprüft.', unter: 'Jetzt am Stand ausprobieren', url: QR, qrtext: 'Scannen & testen' }
+    }
+  };
+  var T = TEXTE[NAME] || {};
+
+  function warte(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  var stufen = 1;
+  function kapitel(m) {
+    stufen = m.n || stufen;
+    var pk = document.getElementById('punkte');
+    if (pk.children.length !== stufen) pk.innerHTML = new Array(stufen + 1).join('<i></i>');
+    [].forEach.call(pk.children, function (x, j) { x.classList.toggle('an', j < m.i + 1); });
+    document.getElementById('fort').style.width = ((m.i + 1) / stufen * 100) + '%';
+    var neuNr = String(m.i + 1);
+    if (nr.textContent !== neuNr) { nr.textContent = neuNr; nr.classList.remove('wechsel'); void nr.offsetWidth; nr.classList.add('wechsel'); }
+    document.getElementById('kick').textContent = m.kick || '';
+    document.getElementById('titel').textContent = m.titel || '';
+    document.getElementById('zeile').innerHTML = m.text || '';
+    txt.classList.remove('wechsel'); void txt.offsetWidth; txt.classList.add('wechsel');
+    band.classList.add('an');
+  }
+
+  var _laeuft = false;
+  async function ablauf() {
+    if (_laeuft) return; _laeuft = true;
+    document.getElementById('start').hidden = true;
+    /* Intro über allem; die App lädt dahinter schon */
+    var fx = DealPilotMesseFX.spiele(vorhang, 'intro', INTRO, T.intro || {});
+    app.src = 'index.html?messe=' + encodeURIComponent(NAME) + '&studio=1';
+    await warte(fx ? fx.dauer : 4000);
+    /* warten, bis das Drehbuch in der App bereitsteht (Anmeldung, Plan) */
+    var t0 = Date.now();
+    while (!_bereit && Date.now() - t0 < 30000) await warte(250);
+    fx && (fx.ebene.style.transition = 'opacity .8s', fx.ebene.style.opacity = '0');
+    await warte(800); fx && fx.weg();
+    try { app.contentWindow.postMessage({ source: 'dp-messe-studio', type: 'los' }, location.origin); } catch (e) {}
+  }
+  var _bereit = false;
+  addEventListener('message', function (e) {
+    if (e.origin !== location.origin || !e.data || e.data.source !== 'dp-messe-studio') return;
+    var m = e.data;
+    if (m.type === 'bereit') _bereit = true;
+    else if (m.type === 'kapitel') kapitel(m);
+    else if (m.type === 'ende') ende();
+  });
+  async function ende() {
+    band.classList.remove('an');
+    await warte(500);
+    DealPilotMesseFX.spiele(vorhang, 'outro', OUTRO, T.outro || {});
+    window.DPM_STUDIO_FERTIG = Date.now();
+  }
+  addEventListener('keydown', function (e) {
+    if (e.key === ' ' && !_laeuft) { e.preventDefault(); ablauf(); }
+    if (e.key === 'Escape') { try { app.contentWindow.DealPilotMesse.stopp(); } catch (x) {} }
+  });
+  document.getElementById('los').onclick = ablauf;
+  window.DPM_STUDIO = { los: ablauf, kapitel: kapitel };
+  if (P.has('auto')) ablauf(); else document.getElementById('start').hidden = false;
+})();
+</script>
+</body>
+</html>
