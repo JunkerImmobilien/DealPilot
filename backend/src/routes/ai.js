@@ -673,6 +673,8 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
       '   und gehoert in "opinion": der Kauf kann als Substanzkauf sinnvoll sein,',
       '   auch wenn die Rendite nicht zum Massstab passt. Liegt er DARUEBER, ist',
       '   das ein Contra-Punkt. Nenne den Betrag von oben, rechne nichts neu.',
+      '   Sie heisst "DealPilot-Marktbewertung" (eine Indikation, kein Gutachten) -',
+      '   NICHT "unabhaengige Bewertung" und nicht "Experten".',
       '',
       /* v1946 · DIESELBEN VERBOTE WIE IN services/bewertungsText.js.
          Jedes hat einen gemessenen Vorfall hinter sich; der erste und
