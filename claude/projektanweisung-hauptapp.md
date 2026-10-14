@@ -38761,6 +38761,24 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### Prod-Rollout (18) · v2208–v2216k auf Produktion (14.10.2026)
+- **Was:** Freigabe Marcel („ja prod rollout freigegeben"). Zweig `prod-rollout-18` neu gebaut (`origin/main` + Merge `origin/staging`), Baum gleich Staging. Push nach `main` → `471bd747`, auf Prod `git pull` und Rebuild `backend` + `mb-backend`.
+- **Commit:** `471bd747`
+- **Nachweis:**
+  - Sicherung vorher: `/root/backups/haupt-20261014-0817.sql.gz` (11 MB, 71 Tabellen) und `mb-20261014-0817.sql.gz` (25 MB, 32 Tabellen), Kopf gelesen.
+  - Backend `healthy`, „No new migrations", mb-backend `listening on :4000`. `schwaerzen.js` liegt im Image.
+  - Live geprüft: `pilot-tower.js` trägt `auswahlText`, `index.html` `v2216k`, `storage.js` `_tax_overrides` (v2214). `/api/v1/auth/me` ohne Token gibt 401, `forschung.html` 200.
+- **Rest:** Abnahme im Browser auf Prod (Steuer-Jahreswerte eines Objekts nach dem Neuladen) steht aus.
+
+### Gesamt-Atlas · Demo (14.10.2026)
+- **Was:** Marcels Wahl: „so starten wie der Atlas jetzt startet, nur mit allem drauf, dann der gesamte Ablauf". `design/Vorschläge/prozessatlas/atlas-gesamt.html` lädt den **echten** `prozess-atlas.js` und `pilot-figur.js` und setzt drauf:
+  - Gesamtnetz als Start (Kartenoptik des Atlas, 9 Abläufe in drei Phasen, Kapitän, Datum-Suche).
+  - Zoom in den Einzelablauf. Sprechlauf und Dokument-Import sind als echte Reiter eingehängt.
+  - In der Seitenleiste: „Was du davon hast", Daten-Spur je Chip, Unterkarten (Demos 2/3/6 als Fenster).
+  - Reiter Zusammenspiel und Flug 2026-1056, dazu der Knopf **Gesamtflug** (rund 3 Minuten, für die Messe).
+- **Nachweis:** Lokal geklickt: Kaufpreis-Spur 7 Treffer, Zoom → Sprechlauf mit Nutzen und Unterkarte, Chip-Spur, Zusammenspiel 21 Knoten, Flug 7 Kapitel, Gesamtflug bis in die Sprechlauf-Unterkarte.
+- **Rest:** Am Handy nicht gemessen. Beim Doppelklick (file://) scrollt der Flug-Teil des Gesamtflugs nicht von selbst (Chrome sperrt den iframe-Zugriff). Übernahme ins Programm erst nach Marcels Abnahme.
+
 ### v2216j–v2216k · Staging · Soll/Ist nur im Pilot, F1 auf Auswahlfeldern, Prozessatlas-Demos (14.10.2026)
 - **Was:** Marcels fünfte Runde (N68).
   - **v2216j** `8a17d8b1`:

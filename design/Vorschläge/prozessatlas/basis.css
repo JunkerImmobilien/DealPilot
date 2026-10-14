@@ -34,3 +34,9 @@ h1,h2,h3{font-family:var(--f-disp);font-weight:600;margin:0}
 .demo-hinweis{position:fixed;right:14px;bottom:12px;font:600 10px var(--f-mono);letter-spacing:.12em;color:var(--still);text-transform:uppercase;z-index:60}
 @media (max-width:640px){.kopf{padding:12px 16px;flex-wrap:wrap}.kopf .titel{display:none}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* Eingebettet im Gesamt-Atlas (atlas-gesamt.html): ohne eigenen Kopf */
+body.eingebettet .kopf,body.eingebettet .demo-hinweis{display:none}
+body.eingebettet{background:transparent}
+body.eingebettet .buehne{min-height:100vh}
+body.eingebettet .instr{top:0;height:100vh}
+body.eingebettet .panel,body.eingebettet .seite{max-height:100vh;top:0}
