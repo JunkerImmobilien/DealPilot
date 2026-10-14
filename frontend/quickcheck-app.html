@@ -5750,7 +5750,14 @@ const QcApp = (function() {
     document.getElementById('ai-source').textContent = 'DealPilot \u00b7 KI-Analyse';
 
     const inputs = QcEngine.getInputs();
-    const score = QcEngine.computeScore(inputs, (_avmResults[0]||null));
+    /* v2224 · DIESELBE ZAHL WIE AUF DEM SCHIRM. Hier stand nur
+       QcEngine.computeScore - der Rueckfall aus v1365. Angezeigt wird aber
+       window._dpPilotScore (updateAll). Gemessen am 14.10.2026: Anzeige
+       76 · Gut, die KI bekam 92 und schrieb „Score von 92/100 und Stufe
+       'Sehr gut'". Jetzt dieselbe Wahl wie in updateAll. */
+    let score = null;
+    try { if (window._dpPilotScore) score = window._dpPilotScore(inputs, (_avmResults[0]||null)); } catch (_e) { score = null; }
+    if (!score) score = QcEngine.computeScore(inputs, (_avmResults[0]||null));
     const avmData = _avmResults.length > 0 ? _avmResults[0] : null;
     var _uFuerKi = null;
     try { _uFuerKi = _qcUrteil(score, inputs, score.kpi || {}, null); } catch (_e) {}
