@@ -17,8 +17,8 @@ import fs from 'fs';
  * Geprueft wird an der Detailkarte zusaetzlich, dass ihr erster
  * <style>-Block WOERTLICH der der Hauptkarte ist. Laufen sie
  * auseinander, stehen am Stand zwei Gestaltungen nebeneinander. */
-const roh = fs.readFileSync('design/Messe/prozesskarte.html', 'utf8');
-const DETAIL = 'design/Messe/prozesskarte-detail.html';
+const roh = fs.readFileSync('frontend/landing/prozesskarte.html', 'utf8');
+const DETAIL = 'frontend/landing/prozesskarte-detail.html';   /* v2215: liegt jetzt in der Landing - EINE Datei fuer Web und Druck */
 const rohD = fs.existsSync(DETAIL) ? fs.readFileSync(DETAIL, 'utf8') : null;
 /* Der Pruefer darf sein EIGENES Zitat nicht finden: die Begruendung,
    warum 'Kerosin' nicht vorkommt, steht im Kommentar der Datei.
