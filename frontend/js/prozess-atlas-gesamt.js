@@ -58,7 +58,7 @@
     'deal:d6': ['atlas/6-flugschreiber.html', 'Beispielflug Parkstraße', 'Soll gegen Ist an der Parkstraße'],
     'reise:be2': ['atlas/6-flugschreiber.html', 'Beispielflug Parkstraße', 'Ist pflegen an der Parkstraße']
   };
-  var BUSTER = 'v2218';
+  var BUSTER = 'v2218d';
   function unterFuer(pid, kid) { return UNTER[pid + ':' + kid] || UNTER[pid + ':*']; }
   var PHASEN = [['PRÜFEN', ['reise', 'quickcheck', 'sprache', 'dokumente']], ['ANALYSIEREN', ['boarding', 'marktbericht', 'scores', 'deal']],
                 ['HALTEN', ['steuer']], ['UNTERWEGS', ['telegram']]];
@@ -220,10 +220,11 @@
     ag.classList.toggle('an', !!m); ag.parentNode.classList.toggle('ag-modus', !!m);
     ag.classList.toggle('voll', m === 'zusammen' || m === 'flug');
     if (!m) {
-      if (_kopfAlt) { root.querySelector('.nm').textContent = _kopfAlt[0]; root.querySelector('.s').textContent = _kopfAlt[1]; _kopfAlt = null; }
-      ag.innerHTML = ''; markiere(); return;
+      /* v2218d · kein Zurückschreiben eines gemerkten Titels: wer den Modus
+         verlässt, landet in einem Ablauf, und zeige() setzt dessen Titel selbst.
+         GEMESSEN: der gemerkte „Sprechlauf" überschrieb danach „Quick-Check". */
+      _kopfAlt = null; ag.innerHTML = ''; markiere(); return;
     }
-    if (!_kopfAlt) _kopfAlt = [root.querySelector('.nm').textContent, root.querySelector('.s').textContent];
     var T = { gesamt: ['Alles auf einer Fläche', 'Alle Abläufe nach Phasen — Klick auf eine Linie zoomt hinein, Klick auf eine Station öffnet sie'],
               zusammen: ['Das Zusammenspiel', 'Ein Objekt, sechs Rechenkerne, alle Abläufe — und was du in der Hand hältst'],
               flug: ['Beispielflug · Parkstraße 9', 'Ein Objekt aus den Demo-Daten fliegt durch die Abläufe — scroll mit'] }[m];
@@ -385,6 +386,10 @@
   /* Der Start: ohne Ziel ins Gesamtnetz, mit Ziel wie bisher */
   var _oeffne = A.oeffne;
   A.oeffne = function (pid, station) {
+    /* v2218d · mit Ziel den Modus ZUERST verlassen: sonst nimmt markiere() beim
+       Neubau der Reiter (Beobachter) dem Ziel-Ablauf die Markierung ab, und die
+       Seitenleiste bekommt keine Erweiterung (gemessen am Handy: .ag-ext fehlte). */
+    if ((pid || station) && ag) { modus = null; ag.classList.remove('an', 'voll'); ag.parentNode.classList.remove('ag-modus'); ag.innerHTML = ''; }
     _oeffne(pid, station);
     /* prozess-atlas.js zeigt nach 16 ms (setTimeout statt rAF) - danach ansetzen */
     setTimeout(function () {
