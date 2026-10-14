@@ -990,6 +990,20 @@ window.DealPilotConfig = (function() {
     // User-Override über Settings → Anzeige (localStorage 'dp_startup_view').
     startupView: 'objekt',
 
+    /* v2237 · Abschlag auf Angebotspreise - recherchierter Marktdurchschnitt.
+       Marcel 14.10.2026: „wir recherchieren immer den aktuellen Durchschnitt".
+       Gilt, solange im Profil kein eigener Satz steht (angebot_abschlag_pct
+       leer). Beim Nachrecherchieren NUR diesen Block ändern (Wert, Stand,
+       Quelle, Link) - alle Bewertungen ziehen nach. */
+    angebotAbschlagMarkt: {
+      pct: 5.8,
+      stand: 'Dezember 2025',
+      quelle: 'ImmoScout24-Marktanalyse, Eigentumswohnungen bundesweit',   /* Partner nie namentlich nach außen */
+      url: 'https://www.immobilienscout24.de/unternehmen/news-medien/news/default-title/verhandlungsspielraum-beim-wohnungskauf-schrumpft-weiter/',
+      recherchiert: '2026-10-14',
+      spanne: 'Leipzig 0 %, Düsseldorf 1,4 %, Hamburg 7,8 %, Köln 9,2 % (Dezember 2025); Mitte 2025 bundesweit 6,8 %'
+    },
+
     investmentProfileDefaults: {
       // Finanzierung
       /* v1257: an setDefaults() in main.js angeglichen — das war der

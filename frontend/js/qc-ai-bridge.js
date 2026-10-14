@@ -74,6 +74,7 @@
           urteil: d.urteil || null,
           urteil_text: d.urteil_text || null,
           avm: d.avm || null,
+          markt: d.markt || null,   /* v2237 · DealPilot-Marktwert an der gewählten Spanne */
           /* v1959: die Zielrendite der Lageklasse. `null` heisst: keine
              Klasse gewaehlt - dann sagt der Prompt dazu nichts. */
           zielBmr: (d.zielBmr != null ? d.zielBmr : null)

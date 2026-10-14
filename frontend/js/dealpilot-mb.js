@@ -288,6 +288,9 @@ if (!window._wlc) {
         });
       }
     } catch (e) {}
+    /* v2237 · Angebotspreise -> realistischer Marktwert (Satz aus den Einstellungen,
+       sonst recherchierter Marktdurchschnitt). Zwilling: dealpilot-mb.js / -qc.js */
+    try { if (global.DealPilotAbschlag) global.DealPilotAbschlag.anwenden(out); } catch (e) {}
     return out;
   }
 

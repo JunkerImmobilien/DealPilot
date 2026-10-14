@@ -562,11 +562,11 @@
           await zeige(function () { return qcEl('qc7-sources'); }, 6);
           var st = qcEl('_mb_state');
           if (!st) { var d = qcDoc(); st = d.createElement('input'); st.type = 'hidden'; st.id = '_mb_state'; d.body.appendChild(st); }
-          st.value = JSON.stringify({ ts: Date.now(), card: MB_KARTE, mode: 'med', collapsed: false });
+          _mbAkt = mbKarte(); st.value = JSON.stringify({ ts: Date.now(), card: _mbAkt, mode: 'med', collapsed: false });   /* v2237: mit Abschlag wie ein echter Abruf */
           try { qcWin()._oabFeedTrigger(); } catch (e) {}
           await warte(900);
           await zeige(function () { return qcEl('oab-results'); }, 6);
-          var mw = MB_KARTE.mw, mm = MB_KARTE.mm;
+          var mw = _mbAkt.mw, mm = _mbAkt.mm;
           s.zeile('Marktwertindikation', 'Die Wohnung ist leer — DealPilot schätzt den Markt: Marktwert <b>' + eur(mw.low) + ' – ' + eur(mw.high) + '</b>, Miete <b>' + eur(mm.low) + ' – ' + eur(mm.high) + '</b> kalt.');
           await warte(5200);
         },
@@ -963,7 +963,15 @@
   var KI_RUNDGANG = {"negotiate":"Zum aktuellen Preis empfehle ich keinen Kauf. Um deine Ziel-Bruttomietrendite von 7 % zu erreichen, solltest du höchstens 117.086 € zahlen.","pros":["Solider Cashflow von 28 € pro Monat trotz hoher Nebenkosten","Bruttomietrendite mit 5,9 % für diese Objektgröße akzeptabel","Score von 60/100 bestätigt rechnerisch tragfähigen Deal","DSCR von 1,29 sorgt für ausreichende Schuldendienstdeckung"],"cons":["Deine Zielrendite wird klar verfehlt (5,9 % statt 7 % nach Vorgabe)","Hohes Hausgeld von 415 € pro Monat drückt Nettoergebnis","Eigenkapitalrendite sehr niedrig mit nur 0,8 %"],"opinion":"Das Objekt rechnet sich zwar mit kleinem positiven Cashflow und solider Schuldendienstdeckung, bleibt aber unter deiner Zielsetzung für die C-Lage. Die Bruttomietrendite liegt mit 5,9 % spürbar unter deinem Mindestwert. Preislich müsste es rund 22.000 € günstiger sein, damit es zu deinem Renditeziel passt."};
   /* v2236 · Abschlag Angebot -> Kaufpreis: ImmoScout24/Sprengnetter, ETW bundesweit
      Dezember 2025: Kaufpreise 5,8 % unter Angebot (Mitte 2025: 6,8 %). */
-  var ABSCHLAG = 0.06;
+  /* v2237 · Der Mitschnitt ist die ROHE Antwort (Angebotsniveau). Wie bei einem
+     echten Abruf geht er durch DealPilotAbschlag.anwenden (Satz aus den
+     Einstellungen, sonst Marktdurchschnitt) - im Quick-Check-Fenster. */
+  var _mbAkt = MB_KARTE;
+  function mbKarte() {
+    var c = JSON.parse(JSON.stringify(MB_KARTE));
+    try { var A = (qcWin() && qcWin().DealPilotAbschlag) || window.DealPilotAbschlag; if (A) A.anwenden(c); } catch (e) {}
+    return c;
+  }
 
   /* ═══ DREHBUCH 6 · QUICK BOARDING — DER RUNDGANG (v2235) ═══════════════
      Marcel 14.10.2026: „oben bei der Datenaufnahme die Methoden vorstellen,
@@ -1021,14 +1029,14 @@
       QC[3],   /* 8 · Marktwertindikation (echter Mitschnitt, richtige Wohnung) */
       async function (s) {   /* 9 · Angebotspreise -> realistischer Wert */
         await zeige(function () { return qcEl('oab-results'); }, 6);
-        var real = Math.round(MB_KARTE.mw.med * (1 - ABSCHLAG) / 1000) * 1000;
-        s.zeile('Achtung: Angebotspreise', 'Die Vergleichswerte sind <b>Angebotspreise</b>. Gezahlt wird im Schnitt rund 6 % weniger (ImmoScout24/Sprengnetter, 12/2025) — realistisch also eher <b>' + eur(real) + '</b>.');
+        var ab = _mbAkt.abschlag || {}, pz = String(ab.pct || '').replace('.', ',');
+        s.zeile('Achtung: Angebotspreise', 'Vergleichswerte aus Inseraten sind <b>Angebotspreise</b>. DealPilot zieht deinen Abschlag gleich ab: <b>' + pz + ' %</b>, der Marktdurchschnitt (ImmoScout24, 12/2025) — Ø ' + eur(ab.roh && ab.roh.med) + ' → realistisch <b>' + eur(_mbAkt.mw.med) + '</b>.');
         await warte(7000);
       },
       async function (s) {   /* 10 · Miete Ø -> erste Einschätzung */
         await zeige(function () { return qcSel('.avs-spanne'); }, 8);
         var t = qcSel('.avs-spanne [data-spanne="mid"]'); if (t) t.click();
-        s.zeile('Die Miete', 'Für die Rechnung die mittlere Marktmiete: <b>' + eur(MB_KARTE.mm.med) + '</b> kalt …');
+        s.zeile('Die Miete', 'Für die Rechnung die mittlere Marktmiete: <b>' + eur(_mbAkt.mm.med) + '</b> kalt …');
         await warte(2600);
         await zeige(function () { return qcEl('score-block'); }, 4);
         await warte(900);
@@ -1053,9 +1061,9 @@
         await warte(5500);
         _kiFrei = null;
       },
-      async function (s) {   /* 14 · Wertpuffer ab Tag 1 */
-        await zeige(function () { return qcEl('oab-results'); }, 6);
-        var real = Math.round(MB_KARTE.mw.med * (1 - ABSCHLAG) / 1000) * 1000, kp = Number((qcEl('qc_kp') || {}).value) || 0;   /* Kaufpreis live */
+      async function (s) {   /* 14 · Wertpuffer ab Tag 1 - steht seit v2237 im Urteil selbst */
+        await zeige(function () { var n = qcEl('ai-negotiate-v'); return n && /Wertpuffer/.test(n.textContent) ? (n.parentElement || n) : qcEl('oab-results'); }, 8);
+        var real = _mbAkt.mw.med, kp = Number((qcEl('qc_kp') || {}).value) || 0;   /* v2237: Marktwert nach Abschlag, Kaufpreis live */
         s.zeile('Und trotzdem spannend', 'Nicht deine Lage-Rendite — aber gekauft für <b>' + eur(kp) + '</b>, realistisch wert rund <b>' + eur(real) + '</b>: <b>+' + eur(real - kp) + '</b> Wertpuffer ab dem ersten Tag.');
         await warte(7500);
       },

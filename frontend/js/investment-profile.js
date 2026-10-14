@@ -322,6 +322,15 @@ window.DealPilotInvestmentProfile = (function() {
         field('ip_maklerkosten',    'Maklergebühr',      p.maklerkosten,    '%', 'inkl. MwSt'),
       '</div>',
 
+      /* v2237 · Abschlag auf Angebotspreise: leer = recherchierter Marktdurchschnitt */
+      '<h3 class="ip-section">Marktbewertung</h3>',
+      '<p class="hint">Marktwerte aus Inseraten sind <b>Angebotspreise</b> — gezahlt wird meist weniger. DealPilot zieht diesen Abschlag von der Marktbewertung ab, bevor sie ins Urteil geht. ' +
+        (function () { var m = window.DealPilotConfig && DealPilotConfig.angebotAbschlagMarkt; return m ? 'Leer lassen = aktueller Marktdurchschnitt: <b>' + String(m.pct).replace('.', ',') + ' %</b> (' + m.quelle + ', ' + m.stand + '; ' + m.spanne + ').' : ''; })() + '</p>',
+      '<div class="ip-grid">',
+        field('ip_angebot_abschlag_pct', 'Abschlag auf Angebotspreise', p.angebot_abschlag_pct, '%',
+          (function () { var m = window.DealPilotConfig && DealPilotConfig.angebotAbschlagMarkt; return m ? 'leer = Ø Markt ' + String(m.pct).replace('.', ',') + ' %' : 'leer = Marktdurchschnitt'; })()),
+      '</div>',
+
       // V63.96: KI-Analyse-Parameter wandern in den Settings-Tab "KI" (Marcels Wunsch).
       // Vorher hier — jetzt zwischen Eigene Anweisungen und Vorlagen im KI-Tab.
 
@@ -391,6 +400,7 @@ window.DealPilotInvestmentProfile = (function() {
       grenzsteuersatz:        v('ip_grenzsteuersatz'),
       notar_grundbuch:        v('ip_notar_grundbuch'),
       maklerkosten:           v('ip_maklerkosten'),
+      angebot_abschlag_pct:   v('ip_angebot_abschlag_pct'),   /* v2237 · leer -> Marktdurchschnitt */
       bundesland:             s('ip_bundesland'),
       // V63.90: KI-Analyse-Standards
       ai_strat:               s('ip_ai_strat'),

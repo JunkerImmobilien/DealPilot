@@ -613,6 +613,29 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
           + (ist != null ? ' (dieses Objekt liegt bei '
               + ist.toFixed(2).replace('.', ',') + ' %)' : '');
       })(),
+      /* ══ v2237 · DER MARKTWERT GEHT MIT ══════════════════════════════
+         Marcel 14.10.2026: „die Bewertung soll aussagekräftig sein - nach
+         eigenen Kriterien und auch darüber. Die Wohnung, bei der die
+         Lageklasse nicht passte, aber der Kauf trotzdem sinnvoll ist."
+         Gemessen vorher: die DealPilot-Marktbewertung erreichte die KI nie
+         (`avm` ist nur der externe Bewertungspartner) - am Rundgang-Objekt
+         (139.000 EUR, Marktwert Ø 189.000 EUR) sagte die Analyse nur „kein
+         Kauf". Der Abstand wird HIER gebildet, nicht vom Modell. */
+      (function () {
+        const m = p.markt || null;
+        const mw = m ? z(m.marktwert) : null;
+        const kp = z(i.kp) || 0;
+        if (!mw || mw <= 0 || !kp) return '';
+        const ab = z(m.abschlag_pct);
+        const diff = mw - kp, pct = Math.round(diff / kp * 100);
+        return '\nDealPilot-Marktbewertung (gewaehlte Spanne: ' + (m.spanne || 'Ø') + '):'
+          + '\n- realistischer Marktwert: ' + eur(mw) + ' EUR'
+          + (m.low && m.high ? ' (Spanne ' + eur(z(m.low)) + ' bis ' + eur(z(m.high)) + ' EUR)' : '')
+          + (ab != null ? '\n- bereits abgezogen: ' + String(ab).replace('.', ',') + ' % Abschlag auf Angebotspreise'
+              + (m.angebot ? ' (Angebotsniveau ' + eur(z(m.angebot)) + ' EUR)' : '') : '')
+          + '\n- Kaufpreis gegen Marktwert: ' + (diff >= 0 ? '+' : '') + eur(diff) + ' EUR ('
+          + (pct >= 0 ? '+' : '') + pct + ' %) - ' + (diff >= 0 ? 'Kaufpreis UNTER Marktwert' : 'Kaufpreis UEBER Marktwert');
+      })(),
       /* v1951: der Massstab fuer den eingegebenen Zins. Nur wenn echt. */
       zinsSatz
         ? '\nMarktzins zum Vergleich: ' + zinsSatz.wert + ' % fuer Zinsbindung '
@@ -639,6 +662,17 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
       '  guten Deal mit den Kennzahlen, nicht mit "dem Urteil" oder "dem Score".',
       '- Beginnt das Urteil mit "Nicht kaufen", empfiehlst du keinen Kauf zum jetzigen',
       '  Preis, sondern nennst den Preis aus der Begruendung oben.',
+      '',
+      /* v2237 · zwei Sichten */
+      'Bewerte in ZWEI Sichten, beide gehoeren in die Antwort:',
+      '1. Nach dem Massstab des Nutzers (Zielrendite seiner Lageklasse, seine',
+      '   Mindestwerte) - hier gilt das gerechnete Urteil.',
+      '2. Darueber hinaus: steht oben eine DealPilot-Marktbewertung, ordne den',
+      '   Kaufpreis gegen den realistischen Marktwert ein. Liegt er deutlich',
+      '   DARUNTER, ist das ein eigener Pro-Punkt (Wertpuffer ab dem ersten Tag)',
+      '   und gehoert in "opinion": der Kauf kann als Substanzkauf sinnvoll sein,',
+      '   auch wenn die Rendite nicht zum Massstab passt. Liegt er DARUEBER, ist',
+      '   das ein Contra-Punkt. Nenne den Betrag von oben, rechne nichts neu.',
       '',
       /* v1946 · DIESELBEN VERBOTE WIE IN services/bewertungsText.js.
          Jedes hat einen gemessenen Vorfall hinter sich; der erste und
