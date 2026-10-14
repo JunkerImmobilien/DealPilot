@@ -38761,6 +38761,21 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2229–v2231b · Staging · Sprache: Rückfragen am Katalog, Spanne/Beleihung gewinnen, Drehbuch Sprache (14.10.2026)
+- **Was:**
+  - **v2229 · Sprache, Rückfragen** (`voice-import.js rueckfragen`): erst auf den Katalog kürzen, dann Lücken prüfen. Vorher geprüft und danach gekürzt. Im Quick-Check gibt es keine Zinsbindung (`d1_bindj`), also galt der Finanzierungsblock dort IMMER als Lücke, und der Co-Pilot fragte Eigenkapital, Zins und Tilgung nach, auch gesprochene. Gefunden beim Vermessen für das Drehbuch.
+  - **v2230 · Quick-Check:** Der Klick auf die Spanne bzw. auf einen Beleihungsknopf hebt `dataset.userSet` von `qc_nkm` bzw. `qc_ek` auf. Gemessen: nach gesprochener/importierter Miete stand Grundmiete 831, Gesamt blieb 680, der Score rührte sich bei keiner Stufe. 80 % Beleihung ließ das EK bei 32.000 €. Ursache: Der Import löst `input` aus, und das setzt den Schutz für Getipptes.
+  - **v2231–v2231b · Drehbuch `?messe=sprache`:**
+    - Echtes Sprachfenster mit stummem Ton statt Mikrofon (`_mikroAn`). Die drei Sprach-Abrufe kommen im Lauf aus dem Mitschnitt (`_fetchAn(_sprAntwort)`, Abruf-Ersatz jetzt allgemein).
+    - Der Sprechtext erscheint Satz für Satz als Mitschrift (aufgeklappt), die Chips leuchten. Die Felder sind die ECHTE Auslese des Textes über `/ai/extract-text` mit dem abgefangenen Quick-Check-Katalog (16 Werte).
+    - Ablauf: Gesprochen 46 · Schwach → Marktbewertung Bielefeld (echt: 186–267 T€, Miete 646–831 €) → Ø 52 · Solide → Oben 63 · Solide → 20 % EK 72 · Gut → Abspann.
+- **Commit:** `ed476792`, `ac735073`, `4d11ebc2`, `d491c105`, `267ff7c9`
+- **Nachweis:** Lauf rund 110 s ohne Co-Pilot-Nachfrage (erster Lauf ohne Lage/Energie fragte zu Recht nach Lageklasse und Zustand & Energie). Danach `fetch` und `getUserMedia` echt, Spannen-Vorgabe zurück. Kein kostenpflichtiger Abruf im Lauf.
+- **Befund für Marcel:** Urteilsschwellen 40/60/75 gegen Score-Stufen 35/50/70/85: Score 39 heißt „Schwach", das Urteil „Finger weg". Nicht geändert.
+- **Rest:**
+  - ffmpeg installiert (winget Gyan.FFmpeg 9.0.2). Aufnahme braucht das Chrome-Fenster sichtbar im Vordergrund (es war minimiert).
+  - Prod: v2224–v2231 offen.
+
 ### v2227–v2228b · Staging · Verhandlungsrat mit Brücke, Analyse im Du, Drehbuch ImmoMetrica (14.10.2026)
 - **Was:**
   - **v2227/a/b · Verhandlungsrat** (Marcel: „am Schluss eine Bewertung mit kaufen und danach kommt im Satz direkt, dass man handeln soll"):
