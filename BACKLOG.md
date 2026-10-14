@@ -49,6 +49,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 9. **Anzeige → Anzeige-Option:** Auslieferungszustand ist immer **Aktenmappe mit Boardkarte**.
 10. **Löschen-/Duplizieren-Knöpfe auf den Objektkarten:** Der Rahmen drumherum ist zu groß → der Score wird abgeschnitten, der Kartenrahmen stimmt nicht mehr.
 
+> **✅ 1–10 gebaut 14.10.2026 · v2216–v2216i (Staging), gemessen in der Messkabine und am Desktop** — Einzelheiten im Journal. Dazu zwei echte Fehler: Marktbericht fehlte im Register der Hauptansichten; Ankauf-Stand teilte die Einheitenliste mit dem Formular (Plan änderte sich rückwirkend).
+> **Offen:** Punkt 0 — der Push nach `main` (Zweig `prod-rollout-18`, Stand v2215b) scheiterte am Sicherheitsfilter. Nach Marcels Auftrag den Merge mit dem neuesten Staging-Stand (v2216i) neu bauen und ausrollen.
+
 ### N66 · Marcel 14.10.2026 (dritte Runde) — Messe-Geschichten, BMF, RND-Abgleich, Werbungskosten
 1. **Messe-Geschichten als Dokument ablegen** — was Marcel an jedem Demo-Objekt erklären kann.
 2. **BMF-Kaufpreisaufteilung** bei den Demo-Objekten nachziehen.

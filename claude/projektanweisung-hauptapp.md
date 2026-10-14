@@ -38761,6 +38761,34 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2216–v2216i · Staging · Handy-Ansicht, Soll/Ist, Parkstraße (14.10.2026)
+- **Was:** Marcels vierte Runde (N67), alles in der Messkabine (390 px) und am Desktop (1280 px) gemessen.
+  - **v2216** `341c7bd7`, Aktionen nach dem Marktbericht.
+    - Befund: Der Marktbericht stand nicht im Register der Hauptansichten (`DealPilotAnsichten`).
+      - Gemessen Cockpit → Marktbericht: `#s-marktbericht.active`, aber unsichtbar, weil das Cockpit `.main-col > .body` und der Single-Schließer `.sec` ausgeblendet hatten.
+      - Gemessen nach dem Marktbericht: Die nächste Ansicht lag dahinter (`mb-standalone-active` blieb).
+    - Jetzt: Der Marktbericht ist angemeldet (leiser Schließer), räumt beim Öffnen über das Register ab und holt seine Behälter zurück. `sbActionsAction` schließt ihn vor Ansichtswechseln.
+    - Kette Cockpit → MB → Track Record → MB → Einzelobjekt → MB → Alle → MB in Standard, Aktenmappe, Kanzlei und Tower: alles OK.
+    - Desktop: Das Aktionsmenü bleibt beim Klick auf eine Objektkarte offen (Marcels Wunsch); am Handy geht es wie bisher zu.
+  - **v2216b–d** `44997fdc`, `357ed5f3`:
+    - Schließen-Knöpfe: Das SVG-Kreuz von `.dpm-x` war 1,8 px breit (leerer Kasten). Plan und Abmelden: Symbol 4 px breit. Jetzt haben die Symbole feste Maße und sind am Handy 40 × 40.
+    - Handy-Kopf als Raster: Menü / Name / Speicherpunkt / Kontingent, darunter der Fortschritt. Die Reiter laufen ohne Balken. Der Fortschritt steht nur noch einmal (das Abzeichen der Darstellung ersetzt die Textzeile), der Kopf ist 90 statt 113 px hoch.
+    - Knopfkasten der Objektkarte: `height:100%` mit Verlauf übermalte den Kartenrand → kleiner Kasten mittig.
+  - **v2216c** (Auslieferung): Aktenmappe mit **Bordkarte**. Das gilt für den Rückfall in `objektkarten-stil.js`, das Onboarding und „Auslieferungszustand zurücksetzen“ (der Knopf führte vorher in `''`).
+  - **v2216e–i** `336286b1` … `d28d5bec`, Soll/Ist:
+    - 16 statt 10 Kennzahlen: Miete je m², leere Einheiten, nicht umlagefähige Kosten, Instandhaltung, Zins, Cashflow vor Steuern, Gebäudeanteil, AfA-Satz.
+    - Gruppiert in Ertrag / Kosten / Finanzierung / Steuer / Ergebnis, dazu „Was sich bewegt hat“ im Pilot-Reiter.
+    - `zahlSatz()`: „6.25“ wird nicht mehr als 625 gelesen.
+    - **Echter Fehler (v2216f):** Der Ankauf-Stand kopierte `_mfh` flach. Plan und Formular teilten dieselbe Einheitenliste, jede spätere Vermietung änderte den Plan rückwirkend. Jetzt tiefe Kopie.
+    - Abweichungstafel im Objekt: Sie war weiß auf hellem Grund (unlesbar) und hat jetzt dunkle Tinte wie die Pilot-Analyse. Grün und Rot der Differenz bleiben.
+  - **Parkstraße 9:** NKM „710 Euro“ → 2.321 € (Summe der Einheiten). BMF jetzt 54,31 %. Geschichte „Altbau mit Hebel“: 1. OG saniert (45.000 € Erhaltungsaufwand 2025, unter der 15-%-Grenze) und neu vermietet zu 9,50 €/m².
+  - Pläne von Parkstr. und Bismarckstr. mit Nachweis korrigiert (Einheiten).
+- **Nachweis:** Messkabine (vier Darstellungen, echte Klicks), Desktop-Screenshots, `prompt-lecks` SAUBER, `buster-ebenen` SAUBER, `gold-audit` RC=0.
+- **Rest:**
+  - Die Pilot-Tafel Soll/Ist nur über die Daten geprüft, nicht im Bild (sie wird erst mit einer Analyse gebaut).
+  - Dunkle Inhaltsflächen (Theme Konsole) mit der neuen Tinte der Abweichungstafel nicht geprüft.
+  - Prod-Push von Zweig `prod-rollout-18` scheiterte am Sicherheitsfilter; Marcel stößt ihn an.
+
 ### v2215–v2215b · Staging · Landing: Prozesskarte im Leistungsumfang, F&E-Seite (14.10.2026)
 - **Was:**
   - **Prozesskarte und Netzplan** per `git mv` von `design/Messe/` nach `frontend/landing/`. Eine Datei dient für Web und Messe-Druck; `tools/prozesskarte-pruefen.mjs` liest von dort (RC=0).

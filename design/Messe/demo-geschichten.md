@@ -62,6 +62,30 @@ Jede Geschichte: **wo klicken → was zeigen → was sagen.**
 
 ---
 
+## 3b · „Altbau mit Hebel" — Parkstr. 9, Bad Oeynhausen (2026-1056)
+
+**Objekt:** Mehrfamilienhaus 1905, 5 Einheiten, 427 m², gekauft 23.12.2024 für 780.000 €. Bei Kauf stand die Wohnung 1. OG links leer.
+
+**Klickweg:** Reiter **Objekt** → Abweichungstafel (Gruppen Ertrag · Kosten · Finanzierung · Steuer · Ergebnis) · MFH-Konfigurator (1. OG links: „Saniert 2025") · Reiter **Steuer** → 2025.
+
+| | Plan beim Kauf | Ist heute |
+|---|---:|---:|
+| Nettokaltmiete / Monat | 2.321 € | **3.195 €** (+38 %) |
+| Miete je m² | 5,44 € | **7,48 €** |
+| Leere Einheiten | 1 | **0** |
+| DSCR | 0,90 | **1,23** |
+| Cashflow nach Steuern / Jahr | −6.193 € | **+775 €** |
+| DealScore | 49 | **59** |
+
+**Steuer 2025:** 45.000 € Sanierung (Bad, Böden, Elektro) als **Erhaltungsaufwand sofort abgesetzt** — Erstattung 16.329 € statt 5.962 €.
+
+**Was du sagst:**
+- „Ein Altbau, der beim Kauf nicht getragen hat — DSCR unter 1. Eine leere Wohnung saniert, für 9,50 €/m² neu vermietet: jetzt trägt er sich."
+- „Die Sanierung lag **unter der 15-%-Grenze** der ersten drei Jahre — deshalb sofort absetzbar und nicht über 50 Jahre AfA. Genau diese Grenze überwacht DealPilot."
+- Gebäudeanteil nach BMF-Arbeitshilfe: **54,3 %**.
+
+---
+
 ## 4 · Restnutzungsdauer-Gutachten — Westerfeldstr. 140, Bielefeld (2026-1041)
 
 **Das Hauptbeispiel für den RND-Abgleich.** Echtes Gutachten unter `Dateien/Westerfeldstr. 140_RND GA Bielefeld.pdf`
@@ -158,5 +182,4 @@ Eingetragen nach Recherche (Belege: Projektanweisung, Journal 14.10.2026):
 
 - **14 Testobjekte löschen** (darf ich nicht): 2026-1090, 1101 „Unbenannt" · 1091–1095 Layouttest · 1096–1100 (5× MFH Wilhelm-Busch) · 1078, 1079 „Teststraße" · 1088 (Hüllhorst doppelt), 1089 (leer).
 - **Restnutzungsdauer** für die vier Altbauten sachverständig setzen.
-- **Parkstr. 9 (2026-1056):** Nettokaltmiete steht auf „710 Euro" für 5 Einheiten / 427 m² — Tippfehler? Die BMF-Arbeitshilfe ergibt damit einen negativen Gebäudeanteil (DealPilot übernimmt ihn seit v2213 nicht mehr).
 - **Sachsenstr. 18:** Grundstücksfläche und Bodenrichtwert fehlen, deshalb keine BMF-Aufteilung.
