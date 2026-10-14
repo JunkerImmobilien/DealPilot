@@ -103,6 +103,7 @@
       P + '.qc7-sources{display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center}',
       P + ".qc7-src{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid rgba(42,39,39,0.16);border-radius:11px;background:#fff;cursor:pointer;font:600 13px/1 'DM Sans',system-ui,sans-serif;color:var(--ch,#2A2727);transition:border-color .15s ease,background .15s ease,box-shadow .15s ease,transform .12s ease;user-select:none}",
       P + '.qc7-src:hover{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 60%, transparent);box-shadow:0 4px 12px -6px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);transform:translateY(-1px)}',
+      P + '.dp-pf-tile.dp-pf-nurico .dp-pf-lbl{display:none}',   /* v2217d · Dokumente als Symbol */
       P + '.dp-pf-tile[data-src="import"]{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent);box-shadow:0 2px 10px -5px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent)}',
       P + '.qc7-src input{display:none}',
       P + '.qc7-src .qc7-box{width:18px;height:18px;flex-shrink:0;border:2px solid rgba(42,39,39,0.26);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;transition:background .15s ease,border-color .15s ease}',
@@ -409,7 +410,10 @@
              unter dem Riegel: er überschreibt nichts still, sondern zeigt je
              Feld „im Dokument / im Objekt" und lässt abweichende Werte
              abgewählt. */
-          (window.DokumentImport ? pfTileTool('dokument', _doc, 'Dokumente', 'Grundbuch, Kaufvertrag, Gutachten, BORIS … — mit Abgleich gegen das Objekt') : '') +
+          (window.DokumentImport ? pfTileTool('dokument', _doc, 'Dokumente', 'Dokumente einlesen: Grundbuch, Kaufvertrag, Gutachten, BORIS … — mit Abgleich gegen das Objekt').replace('class="dp-pf-tile tool"', 'class="dp-pf-tile tool dp-pf-nurico" aria-label="Dokumente einlesen"') : '') +
+          /* v2217d · GEMESSEN: mit Beschriftung (128 px) rutschte „Abrufen" in
+             eine zweite Zeile - Marcels Befund aus v2189. Als Symbol mit
+             Tooltip bleibt die Zeile eine Zeile (live geprüft). */
         '</div></div>' +
         '<a class="dp-pf-qr" id="oab-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run">Abrufen</button>' + '</span>' +
       '</div></div>' +
