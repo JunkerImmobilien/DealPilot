@@ -181,6 +181,12 @@
       if (k === '_thumb') continue;    /* jederzeit neu erzeugbar */
       kopie[k] = d[k];
     }
+    /* v2216f · TIEFE Kopie. Gemessen 14.10.2026 an 2026-1056: `_mfh` (die
+       Einheitenliste) ist ein Objekt - flach kopiert zeigten Ankauf-Stand und
+       Formular auf DIESELBE Liste. Eine Einheit, die nach dem Festschreiben
+       vermietet wurde, war damit auch im Plan vermietet („Leere Einheiten
+       0 -> 0" statt 1 -> 0). Ein Maßstab, der sich mitbewegt, ist keiner. */
+    try { kopie = JSON.parse(JSON.stringify(kopie)); } catch (e) {}
     return kopie;
   }
 
