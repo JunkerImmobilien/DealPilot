@@ -88,6 +88,11 @@
   function zeichnen() {
     var host = el('dp-abweichung');
     if (!host) return;
+    /* v2216j · Marcel 14.10.2026: „der Ist/Soll-Abgleich soll in der Pilot-
+       Analyse sein unter Ist/Soll", nicht im Tab Objekt. Die Tafel dort (seit
+       v2034) bleibt leer; der Abgleich steht im Pilot-Reiter „Soll/Ist-Abgleich"
+       (ui.js _sollIstHtml) mit denselben Zeilen aus DealPilotAnkauf.abweichung(). */
+    host.innerHTML = ''; host.style.display = 'none'; return;
     var A = window.DealPilotAnkauf;
     if (!A || !A.vorhanden()) { host.innerHTML = ''; host.style.display = 'none'; return; }
     var a = A.abweichung();
