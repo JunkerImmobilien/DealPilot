@@ -8,7 +8,7 @@
    auf die Stelle und schreibt eine Untertitelzeile darunter. Aufnehmen mit
    OBS oder Win+Alt+R; am Stand kann es auch live in Schleife laufen.
 
-   Drehbücher: parkstrasse (v2219), immometrica (v2228), quickcheck (v2222: Datenaufnahme mit zwei
+   Drehbücher: parkstrasse (v2219), immometrica (v2228), sprache (v2231), quickcheck (v2222: Datenaufnahme mit zwei
    PDFs, Marktwertindikation, Spanne, Bewertung, Lage), quickcheck-tippen (v2221)
    Start:  ?messe=parkstrasse            einmal
            ?messe=parkstrasse&schleife   immer wieder (Messebildschirm)
@@ -664,6 +664,109 @@
         }
       ],
       schluss: ''
+    },
+
+    /* ═══ DREHBUCH 5 · SPRACHE — ERZÄHLEN STATT TIPPEN (v2231) ═══════════
+       Marcel 14.10.2026: „nach dem Video dann auch mit Sprache … und immer
+       mit Marktbewertung". Das echte Sprachfenster läuft (Aufnahme, Live-
+       Mitschrift, Chips, Auswertung, Tabelle, Übernahme); ersetzt sind nur
+       das Mikrofon (stummer Ton) und die drei Sprach-Abrufe (SPR_*). */
+    sprache: {
+      titel: 'Erzählen statt tippen',
+      unterzeile: 'Quick Boarding · Sprache · DealPilot-Marktbewertung',
+      objekt: null,
+      abspann: [
+        { ms: 5200, html: '<div class="k ab">Quick Boarding</div><h1 class="ab z2">Erzählen statt tippen.</h1><p class="ab z3">Ein Satz pro Wert — DealPilot hört zu, rechnet und sagt dir, wo du stehst.</p>' },
+        { ms: 6200, html: ABSPANN_LOGO }
+      ],
+      aufraeumen: function () {
+        var ab = q('#oabi-ov #oabi-cancel'); if (ab) { try { ab.click(); } catch (e) {} }
+        var ov = q('#oabi-ov'); if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+        _imoFetchAus(); _mikroAus(); _sprSchritt = 0;
+        var _sv = _spanVorher, zurueck = function () { try { if (_sv === null) localStorage.removeItem('qc_span_config'); else if (_sv !== undefined) localStorage.setItem('qc_span_config', _sv); } catch (e) {} };
+        zurueck(); setTimeout(zurueck, 2500);
+        _spanVorher = undefined;
+        qcAufraeumen(); reiter('s0');
+      },
+      szenen: [
+        async function (s) {   /* 1 · Quick Boarding */
+          try { _spanVorher = localStorage.getItem('qc_span_config'); } catch (e) { _spanVorher = undefined; }
+          if (typeof window.sbActionsAction === 'function') sbActionsAction('quickcheck');
+          await warteAuf(function () { var d = qcDoc(); return d && d.readyState === 'complete' && qcEl('qc_kp') && !qcEl('qc_kp').value && qcEl('qc7-sources'); }, 10000);
+          await warte(800);
+          var m = q('.main-col'); if (m) m.scrollTop = 0;
+          await zeige(function () { return qcEl('qc7-sources'); }, 6);
+          s.zeile('Datenaufnahme', 'Kein Exposé zur Hand? Dann einfach erzählen.');
+          await warte(3000);
+        },
+        async function (s) {   /* 2 · Freisprechen mit Live-Mitschrift */
+          _sprSchritt = 0; _mikroAn(); _fetchAn(_sprAntwort);
+          window.postMessage({ source: 'dp-qc', type: 'qc-voice' }, '*');
+          await warteAuf(function () { return q('#oabi-ov #vi-live'); }, 6000);
+          await warte(600);
+          await zeige(function () { return q('#oabi-ov .oabi-modal'); }, 4);
+          s.zeile('Freisprechen', 'DealPilot hört mit — die Mitschrift läuft, erkannte Werte leuchten grün.');
+          /* die App fragt alle 5 s nach der Mitschrift: so kommt Satz für Satz */
+          await warteAuf(function () { var l = q('#vi-live'); return l && l.value && l.value.length >= SPR_TEXT.join(' ').length; }, 45000);
+          await warte(2200);
+          var nx = q('#vi-next'); if (nx) nx.click();
+          await warteAuf(function () { return q('#oabi-result .oabi-tbl'); }, 10000);
+          await warte(700);
+          await zeige(function () { return q('#oabi-ov .oabi-body') || q('#oabi-result'); }, 4);
+          s.zeile('Ausgewertet', '<b>' + Object.keys(SPR_FELDER).length + ' Werte</b> aus dem Gesagten — Adresse, Fläche, Miete, Kaufpreis und Finanzierung.');
+          await warte(4800);
+          var ap = q('#oabi-apply'); if (ap) ap.click();
+          await warte(1400);
+        },
+        async function (s) {   /* 3 · erstes Urteil mit der gesprochenen Miete */
+          await zeige(function () { return qcEl('score-block'); }, 4);
+          await warteAuf(function () { return /\d/.test(qcText('sb-num')); }, 5000);
+          await warte(800);
+          var sc = qcScore();
+          s.zeile('Erstes Urteil', 'Mit deiner Miete von <b>' + eur(+SPR_FELDER.nkm) + '</b>: Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+          await warte(4800);
+        },
+        async function (s) {   /* 4 · DealPilot-Marktbewertung */
+          await zeige(function () { return qcEl('qc7-sources'); }, 6);
+          var st = qcEl('_mb_state');
+          if (!st) { var dd = qcDoc(); st = dd.createElement('input'); st.type = 'hidden'; st.id = '_mb_state'; dd.body.appendChild(st); }
+          st.value = JSON.stringify({ ts: Date.now(), card: SPR_KARTE, mode: 'med', collapsed: false });
+          try { qcWin()._oabFeedTrigger(); } catch (e) {}
+          await warte(900);
+          await zeige(function () { return qcEl('oab-results'); }, 6);
+          s.zeile('Marktbewertung', 'Marktwert <b>' + eur(SPR_KARTE.mw.low) + ' – ' + eur(SPR_KARTE.mw.high) + '</b> — der Kaufpreis liegt darunter. Marktmiete <b>' + eur(SPR_KARTE.mm.low) + ' – ' + eur(SPR_KARTE.mm.high) + '</b>.');
+          await warte(5600);
+        },
+        async function (s) {   /* 5 · Spanne Ø und Oben */
+          var stufen = [['mid', 'Ø', 'med'], ['high', 'Oben', 'high']];
+          for (var k = 0; k < stufen.length; k++) {
+            await zeige(function () { return qcSel('.avs-spanne'); }, 8);
+            s.zeile('Die Spanne', 'Marktmiete „' + stufen[k][1] + '“ statt deiner Schätzung …');
+            await warte(1400);
+            var t = qcSel('.avs-spanne [data-spanne="' + stufen[k][0] + '"]'); if (t) t.click();
+            await warte(700);
+            await zeige(function () { return qcEl('score-block'); }, 4);
+            await warte(900);
+            var sc = qcScore();
+            s.zeile('Die Spanne', stufen[k][1] + ': Miete <b>' + eur(SPR_KARTE.mm[stufen[k][2]]) + '</b> → Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+            await warte(4300);
+          }
+        },
+        async function (s) {   /* 6 · 20 % Eigenkapital */
+          await zeige(function () { return qcGruppe('fin'); }, 6);
+          s.zeile('Mehr Eigenkapital', '20 % Eigenkapital statt der gesprochenen 32.000 € …');
+          await warte(1500);
+          var b80 = [].filter.call((qcDoc() || document).querySelectorAll('.ltv-btn'), function (x) { return /^80/.test(x.textContent.trim()); })[0];
+          if (b80) b80.click();
+          await warte(900);
+          await zeige(function () { return qcEl('score-block'); }, 4);
+          await warte(900);
+          var sc = qcScore();
+          s.zeile('Mehr Eigenkapital', 'Eigenkapital ' + eur(parseFloat(String((qcEl('qc_ek') || {}).value || '0'))) + ': Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+          await warte(5200);
+        }
+      ],
+      schluss: ''
     }
   };
 
@@ -681,16 +784,56 @@
     if (/\/favorites\//.test(u)) return { count: IMO_MIT.fav.count, next: "mitschnitt", items: IMO_MIT.fav.items };
     return null;
   }
-  function _imoFetchAn() {
+  /* v2231 · allgemein: jedes Drehbuch bringt seine Antwortfunktion mit */
+  var _fetchAntwort = null;
+  function _imoFetchAn() { _fetchAn(_imoAntwort); }
+  function _fetchAn(fn) {
+    _fetchAntwort = fn;
     if (_fetchEcht) return;
     _fetchEcht = window.fetch;
     window.fetch = function (url, opt) {
-      var a = lauf ? _imoAntwort(typeof url === 'string' ? url : (url && url.url)) : null;
+      var a = (lauf && _fetchAntwort) ? _fetchAntwort(typeof url === 'string' ? url : (url && url.url), opt) : null;
       if (a) return Promise.resolve(new Response(JSON.stringify(a), { status: 200, headers: { 'Content-Type': 'application/json' } }));
       return _fetchEcht.apply(this, arguments);
     };
   }
-  function _imoFetchAus() { if (_fetchEcht) { window.fetch = _fetchEcht; _fetchEcht = null; } }
+  function _imoFetchAus() { if (_fetchEcht) { window.fetch = _fetchEcht; _fetchEcht = null; } _fetchAntwort = null; }
+
+  /* v2231 · Sprache: Mikrofon und die drei Sprach-Abrufe nur im Lauf ersetzt.
+     SPR_TEXT ist der Sprechtext (Satz für Satz die Live-Mitschrift),
+     SPR_FELDER die ECHTE Auslese dieses Textes (/ai/extract-text mit dem
+     Quick-Check-Katalog, 14.10.2026) - dieselbe Extraktion, die
+     /ai/extract-voice nach der Spracherkennung macht. SPR_KARTE ist die echte
+     DealPilot-Marktbewertung für 33602 Bielefeld. Die grünen Chips während
+     des Sprechens zeigen, welche dieser Felder im bisher Gesagten stehen. */
+  var SPR_TEXT = ['Ich habe hier eine Eigentumswohnung im Musterweg 7 in 33602 Bielefeld.', 'Zweiundsiebzig Quadratmeter, Baujahr 1994, drei Zimmer.', 'Kaltmiete 680 Euro, Hausgeld 230 Euro im Monat.', 'Kaufpreis laut Exposé 159.000 Euro.', 'Ich bringe 32.000 Euro Eigenkapital mit, Zins 4,2 Prozent, Tilgung eineinhalb Prozent.'];
+  var SPR_IDS = [['objart', 'str', 'hnr', 'plz', 'ort'], ['wfl', 'baujahr', 'zimmer'], ['nkm', 'hg_ul'], ['kp'], ['ek', 'd1z', 'd1t']];
+  var SPR_FELDER = {"objart":"ETW","str":"Musterweg","hnr":"7","plz":"33602","ort":"Bielefeld","wfl":"72","zimmer":"3","baujahr":"1994","kp":"159000","nkm":"680","hg_ul":"230","ek":"32000","d1z":"4.2","d1t":"1.5"};
+  var SPR_KARTE = {"area":72,"rating":"Attraktiv","conf":{"label":"Mittel","pct":64},"mikro":"Sehr gut · 9,5","makro":"Durchschnittlich · 5,0","microRaw":95,"macroRaw":50,"trendRaw":null,"trend":"–","zensus":{"ebene":"Gemeinde","name":"Bielefeld, Stadt","leer":3.1,"eig":33.3,"miete":6.81},"brw":{"wert":1250,"quelle":"BORIS-NRW","stichtag":"2026-01-01"},"makroGemessen":4,"mw":{"low":186000,"med":216000,"high":267000,"sqm":"2.995 €/m²"},"mm":{"low":646,"med":724,"high":831,"sqm":"10,06 €/m² kalt"}};
+  var _sprSchritt = 0, _gumEcht = null, _sprTon = null;
+  function _sprAntwort(url) {
+    var u = String(url || '');
+    if (/\/ai\/transcribe-chunk/.test(u)) { _sprSchritt = Math.min(SPR_TEXT.length, _sprSchritt + 1); return { text: SPR_TEXT.slice(0, _sprSchritt).join(' ') }; }
+    if (/\/ai\/voice-quickmatch/.test(u)) { var ids = []; for (var i = 0; i < _sprSchritt; i++) ids = ids.concat(SPR_IDS[i]); return { ids: ids }; }
+    if (/\/ai\/extract-voice/.test(u)) return { transcript: SPR_TEXT.join(' '), fields: SPR_FELDER, unsicher: [], kosten: null };
+    return null;
+  }
+  function _mikroAn() {
+    /* ein stummer Tonstrom statt des Mikrofons: MediaRecorder braucht eine
+       echte Tonspur, sonst bricht die Aufnahme ab (Auswertung erst ab 2 KB) */
+    if (_gumEcht || !navigator.mediaDevices) return;
+    try {
+      var ac = new (window.AudioContext || window.webkitAudioContext)(), dst = ac.createMediaStreamDestination();
+      var osc = ac.createOscillator(), g = ac.createGain(); g.gain.value = 0.02; osc.connect(g); g.connect(dst); osc.start();
+      _sprTon = { ac: ac, stream: dst.stream };
+      _gumEcht = navigator.mediaDevices.getUserMedia;
+      navigator.mediaDevices.getUserMedia = function () { return lauf ? Promise.resolve(_sprTon.stream) : _gumEcht.apply(navigator.mediaDevices, arguments); };
+    } catch (e) {}
+  }
+  function _mikroAus() {
+    if (_gumEcht) { navigator.mediaDevices.getUserMedia = _gumEcht; _gumEcht = null; }
+    if (_sprTon) { try { _sprTon.ac.close(); } catch (e) {} _sprTon = null; }
+  }
 
   /* v2222 · die beiden Mitschnitte (siehe Drehbuch 3) */
   var _spanVorher, _kiFrei = null;
