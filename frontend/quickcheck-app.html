@@ -5516,9 +5516,18 @@ const QcApp = (function() {
       ? cons.slice(0, 2).map(function (c) { return c.replace(/<\/?strong>/g, '"'); }).join(' · ')
       : '';
 
+    /* v2238 · Marcel 14.10.2026: der Wertpuffer gehört auch in die Überschrift.
+       Das Urteil nach dem eigenen Maßstab bleibt vorne stehen; liegt der Preis
+       deutlich unter dem bereinigten Marktwert (qc-heuristik: e.wert), kommt
+       die zweite Sicht in einem Halbsatz dazu - bei „nicht kaufen" als „aber". */
+    var kopf = w.kopf;
+    if (e.wert && e.wert.pct > 0) {
+      var neg = (e.verdict === 'NICHT KAUFEN' || e.verdict === 'KRITISCH' || e.verdict === 'PASS');
+      kopf += (neg ? ' · aber ' : ' · ') + e.wert.pct + ' % unter Marktwert';
+    }
     return {
       ton: w.ton, zeichen: w.zeichen, verdict: e.verdict,
-      ueberschrift: w.kopf, ueberschrift_kurz: w.kurz,
+      ueberschrift: kopf, ueberschrift_kurz: w.kurz,
       rat: e.text + (argumente && (e.verdict === 'VERHANDELN' || e.verdict === 'KRITISCH')
         ? ' Argumente für das Gespräch: ' + argumente + '.' : ''),
       ziel_kp: e.ziel_kp,
