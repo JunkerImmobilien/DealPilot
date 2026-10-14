@@ -1631,7 +1631,10 @@
   async function extractTextFull(file, statusCb) {
     var text = await extractPdfTextRaw(file);
     if (!text || text.replace(/\s/g, '').length < 50) { try { text = await extractOCR(file, statusCb); } catch (e) { text = text || ''; } }
-    return (text || '').slice(0, 12000);
+    /* v2218h · VOLLER Text zurück. GEMESSEN am RND-Gutachten Westerfeldstr.: 72.169
+       Zeichen, „Punktrastermethode" stand erst hinter Zeichen 12.000 - die Erkennung
+       der Dokumentart sah es nie. Gekürzt wird jetzt erst beim Senden (callExtract). */
+    return (text || '');
   }
   function detectMarket(file, text) {
     var fn = (file && file.name || '').toLowerCase();
@@ -1650,6 +1653,7 @@
     return hits >= 2;
   }
   async function callExtract(text, isMarket) {
+    text = String(text || '').slice(0, 12000);   /* v2218h · wie bisher: 12.000 Zeichen an die KI */
     var res = await fetch('/api/v1/ai/' + (isMarket ? 'extract-market-data' : 'extract-expose'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token() }, body: JSON.stringify({ text: text }) });
     var j = await res.json().catch(function () { return {}; });
     return (j && j.extracted) ? j.extracted : (j || {});
@@ -2077,7 +2081,7 @@
         '<option value="market"' + (f.userType === 'market' || (!f.userType && f.type === 'market') ? ' selected' : '') + '>Marktbericht</option>' +
         '<option value="expose"' + (f.userType === 'expose' || (!f.userType && f.type === 'expose') ? ' selected' : '') + '>Exposé</option>' +
         (window.DokumentImport ? '<option value="dokument"' + (f.userType === 'dokument' || (!f.userType && f.type === 'dokument') ? ' selected' : '') + '>' + (f.dokLabel ? escH(f.dokLabel) : 'Dokument (Grundbuch, Vertrag, Gutachten …)') + '</option>' : '') + '</select>' +
-      '<span class="oabi-st">' + (f.status === 'reading' ? 'lese …' : f.status === 'err' ? 'kein Text' : (f.type === 'market' ? 'Marktbericht' : 'Exposé')) + '</span>';
+      '<span class="oabi-st">' + (f.status === 'reading' ? 'lese …' : f.status === 'err' ? 'kein Text' : (f.type === 'market' ? 'Marktbericht' : f.type === 'dokument' ? escH(f.dokLabel || 'Dokument') : 'Exposé')) + '</span>';
     var sel = f.row.querySelector('select');
     if (sel) sel.addEventListener('change', function () { onTypeChange(f, sel.value); });
   }
@@ -2120,7 +2124,7 @@
       if (f.cache.dokument && f.cache.dokument.success) return;
       delete f.cache.dokument;        /* unklar → der alte Weg */
     }
-    var cls = classifyType({ name: f.name }, f.text);
+    var cls = classifyType({ name: f.name }, String(f.text || '').slice(0, 12000));   /* Einordnung wie bisher auf dem Anfang */
     if (cls === 'market' || cls === 'expose') { f.type = cls; await ensureExtract(f); return; }
     setStatus(f, 'Typ prüfen…');
     f.type = 'market'; await ensureExtract(f);

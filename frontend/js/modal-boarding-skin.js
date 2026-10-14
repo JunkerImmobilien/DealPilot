@@ -48,7 +48,7 @@
     var t = (title || '').toLowerCase();
     if (t.indexOf('immometrica') >= 0) return { kick: 'OBJEKT-IMPORT', title: 'ImmoMetrica' };
     if (t.indexOf('sprach') >= 0) return { kick: 'FREI EINSPRECHEN', title: 'Sprachaufzeichnung' };
-    if (t.indexOf('expos') >= 0 || t.indexOf('markt') >= 0) return { kick: 'OBJEKT EINLESEN', title: 'Expos\u00e9 & Marktbericht' };
+    if (t.indexOf('expos') >= 0 || t.indexOf('markt') >= 0) return { kick: 'OBJEKT EINLESEN', title: 'PDFs: Expos\u00e9, Marktbericht, Dokumente' };   /* v2218h: Dokumente laufen hier mit */
     return { kick: 'DEALPILOT', title: null };
   }
 
