@@ -25,7 +25,10 @@
   function isCorp(rf) { return rf === 'gmbh' || rf === 'ug'; } /* eigene KSt-Rechnung + Buchhaltung */
 
   /* ===== PRO-GATE (v806) — Mandanten nur fuer Plan 'pro' ===== */
-  var PRO_PLANS = ['pro']; /* bei neuer Top-Stufe hier ergaenzen */
+  /* v2212b · 'partner' ist ein erweiterter Pro (config.js PRO_FAMILIE, v1081). Hier
+     stand nur 'pro': in Marcels Partner-Konto war die Halterwahl immer auf „Privat"
+     gesperrt, Gesellschaftsobjekte fielen beim Speichern auf Privat zurueck. */
+  var PRO_PLANS = ['pro', 'partner']; /* bei neuer Top-Stufe hier ergaenzen */
   function _isPro() {
     try {
       var cfg = window.DealPilotConfig;
