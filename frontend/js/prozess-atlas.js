@@ -99,6 +99,299 @@
       ],
       kanten: [['q1', 'q2'], ['q2', 'q3'], ['q1', 'q4'], ['q2', 'q4'], ['q3', 'q4'], ['q4', 'q5'], ['q1', 'q6', 'opt'], ['q6', 'q8', 'opt'], ['q5', 'q7'], ['q7', 'q8'], ['q8', 'q9']]
     },
+    /* v2218 · aus der Demo (design/Vorschläge/prozessatlas) übernommen. Marcel 14.10.2026:
+       „so wie es in der Demo ist, ist es super.“ Sprechlauf und Dokument-Import als eigene Abläufe. */
+    {
+      "id": "sprache",
+      "name": "Sprechlauf",
+      "sub": "Du erzählst das Objekt — DealPilot füllt die Felder",
+      "spalten": [
+        "Sprechen",
+        "Verstehen",
+        "Übernehmen"
+      ],
+      "knoten": [
+        {
+          "id": "v1",
+          "s": 0,
+          "z": 0,
+          "t": "Aufnahme",
+          "k": "bis 4 Minuten",
+          "d": "Die Aufnahme startet sofort. Während du sprichst, erscheint der Text live als Vorschau; maßgeblich ist die Audio-Aufnahme.",
+          "ein": [
+            "Mikrofon"
+          ],
+          "aus": [
+            "Audio",
+            "Live-Vorschau"
+          ],
+          "beleg": "frontend/js/voice-import.js:MAX_SEC",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "v2",
+          "s": 0,
+          "z": 1,
+          "t": "Transkription",
+          "k": "in Abschnitten",
+          "d": "Der Mitschnitt wird abschnittsweise in Text übertragen. Pause und Fortsetzen sind jederzeit möglich.",
+          "ein": [
+            "Audio"
+          ],
+          "aus": [
+            "Text"
+          ],
+          "beleg": "frontend/js/voice-import.js:transcribe-chunk",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "v3",
+          "s": 1,
+          "z": 0,
+          "t": "Feldkatalog",
+          "k": "zur Laufzeit gelesen",
+          "d": "Alle Felder aller Reiter, Auswahlfelder mit ihren echten Optionen. So wird „Zustand ist gut\" zum passenden Optionswert.",
+          "ein": [
+            "Felder der App"
+          ],
+          "aus": [
+            "Katalog"
+          ],
+          "beleg": "frontend/js/voice-import.js:renderMergedTable",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "v4",
+          "s": 1,
+          "z": 1,
+          "t": "Zuordnen",
+          "k": "Text → Felder",
+          "d": "Die KI ordnet das Gesagte den Feldern zu. Was nicht im Katalog steht, wird nicht erfunden.",
+          "ein": [
+            "Text",
+            "Katalog"
+          ],
+          "aus": [
+            "Vorschläge je Feld"
+          ],
+          "beleg": "backend/src/routes/ai.js:/extract-voice",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "v5",
+          "s": 2,
+          "z": 0,
+          "t": "Nachfragen",
+          "k": "wenn ein Feld belegt ist",
+          "d": "Trägt das Objekt schon Werte, zeigt DealPilot, was sich ändern würde — und fragt, bevor überschrieben wird.",
+          "ein": [
+            "bestehende Werte"
+          ],
+          "aus": [
+            "Rückfrage"
+          ],
+          "beleg": "frontend/js/voice-import.js:bereits Stammdaten",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "v6",
+          "s": 2,
+          "z": 1,
+          "t": "Übernehmen",
+          "k": "an- und abwählbar",
+          "d": "Dieselbe Tabelle wie beim Exposé-Import. Du wählst, was übernommen wird — danach rechnen alle Kerne neu.",
+          "ein": [
+            "deine Auswahl"
+          ],
+          "aus": [
+            "gefüllte Felder",
+            "neuer Score"
+          ],
+          "beleg": "frontend/js/voice-import.js:applyMerged",
+          "ziel": {
+            "tab": "s0"
+          }
+        }
+      ],
+      "kanten": [
+        [
+          "v1",
+          "v2"
+        ],
+        [
+          "v2",
+          "v3"
+        ],
+        [
+          "v3",
+          "v4"
+        ],
+        [
+          "v4",
+          "v5"
+        ],
+        [
+          "v5",
+          "v6"
+        ]
+      ]
+    },
+    {
+      "id": "dokumente",
+      "name": "Dokument-Import",
+      "sub": "Exposé, Grundbuch, Gutachten, Belege — lesen statt abtippen",
+      "spalten": [
+        "Einlesen",
+        "Schützen",
+        "Auswerten",
+        "Übernehmen"
+      ],
+      "knoten": [
+        {
+          "id": "p1",
+          "s": 0,
+          "z": 0,
+          "t": "PDF wählen",
+          "k": "Text aus allen Seiten",
+          "d": "Der Text wird im Browser aus dem PDF gelesen. Belege und Fotos gehen als Bild in die Auswertung.",
+          "ein": [
+            "PDF",
+            "Foto"
+          ],
+          "aus": [
+            "Seitentext"
+          ],
+          "beleg": "frontend/js/object-actions.js:istDokument",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "p2",
+          "s": 0,
+          "z": 1,
+          "t": "Art erkennen",
+          "k": "neun Dokumentarten",
+          "d": "Grundbuch, Kataster, Kaufvertrag, WEG-Protokoll, BORIS, Verkehrswert-, Restnutzungsdauergutachten, Kaufpreisaufteilung, Marktbericht — je mit eigenem Schema.",
+          "ein": [
+            "Seitentext"
+          ],
+          "aus": [
+            "Dokumentart"
+          ],
+          "beleg": "frontend/js/dokument-import.js:Kaufpreisaufteilung",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "p3",
+          "s": 1,
+          "z": 0,
+          "t": "Schwärzen",
+          "k": "auf dem DealPilot-Server, vor der KI",
+          "d": "Geburtsdaten, Namen nach Anrede, Anschriften nach „wohnhaft\", E-Mail, Telefon, IBAN, Steuer-ID werden ersetzt. Die Objektanschrift und Beträge bleiben — die braucht die Auswertung.",
+          "ein": [
+            "Seitentext"
+          ],
+          "aus": [
+            "geschwärzter Text"
+          ],
+          "beleg": "backend/src/services/schwaerzen.js:schwaerze",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "p4",
+          "s": 2,
+          "z": 0,
+          "t": "Auslesen",
+          "k": "Schema ohne Personendaten",
+          "d": "Das Schema fragt nur nach Objektdaten. Was nicht gefragt wird, schreibt das Modell nicht heraus.",
+          "ein": [
+            "geschwärzter Text",
+            "Schema"
+          ],
+          "aus": [
+            "Felder mit Fundstelle"
+          ],
+          "beleg": "backend/src/routes/ai.js:/extract-dokument",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "p5",
+          "s": 2,
+          "z": 1,
+          "t": "Vergleich, nicht Ergebnis",
+          "k": "fremde Gutachten",
+          "d": "Ein mitgelesener Gutachtenwert (Restnutzungsdauer, Verkehrswert, Gebäudeanteil) erscheint als Vergleich neben der eigenen Rechnung — er wird nicht übernommen.",
+          "ein": [
+            "Gutachtenwert"
+          ],
+          "aus": [
+            "Abgleich"
+          ],
+          "beleg": "frontend/js/dokument-import.js:VERGLEICH",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "p6",
+          "s": 3,
+          "z": 0,
+          "t": "Übernehmen",
+          "k": "Feld für Feld",
+          "d": "Jedes Feld steht mit „im Dokument“ und „im Objekt“ nebeneinander: leere Felder sind vorgehakt, abweichende nicht — still überschrieben wird nie. Belege bestätigst du Zeile für Zeile, weil sie in die Steuer gehen.",
+          "ein": [
+            "deine Auswahl"
+          ],
+          "aus": [
+            "Datenaufnahme",
+            "Anschaffungskosten"
+          ],
+          "beleg": "frontend/js/dokument-import.js:_abgleich",
+          "ziel": {
+            "tab": "s0"
+          }
+        }
+      ],
+      "kanten": [
+        [
+          "p1",
+          "p2"
+        ],
+        [
+          "p2",
+          "p3"
+        ],
+        [
+          "p3",
+          "p4"
+        ],
+        [
+          "p4",
+          "p5"
+        ],
+        [
+          "p5",
+          "p6"
+        ]
+      ]
+    },
     {
       id: 'boarding', name: 'Netzplan Datenaufnahme', sub: 'Jede Stufe schaltet frei, was ohne sie nicht rechnen darf',
       spalten: ['Stufe 1 · Einordnen · 6 Pflichtfelder', 'Stufe 2 · Durchrechnen · 13', 'Stufe 3 · Bewerten · bis 20'],
@@ -157,11 +450,29 @@
       knoten: [
         { id: 'c1', s: 0, z: 0, t: 'Kennzahlen', k: 'aus der Datenaufnahme', d: 'Cashflow, Renditen, DSCR, LTV, Lage, Zustand — dieselben Rechenkerne wie überall in der App.', aus: ['KPI-Satz'], ziel: { tab: 's6' }, beleg: 'frontend/js/deal-kpis.js:compute' },
         { id: 'c2', s: 0, z: 2, t: 'Deine Einstellungen', k: 'Vorlagen · Gewichte · Lageklassen', d: 'Sechs Vorlagen für den DealScore (ausgewogen, konservativ, optimistisch, lageorientiert, cashflowstark, sicherheitsorientiert), eigene Gewichte mit Summe 100, Ziel-Bruttomietrendite je Lageklasse (3,5 / 5,0 / 7,0 %), persönliche Mindest-Schwellen.', ein: ['Vorlage', 'Gewichte', 'Lageklasse'], aus: ['andere Rangfolge — dieselben Objekte'], ziel: { aktion: 'settings' }, beleg: 'frontend/js/dealscore.js:PRESET_WEIGHTS' },
-        { id: 'c3', s: 1, z: 0, t: 'DealScore', k: 'fünf Faktoren · der schnelle Blick', d: 'Barkauf: Beleihungsauslauf und Risiko entfallen und werden nicht schlecht bewertet.', gew: [['Cashflow', 30], ['Rendite', 25], ['Beleihungsauslauf', 15], ['Risiko (Kapitaldienst)', 15], ['Potenzial', 15]], aus: ['0–100'], ziel: { tab: 's6' }, beleg: 'frontend/js/dealscore.js:DEFAULT_WEIGHTS' },
-        { id: 'c4', s: 1, z: 2, t: 'Investor Deal Score', k: 'fünf Kategorien mit Unterkennzahlen', d: 'Fehlt eine Unterkennzahl, fällt sie aus der Gewichtung — sie wird nicht mit einem Mittelwert gefüllt.', gew: [['Rendite', 35], ['Finanzierung', 25], ['Risiko', 20], ['Lage', 10], ['Upside', 10]], unter: [['Rendite', 'brutto 25 · netto 30 · Cashflow 25 · Cash-on-Cash 20'], ['Finanzierung', 'DSCR 35 · LTV 30 · Zins 15 · Tilgung 10 · EK-Bedarf 10'], ['Risiko', 'Leerstand 20 · Instandhaltung 20 · Qualität 20 · Baujahr 15 · Energie 15 · Mietausfall 10'], ['Lage', 'Markt vs. Ist 25 · Mietwachstum 25 · Bevölkerung 20 · Nachfrage 15 · Mikrolage 15'], ['Upside', 'Mietsteigerung 35 · Kaufpreisfaktor 30 · Wertsteigerung 20 · Entwicklung 15']], aus: ['0–100 mit Deckung'], ziel: { tab: 's6' }, beleg: 'frontend/js/dealscore2.js:subWeights' },
+        { id: 'c3', s: 1, z: 0, t: 'DealScore', k: 'fünf Faktoren · der schnelle Blick', d: 'Barkauf: Beleihungsauslauf und Risiko entfallen und werden nicht schlecht bewertet.', ein: ['Cashflow', 'Rendite', 'LTV', 'DSCR'], gew: [['Cashflow', 30], ['Rendite', 25], ['Beleihungsauslauf', 15], ['Risiko (Kapitaldienst)', 15], ['Potenzial', 15]], aus: ['0–100'], ziel: { tab: 's6' }, beleg: 'frontend/js/dealscore.js:DEFAULT_WEIGHTS' },
+        { id: 'c4', s: 1, z: 2, t: 'Investor Deal Score', k: 'fünf Kategorien mit Unterkennzahlen', d: 'Fehlt eine Unterkennzahl, fällt sie aus der Gewichtung — sie wird nicht mit einem Mittelwert gefüllt.', ein: ['DSCR', 'LTV', 'Cashflow', 'Lage', 'Baujahr', 'Energie'], gew: [['Rendite', 35], ['Finanzierung', 25], ['Risiko', 20], ['Lage', 10], ['Upside', 10]], unter: [['Rendite', 'brutto 25 · netto 30 · Cashflow 25 · Cash-on-Cash 20'], ['Finanzierung', 'DSCR 35 · LTV 30 · Zins 15 · Tilgung 10 · EK-Bedarf 10'], ['Risiko', 'Leerstand 20 · Instandhaltung 20 · Qualität 20 · Baujahr 15 · Energie 15 · Mietausfall 10'], ['Lage', 'Markt vs. Ist 25 · Mietwachstum 25 · Bevölkerung 20 · Nachfrage 15 · Mikrolage 15'], ['Upside', 'Mietsteigerung 35 · Kaufpreisfaktor 30 · Wertsteigerung 20 · Entwicklung 15']], aus: ['0–100 mit Deckung'], ziel: { tab: 's6' }, beleg: 'frontend/js/dealscore2.js:subWeights' },
         { id: 'c5', s: 2, z: 1, t: 'Score-Stufen', k: 'überall dieselben', d: 'Sehr gut ab 85 · Gut ab 70 · Solide ab 50 · Schwach ab 35 · Kritisch darunter. Auf der Objektkarte, im Quick-Check, im Marktbericht und im Telegram-Bot.', gew: [['Sehr gut', 85], ['Gut', 70], ['Solide', 50], ['Schwach', 35]], aus: ['Pille auf der Objektkarte'], ziel: { aktion: 'view-all' }, beleg: 'frontend/js/score-tiers.js:stufe' }
       ],
       kanten: [['c1', 'c3'], ['c1', 'c4'], ['c2', 'c3'], ['c2', 'c4'], ['c3', 'c5'], ['c4', 'c5']]
+    },
+    /* v2217 · Marcel 14.10.2026: „Ist der Telegram-Bot … auch in dem Atlas
+       passend integriert?" Er war es nicht - kein Ablauf, keine Station.
+       Jede Station hier hat ihr Werkzeug in agentWerkzeuge.js als Beleg. */
+    {
+      id: 'telegram', name: 'Telegram-Bot', sub: 'DealPilot unterwegs — fragen, sprechen, anlegen, ohne die App zu öffnen',
+      spalten: ['Verbinden', 'Fragen', 'Handeln'],
+      knoten: [
+        { id: 't1', s: 0, z: 0, t: 'Bot verbinden', k: 'Code aus den Einstellungen', d: 'In den Einstellungen erzeugst du einen Code und schickst ihn deinem Bot. Erst dann gehört der Chat zu deinem Konto — welche Daten der Bot liest, entscheidet nie der Nachrichtentext.', ein: ['Code'], aus: ['verknüpfter Chat'], ziel: { aktion: 'settings' }, beleg: 'backend/src/routes/telegram.js:/code' },
+        { id: 't2', s: 0, z: 1, t: 'Sprechen, tippen, fotografieren', k: 'ohne Befehle', d: 'Sprachnachrichten werden umgeschrieben, Text versteht er wie gesagt, ein Foto vom Exposé liest er aus. Befehle wie /objekte gehen auch.', ein: ['Sprachnachricht', 'Text', 'Foto'], aus: ['Frage'], beleg: 'backend/src/routes/telegramWebhook.js:voiceExtract' },
+        { id: 't3', s: 1, z: 0, t: 'Objekt und Kennzahlen', k: 'DSCR, Miete, Score …', d: 'Liste, Kerndaten und gerechnete Kennzahlen eines Objekts — aus denselben Rechenkernen wie die App, ins Backend gespiegelt. Er bleibt beim Objekt, bis du ein anderes nennst.', ein: ['Frage'], aus: ['DSCR', 'Cashflow', 'DealScore'], beleg: 'backend/src/services/agentWerkzeuge.js:objekt_kennzahlen' },
+        { id: 't4', s: 1, z: 1, t: 'Portfolio', k: 'Vermögensbilanz · Rangliste · Hebel', d: 'Summen nur aus Zahlen, die DealPilot gerechnet hat — mit Stand. Dazu die Rangliste deiner Objekte und die Hebel für mehr Cashflow.', ein: ['Frage'], aus: ['Vermögensbilanz', 'Rangliste'], beleg: 'backend/src/services/agentWerkzeuge.js:portfolio_lesen' },
+        { id: 't5', s: 1, z: 2, t: 'Soll/Ist und Pilot-Analyse', k: 'Plan gegen heute', d: 'Für Objekte im Bestand: der Ankauf-Stand gegen heute, Kennzahl für Kennzahl, und die Pilot-Analyse beim Ankauf neben der heutigen.', ein: ['Ankauf-Stand'], aus: ['Soll/Ist-Abgleich', 'Empfehlung damals und heute'], beleg: 'backend/src/services/agentWerkzeuge.js:soll_ist_lesen' },
+        { id: 't6', s: 2, z: 0, t: 'Objekt anlegen', k: 'Frage für Frage', d: '„Leg mir ein Objekt an" — dann erzählst du, und er fragt nach, was fehlt. Das Objekt steht danach in der App.', ein: ['Adresse', 'Kaufpreis', 'Wohnfläche'], aus: ['Objekt · In Prüfung'], beleg: 'backend/src/services/agentWerkzeuge.js:objekt_anlegen' },
+        { id: 't7', s: 2, z: 1, t: 'Felder ändern', k: 'mit Rückfrage', d: '„Setz die Zimmerzahl auf 5" — er nennt alt und neu und ändert erst nach deinem Ja.', ein: ['Feld', 'neuer Wert'], aus: ['geändertes Objekt'], beleg: 'backend/src/services/agentWerkzeuge.js:felder_aendern' },
+        { id: 't8', s: 2, z: 2, t: 'Marktpreis abrufen', k: 'kostet · erst Preis, dann Frage', opt: true, d: 'Erst sagt er, was der Abruf kostet, dann fragt er — abgerufen wird nur nach deinem Ja.', ein: ['Adresse', 'Objektart', 'Wohnfläche'], aus: ['Marktwert mit Spanne'], beleg: 'backend/src/services/agentWerkzeuge.js:marktbericht_abrufen' }
+      ],
+      kanten: [['t1', 't2'], ['t2', 't3'], ['t2', 't4'], ['t2', 't5'], ['t3', 't6'], ['t3', 't7'], ['t3', 't8', 'opt']]
     }
   ];
 

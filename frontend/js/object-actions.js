@@ -380,6 +380,10 @@
           + '<span class="k-neu">Daten \u00fcbernehmen aus</span></span><div class="dp-pf-row">' +
           pfTileTool('import', _doc, 'Expos\u00e9 / Marktbericht', '') +
           (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprache', 'Objekt frei einsprechen — im Plan enthalten') : '') +
+          /* v2217 · ImmoMetrica vor die geführte Eingabe: erst die Quellen, die der
+             Riegel sperrt, dann die freien - der Freigeben-Knopf liegt mittig
+             ueber den gesperrten und verdeckt keine freie. */
+          '<label class="dp-pf-tile tool" data-src="immometrica" id="oab-imo-tile" title="Aus ImmoMetrica importieren"><input type="checkbox" value="immometrica" disabled style="display:none"><span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></span><span class="dp-pf-lbl">ImmoMetrica</span><span class="dp-pf-led"></span></label>' +
           /* ══ v1742 · GEFÜHRTE EINGABE ALS EIGENER WEG ══
              Marcel am 01.10.2026: „vielleicht setzen wir die unter Sprache
              ‚Frag mich durch'-Strecke mit als eigenen Auswahlbutton in die
@@ -399,7 +403,14 @@
              der Name klänge wieder nach Sprache. „Geführte Eingabe" sagt,
              was sie vom Formular unterscheidet. */
           (window.VoiceImport ? pfTileTool('gefuehrt', _liste, 'Geführte Eingabe', 'Frage für Frage — tippen oder sprechen') : '') +
-          '<label class="dp-pf-tile tool" data-src="immometrica" id="oab-imo-tile" title="Aus ImmoMetrica importieren"><input type="checkbox" value="immometrica" disabled style="display:none"><span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></span><span class="dp-pf-lbl">ImmoMetrica</span><span class="dp-pf-led"></span></label>' +
+          /* v2217 · Marcel 14.10.2026: „kann man in der Datenaufnahme im Objekt
+             zusätzlich Dokumente einlesen?" Der Dokument-Import (neun Arten)
+             war nur über das Seitenmenü „Import" erreichbar. Er steht NICHT
+             unter dem Riegel: er überschreibt nichts still, sondern zeigt je
+             Feld „im Dokument / im Objekt" und lässt abweichende Werte
+             abgewählt. */
+          /* v2218h · die Kachel „Dokumente“ (v2217) ist wieder weg: Dokumente laufen über
+             „Exposé / Marktbericht“ mit (Marcel 14.10.2026). */
         '</div></div>' +
         '<a class="dp-pf-qr" id="oab-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run">Abrufen</button>' + '</span>' +
       '</div></div>' +
@@ -765,7 +776,16 @@
      `dealpilot` bleibt immer frei - das sind die Stufen, und der
      Marktbericht ist genau das, was Marcel ab hier noch will. */
   var RIEGEL_KERN = ['plz', 'ort', 'str', 'hnr', 'wfl', 'kp', 'baujahr', 'nkm', 'grd', 'objart', 'zimmer'];
-  var RIEGEL_QUELLEN = ['import', 'immometrica', 'voice', 'gefuehrt'];
+  /* v2217 · „gefuehrt" ist NICHT mehr unter dem Riegel. Marcel 14.10.2026:
+     „ist der Prozess rund, wenn man aus dem Quick-Check ein Objekt speichert
+     - kann man dann in der Datenaufnahme die geführte Eingabe machen?"
+     Gemessen: nein, nur über „Freigeben" - dabei fragt die geführte Eingabe
+     ausschliesslich LUECKEN ab (voice-import.js rueckfragen: _rfFehlt, „die
+     frage ich nicht noch einmal") und überschreibt nie. Der Riegel schützte
+     dort nichts und sperrte genau den naechsten Schritt nach dem Quick-Check.
+     Exposé, ImmoMetrica und freie Sprache bleiben gesperrt: sie koennen
+     Felder überschreiben (Marcels Entscheidung vom 08.10.2026). */
+  var RIEGEL_QUELLEN = ['import', 'immometrica', 'voice'];
   var RIEGEL_SCHWELLE = 3;
   var _riegelFrei = null;   /* Schluessel des Objekts, fuer das freigegeben wurde */
 
@@ -868,6 +888,15 @@
     b.innerHTML = '<span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.8-1.2"/></svg></span><span class="dp-pf-lbl">Freigeben</span>';
     b.addEventListener('click', function (ev) { ev.preventDefault(); ev.stopPropagation(); riegelFreigeben(); });
     row.appendChild(b);
+    /* v2217 · seit „Dokumente" (frei) in derselben Reihe steht, liegt der
+       Knopf ueber der Mitte der GESPERRTEN Kacheln - nicht der Reihe. */
+    try {
+      var zuK = row.querySelectorAll('.dp-pf-riegel-zu');
+      if (zuK.length) {
+        var rr = row.getBoundingClientRect(), a0 = zuK[0].getBoundingClientRect(), a1 = zuK[zuK.length - 1].getBoundingClientRect();
+        if (rr.width > 0) b.style.left = ((a0.left + a1.right) / 2 - rr.left) + 'px';
+      }
+    } catch (e) {}
   }
 
   /* Nachziehen, wenn sich etwas aendert: Objektwechsel, Formulareingabe,
@@ -1602,7 +1631,10 @@
   async function extractTextFull(file, statusCb) {
     var text = await extractPdfTextRaw(file);
     if (!text || text.replace(/\s/g, '').length < 50) { try { text = await extractOCR(file, statusCb); } catch (e) { text = text || ''; } }
-    return (text || '').slice(0, 12000);
+    /* v2218h · VOLLER Text zurück. GEMESSEN am RND-Gutachten Westerfeldstr.: 72.169
+       Zeichen, „Punktrastermethode" stand erst hinter Zeichen 12.000 - die Erkennung
+       der Dokumentart sah es nie. Gekürzt wird jetzt erst beim Senden (callExtract). */
+    return (text || '');
   }
   function detectMarket(file, text) {
     var fn = (file && file.name || '').toLowerCase();
@@ -1621,6 +1653,7 @@
     return hits >= 2;
   }
   async function callExtract(text, isMarket) {
+    text = String(text || '').slice(0, 12000);   /* v2218h · wie bisher: 12.000 Zeichen an die KI */
     var res = await fetch('/api/v1/ai/' + (isMarket ? 'extract-market-data' : 'extract-expose'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token() }, body: JSON.stringify({ text: text }) });
     var j = await res.json().catch(function () { return {}; });
     return (j && j.extracted) ? j.extracted : (j || {});
@@ -1809,6 +1842,17 @@
     _merged = {};
     _files.filter(function (f) { return f.type === 'expose' && f.cache.expose; }).forEach(function (f) { mergeExpose(f.cache.expose); });
     _files.filter(function (f) { return f.type === 'market' && f.cache.market; }).forEach(function (f) { mergeMarket(f.cache.market); });
+    /* v2218h · amtliche Dokumente zuletzt: Grundbuch und Vertrag gehen vor dem Exposé */
+    _vergleich = [];
+    _files.filter(function (f) { return f.type === 'dokument' && f.cache.dokument && f.cache.dokument.success; }).forEach(function (f) { mergeDokument(f.cache.dokument); });
+  }
+  var _vergleich = [];
+  function mergeDokument(a) {
+    var D = window.DokumentImport; if (!D) return;
+    (D.abgleich(a.extracted || {}) || []).forEach(function (z) {
+      _merged[z.feld] = { label: z.wort, value: z.anzeige, raw: z.neu, source: a.label || 'Dokument', kind: 'input' };
+    });
+    (D.vergleich(a.extracted || {}) || []).forEach(function (v) { _vergleich.push({ wort: v.wort, wert: v.wert, eigen: v.eigen, quelle: a.label || 'Dokument' }); });
   }
   function _norm(x){ return String(x==null?'':x).trim().toLowerCase().replace(/\s+/g,' '); }
   function addressWarning() {
@@ -1856,6 +1900,35 @@
     _files.forEach(function (f) { var a = _fileAddr(f); if (!a) return; var key = _norm(a.str) + '|' + _norm(a.plz) + '|' + _norm(a.ort); if (seen[key]) return; seen[key] = 1; a.key = key; a.label = (a.str + (a.hnr ? ' ' + a.hnr : '') + ', ' + a.plz + ' ' + a.ort).replace(/^,\s*|,\s*$/g, '').trim(); out.push(a); });
     return out;
   }
+  /* v2217 · was steht im Objekt, und weicht es vom gelesenen Wert ab? */
+  function _istText(id) {
+    var el = document.getElementById(id); if (!el) return '';
+    if (el.tagName === 'SELECT') { var o = el.selectedOptions && el.selectedOptions[0]; return el.value && o ? String(o.textContent || '').trim() : ''; }
+    if (el.type === 'checkbox') return '';
+    return String(el.value || '').trim();
+  }
+  function _abweichungen(keys) {
+    var out = {};
+    keys.forEach(function (id) {
+      var it = _merged[id]; if (!it || it.kind === 'star' || it.kind === 'bool') return;
+      var ist = _istText(id); if (ist === '') return;
+      var el = document.getElementById(id);
+      var neu = it.raw != null ? it.raw : it.value;
+      /* Schreibweisen sind keine Abweichung: „Hermannstr" = „Hermannstraße",
+         „Eigentumswohnung" = „Eigentumswohnung (ETW)" (gemessen 14.10.2026
+         am Hüllhorst-Gutachten: zwei Fehlalarme von fünf). */
+      var nt = function (x) { return String(x == null ? '' : x).toLowerCase().replace(/stra(ss|ß)e/g, 'str').replace(/str\./g, 'str').replace(/[^a-z0-9äöüß]/g, ''); };
+      var gleichText = function (x, y) { x = nt(x); y = nt(y); return x === y || (x.length > 3 && y.length > 3 && (x.indexOf(y) === 0 || y.indexOf(x) === 0)); };
+      if (el && el.tagName === 'SELECT') { if (String(el.value) === String(neu) || gleichText(ist, it.value) || gleichText(el.value, neu)) return; }
+      else {
+        var a = (typeof parseDe === 'function') ? parseDe(ist) : parseFloat(ist), b = (typeof parseDe === 'function') ? parseDe(neu) : parseFloat(neu);
+        var zahl = /\d/.test(ist) && /^[\s\d.,%€+-]+$/.test(ist) && /^[\s\d.,%€+-]+$/.test(String(neu));
+        if (zahl ? Math.abs(a - b) < 0.005 : gleichText(ist, neu)) return;
+      }
+      out[id] = ist;
+    });
+    return out;
+  }
   function renderMergedTable() {
     var host = $('oabi-result'); if (!host) return;
     var ab = $('oabi-apply');
@@ -1886,11 +1959,24 @@
       var thumbs = _importPhotos.slice(0, 6).map(function (src) { return '<img src="' + src + '" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:4px;margin-right:3px;vertical-align:middle">'; }).join('');
       photoRow = '<tr><td style="width:34px"><input type="checkbox" data-photos="1" checked></td><td>\uD83D\uDDBC Bilder</td><td><b>' + _importPhotos.length + '</b> aus PDF \u2014 in Objektfotos &uebernehmen; ' + thumbs + '</td><td class="src">Expos\u00e9</td></tr>';
     }
-    host.innerHTML = addrHtml + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
+    /* v2217 · Marcel 14.10.2026: „Werden Abweichungen bei PDFs gemeldet?"
+       Gemessen: nein - applyMerged schrieb jeden angehakten Wert, auch über
+       einen anderen, schon eingetragenen. Jetzt steht je Zeile, was im Objekt
+       steht; weicht es ab, ist die Zeile markiert und NICHT vorgehakt. */
+    var abw = _qcMode ? {} : _abweichungen(keys);
+    var nAbw = Object.keys(abw).length;
+    var abwKopf = nAbw ? '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid #d9a441;background:rgba(217,164,65,.12);font-size:12.5px">'
+      + '<b>' + nAbw + (nAbw === 1 ? ' Wert weicht' : ' Werte weichen') + ' vom Objekt ab.</b> Diese Zeilen sind nicht vorgehakt — hak sie an, wenn das Dokument recht hat.</div>' : '';
+    host.innerHTML = addrHtml + abwKopf + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
       var it = _merged[id];
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
-      return '<tr><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '" checked></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:var(--wl-9a7f33, #9a7f33);font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
-    }).join('') + '</tbody></table>';
+      if (abw[id] !== undefined) valCell += '<div class="oabi-bisher" style="font-size:11.5px;color:#b5651d;margin-top:2px">im Objekt: ' + escH(abw[id]) + '</div>';
+      return '<tr' + (abw[id] !== undefined ? ' class="oabi-abw" style="background:rgba(217,164,65,.10)"' : '') + '><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '"' + (abw[id] !== undefined ? '' : ' checked') + '></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:var(--wl-9a7f33, #9a7f33);font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
+    }).join('') + '</tbody></table>'
+      + (_vergleich.length ? '<div class="oabi-vgl" style="margin-top:10px;padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.25);font-size:12.5px">'
+          + '<b>Ergebnis eines fremden Gutachtens — wird nicht übernommen.</b> DealPilot rechnet selbst; die Zahl dient dem Abgleich.'
+          + _vergleich.map(function (v) { return '<div style="margin-top:4px">' + escH(v.wort) + ': <b>' + escH(v.wert) + '</b>' + (v.eigen ? ' · DealPilot: ' + escH(v.eigen) : '') + ' <span class="src">(' + escH(v.quelle) + ')</span></div>'; }).join('')
+          + '</div>' : '');
     if (ab) ab.disabled = false;
     // Range-Toggle-Handler
     host.querySelectorAll('.oabi-spbtn').forEach(function (b) {
@@ -1961,7 +2047,7 @@
     var ov = document.createElement('div'); ov.className = 'oabi-ov'; ov.id = 'oabi-ov';
     ov.innerHTML =
       '<div class="oabi-modal">' +
-        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>Exposé &amp; Marktbericht importieren</h3></div>' +
+        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>PDFs einlesen — Exposé, Marktbericht, Dokumente</h3></div>' +
         '<div class="oabi-sub">Mehrere PDFs gleichzeitig anhängen — Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>' +
         '<div class="oabi-body">' +
           '<div class="oabi-drop" id="oabi-drop">📁 PDFs auswählen oder hierher ziehen<br><span style="font-size:11px;color:var(--muted,#7A7370)">mehrere Dateien möglich · max 100 MB je Datei</span>' +
@@ -1993,12 +2079,25 @@
       '<span class="nm">' + (f.status === 'ok' ? '✓ ' : f.status === 'err' ? '⚠ ' : '⏳ ') + escH(f.name) + '</span>' +
       '<select ' + (f.status === 'reading' ? 'disabled' : '') + '><option value="auto"' + (f.userType ? '' : ' selected') + '>Auto</option>' +
         '<option value="market"' + (f.userType === 'market' || (!f.userType && f.type === 'market') ? ' selected' : '') + '>Marktbericht</option>' +
-        '<option value="expose"' + (f.userType === 'expose' || (!f.userType && f.type === 'expose') ? ' selected' : '') + '>Exposé</option></select>' +
-      '<span class="oabi-st">' + (f.status === 'reading' ? 'lese …' : f.status === 'err' ? 'kein Text' : (f.type === 'market' ? 'Marktbericht' : 'Exposé')) + '</span>';
+        '<option value="expose"' + (f.userType === 'expose' || (!f.userType && f.type === 'expose') ? ' selected' : '') + '>Exposé</option>' +
+        (window.DokumentImport ? '<option value="dokument"' + (f.userType === 'dokument' || (!f.userType && f.type === 'dokument') ? ' selected' : '') + '>' + (f.dokLabel ? escH(f.dokLabel) : 'Dokument (Grundbuch, Vertrag, Gutachten …)') + '</option>' : '') + '</select>' +
+      '<span class="oabi-st">' + (f.status === 'reading' ? 'lese …' : f.status === 'err' ? 'kein Text' : (f.type === 'market' ? 'Marktbericht' : f.type === 'dokument' ? escH(f.dokLabel || 'Dokument') : 'Exposé')) + '</span>';
     var sel = f.row.querySelector('select');
     if (sel) sel.addEventListener('change', function () { onTypeChange(f, sel.value); });
   }
   // Typklassifizierung: 'market' | 'expose' | 'unknown' (Stichwort-Vorfilter, Rest entscheidet der Inhalt)
+  /* v2218h · amtliche Dokumente erkennen: nur EINDEUTIGE Begriffe, und nie in
+     einem eigenen DealPilot-Bericht (der nennt Bodenrichtwert, Restnutzungsdauer
+     und Paragraphen ebenfalls). Was hier nicht sicher ist, geht den alten Weg. */
+  var DOK_LEIT = ['Bestandsverzeichnis', 'Abteilung III', 'Liegenschaftskataster', 'Auflassung', 'UR-Nr',
+    'Eigentümerversammlung', 'Eigentuemerversammlung', 'Verkehrswertgutachten', 'Restnutzungsdauergutachten',
+    'Gutachten zur Restnutzungsdauer', 'Nutzungsdauergutachten', 'Punktrastermethode', 'Kaufpreisaufteilung',
+    'Grundstücksmarktbericht', 'Bodenrichtwertauskunft'];
+  function istDokument(text) {
+    var t = String(text || '');
+    if (/dealpilot/i.test(t)) return false;
+    return DOK_LEIT.some(function (w) { return t.indexOf(w) >= 0; });
+  }
   function classifyType(file, text) {
     var fn = (file && file.name || '').toLowerCase();
     if (/markt|verkehrswert|pricehubble|sprengnetter|gutachten|\bavm\b|bewertung|wertermittlung/.test(fn)) return 'market';
@@ -2020,7 +2119,12 @@
   // Typ auflösen: bei klarem Befund direkt; bei 'unknown' erst Marktbericht versuchen und per Inhalt bestätigen, sonst Exposé.
   async function resolveType(f) {
     if (f.userType) { f.type = f.userType; await ensureExtract(f); return; }
-    var cls = classifyType({ name: f.name }, f.text);
+    if (window.DokumentImport && istDokument(f.text)) {
+      f.type = 'dokument'; await ensureExtract(f);
+      if (f.cache.dokument && f.cache.dokument.success) return;
+      delete f.cache.dokument;        /* unklar → der alte Weg */
+    }
+    var cls = classifyType({ name: f.name }, String(f.text || '').slice(0, 12000));   /* Einordnung wie bisher auf dem Anfang */
     if (cls === 'market' || cls === 'expose') { f.type = cls; await ensureExtract(f); return; }
     setStatus(f, 'Typ prüfen…');
     f.type = 'market'; await ensureExtract(f);
@@ -2030,7 +2134,13 @@
   async function ensureExtract(f) {
     if (f.cache[f.type]) return;
     f.status = 'reading'; renderFileRow(f);
-    try { f.cache[f.type] = await callExtract(f.text, f.type === 'market'); f.status = 'ok'; }
+    try {
+      if (f.type === 'dokument') {
+        var _a = await window.DokumentImport.lesenText(f.text, f.name);
+        f.cache.dokument = _a; f.status = (_a && _a.success) ? 'ok' : 'err';
+        if (_a && _a.success) f.dokLabel = _a.label || 'Dokument';
+      } else { f.cache[f.type] = await callExtract(f.text, f.type === 'market'); f.status = 'ok'; }
+    }
     catch (e) { f.status = 'err'; }
     renderFileRow(f);
   }

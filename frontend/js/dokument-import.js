@@ -63,7 +63,12 @@
 
   /* ── Bedienung ──────────────────────────────────────────────────── */
 
-  async function oeffnen() {
+  /* v2217 · Rueckruf fuer die Kette der Datenaufnahme (object-actions.js
+     runSelected): sie wartet, bis dieses Fenster zu ist. */
+  var _beiSchluss = null;
+
+  async function oeffnen(opts) {
+    _beiSchluss = (opts && typeof opts.beiSchluss === 'function') ? opts.beiSchluss : null;
     var wrap = document.getElementById('dpdi-modal');
     if (wrap) { wrap.remove(); }
     wrap = document.createElement('div');
@@ -99,6 +104,91 @@
   function schliessen() {
     var w = document.getElementById('dpdi-modal');
     if (w) w.remove();
+    var cb = _beiSchluss; _beiSchluss = null;
+    if (cb) { try { cb(); } catch (e) {} }
+  }
+
+  /* ── v2217 · ABGLEICH UND UEBERNAHME ─────────────────────────────────
+     Marcel 14.10.2026: „Werden Abweichungen bei PDFs gemeldet?" Gemessen:
+     dieser Import las aus, zeigte die Rohschluessel (kaufpreis_eur …) und
+     konnte NICHTS uebernehmen - es gab weder Abgleich noch Knopf.
+     Jetzt: jedes Feld, das es im Objekt gibt, steht mit „im Dokument" und
+     „im Objekt" nebeneinander. Leer → vorgehakt. Gleich → nichts zu tun.
+     Abweichend → markiert und NICHT vorgehakt; still ueberschrieben wird
+     nie. Die Ergebnisse fremder Gutachten (VERGLEICHSFELDER) bleiben, wie
+     sie waren, ein Vergleich. */
+  var ZIEL = {
+    kaufpreis_eur: ['kp', 'Kaufpreis', 'eur'], kaufpreis: ['kp', 'Kaufpreis', 'eur'],
+    wohnflaeche_m2: ['wfl', 'Wohnfläche', 'm2'], wohnflaeche: ['wfl', 'Wohnfläche', 'm2'],
+    baujahr: ['baujahr', 'Baujahr', 'jahr'],
+    bgf_m2: ['bgf', 'Bruttogrundfläche', 'm2'],
+    grundstuecksflaeche_m2: ['gsfl', 'Grundstücksfläche', 'm2'],
+    brw_eur_m2: ['brw', 'Bodenrichtwert', 'eurm2'], bodenrichtwert_eur_m2: ['brw', 'Bodenrichtwert', 'eurm2'], bodenrichtwert: ['brw', 'Bodenrichtwert', 'eurm2'],
+    grunderwerbsteuer_pct: ['gest_p', 'Grunderwerbsteuer', 'pct'],
+    kaufdatum: ['kaufdat', 'Kaufdatum', 'datum'],
+    gemarkung: ['gemarkung', 'Gemarkung', 'text'], flur: ['flur', 'Flur', 'text'], flurstueck: ['flurstueck', 'Flurstück', 'text']
+  };
+  /* Klartext statt Schluessel fuer die uebrigen Angaben */
+  var NAMEN = {
+    notar: 'Notar', ur_nr: 'Urkundennummer', nebenkosten_eur: 'Nebenkosten', verkaeufer_anzahl: 'Verkäufer (Anzahl)', kaeufer_anzahl: 'Käufer (Anzahl)',
+    reparaturbedarf_eur: 'Reparaturbedarf', hausgeld_monatlich_eur: 'Hausgeld je Monat', instandhaltungsruecklage_eur: 'Instandhaltungsrücklage',
+    gnd_jahre: 'Gesamtnutzungsdauer', gesamtnutzungsdauer_jahre: 'Gesamtnutzungsdauer', modernisierungspunkte: 'Modernisierungspunkte',
+    liegenschaftszinssatz_pct: 'Liegenschaftszinssatz', sachwertfaktor: 'Sachwertfaktor', stichtag: 'Stichtag', bewertungsstichtag: 'Bewertungsstichtag',
+    amtsgericht: 'Amtsgericht', blatt_nr: 'Blatt', grundschulden_gesamt_eur: 'Grundschulden gesamt', nutzung: 'Nutzung', nutzungsart: 'Nutzungsart',
+    zone_nr: 'Bodenrichtwertzone', versammlungsdatum: 'Versammlung am', verwalter: 'Verwalter', berichtsjahr: 'Berichtsjahr', gutachterausschuss: 'Gutachterausschuss'
+  };
+  function _flach(ext) {
+    var o = {};
+    Object.keys(ext || {}).forEach(function (k) {
+      var v = ext[k];
+      if (v && typeof v === 'object' && !Array.isArray(v)) Object.keys(v).forEach(function (k2) { if (o[k2] === undefined) o[k2] = v[k2]; });
+      else o[k] = v;
+    });
+    return o;
+  }
+  function _datumIso(v) {
+    var m = String(v || '').match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+    if (m) return m[3] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2);
+    return /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')) ? String(v) : null;
+  }
+  function _schreibwert(v, art) {
+    if (art === 'datum') return _datumIso(v);
+    if (art === 'text') return String(v).trim();
+    var n = _zahl(v); if (n === null) return null;
+    if (art === 'jahr') return String(Math.round(n));
+    return (n % 1 === 0) ? String(n) : String(n).replace('.', ',');
+  }
+  function _gleich(ist, neu, art) {
+    if (art === 'text' || art === 'datum') return String(ist).trim().toLowerCase() === String(neu).trim().toLowerCase();
+    var a = (typeof parseDe === 'function') ? parseDe(ist) : parseFloat(ist), b = (typeof parseDe === 'function') ? parseDe(neu) : parseFloat(neu);
+    return Math.abs(a - b) < 0.005;
+  }
+  function _abgleich(ext) {
+    var f = _flach(ext), zeilen = [], gesehen = {};
+    Object.keys(ZIEL).forEach(function (k) {
+      if (f[k] === undefined || f[k] === null || f[k] === '') return;
+      var z = ZIEL[k]; if (gesehen[z[0]]) return;
+      var el = document.getElementById(z[0]); if (!el) return;
+      var neu = _schreibwert(f[k], z[2]); if (neu === null || neu === '') return;
+      gesehen[z[0]] = 1;
+      var ist = String(el.value || '').trim();
+      var status = ist === '' ? 'neu' : (_gleich(ist, neu, z[2]) ? 'gleich' : 'abweichung');
+      zeilen.push({ feld: z[0], wort: z[1], neu: neu, anzeige: (z[2] === 'jahr' ? String(Math.round(_zahl(f[k]))) : typeof f[k] === 'number' ? _fmt(f[k]) : String(f[k])),   /* Baujahr nie „1.967" */ ist: ist, status: status });
+    });
+    return zeilen;
+  }
+  function _uebernehmen(zeilen) {
+    var n = 0;
+    zeilen.forEach(function (z) {
+      var cb = document.querySelector('#dpdi-abgleich input[data-feld="' + z.feld + '"]');
+      if (!cb || !cb.checked) return;
+      var el = document.getElementById(z.feld); if (!el) return;
+      el.value = z.neu;
+      try { el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+      n++;
+    });
+    try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
+    return n;
   }
 
   function _status(text, art) {
@@ -178,13 +268,31 @@
       var v = ext[k];
       if (v === null || v === undefined || v === '') return;
       var text;
+      if (typeof v === 'object' && !Array.isArray(v)) {
+        /* v2217 · statt Rohtext {"veraltet_pct":null,…}: je Unterfeld eine
+           Zeile, leere fallen weg, Felder aus dem Abgleich auch */
+        Object.keys(v).forEach(function (k2) {
+          var v2 = v[k2];
+          if (v2 === null || v2 === undefined || v2 === '' || typeof v2 === 'object' || ZIEL[k2]) return;
+          zeilen.push('<tr><td>' + _esc(NAMEN[k2] || k2.replace(/_/g, ' ')) + '</td><td class="num">' + _esc(typeof v2 === 'number' ? _fmt(v2) : String(v2)) + '</td></tr>');
+        });
+        return;
+      }
       if (typeof v === 'object') {
-        text = Array.isArray(v) ? (v.length + ' Eintraege') : JSON.stringify(v);
+        text = v.length + ' Einträge';
       } else {
         text = (typeof v === 'number') ? _fmt(v) : String(v);
       }
-      var zeile = '<tr><td>' + _esc(VERGLEICHSFELDER[k] || k) + '</td>'
-                + '<td class="num">' + _esc(text) + '</td></tr>';
+      if (ZIEL[k] && !VERGLEICHSFELDER[k]) return;   /* v2217: steht im Abgleich */
+      var eigen = '';
+      /* v2217 · der Vergleich braucht die zweite Zahl: was DealPilot selbst
+         rechnet (Anlage 2, im Objekt unter _rnd). Ohne sie ist er keiner. */
+      if (k === 'rnd_jahre') {
+        var r = (window._currentObjData || {})._rnd;
+        if (r && _zahl(r.rnd_jahre) !== null) eigen = 'DealPilot: ' + _fmt(Math.round(_zahl(r.rnd_jahre) * 10) / 10) + ' Jahre' + (r.gnd_jahre ? ' (GND ' + r.gnd_jahre + ')' : '');
+      }
+      var zeile = '<tr><td>' + _esc(VERGLEICHSFELDER[k] || NAMEN[k] || k.replace(/_/g, ' ')) + '</td>'
+                + '<td class="num">' + _esc(text) + '</td>' + (VERGLEICHSFELDER[k] ? '<td class="num" style="color:#7A7370">' + _esc(eigen) + '</td>' : '') + '</tr>';
       if (VERGLEICHSFELDER[k]) vergleich.push(zeile); else zeilen.push(zeile);
     });
 
@@ -205,8 +313,27 @@
             + '</div>';
     }
 
+    var abg = _abgleich(ext);
+    if (abg.length) {
+      var nAbw = abg.filter(function (z) { return z.status === 'abweichung'; }).length;
+      var objekt = window._currentObjKey ? 'diesem Objekt' : 'dem offenen Formular';
+      html += '<h3 class="dpdi-h3">Abgleich mit ' + objekt + '</h3>'
+        + (nAbw ? '<div class="dpdi-warn"><strong>' + nAbw + (nAbw === 1 ? ' Angabe weicht' : ' Angaben weichen') + ' vom Objekt ab.</strong> '
+            + 'Sie sind nicht vorgehakt — hak sie an, wenn das Dokument recht hat.</div>' : '')
+        + '<table class="dpdi-table" id="dpdi-abgleich"><tr><th></th><th>Feld</th><th>im Dokument</th><th>im Objekt</th></tr>'
+        + abg.map(function (z) {
+            var farbe = z.status === 'abweichung' ? ' style="background:rgba(217,164,65,.14)"' : '';
+            var stat = z.status === 'gleich' ? '<span style="color:#3FA56C">gleich</span>' : z.status === 'neu' ? '<span style="color:#7A7370">leer</span>' : '<b style="color:#b5651d">' + _esc(z.ist) + '</b>';
+            return '<tr' + farbe + '><td><input type="checkbox" data-feld="' + _esc(z.feld) + '"' + (z.status === 'neu' ? ' checked' : '') + (z.status === 'gleich' ? ' disabled' : '') + '></td>'
+              + '<td>' + _esc(z.wort) + '</td><td class="num">' + _esc(z.anzeige) + '</td><td class="num">' + stat + '</td></tr>';
+          }).join('') + '</table>'
+        + (abg.some(function (z) { return z.status !== 'gleich'; })
+            ? '<div class="dpdi-actions" style="margin-top:8px"><button type="button" class="dpdi-btn" id="dpdi-uebernehmen">Ausgewählte übernehmen</button></div>'
+            : '<p class="dpdi-hinweis">Alles, was im Objekt schon steht, stimmt mit dem Dokument überein.</p>');
+    }
+
     if (zeilen.length) {
-      html += '<h3 class="dpdi-h3">Gelesene Angaben</h3>'
+      html += '<h3 class="dpdi-h3">Weitere gelesene Angaben</h3>'
             + '<table class="dpdi-table">' + zeilen.join('') + '</table>';
     }
 
@@ -226,6 +353,12 @@
     res.hidden = false;
     res.innerHTML = html;
 
+    var ub = document.getElementById('dpdi-uebernehmen');
+    if (ub) ub.addEventListener('click', function () {
+      var n = _uebernehmen(abg);
+      ub.disabled = true; ub.textContent = n ? ('✓ ' + n + ' übernommen') : 'Nichts ausgewählt';
+      try { if (typeof toast === 'function') toast('✓ ' + n + ' Angaben aus ' + (a.label || 'dem Dokument') + ' übernommen'); } catch (e) {}
+    });
     var b = document.getElementById('dpdi-json');
     if (b) b.addEventListener('click', function () {
       var o = document.getElementById('dpdi-json-out');
@@ -233,10 +366,38 @@
     });
   }
 
+  /* v2218h · Marcel 14.10.2026: „das neue Dokumenten-Einlesen sollten wir
+     herausnehmen und mit über PDF/Marktbericht-Import integrieren." Der Import
+     in object-actions.js ruft dieselbe Auslese und denselben Abgleich - ohne
+     dieses Fenster. Eine Auslese, ein Abgleich, zwei Eingänge. */
+  async function lesenText(text, dateiname, typ) {
+    return await Auth.apiCall('/ai/extract-dokument', {
+      method: 'POST',
+      body: { text: String(text || '').slice(0, 15000), dateiname: dateiname || '', typ: typ || undefined }
+    });
+  }
+  function vergleich(ext) {
+    var aus = [];
+    Object.keys(VERGLEICHSFELDER).forEach(function (k) {
+      var v = (ext || {})[k];
+      if (v === null || v === undefined || v === '') return;
+      var eigen = '';
+      if (k === 'rnd_jahre') {
+        var r = (window._currentObjData || {})._rnd;
+        if (r && _zahl(r.rnd_jahre) !== null) eigen = _fmt(Math.round(_zahl(r.rnd_jahre) * 10) / 10) + ' Jahre' + (r.gnd_jahre ? ' (GND ' + r.gnd_jahre + ')' : '');
+      }
+      aus.push({ feld: k, wort: VERGLEICHSFELDER[k], wert: (typeof v === 'number' ? _fmt(v) : String(v)), eigen: eigen });
+    });
+    return aus;
+  }
+
   window.DokumentImport = {
     oeffnen: oeffnen,
     schliessen: schliessen,
-    letztes: function () { return _letzter; }
+    letztes: function () { return _letzter; },
+    lesenText: lesenText,
+    abgleich: _abgleich,
+    vergleich: vergleich
   };
 
 })();

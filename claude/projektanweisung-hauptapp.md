@@ -38761,6 +38761,108 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2218g–v2219c · Staging · Geführte Eingabe randlos, Dokumente im PDF-Import, Sprache direkt, Sprechkatalog, Soll-Ansicht überschrieb das Ist, Messe-Drehbuch (14.10.2026)
+- **Was:** Marcels achte Runde (N71).
+  - **v2218g:** Geführte Eingabe am Handy randlos über `100dvh`. Gemessen: Fenster vorher 352×686, Verlauf 168 → 242 px.
+  - **v2218h/i, Dokumente im PDF-Import:**
+    - Die Kachel „Dokumente“ ist entfernt. „Exposé / Marktbericht“ erkennt jetzt auch amtliche Dokumente (Leitbegriffe, nie in DealPilot-Berichten) und liest sie mit `DokumentImport.lesenText`.
+    - Die Werte laufen in dieselbe Tabelle mit „im Objekt“. Gutachten-Ergebnisse stehen als Vergleich darunter.
+    - Gemessen: Der Import kürzte den Text vor der Erkennung auf 12.000 Zeichen, „Punktrastermethode“ stand dahinter. Jetzt wird auf dem vollen Text erkannt und erst beim Senden gekürzt.
+  - **Sprache:** Das Wahlfenster „frei / geführt“ entfällt, es geht direkt ins Freisprechen. `_startkarte()` hat damit keinen Aufrufer mehr.
+  - **Sprechkatalog:** 259 von 267 Formularfeldern waren drin. Ergänzt sind die Kaufnebenkosten in Euro (5), die Darlehensschalter (3), „EK = Nebenkosten“ und „Wert inkl. Erbbaurecht“. Das Backend kappte still bei `MAX_CATALOG = 250` bei rund 240 Einträgen; jetzt 320 mit Log.
+  - **v2219a · ECHTER DATENFEHLER:**
+    - Die Ansicht „Soll · Ankauf-Stand“ konnte das Ist überschreiben. `saveObj` prüfte die Sperre beim Aufruf, las das Formular aber erst nach `await _checkObjIdConflict`. Der „erst sichern“-Save des Umschalters und kurz vorher gestartete Auto-Saves schrieben so den Ankauf als Ist.
+    - Ausgelöst durch mein Drehbuch an der Parkstraße (NKM 3.195 → 2.321, DSCR 1,23 → 0,90, 09:43). **Auf Prod im selben Code vorhanden.**
+    - Behoben: In `saveObj` gilt die Sperre nach dem await erneut (nur der markierte Save `_vorAnkauf` darf durch). Der Umschalter wartet auf diesen Save und lädt erst danach den Ankauf (`ankaufLaden`).
+    - Parkstraße wiederhergestellt aus dem Ableitungs-Skript von heute früh: Einheit „1. OG links“ vermietet 874 €, Maßnahme und 45.000 € Kosten, NKM 3.195, Erhaltungsaufwand 2025 46.200. Vorher gesichert: `/root/backups/parkstr-objekt-0945.json`.
+  - **v2219–v2219c · Messe-Drehbuch** `messe-drehbuch.js`:
+    - `?messe=parkstrasse[&schleife]`, fünf Szenen plus Titel- und Schlusskarte, rund 45 s.
+    - Jede Zahl wird live gelesen (Ankauf-Stand, Abweichung, Steuerverlauf). Der Lichtkegel folgt seinem Ziel per Selektor bzw. Suchfunktion, weil Umschalter und Steuerverlauf sich neu bauen.
+- **Nachweis:**
+  - Echter Upload Westerfeld-RND über den PDF-Import: automatisch „Restnutzungsdauergutachten“, Baujahr in der Tabelle, „RND laut Gutachten 16 · DealPilot 23,6 Jahre“.
+  - Gegenprobe Soll-Ansicht (Reiterwechsel direkt vor „Soll“, zwei Wechsel darin): 1 PUT mit NKM 3.195, keiner während Soll, DB unverändert.
+  - Drehbuch dreimal komplett gelaufen: Zahlen 2.321 € / 1 leer / DSCR 0,90 → 3.195 € → DSCR 0,90→1,23, CF −6.193→775, Score 49→59 → Erstattung 16.329 €. Kegel 1296×51, 293×51, 293×51, 996×163, Balken 2025. DB danach NKM 3.195 / DSCR 1,23.
+- **Rest:**
+  - **Prod-Rollout von v2219a ist dringend.** Dort kann jeder Klick auf „Soll“ das Ist eines Objekts mit Unterschied überschreiben.
+  - Freisprechen-Start nur im Code geprüft (Mikrofon-Freigabe).
+  - Weitere Drehbücher (Westerfeld, Quick-Check, Steuer …) nach Marcels Abnahme des ersten.
+
+### v2218a–v2218f · Staging · Handy-Menü, Pilot erst nach Anmeldung, Mikrofon neben Senden, Atlas am Handy (14.10.2026)
+- **Was:** Marcels siebte Runde (N70).
+  - **Pilot-Analyse Parkstraße neu abgerufen** (Stand 14.10., 09:08, gespeichert). Sie sagt weiter „Nicht kaufen“: Sie rechnet gegen den Marktbericht vom 08.10. mit 482.000 € Marktwert bei 780.000 € Kaufpreis. Die Analyse vom Ankauf bleibt im Ankauf-Stand eingefroren.
+  - **Menü am Handy (v2218b):** In der Aktenmappe klappt eine Aktion das Register zu wie am Schreibtisch, `layout-varianten.css:7009` setzt das zugeklappte Register auf `pointer-events:none`. Es blieb sichtbar, war aber nicht mehr klickbar: `elementFromPoint` traf `aside.sidebar`. `registerOffenHalten()` hört jetzt auf die Klasse.
+  - **Pilot erst nach der Anmeldung (v2218b):** kein Pilot und kein F1, solange `#auth-modal` offen ist oder keine Sitzung besteht.
+  - **Mikrofon wie bei WhatsApp (v2218b/c):** Am Handy ist der Kasten „Halte gedrückt …“ ausgeblendet. Ein runder Halte-Knopf `#vi-rf-ptt` sitzt neben dem Senden-Pfeil, das Eingabefeld wächst von 134 auf 191 px, der Platzhalter sagt „Ich höre dich …“.
+  - **Atlas am Handy (v2218a/d/e/f):**
+    - Gesamtnetz: Linien untereinander, Stationen je Linie wischbar (`--dpm-schiene`).
+    - Karten sind ohne Animation sichtbar. In der Messkabine „Standbild“ blieben sie vorher bei opacity 0.
+    - Wer den Atlas mit Ziel öffnet, verlässt den Modus jetzt zuerst. Vorher nahm der Reiter-Beobachter dem Ziel die Markierung, die Seitenleiste blieb leer, und ein gemerkter Titel überschrieb den richtigen.
+    - Sprechlauf und Beispielflug laufen nicht mehr über (`1fr` → `minmax(0,1fr)`).
+    - Eingebettete Seiten ohne Demo-Kopf und mit Bustern. `basis.css` kam vorher alt aus dem Cache.
+- **Nachweis (Messkabine 390, echte Treffer per `elementFromPoint`):**
+  - Menü: 4 Aktionen nacheinander, jede getroffen.
+  - Pilot: bei Anmeldefenster `display:none`, F1 ohne Wirkung, danach wieder da.
+  - Geführte Eingabe: Kasten `none`, Eingabe 191 / Pfeil 44 / Mikro 44, kein Überlauf.
+  - Atlas: Gesamtnetz Karten opacity 1. Ziel Quick-Check zeigt Titel und Seitenleiste mit Erweiterung. Unterkarte 345/362, Flug 337/354, Zusammenspiel 337/354.
+  - `buster-ebenen` SAUBER.
+- **Rest:**
+  - Halten und Aufnehmen auf einem echten Handy abnehmen. In der Messkabine würde das Mikrofon eine Berechtigung anfragen.
+  - Der Parkstraße fehlt ein aktueller Marktbericht. Mit 482.000 € bleibt jede Analyse bei „Nicht kaufen“ (kostet ein Kontingent, Marcels Entscheidung).
+  - `buster-ebenen-pruefen` kennt die Seiten unter `frontend/atlas/` nicht.
+
+### v2217–v2218 · Staging · Soll/Ist mit Ankauf-Analyse, Dokumente mit Abgleich, Bot Soll/Ist, Gesamt-Atlas in der App (14.10.2026)
+- **Was:** Marcels Auftrag (N69): Pilot-Analyse für den Soll-Stand, Reiter Soll/Ist und Marktbericht nur, wenn es etwas gibt, Datenbank Ankauf/Bestand, Prozess nach dem Quick-Check, Abweichungen bei PDFs, Telegram-Bot und Atlas.
+  - **v2217** `cc6809e8`:
+    - Soll/Ist-Reiter nur im Bestand. Neue Karte „Pilot-Analyse: Ankauf gegen heute“ (Stand, Empfehlung, empfohlener Kaufpreis, Begründung, Gesamtbewertung).
+      - Gemessen: alle 11 Ankauf-Stände auf Staging trugen die Analyse vom Festschreiben schon in `_ankauf.daten._ai`, gezeigt wurde sie nirgends.
+      - `ankauf.js` schreibt seitdem die gerade geltende Analyse fest (`_aiText`).
+    - Marktbericht-Reiter ab dem ERSTEN Bericht, vorher ab dem zweiten.
+    - Datenaufnahme: Kachel „Dokumente“ (neun Arten), nicht unter dem Riegel, in der Kette.
+    - Exposé-Import: Spalte „im Objekt“, abweichende Zeilen sind nicht vorgehakt.
+    - Dokument-Import: Abgleich je Feld (leer/gleich/abweichend) und Übernahme. Vorher konnte er nichts übernehmen und zeigte Rohschlüssel.
+    - Bot: Werkzeug `soll_ist_lesen`, Regel 7m, Hilfetext. Atlas: Ablauf „Telegram-Bot“ (8 Stationen), DSCR als Eingang beider Scores.
+  - **v2217a** `069da796`, zwei echte Fehler im Bot:
+    - Eine erfundene UUID schlug die genannte Adresse („kein Objekt“ zur Parkstraße).
+    - `tilgung_eur_jahr` fiel durch `/_eur$/`, deshalb addierte das Modell selbst: 58.334/59.334/63.334/64.334 statt 57.316.
+  - **v2217b** `c420369f`:
+    - Soll/Ist-Reiter fehlte nach dem Laden: `storage.js` zeichnet die Analyse (Z. 765) vor `_deal_won_state` (Z. 789). Maßgeblich ist jetzt der Datensatz.
+    - Dokument-Import: Baujahr ohne Tausenderpunkt, eigene RND neben der des Gutachtens.
+  - **v2217c** `1ea4d960`: Geführte Eingabe nicht mehr unter dem Riegel (sie fragt nur Lücken und überschreibt nie). Reihe gesperrt-vor-frei. Abweichungsvergleich toleriert Schreibweisen.
+  - **v2217d** `20914fa4`: „Dokumente“ als Symbol mit Tooltip. Mit Beschriftung rutschte „Abrufen“ in eine zweite Zeile (Befund v2189).
+  - **v2218** `91b7e2c5`, Gesamt-Atlas in der App (Marcel: „so wie es in der Demo ist, ist es super“):
+    - Sprechlauf und Dokument-Import sind Abläufe in `prozess-atlas.js`.
+    - Neues Modul `prozess-atlas-gesamt.js`: `oeffne()` ohne Ziel führt ins Gesamtnetz, mit Ziel wie bisher.
+    - Unterkarten unter `frontend/atlas/`. Beispielflug Parkstraße statt „Flug 2026-1056“, weil Kunden das Demo-Objekt nicht haben.
+- **Nachweis:**
+  - Bot im Container (ohne Telegram-Nachricht): `pruef-soll-ist` 3/3 mit richtigen Zahlen, `pruef-agent` 5/5, `pruef-zahlen` 12/12 (vorher 8/12), `pruef-pilot-analyse` 17/17.
+  - Echter Upload Westerfeldstr. 140 RND-Gutachten über die Kachel „Dokumente“: Baujahr „gleich“, RND 16 J als Vergleich, Kette läuft nach dem Schließen weiter.
+  - Echter Upload Verkehrswertgutachten Hüllhorst über den Exposé-Weg in 2026-001: Abweichungen Baujahr 1968/1962 und Marktwert 304.000/204.000 nicht vorgehakt. Zwei Fehlalarme (Schreibweisen) behoben und per Node nachgeprüft. Nichts übernommen.
+  - `prozess-atlas-pruefen` 10 Abläufe, 67/67 Belege. `gold-audit` RC=0. `buster-ebenen` SAUBER.
+  - Atlas im Browser: Gesamtnetz 10 Bahnen, Kaufpreis-Spur 8 Treffer, Zoom → Telegram, Unterkarte Sprechlauf, Zusammenspiel 22 Knoten, Beispielflug 7 Kapitel.
+- **Rest:**
+  - Die Pilot-Analyse der Parkstraße stammt von vor der NKM-Korrektur (DSCR 0,30, LTV 131 %) und gehört neu abgerufen; das kostet ein Kontingent und ist Marcels Entscheidung.
+  - Gesamt-Atlas am Handy nicht gemessen.
+  - Der Marktbericht-Reiter mit genau einem Bericht ist nur über den Code geprüft.
+  - Prod für v2217–v2218 nicht freigegeben (Rebuild backend nötig).
+
+### Prod-Rollout (18) · v2208–v2216k auf Produktion (14.10.2026)
+- **Was:** Freigabe Marcel („ja prod rollout freigegeben"). Zweig `prod-rollout-18` neu gebaut (`origin/main` + Merge `origin/staging`), Baum gleich Staging. Push nach `main` → `471bd747`, auf Prod `git pull` und Rebuild `backend` + `mb-backend`.
+- **Commit:** `471bd747`
+- **Nachweis:**
+  - Sicherung vorher: `/root/backups/haupt-20261014-0817.sql.gz` (11 MB, 71 Tabellen) und `mb-20261014-0817.sql.gz` (25 MB, 32 Tabellen), Kopf gelesen.
+  - Backend `healthy`, „No new migrations", mb-backend `listening on :4000`. `schwaerzen.js` liegt im Image.
+  - Live geprüft: `pilot-tower.js` trägt `auswahlText`, `index.html` `v2216k`, `storage.js` `_tax_overrides` (v2214). `/api/v1/auth/me` ohne Token gibt 401, `forschung.html` 200.
+- **Rest:** Abnahme im Browser auf Prod (Steuer-Jahreswerte eines Objekts nach dem Neuladen) steht aus.
+
+### Gesamt-Atlas · Demo (14.10.2026)
+- **Was:** Marcels Wahl: „so starten wie der Atlas jetzt startet, nur mit allem drauf, dann der gesamte Ablauf". `design/Vorschläge/prozessatlas/atlas-gesamt.html` lädt den **echten** `prozess-atlas.js` und `pilot-figur.js` und setzt drauf:
+  - Gesamtnetz als Start (Kartenoptik des Atlas, 9 Abläufe in drei Phasen, Kapitän, Datum-Suche).
+  - Zoom in den Einzelablauf. Sprechlauf und Dokument-Import sind als echte Reiter eingehängt.
+  - In der Seitenleiste: „Was du davon hast", Daten-Spur je Chip, Unterkarten (Demos 2/3/6 als Fenster).
+  - Reiter Zusammenspiel und Flug 2026-1056, dazu der Knopf **Gesamtflug** (rund 3 Minuten, für die Messe).
+- **Nachweis:** Lokal geklickt: Kaufpreis-Spur 7 Treffer, Zoom → Sprechlauf mit Nutzen und Unterkarte, Chip-Spur, Zusammenspiel 21 Knoten, Flug 7 Kapitel, Gesamtflug bis in die Sprechlauf-Unterkarte.
+- **Rest:** Am Handy nicht gemessen. Beim Doppelklick (file://) scrollt der Flug-Teil des Gesamtflugs nicht von selbst (Chrome sperrt den iframe-Zugriff). Übernahme ins Programm erst nach Marcels Abnahme.
+
 ### v2216j–v2216k · Staging · Soll/Ist nur im Pilot, F1 auf Auswahlfeldern, Prozessatlas-Demos (14.10.2026)
 - **Was:** Marcels fünfte Runde (N68).
   - **v2216j** `8a17d8b1`:

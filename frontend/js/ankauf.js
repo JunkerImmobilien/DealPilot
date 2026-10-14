@@ -187,6 +187,10 @@
        vermietet wurde, war damit auch im Plan vermietet („Leere Einheiten
        0 -> 0" statt 1 -> 0). Ein Maßstab, der sich mitbewegt, ist keiner. */
     try { kopie = JSON.parse(JSON.stringify(kopie)); } catch (e) {}
+    /* v2217 · die Pilot-Analyse gehoert zum Soll. collectData() traegt `_ai`
+       vom LADEN des Objekts; eine danach abgerufene Analyse steht nur in
+       window._aiText. Festgeschrieben wird die, die gerade gilt. */
+    if (typeof window._aiText === 'string' && window._aiText) kopie._ai = window._aiText;
     return kopie;
   }
 

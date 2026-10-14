@@ -888,6 +888,19 @@ async function saveObj(opts) {
     _newObjSaveInflight = false;
     return;
   }
+  /* v2219 · DIE SPERRE MUSS NACH DEM AWAIT NOCH GELTEN. GEMESSEN 14.10.2026 an
+     der Parkstraße (2026-1056): die Ansicht „Soll · Ankauf-Stand" lädt den
+     eingefrorenen Datensatz ins Formular; ankauf-ansicht.js prüft die Sperre
+     aber nur beim AUFRUF von saveObj. Ein Save, der kurz vorher begann (und
+     der „erst sichern"-Save des Umschalters selbst), wartete oben auf
+     _checkObjIdConflict - und las danach hier das Formular mit dem ANKAUF.
+     Ergebnis: Ist überschrieben (NKM 3.195 -> 2.321, DSCR 1,23 -> 0,90).
+     Nur der ausdrücklich vor dem Umschalten angestoßene Save darf durch. */
+  if (!(opts && opts._vorAnkauf) && window.DealPilotAnkaufAnsicht && typeof DealPilotAnkaufAnsicht.aktiv === 'function' && DealPilotAnkaufAnsicht.aktiv()) {
+    try { console.warn('[storage] saveObj: Ankauf-Ansicht wurde während des Speicherns aktiv -> abgebrochen (v2219)'); } catch (e) {}
+    _newObjSaveInflight = false;
+    return;
+  }
   if (typeof updHeader === 'function') updHeader();
 
   var data = collectData();

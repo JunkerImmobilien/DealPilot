@@ -181,6 +181,12 @@
       '.oabi-ov.vi-mode{--vi-surface:#0a0a0a;--vi-card:#151412;--vi-text:#FDFCFA;--vi-muted:#A89F8E;--vi-line:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);--vi-track:#1c1a16;--vi-accent:var(--wl-c9a84c, #C9A84C);--vi-donebd:rgba(63,165,108,.7);--vi-donebg:rgba(63,165,108,.14);--vi-donetx:#c9f0d8}',
       'body[data-dp-skin="hell"] .oabi-ov.vi-mode{--vi-surface:#FDFCFA;--vi-card:#FFFFFF;--vi-text:#1e1a12;--vi-muted:#8a8272;--vi-line:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);--vi-track:#ECE4D2;--vi-accent:#9a7a24;--vi-donebd:rgba(63,165,108,.6);--vi-donebg:rgba(63,165,108,.14);--vi-donetx:#1c6b41}',
       '.oabi-ov.vi-mode .oabi-modal{background:var(--vi-surface)}',
+      /* v2218g · Marcel 14.10.2026: „die geführte Eingabe wird sehr klein dargestellt,
+         nimmt nicht den gesamten Bildschirm ein auf kleinen Displays." GEMESSEN 390 px:
+         Fenster 352 x 686 mit Rand, der Verlauf 168 px hoch. Am Handy jetzt randlos
+         über die ganze Höhe (dvh: die Adressleiste zählt nicht mit). */
+      '@media (max-width:640px){html body .oabi-ov.vi-mode{padding:0 !important;align-items:stretch !important;justify-content:stretch !important}'
+        + 'html body .oabi-ov.vi-mode .oabi-modal{width:100% !important;max-width:none !important;height:100vh !important;height:100dvh !important;max-height:none !important;margin:0 !important;border-radius:0 !important;border:0 !important}}',
 
       /* ═══ v1300c · Der freie Weg wird geteilt ═══════════════════════════
          Marcels Vorgabe: „wenn ich frei erzähle, dass wir dort dann auch
@@ -507,6 +513,22 @@
        kind 'bool' ist der Weg, den _wertSchreiben() in object-actions.js
        versteht: er setzt das Haekchen und feuert change, sonst bliebe die
        Rechenkette stehen. */
+    /* v2218h · Marcel 14.10.2026: „schauen, ob alle neuen Felder auch
+       reingesprochen werden können." GEMESSEN: 259 von 267 Formularfeldern im
+       Katalog; die echten Lücken waren die Kaufnebenkosten in EURO (nur die
+       Prozente standen in FIELDS) und die Schalter der Finanzierung. Die
+       Euro-Felder rechnen ihre Prozente selbst nach (syncCosts, oninput). */
+    [['makler_e', 'Maklerprovision in Euro'], ['notar_e', 'Notarkosten in Euro'], ['gba_e', 'Grundbuchkosten in Euro'],
+     ['gest_e', 'Grunderwerbsteuer in Euro'], ['ji_e', 'Sonstige Kaufnebenkosten in Euro (Gutachter, Anfahrt)']].forEach(function (x) {
+      if ($(x[0])) cat.push({ id: x[0], kind: 'num', label: x[1], hint: 'Nur, wenn ein Eurobetrag genannt wird - Prozentangaben gehören ins Prozentfeld.' });
+    });
+    [['d2_enable', 'Zweites Darlehen vorhanden', 'Setzen, wenn ein zweites Darlehen (z. B. KfW, Nachrang) genannt wird.'],
+     ['d1_anschl_enable', 'Eigene Anschlussfinanzierung für Darlehen 1', 'Nur, wenn ausdrücklich Konditionen für die Zeit nach der Zinsbindung genannt werden.'],
+     ['d2_anschl_enable', 'Eigene Anschlussfinanzierung für Darlehen 2', 'Nur, wenn ausdrücklich Konditionen für die Zeit nach der Zinsbindung von Darlehen 2 genannt werden.'],
+     ['ek_ist_nk', 'Eigenkapital deckt genau die Kaufnebenkosten', 'Setzen, wenn gesagt wird, das Eigenkapital entspreche den Nebenkosten.'],
+     ['erb_wert_ist_erb', 'Verkehrswert ist bereits der Wert mit Erbbaurecht', 'Nur bei Erbbaurecht, wenn der genannte Wert das Erbbaurecht schon berücksichtigt.']].forEach(function (x) {
+      if ($(x[0])) cat.push({ id: x[0], kind: 'bool', label: x[1], hint: x[2] });
+    });
     if ($("erbpacht")) cat.push({ id: 'erbpacht', kind: 'bool', label: 'Erbbaurecht / Erbpacht',
       hint: 'Das Grundstück gehört nicht mit, es wird gegen Erbbauzins überlassen. Nur setzen, wenn ausdrücklich von Erbbaurecht, Erbpacht oder Erbbauzins die Rede ist.' });
     return cat;
@@ -801,8 +823,14 @@
        Der geführte Weg selbst bleibt unverändert: derselbe Fragen-Ablauf,
        dieselben Regeln (tippen oder sprechen, „Weiss ich nicht" beendet
        eine Frage, „Fertig" springt zur Tabelle). */
+    /* v2218h · Marcel 14.10.2026: „Unter Sprache kommt noch ein Modal mit
+       Freisprechen und Geführt. Das haben wir so nicht mehr - der Schritt kann
+       raus, es wird direkt zum Freisprechen geführt." Die geführte Eingabe hat
+       seit v1742 eine eigene Kachel; die Wahl hier fragte zum zweiten Mal.
+       `_startkarte()` hat damit keinen Aufrufer mehr (grep, 14.10.2026) -
+       beim nächsten Anfassen der Datei entfernen. */
     if (opts && opts.gefuehrt) { _gefuehrt(OA); }
-    else { _startkarte(OA); }   /* v1275: erst die Wahl, dann die Aufnahme */
+    else { startRecording(); }
   }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -2410,6 +2438,7 @@
     var k = $('vi-rf-mikro'); if (k) { k.classList.remove('taub'); k.classList.remove('halt'); k.classList.remove('haelt'); }
     _fsHinweis(_fs.rest ? 'Halte noch einmal gedrückt und sag den Rest.' : 'Halte gedrückt und sprich.');
     var sub = $('vi-rf-mikro-sub'); if (sub) sub.textContent = 'Loslassen schickt ab — oder tipp unten.';
+    var inp = $('vi-rf-in'); if (inp && _fsPtt()) inp.placeholder = inp.getAttribute('data-ph') || inp.placeholder;
   }
   function _fsPttDruck(ev) {
     if (!_fsPtt() || !_fs.an || !_rf) return;
@@ -2427,6 +2456,8 @@
       _fs.chunks = [];
       _fs.phase = 'spricht'; _fs.t0 = Date.now(); _fs.tPtt = _fs.t0; _fs.sprechMs = 0;
       var k = $('vi-rf-mikro'); if (k) k.classList.add('haelt');
+      var inp = $('vi-rf-in');
+      if (inp) { if (!inp.getAttribute('data-ph')) inp.setAttribute('data-ph', inp.placeholder); inp.placeholder = '● Ich höre dich … loslassen zum Senden'; }
       _fsHinweis('Ich höre dich …');
       var sub = $('vi-rf-mikro-sub'); if (sub) sub.textContent = 'Loslassen, wenn du fertig bist.';
       if (_fs.uhr) clearInterval(_fs.uhr);
@@ -2459,21 +2490,52 @@
         +   'background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));flex:0 0 auto;transition:transform .15s}'
         + '#vi-rf-mikro.ptt.haelt .vi-rf-mikro-icon{transform:scale(1.18);background:#3FA56C;box-shadow:0 0 0 6px rgba(63,165,108,.25)}'
         + '#vi-rf-mikro.ptt.haelt{border-color:#3FA56C !important}'
-        + '}';
+        /* v2218b · Marcel 14.10.2026: „oberhalb der Eingabe ein großer Mikrofon-
+           Button mit Text ‚halte gedrückt …' - der kann weg. Der Aufnahmebutton
+           bitte so wie bei Telegram oder WhatsApp neben Senden. Es ist vollkommen
+           klar, dass man darauf halten muss." Der Kasten bleibt im DOM (Pegel und
+           Hinweise schreiben hinein), ist am Handy aber unsichtbar. */
+        + '#vi-rf-mikro.ptt{display:none !important}'
+        + '#vi-rf-ptt{display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;width:44px;height:44px;border:0;border-radius:50%;margin-left:6px;'
+        +   'background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1407;cursor:pointer;'
+        +   'user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;transition:transform .15s,box-shadow .15s}'
+        + '#vi-rf-ptt svg{width:20px;height:20px;pointer-events:none}'
+        /* wie bei WhatsApp: Senden als runder Pfeil, das Eingabefeld bekommt den Platz
+           (gemessen 390 px: mit „Übernehmen“ als Text blieben dem Feld 134 px) */
+        + '#vi-rf-ok{flex:0 0 44px;width:44px;height:44px;min-width:0;padding:0;border-radius:50%;font-size:0 !important;display:inline-flex;align-items:center;justify-content:center}'
+        + '#vi-rf-ok::before{content:"➤";font-size:18px;line-height:1}'
+        + '#vi-rf-in{flex:1 1 auto;min-width:0}'
+        + '#vi-rf-ptt.haelt{transform:scale(1.25);background:#3FA56C;color:#fff;box-shadow:0 0 0 7px rgba(63,165,108,.25)}'
+        + '}'
+        + '@media (min-width:769px){#vi-rf-ptt{display:none}}';
       document.head.appendChild(st);
     }
     k.classList.toggle('ptt', _fsPtt());
-    if (k._ptt) return;
-    k._ptt = 1;
-    k.addEventListener('pointerdown', function (ev) {
-      if (!_fsPtt() || (ev.target && ev.target.closest && ev.target.closest('.vi-rf-halt'))) return;
-      try { k.setPointerCapture(ev.pointerId); } catch (e) {}
+    /* v2218b · der Halte-Knopf neben „Übernehmen" */
+    var _ok = $('vi-rf-ok'); if (_ok && !_ok.getAttribute('aria-label')) _ok.setAttribute('aria-label', 'Übernehmen');
+    var b = $('vi-rf-ptt');
+    if (!b) {
+      var ok = $('vi-rf-ok');
+      if (ok && ok.parentNode) {
+        b = document.createElement('button');
+        b.type = 'button'; b.id = 'vi-rf-ptt';
+        b.setAttribute('aria-label', 'Zum Sprechen gedrückt halten'); b.title = 'Zum Sprechen gedrückt halten';
+        b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+        ok.parentNode.insertBefore(b, ok.nextSibling);
+      }
+    }
+    if (!b || b._ptt) return;
+    b._ptt = 1;
+    b.addEventListener('pointerdown', function (ev) {
+      if (!_fsPtt()) return;
+      try { b.setPointerCapture(ev.pointerId); } catch (e) {}
+      b.classList.add('haelt');
       _fsPttDruck(ev);
     });
     ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (n) {
-      k.addEventListener(n, function () { if (_fsPtt()) _fsPttLos(); });
+      b.addEventListener(n, function () { b.classList.remove('haelt'); if (_fsPtt()) _fsPttLos(); });
     });
-    k.addEventListener('contextmenu', function (ev) { if (_fsPtt()) ev.preventDefault(); });
+    b.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
     if (_fsPtt() && _fs.stream) _fsPttRuhe();
   }
   function _fsStopHoeren() {

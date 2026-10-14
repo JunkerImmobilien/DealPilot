@@ -2134,6 +2134,21 @@
         .observe(document.documentElement, { attributes: true, attributeFilter: ['data-dp-layout'] });
     } catch (e) {}
     try { window.matchMedia('(max-width: 900px)').addEventListener('change', registerOffenHalten); } catch (e) {}
+    /* v2218b · Marcel 14.10.2026: „das Menü lässt nur einen Klick zu … Portfolio-
+       Cockpit geht, danach öffne ich das Menü, Neues Objekt reagiert nicht mehr."
+       GEMESSEN (Messkabine 390, Aktenmappe): nach der ersten Aktion fehlte
+       `.sb-actions-open` - die Aktion klappt das Register zu wie am Schreibtisch,
+       und layout-varianten.css:7009 setzt das zugeklappte Register auf
+       pointer-events:none. Sichtbar blieb es (am Handy immer offen gezeichnet),
+       klickbar nicht mehr: elementFromPoint traf `aside.sidebar` statt des Eintrags.
+       registerOffenHalten() lief nur beim Laden und beim Layoutwechsel - jetzt
+       auch, sobald jemand die Klasse wegnimmt. */
+    try {
+      var _acc = document.getElementById('sb-actions-accordion');
+      if (_acc) new MutationObserver(function () {
+        if (nurAktenmappe() && !_acc.classList.contains('sb-actions-open')) registerOffenHalten();
+      }).observe(_acc, { attributes: true, attributeFilter: ['class'] });
+    } catch (e) {}
     /* Nach jedem Umschalten erneut: `portfolio()` baut die Schublade nicht neu,
        aber andere Wege (Mandantenwechsel, Plan-Gates) rendern sie durchaus. */
     try { document.addEventListener('dp:plan-ready', registerOffenHalten); } catch (e) {}

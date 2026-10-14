@@ -655,6 +655,7 @@
     var ae = document.activeElement;
     var imTower = tower && tower.contains(ae);
     if (e.key === 'F1' || (e.key === '?' && !tippt(ae) && !e.ctrlKey && !e.metaKey)) {
+      if (!angemeldet()) return;   /* v2218b: auf der Anmeldeseite kein Pilot */
       e.preventDefault();
       if (tower && tower.classList.contains('an') && imTower) { schliessen(); return; }
       rufen();
@@ -666,8 +667,22 @@
     if (tower && tower.classList.contains('an') && !tower.contains(e.target) && !pilot.contains(e.target)) schliessen();
   }, true);
 
+  /* v2218b · Marcel 14.10.2026: „Der Hilfe-Pilot ist auch auf der Anmeldeseite.
+     Das soll nicht sein, der soll erst nach der Anmeldung erscheinen."
+     Angemeldet heisst: kein Anmeldefenster (#auth-modal) UND eine Sitzung. */
+  function angemeldet() {
+    if (document.getElementById('auth-modal')) return false;
+    try { return !window.Auth || typeof Auth.isLoggedIn !== 'function' || Auth.isLoggedIn(); } catch (e) { return true; }
+  }
+  function anmeldungNachziehen() {
+    var vor = !angemeldet();
+    if (pilot) pilot.style.display = vor ? 'none' : '';
+    if (vor && tower && tower.classList.contains('an')) schliessen();
+  }
   function start() {
     bauen();
+    anmeldungNachziehen();
+    setInterval(anmeldungNachziehen, 700);
     pilot.classList.toggle('aus', ort() === 'aus');
     heimSetzen(true);
     setTimeout(function () { heimSetzen(true); }, 1500);

@@ -36,8 +36,25 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N71 · Marcel 14.10.2026 (achte Runde) — erledigt bis auf Abnahmen (`v2218g`–`v2219c`)
+> Geführte Eingabe randlos · Dokumente im PDF-Import · Sprache direkt Freisprechen · Sprechkatalog ergänzt, Grenze 320 · Messe-Drehbuch Parkstraße · **Datenfehler Soll-Ansicht behoben (v2219a), Parkstraße wiederhergestellt**.
+1. **DRINGEND:** Prod-Rollout v2219a (Soll-Ansicht konnte das Ist überschreiben) — Freigabe nötig.
+2. **Offen:** Marcel nimmt Drehbuch 1 ab (`?messe=parkstrasse`), danach Drehbücher 2–10.
+
+### N70 · Marcel 14.10.2026 (siebte Runde) — erledigt bis auf Abnahmen (`v2218a`–`v2218f`)
+> Pilot-Analyse Parkstraße neu · Atlas am Handy gemessen und repariert · Pilot erst nach Anmeldung · Mikrofon neben Senden (WhatsApp) · Handy-Menü nach der ersten Aktion wieder klickbar.
+1. **Offen:** Halten zum Sprechen auf echtem Handy abnehmen.
+2. **Offen:** Marktbericht Parkstraße neu (482.000 € Marktwert gegen 780.000 € Kaufpreis) — Kontingent, Marcels Entscheidung.
+3. **Offen:** Messe-Videos — Vorschlag liegt bei Marcel.
+
+### N69 · Marcel 14.10.2026 (sechste Runde) — erledigt bis auf Abnahmen
+> Pilot-Analyse beim Ankauf gegenübergestellt, Soll/Ist nur im Bestand, Marktbericht ab erstem Bericht (`v2217`/`v2217b`) · Dokumente in der Datenaufnahme mit Abgleich, Abweichungen beim Exposé-Import (`v2217`–`v2217d`) · geführte Eingabe nach dem Quick-Check frei (`v2217c`) · Bot `soll_ist_lesen`, UUID- und Tilgungsfehler (`v2217a`) · Gesamt-Atlas in der App mit Telegram-Bot (`v2218`).
+1. **Offen:** Pilot-Analyse Parkstraße neu abrufen (veraltet, DSCR 0,30) — Marcels Entscheidung, kostet Kontingent.
+2. **Offen:** Gesamt-Atlas am Handy messen.
+3. **Offen:** Prod-Rollout v2217–v2218 (braucht Freigabe; Rebuild backend).
+
 ### N68 · Marcel 14.10.2026 (fünfte Runde)
-> **Stand 14.10.2026:** 1 erledigt (`v2216j`), 3 erledigt (`v2216j`/`v2216k`), 2: sechs Demos in `design/Vorschläge/prozessatlas/` — **wartet auf Marcels Wahl**.
+> **Stand 14.10.2026:** 1 erledigt (`v2216j`), 3 erledigt (`v2216j`/`v2216k`), 2: Marcel wählte „Start wie heute, alles drauf, dann der Gesamtablauf" → `design/Vorschläge/prozessatlas/atlas-gesamt.html` — **wartet auf Abnahme, dann Übernahme in `prozess-atlas.js`**. Prod-Rollout (18) `471bd747` erledigt.
 1. **Soll/Ist gehört in die Pilot-Analyse (Reiter Ist/Soll), nicht in den Tab Objekt** — die Tafel „Bestand gegen Ankauf" (`#dp-abweichung`, seit v2034) dort raus.
 2. **Prozessatlas cooler und animierter:** Unterkarten; Spracheingabe visualisieren; Import aus PDF visualisieren; sehr detailliert, wie die Prozesse in allen Bereichen funktionieren; die zugehörigen Daten; den Nutzen, der herauskommt; am Schluss, wie alles zusammenspielt. Schlüssig, mit Wow-Effekt für den Kunden. **5–6 Ideen fertig machen** (Demo-first, `design/Vorschläge/`).
 3. **F1 ruft den Piloten bei Dropdown-Feldern nicht.**

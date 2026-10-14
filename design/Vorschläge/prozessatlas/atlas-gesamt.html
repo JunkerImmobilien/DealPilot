@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prozess-Atlas · Gesamt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* atlas-gesamt.html · Demo N68.2, Marcel 14.10.2026:
+     „am besten so starten wie der Atlas jetzt startet, nur mit allem drauf,
+     und dann den gesamten Ablauf wie du es vorschlägst."
+     Der Atlas selbst ist der ECHTE frontend/js/prozess-atlas.js. Diese Datei
+     setzt nur oben drauf: Gesamtnetz als Start, zwei neue Abläufe, Daten-Spur,
+     Unterkarten, Nutzen, Zusammenspiel, Flug und den Gesamtflug. */
+  html,body{margin:0;background:#050505;color:#f3ead0;font:400 14px Inter,system-ui,sans-serif}
+  .vorhang{min-height:100vh;display:grid;place-items:center;text-align:center}
+  .vorhang button{border:0;border-radius:12px;padding:14px 22px;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1a1407;font:600 16px "Space Grotesk",sans-serif;cursor:pointer}
+  .vorhang p{color:#a99d84;font:500 11px "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase}
+
+  /* Reiter-Erweiterung */
+  .atl-wahl button.ext{border-style:dashed}
+  .atl-wahl button.ext.an{border-style:solid}
+  .atl-wahl .trenn{flex:0 0 auto;width:1px;background:color-mix(in srgb,#C9A84C 30%,transparent);margin:4px 4px}
+  .atl-btn.gf{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1a1407;border-color:transparent}
+
+  /* Eigene Buehne ueber dem Rumpf (Gesamtnetz, Zusammenspiel, Flug) */
+  .atl-rumpf{position:relative}
+  .ges{position:absolute;inset:0 20px 18px;display:none;z-index:4;grid-template-columns:minmax(0,1fr) 380px;gap:14px}
+  .ges.an{display:grid}
+  .atl-rumpf.ges-modus > .atl-netz,.atl-rumpf.ges-modus > .atl-panel{visibility:hidden}
+  .ges.voll{grid-template-columns:1fr}
+  .ges .atl-netz{position:relative}
+  .ges iframe{width:100%;height:100%;border:0;border-radius:16px;background:#050505}
+  .ges-flaeche{position:relative;padding:16px 18px 30px;min-width:max-content}
+  .ges-phase{font:600 10px "JetBrains Mono",monospace;letter-spacing:.2em;color:#C9A84C;margin:18px 0 6px 2px;display:flex;align-items:center;gap:10px}
+  .ges-phase::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,color-mix(in srgb,#C9A84C 40%,transparent),transparent);min-width:300px}
+  .ges-bahn{display:flex;align-items:center;gap:0;padding:7px 0;position:relative;border-radius:14px;transition:background .3s}
+  .ges-bahn.an{background:color-mix(in srgb,#C9A84C 7%,transparent)}
+  .ges-kopf{flex:0 0 200px;padding:8px 12px;border-radius:12px;cursor:pointer;border:1px solid transparent;margin-right:54px;position:relative;z-index:1}
+  .ges-kopf:hover{border-color:#E8CC7A;background:rgba(20,18,16,.8)}
+  .ges-kopf b{display:block;font:600 15px "Space Grotesk",sans-serif;color:#fdfcfa}
+  .ges-kopf span{display:block;font:500 9.5px "JetBrains Mono",monospace;color:#a99d84;letter-spacing:.06em;margin-top:2px}
+  .ges-kopf i{font-style:normal;color:#E8CC7A}
+  .ges-reihe{display:flex;gap:16px;position:relative}
+  .ges-reihe::before{content:"";position:absolute;left:10px;right:10px;top:50%;height:2px;background:repeating-linear-gradient(90deg,color-mix(in srgb,#C9A84C 55%,transparent) 0 6px,transparent 6px 14px);animation:ges-lauf 1.2s linear infinite}
+  @keyframes ges-lauf{to{background-position:14px 0}}
+  .ges-k{position:relative;width:148px;height:62px;box-sizing:border-box;padding:8px 10px;border-radius:12px;background:linear-gradient(160deg,#1f1b16,#15120f);border:1px solid color-mix(in srgb,#C9A84C 42%,transparent);cursor:pointer;opacity:0;transform:scale(.6);animation:ges-pop .5s cubic-bezier(.2,1.4,.4,1) forwards;transition:border-color .2s,box-shadow .25s,opacity .3s}
+  .ges-k:hover{border-color:#E8CC7A;box-shadow:0 0 0 1px rgba(232,204,122,.35),0 12px 30px -12px rgba(201,168,76,.45)}
+  .ges-k.opt{border-style:dashed}
+  .ges-k .kk{font:500 8.5px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:#a99d84;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ges-k .tt{font:600 12.5px/1.2 "Space Grotesk",sans-serif;color:#fdfcfa;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .ges-k.neu::after{content:"NEU";position:absolute;right:7px;top:-8px;background:#3FA56C;color:#04140a;font:700 8.5px "JetBrains Mono",monospace;padding:1px 5px;border-radius:4px}
+  .ges-k.treffer{border-color:#E8CC7A;background:linear-gradient(160deg,#3a301c,#1f1a10);box-shadow:0 0 0 2px rgba(232,204,122,.55),0 0 24px -4px rgba(232,204,122,.5)}
+  .ges-k.leise{opacity:.28!important}
+  @keyframes ges-pop{to{opacity:1;transform:scale(1)}}
+  .ges-kap{position:absolute;left:224px;top:0;width:40px;height:64px;z-index:3;pointer-events:none;transition:top .9s cubic-bezier(.45,0,.3,1)}
+  .ges-kap .pf-wrap{display:block;width:100%;height:100%}.ges-kap svg.pf{width:100%;height:100%}
+  .ges .atl-panel h3{margin-top:4px}
+  .ges-zahl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+  .ges-zahl div{border:1px solid #3a3227;border-radius:10px;padding:8px;text-align:center}
+  .ges-zahl b{display:block;font:700 22px "Space Grotesk",sans-serif;color:#E8CC7A}
+  .ges-zahl span{font:500 9.5px "JetBrains Mono",monospace;color:#a99d84;letter-spacing:.08em}
+  .ges-such{width:100%;box-sizing:border-box;margin-top:6px;padding:9px 11px;border-radius:9px;border:1px solid color-mix(in srgb,#C9A84C 45%,transparent);background:#0e0c0a;color:#fdfcfa;font:500 13px Inter,sans-serif}
+  .ges-vor{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .ges-vor button{border:1px dashed color-mix(in srgb,#C9A84C 45%,transparent);background:transparent;color:#e8dcc0;border-radius:7px;padding:3px 8px;font:500 11.5px Inter,sans-serif;cursor:pointer}
+
+  /* „Hinfliegen" fuehrt in der App zur Stelle; in der Demo gibt es keine App dahinter */
+  .atl-hin{display:none}
+  /* Panel-Erweiterung im Einzelablauf */
+  .atl-panel .atl-chip{cursor:pointer}
+  .atl-panel .atl-chip:hover{border-color:#E8CC7A}
+  .ext-nutzen{margin-top:12px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,#3FA56C 10%,transparent);border:1px solid color-mix(in srgb,#3FA56C 40%,transparent);color:#d6eedf;font-size:13px}
+  .ext-nutzen b{display:block;font:500 9.5px "JetBrains Mono",monospace;letter-spacing:.14em;color:#7fd3a0;margin-bottom:3px}
+  .ext-unter{margin-top:12px;width:100%;padding:10px;border-radius:10px;border:1px solid #E8CC7A;background:rgba(232,204,122,.08);color:#E8CC7A;font:600 13px "Space Grotesk",sans-serif;cursor:pointer;text-align:left}
+  .ext-unter small{display:block;font:400 11.5px Inter,sans-serif;color:#b9ad8f;margin-top:2px}
+  .spur{margin-top:12px;border:1px solid color-mix(in srgb,#C9A84C 40%,transparent);border-radius:12px;padding:10px 12px;background:#0e0c0a;animation:spur-ein .35s ease}
+  @keyframes spur-ein{from{opacity:0;transform:translateY(6px)}}
+  .spur .kp{display:flex;justify-content:space-between;align-items:center}
+  .spur .kp b{font:600 14px "Space Grotesk",sans-serif;color:#fdfcfa}
+  .spur .kp span{font:500 10px "JetBrains Mono",monospace;color:#a99d84}
+  .spur .sp2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .spur h5{margin:0 0 5px;font:600 9.5px "JetBrains Mono",monospace;letter-spacing:.12em;color:#a99d84;text-transform:uppercase}
+  .spur button{display:block;width:100%;text-align:left;margin-bottom:5px;border:1px solid #3a3227;background:#15120f;border-radius:8px;padding:5px 8px;color:#efe6d2;font:500 12px Inter,sans-serif;cursor:pointer}
+  .spur button:hover{border-color:#E8CC7A}
+  .spur button small{display:block;color:#7f7663;font:500 9.5px "JetBrains Mono",monospace}
+  .spur .h{border-left:3px solid #7fd3a0}.spur .g{border-left:3px solid #C9A84C}
+  .spur .leer{color:#7f7663;font-size:12px}
+
+  /* Unterkarte als Fenster */
+  .uk{position:fixed;inset:0;z-index:10060;display:none;background:rgba(5,5,5,.78);backdrop-filter:blur(4px);padding:3vh 3vw}
+  .uk.an{display:block;animation:spur-ein .3s ease}
+  .uk .rahmen{position:relative;height:100%;border:1px solid #E8CC7A;border-radius:18px;overflow:hidden;background:#050505;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+  .uk iframe{width:100%;height:100%;border:0}
+  .uk .zu{position:absolute;right:14px;top:12px;z-index:2;border:1px solid #C9A84C;background:#15120f;color:#E8CC7A;border-radius:9px;padding:5px 11px;font:600 18px Inter,sans-serif;cursor:pointer}
+  .uk .tt{position:absolute;left:18px;top:14px;z-index:2;font:600 10px "JetBrains Mono",monospace;letter-spacing:.16em;color:#C9A84C;text-transform:uppercase}
+  .zoomer{position:fixed;z-index:10055;border:2px solid #E8CC7A;border-radius:16px;background:rgba(232,204,122,.06);pointer-events:none;transition:all .5s cubic-bezier(.6,0,.2,1)}
+  .flugband{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:10058;display:none;align-items:center;gap:12px;padding:9px 16px;border-radius:999px;border:1px solid #E8CC7A;background:rgba(14,12,10,.94);font:600 12px "JetBrains Mono",monospace;color:#E8CC7A;box-shadow:0 12px 30px rgba(0,0,0,.6)}
+  .flugband.an{display:flex}
+  .flugband i{width:8px;height:8px;border-radius:50%;background:#D8564C;animation:pk 1.2s infinite}
+  @keyframes pk{50%{opacity:.25}}
+  .flugband span{color:#f3ead0;font-weight:500}
+  @media (max-width:900px){.ges{grid-template-columns:1fr;grid-template-rows:minmax(300px,1fr) auto;overflow:auto;inset:0 12px 14px}.ges-kopf{flex-basis:150px}}
+</style>
+</head>
+<body>
+<div class="vorhang" id="vorhang"><div><p>DealPilot · Prozess-Atlas · Demo</p><button id="auf">Atlas öffnen</button></div></div>
+<div class="uk" id="uk"><div class="rahmen"><span class="tt" id="uk-tt"></span><button class="zu" id="uk-zu" aria-label="Schließen">×</button><iframe id="uk-if" title="Unterkarte"></iframe></div></div>
+<div class="flugband" id="flugband"><i></i>GESAMTFLUG <span id="flug-txt"></span><button class="atl-btn" id="flug-stop" style="padding:3px 10px">■</button></div>
+
+<script src="../../../frontend/js/pilot-figur.js"></script>
+<script src="../../../frontend/js/prozess-atlas.js"></script>
+<script src="zusatz.js"></script>
+<script>
+(function () {
+  var A = window.DealPilotAtlas, PZ = A.PROZESSE;
+  function sort(p) { return p.knoten.slice().sort(function (a, b) { return a.s - b.s || a.z - b.z; }); }
+  function P(id) { return PZ.filter(function (p) { return p.id === id; })[0]; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  /* 1 · Zwei neue Ablaeufe in den ECHTEN Atlas (Kanten der Reihe nach) */
+  var NEU = {};
+  window.ATLAS_ZUSATZ.ablaeufe.forEach(function (p) {
+    if (P(p.id)) return;
+    var k = sort(p); p.kanten = k.slice(1).map(function (n, i) { return [k[i].id, n.id]; });
+    NEU[p.id] = 1;
+    /* einsortiert hinter den Quick-Check: Sprechen und Lesen sind Eingabewege */
+    var i = PZ.indexOf(P('quickcheck')); PZ.splice(i + 1 + Object.keys(NEU).length - 1, 0, p);
+  });
+
+  /* 2 · Was du davon hast — je Ablauf ein Satz, nur was der Code haelt */
+  var NUTZEN = {
+    reise: 'Ein Objekt, ein Datensatz vom Inserat bis zur Steuer — nichts wird zweimal eingegeben.',
+    quickcheck: 'In einer Minute weißt du, ob sich der zweite Blick lohnt — und zu welchem Preis.',
+    sprache: 'Objekt erzählen statt tippen. Du bestätigst, was übernommen wird; nichts wird still überschrieben.',
+    dokumente: 'Exposé, Grundbuch, Gutachten lesen statt abtippen — Personendaten werden vor der KI geschwärzt.',
+    boarding: 'Jede Stufe schaltet frei, was ohne sie nicht rechnen darf: keine Kennzahl auf geschätzter Grundlage.',
+    marktbericht: 'Ein Wert mit Herkunft: jede amtliche Zahl mit Ausschuss, Lizenz und Stichtag.',
+    scores: 'Eine Stufenleiter für alles — dasselbe Objekt trägt überall dieselbe Note.',
+    deal: 'Der Plan beim Kauf bleibt stehen. Später siehst du schwarz auf weiß, was daraus geworden ist.',
+    steuer: 'Anlage V und Werbungskosten aus denselben Zahlen, die schon im Objekt stehen.',
+    telegram: 'DealPilot in der Hosentasche: Kennzahlen, Soll/Ist und Anlegen per Sprachnachricht — mit denselben Rechenkernen wie die App.'
+  };
+  /* Unterkarten: welche Station spielt welche Demo ab */
+  var UNTER = {
+    'sprache:*': ['2-sprechlauf.html', 'Sprechlauf', 'Ein Diktat läuft ab — Wörter fliegen ins Feld'],
+    'dokumente:*': ['3-dokumentenfluss.html', 'Dokument-Import', 'Lesen, schwärzen, auslesen, vergleichen'],
+    'reise:an1': ['2-sprechlauf.html', 'Sprechlauf', 'Die Datenaufnahme per Stimme'],
+    'boarding:e1': ['3-dokumentenfluss.html', 'Dokument-Import', 'Die Basis aus dem Kaufvertrag lesen'],
+    'steuer:s3': ['3-dokumentenfluss.html', 'Dokument-Import', 'Belege einlesen statt abtippen'],
+    'deal:d4': ['6-flugschreiber.html', 'Flug 2026-1056', 'Was nach „Gewonnen" an einem echten Objekt passiert'],
+    'deal:d6': ['6-flugschreiber.html', 'Flug 2026-1056', 'Soll gegen Ist an der Parkstraße'],
+    'reise:be2': ['6-flugschreiber.html', 'Flug 2026-1056', 'Ist pflegen an der Parkstraße']
+  };
+  function unterFuer(pid, kid) { return UNTER[pid + ':' + kid] || UNTER[pid + ':*']; }
+
+  /* Daten-Spur: wo entsteht ein Datum, wo wird es gebraucht */
+  function norm(s) { return String(s).toLowerCase().replace(/[^a-zäöüß0-9]/g, ''); }
+  function passt(a, n) { a = norm(a); return a === n || (n.length > 5 && a.length > 4 && (a.indexOf(n) >= 0 || n.indexOf(a) >= 0)); }
+  function spur(d) {
+    var n = norm(d), her = [], hin = [];
+    PZ.forEach(function (p) { p.knoten.forEach(function (k) {
+      if ((k.aus || []).some(function (a) { return passt(a, n); })) her.push([p, k]);
+      if ((k.ein || []).some(function (a) { return passt(a, n); })) hin.push([p, k]);
+    }); });
+    return { her: her, hin: hin };
+  }
+  function spurHtml(d) {
+    var s = spur(d);
+    function l(x, c) { return x.length ? x.map(function (e) { return '<button class="' + c + '" data-spring="' + e[0].id + ':' + e[1].id + '">' + esc(e[1].t) + '<small>' + esc(e[0].name) + '</small></button>'; }).join('') : '<div class="leer">' + (c === 'h' ? 'Eingabe — keine Station erzeugt es.' : 'Endergebnis — geht nicht weiter.') + '</div>'; }
+    return '<div class="spur"><div class="kp"><b>' + esc(d) + '</b><span>' + (s.her.length + s.hin.length) + ' Stationen · ' + new Set(s.her.concat(s.hin).map(function (e) { return e[0].id; })).size + ' Abläufe</span></div>'
+      + '<div class="sp2"><div><h5>entsteht in</h5>' + l(s.her, 'h') + '</div><div><h5>gebraucht in</h5>' + l(s.hin, 'g') + '</div></div></div>';
+  }
+
+  var root, ges, modus = null, kap = null;
+  function geheZu(pid, kid) { setzeModus(null); A.oeffne(pid, kid); }
+
+  /* 3 · Aufbau, sobald der echte Atlas steht */
+  function erweitern() {
+    root = document.getElementById('dp-atlas');
+    var rumpf = root.querySelector('.atl-rumpf');
+    ges = document.createElement('div'); ges.className = 'ges'; rumpf.appendChild(ges);
+    /* × schliesst wie im Programm; hier zurueck zum Vorhang */
+    root.querySelector('.atl-btn.zu').addEventListener('click', function () { stoppFlug(); setzeModus(null); document.getElementById('vorhang').style.display = ''; });
+    /* Gesamtflug-Knopf neben „Ablauf abspielen" */
+    var gf = document.createElement('button'); gf.type = 'button'; gf.className = 'atl-btn gf'; gf.textContent = '✈ Gesamtflug';
+    root.querySelector('.atl-kopf .rechts').insertBefore(gf, root.querySelector('.atl-btn.sp'));
+    gf.addEventListener('click', function () { flug ? stoppFlug() : gesamtflug(); });
+    /* Reiter: nach jedem Neubau durch zeige() die eigenen ergaenzen */
+    var wahl = root.querySelector('.atl-wahl');
+    new MutationObserver(reiter).observe(wahl, { childList: true });
+    wahl.addEventListener('click', function (e) {
+      var x = e.target.closest('[data-x]'); if (x) { e.stopPropagation(); setzeModus(x.getAttribute('data-x')); return; }
+      if (e.target.closest('[data-p]')) setzeModus(null);
+    }, true);
+    /* Seitenleiste: nach jedem waehle() Nutzen, Unterkarte und Daten-Spur */
+    var pan = root.querySelector('.atl-panel');
+    new MutationObserver(function () { if (!pan.querySelector('.ext') && pan.querySelector('h3')) panelExtra(pan); }).observe(pan, { childList: true });
+    pan.addEventListener('click', panelKlick);
+  }
+  function reiter() {
+    var wahl = root.querySelector('.atl-wahl');
+    if (wahl.querySelector('[data-x]')) return;
+    wahl.insertAdjacentHTML('afterbegin', '<button type="button" class="ext" data-x="gesamt">◎ Gesamtnetz</button><span class="trenn"></span>');
+    wahl.insertAdjacentHTML('beforeend', '<span class="trenn"></span><button type="button" class="ext" data-x="zusammen">⟲ Zusammenspiel</button><button type="button" class="ext" data-x="flug">✈ Flug 2026-1056</button>');
+    wahl.querySelectorAll('[data-p]').forEach(function (b) { if (NEU[b.getAttribute('data-p')]) b.insertAdjacentHTML('beforeend', ' <span style="font:700 8.5px JetBrains Mono;color:#3FA56C">NEU</span>'); });
+    markiere();
+  }
+  function markiere() {
+    var wahl = root.querySelector('.atl-wahl');
+    wahl.querySelectorAll('button').forEach(function (b) {
+      if (b.hasAttribute('data-x')) b.classList.toggle('an', b.getAttribute('data-x') === modus);
+      else if (modus) b.classList.remove('an');
+    });
+  }
+  var _kopfAlt = null;
+  function setzeModus(m) {
+    modus = m;
+    ges.classList.toggle('an', !!m); ges.parentNode.classList.toggle('ges-modus', !!m);
+    ges.classList.toggle('voll', m === 'zusammen' || m === 'flug');
+    if (!m) { if (_kopfAlt) { root.querySelector('.nm').textContent = _kopfAlt[0]; root.querySelector('.s').textContent = _kopfAlt[1]; _kopfAlt = null; } ges.innerHTML = ''; markiere(); return; }
+    if (!_kopfAlt) _kopfAlt = [root.querySelector('.nm').textContent, root.querySelector('.s').textContent];
+    var T = { gesamt: ['Alles auf einer Fläche', 'Alle Abläufe nach Phasen — Klick auf eine Linie zoomt hinein, Klick auf eine Station öffnet sie'], zusammen: ['Das Zusammenspiel', 'Ein Objekt, sechs Rechenkerne, alle Abläufe — und was du in der Hand hältst'], flug: ['Flug 2026-1056 · Parkstraße 9', 'Ein echtes Objekt fliegt durch die Abläufe — scroll mit'] }[m];
+    root.querySelector('.nm').textContent = T[0]; root.querySelector('.s').textContent = T[1];
+    if (m === 'gesamt') gesamtnetz();
+    if (m === 'zusammen') ges.innerHTML = '<iframe src="5-zusammenspiel.html?eingebettet" title="Zusammenspiel"></iframe>';
+    if (m === 'flug') ges.innerHTML = '<iframe src="6-flugschreiber.html?eingebettet" title="Flug Parkstraße"></iframe>';
+    markiere();
+  }
+
+  /* 4 · Das Gesamtnetz in der Kartenoptik des Atlas */
+  var PHASEN = [['PRÜFEN', ['reise', 'quickcheck', 'sprache', 'dokumente']], ['ANALYSIEREN', ['boarding', 'marktbericht', 'scores', 'deal']], ['HALTEN', ['steuer']], ['UNTERWEGS', ['telegram']]];
+  function gesamtnetz() {
+    var n = 0, d = {}; PZ.forEach(function (p) { n += p.knoten.length; p.knoten.forEach(function (k) { (k.ein || []).concat(k.aus || []).forEach(function (x) { d[x] = 1; }); }); });
+    var verz = 0, h = '<div class="ges-flaeche" id="ges-fl">';
+    PHASEN.forEach(function (ph) {
+      h += '<div class="ges-phase">' + ph[0] + '</div>';
+      ph[1].forEach(function (pid) {
+        var p = P(pid); if (!p) return;
+        h += '<div class="ges-bahn" data-bahn="' + pid + '"><div class="ges-kopf" data-zoom="' + pid + '"><b>' + esc(p.name) + (NEU[pid] ? ' <i>· neu</i>' : '') + '</b><span>' + p.knoten.length + ' Stationen · <i>hineinzoomen ›</i></span></div><div class="ges-reihe">'
+          + sort(p).map(function (k) { verz += 12; return '<div class="ges-k' + (k.opt ? ' opt' : '') + (NEU[pid] ? ' neu' : '') + '" data-sp="' + pid + ':' + k.id + '" style="animation-delay:' + verz + 'ms" title="' + esc(k.d) + '"><div class="kk">' + esc(k.k || '') + '</div><div class="tt">' + esc(k.t) + '</div></div>'; }).join('')
+          + '</div></div>';
+      });
+    });
+    h += '</div>';
+    var alle = Object.keys(d).sort();
+    ges.innerHTML = '<div class="atl-netz">' + h + '</div><div class="atl-panel"><div class="u">Prozess-Atlas · Gesamtnetz</div><h3>Alles, was DealPilot tut — auf einer Fläche</h3>'
+      + '<div class="d">Oben die ganze Reise, darunter jeder Ablauf als eigene Linie, geordnet nach Phasen. Die gestrichelte Spur läuft in Flugrichtung.</div>'
+      + '<div class="ges-zahl"><div><b>' + PZ.length + '</b><span>ABLÄUFE</span></div><div><b>' + n + '</b><span>STATIONEN</span></div><div><b>' + alle.length + '</b><span>DATEN</span></div></div>'
+      + '<div class="bl">Ein Datum verfolgen</div><input class="ges-such" id="ges-such" list="ges-liste" placeholder="z. B. Kaufpreis, DSCR, Wohnfläche …"><datalist id="ges-liste">' + alle.map(function (x) { return '<option value="' + esc(x) + '">'; }).join('') + '</datalist>'
+      + '<div class="ges-vor">' + ['Kaufpreis', 'Wohnfläche', 'Nettokaltmiete', 'Bodenrichtwert', 'Zinssatz', 'Werbungskosten'].filter(function (x) { return alle.some(function (a) { return passt(a, norm(x)); }); }).map(function (x) { return '<button data-such="' + x + '">' + x + '</button>'; }).join('') + '</div>'
+      + '<div id="ges-spur"></div>'
+      + '<div class="bl">So geht es weiter</div><div class="d" style="font-size:12.5px">Klick auf einen Ablauf zoomt in seinen Netzplan. Dort klappt jede Station ihre Schritte auf, die Daten fliegen ein — und jedes Datum lässt sich anklicken. Am Ende: <b>Zusammenspiel</b> und der <b>Flug</b> eines echten Objekts.</div></div>';
+    /* der Kapitaen aus dem Atlas steht am Kopf der gewaehlten Linie */
+    if (window.DealPilotFigur) { kap = document.createElement('div'); kap.className = 'ges-kap'; kap.appendChild(DealPilotFigur.bauen({ koffer: true })); ges.querySelector('#ges-fl').appendChild(kap); kapZu('reise'); }
+    ges.addEventListener('mouseover', function (e) { var b = e.target.closest('[data-bahn]'); if (b) kapZu(b.getAttribute('data-bahn')); });
+    ges.querySelector('#ges-such').addEventListener('input', function () { suche(this.value); });
+  }
+  function kapZu(pid) {
+    var b = ges && ges.querySelector('[data-bahn="' + pid + '"]'); if (!b || !kap) return;
+    ges.querySelectorAll('.ges-bahn').forEach(function (x) { x.classList.toggle('an', x === b); });
+    kap.style.top = (b.offsetTop + b.offsetHeight / 2 - 34) + 'px';
+  }
+  function suche(d) {
+    var n = norm(d), box = ges.querySelector('#ges-spur');
+    ges.querySelectorAll('.ges-k').forEach(function (k) { k.classList.remove('treffer', 'leise'); });
+    if (!d || n.length < 3) { box.innerHTML = ''; return; }
+    var s = spur(d), ids = {};
+    s.her.concat(s.hin).forEach(function (e) { ids[e[0].id + ':' + e[1].id] = 1; });
+    ges.querySelectorAll('.ges-k').forEach(function (k) { var t = ids[k.getAttribute('data-sp')]; k.classList.toggle('treffer', !!t); k.classList.toggle('leise', !t); });
+    box.innerHTML = spurHtml(d);
+  }
+  /* Klicks im Gesamtnetz: Linie zoomt, Station oeffnet, Vorschlag sucht, Spur springt */
+  document.addEventListener('click', function (e) {
+    if (!ges || !ges.contains(e.target)) return;
+    var z = e.target.closest('[data-zoom]'); if (z) return zoom(z.closest('.ges-bahn'), z.getAttribute('data-zoom'));
+    var k = e.target.closest('[data-sp]'); if (k) { var a = k.getAttribute('data-sp').split(':'); return zoom(k, a[0], a[1]); }
+    var v = e.target.closest('[data-such]'); if (v) { ges.querySelector('#ges-such').value = v.getAttribute('data-such'); return suche(v.getAttribute('data-such')); }
+    var s = e.target.closest('[data-spring]'); if (s) { var b = s.getAttribute('data-spring').split(':'); return geheZu(b[0], b[1]); }
+  });
+  function zoom(vonEl, pid, kid) {
+    var a = vonEl.getBoundingClientRect(), b = root.querySelector('.atl-rumpf .atl-netz').getBoundingClientRect();
+    var z = document.createElement('div'); z.className = 'zoomer';
+    z.style.cssText = 'left:' + a.left + 'px;top:' + a.top + 'px;width:' + a.width + 'px;height:' + a.height + 'px';
+    document.body.appendChild(z);
+    requestAnimationFrame(function () { requestAnimationFrame(function () { z.style.left = b.left + 'px'; z.style.top = b.top + 'px'; z.style.width = b.width + 'px'; z.style.height = b.height + 'px'; }); });
+    setTimeout(function () { geheZu(pid, kid); z.style.opacity = '0'; }, 480);
+    setTimeout(function () { z.remove(); }, 1000);
+  }
+
+  /* 5 · Seitenleiste im Einzelablauf */
+  function aktuellerAblauf() { var b = root.querySelector('.atl-wahl button.an[data-p]'); return b && b.getAttribute('data-p'); }
+  function aktuelleStation() { var k = root.querySelector('.atl-flaeche .atl-k.an'); return k && k.getAttribute('data-k'); }
+  function panelExtra(pan) {
+    var pid = aktuellerAblauf(); if (!pid) return;
+    var kid = aktuelleStation();
+    var ext = document.createElement('div'); ext.className = 'ext';
+    var h = '';
+    var u = unterFuer(pid, kid);
+    if (u) h += '<button type="button" class="ext-unter" data-uk="' + u[0] + '" data-ukt="' + esc(u[1]) + '">▶ Unterkarte: ' + esc(u[1]) + '<small>' + esc(u[2]) + '</small></button>';
+    if (NUTZEN[pid]) h += '<div class="ext-nutzen"><b>WAS DU DAVON HAST</b>' + esc(NUTZEN[pid]) + '</div>';
+    h += '<div class="bl" style="margin-top:14px">Daten verfolgen</div><div class="d" style="font-size:12px;color:#a99d84">Klick auf ein Datum oben: woher es kommt, wohin es geht.</div><div class="ext-spur"></div>';
+    ext.innerHTML = h;
+    var beleg = pan.querySelector('.atl-beleg');
+    pan.insertBefore(ext, beleg || null);
+  }
+  function panelKlick(e) {
+    var c = e.target.closest('.atl-chip'); var pan = root.querySelector('.atl-rumpf > .atl-panel');
+    if (c && !c.classList.contains('flug')) { var box = pan.querySelector('.ext-spur'); if (box) { box.innerHTML = spurHtml(c.textContent.trim()); box.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } return; }
+    var s = e.target.closest('[data-spring]'); if (s) { var b = s.getAttribute('data-spring').split(':'); geheZu(b[0], b[1]); return; }
+    var u = e.target.closest('[data-uk]'); if (u) unterkarte(u.getAttribute('data-uk'), u.getAttribute('data-ukt'));
+  }
+  var uk = document.getElementById('uk');
+  function unterkarte(datei, titel) { document.getElementById('uk-tt').textContent = 'Unterkarte · ' + titel; document.getElementById('uk-if').src = datei + '?eingebettet'; uk.classList.add('an'); }
+  function ukZu() { uk.classList.remove('an'); document.getElementById('uk-if').src = 'about:blank'; }
+  document.getElementById('uk-zu').onclick = ukZu;
+  uk.addEventListener('click', function (e) { if (e.target === uk) ukZu(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && uk.classList.contains('an')) { e.stopPropagation(); ukZu(); } }, true);
+
+  /* 6 · Gesamtflug: Gesamtnetz → jeder Ablauf → Unterkarten → Zusammenspiel → Flug */
+  var flug = 0;
+  function warte(ms, g) { return new Promise(function (r, x) { setTimeout(function () { g === flug ? r() : x('stopp'); }, ms); }); }
+  function band(t) { document.getElementById('flug-txt').textContent = t; }
+  function stoppFlug() { flug = 0; document.getElementById('flugband').classList.remove('an'); var gf = root && root.querySelector('.atl-btn.gf'); if (gf) gf.textContent = '✈ Gesamtflug'; }
+  document.getElementById('flug-stop').onclick = stoppFlug;
+  async function gesamtflug() {
+    var g = flug = Date.now();
+    root.querySelector('.atl-btn.gf').textContent = '■ Gesamtflug';
+    document.getElementById('flugband').classList.add('an');
+    try {
+      band('Gesamtnetz'); setzeModus('gesamt'); await warte(1400, g);
+      var bahnen = [].map.call(ges.querySelectorAll('.ges-bahn'), function (b) { return b.getAttribute('data-bahn'); });
+      for (var i = 0; i < bahnen.length; i++) { kapZu(bahnen[i]); await warte(550, g); }
+      ges.querySelector('#ges-such').value = 'Kaufpreis'; suche('Kaufpreis'); band('Daten-Spur · Kaufpreis'); await warte(3000, g); suche('');
+      for (var j = 0; j < bahnen.length; j++) {
+        var pid = bahnen[j], p = P(pid);
+        band(p.name + ' · ' + (j + 1) + ' von ' + bahnen.length);
+        zoom(ges.querySelector('[data-bahn="' + pid + '"] .ges-kopf'), pid);
+        await warte(1500, g);
+        var reihe = sort(p), wahl = reihe.length <= 4 ? reihe : [reihe[0], reihe[Math.floor(reihe.length / 3)], reihe[Math.floor(reihe.length * 2 / 3)], reihe[reihe.length - 1]];
+        for (var s = 1; s < wahl.length; s++) {
+          var el = root.querySelector('.atl-flaeche .atl-k[data-k="' + wahl[s].id + '"]'); if (el) el.click();
+          await warte(2300, g);
+        }
+        if (pid === 'sprache' || pid === 'dokumente') {
+          var u = unterFuer(pid, '*'); band('Unterkarte · ' + u[1]); unterkarte(u[0], u[1]);
+          await warte(pid === 'sprache' ? 19000 : 16000, g); ukZu();
+        }
+        setzeModus('gesamt'); await warte(700, g);
+      }
+      band('Zusammenspiel'); setzeModus('zusammen'); await warte(1200, g);
+      try { ges.querySelector('iframe').contentDocument.getElementById('runde').click(); } catch (e) {}
+      await warte(14000, g);
+      band('Flug 2026-1056'); setzeModus('flug'); await warte(1500, g);
+      /* per Doppelklick (file://) sperrt Chrome den Zugriff ins iframe — dann scrollt man selbst */
+      var kap6 = []; try { kap6 = ges.querySelector('iframe').contentWindow.document.querySelectorAll('.kap'); } catch (e) {}
+      for (var q = 1; q < kap6.length; q++) { kap6[q].scrollIntoView({ behavior: 'smooth', block: 'center' }); await warte(3800, g); }
+      band('Ende — danke fürs Mitfliegen'); await warte(2500, g);
+    } catch (e) { if (e !== 'stopp') throw e; }
+    if (g === flug) stoppFlug();
+  }
+
+  /* Start: wie der Atlas heute startet — nur mit allem drauf */
+  function starten() {
+    document.getElementById('vorhang').style.display = 'none';
+    A.oeffne('reise');
+    if (!root) setTimeout(function () { erweitern(); reiter(); setzeModus('gesamt'); }, 40);
+    else setTimeout(function () { reiter(); setzeModus('gesamt'); }, 40);
+  }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setTimeout(function () { if (root && !root.classList.contains('an')) { stoppFlug(); document.getElementById('vorhang').style.display = ''; } }, 60); });
+  document.getElementById('auf').onclick = starten;
+  starten();
+})();
+</script>
+</body>
+</html>

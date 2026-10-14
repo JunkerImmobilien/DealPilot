@@ -1986,6 +1986,16 @@ function _renderAIServerAnalysis(a) {
   function _sollIstHtml() {
     var AK = window.DealPilotAnkauf;
     if (!AK || !AK.vorhanden()) return '';
+    /* v2217 · Marcel 14.10.2026: „Soll/Ist vielleicht nur anzeigen, wenn wir
+       wirklich schon in Bestand überführt haben." Ein Ankauf-Stand ohne
+       Gewonnen ist ein ruhender (`_ankauf_ruhend`) - dann kein Reiter. */
+    /* Gemessen (v2217): beim Laden zeichnet storage.js die Analyse (Z. 765)
+       BEVOR es _deal_won_state setzt (Z. 789) - das Feld trug dann noch den
+       Wert des vorigen Objekts. Massgeblich ist der geladene Datensatz; das
+       Feld zaehlt, wenn es in dieser Sitzung danach auf „gewonnen" steht. */
+    var _wf = (document.getElementById('_deal_won_state') || {}).value;
+    var _wd = window._currentObjData && (window._currentObjData._deal_won === true || window._currentObjData._deal_won === 'true');
+    if (!(_wf === 'true' || _wd)) return '';
     var a = null;
     try { a = AK.abweichung(); } catch (e) {}
     if (!a) return '';
@@ -2063,6 +2073,36 @@ function _renderAIServerAnalysis(a) {
       + '</div></div>';
   }
   var _siHtml = _sollIstHtml();
+  /* v2217 · Marcel 14.10.2026: „haben wir die Pilot-Analyse des Objektes für
+     den Soll-Stand? … wenn wir das Objekt in Bestand überführen, möchte ich
+     das gegenüberstellen." Gemessen: alle 11 Ankauf-Stände auf Staging tragen
+     die Analyse vom Festschreiben in `_ankauf.daten._ai` - gezeigt wurde sie
+     nirgends. Hier steht sie neben der heutigen. */
+  if (_siHtml) _siHtml += (function () {
+    var AK = window.DealPilotAnkauf, st = AK && AK.stand ? AK.stand() : (window._dpAnkauf || null);
+    var roh = st && st.daten ? st.daten._ai : null, alt = null;
+    try { alt = roh ? (typeof roh === 'string' ? JSON.parse(roh) : roh) : null; } catch (e) { alt = null; }
+    var kopf = sec('', I.bank, 'PILOT-ANALYSE: ANKAUF GEGEN HEUTE');
+    if (!alt || typeof alt !== 'object' || !(alt.empfehlung || alt.gesamtbewertung)) {
+      return '<div class="dp-pa-card" style="margin-top:12px">' + kopf + '<p class="dp-pa-p">Beim Festschreiben des Ankauf-Stands lag keine Pilot-Analyse vor. '
+        + 'Was der Pilot damals gesagt hätte, lässt sich nicht nachträglich erzeugen — eine neue Analyse beschreibt immer den heutigen Stand.</p></div>';
+    }
+    function dat(x) { var d = x && x._fuer && x._fuer.stand ? new Date(x._fuer.stand) : null; return d && !isNaN(d) ? d.toLocaleDateString('de-DE') : 'ohne Datum'; }
+    function kp(x) { var o = x && x.kaufpreis_offerte; return o && o.empfohlen ? _escClean(String(o.empfohlen)) : '–'; }
+    function kurz(t, n) { t = String(t || ''); return t.length > n ? t.slice(0, n).replace(/\s+\S*$/, '') + ' …' : t; }
+    var gleich = alt._fuer && a._fuer && alt._fuer.stand === a._fuer.stand;
+    var zeile = function (wort, x, y) { return '<tr><td class="abw-wort">' + wort + '</td><td>' + x + '</td><td>' + y + '</td></tr>'; };
+    return '<div class="dp-pa-card" style="margin-top:12px">' + kopf
+      + (gleich ? '<p class="dp-pa-p">Seit dem Festschreiben wurde keine neue Analyse abgerufen — beide Spalten zeigen dieselbe. Ruf sie neu ab, dann steht hier, wie der Pilot das Objekt <b>heute</b> sieht.</p>' : '')
+      + '<table class="abw-tafel"><thead><tr><th></th><th>Beim Ankauf</th><th>Heute</th></tr></thead><tbody>'
+      + zeile('Stand', dat(alt), dat(a))
+      + zeile('Empfehlung', '<b>' + _escClean(alt.empfehlung || '–') + '</b>', '<b>' + _escClean(a.empfehlung || '–') + '</b>')
+      + zeile('Empfohlener Kaufpreis', kp(alt), kp(a))
+      + zeile('Begründung', _escClean(kurz(alt.empfehlung_begruendung, 260)), _escClean(kurz(a.empfehlung_begruendung, 260)))
+      + '</tbody></table>'
+      + '<details style="margin-top:10px"><summary style="cursor:pointer;font:600 12px Inter,sans-serif">Gesamtbewertung beim Ankauf lesen</summary>'
+      + '<p class="dp-pa-p" style="margin-top:8px">' + _escClean(alt.gesamtbewertung || '') + '</p></details></div>';
+  })();
   /* v2160 · N62.6 — der Steuer-Text des Modells gehoert AN die Tafel:
      die Tafel zeigt die Zahlen, der Text erklaert ihre Bewegung. */
   if (_siHtml && has(a.soll_ist_steuer)) {
@@ -3125,8 +3165,18 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
       .then(function (data) {
         var hist = (data && data.history) || [];
         hist = hist.filter(function (h) { return h && h.market_value != null; });
-        if (hist.length < 2) { if (tabBtn) tabBtn.style.display = 'none'; return; }
-        if (tabBtn) tabBtn.style.display = '';
+        /* v2217 · Marcel 14.10.2026: „Marktbericht auch erst, wenn wir schon
+           einen Report haben." Bis hier erschien der Reiter erst ab ZWEI
+           Berichten - mit einem war er unsichtbar, obwohl es einen gab. */
+        if (hist.length < 1) { if (tabBtn) tabBtn.style.display = 'none'; return; }
+        if (tabBtn) { tabBtn.style.display = ''; tabBtn.textContent = hist.length === 1 ? 'Marktbericht' : 'Marktbericht-Verlauf'; }
+        if (hist.length === 1) {
+          var h1 = hist[0], mw = Number(h1.market_value);
+          body.innerHTML = '<p class="dp-pa-p"><b>Ein Marktbericht vom ' + _dpVDate(h1.created_at) + '</b> — Marktwert '
+            + (isFinite(mw) ? '<b>' + Math.round(mw).toLocaleString('de-DE') + ' €</b>' : '–') + '.</p>'
+            + '<p class="dp-pa-p" style="color:#8b8678">Ein Verlauf mit Wertentwicklung entsteht ab dem zweiten Bericht zu diesem Objekt.</p>';
+          return;
+        }
         body.innerHTML = window._dpVerlaufHtml(hist);
         window._dpVerlaufWire(body, hist);
         _dpVerlaufLocLine(hist);
