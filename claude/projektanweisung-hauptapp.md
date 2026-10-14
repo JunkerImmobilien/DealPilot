@@ -38761,6 +38761,32 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2211 / v2211a · Staging · Einstellungen → Standardwerte aufgeräumt (14.10.2026)
+- **Was:** Marcels Liste (N65).
+  - Karten ohne Icons, die ganze Karte ist klickbar, die Detailansicht ist ein ruhiges Panel.
+  - Das gewählte Set wird gemerkt (`dp_std_set`). Ein Band nennt die Grundlage, Felder aus dem Set tragen das Etikett „Set“, abweichende „eigen“.
+  - Finanzierung: Entweder-oder „Indikativer Marktzins“ oder „Eigener Zinssatz“.
+    - Nebenbefund: Neue Objekte bekamen fest **3,50 %** (`main.js` `setDefaults`).
+    - Ursache: `applyToNewObject` füllt nur leere Felder, und `d1z` war nie leer.
+  - Bewirtschaftung ist **eine** Karte.
+    - Umschalter für neue Objekte: Euro je Objektart (Standard) oder % der NKM (`switchBwkMode`).
+    - Begründung aus der Recherche: ImmoWertV Anlage 3 und BelWertV rechnen Verwaltung und Instandhaltung in Euro, nur den Mietausfall in %.
+    - `bwk-profil.js` führt die Jahreswerte selbst (367 € / 14,40 € / 48 € / 108 €) aus `/bwk/ansaetze`, statt „Basiswert 230 € × Faktor 1,6“. Altprofile werden umgerechnet.
+  - Lageklassen: Mietausfall, Bewirtschaftung nicht umlagefähig und Eigenkapital je Lage entfernt. Sie wurden gespeichert, aber nie gelesen (`LP.zusatz()` hatte keinen Aufrufer).
+  - Steuer: Erklärung des Satzes von 40,45 % und ein Verweis auf Mandanten (nur GmbH/UG haben dort einen Satz). Platzhalter `#grenz` steht jetzt auf 40,45 statt 42.
+  - Quick-Check: `qc_hg_split` („% vom Hausgeld“) bekam `bwk_anteil_default` (16, „% der NKM“). Jetzt kommt der ETW-Anteil aus `bwk-profil` (30).
+- **Commit:** `45917195`, `c1fef5c1`
+- **Nachweis (Browser, Staging, Konto Marcel):**
+  - Karten ohne Icons, Etiketten Set/eigen, Bewirtschaftung 367 €/Jahr.
+  - Zins-Umschalter: Marktzins → Feld gesperrt mit 4,22; eigener Zins → Feld frei; zurück → 4,22 und wieder gesperrt.
+  - `setDefaults()` ergibt `d1z` = 4,22 (vorher 3,50).
+  - Lageklassen nur noch 3 Felder; Verweis auf Mandanten vorhanden.
+  - Quick-Check-iframe (v2211): `qc_hg_split` = 30, `qc_zins` = 4,22.
+  - `buster-ebenen` SAUBER.
+- **Rest:**
+  - Der Mietausfall steht im Standard-Set bei 1 %, nach Anlage 3 bei 2 %. Das bleibt Marcels Entscheidung vom 01.10.
+  - `applyToNewObject` zielt weiter auf IDs, die es nicht gibt (`tilgung`, `zinsbindung` …); wirksam ist der Weg über `main.js`.
+
 ### v2210 / v2210b · Staging · Schwärzen im Dokument-Import, Gewerbe im Ertragswert (14.10.2026)
 - **Was:**
   - **v2210** (`8590d45e`), Marcel: „Ja gerne schwärzen“.
