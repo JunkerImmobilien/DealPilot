@@ -38761,6 +38761,18 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2219d–v2219g · Staging · Drehbuch Parkstraße selbst abgenommen (14.10.2026)
+- **Was:** Marcel: „schau es dir selber an". Drei Läufe mit Zeitprotokoll (Zeile, Kegel-Rechteck, NKM-Wert alle 250 ms) und Bildern je Szene.
+  - Soll und Ist: Der Kegel zeigt erst den Umschalter, dann das Feld „Nettokaltmiete / Monat" im Reiter Miete. Dort springt 2.321 auf 3.195. Vorher stand die Zahl nur in der Zeile.
+  - Gemessen: Das Zurückladen des Ist springt auf den Reiter Objekt. Die Ist-Szene holt den Reiter Miete zurück.
+  - Die alte Zeile stand 2–3 s über dem nächsten Reiter und geht jetzt mit dem Szenenwechsel.
+  - Die Soll-gegen-Ist-Zeile ist kürzer („Cashflow", „Score") und bricht nicht mehr um.
+  - Jeder Reiter beginnt oben. Vorher zeigte der kürzere Steuer-Reiter eine leere Fläche und der Balken 2025 lag 2,4 s außerhalb. Gescrollt wird der Container selbst, weil `scrollIntoView(smooth)` dort nie ankam.
+  - **Zurückgenommen:** „Kasten 9 px unter dem Fensterrand" (v2219e) war ein Messfehler. Ich hatte CSS-Pixel gegen die Screenshot-Höhe 726 gemessen, das Fenster hat bei 90 % Zoom 987 CSS-px.
+- **Commit:** `1c7bb914`, `2768d4cc`, `fe77d2cb`, `c102f69c`
+- **Nachweis:** Letzter Lauf: Soll-Kegel auf dem Feld (NKM 2321), Ist auf dem Feld (3195), Soll-gegen-Ist-Kasten, Steuer-Balken 2025 „+16.329 €". DB Parkstraße danach NKM 3195 / DSCR 1,231875. Vorher gesichert: `/root/backups/parkstr-objekt-1120.json`.
+- **Rest:** Nur auf Staging. Der Prod-Rollout lohnt sich erst mit dem nächsten Paket.
+
 ### Prod-Rollout (19) · v2217–v2219c auf Produktion (14.10.2026)
 - **Was:** Freigabe Marcel. Der Anlass war v2219a: Die Soll-Ansicht konnte das Ist überschreiben. Lokal `main` + Merge `origin/staging` (`--no-ff`), Push → `b11f88b4`. Auf Prod `git pull` und Rebuild `backend`. Das mb-backend ist unverändert, kein Rebuild.
 - **Commit:** `b11f88b4` (22 Commits, 40 Dateien, keine Migration)
