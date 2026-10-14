@@ -30,6 +30,10 @@
   function eur(n) { return (n == null || !isFinite(n)) ? null : de(Math.round(n)) + ' €'; }
   function datum(iso) { var t = String(iso || '').split('-'); return t.length === 3 ? t[2] + '.' + t[1] + '.' + t[0] : ''; }
   /* v2233 · TEMPO: Marcel 14.10.2026 - die Kunden muessen Zeit haben zu sehen, was passiert. Steh- und Lesezeiten (ab 600 ms) werden gestreckt; ?tempo=1.6 o. ae. ueberschreibt. Kurze Takte (Tippen, Nachfuehren) bleiben. */
+  /* v2234 · Marcel 14.10.2026: der Erklaertext soll nicht immer unten stehen,
+     sondern als Karte am Feld, mit Linie und Pfeil dorthin. ?zeile=unten
+     holt den alten Untertitel zurueck. */
+  var HAFT = (function () { try { return new URLSearchParams(location.search).get('zeile') !== 'unten'; } catch (e) { return true; } })();
   var TEMPO = (function () { try { var t = parseFloat(new URLSearchParams(location.search).get('tempo')); return (t > 0.3 && t < 4) ? t : 1.4; } catch (e) { return 1.4; } })();
   function warte(ms) { if (ms >= 600) ms = Math.round(ms * TEMPO); return new Promise(function (r, x) { var l = lauf; setTimeout(function () { l === lauf ? r() : x('stopp'); }, ms); }); }
   function q(sel) { return document.querySelector(sel); }
@@ -46,6 +50,16 @@
       '#dpm-kegel.an{opacity:1}',
       '#dpm-zeile{position:fixed;z-index:10072;left:50%;bottom:34px;transform:translate(-50%,20px);max-width:min(980px,92vw);padding:16px 26px 18px;border-radius:16px;background:rgba(10,9,7,.94);border:1px solid ' + mix(G, 60) + ';box-shadow:0 20px 60px rgba(0,0,0,.6);opacity:0;transition:opacity .4s,transform .4s;text-align:center}',
       '#dpm-zeile.an{opacity:1;transform:translate(-50%,0)}',
+      /* v2234 · Karte am Feld */
+      '#dpm-zeile.haft{left:0;top:0;bottom:auto;transform:none;max-width:440px;width:max-content;text-align:left;padding:14px 20px 16px;border-color:' + mix(GH, 80) + ';transition:opacity .4s,left .6s cubic-bezier(.5,0,.2,1),top .6s cubic-bezier(.5,0,.2,1)}',
+      '#dpm-zeile.haft.an{transform:none}',
+      '#dpm-zeile.haft .t{font-size:21px;line-height:1.35}',
+      '#dpm-zeile.haft .p{justify-content:flex-start}',
+      '#dpm-linie{position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:10071;pointer-events:none;opacity:0;transition:opacity .35s;overflow:visible}',
+      '#dpm-linie.an{opacity:1}',
+      '#dpm-linie line{stroke:' + GH + ';stroke-width:2.5;stroke-linecap:round;filter:drop-shadow(0 0 6px ' + mix(GH, 70) + ')}',
+      '#dpm-linie circle{fill:' + GH + '}',
+      '#dpm-linie path{fill:' + GH + '}',
       '#dpm-zeile .k{font:600 11px "JetBrains Mono",monospace;letter-spacing:.2em;text-transform:uppercase;color:' + G + '}',
       '#dpm-zeile .t{font:600 26px/1.3 "Space Grotesk",sans-serif;color:#FDFCFA;margin-top:4px}',
       '#dpm-zeile .t b{color:' + GH + '}',
@@ -106,8 +120,61 @@
     z.innerHTML = '<div class="k">' + kick + '</div><div class="t">' + text + '</div><div class="p">'
       + Array.apply(null, { length: n }).map(function (_, j) { return '<i class="' + (j <= i ? 'an' : '') + '"></i>'; }).join('') + '</div>';
     z.classList.add('an');
+    platziere();
   }
-  function zeileWeg() { var z = q('#dpm-zeile'); if (z) z.classList.remove('an'); }
+  function zeileWeg() { var z = q('#dpm-zeile'); if (z) z.classList.remove('an'); linie(null); }
+  /* v2234 · die Zeile als Karte neben dem Ziel: rechts, links, darunter oder
+     darüber - die erste Seite, auf der sie ganz ins Fenster passt, ohne das
+     Ziel zu verdecken. Passt keine, steht sie wie früher unten. Die Linie geht
+     von der Kartenkante zur Zielkante, der Pfeil zeigt aufs Ziel. Gerechnet
+     wird gegen innerWidth/innerHeight (Zoom 90 %: Bildrahmen ist kleiner). */
+  var ABST = 64, RAND = 18;
+  function linie(a, b) {
+    var sv = q('#dpm-linie');
+    if (!a) { if (sv) sv.classList.remove('an'); return; }
+    if (!sv) {
+      sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); sv.id = 'dpm-linie';
+      sv.innerHTML = '<line/><circle r="5"/><path/>'; document.body.appendChild(sv);
+    }
+    var l = sv.querySelector('line'), c = sv.querySelector('circle'), pf = sv.querySelector('path');
+    var dx = b.x - a.x, dy = b.y - a.y, len = Math.sqrt(dx * dx + dy * dy) || 1, ux = dx / len, uy = dy / len;
+    var sx = b.x - ux * 14, sy = b.y - uy * 14;   /* Linie endet am Pfeilfuss */
+    l.setAttribute('x1', a.x); l.setAttribute('y1', a.y); l.setAttribute('x2', sx); l.setAttribute('y2', sy);
+    c.setAttribute('cx', a.x); c.setAttribute('cy', a.y);
+    pf.setAttribute('d', 'M' + b.x + ' ' + b.y + ' L' + (sx - uy * 8) + ' ' + (sy + ux * 8) + ' L' + (sx + uy * 8) + ' ' + (sy - ux * 8) + ' Z');
+    sv.classList.add('an');
+  }
+  function platziere() {
+    var z = q('#dpm-zeile'); if (!z || !z.classList.contains('an')) return;
+    var t = HAFT && zielEl();
+    if (!t) { if (z.classList.contains('haft')) { z.classList.remove('haft'); z.style.left = z.style.top = ''; } linie(null); return; }
+    var r = rect(t), pad = _pad, W = innerWidth, H = innerHeight;
+    r = { left: r.left - pad, top: r.top - pad, right: r.right + pad, bottom: r.bottom + pad };
+    var neu = !z.classList.contains('haft');
+    z.classList.add('haft');
+    var w = z.offsetWidth, h = z.offsetHeight, cy = (r.top + r.bottom) / 2, cx = (r.left + r.right) / 2;
+    function klemm(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+    var seiten = [
+      { x: r.right + ABST, y: klemm(cy - h / 2, RAND, H - h - RAND), ok: r.right + ABST + w <= W - RAND, k: 'l' },
+      { x: r.left - ABST - w, y: klemm(cy - h / 2, RAND, H - h - RAND), ok: r.left - ABST - w >= RAND, k: 'r' },
+      { x: klemm(cx - w / 2, RAND, W - w - RAND), y: r.bottom + ABST, ok: r.bottom + ABST + h <= H - RAND, k: 'o' },
+      { x: klemm(cx - w / 2, RAND, W - w - RAND), y: r.top - ABST - h, ok: r.top - ABST - h >= RAND, k: 'u' }
+    ].filter(function (o) { return o.ok; });
+    if (!seiten.length) { z.classList.remove('haft'); z.style.left = z.style.top = ''; linie(null); return; }
+    /* dieselbe Seite behalten, solange sie passt - sonst springt die Karte */
+    var o = seiten.filter(function (x) { return x.k === z.getAttribute('data-seite'); })[0] || seiten[0];
+    z.setAttribute('data-seite', o.k);
+    if (neu) { z.style.transition = 'none'; }
+    z.style.left = Math.round(o.x) + 'px'; z.style.top = Math.round(o.y) + 'px';
+    if (neu) { void z.offsetWidth; z.style.transition = ''; }
+    /* Anfang an der Kartenkante, Ende an der Zielkante (zur Karte hin) */
+    var a, b;
+    if (o.k === 'l') { a = { x: o.x, y: o.y + h / 2 }; b = { x: r.right, y: klemm(o.y + h / 2, r.top + 8, r.bottom - 8) }; }
+    else if (o.k === 'r') { a = { x: o.x + w, y: o.y + h / 2 }; b = { x: r.left, y: klemm(o.y + h / 2, r.top + 8, r.bottom - 8) }; }
+    else if (o.k === 'o') { a = { x: o.x + w / 2, y: o.y }; b = { x: klemm(o.x + w / 2, r.left + 8, r.right - 8), y: r.bottom }; }
+    else { a = { x: o.x + w / 2, y: o.y + h }; b = { x: klemm(o.x + w / 2, r.left + 8, r.right - 8), y: r.top }; }
+    linie(a, b);
+  }
   function karte(html) { var k = el('dpm-karte'); if (html == null) { k.classList.remove('an'); return; } k.innerHTML = '<div>' + html + '</div>'; k.classList.add('an'); }
   /* v2219b · Der Kegel FOLGT seinem Ziel: über einen Selektor, alle 200 ms neu
      aufgelöst. GEMESSEN: der Umschalter Ist/Soll baut sich beim Klick neu (der
@@ -157,13 +224,14 @@
   function folgen() {
     if (_folge) return;
     _folge = setInterval(function () {
-      var z = zielEl(); if (!z) { kegel(null); return; }
+      var z = zielEl(); if (!z) { kegel(null); platziere(); return; }
       var r = rect(z);
       if (!frei(r) && _nachScroll < 3 && Date.now() - _letzterScroll > 1200) {
         _nachScroll++; _letzterScroll = Date.now();
         holen(z, false);
       }
       kegel(z, _pad);
+      platziere();
     }, 200);
   }
   async function zeige(ziel, pad) {
