@@ -29,7 +29,9 @@
   function de(n, st) { return Number(n).toLocaleString('de-DE', { minimumFractionDigits: st || 0, maximumFractionDigits: st || 0 }); }
   function eur(n) { return (n == null || !isFinite(n)) ? null : de(Math.round(n)) + ' €'; }
   function datum(iso) { var t = String(iso || '').split('-'); return t.length === 3 ? t[2] + '.' + t[1] + '.' + t[0] : ''; }
-  function warte(ms) { return new Promise(function (r, x) { var l = lauf; setTimeout(function () { l === lauf ? r() : x('stopp'); }, ms); }); }
+  /* v2233 · TEMPO: Marcel 14.10.2026 - die Kunden muessen Zeit haben zu sehen, was passiert. Steh- und Lesezeiten (ab 600 ms) werden gestreckt; ?tempo=1.6 o. ae. ueberschreibt. Kurze Takte (Tippen, Nachfuehren) bleiben. */
+  var TEMPO = (function () { try { var t = parseFloat(new URLSearchParams(location.search).get('tempo')); return (t > 0.3 && t < 4) ? t : 1.4; } catch (e) { return 1.4; } })();
+  function warte(ms) { if (ms >= 600) ms = Math.round(ms * TEMPO); return new Promise(function (r, x) { var l = lauf; setTimeout(function () { l === lauf ? r() : x('stopp'); }, ms); }); }
   function q(sel) { return document.querySelector(sel); }
   /* v2219 · nur SICHTBARE Treffer: #ai-content steht zweimal im Dokument, die
      erste Kopie war unsichtbar - der Lichtkegel fiel auf 16 x 16 px zusammen. */
@@ -74,6 +76,8 @@
       '@media (max-width:640px){#dpm-logo .w{font-size:56px}#dpm-logo{padding:14px 26px 16px}}',
       '#dpm-stopp{position:fixed;z-index:10076;right:14px;bottom:14px;border:1px solid ' + mix(G, 50) + ';background:rgba(10,9,7,.8);color:' + GH + ';border-radius:8px;padding:4px 10px;font:600 12px "JetBrains Mono",monospace;cursor:pointer;opacity:.35}',
       '#dpm-stopp:hover{opacity:1}',
+      /* v2233 · die Pilot-Hilfe stoert im Video - waehrend eines Laufs ausgeblendet */
+      'html.dpm-laeuft #dp-pilot,html.dpm-laeuft #dp-tower{display:none!important}',
       '@media (max-width:640px){#dpm-zeile .t{font-size:18px}#dpm-karte h1{font-size:40px}#dpm-karte p{font-size:16px}}'
     ].join('\n');
     document.head.appendChild(st);
@@ -188,7 +192,7 @@
     function los(typ) { e.dispatchEvent(new w.Event(typ, { bubbles: true })); }
     if (e.tagName === 'SELECT') { e.value = text; los('input'); los('change'); await warte(ms || 300); return; }
     e.value = ''; los('input');
-    for (var i = 0; i < text.length; i++) { e.value = text.slice(0, i + 1); los('input'); await warte(ms || 70); }
+    for (var i = 0; i < text.length; i++) { e.value = text.slice(0, i + 1); los('input'); await warte(ms || 95); }   /* v2233: etwas ruhiger getippt */
     los('change');
   }
   function qcText(id) { var e = qcEl(id); return e ? e.innerText.replace(/\s+/g, ' ').trim() : ''; }
@@ -856,6 +860,7 @@
     /* v2221 · auch bei Esc mitten im Lauf aufräumen (Boarding-Pass) */
     if (_aktiv && _aktiv.aufraeumen) { try { _aktiv.aufraeumen(); } catch (e) {} }
     _aktiv = null;
+    try { document.documentElement.classList.remove('dpm-laeuft'); } catch (e) {}
     lauf = 0; _ziel = null; if (_folge) { clearInterval(_folge); _folge = null; } kegel(null); zeileWeg(); karte(null);
     var s = q('#dpm-stopp'); if (s) s.remove();
     document.removeEventListener('keydown', esc, true);
@@ -864,6 +869,7 @@
   async function start(name, opts) {
     var D = DREHBUECHER[name]; if (!D) { console.warn('[messe] unbekanntes Drehbuch: ' + name); return; }
     css(); stopp();
+    try { document.documentElement.classList.add('dpm-laeuft'); } catch (e) {}
     var g = lauf = Date.now(); _aktiv = D;
     var b = el('dpm-stopp', 'button'); b.type = 'button'; b.textContent = '■'; b.title = 'Drehbuch beenden (Esc)'; b.onclick = stopp;
     document.addEventListener('keydown', esc, true);
