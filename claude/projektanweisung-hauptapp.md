@@ -38761,6 +38761,41 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2217–v2218 · Staging · Soll/Ist mit Ankauf-Analyse, Dokumente mit Abgleich, Bot Soll/Ist, Gesamt-Atlas in der App (14.10.2026)
+- **Was:** Marcels Auftrag (N69): Pilot-Analyse für den Soll-Stand, Reiter Soll/Ist und Marktbericht nur, wenn es etwas gibt, Datenbank Ankauf/Bestand, Prozess nach dem Quick-Check, Abweichungen bei PDFs, Telegram-Bot und Atlas.
+  - **v2217** `cc6809e8`:
+    - Soll/Ist-Reiter nur im Bestand. Neue Karte „Pilot-Analyse: Ankauf gegen heute“ (Stand, Empfehlung, empfohlener Kaufpreis, Begründung, Gesamtbewertung).
+      - Gemessen: alle 11 Ankauf-Stände auf Staging trugen die Analyse vom Festschreiben schon in `_ankauf.daten._ai`, gezeigt wurde sie nirgends.
+      - `ankauf.js` schreibt seitdem die gerade geltende Analyse fest (`_aiText`).
+    - Marktbericht-Reiter ab dem ERSTEN Bericht, vorher ab dem zweiten.
+    - Datenaufnahme: Kachel „Dokumente“ (neun Arten), nicht unter dem Riegel, in der Kette.
+    - Exposé-Import: Spalte „im Objekt“, abweichende Zeilen sind nicht vorgehakt.
+    - Dokument-Import: Abgleich je Feld (leer/gleich/abweichend) und Übernahme. Vorher konnte er nichts übernehmen und zeigte Rohschlüssel.
+    - Bot: Werkzeug `soll_ist_lesen`, Regel 7m, Hilfetext. Atlas: Ablauf „Telegram-Bot“ (8 Stationen), DSCR als Eingang beider Scores.
+  - **v2217a** `069da796`, zwei echte Fehler im Bot:
+    - Eine erfundene UUID schlug die genannte Adresse („kein Objekt“ zur Parkstraße).
+    - `tilgung_eur_jahr` fiel durch `/_eur$/`, deshalb addierte das Modell selbst: 58.334/59.334/63.334/64.334 statt 57.316.
+  - **v2217b** `c420369f`:
+    - Soll/Ist-Reiter fehlte nach dem Laden: `storage.js` zeichnet die Analyse (Z. 765) vor `_deal_won_state` (Z. 789). Maßgeblich ist jetzt der Datensatz.
+    - Dokument-Import: Baujahr ohne Tausenderpunkt, eigene RND neben der des Gutachtens.
+  - **v2217c** `1ea4d960`: Geführte Eingabe nicht mehr unter dem Riegel (sie fragt nur Lücken und überschreibt nie). Reihe gesperrt-vor-frei. Abweichungsvergleich toleriert Schreibweisen.
+  - **v2217d** `20914fa4`: „Dokumente“ als Symbol mit Tooltip. Mit Beschriftung rutschte „Abrufen“ in eine zweite Zeile (Befund v2189).
+  - **v2218** `91b7e2c5`, Gesamt-Atlas in der App (Marcel: „so wie es in der Demo ist, ist es super“):
+    - Sprechlauf und Dokument-Import sind Abläufe in `prozess-atlas.js`.
+    - Neues Modul `prozess-atlas-gesamt.js`: `oeffne()` ohne Ziel führt ins Gesamtnetz, mit Ziel wie bisher.
+    - Unterkarten unter `frontend/atlas/`. Beispielflug Parkstraße statt „Flug 2026-1056“, weil Kunden das Demo-Objekt nicht haben.
+- **Nachweis:**
+  - Bot im Container (ohne Telegram-Nachricht): `pruef-soll-ist` 3/3 mit richtigen Zahlen, `pruef-agent` 5/5, `pruef-zahlen` 12/12 (vorher 8/12), `pruef-pilot-analyse` 17/17.
+  - Echter Upload Westerfeldstr. 140 RND-Gutachten über die Kachel „Dokumente“: Baujahr „gleich“, RND 16 J als Vergleich, Kette läuft nach dem Schließen weiter.
+  - Echter Upload Verkehrswertgutachten Hüllhorst über den Exposé-Weg in 2026-001: Abweichungen Baujahr 1968/1962 und Marktwert 304.000/204.000 nicht vorgehakt. Zwei Fehlalarme (Schreibweisen) behoben und per Node nachgeprüft. Nichts übernommen.
+  - `prozess-atlas-pruefen` 10 Abläufe, 67/67 Belege. `gold-audit` RC=0. `buster-ebenen` SAUBER.
+  - Atlas im Browser: Gesamtnetz 10 Bahnen, Kaufpreis-Spur 8 Treffer, Zoom → Telegram, Unterkarte Sprechlauf, Zusammenspiel 22 Knoten, Beispielflug 7 Kapitel.
+- **Rest:**
+  - Die Pilot-Analyse der Parkstraße stammt von vor der NKM-Korrektur (DSCR 0,30, LTV 131 %) und gehört neu abgerufen; das kostet ein Kontingent und ist Marcels Entscheidung.
+  - Gesamt-Atlas am Handy nicht gemessen.
+  - Der Marktbericht-Reiter mit genau einem Bericht ist nur über den Code geprüft.
+  - Prod für v2217–v2218 nicht freigegeben (Rebuild backend nötig).
+
 ### Prod-Rollout (18) · v2208–v2216k auf Produktion (14.10.2026)
 - **Was:** Freigabe Marcel („ja prod rollout freigegeben"). Zweig `prod-rollout-18` neu gebaut (`origin/main` + Merge `origin/staging`), Baum gleich Staging. Push nach `main` → `471bd747`, auf Prod `git pull` und Rebuild `backend` + `mb-backend`.
 - **Commit:** `471bd747`

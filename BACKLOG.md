@@ -36,6 +36,12 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N69 · Marcel 14.10.2026 (sechste Runde) — erledigt bis auf Abnahmen
+> Pilot-Analyse beim Ankauf gegenübergestellt, Soll/Ist nur im Bestand, Marktbericht ab erstem Bericht (`v2217`/`v2217b`) · Dokumente in der Datenaufnahme mit Abgleich, Abweichungen beim Exposé-Import (`v2217`–`v2217d`) · geführte Eingabe nach dem Quick-Check frei (`v2217c`) · Bot `soll_ist_lesen`, UUID- und Tilgungsfehler (`v2217a`) · Gesamt-Atlas in der App mit Telegram-Bot (`v2218`).
+1. **Offen:** Pilot-Analyse Parkstraße neu abrufen (veraltet, DSCR 0,30) — Marcels Entscheidung, kostet Kontingent.
+2. **Offen:** Gesamt-Atlas am Handy messen.
+3. **Offen:** Prod-Rollout v2217–v2218 (braucht Freigabe; Rebuild backend).
+
 ### N68 · Marcel 14.10.2026 (fünfte Runde)
 > **Stand 14.10.2026:** 1 erledigt (`v2216j`), 3 erledigt (`v2216j`/`v2216k`), 2: Marcel wählte „Start wie heute, alles drauf, dann der Gesamtablauf" → `design/Vorschläge/prozessatlas/atlas-gesamt.html` — **wartet auf Abnahme, dann Übernahme in `prozess-atlas.js`**. Prod-Rollout (18) `471bd747` erledigt.
 1. **Soll/Ist gehört in die Pilot-Analyse (Reiter Ist/Soll), nicht in den Tab Objekt** — die Tafel „Bestand gegen Ankauf" (`#dp-abweichung`, seit v2034) dort raus.
