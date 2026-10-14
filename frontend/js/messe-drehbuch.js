@@ -89,9 +89,23 @@
     if (typeof _ziel === 'function') { var f = _ziel(); return (f && f.getBoundingClientRect().width > 0) ? f : null; }
     return (_ziel.isConnected && _ziel.getBoundingClientRect().width > 0) ? _ziel : null;
   }
+  /* v2219e · Ein Ziel, das nach dem Scrollen noch wächst (Soll/Ist-Kasten: 89 ->
+     163 px), lag gemessen mit der Unterkante 9 px unter dem Fensterrand und unter
+     der Zeile. Rutscht es aus dem freien Bereich, wird nachgescrollt - höchstens
+     dreimal je Ziel, frühestens alle 1,2 s (smooth braucht so lange). */
+  var _nachScroll = 0, _letzterScroll = 0;
+  function frei(r) { return r.top >= 70 && r.bottom <= innerHeight - 170; }
   function folgen() {
     if (_folge) return;
-    _folge = setInterval(function () { var z = zielEl(); if (z) kegel(z, _pad); else kegel(null); }, 200);
+    _folge = setInterval(function () {
+      var z = zielEl(); if (!z) { kegel(null); return; }
+      var r = z.getBoundingClientRect();
+      if (!frei(r) && _nachScroll < 3 && Date.now() - _letzterScroll > 1200) {
+        _nachScroll++; _letzterScroll = Date.now();
+        try { z.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+      }
+      kegel(z, _pad);
+    }, 200);
   }
   async function zeige(ziel, pad) {
     _ziel = ziel || null; _pad = pad == null ? 10 : pad;
@@ -101,7 +115,8 @@
     var z = zielEl();
     /* nur scrollen, wenn das Ziel nicht frei sichtbar ist - sonst schiebt es den
        Umschalter oben aus dem Bild; unten liegt die Zeile (rund 160 px) */
-    if (z) { var r = z.getBoundingClientRect(); if (r.top < 70 || r.bottom > innerHeight - 170) { try { z.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} } }
+    _nachScroll = 0; _letzterScroll = 0;
+    if (z && !frei(z.getBoundingClientRect())) { _letzterScroll = Date.now(); try { z.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} }
     folgen();
     await warte(750);
   }
@@ -158,6 +173,8 @@
           /* erst weiter, wenn die Ankauf-Ansicht wirklich gelöst ist (der Ist-Stand neu geladen) */
           await warteAuf(function () { return window.DealPilotAnkaufAnsicht && !DealPilotAnkaufAnsicht.aktiv(); }, 8000);
           await warte(400);
+          /* gemessen: das Zurückladen des Ist springt auf den Reiter Objekt */
+          reiter('s2'); await warte(700);
           await zeige(nkmFeld, 10);
           var nkm = parseFloat(String((q('#nkm') || {}).value || '').replace(/\./g, '').replace(',', '.'));
           s.zeile('Ist · heute', 'Eine Wohnung saniert und neu vermietet: <b>' + (isFinite(nkm) ? eur(nkm) : '–') + '</b> Nettokaltmiete.');
@@ -191,7 +208,7 @@
           var betrag = bar ? (bar.querySelector('.tax-tl-amount') || {}).textContent : null;
           await zeige(bar ? balken2025 : '#s3-tax .tax-timeline-card', 8);
           s.zeile('Steuer 2025', 'Die Sanierung als Erhaltungsaufwand sofort abgesetzt' + (betrag ? ' — Erstattung <b>' + String(betrag).replace(/^\+/, '').trim() + '</b>' : '') + '.');
-          await warte(6500);
+          await warte(7500);   /* v2219e: der Weg zum Balken 2025 kostet gemessen gut 2 s Scrollen */
         }
       ],
       schluss: '<div class="k">DealPilot</div><h1>Plan gegen Ist.</h1><p>Der Ankauf bleibt stehen — jedes Jahr misst sich daran.</p><div class="m">Deal<b>Pilot</b> · dealpilot.immo</div>'
