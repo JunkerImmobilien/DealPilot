@@ -38761,6 +38761,24 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### Prod-Rollout (20) · v2220–v2233 auf Produktion (14.10.2026)
+- **Was:** Marcels Freigabe („bitte auch Prod-Rollout machen"). Lokal `main` + Merge `origin/staging` (--no-ff), Push → `f652e4cc` (44 Commits, 19 Dateien, keine Migration). Auf Prod `git pull` und Rebuild `backend`; mb-backend unverändert.
+- **Commit:** `f652e4cc`
+- **Nachweis:**
+  - Sicherung vorher: `/root/backups/haupt-20261014-1434.sql.gz` (11 MB, 71 Tabellen) und `mb-20261014-1434.sql.gz` (25 MB, 32 Tabellen), Kopf gelesen.
+  - Backend `healthy`, „No new migrations". Im Image `kaufen: 70` (Kern) und der Prompt mit „Starker Kauf".
+  - Live: `qc-heuristik.js?v=v2232`, `qc-bridge.js?v=v2232`, `messe-drehbuch.js?v=v2233`; vier Dateien 200 mit richtigem Typ; `/auth/me` ohne Token 401; Gold-Audit RC=0.
+- **Rest:** Abnahme im Browser auf Prod: Quick-Check mit C-Lage → „Nicht kaufen".
+
+### v2232–v2233 · Urteil = Stufe, Drehbuch-Tempo, Video-Agent (14.10.2026)
+- **Was:**
+  - **v2232:** `QcHeuristik.SCHWELLE` 75/60/40 → **70/50/35**, also dieselben Grenzen wie die Score-Stufen (Gut+ = KAUFEN, Solide = VERHANDELN/PRUEFEN, Schwach = KRITISCH, Kritisch = PASS). Marcel: „das muss passen". `score-ketten-pruefen.mjs` prüft jetzt zusätzlich Urteil gegen Stufe für Score 0..100 (216 Punkte, gleich). Gespiegelt, Backend neu gebaut.
+  - **Quick-Check-Score gegen DealScore** gemessen: Quick-Check 46 → „Als Objekt speichern" → Objekt 46 · Schwach, alle fünf Teilwerte gleich (Cashflow 32, Rendite 72, LTV 49, Risiko 58, Potenzial 30). Der **Investor Deal Score** (DS2, 24 Kennzahlen) desselben Objekts zeigt aber **63**. Das ist die offene Frage an Marcel (Backlog N73).
+  - **v2233:** Drehbuch-`TEMPO` 1,4 (Wartezeiten ab 600 ms gestreckt, `?tempo=` überschreibt), langsameres Tippen, Pilot-Hilfe (`#dp-pilot`, `#dp-tower`) im Lauf ausgeblendet.
+  - **Video-Agent `messe-video`** (`.claude/agents/`) und **Skill `messe-video`** (`.claude/skills/`): Regeln (Zahlen live, kein Abruf je Durchgang, Mitschnitte, Aufräumen, Tempo, Pilot aus), Ablauf, ffmpeg-Aufnahme.
+- **Commit:** `13d3daef`, `5d5ef646`, `95d0fa78`
+- **Rest:** Videos mit Tempo 1,4 und ohne Pilot neu aufnehmen (Agent). Score-Frage N73.
+
 ### Messe-Videos aufgenommen (14.10.2026)
 - **Was:** Mit ffmpeg (gdigrab, Hauptbildschirm 1920x1080, Chrome im Vollbild) habe ich fünf MP4 nach `Dateien/Messe/Videos/` aufgenommen. Oben sind 58 px abgeschnitten (Chrome-Leiste „Claude hat die Fehlerbehebung gestartet"), das ergibt 1920x1022, 30 fps, x264 crf 20.
   - quickcheck-datenaufnahme 158 s · 6,3 MB

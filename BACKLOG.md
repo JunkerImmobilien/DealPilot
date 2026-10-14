@@ -36,6 +36,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N73 · Quick-Check-Score gegen Investor Deal Score — Entscheidung Marcel
+> Gemessen 14.10.2026 (Testobjekt Musterweg 7, Bielefeld, Staging): Quick-Check 46 = Objekt-DealScore 46 (alle Teilwerte gleich). Der Investor Deal Score (DS2, 24 Kennzahlen inkl. Lage/Markt) zeigt am selben Objekt 63. Zwei Zahlen für dasselbe Objekt. Offen: welcher Score wo führt, oder ob DS2 im Quick-Check mitgezeigt bzw. angeglichen wird.
+
 ### N72 · Quick-Check: DealPilot-Marktwert erreicht den Score nicht — offen, Entscheidung Marcel
 > Gefunden beim Messe-Drehbuch (v2222). `QcApp.registerDpmb` füllt `_avmResults` (Potenzial-Teilscore, Pro/Contra „Preis vs. Marktwert"). Der einzige Aufruf steht in `frontend/js/dealpilot-mb-qc.js:298` hinter dem `return` aus v832c und nutzt `global.QcApp`, das als `const` nicht am window hängt.
 > Gemessen: Potenzial 30 bei Marktwert 199–351 T€ und Kaufpreis 139 T€. Eine Korrektur ändert Quick-Check-Scores, deshalb erst nach Freigabe.
