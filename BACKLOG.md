@@ -240,7 +240,7 @@ Dateien/vw-modul-v4-2-2.zip und -v4-2-5.zip (08./10.10.2026) stehen in keiner Ba
 
 **Offen, neu:**
 - Straße und Hausnummer im Quick-Check waren NIE Pflicht (`quickcheck-app.html:3803`, `required:false` seit V326). Marcel entscheidet. Achtung: Inserate ohne veröffentlichte Hausnummer gibt es (v1999 ImmoMetrica).
-- Fehlerverdacht aus der Hilfe-Erhebung, nicht nachgemessen:
+- Fehlerverdacht aus der Hilfe-Erhebung — **✅ 14.10.2026 nachgemessen: 1–6, 8, 9 waren mit v2191 (`ad26710b`) behoben, 4 schon mit v1963. Rest in v2208 (`83283246`, Staging): 7 (Steuerregime rechnet längst, Buchhaltung „Stufe 3"/DATEV-Versprechen raus), Hilfe zitierte noch „Auto-saved". Offen als Frage an Marcel: es gibt keinen Speichern-Knopf und kein Strg+S, gesichert wird beim Reiter- oder Objektwechsel — gewollt?**
   1. Quick-Check-Balken lesen `sub-sicherheit`/`sub-finanzierung`/`sub-effizienz`, die es nicht gibt (`quickcheck-app.html:6901/6972`).
   2. Eigene Score-Regler wirken nur beim Profil „custom“, Starter erreichen es nicht (`dealscore.js:61-77`).
   3. Marktbericht aus dem Reiter Objekt ohne `bwk_modus: 'normiert'` nimmt die 23-%-Pauschale (`CrossCheckService.js:971`).

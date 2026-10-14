@@ -38714,6 +38714,14 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2208 · Staging · Fehlerverdachte aus der Hilfe-Erhebung, Rest (14.10.2026)
+- **Was:** Die neun Verdachte aus N62.22 nachgemessen. **Acht waren schon behoben**: v2191 (`ad26710b`) hatte 1–3, 5, 6, 8, 9 erledigt, Punkt 4 stand schon seit v1963. Der Backlog führte sie trotzdem als „nicht nachgemessen". Meine Antwort am Vormittag nannte sie als offen, das war falsch.
+  - **Echt offen war Punkt 7:** `mandanten.js` „Steuerregime · wird in Stufe 2 aktiv". Das rechnet längst (`effRate()` Z. 328, `gesellschaft-abschluss.js`). Dazu: Buchhaltung „(Stufe 3)" und „später Basis für … DATEV-Export". Den Jahresabschluss gibt es seit v1227, einen DATEV-Export gibt es nirgends. Jetzt: „rechnet in Steuer und Jahresabschluss", „für den Jahresabschluss (GuV und Bilanz)", ohne DATEV.
+  - `help.js` zitierte noch „Auto-saved · gerade eben", der Kopf sagt seit v2191 „Gespeichert · gerade eben". Der Ausgangstext in `index.html` ist jetzt ebenfalls deutsch.
+- **Commit:** `83283246`, `ce5df2f7` (frontend-konstanten.json, nur der Fingerabdruck von index.html).
+- **Nachweis:** `node --check` beide Dateien, `buster-ebenen-pruefen` SAUBER, auf Staging per grep: neuer Text da, „Auto-saved" 0×, Buster v2208. Im Browser nicht gesehen (Erweiterung nicht verbunden), Staging-Abnahmepunkt.
+- **Rest:** Frage an Marcel: kein Speichern-Knopf, kein Strg+S. `dpManualSave()` existiert, ruft aber niemand auf. Gesichert wird beim Reiter- und Objektwechsel; beim Schließen mit Änderungen warnt nur der Browser.
+
 ### v2207 · Prod (17) · Grunderwerbsteuer Thüringen und Bremen (13.10.2026)
 
 - **Was:** Mit Quellen geprüft: Thüringen **5,0 %** seit 01.01.2024 (vorher 6,5), Bremen **5,5 %** seit 01.07.2025 (vorher 5,0). Korrigiert in beiden rechnenden Tabellen und in der Anzeige:
