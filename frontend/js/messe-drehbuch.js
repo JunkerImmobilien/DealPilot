@@ -118,7 +118,11 @@
     for (var a = e; a; a = a.ownerDocument.defaultView.frameElement) {
       var w = a.ownerDocument.defaultView;
       for (var s = a.parentElement; s && s !== a.ownerDocument.body; s = s.parentElement) {
-        if (/auto|scroll/.test(w.getComputedStyle(s).overflowY) && s.scrollHeight > s.clientHeight + 5) return s;
+        /* v2222b · nur SENKRECHTE Scroller: die Spannen-Kacheln liegen in einem
+           waagerechten Rollstreifen (overflow-x:auto setzt overflow-y mit) -
+           er wurde als Scroller genommen, gescrollt wurde nie (gemessen 4 s
+           bei Unterkante 856 von 817 freien px). */
+        if (/auto|scroll/.test(w.getComputedStyle(s).overflowY) && s.clientHeight > 120 && s.scrollHeight - s.clientHeight > 20) return s;
       }
     }
     return document.scrollingElement;
@@ -126,7 +130,10 @@
   function holen(e, sanft) {
     var r = rect(e), s = scroller(e), mitte = (70 + innerHeight - 170) / 2;
     var d = r.height > innerHeight - 260 ? r.top - 80 : (r.top + r.height / 2) - mitte;
-    try { s.scrollTo({ top: s.scrollTop + d, behavior: sanft ? 'smooth' : 'auto' }); } catch (x) { s.scrollTop += d; }
+    /* v2222b · immer sofort: sanftes Scrollen brauchte gemessen bis zu 3 s,
+       so lange stand der Kegel außerhalb des Bildes. Die Bewegung liefert der
+       Kegel selbst (Übergang 0,7 s). */
+    try { s.scrollTo({ top: s.scrollTop + d, behavior: 'auto' }); } catch (x) { s.scrollTop += d; }
   }
   function folgen() {
     if (_folge) return;
@@ -391,7 +398,8 @@
           await warte(1500);
         },
         async function (s) {   /* 3 · Tabelle, übernehmen */
-          await zeige(function () { return q('#oabi-result .oabi-tbl'); }, 6);
+          /* v2222b · der sichtbare Teil des Fensters, nicht die ganze Tabelle (1.170 px) */
+          await zeige(function () { return q('#oabi-ov .oabi-body') || q('#oabi-result'); }, 4);
           s.zeile('Jeder Wert mit Quelle', 'Kaufpreis und Hausgeld aus dem Exposé, Fläche, Baujahr und Lage aus dem Marktbericht — ein Klick übernimmt.');
           await warte(4600);
           var ap = q('#oabi-apply'); if (ap) ap.click();
