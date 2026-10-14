@@ -676,7 +676,7 @@
     if (u.indexOf('/api/v1/immometrica/') < 0) return null;
     if (/\/health/.test(u)) return { mode: 'live' };
     if (/\/credentials/.test(u)) return { immometrica: { exists: true } };
-    if (/\/searches\/\d+\/results/.test(u)) return { count: IMO_MIT.suche.count, next: null, items: IMO_MIT.suche.items };
+    if (/\/searches\/\d+\/results/.test(u)) return { count: IMO_MIT.suche.count, next: "mitschnitt", items: IMO_MIT.suche.items };   /* v2228a: wie echt "weitere laden" statt "Mehr liefert die Schnittstelle nicht" */
     if (/\/searches(\?|$)/.test(u)) return IMO_MIT.searches;
     if (/\/favorites\//.test(u)) return { count: IMO_MIT.fav.count, next: null, items: IMO_MIT.fav.items };
     return null;
