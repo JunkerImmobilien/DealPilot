@@ -38761,6 +38761,23 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2220–v2220a · Staging · Zensus-Leerstand am Mietausfall-Risiko, Handy-Knöpfe weiß, neuer Marktbericht Parkstraße (14.10.2026)
+- **Was:**
+  - **v2220:** Der Zensus-Leerstand-Kasten wandert von „Leerstand p.a." unter das Dropdown „Mietausfall-Risiko". Marcel nennt den Gesamtleerstand „nichtssagend".
+    - Gezeigt wird jetzt der marktaktive Leerstand mit einem Anhalt für die Stufe: unter 1,5 / 3 / 5 / 8 % → sehr niedrig / niedrig / mittel / erhöht / hoch. Die Schwellen sind ein VORSCHLAG an der Fluktuationsreserve und stehen sichtbar im Kasten.
+    - Abgleich mit der Wahl, „übernehmen" per Klick (löst das change des Dropdowns aus).
+    - Gesamtleerstand und Dauerleerstand nur noch in der Fußzeile, die Dauer-Liste entfällt.
+  - **v2220a:** „Plan" und „Abmelden" waren in der Handy-Aktenmappe gold. `auth.js` schreibt Gold inline, und die Desktop-Regel hängt an `.dpl-schiene`. Jetzt Creme `#E9E3D6` auf `#171512`, wie am Desktop gemessen.
+  - **Marktbericht Parkstraße neu (Stufe 3):** Marktwert 487.000 € (416.000–570.000), −37,6 % zum Kaufpreis, Marktmiete 6,32 €/m². Vorher 08.10.: 482.000 €.
+- **Commit:** `9fc2dd1a`, `a3c83e1c`
+- **Nachweis:**
+  - Parkstraße: Kasten direkt unter `#ds2_mietausfall`, „2,0 % → Niedrig", Wahl „Mittel" wird als Abweichung erkannt. Nicht übernommen, das entscheidet Marcel.
+  - Messkabine 390 px: beide Knöpfe `rgb(233,227,214)` auf `rgb(23,21,18)`, 40 px.
+  - Gold-Audit Staging RC=0.
+- **Rest:**
+  - Schwellen der Leerstand-Stufen von Marcel abnehmen lassen.
+  - Messe-Szene 1 zeigt neben „780.000 €" weiter „487.000 € · Deutlich über Markt".
+
 ### v2219d–v2219g · Staging · Drehbuch Parkstraße selbst abgenommen (14.10.2026)
 - **Was:** Marcel: „schau es dir selber an". Drei Läufe mit Zeitprotokoll (Zeile, Kegel-Rechteck, NKM-Wert alle 250 ms) und Bildern je Szene.
   - Soll und Ist: Der Kegel zeigt erst den Umschalter, dann das Feld „Nettokaltmiete / Monat" im Reiter Miete. Dort springt 2.321 auf 3.195. Vorher stand die Zahl nur in der Zeile.
