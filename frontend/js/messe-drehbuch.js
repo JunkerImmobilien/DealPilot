@@ -90,9 +90,11 @@
     return (_ziel.isConnected && _ziel.getBoundingClientRect().width > 0) ? _ziel : null;
   }
   /* v2219e/f · Ein Ziel, das nach dem Scrollen noch wächst (Soll/Ist-Kasten: 89 ->
-     163 px), lag gemessen mit der Unterkante 9 px unter dem Fensterrand und unter
-     der Zeile. Rutscht es aus dem freien Bereich, wird nachgescrollt - höchstens
-     dreimal je Ziel, frühestens alle 1,2 s, dann ohne Animation. */
+     163 px), kann aus dem freien Bereich rutschen; dann wird nachgescrollt -
+     höchstens dreimal je Ziel, frühestens alle 1,2 s, ohne Animation.
+     ZURÜCKGENOMMEN: "Unterkante 9 px unter dem Fensterrand" war ein Messfehler -
+     CSS-Pixel gegen die Höhe des Bildschirmfotos (726) verglichen; das Fenster
+     hat bei 90 % Zoom 987 CSS-px, der Kasten lag frei. Immer innerHeight messen. */
   var _nachScroll = 0, _letzterScroll = 0;
   function frei(r) { return r.top >= 70 && r.bottom <= innerHeight - 170; }
   /* v2219f · scrollIntoView(smooth) kam im Drehbuch gemessen NIE an (Kasten blieb
