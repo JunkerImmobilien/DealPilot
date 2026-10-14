@@ -36,7 +36,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N73 · Quick-Check-Score gegen Investor Deal Score — Entscheidung Marcel
+### N73 · Quick-Check-Score gegen Investor Deal Score — ENTSCHIEDEN 14.10.2026: bleibt getrennt
+> Marcel: Der Investor Deal Score bleibt gesondert, weil er mehr Kennzahlen hat, deutlich genauere Aussagen trifft und die Lage eingeht. Quick-Check = DealScore (gemessen gleich), DS2 eigenständig.
 > Gemessen 14.10.2026 (Testobjekt Musterweg 7, Bielefeld, Staging): Quick-Check 46 = Objekt-DealScore 46 (alle Teilwerte gleich). Der Investor Deal Score (DS2, 24 Kennzahlen inkl. Lage/Markt) zeigt am selben Objekt 63. Zwei Zahlen für dasselbe Objekt. Offen: welcher Score wo führt, oder ob DS2 im Quick-Check mitgezeigt bzw. angeglichen wird.
 
 ### N72 · Quick-Check: DealPilot-Marktwert erreicht den Score nicht — offen, Entscheidung Marcel
