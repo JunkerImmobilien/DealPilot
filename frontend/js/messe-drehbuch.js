@@ -8,7 +8,7 @@
    auf die Stelle und schreibt eine Untertitelzeile darunter. Aufnehmen mit
    OBS oder Win+Alt+R; am Stand kann es auch live in Schleife laufen.
 
-   Drehbücher: parkstrasse (v2219), quickcheck (v2222: Datenaufnahme mit zwei
+   Drehbücher: parkstrasse (v2219), immometrica (v2228), quickcheck (v2222: Datenaufnahme mit zwei
    PDFs, Marktwertindikation, Spanne, Bewertung, Lage), quickcheck-tippen (v2221)
    Start:  ?messe=parkstrasse            einmal
            ?messe=parkstrasse&schleife   immer wieder (Messebildschirm)
@@ -219,6 +219,7 @@
     return o ? o.id : null;
   }
 
+  var ABSPANN_LOGO = '<div id="dpm-logo"><span class="w">Deal<b>Pilot</b></span></div><div id="dpm-bahn"><i></i></div><div class="unter">dealpilot.immo</div>';   /* v2228: gemeinsam für alle Abspänne */
   /* ═══ DREHBUCH 1 · PARKSTRASSE 9 — ALTBAU MIT HEBEL ══════════════════ */
   var DREHBUECHER = {
     parkstrasse: {
@@ -550,8 +551,146 @@
         { ms: 5200, html: '<div class="k ab">Quick Boarding</div><h1 class="ab z2">30 Sekunden.</h1><p class="ab z3">Eine fundierte Einschätzung — mit Marktwert, deiner Lage und der Pilot-Analyse.</p>' },
         { ms: 6200, html: '<div id="dpm-logo"><span class="w">Deal<b>Pilot</b></span></div><div id="dpm-bahn"><i></i></div><div class="unter">dealpilot.immo</div>' }
       ]
+    },
+
+    /* ═══ DREHBUCH 4 · IMMOMETRICA — VOM INSERAT ZUM URTEIL (v2228) ═══════
+       Marcel 14.10.2026: „eins mit ImmoMetrica und immer mit Marktbewertung".
+       Echtes Inserat aus Marcels gespeicherter Suche „Haus" (14.10.2026,
+       ImmobilienScout24): 2,5-Familienhaus Herford, 3 WE, 210 m², Bj 1963,
+       350.000 €, leer, Straße nicht veröffentlicht. IMO_MIT ist die einmal
+       echt abgerufene Liste (gekürzt auf das, was das Fenster zeigt), IMO_KARTE
+       die echte DealPilot-Marktbewertung danach (#_mb_state). Je Durchgang
+       KEIN ImmoMetrica- und KEIN Marktbericht-Abruf: die fünf ImmoMetrica-Wege
+       beantwortet _imoFetchAn() aus dem Mitschnitt, nur solange das Drehbuch läuft. */
+    immometrica: {
+      titel: 'Vom Inserat zum Urteil',
+      unterzeile: 'ImmoMetrica · Quick Boarding · DealPilot-Marktbewertung',
+      objekt: null,
+      abspann: [
+        { ms: 5200, html: '<div class="k ab">Quick Boarding</div><h1 class="ab z2">Inserat rein. Urteil raus.</h1><p class="ab z3">Aus über tausend Treffern das eine Haus — mit Marktwert, Spanne und klarer Ansage.</p>' },
+        { ms: 6200, html: ABSPANN_LOGO }
+      ],
+      aufraeumen: function () {
+        _imoFetchAus();
+        var ov = q('#imo-ov'); if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+        var _sv = _spanVorher, zurueck = function () { try { if (_sv === null) localStorage.removeItem('qc_span_config'); else if (_sv !== undefined) localStorage.setItem('qc_span_config', _sv); } catch (e) {} };
+        zurueck(); setTimeout(zurueck, 2500);
+        _spanVorher = undefined;
+        qcAufraeumen(); reiter('s0');
+      },
+      szenen: [
+        async function (s) {   /* 1 · Quick Boarding, Quellen */
+          try { _spanVorher = localStorage.getItem('qc_span_config'); } catch (e) { _spanVorher = undefined; }
+          if (typeof window.sbActionsAction === 'function') sbActionsAction('quickcheck');
+          await warteAuf(function () { var d = qcDoc(); return d && d.readyState === 'complete' && qcEl('qc_kp') && !qcEl('qc_kp').value && qcEl('qc7-sources'); }, 10000);
+          await warte(800);
+          var m = q('.main-col'); if (m) m.scrollTop = 0;
+          await zeige(function () { return qcEl('qc7-sources'); }, 6);
+          s.zeile('Datenaufnahme', 'ImmoMetrica sammelt Inserate aus allen Portalen — deine gespeicherte Suche liegt schon bereit.');
+          await warte(3600);
+        },
+        async function (s) {   /* 2 · ImmoMetrica-Fenster: Suche, Inserat, übernehmen */
+          _imoFetchAn();
+          if (!(window.ImmoMetricaImport && ImmoMetricaImport.open)) return;
+          ImmoMetricaImport.open(function (picked) { try { qcWin().ImmoMetricaQcFill(picked); } catch (e) {} }, { target: 'qc' });
+          await warteAuf(function () { return q('#imo-src .imo-pill'); }, 6000);
+          await warte(700);
+          await zeige('#imo-src', 8);
+          s.zeile('ImmoMetrica', 'Deine Quellen: Favoriten und gespeicherte Suchen.');
+          await warte(2600);
+          var pill = [].filter.call(document.querySelectorAll('#imo-src .imo-pill'), function (x) { return /Suche/.test(x.textContent); })[0];
+          if (pill) pill.click();
+          await warteAuf(function () { return q('#imo-list .imo-o[data-i="3"]'); }, 6000);
+          await warte(600);
+          await zeige('#imo-list', 6);
+          s.zeile('ImmoMetrica', 'Suche „' + IMO_MIT.searches[0].name + '“: <b>' + de(IMO_MIT.suche.count) + '</b> Treffer aus den Portalen.');
+          await warte(3400);
+          var o = q('#imo-list .imo-o[data-i="3"]'); if (o) o.click();
+          await warte(900);
+          await zeige('#imo-detail', 6);
+          var d = IMO_MIT.suche.items[3].dp;
+          s.zeile('Ein Treffer', 'Ein 2,5-Familienhaus in ' + d.ort + ': <b>' + d.einheiten + ' Einheiten</b>, ' + de(d.wfl) + ' m², Baujahr ' + d.baujahr + ', <b>' + eur(d.kp) + '</b> — leer, Straße nicht veröffentlicht.');
+          await warte(5200);
+          var ok = q('#imo-confirm'); if (ok) ok.click();
+          await warte(1400);
+        },
+        async function (s) {   /* 3 · Ortskern */
+          await zeige(function () { return qcGruppe('adr'); }, 6);
+          var h = qcText('qc-ortskern-hinweis');
+          s.zeile('Ohne Straße', h ? h.replace(/\.\s*Straße nachtragen.*$/, '') + ' — Straße nachtragen macht es genauer.' : 'Ohne Straße rechnet Quick Boarding mit dem Ortskern.');
+          await warte(4600);
+        },
+        async function (s) {   /* 4 · DealPilot-Marktbewertung (Mitschnitt) */
+          await zeige(function () { return qcEl('qc7-sources'); }, 6);
+          var st = qcEl('_mb_state');
+          if (!st) { var dd = qcDoc(); st = dd.createElement('input'); st.type = 'hidden'; st.id = '_mb_state'; dd.body.appendChild(st); }
+          st.value = JSON.stringify({ ts: Date.now(), card: IMO_KARTE, mode: 'med', collapsed: false });
+          try { qcWin()._oabFeedTrigger(); } catch (e) {}
+          await warte(900);
+          await zeige(function () { return qcEl('oab-results'); }, 6);
+          s.zeile('Marktbewertung', 'DealPilot schätzt das Haus: Marktwert <b>' + eur(IMO_KARTE.mw.low) + ' – ' + eur(IMO_KARTE.mw.high) + '</b>, Miete <b>' + eur(IMO_KARTE.mm.low) + ' – ' + eur(IMO_KARTE.mm.high) + '</b> im Monat.');
+          await warte(5400);
+        },
+        async function (s) {   /* 5 · Spanne: Unten, Ø, Oben */
+          var stufen = [['low', 'Unten', 'die vorsichtige Miete'], ['mid', 'Ø', 'die mittlere Miete'], ['high', 'Oben', 'die gute Miete']];
+          for (var k = 0; k < stufen.length; k++) {
+            await zeige(function () { return qcSel('.avs-spanne'); }, 8);
+            s.zeile('Die Spanne', '„' + stufen[k][1] + '“ — ' + stufen[k][2] + ' geht in die Rechnung …');
+            await warte(1400);
+            var t = qcSel('.avs-spanne [data-spanne="' + stufen[k][0] + '"]'); if (t) t.click();
+            await warte(700);
+            await zeige(function () { return qcEl('score-block'); }, 4);
+            await warte(900);
+            var sc = qcScore();
+            s.zeile('Die Spanne', stufen[k][1] + ': Miete <b>' + eur(IMO_KARTE.mm[stufen[k][0] === 'mid' ? 'med' : stufen[k][0]]) + '</b> → Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+            await warte(4200);
+          }
+        },
+        async function (s) {   /* 6 · 20 % Eigenkapital -> Gut */
+          await zeige(function () { return qcGruppe('fin'); }, 6);
+          s.zeile('Mehr Eigenkapital', 'Miete „Oben“ und 20 % Eigenkapital …');
+          await warte(1500);
+          var b80 = [].filter.call((qcDoc() || document).querySelectorAll('.ltv-btn'), function (x) { return /^80/.test(x.textContent.trim()); })[0];
+          if (b80) b80.click();
+          await warte(900);
+          await zeige(function () { return qcEl('score-block'); }, 4);
+          await warte(900);
+          var sc = qcScore();
+          s.zeile('Mehr Eigenkapital', 'Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+          await warte(3800);
+          await zeige(function () { return qcEl('ai-verdict'); }, 10);
+          s.zeile('Die Bewertung', 'Unten steht, warum: Rendite, Cashflow, DSCR — und was vor dem Kaufvertrag noch zu prüfen ist.');
+          await warte(5200);
+        }
+      ],
+      schluss: ''
     }
   };
+
+  /* v2228 · ImmoMetrica-Mitschnitt (Drehbuch 4) und Abruf-Ersatz */
+  var IMO_MIT = {"searches":[{"id":110695,"name":"Haus","count":null}],"suche":{"count":1527,"items":[{"raw":{"id":29057744,"title":"Immobilie mit Weitsicht! Familienleben auf großzügigem Grundstück","address_raw":"32584 Nordrhein-Westfalen - Löhne"},"dp":{"plz":"32584","ort":"Löhne","str":"","hnr":"","objart":"EFH","wfl":248,"baujahr":1910,"kp":459000,"kuerzel":"Immobilie mit Weitsicht! Familienleben a"}},{"raw":{"id":29056646,"title":"Zeitlose Architektur - elegante Doppelhaushälfte auf 3 Etagen","address_raw":"32602 Vlotho (Valdorf)"},"dp":{"plz":"32602","ort":"Vlotho","str":"","hnr":"","objart":"DHH","wfl":140,"baujahr":2027,"kp":389550,"kuerzel":"Zeitlose Architektur - elegante Doppelha"}},{"raw":{"id":29056607,"title":"Alles auf einer Ebene: Klein, gut gelegen und voller Komfort","address_raw":"32549 Nordrhein-Westfalen - Bad Oeynhausen"},"dp":{"plz":"32549","ort":"Bad Oeynhausen","str":"","hnr":"","objart":"EFH","wfl":79.9,"baujahr":1996,"kp":269000,"kuerzel":"Alles auf einer Ebene: Klein, gut gelege"}},{"raw":{"id":29054110,"title":"Attraktives 2,5-Familienhaus in Herford mit Entwicklungspotenzial in gefragter Wohnlage ","address_raw":"32049, Herford","online_since":"2026-10-14T09:22:10+02:00","reactivated_at":null},"dp":{"plz":"32049","ort":"Herford","str":"","hnr":"","objart":"MFH","wfl":210,"gsfl":700,"baujahr":1963,"kp":350000,"nkm":null,"zimmer":9,"bad_anz":3,"etage":null,"etagen_ges":3,"einheiten":3,"kuerzel":"Attraktives 2,5-Familienhaus in Herford ","vermstand":"Leer","ds2_zustand":"renovierungsbeduerftig","notizen":"— Aus ImmoMetrica übernommen —\nAttraktives 2,5-Familienhaus in Herford mit Entwicklungspotenzial in gefragter Wohnlage \n\nQuelle: ImmobilienScout24 – https://www.immobilienscout24.de/expose/171754199\nI","_immometrica_id":29054110,"_quelle":"IS24","_expose":"https://www.immobilienscout24.de/expose/171754199","_immometrica_online_since":"2026-10-14T09:22:10+02:00","_immometrica_reaktiviert":null,"_immometrica_portals":1}},{"raw":{"id":29053942,"title":"Ein-/Zweifamilienhaus in Lübbecke","address_raw":"32312 Nordrhein-Westfalen - Lübbecke"},"dp":{"plz":"32312","ort":"Lübbecke","str":"","hnr":"","objart":"EFH","wfl":239,"baujahr":1963,"kp":219000,"kuerzel":"Ein-/Zweifamilienhaus in Lübbecke"}}]},"fav":{"count":7,"items":[{"raw":{"id":28984357,"title":"Modernisiertes Familienhaus mit großer Gewerbefläche","address_raw":"32602, Vlotho"},"dp":{"plz":"32602","ort":"Vlotho","str":"","hnr":"","objart":"EFH","wfl":107,"baujahr":null,"kp":298000,"kuerzel":"Modernisiertes Familienhaus mit großer G"}},{"raw":{"id":28960072,"title":"Mehrfamilienhaus in Enger Pödinghausen zu verkaufen.","address_raw":"32130 Nordrhein-Westfalen - Enger"},"dp":{"plz":"32130","ort":"Enger","str":"","hnr":"","objart":"MFH","wfl":270,"baujahr":1922,"kp":188500,"kuerzel":"Mehrfamilienhaus in Enger Pödinghausen z"}},{"raw":{"id":28948841,"title":"Grundstücke mit Projektentwicklung suchen Anleger/Investor!","address_raw":"32049 Herford (Innenstadt)"},"dp":{"plz":"32049","ort":"Herford","str":"","hnr":"","objart":"MFH","wfl":665,"baujahr":2027,"kp":2976750,"kuerzel":"Grundstücke mit Projektentwicklung suche"}},{"raw":{"id":28927948,"title":"32361 Preußisch Oldendorf: Pure-Home-Aktion für clevere Familienplanung","address_raw":"32361 Nordrhein-Westfalen - Preußisch Oldendorf"},"dp":{"plz":"32361","ort":"Preußisch Oldendorf","str":"","hnr":"","objart":"EFH","wfl":146.36,"baujahr":null,"kp":354139,"kuerzel":"32361 Preußisch Oldendorf: Pure-Home-Akt"}}]}};
+  var IMO_KARTE = {"area":210,"rating":"Attraktiv","conf":{"label":"Mittel","pct":66},"mikro":"Gut · 6,5","makro":"Durchschnittlich · 5,9","microRaw":65,"macroRaw":59,"trendRaw":null,"trend":"–","zensus":{"ebene":"Gemeinde","name":"Herford, Hansestadt","leer":4,"eig":42.1,"miete":4.66},"brw":{"wert":110,"quelle":"BORIS-NRW","stichtag":"2026-01-01"},"makroGemessen":4,"mw":{"low":361000,"med":393000,"high":461000,"sqm":"1.870 €/m²"},"mm":{"low":1499,"med":1756,"high":2327,"sqm":"8,36 €/m² kalt"}};
+  var _fetchEcht = null;
+  function _imoAntwort(url) {
+    var u = String(url || '');
+    if (u.indexOf('/api/v1/immometrica/') < 0) return null;
+    if (/\/health/.test(u)) return { mode: 'live' };
+    if (/\/credentials/.test(u)) return { immometrica: { exists: true } };
+    if (/\/searches\/\d+\/results/.test(u)) return { count: IMO_MIT.suche.count, next: null, items: IMO_MIT.suche.items };
+    if (/\/searches(\?|$)/.test(u)) return IMO_MIT.searches;
+    if (/\/favorites\//.test(u)) return { count: IMO_MIT.fav.count, next: null, items: IMO_MIT.fav.items };
+    return null;
+  }
+  function _imoFetchAn() {
+    if (_fetchEcht) return;
+    _fetchEcht = window.fetch;
+    window.fetch = function (url, opt) {
+      var a = lauf ? _imoAntwort(typeof url === 'string' ? url : (url && url.url)) : null;
+      if (a) return Promise.resolve(new Response(JSON.stringify(a), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+      return _fetchEcht.apply(this, arguments);
+    };
+  }
+  function _imoFetchAus() { if (_fetchEcht) { window.fetch = _fetchEcht; _fetchEcht = null; } }
 
   /* v2222 · die beiden Mitschnitte (siehe Drehbuch 3) */
   var _spanVorher, _kiFrei = null;
