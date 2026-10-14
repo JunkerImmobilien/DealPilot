@@ -38761,6 +38761,19 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2235–v2235e · Messe-Studio und Drehbuch „quickcheck-rundgang" (14.10.2026)
+- **Was:** Marcel wollte es wie in den beiden Referenzvideos (`Dateien/Messe/mediation.mp4`, `werkstatt.mp4`): die App im Rahmen, darunter ein Kapitelband mit dem Text, im DealPilot-Design. Inhalt: erst die Methoden der Datenaufnahme nacheinander, dann mit einer weiter bis „Als Objekt speichern“. Intro 03, Outro 02.
+  - `frontend/messe-studio.html` zeigt die App als iframe im Goldrahmen. Ihr Viewport ist 1.700 px breit und wird auf den Rahmen gestreckt. Darunter liegt das Kapitelband: goldene Nummernkachel, Titel, Erklärung, Punkte, Fortschrittslinie. Intro und Outro kommen aus `js/messe-effekte.js` (Baukasten, Gold über `--wl`-Tokens). Parameter: `?messe=&intro=&outro=&qr=&breite=&auto`.
+  - `messe-drehbuch.js` mit `?studio=1` im iframe: Die Zeilen gehen per postMessage als Kapitel ans Studio. Titelkarte und Abspann entfallen, der Start kommt auf das Zeichen `los`, `ende` vor dem Aufräumen. Unten wird nichts freigehalten. Die Pilot-Figur ist ab dem ersten Laden aus (Marcel: „den Pilot musst du ausblenden!“).
+  - Drehbuch `quickcheck-rundgang`, 14 Kapitel: Datenaufnahme, Exposé/Marktbericht, Sprache, ImmoMetrica, DealPilot-Marktbewertung, von Hand. Dann die Szenen aus `quickcheck` (Mitschnitte) und als Schluss der Knopf „Als Objekt speichern“, gezeigt, nicht geklickt.
+  - `buster-ebenen-pruefen.mjs` prüft `messe-studio.html` als sechstes Dokument.
+- **v2235e · Ursache verschobener Kegel** (Marcel: „der nicht ausgegraute Bereich ist verschoben“): `rect()` und `scroller()` liefen über `frameElement` bis ganz nach oben. Im Studio ist die App selbst ein iframe, und dessen Lage kam noch einmal dazu. Jetzt wird nur bis zum Dokument gerechnet, in dem der Kegel liegt. Nachgemessen: Kegel 886/393/124×50 gegen die Sprache-Kachel +8 px, ebenfalls 886/393/124×50.
+- **Commit:** `0d6ec6e8`, `28ef1ca0`, `be145abc`, `ce71dd42`, `a23d58c1`, `cf2a3f88`
+- **Nachweis:** Gold-Audit auf Staging RC=0. Buster sauber über sechs Dokumente. Drei volle Läufe; der dritte ist das Video `Dateien/Messe/Videos/quickcheck-rundgang-studio_2026-10-14.mp4`: 224,8 s, 1920×1022, 8,8 MB. Kontaktabzug geprüft: Intro, Kapitel 1–14, Outro mit QR.
+  - Aufnahme 1 hatte den verschobenen Kegel, Aufnahme 2 zeigte 7 s den Desktop (Abriss der Browser-Verbindung beim Abfragen). Lehre: während der Aufnahme den Browser nicht abfragen, nur in PowerShell auf ffmpeg warten.
+  - Der Chrome-Hinweisbalken nimmt im Vollbild PLATZ ein (innerHeight 1137 statt 1200 CSS-px), er liegt nicht über der Seite. `oben=` bleibt deshalb 0, der Zuschnitt von 58 px reicht.
+- **Rest:** Kurz nach dem Intro ist die App etwa 1 s ohne Band zu sehen, bevor Quick Boarding öffnet. Ob das Video so passt, entscheidet Marcel. Für andere Drehbücher fehlen noch die Intro-/Outro-Texte in `TEXTE` des Studios.
+
 ### v2234–v2234c · Erklärtext als Karte am Feld · Messe-Baukasten (14.10.2026)
 - **Was:**
   - **Baukasten** `design/Vorschläge/messe-video/messe-effekte.js`: 10 Intros, 10 Info-Karten, 10 Outros. Alle Texte sind Felder mit Vorgabe, sechs Outros tragen einen echten QR-Code. Vorschau mit Video dahinter: https://claude.ai/artifact/BANFkS1maT5MhjhGGNooLe. Skill und Agent `messe-video` kennen ihn.

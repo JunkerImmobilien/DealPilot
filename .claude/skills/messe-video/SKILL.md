@@ -54,6 +54,15 @@ Vorhandene Drehbücher: `parkstrasse`, `quickcheck`, `quickcheck-tippen`,
    - Die Spannen-Vorgabe steht wieder auf dem alten Wert.
 6. Stichbilder ansehen (Screenshot), nicht nur das Protokoll lesen.
 
+## Studio: App im Rahmen, Kapitelband unten (seit v2235, die Vorgabe für neue Videos)
+
+- `https://app.staging.dealpilot.immo/messe-studio.html?messe=<drehbuch>&intro=<id>&outro=<id>&qr=<url>`. Der Start kommt per Knopf, per Leertaste oder per JS mit `DPM_STUDIO.los()`. Fertig ist es, sobald `window.DPM_STUDIO_FERTIG` gesetzt ist (dann läuft das Outro).
+- Jede `s.zeile(titel, text)` wird ein Kapitel: Nummer = Szene, der Titel steht groß, der Text darunter (höchstens 2 Zeilen, kurz halten). Die Intro- und Outro-Texte je Drehbuch stehen in `TEXTE` im Studio.
+- Die App bekommt einen Viewport von 1.700 px (`&breite=`) und wird auf den Rahmen gestreckt. Die Pilot-Figur ist im Studio aus.
+- **Rahmen-Rechnung:** `rect()`/`scroller()` rechnen nur bis zum eigenen Dokument hoch. Nie über `frameElement` bis ganz nach oben, sonst kommt die Lage des Studio-Rahmens doppelt dazu (v2235e).
+- **Aufnahme:** ffmpeg starten, 1 s warten, `DPM_STUDIO.los()`, dann NUR in PowerShell auf das Ende von ffmpeg warten. Browser-Abfragen während der Aufnahme rissen die Verbindung ab, und das Video zeigte 7 s den Desktop. Danach die erste Sekunde abschneiden (`-ss 1.2`). Fenster: `tools/messe-fenster.ps1 -Was vor|zurueck`, Aufnahme: `tools/messe-aufnahme.ps1 -Name <datei>.mp4 -Sekunden <s>`.
+- Der Chrome-Hinweisbalken nimmt im Vollbild Platz ein, er liegt nicht über der Seite. Kein `oben=`, der Zuschnitt `crop=1920:1022:0:58` reicht.
+
 ## Baukasten: Intros, Info-Karten, Outros
 
 `design/Vorschläge/messe-video/messe-effekte.js` stellt 30 Stücke bereit: 10 Intros, 10 Info-Karten und 10 Outros. Die Vorschau mit Textfeldern liegt unter https://claude.ai/artifact/BANFkS1maT5MhjhGGNooLe.
