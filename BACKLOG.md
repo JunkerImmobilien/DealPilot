@@ -44,6 +44,10 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 4. **Handy-Kopf:** alle wichtigen Informationen drauf, aber wild angeordnet → aufräumen. In der Messkabine durchtesten.
 5. **Parkstr. 9 (2026-1056):** Nettokaltmiete anpassen, damit es eine gute Geschichte wird (Demo-Objekt).
 6. **Soll/Ist-Analyse** (Pilot-Analyse) ausbauen.
+7. **Auch in Kanzlei, Tower und Aktenmappe prüfen** (Marcel, während der Arbeit).
+8. **Desktop:** Das Aktionsmenü soll beim Auswählen eines Objekts NICHT zugehen (nur am Handy).
+9. **Anzeige → Anzeige-Option:** Auslieferungszustand ist immer **Aktenmappe mit Boardkarte**.
+10. **Löschen-/Duplizieren-Knöpfe auf den Objektkarten:** Der Rahmen drumherum ist zu groß → der Score wird abgeschnitten, der Kartenrahmen stimmt nicht mehr.
 
 ### N66 · Marcel 14.10.2026 (dritte Runde) — Messe-Geschichten, BMF, RND-Abgleich, Werbungskosten
 1. **Messe-Geschichten als Dokument ablegen** — was Marcel an jedem Demo-Objekt erklären kann.

@@ -9511,3 +9511,37 @@ html:not([data-dp-layout]) body aside.sidebar#sidebar #sb-list .sb-card .sbc-act
     box-shadow:inset 0 0 0 1px rgba(233,227,214,.35) !important;
   }
 }
+
+/* ═══ v2216b · KNOPFKASTEN AUF DER OBJEKTKARTE NUR SO GROSS WIE DIE KNÖPFE ═══
+   Marcel 14.10.2026: „den Löschen- und Duplizieren-Button anschauen auf den
+   Karten. Der Rahmen da drum ist zu groß … dadurch wird der Score
+   abgeschnitten und auch der Rahmen wird nicht mehr richtig angezeigt von der
+   Objektkartei." Gemessen (Aktenmappe + Bordkarte, 1280 px, beim Überfahren):
+   .sbc-actions 61 × 44 px ab der Kartenoberkante - genau die Kartenhöhe
+   (height:100%, Z. 5874) mit dunklem Verlauf: er übermalte den oberen und
+   unteren Kartenrand und reichte bis an den Ring. Jetzt ein kleiner Kasten,
+   mittig, nur um die beiden Knöpfe; die waagerechte Lage bleibt. */
+html[data-dp-layout] body aside#sidebar .dpl-schiene .sb-card .sbc-actions,
+html[data-dp-layout] body .dpl-schiene .sb-card .sbc-actions{
+  top:50% !important;
+  bottom:auto !important;
+  height:auto !important;
+  transform:translateY(-50%) !important;
+  padding:3px !important;
+  gap:4px !important;
+  border-radius:8px !important;
+  background:#15140F !important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.06), -10px 0 12px 2px #15140F !important;
+}
+html[data-dp-layout] body aside#sidebar .dpl-schiene .sb-card:hover .sbc-actions,
+html[data-dp-layout] body .dpl-schiene .sb-card:hover .sbc-actions{
+  background:#1A1815 !important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.06), -10px 0 12px 2px #1A1815 !important;
+}
+html[data-dp-layout] body aside#sidebar .dpl-schiene .sb-card.active .sbc-actions,
+html[data-dp-layout] body aside#sidebar .dpl-schiene .sb-card.is-active .sbc-actions,
+html[data-dp-layout] body .dpl-schiene .sb-card.active .sbc-actions,
+html[data-dp-layout] body .dpl-schiene .sb-card.is-active .sbc-actions{
+  background:#221F1A !important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.06), -10px 0 12px 2px #221F1A !important;
+}
