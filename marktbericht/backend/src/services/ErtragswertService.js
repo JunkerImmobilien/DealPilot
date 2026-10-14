@@ -406,7 +406,22 @@ export const ErtragswertService = {
       const _gewVerwPct = _gewJahr != null ? BWK_JAHRE[_gewJahr].gew_verw_pct : 3;
       const verwGewerbe = gewerbe > 0 ? round0(gewerbe * _gewVerwPct / 100) : 0;
       const verwaltung = round0(we * vJeWe + spAnz * vJeStp) + verwGewerbe;
-      const instand = round0(wfl * iJeQm + spAnz * iJeStp);
+      /* v2210 · Instandhaltung der Gewerbeflaechen je m2 NUTZflaeche, nach
+         Nutzungsart (Anlage 3: Buero/Praxen/Geschaefte 100 %, SB-Markt 50 %,
+         Lager/Logistik 30 % der Wohn-Instandhaltung), zum Stichtag aus BWK_JAHRE.
+         wfl ist hier seit v2210 nur der WOHNteil (CrossCheckService trennt). */
+      const _GEW_SCHL = { buero_praxis_laden: 'buero', sb_markt: 'sb_markt', lager_logistik: 'lager' };
+      const _gewFl = (ein.gewerbe_flaechen && typeof ein.gewerbe_flaechen === 'object') ? ein.gewerbe_flaechen : {};
+      const _gewInstSaetze = (_gewJahr != null && BWK_JAHRE[_gewJahr].gew_inst_qm) || null;
+      let instGewerbe = 0; const _instGewTeile = [];
+      if (gewerbe > 0 && _gewInstSaetze) {
+        Object.keys(_gewFl).forEach((n) => {
+          const satz = _gewInstSaetze[_GEW_SCHL[n]]; const fl = pos(_gewFl[n]);
+          if (satz != null && fl) { instGewerbe += fl * satz; _instGewTeile.push(Math.round(fl) + ' m² × ' + String(satz).replace('.', ',') + ' €'); }
+        });
+      }
+      instGewerbe = round0(instGewerbe);
+      const instand = round0(wfl * iJeQm + spAnz * iJeStp) + instGewerbe;
       /* getrennt exakt rechnen, nicht ueber den gerundeten Mischsatz (1.079 statt 1.080 EUR) */
       const mietausfall = _maGetrennt
         ? round0((rohertrag - gewerbe) * _maGetrennt.wohnen / 100 + gewerbe * _maGetrennt.gewerbe / 100)
@@ -414,8 +429,11 @@ export const ErtragswertService = {
       if (gewerbe > 0) {
         out.hinweise.push('Gewerbe: Verwaltung mit ' + _gewVerwPct + ' % des gewerblichen Rohertrags angesetzt'
           + (_maGetrennt ? ', Mietausfallwagnis 4 % auf Gewerbe und 2 % auf Wohnen' : '')
-          + '. Die Instandhaltung der Gewerbeflächen ist NICHT angesetzt - dafür fehlen Nutzfläche und Nutzungsart'
-          + ' (Anlage 3: Lager 30 %, SB-Markt 50 %, Büro/Praxen/Geschäfte 100 % der Wohn-Instandhaltung je m²).');
+          + (instGewerbe > 0
+            ? '. Instandhaltung der Gewerbeflächen nach Nutzungsart (Anlage 3): ' + _instGewTeile.join(' + ') + ' = ' + instGewerbe.toLocaleString('de-DE') + ' €'
+            : '. Die Instandhaltung der Gewerbeflächen ist NICHT angesetzt - dafür fehlt die Nutzungsart je Gewerbeeinheit'
+              + ' (Anlage 3: Lager 30 %, SB-Markt 50 %, Büro/Praxen/Geschäfte 100 % der Wohn-Instandhaltung je m²).')
+          + (pos(ein.gewerbe_ohne_nutzung_qm) && instGewerbe > 0 ? ' ' + Math.round(ein.gewerbe_ohne_nutzung_qm) + ' m² Gewerbe ohne Nutzungsart sind ohne Instandhaltung gerechnet.' : ''));
       }
       const betriebNul = round0(pos(ein.bwk_betrieb_nul_jahr) || 0);
 
@@ -425,7 +443,8 @@ export const ErtragswertService = {
              + (verwGewerbe ? ` + Gewerbe ${_gewVerwPct} % vom Rohertrag` : '')
              + ')',
         wert: verwaltung });
-      bwkDetail.push({ pos: `Instandhaltung (${wfl} m² × ${deZahl(iJeQm)} €)`,
+      bwkDetail.push({ pos: `Instandhaltung (${wfl} m² × ${deZahl(iJeQm)} €`
+             + (instGewerbe > 0 ? ` + Gewerbe ${_instGewTeile.join(' + ')}` : '') + ')',   /* v2210 */
         detail: iHerkunft === 'Anlage 3' ? null : 'aus deiner Rücklage',
         wert: instand });
       bwkDetail.push({ pos: _maGetrennt ? `Mietausfallwagnis (Wohnen ${_maGetrennt.wohnen} %, Gewerbe ${_maGetrennt.gewerbe} % - zusammen ${deZahl(maPct)} %)` : `Mietausfallwagnis (${deZahl(maPct)} % vom Rohertrag)`,

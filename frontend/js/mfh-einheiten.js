@@ -356,7 +356,9 @@
     return '<tr>' +
       '<td>' + inp('nr', 44, String(i + 1)) + '</td>' +
       '<td>' + inp('lage', 86, 'EG links') + '</td>' +
-      '<td>' + sel('art', [['wohnen', 'Wohnen'], ['gewerbe', 'Gewerbe']]) + '</td>' +
+      '<td>' + sel('art', [['wohnen', 'Wohnen'], ['gewerbe', 'Gewerbe']]) +
+        /* v2210 · Nur bei Gewerbe: die Nutzungsart entscheidet die Instandhaltung (Anlage 3 ImmoWertV). */
+        (e.art === 'gewerbe' ? '<div style="margin-top:4px">' + sel('nutzung_gew', GEWERBE_NUTZUNG) + '</div>' : '') + '</td>' +
       '<td>' + inp('wfl', 60, 'm²', 'decimal') + '</td>' +
       '<td>' + inp('zimmer', 44, '', 'decimal') + '</td>' +
       '<td>' + inp('ist', 72, '€/Mon', 'decimal') + '</td>' +
@@ -401,6 +403,18 @@
   ];
   var WOHNUNG_FOTOS_MAX = 6;
 
+  /* v2210 · Gewerbe im Ertragswert. Anlage 3 ImmoWertV setzt die
+     Instandhaltung gewerblicher Flaechen als Anteil der Wohn-Instandhaltung
+     je m2 Nutzflaeche an: Buero/Praxen/Geschaefte 100 %, SB-Maerkte 50 %,
+     Lager/Logistik 30 %. Ohne Nutzungsart rechnet der Marktbericht keine
+     Gewerbe-Instandhaltung (und sagt es). */
+  var GEWERBE_NUTZUNG = [
+    ['', '– Nutzung –'],
+    ['buero_praxis_laden', 'Büro / Praxis / Laden'],
+    ['sb_markt', 'SB-Markt'],
+    ['lager_logistik', 'Lager / Logistik']
+  ];
+
   function wSchliessen() { var a = el("mfh-we-ov"); if (a && a.parentNode) a.parentNode.removeChild(a); }
 
   function wohnungOeffnen(i) {
@@ -437,6 +451,14 @@
           f('keller', 'Keller / Abstellraum', 'z.\u202fB. Kellerabteil 4') +
           f('stellplatz', 'Stellplatz / Garage', 'z.\u202fB. TG-Platz 7') +
         '</div>' +
+        /* v2210 \u00b7 erscheint nur, wenn die Einheit Gewerbe ist */
+        '<div id="mfh-we-gew-box"><h4>Gewerbe</h4>' +
+          '<p class="mfh-we-hint">Die Fl\u00e4che gilt hier als <b>Nutzfl\u00e4che</b>. F\u00fcr den Ertragswert z\u00e4hlt die <b>markt\u00fcbliche</b> Miete (\u00a7 31 Abs. 2 ImmoWertV). ' +
+          'Fehlt sie, setzt der Marktbericht die Ist-Miete an und kennzeichnet das Ergebnis als indikativ.</p>' +
+          '<div class="mfh-we-raster">' +
+            s('nutzung_gew', 'Nutzungsart', GEWERBE_NUTZUNG) +
+            f('markt_qm', 'Markt\u00fcbliche Miete (\u20ac/m\u00b2 \u00b7 Monat)', 'optional', 'decimal') +
+          '</div></div>' +
         '<h4>Miete</h4><div class="mfh-we-raster">' +
           f('ist', 'Ist-Kaltmiete (\u20ac/Monat)', '', 'decimal') +
           f('soll', 'Soll-Kaltmiete (\u20ac/Monat)', '', 'decimal') +
@@ -549,6 +571,11 @@
     }
     if (vArt) vArt.addEventListener("change", erhoehungZeigen);
     erhoehungZeigen();
+    /* v2210 · Gewerbe-Block nur bei Art = Gewerbe */
+    var gArt = ov.querySelector('[data-wk="art"]');
+    function gewerbeZeigen() { var b = el('mfh-we-gew-box'); if (b) b.style.display = (gArt && gArt.value === 'gewerbe') ? '' : 'none'; }
+    if (gArt) gArt.addEventListener("change", gewerbeZeigen);
+    gewerbeZeigen();
     bilderZeichnen(e);
     el("mfh-we-bild-neu").onclick = function () { el("mfh-we-datei").click(); };
     el("mfh-we-datei").onchange = function (ev) { bilderAufnehmen(e, ev.target.files); };
@@ -888,7 +915,8 @@
     m.addEventListener('input', function (ev) { var t = ev.target; if (t.dataset && t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme(); punkteZeigen(); } });
     m.addEventListener('change', function (ev) {
       var t = ev.target; if (t.tagName !== 'SELECT') return;
-      if (t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme(); }
+      if (t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme();
+        if (t.dataset.k === 'art') { zeichnen(); return; } }   /* v2210: Nutzungsart erscheint/verschwindet */
       if (t.dataset.geb) { _geb[t.dataset.geb] = t.value; }
       if (t.dataset.mk) { var e = _arbeit[+t.dataset.mi]; e.mod = e.mod || {}; e.mod[t.dataset.mk] = t.value; }
       punkteZeigen();

@@ -134,6 +134,9 @@ export const ReportOrchestrator = {
       garden_area: input.garden_area ? Number(input.garden_area) : null,
       plot_area: input.plot_area ? Number(input.plot_area) : null,
       units: input.units ? Number(input.units) : null,
+      /* v2210 · Gewerbeteil aus den MFH-Einheiten (DealPilotObjectMapper.gewerbeAus) - ohne
+         diese Zeile laege er im input und kaeme im CrossCheckService nie an (wie WREF-1). */
+      gewerbe: (input.gewerbe && typeof input.gewerbe === 'object') ? input.gewerbe : null,
       /* v1438: der Mapper liefert eq_elevator als 'Ja' (Grossschreibung) — das fiel bisher durch. */
       elevator: input.elevator === true || /^(true|ja)$/i.test(String(input.elevator == null ? '' : input.elevator)) || false,
       garages: input.garages ? Number(input.garages) : null,
