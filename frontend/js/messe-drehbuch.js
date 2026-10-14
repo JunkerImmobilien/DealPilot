@@ -95,13 +95,18 @@
   }
   async function zeige(ziel, pad) {
     _ziel = ziel || null; _pad = pad == null ? 10 : pad;
-    if (!_ziel) { kegel(null); return; }
+    /* v2219d · Szenenwechsel: die alte Zeile geht mit dem alten Ziel (sie stand
+       gemessen 2-3 s über dem nächsten Reiter) */
+    if (!_ziel) { kegel(null); zeileWeg(); return; }
     var z = zielEl();
-    if (z) { try { z.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} }
+    /* nur scrollen, wenn das Ziel nicht frei sichtbar ist - sonst schiebt es den
+       Umschalter oben aus dem Bild; unten liegt die Zeile (rund 160 px) */
+    if (z) { var r = z.getBoundingClientRect(); if (r.top < 70 || r.bottom > innerHeight - 170) { try { z.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} } }
     folgen();
     await warte(750);
   }
   function reiter(sec) { var t = q('.tab[data-target-sec="' + sec + '"]'); if (t) t.click(); }
+  function nkmFeld() { var n = q('#nkm'); return n && n.closest('.f'); }
   async function warteAuf(fn, ms) { var t0 = Date.now(); while (Date.now() - t0 < (ms || 6000)) { var v = fn(); if (v) return v; await warte(150); } return null; }
 
   /* ── Objekt finden: über die Anschrift, nicht über eine Kennung ─────
@@ -129,10 +134,15 @@
           await warte(5200);
         },
         async function (s) {
-          reiter('s0'); await warte(700);
+          /* v2219d · Der Kegel zeigt erst den Umschalter, dann die Miete selbst:
+             vorher stand die Zahl nur in der Zeile, in der App sah man sie nicht */
+          await zeige(null); reiter('s2'); await warte(900);
           var seg = await warteAuf(function () { return [].filter.call(document.querySelectorAll('.ank-wahl .ank-seg'), function (b) { return /Soll/.test(b.textContent); })[0]; });
-          if (seg) seg.click();
           await zeige('.ank-wahl', 8);
+          if (seg) seg.click();
+          await warteAuf(function () { return window.DealPilotAnkaufAnsicht && DealPilotAnkaufAnsicht.aktiv(); }, 8000);
+          await warte(500);
+          await zeige(nkmFeld, 10);
           var K = (DealPilotAnkauf.stand() || {}).kurz || {};
           var teile = [];
           if (K.nkm != null) teile.push('<b>' + eur(K.nkm) + '</b> Nettokaltmiete');
@@ -143,10 +153,12 @@
         },
         async function (s) {
           var seg = [].filter.call(document.querySelectorAll('.ank-wahl .ank-seg'), function (b) { return /Ist/.test(b.textContent); })[0];
+          zeileWeg(); await zeige('.ank-wahl', 8);
           if (seg) seg.click();
           /* erst weiter, wenn die Ankauf-Ansicht wirklich gelöst ist (der Ist-Stand neu geladen) */
           await warteAuf(function () { return window.DealPilotAnkaufAnsicht && !DealPilotAnkaufAnsicht.aktiv(); }, 8000);
           await warte(400);
+          await zeige(nkmFeld, 10);
           var nkm = parseFloat(String((q('#nkm') || {}).value || '').replace(/\./g, '').replace(',', '.'));
           s.zeile('Ist · heute', 'Eine Wohnung saniert und neu vermietet: <b>' + (isFinite(nkm) ? eur(nkm) : '–') + '</b> Nettokaltmiete.');
           await warte(5500);
@@ -160,8 +172,10 @@
           function z(wort) { return a && a.zeilen.filter(function (x) { return x.wort === wort; })[0]; }
           var teile = [], d = z('DSCR'), c = z('Cashflow n. Steuer'), sc = z('DealScore');
           if (d) teile.push('DSCR <b>' + de(d.ankauf, 2) + ' → ' + de(d.bestand, 2) + '</b>');
-          if (c) teile.push('Cashflow n. St. <b>' + eur(c.ankauf) + ' → ' + eur(c.bestand) + '</b>');
-          if (sc) teile.push('DealScore <b>' + de(sc.ankauf) + ' → ' + de(sc.bestand) + '</b>');
+          /* v2219d · kürzer: mit "Cashflow n. St." und "DealScore" brach die Zeile
+             bei 1568 px um, die 59 stand allein in der zweiten */
+          if (c) teile.push('Cashflow <b>' + eur(c.ankauf) + ' → ' + eur(c.bestand) + '</b>');
+          if (sc) teile.push('Score <b>' + de(sc.ankauf) + ' → ' + de(sc.bestand) + '</b>');
           await zeige(qs('#ai-content .abw-bewegt') ? '#ai-content .abw-bewegt' : '#ai-content .abw-tafel', 10);
           s.zeile('Soll gegen Ist · automatisch', teile.join(' · ') || 'Plan gegen heute, Kennzahl für Kennzahl.');
           await warte(7500);
