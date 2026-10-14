@@ -69,7 +69,35 @@
     return _defaults();
   }
   var _state = _load();
-  function _save() { try { localStorage.setItem(LS_KEY, JSON.stringify(_state)); } catch (e) {} }
+  /* v2212 · Halter ans Konto (/user-settings/mandanten), nicht nur in den Browser.
+     Abgleich beim Start: Server und Browser werden VEREINT (je id), der Server
+     gewinnt bei gleicher id; Einträge, die nur hier lagen, wandern hoch. */
+  var FERN = '/user-settings/mandanten';
+  function _fernSchreiben() {
+    try { if (window.Auth && Auth.apiCall && Auth.isLoggedIn && Auth.isLoggedIn()) Auth.apiCall(FERN, { method: 'PUT', body: { wert: _state } }).catch(function () {}); } catch (e) {}
+  }
+  function _save() { try { localStorage.setItem(LS_KEY, JSON.stringify(_state)); } catch (e) {} _fernSchreiben(); }
+  function _vomServer() {
+    try {
+      if (!window.Auth || !Auth.apiCall || !(Auth.isLoggedIn && Auth.isLoggedIn())) return;
+      Auth.apiCall(FERN, { method: 'GET' }).then(function (r) {
+        var w = r && r.wert;
+        var server = (w && Array.isArray(w.list)) ? w.list : [];
+        var nachId = {}; server.forEach(function (m) { if (m && m.id) nachId[m.id] = m; });
+        var nurHier = _state.list.filter(function (m) { return m && m.id && !nachId[m.id]; });
+        var liste = server.concat(nurHier);
+        if (!liste.some(function (m) { return m.id === 'privat'; })) liste.unshift(_privat());
+        var vorher = JSON.stringify(_state.list);
+        _state = { list: liste };
+        try { localStorage.setItem(LS_KEY, JSON.stringify(_state)); } catch (e) {}
+        if (nurHier.some(function (m) { return m.id !== 'privat'; }) || !server.length) _fernSchreiben();
+        if (JSON.stringify(_state.list) !== vorher) { try { renderHalterOptions(); renderHalterChips(); } catch (e) {} }
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(_vomServer, 800); });
+  else setTimeout(_vomServer, 800);
+  window.addEventListener('dp:plan-ready', function () { _vomServer(); });
 
   function getList() { return _state.list.slice(); }
   function get(id) {

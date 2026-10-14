@@ -58,7 +58,11 @@ const { query } = require('../db/pool');
    mit eigener Ueberschrift - siehe services/projektwissen.js. */
 /* v2184 - `bwk_profil`: Bewirtschaftung je Objektart (bwk-profil.js), Marcel
    am 13.10.2026: die Werte gehoeren ans Konto, nicht nur in den Browser. */
-const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen', 'bwk_profil', 'hinweise'];   /* v2204: abgeschaltete Hinweise (js/hinweise.js) */
+/* v2212 - `mandanten`: Halter (GmbH, UG, GbR …) lagen nur im Browser
+   (localStorage dp_mandanten). Gemessen 14.10.2026: in Marcels Konto
+   kannte der Browser nur „Privat", zwei Gesellschaftsobjekte fielen auf
+   „Privat" zurück. Halter gehoeren ans Konto. */
+const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen', 'bwk_profil', 'hinweise', 'mandanten'];   /* v2204: abgeschaltete Hinweise (js/hinweise.js) */
 
 router.get('/:schluessel', authenticate, async (req, res, next) => {
   try {
