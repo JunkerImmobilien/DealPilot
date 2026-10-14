@@ -523,7 +523,9 @@ router.post('/quickcheck-analyse', authenticate, dialogLimiter, async (req, res,
 
     /* Der Prompt. Frueher stand er in quickcheck-app.html ab Zeile 5299. */
     const prompt = [
-      'Du bist ein Immobilien-Investment-Experte. Analysiere diesen Deal auf Deutsch.',
+      /* v2227b · „im Du": gemessen schrieb die Analyse „Ihrer Zielvorgabe",
+         die App duzt überall */
+      'Du bist ein Immobilien-Investment-Experte. Analysiere diesen Deal auf Deutsch und sprich den Nutzer mit "du" an (nie "Sie"/"Ihr").',
       '',
       'Eingaben:',
       '- Objekt: ' + (i.objektart || '?') + ' in ' + (i.plz || '?') + ' ' + (i.ort || '')
