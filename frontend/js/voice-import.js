@@ -2472,6 +2472,11 @@
         +   'background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1407;cursor:pointer;'
         +   'user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;transition:transform .15s,box-shadow .15s}'
         + '#vi-rf-ptt svg{width:20px;height:20px;pointer-events:none}'
+        /* wie bei WhatsApp: Senden als runder Pfeil, das Eingabefeld bekommt den Platz
+           (gemessen 390 px: mit „Übernehmen“ als Text blieben dem Feld 134 px) */
+        + '#vi-rf-ok{flex:0 0 44px;width:44px;height:44px;min-width:0;padding:0;border-radius:50%;font-size:0 !important;display:inline-flex;align-items:center;justify-content:center}'
+        + '#vi-rf-ok::before{content:"➤";font-size:18px;line-height:1}'
+        + '#vi-rf-in{flex:1 1 auto;min-width:0}'
         + '#vi-rf-ptt.haelt{transform:scale(1.25);background:#3FA56C;color:#fff;box-shadow:0 0 0 7px rgba(63,165,108,.25)}'
         + '}'
         + '@media (min-width:769px){#vi-rf-ptt{display:none}}';
@@ -2479,6 +2484,7 @@
     }
     k.classList.toggle('ptt', _fsPtt());
     /* v2218b · der Halte-Knopf neben „Übernehmen" */
+    var _ok = $('vi-rf-ok'); if (_ok && !_ok.getAttribute('aria-label')) _ok.setAttribute('aria-label', 'Übernehmen');
     var b = $('vi-rf-ptt');
     if (!b) {
       var ok = $('vi-rf-ok');
