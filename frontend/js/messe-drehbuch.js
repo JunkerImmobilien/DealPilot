@@ -86,6 +86,7 @@
   function zielEl() {
     if (!_ziel) return null;
     if (typeof _ziel === 'string') return qs(_ziel);
+    if (typeof _ziel === 'function') { var f = _ziel(); return (f && f.getBoundingClientRect().width > 0) ? f : null; }
     return (_ziel.isConnected && _ziel.getBoundingClientRect().width > 0) ? _ziel : null;
   }
   function folgen() {
@@ -167,9 +168,14 @@
         },
         async function (s) {
           await zeige(null); reiter('s3-tax'); await warte(1400);
-          var bar = await warteAuf(function () { return [].filter.call(document.querySelectorAll('#s3-tax .tax-tl-bar'), function (b) { return /^\s*2025/.test(b.textContent); })[0]; });
+          /* der Steuerverlauf baut sich nach dem Laden der Steuerdaten NEU - das
+             Ziel wird deshalb bei jedem Nachführen frisch gesucht */
+          var balken2025 = function () { return [].filter.call(document.querySelectorAll('#s3-tax .tax-tl-bar'), function (b) { return /^\s*2025/.test(b.textContent) && b.getBoundingClientRect().width > 0; })[0] || null; };
+          var bar = await warteAuf(balken2025, 8000);
+          await warte(800);
+          bar = balken2025() || bar;
           var betrag = bar ? (bar.querySelector('.tax-tl-amount') || {}).textContent : null;
-          await zeige(bar || q('#s3-tax .tax-timeline-card'), 8);
+          await zeige(bar ? balken2025 : '#s3-tax .tax-timeline-card', 8);
           s.zeile('Steuer 2025', 'Die Sanierung als Erhaltungsaufwand sofort abgesetzt' + (betrag ? ' — Erstattung <b>' + String(betrag).replace(/^\+/, '').trim() + '</b>' : '') + '.');
           await warte(6500);
         }
