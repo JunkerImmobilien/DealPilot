@@ -713,7 +713,7 @@
           await warteAuf(function () { return q('#oabi-result .oabi-tbl'); }, 10000);
           await warte(700);
           await zeige(function () { return q('#oabi-ov .oabi-body') || q('#oabi-result'); }, 4);
-          s.zeile('Ausgewertet', '<b>' + Object.keys(SPR_FELDER).length + ' Werte</b> aus dem Gesagten — Adresse, Fläche, Miete, Kaufpreis und Finanzierung.');
+          s.zeile('Ausgewertet', '<b>' + Object.keys(SPR_FELDER).length + ' Werte</b> aus dem Gesagten — Adresse, Fläche, Lage, Miete, Kaufpreis und Finanzierung.');
           await warte(4800);
           var ap = q('#oabi-apply'); if (ap) ap.click();
           await warte(1400);
@@ -806,9 +806,9 @@
      /ai/extract-voice nach der Spracherkennung macht. SPR_KARTE ist die echte
      DealPilot-Marktbewertung für 33602 Bielefeld. Die grünen Chips während
      des Sprechens zeigen, welche dieser Felder im bisher Gesagten stehen. */
-  var SPR_TEXT = ['Ich habe hier eine Eigentumswohnung im Musterweg 7 in 33602 Bielefeld.', 'Zweiundsiebzig Quadratmeter, Baujahr 1994, drei Zimmer.', 'Kaltmiete 680 Euro, Hausgeld 230 Euro im Monat.', 'Kaufpreis laut Exposé 159.000 Euro.', 'Ich bringe 32.000 Euro Eigenkapital mit, Zins 4,2 Prozent, Tilgung eineinhalb Prozent.'];
-  var SPR_IDS = [['objart', 'str', 'hnr', 'plz', 'ort'], ['wfl', 'baujahr', 'zimmer'], ['nkm', 'hg_ul'], ['kp'], ['ek', 'd1z', 'd1t']];
-  var SPR_FELDER = {"objart":"ETW","str":"Musterweg","hnr":"7","plz":"33602","ort":"Bielefeld","wfl":"72","zimmer":"3","baujahr":"1994","kp":"159000","nkm":"680","hg_ul":"230","ek":"32000","d1z":"4.2","d1t":"1.5"};
+  var SPR_TEXT = ['Ich habe hier eine Eigentumswohnung im Musterweg 7 in 33602 Bielefeld.', 'Zweiundsiebzig Quadratmeter, Baujahr 1994, drei Zimmer, Energieklasse C.', 'Die Lage sehe ich als B-Lage.', 'Kaltmiete 680 Euro, Hausgeld 230 Euro im Monat.', 'Kaufpreis laut Exposé 159.000 Euro.', 'Ich bringe 32.000 Euro Eigenkapital mit, Zins 4,2 Prozent, Tilgung eineinhalb Prozent.'];   /* v2231a: mit Lage und Energieklasse - sonst fragt der Co-Pilot zu Recht nach */
+  var SPR_IDS = [['objart', 'str', 'hnr', 'plz', 'ort'], ['wfl', 'baujahr', 'zimmer', 'ds2_energie'], ['lageklasse'], ['nkm', 'hg_ul'], ['kp'], ['ek', 'd1z', 'd1t']];
+  var SPR_FELDER = {"objart":"ETW","str":"Musterweg","hnr":"7","plz":"33602","ort":"Bielefeld","wfl":"72","zimmer":"3","baujahr":"1994","kp":"159000","nkm":"680","hg_ul":"230","ek":"32000","d1z":"4.2","d1t":"1.5","ds2_energie":"C","lageklasse":"B"};
   var SPR_KARTE = {"area":72,"rating":"Attraktiv","conf":{"label":"Mittel","pct":64},"mikro":"Sehr gut · 9,5","makro":"Durchschnittlich · 5,0","microRaw":95,"macroRaw":50,"trendRaw":null,"trend":"–","zensus":{"ebene":"Gemeinde","name":"Bielefeld, Stadt","leer":3.1,"eig":33.3,"miete":6.81},"brw":{"wert":1250,"quelle":"BORIS-NRW","stichtag":"2026-01-01"},"makroGemessen":4,"mw":{"low":186000,"med":216000,"high":267000,"sqm":"2.995 €/m²"},"mm":{"low":646,"med":724,"high":831,"sqm":"10,06 €/m² kalt"}};
   var _sprSchritt = 0, _gumEcht = null, _sprTon = null;
   function _sprAntwort(url) {
