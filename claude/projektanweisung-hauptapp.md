@@ -38761,6 +38761,37 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### Demo-Objekte (N60.19) + v2212–v2212c · Staging (14.10.2026)
+- **Was:** Marcel: „Demo-Objekte … umsetzen, dass es passt“ (Konto info@junker-immobilien.io).
+  - Vorher gesichert: `/root/backups/main-vor-demo-20261014-0608.sql.gz` (48 MB, 71 Tabellen, angesehen).
+  - Alle Eingriffe liefen über die App-Funktionen: `loadSaved`, `setWon`, `festschreiben`, `saveObj`.
+  - **Widersprüche aufgelöst:**
+    - 2026-1052 Gohliser und 2026-1008 Hölderlinstr. waren gekauft und ausgezahlt, aber nicht gewonnen. Jetzt gewonnen, Ankauf-Stand zum Kaufdatum.
+    - 6 Ankauf-Objekte trugen ein vergangenes Kaufdatum (meist 23.12.2024). Sie haben jetzt ein geplantes Kaufdatum 12/2026 bis 04/2027; Übergang und Darlehensauszahlung ziehen mit.
+    - Stand jetzt: Bestand 10, Ankauf 24, davon 14 Testreste.
+  - **Geschichten:**
+    - 2026-1053 Ravensberger Weg 38: im Bestand seit 2020, **über Plan** (NKM 4.910 → 5.500 €, DSCR 1,22 → 1,37, Cashflow nach Steuern +55 %).
+    - 2026-1054 Bismarckstr. 27: seit 2023, **unter Plan** (zweite Einheit leer, Instandhaltung +40 %, DSCR 1,18 → 0,97, Cashflow negativ). Vorher Bewirtschaftung aus den Standardwerten gesetzt; die Instandhaltung stand auf 0.
+    - 2026-1052 Gohliser: **Steuer-Geschichte**. Die Steuerlast steigt (Jahr 2: 555 €, Jahr 6: 3.942 €); 2029 sind 40.000 € Erhaltungsaufwand geplant (mit Bemerkung). Das Jahr dreht auf 12.667 € Erstattung, gespeichert in `tax_records.erhaltungsaufwand`.
+  - **Demo Immobilien GmbH** angelegt (KSt 15,825 %, erweiterte Kürzung) und den beiden Überführungsobjekten 1007 und 1008 zugeordnet.
+- **Drei echte Fehler, dabei gefunden:**
+  - **v2212** `bb63a544`: Der Überführungs-Assistent gibt das Stichtagsdatum auch dem neuen Gesellschaftsobjekt (v816h), und `calc.js` kappte dessen Projektion auf ein Jahr. Gemessen: 1007 und 1008 hatten 15 Jahre Zeitraum, aber eine Zeile. Jetzt kappt nur die Privatseite (`obj_herkunft = 'ueberfuehrung'` markiert die Gesellschaft).
+  - **v2212a / v2212b** `943cb64b`, `37dca6df`:
+    - Mandanten lagen nur im Browser (`dp_mandanten`). Jetzt hängen sie zusätzlich am Konto (`/user-settings/mandanten`, Abgleich je id).
+    - Die Halterwahl prüfte nur `'pro'`. Im Partner-Tarif war sie immer auf Privat gesperrt; das ist dasselbe Muster wie v1081.
+  - **v2212c** `f4d101e5`: `_computeYearTotal` (tax.js) rechnet immer Einkommensteuer mit Erstattung, und `calc.js` überschrieb damit die KSt jeder Projektionszeile. Alle GmbH-Objekte rechneten Cashflow nach Steuern mit persönlicher ESt. Jetzt gilt das Halter-Regime. 1008: 1.953 € Ergebnis → 309 € (15,825 %), Verlust → 0.
+- **Nachweis:** jede Änderung nach dem Speichern vom Server zurückgelesen; Abweichungen mit `abweichungFuer`; Projektion vor und nach den Fixes; Privatobjekt 1052 unverändert.
+- **Rest:**
+  - 14 Testreste darf ich nicht löschen (endgültiges Löschen). Die Liste geht an Marcel:
+    - 2026-1090, 2026-1101 „Unbenannt“
+    - 2026-1091 bis 2026-1095 (Layouttest)
+    - 2026-1096 bis 2026-1100 (5× gleiches MFH Wilhelm-Busch)
+    - 2026-1078 und 2026-1079 „Teststraße“
+    - dazu 2026-1088 und 2026-1089 (doppelt bzw. leer)
+  - **RND:** Für 16 Objekte ist sie jetzt festgehalten (`_rnd`, wie der Assistent seit v2068), gerechnet mit `DealPilotRND.mapDealPilotObject(collectData())` → `calcAll`. Beispiele: Löhner Str. 278 19,3/80, Westerfeldstr. 140 23,6/80, Alexanderstr. 11 30,9/80. Vier Objekte (1052, 1056, 004, 1054) sind älter als die Gesamtnutzungsdauer; der Kern sperrt sie bewusst (`uebernahme_gesperrt`, sachverständige RND nötig). Das ist eine Frage an Marcel. Für Westerfeldstr. und Alexanderstr. liegen echte RND-Gutachten unter `Dateien/`, sie sind der Prüfmaßstab.
+  - Die BMF-Aufteilung hat noch kein Objekt.
+  - `config.js` `getBranding()` prüft ebenfalls nur `'pro'`. Eigenes Branding ist im Partner-Tarif darüber gesperrt, das läuft über den Whitelabel-Weg und ist nicht angefasst.
+
 ### v2211 / v2211a · Staging · Einstellungen → Standardwerte aufgeräumt (14.10.2026)
 - **Was:** Marcels Liste (N65).
   - Karten ohne Icons, die ganze Karte ist klickbar, die Detailansicht ist ein ruhiges Panel.
