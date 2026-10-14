@@ -1989,7 +1989,13 @@ function _renderAIServerAnalysis(a) {
     /* v2217 · Marcel 14.10.2026: „Soll/Ist vielleicht nur anzeigen, wenn wir
        wirklich schon in Bestand überführt haben." Ein Ankauf-Stand ohne
        Gewonnen ist ein ruhender (`_ankauf_ruhend`) - dann kein Reiter. */
-    if ((document.getElementById('_deal_won_state') || {}).value !== 'true') return '';
+    /* Gemessen (v2217): beim Laden zeichnet storage.js die Analyse (Z. 765)
+       BEVOR es _deal_won_state setzt (Z. 789) - das Feld trug dann noch den
+       Wert des vorigen Objekts. Massgeblich ist der geladene Datensatz; das
+       Feld zaehlt, wenn es in dieser Sitzung danach auf „gewonnen" steht. */
+    var _wf = (document.getElementById('_deal_won_state') || {}).value;
+    var _wd = window._currentObjData && (window._currentObjData._deal_won === true || window._currentObjData._deal_won === 'true');
+    if (!(_wf === 'true' || _wd)) return '';
     var a = null;
     try { a = AK.abweichung(); } catch (e) {}
     if (!a) return '';

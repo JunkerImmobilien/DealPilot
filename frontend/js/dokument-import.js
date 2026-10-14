@@ -173,7 +173,7 @@
       gesehen[z[0]] = 1;
       var ist = String(el.value || '').trim();
       var status = ist === '' ? 'neu' : (_gleich(ist, neu, z[2]) ? 'gleich' : 'abweichung');
-      zeilen.push({ feld: z[0], wort: z[1], neu: neu, anzeige: (typeof f[k] === 'number' ? _fmt(f[k]) : String(f[k])), ist: ist, status: status });
+      zeilen.push({ feld: z[0], wort: z[1], neu: neu, anzeige: (z[2] === 'jahr' ? String(Math.round(_zahl(f[k]))) : typeof f[k] === 'number' ? _fmt(f[k]) : String(f[k])),   /* Baujahr nie „1.967" */ ist: ist, status: status });
     });
     return zeilen;
   }
@@ -268,14 +268,31 @@
       var v = ext[k];
       if (v === null || v === undefined || v === '') return;
       var text;
+      if (typeof v === 'object' && !Array.isArray(v)) {
+        /* v2217 · statt Rohtext {"veraltet_pct":null,…}: je Unterfeld eine
+           Zeile, leere fallen weg, Felder aus dem Abgleich auch */
+        Object.keys(v).forEach(function (k2) {
+          var v2 = v[k2];
+          if (v2 === null || v2 === undefined || v2 === '' || typeof v2 === 'object' || ZIEL[k2]) return;
+          zeilen.push('<tr><td>' + _esc(NAMEN[k2] || k2.replace(/_/g, ' ')) + '</td><td class="num">' + _esc(typeof v2 === 'number' ? _fmt(v2) : String(v2)) + '</td></tr>');
+        });
+        return;
+      }
       if (typeof v === 'object') {
-        text = Array.isArray(v) ? (v.length + ' Eintraege') : JSON.stringify(v);
+        text = v.length + ' Einträge';
       } else {
         text = (typeof v === 'number') ? _fmt(v) : String(v);
       }
       if (ZIEL[k] && !VERGLEICHSFELDER[k]) return;   /* v2217: steht im Abgleich */
+      var eigen = '';
+      /* v2217 · der Vergleich braucht die zweite Zahl: was DealPilot selbst
+         rechnet (Anlage 2, im Objekt unter _rnd). Ohne sie ist er keiner. */
+      if (k === 'rnd_jahre') {
+        var r = (window._currentObjData || {})._rnd;
+        if (r && _zahl(r.rnd_jahre) !== null) eigen = 'DealPilot: ' + _fmt(Math.round(_zahl(r.rnd_jahre) * 10) / 10) + ' Jahre' + (r.gnd_jahre ? ' (GND ' + r.gnd_jahre + ')' : '');
+      }
       var zeile = '<tr><td>' + _esc(VERGLEICHSFELDER[k] || NAMEN[k] || k.replace(/_/g, ' ')) + '</td>'
-                + '<td class="num">' + _esc(text) + '</td></tr>';
+                + '<td class="num">' + _esc(text) + '</td>' + (VERGLEICHSFELDER[k] ? '<td class="num" style="color:#7A7370">' + _esc(eigen) + '</td>' : '') + '</tr>';
       if (VERGLEICHSFELDER[k]) vergleich.push(zeile); else zeilen.push(zeile);
     });
 
@@ -310,7 +327,9 @@
             return '<tr' + farbe + '><td><input type="checkbox" data-feld="' + _esc(z.feld) + '"' + (z.status === 'neu' ? ' checked' : '') + (z.status === 'gleich' ? ' disabled' : '') + '></td>'
               + '<td>' + _esc(z.wort) + '</td><td class="num">' + _esc(z.anzeige) + '</td><td class="num">' + stat + '</td></tr>';
           }).join('') + '</table>'
-        + '<div class="dpdi-actions" style="margin-top:8px"><button type="button" class="dpdi-btn" id="dpdi-uebernehmen">Ausgewählte übernehmen</button></div>';
+        + (abg.some(function (z) { return z.status !== 'gleich'; })
+            ? '<div class="dpdi-actions" style="margin-top:8px"><button type="button" class="dpdi-btn" id="dpdi-uebernehmen">Ausgewählte übernehmen</button></div>'
+            : '<p class="dpdi-hinweis">Alles, was im Objekt schon steht, stimmt mit dem Dokument überein.</p>');
     }
 
     if (zeilen.length) {
