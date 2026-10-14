@@ -38761,6 +38761,36 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2210 / v2210b · Staging · Schwärzen im Dokument-Import, Gewerbe im Ertragswert (14.10.2026)
+- **Was:**
+  - **v2210** (`8590d45e`), Marcel: „Ja gerne schwärzen“.
+    - `backend/src/services/schwaerzen.js` (regelbasiert): schwärzt Geburtsdaten, Geburtsnamen, „Nachname, Vorname, geb.“, Namen nach Herr/Frau/Eheleute/Notar, Anschriften nach „wohnhaft“, E-Mail, Telefon, IBAN, Steuer-ID.
+    - Läuft vor dem Versand in extract-dokument, -expose, -rndg und -market-data.
+    - Die Schemata fragen keine Namen, Geburtsdaten oder Anschriften mehr ab, nur Anzahl und Anteile.
+  - **v2210b** (`3fccd761`), Gewerbe getrennt nach § 31 Abs. 2 und Anlage 3.
+    - Im MFH-Konfigurator bekommt eine Gewerbeeinheit die Nutzungsart und die marktübliche Miete.
+    - `_mfh_einheiten` wird mit dem Objekt an den Bericht übergeben.
+    - Der Mapper leitet `gewerbeAus()` ab, der Orchestrator übernimmt es als `ref.gewerbe`.
+    - CrossCheck:
+      - Die Wohnmiete wird nur auf den Wohnteil angesetzt.
+      - Gewerbe läuft mit der Marktmiete, sonst mit der Ist-Miete (indikativ).
+      - Leerstehendes Gewerbe ohne Marktmiete: kein Ertragswert.
+      - Gewerbeanteil am Rohertrag; ab 20 % Hinweis auf den Liegenschaftszins für Wohn- und Geschäftshäuser.
+      - Abweichung Ist/Markt ab 10 % → Hinweis auf boG.
+      - Mit Gewerbe gibt es keine Wohnquote und keine Pauschale.
+    - ErtragswertService: Gewerbe-Instandhaltung je Nutzungsart aus `BWK_JAHRE`.
+- **Nachweis:**
+  - Schwärzen, echter Aufruf aus der App mit einem erfundenen Grundbuch: Die Antwort enthält keinen Namen und kein Geburtsdatum, sondern `eigentuemer_anzahl: 2`, `berechtigter_art: Person`. Die Bank bleibt stehen.
+  - Gewerbe: Funktionslauf 300 m² Wohnen + 100 m² Büro gibt BWK 1.828 / 5.760 / 1.056 = 8.644 €, gleich der Handrechnung. Das EW-RL-Beispiel bleibt unverändert.
+  - Ende-zu-Ende Bericht 204 (Staging, Konto Marcel, Testobjekt Bünde): Rohertrag 26.064 + 12.000 €, Gewerbeanteil 31,5 %, Hinweise wie gebaut.
+  - `objekt-mapper-pruefen` RC=0, `buster-ebenen` SAUBER.
+- **Rest:**
+  - Den Zweig des Liegenschaftszinses wählt der Bericht noch nicht automatisch nach Gewerbeanteil (`zweigwahl.js`, `WertParameterService`). Bisher gibt es nur den Hinweis.
+  - Im NRW-Modell (`agvga_nrw_2016`) bleibt Gewerbe ohne eigene Bewirtschaftungskosten.
+  - Belegbilder werden nicht geschwärzt.
+  - Ein Name ohne Signalwort bleibt stehen.
+  - Ein amtliches Anwendungsbeispiel für gemischte Nutzung gibt es nicht. Abnahme an einem echten Gutachten für ein Wohn- und Geschäftshaus.
+
 ### v2209 · Staging · Rumpfjahr-Zinsen, store:false (14.10.2026)
 - **Was:**
   - `calc.js` D1 und D2: Die Zinsmonate im Jahr 1 zählen jetzt gegen `_v268_baseYear` (Projektionsjahr 1 = WU, sonst Kaufdatum, sonst heute) statt gegen das Auszahlungsjahr selbst. Vorher wurde jede Auszahlung mit ihrem eigenen Jahr verglichen.
