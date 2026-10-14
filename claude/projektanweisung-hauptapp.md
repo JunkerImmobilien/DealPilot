@@ -38761,6 +38761,19 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2226 · Staging · Lage ins Urteil, nicht in den Score; Abspann im Quick-Boarding-Drehbuch (14.10.2026)
+- **Was:**
+  - Marcel: „nicht in den Score [nicht mehr vergleichbar], aber in die Gesamtbewertung … ganz oben … nicht kaufen … aber auch sagen, warum der Deal trotzdem gut ist".
+  - `QcHeuristik.empfehlung` (Rechenkern, gespiegelt): Mit gewählter Lageklasse und Bruttomietrendite unter deren Zielrendite (Ampel gelb/rot aus `zielUrteil`) wird KAUFEN/VERHANDELN/PRUEFEN zu **NICHT KAUFEN**. Dazu kommen Grund (Ist gegen Ziel), Preis für die Zielrendite und – bei Score ≥ 60 – „Rechnerisch trägt der Deal trotzdem: Score, Cashflow, DSCR". Bei KRITISCH/PASS wird der Lage-Satz vorangestellt. Rückgabe `lage {passt, klasse, ziel, ist, wort, kp_ziel}`. Score unverändert.
+  - Quick-Check-Überschrift: „Nicht kaufen — Rendite unter deinem Ziel für die C-Lage".
+  - Drehbuch: Lage-Teil länger und neu geordnet (20 % EK → B passt → C „Nicht kaufen" + „trotzdem"), danach Oben → Starker Kauf. Abspann „30 Sekunden. Eine fundierte Einschätzung …" und animierte Wortmarke (Zoom, Goldkante, Glanz, Runway-Linie).
+- **Commit:** `771f2644`
+- **Nachweis:**
+  - Funktionslauf am echten Kern: Unten 80 %/C → NICHT KAUFEN mit „trotzdem: Score 66"; Unten/B → passt; Oben/C → KAUFEN; ohne Klasse unverändert.
+  - Prüfer: zielurteil SAUBER, score-ketten 115 Punkte gleich, Spiegelung nachgerechnet. Staging-Backend neu gebaut (Bot), Kern im Image.
+  - Drehbuch-Lauf 135 s: „Nicht kaufen — Rendite unter deinem Ziel für die C-Lage", Score 71 (Gut), „Rechnerisch trägt der Deal trotzdem: Score 71, Cashflow +111 €/Monat, DSCR 1,45", Zielpreis 131.314 €. Kein KI-Aufruf, Spannen-Vorgabe zurück.
+- **Rest:** v2224 (KI-Score) und v2226 nicht auf Prod.
+
 ### v2223–v2225a · Staging · Fotos je PDF, KI-Score im Quick-Check, Quick-Boarding-Drehbuch neu (14.10.2026)
 - **Was:**
   - **v2223 · Fotos je PDF getrennt** (Marcel: „bei 2 unterschiedlichen PDFs werden die Fotos des einen Objektes nicht richtig zugeordnet"):
