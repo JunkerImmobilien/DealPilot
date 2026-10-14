@@ -4143,6 +4143,10 @@ const QcApp = (function() {
     const kp = QcEngine.num(inputs.kp);
     if (kp) {
       const ekInp = document.getElementById('qc_ek');
+      /* v2230 · der Beleihungsknopf ist eine ausdrückliche Wahl - er setzt
+         das Eigenkapital neu, auch wenn es vorher importiert/gesprochen war
+         (gemessen: 80 % geklickt, EK blieb 32.000 €, Score unverändert) */
+      if (btnEl) delete ekInp.dataset.userSet;
       if (!ekInp.dataset.userSet) {
         const knkPct = 10.5;
         const ekKpPart = kp * (1 - pct / 100);
@@ -6444,7 +6448,13 @@ function renderTransferList() {
             try {
               var sn = _oabDpSnap(); var cc = sn ? sn.card : null;
               var mm = (cc && cc.mm) ? cc.mm[_oabDpMode] : null;
-              if (mm) { setVal('qc_nkm_grund', String(Math.round(mm))); if (typeof mieteAddUp === 'function') mieteAddUp(); }
+              /* v2230 · Der Klick auf die Spanne IST die Entscheidung des Nutzers.
+                 Gemessen: nach gesprochener Kaltmiete (Import -> input-Ereignis ->
+                 qc_nkm.dataset.userSet) stand Grundmiete 831, Gesamt blieb 680,
+                 der Score rührte sich nicht. Der Schutz gilt Getipptem, nicht
+                 einem ausdrücklichen Klick. */
+              if (mm) { var _nk = document.getElementById('qc_nkm'); if (_nk) delete _nk.dataset.userSet;
+                setVal('qc_nkm_grund', String(Math.round(mm))); if (typeof mieteAddUp === 'function') mieteAddUp(); }
               if (typeof scheduleUpdate === 'function') scheduleUpdate();
             } catch (e) {}
           },
