@@ -364,7 +364,8 @@
     } catch (e) { if (e !== 'stopp') console.warn('[messe]', e); }
     if (g === lauf) stopp();
   }
-  window.DealPilotMesse = { start: start, stopp: stopp, drehbuecher: function () { return Object.keys(DREHBUECHER); } };
+  window.DealPilotMesse = { start: start, stopp: stopp, drehbuecher: function () { return Object.keys(DREHBUECHER); },
+    laeuft: function () { return !!lauf; } };   /* v2221: qc-ai-bridge setzt die KI-Bewertung so lange aus */
 
   /* ?messe=<name>[&schleife] — erst nach Anmeldung und geladenem Plan */
   try {
