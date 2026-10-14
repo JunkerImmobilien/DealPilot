@@ -29,6 +29,9 @@
   function datum(iso) { var t = String(iso || '').split('-'); return t.length === 3 ? t[2] + '.' + t[1] + '.' + t[0] : ''; }
   function warte(ms) { return new Promise(function (r, x) { var l = lauf; setTimeout(function () { l === lauf ? r() : x('stopp'); }, ms); }); }
   function q(sel) { return document.querySelector(sel); }
+  /* v2219 · nur SICHTBARE Treffer: #ai-content steht zweimal im Dokument, die
+     erste Kopie war unsichtbar - der Lichtkegel fiel auf 16 x 16 px zusammen. */
+  function qs(sel) { return [].filter.call(document.querySelectorAll(sel), function (e) { var r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; })[0] || null; }
 
   /* ── Bühne: Lichtkegel, Untertitel, Titelkarte ─────────────────── */
   function css() {
@@ -123,14 +126,16 @@
         async function (s) {
           var seg = [].filter.call(document.querySelectorAll('.ank-wahl .ank-seg'), function (b) { return /Ist/.test(b.textContent); })[0];
           if (seg) seg.click();
-          await warte(500);
+          /* erst weiter, wenn die Ankauf-Ansicht wirklich gelöst ist (der Ist-Stand neu geladen) */
+          await warteAuf(function () { return window.DealPilotAnkaufAnsicht && !DealPilotAnkaufAnsicht.aktiv(); }, 8000);
+          await warte(400);
           var nkm = parseFloat(String((q('#nkm') || {}).value || '').replace(/\./g, '').replace(',', '.'));
           s.zeile('Ist · heute', 'Eine Wohnung saniert und neu vermietet: <b>' + (isFinite(nkm) ? eur(nkm) : '–') + '</b> Nettokaltmiete.');
           await warte(5500);
         },
         async function (s) {
           kegel(null); reiter('s5'); await warte(1200);
-          var tab = await warteAuf(function () { return [].filter.call(document.querySelectorAll('#ai-content .dp-pa-tab'), function (b) { return /Soll\/Ist/.test(b.textContent); })[0]; });
+          var tab = await warteAuf(function () { return [].filter.call(document.querySelectorAll('#ai-content .dp-pa-tab'), function (b) { return /Soll\/Ist/.test(b.textContent) && b.getBoundingClientRect().width > 0; })[0]; });
           if (tab) tab.click();
           await warte(600);
           var a = null; try { a = DealPilotAnkauf.abweichung(); } catch (e) {}
@@ -139,7 +144,7 @@
           if (d) teile.push('DSCR <b>' + de(d.ankauf, 2) + ' → ' + de(d.bestand, 2) + '</b>');
           if (c) teile.push('Cashflow n. St. <b>' + eur(c.ankauf) + ' → ' + eur(c.bestand) + '</b>');
           if (sc) teile.push('DealScore <b>' + de(sc.ankauf) + ' → ' + de(sc.bestand) + '</b>');
-          await zeige(q('#ai-content .abw-bewegt') || q('#ai-content .abw-tafel'), 10);
+          await zeige(qs('#ai-content .abw-bewegt') || qs('#ai-content .abw-tafel'), 10);
           s.zeile('Soll gegen Ist · automatisch', teile.join(' · ') || 'Plan gegen heute, Kennzahl für Kennzahl.');
           await warte(7500);
         },

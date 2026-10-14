@@ -284,6 +284,23 @@
   }
 
   /* ── Hin und zurueck ──────────────────────────────────────────── */
+  /* v2219 · der Teil von setzen(true), der den Ankauf ins Formular laedt -
+     er laeuft erst, wenn der letzte Save des Ist abgeschlossen ist. */
+  function ankaufLaden(A) {
+    /* v2037a · Der Stand muss danach zurück: loadData setzt _dpAnkauf aus
+       d._ankauf, und der eingefrorene Datensatz trägt kein _ankauf (beim
+       Festschreiben bewusst entfernt, sonst Matrjoschka). */
+    var merker = A.stand();
+    if (!merker) return;
+    try { if (typeof loadData === 'function') loadData(merker.daten); } catch (e) {
+      console.warn('[v2037] laden:', e.message);
+    }
+    window._dpAnkauf = merker;
+    bannerZeichnen();
+    var n = sperren();
+    wachen(true);
+    try { console.info('[v2038] Ankauf-Ansicht: ' + n + ' Felder gesperrt'); } catch (e) {}
+  }
   function setzen(anAnkauf) {
     var A = window.DealPilotAnkauf;
     if (!A) return;
@@ -295,34 +312,20 @@
       _key = window._currentObjKey || null;
       /* ERST sichern, DANN sperren - sonst geht der letzte Tastendruck
          am laufenden Objekt verloren. */
+      /* v2219 · „erst sichern" heisst: WARTEN, bis gesichert ist. Vorher lief der
+         Save los und das Laden des Ankaufs gleich hinterher - der Save las das
+         Formular nach seinem await und schrieb den Ankauf als Ist (Parkstraße,
+         14.10.2026). Jetzt: Sperre sofort an (kein weiterer Save kommt durch),
+         dieser eine Save mit _vorAnkauf zu Ende, DANN der Ankauf ins Formular. */
+      var vorher = Promise.resolve();
       try {
         var echt = window.saveObj && window.saveObj._dpEcht;
-        if (typeof echt === 'function') echt({ silent: true });
+        if (typeof echt === 'function') vorher = Promise.resolve(echt({ silent: true, _vorAnkauf: true })).catch(function () {});
       } catch (e) {}
       _aktiv = true; _frei = false;
       document.body.classList.add('dp-ankauf-ansicht');
       document.body.classList.remove('dp-ankauf-frei');
-      /* den eingefrorenen Datensatz ins Formular - ab hier ist alles,
-         was man sieht, Vergangenheit.
-
-         v2037a - DER STAND MUSS DANACH ZURUECK. Gemessen: nach dem
-         Laden war window._dpAnkauf null, und der Hinweis blieb leer.
-         Ursache: loadData setzt _dpAnkauf aus d._ankauf - und der
-         eingefrorene Datensatz traegt kein _ankauf, weil wir es beim
-         Festschreiben bewusst entfernen (sonst Matrjoschka).
-
-         Das Laden der Vergangenheit loescht also die Kenntnis davon,
-         dass es eine gibt. */
-      var merker = A.stand();
-      try { if (typeof loadData === 'function') loadData(merker.daten); } catch (e) {
-        console.warn('[v2037] laden:', e.message);
-      }
-      window._dpAnkauf = merker;
-      bannerZeichnen();
-      /* v2038 - und jetzt wirklich sperren, nicht nur abblenden. */
-      var n = sperren();
-      wachen(true);
-      try { console.info('[v2038] Ankauf-Ansicht: ' + n + ' Felder gesperrt'); } catch (e) {}
+      vorher.then(function () { if (_aktiv && window._currentObjKey === _key) ankaufLaden(A); });
       return;
     }
 
