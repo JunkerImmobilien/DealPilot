@@ -36,6 +36,25 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N65 · Marcel 14.10.2026 (zweite Runde) — Antworten und Einstellungen → Standardwerte
+
+**Antworten:**
+- Chrome ist verbunden, angemeldet als info@junker-immobilien.io (dort liegen die Objekte) → **alles im Browser genau prüfen**.
+- **Datenschutz: schwärzen** („wir schauen, wie weit wir kommen").
+- **Gewerbe: recherchieren, wie es sein muss, und so umsetzen, wie es am besten ist.**
+- **Demo-Objekte: umsetzen, dass es passt** (Konto info@junker-immobilien.io).
+- **F&E-Seite: so machen**, und zwar MIT „wir arbeiten mit Steuerkanzleien zusammen" (Marcels ausdrücklicher Wunsch, gegen meinen Hinweis auf den Antrag).
+
+**Einstellungen → Standardwerte (Marcel wörtlich zusammengefasst):**
+1. Oben die Sets (DealPilot Standard, Vorsichtig, Renditeorientiert), darunter die Einzelkarten. Es ist nicht erkennbar, dass die Einzelkarten zum gewählten Set gehören → klarer darstellen.
+2. **Finanzierung:** Früher gab es eine Checkbox „Zins und Tilgung selbst eingeben" ODER „indikativen Satz ziehen" → wieder als Entweder-oder.
+3. **Bewirtschaftung:** heute nur Prozent → Umschalter **Euro / Prozent**. Prüfen, was üblich ist. Die neuen Sätze je m² aus der eigenen Datenbank (BWK-Jahrestabelle) — wie werden sie übernommen, und wie passiert das im Quick-Check?
+4. **Lageklassen:** Dort stehen Mietausfall, Bewirtschaftung nicht umlagefähig und Eigenkapital. Doppelt mit Bewirtschaftung? Abgleichen.
+5. **„Bewirtschaftung" und „Bewirtschaftung je Objektart"** stehen nebeneinander → „das kann keiner verstehen". Zusammenführen oder klar trennen.
+6. **Steuer:** Welcher Grenzsteuersatz ist der Standard? Den privaten Steuersatz gibt es unter Mandanten → dorthin verlinken.
+7. **KI-Icons auf den Karten: grundsätzlich weg.**
+8. Die Ansicht nach dem Klick auf eine Karte: schöner, einfacher, verständlicher visualisieren.
+
 ### N64 · Marcels Antworten vom 14.10.2026 — Entscheidungen zu den offenen Fragen
 
 | Punkt | Entscheidung |
