@@ -38774,7 +38774,7 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Was:** Marcel: „ja das wäre gut“. Die Überschrift bekommt ab `e.wert` (qc-heuristik) einen Halbsatz: „Nicht kaufen — Rendite unter deinem Ziel für die C-Lage · aber 28 % unter Marktwert“; bei einem positiven Urteil ohne „aber“. **v2238a:** Das Urteil rechnete den Abschlag selbst auf den ungerundeten Angebotswert (178.038 €), die Karte zeigte 178.000 €. Jetzt übernimmt das Urteil den Wert der Karte.
 - **Commit:** `b8b3e901`, `ff37db56`
 - **Nachweis:** Staging, Wohnung mit Mitschnitt: ohne Lage „Nur mit Nachbesserung tragfähig · aber 28 % unter Marktwert“, 20 % EK „Kauf möglich — verhandeln nötig · 28 % unter Marktwert“, C-Lage wie oben; im Rat „178.000 € — +39.000 € (+28 %)“.
-- **Rest:** Das Messe-Video wurde vor v2238 aufgenommen; Kapitel 12 zeigt die Überschrift noch ohne den Zusatz. Bei Bedarf neu aufnehmen.
+- **Rest:** keiner. Das Messe-Video wurde nach v2238 neu aufgenommen (220 s): Kapitel 12 zeigt „… · aber 28 % unter Marktwert“, der Rat 178.000 € / +39.000 €.
 
 ### v2237–v2237d · Angebotsabschlag als Einstellung, Marktwert im Urteil und in der Pilot-Analyse (14.10.2026)
 - **Was:** Marcel: „Die Abschläge kann man im Set angeben … wir recherchieren immer den aktuellen Durchschnitt … der Marktwert, je nachdem was ich von der Spanne nehme, soll mitkommen … nach eigenen Kriterien und auch darüber“.
