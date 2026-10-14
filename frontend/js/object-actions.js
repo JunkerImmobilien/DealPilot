@@ -380,6 +380,10 @@
           + '<span class="k-neu">Daten \u00fcbernehmen aus</span></span><div class="dp-pf-row">' +
           pfTileTool('import', _doc, 'Expos\u00e9 / Marktbericht', '') +
           (window.VoiceImport ? pfTileTool('voice', _mic, 'Sprache', 'Objekt frei einsprechen — im Plan enthalten') : '') +
+          /* v2217 · ImmoMetrica vor die geführte Eingabe: erst die Quellen, die der
+             Riegel sperrt, dann die freien - der Freigeben-Knopf liegt mittig
+             ueber den gesperrten und verdeckt keine freie. */
+          '<label class="dp-pf-tile tool" data-src="immometrica" id="oab-imo-tile" title="Aus ImmoMetrica importieren"><input type="checkbox" value="immometrica" disabled style="display:none"><span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></span><span class="dp-pf-lbl">ImmoMetrica</span><span class="dp-pf-led"></span></label>' +
           /* ══ v1742 · GEFÜHRTE EINGABE ALS EIGENER WEG ══
              Marcel am 01.10.2026: „vielleicht setzen wir die unter Sprache
              ‚Frag mich durch'-Strecke mit als eigenen Auswahlbutton in die
@@ -399,7 +403,6 @@
              der Name klänge wieder nach Sprache. „Geführte Eingabe" sagt,
              was sie vom Formular unterscheidet. */
           (window.VoiceImport ? pfTileTool('gefuehrt', _liste, 'Geführte Eingabe', 'Frage für Frage — tippen oder sprechen') : '') +
-          '<label class="dp-pf-tile tool" data-src="immometrica" id="oab-imo-tile" title="Aus ImmoMetrica importieren"><input type="checkbox" value="immometrica" disabled style="display:none"><span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></span><span class="dp-pf-lbl">ImmoMetrica</span><span class="dp-pf-led"></span></label>' +
           /* v2217 · Marcel 14.10.2026: „kann man in der Datenaufnahme im Objekt
              zusätzlich Dokumente einlesen?" Der Dokument-Import (neun Arten)
              war nur über das Seitenmenü „Import" erreichbar. Er steht NICHT
@@ -772,7 +775,16 @@
      `dealpilot` bleibt immer frei - das sind die Stufen, und der
      Marktbericht ist genau das, was Marcel ab hier noch will. */
   var RIEGEL_KERN = ['plz', 'ort', 'str', 'hnr', 'wfl', 'kp', 'baujahr', 'nkm', 'grd', 'objart', 'zimmer'];
-  var RIEGEL_QUELLEN = ['import', 'immometrica', 'voice', 'gefuehrt'];
+  /* v2217 · „gefuehrt" ist NICHT mehr unter dem Riegel. Marcel 14.10.2026:
+     „ist der Prozess rund, wenn man aus dem Quick-Check ein Objekt speichert
+     - kann man dann in der Datenaufnahme die geführte Eingabe machen?"
+     Gemessen: nein, nur über „Freigeben" - dabei fragt die geführte Eingabe
+     ausschliesslich LUECKEN ab (voice-import.js rueckfragen: _rfFehlt, „die
+     frage ich nicht noch einmal") und überschreibt nie. Der Riegel schützte
+     dort nichts und sperrte genau den naechsten Schritt nach dem Quick-Check.
+     Exposé, ImmoMetrica und freie Sprache bleiben gesperrt: sie koennen
+     Felder überschreiben (Marcels Entscheidung vom 08.10.2026). */
+  var RIEGEL_QUELLEN = ['import', 'immometrica', 'voice'];
   var RIEGEL_SCHWELLE = 3;
   var _riegelFrei = null;   /* Schluessel des Objekts, fuer das freigegeben wurde */
 
@@ -1887,11 +1899,16 @@
       var ist = _istText(id); if (ist === '') return;
       var el = document.getElementById(id);
       var neu = it.raw != null ? it.raw : it.value;
-      if (el && el.tagName === 'SELECT') { if (String(el.value) === String(neu) || ist.toLowerCase() === String(it.value || '').toLowerCase()) return; }
+      /* Schreibweisen sind keine Abweichung: „Hermannstr" = „Hermannstraße",
+         „Eigentumswohnung" = „Eigentumswohnung (ETW)" (gemessen 14.10.2026
+         am Hüllhorst-Gutachten: zwei Fehlalarme von fünf). */
+      var nt = function (x) { return String(x == null ? '' : x).toLowerCase().replace(/stra(ss|ß)e/g, 'str').replace(/str\./g, 'str').replace(/[^a-z0-9äöüß]/g, ''); };
+      var gleichText = function (x, y) { x = nt(x); y = nt(y); return x === y || (x.length > 3 && y.length > 3 && (x.indexOf(y) === 0 || y.indexOf(x) === 0)); };
+      if (el && el.tagName === 'SELECT') { if (String(el.value) === String(neu) || gleichText(ist, it.value) || gleichText(el.value, neu)) return; }
       else {
         var a = (typeof parseDe === 'function') ? parseDe(ist) : parseFloat(ist), b = (typeof parseDe === 'function') ? parseDe(neu) : parseFloat(neu);
         var zahl = /\d/.test(ist) && /^[\s\d.,%€+-]+$/.test(ist) && /^[\s\d.,%€+-]+$/.test(String(neu));
-        if (zahl ? Math.abs(a - b) < 0.005 : ist.toLowerCase() === String(neu).trim().toLowerCase()) return;
+        if (zahl ? Math.abs(a - b) < 0.005 : gleichText(ist, neu)) return;
       }
       out[id] = ist;
     });
