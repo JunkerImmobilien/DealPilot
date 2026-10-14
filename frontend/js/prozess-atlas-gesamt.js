@@ -58,7 +58,7 @@
     'deal:d6': ['atlas/6-flugschreiber.html', 'Beispielflug Parkstraße', 'Soll gegen Ist an der Parkstraße'],
     'reise:be2': ['atlas/6-flugschreiber.html', 'Beispielflug Parkstraße', 'Ist pflegen an der Parkstraße']
   };
-  var BUSTER = 'v2218d';
+  var BUSTER = 'v2218e';
   function unterFuer(pid, kid) { return UNTER[pid + ':' + kid] || UNTER[pid + ':*']; }
   var PHASEN = [['PRÜFEN', ['reise', 'quickcheck', 'sprache', 'dokumente']], ['ANALYSIEREN', ['boarding', 'marktbericht', 'scores', 'deal']],
                 ['HALTEN', ['steuer']], ['UNTERWEGS', ['telegram']]];

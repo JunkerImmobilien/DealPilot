@@ -42,3 +42,6 @@ body.eingebettet{background:transparent}
 body.eingebettet .buehne{min-height:100vh}
 body.eingebettet .instr{top:0;height:100vh}
 body.eingebettet .panel,body.eingebettet .seite{max-height:100vh;top:0}
+/* v2218e · in der App: Platz für den Fenstertitel, kein Demo-Kopf („Idee 2 …“) */
+body.eingebettet .intro > .ueber,body.eingebettet .seite > .ueber,body.eingebettet .kap > .ueber{display:none}
+body.eingebettet .wrap{padding-top:46px}
