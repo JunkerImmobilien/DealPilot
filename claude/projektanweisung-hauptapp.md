@@ -38761,6 +38761,16 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### Messe-Videos aufgenommen (14.10.2026)
+- **Was:** Mit ffmpeg (gdigrab, Hauptbildschirm 1920x1080, Chrome im Vollbild) habe ich fünf MP4 nach `Dateien/Messe/Videos/` aufgenommen. Oben sind 58 px abgeschnitten (Chrome-Leiste „Claude hat die Fehlerbehebung gestartet"), das ergibt 1920x1022, 30 fps, x264 crf 20.
+  - quickcheck-datenaufnahme 158 s · 6,3 MB
+  - immometrica 116 s · 4,6 MB
+  - sprache 128 s · 4,6 MB
+  - parkstrasse 68 s · 4,0 MB
+  - quickcheck-kurz 56 s · 2,6 MB
+- **Nachweis:** Stichbilder je Video gelesen (Kegel, Untertitel, Mitschrift sichtbar, keine Leiste, kein Mauszeiger). Parkstraße danach NKM 3195 / DSCR 1,231875 (Sicherung `/root/backups/parkstr-objekt-video.json`). Das Chrome-Fenster ist danach wieder minimiert.
+- **Rest:** Parkstraße und Quick-Check kurz haben noch die alte Schlusskarte statt Abspann mit Wortmarke. Videos sind nicht im Repo (Dateien/ ist untracked).
+
 ### v2229–v2231b · Staging · Sprache: Rückfragen am Katalog, Spanne/Beleihung gewinnen, Drehbuch Sprache (14.10.2026)
 - **Was:**
   - **v2229 · Sprache, Rückfragen** (`voice-import.js rueckfragen`): erst auf den Katalog kürzen, dann Lücken prüfen. Vorher geprüft und danach gekürzt. Im Quick-Check gibt es keine Zinsbindung (`d1_bindj`), also galt der Finanzierungsblock dort IMMER als Lücke, und der Co-Pilot fragte Eigenkapital, Zins und Tilgung nach, auch gesprochene. Gefunden beim Vermessen für das Drehbuch.
