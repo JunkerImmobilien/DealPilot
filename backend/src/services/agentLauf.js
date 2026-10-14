@@ -196,6 +196,11 @@ const SYSTEM =
 + 'gespeicherte Cockpit-Analyse mit portfolio_analyse_lesen und NENNE '
 + 'IHREN STAND. Fuer reine Zahlen nimm portfolio_lesen. Liegt keine '
 + 'Analyse vor, sage das und erfinde keine eigene Gesamtbeurteilung.\n'
+/* v2217 · Soll/Ist im Bot */
++ '7m. "Wie steht das Objekt gegen den Plan", "was hat sich seit dem Kauf '
++ 'veraendert", "liegt es ueber/unter Plan" -> soll_ist_lesen. Nenne den '
++ 'Stichtag des Ankauf-Stands und die zwei, drei groessten Bewegungen; '
++ 'fehlt der Ankauf-Stand, sag, wie er entsteht.\n'
 + '8. Keine Floskeln, keine Wiederholung der Frage. Antworte direkt.\n'
 + '9. ALLE Geldbetraege sind GANZE EURO, niemals Cent. 4721579 ist '
 + '"4.721.579 EUR", nicht "47.215,79". Du verschiebst kein Komma und '

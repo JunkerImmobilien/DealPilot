@@ -400,6 +400,13 @@
              was sie vom Formular unterscheidet. */
           (window.VoiceImport ? pfTileTool('gefuehrt', _liste, 'Geführte Eingabe', 'Frage für Frage — tippen oder sprechen') : '') +
           '<label class="dp-pf-tile tool" data-src="immometrica" id="oab-imo-tile" title="Aus ImmoMetrica importieren"><input type="checkbox" value="immometrica" disabled style="display:none"><span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h11M4 12h11M4 18h7"/><circle cx="19" cy="6" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></span><span class="dp-pf-lbl">ImmoMetrica</span><span class="dp-pf-led"></span></label>' +
+          /* v2217 · Marcel 14.10.2026: „kann man in der Datenaufnahme im Objekt
+             zusätzlich Dokumente einlesen?" Der Dokument-Import (neun Arten)
+             war nur über das Seitenmenü „Import" erreichbar. Er steht NICHT
+             unter dem Riegel: er überschreibt nichts still, sondern zeigt je
+             Feld „im Dokument / im Objekt" und lässt abweichende Werte
+             abgewählt. */
+          (window.DokumentImport ? pfTileTool('dokument', _doc, 'Dokumente', 'Grundbuch, Kaufvertrag, Gutachten, BORIS … — mit Abgleich gegen das Objekt') : '') +
         '</div></div>' +
         '<a class="dp-pf-qr" id="oab-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run">Abrufen</button>' + '</span>' +
       '</div></div>' +
@@ -868,6 +875,15 @@
     b.innerHTML = '<span class="dp-pf-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.8-1.2"/></svg></span><span class="dp-pf-lbl">Freigeben</span>';
     b.addEventListener('click', function (ev) { ev.preventDefault(); ev.stopPropagation(); riegelFreigeben(); });
     row.appendChild(b);
+    /* v2217 · seit „Dokumente" (frei) in derselben Reihe steht, liegt der
+       Knopf ueber der Mitte der GESPERRTEN Kacheln - nicht der Reihe. */
+    try {
+      var zuK = row.querySelectorAll('.dp-pf-riegel-zu');
+      if (zuK.length) {
+        var rr = row.getBoundingClientRect(), a0 = zuK[0].getBoundingClientRect(), a1 = zuK[zuK.length - 1].getBoundingClientRect();
+        if (rr.width > 0) b.style.left = ((a0.left + a1.right) / 2 - rr.left) + 'px';
+      }
+    } catch (e) {}
   }
 
   /* Nachziehen, wenn sich etwas aendert: Objektwechsel, Formulareingabe,
@@ -895,7 +911,7 @@
        Formular, nur auf verschiedenen Wegen. Die Reihenfolge ist dieselbe
        Logik wie bisher — erst was Dokumente liefern, dann was der Nutzer
        selbst sagt, dann die Marktbewertung. */
-    var order = ['import', 'immometrica', 'voice', 'gefuehrt', 'pricehubble', 'sprengnetter', 'dealpilot'];
+    var order = ['import', 'dokument', 'immometrica', 'voice', 'gefuehrt', 'pricehubble', 'sprengnetter', 'dealpilot'];
     var ordered = order.filter(function (s) { return srcs.indexOf(s) !== -1; });
     var btn = $('oab-run'); if (btn) btn.disabled = true;
     /* Was vorher lief, weiss der naechste Schritt — der Sprechlauf sagt
@@ -941,6 +957,7 @@
           vorlauf.push('gefuehrt');
         }
         else if (s === 'import') { setProg('Import …'); await new Promise(function (res) { openCombinedImport(res); }); vorlauf.push('import'); }
+        else if (s === 'dokument') { setProg('Dokumente …'); await new Promise(function (res) { if (window.DokumentImport) window.DokumentImport.oeffnen({ beiSchluss: res }); else res(); }); vorlauf.push('dokument'); }
         else if (s === 'immometrica') { setProg('ImmoMetrica …'); await new Promise(function (res) { if (window.ImmoMetricaImport) window.ImmoMetricaImport.open(function (picked) { applyImmometrica(picked); res(); }, { target: 'obj', onClose: function () { res(); } }); else res(); }); vorlauf.push('immometrica'); }
         else if (s === 'pricehubble' || s === 'sprengnetter') { setProg((s === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter') + ' …'); await avmFetch(s); }
         else if (s === 'dealpilot') {
@@ -1856,6 +1873,30 @@
     _files.forEach(function (f) { var a = _fileAddr(f); if (!a) return; var key = _norm(a.str) + '|' + _norm(a.plz) + '|' + _norm(a.ort); if (seen[key]) return; seen[key] = 1; a.key = key; a.label = (a.str + (a.hnr ? ' ' + a.hnr : '') + ', ' + a.plz + ' ' + a.ort).replace(/^,\s*|,\s*$/g, '').trim(); out.push(a); });
     return out;
   }
+  /* v2217 · was steht im Objekt, und weicht es vom gelesenen Wert ab? */
+  function _istText(id) {
+    var el = document.getElementById(id); if (!el) return '';
+    if (el.tagName === 'SELECT') { var o = el.selectedOptions && el.selectedOptions[0]; return el.value && o ? String(o.textContent || '').trim() : ''; }
+    if (el.type === 'checkbox') return '';
+    return String(el.value || '').trim();
+  }
+  function _abweichungen(keys) {
+    var out = {};
+    keys.forEach(function (id) {
+      var it = _merged[id]; if (!it || it.kind === 'star' || it.kind === 'bool') return;
+      var ist = _istText(id); if (ist === '') return;
+      var el = document.getElementById(id);
+      var neu = it.raw != null ? it.raw : it.value;
+      if (el && el.tagName === 'SELECT') { if (String(el.value) === String(neu) || ist.toLowerCase() === String(it.value || '').toLowerCase()) return; }
+      else {
+        var a = (typeof parseDe === 'function') ? parseDe(ist) : parseFloat(ist), b = (typeof parseDe === 'function') ? parseDe(neu) : parseFloat(neu);
+        var zahl = /\d/.test(ist) && /^[\s\d.,%€+-]+$/.test(ist) && /^[\s\d.,%€+-]+$/.test(String(neu));
+        if (zahl ? Math.abs(a - b) < 0.005 : ist.toLowerCase() === String(neu).trim().toLowerCase()) return;
+      }
+      out[id] = ist;
+    });
+    return out;
+  }
   function renderMergedTable() {
     var host = $('oabi-result'); if (!host) return;
     var ab = $('oabi-apply');
@@ -1886,10 +1927,19 @@
       var thumbs = _importPhotos.slice(0, 6).map(function (src) { return '<img src="' + src + '" alt="" style="width:30px;height:30px;object-fit:cover;border-radius:4px;margin-right:3px;vertical-align:middle">'; }).join('');
       photoRow = '<tr><td style="width:34px"><input type="checkbox" data-photos="1" checked></td><td>\uD83D\uDDBC Bilder</td><td><b>' + _importPhotos.length + '</b> aus PDF \u2014 in Objektfotos &uebernehmen; ' + thumbs + '</td><td class="src">Expos\u00e9</td></tr>';
     }
-    host.innerHTML = addrHtml + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
+    /* v2217 · Marcel 14.10.2026: „Werden Abweichungen bei PDFs gemeldet?"
+       Gemessen: nein - applyMerged schrieb jeden angehakten Wert, auch über
+       einen anderen, schon eingetragenen. Jetzt steht je Zeile, was im Objekt
+       steht; weicht es ab, ist die Zeile markiert und NICHT vorgehakt. */
+    var abw = _qcMode ? {} : _abweichungen(keys);
+    var nAbw = Object.keys(abw).length;
+    var abwKopf = nAbw ? '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid #d9a441;background:rgba(217,164,65,.12);font-size:12.5px">'
+      + '<b>' + nAbw + (nAbw === 1 ? ' Wert weicht' : ' Werte weichen') + ' vom Objekt ab.</b> Diese Zeilen sind nicht vorgehakt — hak sie an, wenn das Dokument recht hat.</div>' : '';
+    host.innerHTML = addrHtml + abwKopf + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
       var it = _merged[id];
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
-      return '<tr><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '" checked></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:var(--wl-9a7f33, #9a7f33);font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
+      if (abw[id] !== undefined) valCell += '<div class="oabi-bisher" style="font-size:11.5px;color:#b5651d;margin-top:2px">im Objekt: ' + escH(abw[id]) + '</div>';
+      return '<tr' + (abw[id] !== undefined ? ' class="oabi-abw" style="background:rgba(217,164,65,.10)"' : '') + '><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '"' + (abw[id] !== undefined ? '' : ' checked') + '></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:var(--wl-9a7f33, #9a7f33);font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
     }).join('') + '</tbody></table>';
     if (ab) ab.disabled = false;
     // Range-Toggle-Handler
@@ -1967,6 +2017,8 @@
           '<div class="oabi-drop" id="oabi-drop">📁 PDFs auswählen oder hierher ziehen<br><span style="font-size:11px;color:var(--muted,#7A7370)">mehrere Dateien möglich · max 100 MB je Datei</span>' +
             '<input type="file" id="oabi-input" accept="application/pdf,.pdf" multiple style="display:none"></div>' +
           '<div class="oabi-files" id="oabi-files"></div><div id="oabi-result"></div>' +
+          /* v2217 · der Weg zu den anderen acht Dokumentarten */
+          (window.DokumentImport && !_qcMode ? '<div class="oabi-anders" style="margin-top:10px;font-size:12px;color:var(--muted,#7A7370)">Grundbuch, Kaufvertrag, Gutachten oder BORIS-Auszug? <a href="#" id="oabi-zu-dokument" style="color:var(--wl-b8932f,#b8932f);font-weight:600">Dokument einlesen ›</a></div>' : '') +
         '</div>' +
         '<div class="oabi-foot"><button type="button" class="oabi-btn" id="oabi-cancel">Schließen</button>' +
           '<button type="button" class="oabi-btn primary" id="oabi-apply" disabled><span style="display:inline-flex">' + svg('download', 14, '#fff') + '</span> Ausgewählte übernehmen</button></div>' +
@@ -1986,6 +2038,8 @@
     drop.addEventListener('drop', function (e) { e.preventDefault(); drop.classList.remove('drag'); if (e.dataTransfer.files) handleFiles(e.dataTransfer.files); });
     input.addEventListener('change', function (e) { if (e.target.files) handleFiles(e.target.files); });
     $('oabi-apply').addEventListener('click', applyMerged);
+    var zuDok = $('oabi-zu-dokument');
+    if (zuDok) zuDok.addEventListener('click', function (e) { e.preventDefault(); var cb = _oabiDone; _oabiDone = null; try { var x = $('oabi-ov'); if (x) x.remove(); } catch (er) {} window.DokumentImport.oeffnen({ beiSchluss: cb }); });
   }
   function setStatus(f, txt) { var st = f.row.querySelector('.oabi-st'); if (st) st.textContent = txt; }
   function renderFileRow(f) {

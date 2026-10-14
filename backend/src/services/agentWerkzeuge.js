@@ -226,6 +226,98 @@ async function bank_uebersicht(ctx, args) {
   };
 }
 
+/* ── v2217 · SOLL/IST: Ankauf-Stand gegen heute ─────────────────────────
+   Marcel 14.10.2026: „Ist der Telegram-Bot und seine Funktionen alle da
+   oder können wir ihm noch mehr Möglichkeiten geben?" Gemessen: 22
+   Werkzeuge, keins kannte den Ankauf-Stand - der Bot konnte „wie steht
+   das Objekt gegen den Plan?" nicht beantworten, obwohl die App es kann.
+
+   Gelesen wird, was die App beim Festschreiben in `data._ankauf.kurz`
+   abgelegt hat (frontend/js/ankauf.js _kurzfassung), gegen dieselben
+   persistierten Kennzahlen von heute. NICHTS wird neu gerechnet - der
+   Ankauf ist ein eingefrorener Stand, und eine zweite Rechnung im Bot
+   wäre eine zweite Wahrheit. */
+const SOLL_IST = [
+  ['kp', 'Kaufpreis', 'eur', 'kleiner'], ['nkm', 'Nettokaltmiete', 'eur', 'groesser'],
+  ['_kpis_miete_j', 'Jahresmiete', 'eur', 'groesser'], ['_nkm_qm', 'Miete je m²', 'eurqm', 'groesser'],
+  ['_leer_einheiten', 'Leere Einheiten', 'stk', 'kleiner'],
+  ['_kpis_bmy', 'Bruttomietrendite', 'pct', 'groesser'], ['_kpis_nmy', 'Nettomietrendite', 'pct', 'groesser'],
+  ['_kpis_dscr', 'DSCR', 'zahl', 'groesser'], ['_kpis_ltv', 'LTV', 'pct', 'kleiner'],
+  ['_kpis_cf_vs', 'Cashflow vor Steuer', 'eur', 'groesser'], ['_kpis_cf_ns', 'Cashflow nach Steuer', 'eur', 'groesser'],
+  ['_ds2_score', 'DealScore', 'zahl', 'groesser']
+];
+function _zahlSI(v) {
+  if (v === null || v === undefined || v === '') return null;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+  let t = String(v).trim().replace(/[€%\s]/g, '');
+  if (/^-?\d+\.\d{1,2}$/.test(t)) return Number(t);          /* 6.25 ist ein Dezimalpunkt */
+  t = t.replace(/\./g, '').replace(',', '.');
+  const n = Number(t);
+  return Number.isFinite(n) ? n : null;
+}
+function _heuteKurz(d) {
+  const k = {};
+  SOLL_IST.forEach(([s]) => { k[s] = _zahlSI(d[s]); });
+  if (k._ds2_score == null) k._ds2_score = _zahlSI(d._dealpilot_score);
+  const nkm = _zahlSI(d.nkm), wfl = _zahlSI(d.wfl);
+  k._nkm_qm = (nkm !== null && wfl) ? Math.round(nkm / wfl * 100) / 100 : null;
+  try {
+    const e = d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : null;
+    k._leer_einheiten = e && e.length ? e.filter((x) => String(x.status || '') === 'leer').length : null;
+  } catch (e) { k._leer_einheiten = null; }
+  return k;
+}
+function _analyseKurz(roh) {
+  let a = null;
+  try { a = roh ? (typeof roh === 'string' ? JSON.parse(roh) : roh) : null; } catch (e) { a = null; }
+  if (!a || typeof a !== 'object') return null;
+  return {
+    stand: a._fuer && a._fuer.stand ? a._fuer.stand : null,
+    empfehlung: a.empfehlung || null,
+    kaufpreis_empfohlen: a.kaufpreis_offerte && a.kaufpreis_offerte.empfohlen ? a.kaufpreis_offerte.empfohlen : null,
+    begruendung: a.empfehlung_begruendung ? String(a.empfehlung_begruendung).slice(0, 400) : null
+  };
+}
+async function soll_ist_lesen(ctx, args) {
+  const id = await _findeObjekt(ctx, args);
+  if (!id) return { gefunden: false, hinweis: 'Kein Objekt zu dieser Angabe gefunden.' };
+  const o = await dialog.objektKontext(ctx.userId, id);
+  if (!o) return { gefunden: false };
+  ctx.merkeObjekt(id);
+  const d = o.daten || {};
+  const adresse = [d.str, d.hnr].filter(Boolean).join(' ') + (d.ort ? ', ' + [d.plz, d.ort].filter(Boolean).join(' ') : '');
+  const ak = d._ankauf && d._ankauf.kurz ? d._ankauf : null;
+  const gewonnen = d._deal_won === true || d._deal_won === 'true';
+  if (!ak) {
+    return { gefunden: true, id: o.objekt_id, adresse, ankauf_stand: false,
+      so_sagen: gewonnen
+        ? 'Das Objekt ist gewonnen, aber es gibt noch keinen festgeschriebenen Ankauf-Stand. Er entsteht in DealPilot mit dem Nutzen-/Lastenwechsel (Deal-Aktion → Gewonnen).'
+        : 'Einen Soll/Ist-Abgleich gibt es erst für Objekte im Bestand: mit „Gewonnen" und dem Nutzen-/Lastenwechsel wird der Ankauf-Stand festgeschrieben.' };
+  }
+  const heute = _heuteKurz(d), zeilen = [];
+  SOLL_IST.forEach(([s, wort, einheit, besser]) => {
+    const a = _zahlSI(ak.kurz[s]), b = heute[s];
+    if (a === null || b === null) return;                  /* fehlend = keine Zeile, nie geschaetzt */
+    const diff = Math.round((b - a) * 100) / 100;
+    const richtung = Math.abs(diff) < 0.005 ? 'gleich' : ((diff > 0) === (besser === 'groesser') ? 'besser' : 'schlechter');
+    zeilen.push({ kennzahl: wort, einheit, ankauf: a, heute: b, differenz: diff,
+      prozent: (einheit === 'eur' && a) ? Math.round((b - a) / Math.abs(a) * 1000) / 10 : null, richtung });
+  });
+  const pAlt = _analyseKurz(ak.daten && ak.daten._ai), pNeu = _analyseKurz(o.ki_lagebewertung);
+  return {
+    gefunden: true, id: o.objekt_id, adresse, ankauf_stand: true,
+    stichtag: ak.stichtag || null, korrekturen: Array.isArray(ak.korrekturen) ? ak.korrekturen.length : 0,
+    zeilen, vergleichbar: zeilen.length + ' von ' + SOLL_IST.length,
+    besser: zeilen.filter((z) => z.richtung === 'besser').length,
+    schlechter: zeilen.filter((z) => z.richtung === 'schlechter').length,
+    pilot_analyse: { beim_ankauf: pAlt, heute: pNeu,
+      gleich: !!(pAlt && pNeu && pAlt.stand && pAlt.stand === pNeu.stand) },
+    hinweis: 'Ankauf = Stand beim Nutzen-/Lastenwechsel (Soll), heute = gespeicherter Stand (Ist). '
+      + 'Kennzahlen, die zu einem der beiden Zeitpunkte fehlten, stehen nicht in der Liste und werden nicht geschätzt. '
+      + 'Sind beide Pilot-Analysen gleich (gleich: true), wurde seit dem Ankauf keine neue abgerufen - sag das.'
+  };
+}
+
 async function pilot_analyse_lesen(ctx, args) {
   const id = await _findeObjekt(ctx, args);
   if (!id) return { gefunden: false, hinweis: 'Kein Objekt zu dieser Angabe gefunden.' };
@@ -3595,6 +3687,16 @@ const WERKZEUGE = [
       nummer:  { type: 'integer', description: 'Nummer aus der zuletzt gezeigten Liste' },
       id:      { type: 'string', description: 'Objekt-Kennung, falls bekannt' }
     }, additionalProperties: false } },
+
+  /* v2217 · Soll/Ist im Bot */
+  { name: 'soll_ist_lesen', stufe: 'lesen', fn: soll_ist_lesen,
+    beschreibung: 'Soll/Ist EINES Bestandsobjekts: der beim Nutzen-/Lastenwechsel '
+      + 'festgeschriebene Ankauf-Stand (Plan) gegen heute - Miete, Leerstand, Renditen, DSCR, '
+      + 'LTV, Cashflow vor/nach Steuer, DealScore, je mit Differenz und besser/schlechter - '
+      + 'dazu die Pilot-Analyse beim Ankauf neben der heutigen. Nutze es bei Fragen wie '
+      + '"wie steht das Objekt gegen den Plan?", "was hat sich seit dem Kauf verändert?", '
+      + '"liegt es über oder unter Plan?". Kostet nichts; rechnet nichts neu.',
+    parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
 
   { name: 'objekt_lesen', stufe: 'lesen', fn: objekt_lesen,
     beschreibung: 'Alle Daten EINES Objekts: Kerndaten, Scores, Kennzahlen, Felder. '

@@ -138,7 +138,8 @@
     marktbericht: 'Ein Wert mit Herkunft: jede amtliche Zahl mit Ausschuss, Lizenz und Stichtag.',
     scores: 'Eine Stufenleiter für alles — dasselbe Objekt trägt überall dieselbe Note.',
     deal: 'Der Plan beim Kauf bleibt stehen. Später siehst du schwarz auf weiß, was daraus geworden ist.',
-    steuer: 'Anlage V und Werbungskosten aus denselben Zahlen, die schon im Objekt stehen.'
+    steuer: 'Anlage V und Werbungskosten aus denselben Zahlen, die schon im Objekt stehen.',
+    telegram: 'DealPilot in der Hosentasche: Kennzahlen, Soll/Ist und Anlegen per Sprachnachricht — mit denselben Rechenkernen wie die App.'
   };
   /* Unterkarten: welche Station spielt welche Demo ab */
   var UNTER = {
@@ -219,7 +220,7 @@
     ges.classList.toggle('voll', m === 'zusammen' || m === 'flug');
     if (!m) { if (_kopfAlt) { root.querySelector('.nm').textContent = _kopfAlt[0]; root.querySelector('.s').textContent = _kopfAlt[1]; _kopfAlt = null; } ges.innerHTML = ''; markiere(); return; }
     if (!_kopfAlt) _kopfAlt = [root.querySelector('.nm').textContent, root.querySelector('.s').textContent];
-    var T = { gesamt: ['Alles auf einer Fläche', 'Neun Abläufe in drei Phasen — Klick auf eine Linie zoomt hinein, Klick auf eine Station öffnet sie'], zusammen: ['Das Zusammenspiel', 'Ein Objekt, sechs Rechenkerne, neun Abläufe — und was du in der Hand hältst'], flug: ['Flug 2026-1056 · Parkstraße 9', 'Ein echtes Objekt fliegt durch die Abläufe — scroll mit'] }[m];
+    var T = { gesamt: ['Alles auf einer Fläche', 'Alle Abläufe nach Phasen — Klick auf eine Linie zoomt hinein, Klick auf eine Station öffnet sie'], zusammen: ['Das Zusammenspiel', 'Ein Objekt, sechs Rechenkerne, alle Abläufe — und was du in der Hand hältst'], flug: ['Flug 2026-1056 · Parkstraße 9', 'Ein echtes Objekt fliegt durch die Abläufe — scroll mit'] }[m];
     root.querySelector('.nm').textContent = T[0]; root.querySelector('.s').textContent = T[1];
     if (m === 'gesamt') gesamtnetz();
     if (m === 'zusammen') ges.innerHTML = '<iframe src="5-zusammenspiel.html?eingebettet" title="Zusammenspiel"></iframe>';
@@ -228,7 +229,7 @@
   }
 
   /* 4 · Das Gesamtnetz in der Kartenoptik des Atlas */
-  var PHASEN = [['PRÜFEN', ['reise', 'quickcheck', 'sprache', 'dokumente']], ['ANALYSIEREN', ['boarding', 'marktbericht', 'scores', 'deal']], ['HALTEN', ['steuer']]];
+  var PHASEN = [['PRÜFEN', ['reise', 'quickcheck', 'sprache', 'dokumente']], ['ANALYSIEREN', ['boarding', 'marktbericht', 'scores', 'deal']], ['HALTEN', ['steuer']], ['UNTERWEGS', ['telegram']]];
   function gesamtnetz() {
     var n = 0, d = {}; PZ.forEach(function (p) { n += p.knoten.length; p.knoten.forEach(function (k) { (k.ein || []).concat(k.aus || []).forEach(function (x) { d[x] = 1; }); }); });
     var verz = 0, h = '<div class="ges-flaeche" id="ges-fl">';
