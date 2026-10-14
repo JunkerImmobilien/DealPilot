@@ -3278,7 +3278,16 @@ function _calcImmediate(){
       State.cfRows.forEach(function(r, idx) {
         var totals = _computeYearTotal(r.cal, idx);
         if (totals && typeof totals.taxDelta === 'number' && !isNaN(totals.taxDelta)) {
-          r.tax_y = totals.taxDelta;
+          /* v2212c · GmbH/UG: _computeYearTotal (tax.js) rechnet IMMER Einkommen-
+             steuer mit Erstattung - auch fuer eine Gesellschaft. Diese Zeile
+             ueberschrieb damit die richtige KSt aus _mtxYear in jeder Projektions-
+             zeile. Gemessen 14.10.2026 an 2026-1008 (Halter GmbH): Jahr 1 zvE
+             1.953 EUR -> 814 EUR Steuer (42 %), Jahr 2 -207 EUR Erstattung.
+             Jetzt: Ergebnis des Jahres aus derselben Rechnung, besteuert mit dem
+             Halter-Regime (KSt ab Stichtag, keine Erstattung). Privat unveraendert. */
+          r.tax_y = (_mandRate != null && typeof totals.ergebnis === 'number' && isFinite(totals.ergebnis))
+            ? _mtxYear(totals.ergebnis, r.cal)
+            : totals.taxDelta;
           r.cfns_y = r.cfop_y - r.tax_y;
         }
         _taxKumNew += (r.tax_y || 0);
