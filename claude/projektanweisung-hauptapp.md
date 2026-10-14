@@ -38761,6 +38761,44 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### N66 · Messe-Geschichten, BMF, RND-Abgleich, Werbungskosten + v2213–v2214 · Staging (14.10.2026)
+- **Was:**
+  - **Westerfeldstr. 140 (1041)** ist das RND-Beispiel. Bestand seit 01.01.2025, BMF amtlich 14,64 %.
+    - Grund für den kleinen Anteil: 1.570 m² × 450 €/m² BORIS = Bodenwert über dem Kaufpreis.
+    - Plan mit AfA 2 %, Ist mit eigenem Satz aus dem echten Nutzungsdauergutachten (16 Jahre, 6,25 %).
+    - AfA 1.719 → 5.371 €; Steuer 2026 4.955 → 3.421 € (vor Werbungskosten).
+  - **BMF amtlich** übernommen bei 15 Objekten. Nicht übernommen:
+    - 1056: unplausibel
+    - 1082: Eingaben fehlen
+    - 1006: Kern-Fehlerwert
+  - **Pläne** von 1052, 1053 und 1054 mit `korrigieren('daten')` auf den BMF-Gebäudeanteil nachgezogen. Das Ist wurde dafür kurz zurückgestellt, die Geschichten sind erhalten.
+  - **Werbungskosten 2024–2026** bei 11 Bestandsobjekten, recherchiert:
+    - 0,30 €/km je gefahrenem km, BFH IX R 18/15
+    - Kontoführung 16 € bzw. 96 €
+    - Steuerberatung nach StBVV § 27
+    - Verpflegung 14 €
+    - Material als Erhaltungsaufwand
+    - keine Hausverwaltung (die steckt schon in der Bewirtschaftung)
+  - Gohliser 2029: 40.000 € Erhaltungsaufwand neu eingetragen.
+  - **Dokument** `design/Messe/demo-geschichten.md`: sieben Geschichten, RND-Abgleich, Werbungskosten-Grundlage, Restliste für Marcel.
+- **Fehler, dabei gefunden und behoben:**
+  - **v2213** `771fdf72`: Die BMF-Übernahme schrieb **−96,6 %** Gebäudeanteil ins Objekt (2026-1056, negativer Gebäudeertrag). Jetzt meldet die Pipeline `unplausibel`, und `_v292Apply` sperrt Werte außerhalb von 0 bis 100.
+  - **v2213b** `5ee1224d`:
+    - Fehlerwerte des Kerns (`{error:'#VALUE!'}`) liefen als Gebäudeanteil weiter (`toFixed`-Absturz). Jetzt kommt eine Meldung „es fehlt: Grundstücksfläche, Bodenrichtwert“.
+    - Der `bmf_cache`-Schlüssel enthält jetzt den Pipeline-Stand (`PIPELINE_STAND`). Vorher kamen nach jeder Korrektur alte Ergebnisse.
+  - **v2214** `477a077a` (**der schwerste Fund**): Die Steuer-Jahreswerte der Anlage V (`_taxYearlyOverrides`) lebten nur im Fenster.
+    - Kein Ladeweg stellte sie her; beim Objektwechsel wanderten sie ins nächste Objekt.
+    - Nach einem Neuladen waren sie weg, und das nächste Speichern überschrieb die Zeitreihe (Gohliser 2029: 40.000 → 0,00).
+    - Jetzt reisen sie als `d._tax_overrides` im Objekt mit und werden beim Laden gesetzt oder geleert.
+    - Nachgewiesen nach einem frischen Seitenaufruf: Gohliser trägt 2029 = 40.000 € samt Bemerkung, Alexanderstr. danach `{}`.
+- **Eigener Fehler:** Mein erster Werbungskosten-Lauf lief über den Fehler aus v2214. Die Werte wanderten von Objekt zu Objekt, die Steuer stieg bei drei Objekten. Erkannt an der Richtung (mehr Werbungskosten → mehr Steuer ist unmöglich). Nach dem Fix vollständig neu eingetragen, `geerbt=0` überall.
+- **Rest:**
+  - BMF für 1082 und 1006 (Eingaben fehlen).
+  - Parkstr. 9: NKM „710 Euro“ für 5 Einheiten prüfen.
+  - Vier Altbauten brauchen eine sachverständige RND.
+  - Testobjekte löscht Marcel.
+  - Bestehende Nutzer haben ihre früheren Jahreswerte verloren, wo sie nach einem Neuladen gespeichert haben. Wiederherstellen ginge nur aus den Server-Zeitreihen; dort sind eigene Eingaben aber nicht von Vorschlägen zu unterscheiden.
+
 ### Demo-Objekte (N60.19) + v2212–v2212c · Staging (14.10.2026)
 - **Was:** Marcel: „Demo-Objekte … umsetzen, dass es passt“ (Konto info@junker-immobilien.io).
   - Vorher gesichert: `/root/backups/main-vor-demo-20261014-0608.sql.gz` (48 MB, 71 Tabellen, angesehen).
