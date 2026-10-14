@@ -38761,6 +38761,26 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2222–v2222b · Staging · Messe-Drehbuch Quick Boarding mit Datenaufnahme (14.10.2026)
+- **Was:** `?messe=quickcheck` ist neu, das bisherige heißt jetzt `quickcheck-tippen`.
+  - Ablauf: Zwei PDFs aus Marcels Ordner (Exposé Hölderlinstr. + Marktwerteinschätzung Sachsenstr.) → Adresskonflikt → Exposé-Adresse gewählt → übernehmen → DealPilot-Marktwertindikation → Zensus-Bestandsmiete 550 € (22 · Kritisch) → Spanne Unten 766 € (54 · Solide) → Bewertung mit Lage B, dann C (Ziel 5,0 → 7,0 %, Verhandlungsziel 131.314 €) → Oben + 20 % EK (76 · Gut, „Starker Kauf").
+  - **Mitschnitt statt Abruf:** `ObjectActions._voice.mitschnitt()/wiedergabe()` (neu in object-actions.js). Die echten KI-Ausleseergebnisse beider PDFs (einmal echt eingelesen) und die echte `#_mb_state`-Karte nach `DealPilotMBQc.run()` stehen im Drehbuch und werden je Durchgang ohne Abruf wiedergegeben.
+  - Quick-Check: Die KI-Automatik startet während eines Drehbuchs nicht (kein Absage-Toast im Video).
+  - `qc_span_config` wird gesichert und zurückgeschrieben.
+  - Scrollen jetzt sofort statt sanft (gemessen bis 3 s außer Bild). Waagerechte Rollstreifen gelten nicht mehr als Scroller.
+- **Befunde für Marcel:**
+  - **Marktwert erreicht den Quick-Check-Score nicht:** `registerDpmb` steht in dealpilot-mb-qc.js:298 hinter dem `return` aus v832c. „Potenzial" blieb in allen Läufen bei 30, obwohl der Marktwert 199–351 T€ über dem Kaufpreis von 139 T€ lag. Nicht behoben, weil das Scores ändert.
+  - Die KI-Auslese der Marktwert-PDF ergab `wertentwicklung_3jahre_pct 14,1`, im PDF steht −1,65 %.
+  - Lageklasse geht nicht in die Score-Zahl ein, nur in Zielrendite und Verhandlungsrat (so gebaut).
+- **Commit:** `f9d64d6f`, `5afd875d`, `dd5b4563`
+- **Nachweis:**
+  - Letzter Lauf rund 92 s, Kegel bei jeder Zeile im Bild (Protokoll).
+  - Schreibaufrufe nur `PUT /portfolio-spiegel` beim Laden. Kein KI-, kein Pass-, kein Marktbericht-Abruf.
+  - Kosten der Vorbereitung: 2 echte KI-Auslesungen und 1 DealPilot-Marktwertindikation auf Staging.
+- **Rest:**
+  - Datenschutz vor öffentlicher Nutzung: echte Adressen (Exposé einer Privatverkäuferin, Marktwert-PDF eines Privatkunden) stehen im Video. Marcel entscheidet.
+  - `qc_span_config` in Marcels Browser durch meine Handtests verstellt, auf Vorgabe zurückgesetzt (Eintrag entfernt = Ø).
+
 ### v2221–v2221c · Staging · Messe-Drehbuch 2 Quick-Check, Prüfung Co-Pilot-Einstellungen (14.10.2026)
 - **Was:**
   - **Drehbuch `?messe=quickcheck`:** ETW Musterweg 7, Bielefeld, als Beispiel erkennbar. 72 m², Bj 1994, NKM 680, Hausgeld 230.
