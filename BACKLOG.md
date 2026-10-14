@@ -38,7 +38,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ### N71 · Marcel 14.10.2026 (achte Runde) — erledigt bis auf Abnahmen (`v2218g`–`v2219c`)
 > Geführte Eingabe randlos · Dokumente im PDF-Import · Sprache direkt Freisprechen · Sprechkatalog ergänzt, Grenze 320 · Messe-Drehbuch Parkstraße · **Datenfehler Soll-Ansicht behoben (v2219a), Parkstraße wiederhergestellt**.
-1. **DRINGEND:** Prod-Rollout v2219a (Soll-Ansicht konnte das Ist überschreiben) — Freigabe nötig.
+1. ~~Prod-Rollout v2219a~~ **erledigt 14.10.2026**, Prod-Rollout (19) `b11f88b4`.
 2. **Offen:** Marcel nimmt Drehbuch 1 ab (`?messe=parkstrasse`), danach Drehbücher 2–10.
 
 ### N70 · Marcel 14.10.2026 (siebte Runde) — erledigt bis auf Abnahmen (`v2218a`–`v2218f`)

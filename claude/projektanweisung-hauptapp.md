@@ -38761,6 +38761,18 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### Prod-Rollout (19) · v2217–v2219c auf Produktion (14.10.2026)
+- **Was:** Freigabe Marcel. Der Anlass war v2219a: Die Soll-Ansicht konnte das Ist überschreiben. Lokal `main` + Merge `origin/staging` (`--no-ff`), Push → `b11f88b4`. Auf Prod `git pull` und Rebuild `backend`. Das mb-backend ist unverändert, kein Rebuild.
+- **Commit:** `b11f88b4` (22 Commits, 40 Dateien, keine Migration)
+- **Nachweis:**
+  - Sicherung vorher: `/root/backups/haupt-20261014-1102.sql.gz` (11 MB, 71 Tabellen) und `mb-20261014-1102.sql.gz` (25 MB, 32 Tabellen), Kopf gelesen.
+  - Backend `healthy`, „No new migrations“. Im Image: `MAX_CATALOG = 320` und `soll_ist_lesen` (3 Stellen).
+  - Live: `storage.js` trägt `_vorAnkauf`, `ankauf-ansicht.js` und `messe-drehbuch.js` antworten mit 200 und `text/javascript`. `index.html` hat `storage.js?v=v2219` (in v2219a gesetzt) und `messe-drehbuch.js?v=v2219c`.
+  - Gold-Audit auf Prod RC=0. `buster-ebenen-pruefen` SAUBER.
+- **Rest:**
+  - Die Soll-Ansicht auf Prod ist im Browser nicht abgenommen. Getestet ist sie auf Staging.
+  - Freisprechen und Halten-zum-Sprechen fehlen noch am echten Handy.
+
 ### v2218g–v2219c · Staging · Geführte Eingabe randlos, Dokumente im PDF-Import, Sprache direkt, Sprechkatalog, Soll-Ansicht überschrieb das Ist, Messe-Drehbuch (14.10.2026)
 - **Was:** Marcels achte Runde (N71).
   - **v2218g:** Geführte Eingabe am Handy randlos über `100dvh`. Gemessen: Fenster vorher 352×686, Verlauf 168 → 242 px.
