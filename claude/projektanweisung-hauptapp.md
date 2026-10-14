@@ -38761,6 +38761,26 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2227–v2228b · Staging · Verhandlungsrat mit Brücke, Analyse im Du, Drehbuch ImmoMetrica (14.10.2026)
+- **Was:**
+  - **v2227/a/b · Verhandlungsrat** (Marcel: „am Schluss eine Bewertung mit kaufen und danach kommt im Satz direkt, dass man handeln soll"):
+    - Prompt `/ai/quickcheck-analyse`: Bei „Starker Kauf" beginnt `negotiate` mit „guter Deal" und dem Grund, warum Verhandeln trotzdem sinnvoll ist, begründet mit Kennzahlen, nicht mit „dem Urteil". Bei „Nicht kaufen" keine Kaufempfehlung zum jetzigen Preis.
+    - Die Analyse duzt (gemessen vorher: „Ihrer Zielvorgabe").
+    - Absicherung im Quick-Check: Fehlt bei KAUFEN die Brücke, wird sie vorangestellt.
+    - Drehbuch: neue Pilot-Analyse aufgenommen, die Schlussszene zeigt die Brücke.
+  - **v2228 · Drehbuch `?messe=immometrica`:** echtes Inserat aus Marcels Suche „Haus" (2,5-Familienhaus Herford, 3 WE, 210 m², Bj 1963, 350.000 €, leer, ohne Straße).
+    - Ablauf: Quellen → Suche 1.527 Treffer → Inserat → Ortskern-Hinweis → DealPilot-Marktbewertung (361–461 T€, Miete 1.499–2.327 €) → Spanne Unten 25 · Kritisch, Ø 40 · Schwach, Oben 68 · Solide → 20 % EK 76 · Gut → Abspann mit Wortmarke.
+    - Alle fünf ImmoMetrica-Wege beantwortet `_imoFetchAn()` nur im Lauf aus dem Mitschnitt; danach ist `fetch` wieder das echte.
+- **Commit:** `c93997f5`, `1ac7db6a`, `da4aa2a5`, `61ce55ca`, `46ef06d0`, `18f84111`, `40269875`
+- **Nachweis:**
+  - Echter Lauf mit neuem Prompt: „Dies ist ein guter Deal, da die Bruttomietrendite … Obwohl …, liegt dein Zinssatz … Daher solltest du …".
+  - ImmoMetrica-Drehbuch rund 100 s: alle Stufen wie gemessen, Abspann beide Karten (85,5 s / 90,9 s). Danach `fetch` echt, `#imo-ov` weg, Spannen-Vorgabe zurück, nur `PUT /portfolio-spiegel`.
+  - Vorbereitung: 1 DealPilot-Marktbewertung, ImmoMetrica-Listen einmal live.
+- **Rest:**
+  - Sprach-Drehbuch in Arbeit.
+  - Videos als Dateien offen (ffmpeg).
+  - v2224/v2226/v2227 nicht auf Prod.
+
 ### v2226 · Staging · Lage ins Urteil, nicht in den Score; Abspann im Quick-Boarding-Drehbuch (14.10.2026)
 - **Was:**
   - Marcel: „nicht in den Score [nicht mehr vergleichbar], aber in die Gesamtbewertung … ganz oben … nicht kaufen … aber auch sagen, warum der Deal trotzdem gut ist".
