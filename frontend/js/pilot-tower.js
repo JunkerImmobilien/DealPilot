@@ -261,11 +261,11 @@
   function auswahlText(f) {
     var s = f.querySelector('select'); if (!s) return '';
     var gew = s.selectedOptions && s.selectedOptions[0] ? s.selectedOptions[0].textContent.trim() : '';
-    var opt = [].slice.call(s.options).map(function (o) { return o.textContent.trim(); }).filter(function (t) { return t && !/^[–-]+$|bitte w/i.test(t); });
+    var opt = [].slice.call(s.options).map(function (o) { return o.textContent.trim(); }).filter(function (t) { return t && !/^[–—-]+$|bitte w|keine angabe/i.test(t); });
     var zweck = '';
     ZWECK.some(function (z) { if (z[0].test(s.id || '')) { zweck = z[1]; return true; } return false; });
     return (zweck ? zweck + ' ' : '')
-      + (gew && !/bitte w/i.test(gew) ? 'Gewählt: „' + gew + '". ' : 'Noch nichts gewählt. ')
+      + (gew && !/bitte w|keine angabe|^[–—-]+$/i.test(gew) ? 'Gewählt: „' + gew + '". ' : 'Noch nichts gewählt. ')
       + (opt.length ? 'Zur Auswahl: ' + kurz(opt.join(' · '), 220) + '.' : '');
   }
   function feldVon(el) {
