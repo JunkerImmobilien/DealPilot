@@ -706,6 +706,12 @@
           await warte(600);
           await zeige(function () { return q('#oabi-ov .oabi-modal'); }, 4);
           s.zeile('Freisprechen', 'DealPilot hört mit — die Mitschrift läuft, erkannte Werte leuchten grün.');
+          /* v2231b · die Mitschrift ist eingeklappt (<details>) - im Video soll
+             man mitlesen können, was gesagt wird */
+          var det = q('#oabi-ov details.vi-transcript'); if (det) det.open = true;
+          await warte(4500);
+          await zeige(function () { return q('#oabi-ov details.vi-transcript'); }, 8);
+          s.zeile('Freisprechen', 'Einfach so, wie du es einem Kollegen erzählen würdest.');
           /* die App fragt alle 5 s nach der Mitschrift: so kommt Satz für Satz */
           await warteAuf(function () { var l = q('#vi-live'); return l && l.value && l.value.length >= SPR_TEXT.join(' ').length; }, 45000);
           await warte(2200);
