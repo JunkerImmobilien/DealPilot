@@ -49,7 +49,7 @@
     if (!card || !card.mw || card.abschlag) return card;
     var s = satz(), f = 1 - s / 100;
     var roh = { low: card.mw.low, med: card.mw.med, high: card.mw.high };
-    ['low', 'med', 'high'].forEach(function (k) { if (card.mw[k] != null && isFinite(card.mw[k])) card.mw[k] = Math.round(card.mw[k] * f); });
+    ['low', 'med', 'high'].forEach(function (k) { if (card.mw[k] != null && isFinite(card.mw[k])) card.mw[k] = Math.round(card.mw[k] * f / 1000) * 1000; });   /* auf volle 1.000 € - eine Schätzung ist nicht eurogenau */
     if (card.area && card.mw.med) card.mw.sqm = Math.round(card.mw.med / card.area).toLocaleString('de-DE') + ' €/m²';
     card.abschlag = { pct: s, roh: roh, quelle: quelle() };
     return card;
