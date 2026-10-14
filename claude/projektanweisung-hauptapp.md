@@ -38761,6 +38761,22 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### ÜBERGABE 14.10.2026 abends · Stand für den nächsten Chat
+- **Stand:** Produktion = Staging auf **v2238a** (`1fc4be87`, Prod-Rollout 21). Letzte Commits nur Doku. Keine offene Migration, kein ungespeicherter Code.
+- **Offen (Backlog N76, N72):**
+  - Abnahme Marcel auf Prod: Quick-Check mit DealPilot-Abruf, C-Lage, Abschlag-Hinweis, Überschrift „· aber … unter Marktwert“, Pilot-Analyse in zwei Sichten.
+  - Drehbuch `quickcheck` (alt) hat noch die alte `KI_ANALYSE` → neu aufzeichnen oder durch `quickcheck-rundgang` ersetzen.
+  - Alte `_mb_state` ohne Abschlag zeigen Angebotsniveau bis zum nächsten Abruf.
+  - N72: `registerDpmb` in `dealpilot-mb-qc.js` ist tot (hinter `return`, `QcApp` ist `const`) — ändert Scores, nur mit Freigabe.
+- **Neue Regel:** nach außen keine Quellennamen, auch nicht ImmobilienScout (steht jetzt in CLAUDE.md unter Anbieter-Neutralität).
+- **Wo was liegt:**
+  - Angebotsabschlag: `config.js angebotAbschlagMarkt` (5,8 %, 12/2025, Quelle intern) · Profilfeld `angebot_abschlag_pct` (leer = Markt) · Karte „Marktbewertung“ in `standardwerte-karten.js` · Modul `marktwert-abschlag.js` (`DealPilotAbschlag.satz/quelle/anwenden`), aufgerufen aus `mapCard` in `dealpilot-mb.js` und `dealpilot-mb-qc.js`.
+  - Urteil: Kern `qc-heuristik.js` (`marktwertBereinigt`, `empfehlung()` mit `WERT_SCHWELLE` 10 %, Feld `wert`) — gespiegelt ins Backend. Prompt: `backend/src/routes/ai.js` („Bewerte in ZWEI Sichten“).
+  - Messe: `frontend/messe-studio.html` (Goldrahmen, Kapitelband, Intro/Outro, `?messe=&intro=&outro=&qr=`), Drehbücher in `frontend/js/messe-drehbuch.js` (`?studio=1` → postMessage `dp-messe-studio`), Baukasten `design/Vorschläge/messe-video/messe-effekte.js` (10 Intros, 10 Karten, 10 Outros; Vorschau https://claude.ai/artifact/BANFkS1maT5MhjhGGNooLe).
+  - Aufnahme: `tools/messe-fenster.ps1 -Was vor|zurueck` (Fenster NUR per Titel „Messe-Studio“), `tools/messe-aufnahme.ps1 -Name x.mp4 -Sekunden s`. Ablauf und Fallen im Skill `.claude/skills/messe-video/`, Agent `messe-video`.
+  - Videos: `Dateien/Messe/Videos/` — aktuell `quickcheck-rundgang-studio_2026-10-14.mp4` (220 s, ~10 MB).
+- **Lehren dieser Sitzung:** Fenster nie über `MainWindowHandle` greifen (traf Marcels Konferenzfenster) · vor jeder Aufnahme Bildschirm prüfen, bei Konferenz nicht aufnehmen · Urteil und Karte müssen dieselbe gerundete Zahl nehmen · zwei Commit-Botschaften ungenau (`f840c44f`, v2237b) — unten vermerkt.
+
 ### Prod-Rollout (21) · v2234–v2238a auf Produktion (14.10.2026)
 - **Was:** Freigabe von Marcel („ja dann Prod-Rollout“). `main` per `--no-ff` mit `origin/staging` zusammengeführt (28 Commits, keine Migration). Auf Prod `git pull` und Rebuild `backend`; das mb-backend ist unverändert.
 - **Commit:** `1fc4be87`

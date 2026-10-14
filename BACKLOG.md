@@ -36,6 +36,13 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N76 · Messe-Rundgang und Abschlag — Reste nach Prod-Rollout (21) (14.10.2026)
+> Prod = Staging auf v2238a (`1fc4be87`). Video `Dateien/Messe/Videos/quickcheck-rundgang-studio_2026-10-14.mp4` (220 s) ist fertig.
+1. **Abnahme Marcel auf Prod:** Quick-Check mit DealPilot-Abruf und C-Lage — Karte mit „inkl. 5,8 % Abschlag“, Überschrift „· aber … unter Marktwert“, Pilot-Analyse mit zwei Sichten.
+2. **Altes Drehbuch `quickcheck`** trägt noch die alte `KI_ANALYSE` (Score 76) ohne Marktwert-Sicht: neu aufzeichnen oder durch `quickcheck-rundgang` ersetzen.
+3. **Alte `_mb_state`-Schnappschüsse** tragen keinen Abschlag; die Karte zeigt Angebotsniveau, bis neu abgerufen wird. Bewusst nicht nachgerechnet (Abruf kostet Kontingent).
+4. **Regel seit 14.10.:** nach außen keine Quellennamen (auch nicht ImmobilienScout). Quelle, Stand und Link des Abschlags nur intern in `config.js angebotAbschlagMarkt`.
+
 ### N74 · DealPilot-Marktbewertung: Abschlag auf Angebotspreise — ERLEDIGT 14.10.2026 (v2237: Einstellung, Ø Markt 5,8 %, im Urteil)
 > 14.10.2026: Die Spanne der DealPilot-Marktbewertung beruht auf Angebotspreisen. ImmoScout24/Sprengnetter (ETW, bundesweit, 12/2025): Kaufpreise 5,8 % unter Angebot (Mitte 2025: 6,8 %; Köln 9,2 %, Hamburg 7,8 %, Leipzig 0 %). Hamburger Studie: 6,7 %. Im Messe-Video wird der Abschlag nur im Text gezeigt (6 %, Ø 189.000 € → rund 178.000 €). Offen: soll die App den Abschlag selbst abziehen oder ausweisen (pauschal, regional, mit Quelle)?
 

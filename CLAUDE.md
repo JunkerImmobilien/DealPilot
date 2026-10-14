@@ -506,6 +506,10 @@ eingebauten Default, und der stimmt nur auf dem Server.
 
 **Anbieter-Neutralität:** Sprengnetter und PriceHubble nie namentlich nach
 außen — „unabhängige Bewertungspartner". ImmoMetrica darf genannt werden.
+**Auch keine Datenquelle nach außen** (Marcel 14.10.2026: „bitte auch keine
+Quelle wie ImmobilienScout angeben") — Kundentext sagt „aktueller
+Marktdurchschnitt"; Quelle, Stand und Link stehen nur intern (z. B.
+`config.js angebotAbschlagMarkt`).
 
 ---
 
