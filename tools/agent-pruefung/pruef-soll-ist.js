@@ -28,7 +28,7 @@ const FRAGEN = [
   let fehler = 0;
   for (const p of FRAGEN) {
     const protokoll = [];
-    const ctx = { userId: uid, letzteListe: ids, letztesObjekt: null, protokoll,
+    const ctx = { userId: uid, letzteListe: ids, letztesObjekt: null, protokoll, nummerErfunden: true,   /* wie im Webhook: der Nutzer nannte keine Nummer */
       merkeObjekt() {}, merkeListe() {} };
     const t0 = Date.now();
     let r;
@@ -40,6 +40,8 @@ const FRAGEN = [
       fehler++; continue;
     }
     const benutzt = protokoll.map((x) => x.werkzeug);
+    /* v2217 · welche ARGUMENTE das Modell uebergab - ohne sie ist "nicht gefunden" kein Befund */
+    console.log('  Aufrufe: ' + JSON.stringify(protokoll).slice(0, 600));
     /* v1813f · Alternativen zulassen — objekte_rangliste ist fuer eine
        Rangfrage der genauere Weg als portfolio_lesen. */
     const erlaubt = [].concat(p.erwartet);

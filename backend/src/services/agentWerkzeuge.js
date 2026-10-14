@@ -496,8 +496,13 @@ async function portfolio_lesen(ctx) {
   const bil = (sp.payload && sp.payload.vermoegensbilanz) || {};
   const lesbar = {};
   Object.keys(bil).forEach((k) => {
-    if (!/_eur$/.test(k) || !Number.isFinite(Number(bil[k]))) return;
-    lesbar[k] = Number(bil[k]).toLocaleString('de-DE') + ' EUR';
+    /* v2217 · GEMESSEN (pruef-zahlen, 14.10.2026): „Gesamttilgung aller
+       Objekte" ergab 58.334 / 59.334 / 63.334 / 64.334 statt 57.316.
+       `tilgung_eur_jahr` endet auf _jahr, fiel durch `/_eur$/` und stand
+       nicht in so_schreiben - das Modell addierte die elf Einzelwerte
+       selbst und verrechnete sich jedes Mal anders. */
+    if (!/_eur(_jahr|_monat)?$/.test(k) || !Number.isFinite(Number(bil[k]))) return;
+    lesbar[k] = Number(bil[k]).toLocaleString('de-DE') + ' EUR' + (/_jahr$/.test(k) ? ' pro Jahr' : /_monat$/.test(k) ? ' pro Monat' : '');
   });
 
   /* ── v1813 · DIE NUMMER DES SPIEGELS GEHT NICHT MIT ─────────────────
@@ -560,6 +565,8 @@ async function portfolio_lesen(ctx) {
       + 'andere wie einen Fehler aussehen.',
     hinweis: 'Alle Betraege sind GANZE EURO. Unter "so_schreiben" stehen sie '
            + 'fertig formatiert — nimm diese Schreibweise unveraendert. '
+           + 'SUMMEN UEBER DAS PORTFOLIO (Gesamttilgung, Verbindlichkeiten, Gesamtinvestition …) '
+           + 'stehen fertig in "so_schreiben" - NIE selbst aus den Einzelobjekten addieren. '
            + 'Die Objekte hier tragen KEINE Nummer: die Nummer aus der Chat-Liste '
            + 'gilt hier nicht. Willst du die Kennzahlen EINES Objekts, nimm '
            + 'objekt_kennzahlen — das ordnet richtig zu.',
@@ -3543,10 +3550,27 @@ async function _findeObjekt(ctx, args) {
     }
     return perNr;
   }
+  /* ── v2217 · DIE ERFUNDENE UUID ─────────────────────────────────────
+   *
+   * GEMESSEN am 14.10.2026 (tools/agent-pruefung/pruef-soll-ist.js, Staging):
+   * auf „Wie steht die Parkstraße gegen den Plan?" rief der Agent
+   *   soll_ist_lesen { nummer: 14, id: "c1873311-…", adresse: "Parkstraße" }
+   * Die UUID stand in keinem Werkzeugergebnis - erfunden. Hier galt sie
+   * trotzdem zuerst, fand kein Objekt, und `return null` liess die
+   * danebenstehende Adresse ungelesen: „kein Objekt gefunden", obwohl
+   * „Parkstraße" eindeutig auf Parkstr. 9 zeigt (direkt aufgerufen: gefunden).
+   * Dieselbe Lehre wie v1813c bei der Nummer: eine Angabe des NUTZERS
+   * verliert nie gegen eine, die das Modell dazuerfunden hat. */
   if (a.id && /^[0-9a-f-]{36}$/i.test(String(a.id))) {
     const r = await query(`SELECT id FROM objects WHERE id = $1 AND user_id = $2`,
       [a.id, ctx.userId]);
-    return r.rows.length ? r.rows[0].id : null;
+    const perId = r.rows.length ? r.rows[0].id : null;
+    if (!a.adresse || _istPlatzhalter(a.adresse)) return perId;
+    const liste = await dialog.objekteListe(ctx.userId, 60);
+    const t = dialog.objektRaten(String(a.adresse), liste);
+    if (t.art === 'eindeutig') return t.objekt.id;          /* die genannte Adresse gilt */
+    if (perId && t.art === 'mehrdeutig' && t.kandidaten.some((o) => String(o.id) === String(perId))) return perId;
+    delete a.id;                                            /* weiter mit der Adresse allein */
   }
   if (a.adresse && _istPlatzhalter(a.adresse)) {
     /* Ein Platzhalter ist keine Angabe. Ihn wie eine zu behandeln heisst,
