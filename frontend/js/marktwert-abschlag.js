@@ -67,8 +67,12 @@
       + (a.roh && a.roh.med ? ' · Angebotsniveau Ø ' + Math.round(a.roh.med).toLocaleString('de-DE') + ' €' : '');
     if (alt && alt.textContent === txt) return;
     if (!alt) { alt = document.createElement('div'); alt.className = 'dp-abschlag';
-      alt.style.cssText = 'font-size:11.5px;line-height:1.4;opacity:.8;margin-top:6px';
-      var body = karte.querySelector('.mbody') || karte; body.appendChild(alt); }
+      /* v2237c · als eigene Zeile der Karte VOR dem Fuß - gemessen: in .mbody
+         (Raster) wurde sie 1.115 px breit in einer 1.078-px-Spalte und rechts
+         abgeschnitten */
+      alt.style.cssText = 'display:block;font-size:11.5px;line-height:1.45;opacity:.8;padding:4px 16px 2px;white-space:normal;min-width:0';
+      var fuss = karte.querySelector('.mfoot');
+      if (fuss) karte.insertBefore(alt, fuss); else karte.appendChild(alt); }
     alt.textContent = txt;
   }
   if (typeof MutationObserver === 'function') {
