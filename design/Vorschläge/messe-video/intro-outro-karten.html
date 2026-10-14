@@ -1,0 +1,174 @@
+<title>Messe-Video Baukasten</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:var(--wl-c9a84c,#C9A84C); --gold-hi:var(--wl-e8cc7a,#E8CC7A); --gold-lo:var(--wl-b8932f,#b8932f);
+  --obs:#050505; --creme:#FDFCFA; --text:#d9cfb8; --leise:#8c8578; --grund:#0b0a08; --flaeche:#14110b; --rand:#2e281c;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--grund);color:var(--creme);font:15px/1.5 Inter,system-ui,sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:28px 60px}
+header{display:flex;flex-wrap:wrap;align-items:end;gap:16px 32px;margin-bottom:22px}
+h1{margin:0;font:700 clamp(26px,4vw,38px)/1.1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em;text-wrap:balance}
+h1 b{color:var(--gold-hi);font-weight:700}
+.unter{color:var(--text);max-width:62ch;margin:6px 0 0}
+.kick{font:700 11px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}
+.haupt{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start}
+@media (max-width:980px){.haupt{grid-template-columns:minmax(0,1fr)}}
+.buehne{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:12px;overflow:hidden;background:#000;border:1px solid var(--rand)}
+.buehne video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.buehne .leer{position:absolute;inset:0;display:grid;place-items:center;color:var(--leise);font:600 12px "JetBrains Mono",monospace;letter-spacing:.2em}
+.leiste{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+button{font:600 13px Inter,system-ui,sans-serif;color:var(--creme);background:var(--flaeche);border:1px solid var(--rand);border-radius:8px;padding:9px 14px;cursor:pointer}
+button:hover{border-color:var(--gold)}
+button.prim{background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));color:#1a1407;border:0}
+label.sch{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text);margin-left:auto}
+.panel{background:var(--flaeche);border:1px solid var(--rand);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel h2{margin:0;font:700 20px "Space Grotesk",system-ui,sans-serif}
+.panel p{margin:0;color:var(--text);font-size:13px}
+textarea,input[type=text]{width:100%;background:#0a0907;color:var(--creme);border:1px solid var(--rand);border-radius:8px;padding:10px;font:12.5px/1.5 "JetBrains Mono",ui-monospace,monospace}
+textarea{min-height:230px;resize:vertical}
+textarea:focus,input:focus{outline:1px solid var(--gold);border-color:var(--gold)}
+.fehler{color:#D8564C;font-size:12px;min-height:1em}
+.aufruf{background:#0a0907;border:1px dashed var(--rand);border-radius:8px;padding:10px;font:11.5px/1.5 "JetBrains Mono",monospace;color:var(--text);overflow-x:auto;white-space:pre}
+.bereich{margin-top:34px}
+.bereich header{margin-bottom:12px}
+.bereich h3{margin:0;font:700 22px "Space Grotesk",system-ui,sans-serif}
+.raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.kachel{text-align:left;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:baseline;padding:12px 14px}
+.kachel .nr{grid-row:span 2;font:700 22px "Space Grotesk",system-ui,sans-serif;color:var(--gold);font-variant-numeric:tabular-nums}
+.kachel .nm{font:700 15px "Space Grotesk",system-ui,sans-serif}
+.kachel .id{font:500 11px "JetBrains Mono",monospace;color:var(--leise)}
+.kachel.an{border-color:var(--gold-hi);box-shadow:0 0 0 1px var(--gold-hi) inset}
+.qr-zeile{display:flex;gap:8px;align-items:center}
+.qr-zeile input{flex:1}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="kick">DealPilot · Messe-Video</div>
+      <h1>Baukasten: <b>10</b> Intros · <b>10</b> Info-Karten · <b>10</b> Outros</h1>
+      <p class="unter">Jedes Stück hat Textfelder mit Vorgabe. Rechts ändern, abspielen, und den Aufruf unten dem Agenten mitgeben. Die Info-Karten liegen durchsichtig über dem laufenden Video, die QR-Codes sind echt und scannbar.</p>
+    </div>
+  </header>
+
+  <div class="haupt">
+    <div style="min-width:0">
+      <div class="buehne" id="buehne">
+        <video id="vid" src="video-quickcheck.mp4" autoplay muted loop playsinline></video>
+        <div class="leer" id="leer" hidden>VIDEO AUS</div>
+      </div>
+      <div class="leiste">
+        <button class="prim" id="los">▶ Abspielen</button>
+        <button id="weg">Ebene entfernen</button>
+        <button id="folge">Ganze Folge: Intro → Karte → Outro</button>
+        <label class="sch"><input type="checkbox" id="mitvid" checked> Video dahinter</label>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <div class="kick" id="p-art">Info-Karte</div>
+      <h2 id="p-name">–</h2>
+      <p id="p-info"></p>
+      <div>
+        <div class="kick" style="margin-bottom:6px">Ziel für alle QR-Codes</div>
+        <div class="qr-zeile"><input type="text" id="qrurl" value="https://dealpilot.immo" spellcheck="false"></div>
+      </div>
+      <div>
+        <div class="kick" style="margin-bottom:6px">Texte (JSON)</div>
+        <textarea id="felder" spellcheck="false"></textarea>
+        <div class="fehler" id="fehler"></div>
+      </div>
+      <div>
+        <div class="kick" style="margin-bottom:6px">Aufruf für den Agenten</div>
+        <div class="aufruf" id="aufruf"></div>
+        <button id="kopie" style="margin-top:8px">Aufruf kopieren</button>
+      </div>
+    </aside>
+  </div>
+
+  <section class="bereich"><header><div><div class="kick">Vollbild · vor dem Video</div><h3>Intros</h3></div></header><div class="raster" id="r-intro"></div></section>
+  <section class="bereich"><header><div><div class="kick">Durchsichtig · über dem Video</div><h3>Info-Karten</h3></div></header><div class="raster" id="r-karte"></div></section>
+  <section class="bereich"><header><div><div class="kick">Vollbild · nach dem Video · fünf mit QR</div><h3>Outros</h3></div></header><div class="raster" id="r-outro"></div></section>
+</div>
+
+<script src="messe-effekte.js"></script>
+<script>
+(function () {
+  var FX = window.DealPilotMesseFX, L = FX.liste();
+  var buehne = document.getElementById('buehne'), vid = document.getElementById('vid');
+  var ta = document.getElementById('felder'), fehler = document.getElementById('fehler'), qrurl = document.getElementById('qrurl');
+  var ARTNAME = { intro: 'Intro', karte: 'Info-Karte', outro: 'Outro' };
+  var wahl = { art: 'karte', id: 'scorering' }, eigen = {}, laeuft = [];
+
+  function stueck(art, id) { var l = L[art === 'intro' ? 'intros' : art === 'karte' ? 'karten' : 'outros']; for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i]; }
+  function hatQr(s) { return s && Object.prototype.hasOwnProperty.call(s.felder, 'url') && /QR/.test(s.name); }
+  function texte(art, id) {
+    var s = stueck(art, id), t = eigen[art + ':' + id] || JSON.parse(JSON.stringify(s.felder));
+    if (hatQr(s)) t.url = qrurl.value.trim() || t.url;
+    return t;
+  }
+  function zeigeAufruf(t) {
+    document.getElementById('aufruf').textContent = "DealPilotMesseFX.spiele(buehne, '" + wahl.art + "', '" + wahl.id + "', " + JSON.stringify(t, null, 1).replace(/\n\s*/g, ' ') + ')';
+  }
+  function waehle(art, id) {
+    wahl = { art: art, id: id };
+    var s = stueck(art, id), t = texte(art, id);
+    document.getElementById('p-art').textContent = ARTNAME[art];
+    document.getElementById('p-name').textContent = s.name;
+    document.getElementById('p-info').textContent = 'Dauer ' + (s.dauer / 1000).toLocaleString('de-DE') + ' s · ' + Object.keys(s.felder).length + ' Textfelder' + (hatQr(s) ? ' · mit QR-Code' : '') + (art === 'karte' ? ' · Lage per "pos": {x,y,w}, Rahmen um eine Stelle per "ziel": {x,y,w,h}' : '');
+    ta.value = JSON.stringify(t, null, 2); fehler.textContent = '';
+    zeigeAufruf(t);
+    [].forEach.call(document.querySelectorAll('.kachel'), function (k) { k.classList.toggle('an', k.dataset.art === art && k.dataset.id === id); });
+  }
+  function leeren() { laeuft.forEach(clearTimeout); laeuft = []; [].forEach.call(buehne.querySelectorAll('.mfx-ebene'), function (e) { e.remove(); }); }
+  function spiele(art, id, t) {
+    if (art !== 'karte') [].forEach.call(buehne.querySelectorAll('.mfx-ebene'), function (e) { e.remove(); });
+    return FX.spiele(buehne, art, id, t);
+  }
+  function los() {
+    var t;
+    try { t = JSON.parse(ta.value); fehler.textContent = ''; } catch (e) { fehler.textContent = 'JSON nicht lesbar: ' + e.message; return; }
+    eigen[wahl.art + ':' + wahl.id] = t; zeigeAufruf(t);
+    leeren(); vid.currentTime = 0; vid.play().catch(function () {});
+    spiele(wahl.art, wahl.id, t);
+  }
+  function kachelReihe(art, liste, ziel) {
+    var r = document.getElementById(ziel);
+    liste.forEach(function (s, i) {
+      var b = document.createElement('button'); b.className = 'kachel'; b.dataset.art = art; b.dataset.id = s.id;
+      b.innerHTML = '<span class="nr">' + String(i + 1).padStart(2, '0') + '</span><span class="nm">' + s.name + '</span><span class="id">' + s.id + ' · ' + (s.dauer / 1000).toLocaleString('de-DE') + ' s</span>';
+      b.onclick = function () { waehle(art, s.id); los(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+      r.appendChild(b);
+    });
+  }
+  kachelReihe('intro', L.intros, 'r-intro'); kachelReihe('karte', L.karten, 'r-karte'); kachelReihe('outro', L.outros, 'r-outro');
+
+  document.getElementById('los').onclick = los;
+  document.getElementById('weg').onclick = leeren;
+  document.getElementById('folge').onclick = function () {
+    leeren();
+    var art = wahl.art, i = stueck('intro', art === 'intro' ? wahl.id : 'runway'), k = art === 'karte' ? wahl.id : 'scorering', o = art === 'outro' ? wahl.id : 'amstand';
+    var a = spiele('intro', i.id, texte('intro', i.id)), z = a.dauer;
+    laeuft.push(setTimeout(function () { leeren(); vid.currentTime = 0; vid.play().catch(function () {}); }, z));
+    laeuft.push(setTimeout(function () { spiele('karte', k, texte('karte', k)); }, z + 2500));
+    var kd = stueck('karte', k).dauer;
+    laeuft.push(setTimeout(function () { [].forEach.call(buehne.querySelectorAll('.mfx-ebene'), function (e) { e.remove(); }); }, z + 2500 + kd));
+    laeuft.push(setTimeout(function () { spiele('outro', o, texte('outro', o)); }, z + 4000 + kd));
+  };
+  document.getElementById('mitvid').onchange = function () {
+    vid.hidden = !this.checked; document.getElementById('leer').hidden = this.checked;
+    if (this.checked) vid.play().catch(function () {});
+  };
+  qrurl.onchange = function () { var s = stueck(wahl.art, wahl.id); if (hatQr(s)) { var t = JSON.parse(ta.value); t.url = qrurl.value.trim(); ta.value = JSON.stringify(t, null, 2); } };
+  document.getElementById('kopie').onclick = function () {
+    var el = document.getElementById('aufruf'), txt = el.textContent, b = this;
+    function fertig() { b.textContent = 'Kopiert ✓'; setTimeout(function () { b.textContent = 'Aufruf kopieren'; }, 1600); }
+    try { navigator.clipboard.writeText(txt).then(fertig, function () { var r = document.createRange(); r.selectNodeContents(el); getSelection().removeAllRanges(); getSelection().addRange(r); }); } catch (e) {}
+  };
+  waehle('karte', 'scorering'); setTimeout(los, 600);
+})();
+</script>

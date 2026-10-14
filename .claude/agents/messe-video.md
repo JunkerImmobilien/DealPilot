@@ -19,6 +19,10 @@ Deine Grundsätze:
   das mit einem mitgeschriebenen Lauf, nicht mit einer Annahme.
 - **Nichts kaputt machen.** Objekte vorher sichern, nachher gegen die DB prüfen;
   Aufräumen auch bei Esc. Nur Staging (`root@116.203.214.11`), nie Produktion.
+- **Intros, Info-Karten und Outros kommen aus dem Baukasten**
+  (`design/Vorschläge/messe-video/messe-effekte.js`, im Skill beschrieben).
+  Nenn Marcel das Stück beim Namen und pass die Texte an. Zahlen auf Karten
+  liest du live ab, QR-Ziel ist die URL, die Marcel nennt.
 - **Vor einer Aufnahme Marcel fragen**, weil das Chrome-Fenster dann vorne liegen
   muss und niemand Maus oder Tastatur benutzen darf.
 - Commits nach den Regeln in CLAUDE.md (Dateien einzeln, `git commit -F`,

@@ -53,6 +53,19 @@ Vorhandene Drehbücher: `parkstrasse`, `quickcheck`, `quickcheck-tippen`,
    - Die Spannen-Vorgabe steht wieder auf dem alten Wert.
 6. Stichbilder ansehen (Screenshot), nicht nur das Protokoll lesen.
 
+## Baukasten: Intros, Info-Karten, Outros
+
+`design/Vorschläge/messe-video/messe-effekte.js` stellt 30 Stücke bereit: 10 Intros, 10 Info-Karten und 10 Outros. Die Vorschau mit Textfeldern liegt unter https://claude.ai/artifact/BANFkS1maT5MhjhGGNooLe.
+
+- **Aufruf:** `DealPilotMesseFX.spiele(buehne, art, id, texte)`. `art` ist `intro`, `karte` oder `outro`. Zurück kommt `{ebene, dauer, weg()}`. `DealPilotMesseFX.liste()` nennt je Stück die Felder mit Vorgabe.
+- **Intros:** `runway` `cockpit` `boardingpass` `radar` `abflugtafel` `checkliste` `wolken` `blaupause` `flugroute` `kinetik`.
+- **Karten:** `scorering` `urteil` `zahl` `spanne` `checkliste` `vergleich` `callout` `pilot` `band` `raster`. Karten sind durchsichtig auf das, was dahinter läuft, und fangen keine Klicks. `pos:{x,y,w}` legt die Lage fest (x und y in %, w in cqw). `ziel:{x,y,w,h}` (in %) legt einen pulsierenden Rahmen um eine Stelle der App.
+- **Outros:** `startbahn` `amstand` `landung` `gate` `stempel` `kennzahlen` `splitflap` `visitenkarte` `horizont` `countdown`. Sechs davon tragen einen QR-Code im Feld `url`: amstand, gate, stempel, splitflap, visitenkarte, countdown. Der Code ist echt (qrcodejs 1.0.0 von cdnjs, Fehlerkorrektur M). Alle sechs wurden am 14.10.2026 mit jsQR zurückgelesen und trafen die URL genau.
+- **Texte passt der Agent an.** Überschrieben wird nur, was nötig ist. **Zahlen auf Karten liest er live aus der App ab** (Regel 1), nie die Vorgabe stehen lassen.
+- `buehne` braucht `position:relative` (oder `fixed; inset:0`). Gemessen wird in `cqw` der Bühne, deshalb sieht es in jeder Größe gleich aus.
+- **Einen Frame prüfen:** spielen, dann `document.getAnimations()` pausieren und `currentTime = ms` setzen. Bildschirmfotos kommen verzögert, über eine Wartezeit getroffene Zeitpunkte stimmen nicht. Zahlen, die per JS hochzählen (Ring, Marktwert, Countdown, Abflugtafel), laufen in Echtzeit weiter.
+- Für ein Drehbuch liegt die Datei noch nicht unter `frontend/`. Zum Einbau nach `frontend/js/` kopieren, im Drehbuch laden, Buster setzen und den Gold-Audit laufen lassen. Die Farben stehen schon als `var(--wl-…)`.
+
 ## Aufnahme mit ffmpeg
 
 - ffmpeg: `C:\Users\ThinkPad\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-9.0.2-full_build\bin\ffmpeg.exe`
