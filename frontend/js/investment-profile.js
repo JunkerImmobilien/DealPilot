@@ -325,7 +325,7 @@ window.DealPilotInvestmentProfile = (function() {
       /* v2237 · Abschlag auf Angebotspreise: leer = recherchierter Marktdurchschnitt */
       '<h3 class="ip-section">Marktbewertung</h3>',
       '<p class="hint">Marktwerte aus Inseraten sind <b>Angebotspreise</b> — gezahlt wird meist weniger. DealPilot zieht diesen Abschlag von der Marktbewertung ab, bevor sie ins Urteil geht. ' +
-        (function () { var m = window.DealPilotConfig && DealPilotConfig.angebotAbschlagMarkt; return m ? 'Leer lassen = aktueller Marktdurchschnitt: <b>' + String(m.pct).replace('.', ',') + ' %</b> (' + m.quelle + ', ' + m.stand + '; ' + m.spanne + ').' : ''; })() + '</p>',
+        (function () { var m = window.DealPilotConfig && DealPilotConfig.angebotAbschlagMarkt; return m ? 'Leer lassen = aktueller Marktdurchschnitt: <b>' + String(m.pct).replace('.', ',') + ' %</b>.' : '';   /* v2237d: keine Quelle nach außen */ })() + '</p>',
       '<div class="ip-grid">',
         field('ip_angebot_abschlag_pct', 'Abschlag auf Angebotspreise', p.angebot_abschlag_pct, '%',
           (function () { var m = window.DealPilotConfig && DealPilotConfig.angebotAbschlagMarkt; return m ? 'leer = Ø Markt ' + String(m.pct).replace('.', ',') + ' %' : 'leer = Marktdurchschnitt'; })()),

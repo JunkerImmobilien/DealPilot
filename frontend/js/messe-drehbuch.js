@@ -1029,7 +1029,7 @@
       async function (s) {   /* 9 · Angebotspreise -> realistischer Wert */
         await zeige(function () { return qcEl('oab-results'); }, 6);
         var ab = _mbAkt.abschlag || {}, pz = String(ab.pct || '').replace('.', ',');
-        s.zeile('Achtung: Angebotspreise', 'Vergleichswerte aus Inseraten sind <b>Angebotspreise</b>. DealPilot zieht deinen Abschlag gleich ab: <b>' + pz + ' %</b>, der Marktdurchschnitt (ImmoScout24, 12/2025) — Ø ' + eur(ab.roh && ab.roh.med) + ' → realistisch <b>' + eur(_mbAkt.mw.med) + '</b>.');
+        s.zeile('Achtung: Angebotspreise', 'Vergleichswerte aus Inseraten sind <b>Angebotspreise</b>. DealPilot zieht deinen Abschlag gleich ab: <b>' + pz + ' %</b>, den aktuellen Marktdurchschnitt — Ø ' + eur(ab.roh && ab.roh.med) + ' → realistisch <b>' + eur(_mbAkt.mw.med) + '</b>.');
         await warte(7000);
       },
       async function (s) {   /* 10 · Miete Ø -> erste Einschätzung */

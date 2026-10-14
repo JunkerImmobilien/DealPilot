@@ -37,12 +37,13 @@
     var n = (v == null || v === '') ? NaN : Number(String(v).replace(',', '.'));
     return (isFinite(n) && n >= 0 && n < 50) ? n : markt().pct;
   }
-  /** woher der Satz kommt - für Hinweise und den Urteilstext */
+  /** woher der Satz kommt - für Hinweise und den Urteilstext.
+      v2237d · Marcel: „bitte auch keine Quelle wie ImmobilienScout angeben" -
+      nach außen steht nur, OB es der Marktdurchschnitt oder dein Wert ist;
+      Quelle, Stand und Link bleiben intern in config.js. */
   function quelle() {
     var m = markt(), s = satz();
-    return Math.abs(s - m.pct) < 1e-9
-      ? 'Marktdurchschnitt ' + m.quelle + ', ' + m.stand
-      : 'dein Wert aus den Einstellungen; Marktdurchschnitt ' + String(m.pct).replace('.', ',') + ' %';
+    return Math.abs(s - m.pct) < 1e-9 ? 'aktueller Marktdurchschnitt' : 'dein Wert aus den Einstellungen';
   }
 
   function anwenden(card) {
@@ -63,16 +64,15 @@
     var c = st && st.card, a = c && c.abschlag;
     var alt = karte.querySelector('.dp-abschlag');
     if (!a) { if (alt) alt.remove(); return; }
-    var txt = 'Nach ' + String(a.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise (' + a.quelle + ')'
-      + (a.roh && a.roh.med ? ' · Angebotsniveau Ø ' + Math.round(a.roh.med).toLocaleString('de-DE') + ' €' : '');
+    var txt = ' · inkl. ' + String(a.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise';
     if (alt && alt.textContent === txt) return;
-    if (!alt) { alt = document.createElement('div'); alt.className = 'dp-abschlag';
-      /* v2237c · als eigene Zeile der Karte VOR dem Fuß - gemessen: in .mbody
-         (Raster) wurde sie 1.115 px breit in einer 1.078-px-Spalte und rechts
-         abgeschnitten */
-      alt.style.cssText = 'display:block;font-size:11.5px;line-height:1.45;opacity:.8;padding:4px 16px 2px;white-space:normal;min-width:0';
-      var fuss = karte.querySelector('.mfoot');
-      if (fuss) karte.insertBefore(alt, fuss); else karte.appendChild(alt); }
+    /* v2237d · Marcel: „Formatierung passt nicht". Der Hinweis hängt jetzt an
+       der vorhandenen Fußzeile der Karte (.legal, „Marktpreisindikation — kein
+       Gutachten …") und erbt deren Schrift - keine eigene Zeile mit eigenem Stil. */
+    if (!alt) {
+      var legal = karte.querySelector('.legal'); if (!legal) return;
+      alt = document.createElement('span'); alt.className = 'dp-abschlag'; legal.appendChild(alt);
+    }
     alt.textContent = txt;
   }
   if (typeof MutationObserver === 'function') {
