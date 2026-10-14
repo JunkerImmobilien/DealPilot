@@ -38761,6 +38761,23 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2215–v2215b · Staging · Landing: Prozesskarte im Leistungsumfang, F&E-Seite (14.10.2026)
+- **Was:**
+  - **Prozesskarte und Netzplan** per `git mv` von `design/Messe/` nach `frontend/landing/`. Eine Datei dient für Web und Messe-Druck; `tools/prozesskarte-pruefen.mjs` liest von dort (RC=0).
+  - **`leistungsumfang.html`:** Abschnitt `#lu-weg` „Vom ersten Blick bis zum Bestand – auf einer Karte“ mit beiden Karten, Sprungmarke im Kopf.
+  - **Startseite:** Knopf „Der ganze Weg auf einer Karte“.
+  - **`forschung.html` (neu):**
+    - Inhalt: bescheinigtes Vorhaben 2026–2028, was es leisten soll (nicht wie), Zusammenarbeit mit Steuerkanzleien (Marcels ausdrücklicher Wunsch), zehn Arbeitspakete nur als Ziel, BSFZ-Siegel.
+    - Bewusst nicht: Methodik, Schwellen, Messreihen, Förderbeträge, Vorhabennummer.
+    - Eingebunden im Untermenü „Funktionen“ (index, api, leistungsumfang) und in der Sitemap.
+  - **Menü und Meta:** „Alle 18 Kapitel“ → 22 (gezählt: 18 + 4 neuere Kapitel); die Startseite nennt 19 Module, das stimmt (`DP_MODULE` = 19).
+- **Gefunden und behoben:**
+  - v2215a: Die neuen Kacheln auf den hellen Abschnitten waren fast unlesbar (Text rgb 236,230,214 auf Weiß). Jetzt tragen sie die gemessenen Farben des Abschnitts (h2 26,19,5 / p 74,68,54).
+  - v2215b: Die Kontingent-Tabelle war am Handy 395 px breit bei 375 px Ansicht, die Leistungsumfang-Seite lief quer über. Das war schon vorher so. Jetzt sind die Polster schmaler, alle Seiten haben Buster v2215b.
+- **Commit:** `c09b503d`, `ca238ced`, `8cc8cf0a`
+- **Nachweis:** Browser auf Staging, Desktop-Screenshots; bei 390 px im gleich-originigen iframe Breite = 375 bei forschung, prozesskarte, leistungsumfang und index; `gold-audit` RC=0.
+- **Rest:** Die Seite F&E im Footer verlinken (die Footer der Seiten sind unterschiedlich gebaut). Abnahme der Texte durch Marcel.
+
 ### N66 · Messe-Geschichten, BMF, RND-Abgleich, Werbungskosten + v2213–v2214 · Staging (14.10.2026)
 - **Was:**
   - **Westerfeldstr. 140 (1041)** ist das RND-Beispiel. Bestand seit 01.01.2025, BMF amtlich 14,64 %.

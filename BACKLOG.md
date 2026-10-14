@@ -43,6 +43,9 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 4. **Werbungskosten im Detail** bei den Demo-Objekten plausibel füllen (Fahrten, Material …) — recherchiert.
 5. Danach: Landingpage, Leistungsumfang, F&E-Seite.
 
+> **✅ 1–5 erledigt 14.10.2026 (Staging):** `design/Messe/demo-geschichten.md`, BMF bei 15 Objekten, Westerfeld als RND-Beispiel (2 % → 6,25 %, rund 1.530 €/Jahr), RND-Abgleich-Tabelle, Werbungskosten 2024–2026; Landing v2215–v2215b (Prozesskarte im Leistungsumfang, `forschung.html`). Dabei behoben: v2213/v2213b (BMF −96,6 % und `#VALUE!`, Cache), **v2214 (Steuer-Jahreswerte gingen verloren — auch auf Prod!)**.
+> **Offen:** Soll/Ist in der Pilot-Analyse ausbauen (N64), dunkleres Grün/Rot für kleine Zahlen (N64), geführte Datenaufnahme (N62.12), Prod-Rollout v2208–v2215b nach Freigabe — **v2214 dringend**.
+
 ### N65 · Marcel 14.10.2026 (zweite Runde) — Antworten und Einstellungen → Standardwerte
 
 **Antworten:**
