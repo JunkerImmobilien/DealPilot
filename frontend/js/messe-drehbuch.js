@@ -362,7 +362,10 @@
       objekt: null,
       aufraeumen: function () {
         var ov = q('#oabi-ov'); if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
-        try { if (_spanVorher === null) localStorage.removeItem('qc_span_config'); else if (_spanVorher !== undefined) localStorage.setItem('qc_span_config', _spanVorher); } catch (e) {}
+        /* v2225a · zweimal: das Quick-Check-Fenster schreibt den Wert beim
+           Neuladen nach „Neuer Vorgang" noch einmal (gemessen: danach 'high') */
+        var _sv = _spanVorher, zurueck = function () { try { if (_sv === null) localStorage.removeItem('qc_span_config'); else if (_sv !== undefined) localStorage.setItem('qc_span_config', _sv); } catch (e) {} };
+        zurueck(); setTimeout(zurueck, 2500);
         _spanVorher = undefined; _kiFrei = null;
         try { if (q('#settings-modal') && typeof closeSettings === 'function') { if (window._SetDraft) window._SetDraft.dirty = false; closeSettings(); } } catch (e) {}
         qcAufraeumen(); reiter('s0');
@@ -382,7 +385,7 @@
           var karte = [].filter.call(document.querySelectorAll('#settings-modal .swk-karte'), function (k) { return /Lageklassen/.test(k.textContent); })[0];
           if (karte) { karte.click(); await warte(800); }
           await zeige(function () { return q('#settings-modal .ip-lage-box') || karte; }, 8);
-          var LP = window.DealPilotLageProfil, zb = function (k) { try { var v = LP.zielBmr(k); return v != null ? de(v, 1) + ' %' : '–'; } catch (e) { return '–'; } };
+          var LP = window.DealPilotLageProfil, zb = function (k) { try { var v = LP.zielBmr(k); return v != null ? Number(v).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 2 }) + ' %' : '–'; } catch (e) { return '–'; } };
           s.zeile('Deine Vorgaben', 'Und deine Zielrendite je Lage: <b>A ' + zb('A') + '</b> · <b>B ' + zb('B') + '</b> · <b>C ' + zb('C') + '</b>.');
           await warte(4600);
           try { if (window._SetDraft) window._SetDraft.dirty = false; } catch (e) {}
