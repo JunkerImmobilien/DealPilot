@@ -364,16 +364,11 @@
     } catch (e) { if (e !== 'stopp') console.warn('[messe]', e); }
     if (g === lauf) stopp();
   }
-  /* v2221b · Kein Boarding-Pass aus dem Drehbuch. Der Quick-Check meldet bei
-     jedem Score 'qc-autopass', qc-bridge legt daraus einen Pass auf dem Server
-     an; „Neuer Vorgang" widerruft ihn nur (revoked_at) - gemessen blieben drei
-     Zeilen in shared_passes stehen, in der Messeschleife wäre es eine je
-     Durchgang. Abgefangen wird die Nachricht hier, VOR qc-bridge (Erfassung
-     läuft am Ziel zuerst) und nur, solange ein Drehbuch läuft. */
-  window.addEventListener('message', function (ev) {
-    var d = ev.data;
-    if (lauf && d && d.source === 'dp-qc' && d.type === 'qc-autopass') ev.stopImmediatePropagation();
-  }, true);
+  /* v2221c · Kein Boarding-Pass aus dem Drehbuch - die Sperre steht in
+     qc-bridge.js an der Weiche für 'qc-autopass' und fragt laeuft().
+     ZURÜCKGENOMMEN (v2221b): ein Erfassungs-Empfänger hier, der die Nachricht
+     vor qc-bridge abfangen sollte. Gemessen: am Fenster gilt die Reihenfolge
+     der Anmeldung, nicht „Erfassung zuerst" - qc-bridge lädt früher. */
 
   window.DealPilotMesse = { start: start, stopp: stopp, drehbuecher: function () { return Object.keys(DREHBUECHER); },
     laeuft: function () { return !!lauf; } };   /* v2221: qc-ai-bridge setzt die KI-Bewertung so lange aus */

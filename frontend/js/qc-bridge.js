@@ -504,6 +504,10 @@
     else if (d.type === 'qc-import-pdf') _handleImportPdf();
     else if (d.type === 'qc-voice') _handleVoice();  /* v505-voice */
     else if (d.type === 'qc-save-open') _showSaveOverlay(d.items || [], d.avmRaw || {}, d.avmDefault || 'konsens', d.qcSet || []); /* v893k-overview */
-    else if (d.type === 'qc-autopass') _handleAutopass(d.inputs, d.photos);   /* qb-buffer-photos */
+    /* v2221c · kein Boarding-Pass aus einem Messe-Drehbuch: „Neuer Vorgang"
+       widerruft ihn nur (revoked_at), in der Schleife bliebe je Durchgang
+       eine Zeile in shared_passes. Die Sperre steht HIER, weil am Fenster
+       die Anmeldereihenfolge gilt - ein Abfangen im Drehbuch kam zu spät. */
+    else if (d.type === 'qc-autopass' && !(window.DealPilotMesse && typeof DealPilotMesse.laeuft === 'function' && DealPilotMesse.laeuft())) _handleAutopass(d.inputs, d.photos);   /* qb-buffer-photos */
   });
 })();
