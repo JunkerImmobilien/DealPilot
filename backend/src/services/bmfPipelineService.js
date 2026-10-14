@@ -252,6 +252,19 @@ async function _phase4_bmf(inputs, phase3) {
   const bmfResult = await bmfService.calculateKpa(bmfInputs, { includeFile: false });
   const r = bmfResult.results || {};
 
+  /* v2213b · Der Kern (LibreOffice-Arbeitshilfe) meldet fehlende Eingaben als
+     Fehlerwert ({error:'#VALUE!'}). Bis hier wurde das Objekt als „Gebaeudeanteil"
+     weitergereicht -> null-Varianten, toFixed-Absturz im Fenster. Gemessen an
+     2026-1082 (ETW ohne Grundstuecksflaeche, Bodenrichtwert, MEA). */
+  const _gaRoh = r.gebaeudeanteil_prozent?.value;
+  if (_gaRoh != null && typeof _gaRoh !== 'number') {
+    const fehlt = [];
+    if (!(Number(bmfInputs.grundstuecksgroesse) > 0)) fehlt.push('Grundstücksfläche');
+    if (!(Number(bmfInputs.bodenrichtwert) > 0)) fehlt.push('Bodenrichtwert');
+    if (/WE|wohnungseigentum/i.test(String(bmfInputs.grundstuecksart || '')) && !(Number(bmfInputs.mea_zaehler || bmfInputs.mea) > 0)) fehlt.push('Miteigentumsanteil');
+    return { _error: true, _missing: fehlt,
+      _msg: 'Die BMF-Arbeitshilfe liefert für diese Eingaben kein Ergebnis' + (fehlt.length ? ' — es fehlt: ' + fehlt.join(', ') : '') + '.' };
+  }
   // Werte extrahieren — Service liefert nur gebaeudeanteil_prozent
   const gebaeude_pct = r.gebaeudeanteil_prozent?.value ?? 80;
   const boden_pct = 100 - gebaeude_pct;
