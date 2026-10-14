@@ -20,6 +20,7 @@ const usageService = require('../services/usageService');
 const openaiService = require('../services/openaiService');
 const aiCreditsService = require('../services/aiCreditsService');  // V63.86
 const dokumentSchemas = require('../services/dokumentSchemas');   /* v1678 */
+const schwaerzen = require('../services/schwaerzen');   /* v2210 */
 const plzValidator = require('../services/plzValidator');  // V229: PLZ-Halluzinationsschutz
 const voiceExtractService = require('../services/voiceExtractService');  // v503-voice
 const marketRatesService = require('../services/marketRatesService');  /* v1951: Marktzins fuer die Quick-Check-Einordnung */
@@ -742,7 +743,8 @@ router.post('/ds2-suggest', authenticate,
  */
 router.post('/extract-expose', authenticate, extractLimiter, async (req, res, next) => {
   try {
-    const { text, userApiKey: rawUserKey } = req.body || {};
+    const { text: _rohText, userApiKey: rawUserKey } = req.body || {};
+    const text = schwaerzen.schwaerze(_rohText).text;   /* v2210: Personendaten vor dem Versand schwaerzen */
     const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
 
     if (!config.openai.apiKey && !userApiKey) {
@@ -789,7 +791,8 @@ router.post('/extract-expose', authenticate, extractLimiter, async (req, res, ne
  */
 router.post('/extract-dokument', authenticate, extractLimiter, async (req, res, next) => {
   try {
-    const { text, dateiname, typ: typWunsch, userApiKey: rawUserKey } = req.body || {};
+    const { text: _rohText, dateiname, typ: typWunsch, userApiKey: rawUserKey } = req.body || {};
+    const text = schwaerzen.schwaerze(_rohText).text;   /* v2210: Personendaten vor dem Versand schwaerzen */
     const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
 
     if (!config.openai.apiKey && !userApiKey) {
@@ -855,7 +858,8 @@ router.get('/dokument-arten', authenticate, (req, res) => {
  */
 router.post('/extract-rndg', authenticate, extractLimiter, async (req, res, next) => {
   try {
-    const { text, userApiKey: rawUserKey } = req.body || {};
+    const { text: _rohText, userApiKey: rawUserKey } = req.body || {};
+    const text = schwaerzen.schwaerze(_rohText).text;   /* v2210: Personendaten vor dem Versand schwaerzen */
     const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
 
     if (!config.openai.apiKey && !userApiKey) {
@@ -890,7 +894,8 @@ router.post('/extract-rndg', authenticate, extractLimiter, async (req, res, next
  */
 router.post('/extract-market-data', authenticate, extractLimiter, async (req, res, next) => {
   try {
-    const { text, userApiKey: rawUserKey } = req.body || {};
+    const { text: _rohText, userApiKey: rawUserKey } = req.body || {};
+    const text = schwaerzen.schwaerze(_rohText).text;   /* v2210: Personendaten vor dem Versand schwaerzen */
     const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
 
     if (!config.openai.apiKey && !userApiKey) {
