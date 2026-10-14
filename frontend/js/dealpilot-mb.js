@@ -180,6 +180,19 @@ if (!window._wlc) {
       if (OA && OA.passt && OA.passt(art, id) === false) return;   /* v1437: nur was zur Art passt */
       o[id] = v;
     });
+    /* v2210 · Die Einheiten des MFH-Konfigurators reisten nie mit - der
+       Bericht kannte nur ihre ANZAHL. Damit bekam eine Gewerbeflaeche den
+       Wohnmietansatz. Jetzt geht eine schlanke Liste mit (kein Bild, kein
+       Mietername): Art, Flaeche, Ist/Soll, Status, Gewerbe-Nutzung, Marktmiete. */
+    try {
+      var m = window._dpMfh;
+      if (m && Array.isArray(m.einheiten) && m.einheiten.length) {
+        o._mfh_einheiten = m.einheiten.map(function (e) {
+          return { art: e.art || 'wohnen', wfl: e.wfl, ist: e.ist, soll: e.soll, status: e.status || 'vermietet',
+                   nutzung_gew: e.nutzung_gew || null, markt_qm: e.markt_qm || null };
+        });
+      }
+    } catch (e) {}
     return o;
   }
 

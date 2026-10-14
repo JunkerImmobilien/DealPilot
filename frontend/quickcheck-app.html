@@ -6613,7 +6613,12 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
       var IP = window.parent && window.parent.DealPilotInvestmentProfile; if (!IP) return;
       var zins = (typeof IP.getZins === "function") ? IP.getZins() : null;
       var tilg = (typeof IP.get === "function") ? IP.get("tilgung_default") : null;
-      var bwk  = (typeof IP.get === "function") ? IP.get("bwk_anteil_default") : null;
+      /* v2211 · Das Feld fragt "% vom HAUSGELD". Hier kam bwk_anteil_default an - das ist
+         "% der NETTOKALTMIETE" (16), eine andere Groesse. Richtig ist der ETW-Anteil aus
+         Bewirtschaftung je Objektart (bwk-profil.js, nul_pct, Vorgabe 30). */
+      var BP = window.parent && window.parent.DealPilotBwkProfil;
+      var bwk = null;
+      try { var _bp = BP && BP.lesen ? BP.lesen() : null; if (_bp && _bp.etw && _bp.etw.nul_pct != null) bwk = _bp.etw.nul_pct; } catch(e){}
       setEmpty("qc_zins", zins);
       setEmpty("qc_tilg", tilg);
       var hs = document.getElementById("qc_hg_split");
@@ -7518,6 +7523,6 @@ html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !i
 })();
 </script>
 
-<script src="js/pilot-tower.js?v=v2204"></script><!-- v2188: Bruecke F1/? zum Piloten im Elternfenster -->
+<script src="js/pilot-tower.js?v=v2216k"></script><!-- v2188: Bruecke F1/? zum Piloten im Elternfenster -->
 </body>
 </html>

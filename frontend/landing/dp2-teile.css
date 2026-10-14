@@ -654,3 +654,13 @@
 .nav .mark-gross{padding-left:2px}
 footer .mark-gross .wort{font-size:21px}
 @media(max-width:700px){ .mark-gross .wort{font-size:20px} }
+
+/* v2215b · Kontingent-Tabelle am Handy: gemessen 395 px Breite bei 375 px Ansicht
+   (leistungsumfang.html, Seite lief 46 px quer ueber). Weniger Polster, kleinere Ziffern. */
+@media (max-width:560px){
+  .kont-tab th,.kont-tab td{padding:10px 6px}
+  .kont-tab td{font-size:13px}
+  .kont-tab td b{font-size:13.5px}
+  .kont-tab td span{font-size:11.5px}
+  .kont-tab thead th{letter-spacing:.04em}
+}

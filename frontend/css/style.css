@@ -41065,3 +41065,95 @@ html:not([data-ui-theme]) body .main-col .bc-matrix-cell-label {
     display: block !important; white-space: normal !important; font-size: 12px !important; opacity: .85 !important; text-align: left !important;
   }
 }
+
+/* ═══ v2216b · SCHLIESSEN-KNÖPFE MIT EINEM ECHTEN „×" ═══════════════════════
+   Marcel 14.10.2026: „Schließen Buttons sehen komisch aus und sollten ein
+   vernünftiges x bekommen." Gemessen in der Messkabine (390 px): der Knopf
+   .dpm-x im Track Record war 32 × 44 px, das SVG-Kreuz darin 1,8 px breit -
+   es hat keine eigene Breite und schrumpfte im Flex-Knopf auf nichts, zu
+   sehen war ein leerer, hoher Kasten. Jetzt: das Kreuz hat überall feste
+   18 px; am Handy sind die Knöpfe quadratisch 40 × 40 (Vorbild ist
+   .set-modal-close in Einstellungen und Hilfe). */
+html body .dpm-x svg,
+html body .iexp-close svg,
+html body .pricing-close svg,
+html body .gv-close svg,
+html body .auth-close svg,
+html body .set-modal-close svg {
+  width: 18px !important; height: 18px !important;
+  min-width: 18px !important; flex: 0 0 18px !important; display: block !important;
+}
+@media (max-width: 900px) {
+  html body .dpm-x,
+  html body .iexp-close,
+  html body .pricing-close,
+  html body .gv-close,
+  html body .auth-close {
+    width: 40px !important; height: 40px !important;
+    min-width: 40px !important; min-height: 40px !important;
+    flex: 0 0 40px !important; padding: 0 !important;
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    border-radius: 10px !important;
+  }
+}
+/* v2216b · Plan und Abmelden in der Nutzerleiste: dasselbe Muster - Symbol
+   auf 4 px zusammengedrückt (Knopf 34 × 44), „Icons kann man nicht erkennen". */
+html body .sb-user-icons .sb-user-icon-btn svg {
+  width: 20px !important; height: 20px !important; min-width: 20px !important; flex: 0 0 20px !important; display: block !important;
+}
+@media (max-width: 900px) {
+  html body .sb-user-icons .sb-user-icon-btn {
+    width: 40px !important; height: 40px !important; min-width: 40px !important; min-height: 40px !important;
+    flex: 0 0 40px !important; padding: 0 !important;
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  }
+}
+
+/* ═══ v2216b · HANDY-KOPF AUFGERÄUMT ═════════════════════════════════════
+   Marcel 14.10.2026: „Der Header — zwar alle wichtigen Informationen drauf,
+   aber teilweise wild angeordnet." Gemessen bei 390 px: .hdr-v61-row1 ist
+   eine umbrechende Flex-Zeile; der Objektname (flex 1 1 auto, v649) nimmt
+   die ganze Breite, die Kontingent-Pille rutscht ALLEIN rechts in Zeile 2,
+   der Fortschritt klein in Zeile 3, darunter ein grauer Scrollbalken der
+   Reiter. Jetzt ein festes Raster:
+     Zeile 1  Menü · Objektname (kürzt) · Speicherpunkt · Kontingent
+     Zeile 2  Fortschritt über die volle Breite
+   Die Reiterleiste scrollt weiter, ohne Balken, mit Auslauf rechts. */
+@media (max-width: 768px) {
+  html body header.hdr .hdr-v61-row1 {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr) auto auto !important;
+    grid-template-areas: "m t a p" "c c c c" !important;
+    align-items: center !important;
+    column-gap: 8px !important; row-gap: 4px !important;
+    padding: 6px 12px 6px !important;
+  }
+  html body header.hdr .hdr-v61-row1 > #hdr-mobile-menu { grid-area: m !important; }
+  html body header.hdr .hdr-v61-row1 > #hdr-obj { grid-area: t !important; min-width: 0 !important; margin: 0 !important; }
+  html body header.hdr .hdr-v61-row1 > #hdr-autosave { grid-area: a !important; }
+  html body header.hdr .hdr-v61-row1 > .hdr-actions-v61 { grid-area: p !important; margin: 0 !important; justify-self: end !important; }
+  html body header.hdr .hdr-v61-row1 > #hdr-completeness { grid-area: c !important; width: auto !important; margin: 0 !important; }
+  html body header.hdr .hdr-v61-row1 > #hdr-completeness .hdr-comp-text { font-size: 11.5px !important; }
+  html body nav.tabs { scrollbar-width: none !important;
+    -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent) !important;
+            mask-image: linear-gradient(90deg, #000 88%, transparent) !important; }
+  html body nav.tabs::-webkit-scrollbar { display: none !important; height: 0 !important; }
+}
+/* v2216d · Fortschritt nur EINMAL: in Aktenmappe/Kanzlei/Tower holt
+   badgeInDenKopf() das Abzeichen #tabs-status-badge in die Kopfzeile - mit
+   dem Raster oben stand es als dritte Zeile UNTER der gleichen Angabe
+   („21 / 24 Felder" doppelt, gemessen 390 px, Kopf 113 statt 81 px). Ist das
+   Abzeichen da, nimmt es Zeile 2 ein und die Textzeile tritt zurück. */
+@media (max-width: 768px) {
+  html body header.hdr .hdr-v61-row1 > .dpl-badge-im-kopf { grid-area: c !important; justify-self: start !important; margin: 0 !important; }
+  html body header.hdr .hdr-v61-row1:has(> .dpl-badge-im-kopf) > #hdr-completeness { display: none !important; }
+}
+/* v2216h · Abweichungstafel im Reiter Objekt (#dp-abweichung) lag mit den
+   Farben für dunklen Grund (.abw-wort = --dp-ink-1 = weiß, .abw-zahl weiß
+   30 %) auf hellem Grund - gemessen rgb(255,255,255) auf rgba(42,39,39,.05)
+   über der hellen Fläche: unlesbar. Dieselbe Tinte wie in der Pilot-Analyse
+   (.dp-pa-wrap). */
+#dp-abweichung .abw-wort { color: var(--ink, #2A2826) !important; }
+#dp-abweichung .abw-zahl:not(.abw-diff) { color: var(--ink2, #5C554E) !important; }
+#dp-abweichung .abw-tafel th { color: var(--ink3, #6f685e) !important; }
+#dp-abweichung .abw-kopf h4, #dp-abweichung .abw-stand, #dp-abweichung .abw-deckung { color: var(--ink2, #5C554E) !important; }

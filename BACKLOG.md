@@ -36,6 +36,89 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N68 · Marcel 14.10.2026 (fünfte Runde)
+> **Stand 14.10.2026:** 1 erledigt (`v2216j`), 3 erledigt (`v2216j`/`v2216k`), 2: sechs Demos in `design/Vorschläge/prozessatlas/` — **wartet auf Marcels Wahl**.
+1. **Soll/Ist gehört in die Pilot-Analyse (Reiter Ist/Soll), nicht in den Tab Objekt** — die Tafel „Bestand gegen Ankauf" (`#dp-abweichung`, seit v2034) dort raus.
+2. **Prozessatlas cooler und animierter:** Unterkarten; Spracheingabe visualisieren; Import aus PDF visualisieren; sehr detailliert, wie die Prozesse in allen Bereichen funktionieren; die zugehörigen Daten; den Nutzen, der herauskommt; am Schluss, wie alles zusammenspielt. Schlüssig, mit Wow-Effekt für den Kunden. **5–6 Ideen fertig machen** (Demo-first, `design/Vorschläge/`).
+3. **F1 ruft den Piloten bei Dropdown-Feldern nicht.**
+
+### N67 · Marcel 14.10.2026 (vierte Runde)
+0. **Prod-Rollout v2208–v2215b freigegeben** („ja du kannst ausrollen").
+1. **Handy: Aktionen → Marktbericht geht einmal, danach reagiert keine Aktion mehr.**
+2. **Handy: Knöpfe Plan und Abmelden sehr klein, Icons nicht erkennbar.**
+3. **Schließen-Knöpfe sehen komisch aus → ein vernünftiges „×".**
+4. **Handy-Kopf:** alle wichtigen Informationen drauf, aber wild angeordnet → aufräumen. In der Messkabine durchtesten.
+5. **Parkstr. 9 (2026-1056):** Nettokaltmiete anpassen, damit es eine gute Geschichte wird (Demo-Objekt).
+6. **Soll/Ist-Analyse** (Pilot-Analyse) ausbauen.
+7. **Auch in Kanzlei, Tower und Aktenmappe prüfen** (Marcel, während der Arbeit).
+8. **Desktop:** Das Aktionsmenü soll beim Auswählen eines Objekts NICHT zugehen (nur am Handy).
+9. **Anzeige → Anzeige-Option:** Auslieferungszustand ist immer **Aktenmappe mit Boardkarte**.
+10. **Löschen-/Duplizieren-Knöpfe auf den Objektkarten:** Der Rahmen drumherum ist zu groß → der Score wird abgeschnitten, der Kartenrahmen stimmt nicht mehr.
+
+> **✅ 1–10 gebaut 14.10.2026 · v2216–v2216i (Staging), gemessen in der Messkabine und am Desktop** — Einzelheiten im Journal. Dazu zwei echte Fehler: Marktbericht fehlte im Register der Hauptansichten; Ankauf-Stand teilte die Einheitenliste mit dem Formular (Plan änderte sich rückwirkend).
+> **Offen:** Punkt 0 — der Push nach `main` (Zweig `prod-rollout-18`, Stand v2215b) scheiterte am Sicherheitsfilter. Nach Marcels Auftrag den Merge mit dem neuesten Staging-Stand (v2216i) neu bauen und ausrollen.
+
+### N66 · Marcel 14.10.2026 (dritte Runde) — Messe-Geschichten, BMF, RND-Abgleich, Werbungskosten
+1. **Messe-Geschichten als Dokument ablegen** — was Marcel an jedem Demo-Objekt erklären kann.
+2. **BMF-Kaufpreisaufteilung** bei den Demo-Objekten nachziehen.
+3. **RND-Abgleich als Beispiele:** wie man die Restnutzungsdauer heben könnte, und ein Beispiel, wo es so bleibt. **Westerfeldstraße 140** als Hauptbeispiel: von wo auf wo, und was es steuerlich gebracht hat (echtes RND-Gutachten unter `Dateien/`).
+4. **Werbungskosten im Detail** bei den Demo-Objekten plausibel füllen (Fahrten, Material …) — recherchiert.
+5. Danach: Landingpage, Leistungsumfang, F&E-Seite.
+
+> **✅ 1–5 erledigt 14.10.2026 (Staging):** `design/Messe/demo-geschichten.md`, BMF bei 15 Objekten, Westerfeld als RND-Beispiel (2 % → 6,25 %, rund 1.530 €/Jahr), RND-Abgleich-Tabelle, Werbungskosten 2024–2026; Landing v2215–v2215b (Prozesskarte im Leistungsumfang, `forschung.html`). Dabei behoben: v2213/v2213b (BMF −96,6 % und `#VALUE!`, Cache), **v2214 (Steuer-Jahreswerte gingen verloren — auch auf Prod!)**.
+> **Offen:** Soll/Ist in der Pilot-Analyse ausbauen (N64), dunkleres Grün/Rot für kleine Zahlen (N64), geführte Datenaufnahme (N62.12), Prod-Rollout v2208–v2215b nach Freigabe — **v2214 dringend**.
+
+### N65 · Marcel 14.10.2026 (zweite Runde) — Antworten und Einstellungen → Standardwerte
+
+**Antworten:**
+- Chrome ist verbunden, angemeldet als info@junker-immobilien.io (dort liegen die Objekte) → **alles im Browser genau prüfen**.
+- **Datenschutz: schwärzen** („wir schauen, wie weit wir kommen").
+- **Gewerbe: recherchieren, wie es sein muss, und so umsetzen, wie es am besten ist.**
+- **Demo-Objekte: umsetzen, dass es passt** (Konto info@junker-immobilien.io).
+- **F&E-Seite: so machen**, und zwar MIT „wir arbeiten mit Steuerkanzleien zusammen" (Marcels ausdrücklicher Wunsch, gegen meinen Hinweis auf den Antrag).
+
+**Einstellungen → Standardwerte (Marcel wörtlich zusammengefasst):**
+1. Oben die Sets (DealPilot Standard, Vorsichtig, Renditeorientiert), darunter die Einzelkarten. Es ist nicht erkennbar, dass die Einzelkarten zum gewählten Set gehören → klarer darstellen.
+2. **Finanzierung:** Früher gab es eine Checkbox „Zins und Tilgung selbst eingeben" ODER „indikativen Satz ziehen" → wieder als Entweder-oder.
+3. **Bewirtschaftung:** heute nur Prozent → Umschalter **Euro / Prozent**. Prüfen, was üblich ist. Die neuen Sätze je m² aus der eigenen Datenbank (BWK-Jahrestabelle) — wie werden sie übernommen, und wie passiert das im Quick-Check?
+4. **Lageklassen:** Dort stehen Mietausfall, Bewirtschaftung nicht umlagefähig und Eigenkapital. Doppelt mit Bewirtschaftung? Abgleichen.
+5. **„Bewirtschaftung" und „Bewirtschaftung je Objektart"** stehen nebeneinander → „das kann keiner verstehen". Zusammenführen oder klar trennen.
+6. **Steuer:** Welcher Grenzsteuersatz ist der Standard? Den privaten Steuersatz gibt es unter Mandanten → dorthin verlinken.
+7. **KI-Icons auf den Karten: grundsätzlich weg.**
+8. Die Ansicht nach dem Klick auf eine Karte: schöner, einfacher, verständlicher visualisieren.
+
+> **✅ 1–8 gebaut 14.10.2026 · v2211/v2211a (`45917195`, `c1fef5c1`, Staging), im Browser geprüft** — Einzelheiten im Journal. Dazu ✅ Schwärzen v2210, ✅ Gewerbe v2210b (Rest: LZS-Zweig nach Gewerbeanteil nur als Hinweis), ✅ Rumpfjahr v2209.
+> **Offen aus N64/N65:** Demo-Objekte (Konto info@junker-immobilien.io), Landing: Leistungsumfang mit Prozesskarte + F&E-Unterseite (mit Kanzlei-Zusammenarbeit), Soll/Ist in der Pilot-Analyse ausbauen, dunkleres Grün/Rot für kleine Zahlen, geführte Datenaufnahme durchgehen.
+
+### N64 · Marcels Antworten vom 14.10.2026 — Entscheidungen zu den offenen Fragen
+
+| Punkt | Entscheidung |
+|---|---|
+| N62.8 Preise Integrationsservice / Bestandsmigration | **„auf Anfrage"** — kein Festpreis |
+| N62.15 Datenschutz | Marcel glaubt nicht, dass Kaufverträge, Grundbuch, Geburtsdaten, Fotos an OpenAI gehen, und nicht, dass Daten Dritter weitergereicht werden („außer man würde sie explizit in die Felder eintragen"). **Erst im Code nachweisen, was wirklich hinausgeht**, dann entscheiden, was in den Text gehört. |
+| N61.2 Soll/Ist in der Pilot-Analyse | **ausbauen:** genauer beschreiben, ggf. mehr Felder |
+| N62.21 Gewerbe im Ertragswert | **Nutzfläche und Nutzungsart** im passenden Reiter im Tab Objekt, nur sichtbar, wenn wirklich Gewerbe da ist; Ort in Stufe 3 suchen |
+| N62.24 Kontrast | **dunkleres Grün und Rot für kleine Zahlen erlaubt** |
+| Tour am Handy | **bleibt so** — Hauptsache sie funktioniert und wird vernünftig angezeigt |
+| Quick-Check Hausnummer | **keine Pflicht** — die Regel kam aus einem früheren Chat, nicht von Marcel |
+| „Soll/Ist-Umschalter im Quick-Check" | **erledigt**, der ist weg |
+| N62.7 Landing Leistungsumfang | ja — dazu die abgelegte **Prozesskarte** verwenden |
+| N62.9 Subpage F&E | ja — Quelle `E:\Portfolio Strategie` (Marcel gibt den Ordner frei) |
+| N62.12 Geführte Datenaufnahme | durchgehen, mit allen Stufen |
+| N62.13 Rumpfjahr | **erst prüfen**; Marcel: „wird beides anteilig gerechnet" |
+| N62.13 Regionaldatenbank | **gelöst**, dazu eine **eigene Datenbank** angelegt → muss in Projektanweisung / Wissen stehen |
+| N60.19 Demo-Objekte | Marcel fragt, was er entscheiden soll → Frage konkret stellen |
+| Einstellungen-Demo | „irgendwo eine Demo abgelegt, ich glaube für die Einstellungen" → nachsehen |
+
+Alles andere: abarbeiten.
+
+**Stand 14.10.2026:**
+- ✅ **Rumpfjahr** v2209 (`cde5c927`, Staging): ein echter Fehler. Die Zinsmonate im Jahr 1 zählten gegen das Auszahlungsjahr statt gegen das Projektionsjahr 1 (2026-1052: 1 Monat Miete gegen volle Zinsen). Fünf Fälle 5/5 gegen die echten Funktionen. Rest: Auszahlung mitten in Jahr 2 läuft dort voll.
+- ✅ **Regionaldatenbank / eigene Datenbank** im Wissen: Projektanweisung, Abschnitt „EIGENE DATENHALTUNG" (`8fcd85fa`).
+- ✅ **`store:false`** an allen 10 `/v1/responses`-Aufrufen (v2209). Echter Aufruf aus dem Container: 200, `store: false`.
+- ⚠ **Datenschutz — Marcels Annahme stimmt für den Dokument-Import NICHT:** `dokumentSchemas.js:190` verlangt beim Grundbuch `eigentuemer[{name, geburtsdatum}]`, Abt. II/III Berechtigte und Gläubiger. `:224-225` verlangt beim Kaufvertrag Verkäufer und Käufer mit Adresse. Der PDF-Text (bis 15.000 Zeichen) geht ungeschwärzt an OpenAI (`baueprompt`, `:404-411`). Beleg-Import schickt Seitenbilder (bis 30). → **Entscheidung Marcel:** Personendaten aus den Schemata streichen und vor dem Senden schwärzen, ODER im Datenschutztext nennen.
+- ⚠ **Gewerbe — größer als gedacht:** `gewerbe_jahr` setzt KEIN Aufrufer (nur `ErtragswertService.js` kennt es). Die Gewerbe-Rechnung aus v2195 lief also nie. Die MFH-Einheiten (`_mfh.einheiten[]`, Art Gewerbe, Fläche, Ist-Miete) kommen im Marktbericht gar nicht an, nur ihre Anzahl. Der Rohertrag ist `Wohnmiete €/m² × GESAMTE Fläche × 12` (`CrossCheckService.js:831`), die Gewerbefläche bekommt also den Wohnmietansatz. → **Bewertungsfrage an Marcel:** welcher Gewerbe-Rohertrag (Ist-Miete der Gewerbeeinheiten mit Hinweis, oder eigenes Feld „marktübliche Gewerbemiete €/m²")?
+
 ### N62 · Marcels Paket vom 12.10.2026 (abends) — zwölf Punkte, abgeglichen
 
 **Marcel hat ausdrücklich darum gebeten:** *„Also das müsstest du einmal
@@ -168,7 +251,7 @@ gegenübergestellt werden sie nirgends.
 - Beim Öffnen der Hilfe direkt „Abläufe & Pilot" zeigen. Den Piloten-Knopf in den schwarzen Kopf neben „Atlas öffnen" stellen.
 
 **N63.2 · Hilfe: Inhalte gegen den Code abgleichen**
-> ✅ v2200/v2202/v2202a — 17 Themen, FAQ nach Ablauf, Glossar alphabetisch, 33 Korrekturen nach Prüfbericht, 5 neue Fragen, Fuß-KI raus. Offen: GrESt Thüringen im Code (6,5 % vs. vermutlich 5,0 % seit 2024) prüfen.
+> ✅ v2200/v2202/v2202a — 17 Themen, FAQ nach Ablauf, Glossar alphabetisch, 33 Korrekturen nach Prüfbericht, 5 neue Fragen, Fuß-KI raus. GrESt erledigt v2207/Prod (17): TH 5,0 seit 01/2024, HB 5,5 seit 07/2025.
 - Glossar und häufige Fragen: Stimmen alle Zahlen, die die Hilfe nennt?
   - DSCR-Schwellen, LTV-Stufen, Pilot-Skala, Score-Stufen
   - jede Zahl mit Beleg aus dem Code, so wie `docs/hilfe/hilfe-belege-v2189.md`
@@ -210,7 +293,7 @@ gegenübergestellt werden sie nirgends.
 - Dazu Eingabe und Lautsprecher.
 
 **N63.9 · Geführte Eingabe: Mikrofon auf kleinen Bildschirmen „halten zum Sprechen“** — Marcel (13.10. abends, präzisiert): gemeint ist das Mikrofon-Symbol der GEFÜHRTEN EINGABE und die Handy-Darstellung (Messkabine, kleine Breiten). Dort: Mikrofon gedrückt halten = zuhören, loslassen = fertig (wie WhatsApp); das Kästchen „Ich höre nichts, du kannst auch tippen“ und der Anhalten-Knopf entfallen dort. Auf großen Bildschirmen bleibt das automatische Zuhören wie heute.
-> ✅ v2204 (Code + Darstellung geprüft) — echtes Sprechen nur am Gerät abnehmbar.
+> ✅ v2204, Prod (15) — Kette in der Messkabine 390 px geprüft (künstlicher Tonstrom statt Mikrofon): Drücken nimmt auf, Loslassen schickt 53 KB WebM an /ai/extract-voice, Antwort „Keine Sprache erkannt“ (erwartet bei Ton), danach Ruhe ohne Selbst-Zuhören. Dazu mit echter Sprache (Windows-Stimme Hedda, als Testmikrofon eingespielt): Transkript wörtlich „Die Wohnfläche beträgt fünfundachtzig Quadratmeter.“, Feld wfl=85 erkannt, Co-Pilot übernimmt, danach Ruhe.
 
 #### N62.24 · Rest aus dem Responsive-Check (13.10.2026, v2198–v2198c)
 
@@ -240,7 +323,7 @@ Dateien/vw-modul-v4-2-2.zip und -v4-2-5.zip (08./10.10.2026) stehen in keiner Ba
 
 **Offen, neu:**
 - Straße und Hausnummer im Quick-Check waren NIE Pflicht (`quickcheck-app.html:3803`, `required:false` seit V326). Marcel entscheidet. Achtung: Inserate ohne veröffentlichte Hausnummer gibt es (v1999 ImmoMetrica).
-- Fehlerverdacht aus der Hilfe-Erhebung, nicht nachgemessen:
+- Fehlerverdacht aus der Hilfe-Erhebung — **✅ 14.10.2026 nachgemessen: 1–6, 8, 9 waren mit v2191 (`ad26710b`) behoben, 4 schon mit v1963. Rest in v2208 (`83283246`, Staging): 7 (Steuerregime rechnet längst, Buchhaltung „Stufe 3"/DATEV-Versprechen raus), Hilfe zitierte noch „Auto-saved". Speichern-Knopf: **entschieden 14.10.2026 — bleibt wie es ist** (Marcel: „das bleibt so wie es ist"), automatisch beim Reiter- oder Objektwechsel, kein Knopf, kein Strg+S.**
   1. Quick-Check-Balken lesen `sub-sicherheit`/`sub-finanzierung`/`sub-effizienz`, die es nicht gibt (`quickcheck-app.html:6901/6972`).
   2. Eigene Score-Regler wirken nur beim Profil „custom“, Starter erreichen es nicht (`dealscore.js:61-77`).
   3. Marktbericht aus dem Reiter Objekt ohne `bwk_modus: 'normiert'` nimmt die 23-%-Pauschale (`CrossCheckService.js:971`).

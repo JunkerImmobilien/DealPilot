@@ -1,0 +1,371 @@
+<!DOCTYPE html><!-- v1559 · Score-Bereiche am Rechenkern korrigiert --><!-- DealPilot Leistungsumfang · v1543 -->
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="google-site-verification" content="sjsXb3XudmYE75JCus789-lKn_IIX5jOySZx50Iy4i0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forschung &amp; Entwicklung · DealPilot</title>
+<meta name="description" content="Bescheinigtes Forschungsvorhaben 2026–2028: ein Verfahren, das den ganzen Immobilienbestand auf einmal betrachtet – in Zusammenarbeit mit Steuerkanzleien.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="dp2.css?v=v1611">
+<link rel="stylesheet" href="dp2-teile.css?v=v2215b">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   Leistungsumfang aus frontend/landing/index.html Z.3266-3969 (18 Kapitel).
+   Der Inhalt ist per Skript herauskopiert, nicht abgetippt.
+
+   Das CSS kommt MIT seinen @media-Abfragen. Der erste Versuch hat die
+   Abfragen verworfen und die Regeln nackt uebernommen - dadurch galten
+   die Handy-Regeln auf jedem Bildschirm, und das Inhaltsverzeichnis
+   stand einspaltig statt dreispaltig.
+   107 Regeln ohne Kontext, 4 Media-Abfragen.
+   ═══════════════════════════════════════════════════════════════════════ */
+.lu-top,.api-back{display:none}
+hr.rw{height:3px;border:0;background:repeating-linear-gradient(90deg,var(--gd) 0 16px,transparent 16px 34px);opacity:.6;margin:0;position:relative;z-index:2}
+hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z-index:2}
+.api-hero .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.api-hero .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;color:var(--gdh);border:1px solid var(--line);border-radius:20px;padding:6px 13px;background:rgba(201,168,76,.06)}
+#view-lu .lu-hero{background:var(--ob);padding:44px 0 22px}
+#view-lu .lu-back{display:inline-flex;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--gdh);text-transform:uppercase;margin-bottom:8px;cursor:pointer;background:none;border:0}
+.lu-top{position:sticky;top:0;z-index:20;background:rgba(7,7,7,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07)}
+.lu-back{display:inline-flex;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gdh);background:none;border:0;cursor:pointer}
+.lu-kick{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+.lu-sub{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gdi);margin:34px 0 14px}
+.sec-dark .lu-sub{color:var(--gdh)}
+.lu-tanks{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.lu-tank{position:relative;background:#fff;border:1px solid var(--cream-line);border-radius:14px;padding:20px 18px;text-align:center;overflow:hidden}
+.lu-tank.best{border-color:var(--gd);box-shadow:0 18px 40px -26px rgba(201,168,76,.5)}
+.lu-tank .g{position:absolute;left:0;right:0;bottom:0;height:var(--p);background:linear-gradient(0deg,rgba(201,168,76,.16),rgba(201,168,76,.02));z-index:0}
+.lu-tank b{position:relative;font-family:var(--disp);font-weight:700;font-size:26px;color:var(--ink);display:block}
+.lu-tank span{position:relative;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.lu-packs{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.lu-packs-3{grid-template-columns:repeat(3,1fr)}
+.lu-pack{position:relative;background:#fff;border:1px solid var(--cream-line);border-radius:14px;padding:20px 18px;text-align:center}
+.lu-pack.pop{border-color:var(--gd)}
+.lu-pack .lp-tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--runway);color:#221a06;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px}
+.lu-pack .lp-l{font-family:var(--disp);font-weight:700;font-size:24px;color:var(--ink)}
+.lu-pack .lp-p{font-family:var(--disp);font-weight:700;font-size:15px;color:var(--gdd);margin-top:2px}
+.lu-pack .lp-u{font-family:var(--mono);font-size:9px;color:var(--mut);margin-top:4px}
+.lu-costs{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;background:#fff;border:1px solid var(--cream-line);border-radius:14px;padding:8px 22px}
+.lu-cost{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--cream-line)}
+.lu-cost .c-n{font-size:13px;color:var(--inkm)}
+.lu-cost .c-v{font-family:var(--mono);font-weight:600;font-size:12px;color:var(--gdd);white-space:nowrap}
+.lu-feat{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.lu-phase{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:24px 24px 8px}
+.lu-phase .ph-h{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.lu-phase .ph-n{width:34px;height:34px;border-radius:9px;background:var(--runway);color:#221a06;display:grid;place-items:center;font-family:var(--disp);font-weight:700;font-size:15px}
+.lu-phase .ph-t{font-family:var(--disp);font-weight:700;font-size:17px;color:#fff}
+.lu-phase .ph-s{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--gdh)}
+.lu-item{padding:12px 0;border-top:1px solid rgba(255,255,255,.07)}
+.lu-item h4{font-family:var(--disp);font-weight:600;font-size:14px;color:#fff;margin-bottom:3px}
+.lu-item p{font-size:12.5px;line-height:1.55;color:var(--mdk);margin:0}
+.lu-featsec{background:var(--cream);color:var(--inkm)}
+.lu-phase{border-radius:16px;padding:24px 24px 8px;border:1px solid var(--cream-line);background:#fff}
+.lu-phase.d{background:var(--stub);border-color:rgba(255,255,255,.08)}
+.lu-phase.d .ph-t{color:#fff}
+.lu-phase .ph-t{color:var(--ink)}
+.lu-phase.d .lu-item h4{color:#fff}
+.lu-phase .lu-item h4{color:var(--ink)}
+.lu-phase.d .lu-item p{color:var(--mdk)}
+.lu-phase .lu-item p{color:var(--mut)}
+.lu-phase.d .lu-item{border-top-color:rgba(255,255,255,.08)}
+.lu-phase .lu-item{border-top-color:var(--cream-line)}
+.lu-featsec .lu-sub{color:var(--gdi)}
+.lu-hero{max-width:920px}
+.lu-hero h2{font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:700;line-height:1.08;letter-spacing:-.015em;margin:12px 0 14px;color:#fff}
+.lu-hero-lead{max-width:660px;color:rgba(255,255,255,.72);font-size:16px;line-height:1.65;margin:0}
+.lu-hero-stats{display:flex;flex-wrap:wrap;gap:12px;margin:26px 0 4px}
+.lhs{background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.28);border-radius:12px;padding:12px 18px;min-width:112px}
+.lhs b{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;display:block;line-height:1;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lhs span{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:4px;display:block}
+.lu-toc{margin-top:28px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.24);border-radius:16px;padding:20px 22px}
+.lu-toc-h{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#E8CC7A;margin-bottom:14px}
+.lu-toc-h span{color:rgba(255,255,255,.45)}
+.lu-toc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.lu-toc-item{display:flex;align-items:center;gap:10px;text-decoration:none;padding:8px 10px;border-radius:9px;border:1px solid transparent;transition:.14s}
+.lu-toc-item:hover{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.06)}
+.lu-toc-item .n{font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:#221a06;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);border-radius:20px;min-width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.lu-toc-item .t{font-size:13px;color:rgba(255,255,255,.82);line-height:1.25}
+.lu-toc-item:hover .t{color:#fff}
+.lu-ed{padding:52px 0;scroll-margin-top:80px}
+.lu-ed .eyebrow{display:inline-flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#E8CC7A;margin-bottom:14px}
+.lu-ed .eyebrow .anchor{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:#221a06;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);border-radius:20px;min-width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.lu-ed h2{font-family:'Space Grotesk',sans-serif;font-size:29px;font-weight:700;color:#fff;margin:0 0 16px;line-height:1.16;letter-spacing:-.01em}
+.lu-ed h2 .gold{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lu-ed h3{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;color:#E8CC7A;margin:28px 0 8px}
+.lu-ed p{color:rgba(255,255,255,.72);font-size:15px;line-height:1.72;margin:0 0 14px}
+.lu-ed p.lead{font-size:17px;color:rgba(255,255,255,.82)}
+.lu-ed em{color:#E8CC7A;font-style:italic}
+.lu-ed strong{color:#fff;font-weight:600}
+.lu-ed a{color:#E8CC7A;text-decoration:underline;text-underline-offset:2px}
+.lu-ed .info-card{background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.24);border-left:3px solid #C9A84C;border-radius:12px;padding:16px 20px;margin:20px 0}
+.lu-ed .info-card p{margin:0;color:rgba(255,255,255,.8)}
+.lu-ed .info-card p+p{margin-top:10px}
+.lu-ed .stat-row{display:flex;gap:12px;flex-wrap:wrap;margin:22px 0}
+.lu-ed .stat-tile{flex:1;min-width:140px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px 18px}
+.lu-ed .stat-tile-num{font-family:'Space Grotesk',sans-serif;font-size:27px;font-weight:700;background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.05}
+.lu-ed .stat-tile-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:4px}
+.lu-ed .pull{border-left:3px solid #C9A84C;padding:4px 0 4px 20px;margin:24px 0;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;line-height:1.4;color:#fff}
+.lu-ed.light{background:#fff}
+.lu-ed.light h2{color:#1a1305}
+.lu-ed.light h2 .gold{background:linear-gradient(110deg,#b8932f,#8a6d24);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lu-ed.light h3{color:#b8932f}
+.lu-ed.light p{color:#4a4436}
+.lu-ed.light p.lead{color:#2a251c}
+.lu-ed.light em{color:#b8932f}
+.lu-ed.light strong{color:#1a1305}
+.lu-ed.light a{color:#8a6d24}
+.lu-ed.light .eyebrow{color:#b8932f}
+.lu-ed.light .info-card{background:#faf6ea;border-color:rgba(201,168,76,.3);border-left-color:#C9A84C}
+.lu-ed.light .info-card p{color:#4a4436}
+.lu-ed.light .stat-tile{background:#faf6ea;border-color:rgba(201,168,76,.28)}
+.lu-ed.light .stat-tile-num{background:linear-gradient(110deg,#b8932f,#8a6d24);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lu-ed.light .stat-tile-lbl{color:#8a7c60}
+.lu-ed.light .pull{color:#1a1305;border-left-color:#C9A84C}
+.lu-item .luc-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
+.lu-item .luc-chip{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.02em;color:#8a6d24;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.38);border-radius:20px;padding:3px 9px;white-space:nowrap}
+.lu-item .lu-more{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:#b8932f;text-decoration:none;font-weight:600;cursor:pointer}
+.lu-item .lu-more:hover{color:#8a6d24;text-decoration:underline}
+.lu-phase.d .lu-item .luc-chip{color:#E8CC7A;background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.3)}
+.lu-phase.d .lu-item .lu-more{color:#E8CC7A}
+@media(max-width:640px){
+.lu-tanks{grid-template-columns:1fr 1fr}
+.lu-packs-3{grid-template-columns:1fr}
+.lu-packs{grid-template-columns:1fr 1fr}
+.lu-costs{grid-template-columns:1fr}
+}
+@media(max-width:820px){
+.lu-feat{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+.lu-toc-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+.lu-toc-grid{grid-template-columns:1fr}
+.lu-hero h2{font-size:30px}
+}
+
+/* v1559 · Gewicht je Score-Bereich und der Plan-Hinweis am Kapitelende. */
+.gew{display:inline-block;font:700 9px/1 var(--mono);letter-spacing:.1em;
+  background:rgba(201,168,76,.16);color:var(--gdi);padding:3px 7px;margin:0 6px;
+  vertical-align:middle;border-radius:20px}
+.lu-sec .lu-note{margin-top:20px;padding:12px 16px;background:rgba(201,168,76,.08);
+  border-left:3px solid var(--gd);font-size:14px;color:var(--inkm)}
+.lu-sec.lu-light .lu-note{background:rgba(201,168,76,.1)}
+.lu-list li em{font-style:normal;color:var(--gdi);font-weight:600}
+</style>
+</head><body>
+
+<svg style="display:none" aria-hidden="true">
+<symbol id="i-haus" viewBox="0 0 24 24"><path d="M3 21V10l9-7 9 7v11"/><path d="M9 21v-6h6v6"/><path d="M3 21h18"/></symbol>
+<symbol id="i-blitz" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
+<symbol id="i-globus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></symbol>
+<symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="1"/><rect x="3" y="13" width="18" height="7" rx="1"/><path d="M7 7.5h.01M7 16.5h.01"/></symbol>
+<symbol id="i-schild" viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 8.9 8 10.5 4.6-1.6 8-5.5 8-10.5v-6L12 2Z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+<symbol id="i-schloss" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-pokal" viewBox="0 0 24 24"><path d="M7 3h10v6a5 5 0 0 1-10 0V3Z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3M9 21h6M12 14v7"/></symbol>
+<symbol id="i-ebenen" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5M3 18l9 5 9-5"/></symbol>
+<symbol id="i-handy" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18.5h2"/></symbol>
+<symbol id="i-pfeil" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
+<symbol id="i-buch" viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 0 4 22.5V4.5Z"/><path d="M8 7h8M8 11h6"/></symbol>
+<symbol id="i-ziel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></symbol>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6"/><path d="M5 10v8m5-8v8m4-8v8m5-8v8M3 21h18"/></symbol>
+<symbol id="i-frage" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6 1c0 1.9-2.8 2.4-2.8 4M12 17.5h.01"/></symbol>
+<symbol id="i-blitz2" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
+</svg>
+
+
+<div class="tb"><div class="wrap">
+  <span class="pkt"><i></i>4 WOCHEN PRO — OHNE ZAHLUNGSDATEN</span>
+  <span class="pkt"><i></i>MONATLICH KÜNDBAR</span>
+  <span class="pkt hidemid"><i></i>KEINE BEWERTUNG VERFÄLLT</span>
+  <div class="rechts">
+    <span class="nz">&gt; <b data-nutzer data-zaehl>866</b> NUTZER</span><a href="mailto:info@dealpilot.immo">INFO@DEALPILOT.IMMO</a>
+    <a href="mailto:support@dealpilot.immo">SUPPORT</a>
+  </div>
+</div></div>
+
+<nav class="nav"><div class="wrap">
+  <a class="mark mark-gross" href="/"><span class="wort">Deal<b>Pilot</b></span></a>
+  <button class="burger" aria-label="Menü"><span></span><span></span><span></span></button>
+  <ul>
+    <li><a href="dp2.html#workflow">So funktioniert's</a></li>
+    <li><a href="dp2.html#features">Funktionen<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="dp2.html#features"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Die 19 Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
+        <li><a href="leistungsumfang.html" class="hier"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 22 Kapitel ausführlich — was jedes Modul kann</span></span></a></li>
+        <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif — im Vergleich</span></span></a></li>
+        <li><a href="api.html"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD — im Pro-Plan</span></span></a></li>
+        <li><a href="forschung.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Forschung &amp; Entwicklung</b><span>Bescheinigtes Vorhaben: das ganze Portfolio im Blick</span></span></a></li>
+      </ul></li>
+    <li><a href="dp2.html#stories">Stories</a></li>
+    <li><a href="dp2.html#pricing">Preise<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="dp2.html#pricing"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Einzelplatz</b><span>Vier Pakete von kostenlos bis Pro</span></span></a></li>
+        <li><a href="dp2.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Ihre Mandanten unter Ihrer Marke</span></span></a></li>
+        <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
+      </ul></li>
+    <li><a href="dp2.html#partner">Partner</a></li>
+    <li><a href="sicherheit.html">Sicherheit<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="sicherheit.html"><svg class="ico si"><use href="#i-schild"/></svg><span><b>Daten &amp; Server</b><span>Hetzner, DSGVO, was gespeichert wird</span></span></a></li>
+        <li><a href="fragen.html"><svg class="ico si"><use href="#i-frage"/></svg><span><b>Häufige Fragen</b><span>Die Antworten, die wir sonst am Telefon geben</span></span></a></li>
+      </ul></li>
+  </ul>
+  <a class="b-log" href="https://app.dealpilot.immo/">Anmelden</a>
+  <a class="b-cta" href="https://app.dealpilot.immo/?register=1">Kostenlos starten</a>
+</div></nav>
+
+
+<main>
+  <!-- v2215 · F&E-Unterseite. Marcel 12./14.10.2026: „was passieren soll — nicht wie, weil es ein
+       Forschungsprojekt ist … und dass wir mit Steuerkanzleien zusammenarbeiten."
+       Quelle: E:\Portfolio Strategie (Antrag, Arbeitspakete). Bewusst NICHT hier: Methodik,
+       Suchverfahren, Zielfunktion, Schwellen, Messreihen, Förderbeträge. -->
+  <section class="sec sec-dark" id="fe-hero" style="padding-top:44px">
+    <div class="wrap">
+      <div class="lu-hero">
+        <span class="eye">// Forschung &amp; Entwicklung</span>
+        <h2>Nicht das einzelne Objekt. <span class="ac">Der ganze Bestand.</span></h2>
+        <p class="lu-hero-lead">
+          Wer mehrere Immobilien besitzt, bekommt heute meist Tipps zu einzelnen Objekten.
+          In unserem Forschungsvorhaben entwickeln wir ein Verfahren, das das <strong>ganze Portfolio</strong> auf einmal betrachtet —
+          passend zur Lage des Investors.
+        </p>
+        <div class="fe-siegel">
+          <img src="assets/bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="72" height="72">
+          <div><b>Bescheinigtes Forschungsvorhaben</b>
+            <span>nach dem Forschungszulagengesetz · Laufzeit 2026 bis 2028</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <hr class="rws">
+
+  <section class="sec sec-dark lu-ed" id="fe-ziel">
+    <div class="wrap">
+      <span class="eyebrow"><span class="anchor">01</span>Worum es geht</span>
+      <h2>Ein Bestand rein. Wenige belastbare Wege raus. <span class="gold">Jeder mit Fundstelle.</span></h2>
+      <p>
+        Ob ein Objekt privat gehalten oder in eine Gesellschaft überführt wird, ob man verkauft, verschenkt, überträgt oder umfinanziert —
+        jede dieser Entscheidungen wirkt auf alle anderen Objekte im Bestand und auf die persönliche Steuerlage.
+        Fristen wie die Spekulationsfrist laufen nebenher, und was für ein Objekt richtig ist, kann für das Portfolio falsch sein.
+      </p>
+      <p>
+        Das Vorhaben soll aus den Objektdaten, die in DealPilot ohnehin stehen, <strong>nachvollziehbare Strukturwege</strong> ableiten:
+        wenige, gut begründete Varianten, zugeschnitten auf das Profil des Investors — Einkommen, Ziele, Familie, Zeithorizont —
+        und jede mit Rechenweg, Annahmen und Quellen.
+      </p>
+      <div class="info-card">
+        <h4>Was es nicht ist</h4>
+        <p>Keine Steuer- und keine Anlageberatung und keine Empfehlung. Das Ergebnis ist die Grundlage für das Gespräch mit Steuerkanzlei und Bank — die Entscheidung bleibt beim Investor und seinen Beratern.</p>
+      </div>
+    </div>
+  </section>
+  <hr class="rws">
+
+  <section class="sec sec-dark lu-ed light" id="fe-kanzlei">
+    <div class="wrap">
+      <span class="eyebrow"><span class="anchor">02</span>Mit Steuerkanzleien</span>
+      <h2>Gebaut für den Tisch, <span class="gold">an dem entschieden wird.</span></h2>
+      <p>
+        Wir arbeiten mit Steuerkanzleien zusammen. Sie prüfen die Annahmen, an denen ein Strukturweg hängt, und sie sind die Empfänger
+        des Ergebnisses: ein vorbereiteter Fall mit Rechenweg, Annahmen und Fundstellen, den die Kanzlei prüft, kommentiert und freigibt.
+      </p>
+      <div class="fe-raster">
+        <div class="fe-kachel"><b>Für Investoren</b><span>Der Blick auf das Gesamtportfolio statt Einzeltipps — auch bei großen Beständen. Jeder Wert trägt seine Herkunft.</span></div>
+        <div class="fe-kachel"><b>Für Kanzleien</b><span>Ein Fall, der vorbereitet ankommt: Zahlen, Annahmen und Quellen an einer Stelle — prüfen statt zusammentragen.</span></div>
+        <div class="fe-kachel"><b>Für Banken</b><span>Eine Mappe, die Struktur und Kapitaldienst im Zusammenhang zeigt — nicht Objekt für Objekt.</span></div>
+      </div>
+    </div>
+  </section>
+  <hr class="rws">
+
+  <section class="sec sec-dark lu-ed" id="fe-plan">
+    <div class="wrap">
+      <span class="eyebrow"><span class="anchor">03</span>Was bis 2028 entsteht</span>
+      <h2>Zehn Arbeitspakete, <span class="gold">ein Ziel.</span></h2>
+      <div class="fe-plan">
+        <div class="fe-ap"><span class="fe-zeit">2026</span><b>Woran sich eine gute Strategie messen lässt</b></div>
+        <div class="fe-ap"><span class="fe-zeit">2026 – 2027</span><b>Ein verlässlicher Steuer-Rechenkern</b></div>
+        <div class="fe-ap"><span class="fe-zeit">2026 – 2027</span><b>Gestaltungsmöglichkeiten je Objekt erkennen — auch die, die sich gegenseitig ausschließen</b></div>
+        <div class="fe-ap"><span class="fe-zeit">2026 – 2028</span><b>Genauere Bewertung aus mehreren Datenquellen</b></div>
+        <div class="fe-ap"><span class="fe-zeit">2026 – 2028</span><b>Strategien fair vergleichbar machen</b></div>
+        <div class="fe-ap"><span class="fe-zeit">2026 – 2027</span><b>Die passende Zuordnung und den richtigen Zeitpunkt finden</b></div>
+        <div class="fe-ap"><span class="fe-zeit">2026 – 2028</span><b>Fristen und Grenzen sicher einhalten</b></div>
+        <div class="fe-ap"><span class="fe-zeit">2026 – 2027</span><b>Vorgänge aus freiem Text übernehmen — und bei Unklarheit nachfragen</b></div>
+        <div class="fe-ap"><span class="fe-zeit">2027 – 2028</span><b>Passend zu unterschiedlichen Investorenprofilen</b></div>
+        <div class="fe-ap"><span class="fe-zeit">2027 – 2028</span><b>Prüfung an echten, unterschiedlichen Beständen</b></div>
+      </div>
+      <p class="fe-fuss">Wie das Verfahren im Einzelnen arbeitet, ist Gegenstand der Forschung und wird hier bewusst nicht beschrieben.</p>
+    </div>
+  </section>
+  <hr class="rws">
+
+  <section class="sec sec-dark lu-ed light" id="fe-heute">
+    <div class="wrap">
+      <span class="eyebrow"><span class="anchor">04</span>Was es heute schon gibt</span>
+      <h2>Die Grundlage <span class="gold">steht in DealPilot.</span></h2>
+      <p>
+        Das Vorhaben baut auf dem auf, was DealPilot heute je Objekt führt: Kaufpreisaufteilung, Restnutzungsdauer und AfA,
+        Finanzierung, die Steuer Jahr für Jahr, Halter und Gesellschaften mit Überführung, Ankauf-Stand und Soll/Ist im Bestand.
+      </p>
+      <p><a href="leistungsumfang.html" style="color:var(--wl-c9a84c,#C9A84C);font-weight:600;text-decoration:none">Zum vollen Leistungsumfang →</a>
+         &nbsp;·&nbsp; <a href="prozesskarte.html" style="color:var(--wl-c9a84c,#C9A84C);font-weight:600;text-decoration:none">Der Weg auf einer Karte →</a></p>
+    </div>
+  </section>
+  <style>
+    /* v2215 · F&E-Seite — Bausteine der Leistungsumfang-Seite, nur ergänzt */
+    #fe-hero .fe-siegel{display:flex;align-items:center;gap:14px;margin-top:22px}
+    #fe-hero .fe-siegel b{display:block;font:600 15px "Space Grotesk",sans-serif}
+    #fe-hero .fe-siegel span{font-size:13px;opacity:.8}
+    .fe-raster{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:20px}
+    .fe-kachel{padding:16px 18px;border-radius:14px;border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 40%,transparent)}
+    .fe-kachel b{display:block;font:600 16px "Space Grotesk",sans-serif;margin-bottom:6px}
+    .fe-kachel span{font-size:14px;opacity:.85;line-height:1.5}
+    .fe-plan{display:grid;gap:8px;margin-top:18px}
+    .fe-ap{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:baseline;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+    .fe-ap .fe-zeit{font:600 12px "JetBrains Mono",monospace;color:var(--wl-c9a84c,#C9A84C);letter-spacing:.06em}
+    .fe-ap b{font-weight:500}
+    .fe-fuss{margin-top:16px;font-size:13px;opacity:.75}
+    /* v2215a · auf hellem Abschnitt: dieselben Farben wie h2/p dort (gemessen rgb 26,19,5 / 74,68,54) */
+    .light .fe-kachel{background:#fff}
+    .light .fe-kachel b{color:#1a1305}
+    .light .fe-kachel span{color:#4a4436;opacity:1}
+    @media (max-width:560px){ .fe-ap{grid-template-columns:1fr;gap:2px} }
+  </style>
+</main>
+
+<footer class="footer"><div class="wrap">
+  <div class="footer-grid">
+    <div>
+      <div class="mark mark-gross" style="color:#fff"><span class="wort">Deal<b>Pilot</b></span></div>
+      <p class="footer-tag">Immobilien-Investmentanalyse für strukturierte Entscheidungen.
+        Entwickelt von Junker Immobilien · Sachverständigenbüro &amp; Projektentwicklung.</p>
+    </div>
+    <div><h4>Produkt</h4>
+      <a href="#workflow">So funktioniert's</a><a href="#features">Funktionen</a>
+      <a href="leistungsumfang.html">Leistungsumfang</a><a href="#pricing">Preise</a>
+      <a href="api.html">API</a><a href="#app">App</a></div>
+    <div><h4>Vertrauen</h4>
+      <a href="sicherheit.html">Sicherheit &amp; Server</a><a href="fragen.html">Häufige Fragen</a>
+      <a href="#partner">Partner &amp; Datenquellen</a><a href="#feature-matrix">Cockpit-Matrix</a></div>
+    <div><h4>Kontakt</h4>
+      <a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a>
+      <a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a>
+      <a href="/impressum.html">Impressum</a><a href="/datenschutz.html">Datenschutz</a></div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 Junker Immobilien</div>
+    <div>Keine Steuer- oder Finanzberatung. Analyse-Werkzeug für eigene Kalkulationen.</div>
+  </div>
+</div></footer>
+
+
+
+<script src="dp2-lufeat.js?v=v1565"></script>
+<script src="dp2.js?v=v1565"></script>
+  <script src="assets/umgebung.js?v=v1644"></script><!-- v1644 · Landing zeigt auf DIE App, in der sie steht -->
+</body></html>

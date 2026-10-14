@@ -880,6 +880,53 @@ zurückgesetzt** · SN/PH-Logos nicht vom Sweeper überschreiben (W23).
 
 ---
 
+## EIGENE DATENHALTUNG — MAKRO, ZENSUS, ORTE, LAUFZEITEN (Stand 14.10.2026)
+
+**Der Marktbericht fragt Makro- und Zensus-Kennzahlen nicht mehr live ab.
+Er liest sie aus eigenen Tabellen in `dealpilot-mb-db` (Schema `mb.`).**
+Hier stand bis zum 14.10.2026 nichts dazu, nur verstreut in der Chronik
+(v2161–v2172c, v2197). Marcel: *„das mit der Regionaldatenbank haben wir
+gelöst und zusätzlich eine eigene Datenbank angelegt. Das muss auch in der
+Projektanweisung bzw. dem Wissen stehen."*
+
+| Tabelle | Inhalt | Quelle | Füllung | Staging 14.10. |
+|---|---|---|---|---|
+| `mb.makro_werte` (+ `mb.makro_abrufe` als Protokoll) | vier Kennzahlen je Kreis: Bevölkerung/Trend, Arbeitslosenquote, Wanderung, Einkommen/Kaufkraft | Regionaldatenbank (regionalstatistik.de, GENESIS), Konto in `.env` (`DESTATIS_TOKEN`) | `MakroImportService`, Takt alle 12 h prüfen / alle 30 Tage holen, `MAKRO_IMPORT=0` schaltet ab | 22.573 Werte, 118 Abrufe |
+| `mb.zensus_werte` | Leerstand, Eigentümerquote, Nettokaltmiete; Kreis UND Gemeinde, Miete nach Baujahr/Fläche | Zensus-2022-Datenbank `ergebnisse.zensus2022.de`, eigenes Konto `ZENSUS_USER`/`ZENSUS_PASSWORD` | einmalig `npm run zensus` im mb-Container (~2,5 min) | 894.880 Werte |
+| `mb.plz_orte` | PLZ → Ort/Koordinaten (Ersatz für den Live-Dienst: 152 ms gegen 2 ms) | erster Abruf je PLZ | füllt sich mit jedem Bericht | 3 |
+| `mb.laufzeiten` | Dauer je Berichtsschritt | eigene Messung | füllt sich mit jedem Bericht | 9 |
+
+**Auf Produktion:** Migration 016 und der Zensus-Import (894.880 Werte) liefen
+mit Rollout 1 (`b62eb9d2`). Migration 017 und der erste Makro-Takt (627 s,
+400/400 Kreise, 16/16 Länder) liefen mit Rollout 4 (`c7a4c482`). Migration 018
+lief mit Prod (13).
+
+**Was man wissen muss, wenn man hier etwas anfasst:**
+- **Zwei Konten, zwei Datenbanken, nicht verwechseln.** `DESTATIS_TOKEN` ist
+  die **Regionaldatenbank**: dort gibt es nur den Zensus 2011. GENESIS-Online
+  (Destatis) hat **keinen** Zensus 2022. Den gibt es nur auf
+  `ergebnisse.zensus2022.de`, mit eigenem Konto. Anmeldung dort **nur per
+  Header** `username`/`password`; Formulardaten werden als Gast behandelt
+  (Code 15).
+- **Ein Land je Abruf:** `regionalkey: "05*"` holt ein ganzes Bundesland.
+  Deutschland braucht damit 34 Abrufe statt über 800. Ohne Filter: Code 98
+  „zu groß".
+- **Höchstens 10 parallele Abrufe je Konto (Code 6).** Ein von uns
+  abgebrochener Abruf läuft dort bis zu 15 min weiter. Deshalb 3 parallel,
+  10 min Frist, `logincheck` vorweg, Pause vor dem zweiten Versuch (v2172b).
+- **Schlüssel umschlüsseln:** Die Atlas-Tabellen führen Hamburg als `02`,
+  Berlin als `11` und Region Hannover, StädteRegion Aachen und
+  Regionalverband Saarbrücken achtstellig; der Bericht fragt fünfstellig
+  (`MakroImportService.kreisSchluessel()`). Sie führen auch Altkreise (472
+  statt 400) → Deckung gegen die **heutigen** Kreise messen, nicht zählen.
+- **Zensus-Miete ist Bestandsmiete** aller Verträge zum 15.05.2022, keine
+  Angebotsmiete. Neue Zahlen gibt es erst mit dem nächsten Zensus.
+  Größenklassen gelten **je Wohnung** (MFH: Wohnfläche durch Einheiten).
+- **Der Bericht liest nur die Tabelle** (2–38 ms), nie live. Fehlt ein Kreis,
+  fehlt der Wert — kein Nachbarkreis, kein Landesmittel.
+- **Prüfen:** der Agent `datenwaechter` misst Deckung und Stand von Makro,
+  Zensus und Register.
+
 ## AMTLICHE DATEN — WOHER SIE KOMMEN
 
 **Alle NRW-Grundstücksmarktberichte liegen kostenfrei bei `gars.nrw` und
@@ -38713,6 +38760,228 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Abnahmen bei sichtbarem Fenster.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
+
+### v2216j–v2216k · Staging · Soll/Ist nur im Pilot, F1 auf Auswahlfeldern, Prozessatlas-Demos (14.10.2026)
+- **Was:** Marcels fünfte Runde (N68).
+  - **v2216j** `8a17d8b1`:
+    - Die Tafel „Bestand gegen Ankauf" (`#dp-abweichung`, seit v2034) im Tab Objekt bleibt leer. Der Abgleich steht nur noch im Pilot-Reiter „Soll/Ist-Abgleich" (`ui.js _sollIstHtml`, dieselben Zeilen aus `DealPilotAnkauf.abweichung()`).
+    - F1 auf Auswahlfeldern: F1 kam an, aber **54 von 67 Selects** hatten keinen gepflegten Text, und der Pilot sagte nichts. `pilot-tower.js` hat jetzt `ZWECK` (Anlage 2/4, Objektart, Nutzungsart, Standardstufe, Halter …) und `auswahlText()`: Zweck, gewählter Wert, Optionen.
+  - **v2216k** `7b82fa38`: Der Platzhalter „— keine Angabe —" galt als gewählter Wert und stand in der Optionsliste. Beides ist gefiltert.
+  - **Prozessatlas, sechs Demos** (N68.2), `design/Vorschläge/prozessatlas/`:
+    - Dateien: `index.html`, 1 Streckennetz, 2 Sprechlauf, 3 Dokumentenfluss, 4 Tiefenzoom, 5 Zusammenspiel, 6 Flugschreiber (Parkstraße).
+    - Sie laden die echten Abläufe aus `frontend/js/prozess-atlas.js`. Neu in `zusatz.js`: zwei Abläufe (Sprechlauf, Dokument-Import) mit Belegen, alle per grep geprüft, und die sechs Rechenkerne.
+- **Nachweis:**
+  - Echte F1-Taste auf `#standardstufe` (Staging, nach Deploy): Der Tower zeigt Zweck und Optionen. `#dp-abweichung` hat `display:none` und ist leer. `buster-ebenen` SAUBER.
+  - Demos lokal über einen Server im Browser geklickt: Streckennetz „Kaufpreis" findet 7 Stationen in 6 Abläufen, Tiefenzoom bis Ebene 4, RND-Vergleich 16 J / 23,6 J, Flugschreiber Endstand 1,23 / 3.195 / +775 / 59.
+- **Rest:**
+  - **Eigener Fehler in Demo 3, behoben vor der Übergabe:** Die Trennlinie sagte zuerst „im Browser · verlässt das Gerät" vor dem Schwärzen. Geschwärzt wird aber auf dem DealPilot-Server (`schwaerzen.js`), vor der KI. Die Beschriftung lautet jetzt „Browser · DealPilot-Server · erst jetzt an die KI".
+  - Der Tiefenzoom zeigt Lücken im Atlas: DSCR geht laut Atlas in keine weitere Station (in Wahrheit in beide Scores). Die `ein`-Listen von c3/c4 sollten nachgezogen werden, wenn der Atlas umgebaut wird.
+  - Marcels Wahl unter den sechs Demos steht aus.
+  - Pilot-Reiter Soll/Ist im Bild weiterhin ungeprüft.
+
+### v2216–v2216i · Staging · Handy-Ansicht, Soll/Ist, Parkstraße (14.10.2026)
+- **Was:** Marcels vierte Runde (N67), alles in der Messkabine (390 px) und am Desktop (1280 px) gemessen.
+  - **v2216** `341c7bd7`, Aktionen nach dem Marktbericht.
+    - Befund: Der Marktbericht stand nicht im Register der Hauptansichten (`DealPilotAnsichten`).
+      - Gemessen Cockpit → Marktbericht: `#s-marktbericht.active`, aber unsichtbar, weil das Cockpit `.main-col > .body` und der Single-Schließer `.sec` ausgeblendet hatten.
+      - Gemessen nach dem Marktbericht: Die nächste Ansicht lag dahinter (`mb-standalone-active` blieb).
+    - Jetzt: Der Marktbericht ist angemeldet (leiser Schließer), räumt beim Öffnen über das Register ab und holt seine Behälter zurück. `sbActionsAction` schließt ihn vor Ansichtswechseln.
+    - Kette Cockpit → MB → Track Record → MB → Einzelobjekt → MB → Alle → MB in Standard, Aktenmappe, Kanzlei und Tower: alles OK.
+    - Desktop: Das Aktionsmenü bleibt beim Klick auf eine Objektkarte offen (Marcels Wunsch); am Handy geht es wie bisher zu.
+  - **v2216b–d** `44997fdc`, `357ed5f3`:
+    - Schließen-Knöpfe: Das SVG-Kreuz von `.dpm-x` war 1,8 px breit (leerer Kasten). Plan und Abmelden: Symbol 4 px breit. Jetzt haben die Symbole feste Maße und sind am Handy 40 × 40.
+    - Handy-Kopf als Raster: Menü / Name / Speicherpunkt / Kontingent, darunter der Fortschritt. Die Reiter laufen ohne Balken. Der Fortschritt steht nur noch einmal (das Abzeichen der Darstellung ersetzt die Textzeile), der Kopf ist 90 statt 113 px hoch.
+    - Knopfkasten der Objektkarte: `height:100%` mit Verlauf übermalte den Kartenrand → kleiner Kasten mittig.
+  - **v2216c** (Auslieferung): Aktenmappe mit **Bordkarte**. Das gilt für den Rückfall in `objektkarten-stil.js`, das Onboarding und „Auslieferungszustand zurücksetzen“ (der Knopf führte vorher in `''`).
+  - **v2216e–i** `336286b1` … `d28d5bec`, Soll/Ist:
+    - 16 statt 10 Kennzahlen: Miete je m², leere Einheiten, nicht umlagefähige Kosten, Instandhaltung, Zins, Cashflow vor Steuern, Gebäudeanteil, AfA-Satz.
+    - Gruppiert in Ertrag / Kosten / Finanzierung / Steuer / Ergebnis, dazu „Was sich bewegt hat“ im Pilot-Reiter.
+    - `zahlSatz()`: „6.25“ wird nicht mehr als 625 gelesen.
+    - **Echter Fehler (v2216f):** Der Ankauf-Stand kopierte `_mfh` flach. Plan und Formular teilten dieselbe Einheitenliste, jede spätere Vermietung änderte den Plan rückwirkend. Jetzt tiefe Kopie.
+    - Abweichungstafel im Objekt: Sie war weiß auf hellem Grund (unlesbar) und hat jetzt dunkle Tinte wie die Pilot-Analyse. Grün und Rot der Differenz bleiben.
+  - **Parkstraße 9:** NKM „710 Euro“ → 2.321 € (Summe der Einheiten). BMF jetzt 54,31 %. Geschichte „Altbau mit Hebel“: 1. OG saniert (45.000 € Erhaltungsaufwand 2025, unter der 15-%-Grenze) und neu vermietet zu 9,50 €/m².
+  - Pläne von Parkstr. und Bismarckstr. mit Nachweis korrigiert (Einheiten).
+- **Nachweis:** Messkabine (vier Darstellungen, echte Klicks), Desktop-Screenshots, `prompt-lecks` SAUBER, `buster-ebenen` SAUBER, `gold-audit` RC=0.
+- **Rest:**
+  - Die Pilot-Tafel Soll/Ist nur über die Daten geprüft, nicht im Bild (sie wird erst mit einer Analyse gebaut).
+  - Dunkle Inhaltsflächen (Theme Konsole) mit der neuen Tinte der Abweichungstafel nicht geprüft.
+  - Prod-Push von Zweig `prod-rollout-18` scheiterte am Sicherheitsfilter; Marcel stößt ihn an.
+
+### v2215–v2215b · Staging · Landing: Prozesskarte im Leistungsumfang, F&E-Seite (14.10.2026)
+- **Was:**
+  - **Prozesskarte und Netzplan** per `git mv` von `design/Messe/` nach `frontend/landing/`. Eine Datei dient für Web und Messe-Druck; `tools/prozesskarte-pruefen.mjs` liest von dort (RC=0).
+  - **`leistungsumfang.html`:** Abschnitt `#lu-weg` „Vom ersten Blick bis zum Bestand – auf einer Karte“ mit beiden Karten, Sprungmarke im Kopf.
+  - **Startseite:** Knopf „Der ganze Weg auf einer Karte“.
+  - **`forschung.html` (neu):**
+    - Inhalt: bescheinigtes Vorhaben 2026–2028, was es leisten soll (nicht wie), Zusammenarbeit mit Steuerkanzleien (Marcels ausdrücklicher Wunsch), zehn Arbeitspakete nur als Ziel, BSFZ-Siegel.
+    - Bewusst nicht: Methodik, Schwellen, Messreihen, Förderbeträge, Vorhabennummer.
+    - Eingebunden im Untermenü „Funktionen“ (index, api, leistungsumfang) und in der Sitemap.
+  - **Menü und Meta:** „Alle 18 Kapitel“ → 22 (gezählt: 18 + 4 neuere Kapitel); die Startseite nennt 19 Module, das stimmt (`DP_MODULE` = 19).
+- **Gefunden und behoben:**
+  - v2215a: Die neuen Kacheln auf den hellen Abschnitten waren fast unlesbar (Text rgb 236,230,214 auf Weiß). Jetzt tragen sie die gemessenen Farben des Abschnitts (h2 26,19,5 / p 74,68,54).
+  - v2215b: Die Kontingent-Tabelle war am Handy 395 px breit bei 375 px Ansicht, die Leistungsumfang-Seite lief quer über. Das war schon vorher so. Jetzt sind die Polster schmaler, alle Seiten haben Buster v2215b.
+- **Commit:** `c09b503d`, `ca238ced`, `8cc8cf0a`
+- **Nachweis:** Browser auf Staging, Desktop-Screenshots; bei 390 px im gleich-originigen iframe Breite = 375 bei forschung, prozesskarte, leistungsumfang und index; `gold-audit` RC=0.
+- **Rest:** Die Seite F&E im Footer verlinken (die Footer der Seiten sind unterschiedlich gebaut). Abnahme der Texte durch Marcel.
+
+### N66 · Messe-Geschichten, BMF, RND-Abgleich, Werbungskosten + v2213–v2214 · Staging (14.10.2026)
+- **Was:**
+  - **Westerfeldstr. 140 (1041)** ist das RND-Beispiel. Bestand seit 01.01.2025, BMF amtlich 14,64 %.
+    - Grund für den kleinen Anteil: 1.570 m² × 450 €/m² BORIS = Bodenwert über dem Kaufpreis.
+    - Plan mit AfA 2 %, Ist mit eigenem Satz aus dem echten Nutzungsdauergutachten (16 Jahre, 6,25 %).
+    - AfA 1.719 → 5.371 €; Steuer 2026 4.955 → 3.421 € (vor Werbungskosten).
+  - **BMF amtlich** übernommen bei 15 Objekten. Nicht übernommen:
+    - 1056: unplausibel
+    - 1082: Eingaben fehlen
+    - 1006: Kern-Fehlerwert
+  - **Pläne** von 1052, 1053 und 1054 mit `korrigieren('daten')` auf den BMF-Gebäudeanteil nachgezogen. Das Ist wurde dafür kurz zurückgestellt, die Geschichten sind erhalten.
+  - **Werbungskosten 2024–2026** bei 11 Bestandsobjekten, recherchiert:
+    - 0,30 €/km je gefahrenem km, BFH IX R 18/15
+    - Kontoführung 16 € bzw. 96 €
+    - Steuerberatung nach StBVV § 27
+    - Verpflegung 14 €
+    - Material als Erhaltungsaufwand
+    - keine Hausverwaltung (die steckt schon in der Bewirtschaftung)
+  - Gohliser 2029: 40.000 € Erhaltungsaufwand neu eingetragen.
+  - **Dokument** `design/Messe/demo-geschichten.md`: sieben Geschichten, RND-Abgleich, Werbungskosten-Grundlage, Restliste für Marcel.
+- **Fehler, dabei gefunden und behoben:**
+  - **v2213** `771fdf72`: Die BMF-Übernahme schrieb **−96,6 %** Gebäudeanteil ins Objekt (2026-1056, negativer Gebäudeertrag). Jetzt meldet die Pipeline `unplausibel`, und `_v292Apply` sperrt Werte außerhalb von 0 bis 100.
+  - **v2213b** `5ee1224d`:
+    - Fehlerwerte des Kerns (`{error:'#VALUE!'}`) liefen als Gebäudeanteil weiter (`toFixed`-Absturz). Jetzt kommt eine Meldung „es fehlt: Grundstücksfläche, Bodenrichtwert“.
+    - Der `bmf_cache`-Schlüssel enthält jetzt den Pipeline-Stand (`PIPELINE_STAND`). Vorher kamen nach jeder Korrektur alte Ergebnisse.
+  - **v2214** `477a077a` (**der schwerste Fund**): Die Steuer-Jahreswerte der Anlage V (`_taxYearlyOverrides`) lebten nur im Fenster.
+    - Kein Ladeweg stellte sie her; beim Objektwechsel wanderten sie ins nächste Objekt.
+    - Nach einem Neuladen waren sie weg, und das nächste Speichern überschrieb die Zeitreihe (Gohliser 2029: 40.000 → 0,00).
+    - Jetzt reisen sie als `d._tax_overrides` im Objekt mit und werden beim Laden gesetzt oder geleert.
+    - Nachgewiesen nach einem frischen Seitenaufruf: Gohliser trägt 2029 = 40.000 € samt Bemerkung, Alexanderstr. danach `{}`.
+- **Eigener Fehler:** Mein erster Werbungskosten-Lauf lief über den Fehler aus v2214. Die Werte wanderten von Objekt zu Objekt, die Steuer stieg bei drei Objekten. Erkannt an der Richtung (mehr Werbungskosten → mehr Steuer ist unmöglich). Nach dem Fix vollständig neu eingetragen, `geerbt=0` überall.
+- **Rest:**
+  - BMF für 1082 und 1006 (Eingaben fehlen).
+  - Parkstr. 9: NKM „710 Euro“ für 5 Einheiten prüfen.
+  - Vier Altbauten brauchen eine sachverständige RND.
+  - Testobjekte löscht Marcel.
+  - Bestehende Nutzer haben ihre früheren Jahreswerte verloren, wo sie nach einem Neuladen gespeichert haben. Wiederherstellen ginge nur aus den Server-Zeitreihen; dort sind eigene Eingaben aber nicht von Vorschlägen zu unterscheiden.
+
+### Demo-Objekte (N60.19) + v2212–v2212c · Staging (14.10.2026)
+- **Was:** Marcel: „Demo-Objekte … umsetzen, dass es passt“ (Konto info@junker-immobilien.io).
+  - Vorher gesichert: `/root/backups/main-vor-demo-20261014-0608.sql.gz` (48 MB, 71 Tabellen, angesehen).
+  - Alle Eingriffe liefen über die App-Funktionen: `loadSaved`, `setWon`, `festschreiben`, `saveObj`.
+  - **Widersprüche aufgelöst:**
+    - 2026-1052 Gohliser und 2026-1008 Hölderlinstr. waren gekauft und ausgezahlt, aber nicht gewonnen. Jetzt gewonnen, Ankauf-Stand zum Kaufdatum.
+    - 6 Ankauf-Objekte trugen ein vergangenes Kaufdatum (meist 23.12.2024). Sie haben jetzt ein geplantes Kaufdatum 12/2026 bis 04/2027; Übergang und Darlehensauszahlung ziehen mit.
+    - Stand jetzt: Bestand 10, Ankauf 24, davon 14 Testreste.
+  - **Geschichten:**
+    - 2026-1053 Ravensberger Weg 38: im Bestand seit 2020, **über Plan** (NKM 4.910 → 5.500 €, DSCR 1,22 → 1,37, Cashflow nach Steuern +55 %).
+    - 2026-1054 Bismarckstr. 27: seit 2023, **unter Plan** (zweite Einheit leer, Instandhaltung +40 %, DSCR 1,18 → 0,97, Cashflow negativ). Vorher Bewirtschaftung aus den Standardwerten gesetzt; die Instandhaltung stand auf 0.
+    - 2026-1052 Gohliser: **Steuer-Geschichte**. Die Steuerlast steigt (Jahr 2: 555 €, Jahr 6: 3.942 €); 2029 sind 40.000 € Erhaltungsaufwand geplant (mit Bemerkung). Das Jahr dreht auf 12.667 € Erstattung, gespeichert in `tax_records.erhaltungsaufwand`.
+  - **Demo Immobilien GmbH** angelegt (KSt 15,825 %, erweiterte Kürzung) und den beiden Überführungsobjekten 1007 und 1008 zugeordnet.
+- **Drei echte Fehler, dabei gefunden:**
+  - **v2212** `bb63a544`: Der Überführungs-Assistent gibt das Stichtagsdatum auch dem neuen Gesellschaftsobjekt (v816h), und `calc.js` kappte dessen Projektion auf ein Jahr. Gemessen: 1007 und 1008 hatten 15 Jahre Zeitraum, aber eine Zeile. Jetzt kappt nur die Privatseite (`obj_herkunft = 'ueberfuehrung'` markiert die Gesellschaft).
+  - **v2212a / v2212b** `943cb64b`, `37dca6df`:
+    - Mandanten lagen nur im Browser (`dp_mandanten`). Jetzt hängen sie zusätzlich am Konto (`/user-settings/mandanten`, Abgleich je id).
+    - Die Halterwahl prüfte nur `'pro'`. Im Partner-Tarif war sie immer auf Privat gesperrt; das ist dasselbe Muster wie v1081.
+  - **v2212c** `f4d101e5`: `_computeYearTotal` (tax.js) rechnet immer Einkommensteuer mit Erstattung, und `calc.js` überschrieb damit die KSt jeder Projektionszeile. Alle GmbH-Objekte rechneten Cashflow nach Steuern mit persönlicher ESt. Jetzt gilt das Halter-Regime. 1008: 1.953 € Ergebnis → 309 € (15,825 %), Verlust → 0.
+- **Nachweis:** jede Änderung nach dem Speichern vom Server zurückgelesen; Abweichungen mit `abweichungFuer`; Projektion vor und nach den Fixes; Privatobjekt 1052 unverändert.
+- **Rest:**
+  - 14 Testreste darf ich nicht löschen (endgültiges Löschen). Die Liste geht an Marcel:
+    - 2026-1090, 2026-1101 „Unbenannt“
+    - 2026-1091 bis 2026-1095 (Layouttest)
+    - 2026-1096 bis 2026-1100 (5× gleiches MFH Wilhelm-Busch)
+    - 2026-1078 und 2026-1079 „Teststraße“
+    - dazu 2026-1088 und 2026-1089 (doppelt bzw. leer)
+  - **RND:** Für 16 Objekte ist sie jetzt festgehalten (`_rnd`, wie der Assistent seit v2068), gerechnet mit `DealPilotRND.mapDealPilotObject(collectData())` → `calcAll`. Beispiele: Löhner Str. 278 19,3/80, Westerfeldstr. 140 23,6/80, Alexanderstr. 11 30,9/80. Vier Objekte (1052, 1056, 004, 1054) sind älter als die Gesamtnutzungsdauer; der Kern sperrt sie bewusst (`uebernahme_gesperrt`, sachverständige RND nötig). Das ist eine Frage an Marcel. Für Westerfeldstr. und Alexanderstr. liegen echte RND-Gutachten unter `Dateien/`, sie sind der Prüfmaßstab.
+  - Die BMF-Aufteilung hat noch kein Objekt.
+  - `config.js` `getBranding()` prüft ebenfalls nur `'pro'`. Eigenes Branding ist im Partner-Tarif darüber gesperrt, das läuft über den Whitelabel-Weg und ist nicht angefasst.
+
+### v2211 / v2211a · Staging · Einstellungen → Standardwerte aufgeräumt (14.10.2026)
+- **Was:** Marcels Liste (N65).
+  - Karten ohne Icons, die ganze Karte ist klickbar, die Detailansicht ist ein ruhiges Panel.
+  - Das gewählte Set wird gemerkt (`dp_std_set`). Ein Band nennt die Grundlage, Felder aus dem Set tragen das Etikett „Set“, abweichende „eigen“.
+  - Finanzierung: Entweder-oder „Indikativer Marktzins“ oder „Eigener Zinssatz“.
+    - Nebenbefund: Neue Objekte bekamen fest **3,50 %** (`main.js` `setDefaults`).
+    - Ursache: `applyToNewObject` füllt nur leere Felder, und `d1z` war nie leer.
+  - Bewirtschaftung ist **eine** Karte.
+    - Umschalter für neue Objekte: Euro je Objektart (Standard) oder % der NKM (`switchBwkMode`).
+    - Begründung aus der Recherche: ImmoWertV Anlage 3 und BelWertV rechnen Verwaltung und Instandhaltung in Euro, nur den Mietausfall in %.
+    - `bwk-profil.js` führt die Jahreswerte selbst (367 € / 14,40 € / 48 € / 108 €) aus `/bwk/ansaetze`, statt „Basiswert 230 € × Faktor 1,6“. Altprofile werden umgerechnet.
+  - Lageklassen: Mietausfall, Bewirtschaftung nicht umlagefähig und Eigenkapital je Lage entfernt. Sie wurden gespeichert, aber nie gelesen (`LP.zusatz()` hatte keinen Aufrufer).
+  - Steuer: Erklärung des Satzes von 40,45 % und ein Verweis auf Mandanten (nur GmbH/UG haben dort einen Satz). Platzhalter `#grenz` steht jetzt auf 40,45 statt 42.
+  - Quick-Check: `qc_hg_split` („% vom Hausgeld“) bekam `bwk_anteil_default` (16, „% der NKM“). Jetzt kommt der ETW-Anteil aus `bwk-profil` (30).
+- **Commit:** `45917195`, `c1fef5c1`
+- **Nachweis (Browser, Staging, Konto Marcel):**
+  - Karten ohne Icons, Etiketten Set/eigen, Bewirtschaftung 367 €/Jahr.
+  - Zins-Umschalter: Marktzins → Feld gesperrt mit 4,22; eigener Zins → Feld frei; zurück → 4,22 und wieder gesperrt.
+  - `setDefaults()` ergibt `d1z` = 4,22 (vorher 3,50).
+  - Lageklassen nur noch 3 Felder; Verweis auf Mandanten vorhanden.
+  - Quick-Check-iframe (v2211): `qc_hg_split` = 30, `qc_zins` = 4,22.
+  - `buster-ebenen` SAUBER.
+- **Rest:**
+  - Der Mietausfall steht im Standard-Set bei 1 %, nach Anlage 3 bei 2 %. Das bleibt Marcels Entscheidung vom 01.10.
+  - `applyToNewObject` zielt weiter auf IDs, die es nicht gibt (`tilgung`, `zinsbindung` …); wirksam ist der Weg über `main.js`.
+
+### v2210 / v2210b · Staging · Schwärzen im Dokument-Import, Gewerbe im Ertragswert (14.10.2026)
+- **Was:**
+  - **v2210** (`8590d45e`), Marcel: „Ja gerne schwärzen“.
+    - `backend/src/services/schwaerzen.js` (regelbasiert): schwärzt Geburtsdaten, Geburtsnamen, „Nachname, Vorname, geb.“, Namen nach Herr/Frau/Eheleute/Notar, Anschriften nach „wohnhaft“, E-Mail, Telefon, IBAN, Steuer-ID.
+    - Läuft vor dem Versand in extract-dokument, -expose, -rndg und -market-data.
+    - Die Schemata fragen keine Namen, Geburtsdaten oder Anschriften mehr ab, nur Anzahl und Anteile.
+  - **v2210b** (`3fccd761`), Gewerbe getrennt nach § 31 Abs. 2 und Anlage 3.
+    - Im MFH-Konfigurator bekommt eine Gewerbeeinheit die Nutzungsart und die marktübliche Miete.
+    - `_mfh_einheiten` wird mit dem Objekt an den Bericht übergeben.
+    - Der Mapper leitet `gewerbeAus()` ab, der Orchestrator übernimmt es als `ref.gewerbe`.
+    - CrossCheck:
+      - Die Wohnmiete wird nur auf den Wohnteil angesetzt.
+      - Gewerbe läuft mit der Marktmiete, sonst mit der Ist-Miete (indikativ).
+      - Leerstehendes Gewerbe ohne Marktmiete: kein Ertragswert.
+      - Gewerbeanteil am Rohertrag; ab 20 % Hinweis auf den Liegenschaftszins für Wohn- und Geschäftshäuser.
+      - Abweichung Ist/Markt ab 10 % → Hinweis auf boG.
+      - Mit Gewerbe gibt es keine Wohnquote und keine Pauschale.
+    - ErtragswertService: Gewerbe-Instandhaltung je Nutzungsart aus `BWK_JAHRE`.
+- **Nachweis:**
+  - Schwärzen, echter Aufruf aus der App mit einem erfundenen Grundbuch: Die Antwort enthält keinen Namen und kein Geburtsdatum, sondern `eigentuemer_anzahl: 2`, `berechtigter_art: Person`. Die Bank bleibt stehen.
+  - Gewerbe: Funktionslauf 300 m² Wohnen + 100 m² Büro gibt BWK 1.828 / 5.760 / 1.056 = 8.644 €, gleich der Handrechnung. Das EW-RL-Beispiel bleibt unverändert.
+  - Ende-zu-Ende Bericht 204 (Staging, Konto Marcel, Testobjekt Bünde): Rohertrag 26.064 + 12.000 €, Gewerbeanteil 31,5 %, Hinweise wie gebaut.
+  - `objekt-mapper-pruefen` RC=0, `buster-ebenen` SAUBER.
+- **Rest:**
+  - Den Zweig des Liegenschaftszinses wählt der Bericht noch nicht automatisch nach Gewerbeanteil (`zweigwahl.js`, `WertParameterService`). Bisher gibt es nur den Hinweis.
+  - Im NRW-Modell (`agvga_nrw_2016`) bleibt Gewerbe ohne eigene Bewirtschaftungskosten.
+  - Belegbilder werden nicht geschwärzt.
+  - Ein Name ohne Signalwort bleibt stehen.
+  - Ein amtliches Anwendungsbeispiel für gemischte Nutzung gibt es nicht. Abnahme an einem echten Gutachten für ein Wohn- und Geschäftshaus.
+
+### v2209 · Staging · Rumpfjahr-Zinsen, store:false (14.10.2026)
+- **Was:**
+  - `calc.js` D1 und D2: Die Zinsmonate im Jahr 1 zählen jetzt gegen `_v268_baseYear` (Projektionsjahr 1 = WU, sonst Kaufdatum, sonst heute) statt gegen das Auszahlungsjahr selbst. Vorher wurde jede Auszahlung mit ihrem eigenen Jahr verglichen.
+  - `store: false` an allen 10 `/v1/responses`-Aufrufen (openaiService 2, agentLauf, ai.js, voiceExtract 3, mb: Harvest, KiGegenrechnung, MarktberichtImport).
+- **Commit:** `cde5c927`, backend und mb-backend auf Staging neu gebaut.
+- **Nachweis:**
+  - Echte Funktionen aus `anteilig.js` in Node: WU 23.12.2024 / Auszahlung 01.2025 → ALT 12 Monate (56.274 €), NEU 0. WU 04.2024 / Auszahlung 12.2023 → ALT **1**, NEU 12. Drei weitere Fälle unverändert richtig. 5/5.
+  - Im Container: echter Aufruf 200, Antwort `store: false`; `dealpilot-backend` healthy.
+- **Marcel hatte recht, dass beides anteilig gerechnet wird** — der Fehler lag in der Jahreszuordnung, nicht in der Anteiligkeit.
+- **Rest:** Auszahlung mitten in Jahr 2 läuft dort voll. Im Browser an 2026-1052 nicht nachgesehen (Erweiterung nicht verbunden). Prod.
+- **Befunde für Marcel** (Backlog N64): Dokument-Import schickt Personendaten Dritter; Gewerbe-Rohertrag kommt im Ertragswert nie an.
+
+### v2208 · Staging · Fehlerverdachte aus der Hilfe-Erhebung, Rest (14.10.2026)
+- **Was:** Die neun Verdachte aus N62.22 nachgemessen. **Acht waren schon behoben**: v2191 (`ad26710b`) hatte 1–3, 5, 6, 8, 9 erledigt, Punkt 4 stand schon seit v1963. Der Backlog führte sie trotzdem als „nicht nachgemessen". Meine Antwort am Vormittag nannte sie als offen, das war falsch.
+  - **Echt offen war Punkt 7:** `mandanten.js` „Steuerregime · wird in Stufe 2 aktiv". Das rechnet längst (`effRate()` Z. 328, `gesellschaft-abschluss.js`). Dazu: Buchhaltung „(Stufe 3)" und „später Basis für … DATEV-Export". Den Jahresabschluss gibt es seit v1227, einen DATEV-Export gibt es nirgends. Jetzt: „rechnet in Steuer und Jahresabschluss", „für den Jahresabschluss (GuV und Bilanz)", ohne DATEV.
+  - `help.js` zitierte noch „Auto-saved · gerade eben", der Kopf sagt seit v2191 „Gespeichert · gerade eben". Der Ausgangstext in `index.html` ist jetzt ebenfalls deutsch.
+- **Commit:** `83283246`, `ce5df2f7` (frontend-konstanten.json, nur der Fingerabdruck von index.html).
+- **Nachweis:** `node --check` beide Dateien, `buster-ebenen-pruefen` SAUBER, auf Staging per grep: neuer Text da, „Auto-saved" 0×, Buster v2208. Im Browser nicht gesehen (Erweiterung nicht verbunden), Staging-Abnahmepunkt.
+- **Rest:** Frage an Marcel: kein Speichern-Knopf, kein Strg+S. `dpManualSave()` existiert, ruft aber niemand auf. Gesichert wird beim Reiter- und Objektwechsel; beim Schließen mit Änderungen warnt nur der Browser.
+
+### v2207 · Prod (17) · Grunderwerbsteuer Thüringen und Bremen (13.10.2026)
+
+- **Was:** Mit Quellen geprüft: Thüringen **5,0 %** seit 01.01.2024 (vorher 6,5), Bremen **5,5 %** seit 01.07.2025 (vorher 5,0). Korrigiert in beiden rechnenden Tabellen und in der Anzeige:
+  - `grest-plz-lookup.js` (Objekt)
+  - `quick-check.js` `_qcGrEStByLand` (Quick-Check)
+  - Beschriftung der Bundesland-Auswahl in den Standardwerten (`investment-profile.js`: dort stand Sachsen 3,5 statt 5,5 und Bremen 5,0)
+  - Hilfe-Glossar
+- **Commit:** `342c6f62`, Prod (17) `9a7e1f5c`, Backend neu gebaut (`frontend-konstanten.json`).
+- **Nachweis:**
+  - `DealPilotGrest.forPlz`: 99084 und 07743 → TH 5, 28195 → HB 5,5, 01067 → SN 5,5, 80331 → BY 3,5, 40210 → NW 6,5.
+  - Prod liefert `'HB': 5.5`, `'TH': 5.0`.
+- **Nachtrag N63.9:** Halten zum Sprechen in der Messkabine (390 px) mit künstlichem Tonstrom statt Mikrofon geprüft (getUserMedia im Messrahmen ersetzt, nur Test). Drücken → Aufnahme, Loslassen → 53 KB WebM an /ai/extract-voice, Antwort „Keine Sprache erkannt“, danach Ruhe. Zweiter Lauf mit echter Sprache (Windows-TTS „Hedda“ de-DE, WAV vorübergehend unter /_test auf Staging, danach gelöscht): Halten zeigt „Ich höre dich …“, 61 KB WebM, Transkript wörtlich richtig, Feld wfl=85, Co-Pilot „Das nehme ich gleich mit: Wohnfläche 85“.
+- **Rest:** Es gibt zwei rechnende Tabellen (Objekt, Quick-Check) mit eigenen Schlüsseln. Bei der nächsten Änderung eines Satzes beide anfassen; besser wäre eine gemeinsame Quelle.
 
 ### v2206 · Prod (16) · Standardwerte als Karten (N63.5, 13.10.2026)
 

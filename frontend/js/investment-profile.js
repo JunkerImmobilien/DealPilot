@@ -195,16 +195,18 @@ window.DealPilotInvestmentProfile = (function() {
           '  <div class="ip-lage-kopf"><b>' + e.name + '</b><span>' + e.sub + '</span></div>',
           '  <div class="ip-lage-grid">',
           '    <label>Zielrendite ' + zf('ziel_bmr', 'Pflicht') + ' <span class="ip-suffix">% brutto</span></label>',
-          '    <label>Mietausfall ' + zf('mietausfall_pct', 'Standard') + ' <span class="ip-suffix">% NKM</span></label>',
-          '    <label>Bewirt. n. uml. ' + zf('bwk_anteil_default', 'Standard') + ' <span class="ip-suffix">% NKM</span></label>',
-          '    <label>Eigenkapital ' + zf('ek_quote_default', 'Standard') + ' <span class="ip-suffix">% KP</span></label>',
+          /* v2211 · Mietausfall, Bewirtschaftung n. uml. und Eigenkapital je Lage
+             entfallen: gespeichert, aber von KEINER Rechnung gelesen (LP.zusatz()
+             hatte keinen Aufrufer) - sie doppelten nur die Karten Bewirtschaftung
+             und Finanzierung. Marcel 14.10.: „ob das Sinn macht oder ob wir das
+             dann schon in Bewirtschaftung drinne haben". */
           '  </div>',
           '</div>'
         ].join('');
       }).join('');
       return [
         '<h3 class="ip-section">Lageklassen A · B · C</h3>',
-        '<p class="hint">Die <b>Zielrendite</b> ist das Einzige, was gebraucht wird. Im Quick-Check wählst du die Klasse, und DealPilot rechnet aus, auf welchen Kaufpreis du verhandeln müsstest, um sie zu erreichen. Die drei Werte daneben sind freiwillig — bleiben sie leer, gelten deine Standardwerte von oben. Die Vorbelegung ist marktüblich: gute Lage, wenig Rendite.</p>',
+        '<p class="hint">Die <b>Zielrendite</b> ist das Einzige, was gebraucht wird. Im Quick-Check wählst du die Klasse, und DealPilot rechnet aus, auf welchen Kaufpreis du verhandeln müsstest, um sie zu erreichen. Mietausfall, Bewirtschaftung und Eigenkapital stehen nicht je Lage, sondern einmal in den Karten Bewirtschaftung und Finanzierung. Die Vorbelegung ist marktüblich: gute Lage, wenig Rendite.</p>',
         '<div class="ip-lage-box">' + zeilen + '</div>',
         /* v2159 · N62.11: die Standardklasse fuer neue Quick-Checks. */
         '<label class="ip-lage-std-z">Standard für neue Quick-Checks ',
@@ -244,12 +246,31 @@ window.DealPilotInvestmentProfile = (function() {
       '<div class="ip-grid">',
         field('ip_tilgung_default',     'Standard-Tilgung',          p.tilgung_default,     '% p.a.', 'z.B. 2,5 %'),
         (function(){ var bind = String(p.zinsbindung_default || 10); var o = ['5','10','15','20'].map(function(y){ return '<option value="'+y+'"'+(y===bind?' selected':'')+'>'+y+' Jahre</option>'; }).join(''); return '<div class="ip-field"><label for="ip_zinsbindung_default">Standard-Zinsbindung</label><div class="ip-field-row"><select id="ip_zinsbindung_default">'+o+'</select></div><div class="ip-hint">Zins-Quelle: indikativer Pfandbrief-Satz dieser Bindung</div></div>'; })(),
-        field('ip_zins_override', 'Eigener Zinssatz (optional)', p.zins_override, '%', 'leer = indikativer Satz der Zinsbindung'),
+        /* v2211 · Marcel: „eine Checkbox, dass wir selber den Zins und die Tilgung eingeben
+           oder halt den indikativen Satz ziehen ... entweder-oder". Vorher: ein Feld, das
+           leer den Marktzins bedeutete - nicht erkennbar. */
+        '<div class="ip-field ip-zins-wahl"><label>Zinssatz für neue Objekte</label>' +
+          '<div class="ip-zins-modi">' +
+            '<label><input type="radio" name="ip_zins_modus" value="markt"' + ((p.zins_override == null || String(p.zins_override) === '') ? ' checked' : '') + '> Indikativer Marktzins</label>' +
+            '<label><input type="radio" name="ip_zins_modus" value="eigen"' + ((p.zins_override != null && String(p.zins_override) !== '') ? ' checked' : '') + '> Eigener Zinssatz</label>' +
+          '</div>',
+        field('ip_zins_override', 'Eigener Zinssatz', p.zins_override, '%', 'Marktzins: Pfandbrief-Rendite der Zinsbindung plus Bonitätsaufschlag, täglich aktuell') + '</div>',
         (function(){ var mg = String(p.zins_margin || 'standard'); var L = [['premium','Top (LTV ≤ 60 %)'],['standard','Normal (LTV 60–80 %)'],['schwach','Schwächer (LTV > 90 %)']]; var o = L.map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===mg?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_zins_margin">Zins-Stufe (Bonität / LTV)</label><div class="ip-field-row"><select id="ip_zins_margin">'+o+'</select></div><div class="ip-hint">Marge auf den Pfandbrief-Satz — nur bei indikativem Zins (eigener Zinssatz übersteuert)</div></div>'; })(),
         field('ip_ek_quote_default',    'Standard-Eigenkapital',     p.ek_quote_default,    '% v. KP', 'wird automatisch in € umgerechnet'),
       '</div>',
 
       '<h3 class="ip-section">Bewirtschaftung</h3>',
+      /* v2211 · Marcel: „dass man das umschaltet in Euro-Werten und in Prozent. Das prüf
+         bitte, was man da üblicherweise macht." Recherche: ImmoWertV Anlage 3 und die
+         Beleihungswertermittlung setzen Verwaltung (€ je Einheit) und Instandhaltung
+         (€/m²) in EURO an, nur das Mietausfallwagnis in Prozent; „15-25 % der Kaltmiete"
+         ist eine Faustregel der Rechner. Deshalb: Euro ist der Standard, Prozent der
+         Rückfall. Der Reiter Bewirtschaftung kennt beide Modi (switchBwkMode). */
+      '<div class="ip-field ip-bwk-wahl"><label>Neue Objekte rechnen die Bewirtschaftung mit</label><div class="ip-zins-modi">' +
+        '<label><input type="radio" name="ip_bwk_modus" value="detail"' + (p.bwk_modus_default !== 'percent' ? ' checked' : '') + '> Euro-Werten je Objektart <small>(empfohlen, wie ImmoWertV und Banken)</small></label>' +
+        '<label><input type="radio" name="ip_bwk_modus" value="percent"' + (p.bwk_modus_default === 'percent' ? ' checked' : '') + '> Prozent der Nettokaltmiete <small>(Faustregel)</small></label>' +
+      '</div></div>',
+      '<h4 class="ip-unter">Prozent der Nettokaltmiete</h4>',
       '<div class="ip-grid">',
         /* v1257 · Marcels Wunsch: „Mietausfall und BWK-Quote kannst du gerne
            in die Einstellungen packen." Die nicht-umlagefähige Quote stand
@@ -257,7 +278,7 @@ window.DealPilotInvestmentProfile = (function() {
            _dpProfilWert, bis v1431 _dpProfil). Jetzt wirken alle drei. */
         field('ip_bwk_ul_pct_default', 'Bewirtschaftung umlagefähig', p.bwk_ul_pct_default, '% der NKM', 'Hausgeld umlagefähig, Grundsteuer — typisch 15–20 %'),
         field('ip_bwk_anteil_default', 'Bewirtschaftung nicht umlagefähig', p.bwk_anteil_default, '% der NKM', 'Verwaltung, Rücklagen — typisch 15–22 %'),
-        field('ip_mietausfall_pct', 'Kalkulatorischer Mietausfall', p.mietausfall_pct, '% der NKM', 'wird beim neuen Objekt in Euro umgerechnet — A-Lage eher 1 %, C-Lage eher 3 % — je Lageklasse getrennt: siehe unten.'),
+        field('ip_mietausfall_pct', 'Kalkulatorischer Mietausfall', p.mietausfall_pct, '% der NKM', 'wird beim neuen Objekt in Euro umgerechnet — gilt in beiden Rechenwegen; A-Lage eher 1 %, C-Lage eher 3 % (ImmoWertV: 2 % Wohnen).'),
         (function(){ var presets = ['','0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0']; var cur = (p.hausgeld_pct != null && p.hausgeld_pct !== '') ? String(p.hausgeld_pct) : ''; var isP = presets.indexOf(cur) >= 0; var o = [['','— (aus)'],['0.5','0,5 % vom KP / Jahr'],['1.0','1,0 %'],['1.5','1,5 %'],['2.0','2,0 %'],['2.5','2,5 %'],['3.0','3,0 %'],['4.0','4,0 %'],['5.0','5,0 %']].map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===(isP?cur:'')?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_hausgeld_sel">Hausgeld-Annahme</label><div class="ip-field-row"><select id="ip_hausgeld_sel">'+o+'</select></div><div class="ip-hint">Anteil vom Kaufpreis p.a. — Fallback — nur wenn keine Wohnfläche vorliegt (sonst Wohnflächen-Schätzung)</div></div>'; })(),
         field('ip_hausgeld_pct', 'Eigener Hausgeld-Anteil (optional)', (p.hausgeld_pct != null && ['0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0',''].indexOf(String(p.hausgeld_pct)) < 0) ? p.hausgeld_pct : '', '% vom KP/Jahr', 'übersteuert die Schnellauswahl'),
       '</div>',
@@ -286,8 +307,13 @@ window.DealPilotInvestmentProfile = (function() {
 
       '<h3 class="ip-section">Steuer</h3>',
       '<div class="ip-grid">',
-        field('ip_grenzsteuersatz', 'Grenzsteuersatz', p.grenzsteuersatz, '%', 'für Steuer-Modul'),
+        field('ip_grenzsteuersatz', 'Persönlicher Grenzsteuersatz', p.grenzsteuersatz, '%', 'Vorbelegung 40,45 %. Gilt für Objekte im Privatvermögen, solange im Reiter Steuer kein zu versteuerndes Einkommen steht — mit Einkommen rechnet DealPilot den Satz selbst aus.'),
       '</div>',
+      /* v2211 · Marcel: „wir können ja auch unseren Steuersatz unter Mandanten angeben ... dorthin verlinken".
+         Gemessen: Mandanten führt den Satz nur für GESELLSCHAFTEN (effRate: KSt + GewSt);
+         für Privat und GbR liefert es null, dann gilt dieser Satz hier. */
+      '<p class="hint">Gehört ein Objekt einer <b>GmbH oder UG</b>, rechnet DealPilot mit Körperschaft- und Gewerbesteuer des Halters statt mit diesem Satz. ' +
+        '<a href="#" onclick="event.preventDefault();showSettings(\'mandanten\')">Halter und ihre Steuersätze unter Mandanten →</a></p>',
 
       '<h3 class="ip-section">Standort & Nebenkosten</h3>',
       '<div class="ip-grid">',
@@ -358,6 +384,7 @@ window.DealPilotInvestmentProfile = (function() {
       bwk_ul_pct_default:     v('ip_bwk_ul_pct_default'),
       bwk_anteil_default:     v('ip_bwk_anteil_default'),
       mietausfall_pct:        v('ip_mietausfall_pct'),
+      bwk_modus_default:      (function(){ var r=document.querySelector('input[name="ip_bwk_modus"]:checked'); return r ? r.value : null; })(),   /* v2211 */
       min_dscr:               v('ip_min_dscr'),
       min_cashflow_vor_st:    v('ip_min_cashflow_vor_st'),
       max_ltv:                v('ip_max_ltv'),
@@ -429,8 +456,16 @@ window.DealPilotInvestmentProfile = (function() {
     var inp=document.getElementById('ip_zins_override'); if(!inp || inp._mktWired) return; inp._mktWired=1;
     var lab=document.querySelector('label[for="ip_zins_override"]');
     function setLabel(market){ if(lab) lab.textContent = market ? 'Marktzinssatz' : 'Eigener Zinssatz (optional)'; }
-    function toMarket(){ var r=_mktZins(); if(r==null) return; inp.dataset.market='1'; inp.value=r.toFixed(2); setLabel(true); }
-    function toOverride(){ inp.dataset.market=''; setLabel(false); }
+    function toMarket(){ var r=_mktZins(); if(r==null) return; inp.dataset.market='1'; inp.value=r.toFixed(2); inp.readOnly=true; setLabel(true); _radio('markt'); }
+    function toOverride(){ inp.dataset.market=''; inp.readOnly=false; setLabel(false); _radio('eigen'); }
+    /* v2211 · Entweder-oder: die Radios schalten das Feld */
+    function _radio(w){ var r=document.querySelector('input[name="ip_zins_modus"][value="'+w+'"]'); if(r) r.checked=true; }
+    [].slice.call(document.querySelectorAll('input[name="ip_zins_modus"]')).forEach(function(r){
+      r.addEventListener('change', function(){ if(!r.checked) return;
+        if(r.value==='markt'){ inp.value=''; toMarket(); }
+        else { toOverride(); try{ inp.focus(); inp.select(); }catch(e){} }
+        try{ inp.dispatchEvent(new Event('change',{bubbles:true})); }catch(e){} });
+    });
     if(!String(inp.value).trim()){ toMarket(); if(inp.dataset.market!=='1'){ setTimeout(function(){ if(!String(inp.value).trim()) toMarket(); },500); } }
     else { toOverride(); }
     ['ip_zinsbindung_default','ip_zins_margin'].forEach(function(id){ var el=document.getElementById(id); if(!el||el._mktBound) return; el._mktBound=1; el.addEventListener('change', function(){ if(inp.dataset.market==='1') toMarket(); }); });

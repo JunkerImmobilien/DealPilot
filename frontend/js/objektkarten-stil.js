@@ -132,7 +132,10 @@
     if (gewaehlt !== null) return gewaehlt;
     /* v2178: ohne Layout (DealPilot) ist der Standard die Kennzahlen-Karte -
        Marcel am 13.10.2026; ihre CSS ohne Layout steht seit v2114. */
-    return layoutAktiv() ? 'datenzeile' : 'kennzahlen';
+    /* v2216c · Marcel 14.10.2026: „unter Anzeige … ist der Auslieferungszustand
+       immer Aktenmappe mit Boardkarte." Damit gilt wieder v1915 statt v2083a
+       (Datenzeile). Das Onboarding setzt dasselbe (onboarding.js). */
+    return layoutAktiv() ? 'bordkarte' : 'kennzahlen';
   }
 
   /* Eine eigene Wahl. Sie wird gemerkt UND angewandt. */

@@ -57,11 +57,20 @@
 
   var LS = 'dp_bwk_profil';
   var FERN = '/user-settings/bwk_profil';
+  /* v2211 · EURO-WERTE ZUM JAHR statt „Basiswert x Faktor".
+     Marcel 14.10.2026: „wir haben doch in unserer neuen Datenbank dafür, wie
+     viel man pro Quadratmeter ansetzt". Die Karte zeigte „EFH Verwaltung 230 €"
+     und daneben „Faktor 1,6" - gerechnet wurde 368 €, gelesen 230 €. Jetzt
+     stehen die fortgeschriebenen Anlage-3-Werte selbst da (2026: 367 € je
+     Wohnung, 14,40 €/m², Garage 48 € Verwaltung / 108 € Instandhaltung) und
+     werden zum Jahr aus derselben Tabelle nachgeladen wie im Marktbericht
+     (/marktbericht/bwk/ansaetze). Der Faktor bleibt intern 1. */
+  var BASIS_ALT = { verw: 230, inst_qm: 9.0, stp_inst: 68, stp_verw: 30 };
   var STANDARD = {
-    faktor: 1.60,   /* v2185: Stichtage ab 01.01.2026 - siehe Kopf */
+    faktor: 1,
     etw: { hg_qm: 4.00, nul_pct: 30, ruecklage_qm: 0.50 },
-    efh: { verw: 230, inst_qm: 9.0, stp_inst: 68, bk_qm: 2.20 },
-    mfh: { verw: 230, stp_verw: 30, inst_qm: 9.0, stp_inst: 68, bk_qm: 2.50 }
+    efh: { verw: 367, inst_qm: 14.40, stp_inst: 108, bk_qm: 2.20 },
+    mfh: { verw: 367, stp_verw: 48, inst_qm: 14.40, stp_inst: 108, bk_qm: 2.50 }
   };
   var ART = { ETW: 'etw', EFH: 'efh', ZFH: 'efh', DHH: 'efh', RH: 'efh', MFH: 'mfh' };
   var NAME = { etw: 'Eigentumswohnung', efh: 'Ein-/Zweifamilienhaus', mfh: 'Mehrfamilienhaus' };
@@ -85,13 +94,24 @@
     try { p = JSON.parse(localStorage.getItem(LS) || 'null'); } catch (e) {}
     var s = kopie(STANDARD);
     if (!p || typeof p !== 'object') return s;
-    if (p.faktor_eigen && zahl(p.faktor) != null) s.faktor = zahl(p.faktor);   /* v2186: nur ein SELBST gesetzter Faktor gilt vor dem Jahreswert */
+    /* v2211 · Altprofile (bis v2210) speicherten BASISwerte und einen Faktor.
+       Ein unveraenderter Basiswert faellt weg (es gilt der Jahreswert), ein
+       selbst geaenderter wird mit dem damaligen Faktor in Euro umgerechnet. */
+    var altFaktor = (p.v !== 2) ? ((p.faktor_eigen && zahl(p.faktor) != null) ? zahl(p.faktor) : 1.60) : 1;
     ['etw', 'efh', 'mfh'].forEach(function (a) {
-      Object.keys(s[a]).forEach(function (k) { if (p[a] && zahl(p[a][k]) != null) s[a][k] = zahl(p[a][k]); });
+      Object.keys(s[a]).forEach(function (k) {
+        var w = p[a] ? zahl(p[a][k]) : null; if (w == null) return;
+        if (p.v !== 2 && BASIS_ALT[k] != null) {
+          if (Math.abs(w - BASIS_ALT[k]) < 1e-9) return;
+          w = Math.round(w * altFaktor * 100) / 100;
+        }
+        s[a][k] = w;
+      });
     });
     return s;
   }
   function schreiben(p) {
+    p.v = 2; p.faktor = 1; delete p.faktor_eigen;   /* v2211: Euro-Werte, kein Faktor */
     try { localStorage.setItem(LS, JSON.stringify(p)); } catch (e) {}
     try { if (window.Auth && Auth.apiCall) Auth.apiCall(FERN, { method: 'PUT', body: { wert: p } }).catch(function () {}); } catch (e) {}
   }
@@ -102,8 +122,13 @@
   function jahresFaktor() {
     if (!window.Auth || !Auth.apiCall) return;
     Auth.apiCall('/marktbericht/bwk/ansaetze?jahr=' + new Date().getFullYear(), { method: 'GET' }).then(function (r) {
-      var q = r && r.werte && r.werte.inst_qm;
-      if (q > 0) { STANDARD.faktor = Math.round(q / 9 * 100) / 100; STANDARD.jahr = r.stichtag_jahr; leisteZeichnen(); }
+      var w = r && r.werte; if (!w) return;
+      /* v2211: die Jahreswerte selbst, nicht mehr als Faktor */
+      if (w.verw_we > 0) { STANDARD.efh.verw = w.verw_we; STANDARD.mfh.verw = w.verw_we; }
+      if (w.inst_qm > 0) { STANDARD.efh.inst_qm = w.inst_qm; STANDARD.mfh.inst_qm = w.inst_qm; }
+      if (w.inst_garage > 0) { STANDARD.efh.stp_inst = w.inst_garage; STANDARD.mfh.stp_inst = w.inst_garage; }
+      if (w.verw_garage > 0) STANDARD.mfh.stp_verw = w.verw_garage;
+      STANDARD.jahr = r.stichtag_jahr; leisteZeichnen();
     }).catch(function () {});
   }
   function vomServer() {
@@ -131,7 +156,7 @@
     var inst = (h.inst_qm * wfl + h.stp_inst * stp) * f;
     return { art: a, hg_ul: Math.round(h.bk_qm * wfl * 12), hg_nul: Math.round(verw), eigen_r: Math.round(inst),
       text: 'Betriebskosten ' + de(h.bk_qm, 2) + ' €/m² · Verwaltung ' + de(h.verw) + ' € × ' + de(einheiten) + (a === 'mfh' && stp ? ' + ' + de(h.stp_verw) + ' € × ' + de(stp) + ' Stellpl.' : '')
-        + ' · Instandhaltung ' + de(h.inst_qm, 2) + ' €/m²' + (stp ? ' + ' + de(h.stp_inst) + ' € × ' + de(stp) + ' Stellpl.' : '') + ' · Faktor ' + de(f, 2) + ' (ImmoWertV Anlage 3)' };
+        + ' · Instandhaltung ' + de(h.inst_qm, 2) + ' €/m²' + (stp ? ' + ' + de(h.stp_inst) + ' € × ' + de(stp) + ' Stellpl.' : '') + ' (ImmoWertV Anlage 3' + (STANDARD.jahr ? ', ' + STANDARD.jahr : '') + ')' };
   }
   function de(n, d) { return Number(n).toLocaleString('de-DE', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
   function ausFormular() {
@@ -204,14 +229,14 @@
     etw: [['hg_qm', 'Hausgeld-Startwert', '€/m² · Monat', 'gilt, bis ein Wirtschaftsplan vorliegt'],
           ['nul_pct', 'davon nicht umlagefähig', '% des Hausgelds', 'teilt das Hausgeld automatisch auf'],
           ['ruecklage_qm', 'Eigene Rücklage Sondereigentum', '€/m² · Monat', 'Bad, Küche, Böden der eigenen Wohnung']],
-    efh: [['verw', 'Verwaltung', '€ je Gebäude · Jahr', 'ImmoWertV Anlage 3: 230 € Basiswert'],
-          ['inst_qm', 'Instandhaltung', '€/m² · Jahr', 'ImmoWertV Anlage 3: 9,00 € Basiswert'],
-          ['stp_inst', 'Instandhaltung Garage/Stellplatz', '€ · Jahr', 'ImmoWertV Anlage 3: 68 €'],
+    efh: [['verw', 'Verwaltung', '€ je Gebäude · Jahr', 'ImmoWertV Anlage 3, zum Jahr fortgeschrieben (2026: 367 €)'],
+          ['inst_qm', 'Instandhaltung', '€/m² · Jahr', 'ImmoWertV Anlage 3, zum Jahr fortgeschrieben (2026: 14,40 €)'],
+          ['stp_inst', 'Instandhaltung Garage/Stellplatz', '€ · Jahr', 'ImmoWertV Anlage 3 (2026: 108 €)'],
           ['bk_qm', 'Umlagefähige Betriebskosten', '€/m² · Monat', 'Startwert bis zur ersten Abrechnung']],
-    mfh: [['verw', 'Verwaltung', '€ je Wohnung · Jahr', 'ImmoWertV Anlage 3: 230 € Basiswert'],
-          ['stp_verw', 'Verwaltung Garage/Stellplatz', '€ · Jahr', 'ImmoWertV Anlage 3: 30 €'],
-          ['inst_qm', 'Instandhaltung', '€/m² · Jahr', 'ImmoWertV Anlage 3: 9,00 € Basiswert'],
-          ['stp_inst', 'Instandhaltung Garage/Stellplatz', '€ · Jahr', 'ImmoWertV Anlage 3: 68 €'],
+    mfh: [['verw', 'Verwaltung', '€ je Wohnung · Jahr', 'ImmoWertV Anlage 3, zum Jahr fortgeschrieben (2026: 367 €)'],
+          ['stp_verw', 'Verwaltung Garage/Stellplatz', '€ · Jahr', 'ImmoWertV Anlage 3 (2026: 48 €)'],
+          ['inst_qm', 'Instandhaltung', '€/m² · Jahr', 'ImmoWertV Anlage 3, zum Jahr fortgeschrieben (2026: 14,40 €)'],
+          ['stp_inst', 'Instandhaltung Garage/Stellplatz', '€ · Jahr', 'ImmoWertV Anlage 3 (2026: 108 €)'],
           ['bk_qm', 'Umlagefähige Betriebskosten', '€/m² · Monat', 'Startwert bis zur ersten Abrechnung']]
   };
   function einstellungenHtml() {
@@ -227,9 +252,7 @@
         return '<div class="bwkp-block"><div class="bwkp-titel">' + NAME[a] + '</div><div class="ip-grid">'
           + FELDER[a].map(function (x) { return f(a, x[0], x[1], x[2], x[3]); }).join('') + '</div></div>';
       }).join('')
-      + '<div class="ip-grid"><div class="ip-field"><label for="bwkp_faktor">Fortschreibungsfaktor (Häuser)</label><div class="ip-field-row">'
-      + '<input type="text" inputmode="decimal" id="bwkp_faktor" data-bwkp-k="faktor" value="' + String(p.faktor).replace('.', ',') + '"><span class="ip-unit">× Basiswert</span></div>'
-      + '<div class="ip-hint">Verbraucherpreisindex zum Stichtag. 1,60 gilt für Stichtage ab 01.01.2026 (Verwaltung 367 €, Instandhaltung 14,40 €/m²); jährlich zum 1. Januar anpassen.</div></div></div>';
+      + '';   /* v2211: kein Fortschreibungsfaktor mehr - die Werte SIND die Jahreswerte */
   }
   function verdrahten(root) {
     (root || document).addEventListener('change', function (ev) {

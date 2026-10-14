@@ -176,6 +176,41 @@ function gewerkeAus(d) {
   return n ? o : null;
 }
 
+/* v2210 · GEWERBE AUS DEN MFH-EINHEITEN.
+   Bis hier kam von den Einheiten nur die ANZAHL an. Ein Wohn- und
+   Geschaeftshaus rechnete deshalb die Wohnmiete auf die GANZE Flaeche
+   (CrossCheckService, mieteQm x wfl x 12) - auch auf das Ladenlokal.
+   § 31 Abs. 2 ImmoWertV verlangt den marktueblichen Rohertrag JE Nutzung,
+   Anlage 3 die Bewirtschaftung je Nutzung. Hier wird getrennt:
+     wfl_wohnen / wfl_gewerbe, Flaeche je Gewerbe-Nutzung,
+     Ist-Miete Gewerbe (vermietet, x 12), Marktmiete Gewerbe (nur wenn JEDE
+     Gewerbeeinheit eine marktuebliche Miete traegt - halb gibt es nicht). */
+function gewerbeAus(d) {
+  const liste = Array.isArray(d._mfh_einheiten) ? d._mfh_einheiten
+    : (d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : null);
+  if (!liste || !liste.length) return null;
+  const gew = liste.filter((e) => String(e.art || '') === 'gewerbe');
+  if (!gew.length) return null;
+  const out = { n_gewerbe: gew.length, n_wohnen: liste.length - gew.length,
+    wfl_wohnen: 0, wfl_gewerbe: 0, flaechen: {}, ist_jahr: 0, markt_jahr: 0,
+    markt_vollstaendig: true, leer_ohne_markt: 0, ohne_nutzung_qm: 0 };
+  liste.forEach((e) => {
+    const fl = num(e.wfl) || 0;
+    if (String(e.art || '') !== 'gewerbe') { out.wfl_wohnen += fl; return; }
+    out.wfl_gewerbe += fl;
+    const n = e.nutzung_gew || '';
+    if (n) out.flaechen[n] = (out.flaechen[n] || 0) + fl; else out.ohne_nutzung_qm += fl;
+    const leer = String(e.status || '') === 'leer';
+    if (!leer) out.ist_jahr += (num(e.ist) || 0) * 12;
+    const mq = num(e.markt_qm);
+    if (mq > 0 && fl > 0) out.markt_jahr += mq * fl * 12;
+    else { out.markt_vollstaendig = false; if (leer) out.leer_ohne_markt++; }
+  });
+  out.ist_jahr = Math.round(out.ist_jahr);
+  out.markt_jahr = out.markt_vollstaendig ? Math.round(out.markt_jahr) : null;
+  return out;
+}
+
 export const DealPilotObjectMapper = {
   reportInput(obj) {
     const d = dataOf(obj);
@@ -191,6 +226,7 @@ export const DealPilotObjectMapper = {
          je BEWERTETER Einheit an (Anlage 3 ImmoWertV) und rechnete auf dem Objektweg
          ohne sie am Durchschnitt. Der Sprechlauf fragt sie beim MFH jetzt ab. */
       units: num(pick(d, ['einheiten', 'units'])),
+      gewerbe: gewerbeAus(d),   /* v2210 */
       condition: pick(d, ['ds2_zustand', 'zustand']) || 'gepflegt',
       /* v1444: ValuationService liest ref.quality - hier kam die Ausstattung nur als
          `ausstattung` an, der Qualitaetsfaktor griff auf dem Objektweg nie. */

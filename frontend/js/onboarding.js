@@ -60,7 +60,7 @@ window.DealPilotOnboarding = (function () {
      er weiter. Für die Aktenmappe ist er durch die neue Vorgabe
      ersetzt.                                                            */
   var AUSSEHEN = [
-    { id: 'v1b', name: 'Aktenmappe', karte: 'datenzeile', standard: true,
+    { id: 'v1b', name: 'Aktenmappe', karte: 'bordkarte', standard: true,   /* v2216c: Marcel 14.10. - Auslieferung Aktenmappe mit Bordkarte */
       unter: 'Menü links, Reiter oben im Kopf',
       fuer: 'Wie eine Mappe mit Registern. Ruhig und vertraut.' },
     { id: '',    name: 'DealPilot',  karte: 'kennzahlen',   /* v2178: Marcels Standard fuer DealPilot */

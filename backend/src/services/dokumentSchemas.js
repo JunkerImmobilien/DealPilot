@@ -187,9 +187,11 @@ const SCHEMATA = {
       '{',
       '  "amtsgericht": string,',
       '  "blatt_nr": string,',
-      '  "eigentuemer": [{"name": string, "geburtsdatum": string DD.MM.JJJJ}],',
+      /* v2210: keine Namen und Geburtsdaten mehr - nur Anzahl und Anteile (Text wird vorher geschwaerzt) */
+      '  "eigentuemer_anzahl": number,',
+      '  "eigentuemer_anteile": [string] (z. B. "1/2", "Gesamthand"),',
       '  "flurstuecke": [{"gemarkung": string, "flur": string, "flurstueck": string, "flaeche_m2": number, "nutzung": string}],',
-      '  "abt_ii": [{"lfd_nr": string, "art": string, "berechtigter": string, "eingetragen_am": string}],',
+      '  "abt_ii": [{"lfd_nr": string, "art": string, "berechtigter_art": string (Person / Gemeinde / Versorger / Unternehmen - KEIN Name), "eingetragen_am": string}],',
       '  "abt_iii": [{"lfd_nr": string, "betrag_eur": number, "glaubiger": string, "eingetragen_am": string}],',
       '  "grundschulden_gesamt_eur": number',
       '}'
@@ -221,8 +223,9 @@ const SCHEMATA = {
       '  "kaufpreis_eur": number,',
       '  "nebenkosten_eur": number (Notar + Grundbuch + Makler + Grunderwerbsteuer, falls angegeben),',
       '  "grunderwerbsteuer_pct": number,',
-      '  "verkaeufer": [{"name": string, "adresse": string}],',
-      '  "kaeufer": [{"name": string, "adresse": string}],',
+      /* v2210: Käufer und Verkäufer nur als Anzahl - keine Namen, keine Anschriften */
+      '  "verkaeufer_anzahl": number,',
+      '  "kaeufer_anzahl": number,',
       '  "objekt": {"adresse": string, "flurstueck": string, "miteigentumsanteil": string, "raeume": string},',
       '  "reparaturbedarf_eur": number (nur falls kaufpreismindernd)',
       '}'
@@ -406,7 +409,8 @@ function baueprompt(typ, text) {
   if (!s) return null;
   return []
     .concat(s.einleitung)
-    .concat(['Wenn ein Feld nicht auffindbar ist: null. Rate nichts.', '', 'Schema:'])
+    .concat(['Wenn ein Feld nicht auffindbar ist: null. Rate nichts.',
+             'Gib keine Namen, Geburtsdaten oder Anschriften von Personen aus (v2210).', '', 'Schema:'])
     .concat(s.schema)
     .concat(['', 'Antworte NUR mit JSON.', '', 'Dokument:', text])
     .join('\n');

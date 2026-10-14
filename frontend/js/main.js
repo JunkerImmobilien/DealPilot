@@ -63,7 +63,13 @@ function setDefaults() {
   sv('gba_p',   0.50);
   sv('gest_p',  6.50);
   sv('ji_p',    1.50);
-  sv('d1z',     3.50);
+  /* v2211 · Hier stand fest 3,50. Der indikative Satz (oder der eigene aus
+     den Standardwerten) kam bei neuen Objekten nie an: applyToNewObject
+     schreibt nur in LEERE Felder, und dieses war nie leer. */
+  sv('d1z', (function () {
+    try { var z = window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.getZins && DealPilotInvestmentProfile.getZins();
+      if (typeof z === 'number' && isFinite(z) && z > 0) return Math.round(z * 100) / 100; } catch (e) {}
+    return 3.50; })());
   sv('d1t',     _dpProfilWert('tilgung_default', 1.00));
   sv('d1_bindj',_dpProfilWert('zinsbindung_default', 10));
   /* ══ v1899 · DIE PROJEKTION NIMMT MARCELS PAUSCHALEN ══════════════════
@@ -150,6 +156,12 @@ function setDefaults() {
      Die Rückfallwerte sind exakt die bisherigen HTML-Werte. */
   sv('bwk_ul_pct',  _dpProfilWert('bwk_ul_pct_default', 17));
   sv('bwk_nul_pct', _dpProfilWert('bwk_anteil_default', 16));
+  /* v2211 · Rechenweg der Bewirtschaftung fuer NEUE Objekte aus den Standardwerten
+     (Euro je Objektart = 'detail', Standard; Prozent der NKM = 'percent'). */
+  try {
+    var _bm = window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.get && DealPilotInvestmentProfile.get('bwk_modus_default');
+    if (typeof switchBwkMode === 'function') switchBwkMode(_bm === 'percent' ? 'percent' : 'detail');
+  } catch (e) {}
   /* Der kalkulatorische Mietausfall steht in EURO im Formular, das Profil
      führt ihn als Prozentsatz der Jahres-Nettokaltmiete. Ohne Miete gibt
      es nichts zu rechnen — dann bleibt das Feld leer, statt eine Null zu

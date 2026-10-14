@@ -826,9 +826,34 @@ export const CrossCheckService = {
     const _mieteErfasst = _num(ref.monthly_net_rent) > 0 || !!_amtFuehrt;
     const _ertragUnterdruecken = _eigennutz && !_mieteErfasst;
 
-    if (wfl && mieteQm && rnd != null) {
-      /* v1059-WMIET-6 */
-      const rohertrag = Math.round(mieteQm * wfl * 12);
+    /* ── v2210 · GEWERBE GETRENNT (§ 31 Abs. 2, Anlage 3 ImmoWertV) ────────
+       Bis hier: Rohertrag = Wohnmiete/m2 x GESAMTE Flaeche x 12 - das
+       Ladenlokal bekam den Wohnmietansatz, und `gewerbe_jahr` setzte kein
+       Aufrufer. Jetzt aus den MFH-Einheiten (DealPilotObjectMapper.gewerbeAus):
+       Wohnmiete nur auf den Wohnteil, Gewerbe mit marktueblicher Miete, sonst
+       mit der Ist-Miete (gekennzeichnet, indikativ). Leerstehendes Gewerbe
+       OHNE Marktmiete: kein Ertrag bestimmbar -> kein Ertragswert. */
+    const _gew = (ref.gewerbe && _num(ref.gewerbe.wfl_gewerbe)) ? ref.gewerbe : null;
+    const wflWohnen = _gew
+      ? (_num(_gew.wfl_wohnen) || Math.max(0, (wfl || 0) - _gew.wfl_gewerbe))
+      : wfl;
+    let _gewJahr = null, _gewHerkunft = null;
+    if (_gew) {
+      if (_num(_gew.markt_jahr)) { _gewJahr = _gew.markt_jahr; _gewHerkunft = 'marktueblich'; }
+      else if (!_gew.leer_ohne_markt && _num(_gew.ist_jahr)) { _gewJahr = _gew.ist_jahr; _gewHerkunft = 'ist_ungeprueft'; }
+    }
+    const _gewSperre = !!_gew && _gewJahr == null;
+    if (_gewSperre) {
+      out.notes.push('Ertragswert entfällt: Das Objekt hat ' + _gew.n_gewerbe + ' Gewerbeeinheit(en) mit '
+        + Math.round(_gew.wfl_gewerbe) + ' m², aber für '
+        + (_gew.leer_ohne_markt ? 'leerstehende Einheiten' : 'diese Einheiten')
+        + ' liegt weder eine marktübliche Miete noch eine Ist-Miete vor (§ 31 Abs. 2 ImmoWertV). '
+        + 'Im MFH-Konfigurator je Gewerbeeinheit die marktübliche Miete (€/m²) eintragen.');
+    }
+
+    if (wfl && mieteQm && rnd != null && !_gewSperre && wflWohnen > 0) {
+      /* v1059-WMIET-6 · v2210: nur der Wohnteil */
+      const rohertrag = Math.round(mieteQm * wflWohnen * 12);
       const lzsPct = _num(p.lzs_pct) != null ? Number(p.lzs_pct) : LIEGENSCHAFTSZINS * 100;
       /* ── v1198 · „unvollstaendig" ist eine ENTSCHEIDUNG, kein Fehlen ──────
          Hier stand:
@@ -876,8 +901,17 @@ export const CrossCheckService = {
 
       const ein = {
         objektart: ref.property_type, baujahr: buildYear, baustatus: ref.baustatus || 'bestand',
-        wohnflaeche_qm: wfl, anzahl_we: _num(ref.units) || 1, stichtag_jahr: nowYear,
+        /* v2210: Wohnflaeche und Einheiten nur des WOHNteils - Verwaltung je
+           Wohnung und Instandhaltung je m2 Wohnflaeche gelten nur dort. */
+        wohnflaeche_qm: wflWohnen,
+        anzahl_we: _gew ? (_num(_gew.n_wohnen) || Math.max(1, (_num(ref.units) || 1) - _gew.n_gewerbe)) : (_num(ref.units) || 1),
+        stichtag_jahr: nowYear,
         miete_markt_jahr: rohertrag,
+        gewerbe_jahr: _gewJahr,
+        gewerbe_herkunft: _gewHerkunft,
+        gewerbe_ist_jahr: _gew ? _num(_gew.ist_jahr) : null,
+        gewerbe_flaechen: _gew ? _gew.flaechen : null,
+        gewerbe_ohne_nutzung_qm: _gew ? _num(_gew.ohne_nutzung_qm) : null,
         miete_markt_qm: mieteQm, miete_quelle: mieteQuelle,   /* v1059-WMIET-7 */
         /* v1048-WSPL-1 · Vorher nur ref.garages — die Aussenstellplaetze
          * fielen unter den Tisch. Das PDF meldete "1 Stellpl." bei einem
@@ -944,7 +978,30 @@ export const CrossCheckService = {
       /* v1049-WBWK-3 · Hat der Ausschuss seine eigene Quote veroeffentlicht,
        * ist sie der genaueste Ansatz — genauer als jeder Modellwert, weil
        * sie aus denselben Kauffaellen stammt wie der Zinssatz. */
-      const _quote = _num(p.bwk_quote_pct);
+      /* v2210 · Eine Wohn-Quote auf Gewerbe ist nicht modellkonform: mit
+         Gewerbe gilt Anlage 3 je Nutzung (normiert), weder Ausschuss-Quote
+         des Wohnzweigs noch die 23-%-Pauschale. */
+      const _quote = _gew ? null : _num(p.bwk_quote_pct);
+      if (_gew) {
+        const _g = Math.round(_gewJahr / (rohertrag + _gewJahr) * 1000) / 10;
+        out.gewerbeanteil_pct = _g;
+        out.notes.push('Gemischte Nutzung: Gewerbe ' + String(_g).replace('.', ',') + ' % des Rohertrags ('
+          + Math.round(_gewJahr).toLocaleString('de-DE') + ' € von '
+          + Math.round(rohertrag + _gewJahr).toLocaleString('de-DE') + ' €). Wohnen und Gewerbe sind getrennt angesetzt, '
+          + 'die Bewirtschaftung nach Anlage 3 je Nutzung.'
+          + (_gewHerkunft === 'ist_ungeprueft'
+            ? ' Gewerbemiete = Ist-Miete, nicht auf Marktüblichkeit geprüft (§ 31 Abs. 2 ImmoWertV) — der Ertragswert ist deshalb indikativ.'
+            : ' Gewerbemiete = eingegebene marktübliche Miete.')
+          + (_g > 20
+            ? ' Ab rund 20 % Gewerbeanteil führen die Gutachterausschüsse meist einen eigenen Liegenschaftszinssatz für Wohn- und Geschäftshäuser; '
+              + 'der angesetzte Satz ist darauf zu prüfen.'
+            : ''));
+        if (_gewHerkunft === 'marktueblich' && _num(_gew.ist_jahr)) {
+          const _abw = Math.round((_gew.ist_jahr - _gewJahr) / _gewJahr * 1000) / 10;
+          if (Math.abs(_abw) >= 10) out.notes.push('Gewerbe: Ist-Miete weicht ' + String(_abw).replace('.', ',')
+            + ' % von der marktüblichen ab — als besonderes objektspezifisches Grundstücksmerkmal (§ 8 Abs. 3) über die Restlaufzeit des Mietvertrags zu prüfen.');
+        }
+      }
       if (_quote > 0) {
         ein.bwk_modus = 'manuell';
         /* v1061-WBWK-1 · Die Quote gehoert auf den GESAMTEN Rohertrag.
@@ -968,7 +1025,7 @@ export const CrossCheckService = {
           + '. Sie stammt aus denselben Kauffällen wie der Liegenschaftszinssatz '
           + 'und ist damit der modellkonformste verfügbare Ansatz.');
       } else
-      if (!_hatModell && p.bwk_modus !== 'normiert') {
+      if (!_hatModell && p.bwk_modus !== 'normiert' && !_gew) {
         ein.bwk_modus = 'manuell';
         ein.bwk_gesamt_jahr = Math.round(rohertrag * BWK_QUOTE);
       } else {

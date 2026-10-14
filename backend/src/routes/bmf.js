@@ -34,8 +34,12 @@ function _stabil(v) {
   if (v && typeof v === 'object') { const o = {}; Object.keys(v).sort().forEach((k) => { o[k] = _stabil(v[k]); }); return o; }
   return v;
 }
+/* v2213b · Der Stand der Pipeline gehoert in den Schluessel: sonst liefert der
+   Cache nach jeder Korrektur weiter das alte Ergebnis (gemessen: die Kennzeichnung
+   „unplausibel" aus v2213 kam nicht an). Bei jeder Aenderung der Pipeline hochzaehlen. */
+const PIPELINE_STAND = 'v2213b';
 function _bmfHash(inputs) {
-  return crypto.createHash('sha256').update(JSON.stringify(_stabil(inputs))).digest('hex');
+  return crypto.createHash('sha256').update(PIPELINE_STAND + '|' + JSON.stringify(_stabil(inputs))).digest('hex');
 }
 async function _cacheLesen(hash) {
   try {

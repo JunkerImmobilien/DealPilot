@@ -53,6 +53,9 @@
                                        maximumFractionDigits: stellen === undefined ? 2 : stellen });
   }
   function wert(v, einheit) {
+    /* v2216e · neue Einheiten aus ankauf.js */
+    if (einheit === 'eurqm') return zahl(v, 2) + ' €/m²';
+    if (einheit === 'stk') return (v === null || v === undefined || !isFinite(v)) ? '–' : String(Math.round(v));
     return einheit === 'eur' ? eur(v) : einheit === 'pct' ? pct(v) : zahl(v);
   }
 
@@ -60,6 +63,8 @@
      man die Richtung ohne Nachdenken sieht. */
   function diffText(z) {
     var vz = z.diff > 0 ? '+' : '';
+    if (z.einheit === 'stk') return vz + Math.round(z.diff);   /* v2216h: Einheiten sind ganze Zahlen */
+    if (z.einheit === 'eurqm') return vz + zahl(z.diff, 2) + ' €/m²';
     if (z.einheit === 'eur') return vz + Math.round(z.diff).toLocaleString('de-DE') + ' €';
     if (z.einheit === 'pct') return vz + zahl(z.diff, 2) + ' %-Punkte';
     return vz + zahl(z.diff, 2);
@@ -83,6 +88,11 @@
   function zeichnen() {
     var host = el('dp-abweichung');
     if (!host) return;
+    /* v2216j · Marcel 14.10.2026: „der Ist/Soll-Abgleich soll in der Pilot-
+       Analyse sein unter Ist/Soll", nicht im Tab Objekt. Die Tafel dort (seit
+       v2034) bleibt leer; der Abgleich steht im Pilot-Reiter „Soll/Ist-Abgleich"
+       (ui.js _sollIstHtml) mit denselben Zeilen aus DealPilotAnkauf.abweichung(). */
+    host.innerHTML = ''; host.style.display = 'none'; return;
     var A = window.DealPilotAnkauf;
     if (!A || !A.vorhanden()) { host.innerHTML = ''; host.style.display = 'none'; return; }
     var a = A.abweichung();
@@ -90,7 +100,15 @@
     host.style.display = '';
 
     var gesamt = (A.KENNZAHLEN || []).length;
-    var reihen = a.zeilen.map(function (z) {
+    /* v2216e · gruppiert wie im Pilot-Reiter Soll/Ist */
+    var GRUPPEN = ['Ertrag', 'Kosten', 'Finanzierung', 'Steuer', 'Ergebnis'];
+    var reihen = GRUPPEN.map(function (g) {
+      var zz = a.zeilen.filter(function (z) { return (z.gruppe || 'Ergebnis') === g; });
+      if (!zz.length) return '';
+      return '<tr class="abw-gruppe"><td colspan="4" style="font:600 10.5px/1.2 \'JetBrains Mono\',monospace;letter-spacing:.1em;text-transform:uppercase;color:#8a6d1f;padding:12px 6px 4px">' + g + '</td></tr>'
+        + zz.map(zeile).join('');
+    }).join('');
+    function zeile(z) {
       var p = pctText(z);
       return '<tr class="abw-' + z.richtung + '">'
         + '<td class="abw-wort">' + z.wort + '</td>'
@@ -99,7 +117,7 @@
         + '<td class="abw-zahl abw-diff">' + diffText(z)
         + (p ? '<span class="abw-pct">' + p + '</span>' : '') + '</td>'
         + '</tr>';
-    }).join('');
+    }
 
     host.innerHTML =
       '<div class="abw-kopf">'

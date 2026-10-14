@@ -252,6 +252,19 @@ async function _phase4_bmf(inputs, phase3) {
   const bmfResult = await bmfService.calculateKpa(bmfInputs, { includeFile: false });
   const r = bmfResult.results || {};
 
+  /* v2213b · Der Kern (LibreOffice-Arbeitshilfe) meldet fehlende Eingaben als
+     Fehlerwert ({error:'#VALUE!'}). Bis hier wurde das Objekt als „Gebaeudeanteil"
+     weitergereicht -> null-Varianten, toFixed-Absturz im Fenster. Gemessen an
+     2026-1082 (ETW ohne Grundstuecksflaeche, Bodenrichtwert, MEA). */
+  const _gaRoh = r.gebaeudeanteil_prozent?.value;
+  if (_gaRoh != null && typeof _gaRoh !== 'number') {
+    const fehlt = [];
+    if (!(Number(bmfInputs.grundstuecksgroesse) > 0)) fehlt.push('Grundstücksfläche');
+    if (!(Number(bmfInputs.bodenrichtwert) > 0)) fehlt.push('Bodenrichtwert');
+    if (/WE|wohnungseigentum/i.test(String(bmfInputs.grundstuecksart || '')) && !(Number(bmfInputs.mea_zaehler || bmfInputs.mea) > 0)) fehlt.push('Miteigentumsanteil');
+    return { _error: true, _missing: fehlt,
+      _msg: 'Die BMF-Arbeitshilfe liefert für diese Eingaben kein Ergebnis' + (fehlt.length ? ' — es fehlt: ' + fehlt.join(', ') : '') + '.' };
+  }
   // Werte extrahieren — Service liefert nur gebaeudeanteil_prozent
   const gebaeude_pct = r.gebaeudeanteil_prozent?.value ?? 80;
   const boden_pct = 100 - gebaeude_pct;
@@ -282,7 +295,21 @@ async function _phase4_bmf(inputs, phase3) {
   try { jacoby = await _jacobyBlock(objekt, Number(bmfInputs.kaufpreis), Number(bodenwert)); }
   catch (e) { jacoby = { verfuegbar: false, grund: 'Jacoby nicht gerechnet: ' + (e.message || e) }; }
 
+  /* v2213 · Ein Gebaeudeanteil ausserhalb 0-100 % ist kein Ergebnis. Gemessen
+     14.10.2026 an 2026-1056 (MFH Bj 1905, NKM "710 Euro" fuer 5 WE): der
+     Gebaeudeertrag wird negativ, die Arbeitshilfe meldete -96,6 %, und die
+     Uebernahme schrieb ihn ins Objekt. Der Kern bleibt unangetastet - hier
+     wird es nur benannt; die Uebernahme sperrt (bmf-modal-v292.js). */
+  const unplausibel = !(gebaeude_pct > 0 && gebaeude_pct < 100);
+  const _warnungen = (bmfResult.warnings || []).slice();
+  if (unplausibel) {
+    _warnungen.push('Gebäudeanteil ' + Number(gebaeude_pct).toFixed(1) + ' % ist nicht plausibel: Der Bodenwert ('
+      + Math.round(bodenwert).toLocaleString('de-DE') + ' €) übersteigt den Wert des bebauten Grundstücks oder der Gebäudeertrag ist negativ. '
+      + 'Miete, Baujahr und Bodenrichtwert prüfen; sonst ist ein Gutachten zur Kaufpreisaufteilung nötig.');
+  }
+
   return {
+    unplausibel,
     bodenwert,
     gebaeudewert,
     bodenanteil_prozent: boden_pct,
@@ -291,7 +318,7 @@ async function _phase4_bmf(inputs, phase3) {
     jacoby,
     massgebender_verkehrswert: massgebend,
     fiktives_baujahr: r.fiktives_baujahr?.value ?? null,
-    warnings: bmfResult.warnings || []
+    warnings: _warnungen
   };
 }
 

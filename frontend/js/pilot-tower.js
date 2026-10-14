@@ -248,13 +248,42 @@
   }
 
   /* ── Feld unter Maus / Cursor ─────────────────────────────────────── */
+  /* v2216j · Erklärung eines Auswahlfeldes aus seinen eigenen Optionen. */
+  var ZWECK = [
+    [/^mod_/, 'Modernisierung nach Anlage 2 ImmoWertV: daraus ergeben sich die Modernisierungspunkte und damit die Restnutzungsdauer (AfA, Sach- und Ertragswert).'],
+    [/^ausst_/, 'Ausstattungsstandard nach Anlage 4 ImmoWertV (NHK 2010): daraus ergibt sich die Standardstufe für den Sachwert.'],
+    [/^eq_/, 'Ausstattung des Objekts: fließt in die Marktpreisindikation des Marktberichts ein.'],
+    [/^objart$/, 'Die Objektart steuert, welche Felder, Bewirtschaftungsansätze und amtlichen Werte (Liegenschaftszins, Sachwertfaktor) gelten.'],
+    [/^nutzungsart$/, 'Vermietet oder selbst genutzt: entscheidet über Steuer (Anlage V) und welcher amtliche Zinssatz passt.'],
+    [/^standardstufe$/, 'Standardstufe 1–5 nach Anlage 4 ImmoWertV: Grundlage der Normalherstellungskosten im Sachwert.'],
+    [/^halter$/, 'Wem das Objekt gehört: privat oder eine Gesellschaft (GmbH/UG rechnet mit Körperschaftsteuer).']
+  ];
+  function auswahlText(f) {
+    var s = f.querySelector('select'); if (!s) return '';
+    var gew = s.selectedOptions && s.selectedOptions[0] ? s.selectedOptions[0].textContent.trim() : '';
+    var opt = [].slice.call(s.options).map(function (o) { return o.textContent.trim(); }).filter(function (t) { return t && !/^[–—-]+$|bitte w|keine angabe/i.test(t); });
+    var zweck = '';
+    ZWECK.some(function (z) { if (z[0].test(s.id || '')) { zweck = z[1]; return true; } return false; });
+    return (zweck ? zweck + ' ' : '')
+      + (gew && !/bitte w|keine angabe|^[–—-]+$/i.test(gew) ? 'Gewählt: „' + gew + '". ' : 'Noch nichts gewählt. ')
+      + (opt.length ? 'Zur Auswahl: ' + kurz(opt.join(' · '), 220) + '.' : '');
+  }
   function feldVon(el) {
     if (!el || !el.closest) return null;
     if (tower && tower.contains(el)) return null;
     var f = el.closest('.f');
     if (f && window.DealPilotFeldHilfe && typeof window.DealPilotFeldHilfe.textFuer === 'function') {
       var d = null; try { d = window.DealPilotFeldHilfe.textFuer(f); } catch (e) {}
-      if (d && (d.titel || d.body)) return { el: f, titel: d.titel, body: d.body, zusatz: d.zusatz, wofuer: d.wofuer || [], gepflegt: d.gepflegt };
+      if (d && (d.titel || d.body)) {
+        /* v2216j · Marcel 14.10.2026: „mit F1 den Piloten zu rufen geht bei
+           Dropdown-Feldern nicht." Gemessen: F1 kommt an, aber 54 von 67
+           Auswahlfeldern haben keinen gepflegten Text - der Pilot sagte nur
+           „noch kein Text". Für Auswahlfelder ohne Text erklärt er jetzt, was
+           gewählt ist, was es gibt, und - bei den Bauteil-Gruppen - wofür. */
+        var body = d.body;
+        if (!body) { try { body = auswahlText(f); } catch (e) {} }
+        return { el: f, titel: d.titel, body: body, zusatz: d.zusatz, wofuer: d.wofuer || [], gepflegt: d.gepflegt };
+      }
     }
     var tip = el.closest('[data-tip-id]') || (el.querySelector && el.querySelector(':scope > .dp-tip[data-tip-id]'));
     var C = window.DpTooltips && window.DpTooltips.content;

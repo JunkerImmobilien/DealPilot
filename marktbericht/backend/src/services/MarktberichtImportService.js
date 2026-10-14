@@ -84,6 +84,7 @@ export const MarktberichtImportService = {
         method: 'POST', timeoutMs: 180000, retries: 0,
         headers: { Authorization: 'Bearer ' + cfg.ai.openaiKey, 'Content-Type': 'application/json' },
         body: {
+          store: false,   /* v2209 */
           model: cfg.ai.model,
           temperature: 0,
           input: [{

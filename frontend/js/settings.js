@@ -3971,7 +3971,12 @@ window._dpshMinToggle = function (cb) { /* v893o-nostub: nur sauberer Collapse w
     var frage = 'Aufteilung, Darstellung und Marke auf den '
               + 'Auslieferungszustand zurücksetzen?';
     if (!window.confirm(frage)) return;
-    try { if (window.DealPilotLayout && window.DealPilotLayout.setze) window.DealPilotLayout.setze(''); } catch (e) {}
+    /* v2216c · Marcel 14.10.2026: „der Auslieferungszustand ist immer Aktenmappe
+       mit Boardkarte." Hier stand setze('') - der Knopf führte in die
+       DealPilot-Ansicht, nicht in den Auslieferungszustand. */
+    try { if (window.DealPilotLayout && window.DealPilotLayout.setze) window.DealPilotLayout.setze('v1b'); } catch (e) {}
+    try { localStorage.removeItem('dp_layout_gewaehlt'); localStorage.removeItem('dp_objkarte_stil'); } catch (e) {}
+    try { if (window.DealPilotObjektkarte && window.DealPilotObjektkarte.setze) window.DealPilotObjektkarte.setze('bordkarte'); } catch (e) {}
     /* v1699b: `dp_chrome_hell` MIT abraeumen. Ohne ihn blieb die
        Oberflaeche hell, auch nachdem v1699 den Zwang aus den Layouts
        genommen hat — der Merker ueberlebt und stellt sie beim naechsten

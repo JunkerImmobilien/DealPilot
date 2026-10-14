@@ -25,7 +25,10 @@
   function isCorp(rf) { return rf === 'gmbh' || rf === 'ug'; } /* eigene KSt-Rechnung + Buchhaltung */
 
   /* ===== PRO-GATE (v806) — Mandanten nur fuer Plan 'pro' ===== */
-  var PRO_PLANS = ['pro']; /* bei neuer Top-Stufe hier ergaenzen */
+  /* v2212b · 'partner' ist ein erweiterter Pro (config.js PRO_FAMILIE, v1081). Hier
+     stand nur 'pro': in Marcels Partner-Konto war die Halterwahl immer auf „Privat"
+     gesperrt, Gesellschaftsobjekte fielen beim Speichern auf Privat zurueck. */
+  var PRO_PLANS = ['pro', 'partner']; /* bei neuer Top-Stufe hier ergaenzen */
   function _isPro() {
     try {
       var cfg = window.DealPilotConfig;
@@ -69,7 +72,35 @@
     return _defaults();
   }
   var _state = _load();
-  function _save() { try { localStorage.setItem(LS_KEY, JSON.stringify(_state)); } catch (e) {} }
+  /* v2212 · Halter ans Konto (/user-settings/mandanten), nicht nur in den Browser.
+     Abgleich beim Start: Server und Browser werden VEREINT (je id), der Server
+     gewinnt bei gleicher id; Einträge, die nur hier lagen, wandern hoch. */
+  var FERN = '/user-settings/mandanten';
+  function _fernSchreiben() {
+    try { if (window.Auth && Auth.apiCall && Auth.isLoggedIn && Auth.isLoggedIn()) Auth.apiCall(FERN, { method: 'PUT', body: { wert: _state } }).catch(function () {}); } catch (e) {}
+  }
+  function _save() { try { localStorage.setItem(LS_KEY, JSON.stringify(_state)); } catch (e) {} _fernSchreiben(); }
+  function _vomServer() {
+    try {
+      if (!window.Auth || !Auth.apiCall || !(Auth.isLoggedIn && Auth.isLoggedIn())) return;
+      Auth.apiCall(FERN, { method: 'GET' }).then(function (r) {
+        var w = r && r.wert;
+        var server = (w && Array.isArray(w.list)) ? w.list : [];
+        var nachId = {}; server.forEach(function (m) { if (m && m.id) nachId[m.id] = m; });
+        var nurHier = _state.list.filter(function (m) { return m && m.id && !nachId[m.id]; });
+        var liste = server.concat(nurHier);
+        if (!liste.some(function (m) { return m.id === 'privat'; })) liste.unshift(_privat());
+        var vorher = JSON.stringify(_state.list);
+        _state = { list: liste };
+        try { localStorage.setItem(LS_KEY, JSON.stringify(_state)); } catch (e) {}
+        if (nurHier.some(function (m) { return m.id !== 'privat'; }) || !server.length) _fernSchreiben();
+        if (JSON.stringify(_state.list) !== vorher) { try { renderHalterOptions(); renderHalterChips(); } catch (e) {} }
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(_vomServer, 800); });
+  else setTimeout(_vomServer, 800);
+  window.addEventListener('dp:plan-ready', function () { _vomServer(); });
 
   function getList() { return _state.list.slice(); }
   function get(id) {
@@ -640,7 +671,8 @@
         }
         var zeilen = mine.map(function (o) {
           var d = o.data || o;
-          var eingefroren = !!((d.ueberf_ende || '').toString().trim());
+          /* v2212: das Gesellschaftsobjekt aus einer Ueberfuehrung traegt dasselbe Datum als BEGINN */
+          var eingefroren = !!((d.ueberf_ende || '').toString().trim()) && String(d.obj_herkunft || '') !== 'ueberfuehrung';
           var name = [d.str, d.hnr].filter(Boolean).join(' ') || o.name || o.seq_no || 'Objekt';
           /* v1962: hier stand `.replace(/./g, '')` - der Punkt im
              regulaeren Ausdruck war NICHT MASKIERT und trifft damit jedes
@@ -879,7 +911,7 @@
     var corpBlock =
         '<div id="mand-corp-only" style="display:' + (corp ? 'block' : 'none') + '">'
       +   '<hr class="dvd" style="margin:18px 0 6px">'
-      +   '<h3 class="set-section-h">Steuerregime <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 wird in Stufe 2 aktiv</span></h3>'
+      +   '<h3 class="set-section-h">Steuerregime <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 rechnet in Steuer und Jahresabschluss</span></h3>'   /* v2208: hier stand "wird in Stufe 2 aktiv" - effRate() (Z. 328) und gesellschaft-abschluss.js rechnen laengst damit */
       +   '<div style="' + _fGrid() + '">'
       +     fldH('K\u00f6rperschaftsteuer + Soli (%)', inp('mand-f-kst', reg.kst != null ? reg.kst : 15.825), 'Satz, mit dem der Gewinn der Gesellschaft besteuert wird: 15 % K\u00f6rperschaftsteuer + 5,5 % Solidarit\u00e4tszuschlag darauf = 15,825 %.')
       +     fldH('Gewerbesteuer-Hebesatz (%)', inp('mand-f-gewst', reg.gewst != null ? reg.gewst : 0), 'Hebesatz deiner Gemeinde (z.B. 400). Nur relevant, wenn die erweiterte K\u00fcrzung NICHT greift. Bei reiner Vermietung mit K\u00fcrzung 0 lassen.')
@@ -896,8 +928,8 @@
       +     '<div class="mand-fhint" style="margin-top:5px;font-size:11.5px;color:#7A7370;line-height:1.45">Reine Grundst\u00fccksverwaltung (nur Vermietung, kein gewerblicher Handel) kann die Gewerbesteuer auf 0 k\u00fcrzen. Aktiv lassen, wenn die Gesellschaft ausschlie\u00dflich vermietet.</div>'
       +   '</div>'
       +   '<hr class="dvd" style="margin:18px 0 6px">'
-      +   '<h3 class="set-section-h">Buchhaltung <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 f\u00fcr GuV/Bilanz-Export (Stufe 3)</span></h3>'
-      +   '<div class="mand-fhint" style="margin:2px 0 12px;font-size:12px;color:#7A7370;line-height:1.5">Diese Werte bilden die <b>Er\u00f6ffnungsbilanz</b> der Gesellschaft und sind sp\u00e4ter Basis f\u00fcr GuV-/Bilanz- und DATEV-Export. F\u00fcr die laufende Rendite- und Steuerrechnung sind sie nicht n\u00f6tig \u2014 nur f\u00fcrs Reporting. Im Zweifel mit dem Steuerberater abstimmen.</div>'
+      +   '<h3 class="set-section-h">Buchhaltung <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 f\u00fcr den Jahresabschluss (GuV und Bilanz)</span></h3>'   /* v2208: war "(Stufe 3)" - den Abschluss gibt es seit v1227 */
+      +   '<div class="mand-fhint" style="margin:2px 0 12px;font-size:12px;color:#7A7370;line-height:1.5">Diese Werte bilden die <b>Er\u00f6ffnungsbilanz</b> der Gesellschaft; der Jahresabschluss (GuV und Bilanz) rechnet mit ihnen. F\u00fcr die laufende Rendite- und Steuerrechnung sind sie nicht n\u00f6tig \u2014 nur f\u00fcrs Reporting. Im Zweifel mit dem Steuerberater abstimmen.</div>'
       +   '<div style="' + _fGrid() + '">'
       +     fldH('Kontenrahmen', '<select id="mand-f-kr">' + krOpts() + '</select>', 'Buchhaltungs-Kontenrahmen f\u00fcr GuV/Bilanz. SKR04 ist der Standard f\u00fcr Kapitalgesellschaften (DATEV).')
       +     fldH('Wirtschaftsjahr-Beginn (MM-TT)', inp('mand-f-wj', bh.wj_start || '01-01', '01-01'), 'Beginn des Gesch\u00e4ftsjahres. Meist 01-01 (Kalenderjahr). Abweichend nur, wenn im Gesellschaftsvertrag so festgelegt.')
