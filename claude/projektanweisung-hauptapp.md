@@ -38761,6 +38761,27 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2221–v2221c · Staging · Messe-Drehbuch 2 Quick-Check, Prüfung Co-Pilot-Einstellungen (14.10.2026)
+- **Was:**
+  - **Drehbuch `?messe=quickcheck`:** ETW Musterweg 7, Bielefeld, als Beispiel erkennbar. 72 m², Bj 1994, NKM 680, Hausgeld 230.
+    - Es öffnet Quick Boarding und tippt die Felder Zeichen für Zeichen. Der Kegel zeigt die jeweilige Karte, durch das iframe hindurch (`rect()` addiert den Rahmen, `scroller()` geht über `frameElement`).
+    - Urteil bei 159.000 €: Score 31 · Kritisch, DSCR 0,9, Cashflow −147 €.
+    - Danach „verhandelt" auf 129.000 €: 54 · Solide, DSCR 1,11, Cashflow −4 €.
+    - Alle Zahlen liest das Drehbuch aus dem echten Quick-Check. Kein „Abrufen" (Kontingent). Am Ende „Neuer Vorgang" und Reiter Objekt, auch bei Esc.
+  - **Gemessen, was der Quick-Check beim Score selbst schreibt:** `POST /ai/quickcheck-analyse` (2× je Lauf, OpenAI-Kosten, Marcels Entscheidung v1946) und `POST /passes/from-snapshot` (Boarding-Pass; „Neuer Vorgang" setzt nur `revoked_at`).
+    - Beides ist ausgesetzt, solange `DealPilotMesse.laeuft()`: in `qc-ai-bridge.js` mit einer ehrlichen Absage, in `qc-bridge.js` an der Weiche `qc-autopass`.
+    - **Zurückgenommen (v2221b):** Ein Erfassungs-Empfänger im Drehbuch griff nicht, weil am window die Anmeldereihenfolge gilt.
+  - **Co-Pilot (KI) in den Einstellungen geprüft, nicht übrig:**
+    - Detailgrad, Tonalität, Fokus und eigene Anweisungen gehen als `aiOptions` in den Pilot-Prompt (`openaiService.js:1845/1996`), dazu in KI-Lage, KI-Miete und DS2-KI.
+    - Eigenes Wissen geht über `projektwissen.js` an alle Piloten.
+    - Strategie, Risiko, Verkäuferdruck und Marktlage gehen als `investor_profil` in die Pilot-Analyse. Der Reiter ist ihr einziger Eingabeweg (`ip_ai_strat` wird gelesen, aber nirgends gezeichnet).
+  - **Eigener Fehler:** Ein globales `var g` aus meinem Messskript überschrieb `g()` aus calc.js. `saveObj` brach in `updHeader` ab, vor `collectData`, also ohne Schreibzugriff. Der Tab wurde verworfen. Der neue Marktwert 487.000 € war schon um 11:37 gespeichert.
+- **Commit:** `2cc7b3e3`, `129bbe23`, `f3de0771`, `6fb897ca`
+- **Nachweis:** Letzter Lauf über `?messe=quickcheck`: Schreibaufrufe nur `PUT /portfolio-spiegel` (beim Laden der App), kein KI-Aufruf, kein Pass. Kegel auf dem Score-Block 16,8–23,8 s stabil. Gold-Audit RC=0.
+- **Rest:**
+  - Vier widerrufene Test-Pässe in `shared_passes` (ESECY3A8MW, TN4HYX440Q, 6WND7CC064, RYMT3S14DH), ungültig. Löschen ist Marcels Sache.
+  - Der Score-Block zeigt im Drehbuch ein leeres QR-Feld.
+
 ### v2220–v2220a · Staging · Zensus-Leerstand am Mietausfall-Risiko, Handy-Knöpfe weiß, neuer Marktbericht Parkstraße (14.10.2026)
 - **Was:**
   - **v2220:** Der Zensus-Leerstand-Kasten wandert von „Leerstand p.a." unter das Dropdown „Mietausfall-Risiko". Marcel nennt den Gesamtleerstand „nichtssagend".
