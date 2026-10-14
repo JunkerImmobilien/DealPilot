@@ -290,6 +290,24 @@ function collectData() {
      Fensters weg. `afa_rnd_jahre` bleibt unberuehrt: das ist die
      EINGABE des Nutzers, dies hier der VORSCHLAG des Wizards. */
   if (window._dpRnd && window._dpRnd.rnd_jahre) d._rnd = window._dpRnd;
+  /* v2214 · DIE JAHRESWERTE DER ANLAGE V (tax.js _taxYearlyOverrides).
+     Gemessen 14.10.2026: sie lebten NUR im Fenster. Kein Ladeweg stellte sie
+     wieder her, beim Objektwechsel wanderten sie ins naechste Objekt, und nach
+     einem Neuladen waren sie weg - das naechste Speichern ueberschrieb dann
+     die Zeitreihe auf dem Server (Gohliser 2029: 40.000 EUR Erhaltungsaufwand
+     -> 0,00). Jetzt reisen sie im Objekt mit, gleiches Muster wie `_mfh`. */
+  try {
+    var _tyo = window._taxYearlyOverrides;
+    if (_tyo && typeof _tyo === 'object') {
+      var _tyoSauber = {};
+      Object.keys(_tyo).forEach(function (yk) {
+        var e = _tyo[yk]; if (!e || typeof e !== 'object') return;
+        var felder = Object.keys(e).filter(function (f) { return typeof e[f] === 'number' && isFinite(e[f]); });
+        if (felder.length) { _tyoSauber[yk] = {}; felder.forEach(function (f) { _tyoSauber[yk][f] = e[f]; }); }
+      });
+      if (Object.keys(_tyoSauber).length) d._tax_overrides = _tyoSauber;
+    }
+  } catch (e) {}
   /* v2030: der eingefrorene Ankauf-Stand (ankauf.js). Gleiches Muster
      wie `_mfh` - der Zustand haengt an einem Fenster-Merker, nicht an
      einem zweiten Ladeweg. `daten` wird mitgeschrieben, aber NIE hier
@@ -594,6 +612,12 @@ function loadData(d) {
      geladene Objekt die Restnutzungsdauer des vorigen, und zwar eine,
      die zu seinen Bauteilen gar nicht passt. */
   window._dpRnd = (d._rnd && d._rnd.rnd_jahre) ? d._rnd : null;
+  /* v2214: Jahreswerte der Anlage V. Fehlen sie, sind sie LEER - sonst erbte
+     das geladene Objekt die Eingaben des vorigen (gemessen). */
+  try {
+    window._taxYearlyOverrides = (d._tax_overrides && typeof d._tax_overrides === 'object')
+      ? JSON.parse(JSON.stringify(d._tax_overrides)) : {};
+  } catch (e) { window._taxYearlyOverrides = {}; }
   /* v2030: Ankauf-Stand. Fehlt er, ist er NULL - sonst erbte das
      geladene Objekt den Stand des vorigen, und zwar einen, der auf
      eine fremde Adresse zeigt. */
@@ -1069,6 +1093,8 @@ function _clearFormForNewObject() {
   /* v728-status-reset: neues Objekt IMMER Status offen. _currentObjData darf NICHT vom
      Vorgaenger erben (storage.js Fallback Z.126 liest sonst alten _deal_won/_deal_lost). */
   window._currentObjData = {};
+  window._taxYearlyOverrides = {};   /* v2214: Jahreswerte gehoeren zum Objekt */
+  window._taxYearlyBemerkungen = {};
   var _dwS = document.getElementById('_deal_won_state'); if (_dwS) _dwS.value = 'false';
   var _dlS = document.getElementById('_deal_lost_state'); if (_dlS) _dlS.value = 'false';
   var _dwA = document.getElementById('_deal_won_at_state'); if (_dwA) _dwA.value = '';
@@ -1169,6 +1195,8 @@ function _newObjLeeren() {
   _currentObjKey = null; _dpFireObjectReady(null); /* v946 */
   /* v771-status-reset: newObj ruft _clearFormForNewObject NICHT -> Status hier auf offen */
   window._currentObjData = {};
+  window._taxYearlyOverrides = {};   /* v2214: Jahreswerte gehoeren zum Objekt */
+  window._taxYearlyBemerkungen = {};
   var _dwS = document.getElementById('_deal_won_state'); if (_dwS) _dwS.value = 'false';
   var _dlS = document.getElementById('_deal_lost_state'); if (_dlS) _dlS.value = 'false';
   var _dwA = document.getElementById('_deal_won_at_state'); if (_dwA) _dwA.value = '';
