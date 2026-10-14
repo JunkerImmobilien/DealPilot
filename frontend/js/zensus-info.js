@@ -9,8 +9,11 @@
  * Zwei Hinweise, keine Eingaben:
  *   1. unter „Marktmiete": die Zensus-BESTANDSMIETE der Gemeinde und des
  *      Kreises, passend zu Baujahr und Groesse des Objekts.
- *   2. unter „Leerstand p.a." (Investitionen): Leerstand und marktaktiver
- *      Leerstand, dazu wie lange die leeren Wohnungen schon leer stehen.
+ *   2. unter „Mietausfall-Risiko" (seit v2220, vorher unter „Leerstand p.a."):
+ *      der MARKTAKTIVE Leerstand als Anhalt für die Stufe des Dropdowns.
+ *      Marcel am 14.10.2026: der Gesamtleerstand sei „eigentlich nichtssagend";
+ *      bei der Parkstrasse standen 52,5 % der leeren Wohnungen seit über einem
+ *      Jahr leer - Dauerleerstand, kein Mietausfall. Die Dauer-Liste entfällt.
  *
  * Es wird NICHTS eingetragen. Die Bestandsmiete ist keine Marktmiete (alle
  * laufenden Vertraege am 15.05.2022, nicht Neuvermietung), und die
@@ -46,7 +49,8 @@
       '.dp-zi-z span:first-child{opacity:.8;min-width:0}',
       '.dp-zi-z b{white-space:nowrap}',
       '.dp-zi-f{margin-top:6px;font-size:10.5px;opacity:.65}',
-      '.dp-zi-h{margin-top:6px;font-size:11.5px}'
+      '.dp-zi-h{margin-top:6px;font-size:11.5px}',
+      '.dp-zi-btn{margin-left:4px;padding:2px 8px;border-radius:6px;border:1px solid var(--wl-c9a84c,#C9A84C);background:transparent;color:inherit;font:600 11px Inter,system-ui,sans-serif;cursor:pointer}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -74,21 +78,43 @@
       + 'oder Neuvertragsmiete, liegt daher meist darunter. ' + esc(LIZENZ) + '</div></div>';
   }
 
+  /* v2220 · Stufe aus dem marktaktiven Leerstand. VORSCHLAG, keine amtliche
+     Tabelle: angesetzt an der üblichen Fluktuationsreserve von 2-3 % (darunter
+     wird eine frei werdende Wohnung schnell wieder vermietet). Die Schwellen
+     stehen sichtbar im Kasten, damit sie geprüft werden können. */
+  var STUFEN = [
+    { bis: 1.5, wert: 'sehr_niedrig', wort: 'Sehr niedrig' },
+    { bis: 3, wert: 'niedrig', wort: 'Niedrig' },
+    { bis: 5, wert: 'mittel', wort: 'Mittel' },
+    { bis: 8, wert: 'erhoeht', wort: 'Erhöht' },
+    { bis: Infinity, wert: 'hoch', wort: 'Hoch' }
+  ];
+  function stufeAus(pctWert) { for (var i = 0; i < STUFEN.length; i++) if (pctWert < STUFEN[i].bis) return STUFEN[i]; return null; }
+  function wortZu(wert) { for (var i = 0; i < STUFEN.length; i++) if (STUFEN[i].wert === wert) return STUFEN[i].wort; return null; }
+
   function leerHtml(z) {
-    var b = (z.gemeinde && z.gemeinde.leerstandsquote != null) ? z.gemeinde : z.kreis;
+    /* Gemeinde vor Kreis - aber je Kennzahl: fehlt der Gemeinde der marktaktive
+       Wert, steht der Kreis da und heisst Kreis */
+    var g = z.gemeinde, k = z.kreis;
+    var b = (g && g.leerstandsquote_marktaktiv != null) ? g : (k && k.leerstandsquote_marktaktiv != null ? k : null);
     if (!b) return '';
-    var wo = b === z.gemeinde ? 'Gemeinde ' + b.name : 'Kreis ' + b.name;
-    var o = zeile('Leerstand ' + wo, pct(b.leerstandsquote))
-      + zeile('davon marktaktiv (Geschosswohnungen)', pct(b.leerstandsquote_marktaktiv));
-    if (b.leerstandsdauer && b.leerstandsdauer.length) {
-      o += '<div class="dp-zi-h">Wie lange die leeren Wohnungen leer stehen:</div>';
-      b.leerstandsdauer.forEach(function (d) { o += zeile(d.text, pct(d.anteil_pct)); });
+    var wo = (b === g ? 'Gemeinde ' : 'Kreis ') + b.name;
+    var st = stufeAus(Number(b.leerstandsquote_marktaktiv));
+    var sel = $('ds2_mietausfall'), ist = sel ? sel.value : '';
+    var o = zeile('Marktaktiver Leerstand ' + wo, pct(b.leerstandsquote_marktaktiv));
+    if (st) o += zeile('Anhalt für das Risiko', st.wort);
+    if (st) {
+      if (!ist) o += '<div class="dp-zi-h">Noch keine Stufe gewählt. <button type="button" class="dp-zi-btn" data-wert="' + st.wert + '">„' + esc(st.wort) + '“ übernehmen</button></div>';
+      else if (ist !== st.wert) o += '<div class="dp-zi-h">Deine Wahl „' + esc(wortZu(ist) || ist) + '“ weicht vom Zensus-Anhalt ab - begründbar z. B. durch Mieterstruktur oder Objektzustand. <button type="button" class="dp-zi-btn" data-wert="' + st.wert + '">„' + esc(st.wort) + '“ übernehmen</button></div>';
+      else o += '<div class="dp-zi-h">Deine Wahl passt zum Zensus-Anhalt.</div>';
     }
-    return '<div class="dp-zi" id="dp-zi-leer"><div class="dp-zi-k">Zensus 2022 · Leerstand</div>' + o
-      + '<div class="dp-zi-h"><b>Nicht dasselbe wie „Leerstand p.a.":</b> das Feld hier ist deine Annahme für den '
-      + 'Mietausfall pro Jahr. Der Zensus zählt alle leeren Wohnungen am Stichtag, auch die, die seit Jahren '
-      + 'leer stehen. Als Anhalt taugt eher der marktaktive Wert.</div>'
-      + '<div class="dp-zi-f">' + esc(LIZENZ) + '</div></div>';
+    var lang = null;
+    (b.leerstandsdauer || []).forEach(function (d) { if (/12 Monaten oder l/i.test(d.text)) lang = d.anteil_pct; });
+    var gesamt = b.leerstandsquote != null ? 'Gesamtleerstand ' + pct(b.leerstandsquote) + (lang != null ? ', davon ' + pct(lang) + ' seit über einem Jahr leer (Dauerleerstand, kein Mietausfall)' : '') + '. ' : '';
+    return '<div class="dp-zi" id="dp-zi-leer"><div class="dp-zi-k">Zensus 2022 · Leerstand am Markt</div>' + o
+      + '<div class="dp-zi-f">Marktaktiv = leere Geschosswohnungen, die kurzfristig vermietbar wären. '
+      + 'Stufen: unter 1,5 % sehr niedrig · unter 3 % niedrig · unter 5 % mittel · unter 8 % erhöht · darüber hoch. '
+      + esc(gesamt) + 'Stichtag 15.05.2022, Lage der Gemeinde - nicht des Objekts. ' + esc(LIZENZ) + '</div></div>';
   }
 
   function einsetzen(anker, id, html) {
@@ -99,9 +125,9 @@
 
   function zeichnen() {
     var z = _daten;
-    var mm = $('ds2_marktmiete'), ls = $('leerstand');
+    var mm = $('ds2_marktmiete'), ma = $('ds2_mietausfall');
     var fMiete = mm && mm.closest ? mm.closest('.f') : null;
-    var fLeer = ls && ls.closest ? ls.closest('.ass-row') : null;
+    var fLeer = ma && ma.closest ? ma.closest('.f') : null;   /* v2220: am Mietausfall-Risiko */
     if (!z || !z.available) { einsetzen(null, 'dp-zi-miete'); einsetzen(null, 'dp-zi-leer'); return; }
     stil();
     einsetzen(fMiete, 'dp-zi-miete', mieteHtml(z));
@@ -136,6 +162,16 @@
   document.addEventListener('change', function (e) {
     var id = e.target && e.target.id;
     if (id === 'plz' || id === 'ort' || id === 'baujahr' || id === 'wfl' || id === 'einheiten') spaeter();
+    if (id === 'ds2_mietausfall' && _daten) zeichnen();   /* v2220: Vergleich mit der Wahl */
+  });
+  /* v2220 · übernehmen setzt nur das Dropdown und löst dessen eigenes change aus
+     (Score, Speichern) - wie eine Hand-Auswahl */
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('.dp-zi-btn') : null;
+    var sel = $('ds2_mietausfall');
+    if (!b || !sel) return;
+    sel.value = b.getAttribute('data-wert');
+    sel.dispatchEvent(new Event('change', { bubbles: true }));
   });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', spaeter); else spaeter();
 
