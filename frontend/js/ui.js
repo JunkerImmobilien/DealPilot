@@ -2590,6 +2590,13 @@ function _sbActionsOutsideClick(e) {
   var btn = document.getElementById('sb-actions-trigger-btn');
   if (!acc) return;
   if (acc.contains(e.target) || (btn && btn.contains(e.target))) return;
+  /* v2216 · Marcel 14.10.2026: „wir haben definiert, dass das Aktionsmenü
+     geschlossen wird, wenn wir ein Objekt ausgewählt haben. In der Desktop-
+     Version brauchen wir das nicht." Auf breiten Bildschirmen bleibt es beim
+     Objektwechsel offen; am Handy (bis 900 px) schließt es wie bisher. */
+  try {
+    if (window.matchMedia('(min-width: 901px)').matches && e.target && e.target.closest && e.target.closest('.sb-card')) return;
+  } catch (x) {}
   if (acc.classList.contains('sb-actions-open')) sbActionsToggle();
 }
 function _sbActionsEscHandler(e) {
@@ -2640,6 +2647,18 @@ function sbActionsAction(action) {
     sbActionsToggle();
   }
   setTimeout(function() {
+    /* v2216 · Nach dem Marktbericht blieb jede weitere Aktion „ohne Wirkung":
+       Track Record, Bankexport oder ein neues Objekt öffneten sich HINTER der
+       Marktbericht-Ansicht (body.mb-standalone-active blieb stehen). Vor jeder
+       Aktion, die eine Ansicht wechselt, wird er deshalb leise geschlossen;
+       Fenster wie Einstellungen oder Import lassen ihn stehen. */
+    try {
+      var _nurFenster = ['marktbericht', 'settings', 'help', 'feedback', 'hub-import', 'hub-export', 'pdf', 'csv', 'export-csv', 'import-excel', 'import-json', 'export-json'];
+      if (_nurFenster.indexOf(action) < 0 && document.body.classList.contains('mb-standalone-active') && typeof window._mbLeiseSchliessen === 'function') {
+        window._mbLeiseSchliessen();
+        if (action === 'new' && typeof setMainView === 'function') setMainView('single');
+      }
+    } catch (e) {}
     switch (action) {
       case 'dashboard':   if (typeof setMainView === 'function') setMainView('dashboard'); break;
       case 'cockpit':       if (typeof setMainView === 'function') setMainView('dashboard'); break; /* v844-cockpit-handler */

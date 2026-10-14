@@ -197,6 +197,20 @@
       }
     } catch (e) {}
     injectCss();
+    /* v2216 · ÜBER DAS REGISTER ABRÄUMEN. Marcel 14.10.2026 (Handy): „ich kann nur
+       unter Aktionen einmal in den Marktbericht wechseln und danach kann ich keine
+       Aktion mehr anklicken bzw. es wird nicht ausgeführt."
+       Gemessen in der Messkabine (390 px, Kanzlei): Cockpit offen -> Marktbericht
+       antippen -> #s-marktbericht trägt .active, ist aber unsichtbar: das Cockpit
+       hatte `.main-col > .body` auf display:none gesetzt und der Schließer der
+       Einzelansicht jede `.sec` (auch diese). Der Marktbericht kannte nur den
+       Sonderfall dp-dash-fullscreen. Jetzt räumt er wie jede Hauptansicht über
+       DealPilotAnsichten ab und holt danach seine eigenen Behälter zurück. */
+    try { if (global.DealPilotAnsichten) global.DealPilotAnsichten.abraeumen('marktbericht'); } catch (e) {}
+    try {
+      var _bd = document.querySelector('.main-col > .body'); if (_bd) _bd.style.display = '';
+      var _mbs = $('s-marktbericht'); if (_mbs) _mbs.style.display = '';
+    } catch (e) {}
     if (document.body.classList.contains('dp-dash-fullscreen') && global.DealPilotDashboard && typeof global.DealPilotDashboard.close === 'function') {
       try { global.DealPilotDashboard.close(); } catch (e) {}
     }
@@ -233,6 +247,18 @@
     if (typeof global.switchTab === 'function') global.switchTab(idx >= 0 ? idx : 0);
     if (typeof global._updateWfTop === 'function') setTimeout(global._updateWfTop, 50);
   }
+
+  /* v2216 · Im Register anmelden: wer eine andere Hauptansicht öffnet
+     (setMainView, Cockpit, Strategie …), schließt damit auch den Marktbericht.
+     LEISE - ohne switchTab, den will die nächste Ansicht selbst bestimmen
+     (gleiches Muster wie enterQuickCheckMode, v2189). */
+  function _mbLeiseSchliessen() {
+    if (!document.body.classList.contains('mb-standalone-active')) return;
+    var mb = $('s-marktbericht'); if (mb) { mb.classList.remove('active'); mb.innerHTML = ''; }
+    document.body.classList.remove('mb-standalone-active');
+  }
+  try { if (global.DealPilotAnsichten) global.DealPilotAnsichten.melde('marktbericht', _mbLeiseSchliessen); } catch (e) {}
+  global._mbLeiseSchliessen = _mbLeiseSchliessen;
 
   global.openMarktberichtView = openMarktberichtView;
   window.addEventListener('message', function (ev) {
