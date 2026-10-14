@@ -541,7 +541,7 @@
         },
         {
           h: 'Wann speichert DealPilot mein Objekt?',
-          body: 'Es gibt keinen eigenen Speichern-Knopf. DealPilot sichert das geöffnete Objekt automatisch:\n\n• beim <strong>Wechsel des Reiters</strong> (Objekt, Investition, Miete …),\n• beim <strong>Öffnen eines anderen Objekts</strong> und bei „Neues Objekt“,\n• bei Aktionen wie einer Pilot-Analyse oder einem Statuswechsel in der Deal-Aktion.\n\nIm Kopf erscheint dann kurz „Auto-saved · gerade eben“.\n\n<strong>Gut zu wissen:</strong> Gesichert wird erst, wenn ein Kaufpreis oder ein Ort eingetragen ist. Willst du den Tab schließen, während noch Änderungen offen sind, warnt dich der Browser. Wechsle im Zweifel einmal den Reiter — dann ist alles gesichert.'
+          body: 'Es gibt keinen eigenen Speichern-Knopf. DealPilot sichert das geöffnete Objekt automatisch:\n\n• beim <strong>Wechsel des Reiters</strong> (Objekt, Investition, Miete …),\n• beim <strong>Öffnen eines anderen Objekts</strong> und bei „Neues Objekt“,\n• bei Aktionen wie einer Pilot-Analyse oder einem Statuswechsel in der Deal-Aktion.\n\nIm Kopf erscheint dann kurz „Gespeichert · gerade eben“.\n\n<strong>Gut zu wissen:</strong> Gesichert wird erst, wenn ein Kaufpreis oder ein Ort eingetragen ist. Willst du den Tab schließen, während noch Änderungen offen sind, warnt dich der Browser. Wechsle im Zweifel einmal den Reiter — dann ist alles gesichert.'
         },
         {
           h: 'Wie dupliziere oder lösche ich ein Objekt?',

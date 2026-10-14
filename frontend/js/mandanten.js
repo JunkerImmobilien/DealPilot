@@ -879,7 +879,7 @@
     var corpBlock =
         '<div id="mand-corp-only" style="display:' + (corp ? 'block' : 'none') + '">'
       +   '<hr class="dvd" style="margin:18px 0 6px">'
-      +   '<h3 class="set-section-h">Steuerregime <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 wird in Stufe 2 aktiv</span></h3>'
+      +   '<h3 class="set-section-h">Steuerregime <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 rechnet in Steuer und Jahresabschluss</span></h3>'   /* v2208: hier stand "wird in Stufe 2 aktiv" - effRate() (Z. 328) und gesellschaft-abschluss.js rechnen laengst damit */
       +   '<div style="' + _fGrid() + '">'
       +     fldH('K\u00f6rperschaftsteuer + Soli (%)', inp('mand-f-kst', reg.kst != null ? reg.kst : 15.825), 'Satz, mit dem der Gewinn der Gesellschaft besteuert wird: 15 % K\u00f6rperschaftsteuer + 5,5 % Solidarit\u00e4tszuschlag darauf = 15,825 %.')
       +     fldH('Gewerbesteuer-Hebesatz (%)', inp('mand-f-gewst', reg.gewst != null ? reg.gewst : 0), 'Hebesatz deiner Gemeinde (z.B. 400). Nur relevant, wenn die erweiterte K\u00fcrzung NICHT greift. Bei reiner Vermietung mit K\u00fcrzung 0 lassen.')
@@ -896,8 +896,8 @@
       +     '<div class="mand-fhint" style="margin-top:5px;font-size:11.5px;color:#7A7370;line-height:1.45">Reine Grundst\u00fccksverwaltung (nur Vermietung, kein gewerblicher Handel) kann die Gewerbesteuer auf 0 k\u00fcrzen. Aktiv lassen, wenn die Gesellschaft ausschlie\u00dflich vermietet.</div>'
       +   '</div>'
       +   '<hr class="dvd" style="margin:18px 0 6px">'
-      +   '<h3 class="set-section-h">Buchhaltung <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 f\u00fcr GuV/Bilanz-Export (Stufe 3)</span></h3>'
-      +   '<div class="mand-fhint" style="margin:2px 0 12px;font-size:12px;color:#7A7370;line-height:1.5">Diese Werte bilden die <b>Er\u00f6ffnungsbilanz</b> der Gesellschaft und sind sp\u00e4ter Basis f\u00fcr GuV-/Bilanz- und DATEV-Export. F\u00fcr die laufende Rendite- und Steuerrechnung sind sie nicht n\u00f6tig \u2014 nur f\u00fcrs Reporting. Im Zweifel mit dem Steuerberater abstimmen.</div>'
+      +   '<h3 class="set-section-h">Buchhaltung <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 f\u00fcr den Jahresabschluss (GuV und Bilanz)</span></h3>'   /* v2208: war "(Stufe 3)" - den Abschluss gibt es seit v1227 */
+      +   '<div class="mand-fhint" style="margin:2px 0 12px;font-size:12px;color:#7A7370;line-height:1.5">Diese Werte bilden die <b>Er\u00f6ffnungsbilanz</b> der Gesellschaft; der Jahresabschluss (GuV und Bilanz) rechnet mit ihnen. F\u00fcr die laufende Rendite- und Steuerrechnung sind sie nicht n\u00f6tig \u2014 nur f\u00fcrs Reporting. Im Zweifel mit dem Steuerberater abstimmen.</div>'
       +   '<div style="' + _fGrid() + '">'
       +     fldH('Kontenrahmen', '<select id="mand-f-kr">' + krOpts() + '</select>', 'Buchhaltungs-Kontenrahmen f\u00fcr GuV/Bilanz. SKR04 ist der Standard f\u00fcr Kapitalgesellschaften (DATEV).')
       +     fldH('Wirtschaftsjahr-Beginn (MM-TT)', inp('mand-f-wj', bh.wj_start || '01-01', '01-01'), 'Beginn des Gesch\u00e4ftsjahres. Meist 01-01 (Kalenderjahr). Abweichend nur, wenn im Gesellschaftsvertrag so festgelegt.')
