@@ -36,6 +36,15 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N67 · Marcel 14.10.2026 (vierte Runde)
+0. **Prod-Rollout v2208–v2215b freigegeben** („ja du kannst ausrollen").
+1. **Handy: Aktionen → Marktbericht geht einmal, danach reagiert keine Aktion mehr.**
+2. **Handy: Knöpfe Plan und Abmelden sehr klein, Icons nicht erkennbar.**
+3. **Schließen-Knöpfe sehen komisch aus → ein vernünftiges „×".**
+4. **Handy-Kopf:** alle wichtigen Informationen drauf, aber wild angeordnet → aufräumen. In der Messkabine durchtesten.
+5. **Parkstr. 9 (2026-1056):** Nettokaltmiete anpassen, damit es eine gute Geschichte wird (Demo-Objekt).
+6. **Soll/Ist-Analyse** (Pilot-Analyse) ausbauen.
+
 ### N66 · Marcel 14.10.2026 (dritte Runde) — Messe-Geschichten, BMF, RND-Abgleich, Werbungskosten
 1. **Messe-Geschichten als Dokument ablegen** — was Marcel an jedem Demo-Objekt erklären kann.
 2. **BMF-Kaufpreisaufteilung** bei den Demo-Objekten nachziehen.
