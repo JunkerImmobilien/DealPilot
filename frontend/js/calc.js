@@ -2044,6 +2044,12 @@ function _calcImmediate(){
     try {
       var _ue = g('ueberf_ende');
       if (!_ue || !/^\d{4}-\d{2}-\d{2}$/.test(_ue)) return;
+      /* v2212 · Nur das PRIVAT-Objekt endet am Stichtag. Der Assistent gibt
+         das Datum auch dem neuen Gesellschaftsobjekt (v816h) - dort ist es
+         der BEGINN. Gekappt wurde trotzdem: Startjahr = Stichtagsjahr ->
+         eine einzige Zeile. Gemessen 14.10.2026 an 2026-1007 und 2026-1008
+         (Betrachtungszeitraum 15, Projektion 1 Jahr). */
+      if (String(g('obj_herkunft') || '') === 'ueberfuehrung') return;
       var _ueY = parseInt(_ue.slice(0,4),10), _ueM = parseInt(_ue.slice(5,7),10);
       if (!_ueY || !_ueM || _ueM < 1 || _ueM > 12) return;
       /* Startjahr = WU/kaufdat (gleiche Quelle wie Projektion). */

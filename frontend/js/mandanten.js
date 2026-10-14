@@ -640,7 +640,8 @@
         }
         var zeilen = mine.map(function (o) {
           var d = o.data || o;
-          var eingefroren = !!((d.ueberf_ende || '').toString().trim());
+          /* v2212: das Gesellschaftsobjekt aus einer Ueberfuehrung traegt dasselbe Datum als BEGINN */
+          var eingefroren = !!((d.ueberf_ende || '').toString().trim()) && String(d.obj_herkunft || '') !== 'ueberfuehrung';
           var name = [d.str, d.hnr].filter(Boolean).join(' ') || o.name || o.seq_no || 'Objekt';
           /* v1962: hier stand `.replace(/./g, '')` - der Punkt im
              regulaeren Ausdruck war NICHT MASKIERT und trifft damit jedes
