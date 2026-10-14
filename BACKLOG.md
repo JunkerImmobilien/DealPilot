@@ -37,6 +37,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 ---
 
 ### N68 · Marcel 14.10.2026 (fünfte Runde)
+> **Stand 14.10.2026:** 1 erledigt (`v2216j`), 3 erledigt (`v2216j`/`v2216k`), 2: sechs Demos in `design/Vorschläge/prozessatlas/` — **wartet auf Marcels Wahl**.
 1. **Soll/Ist gehört in die Pilot-Analyse (Reiter Ist/Soll), nicht in den Tab Objekt** — die Tafel „Bestand gegen Ankauf" (`#dp-abweichung`, seit v2034) dort raus.
 2. **Prozessatlas cooler und animierter:** Unterkarten; Spracheingabe visualisieren; Import aus PDF visualisieren; sehr detailliert, wie die Prozesse in allen Bereichen funktionieren; die zugehörigen Daten; den Nutzen, der herauskommt; am Schluss, wie alles zusammenspielt. Schlüssig, mit Wow-Effekt für den Kunden. **5–6 Ideen fertig machen** (Demo-first, `design/Vorschläge/`).
 3. **F1 ruft den Piloten bei Dropdown-Feldern nicht.**

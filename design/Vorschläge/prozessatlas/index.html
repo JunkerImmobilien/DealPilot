@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prozessatlas · Vorschläge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="basis.css">
+<style>
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 22px 80px}
+  h1{font-size:40px;letter-spacing:-.02em;margin:8px 0 10px}
+  h1 b{background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{color:var(--leise);max-width:760px;font-size:16px}
+  .gitter{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-top:30px}
+  a.k{display:block;text-decoration:none;color:inherit;border:1px solid var(--linie);border-radius:18px;padding:20px;background:var(--obs2);transition:border-color .2s,transform .2s;position:relative}
+  a.k:hover{border-color:var(--gold);transform:translateY(-3px)}
+  a.k .n{font:700 44px var(--f-disp);color:#211e17;position:absolute;right:18px;top:8px}
+  a.k h3{font-size:21px;margin:4px 0 6px}
+  a.k p{margin:0 0 10px;color:var(--leise);font-size:14px}
+  a.k .w{font:600 10.5px var(--f-mono);letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+  a.k ul{margin:10px 0 0;padding-left:18px;color:var(--tinte);font-size:13px;opacity:.85}
+  .rat{margin-top:34px;border:1px solid var(--gold);border-radius:18px;padding:20px 22px;background:color-mix(in srgb,var(--gold) 6%,var(--obs2))}
+  .rat h2{font-size:20px;margin-bottom:6px}
+  .rat p{margin:6px 0;color:var(--tinte);opacity:.9}
+  .rat ol{margin:8px 0 0;padding-left:20px;color:var(--tinte)}
+  .rat li{margin:5px 0}
+</style>
+</head>
+<body>
+<header class="kopf"><span class="marke">Deal<b>Pilot</b></span><span class="nr">N68.2</span><span class="titel">Prozessatlas — sechs Vorschläge</span></header>
+<div class="wrap">
+  <div class="ueber">Demo-first · 14.10.2026</div>
+  <h1>Der Prozessatlas, <b>sechs Wege</b>.</h1>
+  <p class="lead">Dein Wunsch: Unterkarten, Spracheingabe und PDF-Import sichtbar machen, jeden Bereich im Detail, die Daten dazu, den Nutzen — und am Ende das Zusammenspiel. Mit Wow. Jede Idee ist für sich lauffähig. Die Abläufe kommen direkt aus dem echten Atlas (<span class="beleg">frontend/js/prozess-atlas.js</span>), nicht abgeschrieben.</p>
+  <div class="gitter">
+    <a class="k" href="1-streckennetz.html"><span class="n">1</span><span class="w">Überblick</span><h3>Streckennetz</h3><p>Alle Abläufe als Liniennetz wie ein U-Bahn-Plan. Oben die ganze Reise, darunter zweigt jede Linie dort ab, wo sie beginnt.</p><ul><li>Klick auf eine Station → Unterkarte</li><li>Klick auf ein Datum → das Netz zeigt jede Station, die es braucht</li></ul></a>
+    <a class="k" href="2-sprechlauf.html"><span class="n">2</span><span class="w">Unterkarte</span><h3>Sprechlauf</h3><p>Ein Diktat läuft ab: Wörter erscheinen, werden erkannt, fliegen ins Feld. Ein belegtes Feld löst die Rückfrage aus, am Ende rechnet die Rendite.</p><ul><li>zeigt „nichts wird still überschrieben"</li><li>der Verkäufername fällt weg — kein Feld, keine Übernahme</li></ul></a>
+    <a class="k" href="3-dokumentenfluss.html"><span class="n">3</span><span class="w">Unterkarte</span><h3>Dokumentenfluss</h3><p>Ein Kaufvertrag wird gelesen, die Art erkannt, Personen geschwärzt, Objektdaten ausgelesen. Zweiter Reiter: das echte RND-Gutachten Westerfeldstr. als Vergleich.</p><ul><li>sichtbar, was an die KI geht</li><li>Gutachten 16 J gegen DealPilot 23,6 J — die GND macht den Unterschied</li></ul></a>
+    <a class="k" href="4-tiefenzoom.html"><span class="n">4</span><span class="w">Detail</span><h3>Tiefenzoom</h3><p>Vier Ebenen: App → Phase → Ablauf → Station → ein einzelnes Datum mit Herkunft links und Verwendung rechts.</p><ul><li>beantwortet „woher kommt diese Zahl?"</li><li>deckt nebenbei Lücken im Atlas auf (DSCR geht laut Atlas in nichts weiter)</li></ul></a>
+    <a class="k" href="5-zusammenspiel.html"><span class="n">5</span><span class="w">Schlussbild</span><h3>Zusammenspiel</h3><p>Ein Zifferblatt: in der Mitte das Objekt, innen die sechs Rechenkerne, außen die Abläufe und was du in der Hand hältst. Daten fließen sichtbar.</p><ul><li>Rundflug für die Messe</li><li>erklärt, warum Karte und Telegram-Bot dieselbe Zahl zeigen</li></ul></a>
+    <a class="k" href="6-flugschreiber.html"><span class="n">6</span><span class="w">Geschichte</span><h3>Flugschreiber</h3><p>Die Parkstraße scrollt durch die Abläufe: Kauf, Ankauf-Stand, Sanierung, Neuvermietung, Soll/Ist. Rechts laufen DSCR-Nadel, Miete, Cashflow und Score mit.</p><ul><li>echte Zahlen aus 2026-1056</li><li>der Nutzen in einer Geschichte statt in einem Diagramm</li></ul></a>
+  </div>
+  <div class="rat">
+    <h2>Mein Vorschlag zum Zusammensetzen</h2>
+    <p>Die sechs schließen sich nicht aus — sie sind Ebenen desselben Atlas:</p>
+    <ol>
+      <li><b>Einstieg: Streckennetz (1)</b> ersetzt die heutige Spaltenansicht im Hilfe-Atlas.</li>
+      <li><b>Klick auf eine Station: Tiefenzoom (4)</b> statt der Seitenleiste — bis hinunter zum Datum.</li>
+      <li><b>Sprechlauf (2) und Dokumentenfluss (3)</b> werden die Unterkarten ihrer Stationen, abspielbar.</li>
+      <li><b>Zusammenspiel (5)</b> als letzte Karte des Atlas, <b>Flugschreiber (6)</b> für die Landing-Seite und die Messe.</li>
+    </ol>
+    <p>Die Datengrundlage bleibt eine: <span class="beleg">prozess-atlas.js</span> plus die zwei neuen Abläufe aus <span class="beleg">zusatz.js</span>, geprüft von <span class="beleg">tools/prozess-atlas-pruefen.mjs</span>.</p>
+  </div>
+</div>
+</body>
+</html>

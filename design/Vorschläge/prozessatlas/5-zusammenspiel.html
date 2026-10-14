@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atlas · Zusammenspiel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="basis.css">
+<style>
+  .buehne{display:grid;grid-template-columns:minmax(0,1fr) 360px;min-height:calc(100vh - 57px)}
+  .rad{display:grid;place-items:center;padding:10px;position:relative}
+  .rad svg{width:min(100%,86vh);height:auto;display:block}
+  .seite{background:var(--obs2);border-left:1px solid var(--linie);padding:24px 22px 60px}
+  .seite h1{font-size:24px;margin:6px 0 8px;letter-spacing:-.01em}
+  .seite p{color:var(--leise);font-size:14px}
+  .seite h4{font:600 10.5px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--still);margin:18px 0 8px}
+  .info{border:1px solid var(--linie);border-radius:12px;padding:12px 14px;margin-top:14px;min-height:120px}
+  .info b{font:600 16px var(--f-disp);display:block;margin-bottom:4px}
+  .info .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .knopf{all:unset;cursor:pointer;font:600 12px var(--f-mono);padding:8px 14px;border-radius:9px;background:var(--runway);color:var(--obs);margin-top:14px;display:inline-block}
+  .ring-txt{font:600 9px var(--f-mono);letter-spacing:.2em;fill:var(--still)}
+  .kante{fill:none;stroke:#2a261d;stroke-width:1.4;transition:stroke .3s,stroke-width .3s,opacity .3s}
+  .kante.an{stroke:var(--gold);stroke-width:2.2}
+  .gedimmt .kante:not(.an){opacity:.25}
+  .gedimmt .kn:not(.an){opacity:.3}
+  .kn{cursor:pointer;transition:opacity .3s}
+  .kn circle.k{fill:var(--obs);stroke-width:2}
+  .kn text{font:600 12px var(--f-disp);fill:var(--tinte);text-anchor:middle}
+  .kn text.u{font:500 9px var(--f-mono);fill:var(--still)}
+  .kn.ablauf circle.k{stroke:#5d543f}
+  .kn.kern circle.k{stroke:var(--gold);fill:#100e09}
+  .kn.aus circle.k{stroke:var(--gruen)}
+  .kn.an circle.k{stroke:var(--gold-hi);stroke-width:3;filter:drop-shadow(0 0 8px color-mix(in srgb,var(--gold) 70%,transparent))}
+  .mitte text{text-anchor:middle}
+  .teil{fill:var(--gold-hi)}
+  .zeiger{transform-origin:450px 450px;animation:dreh 40s linear infinite}
+  @keyframes dreh{to{transform:rotate(360deg)}}
+  @media (max-width:900px){.buehne{grid-template-columns:1fr}.seite{border-left:0;border-top:1px solid var(--linie)}}
+</style>
+</head>
+<body>
+<header class="kopf">
+  <span class="marke">Deal<b>Pilot</b></span><span class="nr">Idee 5</span><span class="titel">Zusammenspiel — ein Objekt, sechs Kerne, neun Abläufe</span>
+  <span class="rechts"><a href="4-tiefenzoom.html">← zurück</a><a href="index.html">Übersicht</a><a href="6-flugschreiber.html">weiter →</a></span>
+</header>
+<div class="buehne">
+  <div class="rad"><svg id="rad" viewBox="0 0 900 900" aria-label="Zusammenspiel der Abläufe und Rechenkerne"></svg></div>
+  <aside class="seite">
+    <div class="ueber">Prozessatlas · Idee 5 · das Schlussbild</div>
+    <h1>Warum überall dieselbe Zahl steht</h1>
+    <p>In der Mitte liegt <b>ein</b> Datensatz je Objekt. Der innere Ring sind die Rechenkerne — jeder steht an genau einer Stelle. Außen die Abläufe, ganz außen, was du in der Hand hältst. Fahr über einen Ablauf: du siehst, welche Kerne er fragt. Fahr über einen Kern: du siehst, wer ihm vertraut.</p>
+    <div class="info" id="info"><b>Zeig auf einen Punkt.</b><span class="leise">Oder lass die Runde laufen.</span></div>
+    <button class="knopf" id="runde">▶ Rundflug</button>
+    <h4>Die Regel dahinter</h4>
+    <p>Ein Kern liest nie Einstellungen. Was er braucht, bekommt er als Parameter. Deshalb rechnet der Telegram-Bot im Backend mit denselben fünf Kernen wie die App — sie werden dorthin gespiegelt, nicht nachgebaut.</p>
+  </aside>
+</div>
+<div class="demo-hinweis">Demo · Kerne laut CLAUDE.md, Abläufe aus prozess-atlas.js</div>
+<script src="../../../frontend/js/prozess-atlas.js"></script>
+<script src="zusatz.js"></script>
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg', svg = document.getElementById('rad');
+  var ALLE = ((window.DealPilotAtlas && window.DealPilotAtlas.PROZESSE) || []).concat(window.ATLAS_ZUSATZ.ablaeufe);
+  var KERNE = window.ATLAS_ZUSATZ.kerne;
+  /* Was du in der Hand haeltst — je Ausgabe die Ablaeufe, die sie fuellen. */
+  var AUSGABEN = [
+    { id: 'karte', t: 'Objektkarte', k: 'Score-Pille', von: ['quickcheck', 'scores', 'boarding'] },
+    { id: 'pdf', t: 'Investment-PDF', k: 'für die Bank', von: ['deal'] },
+    { id: 'mb', t: 'Marktbericht-PDF', k: 'mit Quellennachweis', von: ['marktbericht'] },
+    { id: 'anl', t: 'Anlage V', k: 'Finanzamt-PDF', von: ['steuer'] },
+    { id: 'cock', t: 'Portfolio-Cockpit', k: 'alle Objekte', von: ['reise', 'steuer'] },
+    { id: 'bot', t: 'Telegram-Bot', k: 'Kerne gespiegelt', von: [], kerne: ['kpi', 'dscr', 'score', 'tier'] }
+  ];
+  var C = 450, R1 = 150, R2 = 285, R3 = 400;
+  function el(n, a, p) { var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); (p || svg).appendChild(e); return e; }
+  function pol(r, w) { return [C + r * Math.cos(w), C + r * Math.sin(w)]; }
+
+  /* Zifferblatt */
+  var gZ = el('g', { class: 'zeiger' });
+  for (var i = 0; i < 120; i++) { var w = i / 120 * Math.PI * 2, a = pol(R3 + 32, w), b = pol(R3 + (i % 10 ? 38 : 46), w); el('line', { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: i % 10 ? '#1d1a14' : '#3a3324', 'stroke-width': i % 10 ? 1 : 2 }, gZ); }
+  [R1, R2, R3].forEach(function (r) { el('circle', { cx: C, cy: C, r: r, fill: 'none', stroke: '#16140f', 'stroke-dasharray': '2 6' }); });
+  el('text', { x: C, y: C - R1 + 20, class: 'ring-txt', 'text-anchor': 'middle' }).textContent = 'RECHENKERNE';
+  el('text', { x: C, y: C - R2 + 22, class: 'ring-txt', 'text-anchor': 'middle' }).textContent = 'ABLÄUFE';
+  el('text', { x: C, y: C - R3 + 22, class: 'ring-txt', 'text-anchor': 'middle' }).textContent = 'WAS DU IN DER HAND HÄLTST';
+
+  var gK = el('g', {}), gT = el('g', {}), gN = el('g', {});
+  var POS = {}, KANTEN = [];
+  function knoten(art, id, t, u, r, w, rad) {
+    var p = pol(r, w), g = el('g', { class: 'kn ' + art, 'data-id': id, transform: 'translate(' + p[0] + ',' + p[1] + ')' }, gN);
+    el('circle', { class: 'k', r: rad }, g);
+    el('text', { y: art === 'kern' ? 2 : rad + 16 }, g).textContent = t;
+    el('text', { y: art === 'kern' ? 15 : rad + 28, class: 'u' }, g).textContent = u;
+    POS[id] = { x: p[0], y: p[1], g: g, art: art };
+    return g;
+  }
+  /* Mitte: das Objekt */
+  var m = el('g', { class: 'mitte' });
+  el('circle', { cx: C, cy: C, r: 62, fill: 'url(#mg)', stroke: '#C9A84C', 'stroke-width': 1.5 }, m);
+  var defs = el('defs', {}); var rg = el('radialGradient', { id: 'mg' }, defs); el('stop', { offset: 0, 'stop-color': '#3a2f12' }, rg); el('stop', { offset: 1, 'stop-color': '#0c0a06' }, rg);
+  el('text', { x: C, y: C - 4, style: 'font:700 18px Space Grotesk;fill:#E8CC7A' }, m).textContent = 'Objekt';
+  el('text', { x: C, y: C + 14, style: 'font:500 9.5px JetBrains Mono;fill:#a89e86' }, m).textContent = 'ein Datensatz';
+  POS.obj = { x: C, y: C };
+
+  KERNE.forEach(function (k, i) { knoten('kern', k.id, k.t, k.k, R1, -Math.PI / 2 + (i + .5) / KERNE.length * Math.PI * 2, 34); });
+  ALLE.forEach(function (p, i) { knoten('ablauf', p.id, p.name.replace('Netzplan ', ''), p.knoten.length + ' Stationen', R2, -Math.PI / 2 + i / ALLE.length * Math.PI * 2, 13); });
+  AUSGABEN.forEach(function (a, i) { knoten('aus', a.id, a.t, a.k, R3, -Math.PI / 2 + (i + .5) / AUSGABEN.length * Math.PI * 2, 10); });
+
+  function kante(a, b) {
+    var A = POS[a], B = POS[b];
+    var mx = (A.x + B.x) / 2 + (C - (A.x + B.x) / 2) * .35, my = (A.y + B.y) / 2 + (C - (A.y + B.y) / 2) * .35;
+    var p = el('path', { class: 'kante', d: 'M' + A.x + ',' + A.y + ' Q' + mx + ',' + my + ' ' + B.x + ',' + B.y, 'data-a': a, 'data-b': b }, gK);
+    KANTEN.push({ a: a, b: b, p: p, L: p.getTotalLength() });
+  }
+  KERNE.forEach(function (k) { kante('obj', k.id); k.nutzt.forEach(function (pid) { if (POS[pid]) kante(k.id, pid); }); });
+  AUSGABEN.forEach(function (a) { a.von.forEach(function (pid) { kante(pid, a.id); }); (a.kerne || []).forEach(function (kid) { kante(kid, a.id); }); });
+
+  /* Teilchen: laufen auf jeder Kante nach aussen; auf aktiven Kanten mehr und heller */
+  var TEIL = KANTEN.map(function (k, i) { return { k: k, t: Math.random(), c: el('circle', { r: 2, class: 'teil', opacity: .35 }, gT) }; });
+  var aktiv = null;
+  (function lauf() {
+    TEIL.forEach(function (t) {
+      var an = !aktiv || t.k.p.classList.contains('an');
+      t.t = (t.t + (an && aktiv ? .012 : .004)) % 1;
+      var pt = t.k.p.getPointAtLength(t.t * t.k.L);
+      t.c.setAttribute('cx', pt.x); t.c.setAttribute('cy', pt.y);
+      t.c.setAttribute('opacity', aktiv ? (an ? .95 : 0) : .35); t.c.setAttribute('r', aktiv && an ? 3 : 2);
+    });
+    requestAnimationFrame(lauf);
+  })();
+
+  var info = document.getElementById('info');
+  function fokus(id) {
+    aktiv = id; svg.classList.toggle('gedimmt', !!id);
+    svg.querySelectorAll('.an').forEach(function (e) { e.classList.remove('an'); });
+    if (!id) return;
+    POS[id].g.classList.add('an');
+    var nach = {};
+    KANTEN.forEach(function (k) { if (k.a === id || k.b === id) { k.p.classList.add('an'); nach[k.a === id ? k.b : k.a] = 1; } });
+    Object.keys(nach).forEach(function (n) { if (POS[n] && POS[n].g) POS[n].g.classList.add('an'); });
+    var art = POS[id].art, h = '';
+    if (art === 'kern') { var K = KERNE.filter(function (k) { return k.id === id; })[0]; h = '<span class="ueber">Rechenkern</span><b>' + K.t + '</b>' + K.k + '<div class="chips">' + K.nutzt.map(function (p) { var P = ALLE.filter(function (x) { return x.id === p; })[0]; return P ? '<span class="chip">' + P.name + '</span>' : ''; }).join('') + '</div><div class="beleg" style="margin-top:8px">' + K.beleg + '</div>'; }
+    else if (art === 'ablauf') { var P = ALLE.filter(function (x) { return x.id === id; })[0]; var aus = []; P.knoten.forEach(function (k) { (k.aus || []).forEach(function (a) { if (aus.indexOf(a) < 0) aus.push(a); }); }); h = '<span class="ueber">Ablauf</span><b>' + P.name + '</b>' + P.sub + '<div class="chips">' + aus.slice(0, 12).map(function (a) { return '<span class="chip aus">' + a + '</span>'; }).join('') + '</div>'; }
+    else { var A = AUSGABEN.filter(function (x) { return x.id === id; })[0]; h = '<span class="ueber">Ergebnis</span><b>' + A.t + '</b>' + A.k + (A.id === 'bot' ? '<p style="margin:8px 0 0">Läuft ohne Browser im Backend. Die Kerne werden mit <code>rechenkerne-spiegeln.mjs</code> dorthin kopiert — dieselbe Datei, nicht nachgebaut.</p>' : ''); }
+    info.innerHTML = h;
+  }
+  svg.addEventListener('mouseover', function (e) { var g = e.target.closest('.kn'); if (g) { stoppRunde(); fokus(g.getAttribute('data-id')); } });
+  svg.addEventListener('click', function (e) { var g = e.target.closest('.kn'); stoppRunde(); fokus(g ? g.getAttribute('data-id') : null); });
+
+  /* Rundflug: nacheinander durch Ablaeufe, Kerne, Ausgaben */
+  var reihe = ALLE.map(function (p) { return p.id; }).concat(KERNE.map(function (k) { return k.id; }), AUSGABEN.map(function (a) { return a.id; }));
+  var timer = null, idx = 0;
+  function stoppRunde() { if (timer) { clearInterval(timer); timer = null; document.getElementById('runde').textContent = '▶ Rundflug'; } }
+  document.getElementById('runde').onclick = function () {
+    if (timer) return stoppRunde();
+    this.textContent = '❚❚ Rundflug läuft';
+    fokus(reihe[idx++ % reihe.length]);
+    timer = setInterval(function () { fokus(reihe[idx++ % reihe.length]); }, 2300);
+  };
+})();
+</script>
+</body>
+</html>

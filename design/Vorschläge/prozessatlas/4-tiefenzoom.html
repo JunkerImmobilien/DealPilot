@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atlas · Tiefenzoom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="basis.css">
+<style>
+  .wrap{max-width:1240px;margin:0 auto;padding:22px 22px 70px}
+  .pfad{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font:600 12px var(--f-mono);margin-bottom:14px}
+  .pfad a{color:var(--leise);text-decoration:none;cursor:pointer;padding:4px 8px;border-radius:6px;border:1px solid var(--linie)}
+  .pfad a:hover{color:var(--gold-hi);border-color:var(--gold)}
+  .pfad .hier{color:var(--obs);background:var(--gold-hi);padding:4px 8px;border-radius:6px}
+  .pfad .tr{color:var(--still)}
+  .ebene{font:600 10.5px var(--f-mono);letter-spacing:.16em;color:var(--gold);text-transform:uppercase}
+  h1{font-size:30px;letter-spacing:-.01em;margin:4px 0 6px}
+  .sub{color:var(--leise);max-width:760px;margin-bottom:20px}
+  .flaeche{position:relative;min-height:440px}
+  .gitter{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+  .gitter.drei{grid-template-columns:repeat(3,1fr)}
+  .kachel{position:relative;border:1px solid var(--linie);border-radius:16px;padding:18px;background:var(--obs2);cursor:pointer;transition:border-color .2s,transform .2s;overflow:hidden;animation:auf .45s cubic-bezier(.3,0,.2,1) both}
+  .kachel:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .kachel .n{font:600 10px var(--f-mono);color:var(--still);letter-spacing:.12em}
+  .kachel h3{font-size:19px;margin:6px 0 4px}
+  .kachel p{margin:0;color:var(--leise);font-size:13.5px}
+  .kachel .mini{display:flex;gap:4px;margin-top:12px;flex-wrap:wrap}
+  .kachel .mini i{width:10px;height:10px;border-radius:50%;border:2px solid var(--gold);display:block}
+  .kachel .mini i.opt{border-style:dashed}
+  .kachel .zahl{position:absolute;right:16px;top:14px;font:700 28px var(--f-disp);color:#2a261d}
+  .kachel.phase{min-height:230px;background:radial-gradient(circle at 80% 0%,color-mix(in srgb,var(--gold) 14%,transparent),transparent 60%),var(--obs2)}
+  .kachel.phase h3{font-size:24px}
+  .kachel .abl{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+  .kachel .abl span{font:500 12px var(--f-mono);color:var(--tinte);padding:6px 9px;border-radius:8px;background:var(--obs3);border:1px solid var(--linie)}
+  @keyframes auf{from{opacity:0;transform:scale(.94) translateY(10px)}}
+  .zoomer{position:fixed;z-index:90;border:1px solid var(--gold);border-radius:16px;background:var(--obs2);pointer-events:none;transition:all .45s cubic-bezier(.6,0,.2,1)}
+  /* Ebene Station */
+  .station{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:20px}
+  .box{border:1px solid var(--linie);border-radius:16px;padding:18px;background:var(--obs2);animation:auf .45s both}
+  .box h4{font:600 10.5px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--still);margin:0 0 10px}
+  .box p{margin:0 0 6px;color:var(--tinte)}
+  .schritte{list-style:none;margin:0;padding:0}
+  .schritte li{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--linie);animation:auf .4s both}
+  .schritte li em{font:600 11px/26px var(--f-mono);font-style:normal;text-align:center;border-radius:50%;border:1px solid var(--gold);color:var(--gold-hi);height:26px}
+  .schritte b{font:600 14px var(--f-disp)}
+  .schritte span{display:block;color:var(--leise);font-size:13px}
+  .daten{display:flex;flex-wrap:wrap;gap:7px}
+  .daten .chip{cursor:pointer;font-size:12.5px;padding:6px 10px}
+  .daten .chip:hover{border-color:var(--gold-hi);color:var(--gold-hi)}
+  .gew{display:grid;grid-template-columns:120px 1fr 32px;gap:8px;align-items:center;font:500 12px var(--f-mono);margin-top:4px}
+  .gew i{height:8px;border-radius:4px;background:var(--runway);display:block;animation:wachs .8s ease-out both;transform-origin:left}
+  @keyframes wachs{from{transform:scaleX(0)}}
+  /* Ebene Datum */
+  .datum{display:grid;grid-template-columns:1fr 200px 1fr;gap:18px;align-items:center}
+  .seite h4{font:600 10.5px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--still);margin:0 0 10px}
+  .seite .q{border:1px solid var(--linie);border-radius:11px;padding:9px 12px;margin-bottom:8px;background:var(--obs2);cursor:pointer;animation:auf .4s both}
+  .seite .q:hover{border-color:var(--gold)}
+  .seite .q b{display:block;font:600 13.5px var(--f-disp)}
+  .seite .q span{font:500 10.5px var(--f-mono);color:var(--still)}
+  .seite.links .q{border-left:3px solid #bfe6cd}
+  .seite.rechts .q{border-left:3px solid var(--gold)}
+  .kern{width:200px;height:200px;border-radius:50%;display:grid;place-items:center;text-align:center;background:radial-gradient(circle,color-mix(in srgb,var(--gold) 22%,transparent),transparent 70%);border:1px solid var(--gold);position:relative}
+  .kern b{font:700 20px var(--f-disp);display:block;padding:0 14px}
+  .kern span{font:500 10px var(--f-mono);color:var(--leise)}
+  .kern::before,.kern::after{content:"";position:absolute;top:50%;width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--gold-hi));animation:fluss 1.4s linear infinite}
+  .kern::before{right:100%}
+  .kern::after{left:100%}
+  @keyframes fluss{0%{background-position:-60px 0}100%{background-position:60px 0}}
+  .leer{color:var(--still);font:500 12px var(--f-mono);padding:10px 0}
+  @media (max-width:860px){.gitter.drei,.station,.datum{grid-template-columns:1fr}.kern{margin:0 auto}}
+</style>
+</head>
+<body>
+<header class="kopf">
+  <span class="marke">Deal<b>Pilot</b></span><span class="nr">Idee 4</span><span class="titel">Tiefenzoom — von der ganzen App bis zum einzelnen Datum</span>
+  <span class="rechts"><a href="3-dokumentenfluss.html">← zurück</a><a href="index.html">Übersicht</a><a href="5-zusammenspiel.html">weiter →</a></span>
+</header>
+<div class="wrap">
+  <nav class="pfad" id="pfad"></nav>
+  <div class="ebene" id="ebene"></div>
+  <h1 id="h1"></h1>
+  <div class="sub" id="sub"></div>
+  <div class="flaeche" id="flaeche"></div>
+</div>
+<div class="demo-hinweis">Demo · vier Ebenen · Daten aus prozess-atlas.js</div>
+<script src="../../../frontend/js/prozess-atlas.js"></script>
+<script src="zusatz.js"></script>
+<script>
+(function () {
+  var ALLE = ((window.DealPilotAtlas && window.DealPilotAtlas.PROZESSE) || []).concat(window.ATLAS_ZUSATZ.ablaeufe);
+  function P(id) { return ALLE.filter(function (p) { return p.id === id; })[0]; }
+  var PHASEN = [
+    { id: 'pruefen', t: 'Prüfen', sub: 'Vom Inserat zum Urteil — in Minuten', abl: ['quickcheck', 'sprache', 'dokumente'] },
+    { id: 'analysieren', t: 'Analysieren', sub: 'Von der Datenaufnahme bis zur Bank', abl: ['boarding', 'marktbericht', 'scores', 'deal'] },
+    { id: 'halten', t: 'Halten', sub: 'Bestand, Steuer und Portfolio — Jahr für Jahr', abl: ['steuer', 'reise'] }
+  ];
+  var fl = document.getElementById('flaeche');
+  var stapel = [];
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function sort(p) { return p.knoten.slice().sort(function (a, b) { return a.s - b.s || a.z - b.z; }); }
+  function norm(s) { return String(s).toLowerCase().replace(/[^a-zäöüß0-9]/g, ''); }
+  function passt(a, n) { a = norm(a); return a === n || (n.length > 5 && a.length > 4 && (a.indexOf(n) >= 0 || n.indexOf(a) >= 0)); }
+
+  function kopf(eb, t, s) { document.getElementById('ebene').textContent = eb; document.getElementById('h1').textContent = t; document.getElementById('sub').textContent = s; }
+  function pfad() {
+    var h = stapel.map(function (s, i) { return i === stapel.length - 1 ? '<span class="hier">' + esc(s.name) + '</span>' : '<a data-i="' + i + '">' + esc(s.name) + '</a><span class="tr">›</span>'; }).join('');
+    var p = document.getElementById('pfad'); p.innerHTML = h;
+    p.querySelectorAll('a').forEach(function (a) { a.onclick = function () { var i = +a.getAttribute('data-i'); var z = stapel[i]; stapel = stapel.slice(0, i); geh(z, null); }; });
+  }
+  /* Zoom: die geklickte Kachel waechst auf die Flaeche, dann kommt die neue Ebene */
+  function geh(ziel, von) {
+    function zeigen() { stapel.push(ziel); pfad(); ziel.zeichne(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    if (!von) return zeigen();
+    var a = von.getBoundingClientRect(), b = fl.getBoundingClientRect();
+    var z = document.createElement('div'); z.className = 'zoomer';
+    z.style.cssText = 'left:' + a.left + 'px;top:' + a.top + 'px;width:' + a.width + 'px;height:' + a.height + 'px';
+    document.body.appendChild(z);
+    requestAnimationFrame(function () { z.style.left = b.left + 'px'; z.style.top = Math.max(60, b.top) + 'px'; z.style.width = b.width + 'px'; z.style.height = Math.min(innerHeight - 80, 460) + 'px'; z.style.opacity = '.0'; });
+    setTimeout(function () { z.remove(); zeigen(); }, 430);
+  }
+
+  var E0 = { name: 'DealPilot', zeichne: function () {
+    kopf('Ebene 0 · die ganze App', 'Drei Phasen, neun Abläufe, 61 Stationen', 'Jede Kachel lässt sich öffnen — bis hinunter zum einzelnen Datum: woher es kommt und wohin es geht.');
+    var n = 0; ALLE.forEach(function (p) { n += p.knoten.length; });
+    document.getElementById('h1').textContent = 'Drei Phasen, ' + ALLE.length + ' Abläufe, ' + n + ' Stationen';
+    fl.innerHTML = '<div class="gitter drei">' + PHASEN.map(function (ph, i) {
+      return '<div class="kachel phase" data-ph="' + ph.id + '" style="animation-delay:' + (i * 90) + 'ms"><div class="n">PHASE ' + (i + 1) + '</div><h3>' + ph.t + '</h3><p>' + ph.sub + '</p><div class="abl">' + ph.abl.map(function (a) { var p = P(a); return p ? '<span>' + esc(p.name) + ' · ' + p.knoten.length + '</span>' : ''; }).join('') + '</div></div>';
+    }).join('') + '</div>';
+    fl.querySelectorAll('[data-ph]').forEach(function (k) { k.onclick = function () { geh(ebenePhase(PHASEN.filter(function (p) { return p.id === k.getAttribute('data-ph'); })[0]), k); }; });
+  } };
+  function ebenePhase(ph) { return { name: ph.t, zeichne: function () {
+    kopf('Ebene 1 · Phase', ph.t, ph.sub);
+    fl.innerHTML = '<div class="gitter">' + ph.abl.map(function (a, i) { var p = P(a); if (!p) return '';
+      return '<div class="kachel" data-a="' + a + '" style="animation-delay:' + (i * 70) + 'ms"><span class="zahl">' + p.knoten.length + '</span><div class="n">ABLAUF</div><h3>' + esc(p.name) + '</h3><p>' + esc(p.sub) + '</p><div class="mini">' + sort(p).map(function (k) { return '<i class="' + (k.opt ? 'opt' : '') + '"></i>'; }).join('') + '</div></div>'; }).join('') + '</div>';
+    fl.querySelectorAll('[data-a]').forEach(function (k) { k.onclick = function () { geh(ebeneAblauf(P(k.getAttribute('data-a'))), k); }; });
+  } }; }
+  function ebeneAblauf(p) { return { name: p.name, zeichne: function () {
+    kopf('Ebene 2 · Ablauf', p.name, p.sub);
+    fl.innerHTML = '<div class="gitter">' + sort(p).map(function (k, i) {
+      return '<div class="kachel" data-k="' + k.id + '" style="animation-delay:' + (i * 55) + 'ms"><div class="n">STATION ' + (i + 1) + (k.opt ? ' · OPTIONAL' : '') + '</div><h3>' + esc(k.t) + '</h3><p>' + esc(k.k || '') + '</p>'
+        + '<div class="mini" style="margin-top:10px">' + (k.ein || []).slice(0, 3).map(function (e) { return '<span class="chip ein" style="font-size:10.5px;padding:2px 6px">' + esc(e) + '</span>'; }).join('') + '</div></div>';
+    }).join('') + '</div>';
+    fl.querySelectorAll('[data-k]').forEach(function (k) { k.onclick = function () { geh(ebeneStation(p, p.knoten.filter(function (x) { return x.id === k.getAttribute('data-k'); })[0]), k); }; });
+  } }; }
+  function ebeneStation(p, k) { return { name: k.t, zeichne: function () {
+    kopf('Ebene 3 · Station in „' + p.name + '"', k.t, k.k || '');
+    var links = '<div class="box"><h4>Was hier passiert</h4><p>' + esc(k.d || '') + '</p>'
+      + (k.unter ? '<h4 style="margin-top:16px">Unterschritte</h4><ol class="schritte">' + k.unter.map(function (u, i) { return '<li style="animation-delay:' + (i * 80) + 'ms"><em>' + (i + 1) + '</em><div><b>' + esc(u[0]) + '</b><span>' + esc(u[1]) + '</span></div></li>'; }).join('') + '</ol>' : '')
+      + (k.gew ? '<h4 style="margin-top:16px">Gewichte</h4><div class="gew">' + k.gew.map(function (g) { return '<span>' + esc(g[0]) + '</span><i style="width:' + Math.max(3, g[1]) + '%"></i><span>' + (g[1] || '') + '</span>'; }).join('') + '</div>' : '')
+      + (k.beleg ? '<h4 style="margin-top:16px">Beleg im Code</h4><div class="beleg">' + esc(k.beleg) + '</div>' : '') + '</div>';
+    var rechts = '<div class="box" style="animation-delay:.1s"><h4>Braucht · klick für die Herkunft</h4><div class="daten">' + (k.ein || []).map(function (e) { return '<span class="chip ein" data-d="' + esc(e) + '">' + esc(e) + '</span>'; }).join('') + (k.ein && k.ein.length ? '' : '<span class="leer">keine Eingabe</span>') + '</div>'
+      + '<h4 style="margin-top:18px">Liefert · klick für den Weg</h4><div class="daten">' + (k.aus || []).map(function (e) { return '<span class="chip aus" data-d="' + esc(e) + '">' + esc(e) + '</span>'; }).join('') + '</div></div>';
+    fl.innerHTML = '<div class="station">' + links + rechts + '</div>';
+    fl.querySelectorAll('[data-d]').forEach(function (c) { c.onclick = function () { geh(ebeneDatum(c.getAttribute('data-d')), c); }; });
+  } }; }
+  function ebeneDatum(d) { return { name: d, zeichne: function () {
+    var n = norm(d), her = [], hin = [];
+    ALLE.forEach(function (p) { p.knoten.forEach(function (k) {
+      if ((k.aus || []).some(function (a) { return passt(a, n); })) her.push([p, k]);
+      if ((k.ein || []).some(function (a) { return passt(a, n); })) hin.push([p, k]);
+    }); });
+    kopf('Ebene 4 · ein Datum', d, 'Links, wo es entsteht. Rechts, wo es gebraucht wird. Klick auf eine Station springt dorthin.');
+    function liste(l, leer) { return l.length ? l.map(function (x, i) { return '<div class="q" data-p="' + x[0].id + '" data-k="' + x[1].id + '" style="animation-delay:' + (i * 60) + 'ms"><b>' + esc(x[1].t) + '</b><span>' + esc(x[0].name) + '</span></div>'; }).join('') : '<div class="leer">' + leer + '</div>'; }
+    fl.innerHTML = '<div class="datum"><div class="seite links"><h4>Entsteht in · ' + her.length + '</h4>' + liste(her, 'Du gibst es selbst ein — keine Station erzeugt es.') + '</div>'
+      + '<div class="kern"><div><b>' + esc(d) + '</b><span>' + (her.length + hin.length) + ' Berührungen</span></div></div>'
+      + '<div class="seite rechts"><h4>Gebraucht in · ' + hin.length + '</h4>' + liste(hin, 'Ein Endergebnis — es geht in keine weitere Station.') + '</div></div>';
+    fl.querySelectorAll('.q').forEach(function (q) { q.onclick = function () { var p = P(q.getAttribute('data-p')); var k = p.knoten.filter(function (x) { return x.id === q.getAttribute('data-k'); })[0]; geh(ebeneStation(p, k), q); }; });
+  } }; }
+  geh(E0, null);
+})();
+</script>
+</body>
+</html>

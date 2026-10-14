@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atlas · Sprechlauf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="basis.css">
+<style>
+  .wrap{max-width:1280px;margin:0 auto;padding:22px 22px 70px}
+  .intro h1{font-size:28px;letter-spacing:-.01em;margin-top:4px}
+  .intro p{color:var(--leise);max-width:760px;margin:6px 0 0}
+  /* Stationsleiste */
+  .bahn{display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin:24px 0 18px;position:relative}
+  .bahn::before{content:"";position:absolute;left:8%;right:8%;top:15px;height:3px;background:var(--linie);border-radius:2px}
+  .bahn .fort{position:absolute;left:8%;top:15px;height:3px;background:var(--runway);border-radius:2px;width:0;transition:width .7s cubic-bezier(.5,0,.2,1)}
+  .bahn .s{text-align:center;position:relative;z-index:1}
+  .bahn .s i{display:block;width:32px;height:32px;margin:0 auto;border-radius:50%;background:var(--obs);border:2px solid var(--linie);font:600 12px/28px var(--f-mono);color:var(--still);font-style:normal;transition:all .35s}
+  .bahn .s b{display:block;font:600 13px var(--f-disp);margin-top:7px;color:var(--still);transition:color .3s}
+  .bahn .s span{font:500 10px var(--f-mono);color:var(--still)}
+  .bahn .s.an i{border-color:var(--gold);color:var(--obs);background:var(--gold-hi);box-shadow:0 0 0 6px color-mix(in srgb,var(--gold) 18%,transparent)}
+  .bahn .s.an b{color:var(--tinte)}
+  .buehne{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px}
+  .tafel{background:var(--obs2);border:1px solid var(--linie);border-radius:16px;padding:18px;position:relative;overflow:hidden}
+  .tafel h3{font:600 10.5px var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--still);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .rec{width:9px;height:9px;border-radius:50%;background:var(--rot);box-shadow:0 0 0 0 var(--rot);animation:puls 1.4s infinite}
+  .rec.aus{background:var(--still);animation:none}
+  @keyframes puls{70%{box-shadow:0 0 0 9px transparent}}
+  .zeit{margin-left:auto;font:600 12px var(--f-mono);color:var(--leise)}
+  canvas{width:100%;height:70px;display:block}
+  .text{min-height:150px;font:400 17px/1.75 var(--f-body);color:var(--tinte);margin-top:12px}
+  .text .w{opacity:0;transition:opacity .15s}
+  .text .w.da{opacity:1}
+  .text mark{background:none;color:inherit;border-bottom:2px solid transparent;transition:all .4s;border-radius:3px;padding:0 1px}
+  .text mark.erkannt{background:color-mix(in srgb,var(--gold) 16%,transparent);border-bottom-color:var(--gold)}
+  .text mark.erkannt[data-art=neu]{background:color-mix(in srgb,var(--gruen) 16%,transparent);border-bottom-color:var(--gruen)}
+  .text mark.fallen{background:transparent;border-bottom-color:transparent;color:var(--still);text-decoration:line-through}
+  .formular{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .f{border:1px solid var(--linie);border-radius:10px;padding:8px 11px;background:var(--obs);transition:border-color .4s,box-shadow .4s;position:relative}
+  .f label{display:block;font:600 9.5px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--still)}
+  .f .v{font:500 15px var(--f-disp);min-height:22px;color:var(--tinte)}
+  .f .v.leer{color:#3c372d}
+  .f.gefuellt{border-color:color-mix(in srgb,var(--gruen) 70%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--gruen) 14%,transparent)}
+  .f.frage{border-color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 22%,transparent)}
+  .flieg{position:fixed;z-index:80;font:600 12px var(--f-mono);padding:4px 9px;border-radius:7px;background:var(--gold-hi);color:var(--obs);pointer-events:none;transition:transform .85s cubic-bezier(.5,0,.2,1),opacity .3s;box-shadow:0 8px 20px rgba(0,0,0,.5)}
+  .rueck{margin-top:12px;border:1px solid var(--gold);border-radius:12px;padding:12px 14px;background:color-mix(in srgb,var(--gold) 8%,var(--obs2));display:none}
+  .rueck.zeigen{display:block;animation:rein .4s ease-out}
+  @keyframes rein{from{opacity:0;transform:translateY(8px)}}
+  .rueck b{font-family:var(--f-disp)}
+  .rueck .alt{color:var(--still);text-decoration:line-through;margin:0 6px}
+  .rueck .neu{color:#bfe6cd;font-weight:600}
+  .rueck .kn{display:flex;gap:8px;margin-top:9px}
+  .rueck .kn span{font:600 11.5px var(--f-mono);padding:5px 11px;border-radius:7px;border:1px solid var(--linie)}
+  .rueck .kn span.ja{background:var(--gold-hi);color:var(--obs);border-color:var(--gold-hi)}
+  .ergebnis{display:grid;grid-template-columns:120px 1fr;gap:18px;align-items:center;margin-top:16px;opacity:.25;transition:opacity .6s}
+  .ergebnis.an{opacity:1}
+  .ring{width:120px;height:120px}
+  .ring .bg{stroke:var(--linie)}
+  .ring .fg{stroke:url(#rw);stroke-linecap:round;transition:stroke-dashoffset 1.4s cubic-bezier(.5,0,.2,1)}
+  .ring text{font:700 22px var(--f-disp);fill:var(--tinte)}
+  .ring text.u{font:500 9px var(--f-mono);fill:var(--still)}
+  .kpis div{display:flex;justify-content:space-between;border-bottom:1px solid var(--linie);padding:6px 0;font:500 13px var(--f-mono)}
+  .kpis div b{color:var(--gold-hi)}
+  .kpis small{display:block;color:var(--still);font:400 11.5px var(--f-body);margin-top:6px}
+  .steuer{display:flex;gap:8px;margin-top:16px}
+  .steuer button{all:unset;cursor:pointer;font:600 12px var(--f-mono);padding:8px 14px;border-radius:9px;border:1px solid var(--linie);color:var(--tinte)}
+  .steuer button.p{background:var(--runway);color:var(--obs);border:0}
+  .unter{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .unter div{border:1px solid var(--linie);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--leise)}
+  .unter b{display:block;color:var(--tinte);font:600 14px var(--f-disp);margin-bottom:3px}
+  @media (max-width:860px){.buehne,.unter{grid-template-columns:1fr}.bahn .s span{display:none}.bahn .s b{font-size:11px}}
+</style>
+</head>
+<body>
+<header class="kopf">
+  <span class="marke">Deal<b>Pilot</b></span><span class="nr">Idee 2</span><span class="titel">Sprechlauf — vom gesprochenen Satz zum gefüllten Feld</span>
+  <span class="rechts"><a href="1-streckennetz.html">← zurück</a><a href="index.html">Übersicht</a><a href="3-dokumentenfluss.html">weiter →</a></span>
+</header>
+<div class="wrap">
+  <div class="intro">
+    <div class="ueber">Prozessatlas · Idee 2 · Unterkarte „Sprechlauf"</div>
+    <h1>Du erzählst das Objekt. DealPilot hört zu, ordnet zu, fragt nach.</h1>
+    <p>Die Station läuft hier ab, wie sie im Programm abläuft: Aufnahme → Text → Feldkatalog → Zuordnung → Rückfrage, wenn ein Feld schon belegt ist → Übernahme, danach rechnen die Kerne neu.</p>
+  </div>
+  <div class="bahn" id="bahn"><div class="fort" id="fort"></div></div>
+  <div class="buehne">
+    <section class="tafel">
+      <h3><span class="rec aus" id="rec"></span> Aufnahme <span class="zeit" id="zeit">0:00 / 4:00</span></h3>
+      <canvas id="welle" width="600" height="70"></canvas>
+      <div class="text" id="text"></div>
+    </section>
+    <section class="tafel">
+      <h3>Datenaufnahme · Objekt <span class="zeit" id="zaehler">0 von 8 Feldern</span></h3>
+      <div class="formular" id="form"></div>
+      <div class="rueck" id="rueck"></div>
+      <div class="ergebnis" id="erg">
+        <svg class="ring" viewBox="0 0 120 120"><defs><linearGradient id="rw" x1="0" x2="1"><stop offset="0" stop-color="#E8CC7A"/><stop offset=".55" stop-color="#C9A84C"/><stop offset="1" stop-color="#b8932f"/></linearGradient></defs>
+          <circle class="bg" cx="60" cy="60" r="50" fill="none" stroke-width="9"/>
+          <circle class="fg" id="ringfg" cx="60" cy="60" r="50" fill="none" stroke-width="9" transform="rotate(-90 60 60)" stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+          <text x="60" y="62" text-anchor="middle" id="ringz">–</text><text x="60" y="78" text-anchor="middle" class="u">BRUTTO</text></svg>
+        <div class="kpis" id="kpis"></div>
+      </div>
+    </section>
+  </div>
+  <div class="steuer"><button class="p" id="los">▶ Abspielen</button><button id="neu">↺ Von vorn</button></div>
+  <div class="unter">
+    <div><b>Feldkatalog zur Laufzeit</b>Die KI bekommt alle Felder der App mit ihren echten Auswahl-Optionen. „Zustand ist gut" wird so zum Optionswert — nicht zu freiem Text.</div>
+    <div><b>Nichts wird still überschrieben</b>Trägt das Objekt schon einen Wert, zeigt DealPilot alt gegen neu und fragt. Erst dann wird übernommen.</div>
+    <div><b>Was nicht gesagt wird, bleibt leer</b>Kein Feld wird geschätzt. Der Verkäufername gehört zu keinem Feld — er fällt weg.</div>
+  </div>
+</div>
+<div class="demo-hinweis">Demo · Beispieldiktat, Rechnung echt</div>
+<script src="zusatz.js"></script>
+<script>
+(function () {
+  var Z = window.ATLAS_ZUSATZ.ablaeufe[0];
+  var kk = Z.knoten.slice().sort(function (a, b) { return a.s - b.s || a.z - b.z; });
+  var bahn = document.getElementById('bahn');
+  kk.forEach(function (k, i) { var d = document.createElement('div'); d.className = 's'; d.innerHTML = '<i>' + (i + 1) + '</i><b>' + k.t + '</b><span>' + k.k + '</span>'; d.title = k.d; bahn.appendChild(d); });
+  function station(i) { [].forEach.call(bahn.querySelectorAll('.s'), function (s, j) { s.classList.toggle('an', j <= i); }); document.getElementById('fort').style.width = (Math.max(0, i) / 5 * 84) + '%'; }
+
+  /* Das Diktat. [Text|feld|wert] markiert, was zugeordnet wird. */
+  var DIKTAT = 'Eine [Eigentumswohnung|objart|ETW] in der [Musterstraße 12|str|Musterstraße 12], [33602 Bielefeld|ort|33602 Bielefeld]. [78 Quadratmeter|wfl|78 m²], [Baujahr 1967|bj|1967], [Zustand gut|zust|gut]. Kaufpreis [189.000 Euro|kp|189.000 €], kalt vermietet für [640 Euro|nkm|640 €] im Monat. Der Verkäufer ist [Herr Brandt|-|], Hausgeld [310 Euro|hg|310 €].';
+  var FELDER = [['objart', 'Objektart'], ['str', 'Straße'], ['ort', 'PLZ · Ort'], ['wfl', 'Wohnfläche'], ['bj', 'Baujahr'], ['zust', 'Zustand'], ['kp', 'Kaufpreis'], ['nkm', 'Nettokaltmiete'], ['hg', 'Hausgeld']];
+  var form = document.getElementById('form');
+  var text = document.getElementById('text');
+  var gen = 0, laeuft = false;
+
+  function aufbauen() {
+    form.innerHTML = FELDER.map(function (f) { return '<div class="f" id="f-' + f[0] + '"><label>' + f[1] + '</label><div class="v leer">' + (f[0] === 'nkm' ? '600 €' : '—') + '</div></div>'; }).join('');
+    /* Nettokaltmiete war schon aus dem Inserat da: daran zeigt sich die Rückfrage. */
+    var n = document.querySelector('#f-nkm .v'); n.classList.remove('leer');
+    var teile = [], re = /\[([^|\]]+)\|([^|\]]*)\|([^\]]*)\]|(\s*\S+\s*)/g, m;
+    while ((m = re.exec(DIKTAT))) {
+      if (m[1]) teile.push('<mark data-f="' + m[2] + '" data-v="' + m[3] + '" data-art="' + (m[2] === 'nkm' ? 'alt' : 'neu') + '">' + m[1].split(' ').map(function (w, i, l) { return '<span class="w">' + w + (i < l.length - 1 ? ' ' : '') + '</span>'; }).join('') + '</mark>');
+      else teile.push('<span class="w">' + m[4] + '</span>');
+    }
+    text.innerHTML = teile.join('');
+    document.getElementById('rueck').className = 'rueck';
+    document.getElementById('erg').className = 'ergebnis';
+    document.getElementById('ringfg').style.strokeDashoffset = 314.16;
+    document.getElementById('ringz').textContent = '–';
+    document.getElementById('kpis').innerHTML = '';
+    document.getElementById('zaehler').textContent = '1 von 9 Feldern';
+    document.getElementById('zeit').textContent = '0:00 / 4:00';
+    station(-1);
+  }
+  function warte(ms, g) { return new Promise(function (r, x) { setTimeout(function () { g === gen ? r() : x('stopp'); }, ms); }); }
+
+  /* Pegel: Balken, die nur waehrend der Aufnahme leben */
+  var cv = document.getElementById('welle'), cx = cv.getContext('2d'), pegel = 0, phase = 0;
+  (function zeichne() {
+    var w = cv.width, h = cv.height; cx.clearRect(0, 0, w, h);
+    var n = 64, bw = w / n;
+    for (var i = 0; i < n; i++) {
+      var a = pegel * (0.25 + 0.75 * Math.abs(Math.sin(i * 0.37 + phase) * Math.cos(i * 0.11 - phase * 0.7)));
+      var bh = Math.max(2, a * h * 0.9);
+      cx.fillStyle = i / n < pegelFort ? '#E8CC7A' : '#2a261d';
+      cx.fillRect(i * bw + 1, (h - bh) / 2, bw - 3, bh);
+    }
+    phase += 0.09; requestAnimationFrame(zeichne);
+  })();
+  var pegelFort = 0;
+
+  function fliege(von, nach, txt) {
+    var a = von.getBoundingClientRect(), b = nach.getBoundingClientRect();
+    var c = document.createElement('div'); c.className = 'flieg'; c.textContent = txt;
+    c.style.left = a.left + 'px'; c.style.top = a.top + 'px'; document.body.appendChild(c);
+    requestAnimationFrame(function () { c.style.transform = 'translate(' + (b.left - a.left + 10) + 'px,' + (b.top - a.top + 14) + 'px) scale(.9)'; });
+    setTimeout(function () { c.style.opacity = 0; }, 820); setTimeout(function () { c.remove(); }, 1200);
+  }
+
+  async function spiel() {
+    var g = ++gen; laeuft = true; document.getElementById('los').textContent = '❚❚ Läuft';
+    aufbauen();
+    try {
+      station(0); document.getElementById('rec').className = 'rec'; pegel = 0.8;
+      var ws = text.querySelectorAll('.w'), sek = 0;
+      for (var i = 0; i < ws.length; i++) {
+        ws[i].classList.add('da'); pegelFort = i / ws.length;
+        if (i % 3 === 0) { sek++; document.getElementById('zeit').textContent = '0:' + String(sek).padStart(2, '0') + ' / 4:00'; }
+        if (i === 6) station(1);
+        await warte(115, g);
+      }
+      pegel = 0.05; document.getElementById('rec').className = 'rec aus'; pegelFort = 1;
+      await warte(500, g);
+      station(2); await warte(700, g);
+      station(3);
+      var ms = text.querySelectorAll('mark'), n = 1;
+      for (var j = 0; j < ms.length; j++) {
+        var m = ms[j], f = m.getAttribute('data-f');
+        if (f === '-') { m.classList.add('fallen'); await warte(500, g); continue; }
+        m.classList.add('erkannt');
+        if (f === 'nkm') { await warte(350, g); continue; }
+        var ziel = document.getElementById('f-' + f);
+        fliege(m, ziel, m.getAttribute('data-v'));
+        await warte(800, g);
+        var v = ziel.querySelector('.v'); v.textContent = m.getAttribute('data-v'); v.classList.remove('leer'); ziel.classList.add('gefuellt');
+        document.getElementById('zaehler').textContent = (++n) + ' von 9 Feldern';
+        await warte(120, g);
+      }
+      station(4);
+      var fn = document.getElementById('f-nkm'); fn.classList.add('frage');
+      var r = document.getElementById('rueck');
+      r.innerHTML = '<b>Nettokaltmiete ist schon belegt.</b> Aus dem Inserat:<span class="alt">600 €</span>gesagt:<span class="neu">640 €</span><div class="kn"><span class="ja">640 € übernehmen</span><span>600 € behalten</span></div>';
+      r.className = 'rueck zeigen';
+      await warte(2200, g);
+      r.querySelector('.ja').textContent = '✓ übernommen';
+      fn.querySelector('.v').textContent = '640 €'; fn.classList.remove('frage'); fn.classList.add('gefuellt');
+      document.getElementById('zaehler').textContent = '9 von 9 Feldern';
+      await warte(700, g);
+      station(5);
+      /* Echte Rechnung: Bruttomietrendite = NKM × 12 / Kaufpreis; Ziel 5,0 % (Lageklasse B, Vorgabe) */
+      var kp = 189000, nkm = 640, wfl = 78, hg = 310;
+      var br = nkm * 12 / kp * 100, kpf = kp / (nkm * 12), qm = nkm / wfl;
+      document.getElementById('erg').className = 'ergebnis an';
+      document.getElementById('ringfg').style.strokeDashoffset = 314.16 * (1 - Math.min(1, br / 5));
+      var t0 = performance.now();
+      (function zahl(t) { var u = Math.min(1, (t - t0) / 1400); document.getElementById('ringz').textContent = (br * u).toFixed(2).replace('.', ',') + '%'; if (u < 1 && g === gen) requestAnimationFrame(zahl); })(t0);
+      document.getElementById('kpis').innerHTML =
+        '<div>Bruttomietrendite <b>' + br.toFixed(2).replace('.', ',') + ' %</b></div>' +
+        '<div>Kaufpreisfaktor <b>' + kpf.toFixed(1).replace('.', ',') + '</b></div>' +
+        '<div>Miete je m² <b>' + qm.toFixed(2).replace('.', ',') + ' €</b></div>' +
+        '<div>Hausgeld je m² <b>' + (hg / wfl).toFixed(2).replace('.', ',') + ' €</b></div>' +
+        '<small>Ring: Bruttomietrendite gegen das Ziel 5,0 % der Lageklasse B. Gerechnet aus den diktierten Werten — Finanzierung fehlt noch, deshalb kein DSCR und kein Score.</small>';
+    } catch (e) { if (e !== 'stopp') throw e; }
+    if (g === gen) { laeuft = false; document.getElementById('los').textContent = '▶ Noch einmal'; }
+  }
+  document.getElementById('los').onclick = function () { if (!laeuft) spiel(); };
+  document.getElementById('neu').onclick = function () { gen++; laeuft = false; pegel = 0; pegelFort = 0; document.getElementById('los').textContent = '▶ Abspielen'; aufbauen(); };
+  aufbauen();
+  setTimeout(spiel, 700);
+})();
+</script>
+</body>
+</html>

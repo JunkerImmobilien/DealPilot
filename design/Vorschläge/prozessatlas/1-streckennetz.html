@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atlas · Streckennetz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="basis.css">
+<style>
+  .buehne{display:grid;grid-template-columns:minmax(0,1fr) 380px;min-height:calc(100vh - 57px)}
+  .karte{overflow:auto;position:relative;border-right:1px solid var(--linie)}
+  .karte svg{display:block;min-width:1250px;width:100%;height:auto}
+  .intro{padding:20px 24px 0}
+  .intro h1{font-size:26px;letter-spacing:-.01em}
+  .intro p{margin:6px 0 0;max-width:720px;color:var(--leise)}
+  .legende{display:flex;flex-wrap:wrap;gap:6px;padding:14px 24px 4px}
+  .legende button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font:500 12px var(--f-mono);padding:5px 10px;border-radius:20px;border:1px solid var(--linie);color:var(--leise)}
+  .legende button i{width:14px;height:4px;border-radius:2px;display:block}
+  .legende button.an,.legende button:hover{color:var(--tinte);border-color:var(--still)}
+  .linie{fill:none;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;transition:opacity .3s}
+  .st{cursor:pointer}
+  .st circle{fill:var(--obs);stroke-width:3.5;transition:r .2s}
+  .st:hover circle,.st.wahl circle{r:10}
+  .st text{font:500 11.5px var(--f-body);fill:var(--tinte);paint-order:stroke;stroke:var(--obs);stroke-width:4px}
+  .st text.k{font:500 9.5px var(--f-mono);fill:var(--still)}
+  .st.opt circle{stroke-dasharray:3 3}
+  .st.treffer circle{fill:var(--gold-hi);r:11}
+  .st.treffer text{fill:var(--gold-hi)}
+  .gedimmt .linie,.gedimmt .st,.gedimmt .lname{opacity:.18}
+  .gedimmt .aktiv,.gedimmt .st.treffer{opacity:1}
+  .lname{font:700 12px var(--f-disp);letter-spacing:.02em}
+  .lsub{font:500 10px var(--f-mono);fill:var(--still)}
+  .zug{filter:drop-shadow(0 0 6px #E8CC7A)}
+  .panel{padding:22px 22px 60px;background:var(--obs2);overflow:auto;max-height:calc(100vh - 57px);position:sticky;top:57px}
+  .panel .leer{color:var(--still);font:500 13px var(--f-mono);line-height:1.7;margin-top:30px}
+  .panel h2{font-size:22px;margin:6px 0 2px}
+  .panel .k{font:500 12px var(--f-mono);color:var(--gold)}
+  .panel p{color:var(--tinte);opacity:.88}
+  .panel h4{font:600 10.5px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--still);margin:18px 0 8px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chips .chip{cursor:pointer}
+  .chips .chip:hover{border-color:var(--gold-hi)}
+  .schritte{counter-reset:s;list-style:none;margin:0;padding:0}
+  .schritte li{counter-increment:s;position:relative;padding:8px 0 8px 34px;border-left:1px dashed var(--linie);margin-left:11px}
+  .schritte li::before{content:counter(s);position:absolute;left:-12px;top:7px;width:22px;height:22px;border-radius:50%;background:var(--obs3);border:1px solid var(--gold);font:600 11px/22px var(--f-mono);text-align:center;color:var(--gold-hi)}
+  .schritte b{display:block;font:600 13.5px var(--f-disp)}
+  .schritte span{color:var(--leise);font-size:13px}
+  .gew{display:grid;grid-template-columns:110px 1fr 36px;gap:6px 10px;align-items:center;font:500 12px var(--f-mono)}
+  .gew i{display:block;height:8px;border-radius:4px;background:var(--runway);transform-origin:left;animation:wachs .7s ease-out both}
+  @keyframes wachs{from{transform:scaleX(0)}}
+  .fluss{margin-top:14px;padding:10px 12px;border:1px solid var(--linie);border-radius:10px;font-size:13px;color:var(--leise)}
+  .fluss b{color:var(--gold-hi)}
+  @media (max-width:900px){.buehne{grid-template-columns:1fr}.panel{position:static;max-height:none;border-top:1px solid var(--linie)}}
+</style>
+</head>
+<body>
+<header class="kopf">
+  <span class="marke">Deal<b>Pilot</b></span><span class="nr">Idee 1</span><span class="titel">Streckennetz — alle Abläufe als Liniennetz</span>
+  <span class="rechts"><a href="index.html">Übersicht</a><a href="2-sprechlauf.html">weiter →</a></span>
+</header>
+<div class="buehne">
+  <section class="karte" id="karte">
+    <div class="intro">
+      <div class="ueber">Prozessatlas · Idee 1</div>
+      <h1>Ein Liniennetz, neun Linien, eine Hauptstrecke</h1>
+      <p>Oben fährt die ganze Reise vom Inserat bis zum Portfolio. Jede Linie darunter zweigt dort ab, wo der Ablauf beginnt. Klick auf eine Station öffnet ihre Karte. Klick auf ein Datum in der Karte zeigt, <b>wo es überall gebraucht wird</b>.</p>
+    </div>
+    <div class="legende" id="legende"></div>
+    <svg id="netz" viewBox="0 0 1700 980" aria-label="Liniennetz der DealPilot-Abläufe"></svg>
+  </section>
+  <aside class="panel" id="panel"><div class="leer">← Station wählen<br><br>Tipp: Der goldene Punkt auf der Hauptstrecke ist ein Objekt auf seiner Reise.<br>Klick auf „Kaufpreis" in einer Karte — und das Netz zeigt jede Station, die den Kaufpreis liest oder schreibt.</div></aside>
+</div>
+<div class="demo-hinweis">Demo · Daten aus prozess-atlas.js</div>
+<script src="../../../frontend/js/prozess-atlas.js"></script>
+<script src="zusatz.js"></script>
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var A = (window.DealPilotAtlas && window.DealPilotAtlas.PROZESSE) || [];
+  var ALLE = A.concat(window.ATLAS_ZUSATZ.ablaeufe);
+  var FARBE = { reise: '#E8CC7A', quickcheck: '#5B9BD5', boarding: '#3FA56C', deal: '#E39B4B', steuer: '#C27BA0', marktbericht: '#4FB3A9', scores: '#9C8CE6', sprache: '#F2D16B', dokumente: '#D8564C' };
+  /* Wo zweigt eine Linie von der Hauptstrecke ab? Gemessen an der Reise:
+     qc1–qc3 Quick-Check, an1 Datenaufnahme, an2 Wert, an3 Bank, be2 Ist pflegen. */
+  var ABZWEIG = { quickcheck: 'qc1', scores: 'qc3', sprache: 'an1', dokumente: 'an1', boarding: 'an1', marktbericht: 'an2', deal: 'an3', steuer: 'be2' };
+  /* Bahnen nach Abzweig absteigend: so kreuzt keine Linie eine andere. */
+  var BAHNEN = ['steuer', 'deal', 'marktbericht', 'boarding', 'dokumente', 'sprache', 'scores', 'quickcheck'];
+  var VERSATZ = { boarding: 0, dokumente: -16, sprache: -32 };
+  var svg = document.getElementById('netz');
+  function el(n, a, p) { var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); (p || svg).appendChild(e); return e; }
+  function sortiert(P) { return P.knoten.slice().sort(function (a, b) { return a.s - b.s || a.z - b.z; }); }
+  function proz(id) { return ALLE.filter(function (p) { return p.id === id; })[0]; }
+
+  var POS = {}, STN = [];
+  var yH = 130, xH0 = 90, dxH = 165;
+  var reise = proz('reise');
+  var hauptK = sortiert(reise);
+  var gLinien = el('g', {}), gSt = el('g', {});
+
+  /* Hauptstrecke */
+  var dH = 'M' + (xH0 - 40) + ',' + yH + ' H' + (xH0 + (hauptK.length - 1) * dxH + 40);
+  linie('reise', dH);
+  el('text', { x: xH0 - 40, y: yH - 46, class: 'lname', fill: FARBE.reise }, gLinien).textContent = reise.name.toUpperCase();
+  el('text', { x: xH0 - 40, y: yH - 32, class: 'lsub' }, gLinien).textContent = reise.sub;
+  hauptK.forEach(function (k, i) { station('reise', k, xH0 + i * dxH, yH, i % 2 ? 'oben' : 'unten'); });
+
+  BAHNEN.forEach(function (pid, b) {
+    var P = proz(pid); if (!P) return;
+    var y = 300 + b * 84;
+    var x0 = POS['reise:' + ABZWEIG[pid]].x + (VERSATZ[pid] || 0);
+    var kk = sortiert(P);
+    var dx = 108;
+    var xs = x0 + 70;
+    var xe = xs + (kk.length - 1) * dx + 30;
+    linie(pid, 'M' + x0 + ',' + (yH + 12) + ' V' + (y - 34) + ' Q' + x0 + ',' + y + ' ' + (x0 + 34) + ',' + y + ' H' + xe);
+    el('text', { x: xe + 18, y: y - 2, class: 'lname', fill: FARBE[pid] }, gLinien).textContent = P.name;
+    el('text', { x: xe + 18, y: y + 12, class: 'lsub' }, gLinien).textContent = kk.length + ' Stationen';
+    kk.forEach(function (k, i) { station(pid, k, xs + i * dx, y, i % 2 ? 'oben' : 'unten'); });
+  });
+
+  function linie(pid, d) {
+    var p = el('path', { d: d, class: 'linie', stroke: FARBE[pid], 'data-p': pid }, gLinien);
+    var L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L;
+    p.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(.5,0,.2,1) ' + (Object.keys(POS).length * 8) + 'ms';
+    requestAnimationFrame(function () { requestAnimationFrame(function () { p.style.strokeDashoffset = 0; }); });
+    return p;
+  }
+  function station(pid, k, x, y, lage) {
+    var g = el('g', { class: 'st' + (k.opt ? ' opt' : ''), 'data-p': pid, 'data-k': k.id, transform: 'translate(' + x + ',' + y + ')' }, gSt);
+    el('circle', { r: 7.5, stroke: FARBE[pid] }, g);
+    var ty = lage === 'oben' ? -18 : 26;
+    var t = el('text', { y: ty, 'text-anchor': 'middle' }, g); t.textContent = k.t;
+    var t2 = el('text', { y: ty + 13, 'text-anchor': 'middle', class: 'k' }, g); t2.textContent = (k.k || '').slice(0, 26);
+    POS[pid + ':' + k.id] = { x: x, y: y, g: g, k: k, p: pid };
+    STN.push(POS[pid + ':' + k.id]);
+    g.addEventListener('click', function () { zeige(pid, k.id); });
+  }
+
+  /* viewBox nach dem gemessenen Inhalt, nicht geschaetzt */
+  (function () { var bb = svg.getBBox(); svg.setAttribute('viewBox', (bb.x - 20) + ' ' + (bb.y - 20) + ' ' + (bb.width + 40) + ' ' + (bb.height + 40)); })();
+
+  /* Legende */
+  var leg = document.getElementById('legende');
+  ['reise'].concat(BAHNEN).forEach(function (pid) {
+    var P = proz(pid); if (!P) return;
+    var b = document.createElement('button'); b.innerHTML = '<i style="background:' + FARBE[pid] + '"></i>' + P.name;
+    b.onclick = function () { var an = b.classList.toggle('an'); [].forEach.call(leg.children, function (c) { if (c !== b) c.classList.remove('an'); }); fokusLinie(an ? pid : null); };
+    leg.appendChild(b);
+  });
+  function fokusLinie(pid) {
+    svg.classList.toggle('gedimmt', !!pid);
+    svg.querySelectorAll('.aktiv,.treffer').forEach(function (e) { e.classList.remove('aktiv', 'treffer'); });
+    if (!pid) return;
+    svg.querySelectorAll('[data-p="' + pid + '"]').forEach(function (e) { e.classList.add('aktiv'); });
+  }
+
+  /* Daten-Spur: alle Stationen, die ein Datum lesen oder schreiben */
+  function norm(s) { return String(s).toLowerCase().replace(/[^a-zäöüß0-9]/g, ''); }
+  function spur(datum) {
+    var n = norm(datum), treffer = [];
+    svg.classList.add('gedimmt');
+    svg.querySelectorAll('.aktiv,.treffer').forEach(function (e) { e.classList.remove('aktiv', 'treffer'); });
+    STN.forEach(function (s) {
+      var alles = (s.k.ein || []).concat(s.k.aus || []).map(norm);
+      if (alles.some(function (a) { return a === n || (n.length > 5 && (a.indexOf(n) >= 0 || n.indexOf(a) >= 0) && a.length > 4); })) { s.g.classList.add('treffer'); treffer.push(s); }
+    });
+    var f = document.getElementById('fluss');
+    if (f) f.innerHTML = '<b>' + datum + '</b> kommt an ' + treffer.length + ' Stationen in ' + uniq(treffer.map(function (t) { return proz(t.p).name; })).length + ' Abläufen vor: ' + uniq(treffer.map(function (t) { return proz(t.p).name; })).join(' · ');
+  }
+  function uniq(a) { return a.filter(function (x, i) { return a.indexOf(x) === i; }); }
+
+  /* Karte */
+  var panel = document.getElementById('panel');
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function zeige(pid, kid) {
+    var s = POS[pid + ':' + kid], k = s.k, P = proz(pid);
+    svg.querySelectorAll('.st.wahl').forEach(function (e) { e.classList.remove('wahl'); });
+    s.g.classList.add('wahl');
+    var h = '<div class="ueber" style="color:' + FARBE[pid] + '">' + esc(P.name) + '</div><h2>' + esc(k.t) + '</h2><div class="k">' + esc(k.k || '') + '</div><p>' + esc(k.d || '') + '</p>';
+    if (k.unter && k.unter.length) h += '<h4>Unterschritte</h4><ol class="schritte">' + k.unter.map(function (u) { return '<li><b>' + esc(u[0]) + '</b><span>' + esc(u[1]) + '</span></li>'; }).join('') + '</ol>';
+    if (k.gew) h += '<h4>Gewichte</h4><div class="gew">' + k.gew.map(function (g) { return '<span>' + esc(g[0]) + '</span><i style="width:' + Math.max(4, g[1]) + '%"></i><span>' + (g[1] || '') + '</span>'; }).join('') + '</div>';
+    if (k.ein && k.ein.length) h += '<h4>Braucht</h4><div class="chips">' + k.ein.map(function (e) { return '<span class="chip ein" data-d="' + esc(e) + '">' + esc(e) + '</span>'; }).join('') + '</div>';
+    if (k.aus && k.aus.length) h += '<h4>Liefert</h4><div class="chips">' + k.aus.map(function (e) { return '<span class="chip aus" data-d="' + esc(e) + '">' + esc(e) + '</span>'; }).join('') + '</div>';
+    h += '<div class="fluss" id="fluss">Klick auf ein Datum: das Netz zeigt, wo es noch vorkommt.</div>';
+    if (k.beleg) h += '<h4>Beleg im Code</h4><div class="beleg">' + esc(k.beleg) + '</div>';
+    panel.innerHTML = h;
+    panel.querySelectorAll('[data-d]').forEach(function (c) { c.onclick = function () { spur(c.getAttribute('data-d')); }; });
+    fokusLinie(pid);
+  }
+
+  /* Der Zug: ein Objekt auf der Hauptstrecke */
+  var zug = el('circle', { r: 6, fill: '#E8CC7A', class: 'zug' });
+  var xa = xH0 - 40, xb = xH0 + (hauptK.length - 1) * dxH + 40, t0 = performance.now();
+  (function lauf(t) { var u = ((t - t0) / 14000) % 1; zug.setAttribute('cx', xa + (xb - xa) * u); zug.setAttribute('cy', yH); requestAnimationFrame(lauf); })(t0);
+})();
+</script>
+</body>
+</html>

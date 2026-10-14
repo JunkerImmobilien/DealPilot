@@ -38761,6 +38761,24 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2216j–v2216k · Staging · Soll/Ist nur im Pilot, F1 auf Auswahlfeldern, Prozessatlas-Demos (14.10.2026)
+- **Was:** Marcels fünfte Runde (N68).
+  - **v2216j** `8a17d8b1`:
+    - Die Tafel „Bestand gegen Ankauf" (`#dp-abweichung`, seit v2034) im Tab Objekt bleibt leer. Der Abgleich steht nur noch im Pilot-Reiter „Soll/Ist-Abgleich" (`ui.js _sollIstHtml`, dieselben Zeilen aus `DealPilotAnkauf.abweichung()`).
+    - F1 auf Auswahlfeldern: F1 kam an, aber **54 von 67 Selects** hatten keinen gepflegten Text, und der Pilot sagte nichts. `pilot-tower.js` hat jetzt `ZWECK` (Anlage 2/4, Objektart, Nutzungsart, Standardstufe, Halter …) und `auswahlText()`: Zweck, gewählter Wert, Optionen.
+  - **v2216k** `7b82fa38`: Der Platzhalter „— keine Angabe —" galt als gewählter Wert und stand in der Optionsliste. Beides ist gefiltert.
+  - **Prozessatlas, sechs Demos** (N68.2), `design/Vorschläge/prozessatlas/`:
+    - Dateien: `index.html`, 1 Streckennetz, 2 Sprechlauf, 3 Dokumentenfluss, 4 Tiefenzoom, 5 Zusammenspiel, 6 Flugschreiber (Parkstraße).
+    - Sie laden die echten Abläufe aus `frontend/js/prozess-atlas.js`. Neu in `zusatz.js`: zwei Abläufe (Sprechlauf, Dokument-Import) mit Belegen, alle per grep geprüft, und die sechs Rechenkerne.
+- **Nachweis:**
+  - Echte F1-Taste auf `#standardstufe` (Staging, nach Deploy): Der Tower zeigt Zweck und Optionen. `#dp-abweichung` hat `display:none` und ist leer. `buster-ebenen` SAUBER.
+  - Demos lokal über einen Server im Browser geklickt: Streckennetz „Kaufpreis" findet 7 Stationen in 6 Abläufen, Tiefenzoom bis Ebene 4, RND-Vergleich 16 J / 23,6 J, Flugschreiber Endstand 1,23 / 3.195 / +775 / 59.
+- **Rest:**
+  - **Eigener Fehler in Demo 3, behoben vor der Übergabe:** Die Trennlinie sagte zuerst „im Browser · verlässt das Gerät" vor dem Schwärzen. Geschwärzt wird aber auf dem DealPilot-Server (`schwaerzen.js`), vor der KI. Die Beschriftung lautet jetzt „Browser · DealPilot-Server · erst jetzt an die KI".
+  - Der Tiefenzoom zeigt Lücken im Atlas: DSCR geht laut Atlas in keine weitere Station (in Wahrheit in beide Scores). Die `ein`-Listen von c3/c4 sollten nachgezogen werden, wenn der Atlas umgebaut wird.
+  - Marcels Wahl unter den sechs Demos steht aus.
+  - Pilot-Reiter Soll/Ist im Bild weiterhin ungeprüft.
+
 ### v2216–v2216i · Staging · Handy-Ansicht, Soll/Ist, Parkstraße (14.10.2026)
 - **Was:** Marcels vierte Runde (N67), alles in der Messkabine (390 px) und am Desktop (1280 px) gemessen.
   - **v2216** `341c7bd7`, Aktionen nach dem Marktbericht.
