@@ -103,7 +103,6 @@
       P + '.qc7-sources{display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center}',
       P + ".qc7-src{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border:1px solid rgba(42,39,39,0.16);border-radius:11px;background:#fff;cursor:pointer;font:600 13px/1 'DM Sans',system-ui,sans-serif;color:var(--ch,#2A2727);transition:border-color .15s ease,background .15s ease,box-shadow .15s ease,transform .12s ease;user-select:none}",
       P + '.qc7-src:hover{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 60%, transparent);box-shadow:0 4px 12px -6px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);transform:translateY(-1px)}',
-      P + '.dp-pf-tile.dp-pf-nurico .dp-pf-lbl{display:none}',   /* v2217d · Dokumente als Symbol */
       P + '.dp-pf-tile[data-src="import"]{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent);box-shadow:0 2px 10px -5px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent)}',
       P + '.qc7-src input{display:none}',
       P + '.qc7-src .qc7-box{width:18px;height:18px;flex-shrink:0;border:2px solid rgba(42,39,39,0.26);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;transition:background .15s ease,border-color .15s ease}',
@@ -410,10 +409,8 @@
              unter dem Riegel: er überschreibt nichts still, sondern zeigt je
              Feld „im Dokument / im Objekt" und lässt abweichende Werte
              abgewählt. */
-          (window.DokumentImport ? pfTileTool('dokument', _doc, 'Dokumente', 'Dokumente einlesen: Grundbuch, Kaufvertrag, Gutachten, BORIS … — mit Abgleich gegen das Objekt').replace('class="dp-pf-tile tool"', 'class="dp-pf-tile tool dp-pf-nurico" aria-label="Dokumente einlesen"') : '') +
-          /* v2217d · GEMESSEN: mit Beschriftung (128 px) rutschte „Abrufen" in
-             eine zweite Zeile - Marcels Befund aus v2189. Als Symbol mit
-             Tooltip bleibt die Zeile eine Zeile (live geprüft). */
+          /* v2218h · die Kachel „Dokumente“ (v2217) ist wieder weg: Dokumente laufen über
+             „Exposé / Marktbericht“ mit (Marcel 14.10.2026). */
         '</div></div>' +
         '<a class="dp-pf-qr" id="oab-pf-qr" href="https://dealpilot.junker-immobilien.io" target="_blank" rel="noopener" title="DealPilot \u00f6ffnen">' + _qrSvg + '<span class="dp-pf-scan">Scan \u203a</span></a>' + '<span class="dp-pf-rz"><span class="dp-pf-bc"></span>' + '<button type="button" class="dp-pf-launch oab-act" id="oab-run">Abrufen</button>' + '</span>' +
       '</div></div>' +
@@ -927,7 +924,7 @@
        Formular, nur auf verschiedenen Wegen. Die Reihenfolge ist dieselbe
        Logik wie bisher — erst was Dokumente liefern, dann was der Nutzer
        selbst sagt, dann die Marktbewertung. */
-    var order = ['import', 'dokument', 'immometrica', 'voice', 'gefuehrt', 'pricehubble', 'sprengnetter', 'dealpilot'];
+    var order = ['import', 'immometrica', 'voice', 'gefuehrt', 'pricehubble', 'sprengnetter', 'dealpilot'];
     var ordered = order.filter(function (s) { return srcs.indexOf(s) !== -1; });
     var btn = $('oab-run'); if (btn) btn.disabled = true;
     /* Was vorher lief, weiss der naechste Schritt — der Sprechlauf sagt
@@ -973,7 +970,6 @@
           vorlauf.push('gefuehrt');
         }
         else if (s === 'import') { setProg('Import …'); await new Promise(function (res) { openCombinedImport(res); }); vorlauf.push('import'); }
-        else if (s === 'dokument') { setProg('Dokumente …'); await new Promise(function (res) { if (window.DokumentImport) window.DokumentImport.oeffnen({ beiSchluss: res }); else res(); }); vorlauf.push('dokument'); }
         else if (s === 'immometrica') { setProg('ImmoMetrica …'); await new Promise(function (res) { if (window.ImmoMetricaImport) window.ImmoMetricaImport.open(function (picked) { applyImmometrica(picked); res(); }, { target: 'obj', onClose: function () { res(); } }); else res(); }); vorlauf.push('immometrica'); }
         else if (s === 'pricehubble' || s === 'sprengnetter') { setProg((s === 'pricehubble' ? 'PriceHubble' : 'Sprengnetter') + ' …'); await avmFetch(s); }
         else if (s === 'dealpilot') {
@@ -1842,6 +1838,17 @@
     _merged = {};
     _files.filter(function (f) { return f.type === 'expose' && f.cache.expose; }).forEach(function (f) { mergeExpose(f.cache.expose); });
     _files.filter(function (f) { return f.type === 'market' && f.cache.market; }).forEach(function (f) { mergeMarket(f.cache.market); });
+    /* v2218h · amtliche Dokumente zuletzt: Grundbuch und Vertrag gehen vor dem Exposé */
+    _vergleich = [];
+    _files.filter(function (f) { return f.type === 'dokument' && f.cache.dokument && f.cache.dokument.success; }).forEach(function (f) { mergeDokument(f.cache.dokument); });
+  }
+  var _vergleich = [];
+  function mergeDokument(a) {
+    var D = window.DokumentImport; if (!D) return;
+    (D.abgleich(a.extracted || {}) || []).forEach(function (z) {
+      _merged[z.feld] = { label: z.wort, value: z.anzeige, raw: z.neu, source: a.label || 'Dokument', kind: 'input' };
+    });
+    (D.vergleich(a.extracted || {}) || []).forEach(function (v) { _vergleich.push({ wort: v.wort, wert: v.wert, eigen: v.eigen, quelle: a.label || 'Dokument' }); });
   }
   function _norm(x){ return String(x==null?'':x).trim().toLowerCase().replace(/\s+/g,' '); }
   function addressWarning() {
@@ -1961,7 +1968,11 @@
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
       if (abw[id] !== undefined) valCell += '<div class="oabi-bisher" style="font-size:11.5px;color:#b5651d;margin-top:2px">im Objekt: ' + escH(abw[id]) + '</div>';
       return '<tr' + (abw[id] !== undefined ? ' class="oabi-abw" style="background:rgba(217,164,65,.10)"' : '') + '><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '"' + (abw[id] !== undefined ? '' : ' checked') + '></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:var(--wl-9a7f33, #9a7f33);font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
-    }).join('') + '</tbody></table>';
+    }).join('') + '</tbody></table>'
+      + (_vergleich.length ? '<div class="oabi-vgl" style="margin-top:10px;padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.25);font-size:12.5px">'
+          + '<b>Ergebnis eines fremden Gutachtens — wird nicht übernommen.</b> DealPilot rechnet selbst; die Zahl dient dem Abgleich.'
+          + _vergleich.map(function (v) { return '<div style="margin-top:4px">' + escH(v.wort) + ': <b>' + escH(v.wert) + '</b>' + (v.eigen ? ' · DealPilot: ' + escH(v.eigen) : '') + ' <span class="src">(' + escH(v.quelle) + ')</span></div>'; }).join('')
+          + '</div>' : '');
     if (ab) ab.disabled = false;
     // Range-Toggle-Handler
     host.querySelectorAll('.oabi-spbtn').forEach(function (b) {
@@ -2032,14 +2043,12 @@
     var ov = document.createElement('div'); ov.className = 'oabi-ov'; ov.id = 'oabi-ov';
     ov.innerHTML =
       '<div class="oabi-modal">' +
-        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>Exposé &amp; Marktbericht importieren</h3></div>' +
+        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>PDFs einlesen — Exposé, Marktbericht, Dokumente</h3></div>' +
         '<div class="oabi-sub">Mehrere PDFs gleichzeitig anhängen — Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>' +
         '<div class="oabi-body">' +
           '<div class="oabi-drop" id="oabi-drop">📁 PDFs auswählen oder hierher ziehen<br><span style="font-size:11px;color:var(--muted,#7A7370)">mehrere Dateien möglich · max 100 MB je Datei</span>' +
             '<input type="file" id="oabi-input" accept="application/pdf,.pdf" multiple style="display:none"></div>' +
           '<div class="oabi-files" id="oabi-files"></div><div id="oabi-result"></div>' +
-          /* v2217 · der Weg zu den anderen acht Dokumentarten */
-          (window.DokumentImport && !_qcMode ? '<div class="oabi-anders" style="margin-top:10px;font-size:12px;color:var(--muted,#7A7370)">Grundbuch, Kaufvertrag, Gutachten oder BORIS-Auszug? <a href="#" id="oabi-zu-dokument" style="color:var(--wl-b8932f,#b8932f);font-weight:600">Dokument einlesen ›</a></div>' : '') +
         '</div>' +
         '<div class="oabi-foot"><button type="button" class="oabi-btn" id="oabi-cancel">Schließen</button>' +
           '<button type="button" class="oabi-btn primary" id="oabi-apply" disabled><span style="display:inline-flex">' + svg('download', 14, '#fff') + '</span> Ausgewählte übernehmen</button></div>' +
@@ -2059,8 +2068,6 @@
     drop.addEventListener('drop', function (e) { e.preventDefault(); drop.classList.remove('drag'); if (e.dataTransfer.files) handleFiles(e.dataTransfer.files); });
     input.addEventListener('change', function (e) { if (e.target.files) handleFiles(e.target.files); });
     $('oabi-apply').addEventListener('click', applyMerged);
-    var zuDok = $('oabi-zu-dokument');
-    if (zuDok) zuDok.addEventListener('click', function (e) { e.preventDefault(); var cb = _oabiDone; _oabiDone = null; try { var x = $('oabi-ov'); if (x) x.remove(); } catch (er) {} window.DokumentImport.oeffnen({ beiSchluss: cb }); });
   }
   function setStatus(f, txt) { var st = f.row.querySelector('.oabi-st'); if (st) st.textContent = txt; }
   function renderFileRow(f) {
@@ -2068,12 +2075,25 @@
       '<span class="nm">' + (f.status === 'ok' ? '✓ ' : f.status === 'err' ? '⚠ ' : '⏳ ') + escH(f.name) + '</span>' +
       '<select ' + (f.status === 'reading' ? 'disabled' : '') + '><option value="auto"' + (f.userType ? '' : ' selected') + '>Auto</option>' +
         '<option value="market"' + (f.userType === 'market' || (!f.userType && f.type === 'market') ? ' selected' : '') + '>Marktbericht</option>' +
-        '<option value="expose"' + (f.userType === 'expose' || (!f.userType && f.type === 'expose') ? ' selected' : '') + '>Exposé</option></select>' +
+        '<option value="expose"' + (f.userType === 'expose' || (!f.userType && f.type === 'expose') ? ' selected' : '') + '>Exposé</option>' +
+        (window.DokumentImport ? '<option value="dokument"' + (f.userType === 'dokument' || (!f.userType && f.type === 'dokument') ? ' selected' : '') + '>' + (f.dokLabel ? escH(f.dokLabel) : 'Dokument (Grundbuch, Vertrag, Gutachten …)') + '</option>' : '') + '</select>' +
       '<span class="oabi-st">' + (f.status === 'reading' ? 'lese …' : f.status === 'err' ? 'kein Text' : (f.type === 'market' ? 'Marktbericht' : 'Exposé')) + '</span>';
     var sel = f.row.querySelector('select');
     if (sel) sel.addEventListener('change', function () { onTypeChange(f, sel.value); });
   }
   // Typklassifizierung: 'market' | 'expose' | 'unknown' (Stichwort-Vorfilter, Rest entscheidet der Inhalt)
+  /* v2218h · amtliche Dokumente erkennen: nur EINDEUTIGE Begriffe, und nie in
+     einem eigenen DealPilot-Bericht (der nennt Bodenrichtwert, Restnutzungsdauer
+     und Paragraphen ebenfalls). Was hier nicht sicher ist, geht den alten Weg. */
+  var DOK_LEIT = ['Bestandsverzeichnis', 'Abteilung III', 'Liegenschaftskataster', 'Auflassung', 'UR-Nr',
+    'Eigentümerversammlung', 'Eigentuemerversammlung', 'Verkehrswertgutachten', 'Restnutzungsdauergutachten',
+    'Gutachten zur Restnutzungsdauer', 'Nutzungsdauergutachten', 'Punktrastermethode', 'Kaufpreisaufteilung',
+    'Grundstücksmarktbericht', 'Bodenrichtwertauskunft'];
+  function istDokument(text) {
+    var t = String(text || '');
+    if (/dealpilot/i.test(t)) return false;
+    return DOK_LEIT.some(function (w) { return t.indexOf(w) >= 0; });
+  }
   function classifyType(file, text) {
     var fn = (file && file.name || '').toLowerCase();
     if (/markt|verkehrswert|pricehubble|sprengnetter|gutachten|\bavm\b|bewertung|wertermittlung/.test(fn)) return 'market';
@@ -2095,6 +2115,11 @@
   // Typ auflösen: bei klarem Befund direkt; bei 'unknown' erst Marktbericht versuchen und per Inhalt bestätigen, sonst Exposé.
   async function resolveType(f) {
     if (f.userType) { f.type = f.userType; await ensureExtract(f); return; }
+    if (window.DokumentImport && istDokument(f.text)) {
+      f.type = 'dokument'; await ensureExtract(f);
+      if (f.cache.dokument && f.cache.dokument.success) return;
+      delete f.cache.dokument;        /* unklar → der alte Weg */
+    }
     var cls = classifyType({ name: f.name }, f.text);
     if (cls === 'market' || cls === 'expose') { f.type = cls; await ensureExtract(f); return; }
     setStatus(f, 'Typ prüfen…');
@@ -2105,7 +2130,13 @@
   async function ensureExtract(f) {
     if (f.cache[f.type]) return;
     f.status = 'reading'; renderFileRow(f);
-    try { f.cache[f.type] = await callExtract(f.text, f.type === 'market'); f.status = 'ok'; }
+    try {
+      if (f.type === 'dokument') {
+        var _a = await window.DokumentImport.lesenText(f.text, f.name);
+        f.cache.dokument = _a; f.status = (_a && _a.success) ? 'ok' : 'err';
+        if (_a && _a.success) f.dokLabel = _a.label || 'Dokument';
+      } else { f.cache[f.type] = await callExtract(f.text, f.type === 'market'); f.status = 'ok'; }
+    }
     catch (e) { f.status = 'err'; }
     renderFileRow(f);
   }

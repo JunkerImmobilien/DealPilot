@@ -271,7 +271,7 @@
           "aus": [
             "Seitentext"
           ],
-          "beleg": "frontend/js/object-actions.js:pfTileTool('dokument'",
+          "beleg": "frontend/js/object-actions.js:istDokument",
           "ziel": {
             "tab": "s0"
           }

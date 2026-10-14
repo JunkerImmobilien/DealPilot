@@ -36,7 +36,12 @@ const EXTRACT_MODEL = process.env.OPENAI_VOICE_EXTRACT_MODEL || process.env.OPEN
    je Mio Token statt 0,75/4,50 bei gpt-5.4-mini und traegt 1 Mio Kontext. */
 const QUICKMATCH_MODEL = process.env.OPENAI_QUICKMATCH_MODEL || 'gpt-5.6-luna';
 
-const MAX_CATALOG = 250;       /* Eintraege */
+/* v2218h · GEMESSEN 14.10.2026: der volle Objekt-Katalog hat rund 240 Einträge
+   (231 Formularfelder aus FIELDS + Sanierungsgewerke + Erbbaurecht). Mit den
+   Kaufnebenkosten in Euro und den Darlehensschaltern wären es über 250 - und
+   alles darüber fiel STILL weg (break ohne Meldung). 320 lässt Luft; wird
+   trotzdem gekappt, steht es im Log. */
+const MAX_CATALOG = 320;       /* Eintraege */
 const MAX_OPTIONS = 40;        /* Optionen je Select */
 
 /* ════════════════════════════════════════════════════════════════════
@@ -187,7 +192,7 @@ function sanitizeCatalog(raw) {
   if (!Array.isArray(raw)) return [];
   const out = [];
   for (const e of raw) {
-    if (out.length >= MAX_CATALOG) break;
+    if (out.length >= MAX_CATALOG) { console.warn('[voiceExtract] Katalog gekappt bei ' + MAX_CATALOG + ' von ' + raw.length + ' Eintraegen'); break; }
     if (!e || typeof e.id !== 'string' || !/^[A-Za-z0-9_]{1,40}$/.test(e.id)) continue;
     const entry = {
       id: e.id,

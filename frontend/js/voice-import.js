@@ -181,6 +181,12 @@
       '.oabi-ov.vi-mode{--vi-surface:#0a0a0a;--vi-card:#151412;--vi-text:#FDFCFA;--vi-muted:#A89F8E;--vi-line:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 22%, transparent);--vi-track:#1c1a16;--vi-accent:var(--wl-c9a84c, #C9A84C);--vi-donebd:rgba(63,165,108,.7);--vi-donebg:rgba(63,165,108,.14);--vi-donetx:#c9f0d8}',
       'body[data-dp-skin="hell"] .oabi-ov.vi-mode{--vi-surface:#FDFCFA;--vi-card:#FFFFFF;--vi-text:#1e1a12;--vi-muted:#8a8272;--vi-line:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);--vi-track:#ECE4D2;--vi-accent:#9a7a24;--vi-donebd:rgba(63,165,108,.6);--vi-donebg:rgba(63,165,108,.14);--vi-donetx:#1c6b41}',
       '.oabi-ov.vi-mode .oabi-modal{background:var(--vi-surface)}',
+      /* v2218g · Marcel 14.10.2026: „die geführte Eingabe wird sehr klein dargestellt,
+         nimmt nicht den gesamten Bildschirm ein auf kleinen Displays." GEMESSEN 390 px:
+         Fenster 352 x 686 mit Rand, der Verlauf 168 px hoch. Am Handy jetzt randlos
+         über die ganze Höhe (dvh: die Adressleiste zählt nicht mit). */
+      '@media (max-width:640px){html body .oabi-ov.vi-mode{padding:0 !important;align-items:stretch !important;justify-content:stretch !important}'
+        + 'html body .oabi-ov.vi-mode .oabi-modal{width:100% !important;max-width:none !important;height:100vh !important;height:100dvh !important;max-height:none !important;margin:0 !important;border-radius:0 !important;border:0 !important}}',
 
       /* ═══ v1300c · Der freie Weg wird geteilt ═══════════════════════════
          Marcels Vorgabe: „wenn ich frei erzähle, dass wir dort dann auch
@@ -507,6 +513,22 @@
        kind 'bool' ist der Weg, den _wertSchreiben() in object-actions.js
        versteht: er setzt das Haekchen und feuert change, sonst bliebe die
        Rechenkette stehen. */
+    /* v2218h · Marcel 14.10.2026: „schauen, ob alle neuen Felder auch
+       reingesprochen werden können." GEMESSEN: 259 von 267 Formularfeldern im
+       Katalog; die echten Lücken waren die Kaufnebenkosten in EURO (nur die
+       Prozente standen in FIELDS) und die Schalter der Finanzierung. Die
+       Euro-Felder rechnen ihre Prozente selbst nach (syncCosts, oninput). */
+    [['makler_e', 'Maklerprovision in Euro'], ['notar_e', 'Notarkosten in Euro'], ['gba_e', 'Grundbuchkosten in Euro'],
+     ['gest_e', 'Grunderwerbsteuer in Euro'], ['ji_e', 'Sonstige Kaufnebenkosten in Euro (Gutachter, Anfahrt)']].forEach(function (x) {
+      if ($(x[0])) cat.push({ id: x[0], kind: 'num', label: x[1], hint: 'Nur, wenn ein Eurobetrag genannt wird - Prozentangaben gehören ins Prozentfeld.' });
+    });
+    [['d2_enable', 'Zweites Darlehen vorhanden', 'Setzen, wenn ein zweites Darlehen (z. B. KfW, Nachrang) genannt wird.'],
+     ['d1_anschl_enable', 'Eigene Anschlussfinanzierung für Darlehen 1', 'Nur, wenn ausdrücklich Konditionen für die Zeit nach der Zinsbindung genannt werden.'],
+     ['d2_anschl_enable', 'Eigene Anschlussfinanzierung für Darlehen 2', 'Nur, wenn ausdrücklich Konditionen für die Zeit nach der Zinsbindung von Darlehen 2 genannt werden.'],
+     ['ek_ist_nk', 'Eigenkapital deckt genau die Kaufnebenkosten', 'Setzen, wenn gesagt wird, das Eigenkapital entspreche den Nebenkosten.'],
+     ['erb_wert_ist_erb', 'Verkehrswert ist bereits der Wert mit Erbbaurecht', 'Nur bei Erbbaurecht, wenn der genannte Wert das Erbbaurecht schon berücksichtigt.']].forEach(function (x) {
+      if ($(x[0])) cat.push({ id: x[0], kind: 'bool', label: x[1], hint: x[2] });
+    });
     if ($("erbpacht")) cat.push({ id: 'erbpacht', kind: 'bool', label: 'Erbbaurecht / Erbpacht',
       hint: 'Das Grundstück gehört nicht mit, es wird gegen Erbbauzins überlassen. Nur setzen, wenn ausdrücklich von Erbbaurecht, Erbpacht oder Erbbauzins die Rede ist.' });
     return cat;
@@ -801,8 +823,14 @@
        Der geführte Weg selbst bleibt unverändert: derselbe Fragen-Ablauf,
        dieselben Regeln (tippen oder sprechen, „Weiss ich nicht" beendet
        eine Frage, „Fertig" springt zur Tabelle). */
+    /* v2218h · Marcel 14.10.2026: „Unter Sprache kommt noch ein Modal mit
+       Freisprechen und Geführt. Das haben wir so nicht mehr - der Schritt kann
+       raus, es wird direkt zum Freisprechen geführt." Die geführte Eingabe hat
+       seit v1742 eine eigene Kachel; die Wahl hier fragte zum zweiten Mal.
+       `_startkarte()` hat damit keinen Aufrufer mehr (grep, 14.10.2026) -
+       beim nächsten Anfassen der Datei entfernen. */
     if (opts && opts.gefuehrt) { _gefuehrt(OA); }
-    else { _startkarte(OA); }   /* v1275: erst die Wahl, dann die Aufnahme */
+    else { startRecording(); }
   }
 
   /* ═══════════════════════════════════════════════════════════════════

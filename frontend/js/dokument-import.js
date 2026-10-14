@@ -366,10 +366,38 @@
     });
   }
 
+  /* v2218h · Marcel 14.10.2026: „das neue Dokumenten-Einlesen sollten wir
+     herausnehmen und mit über PDF/Marktbericht-Import integrieren." Der Import
+     in object-actions.js ruft dieselbe Auslese und denselben Abgleich - ohne
+     dieses Fenster. Eine Auslese, ein Abgleich, zwei Eingänge. */
+  async function lesenText(text, dateiname, typ) {
+    return await Auth.apiCall('/ai/extract-dokument', {
+      method: 'POST',
+      body: { text: String(text || '').slice(0, 15000), dateiname: dateiname || '', typ: typ || undefined }
+    });
+  }
+  function vergleich(ext) {
+    var aus = [];
+    Object.keys(VERGLEICHSFELDER).forEach(function (k) {
+      var v = (ext || {})[k];
+      if (v === null || v === undefined || v === '') return;
+      var eigen = '';
+      if (k === 'rnd_jahre') {
+        var r = (window._currentObjData || {})._rnd;
+        if (r && _zahl(r.rnd_jahre) !== null) eigen = _fmt(Math.round(_zahl(r.rnd_jahre) * 10) / 10) + ' Jahre' + (r.gnd_jahre ? ' (GND ' + r.gnd_jahre + ')' : '');
+      }
+      aus.push({ feld: k, wort: VERGLEICHSFELDER[k], wert: (typeof v === 'number' ? _fmt(v) : String(v)), eigen: eigen });
+    });
+    return aus;
+  }
+
   window.DokumentImport = {
     oeffnen: oeffnen,
     schliessen: schliessen,
-    letztes: function () { return _letzter; }
+    letztes: function () { return _letzter; },
+    lesenText: lesenText,
+    abgleich: _abgleich,
+    vergleich: vergleich
   };
 
 })();
