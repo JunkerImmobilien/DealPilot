@@ -120,6 +120,7 @@
     z.innerHTML = '<div class="k">' + kick + '</div><div class="t">' + text + '</div><div class="p">'
       + Array.apply(null, { length: n }).map(function (_, j) { return '<i class="' + (j <= i ? 'an' : '') + '"></i>'; }).join('') + '</div>';
     z.classList.add('an');
+    z.removeAttribute('data-seite');   /* jede neue Zeile waehlt ihre Seite neu */
     platziere();
   }
   function zeileWeg() { var z = q('#dpm-zeile'); if (z) z.classList.remove('an'); linie(null); }
