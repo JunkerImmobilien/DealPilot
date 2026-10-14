@@ -163,6 +163,26 @@ for (const s of [92, 78, 60, 40, 12]) {
 }
 console.log('');
 
+/* ── v2232 · Urteil (qc-heuristik) gegen Stufe (score-tiers) ─────────────
+   Marcel 14.10.2026: „Urteil und Stufe … das muss passen." Der ECHTE Kern
+   wird geladen und für jeden Score 0..100 gefragt; erwartet wird je Stufe
+   das Urteil, das zu ihr gehört. */
+{
+  const hq = fs.readFileSync(new URL('../frontend/js/qc-heuristik.js', import.meta.url), 'utf8');
+  const ctx = { window: {}, console };
+  vm.createContext(ctx); vm.runInContext(hq, ctx);
+  const H = ctx.window.QcHeuristik || ctx.QcHeuristik;
+  const ERLAUBT = { 'Sehr gut': ['KAUFEN'], 'Gut': ['KAUFEN'], 'Solide': ['VERHANDELN', 'PRUEFEN'], 'Schwach': ['KRITISCH'], 'Kritisch': ['PASS'] };
+  let urteile = 0;
+  for (let s = 0; s <= 100; s++) {
+    const st = ScoreTier.stufe(s).wort;
+    const e = H.empfehlung({ score: s, kp: 200000, nkm: 900, bmr: 5.4, cfMon: 50, dscr: 1.2 }, (x) => x);
+    urteile++; gemessen++;
+    if ((ERLAUBT[st] || []).indexOf(e.verdict) < 0) { fehler++; abw.push('  Urteil ' + s + ': Stufe ' + st + ' aber ' + e.verdict); }
+  }
+  console.log('  Urteil gegen Stufe: ' + urteile + ' Scores geprüft');
+}
+
 if (fehler) {
   console.log(rot(fehler + ' ABWEICHUNGEN:'));
   console.log(abw.slice(0, 20).join('\n'));

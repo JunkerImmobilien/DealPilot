@@ -64,7 +64,17 @@ window.QcHeuristik = (function () {
      Aussage als eine Note, und sie stand hier seit V54 auf 75/60/40.
      Wer sie angleichen will, entscheidet das fachlich; stillschweigend
      verschieben waere eine Produktaenderung ohne Ansage. */
-  var SCHWELLE = { kaufen: 75, verhandeln: 60, kritisch: 40 };
+  /* v2232 · URTEIL UND STUFE AUF DENSELBEN GRENZEN. Marcel 14.10.2026:
+     „das müssen wir angleichen mit dem Urteil und Stufe. Das muss passen."
+     Hier standen 75/60/40, die Score-Stufen (score-tiers.js) brechen bei
+     85/70/50/35. Gemessen: Score 39 hieß „Schwach" und „Finger weg", Score 71
+     hieß „Gut" und „Kauf möglich — genauer prüfen". Jetzt:
+       Gut und Sehr gut (>= 70) -> KAUFEN (bzw. VERHANDELN über Markt)
+       Solide (>= 50)           -> VERHANDELN / PRUEFEN
+       Schwach (>= 35)          -> KRITISCH
+       Kritisch (< 35)          -> PASS
+     tools/score-ketten-pruefen.mjs prüft die Gleichheit mit ScoreTier. */
+  var SCHWELLE = { kaufen: 70, verhandeln: 50, kritisch: 35 };
 
   /* ── v1939 · DER ANGEBOTSABSCHLAG ───────────────────────────────────────
    *
