@@ -217,7 +217,9 @@
      CSS-Pixel gegen die Höhe des Bildschirmfotos (726) verglichen; das Fenster
      hat bei 90 % Zoom 987 CSS-px, der Kasten lag frei. Immer innerHeight messen. */
   var _nachScroll = 0, _letzterScroll = 0;
-  function frei(r) { return r.top >= 70 && r.bottom <= innerHeight - 170; }
+  /* v2235c · im Studio steht die Zeile ausserhalb der App: unten nichts freihalten */
+  function unten() { return STUDIO ? 24 : 170; }
+  function frei(r) { return r.top >= 70 && r.bottom <= innerHeight - unten(); }
   /* v2219f · scrollIntoView(smooth) kam im Drehbuch gemessen NIE an (Kasten blieb
      bei 572-736 stehen; dieselbe Zeile ohne smooth scrollte sofort). Gescrollt wird
      deshalb der Container selbst (.main-col), mittig in den freien Bereich. */
@@ -237,7 +239,7 @@
     return document.scrollingElement;
   }
   function holen(e, sanft) {
-    var r = rect(e), s = scroller(e), mitte = (70 + innerHeight - 170) / 2;
+    var r = rect(e), s = scroller(e), mitte = (70 + innerHeight - unten()) / 2;
     var d = r.height > innerHeight - 260 ? r.top - 80 : (r.top + r.height / 2) - mitte;
     /* v2222b · immer sofort: sanftes Scrollen brauchte gemessen bis zu 3 s,
        so lange stand der Kegel außerhalb des Bildes. Die Bewegung liefert der
