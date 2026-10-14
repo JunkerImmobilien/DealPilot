@@ -58,6 +58,13 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 Alles andere: abarbeiten.
 
+**Stand 14.10.2026:**
+- ✅ **Rumpfjahr** v2209 (`cde5c927`, Staging): ein echter Fehler. Die Zinsmonate im Jahr 1 zählten gegen das Auszahlungsjahr statt gegen das Projektionsjahr 1 (2026-1052: 1 Monat Miete gegen volle Zinsen). Fünf Fälle 5/5 gegen die echten Funktionen. Rest: Auszahlung mitten in Jahr 2 läuft dort voll.
+- ✅ **Regionaldatenbank / eigene Datenbank** im Wissen: Projektanweisung, Abschnitt „EIGENE DATENHALTUNG" (`8fcd85fa`).
+- ✅ **`store:false`** an allen 10 `/v1/responses`-Aufrufen (v2209). Echter Aufruf aus dem Container: 200, `store: false`.
+- ⚠ **Datenschutz — Marcels Annahme stimmt für den Dokument-Import NICHT:** `dokumentSchemas.js:190` verlangt beim Grundbuch `eigentuemer[{name, geburtsdatum}]`, Abt. II/III Berechtigte und Gläubiger. `:224-225` verlangt beim Kaufvertrag Verkäufer und Käufer mit Adresse. Der PDF-Text (bis 15.000 Zeichen) geht ungeschwärzt an OpenAI (`baueprompt`, `:404-411`). Beleg-Import schickt Seitenbilder (bis 30). → **Entscheidung Marcel:** Personendaten aus den Schemata streichen und vor dem Senden schwärzen, ODER im Datenschutztext nennen.
+- ⚠ **Gewerbe — größer als gedacht:** `gewerbe_jahr` setzt KEIN Aufrufer (nur `ErtragswertService.js` kennt es). Die Gewerbe-Rechnung aus v2195 lief also nie. Die MFH-Einheiten (`_mfh.einheiten[]`, Art Gewerbe, Fläche, Ist-Miete) kommen im Marktbericht gar nicht an, nur ihre Anzahl. Der Rohertrag ist `Wohnmiete €/m² × GESAMTE Fläche × 12` (`CrossCheckService.js:831`), die Gewerbefläche bekommt also den Wohnmietansatz. → **Bewertungsfrage an Marcel:** welcher Gewerbe-Rohertrag (Ist-Miete der Gewerbeeinheiten mit Hinweis, oder eigenes Feld „marktübliche Gewerbemiete €/m²")?
+
 ### N62 · Marcels Paket vom 12.10.2026 (abends) — zwölf Punkte, abgeglichen
 
 **Marcel hat ausdrücklich darum gebeten:** *„Also das müsstest du einmal

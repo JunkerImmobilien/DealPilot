@@ -38761,6 +38761,18 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2209 · Staging · Rumpfjahr-Zinsen, store:false (14.10.2026)
+- **Was:**
+  - `calc.js` D1 und D2: Die Zinsmonate im Jahr 1 zählen jetzt gegen `_v268_baseYear` (Projektionsjahr 1 = WU, sonst Kaufdatum, sonst heute) statt gegen das Auszahlungsjahr selbst. Vorher wurde jede Auszahlung mit ihrem eigenen Jahr verglichen.
+  - `store: false` an allen 10 `/v1/responses`-Aufrufen (openaiService 2, agentLauf, ai.js, voiceExtract 3, mb: Harvest, KiGegenrechnung, MarktberichtImport).
+- **Commit:** `cde5c927`, backend und mb-backend auf Staging neu gebaut.
+- **Nachweis:**
+  - Echte Funktionen aus `anteilig.js` in Node: WU 23.12.2024 / Auszahlung 01.2025 → ALT 12 Monate (56.274 €), NEU 0. WU 04.2024 / Auszahlung 12.2023 → ALT **1**, NEU 12. Drei weitere Fälle unverändert richtig. 5/5.
+  - Im Container: echter Aufruf 200, Antwort `store: false`; `dealpilot-backend` healthy.
+- **Marcel hatte recht, dass beides anteilig gerechnet wird** — der Fehler lag in der Jahreszuordnung, nicht in der Anteiligkeit.
+- **Rest:** Auszahlung mitten in Jahr 2 läuft dort voll. Im Browser an 2026-1052 nicht nachgesehen (Erweiterung nicht verbunden). Prod.
+- **Befunde für Marcel** (Backlog N64): Dokument-Import schickt Personendaten Dritter; Gewerbe-Rohertrag kommt im Ertragswert nie an.
+
 ### v2208 · Staging · Fehlerverdachte aus der Hilfe-Erhebung, Rest (14.10.2026)
 - **Was:** Die neun Verdachte aus N62.22 nachgemessen. **Acht waren schon behoben**: v2191 (`ad26710b`) hatte 1–3, 5, 6, 8, 9 erledigt, Punkt 4 stand schon seit v1963. Der Backlog führte sie trotzdem als „nicht nachgemessen". Meine Antwort am Vormittag nannte sie als offen, das war falsch.
   - **Echt offen war Punkt 7:** `mandanten.js` „Steuerregime · wird in Stufe 2 aktiv". Das rechnet längst (`effRate()` Z. 328, `gesellschaft-abschluss.js`). Dazu: Buchhaltung „(Stufe 3)" und „später Basis für … DATEV-Export". Den Jahresabschluss gibt es seit v1227, einen DATEV-Export gibt es nirgends. Jetzt: „rechnet in Steuer und Jahresabschluss", „für den Jahresabschluss (GuV und Bilanz)", ohne DATEV.
