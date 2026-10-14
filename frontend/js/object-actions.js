@@ -2499,7 +2499,24 @@
       setMode: function (qc, done) { _qcMode = !!qc; _qcPendingMerged = {}; _oabiDone = (typeof done === 'function') ? done : null; },
       addRow: addRow,
       render: renderMergedTable,
-      apply: applyMerged
+      apply: applyMerged,
+      /* v2222 · Mitschnitt und Wiedergabe für das Messe-Drehbuch: die echten
+         Ausleseergebnisse (cache je PDF) einmal festhalten und später ohne
+         erneuten KI-Aufruf wieder einsetzen. Danach läuft der echte Weg:
+         recompute (Zusammenführen, Adresskonflikt, Spannen) und die Tabelle. */
+      mitschnitt: function () {
+        return { files: _files.map(function (f) { return { name: f.name, type: f.type, userType: f.userType, cache: f.cache }; }) };
+      },
+      wiedergabe: function (m) {
+        var host = $('oabi-files'); if (!host || !m || !m.files) return false;
+        m.files.forEach(function (x) {
+          var row = document.createElement('div'); row.className = 'oabi-file'; host.appendChild(row);
+          var f = { name: x.name, file: null, text: '', type: x.type, userType: x.userType || null, cache: JSON.parse(JSON.stringify(x.cache || {})), status: 'ok', row: row };
+          _files.push(f); renderFileRow(f);
+        });
+        recompute(); renderMergedTable();
+        return true;
+      }
     } };
 })();
 

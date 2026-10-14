@@ -5718,6 +5718,10 @@ const QcApp = (function() {
     if (!window.parent || window.parent === window) return;
     if (!score || score.score == null) return;
     if (!QcEngine.completeness(inputs).hasAllRequired) return;
+    /* v2222 · Während eines Messe-Drehbuchs gar nicht erst anfangen: die
+       Brücke sagt ohnehin ab (Kosten), und Absage-Toast samt Vermerk in der
+       Meinung stünden im Video. Die Bewertung bleibt die gerechnete. */
+    try { if (window.parent.DealPilotMesse && window.parent.DealPilotMesse.laeuft()) return; } catch (e) {}
 
     var stand = _kiFingerabdruck(inputs, score);
     if (stand === _kiStand) return;     /* dieser Stand ist schon analysiert */
