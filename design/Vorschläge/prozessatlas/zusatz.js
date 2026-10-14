@@ -48,3 +48,14 @@ window.ATLAS_ZUSATZ = {
     { id: 'steuer', t: 'Steuer & AfA', k: 'Anlage V · § 7b', beleg: 'frontend/js/anlage-v-2025.js:Anlage V', nutzt: ['steuer', 'deal', 'boarding', 'dokumente'] }
   ]
 };
+
+/* v2218 · Sprechlauf und Dokument-Import stehen jetzt im ECHTEN Atlas
+   (frontend/js/prozess-atlas.js). Wer beide lädt, bekäme sie doppelt -
+   deshalb gilt hier nur, was der Atlas noch nicht kennt. */
+(function () {
+  var A = window.DealPilotAtlas && window.DealPilotAtlas.PROZESSE;
+  if (!A) return;
+  window.ATLAS_ZUSATZ.ablaeufe = window.ATLAS_ZUSATZ.ablaeufe.filter(function (p) {
+    return !A.some(function (x) { return x.id === p.id; });
+  });
+})();

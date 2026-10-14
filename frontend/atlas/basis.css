@@ -1,0 +1,44 @@
+/* frontend/atlas · Unterkarten des Prozess-Atlas (v2218), eingebettet per iframe aus prozess-atlas-gesamt.js.
+   Quelle der Gestaltung: design/Vorschläge/prozessatlas. */
+/* Prozessatlas-Demos · gemeinsame Grundlage (v2216k, Demo-first, N68.2)
+   Farben aus CLAUDE.md "Marke und Design". Nur Demo — uebernommen wird die
+   Gestaltung, nicht der Code. */
+:root{
+  --obs:#050505; --obs2:#0e0d0b; --obs3:#16140f; --linie:#2a261d;
+  --gold:var(--wl-c9a84c,#C9A84C); --gold-hi:var(--wl-e8cc7a,#E8CC7A); --gold-lo:var(--wl-b8932f,#b8932f);
+  --gruen:#3FA56C; --rot:#D8564C; --creme:#FDFCFA; --karte:#FBF6E9;
+  --tinte:#f3ead0; --leise:#a89e86; --still:#6f6757;
+  --runway:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));
+  --f-disp:'Space Grotesk',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,monospace;
+  --f-body:'Inter',system-ui,sans-serif;
+  --f-serif:'Cormorant Garamond',Georgia,serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--obs);color:var(--tinte);font:15px/1.5 var(--f-body);-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden}
+a{color:var(--gold-hi)}
+.kopf{display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid var(--linie);position:sticky;top:0;background:rgba(5,5,5,.88);backdrop-filter:blur(8px);z-index:50}
+.kopf .marke{font:700 15px var(--f-disp);letter-spacing:.02em}
+.kopf .marke b{background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+.kopf .nr{font:600 10.5px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border:1px solid color-mix(in srgb,var(--gold) 45%,transparent);border-radius:20px;padding:3px 10px}
+.kopf .titel{font:500 14px var(--f-disp);color:var(--leise)}
+.kopf .rechts{margin-left:auto;display:flex;gap:8px}
+.kopf .rechts a{font:600 11px var(--f-mono);letter-spacing:.08em;text-decoration:none;color:var(--leise);border:1px solid var(--linie);border-radius:8px;padding:6px 10px}
+.kopf .rechts a:hover{color:var(--gold-hi);border-color:var(--gold)}
+.ueber{font:600 10.5px var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+h1,h2,h3{font-family:var(--f-disp);font-weight:600;margin:0}
+.leise{color:var(--leise)}
+.chip{display:inline-flex;align-items:center;gap:6px;font:500 12px var(--f-mono);padding:4px 9px;border-radius:7px;background:var(--obs3);border:1px solid var(--linie);color:var(--tinte);white-space:nowrap}
+.chip.ein{border-color:color-mix(in srgb,var(--gold) 50%,transparent)}
+.chip.aus{border-color:color-mix(in srgb,var(--gruen) 60%,transparent);color:#bfe6cd}
+.beleg{font:500 10.5px var(--f-mono);color:var(--still);word-break:break-all}
+.demo-hinweis{position:fixed;right:14px;bottom:12px;font:600 10px var(--f-mono);letter-spacing:.12em;color:var(--still);text-transform:uppercase;z-index:60}
+@media (max-width:640px){.kopf{padding:12px 16px;flex-wrap:wrap}.kopf .titel{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* Eingebettet im Gesamt-Atlas (atlas-gesamt.html): ohne eigenen Kopf */
+body.eingebettet .kopf,body.eingebettet .demo-hinweis{display:none}
+body.eingebettet{background:transparent}
+body.eingebettet .buehne{min-height:100vh}
+body.eingebettet .instr{top:0;height:100vh}
+body.eingebettet .panel,body.eingebettet .seite{max-height:100vh;top:0}

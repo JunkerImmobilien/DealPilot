@@ -99,6 +99,299 @@
       ],
       kanten: [['q1', 'q2'], ['q2', 'q3'], ['q1', 'q4'], ['q2', 'q4'], ['q3', 'q4'], ['q4', 'q5'], ['q1', 'q6', 'opt'], ['q6', 'q8', 'opt'], ['q5', 'q7'], ['q7', 'q8'], ['q8', 'q9']]
     },
+    /* v2218 · aus der Demo (design/Vorschläge/prozessatlas) übernommen. Marcel 14.10.2026:
+       „so wie es in der Demo ist, ist es super.“ Sprechlauf und Dokument-Import als eigene Abläufe. */
+    {
+      "id": "sprache",
+      "name": "Sprechlauf",
+      "sub": "Du erzählst das Objekt — DealPilot füllt die Felder",
+      "spalten": [
+        "Sprechen",
+        "Verstehen",
+        "Übernehmen"
+      ],
+      "knoten": [
+        {
+          "id": "v1",
+          "s": 0,
+          "z": 0,
+          "t": "Aufnahme",
+          "k": "bis 4 Minuten",
+          "d": "Die Aufnahme startet sofort. Während du sprichst, erscheint der Text live als Vorschau; maßgeblich ist die Audio-Aufnahme.",
+          "ein": [
+            "Mikrofon"
+          ],
+          "aus": [
+            "Audio",
+            "Live-Vorschau"
+          ],
+          "beleg": "frontend/js/voice-import.js:MAX_SEC",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "v2",
+          "s": 0,
+          "z": 1,
+          "t": "Transkription",
+          "k": "in Abschnitten",
+          "d": "Der Mitschnitt wird abschnittsweise in Text übertragen. Pause und Fortsetzen sind jederzeit möglich.",
+          "ein": [
+            "Audio"
+          ],
+          "aus": [
+            "Text"
+          ],
+          "beleg": "frontend/js/voice-import.js:transcribe-chunk",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "v3",
+          "s": 1,
+          "z": 0,
+          "t": "Feldkatalog",
+          "k": "zur Laufzeit gelesen",
+          "d": "Alle Felder aller Reiter, Auswahlfelder mit ihren echten Optionen. So wird „Zustand ist gut\" zum passenden Optionswert.",
+          "ein": [
+            "Felder der App"
+          ],
+          "aus": [
+            "Katalog"
+          ],
+          "beleg": "frontend/js/voice-import.js:renderMergedTable",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "v4",
+          "s": 1,
+          "z": 1,
+          "t": "Zuordnen",
+          "k": "Text → Felder",
+          "d": "Die KI ordnet das Gesagte den Feldern zu. Was nicht im Katalog steht, wird nicht erfunden.",
+          "ein": [
+            "Text",
+            "Katalog"
+          ],
+          "aus": [
+            "Vorschläge je Feld"
+          ],
+          "beleg": "backend/src/routes/ai.js:/extract-voice",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "v5",
+          "s": 2,
+          "z": 0,
+          "t": "Nachfragen",
+          "k": "wenn ein Feld belegt ist",
+          "d": "Trägt das Objekt schon Werte, zeigt DealPilot, was sich ändern würde — und fragt, bevor überschrieben wird.",
+          "ein": [
+            "bestehende Werte"
+          ],
+          "aus": [
+            "Rückfrage"
+          ],
+          "beleg": "frontend/js/voice-import.js:bereits Stammdaten",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "v6",
+          "s": 2,
+          "z": 1,
+          "t": "Übernehmen",
+          "k": "an- und abwählbar",
+          "d": "Dieselbe Tabelle wie beim Exposé-Import. Du wählst, was übernommen wird — danach rechnen alle Kerne neu.",
+          "ein": [
+            "deine Auswahl"
+          ],
+          "aus": [
+            "gefüllte Felder",
+            "neuer Score"
+          ],
+          "beleg": "frontend/js/voice-import.js:applyMerged",
+          "ziel": {
+            "tab": "s0"
+          }
+        }
+      ],
+      "kanten": [
+        [
+          "v1",
+          "v2"
+        ],
+        [
+          "v2",
+          "v3"
+        ],
+        [
+          "v3",
+          "v4"
+        ],
+        [
+          "v4",
+          "v5"
+        ],
+        [
+          "v5",
+          "v6"
+        ]
+      ]
+    },
+    {
+      "id": "dokumente",
+      "name": "Dokument-Import",
+      "sub": "Exposé, Grundbuch, Gutachten, Belege — lesen statt abtippen",
+      "spalten": [
+        "Einlesen",
+        "Schützen",
+        "Auswerten",
+        "Übernehmen"
+      ],
+      "knoten": [
+        {
+          "id": "p1",
+          "s": 0,
+          "z": 0,
+          "t": "PDF wählen",
+          "k": "Text aus allen Seiten",
+          "d": "Der Text wird im Browser aus dem PDF gelesen. Belege und Fotos gehen als Bild in die Auswertung.",
+          "ein": [
+            "PDF",
+            "Foto"
+          ],
+          "aus": [
+            "Seitentext"
+          ],
+          "beleg": "frontend/js/object-actions.js:pfTileTool('dokument'",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "p2",
+          "s": 0,
+          "z": 1,
+          "t": "Art erkennen",
+          "k": "neun Dokumentarten",
+          "d": "Grundbuch, Kataster, Kaufvertrag, WEG-Protokoll, BORIS, Verkehrswert-, Restnutzungsdauergutachten, Kaufpreisaufteilung, Marktbericht — je mit eigenem Schema.",
+          "ein": [
+            "Seitentext"
+          ],
+          "aus": [
+            "Dokumentart"
+          ],
+          "beleg": "frontend/js/dokument-import.js:Kaufpreisaufteilung",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "p3",
+          "s": 1,
+          "z": 0,
+          "t": "Schwärzen",
+          "k": "auf dem DealPilot-Server, vor der KI",
+          "d": "Geburtsdaten, Namen nach Anrede, Anschriften nach „wohnhaft\", E-Mail, Telefon, IBAN, Steuer-ID werden ersetzt. Die Objektanschrift und Beträge bleiben — die braucht die Auswertung.",
+          "ein": [
+            "Seitentext"
+          ],
+          "aus": [
+            "geschwärzter Text"
+          ],
+          "beleg": "backend/src/services/schwaerzen.js:schwaerze",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "p4",
+          "s": 2,
+          "z": 0,
+          "t": "Auslesen",
+          "k": "Schema ohne Personendaten",
+          "d": "Das Schema fragt nur nach Objektdaten. Was nicht gefragt wird, schreibt das Modell nicht heraus.",
+          "ein": [
+            "geschwärzter Text",
+            "Schema"
+          ],
+          "aus": [
+            "Felder mit Fundstelle"
+          ],
+          "beleg": "backend/src/routes/ai.js:/extract-dokument",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "p5",
+          "s": 2,
+          "z": 1,
+          "t": "Vergleich, nicht Ergebnis",
+          "k": "fremde Gutachten",
+          "d": "Ein mitgelesener Gutachtenwert (Restnutzungsdauer, Verkehrswert, Gebäudeanteil) erscheint als Vergleich neben der eigenen Rechnung — er wird nicht übernommen.",
+          "ein": [
+            "Gutachtenwert"
+          ],
+          "aus": [
+            "Abgleich"
+          ],
+          "beleg": "frontend/js/dokument-import.js:VERGLEICH",
+          "ziel": {
+            "tab": "s0"
+          }
+        },
+        {
+          "id": "p6",
+          "s": 3,
+          "z": 0,
+          "t": "Übernehmen",
+          "k": "Feld für Feld",
+          "d": "Jedes Feld steht mit „im Dokument“ und „im Objekt“ nebeneinander: leere Felder sind vorgehakt, abweichende nicht — still überschrieben wird nie. Belege bestätigst du Zeile für Zeile, weil sie in die Steuer gehen.",
+          "ein": [
+            "deine Auswahl"
+          ],
+          "aus": [
+            "Datenaufnahme",
+            "Anschaffungskosten"
+          ],
+          "beleg": "frontend/js/dokument-import.js:_abgleich",
+          "ziel": {
+            "tab": "s0"
+          }
+        }
+      ],
+      "kanten": [
+        [
+          "p1",
+          "p2"
+        ],
+        [
+          "p2",
+          "p3"
+        ],
+        [
+          "p3",
+          "p4"
+        ],
+        [
+          "p4",
+          "p5"
+        ],
+        [
+          "p5",
+          "p6"
+        ]
+      ]
+    },
     {
       id: 'boarding', name: 'Netzplan Datenaufnahme', sub: 'Jede Stufe schaltet frei, was ohne sie nicht rechnen darf',
       spalten: ['Stufe 1 · Einordnen · 6 Pflichtfelder', 'Stufe 2 · Durchrechnen · 13', 'Stufe 3 · Bewerten · bis 20'],
