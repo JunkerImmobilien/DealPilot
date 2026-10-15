@@ -258,8 +258,11 @@
     if (!window.DealScore || typeof window.DealScore.compute !== 'function') return null;
     var r; try { r = window.DealScore.compute(); } catch (e) { return null; }
     if (!r || !r.breakdown || !r.breakdown.length) return null;
-    var cats = r.breakdown.map(function (b) { return { name: b.label, k: (b.weight) + '%', v: Math.round(b.score), s: b.input }; });
-    function inp(key) { var f = r.breakdown.filter(function (b) { return b.key === key; })[0]; return f ? f.input : '\u2014'; }
+    /* v2263 \u00b7 der Kern liefert die Eingabe mit Dezimalpunkt ("DSCR 1.67", "5.41 %") -
+       hier steht sie deutsch. Tausenderpunkte ("74.000 \u20ac") bleiben: nur 1-2 Nachkommastellen. */
+    function deDez(x) { return x == null ? x : String(x).replace(/(\d)\.(\d{1,2})(?!\d)/g, '$1,$2'); }
+    var cats = r.breakdown.map(function (b) { return { name: b.label, k: (b.weight) + '%', v: Math.round(b.score), s: deDez(b.input) }; });
+    function inp(key) { var f = r.breakdown.filter(function (b) { return b.key === key; })[0]; return f ? deDez(f.input) : '\u2014'; }
     var stats = [['Kaufpreis', kaufpreisTxt()], ['Cashflow', inp('cashflow')], ['DSCR', String(inp('risiko')).replace('DSCR ', '')]];
     return {
       kind: 'classic', logo: 'DealPilot <b>Score</b>', eyebrow: 'DealPilot Score',

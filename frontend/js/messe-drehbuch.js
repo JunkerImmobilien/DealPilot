@@ -1366,7 +1366,10 @@
   var RH_BUSTER = 'v2257h';
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
-  var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten/i;
+  var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel/i;
+  /* v2263 · dazu Netzwerk-Einreichung, Partner-Anfrage, Ämter-Anfragen (Modul 13) und
+     der Portfolio-Spiegel: eine gewonnene KOPIE (Modul 14) ginge sonst als zweites
+     Objekt in die Zahlen des Telegram-Bots (gemessen: 12 statt 11 Objekte). */
   window.DPM_REIHE = { angelegt: [], gesperrt: [], gespielt: [], geloescht: [], abrufe: [], fertig: null };
   var _rh = null, _rhNachlauf = 0, _rhToene = [], _rhGum = null;
   function rhLaden() {
@@ -2086,11 +2089,13 @@
         await zeigeGruppe(feldVon('notar_p'), feldVon('ji_e'), 8);
         await b2oZeile(s, 'Schon vorbelegt', 'Kaufpreis <b>' + eur(zahl('kp')) + '</b> — die Nebenkosten stehen sofort da, in Prozent und in Euro.');
       },
-      async function (s) {   /* 3 · Notar, Grundbuch, Sonstige */
+      async function (s) {   /* 3 · Makler, Notar, Grundbuch, Sonstige (v2263: alle vier aus den Standardwerten, v2261) */
+        await zeigeGruppe(feldVon('makler_p'), feldVon('makler_e'), 8);
+        await b2oZeile(s, 'Makler', 'Maklerprovision <b>' + r6Pz(wert('makler_p')) + ' %</b> = ' + eur(zahl('makler_e')) + ' — aus deinen Standardwerten. Ohne Makler einfach auf 0 setzen.');
         await zeigeGruppe(feldVon('notar_p'), feldVon('gba_e'), 8);
-        await b2oZeile(s, 'Notar und Grundbuch', 'Notar <b>' + r6Pz(wert('notar_p')) + ' %</b> = ' + eur(zahl('notar_e')) + ' — aus deinen Standardwerten. Grundbuchamt <b>' + r6Pz(wert('gba_p')) + ' %</b> = ' + eur(zahl('gba_e')) + ', fest vorbelegt.');
+        await b2oZeile(s, 'Notar und Grundbuch', 'Notar <b>' + r6Pz(wert('notar_p')) + ' %</b> = ' + eur(zahl('notar_e')) + ', Grundbuchamt <b>' + r6Pz(wert('gba_p')) + ' %</b> = ' + eur(zahl('gba_e')) + ' — beide aus deinen Standardwerten.');
         await zeigeGruppe(feldVon('ji_p'), feldVon('ji_e'), 8);
-        await b2oZeile(s, 'Sonstige Kosten', '<b>' + r6Pz(wert('ji_p')) + ' %</b> = ' + eur(zahl('ji_e')) + ' für Bausachverständigen, Anfahrt, Gutachten — fest vorbelegt, jederzeit änderbar.');
+        await b2oZeile(s, 'Sonstige Kosten', '<b>' + r6Pz(wert('ji_p')) + ' %</b> = ' + eur(zahl('ji_e')) + ' für Bausachverständigen, Anfahrt, Gutachten — ebenfalls vorbelegt, jederzeit änderbar.');
       },
       async function (s) {   /* 4 · Grunderwerbsteuer nach PLZ */
         await zeigeGruppe(feldVon('gest_p'), feldVon('gest_e'), 8);
@@ -2104,8 +2109,8 @@
       async function (s) {   /* 6 · woher die Standardwerte kommen */
         await r6Einstellungen('standardwerte');
         await zeige(r6Karte('.settings-modal', /^Standort & Nebenkosten$/), 8);
-        var bl = r6SwkWert(/^Standort & Nebenkosten$/, /^Bundesland$/), ng = r6SwkWert(/^Standort & Nebenkosten$/, /^Notar\/Grundbuch$/);
-        await b2oZeile(s, 'Woher die Vorbelegung kommt', 'Einstellungen › <b>Standardwerte</b>: Bundesland ' + (bl || '–') + ', Notar ' + (ng || '–') + '. Was du hier änderst, gilt für jedes neue Objekt.');
+        var SN = /^Standort & Nebenkosten$/, bl = r6SwkWert(SN, /^Bundesland$/), no = r6SwkWert(SN, /^Notar$/), gb = r6SwkWert(SN, /^Grundbuch$/), so = r6SwkWert(SN, /^Sonstige$/), mk = r6SwkWert(SN, /^Makler$/);
+        await b2oZeile(s, 'Woher die Vorbelegung kommt', 'Einstellungen › <b>Standardwerte</b>: Notar ' + (no || '–') + ', Grundbuch ' + (gb || '–') + ', Sonstige ' + (so || '–') + ', Makler ' + (mk || '–') + ' — Bundesland ' + (bl || '–') + '. Gilt für jedes neue Objekt.');
         r6EinstellungenZu();
         await warte(700);
       },
@@ -2136,7 +2141,7 @@
         var t = q('#inv_detail_toggle'); if (t && !t.checked) t.click();
         await warte(700);
         await zeigeGruppe(feldVon('inv_kueche'), feldVon('inv_geraete'), 8);
-        var zb = r6Beginn(s, 'Inventar', 'Küche und Möbel, die mitverkauft werden — getrennt vom Gebäude erfasst.');
+        var zb = r6Beginn(s, 'Inventar', 'Küche und Möbel, die mitverkauft werden — sie stecken im Kaufpreis und werden getrennt vom Gebäude erfasst.');
         await tippeH('inv_kueche', '6000', 90); await tippeH('inv_moebel', '2500', 90);
         await warte(1000);
         await r6Ende(zb);
@@ -2149,7 +2154,7 @@
         await b2oZeile(s, 'Was es bewirkt', 'Eigene Abschreibung über <b>' + r6Optionstext('inv_tax_years') + '</b> — und es zählt nicht zur 15-%-Grenze der Sanierung.');
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeige(function () { return q('#gi_val') && q('#gi_val').closest('.total-bar'); }, 10);
-        await b2oZeile(s, 'Gesamtinvestition', 'Kaufpreis, Nebenkosten, Sanierung und Inventar: <b>' + r6Id('gi_val').replace(/^€\s*/, '') + ' €</b> — die Grundlage für Finanzierung und Steuer.', 600);
+        await b2oZeile(s, 'Gesamtinvestition', 'Kaufpreis (mit Inventar), Nebenkosten und Sanierung: <b>' + r6Id('gi_val').replace(/^€\s*/, '') + ' €</b> — das Inventar zählt nicht doppelt. Die Grundlage für Finanzierung und Steuer.', 600);
       }
     ]
   };
@@ -2417,7 +2422,8 @@
      „Duplizieren“), deren Kennung landet über den fetch-Ersatz in
      DPM_REIHE.angelegt und wird beim Aufräumen gelöscht, auch bei Esc. */
   var R6_MFH = '72082555-b960-4868-a409-b241fbaf86ed';
-  async function r6KopieStart(id) {
+  async function r6KopieStart(id, opt) {
+    opt = opt || {};
     DPM_REIHE.angelegt = []; DPM_REIHE.gesperrt = []; DPM_REIHE.gespielt = []; DPM_REIHE.geloescht = []; DPM_REIHE.abrufe = []; DPM_REIHE.fertig = null;
     var sk = null; try { sk = Auth.getStorageKey('seq_') + new Date().getFullYear(); } catch (e) {}
     var ls = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
@@ -2430,12 +2436,19 @@
     reiter('s0');
     var o = await Auth.apiCall('/objects/' + id);
     var d = JSON.parse(JSON.stringify((o && o.data) || {}));
-    ['_obj_seq', '_deal_won', '_deal_won_at', '_deal_lost'].forEach(function (k) { delete d[k]; });   /* wie dupSaved() */
-    var neu = await Auth.apiCall('/objects', { method: 'POST', body: { data: d, aiAnalysis: o.ai_analysis, photos: o.photos || [] } });
+    /* v2263 · opt.behalte: Gewonnen-Status bleibt (Modul 14, Bestand) */
+    (opt.behalte ? ['_obj_seq'] : ['_obj_seq', '_deal_won', '_deal_won_at', '_deal_lost']).forEach(function (k) { delete d[k]; });   /* wie dupSaved() */
+    if (opt.ohneAnkauf) delete d._ankauf;   /* v2263: ein offener Deal hat noch keinen eingefrorenen Ankauf-Stand */
+    /* v2263 · die Analyse trägt die Kennung ihres Objekts (_fuer.objekt_id) - an
+       der Kopie hieße es sonst „gehört zu einem anderen Objekt". Ohne Kennung
+       prüft die App nur den Zahlenabdruck, wie bei jeder Analyse. */
+    var ai = o.ai_analysis;
+    try { var aj = typeof ai === 'string' ? JSON.parse(ai) : ai; if (aj && aj._fuer) { delete aj._fuer.objekt_id; ai = JSON.stringify(aj); } } catch (e) {}
+    var neu = await Auth.apiCall('/objects', { method: 'POST', body: { data: d, aiAnalysis: ai, photos: o.photos || [] } });
     var nid = neu && (neu.id || (neu.data && neu.data.id) || (neu.object && neu.object.id));
     if (nid && DPM_REIHE.angelegt.indexOf(nid) < 0) DPM_REIHE.angelegt.push(nid);
     if (nid && typeof window.loadSaved === 'function') await window.loadSaved(nid);
-    await warteAuf(function () { return window._currentObjKey === nid && /Ravensberger|\S/.test(wert('str')); }, 9000);
+    await warteAuf(function () { return window._currentObjKey === nid && /\S/.test(wert('str')); }, 9000);
     await warte(900);
     var m = q('.main-col'); if (m) m.scrollTop = 0;
   }
@@ -2694,6 +2707,432 @@
         var n = r6San15(), v = _r6Vorher || {};
         await zeige(function () { return q('#san_limit_hint') && (q('#san_limit_hint').closest('.f') || q('#san_limit_hint')); }, 8);
         await b2oZeile(s, 'Die 15-%-Grenze zieht mit', 'Mehr Gebäude, höhere Grenze: <b>' + n.max + '</b> statt ' + (v.max || '–') + '. Die Sanierung (' + n.netto + ' netto) bleibt darunter — ' + n.status + '.', 600);
+      }
+    ]
+  };
+
+  /* ═══ VIDEOREIHE · SPEZIALMODULE 11–14 (v2263) ═══════════════════════
+     Videoreihe.md, Teil C. Alle vier an KOPIEN (r6KopieStart, beim Aufräumen
+     gelöscht, auch bei Esc); die echten Objekte werden nie geladen.
+       11 Pilot-Analyse  Ravensberger Weg 38 (MFH) - die gespeicherte Analyse
+          vom 13.10.2026. NICHT Westerfeldstr. 140: deren Analyse empfiehlt eine
+          Offerte von 910.000 € bei 545.000 € Kaufpreis und nennt im Abschnitt
+          Lage Immobilienportale (gemessen 15.10.2026; gemeldet).
+       12 Bewertung, 13 Deal-Aktion  Westerfeldstr. 140 (MFH, 4 WE)
+       14 Bestand  Parkstr. 9 (gewonnen, Ankauf-Stand) - Kopie MIT Gewonnen-Status
+     Kein KI-Abruf: die Analyse ist die gespeicherte. Gesperrt (RH_SPERRE):
+     KI, Marktbericht, BMF, Partner-/Netzwerk-/Ämter-Anfragen, Pässe,
+     Portfolio-Spiegel. Geklickt werden nur Reiter, Unter-Reiter und der
+     Soll/Ist-Umschalter - kein Deal-Status, kein PDF, kein „Stand neu nehmen". */
+  var R11_WESTERFELD = 'ae155d38-c0ea-462b-8b69-253e9eb311a8', R11_PARK = '0da7e9b6-da19-4910-8259-905f5ac10123';
+  var R11_VERBOTEN = /scout|immowelt|wohnungsboerse|immonet|kleinanzeig/i;
+  function r11Panel() { return [].filter.call(document.querySelectorAll('#ai-content .dp-pa-panel'), function (x) { return x.offsetWidth > 0; })[0] || null; }
+  async function r11PaTab(re) {
+    var t = [].filter.call(document.querySelectorAll('#ai-content .dp-pa-tab'), function (b) { return b.offsetWidth && re.test(r6Text(b)); })[0];
+    if (t) t.click();
+    await warte(700);
+    return !!t;
+  }
+  /* die Karte eines Abschnitts: .dp-pa-card, deren erster Kopf passt */
+  function r11Karte(re) {
+    return function () {
+      var p = r11Panel(); if (!p) return null;
+      return [].filter.call(p.querySelectorAll('.dp-pa-card'), function (c) { var s = c.querySelector('.dp-pa-sec'); return s && re.test(r6Text(s)); })[0] || null;
+    };
+  }
+  function r11Text(re, wo) { var m = re.exec(r6Inner(wo || r11Panel())); return m ? m[1].trim() : null; }
+  /* liegt ein Portalname gerade im Bild? (Regel: keine Datenquelle nach außen) */
+  function r11VerbotenImBild() {
+    var tw = document.createTreeWalker(q('#ai-content') || document.body, NodeFilter.SHOW_TEXT), n;
+    while ((n = tw.nextNode())) {
+      if (!R11_VERBOTEN.test(n.nodeValue) || !n.parentElement || !n.parentElement.offsetWidth) continue;
+      var rg = document.createRange(); rg.selectNodeContents(n); var b = rg.getBoundingClientRect();
+      if (b.width && b.bottom > 0 && b.top < innerHeight) return true;
+    }
+    return false;
+  }
+  /* ein Element mit seiner UNTERKANTE an den unteren Bildrand (darunter liegt
+     im Abschnitt Lage die Gegenüberstellung mit den Portal-Quellen) */
+  async function r11Unten(fn) {
+    var e = fn(); if (!e) return;
+    var s = scroller(e), r = rect(e);
+    s.scrollTop += r.bottom - (innerHeight - unten() - 30);
+    await warte(300);
+  }
+  function r11Kurz(t, n) { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n).replace(/\s+\S*$/, '') + ' …' : t; }
+
+  /* ── MODUL 11 · PILOT-ANALYSE IM DETAIL ──────────────────────────── */
+  DREHBUECHER['reihe-pilot'] = {
+    titel: 'Pilot-Analyse im Detail', unterzeile: 'Die KI-Einschätzung Abschnitt für Abschnitt', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }], aufraeumen: rhAufraeumen,
+    szenen: [
+      async function (s) {   /* 1 · das Beispiel */
+        await r6KopieStart(R6_MFH, { ohneAnkauf: true });
+        await r6MfhBeispiel(s, ' Heute: die <b>Pilot-Analyse</b>.');
+      },
+      async function (s) {   /* 2 · Aufruf und was sie liest */
+        reiter('s5'); await warte(1200);
+        await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 6000);
+        var n = [].filter.call(document.querySelectorAll('#ai-content .dp-pa-tab'), function (b) { return b.offsetWidth; }).length;
+        await zeige(function () { var t = q('#ai-content .dp-pa-tab'); return t && t.parentElement; }, 8);
+        await b2oZeile(s, 'Was der Pilot liest', 'Alle Reiter auf einmal: Objekt, Miete, Finanzierung, Steuer, Marktbewertung und Lage. Heraus kommen <b>' + n + ' Abschnitte</b>.');
+      },
+      async function (s) {   /* 3 · Stand */
+        await zeige(function () { return q('#ai-content .dp-pa-stand'); }, 8);
+        var st = r6Text(q('#ai-content .dp-pa-stand')), d = /Stand ([\d.]+)/.exec(st), ab = /seitdem (?:hat|haben) sich (.+?) geändert/.exec(st);
+        await b2oZeile(s, 'Der Stand', 'Die Analyse ist vom <b>' + (d ? d[1] : '–') + '</b>. ' + (ab ? 'Seitdem hat sich <b>' + ab[1] + '</b> geändert — der Pilot sagt es dir, statt alte Sätze als aktuell zu verkaufen.' : 'Ändern sich die Zahlen, sagt der Pilot es dir hier.'));
+      },
+      async function (s) {   /* 4 · Gesamturteil */
+        await r11PaTab(/^Briefing$/);
+        var urteil = r6Text(q('#ai-content .dp-pa-empf-row'));
+        await zeige(function () { return q('#ai-content .dp-pa-empf-row') && q('#ai-content .dp-pa-empf-row').closest('.dp-pa-card'); }, 8);
+        await b2oZeile(s, 'Das Gesamturteil', 'Ganz oben die Empfehlung: <b>' + (urteil || '–') + '</b>. Darunter Gesamtbewertung und Begründung — in ganzen Sätzen, mit deinen Zahlen.');
+        await zeige(r11Karte(/^SCORE-VERGLEICH$/), 8);
+        await b2oZeile(s, 'Score-Vergleich und Investor-Fit', 'Warum DealScore und Investor-DealScore auseinanderliegen — und ob das Objekt zu deinen Zielen passt.');
+      },
+      async function (s) {   /* 5 · Stärken und Risiken */
+        await r11PaTab(/^Stärken/);
+        var k = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-cols'); };
+        await zeige(k, 8);
+        var c = k(), ns = c ? c.children[0].querySelectorAll('li').length : 0, nr = c && c.children[1] ? c.children[1].querySelectorAll('li').length : 0;
+        await b2oZeile(s, 'Stärken und Risiken', '<b>' + ns + ' Stärken</b>, <b>' + nr + ' Risiken</b> — jeweils kurz begründet, nebeneinander zum Abwägen.');
+        var f = r11Karte(/^OPTISCHER EINDRUCK/);
+        if (f()) { await zeige(f, 8); await b2oZeile(s, 'Der Blick auf die Fotos', 'Liegen Fotos am Objekt, schaut der Pilot hin: Zustand, Pflege, was ins Auge fällt.'); }
+      },
+      async function (s) {   /* 6 · Risiko und Szenarien */
+        await r11PaTab(/^Risiko/);
+        await zeige(r11Karte(/^ANSCHLUSSFINANZIERUNG$/), 8);
+        await b2oZeile(s, 'Anschlussfinanzierung', 'Was passiert nach der Zinsbindung, wenn der Zins steigt? Der Pilot rechnet es durch.');
+        var w = function () { var p = r11Panel(); var c = p && [].filter.call(p.querySelectorAll('.dp-pa-cols'), function (x) { return /WORST CASE/.test(x.textContent); })[0]; return c || null; };
+        await zeige(w, 8);
+        var wc = r11Text(/WORST CASE\s*\n\s*([^\n]+)/), bc = r11Text(/BEST CASE\s*\n\s*([^\n]+)/);
+        await b2oZeile(s, 'Worst Case und Best Case', 'Zwei Szenarien' + (wc ? ': schlecht „' + wc.toLowerCase().replace(/(^|, )([a-zäöü])/g, function (a, b, c2) { return b + c2.toUpperCase(); }) + '“' : '') + (bc ? ', gut „' + bc.toLowerCase().replace(/(^|, )([a-zäöü])/g, function (a, b, c2) { return b + c2.toUpperCase(); }) + '“' : '') + ' — mit dem, was dann vom Cashflow bleibt.');
+      },
+      async function (s) {   /* 7 · Lage und Markt (ohne die Portal-Quellen) */
+        await r11PaTab(/^Lage/);
+        var k1 = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-card'); };
+        await zeige(k1, 8);
+        await r11Unten(k1);
+        if (!r11VerbotenImBild()) await b2oZeile(s, 'Lage und Markt', 'Makro- und Mikrolage recherchiert: Einwohner, Arbeitsmarkt, Nachfrage, Umfeld der Straße.');
+        var k2 = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-abgl'); };
+        await zeige(k2, 8);
+        await r11Unten(k2);
+        if (!r11VerbotenImBild()) await b2oZeile(s, 'Abgleich mit dem Marktbericht', 'Wo die Recherche dem Marktbericht zustimmt — und wo sie abweicht. Abweichungen nennt der Pilot ausdrücklich.');
+      },
+      async function (s) {   /* 8 · Verhandlung */
+        await r11PaTab(/^Verhandlung/);
+        await zeige(r11Karte(/^VERHANDLUNGSEMPFEHLUNG$/), 8);
+        await b2oZeile(s, 'Verhandlungsempfehlung', 'Wo du ansetzen kannst — mit den Argumenten aus deinen Zahlen und dem Marktbericht.');
+        var o = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-offerte'); };
+        await zeige(o, 8);
+        var off = r11Text(/KAUFPREIS-OFFERTE\s*\n\s*([\d.]+ €)/), kp = zahl('kp'), on = off ? Number(off.replace(/\D/g, '')) : null;
+        var ab = (on && kp) ? Math.round((1 - on / kp) * 1000) / 10 : null;
+        await b2oZeile(s, 'Die Kaufpreis-Offerte', 'Empfohlen: <b>' + (off || '–') + '</b> statt ' + eur(kp) + (ab != null && ab > 0 ? ' — ' + String(ab).replace('.', ',') + ' % darunter' : '') + '. Mit Begründung, die du dem Verkäufer nennen kannst.');
+        var m = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-offmail'); };
+        await zeige(m, 8);
+        await b2oZeile(s, 'Offerte als E-Mail', 'Fertig formuliert — als E-Mail öffnen oder kopieren. Abgeschickt wird nur, was du selbst abschickst.');
+      },
+      async function (s) {   /* 9 · Bank und Steuer */
+        await r11PaTab(/^Bank$/);
+        await zeige(r11Karte(/^BANKARGUMENTE$/), 8);
+        await b2oZeile(s, 'Bankargumente', 'Was du im Bankgespräch sagst: Kapitaldienst, Beleihung, Sicherheiten — kurz und belastbar.');
+        await r11PaTab(/^Steuer$/);
+        await zeige(function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-card'); }, 8);
+        await b2oZeile(s, 'Steuerliche Zusammenfassung', 'Was die Abschreibung und die Werbungskosten im Jahr bringen. Keine Steuerberatung — der Pilot sagt das auch dazu.');
+      },
+      async function (s) {   /* 10 · was sie NICHT tut */
+        await r11PaTab(/^Briefing$/);
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeige(function () { return q('#ai-content .dp-pa-stand'); }, 8);
+        await b2oZeile(s, 'Was der Pilot nicht tut', 'Kennzahlen und Scores kommen aus DealPilot, der Pilot ordnet sie ein. Er ersetzt kein Gutachten und keine Steuerberatung — und er kauft nichts für dich.', 600);
+      }
+    ]
+  };
+
+  async function r11Beispiel(s, rest) {
+    var m = q('.main-col'); if (m) m.scrollTop = 0;
+    await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+    var we = wert('einheiten');
+    await b2oZeile(s, 'Das Beispiel', 'Ein Mehrfamilienhaus: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Wohnungen, ' : '') + de(zahl('wfl')) + ' m², Baujahr ' + wert('baujahr') + ', Kaufpreis ' + eur(zahl('kp')) + '.' + (rest || ''));
+  }
+  /* ── MODUL 12 · BEWERTUNG UND KPIS ───────────────────────────────── */
+  function r12Karte(i) { return function () { return document.querySelectorAll('#s6 .dpsh-body')[i] || null; }; }
+  function r12Kopf(i) {   /* Score, Stufe, Datentiefe aus dem Kopf der Karte */
+    var k = r12Karte(i)(), t = k ? r6Inner(k.querySelector('.dpsh-mainrow') || k) : '';
+    var sc = /(\d+)\s*\n\s*\/\s*100/.exec(t), dt = /DATENTIEFE\s*([\d,]+\s*%)/i.exec(t), w = /DATENTIEFE[^\n]*\n\s*([A-ZÄÖÜ ]+)\n/.exec(t);
+    return { score: sc ? sc[1] : null, tiefe: dt ? dt[1] : null, wort: w ? w[1].trim() : null };
+  }
+  function r12Teile(i) {   /* [Name, Gewicht, Teilnote] je Balken */
+    var k = r12Karte(i)(); if (!k) return [];
+    return [].map.call(k.querySelectorAll('.dpsh-cbar'), function (b) {
+      var n = b.querySelector('.dpsh-cbar-name'), g = n && n.querySelector('.dpsh-kpi'), sc = b.querySelector('.dpsh-cbar-score');
+      var name = n ? r6Text(n).replace(g ? r6Text(g) : '', '').trim() : '';
+      return { name: name, gewicht: g ? r6Text(g).replace(/\s*%/, ' %') : '', note: sc ? (/(\d+)/.exec(r6Text(sc)) || [])[1] : '' };
+    });
+  }
+  function r12Bewertung(re) {   /* Zeile der Kennzahlen-Bewertung: Wert und Wort */
+    var t = q('#s6 .kpi-eval-card table'); if (!t) return null;
+    var r = [].filter.call(t.rows, function (x) { return x.cells[0] && re.test(r6Text(x.cells[0])); })[0];
+    return r ? { wert: r6Text(r.cells[1]), wort: r6Text(r.cells[2]) } : null;
+  }
+  function r12Kpi(re) {   /* Zeile im Fenster „Alle KPIs" */
+    var o = q('.dpshm-overlay'); if (!o) return null;
+    return [].filter.call(o.querySelectorAll('.dpshm-kpi'), function (x) { var n = x.querySelector('.dpshm-kpi-nm'); return n && re.test(r6Text(n).replace(/f\(x\)$/, '')); })[0] || null;
+  }
+  function r12SetFeld(re) {   /* Eingabe in den Einstellungen über ihre Beschriftung */
+    var c = q('.settings-modal .set-modal-content'); if (!c) return null;
+    return [].filter.call(c.querySelectorAll('input'), function (x) { var f = x.closest('div'), l = f && f.querySelector('label'); return x.offsetWidth && l && re.test(r6Text(l)); })[0] || null;
+  }
+  function r12Punkte(v) {   /* „0.9:0, 1:40, 1.3:100" -> „ab 1,0 → 40 Punkte …" */
+    return String(v || '').split(',').map(function (p) { var a = p.split(':'); return a.length === 2 ? r6Pz(a[0].trim()) + ' → ' + a[1].trim() : ''; }).filter(Boolean).join(' · ');
+  }
+  function r12Zu() {
+    try { if (window.DealPilotScoreHero) { DealPilotScoreHero.closeParts(); DealPilotScoreHero.closeKpi(); } } catch (e) {}
+    try { if (window._SetDraft) window._SetDraft.dirty = false; } catch (e) {}
+    r6EinstellungenZu();
+  }
+  DREHBUECHER['reihe-bewertung'] = {
+    titel: 'Bewertung und KPIs', unterzeile: 'Kennzahlen, Ampeln, DealScore und Investor-DealScore', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }], aufraeumen: function () { r12Zu(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das Beispiel */
+        await r6KopieStart(R11_WESTERFELD, { ohneAnkauf: true });
+        await r11Beispiel(s, ' Heute: der Reiter <b>Bewertung</b>.');
+      },
+      async function (s) {   /* 2 · Kennzahlen mit Ampel */
+        reiter('s6'); await warte(1400);
+        var tb = function () { return q('#s6 .kpi-eval-card'); };
+        await warteAuf(tb, 6000);
+        await zeige(tb, 8);
+        var d = r12Bewertung(/^DSCR/), c = r12Bewertung(/^Cashflow vor/), b = r12Bewertung(/^Bruttomiet/), n = r12Bewertung(/^Nettomiet/), e = r12Bewertung(/^EK-Rendite/), l = r12Bewertung(/^LTV/);
+        function f(x, nm) { return x ? nm + ' <b>' + x.wert + '</b> ' + x.wort.toLowerCase() : ''; }
+        await b2oZeile(s, 'Jede Kennzahl mit Ampel', [f(d, 'DSCR'), f(c, 'Cashflow'), f(b, 'Bruttorendite')].filter(Boolean).join(', ') + '.');
+        await b2oZeile(s, 'Jede Kennzahl mit Ampel', [f(n, 'Nettorendite'), f(e, 'EK-Rendite'), f(l, 'LTV')].filter(Boolean).join(', ') + ' — mit einem Satz, was das heißt.');
+      },
+      async function (s) {   /* 3 · Formel und Zielwert */
+        try { DealPilotScoreHero.openKpi(); } catch (e) {}
+        await warteAuf(function () { return q('.dpshm-overlay .dpshm-kpi'); }, 5000);
+        kegelHoch(true); await warte(800);
+        var br = function () { return r12Kpi(/^Bruttorendite/); };
+        await zeige(br, 6);
+        var h = br() ? r6Inner(br()).split('\n').map(function (x) { return x.trim(); }).filter(Boolean) : [];
+        await b2oZeile(s, 'Zielwert je Kennzahl', 'Bruttorendite <b>' + (h[2] || '–') + '</b>, ' + (h[3] || '') + ' Punkte. Daneben der Maßstab: „' + (h[1] || '') + '“');
+        var zb = r6Beginn(s, 'Die Formel', 'Ein Klick auf die Kennzahl zeigt, wie sie gerechnet wird — und welche Felder einfließen.');
+        await warte(1500);
+        if (br()) br().click();
+        await warteAuf(function () { return q('#dpsh-parts-overlay .dpshp-formula'); }, 4000);
+        await r6Ende(zb);
+        await zeige(function () { return q('#dpsh-parts-overlay .dpshp-modal'); }, 6);
+        await b2oZeile(s, 'Die Formel', 'Bruttorendite = <b>' + r6Text(q('#dpsh-parts-overlay .dpshp-formula')).replace(/^FORMEL\s*/i, '') + '</b>. Jedes Feld darunter springt direkt in seinen Reiter.');
+        try { DealPilotScoreHero.closeParts(); } catch (e) {}
+        await warte(700);
+        var ds = function () { return r12Kpi(/^DSCR/); };
+        await zeige(ds, 6);
+        var hd = ds() ? r6Inner(ds()).split('\n').map(function (x) { return x.trim(); }).filter(Boolean) : [];
+        await b2oZeile(s, 'Und so für jede Kennzahl', 'DSCR <b>' + (hd[2] || '–') + '</b>: „' + (hd[1] || '') + '“ — Rendite, Finanzierung, Risiko, Lage, Potenzial.');
+        try { DealPilotScoreHero.closeKpi(); } catch (e) {}
+        kegelHoch(false); await warte(700);
+      },
+      async function (s) {   /* 4 · eigene Schwellen */
+        await r6Einstellungen('standardwerte');
+        var K = /^Persönliche Mindest/;
+        await zeige(r6Karte('.settings-modal', K), 8);
+        var dm = r6SwkWert(K, /^DSCR$/), cm = r6SwkWert(K, /^Cashflow$/), lm = r6SwkWert(K, /^max\. LTV$/);
+        await b2oZeile(s, 'Deine eigenen Grenzen', 'Einstellungen › Standardwerte: Mindest-DSCR <b>' + (dm || '–') + '</b>, Mindest-Cashflow ' + (cm || '–') + ', höchstens ' + (lm || '–') + ' LTV — als Marker an den Kennzahlen.');
+        r6EinstellungenZu(); await warte(700);
+      },
+      async function (s) {   /* 5 · DealPilot Score */
+        reiter('s6'); await warte(1000);
+        await zeige(function () { var k = r12Karte(0)(); return k && k.querySelector('.dpsh-mainrow'); }, 8);
+        var h = r12Kopf(0), st = [85, 70, 50, 35, 34].map(function (x) { try { return ScoreTier.stufe(x).wort; } catch (e) { return null; } });
+        await b2oZeile(s, 'Der DealPilot Score', '<b>' + (h.score || '–') + ' von 100 · ' + (h.wort || '–') + '</b>. Die Stufen: ab 85 ' + st[0] + ', ab 70 ' + st[1] + ', ab 50 ' + st[2] + ', ab 35 ' + st[3] + ', darunter ' + st[4] + '.');
+      },
+      async function (s) {   /* 6 · Teilnoten und Gewichte */
+        await zeige(function () { var k = r12Karte(0)(); var b = k && k.querySelectorAll('.dpsh-cbar'); return b && b.length ? b2oHuelle(b[0], b[b.length - 1]) : null; }, 8);
+        var t = r12Teile(0);
+        await b2oZeile(s, 'Teilnoten und Gewichte', t.map(function (x) { return x.name.replace(/\s*\(.*\)$/, '') + ' ' + x.gewicht + ': <b>' + x.note + '</b>'; }).join(' · ') + '.');
+      },
+      async function (s) {   /* 7 · Gewichte und Grenzwerte in den Einstellungen */
+        await r6Einstellungen('dealscore');
+        await warteAuf(function () { return q('#set-ds-cashflow'); }, 5000);
+        await zeigeGruppe(function () { return q('#set-ds-cashflow') && q('#set-ds-cashflow').closest('div'); }, function () { return q('#set-ds-potenzial') && q('#set-ds-potenzial').closest('div'); }, 8);
+        await b2oZeile(s, 'Die Gewichte stellst du ein', 'Einstellungen › Deal Score: Cashflow ' + wert('set-ds-cashflow') + ' %, Rendite ' + wert('set-ds-rendite') + ' %, LTV ' + wert('set-ds-ltv') + ' %, DSCR ' + wert('set-ds-risiko') + ' %, Potenzial ' + wert('set-ds-potenzial') + ' %.');
+        var g = function () { return r12SetFeld(/^DSCR$/); };
+        await zeige(function () { var e = g(); return e && e.closest('div'); }, 10);
+        await b2oZeile(s, 'Punkte je Wert', 'Wie viele Punkte ein Wert bringt, steht als Treppe: DSCR <b>' + r12Punkte(g() && g().value) + '</b>.');
+      },
+      async function (s) {   /* 8 · Investor-Profile */
+        var pk = function () { var a = document.querySelectorAll('.settings-modal .ds2-preset-card'); return a.length ? b2oHuelle(a[0], a[a.length - 1]) : null; };
+        await zeige(pk, 8);
+        var namen = [].map.call(document.querySelectorAll('.settings-modal .ds2-preset-card .ds2-preset-label'), function (x) { return r6Text(x); }).filter(Boolean);
+        var akt = q('.settings-modal .ds2-preset-card.ds2-preset-active .ds2-preset-label');
+        await b2oZeile(s, 'Investor-DealScore: dein Profil', namen.slice(0, 6).join(', ') + ' — oder eigene Gewichte. In diesem Konto aktiv: <b>' + (akt ? r6Text(akt) : '–') + '</b>.');
+        r12Zu(); await warte(700);
+      },
+      async function (s) {   /* 9 · Investor-DealScore */
+        reiter('s6'); await warte(900);
+        await zeige(r12Karte(1), 8);
+        var h = r12Kopf(1), t = r12Teile(1), kp = /KPIS\s*\n\s*(\d+\s*\/\s*\d+)/i.exec(r6Inner(r12Karte(1)()));
+        await b2oZeile(s, 'Der Investor-DealScore', '<b>' + (h.score || '–') + ' von 100 · ' + (h.wort || '–') + '</b> aus ' + (kp ? kp[1].replace(/\s/g, '') : '–') + ' Kennzahlen — ' + t.map(function (x) { return x.name + ' ' + x.gewicht; }).join(', ') + '.');
+        var lk = wert('lageklasse');
+        await b2oZeile(s, 'Lage zählt mit', 'Lage & Markt: Teilnote <b>' + ((t.filter(function (x) { return /^Lage/.test(x.name); })[0] || {}).note || '–') + '</b>' + (lk ? ', das Objekt steht in Lageklasse <b>' + lk + '</b>' : '') + ' — Mikrolage, Nachfrage, Bevölkerung, Marktmiete gegen Ist.');
+      },
+      async function (s) {   /* 10 · warum zwei Scores */
+        await zeige(function () { var a = r12Karte(0)(), b = r12Karte(1)(); return a && b ? b2oHuelle(a, b) : a; }, 6);
+        await b2oZeile(s, 'Warum zwei Scores', 'Der <b>DealPilot Score</b> braucht nur fünf Zahlen — wie im Quick Boarding. Der <b>Investor-DealScore</b> wiegt alles, auch Lage und Zustand.', 600);
+      }
+    ]
+  };
+
+  /* ── MODUL 13 · DEAL-AKTION ──────────────────────────────────────── */
+  function r13Band(re) {
+    return function () {
+      var b = [].filter.call(document.querySelectorAll('#s8 .dab-band'), function (x) { return x.offsetWidth && re.test(r6Text(x.querySelector('.dab-band-t') || x)); })[0];
+      var p = b && b.nextElementSibling;
+      return b && p ? b2oHuelle(b, p) : b;
+    };
+  }
+  function r13Bp(re) {   /* Netzwerk-Karte über ihren Namen */
+    return [].filter.call(document.querySelectorAll('#s8 .dab-bp'), function (x) { return x.offsetWidth && re.test(x.textContent); })[0] || null;
+  }
+  DREHBUECHER['reihe-dealaktion'] = {
+    titel: 'Deal-Aktion', unterzeile: 'Bereit für die Bank, Unterlagen, Netzwerk', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }], aufraeumen: rhAufraeumen,
+    szenen: [
+      async function (s) {   /* 1 · das Beispiel */
+        await r6KopieStart(R11_WESTERFELD, { ohneAnkauf: true });
+        await r11Beispiel(s, ' Heute: die <b>Deal-Aktion</b> — was nach der Analyse kommt.');
+      },
+      async function (s) {   /* 2 · Bereit für die Bank */
+        reiter('s8'); await warte(1400);
+        await warteAuf(function () { return q('#dab-cockpit .dab-donut'); }, 6000);
+        await zeige(function () { var r = q('#dab-cockpit .dab-rowflex'); return r && r.parentElement; }, 8);
+        var t = r6Inner(q('#dab-cockpit .dab-rowflex')), pz = /(\d+)\s*\n?\s*\/\s*100/.exec(t), fe = /(\d+\s*\/\s*\d+)\s*Grundfelder/.exec(t);
+        await b2oZeile(s, 'Bereit für die Bank?', 'Der Vorflug-Check: <b>' + (pz ? pz[1] + ' %' : '–') + '</b> — ' + (fe ? fe[1].replace(/\s/g, '') : '–') + ' Grundfelder befüllt, die eine Bank für ihre Bewertung braucht.');
+        var ch = [].map.call(document.querySelectorAll('#dab-cockpit .dab-chip'), function (x) { return r6Text(x); });
+        await zeige(function () { return q('#dab-cockpit .dab-chips'); }, 8);
+        await b2oZeile(s, 'Was noch fehlt', ch.length ? 'Fehlt: <b>' + ch.slice(0, 4).join(', ') + '</b> — ein Klick springt ins Feld.' : 'Alle Grundfelder sind da.');
+      },
+      async function (s) {   /* 3 · Deal-Status und Ankauf-Stand */
+        await zeige(function () { return q('#dab-cockpit .dab-tafel'); }, 8);
+        var a = q('#dab-cockpit .da-status-tile.active .dab-row-main');
+        await b2oZeile(s, 'Bereit zum Abflug', 'Der Deal-Status: <b>' + (a ? r6Text(a).replace(/\s*(Deal|BOARDING|ABGEFLOGEN|GESTRICHEN).*$/, '') : 'Offen') + '</b>. Steht der Zuschlag fest: gewonnen oder verloren.');
+        await b2oZeile(s, 'Gewonnen heißt: Soll steht fest', 'Bei „Gewonnen“ friert DealPilot den Ankauf-Stand ein — das Soll für den Soll-Ist-Vergleich im Bestand (Modul 14). Im Video bleibt der Deal offen.');
+      },
+      async function (s) {   /* 4 · Dokumente und Exporte */
+        await zeige(r13Band(/^Dokumente/), 6);
+        var n = [].filter.call(document.querySelectorAll('#s8 .dab-panel'), function (p) { return /Investment-PDF/.test(p.textContent); })[0];
+        var z = n ? [].filter.call(n.querySelectorAll('*'), function (x) { return x.children.length === 0 && /^(Investment-PDF|Finanzamt-PDF|Kaufpreisaufteilung|Track Record)/.test(r6Text(x)); }).map(function (x) { return r6Text(x).replace(/\s*\(.*$/, ''); }) : [];
+        await b2oZeile(s, 'Dokumente und Exporte', (z.length ? '<b>' + z.join(', ') + '</b>' : 'Die PDFs') + ' — fertig aus den Daten des Objekts, für Bank, Finanzamt und dich.');
+      },
+      async function (s) {   /* 5 · Bordkarte und Unterlagen */
+        await zeige(r13Band(/^Bordkarte/), 6);
+        var p = [].filter.call(document.querySelectorAll('#s8 .dab-ct'), function (x) { return /Persönliche/.test(x.textContent); })[0], o = [].filter.call(document.querySelectorAll('#s8 .dab-ct'), function (x) { return /Objekt-Unterlagen/.test(x.textContent); })[0];
+        function n(e) { return e && e.parentElement ? e.parentElement.querySelectorAll('li').length || ([].filter.call(e.parentElement.children, function (c) { return c !== e; }).length) : 0; }
+        await b2oZeile(s, 'Bordkarte und Unterlagen', 'Die Checkliste fürs Bankgespräch: <b>' + n(p) + ' persönliche</b> und <b>' + n(o) + ' Objekt-Unterlagen</b> — Ausweis, Gehaltsnachweise, Grundbuch, Wohnflächenberechnung.');
+        var am = function () { return r6Knopf('#s8', /Unterlagen beim Amt anfordern/); };
+        await zeige(function () { var b = am(); return b && (b.parentElement || b); }, 8);
+        await b2oZeile(s, 'Unterlagen vom Amt', 'Flurkarte, Grundbuch, Baulasten, Altlasten, Bauakte: DealPilot findet die zuständige Stelle und schreibt den Antrag. Abgeschickt wird hier nichts.');
+        var dr = function () { var t = q('#s8 .dab-dr-t'); return t && (t.closest('.dab-dr') || t.parentElement.parentElement); };
+        await zeige(dr, 8);
+        await b2oZeile(s, 'Der Datenraum', 'Persönlicher und Objekt-Datenraum: einmal hochgeladen, gehen die Unterlagen jeder Bank-Anfrage automatisch mit.');
+      },
+      async function (s) {   /* 6 · Netzwerk */
+        await zeige(r13Band(/^Dein Netzwerk/), 6);
+        var n = [].filter.call(document.querySelectorAll('#s8 .dab-bp'), function (x) { return x.offsetWidth; }).length;
+        await b2oZeile(s, 'Dein Netzwerk', 'Geprüfte Partner: Finanzierung und Banken, Gutachter, Beratung — das Objekt geht mit allen Daten an den, den du wählst.');
+        var bp = function () { return [].filter.call(document.querySelectorAll('#s8 .dab-bp'), function (x) { return x.offsetWidth && x.querySelector('.dab-req'); })[0] || null; };
+        await zeige(function () { var b = bp(); return b && (b.querySelector('.dab-req') ? b2oHuelle(b.querySelector('.dab-req'), b.querySelector('.dab-req').parentElement.lastElementChild || b.querySelector('.dab-req')) : b); }, 8);
+        var rq = bp() ? [].map.call(bp().querySelectorAll('.dab-req'), function (r) { return r6Text(r.querySelector('.dab-req-t') || r).replace(/\s*Beheben$/, ''); }) : [];
+        await b2oZeile(s, 'Erst die Voraussetzungen', 'Weitergereicht wird erst, wenn alles da ist: <b>' + (rq.join(', ') || '–') + '</b>. Bis dahin bleibt die Anfrage gesperrt.');
+      },
+      async function (s) {   /* 7 · Gutachter und Beratung */
+        var g = function () { var h = [].filter.call(document.querySelectorAll('#s8 .dab-rh-n'), function (x) { return /^Gutachter/.test(r6Text(x)); })[0]; var r = h && (h.closest('.dab-rail') || h.parentElement.parentElement); return r; };
+        await zeige(g, 8);
+        await b2oZeile(s, 'Gutachter und Beratung', 'Verkehrswert- oder Restnutzungsdauer-Gutachten, Zweitmeinung vor dem Kauf — die Anfrage nimmt die Objektdaten mit. Im Video schicken wir nichts ab.', 600);
+      }
+    ]
+  };
+
+  /* ── MODUL 14 · VOM ANKAUF IN DEN BESTAND ────────────────────────── */
+  function r14Seg(re) { return [].filter.call(document.querySelectorAll('.ank-wahl .ank-seg'), function (b) { return re.test(b.textContent); })[0] || null; }
+  DREHBUECHER['reihe-bestand'] = {
+    titel: 'Vom Ankauf in den Bestand', unterzeile: 'Gewonnen, eingefroren, verglichen', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { try { var i = r14Seg(/Ist/); if (i && window.DealPilotAnkaufAnsicht && DealPilotAnkaufAnsicht.aktiv()) i.click(); } catch (e) {} rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das Objekt */
+        await r6KopieStart(R11_PARK, { behalte: true });
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        var we = wert('einheiten');
+        await b2oZeile(s, 'Das Beispiel', 'Ein Altbau im Bestand: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Wohnungen, ' : '') + 'Baujahr ' + wert('baujahr') + '.');
+      },
+      async function (s) {   /* 2 · gewonnen -> Bestand */
+        reiter('s8'); await warte(1400);
+        await warteAuf(function () { return q('#dab-cockpit .dab-tafel'); }, 6000);
+        await zeige(function () { return q('#dab-cockpit .dab-tafel'); }, 8);
+        var a = q('#dab-cockpit .da-status-tile.active .dab-row-main');
+        await b2oZeile(s, 'Auf „gewonnen“ gestellt', 'In der Deal-Aktion: <b>' + (a ? r6Text(a).replace(/\s*(Deal|BOARDING|ABGEFLOGEN|GESTRICHEN).*$/, '') : '–') + '</b>. Damit wandert das Objekt in den Bestand — die Liste links trennt Ankauf und Bestand.');
+      },
+      async function (s) {   /* 3 · Ankauf-Stand eingefroren */
+        var A = null; try { A = DealPilotAnkauf.stand(); } catch (e) {}
+        var row = function () { return rhIm('#dab-cockpit .dab-tafel', /Ankauf-Stand festgeschrieben/); };
+        await zeige(function () { var r = row(); return r && (r.closest('div[class]') || r); }, 8);
+        await b2oZeile(s, 'Der Ankauf-Stand', 'Eingefroren zum <b>' + datum(A && A.stichtag) + '</b>' + (A && A.kurz && A.kurz.kp ? ', Kaufpreis ' + eur(A.kurz.kp) : '') + ' — alle Zahlen des Kaufs. Das ist dein Soll.');
+      },
+      async function (s) {   /* 4 · Soll · der Plan */
+        reiter('s2'); await warte(900);
+        await zeige('.ank-wahl', 8);
+        var zb = r6Beginn(s, 'Soll und Ist umschalten', 'Oben im Objekt: der Stand beim Kauf oder der von heute.');
+        await warte(1500);
+        var seg = r14Seg(/Soll/); if (seg) seg.click();
+        await warteAuf(function () { return window.DealPilotAnkaufAnsicht && DealPilotAnkaufAnsicht.aktiv(); }, 8000);
+        await warte(600);
+        await r6Ende(zb);
+        if (!q('#s2.active')) reiter('s2');
+        await zeige(nkmFeld, 10);
+        var K = (DealPilotAnkauf.stand() || {}).kurz || {};
+        await b2oZeile(s, 'Soll · der Plan beim Kauf', 'Nettokaltmiete <b>' + eur(K.nkm) + '</b>' + (K._leer_einheiten ? ', ' + K._leer_einheiten + (K._leer_einheiten === 1 ? ' Wohnung' : ' Wohnungen') + ' leer' : '') + (K._kpis_dscr != null ? ', DSCR ' + de(K._kpis_dscr, 2) : '') + '.');
+      },
+      async function (s) {   /* 5 · Ist · heute */
+        var seg = r14Seg(/Ist/);
+        await zeige('.ank-wahl', 8);
+        if (seg) seg.click();
+        await warteAuf(function () { return window.DealPilotAnkaufAnsicht && !DealPilotAnkaufAnsicht.aktiv(); }, 8000);
+        await warte(500);
+        reiter('s2'); await warte(700);
+        await zeige(nkmFeld, 10);
+        await b2oZeile(s, 'Ist · heute', 'Nettokaltmiete heute: <b>' + eur(zahl('nkm')) + '</b>. Jede Änderung am Objekt ist das Ist — der Ankauf bleibt stehen.');
+      },
+      async function (s) {   /* 6 · Soll/Ist-Abgleich */
+        reiter('s5'); await warte(1200);
+        await r11PaTab(/Soll\/Ist/);
+        var p = r11Panel(), t = r6Inner(p);
+        var vg = /Von (\d+) vergleichbaren Kennzahlen stehen (\d+) besser und (\d+) schlechter/.exec(t);
+        await zeige(function () { var x = r11Panel(); return x && (x.querySelector('.dp-pa-card') || x.firstElementChild); }, 8);
+        await b2oZeile(s, 'Soll gegen Ist · automatisch', vg ? 'Von <b>' + vg[1] + ' Kennzahlen</b> stehen heute <b>' + vg[2] + ' besser</b> und <b>' + vg[3] + ' schlechter</b> als beim Kauf.' : 'Plan gegen heute, Kennzahl für Kennzahl.');
+      },
+      async function (s) {   /* 7 · was sich bewegt hat */
+        await zeige(function () { var x = q('#ai-content .abw-bewegt'); return x || q('#ai-content .abw-tafel'); }, 8);
+        var a = null; try { a = DealPilotAnkauf.abweichung(); } catch (e) {}
+        function z(w) { return a && a.zeilen.filter(function (x) { return x.wort === w; })[0]; }
+        var d = z('DSCR'), c = z('Cashflow n. Steuer'), sc = z('DealScore'), teile = [];
+        if (d) teile.push('DSCR <b>' + de(d.ankauf, 2) + ' → ' + de(d.bestand, 2) + '</b>');
+        if (c) teile.push('Cashflow nach Steuer <b>' + eur(c.ankauf) + ' → ' + eur(c.bestand) + '</b>');
+        if (sc) teile.push('DealScore <b>' + de(sc.ankauf) + ' → ' + de(sc.bestand) + '</b>');
+        await b2oZeile(s, 'Was sich bewegt hat', (teile.join(' · ') || '–') + ' — im Jahr.');
+      },
+      async function (s) {   /* 8 · die Tafel */
+        await zeige(function () { return q('#ai-content .abw-tafel'); }, 6);
+        var t = r6Inner(q('#ai-content .abw-tafel')), nk = /Nettokaltmiete\s+([\d.]+ €)\s+([\d.]+ €)/.exec(t), mq = /Miete je m²\s+([\d,]+ €\/m²)\s+([\d,]+ €\/m²)/.exec(t);
+        await b2oZeile(s, 'Kennzahl für Kennzahl', 'Ertrag, Kosten, Finanzierung, Steuer, Ergebnis — z. B. Nettokaltmiete <b>' + (nk ? nk[1] + ' → ' + nk[2] : '–') + '</b>' + (mq ? ', je m² ' + mq[1] + ' → ' + mq[2] : '') + '. Was nicht vorlag, wird nicht geschätzt.');
+      },
+      async function (s) {   /* 9 · Entwicklung in der Pilot-Analyse */
+        var k = function () { var x = rhIm('#ai-content', /^PILOT-ANALYSE: ANKAUF GEGEN HEUTE$/); return x && x.closest('.dp-pa-card'); };
+        await zeige(k, 8);
+        var t = r6Inner(k()), e = /Empfehlung\s+([^\t\n]+)\t\s*([^\n]+)/.exec(t), st = /Stand\s+([\d.]+)\s+([\d.]+)/.exec(t);
+        await b2oZeile(s, 'Die Pilot-Analyse: damals und heute', 'Zwei Spalten: was der Pilot beim Ankauf sagte und was er heute sagt' + (e ? ' — hier beide <b>' + e[1].trim() + '</b>' : '') + '. Ein neuer Abruf füllt die Spalte „Heute“.', 600);
       }
     ]
   };
