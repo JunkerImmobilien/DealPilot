@@ -261,8 +261,12 @@
       /* v2261: „Default" ist jetzt der Satz des Profil-Bundeslands, nicht fest 6,5 */
       var _defBl = 6.5;
       try { var _bl = window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.get('bundesland'); if (_bl && GREST_RATES[_bl] != null) _defBl = GREST_RATES[_bl]; } catch (e) {}
-      if (isNaN(cur) || Math.abs(cur - 6.5) < 0.01 || Math.abs(cur - _defBl) < 0.01 || cur === 0) {
+      /* v2261: auch den Satz, den die Automatik SELBST gesetzt hat - sonst blieb nach
+         einem PLZ-Wechsel (Muenchen -> Herford) der alte Landessatz stehen. */
+      var _auto = parseFloat(gestPctInput.dataset.autoRate || 'NaN');
+      if (isNaN(cur) || Math.abs(cur - 6.5) < 0.01 || Math.abs(cur - _defBl) < 0.01 || cur === 0 || (isFinite(_auto) && Math.abs(cur - _auto) < 0.01)) {
         gestPctInput.value = info.rate.toFixed(2);
+        gestPctInput.dataset.autoRate = String(info.rate);
         // Trigger Sync auf Euro-Feld
         if (typeof window.syncCostPct === 'function') {
           window.syncCostPct('gest');
