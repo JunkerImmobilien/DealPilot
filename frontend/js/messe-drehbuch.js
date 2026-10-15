@@ -1505,10 +1505,10 @@
     var a = fa(), b = fb();
     if (a && b) {
       var ra = rect(a), rb = rect(b), oben = Math.min(ra.top, rb.top), unten2 = Math.max(ra.bottom, rb.bottom);
-      if (oben < 70 || unten2 > innerHeight - unten()) {
-        var s = scroller(a), mitte = (70 + innerHeight - unten()) / 2;
-        s.scrollTop += ((oben + unten2) / 2) - mitte;
-      }
+      var s = scroller(a), sr = (s && s !== document.scrollingElement) ? rect(s) : null;
+      /* in einem Fenster mit eigenem Scrollbereich: dessen Mitte, sonst die des Bildes */
+      var lo = sr ? Math.max(70, sr.top) : 70, hi = sr ? Math.min(innerHeight - unten(), sr.bottom) : innerHeight - unten();
+      if (oben < lo || unten2 > hi) s.scrollTop += ((oben + unten2) / 2) - (lo + hi) / 2;
     }
     await zeige(function () { return b2oHuelle(fa(), fb()); }, pad);
   }
@@ -1905,11 +1905,14 @@
         var m = b && /(\d+)\s*Angaben aus deiner Aufnahme/.exec(b.textContent);
         await b2oZeile(s, 'Ausgewertet', (m ? '<b>' + m[1] + ' Angaben</b> aus der Aufnahme gelesen' : 'Ausgewertet') + '. Was noch fehlt, fragt DealPilot nach — oder du gehst gleich zur Übersicht.');
         var f = q('#vi-rf-ende'); if (f) f.click();
-        await warte(1800);
         /* die Karte „Investor Deal Score 2.0" (voice-import.js _scoreKopf):
-           Zahl aus data-ziel (sie zählt hoch), Wort aus der Pille */
+           Zahl aus data-ziel (sie zählt hoch), Wort aus der Pille. GEMESSEN:
+           die ganze Karte ist höher als das Bild (Kegel lag mit der Zahl
+           oberhalb des Rands) - gezeigt wird Kopf bis Fazit. */
         function ds2() { return [].filter.call(document.querySelectorAll('#oabi-ov .vi-sc'), function (e) { var t = e.querySelector('.vi-sc-titel'); return t && /Investor Deal Score/i.test(t.textContent) && e.offsetWidth; })[0] || null; }
-        await zeige(function () { var e = ds2(); return e && (e.querySelector('.vi-sc-kopf') ? e : e); }, 6);
+        await warteAuf(ds2, 6000);
+        await warte(500);
+        await zeigeGruppe(function () { var e = ds2(); return e && e.querySelector('.vi-sc-kopf'); }, function () { var e = ds2(); return e && (e.querySelector('.vi-sc-fazit') || e.querySelector('.vi-sc-bar')); }, 8);
         var k2 = ds2(), n2 = k2 && k2.querySelector('.vi-sc-zahl-n'), w2 = k2 && k2.querySelector('.vi-sc-pille');
         var zahl2 = n2 ? n2.getAttribute('data-ziel') : null, wort2 = w2 ? w2.textContent.trim() : '';
         await b2oZeile(s, 'Erste Einschätzung', 'Schon im Fenster gerechnet: Investor Deal Score' + (zahl2 ? ' <b>' + zahl2 + '</b>' : '') + (wort2 ? ' · ' + wort2.charAt(0) + wort2.slice(1).toLowerCase() : '') + ' — dazu die Hebel, die den Score heben.');
