@@ -120,7 +120,7 @@
       '#dpmd .md-leg i.bar{height:10px;width:10px;border-radius:2px}',
       /* Konditionen */
       '#dpmd .md-k4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}',
-      '#dpmd .md-k{border:1px solid #ece4cf !important;border-radius:10px !important;padding:12px !important;cursor:pointer;background:#fff !important;text-align:left;font:inherit;color:#1b1916 !important}',
+      '#dpmd .md-k{display:block !important;width:100%;min-width:0;height:auto !important;border:1px solid #ece4cf !important;border-radius:10px !important;padding:12px !important;cursor:pointer;background:#fff !important;text-align:left;font:inherit;color:#1b1916 !important}',
       '#dpmd .md-k.an{border-color:' + G + ' !important;box-shadow:0 0 0 1px ' + G + ' inset;background:#FBF6E9 !important}',
       '#dpmd .md-k em{font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.1em;color:#6b6252;font-style:normal}',
       '#dpmd .md-k strong{display:block;font:600 22px/1.1 "Space Grotesk",sans-serif;margin:7px 0 4px}',
