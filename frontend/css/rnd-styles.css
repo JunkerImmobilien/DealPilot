@@ -536,7 +536,7 @@
 }
 .rnd-wiz-title h2 {
   margin: 0;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;  /* v2258: DealPilot-Schrift statt Cormorant */
   font-size: 23px;
   font-weight: 600;
   color: var(--wl-C9A84C, #C9A84C);
@@ -1066,7 +1066,7 @@
   text-align: center;
 }
 .rnd-result-hero-value {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;  /* v2258: DealPilot-Schrift statt Cormorant */
   font-size: 110px;
   font-weight: 600;
   color: var(--gold, #C9A84C);
@@ -1134,7 +1134,7 @@
   margin: 0 0 8px;
 }
 .rnd-result-hero-kpi-value {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;  /* v2258: DealPilot-Schrift statt Cormorant */
   font-size: 26px;
   font-weight: 600;
   color: #fff;
@@ -1197,7 +1197,7 @@
 .rnd-vorteil-table tr.rnd-vorteil-total td {
   background: var(--gold-dim, rgba(201,168,76,.12));
   color: var(--gold, #C9A84C);
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;  /* v2258: DealPilot-Schrift statt Cormorant */
   font-size: 17px;
   font-weight: 600;
   padding: 12px 8px;
