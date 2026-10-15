@@ -2509,6 +2509,11 @@
         await warte(1300);
         var b = q('#afa-rnd-ermitteln'); if (b) b.click();
         await warteAuf(r6Wiz, 5000);
+        /* GEMESSEN (Prueflauf 10a, Studio-Hoehe 770 px): css/rnd-styles.css:1278
+           setzt max-height 915px !important und hebt die 92vh auf - die Fusszeile
+           mit „Weiter" und „Anfrage senden" lag unter dem Bildrand (y 775). Nur
+           fuer diesen Lauf inline begrenzt; der Fehler selbst ist gemeldet. */
+        try { var wm = r6Wiz().querySelector('.rnd-wiz-modal'); if (wm) wm.style.setProperty('max-height', (innerHeight - 40) + 'px', 'important'); } catch (e) {}
         kegelHoch(true);
         await warte(900);
         await zeige(function () { var w = r6Wiz(); return w && (w.querySelector('.rnd-wiz-modal,[class*=modal]') || w.firstElementChild); }, 6);
@@ -2532,7 +2537,7 @@
         var e = rhIm(r6Wiz(), /^AfA-Vergleich$/i); if (e) e.scrollIntoView({ block: 'start' });
         await warte(500);
         await zeige(function () { var x = rhIm(r6Wiz(), /^AfA-Vergleich$/i); return x && (x.closest('table') || x.parentElement); }, 8);
-        await b2oZeile(s, 'Was das Gutachten bringt', 'AfA <b>' + (red ? red[1] : '–') + '</b> statt 2 %: ' + (mehr ? mehr[1] : '–') + ' Abschreibung mehr im Jahr, ' + (spar ? spar[1] : '–') + ' weniger Steuer im Jahr. Über die ganze Restnutzungsdauer, nach Gutachterkosten: <b>' + (net ? net[1] : '–') + '</b>.');
+        await b2oZeile(s, 'Was das Gutachten bringt', 'AfA <b>' + (red ? red[1] : '–') + '</b> statt 2 %: ' + (mehr ? mehr[1] : '–') + ' AfA und ' + (spar ? spar[1] : '–') + ' weniger Steuer im Jahr. Netto-Vorteil über die Restnutzungsdauer: <b>' + (net ? net[1] : '–') + '</b>.');
       },
       async function (s) {   /* 8 · Anfrage: nur zeigen (NIE klicken) */
         function knopf() { var w = r6Wiz(); return w && [].filter.call(w.querySelectorAll('button'), function (b) { return b.offsetWidth && /Anfrage senden/.test(b.textContent); })[0]; }
