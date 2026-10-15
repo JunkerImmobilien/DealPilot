@@ -1111,6 +1111,7 @@
   function b2oSpion(w) {
     if (!w || w.__dpmB2o) return;
     var echt = w.fetch; w.__dpmB2o = echt;
+    DPM_B2O.fenster = (DPM_B2O.fenster || 0) + 1;   /* Nachweis: wie viele Fenster die Sperre tragen */
     w.fetch = function (url, opt) {
       var u = typeof url === 'string' ? url : (url && url.url) || '', m = String((opt && opt.method) || 'GET').toUpperCase();
       if (lauf && m !== 'GET' && B2O_SPERRE.test(u)) {
@@ -1143,6 +1144,16 @@
   function feldVon(id) { return function () { var e = document.getElementById(id); return e && (e.closest('.f,.field,.fg,.form-group') || e.parentElement); }; }
   function pz(n) { return n == null ? null : String(n).replace('.', ','); }
   async function b2oZeile(s, titel, text, extra) { s.zeile(titel, text); await warte(lies(titel, text) + (extra || 0)); }
+  /* Ein Kegel über zwei Knöpfe: ein unsichtbarer Rahmen um beide (nur
+     im Lauf, pointer-events:none, beim Aufräumen entfernt) */
+  function b2oHuelle(a, b) {
+    if (!a || !b) return a || b || null;
+    var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect(), h = el('dpm-huelle');
+    h.style.cssText = 'position:fixed;pointer-events:none;visibility:hidden;left:' + Math.min(ra.left, rb.left) + 'px;top:' + Math.min(ra.top, rb.top) + 'px;width:' + (Math.max(ra.right, rb.right) - Math.min(ra.left, rb.left)) + 'px;height:' + (Math.max(ra.bottom, rb.bottom) - Math.min(ra.top, rb.top)) + 'px';
+    return h;
+  }
+  /* Das Übernahme-Fenster liegt auf z-index 100000 - der Kegel darüber */
+  function kegelHoch(an) { var k = el('dpm-kegel'); k.style.zIndex = an ? '100001' : ''; }
 
   DREHBUECHER['boarding-zum-objekt'] = {
     titel: 'Vom Quick Boarding zum Objekt',
@@ -1156,6 +1167,8 @@
       var b = _b2o; _b2o = null;
       var ov = q('#qcpm-ov'); if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
       var nq = q('#dp-nq'); if (nq && nq.parentNode) nq.parentNode.removeChild(nq);
+      var hu = q('#dpm-huelle'); if (hu && hu.parentNode) hu.parentNode.removeChild(hu);
+      kegelHoch(false);
       if (!b) return;   /* zweiter Aufruf (stopp nach dem Ende) */
       try { qcAufraeumen(); } catch (e) {}
       function ls(k, v) { try { if (v === null) localStorage.removeItem(k); else if (v !== undefined) localStorage.setItem(k, v); } catch (e) {} }
@@ -1185,15 +1198,14 @@
     },
     szenen: [
       async function (s) {   /* 1 · Zwei Wege */
-        DPM_B2O.angelegt = []; DPM_B2O.gesperrt = []; DPM_B2O.geloescht = []; DPM_B2O.fertig = null;
+        DPM_B2O.angelegt = []; DPM_B2O.gesperrt = []; DPM_B2O.geloescht = []; DPM_B2O.fertig = null; DPM_B2O.fenster = 0;
         var sk = null; try { sk = Auth.getStorageKey('seq_') + new Date().getFullYear(); } catch (e) {}
         _b2o = { span: localStorage.getItem('qc_span_config'), pref: localStorage.getItem('dp_mb_pref_span'), seqKey: sk, seq: sk ? localStorage.getItem(sk) : undefined };
         b2oSpion(window);
         try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
-        await zeige(sbKnopf('quickcheck'), 6);
-        await b2oZeile(s, 'Zwei Wege ins Portfolio', 'Weg 1: erst im <b>Quick Boarding</b> prüfen — und das Ergebnis übernehmen.');
-        await zeige(sbKnopf('new'), 6);
-        await b2oZeile(s, 'Zwei Wege ins Portfolio', 'Weg 2: direkt ein <b>neues Objekt</b> anlegen und selbst füllen.');
+        /* beide Knöpfe in EINEM Kegel: ihr gemeinsamer Rahmen */
+        await zeige(function () { return b2oHuelle(sbKnopf('new')(), sbKnopf('quickcheck')()); }, 6);
+        await b2oZeile(s, 'Zwei Wege ins Portfolio', 'Erst im <b>Quick Boarding</b> prüfen und übernehmen — oder direkt ein <b>neues Objekt</b> anlegen.');
       },
       async function (s) {   /* 2 · Quick Boarding: die Wohnung */
         var kb = sbKnopf('quickcheck')(); if (kb) kb.click(); else if (typeof window.sbActionsAction === 'function') sbActionsAction('quickcheck');
@@ -1245,72 +1257,77 @@
         await b2oZeile(s, 'Als Objekt speichern', 'Passt die Wohnung? <b>Ein Klick</b> — und DealPilot fragt, was mitkommt.');
         var sb = qcEl('save-btn'); if (sb && !sb.disabled) sb.click();
         await warteAuf(function () { return q('#qcpm-ov .qcpm-box'); }, 5000);
+        kegelHoch(true);
         await warte(700);
         await zeige(function () { return q('#qcpm-ov #qcpm-secs') || q('#qcpm-ov .qcpm-box'); }, 8);
         var mw = (q('#qcpm-ov span.v[data-k="mw"]') || {}).textContent, mm = (q('#qcpm-ov span.v[data-k="mm"]') || {}).textContent;
         await b2oZeile(s, 'Was mitkommt', 'Aus der Marktbewertung: Marktwert <b>' + (mw || '–') + '</b> und Marktmiete <b>' + (mm || '–') + '</b> — angehakt, die Spanne wählst du hier.');
       },
-      async function (s) {   /* 7 · Ausgelesene Daten */
+      async function (s) {   /* 7 · Ausgelesene Daten, dann speichern */
         var tab = q('#qcpm-ov .qcpm-tab[data-tab="src"]'); if (tab) tab.click();
         await warte(600);
-        await zeige(function () { return q('#qcpm-ov .qcpm-pane.active') || q('#qcpm-ov .qcpm-box'); }, 8);
+        var bd = q('#qcpm-ov .qcpm-body'); if (bd) bd.scrollTop = 0;
+        /* die ganze Box: sie scrollt nicht, die Liste darin bleibt oben */
+        await zeige(function () { return q('#qcpm-ov .qcpm-box'); }, 6);
         var n = [].filter.call(document.querySelectorAll('#qcpm-ov .qcpm-pane[data-pane="src"] .qcpm-item'), function (x) { return x.offsetWidth; }).length;
-        await b2oZeile(s, 'Was mitkommt', 'Dazu alles, was du eingegeben hast: <b>' + n + ' Werte</b> — Adresse, Fläche, Baujahr, Miete, Hausgeld, Kaufpreis und Finanzierung.');
+        await b2oZeile(s, 'Was mitkommt', 'Dazu alles, was du eingegeben hast: <b>' + n + ' Werte</b> — Adresse, Fläche, Baujahr, Miete, Hausgeld, Kaufpreis, Finanzierung.');
         var ok = q('#qcpm-ov #qcpm-ok');
         await zeige(function () { return q('#qcpm-ov #qcpm-ok'); }, 8);
-        await b2oZeile(s, 'Speichern & übernehmen', 'Ein Klick legt das Objekt an.', -1500);
+        await warte(1600);
         if (ok) ok.click();
+        kegelHoch(false);
         await warteAuf(function () { return !q('#qcpm-ov') && !document.body.classList.contains('qc-standalone-active') && /Sachsen/.test((q('#hdr-obj') || {}).textContent || ''); }, 8000);
         await warteAuf(function () { return DPM_B2O.angelegt.length >= 1; }, 6000);
-        await warte(900);
+        await warte(700);
       },
       async function (s) {   /* 8 · Reiter Objekt */
-        reiter('s0'); await warte(700);
-        await zeige(function () { return q('#hdr-obj'); }, 8);
-        await b2oZeile(s, 'Das neue Objekt', 'Angelegt: <b>' + (q('#hdr-obj') || {}).textContent.trim() + '</b> — in Prüfung, mit allen Werten aus dem Quick Boarding.');
+        reiter('s0'); await warte(600);
         await zeige(feldVon('wfl'), 10);
         var oa = (function () { var e = document.getElementById('objart'); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : wert('objart'); })();
-        await b2oZeile(s, 'Reiter Objekt', 'Adresse, <b>' + oa + '</b>, <b>' + wert('wfl') + ' m²</b> Wohnfläche, Baujahr <b>' + wert('baujahr') + '</b>.');
+        await b2oZeile(s, 'Das neue Objekt', 'Angelegt: <b>' + ((q('#hdr-obj') || {}).textContent || '').trim() + '</b> — ' + oa + ', ' + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + '. Alles im Reiter Objekt.');
         var sv = zahl('svwert');
         if (sv) {
           await zeige(feldVon('svwert'), 10);
-          await b2oZeile(s, 'Reiter Objekt', 'Und der DealPilot-Marktwert steht als Verkehrswert bereit: <b>' + eur(sv) + '</b>.');
+          await b2oZeile(s, 'Das neue Objekt', 'Der DealPilot-Marktwert steht als Verkehrswert bereit: <b>' + eur(sv) + '</b>.');
         }
       },
       async function (s) {   /* 9 · Investition */
-        reiter('s1'); await warte(800);
+        reiter('s1'); await warte(700);
         await zeige(feldVon('kp'), 10);
         var nk = (q('#nk_sum') || {}).textContent;
         await b2oZeile(s, 'Reiter Investition', 'Kaufpreis <b>' + eur(zahl('kp')) + '</b>' + (nk && /\d/.test(nk) ? ' — die Kaufnebenkosten rechnet DealPilot dazu: <b>' + nk.trim() + '</b>' : '') + '.');
       },
-      async function (s) {   /* 10 · Miete */
-        reiter('s2'); await warte(800);
+      async function (s) {   /* 10 · Miete und Bewirtschaftung */
+        reiter('s2'); await warte(700);
         await zeige(feldVon('nkm'), 10);
         var mm = wert('ds2_marktmiete');
-        await b2oZeile(s, 'Reiter Miete', 'Deine Kaltmiete <b>' + eur(zahl('nkm')) + '</b> im Monat' + (mm ? ' — die Marktmiete <b>' + mm + ' €/m²</b> daneben zum Vergleich' : '') + '.');
-      },
-      async function (s) {   /* 11 · Finanzierung und Bewirtschaftung */
-        reiter('s3'); await warte(800);
-        await zeige(feldVon('d1'), 10);
-        await b2oZeile(s, 'Reiter Finanzierung', 'Darlehen <b>' + eur(zahl('d1')) + '</b> zu <b>' + pz(wert('d1z')) + ' %</b>, Tilgung <b>' + pz(wert('d1t')) + ' %</b> — Eigenkapital <b>' + eur(zahl('ek')) + '</b> für die Nebenkosten.');
-        reiter('s4'); await warte(800);
+        await b2oZeile(s, 'Reiter Miete', 'Deine Kaltmiete <b>' + eur(zahl('nkm')) + '</b>' + (mm ? ', daneben die Marktmiete <b>' + mm + ' €/m²</b> zum Vergleich' : '') + '.');
+        reiter('s4'); await warte(700);
         await zeige(feldVon('hg_ul'), 10);
-        await b2oZeile(s, 'Reiter Bewirtschaftung', 'Das Hausgeld schon aufgeteilt: <b>' + eur(zahl('hg_ul')) + '</b> umlagefähig, <b>' + eur(zahl('hg_nul')) + '</b> nicht umlagefähig im Jahr.');
+        await b2oZeile(s, 'Reiter Bewirtschaftung', 'Das Hausgeld schon aufgeteilt: <b>' + eur(zahl('hg_ul')) + '</b> umlagefähig, <b>' + eur(zahl('hg_nul')) + '</b> nicht, im Jahr.');
+      },
+      async function (s) {   /* 11 · Finanzierung */
+        reiter('s3'); await warte(700);
+        await zeige(feldVon('d1'), 10);
+        await b2oZeile(s, 'Reiter Finanzierung', 'Darlehen <b>' + eur(zahl('d1')) + '</b> zu <b>' + pz(wert('d1z')) + ' %</b>, Tilgung <b>' + pz(wert('d1t')) + ' %</b>, Eigenkapital <b>' + eur(zahl('ek')) + '</b> — wie im Quick Boarding.');
       },
       async function (s) {   /* 12 · Weg 2: Neues Objekt */
         reiter('s0'); await warte(500);
-        await zeige(sbKnopf('new'), 6);
-        await b2oZeile(s, 'Weg 2 · Neues Objekt', 'Oder ohne Umweg: <b>„Neues Objekt“</b> legt sofort ein leeres Objekt an.', -1000);
-        var kn = sbKnopf('new')(); if (kn) kn.click(); else if (typeof window.newObj === 'function') newObj();
+        /* GEMESSEN: mit geladenem Objekt deckt der Deal-Score-Hinweis der
+           Seitenleiste den Knopf ab - geklickt wird über den Bedienweg,
+           gezeigt wird danach der Kopf „Neues Objekt" */
+        var kn = sbKnopf('new')();
+        if (kn) kn.click(); else if (typeof window.sbActionsAction === 'function') sbActionsAction('new');
         await warteAuf(function () { return DPM_B2O.angelegt.length >= 2 && /Neues Objekt/.test((q('#hdr-obj') || {}).textContent || ''); }, 8000);
-        await warte(900);
+        await warte(600);
         var m = q('.main-col'); if (m) m.scrollTop = 0;
-        var leiste = function () { var t = qs('.dp-pf-tile'); return t && (t.closest('.dp-pf-row') || t.parentElement); };
-        await zeige(leiste, 8);
+        await zeige(function () { return q('#hdr-obj'); }, 8);
+        await b2oZeile(s, 'Weg 2 · Neues Objekt', 'Oder ohne Umweg: <b>„Neues Objekt“</b> legt sofort ein leeres Objekt an.');
+        var NAME = { dealpilot: 'DealPilot-Marktbewertung', dpmb: 'DealPilot-Marktbewertung', import: 'Exposé / Marktbericht', expose: 'Exposé / Marktbericht', voice: 'Sprache', immometrica: 'ImmoMetrica', gefuehrt: 'Geführte Eingabe' };
         var kac = [].filter.call(document.querySelectorAll('.dp-pf-tile'), function (e) { return e.getBoundingClientRect().width > 0 && !e.classList.contains('dp-pf-disabled'); });
-        var namen = kac.map(function (e) { return ((e.querySelector('.dp-pf-lbl') || e).textContent || '').replace(/\s+/g, ' ').trim(); }).filter(Boolean);
-        await b2oZeile(s, 'Die Datenaufnahme', 'Oben die Datenaufnahme: <b>' + kac.length + ' Wege</b>, es zu füllen — ' + namen.join(' · ') + '.');
-        await b2oZeile(s, 'Die Datenaufnahme', 'Eine Quelle wählen, abrufen, übernehmen — wie das geht, zeigt <b>Modul 03</b>.');
+        var wege = kac.filter(function (e) { return !/^(dealpilot|dpmb)$/.test(e.dataset.src || ''); }).map(function (e) { return NAME[e.dataset.src] || ((e.querySelector('.dp-pf-lbl') || e).textContent || '').trim(); });
+        await zeige(function () { return q('#oab-bar') || b2oHuelle(kac[0], kac[kac.length - 1]); }, 8);
+        await b2oZeile(s, 'Die Datenaufnahme', 'Oben die DealPilot-Marktbewertung und <b>' + wege.length + ' Wege</b> für deine Daten: ' + wege.join(' · ') + '.');
       }
     ]
   };

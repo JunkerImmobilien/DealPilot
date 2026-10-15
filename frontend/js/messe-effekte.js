@@ -258,15 +258,15 @@
     /* Outro: der Logo-Rahmen zieht sich, die Wortmarke glänzt */
     '.r-logo{position:relative;width:52cqw;margin:0 auto}',
     '.r-logo svg{display:block;width:100%;overflow:visible}',
-    '.r-logo rect{fill:none;stroke-width:5;stroke-dasharray:1;stroke-dashoffset:1;animation:rRahmen 1.8s .3s cubic-bezier(.6,0,.3,1) forwards;filter:drop-shadow(0 0 .9cqw color-mix(in srgb,' + G + ' 55%,transparent))}',
-    '@keyframes rRahmen{to{stroke-dashoffset:0}}',
-    '.r-logo .w{position:absolute;inset:0;display:grid;place-items:center;font:700 9.6cqw/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.035em;color:#FDFCFA;opacity:0;animation:mfxZoom 1.1s 1.3s cubic-bezier(.2,.8,.2,1) forwards}',
-    '.r-logo .w b{font-weight:700;background:linear-gradient(110deg,' + G + ' 0%,' + G + ' 38%,#FFF6D8 50%,' + G + ' 62%,' + G + ' 100%);background-size:280% 100%;background-position:130% 0;-webkit-background-clip:text;background-clip:text;color:transparent;animation:mfxGlanz 2.2s 2.4s ease-in-out forwards}',
-    '.r-logo .fl{position:absolute;top:-1.6cqw;left:-3cqw;width:3.2cqw;fill:' + GH + ';transform:rotate(90deg);filter:drop-shadow(0 0 .8cqw ' + G + ');opacity:0;animation:rLogoFlug 1.8s .3s cubic-bezier(.6,0,.3,1) forwards}',
-    '@keyframes rLogoFlug{0%{opacity:1;left:-3cqw}85%{opacity:1}100%{opacity:0;left:52cqw}}',
-    '.r-spruch{font:700 3.3cqw/1.2 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.015em;margin-top:3.4cqw;opacity:0;animation:mfxAuf .9s 3s cubic-bezier(.2,.8,.2,1) forwards}',
+    '.r-logo rect{fill:none;stroke-width:5;stroke-dasharray:1;stroke-dashoffset:1;animation:rRahmen 2.4s .3s linear forwards;filter:drop-shadow(0 0 .9cqw color-mix(in srgb,' + G + ' 55%,transparent))}',
+    '@keyframes rRahmen{0%{stroke-dashoffset:1;animation-timing-function:cubic-bezier(.4,0,.6,1)}45%{stroke-dashoffset:.6474;animation-timing-function:cubic-bezier(.3,0,.3,1)}100%{stroke-dashoffset:0}}',
+    '.r-logo .w{position:absolute;inset:0;display:grid;place-items:center;font:700 9.6cqw/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.035em;color:#FDFCFA;opacity:0;animation:mfxZoom 1.1s 1.9s cubic-bezier(.2,.8,.2,1) forwards}',
+    '.r-logo .w b{font-weight:700;background:linear-gradient(110deg,' + G + ' 0%,' + G + ' 38%,#FFF6D8 50%,' + G + ' 62%,' + G + ' 100%);background-size:280% 100%;background-position:130% 0;-webkit-background-clip:text;background-clip:text;color:transparent;animation:mfxGlanz 2.2s 3s ease-in-out forwards}',
+    '.r-logo .fl{position:absolute;top:-1.4cqw;left:1.83cqw;width:3.2cqw;fill:' + GH + ';transform:rotate(90deg);filter:drop-shadow(0 0 .8cqw ' + G + ');opacity:0;animation:rLogoFlug 2.4s .3s linear forwards}',
+    '@keyframes rLogoFlug{0%{opacity:1;left:1.83cqw;animation-timing-function:cubic-bezier(.4,0,.6,1)}45%{opacity:1;left:46.97cqw;animation-timing-function:ease-out}60%{opacity:0;left:56cqw}100%{opacity:0;left:56cqw}}',
+    '.r-spruch{font:700 3.3cqw/1.2 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.015em;margin-top:3.4cqw;opacity:0;animation:mfxAuf .9s 3.4s cubic-bezier(.2,.8,.2,1) forwards}',
     '.r-spruch em{font-style:normal;color:' + GH + '}',
-    '.r-fuss{position:absolute;left:0;right:0;bottom:4.6cqw;display:flex;justify-content:center;align-items:center;gap:2.4cqw;opacity:0;animation:mfxAuf .9s 3.9s forwards}',
+    '.r-fuss{position:absolute;left:0;right:0;bottom:4.6cqw;display:flex;justify-content:center;align-items:center;gap:2.4cqw;opacity:0;animation:mfxAuf .9s 4.3s forwards}',
     '.r-fuss .mfx-kick{color:#8c8578}',
     '.r-weiter{font:600 1.25cqw Inter,system-ui,sans-serif;color:#d9cfb8}',
     '.r-weiter b{color:' + GH + ';font-weight:600}'
@@ -592,5 +592,5 @@
     function l(o) { return Object.keys(o).map(function (k) { return { id: k, name: o[k].name, dauer: o[k].dauer, felder: o[k].felder }; }); }
     return { intros: l(INTROS), karten: l(KARTEN), outros: l(OUTROS) };
   }
-  window.DealPilotMesseFX = { spiele: spiele, liste: liste, qr: qr, version: 'v2253' };
+  window.DealPilotMesseFX = { spiele: spiele, liste: liste, qr: qr, version: 'v2253a' };
 })();
