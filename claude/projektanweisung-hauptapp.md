@@ -38761,6 +38761,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2250 · Bestätigungsband verschwindet nach dem Klick, Flieger aus der Mail (15.10.2026, Staging)
+
+- **Was:** Nach Klick auf den Bestätigungslink blieb das Band „noch nicht bestätigt“ stehen: `dp_verify_frist` wurde nur bei einer neuen Anmeldung geräumt. Jetzt fragt `verify-frist.js` `/auth/me` (Laden, Rückkehr in den Tab, minütlich); fehlt `X-DP-Verify-Deadline` (setzt `middleware/auth.js` nur ohne `email_verified_at`), geht das Band. `storage`-Ereignis räumt andere Tabs, der Link-Weg in `register-easter-egg.js` räumt den Merker selbst. Mail: Flieger-Zeichen hinter „Check-in abschließen“ und „dein DealPilot-Team“ entfernt.
+- **Commit:** `87982c14`
+- **Nachweis:** Staging, bestätigtes Konto mit künstlich gesetztem Merker: nach dem Laden Merker `null`, kein Band, kein `data-dp-verify`. Backend-Image: 0× `✈` in `verifyMailTemplate.js`.
+- **Rest:** Prod-Rollout (Freigabe, Backend-Neubau) zusammen mit v2248/v2249.
+
 ### v2249 · Setup je Konto, nach der Anmeldung, mit Hilfe-Schritt (15.10.2026, Staging)
 
 - **Was:** Marcel meldete majunker@gmx.net neu an und bekam weder Grunddaten/Aussehen noch Tour. Zwei Ursachen: (1) `dp_onboarding_done_v1` hing am BROWSER, in dem schon ein Setup gelaufen war; (2) das Setup prüfte nur beim Laden der Seite, die Anmeldung lädt nicht neu. Jetzt: Merker `dp_onboarding_done_v1:<userId>`, der alte zählt nur für Konten älter als 30 Tage (`createdAt` in der Sitzung, Backend liefert `created_at` bei Register/Login/2FA). `DealPilotOnboarding.pruefen()` läuft nach `onLoginSuccess`; ist das Setup fällig, öffnet der Quick-Check nicht automatisch. Neuer Schritt 6 „Hilfe“: Pilot anzeigen oder nur F1 (`DealPilotPilot.setOrt`) und Haken „Rundgang danach starten“.
