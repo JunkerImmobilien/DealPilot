@@ -3202,14 +3202,34 @@
       async function (s) {   /* 3 · Investition */
         reiter('s1'); await warte(900);
         await zeigeGruppe(feldVon('kp'), function () { return q('#gi_val') && q('#gi_val').closest('.total-bar'); }, 8);
-        var gest = (function () { var h = q('#s1 .grest-auto-hint'), x = h && /ermittelt:\s*(.+?)\s+([\d.,]+)\s*%/.exec(h.textContent); return x ? x[1] + ' ' + r6Pz(x[2]) + ' %' : r6Pz(wert('gest_p')) + ' %'; })();
+        /* GEMESSEN (Prueflauf Ü2): das Demo-Objekt stammt von vor v2261 und trägt
+           alte Sätze (Notar/Grundbuch 2,2 %, GrESt 5,5 % in NRW). Ein neues Objekt
+           bekäme die Standardwerte - die setzen wir hier sichtbar ein, die
+           Grunderwerbsteuer über die PLZ-Automatik. Nur an der Kopie. */
+        var zb = r6Beginn(s, 'Investition', 'Kaufpreis ' + eur(zahl('kp')) + ' — die Nebenkosten kommen aus deinen Standardwerten.');
+        try {
+          var IP = window.DealPilotInvestmentProfile;
+          [['makler', 'maklerkosten'], ['notar', 'notar_pct'], ['gba', 'grundbuch_pct'], ['ji', 'sonstige_nk_pct']].forEach(function (x) {
+            var v = IP && IP.get(x[1]); if (v == null || v === '') return;
+            var e = document.getElementById(x[0] + '_p'); if (!e) return;
+            e.value = String(v).replace('.', ','); e.dispatchEvent(new Event('input', { bubbles: true }));
+            if (typeof window.syncCostPct === 'function') window.syncCostPct(x[0]);
+          });
+          var gp = q('#gest_p'); if (gp) { gp.value = ''; delete gp.dataset.userEdited; }
+          var pz = q('#plz'); if (pz) pz.dispatchEvent(new Event('change', { bubbles: true }));
+          if (typeof window.calc === 'function') window.calc();
+        } catch (e) {}
+        await warte(1500);
+        try { var gp2 = q('#gest_p'); if (gp2 && !String(gp2.value).trim()) DPM_REIHE.gestLeer = true; } catch (e) {}
+        await r6Ende(zb);
+        var gest =(function () { var h = q('#s1 .grest-auto-hint'), x = h && /ermittelt:\s*(.+?)\s+([\d.,]+)\s*%/.exec(h.textContent); return x ? x[1] + ' ' + r6Pz(x[2]) + ' %' : r6Pz(wert('gest_p')) + ' %'; })();
         await b2oZeile(s, 'Investition', 'Kaufpreis <b>' + eur(zahl('kp')) + '</b>. Nebenkosten: Makler ' + r6Pz(wert('makler_p')) + ' %, Notar ' + r6Pz(wert('notar_p')) + ' %, Grundbuch ' + r6Pz(wert('gba_p')) + ' %, Grunderwerbsteuer ' + gest + ' nach PLZ — zusammen <b>' + r6Id('nk_sum') + '</b>.');
       },
       async function (s) {   /* 4 · Miete */
         reiter('s2'); await warte(900);
-        await zeigeGruppe(feldVon('nkm'), r6Gruppe('ds2_marktmiete'), 8);
-        var mm = wert('ds2_marktmiete');
-        await b2oZeile(s, 'Miete', 'Ist: <b>' + eur(zahl('nkm')) + '</b> kalt im Monat, ' + r6Id('miete_qm') + (mm ? ' — Marktmiete <b>' + mm + ' €/m²</b>' : '') + '. Der Abstand ist dein Potenzial.');
+        await zeigeGruppe(feldVon('nkm'), function () { return q('#miete_qm') && q('#miete_qm').closest('.f'); }, 8);
+        var mm = wert('ds2_marktmiete'), k = mbKarteH() || {}, km = k.mm && k.mm.sqm ? String(k.mm.sqm).replace(/\s*kalt$/, '') : null;
+        await b2oZeile(s, 'Miete', 'Ist: <b>' + eur(zahl('nkm')) + '</b> kalt im Monat, ' + r6Id('miete_qm') + (mm ? ' — Marktmiete <b>' + mm + ' €/m²</b>' : (km ? ' — die Marktbewertung sieht <b>' + km + '</b>' : '')) + '. Der Abstand ist dein Potenzial.');
       },
       async function (s) {   /* 5 · Finanzierung */
         reiter('s3'); await warte(1000);
@@ -3227,7 +3247,7 @@
       async function (s) {   /* 7 · Steuer */
         reiter('s3-tax'); await warte(1100);
         await zeigeGruppe(feldVon('afa_satz'), function () { return q('#afa_kalk') && q('#afa_kalk').closest('.f'); }, 8);
-        await b2oZeile(s, 'Steuer', 'Gebäudeanteil ' + r6Pz(wert('geb_ant')) + ' %, AfA ' + r6Optionstext('afa_satz') + ' — <b>' + r6Id('afa_kalk') + '</b> Abschreibung im Jahr.');
+        await b2oZeile(s, 'Steuer', 'Gebäudeanteil ' + r6Pz(wert('geb_ant')) + ' %, AfA ' + r6Optionstext('afa_satz').split(' — ')[0] + ' — <b>' + r6Id('afa_kalk') + '</b> Abschreibung im Jahr.');
         var e = r6TaxItem(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/);
         if (e) { var bx = e.closest('.card') || e; bx.scrollIntoView({ block: 'center' }); await warte(400); await zeige(function () { return r6TaxItem(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/); }, 8); }
         await b2oZeile(s, 'Steuer', 'Ergebnis aus Vermietung: <b>' + (r6TaxWert(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/) || '–') + '</b> im ersten Jahr — mit deinem Grenzsteuersatz verrechnet.');
@@ -3251,7 +3271,11 @@
         await zeige(zeileFn, 8);
         var zb = r6Beginn(s, 'Das Investment-PDF', 'Ein Klick — der Business-Case für die Bank: Kaufpreis, Finanzierung, Cashflow, DSCR und LTV, Stresstest.');
         try { _ue2Brand = DealPilotConfig.branding.get; DealPilotConfig.branding.get = function () { var b = _ue2Brand.apply(this, arguments) || {}; var c = {}; Object.keys(b).forEach(function (k) { c[k] = b[k]; }); ['name', 'role', 'address', 'plz', 'city', 'phone', 'email', 'website'].forEach(function (k) { c[k] = ''; }); return c; }; } catch (e) {}
-        var r = null; try { r = await window.exportPDFBlob(); } catch (e) {}
+        /* GEMESSEN (Prueflauf Ü2): exportPDFBlob ruft exportPDF - das ist seit
+           pdf-wahl.js die Fassungs-Rückfrage und lieferte kein Blob (null). Für
+           diesen einen Aufruf ohne Rückfrage, danach wieder die Hülle. */
+        var r = null, huelle = window.exportPDF;
+        try { window.exportPDF = function () { return huelle({ ohneRueckfrage: true }); }; r = await window.exportPDFBlob(); } catch (e) {} finally { window.exportPDF = huelle; }
         try { if (_ue2Brand) { DealPilotConfig.branding.get = _ue2Brand; _ue2Brand = null; } } catch (e) {}
         DPM_REIHE.pdf = r && r.blob ? { bytes: r.blob.size, name: r.filename } : null;
         await r6Ende(zb);
