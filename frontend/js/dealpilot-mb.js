@@ -374,18 +374,41 @@ if (!window._wlc) {
        · sonst (von Hand, Gutachten) -> die Beschriftung aus dem HTML.
      Gelesen wird bei jedem Zeichnen und bei jeder Eingabe - nach dem Laden
      eines Objekts stimmt sie also ohne eigenen Merker. */
+  /* ══ v2255 · DIE KARTE IST NIE DER VERKEHRSWERT ═════════════════════
+     GEMESSEN am 15.10.2026 (Sachsenstraße 18, Stufe-3-Bericht 213): die
+     Karte zeigt auch nach Stufe 3 den Marktwert aus ANGEBOTSPREISEN
+     (246.000 roh, 232.000 nach 5,8 % Abschlag). Über „übernehmen" stand
+     danach „Verkehrswert (Stufe 3 · amtliche Wertermittlung)" über einer
+     Zahl, die keine Wertermittlung ist - die amtlichen Werte (Ertragswert
+     218.000, vorläufiger Sachwert 165.632) kommen nur über den Verlauf
+     (#oe-vw, objekt-reiter.js), und dort fiel die Beschriftung auf den
+     HTML-Text zurück. Jetzt:
+       · Kartenzahl         -> immer Marktwertindikation (Stufe der Karte,
+                               aber nur 1/2 genannt)
+       · Vermerk `sv` mit amtlich:true (Ertrags-/Sachwert aus dem Verlauf)
+                            -> Verkehrswert, Stufe 3
+       · Vermerk ohne amtlich (Quick Boarding, Marktwert aus dem Verlauf)
+                            -> Marktwertindikation
+     Rückgabe { amtlich, stufe, art } oder null. */
   function _svHerkunft() {
     var sv = $('svwert'); if (!sv) return null;
     var v = numDe(sv.value); if (!(v > 0)) return null;
     try {
       var s = JSON.parse(($(STATE_ID) || {}).value || 'null');
-      if (s && s.sv && Math.abs(Number(s.sv.wert) - v) <= 1) return Number(s.sv.stufe) || 1;
+      if (s && s.sv && Math.abs(Number(s.sv.wert) - v) <= 1) {
+        if (s.sv.amtlich) return { amtlich: true, stufe: 3, art: s.sv.art || null };
+        var st0 = Number(s.sv.stufe) || 0;
+        return { amtlich: false, stufe: (st0 >= 1 && st0 <= 2) ? st0 : null, art: s.sv.art || null };
+      }
     } catch (e) {}
     if (D && D.mw) {
       var ks = ['low', 'med', 'high'];
       for (var i = 0; i < ks.length; i++) {
         var w = Number(D.mw[ks[i]]);
-        if (isFinite(w) && Math.abs(Math.round(w) - v) <= 1) return D.stufe || 1;
+        if (isFinite(w) && Math.abs(Math.round(w) - v) <= 1) {
+          var st1 = Number(D.stufe) || 1;
+          return { amtlich: false, stufe: st1 <= 2 ? st1 : null, art: null };
+        }
       }
     }
     return null;
@@ -404,23 +427,32 @@ if (!window._wlc) {
       if (!lbl._svMark) return;          /* nur zuruecknehmen, was wir gesetzt haben */
       if (tn && lbl._svOrigTxt != null) tn.nodeValue = lbl._svOrigTxt;
       if (hint && hint._svOrig != null) { hint.textContent = hint._svOrig; hint.style.color = ''; }
-      lbl.style.color = ''; lbl._svMark = false; lbl.removeAttribute('data-sv-stufe');
+      lbl.style.color = ''; lbl._svMark = false; lbl._svSchl = null; lbl.removeAttribute('data-sv-stufe'); lbl.removeAttribute('data-sv-art');
+      if (lbl._svOrigTitle != null) lbl.title = lbl._svOrigTitle;
       return;
     }
-    if (lbl.getAttribute('data-sv-stufe') === String(st)) return;
-    if (st >= 3) {
+    if (lbl._svOrigTitle == null) lbl._svOrigTitle = lbl.title || '';
+    if (!st.amtlich) lbl.title = lbl._svOrigTitle;
+    /* v2255: data-sv-stufe = 3 (amtlich), 1/2 (Indikation dieser Stufe),
+       0 (Indikation aus einem Stufe-3-Bericht oder ohne Stufe) */
+    var schl = (st.amtlich ? 'a' : 'i') + (st.stufe || 0) + (st.art || '');
+    if (lbl._svSchl === schl) return;
+    if (st.amtlich) {
       if (tn) tn.nodeValue = 'Verkehrswert ';
       if (hint) { hint.textContent = '(Stufe 3 · amtliche Wertermittlung nach ImmoWertV)'; hint.style.color = ''; }
       lbl.style.color = '';
+      lbl.title = st.art ? ('Übernommen: ' + st.art + ' aus der Wertermittlung (Stufe 3)') : lbl.title;
     } else {
       if (tn) tn.nodeValue = 'Marktwertindikation ';
       if (hint) {
-        hint.textContent = '(Stufe ' + st + ' · aus Angebotspreisen mit Abschlag — kein Verkehrswert n. § 194 BauGB)';
+        hint.textContent = '(' + (st.stufe ? 'Stufe ' + st.stufe + ' · ' : '') + 'aus Angebotspreisen mit Abschlag — kein Verkehrswert n. § 194 BauGB)';
         hint.style.color = 'var(--gold-3,#9a7f33)';
       }
       lbl.style.color = 'var(--gold-3,#9a7f33)';
     }
-    lbl._svMark = true; lbl.setAttribute('data-sv-stufe', String(st));
+    lbl._svMark = true; lbl._svSchl = schl;
+    lbl.setAttribute('data-sv-stufe', String(st.amtlich ? 3 : (st.stufe || 0)));
+    lbl.setAttribute('data-sv-art', st.amtlich ? 'amtlich' : 'indikation');
   }
   try {
     document.addEventListener('input', function (e) { if (e.target && e.target.id === 'svwert') _svLabel(); }, true);

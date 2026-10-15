@@ -91,7 +91,14 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     '01': { messe: 'quickcheck-rundgang', titel: 'Quick Boarding', unter: 'Vom Exposé zum ersten Urteil — in wenigen Minuten.',
             spruch: 'Erst rechnen,', spruch2: 'dann boarden.', weiter: 'Modul 02 · Vom Quick Boarding zum Objekt' },
     '02': { messe: 'boarding-zum-objekt', titel: 'Vom Quick Boarding zum Objekt', unter: 'Zwei Wege ins Portfolio — und was dabei mitwandert.',
-            spruch: 'Boarding abgeschlossen.', spruch2: 'Dein Objekt ist an Bord.', weiter: 'Modul 03 · Datenaufnahme: vier Wege' }
+            spruch: 'Boarding abgeschlossen.', spruch2: 'Dein Objekt ist an Bord.', weiter: 'Modul 03 · Datenaufnahme: vier Wege' },
+    /* v2255 · Module 03–05 */
+    '03': { messe: 'reihe-datenaufnahme', titel: 'Datenaufnahme: vier Wege', unter: 'Exposé, Sprache, ImmoMetrica, geführte Eingabe — ein Blick auf jeden Weg.',
+            spruch: 'Vier Wege an Bord.', spruch2: 'Einer reicht für den Start.', weiter: 'Modul 04 · Marktbewertung in drei Stufen' },
+    '04': { messe: 'reihe-stufen', titel: 'Marktbewertung in drei Stufen', unter: 'Was jede Stufe braucht — und was sie liefert.',
+            spruch: 'Drei Stufen Steigflug.', spruch2: 'Ab Stufe 3 amtlich.', weiter: 'Modul 05 · Komplettbeispiel: Sprache + Stufe 2' },
+    '05': { messe: 'reihe-sprache-stufe2', titel: 'Komplettbeispiel: Sprache + Stufe 2', unter: 'Erzählen, übernehmen, einschätzen — in einem Durchgang.',
+            spruch: 'Erzählt, bewertet, eingeordnet.', spruch2: 'Klar zum Start.', weiter: 'Modul 06 · Investition' }
   };
   var MODUL = P.get('modul'), M = null;
   if (MODUL && REIHE[MODUL]) M = REIHE[MODUL];

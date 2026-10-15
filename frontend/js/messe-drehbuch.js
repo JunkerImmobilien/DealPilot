@@ -8,6 +8,9 @@
    auf die Stelle und schreibt eine Untertitelzeile darunter. Aufnehmen mit
    OBS oder Win+Alt+R; am Stand kann es auch live in Schleife laufen.
 
+   Videoreihe (v2253/v2255): boarding-zum-objekt (Modul 02), reihe-datenaufnahme
+   (03), reihe-stufen (04), reihe-sprache-stufe2 (05) - Mitschnitte der Module
+   03-05 in js/messe-reihe-daten.js.
    Drehbücher: parkstrasse (v2219), immometrica (v2228), sprache (v2231), quickcheck (v2222: Datenaufnahme mit zwei
    PDFs, Marktwertindikation, Spanne, Bewertung, Lage), quickcheck-tippen (v2221)
    Start:  ?messe=parkstrasse            einmal
@@ -1332,6 +1335,593 @@
         var wege = kac.filter(function (e) { return !/^(dealpilot|dpmb)$/.test(e.dataset.src || ''); }).map(function (e) { return NAME[e.dataset.src] || ((e.querySelector('.dp-pf-lbl') || e).textContent || '').trim(); });
         await zeige(function () { return q('#oab-bar') || b2oHuelle(kac[0], kac[kac.length - 1]); }, 8);
         await b2oZeile(s, 'Die Datenaufnahme', 'Oben die DealPilot-Marktbewertung und <b>' + wege.length + ' Wege</b> für deine Daten: ' + wege.join(' · ') + '.');
+      }
+    ]
+  };
+
+  /* ═══ VIDEOREIHE · MODULE 03, 04, 05 (v2255) ════════════════════════════
+     Marcel 15.10.2026 (Dateien/Messe/Videos/Videoreihe.md): Datenaufnahme
+     (vier Wege), Marktbewertung in drei Stufen, Komplettbeispiel Sprache +
+     Stufe 2. Dasselbe Beispielobjekt wie Modul 02: Sachsenstraße 18, 32052
+     Herford, ETW.
+
+     KEIN ABRUF JE DURCHGANG. Die Mitschnitte liegen in js/messe-reihe-daten.js
+     (einmal echt erzeugt, Kopf der Datei) und werden erst beim Start geladen.
+     Ein Ersatz für fetch (nur im Lauf) spielt sie ab:
+       - Marktbericht Stufe 1/2/3: der echte Stream-Weg (generate-stream) mit
+         Etappen und dem ROHEN Bericht - der Abschlag auf Angebotspreise läuft
+         wie im Betrieb in dealpilot-mb.js (DealPilotAbschlag).
+       - Verlauf (#oe-vw) für das angelegte Objekt: aus den gespielten Berichten.
+       - Sprache: Mitschrift Satz für Satz, Chips, Auswertung; Mikrofon ist ein
+         stummer Ton (je Aufruf ein neuer - ein gestoppter Strom liefert nichts).
+       - Geführte Eingabe: die Auslese der ersten Antwort (Adresse).
+       - ImmoMetrica: derselbe Mitschnitt wie Drehbuch 4.
+     Alles andere, was Geld kostet (KI, Marktbericht, Bewertung, Sprache,
+     Boarding-Pass), wird abgewiesen und in DPM_REIHE.gesperrt notiert - auch
+     noch 6 s nach einem Abbruch (ein Fenster, das beim Schließen weiterläuft).
+     ANGELEGT wird je Drehbuch ein Objekt („Neues Objekt"); seine Kennung kommt
+     aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
+     bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
+     Marktbericht-Aufträge, Spannenwahl. */
+  var RH_BUSTER = 'v2255';
+  var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes/i;
+  window.DPM_REIHE = { angelegt: [], gesperrt: [], gespielt: [], geloescht: [], abrufe: [], fertig: null };
+  var _rh = null, _rhNachlauf = 0, _rhToene = [], _rhGum = null;
+  function rhLaden() {
+    return new Promise(function (ok) {
+      if (window.DPM_REIHE_DATEN) { ok(true); return; }
+      var s = document.createElement('script'); s.src = 'js/messe-reihe-daten.js?v=' + RH_BUSTER;
+      s.onload = function () { ok(!!window.DPM_REIHE_DATEN); }; s.onerror = function () { ok(false); };
+      document.head.appendChild(s);
+    });
+  }
+  function rhJ(x) { return new Response(JSON.stringify(x), { status: 200, headers: { 'Content-Type': 'application/json' } }); }
+  function rhStrom(st) {
+    var D = window.DPM_REIHE_DATEN, steps = D.schritte[st] || [], p = JSON.parse(JSON.stringify(D.mb[st])), enc = new TextEncoder(), i = 0;
+    if (_rh) _rh.berichte.push({ stufe: st, at: new Date().toISOString(), p: p });
+    var rs = new ReadableStream({ pull: function (c) {
+      return new Promise(function (ok) {
+        setTimeout(function () {
+          if (i < steps.length) c.enqueue(enc.encode(JSON.stringify({ type: 'step', msg: steps[i++] }) + '\n'));
+          else { c.enqueue(enc.encode(JSON.stringify({ type: 'done', result: { report_id: null, object_key: null, cost: 0, data: JSON.parse(JSON.stringify(p)) } }) + '\n')); c.close(); }
+          ok();
+        }, i < steps.length ? Math.round(430 * TEMPO) : 300);
+      });
+    } });
+    return new Response(rs, { status: 200, headers: { 'Content-Type': 'application/x-ndjson' } });
+  }
+  /* der Verlauf so, wie /objects/history ihn liefert (dieselben Spalten) */
+  function rhVerlauf() {
+    return ((_rh && _rh.berichte) || []).slice().reverse().map(function (b, i) {
+      var p = b.p, cc = p.cross_check || {}, vw = cc.verfahrenswahl || {}, mv = (p.valuation && p.valuation.market_value) || {};
+      function weg(x) { return ((x && x.staffel) || []).map(function (e) { return { pos: e.pos, wert: e.wert == null ? null : String(e.wert) }; }); }
+      return { id: 990000 + i, created_at: b.at, ai_mode: b.stufe === 1 ? 'schnell' : 'openai',
+        market_value: mv.estimated != null ? String(mv.estimated) : null,
+        ertragswert_eur: (cc.ertragswert && cc.ertragswert.value_eur) || null, sachwert_eur: (cc.sachwert && cc.sachwert.value_eur) || null,
+        ertrag_weg: weg(cc.ertragswert), sachwert_weg: weg(cc.sachwert),
+        fuehrend: vw.verfahren || null, fuehrend_grund: vw.grund || null, fuehrend_quelle: vw.quelle || null };
+    });
+  }
+  function rhAntwort(u, m, opt) {
+    var D = window.DPM_REIHE_DATEN; if (!D || !_rh) return null;
+    var body = null; try { body = opt && typeof opt.body === 'string' ? JSON.parse(opt.body) : null; } catch (e) {}
+    if (/\/ai\/transcribe-chunk/.test(u)) { _rh.spr = Math.min(_rh.sprMax || D.sprache.text.length, (_rh.spr || 0) + 1); return rhJ({ text: D.sprache.text.slice(0, _rh.spr).join(' ') }); }
+    if (/\/ai\/voice-quickmatch/.test(u)) { var ids = []; for (var i = 0; i < (_rh.spr || 0); i++) ids = ids.concat(D.sprache.ids[i] || []); return rhJ({ ids: ids }); }
+    if (/\/ai\/extract-voice/.test(u)) return rhJ({ transcript: D.sprache.text.join(' '), fields: D.sprache.felder, unsicher: D.sprache.unsicher, kosten: null });
+    if (/\/ai\/extract-text/.test(u) && body && String(body.text || '').trim() === D.gefuehrt.text) return rhJ({ transcript: D.gefuehrt.text, fields: D.gefuehrt.felder, unsicher: [], kosten: null, modus: 'antwort' });
+    if (m === 'POST' && /\/marktbericht\/reports\/generate-stream/.test(u)) return rhStrom(body && body.wert_stufe >= 2 ? Number(body.wert_stufe) : 1);
+    if (m === 'GET' && /\/marktbericht\/objects\/history\?/.test(u)) {
+      var ref = decodeURIComponent((u.match(/[?&]ref=([^&]+)/) || [])[1] || '');
+      if (ref && DPM_REIHE.angelegt.indexOf(ref) >= 0) return rhJ({ history: rhVerlauf() });
+    }
+    if (/\/api\/v1\/immometrica\//.test(u)) { var a = _imoAntwort(u); if (a) return rhJ(a); }
+    return null;
+  }
+  function rhSpion() {
+    if (window.__dpmRh) return;
+    var echt = window.fetch; window.__dpmRh = echt;
+    window.fetch = function (url, opt) {
+      var u = typeof url === 'string' ? url : (url && url.url) || '', m = String((opt && opt.method) || 'GET').toUpperCase();
+      var kurz = u.replace(location.origin, ''), pfad = kurz.split('?')[0];
+      if (lauf && _rh) {
+        if (m !== 'GET') DPM_REIHE.abrufe.push(m + ' ' + pfad);
+        var a = rhAntwort(kurz, m, opt);
+        if (a) { DPM_REIHE.gespielt.push(m + ' ' + pfad); return Promise.resolve(a); }
+      }
+      if (m !== 'GET' && RH_SPERRE.test(kurz) && ((lauf && _rh) || Date.now() < _rhNachlauf)) {
+        DPM_REIHE.gesperrt.push(m + ' ' + pfad);
+        return Promise.resolve(new Response(JSON.stringify({ error: 'Vorführung: Abruf gesperrt' }), { status: 503, headers: { 'Content-Type': 'application/json' } }));
+      }
+      var p = echt.apply(this, arguments);
+      if (m === 'POST' && /\/api\/v1\/objects\/?(\?|$)/.test(u)) {
+        p.then(function (r) { return r.clone().json(); }).then(function (j) {
+          var id = j && (j.id || (j.data && j.data.id) || (j.object && j.object.id));
+          if (id && DPM_REIHE.angelegt.indexOf(id) < 0) DPM_REIHE.angelegt.push(id);
+        }).catch(function () {});
+      }
+      return p;
+    };
+  }
+  function rhSpionAus() { if (window.__dpmRh) { window.fetch = window.__dpmRh; delete window.__dpmRh; } }
+  function rhMikroAn() {
+    if (_rhGum || !navigator.mediaDevices) return;
+    _rhGum = navigator.mediaDevices.getUserMedia;
+    navigator.mediaDevices.getUserMedia = function () {
+      if (!lauf) return _rhGum.apply(navigator.mediaDevices, arguments);
+      try {
+        var ac = new (window.AudioContext || window.webkitAudioContext)(), dst = ac.createMediaStreamDestination();
+        var osc = ac.createOscillator(), g = ac.createGain(); g.gain.value = 0.02; osc.connect(g); g.connect(dst); osc.start();
+        _rhToene.push(ac); return Promise.resolve(dst.stream);
+      } catch (e) { return Promise.reject(e); }
+    };
+  }
+  function rhMikroAus() {
+    if (_rhGum) { navigator.mediaDevices.getUserMedia = _rhGum; _rhGum = null; }
+    _rhToene.forEach(function (ac) { try { ac.close(); } catch (e) {} }); _rhToene = [];
+  }
+  function rhKachel(src) { return function () { return qs('.dp-pf-tile[data-src="' + src + '"]'); }; }
+  function rhGewaehlt(src) { var c = q('.dp-pf-tile[data-src="' + src + '"] input[type=checkbox]'); return !!(c && c.checked); }
+  function rhWaehle(src, an) { if (rhGewaehlt(src) !== !!an) { var t = q('.dp-pf-tile[data-src="' + src + '"]'); if (t) t.click(); } }
+  function rhNur(srcs) { ['dealpilot', 'import', 'voice', 'immometrica', 'gefuehrt'].forEach(function (s) { rhWaehle(s, srcs.indexOf(s) >= 0); }); }
+  function rhNameKachel(src) { var t = q('.dp-pf-tile[data-src="' + src + '"] .dp-pf-lbl') || q('.dp-pf-tile[data-src="' + src + '"]'); return t ? t.textContent.replace(/\s+/g, ' ').trim() : src; }
+  /* kleinstes Element im Fenster, dessen Text passt */
+  function rhIm(wurzel, re) {
+    var w = typeof wurzel === 'string' ? q(wurzel) : wurzel; if (!w) return null;
+    var best = null;
+    [].forEach.call(w.querySelectorAll('*'), function (e) {
+      if (!e.offsetWidth || !re.test(e.textContent || '')) return;
+      if (!best || (e.textContent.length < best.textContent.length)) best = e;
+    });
+    return best;
+  }
+  async function tippeH(id, text, ms) {
+    var e = document.getElementById(id); if (!e) return;
+    function los(t) { e.dispatchEvent(new Event(t, { bubbles: true })); }
+    if (e.tagName === 'SELECT') { e.value = text; los('input'); los('change'); await warte(ms || 380); return; }
+    e.value = ''; los('input');
+    for (var i = 0; i < text.length; i++) { e.value = text.slice(0, i + 1); los('input'); await warte(ms || 75); }
+    los('change');
+  }
+  function svBeschriftung() {
+    var sv = document.getElementById('svwert'), l = sv && sv.closest('.f'); l = l && l.querySelector('label'); if (!l) return { titel: '', hinweis: '', stufe: 0 };
+    var h = l.querySelector('.cf-hint'), t = '';
+    for (var i = 0; i < l.childNodes.length; i++) { var n = l.childNodes[i]; if (n.nodeType === 3 && n.nodeValue.trim()) { t = n.nodeValue.trim(); break; } }
+    return { titel: t, hinweis: h ? h.textContent.trim() : '', stufe: Number(l.getAttribute('data-sv-stufe')) || 0, art: l.getAttribute('data-sv-art') || '' };
+  }
+  function feldNamen(liste) {
+    var F = (window.DealPilotObjektReiter && DealPilotObjektReiter.FELDNAMEN) || {};
+    return liste.map(function (id) { return String(F[id] || id).replace(/\s*\(Reiter[^)]*\)/, ''); });
+  }
+  function fehlt(s) { try { return DealPilotObjektReiter.fehltFuer(s); } catch (e) { return []; } }
+  function stufeZeile(s) { return function () { var b = q('#oe-stufen [data-oe-stufe="' + s + '"]'); return b && b.closest('.oe-row'); }; }
+  function frei(s) { var r = stufeZeile(s)(); var m = r && /(\d+)\s*frei/.exec(r.textContent); return m ? m[1] : null; }
+  function mbKarteH() { try { return DealPilotMB.letzter(); } catch (e) { return null; } }
+
+  /* gemeinsamer Anfang: Merker sichern, Spion, „Neues Objekt" */
+  async function rhStart(sprMax) {
+    DPM_REIHE.angelegt = []; DPM_REIHE.gesperrt = []; DPM_REIHE.gespielt = []; DPM_REIHE.geloescht = []; DPM_REIHE.abrufe = []; DPM_REIHE.fertig = null;
+    var sk = null; try { sk = Auth.getStorageKey('seq_') + new Date().getFullYear(); } catch (e) {}
+    var ls = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
+    _rh = { berichte: [], spr: 0, sprMax: sprMax || 0, seqKey: sk, seq: sk ? ls(sk) : undefined,
+      merker: { dp_zielstufe: ls('dp_zielstufe'), dp_mb_auftraege: ls('dp_mb_auftraege'), dp_mb_pref_span: ls('dp_mb_pref_span'), qc_span_config: ls('qc_span_config') },
+      kacheln: ['dealpilot', 'import', 'voice', 'immometrica', 'gefuehrt'].filter(rhGewaehlt) };
+    await rhLaden();
+    rhSpion(); rhMikroAn();
+    try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
+    reiter('s0');
+    var kn = sbKnopf('new')();
+    if (kn) kn.click(); else if (typeof window.sbActionsAction === 'function') sbActionsAction('new');
+    await warteAuf(function () { return DPM_REIHE.angelegt.length >= 1 && /Neues Objekt/.test((q('#hdr-obj') || {}).textContent || ''); }, 9000);
+    await warte(700);
+    rhNur([]);
+    var m = q('.main-col'); if (m) m.scrollTop = 0;
+  }
+  function rhAufraeumen() {
+    var r = _rh; _rh = null;
+    var c = q('#oabi-ov #oabi-cancel'); if (c) { try { c.click(); } catch (e) {} }
+    var ov = q('#oabi-ov'); if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+    var ic = q('#imo-cancel'); if (ic) { try { ic.click(); } catch (e) {} }
+    var im = q('#imo-ov'); if (im && im.parentNode) im.parentNode.removeChild(im);
+    var mb = q('#dp-mba [data-mba="schliessen"], #dp-mba [data-mba="hintergrund"]'); if (mb) { try { mb.click(); } catch (e) {} }
+    var hu = q('#dpm-huelle'); if (hu && hu.parentNode) hu.parentNode.removeChild(hu);
+    kegelHoch(false);
+    if (!r) return;
+    _rhNachlauf = Date.now() + 6000;   /* ein Fenster, das beim Schließen weiterläuft, kostet trotzdem nichts */
+    rhMikroAus();
+    function ls(k, v) { try { if (v === null) localStorage.removeItem(k); else if (v !== undefined) localStorage.setItem(k, v); } catch (e) {} }
+    var zurueck = function () {
+      Object.keys(r.merker).forEach(function (k) { ls(k, r.merker[k]); });
+      if (r.seqKey) ls(r.seqKey, r.seq);
+    };
+    zurueck(); setTimeout(zurueck, 2500);
+    try { rhNur(r.kacheln); } catch (e) {}
+    (async function () {
+      await new Promise(function (ok) { setTimeout(ok, 900); });
+      var ids = DPM_REIHE.angelegt.slice();
+      for (var i = 0; i < ids.length; i++) {
+        var id = ids[i];
+        try {
+          if (window._currentObjKey === id && typeof window.delSaved === 'function') {
+            var oc = window.confirm; window.confirm = function () { return true; };
+            try { await window.delSaved(id); } finally { window.confirm = oc; }
+          } else await Auth.apiCall('/objects/' + id, { method: 'DELETE' });
+          DPM_REIHE.geloescht.push(id);
+        } catch (e) { DPM_REIHE.geloescht.push('FEHLER ' + id + ' ' + (e && e.message)); }
+      }
+      try { if (typeof window.renderSaved === 'function') window.renderSaved({ forceFresh: true, _immediate: true }); } catch (e) {}
+      zurueck();
+      try { if (window.DealPilotObjektReiter) DealPilotObjektReiter.zielSetzen(parseInt(r.merker.dp_zielstufe, 10) || 1); } catch (e) {}
+      ls('dp_zielstufe', r.merker.dp_zielstufe);
+      await new Promise(function (ok) { setTimeout(ok, Math.max(0, _rhNachlauf - Date.now())); });
+      rhSpionAus();
+      DPM_REIHE.fertig = Date.now();
+    })();
+    reiter('s0');
+  }
+  /* Abruf einer Stufe über ihren Knopf, dann warten, bis das Fenster zu ist */
+  async function rhStufeAbrufen(s, zeigeModal) {
+    var n0 = ((_rh && _rh.berichte) || []).length;
+    var b = q('#oe-stufen [data-oe-stufe="' + s + '"]'); if (b) b.click();
+    await warteAuf(function () { return q('#dp-mba .k'); }, 5000);
+    if (zeigeModal) {
+      kegelHoch(true);
+      await zeige(function () { return q('#dp-mba .k'); }, 8);
+      zeigeModal();
+    }
+    await warteAuf(function () { return _rh && _rh.berichte.length > n0 && !q('#dp-mba .k') && mbKarteH() && mbKarteH().stufe === s; }, 30000);
+    kegelHoch(false);
+    await warte(800);
+  }
+  function kartenUebernehmen() { var b = [].filter.call(document.querySelectorAll('#avsec button'), function (x) { return /übernehmen/.test(x.textContent) && x.offsetWidth; })[0]; if (b) b.click(); return !!b; }
+  function kartenText(re) { var a = q('#avsec'); var t = a ? a.innerText.replace(/\s+/g, ' ') : ''; var m = re.exec(t); return m ? m[1].trim() : null; }
+
+  /* ── MODUL 03 · DATENAUFNAHME: VIER WEGE ─────────────────────────── */
+  DREHBUECHER['reihe-datenaufnahme'] = {
+    titel: 'Datenaufnahme: vier Wege',
+    unterzeile: 'Exposé · Sprache · ImmoMetrica · Geführte Eingabe',
+    objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: rhAufraeumen,
+    szenen: [
+      async function (s) {   /* 1 · die Leiste */
+        await rhStart(2);
+        await zeige(function () { return q('#oab-bar'); }, 8);
+        var wege = ['import', 'voice', 'immometrica', 'gefuehrt'].filter(function (x) { return rhKachel(x)(); }).map(rhNameKachel);
+        await b2oZeile(s, 'Die Datenaufnahme', 'Oben im Reiter Objekt: <b>' + wege.length + ' Wege</b>, wie Daten ins Objekt kommen — ' + wege.join(' · ') + '.');
+      },
+      async function (s) {   /* 2 · anhaken, abrufen */
+        await zeige(function () { return b2oHuelle(rhKachel('import')(), q('#oab-run')); }, 8);
+        await b2oZeile(s, 'Anhaken, dann Abrufen', 'Einen Weg oder mehrere anhaken und <b>Abrufen</b> drücken. Mehrere laufen nacheinander: erst Dokumente, dann Sprache.');
+      },
+      async function (s) {   /* 3 · Exposé / Marktbericht */
+        rhNur(['import']);
+        await zeige(rhKachel('import'), 8);
+        await warte(900);
+        var r = q('#oab-run'); if (r) r.click();
+        await warteAuf(function () { return q('#oabi-ov #oabi-drop'); }, 5000);
+        kegelHoch(true);
+        await zeige(function () { return q('#oabi-ov .oabi-modal'); }, 6);
+        await b2oZeile(s, 'Weg 1 · ' + rhNameKachel('import'), 'PDFs hineinziehen — Exposé, Marktbericht, Unterlagen. DealPilot erkennt den Typ, auch bei Scans.');
+        try { ObjectActions._voice.wiedergabe(window.DPM_REIHE_DATEN.expose); } catch (e) {}
+        await warteAuf(function () { return q('#oabi-ov #oabi-result tr'); }, 4000);
+        await warte(600);
+        await zeige(function () { return q('#oabi-ov .oabi-modal'); }, 6);
+        var n = [].filter.call(document.querySelectorAll('#oabi-ov #oabi-result tr'), function (x) { return x.offsetWidth && x.querySelector('input[type=checkbox]'); }).length;
+        await b2oZeile(s, 'Weg 1 · ' + rhNameKachel('import'), 'Aus einem Beispiel-Exposé gelesen: <b>' + n + ' Werte</b> — Adresse, Fläche, Baujahr, Kaufpreis, Hausgeld, Energie. Du hakst ab, was ins Objekt geht.');
+        var c = q('#oabi-ov #oabi-cancel'); if (c) c.click();
+        kegelHoch(false);
+        await warte(700);
+      },
+      async function (s) {   /* 4 · Sprache */
+        rhNur(['voice']);
+        await zeige(rhKachel('voice'), 8);
+        await warte(900);
+        var r = q('#oab-run'); if (r) r.click();
+        await warteAuf(function () { return q('#oabi-ov #vi-live'); }, 6000);
+        kegelHoch(true);
+        var det = q('#oabi-ov details.vi-transcript'); if (det) det.open = true;
+        await zeige(function () { return q('#oabi-ov .oabi-modal'); }, 4);
+        await b2oZeile(s, 'Weg 2 · ' + rhNameKachel('voice'), 'Einfach erzählen. Die Mitschrift läuft mit, erkannte Angaben werden grün.');
+        await warteAuf(function () { return _rh && _rh.spr >= 2 && /Obergeschoss/.test((q('#vi-live') || {}).value || ''); }, 20000);
+        await warte(2600);
+        var z = rhIm('#oabi-ov', /\d+\s*von\s*\d+\s*Angaben/i), m = z && /(\d+)\s*von\s*(\d+)\s*Angaben/i.exec(z.textContent);
+        await zeige(function () { return q('#oabi-ov details.vi-transcript') || q('#oabi-ov .oabi-modal'); }, 6);
+        await b2oZeile(s, 'Weg 2 · ' + rhNameKachel('voice'), 'Zwei Sätze gesprochen' + (m ? ' — <b>' + m[1] + ' von ' + m[2] + '</b> Angaben schon erkannt' : '') + '. Das ganze Beispiel zeigt Modul 05.');
+        var c = q('#oabi-ov #oabi-cancel'); if (c) c.click();
+        kegelHoch(false);
+        await warte(700);
+      },
+      async function (s) {   /* 5 · ImmoMetrica */
+        rhNur(['immometrica']);
+        await zeige(rhKachel('immometrica'), 8);
+        await warte(900);
+        var r = q('#oab-run'); if (r) r.click();
+        await warteAuf(function () { return q('#imo-src .imo-pill'); }, 6000);
+        kegelHoch(true);
+        await warte(500);
+        await zeige('#imo-src', 8);
+        await b2oZeile(s, 'Weg 3 · ' + rhNameKachel('immometrica'), 'Deine Favoriten und gespeicherten Suchen — Inserate aus allen Portalen.');
+        var pill = [].filter.call(document.querySelectorAll('#imo-src .imo-pill'), function (x) { return /Suche/.test(x.textContent); })[0];
+        if (pill) pill.click();
+        await warteAuf(function () { return q('#imo-list .imo-o[data-i="3"]'); }, 6000);
+        await warte(500);
+        var o = q('#imo-list .imo-o[data-i="3"]'); if (o) o.click();
+        await warte(900);
+        await zeige(function () { return q('#imo-ov .imo-body') || q('#imo-detail'); }, 6);
+        var d = IMO_MIT.suche.items[3].dp;
+        await b2oZeile(s, 'Weg 3 · ' + rhNameKachel('immometrica'), 'Suche „' + IMO_MIT.searches[0].name + '“: <b>' + de(IMO_MIT.suche.count) + ' Treffer</b>. Ein Klick aufs Inserat — Ort, Fläche (' + de(d.wfl) + ' m²), Baujahr und Preis gehen ins Objekt.');
+        var c = q('#imo-cancel'); if (c) c.click();
+        kegelHoch(false);
+        await warte(700);
+      },
+      async function (s) {   /* 6 · Geführte Eingabe */
+        rhNur(['gefuehrt']);
+        await zeige(rhKachel('gefuehrt'), 8);
+        await warte(900);
+        var r = q('#oab-run'); if (r) r.click();
+        await warteAuf(function () { return q('#oabi-ov #vi-rf-in'); }, 6000);
+        kegelHoch(true);
+        await warte(600);
+        await zeige(function () { return q('#oabi-ov .oabi-modal'); }, 4);
+        var b1 = rhIm('#oabi-ov', /\d+\s*Fragen in\s*\d+\s*Etappen/), m = b1 && /(\d+)\s*Fragen in\s*(\d+)\s*Etappen/.exec(b1.textContent);
+        await b2oZeile(s, 'Weg 4 · ' + rhNameKachel('gefuehrt'), (m ? '<b>' + m[1] + ' Fragen in ' + m[2] + ' Etappen</b>' : 'Frage für Frage') + ' — DealPilot fragt, du sprichst oder tippst.');
+        var inp = q('#vi-rf-in');
+        await zeige(function () { return q('#vi-rf-in'); }, 8);
+        if (inp) {
+          var t = window.DPM_REIHE_DATEN.gefuehrt.text;
+          for (var i = 0; i < t.length; i++) { inp.value = t.slice(0, i + 1); inp.dispatchEvent(new Event('input', { bubbles: true })); await warte(70); }
+          await warte(500);
+          var ok = q('#vi-rf-ok'); if (ok) ok.click();
+        }
+        var ja = await warteAuf(function () { return [].filter.call(document.querySelectorAll('#oabi-ov button'), function (x) { return /Ja, stimmt/.test(x.textContent) && x.offsetWidth; })[0]; }, 8000);
+        await zeige(function () { return rhIm('#oabi-ov', /Ich habe verstanden/) && rhIm('#oabi-ov', /Ich habe verstanden/).closest('div[class]'); }, 8);
+        await b2oZeile(s, 'Weg 4 · ' + rhNameKachel('gefuehrt'), 'Erste Frage: die Adresse. DealPilot wiederholt, was es verstanden hat — du bestätigst.');
+        if (ja) ja.click();
+        await warte(1200);
+        await zeige(function () { var e = rhIm('#oabi-ov', /Was schon steht/i); return e && (e.closest('aside') || e.parentElement); }, 6);
+        await b2oZeile(s, 'Weg 4 · ' + rhNameKachel('gefuehrt'), 'Rechts wächst mit, was schon steht. Was du nicht weißt, überspringst du einfach.');
+        var c = q('#oabi-ov #oabi-cancel'); if (c) c.click();
+        kegelHoch(false);
+        await warte(700);
+      },
+      async function (s) {   /* 7 · und die Marktbewertung */
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeige(function () { return q('#oab-dp-stufen') && q('#oab-dp-stufen').closest('.dp-pf-tile'); }, 8);
+        await b2oZeile(s, 'Dazu die Marktbewertung', 'Die DealPilot-Kachel holt Marktwert und Miete — in <b>drei Stufen</b>. Das zeigt Modul 04.');
+      }
+    ]
+  };
+
+  /* ── MODUL 04 · MARKTBEWERTUNG IN DREI STUFEN ────────────────────── */
+  DREHBUECHER['reihe-stufen'] = {
+    titel: 'Marktbewertung in drei Stufen',
+    unterzeile: 'Was jede Stufe braucht — und was sie liefert',
+    objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: rhAufraeumen,
+    szenen: [
+      async function (s) {   /* 1 · drei Stufen */
+        await rhStart(0);
+        try { DealPilotObjektReiter.zielSetzen(1); } catch (e) {}
+        await warte(600);
+        await zeige(function () { return q('#oe-abruf-box'); }, 8);
+        var f = [frei(1), frei(2), frei(3)];
+        await b2oZeile(s, 'Drei Stufen', 'Einfach, Mittel, Ausgiebig: je tiefer, desto mehr Angaben — und desto mehr kommt heraus.' + (f[0] ? ' Im Plan frei: <b>' + f.join(' · ') + '</b>.' : ''));
+      },
+      async function (s) {   /* 2 · Stufe 1 braucht */
+        await zeige(function () { return q('#oab-dp-stufen'); }, 10);
+        await b2oZeile(s, 'Stufe 1 · Einfach', 'Die Stufe wählst du oben an der DealPilot-Kachel — oder hier im Reiter.');
+        var b = q('#oe-stufen [data-oe-stufe="1"]'); if (b) b.click();
+        await warte(600);
+        await zeige(function () { return q('#oe-fehlt'); }, 8);
+        var l = feldNamen(fehlt(1));
+        await b2oZeile(s, 'Stufe 1 braucht', '<b>' + l.length + ' Angaben</b>: ' + l.join(', ') + '.');
+      },
+      async function (s) {   /* 3 · ausfüllen, abrufen */
+        await zeige(function () { var e = document.getElementById('plz'); return e && e.closest('.card'); }, 8);
+        s.zeile('Stufe 1 · Einfach', 'Die Wohnung aus Modul 02: Sachsenstraße 18 in Herford.');
+        await tippeH('plz', '32052'); await tippeH('ort', 'Herford'); await tippeH('str', 'Sachsenstraße', 60); await tippeH('hnr', '18');
+        await tippeH('objart', 'ETW'); await tippeH('wfl', '100'); await tippeH('baujahr', '1998');
+        await warte(1200);
+        await zeige(stufeZeile(1), 8);
+        await b2oZeile(s, 'Stufe 1 · Einfach', fehlt(1).length ? 'Noch offen: ' + feldNamen(fehlt(1)).join(', ') + '.' : 'Alles da — <b>bereit</b>. Ein Klick auf Abrufen.');
+        await rhStufeAbrufen(1, function () { s.zeile('Stufe 1 · Marktpreisindikation', 'Standort, Vergleichspreise, Mieten, Lage — Etappe für Etappe.'); });
+      },
+      async function (s) {   /* 4 · Ergebnis Stufe 1, Abschlag */
+        var k = mbKarteH() || {};
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeige(function () { return q('#avsec'); }, 8);
+        await b2oZeile(s, 'Ergebnis Stufe 1', 'Marktwert <b>' + eur(k.mw && k.mw.med) + '</b> (Spanne ' + eur(k.mw && k.mw.low) + ' – ' + eur(k.mw && k.mw.high) + '), Marktmiete <b>' + eur(k.mm && k.mm.med) + '</b> kalt.');
+        if (k.abschlag && k.abschlag.roh) {
+          await zeige(function () { return q('#avsec .dp-abschlag') || q('#avsec .legal') || q('#avsec'); }, 10);
+          await b2oZeile(s, 'Der Abschlag', 'Stufe 1 schätzt aus <b>Angebotspreisen</b> (' + eur(k.abschlag.roh.med) + '). Verkauft wird meist darunter — DealPilot rechnet <b>' + String(k.abschlag.pct).replace('.', ',') + ' %</b> ab (' + k.abschlag.quelle + ').');
+        }
+        kartenUebernehmen();
+        await warte(900);
+        await zeige(feldVon('svwert'), 10);
+        await warte(1600);
+        var b = svBeschriftung();
+        await b2oZeile(s, 'Im Feld', '„<b>' + b.titel + '</b> ' + b.hinweis + '“ — <b>' + eur(zahl('svwert')) + '</b>.');
+      },
+      async function (s) {   /* 5 · Stufe 2 braucht */
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        try { DealPilotObjektReiter.zielSetzen(2); } catch (e) {}
+        await warte(600);
+        var b = q('#oe-stufen [data-oe-stufe="2"]'); if (b) b.click();
+        await warte(600);
+        await zeige(function () { return q('#oe-fehlt'); }, 8);
+        var l = feldNamen(fehlt(2));
+        await b2oZeile(s, 'Stufe 2 · Mittel', 'Dazu <b>' + l.length + ' Angaben</b>: ' + l.join(', ') + '.');
+        await zeige(function () { var e = document.getElementById('zimmer'); return e && e.closest('.card'); }, 8);
+        s.zeile('Stufe 2 · Mittel', 'Kaufpreis 180.000 €, Kaltmiete 900 € — dazu Zimmer, Etage, Zustand, Energie und Standardstufe.');
+        await tippeH('kp', '180000', 40); await tippeH('nkm', '900', 40);
+        await tippeH('zimmer', '3'); await tippeH('etage', '1');
+        await tippeH('ds2_zustand', 'gut'); await tippeH('ds2_energie', 'C'); await tippeH('standardstufe', '3');
+        await warte(1400);
+        await zeige(stufeZeile(2), 8);
+        await b2oZeile(s, 'Stufe 2 · Mittel', fehlt(2).length ? 'Noch offen: ' + feldNamen(fehlt(2)).join(', ') + '.' : 'Alles da — <b>bereit</b>.');
+        await rhStufeAbrufen(2, function () { s.zeile('Stufe 2 · erweiterte Indikation', 'Dieselben Etappen, dazu Makrolage und der Abgleich mit deinem Preis.'); });
+      },
+      async function (s) {   /* 6 · Ergebnis Stufe 2 */
+        var k = mbKarteH() || {};
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeige(function () { return q('#avsec'); }, 8);
+        var ein = kartenText(/EINORDNUNG\s+(.+?)\s+GENAUIGKEIT/i), gen = kartenText(/GENAUIGKEIT\s+(\S+)/i);
+        await b2oZeile(s, 'Ergebnis Stufe 2', 'Marktwert <b>' + eur(k.mw && k.mw.med) + '</b> nach Abschlag' + (ein ? ' — gegen deinen Kaufpreis von ' + eur(zahl('kp')) + ': <b>' + ein + '</b>' : '') + (gen ? ', Genauigkeit ' + gen : '') + '.');
+        kartenUebernehmen();
+        await warte(900);
+        await zeige(feldVon('svwert'), 10);
+        await warte(1600);
+        var b = svBeschriftung();
+        await b2oZeile(s, 'Im Feld', 'Weiter eine <b>' + b.titel + '</b> ' + b.hinweis + ': ' + eur(zahl('svwert')) + '.');
+      },
+      async function (s) {   /* 7 · Stufe 3 braucht */
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        try { DealPilotObjektReiter.zielSetzen(3); } catch (e) {}
+        await warte(600);
+        var b = q('#oe-stufen [data-oe-stufe="3"]'); if (b) b.click();
+        await warte(700);
+        await zeige(function () { return q('#oe-fehlt'); }, 8);
+        var l = feldNamen(fehlt(3));
+        var brw = wert('brw');
+        await b2oZeile(s, 'Stufe 3 · Ausgiebig', 'Für die Wertermittlung nach ImmoWertV noch <b>' + l.length + ' Angaben</b>: ' + l.join(', ') + '.' + (brw ? ' Den Bodenrichtwert (' + brw + ' €/m²) hat DealPilot schon geholt.' : ''));
+        var ids = fehlt(3), wertVon = { gsfl: '1200', mea: '12', bgf: '135', brw: '190', nutzungsart: 'kapitalanlage' };
+        for (var i = 0; i < ids.length; i++) {
+          if (!wertVon[ids[i]]) continue;
+          await zeige(feldVon(ids[i]), 10);
+          await tippeH(ids[i], wertVon[ids[i]]);
+          await warte(700);
+        }
+        await warte(1000);
+        await zeige(stufeZeile(3), 8);
+        await b2oZeile(s, 'Stufe 3 · Ausgiebig', fehlt(3).length ? 'Noch offen: ' + feldNamen(fehlt(3)).join(', ') + '.' : 'Grundstück 1.200 m², Miteigentumsanteil 12 %, Bruttogrundfläche 135 m² — <b>bereit</b>.');
+        await rhStufeAbrufen(3, function () { s.zeile('Stufe 3 · Wertermittlung', 'Mit Bodenwert, Liegenschaftszins und Restnutzungsdauer — nach ImmoWertV.'); });
+      },
+      async function (s) {   /* 8 · Ergebnis Stufe 3: Verkehrswert */
+        await warteAuf(function () { var w = q('#oe-vw-wahl'); return w && w.options.length >= 2; }, 8000);
+        await zeige(function () { return q('#oe-vw'); }, 10);
+        var opts = [].map.call((q('#oe-vw-wahl') || { options: [] }).options, function (o) { return o.textContent; });
+        var ew = opts.filter(function (t) { return /^Ertragswert/.test(t); })[0], sw = opts.filter(function (t) { return /^Sachwert/.test(t); })[0];
+        function betrag(t) { var m = t && /·\s*([\d.]+ €)/.exec(t); return m ? m[1] : null; }
+        await b2oZeile(s, 'Ergebnis Stufe 3', 'Nach ImmoWertV gerechnet: Ertragswert <b>' + betrag(ew) + '</b>' + (sw ? ', vorläufiger Sachwert ' + betrag(sw) : '') + '. Welchen Wert du ansetzt, entscheidest du.');
+        var sel = q('#oe-vw-wahl');
+        if (sel) { var ix = [].findIndex.call(sel.options, function (o) { return /^Ertragswert/.test(o.textContent); }); if (ix >= 0) { sel.selectedIndex = ix; sel.dispatchEvent(new Event('change', { bubbles: true })); } }
+        await warte(900);
+        await zeige(function () { return q('#oe-vw-btn'); }, 8);
+        await warte(1400);
+        var bt = q('#oe-vw-btn'); if (bt) bt.click();
+        await warte(1800);
+        await zeige(feldVon('svwert'), 10);
+        await warte(1200);
+        var b = svBeschriftung();
+        await b2oZeile(s, 'Erst jetzt: Verkehrswert', '„<b>' + b.titel + '</b> ' + b.hinweis + '“ — <b>' + eur(zahl('svwert')) + '</b>, der Ertragswert aus Stufe 3.', 800);
+      },
+      async function (s) {   /* 9 · Kontingent */
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeige(function () { return q('#oe-abruf-box'); }, 8);
+        await b2oZeile(s, 'Drei Stufen, ein Verlauf', 'Jeder Abruf landet im Verlauf des Objekts. Stufe 1 und 2 sind Indikationen — <b>Verkehrswert</b> heißt es erst ab Stufe 3.');
+      }
+    ]
+  };
+
+  /* ── MODUL 05 · KOMPLETTBEISPIEL: SPRACHE + STUFE 2 ─────────────── */
+  DREHBUECHER['reihe-sprache-stufe2'] = {
+    titel: 'Komplettbeispiel: Sprache + Stufe 2',
+    unterzeile: 'Erzählen, übernehmen, einschätzen',
+    objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: rhAufraeumen,
+    szenen: [
+      async function (s) {   /* 1 · Stufe 2 wählen */
+        await rhStart(5);
+        try { DealPilotObjektReiter.zielSetzen(1); } catch (e) {}
+        await zeige(function () { return q('#oab-bar'); }, 8);
+        await b2oZeile(s, 'Komplettbeispiel', 'Eine Wohnung, nur erzählt — und gleich mit der Marktbewertung <b>Stufe 2</b>.');
+        await zeige(function () { return q('#oab-dp-stufen'); }, 10);
+        await warte(900);
+        var p = q('#oab-dp-stufen [data-oe-ziel="2"]'); if (p) p.click();
+        await warte(700);
+        await b2oZeile(s, 'Stufe 2 wählen', 'Mittel · Stufe 2: die erweiterte Indikation — mit Kaufpreis, Miete, Zustand, Energie und Ausstattung.');
+      },
+      async function (s) {   /* 2 · Sprache und DealPilot anhaken, Abrufen */
+        rhNur(['dealpilot', 'voice']);
+        await zeige(function () { return b2oHuelle(rhKachel('dealpilot')(), rhKachel('voice')()); }, 8);
+        await b2oZeile(s, 'Anhaken', '<b>DealPilot</b> und <b>' + rhNameKachel('voice') + '</b> angehakt — erst wird erzählt, dann bewertet.');
+        await zeige(function () { return q('#oab-run'); }, 8);
+        await warte(1200);
+        var r = q('#oab-run'); if (r) r.click();
+        await warteAuf(function () { return q('#oabi-ov #vi-live'); }, 6000);
+      },
+      async function (s) {   /* 3 · einsprechen */
+        kegelHoch(true);
+        var det = q('#oabi-ov details.vi-transcript'); if (det) det.open = true;
+        await warte(500);
+        await zeige(function () { return q('#oabi-ov .oabi-modal'); }, 4);
+        s.zeile('Das Fenster hört zu', 'Sprich einfach los — die Mitschrift läuft live mit.');
+        await warteAuf(function () { return _rh && _rh.spr >= 2; }, 20000);
+        await zeige(function () { return q('#oabi-ov details.vi-transcript') || q('#oabi-ov .oabi-modal'); }, 6);
+        s.zeile('Eingesprochen', 'Adresse, Fläche, Baujahr, Zimmer, Etage — erkannte Angaben werden grün.');
+        await warteAuf(function () { return _rh && _rh.spr >= 5 && ((q('#vi-live') || {}).value || '').length >= window.DPM_REIHE_DATEN.sprache.text.join(' ').length; }, 40000);
+        await warte(2800);
+        var z = rhIm('#oabi-ov', /\d+\s*von\s*\d+\s*Angaben/i), m = z && /(\d+)\s*von\s*(\d+)\s*Angaben/i.exec(z.textContent);
+        await b2oZeile(s, 'Eingesprochen', 'Zustand, Energie, Standardstufe, Miete, Hausgeld, Kaufpreis' + (m ? ' — <b>' + m[1] + ' von ' + m[2] + '</b> Angaben erkannt' : '') + '.');
+        var nx = q('#vi-next'); if (nx) nx.click();
+      },
+      async function (s) {   /* 4 · ausgewertet, erste Rechnung */
+        var b = await warteAuf(function () { return rhIm('#oabi-ov', /Angaben aus deiner Aufnahme/); }, 12000);
+        await warte(800);
+        await zeige(function () { var e = rhIm('#oabi-ov', /Angaben aus deiner Aufnahme/); return e && (e.closest('[class*="blase"],[class*="bubble"]') || e); }, 8);
+        var m = b && /(\d+)\s*Angaben aus deiner Aufnahme/.exec(b.textContent);
+        await b2oZeile(s, 'Ausgewertet', (m ? '<b>' + m[1] + ' Angaben</b> aus der Aufnahme gelesen' : 'Ausgewertet') + '. Was noch fehlt, fragt DealPilot nach — oder du gehst gleich zur Übersicht.');
+        var f = q('#vi-rf-ende'); if (f) f.click();
+        await warte(1800);
+        var ds = rhIm('#oabi-ov', /Investor Deal Score/i);
+        var karte = ds && (ds.closest('[class*="score"],[class*="karte"]') || ds.parentElement);
+        await zeige(function () { var e = rhIm('#oabi-ov', /Investor Deal Score/i); return e && (e.closest('[class*="score"],[class*="karte"]') || e.parentElement); }, 6);
+        var t = karte ? karte.innerText.replace(/\s+/g, ' ') : '', sc = /Deal Score 2\.0\s+(?:\S+\s+)?(\d+)\s*\/\s*100/i.exec(t), wort = /\b(SEHR GUT|GUT|SOLIDE|SCHWACH|KRITISCH)\b/.exec(t);
+        await b2oZeile(s, 'Erste Einschätzung', 'Schon im Fenster gerechnet: Investor Deal Score' + (sc ? ' <b>' + sc[1] + '</b>' : '') + (wort ? ' · ' + wort[1].charAt(0) + wort[1].slice(1).toLowerCase() : '') + ' — mit den Hebeln, die den Score heben.');
+      },
+      async function (s) {   /* 5 · Übersicht, übernehmen */
+        var b = [].filter.call(document.querySelectorAll('#oabi-ov button'), function (x) { return /Zur Übersicht — Werte/.test(x.textContent) && x.offsetWidth; })[0];
+        if (b) b.click();
+        await warteAuf(function () { return q('#oabi-ov #oabi-apply'); }, 6000);
+        await warte(700);
+        await zeige(function () { return q('#oabi-ov .oabi-modal'); }, 4);
+        var n = [].filter.call(document.querySelectorAll('#oabi-ov .oabi-tbl tr'), function (x) { return x.offsetWidth && x.querySelector('input[type=checkbox]'); }).length;
+        await b2oZeile(s, 'Die Übersicht', '<b>' + n + ' Werte</b> mit Herkunft — was DealPilot geschätzt hat, steht dabei. Abhaken, übernehmen.');
+        await zeige(function () { return q('#oabi-apply'); }, 8);
+        await warte(1300);
+        var ap = q('#oabi-apply'); if (ap) ap.click();
+        kegelHoch(false);
+        await warteAuf(function () { return !q('#oabi-ov') && /Sachsen/.test(wert('str')); }, 8000);
+        await warte(900);
+      },
+      async function (s) {   /* 6 · Werte in den Feldern, Stufe 2 läuft */
+        await zeige(function () { var e = document.getElementById('plz'); return e && e.closest('.card'); }, 8);
+        var oa = (function () { var e = document.getElementById('objart'); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : wert('objart'); })();
+        s.zeile('In den Feldern', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + oa + ', ' + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + ' — und gleich startet die Stufe 2.');
+        var mod = await warteAuf(function () { return q('#dp-mba .k'); }, 12000);
+        if (mod) {
+          kegelHoch(true);
+          await zeige(function () { return q('#dp-mba .k'); }, 8);
+          s.zeile('Stufe 2 läuft', 'Erweiterte Marktpreisindikation — mit allem, was du gerade erzählt hast.');
+        }
+        await warteAuf(function () { return _rh && _rh.berichte.length >= 1 && !q('#dp-mba .k') && mbKarteH() && mbKarteH().stufe === 2; }, 30000);
+        kegelHoch(false);
+        await warte(900);
+      },
+      async function (s) {   /* 7 · Einschätzung */
+        var k = mbKarteH() || {};
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeige(function () { return q('#avsec'); }, 8);
+        var ein = kartenText(/EINORDNUNG\s+(.+?)\s+GENAUIGKEIT/i);
+        await b2oZeile(s, 'Die Einschätzung', 'Marktwert <b>' + eur(k.mw && k.mw.med) + '</b>' + (k.abschlag ? ' (nach ' + String(k.abschlag.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise)' : '') + (ein ? ' — dein Kaufpreis ' + eur(zahl('kp')) + ': <b>' + ein + '</b>' : '') + '. Marktmiete ' + eur(k.mm && k.mm.med) + '.');
+        kartenUebernehmen();
+        await warte(900);
+        await zeige(feldVon('svwert'), 10);
+        await warte(1600);
+        var b = svBeschriftung();
+        await b2oZeile(s, 'Übernommen', '„<b>' + b.titel + '</b> ' + b.hinweis + '“: ' + eur(zahl('svwert')) + '. Erzählt, bewertet, eingeordnet.', 600);
       }
     ]
   };

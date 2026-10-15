@@ -907,7 +907,19 @@
       var e = Number(h.ertragswert_eur), s = Number(h.sachwert_eur), m = Number(h.market_value);
       if (isFinite(e) && e > 0) liste.push(Object.assign({}, basis, { wert: e, art: 'Ertragswert', fuehrend: fv === 'ertragswert', weg: h.ertrag_weg || null }));
       if (isFinite(s) && s > 0) liste.push(Object.assign({}, basis, { wert: s, art: 'Sachwert', fuehrend: fv === 'sachwert', weg: h.sachwert_weg || null }));
-      if (isFinite(m) && m > 0) liste.push(Object.assign({}, basis, { wert: m, art: 'Marktwert', fuehrend: false }));
+      /* v2255 · Der Marktwert im Verlauf ist der ROHE Wert aus Angebotspreisen
+         (gemessen: Bericht 212, 246.000 €), die Karte zeigt ihn nach Abschlag
+         (232.000 €). Hier ging bis v2254 der rohe Wert ins Feld - als
+         „Verkehrswert". Jetzt derselbe Abschlag wie auf der Karte
+         (DealPilotAbschlag, Satz aus den Einstellungen, sonst Marktdurchschnitt). */
+      if (isFinite(m) && m > 0) {
+        var ab = null, mw = m;
+        try {
+          var A = window.DealPilotAbschlag;
+          if (A && typeof A.satz === 'function') { ab = A.satz(); mw = Math.round(m * (1 - ab / 100) / 1000) * 1000; }
+        } catch (x) { ab = null; mw = m; }
+        liste.push(Object.assign({}, basis, { wert: mw, roh: m, abschlag: ab, art: 'Marktwert', fuehrend: false }));
+      }
     });
     if (!liste.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
     /* v1963: neueste zuerst. Innerhalb desselben Berichts bleibt die
@@ -922,14 +934,19 @@
       var _f = h.fuehrend ? ' · führend' : '';
       var _t = h.fuehrend && h.fuehrend_grund
         ? ' title="' + esc(h.fuehrend_grund + (h.fuehrend_quelle ? ' (' + h.fuehrend_quelle + ')' : '')) + '"' : '';
-      return '<option value="' + i + '"' + _t + '>' + (h.art || 'Marktwert') + ' · '
-        + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €' + _f + '</option>';
+      /* v2255: der Marktwert heisst hier, was er ist - Marktwertindikation,
+         mit dem Abschlag dahinter */
+      var _art = h.art === 'Marktwert' ? 'Marktwertindikation' : (h.art || 'Marktwertindikation');
+      var _ab = (h.art === 'Marktwert' && h.abschlag != null) ? ' (−' + String(h.abschlag).replace('.', ',') + ' %)' : '';
+      return '<option value="' + i + '"' + _t + '>' + _art + ' · '
+        + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €' + _ab + _f + '</option>';
     };
+    var _k0 = liste[0].art === 'Marktwert' ? 'Marktwertindikation' : (liste[0].art || 'Marktwertindikation');
     box.innerHTML = (liste.length > 1
       ? '<select id="oe-vw-wahl" aria-label="Marktbericht wählen">' + liste.map(opt).join('') + '</select><div id="oe-vw-diff"></div>'
-      : '<span class="oe-q">' + (liste[0].art || 'Marktwert') + ' · '
+      : '<span class="oe-q">' + _k0 + ' · '
         + _datum(liste[0].created_at) + ': <b>' + deNum(liste[0].wert) + ' €</b></span>')
-      + '<button type="button" class="oe-btn" id="oe-vw-btn">als Verkehrswert übernehmen</button>'
+      + '<button type="button" class="oe-btn" id="oe-vw-btn">' + _vwKnopf(liste[0]) + '</button>'
       + (liste.length > 1 ? '<span class="oe-q">' + liste.length + ' Berichte im Verlauf</span>' : '');
     box.style.display = '';
     box._liste = liste;
@@ -939,11 +956,15 @@
     var _s = $('oe-vw-wahl');
     if (_s) {
       _s.addEventListener('change', function () {
-        _unterschiedZeigen(liste, parseInt(_s.value, 10) || 0);
+        var _i = parseInt(_s.value, 10) || 0;
+        _unterschiedZeigen(liste, _i);
+        var _b = $('oe-vw-btn'); if (_b && liste[_i]) _b.textContent = _vwKnopf(liste[_i]);   /* v2255 */
       });
     }
     _unterschiedZeigen(liste, _s ? (parseInt(_s.value, 10) || 0) : 0);
   }
+  /* v2255 · der Knopf sagt, ALS WAS übernommen wird */
+  function _vwKnopf(h) { return (h && h.art !== 'Marktwert') ? 'als Verkehrswert übernehmen' : 'als Marktwertindikation übernehmen'; }
   function verkehrswertSetzen() {
     var box = $('oe-vw'), el = $('svwert'); if (!box || !el || !box._liste) return;
     /* v1979a: der Aufruf von `_unterschiedZeigen` stand HIER — in
@@ -955,11 +976,28 @@
     var sel = $('oe-vw-wahl'); var h = box._liste[sel ? parseInt(sel.value, 10) || 0 : 0]; if (!h) return;
     /* v1963: `wert` statt `market_value` - der Eintrag weiss selbst,
        welche Zahl er traegt (Ertrags-, Sach- oder Marktwert). */
-    el.value = String(Math.round(Number(h.wert != null ? h.wert : h.market_value)));
+    var _wert = Math.round(Number(h.wert != null ? h.wert : h.market_value));
+    /* v2255 · Herkunft vermerken, BEVOR der Wert ins Feld geht: die
+       Beschriftung (dealpilot-mb.js _svLabel) liest den Vermerk `sv` in
+       #_mb_state. Ertrags-/Sachwert = amtlich (Stufe 3), Marktwert =
+       Indikation. Ohne Vermerk fiel sie auf den HTML-Text „Verkehrswert"
+       zurück - auch für den rohen Angebotswert. */
+    var _amtlich = h.art === 'Ertragswert' || h.art === 'Sachwert';
+    try {
+      var st = $('_mb_state');
+      if (st) {
+        var s = null; try { s = st.value ? JSON.parse(st.value) : null; } catch (x) { s = null; }
+        s = (s && typeof s === 'object') ? s : {};
+        s.sv = { wert: _wert, art: h.art || 'Marktwert', amtlich: _amtlich, stufe: _amtlich ? 3 : null, datum: h.created_at || null };
+        st.value = JSON.stringify(s);
+        st.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    } catch (x) {}
+    el.value = String(_wert);
     el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
     if (typeof calc === 'function') { try { calc(); } catch (e) {} }
-    if (typeof toast === 'function') { try { toast('✓ Verkehrswert ' + deNum(h.wert != null ? h.wert : h.market_value, 0) + ' € übernommen (Marktbericht ' + _datum(h.created_at) + ')'); } catch (e) {} }
+    if (typeof toast === 'function') { try { toast('✓ ' + (_amtlich ? h.art + ' als Verkehrswert' : 'Marktwertindikation') + ' ' + deNum(_wert, 0) + ' € übernommen (Marktbericht ' + _datum(h.created_at) + ')'); } catch (e) {} }
   }
 
   /* ═══ Verdrahtung ════════════════════════════════════════════════════ */
