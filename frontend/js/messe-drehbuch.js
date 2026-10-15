@@ -3958,7 +3958,8 @@
         var wv = function () { return r16Mb('#wv-box'); };
         await r16Hin(wv(), true);
         await zeigeGruppe(function () { return r16Mb('#wv-box .wv-boden'); }, function () { var d = r16Doc(); var k = d && d.querySelectorAll('#wv-box .wv-k'); return k && k.length ? k[k.length - 1] : null; }, 8);
-        var t = r6Inner(wv()), bw = /Bodenwert\s*\n?\s*([\d.]+ €)/.exec(t), lz = /Liegenschaftszinssatz:\s*([\d,]+ %)/.exec(t);
+        /* innerText liefert die Überschrift in Versalien (CSS) - daher /i (Prüflauf 18: „Bodenwert –“) */
+        var t = r6Inner(wv()), bw = /Bodenwert\s*\n?\s*([\d.]+ €)/i.exec(t), lz = /Liegenschaftszinssatz:\s*([\d,]+ %)/.exec(t);
         function karte(re) { var d = r16Doc(); var k = d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return re.test(r6Text(x.querySelector('.wv-t'))); })[0]; return k ? r6Text(k.querySelector('.wv-v')) : '–'; }
         await b2oZeile(s, 'Wertermittlung · Stufe 3', 'Bodenwert <b>' + (bw ? bw[1] : '–') + '</b>, Liegenschaftszins ' + (lz ? lz[1] : '–') + '. Ertragswert <b>' + karte(/^Ertragswert/i) + '</b>, Sachwert ' + karte(/^Sachwert/i) + ' — mit Rechenweg zum Aufklappen.');
       },
@@ -3971,8 +3972,8 @@
       async function (s) {   /* 9 · der Text */
         var rm = function () { return r16Mb('#reportMd'); };
         await r16Hin(rm(), true);
-        await zeige(function () { var r = rm(); return r && (r.querySelector('h2,h3') ? b2oHuelle(r.querySelector('h2,h3'), r.querySelector('p') || r) : r); }, 8);
-        var hs = []; try { hs = [].map.call(rm().querySelectorAll('h2,h3'), function (h) { return r6Text(h).replace(/^[—–-]\s*/, ''); }).slice(0, 4); } catch (e) {}
+        await zeige(function () { var r = rm(); return r && (r.querySelector('h1,h2') ? b2oHuelle(r.querySelector('h1,h2'), r.querySelector('p') || r) : r); }, 8);
+        var hs = []; try { hs = [].map.call(rm().querySelectorAll('h1,h2'), function (h) { return r6Text(h).replace(/^[—–-]\s*/, ''); }).slice(0, 4); } catch (e) {}
         await b2oZeile(s, 'Der Bericht in Worten', (hs.length ? hs.join(' · ') : 'Zusammenfassung, Lage, Bewertung, Ausblick') + ' — geschrieben aus genau diesen Zahlen.');
       },
       async function (s) {   /* 10 · das PDF */
@@ -3982,10 +3983,10 @@
         _r18.pdf = await r18Pdf();
         await r6Ende(zb);
         if (!_r18.pdf) { await b2oZeile(s, 'Das PDF', 'Hier entsteht das PDF.'); return; }
-        try { var tx = await _r18.pdf.text(), mm = /Seite 1 von (\d+)/.exec(tx) || /1 \/ (\d+)/.exec(tx); _r18.seiten = mm ? Number(mm[1]) : null; } catch (e) {}
+        try { var tx = await _r18.pdf.text(), mm = /\/Type \/Pages[\s\S]{0,2000}?\/Count (\d+)/.exec(tx); _r18.seiten = mm ? Number(mm[1]) : null; } catch (e) {}
         zeige(null); kegelHoch(true);
         await r18Seite(1);
-        await b2oZeile(s, 'Das PDF', 'Deckblatt mit Karte und Eckdaten' + (_r18.seiten ? ' — ' + _r18.seiten + ' Seiten' : '') + ': für die Bank, den Verkäufer oder deine Unterlagen.');
+        await b2oZeile(s, 'Das PDF', 'Deckblatt mit Score und Eckdaten' + (_r18.seiten ? ' — ' + _r18.seiten + ' Seiten' : '') + ': für die Bank, den Verkäufer oder deine Unterlagen.');
         await r18Seite(3);
         await b2oZeile(s, 'Im Dokument', 'Dieselben Kapitel wie am Bildschirm — Lage, Vergleichsdaten, Wertermittlung mit Rechenweg und Quellennachweis.', 600);
       }
