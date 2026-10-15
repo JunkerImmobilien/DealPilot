@@ -1495,8 +1495,23 @@
   function fehlt(s) { try { return DealPilotObjektReiter.fehltFuer(s); } catch (e) { return []; } }
   function stufeZeile(s) { return function () { var b = q('#oe-stufen [data-oe-stufe="' + s + '"]'); return b && b.closest('.oe-row'); }; }
   /* nur die Zelle „N frei" - gemessen las der ganze Zeilentext „Stufe 1" + „10 frei" als 110 */
-  function frei(s) { var r = stufeZeile(s)(), w = r && r.querySelector('.oe-w'); var m = w && /(\d+)\s*frei/.exec(w.textContent); return m ? m[1] : null; }
+  function kontingentFrei(s) { var r = stufeZeile(s)(), w = r && r.querySelector('.oe-w'); var m = w && /(\d+)\s*frei/.exec(w.textContent); return m ? m[1] : null; }
   function mbKarteH() { try { return DealPilotMB.letzter(); } catch (e) { return null; } }
+  /* ein Kegel über eine Feldgruppe. Die Hülle (b2oHuelle) hängt am body -
+     gemessen fand scroller() für sie nur das Dokument, .main-col blieb
+     stehen und die Gruppe lag halb unter dem Rand. Gescrollt wird deshalb
+     über das erste Feld, gezeigt die Hülle. */
+  async function zeigeGruppe(fa, fb, pad) {
+    var a = fa(), b = fb();
+    if (a && b) {
+      var ra = rect(a), rb = rect(b), oben = Math.min(ra.top, rb.top), unten2 = Math.max(ra.bottom, rb.bottom);
+      if (oben < 70 || unten2 > innerHeight - unten()) {
+        var s = scroller(a), mitte = (70 + innerHeight - unten()) / 2;
+        s.scrollTop += ((oben + unten2) / 2) - mitte;
+      }
+    }
+    await zeige(function () { return b2oHuelle(fa(), fb()); }, pad);
+  }
 
   /* gemeinsamer Anfang: Merker sichern, Spion, „Neues Objekt" */
   async function rhStart(sprMax) {
@@ -1729,7 +1744,7 @@
         try { DealPilotObjektReiter.zielSetzen(1); } catch (e) {}
         await warte(600);
         await zeige(function () { return q('#oe-abruf-box'); }, 8);
-        var f = [frei(1), frei(2), frei(3)];
+        var f = [kontingentFrei(1), kontingentFrei(2), kontingentFrei(3)];
         await b2oZeile(s, 'Drei Stufen', 'Je tiefer die Stufe, desto mehr Angaben — und desto mehr Ergebnis.' + (f[0] ? ' Frei im Plan: <b>' + f.join(' · ') + '</b>.' : ''));
       },
       async function (s) {   /* 2 · Stufe 1 braucht */
@@ -1739,7 +1754,7 @@
         await b2oZeile(s, 'Stufe 1 · Einfach', 'Braucht <b>' + l.length + ' Angaben</b>: ' + l.join(', ') + '.');
       },
       async function (s) {   /* 3 · ausfüllen, abrufen */
-        await zeige(function () { return b2oHuelle(feldVon('plz')(), feldVon('etage')()); }, 8);
+        await zeigeGruppe(feldVon('plz'), feldVon('etage'), 8);
         s.zeile('Stufe 1 · Einfach', 'Die Wohnung aus Modul 02, kurz eingetippt.');
         await tippeH('plz', '32052'); await tippeH('ort', 'Herford'); await tippeH('str', 'Sachsenstraße', 60); await tippeH('hnr', '18');
         await tippeH('objart', 'ETW'); await tippeH('wfl', '100'); await tippeH('baujahr', '1998');
@@ -1772,7 +1787,7 @@
         await zeige(function () { return q('#oe-fehlt'); }, 8);
         var l = feldNamen(fehlt(2));
         await b2oZeile(s, 'Stufe 2 · Mittel', 'Dazu <b>' + l.length + ' Angaben</b>: ' + l.join(', ') + '.');
-        await zeige(function () { return b2oHuelle(feldVon('zimmer')(), feldVon('standardstufe')()); }, 8);
+        await zeigeGruppe(feldVon('zimmer'), feldVon('standardstufe'), 8);
         s.zeile('Stufe 2 · Mittel', 'Eingetippt — Kaufpreis und Miete stehen in den Reitern Investition und Miete.');
         await tippeH('kp', '180000', 40); await tippeH('nkm', '900', 40);
         await tippeH('zimmer', '3'); await tippeH('etage', '1');
@@ -1927,7 +1942,7 @@
         kegelHoch(false);
         await warte(700);
         if (!q('#s0.active')) reiter('s0');
-        await zeige(function () { return b2oHuelle(feldVon('plz')(), feldVon('ds2_energie')()); }, 8);
+        await zeigeGruppe(feldVon('plz'), feldVon('ds2_energie'), 8);
         var oa = (function () { var e = document.getElementById('objart'); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : wert('objart'); })();
         await b2oZeile(s, 'In den Feldern', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + oa + ', ' + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + ', Zustand und Energie — alles aus dem Gesagten.');
       },
