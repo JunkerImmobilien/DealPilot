@@ -38761,6 +38761,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2251 · Leeres Objekt nach dem Setup, Tour lädt das Demo, Bütten, Demo ergänzt (15.10.2026, Staging)
+
+- **Was:** Nach dem Setup steht ein leeres „Neues Objekt“ (ohne Tour sofort, mit Tour nach deren Ende über `__dpNachSetup`) – angezeigt, nicht gespeichert: `_dpEmptyCardSaving` hält `saveEmptyCard` an, weil das Demo aus der Bestätigung (`assignDemoObject`) schon einen Platz belegt. Die Tour lädt gezielt das Demo (Ort Dealhausen, Server-Abfrage `GET /objects`), bei nur leeren Objekten ein Tour-Demo. Kartenstil Bütten für alle Ansichten (`KARTENSTIL`), wirkt auch ohne Kachelklick. `erststart.js` schweigt, wenn es das Setup gibt. `demo-object.json`: 48 Felder ergänzt (129 → 175).
+- **Commit:** `c0a92527`
+- **Nachweis:** Staging `?setup=1`: Zusatz „Kartenstil Bütten“, nach Schritt 1 `data-dp-kartenstil=buetten`; Abschluss ohne Tour → Kopf „Neues Objekt“, kp/ort leer, `_currentObjKey` null, Quick-Check zu, Objekte 39 → 39. Image: Demo mit `mod_heizung`. localStorage danach zurückgesetzt.
+- **Rest:** Tour-Demo-Weg nur an einem neuen Konto prüfbar (Abnahme Marcel). Bestehende Demos (majunker) behalten die alten 129 Felder.
+
 ### v2250 · Bestätigungsband verschwindet nach dem Klick, Flieger aus der Mail (15.10.2026, Staging)
 
 - **Was:** Nach Klick auf den Bestätigungslink blieb das Band „noch nicht bestätigt“ stehen: `dp_verify_frist` wurde nur bei einer neuen Anmeldung geräumt. Jetzt fragt `verify-frist.js` `/auth/me` (Laden, Rückkehr in den Tab, minütlich); fehlt `X-DP-Verify-Deadline` (setzt `middleware/auth.js` nur ohne `email_verified_at`), geht das Band. `storage`-Ereignis räumt andere Tabs, der Link-Weg in `register-easter-egg.js` räumt den Merker selbst. Mail: Flieger-Zeichen hinter „Check-in abschließen“ und „dein DealPilot-Team“ entfernt.
