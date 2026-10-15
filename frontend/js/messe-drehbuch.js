@@ -104,6 +104,9 @@
       'html.dpm-studio #dpm-stopp{display:none}',
       /* v2233 · die Pilot-Hilfe stoert im Video - waehrend eines Laufs ausgeblendet */
       'html.dpm-laeuft #dp-pilot,html.dpm-laeuft #dp-tower{display:none!important}',
+      /* v2266a · keine Kontaktdaten im Bild: die Konto-Adresse unten in der
+         Seitenleiste stand in allen Reihen-Videos bis 11 (gemessen am Bild) */
+      'html.dpm-laeuft .sb-user-email{visibility:hidden!important}',
       '@media (max-width:640px){#dpm-zeile .t{font-size:18px}#dpm-karte h1{font-size:40px}#dpm-karte p{font-size:16px}}'
     ].join('\n');
     document.head.appendChild(st);
@@ -2817,7 +2820,10 @@
         await b2oZeile(s, 'Anschlussfinanzierung', 'Was passiert nach der Zinsbindung, wenn der Zins steigt? Der Pilot rechnet es durch.');
         var w = function () { var p = r11Panel(); var c = p && [].filter.call(p.querySelectorAll('.dp-pa-cols'), function (x) { return /WORST CASE/.test(x.textContent); })[0]; return c || null; };
         await zeige(w, 8);
-        var wc = r11Text(/WORST CASE\s*\n\s*([^\n]+)/), bc = r11Text(/BEST CASE\s*\n\s*([^\n]+)/);
+        /* v2266 · die Unterzeile der Karte (.dp-pa-kv-sub) per textContent - innerText
+           lieferte sie in Versalien („MIETE -10%") */
+        var sub = function (re) { var c = w(); var k = c && [].filter.call(c.querySelectorAll('.dp-pa-card'), function (x) { return re.test(r6Text(x.querySelector('.dp-pa-sec') || x)); })[0]; var u = k && k.querySelector('.dp-pa-kv-sub'); return u ? u.textContent.trim().replace(/(\d)%/g, '$1 %') : null; };
+        var wc = sub(/WORST CASE/i) || r11Text(/WORST CASE\s*\n\s*([^\n]+)/), bc = sub(/BEST CASE/i) || r11Text(/BEST CASE\s*\n\s*([^\n]+)/);
         await b2oZeile(s, 'Worst Case und Best Case', 'Zwei Szenarien' + (wc ? ': schlecht <b>' + wc + '</b>' : '') + (bc ? ', gut <b>' + bc + '</b>' : '') + ' — mit dem, was dann vom Cashflow bleibt.');
       },
       async function (s) {   /* 7 · Lage und Markt (ohne die Portal-Quellen) */
@@ -2826,10 +2832,19 @@
         await zeige(k1, 8);
         await r11Unten(k1);
         if (!r11VerbotenImBild()) await b2oZeile(s, 'Lage und Markt', 'Makro- und Mikrolage recherchiert: Einwohner, Arbeitsmarkt, Nachfrage, Umfeld der Straße.');
+        /* v2266 · der Abgleich steht nur, wenn ein Marktbericht vorlag (an der Kopie
+           der Westerfeldstr. nicht) - dann die Gegenüberstellung je Merkmal */
         var k2 = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-abgl'); };
-        await zeige(k2, 8);
-        await r11Unten(k2);
-        if (!r11VerbotenImBild()) await b2oZeile(s, 'Abgleich mit dem Marktbericht', 'Wo die Recherche dem Marktbericht zustimmt — und wo sie abweicht. Abweichungen nennt der Pilot ausdrücklich.');
+        var k3 = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-ggs'); };
+        if (k2()) {
+          await zeige(k2, 8);
+          await r11Unten(k2);
+          if (!r11VerbotenImBild()) await b2oZeile(s, 'Abgleich mit dem Marktbericht', 'Wo die Recherche dem Marktbericht zustimmt — und wo sie abweicht. Abweichungen nennt der Pilot ausdrücklich.');
+        } else if (k3()) {
+          await zeige(k3, 8);
+          await r11Unten(k3);
+          if (!r11VerbotenImBild()) await b2oZeile(s, 'Gegenüberstellung', 'Je Merkmal deine Angabe neben der Recherche — mit Quelle und Urteil. Wo es nicht passt, sagt der Pilot es.');
+        }
       },
       async function (s) {   /* 8 · Verhandlung */
         await r11PaTab(/^Verhandlung/);
