@@ -379,6 +379,7 @@
           email: _claims.email || '',
           name: _claims.name || '',
           role: _claims.role || 'user',
+          createdAt: new Date().toISOString(),   /* v2249: eben bestaetigt = neues Konto */
           token: token,
           expires: Date.now() + 7 * 24 * 60 * 60 * 1000  // 7 Tage
         };

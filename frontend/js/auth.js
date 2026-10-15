@@ -204,6 +204,7 @@ var Auth = (function() {
       localStorage.setItem(SESSION_KEY, JSON.stringify({
         userId: resp.user.id, email: resp.user.email, name: resp.user.name,
         role: resp.user.role, mode: 'api',
+        createdAt: resp.user.created_at || null,   /* v2249: Setup je Konto */
         expires: Date.now() + SESSION_DURATION_MS
       }));
     },
@@ -437,9 +438,21 @@ async function handleAuthSubmit(mode) {
 
     if (typeof onLoginSuccess === 'function') onLoginSuccess(session);
 
+    /* v2249 · Marcel 15.10.2026: „nach der Anmeldung keine Aufforderung für
+       die Grunddaten … und auch keine Tour." Das Setup prüfte nur beim
+       Laden der Seite - die Anmeldung lädt nicht neu, also kam es nie.
+       Ist es fällig, kommt es jetzt, und der Quick-Check bleibt zu: er
+       würde sonst mit den Vorgaben rechnen, die das Setup gerade festlegt. */
+    var _setupKommt = false;
+    try {
+      if (window.DealPilotOnboarding && typeof DealPilotOnboarding.pruefen === 'function') {
+        _setupKommt = DealPilotOnboarding.pruefen();
+      }
+    } catch (obErr) { console.warn('[v2249] Setup-Pruefung fehlgeschlagen:', obErr); }
+
     // V225: Quick-Check automatisch öffnen nach erfolgreicher Anmeldung
     // (nicht für Registrierung — nur bei mode === 'login')
-    if (mode === 'login') {
+    if (mode === 'login' && !_setupKommt) {
       setTimeout(function() {
         try {
           if (typeof window.enterQuickCheckMode === 'function') {

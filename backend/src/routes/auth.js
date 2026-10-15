@@ -75,7 +75,7 @@ router.post('/register', validate({ body: registerSchema }), async (req, res, ne
     });
 
     res.status(201).json({
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      user: { id: user.id, email: user.email, name: user.name, role: user.role, created_at: user.created_at },
       token
     });
   } catch (err) { next(err); }
@@ -117,7 +117,7 @@ router.post('/login', validate({ body: loginSchema }), async (req, res, next) =>
     });
 
     res.json({
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      user: { id: user.id, email: user.email, name: user.name, role: user.role, created_at: user.created_at },
       token
     });
   } catch (err) { next(err); }
@@ -161,7 +161,7 @@ router.post('/2fa/verify-login', validate({ body: verifyLoginSchema }), async (r
     });
 
     res.json({
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      user: { id: user.id, email: user.email, name: user.name, role: user.role, created_at: user.created_at },
       token
     });
   } catch (err) { next(err); }
