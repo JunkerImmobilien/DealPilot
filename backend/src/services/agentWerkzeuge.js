@@ -2382,7 +2382,10 @@ async function objekt_schnellblick(ctx, args) {
       score: score, kp: kp, nkm: nkm + ze,
       bmr: K.bmy, nmr: K.nmy, cfMon: K.cf_m, dscr: K.dscr, ltv: K.ltv,
       ekr: K.ekr, bewirtPctNkm: bwkQuote || 0,
-      marktwert: marktBasis, marktwert_grund: marktGrund
+      marktwert: marktBasis, marktwert_grund: marktGrund,
+      /* v2239: Zielrendite der Lageklasse - ohne sie fiel die Kaufempfehlung
+         still auf 6 % und das Lage-Urteil weg (die Ampel bekam sie schon). */
+      zielBmr: zielBmrLage, lageklasse: d.lageklasse || null
     }, undefined, nichtAnwendbar) : null;
 
     bewertung = {

@@ -398,8 +398,21 @@
      Ohne Stichtag passiert NICHTS. Ein eingefrorener Stand mit
      falschem Datum sieht richtig aus und ist es nicht. */
   var _autoLaeuft = false;
+  /* v2239: nach „rueckgaengig" friert das Modul fuer DIESES Objekt nicht
+     sofort wieder ein - vorher rief zuruecknehmen() frageZeigen('won'),
+     und vonSelbst() schrieb den Stand im selben Atemzug neu. */
+  var _autoAus = false;
   function vonSelbst() {
-    if (_autoLaeuft || vorhanden()) return false;
+    if (_autoLaeuft || _autoAus || vorhanden()) return false;
+    /* v2239: liegt ein ruhender Stand vor (Objekt war schon einmal
+       gewonnen), wird DER wieder aktiv - nicht der heutige eingefroren. */
+    if (window._dpAnkaufRuhend && window._dpAnkaufRuhend.daten) {
+      window._dpAnkauf = window._dpAnkaufRuhend;
+      window._dpAnkaufRuhend = null;
+      if (typeof saveObj === 'function') saveObj(true);
+      if (typeof toast === 'function') toast('✓ Ankauf-Stand vom ' + _datum(window._dpAnkauf.stichtag) + ' wieder aktiv');
+      return true;
+    }
     var t = stichtagVorschlag();
     if (!t) return false;
     _autoLaeuft = true;
@@ -421,6 +434,7 @@
     if (!confirm('Den automatisch festgeschriebenen Ankauf-Stand wieder entfernen?')) return;
     verwerfen();
     window._dpAnkaufAuto = false;
+    _autoAus = true;
     if (typeof saveObj === 'function') saveObj(true);
     frageZeigen('won');
     if (typeof toast === 'function') toast('\u2713 Ankauf-Stand entfernt.');
@@ -477,6 +491,7 @@
      DIESEM Objekt, nicht zur Sitzung. */
   window.addEventListener('dp:object-ready', function () {
     _spaeterGeklickt = false;
+    _autoAus = false;
     setTimeout(function () {
       var st = 'open';
       try {

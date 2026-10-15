@@ -606,8 +606,9 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
     }
   } catch(_e2751a) {}
   if (baseIncome === null) {
-    baseIncome = parseDe((document.getElementById('zve') || {}).value) || 65891;
+    baseIncome = parseDe((document.getElementById('zve') || {}).value) || 0;
     _zveSource = 'aktueller zvE-Wert';
+    if (!(baseIncome > 0)) { baseIncome = window._dpZveErsatz(); _zveSource = 'kein zvE hinterlegt - abgeleitet aus dem Grenzsteuersatz'; }
   }
 
   // V276-other-objects: Saldo aus anderen Bestandsobjekten
@@ -1036,6 +1037,25 @@ function renderTaxTimeline() {
 }
 
 // Hook into existing renderTaxModule
+/* v2239 · Ohne zvE rechnete der Steuer-Reiter still mit 65.891 EUR nach
+   Tarif, die Kennzahlen dagegen linear mit dem Grenzsteuersatz aus Feld
+   `grenz` (aus den Einstellungen). Bei 40,45 % fiel das nicht auf - genau
+   dort liegt 65.891 EUR. Bei jedem anderen Satz zeigten beide Stellen fuer
+   dasselbe Objekt eine andere Steuerwirkung. Jetzt: das zvE, dessen
+   Grenzsteuersatz dem eingestellten entspricht (Suche ueber den Tarif). */
+window._dpZveErsatz = function () {
+  var g = NaN;
+  try { g = parseDe((document.getElementById('grenz') || {}).value); } catch (e) {}
+  if (!(g > 0)) return 65891;
+  var ziel = g / 100, lo = 12000, hi = 280000;
+  if (Tax.calcGrenzsteuersatz(hi) < ziel) return hi;
+  if (Tax.calcGrenzsteuersatz(lo) > ziel) return lo;
+  for (var i = 0; i < 40; i++) {
+    var m = (lo + hi) / 2;
+    if (Tax.calcGrenzsteuersatz(m) < ziel) lo = m; else hi = m;
+  }
+  return Math.round(hi);
+};
 var _origRenderTax = renderTaxModule;
 renderTaxModule = function(year) { /* V270.1-hook-passthrough */
   _origRenderTax(year);
@@ -1416,7 +1436,7 @@ function _computeYearTotal(year, yearIdx, vorgabe) {
 
   } catch(_) {}
 
-  if (baseIncome === null) baseIncome = parseDe((document.getElementById('zve') || {}).value) || 65891;
+  if (baseIncome === null) baseIncome = parseDe((document.getElementById('zve') || {}).value) || window._dpZveErsatz();   /* v2239 */
   var impact = Tax.calcImmoTaxImpact(baseIncome, ergebnis);
 
   return {
@@ -2115,7 +2135,7 @@ function showProgressionChart() {
   var existing = document.getElementById('progression-modal');
   if (existing) existing.remove();
 
-  var zve = parseDe((document.getElementById('zve') || {}).value) || 65891;
+  var zve = parseDe((document.getElementById('zve') || {}).value) || window._dpZveErsatz();   /* v2239 */
   // Estimate immo result for "after investment" scenario - use first year tax data
   var immoResult = 0;
   if (State.cfRows && State.cfRows.length) {

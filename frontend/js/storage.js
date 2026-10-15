@@ -319,6 +319,12 @@ function collectData() {
   if (window._dpAnkauf && window._dpAnkauf.daten) {
     var _ankWon = (document.getElementById('_deal_won_state') || {}).value === 'true';
     if (_ankWon) d._ankauf = window._dpAnkauf; else d._ankauf_ruhend = window._dpAnkauf;
+  } else if (window._dpAnkaufRuhend && window._dpAnkaufRuhend.daten) {
+    /* v2239: ein RUHENDER Stand (Objekt geladen als offen/verloren) reist
+       mit. Vorher setzte das Laden `_dpAnkauf` auf null, und das naechste
+       Speichern schrieb weder `_ankauf` noch `_ankauf_ruhend` - der Stand
+       war geloescht, entgegen dem Kommentar oben. */
+    d._ankauf_ruhend = window._dpAnkaufRuhend;
   }
   // V63.99: Küche-im-Kaufpreis-Checkbox
   /* V291.1-storage-cleanup: kueche_im_kp-Checkbox entfernt — kein Save mehr nötig */
@@ -623,6 +629,10 @@ function loadData(d) {
      eine fremde Adresse zeigt. */
   window._dpAnkauf = (d._ankauf && d._ankauf.daten) ? d._ankauf
     : ((d._deal_won && d._ankauf_ruhend && d._ankauf_ruhend.daten) ? d._ankauf_ruhend : null);   /* v2164 */
+  /* v2239: nicht gewonnen -> der ruhende Stand bleibt als eigener Merker
+     erhalten (collectData reicht ihn durch, ankauf.js holt ihn beim
+     erneuten Gewinnen zurueck statt neu einzufrieren). */
+  window._dpAnkaufRuhend = (!window._dpAnkauf && d._ankauf_ruhend && d._ankauf_ruhend.daten) ? d._ankauf_ruhend : null;
   // V23: Mietentwicklungs-Toggle wiederherstellen
   if (d._me_inc_ze !== undefined) {
     var meCb = document.getElementById('me_inc_ze');
@@ -968,7 +978,7 @@ async function saveObj(opts) {
             var v = totals.values;
             return {
               year: t.year,
-              base_income: parseDe((document.getElementById('zve') || {}).value) || 65891,
+              base_income: parseDe((document.getElementById('zve') || {}).value) || (typeof window._dpZveErsatz === 'function' ? window._dpZveErsatz() : 65891),   /* v2239 */
               marginal_tax_rate: parseDe((document.getElementById('grenz') || {}).value) / 100 || null,
               einnahmen_vv: t.einnahmen,
               schuldzinsen: v.schuldzinsen || 0,
@@ -1114,7 +1124,7 @@ function _clearFormForNewObject() {
   /* v2164: der Ankauf-Stand gehoert zum OBJEKT. Ohne diese Zeile erbte ein
      neues Objekt den Stand des vorher geoeffneten (gemessen: 2026-1090
      "Unbenannt", offen, trug den Stand der Bismarckstr. 27). */
-  window._dpAnkauf = null; window._dpAnkaufAuto = false;
+  window._dpAnkauf = null; window._dpAnkaufAuto = false; window._dpAnkaufRuhend = null;
   if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
     setTimeout(DealPilotWorkflow.renderProgressBar, 50);
   }
@@ -1216,7 +1226,7 @@ function _newObjLeeren() {
   /* v2164: der Ankauf-Stand gehoert zum OBJEKT. Ohne diese Zeile erbte ein
      neues Objekt den Stand des vorher geoeffneten (gemessen: 2026-1090
      "Unbenannt", offen, trug den Stand der Bismarckstr. 27). */
-  window._dpAnkauf = null; window._dpAnkaufAuto = false;
+  window._dpAnkauf = null; window._dpAnkaufAuto = false; window._dpAnkaufRuhend = null;
   // V58: Workflow-Bar zurücksetzen + Outputs nullen
   if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
     setTimeout(DealPilotWorkflow.renderProgressBar, 50);
