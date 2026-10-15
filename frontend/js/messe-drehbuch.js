@@ -1433,7 +1433,8 @@
     if (m === 'POST' && D.belege && /\/ai\/extract-beleg/.test(u)) return rhJ(JSON.parse(JSON.stringify(D.belege)));
     /* v2257 · BMF-Kaufpreisaufteilung (Modul 10b): einmal echt gerechnet, hier
        abgespielt. Mit Datei (PDF/XLSX) wird nichts gespielt - das sperrt RH_SPERRE. */
-    if (m === 'POST' && D.bmf && /\/bmf\/(aufteilung|pipeline)/.test(u) && !(body && (body.include_pdf || body.include_file))) {
+    /* v2273 · nur im BMF-Modul: der stille Vorlauf (bmf-modal.js, 6 s nach dem Laden) bekam in Modul 15 die Ravensberger-Antwort - jetzt gesperrt */
+    if (m === 'POST' && D.bmf && _aktiv === DREHBUECHER['reihe-bmf'] && /\/bmf\/(aufteilung|pipeline)/.test(u) && !(body && (body.include_pdf || body.include_file))) {
       return rhJ(JSON.parse(JSON.stringify(/pipeline/.test(u) ? D.bmf.pipeline : D.bmf.aufteilung)));
     }
     return null;
@@ -3418,7 +3419,7 @@
         var sw = z('Steuerwirkung p. a.'), ga = z('Gebäudeanteil (AfA-Basis)');
         await b2oZeile(s, 'Soll gegen Ist · Steuer', 'Steuerwirkung im Jahr: geplant <b>' + (sw ? eur(sw.ankauf) : '–') + '</b>, heute <b>' + (sw ? eur(sw.bestand) : '–') + '</b>.' + (ga ? ' Gebäudeanteil ' + de(ga.bestand, 2) + ' % und AfA-Satz bleiben, wie beim Kauf.' : ''));
         var nk = z('Nettokaltmiete'), cf = z('Cashflow n. Steuer');
-        if (nk && cf) await b2oZeile(s, 'Warum weniger Erstattung?', 'Nettokaltmiete <b>' + eur(nk.ankauf) + ' → ' + eur(nk.bestand) + '</b>: mehr Überschuss, weniger Erstattung. Unterm Strich: Cashflow nach Steuer <b>' + eur(cf.ankauf) + ' → ' + eur(cf.bestand) + '</b>.');
+        if (nk && cf) await b2oZeile(s, 'Warum weniger Erstattung?', 'Nettokaltmiete <b>' + eur(nk.ankauf) + ' → ' + eur(nk.bestand) + '</b> im Monat: mehr Überschuss, weniger Erstattung. Unterm Strich: Cashflow nach Steuer <b>' + eur(cf.ankauf) + ' → ' + eur(cf.bestand) + '</b> im Jahr.');
       },
       async function (s) {   /* 3 · das Steuerformular pro Jahr (Quick) */
         reiter('s3-tax'); await warte(1100);
@@ -3501,10 +3502,11 @@
         await warte(1200);
         if (!q('#s3-tax.active')) reiter('s3-tax');
         r15Modus(0); await warte(700);
-        await r6Ende(zb);
+        /* GEMESSEN (Prüflauf 15): der Knopf verschwindet mit dem Fenster - erst die Zeile zeigen, dann die Restzeit (Kegel 50 %) */
         var zl = function () { return r15Zeile(R15_JAHR); };
         r15Oben(zl()); await warte(400);
         await zeige(zl, 6);
+        await r6Ende(zb);
         var v = _r15Vor || [], n = r15Zellen(R15_JAHR);
         await b2oZeile(s, 'Das Jahr ' + R15_JAHR + ' danach', 'Bewirtschaftung <b>' + (n[4] || '–') + '</b> statt ' + (v[4] || '–') + ', Ergebnis ' + (n[6] || '–') + ' — Steuer-Effekt <b>' + (n[7] || '–') + '</b> statt ' + (v[7] || '–') + '.');
       },
@@ -3517,6 +3519,218 @@
     ]
   };
   var _r15Vor = null;
+
+  /* ═══ VIDEOREIHE · SPEZIALMODUL 16 · STUFE 3 GENAUER (v2273) ═════════════
+     Videoreihe.md, Teil C (= Ergänzung zu Modul 04). KOPIE der Bismarckstr. 27,
+     Detmold (MFH, 6 WE, Bj 1908 - Vierspänner, 9 Modernisierungspunkte,
+     Standardstufe 4 stehen schon im Objekt), ohne Analyse und Ankauf-Stand, beim
+     Aufräumen gelöscht. Im Lauf ANGENOMMEN (nur an der Kopie, im Untertitel so
+     gesagt): Hinterland 250 m² à 5 €, zwei Garagen 36 m² Stufe 4, Sanierung
+     25.000 € (boG). Mit genau diesen Angaben ist Marktbericht 215 EINMAL echt
+     erzeugt (DPM_REIHE_DATEN.bismarck) - hier abgespielt.
+     Der Marktbericht wird danach im Marktbericht-Fenster gezeigt: GET des
+     gespeicherten Berichts 215 (kein Abruf mit Kosten). Das Fenster ist ein
+     eigenes Dokument - r16MbSpion hängt sich an sein fetch, sperrt alles außer
+     GET und beantwortet die Adresssuche (externer Dienst) leer.
+     GEMESSEN: Bj 1908 liegt hinter dem Scheitel der Anlage 2 - die Punkte
+     bewegen die Restnutzungsdauer NICHT, und für Mehrfamilienhäuser in Lippe
+     führt der Ausschuss keinen Sachwertfaktor: der boG wirkt deshalb nicht im
+     vorläufigen Sachwert. Das Drehbuch sagt beides, statt es zu verschweigen. */
+  var R16_BISMARCK = 'c5278bb5-7012-4e1b-8372-7e5cef3500a1', R16_BERICHT = 215;
+  var _r16Iv = null;
+  function r16Frame() { return q('#mbv-frame'); }
+  function r16Doc() { var f = r16Frame(); try { return f && f.contentDocument; } catch (e) { return null; } }
+  function r16MbSpion() {
+    if (_r16Iv) return;
+    _r16Iv = setInterval(function () {
+      var f = r16Frame(); if (!f) return;
+      try {
+        var w = f.contentWindow, d = w.document;
+        if (!d || !/marktbericht-app/.test(d.URL) || w.__dpmMb) return;
+        var echt = w.fetch; w.__dpmMb = 1;
+        w.fetch = function (u, o) {
+          var m = String((o && o.method) || 'GET').toUpperCase(), p = String(typeof u === 'string' ? u : (u && u.url) || '').replace(location.origin, '').split('?')[0];
+          DPM_REIHE.abrufe.push('MB ' + m + ' ' + p);
+          if (/\/geocode\//.test(p)) { DPM_REIHE.gespielt.push('MB ' + m + ' ' + p); return Promise.resolve(new Response('{"results":[],"features":[]}', { status: 200, headers: { 'Content-Type': 'application/json' } })); }
+          if (m !== 'GET') { DPM_REIHE.gesperrt.push('MB ' + m + ' ' + p); return Promise.resolve(new Response('{"error":"Vorführung: Abruf gesperrt"}', { status: 503, headers: { 'Content-Type': 'application/json' } })); }
+          return echt.apply(this, arguments);
+        };
+      } catch (e) {}
+    }, 5);
+  }
+  function r16MbZu() {
+    if (_r16Iv) { clearInterval(_r16Iv); _r16Iv = null; }
+    try { if (window._mbLeiseSchliessen) window._mbLeiseSchliessen(); } catch (e) {}
+    try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
+  }
+  /* Marktbericht-Fenster öffnen und einen gespeicherten Bericht zeigen */
+  async function r16MbOeffnen(rid) {
+    r16MbSpion();
+    try { await window.openMarktberichtView(); } catch (e) {}
+    await warteAuf(function () { var f = r16Frame(); try { return f && f.contentWindow._mbOpenReport && f.contentDocument.readyState === 'complete'; } catch (e) { return false; } }, 12000);
+    await warte(900);
+    try { await r16Frame().contentWindow._mbOpenReport(rid, false); } catch (e) {}
+    await warteAuf(function () { var d = r16Doc(); return d && d.getElementById('wv-box'); }, 10000);
+    await warte(1200);
+  }
+  function r16Mb(sel) { var d = r16Doc(); return d ? d.querySelector(sel) : null; }
+  function r16Aufklappen(re) {
+    var d = r16Doc(); if (!d) return;
+    [].forEach.call(d.querySelectorAll('#wv-box .wv-mehr'), function (x) { if (re.test(x.textContent) && /▸/.test(x.textContent)) x.click(); });
+  }
+  /* ein Element im Marktbericht-Fenster mittig ins Bild (gescrollt wird .main-col) */
+  async function r16Hin(e, oben) {
+    if (!e) return; var s = scroller(e), r = rect(e);
+    if (s) s.scrollTop += oben ? r.top - 110 : (r.top + r.height / 2) - innerHeight / 2;
+    await warte(400);
+  }
+  function r16Leiste(re) { return [].filter.call(document.querySelectorAll('.oe-row'), function (r) { return r.offsetWidth && re.test(r6Text(r.querySelector('.oe-k'))); })[0] || null; }
+  function r16LeisteWert(re) { var r = r16Leiste(re); return r ? r6Text(r.querySelector('.oe-w')) : null; }
+  function r16Gewerk(id) { return function () { var e = document.getElementById(id); return e && e.closest('tr'); }; }
+  async function r16Setze(id, v) { var e = document.getElementById(id); if (!e) return; e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); await warte(500); }
+  DREHBUECHER['reihe-stufe3'] = {
+    titel: 'Stufe 3 genauer', unterzeile: 'Pflichtfelder, optionale Felder — und was sie bewegen', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { r16MbZu(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das Beispiel */
+        await r6KopieStart(R16_BISMARCK, { ohneAnkauf: true, ohneAnalyse: true });
+        if (_rh) _rh.satz = 'bismarck';
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        var we = wert('einheiten');
+        await b2oZeile(s, 'Das Beispiel', 'Ein Mehrfamilienhaus: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Wohnungen, ' : '') + de(zahl('wfl')) + ' m², Baujahr ' + wert('baujahr') + '. Heute: <b>Stufe 3</b>, die Wertermittlung nach ImmoWertV.');
+      },
+      async function (s) {   /* 2 · Stufe 3 wählen, Pflichtfelder */
+        await stufeWaehlen(3);
+        await zeige(stufeZeile(3), 8);
+        await b2oZeile(s, 'Stufe 3 · Ausgiebig', 'Sachwert und Ertragswert, gerechnet wie im Gutachten. Die Zeile sagt: <b>' + (fehlt(3).length ? fehlt(3).length + ' Angaben fehlen' : 'bereit') + '</b>.');
+        var nur3 = DealPilotObjektReiter.pflichtFuer(3).filter(function (id) { return DealPilotObjektReiter.pflichtFuer(2).indexOf(id) < 0 && !/^garagen_/.test(id); });
+        await zeigeGruppe(feldVon('gsfl'), feldVon('brw'), 8);
+        await b2oZeile(s, 'Nur ' + nur3.length + ' Pflichtfelder mehr', 'Zu Stufe 2 kommen nur: <b>' + feldNamen(nur3).join(', ') + '</b>. Grundstück und Bodenrichtwert ergeben den Bodenwert.');
+        await zeige(feldVon('bgf'), 10);
+        await b2oZeile(s, 'Warum nur die?', 'Die Bruttogrundfläche (' + de(zahl('bgf')) + ' m²) trägt den Sachwert, Miete und Baujahr den Ertragswert. Alles andere hat einen Ansatz der ImmoWertV — es <b>verfeinert</b> nur.');
+      },
+      async function (s) {   /* 3 · was DealPilot vorab aus dem Register liest */
+        var a = function () { return r16Leiste(/^Liegenschaftszins/); }, b = function () { return r16Leiste(/^GND \/ RND/); };
+        await warteAuf(b, 8000);
+        r15Oben(a()); await warte(400);
+        await zeigeGruppe(a, b, 6);
+        await b2oZeile(s, 'Vorab aus dem Register', 'Liegenschaftszins <b>' + (r16LeisteWert(/^Liegenschaftszins/) || '–') + '</b> vom Gutachterausschuss, Sachwertfaktor ' + (r16LeisteWert(/^Sachwertfaktor/) || '–') + ', Nutzungsdauer ' + (r16LeisteWert(/^GND \/ RND/) || '–') + ' — vorab, ohne Kosten.');
+      },
+      async function (s) {   /* 4 · Modernisierung -> Punkte -> Restnutzungsdauer */
+        var tab = function () { return q('#oe-gewerke'); };
+        r15Oben(tab()); await warte(400);
+        await zeigeGruppe(r16Gewerk('mod_aussenwand'), r16Gewerk('mod_grundriss'), 6);
+        await b2oZeile(s, 'Optional: Modernisierung', 'Die Spalte „modernisiert“ ergibt die Punkte der Anlage 2: hier <b>' + wert('mod_punkte') + ' von 20</b> — Dach, Fenster, Heizung, Bäder, Leitungen.');
+        await zeige(r16Gewerk('mod_aussenwand'), 6);
+        var zb = r6Beginn(s, 'Ein Feld mehr', 'Angenommen, die Fassade wäre vor drei Jahren gedämmt worden …');
+        var vor = wert('mod_punkte'), rndVor = r16LeisteWert(/^GND \/ RND/);
+        await warte(1600);
+        await r16Setze('mod_aussenwand', '< 5 Jahre');
+        await warte(1800);
+        await warteAuf(function () { return r16Leiste(/^GND \/ RND/); }, 6000);
+        await r6Ende(zb);
+        var nach = wert('mod_punkte'), rndNach = r16LeisteWert(/^GND \/ RND/), bewegt = rndVor && rndNach && rndVor !== rndNach;
+        var rr = function () { return r16Leiste(/^GND \/ RND/); };
+        await zeigeGruppe(rr, function () { return r16Leiste(/^Modernisierungspunkte/); }, 6);
+        /* die Leiste rechnet live (Register, ohne Kosten): bewegt sich die Restnutzungsdauer, steht es da - sonst der Grund */
+        if (bewegt) await b2oZeile(s, 'Was sich bewegt', 'Punkte <b>' + vor + ' → ' + nach + '</b>, Nutzungsdauer gesamt / rest <b>' + rndVor + ' → ' + rndNach + '</b>. Mehr Restnutzungsdauer heißt weniger Alterswertminderung.');
+        else {
+          await b2oZeile(s, 'Was sich bewegt', 'Punkte <b>' + vor + ' → ' + nach + '</b>. Nutzungsdauer gesamt / rest bleibt <b>' + (rndNach || '–') + '</b>: bei Baujahr ' + wert('baujahr') + ' ist das Haus älter als die Gesamtnutzungsdauer — die Anlage 2 greift hier nicht.');
+          await b2oZeile(s, 'Das sagt DealPilot dazu', 'Kein hochgerechneter Wert, sondern: „sachverständig zu würdigen“. Bei einem jüngeren Haus schiebt jeder Punkt die Restnutzungsdauer nach oben.');
+        }
+        await r16Setze('mod_aussenwand', 'Keine/Nie');
+        await warte(900);
+      },
+      async function (s) {   /* 5 · Standardstufe je Gewerk */
+        await zeigeGruppe(function () { var e = q('#ausst_dach'); return e && e.closest('tr'); }, function () { var e = q('#ausst_heizung'); return e && e.closest('tr'); }, 6);
+        await b2oZeile(s, 'Optional: Standardstufe je Gewerk', 'Dach <b>' + r6Pz(wert('ausst_dach')) + '</b>, Fenster ' + r6Pz(wert('ausst_fenster')) + ', Heizung ' + r6Pz(wert('ausst_heizung')) + ' — gestrichelt ist ein Vorschlag. Gewichtet nach Kostenanteil (rechte Spalte).');
+        await zeige(feldVon('standardstufe'), 10);
+        var sst = (function () { var e = q('#standardstufe'); return e && e.selectedIndex >= 0 ? r6Text(e.options[e.selectedIndex]) : wert('standardstufe'); })();
+        await b2oZeile(s, 'Daraus die Standardstufe', '<b>' + sst + '</b> — sie wählt die Normalherstellungskosten je m² Bruttogrundfläche. Jede halbe Stufe verschiebt den Sachwert.');
+      },
+      async function (s) {   /* 6 · Grundrissart */
+        await zeige(feldVon('grundriss'), 10);
+        var g = (function () { var e = q('#grundriss'); return e && e.selectedIndex > 0 ? r6Text(e.options[e.selectedIndex]) : null; })();
+        await b2oZeile(s, 'Optional: Grundrissart', (g ? '<b>' + g + '</b>' : 'Keine Angabe') + ' — vier Wohnungen je Treppenhaus bauen sich günstiger. Der Faktor geht direkt auf die Herstellungskosten.');
+      },
+      async function (s) {   /* 7 · Hinterland (angenommen) */
+        await zeigeGruppe(feldVon('hinterland_qm'), feldVon('hinterland_eur_qm'), 8);
+        var zb = r6Beginn(s, 'Optional: Hinterland', 'Angenommen: 250 m² Gartenland hinter dem Haus, außerhalb des Baulands.');
+        await tippeH('hinterland_qm', '250', 110);
+        await tippeH('hinterland_eur_qm', '5', 110);
+        await warte(800);
+        await r6Ende(zb);
+        await b2oZeile(s, 'Optional: Hinterland', 'Es kommt mit <b>' + wert('hinterland_eur_qm') + ' €/m²</b> zum Bodenwert — nicht zum Bodenrichtwert des Baulands. Ein Garten ist kein Bauplatz.');
+      },
+      async function (s) {   /* 8 · Garagen (angenommen) */
+        await zeige(feldVon('garagen'), 10);
+        var zb = r6Beginn(s, 'Optional: Garagen', 'Angenommen: zwei massive Garagen auf dem Grundstück, zusammen 36 m².');
+        await tippeH('garagen', '2', 120);
+        await warte(700);
+        await r6Ende(zb);
+        await zeigeGruppe(feldVon('garagen_bgf_qm'), feldVon('garagen_stufe'), 8);
+        var zb2 = r6Beginn(s, 'Optional: Garagen', 'Sobald es Garagen gibt, braucht die Rechnung ihre Fläche und Bauart.');
+        await tippeH('garagen_bgf_qm', '36', 110);
+        await tippeH('garagen_stufe', '4', 400);
+        await warte(700);
+        await r6Ende(zb2);
+        var gs = (function () { var e = q('#garagen_stufe'); return e && e.selectedIndex > 0 ? r6Text(e.options[e.selectedIndex]) : ''; })();
+        await b2oZeile(s, 'Optional: Garagen', '<b>' + wert('garagen_bgf_qm') + ' m², ' + gs + '</b> — Garagen haben in den Normalherstellungskosten eigene Sätze, getrennt vom Wohnhaus.');
+      },
+      async function (s) {   /* 9 · boG über die Sanierung (angenommen) */
+        reiter('s1'); await warte(900);
+        await zeige(r6Gruppe('san'), 10);
+        var zb = r6Beginn(s, 'Optional: Besonderheiten (boG)', 'Angenommen: an der Fassade stehen 25.000 € Reparaturen an.');
+        await tippeH('san', '25000', 100);
+        await warte(900);
+        await r6Ende(zb);
+        await b2oZeile(s, 'Optional: Besonderheiten (boG)', 'Im Bericht wird daraus ein <b>besonderes objektspezifisches Grundstücksmerkmal</b>: ' + eur(zahl('san')) + ' Abzug — nach der Marktanpassung.');
+        reiter('s0'); await warte(900);
+      },
+      async function (s) {   /* 10 · Abruf (Mitschnitt) */
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeige(stufeZeile(3), 8);
+        await b2oZeile(s, 'Jetzt abrufen', 'Alle Angaben sind drin. Ein Klick auf Stufe 3 — der Bericht entsteht in einer Minute.');
+        await rhStufeAbrufen(3, function () { s.zeile('Stufe 3 · Wertermittlung', 'Bodenwert, Liegenschaftszins, Sachwert — Schritt für Schritt.'); });
+        await warteAuf(function () { var w = q('#oe-vw-wahl'); return w && w.options.length >= 1; }, 8000);
+        await zeige(function () { return q('#oe-vw'); }, 10);
+        var opts = [].map.call((q('#oe-vw-wahl') || { options: [] }).options, function (o) { return r6Text(o); });
+        var sw = opts.filter(function (o) { return /^Sachwert/.test(o); })[0];
+        await b2oZeile(s, 'Das Ergebnis', (sw ? '<b>' + sw.replace(/\s*·\s*\d{2}\.\d{2}\.\d{4}\s*·\s*/, ': ') + '</b>' : 'Sachwert') + ' — dazu Vergleichswert und Marktwertindikation. Den Rechenweg zeigt der Marktbericht.');
+      },
+      async function (s) {   /* 11 · Bodenwert mit Hinterland (Marktbericht-Fenster) */
+        await r16MbOeffnen(R16_BERICHT);
+        r16Aufklappen(/Rechenweg/);
+        await warte(600);
+        var bw = function () { var t = r16Mb('#wv-box .wv-rw'); return t || r16Mb('#wv-box .wv-boden'); };
+        await r16Hin(r16Mb('#wv-box'), true);
+        await zeigeGruppe(function () { return r16Mb('#wv-box .wv-boden'); }, bw, 8);
+        var t = r6Inner(r16Mb('#wv-box')), g = /Grundstücksfläche × Bodenrichtwert\s*\n?\s*([^\n]+)\s*\n?\s*\t?([\d.]+ €)/.exec(t), h = /\+ Hinterlandfläche\s*\n?\s*([^\n]+)\s*\n?\s*\t?([\d.]+ €)/.exec(t), su = /Bodenwert\s*\t\s*([\d.]+ €)/.exec(t);
+        await b2oZeile(s, 'Bodenwert · Rechenweg', (g ? g[1].trim() + ' = ' + g[2] : '–') + (h ? ', <b>Hinterland ' + h[1].trim() + ' = ' + h[2] + '</b>' : '') + ' — zusammen <b>' + (su ? su[1] : '–') + '</b>.');
+      },
+      async function (s) {   /* 12 · Sachwert und was nicht wirkt */
+        var k = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return /^Sachwert/i.test(r6Text(x.querySelector('.wv-t'))); })[0]; };
+        await r16Hin(k(), false);
+        await zeige(k, 8);
+        /* alles aus dem gespielten Bericht gelesen (= Bericht 215 im Fenster), nichts angenommen */
+        var P = (window.DPM_REIHE_DATEN && _rh && DPM_REIHE_DATEN[_rh.satz] && DPM_REIHE_DATEN[_rh.satz].mb[3]) || {}, cc = P.cross_check || {}, sw = cc.sachwert || {}, no = (cc.notes || []).join(' ');
+        var kt = r6Text(k()), wv = /Sachwert\s*([\d.]+ €)/i.exec(kt), ohneSwf = /KEINE Marktanpassung/.test(no), bog = /objektspezifischen Grundstücksmerkmale \((-?[\d.]+ €)\) wirken im vorläufigen Sachwert nicht/.exec(no);
+        await b2oZeile(s, 'Sachwert', '<b>' + (wv ? wv[1] : '–') + '</b>: Bodenwert ' + (eur(sw.bodenwert_eur) || '–') + ' plus Gebäude ' + (eur(sw.gebaeude_sachwert_eur) || '–') + ' — Herstellungskosten neu, gemindert nach Restnutzungsdauer ' + (sw.restnutzungsdauer_jahre != null ? sw.restnutzungsdauer_jahre + ' von ' + (cc.restnutzungsdauer_herkunft && cc.restnutzungsdauer_herkunft.gnd_jahre || '–') + ' Jahren' : '–') + '.');
+        if (ohneSwf) await b2oZeile(s, 'Was deshalb nicht wirkt', 'Für diese Objektart führt der Ausschuss hier <b>keinen Sachwertfaktor</b> — also keine Marktanpassung.' + (bog ? ' Die ' + bog[1].replace('-', '') + ' Reparaturen würden erst danach abgezogen. DealPilot schreibt es dazu, statt einen Faktor zu erfinden.' : ''));
+        var e = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return /^Ertragswert/i.test(r6Text(x.querySelector('.wv-t'))); })[0]; };
+        await zeige(e, 8);
+        var ew = cc.ertragswert || {};
+        if (ew.available) await b2oZeile(s, 'Ertragswert', '<b>' + eur(ew.value_eur) + '</b> — Miete, Bewirtschaftung, Liegenschaftszins und Restnutzungsdauer.' + (bog ? ' Hier wirkt der Abzug für die Reparaturen.' : ''));
+        else await b2oZeile(s, 'Ertragswert', 'Hier steht ein Strich: für dieses Objekt war die Rechnung nicht vollständig, also gibt es keine Zahl. Wo die Quelle endet, endet die Rechnung.');
+      },
+      async function (s) {   /* 13 · je mehr, desto genauer */
+        await zeige(function () { return r16Mb('#wv-box'); }, 6);
+        await b2oZeile(s, 'Je mehr, desto genauer', 'Pflichtfelder reichen für eine Rechnung. Jede optionale Angabe ersetzt einen Pauschalansatz durch dein Objekt — und der Bericht sagt dir, wo er an Grenzen stößt.', 600);
+      }
+    ]
+  };
 
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0, _aktiv = null;
