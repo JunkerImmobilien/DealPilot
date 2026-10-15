@@ -38761,6 +38761,17 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2245–v2246 · Dynamischer Bauzins, Grundstücksformular (15.10.2026, Staging)
+- **Was:** Marcel: Zinsaufschlag „marktabhängig … wie im Bild dynamisch neu berechnet“, Finanzierungs-Tab und Landingpage 1:1.
+  - **Formel** (`backend/src/services/bauzinsService.js`): Bauzins(b, LTV) = Bund_b (täglich, Bundesbank BBSIS) + A (MFI-Effektivzins Wohnungsbau 5–10 J minus Ø Bund 10 J des letzten veröffentlichten Monats, ~6 Wochen Verzug) + K 0,27 (Angebotsniveau 80 %, kalibriert 15.10.) + Z(LTV) (60 % −0,20 · 70 −0,10 · 80 0 · 90 +0,22 · 100 +0,45 · 110+ +0,95, linear).
+  - **v2246:** EIN Aufschlag für alle Bindungen. Je Bindung eigene MFI-Reihen ergaben 5 J = 4,64 % (über 10 J) und 20 J < 15 J (Klasse 1–5 J mischt kurze teure Kredite, Klasse >10 J mischt 15/20 J).
+  - Migration 088 (`markt_zins_tag`, `markt_bauzins_monat`), Takt täglich 18:00 **Containerzeit = UTC** (20:00 deutsch), beim Start nur wenn älter 24 h. `/pfandbrief` liefert `indicativeRates` aus der Formel + `formel`/`verlauf`; `/bauzins?ltv=`; `/refresh` nur Admin.
+  - Finanzierungs-Tab: Kacheln „Bundesanleihe x + Marktaufschlag y (Stand Monat)“, Knöpfe LTV 60/80/90 %, Hinweis am Zinsfeld `#d1z` mit „übernehmen“ (überschreibt nie selbst). Landing (`dp2-inhalt.js`, `landing/index.html`) gleiche Zahlen, Text „80 % Beleihung“ statt „über 90 %“. Vergleichsportal-Namen aus `index.html`/`config.js compareLinks` entfernt.
+  - **v2245 Grundstück:** `pflichtFuer` für GRST = Lage + `gsfl` (+ `kp`, `brw` ab Stufe 2); `objektart-felder.js` blendet `wfl`/`baujahr` bei GRST aus.
+- **Commit:** `82318889` (v2245 GRST), `35d5be43` + Merge `65ee0139` (Bauzins, v2246)
+- **Nachweis:** Migration 88 angewandt, erster Abruf 1.280 Tageszeilen + 52 Monatszeilen in 0,5 s. Live: 4,06 / 4,34 / 4,53 / 4,63 % (80 %), 10 J bei LTV 95 % 4,67 %. App-Kacheln und Landing zeigen dieselben vier Zahlen und Unterzeilen. Wochenverlauf W41 Modell 4,36 % gegen Vergleichsbild 4,35 %. `tools/bauzins-pruefen.mjs` SAUBER. GRST: wfl/baujahr aus, gsfl „wichtig“; EFH/ETW unverändert.
+- **Rest:** Grafik „Aufschlag über die Wochen“ ist nicht gebaut (Daten in `verlauf`; Aufschlag springt nur monatlich). K gelegentlich nachkalibrieren. Hinweis am Zinsfeld im Browser an einem Objekt abnehmen. Prod-Rollout v2239–v2246 offen (Rebuild backend + mb-backend, Migration 088).
+
 ### v2241/v2244 · Marktbewertung: Gewerbe, Grundstück, Sanierung, Modernisierungspunkte (15.10.2026, Staging)
 - **Was:** Marcel: „können wir das so machen, dass das auch richtig funktioniert?“ (Agent im Worktree, Merge `726aa0ff`).
   - Gewerbe trägt die Unterart (`gewerbe_art`), Vergleichswert nur aus Gewerbe-Angeboten derselben Klasse (sonst entfällt), Ertragswert mit Ist- oder Marktmiete, Anlage 3 je Nutzung, GND Anlage 1, nur Gewerbe-LZS aus dem Register (sonst entfällt). Mapper: „Bürohaus“/„Lagerhalle“ nicht mehr als Haus, „Wohn- und Geschäftshaus“ als MFH.
