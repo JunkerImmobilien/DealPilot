@@ -5,6 +5,7 @@
 //                  Entwicklung/Wertsteigerung/Mietausfall + Marktmiete/Marktfaktor)
 //   - dealpilot:   vorhandener DealScore + (geparste) KI-Investmentanalyse
 // So fliessen die in DealPilot bereits erfassten Einschaetzungen direkt in den Bericht.
+import { gewerbeArt } from '../lib/marktsegment.js';   /* v2241 */
 
 function dataOf(obj) {
   if (obj && typeof obj === 'object' && obj.data && typeof obj.data === 'object') return obj.data;
@@ -98,14 +99,67 @@ function num(v) {
  * Garagen sind ein eigener Fall: sie sind kein Bewertungsobjekt für
  * diesen Bericht, sondern Zubehör.
  */
+/* ── v2241 · DIE REIHENFOLGE ENTSCHIED UEBER DIE OBJEKTART ───────────────
+ *
+ * `haus` stand VOR `gewerbe`. Jede Bezeichnung, die auf -haus endet, war
+ * damit ein Wohnhaus: „Bürohaus", „Geschäftshaus", „Ärztehaus" — und über
+ * das `rh` im Muster sogar „Lagerhalle" (lage-RH-alle). Gemessen am
+ * 15.10.2026: ein Bürohaus mit 500 m² bekam die Wohn-NHK und einen
+ * Sachwert von 727.000 €.
+ *
+ * Jetzt: Wohnung und MFH zuerst (ein „Wohn- und Geschäftshaus" ist ein
+ * MFH mit Gewerbeeinheiten — v2210 trennt dort Wohnen und Gewerbe),
+ * dann Gewerbe, dann Haus. Die Gewerbeart reist getrennt mit
+ * (`gewerbeArtAus`), damit der Bericht Buero nicht wie Halle misst.
+ */
 function mapPropertyType(raw) {
   const s = String(raw || '').toLowerCase();
   if (/etw|wohnung|eigentumswohnung/.test(s)) return 'wohnung';
-  if (/mfh|mehrfamilien/.test(s)) return 'mfh';
-  if (/efh|dhh|rh|zfh|haus|einfamilien|doppelhaus|reihenhaus/.test(s)) return 'haus';
+  if (/mfh|mehrfamilien|wohn.*gesch(ae|ä)?ft|^wgh$/.test(s)) return 'mfh';
+  if (/^grst$|grundst(ue|ü)ck|bauland|unbebaut/.test(s)) return 'grundstueck';   /* v2241 */
   if (/^gar$|garage|stellplatz/.test(s)) return 'garage';
-  if (/buero|büro|gesch|hotel|gew|laden|handel|praxis/.test(s)) return 'gewerbe';
+  if (/buero|büro|gesch|hotel|gew|laden|handel|praxis|gastro|halle|lager|industrie/.test(s)) return 'gewerbe';
+  if (/efh|dhh|rh|zfh|haus|einfamilien|doppelhaus|reihenhaus/.test(s)) return 'haus';
   return null;
+}
+function gewerbeArtAus(raw) {
+  return mapPropertyType(raw) === 'gewerbe' ? gewerbeArt(raw) : null;
+}
+
+/* ── v2241 · SANIERUNGSKOSTEN ALS BESONDERES OBJEKTSPEZIFISCHES MERKMAL ──
+ *
+ * `san` (Reiter Investition, „Sanierungskosten") kam im Marktbericht nie
+ * an. Der Zustand wirkte nur im Vergleichswert, und dort gedeckelt
+ * (Objektzuschlag ≥ 0,82) — ein Haus mit 60.000 € Instandsetzungsbedarf
+ * stand im Sach- und Ertragswert wie ein gepflegtes.
+ *
+ * § 8 Abs. 3 ImmoWertV: ein Bauschaden oder Instandsetzungsstau ist ein
+ * besonderes objektspezifisches Grundstücksmerkmal und wird NACH der
+ * Marktanpassung berücksichtigt. Das Feldpaar dafür gibt es seit v1338
+ * (`bom_eur`/`bom_grund`, beide Verfahren) — es hatte auf dem
+ * Objektweg nur keinen Lieferanten.
+ *
+ * Eine ausdrückliche bOM-Angabe gewinnt; `san` füllt nur, was leer ist.
+ * Angesetzt wird der Betrag, wie er im Objekt steht (brutto oder netto,
+ * das steht im Grund). Kosten sind nicht zwingend gleich der
+ * Wertminderung — der Grund sagt deshalb, dass es eine Kostenangabe ist. */
+function bomAus(d) {
+  const eigen = Number.isFinite(Number(d.bom_eur)) && d.bom_eur !== '' && d.bom_eur != null
+    ? Number(d.bom_eur) : null;
+  if (eigen != null) {
+    return { bom_eur: eigen, bom_grund: pick(d, ['bom_grund']) || null, bom_quelle: 'eigene_angabe' };
+  }
+  const san = num(pick(d, ['san', 'sanierungskosten']));
+  if (!(san > 0)) return { bom_eur: null, bom_grund: null, bom_quelle: null };
+  const ust = String(pick(d, ['san_ust']) || '').toLowerCase();
+  const art = ust === 'netto' ? 'netto' : (ust === 'brutto' ? 'brutto' : null);
+  return {
+    bom_eur: -Math.round(san),
+    bom_grund: 'Sanierungs-/Instandsetzungskosten laut Objekt'
+      + (art ? ' (' + art + ')' : '')
+      + ' — Kostenansatz, kein sachverständig ermittelter Wertabschlag',
+    bom_quelle: 'sanierungskosten',
+  };
 }
 function buildAddress(d) {
   const str = pick(d, ['str', 'strasse', 'straße']);
@@ -193,10 +247,19 @@ function gewerbeAus(d) {
   if (!gew.length) return null;
   const out = { n_gewerbe: gew.length, n_wohnen: liste.length - gew.length,
     wfl_wohnen: 0, wfl_gewerbe: 0, flaechen: {}, ist_jahr: 0, markt_jahr: 0,
-    markt_vollstaendig: true, leer_ohne_markt: 0, ohne_nutzung_qm: 0 };
+    markt_vollstaendig: true, leer_ohne_markt: 0, ohne_nutzung_qm: 0,
+    /* v2241 · Ist-Miete des Wohnteils — nur fuer Objekte, die als GEWERBE
+       erfasst sind (Geschaeftshaus mit Wohnungen). Dort gibt es keine
+       Wohn-Angebotsmiete im Abruf; ein MFH rechnet weiter wie bisher. */
+    wohnen_ist_jahr: 0, wohnen_leer: 0 };
   liste.forEach((e) => {
     const fl = num(e.wfl) || 0;
-    if (String(e.art || '') !== 'gewerbe') { out.wfl_wohnen += fl; return; }
+    if (String(e.art || '') !== 'gewerbe') {
+      out.wfl_wohnen += fl;
+      if (String(e.status || '') === 'leer' || !(num(e.ist) > 0)) out.wohnen_leer++;
+      else out.wohnen_ist_jahr += num(e.ist) * 12;
+      return;
+    }
     out.wfl_gewerbe += fl;
     const n = e.nutzung_gew || '';
     if (n) out.flaechen[n] = (out.flaechen[n] || 0) + fl; else out.ohne_nutzung_qm += fl;
@@ -207,6 +270,7 @@ function gewerbeAus(d) {
     else { out.markt_vollstaendig = false; if (leer) out.leer_ohne_markt++; }
   });
   out.ist_jahr = Math.round(out.ist_jahr);
+  out.wohnen_ist_jahr = Math.round(out.wohnen_ist_jahr);
   out.markt_jahr = out.markt_vollstaendig ? Math.round(out.markt_jahr) : null;
   return out;
 }
@@ -215,9 +279,16 @@ export const DealPilotObjectMapper = {
   reportInput(obj) {
     const d = dataOf(obj);
     const wfl = num(pick(d, ['wfl', 'wohnflaeche', 'wohnfläche']));
+    const _bom = bomAus(d);   /* v2241 */
     return {
       address: buildAddress(d),
       property_type: mapPropertyType(pick(d, ['objart', 'objektart'])),
+      /* v2241 · Die Unterart (buero, gesch, hotel, gew, laden, praxis …).
+         Ohne sie misst der Bericht ein Buero am Wohnungsmarkt. */
+      gewerbe_art: gewerbeArtAus(pick(d, ['objart', 'objektart'])),
+      /* Nur wenn es einen Betrag gibt: der Orchestrator liest
+         `Number.isFinite(Number(input.bom_eur))`, und Number(null) ist 0. */
+      ...(_bom.bom_eur != null ? { bom_eur: _bom.bom_eur, bom_grund: _bom.bom_grund, bom_quelle: _bom.bom_quelle } : {}),
       living_area: wfl,
       rooms: num(pick(d, ['zimmer'])),
       build_year: num(pick(d, ['baujahr'])),
@@ -227,7 +298,13 @@ export const DealPilotObjectMapper = {
          ohne sie am Durchschnitt. Der Sprechlauf fragt sie beim MFH jetzt ab. */
       units: num(pick(d, ['einheiten', 'units'])),
       gewerbe: gewerbeAus(d),   /* v2210 */
-      condition: pick(d, ['ds2_zustand', 'zustand']) || 'gepflegt',
+      /* v2241 · Hier stand `|| 'gepflegt'`. Ein Objekt OHNE Zustandsangabe
+         (der Quick-Check fuehrt gar kein Feld dafuer) wurde damit als
+         gepflegt bewertet UND zaehlte in der Aussagekraft als „Zustand
+         angegeben". Der Faktor bleibt ohne Angabe 1,0 (ValuationService,
+         Vorgabe der Nachschlagetabelle) — nur die Aussagekraft sagt jetzt
+         ehrlich, dass er fehlt. */
+      condition: pick(d, ['ds2_zustand', 'zustand']) || null,
       /* v1444: ValuationService liest ref.quality - hier kam die Ausstattung nur als
          `ausstattung` an, der Qualitaetsfaktor griff auf dem Objektweg nie. */
       quality: qualityAus(d),   /* v1851: aus `ausst` ODER aus der Standardstufe */

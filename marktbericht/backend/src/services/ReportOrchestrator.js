@@ -43,6 +43,7 @@ import { ableiten as ausstAbleiten, zusammenfuehren as ausstMerge }
   from '../lib/ausstattung_stufen.js';   /* v1345 */
 import { finde as findeKennzahl } from '../lib/ausschuss_register.js';   /* v1320b */
 import { MarktkontextService } from './MarktkontextService.js';   /* v1321 */
+import { objektartNormal, gewerbeArt, zinsObjektart, istGrundstueck } from '../lib/marktsegment.js';   /* v2241 */
 
 export const ReportOrchestrator = {
   async generate(input, opts = {}) {
@@ -89,10 +90,19 @@ export const ReportOrchestrator = {
       throw err;
     }
 
+    /* v2241 · EINE Normalisierung fuer Gewerbe, Garage und Grundstueck.
+       Die Marktbericht-App schickt den App-Code (BUERO, GAR), der
+       DealPilotObjectMapper schon den internen Schluessel (gewerbe +
+       gewerbe_art). Bis hier kamen beide Formen unterschiedlich weit:
+       'BUERO' fand den Gewerbe-Kontext, aber nicht den Gewerbe-Sachwert-
+       Ausschluss (der fragt `=== 'gewerbe'`); 'gewerbe' umgekehrt.
+       Wohnarten bleiben unveraendert stehen. */
+    const _oa = objektartNormal(input.property_type || null);
     const ref = {
       address: input.address,
       lat, lon,
-      property_type: input.property_type || null,
+      property_type: _oa.property_type || null,
+      gewerbe_art: gewerbeArt(input.gewerbe_art) || _oa.gewerbe_art || null,
       usage_type: input.usage_type || null,
       living_area: input.living_area ? Number(input.living_area) : null,
       rooms: input.rooms ? Number(input.rooms) : null,
@@ -206,6 +216,14 @@ export const ReportOrchestrator = {
       sonstige_dauer_jahre: input.sonstige_dauer_jahre ? Number(input.sonstige_dauer_jahre) : null,
       mod_punkte: input.mod_punkte != null && input.mod_punkte !== ''
         ? Number(input.mod_punkte) : null,
+      /* v2241 · `mod_angaben` zaehlt der DealPilotObjectMapper seit v1973 —
+         und hier fiel es weg (die ref-Liste ist ausdruecklich). Ohne es
+         liest lib/rnd-einheitlich.js JEDE Null als „keine Angabe", auch
+         die aus acht Antworten „Keine/Nie". Gemessen am 15.10.2026: im
+         ganzen Dienst las nur rnd-einheitlich.js das Feld, gesetzt hat es
+         auf dem Weg dorthin niemand. */
+      mod_angaben: input.mod_angaben != null && input.mod_angaben !== ''
+        && Number.isFinite(Number(input.mod_angaben)) ? Number(input.mod_angaben) : null,
       bgf: input.bgf ? Number(input.bgf) : null,
       regionalfaktor: input.regionalfaktor ? Number(input.regionalfaktor) : null,
       sachwertfaktor: input.sachwertfaktor ? Number(input.sachwertfaktor) : null,
@@ -217,6 +235,10 @@ export const ReportOrchestrator = {
          0 ist eine Aussage. */
       bom_eur: Number.isFinite(Number(input.bom_eur)) ? Number(input.bom_eur) : null,
       bom_grund: input.bom_grund || null,
+      /* v2241 · woher der bOM-Betrag stammt ('sanierungskosten' aus dem
+         Objekt oder 'eigene_angabe'). ValuationService entscheidet daran,
+         ob der Zustandsabschlag entfaellt (kein Doppelabzug). */
+      bom_quelle: input.bom_quelle || (Number.isFinite(Number(input.bom_eur)) && input.bom_eur != null ? 'eigene_angabe' : null),
       bom_worst_eur: Number.isFinite(Number(input.bom_worst_eur)) ? Number(input.bom_worst_eur) : null,
       rnd_verkuerzt: input.rnd_verkuerzt === true || input.rnd_verkuerzt === 'ja',
 
@@ -779,7 +801,11 @@ export const ReportOrchestrator = {
         brwSqm: landValue && landValue.available ? landValue.value_sqm : null,
         nutzerwert: ref.lzs_pct || null,
         objekt: {
-          objart: ref.property_type,
+          /* v2241 · Fuer Gewerbe die Art, nach der die Ausschuesse
+             staffeln (buero, handel, hotel, gewerbe). Mit dem blossen
+             `gewerbe` griff nur der allgemeine Gewerbezweig, und `gesch`
+             las die Zweigwahl als Wohn- und Geschaeftshaus bis zum MFH. */
+          objart: (ref.gewerbe_art && zinsObjektart(ref.gewerbe_art)) || ref.property_type,
           /* v1816 · Marcels Entscheidung: eine Eigentumswohnung ist
              standardmäßig VERMIETET — „Ist ja ein Kapitalrechner." Nur
              wenn der Nutzer ausdrücklich Eigennutzung angibt, gilt der
@@ -1202,6 +1228,22 @@ export const ReportOrchestrator = {
     }
 
     let crossCheck = CrossCheckService.compute(ref, landValue, rent, valuation, _wertParams);
+
+    /* v2241 · UNBEBAUTES GRUNDSTUECK: der Wert IST der Bodenwert.
+       Er kommt aus demselben Kern wie in Ertrags- und Sachwert
+       (ErtragswertService.bodenwert: Flaeche x Bodenrichtwert, Anpassung,
+       Erschliessungsbeitrag) — hier wird nichts neu gerechnet, nur als
+       Ergebnis ausgewiesen. Er steht in `valuation`, weil die Karte auf
+       jeder Stufe dort liest; auf Stufe 1 und 2 ist er die
+       Marktpreisindikation, und der Rechenweg ist eine Zeile lang. */
+    if (istGrundstueck(ref.property_type)) {
+      try {
+        ValuationService.grundstueck(valuation, (_wertParams && _wertParams.bodenwert) || null, landValue, ref);
+        step('grundstueck: ' + (valuation.market_value && valuation.market_value.estimated != null
+          ? 'Bodenwert ' + valuation.market_value.estimated + ' EUR' : 'kein Bodenwert ('
+            + ((valuation.vergleichswert_gesperrt && valuation.vergleichswert_gesperrt.grund) || '?') + ')'));
+      } catch (e) { step('grundstueck: fehler ' + String(e.message).slice(0, 60)); }
+    }
 
     /* v1141b · Der Bodenwert-Rechenweg blieb im Backend liegen.
      * `ErtragswertService.bodenwert()` protokolliert jeden Schritt in

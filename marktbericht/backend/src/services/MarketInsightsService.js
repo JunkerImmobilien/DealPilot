@@ -8,7 +8,7 @@
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { cfg, geomapEnabled } from '../lib/config.js';
 import { cacheGet, cacheSet } from '../lib/cache.js';
-import { segment } from '../lib/marktsegment.js';   /* v1314 */
+import { segment, istGewerbe, istGrundstueck } from '../lib/marktsegment.js';   /* v1314, v2241 */
 
 // Historie/Trends aendern sich kaum -> lang cachen (Default 7 Tage), spart die ~10 Calls.
 const INSIGHTS_CACHE_TTL_MS = (parseInt(process.env.INSIGHTS_CACHE_TTL_MIN, 10) || 10080) * 60 * 1000;
@@ -33,6 +33,12 @@ export const MarketInsightsService = {
   // ref:{lat,lon,property_type}, micro:{score}. Gibt {assessment, series, dynamics} | null.
   async derive(ref, micro) {
     if (!geomapEnabled()) return null;
+    /* v2241 · Preis- und Miethistorie, Markttempo und Wertentwicklung
+       werden hier am WOHNmarkt gemessen (segment() kennt keine
+       Gewerbekategorie, timeSeries() keinen Kategorie-Parameter). Fuer
+       Gewerbe und unbebaute Grundstuecke waeren das Aussagen ueber einen
+       anderen Markt — dann lieber keine. */
+    if (istGewerbe(ref.property_type) || ref.gewerbe_art || istGrundstueck(ref.property_type)) return null;
     /* v1314: zwei Segmente statt einem - Kauf und Miete sind beim MFH
        verschiedene Maerkte. */
     const segKauf  = segment(ref.property_type, 'Kauf');

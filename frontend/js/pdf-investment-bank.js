@@ -149,7 +149,7 @@
 
   var OBJART = { ETW: 'Eigentumswohnung', EFH: 'Einfamilienhaus', ZFH: 'Zweifamilienhaus', MFH: 'Mehrfamilienhaus',
     DHH: 'Doppelhaushälfte', RH: 'Reihenhaus', BUERO: 'Bürogebäude', GESCH: 'Geschäftshaus', HOTEL: 'Hotel',
-    GEW: 'Gewerbe', GAR: 'Garage / Stellplatz' };
+    GEW: 'Gewerbe', GAR: 'Garage / Stellplatz', GRST: 'Unbebautes Grundstück' /* v2241 */ };
 
   /* Objektfotos: Groesse muss bekannt sein, sonst verzerrt addImage.
      Deshalb laedt diese Funktion sie vorher - der Export ist async. */

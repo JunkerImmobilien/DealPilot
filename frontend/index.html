@@ -1088,7 +1088,7 @@ label.dp-required.qc-required::after {
       <div class="f"><label class="dp-required" data-v236-required-set="1">Straße</label><input id="str" type="text" placeholder="z.B. Musterstraße" oninput="calc()" autocomplete="off" data-form-type="other"></div>
       <div class="f"><label>Hausnummer</label><input id="hnr" type="text" placeholder="z.B. 12" autocomplete="off" data-form-type="other"></div>
       <div class="f"><label>Objektart</label><select id="objart"><!-- v1315c: Bis zum 11.09.2026 gab es KEINE leere Option - ETW war damit an jedem leeren Objekt vorausgewaehlt, ohne dass es jemand gesagt hatte. Seit v1314 waehlt die Objektart auch das Marktsegment bei GeoMap: eine stillschweigende ETW-Annahme misst ein Haus am Wohnungsmarkt. --><option value="">&#8211; bitte w&auml;hlen &#8211;</option><option value="ETW">Eigentumswohnung (ETW)</option><option value="EFH">Einfamilienhaus (EFH)</option>
-              <option value="ZFH">Zweifamilienhaus (ZFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option></select></div>
+              <option value="ZFH">Zweifamilienhaus (ZFH)</option><option value="MFH">Mehrfamilienhaus (MFH)</option><option value="DHH">Doppelhaushälfte (DHH)</option><option value="RH">Reihenhaus (RH)</option><option value="BUERO">Bürogebäude</option><option value="GESCH">Geschäftshaus</option><option value="HOTEL">Hotel</option><option value="GEW">Gewerbe-/Industriegebäude</option><option value="GAR">Garage / Stellplatz</option><option value="GRST">Unbebautes Grundstück</option></select></div><!-- v2241: GRST - Marktbericht bewertet ueber den Bodenwert (BRW x Grundstuecksflaeche) -->
       <div class="f"><label>Nutzungsart</label><select id="nutzungsart"><option value="kapitalanlage" selected>Vermietet (Kapitalanlage)</option><option value="eigennutzung">Selbst genutzt</option></select></div>
       <div class="f"><label class="dp-required" data-v236-required-set="1">Wohnfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wfl" tabindex="-1" aria-label="Hilfe zu tab1.wfl"></button></label><div class="iw"><input id="wfl" type="text" inputmode="decimal" placeholder="96" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
       <div class="f" data-v362-stammdaten><label>Zimmer</label><input id="zimmer" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
@@ -3555,7 +3555,7 @@ label.dp-required.qc-required::after {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="js/pdf-logo.js?v=v1634b"></script><!-- v1634 · muss VOR den PDF-Bausteinen stehen: waermt das Logo vor -->
 <script src="js/pdf-anlage-bmf.js?v=v1634c"></script>
-<script src="js/pdf-investment-bank.js?v=v2180"></script>
+<script src="js/pdf-investment-bank.js?v=v2241"></script>
 <script src="js/bmf-modal.js?v=v2180"></script>
 <script src="js/bmf-modal-v292.js?v=v2213"></script>
 <script src="js/bmf-bodenabschlag.js?v=v2180"></script>
@@ -3668,7 +3668,7 @@ label.dp-required.qc-required::after {
 <script src="js/qc-bridge.js?v=v2238a"></script>
 <script src="js/bodenrichtwert.js?v=v1999"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
-<script src="js/objektart-felder.js?v=v1840"></script>
+<script src="js/objektart-felder.js?v=v2241"></script>
 <script src="js/objekt-reiter.js?v=v2191"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
@@ -3709,7 +3709,7 @@ label.dp-required.qc-required::after {
 <!-- v2060: breite Tabellen werden auf dem Handy zu Karten (zentral, alle Ansichten) -->
 <script src="js/tabellen-karten.js?v=v2060c"></script>
 <script src="js/portfolio-export.js?v=v2180"></script>
-<script src="js/deal-action.js?v=v2180"></script>
+<script src="js/deal-action.js?v=v2241"></script>
 <script src="js/gutachten-org.js?v=v1448b"></script>
 <script src="js/afa-eigen.js?v=v1871"></script>
 <script src="js/deal-action-readycheck.js?v=v2080"></script>
@@ -3724,7 +3724,7 @@ label.dp-required.qc-required::after {
 <script src="js/avm-section.js?v=v2149"></script>
 <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte, klickbar = übernehmen -->
 <script src="js/marktwert-abschlag.js?v=v2237d"></script><!-- v2237 · Abschlag auf Angebotspreise -->
-<script src="js/dealpilot-mb.js?v=v2237"></script>
+<script src="js/dealpilot-mb.js?v=v2241"></script>
 <script src="js/mb-auftrag.js?v=v2191"></script>
   <script src="js/marktbericht-view.js?v=v2218b"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->

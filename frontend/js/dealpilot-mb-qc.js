@@ -155,7 +155,12 @@ if (!window._wlc) {
     var el = $('obj-id') || $('object-id'); if (el && el.value) return String(el.value);
     return null;
   }
-  function inputs() { return { plz: vIn('qc_plz'), ort: vIn('qc_ort'), str: vIn('qc_str'), hnr: vIn('qc_hnr'), objektart: vIn('qc_objektart'), wfl: numDe(vIn('qc_wfl')), baujahr: numDe(vIn('qc_baujahr')), kp: numDe(vIn('qc_kp')) }; }
+  /* v2241 · Das Baujahrfeld heisst `qc_bj` (quickcheck-app.html:3505) —
+     hier stand `qc_baujahr`, das es nicht gibt. Das Baujahr kam deshalb
+     nie in der Marktbewertung an. Einen Zustand fuehrt der Quick-Check
+     nicht; seit v2241 nimmt der Bericht dafuer auch nicht mehr still
+     „gepflegt" an (DealPilotObjectMapper), sondern weist ihn als fehlend aus. */
+  function inputs() { return { plz: vIn('qc_plz'), ort: vIn('qc_ort'), str: vIn('qc_str'), hnr: vIn('qc_hnr'), objektart: vIn('qc_objektart'), wfl: numDe(vIn('qc_wfl')), baujahr: numDe(vIn('qc_bj') || vIn('qc_baujahr')), kp: numDe(vIn('qc_kp')) }; }
 
   function mapCard(d) {
     d = d || {};

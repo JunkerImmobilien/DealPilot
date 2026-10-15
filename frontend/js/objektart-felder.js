@@ -63,6 +63,9 @@
     HOTEL: { passt: ['etagen_ges', 'einheiten'], pflicht: [] },
     GEW:   { passt: ['etagen_ges'], pflicht: [] },
     GAR:   { passt: [], pflicht: [] },
+    /* v2241 · Unbebautes Grundstueck: kein Gebaeude, keine Einheit. Der
+       Marktbericht rechnet Bodenrichtwert x Grundstuecksflaeche (gsfl). */
+    GRST:  { passt: [], pflicht: [] },
   };
 
   /* Alle Felder, die diese Steuerung ueberhaupt anfasst. Was hier nicht
