@@ -1370,10 +1370,13 @@
   var RH_BUSTER = 'v2268';   /* v2268: BMF-Mitschnitt neu (1.233.000) */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
-  var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel/i;
+  var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage/i;
   /* v2263 · dazu Netzwerk-Einreichung, Partner-Anfrage, Ämter-Anfragen (Modul 13) und
      der Portfolio-Spiegel: eine gewonnene KOPIE (Modul 14) ginge sonst als zweites
      Objekt in die Zahlen des Telegram-Bots (gemessen: 12 statt 11 Objekte). */
+  /* v2271 · dazu der Nutzungszaehler: das Investment-PDF in Ueberblick 2 zaehlte je
+     Lauf einen PDF-Export im Konto (usage_counters pdf_export, gemessen 11 -> 12).
+     Gesperrt rechnet der Export weiter (pdf.js warnt nur). */
   window.DPM_REIHE = { angelegt: [], gesperrt: [], gespielt: [], geloescht: [], abrufe: [], fertig: null };
   var _rh = null, _rhNachlauf = 0, _rhToene = [], _rhGum = null;
   function rhLaden() {
