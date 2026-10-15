@@ -142,7 +142,24 @@
       baujahr:    parseInt(_v('bmf_bj'), 10) || parseInt(_v('baujahr'), 10) || 0,
       gsfl:       _parseDe(_v('bmf_gsfl')) || _parseDe(_v('gsfl')),
       brw:        _parseDe(_v('bmf_brw')) || _parseDe(_v('brw')),
-      mea:        _parseDe(_v('bmf_mea')) || _parseDe(_v('mea'))
+      mea:        _parseDe(_v('bmf_mea')) || _parseDe(_v('mea')),
+      /* v2260 · DIE MODERNISIERUNG FEHLTE IN DER PIPELINE. Der amtliche Lauf
+         (bmf-modal.js runBmf -> /bmf/aufteilung) schickt die acht Elemente
+         der Arbeitshilfe mit, die Pipeline nicht - die Arbeitshilfe rechnete
+         dort ohne Modernisierung: fiktives Baujahr 1978 statt 1979, Ertragswert
+         1.257.553 statt 1.269.575 EUR, Gebaeudeanteil 74,57 statt 74,82 %.
+         Gemessen am 15.10.2026, Ravensberger Weg 38 (Heizung ja, Fenster
+         teilweise), am echten Rechenkern nachgestellt: ohne die Angaben 74,57,
+         mit ihnen 74,82 - der Kaufpreis aendert den Anteil nicht. Dieselben
+         Felder wie runBmf, damit beide Laeufe dieselbe Zahl liefern. */
+      mod_dach:           _v('bmf_mod_dach')    || 'nein',
+      mod_fenster:        _v('bmf_mod_fenster') || 'nein',
+      mod_leitungen:      _v('mod_leit')  || 'nein',
+      mod_heizung:        _v('mod_heiz')  || 'nein',
+      mod_waermedaemmung: _v('mod_daemm') || 'nein',
+      mod_baeder:         _v('mod_bad')   || 'nein',
+      mod_innenausbau:    _v('mod_innen') || 'nein',
+      mod_grundriss:      _v('mod_grdr')  || 'nein'
     };
 
     // Miete (Tab Miete)
@@ -651,6 +668,16 @@
     var g15bar = document.getElementById('g15_bar');
     var g15geplant = document.getElementById('g15_geplant');
 
+    /* v2260 · Die 15-%-Grenze zeichnet EINE Funktion (bmf-modal.js
+       updateG15 -> _bmfG15): Schwelle aus phase8 der gewaehlten Variante,
+       Sanierung NETTO. phase9.geplant ist der Bruttobetrag - hier stand er
+       gegen eine Netto-Grenze, und bmf-modal.js ueberschrieb den Block danach
+       mit einer zweiten, falschen Rechnung. Der alte Weg bleibt Rueckfall. */
+    if (typeof window.__updateG15 === 'function' && typeof window._bmfG15 === 'function') {
+      try { window.__updateG15(); p9 = null; } catch (e) { console.warn('[v2260] updateG15:', e.message); }
+    }
+    if (!p9) { /* gezeichnet */ }
+    else {
     if (g15max)    g15max.textContent = _fmtEur(p9.max);
     if (g15basis)  g15basis.textContent = _fmtEur(p8.gebaeude_ak);
     if (g15puffer) g15puffer.textContent = _fmtEur(p9.puffer);
@@ -663,6 +690,7 @@
       var pct = p9.max > 0 ? Math.min(100, (p9.geplant / p9.max) * 100) : 0;
       g15bar.style.width = pct + '%';
       g15bar.style.background = p9.status === 'ueberschritten' ? '#B8625C' : (p9.status === 'eng' ? '#E0A030' : '#3FA56C');
+    }
     }
 
     // Inventar-Hint (V292.2-bugfixes-applied — Scope-Fix für afa)
@@ -690,7 +718,10 @@
       if (klauselTextEl && (!klauselTextEl.innerHTML || klauselTextEl.innerHTML.trim() === '')) {
         if (typeof window.selectKlausel === 'function') {
           /* v1491: vier Varianten auf die drei Klauseltexte abbilden. */
-          window.selectKlausel(selected === 'amtlich' ? 'konservativ' : (selected === 'aggressiv' ? 'aggressiv' : 'moderat'));
+          /* v2260 · die Klausel kennt jetzt alle vier Varianten - die
+             Abbildung auf drei Texte schrieb „amtlich" als „konservativ" und
+             wuerde heute die Variante im ganzen Fenster umstellen. */
+          window.selectKlausel(selected);
         }
       }
     } catch(e) { console.warn('[v292.2] selectKlausel:', e); }

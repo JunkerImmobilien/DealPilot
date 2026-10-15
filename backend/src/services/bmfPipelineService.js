@@ -234,7 +234,17 @@ async function _phase4_bmf(inputs, phase3) {
        Arbeitshilfe nahm ihren Modellwert. Leer bleibt erlaubt: dann gilt
        weiter der Modellwert, und das ist die richtige Vorgabe. */
     ...(Number(gaa.liegenschaftszinssatz) > 0
-        ? { liegenschaftszinssatz: Number(gaa.liegenschaftszinssatz) } : {})
+        ? { liegenschaftszinssatz: Number(gaa.liegenschaftszinssatz) } : {}),
+    /* v2260 · Modernisierung wie im amtlichen Lauf (/bmf/aufteilung). Ohne
+       sie rechnete die Arbeitshilfe hier ein unmodernisiertes Gebaeude und
+       der Reiter 3 zeigte einen anderen Gebaeudeanteil als der Reiter
+       Bodenabschlag (Ravensberger Weg 38: 74,57 statt 74,82 %). Fehlt ein
+       Feld, gilt wie bisher der Vorgabewert der Arbeitshilfe. */
+    ...['mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_waermedaemmung',
+        'mod_baeder', 'mod_innenausbau', 'mod_grundriss'].reduce((o, k) => {
+      if (objekt[k]) o[k] = String(objekt[k]);
+      return o;
+    }, {})
   };
 
   // Pflichtfelder validieren (Backend-Service erwartet sie)
@@ -292,7 +302,16 @@ async function _phase4_bmf(inputs, phase3) {
      der Arbeitshilfe, weil der Bodenwert von ihr kommt; ein Fehler hier
      darf die Arbeitshilfe nicht mitreissen, deshalb in eigenem try. */
   let jacoby;
-  try { jacoby = await _jacobyBlock(objekt, Number(bmfInputs.kaufpreis), Number(bodenwert)); }
+  /* v2260 · Jacoby bekommt den Kaufpreis OHNE Nebenkosten (Vertrag von
+     jacobyService.berechne: „kaufpreis = Kaufpreis OHNE Erwerbsnebenkosten").
+     Hier ging die Prognose-AK hinein (Kaufpreis + Nebenkosten), Schritt 1
+     hiess „Kaufpreis ohne Nebenkosten" und zeigte 1.242.728 statt 1.240.000 EUR
+     (Ravensberger Weg 38). Die Methode stellt den gezahlten PREIS dem
+     Ertragswert gegenueber und zieht den Bodenwert (Marktwert) ab; die
+     Erwerbsnebenkosten sind kein Teil davon. Sie werden erst danach nach dem
+     ermittelten Verhaeltnis verteilt - wie bei der Arbeitshilfe. Inventar ist
+     ebenfalls nicht enthalten (immobilien_kp = Kaufpreis - Inventar). */
+  try { jacoby = await _jacobyBlock(objekt, Number(phase3.immobilien_kp), Number(bodenwert)); }
   catch (e) { jacoby = { verfuegbar: false, grund: 'Jacoby nicht gerechnet: ' + (e.message || e) }; }
 
   /* v2213 · Ein Gebaeudeanteil ausserhalb 0-100 % ist kein Ergebnis. Gemessen

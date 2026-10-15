@@ -632,7 +632,13 @@ function runBmf(){
       var immoKp = Math.max(0, kpBrutto - invSum);
       var nk = (parseDe(_v('gest_e')) || 0) + (parseDe(_v('notar_e')) || 0)
              + (parseDe(_v('gba_e')) || 0) + (parseDe(_v('makler_e')) || 0)
-             + (parseDe(_v('ji_e')) || 0);
+             /* v2260 · „Sonstige" (ji_e) stand hier UND kam unten als ak_sonst
+                noch einmal an - syncFromTabInvest spiegelt ji_e nach ak_sonst.
+                Gemessen am 15.10.2026, Ravensberger Weg 38: Sonstige 2.728 EUR,
+                an die Arbeitshilfe gingen 1.245.456 statt 1.242.728 EUR. Der
+                Betrag zaehlt jetzt EINMAL, ueber ak_sonst (dort im Fenster
+                aenderbar); ji_e nur, wenn es das Feld nicht gibt. */
+             + ($('ak_sonst') ? 0 : (parseDe(_v('ji_e')) || 0));
       /* v1478 · Marcel 21.09.2026: "warum ist die Fahrten nicht mit drin? das sind
          Fahrten die ja mit dem Kauf zusammenhaengen". Richtig — Fahrten zum Objekt
          und zum Notar, ein Wertgutachten zur Kaufentscheidung, Anwaltskosten des
@@ -1044,6 +1050,64 @@ function downloadXlsx(){
    AfA-Vorschau
    ────────────────────────────────────────────────────── */
 function _bmfHk(){ try{ var v = parseDe((document.getElementById('bmf_hk')||{}).value); return (v > 0) ? v : 0; }catch(e){ return 0; } }  /* v988-hk-calc */
+
+/* v2260 · Nebenkosten OHNE die Sanierung. ak_total (calcAk) zaehlt ak_ahk mit -
+   dort steht die geplante Sanierung aus dem Reiter Investition. „AK-Summe minus
+   Kaufpreis" war damit Nebenkosten PLUS Sanierung, und jede Stelle, die daraus
+   den Gebaeudeanteil der Nebenkosten zog (15-%-Grenze, AfA der Varianten),
+   rechnete die Sanierung anteilig ins Gebaeude. Gemessen am 15.10.2026,
+   Ravensberger Weg 38: 87.000 EUR Sanierung standen als Nebenkosten in der
+   Basis der 15-%-Grenze. */
+function _bmfNkImmo(akTotal, bruttoKp){
+  var san = parseDe((document.getElementById('ak_ahk') || {}).value) || 0;
+  return Math.max(0, akTotal - bruttoKp - san);
+}
+
+/* v2260 · Die 15-%-Grenze (§ 6 Abs. 1 Nr. 1a EStG) an EINER Stelle.
+   Schwelle = 15 % der Anschaffungskosten des GEBAEUDES der gewaehlten Variante
+   = Gebaeudeanteil x (Kaufpreis ohne Inventar + Nebenkosten), ohne Sanierung.
+   Das ist dieselbe Rechnung wie im Reiter Investition (calc.js, gebAHK) und in
+   der Pipeline (phase8_finale_ak.gebaeude_ak) - deshalb liest sie diese Zahl,
+   statt eine dritte zu bilden. Nur ohne Pipeline-Ergebnis rechnet sie aus den
+   Feldern des Fensters nach derselben Formel.
+   Verglichen wird die Sanierung OHNE Umsatzsteuer (Gesetzeswortlaut; wie
+   calc.js v1261): san_ust 'netto' -> wie eingetragen, sonst / 1,19.
+   Gemessen am 15.10.2026, Ravensberger Weg 38, Optimiert (79,66 %): das Fenster
+   zeigte 182.664 EUR (Demo-Gebaeudeanteil 91,58 % + Sanierung als Nebenkosten),
+   richtig waren auf dieser Grundlage 148.160 EUR (mit der Modernisierung in
+   der Pipeline, v2260: amtlich 74,82 %, Optimiert 79,86 % -> 148.532 EUR);
+   verglichen wurden 87.000 brutto statt 73.109 netto. */
+function _bmfG15(){
+  var basis = null, quelle = '';
+  try {
+    var st = window._v292State, r = st && st.response, sel = st && st.selectedVariant;
+    if (r && r.ok && r.phase8_finale_ak && sel && r.phase8_finale_ak[sel]
+        && isFinite(Number(r.phase8_finale_ak[sel].gebaeude_ak))) {
+      basis = Number(r.phase8_finale_ak[sel].gebaeude_ak);
+      quelle = 'pipeline:' + sel;
+    }
+  } catch (e) {}
+  if (basis == null) {
+    var varianten = (typeof _varianten === 'function') ? _varianten() : [];
+    var chosen = varianten.find(function(v){ return v.key === _varChoice; }) || varianten[0];
+    if (chosen) {
+      var e = $('ak_total');
+      var akTotal = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN;
+      if (!isFinite(akTotal)) akTotal = parseDe(((e || {}).textContent || '').replace('€','').trim());
+      var bruttoKp = parseDe(($('ak_kp') || {}).value);
+      basis = chosen.gebEur + _bmfNkImmo(akTotal, bruttoKp) * chosen.gebPct / 100;
+      quelle = 'fenster:' + chosen.key;
+    }
+  }
+  var sanEl = document.getElementById('san');
+  var brutto = sanEl ? (parseDe(sanEl.value) || 0) : (parseDe(($('g15_geplant') || {}).dataset.brutto) || 0);
+  var ust = ((document.getElementById('san_ust') || {}).value) || 'brutto';
+  var netto = (ust === 'netto') ? brutto : brutto / 1.19;
+  var max = (basis != null) ? basis * 0.15 : 0;
+  return { basis: basis, max: max, geplantBrutto: brutto, geplantNetto: netto,
+           ust: ust, puffer: max - netto, quelle: quelle };
+}
+window._bmfG15 = _bmfG15;
 function updateAfaPreview(ak_total){
   /* v1856 · Marcel: „dann bin ich auf AfA-Vorschau gegangen und dann hat er
      irgendwas Altes angezeigt für vier oder fünf Sekunden und hat dann
@@ -1321,7 +1385,7 @@ function renderVarGrid(){
   // (immobilienbezogene NK = AK-Total − Brutto-Kaufpreis, also nur die NK ohne KP)
   var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
-  var nkImmo = Math.max(0, akTotal - bruttoKp);
+  var nkImmo = _bmfNkImmo(akTotal, bruttoKp);
 
   // BMF-Variante als Referenz für Delta
   var bmfAfa = (varianten[0].gebEur + nkImmo * varianten[0].gebPct/100) * afaSatz/100;
@@ -1387,7 +1451,7 @@ function renderVarImpact(){
   var afaSatz = parseDe($('afa_satz').value) || 2.0;
   var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
-  var nkImmo = Math.max(0, akTotal - bruttoKp);
+  var nkImmo = _bmfNkImmo(akTotal, bruttoKp);
   var grenz = 0.4045;
 
   var _hk988 = _bmfHk();
@@ -1416,21 +1480,27 @@ function renderVarImpact(){
 
 // ── 6) 15-%-Grenze ─────────────────────────────────────
 function updateG15(){
-  var varianten = _varianten();
-  var chosen = varianten.find(function(v){ return v.key === _varChoice; }) || varianten[0];
-  if(!chosen) return;
-  var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
-  var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
-  var nkImmo = Math.max(0, akTotal - bruttoKp);
-  var gebAk = chosen.gebEur + (nkImmo * chosen.gebPct/100);
-  var max15 = gebAk * 0.15;
-
-  var geplant = parseDe($('g15_geplant').value) || 0;
-  var puffer = max15 - geplant;
+  /* v2260 · eine Quelle: _bmfG15() (Gebaeude-AK der gewaehlten Variante ohne
+     Sanierung, Sanierung netto). Vorher eigene Rechnung mit dem Demo-
+     Gebaeudeanteil aus _lastBmf und der Sanierung in den Nebenkosten. */
+  var g = _bmfG15();
+  if(g.basis == null) return;
+  var gebAk = g.basis;
+  var max15 = g.max;
+  var geplant = g.geplantNetto;
+  var puffer = g.puffer;
   var quote = max15 > 0 ? (geplant / max15) * 100 : 0;
 
   setText('g15_max', fmtEur(max15,2));
   setText('g15_basis', fmtEur(gebAk,2));
+  var _gEl = $('g15_geplant');
+  if (_gEl) {
+    _gEl.value = fmtForInput(geplant, 2);
+    _gEl.dataset.brutto = String(g.geplantBrutto);
+    _gEl.title = (g.ust === 'netto')
+      ? 'Sanierung aus Tab Investition (netto eingetragen)'
+      : 'Sanierung aus Tab Investition: ' + fmtEur(g.geplantBrutto, 2) + ' brutto = ' + fmtEur(geplant, 2) + ' netto (÷ 1,19)';
+  }
 
   // Puffer/Überschreitung
   var pufferEl = $('g15_puffer');
@@ -1490,7 +1560,7 @@ function updateTabInvestSync(){
       if(chosen){
         var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
         var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
-        var nkImmo = Math.max(0, akTotal - bruttoKp);
+        var nkImmo = _bmfNkImmo(akTotal, bruttoKp);
         var gebAk = chosen.gebEur + (nkImmo * chosen.gebPct/100);
         var max15 = gebAk * 0.15;
         statusEl.style.display = '';
@@ -1559,10 +1629,12 @@ function renderRiskGrid(){
   // 3) 15-%-Grenze
   if($('risk_15')){
     var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
-    var nkImmo = Math.max(0, akTotal - bruttoKp);
+    var nkImmo = _bmfNkImmo(akTotal, bruttoKp);
     var gebAk = chosen.gebEur + (nkImmo * chosen.gebPct/100);
+    var _g15r = _bmfG15();  /* v2260 · eine Quelle, Sanierung netto */
+    if (_g15r.basis != null) gebAk = _g15r.basis;
     var max15 = gebAk * 0.15;
-    var geplant = parseDe($('g15_geplant').value) || 0;
+    var geplant = _g15r.geplantNetto;
     var quote = max15 > 0 ? (geplant / max15) * 100 : 0;
     var g15Dot = $('risk_15').querySelector('.risk-dot');
     var g15Sub = $('risk_15').querySelector('.risk-sub');
@@ -1632,10 +1704,12 @@ function renderEmpfehlung(){
 
   // 15-%-Grenze
   var akTotal = (function(){ var e = $('ak_total'); var r = (e && e.dataset && e.dataset.raw) ? parseFloat(e.dataset.raw) : NaN; return isFinite(r) ? r : (parseDe(e.textContent.replace('€','').trim()) || 94224.83); })() /* v994 */;
-  var nkImmo = Math.max(0, akTotal - bruttoKp);
+  var nkImmo = _bmfNkImmo(akTotal, bruttoKp);
   var gebAk = chosen.gebEur + (nkImmo * chosen.gebPct/100);
+  var _g15e = _bmfG15();  /* v2260 · eine Quelle, Sanierung netto */
+  if (_g15e.basis != null) gebAk = _g15e.basis;
   var max15 = gebAk * 0.15;
-  var geplant = parseDe($('g15_geplant').value) || 0;
+  var geplant = _g15e.geplantNetto;
   if(geplant > max15){
     listItems.push('15-%-Grenze überschritten — geplante Renovierung wird zu AHK (keine sofortige Werbungskosten-Wirksamkeit).');
   } else if(geplant > max15 * 0.80 && geplant > 0){
@@ -2386,7 +2460,9 @@ function _syncSanierungViz(){
   // g15_geplant befüllen mit san
   var g15 = $('g15_geplant');
   if(g15){
-    g15.value = san > 0 ? fmtForInput(san, 2) : '0,00';
+    /* v2260 · das Feld heisst „Geplant (3 Jahre, netto)" - es zeigt den
+       Nettobetrag, gegen den die Grenze misst (brutto steht im title). */
+    g15.value = san > 0 ? fmtForInput(_bmfG15().geplantNetto, 2) : '0,00';
   }
 
   // Verteilung anzeigen
@@ -2485,8 +2561,47 @@ function _renderVergleich(){
 
 // Issue #8: 3 Notarvertrag-Klausel-Varianten
 var _currentKlauselVariant = 'konservativ';
+/* v2260 · Die Klausel folgt der GEWAEHLTEN Variante - Ueberschrift, Text und
+   Betraege aus derselben Wahl. Gemessen am 15.10.2026, Ravensberger Weg 38:
+   bei jeder Variante stand „Kaufpreisaufteilung (Konservativ — FA-freundlich)".
+   Ursache: die Pipeline waehlt amtlich/konservativ/optimiert/aggressiv, die
+   Texte kannten nur konservativ/moderat/aggressiv - „amtlich" und „optimiert"
+   fielen auf den Konservativ-Text zurueck, die Betraege kamen aber aus der
+   gewaehlten Variante. Dazu trug „konservativ" (Boden -15 %) den Satz „anhand
+   der BMF-Arbeitshilfe ermittelt", der nur fuer die amtliche Aufteilung stimmt. */
+var _KLAUSEL_VARIANTEN = [
+  { key: 'amtlich',     name: 'Amtlich',     zusatz: 'BMF-Arbeitshilfe' },
+  { key: 'konservativ', name: 'Konservativ', zusatz: 'Boden −15 %' },
+  { key: 'optimiert',   name: 'Optimiert',   zusatz: 'Boden −20 %' },
+  { key: 'aggressiv',   name: 'Aggressiv',   zusatz: 'Boden −25 %' }
+];
+function _klauselKnoepfeAufVier(){
+  /* Die Knoepfe stammen aus dem v289-Geruest (konservativ/moderat/aggressiv).
+     Mit Pipeline-Ergebnis zeigen sie die vier Varianten, die es tatsaechlich gibt. */
+  var hatPipeline = !!(window._v292State && window._v292State.response && window._v292State.response.phase5_varianten);
+  if (!hatPipeline) return;
+  var alt = document.querySelector('[data-klausel]');
+  var box = alt && alt.parentNode;
+  if (!box || box.dataset.v2260 === '1') return;
+  box.dataset.v2260 = '1';
+  box.innerHTML = _KLAUSEL_VARIANTEN.map(function(v){
+    return '<button class="bmfmo-verf-btn" data-klausel="' + v.key + '" onclick="selectKlausel(\'' + v.key + '\')" type="button">'
+      + v.name + ' <span style="font-size:10px;color:var(--muted);margin-left:4px">' + v.zusatz + '</span></button>';
+  }).join('');
+}
 function selectKlausel(variant){
+  if (variant === 'moderat') variant = 'optimiert';   /* v289-Name -> Pipeline-Name */
+  var st = window._v292State;
+  /* Ein Klick auf einen Klausel-Knopf waehlt die Variante im ganzen Fenster -
+     sonst stuende der Text einer Variante neben den Betraegen einer anderen.
+     _v292SelectVariant ruft selectKlausel mit demselben Namen zurueck. */
+  if (st && st.response && st.response.phase5_varianten && st.response.phase5_varianten[variant]
+      && st.selectedVariant !== variant && typeof window._v292SelectVariant === 'function') {
+    window._v292SelectVariant(variant);
+    return;
+  }
   _currentKlauselVariant = variant;
+  _klauselKnoepfeAufVier();
   document.querySelectorAll('[data-klausel]').forEach(function(b){
     b.classList.toggle('active', b.dataset.klausel === variant);
   });
@@ -2526,9 +2641,12 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
   function _eur(v){ return new Intl.NumberFormat('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}).format(v) + ' €'; }
   function _pct(v){ return v.toFixed(2).replace('.', ',') + ' %'; }
 
+  /* v2260 · Ueberschrift der abweichenden Varianten aus ihrer Definition */
+  var _kv = _KLAUSEL_VARIANTEN.filter(function(v){ return v.key === _selVar; })[0];
+  var _kopfAbw = _kv ? (_kv.name + ' — ' + _kv.zusatz) : 'Moderat — empfohlen';
   var texts = {
-    konservativ:
-      '<p><strong>Kaufpreisaufteilung (Konservativ — FA-freundlich)</strong></p>' +
+    amtlich:
+      '<p><strong>Kaufpreisaufteilung (Amtlich — nach BMF-Arbeitshilfe)</strong></p>' +
       '<p>Die Vertragsparteien teilen den Gesamtkaufpreis in Höhe von <strong>' + _eur(kp) + '</strong> ' +
       'für das Objekt <em>' + (addr || '[Objektadresse]') + '</em> wie folgt auf:</p>' +
       '<ul style="margin:8px 0;padding-left:22px"><li>Auf den Grund und Boden entfallen <strong>' + _eur(basisGrund) + '</strong>.</li>' +
@@ -2536,7 +2654,7 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
       '<p>Die Aufteilung wurde anhand der BMF-Arbeitshilfe (Juni 2023) ermittelt und gilt vorbehaltlich abweichender Feststellung durch das Finanzamt. Sie ist Grundlage für die Absetzung für Abnutzung (AfA) nach § 7 Abs. 4 EStG.</p>',
 
     moderat:
-      '<p><strong>Kaufpreisaufteilung (Moderat — empfohlen)</strong></p>' +
+      '<p><strong>Kaufpreisaufteilung (' + _kopfAbw + ')</strong></p>' +
       '<p>Die Vertragsparteien sind sich darüber einig, dass sich der vereinbarte Gesamtkaufpreis in Höhe von <strong>' + _eur(kp) + '</strong> ' +
       'für das Objekt <em>' + (addr || '[Objektadresse]') + '</em> aus folgenden Komponenten zusammensetzt:</p>' +
       '<ul style="margin:8px 0;padding-left:22px"><li>Grund und Boden: <strong>' + _eur(basisGrund) + '</strong></li>' +
@@ -2557,7 +2675,15 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
   };
 
   var el = document.getElementById('klauselText');
-  if(el) el.innerHTML = texts[_currentKlauselVariant] || texts.konservativ; /* V292.3-v289-bugfixes: 'variant' nicht im Scope, nutze _currentKlauselVariant */
+  /* v2260 · Text aus DERSELBEN Wahl wie die Betraege (_selVar). Konservativ und
+     Optimiert weichen vom amtlichen Ergebnis ab - sie tragen den Text der
+     abweichenden Aufteilung mit eigener Ueberschrift, nicht den amtlichen. */
+  texts.konservativ = texts.moderat;
+  texts.optimiert = texts.moderat;
+  /* Ohne Pipeline-Variante sind die Betraege die amtlichen (Rueckfall oben) -
+     dann auch der amtliche Text. */
+  var _textKey = (_p5 && _p5[_selVar]) ? _selVar : 'amtlich';
+  if(el) el.innerHTML = texts[_textKey] || texts.amtlich;
 }
 
 function copyKlausel_unused_v292(){
