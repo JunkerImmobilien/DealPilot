@@ -1288,7 +1288,11 @@
         var sv = zahl('svwert');
         if (sv) {
           await zeige(feldVon('svwert'), 10);
-          await b2oZeile(s, 'Das neue Objekt', 'Der DealPilot-Marktwert steht als Verkehrswert bereit: <b>' + eur(sv) + '</b>.');
+          /* v2254: die Beschriftung live ablesen - Stufe 1/2 ist eine Marktwertindikation, kein Verkehrswert */
+          var svSt = (function () { var l = document.getElementById('svwert'); l = l && l.closest('.f'); l = l && l.querySelector('label'); return l ? Number(l.getAttribute('data-sv-stufe')) || 0 : 0; })();
+          await b2oZeile(s, 'Das neue Objekt', svSt >= 3
+            ? 'Aus der amtlichen Wertermittlung (Stufe 3) steht der Verkehrswert bereit: <b>' + eur(sv) + '</b>.'
+            : 'Der Marktwert kommt als <b>Marktwertindikation</b> mit (Stufe ' + (svSt || 1) + '): <b>' + eur(sv) + '</b>. Verkehrswert heißt er erst ab Stufe 3, amtlich.');
         }
       },
       async function (s) {   /* 9 · Investition */
