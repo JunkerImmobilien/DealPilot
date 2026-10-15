@@ -2000,7 +2000,9 @@
     e.value = v;
     ['input', 'change', 'blur'].forEach(function (t) { e.dispatchEvent(new Event(t, { bubbles: true })); });
   }
-  function r6Text(e) { return e ? String(e.textContent || '').replace(/\s+/g, ' ').trim() : ''; }
+  function r6Text(e) { return e ? String(e.textContent || '').replace(/[\s\u00a0]+/g, ' ').trim() : ''; }
+  /* innerText ohne geschützte Leerzeichen (gemessen: „4,34\u00a0%" - die Muster mit „ %" griffen nicht) */
+  function r6Inner(e) { return e ? String(e.innerText || '').replace(/\u00a0/g, ' ') : ''; }
   function r6Id(id) { return r6Text(document.getElementById(id)); }
   /* der Wert neben einer Beschriftung: kleinstes Element mit passendem Text,
      dessen naechstes Geschwister den Wert traegt */
@@ -2170,7 +2172,7 @@
         await zeigeGruppe(feldVon('nkm'), function () { return q('#wm_m') && q('#wm_m').closest('.f'); }, 8);
         await b2oZeile(s, 'Die Ist-Miete', 'Kaltmiete <b>' + eur(zahl('nkm')) + '</b>, Stellplatz ' + eur(zahl('ze')) + ', Nebenkosten-Vorauszahlung ' + eur(zahl('umlagef')) + ' — Warmmiete <b>' + r6Id('wm_m') + '</b>.');
         await zeige(function () { return q('#miete_qm') && q('#miete_qm').closest('.f'); }, 10);
-        await b2oZeile(s, 'Pro Quadratmeter', 'Bezogen auf die Wohnfläche aus dem Reiter Objekt: <b>' + r6Id('miete_qm') + '</b> kalt.');
+        await b2oZeile(s, 'Pro Quadratmeter', 'Bezogen auf die Wohnfläche aus dem Reiter Objekt: <b>' + r6Id('miete_qm') + '</b> — der Stellplatz zählt mit.');
       },
       async function (s) {   /* 3 · Zensus-Miete */
         await warteAuf(function () { return q('#dp-zi-miete .dp-zi-z'); }, 5000);
@@ -2226,7 +2228,7 @@
         await tippeH('me_soll', '8,50', 110);
         await warte(1200);
         await r6Ende(zb);
-        await b2oZeile(s, 'Oder im Detail', '<b>' + wert('me_anz') + ' Erhöhungen</b> alle ' + wert('me_int') + ' Jahre, zusammen ' + r6Pz(wert('me_pct')) + ' % — Soll-Mietspiegel ' + wert('me_soll') + ' €/m²' + (r6Id('me_opp') && r6Id('me_opp') !== '—' ? ', Abstand ' + r6Id('me_opp') : '') + '.');
+        await b2oZeile(s, 'Oder im Detail', '<b>' + wert('me_anz') + ' Erhöhungen</b> alle ' + wert('me_int') + ' Jahre, zusammen ' + r6Pz(wert('me_pct')) + ' % — Soll-Mietspiegel ' + wert('me_soll') + ' €/m²' + (r6Id('me_opp') && r6Id('me_opp') !== '—' ? ', Abstand deiner Miete: ' + r6Id('me_opp') : '') + '.');
         var p = q('#me-mode-prog'); if (p) p.click();
         await warte(700);
       },
@@ -2276,7 +2278,7 @@
         kegelHoch(true);
         await warte(900);
         await zeige(function () { return q('#v10-market-modal .md-karte'); }, 8);
-        var kt = (q('#v10-market-modal .md-karte') || {}).innerText || '';
+        var kt = ((q('#v10-market-modal .md-karte') || {}).innerText || '').replace(/\u00a0/g, ' ');   /* gemessen: geschütztes Leerzeichen vor % */
         var bund = /BUNDESANLEIHE[^\n]*\n\s*([\d,]+ %)/i.exec(kt), mk = /MARKTAUFSCHLAG\s*\n\s*([\d,]+)/i.exec(kt), an = /ANGEBOTSNIVEAU\s*\n\s*([\d,]+)/i.exec(kt), gz = /\n\s*([\d,]+ %)\s*\n[^\n]*Jahre fest/i.exec(kt);
         await b2oZeile(s, 'Marktdaten ansehen', (gz ? '<b>' + gz[1] + '</b> = ' : '') + 'Bundesanleihe ' + (bund ? bund[1] : '–') + ' + Marktaufschlag ' + (mk ? mk[1] : '–') + ' + Angebotsniveau ' + (an ? an[1] : '–') + ' ± Zuschlag nach Beleihung.');
         var vt = rhIm('#v10-market-modal', /lagen zuletzt\s+[\d,]+\s+Punkte/);
@@ -2311,7 +2313,7 @@
         await zeigeGruppe(function () { return q('#d1_rate') && q('#d1_rate').closest('.f'); }, function () { return q('#restschuld') && q('#restschuld').closest('.f'); }, 8);
         await b2oZeile(s, 'Rate und Restschuld', 'Monatliche Rate <b>' + r6Id('d1_rate') + '</b>. Nach ' + wert('d1_bindj') + ' Jahren stehen noch <b>' + r6Id('restschuld') + '</b> offen.');
         await zeige(function () { return q('#r-ltv') && q('#r-ltv').closest('.card'); }, 8);
-        await b2oZeile(s, 'Die Beleihung', 'Beleihungsauslauf <b>' + r6Id('r-ltv') + '</b> — über 80 % rechnet die Bank mit Zuschlag, siehe oben.');
+        await b2oZeile(s, 'Die Beleihung', 'Beleihungsauslauf <b>' + r6Id('r-ltv') + '</b> — den passenden Zins dazu zeigt die Konditionen-Karte oben (Knopf 100 %). Den Satz im Darlehen bestimmst du.');
       },
       async function (s) {   /* 8 · Standardwerte in den Einstellungen */
         await r6Einstellungen('standardwerte');
@@ -2475,7 +2477,7 @@
         for (var i = 0; i < 8 && !/Schritt 9/.test(r6WizTitel()); i++) { if (!(await r6WizWeiter())) break; await warte(1100); }
         await warteAuf(function () { return /Schritt 9/.test(r6WizTitel()); }, 4000);
         await warte(700);
-        var t = (r6Wiz() || {}).innerText || '';
+        var t = r6Inner(r6Wiz());
         var rnd = /GESCHÄTZTE RESTNUTZUNGSDAUER[\s\S]*?(\d+)\s*Jahre/i.exec(t), urt = /(Gutachten lohnt[^\n]*)/.exec(t), net = /Netto-Vorteil\s*([−\-+]?[\d.]+\s*€)/.exec(t);
         await r6Ende(zb);
         await zeige(function () { var e = rhIm(r6Wiz(), /GESCHÄTZTE RESTNUTZUNGSDAUER/i); return e && (e.closest('div[style]') || e.parentElement); }, 8);
@@ -2531,7 +2533,7 @@
         kegelHoch(true);
         await warte(1000);
         await zeige(function () { var p = r6BmfPane(); return p && (p.querySelector('.bmfmo-ak-box,[class*=summary],[class*=box]') || p.firstElementChild); }, 6);
-        var t = (r6BmfPane() || {}).innerText || '';
+        var t = r6Inner(r6BmfPane());
         var kp = /Brutto-Kaufpreis\s*\n?\s*([\d.]+ €)/.exec(t), nk = /\+\s*Nebenkosten\s*\n?\s*([\d.]+ €)/.exec(t), ak = /Prognose-AK[^\n]*\n?[^\d]*([\d.]+ €)/.exec(t);
         await b2oZeile(s, 'Schritt 1 · Anschaffungskosten', 'Aus dem Reiter Investition: Kaufpreis ' + (kp ? kp[1] : '–') + ' + Nebenkosten ' + (nk ? nk[1] : '–') + ' = <b>' + (ak ? ak[1] : '–') + '</b>. Fahrten zum Objekt und Notar kommen hier dazu.');
       },
@@ -2542,7 +2544,7 @@
         await zeigeGruppe(function () { return q('#bmf_gsfl') && q('#bmf_gsfl').closest('div'); }, function () { return q('#bmf_mea') && q('#bmf_mea').closest('div'); }, 6);
         await b2oZeile(s, 'Schritt 2 · Die Aufteilung', 'Grundstück ' + wert('bmf_gsfl') + ' m², Bodenrichtwert <b>' + wert('bmf_brw') + ' €/m²</b>, Anteil ' + wert('bmf_mea') + ' % — alles aus dem Objekt übernommen.');
         var j = rhIm('#bmfOverlay', /Nach Jacoby/), jt = j ? r6Text(j.closest('div') || j) : '';
-        var am = /([\d,]+)\s*%\s*Gebäude per Ertragswert/.exec(((r6BmfPane() || {}).innerText || '')), jm = /Nach Jacoby[^:]*:\s*([\d,]+ %)/.exec(jt);
+        var am = /([\d,]+)\s*%\s*Gebäude per Ertragswert/.exec(r6Inner(r6BmfPane())), jm = /Nach Jacoby[^:]*:\s*([\d,]+ %)/.exec(jt);
         await zeige(function () { var e = rhIm('#bmfOverlay', /Nach Jacoby/); return e && (e.closest('div[class]') || e); }, 8);
         await b2oZeile(s, 'Schritt 2 · Die Aufteilung', 'Zum Vergleich rechnet DealPilot die umgekehrte Ertragswertmethode (BFH IX R 12/21) mit: <b>' + (jm ? jm[1] : '–') + ' Gebäude</b>.');
       },
@@ -2551,7 +2553,7 @@
         await warteAuf(function () { var p = r6BmfPane(); return p && p.id === 'p-afa' && p.querySelector('table'); }, 6000);
         await warte(600);
         await zeige(function () { var p = r6BmfPane(); return p && p.querySelector('table'); }, 6);
-        var tt = ((r6BmfPane() || {}).innerText || '');
+        var tt = r6Inner(r6BmfPane());
         var g = /Gebäude %\s+([\d,]+ %)\s+([\d,]+ %)\s+([\d,]+ %)\s+([\d,]+ %)/.exec(tt), a = /AfA Gebäude\/Jahr\s+([\d.]+ €)\s+([\d.]+ €)\s+([\d.]+ €)\s+([\d.]+ €)/.exec(tt);
         await b2oZeile(s, 'Schritt 3 · Amtlich und drei Abweichungen', 'Amtlich <b>' + (g ? g[1] : '–') + '</b> Gebäude — mit Boden −15/−20/−25 % bis ' + (g ? g[4] : '–') + '. AfA ' + (a ? a[1] + ' bis ' + a[4] : '–') + ' im Jahr.');
       },
@@ -2577,7 +2579,7 @@
         await warte(800);
         var p = r6BmfPane(); if (p) { var sc = p.closest('.bmfmo-body'); if (sc) sc.scrollTop = 0; }
         await zeige(function () { var x = r6BmfPane(); return x && x.querySelector('table'); }, 6);
-        var tt = ((r6BmfPane() || {}).innerText || '');
+        var tt = r6Inner(r6BmfPane());
         var kopf = /MIT\s+(\d+)\s*%\s*ABSCHLAG/i.exec(tt), bo = /davon Grund und Boden\s+([\d.]+ €)\s+([\d.]+ €)/.exec(tt), af = /AfA pro Jahr bei [\d,]+ %\s+([\d.]+ €)\s+([\d.]+ €)\s+([+−\-]?[\d.]+ €)/.exec(tt);
         await b2oZeile(s, 'Bodenabschlag ' + (kopf ? kopf[1] : '20') + ' %', 'Die amtliche Zahl bleibt stehen, das Szenario daneben: Boden <b>' + (bo ? bo[2] : '–') + '</b> statt ' + (bo ? bo[1] : '–') + ', AfA <b>' + (af ? af[2] : '–') + '</b> statt ' + (af ? af[1] : '–') + ' im Jahr.');
       },
