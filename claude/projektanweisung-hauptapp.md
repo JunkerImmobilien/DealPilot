@@ -38761,6 +38761,32 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2263–v2263e · Videoreihe Spezialmodule 11–14 und Überblick 2 aufgenommen; 06, 08, 10b nach v2260/v2261 neu (15.10.2026, Staging)
+
+- **Was:**
+  - Fünf Drehbücher in `messe-drehbuch.js`: `reihe-pilot` (11), `reihe-bewertung` (12), `reihe-dealaktion` (13), `reihe-bestand` (14), `reihe-ueberblick2` (Ü2); Studio `REIHE` 11–14 und `ue2`, Reihen-Intro/-Outro mit `art` („Überblick 2" statt „Modul").
+  - Alle an KOPIEN (`r6KopieStart` mit `behalte`, `ohneAnkauf`, `ohneAnalyse`; die Analyse verliert an der Kopie nur `_fuer.objekt_id`, sonst stünde „gehört zu einem anderen Objekt"). 11 an Ravensberger Weg 38, 12/13/Ü2 an Westerfeldstr. 140, 14 an Parkstr. 9 mit Gewonnen-Status.
+  - `RH_SPERRE` zusätzlich: Netzwerk-Einreichung, Partner-Anfrage, `/unterlagen`, `/portfolio-spiegel` (eine gewonnene Kopie lief sonst als 12. Objekt in den Spiegel des Bots — gemessen, danach per Neuladen auf 11 zurück).
+  - Mitschnitte (`messe-reihe-daten.js`): `bmf` nach v2260 neu gerechnet (Ravensberger, Sanierung 87.000: amtlich 74,82 %, Jacoby 79,94 %); `westerfeld` = Marktbericht **214** (Stufe 2) mit Etappen; `rhStrom` spielt einen Satz je Lauf (`_rh.satz`).
+  - Ü2 erzeugt das Investment-PDF lokal (`exportPDFBlob`, ohne Fassungs-Rückfrage, kein Download) und zeigt drei Seiten; `branding.get` liefert im Lauf keine Kontaktdaten.
+- **Behoben (klein):** `dpsh-score-hero.js` Teilnoten „DSCR 1.67", „5.41 %" → Komma; `pdf.js` „Westerfeldstr., 140, Bielefeld"; `grest-plz-lookup.js` schrieb „6.50"; `all-objects.js` `num()` las „1,7" als 1 (Nebenkosten/Zins in „Alle Objekte" zu niedrig); Modul 06 an v2261 angepasst (Makler, alle NK aus den Standardwerten, Inventar im Kaufpreis).
+- **Gemeldet, nicht geändert (fachlich):**
+  1. Pilot-Analyse Westerfeldstr. 140: **Offerte 910.000 € bei 545.000 € Kaufpreis**; ebenso Alexanderstr. 11 (140.000 bei 129.000) und Am Markt 9 (163.000 bei 132.000) — der Prompt verankert die Offerte am Marktwert statt am Angebotspreis.
+  2. Die Analysen nennen Portale (immobilienscout24, Immowelt, wohnungsboerse) im Text und in der Quellenliste — 19 von 27 gespeicherten Analysen im Konto. Widerspricht „keine Quellennamen nach außen" (14.10.).
+  3. Sachsenstraße 18: „DSCR 0,00 kritisch, Mieteinnahmen decken den Schuldendienst nicht" — ohne Darlehen gibt es keinen Schuldendienst.
+  4. Parkstr. 9: Steuer-Text der Analyse (Cashflow n. St. −3.223 → −16.518 €) widerspricht der Soll/Ist-Tafel (−6.193 → +748 €); Begründung nennt DSCR 0,30, Tafel 0,90.
+  5. BMF-Pipeline rechnet AfA und 15-%-Grenze mit Inventar (Ravensberger `moebl` 7.000 €, `inventar_gesamt` 0): Karte 19.804 € AfA, Reiter Steuer 19.693,48 € (ohne Inventar, v2261). Gehört dem BMF-Strang.
+  6. Investment-PDF Seite 4 „Warmmiete / Jahr 39.420" ist Kaltmiete + Stellplätze.
+  7. Demo-Objekt Westerfeldstr. 140 trägt GrESt 5,5 % (NRW 6,5) und Notar/Grundbuch 2,2 % aus der Zeit vor v2261; Gebäudeanteil 14,64 %.
+- **Eigener Fehler (zurückgenommen):** Ein Messskript setzte im Seitenkontext `var st` und überschrieb damit `st()` aus calc.js. `loadData` brach ab, die nächste Kopie zeigte und speicherte die Analyse des VORIGEN Objekts. Kein App-Fehler — nur an einer Kopie, gelöscht. Skripte seitdem gekapselt.
+- **Commit:** `5c7fea58` (v2263), `fb83e942` (a), `312a848d` (b), `6e26204c` (c), `de9e7a9b` (d), `b790dcdd` (e)
+- **Nachweis:**
+  - Prüfläufe im Studio mit Protokoll (300 ms) für 11, 12, 13, 14, Ü2, 06, 10b: Kegel je Zeile im Bild (Lücken nur beim Fensterwechsel und im PDF-Fenster), Portalnamen im Bild 0 (11 nach dem Fix erneut gemessen), gesperrt nur `PUT /portfolio-spiegel` (14), `fetch` danach echt.
+  - DB vorher/nachher: Objekte 39/39, `tax_records` 583/583, `tax_snapshots` 36/36, Pässe 148/148, Waisen 0 (auch avm, shares, bemerkungen), Spiegel 11 Objekte. Parkstr. 9, Westerfeldstr. 140, Ravensberger Weg 38, Sachsenstraße 18, Musterstraße 12: `updated_at`, md5(data), md5(Analyse) und Steuerzeilen-Hash unverändert. Sicherung `/root/backups/objekte-vor-reihe11-20261015.json`.
+- **Videos** (`Dateien/Messe/Videos/Videoreihe/`): 11 4:32 (17,7 MB), 12 4:27 (9,8 MB), 13 3:41 (8,3 MB), 14 2:45 (6,8 MB), Ü2 4:59 (13,1 MB); neu 06 4:27 (8,4 MB), 08 4:01 (9,4 MB), 10b 4:51 (12,0 MB). Je Probe/Konferenzprüfung, Start per Leertaste (kein Leuchtrahmen der Erweiterung), Bildraster über das ganze Video.
+- **Kosten:** ein Marktbericht Stufe 2 (214, Kontingent 1, `ai_credits_log` 1611 → 1612). BMF neu gerechnet (kein Kontingent). Keine KI.
+- **Rest:** die sieben Meldungen; Modul 11 nach Prompt-Korrektur an der Westerfeldstr. neu drehen; 10a nicht neu geprüft (Inventar-Abzug v2261 kann die AfA dort verschieben).
+
 ### Prod-Rollout (26) · v2257–v2261a (15.10.2026)
 
 - **Was:** v2260 BMF-Fenster (Agent): „Sonstige“ nicht mehr doppelt (`ji_e` nur ohne `ak_sonst`); 15-%-Grenze über `_bmfG15()` = Gebäude-AK der gewählten Variante, Sanierung netto (vorher Demo-Daten Sachsenstr. 91,58 %, Sanierung als NK, brutto gegen netto: 182.665 € → Optimiert 148.486 €); Notarklausel mit vier Varianten-Überschriften; amtlicher Wert: **74,82 % ist richtig** – die Pipeline gab die Modernisierung nicht an die Arbeitshilfe (74,57 %), jetzt `mod_*` durchgereicht (bmfPipelineService); Jacoby bekommt den Kaufpreis ohne Nebenkosten (1.240.000 statt 1.242.728). Dazu v2257–v2259 (Videoreihe 06–10b + kleine Fehler), v2258, v2261/a.
