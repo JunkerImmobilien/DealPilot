@@ -1,6 +1,8 @@
 'use strict';
 const express = require('express');
 const marketRatesService = require('../services/marketRatesService');
+const bauzinsService = require('../services/bauzinsService');   /* v2245 */
+const { authenticate, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -37,12 +39,45 @@ router.get('/current', async (req, res, next) => {
 /**
  * POST /api/v1/market-rates/refresh
  * Erzwingt einen Cache-Refresh.
+ * v2245: nur fuer Admins. Bis v2244 ohne Anmeldung erreichbar - jeder
+ * Aufruf loeste Abrufe bei Bundesbank und EZB aus. Seit v2245 holt er
+ * auch den Bauzins neu und schreibt ihn in die Datenbank.
  */
-router.post('/refresh', async (req, res, next) => {
+router.post('/refresh', authenticate, requireRole('admin'), async (req, res, next) => {
   try {
     marketRatesService.clearCache();
+    let bauzins = null;
+    try { await bauzinsService.aktualisieren({ voll: req.query.voll === '1' }); bauzins = 'aktualisiert'; }
+    catch (e) { bauzins = 'fehlgeschlagen: ' + e.message; }
     const data = await marketRatesService.getCurrentRates();
-    res.json({ refreshed: true, rates: data.rates, source: data.source, asOf: data.asOf });
+    res.json({ refreshed: true, rates: data.rates, source: data.source, asOf: data.asOf, bauzins: bauzins });
+  } catch (err) { next(err); }
+});
+
+/**
+ * v2245: GET /api/v1/market-rates/bauzins
+ * Der marktabhaengige indikative Bauzins mit allen Bausteinen.
+ * Public (wie /pfandbrief; die Landing liest ohne Anmeldung).
+ *
+ *   Bauzins(b, LTV) = formel.bund[b] + formel.aufschlag[b] + formel.k + Z(LTV)
+ *   Z(LTV) linear zwischen formel.zuschlaege [[ltv, pp], ...], Bezug 80 %.
+ *
+ * ?ltv=85 liefert zusaetzlich `fuer_ltv` { ltv, zuschlag, rates{b} }.
+ */
+router.get('/bauzins', async (req, res, next) => {
+  try {
+    const d = await bauzinsService.getBauzins();
+    const out = Object.assign({}, d);
+    const ltv = req.query.ltv != null ? Number(String(req.query.ltv).replace(',', '.')) : null;
+    if (ltv != null && isFinite(ltv) && ltv > 0 && ltv < 300) {
+      const rates = {};
+      d.maturities.forEach(b => {
+        const f = d.formel;
+        rates[b] = (f.bund[b] != null && f.aufschlag[b] != null) ? bauzinsService.zinsFuer(f.bund[b], f.aufschlag[b], ltv) : null;
+      });
+      out.fuer_ltv = { ltv: ltv, zuschlag: bauzinsService.zuschlagLtv(ltv), rates: rates };
+    }
+    res.json(out);
   } catch (err) { next(err); }
 });
 
@@ -115,7 +150,12 @@ router.get('/pfandbrief', async (req, res, next) => {
       maturities: data.maturities,
       yields: data.yields,
       margins: data.margins,
+      margins_bezug: data.margins_bezug,     // v2245
+      modell: data.modell,                   // v2245: 'bund+aufschlag' | 'pfandbrief+marge'
       indicativeRates: data.indicativeRates,
+      formel: data.formel,                   // v2245: bund, aufschlag, aufschlag_monat, k, zuschlaege
+      stufen_ltv: data.stufen_ltv,           // v2245: premium 60, standard 80, schwach 90
+      verlauf: data.verlauf,                 // v2245: wochen[], monate[] fuer die Aufschlag-Grafik
       sources: data.sources,
       periods: data.periods,
       source: data.source,

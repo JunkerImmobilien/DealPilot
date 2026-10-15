@@ -2,14 +2,16 @@
 /* ═══════════════════════════════════════════════════
    DealPilot V210 – market-rates-pf.js
 
-   Pfandbrief-basierte indikative Bauzinsen für 5/10/15/20 Jahre.
-   Quelle: Bundesbank-Pfandbrief-Zinsstruktur (BBSIS) + indikative Bank-Marge.
+   Indikative Bauzinsen für 5/10/15/20 Jahre.
 
-   Marge-Modell:
-     premium  +0,25 %  (LTV bis 60 %, Top-Bonität)
-     standard +0,40 %  (LTV bis 80 %, normale Bonität)
-     schwach  +0,80 %  (LTV über 80 % oder Bonität mittel)
-   (v2242, kalibriert 15.10.2026 - Zahlen aus dem Backend gewinnen)
+   v2245 · MARKTFORMEL (backend/src/services/bauzinsService.js):
+     Bauzins(b, LTV) = Bundesanleihe_b (Tag) + Marktaufschlag_b (Monat,
+                       MFI-Zinsstatistik minus Bund) + K + Zuschlag(LTV)
+   Stufen = feste Beleihungen: premium 60 %, standard 80 %, schwach 90 %.
+   Die Zahlen kommen fertig aus dem Backend (indicativeRates + formel);
+   STATIC_FALLBACK_PF unten ist nur noch Rueckfall und rechnet mit
+   derselben Formel (dpBauzinsRechnen aus indicative-zins.js).
+   Bis v2242: Pfandbrief + feste Marge 0,25 / 0,40 / 0,80.
 
    Diese Werte sind INDIKATIONEN, keine Konditions-Quoten.
    ═══════════════════════════════════════════════════ */
@@ -28,7 +30,9 @@ var MarketRatesPF = (function() {
     { key: '20', label: '20 Jahre', color: '#B8625C' }
   ];
 
-  // Sane Defaults — falls Backend nie antwortet
+  // Sane Defaults — falls Backend nie antwortet.
+  // v2245: NUR NOCH Altmodell-Rueckfall (Pfandbrief-Kurve); gerechnet wird
+  // ueber die Marktformel aus config.js marketRates.bauzins.
   var STATIC_FALLBACK_PF = {
     yields:  { '5': 3.68, '10': 3.93, '15': 4.05, '20': 4.11 },
     margins: { premium: 0.25, standard: 0.40, schwach: 0.80 }
@@ -56,7 +60,19 @@ var MarketRatesPF = (function() {
     // Wird genutzt wenn Backend gar nicht antwortet — minimal aber konsistent
     var f = STATIC_FALLBACK_PF;
     var indicative = {};
+    /* v2245: dieselbe Marktformel wie das Backend, mit dem statischen Stand */
+    var formel = null;
+    try { formel = (typeof window.dpBauzinsFormel === 'function') ? window.dpBauzinsFormel() : null; } catch (e) {}
+    var STL = (formel && formel.stufen_ltv) || { premium: 60, standard: 80, schwach: 90 };
     Object.keys(f.yields).forEach(function(m) {
+      if (formel && typeof window.dpBauzinsRechnen === 'function') {
+        indicative[m] = {
+          premium:  window.dpBauzinsRechnen(formel, m, STL.premium),
+          standard: window.dpBauzinsRechnen(formel, m, STL.standard),
+          schwach:  window.dpBauzinsRechnen(formel, m, STL.schwach)
+        };
+        if (indicative[m].standard != null) return;
+      }
       indicative[m] = {
         premium:  Math.round((f.yields[m] + f.margins.premium)  * 100) / 100,
         standard: Math.round((f.yields[m] + f.margins.standard) * 100) / 100,
@@ -65,6 +81,9 @@ var MarketRatesPF = (function() {
     });
     return {
       maturities: ['5', '10', '15', '20'],
+      modell: formel ? 'bund+aufschlag' : 'pfandbrief+marge',
+      formel: formel,
+      stufen_ltv: STL,
       yields: f.yields,
       margins: f.margins,
       indicativeRates: indicative,
@@ -83,7 +102,45 @@ var MarketRatesPF = (function() {
     _currentData = data;
     _renderUI();
     try { _syncTopStrip(); } catch(e){}
+    try { if (typeof window.dpMarktzinsHinweis === 'function') window.dpMarktzinsHinweis(); } catch(e){}   /* v2245 */
   }
+
+  /* v2245: Zerlegung einer Kachel in ihre Bausteine (fuer Unterzeile + Tooltip).
+     Marktaufschlag = gemessener MFI-Aufschlag + K, damit die Zahlen aufgehen:
+     Zins = Bundesanleihe + Marktaufschlag + Zuschlag nach Beleihung. */
+  function _pz(x) { return (x == null || !isFinite(x)) ? '–' : x.toFixed(2).replace('.', ','); }
+  function _monat(m) {
+    if (!m) return '';
+    var p = String(m).split('-');
+    return p.length >= 2 ? p[1] + '/' + p[0] : String(m);
+  }
+  function _zerlegung(d, key, stufe) {
+    var f = d && d.formel;
+    if (!f || !f.bund || f.bund[key] == null || f.aufschlag == null || f.aufschlag[key] == null) return null;
+    var ltv = (d.stufen_ltv && d.stufen_ltv[stufe]) || ({ premium: 60, standard: 80, schwach: 90 })[stufe] || 80;
+    var z = (typeof window.dpBauzinsZuschlag === 'function') ? window.dpBauzinsZuschlag(ltv, f.zuschlaege) : 0;
+    /* Angezeigter Marktaufschlag = Zins - Bundesanleihe - Zuschlag: so geht
+       die Unterzeile auf den Cent genau auf (getrennt gerundet wuerde z. B.
+       0,385 + 0,27 = 0,655 zu 0,65 und die Summe stimmte nicht). Dieselbe
+       Ableitung steht in landing/dp2-inhalt.js. */
+    var ir = d.indicativeRates && d.indicativeRates[key];
+    var zins = ir && typeof ir[stufe] === 'number' ? ir[stufe] : null;
+    return {
+      bund: f.bund[key], aufschlagMfi: f.aufschlag[key], k: f.k,
+      markt: zins != null ? Math.round((zins - f.bund[key] - z) * 100) / 100 : Math.round((f.aufschlag[key] + f.k) * 100) / 100,
+      zuschlag: z, ltv: ltv,
+      monat: (f.aufschlag_monat_je && f.aufschlag_monat_je[key]) || f.aufschlag_monat || ''
+    };
+  }
+  function _detailText(d, key, stufe) {
+    var z = _zerlegung(d, key, stufe);
+    if (!z) return null;
+    var s = 'Bundesanleihe ' + _pz(z.bund) + ' % + Marktaufschlag ' + _pz(z.markt)
+          + (z.monat ? ' (Stand ' + _monat(z.monat) + ')' : '');
+    if (Math.abs(z.zuschlag) >= 0.005) s += (z.zuschlag > 0 ? ' + ' : ' − ') + 'Beleihung ' + _pz(Math.abs(z.zuschlag));
+    return s;
+  }
+  window.dpBauzinsDetailText = function (key, stufe) { try { return _detailText(_currentData, String(key), stufe || _activeMargin); } catch (e) { return null; } };
 
   function setMargin(marginKey) {
     if (!['premium', 'standard', 'schwach'].includes(marginKey)) return;
@@ -143,8 +200,9 @@ var MarketRatesPF = (function() {
       var yield_ = d.yields[b.key];
       var indic  = d.indicativeRates[b.key];
       var src    = d.sources[b.key] || 'static';
+      var _neu   = !!(d.formel && d.formel.bund);   /* v2245: Marktformel */
 
-      if (typeof yield_ !== 'number' || !indic) {
+      if ((!_neu && typeof yield_ !== 'number') || !indic || typeof indic[_activeMargin] !== 'number') {
         rateEl.textContent = '–';
         if (srcEl) { srcEl.textContent = '–'; srcEl.className = 'mr-pf-tile-src'; }
         if (detailEl) detailEl.textContent = 'Keine Daten';
@@ -162,8 +220,13 @@ var MarketRatesPF = (function() {
           : 'Hinterlegter Wert · Stand ' + (d.periods[b.key] || '–'));
       }
       if (detailEl) {
-        var marginVal = d.margins[_activeMargin];
-        detailEl.textContent = 'Pfandbrief ' + yield_.toFixed(2).replace('.', ',') + '% + Marge ' + marginVal.toFixed(2).replace('.', ',') + '%';
+        var _dt = _neu ? _detailText(d, b.key, _activeMargin) : null;
+        if (_dt) {
+          detailEl.textContent = _dt;
+        } else {
+          var marginVal = d.margins[_activeMargin];
+          detailEl.textContent = 'Pfandbrief ' + yield_.toFixed(2).replace('.', ',') + '% + Marge ' + marginVal.toFixed(2).replace('.', ',') + '%';
+        }
       }
     });
 
@@ -196,15 +259,17 @@ var MarketRatesPF = (function() {
     var headerBadge = document.getElementById('mr-pf-source-badge');
     if (headerBadge) {
       var srcKey2 = d.source || 'static';
-      if (srcKey2 === 'live')      headerBadge.textContent = 'Pfandbrief Live · Bundesbank';
-      else if (srcKey2 === 'mixed') headerBadge.textContent = 'Pfandbrief Mixed (Live+Hinterlegt)';
-      else                          headerBadge.textContent = 'Pfandbrief Hinterlegt';
+      var _nm = (d.formel && d.formel.bund) ? 'Bundesanleihe + Marktaufschlag' : 'Pfandbrief + Marge';   /* v2245 */
+      if (srcKey2 === 'live')      headerBadge.textContent = _nm + ' · Live';
+      else if (srcKey2 === 'mixed') headerBadge.textContent = _nm + ' · Live + Hinterlegt';
+      else                          headerBadge.textContent = _nm + ' · Hinterlegt';
     }
 
-    // V213: Sublabel
+    // V213: Sublabel  (v2245: der indikative Zins der aktiven Stufe, nicht mehr die Pfandbrief-Rendite)
     if (window.CollapsibleCards && window.CollapsibleCards.setSublabel) {
-      var y10 = d.yields && d.yields['10'];
-      var y20 = d.yields && d.yields['20'];
+      var _i10 = d.indicativeRates && d.indicativeRates['10'], _i20 = d.indicativeRates && d.indicativeRates['20'];
+      var y10 = _i10 ? _i10[_activeMargin] : null;
+      var y20 = _i20 ? _i20[_activeMargin] : null;
       var bits = [];
       if (y10 != null) bits.push('10J ' + y10.toFixed(2).replace('.', ',') + '%');
       if (y20 != null) bits.push('20J ' + y20.toFixed(2).replace('.', ',') + '%');
@@ -260,6 +325,15 @@ var MarketRatesPF = (function() {
               label: function(ctx) {
                 if (ctx.parsed.y == null) return '–';
                 var bk = BUCKETS_PF[ctx.dataIndex].key;
+                var zl = _zerlegung(d, bk, _activeMargin);   /* v2245 */
+                if (zl) {
+                  return [
+                    'Indikativ: ' + ctx.parsed.y.toFixed(2).replace('.', ',') + ' % (Beleihung ' + zl.ltv + ' %)',
+                    'davon Bundesanleihe: ' + _pz(zl.bund) + ' %',
+                    'davon Marktaufschlag: ' + _pz(zl.markt) + (zl.monat ? ' (Stand ' + _monat(zl.monat) + ')' : ''),
+                    'davon Zuschlag nach Beleihung: ' + (zl.zuschlag >= 0 ? '+' : '−') + _pz(Math.abs(zl.zuschlag))
+                  ];
+                }
                 var yld = d.yields[bk];
                 var mar = d.margins[_activeMargin];
                 return [
@@ -311,7 +385,8 @@ var MarketRatesPF = (function() {
 /* === dpfk-konditionen-v3 BEGIN — alleiniger Kopfzeilen-Builder (finanz-card-merge ist deaktiviert) === */
 (function(){
   var PLANE='<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M21.5 2.5l-7 19.5-3.8-8.2-8.2-3.8z"/></svg>';
-  var LBL={ premium:'LTV \u2264 60 %', standard:'LTV \u2264 80 %', schwach:'LTV > 90 %' };
+  /* v2245: die Stufen SIND feste Beleihungen der Marktformel (60 / 80 / 90 %) */
+  var LBL={ premium:'LTV 60 %', standard:'LTV 80 %', schwach:'LTV 90 %' };
   function activeKey(){
     var a=document.querySelector('.mr-pf-margin-btn.active');
     return a ? a.getAttribute('data-margin') : 'standard';
@@ -329,14 +404,14 @@ var MarketRatesPF = (function() {
     if(!band){
       band=document.createElement('div'); band.className='dpfk-band'; band.id='dpfk-band';
       band.innerHTML=
-        '<div class="dpfk-stub"><span class="dpfk-bp">PRE-FLIGHT</span><span class="dpfk-pf">KONDI&shy;TIONEN</span><span class="dpfk-fl" id="dpfk-ltvlabel">LTV \u2264 80 %</span><span class="dpfk-bc"></span></div>'+
+        '<div class="dpfk-stub"><span class="dpfk-bp">PRE-FLIGHT</span><span class="dpfk-pf">KONDI&shy;TIONEN</span><span class="dpfk-fl" id="dpfk-ltvlabel">LTV 80 %</span><span class="dpfk-bc"></span></div>'+
         '<div class="dpfk-perf"></div>'+
         '<div class="dpfk-body"><div class="dpfk-head">'+
           '<span class="dpfk-title"><span class="dpfk-plane">'+PLANE+'</span>Indikative Konditionen nach Zinsbindung</span>'+
           '<span class="dpfk-ctrl"><span class="dpfk-ltv">'+
-            '<button type="button" class="dpfk-ltv-btn" data-margin="premium">\u226460&nbsp;%</button>'+
-            '<button type="button" class="dpfk-ltv-btn" data-margin="standard">\u226480&nbsp;%</button>'+
-            '<button type="button" class="dpfk-ltv-btn" data-margin="schwach">&gt;80&nbsp;%</button>'+
+            '<button type="button" class="dpfk-ltv-btn" data-margin="premium" title="Beleihung 60 %">60&nbsp;%</button>'+
+            '<button type="button" class="dpfk-ltv-btn" data-margin="standard" title="Beleihung 80 %">80&nbsp;%</button>'+
+            '<button type="button" class="dpfk-ltv-btn" data-margin="schwach" title="Beleihung 90 %">90&nbsp;%</button>'+
           '</span></span>'+
         '</div></div>';
       strip.parentNode.insertBefore(band, strip);

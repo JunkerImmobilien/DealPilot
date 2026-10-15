@@ -281,6 +281,8 @@
        yields          {"5":3.68,"10":3.88,"15":3.99,"20":4.05}
        margins         {"premium":0.2,"standard":0.3,"schwach":0.55}
        indicativeRates {"10":{"premium":4.08,"standard":4.18,...}}
+       (v2245: dazu formel {bund, aufschlag, aufschlag_monat, k, zuschlaege};
+        indicativeRates rechnet seit v2245 die Marktformel, Stufe standard = 80 %)
 
      Dazu haette meine Rechnung "+1,00 % Marge" auch inhaltlich nicht
      gestimmt: die Marge liefert die Schnittstelle selbst mit, und sie
@@ -313,10 +315,26 @@
         var zins = satz.standard != null ? satz.standard : satz.premium;
         if (zins == null) return;
         karten[i].querySelector('.zs').textContent = pz(zins);
-        var marge = d.margins && d.margins.standard;
-        karten[i].querySelector('.er').textContent = (roh != null)
-          ? 'Pfandbrief ' + pz(roh) + ' + Marge ' + (marge != null ? pz(marge) : '\u2013')
-          : 'Indikativ nach Zinsbindung';
+        /* v2245 \u00b7 Marktformel: Bundesanleihe + Marktaufschlag (+ Zuschlag
+           nach Beleihung, bei 80 % = 0). Der angezeigte Marktaufschlag ist
+           Zins - Bundesanleihe, genau wie in der App (market-rates-pf.js
+           _zerlegung) - so zeigen beide dieselbe Zerlegung und sie geht
+           auf den Cent auf. Altmodell nur, wenn das Backend keine
+           Formel liefert. */
+        var f = d.formel, bund = f && f.bund ? f.bund[j] : null;
+        var er = karten[i].querySelector('.er');
+        if (bund != null) {
+          var mon = (f.aufschlag_monat_je && f.aufschlag_monat_je[j]) || f.aufschlag_monat || '';
+          var mp = String(mon).split('-');
+          er.textContent = 'Bundesanleihe ' + pz(bund) + ' + Marktaufschlag '
+            + (Math.round((zins - bund) * 100) / 100).toFixed(2).replace('.', ',')
+            + (mp.length >= 2 ? ' (Stand ' + mp[1] + '/' + mp[0] + ')' : '');
+        } else {
+          var marge = d.margins && d.margins.standard;
+          er.textContent = (roh != null)
+            ? 'Pfandbrief ' + pz(roh) + ' + Marge ' + (marge != null ? pz(marge) : '\u2013')
+            : 'Indikativ nach Zinsbindung';
+        }
         /* Was live ist, darf auch so heissen - und was es nicht ist, nicht. */
         var bd = karten[i].querySelector('.bd');
         if (bd) bd.textContent = (d.sources && d.sources[j] === 'live') ? 'LIVE' : 'INDIKATIV';

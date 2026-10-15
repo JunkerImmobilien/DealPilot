@@ -2506,7 +2506,7 @@ label.dp-required.qc-required::after {
     <div id="rates-source" class="rates-source-box"></div>
     <div class="mr-disclaimer">
       <strong>Hinweis:</strong> Diese Daten zeigen den durchschnittlichen Markt-Effektivzins der MFI-Statistik der Deutschen Bundesbank — keine Konditions-Quote.
-      Bank-individuelle Angebote (z.B. bei Interhyp, Dr. Klein, Baufi24) hängen von Bonität, LTV, Lage und Bankpartner ab und können abweichen.
+      Bank-individuelle Angebote hängen von Bonität, LTV, Lage und Bankpartner ab und können abweichen.
       Diese Empfehlung ist kein Finanzberatungs-Ersatz nach § 34c GewO.
     </div>
   </div>
@@ -2518,27 +2518,27 @@ label.dp-required.qc-required::after {
       <div class="ct" style="margin:0;border:none;padding:0">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>
         Indikative Konditionen nach Zinsbindung
-        <span class="info-tag" id="mr-pf-source-badge">Pfandbrief + Marge</span>
+        <span class="info-tag" id="mr-pf-source-badge">Bundesanleihe + Marktaufschlag</span>
       </div>
-      <button class="btn btn-outline btn-sm" onclick="refreshPfandbriefRates()" title="Pfandbrief-Daten aktualisieren" aria-label="Aktualisieren">↻</button>
+      <button class="btn btn-outline btn-sm" onclick="refreshPfandbriefRates()" title="Zinsdaten aktualisieren" aria-label="Aktualisieren">↻</button>
     </div>
 
-    <p class="mr-pf-intro">Banken refinanzieren Wohnungsbau-Darlehen über Pfandbriefe. Der Bauzins ergibt sich aus Pfandbrief-Rendite plus Bank-Marge — abhängig von Beleihung (LTV) und Bonität.</p>
+    <p class="mr-pf-intro">Der Bauzins folgt dem Kapitalmarkt: Rendite der Bundesanleihe gleicher Laufzeit (täglich) plus der Marktaufschlag, den Banken in Deutschland tatsächlich nehmen (MFI-Zinsstatistik der Bundesbank, monatlich), plus ein Zuschlag nach Beleihung (LTV).</p>
 
     <!-- Marge-Stufen-Picker -->
-    <div class="mr-pf-margin-picker" role="group" aria-label="Bonitäts-Szenario">
-      <span class="mr-pf-margin-label">Ihr Szenario:</span>
+    <div class="mr-pf-margin-picker" role="group" aria-label="Beleihung">
+      <span class="mr-pf-margin-label">Beleihung:</span>
       <button type="button" class="mr-pf-margin-btn" data-margin="premium"            onclick="setPfandbriefMargin('premium')">
-        <span class="mr-pf-margin-btn-title">Premium</span>
-        <span class="mr-pf-margin-btn-hint">LTV bis 60 % · Top-Bonität · +0,25 %</span>
+        <span class="mr-pf-margin-btn-title">LTV 60 %</span>
+        <span class="mr-pf-margin-btn-hint">Zuschlag −0,20 · viel Eigenkapital</span>
       </button>
       <button type="button" class="mr-pf-margin-btn active" data-margin="standard"   onclick="setPfandbriefMargin('standard')">
-        <span class="mr-pf-margin-btn-title">Standard</span>
-        <span class="mr-pf-margin-btn-hint">LTV bis 80 % · normale Bonität · +0,40 %</span>
+        <span class="mr-pf-margin-btn-title">LTV 80 %</span>
+        <span class="mr-pf-margin-btn-hint">Zuschlag ±0 · Bezugspunkt</span>
       </button>
       <button type="button" class="mr-pf-margin-btn" data-margin="schwach"            onclick="setPfandbriefMargin('schwach')">
-        <span class="mr-pf-margin-btn-title">Risiko-Aufschlag</span>
-        <span class="mr-pf-margin-btn-hint">LTV über 80 % oder Bonität mittel · +0,80 %</span>
+        <span class="mr-pf-margin-btn-title">LTV 90 %</span>
+        <span class="mr-pf-margin-btn-hint">Zuschlag +0,22 · wenig Eigenkapital</span>
       </button>
     </div>
 
@@ -2550,7 +2550,7 @@ label.dp-required.qc-required::after {
           <span class="mr-pf-tile-src" id="mr-pf-src-5">…</span>
         </div>
         <div class="mr-pf-tile-rate" id="mr-pf-rate-5">–</div>
-        <div class="mr-pf-tile-detail" id="mr-pf-detail-5">Pfandbrief + Marge</div>
+        <div class="mr-pf-tile-detail" id="mr-pf-detail-5">Bundesanleihe + Marktaufschlag</div>
       </div>
       <div class="mr-pf-tile" data-maturity="10">
         <div class="mr-pf-tile-head">
@@ -2558,7 +2558,7 @@ label.dp-required.qc-required::after {
           <span class="mr-pf-tile-src" id="mr-pf-src-10">…</span>
         </div>
         <div class="mr-pf-tile-rate" id="mr-pf-rate-10">–</div>
-        <div class="mr-pf-tile-detail" id="mr-pf-detail-10">Pfandbrief + Marge</div>
+        <div class="mr-pf-tile-detail" id="mr-pf-detail-10">Bundesanleihe + Marktaufschlag</div>
       </div>
       <div class="mr-pf-tile" data-maturity="15">
         <div class="mr-pf-tile-head">
@@ -2566,7 +2566,7 @@ label.dp-required.qc-required::after {
           <span class="mr-pf-tile-src" id="mr-pf-src-15">…</span>
         </div>
         <div class="mr-pf-tile-rate" id="mr-pf-rate-15">–</div>
-        <div class="mr-pf-tile-detail" id="mr-pf-detail-15">Pfandbrief + Marge</div>
+        <div class="mr-pf-tile-detail" id="mr-pf-detail-15">Bundesanleihe + Marktaufschlag</div>
       </div>
       <div class="mr-pf-tile" data-maturity="20">
         <div class="mr-pf-tile-head">
@@ -2574,7 +2574,7 @@ label.dp-required.qc-required::after {
           <span class="mr-pf-tile-src" id="mr-pf-src-20">…</span>
         </div>
         <div class="mr-pf-tile-rate" id="mr-pf-rate-20">–</div>
-        <div class="mr-pf-tile-detail" id="mr-pf-detail-20">Pfandbrief + Marge</div>
+        <div class="mr-pf-tile-detail" id="mr-pf-detail-20">Bundesanleihe + Marktaufschlag</div>
       </div>
     </div>
 
@@ -2589,9 +2589,9 @@ label.dp-required.qc-required::after {
     <!-- Quelle + Disclaimer -->
     <div class="mr-pf-source" id="mr-pf-source"></div>
     <div class="mr-disclaimer">
-      <strong>Hinweis:</strong> Diese Werte sind <strong>indikative Schätzungen</strong> basierend auf der Bundesbank-Pfandbrief-Zinsstruktur (BBSIS) plus einer typischen Bank-Marge.
-      Sie ersetzen <strong>kein</strong> konkretes Bankangebot. Tatsächliche Konditionen variieren je nach Bank, regionaler Lage, individueller Bonität, Beleihungswert und Auszahlungszeitpunkt. Es handelt sich um <strong>keine Finanzierungsberatung und keine Darlehensvermittlung</strong> im Sinne des § 34c GewO und um kein konkretes Angebot; die zugrunde gelegte Bank-Marge ist eine <strong>typisierte Annahme</strong>.
-      Konkrete Angebote über Vermittler wie Interhyp, Dr. Klein, Baufi24 oder direkt bei der Hausbank.
+      <strong>Hinweis:</strong> Diese Werte sind <strong>indikative Schätzungen</strong>: Rendite der Bundesanleihe (Deutsche Bundesbank, täglich) plus Marktaufschlag aus der MFI-Zinsstatistik Wohnungsbau (Deutsche Bundesbank, monatlich) plus Zuschlag nach Beleihung.
+      Sie ersetzen <strong>kein</strong> konkretes Bankangebot. Tatsächliche Konditionen variieren je nach Bank, regionaler Lage, individueller Bonität, Beleihungswert und Auszahlungszeitpunkt. Es handelt sich um <strong>keine Finanzierungsberatung und keine Darlehensvermittlung</strong> im Sinne des § 34c GewO und um kein konkretes Angebot; Kalibrierung auf das Angebotsniveau und Zuschlag nach Beleihung sind <strong>typisierte Annahmen</strong>.
+      Konkrete Angebote bei Banken oder Finanzierungsvermittlern.
     </div>
   </div>
 
@@ -2601,10 +2601,10 @@ label.dp-required.qc-required::after {
 
   <!-- v358-pf-split: schlanke Pfandbrief-Zins-Leiste (Auszug). Vollkarte im Marktdaten-Modal. -->
   <div class="mrpf-top-strip" id="mrpf-top-strip" aria-label="Indikative Konditionen nach Zinsbindung">
-    <div class="mrpf-top-tile"><div class="mrpf-top-head"><span class="mrpf-top-label">5 Jahre</span><span class="mrpf-top-src" id="mrpf-top-src-5">…</span></div><div class="mrpf-top-rate" id="mrpf-top-rate-5">–</div><div class="mrpf-top-detail" id="mrpf-top-detail-5">Pfandbrief + Marge</div></div>
-    <div class="mrpf-top-tile"><div class="mrpf-top-head"><span class="mrpf-top-label">10 Jahre</span><span class="mrpf-top-src" id="mrpf-top-src-10">…</span></div><div class="mrpf-top-rate" id="mrpf-top-rate-10">–</div><div class="mrpf-top-detail" id="mrpf-top-detail-10">Pfandbrief + Marge</div></div>
-    <div class="mrpf-top-tile"><div class="mrpf-top-head"><span class="mrpf-top-label">15 Jahre</span><span class="mrpf-top-src" id="mrpf-top-src-15">…</span></div><div class="mrpf-top-rate" id="mrpf-top-rate-15">–</div><div class="mrpf-top-detail" id="mrpf-top-detail-15">Pfandbrief + Marge</div></div>
-    <div class="mrpf-top-tile"><div class="mrpf-top-head"><span class="mrpf-top-label">20 Jahre</span><span class="mrpf-top-src" id="mrpf-top-src-20">…</span></div><div class="mrpf-top-rate" id="mrpf-top-rate-20">–</div><div class="mrpf-top-detail" id="mrpf-top-detail-20">Pfandbrief + Marge</div></div>
+    <div class="mrpf-top-tile"><div class="mrpf-top-head"><span class="mrpf-top-label">5 Jahre</span><span class="mrpf-top-src" id="mrpf-top-src-5">…</span></div><div class="mrpf-top-rate" id="mrpf-top-rate-5">–</div><div class="mrpf-top-detail" id="mrpf-top-detail-5">Bundesanleihe + Marktaufschlag</div></div>
+    <div class="mrpf-top-tile"><div class="mrpf-top-head"><span class="mrpf-top-label">10 Jahre</span><span class="mrpf-top-src" id="mrpf-top-src-10">…</span></div><div class="mrpf-top-rate" id="mrpf-top-rate-10">–</div><div class="mrpf-top-detail" id="mrpf-top-detail-10">Bundesanleihe + Marktaufschlag</div></div>
+    <div class="mrpf-top-tile"><div class="mrpf-top-head"><span class="mrpf-top-label">15 Jahre</span><span class="mrpf-top-src" id="mrpf-top-src-15">…</span></div><div class="mrpf-top-rate" id="mrpf-top-rate-15">–</div><div class="mrpf-top-detail" id="mrpf-top-detail-15">Bundesanleihe + Marktaufschlag</div></div>
+    <div class="mrpf-top-tile"><div class="mrpf-top-head"><span class="mrpf-top-label">20 Jahre</span><span class="mrpf-top-src" id="mrpf-top-src-20">…</span></div><div class="mrpf-top-rate" id="mrpf-top-rate-20">–</div><div class="mrpf-top-detail" id="mrpf-top-detail-20">Bundesanleihe + Marktaufschlag</div></div>
   </div>
   <div class="col2">
     <div>
@@ -3593,7 +3593,7 @@ label.dp-required.qc-required::after {
 <script src="js/mietentwicklung.js?v=v2180"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=v2239"></script>
-<script src="js/config.js?v=v2242"></script>
+<script src="js/config.js?v=v2245"></script>
   <script src="js/legal-links.js?v=v1885" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
   <script src="js/autocomplete-debug.js?v=174" defer></script>
@@ -3629,12 +3629,12 @@ label.dp-required.qc-required::after {
 <script src="js/gesellschaft-abschluss.js?v=v1235b"></script>
 <script src="js/charts.js?v=166"></script>
 <script src="js/market-rates.js?v=893a"></script>
-<script src="js/market-rates-pf.js?v=v2242"></script>
-<script src="js/indicative-zins.js?v=v2242"></script>
+<script src="js/market-rates-pf.js?v=v2245"></script>
+<script src="js/indicative-zins.js?v=v2245"></script>
 <script src="js/market-context.js?v=100"></script>
 <script src="js/zinsannahme.js?v=100"></script>
 <script src="js/collapsible-cards.js?v=100"></script>
-<script src="js/v10.js?v=v2242"></script>
+<script src="js/v10.js?v=v2245"></script>
 <script src="js/ui.js?v=v2217b"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
 <script src="js/storage.js?v=v2243"></script>
@@ -3736,7 +3736,7 @@ label.dp-required.qc-required::after {
 <script src="js/rnd-wizard.js?v=v1970"></script>
 <script src="js/free-lock.js?v=v2180"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
-<script src="js/investment-profile.js?v=v2243"></script>
+<script src="js/investment-profile.js?v=v2245"></script>
 <script src="js/bwk-profil.js?v=v2211"></script>
 <script src="js/dashboard.js?v=v2240"></script>
 <script src="js/portfolio-strategie.js?v=v1935c"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
