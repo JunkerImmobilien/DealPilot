@@ -43,7 +43,7 @@
   var STUDIO = (function () { try { return new URLSearchParams(location.search).has('studio') && window.parent !== window; } catch (e) { return false; } })();
   /* v2235d · Marcel: „den Pilot musst du ausblenden!" - im Studio ab dem
      ersten Laden, nicht erst ab start() (vorher stand er gemessen links unten) */
-  if (STUDIO) { try { document.documentElement.classList.add('dpm-studio', 'dpm-laeuft'); var _ps = document.createElement('style'); _ps.textContent = 'html.dpm-studio #dp-pilot,html.dpm-studio #dp-tower,html.dpm-studio .dp-pilot-fab{display:none!important}'; document.head.appendChild(_ps); } catch (e) {} }
+  if (STUDIO) { try { document.documentElement.classList.add('dpm-studio', 'dpm-laeuft'); var _ps = document.createElement('style'); _ps.textContent = 'html.dpm-studio #dp-pilot,html.dpm-studio #dp-tower,html.dpm-studio .dp-pilot-fab{display:none!important}html.dpm-studio .sb-user-email,html.dpm-studio .settings-modal .ms-foot .ml{visibility:hidden!important}'; document.head.appendChild(_ps); } catch (e) {} }
   function anStudio(m) { try { m.source = 'dp-messe-studio'; window.parent.postMessage(m, location.origin); } catch (e) {} }
   var TEMPO = (function () { try { var t = parseFloat(new URLSearchParams(location.search).get('tempo')); return (t > 0.3 && t < 4) ? t : 1.4; } catch (e) { return 1.4; } })();
   function warte(ms) { if (ms >= 600) ms = Math.round(ms * TEMPO); return new Promise(function (r, x) { var l = lauf; setTimeout(function () { l === lauf ? r() : x('stopp'); }, ms); }); }
@@ -104,6 +104,9 @@
       'html.dpm-studio #dpm-stopp{display:none}',
       /* v2233 · die Pilot-Hilfe stoert im Video - waehrend eines Laufs ausgeblendet */
       'html.dpm-laeuft #dp-pilot,html.dpm-laeuft #dp-tower{display:none!important}',
+      /* v2266a · keine Kontaktdaten im Bild: die Konto-Adresse unten in der
+         Seitenleiste stand in allen Reihen-Videos bis 11 (gemessen am Bild) */
+      'html.dpm-laeuft .sb-user-email,html.dpm-laeuft .settings-modal .ms-foot .ml{visibility:hidden!important}',
       '@media (max-width:640px){#dpm-zeile .t{font-size:18px}#dpm-karte h1{font-size:40px}#dpm-karte p{font-size:16px}}'
     ].join('\n');
     document.head.appendChild(st);
@@ -1363,7 +1366,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2263b';
+  var RH_BUSTER = 'v2266';
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel/i;
@@ -2445,6 +2448,9 @@
        der Kopie hieße es sonst „gehört zu einem anderen Objekt". Ohne Kennung
        prüft die App nur den Zahlenabdruck, wie bei jeder Analyse. */
     var ai = opt.ohneAnalyse ? null : o.ai_analysis;   /* v2263: Überblick 2 braucht keine (und das PDF druckte sie) */
+    /* v2266 · opt.analyse: ein MITSCHNITT statt der gespeicherten Analyse (Modul 11,
+       DPM_REIHE_DATEN.pilot) - das echte Objekt behält seine. */
+    if (opt.analyse) ai = JSON.stringify(opt.analyse);
     try { var aj = typeof ai === 'string' ? JSON.parse(ai) : ai; if (aj && aj._fuer) { delete aj._fuer.objekt_id; ai = JSON.stringify(aj); } } catch (e) {}
     var neu = await Auth.apiCall('/objects', { method: 'POST', body: { data: d, aiAnalysis: ai, photos: o.photos || [] } });
     var nid = neu && (neu.id || (neu.data && neu.data.id) || (neu.object && neu.object.id));
@@ -2716,13 +2722,14 @@
   /* ═══ VIDEOREIHE · SPEZIALMODULE 11–14 (v2263) ═══════════════════════
      Videoreihe.md, Teil C. Alle vier an KOPIEN (r6KopieStart, beim Aufräumen
      gelöscht, auch bei Esc); die echten Objekte werden nie geladen.
-       11 Pilot-Analyse  Ravensberger Weg 38 (MFH) - die gespeicherte Analyse
-          vom 13.10.2026. NICHT Westerfeldstr. 140: deren Analyse empfiehlt eine
-          Offerte von 910.000 € bei 545.000 € Kaufpreis und nennt im Abschnitt
-          Lage Immobilienportale (gemessen 15.10.2026; gemeldet).
+       11 Pilot-Analyse  Westerfeldstr. 140 (MFH, 4 WE) - seit v2266 mit einer
+          NEUEN Analyse als Mitschnitt (DPM_REIHE_DATEN.pilot, einmal echt erzeugt
+          am 15.10.2026 nach v2264: keine Anbieternamen, Offerte 530.000 € bei
+          545.000 € Kaufpreis). Die gespeicherte Analyse des Objekts (Offerte
+          910.000 €, Portalnamen) wird an der Kopie ersetzt, nie angezeigt.
        12 Bewertung, 13 Deal-Aktion  Westerfeldstr. 140 (MFH, 4 WE)
        14 Bestand  Parkstr. 9 (gewonnen, Ankauf-Stand) - Kopie MIT Gewonnen-Status
-     Kein KI-Abruf: die Analyse ist die gespeicherte. Gesperrt (RH_SPERRE):
+     Kein KI-Abruf: die Analyse ist ein Mitschnitt (11) oder die gespeicherte (12-14). Gesperrt (RH_SPERRE):
      KI, Marktbericht, BMF, Partner-/Netzwerk-/Ämter-Anfragen, Pässe,
      Portfolio-Spiegel. Geklickt werden nur Reiter, Unter-Reiter und der
      Soll/Ist-Umschalter - kein Deal-Status, kein PDF, kein „Stand neu nehmen". */
@@ -2773,8 +2780,10 @@
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }], aufraeumen: rhAufraeumen,
     szenen: [
       async function (s) {   /* 1 · das Beispiel */
-        await r6KopieStart(R6_MFH, { ohneAnkauf: true });
-        await r6MfhBeispiel(s, ' Heute: die <b>Pilot-Analyse</b>.');
+        await rhLaden();
+        var pa = (window.DPM_REIHE_DATEN || {}).pilot; if (!pa) throw new Error('Mitschnitt pilot fehlt - die gespeicherte Analyse nennt Portale');
+        await r6KopieStart(R11_WESTERFELD, { ohneAnkauf: true, analyse: pa });
+        await r11Beispiel(s, ' Heute: die <b>Pilot-Analyse</b>.');
       },
       async function (s) {   /* 2 · Aufruf und was sie liest */
         reiter('s5'); await warte(1200);
@@ -2811,7 +2820,10 @@
         await b2oZeile(s, 'Anschlussfinanzierung', 'Was passiert nach der Zinsbindung, wenn der Zins steigt? Der Pilot rechnet es durch.');
         var w = function () { var p = r11Panel(); var c = p && [].filter.call(p.querySelectorAll('.dp-pa-cols'), function (x) { return /WORST CASE/.test(x.textContent); })[0]; return c || null; };
         await zeige(w, 8);
-        var wc = r11Text(/WORST CASE\s*\n\s*([^\n]+)/), bc = r11Text(/BEST CASE\s*\n\s*([^\n]+)/);
+        /* v2266 · die Unterzeile der Karte (.dp-pa-kv-sub) per textContent - innerText
+           lieferte sie in Versalien („MIETE -10%") */
+        var sub = function (re) { var c = w(); var k = c && [].filter.call(c.querySelectorAll('.dp-pa-card'), function (x) { return re.test(r6Text(x.querySelector('.dp-pa-sec') || x)); })[0]; var u = k && k.querySelector('.dp-pa-kv-sub'); return u ? u.textContent.trim().replace(/(\d)%/g, '$1 %') : null; };
+        var wc = sub(/WORST CASE/i) || r11Text(/WORST CASE\s*\n\s*([^\n]+)/), bc = sub(/BEST CASE/i) || r11Text(/BEST CASE\s*\n\s*([^\n]+)/);
         await b2oZeile(s, 'Worst Case und Best Case', 'Zwei Szenarien' + (wc ? ': schlecht <b>' + wc + '</b>' : '') + (bc ? ', gut <b>' + bc + '</b>' : '') + ' — mit dem, was dann vom Cashflow bleibt.');
       },
       async function (s) {   /* 7 · Lage und Markt (ohne die Portal-Quellen) */
@@ -2820,10 +2832,19 @@
         await zeige(k1, 8);
         await r11Unten(k1);
         if (!r11VerbotenImBild()) await b2oZeile(s, 'Lage und Markt', 'Makro- und Mikrolage recherchiert: Einwohner, Arbeitsmarkt, Nachfrage, Umfeld der Straße.');
+        /* v2266 · der Abgleich steht nur, wenn ein Marktbericht vorlag (an der Kopie
+           der Westerfeldstr. nicht) - dann die Gegenüberstellung je Merkmal */
         var k2 = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-abgl'); };
-        await zeige(k2, 8);
-        await r11Unten(k2);
-        if (!r11VerbotenImBild()) await b2oZeile(s, 'Abgleich mit dem Marktbericht', 'Wo die Recherche dem Marktbericht zustimmt — und wo sie abweicht. Abweichungen nennt der Pilot ausdrücklich.');
+        var k3 = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-ggs'); };
+        if (k2()) {
+          await zeige(k2, 8);
+          await r11Unten(k2);
+          if (!r11VerbotenImBild()) await b2oZeile(s, 'Abgleich mit dem Marktbericht', 'Wo die Recherche dem Marktbericht zustimmt — und wo sie abweicht. Abweichungen nennt der Pilot ausdrücklich.');
+        } else if (k3()) {
+          await zeige(k3, 8);
+          await r11Unten(k3);
+          if (!r11VerbotenImBild()) await b2oZeile(s, 'Gegenüberstellung', 'Je Merkmal deine Angabe neben der Recherche — mit Quelle und Urteil. Wo es nicht passt, sagt der Pilot es.');
+        }
       },
       async function (s) {   /* 8 · Verhandlung */
         await r11PaTab(/^Verhandlung/);
