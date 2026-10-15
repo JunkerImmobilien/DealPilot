@@ -2304,7 +2304,7 @@ function _updateFooterNav(paneId){
     var hints = {
       'p-ak':    '<b>Schritt 1 / 4:</b> Anschaffungskosten — Brutto-KP, Inventar, Nebenkosten ergeben die Prognose-AK (V292-Pipeline).',
       'p-bmf':   '<b>Schritt 2 / 4:</b> BMF-Eckdaten + KI-GAA. Änderungen lösen automatisch eine neue Berechnung aus (500ms debounced).',
-      'p-afa':   '<b>Schritt 3 / 4:</b> 3-Spalten-Vergleich der Varianten (Konservativ / Optimiert / Aggressiv) — wählen Sie in Pane 4.',
+      'p-afa':   '<b>Schritt 3 / 4:</b> Vergleich der vier Varianten (Amtlich / Konservativ / Optimiert / Aggressiv) — wählen Sie in Pane 4.',
       'p-hebel': '<b>Schritt 4 / 4:</b> Wählen Sie die Variante per Klick auf eine Karte. Bei „Übernehmen" wird der Gebäudeanteil ins Steuermodul geschrieben.'
     }; /* V292-footer-hints */
     hint.innerHTML = hints[paneId] || hints['p-ak'];

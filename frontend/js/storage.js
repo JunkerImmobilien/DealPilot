@@ -1188,6 +1188,26 @@ function _newObjLeeren() {
     if (e.type === 'checkbox') { e.checked = e.defaultChecked; return; }
     e.value = '';
   });
+  /* v2257 · Dasselbe fuer Felder, deren Markup einen RICHTWERT traegt.
+     Gemessen am 15.10.2026 (Videoreihe Modul 06): nach „Neues Objekt"
+     standen die acht Sanierungs-Richtwerte (Fenster 8.000 € … Baeder
+     10.000 €) leer - ein Haken bei „Baeder" ergab 0 €, und „In
+     Sanierungskosten uebernehmen" meldete „erst Bereiche auswaehlen".
+     Ebenso die Staffel im Detail-Modus der Mietentwicklung (3 x alle
+     3 Jahre, 18 %) und drei Auswahllisten ohne Auswahl (brutto/netto,
+     Verteilung Sanierung, Verteilung Inventar). Gefuellt wird nur, was
+     setDefaults() nicht ohnehin setzt. */
+  ['fesh_f_cost', 'fesh_e_cost', 'fesh_s_cost', 'fesh_h_cost', 'fesh_d_cost', 'fesh_b_cost', 'fesh_k_cost', 'fesh_o_cost',
+   'me_anz', 'me_int', 'me_pct'].forEach(function (id) {
+    var e = document.getElementById(id);
+    if (e && e.defaultValue) e.value = e.defaultValue;
+  });
+  ['san_ust', 'san_tax_years', 'inv_tax_years'].forEach(function (id) {
+    var e = document.getElementById(id);
+    if (!e || e.tagName !== 'SELECT' || !e.options.length) return;
+    var std = [].filter.call(e.options, function (o) { return o.defaultSelected; })[0] || e.options[0];
+    e.value = std.value;
+  });
   // V63.22: Auch QC-Felder explizit leeren (waren nicht in FIELDS)
   // Sonst behalten qc_kp / qc_nkm_grund / qc_nkm_stp / qc_nkm_garage / qc_nkm_sonst /
   // qc_ek / qc_knk / qc_zins / qc_tilg ihre Werte → Score "merkt" sich altes Objekt

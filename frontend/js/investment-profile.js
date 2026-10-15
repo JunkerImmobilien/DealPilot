@@ -481,10 +481,59 @@ window.DealPilotInvestmentProfile = (function() {
     ['ip_zinsbindung_default','ip_zins_margin'].forEach(function(id){ var el=document.getElementById(id); if(!el||el._mktBound) return; el._mktBound=1; el.addEventListener('change', function(){ if(inp.dataset.market==='1') toMarket(); }); });
     inp.addEventListener('input', function(){ if(inp.dataset.market==='1' && document.activeElement===inp) toOverride(); });
   }
+  /* ══ v2257 · EIGENKAPITAL UND MIETAUSFALL KOMMEN NACH ══════════════════
+     Gemessen am 15.10.2026 (Videoreihe Module 08/09): „Neues Objekt" legt
+     ein LEERES Formular an. applyToNewObject() und setDefaults() rechnen
+     Eigenkapital (10 % v. KP) und Mietausfall (1 % der Jahresmiete) nur,
+     wenn Kaufpreis bzw. Miete in diesem Augenblick schon stehen - das tun
+     sie dort nie. Beide Standardwerte kamen so bei keinem neu angelegten
+     Objekt an; Eigenkapital und Darlehen standen auf 0, der Mietausfall
+     leer, obwohl die Einstellungen „wird automatisch in € umgerechnet"
+     zusagen.
+     Jetzt: sobald der Nutzer Kaufpreis bzw. Nettokaltmiete eintraegt und
+     das Zielfeld LEER ist, wird es aus dem Profil gesetzt. Nur auf echte
+     Eingaben (isTrusted) - beim Laden eines Objekts wird nie geschrieben.
+     Ein eingetragener Wert wird nie ueberschrieben. */
+  function _zahlFeld(id) {
+    var e = document.getElementById(id); if (!e) return null;
+    var s = String(e.value || '').trim(); if (!s) return null;
+    var n = (typeof window.parseDe === 'function') ? window.parseDe(s) : parseFloat(s.replace(/\./g, '').replace(',', '.'));
+    return isFinite(n) ? n : null;
+  }
+  function nachziehen(quelle) {
+    var gesetzt = [];
+    function setzeLeer(id, wert) {
+      var e = document.getElementById(id);
+      if (!e || String(e.value || '').trim() !== '' || !(wert > 0)) return;
+      e.value = String(Math.round(wert));
+      try { e.dispatchEvent(new Event('input', { bubbles: true })); } catch (x) {}
+      gesetzt.push(id);
+    }
+    function pct(k) { var v = parseFloat(String(get(k) == null ? '' : get(k)).replace(',', '.')); return isFinite(v) && v > 0 ? v : null; }
+    if (quelle === 'kp') {
+      var kp = _zahlFeld('kp'), q = pct('ek_quote_default');
+      if (kp > 0 && q) setzeLeer('ek', kp * q / 100);
+      /* das Darlehen laeuft mit (financing.js), wie nach einer eigenen Eingabe */
+      if (gesetzt.length && typeof window.dpDarlehenNachziehen === 'function') setTimeout(window.dpDarlehenNachziehen, 420);
+    }
+    if (quelle === 'nkm') {
+      var nkm = _zahlFeld('nkm'), m = pct('mietausfall_pct');
+      if (nkm > 0 && m) setzeLeer('mietausfall', nkm * 12 * m / 100);
+    }
+    if (gesetzt.length && typeof window.calc === 'function') { try { window.calc(); } catch (x) {} }
+    return gesetzt;
+  }
+  document.addEventListener('change', function (ev) {
+    var t = ev.target;
+    if (!ev.isTrusted || !t || (t.id !== 'kp' && t.id !== 'nkm')) return;
+    nachziehen(t.id);
+  }, true);
+
   return {
     load: load,
     get: get,
     save: save,                     // V63.96: für Settings-KI-Tab-Persist
+    nachziehen: nachziehen,         /* v2257 */
     applyToNewObject: applyToNewObject,
     getZins: getZins,
     wireMarketRate: wireMarketRate,

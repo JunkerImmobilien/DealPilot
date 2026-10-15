@@ -275,7 +275,7 @@
         hint.style.cssText = 'display:block;margin-top:4px;font-size:11px;color:var(--gold)';
         parent.appendChild(hint);
       }
-      hint.textContent = `Aus PLZ ermittelt: ${info.name} ${info.rate.toFixed(1)}%`;
+      hint.textContent = `Aus PLZ ermittelt: ${info.name} ${info.rate.toFixed(1).replace('.', ',')} %`;   /* v2257: Dezimalkomma */
     }
 
     plzInput.addEventListener('change', applyGrestFromPlz);

@@ -98,7 +98,20 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     '04': { hinweis: 'Vorführung · Beispieldaten · aufgezeichnete Abrufe', messe: 'reihe-stufen', titel: 'Marktbewertung in drei Stufen', unter: 'Was jede Stufe braucht — und was sie liefert.',
             spruch: 'Drei Stufen Steigflug.', spruch2: 'Ab Stufe 3 amtlich.', weiter: 'Modul 05 · Komplettbeispiel: Sprache + Stufe 2' },
     '05': { hinweis: 'Vorführung · Beispieldaten · aufgezeichnete Abrufe', messe: 'reihe-sprache-stufe2', titel: 'Komplettbeispiel: Sprache + Stufe 2', unter: 'Erzählen, übernehmen, einschätzen — in einem Durchgang.',
-            spruch: 'Erzählt, bewertet, eingeordnet.', spruch2: 'Klar zum Start.', weiter: 'Modul 06 · Investition' }
+            spruch: 'Erzählt, bewertet, eingeordnet.', spruch2: 'Klar zum Start.', weiter: 'Modul 06 · Investition' },
+    /* v2257 · Module 06–10 (die Reiter); Modul 10 geteilt in 10a und 10b */
+    '06': { hinweis: 'Vorführung · Beispieldaten', messe: 'reihe-investition', titel: 'Investition', unter: 'Kaufpreis, Nebenkosten, Sanierung und Inventar — und woher die Vorbelegung kommt.',
+            spruch: 'Alles an Bord gewogen.', spruch2: 'Die Investition steht.', weiter: 'Modul 07 · Miete und Mietvertrag' },
+    '07': { hinweis: 'Vorführung · Beispieldaten', messe: 'reihe-miete', titel: 'Miete und Mietvertrag', unter: 'Ist-Miete, Marktmiete, Vertragsart und Mietentwicklung.',
+            spruch: 'Die Miete trägt.', spruch2: 'Steigflug eingeplant.', weiter: 'Modul 08 · Finanzierung' },
+    '08': { hinweis: 'Vorführung · Beispieldaten', messe: 'reihe-finanzierung', titel: 'Finanzierung', unter: 'Wie der Zins entsteht — und wo du die Standardwerte setzt.',
+            spruch: 'Zins verstanden,', spruch2: 'Schub berechnet.', weiter: 'Modul 09 · Bewirtschaftung' },
+    '09': { hinweis: 'Vorführung · Beispieldaten', messe: 'reihe-bewirtschaftung', titel: 'Bewirtschaftung', unter: 'Umlagefähig, nicht umlagefähig, Rücklage, Mietausfall.',
+            spruch: 'Laufende Kosten im Blick —', spruch2: 'ruhiger Reiseflug.', weiter: 'Modul 10a · Steuer' },
+    '10a': { hinweis: 'Vorführung · Beispieldaten', messe: 'reihe-steuer', titel: 'Steuer: AfA, Zeiträume, Restnutzungsdauer', unter: 'Was die Immobilie dir steuerlich bringt.',
+            spruch: 'Abschreibung an Bord,', spruch2: 'Steuer im Steigflug.', weiter: 'Modul 10b · BMF-Kaufpreisaufteilung' },
+    '10b': { hinweis: 'Vorführung · Beispieldaten · aufgezeichnete BMF-Berechnung', messe: 'reihe-bmf', titel: 'BMF-Kaufpreisaufteilung', unter: 'Gebäude und Boden — Bodenabschlag, Notarklausel, Absprünge.',
+            spruch: 'Gebäude und Boden getrennt —', spruch2: 'sauber gelandet.', weiter: 'Modul 11 · Pilot-Analyse' }
   };
   var MODUL = P.get('modul'), M = null;
   if (MODUL && REIHE[MODUL]) M = REIHE[MODUL];

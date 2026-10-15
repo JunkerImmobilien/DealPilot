@@ -557,7 +557,7 @@
     html += '</tr>';
 
     html += '</tbody></table>' +
-      '<p class="hint" style="margin-top:14px">Bitte beachten: <strong>Konservativ</strong> entspricht exakt dem BMF-Wert und ist FA-konform. ' +
+      '<p class="hint" style="margin-top:14px">Bitte beachten: <strong>Amtlich</strong> entspricht exakt dem BMF-Wert und ist FA-konform. ' +
       '<strong>Aggressiv</strong> kann bei Prüfung beanstandet werden. Empfehlung in Pane 4 wählen.</p>';
 
     v292Container.innerHTML = html;
