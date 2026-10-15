@@ -43,7 +43,7 @@
   var STUDIO = (function () { try { return new URLSearchParams(location.search).has('studio') && window.parent !== window; } catch (e) { return false; } })();
   /* v2235d · Marcel: „den Pilot musst du ausblenden!" - im Studio ab dem
      ersten Laden, nicht erst ab start() (vorher stand er gemessen links unten) */
-  if (STUDIO) { try { document.documentElement.classList.add('dpm-studio', 'dpm-laeuft'); var _ps = document.createElement('style'); _ps.textContent = 'html.dpm-studio #dp-pilot,html.dpm-studio #dp-tower,html.dpm-studio .dp-pilot-fab{display:none!important}html.dpm-studio .sb-user-email,html.dpm-studio .settings-modal .ms-foot .ml{visibility:hidden!important}'; document.head.appendChild(_ps); } catch (e) {} }
+  if (STUDIO) { try { document.documentElement.classList.add('dpm-studio', 'dpm-laeuft'); var _ps = document.createElement('style'); _ps.textContent = 'html.dpm-studio #dp-pilot,html.dpm-studio #dp-tower,html.dpm-studio .dp-pilot-fab{display:none!important}html.dpm-studio .sb-user-email,html.dpm-studio .sb-user-name,html.dpm-studio .sb-user-avatar,html.dpm-studio .settings-modal .ms-foot .ml,html.dpm-studio .settings-modal .ms-foot .nm,html.dpm-studio .settings-modal .ms-foot .av{visibility:hidden!important}'; document.head.appendChild(_ps); } catch (e) {} }
   function anStudio(m) { try { m.source = 'dp-messe-studio'; window.parent.postMessage(m, location.origin); } catch (e) {} }
   var TEMPO = (function () { try { var t = parseFloat(new URLSearchParams(location.search).get('tempo')); return (t > 0.3 && t < 4) ? t : 1.4; } catch (e) { return 1.4; } })();
   function warte(ms) { if (ms >= 600) ms = Math.round(ms * TEMPO); return new Promise(function (r, x) { var l = lauf; setTimeout(function () { l === lauf ? r() : x('stopp'); }, ms); }); }
@@ -106,7 +106,8 @@
       'html.dpm-laeuft #dp-pilot,html.dpm-laeuft #dp-tower{display:none!important}',
       /* v2266a · keine Kontaktdaten im Bild: die Konto-Adresse unten in der
          Seitenleiste stand in allen Reihen-Videos bis 11 (gemessen am Bild) */
-      'html.dpm-laeuft .sb-user-email,html.dpm-laeuft .settings-modal .ms-foot .ml{visibility:hidden!important}',
+      /* v2270 · auch der Name (Seitenleiste und Fuss der Einstellungen) */
+      'html.dpm-laeuft .sb-user-email,html.dpm-laeuft .sb-user-name,html.dpm-laeuft .sb-user-avatar,html.dpm-laeuft .settings-modal .ms-foot .ml,html.dpm-laeuft .settings-modal .ms-foot .nm,html.dpm-laeuft .settings-modal .ms-foot .av{visibility:hidden!important}',
       '@media (max-width:640px){#dpm-zeile .t{font-size:18px}#dpm-karte h1{font-size:40px}#dpm-karte p{font-size:16px}}'
     ].join('\n');
     document.head.appendChild(st);
