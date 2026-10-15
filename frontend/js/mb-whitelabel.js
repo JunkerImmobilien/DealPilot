@@ -25,6 +25,8 @@
       .then(function (j) {
         var b = j && j.branding;
         if (!b) return;                     /* kein Mandant -> nichts tun */
+        /* v2273 · der Markenname fürs PDF-Deckblatt (app.js) - dort stand fest „Junker Immobilien“ */
+        if (b.brand_name) window._mbMarkenName = String(b.brand_name);
         window.DealPilotWhitelabel.apply({
           accent: b.brand_accent, accentHi: b.brand_accent_hi, accentLo: b.brand_accent_lo,
           obsidian: b.brand_obsidian, name: b.brand_name, logo: b.brand_logo_b64

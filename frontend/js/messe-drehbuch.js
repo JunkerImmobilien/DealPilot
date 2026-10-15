@@ -1155,7 +1155,8 @@
      im Lauf, pointer-events:none, beim Aufräumen entfernt) */
   function b2oHuelle(a, b) {
     if (!a || !b) return a || b || null;
-    var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect(), h = el('dpm-huelle');
+    /* v2273 · rect() statt getBoundingClientRect: Ziele im Marktbericht-Fenster (iframe) lagen sonst um die Lage des Fensters verschoben (Prüflauf 16: Kegel 5 %) */
+    var ra = rect(a), rb = rect(b), h = el('dpm-huelle');
     h.style.cssText = 'position:fixed;pointer-events:none;visibility:hidden;left:' + Math.min(ra.left, rb.left) + 'px;top:' + Math.min(ra.top, rb.top) + 'px;width:' + (Math.max(ra.right, rb.right) - Math.min(ra.left, rb.left)) + 'px;height:' + (Math.max(ra.bottom, rb.bottom) - Math.min(ra.top, rb.top)) + 'px';
     return h;
   }
@@ -1367,7 +1368,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2268';   /* v2268: BMF-Mitschnitt neu (1.233.000) */
+  var RH_BUSTER = 'v2273';   /* v2273: Belege-Mitschnitt (Modul 15) */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage/i;
@@ -1377,6 +1378,8 @@
   /* v2271 · dazu der Nutzungszaehler: das Investment-PDF in Ueberblick 2 zaehlte je
      Lauf einen PDF-Export im Konto (usage_counters pdf_export, gemessen 11 -> 12).
      Gesperrt rechnet der Export weiter (pdf.js warnt nur). */
+  /* v2273 · Prüfung der im Lauf erzeugten PDFs (Module 18, 19): Konto-, Firmen-, Portal- und Dienstnamen im Text */
+  var RH_PDF_NAMEN = /Junker|info@|Marcel|scout|immowelt|wohnungsboerse|immonet|kleinanzeig|sprengnetter|pricehubble|openai|geoapify/gi;
   window.DPM_REIHE = { angelegt: [], gesperrt: [], gespielt: [], geloescht: [], abrufe: [], fertig: null };
   var _rh = null, _rhNachlauf = 0, _rhToene = [], _rhGum = null;
   function rhLaden() {
@@ -1429,9 +1432,12 @@
       if (ref && DPM_REIHE.angelegt.indexOf(ref) >= 0) return rhJ({ history: rhVerlauf() });
     }
     if (/\/api\/v1\/immometrica\//.test(u)) { var a = _imoAntwort(u); if (a) return rhJ(a); }
+    /* v2273 · Belege einlesen (Modul 15): die Auslese der beiden Beispielbelege, einmal echt */
+    if (m === 'POST' && D.belege && /\/ai\/extract-beleg/.test(u)) return rhJ(JSON.parse(JSON.stringify(D.belege)));
     /* v2257 · BMF-Kaufpreisaufteilung (Modul 10b): einmal echt gerechnet, hier
        abgespielt. Mit Datei (PDF/XLSX) wird nichts gespielt - das sperrt RH_SPERRE. */
-    if (m === 'POST' && D.bmf && /\/bmf\/(aufteilung|pipeline)/.test(u) && !(body && (body.include_pdf || body.include_file))) {
+    /* v2273 · nur im BMF-Modul: der stille Vorlauf (bmf-modal.js, 6 s nach dem Laden) bekam in Modul 15 die Ravensberger-Antwort - jetzt gesperrt */
+    if (m === 'POST' && D.bmf && _aktiv === DREHBUECHER['reihe-bmf'] && /\/bmf\/(aufteilung|pipeline)/.test(u) && !(body && (body.include_pdf || body.include_file))) {
       return rhJ(JSON.parse(JSON.stringify(/pipeline/.test(u) ? D.bmf.pipeline : D.bmf.aufteilung)));
     }
     return null;
@@ -3325,6 +3331,666 @@
         await b2oZeile(s, 'Die Kennzahlen', 'Executive Summary: Rendite, Cashflow, DSCR, LTV — mit denselben Ampeln wie in der App.');
         await ue2PdfSeite(4);
         await b2oZeile(s, 'Der Cashflow in drei Phasen', 'Heute, am Ende der Zinsbindung und in der Anschlussfinanzierung — das will die Bank sehen.', 600);
+      }
+    ]
+  };
+
+  /* ═══ VIDEOREIHE · SPEZIALMODUL 15 · STEUER IM BESTAND (v2273) ════════════
+     Videoreihe.md, Teil C. KOPIE der Parkstr. 9, Bad Oeynhausen (gewonnen, mit
+     Ankauf-Stand, behalte), beim Aufräumen gelöscht. Die Jahreswerte der
+     Steuer (_taxYearlyOverrides) stehen im Objekt und kommen mit der Kopie.
+     Belege einlesen: zwei Beispielbelege werden im Lauf als Bild gezeichnet
+     (r15Belege, Beispieldaten, keine echte Firma), die Auslese der KI ist ein
+     Mitschnitt (DPM_REIHE_DATEN.belege, EINMAL echt erzeugt am 16.10.2026 mit
+     genau diesen beiden Bildern). Übernommen wird nur in die Kopie.
+     GEMESSEN (Prüfung am 16.10.2026): Die Steuerwirkung steht in der App an
+     drei Stellen mit drei Zahlen (Soll/Ist-Tafel, Steuer-Modul, Jahreszeile) -
+     das Drehbuch zeigt deshalb je Szene nur EINE Quelle und nennt sie. */
+  function r15Box() { return q('#yearly-tax-form-box'); }
+  function r15Modus(n) { var b = r15Box(); var k = b ? b.querySelectorAll('.ytf-mode-btn') : []; if (k[n] && !k[n].classList.contains('active')) k[n].click(); }
+  /* Quick-Modus: die Zeile eines Jahres; Zellen: Jahr, Einnahmen, Zinsen, AfA (Felder), Bewirtschaftung, Sonstige WK, Ergebnis, Steuer-Effekt */
+  function r15Zeile(j) { var b = r15Box(); return b ? [].filter.call(b.querySelectorAll('tr'), function (t) { return t.offsetWidth && t.firstElementChild && r6Text(t.firstElementChild) === String(j); })[0] || null : null; }
+  function r15Zellen(j) { var t = r15Zeile(j); return t ? [].map.call(t.children, function (c) { var i = c.querySelector('input'); return i ? (i.value ? eur(Number(i.value)) : '–') : r6Text(c); }) : []; }
+  /* Detail-Modus: Jahr wählen, Zeile über ihre Beschriftung */
+  async function r15Jahr(j) {
+    var s = r15Box() && r15Box().querySelector('select'); if (!s) return;
+    var o = [].filter.call(s.options, function (x) { return r6Text(x) === String(j); })[0];
+    if (o && s.value !== o.value) { s.value = o.value; s.dispatchEvent(new Event('change', { bubbles: true })); await warte(700); }
+  }
+  function r15Det(re) { var b = r15Box(); return b ? [].filter.call(b.querySelectorAll('tr'), function (t) { return t.offsetWidth && t.firstElementChild && re.test(r6Text(t.firstElementChild).replace(/\s*ℹ\s*$/, '')); })[0] || null : null; }
+  function r15DetWert(re) { var t = r15Det(re), i = t && t.querySelector('input'); return i && i.value ? eur(Number(i.value)) : null; }
+  function r15Gruppe(re) { var b = r15Box(); return b ? [].filter.call(b.querySelectorAll('tr,div'), function (t) { return t.offsetWidth && t.children.length <= 2 && re.test(r6Text(t)); }).pop() || null : null; }
+  function r15Summe(re) { var t = r6Inner(r15Box()), m = re.exec(t); return m ? m[1].trim() : null; }
+  function r15Oben(e) { if (!e) return; var s = scroller(e); if (s) s.scrollTop += rect(e).top - 110; }
+  function r15BiZu() { try { if (window.DealPilotBelegImport) DealPilotBelegImport.close(); } catch (e) {} var o = q('#beleg-import-ov'); if (o && o.parentNode) o.parentNode.removeChild(o); }
+  /* zwei Beispielbelege als Bild (Canvas -> PNG-Datei). Genau diese Bilder
+     lagen der KI beim Mitschnitt vor. */
+  async function r15Belege() {
+    function blatt(zeilen) {
+      var c = document.createElement('canvas'); c.width = 1240; c.height = 1754;
+      var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#111';
+      zeilen.forEach(function (z) { x.font = (z[3] || 'normal') + ' ' + (z[2] || 26) + 'px Arial'; x.textAlign = z[4] || 'left'; x.fillText(z[0], z[4] === 'right' ? 1140 : 100, z[1]); });
+      return new Promise(function (ok) { c.toBlob(ok, 'image/png'); });
+    }
+    var a = await blatt([
+      ['Beispiel-Dachdeckerei GmbH', 140, 40, 'bold'], ['Am Werkhof 4 · 32545 Bad Oeynhausen · USt-IdNr. DE000000000', 180, 22],
+      ['RECHNUNG', 320, 44, 'bold'], ['Rechnungsnummer: 2025-0815', 380], ['Rechnungsdatum: 14.08.2025', 420], ['Leistungszeitraum: 04.08.2025 – 08.08.2025', 460],
+      ['Objekt: Parkstr. 9, 32545 Bad Oeynhausen (Mehrfamilienhaus)', 520],
+      ['Pos.  Leistung', 620, 26, 'bold'], ['Betrag', 620, 26, 'bold', 'right'],
+      ['1     Dachrinne erneuert, 18 m, Zink, inkl. Halter', 670], ['1.080,00 €', 670, 26, 'normal', 'right'],
+      ['2     Fallrohr ausgetauscht, 2 Stück', 715], ['420,00 €', 715, 26, 'normal', 'right'],
+      ['3     Arbeitszeit Geselle, 8 Std. à 42,50 €', 760], ['340,00 €', 760, 26, 'normal', 'right'],
+      ['Nettobetrag', 860, 26, 'bold'], ['1.840,00 €', 860, 26, 'bold', 'right'],
+      ['zzgl. 19 % Umsatzsteuer', 900], ['349,60 €', 900, 26, 'normal', 'right'],
+      ['Rechnungsbetrag', 960, 30, 'bold'], ['2.189,60 €', 960, 30, 'bold', 'right'],
+      ['Es handelt sich um eine Instandhaltung (Erhaltungsaufwand).', 1060, 22], ['Zahlbar innerhalb von 14 Tagen ohne Abzug.', 1095, 22]
+    ]);
+    var b = await blatt([
+      ['Beispiel-Versicherung AG', 140, 40, 'bold'], ['Versicherungsweg 1 · 30159 Hannover', 180, 22],
+      ['BEITRAGSRECHNUNG 2025', 320, 44, 'bold'], ['Verbundene Wohngebäudeversicherung', 380], ['Vertragsnummer: WG-000-000-000', 420], ['Datum: 02.01.2025', 460],
+      ['Versichertes Objekt: Parkstr. 9, 32545 Bad Oeynhausen', 520], ['Versicherungszeitraum: 01.01.2025 – 31.12.2025', 560],
+      ['Nettobeitrag (Feuer, Leitungswasser, Sturm/Hagel)', 670], ['1.165,04 €', 670, 26, 'normal', 'right'],
+      ['Versicherungsteuer 19 %', 715], ['221,36 €', 715, 26, 'normal', 'right'],
+      ['Jahresbeitrag 2025', 790, 30, 'bold'], ['1.386,40 €', 790, 30, 'bold', 'right'],
+      ['Der Beitrag wird am 15.01.2025 von Ihrem Konto abgebucht.', 880, 22]
+    ]);
+    return [new File([a], 'Rechnung-Dachrinne-2025.png', { type: 'image/png' }), new File([b], 'Wohngebaeudeversicherung-2025.png', { type: 'image/png' })];
+  }
+  var R15_JAHR = 2025;   /* das erste volle Jahr im Bestand (Kauf 23.12.2024) */
+  DREHBUECHER['reihe-steuer-bestand'] = {
+    titel: 'Steuer im Bestand', unterzeile: 'Soll und Ist, das Steuerformular pro Jahr, Belege', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { r15BiZu(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das Objekt */
+        await r6KopieStart(R11_PARK, { behalte: true });
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        var we = wert('einheiten');
+        await b2oZeile(s, 'Das Beispiel', 'Im Bestand: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Wohnungen, ' : '') + 'Baujahr ' + wert('baujahr') + ', gekauft am ' + datum(wert('kaufdat')) + '. Heute: die <b>Steuer</b> nach dem Kauf.');
+      },
+      async function (s) {   /* 2 · Soll gegen Ist: die Steuer-Zeilen der Tafel */
+        reiter('s5'); await warte(1200);
+        await r11PaTab(/Soll\/Ist/);
+        await warteAuf(function () { return q('#ai-content .abw-tafel'); }, 6000);
+        var grp = function () { return [].filter.call(document.querySelectorAll('#ai-content .abw-tafel tr.abw-gruppe'), function (t) { return /^Steuer$/.test(r6Text(t)); })[0] || null; };
+        var letzte = function () { var g = grp(), t = g, l = null; while (t && (t = t.nextElementSibling) && !t.classList.contains('abw-gruppe')) l = t; return l; };
+        r15Oben(grp()); await warte(400);
+        await zeigeGruppe(grp, letzte, 6);
+        var a = null; try { a = DealPilotAnkauf.abweichung(); } catch (e) {}
+        function z(w) { return a && a.zeilen.filter(function (x) { return x.wort === w; })[0]; }
+        var sw = z('Steuerwirkung p. a.'), ga = z('Gebäudeanteil (AfA-Basis)');
+        await b2oZeile(s, 'Soll gegen Ist · Steuer', 'Steuerwirkung im Jahr: geplant <b>' + (sw ? eur(sw.ankauf) : '–') + '</b>, heute <b>' + (sw ? eur(sw.bestand) : '–') + '</b>.' + (ga ? ' Gebäudeanteil ' + de(ga.bestand, 2) + ' % und AfA-Satz bleiben, wie beim Kauf.' : ''));
+        var nk = z('Nettokaltmiete'), cf = z('Cashflow n. Steuer');
+        if (nk && cf) await b2oZeile(s, 'Warum weniger Erstattung?', 'Nettokaltmiete <b>' + eur(nk.ankauf) + ' → ' + eur(nk.bestand) + '</b> im Monat: mehr Überschuss, weniger Erstattung. Unterm Strich: Cashflow nach Steuer <b>' + eur(cf.ankauf) + ' → ' + eur(cf.bestand) + '</b> im Jahr.');
+      },
+      async function (s) {   /* 3 · das Steuerformular pro Jahr (Quick) */
+        reiter('s3-tax'); await warte(1100);
+        r15Modus(0); await warte(600);
+        var kopf = function () { var b = r15Box(); return b && b.closest('.card'); };
+        r15Oben(kopf()); await warte(400);
+        await zeige(function () { var k = kopf(); return k && k.querySelector('.ct-row'); }, 8);
+        await b2oZeile(s, 'Steuerformular pro Jahr', 'Eine Zeile je Jahr: Einnahmen, Schuldzinsen, AfA, Bewirtschaftung, sonstige Werbungskosten — und was davon bei der Steuer ankommt.');
+        var zl = function () { return r15Zeile(R15_JAHR); };
+        await zeige(zl, 6);
+        var c = r15Zellen(R15_JAHR);
+        await b2oZeile(s, 'Das Jahr ' + R15_JAHR, 'Einnahmen <b>' + (c[1] || '–') + '</b>, Schuldzinsen ' + (c[2] || '–') + ', AfA ' + (c[3] || '–') + ' — Ergebnis <b>' + (c[6] || '–') + '</b>, Steuer-Effekt <b>' + (c[7] || '–') + '</b>.');
+      },
+      async function (s) {   /* 4 · was man einträgt */
+        var f = function () { var t = r15Zeile(R15_JAHR); return t && t.querySelector('input'); };
+        await zeige(function () { var t = r15Zeile(R15_JAHR), i = t ? t.querySelectorAll('input') : []; return i.length ? b2oHuelle(i[0], i[i.length - 1]) : t; }, 8);
+        await b2oZeile(s, 'Was du einträgst', 'Die App schlägt jede Zahl vor. Liegt die Erklärung vor, trägst du die echten ein: <b>Mieteinnahmen</b> aus der Anlage V, <b>Schuldzinsen</b> aus der Zinsbescheinigung der Bank.');
+        await b2oZeile(s, 'Was du einträgst', 'Die <b>AfA</b> so, wie sie im Steuerbescheid anerkannt ist. Der Pfeil ↺ neben einem Feld setzt es auf den Vorschlag zurück.');
+      },
+      async function (s) {   /* 5 · Detail-Modus */
+        r15Modus(1); await warte(900);
+        await r15Jahr(R15_JAHR);
+        var kopf = function () { var b = r15Box(); return b && b.querySelector('select'); };
+        r15Oben(kopf()); await warte(400);
+        await zeigeGruppe(function () { var b = r15Box(); return b && b.querySelector('.ytf-mode-btn.active'); }, kopf, 8);
+        await b2oZeile(s, 'Detail-Modus', 'Ein Veranlagungsjahr, gegliedert wie die Anlage V: Finanzierung, Betrieb, Verwaltung, sonstige Kosten, AfA, Erhaltung.');
+        var fin = function () { return r15Det(/^Schuldzinsen$/); }, finE = function () { return r15Det(/^Vermittlungsprovision/); };
+        r15Oben(fin()); await warte(400);
+        await zeigeGruppe(fin, finE, 6);
+        await b2oZeile(s, 'Finanzierungskosten', 'Schuldzinsen <b>' + (r15DetWert(/^Schuldzinsen$/) || '–') + '</b>, Kontoführung ' + (r15DetWert(/^Kontoführungsgebühren$/) || '–') + ' — dazu Bereitstellungszinsen, Grundschuld beim Notar, Vermittlung.');
+        var vw = function () { return r15Det(/^Steuerberatung$/); }, vwE = function () { return r15Det(/^Telefon\/Internet$/); };
+        r15Oben(vw()); await warte(400);
+        await zeigeGruppe(vw, vwE, 6);
+        var teile = [['Steuerberatung', /^Steuerberatung$/], ['Fahrten zum Objekt', /^Fahrtkosten zur Immobilie$/], ['Inserate', /^Inseratskosten$/], ['Telefon', /^Telefon\/Internet$/]].map(function (x) { var w = r15DetWert(x[1]); return w ? x[0] + ' ' + w : null; }).filter(Boolean);
+        await b2oZeile(s, 'Verwaltung und Sonstiges', 'Was oft vergessen wird: ' + (teile.join(', ') || '–') + '. Eingetragene Werte tragen das ↺.');
+      },
+      async function (s) {   /* 6 · Erhaltung und was es im Jahr bedeutet */
+        var er = function () { return r15Det(/^Erhaltungsaufwendungen/); };
+        r15Oben(er()); await warte(400);
+        await zeige(er, 8);
+        await b2oZeile(s, 'Erhaltungsaufwand', 'In ' + R15_JAHR + ' eingetragen: <b>' + (r15DetWert(/^Erhaltungsaufwendungen/) || '–') + '</b> für Reparaturen. In den ersten drei Jahren nach dem Kauf zählt dabei die 15-%-Grenze — Modul 10b zeigt sie.');
+        var sm = function () { return rhIm(r15Box(), /^Werbungskosten gesamt:?$/); };
+        var sb = function () { var e = sm(); return e && (e.closest('div[style*=grid],div[class]') || e.parentElement); };
+        r15Oben(sb()); await warte(400);
+        await zeige(sb, 8);
+        var wk = r15Summe(/Werbungskosten gesamt:\s*([^\n]+)/), ein = r15Summe(/Einnahmen V\+V:\s*([^\n]+)/), erg = r15Summe(/Verlust\/Überschuss V\+V:\s*([^\n]+)/), eff = r15Summe(/Steuer-Effekt:\s*([^\n]+)/);
+        await b2oZeile(s, 'Was das im Jahr bedeutet', 'Werbungskosten <b>' + (wk || '–') + '</b> gegen Einnahmen ' + (ein || '–') + ': Ergebnis <b>' + (erg || '–') + '</b>. Mit deiner Progression: <b>' + (eff || '–') + '</b> Erstattung.');
+      },
+      async function (s) {   /* 7 · Belege einlesen (Mitschnitt) */
+        var kn = function () { return r6Knopf(r15Box() && r15Box().closest('.card'), /Belege & Abrechnungen einlesen/); };
+        r15Oben(kn()); await warte(400);
+        await zeige(kn, 10);
+        await b2oZeile(s, 'Belege einlesen', 'Statt abzutippen: Rechnungen, Hausgeld- und Nebenkostenabrechnungen als PDF oder Foto. Die KI liest Datum, Betrag, Steuer, Aussteller.');
+        r15Modus(0); await warte(500);
+        var vor = r15Zellen(R15_JAHR);
+        try { DealPilotBelegImport.open('wk'); } catch (e) {}
+        await warteAuf(function () { return q('#bi-files'); }, 3000);
+        try {
+          var fs = await r15Belege(), dt = new DataTransfer(); fs.forEach(function (f) { dt.items.add(f); });
+          var inp = q('#bi-files'); inp.files = dt.files; inp.dispatchEvent(new Event('change'));
+        } catch (e) {}
+        kegelHoch(true);
+        await warteAuf(function () { return q('#bi-review table') || q('#bi-review tr'); }, 15000);
+        await warte(700);
+        await zeige(function () { var t = q('#bi-review table'); return t || q('#bi-review'); }, 6);
+        var R = [].filter.call(document.querySelectorAll('#bi-review tbody tr'), function (t) { return t.offsetWidth && t.querySelector('input[type=checkbox]'); });
+        var zt = R.map(function (t) { var c = [].map.call(t.children, r6Text); var br = c.filter(function (x) { return /€/.test(x); }); var sel = t.querySelector('select'); return '<b>' + (br[2] || br[br.length - 1] || '–') + '</b> ' + (sel ? sel.value : ''); });
+        await b2oZeile(s, 'Zwei Belege gelesen', (zt.join(' und ') || '–') + ' — beide für ' + R15_JAHR + '. Jede Zeile prüfst du, bevor etwas übernommen wird.');
+        _r15Vor = vor;
+      },
+      async function (s) {   /* 8 · übernehmen -> das Jahr bewegt sich */
+        var tk = function () { return q('#bi-take'); };
+        await zeige(tk, 10);
+        var zb = r6Beginn(s, 'Übernehmen', 'Ein Klick — die Beträge gehen in das Jahr ' + R15_JAHR + ' dieses Objekts.');
+        await warte(2400);
+        var oc = window.confirm; window.confirm = function () { return true; };
+        try { DealPilotBelegImport.apply(); } catch (e) {} finally { window.confirm = oc; }
+        await warteAuf(function () { return !q('#beleg-import-ov'); }, 4000);
+        kegelHoch(false);
+        await warte(1200);
+        if (!q('#s3-tax.active')) reiter('s3-tax');
+        r15Modus(0); await warte(700);
+        /* GEMESSEN (Prüflauf 15): der Knopf verschwindet mit dem Fenster - erst die Zeile zeigen, dann die Restzeit (Kegel 50 %) */
+        var zl = function () { return r15Zeile(R15_JAHR); };
+        r15Oben(zl()); await warte(400);
+        await zeige(zl, 6);
+        await r6Ende(zb);
+        var v = _r15Vor || [], n = r15Zellen(R15_JAHR);
+        await b2oZeile(s, 'Das Jahr ' + R15_JAHR + ' danach', 'Bewirtschaftung <b>' + (n[4] || '–') + '</b> statt ' + (v[4] || '–') + ', Ergebnis ' + (n[6] || '–') + ' — Steuer-Effekt <b>' + (n[7] || '–') + '</b> statt ' + (v[7] || '–') + '.');
+      },
+      async function (s) {   /* 9 · Finanzamt-PDF (nur zeigen) */
+        var k = function () { var b = r15Box(); return b && b.closest('.card').querySelector('.fa-pdf-ctrl'); };
+        r15Oben(k()); await warte(400);
+        await zeige(k, 8);
+        await b2oZeile(s, 'Für die Erklärung', 'Steuerjahr wählen, auf Wunsch mit den Zeilen der <b>Anlage V</b> — das Finanzamt-PDF fasst alles zusammen, für dich oder deinen Steuerberater.', 600);
+      }
+    ]
+  };
+  var _r15Vor = null;
+
+  /* ═══ VIDEOREIHE · SPEZIALMODUL 16 · STUFE 3 GENAUER (v2273) ═════════════
+     Videoreihe.md, Teil C (= Ergänzung zu Modul 04). KOPIE der Bismarckstr. 27,
+     Detmold (MFH, 6 WE, Bj 1908 - Vierspänner, 9 Modernisierungspunkte,
+     Standardstufe 4 stehen schon im Objekt), ohne Analyse und Ankauf-Stand, beim
+     Aufräumen gelöscht. Im Lauf ANGENOMMEN (nur an der Kopie, im Untertitel so
+     gesagt): Hinterland 250 m² à 5 €, zwei Garagen 36 m² Stufe 4, Sanierung
+     25.000 € (boG). Mit genau diesen Angaben ist Marktbericht 215 EINMAL echt
+     erzeugt (DPM_REIHE_DATEN.bismarck) - hier abgespielt.
+     Der Marktbericht wird danach im Marktbericht-Fenster gezeigt: GET des
+     gespeicherten Berichts 215 (kein Abruf mit Kosten). Das Fenster ist ein
+     eigenes Dokument - r16MbSpion hängt sich an sein fetch, sperrt alles außer
+     GET und beantwortet die Adresssuche (externer Dienst) leer.
+     GEMESSEN: Bj 1908 liegt hinter dem Scheitel der Anlage 2 - die Punkte
+     bewegen die Restnutzungsdauer NICHT, und für Mehrfamilienhäuser in Lippe
+     führt der Ausschuss keinen Sachwertfaktor: der boG wirkt deshalb nicht im
+     vorläufigen Sachwert. Das Drehbuch sagt beides, statt es zu verschweigen. */
+  var R16_BISMARCK = 'c5278bb5-7012-4e1b-8372-7e5cef3500a1', R16_BERICHT = 215;
+  var _r16Iv = null;
+  function r16Frame() { return q('#mbv-frame'); }
+  function r16Doc() { var f = r16Frame(); try { return f && f.contentDocument; } catch (e) { return null; } }
+  function r16MbSpion() {
+    if (_r16Iv) return;
+    _r16Iv = setInterval(function () {
+      var f = r16Frame(); if (!f) return;
+      try {
+        var w = f.contentWindow, d = w.document;
+        if (!d || !/marktbericht-app/.test(d.URL) || w.__dpmMb) return;
+        var echt = w.fetch; w.__dpmMb = 1;
+        w.fetch = function (u, o) {
+          var m = String((o && o.method) || 'GET').toUpperCase(), p = String(typeof u === 'string' ? u : (u && u.url) || '').replace(location.origin, '').split('?')[0];
+          DPM_REIHE.abrufe.push('MB ' + m + ' ' + p);
+          if (/\/geocode\//.test(p)) { DPM_REIHE.gespielt.push('MB ' + m + ' ' + p); return Promise.resolve(new Response('{"results":[],"features":[]}', { status: 200, headers: { 'Content-Type': 'application/json' } })); }
+          /* v2273 · Kartenbilder fürs PDF (Modul 18): der Server holt sie je Abruf beim externen
+             Kartendienst - im Lauf gesperrt, das PDF entsteht dann ohne die beiden Karten */
+          if (/\/(static-map|streetview)\b/.test(p)) { DPM_REIHE.gesperrt.push('MB ' + m + ' ' + p); return Promise.resolve(new Response('', { status: 404 })); }
+          if (m !== 'GET') { DPM_REIHE.gesperrt.push('MB ' + m + ' ' + p); return Promise.resolve(new Response('{"error":"Vorführung: Abruf gesperrt"}', { status: 503, headers: { 'Content-Type': 'application/json' } })); }
+          return echt.apply(this, arguments);
+        };
+      } catch (e) {}
+    }, 5);
+  }
+  function r16MbZu() {
+    if (_r16Iv) { clearInterval(_r16Iv); _r16Iv = null; }
+    try { if (window._mbLeiseSchliessen) window._mbLeiseSchliessen(); } catch (e) {}
+    try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
+  }
+  /* Marktbericht-Fenster öffnen und einen gespeicherten Bericht zeigen */
+  async function r16MbOeffnen(rid) {
+    r16MbSpion();
+    try { await window.openMarktberichtView(); } catch (e) {}
+    await warteAuf(function () { var f = r16Frame(); try { return f && f.contentWindow._mbOpenReport && f.contentDocument.readyState === 'complete'; } catch (e) { return false; } }, 12000);
+    await warte(900);
+    try { await r16Frame().contentWindow._mbOpenReport(rid, false); } catch (e) {}
+    await warteAuf(function () { var d = r16Doc(); return d && d.getElementById('wv-box'); }, 10000);
+    await warte(1200);
+  }
+  function r16Mb(sel) { var d = r16Doc(); return d ? d.querySelector(sel) : null; }
+  function r16Aufklappen(re) {
+    var d = r16Doc(); if (!d) return;
+    [].forEach.call(d.querySelectorAll('#wv-box .wv-mehr'), function (x) { if (re.test(x.textContent) && /▸/.test(x.textContent)) x.click(); });
+  }
+  /* ein Element im Marktbericht-Fenster mittig ins Bild (gescrollt wird .main-col) */
+  async function r16Hin(e, oben) {
+    if (!e) return; var s = scroller(e), r = rect(e);
+    if (s) s.scrollTop += oben ? r.top - 110 : (r.top + r.height / 2) - innerHeight / 2;
+    await warte(400);
+  }
+  function r16Leiste(re) { return [].filter.call(document.querySelectorAll('.oe-row'), function (r) { return r.offsetWidth && re.test(r6Text(r.querySelector('.oe-k'))); })[0] || null; }
+  function r16LeisteWert(re) { var r = r16Leiste(re); return r ? r6Text(r.querySelector('.oe-w')) : null; }
+  function r16Gewerk(id) { return function () { var e = document.getElementById(id); return e && e.closest('tr'); }; }
+  async function r16Setze(id, v) { var e = document.getElementById(id); if (!e) return; e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); await warte(500); }
+  DREHBUECHER['reihe-stufe3'] = {
+    titel: 'Stufe 3 genauer', unterzeile: 'Pflichtfelder, optionale Felder — und was sie bewegen', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { r16MbZu(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das Beispiel */
+        await r6KopieStart(R16_BISMARCK, { ohneAnkauf: true, ohneAnalyse: true });
+        if (_rh) _rh.satz = 'bismarck';
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        var we = wert('einheiten');
+        await b2oZeile(s, 'Das Beispiel', 'Ein Mehrfamilienhaus: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Wohnungen, ' : '') + de(zahl('wfl')) + ' m², Baujahr ' + wert('baujahr') + '. Heute: <b>Stufe 3</b> genauer.');
+      },
+      async function (s) {   /* 2 · Stufe 3 wählen, Pflichtfelder */
+        await stufeWaehlen(3);
+        await zeige(stufeZeile(3), 8);
+        var nur3 = DealPilotObjektReiter.pflichtFuer(3).filter(function (id) { return DealPilotObjektReiter.pflichtFuer(2).indexOf(id) < 0 && !/^garagen_/.test(id); });
+        /* v2273i · zusammengelegt (Länge): Status und die zusätzlichen Pflichtfelder in einer Zeile */
+        await b2oZeile(s, 'Stufe 3 · nur ' + nur3.length + ' Pflichtfelder mehr', 'Status <b>' + (fehlt(3).length ? fehlt(3).length + ' Angaben fehlen' : 'bereit') + '</b>. Zu Stufe 2 kommen nur: <b>' + feldNamen(nur3).join(', ') + '</b>.');
+        await zeige(feldVon('bgf'), 10);
+        await b2oZeile(s, 'Warum nur die?', 'Das ist das Minimum für Boden-, Sach- und Ertragswert. Alles andere hat einen Ansatz der ImmoWertV — es <b>verfeinert</b>.');
+      },
+      async function (s) {   /* 3 · was DealPilot vorab aus dem Register liest */
+        var a = function () { return r16Leiste(/^Liegenschaftszins/); }, b = function () { return r16Leiste(/^GND \/ RND/); };
+        await warteAuf(b, 8000);
+        r15Oben(a()); await warte(400);
+        await zeigeGruppe(a, b, 6);
+        await b2oZeile(s, 'Vorab aus dem Register', 'Liegenschaftszins <b>' + (r16LeisteWert(/^Liegenschaftszins/) || '–') + '</b>, Sachwertfaktor ' + (r16LeisteWert(/^Sachwertfaktor/) || '–') + ', Nutzungsdauer ' + (r16LeisteWert(/^GND \/ RND/) || '–') + ' — vorab, ohne Kosten.');
+      },
+      async function (s) {   /* 4 · Modernisierung -> Punkte -> Restnutzungsdauer */
+        var tab = function () { return q('#oe-gewerke'); };
+        r15Oben(tab()); await warte(400);
+        await zeigeGruppe(r16Gewerk('mod_aussenwand'), r16Gewerk('mod_grundriss'), 6);
+        await b2oZeile(s, 'Optional: Modernisierung', 'Die Spalte „modernisiert“ ergibt die Punkte der Anlage 2: hier <b>' + wert('mod_punkte') + ' von 20</b>.');
+        await zeige(r16Gewerk('mod_aussenwand'), 6);
+        var zb = r6Beginn(s, 'Ein Feld mehr', 'Angenommen, die Fassade wäre neu gedämmt …');
+        var vor = wert('mod_punkte'), rndVor = r16LeisteWert(/^GND \/ RND/);
+        await warte(1600);
+        await r16Setze('mod_aussenwand', '< 5 Jahre');
+        await warte(1800);
+        await warteAuf(function () { return r16Leiste(/^GND \/ RND/); }, 6000);
+        await r6Ende(zb);
+        var nach = wert('mod_punkte'), rndNach = r16LeisteWert(/^GND \/ RND/), bewegt = rndVor && rndNach && rndVor !== rndNach;
+        var rr = function () { return r16Leiste(/^GND \/ RND/); };
+        await zeigeGruppe(rr, function () { return r16Leiste(/^Modernisierungspunkte/); }, 6);
+        /* die Leiste rechnet live (Register, ohne Kosten): bewegt sich die Restnutzungsdauer, steht es da - sonst der Grund */
+        if (bewegt) await b2oZeile(s, 'Was sich bewegt', 'Punkte <b>' + vor + ' → ' + nach + '</b>, Nutzungsdauer gesamt / rest <b>' + rndVor + ' → ' + rndNach + '</b> — weniger Alterswertminderung.');
+        else {
+          await b2oZeile(s, 'Was sich bewegt', 'Punkte <b>' + vor + ' → ' + nach + '</b>, Nutzungsdauer bleibt <b>' + (rndNach || '–') + '</b>: Baujahr ' + wert('baujahr') + ' liegt hinter der Anlage 2. DealPilot rechnet nichts hoch — „sachverständig zu würdigen“.');
+        }
+        await r16Setze('mod_aussenwand', 'Keine/Nie');
+        await warte(900);
+      },
+      async function (s) {   /* 5 · Standardstufe je Gewerk */
+        await zeigeGruppe(function () { var e = q('#ausst_dach'); return e && e.closest('tr'); }, function () { var e = q('#ausst_heizung'); return e && e.closest('tr'); }, 6);
+        var sst = (function () { var e = q('#standardstufe'); return e && e.selectedIndex >= 0 ? r6Text(e.options[e.selectedIndex]) : wert('standardstufe'); })();
+        await b2oZeile(s, 'Optional: Standardstufe je Gewerk', 'Dach <b>' + r6Pz(wert('ausst_dach')) + '</b>, Fenster ' + r6Pz(wert('ausst_fenster')) + ', Heizung ' + r6Pz(wert('ausst_heizung')) + ' — gewichtet ergibt das <b>' + sst + '</b>: die Herstellungskosten je m².');
+      },
+      async function (s) {   /* 6 · Grundrissart */
+        await zeige(feldVon('grundriss'), 10);
+        var g = (function () { var e = q('#grundriss'); return e && e.selectedIndex > 0 ? r6Text(e.options[e.selectedIndex]) : null; })();
+        await b2oZeile(s, 'Optional: Grundrissart', (g ? '<b>' + g + '</b>' : 'Keine Angabe') + ' — der Faktor geht direkt auf die Herstellungskosten.');
+      },
+      async function (s) {   /* 7 · Hinterland (angenommen) */
+        await zeigeGruppe(feldVon('hinterland_qm'), feldVon('hinterland_eur_qm'), 8);
+        var zb = r6Beginn(s, 'Optional: Hinterland', 'Angenommen: 250 m² Gartenland à 5 €/m² — es zählt zum Bodenwert, nicht zum Preis des Baulands.');
+        await tippeH('hinterland_qm', '250', 110);
+        await tippeH('hinterland_eur_qm', '5', 110);
+        await warte(800);
+        await r6Ende(zb);
+      },
+      async function (s) {   /* 8 · Garagen (angenommen) */
+        await zeige(feldVon('garagen'), 10);
+        var zb = r6Beginn(s, 'Optional: Garagen', 'Angenommen: zwei massive Garagen, zusammen 36 m².');
+        await tippeH('garagen', '2', 120);
+        await warte(500);
+        await zeigeGruppe(feldVon('garagen_bgf_qm'), feldVon('garagen_stufe'), 8);
+        await tippeH('garagen_bgf_qm', '36', 110);
+        await tippeH('garagen_stufe', '4', 400);
+        await warte(700);
+        await r6Ende(zb);
+        var gs = (function () { var e = q('#garagen_stufe'); return e && e.selectedIndex > 0 ? r6Text(e.options[e.selectedIndex]) : ''; })();
+        await b2oZeile(s, 'Optional: Garagen', '<b>' + wert('garagen_bgf_qm') + ' m², ' + gs + '</b> — mit eigenen Herstellungskosten, getrennt vom Wohnhaus.');
+      },
+      async function (s) {   /* 9 · boG über die Sanierung (angenommen) */
+        reiter('s1'); await warte(900);
+        await zeige(r6Gruppe('san'), 10);
+        var zb = r6Beginn(s, 'Optional: Besonderheiten (boG)', 'Angenommen: 25.000 € Reparaturen an der Fassade.');
+        await tippeH('san', '25000', 100);
+        await warte(900);
+        await r6Ende(zb);
+        await b2oZeile(s, 'Optional: Besonderheiten (boG)', 'Im Bericht ein <b>besonderes objektspezifisches Grundstücksmerkmal</b>: Abzug nach der Marktanpassung.');
+        reiter('s0'); await warte(900);
+      },
+      async function (s) {   /* 10 · Abruf (Mitschnitt) */
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeige(stufeZeile(3), 8);
+        await warte(900);   /* v2273i: Zeile „Jetzt abrufen“ gestrichen (Länge) - die Etappen erklären es */
+        await rhStufeAbrufen(3, function () { s.zeile('Stufe 3 · Wertermittlung', 'Bodenwert, Liegenschaftszins, Sachwert — Schritt für Schritt.'); });
+        await warteAuf(function () { var w = q('#oe-vw-wahl'); return w && w.options.length >= 1; }, 8000);
+        await warteAuf(function () { var v = q('#oe-vw'); return v && v.offsetHeight > 20; }, 6000);   /* Prüflauf 16: Kegel 69 % */
+        await zeige(function () { return q('#oe-vw'); }, 10);
+        var opts = [].map.call((q('#oe-vw-wahl') || { options: [] }).options, function (o) { return r6Text(o); });
+        var sw = opts.filter(function (o) { return /^Sachwert/.test(o); })[0];
+        await warte(600);
+        await b2oZeile(s, 'Das Ergebnis', (sw ? '<b>' + sw.replace(/\s*·\s*\d{2}\.\d{2}\.\d{4}\s*·\s*/, ': ') + '</b>' : 'Sachwert') + '. Den Rechenweg zeigt der Marktbericht.');
+      },
+      async function (s) {   /* 11 · Bodenwert mit Hinterland (Marktbericht-Fenster) */
+        await r16MbOeffnen(R16_BERICHT);
+        r16Aufklappen(/Rechenweg/);
+        await warte(600);
+        var bw = function () { var t = r16Mb('#wv-box .wv-rw'); return t || r16Mb('#wv-box .wv-boden'); };
+        await r16Hin(r16Mb('#wv-box'), true);
+        await zeigeGruppe(function () { return r16Mb('#wv-box .wv-boden'); }, bw, 8);
+        var t = r6Inner(r16Mb('#wv-box')), g = /Grundstücksfläche × Bodenrichtwert\s*\n?\s*([^\n]+)\s*\n?\s*\t?([\d.]+ €)/.exec(t), h = /\+ Hinterlandfläche\s*\n?\s*([^\n]+)\s*\n?\s*\t?([\d.]+ €)/.exec(t), su = /Bodenwert\s*\t\s*([\d.]+ €)/.exec(t);
+        await b2oZeile(s, 'Bodenwert · Rechenweg', (g ? g[1].trim() + ' = ' + g[2] : '–') + (h ? ', <b>Hinterland ' + h[1].trim() + ' = ' + h[2] + '</b>' : '') + ' — zusammen <b>' + (su ? su[1] : '–') + '</b>.');
+      },
+      async function (s) {   /* 12 · Sachwert und was nicht wirkt */
+        var k = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return /^Sachwert/i.test(r6Text(x.querySelector('.wv-t'))); })[0]; };
+        await r16Hin(k(), false);
+        await zeige(k, 8);
+        /* alles aus dem gespielten Bericht gelesen (= Bericht 215 im Fenster), nichts angenommen */
+        var P = (window.DPM_REIHE_DATEN && _rh && DPM_REIHE_DATEN[_rh.satz] && DPM_REIHE_DATEN[_rh.satz].mb[3]) || {}, cc = P.cross_check || {}, sw = cc.sachwert || {}, no = (cc.notes || []).join(' ');
+        var kt = r6Text(k()), wv = /Sachwert\s*([\d.]+ €)/i.exec(kt), ohneSwf = /KEINE Marktanpassung/.test(no), bog = /objektspezifischen Grundstücksmerkmale \((-?[\d.]+ €)\) wirken im vorläufigen Sachwert nicht/.exec(no);
+        await b2oZeile(s, 'Sachwert', '<b>' + (wv ? wv[1] : '–') + '</b>: Bodenwert ' + (eur(sw.bodenwert_eur) || '–') + ' plus Gebäude ' + (eur(sw.gebaeude_sachwert_eur) || '–') + ', gemindert nach Restnutzungsdauer ' + (sw.restnutzungsdauer_jahre != null ? sw.restnutzungsdauer_jahre + ' von ' + (cc.restnutzungsdauer_herkunft && cc.restnutzungsdauer_herkunft.gnd_jahre || '–') + ' Jahren' : '–') + '.');
+        if (ohneSwf) await b2oZeile(s, 'Was deshalb nicht wirkt', 'Kein amtlicher <b>Sachwertfaktor</b> für diese Objektart — also keine Marktanpassung' + (bog ? ', und der Abzug von ' + bog[1].replace('-', '') + ' entfällt. DealPilot erfindet keinen Faktor.' : '.'));
+        var e = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return /^Ertragswert/i.test(r6Text(x.querySelector('.wv-t'))); })[0]; };
+        await zeige(e, 8);
+        var ew = cc.ertragswert || {};
+        if (ew.available) await b2oZeile(s, 'Ertragswert', '<b>' + eur(ew.value_eur) + '</b> — Miete, Bewirtschaftung, Liegenschaftszins und Restnutzungsdauer.' + (bog ? ' Hier wirkt der Abzug für die Reparaturen.' : ''));
+        else await b2oZeile(s, 'Ertragswert', 'Ein Strich: die Rechnung war hier nicht vollständig. Wo die Quelle endet, endet die Rechnung.');
+      },
+      async function (s) {   /* 13 · je mehr, desto genauer */
+        await zeige(function () { return r16Mb('#wv-box'); }, 6);
+        await b2oZeile(s, 'Je mehr, desto genauer', 'Jede optionale Angabe ersetzt einen Pauschalansatz durch dein Objekt — und der Bericht sagt, wo er an Grenzen stößt.', 600);
+      }
+    ]
+  };
+
+  /* ═══ VIDEOREIHE · SPEZIALMODUL 19 · DAS BANK-PDF (v2273) ═════════════════
+     Videoreihe.md, Teil C. KOPIE der Westerfeldstr. 140, Bielefeld (ohne
+     Analyse, ohne Ankauf-Stand), beim Aufräumen gelöscht. Gezeigt werden die
+     Fassungs-Rückfrage (pdf-wahl.js, echt) und die Bankfassung
+     (pdf-investment-bank.js) - weißes Papier, Logo der Marke, alle Blöcke
+     aufgerollt. Sie entsteht LOKAL (jsPDF), kein Abruf, kein Download: die
+     Bankfassung kennt kein Blob, ihr doc.save wird nur für diesen einen
+     Aufruf auf output('blob') umgelenkt (jsPDF.API.save).
+     GEMESSEN: das Investment-PDF hell brauchte im Prüflauf 45 s Rechenzeit
+     bei stehendem Bild - es wird deshalb nur in der Rückfrage genannt.
+     Der Nutzungszähler (/objects/track-usage) ist im Lauf gesperrt (v2271),
+     branding.get liefert keine Kontaktdaten (wie Ü2), der Merker
+     dp_pdf_wahl wird gesichert und zurückgeschrieben. */
+  var _r19 = { url: [], brand: null, save: null, wahl: undefined };
+  function r19Zu() {
+    var o = q('#dpm-pdf'); if (o && o.parentNode) o.parentNode.removeChild(o);
+    var w = q('#dp-pdf-wahl'); if (w && w.parentNode) w.parentNode.removeChild(w);
+    _r19.url.forEach(function (u) { try { URL.revokeObjectURL(u); } catch (e) {} }); _r19.url = [];
+    if (_r19.brand) { try { DealPilotConfig.branding.get = _r19.brand; } catch (e) {} _r19.brand = null; }
+    if (_r19.save) { try { window.jspdf.jsPDF.API.save = _r19.save; } catch (e) {} _r19.save = null; }
+    if (_r19.wahl !== undefined) { try { if (_r19.wahl === null) localStorage.removeItem('dp_pdf_wahl'); else localStorage.setItem('dp_pdf_wahl', _r19.wahl); } catch (e) {} _r19.wahl = undefined; }
+  }
+  function r19OhneKontakt() {
+    if (_r19.brand) return;
+    try {
+      _r19.brand = DealPilotConfig.branding.get;
+      DealPilotConfig.branding.get = function () { var b = _r19.brand.apply(this, arguments) || {}, c = {}; Object.keys(b).forEach(function (k) { c[k] = b[k]; }); ['name', 'role', 'address', 'plz', 'city', 'phone', 'email', 'website'].forEach(function (k) { c[k] = ''; }); return c; };
+    } catch (e) {}
+  }
+  function r19MitKontakt() { if (_r19.brand) { try { DealPilotConfig.branding.get = _r19.brand; } catch (e) {} _r19.brand = null; } }
+  async function r19Bank() {
+    var fang = null, api = window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API;
+    if (!api || typeof window.exportPDFBank !== 'function') return null;
+    r19OhneKontakt();
+    _r19.save = api.save;
+    api.save = function () { fang = this.output('blob'); return this; };
+    try { await window.exportPDFBank({ ohneRueckfrage: true }); } catch (e) {} finally { api.save = _r19.save; _r19.save = null; r19MitKontakt(); }
+    return fang;
+  }
+  async function r19Seite(blob, n) {
+    var u = blob.__url || (blob.__url = URL.createObjectURL(blob)); if (_r19.url.indexOf(u) < 0) _r19.url.push(u);
+    var o = el('dpm-pdf');
+    o.style.cssText = 'position:fixed;left:4%;right:4%;top:3%;bottom:4%;z-index:100002;background:#2b2b2b;border:2px solid ' + G + ';border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)';
+    o.innerHTML = '<iframe title="PDF" style="width:100%;height:100%;border:0" src="' + u + '#page=' + n + '&toolbar=0&navpanes=0&view=Fit"></iframe>';
+    await warte(1800);
+  }
+  function r19K() { return (window.State && State.kpis) || {}; }
+  function r19Pz(n, st) { return n == null || !isFinite(n) ? '–' : de(n, st == null ? 2 : st) + ' %'; }
+  DREHBUECHER['reihe-bankpdf'] = {
+    titel: 'Das Bank-PDF', unterzeile: 'Deine Marke, die Bankfassung — der Investment Case', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { r19Zu(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das Beispiel */
+        await r6KopieStart(R11_WESTERFELD, { ohneAnkauf: true, ohneAnalyse: true });
+        try { _r19.wahl = localStorage.getItem('dp_pdf_wahl'); localStorage.removeItem('dp_pdf_wahl'); } catch (e) {}
+        await r11Beispiel(s, ' Heute: was die <b>Bank</b> davon bekommt.');
+      },
+      async function (s) {   /* 2 · wo die PDFs liegen, die Rückfrage */
+        reiter('s8'); await warte(1300);
+        var zeileFn = function () { var e = rhIm('#s8', /^\s*Investment-PDF/); return e && (e.closest('[class*=row]') || e.parentElement); };
+        await warteAuf(zeileFn, 5000);
+        await zeige(zeileFn, 8);
+        await b2oZeile(s, 'Deal-Aktion · Dokumente', 'Hier entstehen die PDFs — aus den Daten des Objekts, ohne Abtippen.');
+        try { DealPilotPdfWahl.zeige('bank'); } catch (e) {}
+        await warteAuf(function () { return q('#dp-pdf-wahl .dpw-kasten'); }, 3000);
+        kegelHoch(true);
+        await zeige(function () { return q('#dp-pdf-wahl .dpw-liste'); }, 8);
+        var W = (window.DealPilotPdfWahl && DealPilotPdfWahl.wahlen) || [];
+        await b2oZeile(s, 'Drei Fassungen', W.map(function (w) { return '<b>' + w.titel + '</b> (' + w.fuer.split(' · ')[0] + ')'; }).join(', ') + '. Der Inhalt ist derselbe.');
+        var x = q('#dp-pdf-wahl'); if (x && x.parentNode) x.parentNode.removeChild(x);
+        kegelHoch(false);
+      },
+      async function (s) {   /* 3 · die Bankfassung entsteht: Deckblatt */
+        /* GEMESSEN (Prüflauf 19): das Investment-PDF hell brauchte 45 s Rechenzeit, das Bild stand so lange still -
+           gezeigt wird deshalb nur die Bankfassung (13 s). Sie ist die weiße Fassung und trägt das Logo der Marke. */
+        /* Prüflauf 19: während der 13 s Rechenzeit stand kein Kegel (Ziel war das geschlossene Fenster) */
+        await zeige(function () { var e = rhIm('#s8', /^\s*Investment-PDF/); return e && (e.closest('[class*=row]') || e.parentElement); }, 8);
+        var zb = r6Beginn(s, 'Die Bankfassung', 'Weißes Papier, alles aufgerollt: jeder Block als Tabelle, so wie eine Bank ihn prüft.');
+        var bank = await r19Bank();
+        await r6Ende(zb);
+        if (!bank) { await b2oZeile(s, 'Die Bankfassung', 'Hier entsteht das PDF.'); return; }
+        _r19.bank = bank;
+        try { var tx = await bank.text(), mm = /Seite 1 von (\d+)/.exec(tx); _r19.seiten = mm ? Number(mm[1]) : null; _r19.tok = (tx.match(/\(([^()]{1,80})\) Tj/g) || []).map(function (x) { return x.slice(1, -4); }); DPM_REIHE.pdf19 = { bytes: bank.size, seiten: _r19.seiten, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8) }; } catch (e) {}
+        zeige(null); kegelHoch(true);
+        await r19Seite(bank, 1);
+        await b2oZeile(s, 'Oben: deine Marke', 'Kopf mit Logo — mit Whitelabel steht hier deins, nicht unseres. Darunter Objekt, Foto und Stand.');
+        var K = r19K();
+        await b2oZeile(s, 'Seite 1 · Objekt und Finanzierung', 'Kaufpreis <b>' + eur(K.kp) + '</b> mit jeder Nebenkostenzeile, Gesamtinvestition ' + eur(K.gi) + '. Eigenkapital ' + eur(K.ek) + ', Darlehen <b>' + eur(K.d1) + '</b> zu ' + r19Pz(K.d1z_pct) + '.');
+      },
+      async function (s) {   /* 5 · Kennzahlen */
+        if (!_r19.bank) return;
+        await r19Seite(_r19.bank, 2);
+        var K = r19K();
+        await b2oZeile(s, 'Seite 2 · Kennzahlen', 'Bruttorendite <b>' + r19Pz(K.bmy) + '</b>, Nettorendite ' + r19Pz(K.nmy) + ', DSCR <b>' + de(K.dscr, 2) + '</b>, Beleihung ' + r19Pz(K.ltv, 1) + ', Cashflow ' + eur(K.cf_m) + ' im Monat.');
+        await b2oZeile(s, 'Von der Warmmiete zum Cashflow', 'Darunter die Rechnung Zeile für Zeile: Miete, Bewirtschaftung, Zinsen, Tilgung, Steuer — am Ende <b>' + eur(K.cf_ns) + '</b> nach Steuern im Jahr.');
+      },
+      async function (s) {   /* 6 · drei Phasen */
+        if (!_r19.bank) return;
+        await r19Seite(_r19.bank, 3);
+        var K = r19K();
+        await b2oZeile(s, 'Heute, Zinsbindung, Anschluss', 'Cashflow nach Steuern im Jahr: heute <b>' + eur(K.cf_ns) + '</b>, am Ende der Zinsbindung ' + eur(K.cf_ns_ezb) + ', in der Anschlussfinanzierung ' + eur(K.cf_ns_an) + '.');
+      },
+      async function (s) {   /* 7 · Vermögen und Exit */
+        if (!_r19.bank) return;
+        await r19Seite(_r19.bank, 6);
+        var K = r19K();
+        /* aus dem PDF gelesen, nicht aus den Kennzahlen: der Exit dort rechnet mit eigener Haltedauer */
+        var T = _r19.tok || [], iw = T.indexOf('Angenommene Wertsteigerung p. a.'), ws = iw >= 0 ? T[iw + 1] : null;
+        await b2oZeile(s, 'Vermögensaufbau und Exit', 'Wert, Restschuld und Eigenkapital über die Jahre' + (ws ? ', gerechnet mit <b>' + ws + '</b> Wertsteigerung im Jahr' : '') + ' — und was beim Verkauf bliebe. Equity Multiple ' + de(K.em, 1) + '.');
+      },
+      async function (s) {   /* 8 · Belastungsprobe */
+        if (!_r19.bank) return;
+        await r19Seite(_r19.bank, 7);
+        await b2oZeile(s, 'Die Belastungsprobe', 'Der DSCR, wenn der Zins steigt oder die Miete fällt — genau die Frage, die jede Bank stellt. Die Antwort steht schon drin.');
+      },
+      async function (s) {   /* 9 · Annahmen */
+        if (!_r19.bank) return;
+        await r19Seite(_r19.bank, 8);
+        await b2oZeile(s, 'Annahmen und Hinweise', 'Mietsteigerung, Kostensteigerung, Wertentwicklung: jede Annahme steht offen da. Was fehlt, ist ein Strich — keine Null.');
+      },
+      async function (s) {   /* 10 · was die Bank bekommt */
+        var o = q('#dpm-pdf'); if (o && o.parentNode) o.parentNode.removeChild(o);
+        kegelHoch(false);
+        await zeige(function () { var e = rhIm('#s8', /^\s*Investment-PDF/); return e && (e.closest('[class*=row]') || e.parentElement); }, 8);
+        await b2oZeile(s, 'Der Investment Case', 'Objekt, Finanzierung, Kennzahlen, Phasen, Belastungsprobe' + (_r19.seiten ? ' — <b>' + _r19.seiten + ' Seiten</b>' : '') + ', die eine Kreditanfrage tragen. Ein Klick, jedes Mal aktuell.', 600);
+      }
+    ]
+  };
+
+  /* ═══ VIDEOREIHE · SPEZIALMODUL 18 · DER MARKTBERICHT (v2273) ════════════
+     Videoreihe.md, Teil C. Ein VORHANDENER Bericht: Marktbericht 205 (Stufe 3,
+     14.10.2026) der Parkstr. 9, Bad Oeynhausen - geöffnet aus einer KOPIE des
+     Objekts (beim Aufräumen gelöscht) über das Marktbericht-Fenster. Gelesen
+     wird der gespeicherte Bericht (GET, keine Kosten); im Fenster sperrt
+     r16MbSpion alles außer GET, die Adresssuche (externer Dienst) bekommt eine
+     leere Antwort. Das PDF entsteht lokal in diesem Fenster (jsPDF, doc.save
+     für diesen Aufruf auf Blob umgelenkt) und wird im Bild gezeigt.
+     Keine Anbieter- oder Portalnamen in den Kapiteltexten; der Prüflauf
+     misst Portal- und Dienstnamen auch im Fenster und im PDF. */
+  var R18_BERICHT = 205;
+  var _r18 = { pdf: null, url: null, save: null };
+  function r18Zu() {
+    var o = q('#dpm-pdf'); if (o && o.parentNode) o.parentNode.removeChild(o);
+    if (_r18.url) { try { URL.revokeObjectURL(_r18.url); } catch (e) {} _r18.url = null; }
+    if (_r18.save) { try { r16Frame().contentWindow.jspdf.jsPDF.API.save = _r18.save; } catch (e) {} _r18.save = null; }
+    _r18.pdf = null;
+  }
+  function r18Mb(re) { var d = r16Doc(); return d ? rhIm(d.body, re) : null; }
+  /* Karte eines Abschnitts im Bericht: der Kasten um die Überschrift */
+  function r18Karte(re) { return function () { var h = r18Mb(re); return h && (h.closest('.card,.panel,section,.box') || h.parentElement); }; }
+  function r18Assess(re) { var d = r16Doc(); if (!d) return null; var a = [].filter.call(d.querySelectorAll('#assessGrid .assess'), function (x) { var l = x.querySelector('.l'); return x.offsetWidth && l && re.test(r6Text(l)); })[0]; return a ? r6Text(a.querySelector('.v')) : null; }
+  function r18AssessEl(re) { return function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#assessGrid .assess'), function (x) { var l = x.querySelector('.l'); return x.offsetWidth && l && re.test(r6Text(l)); })[0]; }; }
+  async function r18Pdf() {
+    var f = r16Frame(), w = f && f.contentWindow, fang = null;
+    if (!w || !w.jspdf || !w._lastOut || typeof w.exportPdf !== 'function') return null;
+    var api = w.jspdf.jsPDF.API; _r18.save = api.save;
+    api.save = function () { fang = this.output('blob'); return this; };
+    /* das Deckblatt nennt die Marke des Kontos - im Lauf neutral (wie branding.get in Ü2) */
+    var mk = w._mbMarkenName; w._mbMarkenName = 'DealPilot';
+    try { await w.exportPdf(w._lastOut); } catch (e) {} finally { api.save = _r18.save; _r18.save = null; w._mbMarkenName = mk; }
+    return fang;
+  }
+  async function r18Seite(n) {
+    if (!_r18.pdf) return;
+    if (!_r18.url) _r18.url = URL.createObjectURL(_r18.pdf);
+    var o = el('dpm-pdf');
+    o.style.cssText = 'position:fixed;left:4%;right:4%;top:3%;bottom:4%;z-index:100002;background:#2b2b2b;border:2px solid ' + G + ';border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)';
+    o.innerHTML = '<iframe title="Marktbericht-PDF" style="width:100%;height:100%;border:0" src="' + _r18.url + '#page=' + n + '&toolbar=0&navpanes=0&view=Fit"></iframe>';
+    await warte(1800);
+  }
+  DREHBUECHER['reihe-marktbericht'] = {
+    titel: 'Der Marktbericht', unterzeile: 'Lage, Vergleichsdaten, Wertermittlung, Quellen — und das PDF', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { r18Zu(); r16MbZu(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das Objekt */
+        await r6KopieStart(R11_PARK, { ohneAnkauf: true, ohneAnalyse: true });
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        var we = wert('einheiten');
+        await b2oZeile(s, 'Das Beispiel', 'Ein Mehrfamilienhaus: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Wohnungen, ' : '') + de(zahl('wfl')) + ' m², Baujahr ' + wert('baujahr') + '. Für das Objekt liegt ein Marktbericht vor.');
+      },
+      async function (s) {   /* 2 · Bericht öffnen */
+        await zeige(function () { return qs('.sb-act-item[onclick*="arktbericht"]') || rhIm('aside.sidebar', /^Marktbericht$/); }, 10);
+        await b2oZeile(s, 'Der Marktbericht', 'Links unter Analyse. Er öffnet sich mit den Daten des Objekts — vorhandene Berichte stehen in der Liste.');
+        await r16MbOeffnen(R18_BERICHT);
+        var sb = function () { return r16Mb('#resultBody .scorebox'); };
+        await r16Hin(sb(), true);
+        await zeigeGruppe(sb, function () { return r16Mb('#resultBody .kpis'); }, 8);
+        var sc = r6Text(r16Mb('#resultBody .scorebox')), num = /(\d+)\s*\/\s*100/.exec(sc), wort = /(Sehr gut|Gut|Solide|Schwach|Kritisch)/i.exec(sc);
+        await b2oZeile(s, 'Das Ergebnis oben', 'Deal-Score <b>' + (num ? num[1] : '–') + ' · ' + (wort ? wort[1] : '–') + '</b>, daneben Marktwert, Bruttorendite ' + (r6Text(r16Mb('#kYield')) || '–') + ', Kaufpreisfaktor und Abstand zum Marktwert.');
+      },
+      async function (s) {   /* 3 · Marktwert und Spanne */
+        var vb = function () { return r16Mb('#valBox'); };
+        await r16Hin(vb(), false);
+        await zeige(vb, 8);
+        var t = r6Inner(vb()), mw = /([\d.]+ €)/.exec(t), sp = /Spanne\s*([\d.]+\s*[–-]\s*[\d.]+ €\/m²)/.exec(t), az = /(\d+) Vergleiche/.exec(t);
+        await b2oZeile(s, 'Marktwert · Indikation', '<b>' + (mw ? mw[1] : '–') + '</b> — aus ' + (az ? az[1] : '–') + ' vergleichbaren Angeboten der Umgebung' + (sp ? ', Spanne ' + sp[1] : '') + '. Eine Indikation, kein Gutachten.');
+      },
+      async function (s) {   /* 4 · Lage */
+        var ag = function () { return r16Mb('#assessGrid'); };
+        await r16Hin(r16Mb('#map'), true);
+        await zeigeGruppe(function () { return r16Mb('#map'); }, r18AssessEl(/^Mietentwicklung/), 8);
+        await b2oZeile(s, 'Lage', 'Mikrolage <b>' + (r18Assess(/^Mikrolage$/) || '–') + '</b>, Makrolage ' + (r18Assess(/^Makrolage$/) || '–') + ', Nachfrage ' + (r18Assess(/^Nachfrage$/) || '–') + ', Entwicklung ' + (r18Assess(/^Entwicklung$/) || '–') + ' — gemessen, nicht geschätzt.');
+      },
+      async function (s) {   /* 5 · Bodenrichtwert und Zensus */
+        var a = r18AssessEl(/^Bodenrichtwert/), b = r18AssessEl(/^Eigentümerquote/);
+        await r16Hin(a(), false);
+        await zeigeGruppe(a, function () { return b() || a(); }, 8);
+        await b2oZeile(s, 'Bodenrichtwert und Zensus', 'Bodenrichtwert <b>' + (r18Assess(/^Bodenrichtwert/) || '–') + '</b> vom Gutachterausschuss. Zensus 2022: Durchschnittsmiete der Gemeinde ' + (r18Assess(/^Ø Nettokaltmiete Gemeinde/) || '–') + ', Leerstand ' + (r18Assess(/^Leerstandsquote Gemeinde/) || '–') + '.');
+      },
+      async function (s) {   /* 6 · Marktentwicklung und Vergleichspreise */
+        var h = r18Karte(/^Marktentwicklung/i);
+        await r16Hin(h(), true);
+        await zeige(h, 8);
+        await b2oZeile(s, 'Marktentwicklung', 'Wie sich die Preise je m² hier entwickelt haben — echte Historie, keine Prognose.');
+        var c = r18Karte(/^Vergleichspreise/i);
+        await r16Hin(c(), false);
+        await zeige(c, 8);
+        var kp = r6Text(r16Mb('#kSqmSp')) || '';
+        await b2oZeile(s, 'Vergleichspreise', 'Die Verteilung der Angebotspreise je m² — und wo dein Kaufpreis darin liegt.');
+      },
+      async function (s) {   /* 7 · Wertermittlung */
+        var wv = function () { return r16Mb('#wv-box'); };
+        await r16Hin(wv(), true);
+        await zeigeGruppe(function () { return r16Mb('#wv-box .wv-boden'); }, function () { var d = r16Doc(); var k = d && d.querySelectorAll('#wv-box .wv-k'); return k && k.length ? k[k.length - 1] : null; }, 8);
+        /* innerText liefert die Überschrift in Versalien (CSS) - daher /i (Prüflauf 18: „Bodenwert –“) */
+        var t = r6Inner(wv()), bw = /Bodenwert\s*\n?\s*([\d.]+ €)/i.exec(t), lz = /Liegenschaftszinssatz:\s*([\d,]+ %)/.exec(t);
+        function karte(re) { var d = r16Doc(); var k = d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return re.test(r6Text(x.querySelector('.wv-t'))); })[0]; return k ? r6Text(k.querySelector('.wv-v')) : '–'; }
+        await b2oZeile(s, 'Wertermittlung · Stufe 3', 'Bodenwert <b>' + (bw ? bw[1] : '–') + '</b>, Liegenschaftszins ' + (lz ? lz[1] : '–') + '. Ertragswert <b>' + karte(/^Ertragswert/i) + '</b>, Sachwert ' + karte(/^Sachwert/i) + ' — mit Rechenweg zum Aufklappen.');
+      },
+      async function (s) {   /* 8 · Quellennachweis */
+        var nw = function () { return r16Mb('#wv-box .wv-nachweis') || r16Mb('#wv-box .wv-hk'); };
+        await r16Hin(nw(), false);
+        await zeige(nw, 8);
+        await b2oZeile(s, 'Quellennachweis', 'Jede amtliche Zahl mit Herkunft: welcher Ausschuss, welcher Jahrgang, welche Lizenz — und ein Link, wo du sie selbst nachschlägst.');
+      },
+      async function (s) {   /* 9 · der Text */
+        var rm = function () { return r16Mb('#reportMd'); };
+        await r16Hin(rm(), true);
+        await zeige(function () { var r = rm(); return r && (r.querySelector('h1,h2') ? b2oHuelle(r.querySelector('h1,h2'), r.querySelector('p') || r) : r); }, 8);
+        var hs = []; try { hs = [].map.call(rm().querySelectorAll('h1,h2'), function (h) { return r6Text(h).replace(/^[—–-]\s*/, ''); }).slice(0, 4); } catch (e) {}
+        await b2oZeile(s, 'Der Bericht in Worten', (hs.length ? hs.join(' · ') : 'Zusammenfassung, Lage, Bewertung, Ausblick') + ' — geschrieben aus genau diesen Zahlen.');
+      },
+      async function (s) {   /* 10 · das PDF */
+        var pb = function () { return q('#mbv-pdf'); };
+        await zeige(pb, 8);
+        var zb = r6Beginn(s, 'Das PDF', 'Ein Klick oben rechts: derselbe Bericht als Dokument.');
+        _r18.pdf = await r18Pdf();
+        await r6Ende(zb);
+        if (!_r18.pdf) { await b2oZeile(s, 'Das PDF', 'Hier entsteht das PDF.'); return; }
+        try { var tx = await _r18.pdf.text(), mm = /\/Type \/Pages[\s\S]{0,2000}?\/Count (\d+)/.exec(tx); _r18.seiten = mm ? Number(mm[1]) : null; DPM_REIHE.pdf18 = { bytes: _r18.pdf.size, seiten: _r18.seiten, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8) }; } catch (e) {}
+        zeige(null); kegelHoch(true);
+        await r18Seite(1);
+        await b2oZeile(s, 'Das PDF', 'Deckblatt mit Marktwert und Eckdaten' + (_r18.seiten ? ' — ' + _r18.seiten + ' Seiten' : '') + ': für die Bank, den Verkäufer oder deine Unterlagen.');
+        await r18Seite(3);
+        await b2oZeile(s, 'Im Dokument', 'Dieselben Kapitel wie am Bildschirm — Lage, Vergleichsdaten, Wertermittlung mit Rechenweg und Quellennachweis.', 600);
       }
     ]
   };

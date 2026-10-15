@@ -772,7 +772,12 @@ function _renderWertverfahren(d) {
 
   box.innerHTML =
     '<h3 class="wv-h">Bodenwert</h3>'
-    + '<div class="wv-boden"><b>' + (e.bodenwert_eur != null ? eur(e.bodenwert_eur) : '\u2013')
+    /* v2273 \u00b7 ohne Ertragswert (gemessen Bericht 215, Detmold: Ertragswert nicht verf\u00fcgbar)
+       stand hier ein Strich, obwohl der Rechenweg darunter den Bodenwert nennt (477.250 EUR).
+       Jetzt der Wert des Bodenwert-Blocks - nur wenn er vollst\u00e4ndig ist (ETW ohne MEA bleibt
+       der Strich, v1198). */
+    + '<div class="wv-boden"><b>' + (e.bodenwert_eur != null ? eur(e.bodenwert_eur)
+        : ((cc.bodenwert && cc.bodenwert.vollstaendig !== false && cc.bodenwert.wert != null) ? eur(cc.bodenwert.wert) : '\u2013'))
     + '</b><span>' + bodenZeile + '</span></div>'
     /* ── v1198b · Ein Strich ohne Grund sieht aus wie ein Fehler ───────────
        Seit v1198 steht hier korrekt „–", wenn der Bodenwert nicht angesetzt
@@ -1167,11 +1172,12 @@ function render(out) {
   // KPIs
   const mv = d.valuation.market_value || {}, y = d.valuation.yield || {}, inp = d.valuation.inputs || {};
   $('kMv').textContent = fmt(mv.estimated, ' €');
-  $('kYield').textContent = (y.gross_yield_pct ?? '–') + ' %';
-  $('kFactor').textContent = y.rent_multiplier ?? '–';
+  /* v2273 · Dezimalkomma (stand „3.83 %“, „26.1“) */
+  $('kYield').textContent = (y.gross_yield_pct != null ? String(y.gross_yield_pct).replace('.', ',') : '–') + ' %';
+  $('kFactor').textContent = y.rent_multiplier != null ? String(y.rent_multiplier).replace('.', ',') : '–';
   $('kSqm').textContent = fmt(inp.price_per_sqm, ' €');
   $('kMrent').textContent = fmt(inp.market_rent_sqm, ' €');
-  $('kDisc').textContent = (mv.discount_to_market_pct ?? '–') + ' %';
+  $('kDisc').textContent = (mv.discount_to_market_pct != null ? String(mv.discount_to_market_pct).replace('.', ',') : '–') + ' %';
   /* v877-kpi-spannen: Sub-Zeilen mit Spannen (nur wo Daten vorliegen) */
   (function(){
     var _sale = d.sale || {}, _rent = d.rent || {};
@@ -1209,9 +1215,9 @@ function render(out) {
   const geraten = Array.isArray(ds.geschaetzt) ? ds.geschaetzt : [];
   const subFor = {
     preisabschlag: mvv.discount_to_market_pct != null
-      ? `Kaufpreis ${mvv.discount_to_market_pct >= 0 ? mvv.discount_to_market_pct + ' % unter' : Math.abs(mvv.discount_to_market_pct) + ' % über'} Marktwert`
+      ? 'Kaufpreis ' + String(Math.abs(mvv.discount_to_market_pct)).replace('.', ',') + (mvv.discount_to_market_pct >= 0 ? ' % unter' : ' % über') + ' Marktwert'
       : null,
-    bruttorendite: yld.gross_yield_pct != null ? `${yld.gross_yield_pct} % Rendite · Faktor ${yld.rent_multiplier ?? '–'}` : null,
+    bruttorendite: yld.gross_yield_pct != null ? String(yld.gross_yield_pct).replace('.', ',') + ' % Rendite · Faktor ' + (yld.rent_multiplier != null ? String(yld.rent_multiplier).replace('.', ',') : '–') : null,
     /* v2158 · Seit N62.4a mittelt der Makro-Score nur gemessene Kennzahlen;
        wie viele es sind, gehoert an die Zahl. Alte Berichte kennen das Feld nicht. */
     makrolage: (d.macro && d.macro.score != null)
@@ -1247,7 +1253,9 @@ function render(out) {
   drawChart(d.sale, inp.price_per_sqm);
 
   // Bericht
-  $('aiMode').textContent = '· ' + out.ai_mode + (out.ai_error ? ' (' + out.ai_error + ')' : '');
+  /* v2273 · hier stand der rohe Modus („· openai") samt Fehlertext des Dienstes im
+     Kundenbild - Anbieter-Neutralität: kein Dienstleistername nach außen. */
+  $('aiMode').textContent = out.ai_mode ? '· ' + (out.ai_mode === 'schnell' ? 'Kurzfassung' : 'KI-Auswertung') + (out.ai_error ? ' (Text nicht verfügbar)' : '') : '';
   $('reportMd').innerHTML = mdToHtml(out.report_md || '');
   renderProvenance(out);
   window._lastOut = out;
@@ -1600,11 +1608,13 @@ function renderAssessment(d) {
      Orchestrator liefert sie als `nutzer_einschaetzung`; `assessment`
      bleibt, was gemessen wurde (GeoMap, Zensus, Makro). */
   const n = d.nutzer_einschaetzung;
+  const ENTW_WORT = { mehrere: 'mehrere klare Möglichkeiten', eine_starke: 'eine starke Möglichkeit', begrenzt: 'begrenzt', kaum: 'kaum', keine: 'keine' };
   const nrows = n ? [
     ['Mikrolage', n.mikrolage], ['Makrolage', n.makrolage], ['Bevölkerung', n.bevoelkerung],
     ['Nachfrage', n.nachfrage], ['Entwicklung', n.entwicklung], ['Wertsteigerung', n.wertsteigerung],
     ['Mietausfallrisiko', n.mietausfallrisiko],
-  ].filter(([, v]) => v != null && v !== '').map(([l, v]) => [l, String(v).replace(/_/g, ' ')]) : [];
+  ].filter(([, v]) => v != null && v !== '').map(([l, v]) => [l, (l === 'Entwicklung' && ENTW_WORT[v]) || String(v).replace(/_/g, ' ')]) : [];
+  /* v2273 · ds2_entwicklung führt Schlüssel (index.html:1378) - im Bericht stand „Eine Starke" */
   const nutzerHtml = nrows.length
     ? `<div class="assess rate-neutral" style="grid-column:1/-1;padding:4px 0 0;border:0;background:transparent"><div class="l">Ihre Einschätzung (aus DealPilot, Reiter Objekt) — keine Messung</div></div>`
       + nrows.map(([l, v]) => `<div class="assess rate-${rateClass(l, v)} assess-nutzer"><div class="l">${l} · Ihre Angabe</div>
@@ -3298,10 +3308,13 @@ async function exportPdf(out) {
     doc.text(f1, fx, 284.3); fx += doc.getTextWidth(f1) + 4;
     doc.setTextColor(...C.obj); doc.text('|', fx, 284.1); fx += 4;
     covIcon('user', fx, 284.0, C.footAccent, 0.85); fx += 4.4;
-    doc.setTextColor(...C.foot); doc.text('Junker Immobilien', fx, 284.3);
+    /* v2273 · hier standen fest „Junker Immobilien“ und „dealpilot.junker-immobilien.io“ - auf dem
+       Deckblatt JEDES Nutzers, auch eines Mandanten mit eigener Marke (gemessen im Prüflauf 18).
+       Jetzt die Marke des Mandanten, sonst DealPilot; die Adresse ist die, unter der die App läuft. */
+    doc.setTextColor(...C.foot); doc.text(window._mbMarkenName || 'DealPilot', fx, 284.3);
   }
   doc.setTextColor(...C.footAccent); doc.setFont('helvetica', 'bold');
-  doc.text('dealpilot.junker-immobilien.io', W - LX, 284.3, { align: 'right' });
+  doc.text(String(location.hostname || 'dealpilot.immo'), W - LX, 284.3, { align: 'right' });
   doc.setFont('helvetica', 'normal');
   // Inhaltsverzeichnis-Seite reservieren (wird am Ende gefuellt, wenn alle Sektionen bekannt sind).
   doc.addPage();
@@ -3425,9 +3438,9 @@ async function exportPdf(out) {
     /* v1207-01schlank · Hier standen ['Marktwert', …] und ['Marktmiete €/m²', …].
      * Beide sind raus — der Marktwert steht in 03 im Band, die Marktmiete
      * ebenfalls. 01 zeigt nur noch, was NICHT anderswo steht. */
-    ['Bruttorendite', yld.gross_yield_pct != null ? yld.gross_yield_pct + ' %' : null, [67, 183, 124]],
-    ['Kaufpreisfaktor', yld.rent_multiplier != null ? yld.rent_multiplier : null, [150, 142, 120]],
-    ['Abw. z. Marktwert', mv.discount_to_market_pct != null ? mv.discount_to_market_pct + ' %' : null, GOLD],
+    ['Bruttorendite', yld.gross_yield_pct != null ? String(yld.gross_yield_pct).replace('.', ',') + ' %' : null, [67, 183, 124]],
+    ['Kaufpreisfaktor', yld.rent_multiplier != null ? String(yld.rent_multiplier).replace('.', ',') : null, [150, 142, 120]],
+    ['Abw. z. Marktwert', mv.discount_to_market_pct != null ? String(mv.discount_to_market_pct).replace('.', ',') + ' %' : null, GOLD],
     ['Kaufpreis €/m²', inp.price_per_sqm ? Math.round(inp.price_per_sqm).toLocaleString('de-DE') + ' €' : null, [138, 138, 147]],
   ].filter((t) => t[1] != null); // leere Kacheln (z.B. Kauf-Szenario ohne Preis) NICHT zeigen
   const tileRows = Math.ceil(tiles.length / 3);
@@ -3494,10 +3507,15 @@ async function exportPdf(out) {
 
   // ---------- Stammdaten ----------
   sectionTitle('Objekt-Stammdaten', 60);
+  /* v2273 · hier standen die Rohschlüssel („mfh“, „renovierungsbeduerftig“) - gemessen Bericht 205.
+     Die Beschriftung kommt aus den Auswahlfeldern dieses Dokuments (#cond, #quality, #modern),
+     die Objektart aus einer kleinen Liste; Unbekanntes bleibt wie es ist. */
+  const _optText = (id, v) => { try { const o = [].find.call(document.querySelectorAll('#' + id + ' option'), (x) => x.value === String(v)); return o ? o.textContent.trim() : v; } catch (e) { return v; } };
+  const _ART = { mfh: 'Mehrfamilienhaus', efh: 'Einfamilienhaus', zfh: 'Zweifamilienhaus', wohnung: 'Eigentumswohnung', etw: 'Eigentumswohnung', dhh: 'Doppelhaushälfte', rh: 'Reihenhaus' };
   const col = (W - 2 * M) / 3; const rows = [
-    ['Objekttyp', ref.property_type], ['Wohnfläche', ref.living_area ? ref.living_area + ' m²' : null], ['Zimmer', ref.rooms],
+    ['Objekttyp', _ART[String(ref.property_type || '').toLowerCase()] || ref.property_type], ['Wohnfläche', ref.living_area ? ref.living_area + ' m²' : null], ['Zimmer', ref.rooms],
     ['Baujahr', ref.build_year], ['Etage', ref.floor], ['Energieklasse', ref.energy_class],
-    ['Zustand', ref.condition || '–'], ['Ausstattung', ref.quality || '–'], ['Modernisierung', ref.modernization || '–'],
+    ['Zustand', ref.condition ? _optText('cond', ref.condition) : '–'], ['Ausstattung', ref.quality ? _optText('quality', ref.quality) : '–'], ['Modernisierung', ref.modernization ? _optText('modern', ref.modernization) : '–'],
   ];
   if (ref.modernization_year) rows.push(['Modernisierungsjahr', ref.modernization_year]);
   if (ref.bathrooms) rows.push(['Badezimmer', ref.bathrooms]);
@@ -3767,8 +3785,8 @@ async function exportPdf(out) {
   // KPIs
   need(16);
   const kpis = [
-    yld.gross_yield_pct != null ? ['Bruttorendite', yld.gross_yield_pct + ' %'] : null,
-    yld.rent_multiplier != null ? ['Kaufpreisfaktor', yld.rent_multiplier] : null,
+    yld.gross_yield_pct != null ? ['Bruttorendite', String(yld.gross_yield_pct).replace('.', ',') + ' %'] : null,
+    yld.rent_multiplier != null ? ['Kaufpreisfaktor', String(yld.rent_multiplier).replace('.', ',')] : null,
     ds.score != null ? ['Deal-Score', ds.score + ' (' + _scoreTier(ds.score) + ')'] : null,   /* v1203 */
   ].filter(Boolean);
   if (kpis.length) { kpis.forEach((k, i) => kv(k[0], k[1], M + i * col, col, k[2])); y += 16; } /* v952-kvaccent */

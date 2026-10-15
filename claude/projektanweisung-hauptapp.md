@@ -38839,6 +38839,74 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2273–v2273j · Videoreihe Spezialmodule 15, 16, 18, 19 gebaut und im Studio geprüft, KEINE Aufnahme (Bildschirm 1024 × 768); acht kleine App-Fehler behoben (16.10.2026, Staging)
+
+- **Was:**
+  - Vier Drehbücher in `messe-drehbuch.js`, alle an KOPIEN (`r6KopieStart`), Studio `REIHE` 15, 16, 18, 19:
+    - `reihe-steuer-bestand` (15): Parkstr. 9 mit Gewonnen-Status.
+    - `reihe-stufe3` (16): Bismarckstr. 27, Detmold.
+    - `reihe-marktbericht` (18): Parkstr. 9 mit dem gespeicherten Bericht 205.
+    - `reihe-bankpdf` (19): Westerfeldstr. 140.
+  - Mitschnitte (`messe-reihe-daten.js`):
+    - `belege`: `/ai/extract-beleg`, einmal echt mit zwei im Lauf gezeichneten Beispielbelegen.
+    - `bismarck`: Marktbericht 215 (Stufe 3), einmal echt mit den angenommenen Zusatzangaben des Drehbuchs.
+  - Marktbericht-Fenster im Lauf (`r16MbSpion`, eigenes Dokument): es geht nur GET hinaus. Die Adresssuche bekommt eine leere Antwort, Kartenbilder (static-map/streetview, externer Dienst) sind gesperrt. Gezeigt wird der gespeicherte Bericht per GET.
+  - PDFs entstehen lokal: `jsPDF.API.save` wird nur für den einen Aufruf auf Blob umgelenkt. Konto- und Markenname sind im Lauf neutral. `DPM_REIHE.pdf18/pdf19` halten Seitenzahl und gefundene Konto-, Firmen- und Portalnamen im PDF-Text fest.
+  - `RH_SPERRE` unverändert. Der BMF-Mitschnitt wird nur noch im BMF-Modul gespielt; der stille Vorlauf (`bmf-modal.js`, 6 s nach dem Laden) bekam vorher in jedem Reihen-Lauf die Ravensberger-Antwort.
+  - `b2oHuelle` rechnet mit `rect()`. Ziele im iframe lagen sonst um die Lage des Fensters verschoben (Kegel 5 %).
+- **Behoben (klein, gemessen):**
+  1. `beleg-import.js`: Der Kopf sagte im WK-Modus „… in die Anschaffungskosten fließt“.
+  2. `objekt-reiter.js`: Die Punkte-Auswahl sammelte alte Auto-Optionen („9 Punkte“ UND „13 Punkte“). Die Punkte-Zeile sagte „Anlage 2 greift“, während GND/RND „nicht angewandt“ meldete (Bj 1908).
+  3. `marktbericht-app/app.js`:
+     - Der Bodenwert-Kopf zeigte „–“ ohne Ertragswert (der Rechenweg nannte 477.250 €).
+     - „· openai“ im Berichtskopf.
+     - Dezimalpunkt bei Rendite, Faktor und Abweichung („3.83 %“).
+     - „Eine Starke“ (Schlüssel `eine_starke`).
+     - **Das PDF-Deckblatt trug fest „Junker Immobilien“ und „dealpilot.junker-immobilien.io“ — bei jedem Nutzer, auch bei Mandanten.** Jetzt steht dort die Marke des Mandanten (`mb-whitelabel.js` merkt sich `brand_name`), sonst DealPilot, dazu `location.hostname`.
+     - Stammdaten im PDF zeigten Rohschlüssel („mfh“, „renovierungsbeduerftig“).
+  4. `pdf-investment-bank.js`:
+     - Die Erwerbsnebenkosten zogen das Inventar ab (40.415 € unter Einzelzeilen von 47.415 €), das Inventar stand als Summand. Seit v2261 steckt es im Kaufpreis; jetzt steht es als „davon“.
+     - Das Kaufdatum stand im ISO-Format.
+     - Die Kette Warmmiete → Kaltmiete zog die umlagefähigen Kosten statt der Umlagen ab (41.147 − 336 ≠ 39.420).
+  5. `pdf.js`: „Junker Immo. (x %)“ als Zeilenname im Investment-PDF jedes Nutzers, jetzt „Vermittlung / Beratung“. Möblierung stand als Summand.
+- **Gemeldet, nicht geändert (fachlich):**
+  1. Steuer-Reiter in der Ansicht Soll: Einnahmen aus dem Ankauf-Stand (30.926 €), aber Werbungskosten aus den eingetragenen Jahreswerten (45.702 € = Ist).
+  2. Die Steuerwirkung steht an drei Stellen mit drei Zahlen: Soll/Ist-Tafel 1.008 €, Steuer-Modul „Erstattung (jährlich)“ +1.592 €, Steuerformular 2026 +1.742 €. Im Video kommt je Szene nur eine Quelle vor.
+  3. Beleg-Import WK: „Erhaltungsaufwand / Reparatur“, „Grundsteuer“ und „Versicherung“ landen alle in `betr_sonst` (Sonstige Betriebskosten), nicht im Feld Erhaltungsaufwendungen (Anlage V Z. 40).
+  4. Bericht 215 (Bismarckstr. 27, Bj 1908):
+     - Ertragswert `{available:false}` ohne `grund`, obwohl das führende Verfahren Ertragswert ist (Miete erfasst, LZS 3,8 %, Vergleichsmieten 0).
+     - Der Sachwert führt keine Garage und keine Außenanlagen (Schlüssel fehlen, BGF 737 statt 710), obwohl beides angegeben war.
+     - Der boG (−25.000 €) wirkt ohne Sachwertfaktor nicht.
+  5. Marktbericht, Karte „Vergleichswert“: Sie trägt „amtliche Grundlage · § 20, § 25 ImmoWertV“, die Erklärung darunter sagt „Grundlage sind tatsächliche Angebote im Umkreis“.
+  6. Die Bank-PDF-Zeile LTV „auf Verkehrswert (§194 BauGB)“ stützt sich auf eine Marktwertindikation.
+  7. Das Marktbericht-Fenster (Kopie via `?ref`) meldet in der Stufenwahl „fehlt: Objektart, Baujahr, Hausform (NHK)“ für ein MFH mit gesetzter Objektart und gesetztem Baujahr.
+  8. Das Investment-PDF hell braucht rund 45 s Hauptthread (Bankfassung 13 s). Modul 19 zeigt es deshalb nicht.
+  9. `closeMarktberichtView()` direkt aufgerufen hinterlässt eine leere Hauptansicht ohne Reiterleiste. Das Drehbuch schließt deshalb über `_mbLeiseSchliessen` + `setMainView('single')`.
+- **Commit:** `49964e76` (v2273), `600eee3d` (a), `5880c443` (b), `0e330329` (c), `f2e67226` (d), `2b747991` (e), `61f4ce41` (f), `6de00aa4` (g), `77d41ab9` (h), `f22d8b88` (i), j mit diesem Eintrag (Textkorrektur 18, Journal, Videoreihe.md)
+- **Nachweis:**
+  - Prüfläufe im Studio (300 ms, Kegel je Zeile, Namen im Bild auch im Marktbericht-iframe):
+    - 15 zweimal: zuletzt alle Zeilen 81–100 %, nur „Übernehmen“ 67 % beim Schließen des Fensters.
+    - 16 viermal: 6:45 → 5:40 → 5:30 → zuletzt ≈ 4:57.
+    - 18 viermal (zuletzt ≈ 3:50) und 19 viermal (zuletzt ≈ 3:50).
+    - Name/Adresse/Portalnamen im Bild 0.
+    - PDF-Text 18: 10 Seiten, Namen 0.
+    - Jede Kopie gelöscht, `fetch` danach echt.
+    - Gespielt: `extract-beleg`, `generate-stream`, Adresssuche. Gesperrt: BMF-Vorlauf, Kartenbilder, (Ü2-Weg) track-usage.
+  - DB vorher/nachher (Sicherung `/root/backups/objekte-vor-reihe15-20261016.json`, 9,0 MB, 39 Zeilen):
+    - Objekte info@ 39 (gesamt 43), `tax_records` 583, `tax_snapshots` 36, `tax_bemerkungen` 26, Pässe 148, shares 1, avm 5, `api_keys` 7, Waisen 0.
+    - `usage_counters`-Hash unverändert.
+    - Alle 39 Objekte: `version`/`updated_at`/md5(data)/md5(Analyse)/Steuerzeilen- und Snapshot-Hash unverändert (diff leer).
+  - `bmf_cache` 77 → 80: drei Cache-Zeilen aus meinen Erkundungen AUSSERHALB eines Laufs (stiller Vorlauf an Kopien; Cache, kein Kontingent).
+- **Kosten:**
+  - `ai_credits_log` 1690 `extract-beleg` (0 Credits).
+  - `ai_credits_log` 1691 `marktbericht:full` (1, Bericht 215; Kontingent Stufe 3: 4 → 3 frei).
+  - `marktbericht_cost_log` 315 → 316.
+  - Sonst nichts; in den Läufen kein Abruf mit Kosten.
+- **Rest:**
+  - Aufnahmen 15, 16, 18, 19 bei 1920 × 1080.
+  - Modul 16 mit einem Stufe-3-Abruf an der Westerfeldstr. 140 neu fassen (RND nach Anlage 2 live 23,6 J., Ertragswert vorhanden). Braucht Marcels Freigabe.
+  - Die neun Meldungen oben.
+
 ### Prod-Rollout (29) · v2265 + Datenkorrektur Westerfeldstr. 140 (15.10.2026)
 
 - **Was:** v2265: Inventar, das nur in `#moebl` steht (Detailbox leer, „Legacy-Modus“), kam im BMF-Fenster als 0 an – Pipeline rechnete mit dem vollen Kaufpreis. Jetzt Rückfall auf `#moebl` (bmf-modal-v292 Eingaben, bmf-modal vier Summen). **Selbst nachgemessen** (Ravensberger Weg 38, Schreibzugriffe gesperrt): Pipeline `immobilien_kp` 1.233.000, amtlich **74,82 %** (fiktives Bj 1979), Gebäude-AK amtlich 922.531 € (vorher 927.768); amtlicher Lauf (`/bmf/aufteilung`) ebenfalls 74,82 %, Ertragswert 1.269.575 € – beide Stellen gleich, 74,82 % ist der Wert MIT Modernisierung (Arbeitshilfe leitet die RND aus Baujahr + Modernisierung ab). Datenkorrektur Westerfeldstr. 140 (PLZ 33613, NRW): GrESt 5,5 → 6,5 %, Notar 2,2 → 1,7 + Grundbuch 0 → 0,5 % (Summe unverändert) – Staging über die App (Version 95, NK 41.965 → 47.415 €), Prod per SQL (Version 94; Euro-Werte rechnet die App beim Öffnen).

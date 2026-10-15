@@ -158,6 +158,9 @@
     var sel = $('mod_punkte'); if (!sel) return;
     if (!p) return;
     var v = String(p.total);
+    /* v2273 · alte Auto-Optionen weg - gemessen standen nach zwei Änderungen
+       „9 Punkte (aus den Gewerken)“ UND „13 Punkte (aus den Gewerken)“ im Feld */
+    Array.prototype.slice.call(sel.querySelectorAll('option[data-oe-auto]')).forEach(function (o) { if (o.value !== v) o.parentNode.removeChild(o); });
     var opt = Array.prototype.find.call(sel.options, function (o) { return o.value === v; });
     if (!opt) { opt = document.createElement('option'); opt.value = v; opt.textContent = v + ' Punkte (aus den Gewerken)'; opt.setAttribute('data-oe-auto', '1'); sel.appendChild(opt); }
     /* ══ v1973 · GESETZT IST NICHT GESPEICHERT ═════════════════════════
@@ -312,6 +315,14 @@
     box.innerHTML = brwZeile() + zeile('Liegenschaftszins', '…', 'wird aus dem Register gelesen', '') + mpZeile;
     var r = await api('/marktbericht/wertparameter/zinssatz', { object: o });
     if (lauf !== _autoLauf) return;
+    /* v2273 · gemessen Bismarckstr. 27 (Bj 1908, 9 Punkte): die Zeile sagte „Anlage 2
+       greift", die Zeile GND / RND darüber „Anlage 2 wurde nicht angewandt“. Rechnet
+       der Endpunkt den Rückfall, sagt das jetzt auch die Punkte-Zeile. */
+    if (r && r.rnd_quelle === 'geschaetzt' && mp && mp.total > 0) {
+      mpZeile = zeile('Modernisierungspunkte', mp.total + ' von 20', st('x', 'Anlage 2 greift hier nicht')
+        + 'Die Restnutzungsdauer ist geschätzt — den Grund nennt die Zeile GND / RND. Die Punkte entstehen aus der Spalte „modernisiert" der Gewerke-Tabelle. Klick springt zum Feld:'
+        + '<br>' + mpChips, '');
+    }
     var html = brwZeile();
     if (!r || !r.verfuegbar) {
       var grund = (r && r.grund) || 'Register nicht erreichbar';

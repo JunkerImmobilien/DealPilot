@@ -741,7 +741,10 @@
     /* ── Daten (nur gelesen) ─────────────────────────────────── */
     var adr = [[txt('str'), txt('hnr')].filter(Boolean).join(' '), [txt('plz'), txt('ort')].filter(Boolean).join(' ')].filter(Boolean).join(', ');
     var kp = num('kp'), san = num('san'), moebl = num('moebl'), gi = da(S.gi);
-    var nk = (gi !== null && kp !== null) ? Math.max(0, gi - kp - (san || 0) - (moebl || 0)) : null;
+    /* v2273 · seit v2261 ist das Inventar Teil des Kaufpreises (gi = kp + nk + san). Hier wurde es
+       noch einmal abgezogen: Westerfeldstr. 140 zeigte Erwerbsnebenkosten 40.415 EUR unter den
+       Einzelzeilen 9.265 + 2.725 + 35.425 = 47.415 EUR, und das Inventar stand als Summand darunter. */
+    var nk = (gi !== null && kp !== null) ? Math.max(0, gi - kp - (san || 0)) : null;
     var ek = num('ek'), d1 = num('d1');
     var fotos = await bilderLaden(5);
     var d2an = el('d2_enable') && el('d2_enable').checked, d2 = d2an ? num('d2') : null;
@@ -756,13 +759,14 @@
     zeile('Objektart', OBJART[txt('objart')] || txt('objart') || '-');
     zeile('Wohnfläche', num('wfl') !== null ? fmt(num('wfl'), 0) + ' m²' : '-');
     zeile('Baujahr', txt('baujahr') || '-');     /* Jahreszahl nie durch Intl (CLAUDE.md) */
-    if (txt('kaufdat')) zeile('Kaufdatum', txt('kaufdat'));
+    if (txt('kaufdat')) zeile('Kaufdatum', /^\d{4}-\d{2}-\d{2}$/.test(txt('kaufdat')) ? txt('kaufdat').split('-').reverse().join('.') : txt('kaufdat'));   /* v2273: stand als 2025-01-01 */
     y += 3;
 
     ansprechpartner();
 
     abschnitt('Investition');
     zeile('Kaufpreis', eur(kp));
+    if (moebl) zeile('davon Möblierung / Inventar', eur(moebl), { einzug: true, klein: true });
     /* Nebenkosten einzeln wie im alten PDF - eine Summe allein beantwortet
        der Bank die Frage nach der Zusammensetzung nicht. */
     function nkZeile(feld, name) {
@@ -781,7 +785,6 @@
     summeNk += nkZeile('ji_p', 'Vermittlung / Beratung');
     zeile('Erwerbsnebenkosten' + (kp && nk !== null ? ' (' + pct(nk / kp * 100, 1) + ' vom Kaufpreis)' : ''), eur(nk), { fett: true });
     if (san) zeile('Sanierung / Modernisierung', eur(san));
-    if (moebl) zeile('Möblierung / Inventar', eur(moebl));
     zeile('Gesamtinvestition', eur(gi), { summe: true });
     y += 1;
 
@@ -934,7 +937,11 @@
     platz(46, 'Ertrag und Cashflow', (adr || 'Objekt') + ' · laufendes Jahr');
     abschnitt('Von der Warmmiete zum Cashflow');
     zeile('Warmmiete / Jahr (Kaltmiete und Umlagen)', eur(K.wm_j));
-    zeile('abzüglich umlagefähiger Bewirtschaftung', da(K.bwk_ul) === null ? '-' : '- ' + eur(K.bwk_ul), { einzug: true });
+    /* v2273 · hier stand „abzüglich umlagefähiger Bewirtschaftung“ (K.bwk_ul) - die Kette ging
+       nicht auf: Westerfeldstr. 140 Warmmiete 41.147 − 336 ≠ Kaltmiete 39.420. Die Warmmiete
+       enthält die Umlagen der Mieter (calc.js wm_m = nkm + ze + uf), abgezogen werden also
+       diese; die umlagefähigen Kosten stehen weiter unten im Block Bewirtschaftung. */
+    zeile('abzüglich Umlagen der Mieter', (da(K.wm_j) === null || da(K.nkm_j) === null) ? '-' : '- ' + eur(K.wm_j - K.nkm_j), { einzug: true });
     zeile('Kaltmiete / Jahr (netto, inkl. Zuschläge)', eur(K.nkm_j), { fett: true });
     zeile('abzüglich nicht umlagefähiger Bewirtschaftung', da(K.bwk_cf) === null ? '-' : '- ' + eur(K.bwk_cf), { einzug: true });
     zeile('Betriebsergebnis (NOI)', da(K.nkm_j) === null ? '-' : eur(K.nkm_j - (K.bwk_cf || 0)), { fett: true });
