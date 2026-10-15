@@ -416,7 +416,7 @@
         return '<div class="mfx-voll r-grund" style="position:absolute;inset:0"><div class="r-kopf"><div class="mfx-claim mfx-a" style="animation-delay:.4s">' + esc(t.reihe) + '</div></div>' +
           '<div class="r-spur"></div><div class="r-fl">' + FLIEGER + '</div>' +
           '<div class="r-mitte"><div class="mfx-marke m mfx-buchst">' + buchstaben('Deal', .7, .07) + '<b>' + buchstaben('Pilot', .98, .07) + '</b></div>' +
-          '<div class="r-nr"><i>Modul</i><b>' + esc(t.modul) + '</b></div>' +
+          '<div class="r-nr"><i>' + esc(t.art || 'Modul') + '</i><b>' + esc(t.modul) + '</b></div>' +
           '<div class="r-titel">' + esc(t.titel) + '</div>' +
           (t.unter ? '<div class="r-unter">' + esc(t.unter) + '</div>' : '') + '</div></div>';
       } }
@@ -566,7 +566,7 @@
           '<rect x="4" y="4" width="992" height="292" rx="62" pathLength="1" stroke="url(#rGold)"/></svg>' +
           '<div class="w"><span>Deal<b>Pilot</b></span></div><div class="fl">' + FLIEGER + '</div></div>' +
           '<div class="r-spruch">' + esc(t.spruch) + (t.spruch2 ? '<br><em>' + esc(t.spruch2) + '</em>' : '') + '</div></div></div>' +
-          '<div class="r-fuss"><span class="mfx-kick">' + esc(t.reihe) + (t.modul ? ' · Modul ' + esc(t.modul) : '') + '</span>' +
+          '<div class="r-fuss"><span class="mfx-kick">' + esc(t.reihe) + (t.modul ? ' · ' + esc(t.art || 'Modul') + ' ' + esc(t.modul) : '') + '</span>' +
           (t.weiter ? '<span class="r-weiter">Weiter: <b>' + esc(t.weiter) + '</b></span>' : '') +
           '<span class="mfx-url" style="font-size:1.25cqw">' + esc(t.url) + '</span></div></div>';
       } }
