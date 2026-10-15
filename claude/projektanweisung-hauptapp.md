@@ -38787,6 +38787,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** ein Marktbericht Stufe 2 (214, Kontingent 1, `ai_credits_log` 1611 → 1612). BMF neu gerechnet (kein Kontingent). Keine KI.
 - **Rest:** die sieben Meldungen; Modul 11 nach Prompt-Korrektur an der Westerfeldstr. neu drehen; 10a nicht neu geprüft (Inventar-Abzug v2261 kann die AfA dort verschieben).
 
+### Prod-Rollout (29) · v2265 + Datenkorrektur Westerfeldstr. 140 (15.10.2026)
+
+- **Was:** v2265: Inventar, das nur in `#moebl` steht (Detailbox leer, „Legacy-Modus“), kam im BMF-Fenster als 0 an – Pipeline rechnete mit dem vollen Kaufpreis. Jetzt Rückfall auf `#moebl` (bmf-modal-v292 Eingaben, bmf-modal vier Summen). **Selbst nachgemessen** (Ravensberger Weg 38, Schreibzugriffe gesperrt): Pipeline `immobilien_kp` 1.233.000, amtlich **74,82 %** (fiktives Bj 1979), Gebäude-AK amtlich 922.531 € (vorher 927.768); amtlicher Lauf (`/bmf/aufteilung`) ebenfalls 74,82 %, Ertragswert 1.269.575 € – beide Stellen gleich, 74,82 % ist der Wert MIT Modernisierung (Arbeitshilfe leitet die RND aus Baujahr + Modernisierung ab). Datenkorrektur Westerfeldstr. 140 (PLZ 33613, NRW): GrESt 5,5 → 6,5 %, Notar 2,2 → 1,7 + Grundbuch 0 → 0,5 % (Summe unverändert) – Staging über die App (Version 95, NK 41.965 → 47.415 €), Prod per SQL (Version 94; Euro-Werte rechnet die App beim Öffnen).
+- **Commit:** `7c54f933` (v2265), Merge `c39a570a`.
+- **Nachweis:** Sicherungen `haupt-/mb-20261015-1850` (14/25 MB, 73/32 Tab.), Objektsicherung `/root/backups/westerfeld140-vor-v2265-20261015.json` (Staging und Prod, je 267.981 Byte). Gold-Audit RC=0, `/auth/me` 401, Buster bmf-modal(-v292) v2265 live. Objekte 39.
+- **Rest:** Ravensberger Weg 38 führt im Objekt noch den alten Gebäudeanteil 74,57 % (gespeicherte BMF-Übernahme) – Marcels Steuerwert, nicht angefasst. Videos 10a/11 werden neu aufgenommen (Agent).
+
 ### Prod-Rollout (27) und (28) · v2262–v2264 (15.10.2026)
 
 - **Was:** (27) v2262 BMF-Fenster ohne Demo-Vorbelegung (`_lastBmf` = Sachsenstr.-Demo speiste alte Varianten-/Risikoblöcke jedes Objekts), Klauseltext „Aggressiv“ ohne festes „Sachwertermittlung“; v2263–v2263e Videoreihe 11–14 und Überblick 2, Neuaufnahmen 06/08/10b, kleine Fehler (Score-Kopf Dezimalkomma, PDF-Adresse „Westerfeldstr., 140“, GrESt-Format, „Alle Objekte“ las 1,7 als 1). (28) v2264 Pilot-Analyse: Prompt erlaubte Anbieter beim Namen – jetzt verboten (Text und quellen-Array, amtliche Stellen erlaubt); Offerte nie über dem Kaufpreis (Prompt + `_offerteDeckeln`, gemessen Westerfeldstr. 910.000 bei 545.000); ohne Darlehen „DSCR entfällt“; PDF „Warmmiete / Jahr“ → „Mieteinnahmen kalt / Jahr“.
