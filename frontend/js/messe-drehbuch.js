@@ -1671,7 +1671,7 @@
         await warte(900);
         await zeige(function () { return q('#imo-ov .imo-body') || q('#imo-detail'); }, 6);
         /* die Trefferzahl so, wie das Fenster sie zeigt („5 von 1.527 geladen") */
-        var nt = (function () { var e = rhIm('#imo-ov', /von\s+[\d.]+\s+geladen/); var m = e && /von\s+([\d.]+)\s+geladen/.exec(e.textContent); return m ? m[1] : null; })();
+        var nt = (function () { var e = rhIm('#imo-ov', /von\s+[\d.]+\s+geladen/); var m = e && /von\s+([\d.]+)\s+geladen/.exec(e.textContent); return m ? de(parseInt(m[1].replace(/\./g, ''), 10)) : null; })();
         await b2oZeile(s, 'Weg 3 · ' + rhNameKachel('immometrica'), (nt ? 'Eine gespeicherte Suche: <b>' + nt + ' Treffer</b>. ' : '') + 'Ein Klick aufs Inserat — Ort, Fläche, Baujahr und Preis gehen ins Objekt.');
         var c = q('#imo-cancel'); if (c) c.click();
         kegelHoch(false);
