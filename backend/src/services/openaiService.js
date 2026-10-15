@@ -932,9 +932,12 @@ function buildPrompt(payload, opts) {
     '- Score: ' + ltvScore + ' / 100',
     '',
     'DSCR (Debt Service Coverage Ratio):',
-    '- Wert: ' + fmtNum(k.dscr, 2) +
-      '  → Einordnung nach DealPilot-Skala oben',
-    '- Score: ' + dscrScore + ' / 100',
+    /* v2264 · Ohne Darlehen gibt es keinen Schuldendienst - „DSCR 0,00 kritisch"
+       (gemessen Sachsenstr. 18) war falsch. */
+    (!(Number(f.d1) > 0) && !(Number(k.dscr) > 0))
+      ? '- Wert: entfällt — kein Darlehen, also kein Schuldendienst. NICHT als Risiko oder „kritisch“ werten.'
+      : ('- Wert: ' + fmtNum(k.dscr, 2) + '  → Einordnung nach DealPilot-Skala oben'),
+    (!(Number(f.d1) > 0) && !(Number(k.dscr) > 0)) ? '' : ('- Score: ' + dscrScore + ' / 100'),
     '',
     'Potenzial (Wertsteigerung + Mietsteigerung):',
     '- Beschreibung: ' + potDesc,
@@ -1397,9 +1400,16 @@ function buildPrompt(payload, opts) {
     '## OFFERTE-LEITLINIEN (verbindlich)',
     '- In Kaufpreis-Offerte UND offerte_mail NICHT mit LTV/Beleihungsauslauf argumentieren',
     '  (interne Finanzierungskennzahl des Kaeufers, KEIN Verhandlungsargument).',
-    '- Argumentiere mit: den vorliegenden Marktbewertungen (du DARFST Quellen/Anbieter beim',
-    '  Namen nennen — sie sind belastbar), Objektzustand (z.B. Modernisierungsbedarf),',
+    '- Argumentiere mit: den vorliegenden Marktbewertungen (OHNE Anbieter, Portale oder',
+    '  Datenquellen beim Namen zu nennen — schreibe „aktuelle Marktdaten“ bzw.',
+    '  „Marktdurchschnitt“), Objektzustand (z.B. Modernisierungsbedarf),',
     '  Lage/Markt und den eigenen Kennzahlen des Deals. Nenne Vorteile UND Nachteile.',
+    /* v2264 · Marcel 15.10.2026, gemessen an gespeicherten Analysen: Westerfeldstr.
+       empfahl 910.000 EUR bei 545.000 EUR Kaufpreis, Alexanderstr. 140.000 bei
+       129.000. Eine Kaufpreis-Offerte ueber dem Angebotspreis ist keine Verhandlung. */
+    '- Die empfohlene Offerte liegt NIE über dem Kaufpreis (Angebotspreis) des Objekts.',
+    '  Ist das Objekt deutlich mehr wert, ist das ein Argument, ZÜGIG zum Angebotspreis',
+    '  oder knapp darunter zu kaufen — die Offerte bleibt höchstens beim Kaufpreis.',
     '- Formatiere die offerte_mail wie einen echten Brief: Anrede in eigener Zeile, dann',
     '  2-3 inhaltliche Absaetze (durch Leerzeile getrennt), dann Grussformel und Name in',
     '  eigenen Zeilen. Nutze echte Zeilenumbrueche, KEIN durchgehender Fliesstext-Block.',
@@ -1497,8 +1507,14 @@ function buildPrompt(payload, opts) {
     '- Werte Investitionsthese, die vom Investor benannten Risiken und die sonstigen',
     '  Bemerkungen aktiv aus: spiegle sie in Stärken/Risiken (Pro/Kontra) und',
     '  bestätige oder widerlege sie mit Zahlen.',
-    '- Quellen: vollständige URLs NUR im "quellen"-Array. Im Fließtext höchstens',
-    '  den Quellennamen nennen — KEINE rohen Markdown-Links im Text.',
+    '- Quellen: vollständige URLs NUR im "quellen"-Array, KEINE rohen Markdown-Links im Text.',
+    /* v2264 · Regel vom 14.10.2026 (CLAUDE.md, Anbieter-Neutralitaet): 19 von 27
+       gespeicherten Analysen nannten Portale im Text oder in der Quellenliste. */
+    '- KEINE Namen von Immobilienportalen, Bewertungsdiensten oder kommerziellen',
+    '  Datenanbietern — weder im Fließtext noch im "quellen"-Array (keine URLs solcher',
+    '  Seiten). Schreibe „aktuelle Angebotsdaten“ bzw. „Marktdaten“. Erlaubt sind amtliche',
+    '  und öffentliche Stellen (Gutachterausschuss, Statistisches Bundesamt/Landesamt,',
+    '  Deutsche Bundesbank, Kommune) und ImmoMetrica.',
     '',
     '## ANTWORTFORMAT — strikt JSON, keine Markdown-Codeblöcke',
     'Antworte AUSSCHLIESSLICH mit folgendem JSON-Objekt:',
@@ -1868,6 +1884,26 @@ const ANTI_RUECKFRAGE = [
   ''
 ].join('\n');
 
+/* v2264 · Die Offerte liegt nie ueber dem Kaufpreis - auch wenn das Modell die
+   Regel im Prompt ueberliest. Gedeckelt wird auf den Kaufpreis, mit Vermerk. */
+function _offerteDeckeln(a, payload) {
+  try {
+    var kp = Number(payload && payload.kennzahlen && payload.kennzahlen.kp);
+    var o = a && a.kaufpreis_offerte;
+    if (!(kp > 0) || !o || o.empfohlen == null) return a;
+    var roh = String(o.empfohlen);
+    var m = roh.replace(/[^0-9.,]/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.');
+    var wert = parseFloat(m);
+    if (!isFinite(wert) || wert <= kp) return a;
+    o.empfohlen = Math.round(kp).toLocaleString('de-DE') + ' €';
+    o.begruendung = (o.begruendung ? o.begruendung + ' ' : '')
+      + '(Vom Modell vorgeschlagen waren ' + Math.round(wert).toLocaleString('de-DE') + ' € — über dem Angebotspreis; '
+      + 'eine Offerte liegt höchstens beim Kaufpreis.)';
+    try { console.warn('[analyze] Offerte gedeckelt: ' + wert + ' -> ' + kp); } catch (e) {}
+  } catch (e) {}
+  return a;
+}
+
 async function analyze(payload, opts) {
   const prompt = buildPrompt(payload, opts) + _analyzeStyleSuffix(opts) + ANTI_RUECKFRAGE;
   /* v2013 - MIT Fotos geht der ERSTE Anlauf ueber den Bildweg.
@@ -1943,7 +1979,7 @@ async function analyze(payload, opts) {
        strukturierten Quellenfelder - die LANGTEXTE
        (`makrolage_recherche`, `kaufpreisniveau`, …) tragen ihre Links im
        Fliesstext und kamen dort nie an. */
-    analysis: _analyseUrlsSaeubern(parsed),
+    analysis: _offerteDeckeln(_analyseUrlsSaeubern(parsed), payload),
     raw_text: parsed ? null : used.text  // bei Parse-Fail Text zurückgeben für Debug
   };
 }

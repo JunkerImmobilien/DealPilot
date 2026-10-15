@@ -1533,7 +1533,7 @@ async function _exportPDFInner() {
     var rows;
     if (hasBspar) {
       rows = [
-        ['Warmmiete / Jahr',         pE(data.wm)],
+        ['Mieteinnahmen kalt / Jahr', pE(data.wm)],   /* v2264: wm = NKM + Zusatzeinnahmen, keine Warmmiete */
         ['- Bewirtschaftung', '- ' + pE(data.bwk)],
         ['- Zinsen',            '- ' + pE(data.zins)],
         ['= CF operativ vor BSV',     pE(data.cf_op + data.bspar, true)],
@@ -1545,7 +1545,7 @@ async function _exportPDFInner() {
       ];
     } else {
       rows = [
-        ['Warmmiete / Jahr',         pE(data.wm)],
+        ['Mieteinnahmen kalt / Jahr', pE(data.wm)],   /* v2264: wm = NKM + Zusatzeinnahmen, keine Warmmiete */
         ['- Bewirtschaftung', '- ' + pE(data.bwk)],
         ['- Zinsen',            '- ' + pE(data.zins)],
         ['= CF operativ',             pE(data.cf_op, true)],
