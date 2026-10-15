@@ -629,6 +629,10 @@ function runBmf(){
       var invSum = (parseDe(_v('inv_kueche')) || 0) + (parseDe(_v('inv_moebel')) || 0)
                  + (parseDe(_v('inv_geraete')) || 0) + (parseDe(_v('inv_pv')) || 0)
                  + (parseDe(_v('inv_stellplatz')) || 0) + (parseDe(_v('inv_sonst')) || 0);
+      /* v2267: Inventar nur in #moebl (Detailbox leer) - derselbe Rueckfall wie v2265
+         in den Pipeline-Eingaben. Gemessen Ravensberger Weg 38: Schritt 3 und
+         Bodenabschlag rechneten mit 1.240.000 statt 1.233.000 EUR. */
+      if (!(invSum > 0)) invSum = parseDe(_v('moebl')) || 0;
       var immoKp = Math.max(0, kpBrutto - invSum);
       var nk = (parseDe(_v('gest_e')) || 0) + (parseDe(_v('notar_e')) || 0)
              + (parseDe(_v('gba_e')) || 0) + (parseDe(_v('makler_e')) || 0)

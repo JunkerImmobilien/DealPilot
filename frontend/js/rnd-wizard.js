@@ -293,7 +293,15 @@
     // Für AfA-Vergleich: Gebäudeanteil + Grenzsteuersatz aus DealPilot
     const kp = parseFloat(String(dpObj.kp || dpObj.kaufpreis || 0).replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
     const gaPct = parseFloat(String(dpObj.geb_ant || 80).replace(',', '.')) || 80;
-    if (kp > 0) prefill._dpGebaeudeanteil = kp * gaPct / 100;
+    /* v2267 · Dieselbe Gebaeude-Basis wie der Reiter Steuer (calc.js gebAHK):
+       (Kaufpreis - Inventar) x Gebaeudeanteil + Nebenkosten x Gebaeudeanteil.
+       Hier stand Kaufpreis x Gebaeudeanteil - mit Inventar, ohne Nebenkosten;
+       der AfA-Vergleich wich deshalb vom Reiter Steuer ab (Ravensberger Weg 38:
+       924.668 statt 919.448 EUR). */
+    const _zahl = function (x) { if (x == null || x === '') return 0; if (typeof window.parseDe === 'function') return window.parseDe(x) || 0; const n = parseFloat(String(x).replace(',', '.')); return isFinite(n) ? n : 0; };
+    const _inv = ['inv_kueche', 'inv_moebel', 'inv_geraete', 'inv_pv', 'inv_stellplatz', 'inv_sonst'].reduce(function (s, k) { return s + _zahl(dpObj[k]); }, 0) || _zahl(dpObj.moebl);
+    const _nkPct = ['makler_p', 'notar_p', 'gba_p', 'gest_p', 'ji_p'].reduce(function (s, k) { return s + _zahl(dpObj[k]); }, 0);
+    if (kp > 0) prefill._dpGebaeudeanteil = (Math.max(0, kp - _inv) + kp * _nkPct / 100) * gaPct / 100;
     const grenz = parseFloat(String(dpObj.grenz || 42).replace(',', '.')) || 42;
     prefill._dpGrenzsteuersatz = grenz / 100;
 
