@@ -3553,6 +3553,9 @@
           var m = String((o && o.method) || 'GET').toUpperCase(), p = String(typeof u === 'string' ? u : (u && u.url) || '').replace(location.origin, '').split('?')[0];
           DPM_REIHE.abrufe.push('MB ' + m + ' ' + p);
           if (/\/geocode\//.test(p)) { DPM_REIHE.gespielt.push('MB ' + m + ' ' + p); return Promise.resolve(new Response('{"results":[],"features":[]}', { status: 200, headers: { 'Content-Type': 'application/json' } })); }
+          /* v2273 · Kartenbilder fürs PDF (Modul 18): der Server holt sie je Abruf beim externen
+             Kartendienst - im Lauf gesperrt, das PDF entsteht dann ohne die beiden Karten */
+          if (/\/(static-map|streetview)\b/.test(p)) { DPM_REIHE.gesperrt.push('MB ' + m + ' ' + p); return Promise.resolve(new Response('', { status: 404 })); }
           if (m !== 'GET') { DPM_REIHE.gesperrt.push('MB ' + m + ' ' + p); return Promise.resolve(new Response('{"error":"Vorführung: Abruf gesperrt"}', { status: 503, headers: { 'Content-Type': 'application/json' } })); }
           return echt.apply(this, arguments);
         };
@@ -3735,12 +3738,13 @@
   /* ═══ VIDEOREIHE · SPEZIALMODUL 19 · DAS BANK-PDF (v2273) ═════════════════
      Videoreihe.md, Teil C. KOPIE der Westerfeldstr. 140, Bielefeld (ohne
      Analyse, ohne Ankauf-Stand), beim Aufräumen gelöscht. Gezeigt werden die
-     Fassungs-Rückfrage (pdf-wahl.js, echt), das Investment-PDF hell (die
-     Fassung in deiner Marke) und die Bankfassung (pdf-investment-bank.js).
-     Beide entstehen LOKAL (jsPDF) - kein Abruf, kein Download:
-       - hell: exportPDFBlob mit hellem Schalter, ohne Rückfrage (wie Ü2);
-       - Bank: die Bankfassung kennt kein Blob - ihr doc.save wird nur für
-         diesen einen Aufruf auf output('blob') umgelenkt (jsPDF.API.save).
+     Fassungs-Rückfrage (pdf-wahl.js, echt) und die Bankfassung
+     (pdf-investment-bank.js) - weißes Papier, Logo der Marke, alle Blöcke
+     aufgerollt. Sie entsteht LOKAL (jsPDF), kein Abruf, kein Download: die
+     Bankfassung kennt kein Blob, ihr doc.save wird nur für diesen einen
+     Aufruf auf output('blob') umgelenkt (jsPDF.API.save).
+     GEMESSEN: das Investment-PDF hell brauchte im Prüflauf 45 s Rechenzeit
+     bei stehendem Bild - es wird deshalb nur in der Rückfrage genannt.
      Der Nutzungszähler (/objects/track-usage) ist im Lauf gesperrt (v2271),
      branding.get liefert keine Kontaktdaten (wie Ü2), der Merker
      dp_pdf_wahl wird gesichert und zurückgeschrieben. */
@@ -3761,20 +3765,6 @@
     } catch (e) {}
   }
   function r19MitKontakt() { if (_r19.brand) { try { DealPilotConfig.branding.get = _r19.brand; } catch (e) {} _r19.brand = null; } }
-  async function r19Hell() {
-    var vorher = window._dpPdfLight, r = null, huelle = window.exportPDF;
-    r19OhneKontakt();
-    try {
-      if (typeof window._dpPdfSetLight === 'function') window._dpPdfSetLight(true); else window._dpPdfLight = true;
-      window.exportPDF = function () { return huelle({ ohneRueckfrage: true }); };
-      r = await window.exportPDFBlob();
-    } catch (e) {} finally {
-      window.exportPDF = huelle;
-      if (typeof window._dpPdfSetLight === 'function') window._dpPdfSetLight(vorher); else window._dpPdfLight = vorher;
-      r19MitKontakt();
-    }
-    return r && r.blob ? r.blob : null;
-  }
   async function r19Bank() {
     var fang = null, api = window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API;
     if (!api || typeof window.exportPDFBank !== 'function') return null;
@@ -3818,24 +3808,18 @@
         var x = q('#dp-pdf-wahl'); if (x && x.parentNode) x.parentNode.removeChild(x);
         kegelHoch(false);
       },
-      async function (s) {   /* 3 · Investment-PDF hell: deine Marke */
-        var zb = r6Beginn(s, 'Investment-PDF · hell', 'Das volle Dokument mit hellem Deckblatt — für Partner und Miteigentümer.');
-        var hell = await r19Hell();
-        await r6Ende(zb);
-        if (!hell) { await b2oZeile(s, 'Investment-PDF · hell', 'Hier entsteht das PDF.'); return; }
-        zeige(null); kegelHoch(true);
-        await r19Seite(hell, 1);
-        var K = r19K();
-        await b2oZeile(s, 'Deckblatt in deiner Marke', 'Logo und Farben kommen aus deinen Einstellungen — mit Whitelabel steht dein Logo hier. Kaufpreis ' + eur(K.kp) + ', Gesamtinvestition ' + eur(K.gi) + '.');
-      },
-      async function (s) {   /* 4 · Bankfassung: Seite 1 */
-        var zb = r6Beginn(s, 'Die Bankfassung', 'Weißes Papier, alles aufgerollt: jeder Block als Tabelle, wie eine Bank ihn prüft.');
+      async function (s) {   /* 3 · die Bankfassung entsteht: Deckblatt */
+        /* GEMESSEN (Prüflauf 19): das Investment-PDF hell brauchte 45 s Rechenzeit, das Bild stand so lange still -
+           gezeigt wird deshalb nur die Bankfassung (13 s). Sie ist die weiße Fassung und trägt das Logo der Marke. */
+        var zb = r6Beginn(s, 'Die Bankfassung', 'Weißes Papier, alles aufgerollt: jeder Block als Tabelle, so wie eine Bank ihn prüft.');
         var bank = await r19Bank();
         await r6Ende(zb);
         if (!bank) { await b2oZeile(s, 'Die Bankfassung', 'Hier entsteht das PDF.'); return; }
         _r19.bank = bank;
-        try { var tx = await bank.text(), mm = /Seite 1 von (\d+)/.exec(tx); _r19.seiten = mm ? Number(mm[1]) : null; } catch (e) {}
+        try { var tx = await bank.text(), mm = /Seite 1 von (\d+)/.exec(tx); _r19.seiten = mm ? Number(mm[1]) : null; _r19.tok = (tx.match(/\(([^()]{1,80})\) Tj/g) || []).map(function (x) { return x.slice(1, -4); }); } catch (e) {}
+        zeige(null); kegelHoch(true);
         await r19Seite(bank, 1);
+        await b2oZeile(s, 'Oben: deine Marke', 'Kopf mit Logo — mit Whitelabel steht hier deins, nicht unseres. Darunter Objekt, Foto und Stand.');
         var K = r19K();
         await b2oZeile(s, 'Seite 1 · Objekt und Finanzierung', 'Kaufpreis <b>' + eur(K.kp) + '</b> mit jeder Nebenkostenzeile, Gesamtinvestition ' + eur(K.gi) + '. Eigenkapital ' + eur(K.ek) + ', Darlehen <b>' + eur(K.d1) + '</b> zu ' + r19Pz(K.d1z_pct) + '.');
       },
@@ -3856,7 +3840,9 @@
         if (!_r19.bank) return;
         await r19Seite(_r19.bank, 6);
         var K = r19K();
-        await b2oZeile(s, 'Vermögensaufbau und Exit', 'Wert, Restschuld und Eigenkapital über die Jahre; angenommener Verkaufspreis <b>' + eur(K.exit_vkp) + '</b>, Equity Multiple ' + de(K.em, 1) + '.');
+        /* aus dem PDF gelesen, nicht aus den Kennzahlen: der Exit dort rechnet mit eigener Haltedauer */
+        var T = _r19.tok || [], iw = T.indexOf('Angenommene Wertsteigerung p. a.'), ws = iw >= 0 ? T[iw + 1] : null;
+        await b2oZeile(s, 'Vermögensaufbau und Exit', 'Wert, Restschuld und Eigenkapital über die Jahre' + (ws ? ', gerechnet mit <b>' + ws + '</b> Wertsteigerung im Jahr' : '') + ' — und was beim Verkauf bliebe. Equity Multiple ' + de(K.em, 1) + '.');
       },
       async function (s) {   /* 8 · Belastungsprobe */
         if (!_r19.bank) return;
@@ -3873,6 +3859,135 @@
         kegelHoch(false);
         await zeige(function () { var e = rhIm('#s8', /^\s*Investment-PDF/); return e && (e.closest('[class*=row]') || e.parentElement); }, 8);
         await b2oZeile(s, 'Der Investment Case', 'Objekt, Finanzierung, Kennzahlen, Phasen, Belastungsprobe' + (_r19.seiten ? ' — <b>' + _r19.seiten + ' Seiten</b>' : '') + ', die eine Kreditanfrage tragen. Ein Klick, jedes Mal aktuell.', 600);
+      }
+    ]
+  };
+
+  /* ═══ VIDEOREIHE · SPEZIALMODUL 18 · DER MARKTBERICHT (v2273) ════════════
+     Videoreihe.md, Teil C. Ein VORHANDENER Bericht: Marktbericht 205 (Stufe 3,
+     14.10.2026) der Parkstr. 9, Bad Oeynhausen - geöffnet aus einer KOPIE des
+     Objekts (beim Aufräumen gelöscht) über das Marktbericht-Fenster. Gelesen
+     wird der gespeicherte Bericht (GET, keine Kosten); im Fenster sperrt
+     r16MbSpion alles außer GET, die Adresssuche (externer Dienst) bekommt eine
+     leere Antwort. Das PDF entsteht lokal in diesem Fenster (jsPDF, doc.save
+     für diesen Aufruf auf Blob umgelenkt) und wird im Bild gezeigt.
+     Keine Anbieter- oder Portalnamen in den Kapiteltexten; der Prüflauf
+     misst Portal- und Dienstnamen auch im Fenster und im PDF. */
+  var R18_BERICHT = 205;
+  var _r18 = { pdf: null, url: null, save: null };
+  function r18Zu() {
+    var o = q('#dpm-pdf'); if (o && o.parentNode) o.parentNode.removeChild(o);
+    if (_r18.url) { try { URL.revokeObjectURL(_r18.url); } catch (e) {} _r18.url = null; }
+    if (_r18.save) { try { r16Frame().contentWindow.jspdf.jsPDF.API.save = _r18.save; } catch (e) {} _r18.save = null; }
+    _r18.pdf = null;
+  }
+  function r18Mb(re) { var d = r16Doc(); return d ? rhIm(d.body, re) : null; }
+  /* Karte eines Abschnitts im Bericht: der Kasten um die Überschrift */
+  function r18Karte(re) { return function () { var h = r18Mb(re); return h && (h.closest('.card,.panel,section,.box') || h.parentElement); }; }
+  function r18Assess(re) { var d = r16Doc(); if (!d) return null; var a = [].filter.call(d.querySelectorAll('#assessGrid .assess'), function (x) { var l = x.querySelector('.l'); return x.offsetWidth && l && re.test(r6Text(l)); })[0]; return a ? r6Text(a.querySelector('.v')) : null; }
+  function r18AssessEl(re) { return function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#assessGrid .assess'), function (x) { var l = x.querySelector('.l'); return x.offsetWidth && l && re.test(r6Text(l)); })[0]; }; }
+  async function r18Pdf() {
+    var f = r16Frame(), w = f && f.contentWindow, fang = null;
+    if (!w || !w.jspdf || !w._lastOut || typeof w.exportPdf !== 'function') return null;
+    var api = w.jspdf.jsPDF.API; _r18.save = api.save;
+    api.save = function () { fang = this.output('blob'); return this; };
+    try { await w.exportPdf(w._lastOut); } catch (e) {} finally { api.save = _r18.save; _r18.save = null; }
+    return fang;
+  }
+  async function r18Seite(n) {
+    if (!_r18.pdf) return;
+    if (!_r18.url) _r18.url = URL.createObjectURL(_r18.pdf);
+    var o = el('dpm-pdf');
+    o.style.cssText = 'position:fixed;left:4%;right:4%;top:3%;bottom:4%;z-index:100002;background:#2b2b2b;border:2px solid ' + G + ';border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)';
+    o.innerHTML = '<iframe title="Marktbericht-PDF" style="width:100%;height:100%;border:0" src="' + _r18.url + '#page=' + n + '&toolbar=0&navpanes=0&view=Fit"></iframe>';
+    await warte(1800);
+  }
+  DREHBUECHER['reihe-marktbericht'] = {
+    titel: 'Der Marktbericht', unterzeile: 'Lage, Vergleichsdaten, Wertermittlung, Quellen — und das PDF', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { r18Zu(); r16MbZu(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das Objekt */
+        await r6KopieStart(R11_PARK, { ohneAnkauf: true, ohneAnalyse: true });
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        var we = wert('einheiten');
+        await b2oZeile(s, 'Das Beispiel', 'Ein Mehrfamilienhaus: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Wohnungen, ' : '') + de(zahl('wfl')) + ' m², Baujahr ' + wert('baujahr') + '. Für das Objekt liegt ein Marktbericht vor.');
+      },
+      async function (s) {   /* 2 · Bericht öffnen */
+        await zeige(function () { return qs('.sb-act-item[onclick*="arktbericht"]') || rhIm('aside.sidebar', /^Marktbericht$/); }, 10);
+        await b2oZeile(s, 'Der Marktbericht', 'Links unter Analyse. Er öffnet sich mit den Daten des Objekts — vorhandene Berichte stehen in der Liste.');
+        await r16MbOeffnen(R18_BERICHT);
+        var sb = function () { return r16Mb('#resultBody .scorebox'); };
+        await r16Hin(sb(), true);
+        await zeigeGruppe(sb, function () { return r16Mb('#resultBody .kpis'); }, 8);
+        var sc = r6Text(r16Mb('#resultBody .scorebox')), num = /(\d+)\s*\/\s*100/.exec(sc), wort = /(Sehr gut|Gut|Solide|Schwach|Kritisch)/i.exec(sc);
+        await b2oZeile(s, 'Das Ergebnis oben', 'Deal-Score <b>' + (num ? num[1] : '–') + ' · ' + (wort ? wort[1] : '–') + '</b>, daneben Marktwert, Bruttorendite ' + (r6Text(r16Mb('#kYield')) || '–') + ', Kaufpreisfaktor und Abstand zum Marktwert.');
+      },
+      async function (s) {   /* 3 · Marktwert und Spanne */
+        var vb = function () { return r16Mb('#valBox'); };
+        await r16Hin(vb(), false);
+        await zeige(vb, 8);
+        var t = r6Inner(vb()), mw = /([\d.]+ €)/.exec(t), sp = /Spanne\s*([\d.]+\s*[–-]\s*[\d.]+ €\/m²)/.exec(t), az = /(\d+) Vergleiche/.exec(t);
+        await b2oZeile(s, 'Marktwert · Indikation', '<b>' + (mw ? mw[1] : '–') + '</b> — aus ' + (az ? az[1] : '–') + ' vergleichbaren Angeboten der Umgebung' + (sp ? ', Spanne ' + sp[1] : '') + '. Eine Indikation, kein Gutachten.');
+      },
+      async function (s) {   /* 4 · Lage */
+        var ag = function () { return r16Mb('#assessGrid'); };
+        await r16Hin(r16Mb('#map'), true);
+        await zeigeGruppe(function () { return r16Mb('#map'); }, r18AssessEl(/^Mietentwicklung/), 8);
+        await b2oZeile(s, 'Lage', 'Mikrolage <b>' + (r18Assess(/^Mikrolage$/) || '–') + '</b>, Makrolage ' + (r18Assess(/^Makrolage$/) || '–') + ', Nachfrage ' + (r18Assess(/^Nachfrage$/) || '–') + ', Entwicklung ' + (r18Assess(/^Entwicklung$/) || '–') + ' — gemessen, nicht geschätzt.');
+      },
+      async function (s) {   /* 5 · Bodenrichtwert und Zensus */
+        var a = r18AssessEl(/^Bodenrichtwert/), b = r18AssessEl(/^Eigentümerquote/);
+        await r16Hin(a(), false);
+        await zeigeGruppe(a, function () { return b() || a(); }, 8);
+        await b2oZeile(s, 'Bodenrichtwert und Zensus', 'Bodenrichtwert <b>' + (r18Assess(/^Bodenrichtwert/) || '–') + '</b> vom Gutachterausschuss. Zensus 2022: Durchschnittsmiete der Gemeinde ' + (r18Assess(/^Ø Nettokaltmiete Gemeinde/) || '–') + ', Leerstand ' + (r18Assess(/^Leerstandsquote Gemeinde/) || '–') + '.');
+      },
+      async function (s) {   /* 6 · Marktentwicklung und Vergleichspreise */
+        var h = r18Karte(/^Marktentwicklung/i);
+        await r16Hin(h(), true);
+        await zeige(h, 8);
+        await b2oZeile(s, 'Marktentwicklung', 'Wie sich die Preise je m² hier entwickelt haben — echte Historie, keine Prognose.');
+        var c = r18Karte(/^Vergleichspreise/i);
+        await r16Hin(c(), false);
+        await zeige(c, 8);
+        var kp = r6Text(r16Mb('#kSqmSp')) || '';
+        await b2oZeile(s, 'Vergleichspreise', 'Die Verteilung der Angebotspreise je m² — und wo dein Kaufpreis darin liegt.');
+      },
+      async function (s) {   /* 7 · Wertermittlung */
+        var wv = function () { return r16Mb('#wv-box'); };
+        await r16Hin(wv(), true);
+        await zeigeGruppe(function () { return r16Mb('#wv-box .wv-boden'); }, function () { var d = r16Doc(); var k = d && d.querySelectorAll('#wv-box .wv-k'); return k && k.length ? k[k.length - 1] : null; }, 8);
+        var t = r6Inner(wv()), bw = /Bodenwert\s*\n?\s*([\d.]+ €)/.exec(t), lz = /Liegenschaftszinssatz:\s*([\d,]+ %)/.exec(t);
+        function karte(re) { var d = r16Doc(); var k = d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return re.test(r6Text(x.querySelector('.wv-t'))); })[0]; return k ? r6Text(k.querySelector('.wv-v')) : '–'; }
+        await b2oZeile(s, 'Wertermittlung · Stufe 3', 'Bodenwert <b>' + (bw ? bw[1] : '–') + '</b>, Liegenschaftszins ' + (lz ? lz[1] : '–') + '. Ertragswert <b>' + karte(/^Ertragswert/i) + '</b>, Sachwert ' + karte(/^Sachwert/i) + ' — mit Rechenweg zum Aufklappen.');
+      },
+      async function (s) {   /* 8 · Quellennachweis */
+        var nw = function () { return r16Mb('#wv-box .wv-nachweis') || r16Mb('#wv-box .wv-hk'); };
+        await r16Hin(nw(), false);
+        await zeige(nw, 8);
+        await b2oZeile(s, 'Quellennachweis', 'Jede amtliche Zahl mit Herkunft: welcher Ausschuss, welcher Jahrgang, welche Lizenz — und ein Link, wo du sie selbst nachschlägst.');
+      },
+      async function (s) {   /* 9 · der Text */
+        var rm = function () { return r16Mb('#reportMd'); };
+        await r16Hin(rm(), true);
+        await zeige(function () { var r = rm(); return r && (r.querySelector('h2,h3') ? b2oHuelle(r.querySelector('h2,h3'), r.querySelector('p') || r) : r); }, 8);
+        var hs = []; try { hs = [].map.call(rm().querySelectorAll('h2,h3'), function (h) { return r6Text(h).replace(/^[—–-]\s*/, ''); }).slice(0, 4); } catch (e) {}
+        await b2oZeile(s, 'Der Bericht in Worten', (hs.length ? hs.join(' · ') : 'Zusammenfassung, Lage, Bewertung, Ausblick') + ' — geschrieben aus genau diesen Zahlen.');
+      },
+      async function (s) {   /* 10 · das PDF */
+        var pb = function () { return q('#mbv-pdf'); };
+        await zeige(pb, 8);
+        var zb = r6Beginn(s, 'Das PDF', 'Ein Klick oben rechts: derselbe Bericht als Dokument.');
+        _r18.pdf = await r18Pdf();
+        await r6Ende(zb);
+        if (!_r18.pdf) { await b2oZeile(s, 'Das PDF', 'Hier entsteht das PDF.'); return; }
+        try { var tx = await _r18.pdf.text(), mm = /Seite 1 von (\d+)/.exec(tx) || /1 \/ (\d+)/.exec(tx); _r18.seiten = mm ? Number(mm[1]) : null; } catch (e) {}
+        zeige(null); kegelHoch(true);
+        await r18Seite(1);
+        await b2oZeile(s, 'Das PDF', 'Deckblatt mit Karte und Eckdaten' + (_r18.seiten ? ' — ' + _r18.seiten + ' Seiten' : '') + ': für die Bank, den Verkäufer oder deine Unterlagen.');
+        await r18Seite(3);
+        await b2oZeile(s, 'Im Dokument', 'Dieselben Kapitel wie am Bildschirm — Lage, Vergleichsdaten, Wertermittlung mit Rechenweg und Quellennachweis.', 600);
       }
     ]
   };
