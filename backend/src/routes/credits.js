@@ -197,6 +197,14 @@ router.post('/checkout', userAuth, async (req, res) => {
       }],
       customer_email: !userPlan.stripe_customer_id ? user.email : undefined,
       customer: userPlan.stripe_customer_id || undefined,
+      /* v2248 · Einmalkaeufe bekommen eine RECHNUNG, nicht nur einen
+         Zahlungsbeleg: ohne invoice_creation legt Checkout im Modus
+         'payment' keine Rechnung an (gemessen 15.10.2026 im Live-Konto).
+         Name und Anschrift sind Pflichtangaben des Empfaengers (§ 14
+         Abs. 4 UStG) - deshalb abfragen und am Kunden speichern. */
+      billing_address_collection: 'required',
+      ...(userPlan.stripe_customer_id ? { customer_update: { address: 'auto', name: 'auto' } } : {}),
+      invoice_creation: { enabled: true, invoice_data: { metadata: { user_id: String(user.id) } } },
       client_reference_id: user.id,
       metadata: {
         user_id: user.id,
@@ -340,6 +348,14 @@ async function _checkoutBewertung(req, res, db, sku, mengeRoh) {
       line_items: [{ price: eintrag.price_id, quantity: menge }],
       customer_email: !userPlan.stripe_customer_id ? user.email : undefined,
       customer: userPlan.stripe_customer_id || undefined,
+      /* v2248 · Einmalkaeufe bekommen eine RECHNUNG, nicht nur einen
+         Zahlungsbeleg: ohne invoice_creation legt Checkout im Modus
+         'payment' keine Rechnung an (gemessen 15.10.2026 im Live-Konto).
+         Name und Anschrift sind Pflichtangaben des Empfaengers (§ 14
+         Abs. 4 UStG) - deshalb abfragen und am Kunden speichern. */
+      billing_address_collection: 'required',
+      ...(userPlan.stripe_customer_id ? { customer_update: { address: 'auto', name: 'auto' } } : {}),
+      invoice_creation: { enabled: true, invoice_data: { metadata: { user_id: String(user.id) } } },
       client_reference_id: user.id,
       metadata: meta,
       payment_intent_data: { metadata: meta },
