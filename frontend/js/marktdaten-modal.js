@@ -92,8 +92,10 @@
       '#dpmd .md-wahl{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center}',
       '#dpmd .md-gr{display:flex;align-items:center;gap:6px;flex-wrap:wrap}',
       '#dpmd .md-gr > i{font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#7a7160;font-style:normal;margin-right:4px}',
-      '#dpmd .md-chip{border:1px solid #e3d9bf;background:#fff;color:#3b3528;border-radius:999px;padding:6px 11px;font:600 12px/1 Inter,sans-serif;cursor:pointer;min-height:30px}',
-      '#dpmd .md-chip.an{background:var(--obsidian,#050505);color:#f3ead0;border-color:var(--obsidian,#050505)}',
+      /* !important: style.css faerbt jeden Knopf in .sec mit
+         `.sec button:not(...)` !important weiss (gemessen am Kaskaden-Walker). */
+      '#dpmd .md-chip{border:1px solid #e3d9bf !important;background:#fff !important;color:#3b3528 !important;border-radius:999px !important;padding:6px 11px !important;font:600 12px/1 Inter,sans-serif !important;cursor:pointer;min-height:30px}',
+      '#dpmd .md-chip.an{background:var(--obsidian,#050505) !important;color:#f3ead0 !important;border-color:var(--obsidian,#050505) !important}',
       '#dpmd .md-chip:focus-visible{outline:2px solid ' + G + ';outline-offset:2px}',
       /* Held: Zins + Gleichung */
       '#dpmd .md-held{display:grid;grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:20px;align-items:center;margin-top:16px}',
@@ -118,8 +120,8 @@
       '#dpmd .md-leg i.bar{height:10px;width:10px;border-radius:2px}',
       /* Konditionen */
       '#dpmd .md-k4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}',
-      '#dpmd .md-k{border:1px solid #ece4cf;border-radius:10px;padding:12px;cursor:pointer;background:#fff;text-align:left;font:inherit;color:inherit}',
-      '#dpmd .md-k.an{border-color:' + G + ';box-shadow:0 0 0 1px ' + G + ' inset;background:#FBF6E9}',
+      '#dpmd .md-k{border:1px solid #ece4cf !important;border-radius:10px !important;padding:12px !important;cursor:pointer;background:#fff !important;text-align:left;font:inherit;color:#1b1916 !important}',
+      '#dpmd .md-k.an{border-color:' + G + ' !important;box-shadow:0 0 0 1px ' + G + ' inset;background:#FBF6E9 !important}',
       '#dpmd .md-k em{font:600 10px/1 "JetBrains Mono",monospace;letter-spacing:.1em;color:#6b6252;font-style:normal}',
       '#dpmd .md-k strong{display:block;font:600 22px/1.1 "Space Grotesk",sans-serif;margin:7px 0 4px}',
       '#dpmd .md-k small{font-size:10.5px;color:#7a7160;line-height:1.35;display:block}',
@@ -173,8 +175,6 @@
       + '<div class="md-tl"><em>Angebotsniveau</em><strong>' + pz(k, false) + '</strong><small>Angebot statt Durchschnitt, kalibriert ' + datum(f.k_stand) + '</small></div>'
       + '<span class="md-op">' + (zs < 0 ? '−' : '+') + '</span>'
       + '<div class="md-tl"><em>Beleihung ' + L + ' %</em><strong>' + pz(Math.abs(zs), false) + '</strong><small>' + (zs < 0 ? 'Abschlag' : zs > 0 ? 'Zuschlag' : 'Bezugsgröße') + ' gegenüber 80 %</small></div>'
-      + '<span class="md-op">=</span>'
-      + '<div class="md-tl summe"><em>Bauzins</em><strong>' + pz(z) + '</strong><small>indikativ, kein Bankangebot</small></div>'
       + '</div></div>';
   }
 
