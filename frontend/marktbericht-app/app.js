@@ -3308,10 +3308,13 @@ async function exportPdf(out) {
     doc.text(f1, fx, 284.3); fx += doc.getTextWidth(f1) + 4;
     doc.setTextColor(...C.obj); doc.text('|', fx, 284.1); fx += 4;
     covIcon('user', fx, 284.0, C.footAccent, 0.85); fx += 4.4;
-    doc.setTextColor(...C.foot); doc.text('Junker Immobilien', fx, 284.3);
+    /* v2273 · hier standen fest „Junker Immobilien“ und „dealpilot.junker-immobilien.io“ - auf dem
+       Deckblatt JEDES Nutzers, auch eines Mandanten mit eigener Marke (gemessen im Prüflauf 18).
+       Jetzt die Marke des Mandanten, sonst DealPilot; die Adresse ist die, unter der die App läuft. */
+    doc.setTextColor(...C.foot); doc.text(window._mbMarkenName || 'DealPilot', fx, 284.3);
   }
   doc.setTextColor(...C.footAccent); doc.setFont('helvetica', 'bold');
-  doc.text('dealpilot.junker-immobilien.io', W - LX, 284.3, { align: 'right' });
+  doc.text(String(location.hostname || 'dealpilot.immo'), W - LX, 284.3, { align: 'right' });
   doc.setFont('helvetica', 'normal');
   // Inhaltsverzeichnis-Seite reservieren (wird am Ende gefuellt, wenn alle Sektionen bekannt sind).
   doc.addPage();

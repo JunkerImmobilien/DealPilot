@@ -1378,6 +1378,8 @@
   /* v2271 · dazu der Nutzungszaehler: das Investment-PDF in Ueberblick 2 zaehlte je
      Lauf einen PDF-Export im Konto (usage_counters pdf_export, gemessen 11 -> 12).
      Gesperrt rechnet der Export weiter (pdf.js warnt nur). */
+  /* v2273 · Prüfung der im Lauf erzeugten PDFs (Module 18, 19): Konto-, Firmen-, Portal- und Dienstnamen im Text */
+  var RH_PDF_NAMEN = /Junker|info@|Marcel|scout|immowelt|wohnungsboerse|immonet|kleinanzeig|sprengnetter|pricehubble|openai|geoapify/gi;
   window.DPM_REIHE = { angelegt: [], gesperrt: [], gespielt: [], geloescht: [], abrufe: [], fertig: null };
   var _rh = null, _rhNachlauf = 0, _rhToene = [], _rhGum = null;
   function rhLaden() {
@@ -3815,7 +3817,7 @@
         await r6Ende(zb);
         if (!bank) { await b2oZeile(s, 'Die Bankfassung', 'Hier entsteht das PDF.'); return; }
         _r19.bank = bank;
-        try { var tx = await bank.text(), mm = /Seite 1 von (\d+)/.exec(tx); _r19.seiten = mm ? Number(mm[1]) : null; _r19.tok = (tx.match(/\(([^()]{1,80})\) Tj/g) || []).map(function (x) { return x.slice(1, -4); }); } catch (e) {}
+        try { var tx = await bank.text(), mm = /Seite 1 von (\d+)/.exec(tx); _r19.seiten = mm ? Number(mm[1]) : null; _r19.tok = (tx.match(/\(([^()]{1,80})\) Tj/g) || []).map(function (x) { return x.slice(1, -4); }); DPM_REIHE.pdf19 = { bytes: bank.size, seiten: _r19.seiten, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8) }; } catch (e) {}
         zeige(null); kegelHoch(true);
         await r19Seite(bank, 1);
         await b2oZeile(s, 'Oben: deine Marke', 'Kopf mit Logo — mit Whitelabel steht hier deins, nicht unseres. Darunter Objekt, Foto und Stand.');
@@ -3890,7 +3892,9 @@
     if (!w || !w.jspdf || !w._lastOut || typeof w.exportPdf !== 'function') return null;
     var api = w.jspdf.jsPDF.API; _r18.save = api.save;
     api.save = function () { fang = this.output('blob'); return this; };
-    try { await w.exportPdf(w._lastOut); } catch (e) {} finally { api.save = _r18.save; _r18.save = null; }
+    /* das Deckblatt nennt die Marke des Kontos - im Lauf neutral (wie branding.get in Ü2) */
+    var mk = w._mbMarkenName; w._mbMarkenName = 'DealPilot';
+    try { await w.exportPdf(w._lastOut); } catch (e) {} finally { api.save = _r18.save; _r18.save = null; w._mbMarkenName = mk; }
     return fang;
   }
   async function r18Seite(n) {
@@ -3982,7 +3986,7 @@
         _r18.pdf = await r18Pdf();
         await r6Ende(zb);
         if (!_r18.pdf) { await b2oZeile(s, 'Das PDF', 'Hier entsteht das PDF.'); return; }
-        try { var tx = await _r18.pdf.text(), mm = /\/Type \/Pages[\s\S]{0,2000}?\/Count (\d+)/.exec(tx); _r18.seiten = mm ? Number(mm[1]) : null; } catch (e) {}
+        try { var tx = await _r18.pdf.text(), mm = /\/Type \/Pages[\s\S]{0,2000}?\/Count (\d+)/.exec(tx); _r18.seiten = mm ? Number(mm[1]) : null; DPM_REIHE.pdf18 = { bytes: _r18.pdf.size, seiten: _r18.seiten, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8) }; } catch (e) {}
         zeige(null); kegelHoch(true);
         await r18Seite(1);
         await b2oZeile(s, 'Das PDF', 'Deckblatt mit Score und Eckdaten' + (_r18.seiten ? ' — ' + _r18.seiten + ' Seiten' : '') + ': für die Bank, den Verkäufer oder deine Unterlagen.');
