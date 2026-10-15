@@ -48,7 +48,7 @@ window.V10 = (function() {
 
   function _computeRates() {
     if (!_pfandbrief || !_context) return null;
-    var m = (_pfandbrief.margins && _pfandbrief.margins[_activeMargin]) || 1.20;
+    var m = (_pfandbrief.margins && _pfandbrief.margins[_activeMargin]) || 0.40;   /* v2242: wie standard */
     var euribor = (_context.euribor_3m && _context.euribor_3m.value) || null;
     return {
       'var': (euribor != null) ? Math.round((euribor + m) * 100) / 100 : null,

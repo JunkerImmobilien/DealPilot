@@ -6,9 +6,10 @@
    Quelle: Bundesbank-Pfandbrief-Zinsstruktur (BBSIS) + indikative Bank-Marge.
 
    Marge-Modell:
-     premium  +0,8%  (LTV ≤ 60%, Top-Bonität)
-     standard +1,2%  (LTV 60–80%, normale Bonität)
-     schwach  +1,8%  (LTV > 90% oder Bonität mittel)
+     premium  +0,25 %  (LTV bis 60 %, Top-Bonität)
+     standard +0,40 %  (LTV bis 80 %, normale Bonität)
+     schwach  +0,80 %  (LTV über 80 % oder Bonität mittel)
+   (v2242, kalibriert 15.10.2026 - Zahlen aus dem Backend gewinnen)
 
    Diese Werte sind INDIKATIONEN, keine Konditions-Quoten.
    ═══════════════════════════════════════════════════ */
@@ -29,8 +30,8 @@ var MarketRatesPF = (function() {
 
   // Sane Defaults — falls Backend nie antwortet
   var STATIC_FALLBACK_PF = {
-    yields:  { '5': 2.85, '10': 3.05, '15': 3.18, '20': 3.28 },
-    margins: { premium: 0.40, standard: 0.70, schwach: 1.00 }
+    yields:  { '5': 3.68, '10': 3.93, '15': 4.05, '20': 4.11 },
+    margins: { premium: 0.25, standard: 0.40, schwach: 0.80 }
   };
 
   async function _fetchFromBackend() {
@@ -335,7 +336,7 @@ var MarketRatesPF = (function() {
           '<span class="dpfk-ctrl"><span class="dpfk-ltv">'+
             '<button type="button" class="dpfk-ltv-btn" data-margin="premium">\u226460&nbsp;%</button>'+
             '<button type="button" class="dpfk-ltv-btn" data-margin="standard">\u226480&nbsp;%</button>'+
-            '<button type="button" class="dpfk-ltv-btn" data-margin="schwach">&gt;90&nbsp;%</button>'+
+            '<button type="button" class="dpfk-ltv-btn" data-margin="schwach">&gt;80&nbsp;%</button>'+
           '</span></span>'+
         '</div></div>';
       strip.parentNode.insertBefore(band, strip);

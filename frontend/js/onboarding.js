@@ -410,7 +410,7 @@ window.DealPilotOnboarding = (function () {
       + '<div class="dpo-raster">'
       +   _sel('dpo_zinsbindung', 'Zinsbindung', [[5,'5 Jahre'],[10,'10 Jahre'],[15,'15 Jahre'],[20,'20 Jahre']], profil('zinsbindung_default', 10),
           'Wie lange der Zins festgeschrieben ist. Je länger, desto teurer — dafür planbar.')
-      +   _sel('dpo_margin', 'Zinsstufe', [['premium','Premium (LTV bis 60 %)'],['standard','Standard (60–80 %)'],['schwach','Schwach (über 90 %)']], profil('zins_margin', 'standard'),
+      +   _sel('dpo_margin', 'Zinsstufe', [['premium','Premium (LTV bis 60 %)'],['standard','Standard (bis 80 %)'],['schwach','Schwach (über 80 %)']], profil('zins_margin', 'standard'),
           'Der Aufschlag der Bank auf den Pfandbriefsatz. Er hängt am Beleihungsauslauf: wer wenig Eigenkapital mitbringt, zahlt mehr.')
       +   _num('dpo_zins', 'Eigener Zinssatz', _eigenerZins(), '% p. a.',
           'Nur wenn der Haken oben raus ist. Dann rechnet DealPilot mit DIESEM Satz statt mit dem Marktzins.')

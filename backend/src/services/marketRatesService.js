@@ -418,19 +418,26 @@ const PFANDBRIEF_SERIES = {
 // V210: Statischer Fallback für Pfandbrief-Renditen (Stand 05/2026)
 // Quelle: Bundesbank Kapitalmarktstatistik Mai 2026 + FMH-Approximation
 // Marcel pflegt diese monatlich falls API nicht greift.
-const STATIC_PFANDBRIEF = {
-  '5':  2.85,
-  '10': 3.05,
-  '15': 3.18,
-  '20': 3.28
+const STATIC_PFANDBRIEF = {   // v2242: Tageswerte vom 14.10.2026
+  '5':  3.68,
+  '10': 3.93,
+  '15': 4.05,
+  '20': 4.11
 };
-const STATIC_PFANDBRIEF_AS_OF = '2026-05';
+const STATIC_PFANDBRIEF_AS_OF = '2026-10';
 
 // Marge-Modell — wird im Frontend wählbar gemacht
+/* v2242 · kalibriert am 15.10.2026: Bauzins 10 J / 80 % Beleihung lag bei
+   4,34 % (Vergleichsrechner, Woche 05.-11.10.), der 10-J-Pfandbrief bei rund
+   3,93 % -> Marge ~0,40 auf den Pfandbrief (~0,84 auf die Bundesanleihe).
+   Vorher 0,20/0,30/0,55 - im Frontend standen zugleich 0,40/0,70/1,00 und
+   in Kommentaren 0,8/1,2/1,8. Jetzt EINE Zahlenreihe an allen Stellen.
+   Die Marge ist eine Konstante: der Pfandbrief folgt dem Markt taeglich,
+   der Bankaufschlag nicht - nachkalibrieren, wenn er sich verschiebt. */
 const MARGINS = {
-  premium:  0.20,  // LTV ≤ 60%, Top-Bonität
-  standard: 0.30,  // LTV 60-80%, normale Bonität
-  schwach:  0.55   // LTV > 90% oder Bonität mittel
+  premium:  0.25,  // LTV bis 60 %, Top-Bonität
+  standard: 0.40,  // LTV bis 80 %, normale Bonität
+  schwach:  0.80   // LTV über 80 % oder Bonität mittel
 };
 
 const SOURCE_PFANDBRIEF_LIVE = {

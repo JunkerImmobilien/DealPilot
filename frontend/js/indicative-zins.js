@@ -42,8 +42,8 @@
 
   /* Harter Fallback, falls die Config-Tabelle nicht erreichbar ist (gleiche Werte wie config.js/asOf 2026-05) */
   var STATIC = {
-    yields:  { '5': 2.85, '10': 3.05, '15': 3.18, '20': 3.28 },
-    margins: { premium: 0.40, standard: 0.70, schwach: 1.00 }
+    yields:  { '5': 3.68, '10': 3.93, '15': 4.05, '20': 4.11 },
+    margins: { premium: 0.25, standard: 0.40, schwach: 0.80 }   /* v2242 */
   };
 
   function _nearestBinding(yields, binding) {
@@ -67,7 +67,7 @@
       if (bKey == null) return null;
       var y = yields[bKey];
       var mKey = (margin && margins[margin] != null) ? margin : 'standard';
-      var marge = (margins[mKey] != null) ? margins[mKey] : 0.70;
+      var marge = (margins[mKey] != null) ? margins[mKey] : 0.40;
       if (typeof y !== 'number' || !isFinite(y)) return null;
       return Math.round((y + marge) * 100) / 100;
     } catch (e) { return null; }

@@ -1013,7 +1013,7 @@ window.DealPilotConfig = (function() {
       tilgung_default:        1.5,    /* % p.a. — Marcel 01.10.2026: "Standardtilgung würde ich 1,5 setzen". War 1,0 (davor 2,5, nie wirksam). */
       zinsbindung_default:    10,     // Jahre
       zins_override:          null,   // eigener Zinssatz (%); null = indikativer Pfandbrief-Satz
-      zins_margin:            'standard', // Zins-Stufe: premium (LTV<=60%) / standard (60-80%) / schwach (>90%)
+      zins_margin:            'standard', // Zins-Stufe: premium (LTV bis 60 %) / standard (bis 80 %) / schwach (über 80 %)
       hausgeld_pct:           null,   // Hausgeld-Annahme als % vom Kaufpreis p.a.; null = aus
       ek_quote_default:       10,     /* % vom Kaufpreis — Marcel 01.10.2026: "Standard Eigenkapital würde ich eigentlich immer jetzt erst mal 10 Prozent setzen". Damit liegt der LTV ueber 90 %, was zur vorsichtigen Vorbelegung passt. */
       /* Bewirtschaftung — v1257: Marcels Wunsch, „Mietausfall und BWK-Quote
@@ -1087,18 +1087,18 @@ window.DealPilotConfig = (function() {
       //   (Kapitalmarktstatistik-PDF, Tabelle "Zinssatz bei Restlaufzeiten von ... Jahren")
       pfandbrief: {
         yields: {
-          '5':  2.85,
-          '10': 3.05,
-          '15': 3.18,
-          '20': 3.28
+          '5':  3.68,   /* v2242: Bundesbank-Tageswerte vom 14.10.2026 */
+          '10': 3.93,
+          '15': 4.05,
+          '20': 4.11
         },
         // Bank-Marge pro Bonitäts-/LTV-Stufe
         margins: {
-          premium:  0.40,   // LTV ≤ 60%, Top-Bonität
-          standard: 0.70,   // LTV 60–80%, normale Bonität
-          schwach:  1.00    // LTV > 90% oder Bonität mittel
+          premium:  0.25,   // LTV bis 60 %, Top-Bonität (v2242, kalibriert 15.10.2026)
+          standard: 0.40,   // LTV bis 80 %, normale Bonität
+          schwach:  0.80    // LTV über 80 % oder Bonität mittel
         },
-        asOf: '2026-05',
+        asOf: '2026-10',
         sourceLabel: 'Bundesbank Kapitalmarktstatistik · Pfandbrief-Zinsstruktur',
         sourceUrl: 'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen/taegliche-zinsstruktur-fuer-pfandbriefe-650734'
       },

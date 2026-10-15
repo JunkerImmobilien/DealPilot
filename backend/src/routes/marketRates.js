@@ -90,7 +90,7 @@ router.get('/history', async (req, res, next) => {
  *   {
  *     "maturities": ["5","10","15","20"],
  *     "yields":  { "5": 2.85, "10": 3.05, "15": 3.18, "20": 3.28 },
- *     "margins": { "premium": 0.8, "standard": 1.2, "schwach": 1.8 },
+ *     "margins": { "premium": 0.25, "standard": 0.40, "schwach": 0.80 },
  *     "indicativeRates": {
  *       "5":  { "premium": 3.65, "standard": 4.05, "schwach": 4.65 },
  *       "10": { ... },
