@@ -38761,6 +38761,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### Prod-Rollout (26) · v2257–v2261a (15.10.2026)
+
+- **Was:** v2260 BMF-Fenster (Agent): „Sonstige“ nicht mehr doppelt (`ji_e` nur ohne `ak_sonst`); 15-%-Grenze über `_bmfG15()` = Gebäude-AK der gewählten Variante, Sanierung netto (vorher Demo-Daten Sachsenstr. 91,58 %, Sanierung als NK, brutto gegen netto: 182.665 € → Optimiert 148.486 €); Notarklausel mit vier Varianten-Überschriften; amtlicher Wert: **74,82 % ist richtig** – die Pipeline gab die Modernisierung nicht an die Arbeitshilfe (74,57 %), jetzt `mod_*` durchgereicht (bmfPipelineService); Jacoby bekommt den Kaufpreis ohne Nebenkosten (1.240.000 statt 1.242.728). Dazu v2257–v2259 (Videoreihe 06–10b + kleine Fehler), v2258, v2261/a.
+- **Commit:** Merge `0e56865c` (bis `15d6b80a`).
+- **Nachweis:** Sicherung `haupt-20261015-1630` (14 MB, 73 Tab.) / `mb-20261015-1630` (25 MB, 32 Tab.). Backend neu gebaut, `mod_` im Pipeline-Dienst, Kern `gi = kp + nk + san` im Image, Gold-Audit RC=0, `/auth/me` 401, Buster bmf-modal v2260 / calc v2261 / grest v2261a / rnd-wizard v2258 live.
+- **Rest:** Nebenbefund `window._lastBmf` bleibt auf Demo-Daten (alte Varianten-/Risiko-Blöcke); Aggressiv-Klauseltext nennt „Sachwertermittlung“. Neue Klausel-Überschriften Marcel zeigen. Videoreihe 11–14 läuft (Agent).
+
 ### v2258–v2261a · RND-Spanne, Inventar, Nebenkosten aus den Einstellungen (15.10.2026, Staging)
 
 - **Was:** v2258 RND-Spanne = Modellwert ±2 Jahre (vorher technisch gegen Punktraster, „32–33“), RND-Fenster in Space Grotesk statt Cormorant. Kern geprüft: rnd-calc.js deckungsgleich mit vw-modul V4.2.5 (`rnd-kerne-pruefen.mjs --modul`, 1.764 Fälle). v2261 (Marcel): Inventar ist Teil des Kaufpreises – Gesamtinvestition ohne `moebl` (calc, Kern deal-kpis gespiegelt, all-objects, dashboard, financing), Gebäude-AfA zieht das ganze Inventar ab; Nebenkosten getrennt aus dem Investmentprofil (`notar_pct`, `grundbuch_pct`, `maklerkosten`, `sonstige_nk_pct`; Altwert `notar_grundbuch` → Notar = Wert − Grundbuch), Haken `grest_auto` (GrESt nach PLZ, sonst Profil-Bundesland), `setIfEmpty(notar_pct/makler_pct)` zielte auf nicht vorhandene Ids; RND-Fenster `max-height: min(915px, 100vh − 48px)`; Inventar-Haken liest das sichtbare Kästchen. v2261a: Automatik folgt auch einem PLZ-Wechsel (`data-auto-rate`).
