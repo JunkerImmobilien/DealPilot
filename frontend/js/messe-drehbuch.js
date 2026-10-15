@@ -3260,6 +3260,17 @@
       async function (s) {   /* 5 · Finanzierung */
         reiter('s3'); await warte(1000);
         await warteAuf(function () { return /\d/.test(r6Id('mrpf-top-rate-10')); }, 5000);
+        /* v2272 · Kapitaldeckung: deckt das (aeltere) Darlehen die Gesamtinvestition
+           nicht, zeigt die App „Es fehlen …“ - der Knopf „Darlehen anpassen“
+           gleicht aus. Gemessen Westerfeld-Kopie: 592.415 gegen 620.047 EUR. */
+        var _kdBtn = q('#kd-btn-d1');
+        if (_kdBtn && _kdBtn.offsetParent && _kdBtn.style.display !== 'none') {
+          var _kdTxt = ((q('#kd-btn-d1').closest('div') || {}).textContent || '').match(/Es fehlen[^.]*\./);
+          await zeige(function () { return q('#kd-btn-d1'); }, 8);
+          await b2oZeile(s, 'Kapitaldeckung', (_kdTxt ? _kdTxt[0] + ' ' : '') + 'Eigenkapital und Darlehen müssen die Gesamtinvestition decken — ein Klick passt das Darlehen an.');
+          try { q('#kd-btn-d1').click(); } catch (e) {}
+          await warte(900);
+        }
         await zeigeGruppe(feldVon('ek'), feldVon('d1t'), 8);
         await b2oZeile(s, 'Finanzierung', 'Eigenkapital ' + eur(zahl('ek')) + ', Darlehen <b>' + eur(zahl('d1')) + '</b> zu ' + r6Pz(wert('d1z')) + ' % — der Marktzins für 10 Jahre liegt bei ' + (r6Id('mrpf-top-rate-10') || '–') + '.');
         await zeige(function () { return q('#d1_rate') && q('#d1_rate').closest('.f'); }, 10);
