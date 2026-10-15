@@ -59,6 +59,7 @@ window.DealPilotOnboarding = (function () {
      galt für „Aktenmappe, Kanzlei und Tower", und für zwei davon gilt
      er weiter. Für die Aktenmappe ist er durch die neue Vorgabe
      ersetzt.                                                            */
+  var KARTENSTIL = 'buetten';   /* v2251: fuer jede Ansicht dieselbe */
   var AUSSEHEN = [
     { id: 'v1b', name: 'Aktenmappe', karte: 'bordkarte', standard: true,   /* v2216c: Marcel 14.10. - Auslieferung Aktenmappe mit Bordkarte */
       unter: 'Menü links, Reiter oben im Kopf',
@@ -332,7 +333,7 @@ window.DealPilotOnboarding = (function () {
             + '<span class="dpo-k-fuer">' + esc(a.fuer) + '</span>'
             /* v2083: der Kartenstil wird beim Namen genannt, nicht geraten. */
             + (a.karte ? '<span class="dpo-k-zusatz">Objektkarten als '
-                + esc(_karteName(a.karte)) + '</span>' : '')
+                + esc(_karteName(a.karte)) + ', Kartenstil Bütten</span>' : '')
             + (a.standard ? '<span class="dpo-k-std">Standard</span>' : '')
             + '</button>';
         }).join('')
@@ -930,6 +931,13 @@ window.DealPilotOnboarding = (function () {
         DealPilotObjektkarte.setze(a.karte);
       }
     } catch (e) {}
+    /* v2251 · Marcel am 15.10.2026: „Standard-Aussehen Karte immer Bütten
+       nehmen." Der Kartenstil (karten-stil.js: zeile · kartei · buetten)
+       ist eine eigene Ebene neben der Objektkarte darüber - er gilt in
+       allen vier Ansichten gleich. */
+    try {
+      if (window.DealPilotKartenStil && DealPilotKartenStil.setze) DealPilotKartenStil.setze(KARTENSTIL);
+    } catch (e) {}
   }
 
   function _zahl(id) {
@@ -939,6 +947,9 @@ window.DealPilotOnboarding = (function () {
   }
 
   function _sichern() {
+    /* v2251: wer im ersten Schritt nur „Weiter" drückt, bekommt den
+       Standard trotzdem gesetzt - bisher wirkte die Wahl nur per Klick. */
+    if (_schritt === 0) { try { _aussehenAnwenden(_wahl.aussehen); } catch (e) {} }
     if (_schritt === 1) {
       try {
         var s = (window.Settings && Settings.get()) || {};
@@ -1109,6 +1120,40 @@ window.DealPilotOnboarding = (function () {
     }
   }
 
+  /* ══ v2251 · NACH DEM SETUP STEHT EIN LEERES OBJEKT DA ════════════
+     Marcel am 15.10.2026: „Standard soll auch ein leeres Objekt angezeigt
+     werden, je nachdem ob man die Tour macht oder nicht."
+
+     Bisher stand nach der Anmeldung der Quick-Check offen (auth.js V225)
+     oder, nach der Tour, das Formular des eben GELOESCHTEN Demo-Objekts.
+
+     ANGEZEIGT, nicht ANGELEGT: der Knopf „Neues Objekt" speichert sofort
+     eine leere Karte (newobj-fixes.js `saveEmptyCard`). Ein neues Konto hat
+     aber schon das Demo aus der Bestaetigung (registerWithVerify.js,
+     `assignDemoObject`), und das Demo zaehlt gegen die Plan-Grenze - eine
+     zweite, leere Karte koennte im Free-Plan am Limit scheitern und waere
+     ohnehin eine Karteileiche. Deshalb haelt der Sperrmerker
+     `_dpEmptyCardSaving` das Speichern an; das Formular steht leer da, und
+     der Auto-Save legt das Objekt an, sobald etwas eingetragen ist.
+     Auf den Rundgang ruft `tour-engine.js` dieselbe Funktion, nachdem er
+     beendet ist. */
+  function leeresObjekt() {
+    try {
+      if (document.body.classList.contains('qc-standalone-active') && typeof window.exitQuickCheckMode === 'function') {
+        window.exitQuickCheckMode();
+      }
+    } catch (e) {}
+    try {
+      if (typeof window.newObj !== 'function') return;
+      /* Ein geloeschtes Demo darf nicht mehr als „geladen" gelten - sonst
+         sichert newObj es vor dem Leeren und legt es neu an (v1268). */
+      window._currentObjKey = null;
+      window._dpEmptyCardSaving = true;
+      window.newObj({ ohneAuswahl: true });
+      setTimeout(function () { window._dpEmptyCardSaving = false; }, 2000);
+    } catch (e) { window._dpEmptyCardSaving = false; }
+  }
+
   function _abschliessen() {
     /* v2249: der Haken im letzten Schritt entscheidet ueber den Rundgang.
        Gelesen, BEVOR das Fenster verschwindet. Fehlt er (alter Stand),
@@ -1123,7 +1168,10 @@ window.DealPilotOnboarding = (function () {
     /* Jetzt erst der Rundgang — er zeigt die Oberflaeche, die eben
        gewaehlt wurde. */
     try {
-      if (mitTour && window.DpTour && typeof DpTour.start === 'function') setTimeout(function () { DpTour.start(); }, 500);
+      if (mitTour && window.DpTour && typeof DpTour.start === 'function') {
+        window.__dpNachSetup = true;   /* die Tour zeigt danach das leere Objekt */
+        setTimeout(function () { DpTour.start(); }, 500);
+      } else leeresObjekt();
     } catch (e) {}
   }
 
@@ -1423,6 +1471,7 @@ window.DealPilotOnboarding = (function () {
     zeige: zeige,
     istFertig: istFertig,
     pruefen: pruefen,
+    leeresObjekt: leeresObjekt,
     zuruecksetzen: function () {
       try {
         localStorage.removeItem(FERTIG_KEY); localStorage.removeItem(SCHRITT_KEY);

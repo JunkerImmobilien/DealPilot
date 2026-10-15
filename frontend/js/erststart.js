@@ -150,6 +150,13 @@
   }
 
   function faellig() {
+    /* v2251 · Das Setup (onboarding.js, seit v1740) fragt dieselben Werte in
+       Schritt „Finanzierung" ab. Diese Karte kam deshalb zusätzlich - und
+       als das Setup nach der Anmeldung nicht startete (v2249), als
+       EINZIGES. Marcel am 15.10.2026: „dann kam der Hinweis mit den
+       Standardwerten … wo ist die Modalreihe?" Gibt es das Setup, schweigt
+       die Karte. */
+    if (window.DealPilotOnboarding) return false;
     if (ls(GESEHEN)) return false;
     if (ls(TOUR_FERTIG)) return false;   /* wer die Tour kennt, ist nicht neu */
     return true;
