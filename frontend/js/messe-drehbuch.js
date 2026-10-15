@@ -1367,7 +1367,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2268';   /* v2268: BMF-Mitschnitt neu (1.233.000) */
+  var RH_BUSTER = 'v2273';   /* v2273: Belege-Mitschnitt (Modul 15) */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage/i;
@@ -1429,6 +1429,8 @@
       if (ref && DPM_REIHE.angelegt.indexOf(ref) >= 0) return rhJ({ history: rhVerlauf() });
     }
     if (/\/api\/v1\/immometrica\//.test(u)) { var a = _imoAntwort(u); if (a) return rhJ(a); }
+    /* v2273 · Belege einlesen (Modul 15): die Auslese der beiden Beispielbelege, einmal echt */
+    if (m === 'POST' && D.belege && /\/ai\/extract-beleg/.test(u)) return rhJ(JSON.parse(JSON.stringify(D.belege)));
     /* v2257 · BMF-Kaufpreisaufteilung (Modul 10b): einmal echt gerechnet, hier
        abgespielt. Mit Datei (PDF/XLSX) wird nichts gespielt - das sperrt RH_SPERRE. */
     if (m === 'POST' && D.bmf && /\/bmf\/(aufteilung|pipeline)/.test(u) && !(body && (body.include_pdf || body.include_file))) {
@@ -3328,6 +3330,193 @@
       }
     ]
   };
+
+  /* ═══ VIDEOREIHE · SPEZIALMODUL 15 · STEUER IM BESTAND (v2273) ════════════
+     Videoreihe.md, Teil C. KOPIE der Parkstr. 9, Bad Oeynhausen (gewonnen, mit
+     Ankauf-Stand, behalte), beim Aufräumen gelöscht. Die Jahreswerte der
+     Steuer (_taxYearlyOverrides) stehen im Objekt und kommen mit der Kopie.
+     Belege einlesen: zwei Beispielbelege werden im Lauf als Bild gezeichnet
+     (r15Belege, Beispieldaten, keine echte Firma), die Auslese der KI ist ein
+     Mitschnitt (DPM_REIHE_DATEN.belege, EINMAL echt erzeugt am 16.10.2026 mit
+     genau diesen beiden Bildern). Übernommen wird nur in die Kopie.
+     GEMESSEN (Prüfung am 16.10.2026): Die Steuerwirkung steht in der App an
+     drei Stellen mit drei Zahlen (Soll/Ist-Tafel, Steuer-Modul, Jahreszeile) -
+     das Drehbuch zeigt deshalb je Szene nur EINE Quelle und nennt sie. */
+  function r15Box() { return q('#yearly-tax-form-box'); }
+  function r15Modus(n) { var b = r15Box(); var k = b ? b.querySelectorAll('.ytf-mode-btn') : []; if (k[n] && !k[n].classList.contains('active')) k[n].click(); }
+  /* Quick-Modus: die Zeile eines Jahres; Zellen: Jahr, Einnahmen, Zinsen, AfA (Felder), Bewirtschaftung, Sonstige WK, Ergebnis, Steuer-Effekt */
+  function r15Zeile(j) { var b = r15Box(); return b ? [].filter.call(b.querySelectorAll('tr'), function (t) { return t.offsetWidth && t.firstElementChild && r6Text(t.firstElementChild) === String(j); })[0] || null : null; }
+  function r15Zellen(j) { var t = r15Zeile(j); return t ? [].map.call(t.children, function (c) { var i = c.querySelector('input'); return i ? (i.value ? eur(Number(i.value)) : '–') : r6Text(c); }) : []; }
+  /* Detail-Modus: Jahr wählen, Zeile über ihre Beschriftung */
+  async function r15Jahr(j) {
+    var s = r15Box() && r15Box().querySelector('select'); if (!s) return;
+    var o = [].filter.call(s.options, function (x) { return r6Text(x) === String(j); })[0];
+    if (o && s.value !== o.value) { s.value = o.value; s.dispatchEvent(new Event('change', { bubbles: true })); await warte(700); }
+  }
+  function r15Det(re) { var b = r15Box(); return b ? [].filter.call(b.querySelectorAll('tr'), function (t) { return t.offsetWidth && t.firstElementChild && re.test(r6Text(t.firstElementChild).replace(/\s*ℹ\s*$/, '')); })[0] || null : null; }
+  function r15DetWert(re) { var t = r15Det(re), i = t && t.querySelector('input'); return i && i.value ? eur(Number(i.value)) : null; }
+  function r15Gruppe(re) { var b = r15Box(); return b ? [].filter.call(b.querySelectorAll('tr,div'), function (t) { return t.offsetWidth && t.children.length <= 2 && re.test(r6Text(t)); }).pop() || null : null; }
+  function r15Summe(re) { var t = r6Inner(r15Box()), m = re.exec(t); return m ? m[1].trim() : null; }
+  function r15Oben(e) { if (!e) return; var s = scroller(e); if (s) s.scrollTop += rect(e).top - 110; }
+  function r15BiZu() { try { if (window.DealPilotBelegImport) DealPilotBelegImport.close(); } catch (e) {} var o = q('#beleg-import-ov'); if (o && o.parentNode) o.parentNode.removeChild(o); }
+  /* zwei Beispielbelege als Bild (Canvas -> PNG-Datei). Genau diese Bilder
+     lagen der KI beim Mitschnitt vor. */
+  async function r15Belege() {
+    function blatt(zeilen) {
+      var c = document.createElement('canvas'); c.width = 1240; c.height = 1754;
+      var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#111';
+      zeilen.forEach(function (z) { x.font = (z[3] || 'normal') + ' ' + (z[2] || 26) + 'px Arial'; x.textAlign = z[4] || 'left'; x.fillText(z[0], z[4] === 'right' ? 1140 : 100, z[1]); });
+      return new Promise(function (ok) { c.toBlob(ok, 'image/png'); });
+    }
+    var a = await blatt([
+      ['Beispiel-Dachdeckerei GmbH', 140, 40, 'bold'], ['Am Werkhof 4 · 32545 Bad Oeynhausen · USt-IdNr. DE000000000', 180, 22],
+      ['RECHNUNG', 320, 44, 'bold'], ['Rechnungsnummer: 2025-0815', 380], ['Rechnungsdatum: 14.08.2025', 420], ['Leistungszeitraum: 04.08.2025 – 08.08.2025', 460],
+      ['Objekt: Parkstr. 9, 32545 Bad Oeynhausen (Mehrfamilienhaus)', 520],
+      ['Pos.  Leistung', 620, 26, 'bold'], ['Betrag', 620, 26, 'bold', 'right'],
+      ['1     Dachrinne erneuert, 18 m, Zink, inkl. Halter', 670], ['1.080,00 €', 670, 26, 'normal', 'right'],
+      ['2     Fallrohr ausgetauscht, 2 Stück', 715], ['420,00 €', 715, 26, 'normal', 'right'],
+      ['3     Arbeitszeit Geselle, 8 Std. à 42,50 €', 760], ['340,00 €', 760, 26, 'normal', 'right'],
+      ['Nettobetrag', 860, 26, 'bold'], ['1.840,00 €', 860, 26, 'bold', 'right'],
+      ['zzgl. 19 % Umsatzsteuer', 900], ['349,60 €', 900, 26, 'normal', 'right'],
+      ['Rechnungsbetrag', 960, 30, 'bold'], ['2.189,60 €', 960, 30, 'bold', 'right'],
+      ['Es handelt sich um eine Instandhaltung (Erhaltungsaufwand).', 1060, 22], ['Zahlbar innerhalb von 14 Tagen ohne Abzug.', 1095, 22]
+    ]);
+    var b = await blatt([
+      ['Beispiel-Versicherung AG', 140, 40, 'bold'], ['Versicherungsweg 1 · 30159 Hannover', 180, 22],
+      ['BEITRAGSRECHNUNG 2025', 320, 44, 'bold'], ['Verbundene Wohngebäudeversicherung', 380], ['Vertragsnummer: WG-000-000-000', 420], ['Datum: 02.01.2025', 460],
+      ['Versichertes Objekt: Parkstr. 9, 32545 Bad Oeynhausen', 520], ['Versicherungszeitraum: 01.01.2025 – 31.12.2025', 560],
+      ['Nettobeitrag (Feuer, Leitungswasser, Sturm/Hagel)', 670], ['1.165,04 €', 670, 26, 'normal', 'right'],
+      ['Versicherungsteuer 19 %', 715], ['221,36 €', 715, 26, 'normal', 'right'],
+      ['Jahresbeitrag 2025', 790, 30, 'bold'], ['1.386,40 €', 790, 30, 'bold', 'right'],
+      ['Der Beitrag wird am 15.01.2025 von Ihrem Konto abgebucht.', 880, 22]
+    ]);
+    return [new File([a], 'Rechnung-Dachrinne-2025.png', { type: 'image/png' }), new File([b], 'Wohngebaeudeversicherung-2025.png', { type: 'image/png' })];
+  }
+  var R15_JAHR = 2025;   /* das erste volle Jahr im Bestand (Kauf 23.12.2024) */
+  DREHBUECHER['reihe-steuer-bestand'] = {
+    titel: 'Steuer im Bestand', unterzeile: 'Soll und Ist, das Steuerformular pro Jahr, Belege', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { r15BiZu(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das Objekt */
+        await r6KopieStart(R11_PARK, { behalte: true });
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        var we = wert('einheiten');
+        await b2oZeile(s, 'Das Beispiel', 'Im Bestand: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Wohnungen, ' : '') + 'Baujahr ' + wert('baujahr') + ', gekauft am ' + datum(wert('kaufdat')) + '. Heute: die <b>Steuer</b> nach dem Kauf.');
+      },
+      async function (s) {   /* 2 · Soll gegen Ist: die Steuer-Zeilen der Tafel */
+        reiter('s5'); await warte(1200);
+        await r11PaTab(/Soll\/Ist/);
+        await warteAuf(function () { return q('#ai-content .abw-tafel'); }, 6000);
+        var grp = function () { return [].filter.call(document.querySelectorAll('#ai-content .abw-tafel tr.abw-gruppe'), function (t) { return /^Steuer$/.test(r6Text(t)); })[0] || null; };
+        var letzte = function () { var g = grp(), t = g, l = null; while (t && (t = t.nextElementSibling) && !t.classList.contains('abw-gruppe')) l = t; return l; };
+        r15Oben(grp()); await warte(400);
+        await zeigeGruppe(grp, letzte, 6);
+        var a = null; try { a = DealPilotAnkauf.abweichung(); } catch (e) {}
+        function z(w) { return a && a.zeilen.filter(function (x) { return x.wort === w; })[0]; }
+        var sw = z('Steuerwirkung p. a.'), ga = z('Gebäudeanteil (AfA-Basis)');
+        await b2oZeile(s, 'Soll gegen Ist · Steuer', 'Steuerwirkung im Jahr: geplant <b>' + (sw ? eur(sw.ankauf) : '–') + '</b>, heute <b>' + (sw ? eur(sw.bestand) : '–') + '</b>.' + (ga ? ' Gebäudeanteil ' + de(ga.bestand, 2) + ' % und AfA-Satz bleiben, wie beim Kauf.' : ''));
+        var nk = z('Nettokaltmiete'), cf = z('Cashflow n. Steuer');
+        if (nk && cf) await b2oZeile(s, 'Warum weniger Erstattung?', 'Nettokaltmiete <b>' + eur(nk.ankauf) + ' → ' + eur(nk.bestand) + '</b>: mehr Überschuss, weniger Erstattung. Unterm Strich: Cashflow nach Steuer <b>' + eur(cf.ankauf) + ' → ' + eur(cf.bestand) + '</b>.');
+      },
+      async function (s) {   /* 3 · das Steuerformular pro Jahr (Quick) */
+        reiter('s3-tax'); await warte(1100);
+        r15Modus(0); await warte(600);
+        var kopf = function () { var b = r15Box(); return b && b.closest('.card'); };
+        r15Oben(kopf()); await warte(400);
+        await zeige(function () { var k = kopf(); return k && k.querySelector('.ct-row'); }, 8);
+        await b2oZeile(s, 'Steuerformular pro Jahr', 'Eine Zeile je Jahr: Einnahmen, Schuldzinsen, AfA, Bewirtschaftung, sonstige Werbungskosten — und was davon bei der Steuer ankommt.');
+        var zl = function () { return r15Zeile(R15_JAHR); };
+        await zeige(zl, 6);
+        var c = r15Zellen(R15_JAHR);
+        await b2oZeile(s, 'Das Jahr ' + R15_JAHR, 'Einnahmen <b>' + (c[1] || '–') + '</b>, Schuldzinsen ' + (c[2] || '–') + ', AfA ' + (c[3] || '–') + ' — Ergebnis <b>' + (c[6] || '–') + '</b>, Steuer-Effekt <b>' + (c[7] || '–') + '</b>.');
+      },
+      async function (s) {   /* 4 · was man einträgt */
+        var f = function () { var t = r15Zeile(R15_JAHR); return t && t.querySelector('input'); };
+        await zeige(function () { var t = r15Zeile(R15_JAHR), i = t ? t.querySelectorAll('input') : []; return i.length ? b2oHuelle(i[0], i[i.length - 1]) : t; }, 8);
+        await b2oZeile(s, 'Was du einträgst', 'Die App schlägt jede Zahl vor. Liegt die Erklärung vor, trägst du die echten ein: <b>Mieteinnahmen</b> aus der Anlage V, <b>Schuldzinsen</b> aus der Zinsbescheinigung der Bank.');
+        await b2oZeile(s, 'Was du einträgst', 'Die <b>AfA</b> so, wie sie im Steuerbescheid anerkannt ist. Der Pfeil ↺ neben einem Feld setzt es auf den Vorschlag zurück.');
+      },
+      async function (s) {   /* 5 · Detail-Modus */
+        r15Modus(1); await warte(900);
+        await r15Jahr(R15_JAHR);
+        var kopf = function () { var b = r15Box(); return b && b.querySelector('select'); };
+        r15Oben(kopf()); await warte(400);
+        await zeigeGruppe(function () { var b = r15Box(); return b && b.querySelector('.ytf-mode-btn.active'); }, kopf, 8);
+        await b2oZeile(s, 'Detail-Modus', 'Ein Veranlagungsjahr, gegliedert wie die Anlage V: Finanzierung, Betrieb, Verwaltung, sonstige Kosten, AfA, Erhaltung.');
+        var fin = function () { return r15Det(/^Schuldzinsen$/); }, finE = function () { return r15Det(/^Vermittlungsprovision/); };
+        r15Oben(fin()); await warte(400);
+        await zeigeGruppe(fin, finE, 6);
+        await b2oZeile(s, 'Finanzierungskosten', 'Schuldzinsen <b>' + (r15DetWert(/^Schuldzinsen$/) || '–') + '</b>, Kontoführung ' + (r15DetWert(/^Kontoführungsgebühren$/) || '–') + ' — dazu Bereitstellungszinsen, Grundschuld beim Notar, Vermittlung.');
+        var vw = function () { return r15Det(/^Steuerberatung$/); }, vwE = function () { return r15Det(/^Telefon\/Internet$/); };
+        r15Oben(vw()); await warte(400);
+        await zeigeGruppe(vw, vwE, 6);
+        var teile = [['Steuerberatung', /^Steuerberatung$/], ['Fahrten zum Objekt', /^Fahrtkosten zur Immobilie$/], ['Inserate', /^Inseratskosten$/], ['Telefon', /^Telefon\/Internet$/]].map(function (x) { var w = r15DetWert(x[1]); return w ? x[0] + ' ' + w : null; }).filter(Boolean);
+        await b2oZeile(s, 'Verwaltung und Sonstiges', 'Was oft vergessen wird: ' + (teile.join(', ') || '–') + '. Eingetragene Werte tragen das ↺.');
+      },
+      async function (s) {   /* 6 · Erhaltung und was es im Jahr bedeutet */
+        var er = function () { return r15Det(/^Erhaltungsaufwendungen/); };
+        r15Oben(er()); await warte(400);
+        await zeige(er, 8);
+        await b2oZeile(s, 'Erhaltungsaufwand', 'In ' + R15_JAHR + ' eingetragen: <b>' + (r15DetWert(/^Erhaltungsaufwendungen/) || '–') + '</b> für Reparaturen. In den ersten drei Jahren nach dem Kauf zählt dabei die 15-%-Grenze — Modul 10b zeigt sie.');
+        var sm = function () { return rhIm(r15Box(), /^Werbungskosten gesamt:?$/); };
+        var sb = function () { var e = sm(); return e && (e.closest('div[style*=grid],div[class]') || e.parentElement); };
+        r15Oben(sb()); await warte(400);
+        await zeige(sb, 8);
+        var wk = r15Summe(/Werbungskosten gesamt:\s*([^\n]+)/), ein = r15Summe(/Einnahmen V\+V:\s*([^\n]+)/), erg = r15Summe(/Verlust\/Überschuss V\+V:\s*([^\n]+)/), eff = r15Summe(/Steuer-Effekt:\s*([^\n]+)/);
+        await b2oZeile(s, 'Was das im Jahr bedeutet', 'Werbungskosten <b>' + (wk || '–') + '</b> gegen Einnahmen ' + (ein || '–') + ': Ergebnis <b>' + (erg || '–') + '</b>. Mit deiner Progression: <b>' + (eff || '–') + '</b> Erstattung.');
+      },
+      async function (s) {   /* 7 · Belege einlesen (Mitschnitt) */
+        var kn = function () { return r6Knopf(r15Box() && r15Box().closest('.card'), /Belege & Abrechnungen einlesen/); };
+        r15Oben(kn()); await warte(400);
+        await zeige(kn, 10);
+        await b2oZeile(s, 'Belege einlesen', 'Statt abzutippen: Rechnungen, Hausgeld- und Nebenkostenabrechnungen als PDF oder Foto. Die KI liest Datum, Betrag, Steuer, Aussteller.');
+        r15Modus(0); await warte(500);
+        var vor = r15Zellen(R15_JAHR);
+        try { DealPilotBelegImport.open('wk'); } catch (e) {}
+        await warteAuf(function () { return q('#bi-files'); }, 3000);
+        try {
+          var fs = await r15Belege(), dt = new DataTransfer(); fs.forEach(function (f) { dt.items.add(f); });
+          var inp = q('#bi-files'); inp.files = dt.files; inp.dispatchEvent(new Event('change'));
+        } catch (e) {}
+        kegelHoch(true);
+        await warteAuf(function () { return q('#bi-review table') || q('#bi-review tr'); }, 15000);
+        await warte(700);
+        await zeige(function () { var t = q('#bi-review table'); return t || q('#bi-review'); }, 6);
+        var R = [].filter.call(document.querySelectorAll('#bi-review tbody tr'), function (t) { return t.offsetWidth && t.querySelector('input[type=checkbox]'); });
+        var zt = R.map(function (t) { var c = [].map.call(t.children, r6Text); var br = c.filter(function (x) { return /€/.test(x); }); var sel = t.querySelector('select'); return '<b>' + (br[2] || br[br.length - 1] || '–') + '</b> ' + (sel ? sel.value : ''); });
+        await b2oZeile(s, 'Zwei Belege gelesen', (zt.join(' und ') || '–') + ' — beide für ' + R15_JAHR + '. Jede Zeile prüfst du, bevor etwas übernommen wird.');
+        _r15Vor = vor;
+      },
+      async function (s) {   /* 8 · übernehmen -> das Jahr bewegt sich */
+        var tk = function () { return q('#bi-take'); };
+        await zeige(tk, 10);
+        var zb = r6Beginn(s, 'Übernehmen', 'Ein Klick — die Beträge gehen in das Jahr ' + R15_JAHR + ' dieses Objekts.');
+        await warte(2400);
+        var oc = window.confirm; window.confirm = function () { return true; };
+        try { DealPilotBelegImport.apply(); } catch (e) {} finally { window.confirm = oc; }
+        await warteAuf(function () { return !q('#beleg-import-ov'); }, 4000);
+        kegelHoch(false);
+        await warte(1200);
+        if (!q('#s3-tax.active')) reiter('s3-tax');
+        r15Modus(0); await warte(700);
+        await r6Ende(zb);
+        var zl = function () { return r15Zeile(R15_JAHR); };
+        r15Oben(zl()); await warte(400);
+        await zeige(zl, 6);
+        var v = _r15Vor || [], n = r15Zellen(R15_JAHR);
+        await b2oZeile(s, 'Das Jahr ' + R15_JAHR + ' danach', 'Bewirtschaftung <b>' + (n[4] || '–') + '</b> statt ' + (v[4] || '–') + ', Ergebnis ' + (n[6] || '–') + ' — Steuer-Effekt <b>' + (n[7] || '–') + '</b> statt ' + (v[7] || '–') + '.');
+      },
+      async function (s) {   /* 9 · Finanzamt-PDF (nur zeigen) */
+        var k = function () { var b = r15Box(); return b && b.closest('.card').querySelector('.fa-pdf-ctrl'); };
+        r15Oben(k()); await warte(400);
+        await zeige(k, 8);
+        await b2oZeile(s, 'Für die Erklärung', 'Steuerjahr wählen, auf Wunsch mit den Zeilen der <b>Anlage V</b> — das Finanzamt-PDF fasst alles zusammen, für dich oder deinen Steuerberater.', 600);
+      }
+    ]
+  };
+  var _r15Vor = null;
 
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0, _aktiv = null;

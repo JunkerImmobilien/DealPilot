@@ -286,7 +286,7 @@
       '<div class="bi-card">' +
         '<div class="bi-bar"><span class="bi-t">📎 ' + (_modus === 'wk' ? 'Belege & Abrechnungen einlesen' : 'Belege importieren') + '</span>' +
           '<button class="bi-x" type="button" onclick="DealPilotBelegImport.close()" aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' + /* v1116-x */
-        '<div class="bi-hero">KI liest Datum · Betrag · USt · Aussteller · Kategorie — du bestätigst jede Zeile, bevor sie in die Anschaffungskosten fließt.</div>' +
+        '<div class="bi-hero">KI liest Datum · Betrag · USt · Aussteller · Kategorie — du bestätigst jede Zeile, bevor sie in die ' + (_modus === 'wk' ? 'Werbungskosten' : 'Anschaffungskosten') + ' fließt.</div>' +   /* v2273: im WK-Modus stand hier „Anschaffungskosten“ */
         '<div class="bi-body">' +
           '<div class="bi-drop" id="bi-drop">' +
             '<div class="bi-big">Ordner mit Belegen wählen</div>' +
