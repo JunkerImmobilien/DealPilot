@@ -659,8 +659,14 @@
       if (gemerkt && !localStorage.getItem(MIGRIERT + 'v1702')) {
         gemerkt = '';
         localStorage.setItem(LS, '');
-        localStorage.setItem(MIGRIERT + 'v1702', '1');
       }
+      /* v2252 · Die Marke wird JETZT gesetzt, auch ohne gemerkten Stil.
+         Vorher nur, wenn etwas zu raeumen war - ein neuer Browser bekam sie
+         also nie, und der Stil, den das Setup danach waehlte (Buetten),
+         wurde beim naechsten Laden als „Altlast" geloescht. Marcel am
+         15.10.2026: „das Aussehen der Datenaufnahme-Karte wird nicht in
+         Buetten dargestellt." */
+      if (!localStorage.getItem(MIGRIERT + 'v1702')) localStorage.setItem(MIGRIERT + 'v1702', '1');
     } catch (e) {}
 
     /* v1702c: `else if (gemerkt)` stand hier - und genau daran scheiterte

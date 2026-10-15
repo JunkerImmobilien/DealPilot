@@ -38,6 +38,12 @@
   var MERKER = 'dp_verify_frist';      /* ISO-Zeitstempel oder leer */
   var MAIL   = 'dp_verify_mail';       /* für „erneut senden"        */
   var band = null, ticker = null;
+  /* v2252 · Marcel: „Die Meldung bleibt lange stehen, das sollte direkt
+     passieren, wenn ich draufklicke." Minuetlich war zu traege, wenn der
+     Link in einem anderen Programm aufging und der Tab vorn blieb (dann
+     feuert weder 'focus' noch 'visibilitychange'). 10 s, und nur solange
+     das Band steht - danach laeuft kein Takt mehr. */
+  var TAKT = 10000;
 
   function lese() {
     try { return localStorage.getItem(MERKER) || ''; } catch (e) { return ''; }
@@ -188,7 +194,7 @@
     if (ticker) clearInterval(ticker);
     /* Minütlich reicht: die Anzeige nennt Minuten. v2250: im selben Takt
        fragt das Band den Server, ob inzwischen bestaetigt wurde. */
-    ticker = setInterval(function () { zeichne(); pruefeServer(); }, 60000);
+    ticker = setInterval(function () { zeichne(); pruefeServer(); }, TAKT);
   }
 
   /* ══ v2250 · DAS BAND FRAGT, OB ES NOCH GILT ═════════════════════════
@@ -263,7 +269,7 @@
         if (d) {
           if (lese() !== d) schreibe(d, null);
           zeichne();
-          if (!ticker) ticker = setInterval(function () { zeichne(); pruefeServer(); }, 60000);
+          if (!ticker) ticker = setInterval(function () { zeichne(); pruefeServer(); }, TAKT);
         }
       } catch (e) {}
       return resp;
