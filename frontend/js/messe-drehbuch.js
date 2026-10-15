@@ -3801,13 +3801,15 @@
         kegelHoch(true);
         await zeige(function () { return q('#dp-pdf-wahl .dpw-liste'); }, 8);
         var W = (window.DealPilotPdfWahl && DealPilotPdfWahl.wahlen) || [];
-        await b2oZeile(s, 'Drei Fassungen', W.map(function (w) { return '<b>' + w.titel + '</b> für ' + w.fuer.split(' · ')[0]; }).join(', ') + '. Der Inhalt ist derselbe.');
+        await b2oZeile(s, 'Drei Fassungen', W.map(function (w) { return '<b>' + w.titel + '</b> (' + w.fuer.split(' · ')[0] + ')'; }).join(', ') + '. Der Inhalt ist derselbe.');
         var x = q('#dp-pdf-wahl'); if (x && x.parentNode) x.parentNode.removeChild(x);
         kegelHoch(false);
       },
       async function (s) {   /* 3 · die Bankfassung entsteht: Deckblatt */
         /* GEMESSEN (Prüflauf 19): das Investment-PDF hell brauchte 45 s Rechenzeit, das Bild stand so lange still -
            gezeigt wird deshalb nur die Bankfassung (13 s). Sie ist die weiße Fassung und trägt das Logo der Marke. */
+        /* Prüflauf 19: während der 13 s Rechenzeit stand kein Kegel (Ziel war das geschlossene Fenster) */
+        await zeige(function () { var e = rhIm('#s8', /^\s*Investment-PDF/); return e && (e.closest('[class*=row]') || e.parentElement); }, 8);
         var zb = r6Beginn(s, 'Die Bankfassung', 'Weißes Papier, alles aufgerollt: jeder Block als Tabelle, so wie eine Bank ihn prüft.');
         var bank = await r19Bank();
         await r6Ende(zb);
