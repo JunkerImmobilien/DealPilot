@@ -1074,6 +1074,247 @@
     ]
   };
 
+  /* ═══ DREHBUCH 7 · VOM QUICK BOARDING ZUM OBJEKT (v2252, Reihe Modul 02) ═══
+     Videoreihe „So funktioniert DealPilot" (Dateien/Messe/Videos/
+     Videoreihe.md). Zwei Wege ins Portfolio: (a) Quick Boarding prüfen und
+     „Als Objekt speichern", (b) „Neues Objekt" leer anlegen.
+     GEMESSEN am 15.10.2026 auf Staging, bevor das Drehbuch stand:
+     - „Als Objekt speichern" öffnet im Hauptfenster „Diese Daten werden
+       übernommen" (#qcpm-ov, qc-bridge.js) mit zwei Reitern: Übernahme
+       (DealPilot-Marktwert und -Marktmiete, Spanne) und „Ausgelesene Daten"
+       (die im Quick Boarding gesetzten Werte). „Speichern & übernehmen"
+       legt das Objekt an (POST /objects) und springt in den Reiter Objekt.
+     - Mit wandern: Adresse, Objektart, Wohnfläche, Baujahr, Kaufpreis,
+       Kaltmiete, Hausgeld (280 €/Monat -> 2.352 € umlagefähig + 1.008 €
+       nicht umlagefähig im Jahr, 70/30), Eigenkapital, Zins, Tilgung,
+       Darlehen. Der Marktwert kam bis v2252 NICHT an (quickcheck-app.html
+       confirmSave) - behoben. Nicht mit: Makro-/Mikrolage, die Karte der
+       Marktbewertung selbst (#_mb_state), die Lageklasse.
+     - „Neues Objekt" legt SOFORT eine leere Karte an (POST /objects,
+       newobj-fixes.js). Die Quellen-Auswahl beim Anlegen
+       (neues-objekt-quellen.js) ist seit v1697 auf Marcels Wunsch
+       ausgehängt (index.html, Kommentar am Ende) - es erscheint die
+       Datenaufnahme-Leiste oben im Reiter Objekt.
+     MB_SACHSEN ist die ROHE DealPilot-Marktbewertung (Angebotsniveau) für
+     Sachsenstraße 18, 32052 Herford, ETW 100 m², Bj 1998 - einmal echt
+     abgerufen am 15.10.2026; der Abschlag läuft wie im Betrieb über
+     DealPilotAbschlag.anwenden. Je Durchgang KEIN Abruf: eine Sperre im
+     fetch beider Fenster weist Marktbericht-, KI-, Bewertungs-, ImmoMetrica-
+     und Sprach-Abrufe ab und schreibt sie in DPM_B2O.gesperrt.
+     ANGELEGT werden zwei Objekte; ihre Kennungen liest das Drehbuch aus der
+     Antwort auf POST /objects und löscht genau diese beim Aufräumen - auch
+     bei Esc. Der lokale Nummernzähler (seq_<Jahr>) wird zurückgesetzt. */
+  var MB_SACHSEN = {"area":100,"rating":"Sehr attraktiv","conf":{"label":"Mittel","pct":64},"mikro":"Sehr gut · 9,5","makro":"Durchschnittlich · 5,9","microRaw":95,"macroRaw":59,"trendRaw":null,"trend":"–","zensus":{"ebene":"Gemeinde","name":"Herford, Hansestadt","leer":4,"eig":42.1,"miete":5.56},"brw":{"wert":190,"quelle":"BORIS-NRW","stichtag":"2026-01-01"},"makroGemessen":4,"mw":{"low":204000,"med":244000,"high":284000,"sqm":"2.440 €/m²"},"mm":{"low":633,"med":802,"high":922,"sqm":"8,02 €/m² kalt"}};
+  var B2O_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes/i;
+  var _b2o = null;
+  window.DPM_B2O = { angelegt: [], gesperrt: [], geloescht: [] };
+  function b2oSpion(w) {
+    if (!w || w.__dpmB2o) return;
+    var echt = w.fetch; w.__dpmB2o = echt;
+    w.fetch = function (url, opt) {
+      var u = typeof url === 'string' ? url : (url && url.url) || '', m = String((opt && opt.method) || 'GET').toUpperCase();
+      if (lauf && m !== 'GET' && B2O_SPERRE.test(u)) {
+        DPM_B2O.gesperrt.push(m + ' ' + u.replace(location.origin, ''));
+        return Promise.resolve(new w.Response(JSON.stringify({ error: 'Vorführung: Abruf gesperrt' }), { status: 503, headers: { 'Content-Type': 'application/json' } }));
+      }
+      var p = echt.apply(this, arguments);
+      if (m === 'POST' && /\/api\/v1\/objects\/?(\?|$)/.test(u)) {
+        p.then(function (r) { return r.clone().json(); }).then(function (j) {
+          var id = j && (j.id || (j.data && j.data.id) || (j.object && j.object.id));
+          if (id && DPM_B2O.angelegt.indexOf(id) < 0) DPM_B2O.angelegt.push(id);
+        }).catch(function () {});
+      }
+      return p;
+    };
+  }
+  function b2oSpionAus(w) { try { if (w && w.__dpmB2o) { w.fetch = w.__dpmB2o; delete w.__dpmB2o; } } catch (e) {} }
+  function b2oKarte() {
+    var c = JSON.parse(JSON.stringify(MB_SACHSEN));
+    try { var A = (qcWin() && qcWin().DealPilotAbschlag) || window.DealPilotAbschlag; if (A) A.anwenden(c); } catch (e) {}
+    return c;
+  }
+  function textLen(h) { return String(h || '').replace(/<[^>]+>/g, '').length; }
+  /* Lesezeit nach Regel 6 (4 s + 1 s je 15 Zeichen) - in echter Zeit, also
+     durch TEMPO geteilt, weil warte() wieder streckt */
+  function lies(titel, text) { return Math.round((4000 + 1000 * (textLen(titel) + textLen(text)) / 15) / TEMPO); }
+  function sbKnopf(akt) { return function () { return qs('.sb-act-item[onclick*="\'' + akt + '\'"]'); }; }
+  function wert(id) { var e = document.getElementById(id); return e ? String(e.value || '').trim() : ''; }
+  function zahl(id) { var v = wert(id).replace(/\./g, '').replace(',', '.'); var n = parseFloat(v); return isFinite(n) && v !== '' ? n : null; }
+  function feldVon(id) { return function () { var e = document.getElementById(id); return e && (e.closest('.f,.field,.fg,.form-group') || e.parentElement); }; }
+  function pz(n) { return n == null ? null : String(n).replace('.', ','); }
+  async function b2oZeile(s, titel, text, extra) { s.zeile(titel, text); await warte(lies(titel, text) + (extra || 0)); }
+
+  DREHBUECHER['boarding-zum-objekt'] = {
+    titel: 'Vom Quick Boarding zum Objekt',
+    unterzeile: 'Zwei Wege ins Portfolio — und was dabei mitwandert',
+    objekt: null,
+    abspann: [
+      { ms: 5200, html: '<div class="k ab">So funktioniert DealPilot · Modul 02</div><h1 class="ab z2">Dein Objekt ist an Bord.</h1><p class="ab z3">Aus dem Quick Boarding übernommen — oder leer angelegt und selbst gefüllt.</p>' },
+      { ms: 6200, html: ABSPANN_LOGO }
+    ],
+    aufraeumen: function () {
+      var b = _b2o; _b2o = null;
+      var ov = q('#qcpm-ov'); if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+      var nq = q('#dp-nq'); if (nq && nq.parentNode) nq.parentNode.removeChild(nq);
+      if (!b) return;   /* zweiter Aufruf (stopp nach dem Ende) */
+      try { qcAufraeumen(); } catch (e) {}
+      function ls(k, v) { try { if (v === null) localStorage.removeItem(k); else if (v !== undefined) localStorage.setItem(k, v); } catch (e) {} }
+      var zurueck = function () { ls('qc_span_config', b.span); ls('dp_mb_pref_span', b.pref); if (b.seqKey) ls(b.seqKey, b.seq); };
+      zurueck(); setTimeout(zurueck, 2500);
+      /* genau die Objekte, die dieser Lauf angelegt hat */
+      var ids = DPM_B2O.angelegt.slice();
+      (async function () {
+        await new Promise(function (r) { setTimeout(r, 900); });   /* ein letzter Save darf noch ankommen */
+        ids = DPM_B2O.angelegt.slice();
+        for (var i = 0; i < ids.length; i++) {
+          var id = ids[i];
+          try {
+            if (window._currentObjKey === id && typeof window.delSaved === 'function') {
+              var oc = window.confirm; window.confirm = function () { return true; };
+              try { await window.delSaved(id); } finally { window.confirm = oc; }
+            } else await Auth.apiCall('/objects/' + id, { method: 'DELETE' });
+            DPM_B2O.geloescht.push(id);
+          } catch (e) { DPM_B2O.geloescht.push('FEHLER ' + id + ' ' + (e && e.message)); }
+        }
+        try { if (typeof window.renderSaved === 'function') window.renderSaved({ forceFresh: true, _immediate: true }); } catch (e) {}
+        b2oSpionAus(window); b2oSpionAus(qcWin());
+        zurueck();
+        DPM_B2O.fertig = Date.now();
+      })();
+      reiter('s0');
+    },
+    szenen: [
+      async function (s) {   /* 1 · Zwei Wege */
+        DPM_B2O.angelegt = []; DPM_B2O.gesperrt = []; DPM_B2O.geloescht = []; DPM_B2O.fertig = null;
+        var sk = null; try { sk = Auth.getStorageKey('seq_') + new Date().getFullYear(); } catch (e) {}
+        _b2o = { span: localStorage.getItem('qc_span_config'), pref: localStorage.getItem('dp_mb_pref_span'), seqKey: sk, seq: sk ? localStorage.getItem(sk) : undefined };
+        b2oSpion(window);
+        try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
+        await zeige(sbKnopf('quickcheck'), 6);
+        await b2oZeile(s, 'Zwei Wege ins Portfolio', 'Weg 1: erst im <b>Quick Boarding</b> prüfen — und das Ergebnis übernehmen.');
+        await zeige(sbKnopf('new'), 6);
+        await b2oZeile(s, 'Zwei Wege ins Portfolio', 'Weg 2: direkt ein <b>neues Objekt</b> anlegen und selbst füllen.');
+      },
+      async function (s) {   /* 2 · Quick Boarding: die Wohnung */
+        var kb = sbKnopf('quickcheck')(); if (kb) kb.click(); else if (typeof window.sbActionsAction === 'function') sbActionsAction('quickcheck');
+        await warteAuf(function () { var d = qcDoc(); return d && d.readyState === 'complete' && qcEl('qc_kp') && !qcEl('qc_kp').value && qcEl('qc7-sources'); }, 10000);
+        await warteAuf(function () { return qcEl('qc_zins') && qcEl('qc_zins').value; }, 4000);
+        b2oSpion(qcWin());
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await warte(600);
+        await zeige(function () { return qcGruppe('adr'); }, 6);
+        s.zeile('Weg 1 · Quick Boarding', 'Eine Eigentumswohnung in Herford — die Eckdaten kurz eingetippt.');
+        await tippe('qc_str', 'Sachsenstraße', 70); await tippe('qc_hnr', '18'); await tippe('qc_plz', '32052'); await tippe('qc_ort', 'Herford');
+        await zeige(function () { return qcGruppe('obj'); }, 6);
+        await tippe('qc_objektart', 'ETW'); await tippe('qc_wfl', '100'); await tippe('qc_bj', '1998');
+        var t = '<b>' + (qcEl('qc_str') || {}).value + ' ' + (qcEl('qc_hnr') || {}).value + '</b>, ' + (qcEl('qc_wfl') || {}).value + ' m², Baujahr ' + (qcEl('qc_bj') || {}).value + '.';
+        await b2oZeile(s, 'Weg 1 · Quick Boarding', t);
+      },
+      async function (s) {   /* 3 · Miete, Hausgeld, Kaufpreis */
+        await zeige(function () { return qcGruppe('miete'); }, 6);
+        await tippe('qc_nkm_grund', '900');
+        await zeige(function () { return qcGruppe('bewirt'); }, 6);
+        await tippe('qc_hg', '280');
+        await zeige(function () { return qcGruppe('fin'); }, 6);
+        await tippe('qc_kp', '180000', 90);
+        await warte(700);
+        var z = (qcEl('qc_zins') || {}).value, tl = (qcEl('qc_tilg') || {}).value;
+        await b2oZeile(s, 'Miete und Preis', 'Kaltmiete <b>' + eur(+qcEl('qc_nkm_grund').value) + '</b>, Hausgeld <b>' + eur(+qcEl('qc_hg').value) + '</b>, Kaufpreis <b>' + eur(+qcEl('qc_kp').value) + '</b>' + (z ? ' — Zins ' + z + ' % und Tilgung ' + tl + ' % aus deinen Standardwerten' : '') + '.');
+      },
+      async function (s) {   /* 4 · Score */
+        await zeige(function () { return qcEl('score-block'); }, 4);
+        await warteAuf(function () { return /\d/.test(qcText('sb-num')); }, 5000);
+        await warte(800);
+        var sc = qcScore();
+        await b2oZeile(s, 'Das erste Urteil', 'Score <b>' + sc.n + '</b> · ' + sc.stufe + (sc.urteil ? ' — „' + sc.urteil + '“' : '') + '.');
+      },
+      async function (s) {   /* 5 · Marktbewertung (Mitschnitt) */
+        await zeige(function () { return qcEl('qc7-sources'); }, 6);
+        var st = qcEl('_mb_state');
+        if (!st) { var d = qcDoc(); st = d.createElement('input'); st.type = 'hidden'; st.id = '_mb_state'; d.body.appendChild(st); }
+        _b2o && (_b2o.karte = b2oKarte());
+        var k = (_b2o && _b2o.karte) || b2oKarte();
+        st.value = JSON.stringify({ ts: Date.now(), card: k, mode: 'med', collapsed: false });
+        try { qcWin()._oabFeedTrigger(); } catch (e) {}
+        await warte(900);
+        await zeige(function () { return qcEl('oab-results'); }, 6);
+        await b2oZeile(s, 'Der Markt schätzt mit', 'DealPilot-Marktbewertung: Marktwert <b>' + eur(k.mw.med) + '</b> (Spanne ' + eur(k.mw.low) + ' – ' + eur(k.mw.high) + '), Marktmiete <b>' + eur(k.mm.med) + '</b> kalt.');
+      },
+      async function (s) {   /* 6 · Als Objekt speichern -> Übernahme-Fenster */
+        await zeige(function () { var b = qcEl('save-btn'); return b && b.getBoundingClientRect().width ? b : null; }, 12);
+        await b2oZeile(s, 'Als Objekt speichern', 'Passt die Wohnung? <b>Ein Klick</b> — und DealPilot fragt, was mitkommt.');
+        var sb = qcEl('save-btn'); if (sb && !sb.disabled) sb.click();
+        await warteAuf(function () { return q('#qcpm-ov .qcpm-box'); }, 5000);
+        await warte(700);
+        await zeige(function () { return q('#qcpm-ov #qcpm-secs') || q('#qcpm-ov .qcpm-box'); }, 8);
+        var mw = (q('#qcpm-ov span.v[data-k="mw"]') || {}).textContent, mm = (q('#qcpm-ov span.v[data-k="mm"]') || {}).textContent;
+        await b2oZeile(s, 'Was mitkommt', 'Aus der Marktbewertung: Marktwert <b>' + (mw || '–') + '</b> und Marktmiete <b>' + (mm || '–') + '</b> — angehakt, die Spanne wählst du hier.');
+      },
+      async function (s) {   /* 7 · Ausgelesene Daten */
+        var tab = q('#qcpm-ov .qcpm-tab[data-tab="src"]'); if (tab) tab.click();
+        await warte(600);
+        await zeige(function () { return q('#qcpm-ov .qcpm-pane.active') || q('#qcpm-ov .qcpm-box'); }, 8);
+        var n = [].filter.call(document.querySelectorAll('#qcpm-ov .qcpm-pane[data-pane="src"] .qcpm-item'), function (x) { return x.offsetWidth; }).length;
+        await b2oZeile(s, 'Was mitkommt', 'Dazu alles, was du eingegeben hast: <b>' + n + ' Werte</b> — Adresse, Fläche, Baujahr, Miete, Hausgeld, Kaufpreis und Finanzierung.');
+        var ok = q('#qcpm-ov #qcpm-ok');
+        await zeige(function () { return q('#qcpm-ov #qcpm-ok'); }, 8);
+        await b2oZeile(s, 'Speichern & übernehmen', 'Ein Klick legt das Objekt an.', -1500);
+        if (ok) ok.click();
+        await warteAuf(function () { return !q('#qcpm-ov') && !document.body.classList.contains('qc-standalone-active') && /Sachsen/.test((q('#hdr-obj') || {}).textContent || ''); }, 8000);
+        await warteAuf(function () { return DPM_B2O.angelegt.length >= 1; }, 6000);
+        await warte(900);
+      },
+      async function (s) {   /* 8 · Reiter Objekt */
+        reiter('s0'); await warte(700);
+        await zeige(function () { return q('#hdr-obj'); }, 8);
+        await b2oZeile(s, 'Das neue Objekt', 'Angelegt: <b>' + (q('#hdr-obj') || {}).textContent.trim() + '</b> — in Prüfung, mit allen Werten aus dem Quick Boarding.');
+        await zeige(feldVon('wfl'), 10);
+        var oa = (function () { var e = document.getElementById('objart'); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : wert('objart'); })();
+        await b2oZeile(s, 'Reiter Objekt', 'Adresse, <b>' + oa + '</b>, <b>' + wert('wfl') + ' m²</b> Wohnfläche, Baujahr <b>' + wert('baujahr') + '</b>.');
+        var sv = zahl('svwert');
+        if (sv) {
+          await zeige(feldVon('svwert'), 10);
+          await b2oZeile(s, 'Reiter Objekt', 'Und der DealPilot-Marktwert steht als Verkehrswert bereit: <b>' + eur(sv) + '</b>.');
+        }
+      },
+      async function (s) {   /* 9 · Investition */
+        reiter('s1'); await warte(800);
+        await zeige(feldVon('kp'), 10);
+        var nk = (q('#nk_sum') || {}).textContent;
+        await b2oZeile(s, 'Reiter Investition', 'Kaufpreis <b>' + eur(zahl('kp')) + '</b>' + (nk && /\d/.test(nk) ? ' — die Kaufnebenkosten rechnet DealPilot dazu: <b>' + nk.trim() + '</b>' : '') + '.');
+      },
+      async function (s) {   /* 10 · Miete */
+        reiter('s2'); await warte(800);
+        await zeige(feldVon('nkm'), 10);
+        var mm = wert('ds2_marktmiete');
+        await b2oZeile(s, 'Reiter Miete', 'Deine Kaltmiete <b>' + eur(zahl('nkm')) + '</b> im Monat' + (mm ? ' — die Marktmiete <b>' + mm + ' €/m²</b> daneben zum Vergleich' : '') + '.');
+      },
+      async function (s) {   /* 11 · Finanzierung und Bewirtschaftung */
+        reiter('s3'); await warte(800);
+        await zeige(feldVon('d1'), 10);
+        await b2oZeile(s, 'Reiter Finanzierung', 'Darlehen <b>' + eur(zahl('d1')) + '</b> zu <b>' + pz(wert('d1z')) + ' %</b>, Tilgung <b>' + pz(wert('d1t')) + ' %</b> — Eigenkapital <b>' + eur(zahl('ek')) + '</b> für die Nebenkosten.');
+        reiter('s4'); await warte(800);
+        await zeige(feldVon('hg_ul'), 10);
+        await b2oZeile(s, 'Reiter Bewirtschaftung', 'Das Hausgeld schon aufgeteilt: <b>' + eur(zahl('hg_ul')) + '</b> umlagefähig, <b>' + eur(zahl('hg_nul')) + '</b> nicht umlagefähig im Jahr.');
+      },
+      async function (s) {   /* 12 · Weg 2: Neues Objekt */
+        reiter('s0'); await warte(500);
+        await zeige(sbKnopf('new'), 6);
+        await b2oZeile(s, 'Weg 2 · Neues Objekt', 'Oder ohne Umweg: <b>„Neues Objekt“</b> legt sofort ein leeres Objekt an.', -1000);
+        var kn = sbKnopf('new')(); if (kn) kn.click(); else if (typeof window.newObj === 'function') newObj();
+        await warteAuf(function () { return DPM_B2O.angelegt.length >= 2 && /Neues Objekt/.test((q('#hdr-obj') || {}).textContent || ''); }, 8000);
+        await warte(900);
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        var leiste = function () { var t = qs('.dp-pf-tile'); return t && (t.closest('.dp-pf-row') || t.parentElement); };
+        await zeige(leiste, 8);
+        var kac = [].filter.call(document.querySelectorAll('.dp-pf-tile'), function (e) { return e.getBoundingClientRect().width > 0 && !e.classList.contains('dp-pf-disabled'); });
+        var namen = kac.map(function (e) { return ((e.querySelector('.dp-pf-lbl') || e).textContent || '').replace(/\s+/g, ' ').trim(); }).filter(Boolean);
+        await b2oZeile(s, 'Die Datenaufnahme', 'Oben die Datenaufnahme: <b>' + kac.length + ' Wege</b>, es zu füllen — ' + namen.join(' · ') + '.');
+        await b2oZeile(s, 'Die Datenaufnahme', 'Eine Quelle wählen, abrufen, übernehmen — wie das geht, zeigt <b>Modul 03</b>.');
+      }
+    ]
+  };
+
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0, _aktiv = null;
   function stopp() {

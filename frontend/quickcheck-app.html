@@ -6032,18 +6032,40 @@ function renderTransferList() {
     try {
       /* v893j-modalpick: Marktwert/Marktmiete aus gewaehlter Quelle (Konsens|Provider) + Spanne */
       var _sp = (_span==='low'||_span==='high'||_span==='mid') ? _span : (_spanConfig||'mid');
-      var _dpR = (_avmResults||[]).filter(function(x){return x&&x.provider==='DealPilot';})[0] || null;
+      /* v2252 · GEMESSEN 15.10.2026 (Sachsenstr. 18, Herford): das Fenster
+         „Diese Daten werden übernommen" zeigte „Marktwert → verkehrswert
+         230.000 €" angehakt - im Objekt stand danach KEIN Verkehrswert.
+         Ursache: die DealPilot-Bewertung kommt nie in _avmResults.
+         dealpilot-mb-qc.js meldet sie über global.QcApp.registerDpmb(), und
+         QcApp ist hier ein const, kein window-Eigenschaft (qc-bridge.js:357
+         sagt es selbst). Das Fenster liest sie dagegen aus #_mb_state.
+         Hier wird dieselbe Quelle gelesen wie im Fenster - was dort steht,
+         wird übernommen. window.QcApp freizugeben hätte fünf stille Wege
+         auf einmal geweckt (toter Pfad, erster Lauf). */
+      var _avL = (_avmResults||[]).slice();
+      if (!_avL.some(function(x){return x&&x.provider==='DealPilot';})) {
+        try { var _mbs = JSON.parse((document.getElementById('_mb_state')||{}).value||'null'), _mc = _mbs && _mbs.card;
+          if (_mc && (_mc.mw || _mc.mm)) _avL.unshift({ provider: 'DealPilot',
+            marktwert: _mc.mw ? _mc.mw.med : null, low: _mc.mw ? _mc.mw.low : null, high: _mc.mw ? _mc.mw.high : null,
+            marktmieteCold: _mc.mm ? _mc.mm.med : null, marktmieteLow: _mc.mm ? _mc.mm.low : null, marktmieteHigh: _mc.mm ? _mc.mm.high : null,
+            scoreMacro: _mc.macroRaw != null ? _mc.macroRaw / 10 : null, scoreMicro: _mc.microRaw != null ? _mc.microRaw / 10 : null,
+            wertentwicklung: _mc.trendRaw != null ? _mc.trendRaw : null }); } catch (e) {}
+      }
+      var _dpR = _avL.filter(function(x){return x&&x.provider==='DealPilot';})[0] || null;
       var _effR = (_src==='DealPilot'||_src==='Sprengnetter'||_src==='PriceHubble')
-        ? ((_avmResults||[]).filter(function(x){return x&&x.provider===_src;})[0] || (_avmResults||[])[0])
-        : ((_avmResults||[])[0] || null);
+        ? (_avL.filter(function(x){return x&&x.provider===_src;})[0] || _avL[0])
+        : (_avL[0] || null);
       function _valAt(r,kind){ if(!r) return null; if(kind==='mw'){ return _sp==='low'?r.low:_sp==='high'?r.high:r.marktwert; } return _sp==='low'?r.marktmieteLow:_sp==='high'?r.marktmieteHigh:r.marktmieteCold; }
       function _pick(kind){
         if(_src==='DealPilot'||_src==='Sprengnetter'||_src==='PriceHubble'){ return _valAt(_effR,kind); }
-        var vals=[]; (_avmResults||[]).forEach(function(x){ if(!x) return; if(x.provider==='DealPilot'||x.provider==='Sprengnetter'||x.provider==='PriceHubble'){ var v=_valAt(x,kind); if(v!=null&&isFinite(v)) vals.push(v); } });
+        var vals=[]; _avL.forEach(function(x){ if(!x) return; if(x.provider==='DealPilot'||x.provider==='Sprengnetter'||x.provider==='PriceHubble'){ var v=_valAt(x,kind); if(v!=null&&isFinite(v)) vals.push(v); } });
         if(!vals.length) return null; return Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length);
       }
       var _checked = {};
       try { Object.keys(_pendingTransfer).forEach(function (key) { var cb = document.getElementById('transfer-cb-' + key); if (_useCk ? _ck.has(key) : (!cb || cb.checked)) _checked[_pendingTransfer[key].target] = true; }); } catch (e) {}
+      /* v2252 · die Haken im Fenster heissen ohne _pendingTransfer-Eintrag
+         „DealPilot_mw"/„DealPilot_mm" (qc-bridge.js secHtml) */
+      if (_useCk) { if (_ck.has('DealPilot_mw')) _checked.verkehrswert = true; if (_ck.has('DealPilot_mm')) _checked.nkm_grund = true; }
       var _mw=_pick('mw'), _mm=_pick('mm');
       if (_mw!=null || _mm!=null || _dpR || _effR) {
         avm = {
