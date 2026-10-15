@@ -99,6 +99,17 @@
       sonstiges:  _parseDe(_v('inv_sonst'))
     };
 
+    /* v2265 · Inventar, das nur in #moebl steht (Detailbox leer, „Legacy-Modus" von
+     inventar-sync.js), kam im BMF-Fenster als 0 an. Gemessen am Ravensberger Weg 38
+     (15.10.2026): moebl 7.000, Detailbox leer -> Pipeline rechnete mit 1.240.000 statt
+     1.233.000 Immobilien-Kaufpreis, Gebaeude-AK 927.768 statt 922.531 EUR. Jetzt gilt
+     #moebl als „Sonstiges", wenn die Detailbox nichts traegt. */
+    try {
+      var _invSum = 0; Object.keys(inventar).forEach(function (k) { _invSum += Number(inventar[k]) || 0; });
+      var _moeblW = _parseDe(_v('moebl'));
+      if (!(_invSum > 0) && _moeblW > 0) inventar.sonstiges = _moeblW;
+    } catch (e) {}
+
     // Investition (Tab Investition)
     var investition = {
       kp_brutto:  _parseDe(_v('kp')),

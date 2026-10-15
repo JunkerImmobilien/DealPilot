@@ -1242,6 +1242,12 @@ function updateInv(){
   var sp = _safeVal('inv_stellplatz');
   var s  = _safeVal('inv_sonst');
   var total = k + m + g + p + sp + s;
+  /* v2265 · Inventar, das nur in #moebl steht (Detailbox leer, „Legacy-Modus" von
+     inventar-sync.js), kam im BMF-Fenster als 0 an. Gemessen am Ravensberger Weg 38
+     (15.10.2026): moebl 7.000, Detailbox leer -> Pipeline rechnete mit 1.240.000 statt
+     1.233.000 Immobilien-Kaufpreis, Gebaeude-AK 927.768 statt 922.531 EUR. Jetzt gilt
+     #moebl als „Sonstiges", wenn die Detailbox nichts traegt. */
+  if (!(total > 0)) { var _mw = _safeVal('moebl'); if (_mw > 0) total = _mw; }
 
   // Brutto-KP (laut Notarvertrag, aus ak_kp Tab oder Default)
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
@@ -1609,6 +1615,7 @@ function renderRiskGrid(){
             (parseDe($('inv_moebl').value) || 0) +
             (parseDe($('inv_pv').value) || 0) +
             (parseDe($('inv_sonst').value) || 0);
+  if (!(inv > 0)) inv = parseDe(($('moebl') || {}).value) || 0;   /* v2265: Inventar nur in #moebl */
   var bruttoKp = parseDe($('ak_kp').value) || 87569.13;
   var invQuote = bruttoKp > 0 ? (inv / bruttoKp) * 100 : 0;
   if($('risk_inv')){
@@ -1666,6 +1673,7 @@ function renderEmpfehlung(){
             (parseDe($('inv_moebl').value) || 0) +
             (parseDe($('inv_pv').value) || 0) +
             (parseDe($('inv_sonst').value) || 0);
+  if (!(inv > 0)) inv = parseDe(($('moebl') || {}).value) || 0;   /* v2265: Inventar nur in #moebl */
   var invQuote = bruttoKp > 0 ? (inv / bruttoKp) * 100 : 0;
 
   var mainHtml = '', listItems = [];
@@ -1736,6 +1744,7 @@ function renderKlausel(){
             (parseDe($('inv_moebl').value) || 0) +
             (parseDe($('inv_pv').value) || 0) +
             (parseDe($('inv_sonst').value) || 0);
+  if (!(inv > 0)) inv = parseDe(($('moebl') || {}).value) || 0;   /* v2265: Inventar nur in #moebl */
   var immoKp = Math.max(0, bruttoKp - inv);
 
   // Begründungs-Zusatz je nach Variante
