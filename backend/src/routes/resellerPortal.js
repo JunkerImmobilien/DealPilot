@@ -134,6 +134,8 @@ router.post('/seats/checkout', async (req, res, next) => {
       metadata: meta,
       subscription_data: { metadata: meta },
       client_reference_id: req.user.id,
+      /* v2248 · Anschrift fuer die Rechnung (Pflichtangabe) */
+      billing_address_collection: 'required',
       success_url: base + '/?reseller_pool=success&session_id={CHECKOUT_SESSION_ID}',
       cancel_url:  base + '/?reseller_pool=cancel',
       locale: 'de'

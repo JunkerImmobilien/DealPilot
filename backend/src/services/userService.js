@@ -220,7 +220,8 @@ async function authenticate({ email, plainPassword, ipAddress }) {
     id: user.id,
     email: user.email,
     name: user.name,
-    role: user.role
+    role: user.role,
+    created_at: user.created_at   /* v2249: das Setup gilt je Konto, nicht je Browser */
   };
 }
 

@@ -410,6 +410,8 @@
       if (!window.Auth || typeof window.Auth.apiCall !== 'function') return;
       window.Auth.apiCall('/objects/' + key, { method: 'DELETE' }).then(function () {
         console.log('[DpTour v1746] Demo-Objekt wieder entfernt:', key);
+        /* v2251: das Formular gehoerte dem eben geloeschten Demo */
+        try { if (window._currentObjKey === key) window._currentObjKey = null; } catch (e) {}
         try { if (typeof window.renderSaved === 'function') window.renderSaved({ forceFresh: true, _immediate: true }); } catch (e) {}   /* v2178: refreshSavedList gibt es nicht */
       }).catch(function () {});
     } catch (e) {}
@@ -417,7 +419,45 @@
 
   // V239.1: Stelle sicher, dass ein Objekt geladen ist (sonst leere Donuts)
   // V239.7: MouseEvent statt .click() weil Sidebar-Cards Event-Delegation nutzen
+  /* ══ v2251 · DIE TOUR ZEIGT DAS DEMO, NICHT DIE ERSTE KARTE ══════════
+     Marcel am 15.10.2026: „beim Laden der Tour muss das Objekt natürlich
+     wieder geladen werden, also das Demo-Objekt."
+
+     Ein neues Konto hat nach der Bestaetigung GENAU das Demo
+     (Ort „Dealhausen", registerWithVerify.js). Die Tour klickte bisher die
+     erste sichtbare Karte - nach dem Setup ist das das leere „Neue Objekt",
+     und die Tour erklaerte leere Felder.
+
+     Jetzt beim Server nachsehen:
+       · Demo vorhanden            -> genau das laden
+       · nur Objekte ohne Daten    -> ein Demo fuer die Dauer der Tour
+                                      anlegen (wie bisher, wird geloescht)
+       · echte Objekte             -> wie bisher die erste Karte
+     Kein Ergebnis vom Server -> wie bisher. */
+  function _istDemo(it) { return String((it && it.ort) || '').trim().toLowerCase() === 'dealhausen'; }
+  function _hatDaten(it) { return !!(it && (String(it.ort || '').trim() || Number(it.kaufpreis) > 0)); }
   function _ensureObjectLoaded() {
+    var A = window.Auth;
+    if (!A || typeof A.apiCall !== 'function') return _ensureObjectLoadedBisher();
+    return A.apiCall('/objects').then(function (r) {
+      var items = (r && Array.isArray(r.items)) ? r.items : null;
+      if (!items) return _ensureObjectLoadedBisher();
+      var demo = items.filter(_istDemo)[0];
+      if (demo) {
+        _portfolioAufklappen();
+        if (window._currentObjKey === demo.id) return true;
+        return Promise.resolve(typeof window.loadSaved === 'function' ? window.loadSaved(demo.id) : null)
+          .then(function () { return true; }, function () { return _ensureObjectLoadedBisher(); });
+      }
+      if (!items.some(_hatDaten)) {
+        _portfolioAufklappen();
+        return _demoAnlegen().then(function (key) { return key ? true : _ensureObjectLoadedBisher(); });
+      }
+      return _ensureObjectLoadedBisher();
+    }, function () { return _ensureObjectLoadedBisher(); });
+  }
+
+  function _ensureObjectLoadedBisher() {
     return new Promise(function(resolve) {
       /* v1747 · ZUERST aufklappen, dann alles andere. Das gehoert vor die
          Abkuerzungen darunter: Marcel hatte ein Objekt geladen, also kehrte
@@ -1368,6 +1408,9 @@
     exit: function() {
 
           try { _demoAufraeumen(); } catch (e) {}
+          /* v2251: nach der Tour steht ein leeres Objekt da - nur beim Rundgang
+             eines neuen Kontos (das Setup laeuft in derselben Sitzung) */
+          try { if (window.__dpNachSetup && window.DealPilotOnboarding && DealPilotOnboarding.leeresObjekt) { window.__dpNachSetup = false; setTimeout(DealPilotOnboarding.leeresObjekt, 400); } } catch (e) {}
       // v433: beim Schliessen (X / ESC) als gesehen markieren, sonst startet die
       // Tour bei jedem Hard-Reload erneut (nur complete()/skip() setzten das Flag).
       try { localStorage.setItem(STORAGE_KEY, new Date().toISOString()); } catch(e) {}
@@ -1379,6 +1422,9 @@
     complete: function() {
 
           try { _demoAufraeumen(); } catch (e) {}
+          /* v2251: nach der Tour steht ein leeres Objekt da - nur beim Rundgang
+             eines neuen Kontos (das Setup laeuft in derselben Sitzung) */
+          try { if (window.__dpNachSetup && window.DealPilotOnboarding && DealPilotOnboarding.leeresObjekt) { window.__dpNachSetup = false; setTimeout(DealPilotOnboarding.leeresObjekt, 400); } } catch (e) {}
       if (!state.active) return;  // V239.1: doppel-Aufrufe schlucken
       state.active = false;  // V239.1: SOFORT deaktivieren
       try { localStorage.setItem(STORAGE_KEY, new Date().toISOString()); } catch(e) {}

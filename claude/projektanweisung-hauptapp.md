@@ -38761,6 +38761,47 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2251 · Leeres Objekt nach dem Setup, Tour lädt das Demo, Bütten, Demo ergänzt (15.10.2026, Staging)
+
+- **Was:** Nach dem Setup steht ein leeres „Neues Objekt“ (ohne Tour sofort, mit Tour nach deren Ende über `__dpNachSetup`) – angezeigt, nicht gespeichert: `_dpEmptyCardSaving` hält `saveEmptyCard` an, weil das Demo aus der Bestätigung (`assignDemoObject`) schon einen Platz belegt. Die Tour lädt gezielt das Demo (Ort Dealhausen, Server-Abfrage `GET /objects`), bei nur leeren Objekten ein Tour-Demo. Kartenstil Bütten für alle Ansichten (`KARTENSTIL`), wirkt auch ohne Kachelklick. `erststart.js` schweigt, wenn es das Setup gibt. `demo-object.json`: 48 Felder ergänzt (129 → 175).
+- **Commit:** `c0a92527`
+- **Nachweis:** Staging `?setup=1`: Zusatz „Kartenstil Bütten“, nach Schritt 1 `data-dp-kartenstil=buetten`; Abschluss ohne Tour → Kopf „Neues Objekt“, kp/ort leer, `_currentObjKey` null, Quick-Check zu, Objekte 39 → 39. Image: Demo mit `mod_heizung`. localStorage danach zurückgesetzt.
+- **Rest:** Tour-Demo-Weg nur an einem neuen Konto prüfbar (Abnahme Marcel). Bestehende Demos (majunker) behalten die alten 129 Felder.
+
+### v2250 · Bestätigungsband verschwindet nach dem Klick, Flieger aus der Mail (15.10.2026, Staging)
+
+- **Was:** Nach Klick auf den Bestätigungslink blieb das Band „noch nicht bestätigt“ stehen: `dp_verify_frist` wurde nur bei einer neuen Anmeldung geräumt. Jetzt fragt `verify-frist.js` `/auth/me` (Laden, Rückkehr in den Tab, minütlich); fehlt `X-DP-Verify-Deadline` (setzt `middleware/auth.js` nur ohne `email_verified_at`), geht das Band. `storage`-Ereignis räumt andere Tabs, der Link-Weg in `register-easter-egg.js` räumt den Merker selbst. Mail: Flieger-Zeichen hinter „Check-in abschließen“ und „dein DealPilot-Team“ entfernt.
+- **Commit:** `87982c14`
+- **Nachweis:** Staging, bestätigtes Konto mit künstlich gesetztem Merker: nach dem Laden Merker `null`, kein Band, kein `data-dp-verify`. Backend-Image: 0× `✈` in `verifyMailTemplate.js`.
+- **Rest:** Prod-Rollout (Freigabe, Backend-Neubau) zusammen mit v2248/v2249.
+
+### v2249 · Setup je Konto, nach der Anmeldung, mit Hilfe-Schritt (15.10.2026, Staging)
+
+- **Was:** Marcel meldete majunker@gmx.net neu an und bekam weder Grunddaten/Aussehen noch Tour. Zwei Ursachen: (1) `dp_onboarding_done_v1` hing am BROWSER, in dem schon ein Setup gelaufen war; (2) das Setup prüfte nur beim Laden der Seite, die Anmeldung lädt nicht neu. Jetzt: Merker `dp_onboarding_done_v1:<userId>`, der alte zählt nur für Konten älter als 30 Tage (`createdAt` in der Sitzung, Backend liefert `created_at` bei Register/Login/2FA). `DealPilotOnboarding.pruefen()` läuft nach `onLoginSuccess`; ist das Setup fällig, öffnet der Quick-Check nicht automatisch. Neuer Schritt 6 „Hilfe“: Pilot anzeigen oder nur F1 (`DealPilotPilot.setOrt`) und Haken „Rundgang danach starten“.
+- **Commit:** `a7c6fef9`
+- **Nachweis:** Staging, Marcels Konto mit gesetztem Browser-Merker und frischem `createdAt`: Setup erscheint mit 6 Schritten; „Nein“ setzt `dp_pilot_ort=aus` (Pilot `ruht aus`); Haken raus → `DpTour.start` 0×; Kontomerker gesetzt. Altes Konto ohne `createdAt`: `istFertig` true, `pruefen` false, Merker wird gespiegelt. Neues Konto: `pruefen` true, Setup erscheint. Sitzung danach zurückgestellt.
+- **Rest:** Prod-Rollout (Freigabe, Backend-Neubau). Bestehende Sitzungen kennen `createdAt` erst nach erneuter Anmeldung.
+
+### v2248 · Stripe-Rechnungen geprüft und Checkouts nachgezogen (15.10.2026, Staging)
+- **Was:** Marcel: „prüfen ob jeder Kunde bei Stripe eine vernünftige Rechnung bekommt“.
+- **Gemessen (Live-Konto `acct_1TWXFdGefFev8arz`, lesend im Prod-Container):** 2 Kunden, beide eigene Testkonten; 1 bezahlte Rechnung `DEALPILOT-0001` (0,00 €), ein Kunde ohne Anschrift; 0 bezahlte Einmal-Checkouts. Keine aktiven Steuersätze, Stripe Tax „active“ (ungenutzt, `automatic_tax` aus). Portal: Rechnungsverlauf an, Adresse änderbar. Fußzeile trägt den § 19-Hinweis.
+  - **PDF gelesen:** Absender „Junker Immobilien, Hermannstr. 9, 32609 Hüllhorst“ — **keine Steuernummer** (§ 14 Abs. 4 Nr. 2 UStG verlangt Steuernummer oder USt-IdNr, auch beim Kleinunternehmer); Absendername ist die Marke, nicht der Unternehmer (Junker Solution, Inh. Marcel Junker); Spalten „zzgl. Steuern“; Papier „letter“ statt A4. → **Dashboard-Einstellungen, nur Marcel.**
+  - **Code:** Einmalkäufe (`credits.js`, Kontingent + Bewertungen) als `mode: 'payment'` ohne `invoice_creation` → keine Rechnung, nur Beleg. Abo-Checkout ohne `customer_update` → Anschrift landet nicht am Kunden. Seat-Checkout ohne Anschrift.
+- **Gebaut:** `invoice_creation` + Anschrift Pflicht + `customer_update` in beiden Einmal-Checkouts; Abo `customer_update` + `locale: 'de'`; Seats Anschrift Pflicht.
+- **Commit:** `963db402`, `8b8d2305`
+- **Nachweis:** Sandbox (Staging-Container, `sk_test`): Checkout payment mit Kunde, payment mit neuer E-Mail, Abo — alle drei von Stripe angenommen, `invoice_creation.enabled=true`; Sitzungen verfallen lassen, Probekunde gelöscht. Backend neu gebaut, `invoice_creation` 4× im Image.
+- **Rest:** Prod-Rollout v2248 (Freigabe). Marcel im Dashboard: Steuernummer, Unternehmername, A4, ggf. Stripe Tax aus. Ein echter Testkauf auf Prod danach am PDF prüfen.
+
+### Prod-Rollout (22) · v2239–v2247d auf Produktion (15.10.2026)
+- **Was:** Freigabe Marcel („ja angleichen und dann rollout“). v2247d: Zinsbindungs-Empfehlung (`market-rates.js`) im Du. `main` per `--no-ff` mit `origin/staging`; Prod `git pull`, Rebuild `backend` + `mb-backend`, Migration 088.
+- **Commit:** `536db030` (v2247d), Merge `639a3b7f`
+- **Nachweis:**
+  - Sicherung vorher, angesehen: `haupt-20261015-0725.sql.gz` (14 MB, 71 Tabellen — größer durch die übernommenen Objekte von info@), `mb-20261015-0725.sql.gz` (25 MB, 32 Tabellen).
+  - Migration 88 angewandt, erster Bauzins-Abruf 1.280 Tages-/52 Monatszeilen; beide Backends laufen; Gold-Audit RC=0.
+  - Live am Inhalt: `/pfandbrief` source live, Modell bund+aufschlag, 80 %: 4,06 / 4,34 / 4,53 / 4,63; App lädt `marktdaten-modal.js?v=v2247c`, `market-rates.js?v=v2247d`, `objekt-reiter.js?v=v2245`; `schwellen.js` ausgeliefert; Landing „BELEIHUNG 80 %“, `dp2-inhalt.js?v=v2245` mit „Marktaufschlag“; `/auth/me` 401.
+  - Vorher am selben Tag auf Prod (Freigabe Marcel): Konto info@ ergänzt (25 Objekte), `majunker@gmx.net` von Marcel selbst gelöscht (DELETE 1, keine Waisen, 13 Nutzer).
+- **Rest:** Abnahme Marcel: Marktdaten-Fenster, Hinweis am Zinsfeld, Ampeln mit eigenen Grenzen, Gewerbe-/Grundstücks-Bewertung mit echtem Abruf. K des Bauzinses gelegentlich nachkalibrieren. Gespeicherte Scores nach Gewichtsänderung, statische Hilfetexte 1,2/85.
+
 ### v2247–v2247c · Marktdaten-Fenster neu: Zusammensetzung, Verlauf, Hausoptik (15.10.2026, Staging)
 - **Was:** Marcel: Verlaufsgrafik unter Finanzierung → „Marktdaten ansehen“, wie sich der Zins zusammensetzt, Optik DealPilot, Irrelevantes raus, Messkabine.
   - Neues Modul `frontend/js/marktdaten-modal.js` übernimmt `V10.openMarketModal/closeMarketModal/handleOverlayClick`. Obsidian-Kopf mit Runway-Linie; Zins für Bindung × Beleihung (Objekt-LTV und Bindung `#d1_bindj` vorgewählt); Gleichung Bundesanleihe + Marktaufschlag + Angebotsniveau ± Beleihung (Marktaufschlag als Rest → geht immer auf); Verlauf 13 Monate (Ø abgeschlossen vs. Bund, Aufschlag-Balken) / 12 Wochen (Modell vs. Bund); vier Konditionen; Geldmarkt (EZB, Euribor, Ø abgeschlossen) + Einordnung Zinsbindung; eine Quellenzeile.

@@ -59,6 +59,7 @@ window.DealPilotOnboarding = (function () {
      galt für „Aktenmappe, Kanzlei und Tower", und für zwei davon gilt
      er weiter. Für die Aktenmappe ist er durch die neue Vorgabe
      ersetzt.                                                            */
+  var KARTENSTIL = 'buetten';   /* v2251: fuer jede Ansicht dieselbe */
   var AUSSEHEN = [
     { id: 'v1b', name: 'Aktenmappe', karte: 'bordkarte', standard: true,   /* v2216c: Marcel 14.10. - Auslieferung Aktenmappe mit Bordkarte */
       unter: 'Menü links, Reiter oben im Kopf',
@@ -200,7 +201,7 @@ window.DealPilotOnboarding = (function () {
   var _schritt = 0, _ov = null;
   /* v2083: die Vorauswahl ist der Standard (Aktenmappe), nicht null -
      vorher musste der Nutzer erst klicken, bevor es weiterging. */
-  var _wahl = { aussehen: _aussehenStandard(), typ: _typDefault() };
+  var _wahl = { aussehen: _aussehenStandard(), typ: _typDefault(), pilot: null };
 
   function _ls(k)      { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function _lsSet(k,v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -208,7 +209,37 @@ window.DealPilotOnboarding = (function () {
   function esc(s)      { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
     return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c]; }); }
 
-  function istFertig() { return !!_ls(FERTIG_KEY); }
+  /* ══ v2249 · DER MERKER GILT JE KONTO, NICHT JE BROWSER ═══════════
+     Marcel am 15.10.2026: „ich habe majunker@gmx.net neu angemeldet und
+     bekomme keine Aufforderung für die Grunddaten … und auch keine Tour."
+
+     Gemessen: `dp_onboarding_done_v1` lag im localStorage - also am
+     BROWSER. Wer in diesem Browser schon einmal mit einem anderen Konto
+     das Setup abgeschlossen hatte, bekam es fuer jedes neue Konto nie
+     wieder. Jetzt traegt der Merker die Nutzerkennung.
+
+     Der alte Merker ohne Kennung zaehlt nur noch fuer Konten, die AELTER
+     sind als 30 Tage (oder deren Alter die Sitzung nicht kennt): die haben
+     das Setup mit ihm abgeschlossen und sollen es nicht noch einmal sehen.
+     Ein neues Konto ignoriert ihn. */
+  function _sitzung() {
+    try { return (window.Auth && Auth.getSession && Auth.getSession()) || null; } catch (e) { return null; }
+  }
+  function _uid() { var s = _sitzung(); return (s && s.userId) ? String(s.userId) : ''; }
+  function _neuesKonto() {
+    var s = _sitzung(), t = s && s.createdAt ? Date.parse(s.createdAt) : NaN;
+    return Number.isFinite(t) && (Date.now() - t) < 30 * 864e5;
+  }
+  function _fertigKey()  { var u = _uid(); return u ? FERTIG_KEY + ':' + u : FERTIG_KEY; }
+  function _schrittKey() { var u = _uid(); return u ? SCHRITT_KEY + ':' + u : SCHRITT_KEY; }
+  function istFertig() {
+    var u = _uid();
+    if (!u) return !!_ls(FERTIG_KEY);
+    if (_ls(_fertigKey())) return true;
+    if (_neuesKonto()) return false;
+    if (_ls(FERTIG_KEY)) { _lsSet(_fertigKey(), _ls(FERTIG_KEY)); return true; }
+    return false;
+  }
 
   /* ── Profil lesen/schreiben über das vorhandene Modul ─────────────── */
   function profil(k, fallback) {
@@ -302,7 +333,7 @@ window.DealPilotOnboarding = (function () {
             + '<span class="dpo-k-fuer">' + esc(a.fuer) + '</span>'
             /* v2083: der Kartenstil wird beim Namen genannt, nicht geraten. */
             + (a.karte ? '<span class="dpo-k-zusatz">Objektkarten als '
-                + esc(_karteName(a.karte)) + '</span>' : '')
+                + esc(_karteName(a.karte)) + ', Kartenstil Bütten</span>' : '')
             + (a.standard ? '<span class="dpo-k-std">Standard</span>' : '')
             + '</button>';
         }).join('')
@@ -617,12 +648,51 @@ window.DealPilotOnboarding = (function () {
         })();
   }
 
+  /* ══ v2249 · SCHRITT 6 · HILFE ════════════════════════════════════
+     Marcel am 15.10.2026: „Den Hilfe-Pilot sollte man auch am Anfang
+     auswählen können, ob man den haben möchte oder nicht. Also am Ende
+     des Modals."
+
+     Keine neue Einstellung: die Wahl schreibt dieselbe, die unter
+     Einstellungen › Allgemein steht (`DealPilotPilot.setOrt`, Merker
+     `dp_pilot_ort`). „Nein" heisst dort „Nur auf F1" - der Pilot ist
+     unsichtbar, laesst sich aber jederzeit rufen. Darunter der Rundgang,
+     der nach dem Setup startet: wer ihn nicht will, nimmt den Haken raus. */
+  function _pilotOrt() {
+    try { if (window.DealPilotPilot && DealPilotPilot.ort) return DealPilotPilot.ort(); } catch (e) {}
+    return 'seite';
+  }
+  function s6() {
+    var an = (_wahl.pilot || _pilotOrt()) !== 'aus';
+    return ''
+      + '<p class="dpo-vor">Der <b>Hilfe-Pilot</b> wartet am Rand und erklärt '
+      + 'dir das Feld, auf dem du gerade bist, oder beantwortet deine Frage. '
+      + 'Gerufen wird er mit <b>F1</b> oder <b>?</b>.</p>'
+      + '<div class="dpo-kacheln">'
+      +   '<button type="button" class="dpo-kachel' + (an ? ' an' : '') + '" data-pilotwahl="seite">'
+      +     '<span class="dpo-k-name">Ja, Pilot anzeigen</span>'
+      +     '<span class="dpo-k-unter">Er steht sichtbar am Rand und hilft auf Klick oder F1.</span>'
+      +   '</button>'
+      +   '<button type="button" class="dpo-kachel' + (an ? '' : ' an') + '" data-pilotwahl="aus">'
+      +     '<span class="dpo-k-name">Nein, nur auf F1</span>'
+      +     '<span class="dpo-k-unter">Unsichtbar, bis du F1 oder ? drückst.</span>'
+      +   '</button>'
+      + '</div>'
+      + '<label class="dpo-haken" for="dpo_tour" style="margin-top:16px">'
+      +   '<input type="checkbox" id="dpo_tour" checked>'
+      +   '<span>Danach den <b>Rundgang</b> starten: zwei Minuten durch die wichtigsten Stellen</span>'
+      + '</label>'
+      + '<p class="dpo-vor dpo-vor-klein">Beides lässt sich später ändern: den Pilot unter '
+      + '<b>Einstellungen › Allgemein</b>, den Rundgang über das Hilfe-Symbol oben.</p>';
+  }
+
   var SCHRITTE = [
     { titel: 'Wie soll DealPilot aussehen?', kurz: 'Aussehen',    bau: s1 },
     { titel: 'Deine Daten',                  kurz: 'Daten',       bau: s2 },
     { titel: 'Womit sollen wir rechnen?',    kurz: 'Finanzierung',bau: s3 },
     { titel: 'Steuer',                       kurz: 'Steuer',      bau: s4 },
-    { titel: 'Was für ein Investor bist du?',kurz: 'Profil',      bau: s5 }
+    { titel: 'Was für ein Investor bist du?',kurz: 'Profil',      bau: s5 },
+    { titel: 'Möchtest du Hilfe beim Start?', kurz: 'Hilfe',      bau: s6 }
   ];
 
   /* v1750 · ERKLAERUNGEN AN JEDES FELD.
@@ -776,9 +846,12 @@ window.DealPilotOnboarding = (function () {
 
     _ov.addEventListener('click', function (ev) {
       if (ev.target === _ov) { ev.preventDefault(); ev.stopPropagation(); return; }
-      var k = ev.target.closest ? ev.target.closest('[data-aussehen],[data-typ]') : null;
+      var k = ev.target.closest ? ev.target.closest('[data-aussehen],[data-typ],[data-pilotwahl]') : null;
       if (k) {
-        if (k.hasAttribute('data-aussehen')) {
+        if (k.hasAttribute('data-pilotwahl')) {
+          _wahl.pilot = k.getAttribute('data-pilotwahl');
+          try { if (window.DealPilotPilot && DealPilotPilot.setOrt) DealPilotPilot.setOrt(_wahl.pilot); } catch (e) {}
+        } else if (k.hasAttribute('data-aussehen')) {
           _wahl.aussehen = k.getAttribute('data-aussehen');
           _aussehenAnwenden(_wahl.aussehen);
         } else { _wahl.typ = k.getAttribute('data-typ'); }
@@ -858,6 +931,13 @@ window.DealPilotOnboarding = (function () {
         DealPilotObjektkarte.setze(a.karte);
       }
     } catch (e) {}
+    /* v2251 · Marcel am 15.10.2026: „Standard-Aussehen Karte immer Bütten
+       nehmen." Der Kartenstil (karten-stil.js: zeile · kartei · buetten)
+       ist eine eigene Ebene neben der Objektkarte darüber - er gilt in
+       allen vier Ansichten gleich. */
+    try {
+      if (window.DealPilotKartenStil && DealPilotKartenStil.setze) DealPilotKartenStil.setze(KARTENSTIL);
+    } catch (e) {}
   }
 
   function _zahl(id) {
@@ -867,6 +947,9 @@ window.DealPilotOnboarding = (function () {
   }
 
   function _sichern() {
+    /* v2251: wer im ersten Schritt nur „Weiter" drückt, bekommt den
+       Standard trotzdem gesetzt - bisher wirkte die Wahl nur per Klick. */
+    if (_schritt === 0) { try { _aussehenAnwenden(_wahl.aussehen); } catch (e) {} }
     if (_schritt === 1) {
       try {
         var s = (window.Settings && Settings.get()) || {};
@@ -1002,7 +1085,7 @@ window.DealPilotOnboarding = (function () {
   }
 
   function _vor() {
-    if (_schritt < SCHRITTE.length - 1) { _schritt++; _lsSet(SCHRITT_KEY, String(_schritt)); _zeichne(); }
+    if (_schritt < SCHRITTE.length - 1) { _schritt++; _lsSet(_schrittKey(), String(_schritt)); _zeichne(); }
     else { _abschliessen(); }
   }
   function _zurueck() { if (_schritt > 0) { _schritt--; _zeichne(); } }
@@ -1037,15 +1120,58 @@ window.DealPilotOnboarding = (function () {
     }
   }
 
+  /* ══ v2251 · NACH DEM SETUP STEHT EIN LEERES OBJEKT DA ════════════
+     Marcel am 15.10.2026: „Standard soll auch ein leeres Objekt angezeigt
+     werden, je nachdem ob man die Tour macht oder nicht."
+
+     Bisher stand nach der Anmeldung der Quick-Check offen (auth.js V225)
+     oder, nach der Tour, das Formular des eben GELOESCHTEN Demo-Objekts.
+
+     ANGEZEIGT, nicht ANGELEGT: der Knopf „Neues Objekt" speichert sofort
+     eine leere Karte (newobj-fixes.js `saveEmptyCard`). Ein neues Konto hat
+     aber schon das Demo aus der Bestaetigung (registerWithVerify.js,
+     `assignDemoObject`), und das Demo zaehlt gegen die Plan-Grenze - eine
+     zweite, leere Karte koennte im Free-Plan am Limit scheitern und waere
+     ohnehin eine Karteileiche. Deshalb haelt der Sperrmerker
+     `_dpEmptyCardSaving` das Speichern an; das Formular steht leer da, und
+     der Auto-Save legt das Objekt an, sobald etwas eingetragen ist.
+     Auf den Rundgang ruft `tour-engine.js` dieselbe Funktion, nachdem er
+     beendet ist. */
+  function leeresObjekt() {
+    try {
+      if (document.body.classList.contains('qc-standalone-active') && typeof window.exitQuickCheckMode === 'function') {
+        window.exitQuickCheckMode();
+      }
+    } catch (e) {}
+    try {
+      if (typeof window.newObj !== 'function') return;
+      /* Ein geloeschtes Demo darf nicht mehr als „geladen" gelten - sonst
+         sichert newObj es vor dem Leeren und legt es neu an (v1268). */
+      window._currentObjKey = null;
+      window._dpEmptyCardSaving = true;
+      window.newObj({ ohneAuswahl: true });
+      setTimeout(function () { window._dpEmptyCardSaving = false; }, 2000);
+    } catch (e) { window._dpEmptyCardSaving = false; }
+  }
+
   function _abschliessen() {
-    _lsSet(FERTIG_KEY, new Date().toISOString());
-    try { localStorage.removeItem(SCHRITT_KEY); } catch (e) {}
+    /* v2249: der Haken im letzten Schritt entscheidet ueber den Rundgang.
+       Gelesen, BEVOR das Fenster verschwindet. Fehlt er (alter Stand),
+       gilt das Bisherige: Rundgang. */
+    var tourEl = el('dpo_tour'), mitTour = tourEl ? !!tourEl.checked : true;
+    var jetzt = new Date().toISOString();
+    _lsSet(_fertigKey(), jetzt);
+    _lsSet(FERTIG_KEY, jetzt);
+    try { localStorage.removeItem(_schrittKey()); localStorage.removeItem(SCHRITT_KEY); } catch (e) {}
     try { window.__dpOnboardingAktiv = false; } catch (e) {}
     if (_ov) { _ov.remove(); _ov = null; }
     /* Jetzt erst der Rundgang — er zeigt die Oberflaeche, die eben
        gewaehlt wurde. */
     try {
-      if (window.DpTour && typeof DpTour.start === 'function') setTimeout(function () { DpTour.start(); }, 500);
+      if (mitTour && window.DpTour && typeof DpTour.start === 'function') {
+        window.__dpNachSetup = true;   /* die Tour zeigt danach das leere Objekt */
+        setTimeout(function () { DpTour.start(); }, 500);
+      } else leeresObjekt();
     } catch (e) {}
   }
 
@@ -1312,7 +1438,7 @@ window.DealPilotOnboarding = (function () {
       if (modus) {
         /* Erzwungen heisst: von vorn. Ein gemerkter Zwischenschritt waere
            hier das Gegenteil dessen, was geprueft werden soll. */
-        try { localStorage.removeItem(FERTIG_KEY); localStorage.removeItem(SCHRITT_KEY); } catch (e) {}
+        try { localStorage.removeItem(FERTIG_KEY); localStorage.removeItem(SCHRITT_KEY); localStorage.removeItem(_fertigKey()); localStorage.removeItem(_schrittKey()); } catch (e) {}
         if (modus === 'neu') {
           ['dp_tour_completed_v1', 'dp_tour_seen_v1', 'dp_tour_offer_count', 'dp_tour_offer_day']
             .forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
@@ -1320,8 +1446,19 @@ window.DealPilotOnboarding = (function () {
         zeige(0);
         return;
       }
-      zeige(parseInt(_ls(SCHRITT_KEY) || '0', 10) || 0);
+      zeige(parseInt(_ls(_schrittKey()) || '0', 10) || 0);
     })();
+  }
+
+  /* v2249 · Nach der Anmeldung erneut fragen. Die Anmeldung laedt die
+     Seite nicht neu; geprueft wurde bisher nur beim Laden - als noch
+     niemand angemeldet war. Gibt zurueck, ob das Setup jetzt kommt. Der
+     Merker `dp_auth_flow` gehoert zum Anmeldeweg und ist hier vorbei. */
+  function pruefen() {
+    try { sessionStorage.removeItem('dp_auth_flow'); } catch (e) {}
+    if (!_faellig()) return false;
+    setTimeout(_vielleichtZeigen, 300);
+    return true;
   }
 
   if (document.readyState === 'loading') {
@@ -1333,8 +1470,13 @@ window.DealPilotOnboarding = (function () {
   return {
     zeige: zeige,
     istFertig: istFertig,
+    pruefen: pruefen,
+    leeresObjekt: leeresObjekt,
     zuruecksetzen: function () {
-      try { localStorage.removeItem(FERTIG_KEY); localStorage.removeItem(SCHRITT_KEY); } catch (e) {}
+      try {
+        localStorage.removeItem(FERTIG_KEY); localStorage.removeItem(SCHRITT_KEY);
+        localStorage.removeItem(_fertigKey()); localStorage.removeItem(_schrittKey());
+      } catch (e) {}
     },
     /* ══ v1743 · DAS SETUP NOCH EINMAL SEHEN ══
        Marcel am 01.10.2026: „Ich würde auch gerne das einmal ausprobieren.
@@ -1354,7 +1496,7 @@ window.DealPilotOnboarding = (function () {
     nochmal: function (auchTour) {
       try {
         localStorage.removeItem(FERTIG_KEY);
-        localStorage.removeItem(SCHRITT_KEY);
+        localStorage.removeItem(SCHRITT_KEY); localStorage.removeItem(_fertigKey()); localStorage.removeItem(_schrittKey());
         if (auchTour) {
           ['dp_tour_completed_v1', 'dp_tour_seen_v1', 'dp_tour_offer_count', 'dp_tour_offer_day']
             .forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });

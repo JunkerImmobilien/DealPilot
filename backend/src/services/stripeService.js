@@ -135,7 +135,12 @@ async function createCheckoutSession({ userId, email, name, priceId, successUrl,
       ? { discounts: [{ promotion_code: promoId }] }
       : { allow_promotion_codes: true }),
     billing_address_collection: 'required',
-    automatic_tax: { enabled: false }, // Enable when Stripe Tax is configured
+    /* v2248 · die abgefragte Anschrift auch am KUNDEN speichern - sonst
+       landet sie nur an der Zahlungsart, und die Rechnung hat keinen
+       Empfaenger mit Anschrift (ein Live-Kunde ohne Adresse gemessen). */
+    customer_update: { address: 'auto', name: 'auto' },
+    locale: 'de',
+    automatic_tax: { enabled: false }, // Kleinunternehmer § 19 UStG - keine Steuer
     subscription_data: {
       metadata: { userId }
     },
