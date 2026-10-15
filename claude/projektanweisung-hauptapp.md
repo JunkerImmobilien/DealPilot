@@ -38761,6 +38761,25 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2239–v2243 · Ankauf-Stand, Steuer ohne zvE, Zinsmarge, Ampeln nach Schwellen; Konto info@ auf Prod (15.10.2026)
+- **Was:** Marcels Prüfliste vom 15.10.
+  - **v2239:** Ruhender Ankauf-Stand ging nach Neuladen beim nächsten Speichern verloren (`_dpAnkaufRuhend` neu, beim erneuten Gewinnen kommt DER Stand zurück). „Rückgängig“ beim Auto-Festschreiben fror sofort neu ein (`_autoAus`). Steuer-Reiter ohne zvE rechnete still mit 65.891 € — jetzt `_dpZveErsatz()`: das zvE, dessen Grenzsteuersatz dem eingestellten entspricht. Bot-Kaufempfehlung bekommt `zielBmr`/`lageklasse` (fiel still auf 6 %).
+  - **v2242:** Zinsmarge 0,25/0,40/0,80 auf den Pfandbrief (vorher Backend 0,20/0,30/0,55, Frontend 0,40/0,70/1,00, Kommentare 0,8/1,2/1,8). Stufen bis 60 / bis 80 / über 80 %. Ersatzwerte auf 14.10. gezogen.
+  - **v2240 (Agent, Merge v2243):** `schwellen.js` (`DealPilotSchwellen.get`), Kerne `dscr-engine`/`qc-heuristik` nehmen Schwellen als Parameter; alle Ampeln folgen `min_dscr`/`max_ltv`/`min_cashflow` (Vorgabe 1,2/90/0). PDF „OK“ ab `min_dscr` statt 1,5. Bot-Ampel mit Vorgabe-Schwellen.
+  - **Prod-Daten (Freigabe Marcel):** `info@junker-immobilien.io` ergänzt um 15 Staging-Objekte (20 übernommen, 5 überschrieben, 19 Testobjekte draußen), 268 Steuerzeilen, 26 Bemerkungen, 5 Bewertungen, 20 Steuer-Schnappschüsse, 8 Einstellungen; Passwort-Hash = Staging. Abo/Stripe unverändert. Probelauf mit ROLLBACK vorher.
+- **Commit:** `06715591` (v2239), `52b6f344` (v2242), `50e3487e` + Merge `42029272` (v2240/v2243)
+- **Nachweis:**
+  - Sicherung Prod vorher: `haupt-20261015-0535.sql.gz` (11 MB, 71 Tabellen), `mb-20261015-0535.sql.gz` (25 MB, 32 Tabellen). Nach Import 25 Objekte, md5 des Passwort-Hashs auf beiden Servern gleich, `/auth/me` 401.
+  - `_dpZveErsatz` bei 20/30/35/42/45 % trifft den Grenzsteuersatz genau (zvE 15.091/34.503/49.042/69.185/277.799). `collectData` schreibt `_ankauf_ruhend` aus dem Merker.
+  - `/market-rates/pfandbrief` live: Marge 0,25/0,40/0,80, 10 J standard **4,33 %** (Vergleichsportal 4,34 %; vorher 4,23 %).
+  - Schwellen: Vorgabe 1,2/90/0; mit 1,4 → DSCR 1,3 `warn`, ohne Parameter `good`. Buster SAUBER, Score-Ketten gleich (216), Kerne gespiegelt, Gold-Audit RC=0.
+- **Rest:**
+  - `majunker@gmx.net` auf Prod löschen — Marcel führt den DELETE selbst aus (Befehl im Chat).
+  - Zins dynamisch (Bund täglich + Aufschlag aus Bundesbank-Bauzinsstatistik monatlich + LTV-Staffel) — Vorschlag liegt bei Marcel.
+  - Gespeicherte Scores werden nach Gewichtsänderung nicht neu gerechnet; Bot nutzt Standardgewichte (Gewichte nur im Browser).
+  - Statische Hilfetexte (help.js, tooltip-content.js, tour-content.js) nennen weiter 1,2/85.
+  - Marktbewertung Gewerbe/Grundstück/Sanierung: Agent arbeitet.
+
 ### ÜBERGABE 14.10.2026 abends · Stand für den nächsten Chat
 - **Stand:** Produktion = Staging auf **v2238a** (`1fc4be87`, Prod-Rollout 21). Letzte Commits nur Doku. Keine offene Migration, kein ungespeicherter Code.
 - **Offen (Backlog N76, N72):**
