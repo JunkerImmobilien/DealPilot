@@ -2519,6 +2519,7 @@
 
   /* ── MODUL 10b · BMF-KAUFPREISAUFTEILUNG ──────────────────────── */
   function r6Bmf() { return q('#bmfOverlay'); }
+  function r6Sichtbar(w, sel) { return w ? [].filter.call(w.querySelectorAll(sel), function (x) { return x.offsetWidth > 0; })[0] || null : null; }
   function r6BmfPane() { return q('#bmfOverlay .bmfmo-pane.active'); }
   async function r6BmfWeiter() { var b = q('#btnBmfNext'); if (b) b.click(); await warte(1600); }
   DREHBUECHER['reihe-bmf'] = {
@@ -2554,14 +2555,16 @@
         await b2oZeile(s, 'Schritt 2 · Die Aufteilung', 'Grundstück ' + wert('bmf_gsfl') + ' m², Bodenrichtwert <b>' + wert('bmf_brw') + ' €/m²</b>, Anteil ' + wert('bmf_mea') + ' % — alles aus dem Objekt übernommen.');
         var j = rhIm('#bmfOverlay', /Nach Jacoby/), jt = j ? r6Text(j.closest('div') || j) : '';
         var am = /([\d,]+)\s*%\s*Gebäude per Ertragswert/.exec(r6Inner(r6BmfPane())), jm = /Nach Jacoby[^:]*:\s*([\d,]+ %)/.exec(jt);
-        await zeige(function () { var e = rhIm('#bmfOverlay', /Nach Jacoby/); return e && (e.closest('div[class]') || e); }, 8);
+        var jz = q('#bmfJacobyZeile'); if (jz) jz.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(function () { return q('#bmfJacobyZeile') || rhIm('#bmfOverlay', /Nach Jacoby/); }, 8);
         await b2oZeile(s, 'Schritt 2 · Die Aufteilung', 'Zum Vergleich rechnet DealPilot die umgekehrte Ertragswertmethode (BFH IX R 12/21) mit: <b>' + (jm ? jm[1] : '–') + ' Gebäude</b>.');
       },
       async function (s) {   /* 4 · Schritt 3: vier Varianten */
         await r6BmfWeiter();
-        await warteAuf(function () { var p = r6BmfPane(); return p && p.id === 'p-afa' && p.querySelector('table'); }, 6000);
+        await warteAuf(function () { var p = r6BmfPane(); return p && p.id === 'p-afa' && r6Sichtbar(p, 'table'); }, 6000);
         await warte(600);
-        await zeige(function () { var p = r6BmfPane(); return p && p.querySelector('table'); }, 6);
+        await zeige(function () { var p = r6BmfPane(); return p && r6Sichtbar(p, 'table'); }, 6);
         var tt = r6Inner(r6BmfPane());
         var g = /Gebäude %\s+([\d,]+ %)\s+([\d,]+ %)\s+([\d,]+ %)\s+([\d,]+ %)/.exec(tt), a = /AfA Gebäude\/Jahr\s+([\d.]+ €)\s+([\d.]+ €)\s+([\d.]+ €)\s+([\d.]+ €)/.exec(tt);
         await b2oZeile(s, 'Schritt 3 · Amtlich und drei Abweichungen', 'Amtlich <b>' + (g ? g[1] : '–') + '</b> Gebäude — mit Boden −15/−20/−25 % bis ' + (g ? g[4] : '–') + '. AfA ' + (a ? a[1] + ' bis ' + a[4] : '–') + ' im Jahr.');
@@ -2580,14 +2583,14 @@
         await zeige(function () { return karte('optimiert'); }, 8);
         var kt = r6Text(karte('optimiert'));
         var gp = /Gebäude\s*([\d,]+ %)/.exec(kt), af = /AfA Gebäude \/ Jahr\s*([\d.]+ €)/.exec(kt), sc = /Risiko Score (\d)/.exec(kt);
-        await b2oZeile(s, 'Optimiert · Boden −20 %', 'Gebäude <b>' + (gp ? gp[1] : '–') + '</b>, AfA <b>' + (af ? af[1] : '–') + '</b> im Jahr' + (sc ? ' — Risiko-Score ' + sc[1] : '') + '. Mit Begründung vertretbar.');
+        await b2oZeile(s, 'Optimiert · Boden −20 %', 'Gebäude <b>' + (gp ? gp[1] : '–') + '</b>, AfA <b>' + (af ? af[1] : '–') + '</b> im Jahr' + (sc ? ' — Risiko-Score ' + sc[1] + ', gelb' : '') + '.');
       },
       async function (s) {   /* 6 · Bodenabschlag: 20 % */
         var t = q('#bmf-boden-tab'); if (t) t.click();
-        await warteAuf(function () { var p = r6BmfPane(); return p && p.id === 'p-boden' && p.querySelector('table'); }, 6000);
+        await warteAuf(function () { var p = r6BmfPane(); return p && p.id === 'p-boden' && r6Sichtbar(p, 'table'); }, 6000);
         await warte(800);
         var p = r6BmfPane(); if (p) { var sc = p.closest('.bmfmo-body'); if (sc) sc.scrollTop = 0; }
-        await zeige(function () { var x = r6BmfPane(); return x && x.querySelector('table'); }, 6);
+        await zeige(function () { var x = r6BmfPane(); return x && r6Sichtbar(x, 'table'); }, 6);
         var tt = r6Inner(r6BmfPane());
         var kopf = /MIT\s+(\d+)\s*%\s*ABSCHLAG/i.exec(tt), bo = /davon Grund und Boden\s+([\d.]+ €)\s+([\d.]+ €)/.exec(tt), af = /AfA pro Jahr bei [\d,]+ %\s+([\d.]+ €)\s+([\d.]+ €)\s+([+−\-]?[\d.]+ €)/.exec(tt);
         await b2oZeile(s, 'Bodenabschlag ' + (kopf ? kopf[1] : '20') + ' %', 'Die amtliche Zahl bleibt stehen, das Szenario daneben: Boden <b>' + (bo ? bo[2] : '–') + '</b> statt ' + (bo ? bo[1] : '–') + ', AfA <b>' + (af ? af[2] : '–') + '</b> statt ' + (af ? af[1] : '–') + ' im Jahr.');
@@ -2597,7 +2600,8 @@
         var box = k && (k.closest('div[class]') || k.parentElement); if (box) box.scrollIntoView({ block: 'center' });
         await warte(500);
         await zeige(function () { var e = rhIm('#bmfOverlay .bmfmo-pane.active', /Text für den Kaufvertrag/i); var b = e; for (var i = 0; i < 3 && b && !/kopieren/i.test(b.textContent); i++) b = b.parentElement; return b || e; }, 8);
-        await b2oZeile(s, 'Die Notarklausel', 'Der <b>Text für den Kaufvertrag</b> steht fertig da — mit Begründung zum Kopieren für den Notar. Ohne Begründung bleibt ein Abschlag angreifbar.');
+        var kl = (q('#bmf-boden-klausel-text') || {}).value || '', kb = /Grund und Boden entfallen\s+([\d.,]+\s*€)/.exec(kl), kg = /Gebäude[^.]*?entfallen\s+([\d.,]+\s*€)/.exec(kl);
+        await b2oZeile(s, 'Die Notarklausel', 'Der <b>Text für den Kaufvertrag</b> steht fertig da' + (kb && kg ? ': Boden ' + kb[1] + ', Gebäude ' + kg[1] : '') + ' — zum Kopieren für den Notar. Die Begründung gehört hinein.');
       },
       async function (s) {   /* 8 · Absprünge */
         var b1 = r6Knopf('#bmfOverlay .bmfmo-pane.active', /Restnutzungsdauer berechnen/);
