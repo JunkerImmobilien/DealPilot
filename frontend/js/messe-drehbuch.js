@@ -1363,7 +1363,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2263';
+  var RH_BUSTER = 'v2263b';
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel/i;
@@ -1382,7 +1382,9 @@
   }
   function rhJ(x) { return new Response(JSON.stringify(x), { status: 200, headers: { 'Content-Type': 'application/json' } }); }
   function rhStrom(st) {
-    var D = window.DPM_REIHE_DATEN, steps = D.schritte[st] || [], p = JSON.parse(JSON.stringify(D.mb[st])), enc = new TextEncoder(), i = 0;
+    /* v2263 · ein Lauf kann einen eigenen Satz spielen (Überblick 2: Westerfeldstr.) */
+    var D0 = window.DPM_REIHE_DATEN, D = (_rh && _rh.satz && D0[_rh.satz] && D0[_rh.satz].mb[st]) ? D0[_rh.satz] : D0;
+    var steps = D.schritte[st] || [], p = JSON.parse(JSON.stringify(D.mb[st])), enc = new TextEncoder(), i = 0;
     if (_rh) _rh.berichte.push({ stufe: st, at: new Date().toISOString(), p: p });
     var rs = new ReadableStream({ pull: function (c) {
       return new Promise(function (ok) {
@@ -2442,7 +2444,7 @@
     /* v2263 · die Analyse trägt die Kennung ihres Objekts (_fuer.objekt_id) - an
        der Kopie hieße es sonst „gehört zu einem anderen Objekt". Ohne Kennung
        prüft die App nur den Zahlenabdruck, wie bei jeder Analyse. */
-    var ai = o.ai_analysis;
+    var ai = opt.ohneAnalyse ? null : o.ai_analysis;   /* v2263: Überblick 2 braucht keine (und das PDF druckte sie) */
     try { var aj = typeof ai === 'string' ? JSON.parse(ai) : ai; if (aj && aj._fuer) { delete aj._fuer.objekt_id; ai = JSON.stringify(aj); } } catch (e) {}
     var neu = await Auth.apiCall('/objects', { method: 'POST', body: { data: d, aiAnalysis: ai, photos: o.photos || [] } });
     var nid = neu && (neu.id || (neu.data && neu.data.id) || (neu.object && neu.object.id));
@@ -2661,8 +2663,8 @@
         await r6Ende(zb);
         await zeige(function () { return r6BmfKarte('optimiert'); }, 8);
         var kt = r6Text(r6BmfKarte('optimiert'));
-        var gp = /Gebäude\s*([\d,]+ %)/.exec(kt), af = /AfA Gebäude \/ Jahr\s*([\d.]+ €)/.exec(kt), sc = /Risiko Score (\d)/.exec(kt);
-        await b2oZeile(s, 'Optimiert · Boden −20 %', 'Gebäude <b>' + (gp ? gp[1] : '–') + '</b>, AfA <b>' + (af ? af[1] : '–') + '</b> im Jahr' + (sc ? ' — Risiko-Score ' + sc[1] + ', gelb' : '') + '.');
+        var gp = /Gebäude\s*([\d,]+ %)/.exec(kt), af = /AfA Gebäude \/ Jahr\s*([\d.]+ €)/.exec(kt), sc = /Risiko Score (\d)/.exec(kt), se = /Steuerersparnis\s*~?\s*([\d.]+ €)/.exec(kt);
+        await b2oZeile(s, 'Optimiert · Boden −20 %', 'Gebäude <b>' + (gp ? gp[1] : '–') + '</b>, AfA <b>' + (af ? af[1] : '–') + '</b> im Jahr' + (se ? ', rund ' + se[1] + ' Steuerersparnis' : '') + (sc ? ' — Risiko-Score ' + sc[1] + ', gelb' : '') + '.');
       },
       async function (s) {   /* 6 · Bodenabschlag: 20 % */
         var t = q('#bmf-boden-tab'); if (t) t.click();
@@ -3149,6 +3151,119 @@
         await zeige(k, 8);
         var t = r6Inner(k()), e = /Empfehlung\s+([^\t\n]+)\t\s*([^\n]+)/.exec(t), st = /Stand\s+([\d.]+)\s+([\d.]+)/.exec(t);
         await b2oZeile(s, 'Die Pilot-Analyse: damals und heute', 'Zwei Spalten: was der Pilot beim Ankauf sagte und was er heute sagt' + (e ? ' — hier beide <b>' + e[1].trim() + '</b>' : '') + '. Ein neuer Abruf füllt die Spalte „Heute“.', 600);
+      }
+    ]
+  };
+
+  /* ═══ ÜBERBLICK 2 · VOM NEUEN OBJEKT ZUM DEALSCORE UND INVESTMENT-PDF (v2263)
+     Videoreihe.md, Ebene A. Kopie der Westerfeldstr. 140 (ohne Analyse, ohne
+     Ankauf-Stand), am Ende gelöscht. Marktbewertung Stufe 2 = Bericht 214,
+     einmal echt erzeugt (DPM_REIHE_DATEN.westerfeld), hier abgespielt.
+     Das Investment-PDF entsteht lokal (exportPDFBlob, kein Abruf, kein
+     Download) und wird im Bild gezeigt. Für die Dauer des Laufs trägt es
+     KEINE persönlichen Kontaktdaten: branding.get liefert Name, Anschrift,
+     Telefon und E-Mail leer (Marcel: Kontakt & Logo nie ins Bild). */
+  var _ue2Pdf = null, _ue2Brand = null;
+  function ue2Aufraeumen() {
+    var o = q('#dpm-pdf'); if (o && o.parentNode) o.parentNode.removeChild(o);
+    if (_ue2Pdf) { try { URL.revokeObjectURL(_ue2Pdf); } catch (e) {} _ue2Pdf = null; }
+    if (_ue2Brand) { try { DealPilotConfig.branding.get = _ue2Brand; } catch (e) {} _ue2Brand = null; }
+    r12Zu(); rhAufraeumen();
+  }
+  async function ue2PdfSeite(n) {
+    var o = el('dpm-pdf');
+    o.style.cssText = 'position:fixed;left:4%;right:4%;top:3%;bottom:4%;z-index:100002;background:#2b2b2b;border:2px solid ' + G + ';border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)';
+    o.innerHTML = '<iframe title="Investment-PDF" style="width:100%;height:100%;border:0" src="' + _ue2Pdf + '#page=' + n + '&toolbar=0&navpanes=0&view=FitH"></iframe>';
+    await warte(1800);
+  }
+  DREHBUECHER['reihe-ueberblick2'] = {
+    titel: 'Vom neuen Objekt zum DealScore', unterzeile: 'Der ganze Weg am Stück', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }], aufraeumen: ue2Aufraeumen,
+    szenen: [
+      async function (s) {   /* 1 · neues Objekt */
+        await r6KopieStart(R11_WESTERFELD, { ohneAnkauf: true, ohneAnalyse: true });
+        if (_rh) _rh.satz = 'westerfeld';
+        await zeige(sbKnopf('new'), 10);
+        await b2oZeile(s, 'Ein neues Objekt', 'Links „Neues Objekt“ — oder du übernimmst ein Ergebnis aus dem Quick Boarding (Überblick 1).');
+        await r11Beispiel(s, ' Adresse, Objektart, Fläche, Baujahr — mehr braucht der Start nicht.');
+      },
+      async function (s) {   /* 2 · Marktbewertung Stufe 2 */
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await stufeWaehlen(2);
+        await zeige(stufeZeile(2), 8);
+        await b2oZeile(s, 'Marktbewertung · Stufe 2', 'Mit Kaufpreis und Miete: <b>bereit</b>. Ein Klick — DealPilot holt Lage, Vergleichspreise und Mieten.');
+        await rhStufeAbrufen(2, function () { s.zeile('Marktbewertung · Stufe 2', 'Standort, Vergleichsdaten, Bodenrichtwert — Schritt für Schritt.'); });
+        var k = mbKarteH() || {};
+        if (m) m.scrollTop = 0;
+        await zeige(function () { return q('#avsec'); }, 8);
+        var ein = kartenText(/EINORDNUNG\s+(.+?)\s+GENAUIGKEIT/i);
+        await b2oZeile(s, 'Marktwert und Lage', 'Marktwertindikation <b>' + (eur(k.mw && k.mw.med) || '–') + '</b>' + (ein ? ' — dein Preis: <b>' + ein + '</b>' : '') + '. Mikrolage ' + (k.mikro || '–') + ', Makrolage ' + (k.makro || '–') + '.');
+      },
+      async function (s) {   /* 3 · Investition */
+        reiter('s1'); await warte(900);
+        await zeigeGruppe(feldVon('kp'), function () { return q('#gi_val') && q('#gi_val').closest('.total-bar'); }, 8);
+        var gest = (function () { var h = q('#s1 .grest-auto-hint'), x = h && /ermittelt:\s*(.+?)\s+([\d.,]+)\s*%/.exec(h.textContent); return x ? x[1] + ' ' + r6Pz(x[2]) + ' %' : r6Pz(wert('gest_p')) + ' %'; })();
+        await b2oZeile(s, 'Investition', 'Kaufpreis <b>' + eur(zahl('kp')) + '</b>. Nebenkosten: Makler ' + r6Pz(wert('makler_p')) + ' %, Notar ' + r6Pz(wert('notar_p')) + ' %, Grundbuch ' + r6Pz(wert('gba_p')) + ' %, Grunderwerbsteuer ' + gest + ' nach PLZ — zusammen <b>' + r6Id('nk_sum') + '</b>.');
+      },
+      async function (s) {   /* 4 · Miete */
+        reiter('s2'); await warte(900);
+        await zeigeGruppe(feldVon('nkm'), r6Gruppe('ds2_marktmiete'), 8);
+        var mm = wert('ds2_marktmiete');
+        await b2oZeile(s, 'Miete', 'Ist: <b>' + eur(zahl('nkm')) + '</b> kalt im Monat, ' + r6Id('miete_qm') + (mm ? ' — Marktmiete <b>' + mm + ' €/m²</b>' : '') + '. Der Abstand ist dein Potenzial.');
+      },
+      async function (s) {   /* 5 · Finanzierung */
+        reiter('s3'); await warte(1000);
+        await warteAuf(function () { return /\d/.test(r6Id('mrpf-top-rate-10')); }, 5000);
+        await zeigeGruppe(feldVon('ek'), feldVon('d1t'), 8);
+        await b2oZeile(s, 'Finanzierung', 'Eigenkapital ' + eur(zahl('ek')) + ', Darlehen <b>' + eur(zahl('d1')) + '</b> zu ' + r6Pz(wert('d1z')) + ' % — der Marktzins für 10 Jahre liegt bei ' + (r6Id('mrpf-top-rate-10') || '–') + '.');
+        await zeige(function () { return q('#d1_rate') && q('#d1_rate').closest('.f'); }, 10);
+        await b2oZeile(s, 'Finanzierung', 'Rate <b>' + r6Id('d1_rate') + '</b> im Monat, Beleihung ' + (r6Id('r-ltv') || '–') + '.');
+      },
+      async function (s) {   /* 6 · Bewirtschaftung */
+        reiter('s4'); await warte(900);
+        await zeige(function () { return q('#r-bwk') && q('#r-bwk').closest('.card'); }, 8);
+        await b2oZeile(s, 'Bewirtschaftung', 'Laufende Kosten <b>' + r6Id('r-bwk') + '</b> im Jahr, ' + r6Id('r-bwk-pct') + ' der Kaltmiete — umlagefähig und nicht umlagefähig getrennt, mit Rücklage.');
+      },
+      async function (s) {   /* 7 · Steuer */
+        reiter('s3-tax'); await warte(1100);
+        await zeigeGruppe(feldVon('afa_satz'), function () { return q('#afa_kalk') && q('#afa_kalk').closest('.f'); }, 8);
+        await b2oZeile(s, 'Steuer', 'Gebäudeanteil ' + r6Pz(wert('geb_ant')) + ' %, AfA ' + r6Optionstext('afa_satz') + ' — <b>' + r6Id('afa_kalk') + '</b> Abschreibung im Jahr.');
+        var e = r6TaxItem(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/);
+        if (e) { var bx = e.closest('.card') || e; bx.scrollIntoView({ block: 'center' }); await warte(400); await zeige(function () { return r6TaxItem(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/); }, 8); }
+        await b2oZeile(s, 'Steuer', 'Ergebnis aus Vermietung: <b>' + (r6TaxWert(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/) || '–') + '</b> im ersten Jahr — mit deinem Grenzsteuersatz verrechnet.');
+      },
+      async function (s) {   /* 8 · Kennzahlen mit Ampel */
+        reiter('s6'); await warte(1300);
+        await warteAuf(function () { return q('#s6 .kpi-eval-card'); }, 6000);
+        await zeige(function () { return q('#s6 .kpi-eval-card'); }, 8);
+        function f(re, nm) { var x = r12Bewertung(re); return x ? nm + ' <b>' + x.wert + '</b> ' + x.wort.toLowerCase() : ''; }
+        await b2oZeile(s, 'Kennzahlen mit Ampel', [f(/^Cashflow vor/, 'Cashflow'), f(/^DSCR/, 'DSCR'), f(/^Nettomiet/, 'Nettorendite'), f(/^LTV/, 'LTV')].filter(Boolean).join(', ') + '.');
+      },
+      async function (s) {   /* 9 · DealScore und Investor-DealScore */
+        await zeigeGruppe(function () { var k = r12Karte(0)(); return k && k.querySelector('.dpsh-headrow'); }, function () { var k = r12Karte(1)(); return k && k.querySelector('.dpsh-headrow'); }, 6);
+        var a = r12Kopf(0), b = r12Kopf(1);
+        await b2oZeile(s, 'Das Urteil', 'DealPilot Score <b>' + (a.score || '–') + ' · ' + r12Wort(a.wort) + '</b>, Investor-DealScore <b>' + (b.score || '–') + ' · ' + r12Wort(b.wort) + '</b> — Modul 12 zeigt, wie sie entstehen.');
+      },
+      async function (s) {   /* 10 · Investment-PDF */
+        reiter('s8'); await warte(1300);
+        var zeileFn = function () { var e = rhIm('#s8', /^\s*Investment-PDF/); return e && (e.closest('[class*=row]') || e.parentElement); };
+        await warteAuf(zeileFn, 5000);
+        await zeige(zeileFn, 8);
+        var zb = r6Beginn(s, 'Das Investment-PDF', 'Ein Klick — der Business-Case für die Bank: Kaufpreis, Finanzierung, Cashflow, DSCR und LTV, Stresstest.');
+        try { _ue2Brand = DealPilotConfig.branding.get; DealPilotConfig.branding.get = function () { var b = _ue2Brand.apply(this, arguments) || {}; var c = {}; Object.keys(b).forEach(function (k) { c[k] = b[k]; }); ['name', 'role', 'address', 'plz', 'city', 'phone', 'email', 'website'].forEach(function (k) { c[k] = ''; }); return c; }; } catch (e) {}
+        var r = null; try { r = await window.exportPDFBlob(); } catch (e) {}
+        try { if (_ue2Brand) { DealPilotConfig.branding.get = _ue2Brand; _ue2Brand = null; } } catch (e) {}
+        DPM_REIHE.pdf = r && r.blob ? { bytes: r.blob.size, name: r.filename } : null;
+        await r6Ende(zb);
+        if (!(r && r.blob)) { await b2oZeile(s, 'Das Investment-PDF', 'Hier entsteht das PDF.'); return; }
+        _ue2Pdf = URL.createObjectURL(r.blob);
+        zeige(null); kegelHoch(true);
+        await ue2PdfSeite(1);
+        await b2oZeile(s, 'Deckblatt', 'Objekt, Kaufpreis, Eckdaten — in deiner Marke oder als neutrale Bankfassung.');
+        await ue2PdfSeite(2);
+        await b2oZeile(s, 'Die Kennzahlen', 'Executive Summary: Rendite, Cashflow, DSCR, LTV — mit denselben Ampeln wie in der App.');
+        await ue2PdfSeite(4);
+        await b2oZeile(s, 'Der Cashflow-Plan', 'Jahr für Jahr: Miete, Zins, Tilgung, Steuer, Cashflow — das will die Bank sehen.', 600);
       }
     ]
   };

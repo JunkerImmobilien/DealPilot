@@ -76,7 +76,7 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
 <div id="start" hidden><div><button type="button" id="los">Aufnahme starten</button><p>Leertaste startet ebenfalls · Esc beendet</p></div></div>
 
 <script src="js/whitelabel-override.js?v=v2149"></script>
-<script src="js/messe-effekte.js?v=v2253a"></script>
+<script src="js/messe-effekte.js?v=v2263"></script>
 <script>
 (function () {
   'use strict';
@@ -120,7 +120,10 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     '13': { hinweis: 'Vorführung · Kopie eines Demo-Objekts · nichts wird abgeschickt', messe: 'reihe-dealaktion', titel: 'Deal-Aktion', unter: 'Bereit für die Bank, Unterlagen, Netzwerk — der nächste Schritt nach der Analyse.',
             spruch: 'Checkliste abgehakt —', spruch2: 'bereit zum Abflug.', weiter: 'Modul 14 · Vom Ankauf in den Bestand' },
     '14': { hinweis: 'Vorführung · Kopie eines Demo-Objekts', messe: 'reihe-bestand', titel: 'Vom Ankauf in den Bestand', unter: 'Gewonnen, eingefroren, verglichen — Plan gegen heute.',
-            spruch: 'Gelandet.', spruch2: 'Jetzt zählt der Reiseflug.', weiter: 'Modul 15 · Steuer im Bestand' }
+            spruch: 'Gelandet.', spruch2: 'Jetzt zählt der Reiseflug.', weiter: 'Modul 15 · Steuer im Bestand' },
+    /* v2263 · Überblick (Ebene A): art statt „Modul", nr im Intro */
+    'ue2': { art: 'Überblick', nr: '2', hinweis: 'Vorführung · Kopie eines Demo-Objekts · aufgezeichnete Marktbewertung', messe: 'reihe-ueberblick2', titel: 'Vom neuen Objekt zum DealScore und Investment-PDF', unter: 'Der ganze Weg am Stück — in fünf Minuten.',
+            spruch: 'Vom ersten Eintrag', spruch2: 'bis zur Bankmappe.', weiter: 'Basismodule 02–10 · jeder Bereich im Detail' }
   };
   var MODUL = P.get('modul'), M = null;
   if (MODUL && REIHE[MODUL]) M = REIHE[MODUL];
@@ -160,9 +163,9 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
   if (M) {
     var RT = { reihe: 'So funktioniert DealPilot', modul: MODUL };
     T = { intro: T.intro, outro: T.outro };
-    if (INTRO === 'reihe') T.intro = { reihe: RT.reihe, modul: MODUL, titel: M.titel, unter: M.unter };
-    if (OUTRO === 'reihe') T.outro = { reihe: RT.reihe, modul: MODUL, spruch: M.spruch, spruch2: M.spruch2, weiter: M.weiter || '', url: String(QR).replace(/^https?:\/\//, '') };
-    document.title = 'Messe-Studio · Modul ' + MODUL + ' · DealPilot';
+    if (INTRO === 'reihe') T.intro = { reihe: RT.reihe, modul: M.nr || MODUL, art: M.art, titel: M.titel, unter: M.unter };
+    if (OUTRO === 'reihe') T.outro = { reihe: RT.reihe, modul: M.nr || MODUL, art: M.art, spruch: M.spruch, spruch2: M.spruch2, weiter: M.weiter || '', url: String(QR).replace(/^https?:\/\//, '') };
+    document.title = 'Messe-Studio · ' + (M.art || 'Modul') + ' ' + (M.nr || MODUL) + ' · DealPilot';
   }
 
   function warte(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
