@@ -150,7 +150,7 @@
     '@keyframes iWolkeL{to{transform:translateX(-60cqw);opacity:.2}}@keyframes iWolkeR{to{transform:translateX(60cqw);opacity:.2}}@keyframes iWolkeU{to{transform:translateY(30cqw);opacity:0}}',
 
     /* INTRO 8 · Blaupause (Haus zeichnet sich) */
-    '.i-plan{background:#060a10;background-image:linear-gradient(rgba(201,168,76,.06) .06cqw,transparent .06cqw),linear-gradient(90deg,rgba(201,168,76,.06) .06cqw,transparent .06cqw);background-size:2.4cqw 2.4cqw}',
+    '.i-plan{background:#060a10;background-image:linear-gradient(color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 6%,transparent) .06cqw,transparent .06cqw),linear-gradient(90deg,color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 6%,transparent) .06cqw,transparent .06cqw);background-size:2.4cqw 2.4cqw}',
     '.i-plan svg{position:absolute;left:50%;top:36%;width:24cqw;transform:translate(-50%,-50%)}',
     '.i-plan path{fill:none;stroke:' + GH + ';stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:900;stroke-dashoffset:900;animation:iZeichne 2.4s .3s ease-in-out forwards}',
     '@keyframes iZeichne{to{stroke-dashoffset:0}}',
@@ -158,7 +158,7 @@
     '.i-plan .unten{position:absolute;left:0;right:0;bottom:4.5cqw;text-align:center;opacity:0;animation:mfxZoom 1s 2.9s forwards}',
 
     /* INTRO 9 · Flugroute über Karte */
-    '.i-route{background:#050505;background-image:radial-gradient(circle,rgba(201,168,76,.18) .12cqw,transparent .14cqw);background-size:1.8cqw 1.8cqw}',
+    '.i-route{background:#050505;background-image:radial-gradient(circle,color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 18%,transparent) .12cqw,transparent .14cqw);background-size:1.8cqw 1.8cqw}',
     '.i-route svg{position:absolute;inset:0;width:100%;height:100%}',
     '.i-route .bahnp{fill:none;stroke:' + GH + ';stroke-width:.35;stroke-dasharray:2 1.2;stroke-dashoffset:0}',
     '.i-route .zug{fill:none;stroke:' + GH + ';stroke-width:.5;stroke-dasharray:160;stroke-dashoffset:160;animation:iZeichne 2.6s .4s ease-in-out forwards}',
@@ -179,7 +179,7 @@
     '.k-ring .hg{fill:none;stroke:#2a2418;stroke-width:10}.k-ring .vg{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:283;transition:stroke-dashoffset 1.6s cubic-bezier(.3,0,.2,1),stroke 1.6s}',
     '.k-ring .wert{position:absolute;inset:0;display:grid;place-items:center;font:700 3cqw "Space Grotesk"}',
     '.mfx-pille{display:inline-block;padding:.35cqw .8cqw;border-radius:9cqw;font:700 .8cqw "JetBrains Mono";letter-spacing:.2em;border:.06cqw solid currentColor}',
-    '.k-spanne .bar{position:relative;height:1.2cqw;border-radius:1cqw;background:linear-gradient(90deg,#D8564C,#E8CC7A 50%,#3FA56C);margin:2.4cqw 0 1cqw}',
+    '.k-spanne .bar{position:relative;height:1.2cqw;border-radius:1cqw;background:linear-gradient(90deg,#D8564C,var(--wl-e8cc7a,#E8CC7A) 50%,#3FA56C);margin:2.4cqw 0 1cqw}',
     '.k-spanne .mk{position:absolute;top:50%;width:2cqw;height:2cqw;margin:-1cqw;border-radius:50%;background:#FDFCFA;box-shadow:0 0 0 .3cqw #050505,0 0 1.4cqw ' + GH + ';left:0;transition:left 1.6s cubic-bezier(.3,0,.2,1)}',
     '.k-spanne .stufen{display:flex;justify-content:space-between;font:600 .9cqw "JetBrains Mono";color:#8c8578}',
     '.k-spanne .stufen b{display:block;font:700 1.5cqw "Space Grotesk";color:#FDFCFA}',
@@ -238,7 +238,38 @@
     '.o-countdown svg{width:100%;height:100%;transform:rotate(-90deg)}',
     '.o-countdown .vg{fill:none;stroke:' + GH + ';stroke-width:6;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:0;animation:oUhr 5s linear forwards}',
     '@keyframes oUhr{to{stroke-dashoffset:283}}',
-    '.o-countdown .zahl{position:absolute;inset:0;display:grid;place-items:center;font:700 6cqw "Space Grotesk"}'
+    '.o-countdown .zahl{position:absolute;inset:0;display:grid;place-items:center;font:700 6cqw "Space Grotesk"}',
+
+    /* v2253 · REIHE „So funktioniert DealPilot" - ein Intro und ein Outro
+       für alle Module: Nummer, Titel, Unterzeile bzw. Spruch je Video */
+    '.r-grund{background:radial-gradient(70% 70% at 50% 38%,#17120a,#050505 70%)}',
+    '.r-grund::before{content:"";position:absolute;left:50%;bottom:-6%;width:200%;height:62%;transform:translateX(-50%) perspective(30cqw) rotateX(66deg);transform-origin:50% 100%;background:repeating-linear-gradient(90deg,transparent 0 6cqw,color-mix(in srgb,' + G + ' 10%,transparent) 6cqw 6.08cqw),linear-gradient(90deg,transparent 49.6%,color-mix(in srgb,' + G + ' 45%,transparent) 49.6% 50.4%,transparent 50.4%);opacity:0;animation:mfxAuf 1.6s .2s forwards}',
+    '.r-kopf{position:absolute;left:0;right:0;top:7cqw;text-align:center}',
+    '.r-mitte{position:absolute;left:0;right:0;top:12.5cqw;text-align:center}',
+    '.r-nr{display:inline-flex;align-items:center;gap:1.4cqw;margin-top:2.6cqw;opacity:0;animation:mfxZoom .9s 2.3s cubic-bezier(.2,.8,.2,1) forwards}',
+    '.r-nr i{font:700 1.15cqw "JetBrains Mono",monospace;font-style:normal;letter-spacing:.34em;text-transform:uppercase;color:' + G + '}',
+    '.r-nr b{display:inline-grid;place-items:center;min-width:7.4cqw;height:7.4cqw;padding:0 1.2cqw;border-radius:1.6cqw;font:700 4.8cqw/1 "Space Grotesk",sans-serif;color:#1a1407;background:linear-gradient(110deg,' + GH + ',' + G + ' 55%,' + GL + ');box-shadow:0 1cqw 3cqw color-mix(in srgb,' + G + ' 35%,transparent),inset 0 .1cqw 0 rgba(255,255,255,.35)}',
+    '.r-titel{font:700 4.6cqw/1.1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em;margin-top:2.2cqw;opacity:0;animation:mfxAuf .9s 2.9s cubic-bezier(.2,.8,.2,1) forwards}',
+    '.r-unter{font:400 1.75cqw/1.45 Inter,system-ui,sans-serif;color:#d9cfb8;margin:1.3cqw auto 0;max-width:62cqw;opacity:0;animation:mfxAuf .9s 3.5s cubic-bezier(.2,.8,.2,1) forwards}',
+    '.r-spur{position:absolute;left:0;right:0;top:9.6cqw;height:.14cqw;background:linear-gradient(90deg,transparent,' + GH + ',transparent);transform:scaleX(0);animation:rSpur 1.4s 1.2s cubic-bezier(.6,0,.2,1) forwards}',
+    '@keyframes rSpur{to{transform:scaleX(1)}}',
+    '.r-fl{position:absolute;top:8.2cqw;left:-6cqw;width:3cqw;fill:' + GH + ';transform:rotate(90deg);filter:drop-shadow(0 0 .8cqw ' + G + ');animation:rFlug 2.2s 1s cubic-bezier(.5,0,.4,1) forwards}',
+    '@keyframes rFlug{to{left:104cqw}}',
+    /* Outro: der Logo-Rahmen zieht sich, die Wortmarke glänzt */
+    '.r-logo{position:relative;width:52cqw;margin:0 auto}',
+    '.r-logo svg{display:block;width:100%;overflow:visible}',
+    '.r-logo rect{fill:none;stroke-width:5;stroke-dasharray:1;stroke-dashoffset:1;animation:rRahmen 2.4s .3s linear forwards;filter:drop-shadow(0 0 .9cqw color-mix(in srgb,' + G + ' 55%,transparent))}',
+    '@keyframes rRahmen{0%{stroke-dashoffset:1;animation-timing-function:cubic-bezier(.4,0,.6,1)}45%{stroke-dashoffset:.6474;animation-timing-function:cubic-bezier(.3,0,.3,1)}100%{stroke-dashoffset:0}}',
+    '.r-logo .w{position:absolute;inset:0;display:grid;place-items:center;font:700 9.6cqw/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.035em;color:#FDFCFA;opacity:0;animation:mfxZoom 1.1s 1.9s cubic-bezier(.2,.8,.2,1) forwards}',
+    '.r-logo .w b{font-weight:700;background:linear-gradient(110deg,' + G + ' 0%,' + G + ' 38%,#FFF6D8 50%,' + G + ' 62%,' + G + ' 100%);background-size:280% 100%;background-position:130% 0;-webkit-background-clip:text;background-clip:text;color:transparent;animation:mfxGlanz 2.2s 3s ease-in-out forwards}',
+    '.r-logo .fl{position:absolute;top:-1.4cqw;left:1.83cqw;width:3.2cqw;fill:' + GH + ';transform:rotate(90deg);filter:drop-shadow(0 0 .8cqw ' + G + ');opacity:0;animation:rLogoFlug 2.4s .3s linear forwards}',
+    '@keyframes rLogoFlug{0%{opacity:1;left:1.83cqw;animation-timing-function:cubic-bezier(.4,0,.6,1)}45%{opacity:1;left:46.97cqw;animation-timing-function:ease-out}60%{opacity:0;left:56cqw}100%{opacity:0;left:56cqw}}',
+    '.r-spruch{font:700 3.3cqw/1.2 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.015em;margin-top:3.4cqw;opacity:0;animation:mfxAuf .9s 3.4s cubic-bezier(.2,.8,.2,1) forwards}',
+    '.r-spruch em{font-style:normal;color:' + GH + '}',
+    '.r-fuss{position:absolute;left:0;right:0;bottom:4.6cqw;display:flex;justify-content:center;align-items:center;gap:2.4cqw;opacity:0;animation:mfxAuf .9s 4.3s forwards}',
+    '.r-fuss .mfx-kick{color:#8c8578}',
+    '.r-weiter{font:600 1.25cqw Inter,system-ui,sans-serif;color:#d9cfb8}',
+    '.r-weiter b{color:' + GH + ';font-weight:600}'
   ].join('\n');
 
   function stil() {
@@ -307,12 +338,12 @@
       html: function (t) {
         var ticks = ''; for (var k = 0; k <= 20; k++) { var a = (135 + k * 13.5) * Math.PI / 180, r2 = k % 5 ? 246 : 258;
           ticks += '<line x1="' + (310 + Math.cos(a) * 232) + '" y1="' + (310 + Math.sin(a) * 232) + '" x2="' + (310 + Math.cos(a) * r2) + '" y2="' + (310 + Math.sin(a) * r2) + '" stroke="#5a4a24" stroke-width="3"/>'; }
-        return '<div class="mfx-voll i-cockpit" style="position:absolute;inset:0"><svg viewBox="0 0 620 620"><defs><linearGradient id="mfxGold" x1="0" x2="1"><stop offset="0" stop-color="#b8932f"/><stop offset=".55" stop-color="#C9A84C"/><stop offset="1" stop-color="#E8CC7A"/></linearGradient></defs>' +
+        return '<div class="mfx-voll i-cockpit" style="position:absolute;inset:0"><svg viewBox="0 0 620 620"><defs><linearGradient id="mfxGold" x1="0" x2="1"><stop offset="0" style="stop-color:var(--wl-b8932f,#b8932f)"/><stop offset=".55" style="stop-color:var(--wl-c9a84c,#C9A84C)"/><stop offset="1" style="stop-color:var(--wl-e8cc7a,#E8CC7A)"/></linearGradient></defs>' +
           '<circle cx="310" cy="310" r="200" fill="none" stroke="#2a2418" stroke-width="16" stroke-linecap="round" stroke-dasharray="942 1257" transform="rotate(135 310 310)"/>' +
           '<circle class="fuell" cx="310" cy="310" r="200" fill="none" stroke="url(#mfxGold)" stroke-width="16" stroke-linecap="round" transform="rotate(135 310 310)"/>' + ticks +
-          '<g class="zeiger"><line x1="310" y1="310" x2="310" y2="140" stroke="#E8CC7A" stroke-width="6" stroke-linecap="round"/><circle cx="310" cy="310" r="16" fill="#E8CC7A"/></g>' +
+          '<g class="zeiger"><line x1="310" y1="310" x2="310" y2="140" style="stroke:var(--wl-e8cc7a,#E8CC7A)" stroke-width="6" stroke-linecap="round"/><circle cx="310" cy="310" r="16" style="fill:var(--wl-e8cc7a,#E8CC7A)"/></g>' +
           '<text x="310" y="460" text-anchor="middle" fill="#FDFCFA" style="font:700 120px Space Grotesk" data-zaehl="' + (+t.wert || 92) + '">0</text>' +
-          '<text x="310" y="500" text-anchor="middle" fill="#C9A84C" style="font:600 22px JetBrains Mono;letter-spacing:.3em">' + esc(String(t.kick).toUpperCase()) + '</text></svg>' +
+          '<text x="310" y="500" text-anchor="middle" style="fill:var(--wl-c9a84c,#C9A84C);font:600 22px JetBrains Mono;letter-spacing:.3em">' + esc(String(t.kick).toUpperCase()) + '</text></svg>' +
           '<div class="mfx-danach" style="animation-delay:3.2s;background:transparent"><div>' + marke() + '<div class="mfx-claim" style="margin-top:1.4cqw">' + esc(t.claim) + '</div></div></div></div>';
       },
       start: function (e) { zaehle(e.querySelector('[data-zaehl]'), 0, +e.querySelector('[data-zaehl]').getAttribute('data-zaehl'), 2200, 400); } },
@@ -377,6 +408,17 @@
       html: function (t) {
         var w = (t.worte || []).map(function (x, i) { return '<div class="wort' + (i === (t.worte.length - 1) ? ' g' : '') + '" style="opacity:1"><span style="opacity:0;animation-delay:' + (i * 1.05) + 's">' + esc(x) + '</span></div>'; }).join('');
         return '<div class="mfx-voll i-typo" style="position:absolute;inset:0">' + w + '<div class="mfx-mitte"><div style="opacity:0;animation:mfxZoom .9s ' + ((t.worte || []).length * 1.05) + 's forwards">' + marke('mfx-glanz') + '</div></div></div>';
+      } },
+    /* v2253 · Reihen-Intro „So funktioniert DealPilot": Marke, Modulnummer,
+       Titel, eine Zeile worum es geht. Gleich für jedes Modul. */
+    reihe: { name: 'Reihe · Modul', dauer: 7000, felder: { reihe: 'So funktioniert DealPilot', modul: '02', titel: 'Vom Quick Boarding zum Objekt', unter: 'Zwei Wege ins Portfolio — und was dabei mitwandert.' },
+      html: function (t) {
+        return '<div class="mfx-voll r-grund" style="position:absolute;inset:0"><div class="r-kopf"><div class="mfx-claim mfx-a" style="animation-delay:.4s">' + esc(t.reihe) + '</div></div>' +
+          '<div class="r-spur"></div><div class="r-fl">' + FLIEGER + '</div>' +
+          '<div class="r-mitte"><div class="mfx-marke m mfx-buchst">' + buchstaben('Deal', .7, .07) + '<b>' + buchstaben('Pilot', .98, .07) + '</b></div>' +
+          '<div class="r-nr"><i>Modul</i><b>' + esc(t.modul) + '</b></div>' +
+          '<div class="r-titel">' + esc(t.titel) + '</div>' +
+          (t.unter ? '<div class="r-unter">' + esc(t.unter) + '</div>' : '') + '</div></div>';
       } }
   };
 
@@ -386,13 +428,13 @@
       html: function (t) {
         var k = (t.kacheln || []).map(function (x, i) { return '<div class="mfx-kachel" style="animation-delay:' + (1.4 + i * .2) + 's"><i>' + esc(x[0]) + '</i><b class="' + (x[2] || '') + '">' + esc(x[1]) + '</b></div>'; }).join('');
         return ziel(t) + '<div class="mfx-karte k-ring" style="' + pos(t) + '"><div class="mfx-kick">' + esc(t.kick) + '</div>' +
-          '<div style="display:flex;align-items:center;gap:1.4cqw;margin:1cqw 0"><div class="ring"><svg viewBox="0 0 100 100"><circle class="hg" cx="50" cy="50" r="45"/><circle class="vg" cx="50" cy="50" r="45" stroke="#C9A84C" stroke-dashoffset="' + (283 * (1 - (+t.von || 0) / 100)) + '"/></svg><div class="wert">' + esc(t.von) + '</div></div>' +
+          '<div style="display:flex;align-items:center;gap:1.4cqw;margin:1cqw 0"><div class="ring"><svg viewBox="0 0 100 100"><circle class="hg" cx="50" cy="50" r="45"/><circle class="vg" cx="50" cy="50" r="45" style="stroke:var(--wl-c9a84c,#C9A84C)" stroke-dashoffset="' + (283 * (1 - (+t.von || 0) / 100)) + '"/></svg><div class="wert">' + esc(t.von) + '</div></div>' +
           '<div><h2 style="margin:0 0 .6cqw">' + esc(t.titel) + '</h2><span class="mfx-pille gr">' + esc(t.stufe) + '</span></div></div>' +
           '<div style="display:grid;grid-template-columns:repeat(' + Math.max(1, (t.kacheln || []).length) + ',1fr);gap:.7cqw">' + k + '</div></div>';
       },
       start: function (e, t) {
         var vg = e.querySelector('.vg'), w = e.querySelector('.wert');
-        setTimeout(function () { vg.style.strokeDashoffset = 283 * (1 - (+t.bis || 0) / 100); vg.style.stroke = (+t.bis >= 70 ? '#3FA56C' : '#C9A84C'); zaehle(w, +t.von, +t.bis, 1600); }, 1300);
+        setTimeout(function () { vg.style.strokeDashoffset = 283 * (1 - (+t.bis || 0) / 100); vg.style.stroke = (+t.bis >= 70 ? '#3FA56C' : 'var(--wl-c9a84c,#C9A84C)'); zaehle(w, +t.von, +t.bis, 1600); }, 1300);
       } },
     urteil: { name: 'Urteil zweispaltig', dauer: 7000, felder: { kick: 'Gegen deine Lage · C-Lage', titel: 'Nicht kaufen — 6,6 % statt deiner 7,0 %', nein: ['Zielrendite der C-Lage verfehlt', 'Ziel erst bei 131.314 €'], ja: ['Score 71 · Gut', 'Cashflow +111 € · DSCR 1,45'], ton: 'rot' },
       html: function (t) {
@@ -404,7 +446,7 @@
     zahl: { name: 'Große Zahl', dauer: 5500, felder: { kick: 'Marktwert', bis: 251000, einheit: '€', unter: 'Spanne 199.000 € – 351.000 €', delta: '+44 % zum Kaufpreis' },
       html: function (t) {
         return ziel(t) + '<div class="mfx-karte" style="' + pos(t, { x: 60, y: 30, w: 32 }) + '"><div class="mfx-kick">' + esc(t.kick) + '</div>' +
-          '<div style="font:700 5.4cqw/1.1 Space Grotesk;margin:.8cqw 0"><span data-zahl>0</span> <span style="font-size:3cqw;color:#E8CC7A">' + esc(t.einheit) + '</span></div>' +
+          '<div style="font:700 5.4cqw/1.1 Space Grotesk;margin:.8cqw 0"><span data-zahl>0</span> <span style="font-size:3cqw;color:var(--wl-e8cc7a,#E8CC7A)">' + esc(t.einheit) + '</span></div>' +
           '<p>' + esc(t.unter) + '</p><div class="mfx-pille gr mfx-a" style="animation-delay:2s;margin-top:1cqw">▲ ' + esc(t.delta) + '</div></div>';
       },
       start: function (e, t) { zaehle(e.querySelector('[data-zahl]'), 0, +t.bis, 1800, 700, function (v) { return de(Math.round(v)); }); } },
@@ -480,7 +522,7 @@
       } },
     kennzahlen: { name: 'Kennzahlen-Wirbel', dauer: 5500, felder: { werte: ['Score 76', 'DSCR 1,73', '+357 €', '8,7 %', 'Gut', 'B-Lage'], claim: 'Alles, was zählt — in einem Urteil.', url: 'dealpilot.immo' },
       html: function (t) {
-        var w = (t.werte || []).map(function (x, i) { var a = i / (t.werte.length) * Math.PI * 2; return '<span class="mfx-pille" style="position:absolute;left:50%;top:50%;white-space:nowrap;color:#E8CC7A;font-size:2cqw;padding:.6cqw 1.3cqw;transform:translate(-50%,-50%);animation:oWirbel 2s ' + (i * .12) + 's cubic-bezier(.6,0,.3,1) forwards;--x:' + (Math.cos(a) * 34) + 'cqw;--y:' + (Math.sin(a) * 16) + 'cqw">' + esc(x) + '</span>'; }).join('');
+        var w = (t.werte || []).map(function (x, i) { var a = i / (t.werte.length) * Math.PI * 2; return '<span class="mfx-pille" style="position:absolute;left:50%;top:50%;white-space:nowrap;color:var(--wl-e8cc7a,#E8CC7A);font-size:2cqw;padding:.6cqw 1.3cqw;transform:translate(-50%,-50%);animation:oWirbel 2s ' + (i * .12) + 's cubic-bezier(.6,0,.3,1) forwards;--x:' + (Math.cos(a) * 34) + 'cqw;--y:' + (Math.sin(a) * 16) + 'cqw">' + esc(x) + '</span>'; }).join('');
         return '<style>@keyframes oWirbel{0%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y)));opacity:1}80%{opacity:1}100%{transform:translate(-50%,-50%) scale(.2);opacity:0}}</style>' +
           '<div class="mfx-voll" style="position:absolute;inset:0;background:radial-gradient(circle,#17120a,#050505 70%)">' + w +
           '<div class="mfx-mitte"><div style="opacity:0;animation:mfxZoom 1s 2s forwards">' + marke('mfx-glanz') + '<div class="mfx-claim" style="margin-top:1.4cqw">' + esc(t.claim) + '</div><div class="mfx-url" style="margin-top:1cqw">' + esc(t.url) + '</div></div></div></div>';
@@ -514,6 +556,19 @@
         /* Sekundentakt, gleichmaessig wie der Ring (linear ueber 5 s) */
         var el = e.querySelector('[data-zahl]'), von = +t.von || 30, t0 = Date.now();
         var iv = setInterval(function () { var p = Math.min(1, (Date.now() - t0) / 5000); el.textContent = Math.ceil(von * (1 - p)); if (p >= 1 || !el.isConnected) clearInterval(iv); }, 100);
+      } },
+    /* v2253 · Reihen-Outro: der Logo-Rahmen zieht sich hinter dem Flieger
+       zu, die Wortmarke glänzt, darunter der Spruch des Moduls */
+    reihe: { name: 'Reihe · Logo und Spruch', dauer: 7500, felder: { spruch: 'Vom ersten Blick', spruch2: 'zum eigenen Objekt.', reihe: 'So funktioniert DealPilot', modul: '02', weiter: '', url: 'dealpilot.immo' },
+      html: function (t) {
+        return '<div class="mfx-voll r-grund" style="position:absolute;inset:0"><div class="mfx-mitte" style="align-items:start;padding-top:9cqw"><div>' +
+          '<div class="r-logo"><svg viewBox="0 0 1000 300"><defs><linearGradient id="rGold" x1="0" x2="1"><stop offset="0" style="stop-color:var(--wl-e8cc7a,#E8CC7A)"/><stop offset=".55" style="stop-color:var(--wl-c9a84c,#C9A84C)"/><stop offset="1" style="stop-color:var(--wl-b8932f,#b8932f)"/></linearGradient></defs>' +
+          '<rect x="4" y="4" width="992" height="292" rx="62" pathLength="1" stroke="url(#rGold)"/></svg>' +
+          '<div class="w"><span>Deal<b>Pilot</b></span></div><div class="fl">' + FLIEGER + '</div></div>' +
+          '<div class="r-spruch">' + esc(t.spruch) + (t.spruch2 ? '<br><em>' + esc(t.spruch2) + '</em>' : '') + '</div></div></div>' +
+          '<div class="r-fuss"><span class="mfx-kick">' + esc(t.reihe) + (t.modul ? ' · Modul ' + esc(t.modul) : '') + '</span>' +
+          (t.weiter ? '<span class="r-weiter">Weiter: <b>' + esc(t.weiter) + '</b></span>' : '') +
+          '<span class="mfx-url" style="font-size:1.25cqw">' + esc(t.url) + '</span></div></div>';
       } }
   };
 
@@ -537,5 +592,5 @@
     function l(o) { return Object.keys(o).map(function (k) { return { id: k, name: o[k].name, dauer: o[k].dauer, felder: o[k].felder }; }); }
     return { intros: l(INTROS), karten: l(KARTEN), outros: l(OUTROS) };
   }
-  window.DealPilotMesseFX = { spiele: spiele, liste: liste, qr: qr, version: 'v2234' };
+  window.DealPilotMesseFX = { spiele: spiele, liste: liste, qr: qr, version: 'v2253a' };
 })();

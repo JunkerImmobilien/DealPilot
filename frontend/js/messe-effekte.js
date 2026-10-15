@@ -238,7 +238,38 @@
     '.o-countdown svg{width:100%;height:100%;transform:rotate(-90deg)}',
     '.o-countdown .vg{fill:none;stroke:' + GH + ';stroke-width:6;stroke-linecap:round;stroke-dasharray:283;stroke-dashoffset:0;animation:oUhr 5s linear forwards}',
     '@keyframes oUhr{to{stroke-dashoffset:283}}',
-    '.o-countdown .zahl{position:absolute;inset:0;display:grid;place-items:center;font:700 6cqw "Space Grotesk"}'
+    '.o-countdown .zahl{position:absolute;inset:0;display:grid;place-items:center;font:700 6cqw "Space Grotesk"}',
+
+    /* v2253 · REIHE „So funktioniert DealPilot" - ein Intro und ein Outro
+       für alle Module: Nummer, Titel, Unterzeile bzw. Spruch je Video */
+    '.r-grund{background:radial-gradient(70% 70% at 50% 38%,#17120a,#050505 70%)}',
+    '.r-grund::before{content:"";position:absolute;left:50%;bottom:-6%;width:200%;height:62%;transform:translateX(-50%) perspective(30cqw) rotateX(66deg);transform-origin:50% 100%;background:repeating-linear-gradient(90deg,transparent 0 6cqw,color-mix(in srgb,' + G + ' 10%,transparent) 6cqw 6.08cqw),linear-gradient(90deg,transparent 49.6%,color-mix(in srgb,' + G + ' 45%,transparent) 49.6% 50.4%,transparent 50.4%);opacity:0;animation:mfxAuf 1.6s .2s forwards}',
+    '.r-kopf{position:absolute;left:0;right:0;top:7cqw;text-align:center}',
+    '.r-mitte{position:absolute;left:0;right:0;top:12.5cqw;text-align:center}',
+    '.r-nr{display:inline-flex;align-items:center;gap:1.4cqw;margin-top:2.6cqw;opacity:0;animation:mfxZoom .9s 2.3s cubic-bezier(.2,.8,.2,1) forwards}',
+    '.r-nr i{font:700 1.15cqw "JetBrains Mono",monospace;font-style:normal;letter-spacing:.34em;text-transform:uppercase;color:' + G + '}',
+    '.r-nr b{display:inline-grid;place-items:center;min-width:7.4cqw;height:7.4cqw;padding:0 1.2cqw;border-radius:1.6cqw;font:700 4.8cqw/1 "Space Grotesk",sans-serif;color:#1a1407;background:linear-gradient(110deg,' + GH + ',' + G + ' 55%,' + GL + ');box-shadow:0 1cqw 3cqw color-mix(in srgb,' + G + ' 35%,transparent),inset 0 .1cqw 0 rgba(255,255,255,.35)}',
+    '.r-titel{font:700 4.6cqw/1.1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em;margin-top:2.2cqw;opacity:0;animation:mfxAuf .9s 2.9s cubic-bezier(.2,.8,.2,1) forwards}',
+    '.r-unter{font:400 1.75cqw/1.45 Inter,system-ui,sans-serif;color:#d9cfb8;margin:1.3cqw auto 0;max-width:62cqw;opacity:0;animation:mfxAuf .9s 3.5s cubic-bezier(.2,.8,.2,1) forwards}',
+    '.r-spur{position:absolute;left:0;right:0;top:9.6cqw;height:.14cqw;background:linear-gradient(90deg,transparent,' + GH + ',transparent);transform:scaleX(0);animation:rSpur 1.4s 1.2s cubic-bezier(.6,0,.2,1) forwards}',
+    '@keyframes rSpur{to{transform:scaleX(1)}}',
+    '.r-fl{position:absolute;top:8.2cqw;left:-6cqw;width:3cqw;fill:' + GH + ';transform:rotate(90deg);filter:drop-shadow(0 0 .8cqw ' + G + ');animation:rFlug 2.2s 1s cubic-bezier(.5,0,.4,1) forwards}',
+    '@keyframes rFlug{to{left:104cqw}}',
+    /* Outro: der Logo-Rahmen zieht sich, die Wortmarke glänzt */
+    '.r-logo{position:relative;width:52cqw;margin:0 auto}',
+    '.r-logo svg{display:block;width:100%;overflow:visible}',
+    '.r-logo rect{fill:none;stroke-width:5;stroke-dasharray:1;stroke-dashoffset:1;animation:rRahmen 2.4s .3s linear forwards;filter:drop-shadow(0 0 .9cqw color-mix(in srgb,' + G + ' 55%,transparent))}',
+    '@keyframes rRahmen{0%{stroke-dashoffset:1;animation-timing-function:cubic-bezier(.4,0,.6,1)}45%{stroke-dashoffset:.6474;animation-timing-function:cubic-bezier(.3,0,.3,1)}100%{stroke-dashoffset:0}}',
+    '.r-logo .w{position:absolute;inset:0;display:grid;place-items:center;font:700 9.6cqw/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.035em;color:#FDFCFA;opacity:0;animation:mfxZoom 1.1s 1.9s cubic-bezier(.2,.8,.2,1) forwards}',
+    '.r-logo .w b{font-weight:700;background:linear-gradient(110deg,' + G + ' 0%,' + G + ' 38%,#FFF6D8 50%,' + G + ' 62%,' + G + ' 100%);background-size:280% 100%;background-position:130% 0;-webkit-background-clip:text;background-clip:text;color:transparent;animation:mfxGlanz 2.2s 3s ease-in-out forwards}',
+    '.r-logo .fl{position:absolute;top:-1.4cqw;left:1.83cqw;width:3.2cqw;fill:' + GH + ';transform:rotate(90deg);filter:drop-shadow(0 0 .8cqw ' + G + ');opacity:0;animation:rLogoFlug 2.4s .3s linear forwards}',
+    '@keyframes rLogoFlug{0%{opacity:1;left:1.83cqw;animation-timing-function:cubic-bezier(.4,0,.6,1)}45%{opacity:1;left:46.97cqw;animation-timing-function:ease-out}60%{opacity:0;left:56cqw}100%{opacity:0;left:56cqw}}',
+    '.r-spruch{font:700 3.3cqw/1.2 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.015em;margin-top:3.4cqw;opacity:0;animation:mfxAuf .9s 3.4s cubic-bezier(.2,.8,.2,1) forwards}',
+    '.r-spruch em{font-style:normal;color:' + GH + '}',
+    '.r-fuss{position:absolute;left:0;right:0;bottom:4.6cqw;display:flex;justify-content:center;align-items:center;gap:2.4cqw;opacity:0;animation:mfxAuf .9s 4.3s forwards}',
+    '.r-fuss .mfx-kick{color:#8c8578}',
+    '.r-weiter{font:600 1.25cqw Inter,system-ui,sans-serif;color:#d9cfb8}',
+    '.r-weiter b{color:' + GH + ';font-weight:600}'
   ].join('\n');
 
   function stil() {
@@ -377,6 +408,17 @@
       html: function (t) {
         var w = (t.worte || []).map(function (x, i) { return '<div class="wort' + (i === (t.worte.length - 1) ? ' g' : '') + '" style="opacity:1"><span style="opacity:0;animation-delay:' + (i * 1.05) + 's">' + esc(x) + '</span></div>'; }).join('');
         return '<div class="mfx-voll i-typo" style="position:absolute;inset:0">' + w + '<div class="mfx-mitte"><div style="opacity:0;animation:mfxZoom .9s ' + ((t.worte || []).length * 1.05) + 's forwards">' + marke('mfx-glanz') + '</div></div></div>';
+      } },
+    /* v2253 · Reihen-Intro „So funktioniert DealPilot": Marke, Modulnummer,
+       Titel, eine Zeile worum es geht. Gleich für jedes Modul. */
+    reihe: { name: 'Reihe · Modul', dauer: 7000, felder: { reihe: 'So funktioniert DealPilot', modul: '02', titel: 'Vom Quick Boarding zum Objekt', unter: 'Zwei Wege ins Portfolio — und was dabei mitwandert.' },
+      html: function (t) {
+        return '<div class="mfx-voll r-grund" style="position:absolute;inset:0"><div class="r-kopf"><div class="mfx-claim mfx-a" style="animation-delay:.4s">' + esc(t.reihe) + '</div></div>' +
+          '<div class="r-spur"></div><div class="r-fl">' + FLIEGER + '</div>' +
+          '<div class="r-mitte"><div class="mfx-marke m mfx-buchst">' + buchstaben('Deal', .7, .07) + '<b>' + buchstaben('Pilot', .98, .07) + '</b></div>' +
+          '<div class="r-nr"><i>Modul</i><b>' + esc(t.modul) + '</b></div>' +
+          '<div class="r-titel">' + esc(t.titel) + '</div>' +
+          (t.unter ? '<div class="r-unter">' + esc(t.unter) + '</div>' : '') + '</div></div>';
       } }
   };
 
@@ -514,6 +556,19 @@
         /* Sekundentakt, gleichmaessig wie der Ring (linear ueber 5 s) */
         var el = e.querySelector('[data-zahl]'), von = +t.von || 30, t0 = Date.now();
         var iv = setInterval(function () { var p = Math.min(1, (Date.now() - t0) / 5000); el.textContent = Math.ceil(von * (1 - p)); if (p >= 1 || !el.isConnected) clearInterval(iv); }, 100);
+      } },
+    /* v2253 · Reihen-Outro: der Logo-Rahmen zieht sich hinter dem Flieger
+       zu, die Wortmarke glänzt, darunter der Spruch des Moduls */
+    reihe: { name: 'Reihe · Logo und Spruch', dauer: 7500, felder: { spruch: 'Vom ersten Blick', spruch2: 'zum eigenen Objekt.', reihe: 'So funktioniert DealPilot', modul: '02', weiter: '', url: 'dealpilot.immo' },
+      html: function (t) {
+        return '<div class="mfx-voll r-grund" style="position:absolute;inset:0"><div class="mfx-mitte" style="align-items:start;padding-top:9cqw"><div>' +
+          '<div class="r-logo"><svg viewBox="0 0 1000 300"><defs><linearGradient id="rGold" x1="0" x2="1"><stop offset="0" style="stop-color:var(--wl-e8cc7a,#E8CC7A)"/><stop offset=".55" style="stop-color:var(--wl-c9a84c,#C9A84C)"/><stop offset="1" style="stop-color:var(--wl-b8932f,#b8932f)"/></linearGradient></defs>' +
+          '<rect x="4" y="4" width="992" height="292" rx="62" pathLength="1" stroke="url(#rGold)"/></svg>' +
+          '<div class="w"><span>Deal<b>Pilot</b></span></div><div class="fl">' + FLIEGER + '</div></div>' +
+          '<div class="r-spruch">' + esc(t.spruch) + (t.spruch2 ? '<br><em>' + esc(t.spruch2) + '</em>' : '') + '</div></div></div>' +
+          '<div class="r-fuss"><span class="mfx-kick">' + esc(t.reihe) + (t.modul ? ' · Modul ' + esc(t.modul) : '') + '</span>' +
+          (t.weiter ? '<span class="r-weiter">Weiter: <b>' + esc(t.weiter) + '</b></span>' : '') +
+          '<span class="mfx-url" style="font-size:1.25cqw">' + esc(t.url) + '</span></div></div>';
       } }
   };
 
@@ -537,5 +592,5 @@
     function l(o) { return Object.keys(o).map(function (k) { return { id: k, name: o[k].name, dauer: o[k].dauer, felder: o[k].felder }; }); }
     return { intros: l(INTROS), karten: l(KARTEN), outros: l(OUTROS) };
   }
-  window.DealPilotMesseFX = { spiele: spiele, liste: liste, qr: qr, version: 'v2235' };
+  window.DealPilotMesseFX = { spiele: spiele, liste: liste, qr: qr, version: 'v2253a' };
 })();

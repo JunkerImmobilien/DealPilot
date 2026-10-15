@@ -1674,7 +1674,8 @@
     if (hint) {
       if (!hint._orig) hint._orig = hint.textContent;
       hint.textContent = '(Marktpreisindikation · AVM — kein Verkehrswert n. § 194 BauGB)';
-      hint.title = 'Der übernommene Wert stammt aus einer AVM-Markteinschätzung (PriceHubble/Sprengnetter), nicht aus einem Verkehrswertgutachten nach § 194 BauGB. Bei manueller Eingabe wird die Bezeichnung automatisch zurückgesetzt.';
+      /* v2254: keine Anbieternamen nach aussen (CLAUDE.md Anbieter-Neutralitaet) */
+      hint.title = 'Der übernommene Wert stammt aus einer Markteinschätzung unabhängiger Bewertungspartner, nicht aus einem Verkehrswertgutachten nach § 194 BauGB. Bei manueller Eingabe wird die Bezeichnung automatisch zurückgesetzt.';
       hint.style.color = 'var(--gold-3,#9a7f33)';
     }
     if (tn) { if (lbl._origTxt == null) lbl._origTxt = tn.nodeValue; tn.nodeValue = 'Marktpreis '; }
@@ -2258,8 +2259,28 @@
       }
       return null;
     }
-    setInput(id, it.raw);
+    var _ziel = document.getElementById(id);
+    setInput(id, (_ziel && _ziel.type === 'number') ? it.raw : _deZahl(it.raw));   /* v2256 */
     return 'text';
+  }
+
+  /* ══ v2256 · DEZIMALKOMMA BEI DER UEBERNAHME ═══════════════════════════
+     Marcel am 15.10.2026: „bei der Übernahme gucken, dass Punkt und Komma
+     mitgegeben werden, je nachdem, was wir verwenden."
+     Die Quellen (Sprach-Auslese, KI, PDF) liefern Zahlen im JSON-Format:
+     3.5 statt 3,5. Im Feld stand dann der Punkt - und bei DREI Nachkomma-
+     stellen las parseDe (calc.js) ihn als Tausendertrenner: 3.125 % Zins
+     wurde 3125. Hier wird auf das deutsche Format gebracht:
+       Zahl (typeof number) mit Nachkommastellen -> Komma
+       Text "3.5" / "8.02" (ein Punkt, 1-2 Nachkommastellen) -> Komma
+     Ganze Zahlen, Tausenderpunkte ("1.250"), Daten und Text bleiben. */
+  function _deZahl(v) {
+    if (typeof v === 'number') {
+      if (!isFinite(v)) return v;
+      return Number.isInteger(v) ? String(v) : String(v).replace('.', ',');
+    }
+    if (typeof v === 'string' && /^-?\d+\.\d{1,2}$/.test(v.trim())) return v.trim().replace('.', ',');
+    return v;
   }
 
   /* ═══ v1330 · DER RUECKRUF MUSS IMMER FEUERN ════════════════════════

@@ -32,7 +32,7 @@
      quickcheck-app.html am Browser-Cache vorbeikommt. Das qcpm-Overlay
      (ab Zeile ~348), auf das sich der Nicht-anfassen-Vermerk in
      CLAUDE.md bezieht, ist unberuehrt. */
-  var IFRAME_SRC = 'quickcheck-app.html?v=v2244';
+  var IFRAME_SRC = 'quickcheck-app.html?v=v2254';
   // qb-buffer: Zwischenspeicher-Pass. Score erreichbar -> Snapshot -> EIN Pass (debounced),
   //   ohne echtes Objekt (object_id NULL). 'Als Objekt speichern' legt erst dann ein Portfolio-Objekt an.
   var _bufState = { code:null, timer:0, lastSig:'', busy:false };
@@ -259,6 +259,21 @@
       // Mietausfall-Risiko (Score 1–5 → Kategorie)
       if (avm.riskScore && _on('mietausfall_risk')) { var _rc = _riskCat(avm.riskScore); if (_rc) _setM('ds2_mietausfall', _rc, 'change'); }
 
+      /* v2254 · Die Bewertungskarte zieht mit ins Objekt (dealpilot-mb.js
+         liest #_mb_state im 1,2-s-Takt). `sv` vermerkt, welcher Wert als
+         Marktwert uebernommen wurde - daran haengt die Beschriftung
+         „Marktwertindikation" / „Verkehrswert (Stufe 3)". fuer.key bleibt
+         leer: das Objekt hat noch keine Kennung, die Flaechenpruefung greift. */
+      if (avm.mbState) {
+        try {
+          var _ms = JSON.parse(avm.mbState);
+          if (_ms && _ms.card) {
+            _ms.fuer = { key: null, wfl: avm.wfl || null };
+            if (avm.marktwert && _on('verkehrswert')) _ms.sv = { wert: Math.round(avm.marktwert), stufe: _ms.card.stufe || 1 };
+            _set('_mb_state', JSON.stringify(_ms), 'input');
+          }
+        } catch (e) { console.warn('[qc-bridge] mbState:', e); }
+      }
       // V350: übernommene Felder golden markieren (wie PLZ/Ort) — NACH dem Setzen,
       // damit das set-input-Event den Auto-Clear nicht sofort auslöst.
       try { if (typeof window._v236MarkQcLoaded === 'function' && _marked.length) window._v236MarkQcLoaded(_marked); } catch (e) {}

@@ -643,6 +643,15 @@ router.get('/objects/history', async (req, res) => {
                 AS lzs_aus_register,
               (data->'cross_check'->'assumptions'->>'gnd_jahre')::numeric           AS gnd_jahre,
               (data->'cross_check'->'assumptions'->>'bwk_quote')::numeric           AS bwk_quote,
+              /* v2256 · Marcel 15.10.2026: der Vergleichswert als eigener
+                 Eintrag im Verlauf, „dann kann man den auch vergleichen".
+                 Amtlich ist er nur mit einem Vergleichsfaktor des
+                 zustaendigen Ausschusses - sonst stammt er aus Angebots-
+                 preisen (gemessen Bericht 213: 246.000 = roher Angebotswert,
+                 amtlicher_vergleichsfaktor.verfuegbar = false). Die Bedingung
+                 steht VOR dem Literal, nicht darin (Backtick-Falle). */
+              (data->'cross_check'->'comparison'->>'vergleichswert_eur')::numeric AS vergleichswert_eur,
+              coalesce((data->'cross_check'->'amtlicher_vergleichsfaktor'->>'verfuegbar')::boolean, false) AS vergleichsfaktor_amtlich,
               (data->'cross_check'->'verfahrenswahl'->>'verfahren')  AS fuehrend,
               (data->'cross_check'->'verfahrenswahl'->>'grund')      AS fuehrend_grund,
               (data->'cross_check'->'verfahrenswahl'->>'quelle')     AS fuehrend_quelle,

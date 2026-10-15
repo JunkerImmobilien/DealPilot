@@ -1013,7 +1013,7 @@ window.DealPilotConfig = (function() {
       tilgung_default:        1.5,    /* % p.a. — Marcel 01.10.2026: "Standardtilgung würde ich 1,5 setzen". War 1,0 (davor 2,5, nie wirksam). */
       zinsbindung_default:    10,     // Jahre
       zins_override:          null,   // eigener Zinssatz (%); null = indikativer Pfandbrief-Satz
-      zins_margin:            'standard', // Zins-Stufe: premium (LTV bis 60 %) / standard (bis 80 %) / schwach (über 80 %)
+      zins_margin:            'standard', // Zins-Stufe: premium (LTV 60 %) / standard (80 %) / schwach (90 %) / voll (100 %, v2254)
       hausgeld_pct:           null,   // Hausgeld-Annahme als % vom Kaufpreis p.a.; null = aus
       ek_quote_default:       10,     /* % vom Kaufpreis — Marcel 01.10.2026: "Standard Eigenkapital würde ich eigentlich immer jetzt erst mal 10 Prozent setzen". Damit liegt der LTV ueber 90 %, was zur vorsichtigen Vorbelegung passt. */
       /* Bewirtschaftung — v1257: Marcels Wunsch, „Mietausfall und BWK-Quote
@@ -1096,7 +1096,8 @@ window.DealPilotConfig = (function() {
         margins: {
           premium:  0.25,   // LTV bis 60 %, Top-Bonität (v2242, kalibriert 15.10.2026)
           standard: 0.40,   // LTV bis 80 %, normale Bonität
-          schwach:  0.80    // LTV über 80 % oder Bonität mittel
+          schwach:  0.80,   // LTV über 80 % oder Bonität mittel
+          voll:     1.03    // v2254: LTV 100 % (Altmodell-Rueckfall, Abstand wie in der Marktformel)
         },
         asOf: '2026-10',
         sourceLabel: 'Bundesbank Kapitalmarktstatistik · Pfandbrief-Zinsstruktur',
@@ -1116,7 +1117,7 @@ window.DealPilotConfig = (function() {
         aufschlag_monat: '2026-08',
         k: 0.27,                       // Kalibrierung 15.10.2026: 10 J / 80 % = 4,34 %
         zuschlaege: [[60, -0.20], [70, -0.10], [80, 0], [90, 0.22], [100, 0.45], [110, 0.95]],
-        stufen_ltv: { premium: 60, standard: 80, schwach: 90 },
+        stufen_ltv: { premium: 60, standard: 80, schwach: 90, voll: 100 },   /* v2254: voll */
         asOf: '2026-10-14'
       },
 

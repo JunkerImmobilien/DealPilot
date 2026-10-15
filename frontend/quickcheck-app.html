@@ -3783,6 +3783,33 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 </div>
 
 <script>
+/* ══ v2254 · KAUFNEBENKOSTEN WIE IM OBJEKT ══════════════════════════════
+   Gemessen 15.10.2026 (Sachsenstr. 18, Herford): das Quick Boarding rechnete
+   pauschal 10,5 %, das Objekt nach der Uebernahme 10,7 % - im Reiter
+   Finanzierung stand danach „Es fehlen 360 €".
+   Das Objekt setzt sich zusammen aus (main.js setDefaults, grest-plz-lookup.js):
+     Grunderwerbsteuer nach Bundesland (aus der PLZ)
+     + Notar & Grundbuch (Profil `notar_grundbuch`, Vorgabe 2,2)
+     + Grundbuchamt 0,5 + Sonstige 1,5 (+ Makler 0)
+   Dieselben Bausteine hier, gelesen aus der Hauptanwendung (gleiche Herkunft).
+   Ohne PLZ: 6,5 % Grunderwerbsteuer wie die Vorbelegung im Objekt. */
+window._qcKnkPct = function () {
+  var P = null; try { P = window.parent && window.parent !== window ? window.parent : window; } catch (e) { P = window; }
+  var grest = 6.5, notar = 2.2;
+  try {
+    var plz = ((document.getElementById('qc_plz') || {}).value || '').trim();
+    var G = (P && P.DealPilotGrest) || window.DealPilotGrest;
+    if (plz.length === 5 && G && typeof G.forPlz === 'function') { var r = G.forPlz(plz); if (r && isFinite(r.rate)) grest = Number(r.rate); }
+  } catch (e) {}
+  try {
+    var IP = (P && P.DealPilotInvestmentProfile) || window.DealPilotInvestmentProfile;
+    var v = IP && typeof IP.get === 'function' ? parseFloat(IP.get('notar_grundbuch')) : NaN;
+    if (isFinite(v)) notar = v;
+  } catch (e) {}
+  return Math.round((grest + notar + 0.5 + 1.5) * 100) / 100;
+};
+</script>
+<script>
 /* ═══════════════════════════════════════════════════════════════════
    ICONS — Lucide-Style SVG
    ═══════════════════════════════════════════════════════════════════ */
@@ -3893,7 +3920,7 @@ const QcEngine = (function() {
     const nulY = hgY * hgSplit / 100;
     const ulY = hgY * (100 - hgSplit) / 100;
     const nmr = ((nkm * 12) - nulY) / kp * 100;
-    const knkPct = 10.5;
+    const knkPct = window._qcKnkPct();   /* v2254: war fest 10,5 */
     const gesamt = kp * (1 + knkPct / 100);
     const ekValue = ek != null ? ek : gesamt * 0.20;
     const darlehen = Math.max(0, gesamt - ekValue);
@@ -3988,7 +4015,7 @@ const QcEngine = (function() {
         avmMarktwert: mlMarktwert, avmPriceGapPct: mlPriceGapPct, marktlage: sMarktlage,
         annuMon: Math.round(annuMon), darlehen: Math.round(darlehen),
         ekValue: Math.round(ekValue), gesamt: Math.round(gesamt),
-        hgY: Math.round(hgY), nulY: Math.round(nulY), ulY: Math.round(ulY)
+        hgY: Math.round(hgY), nulY: Math.round(nulY), ulY: Math.round(ulY), knkPct: knkPct /* v2254 */
       }
     };
   }
@@ -4173,7 +4200,7 @@ const QcApp = (function() {
          (gemessen: 80 % geklickt, EK blieb 32.000 €, Score unverändert) */
       if (btnEl) delete ekInp.dataset.userSet;
       if (!ekInp.dataset.userSet) {
-        const knkPct = 10.5;
+        const knkPct = window._qcKnkPct();   /* v2254: war fest 10,5 */
         const ekKpPart = kp * (1 - pct / 100);
         const ekNk = kp * knkPct / 100;
         ekInp.value = String(Math.round(ekKpPart + ekNk));
@@ -4372,7 +4399,7 @@ const QcApp = (function() {
      liefen sofort auseinander: computeScore() haelt den Nebenkostensatz fest
      auf 10,5 % und nimmt notfalls 20 % der Gesamtinvestition als
      Eigenkapital an. Genau das steht deshalb auch im Satz. */
-  var QCB_KNK_PCT = 10.5;   /* gespiegelt aus computeScore(), NICHT neu gesetzt */
+  var QCB_KNK_PCT = 10.5;   /* nur Rueckfall; v2254: computeScore liefert k.knkPct aus window._qcKnkPct() */
   function _qcbRechenweg(inputs, k, gated) {
     var box = document.getElementById('qcb-hinweis');
     var host = document.getElementById('qcb-rows');
@@ -6032,18 +6059,44 @@ function renderTransferList() {
     try {
       /* v893j-modalpick: Marktwert/Marktmiete aus gewaehlter Quelle (Konsens|Provider) + Spanne */
       var _sp = (_span==='low'||_span==='high'||_span==='mid') ? _span : (_spanConfig||'mid');
-      var _dpR = (_avmResults||[]).filter(function(x){return x&&x.provider==='DealPilot';})[0] || null;
+      /* v2253 · GEMESSEN 15.10.2026 (Sachsenstr. 18, Herford): das Fenster
+         „Diese Daten werden übernommen" zeigte „Marktwert → verkehrswert
+         230.000 €" angehakt - im Objekt stand danach KEIN Verkehrswert.
+         Ursache: die DealPilot-Bewertung kommt nie in _avmResults.
+         dealpilot-mb-qc.js meldet sie über global.QcApp.registerDpmb(), und
+         QcApp ist hier ein const, kein window-Eigenschaft (qc-bridge.js:357
+         sagt es selbst). Das Fenster liest sie dagegen aus #_mb_state.
+         Hier wird dieselbe Quelle gelesen wie im Fenster - was dort steht,
+         wird übernommen. window.QcApp freizugeben hätte fünf stille Wege
+         auf einmal geweckt (toter Pfad, erster Lauf). */
+      var _avL = (_avmResults||[]).slice();
+      if (!_avL.some(function(x){return x&&x.provider==='DealPilot';})) {
+        try { var _mbs = JSON.parse((document.getElementById('_mb_state')||{}).value||'null'), _mc = _mbs && _mbs.card;
+          if (_mc && (_mc.mw || _mc.mm)) _avL.unshift({ provider: 'DealPilot',
+            marktwert: _mc.mw ? _mc.mw.med : null, low: _mc.mw ? _mc.mw.low : null, high: _mc.mw ? _mc.mw.high : null,
+            marktmieteCold: _mc.mm ? _mc.mm.med : null, marktmieteLow: _mc.mm ? _mc.mm.low : null, marktmieteHigh: _mc.mm ? _mc.mm.high : null,
+            scoreMacro: _mc.macroRaw != null ? _mc.macroRaw / 10 : null, scoreMicro: _mc.microRaw != null ? _mc.microRaw / 10 : null,
+            wertentwicklung: _mc.trendRaw != null ? _mc.trendRaw : null }); } catch (e) {}
+      }
+      var _dpR = _avL.filter(function(x){return x&&x.provider==='DealPilot';})[0] || null;
       var _effR = (_src==='DealPilot'||_src==='Sprengnetter'||_src==='PriceHubble')
-        ? ((_avmResults||[]).filter(function(x){return x&&x.provider===_src;})[0] || (_avmResults||[])[0])
-        : ((_avmResults||[])[0] || null);
+        ? (_avL.filter(function(x){return x&&x.provider===_src;})[0] || _avL[0])
+        : (_avL[0] || null);
       function _valAt(r,kind){ if(!r) return null; if(kind==='mw'){ return _sp==='low'?r.low:_sp==='high'?r.high:r.marktwert; } return _sp==='low'?r.marktmieteLow:_sp==='high'?r.marktmieteHigh:r.marktmieteCold; }
       function _pick(kind){
         if(_src==='DealPilot'||_src==='Sprengnetter'||_src==='PriceHubble'){ return _valAt(_effR,kind); }
-        var vals=[]; (_avmResults||[]).forEach(function(x){ if(!x) return; if(x.provider==='DealPilot'||x.provider==='Sprengnetter'||x.provider==='PriceHubble'){ var v=_valAt(x,kind); if(v!=null&&isFinite(v)) vals.push(v); } });
+        var vals=[]; _avL.forEach(function(x){ if(!x) return; if(x.provider==='DealPilot'||x.provider==='Sprengnetter'||x.provider==='PriceHubble'){ var v=_valAt(x,kind); if(v!=null&&isFinite(v)) vals.push(v); } });
         if(!vals.length) return null; return Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length);
       }
       var _checked = {};
       try { Object.keys(_pendingTransfer).forEach(function (key) { var cb = document.getElementById('transfer-cb-' + key); if (_useCk ? _ck.has(key) : (!cb || cb.checked)) _checked[_pendingTransfer[key].target] = true; }); } catch (e) {}
+      /* v2253 · die Haken im Fenster heissen ohne _pendingTransfer-Eintrag
+         „DealPilot_mw"/„DealPilot_mm" (qc-bridge.js secHtml) */
+      if (_useCk) { if (_ck.has('DealPilot_mw')) _checked.verkehrswert = true; if (_ck.has('DealPilot_mm')) _checked.nkm_grund = true; }
+      /* v2254 · Marcel 15.10.2026: Lage und Bewertungskarte wandern mit.
+         Die Lage liefert nur DealPilot - sie hatte im Fenster keinen eigenen
+         Haken und fiel deshalb in qc-bridge.js an _on() durch. */
+      if (_useCk && _dpR) { _checked.lage_macro = true; _checked.lage_micro = true; _checked.wertsteigerung_pa = true; }
       var _mw=_pick('mw'), _mm=_pick('mm');
       if (_mw!=null || _mm!=null || _dpR || _effR) {
         avm = {
@@ -6056,7 +6109,9 @@ function renderTransferList() {
           demandScore: (_effR && typeof _demandScore === 'function') ? (_demandScore(_effR) || {}).score : null,
           riskScore:   (_effR && typeof _rentRiskScore === 'function') ? (_rentRiskScore(_effR) || {}).score : null,
           wfl: QcEngine.num(inputs.wfl) || 0,
-          checkedTargets: _checked
+          checkedTargets: _checked,
+          /* v2254: die DealPilot-Bewertungskarte selbst (Spanne, Lage, Stufe) */
+          mbState: (function () { try { return (document.getElementById('_mb_state') || {}).value || null; } catch (e) { return null; } })()
         };
       }
     } catch (e) {}
@@ -6773,7 +6828,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
     var kp=_num(kpEl.value); if(!kp) return;
     var act=document.querySelector(".ltv-btn.active");
     var pct=act?parseFloat(act.getAttribute("data-ltv")):100; if(isNaN(pct)) pct=100;
-    ekEl.value=String(Math.round(kp*(1-pct/100)+kp*10.5/100));
+    ekEl.value=String(Math.round(kp*(1-pct/100)+kp*window._qcKnkPct()/100));   /* v2254 */
     try{ if(window.QcApp&&QcApp.scheduleUpdate) QcApp.scheduleUpdate(); }catch(_){}
   }
   function ready(){
@@ -7280,7 +7335,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     if (!window.DealKpis || !window.DealScore || typeof window.DealScore.computeFromKpis!=="function") return null;
     var kp=n(i.kp), nkm=n(i.nkm);
     if (!kp || !nkm) return { score:null, label:"\u2013", tier:null, sub:{}, kpi:{} };
-    var hgY=n(i.hg)*12, split=(n(i.hg_split)||22)/100, knk=(n(i.knk)||10.5)/100;
+    var hgY=n(i.hg)*12, split=(n(i.hg_split)||22)/100, knk=(n(i.knk)||window._qcKnkPct())/100;   /* v2254 */
     var gesamt=kp*(1+knk), ek=n(i.ek), darlehen=Math.max(0,gesamt-ek);
     var k = window.DealKpis.compute({ kp:kp, nk:kp*knk, nkm:nkm, ze:0,
       bwk_ul:hgY*(1-split), bwk_nul:hgY*split, d1:darlehen, d1z:(n(i.zins)||3.8), d1t:(n(i.tilg)||1.5),

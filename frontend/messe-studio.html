@@ -16,6 +16,7 @@
   unten zeigt Nummer, Titel und Erklärung. Intro und Outro kommen aus dem
   Baukasten (js/messe-effekte.js).
   Aufruf: messe-studio.html?messe=<drehbuch>&intro=<id>&outro=<id>[&qr=<url>][&oben=58]
+  Videoreihe (v2253): messe-studio.html?modul=02 - Intro/Outro "reihe", Texte aus REIHE
   oben = Höhe, die die Aufnahme oben abschneidet (Chrome-Leiste im Vollbild).
 -->
 <style>
@@ -75,16 +76,40 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
 <div id="start" hidden><div><button type="button" id="los">Aufnahme starten</button><p>Leertaste startet ebenfalls · Esc beendet</p></div></div>
 
 <script src="js/whitelabel-override.js?v=v2149"></script>
-<script src="js/messe-effekte.js?v=v2235"></script>
+<script src="js/messe-effekte.js?v=v2253a"></script>
 <script>
 (function () {
   'use strict';
   var P = new URLSearchParams(location.search);
-  var NAME = P.get('messe') || 'quickcheck-rundgang';
-  var INTRO = P.get('intro') || 'boardingpass', OUTRO = P.get('outro') || 'amstand';
+  /* v2253 · Videoreihe „So funktioniert DealPilot" (Dateien/Messe/Videos/
+     Videoreihe.md). Je Modul: Drehbuch, Titel, eine Zeile worum es geht, ein
+     Spruch fürs Outro (Luftfahrt-Bildsprache; nie Kerosin, keine Quellen-
+     oder Anbieternamen). Aufruf ?modul=02 - oder ?messe=<drehbuch>, dann
+     wird das Modul über das Drehbuch gefunden. Ein Modul spielt das
+     einheitliche Intro/Outro 'reihe'; &intro=/&outro= überschreiben. */
+  var REIHE = {
+    '01': { messe: 'quickcheck-rundgang', titel: 'Quick Boarding', unter: 'Vom Exposé zum ersten Urteil — in wenigen Minuten.',
+            spruch: 'Erst rechnen,', spruch2: 'dann boarden.', weiter: 'Modul 02 · Vom Quick Boarding zum Objekt' },
+    '02': { messe: 'boarding-zum-objekt', titel: 'Vom Quick Boarding zum Objekt', unter: 'Zwei Wege ins Portfolio — und was dabei mitwandert.',
+            spruch: 'Boarding abgeschlossen.', spruch2: 'Dein Objekt ist an Bord.', weiter: 'Modul 03 · Datenaufnahme: vier Wege' },
+    /* v2255 · Module 03–05 */
+    '03': { hinweis: 'Vorführung · Beispieldaten · aufgezeichnete Abrufe', messe: 'reihe-datenaufnahme', titel: 'Datenaufnahme: vier Wege', unter: 'Exposé, Sprache, ImmoMetrica, geführte Eingabe — ein Blick auf jeden Weg.',
+            spruch: 'Vier Wege an Bord.', spruch2: 'Einer reicht für den Start.', weiter: 'Modul 04 · Marktbewertung in drei Stufen' },
+    '04': { hinweis: 'Vorführung · Beispieldaten · aufgezeichnete Abrufe', messe: 'reihe-stufen', titel: 'Marktbewertung in drei Stufen', unter: 'Was jede Stufe braucht — und was sie liefert.',
+            spruch: 'Drei Stufen Steigflug.', spruch2: 'Ab Stufe 3 amtlich.', weiter: 'Modul 05 · Komplettbeispiel: Sprache + Stufe 2' },
+    '05': { hinweis: 'Vorführung · Beispieldaten · aufgezeichnete Abrufe', messe: 'reihe-sprache-stufe2', titel: 'Komplettbeispiel: Sprache + Stufe 2', unter: 'Erzählen, übernehmen, einschätzen — in einem Durchgang.',
+            spruch: 'Erzählt, bewertet, eingeordnet.', spruch2: 'Klar zum Start.', weiter: 'Modul 06 · Investition' }
+  };
+  var MODUL = P.get('modul'), M = null;
+  if (MODUL && REIHE[MODUL]) M = REIHE[MODUL];
+  else Object.keys(REIHE).forEach(function (k) { if (!M && REIHE[k].messe === P.get('messe')) { M = REIHE[k]; MODUL = k; } });
+  var NAME = P.get('messe') || (M && M.messe) || 'quickcheck-rundgang';
+  var INTRO = P.get('intro') || (M ? 'reihe' : 'boardingpass'), OUTRO = P.get('outro') || (M ? 'reihe' : 'amstand');
   var QR = P.get('qr') || 'https://dealpilot.immo';
   var OBEN = parseInt(P.get('oben'), 10) || 0;
   document.documentElement.style.setProperty('--oben', OBEN + 'px');
+  /* v2255 · der Hinweis oben rechts sagt, was aufgezeichnet ist (Modul 01 hat eine Pilot-Analyse, 03-05 Abrufe) */
+  try { if (M && M.hinweis) document.getElementById('hinweis').textContent = M.hinweis; } catch (e) {}
   /* v2235b · die App bekommt einen Viewport von BREITE CSS-px und wird auf den
      Rahmen gestreckt. Gemessen bei 0,8 (2.606 px App-Breite): Kacheln und
      Kegel im Video kaum lesbar. 1.700 bleibt Desktop-Fassung, Schrift x1,23. */
@@ -108,6 +133,15 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     }
   };
   var T = TEXTE[NAME] || {};
+  /* v2253 · Reihen-Stücke bekommen ihre Texte aus REIHE; andere Stücke
+     behalten die Texte aus TEXTE */
+  if (M) {
+    var RT = { reihe: 'So funktioniert DealPilot', modul: MODUL };
+    T = { intro: T.intro, outro: T.outro };
+    if (INTRO === 'reihe') T.intro = { reihe: RT.reihe, modul: MODUL, titel: M.titel, unter: M.unter };
+    if (OUTRO === 'reihe') T.outro = { reihe: RT.reihe, modul: MODUL, spruch: M.spruch, spruch2: M.spruch2, weiter: M.weiter || '', url: String(QR).replace(/^https?:\/\//, '') };
+    document.title = 'Messe-Studio · Modul ' + MODUL + ' · DealPilot';
+  }
 
   function warte(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   var stufen = 1;
@@ -132,7 +166,10 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     document.getElementById('start').hidden = true;
     /* Intro über allem; die App lädt dahinter schon */
     var fx = DealPilotMesseFX.spiele(vorhang, 'intro', INTRO, T.intro || {});
-    app.src = 'index.html?messe=' + encodeURIComponent(NAME) + '&studio=1';
+    /* v2255d · mit Zeitstempel: index.html kommt ohne Cache-Control (gemessen,
+       nur ETag/Last-Modified) - dieselbe Adresse durfte der Browser aus dem
+       Speicher holen, samt alter Buster */
+    app.src = 'index.html?messe=' + encodeURIComponent(NAME) + '&studio=1&_=' + Date.now();
     await warte(fx ? fx.dauer : 4000);
     /* warten, bis das Drehbuch in der App bereitsteht (Anmeldung, Plan) */
     var t0 = Date.now();
