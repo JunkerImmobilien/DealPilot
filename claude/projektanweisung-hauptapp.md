@@ -38761,6 +38761,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2258–v2261a · RND-Spanne, Inventar, Nebenkosten aus den Einstellungen (15.10.2026, Staging)
+
+- **Was:** v2258 RND-Spanne = Modellwert ±2 Jahre (vorher technisch gegen Punktraster, „32–33“), RND-Fenster in Space Grotesk statt Cormorant. Kern geprüft: rnd-calc.js deckungsgleich mit vw-modul V4.2.5 (`rnd-kerne-pruefen.mjs --modul`, 1.764 Fälle). v2261 (Marcel): Inventar ist Teil des Kaufpreises – Gesamtinvestition ohne `moebl` (calc, Kern deal-kpis gespiegelt, all-objects, dashboard, financing), Gebäude-AfA zieht das ganze Inventar ab; Nebenkosten getrennt aus dem Investmentprofil (`notar_pct`, `grundbuch_pct`, `maklerkosten`, `sonstige_nk_pct`; Altwert `notar_grundbuch` → Notar = Wert − Grundbuch), Haken `grest_auto` (GrESt nach PLZ, sonst Profil-Bundesland), `setIfEmpty(notar_pct/makler_pct)` zielte auf nicht vorhandene Ids; RND-Fenster `max-height: min(915px, 100vh − 48px)`; Inventar-Haken liest das sichtbare Kästchen. v2261a: Automatik folgt auch einem PLZ-Wechsel (`data-auto-rate`).
+- **Commit:** `8816b3e9` (v2258), `3dcec6c5` (v2261), `d6ef4230` (v2261a).
+- **Nachweis:** Staging, ungespeichertes neues Objekt: Notar 1,7 · Grundbuch 0,5 · Makler 3,57 · Sonstige 1,5 · GrESt 6,5 → NK 27.540 € (13,8 %) bei KP 200.000, GI 227.540 € mit 5.000 € Inventar (nicht addiert); PLZ 80331 → 3,5, 32052 → 6,5, 10115 → 6,0, zurück 6,5; Automatik aus → Profilsatz bleibt. Einstellungen › Standardwerte › Standort & Nebenkosten zeigt vier Felder + Haken. Objekte 39 → 39. score-ketten 216 Punkte gleich, Kerne gespiegelt.
+- **Rest:** Für neue Objekte steigen die Nebenkosten um den Makler (3,57 % aus den Standardwerten) – bestehende Objekte unverändert. BMF-Fenster-Fehler (2–6) in v2260.
+
 ### Prod-Rollout (25) · v2253–v2256 (15.10.2026)
 
 - **Was:** v2254 (Marktwertindikation/Verkehrswert nach Herkunft, Beleihung 100 % `voll`, QC-Nebenkosten wie im Objekt, Karte+Lage wandern aus dem Quick Boarding mit), v2255 (nur amtliche Verfahren heißen Verkehrswert, Abschlag auch im Verlauf `#oe-vw`, Videoreihe 03–05), v2256 (Hausgeld Monat→Jahr `_monatsFalle`, Dezimalkomma `_deZahl` bei der Übernahme, Vergleichswert als eigener Eintrag – amtlich nur mit Vergleichsfaktor des Ausschusses).
