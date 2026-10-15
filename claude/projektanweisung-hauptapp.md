@@ -38761,6 +38761,16 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### Prod-Rollout (22) · v2239–v2247d auf Produktion (15.10.2026)
+- **Was:** Freigabe Marcel („ja angleichen und dann rollout“). v2247d: Zinsbindungs-Empfehlung (`market-rates.js`) im Du. `main` per `--no-ff` mit `origin/staging`; Prod `git pull`, Rebuild `backend` + `mb-backend`, Migration 088.
+- **Commit:** `536db030` (v2247d), Merge `639a3b7f`
+- **Nachweis:**
+  - Sicherung vorher, angesehen: `haupt-20261015-0725.sql.gz` (14 MB, 71 Tabellen — größer durch die übernommenen Objekte von info@), `mb-20261015-0725.sql.gz` (25 MB, 32 Tabellen).
+  - Migration 88 angewandt, erster Bauzins-Abruf 1.280 Tages-/52 Monatszeilen; beide Backends laufen; Gold-Audit RC=0.
+  - Live am Inhalt: `/pfandbrief` source live, Modell bund+aufschlag, 80 %: 4,06 / 4,34 / 4,53 / 4,63; App lädt `marktdaten-modal.js?v=v2247c`, `market-rates.js?v=v2247d`, `objekt-reiter.js?v=v2245`; `schwellen.js` ausgeliefert; Landing „BELEIHUNG 80 %“, `dp2-inhalt.js?v=v2245` mit „Marktaufschlag“; `/auth/me` 401.
+  - Vorher am selben Tag auf Prod (Freigabe Marcel): Konto info@ ergänzt (25 Objekte), `majunker@gmx.net` von Marcel selbst gelöscht (DELETE 1, keine Waisen, 13 Nutzer).
+- **Rest:** Abnahme Marcel: Marktdaten-Fenster, Hinweis am Zinsfeld, Ampeln mit eigenen Grenzen, Gewerbe-/Grundstücks-Bewertung mit echtem Abruf. K des Bauzinses gelegentlich nachkalibrieren. Gespeicherte Scores nach Gewichtsänderung, statische Hilfetexte 1,2/85.
+
 ### v2247–v2247c · Marktdaten-Fenster neu: Zusammensetzung, Verlauf, Hausoptik (15.10.2026, Staging)
 - **Was:** Marcel: Verlaufsgrafik unter Finanzierung → „Marktdaten ansehen“, wie sich der Zins zusammensetzt, Optik DealPilot, Irrelevantes raus, Messkabine.
   - Neues Modul `frontend/js/marktdaten-modal.js` übernimmt `V10.openMarketModal/closeMarketModal/handleOverlayClick`. Obsidian-Kopf mit Runway-Linie; Zins für Bindung × Beleihung (Objekt-LTV und Bindung `#d1_bindj` vorgewählt); Gleichung Bundesanleihe + Marktaufschlag + Angebotsniveau ± Beleihung (Marktaufschlag als Rest → geht immer auf); Verlauf 13 Monate (Ø abgeschlossen vs. Bund, Aufschlag-Balken) / 12 Wochen (Modell vs. Bund); vier Konditionen; Geldmarkt (EZB, Euribor, Ø abgeschlossen) + Einordnung Zinsbindung; eine Quellenzeile.
