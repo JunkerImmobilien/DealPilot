@@ -1301,7 +1301,7 @@
         reiter('s2'); await warte(700);
         await zeige(feldVon('nkm'), 10);
         var mm = wert('ds2_marktmiete');
-        await b2oZeile(s, 'Reiter Miete', 'Deine Kaltmiete <b>' + eur(zahl('nkm')) + '</b>' + (mm ? ', daneben die Marktmiete <b>' + mm + ' €/m²</b> zum Vergleich' : '') + '.');
+        await b2oZeile(s, 'Reiter Miete', 'Deine Kaltmiete <b>' + eur(zahl('nkm')) + '</b>' + (mm ? ', dazu die Marktmiete <b>' + mm + ' €/m²</b> zum Vergleich' : '') + '.');
         reiter('s4'); await warte(700);
         await zeige(feldVon('hg_ul'), 10);
         await b2oZeile(s, 'Reiter Bewirtschaftung', 'Das Hausgeld schon aufgeteilt: <b>' + eur(zahl('hg_ul')) + '</b> umlagefähig, <b>' + eur(zahl('hg_nul')) + '</b> nicht, im Jahr.');

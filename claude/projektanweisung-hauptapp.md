@@ -38761,6 +38761,36 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2252–v2253b · Videoreihe „So funktioniert DealPilot": Reihen-Intro/-Outro, Modul 02, Marktwert wandert mit (15.10.2026, Staging)
+
+- **Was:** Reihe laut `Dateien/Messe/Videos/Videoreihe.md`.
+  - Baukasten `messe-effekte.js` hat zwei neue Stücke: Intro `reihe` (Marke, „Modul NN“, Titel, eine Zeile) und Outro `reihe` (Logo-Rahmen zieht sich hinter dem Flieger zu, Wortmarke glänzt, Spruch je Modul, „Weiter: Modul NN“). Kopie unter `design/Vorschläge/messe-video/`.
+  - `messe-studio.html` hat die Tabelle `REIHE` je Modul (Drehbuch, Titel, Unterzeile, Spruch). Aufruf `?modul=02` oder `?messe=<drehbuch>`.
+  - Neues Drehbuch `boarding-zum-objekt` (Modul 02) mit 12 Kapiteln. Weg 1: Quick Boarding mit Sachsenstraße 18, Herford (ETW 100 m², Bj 1998, 900 € kalt, Hausgeld 280 €, Kaufpreis 180.000 €), dann die Marktbewertung als Mitschnitt, dann „Als Objekt speichern“ mit beiden Reitern des Übernahme-Fensters, dann Reiter Objekt, Investition, Miete, Bewirtschaftung und Finanzierung. Weg 2: „Neues Objekt“ und die Datenaufnahme-Leiste.
+  - **Fehler im Übernahme-Weg behoben (`quickcheck-app.html` `confirmSave`):** Das Fenster zeigte „Marktwert → verkehrswert 230.000 €“ angehakt, im Objekt stand danach aber kein Verkehrswert (in der DB `svwert` leer).
+    - Ursache: `dealpilot-mb-qc.js` meldet die Bewertung über `global.QcApp.registerDpmb()`. `QcApp` ist im iframe ein `const`, `window.QcApp` ist `undefined`, also kam der Aufruf nie an.
+    - Behebung: `confirmSave` liest jetzt dieselbe Quelle wie das Fenster (`#_mb_state`). `window.QcApp` habe ich bewusst nicht freigegeben, weil das fünf stille Wege auf einmal geweckt hätte.
+  - Nummer: `v2252` war parallel schon vergeben (`0de6a0e6`, erste Anmeldung). Das Paket heißt deshalb ab `e27cfb3f` v2253.
+- **Commit:** `627a663a`, `e27cfb3f` (Umbenennung), `95df0a19` (v2253a gestrafft, Outro), v2253b (Text)
+- **Nachweis:**
+  - **Erster Prüflauf:** Ende bei 262 s, mit Outro etwa 4:30. Danach gestrafft.
+  - **Zweiter Prüflauf** (Studio, TEMPO 1,4, Protokoll alle 300 ms):
+    - Ablauf: bereit 4,3 s, Drehbuch-Ende 229,6 s, mit Outro etwa 3:57.
+    - Kegel im Bild bei allen Kapitelzeilen. Die Lücken liegen nur in den Reiterwechseln und nach dem Ende.
+    - Abrufe (Nicht-GET) im Haupt- und Quick-Check-Fenster: nur `POST/PUT /objects`, `tax-records/timeline`, `wertparameter/zinssatz` (Register, kostenlos), `portfolio-spiegel` (beim Laden). Die Sperre lag in 2 Fenstern und wurde 0× ausgelöst.
+    - Danach: `fetch` wieder echt, `seq_2026` 1106, `qc_span_config` und `dp_mb_pref_span` unverändert.
+  - **DB:** Objekte des Kontos 39 → 39, die zwei angelegten Kennungen sind weg, `shared_passes` 148 → 148, `tax_records` 553 → 553, keine Waisen.
+  - **Esc-Lauf:** Abbruch nach dem Anlegen (Reiter Investition). Das Objekt wurde gelöscht, die DB steht wieder bei 39.
+  - **Abgelesene Zahlen:** Score 50 · Solide „Kauf möglich — verhandeln nötig“; Marktwert 230.000 € (192.000–268.000 €) nach 5,8 % Abschlag; Marktmiete 802 €; 10 übernommene Werte; Kaufnebenkosten 19.260 € (10,7 %); Hausgeld 2.352 € umlagefähig + 1.008 € nicht umlagefähig; Darlehen 180.000 € zu 4,34 %, Tilgung 1,5 %, Eigenkapital 18.900 €.
+  - **Kosten:** eine echte Marktbewertung für den Mitschnitt (`mb.market_reports` 196 → 197). Eine Quick-Check-KI-Analyse und ein Boarding-Pass entstanden bei meinem Handlauf ohne Drehbuch, den Pass habe ich gelöscht.
+- **Rest:**
+  - Aufnahme (Marcels Bildschirm).
+  - Intro/Outro-Abnahme durch Marcel.
+  - Nicht mit über: Makro-/Mikrolage, die Bewertungskarte selbst (`_mb_state`) und die Lageklasse.
+  - Das Quick Boarding rechnet 10,5 % Nebenkosten (Eigenkapital 18.900 €), die App 10,7 % (19.260 €). Sie meldet danach „Es fehlen 360 €“.
+  - Die Quellen-Auswahl beim Anlegen (`neues-objekt-quellen.js`) ist seit v1697 ausgehängt, deshalb zeigt Weg 2 die Leiste.
+  - Im Studio-Bild lag der Kegel auf „Neues Objekt“ bei geladenem Objekt auf leerer Fläche: der Deal-Score-Hinweis der Seitenleiste schiebt sich darüber. Nur gesehen, nicht weiter untersucht; das Drehbuch zeigt deshalb den Kopf.
+
 ### v2251 · Leeres Objekt nach dem Setup, Tour lädt das Demo, Bütten, Demo ergänzt (15.10.2026, Staging)
 
 - **Was:** Nach dem Setup steht ein leeres „Neues Objekt“ (ohne Tour sofort, mit Tour nach deren Ende über `__dpNachSetup`) – angezeigt, nicht gespeichert: `_dpEmptyCardSaving` hält `saveEmptyCard` an, weil das Demo aus der Bestätigung (`assignDemoObject`) schon einen Platz belegt. Die Tour lädt gezielt das Demo (Ort Dealhausen, Server-Abfrage `GET /objects`), bei nur leeren Objekten ein Tour-Demo. Kartenstil Bütten für alle Ansichten (`KARTENSTIL`), wirkt auch ohne Kachelklick. `erststart.js` schweigt, wenn es das Setup gibt. `demo-object.json`: 48 Felder ergänzt (129 → 175).
