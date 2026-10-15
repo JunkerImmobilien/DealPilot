@@ -1674,7 +1674,8 @@
     if (hint) {
       if (!hint._orig) hint._orig = hint.textContent;
       hint.textContent = '(Marktpreisindikation · AVM — kein Verkehrswert n. § 194 BauGB)';
-      hint.title = 'Der übernommene Wert stammt aus einer AVM-Markteinschätzung (PriceHubble/Sprengnetter), nicht aus einem Verkehrswertgutachten nach § 194 BauGB. Bei manueller Eingabe wird die Bezeichnung automatisch zurückgesetzt.';
+      /* v2254: keine Anbieternamen nach aussen (CLAUDE.md Anbieter-Neutralitaet) */
+      hint.title = 'Der übernommene Wert stammt aus einer Markteinschätzung unabhängiger Bewertungspartner, nicht aus einem Verkehrswertgutachten nach § 194 BauGB. Bei manueller Eingabe wird die Bezeichnung automatisch zurückgesetzt.';
       hint.style.color = 'var(--gold-3,#9a7f33)';
     }
     if (tn) { if (lbl._origTxt == null) lbl._origTxt = tn.nodeValue; tn.nodeValue = 'Marktpreis '; }

@@ -213,6 +213,8 @@ if (!window._wlc) {
     var vin = (d.valuation && d.valuation.inputs) || {};
     var area = (d.ref && d.ref.living_area) || numDe(vIn('wfl')) || 0;
     var out = { area: area };
+    /* v2254: aus welcher Stufe die Karte stammt (1/2 Indikation, 3 Wertermittlung) */
+    out.stufe = Number((d.ref && d.ref.wert_stufe) || (d.meta && d.meta.wert_stufe) || d.wert_stufe || 0) || null;
     out.rating = (d.deal_score && d.deal_score.rating) ? d.deal_score.rating : 'Indikation';
     out.conf = { label: mv.confidence_label || 'Indikation', pct: mv.confidence_pct != null ? mv.confidence_pct : 0 };
     /* v746-mikro-label: Label (wie Pilot) + Score auf 0-10-Skala statt Rohwert 0-100 */
@@ -357,7 +359,76 @@ if (!window._wlc) {
     } catch (e) { return ''; }
   }
 
+  /* ══ v2254 · MARKTWERTINDIKATION IST KEIN VERKEHRSWERT ═══════════════
+     Marcel am 15.10.2026: „Wenn wir die Marktpreisindikation mit dem
+     Angebotspreis und dem Abschlag übernehmen, ist das nicht der
+     Verkehrswert. Erst wenn wir Stufe 3 rechnen, sollte dort Verkehrswert
+     stehen - und auch welche Stufe bzw. amtlich. Automatisch."
+
+     Die Beschriftung von #svwert folgt der HERKUNFT des eingetragenen
+     Werts, nicht dem Feld:
+       · Wert gleich einer Spannen-Zahl dieser Karte (oder dem bei der
+         Uebernahme vermerkten Wert `sv`) -> Stufe der Karte
+           Stufe 1/2 -> „Marktwertindikation" (Angebotspreise mit Abschlag)
+           Stufe 3   -> „Verkehrswert", Stufe 3 · amtliche Wertermittlung
+       · sonst (von Hand, Gutachten) -> die Beschriftung aus dem HTML.
+     Gelesen wird bei jedem Zeichnen und bei jeder Eingabe - nach dem Laden
+     eines Objekts stimmt sie also ohne eigenen Merker. */
+  function _svHerkunft() {
+    var sv = $('svwert'); if (!sv) return null;
+    var v = numDe(sv.value); if (!(v > 0)) return null;
+    try {
+      var s = JSON.parse(($(STATE_ID) || {}).value || 'null');
+      if (s && s.sv && Math.abs(Number(s.sv.wert) - v) <= 1) return Number(s.sv.stufe) || 1;
+    } catch (e) {}
+    if (D && D.mw) {
+      var ks = ['low', 'med', 'high'];
+      for (var i = 0; i < ks.length; i++) {
+        var w = Number(D.mw[ks[i]]);
+        if (isFinite(w) && Math.abs(Math.round(w) - v) <= 1) return D.stufe || 1;
+      }
+    }
+    return null;
+  }
+  function _svLabel() {
+    var sv = $('svwert'); if (!sv) return;
+    var fld = sv.closest ? sv.closest('.f') : null;
+    var lbl = fld ? fld.querySelector('label') : null; if (!lbl) return;
+    var hint = lbl.querySelector('.cf-hint');
+    var tn = null;
+    for (var i = 0; i < lbl.childNodes.length; i++) { var n = lbl.childNodes[i]; if (n.nodeType === 3 && n.nodeValue && n.nodeValue.trim()) { tn = n; break; } }
+    if (lbl._svOrigTxt == null && tn) lbl._svOrigTxt = tn.nodeValue;
+    if (hint && hint._svOrig == null) hint._svOrig = hint.textContent;
+    var st = _svHerkunft();
+    if (st == null) {
+      if (!lbl._svMark) return;          /* nur zuruecknehmen, was wir gesetzt haben */
+      if (tn && lbl._svOrigTxt != null) tn.nodeValue = lbl._svOrigTxt;
+      if (hint && hint._svOrig != null) { hint.textContent = hint._svOrig; hint.style.color = ''; }
+      lbl.style.color = ''; lbl._svMark = false; lbl.removeAttribute('data-sv-stufe');
+      return;
+    }
+    if (lbl.getAttribute('data-sv-stufe') === String(st)) return;
+    if (st >= 3) {
+      if (tn) tn.nodeValue = 'Verkehrswert ';
+      if (hint) { hint.textContent = '(Stufe 3 · amtliche Wertermittlung nach ImmoWertV)'; hint.style.color = ''; }
+      lbl.style.color = '';
+    } else {
+      if (tn) tn.nodeValue = 'Marktwertindikation ';
+      if (hint) {
+        hint.textContent = '(Stufe ' + st + ' · aus Angebotspreisen mit Abschlag — kein Verkehrswert n. § 194 BauGB)';
+        hint.style.color = 'var(--gold-3,#9a7f33)';
+      }
+      lbl.style.color = 'var(--gold-3,#9a7f33)';
+    }
+    lbl._svMark = true; lbl.setAttribute('data-sv-stufe', String(st));
+  }
+  try {
+    document.addEventListener('input', function (e) { if (e.target && e.target.id === 'svwert') _svLabel(); }, true);
+    setInterval(_svLabel, 1500);   /* Laden eines Objekts, Werte von anderen Wegen */
+  } catch (e) {}
+
   function render() { /* v752-bridge */
+    try { _svLabel(); } catch (e) {}
     if (!D) return;
     persistLight();
     /* Section-Renderer (avm-section.js) uebernimmt die Darstellung; eigener Host bleibt leer. */
@@ -721,6 +792,7 @@ if (!window._wlc) {
         return;
       }
       D = mapCard(payload); mode = (_prefSpan() || 'med'); collapsed = false; /* v830-mb-expanded; v969c: Vorwahl-Spanne */
+      if (D && !D.stufe) D.stufe = stufe;   /* v2254: die angefragte Stufe */
       render();
       /* v1316: die Einstufungen wandern jetzt von selbst ins Formular -
          nur in leere Felder, und nur die, an denen keine Spannen-Wahl

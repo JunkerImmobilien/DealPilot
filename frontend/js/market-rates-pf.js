@@ -35,7 +35,7 @@ var MarketRatesPF = (function() {
   // ueber die Marktformel aus config.js marketRates.bauzins.
   var STATIC_FALLBACK_PF = {
     yields:  { '5': 3.68, '10': 3.93, '15': 4.05, '20': 4.11 },
-    margins: { premium: 0.25, standard: 0.40, schwach: 0.80 }
+    margins: { premium: 0.25, standard: 0.40, schwach: 0.80, voll: 1.03 }
   };
 
   async function _fetchFromBackend() {
@@ -63,20 +63,23 @@ var MarketRatesPF = (function() {
     /* v2245: dieselbe Marktformel wie das Backend, mit dem statischen Stand */
     var formel = null;
     try { formel = (typeof window.dpBauzinsFormel === 'function') ? window.dpBauzinsFormel() : null; } catch (e) {}
-    var STL = (formel && formel.stufen_ltv) || { premium: 60, standard: 80, schwach: 90 };
+    var STL = (formel && formel.stufen_ltv) || { premium: 60, standard: 80, schwach: 90, voll: 100 };
+    if (STL.voll == null) STL.voll = 100;   /* v2254 */
     Object.keys(f.yields).forEach(function(m) {
       if (formel && typeof window.dpBauzinsRechnen === 'function') {
         indicative[m] = {
           premium:  window.dpBauzinsRechnen(formel, m, STL.premium),
           standard: window.dpBauzinsRechnen(formel, m, STL.standard),
-          schwach:  window.dpBauzinsRechnen(formel, m, STL.schwach)
+          schwach:  window.dpBauzinsRechnen(formel, m, STL.schwach),
+          voll:     window.dpBauzinsRechnen(formel, m, STL.voll)
         };
         if (indicative[m].standard != null) return;
       }
       indicative[m] = {
         premium:  Math.round((f.yields[m] + f.margins.premium)  * 100) / 100,
         standard: Math.round((f.yields[m] + f.margins.standard) * 100) / 100,
-        schwach:  Math.round((f.yields[m] + f.margins.schwach)  * 100) / 100
+        schwach:  Math.round((f.yields[m] + f.margins.schwach)  * 100) / 100,
+        voll:     Math.round((f.yields[m] + f.margins.voll)     * 100) / 100
       };
     });
     return {
@@ -99,6 +102,17 @@ var MarketRatesPF = (function() {
   async function _refresh() {
     var data = await _fetchFromBackend();
     if (!data) data = _buildFromFallback();
+    /* v2254: liefert das Backend noch keine Stufe `voll`, wird sie aus
+       derselben Formel nachgerechnet - die Kachel zeigt sonst „–". */
+    try {
+      if (data && data.formel && data.indicativeRates && typeof window.dpBauzinsRechnen === 'function') {
+        data.stufen_ltv = Object.assign({ voll: 100 }, data.stufen_ltv || {});
+        Object.keys(data.indicativeRates).forEach(function (m) {
+          var ir = data.indicativeRates[m];
+          if (ir && ir.voll == null) ir.voll = window.dpBauzinsRechnen(data.formel, m, data.stufen_ltv.voll);
+        });
+      }
+    } catch (e) {}
     _currentData = data;
     _renderUI();
     try { _syncTopStrip(); } catch(e){}
@@ -117,7 +131,7 @@ var MarketRatesPF = (function() {
   function _zerlegung(d, key, stufe) {
     var f = d && d.formel;
     if (!f || !f.bund || f.bund[key] == null || f.aufschlag == null || f.aufschlag[key] == null) return null;
-    var ltv = (d.stufen_ltv && d.stufen_ltv[stufe]) || ({ premium: 60, standard: 80, schwach: 90 })[stufe] || 80;
+    var ltv = (d.stufen_ltv && d.stufen_ltv[stufe]) || ({ premium: 60, standard: 80, schwach: 90, voll: 100 })[stufe] || 80;
     var z = (typeof window.dpBauzinsZuschlag === 'function') ? window.dpBauzinsZuschlag(ltv, f.zuschlaege) : 0;
     /* Angezeigter Marktaufschlag = Zins - Bundesanleihe - Zuschlag: so geht
        die Unterzeile auf den Cent genau auf (getrennt gerundet wuerde z. B.
@@ -143,7 +157,7 @@ var MarketRatesPF = (function() {
   window.dpBauzinsDetailText = function (key, stufe) { try { return _detailText(_currentData, String(key), stufe || _activeMargin); } catch (e) { return null; } };
 
   function setMargin(marginKey) {
-    if (!['premium', 'standard', 'schwach'].includes(marginKey)) return;
+    if (!['premium', 'standard', 'schwach', 'voll'].includes(marginKey)) return;   /* v2254: voll */
     _activeMargin = marginKey;
     // Buttons visuell
     document.querySelectorAll('.mr-pf-margin-btn').forEach(function(b) {
@@ -386,7 +400,7 @@ var MarketRatesPF = (function() {
 (function(){
   var PLANE='<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M21.5 2.5l-7 19.5-3.8-8.2-8.2-3.8z"/></svg>';
   /* v2245: die Stufen SIND feste Beleihungen der Marktformel (60 / 80 / 90 %) */
-  var LBL={ premium:'LTV 60 %', standard:'LTV 80 %', schwach:'LTV 90 %' };
+  var LBL={ premium:'LTV 60 %', standard:'LTV 80 %', schwach:'LTV 90 %', voll:'LTV 100 %' };
   function activeKey(){
     var a=document.querySelector('.mr-pf-margin-btn.active');
     return a ? a.getAttribute('data-margin') : 'standard';
@@ -412,6 +426,7 @@ var MarketRatesPF = (function() {
             '<button type="button" class="dpfk-ltv-btn" data-margin="premium" title="Beleihung 60 %">60&nbsp;%</button>'+
             '<button type="button" class="dpfk-ltv-btn" data-margin="standard" title="Beleihung 80 %">80&nbsp;%</button>'+
             '<button type="button" class="dpfk-ltv-btn" data-margin="schwach" title="Beleihung 90 %">90&nbsp;%</button>'+
+            '<button type="button" class="dpfk-ltv-btn" data-margin="voll" title="Beleihung 100 % (Vollfinanzierung)">100&nbsp;%</button>'+
           '</span></span>'+
         '</div></div>';
       strip.parentNode.insertBefore(band, strip);

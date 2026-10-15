@@ -152,13 +152,14 @@ window.V10 = (function() {
         if (cfg) _pfandbrief = { yields: cfg.yields, margins: cfg.margins, source: 'static', asOf: cfg.asOf };
         /* v2245: auch im Rueckfall die Marktformel (statischer Stand aus config.js) */
         if (_pfandbrief && typeof window.dpBauzinsRechnen === 'function' && typeof window.dpBauzinsFormel === 'function') {
-          var _f = window.dpBauzinsFormel(), _st = _f.stufen_ltv || { premium: 60, standard: 80, schwach: 90 };
+          var _f = window.dpBauzinsFormel(), _st = Object.assign({ voll: 100 }, _f.stufen_ltv || { premium: 60, standard: 80, schwach: 90 });
           _pfandbrief.indicativeRates = {};
           ['5', '10', '15', '20'].forEach(function (k) {
             _pfandbrief.indicativeRates[k] = {
               premium: window.dpBauzinsRechnen(_f, k, _st.premium),
               standard: window.dpBauzinsRechnen(_f, k, _st.standard),
-              schwach: window.dpBauzinsRechnen(_f, k, _st.schwach)
+              schwach: window.dpBauzinsRechnen(_f, k, _st.schwach),
+              voll: window.dpBauzinsRechnen(_f, k, _st.voll)   /* v2254 */
             };
           });
         }

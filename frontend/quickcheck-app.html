@@ -3783,6 +3783,33 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 </div>
 
 <script>
+/* ══ v2254 · KAUFNEBENKOSTEN WIE IM OBJEKT ══════════════════════════════
+   Gemessen 15.10.2026 (Sachsenstr. 18, Herford): das Quick Boarding rechnete
+   pauschal 10,5 %, das Objekt nach der Uebernahme 10,7 % - im Reiter
+   Finanzierung stand danach „Es fehlen 360 €".
+   Das Objekt setzt sich zusammen aus (main.js setDefaults, grest-plz-lookup.js):
+     Grunderwerbsteuer nach Bundesland (aus der PLZ)
+     + Notar & Grundbuch (Profil `notar_grundbuch`, Vorgabe 2,2)
+     + Grundbuchamt 0,5 + Sonstige 1,5 (+ Makler 0)
+   Dieselben Bausteine hier, gelesen aus der Hauptanwendung (gleiche Herkunft).
+   Ohne PLZ: 6,5 % Grunderwerbsteuer wie die Vorbelegung im Objekt. */
+window._qcKnkPct = function () {
+  var P = null; try { P = window.parent && window.parent !== window ? window.parent : window; } catch (e) { P = window; }
+  var grest = 6.5, notar = 2.2;
+  try {
+    var plz = ((document.getElementById('qc_plz') || {}).value || '').trim();
+    var G = (P && P.DealPilotGrest) || window.DealPilotGrest;
+    if (plz.length === 5 && G && typeof G.forPlz === 'function') { var r = G.forPlz(plz); if (r && isFinite(r.rate)) grest = Number(r.rate); }
+  } catch (e) {}
+  try {
+    var IP = (P && P.DealPilotInvestmentProfile) || window.DealPilotInvestmentProfile;
+    var v = IP && typeof IP.get === 'function' ? parseFloat(IP.get('notar_grundbuch')) : NaN;
+    if (isFinite(v)) notar = v;
+  } catch (e) {}
+  return Math.round((grest + notar + 0.5 + 1.5) * 100) / 100;
+};
+</script>
+<script>
 /* ═══════════════════════════════════════════════════════════════════
    ICONS — Lucide-Style SVG
    ═══════════════════════════════════════════════════════════════════ */
@@ -3893,7 +3920,7 @@ const QcEngine = (function() {
     const nulY = hgY * hgSplit / 100;
     const ulY = hgY * (100 - hgSplit) / 100;
     const nmr = ((nkm * 12) - nulY) / kp * 100;
-    const knkPct = 10.5;
+    const knkPct = window._qcKnkPct();   /* v2254: war fest 10,5 */
     const gesamt = kp * (1 + knkPct / 100);
     const ekValue = ek != null ? ek : gesamt * 0.20;
     const darlehen = Math.max(0, gesamt - ekValue);
@@ -3988,7 +4015,7 @@ const QcEngine = (function() {
         avmMarktwert: mlMarktwert, avmPriceGapPct: mlPriceGapPct, marktlage: sMarktlage,
         annuMon: Math.round(annuMon), darlehen: Math.round(darlehen),
         ekValue: Math.round(ekValue), gesamt: Math.round(gesamt),
-        hgY: Math.round(hgY), nulY: Math.round(nulY), ulY: Math.round(ulY)
+        hgY: Math.round(hgY), nulY: Math.round(nulY), ulY: Math.round(ulY), knkPct: knkPct /* v2254 */
       }
     };
   }
@@ -4173,7 +4200,7 @@ const QcApp = (function() {
          (gemessen: 80 % geklickt, EK blieb 32.000 €, Score unverändert) */
       if (btnEl) delete ekInp.dataset.userSet;
       if (!ekInp.dataset.userSet) {
-        const knkPct = 10.5;
+        const knkPct = window._qcKnkPct();   /* v2254: war fest 10,5 */
         const ekKpPart = kp * (1 - pct / 100);
         const ekNk = kp * knkPct / 100;
         ekInp.value = String(Math.round(ekKpPart + ekNk));
@@ -4372,7 +4399,7 @@ const QcApp = (function() {
      liefen sofort auseinander: computeScore() haelt den Nebenkostensatz fest
      auf 10,5 % und nimmt notfalls 20 % der Gesamtinvestition als
      Eigenkapital an. Genau das steht deshalb auch im Satz. */
-  var QCB_KNK_PCT = 10.5;   /* gespiegelt aus computeScore(), NICHT neu gesetzt */
+  var QCB_KNK_PCT = 10.5;   /* nur Rueckfall; v2254: computeScore liefert k.knkPct aus window._qcKnkPct() */
   function _qcbRechenweg(inputs, k, gated) {
     var box = document.getElementById('qcb-hinweis');
     var host = document.getElementById('qcb-rows');
@@ -6066,6 +6093,10 @@ function renderTransferList() {
       /* v2253 · die Haken im Fenster heissen ohne _pendingTransfer-Eintrag
          „DealPilot_mw"/„DealPilot_mm" (qc-bridge.js secHtml) */
       if (_useCk) { if (_ck.has('DealPilot_mw')) _checked.verkehrswert = true; if (_ck.has('DealPilot_mm')) _checked.nkm_grund = true; }
+      /* v2254 · Marcel 15.10.2026: Lage und Bewertungskarte wandern mit.
+         Die Lage liefert nur DealPilot - sie hatte im Fenster keinen eigenen
+         Haken und fiel deshalb in qc-bridge.js an _on() durch. */
+      if (_useCk && _dpR) { _checked.lage_macro = true; _checked.lage_micro = true; _checked.wertsteigerung_pa = true; }
       var _mw=_pick('mw'), _mm=_pick('mm');
       if (_mw!=null || _mm!=null || _dpR || _effR) {
         avm = {
@@ -6078,7 +6109,9 @@ function renderTransferList() {
           demandScore: (_effR && typeof _demandScore === 'function') ? (_demandScore(_effR) || {}).score : null,
           riskScore:   (_effR && typeof _rentRiskScore === 'function') ? (_rentRiskScore(_effR) || {}).score : null,
           wfl: QcEngine.num(inputs.wfl) || 0,
-          checkedTargets: _checked
+          checkedTargets: _checked,
+          /* v2254: die DealPilot-Bewertungskarte selbst (Spanne, Lage, Stufe) */
+          mbState: (function () { try { return (document.getElementById('_mb_state') || {}).value || null; } catch (e) { return null; } })()
         };
       }
     } catch (e) {}
@@ -6795,7 +6828,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
     var kp=_num(kpEl.value); if(!kp) return;
     var act=document.querySelector(".ltv-btn.active");
     var pct=act?parseFloat(act.getAttribute("data-ltv")):100; if(isNaN(pct)) pct=100;
-    ekEl.value=String(Math.round(kp*(1-pct/100)+kp*10.5/100));
+    ekEl.value=String(Math.round(kp*(1-pct/100)+kp*window._qcKnkPct()/100));   /* v2254 */
     try{ if(window.QcApp&&QcApp.scheduleUpdate) QcApp.scheduleUpdate(); }catch(_){}
   }
   function ready(){
@@ -7302,7 +7335,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     if (!window.DealKpis || !window.DealScore || typeof window.DealScore.computeFromKpis!=="function") return null;
     var kp=n(i.kp), nkm=n(i.nkm);
     if (!kp || !nkm) return { score:null, label:"\u2013", tier:null, sub:{}, kpi:{} };
-    var hgY=n(i.hg)*12, split=(n(i.hg_split)||22)/100, knk=(n(i.knk)||10.5)/100;
+    var hgY=n(i.hg)*12, split=(n(i.hg_split)||22)/100, knk=(n(i.knk)||window._qcKnkPct())/100;   /* v2254 */
     var gesamt=kp*(1+knk), ek=n(i.ek), darlehen=Math.max(0,gesamt-ek);
     var k = window.DealKpis.compute({ kp:kp, nk:kp*knk, nkm:nkm, ze:0,
       bwk_ul:hgY*(1-split), bwk_nul:hgY*split, d1:darlehen, d1z:(n(i.zins)||3.8), d1t:(n(i.tilg)||1.5),

@@ -78,7 +78,10 @@ const LTV_STUETZSTELLEN = [
 /* Die drei Stufen der bisherigen Oberflaeche (premium / standard /
    schwach) bleiben als feste Beleihungen erhalten - abwaertskompatibel
    fuer jeden, der indicativeRates[b][stufe] liest. */
-const STUFEN_LTV = { premium: 60, standard: 80, schwach: 90 };
+/* v2254 · Marcel 15.10.2026: „Wir haben neue LTV-Werte bei den Zinssaetzen,
+   auch 100 % - das muss im Tab Finanzierung auf der Karte auswaehlbar sein."
+   `voll` = Vollfinanzierung, Zuschlag aus derselben Stuetzstellen-Tabelle. */
+const STUFEN_LTV = { premium: 60, standard: 80, schwach: 90, voll: 100 };
 
 /* Letztes Sicherheitsnetz, gemessen an der Bundesbank-API am 15.10.2026
    (tools/bauzins-pruefen.mjs). Nur fuer den Fall, dass weder die API

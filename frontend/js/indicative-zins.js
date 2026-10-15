@@ -34,14 +34,14 @@
     aufschlag_monat: '2026-08',
     k: 0.27,
     zuschlaege: [[60, -0.20], [70, -0.10], [80, 0], [90, 0.22], [100, 0.45], [110, 0.95]],
-    stufen_ltv: { premium: 60, standard: 80, schwach: 90 }
+    stufen_ltv: { premium: 60, standard: 80, schwach: 90, voll: 100 }
   };
-  var STUFEN_LTV = { premium: 60, standard: 80, schwach: 90 };
+  var STUFEN_LTV = { premium: 60, standard: 80, schwach: 90, voll: 100 };   /* v2254: voll = 100 % */
 
   /* Altmodell (vor v2245) - nur noch, wenn keine Formel vorliegt. */
   var STATIC_ALT = {
     yields:  { '5': 3.68, '10': 3.93, '15': 4.05, '20': 4.11 },
-    margins: { premium: 0.25, standard: 0.40, schwach: 0.80 }
+    margins: { premium: 0.25, standard: 0.40, schwach: 0.80, voll: 1.03 }
   };
 
   function _live() {
