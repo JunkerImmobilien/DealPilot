@@ -2023,6 +2023,10 @@
   }
   function r6Optionstext(id) { var e = document.getElementById(id); return e && e.selectedIndex >= 0 ? r6Text(e.options[e.selectedIndex]) : ''; }
   function r6Pz(s) { return String(s == null ? '' : s).replace('.', ','); }
+  /* eine Zeile, während derer etwas passiert (tippen, klicken): sie steht
+     mindestens ihre Lesezeit - gemessen standen solche Zeilen nur 3 s */
+  function r6Beginn(s, titel, text) { s.zeile(titel, text); return { t0: Date.now(), soll: lies(titel, text) * TEMPO }; }
+  async function r6Ende(b) { var rest = b.soll - (Date.now() - b.t0); if (rest > 300) await warte(rest >= 600 * TEMPO ? rest / TEMPO : rest); }
   function r6Knopf(wurzel, re) { var w = typeof wurzel === 'string' ? q(wurzel) : wurzel; return w ? [].filter.call(w.querySelectorAll('button,a'), function (b) { return b.offsetWidth && re.test(b.textContent || ''); })[0] || null : null; }
   /* Einstellungen nur ansehen - nie speichern */
   async function r6Einstellungen(bereich) {
@@ -2068,10 +2072,11 @@
       async function (s) {   /* 2 · Kaufpreis */
         reiter('s1'); await warte(700);
         await zeige(r6Gruppe('kp'), 10);
-        s.zeile('Der Kaufpreis', 'Eingetippt — alles andere in diesem Reiter rechnet DealPilot daraus.');
+        var zb = r6Beginn(s, 'Der Kaufpreis', 'Eingetippt — alles andere in diesem Reiter rechnet DealPilot daraus.');
         await tippeH('kp', '180000', 80);
         try { DealPilotInvestmentProfile.nachziehen('kp'); } catch (e) {}
         await warte(1200);
+        await r6Ende(zb);
         await zeigeGruppe(feldVon('notar_p'), feldVon('ji_e'), 8);
         await b2oZeile(s, 'Schon vorbelegt', 'Kaufpreis <b>' + eur(zahl('kp')) + '</b> — die Nebenkosten stehen sofort da, in Prozent und in Euro.');
       },
@@ -2102,11 +2107,12 @@
         var t = q('#sanbedarf_toggle'); if (t && !t.checked) t.click();
         await warte(700);
         await zeige(function () { return q('#sanbedarf_body .fesh-grid'); }, 8);
-        s.zeile('Sanierung', 'Welche Bereiche müssen gemacht werden? Ein Klick je Gewerk — mit Richtwert.');
+        var zb = r6Beginn(s, 'Sanierung', 'Welche Bereiche müssen gemacht werden? Ein Klick je Gewerk — mit Richtwert.');
         await warte(1800);
         ['fesh_b', 'fesh_e'].forEach(function (id) { var c = document.getElementById(id); if (c && !c.checked) c.click(); });
         await warte(1200);
         var b = document.getElementById('fesh_b_cost'), e = document.getElementById('fesh_e_cost');
+        await r6Ende(zb);
         await b2oZeile(s, 'Sanierung', 'Bäder <b>' + eur(zahl('fesh_b_cost')) + '</b> und Elektrik <b>' + eur(zahl('fesh_e_cost')) + '</b> angehakt — Summe <b>' + r6Id('fesh_total') + '</b>. Die Beträge sind änderbar.');
         await zeige(function () { return q('.fesh-apply-btn'); }, 10);
         await warte(1400);
@@ -2124,13 +2130,15 @@
         var t = q('#inv_detail_toggle'); if (t && !t.checked) t.click();
         await warte(700);
         await zeigeGruppe(feldVon('inv_kueche'), feldVon('inv_geraete'), 8);
-        s.zeile('Inventar', 'Küche und Möbel, die mitverkauft werden — getrennt vom Gebäude erfasst.');
+        var zb = r6Beginn(s, 'Inventar', 'Küche und Möbel, die mitverkauft werden — getrennt vom Gebäude erfasst.');
         await tippeH('inv_kueche', '6000', 90); await tippeH('inv_moebel', '2500', 90);
         await warte(1000);
+        await r6Ende(zb);
         await zeige(function () { return q('#inv_sum') && q('#inv_sum').closest('.kv'); }, 10);
         await b2oZeile(s, 'Inventar', 'Küche ' + eur(zahl('inv_kueche')) + ' + Möbel ' + eur(zahl('inv_moebel')) + ' = <b>' + r6Id('inv_sum') + '</b>.');
       },
       async function (s) {   /* 10 · was das Inventar bewirkt */
+        var it = q('#inv_tax_active'); if (it && !it.checked) it.click();
         await zeige(function () { return q('#moebl') && q('#moebl').closest('.card'); }, 8);
         await b2oZeile(s, 'Was es bewirkt', 'Eigene Abschreibung über <b>' + r6Optionstext('inv_tax_years') + '</b> — und es zählt nicht zur 15-%-Grenze der Sanierung.');
         var m = q('.main-col'); if (m) m.scrollTop = 0;
@@ -2152,12 +2160,13 @@
       async function (s) {   /* 2 · Nettokaltmiete */
         reiter('s2'); await warte(700);
         await zeige(r6Gruppe('nkm'), 10);
-        s.zeile('Die Ist-Miete', 'Was der Mieter heute kalt zahlt — eingetippt.');
+        var zb = r6Beginn(s, 'Die Ist-Miete', 'Was der Mieter heute kalt zahlt — eingetippt.');
         await tippeH('nkm', '900', 90);
         try { DealPilotInvestmentProfile.nachziehen('nkm'); } catch (e) {}
         await tippeH('ze', '40', 90);
         await tippeH('umlagef', '230', 90);
         await warte(1000);
+        await r6Ende(zb);
         await zeigeGruppe(feldVon('nkm'), function () { return q('#wm_m') && q('#wm_m').closest('.f'); }, 8);
         await b2oZeile(s, 'Die Ist-Miete', 'Kaltmiete <b>' + eur(zahl('nkm')) + '</b>, Stellplatz ' + eur(zahl('ze')) + ', Nebenkosten-Vorauszahlung ' + eur(zahl('umlagef')) + ' — Warmmiete <b>' + r6Id('wm_m') + '</b>.');
         await zeige(function () { return q('#miete_qm') && q('#miete_qm').closest('.f'); }, 10);
@@ -2171,13 +2180,14 @@
       },
       async function (s) {   /* 4 · Marktmiete */
         await zeige(r6Gruppe('ds2_marktmiete'), 10);
-        s.zeile('Die Marktmiete', 'Was eine Neuvermietung heute bringt — aus der Marktbewertung (Modul 04) oder von dir.');
+        var zb = r6Beginn(s, 'Die Marktmiete', 'Was eine Neuvermietung heute bringt — aus der Marktbewertung (Modul 04) oder von dir.');
         var k = window.DPM_REIHE_DATEN && DPM_REIHE_DATEN.mb && DPM_REIHE_DATEN.mb[1];
         var qm = (function () { try { return k.valuation.inputs.market_rent_sqm; } catch (e) { return null; } })();
         if (!(qm > 0)) qm = 8;   /* nur Rückfall, gelesen wird unten aus dem Feld */
         await warte(1600);
         await tippeH('ds2_marktmiete', String(qm).replace('.', ','), 110);
         await warte(1000);
+        await r6Ende(zb);
         await b2oZeile(s, 'Die Marktmiete', 'Marktmiete <b>' + wert('ds2_marktmiete') + ' €/m²</b> gegen deine ' + r6Id('miete_qm') + ' — der Abstand fließt in den Investor Deal Score.');
       },
       async function (s) {   /* 5 · Mietausfall-Risiko aus dem Leerstand */
@@ -2192,7 +2202,7 @@
       },
       async function (s) {   /* 6 · Mietvertrag */
         await zeigeGruppe(feldVon('mv_art'), feldVon('mv_letzte_erhoehung'), 8);
-        s.zeile('Der Mietvertrag', 'Vertragsart, Beginn und letzte Erhöhung — für jede Objektart.');
+        var zb = r6Beginn(s, 'Der Mietvertrag', 'Vertragsart, Beginn und letzte Erhöhung — für jede Objektart.');
         await warte(1500);
         var sel = document.getElementById('mv_art');
         var idx = sel ? [].findIndex.call(sel.options, function (o) { return /Index/i.test(o.textContent); }) : -1;
@@ -2201,6 +2211,7 @@
         r6Setz('mv_beginn', '2019-04-01'); await warte(600);
         r6Setz('mv_letzte_erhoehung', '2024-04-01'); await warte(900);
         var n = sel ? sel.options.length : 0;
+        await r6Ende(zb);
         await b2oZeile(s, 'Der Mietvertrag', '<b>' + r6Optionstext('mv_art') + '</b> seit 04/2019, zuletzt erhöht 04/2024' + (n ? ' — ' + (n - 1) + ' Vertragsarten zur Auswahl' : '') + '.');
       },
       async function (s) {   /* 7 · Mietentwicklung: Prognose */
@@ -2211,9 +2222,10 @@
         var b = q('#me-mode-detail'); if (b) b.click();
         await warte(900);
         await zeige(function () { return q('#me-block-detail .g2'); }, 8);
-        s.zeile('Oder im Detail', 'Einzelne Erhöhungen, z. B. bei Staffel- oder Indexmiete — gegen den Mietspiegel.');
+        var zb = r6Beginn(s, 'Oder im Detail', 'Einzelne Erhöhungen, z. B. bei Staffel- oder Indexmiete — gegen den Mietspiegel.');
         await tippeH('me_soll', '8,50', 110);
         await warte(1200);
+        await r6Ende(zb);
         await b2oZeile(s, 'Oder im Detail', '<b>' + wert('me_anz') + ' Erhöhungen</b> alle ' + wert('me_int') + ' Jahre, zusammen ' + r6Pz(wert('me_pct')) + ' % — Soll-Mietspiegel ' + wert('me_soll') + ' €/m²' + (r6Id('me_opp') && r6Id('me_opp') !== '—' ? ', Abstand ' + r6Id('me_opp') : '') + '.');
         var p = q('#me-mode-prog'); if (p) p.click();
         await warte(700);
@@ -2248,11 +2260,12 @@
       },
       async function (s) {   /* 3 · Zuschlag nach Beleihung */
         await zeige(function () { return q('#dpfk-band .dpfk-ltv'); }, 10);
-        s.zeile('Zuschlag nach Beleihung', 'Je mehr die Bank finanziert, desto höher der Zins — die Knöpfe zeigen es.');
+        var zb = r6Beginn(s, 'Zuschlag nach Beleihung', 'Je mehr die Bank finanziert, desto höher der Zins — die Knöpfe zeigen es.');
         await warte(1800);
         var a = await r6Ltv('premium'); await warte(700);
         var c = await r6Ltv('schwach'); await warte(700);
         var d = await r6Ltv('voll'); await warte(500);
+        await r6Ende(zb);
         await zeige(function () { return q('#mrpf-top-detail-10') && q('#mrpf-top-detail-10').closest('.mrpf-top-tile'); }, 10);
         await b2oZeile(s, 'Zuschlag nach Beleihung', '10 Jahre: 60 % → <b>' + a.zins + '</b> · 90 % → <b>' + c.zins + '</b> · 100 % → <b>' + d.zins + '</b>. ' + (/Beleihung\s+([\d,]+)/.test(d.weg) ? 'Bei 100 % kommen ' + /Beleihung\s+([\d,]+)/.exec(d.weg)[1] + ' Punkte dazu.' : ''));
         await r6Ltv('standard');
@@ -2281,10 +2294,11 @@
       async function (s) {   /* 6 · Kaufpreis -> Eigenkapital -> Darlehen */
         reiter('s1'); await warte(600);
         await zeige(r6Gruppe('kp'), 10);
-        s.zeile('Erst der Kaufpreis', 'Im Reiter Investition: 180.000 € — mit Nebenkosten die Gesamtinvestition.');
+        var zb = r6Beginn(s, 'Erst der Kaufpreis', 'Im Reiter Investition: 180.000 € — mit Nebenkosten die Gesamtinvestition.');
         await tippeH('kp', '180000', 70);
         try { DealPilotInvestmentProfile.nachziehen('kp'); } catch (e) {}
         await warte(1400);
+        await r6Ende(zb);
         reiter('s3'); await warte(800);
         await zeigeGruppe(feldVon('ek'), feldVon('d1'), 8);
         await warteAuf(function () { return zahl('d1') > 0; }, 4000);
@@ -2324,10 +2338,11 @@
       async function (s) {   /* 2 · Miete eintragen (Mietausfall kommt nach) */
         reiter('s2'); await warte(600);
         await zeige(r6Gruppe('nkm'), 10);
-        s.zeile('Erst die Miete', 'Im Reiter Miete: 900 € kalt — daran hängt der kalkulatorische Mietausfall.');
+        var zb = r6Beginn(s, 'Erst die Miete', 'Im Reiter Miete: 900 € kalt — daran hängt der kalkulatorische Mietausfall.');
         await tippeH('nkm', '900', 90);
         try { DealPilotInvestmentProfile.nachziehen('nkm'); } catch (e) {}
         await warte(1300);
+        await r6Ende(zb);
       },
       async function (s) {   /* 3 · zwei Rechenwege */
         reiter('s4'); await warte(800);
@@ -2344,17 +2359,19 @@
       },
       async function (s) {   /* 5 · umlagefähig */
         await zeigeGruppe(feldVon('hg_ul'), feldVon('ul_sonst'), 8);
-        s.zeile('Umlagefähig', 'Zahlt der Mieter über die Nebenkosten — dazu die Grundsteuer.');
+        var zb = r6Beginn(s, 'Umlagefähig', 'Zahlt der Mieter über die Nebenkosten — dazu die Grundsteuer.');
         await tippeH('grundsteuer', '190', 110);
         await warte(1100);
+        await r6Ende(zb);
         await zeige(function () { return q('#ul_sum') && q('#ul_sum').closest('.card'); }, 8);
         await b2oZeile(s, 'Umlagefähig', 'Hausgeld-Anteil <b>' + eur(zahl('hg_ul')) + '</b> + Grundsteuer ' + eur(zahl('grundsteuer')) + ' = <b>' + r6Id('ul_sum') + '</b> im Jahr — für dich ein durchlaufender Posten.');
       },
       async function (s) {   /* 6 · nicht umlagefähig, Rücklagen */
         await zeigeGruppe(feldVon('hg_nul'), feldVon('eigen_r'), 8);
-        s.zeile('Nicht umlagefähig', 'Das bleibt bei dir: Verwaltung und Rücklage aus dem Hausgeld.');
+        var zb = r6Beginn(s, 'Nicht umlagefähig', 'Das bleibt bei dir: Verwaltung und Rücklage aus dem Hausgeld.');
         await tippeH('weg_r', '480', 110);
         await warte(1000);
+        await r6Ende(zb);
         await b2oZeile(s, 'Nicht umlagefähig', 'Hausgeld-Anteil <b>' + eur(zahl('hg_nul')) + '</b> — darin steckt die WEG-Rücklage (' + eur(zahl('weg_r')) + ', nur zur Info, nicht doppelt gezählt). Eigene Rücklage für Bad, Küche, Böden: <b>' + eur(zahl('eigen_r')) + '</b>.');
       },
       async function (s) {   /* 7 · Mietausfall */
@@ -2454,12 +2471,13 @@
         await b2oZeile(s, 'Restnutzungsdauer ermitteln', 'Neun Schritte, die Objektdaten sind schon da: ' + wert('str') + ' ' + wert('hnr') + ', Baujahr ' + wert('baujahr') + ', ' + wert('wfl') + ' m².');
       },
       async function (s) {   /* 6 · durch den Wizard */
-        s.zeile('Restnutzungsdauer ermitteln', 'Bauweise, Technik, Modernisierungen, Zustand der Gewerke, Schäden — Schritt für Schritt.');
+        var zb = r6Beginn(s, 'Restnutzungsdauer ermitteln', 'Bauweise, Technik, Modernisierungen, Zustand der Gewerke, Schäden — Schritt für Schritt.');
         for (var i = 0; i < 8 && !/Schritt 9/.test(r6WizTitel()); i++) { if (!(await r6WizWeiter())) break; await warte(1100); }
         await warteAuf(function () { return /Schritt 9/.test(r6WizTitel()); }, 4000);
         await warte(700);
         var t = (r6Wiz() || {}).innerText || '';
         var rnd = /GESCHÄTZTE RESTNUTZUNGSDAUER[\s\S]*?(\d+)\s*Jahre/i.exec(t), urt = /(Gutachten lohnt[^\n]*)/.exec(t), net = /Netto-Vorteil\s*([−\-+]?[\d.]+\s*€)/.exec(t);
+        await r6Ende(zb);
         await zeige(function () { var e = rhIm(r6Wiz(), /GESCHÄTZTE RESTNUTZUNGSDAUER/i); return e && (e.closest('div[style]') || e.parentElement); }, 8);
         await b2oZeile(s, 'Das Ergebnis', 'Geschätzte Restnutzungsdauer <b>' + (rnd ? rnd[1] + ' Jahre' : '–') + '</b>. ' + (urt ? '„' + urt[1].trim() + '“' : '') + (net ? ' — Netto-Vorteil ' + net[1] : '') + '.');
       },
@@ -2543,10 +2561,11 @@
         await warte(600);
         function karte(v) { return [].filter.call(document.querySelectorAll('#bmfOverlay [onclick*="_v292SelectVariant"]'), function (x) { return x.tagName !== 'INPUT' && new RegExp("'" + v + "'").test(x.getAttribute('onclick')); })[0] || null; }
         await zeige(function () { var a = karte('amtlich'), b = karte('aggressiv'); return a && b ? b2oHuelle(a, b) : (a || b); }, 6);
-        s.zeile('Schritt 4 · Du wählst', 'Vier Karten, jede mit Risiko-Score — grün ist die Arbeitshilfe, rot kann das Finanzamt beanstanden.');
+        var zb = r6Beginn(s, 'Schritt 4 · Du wählst', 'Vier Karten, jede mit Risiko-Score — grün ist die Arbeitshilfe, rot kann das Finanzamt beanstanden.');
         await warte(3200);
         var o = karte('optimiert'); if (o) o.click();
         await warte(900);
+        await r6Ende(zb);
         await zeige(function () { return karte('optimiert'); }, 8);
         var kt = r6Text(karte('optimiert'));
         var gp = /Gebäude\s*([\d,]+ %)/.exec(kt), af = /AfA Gebäude \/ Jahr\s*([\d.]+ €)/.exec(kt), sc = /Risiko Score (\d)/.exec(kt);
@@ -2579,13 +2598,14 @@
         await warte(1000);
         var ub = r6Knopf('#bmfOverlay', /Übernehmen/);
         await zeige(function () { return r6Knopf('#bmfOverlay', /Übernehmen/); }, 10);
-        s.zeile('Übernehmen', 'Ein Klick — der Gebäudeanteil der gewählten Variante geht in den Reiter Steuer.');
+        var zb = r6Beginn(s, 'Übernehmen', 'Ein Klick — der Gebäudeanteil der gewählten Variante geht in den Reiter Steuer.');
         await warte(2600);
         if (ub) ub.click();
         await warteAuf(function () { return !r6Bmf() || !r6Bmf().classList.contains('open'); }, 5000);
         kegelHoch(false);
         await warte(1200);
         if (!q('#s3-tax.active')) reiter('s3-tax');
+        await r6Ende(zb);
         await zeigeGruppe(feldVon('geb_ant'), function () { return q('#afa_kalk') && q('#afa_kalk').closest('.f'); }, 8);
         await b2oZeile(s, 'Im Reiter Steuer', 'Gebäudeanteil <b>' + r6Pz(wert('geb_ant')) + ' %</b> — die Abschreibung steigt auf <b>' + r6Id('afa_kalk') + '</b> im Jahr.', 600);
       }
