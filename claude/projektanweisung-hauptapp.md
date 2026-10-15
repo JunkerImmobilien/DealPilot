@@ -38787,6 +38787,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** ein Marktbericht Stufe 2 (214, Kontingent 1, `ai_credits_log` 1611 → 1612). BMF neu gerechnet (kein Kontingent). Keine KI.
 - **Rest:** die sieben Meldungen; Modul 11 nach Prompt-Korrektur an der Westerfeldstr. neu drehen; 10a nicht neu geprüft (Inventar-Abzug v2261 kann die AfA dort verschieben).
 
+### Prod-Rollout (27) und (28) · v2262–v2264 (15.10.2026)
+
+- **Was:** (27) v2262 BMF-Fenster ohne Demo-Vorbelegung (`_lastBmf` = Sachsenstr.-Demo speiste alte Varianten-/Risikoblöcke jedes Objekts), Klauseltext „Aggressiv“ ohne festes „Sachwertermittlung“; v2263–v2263e Videoreihe 11–14 und Überblick 2, Neuaufnahmen 06/08/10b, kleine Fehler (Score-Kopf Dezimalkomma, PDF-Adresse „Westerfeldstr., 140“, GrESt-Format, „Alle Objekte“ las 1,7 als 1). (28) v2264 Pilot-Analyse: Prompt erlaubte Anbieter beim Namen – jetzt verboten (Text und quellen-Array, amtliche Stellen erlaubt); Offerte nie über dem Kaufpreis (Prompt + `_offerteDeckeln`, gemessen Westerfeldstr. 910.000 bei 545.000); ohne Darlehen „DSCR entfällt“; PDF „Warmmiete / Jahr“ → „Mieteinnahmen kalt / Jahr“.
+- **Commit:** Merge `fc1ba0bd` (bis `71abcd59`), Merge `a880fe4e` (bis `1349f622`).
+- **Nachweis:** Sicherungen `haupt-/mb-20261015-1837` und `-1841` (14/25 MB, 73/32 Tab.). Backend jeweils neu gebaut, `_offerteDeckeln` im Image, Gold-Audit RC=0, `/auth/me` 401. `_offerteDeckeln` geprüft: 910.000→545.000, 140.000→129.000, 1.180.000 bei 1.240.000 bleibt.
+- **Rest:** Gespeicherte Analysen behalten ihre Portalnamen/Offerten bis zum nächsten Abruf. Modul 11 nach neuem Abruf an der Westerfeldstr. neu drehen. Steuertext der Analyse Parkstr. 9 widerspricht der Soll/Ist-Tafel (KI-Text). AfA BMF-Karte 19.804 € gegen Reiter Steuer 19.693 € – Pipeline zieht Inventar ab (geprüft), Differenz nachmessen. Demo-Objekt Westerfeldstr. führt alte Sätze (GrESt 5,5 %, Notar/Grundbuch 2,2 %). 10a nach v2261 nicht neu geprüft.
+
 ### Prod-Rollout (26) · v2257–v2261a (15.10.2026)
 
 - **Was:** v2260 BMF-Fenster (Agent): „Sonstige“ nicht mehr doppelt (`ji_e` nur ohne `ak_sonst`); 15-%-Grenze über `_bmfG15()` = Gebäude-AK der gewählten Variante, Sanierung netto (vorher Demo-Daten Sachsenstr. 91,58 %, Sanierung als NK, brutto gegen netto: 182.665 € → Optimiert 148.486 €); Notarklausel mit vier Varianten-Überschriften; amtlicher Wert: **74,82 % ist richtig** – die Pipeline gab die Modernisierung nicht an die Arbeitshilfe (74,57 %), jetzt `mod_*` durchgereicht (bmfPipelineService); Jacoby bekommt den Kaufpreis ohne Nebenkosten (1.240.000 statt 1.242.728). Dazu v2257–v2259 (Videoreihe 06–10b + kleine Fehler), v2258, v2261/a.
