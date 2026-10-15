@@ -1323,9 +1323,11 @@ async function _exportPDFInner() {
     ['Notar (' + pP(v('notar_p'), 2) + ')',    pE(K.kp * v('notar_p') / 100)],
     ['Grundbuchamt',              pE(K.kp * v('gba_p') / 100)],
     ['Grunderwerbsteuer (' + pP(v('gest_p'), 2) + ')', pE(K.kp * v('gest_p') / 100)],
-    ['Junker Immo. (' + pP(v('ji_p'), 2) + ')', pE(K.kp * v('ji_p') / 100)],
+    /* v2273 · hier stand „Junker Immo.“ - ein Firmenname im PDF jedes Nutzers (die Bankfassung sagt seit v1463 „Vermittlung / Beratung“) */
+    ['Vermittlung / Beratung (' + pP(v('ji_p'), 2) + ')', pE(K.kp * v('ji_p') / 100)],
     ['Sanierungskosten',          pE(v('san'))],
-    ['M\u00f6blierung',           pE(v('moebl'))],
+    /* v2273 \u00b7 seit v2261 steckt das Inventar im Kaufpreis - die Zeile stand wie ein Summand vor der Gesamtinvestition */
+    ['davon M\u00f6blierung (im Kaufpreis)', pE(v('moebl'))],
     ['= Gesamtinvestition',  pE(K.gi)]
   ], [8]);
 
