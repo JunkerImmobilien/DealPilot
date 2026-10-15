@@ -321,6 +321,10 @@ function buildPrompt(transcript, catalog, zusatz) {
     '    hg_nul = 100 und hg_ul = Gesamt minus nicht-umlagefaehig = 200. Werden beide\n' +
     '    Anteile direkt genannt, uebernimm sie 1:1. Nur ein Hausgeld-Wert ohne\n' +
     '    Aufteilung -> in hg_ul.\n' +
+    '15. ZEITRAUM: Achte auf die Einheit im Feldnamen. Steht dort "pro Jahr" und nennt\n' +
+    '    der Sprecher einen Betrag pro Monat ("Hausgeld 280 Euro im Monat"), dann\n' +
+    '    rechne mal 12 (hier 3360). Steht dort "pro Monat" und er nennt einen\n' +
+    '    Jahresbetrag, teile durch 12.\n' +
     (zusatz ? zusatz + String.fromCharCode(10) : "") +
     'TRANSKRIPT:\n"""\n' + transcript + '\n"""';
 }
@@ -560,6 +564,7 @@ async function extractFromAudio(audioB64, mime, catalog, opts) {
   let out = await extractFields(transcript, cat, key, sammler, _zusatzAusKontext(o.kontext, o.modus));
   if (!o.kontext) out.fields = _prozentFalle(transcript, out.fields, cat);   /* v1280c */
   if (VERIFY_ON) { try { out = await verifyFields(transcript, out, cat, key, sammler); } catch (e) {} }  /* v522 verify-pass, fail-soft */
+  out.fields = _monatsFalle(transcript, out.fields);   /* v2256 */
 
   /* v1259 \u00b7 Der eigene Schluessel eines Nutzers ist SEINE Rechnung, nicht
      unsere. Kosten werden nur ausgewiesen, wenn der Server-Key gezahlt hat. */
@@ -898,6 +903,36 @@ const ZUSATZ_INSERAT = [
  * Regel, nach der auch der Marktbericht ein Verfahren weglaesst, wenn eine
  * Pflichtangabe fehlt.
  * ════════════════════════════════════════════════════════════════════ */
+/* ══ v2256 · MONAT GEGEN JAHR BEIM HAUSGELD ═══════════════════════════
+   Gemessen 15.10.2026 (Videoreihe Modul 05): „Hausgeld 280 Euro im Monat"
+   landete als 280 in hg_ul - das Feld ist „in Euro pro Jahr". Die Regel 15
+   im Prompt bittet das Modell um die Umrechnung; diese Wache haengt nicht
+   davon ab, ob es folgt: Steht im Text Hausgeld mit Monatsbezug und ist der
+   Wert klein genug fuer einen Monatsbetrag (< 2.000 €), wird er mal 12
+   genommen. Ein bereits umgerechneter Wert (3.360) bleibt unberuehrt. */
+function _monatsFalle(text, felder) {
+  try {
+    const t = String(text || '');
+    /* Nur innerhalb DESSELBEN Satzteils (kein Komma, Semikolon, Satzende):
+       „Miete 900 im Monat, Hausgeld 1.400" darf das Hausgeld nicht treffen. */
+    const monat = /hausgeld[^.!?\n,;]{0,40}?(im monat|pro monat|monatlich|je monat|\/\s*monat|mtl\.?)/i.test(t)
+      || /monatliche[sn]?\s+hausgeld/i.test(t);
+    if (!monat || !felder) return felder;
+    const kopie = Object.assign({}, felder);
+    let geaendert = [];
+    ['hg_ul', 'hg_nul'].forEach(function (id) {
+      if (kopie[id] == null || kopie[id] === '') return;
+      const roh = String(kopie[id]).trim();
+      const v = parseFloat(roh.replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'));
+      if (!isFinite(v) || v <= 0 || v >= 2000) return;
+      kopie[id] = String(Math.round(v * 12));
+      geaendert.push(id + ' ' + v + ' -> ' + kopie[id]);
+    });
+    if (geaendert.length) { try { console.log('[voice] Hausgeld Monat -> Jahr:', geaendert.join(', ')); } catch (e) {} }
+    return kopie;
+  } catch (e) { return felder; }
+}
+
 function _prozentFalle(text, felder, katalog) {
   try {
     const t = String(text || '');
@@ -973,6 +1008,7 @@ async function extractFromText(text, catalog, opts) {
   const out = await extractFields(t, cat, key, sammler, _zusatzAusKontext(o.kontext, modus));
   /* v1280c: Prozentbezug ohne Bezugswert -> Feld verwerfen statt raten. */
   if (!o.kontext) out.fields = _prozentFalle(t, out.fields, cat);
+  out.fields = _monatsFalle(t, out.fields);   /* v2256: auch getippt / Live-Mitschrift */
   const kosten = o.userApiKey ? null : kostenAbschluss(sammler);
   return { transcript: t, fields: out.fields, unsicher: out.unsicher, kosten, modus };
 }

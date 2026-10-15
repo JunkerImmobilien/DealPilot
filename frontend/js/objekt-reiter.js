@@ -907,6 +907,12 @@
       var e = Number(h.ertragswert_eur), s = Number(h.sachwert_eur), m = Number(h.market_value);
       if (isFinite(e) && e > 0) liste.push(Object.assign({}, basis, { wert: e, art: 'Ertragswert', fuehrend: fv === 'ertragswert', weg: h.ertrag_weg || null }));
       if (isFinite(s) && s > 0) liste.push(Object.assign({}, basis, { wert: s, art: 'Sachwert', fuehrend: fv === 'sachwert', weg: h.sachwert_weg || null }));
+      /* v2256 · Vergleichswert als eigener Eintrag (Marcel 15.10.2026). Er
+         ist nur dann amtlich, wenn ein Vergleichsfaktor des zustaendigen
+         Ausschusses dahintersteht; sonst traegt er den Zusatz
+         „Angebotspreise" und wird als Indikation uebernommen. */
+      var vg = Number(h.vergleichswert_eur);
+      if (isFinite(vg) && vg > 0) liste.push(Object.assign({}, basis, { wert: vg, art: 'Vergleichswert', amtlich: !!h.vergleichsfaktor_amtlich, fuehrend: fv === 'vergleichswert' }));
       /* v2255 · Der Marktwert im Verlauf ist der ROHE Wert aus Angebotspreisen
          (gemessen: Bericht 212, 246.000 €), die Karte zeigt ihn nach Abschlag
          (232.000 €). Hier ging bis v2254 der rohe Wert ins Feld - als
@@ -936,7 +942,8 @@
         ? ' title="' + esc(h.fuehrend_grund + (h.fuehrend_quelle ? ' (' + h.fuehrend_quelle + ')' : '')) + '"' : '';
       /* v2255: der Marktwert heisst hier, was er ist - Marktwertindikation,
          mit dem Abschlag dahinter */
-      var _art = h.art === 'Marktwert' ? 'Marktwertindikation' : (h.art || 'Marktwertindikation');
+      var _art = h.art === 'Marktwert' ? 'Marktwertindikation'
+        : (h.art === 'Vergleichswert' && !h.amtlich ? 'Vergleichswert (Angebotspreise)' : (h.art || 'Marktwertindikation'));
       var _ab = (h.art === 'Marktwert' && h.abschlag != null) ? ' (−' + String(h.abschlag).replace('.', ',') + ' %)' : '';
       return '<option value="' + i + '"' + _t + '>' + _art + ' · '
         + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €' + _ab + _f + '</option>';
@@ -964,7 +971,8 @@
     _unterschiedZeigen(liste, _s ? (parseInt(_s.value, 10) || 0) : 0);
   }
   /* v2255 · der Knopf sagt, ALS WAS übernommen wird */
-  function _vwKnopf(h) { return (h && h.art !== 'Marktwert') ? 'als Verkehrswert übernehmen' : 'als Marktwertindikation übernehmen'; }
+  function _vwAmtlich(h) { return !!h && (h.art === 'Ertragswert' || h.art === 'Sachwert' || (h.art === 'Vergleichswert' && !!h.amtlich)); }   /* v2256 */
+  function _vwKnopf(h) { return _vwAmtlich(h) ? 'als Verkehrswert übernehmen' : (h && h.art === 'Vergleichswert' ? 'als Vergleichswert übernehmen' : 'als Marktwertindikation übernehmen'); }
   function verkehrswertSetzen() {
     var box = $('oe-vw'), el = $('svwert'); if (!box || !el || !box._liste) return;
     /* v1979a: der Aufruf von `_unterschiedZeigen` stand HIER — in
@@ -982,7 +990,7 @@
        #_mb_state. Ertrags-/Sachwert = amtlich (Stufe 3), Marktwert =
        Indikation. Ohne Vermerk fiel sie auf den HTML-Text „Verkehrswert"
        zurück - auch für den rohen Angebotswert. */
-    var _amtlich = h.art === 'Ertragswert' || h.art === 'Sachwert';
+    var _amtlich = _vwAmtlich(h);   /* v2256: auch ein amtlicher Vergleichswert */
     try {
       var st = $('_mb_state');
       if (st) {
