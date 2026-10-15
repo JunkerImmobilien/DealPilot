@@ -265,7 +265,7 @@
          einem PLZ-Wechsel (Muenchen -> Herford) der alte Landessatz stehen. */
       var _auto = parseFloat(gestPctInput.dataset.autoRate || 'NaN');
       if (isNaN(cur) || Math.abs(cur - 6.5) < 0.01 || Math.abs(cur - _defBl) < 0.01 || cur === 0 || (isFinite(_auto) && Math.abs(cur - _auto) < 0.01)) {
-        gestPctInput.value = info.rate.toFixed(2);
+        gestPctInput.value = String(info.rate).replace(".", ",");   /* v2263: Dezimalkomma wie die anderen Felder (stand "6.50") */
         gestPctInput.dataset.autoRate = String(info.rate);
         // Trigger Sync auf Euro-Feld
         if (typeof window.syncCostPct === 'function') {

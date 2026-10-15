@@ -37,7 +37,10 @@
   // Compute display KPIs from a stored object
   function _computeRow(obj) {
     var d = obj.data || obj;  // sometimes nested
-    function num(k) { return parseFloat(d[k]) || 0; }
+    /* v2263 · gespeicherte Prozentfelder tragen das Dezimalkomma ("1,7") - parseFloat
+       las daraus 1, die Nebenkosten in „Alle Objekte" lagen zu niedrig. Mit Komma:
+       Punkte sind Tausender, sonst bleibt der Wert, wie er ist ("1.5", "180000"). */
+    function num(k) { var s = String(d[k] == null ? '' : d[k]); if (s.indexOf(',') >= 0) s = s.replace(/\./g, '').replace(',', '.'); return parseFloat(s) || 0; }
     var kp = num('kp');
     var nkm = num('nkm') + num('ze');
     var d1 = num('d1'), d2 = num('d2');

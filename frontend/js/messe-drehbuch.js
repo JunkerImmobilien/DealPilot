@@ -3128,7 +3128,8 @@
         await r11PaTab(/Soll\/Ist/);
         var p = r11Panel(), t = r6Inner(p);
         var vg = /Von (\d+) vergleichbaren Kennzahlen stehen (\d+) besser und (\d+) schlechter/.exec(t);
-        await zeige(function () { var x = r11Panel(); return x && (x.querySelector('.dp-pa-card') || x.firstElementChild); }, 8);
+        /* GEMESSEN (Aufnahme 14): die erste .dp-pa-card des Panels ist die Analyse-Tafel weiter unten - der Kegel lag dort */
+        await zeige(function () { var x = rhIm(r11Panel(), /Von \d+ vergleichbaren Kennzahlen/); return x && (x.closest('p,div') || x); }, 8);
         await b2oZeile(s, 'Soll gegen Ist · automatisch', vg ? 'Von <b>' + vg[1] + ' Kennzahlen</b> stehen heute <b>' + vg[2] + ' besser</b> und <b>' + vg[3] + ' schlechter</b> als beim Kauf.' : 'Plan gegen heute, Kennzahl für Kennzahl.');
       },
       async function (s) {   /* 7 · was sich bewegt hat */
