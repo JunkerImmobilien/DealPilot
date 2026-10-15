@@ -38761,6 +38761,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### Prod-Rollout (25) · v2253–v2256 (15.10.2026)
+
+- **Was:** v2254 (Marktwertindikation/Verkehrswert nach Herkunft, Beleihung 100 % `voll`, QC-Nebenkosten wie im Objekt, Karte+Lage wandern aus dem Quick Boarding mit), v2255 (nur amtliche Verfahren heißen Verkehrswert, Abschlag auch im Verlauf `#oe-vw`, Videoreihe 03–05), v2256 (Hausgeld Monat→Jahr `_monatsFalle`, Dezimalkomma `_deZahl` bei der Übernahme, Vergleichswert als eigener Eintrag – amtlich nur mit Vergleichsfaktor des Ausschusses).
+- **Commit:** Merge `eff52282` (bis `bcd2cb93`).
+- **Nachweis:** Sicherung `haupt-20261015-1348` (14 MB, 73 Tab.) / `mb-20261015-1348` (25 MB, 32 Tab.). Backends neu gebaut, `_monatsFalle` und `voll: 100` im Image, Gold-Audit RC=0, `/auth/me` 401, `/market-rates/pfandbrief` liefert `voll` 4,51 / 4,79 %. Staging: `_monatsFalle` 7 Fälle richtig (auch „Miete 900 im Monat, Hausgeld 1.400“ bleibt), `_deZahl` 10 Fälle, Historie liefert `vergleichswert_eur`/`vergleichsfaktor_amtlich`.
+- **Rest:** Vergleichswert aus Angebotspreisen trägt im Bericht die Notiz „Amtliche Grundlage aus der Kaufpreissammlung“ – fachlich prüfen (Marcel). Videoreihe 06–10 läuft auf Staging.
+
 ### v2255–v2255h · Videoreihe Module 03, 04, 05 aufgenommen; Verkehrswert nur aus der Wertermittlung (15.10.2026, Staging)
 
 - **Was:**
