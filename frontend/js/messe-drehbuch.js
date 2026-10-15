@@ -2531,7 +2531,7 @@
         var e = rhIm(r6Wiz(), /^AfA-Vergleich$/i); if (e) e.scrollIntoView({ block: 'start' });
         await warte(500);
         await zeige(function () { var x = rhIm(r6Wiz(), /^AfA-Vergleich$/i); return x && (x.closest('table') || x.parentElement); }, 8);
-        await b2oZeile(s, 'Was das Gutachten bringt', 'AfA <b>' + (red ? red[1] : '–') + '</b> statt 2 %: ' + (mehr ? mehr[1] : '–') + ' Abschreibung mehr im Jahr, ' + (spar ? spar[1] : '–') + ' weniger Steuer. Nach Gutachterkosten: <b>' + (net ? net[1] : '–') + '</b>.');
+        await b2oZeile(s, 'Was das Gutachten bringt', 'AfA <b>' + (red ? red[1] : '–') + '</b> statt 2 %: ' + (mehr ? mehr[1] : '–') + ' Abschreibung mehr im Jahr, ' + (spar ? spar[1] : '–') + ' weniger Steuer im Jahr. Über die ganze Restnutzungsdauer, nach Gutachterkosten: <b>' + (net ? net[1] : '–') + '</b>.');
       },
       async function (s) {   /* 8 · Anfrage: nur zeigen (NIE klicken) */
         function knopf() { var w = r6Wiz(); return w && [].filter.call(w.querySelectorAll('button'), function (b) { return b.offsetWidth && /Anfrage senden/.test(b.textContent); })[0]; }
