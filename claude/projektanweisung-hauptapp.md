@@ -38761,6 +38761,19 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2241/v2244 · Marktbewertung: Gewerbe, Grundstück, Sanierung, Modernisierungspunkte (15.10.2026, Staging)
+- **Was:** Marcel: „können wir das so machen, dass das auch richtig funktioniert?“ (Agent im Worktree, Merge `726aa0ff`).
+  - Gewerbe trägt die Unterart (`gewerbe_art`), Vergleichswert nur aus Gewerbe-Angeboten derselben Klasse (sonst entfällt), Ertragswert mit Ist- oder Marktmiete, Anlage 3 je Nutzung, GND Anlage 1, nur Gewerbe-LZS aus dem Register (sonst entfällt). Mapper: „Bürohaus“/„Lagerhalle“ nicht mehr als Haus, „Wohn- und Geschäftshaus“ als MFH.
+  - Neue Objektart `GRST` (12 Arten): Wert = Bodenwert (Fläche × BRW, Herkunft); die übrigen Verfahren entfallen mit Grund.
+  - `san`/`san_ust` als boG (§ 8 Abs. 3) nach der Marktanpassung; Mangel-Zustandsabschlag entfällt dann (kein Doppelabzug). Fehlender Zustand nicht mehr still „gepflegt“.
+  - `mod_*` und `mod_angaben` reisen mit; 0 Punkte mit Angaben = Anlage 2. Quick-Check las `qc_baujahr` statt `qc_bj` (Baujahr kam nie an).
+- **Commit:** `a9ba1bde`, Merge `726aa0ff` (Buster v2244)
+- **Nachweis:** Service-Läufe mit festen Marktdaten: Wohnen ohne `san` unverändert (ETW, MFH, EFH); Büro mit Ist-Miete EW 620.000 statt Wohnmiete-Rechnung; Laden ohne Miete → EW entfällt; Grundstück 600 m² × 250 = 150.000; EFH mit 60.000 San → −60.000 genau einmal (VW, Sachwert, EW). objekt-mapper/rnd-kerne RC=0, Buster SAUBER, Gold-Audit RC=0. Staging: backend + mb-backend neu gebaut, Register geladen (4.832 Sätze), GRST im Formular.
+- **Rest:**
+  - **Achtung Verhalten:** jedes Objekt mit gepflegtem `san` zeigt in Stufe 1/2 jetzt einen niedrigeren Marktwert.
+  - Fachfragen an Marcel: Ist-Miete als Rohertrag bei Gewerbe? Gewerbe-Angebotspreise als Vergleich? `san` als Wertabschlag (Kosten ≠ Wertminderung; Zustand vor/nach Sanierung)? Hotel/Gastro ohne Anlage-3-Ansatz → EW entfällt.
+  - GRST verlangt im Formular noch Wohnfläche/Baujahr als Pflicht; Marktbericht-App kennt GRST nicht. GeoMap-Flächenfilter im Gewerbesegment ungemessen — Staging-Abnahme mit echtem Abruf.
+
 ### v2239–v2243 · Ankauf-Stand, Steuer ohne zvE, Zinsmarge, Ampeln nach Schwellen; Konto info@ auf Prod (15.10.2026)
 - **Was:** Marcels Prüfliste vom 15.10.
   - **v2239:** Ruhender Ankauf-Stand ging nach Neuladen beim nächsten Speichern verloren (`_dpAnkaufRuhend` neu, beim erneuten Gewinnen kommt DER Stand zurück). „Rückgängig“ beim Auto-Festschreiben fror sofort neu ein (`_autoAus`). Steuer-Reiter ohne zvE rechnete still mit 65.891 € — jetzt `_dpZveErsatz()`: das zvE, dessen Grenzsteuersatz dem eingestellten entspricht. Bot-Kaufempfehlung bekommt `zielBmr`/`lageklasse` (fiel still auf 6 %).
