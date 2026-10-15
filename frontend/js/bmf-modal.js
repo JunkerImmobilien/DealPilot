@@ -133,9 +133,15 @@ function syncFromTabInvest(){
     ['ji_e',     'ak_sonst'],   // ji_e ist 'Sonstige (€)' in Tab Investition
     ['san',      'ak_ahk']      // Sanierung als anschaffungsnahe HK
   ];
+  /* v2257 · IMMER setzen, bei 0 leeren - wie die Eckdaten unten (V292.6.6).
+     Gemessen am 15.10.2026: nach einem Objekt mit Nebenkosten (Sachsenstr.
+     18: GrESt 11.700, Notar 3.960, Grundbuch 900, Sonstige 2.700) zeigte das
+     Fenster beim naechsten Objekt OHNE Nebenkosten (Ravensberger Weg 38)
+     dieselben Betraege, Anschaffungskosten 1.346.260 statt 1.327.000 €, und
+     schickte sie an die Arbeitshilfe. */
   eurPairs.forEach(function(p){
     var v = parseDe(_val(p[0]));
-    if(v > 0) _setField(p[1], _formatEur(v), true);
+    _setField(p[1], v > 0 ? _formatEur(v) : '', true);
   });
 
   // V292.6.6-pane2-force-fresh: Eckdaten aus Tab Objekt ERZWINGEN.
