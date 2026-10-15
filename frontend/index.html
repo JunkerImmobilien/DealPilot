@@ -53,7 +53,7 @@
 <link rel="stylesheet" href="css/pricing-modal.css?v=v2132">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
 <link rel="stylesheet" href="css/hell-varianten.css?v=v1652c">
-<link rel="stylesheet" href="css/rnd-styles.css?v=v1875a">
+<link rel="stylesheet" href="css/rnd-styles.css?v=v2261">
 <link rel="stylesheet" href="css/select-fix.css?v=W34">
     <link rel="stylesheet" href="css/v187-additions.css?v=W34">
   <link rel="stylesheet" href="credits-modal.css?v=W34">
@@ -1704,7 +1704,7 @@ label.dp-required.qc-required::after {
               <div class="hint" style="font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em;font-size:10px;margin-bottom:6px">So wird die Grenze berechnet</div>
               <div class="kv" style="font-size:12px"><span>Gebäudeanteil (Standard 80%)</span><span class="kv-v" id="ahk_geb_anteil">—</span></div>
               <div class="kv" style="font-size:12px"><span id="ahk_geb_label">Gebäude (vor Küchen-Abzug)</span><span class="kv-v" id="ahk_geb_brutto">—</span></div>
-              <div class="kv" style="font-size:12px;display:none" id="ahk_kueche_row"><span>− Küche (separates Wirtschaftsgut)</span><span class="kv-v" id="ahk_kueche_val">—</span></div>
+              <div class="kv" style="font-size:12px;display:none" id="ahk_kueche_row"><span>− Inventar (separates Wirtschaftsgut)</span><span class="kv-v" id="ahk_kueche_val">—</span></div>
               <div class="kv" style="font-size:12px;display:none" id="ahk_geb_netto_row"><span>= Gebäude ohne Küche</span><span class="kv-v" id="ahk_geb_netto">—</span></div>
               <div class="kv" style="font-size:12px"><span>+ Anteilige Nebenkosten (Gebäudeanteil)</span><span class="kv-v" id="ahk_nk_anteil">—</span></div>
               <div class="kv" style="font-size:12px;font-weight:600;border-top:1px dashed color-mix(in srgb, var(--gold) 30%, transparent);padding-top:5px;margin-top:5px"><span>= Gebäude-Anschaffungskosten</span><span class="kv-v" id="ahk_basis">—</span></div>
@@ -3560,8 +3560,8 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-logo.js?v=v1634b"></script><!-- v1634 · muss VOR den PDF-Bausteinen stehen: waermt das Logo vor -->
 <script src="js/pdf-anlage-bmf.js?v=v1634c"></script>
 <script src="js/pdf-investment-bank.js?v=v2244"></script>
-<script src="js/bmf-modal.js?v=v2180"></script>
-<script src="js/bmf-modal-v292.js?v=v2213"></script>
+<script src="js/bmf-modal.js?v=v2260"></script>
+<script src="js/bmf-modal-v292.js?v=v2260"></script>
 <script src="js/bmf-bodenabschlag.js?v=v2180"></script>
 <script src="js/pdf-kaufpreisaufteilung.js?v=v2180"></script><!-- v987-v292-restore -->
 <!-- V63.86: html2canvas für 1:1-Capture von Tab-Kennzahlen-Tabellen ins PDF -->
@@ -3571,7 +3571,7 @@ label.dp-required.qc-required::after {
 <script src="js/schwellen.js?v=v2240"></script><!-- v2240 · EINE Quelle fuer die Ampel-Schwellen (DSCR/LTV/Cashflow) aus den Einstellungen -->
 <script src="js/dp-qr.js?v=v2180"></script>
 <script src="js/hausgeld-engine.js?v=v2191a"></script>
-<script src="js/deal-kpis.js?v=v2149"></script>
+<script src="js/deal-kpis.js?v=v2261"></script>
 <script src="js/afa-engine.js?v=v1878"></script>
 <script src="js/irr-engine.js?v=v1260"></script>
 <!-- v1312: Erbbaurecht - Rechenkern (rein) + DOM-Schicht -->
@@ -3590,14 +3590,14 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v2240"></script>
+  <script src="js/calc.js?v=v2261"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v2180"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v2239"></script>
-<script src="js/config.js?v=v2254"></script>
+<script src="js/tax.js?v=v2261"></script>
+<script src="js/config.js?v=v2261"></script>
   <script src="js/legal-links.js?v=v1885" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
   <script src="js/autocomplete-debug.js?v=174" defer></script>
@@ -3621,7 +3621,7 @@ label.dp-required.qc-required::after {
   <script src="js/apikeys.js?v=811"></script>
   <script src="js/telegram-panel.js?v=v1827"></script>
   <script src="js/unterlagen-modal.js?v=v2188a"></script>
-  <script src="js/standardwerte-karten.js?v=v2237"></script>
+  <script src="js/standardwerte-karten.js?v=v2261"></script>
   <script src="js/settings.js?v=v2216c"></script>
 <script src="js/pricing-modal.js?v=v2132a"></script>
   <script src="js/flyer-code.js?v=v1421c"></script>
@@ -3640,12 +3640,12 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=v2254"></script>
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
-<script src="js/ui.js?v=v2217b"></script>
+<script src="js/ui.js?v=v2261"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v2243"></script>
+<script src="js/storage.js?v=v2257"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=291.1"></script><!-- V291-inv-sync-applied -->
-<script src="js/all-objects.js?v=v1960"></script>
+<script src="js/all-objects.js?v=v2261"></script>
 <script src="js/track-record.js?v=W39"></script>
 <script src="js/pdf.js?v=v2240"></script>
 <script src="js/auth.js?v=v2249"></script>
@@ -3666,12 +3666,12 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-import.js?v=v1678"></script>
 <script src="js/dokument-import.js?v=v2218h"></script>
 <script src="js/beleg-import.js?v=v2180"></script>
-<script src="js/financing.js?v=v2240"></script>
+<script src="js/financing.js?v=v2261"></script>
 <script src="js/financing-pdf.js?v=20260611105943"></script>
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
 <script src="js/quick-check.js?v=v2240"></script>
-<script src="js/qc-bridge.js?v=v2254"></script>
+<script src="js/qc-bridge.js?v=v2261"></script>
 <script src="js/bodenrichtwert.js?v=v1999"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v2245"></script>
@@ -3694,7 +3694,7 @@ label.dp-required.qc-required::after {
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v2240"></script>
 <script src="js/prozess-atlas-gesamt.js?v=v2218f"></script>
-<script src="js/messe-drehbuch.js?v=v2255h"></script>
+<script src="js/messe-drehbuch.js?v=v2259a"></script>
 <script src="js/hinweise.js?v=v2204"></script>
 <script src="js/pilot-tower.js?v=v2252"></script>
   <script src="js/dp-band-fix.js?v=1117"></script> <!-- v863-band-fix, v1117: 32/15 -->
@@ -3715,7 +3715,7 @@ label.dp-required.qc-required::after {
 <!-- v2060: breite Tabellen werden auf dem Handy zu Karten (zentral, alle Ansichten) -->
 <script src="js/tabellen-karten.js?v=v2060c"></script>
 <script src="js/portfolio-export.js?v=v2180"></script>
-<script src="js/deal-action.js?v=v2241"></script>
+<script src="js/deal-action.js?v=v2257"></script>
 <script src="js/gutachten-org.js?v=v1448b"></script>
 <script src="js/afa-eigen.js?v=v1871"></script>
 <script src="js/deal-action-readycheck.js?v=v2080"></script>
@@ -3738,25 +3738,25 @@ label.dp-required.qc-required::after {
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
 <script src="js/rnd-gnd-table.js?v=v1426"></script>
 <script src="js/rnd-calc.js?v=v2180"></script>
-<script src="js/rnd-wizard.js?v=v1970"></script>
+<script src="js/rnd-wizard.js?v=v2258"></script>
 <script src="js/free-lock.js?v=v2180"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
-<script src="js/investment-profile.js?v=v2254"></script>
+<script src="js/investment-profile.js?v=v2261"></script>
 <script src="js/bwk-profil.js?v=v2211"></script>
-<script src="js/dashboard.js?v=v2240"></script>
+<script src="js/dashboard.js?v=v2261"></script>
 <script src="js/portfolio-strategie.js?v=v1935c"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
 <script src="js/portfolio-spiegel.js?v=v1802"></script><!-- v1793: liest portfolioPayload() und legt es fuer den Bot ab - rechnet NICHTS -->
 
 <!-- v1704 � Portfolio-Pilot: haengt sich ans Cockpit, sobald dessen Markup steht -->
 <script src="js/portfolio-pilot.js?v=v2180"></script>
 <script src="js/score-fx.js?v=464"></script>
-<script src="js/main.js?v=v2211"></script>
+<script src="js/main.js?v=v2261"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
   <script src="js/object-actions.js?v=v2256"></script>
   <script src="js/dpsh-score-hero.js?v=v1640"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
-  <script src="js/voice-import.js?v=v2229"></script>
+  <script src="js/voice-import.js?v=v2261"></script>
   <!-- v1895: der sichtbare Vermerk an jedem pauschal angesetzten
        Bewirtschaftungsposten. Liest nur `_dp_herkunft`, rechnet nichts. -->
   <script src="js/bwk-vermerk.js?v=v1895b"></script>
@@ -3772,7 +3772,7 @@ label.dp-required.qc-required::after {
        noch nicht da. -->
   <script src="js/verify-frist.js?v=v2252"></script>
   <script src="credits-modal.js?v=1194"></script>
-  <script src="js/grest-plz-lookup.js?v=v2207"></script>
+  <script src="js/grest-plz-lookup.js?v=v2261a"></script>
 
 <!-- V229: globaler PLZ-Fehler-Interceptor -->
 <script id="v229-plz-interceptor">

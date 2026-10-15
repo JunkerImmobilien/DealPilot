@@ -536,7 +536,7 @@
 }
 .rnd-wiz-title h2 {
   margin: 0;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;  /* v2258: DealPilot-Schrift statt Cormorant */
   font-size: 23px;
   font-weight: 600;
   color: var(--wl-C9A84C, #C9A84C);
@@ -1066,7 +1066,7 @@
   text-align: center;
 }
 .rnd-result-hero-value {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;  /* v2258: DealPilot-Schrift statt Cormorant */
   font-size: 110px;
   font-weight: 600;
   color: var(--gold, #C9A84C);
@@ -1134,7 +1134,7 @@
   margin: 0 0 8px;
 }
 .rnd-result-hero-kpi-value {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;  /* v2258: DealPilot-Schrift statt Cormorant */
   font-size: 26px;
   font-weight: 600;
   color: #fff;
@@ -1197,7 +1197,7 @@
 .rnd-vorteil-table tr.rnd-vorteil-total td {
   background: var(--gold-dim, rgba(201,168,76,.12));
   color: var(--gold, #C9A84C);
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;  /* v2258: DealPilot-Schrift statt Cormorant */
   font-size: 17px;
   font-weight: 600;
   padding: 12px 8px;
@@ -1275,7 +1275,9 @@
 .rnd-wiz-modal {
   max-width: 1143px !important;
   width: min(1143px, calc(100vw - 48px)) !important;
-  max-height: 915px !important;
+  /* v2261: das Kleinere aus 915 px und Fensterhoehe - fest 915 px schob unter ~995 px
+     Fensterhoehe die Fusszeile („Weiter", „Anfrage senden") aus dem Bild. */
+  max-height: min(915px, calc(100vh - 48px)) !important;
   border-radius: 12px !important;
   /* v1513b: --surface ist im Hellprofil reines Weiss - hier soll die
      Cremeflaeche des BMF-Rechners stehen, also der Wert direkt. */

@@ -1878,8 +1878,10 @@ window.DealPilotDealAction = (function() {
         ((prefill.plz || prefill.ort) ? ', ' + (prefill.plz || '') + ' ' + (prefill.ort || '') : '');
       prefill.objekt_adresse = prefill.objekt_adresse.trim().replace(/\s+/g, ' ');
     }
-    // Einheit/Bezeichnung (z.B. WE 02)
-    if (prefill.mea) prefill.einheit = prefill.mea;
+    /* v2257 · Hier stand `prefill.einheit = prefill.mea`. Gemessen am
+       15.10.2026: der Miteigentumsanteil (12 %) erschien im Wizard als
+       „Einheit / Bezeichnung: 12" - und ging so in die Gutachten-Anfrage.
+       Das Objekt fuehrt keine Wohnungsbezeichnung; das Feld bleibt leer. */
     if (prefill.kuerzel) prefill.kuerzel_kurz = prefill.kuerzel;
 
     /* v1503 · Marcel: "schau, ob wir alle Felder schon vorbefuellen, die wir

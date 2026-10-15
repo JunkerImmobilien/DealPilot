@@ -1190,7 +1190,7 @@
       + '  <p style="font:600 10.5px/1 JetBrains Mono,ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:#9a7f33;margin:0 0 3px;text-align:center">Geschätzte Restnutzungsdauer</p>'
       + '  <p style="font-size:11px;color:#8A8272;text-align:center;margin:0 0 16px">Ersteinschätzung — die verbindliche Berechnung steht im Gutachten</p>'
       + '  <div style="text-align:center">'
-      + '    <span style="font-family:Cormorant Garamond,serif;font-size:82px;font-weight:600;color:#b8932f;line-height:1;letter-spacing:-1px">'
+      + '    <span style="font-family:Space Grotesk,Inter,sans-serif;font-size:64px;font-weight:700;color:var(--wl-b8932f,#b8932f);line-height:1;letter-spacing:-2px;font-variant-numeric:tabular-nums">'
       + (function () {
           var sp = spanneAus(result);
           if (!sp) return fmtJ(result.final_rnd);
@@ -1201,12 +1201,12 @@
       + '  </div>'
       + (function () {
           var sp = spanneAus(result);
-          var mm = (result && result.methods) || {};
-          var a = Math.round(Number(mm.technisch && mm.technisch.restnutzungsdauer) || 0);
-          var b = Math.round(Number(mm.punktraster && mm.punktraster.restnutzungsdauer) || 0);
-          if (!sp || sp.einzeln || !a || !b) return "";
+          if (!sp) return "";
+          /* v2258: der Modellwert steht dabei - er ist die Mitte der Spanne */
           return '<p style="margin:14px 0 0;text-align:center;font-size:12.5px;color:#6B6356">'
-            + 'technisch <b style="color:#2A2727">' + a + '</b> · Punktraster nach Anlage 2 <b style="color:#2A2727">' + b + '</b>'
+            + 'Modellwert <b style="color:#2A2727">' + sp.mitte + ' Jahre</b>'
+            + (result.final_source ? ' <span style="color:#8A8272">(' + escapeHtml(String(result.final_source)) + ')</span>' : '')
+            + ' · Spanne ± ' + RND_SPANNE_JAHRE + ' Jahre'
             + '<span style="display:block;font-size:11px;color:#8A8272;margin-top:4px">Eine einzelne Zahl behauptet eine Genauigkeit, die eine Ersteinschätzung nicht hat.</span></p>';
         })()
       + '  <p style="margin:16px 0 0;font-size:12.5px;color:#6B6356;line-height:1.55;text-align:center;font-style:italic">'
@@ -1223,7 +1223,7 @@
       + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#7A7370">Linear-Verfahren</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;color:#2A2727">' + fmtJ(m.linear.restnutzungsdauer) + ' J. (' + RND.fmtNum2(m.linear.alterswertminderung_pct) + ' % AWM)</td></tr>'
       + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#7A7370">Punktraster-Verfahren</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;color:#2A2727">' + fmtJ(m.punktraster.restnutzungsdauer) + ' J. (' + RND.fmtNum2(m.punktraster.alterswertminderung_pct) + ' % AWM)</td></tr>'
       + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#7A7370">Technisches Verfahren</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;color:#2A2727">' + fmtJ(m.technisch.restnutzungsdauer) + ' J. (' + RND.fmtNum2(m.technisch.alterswertminderung_pct) + ' % AWM)</td></tr>'
-      + '    <tr><td style="padding:10px 4px;border-bottom:2px solid #C9A84C;color:#2A2727;font-weight:600">= Geschätzte RND <span style="color:#7A7370;font-size:11.5px;font-weight:400">(' + result.final_source + ')</span></td><td style="padding:10px 4px;border-bottom:2px solid #C9A84C;text-align:right;font-variant-numeric:tabular-nums;color:#C9A84C;font-weight:700;font-family:Cormorant Garamond,serif;font-size:16px">' + (function () {
+      + '    <tr><td style="padding:10px 4px;border-bottom:2px solid #C9A84C;color:#2A2727;font-weight:600">= Geschätzte RND <span style="color:#7A7370;font-size:11.5px;font-weight:400">(' + result.final_source + ')</span></td><td style="padding:10px 4px;border-bottom:2px solid #C9A84C;text-align:right;font-variant-numeric:tabular-nums;color:#C9A84C;font-weight:700;font-family:Space Grotesk,Inter,sans-serif;font-size:16px">' + (function () {
         var sp = spanneAus(result);
         if (!sp) return fmtJ(result.final_rnd);
         return sp.einzeln ? String(sp.von) : (sp.von + '\u2013' + sp.bis);
@@ -1232,14 +1232,14 @@
     if (afa && afa.valid) {
       html += ''
         + '    <tr><td colspan="2" style="padding:16px 0 6px;color:#C9A84C;font-size:9.5px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase">AfA-Vergleich</td></tr>'
-        + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#7A7370;font-size:12px">Standard-AfA <span style="color:#C9A84C;font-weight:600">' + afa.afa_standard.satz_pct + ' %</span> × Gebäudeanteil</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;color:#2A2727">' + fmtEUR(afa.afa_standard.jahresbetrag) + ' / Jahr</td></tr>'
-        + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#7A7370;font-size:12px">Reduzierte AfA <span style="color:#C9A84C;font-weight:600">' + afa.afa_kurz.satz_pct + ' %</span> × Gebäudeanteil</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;color:#2A2727">' + fmtEUR(afa.afa_kurz.jahresbetrag) + ' / Jahr</td></tr>'
-        + '    <tr><td style="padding:10px 4px;border-bottom:1.5px solid #E0DBD3;color:#2A2727;font-weight:600">= Mehr-AfA pro Jahr</td><td style="padding:10px 4px;border-bottom:1.5px solid #E0DBD3;text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:#3FA56C">+' + fmtEUR(afa.mehr_afa_jahr) + '</td></tr>'
-        + '    <tr><td colspan="2" style="padding:16px 0 6px;color:#C9A84C;font-size:9.5px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase">Steuerlicher Vorteil <span style="color:#7A7370;font-weight:500;text-transform:none;letter-spacing:0.05em">(Grenzsteuersatz ' + afa.input.grenzsteuersatz_pct + ' %)</span></td></tr>'
+        + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#7A7370;font-size:12px">Standard-AfA <span style="color:#C9A84C;font-weight:600">' + pzW(afa.afa_standard.satz_pct) + ' %</span> × Gebäudeanteil</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;color:#2A2727">' + fmtEUR(afa.afa_standard.jahresbetrag) + ' / Jahr</td></tr>'
+        + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#7A7370;font-size:12px">' + (afa.mehr_afa_jahr >= 0 ? 'Reduzierte' : 'Verlängerte') + ' AfA <span style="color:#C9A84C;font-weight:600">' + pzW(afa.afa_kurz.satz_pct) + ' %</span> × Gebäudeanteil</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;color:#2A2727">' + fmtEUR(afa.afa_kurz.jahresbetrag) + ' / Jahr</td></tr>'
+        + '    <tr><td style="padding:10px 4px;border-bottom:1.5px solid #E0DBD3;color:#2A2727;font-weight:600">= Mehr-AfA pro Jahr</td><td style="padding:10px 4px;border-bottom:1.5px solid #E0DBD3;text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:' + (afa.mehr_afa_jahr >= 0 ? '#3FA56C' : '#B8625C') + '">' + (afa.mehr_afa_jahr >= 0 ? '+' : '') + fmtEUR(afa.mehr_afa_jahr) + '</td></tr>'
+        + '    <tr><td colspan="2" style="padding:16px 0 6px;color:#C9A84C;font-size:9.5px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase">Steuerlicher Vorteil <span style="color:#7A7370;font-weight:500;text-transform:none;letter-spacing:0.05em">(Grenzsteuersatz ' + pzW(afa.input.grenzsteuersatz_pct) + ' %)</span></td></tr>'
         + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#2A2727">Steuerersparnis pro Jahr</td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#2A2727">' + fmtEUR(afa.steuerersparnis_jahr) + '</td></tr>'
-        + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#2A2727">Steuerersparnis Gesamt <span style="color:#7A7370;font-size:11.5px">(über ' + afa.input.rnd + ' Jahre)</span></td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#2A2727">' + fmtEUR(afa.steuerersparnis_barwert) + '</td></tr>'
+        + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#2A2727">Steuerersparnis Gesamt <span style="color:#7A7370;font-size:11.5px">(über ' + pzW(afa.input.rnd) + ' Jahre)</span></td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#2A2727">' + fmtEUR(afa.steuerersparnis_barwert) + '</td></tr>'
         + '    <tr><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;color:#B8625C">− Gutachterkosten <span style="color:#7A7370;font-size:11.5px;font-style:italic">(999 € ohne Außenbesichtigung)</span></td><td style="padding:8px 4px;border-bottom:1px solid #F0ECE4;text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#B8625C">−' + fmtEUR(afa.gutachterkosten) + '</td></tr>'
-        + '    <tr style="background:linear-gradient(90deg,rgba(201,168,76,0.18) 0%,rgba(201,168,76,0.08) 100%)"><td style="padding:16px 10px;color:#C9A84C;font-family:Cormorant Garamond,serif;font-size:18px;font-weight:600;border-radius:8px 0 0 8px">= Netto-Vorteil</td><td style="padding:16px 10px;text-align:right;font-variant-numeric:tabular-nums;color:#C9A84C;font-family:Cormorant Garamond,serif;font-size:22px;font-weight:700;border-radius:0 8px 8px 0">' + fmtEUR(afa.netto_vorteil) + '</td></tr>';
+        + '    <tr style="background:linear-gradient(90deg,rgba(201,168,76,0.18) 0%,rgba(201,168,76,0.08) 100%)"><td style="padding:16px 10px;color:#C9A84C;font-family:Space Grotesk,Inter,sans-serif;font-size:18px;font-weight:600;border-radius:8px 0 0 8px">= Netto-Vorteil</td><td style="padding:16px 10px;text-align:right;font-variant-numeric:tabular-nums;color:#C9A84C;font-family:Space Grotesk,Inter,sans-serif;font-size:22px;font-weight:700;border-radius:0 8px 8px 0">' + fmtEUR(afa.netto_vorteil) + '</td></tr>';
     }
 
     html += '  </table></div>';
@@ -1263,6 +1263,8 @@
     });
   }
 
+  /* v2257 · Prozentsaetze mit Komma (gemessen: „41.5 %", „1.92 %" und „+-111 €") */
+  function pzW(n) { var x = Number(n); return isFinite(x) ? String(Math.round(x * 100) / 100).replace('.', ',') : String(n); }
   function fmtEUR(n) {
     if (typeof n !== 'number' || !isFinite(n)) return '–';
     return n.toLocaleString('de-DE', {
@@ -1291,15 +1293,25 @@
      ausweist: der technischen Restnutzungsdauer und dem Punktraster nach
      Anlage 2. Fallen beide zusammen, gibt es keine Spanne - dann steht eine
      Zahl, und das ist dann auch ehrlich. */
+  /* ══ v2258 · DIE SPANNE LIEGT UM DEN MODELLWERT ════════════════════
+     Marcel am 15.10.2026: „Die Spanne ist viel zu gering … den exakten Wert
+     in die Mitte und dann 2 nach oben und nach unten abweichen."
+     Bis hier spannten technische RND und Punktraster die Spanne auf - beide
+     liegen bei wenig Modernisierung fast gleich (Ravensberger Weg 38,
+     Bj 1978, 2 Punkte: 32 und 32,8 -> „32–33"), die Ersteinschaetzung
+     wirkte genauer, als sie ist.
+     Jetzt: der ausgelieferte Wert (final_rnd, derselbe Kern wie das
+     Gutachten-Modul vw-modul V4.2.5 - gemessen mit rnd-kerne-pruefen.mjs
+     --modul) steht in der MITTE, die Spanne reicht 2 Jahre darunter und
+     darueber. Nach unten nie unter 0. Gerundet auf eine Nachkommastelle. */
+  var RND_SPANNE_JAHRE = 2;
+  function _rndJ(x) { var r = Math.round(x * 10) / 10; return String(r).replace('.', ','); }
   function spanneAus(result) {
     try {
-      var m = (result && result.methods) || {};
-      var a = Math.round(Number(m.technisch && m.technisch.restnutzungsdauer) || 0);
-      var b = Math.round(Number(m.punktraster && m.punktraster.restnutzungsdauer) || 0);
-      var w = [a, b].filter(function (x) { return x > 0; });
-      if (!w.length) return null;
-      var von = Math.min.apply(null, w), bis = Math.max.apply(null, w);
-      return { von: von, bis: bis, einzeln: von === bis };
+      var mitte = Number(result && result.final_rnd);
+      if (!isFinite(mitte) || mitte <= 0) return null;
+      var von = Math.max(0, mitte - RND_SPANNE_JAHRE), bis = mitte + RND_SPANNE_JAHRE;
+      return { von: _rndJ(von), bis: _rndJ(bis), mitte: _rndJ(mitte), einzeln: false };
     } catch (e) { return null; }
   }
   global.__rndSpanneAus = spanneAus;

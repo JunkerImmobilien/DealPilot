@@ -49,7 +49,13 @@ function _dpProfilWert(schluessel, rueckfall) {
 }
 
 function setDefaults() {
-  sv('notar_p', _dpProfilWert('notar_grundbuch', 2.20));
+  /* v2261 · Alle fuenf Erwerbsnebenkosten aus den Einstellungen (Marcel 15.10.2026:
+     „die Werte immer aus den Einstellungen und dem Set ziehen"). Bis hier: Notar aus
+     dem kombinierten „Notar & Grundbuch", Grundbuch 0,5 und Sonstige 1,5 fest, der
+     Makler gar nicht. Die Grunderwerbsteuer: Satz des Bundeslands aus dem Profil;
+     ist die Automatik an, setzt grest-plz-lookup.js ihn nach der Postleitzahl. */
+  sv('notar_p',  _dpProfilWert('notar_pct', 1.70));
+  sv('makler_p', _dpProfilWert('maklerkosten', 0));
   /* v1238 · Testbericht Block D: „Grundbuchamt mit 0,5 % vorbelegen — der
      Anwender kennt den Wert nicht."
      Gemessen am 04.09.2026: `gba_p` stand in dieser Liste als EINZIGE der
@@ -60,9 +66,16 @@ function setDefaults() {
      setDefaults() laeuft in newObj(), also gilt die Vorbelegung nur fuer
      NEUE Objekte. Bestehende behalten ihren gespeicherten Wert — ihre
      Zahlen verschieben sich nicht rueckwirkend. */
-  sv('gba_p',   0.50);
-  sv('gest_p',  6.50);
-  sv('ji_p',    1.50);
+  sv('gba_p',   _dpProfilWert('grundbuch_pct', 0.50));
+  sv('gest_p',  (function () {
+    try {
+      var bl = window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.get('bundesland');
+      var R = window.DealPilotGrest && DealPilotGrest.rates;
+      if (bl && R && isFinite(R[bl])) return R[bl];
+    } catch (e) {}
+    return 6.50;
+  })());
+  sv('ji_p',    _dpProfilWert('sonstige_nk_pct', 1.50));
   /* v2211 · Hier stand fest 3,50. Der indikative Satz (oder der eigene aus
      den Standardwerten) kam bei neuen Objekten nie an: applyToNewObject
      schreibt nur in LEERE Felder, und dieses war nie leer. */

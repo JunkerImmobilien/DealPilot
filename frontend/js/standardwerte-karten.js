@@ -60,7 +60,7 @@
     { an: 'Steuer', txt: 'Dein persönlicher Grenzsteuersatz. Gesellschaften rechnen mit dem Satz aus Mandanten.',
       felder: [['ip_grenzsteuersatz', 'Grenzsteuersatz', ' %']] },
     { an: 'Standort', txt: 'Bundesland und Kaufnebenkosten.',
-      felder: [['ip_bundesland', 'Bundesland', ''], ['ip_notar_grundbuch', 'Notar/Grundbuch', ' %'], ['ip_maklerkosten', 'Makler', ' %']] }
+      felder: [['ip_bundesland', 'Bundesland', ''], ['ip_notar_pct', 'Notar', ' %'], ['ip_grundbuch_pct', 'Grundbuch', ' %'], ['ip_sonstige_nk_pct', 'Sonstige', ' %'], ['ip_maklerkosten', 'Makler', ' %']] }
   ];
   /* Welche Felder ein Set setzt - in den Karten als „Set" bzw. „eigen" markiert. */
   var SET_FELDER = { ip_tilgung_default: 1, ip_ek_quote_default: 1, ip_mietausfall_pct: 1, ip_min_dscr: 1, ip_angebot_abschlag_pct: 1 };

@@ -36,6 +36,13 @@ window.DealPilotInvestmentProfile = (function() {
   function get(key) {
     var p = load();
     if (p[key] !== undefined && p[key] !== null && p[key] !== '') return p[key];
+    /* v2261: wer frueher „Notar & Grundbuch" gesetzt hat, behaelt seinen Ansatz -
+       Notar = alter Wert minus Grundbuch. */
+    if (key === 'notar_pct' && p.notar_grundbuch != null && p.notar_grundbuch !== '') {
+      var gb = parseFloat(get('grundbuch_pct')); if (!isFinite(gb)) gb = 0.5;
+      var alt = parseFloat(p.notar_grundbuch);
+      if (isFinite(alt)) return Math.max(0, Math.round((alt - gb) * 100) / 100);
+    }
     var d = defaults();
     return d[key];
   }
@@ -104,9 +111,9 @@ window.DealPilotInvestmentProfile = (function() {
       setIfEmpty('ek', Math.round(kp * merged.ek_quote_default / 100));
     }
     setIfEmpty('grenzsteuersatz', merged.grenzsteuersatz);
-    // Notar/Grundbuch + Makler nur falls Inputs existieren (Investition-Tab)
-    setIfEmpty('notar_pct',  merged.notar_grundbuch);
-    setIfEmpty('makler_pct', merged.maklerkosten);
+    /* v2261: hier stand setIfEmpty('notar_pct'/'makler_pct') - Felder, die es nicht
+       gibt (sie heissen notar_p/makler_p). Die Nebenkosten setzt setDefaults()
+       in main.js aus diesem Profil, fuer jedes neue Objekt. */
     /* v816-zins: effektiver Zins (eigener Wert ODER indikativer Pfandbrief-Satz der Zinsbindung+Stufe)
        in Haupt-Zinsfeld (d1z) UND Quick-Boarding-Zinsfeld (qc_zins) schreiben. setIfEmpty -> User/eigener Zins behaelt Vorrang. */
     try {
@@ -318,9 +325,17 @@ window.DealPilotInvestmentProfile = (function() {
       '<h3 class="ip-section">Standort & Nebenkosten</h3>',
       '<div class="ip-grid">',
         blEl(),
-        field('ip_notar_grundbuch', 'Notar & Grundbuch', p.notar_grundbuch, '%', 'pauschal vom Kaufpreis'),
-        field('ip_maklerkosten',    'Maklergebühr',      p.maklerkosten,    '%', 'inkl. MwSt'),
+        field('ip_notar_pct',       'Notar',             get('notar_pct'),       '%', 'vom Kaufpreis'),
+        field('ip_grundbuch_pct',   'Grundbuchamt',      get('grundbuch_pct'),   '%', 'vom Kaufpreis'),
+        field('ip_maklerkosten',    'Maklergebühr',      get('maklerkosten'),    '%', 'inkl. MwSt — 0, wenn ohne Makler'),
+        field('ip_sonstige_nk_pct', 'Sonstige Kosten',   get('sonstige_nk_pct'), '%', 'Gutachten, Anfahrt, Gebühren'),
       '</div>',
+      /* v2261 · Grunderwerbsteuer automatisch nach Bundesland */
+      '<label class="ip-check" style="display:flex;gap:9px;align-items:flex-start;margin:6px 0 16px;cursor:pointer;font-size:13px;line-height:1.45">'
+        + '<input type="checkbox" id="ip_grest_auto" style="margin-top:3px"' + (get('grest_auto') === false ? '' : ' checked') + '>'
+        + '<span><b>Grunderwerbsteuer automatisch nach Bundesland</b><br><span class="hint" style="color:var(--muted)">'
+        + 'DealPilot erkennt das Bundesland an der Postleitzahl des Objekts und setzt den passenden Satz. '
+        + 'Ohne Haken gilt das Bundesland oben — für jedes Objekt, bis du es dort änderst.</span></span></label>',
 
       /* v2237 · Abschlag auf Angebotspreise: leer = recherchierter Marktdurchschnitt */
       '<h3 class="ip-section">Marktbewertung</h3>',
@@ -398,7 +413,10 @@ window.DealPilotInvestmentProfile = (function() {
       min_cashflow_vor_st:    v('ip_min_cashflow_vor_st'),
       max_ltv:                v('ip_max_ltv'),
       grenzsteuersatz:        v('ip_grenzsteuersatz'),
-      notar_grundbuch:        v('ip_notar_grundbuch'),
+      notar_pct:              v('ip_notar_pct'),          /* v2261 */
+      grundbuch_pct:          v('ip_grundbuch_pct'),
+      sonstige_nk_pct:        v('ip_sonstige_nk_pct'),
+      grest_auto:             (function(){ var c = document.getElementById('ip_grest_auto'); return c ? !!c.checked : null; })(),
       maklerkosten:           v('ip_maklerkosten'),
       angebot_abschlag_pct:   v('ip_angebot_abschlag_pct'),   /* v2237 · leer -> Marktdurchschnitt */
       bundesland:             s('ip_bundesland'),
@@ -481,10 +499,59 @@ window.DealPilotInvestmentProfile = (function() {
     ['ip_zinsbindung_default','ip_zins_margin'].forEach(function(id){ var el=document.getElementById(id); if(!el||el._mktBound) return; el._mktBound=1; el.addEventListener('change', function(){ if(inp.dataset.market==='1') toMarket(); }); });
     inp.addEventListener('input', function(){ if(inp.dataset.market==='1' && document.activeElement===inp) toOverride(); });
   }
+  /* ══ v2257 · EIGENKAPITAL UND MIETAUSFALL KOMMEN NACH ══════════════════
+     Gemessen am 15.10.2026 (Videoreihe Module 08/09): „Neues Objekt" legt
+     ein LEERES Formular an. applyToNewObject() und setDefaults() rechnen
+     Eigenkapital (10 % v. KP) und Mietausfall (1 % der Jahresmiete) nur,
+     wenn Kaufpreis bzw. Miete in diesem Augenblick schon stehen - das tun
+     sie dort nie. Beide Standardwerte kamen so bei keinem neu angelegten
+     Objekt an; Eigenkapital und Darlehen standen auf 0, der Mietausfall
+     leer, obwohl die Einstellungen „wird automatisch in € umgerechnet"
+     zusagen.
+     Jetzt: sobald der Nutzer Kaufpreis bzw. Nettokaltmiete eintraegt und
+     das Zielfeld LEER ist, wird es aus dem Profil gesetzt. Nur auf echte
+     Eingaben (isTrusted) - beim Laden eines Objekts wird nie geschrieben.
+     Ein eingetragener Wert wird nie ueberschrieben. */
+  function _zahlFeld(id) {
+    var e = document.getElementById(id); if (!e) return null;
+    var s = String(e.value || '').trim(); if (!s) return null;
+    var n = (typeof window.parseDe === 'function') ? window.parseDe(s) : parseFloat(s.replace(/\./g, '').replace(',', '.'));
+    return isFinite(n) ? n : null;
+  }
+  function nachziehen(quelle) {
+    var gesetzt = [];
+    function setzeLeer(id, wert) {
+      var e = document.getElementById(id);
+      if (!e || String(e.value || '').trim() !== '' || !(wert > 0)) return;
+      e.value = String(Math.round(wert));
+      try { e.dispatchEvent(new Event('input', { bubbles: true })); } catch (x) {}
+      gesetzt.push(id);
+    }
+    function pct(k) { var v = parseFloat(String(get(k) == null ? '' : get(k)).replace(',', '.')); return isFinite(v) && v > 0 ? v : null; }
+    if (quelle === 'kp') {
+      var kp = _zahlFeld('kp'), q = pct('ek_quote_default');
+      if (kp > 0 && q) setzeLeer('ek', kp * q / 100);
+      /* das Darlehen laeuft mit (financing.js), wie nach einer eigenen Eingabe */
+      if (gesetzt.length && typeof window.dpDarlehenNachziehen === 'function') setTimeout(window.dpDarlehenNachziehen, 420);
+    }
+    if (quelle === 'nkm') {
+      var nkm = _zahlFeld('nkm'), m = pct('mietausfall_pct');
+      if (nkm > 0 && m) setzeLeer('mietausfall', nkm * 12 * m / 100);
+    }
+    if (gesetzt.length && typeof window.calc === 'function') { try { window.calc(); } catch (x) {} }
+    return gesetzt;
+  }
+  document.addEventListener('change', function (ev) {
+    var t = ev.target;
+    if (!ev.isTrusted || !t || (t.id !== 'kp' && t.id !== 'nkm')) return;
+    nachziehen(t.id);
+  }, true);
+
   return {
     load: load,
     get: get,
     save: save,                     // V63.96: für Settings-KI-Tab-Persist
+    nachziehen: nachziehen,         /* v2257 */
     applyToNewObject: applyToNewObject,
     getZins: getZins,
     wireMarketRate: wireMarketRate,

@@ -3801,12 +3801,20 @@ window._qcKnkPct = function () {
     var G = (P && P.DealPilotGrest) || window.DealPilotGrest;
     if (plz.length === 5 && G && typeof G.forPlz === 'function') { var r = G.forPlz(plz); if (r && isFinite(r.rate)) grest = Number(r.rate); }
   } catch (e) {}
+  /* v2261: dieselben vier Saetze wie das Objekt (main.js setDefaults) - Notar,
+     Grundbuch, Makler, Sonstige aus den Einstellungen; Grunderwerbsteuer nach
+     PLZ nur mit Automatik, sonst Satz des Profil-Bundeslands. */
+  var gb = 0.5, makler = 0, sonst = 1.5, IP = null;
   try {
-    var IP = (P && P.DealPilotInvestmentProfile) || window.DealPilotInvestmentProfile;
-    var v = IP && typeof IP.get === 'function' ? parseFloat(IP.get('notar_grundbuch')) : NaN;
-    if (isFinite(v)) notar = v;
+    IP = (P && P.DealPilotInvestmentProfile) || window.DealPilotInvestmentProfile;
+    var num = function (k, d) { var x = IP && typeof IP.get === 'function' ? parseFloat(IP.get(k)) : NaN; return isFinite(x) ? x : d; };
+    notar = num('notar_pct', 1.7); gb = num('grundbuch_pct', 0.5); makler = num('maklerkosten', 0); sonst = num('sonstige_nk_pct', 1.5);
+    if (IP && IP.get('grest_auto') === false) {
+      var G2 = (P && P.DealPilotGrest) || window.DealPilotGrest, bl = IP.get('bundesland');
+      if (G2 && G2.rates && bl && isFinite(G2.rates[bl])) grest = Number(G2.rates[bl]);
+    }
   } catch (e) {}
-  return Math.round((grest + notar + 0.5 + 1.5) * 100) / 100;
+  return Math.round((grest + notar + gb + makler + sonst) * 100) / 100;
 };
 </script>
 <script>
@@ -6848,7 +6856,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 
 
   <script src="js/dscr-engine.js?v=v2240"></script>
-  <script src="js/deal-kpis.js?v=v2149"></script>
+  <script src="js/deal-kpis.js?v=v2261"></script>
   <!-- v1956: das Lage-Profil. Eigenes Dokument, eigene Einbindung -
        gleicher Ursprung, also derselbe Speicher wie im Hauptfenster. -->
   <script src="js/lage-profil.js?v=v2159"></script>

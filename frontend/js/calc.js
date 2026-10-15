@@ -895,7 +895,11 @@ function _calcImmediate(){
   var kp=v('kp');
   var m_e=kp*v('makler_p')/100,n_e=kp*v('notar_p')/100,g_e=kp*v('gba_p')/100,ge_e=kp*v('gest_p')/100,ji_e=kp*v('ji_p')/100;
   var nk=m_e+n_e+g_e+ge_e+ji_e;
-  var gi=kp+nk+v('san')+v('moebl');
+  /* v2261 · Marcel am 15.10.2026: „Inventar ist nicht zusaetzlich." Es ist Teil des
+     Kaufpreises (separates Wirtschaftsgut darin) - die Gesamtinvestition ist
+     Kaufpreis + Nebenkosten + Sanierung. Bis hier kam `moebl` noch einmal oben
+     drauf; BMF-Rechner und Inventar-Box zogen es dagegen vom Kaufpreis ab. */
+  var gi=kp+nk+v('san');
   State.gi=gi;
   // V35: Euro-Felder sind editable Inputs — value statt textContent setzen,
   //      und nur wenn das Feld nicht aktuell fokussiert ist (User tippt grade).
@@ -964,7 +968,10 @@ function _calcImmediate(){
    * (V291 Inventar-Detail-Box ist Single Source of Truth).
    * kuecheActive wird abgeleitet von kuecheVal > 0 — bleibt erhalten
    * weil mehrere Folge-Stellen (15%-Grenze, AfA-Label, State-Export) sie nutzen. */
-  var kuecheVal = Math.max(0, v('inv_kueche') || 0);
+  /* v2261: das GANZE Inventar (#moebl = Summe der Inventar-Box) geht vom Kaufpreis ab,
+     nicht nur die Kueche - sonst stuende z. B. die Moeblierung zugleich in der
+     Gebaeude-AfA und in der Inventar-AfA. Name bleibt fuer die Folgestellen. */
+  var kuecheVal = Math.max(0, v('inv_kueche') || 0, v('moebl') || 0);
   var kuecheActive = kuecheVal > 0;
   // Sicherheit: Küche kann nicht > Gebäudeanteil sein
   var gebBruttoMax = kp * gebAnt;
@@ -1122,7 +1129,7 @@ function _calcImmediate(){
       st('ahk_geb_anteil', (gebAnt * 100).toFixed(0) + ' %');
       st('ahk_geb_brutto', fE(gebBruttoMax, 0));
       var labelEl = el('ahk_geb_label');
-      if (labelEl) labelEl.textContent = kuecheActive ? 'Gebäude (vor Küchen-Abzug)' : 'Gebäude (' + (gebAnt*100).toFixed(0) + ' % von Kaufpreis)';
+      if (labelEl) labelEl.textContent = kuecheActive ? 'Gebäude (vor Inventar-Abzug)' : 'Gebäude (' + (gebAnt*100).toFixed(0) + ' % von Kaufpreis)';
       var kuecheRow = el('ahk_kueche_row');
       var gebNettoRow = el('ahk_geb_netto_row');
       if (kuecheActive && kuecheVal > 0) {
