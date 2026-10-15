@@ -2520,7 +2520,8 @@
         await warteAuf(function () { return /Schritt 9/.test(r6WizTitel()); }, 4000);
         await warte(700);
         var t = r6Inner(r6Wiz());
-        var rnd = /GESCHÄTZTE RESTNUTZUNGSDAUER[\s\S]*?([\d–\-]+)\s*Jahre/i.exec(t), urt = /(Gutachten lohnt[^\n]*)/.exec(t);
+        /* v2258 (Hauptsitzung): die Spanne steht jetzt mit Komma („30,8–34,8 Jahre") */
+        var rnd = /GESCHÄTZTE RESTNUTZUNGSDAUER[\s\S]*?(\d[\d,]*(?:\s*[–\-]\s*\d[\d,]*)?)\s*Jahre/i.exec(t), urt = /(Gutachten lohnt[^\n]*)/.exec(t);
         await r6Ende(zb);
         await zeige(function () { var e = rhIm(r6Wiz(), /GESCHÄTZTE RESTNUTZUNGSDAUER/i); return e && (e.closest('div[style]') || e.parentElement); }, 8);
         await b2oZeile(s, 'Das Ergebnis', 'Geschätzte Restnutzungsdauer <b>' + (rnd ? rnd[1] + ' Jahre' : '–') + '</b> statt 50. ' + (urt ? '„' + urt[1].trim() + '“' : '') + '.');
