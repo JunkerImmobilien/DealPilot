@@ -1744,6 +1744,7 @@
         await tippeH('plz', '32052'); await tippeH('ort', 'Herford'); await tippeH('str', 'Sachsenstraße', 60); await tippeH('hnr', '18');
         await tippeH('objart', 'ETW'); await tippeH('wfl', '100'); await tippeH('baujahr', '1998');
         await warte(900);
+        await warteAuf(function () { var r = stufeZeile(1)(); return r && /bereit/.test(r.textContent); }, 5000);   /* die Zeile zieht verzögert nach */
         await zeige(stufeZeile(1), 8);
         await b2oZeile(s, 'Stufe 1 · Einfach', fehlt(1).length ? 'Noch offen: ' + feldNamen(fehlt(1)).join(', ') + '.'
           : '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + ' — <b>bereit</b>.');
@@ -1777,6 +1778,7 @@
         await tippeH('zimmer', '3'); await tippeH('etage', '1');
         await tippeH('ds2_zustand', 'gut'); await tippeH('ds2_energie', 'C'); await tippeH('standardstufe', '3');
         await warte(1000);
+        await warteAuf(function () { var r = stufeZeile(2)(); return r && /bereit/.test(r.textContent); }, 5000);   /* die Zeile zieht verzögert nach */
         await zeige(stufeZeile(2), 8);
         await b2oZeile(s, 'Stufe 2 · Mittel', fehlt(2).length ? 'Noch offen: ' + feldNamen(fehlt(2)).join(', ') + '.'
           : 'Kaufpreis <b>' + eur(zahl('kp')) + '</b>, Kaltmiete <b>' + eur(zahl('nkm')) + '</b> — <b>bereit</b>.');
@@ -1810,6 +1812,7 @@
           await tippeH(ids[i], wertVon[ids[i]]);
         }
         await warte(900);
+        await warteAuf(function () { var r = stufeZeile(3)(); return r && /bereit/.test(r.textContent); }, 5000);   /* die Zeile zieht verzögert nach */
         await zeige(stufeZeile(3), 8);
         await b2oZeile(s, 'Stufe 3 · Ausgiebig', fehlt(3).length ? 'Noch offen: ' + feldNamen(fehlt(3)).join(', ') + '.'
           : 'Grundstück ' + de(zahl('gsfl')) + ' m², Anteil ' + wert('mea') + ' %, BGF ' + wert('bgf') + ' m² — <b>bereit</b>.');

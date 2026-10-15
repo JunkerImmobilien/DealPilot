@@ -1001,8 +1001,14 @@
   }
 
   /* ═══ Verdrahtung ════════════════════════════════════════════════════ */
-  var _t = null;
-  function spaeter(fn, ms) { clearTimeout(_t); _t = setTimeout(fn, ms || 350); }
+  /* v2255e · EIN Zeitgeber je Aufgabe, nicht einer für alle. GEMESSEN
+     (Videoreihe Modul 04, Baujahr als letztes Feld getippt): das Feld trägt
+     zwei change-Horcher - erst „Pflicht nachziehen" (150 ms), dann
+     „automatik". Der zweite löschte den Zeitgeber des ersten, die Zeile
+     blieb auf „3 fehlt", obwohl alles da war. Benannte Funktionen bekommen
+     ihren eigenen Zeitgeber, die namenlosen (Pflicht) teilen sich einen. */
+  var _tt = {};
+  function spaeter(fn, ms) { var k = (fn && fn.name) || '_'; clearTimeout(_tt[k]); _tt[k] = setTimeout(fn, ms || 350); }
   function alles() { zielAnwenden(); automatik(); gewerke(); lageVergleich(); verkehrswertUebernahme(); }
   var _verdrahtet = false;
   function verdrahten() {
