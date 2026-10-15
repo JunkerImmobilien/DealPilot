@@ -1977,7 +1977,14 @@ window.DealPilotDealAction = (function() {
     var _kp  = _pd(prefill.kp) || 0;
     var _ga  = _pd(prefill.geb_ant) || 80;
     var _grz = _pd(prefill.grenz) || 42;
-    if (_kp > 0) prefill._dpGebaeudeanteil = _kp * _ga / 100;
+    /* v2269 · Dieselbe Gebaeude-Basis wie der Reiter Steuer (calc.js gebAHK):
+       (Kaufpreis - Inventar + Nebenkosten) x Gebaeudeanteil. Hier stand
+       Kaufpreis x Gebaeudeanteil - mit Inventar, ohne Nebenkosten (Ravensberger
+       Weg 38: 924.668 statt 919.448 EUR, Mehr-AfA +9.698 statt ~9.643). */
+    var _inv = (typeof window.dpInventarSumme === 'function') ? window.dpInventarSumme() : (_pd(prefill.moebl) || 0);
+    var _nkP = ['makler_p', 'notar_p', 'gba_p', 'gest_p', 'ji_p'].reduce(function (s, id) {
+      var e = document.getElementById(id); return s + ((e && _pd(e.value)) || 0); }, 0);
+    if (_kp > 0) prefill._dpGebaeudeanteil = (Math.max(0, _kp - _inv) + _kp * _nkP / 100) * _ga / 100;
     prefill._dpGrenzsteuersatz = _grz / 100;
 
     console.log('[RND-Wizard] Prefill ermittelt:', prefill);

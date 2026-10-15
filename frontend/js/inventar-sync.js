@@ -99,6 +99,19 @@
     if (immoKpEl) immoKpEl.textContent = kp > 0 ? _fmtEur(immoKp) : '—';
   }
 
+  /* v2269 · EINE Inventarsumme fuer alle Rechner: die Detailbox, und wenn sie
+     leer ist, #moebl („Legacy-Modus" oben - Inventar direkt eingetragen).
+     Bis hier zaehlten BMF-Fenster, Bodenabschlag und RND-Rechner nur die
+     Detailbox und rechneten mit dem vollen Kaufpreis, sobald das Inventar nur
+     in #moebl stand (Ravensberger Weg 38: 7.000 EUR). */
+  window.dpInventarSumme = function () {
+    var s = _getInvSum();
+    if (s > 0) return s;
+    var m = document.getElementById('moebl');
+    var v = m ? _parseDe(m.value) : 0;
+    return v > 0 ? v : 0;
+  };
+
   // Globaler Export
   window._syncInventarToMoebl = _syncInventarToMoebl;
   window._getInventarSum = _getInvSum;

@@ -942,6 +942,7 @@
     var kp       = z('ak_kp');
     var inv      = z('inv_kueche') + z('inv_moebel') + z('inv_geraete')
                  + z('inv_pv') + z('inv_stellplatz') + z('inv_sonst');
+    if (!(inv > 0) && typeof window.dpInventarSumme === 'function') inv = window.dpInventarSumme();   /* v2269 */
     var grest    = z('ak_grest'), notar = z('ak_notar'), gba = z('ak_gba');
     var makler   = z('ak_makler'), jiSonst = z('ak_ji');
     var reise    = z('ak_fahrt') + z('ak_verpfl') + z('ak_hotel');

@@ -1366,7 +1366,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2266';
+  var RH_BUSTER = 'v2268';   /* v2268: BMF-Mitschnitt neu (1.233.000) */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel/i;
