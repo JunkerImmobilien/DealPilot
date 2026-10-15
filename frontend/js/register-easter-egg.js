@@ -384,6 +384,11 @@
           expires: Date.now() + 7 * 24 * 60 * 60 * 1000  // 7 Tage
         };
         localStorage.setItem('ji_session', JSON.stringify(nullSession));
+        /* v2250: der Link IST die Bestätigung - das Band der Frist geht mit. */
+        try {
+          localStorage.removeItem('dp_verify_frist');
+          if (window.DealPilotVerifyFrist) window.DealPilotVerifyFrist.stop();
+        } catch (e) {}
         console.log('[register V204] Mail bestätigt — Token gespeichert, Welcome-Toast');
 
         // URL bereinigen — Query UND Hash entfernen

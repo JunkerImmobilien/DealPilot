@@ -179,7 +179,7 @@ function renderVerifyMail(firstName, verifyUrl, brand) {
 '          <td align="center" bgcolor="#0a0a0a" style="border-radius:11px;">\n' +
 '            <a href="' + url + '" target="_blank"\n' +
 '               style="display:inline-block;font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:' + B.hi + ';padding:14px 30px;border-radius:11px;">\n' +
-'              \u2708&nbsp;&nbsp;Check-in abschließen\n' +
+'              Check-in abschließen\n' +
 '            </a>\n' +
 '          </td>\n' +
 '        </tr></table>\n' +
@@ -210,7 +210,7 @@ function renderVerifyMail(firstName, verifyUrl, brand) {
 '    </tr>\n' +
 '    <tr>\n' +
 '      <td style="background:#070707;border-radius:0 0 16px 16px;padding:24px 26px;" class="px">\n' +
-'        <div style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:#ffffff;">Guten Flug \u2014 dein DealPilot-Team \u2708</div>\n' +
+'        <div style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:#ffffff;">Guten Flug \u2014 dein DealPilot-Team</div>\n' +
 '        <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#9a8f6a;margin-top:12px;">\n' +
 '          Fragen? Antworte einfach auf diese Mail oder schreib an\n' +
 '          <a href="mailto:' + B.sup + '" style="color:' + B.acc + ';">' + B.sup + '</a>.\n' +

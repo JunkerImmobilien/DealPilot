@@ -186,9 +186,54 @@
     schreibe(iso, mail);
     zeichne();
     if (ticker) clearInterval(ticker);
-    /* Minütlich reicht: die Anzeige nennt Minuten. */
-    ticker = setInterval(zeichne, 60000);
+    /* Minütlich reicht: die Anzeige nennt Minuten. v2250: im selben Takt
+       fragt das Band den Server, ob inzwischen bestaetigt wurde. */
+    ticker = setInterval(function () { zeichne(); pruefeServer(); }, 60000);
   }
+
+  /* ══ v2250 · DAS BAND FRAGT, OB ES NOCH GILT ═════════════════════════
+     Marcel am 15.10.2026: „Ich habe auf den Bestätigungslink geklickt.
+     Es wird in der App aber immer noch angezeigt, dass ich noch nicht
+     bestätigt habe."
+
+     Der Merker wurde gesetzt (Anmeldung, jede Antwort mit
+     X-DP-Verify-Deadline), aber nur bei einer neuen ANMELDUNG wieder
+     geraeumt. Der Bestätigungslink oeffnet meist einen neuen Tab; der
+     alte Tab behielt das Band, und auch der neue las den alten Merker.
+
+     Die Gegenprobe ist die Abwesenheit der Kopfzeile: der Server setzt
+     sie in `middleware/auth.js` NUR, solange `email_verified_at` leer
+     ist. Gefragt wird ein Endpunkt, der sicher durch diese Pruefung
+     laeuft (`/auth/me`) - bei einem oeffentlichen Endpunkt fehlte die
+     Kopfzeile auch ohne Bestätigung. Kein Ergebnis (Netz, 401) aendert
+     nichts. */
+  var _fragtGerade = false;
+  function pruefeServer() {
+    if (!lese() || _fragtGerade) return;
+    var basis = '', token = '';
+    try { basis = (window.Auth && Auth.getApiBase && Auth.getApiBase()) || ''; } catch (e) {}
+    try { token = localStorage.getItem('ji_token') || ''; } catch (e) {}
+    if (!basis || !token) return;
+    _fragtGerade = true;
+    origFetch.call(window, basis + '/auth/me', { headers: { Authorization: 'Bearer ' + token } })
+      .then(function (r) {
+        if (!r.ok) return;
+        var d = r.headers.get('X-DP-Verify-Deadline');
+        if (d) { if (lese() !== d) schreibe(d, null); zeichne(); }
+        else stop();
+      })
+      .catch(function () {})
+      .then(function () { _fragtGerade = false; });
+  }
+  /* Zurueck aus dem Mail-Programm: sofort fragen, nicht erst im Minutentakt. */
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') pruefeServer();
+  });
+  window.addEventListener('focus', pruefeServer);
+  /* Ein anderer Tab hat bestaetigt und den Merker geraeumt. */
+  window.addEventListener('storage', function (e) {
+    if (e.key === MERKER && !e.newValue) stop();
+  });
 
   function stop() {
     schreibe('', null);
@@ -218,7 +263,7 @@
         if (d) {
           if (lese() !== d) schreibe(d, null);
           zeichne();
-          if (!ticker) ticker = setInterval(zeichne, 60000);
+          if (!ticker) ticker = setInterval(function () { zeichne(); pruefeServer(); }, 60000);
         }
       } catch (e) {}
       return resp;
@@ -230,6 +275,7 @@
     start: start,
     stop: stop,
     zeichne: zeichne,
+    pruefeServer: pruefeServer,
     /* Für den Fall VERIFY_EXPIRED: Band auf „abgelaufen" stellen, ohne
        auf den nächsten Minutentakt zu warten. */
     abgelaufen: function () {
@@ -243,8 +289,9 @@
 
   /* Beim Laden: falls ein Merker liegt, Band zeigen. */
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { if (lese()) start(lese(), null); });
+    document.addEventListener('DOMContentLoaded', function () { if (lese()) { start(lese(), null); pruefeServer(); } });
   } else if (lese()) {
     start(lese(), null);
+    pruefeServer();
   }
 })();
