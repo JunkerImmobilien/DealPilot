@@ -1013,7 +1013,7 @@ window.DealPilotConfig = (function() {
       tilgung_default:        1.5,    /* % p.a. — Marcel 01.10.2026: "Standardtilgung würde ich 1,5 setzen". War 1,0 (davor 2,5, nie wirksam). */
       zinsbindung_default:    10,     // Jahre
       zins_override:          null,   // eigener Zinssatz (%); null = indikativer Pfandbrief-Satz
-      zins_margin:            'standard', // Zins-Stufe: premium (LTV<=60%) / standard (60-80%) / schwach (>90%)
+      zins_margin:            'standard', // Zins-Stufe: premium (LTV bis 60 %) / standard (bis 80 %) / schwach (über 80 %)
       hausgeld_pct:           null,   // Hausgeld-Annahme als % vom Kaufpreis p.a.; null = aus
       ek_quote_default:       10,     /* % vom Kaufpreis — Marcel 01.10.2026: "Standard Eigenkapital würde ich eigentlich immer jetzt erst mal 10 Prozent setzen". Damit liegt der LTV ueber 90 %, was zur vorsichtigen Vorbelegung passt. */
       /* Bewirtschaftung — v1257: Marcels Wunsch, „Mietausfall und BWK-Quote
@@ -1075,9 +1075,7 @@ window.DealPilotConfig = (function() {
       sourceUrl:   'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen',
       // Vergleichslinks (Konditionen-Rechner — anders als Bundesbank-Durchschnitt)
       compareLinks: [
-        { label: 'Interhyp',            url: 'https://www.interhyp.de/ratgeber/was-zaehlt/bauzinsen/aktuelle-bauzinsen.html' },
-        { label: 'Dr. Klein',           url: 'https://www.drklein.de/bauzinsen.html' },
-        { label: 'Baufi24',             url: 'https://www.baufi24.de/bauzinsen-aktuell/' },
+        /* v2245: keine Vergleichsportale/Vermittler nach aussen - nur die amtliche Quelle */
         { label: 'Bundesbank-Statistik', url: 'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen' }
       ],
 
@@ -1087,20 +1085,39 @@ window.DealPilotConfig = (function() {
       //   (Kapitalmarktstatistik-PDF, Tabelle "Zinssatz bei Restlaufzeiten von ... Jahren")
       pfandbrief: {
         yields: {
-          '5':  2.85,
-          '10': 3.05,
-          '15': 3.18,
-          '20': 3.28
+          '5':  3.68,   /* v2242: Bundesbank-Tageswerte vom 14.10.2026 */
+          '10': 3.93,
+          '15': 4.05,
+          '20': 4.11
         },
         // Bank-Marge pro Bonitäts-/LTV-Stufe
+        // v2245: NUR NOCH RUECKFALL (Pfandbrief + feste Marge), wenn auch
+        // `bauzins` unten fehlt. Gerechnet wird mit der Marktformel.
         margins: {
-          premium:  0.40,   // LTV ≤ 60%, Top-Bonität
-          standard: 0.70,   // LTV 60–80%, normale Bonität
-          schwach:  1.00    // LTV > 90% oder Bonität mittel
+          premium:  0.25,   // LTV bis 60 %, Top-Bonität (v2242, kalibriert 15.10.2026)
+          standard: 0.40,   // LTV bis 80 %, normale Bonität
+          schwach:  0.80    // LTV über 80 % oder Bonität mittel
         },
-        asOf: '2026-05',
+        asOf: '2026-10',
         sourceLabel: 'Bundesbank Kapitalmarktstatistik · Pfandbrief-Zinsstruktur',
         sourceUrl: 'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen/taegliche-zinsstruktur-fuer-pfandbriefe-650734'
+      },
+
+      // v2245: MARKTFORMEL - statischer Stand, nur wenn das Backend nicht antwortet.
+      //   Bauzins(b, LTV) = bund[b] + aufschlag[b] + k + Z(LTV)
+      //   Quelle der Live-Werte: backend/src/services/bauzinsService.js
+      //   (Bundesbank: Rendite Bundeswertpapiere taeglich, MFI-Zinsstatistik
+      //   Wohnungsbau monatlich). Gemessen am 15.10.2026 mit
+      //   tools/bauzins-pruefen.mjs - beim Nachpflegen DORT messen, nicht hier
+      //   rechnen; Stuetzstellen und K muessen zum Backend passen.
+      bauzins: {
+        bund:      { '5': 3.23,  '10': 3.51,  '15': 3.70,  '20': 3.80 },   // Bund-Rendite 14.10.2026
+        aufschlag: { '5': 0.558, '10': 0.558, '15': 0.558, '20': 0.558 },  // v2246: EIN Aufschlag (MFI 5-10 J minus Bund 10), 08/2026
+        aufschlag_monat: '2026-08',
+        k: 0.27,                       // Kalibrierung 15.10.2026: 10 J / 80 % = 4,34 %
+        zuschlaege: [[60, -0.20], [70, -0.10], [80, 0], [90, 0.22], [100, 0.45], [110, 0.95]],
+        stufen_ltv: { premium: 60, standard: 80, schwach: 90 },
+        asOf: '2026-10-14'
       },
 
       // V211: Markt-Kontext (EZB-Leitzins + EURIBOR 3M)

@@ -764,7 +764,10 @@
       var _amp = (window.QcHeuristik && QcHeuristik.kennzahlenAmpel)
         ? QcHeuristik.kennzahlenAmpel({ bmr: bmr, nmr: nmr, ekr: ekr, cfMon: cfMon,
             dscr: dscr, ltv: ltvPct, bewirtPctNkm: bewirtPctNkm,
-            zielBmr: _zielB, lageklasse: _lk })
+            zielBmr: _zielB, lageklasse: _lk }, null,
+            /* v2240 · Alle Ampeln: die persoenlichen Mindest-Schwellen
+               (DSCR, LTV, Cashflow) faerben auch diese drei Kacheln */
+            window.DealPilotSchwellen ? DealPilotSchwellen.get() : null)
         : [];
       /* Die Ampelstufe wird in die Quote zurueckuebersetzt, die `_setKpi`
          erwartet — die Schwellen dort (>= 0,75 gruen, >= 0,40 gelb) sind

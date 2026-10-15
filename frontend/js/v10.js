@@ -48,8 +48,19 @@ window.V10 = (function() {
 
   function _computeRates() {
     if (!_pfandbrief || !_context) return null;
-    var m = (_pfandbrief.margins && _pfandbrief.margins[_activeMargin]) || 1.20;
+    var m = (_pfandbrief.margins && _pfandbrief.margins[_activeMargin]) || 0.40;   /* v2242: wie standard */
     var euribor = (_context.euribor_3m && _context.euribor_3m.value) || null;
+    /* v2245: 10/15/20 J sind die fertigen Werte der Marktformel - exakt
+       dieselben Zahlen wie die Kacheln. Selbst gerechnet (Pfandbrief +
+       Marge) wird nur noch im Rueckfall ohne indicativeRates. */
+    var ir = _pfandbrief.indicativeRates;
+    if (ir) {
+      var _iv = function (k) { return (ir[k] && typeof ir[k][_activeMargin] === 'number') ? ir[k][_activeMargin] : null; };
+      return {
+        'var': (euribor != null) ? Math.round((euribor + m) * 100) / 100 : null,
+        '10': _iv('10'), '15': _iv('15'), '20': _iv('20')
+      };
+    }
     return {
       'var': (euribor != null) ? Math.round((euribor + m) * 100) / 100 : null,
       '10':  (_pfandbrief.yields['10'] != null) ? Math.round((_pfandbrief.yields['10'] + m) * 100) / 100 : null,
@@ -139,6 +150,18 @@ window.V10 = (function() {
       try {
         var cfg = window.DealPilotConfig && DealPilotConfig.marketRates && DealPilotConfig.marketRates.pfandbrief;
         if (cfg) _pfandbrief = { yields: cfg.yields, margins: cfg.margins, source: 'static', asOf: cfg.asOf };
+        /* v2245: auch im Rueckfall die Marktformel (statischer Stand aus config.js) */
+        if (_pfandbrief && typeof window.dpBauzinsRechnen === 'function' && typeof window.dpBauzinsFormel === 'function') {
+          var _f = window.dpBauzinsFormel(), _st = _f.stufen_ltv || { premium: 60, standard: 80, schwach: 90 };
+          _pfandbrief.indicativeRates = {};
+          ['5', '10', '15', '20'].forEach(function (k) {
+            _pfandbrief.indicativeRates[k] = {
+              premium: window.dpBauzinsRechnen(_f, k, _st.premium),
+              standard: window.dpBauzinsRechnen(_f, k, _st.standard),
+              schwach: window.dpBauzinsRechnen(_f, k, _st.schwach)
+            };
+          });
+        }
       } catch(e) {}
     }
     if (!_context) {

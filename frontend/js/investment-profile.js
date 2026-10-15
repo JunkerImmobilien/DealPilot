@@ -255,7 +255,7 @@ window.DealPilotInvestmentProfile = (function() {
             '<label><input type="radio" name="ip_zins_modus" value="eigen"' + ((p.zins_override != null && String(p.zins_override) !== '') ? ' checked' : '') + '> Eigener Zinssatz</label>' +
           '</div>',
         field('ip_zins_override', 'Eigener Zinssatz', p.zins_override, '%', 'Marktzins: Pfandbrief-Rendite der Zinsbindung plus Bonitätsaufschlag, täglich aktuell') + '</div>',
-        (function(){ var mg = String(p.zins_margin || 'standard'); var L = [['premium','Top (LTV ≤ 60 %)'],['standard','Normal (LTV 60–80 %)'],['schwach','Schwächer (LTV > 90 %)']]; var o = L.map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===mg?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_zins_margin">Zins-Stufe (Bonität / LTV)</label><div class="ip-field-row"><select id="ip_zins_margin">'+o+'</select></div><div class="ip-hint">Marge auf den Pfandbrief-Satz — nur bei indikativem Zins (eigener Zinssatz übersteuert)</div></div>'; })(),
+        (function(){ var mg = String(p.zins_margin || 'standard'); var L = [['premium','Top (LTV ≤ 60 %)'],['standard','Normal (LTV bis 80 %)'],['schwach','Schwächer (LTV über 80 %)']]; var o = L.map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===mg?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_zins_margin">Zins-Stufe (Bonität / LTV)</label><div class="ip-field-row"><select id="ip_zins_margin">'+o+'</select></div><div class="ip-hint">Zuschlag nach Beleihung auf den Marktzins (Bundesanleihe + Marktaufschlag): 60 / 80 / 90 % — nur bei indikativem Zins (eigener Zinssatz übersteuert)</div></div>'; })(),
         field('ip_ek_quote_default',    'Standard-Eigenkapital',     p.ek_quote_default,    '% v. KP', 'wird automatisch in € umgerechnet'),
       '</div>',
 
@@ -298,7 +298,7 @@ window.DealPilotInvestmentProfile = (function() {
       (window.DealPilotBwkProfil ? DealPilotBwkProfil.einstellungenHtml() : ''),
 
       '<h3 class="ip-section">Persönliche Mindest-Schwellen</h3>',
-      '<p class="hint">Diese Werte erscheinen ab V63.77 als farbliche Marker in den Kennzahlen — „grün" wenn dein persönliches Ziel erreicht ist.</p>',
+      '<p class="hint">Diese Werte steuern die Ampeln für DSCR und LTV — Bank-Kacheln, Objektkarte, Cockpit, Bank-Charts, PDF und Quick-Check — sowie „Deine Kaufgrenzen" und die Cashflow-Ampel im Quick-Check. „Grün", wenn dein persönliches Ziel erreicht ist; beim DSCR gelb ab 1,0, beim LTV gelb bis 100 %.</p>',   /* v2240 */
       '<div class="ip-grid">',
         field('ip_min_dscr',            'Mindest-DSCR',           p.min_dscr,            '',      'z.B. 1,20'),
         field('ip_min_cashflow_vor_st', 'Mindest-Cashflow / Monat', p.min_cashflow_vor_st, '€',   'vor Steuer'),

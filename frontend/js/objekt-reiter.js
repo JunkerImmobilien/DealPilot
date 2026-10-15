@@ -506,6 +506,15 @@
      schon aus dem Gespräch, bevor sie im Formular stehen. */
   function pflichtFuer(stufe, artOpt, garOpt) {
     var art = String(artOpt || _v('objart')).toUpperCase();
+    /* v2245 · Unbebautes Grundstueck: kein Gebaeude, also weder Wohnflaeche
+       noch Baujahr. Der Wert ist der Bodenwert - Pflicht sind Lage,
+       Grundstuecksflaeche und (ab Stufe 2) der Bodenrichtwert. Marcel am
+       15.10.2026: „nur angezeigt, wenn wir es auch wirklich brauchen". */
+    if (art === 'GRST') {
+      var g = ['plz', 'ort', 'str', 'objart', 'gsfl'];
+      if (stufe >= 2) g = g.concat(['kp', 'brw']);
+      return g;
+    }
     var l = ['plz', 'ort', 'str', 'objart', 'wfl', 'baujahr'];
     if (stufe >= 2) {
       l = l.concat(['kp', 'nkm', 'ds2_zustand', 'ds2_energie', 'standardstufe', 'zimmer']);

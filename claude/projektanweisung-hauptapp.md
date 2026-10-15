@@ -38761,6 +38761,90 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2247–v2247c · Marktdaten-Fenster neu: Zusammensetzung, Verlauf, Hausoptik (15.10.2026, Staging)
+- **Was:** Marcel: Verlaufsgrafik unter Finanzierung → „Marktdaten ansehen“, wie sich der Zins zusammensetzt, Optik DealPilot, Irrelevantes raus, Messkabine.
+  - Neues Modul `frontend/js/marktdaten-modal.js` übernimmt `V10.openMarketModal/closeMarketModal/handleOverlayClick`. Obsidian-Kopf mit Runway-Linie; Zins für Bindung × Beleihung (Objekt-LTV und Bindung `#d1_bindj` vorgewählt); Gleichung Bundesanleihe + Marktaufschlag + Angebotsniveau ± Beleihung (Marktaufschlag als Rest → geht immer auf); Verlauf 13 Monate (Ø abgeschlossen vs. Bund, Aufschlag-Balken) / 12 Wochen (Modell vs. Bund); vier Konditionen; Geldmarkt (EZB, Euribor, Ø abgeschlossen) + Einordnung Zinsbindung; eine Quellenzeile.
+  - Die drei alten Karten bleiben im versteckten `#v10-cards-source` (speisen Kopfzeile/Empfehlung) und werden nicht mehr verschoben. Weg: Linien-Schalter, doppelte Quellen, Türkis/Beige. Höhe 2.476 → 1.361 px.
+  - **Falle:** `style.css` `.sec button:not(...)` setzt Hintergrund/Farbe `!important` und macht Knöpfe zur Zeile → Chips und Konditionskacheln brauchen `!important` und `display:block` (v2247a/b). Gold im Canvas über Probe-Element `var(--wl-c9a84c)` (whitelabel, kein Literal).
+  - v2247c: Einordnung aus `.mr-rec-headline/-risk/-reasoning` statt `innerText` (klebte „RisikoMarktlage“ und den EK-Regler mit); `market-rates.js` beugt das Niveau (`mittlerem`/`hohem` statt `mittelem`/`hochem`).
+- **Commit:** `400777f0`, `158bdc9b`, `9af14a1f`, `28b3ee23`, `bb26f37e`
+- **Nachweis:** Messkabine 390/768/1440 px: kein Quer-Überlauf (vorher 20 px bei 390 durch die Kacheln), keine Kontrast- oder Zielgrößen-Befunde im Fenster, Chip „an“ rgb(5,5,5), Grafik 220/260 px. Bedienweg: 90 % → 4,56 % = 3,51 + 0,56 + 0,27 + 0,22; Wochen-Ansicht KW 41/42; Kachel 5 J → 4,28 %; Kreuz schließt, alte Karten (3) bleiben im Behälter. Gold-Audit RC=0, Buster SAUBER.
+- **Rest:** Abnahme durch Marcel; der Text der Empfehlung (market-rates.js) spricht noch „Sie“.
+
+### v2245–v2246 · Dynamischer Bauzins, Grundstücksformular (15.10.2026, Staging)
+- **Was:** Marcel: Zinsaufschlag „marktabhängig … wie im Bild dynamisch neu berechnet“, Finanzierungs-Tab und Landingpage 1:1.
+  - **Formel** (`backend/src/services/bauzinsService.js`): Bauzins(b, LTV) = Bund_b (täglich, Bundesbank BBSIS) + A (MFI-Effektivzins Wohnungsbau 5–10 J minus Ø Bund 10 J des letzten veröffentlichten Monats, ~6 Wochen Verzug) + K 0,27 (Angebotsniveau 80 %, kalibriert 15.10.) + Z(LTV) (60 % −0,20 · 70 −0,10 · 80 0 · 90 +0,22 · 100 +0,45 · 110+ +0,95, linear).
+  - **v2246:** EIN Aufschlag für alle Bindungen. Je Bindung eigene MFI-Reihen ergaben 5 J = 4,64 % (über 10 J) und 20 J < 15 J (Klasse 1–5 J mischt kurze teure Kredite, Klasse >10 J mischt 15/20 J).
+  - Migration 088 (`markt_zins_tag`, `markt_bauzins_monat`), Takt täglich 18:00 **Containerzeit = UTC** (20:00 deutsch), beim Start nur wenn älter 24 h. `/pfandbrief` liefert `indicativeRates` aus der Formel + `formel`/`verlauf`; `/bauzins?ltv=`; `/refresh` nur Admin.
+  - Finanzierungs-Tab: Kacheln „Bundesanleihe x + Marktaufschlag y (Stand Monat)“, Knöpfe LTV 60/80/90 %, Hinweis am Zinsfeld `#d1z` mit „übernehmen“ (überschreibt nie selbst). Landing (`dp2-inhalt.js`, `landing/index.html`) gleiche Zahlen, Text „80 % Beleihung“ statt „über 90 %“. Vergleichsportal-Namen aus `index.html`/`config.js compareLinks` entfernt.
+  - **v2245 Grundstück:** `pflichtFuer` für GRST = Lage + `gsfl` (+ `kp`, `brw` ab Stufe 2); `objektart-felder.js` blendet `wfl`/`baujahr` bei GRST aus.
+- **Commit:** `82318889` (v2245 GRST), `35d5be43` + Merge `65ee0139` (Bauzins, v2246)
+- **Nachweis:** Migration 88 angewandt, erster Abruf 1.280 Tageszeilen + 52 Monatszeilen in 0,5 s. Live: 4,06 / 4,34 / 4,53 / 4,63 % (80 %), 10 J bei LTV 95 % 4,67 %. App-Kacheln und Landing zeigen dieselben vier Zahlen und Unterzeilen. Wochenverlauf W41 Modell 4,36 % gegen Vergleichsbild 4,35 %. `tools/bauzins-pruefen.mjs` SAUBER. GRST: wfl/baujahr aus, gsfl „wichtig“; EFH/ETW unverändert.
+- **Rest:** Grafik „Aufschlag über die Wochen“ ist nicht gebaut (Daten in `verlauf`; Aufschlag springt nur monatlich). K gelegentlich nachkalibrieren. Hinweis am Zinsfeld im Browser an einem Objekt abnehmen. Prod-Rollout v2239–v2246 offen (Rebuild backend + mb-backend, Migration 088).
+
+### v2241/v2244 · Marktbewertung: Gewerbe, Grundstück, Sanierung, Modernisierungspunkte (15.10.2026, Staging)
+- **Was:** Marcel: „können wir das so machen, dass das auch richtig funktioniert?“ (Agent im Worktree, Merge `726aa0ff`).
+  - Gewerbe trägt die Unterart (`gewerbe_art`), Vergleichswert nur aus Gewerbe-Angeboten derselben Klasse (sonst entfällt), Ertragswert mit Ist- oder Marktmiete, Anlage 3 je Nutzung, GND Anlage 1, nur Gewerbe-LZS aus dem Register (sonst entfällt). Mapper: „Bürohaus“/„Lagerhalle“ nicht mehr als Haus, „Wohn- und Geschäftshaus“ als MFH.
+  - Neue Objektart `GRST` (12 Arten): Wert = Bodenwert (Fläche × BRW, Herkunft); die übrigen Verfahren entfallen mit Grund.
+  - `san`/`san_ust` als boG (§ 8 Abs. 3) nach der Marktanpassung; Mangel-Zustandsabschlag entfällt dann (kein Doppelabzug). Fehlender Zustand nicht mehr still „gepflegt“.
+  - `mod_*` und `mod_angaben` reisen mit; 0 Punkte mit Angaben = Anlage 2. Quick-Check las `qc_baujahr` statt `qc_bj` (Baujahr kam nie an).
+- **Commit:** `a9ba1bde`, Merge `726aa0ff` (Buster v2244)
+- **Nachweis:** Service-Läufe mit festen Marktdaten: Wohnen ohne `san` unverändert (ETW, MFH, EFH); Büro mit Ist-Miete EW 620.000 statt Wohnmiete-Rechnung; Laden ohne Miete → EW entfällt; Grundstück 600 m² × 250 = 150.000; EFH mit 60.000 San → −60.000 genau einmal (VW, Sachwert, EW). objekt-mapper/rnd-kerne RC=0, Buster SAUBER, Gold-Audit RC=0. Staging: backend + mb-backend neu gebaut, Register geladen (4.832 Sätze), GRST im Formular.
+- **Rest:**
+  - **Achtung Verhalten:** jedes Objekt mit gepflegtem `san` zeigt in Stufe 1/2 jetzt einen niedrigeren Marktwert.
+  - Fachfragen an Marcel: Ist-Miete als Rohertrag bei Gewerbe? Gewerbe-Angebotspreise als Vergleich? `san` als Wertabschlag (Kosten ≠ Wertminderung; Zustand vor/nach Sanierung)? Hotel/Gastro ohne Anlage-3-Ansatz → EW entfällt.
+  - GRST verlangt im Formular noch Wohnfläche/Baujahr als Pflicht; Marktbericht-App kennt GRST nicht. GeoMap-Flächenfilter im Gewerbesegment ungemessen — Staging-Abnahme mit echtem Abruf.
+
+### v2239–v2243 · Ankauf-Stand, Steuer ohne zvE, Zinsmarge, Ampeln nach Schwellen; Konto info@ auf Prod (15.10.2026)
+- **Was:** Marcels Prüfliste vom 15.10.
+  - **v2239:** Ruhender Ankauf-Stand ging nach Neuladen beim nächsten Speichern verloren (`_dpAnkaufRuhend` neu, beim erneuten Gewinnen kommt DER Stand zurück). „Rückgängig“ beim Auto-Festschreiben fror sofort neu ein (`_autoAus`). Steuer-Reiter ohne zvE rechnete still mit 65.891 € — jetzt `_dpZveErsatz()`: das zvE, dessen Grenzsteuersatz dem eingestellten entspricht. Bot-Kaufempfehlung bekommt `zielBmr`/`lageklasse` (fiel still auf 6 %).
+  - **v2242:** Zinsmarge 0,25/0,40/0,80 auf den Pfandbrief (vorher Backend 0,20/0,30/0,55, Frontend 0,40/0,70/1,00, Kommentare 0,8/1,2/1,8). Stufen bis 60 / bis 80 / über 80 %. Ersatzwerte auf 14.10. gezogen.
+  - **v2240 (Agent, Merge v2243):** `schwellen.js` (`DealPilotSchwellen.get`), Kerne `dscr-engine`/`qc-heuristik` nehmen Schwellen als Parameter; alle Ampeln folgen `min_dscr`/`max_ltv`/`min_cashflow` (Vorgabe 1,2/90/0). PDF „OK“ ab `min_dscr` statt 1,5. Bot-Ampel mit Vorgabe-Schwellen.
+  - **Prod-Daten (Freigabe Marcel):** `info@junker-immobilien.io` ergänzt um 15 Staging-Objekte (20 übernommen, 5 überschrieben, 19 Testobjekte draußen), 268 Steuerzeilen, 26 Bemerkungen, 5 Bewertungen, 20 Steuer-Schnappschüsse, 8 Einstellungen; Passwort-Hash = Staging. Abo/Stripe unverändert. Probelauf mit ROLLBACK vorher.
+- **Commit:** `06715591` (v2239), `52b6f344` (v2242), `50e3487e` + Merge `42029272` (v2240/v2243)
+- **Nachweis:**
+  - Sicherung Prod vorher: `haupt-20261015-0535.sql.gz` (11 MB, 71 Tabellen), `mb-20261015-0535.sql.gz` (25 MB, 32 Tabellen). Nach Import 25 Objekte, md5 des Passwort-Hashs auf beiden Servern gleich, `/auth/me` 401.
+  - `_dpZveErsatz` bei 20/30/35/42/45 % trifft den Grenzsteuersatz genau (zvE 15.091/34.503/49.042/69.185/277.799). `collectData` schreibt `_ankauf_ruhend` aus dem Merker.
+  - `/market-rates/pfandbrief` live: Marge 0,25/0,40/0,80, 10 J standard **4,33 %** (Vergleichsportal 4,34 %; vorher 4,23 %).
+  - Schwellen: Vorgabe 1,2/90/0; mit 1,4 → DSCR 1,3 `warn`, ohne Parameter `good`. Buster SAUBER, Score-Ketten gleich (216), Kerne gespiegelt, Gold-Audit RC=0.
+- **Rest:**
+  - `majunker@gmx.net` auf Prod löschen — Marcel führt den DELETE selbst aus (Befehl im Chat).
+  - Zins dynamisch (Bund täglich + Aufschlag aus Bundesbank-Bauzinsstatistik monatlich + LTV-Staffel) — Vorschlag liegt bei Marcel.
+  - Gespeicherte Scores werden nach Gewichtsänderung nicht neu gerechnet; Bot nutzt Standardgewichte (Gewichte nur im Browser).
+  - Statische Hilfetexte (help.js, tooltip-content.js, tour-content.js) nennen weiter 1,2/85.
+  - Marktbewertung Gewerbe/Grundstück/Sanierung: Agent arbeitet.
+
+### ÜBERGABE 14.10.2026 abends · Stand für den nächsten Chat
+- **Stand:** Produktion = Staging auf **v2238a** (`1fc4be87`, Prod-Rollout 21). Letzte Commits nur Doku. Keine offene Migration, kein ungespeicherter Code.
+- **Offen (Backlog N76, N72):**
+  - Abnahme Marcel auf Prod: Quick-Check mit DealPilot-Abruf, C-Lage, Abschlag-Hinweis, Überschrift „· aber … unter Marktwert“, Pilot-Analyse in zwei Sichten.
+  - Drehbuch `quickcheck` (alt) hat noch die alte `KI_ANALYSE` → neu aufzeichnen oder durch `quickcheck-rundgang` ersetzen.
+  - Alte `_mb_state` ohne Abschlag zeigen Angebotsniveau bis zum nächsten Abruf.
+  - N72: `registerDpmb` in `dealpilot-mb-qc.js` ist tot (hinter `return`, `QcApp` ist `const`) — ändert Scores, nur mit Freigabe.
+- **Neue Regel:** nach außen keine Quellennamen, auch nicht ImmobilienScout (steht jetzt in CLAUDE.md unter Anbieter-Neutralität).
+- **Wo was liegt:**
+  - Angebotsabschlag: `config.js angebotAbschlagMarkt` (5,8 %, 12/2025, Quelle intern) · Profilfeld `angebot_abschlag_pct` (leer = Markt) · Karte „Marktbewertung“ in `standardwerte-karten.js` · Modul `marktwert-abschlag.js` (`DealPilotAbschlag.satz/quelle/anwenden`), aufgerufen aus `mapCard` in `dealpilot-mb.js` und `dealpilot-mb-qc.js`.
+  - Urteil: Kern `qc-heuristik.js` (`marktwertBereinigt`, `empfehlung()` mit `WERT_SCHWELLE` 10 %, Feld `wert`) — gespiegelt ins Backend. Prompt: `backend/src/routes/ai.js` („Bewerte in ZWEI Sichten“).
+  - Messe: `frontend/messe-studio.html` (Goldrahmen, Kapitelband, Intro/Outro, `?messe=&intro=&outro=&qr=`), Drehbücher in `frontend/js/messe-drehbuch.js` (`?studio=1` → postMessage `dp-messe-studio`), Baukasten `design/Vorschläge/messe-video/messe-effekte.js` (10 Intros, 10 Karten, 10 Outros; Vorschau https://claude.ai/artifact/BANFkS1maT5MhjhGGNooLe).
+  - Aufnahme: `tools/messe-fenster.ps1 -Was vor|zurueck` (Fenster NUR per Titel „Messe-Studio“), `tools/messe-aufnahme.ps1 -Name x.mp4 -Sekunden s`. Ablauf und Fallen im Skill `.claude/skills/messe-video/`, Agent `messe-video`.
+  - Videos: `Dateien/Messe/Videos/` — aktuell `quickcheck-rundgang-studio_2026-10-14.mp4` (220 s, ~10 MB).
+- **Lehren dieser Sitzung:** Fenster nie über `MainWindowHandle` greifen (traf Marcels Konferenzfenster) · vor jeder Aufnahme Bildschirm prüfen, bei Konferenz nicht aufnehmen · Urteil und Karte müssen dieselbe gerundete Zahl nehmen · zwei Commit-Botschaften ungenau (`f840c44f`, v2237b) — unten vermerkt.
+
+### Prod-Rollout (21) · v2234–v2238a auf Produktion (14.10.2026)
+- **Was:** Freigabe von Marcel („ja dann Prod-Rollout“). `main` per `--no-ff` mit `origin/staging` zusammengeführt (28 Commits, keine Migration). Auf Prod `git pull` und Rebuild `backend`; das mb-backend ist unverändert.
+- **Commit:** `1fc4be87`
+- **Nachweis:**
+  - Sicherung vorher, Kopf gelesen: `/root/backups/haupt-20261014-1728.sql.gz` (11 MB, 71 Tabellen) und `mb-20261014-1728.sql.gz` (25 MB, 32 Tabellen).
+  - Backend `healthy`, „No new migrations“. Im Image stehen „Bewerte in ZWEI Sichten“ (Prompt) und `WERT_SCHWELLE` (Kern). Gold-Audit RC=0.
+  - Live mit Inhalt geprüft (nicht nur Status 200): `marktwert-abschlag.js?v=v2237d` enthält das Modul, `qc-bridge` zeigt auf `quickcheck-app.html?v=v2238a`, darin steht der Überschrift-Zusatz; `messe-studio.html` ist da; `/auth/me` ohne Token 401.
+- **Rest:** Abnahme im Browser auf Prod: Quick-Check mit DealPilot-Abruf und C-Lage, Überschrift „· aber … % unter Marktwert“.
+
+### v2238–v2238a · Wertpuffer in der Überschrift, gleiche Zahl wie die Karte (14.10.2026)
+- **Was:** Marcel: „ja das wäre gut“. Die Überschrift bekommt ab `e.wert` (qc-heuristik) einen Halbsatz: „Nicht kaufen — Rendite unter deinem Ziel für die C-Lage · aber 28 % unter Marktwert“; bei einem positiven Urteil ohne „aber“. **v2238a:** Das Urteil rechnete den Abschlag selbst auf den ungerundeten Angebotswert (178.038 €), die Karte zeigte 178.000 €. Jetzt übernimmt das Urteil den Wert der Karte.
+- **Commit:** `b8b3e901`, `ff37db56`
+- **Nachweis:** Staging, Wohnung mit Mitschnitt: ohne Lage „Nur mit Nachbesserung tragfähig · aber 28 % unter Marktwert“, 20 % EK „Kauf möglich — verhandeln nötig · 28 % unter Marktwert“, C-Lage wie oben; im Rat „178.000 € — +39.000 € (+28 %)“.
+- **Rest:** keiner. Das Messe-Video wurde nach v2238 neu aufgenommen (220 s): Kapitel 12 zeigt „… · aber 28 % unter Marktwert“, der Rat 178.000 € / +39.000 €.
+
 ### v2237–v2237d · Angebotsabschlag als Einstellung, Marktwert im Urteil und in der Pilot-Analyse (14.10.2026)
 - **Was:** Marcel: „Die Abschläge kann man im Set angeben … wir recherchieren immer den aktuellen Durchschnitt … der Marktwert, je nachdem was ich von der Spanne nehme, soll mitkommen … nach eigenen Kriterien und auch darüber“.
   - `config.js angebotAbschlagMarkt`: 5,8 %, Stand Dezember 2025, Quelle und Link stehen **nur intern**. Beim Nachrecherchieren wird nur dieser Block geändert.

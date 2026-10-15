@@ -33,6 +33,10 @@ import { fuehrendesVerfahren, angepassterZins } from '../lib/verfahrenswahl.js';
  * ist, und gibt immer dieselbe Form zurueck. Kein Treffer heisst KEIN
  * WERT — nie ein Nachbarkreis, nie ein Landesmittel. */
 import { sachwertfaktor as swfNachTabelle } from '../lib/gutachterausschuss.js';
+/* v2241 · Gewerbe und Grundstueck: eine Quelle fuer die Objektart. */
+import { istGewerbe, istGrundstueck, gewerbeArt, gewerbeAnlage3, gewerbeGndSchluessel } from '../lib/marktsegment.js';
+import { gnd as gndNachArt, GND_TABELLE } from '../lib/immowertv.js';
+import { schaetzung as rndSchaetzung } from '../lib/rnd-einheitlich.js';
 
 // ---- Annahmen (dokumentiert, anpassbar) ----
 const NHK_EFH_BGF = 835;          // NHK 2010, EFH Standardstufe 3, €/m² BGF
@@ -151,6 +155,40 @@ export const CrossCheckService = {
         out.liegenschaftszins_rueckfrage = _rf;
       }
     } catch (e) { /* ein Hinweis darf den Bericht nie kippen */ }
+
+    /* ═══ v2241 · UNBEBAUTES GRUNDSTUECK ═══════════════════════════════════
+       Bis hier hatte es keinen Weg: die App kannte die Objektart nicht, und
+       der Bericht meldete „Objekttyp nicht angegeben". Ohne Gebaeude gibt
+       es keinen Gebaeudesachwert, keinen Gebaeudeertrag und keine
+       Gebaeude-Vergleichspreise. Der Wert ist der Bodenwert (§ 40 ImmoWertV,
+       Abs. 2: auf Grundlage geeigneter Bodenrichtwerte) — aus dem
+       Bodenwert-Kern, mit seinem Rechenweg und seiner Herkunft. */
+    if (istGrundstueck(ref.property_type)) {
+      const _bwG = p.bodenwert || null;
+      const _gruendeG = 'Unbebautes Grundstück — kein Gebäude, für das ';
+      out.sachwert = { available: false, grund: _gruendeG + 'Herstellungskosten (NHK, § 36 ImmoWertV) anzusetzen wären.' };
+      out.ertragswert = { available: false, grund: _gruendeG + 'ein Gebäudereinertrag kapitalisiert werden könnte (§ 27 ImmoWertV).' };
+      out.bodenwert_verfahren = (_bwG && _bwG.vollstaendig && _bwG.wert != null)
+        ? { available: true, value_eur: _bwG.wert, verfahren: 'Bodenwert nach § 40 Abs. 2 ImmoWertV (Bodenrichtwert)',
+            staffel: Array.isArray(_bwG.schritte) ? _bwG.schritte : [], quelle: _bwG.quelle || null,
+            hinweise: Array.isArray(_bwG.hinweise) ? _bwG.hinweise : [] }
+        : { available: false,
+            grund: (_bwG && Array.isArray(_bwG.hinweise) && _bwG.hinweise.length)
+              ? _bwG.hinweise.join(' ') : 'Grundstücksfläche oder Bodenrichtwert fehlt.' };
+      out.verfahrenswahl = { verfahren: 'bodenwert',
+        grund: 'Unbebautes Grundstück: maßgeblich ist der Bodenwert (§ 40 ImmoWertV). Vergleichs-, '
+          + 'Ertrags- und Sachwertverfahren für Gebäude entfallen.' };
+      out.notes.push('Führendes Verfahren: Bodenwert. ' + out.verfahrenswahl.grund);
+      if (!out.bodenwert_verfahren.available) out.notes.push('Bodenwert nicht ausgewiesen: ' + out.bodenwert_verfahren.grund);
+      out.comparison = out.bodenwert_verfahren.available
+        ? { vergleichswert_eur: null, basis: 'bodenwert', bezeichnung: 'Bodenwert',
+            bodenwert_eur: out.bodenwert_verfahren.value_eur, sachwert_eur: null, ertragswert_eur: null,
+            min_eur: out.bodenwert_verfahren.value_eur, max_eur: out.bodenwert_verfahren.value_eur, spread_pct: null }
+        : null;
+      out.available = !!out.bodenwert_verfahren.available;
+      out.quellen_nachweis = [];
+      return out;
+    }
 
     /* v955-etw: Die Objektart kam in dieser Datei bisher NICHT vor (grep = 0).
      * Gerechnet wurde alles als EFH — auch jede Eigentumswohnung. */
@@ -711,6 +749,16 @@ export const CrossCheckService = {
           bodenwert_fehlt: bodenwert == null,
         };
         if (bodenwert == null) out.notes.push('Sachwert OHNE Bodenwert (Grundstücksfläche oder Bodenrichtwert fehlt) – nur Gebäudesachwert ausgewiesen.');
+        /* v2241 · Derselbe Grundsatz wie im NHK-Kern (nhk2010.js): bOM wirken
+           NACH der Marktanpassung, und dieser Weg hat keine. Ohne den Satz
+           saehe es aus, als waeren die Sanierungskosten vergessen worden. */
+        const _bomS = Number(ref.bom_eur);
+        if (ref.bom_eur != null && Number.isFinite(_bomS) && _bomS !== 0) {
+          out.sachwert.bom_nicht_angesetzt_eur = Math.round(_bomS);
+          out.notes.push('Die besonderen objektspezifischen Grundstücksmerkmale ('
+            + Math.round(_bomS).toLocaleString('de-DE') + ' €) wirken im vorläufigen Sachwert nicht: '
+            + 'sie werden nach der Marktanpassung angesetzt, und dieser Sachwert ist unangepasst.');
+        }
         /* v955-etw: SACHWERTFAKTOR = 1.0 heisst "keine Marktanpassung", nicht
          * "Marktanpassung ergibt 1,0". Real liegt er je nach Lage bei 0,8-1,3.
          * Wer das nicht weiss, liest den Sachwert als Verkehrswert. */
@@ -842,7 +890,12 @@ export const CrossCheckService = {
       if (_num(_gew.markt_jahr)) { _gewJahr = _gew.markt_jahr; _gewHerkunft = 'marktueblich'; }
       else if (!_gew.leer_ohne_markt && _num(_gew.ist_jahr)) { _gewJahr = _gew.ist_jahr; _gewHerkunft = 'ist_ungeprueft'; }
     }
-    const _gewSperre = !!_gew && _gewJahr == null;
+    /* v2241 · Ist das GANZE Objekt gewerblich (Buero, Geschaeftshaus, Hotel,
+       Gewerbe), rechnet unten ein eigener Zweig — nie die Wohnmiete auf die
+       Nutzflaeche. Hier stand bis v2240 fuer jedes Gewerbeobjekt ohne
+       MFH-Einheiten: Angebotsmiete WOHNEN x gesamte Flaeche x 12. */
+    const _gewObjekt = istGewerbe(ref.property_type) || !!ref.gewerbe_art;
+    const _gewSperre = !_gewObjekt && !!_gew && _gewJahr == null;
     if (_gewSperre) {
       out.notes.push('Ertragswert entfällt: Das Objekt hat ' + _gew.n_gewerbe + ' Gewerbeeinheit(en) mit '
         + Math.round(_gew.wfl_gewerbe) + ' m², aber für '
@@ -851,7 +904,7 @@ export const CrossCheckService = {
         + 'Im MFH-Konfigurator je Gewerbeeinheit die marktübliche Miete (€/m²) eintragen.');
     }
 
-    if (wfl && mieteQm && rnd != null && !_gewSperre && wflWohnen > 0) {
+    if (!_gewObjekt && wfl && mieteQm && rnd != null && !_gewSperre && wflWohnen > 0) {
       /* v1059-WMIET-6 · v2210: nur der Wohnteil */
       const rohertrag = Math.round(mieteQm * wflWohnen * 12);
       const lzsPct = _num(p.lzs_pct) != null ? Number(p.lzs_pct) : LIEGENSCHAFTSZINS * 100;
@@ -1121,6 +1174,155 @@ export const CrossCheckService = {
         kern.hinweise.forEach((h) => { if (out.notes.indexOf(h) < 0) out.notes.push(h); });
       } else {
         out.ertragswert = { available: false, grund: (kern.warnungen[0] || 'Ertragswert nicht berechenbar.') };
+      }
+    }
+
+    /* ═══ v2241 · ERTRAGSWERT FUER GEWERBEOBJEKTE ══════════════════════════
+       Pflichtangaben, ohne die das Verfahren ENTFAELLT (kein halbes Rechnen):
+         1  Nutzflaeche
+         2  Gewerbe-Rohertrag: marktuebliche Miete je Einheit (MFH-
+            Konfigurator) oder die Ist-Miete — Letztere gekennzeichnet als
+            nicht auf Marktueblichkeit geprueft (§ 31 Abs. 2). Angebotsmieten
+            aus dem Gewerbemarkt werden NICHT als marktueblich angesetzt.
+         3  ein amtlicher Gewerbe-Liegenschaftszinssatz aus dem Register.
+            Ein Wohn-Zinssatz oder ein Auffangwert waere nicht modellkonform.
+         4  ein Instandhaltungsansatz nach Anlage 3 je Nutzung (Buero/
+            Praxis/Laden 100 %, Lager/Logistik/Produktion 30 %). Hotel und
+            Gastronomie fuehrt Anlage 3 nicht.
+         5  das Baujahr (RND = GND nach Anlage 1 minus Alter; Anlage 2 gilt
+            fuer Wohngebaeude und wird hier nicht angewandt).
+       Der Rechenkern ist derselbe wie fuer Wohnen (ErtragswertService). */
+    if (_gewObjekt) {
+      const _artG = gewerbeArt(ref.gewerbe_art) || null;
+      const _flaechenEin = (_gew && _gew.flaechen && Object.keys(_gew.flaechen).length) ? _gew.flaechen : null;
+      const _nutzung3 = gewerbeAnlage3(_artG);
+      const _flG = _gew ? _num(_gew.wfl_gewerbe) : wfl;
+      const _flW = _gew ? (_num(_gew.wfl_wohnen) || 0) : 0;
+      let _gJahr = null, _gHerk = null;
+      if (_gew) {
+        _gJahr = _gewJahr; _gHerk = _gewHerkunft;
+      } else if (_num(ref.monthly_net_rent) > 0 && !ref.vacancy) {
+        _gJahr = Math.round(_num(ref.monthly_net_rent) * 12); _gHerk = 'ist_ungeprueft';
+      }
+      let _wJahr = 0;
+      const _wohnOk = !(_flW > 0) || (_num(_gew && _gew.wohnen_ist_jahr) > 0 && !(_gew && _gew.wohnen_leer));
+      if (_flW > 0 && _wohnOk) _wJahr = _num(_gew.wohnen_ist_jahr);
+      /* Nur ein Registersatz, dessen ZWEIG gewerblich ist. `lzs_aus_register`
+         allein reicht nicht: die Zweigwahl faellt bei 'gesch' bis zum
+         MFH-Zweig zurueck, und ein Wohnsatz waere hier genau der Fehler. */
+      const _zweigGew = /buero|gewerbe|gew_dl|ggg|gegi|indwb|handel|hotel|produktion|logistik/
+        .test(String(p.lzs_zweig || ''));
+      const _lzsG = (p.lzs_aus_register && _zweigGew && _num(p.lzs_pct)) ? Number(p.lzs_pct) : null;
+      const _artText = { hotel: 'Hotels', gastro: 'Gastronomie' }[_artG] || 'diese Nutzung';
+      let _sperreG = null;
+      if (!_flG) _sperreG = ['flaeche_fehlt', 'Die Nutzfläche des Gewerbeobjekts fehlt.'];
+      else if (_gJahr == null) {
+        _sperreG = ['keine_gewerbemiete', 'Für das Gewerbeobjekt liegt weder eine marktübliche Miete '
+          + 'noch eine Ist-Miete vor' + (ref.vacancy ? ' (als leerstehend erfasst)' : '') + ' (§ 31 Abs. 2 ImmoWertV). '
+          + 'Angebotsmieten aus dem Gewerbemarkt werden nicht als marktüblich angesetzt — sie sind nicht auf '
+          + 'Lage, Zuschnitt und Ausstattung des Objekts geprüft. Die Ist-Miete im Reiter Miete oder die '
+          + 'marktübliche Miete je Gewerbeeinheit eintragen.'];
+      } else if (!_wohnOk) {
+        _sperreG = ['wohnteil_ohne_miete', 'Das Gewerbeobjekt enthält ' + Math.round(_flW) + ' m² Wohnfläche, '
+          + 'für die keine Ist-Miete vorliegt (oder Einheiten leer stehen). Wohnmieten aus Angeboten werden in '
+          + 'einem Gewerbeobjekt nicht angesetzt. Für ein Wohn- und Geschäftshaus die Objektart MFH wählen — '
+          + 'dann rechnet der Bericht Wohnen und Gewerbe getrennt.'];
+      } else if (_lzsG == null) {
+        _sperreG = ['kein_gewerbe_lzs', 'Für diesen Ort führt das Register keinen amtlichen '
+          + 'Liegenschaftszinssatz für diese gewerbliche Nutzung. Ein Zinssatz für Wohnnutzung oder ein '
+          + 'gesetzlicher Auffangwert wäre für Gewerbe nicht modellkonform (§ 10, § 21 Abs. 2 ImmoWertV). '
+          + 'Der zuständige Gutachterausschuss führt ihn gegebenenfalls in seinem Grundstücksmarktbericht.'];
+      } else if (!_flaechenEin && !_nutzung3) {
+        _sperreG = ['keine_anlage3_nutzung', _artG
+          ? 'Anlage 3 ImmoWertV führt für ' + _artText + ' keinen Instandhaltungsansatz; ein eigener Ansatz '
+            + 'wäre eine sachverständige Festlegung, die dieser Bericht nicht trifft.'
+          : 'Die Gewerbeart (Büro, Laden, Hotel, Halle …) ist nicht angegeben — ohne sie gibt es weder den '
+            + 'Instandhaltungsansatz nach Anlage 3 noch die Gesamtnutzungsdauer nach Anlage 1.'];
+      } else if (!buildYear) {
+        _sperreG = ['kein_baujahr', 'Ohne Baujahr ist keine Restnutzungsdauer bestimmbar.'];
+      }
+      if (_sperreG) {
+        out.ertragswert = { available: false, grund: _sperreG[0], hinweis: _sperreG[1], gewerbe: true };
+        out.notes.push('Ertragswert entfällt: ' + _sperreG[1]);
+      } else {
+        const _gndG = gndNachArt(gewerbeGndSchluessel(_artG) || (_flaechenEin && _flaechenEin.lager_logistik ? 'lager' : 'buero'));
+        const _rndG = rndSchaetzung(ref, _gndG);
+        const bwErgebnisG = p.bodenwert
+          ? p.bodenwert
+          : { vollstaendig: bodenwert != null, wert: bodenwert,
+              quelle: { brw_sqm: brw, herkunft: brw ? 'boris' : 'manuell' } };
+        const einG = {
+          objektart: 'gewerbe', baujahr: buildYear, baustatus: ref.baustatus || 'bestand',
+          wohnflaeche_qm: _flW, anzahl_we: _gew ? (_num(_gew.n_wohnen) || 0) : 0,
+          stichtag_jahr: nowYear,
+          miete_markt_jahr: _wJahr, gewerbe_jahr: _gJahr, gewerbe_herkunft: _gHerk,
+          gewerbe_ist_jahr: _gew ? _num(_gew.ist_jahr) : _gJahr,
+          gewerbe_flaechen: _flaechenEin || { [_nutzung3]: _flG },
+          gewerbe_ohne_nutzung_qm: _gew ? _num(_gew.ohne_nutzung_qm) : null,
+          miete_quelle: _gHerk === 'marktueblich' ? 'marktübliche Gewerbemiete (eigene Angabe)' : 'Ist-Miete Gewerbe',
+          stellplatz_anz: (_num(ref.garages) || 0) + (_num(ref.outdoor_parking) || 0),
+          garagen_anz: _num(ref.garages) || 0, aussen_anz: _num(ref.outdoor_parking) || 0,
+          stellplatz_miete_monat: _num(p.stellplatz_miete_monat),
+          modellversion: p.modellversion || null,
+          gnd_jahre: _gndG, rnd_jahre: _rndG,
+          sonstige_jahr: _num(ref.sonstige_jahr), sonstige_dauer_jahre: _num(ref.sonstige_dauer_jahre),
+          lzs_pct: _lzsG, lzs_quelle: p.lzs_quelle || 'register', lzs_stufe: p.lzs_stufe || null,
+          lzs_herabgestuft: !!p.lzs_herabgestuft,
+          lzs_streuung_pp: p.lzs_streuung_pp != null ? p.lzs_streuung_pp : null,
+          lzs_massstab: p.lzs_massstab || null,
+          bwk_modus: 'normiert',
+          bwk_verwaltung_je_we: _num(p.bwk_verwaltung_je_we),
+          bwk_instandhaltung_je_qm: _num(p.bwk_instandhaltung_je_qm),
+          bwk_mietausfall_pct: _num(p.bwk_mietausfall_pct),
+          bwk_betrieb_nul_jahr: _num(p.bwk_betrieb_nul_jahr),
+          bog_eur: (function () { const n = Number(p.bog_eur); return Number.isFinite(n) && n !== 0 ? n : null; })(),
+          bog_grund: p.bog_grund || null,
+        };
+        const kernG = ErtragswertService.ertragswert(einG, bwErgebnisG);
+        out.ertragswert_kern = kernG;
+        if (kernG.vollstaendig && kernG.wert != null) {
+          const holG = (t) => { const r = kernG.staffel.find((s) => s.pos.indexOf(t) >= 0); return r ? r.wert : null; };
+          out.ertragswert = {
+            available: true, gewerbe: true, gewerbe_art: _artG,
+            rohertrag_pa_eur: holG('= Rohertrag'),
+            bwk_pa_eur: Math.abs(holG('Bewirtschaftungskosten') || 0),
+            reinertrag_pa_eur: holG('= Reinertrag'),
+            liegenschaftszins_pct: kernG.lzs ? kernG.lzs.pct : _lzsG,
+            liegenschaftszins_stufe: kernG.lzs ? kernG.lzs.stufe : null,
+            liegenschaftszins_zweig: p.lzs_zweig || null,
+            streuung_pct: _num(p.lzs_streuung_pct),
+            liegenschaftszins_min: _num(p.lzs_min), liegenschaftszins_max: _num(p.lzs_max),
+            liegenschaftszins_herabgestuft: !!p.lzs_herabgestuft,
+            liegenschaftszins_quelle: kernG.lzs ? kernG.lzs.quelle : null,
+            liegenschaftszins_quelle_link: p.lzs_quelle_link || null,
+            liegenschaftszins_quellenvermerk: p.lzs_quellenvermerk || null,
+            liegenschaftszins_lizenz: p.lzs_lizenz || null,
+            liegenschaftszins_quelle_url: p.lzs_quelle_url || null,
+            liegenschaftszins_berichtsjahr: p.lzs_berichtsjahr || null,
+            miete_quelle: einG.miete_quelle, miete_erfasst: true,
+            miete_modellkonform: _gHerk === 'marktueblich', miete_qm: null, miete_vergleich: null,
+            gewerbe_herkunft: _gHerk,
+            restnutzungsdauer_jahre: kernG.nutzungsdauer ? kernG.nutzungsdauer.rnd : _rndG,
+            gesamtnutzungsdauer_jahre: _gndG,
+            vervielfaeltiger: kernG.barwertfaktor,
+            bodenwert_eur: bwErgebnisG.vollstaendig ? bwErgebnisG.wert : null,
+            bodenwert_fehlt: !bwErgebnisG.vollstaendig,
+            value_eur: kernG.wert, staffel: kernG.staffel,
+            belastbarkeit: kernG.belastbarkeit, sensitivitaet: kernG.sensitivitaet,
+            verfahren: kernG.verfahren, modellversion: kernG.modellversion,
+            indikativ: _gHerk !== 'marktueblich',
+          };
+          out.notes.push('Ertragswert Gewerbe: Gesamtnutzungsdauer ' + _gndG + ' Jahre (Anlage 1 ImmoWertV'
+            + (GND_TABELLE.geprueft ? '' : ', Tabellenstand nicht gegen den Verordnungstext verifiziert')
+            + '), Restnutzungsdauer ' + _rndG + ' Jahre geschätzt (GND minus Alter; Anlage 2 gilt für Wohngebäude). '
+            + (_gHerk === 'marktueblich' ? 'Rohertrag aus der eingegebenen marktüblichen Gewerbemiete.'
+              : 'Rohertrag = Ist-Miete, nicht auf Marktüblichkeit geprüft (§ 31 Abs. 2 ImmoWertV) — der Ertragswert ist indikativ.'));
+          kernG.warnungen.forEach((w) => { if (out.notes.indexOf(w) < 0) out.notes.push(w); });
+          kernG.hinweise.forEach((h) => { if (out.notes.indexOf(h) < 0) out.notes.push(h); });
+        } else {
+          out.ertragswert = { available: false, gewerbe: true,
+            grund: (kernG.warnungen[0] || 'Ertragswert nicht berechenbar.') };
+        }
       }
     }
 

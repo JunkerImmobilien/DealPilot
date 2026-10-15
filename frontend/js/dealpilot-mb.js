@@ -166,7 +166,17 @@ if (!window._wlc) {
     'ausst_aussenwaende', 'ausst_dach', 'ausst_fenster', 'ausst_innenwaende', 'ausst_decken', 'ausst_fussboeden', 'ausst_sanitaer', 'ausst_heizung', 'ausst_technik',
     'bes_bauteile', 'btl_gauben', 'btl_balkone', 'btl_vordach', 'btl_terrassen', 'btl_sonstige',
     'lzs_pct', 'brw_anpassung_pct', 'brw_anpassung_grund', 'stellplatz_miete_monat',
-    'mikrolage', 'makrolage', 'ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_entwicklung', 'ds2_wertsteigerung', 'ds2_mietausfall'];
+    'mikrolage', 'makrolage', 'ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_entwicklung', 'ds2_wertsteigerung', 'ds2_mietausfall',
+    /* v2241 · Die acht Bauteile der Anlage 2. Ohne sie zaehlte der Mapper
+       `mod_angaben` immer 0 — und 0 Punkte aus acht Antworten „Keine/Nie"
+       (ein Befund) sahen aus wie „nichts erfasst" (eine Luecke). Leere
+       Auswahl („– keine Angabe –") reist weiter NICHT mit. */
+    'mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss',
+    /* v2241 · Sanierungskosten (Reiter Investition) — im Bericht als
+       besonderes objektspezifisches Grundstuecksmerkmal (§ 8 Abs. 3
+       ImmoWertV) nach der Marktanpassung abgezogen. `san_ust` sagt, ob
+       der Betrag brutto oder netto eingetragen ist. */
+    'san', 'san_ust'];
   function inputs() {
     var o = { plz: vIn('plz'), ort: vIn('ort'), str: vIn('str'), hnr: vIn('hnr'), objektart: vIn('objart'), objart: vIn('objart'), wfl: numDe(vIn('wfl')), baujahr: numDe(vIn('baujahr')), kp: numDe(vIn('kp')) };
     var art = String(o.objart || '').toUpperCase(), OA = window.DealPilotObjektart;

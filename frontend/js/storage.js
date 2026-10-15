@@ -319,6 +319,12 @@ function collectData() {
   if (window._dpAnkauf && window._dpAnkauf.daten) {
     var _ankWon = (document.getElementById('_deal_won_state') || {}).value === 'true';
     if (_ankWon) d._ankauf = window._dpAnkauf; else d._ankauf_ruhend = window._dpAnkauf;
+  } else if (window._dpAnkaufRuhend && window._dpAnkaufRuhend.daten) {
+    /* v2239: ein RUHENDER Stand (Objekt geladen als offen/verloren) reist
+       mit. Vorher setzte das Laden `_dpAnkauf` auf null, und das naechste
+       Speichern schrieb weder `_ankauf` noch `_ankauf_ruhend` - der Stand
+       war geloescht, entgegen dem Kommentar oben. */
+    d._ankauf_ruhend = window._dpAnkaufRuhend;
   }
   // V63.99: Küche-im-Kaufpreis-Checkbox
   /* V291.1-storage-cleanup: kueche_im_kp-Checkbox entfernt — kein Save mehr nötig */
@@ -623,6 +629,10 @@ function loadData(d) {
      eine fremde Adresse zeigt. */
   window._dpAnkauf = (d._ankauf && d._ankauf.daten) ? d._ankauf
     : ((d._deal_won && d._ankauf_ruhend && d._ankauf_ruhend.daten) ? d._ankauf_ruhend : null);   /* v2164 */
+  /* v2239: nicht gewonnen -> der ruhende Stand bleibt als eigener Merker
+     erhalten (collectData reicht ihn durch, ankauf.js holt ihn beim
+     erneuten Gewinnen zurueck statt neu einzufrieren). */
+  window._dpAnkaufRuhend = (!window._dpAnkauf && d._ankauf_ruhend && d._ankauf_ruhend.daten) ? d._ankauf_ruhend : null;
   // V23: Mietentwicklungs-Toggle wiederherstellen
   if (d._me_inc_ze !== undefined) {
     var meCb = document.getElementById('me_inc_ze');
@@ -968,7 +978,7 @@ async function saveObj(opts) {
             var v = totals.values;
             return {
               year: t.year,
-              base_income: parseDe((document.getElementById('zve') || {}).value) || 65891,
+              base_income: parseDe((document.getElementById('zve') || {}).value) || (typeof window._dpZveErsatz === 'function' ? window._dpZveErsatz() : 65891),   /* v2239 */
               marginal_tax_rate: parseDe((document.getElementById('grenz') || {}).value) / 100 || null,
               einnahmen_vv: t.einnahmen,
               schuldzinsen: v.schuldzinsen || 0,
@@ -1114,7 +1124,7 @@ function _clearFormForNewObject() {
   /* v2164: der Ankauf-Stand gehoert zum OBJEKT. Ohne diese Zeile erbte ein
      neues Objekt den Stand des vorher geoeffneten (gemessen: 2026-1090
      "Unbenannt", offen, trug den Stand der Bismarckstr. 27). */
-  window._dpAnkauf = null; window._dpAnkaufAuto = false;
+  window._dpAnkauf = null; window._dpAnkaufAuto = false; window._dpAnkaufRuhend = null;
   if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
     setTimeout(DealPilotWorkflow.renderProgressBar, 50);
   }
@@ -1216,7 +1226,7 @@ function _newObjLeeren() {
   /* v2164: der Ankauf-Stand gehoert zum OBJEKT. Ohne diese Zeile erbte ein
      neues Objekt den Stand des vorher geoeffneten (gemessen: 2026-1090
      "Unbenannt", offen, trug den Stand der Bismarckstr. 27). */
-  window._dpAnkauf = null; window._dpAnkaufAuto = false;
+  window._dpAnkauf = null; window._dpAnkaufAuto = false; window._dpAnkaufRuhend = null;
   // V58: Workflow-Bar zurücksetzen + Outputs nullen
   if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
     setTimeout(DealPilotWorkflow.renderProgressBar, 50);
@@ -1367,6 +1377,10 @@ async function renderSaved(opts) {
   function _dscrClass(d) {
     if (d == null || isNaN(d)) return 'neutral';
     var v = parseFloat(d);
+    /* v2240 · Schwellen aus den Einstellungen (DealPilotSchwellen), Einstufung im Kern */
+    if (window.Dscr && Dscr.classify) {
+      return Dscr.classify(v, window.DealPilotSchwellen ? DealPilotSchwellen.get() : null);
+    }
     if (v >= 1.2) return 'good';
     if (v >= 1.0) return 'warn';
     return 'bad';
@@ -1501,10 +1515,11 @@ async function renderSaved(opts) {
       var dscrCls = _dscrClass(opts.dscr);
       // DSCR-Marker: 0 → 0%, 1.0 → 33%, 1.5 → 66%, 2+ → 100%
       var dscrMarkerPct = Math.min(100, Math.max(0, (Math.min(dscrVal, 2.0) / 2.0) * 100));
-      // LTV-Klasse: <85 grün, 85-100 gold, >100 rot — DealPilot-Konvention (V21)
+      // v2240 · LTV-Klasse nach den Einstellungen: gruen bis max_ltv (Vorgabe 90), gelb bis 100, darueber rot
+      var _swL = window.DealPilotSchwellen ? DealPilotSchwellen.get() : { ltvGruen: 90, ltvRot: 100 };
       var ltvCls = (ltvVal == null) ? 'neutral'
-                 : ltvVal < 85 ? 'good'
-                 : ltvVal <= 100 ? 'warn'
+                 : ltvVal <= _swL.ltvGruen ? 'good'
+                 : ltvVal <= _swL.ltvRot ? 'warn'
                  : 'bad';
       // LTV-Marker: 0 → 0%, 100 → 100%, > 100 → 100% (gekappt)
       var ltvMarkerPct = ltvVal == null ? 0 : Math.min(100, Math.max(0, ltvVal));
@@ -4388,7 +4403,7 @@ window._toggleSbcDscr = function(card) {
   if (scaleEl) {
     scaleEl.innerHTML = newMode === 'dscr'
       ? '<span>0</span><span>1</span><span>1,5</span><span>2+</span>'
-      : '<span>0%</span><span>50%</span><span>85%</span><span>100%+</span>';
+      : '<span>0%</span><span>50%</span><span>' + (window.DealPilotSchwellen ? DealPilotSchwellen.fmtPct(DealPilotSchwellen.get().ltvGruen) : '90') + '%</span><span>100%+</span>';   /* v2240: die eingestellte LTV-Grenze */
   }
 };
 

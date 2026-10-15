@@ -1,6 +1,7 @@
 // ValuationService.js — Marktwert + Renditekennzahlen.
 // Formeln exakt nach Auftrag; Faktoren transparent & einzeln ausgewiesen.
 import { round } from '../lib/stats.js';
+import { istGewerbe, istGrundstueck } from '../lib/marktsegment.js';   /* v2241 */
 
 // Zustands-/Energie-/Etagen-Faktoren (dokumentiert, anpassbar)
 // Zustand robust gemappt inkl. Synonyme & DealPilot-Werte ("gut", "saniert", ...).
@@ -23,6 +24,11 @@ const MODERNIZATION_FACTOR = {
   teilmodernisiert: 1.02, teilweise: 1.02, keine: 1.0,
   unsaniert: 0.95, original: 0.95, renovierungsstau: 0.90,
 };
+/* v2241 · Zustaende, die einen Instandsetzungsbedarf ausdruecken. Liegt
+   dafuer ein Kostenbetrag (bOM) vor, entfaellt ihr Abschlag. */
+const MANGEL_ZUSTAND = new Set(['renovierungsbeduerftig', 'renovierungsbedürftig', 'sanierungsbeduerftig',
+  'sanierungsbedürftig', 'unsaniert', 'abrissreif', 'stark_sanierungsbeduerftig', 'stark sanierungsbedürftig']);
+const MANGEL_MODERNISIERUNG = new Set(['unsaniert', 'original', 'renovierungsstau']);
 const ENERGY_FACTOR = { 'A+': 1.06, A: 1.05, B: 1.03, C: 1.01, D: 1.0, E: 0.98, F: 0.95, G: 0.92, H: 0.9 };
 
 const _norm = (v) => String(v ?? '').toLowerCase().trim();
@@ -36,7 +42,151 @@ function floorFactor(floor, propertyType) {
   return 1.0;
 }
 
+const _roundNice = (v) => {
+  if (v == null) return v;
+  const step = v >= 500000 ? 5000 : v >= 100000 ? 1000 : 500;
+  return Math.round(v / step) * step;
+};
+
+/* ═══ v2241 · VERGLEICH FUER GEWERBE ════════════════════════════════════
+   Nur mit Angeboten aus dem Segment Gewerbe DERSELBEN Klasse
+   (MarketAnalysisService setzt `segment: 'gewerbe'`). Fehlt das, entfaellt
+   der Vergleich — mit Grund, ohne Ersatz.
+
+   Die Objektfaktoren oben (Zustand, Ausstattung, Energie, Etage, Balkon,
+   Aufzug, Stellplaetze, Grundstuecks-Mehrflaeche) sind Festlegungen fuer
+   WOHNraum. Fuer ein Buero oder eine Halle gibt es keine belegte
+   Entsprechung; sie werden deshalb nicht angewandt. Gerechnet wird
+   Median x Flaeche, Spanne aus den Quartilen, dazu ein bOM-Betrag, wenn
+   einer vorliegt. Es bleibt eine Angebotsindikation (§ 25 Abs. 1:
+   Kaufpreise, nicht Angebote) und heisst auch so. */
+function gewerbeVergleich(ref, sale, area, out) {
+  const ok = sale && sale.segment === 'gewerbe' && Number(sale.median_per_sqm) > 0;
+  /* Mit Wohnteil (Geschaeftshaus mit Wohnungen) gibt es keine EINE
+     Vergleichsklasse: der Gewerbemedian auf die Wohnflaeche waere
+     derselbe Fehler wie bisher umgekehrt. */
+  const _wohnteil = ref.gewerbe && Number(ref.gewerbe.wfl_wohnen) > 0;
+  if (ok && area && _wohnteil) {
+    out.vergleichswert_gesperrt = { grund: 'gemischte_nutzung',
+      hinweis: 'Vergleichswert entfällt: das Objekt verbindet Gewerbe- und Wohnflächen ('
+        + Math.round(Number(ref.gewerbe.wfl_wohnen)) + ' m² Wohnen). Für diese Mischung gibt es keine '
+        + 'einheitliche Vergleichsgruppe; maßgeblich ist der Ertragswert.' };
+    out.notes.push(out.vergleichswert_gesperrt.hinweis);
+    return out;
+  }
+  if (!ok || !area) {
+    out.vergleichswert_gesperrt = {
+      grund: !ok ? 'keine_gewerbe_vergleichsdaten' : 'flaeche_fehlt',
+      hinweis: !ok
+        ? ('Vergleichswert entfällt: für dieses Gewerbeobjekt'
+          + (ref.gewerbe_art ? '' : ' (Gewerbeart nicht bestimmt)')
+          + ' liegen keine Vergleichsdaten aus dem Gewerbemarkt derselben Nutzung vor. '
+          + 'Wohnungs- und Hauspreise sind dafür kein Maßstab und werden nicht ersatzweise verwendet.')
+        : 'Vergleichswert entfällt: die Nutzfläche fehlt.',
+    };
+    out.notes.push(out.vergleichswert_gesperrt.hinweis);
+    return out;
+  }
+  const base = Number(sale.median_per_sqm);
+  const _b = Number(ref.bom_eur);
+  const kosten = (ref.bom_eur != null && Number.isFinite(_b) && _b !== 0) ? Math.round(_b) : 0;
+  const ev = base * area + kosten;
+  out.factors = { location_factor: 1.0, condition_factor: 1.0, quality_factor: 1.0,
+    modernization_factor: 1.0, object_adjustment: 1.0, amenity_factor: 1.0, energy_factor: 1.0,
+    floor_factor: 1.0, vacancy_factor: 1.0, parking_value_eur: 0, land_excess_value_eur: 0,
+    ...(kosten ? { kostenabzug_eur: kosten, kostenabzug_grund: ref.bom_grund || null } : {}) };
+  out.market_value.estimated = _roundNice(ev);
+  if (sale.q25_per_sqm != null && sale.q75_per_sqm != null) {
+    out.market_value.low = _roundNice(sale.q25_per_sqm * area + kosten);
+    out.market_value.high = _roundNice(sale.q75_per_sqm * area + kosten);
+    out.market_value.range_basis = 'quartile';
+  } else {
+    /* Keine erfundene ±10-%-Spanne fuer Gewerbe: ohne Quartile keine Spanne. */
+    out.market_value.low = null; out.market_value.high = null;
+    out.market_value.range_basis = 'keine';
+  }
+  out.market_value.basis_median_sqm = round(base / 5, 0) * 5;
+  out.market_value.confidence = sale.confidence;
+  out.market_value.segment = 'gewerbe';
+  out.market_value.gewerbe_klasse = sale.gewerbe_klasse || null;
+  out.market_value.bezeichnung = 'Marktpreisindikation aus Gewerbeangeboten';
+  const dc = sale.confidence != null ? sale.confidence : 0.5;
+  /* Ohne Objektfaktoren und mit Angebotspreisen: gedaempft wie die
+     pauschale Spanne im Wohnweg (0,82), nie hoeher als die Stichprobe. */
+  const _conf = _clamp(dc * 0.82, 0, 0.98);
+  out.market_value.confidence_pct = Math.round(_conf * 100);
+  out.market_value.confidence_label = out.market_value.confidence_pct >= 85 ? 'Sehr hoch'
+    : out.market_value.confidence_pct >= 70 ? 'Hoch' : out.market_value.confidence_pct >= 55 ? 'Mittel' : 'Niedrig';
+  out.market_value.confidence_parts = { marktdaten: round(dc, 2), eingaben: null, streuung: 0.82 };
+  out.notes.push('Gewerbe: Marktpreisindikation aus Angeboten der Klasse '
+    + (sale.gewerbe_klasse || 'Gewerbe') + ' (Median ' + Math.round(base).toLocaleString('de-DE')
+    + ' €/m² × ' + Math.round(area).toLocaleString('de-DE') + ' m²). Die Objektfaktoren für Wohnraum '
+    + '(Zustand, Ausstattung, Energie, Etage, Stellplätze) sind nicht angewandt — für Gewerbe gibt es dafür '
+    + 'keine belegten Ansätze. Angebotspreise sind keine Kaufpreise (§ 25 Abs. 1 ImmoWertV).');
+  if (kosten) {
+    out.notes.push((kosten < 0 ? 'Abzug' : 'Zuschlag') + ' besondere objektspezifische Grundstücksmerkmale: '
+      + (kosten < 0 ? '− ' : '+ ') + Math.abs(kosten).toLocaleString('de-DE') + ' €'
+      + (ref.bom_grund ? ' (' + ref.bom_grund + ')' : '') + ' (§ 8 Abs. 3 ImmoWertV).');
+  }
+  if (ref.purchase_price && ev > 0) {
+    out.market_value.discount_to_market_pct = round((1 - ref.purchase_price / ev) * 100, 1);
+  }
+  return out;
+}
+
 export const ValuationService = {
+  /* ═══ v2241 · UNBEBAUTES GRUNDSTUECK ═══════════════════════════════════
+     Setzt den Bodenwert als Ergebnis ein. `bw` ist die Rueckgabe von
+     ErtragswertService.bodenwert() — DER Bodenwert-Kern (Flaeche x BRW,
+     Groessenanpassung, Zuschnitt, Erschliessungsbeitrag). Hier wird nichts
+     gerechnet, nur ausgewiesen. Keine Spanne: der Bodenrichtwert ist ein
+     Durchschnittswert der Zone, und eine Spanne darum waere erfunden. */
+  grundstueck(valuation, bw, landValue, ref) {
+    const v = valuation || {};
+    v.market_value = {};
+    v.notes = Array.isArray(v.notes) ? v.notes : [];
+    if (!(bw && bw.vollstaendig && bw.wert != null)) {
+      v.vergleichswert_gesperrt = { grund: 'bodenwert_fehlt',
+        hinweis: 'Bodenwert nicht bestimmbar: '
+          + ((bw && Array.isArray(bw.hinweise) && bw.hinweise.length) ? bw.hinweise.join(' ')
+            : 'Grundstücksfläche oder Bodenrichtwert fehlt.') };
+      v.notes.push(v.vergleichswert_gesperrt.hinweis);
+      return v;
+    }
+    const q = Object.assign({}, bw.quelle || {});
+    /* Der Orchestrator setzt `brw_quelle: 'boris'`, sobald landValue
+       verfuegbar ist — auch fuer den Rueckfall auf die eigene Eingabe
+       (registry.js: source 'dealpilot-eingabe'). Hier zaehlt die echte
+       Herkunft: eine eigene Angabe ist kein amtlicher Wert. */
+    if (landValue && landValue.source === 'dealpilot-eingabe') q.herkunft = 'eigene_angabe';
+    v.vergleichswert_gesperrt = { grund: 'grundstueck',
+      hinweis: 'Unbebautes Grundstück: Vergleichs-, Ertrags- und Sachwert entfallen; der Wert ist der Bodenwert.' };
+    v.market_value = {
+      estimated: bw.wert, low: bw.wert, high: bw.wert, range_basis: 'keine',
+      verfahren: 'bodenwert', bezeichnung: 'Bodenwert (Bodenrichtwert × Fläche, § 40 Abs. 2 ImmoWertV)',
+      basis_median_sqm: q.brw_sqm != null ? q.brw_sqm : null,
+      brw_sqm: q.brw_sqm != null ? q.brw_sqm : null,
+      brw_stichtag: q.stichtag || (landValue && landValue.stichtag) || null,
+      brw_zone: q.zone || null,
+      brw_herkunft: q.herkunft || null,
+      flaeche_qm: Number(ref && ref.plot_area) || null,
+      schritte: Array.isArray(bw.schritte) ? bw.schritte : [],
+      hinweise: Array.isArray(bw.hinweise) ? bw.hinweise : [],
+      confidence_pct: null,
+      confidence_label: q.herkunft === 'boris' ? 'Bodenrichtwert' : 'Bodenrichtwert (eigene Angabe)',
+    };
+    if (ref && ref.purchase_price) {
+      v.market_value.discount_to_market_pct = round((1 - ref.purchase_price / bw.wert) * 100, 1);
+    }
+    v.notes.push('Unbebautes Grundstück: Bodenwert '
+      + Math.round(bw.wert).toLocaleString('de-DE') + ' € aus dem Bodenrichtwert '
+      + (q.brw_sqm != null ? String(q.brw_sqm).replace('.', ',') + ' €/m² ' : '')
+      + (q.herkunft === 'boris' ? '(amtlich)' : '(eigene Angabe)')
+      + '. Abweichungen vom Richtwertgrundstück (Größe, Zuschnitt, Erschließung) sind nur berücksichtigt, '
+      + 'soweit sie im Objekt angegeben sind.');
+    return v;
+  },
+
   // ref: {living_area, purchase_price, monthly_net_rent, condition, energy_class, floor,
   //       property_type, vacancy, plot_area}
   // sale: comparables-Stats (Kauf), rent: comparables-Stats (Miete)
@@ -62,13 +212,59 @@ export const ValuationService = {
     out.yield.rent_multiplier =
       annualNetRent && ref.purchase_price ? round(ref.purchase_price / annualNetRent, 1) : null;
 
+    /* ═══ v2241 · ZWEI OBJEKTARTEN OHNE WOHN-VERGLEICH ═══════════════════
+       Unbebautes Grundstueck: kein Gebaeude, keine Wohnflaeche — der Wert
+       ist der Bodenwert und wird im Orchestrator aus dem Bodenwert-Kern
+       eingesetzt (grundstueck() unten). Gewerbe: NUR mit Vergleichsdaten
+       aus dem Segment Gewerbe derselben Klasse. Bis hier rechnete ein
+       Buero mit dem Median von Wohnungen und Haeusern. */
+    const _ptV = _norm(ref.property_type);
+    if (istGrundstueck(_ptV)) {
+      out.inputs.market_rent_sqm = null;
+      out.vergleichswert_gesperrt = { grund: 'grundstueck',
+        hinweis: 'Unbebautes Grundstück: ein Vergleichswert aus Gebäudeangeboten entfällt. '
+          + 'Der Wert ergibt sich aus dem Bodenwert (Bodenrichtwert × Fläche, § 40 Abs. 2 ImmoWertV).' };
+      out.notes.push(out.vergleichswert_gesperrt.hinweis);
+      return out;
+    }
+    if (istGewerbe(_ptV) || ref.gewerbe_art) {
+      if (!(rent && rent.segment === 'gewerbe')) out.inputs.market_rent_sqm = null;
+      return gewerbeVergleich(ref, sale, area, out);
+    }
+
+    /* v2241 · BESONDERE OBJEKTSPEZIFISCHE GRUNDSTUECKSMERKMALE (§ 8 Abs. 3).
+       Sanierungs- oder Instandsetzungskosten aus dem Objekt (`san`) oder
+       ein ausdruecklicher bOM-Ansatz. Sie wirken NACH den Marktfaktoren als
+       Betrag. Der Zustandsabschlag druckt DENSELBEN Mangel als Prozentsatz
+       aus — beides zusammen waere ein Doppelabzug. Liegt ein Abzug vor,
+       entfaellt deshalb jeder ZustandsABSCHLAG (Faktor < 1); Zuschlaege
+       bleiben, sie beschreiben keinen Mangel. Ohne bOM aendert sich hier
+       nichts. */
+    const _bomV = Number(ref.bom_eur);
+    const kostenAbzug = (ref.bom_eur != null && Number.isFinite(_bomV) && _bomV !== 0) ? Math.round(_bomV) : 0;
+
     // F) Marktwert = Median-Vergleichspreis/m² * Fläche * Faktoren
     const base = sale && sale.median_per_sqm ? sale.median_per_sqm : null;
     if (base && area) {
       const locationFactor = 1.0; // später aus Makro/Mikro-Score ableitbar
-      const condFactor = _lookup(CONDITION_FACTOR, ref.condition);
+      const condFactorRoh = _lookup(CONDITION_FACTOR, ref.condition);
       const qualFactor = _lookup(QUALITY_FACTOR, ref.quality);
-      const modFactor = _lookup(MODERNIZATION_FACTOR, ref.modernization);
+      const modFactorRoh = _lookup(MODERNIZATION_FACTOR, ref.modernization);
+      /* v2241: Abzug ODER Abschlag, nie beides. Nur die Stufen, die einen
+         MANGEL beschreiben (renovierungs-/sanierungsbeduerftig, unsaniert,
+         Renovierungsstau, abrissreif). „normal" (0,99) und „mittel" (0,96)
+         sind Abnutzung im ueblichen Rahmen, kein Instandsetzungsbedarf —
+         sie bleiben stehen. */
+      const _mangelZ = kostenAbzug < 0 && MANGEL_ZUSTAND.has(_norm(ref.condition));
+      const _mangelM = kostenAbzug < 0 && MANGEL_MODERNISIERUNG.has(_norm(ref.modernization));
+      const condFactor = _mangelZ ? 1.0 : condFactorRoh;
+      const modFactor = _mangelM ? 1.0 : modFactorRoh;
+      if (_mangelZ || _mangelM) {
+        out.notes.push('Zustandsabschlag nicht angesetzt (Faktor '
+          + String(_mangelZ ? condFactorRoh : modFactorRoh).replace('.', ',') + '): für denselben Mangel ist ein Betrag von '
+          + Math.abs(kostenAbzug).toLocaleString('de-DE') + ' € als besonderes objektspezifisches Grundstücksmerkmal '
+          + 'abgezogen (§ 8 Abs. 3 ImmoWertV) — beides zusammen wäre ein Doppelabzug.');
+      }
       const enFactor = ENERGY_FACTOR[(ref.energy_class || '').toUpperCase()] ?? 1.0;
       const flFactor = floorFactor(ref.floor, ref.property_type);
       const vacFactor = ref.vacancy ? 0.97 : 1.0;
@@ -161,14 +357,27 @@ export const ValuationService = {
         parking_value_eur: parkingValue || 0,
         land_excess_value_eur: landExcessValue || 0,
       };
+      if (kostenAbzug) {
+        /* v2241: nur wenn es einen gibt — sonst bleibt die Ausgabe wie bisher */
+        out.factors.kostenabzug_eur = kostenAbzug;
+        out.factors.kostenabzug_grund = ref.bom_grund || null;
+        if (condFactor !== condFactorRoh) out.factors.condition_factor_ohne_abzug = condFactorRoh;
+      }
       if (round(objAdjRaw, 3) !== round(objAdj, 3)) {
         out.notes.push(`Objektzuschlag (Zustand×Qualität×Modernisierung = ${round(objAdjRaw, 3)}) auf ${objAdj} gedeckelt (Plausibilität).`);
       }
       out.notes.push('Objektfaktoren (Zustand, Ausstattungsqualität, Modernisierung, Energie, Etage, Ausstattung) verschieben die Punkt-Indikation; Stellplätze fließen additiv ein; die Spanne bleibt datenbasiert (GeoMap-Quartile).');
 
       const factorProduct = locationFactor * objAdj * amenityFactor * enFactor * flFactor * vacFactor;
-      const additive = parkingValue + landExcessValue;
+      /* v2241: der bOM-Betrag ist Teil des Additivs — er wirkt nach den
+         Faktoren und in Punktwert UND Spanne gleich. */
+      const additive = parkingValue + landExcessValue + kostenAbzug;
       const ev = base * area * factorProduct + additive;
+      if (kostenAbzug) {
+        out.notes.push((kostenAbzug < 0 ? 'Abzug' : 'Zuschlag') + ' besondere objektspezifische Grundstücksmerkmale: '
+          + (kostenAbzug < 0 ? '− ' : '+ ') + Math.abs(kostenAbzug).toLocaleString('de-DE') + ' €'
+          + (ref.bom_grund ? ' (' + ref.bom_grund + ')' : '') + ', nach den Marktfaktoren angesetzt (§ 8 Abs. 3 ImmoWertV).');
+      }
       // Sinnvolles Runden gegen Scheingenauigkeit: Marktwerte auf 1.000er (kleine auf 500er,
       // grosse auf 5.000er), damit minimale Restschwankungen unsichtbar werden.
       const roundNice = (v) => {

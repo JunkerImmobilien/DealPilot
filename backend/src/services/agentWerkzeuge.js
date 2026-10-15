@@ -2382,7 +2382,10 @@ async function objekt_schnellblick(ctx, args) {
       score: score, kp: kp, nkm: nkm + ze,
       bmr: K.bmy, nmr: K.nmy, cfMon: K.cf_m, dscr: K.dscr, ltv: K.ltv,
       ekr: K.ekr, bewirtPctNkm: bwkQuote || 0,
-      marktwert: marktBasis, marktwert_grund: marktGrund
+      marktwert: marktBasis, marktwert_grund: marktGrund,
+      /* v2239: Zielrendite der Lageklasse - ohne sie fiel die Kaufempfehlung
+         still auf 6 % und das Lage-Urteil weg (die Ampel bekam sie schon). */
+      zielBmr: zielBmrLage, lageklasse: d.lageklasse || null
     }, undefined, nichtAnwendbar) : null;
 
     bewertung = {
@@ -2459,7 +2462,11 @@ async function objekt_schnellblick(ctx, args) {
       kennzahlen_ampel: K ? rechenkerne.heuristikTeil('kennzahlenAmpel',
         { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
           dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0,
-          zielBmr: zielBmrLage, lageklasse: d.lageklasse || null }, nichtAnwendbar) : undefined,
+          zielBmr: zielBmrLage, lageklasse: d.lageklasse || null }, nichtAnwendbar,
+          /* v2243: Vorgabe-Schwellen 1,2 / 90 / 0 wie in der App ohne eigene
+             Einstellung - sonst sagte der Bot bei DSCR 1,3 "gelb", die App "gruen".
+             Die persoenlichen Werte liegen nur im Browser. */
+          {}) : undefined,
       kategorien: K ? rechenkerne.heuristikTeil('kategorien',
         { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
           dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0 },

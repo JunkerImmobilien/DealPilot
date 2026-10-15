@@ -29,6 +29,8 @@
    In-Memory Cache: 6 Stunden (beide APIs aktualisieren monatlich).
 ═══════════════════════════════════════════════════ */
 
+const bauzinsService = require('./bauzinsService');   /* v2245: Marktformel Bund + Aufschlag */
+
 const BUNDESBANK_BASE = 'https://api.statistiken.bundesbank.de/rest/data/BBIM1';
 const ECB_BASE        = 'https://data-api.ecb.europa.eu/service/data/MIR';
 
@@ -379,6 +381,7 @@ function clearCache() {
   _historyCache = null;
   _pfandbriefCache = null;
   _marketContextCache = null;
+  try { bauzinsService.clearCache(); } catch (e) {}   /* v2245 */
 }
 
 // ═════════════════════════════════════════════════════════════
@@ -418,25 +421,48 @@ const PFANDBRIEF_SERIES = {
 // V210: Statischer Fallback für Pfandbrief-Renditen (Stand 05/2026)
 // Quelle: Bundesbank Kapitalmarktstatistik Mai 2026 + FMH-Approximation
 // Marcel pflegt diese monatlich falls API nicht greift.
-const STATIC_PFANDBRIEF = {
-  '5':  2.85,
-  '10': 3.05,
-  '15': 3.18,
-  '20': 3.28
+const STATIC_PFANDBRIEF = {   // v2242: Tageswerte vom 14.10.2026
+  '5':  3.68,
+  '10': 3.93,
+  '15': 4.05,
+  '20': 4.11
 };
-const STATIC_PFANDBRIEF_AS_OF = '2026-05';
+const STATIC_PFANDBRIEF_AS_OF = '2026-10';
 
 // Marge-Modell — wird im Frontend wählbar gemacht
+/* v2242 · kalibriert am 15.10.2026: Bauzins 10 J / 80 % Beleihung lag bei
+   4,34 % (Vergleichsrechner, Woche 05.-11.10.), der 10-J-Pfandbrief bei rund
+   3,93 % -> Marge ~0,40 auf den Pfandbrief (~0,84 auf die Bundesanleihe).
+   Vorher 0,20/0,30/0,55 - im Frontend standen zugleich 0,40/0,70/1,00 und
+   in Kommentaren 0,8/1,2/1,8. Jetzt EINE Zahlenreihe an allen Stellen.
+   Die Marge ist eine Konstante: der Pfandbrief folgt dem Markt taeglich,
+   der Bankaufschlag nicht - nachkalibrieren, wenn er sich verschiebt.
+
+   v2245 · NUR NOCH RUECKFALL. Die indikativen Zinsen rechnet seit v2245
+   bauzinsService.js aus Bundesanleihe + gemessenem MFI-Aufschlag + K +
+   Beleihungszuschlag. Diese Margen greifen nur, wenn der Dienst gar keine
+   Zahl liefert (auch nicht aus DB oder statischem Stand). */
 const MARGINS = {
-  premium:  0.20,  // LTV ≤ 60%, Top-Bonität
-  standard: 0.30,  // LTV 60-80%, normale Bonität
-  schwach:  0.55   // LTV > 90% oder Bonität mittel
+  premium:  0.25,  // LTV bis 60 %, Top-Bonität
+  standard: 0.40,  // LTV bis 80 %, normale Bonität
+  schwach:  0.80   // LTV über 80 % oder Bonität mittel
 };
 
 const SOURCE_PFANDBRIEF_LIVE = {
   name: 'Deutsche Bundesbank',
   url: 'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen/taegliche-zinsstruktur-fuer-pfandbriefe-650734',
   description: 'Tägliche Zinsstruktur Pfandbriefe (BBSIS) + indikative Bank-Marge'
+};
+/* v2245: Quelle der Marktformel. Deutsche Bundesbank als amtliche Quelle. */
+const SOURCE_BAUZINS_LIVE = {
+  name: 'Deutsche Bundesbank',
+  url: 'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen',
+  description: 'Rendite Bundeswertpapiere (täglich) + Marktaufschlag aus der MFI-Zinsstatistik Wohnungsbau (monatlich) + Zuschlag nach Beleihung'
+};
+const SOURCE_BAUZINS_STAND = {
+  name: 'Deutsche Bundesbank (letzter Stand)',
+  url: 'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen',
+  description: 'Letzter gespeicherter Stand: Rendite Bundeswertpapiere + Marktaufschlag MFI-Zinsstatistik + Zuschlag nach Beleihung'
 };
 const SOURCE_PFANDBRIEF_STATIC = {
   name: 'Hinterlegte Pfandbrief-Renditen',
@@ -545,19 +571,53 @@ async function getPfandbriefRates(opts) {
     }
   });
 
-  // Indikative Bauzinsen = Yield + Marge pro Stufe
+  /* v2245 · Die indikativen Bauzinsen kommen aus der MARKTFORMEL
+     (bauzinsService: Bundesanleihe + Marktaufschlag + K + Beleihungszuschlag).
+     Pfandbrief + feste Marge (MARGINS) ist nur noch der Rueckfall, falls der
+     Dienst gar nichts liefert. `yields` bleiben die Pfandbrief-Renditen.
+     `margins` ist seit v2245 der GEMESSENE Abstand des 10-J-Modellzinses
+     zum 10-J-Pfandbrief je Stufe - damit rechnen Altabnehmer, die selbst
+     yields + margins bilden (v10.js, Landing-Altseiten), bei 10 J exakt
+     dasselbe wie indicativeRates. */
+  let bauzins = null;
+  try { bauzins = await bauzinsService.getBauzins(); }
+  catch (e) { console.warn('[v2245 bauzins] Dienst fehlgeschlagen: ' + e.message); }
+
   const indicativeRates = {};
-  maturities.forEach(m => {
-    if (yields[m] == null) {
-      indicativeRates[m] = null;
-      return;
+  let margins = { ...MARGINS };
+  let modell = 'pfandbrief+marge';
+  const bzQuelle = bauzins && bauzins.quelle;
+  if (bauzins && bzQuelle !== 'unavailable') {
+    modell = 'bund+aufschlag';
+    maturities.forEach(m => {
+      indicativeRates[m] = bauzins.indicativeRates[m] || null;
+      const q = (bauzins.quellen_je && bauzins.quellen_je[m]) || bzQuelle;
+      if (indicativeRates[m]) {
+        sources[m] = q === 'live' ? 'live' : (q === 'db' ? 'db' : 'static');
+        periods[m] = (bauzins.formel.bund_datum && bauzins.formel.bund_datum[m]) || periods[m];
+      }
+    });
+    const i10 = bauzins.indicativeRates['10'];
+    if (i10 && yields['10'] != null) {
+      margins = {
+        premium:  Math.round((i10.premium  - yields['10']) * 100) / 100,
+        standard: Math.round((i10.standard - yields['10']) * 100) / 100,
+        schwach:  Math.round((i10.schwach  - yields['10']) * 100) / 100
+      };
     }
-    indicativeRates[m] = {
-      premium:  Math.round((yields[m] + MARGINS.premium)  * 100) / 100,
-      standard: Math.round((yields[m] + MARGINS.standard) * 100) / 100,
-      schwach:  Math.round((yields[m] + MARGINS.schwach)  * 100) / 100
-    };
-  });
+    anyLive = maturities.some(m => sources[m] === 'live');
+    anyStatic = maturities.some(m => sources[m] !== 'live');
+  } else {
+    // Rueckfall: Indikative Bauzinsen = Pfandbrief-Yield + feste Marge pro Stufe
+    maturities.forEach(m => {
+      if (yields[m] == null) { indicativeRates[m] = null; return; }
+      indicativeRates[m] = {
+        premium:  Math.round((yields[m] + MARGINS.premium)  * 100) / 100,
+        standard: Math.round((yields[m] + MARGINS.standard) * 100) / 100,
+        schwach:  Math.round((yields[m] + MARGINS.schwach)  * 100) / 100
+      };
+    });
+  }
 
   // Source-Aggregation
   let overallSource;
@@ -568,13 +628,20 @@ async function getPfandbriefRates(opts) {
 
   const result = {
     maturities: maturities,
-    yields: yields,
-    margins: { ...MARGINS },
+    modell: modell,                 // v2245: 'bund+aufschlag' | 'pfandbrief+marge' (Rueckfall)
+    yields: yields,                 // Pfandbrief-Renditen
+    margins: margins,
+    margins_bezug: modell === 'bund+aufschlag' ? 'abstand_modell10_zu_pfandbrief10' : 'feste_marge_auf_pfandbrief',
     indicativeRates: indicativeRates,
+    formel: bauzins && modell === 'bund+aufschlag' ? bauzins.formel : null,
+    stufen_ltv: bauzins ? bauzins.stufen_ltv : null,
+    verlauf: bauzins && modell === 'bund+aufschlag' ? bauzins.verlauf : null,
     sources: sources,           // pro Laufzeit
     periods: periods,           // pro Laufzeit
     source: overallSource,      // gesamt
-    sourceInfo: overallSource === 'live' ? SOURCE_PFANDBRIEF_LIVE : SOURCE_PFANDBRIEF_STATIC,
+    sourceInfo: modell === 'bund+aufschlag'
+      ? (overallSource === 'live' ? SOURCE_BAUZINS_LIVE : SOURCE_BAUZINS_STAND)
+      : (overallSource === 'live' ? SOURCE_PFANDBRIEF_LIVE : SOURCE_PFANDBRIEF_STATIC),
     asOf: anyLive ? new Date() : new Date(STATIC_PFANDBRIEF_AS_OF + '-01T00:00:00Z'),
     fetchedAt: new Date(),
     cacheKey: cacheKey
@@ -723,5 +790,7 @@ module.exports = {
   SOURCE_PFANDBRIEF_STATIC,   // V210
   SERIES_SUFFIX,
   PFANDBRIEF_SERIES,          // V210
-  PFANDBRIEF_SERIES_VARIANTS  // V211
+  PFANDBRIEF_SERIES_VARIANTS, // V211
+  SOURCE_BAUZINS_LIVE,        // v2245
+  SOURCE_BAUZINS_STAND        // v2245
 };

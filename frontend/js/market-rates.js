@@ -545,6 +545,8 @@ function _renderRecommendation(current, hist) {
   // ── Marktniveau-Einordnung ──────────────────────────────────────
   // Skala basierend auf historischer Bandbreite (2003-2026: 1,2% bis 6%, Median ~3,5%)
   var niveau, niveauTag;
+  /* v2247c: "niveau + 'em'" ergab "mittelem" und "hochem". */
+  function _niveauDativ(n) { return ({ 'sehr niedrig': 'sehr niedrigem', 'niedrig': 'niedrigem', 'mittel': 'mittlerem', 'hoch': 'hohem', 'sehr hoch': 'sehr hohem' })[n] || n; }
   if (r_5_10 < 2.5)      { niveau = 'sehr niedrig'; niveauTag = 'günstig'; }
   else if (r_5_10 < 3.3) { niveau = 'niedrig';      niveauTag = 'attraktiv'; }
   else if (r_5_10 < 4.0) { niveau = 'mittel';       niveauTag = 'normal'; }
@@ -617,7 +619,7 @@ function _renderRecommendation(current, hist) {
     // Günstige Phase: lange Bindung sinnvoll
     empfehlung = '15 Jahre';
     risiko = 'low';
-    begruendung = 'Bei aktuell ' + niveau + 'em Zinsniveau lohnt sich eine längere Zinsbindung — Sie sichern sich den günstigen Satz für lange Zeit.';
+    begruendung = 'Bei aktuell ' + _niveauDativ(niveau) + ' Zinsniveau lohnt sich eine längere Zinsbindung — du sicherst dir den günstigen Satz für lange Zeit.';
     if (trend === 'steigend' || trend === 'stark_steigend') {
       empfehlung = '15–20 Jahre';
       begruendung += ' Da die Marktzinsen zudem ' + trendText + ' sind, schützt eine lange Bindung zusätzlich vor weiteren Anstiegen.';
@@ -626,7 +628,7 @@ function _renderRecommendation(current, hist) {
     // Normale Phase: 10J Standard
     empfehlung = '10 Jahre';
     risiko = 'medium';
-    begruendung = 'Bei aktuell ' + niveau + 'em Zinsniveau ist eine 10-jährige Bindung der bewährte Standard — Balance aus Planungssicherheit und Flexibilität.';
+    begruendung = 'Bei aktuell ' + _niveauDativ(niveau) + ' Zinsniveau ist eine 10-jährige Bindung der bewährte Standard — Balance aus Planungssicherheit und Flexibilität.';
     if (trend === 'fallend' || trend === 'stark_fallend') {
       empfehlung = '5–10 Jahre';
       begruendung += ' Da die Marktzinsen ' + trendText + ' sind, könnte eine kürzere Bindung die spätere Anschlussfinanzierung zu besseren Konditionen ermöglichen.';
@@ -638,7 +640,7 @@ function _renderRecommendation(current, hist) {
     // Hohe Phase: kurze bis mittlere Bindung
     empfehlung = '5–10 Jahre';
     risiko = 'medium';
-    begruendung = 'Bei aktuell ' + niveau + 'em Zinsniveau ist eine kürzere bis mittlere Bindung sinnvoll — falls die Zinsen wieder sinken, können Sie zur Anschlussfinanzierung umschulden.';
+    begruendung = 'Bei aktuell ' + _niveauDativ(niveau) + ' Zinsniveau ist eine kürzere bis mittlere Bindung sinnvoll — falls die Zinsen wieder sinken, kannst du zur Anschlussfinanzierung umschulden.';
     if (trend === 'steigend' || trend === 'stark_steigend') {
       empfehlung = '10 Jahre';
       begruendung += ' Da die Zinsen aber ' + trendText + ' sind, bietet eine 10-jährige Bindung mehr Sicherheit.';
@@ -647,7 +649,7 @@ function _renderRecommendation(current, hist) {
     // Sehr hohe Phase
     empfehlung = '5 Jahre';
     risiko = 'high';
-    begruendung = 'Bei aktuell ' + niveau + 'em Zinsniveau ist eine kurze Bindung empfehlenswert, um beim erwarteten Rückgang umschulden zu können — aber kalkulieren Sie konservativ mit der Anschlussfinanzierung.';
+    begruendung = 'Bei aktuell ' + _niveauDativ(niveau) + ' Zinsniveau ist eine kurze Bindung empfehlenswert, um beim erwarteten Rückgang umschulden zu können — aber kalkuliere konservativ mit der Anschlussfinanzierung.';
   }
 
   // LTV-Override: bei sehr hohem LTV (>= 95%) immer lange Bindung empfehlen
@@ -657,7 +659,7 @@ function _renderRecommendation(current, hist) {
     begruendung = 'Bei einer Beleihung von ' + userLtv.toFixed(0) + '% (kaum Eigenkapital) ist eine LANGE Zinsbindung die einzig vertretbare Strategie — das Zinsänderungsrisiko bei niedrigem EK kann existenzbedrohend sein. ' + begruendung;
   } else if (typeof userLtv === 'number' && userLtv <= 60) {
     // Niedriger LTV gibt Flexibilität — eine Stufe kürzer als Default ist OK
-    begruendung += ' Da Ihr LTV bei ' + userLtv.toFixed(0) + '% liegt (hoher EK-Anteil), haben Sie auch bei einer kürzeren Bindung viel Risiko-Puffer.';
+    begruendung += ' Da dein LTV bei ' + userLtv.toFixed(0) + '% liegt (hoher EK-Anteil), hast du auch bei einer kürzeren Bindung viel Risiko-Puffer.';
   }
 
   // Render
@@ -665,7 +667,7 @@ function _renderRecommendation(current, hist) {
   if (typeof userLtv === 'number') {
     ctxLine = 'Marktlage: <strong>' + niveauTag + '</strong> (5–10 J · ' + r_5_10.toFixed(2).replace('.', ',') + '%) · ' +
               'Trend: <strong>' + trendText + '</strong>' +
-              ' · Ihre Beleihung: <strong>' + userLtv.toFixed(0) + '%</strong>';
+              ' · Deine Beleihung: <strong>' + userLtv.toFixed(0) + '%</strong>';
   } else {
     ctxLine = 'Marktlage: <strong>' + niveauTag + '</strong> (5–10 J · ' + r_5_10.toFixed(2).replace('.', ',') + '%) · ' +
               'Trend: <strong>' + trendText + '</strong>';

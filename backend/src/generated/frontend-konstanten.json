@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-14T17:27:27.117Z",
+ "erzeugt_am": "2026-10-15T07:16:07.715Z",
  "quellen": {
   "voice-import": "1cb32debc249551e",
-  "objektart-felder": "b1481ff1f7c0b04d",
-  "storage": "179def6f1d486de0",
-  "index-html": "7a6a60644666e1cf",
+  "objektart-felder": "1e0549e54a17a054",
+  "storage": "2378edc29a71e1bf",
+  "index-html": "c5eef02418b8058f",
   "grest": "114ed6834357a806"
  },
  "daten": {
@@ -15,7 +15,10 @@
      "bad_anz",
      "etage",
      "etagen_ges",
-     "mea"
+     "mea",
+     "gsfl",
+     "wfl",
+     "baujahr"
     ],
     "pflicht": [
      "mea"
@@ -28,7 +31,10 @@
     "passt": [
      "zimmer",
      "bad_anz",
-     "etagen_ges"
+     "etagen_ges",
+     "gsfl",
+     "wfl",
+     "baujahr"
     ],
     "pflicht": []
    },
@@ -37,7 +43,10 @@
      "zimmer",
      "bad_anz",
      "etagen_ges",
-     "einheiten"
+     "einheiten",
+     "gsfl",
+     "wfl",
+     "baujahr"
     ],
     "pflicht": []
    },
@@ -45,7 +54,10 @@
     "passt": [
      "zimmer",
      "bad_anz",
-     "etagen_ges"
+     "etagen_ges",
+     "gsfl",
+     "wfl",
+     "baujahr"
     ],
     "pflicht": []
    },
@@ -53,14 +65,20 @@
     "passt": [
      "zimmer",
      "bad_anz",
-     "etagen_ges"
+     "etagen_ges",
+     "gsfl",
+     "wfl",
+     "baujahr"
     ],
     "pflicht": []
    },
    "MFH": {
     "passt": [
      "etagen_ges",
-     "einheiten"
+     "einheiten",
+     "gsfl",
+     "wfl",
+     "baujahr"
     ],
     "pflicht": [
      "einheiten"
@@ -72,33 +90,60 @@
    "BUERO": {
     "passt": [
      "etagen_ges",
-     "einheiten"
+     "einheiten",
+     "gsfl",
+     "wfl",
+     "baujahr"
     ],
     "pflicht": []
    },
    "GESCH": {
     "passt": [
      "etagen_ges",
-     "einheiten"
+     "einheiten",
+     "gsfl",
+     "wfl",
+     "baujahr"
     ],
     "pflicht": []
    },
    "HOTEL": {
     "passt": [
      "etagen_ges",
-     "einheiten"
+     "einheiten",
+     "gsfl",
+     "wfl",
+     "baujahr"
     ],
     "pflicht": []
    },
    "GEW": {
     "passt": [
-     "etagen_ges"
+     "etagen_ges",
+     "gsfl",
+     "wfl",
+     "baujahr"
     ],
     "pflicht": []
    },
    "GAR": {
-    "passt": [],
+    "passt": [
+     "gsfl",
+     "wfl",
+     "baujahr"
+    ],
     "pflicht": []
+   },
+   "GRST": {
+    "passt": [
+     "gsfl"
+    ],
+    "pflicht": [
+     "gsfl"
+    ],
+    "hinweis": {
+     "gsfl": "Beim unbebauten Grundstück ist der Wert Fläche × Bodenrichtwert."
+    }
    }
   },
   "etappen": [
@@ -689,6 +734,10 @@
      {
       "wert": "GAR",
       "text": "Garage / Stellplatz"
+     },
+     {
+      "wert": "GRST",
+      "text": "Unbebautes Grundstück"
      }
     ],
     "label": "Objektart"

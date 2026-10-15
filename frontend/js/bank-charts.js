@@ -73,30 +73,45 @@ if (!window._wlc) {
   }
 
   // ───────────── DSCR-Klassifizierung ─────────────
+  /* v2240 · ALLE AMPELN FOLGEN DEN PERSOENLICHEN MINDEST-SCHWELLEN.
+     Gruen/Gelb kommen aus DealPilotSchwellen.get() (Einstellungen,
+     Vorgabe DSCR 1,2 / LTV 90). Die feineren Baender darunter bzw.
+     darueber (DSCR 0,8 Stress, LTV 60 „sehr sicher") bleiben fest -
+     sie haben keine Einstellung. */
+  function _sw() {
+    return window.DealPilotSchwellen ? DealPilotSchwellen.get()
+      : { dscrGruen: 1.2, dscrGelb: 1.0, ltvGruen: 90, ltvRot: 100 };
+  }
+  function _ltvTxt(n) { return String(Math.round(Number(n) * 10) / 10).replace('.', ','); }
+  function _dscrTxt(n) { return Number(n).toFixed(2).replace(/0$/, '').replace('.', ','); }
   function _dscrCls(dscr) {
-    if (dscr >= 1.2) return 'good';
-    if (dscr >= 1.0) return 'warn';
-    if (dscr >= 0.8) return 'bad';
+    var s = _sw();
+    if (dscr >= s.dscrGruen) return 'good';
+    if (dscr >= s.dscrGelb) return 'warn';
+    if (dscr >= Math.min(0.8, s.dscrGelb)) return 'bad';
     return 'critical';
   }
   function _dscrLabel(dscr) {
-    if (dscr >= 1.5) return 'sehr solide';
-    if (dscr >= 1.2) return 'solide';
-    if (dscr >= 1.0) return 'knapp';
-    if (dscr >= 0.8) return 'kritisch';
+    var s = _sw();
+    if (dscr >= Math.max(1.5, s.dscrGruen)) return 'sehr solide';
+    if (dscr >= s.dscrGruen) return 'solide';
+    if (dscr >= s.dscrGelb) return 'knapp';
+    if (dscr >= Math.min(0.8, s.dscrGelb)) return 'kritisch';
     return 'Stress';
   }
   function _ltvCls(ltv) {
-    // V63.65: Einheitlich zu DealScore und System-Definition: <85% grün, 85-100% gold, >100% rot
-    if (ltv <= 60) return 'good';
-    if (ltv <= 85) return 'ok';
-    if (ltv <= 100) return 'warn';
+    // v2240: gruen bis max_ltv (Einstellung, Vorgabe 90), gold bis 100, darueber rot
+    var s = _sw();
+    if (ltv <= Math.min(60, s.ltvGruen)) return 'good';
+    if (ltv <= s.ltvGruen) return 'ok';
+    if (ltv <= s.ltvRot) return 'warn';
     return 'bad';
   }
   function _ltvLabel(ltv) {
-    if (ltv <= 60) return 'sehr sicher';
-    if (ltv <= 85) return 'solide';
-    if (ltv <= 100) return 'erhöht';
+    var s = _sw();
+    if (ltv <= Math.min(60, s.ltvGruen)) return 'sehr sicher';
+    if (ltv <= s.ltvGruen) return 'solide';
+    if (ltv <= s.ltvRot) return 'erhöht';
     return 'kritisch';
   }
 
@@ -548,39 +563,43 @@ if (!window._wlc) {
     var ltvLab = _ltvLabel(ltvToday);
 
     // V63.65: DSCR-Quote-Text und -Farbe konsistent mit Status (vorher: Quote war grün auch bei knappem DSCR)
+    /* v2240 · Schwellen und Texte aus den Einstellungen (DealPilotSchwellen) */
+    var _s = _sw();
+    var _dG = _dscrTxt(_s.dscrGruen), _dY = _dscrTxt(_s.dscrGelb);
+    var _lG = _ltvTxt(_s.ltvGruen);
     var dscrAbove12Year = -1;
     for (var i = 0; i < dscrArr.length; i++) {
-      if (dscrArr[i] >= 1.2) { dscrAbove12Year = i; break; }
+      if (dscrArr[i] >= _s.dscrGruen) { dscrAbove12Year = i; break; }
     }
     var dscrQuoteText, dscrQuoteCls;
-    if (dscrToday < 1.0) {
-      dscrQuoteText = '<strong>Bank-Achtung:</strong> DSCR heute unter 1,0 — Bedienung kritisch. Eigenanteil oder strukturelle Anpassungen nötig.';
+    if (dscrToday < _s.dscrGelb) {
+      dscrQuoteText = '<strong>Bank-Achtung:</strong> DSCR heute unter ' + _dY + ' — Bedienung kritisch. Eigenanteil oder strukturelle Anpassungen nötig.';
       dscrQuoteCls = 'bc-bank-tag-warn';
-    } else if (dscrToday < 1.2) {
+    } else if (dscrToday < _s.dscrGruen) {
       if (dscrAbove12Year > 0) {
-        dscrQuoteText = '<strong>Knapp heute:</strong> DSCR ' + _fmtNum(dscrToday, 2) + ' (zwischen 1,0 und 1,2). Steigt ab Jahr ' + (dscrAbove12Year + 1) + ' über 1,2 — danach klar bedient.';
+        dscrQuoteText = '<strong>Knapp heute:</strong> DSCR ' + _fmtNum(dscrToday, 2) + ' (zwischen ' + _dY + ' und ' + _dG + '). Steigt ab Jahr ' + (dscrAbove12Year + 1) + ' über ' + _dG + ' — danach klar bedient.';
       } else {
-        dscrQuoteText = '<strong>Knapp:</strong> DSCR ' + _fmtNum(dscrToday, 2) + ' liegt im Verlauf nicht über 1,2 — wenig Spielraum bei Mietausfall oder Zinsanstieg.';
+        dscrQuoteText = '<strong>Knapp:</strong> DSCR ' + _fmtNum(dscrToday, 2) + ' liegt im Verlauf nicht über ' + _dG + ' — wenig Spielraum bei Mietausfall oder Zinsanstieg.';
       }
       dscrQuoteCls = 'bc-bank-tag-warn';  // gold/orange — passt zum Status
     } else {
-      dscrQuoteText = '<strong>Bank-OK:</strong> DSCR ' + _fmtNum(dscrToday, 2) + ' von Anfang an über 1,2 — Bedienung klar gewährleistet.';
+      dscrQuoteText = '<strong>Bank-OK:</strong> DSCR ' + _fmtNum(dscrToday, 2) + ' von Anfang an über ' + _dG + ' — Bedienung klar gewährleistet.';
       dscrQuoteCls = 'bc-bank-tag-good';
     }
 
     var ltvDelta = ltvToday - ltvEnd;
     var ltvQuoteText;
-    // V63.65: Schwellen einheitlich zu DealScore (≤60 sehr sicher, ≤85 solide, ≤100 erhöht, >100 kritisch)
-    if (ltvToday > 100) {
+    // v2240: ≤60 sehr sicher, ≤ max_ltv solide, ≤100 erhöht, >100 kritisch (max_ltv aus den Einstellungen)
+    if (ltvToday > _s.ltvRot) {
       ltvQuoteText = '<strong>Übersichert (' + _fmtPct(ltvToday, 0) + '):</strong> Restschuld höher als Wert — kritisch. Sinkt durch Tilgung &amp; Wertsteigerung in ' + bindj + ' Jahren auf ' + _fmtPct(ltvEzb, 0) + '.';
-    } else if (ltvToday > 85) {
-      ltvQuoteText = '<strong>Erhöhter Start-LTV (' + _fmtPct(ltvToday, 0) + '):</strong> Über 85% Beleihung — Zinsaufschläge wahrscheinlich. Sinkt in ' + bindj + ' Jahren auf ' + _fmtPct(ltvEzb, 0) + '.';
-    } else if (ltvToday > 60) {
+    } else if (ltvToday > _s.ltvGruen) {
+      ltvQuoteText = '<strong>Erhöhter Start-LTV (' + _fmtPct(ltvToday, 0) + '):</strong> Über ' + _lG + '% Beleihung — Zinsaufschläge wahrscheinlich. Sinkt in ' + bindj + ' Jahren auf ' + _fmtPct(ltvEzb, 0) + '.';
+    } else if (ltvToday > Math.min(60, _s.ltvGruen)) {
       ltvQuoteText = '<strong>Solider Start-LTV (' + _fmtPct(ltvToday, 0) + '):</strong> Klassische Bank-Finanzierung — verhandelbare Konditionen.';
     } else {
       ltvQuoteText = '<strong>Sehr sicher (' + _fmtPct(ltvToday, 0) + '):</strong> Hoher EK-Anteil — beste Konditionen, niedriges Risiko.';
     }
-    var ltvQuoteCls = ltvToday > 100 ? 'bc-bank-tag-warn' : (ltvToday > 85 ? 'bc-bank-tag-warn' : '');
+    var ltvQuoteCls = ltvToday > _s.ltvGruen ? 'bc-bank-tag-warn' : '';
 
     var html =
       '<div class="bc-card">' +
@@ -615,8 +634,8 @@ if (!window._wlc) {
               '</div>' +
               _miniTrend(dscrArr, {
                 color: '#3FA56C',
-                thresholdLine: { value: 1.0, color: '#B8625C', label: 'DSCR 1,0' },
-                thresholdLine2: { value: 1.2, color: window._wlc('#C9A84C'), label: 'DSCR 1,2' }
+                thresholdLine: { value: _s.dscrGelb, color: '#B8625C', label: 'DSCR ' + _dY },
+                thresholdLine2: { value: _s.dscrGruen, color: window._wlc('#C9A84C'), label: 'DSCR ' + _dG }
               }) +
               '<div class="bc-kpi-trend-bench">' +
                 '<div class="bc-kpi-trend-bench-cell"><span class="bc-kpi-trend-bench-label">Heute</span><span class="bc-kpi-trend-bench-val">' + _fmtNum(dscrToday, 2) + '</span></div>' +
@@ -640,7 +659,7 @@ if (!window._wlc) {
             '<div class="bc-kpi-track">' +
               '<div class="bc-kpi-track-bar bc-kpi-track-bar-ltv"></div>' +
               '<div class="bc-kpi-track-marker" data-val="' + _fmtPct(ltvToday, 0) + '" style="left: ' + ltvTrackPct.toFixed(1) + '%;"></div>' +
-              '<div class="bc-kpi-track-scale"><span>0%</span><span>60%</span><span>85%</span><span>100%+</span></div>' +
+              '<div class="bc-kpi-track-scale"><span>0%</span><span>60%</span><span>' + _lG + '%</span><span>100%+</span></div>' +
             '</div>' +
             '<div class="bc-kpi-trend">' +
               '<div class="bc-kpi-trend-head">' +
@@ -652,7 +671,7 @@ if (!window._wlc) {
               '</div>' +
               _miniTrend(ltvArr, {
                 color: window._wlc('#A68A36'),
-                thresholdLine: { value: 85, color: '#B8625C', label: 'LTV 85%' },
+                thresholdLine: { value: _s.ltvGruen, color: '#B8625C', label: 'LTV ' + _lG + '%' },
                 thresholdLine2: { value: 60, color: window._wlc('#C9A84C'), label: 'LTV 60%' }
               }) +
               '<div class="bc-kpi-trend-bench">' +
@@ -996,10 +1015,13 @@ if (!window._wlc) {
       };
     } catch(e) {}
 
+    /* v2240 · gruen/gelb nach den Einstellungen, die Stress-Baender darunter fest */
+    var _sm = _sw(), _smG = _dscrTxt(_sm.dscrGruen), _smY = _dscrTxt(_sm.dscrGelb);
+    var _smW = Math.min(0.8, _sm.dscrGelb), _smWt = _dscrTxt(_smW);
     function _cellCls(d) {
-      if (d >= 1.2) return 's-good';
-      if (d >= 1.0) return 's-ok';
-      if (d >= 0.8) return 's-warn';
+      if (d >= _sm.dscrGruen) return 's-good';
+      if (d >= _sm.dscrGelb) return 's-ok';
+      if (d >= _smW) return 's-warn';
       if (d >= 0.6) return 's-bad';
       return 's-critical';
     }
@@ -1077,10 +1099,10 @@ if (!window._wlc) {
           '</div>' +
           '<div class="bc-stress-footer">' +
             '<div class="bc-legend-scale">' +
-              '<div class="bc-legend-chip"><span class="bc-legend-chip-dot" style="background: rgba(63,165,108,0.30); border-color: rgba(63,165,108,0.40)"></span>DSCR ≥ 1,2 (gut)</div>' +
-              '<div class="bc-legend-chip"><span class="bc-legend-chip-dot" style="background: rgba(63,165,108,0.15); border-color: rgba(63,165,108,0.25)"></span>DSCR 1,0–1,2 (knapp)</div>' +
-              '<div class="bc-legend-chip"><span class="bc-legend-chip-dot" style="background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent); border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)"></span>DSCR 0,8–1,0 (warn)</div>' +
-              '<div class="bc-legend-chip"><span class="bc-legend-chip-dot" style="background: rgba(184,98,92,0.18); border-color: rgba(184,98,92,0.30)"></span>DSCR &lt; 0,8 (Stress)</div>' +
+              '<div class="bc-legend-chip"><span class="bc-legend-chip-dot" style="background: rgba(63,165,108,0.30); border-color: rgba(63,165,108,0.40)"></span>DSCR ≥ ' + _smG + ' (gut)</div>' +
+              '<div class="bc-legend-chip"><span class="bc-legend-chip-dot" style="background: rgba(63,165,108,0.15); border-color: rgba(63,165,108,0.25)"></span>DSCR ' + _smY + '–' + _smG + ' (knapp)</div>' +
+              '<div class="bc-legend-chip"><span class="bc-legend-chip-dot" style="background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent); border-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent)"></span>DSCR ' + _smWt + '–' + _smY + ' (warn)</div>' +
+              '<div class="bc-legend-chip"><span class="bc-legend-chip-dot" style="background: rgba(184,98,92,0.18); border-color: rgba(184,98,92,0.30)"></span>DSCR &lt; ' + _smWt + ' (Stress)</div>' +
             '</div>' +
             '<div class="bc-bank-tag">' +
               '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>' +

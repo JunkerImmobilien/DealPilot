@@ -550,6 +550,17 @@ async function start() {
     console.error('✗ plans-sync konnte nicht starten:', e.message);
   }
 
+  /* v2245: Marktabhaengiger Bauzins. Taeglich 18:00 Serverzeit Bund-,
+     Pfandbrief- und MFI-Reihen der Bundesbank holen und in
+     markt_zins_tag / markt_bauzins_monat schreiben; beim Start nur, wenn
+     der letzte Abruf aelter als ein Tag ist. Faellt der Abruf aus, rechnet
+     der Dienst mit dem letzten DB-Stand weiter. */
+  try {
+    require('./services/bauzinsService').starteTakt();
+  } catch (e) {
+    console.error('✗ Bauzins-Takt konnte nicht starten:', e.message);
+  }
+
   // v507: WebSocket-Relay fuer Live-Transkription (OpenAI Realtime)
   /* v538-ws-removed: Realtime-WS-Live-Pfad entfernt. Web-Audio liefert auf manchen
      Geraeten Stille -> Realtime unbrauchbar. Live-Mitschrift laeuft seit v536 ueber

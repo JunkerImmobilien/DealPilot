@@ -1987,13 +1987,17 @@ function _calcImmediate(){
   var kd_dscr     = _dscrMain.kd;
   var dscr        = _dscrMain.brutto;
   var dscr_netto  = _dscrMain.netto;
-  // Einheitliche DSCR-Schwellen: <1.0 kritisch · 1.0–1.2 ausreichend · ≥1.2 standard
-  var dscrLabel = dscr >= 1.2 ? '✓ Standard (≥1,2)' : dscr >= 1.0 ? '⚠ Ausreichend (1,0–1,2)' : '✗ Kritisch (<1,0)';
-  var dscrCls   = dscr >= 1.2 ? 'dscr-good' : dscr >= 1.0 ? 'dscr-warn' : 'dscr-bad';
+  /* v2240 · Alle Ampeln folgen den persoenlichen Mindest-Schwellen
+     (Einstellungen -> DealPilotSchwellen.get(); Vorgabe 1,2 / 90 / 0).
+     Die Einstufung macht der Kern (Dscr.classify), die Schwellen bringt
+     der Aufrufer mit. */
+  var _sw = window.DealPilotSchwellen ? DealPilotSchwellen.get() : null;
+  var dscrLabel = Dscr.label(dscr, _sw);
+  var dscrCls   = Dscr.kpiCls(dscr, _sw);
   var dscrEl=document.getElementById('bank-dscr-t');
   if(dscrEl)dscrEl.innerHTML='DSCR: <span class="dscr-badge '+dscrCls+'">'+dscr.toFixed(2)+'</span> '+dscrLabel;
   var bankItem2=dscrEl&&dscrEl.closest('.bank-item');
-  if(bankItem2)bankItem2.className='bank-item '+(dscr>=1.2?'ok':dscr>=1.0?'warn':'bad');
+  if(bankItem2)bankItem2.className='bank-item '+Dscr.bankItemCls(dscr, _sw);
   // Detail-Text: bei BSV explizit anzeigen
   var dscrDetail = 'Mieteinnahmen '+fE(noi_dscr)+' / Kapitaldienst '+fE(kd_dscr)+' p.a.';
   if (bsv_in_kd > 0) dscrDetail += ' (Zins '+fE(zins_j,0)+' + BSV-Sparrate '+fE(bsv_in_kd,0)+')';
@@ -2005,9 +2009,12 @@ function _calcImmediate(){
   var _ekValEarly = v('ek') || 0;
   if(bi_ltv){
     /* v2202 · gleiche LTV-Skala wie Hilfe, Kennzahlen-Bewertung, Bank-Charts, PDF und Karte (85/100) - hier stand 80/90 */
-    var ltv_ok=ltv<85,ltv_warn=ltv<=100;
+    /* v2240 · Grenzen aus den Einstellungen: gruen bis max_ltv (Vorgabe 90), gelb bis 100, darueber rot */
+    var _ltvG = _sw ? _sw.ltvGruen : 90, _ltvR = _sw ? _sw.ltvRot : 100;
+    var _ltvGt = String(_ltvG).replace('.', ','), _ltvRt = String(_ltvR).replace('.', ',');
+    var ltv_ok=ltv<=_ltvG,ltv_warn=ltv<=_ltvR;
     bi_ltv.className='bank-item '+(ltv_ok?'ok':ltv_warn?'warn':'bad');
-    st('bank-ltv-t','LTV: '+fP(ltv,1)+' – '+(ltv_ok?'✓ Solide (unter 85 %)':ltv_warn?'⚠ Erhöht (85–100 %)':'✗ Kritisch (über 100 %)'));
+    st('bank-ltv-t','LTV: '+fP(ltv,1)+' – '+(ltv_ok?'✓ Solide (bis '+_ltvGt+' %)':ltv_warn?'⚠ Erhöht ('+_ltvGt+'–'+_ltvRt+' %)':'✗ Kritisch (über '+_ltvRt+' %)'));
     // V63.37: Detail-Text richtet sich nach LTV-Bezugsgröße
     st('bank-ltv-d','Darlehen '+fE(d_total)+' / '+ltv_basis_label+' '+fE(ltv_basis)+' · Eigenkapital '+fE(_ekValEarly));
   }
@@ -3676,7 +3683,9 @@ function renderProjTable(){
       '<td>'+fE(r.rs,0)+'</td><td>'+fE(r.wert_y,0)+'</td>'+
       '<td class="pos">'+fE(r.eq_y,0)+'</td>'+
       (function(){
-        var ltv_cls = r.ltv_y < 85 ? 'pos' : (r.ltv_y > 100 ? 'neg' : 'ltv-warn');
+        /* v2240 · Grenzen aus den Einstellungen (DealPilotSchwellen) */
+        var _swT = window.DealPilotSchwellen ? DealPilotSchwellen.get() : { ltvGruen: 90, ltvRot: 100 };
+        var ltv_cls = r.ltv_y <= _swT.ltvGruen ? 'pos' : (r.ltv_y > _swT.ltvRot ? 'neg' : 'ltv-warn');
         return '<td class="'+ltv_cls+'">'+r.ltv_y.toFixed(0)+'%</td></tr>';
       })();
   }).join('');
@@ -3862,8 +3871,11 @@ function renderCFCalc(mode){
   if (dscrVal) {
     dscrVal.textContent = dscrBrutto > 0 ? dscrBrutto.toFixed(2).replace('.', ',') : '—';
     dscrVal.classList.remove('warn', 'bad');
-    if (dscrBrutto < 1) dscrVal.classList.add('bad');
-    else if (dscrBrutto < 1.2) dscrVal.classList.add('warn');
+    /* v2240 · Schwellen aus den Einstellungen, Einstufung im Kern */
+    var _swV = window.DealPilotSchwellen ? DealPilotSchwellen.get() : null;
+    var _clsV = Dscr.classify(dscrBrutto, _swV);
+    if (_clsV === 'bad') dscrVal.classList.add('bad');
+    else if (_clsV === 'warn') dscrVal.classList.add('warn');
   }
   if (dscrSubVal) {
     dscrSubVal.textContent = dscrNetto > 0 ? dscrNetto.toFixed(2).replace('.', ',') : '—';
