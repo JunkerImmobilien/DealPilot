@@ -246,7 +246,15 @@
   function geldHtml() {
     var e = CTX && CTX.ecb_mrr, u = CTX && CTX.euribor_3m, r = CUR && CUR.rates;
     var ein = '';
-    try { var rb = $('mr-rec-body'); if (rb) { var t = rb.innerText.split('\n').filter(Boolean); if (t.length) ein = t.slice(0, 3).join(' · '); } } catch (x) {}
+    /* Die Empfehlung aus market-rates.js gezielt aus IHREN Feldern lesen -
+       innerText des ganzen Blocks klebte Ueberschrift und Risiko zusammen
+       und zog den Eigenkapital-Regler mit (gemessen in der Messkabine). */
+    try {
+      var rb = $('mr-rec-body');
+      var tx = function (s) { var e = rb && rb.querySelector(s); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; };
+      var rs = tx('.mr-rec-risk'), hl = tx('.mr-rec-headline').replace(rs, '').trim(), gr = tx('.mr-rec-reasoning');
+      if (hl) ein = hl + (rs ? ' (' + rs + ')' : '') + (gr ? '. ' + gr : '');
+    } catch (x) {}
     return '<div class="md-g3">'
       + '<div class="md-g"><em>EZB-Leitzins (Hauptrefinanzierung)</em><strong>' + pz(e && e.value) + '</strong><small>Stand ' + datum(e && e.period) + ' · steuert die kurzfristige Refinanzierung</small></div>'
       + '<div class="md-g"><em>Euribor 3 Monate</em><strong>' + pz(u && u.value) + '</strong><small>' + monat(u && u.period) + ' · Basis variabler Kredite</small></div>'
