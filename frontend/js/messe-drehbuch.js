@@ -3173,7 +3173,7 @@
   async function ue2PdfSeite(n) {
     var o = el('dpm-pdf');
     o.style.cssText = 'position:fixed;left:4%;right:4%;top:3%;bottom:4%;z-index:100002;background:#2b2b2b;border:2px solid ' + G + ';border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)';
-    o.innerHTML = '<iframe title="Investment-PDF" style="width:100%;height:100%;border:0" src="' + _ue2Pdf + '#page=' + n + '&toolbar=0&navpanes=0&view=FitH"></iframe>';
+    o.innerHTML = '<iframe title="Investment-PDF" style="width:100%;height:100%;border:0" src="' + _ue2Pdf + '#page=' + n + '&toolbar=0&navpanes=0&view=Fit"></iframe>';
     await warte(1800);
   }
   DREHBUECHER['reihe-ueberblick2'] = {
@@ -3287,7 +3287,7 @@
         await ue2PdfSeite(2);
         await b2oZeile(s, 'Die Kennzahlen', 'Executive Summary: Rendite, Cashflow, DSCR, LTV — mit denselben Ampeln wie in der App.');
         await ue2PdfSeite(4);
-        await b2oZeile(s, 'Der Cashflow-Plan', 'Jahr für Jahr: Miete, Zins, Tilgung, Steuer, Cashflow — das will die Bank sehen.', 600);
+        await b2oZeile(s, 'Der Cashflow in drei Phasen', 'Heute, am Ende der Zinsbindung und in der Anschlussfinanzierung — das will die Bank sehen.', 600);
       }
     ]
   };

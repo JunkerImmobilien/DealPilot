@@ -1059,7 +1059,8 @@ async function _exportPDFInner() {
   var K = State.kpis;
   var pageNum = 0;
 
-  var objName = [g('str'), g('hnr'), g('ort')].filter(Boolean).join(', ') || 'Kalkulation';
+  /* v2263 · Hausnummer gehört zur Straße: hier stand „Westerfeldstr., 140, Bielefeld" */
+  var objName = [[g('str'), g('hnr')].filter(Boolean).join(' '), g('ort')].filter(Boolean).join(', ') || 'Kalkulation';
   // V23: Objektnummer (z.B. "2026-007") in der Detailzeile
   var objNum = window._currentObjSeq || '';
   var objDetailParts = [];
