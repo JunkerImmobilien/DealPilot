@@ -1074,7 +1074,7 @@
     ]
   };
 
-  /* ═══ DREHBUCH 7 · VOM QUICK BOARDING ZUM OBJEKT (v2252, Reihe Modul 02) ═══
+  /* ═══ DREHBUCH 7 · VOM QUICK BOARDING ZUM OBJEKT (v2253, Reihe Modul 02) ═══
      Videoreihe „So funktioniert DealPilot" (Dateien/Messe/Videos/
      Videoreihe.md). Zwei Wege ins Portfolio: (a) Quick Boarding prüfen und
      „Als Objekt speichern", (b) „Neues Objekt" leer anlegen.
@@ -1087,7 +1087,7 @@
      - Mit wandern: Adresse, Objektart, Wohnfläche, Baujahr, Kaufpreis,
        Kaltmiete, Hausgeld (280 €/Monat -> 2.352 € umlagefähig + 1.008 €
        nicht umlagefähig im Jahr, 70/30), Eigenkapital, Zins, Tilgung,
-       Darlehen. Der Marktwert kam bis v2252 NICHT an (quickcheck-app.html
+       Darlehen. Der Marktwert kam bis v2253 NICHT an (quickcheck-app.html
        confirmSave) - behoben. Nicht mit: Makro-/Mikrolage, die Karte der
        Marktbewertung selbst (#_mb_state), die Lageklasse.
      - „Neues Objekt" legt SOFORT eine leere Karte an (POST /objects,

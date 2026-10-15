@@ -16,7 +16,7 @@
   unten zeigt Nummer, Titel und Erklärung. Intro und Outro kommen aus dem
   Baukasten (js/messe-effekte.js).
   Aufruf: messe-studio.html?messe=<drehbuch>&intro=<id>&outro=<id>[&qr=<url>][&oben=58]
-  Videoreihe (v2252): messe-studio.html?modul=02 - Intro/Outro "reihe", Texte aus REIHE
+  Videoreihe (v2253): messe-studio.html?modul=02 - Intro/Outro "reihe", Texte aus REIHE
   oben = Höhe, die die Aufnahme oben abschneidet (Chrome-Leiste im Vollbild).
 -->
 <style>
@@ -76,12 +76,12 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
 <div id="start" hidden><div><button type="button" id="los">Aufnahme starten</button><p>Leertaste startet ebenfalls · Esc beendet</p></div></div>
 
 <script src="js/whitelabel-override.js?v=v2149"></script>
-<script src="js/messe-effekte.js?v=v2252"></script>
+<script src="js/messe-effekte.js?v=v2253"></script>
 <script>
 (function () {
   'use strict';
   var P = new URLSearchParams(location.search);
-  /* v2252 · Videoreihe „So funktioniert DealPilot" (Dateien/Messe/Videos/
+  /* v2253 · Videoreihe „So funktioniert DealPilot" (Dateien/Messe/Videos/
      Videoreihe.md). Je Modul: Drehbuch, Titel, eine Zeile worum es geht, ein
      Spruch fürs Outro (Luftfahrt-Bildsprache; nie Kerosin, keine Quellen-
      oder Anbieternamen). Aufruf ?modul=02 - oder ?messe=<drehbuch>, dann
@@ -124,7 +124,7 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     }
   };
   var T = TEXTE[NAME] || {};
-  /* v2252 · Reihen-Stücke bekommen ihre Texte aus REIHE; andere Stücke
+  /* v2253 · Reihen-Stücke bekommen ihre Texte aus REIHE; andere Stücke
      behalten die Texte aus TEXTE */
   if (M) {
     var RT = { reihe: 'So funktioniert DealPilot', modul: MODUL };

@@ -240,7 +240,7 @@
     '@keyframes oUhr{to{stroke-dashoffset:283}}',
     '.o-countdown .zahl{position:absolute;inset:0;display:grid;place-items:center;font:700 6cqw "Space Grotesk"}',
 
-    /* v2252 · REIHE „So funktioniert DealPilot" - ein Intro und ein Outro
+    /* v2253 · REIHE „So funktioniert DealPilot" - ein Intro und ein Outro
        für alle Module: Nummer, Titel, Unterzeile bzw. Spruch je Video */
     '.r-grund{background:radial-gradient(70% 70% at 50% 38%,#17120a,#050505 70%)}',
     '.r-grund::before{content:"";position:absolute;left:50%;bottom:-6%;width:200%;height:62%;transform:translateX(-50%) perspective(30cqw) rotateX(66deg);transform-origin:50% 100%;background:repeating-linear-gradient(90deg,transparent 0 6cqw,color-mix(in srgb,' + G + ' 10%,transparent) 6cqw 6.08cqw),linear-gradient(90deg,transparent 49.6%,color-mix(in srgb,' + G + ' 45%,transparent) 49.6% 50.4%,transparent 50.4%);opacity:0;animation:mfxAuf 1.6s .2s forwards}',
@@ -409,7 +409,7 @@
         var w = (t.worte || []).map(function (x, i) { return '<div class="wort' + (i === (t.worte.length - 1) ? ' g' : '') + '" style="opacity:1"><span style="opacity:0;animation-delay:' + (i * 1.05) + 's">' + esc(x) + '</span></div>'; }).join('');
         return '<div class="mfx-voll i-typo" style="position:absolute;inset:0">' + w + '<div class="mfx-mitte"><div style="opacity:0;animation:mfxZoom .9s ' + ((t.worte || []).length * 1.05) + 's forwards">' + marke('mfx-glanz') + '</div></div></div>';
       } },
-    /* v2252 · Reihen-Intro „So funktioniert DealPilot": Marke, Modulnummer,
+    /* v2253 · Reihen-Intro „So funktioniert DealPilot": Marke, Modulnummer,
        Titel, eine Zeile worum es geht. Gleich für jedes Modul. */
     reihe: { name: 'Reihe · Modul', dauer: 7000, felder: { reihe: 'So funktioniert DealPilot', modul: '02', titel: 'Vom Quick Boarding zum Objekt', unter: 'Zwei Wege ins Portfolio — und was dabei mitwandert.' },
       html: function (t) {
@@ -557,7 +557,7 @@
         var el = e.querySelector('[data-zahl]'), von = +t.von || 30, t0 = Date.now();
         var iv = setInterval(function () { var p = Math.min(1, (Date.now() - t0) / 5000); el.textContent = Math.ceil(von * (1 - p)); if (p >= 1 || !el.isConnected) clearInterval(iv); }, 100);
       } },
-    /* v2252 · Reihen-Outro: der Logo-Rahmen zieht sich hinter dem Flieger
+    /* v2253 · Reihen-Outro: der Logo-Rahmen zieht sich hinter dem Flieger
        zu, die Wortmarke glänzt, darunter der Spruch des Moduls */
     reihe: { name: 'Reihe · Logo und Spruch', dauer: 7500, felder: { spruch: 'Vom ersten Blick', spruch2: 'zum eigenen Objekt.', reihe: 'So funktioniert DealPilot', modul: '02', weiter: '', url: 'dealpilot.immo' },
       html: function (t) {
@@ -592,5 +592,5 @@
     function l(o) { return Object.keys(o).map(function (k) { return { id: k, name: o[k].name, dauer: o[k].dauer, felder: o[k].felder }; }); }
     return { intros: l(INTROS), karten: l(KARTEN), outros: l(OUTROS) };
   }
-  window.DealPilotMesseFX = { spiele: spiele, liste: liste, qr: qr, version: 'v2252' };
+  window.DealPilotMesseFX = { spiele: spiele, liste: liste, qr: qr, version: 'v2253' };
 })();

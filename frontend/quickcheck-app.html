@@ -6032,7 +6032,7 @@ function renderTransferList() {
     try {
       /* v893j-modalpick: Marktwert/Marktmiete aus gewaehlter Quelle (Konsens|Provider) + Spanne */
       var _sp = (_span==='low'||_span==='high'||_span==='mid') ? _span : (_spanConfig||'mid');
-      /* v2252 · GEMESSEN 15.10.2026 (Sachsenstr. 18, Herford): das Fenster
+      /* v2253 · GEMESSEN 15.10.2026 (Sachsenstr. 18, Herford): das Fenster
          „Diese Daten werden übernommen" zeigte „Marktwert → verkehrswert
          230.000 €" angehakt - im Objekt stand danach KEIN Verkehrswert.
          Ursache: die DealPilot-Bewertung kommt nie in _avmResults.
@@ -6063,7 +6063,7 @@ function renderTransferList() {
       }
       var _checked = {};
       try { Object.keys(_pendingTransfer).forEach(function (key) { var cb = document.getElementById('transfer-cb-' + key); if (_useCk ? _ck.has(key) : (!cb || cb.checked)) _checked[_pendingTransfer[key].target] = true; }); } catch (e) {}
-      /* v2252 · die Haken im Fenster heissen ohne _pendingTransfer-Eintrag
+      /* v2253 · die Haken im Fenster heissen ohne _pendingTransfer-Eintrag
          „DealPilot_mw"/„DealPilot_mm" (qc-bridge.js secHtml) */
       if (_useCk) { if (_ck.has('DealPilot_mw')) _checked.verkehrswert = true; if (_ck.has('DealPilot_mm')) _checked.nkm_grund = true; }
       var _mw=_pick('mw'), _mm=_pick('mm');
