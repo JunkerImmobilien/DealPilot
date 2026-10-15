@@ -1730,25 +1730,23 @@
         await warte(600);
         await zeige(function () { return q('#oe-abruf-box'); }, 8);
         var f = [frei(1), frei(2), frei(3)];
-        await b2oZeile(s, 'Drei Stufen', 'Einfach, Mittel, Ausgiebig: je tiefer, desto mehr Angaben — und desto mehr kommt heraus.' + (f[0] ? ' Im Plan frei: <b>' + f.join(' · ') + '</b>.' : ''));
+        await b2oZeile(s, 'Drei Stufen', 'Je tiefer die Stufe, desto mehr Angaben — und desto mehr Ergebnis.' + (f[0] ? ' Frei im Plan: <b>' + f.join(' · ') + '</b>.' : ''));
       },
       async function (s) {   /* 2 · Stufe 1 braucht */
-        await zeige(function () { return q('#oab-dp-stufen'); }, 10);
-        await b2oZeile(s, 'Stufe 1 · Einfach', 'Die Stufe wählst du oben an der DealPilot-Kachel — oder hier im Reiter.');
         await stufeWaehlen(1);
-        await warte(600);
         await zeige(function () { return q('#oe-fehlt'); }, 8);
         var l = feldNamen(fehlt(1));
-        await b2oZeile(s, 'Stufe 1 braucht', '<b>' + l.length + ' Angaben</b>: ' + l.join(', ') + '.');
+        await b2oZeile(s, 'Stufe 1 · Einfach', 'Braucht <b>' + l.length + ' Angaben</b>: ' + l.join(', ') + '.');
       },
       async function (s) {   /* 3 · ausfüllen, abrufen */
-        await zeige(function () { return b2oHuelle(feldVon('plz')(), feldVon('baujahr')()); }, 8);
-        s.zeile('Stufe 1 · Einfach', 'Die Wohnung aus Modul 02: Sachsenstraße 18 in Herford.');
+        await zeige(function () { return b2oHuelle(feldVon('plz')(), feldVon('etage')()); }, 8);
+        s.zeile('Stufe 1 · Einfach', 'Die Wohnung aus Modul 02, kurz eingetippt.');
         await tippeH('plz', '32052'); await tippeH('ort', 'Herford'); await tippeH('str', 'Sachsenstraße', 60); await tippeH('hnr', '18');
         await tippeH('objart', 'ETW'); await tippeH('wfl', '100'); await tippeH('baujahr', '1998');
-        await warte(1200);
+        await warte(900);
         await zeige(stufeZeile(1), 8);
-        await b2oZeile(s, 'Stufe 1 · Einfach', fehlt(1).length ? 'Noch offen: ' + feldNamen(fehlt(1)).join(', ') + '.' : 'Alles da — <b>bereit</b>. Ein Klick auf Abrufen.');
+        await b2oZeile(s, 'Stufe 1 · Einfach', fehlt(1).length ? 'Noch offen: ' + feldNamen(fehlt(1)).join(', ') + '.'
+          : '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + ' — <b>bereit</b>.');
         await rhStufeAbrufen(1, function () { s.zeile('Stufe 1 · Marktpreisindikation', 'Standort, Vergleichspreise, Mieten, Lage — Etappe für Etappe.'); });
       },
       async function (s) {   /* 4 · Ergebnis Stufe 1, Abschlag */
@@ -1758,33 +1756,31 @@
         await b2oZeile(s, 'Ergebnis Stufe 1', 'Marktwert <b>' + eur(k.mw && k.mw.med) + '</b> (Spanne ' + eur(k.mw && k.mw.low) + ' – ' + eur(k.mw && k.mw.high) + '), Marktmiete <b>' + eur(k.mm && k.mm.med) + '</b> kalt.');
         if (k.abschlag && k.abschlag.roh) {
           await zeige(function () { return q('#avsec .dp-abschlag') || q('#avsec .legal') || q('#avsec'); }, 10);
-          await b2oZeile(s, 'Der Abschlag', 'Stufe 1 schätzt aus <b>Angebotspreisen</b> (' + eur(k.abschlag.roh.med) + '). Verkauft wird meist darunter — DealPilot rechnet <b>' + String(k.abschlag.pct).replace('.', ',') + ' %</b> ab (' + k.abschlag.quelle + ').');
+          await b2oZeile(s, 'Der Abschlag', 'Geschätzt aus <b>Angebotspreisen</b> (' + eur(k.abschlag.roh.med) + ') — DealPilot zieht <b>' + String(k.abschlag.pct).replace('.', ',') + ' %</b> ab (' + k.abschlag.quelle + ').');
         }
         kartenUebernehmen();
         await warte(900);
         await zeige(feldVon('svwert'), 10);
-        await warte(1600);
+        await warte(1400);
         var b = svBeschriftung();
         await b2oZeile(s, 'Im Feld', '„<b>' + b.titel + '</b> ' + b.hinweis + '“ — <b>' + eur(zahl('svwert')) + '</b>.');
       },
       async function (s) {   /* 5 · Stufe 2 braucht */
         var m = q('.main-col'); if (m) m.scrollTop = 0;
-        try { DealPilotObjektReiter.zielSetzen(2); } catch (e) {}
-        await warte(600);
         await stufeWaehlen(2);
-        await warte(600);
         await zeige(function () { return q('#oe-fehlt'); }, 8);
         var l = feldNamen(fehlt(2));
         await b2oZeile(s, 'Stufe 2 · Mittel', 'Dazu <b>' + l.length + ' Angaben</b>: ' + l.join(', ') + '.');
         await zeige(function () { return b2oHuelle(feldVon('zimmer')(), feldVon('standardstufe')()); }, 8);
-        s.zeile('Stufe 2 · Mittel', 'Kaufpreis 180.000 €, Kaltmiete 900 € — dazu Zimmer, Etage, Zustand, Energie und Standardstufe.');
+        s.zeile('Stufe 2 · Mittel', 'Eingetippt — Kaufpreis und Miete stehen in den Reitern Investition und Miete.');
         await tippeH('kp', '180000', 40); await tippeH('nkm', '900', 40);
         await tippeH('zimmer', '3'); await tippeH('etage', '1');
         await tippeH('ds2_zustand', 'gut'); await tippeH('ds2_energie', 'C'); await tippeH('standardstufe', '3');
-        await warte(1400);
+        await warte(1000);
         await zeige(stufeZeile(2), 8);
-        await b2oZeile(s, 'Stufe 2 · Mittel', fehlt(2).length ? 'Noch offen: ' + feldNamen(fehlt(2)).join(', ') + '.' : 'Alles da — <b>bereit</b>.');
-        await rhStufeAbrufen(2, function () { s.zeile('Stufe 2 · erweiterte Indikation', 'Dieselben Etappen, dazu Makrolage und der Abgleich mit deinem Preis.'); });
+        await b2oZeile(s, 'Stufe 2 · Mittel', fehlt(2).length ? 'Noch offen: ' + feldNamen(fehlt(2)).join(', ') + '.'
+          : 'Kaufpreis <b>' + eur(zahl('kp')) + '</b>, Kaltmiete <b>' + eur(zahl('nkm')) + '</b> — <b>bereit</b>.');
+        await rhStufeAbrufen(2, function () { s.zeile('Stufe 2 · erweiterte Indikation', 'Dazu Makrolage und der Abgleich mit deinem Preis.'); });
       },
       async function (s) {   /* 6 · Ergebnis Stufe 2 */
         var k = mbKarteH() || {};
@@ -1801,25 +1797,23 @@
       },
       async function (s) {   /* 7 · Stufe 3 braucht */
         var m = q('.main-col'); if (m) m.scrollTop = 0;
-        try { DealPilotObjektReiter.zielSetzen(3); } catch (e) {}
-        await warte(600);
         await stufeWaehlen(3);
-        await warte(700);
         await zeige(function () { return q('#oe-fehlt'); }, 8);
         var l = feldNamen(fehlt(3));
         var brw = wert('brw');
-        await b2oZeile(s, 'Stufe 3 · Ausgiebig', 'Für die Wertermittlung nach ImmoWertV noch <b>' + l.length + ' Angaben</b>: ' + l.join(', ') + '.' + (brw ? ' Den Bodenrichtwert (' + brw + ' €/m²) hat DealPilot schon geholt.' : ''));
+        await b2oZeile(s, 'Stufe 3 · Ausgiebig', 'Für die Wertermittlung noch <b>' + l.length + ' Angaben</b>: ' + l.join(', ') + '.' + (brw ? ' Den Bodenrichtwert (' + brw + ' €/m²) hat DealPilot schon geholt.' : ''));
         var ids = fehlt(3), wertVon = { gsfl: '1200', mea: '12', bgf: '135', brw: '190', nutzungsart: 'kapitalanlage' };
+        s.zeile('Stufe 3 · Ausgiebig', 'Eingetippt: Nutzung, Grundstück, Miteigentumsanteil, Bruttogrundfläche.');
         for (var i = 0; i < ids.length; i++) {
           if (!wertVon[ids[i]]) continue;
           await zeige(feldVon(ids[i]), 10);
           await tippeH(ids[i], wertVon[ids[i]]);
-          await warte(700);
         }
-        await warte(1000);
+        await warte(900);
         await zeige(stufeZeile(3), 8);
-        await b2oZeile(s, 'Stufe 3 · Ausgiebig', fehlt(3).length ? 'Noch offen: ' + feldNamen(fehlt(3)).join(', ') + '.' : 'Grundstück 1.200 m², Miteigentumsanteil 12 %, Bruttogrundfläche 135 m² — <b>bereit</b>.');
-        await rhStufeAbrufen(3, function () { s.zeile('Stufe 3 · Wertermittlung', 'Mit Bodenwert, Liegenschaftszins und Restnutzungsdauer — nach ImmoWertV.'); });
+        await b2oZeile(s, 'Stufe 3 · Ausgiebig', fehlt(3).length ? 'Noch offen: ' + feldNamen(fehlt(3)).join(', ') + '.'
+          : 'Grundstück ' + de(zahl('gsfl')) + ' m², Anteil ' + wert('mea') + ' %, BGF ' + wert('bgf') + ' m² — <b>bereit</b>.');
+        await rhStufeAbrufen(3, function () { s.zeile('Stufe 3 · Wertermittlung', 'Bodenwert, Liegenschaftszins, Restnutzungsdauer — nach ImmoWertV.'); });
       },
       async function (s) {   /* 8 · Ergebnis Stufe 3: Verkehrswert */
         await warteAuf(function () { var w = q('#oe-vw-wahl'); return w && w.options.length >= 2; }, 8000);
@@ -1838,12 +1832,7 @@
         await zeige(feldVon('svwert'), 10);
         await warte(1200);
         var b = svBeschriftung();
-        await b2oZeile(s, 'Erst jetzt: Verkehrswert', '„<b>' + b.titel + '</b> ' + b.hinweis + '“ — <b>' + eur(zahl('svwert')) + '</b>, der Ertragswert aus Stufe 3.', 800);
-      },
-      async function (s) {   /* 9 · Kontingent */
-        var m = q('.main-col'); if (m) m.scrollTop = 0;
-        await zeige(function () { return q('#oe-abruf-box'); }, 8);
-        await b2oZeile(s, 'Drei Stufen, ein Verlauf', 'Jeder Abruf landet im Verlauf des Objekts. Stufe 1 und 2 sind Indikationen — <b>Verkehrswert</b> heißt es erst ab Stufe 3.');
+        await b2oZeile(s, 'Erst jetzt: Verkehrswert', '„<b>' + b.titel + '</b> ' + b.hinweis + '“ — <b>' + eur(zahl('svwert')) + '</b>, der Ertragswert aus Stufe 3.', 1200);
       }
     ]
   };
@@ -1899,11 +1888,13 @@
         await b2oZeile(s, 'Ausgewertet', (m ? '<b>' + m[1] + ' Angaben</b> aus der Aufnahme gelesen' : 'Ausgewertet') + '. Was noch fehlt, fragt DealPilot nach — oder du gehst gleich zur Übersicht.');
         var f = q('#vi-rf-ende'); if (f) f.click();
         await warte(1800);
-        var ds = rhIm('#oabi-ov', /Investor Deal Score/i);
-        var karte = ds && (ds.closest('[class*="score"],[class*="karte"]') || ds.parentElement);
-        await zeige(function () { var e = rhIm('#oabi-ov', /Investor Deal Score/i); return e && (e.closest('[class*="score"],[class*="karte"]') || e.parentElement); }, 6);
-        var t = karte ? karte.innerText.replace(/\s+/g, ' ') : '', sc = /Deal Score 2\.0\s+(?:\S+\s+)?(\d+)\s*\/\s*100/i.exec(t), wort = /\b(SEHR GUT|GUT|SOLIDE|SCHWACH|KRITISCH)\b/.exec(t);
-        await b2oZeile(s, 'Erste Einschätzung', 'Schon im Fenster gerechnet: Investor Deal Score' + (sc ? ' <b>' + sc[1] + '</b>' : '') + (wort ? ' · ' + wort[1].charAt(0) + wort[1].slice(1).toLowerCase() : '') + ' — mit den Hebeln, die den Score heben.');
+        /* die Karte „Investor Deal Score 2.0" (voice-import.js _scoreKopf):
+           Zahl aus data-ziel (sie zählt hoch), Wort aus der Pille */
+        function ds2() { return [].filter.call(document.querySelectorAll('#oabi-ov .vi-sc'), function (e) { var t = e.querySelector('.vi-sc-titel'); return t && /Investor Deal Score/i.test(t.textContent) && e.offsetWidth; })[0] || null; }
+        await zeige(function () { var e = ds2(); return e && (e.querySelector('.vi-sc-kopf') ? e : e); }, 6);
+        var k2 = ds2(), n2 = k2 && k2.querySelector('.vi-sc-zahl-n'), w2 = k2 && k2.querySelector('.vi-sc-pille');
+        var zahl2 = n2 ? n2.getAttribute('data-ziel') : null, wort2 = w2 ? w2.textContent.trim() : '';
+        await b2oZeile(s, 'Erste Einschätzung', 'Schon im Fenster gerechnet: Investor Deal Score' + (zahl2 ? ' <b>' + zahl2 + '</b>' : '') + (wort2 ? ' · ' + wort2.charAt(0) + wort2.slice(1).toLowerCase() : '') + ' — dazu die Hebel, die den Score heben.');
       },
       async function (s) {   /* 5 · Übersicht, übernehmen */
         var b = [].filter.call(document.querySelectorAll('#oabi-ov button'), function (x) { return /Zur Übersicht — Werte/.test(x.textContent) && x.offsetWidth; })[0];
@@ -1921,9 +1912,8 @@
         await warte(900);
       },
       async function (s) {   /* 6 · Werte in den Feldern, Stufe 2 läuft */
-        await zeige(function () { return b2oHuelle(feldVon('plz')(), feldVon('ds2_energie')()); }, 8);
-        var oa = (function () { var e = document.getElementById('objart'); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : wert('objart'); })();
-        s.zeile('In den Feldern', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + oa + ', ' + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + ' — und gleich startet die Stufe 2.');
+        /* GEMESSEN: die Stufe 2 startet sofort nach der Übernahme - erst das
+           Fenster zeigen, danach die Felder (die Zeile dazu stand sonst 0,9 s) */
         var mod = await warteAuf(function () { return q('#dp-mba .k'); }, 12000);
         if (mod) {
           kegelHoch(true);
@@ -1932,7 +1922,11 @@
         }
         await warteAuf(function () { return _rh && _rh.berichte.length >= 1 && !q('#dp-mba .k') && mbKarteH() && mbKarteH().stufe === 2; }, 30000);
         kegelHoch(false);
-        await warte(900);
+        await warte(700);
+        if (!q('#s0.active')) reiter('s0');
+        await zeige(function () { return b2oHuelle(feldVon('plz')(), feldVon('ds2_energie')()); }, 8);
+        var oa = (function () { var e = document.getElementById('objart'); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : wert('objart'); })();
+        await b2oZeile(s, 'In den Feldern', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + oa + ', ' + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + ', Zustand und Energie — alles aus dem Gesagten.');
       },
       async function (s) {   /* 7 · Einschätzung */
         var k = mbKarteH() || {};
