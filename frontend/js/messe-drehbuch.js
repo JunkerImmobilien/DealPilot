@@ -1518,7 +1518,7 @@
     DPM_REIHE.angelegt = []; DPM_REIHE.gesperrt = []; DPM_REIHE.gespielt = []; DPM_REIHE.geloescht = []; DPM_REIHE.abrufe = []; DPM_REIHE.fertig = null;
     var sk = null; try { sk = Auth.getStorageKey('seq_') + new Date().getFullYear(); } catch (e) {}
     var ls = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
-    _rh = { berichte: [], spr: 0, sprMax: sprMax || 0, seqKey: sk, seq: sk ? ls(sk) : undefined,
+    _rh = { start: Date.now() - 1000, berichte: [], spr: 0, sprMax: sprMax || 0, seqKey: sk, seq: sk ? ls(sk) : undefined,
       merker: { dp_zielstufe: ls('dp_zielstufe'), dp_mb_auftraege: ls('dp_mb_auftraege'), dp_mb_pref_span: ls('dp_mb_pref_span'), qc_span_config: ls('qc_span_config') },
       kacheln: ['dealpilot', 'import', 'voice', 'immometrica', 'gefuehrt'].filter(rhGewaehlt) };
     await rhLaden();
@@ -1569,6 +1569,17 @@
       try { if (window.DealPilotObjektReiter) DealPilotObjektReiter.zielSetzen(parseInt(r.merker.dp_zielstufe, 10) || 1); } catch (e) {}
       ls('dp_zielstufe', r.merker.dp_zielstufe);
       await new Promise(function (ok) { setTimeout(ok, Math.max(0, _rhNachlauf - Date.now())); });
+      /* GEMESSEN (Esc während Stufe 2): der gespielte Stream lief nach dem
+         Abbruch zu Ende, der Auftrag wurde als „fertig, ungesehen" gemerkt
+         und stand beim nächsten Laden als „Marktbericht fertig … öffnen"
+         im Bild - mitten in der nächsten Aufnahme. Erst warten, bis kein
+         Auftrag dieses Laufs mehr läuft, dann alle dieses Laufs entfernen. */
+      try {
+        var M = window.MbAuftrag, t0 = Date.now();
+        while (M && Date.now() - t0 < 15000 && M.liste().some(function (a) { return a.start >= r.start && a.status === 'laeuft'; })) await new Promise(function (ok) { setTimeout(ok, 500); });
+        if (M) M.liste().forEach(function (a) { if (a.start >= r.start) M.abbrechen(a.id); });
+      } catch (e) {}
+      zurueck();
       rhSpionAus();
       DPM_REIHE.fertig = Date.now();
     })();
