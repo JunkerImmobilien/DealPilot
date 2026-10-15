@@ -1179,7 +1179,21 @@ function _dpInjectTreeHk(){  /* v992-tree2 */
       kpRow.insertAdjacentElement('afterend', d);
     }
   }
-  /* Endzeile: Anschaffungs- & Herstellungskosten (inkl. HK) statt Prognose/Gesamtaufwand */
+  /* v2269 · Die Endzeile „Basis fuer AfA" zeigte ak_total + HK = Kaufpreis MIT
+     Inventar + Sanierung + Nebenkosten (Ravensberger Weg 38: 1.327.000 EUR unter
+     „1.233.000 + Nebenkosten 0"). Richtig: Kaufpreis ohne Inventar + Nebenkosten;
+     die Sanierung nur, wenn sie anschaffungsnah ist (netto ueber der 15-%-Grenze,
+     _bmfG15) - darunter ist sie sofort abziehbarer Erhaltungsaufwand. HK aus
+     dem eigenen Feld (§ 255 Abs. 2) bleiben. */
+  try {
+    var _kp0 = parseDe(($('ak_kp') || {}).value) || 0;
+    var _inv0 = (typeof window.dpInventarSumme === 'function') ? window.dpInventarSumme() : 0;
+    var _nk0 = (typeof _bmfNkImmo === 'function') ? _bmfNkImmo() : 0;
+    var _san0 = parseDe(($('ak_ahk') || {}).value) || 0;
+    var _g = (typeof window._bmfG15 === 'function') ? window._bmfG15() : null;
+    var _anschaffungsnah = !!(_g && _g.max > 0 && _g.geplantNetto > _g.max);
+    if (_kp0 > 0) base = Math.max(0, _kp0 - _inv0) + (isFinite(_nk0) ? _nk0 : 0) + (_anschaffungsnah ? _san0 : 0);
+  } catch (e) {}
   var label = (hk > 0) ? '= Anschaffungs- & Herstellungskosten' : '= Anschaffungskosten';
   fin.innerHTML = '<span><b>' + label + '</b> <span class="v292-arrow">\u2192 Basis f\u00fcr AfA</span></span><span class="v292-final-value"><b>' + fmtEur(base + hk, 0) + '</b></span>';
 }

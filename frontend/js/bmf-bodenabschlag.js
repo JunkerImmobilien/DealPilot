@@ -54,6 +54,7 @@
     /* Inventar gehoert nicht in die Aufteilung (Phase 6 der Pipeline). */
     var inv = ['inv_kueche', 'inv_moebel', 'inv_geraete', 'inv_pv', 'inv_stellplatz', 'inv_sonst']
       .reduce(function (a, i) { return a + (zahl(el(i) && el(i).value) || 0); }, 0);
+    if (!(inv > 0) && typeof window.dpInventarSumme === 'function') inv = window.dpInventarSumme();   /* v2269: auch #moebl */
     var immoKp = Math.max(0, kp - inv);
     /* Nebenkosten aus dem Reiter Anschaffungskosten — sie teilen sich im
        selben Verhaeltnis und gehoeren in die AfA-Bemessungsgrundlage. */
