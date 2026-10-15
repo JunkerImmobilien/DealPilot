@@ -1899,9 +1899,11 @@ function updateAfaCalc(){
 window.addEventListener('DOMContentLoaded', function(){
   // V282: Sachsenstr-Demo-Werte SOFORT vorab laden (synchron, vor allem anderen)
   // damit Pane 4 (AfA-Hebel) ohne manuelle BMF-Berechnung funktioniert
-  if(typeof DEMOS !== 'undefined' && DEMOS.real3){
-    window._lastBmf = DEMOS.real3.result;
-  }
+  /* v2262 · NICHT mehr vorab: das Demo-Ergebnis (Sachsenstr., 91,58 %) blieb hier
+     als `_lastBmf` stehen und speiste Varianten-, Risiko- und Empfehlungsbloecke
+     JEDES Objekts, bis ein eigener Lauf kam (gemessen am Ravensberger Weg 38,
+     15.10.2026). Das Fenster rechnet beim Oeffnen selbst; bis dahin steht
+     „wird berechnet". Die Demos bleiben ueber ihre Knoepfe erreichbar. */
 
   // AK-Summe rechnen (für Steuer-Tab + Modal)
   calcAk();
@@ -2203,8 +2205,9 @@ function openBMFModal(){
        (rund drei Sekunden) da ist. Ein fremdes Ergebnis wird deshalb beim
        Oeffnen verworfen, die Vorschau sagt „wird berechnet". */
     try {
-      if (window._lastBmf && window._lastBmf._objKey && window._currentObjKey
-          && String(window._lastBmf._objKey) !== String(window._currentObjKey)) window._lastBmf = null;
+      /* v2262: auch ein Ergebnis OHNE Objektkennung (Demo) ist fremd */
+      if (window._lastBmf && window._currentObjKey
+          && (!window._lastBmf._objKey || String(window._lastBmf._objKey) !== String(window._currentObjKey))) window._lastBmf = null;
       if (typeof updateAfaPreview === 'function') updateAfaPreview(null);
     } catch(e) {}
 
@@ -2668,7 +2671,7 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
       '<p>Hiermit erklären die Vertragsparteien rechtsverbindlich: Der vereinbarte Gesamtkaufpreis in Höhe von <strong>' + _eur(kp) + '</strong> für das in der Vertragsurkunde näher bezeichnete Objekt <em>' + (addr || '[Objektadresse]') + '</em> entfällt nach übereinstimmender Bewertung wie folgt:</p>' +
       '<ul style="margin:8px 0;padding-left:22px"><li>Grund und Boden: <strong>' + _eur(basisGrund) + '</strong></li>' +
       '<li>Gebäude inkl. wesentlicher Gebäudeteile: <strong>' + _eur(basisGeb) + '</strong></li></ul>' +
-      '<p>Diese Aufteilung wurde im Rahmen einer Sachwertermittlung nach BMF-Arbeitshilfe (Juni 2023) unter Heranziehung lagespezifischer Bodenrichtwerte, der tatsächlichen Restnutzungsdauer des Gebäudes sowie ggf. vorgenommener Modernisierungen erstellt. ' +
+      '<p>Diese Aufteilung wurde im Rahmen einer Wertermittlung nach BMF-Arbeitshilfe (Juni 2023, maßgebendes Verfahren nach der Arbeitshilfe) unter Heranziehung lagespezifischer Bodenrichtwerte, der tatsächlichen Restnutzungsdauer des Gebäudes sowie ggf. vorgenommener Modernisierungen erstellt. ' +
       '<strong>Sie hat verbindlichen Charakter</strong> und gilt insbesondere als wirtschaftlich angemessen i.S.d. BFH-Rechtsprechung (BFH IX R 26/19 v. 21.07.2020). ' +
       'Die Parteien sind sich einig, dass eine pauschale 80/20-Aufteilung im konkreten Fall nicht sachgerecht wäre. ' +
       'Eine abweichende Wertfeststellung durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus (vgl. § 199 BewG). Stand: ' + datum + '.</p>'
