@@ -1363,7 +1363,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2263b';
+  var RH_BUSTER = 'v2266';
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel/i;
@@ -2445,6 +2445,9 @@
        der Kopie hieße es sonst „gehört zu einem anderen Objekt". Ohne Kennung
        prüft die App nur den Zahlenabdruck, wie bei jeder Analyse. */
     var ai = opt.ohneAnalyse ? null : o.ai_analysis;   /* v2263: Überblick 2 braucht keine (und das PDF druckte sie) */
+    /* v2266 · opt.analyse: ein MITSCHNITT statt der gespeicherten Analyse (Modul 11,
+       DPM_REIHE_DATEN.pilot) - das echte Objekt behält seine. */
+    if (opt.analyse) ai = JSON.stringify(opt.analyse);
     try { var aj = typeof ai === 'string' ? JSON.parse(ai) : ai; if (aj && aj._fuer) { delete aj._fuer.objekt_id; ai = JSON.stringify(aj); } } catch (e) {}
     var neu = await Auth.apiCall('/objects', { method: 'POST', body: { data: d, aiAnalysis: ai, photos: o.photos || [] } });
     var nid = neu && (neu.id || (neu.data && neu.data.id) || (neu.object && neu.object.id));
@@ -2716,13 +2719,14 @@
   /* ═══ VIDEOREIHE · SPEZIALMODULE 11–14 (v2263) ═══════════════════════
      Videoreihe.md, Teil C. Alle vier an KOPIEN (r6KopieStart, beim Aufräumen
      gelöscht, auch bei Esc); die echten Objekte werden nie geladen.
-       11 Pilot-Analyse  Ravensberger Weg 38 (MFH) - die gespeicherte Analyse
-          vom 13.10.2026. NICHT Westerfeldstr. 140: deren Analyse empfiehlt eine
-          Offerte von 910.000 € bei 545.000 € Kaufpreis und nennt im Abschnitt
-          Lage Immobilienportale (gemessen 15.10.2026; gemeldet).
+       11 Pilot-Analyse  Westerfeldstr. 140 (MFH, 4 WE) - seit v2266 mit einer
+          NEUEN Analyse als Mitschnitt (DPM_REIHE_DATEN.pilot, einmal echt erzeugt
+          am 15.10.2026 nach v2264: keine Anbieternamen, Offerte 530.000 € bei
+          545.000 € Kaufpreis). Die gespeicherte Analyse des Objekts (Offerte
+          910.000 €, Portalnamen) wird an der Kopie ersetzt, nie angezeigt.
        12 Bewertung, 13 Deal-Aktion  Westerfeldstr. 140 (MFH, 4 WE)
        14 Bestand  Parkstr. 9 (gewonnen, Ankauf-Stand) - Kopie MIT Gewonnen-Status
-     Kein KI-Abruf: die Analyse ist die gespeicherte. Gesperrt (RH_SPERRE):
+     Kein KI-Abruf: die Analyse ist ein Mitschnitt (11) oder die gespeicherte (12-14). Gesperrt (RH_SPERRE):
      KI, Marktbericht, BMF, Partner-/Netzwerk-/Ämter-Anfragen, Pässe,
      Portfolio-Spiegel. Geklickt werden nur Reiter, Unter-Reiter und der
      Soll/Ist-Umschalter - kein Deal-Status, kein PDF, kein „Stand neu nehmen". */
@@ -2773,8 +2777,10 @@
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }], aufraeumen: rhAufraeumen,
     szenen: [
       async function (s) {   /* 1 · das Beispiel */
-        await r6KopieStart(R6_MFH, { ohneAnkauf: true });
-        await r6MfhBeispiel(s, ' Heute: die <b>Pilot-Analyse</b>.');
+        await rhLaden();
+        var pa = (window.DPM_REIHE_DATEN || {}).pilot; if (!pa) throw new Error('Mitschnitt pilot fehlt - die gespeicherte Analyse nennt Portale');
+        await r6KopieStart(R11_WESTERFELD, { ohneAnkauf: true, analyse: pa });
+        await r11Beispiel(s, ' Heute: die <b>Pilot-Analyse</b>.');
       },
       async function (s) {   /* 2 · Aufruf und was sie liest */
         reiter('s5'); await warte(1200);
