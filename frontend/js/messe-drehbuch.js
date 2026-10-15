@@ -3610,10 +3610,9 @@
       async function (s) {   /* 2 · Stufe 3 wählen, Pflichtfelder */
         await stufeWaehlen(3);
         await zeige(stufeZeile(3), 8);
-        await b2oZeile(s, 'Stufe 3 · Ausgiebig', 'Sach- und Ertragswert nach ImmoWertV. Status: <b>' + (fehlt(3).length ? fehlt(3).length + ' Angaben fehlen' : 'bereit') + '</b>.');
         var nur3 = DealPilotObjektReiter.pflichtFuer(3).filter(function (id) { return DealPilotObjektReiter.pflichtFuer(2).indexOf(id) < 0 && !/^garagen_/.test(id); });
-        await zeigeGruppe(feldVon('gsfl'), feldVon('brw'), 8);
-        await b2oZeile(s, 'Nur ' + nur3.length + ' Pflichtfelder mehr', 'Zu Stufe 2 kommen nur: <b>' + feldNamen(nur3).join(', ') + '</b>.');
+        /* v2273i · zusammengelegt (Länge): Status und die zusätzlichen Pflichtfelder in einer Zeile */
+        await b2oZeile(s, 'Stufe 3 · nur ' + nur3.length + ' Pflichtfelder mehr', 'Status <b>' + (fehlt(3).length ? fehlt(3).length + ' Angaben fehlen' : 'bereit') + '</b>. Zu Stufe 2 kommen nur: <b>' + feldNamen(nur3).join(', ') + '</b>.');
         await zeige(feldVon('bgf'), 10);
         await b2oZeile(s, 'Warum nur die?', 'Das ist das Minimum für Boden-, Sach- und Ertragswert. Alles andere hat einen Ansatz der ImmoWertV — es <b>verfeinert</b>.');
       },
@@ -3692,7 +3691,7 @@
       async function (s) {   /* 10 · Abruf (Mitschnitt) */
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeige(stufeZeile(3), 8);
-        await b2oZeile(s, 'Jetzt abrufen', 'Alle Angaben drin — ein Klick auf Stufe 3.');
+        await warte(900);   /* v2273i: Zeile „Jetzt abrufen“ gestrichen (Länge) - die Etappen erklären es */
         await rhStufeAbrufen(3, function () { s.zeile('Stufe 3 · Wertermittlung', 'Bodenwert, Liegenschaftszins, Sachwert — Schritt für Schritt.'); });
         await warteAuf(function () { var w = q('#oe-vw-wahl'); return w && w.options.length >= 1; }, 8000);
         await warteAuf(function () { var v = q('#oe-vw'); return v && v.offsetHeight > 20; }, 6000);   /* Prüflauf 16: Kegel 69 % */
