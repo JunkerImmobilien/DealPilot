@@ -65,13 +65,24 @@
     GAR:   { passt: [], pflicht: [] },
     /* v2241 · Unbebautes Grundstueck: kein Gebaeude, keine Einheit. Der
        Marktbericht rechnet Bodenrichtwert x Grundstuecksflaeche (gsfl). */
-    GRST:  { passt: [], pflicht: [] },
+    GRST:  { passt: ['gsfl'], pflicht: ['gsfl'],
+             hinweis: { gsfl: 'Beim unbebauten Grundstück ist der Wert Fläche × Bodenrichtwert.' } },
   };
 
+  /* v2245 · Wohnflaeche und Baujahr gehoeren zu JEDER Art mit Gebaeude,
+     die Grundstuecksflaeche zu jeder - nur das unbebaute Grundstueck hat
+     kein Gebaeude. Statt sie in jede Zeile zu schreiben, hier ergaenzt. */
+  Object.keys(ARTEN).forEach(function (k) {
+    var p = ARTEN[k].passt;
+    if (p.indexOf('gsfl') < 0) p.push('gsfl');
+    if (k !== 'GRST') { p.push('wfl'); p.push('baujahr'); }
+  });
+
   /* Alle Felder, die diese Steuerung ueberhaupt anfasst. Was hier nicht
-     steht, bleibt unberuehrt — Wohnflaeche, Kaufpreis und Baujahr gelten
-     fuer jede Art. */
-  var ALLE = ['zimmer', 'bad_anz', 'etage', 'etagen_ges', 'einheiten', 'mea'];
+     steht, bleibt unberuehrt. Seit v2245 stehen Wohnflaeche und Baujahr
+     hier mit drin - sie gelten fuer jede Art AUSSER dem unbebauten
+     Grundstueck; der Kaufpreis gilt fuer alle. */
+  var ALLE = ['zimmer', 'bad_anz', 'etage', 'etagen_ges', 'einheiten', 'mea', 'wfl', 'baujahr', 'gsfl'];
 
   /* Warum ein Feld nicht passt — in der Sprache des Objekts, nicht der
      Software. */
@@ -82,6 +93,8 @@
     etagen_ges: 'gilt für Gebäude',
     einheiten:  'gilt für Gebäude mit mehreren Einheiten',
     mea:        'gilt nur für Wohnungseigentum',
+    wfl:        'gilt nur für bebaute Grundstücke',
+    baujahr:    'gilt nur für bebaute Grundstücke',
   };
 
   function el(id) { try { return document.getElementById(id); } catch (e) { return null; } }
