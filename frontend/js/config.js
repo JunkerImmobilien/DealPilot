@@ -1075,9 +1075,7 @@ window.DealPilotConfig = (function() {
       sourceUrl:   'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen',
       // Vergleichslinks (Konditionen-Rechner — anders als Bundesbank-Durchschnitt)
       compareLinks: [
-        { label: 'Interhyp',            url: 'https://www.interhyp.de/ratgeber/was-zaehlt/bauzinsen/aktuelle-bauzinsen.html' },
-        { label: 'Dr. Klein',           url: 'https://www.drklein.de/bauzinsen.html' },
-        { label: 'Baufi24',             url: 'https://www.baufi24.de/bauzinsen-aktuell/' },
+        /* v2245: keine Vergleichsportale/Vermittler nach aussen - nur die amtliche Quelle */
         { label: 'Bundesbank-Statistik', url: 'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen' }
       ],
 
@@ -1093,6 +1091,8 @@ window.DealPilotConfig = (function() {
           '20': 4.11
         },
         // Bank-Marge pro Bonitäts-/LTV-Stufe
+        // v2245: NUR NOCH RUECKFALL (Pfandbrief + feste Marge), wenn auch
+        // `bauzins` unten fehlt. Gerechnet wird mit der Marktformel.
         margins: {
           premium:  0.25,   // LTV bis 60 %, Top-Bonität (v2242, kalibriert 15.10.2026)
           standard: 0.40,   // LTV bis 80 %, normale Bonität
@@ -1101,6 +1101,23 @@ window.DealPilotConfig = (function() {
         asOf: '2026-10',
         sourceLabel: 'Bundesbank Kapitalmarktstatistik · Pfandbrief-Zinsstruktur',
         sourceUrl: 'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen/taegliche-zinsstruktur-fuer-pfandbriefe-650734'
+      },
+
+      // v2245: MARKTFORMEL - statischer Stand, nur wenn das Backend nicht antwortet.
+      //   Bauzins(b, LTV) = bund[b] + aufschlag[b] + k + Z(LTV)
+      //   Quelle der Live-Werte: backend/src/services/bauzinsService.js
+      //   (Bundesbank: Rendite Bundeswertpapiere taeglich, MFI-Zinsstatistik
+      //   Wohnungsbau monatlich). Gemessen am 15.10.2026 mit
+      //   tools/bauzins-pruefen.mjs - beim Nachpflegen DORT messen, nicht hier
+      //   rechnen; Stuetzstellen und K muessen zum Backend passen.
+      bauzins: {
+        bund:      { '5': 3.23,  '10': 3.51,  '15': 3.70,  '20': 3.80 },   // Bund-Rendite 14.10.2026
+        aufschlag: { '5': 0.558, '10': 0.558, '15': 0.558, '20': 0.558 },  // v2246: EIN Aufschlag (MFI 5-10 J minus Bund 10), 08/2026
+        aufschlag_monat: '2026-08',
+        k: 0.27,                       // Kalibrierung 15.10.2026: 10 J / 80 % = 4,34 %
+        zuschlaege: [[60, -0.20], [70, -0.10], [80, 0], [90, 0.22], [100, 0.45], [110, 0.95]],
+        stufen_ltv: { premium: 60, standard: 80, schwach: 90 },
+        asOf: '2026-10-14'
       },
 
       // V211: Markt-Kontext (EZB-Leitzins + EURIBOR 3M)
