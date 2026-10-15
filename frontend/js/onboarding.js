@@ -353,6 +353,14 @@ window.DealPilotOnboarding = (function () {
        info@firma.de. Dann lieber leer lassen, damit die Frage noch als
        Frage erkennbar ist. */
     var name = (s.user_name && s.user_name.indexOf('@') < 0) ? s.user_name : '';
+    /* v2252 · Marcel: „In den Anfangseingaben wird der Vor- und Nachname
+       nicht übernommen." Er steht seit der Registrierung in der Sitzung. */
+    if (!name) {
+      try {
+        var ses = window.Auth && Auth.getSession && Auth.getSession();
+        if (ses && ses.name && String(ses.name).indexOf('@') < 0) name = String(ses.name);
+      } catch (e) {}
+    }
     return ''
       + '<p class="dpo-vor">Diese Angaben stehen später im Kopf deiner '
       + '<b>Investment-PDFs und Bankunterlagen</b> — dort, wo sonst ein '

@@ -105,6 +105,13 @@
             '<label for="dp-reg-pass">Passwort</label>' +
             '<div class="auth-input-wrap">' +
               '<input type="password" id="dp-reg-pass" placeholder="Mindestens 10 Zeichen" autocomplete="new-password" required minlength="10" maxlength="128">' +
+              /* v2252 · Marcel: „Bei der Registrierung kann ich nicht sehen, was
+                 ich als Passwort eingebe." Derselbe Knopf wie im Anmeldefenster. */
+              '<button type="button" class="auth-eye-btn" id="dp-reg-eye" tabindex="-1" aria-label="Passwort anzeigen">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">' +
+                  '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="2.5"/>' +
+                '</svg>' +
+              '</button>' +
             '</div>' +
           '</div>' +
 
@@ -186,6 +193,15 @@
         }
       });
     }
+
+    /* v2252: Passwort anzeigen / verbergen */
+    var regEye = document.getElementById('dp-reg-eye'), regPw = document.getElementById('dp-reg-pass');
+    if (regEye && regPw) regEye.addEventListener('click', function () {
+      var zu = regPw.type === 'password';
+      regPw.type = zu ? 'text' : 'password';
+      regEye.classList.toggle('auth-eye-active', zu);
+      regEye.setAttribute('aria-label', zu ? 'Passwort verbergen' : 'Passwort anzeigen');
+    });
 
     // Submit
     document.getElementById('dp-reg-submit').addEventListener('click', _handleSubmit);
@@ -298,8 +314,15 @@
           localStorage.setItem('ji_session', JSON.stringify({
             userId: data.user.id, email: data.user.email, name: data.user.name,
             role: data.user.role, mode: 'api',
+            /* v2252: eben angelegt = neues Konto. Ohne das Datum zaehlte der
+               alte Setup-Merker des Browsers, und das Setup kam erst nach
+               dem Klick auf den Bestaetigungslink. */
+            createdAt: data.user.created_at || new Date().toISOString(),
             expires: Date.now() + 7 * 24 * 60 * 60 * 1000
           }));
+          /* Der Anmeldeweg ist vorbei - der Merker hielte Setup und Tour
+             nach dem Neuladen an (onboarding.js _faellig). */
+          sessionStorage.removeItem('dp_auth_flow');
         } catch (e) {}
         if (data.verifyDeadline && window.DealPilotVerifyFrist) {
           try { window.DealPilotVerifyFrist.start(data.verifyDeadline, data.user.email); } catch (e) {}

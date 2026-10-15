@@ -325,7 +325,10 @@
   ];
   function ort() {
     try { var o = localStorage.getItem('dp_pilot_ort'); if (ORTE.some(function (x) { return x.id === o; })) return o; } catch (e) {}
-    return 'seite';
+    /* v2252 · Marcel am 15.10.2026: „Standardmaessig soll der Pilot
+       ausgeschaltet sein." Er bleibt auf F1 / ? erreichbar und laesst sich
+       im Setup (Schritt Hilfe) und in den Einstellungen sichtbar schalten. */
+    return 'aus';
   }
   function setOrt(o) {
     try { localStorage.setItem('dp_pilot_ort', o); } catch (e) {}
@@ -340,7 +343,7 @@
       + '<p class="hint" style="margin-bottom:10px">Drück F1 oder ? — der Pilot erklärt das Feld, auf dem du gerade bist, und beantwortet Fragen. Hier stellst du ein, wo er wartet.</p>'
       + '<div class="dp-tt-mode-toggle" style="flex-wrap:wrap">' + ORTE.map(function (o) {
         return '<button type="button" style="flex:1 1 140px;min-width:0" class="dp-tt-mode-btn' + (o.id === a ? ' active' : '') + '" data-pilot-ort="' + o.id + '" onclick="DealPilotPilot.setOrt(\'' + o.id + '\')">'
-          + esc(o.t) + (o.id === 'seite' ? ' · Standard' : '') + '<span class="dp-tt-mode-btn-label">' + esc(o.d) + '</span></button>';
+          + esc(o.t) + (o.id === 'aus' ? ' · Standard' : '') + '<span class="dp-tt-mode-btn-label">' + esc(o.d) + '</span></button>';
       }).join('') + '</div>'
       + '<p class="hint" style="margin-top:8px;color:var(--muted)">Auf dem Handy sitzt er immer als runder Knopf unten links. Die Wahl gilt für dieses Gerät.</p>'
       /* v2204 · N63.7: der Rückweg zu „Nicht mehr anzeigen“ in der geführten Eingabe */
