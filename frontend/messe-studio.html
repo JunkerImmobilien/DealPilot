@@ -93,11 +93,11 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     '02': { messe: 'boarding-zum-objekt', titel: 'Vom Quick Boarding zum Objekt', unter: 'Zwei Wege ins Portfolio — und was dabei mitwandert.',
             spruch: 'Boarding abgeschlossen.', spruch2: 'Dein Objekt ist an Bord.', weiter: 'Modul 03 · Datenaufnahme: vier Wege' },
     /* v2255 · Module 03–05 */
-    '03': { messe: 'reihe-datenaufnahme', titel: 'Datenaufnahme: vier Wege', unter: 'Exposé, Sprache, ImmoMetrica, geführte Eingabe — ein Blick auf jeden Weg.',
+    '03': { hinweis: 'Vorführung · Beispieldaten · aufgezeichnete Abrufe', messe: 'reihe-datenaufnahme', titel: 'Datenaufnahme: vier Wege', unter: 'Exposé, Sprache, ImmoMetrica, geführte Eingabe — ein Blick auf jeden Weg.',
             spruch: 'Vier Wege an Bord.', spruch2: 'Einer reicht für den Start.', weiter: 'Modul 04 · Marktbewertung in drei Stufen' },
-    '04': { messe: 'reihe-stufen', titel: 'Marktbewertung in drei Stufen', unter: 'Was jede Stufe braucht — und was sie liefert.',
+    '04': { hinweis: 'Vorführung · Beispieldaten · aufgezeichnete Abrufe', messe: 'reihe-stufen', titel: 'Marktbewertung in drei Stufen', unter: 'Was jede Stufe braucht — und was sie liefert.',
             spruch: 'Drei Stufen Steigflug.', spruch2: 'Ab Stufe 3 amtlich.', weiter: 'Modul 05 · Komplettbeispiel: Sprache + Stufe 2' },
-    '05': { messe: 'reihe-sprache-stufe2', titel: 'Komplettbeispiel: Sprache + Stufe 2', unter: 'Erzählen, übernehmen, einschätzen — in einem Durchgang.',
+    '05': { hinweis: 'Vorführung · Beispieldaten · aufgezeichnete Abrufe', messe: 'reihe-sprache-stufe2', titel: 'Komplettbeispiel: Sprache + Stufe 2', unter: 'Erzählen, übernehmen, einschätzen — in einem Durchgang.',
             spruch: 'Erzählt, bewertet, eingeordnet.', spruch2: 'Klar zum Start.', weiter: 'Modul 06 · Investition' }
   };
   var MODUL = P.get('modul'), M = null;
@@ -108,6 +108,8 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
   var QR = P.get('qr') || 'https://dealpilot.immo';
   var OBEN = parseInt(P.get('oben'), 10) || 0;
   document.documentElement.style.setProperty('--oben', OBEN + 'px');
+  /* v2255 · der Hinweis oben rechts sagt, was aufgezeichnet ist (Modul 01 hat eine Pilot-Analyse, 03-05 Abrufe) */
+  try { if (M && M.hinweis) document.getElementById('hinweis').textContent = M.hinweis; } catch (e) {}
   /* v2235b · die App bekommt einen Viewport von BREITE CSS-px und wird auf den
      Rahmen gestreckt. Gemessen bei 0,8 (2.606 px App-Breite): Kacheln und
      Kegel im Video kaum lesbar. 1.700 bleibt Desktop-Fassung, Schrift x1,23. */
