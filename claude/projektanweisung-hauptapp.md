@@ -38761,6 +38761,28 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2255–v2255h · Videoreihe Module 03, 04, 05 aufgenommen; Verkehrswert nur aus der Wertermittlung (15.10.2026, Staging)
+
+- **Was:**
+  - Drei Drehbücher in `messe-drehbuch.js`: `reihe-datenaufnahme` (03), `reihe-stufen` (04), `reihe-sprache-stufe2` (05), Studio-Tabelle `REIHE` 03–05. Mitschnitte in `js/messe-reihe-daten.js` (wird erst im Lauf geladen): Marktberichte 211/212/213 (Stufe 1/2/3, Sachsenstraße 18 Herford), Sprach- und Antwort-Auslese, Beispiel-Exposé. Ein Ersatz für `fetch` spielt sie ab (Stream mit Etappen, Verlauf, Sprache), alle Kostenwege sind gesperrt, auch 6 s nach Esc.
+  - **Abschlag-Prüfung Modul 04 (gemessen):** Die Karte im Reiter Objekt rechnet den Abschlag wie das Quick Boarding (246.000 → 232.000 €, Fußnote „inkl. 5,8 %"). Der Verlauf `#oe-vw` übernahm dagegen den ROHEN Wert als „Verkehrswert". Und nach Stufe 3 erschien die Kartenzahl (Angebotspreise) als „Verkehrswert (Stufe 3 · amtliche Wertermittlung)". Behoben in `dealpilot-mb.js` (`_svHerkunft`: Kartenzahl ist immer Indikation, Verkehrswert nur mit Vermerk `amtlich`) und `objekt-reiter.js` (Verlauf mit Abschlag, Knopf/Toast nach Art, Vermerk `sv` in `#_mb_state`).
+  - `objekt-reiter.js`: ein Zeitgeber je Aufgabe. Baujahr trägt zwei change-Horcher, der zweite löschte den gemeinsamen Zeitgeber des ersten, die Stufen-Zeile blieb auf „3 fehlt".
+  - Studio: Hinweis je Modul, App-Adresse mit Zeitstempel (`index.html` kommt ohne Cache-Control).
+  - **Eigener Fehler (v2255, behoben in v2255f):** Meine Hilfsfunktion `frei(s)` überschrieb im selben Gültigkeitsbereich `frei(r)` des Kegels, für ALLE Drehbücher. Gemessen am Kegel, der nicht mehr nachscrollte. Jetzt `kontingentFrei`. Keine Aufnahme betroffen.
+- **Commit:** `30e10ba5`, `8807603c`, `b23f839c`, `5b986297`, `f8d3c793`, `6c5dda1d`, `5601fc17`, `d1d74f99`, `0a118205`
+- **Nachweis:**
+  - Studio-Prüfläufe mit Protokoll (300 ms): jede Kapitelzeile hat ihren Kegel im Bild. Lücken gibt es nur beim Schließen eines Fensters (≤ 1,5 s).
+  - Gesperrt 0×, gespielt: generate-stream, extract-voice/-text, transcribe, quickmatch, ImmoMetrica.
+  - Server vor/nach allen Läufen und Aufnahmen: Objekte 39/39, `ai_credits_log` 1609/1609, `mb.market_reports` max 213/213, Pässe 148/148, Waisen 0.
+  - Esc-Lauf (05, während der Stufe 2): Objekt gelöscht, `fetch` echt.
+- **Videos:** `Dateien/Messe/Videos/Videoreihe/Modul 03 …` 3:41 (9,7 MB), `Modul 04 …` 4:34 (10,1 MB), `Modul 05 …` 3:33 (8,3 MB). Probe je 25 s vorher, Bildraster angesehen.
+- **Kosten (einmalig):** Bericht 212 (Stufe 2, Kontingent 7 → 6), Bericht 213 (Stufe 3, 5 → 4), vier `/ai/extract-text` zu je 0,2–0,9 Cent. Bericht 211 bestand schon.
+- **Rest:**
+  - Modul 04 liegt mit 4:34 über der 4-Minuten-Vorgabe.
+  - Sprache: „Hausgeld 280 Euro im Monat" wurde als 280 €/Jahr in `hg_ul` ausgelesen (Katalog sagt pro Jahr). Das ist ein Extraktionsfehler; im Video umgangen, indem der Jahreswert gesprochen wird.
+  - Stufe 3 bei der ETW: `verfahrenswahl` = Vergleichswert, aber der Verlauf kennt keinen Vergleichswert-Eintrag („führend" erscheint nie). Der Vergleichswert 246.000 ist gleich dem Angebots-Marktwert.
+  - Commit `5b986297` trägt ein BOM vor der Betreffzeile.
+
 ### v2252–v2253b · Videoreihe „So funktioniert DealPilot": Reihen-Intro/-Outro, Modul 02, Marktwert wandert mit (15.10.2026, Staging)
 
 - **Was:** Reihe laut `Dateien/Messe/Videos/Videoreihe.md`.
