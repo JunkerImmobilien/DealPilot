@@ -38761,6 +38761,16 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2247–v2247c · Marktdaten-Fenster neu: Zusammensetzung, Verlauf, Hausoptik (15.10.2026, Staging)
+- **Was:** Marcel: Verlaufsgrafik unter Finanzierung → „Marktdaten ansehen“, wie sich der Zins zusammensetzt, Optik DealPilot, Irrelevantes raus, Messkabine.
+  - Neues Modul `frontend/js/marktdaten-modal.js` übernimmt `V10.openMarketModal/closeMarketModal/handleOverlayClick`. Obsidian-Kopf mit Runway-Linie; Zins für Bindung × Beleihung (Objekt-LTV und Bindung `#d1_bindj` vorgewählt); Gleichung Bundesanleihe + Marktaufschlag + Angebotsniveau ± Beleihung (Marktaufschlag als Rest → geht immer auf); Verlauf 13 Monate (Ø abgeschlossen vs. Bund, Aufschlag-Balken) / 12 Wochen (Modell vs. Bund); vier Konditionen; Geldmarkt (EZB, Euribor, Ø abgeschlossen) + Einordnung Zinsbindung; eine Quellenzeile.
+  - Die drei alten Karten bleiben im versteckten `#v10-cards-source` (speisen Kopfzeile/Empfehlung) und werden nicht mehr verschoben. Weg: Linien-Schalter, doppelte Quellen, Türkis/Beige. Höhe 2.476 → 1.361 px.
+  - **Falle:** `style.css` `.sec button:not(...)` setzt Hintergrund/Farbe `!important` und macht Knöpfe zur Zeile → Chips und Konditionskacheln brauchen `!important` und `display:block` (v2247a/b). Gold im Canvas über Probe-Element `var(--wl-c9a84c)` (whitelabel, kein Literal).
+  - v2247c: Einordnung aus `.mr-rec-headline/-risk/-reasoning` statt `innerText` (klebte „RisikoMarktlage“ und den EK-Regler mit); `market-rates.js` beugt das Niveau (`mittlerem`/`hohem` statt `mittelem`/`hochem`).
+- **Commit:** `400777f0`, `158bdc9b`, `9af14a1f`, `28b3ee23`, `bb26f37e`
+- **Nachweis:** Messkabine 390/768/1440 px: kein Quer-Überlauf (vorher 20 px bei 390 durch die Kacheln), keine Kontrast- oder Zielgrößen-Befunde im Fenster, Chip „an“ rgb(5,5,5), Grafik 220/260 px. Bedienweg: 90 % → 4,56 % = 3,51 + 0,56 + 0,27 + 0,22; Wochen-Ansicht KW 41/42; Kachel 5 J → 4,28 %; Kreuz schließt, alte Karten (3) bleiben im Behälter. Gold-Audit RC=0, Buster SAUBER.
+- **Rest:** Abnahme durch Marcel; der Text der Empfehlung (market-rates.js) spricht noch „Sie“.
+
 ### v2245–v2246 · Dynamischer Bauzins, Grundstücksformular (15.10.2026, Staging)
 - **Was:** Marcel: Zinsaufschlag „marktabhängig … wie im Bild dynamisch neu berechnet“, Finanzierungs-Tab und Landingpage 1:1.
   - **Formel** (`backend/src/services/bauzinsService.js`): Bauzins(b, LTV) = Bund_b (täglich, Bundesbank BBSIS) + A (MFI-Effektivzins Wohnungsbau 5–10 J minus Ø Bund 10 J des letzten veröffentlichten Monats, ~6 Wochen Verzug) + K 0,27 (Angebotsniveau 80 %, kalibriert 15.10.) + Z(LTV) (60 % −0,20 · 70 −0,10 · 80 0 · 90 +0,22 · 100 +0,45 · 110+ +0,95, linear).
