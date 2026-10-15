@@ -3641,18 +3641,15 @@
         /* die Leiste rechnet live (Register, ohne Kosten): bewegt sich die Restnutzungsdauer, steht es da - sonst der Grund */
         if (bewegt) await b2oZeile(s, 'Was sich bewegt', 'Punkte <b>' + vor + ' → ' + nach + '</b>, Nutzungsdauer gesamt / rest <b>' + rndVor + ' → ' + rndNach + '</b> — weniger Alterswertminderung.');
         else {
-          await b2oZeile(s, 'Was sich bewegt', 'Punkte <b>' + vor + ' → ' + nach + '</b>, Nutzungsdauer bleibt <b>' + (rndNach || '–') + '</b>: Baujahr ' + wert('baujahr') + ' liegt hinter der Anlage 2.');
-          await b2oZeile(s, 'Das sagt DealPilot dazu', 'Kein hochgerechneter Wert, sondern „sachverständig zu würdigen“. Bei jüngeren Häusern hebt jeder Punkt die Restnutzungsdauer.');
+          await b2oZeile(s, 'Was sich bewegt', 'Punkte <b>' + vor + ' → ' + nach + '</b>, Nutzungsdauer bleibt <b>' + (rndNach || '–') + '</b>: Baujahr ' + wert('baujahr') + ' liegt hinter der Anlage 2. DealPilot rechnet nichts hoch — „sachverständig zu würdigen“.');
         }
         await r16Setze('mod_aussenwand', 'Keine/Nie');
         await warte(900);
       },
       async function (s) {   /* 5 · Standardstufe je Gewerk */
         await zeigeGruppe(function () { var e = q('#ausst_dach'); return e && e.closest('tr'); }, function () { var e = q('#ausst_heizung'); return e && e.closest('tr'); }, 6);
-        await b2oZeile(s, 'Optional: Standardstufe je Gewerk', 'Dach <b>' + r6Pz(wert('ausst_dach')) + '</b>, Fenster ' + r6Pz(wert('ausst_fenster')) + ', Heizung ' + r6Pz(wert('ausst_heizung')) + ' — gewichtet nach Kostenanteil.');
-        await zeige(feldVon('standardstufe'), 10);
         var sst = (function () { var e = q('#standardstufe'); return e && e.selectedIndex >= 0 ? r6Text(e.options[e.selectedIndex]) : wert('standardstufe'); })();
-        await b2oZeile(s, 'Daraus die Standardstufe', '<b>' + sst + '</b> — sie wählt die Herstellungskosten je m² Bruttogrundfläche.');
+        await b2oZeile(s, 'Optional: Standardstufe je Gewerk', 'Dach <b>' + r6Pz(wert('ausst_dach')) + '</b>, Fenster ' + r6Pz(wert('ausst_fenster')) + ', Heizung ' + r6Pz(wert('ausst_heizung')) + ' — gewichtet ergibt das <b>' + sst + '</b>: die Herstellungskosten je m².');
       },
       async function (s) {   /* 6 · Grundrissart */
         await zeige(feldVon('grundriss'), 10);
@@ -3661,12 +3658,11 @@
       },
       async function (s) {   /* 7 · Hinterland (angenommen) */
         await zeigeGruppe(feldVon('hinterland_qm'), feldVon('hinterland_eur_qm'), 8);
-        var zb = r6Beginn(s, 'Optional: Hinterland', 'Angenommen: 250 m² Gartenland hinter dem Haus.');
+        var zb = r6Beginn(s, 'Optional: Hinterland', 'Angenommen: 250 m² Gartenland à 5 €/m² — es zählt zum Bodenwert, nicht zum Preis des Baulands.');
         await tippeH('hinterland_qm', '250', 110);
         await tippeH('hinterland_eur_qm', '5', 110);
         await warte(800);
         await r6Ende(zb);
-        await b2oZeile(s, 'Optional: Hinterland', 'Mit <b>' + wert('hinterland_eur_qm') + ' €/m²</b> zum Bodenwert — nicht zum Preis des Baulands.');
       },
       async function (s) {   /* 8 · Garagen (angenommen) */
         await zeige(feldVon('garagen'), 10);
@@ -3697,6 +3693,7 @@
         await b2oZeile(s, 'Jetzt abrufen', 'Alle Angaben drin — ein Klick auf Stufe 3.');
         await rhStufeAbrufen(3, function () { s.zeile('Stufe 3 · Wertermittlung', 'Bodenwert, Liegenschaftszins, Sachwert — Schritt für Schritt.'); });
         await warteAuf(function () { var w = q('#oe-vw-wahl'); return w && w.options.length >= 1; }, 8000);
+        await warteAuf(function () { var v = q('#oe-vw'); return v && v.offsetHeight > 20; }, 6000);   /* Prüflauf 16: Kegel 69 % */
         await zeige(function () { return q('#oe-vw'); }, 10);
         var opts = [].map.call((q('#oe-vw-wahl') || { options: [] }).options, function (o) { return r6Text(o); });
         var sw = opts.filter(function (o) { return /^Sachwert/.test(o); })[0];
