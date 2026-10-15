@@ -38761,6 +38761,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2249 · Setup je Konto, nach der Anmeldung, mit Hilfe-Schritt (15.10.2026, Staging)
+
+- **Was:** Marcel meldete majunker@gmx.net neu an und bekam weder Grunddaten/Aussehen noch Tour. Zwei Ursachen: (1) `dp_onboarding_done_v1` hing am BROWSER, in dem schon ein Setup gelaufen war; (2) das Setup prüfte nur beim Laden der Seite, die Anmeldung lädt nicht neu. Jetzt: Merker `dp_onboarding_done_v1:<userId>`, der alte zählt nur für Konten älter als 30 Tage (`createdAt` in der Sitzung, Backend liefert `created_at` bei Register/Login/2FA). `DealPilotOnboarding.pruefen()` läuft nach `onLoginSuccess`; ist das Setup fällig, öffnet der Quick-Check nicht automatisch. Neuer Schritt 6 „Hilfe“: Pilot anzeigen oder nur F1 (`DealPilotPilot.setOrt`) und Haken „Rundgang danach starten“.
+- **Commit:** `a7c6fef9`
+- **Nachweis:** Staging, Marcels Konto mit gesetztem Browser-Merker und frischem `createdAt`: Setup erscheint mit 6 Schritten; „Nein“ setzt `dp_pilot_ort=aus` (Pilot `ruht aus`); Haken raus → `DpTour.start` 0×; Kontomerker gesetzt. Altes Konto ohne `createdAt`: `istFertig` true, `pruefen` false, Merker wird gespiegelt. Neues Konto: `pruefen` true, Setup erscheint. Sitzung danach zurückgestellt.
+- **Rest:** Prod-Rollout (Freigabe, Backend-Neubau). Bestehende Sitzungen kennen `createdAt` erst nach erneuter Anmeldung.
+
 ### v2248 · Stripe-Rechnungen geprüft und Checkouts nachgezogen (15.10.2026, Staging)
 - **Was:** Marcel: „prüfen ob jeder Kunde bei Stripe eine vernünftige Rechnung bekommt“.
 - **Gemessen (Live-Konto `acct_1TWXFdGefFev8arz`, lesend im Prod-Container):** 2 Kunden, beide eigene Testkonten; 1 bezahlte Rechnung `DEALPILOT-0001` (0,00 €), ein Kunde ohne Anschrift; 0 bezahlte Einmal-Checkouts. Keine aktiven Steuersätze, Stripe Tax „active“ (ungenutzt, `automatic_tax` aus). Portal: Rechnungsverlauf an, Adresse änderbar. Fußzeile trägt den § 19-Hinweis.
