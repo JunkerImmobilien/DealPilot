@@ -81,8 +81,10 @@
     _setT('qct_ppm',  _fmtEur(ppm));
 
     // Farben für CF + LTV
-    _setCls('qct_cf', cf_vst_m >= 0 ? 'gn' : 'rd');
-    _setCls('qct_ltv', ltv > 100 ? 'rd' : (ltv <= 85 ? 'gn' : null));
+    /* v2240 · Schwellen aus den Einstellungen (DealPilotSchwellen; Vorgabe 90 / 0) */
+    var _sw = window.DealPilotSchwellen ? DealPilotSchwellen.get() : { ltvGruen: 90, ltvRot: 100, cfGruen: 0, cfGelb: 0 };
+    _setCls('qct_cf', cf_vst_m >= _sw.cfGruen ? 'gn' : (cf_vst_m >= _sw.cfGelb ? null : 'rd'));
+    _setCls('qct_ltv', ltv > _sw.ltvRot ? 'rd' : (ltv <= _sw.ltvGruen ? 'gn' : null));
     _setCls('qct_bmr', bmr >= 5 ? 'gn' : (bmr < 3.5 ? 'rd' : null));
 
     // Verdict (v474): IDENTISCHE Engine wie QC-Modal + DealScore-Karte.

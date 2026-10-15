@@ -3285,6 +3285,26 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     return parseInt(h.substr(1, 2), 16) + ',' + parseInt(h.substr(3, 2), 16) + ',' + parseInt(h.substr(5, 2), 16);
   };
 })();</script>
+<!-- v2240 · EINE Quelle fuer die Ampel-Schwellen (DSCR/LTV/Cashflow); liest das Profil der Haupt-App ueber window.parent -->
+<script src="js/schwellen.js?v=v2240"></script>
+<script id="qc-schwellen-v2240">
+(function () {
+  var VORGABE = { dscrGruen: 1.2, dscrGelb: 1.0, ltvGruen: 90, ltvRot: 100, cfMin: 0, cfGruen: 0, cfGelb: 0 };
+  window._qcSw = function () {
+    try { if (window.DealPilotSchwellen) return window.DealPilotSchwellen.get(); } catch (e) {}
+    return VORGABE;
+  };
+  /* Kurzbeschriftung der Zielwerte unter den Kacheln: '≥1,2' / '≤90%' / '≥0€' */
+  window._qcSwHint = function (id) {
+    var S = window._qcSw();
+    function z(n, st) { var t = Number(n).toFixed(st); if (st === 2) t = t.replace(/0$/, ''); return t.replace('.', ','); }
+    if (id === 'kpi-dscr') return '≥' + z(S.dscrGruen, 2);
+    if (id === 'kpi-ltv')  return '≤' + String(Math.round(S.ltvGruen * 10) / 10).replace('.', ',') + '%';
+    if (id === 'kpi-cf')   return '≥' + Math.round(S.cfGruen).toLocaleString('de-DE') + '€';
+    return null;
+  };
+})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v1881c">
 <style id="v2198a-lange-woerter">
@@ -3977,13 +3997,18 @@ const QcEngine = (function() {
   }
   function kpiClass(kpi, value) {
     if (value == null) return null;
+    /* v2240 · Alle Ampeln: DSCR, LTV und Cashflow folgen den persoenlichen
+       Mindest-Schwellen der Haupt-App (js/schwellen.js liest sie ueber
+       window.parent). Vorgabe 1,2 / 90 / 0. Hier stand LTV 95/105 - jetzt
+       dieselben Grenzen wie ueberall: gruen bis max_ltv, gelb bis 100. */
+    const S = window._qcSw();
     const r = {
       bmr: value <= 3 ? 'bad' : value >= 5 ? 'good' : 'mid',
       nmr: value <= 1 ? 'bad' : value >= 3 ? 'good' : 'mid',
       ekr: value <= 0 ? 'bad' : value >= 7 ? 'good' : 'mid',
-      cfMon: value <= -100 ? 'bad' : value >= 0 ? 'good' : 'mid',
-      dscr: value <= 1.0 ? 'bad' : value >= 1.2 ? 'good' : 'mid',
-      ltvPct: value >= 105 ? 'bad' : value <= 95 ? 'good' : 'mid',
+      cfMon: value <= S.cfGruen - 100 ? 'bad' : value >= S.cfGruen ? 'good' : 'mid',
+      dscr: value < S.dscrGelb ? 'bad' : value >= S.dscrGruen ? 'good' : 'mid',
+      ltvPct: value > S.ltvRot ? 'bad' : value <= S.ltvGruen ? 'good' : 'mid',
       bwk: value > 35 ? 'bad' : value >= 18 ? 'good' : 'mid'
     };
     return r[kpi] || null;
@@ -4393,6 +4418,9 @@ const QcApp = (function() {
     const el = document.getElementById(id);
     if (!el) return;
     const v = el.querySelector('.v');
+    /* v2240 · der Zielwert unter der Kachel nennt die eingestellte Schwelle */
+    const _hz = window._qcSwHint ? window._qcSwHint(id) : null;
+    if (_hz) { const h = el.querySelector('.h'); if (h) h.textContent = 'Ziel ' + _hz; }
     if (val == null) { v.textContent = '—'; el.classList.remove('good', 'mid', 'bad'); return; }
     v.textContent = val;
     const cls = QcEngine.kpiClass(kpiKey, parseFloat(String(val).replace(/[^\d.,\-]/g, '').replace(',', '.')));
@@ -5131,17 +5159,23 @@ const QcApp = (function() {
     else                   cons.push(`Bruttomietrendite <strong>${k.bmr.toString().replace('.', ',')}%</strong> unter Zielwert — Verhandlungsbedarf`);
     if (k.nmr >= 3)        pros.push(`Nettomietrendite <strong>${k.nmr.toString().replace('.', ',')}%</strong> erreicht das Ziel`);
     else                   cons.push(`Nettomietrendite <strong>${k.nmr.toString().replace('.', ',')}%</strong> zu niedrig`);
-    if (k.cfMon >= 100)    pros.push(`Cashflow <strong>+${k.cfMon} €/Mo</strong> ist solide positiv`);
-    else if (k.cfMon >= 0) pros.push(`Cashflow knapp positiv (+${k.cfMon} €/Mo)`);
-    else                   cons.push(`Cashflow <strong>${k.cfMon} €/Mo</strong> — Zuzahlung nötig`);
+    /* v2240 · Alle Ampeln: DSCR, LTV und Cashflow gegen die persoenlichen
+       Mindest-Schwellen (Vorgabe 1,2 / 90 / 0). Hier standen eigene
+       Grenzen (DSCR 1,3/1,1, LTV 95/105). */
+    const _S = window._qcSw();
+    const _cfS = (_S.cfGruen > 0 ? '+' : '') + Math.round(_S.cfGruen).toLocaleString('de-DE');
+    if (k.cfMon >= _S.cfGruen + 100) pros.push(`Cashflow <strong>${k.cfMon >= 0 ? '+' : ''}${k.cfMon} €/Mo</strong> ist solide positiv`);
+    else if (k.cfMon >= _S.cfGruen)  pros.push(_S.cfGruen === 0 ? `Cashflow knapp positiv (+${k.cfMon} €/Mo)` : `Cashflow ${k.cfMon >= 0 ? '+' : ''}${k.cfMon} €/Mo erreicht dein Minimum (${_cfS} €)`);
+    else if (k.cfMon >= 0)           cons.push(`Cashflow <strong>+${k.cfMon} €/Mo</strong> unter deinem Minimum (${_cfS} €)`);
+    else                             cons.push(`Cashflow <strong>${k.cfMon} €/Mo</strong> — Zuzahlung nötig`);
     if (k.dscr != null) {
-      if (k.dscr >= 1.3)   pros.push(`DSCR <strong>${k.dscr.toString().replace('.', ',')}</strong> — Bank-tauglich`);
-      else if (k.dscr >= 1.1) cons.push(`DSCR <strong>${k.dscr.toString().replace('.', ',')}</strong> grenzwertig für die Bank`);
-      else                 cons.push(`DSCR <strong>${k.dscr.toString().replace('.', ',')}</strong> kritisch — Finanzierung schwierig`);
+      if (k.dscr >= _S.dscrGruen)     pros.push(`DSCR <strong>${k.dscr.toString().replace('.', ',')}</strong> — Bank-tauglich`);
+      else if (k.dscr >= _S.dscrGelb) cons.push(`DSCR <strong>${k.dscr.toString().replace('.', ',')}</strong> grenzwertig für die Bank`);
+      else                            cons.push(`DSCR <strong>${k.dscr.toString().replace('.', ',')}</strong> kritisch — Finanzierung schwierig`);
     }
-    if (k.ltvPct <= 95)      pros.push(`Beleihung <strong>${k.ltvPct}%</strong> in solidem Rahmen`);
-    else if (k.ltvPct < 105) cons.push(`Beleihung <strong>${k.ltvPct}%</strong> leicht erhöht`);
-    else                     cons.push(`Beleihung <strong>${k.ltvPct}%</strong> — Vollfinanzierung+`);
+    if (k.ltvPct <= _S.ltvGruen)     pros.push(`Beleihung <strong>${k.ltvPct}%</strong> in solidem Rahmen`);
+    else if (k.ltvPct <= _S.ltvRot)  cons.push(`Beleihung <strong>${k.ltvPct}%</strong> leicht erhöht`);
+    else                             cons.push(`Beleihung <strong>${k.ltvPct}%</strong> — Vollfinanzierung+`);
     if (k.bwkPctOfNkm <= 25) pros.push(`Bewirtschaftung <strong>${k.bwkPctOfNkm}%</strong> der NKM — schlank`);
     else if (k.bwkPctOfNkm > 35) cons.push(`Bewirtschaftung <strong>${k.bwkPctOfNkm}%</strong> der NKM hoch`);
 
@@ -6758,7 +6792,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 
 
 
-  <script src="js/dscr-engine.js?v=v2149"></script>
+  <script src="js/dscr-engine.js?v=v2240"></script>
   <script src="js/deal-kpis.js?v=v2149"></script>
   <!-- v1956: das Lage-Profil. Eigenes Dokument, eigene Einbindung -
        gleicher Ursprung, also derselbe Speicher wie im Hauptfenster. -->
@@ -6805,7 +6839,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
-  <script src="js/qc-heuristik.js?v=v2237"></script>
+  <script src="js/qc-heuristik.js?v=v2240"></script>
   <script src="js/dealscore.js?v=v2191"></script>
   <script src="js/avm-section.js?v=v2149"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->
@@ -7111,7 +7145,8 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
       var src=document.getElementById(k[0]); var sv=src?src.querySelector('.v'):null;
       var txt=sv?(sv.textContent||'\u2014'):'\u2014'; var col='';
       try{ if(sv){ var c=getComputedStyle(sv).color; if(c) col='color:'+c; } }catch(e){}
-      return '<div class="k"><div class="l">'+k[1]+'</div><div class="v" style="'+col+'">'+txt+'</div><div class="h">'+k[2]+'</div></div>';
+      var hz=(window._qcSwHint&&window._qcSwHint(k[0]))||k[2]; /* v2240: eingestellte Schwelle */
+      return '<div class="k"><div class="l">'+k[1]+'</div><div class="v" style="'+col+'">'+txt+'</div><div class="h">'+hz+'</div></div>';
     }).join(''); }
     var ht=document.getElementById('qb-htier');
     if(ht){ if(s==null){ht.textContent='';} else { ht.textContent=tl(s); ht.style.color=th(s); } }

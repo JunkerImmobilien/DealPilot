@@ -741,8 +741,50 @@ window.QcHeuristik = (function () {
    * Felder, die gar nicht anwendbar sind, uebergibt der Aufrufer als
    * `null` — dann steht `wert: null` und ein Grund daneben.
    */
-  function kennzahlenAmpel(d, nichtAnwendbar) {
+  /* ══ v2240 · DIE PERSOENLICHEN MINDEST-SCHWELLEN ALS PARAMETER ══════
+     Marcels Entscheidung „Alle Ampeln": min_dscr, max_ltv und
+     min_cashflow_vor_st aus den Einstellungen steuern auch diese Ampel.
+     Der Kern liest sie NIE selbst (er laeuft im Backend ohne Browser) -
+     der Aufrufer uebergibt { dscrGruen, dscrGelb, ltvGruen, ltvRot,
+     cfGruen, cfGelb } (im Browser DealPilotSchwellen.get()).
+
+     Ohne Parameter bleibt alles wie bisher: die Ampel folgt der
+     Punkte-Skala aus KPI_SKALEN. Das ist der Weg des Backends, das kein
+     Investmentprofil kennt. Der SCORE bleibt in beiden Faellen
+     unberuehrt - die Schwellen faerben, sie rechnen nicht. */
+  function _schwellenOk(sw) {
+    if (!sw || typeof sw !== 'object') return null;
+    function n(x, rf) { var z = Number(x); return (x != null && x !== '' && isFinite(z)) ? z : rf; }
+    var g = n(sw.dscrGruen, 1.2); if (!(g > 0)) g = 1.2;
+    var y = n(sw.dscrGelb, Math.min(1.0, g)); if (y > g) y = g;
+    var lg = n(sw.ltvGruen, 90); if (!(lg > 0)) lg = 90;
+    var lr = n(sw.ltvRot, Math.max(100, lg)); if (lr < lg) lr = lg;
+    var cg = n(sw.cfGruen, n(sw.cfMin, 0));
+    var cy = n(sw.cfGelb, Math.min(0, cg)); if (cy > cg) cy = cg;
+    return { dscrGruen: g, dscrGelb: y, ltvGruen: lg, ltvRot: lr, cfGruen: cg, cfGelb: cy };
+  }
+  function _z2(n) { return n.toFixed(2).replace('.', ','); }
+  function _z1(n) { return String(Math.round(n * 10) / 10).replace('.', ','); }
+  function _eu(n) { return (n > 0 ? '+' : '') + Math.round(n).toLocaleString('de-DE') + ' €/Mon'; }
+  function _schwellenAmpel(id, v, sw) {
+    if (id === 'dscr') return {
+      ampel: v >= sw.dscrGruen ? 'gruen' : v >= sw.dscrGelb ? 'gelb' : 'rot',
+      skala: 'grün ab ' + _z2(sw.dscrGruen) + ' (deine Mindest-Schwelle)'
+        + (sw.dscrGelb < sw.dscrGruen ? ' · gelb ab ' + _z2(sw.dscrGelb) : '') + ' · darunter rot' };
+    if (id === 'ltv') return {
+      ampel: v <= sw.ltvGruen ? 'gruen' : v <= sw.ltvRot ? 'gelb' : 'rot',
+      skala: 'grün bis ' + _z1(sw.ltvGruen) + ' % (dein Maximal-LTV)'
+        + (sw.ltvRot > sw.ltvGruen ? ' · gelb bis ' + _z1(sw.ltvRot) + ' %' : '') + ' · darüber rot' };
+    if (id === 'cf') return {
+      ampel: v >= sw.cfGruen ? 'gruen' : v >= sw.cfGelb ? 'gelb' : 'rot',
+      skala: 'grün ab ' + _eu(sw.cfGruen) + ' (dein Mindest-Cashflow vor Steuer)'
+        + (sw.cfGelb < sw.cfGruen ? ' · gelb ab ' + _eu(sw.cfGelb) : '') + ' · darunter rot' };
+    return null;
+  }
+
+  function kennzahlenAmpel(d, nichtAnwendbar, schwellen) {
     var na = nichtAnwendbar || {};
+    var sw = _schwellenOk(schwellen);
     var quelle = { bmr: d.bmr, nmr: d.nmr, ekr: d.ekr, cf: d.cfMon,
                    dscr: d.dscr, ltv: d.ltv, bwk: d.bewirtPctNkm };
     return KPI_SKALEN.map(function (s) {
@@ -750,6 +792,9 @@ window.QcHeuristik = (function () {
       if (na[id]) return { id: id, was: s[1], wert: null, ampel: null,
                            skala: s[4], entfaellt: na[id] };
       var v = +quelle[id] || 0;
+      var sa = sw ? _schwellenAmpel(id, v, sw) : null;
+      if (sa) return { id: id, was: s[1], wert: _kpiText(s[2], v), ampel: sa.ampel,
+                       skala: sa.skala, am_schwelle: true };
       /* ══ v2143 · DIE BRUTTOMIETRENDITE MISST AM ZIEL DER LAGE ══════
          Nur sie: die Lageklasse ist in BRUTTOmietrendite definiert
          (lage-profil.js VORGABE), und die anderen Groessen haben mit

@@ -31,6 +31,8 @@
  *   //   noi_netto:  10800,  // Zähler Netto
  *   //   kd:        11200,   // Schuldendienst (Zins+Tilg+BSV)
  *   //   schwelle:  'warn'   // 'good' (≥1.2), 'warn' (1.0-1.2), 'bad' (<1.0)
+ *   //                       // v2240: Dscr.compute(input, schwellen) mit
+ *   //                       // { dscrGruen, dscrGelb } aus DealPilotSchwellen.get()
  *   // }
  *
  * Reine Compute-Funktion — keine DOM-Manipulation, keine Side-Effects.
@@ -45,10 +47,27 @@ window.Dscr = (function () {
    * - warn:  DSCR 1.0–1.2 (knapp, kleinerer Puffer)
    * - bad:   DSCR < 1.0 (kritisch, Mieten decken Kapitaldienst nicht)
    */
-  function classify(dscr) {
+  /* v2240 · DIE SCHWELLEN KOMMEN ALS PARAMETER.
+     Marcels Entscheidung „Alle Ampeln": der persoenliche Mindest-DSCR aus
+     den Einstellungen steuert jede Ampel. Ein Kern liest aber NIE
+     Einstellungen (er laeuft auch im Backend) - also bringt der Aufrufer
+     sie mit: schwellen = { dscrGruen, dscrGelb }, im Browser aus
+     DealPilotSchwellen.get(). Ohne Parameter gelten die alten Werte
+     1,2 / 1,0. */
+  var GRUEN_VORGABE = 1.2, GELB_VORGABE = 1.0;
+  function _grenzen(schwellen) {
+    var g = (schwellen && isFinite(schwellen.dscrGruen) && schwellen.dscrGruen > 0) ? +schwellen.dscrGruen : GRUEN_VORGABE;
+    var y = (schwellen && isFinite(schwellen.dscrGelb) && schwellen.dscrGelb > 0) ? +schwellen.dscrGelb : Math.min(GELB_VORGABE, g);
+    if (y > g) y = g;
+    return { gruen: g, gelb: y };
+  }
+  function _komma(n) { return n.toFixed(2).replace(/0$/, '').replace('.', ','); }
+
+  function classify(dscr, schwellen) {
     if (!isFinite(dscr) || dscr <= 0) return 'bad';
-    if (dscr >= 1.2) return 'good';
-    if (dscr >= 1.0) return 'warn';
+    var gr = _grenzen(schwellen);
+    if (dscr >= gr.gruen) return 'good';
+    if (dscr >= gr.gelb) return 'warn';
     return 'bad';
   }
 
@@ -74,7 +93,7 @@ window.Dscr = (function () {
    * @param {number} input.bwk_cf Nicht-umlagef. Bewirtschaftungskosten p.a.
    * @returns {{brutto, netto, noi_brutto, noi_netto, kd, schwelle, hat_bsv}}
    */
-  function compute(input) {
+  function compute(input, schwellen) {
     input = input || {};
     var nkm_j  = num(input.nkm_j);
     var ze_j   = num(input.ze_j);
@@ -104,7 +123,7 @@ window.Dscr = (function () {
       noi_brutto:  noi_brutto,
       noi_netto:   noi_netto,
       kd:          kd,
-      schwelle:    classify(brutto),
+      schwelle:    classify(brutto, schwellen),
       hat_bsv:     bsv_j > 0
     };
   }
@@ -112,18 +131,19 @@ window.Dscr = (function () {
   /**
    * Convenience: liefert label-Text für eine DSCR-Stufe.
    */
-  function label(dscr) {
-    var c = classify(dscr);
-    if (c === 'good') return '✓ Standard (≥1,2)';
-    if (c === 'warn') return '⚠ Ausreichend (1,0–1,2)';
-    return '✗ Kritisch (<1,0)';
+  function label(dscr, schwellen) {
+    var c = classify(dscr, schwellen);
+    var gr = _grenzen(schwellen), g = _komma(gr.gruen), y = _komma(gr.gelb);
+    if (c === 'good') return '✓ Standard (≥' + g + ')';
+    if (c === 'warn') return '⚠ Ausreichend (' + y + '–' + g + ')';
+    return '✗ Kritisch (<' + y + ')';
   }
 
   /**
    * Convenience: bank-item CSS-Class für DSCR.
    */
-  function bankItemCls(dscr) {
-    var c = classify(dscr);
+  function bankItemCls(dscr, schwellen) {
+    var c = classify(dscr, schwellen);
     if (c === 'good') return 'ok';
     if (c === 'warn') return 'warn';
     return 'bad';
@@ -132,8 +152,8 @@ window.Dscr = (function () {
   /**
    * Convenience: kpi-val color CSS-Class.
    */
-  function kpiCls(dscr) {
-    var c = classify(dscr);
+  function kpiCls(dscr, schwellen) {
+    var c = classify(dscr, schwellen);
     if (c === 'good') return 'dscr-good';
     if (c === 'warn') return 'dscr-warn';
     return 'dscr-bad';

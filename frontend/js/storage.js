@@ -1367,6 +1367,10 @@ async function renderSaved(opts) {
   function _dscrClass(d) {
     if (d == null || isNaN(d)) return 'neutral';
     var v = parseFloat(d);
+    /* v2240 · Schwellen aus den Einstellungen (DealPilotSchwellen), Einstufung im Kern */
+    if (window.Dscr && Dscr.classify) {
+      return Dscr.classify(v, window.DealPilotSchwellen ? DealPilotSchwellen.get() : null);
+    }
     if (v >= 1.2) return 'good';
     if (v >= 1.0) return 'warn';
     return 'bad';
@@ -1501,10 +1505,11 @@ async function renderSaved(opts) {
       var dscrCls = _dscrClass(opts.dscr);
       // DSCR-Marker: 0 → 0%, 1.0 → 33%, 1.5 → 66%, 2+ → 100%
       var dscrMarkerPct = Math.min(100, Math.max(0, (Math.min(dscrVal, 2.0) / 2.0) * 100));
-      // LTV-Klasse: <85 grün, 85-100 gold, >100 rot — DealPilot-Konvention (V21)
+      // v2240 · LTV-Klasse nach den Einstellungen: gruen bis max_ltv (Vorgabe 90), gelb bis 100, darueber rot
+      var _swL = window.DealPilotSchwellen ? DealPilotSchwellen.get() : { ltvGruen: 90, ltvRot: 100 };
       var ltvCls = (ltvVal == null) ? 'neutral'
-                 : ltvVal < 85 ? 'good'
-                 : ltvVal <= 100 ? 'warn'
+                 : ltvVal <= _swL.ltvGruen ? 'good'
+                 : ltvVal <= _swL.ltvRot ? 'warn'
                  : 'bad';
       // LTV-Marker: 0 → 0%, 100 → 100%, > 100 → 100% (gekappt)
       var ltvMarkerPct = ltvVal == null ? 0 : Math.min(100, Math.max(0, ltvVal));
@@ -4388,7 +4393,7 @@ window._toggleSbcDscr = function(card) {
   if (scaleEl) {
     scaleEl.innerHTML = newMode === 'dscr'
       ? '<span>0</span><span>1</span><span>1,5</span><span>2+</span>'
-      : '<span>0%</span><span>50%</span><span>85%</span><span>100%+</span>';
+      : '<span>0%</span><span>50%</span><span>' + (window.DealPilotSchwellen ? DealPilotSchwellen.fmtPct(DealPilotSchwellen.get().ltvGruen) : '90') + '%</span><span>100%+</span>';   /* v2240: die eingestellte LTV-Grenze */
   }
 };
 
