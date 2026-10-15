@@ -829,7 +829,7 @@
   function _teile() {
     var gi = _gesamtinvestition();
     var kp = _zahl('kp'), san = _zahl('san'), moebl = _zahl('moebl');
-    var nk = gi.sicher ? Math.max(0, gi.wert - kp - san - moebl) : 0;
+    var nk = gi.sicher ? Math.max(0, gi.wert - kp - san) : 0;   /* v2261: Inventar steckt im Kaufpreis */
     var d = _darlehenSumme();
     var ek = _zahl('ek');
     return { gi: gi, kp: kp, nk: nk, san: san, moebl: moebl, ek: ek, d: d,
@@ -860,7 +860,7 @@
     if (!t.gi.sicher || t.gi.wert <= 0) { h.textContent = ''; return; }
     var weg = 'Kaufpreis ' + _eur(t.kp) + ' + Nebenkosten ' + _eur(t.nk)
       + (t.san ? ' + Sanierung ' + _eur(t.san) : '')
-      + (t.moebl ? ' + Möblierung ' + _eur(t.moebl) : '')
+      /* v2261: Inventar steckt im Kaufpreis - keine eigene Zeile mehr */
       + ' − Eigenkapital ' + _eur(t.ek)
       + (t.d.d2 ? ' − Darlehen II ' + _eur(t.d.d2) : '')
       + ' = ' + _eur(t.soll);

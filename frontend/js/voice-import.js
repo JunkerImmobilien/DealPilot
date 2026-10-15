@@ -3615,9 +3615,11 @@
     if (mak != null) { w.makler_p = String(mak).replace('.', ','); teile.push(w.makler_p + ' % Makler'); }
     /* notar_grundbuch ist EIN Satz fuer beides. Aufgeteilt wird nach der
        Vorbelegung des Formulars: 0,5 % Grundbuchamt, der Rest Notar. */
-    var ng = _profilZahl('notar_grundbuch');
+    /* v2261: getrennte Saetze aus den Einstellungen (notar_pct + grundbuch_pct) */
+    var _np = _profilZahl('notar_pct'), _gp = _profilZahl('grundbuch_pct');
+    var ng = (_np != null || _gp != null) ? ((_np || 0) + (_gp || 0)) : _profilZahl('notar_grundbuch');
     if (ng != null) {
-      var gba = Math.min(0.5, ng), notar = Math.round((ng - gba) * 100) / 100;
+      var gba = (_gp != null) ? _gp : Math.min(0.5, ng), notar = Math.round((ng - gba) * 100) / 100;
       w.gba_p = String(gba).replace('.', ',');
       w.notar_p = String(notar).replace('.', ',');
       teile.push(w.notar_p + ' % Notar', w.gba_p + ' % Grundbuch');

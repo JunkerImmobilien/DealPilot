@@ -36,6 +36,13 @@ window.DealPilotInvestmentProfile = (function() {
   function get(key) {
     var p = load();
     if (p[key] !== undefined && p[key] !== null && p[key] !== '') return p[key];
+    /* v2261: wer frueher „Notar & Grundbuch" gesetzt hat, behaelt seinen Ansatz -
+       Notar = alter Wert minus Grundbuch. */
+    if (key === 'notar_pct' && p.notar_grundbuch != null && p.notar_grundbuch !== '') {
+      var gb = parseFloat(get('grundbuch_pct')); if (!isFinite(gb)) gb = 0.5;
+      var alt = parseFloat(p.notar_grundbuch);
+      if (isFinite(alt)) return Math.max(0, Math.round((alt - gb) * 100) / 100);
+    }
     var d = defaults();
     return d[key];
   }
@@ -104,9 +111,9 @@ window.DealPilotInvestmentProfile = (function() {
       setIfEmpty('ek', Math.round(kp * merged.ek_quote_default / 100));
     }
     setIfEmpty('grenzsteuersatz', merged.grenzsteuersatz);
-    // Notar/Grundbuch + Makler nur falls Inputs existieren (Investition-Tab)
-    setIfEmpty('notar_pct',  merged.notar_grundbuch);
-    setIfEmpty('makler_pct', merged.maklerkosten);
+    /* v2261: hier stand setIfEmpty('notar_pct'/'makler_pct') - Felder, die es nicht
+       gibt (sie heissen notar_p/makler_p). Die Nebenkosten setzt setDefaults()
+       in main.js aus diesem Profil, fuer jedes neue Objekt. */
     /* v816-zins: effektiver Zins (eigener Wert ODER indikativer Pfandbrief-Satz der Zinsbindung+Stufe)
        in Haupt-Zinsfeld (d1z) UND Quick-Boarding-Zinsfeld (qc_zins) schreiben. setIfEmpty -> User/eigener Zins behaelt Vorrang. */
     try {
@@ -318,9 +325,17 @@ window.DealPilotInvestmentProfile = (function() {
       '<h3 class="ip-section">Standort & Nebenkosten</h3>',
       '<div class="ip-grid">',
         blEl(),
-        field('ip_notar_grundbuch', 'Notar & Grundbuch', p.notar_grundbuch, '%', 'pauschal vom Kaufpreis'),
-        field('ip_maklerkosten',    'Maklergebühr',      p.maklerkosten,    '%', 'inkl. MwSt'),
+        field('ip_notar_pct',       'Notar',             get('notar_pct'),       '%', 'vom Kaufpreis'),
+        field('ip_grundbuch_pct',   'Grundbuchamt',      get('grundbuch_pct'),   '%', 'vom Kaufpreis'),
+        field('ip_maklerkosten',    'Maklergebühr',      get('maklerkosten'),    '%', 'inkl. MwSt — 0, wenn ohne Makler'),
+        field('ip_sonstige_nk_pct', 'Sonstige Kosten',   get('sonstige_nk_pct'), '%', 'Gutachten, Anfahrt, Gebühren'),
       '</div>',
+      /* v2261 · Grunderwerbsteuer automatisch nach Bundesland */
+      '<label class="ip-check" style="display:flex;gap:9px;align-items:flex-start;margin:6px 0 16px;cursor:pointer;font-size:13px;line-height:1.45">'
+        + '<input type="checkbox" id="ip_grest_auto" style="margin-top:3px"' + (get('grest_auto') === false ? '' : ' checked') + '>'
+        + '<span><b>Grunderwerbsteuer automatisch nach Bundesland</b><br><span class="hint" style="color:var(--muted)">'
+        + 'DealPilot erkennt das Bundesland an der Postleitzahl des Objekts und setzt den passenden Satz. '
+        + 'Ohne Haken gilt das Bundesland oben — für jedes Objekt, bis du es dort änderst.</span></span></label>',
 
       /* v2237 · Abschlag auf Angebotspreise: leer = recherchierter Marktdurchschnitt */
       '<h3 class="ip-section">Marktbewertung</h3>',
@@ -398,7 +413,10 @@ window.DealPilotInvestmentProfile = (function() {
       min_cashflow_vor_st:    v('ip_min_cashflow_vor_st'),
       max_ltv:                v('ip_max_ltv'),
       grenzsteuersatz:        v('ip_grenzsteuersatz'),
-      notar_grundbuch:        v('ip_notar_grundbuch'),
+      notar_pct:              v('ip_notar_pct'),          /* v2261 */
+      grundbuch_pct:          v('ip_grundbuch_pct'),
+      sonstige_nk_pct:        v('ip_sonstige_nk_pct'),
+      grest_auto:             (function(){ var c = document.getElementById('ip_grest_auto'); return c ? !!c.checked : null; })(),
       maklerkosten:           v('ip_maklerkosten'),
       angebot_abschlag_pct:   v('ip_angebot_abschlag_pct'),   /* v2237 · leer -> Marktdurchschnitt */
       bundesland:             s('ip_bundesland'),

@@ -43,7 +43,7 @@
     var d1 = num('d1'), d2 = num('d2');
     var d_total = d1 + d2;
     var nebenkosten = (kp * (num('makler_p') + num('notar_p') + num('gba_p') + num('gest_p') + num('ji_p')) / 100);
-    var gi = kp + nebenkosten + num('san') + num('moebl');
+    var gi = kp + nebenkosten + num('san');   /* v2261: Inventar ist Teil des Kaufpreises */
     var bmy = kp > 0 ? (nkm * 12 / kp) * 100 : 0;
     var ek = gi - d_total;
     var ltv = gi > 0 ? (d_total / gi) * 100 : 0;

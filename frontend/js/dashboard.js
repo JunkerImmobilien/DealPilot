@@ -534,7 +534,7 @@
     }
     var sum=function(f){return arr.reduce(function(s,o){return s+(f(o)||0);},0);};
     var kpSum=sum(_kpEuro);
-    var giSum=sum(function(o){var g=num(o._kpis_gi); if(g>0)return g; return _kpEuro(o)+_nkEuro(o)+num(o.san)+num(o.moebl);});
+    var giSum=sum(function(o){var g=num(o._kpis_gi); if(g>0)return g; return _kpEuro(o)+_nkEuro(o)+num(o.san); /* v2261: Inventar ist Teil des Kaufpreises */});
     var mieteJ=sum(function(o){var m=num(o._kpis_miete_j); if(m>0)return m; return (num(o.nkm)+num(o.ze))*12;});
     var rest=sum(_restschuldOf);
     var cfNsJ=sum(function(o){return num(o._kpis_cf_ns);});

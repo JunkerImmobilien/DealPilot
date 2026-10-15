@@ -251,9 +251,17 @@
       if (!info) return;
       // Nur überschreiben wenn User noch nicht manuell editiert hat
       if (gestPctInput.dataset.userEdited === '1') return;
+      /* v2261 · Haken „Grunderwerbsteuer automatisch nach Bundesland" in den
+         Einstellungen. Aus: der Satz des Profil-Bundeslands bleibt stehen. */
+      try {
+        var IPg = window.DealPilotInvestmentProfile;
+        if (IPg && typeof IPg.get === 'function' && IPg.get('grest_auto') === false) return;
+      } catch (e) {}
       const cur = parseFloat(String(gestPctInput.value).replace(',', '.'));
-      // Nur überschreiben wenn aktueller Wert == Default oder leer
-      if (isNaN(cur) || Math.abs(cur - 6.5) < 0.01 || cur === 0) {
+      /* v2261: „Default" ist jetzt der Satz des Profil-Bundeslands, nicht fest 6,5 */
+      var _defBl = 6.5;
+      try { var _bl = window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.get('bundesland'); if (_bl && GREST_RATES[_bl] != null) _defBl = GREST_RATES[_bl]; } catch (e) {}
+      if (isNaN(cur) || Math.abs(cur - 6.5) < 0.01 || Math.abs(cur - _defBl) < 0.01 || cur === 0) {
         gestPctInput.value = info.rate.toFixed(2);
         // Trigger Sync auf Euro-Feld
         if (typeof window.syncCostPct === 'function') {

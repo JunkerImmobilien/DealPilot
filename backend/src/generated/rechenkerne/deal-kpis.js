@@ -89,7 +89,11 @@ window.DealKpis = (function() {
     var grenz  = (+i.grenz || 0) / 100;
 
     // ═════ Investition ═════
-    var gi = kp + nk + san + moebl;
+    /* v2261 · Marcel am 15.10.2026: „Inventar ist nicht zusaetzlich." Es ist Teil des
+       Kaufpreises (separates Wirtschaftsgut darin) - die Gesamtinvestition ist
+       Kaufpreis + Nebenkosten + Sanierung. Bis hier kam `moebl` noch einmal oben
+       drauf; BMF-Rechner und Inventar-Box zogen es dagegen vom Kaufpreis ab. */
+    var gi = kp + nk + san;
 
     // ═════ Mietaufstellung ═════
     var wm_m  = nkm + ze + uf;          // Warmmiete für UI-Anzeige

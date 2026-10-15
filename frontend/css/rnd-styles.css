@@ -1275,7 +1275,9 @@
 .rnd-wiz-modal {
   max-width: 1143px !important;
   width: min(1143px, calc(100vw - 48px)) !important;
-  max-height: 915px !important;
+  /* v2261: das Kleinere aus 915 px und Fensterhoehe - fest 915 px schob unter ~995 px
+     Fensterhoehe die Fusszeile („Weiter", „Anfrage senden") aus dem Bild. */
+  max-height: min(915px, calc(100vh - 48px)) !important;
   border-radius: 12px !important;
   /* v1513b: --surface ist im Hellprofil reines Weiss - hier soll die
      Cremeflaeche des BMF-Rechners stehen, also der Wert direkt. */

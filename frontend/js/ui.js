@@ -2908,6 +2908,8 @@ function syncKuecheToMoebl() {
   var moeblTax = document.getElementById('moebl_tax_active');
   if (moeblTax && !moeblTax.checked && val && parseFloat(val.replace(',', '.')) > 0) {
     moeblTax.checked = true;
+    /* v2261: auch das sichtbare, gespeicherte Kästchen - sonst ist der Haken nach dem Laden weg */
+    try { var _invCb2 = document.getElementById('inv_tax_active'); if (_invCb2) _invCb2.checked = true; } catch (e) {}
   }
 }
 window.toggleKuecheKp = toggleKuecheKp;

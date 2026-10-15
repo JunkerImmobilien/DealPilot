@@ -1130,9 +1130,18 @@ function _computeAutoForYear(yearIdx, year) {
 
   // V32: User-Toggles aus Investition-Tab
   var sanActive = (document.getElementById('san_tax_active') || {}).checked !== false;
-  var moeblActive = (document.getElementById('moebl_tax_active') || {}).checked !== false;
+  /* v2261 · Der Haken „In Steuer-Werbungskosten übernehmen" der Inventar-Box
+     (#inv_tax_active) wirkte nicht dauerhaft: gelesen wurde #moebl_tax_active,
+     ein VERSTECKTES Textfeld. storage.js sichert davon den Wert (leer), nicht
+     den Haken - nach dem Laden war das Inventar immer „nicht übernehmen".
+     Das sichtbare Kästchen wird gespeichert und ist die Wahrheit. */
+  var _invCb = document.getElementById('inv_tax_active');
+  var moeblActive = _invCb
+    ? (!!_invCb.checked || (document.getElementById('moebl_tax_active') || {}).checked === true)
+    : ((document.getElementById('moebl_tax_active') || {}).checked !== false);
   var sanYearsChoice = (document.getElementById('san_tax_years') || {}).value || 'auto';
-  var moeblYearsChoice = parseInt((document.getElementById('moebl_tax_years') || {}).value || '10');
+  var moeblYearsChoice = parseInt(((document.getElementById('inv_tax_years') || {}).value)
+    || (document.getElementById('moebl_tax_years') || {}).value || '10');   /* v2261: sichtbare Auswahl zuerst */
 
   // SANIERUNG
   // V227: Methode-aware AfA-Satz-Bestimmung für Sanierungs-Laufzeit.

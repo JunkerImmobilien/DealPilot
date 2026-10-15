@@ -1050,8 +1050,16 @@ window.DealPilotConfig = (function() {
       // Bundesland (für Grunderwerbsteuer-Default)
       bundesland:             'NW',   // ISO-Kürzel
       // Nebenkosten-Pauschalen
-      notar_grundbuch:        2.20,   /* % — war 2,0, nie wirksam */
+      notar_grundbuch:        2.20,   /* % — v2261: nur noch Altbestand (Notar + Grundbuch zusammen) */
       maklerkosten:           3.57,   // %
+      /* v2261 · Marcel 15.10.2026: „die Werte immer aus den Einstellungen und dem
+         Set ziehen". Vier getrennte Saetze statt eines kombinierten - das Objekt
+         fuehrt sie ohnehin getrennt (notar_p, gba_p, makler_p, ji_p). Notar 1,70 +
+         Grundbuch 0,50 = die bisherigen 2,20 „Notar & Grundbuch". */
+      notar_pct:              1.70,   // % Notar
+      grundbuch_pct:          0.50,   // % Grundbuchamt
+      sonstige_nk_pct:        1.50,   // % Sonstige (Gutachten, Anfahrt, Gebuehren)
+      grest_auto:             true,   // Grunderwerbsteuer nach Bundesland aus der Objektadresse
       // V63.90: KI-Analyse-Standardparameter (vorher nur als Selects im KI-Tab,
       // jetzt persönlicher Default — nutzt der KI-Prompt-Builder via hidden inputs)
       ai_strat:  'Buy & Hold (Langfristig halten)',
