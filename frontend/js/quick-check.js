@@ -1899,7 +1899,22 @@
 
     // Darlehen aus EK + KP
     if (snapshot.ek && snapshot.kp) {
-      var darlehen = Math.max(0, snapshot.kp * 1.105 - snapshot.ek);
+      /* v2272 · Hier stand kp x 1,105 - fest 10,5 % Nebenkosten. Seit v2261
+         kommen die Saetze aus den Einstellungen (13,8 % mit Makler); Darlehen +
+         Eigenkapital deckten die Gesamtinvestition dann nicht (Videoreihe Modul 02:
+         198.900 gegen 204.786 EUR). Jetzt die Saetze des neuen Objekts, die
+         Grunderwerbsteuer nach PLZ, wenn die Automatik an ist. */
+      var _pz = function (id) { var e = document.getElementById(id); return e ? (parseDe(e.value) || 0) : 0; };
+      var _gest = _pz('gest_p');
+      try {
+        var _IP = window.DealPilotInvestmentProfile, _G = window.DealPilotGrest;
+        var _plz = String(snapshot.plz || ((document.getElementById('qc_plz') || {}).value) || '').trim();
+        if (_G && _plz && !(_IP && _IP.get && _IP.get('grest_auto') === false)) {
+          var _r = _G.forPlz(_plz); if (_r && isFinite(_r.rate)) _gest = Number(_r.rate);
+        }
+      } catch (e) {}
+      var _nkP = _pz('makler_p') + _pz('notar_p') + _pz('gba_p') + _pz('ji_p') + _gest;
+      var darlehen = Math.max(0, snapshot.kp * (1 + _nkP / 100) - snapshot.ek);
       set('d1', String(Math.round(darlehen)));
     }
 

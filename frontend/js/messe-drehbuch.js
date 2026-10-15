@@ -43,7 +43,7 @@
   var STUDIO = (function () { try { return new URLSearchParams(location.search).has('studio') && window.parent !== window; } catch (e) { return false; } })();
   /* v2235d · Marcel: „den Pilot musst du ausblenden!" - im Studio ab dem
      ersten Laden, nicht erst ab start() (vorher stand er gemessen links unten) */
-  if (STUDIO) { try { document.documentElement.classList.add('dpm-studio', 'dpm-laeuft'); var _ps = document.createElement('style'); _ps.textContent = 'html.dpm-studio #dp-pilot,html.dpm-studio #dp-tower,html.dpm-studio .dp-pilot-fab{display:none!important}html.dpm-studio .sb-user-email,html.dpm-studio .settings-modal .ms-foot .ml{visibility:hidden!important}'; document.head.appendChild(_ps); } catch (e) {} }
+  if (STUDIO) { try { document.documentElement.classList.add('dpm-studio', 'dpm-laeuft'); var _ps = document.createElement('style'); _ps.textContent = 'html.dpm-studio #dp-pilot,html.dpm-studio #dp-tower,html.dpm-studio .dp-pilot-fab{display:none!important}html.dpm-studio .sb-user-email,html.dpm-studio .sb-user-name,html.dpm-studio .sb-user-avatar,html.dpm-studio .settings-modal .ms-foot .ml,html.dpm-studio .settings-modal .ms-foot .nm,html.dpm-studio .settings-modal .ms-foot .av{visibility:hidden!important}'; document.head.appendChild(_ps); } catch (e) {} }
   function anStudio(m) { try { m.source = 'dp-messe-studio'; window.parent.postMessage(m, location.origin); } catch (e) {} }
   var TEMPO = (function () { try { var t = parseFloat(new URLSearchParams(location.search).get('tempo')); return (t > 0.3 && t < 4) ? t : 1.4; } catch (e) { return 1.4; } })();
   function warte(ms) { if (ms >= 600) ms = Math.round(ms * TEMPO); return new Promise(function (r, x) { var l = lauf; setTimeout(function () { l === lauf ? r() : x('stopp'); }, ms); }); }
@@ -106,7 +106,8 @@
       'html.dpm-laeuft #dp-pilot,html.dpm-laeuft #dp-tower{display:none!important}',
       /* v2266a · keine Kontaktdaten im Bild: die Konto-Adresse unten in der
          Seitenleiste stand in allen Reihen-Videos bis 11 (gemessen am Bild) */
-      'html.dpm-laeuft .sb-user-email,html.dpm-laeuft .settings-modal .ms-foot .ml{visibility:hidden!important}',
+      /* v2270 · auch der Name (Seitenleiste und Fuss der Einstellungen) */
+      'html.dpm-laeuft .sb-user-email,html.dpm-laeuft .sb-user-name,html.dpm-laeuft .sb-user-avatar,html.dpm-laeuft .settings-modal .ms-foot .ml,html.dpm-laeuft .settings-modal .ms-foot .nm,html.dpm-laeuft .settings-modal .ms-foot .av{visibility:hidden!important}',
       '@media (max-width:640px){#dpm-zeile .t{font-size:18px}#dpm-karte h1{font-size:40px}#dpm-karte p{font-size:16px}}'
     ].join('\n');
     document.head.appendChild(st);
@@ -1369,10 +1370,13 @@
   var RH_BUSTER = 'v2268';   /* v2268: BMF-Mitschnitt neu (1.233.000) */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
-  var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel/i;
+  var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage/i;
   /* v2263 · dazu Netzwerk-Einreichung, Partner-Anfrage, Ämter-Anfragen (Modul 13) und
      der Portfolio-Spiegel: eine gewonnene KOPIE (Modul 14) ginge sonst als zweites
      Objekt in die Zahlen des Telegram-Bots (gemessen: 12 statt 11 Objekte). */
+  /* v2271 · dazu der Nutzungszaehler: das Investment-PDF in Ueberblick 2 zaehlte je
+     Lauf einen PDF-Export im Konto (usage_counters pdf_export, gemessen 11 -> 12).
+     Gesperrt rechnet der Export weiter (pdf.js warnt nur). */
   window.DPM_REIHE = { angelegt: [], gesperrt: [], gespielt: [], geloescht: [], abrufe: [], fertig: null };
   var _rh = null, _rhNachlauf = 0, _rhToene = [], _rhGum = null;
   function rhLaden() {
@@ -3256,6 +3260,17 @@
       async function (s) {   /* 5 · Finanzierung */
         reiter('s3'); await warte(1000);
         await warteAuf(function () { return /\d/.test(r6Id('mrpf-top-rate-10')); }, 5000);
+        /* v2272 · Kapitaldeckung: deckt das (aeltere) Darlehen die Gesamtinvestition
+           nicht, zeigt die App „Es fehlen …“ - der Knopf „Darlehen anpassen“
+           gleicht aus. Gemessen Westerfeld-Kopie: 592.415 gegen 620.047 EUR. */
+        var _kdBtn = q('#kd-btn-d1');
+        if (_kdBtn && _kdBtn.offsetParent && _kdBtn.style.display !== 'none') {
+          var _kdTxt = ((q('#kd-btn-d1').closest('div') || {}).textContent || '').match(/Es fehlen[^.]*\./);
+          await zeige(function () { return q('#kd-btn-d1'); }, 8);
+          await b2oZeile(s, 'Kapitaldeckung', (_kdTxt ? _kdTxt[0] + ' ' : '') + 'Eigenkapital und Darlehen müssen die Gesamtinvestition decken — ein Klick passt das Darlehen an.');
+          try { q('#kd-btn-d1').click(); } catch (e) {}
+          await warte(900);
+        }
         await zeigeGruppe(feldVon('ek'), feldVon('d1t'), 8);
         await b2oZeile(s, 'Finanzierung', 'Eigenkapital ' + eur(zahl('ek')) + ', Darlehen <b>' + eur(zahl('d1')) + '</b> zu ' + r6Pz(wert('d1z')) + ' % — der Marktzins für 10 Jahre liegt bei ' + (r6Id('mrpf-top-rate-10') || '–') + '.');
         await zeige(function () { return q('#d1_rate') && q('#d1_rate').closest('.f'); }, 10);
