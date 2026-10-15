@@ -38768,6 +38768,40 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Nachweis:** Sicherung `haupt-20261015-1348` (14 MB, 73 Tab.) / `mb-20261015-1348` (25 MB, 32 Tab.). Backends neu gebaut, `_monatsFalle` und `voll: 100` im Image, Gold-Audit RC=0, `/auth/me` 401, `/market-rates/pfandbrief` liefert `voll` 4,51 / 4,79 %. Staging: `_monatsFalle` 7 Fälle richtig (auch „Miete 900 im Monat, Hausgeld 1.400“ bleibt), `_deZahl` 10 Fälle, Historie liefert `vergleichswert_eur`/`vergleichsfaktor_amtlich`.
 - **Rest:** Vergleichswert aus Angebotspreisen trägt im Bericht die Notiz „Amtliche Grundlage aus der Kaufpreissammlung“ – fachlich prüfen (Marcel). Videoreihe 06–10 läuft auf Staging.
 
+### v2257–v2259a · Videoreihe Module 06–10 aufgenommen (10 geteilt in 10a/10b); sechs kleine Fehler behoben, sieben fachliche gemeldet (15.10.2026, Staging)
+
+- **Was:**
+  - Sechs Drehbücher in `messe-drehbuch.js`: `reihe-investition` (06), `reihe-miete` (07), `reihe-finanzierung` (08), `reihe-bewirtschaftung` (09), `reihe-steuer` (10a), `reihe-bmf` (10b); Studio-Tabelle `REIHE` 06–10b. Hilfsfunktionen mit Präfix `r6`.
+  - 06–09: je ein „Neues Objekt“ (Sachsenstraße 18, Herford), am Ende gelöscht. 10a/10b auf Marcels Wunsch am MFH **Ravensberger Weg 38** (8 WE, Bj 1978) — als **Kopie** (`r6KopieStart`, wie Duplizieren), das echte Objekt wird nie geladen.
+  - BMF-Kaufpreisaufteilung als Mitschnitt (`DPM_REIHE_DATEN.bmf`, Kopie Ravensberger Weg, Sanierung 87.000 €). Im Lauf gesperrt: `/bmf/` (sonst gespielt), `/rnd-request`, `/deal-action/submit`, `/checkout`, alles mit „gutachten“. Der Knopf „Anfrage senden“ wird gezeigt, nie geklickt.
+  - Zeilen, während derer getippt oder geklickt wird, stehen ihre Lesezeit (`r6Beginn`/`r6Ende`, gemessen standen sie 3 s).
+- **Behoben (klein):**
+  - `storage.js`: „Neues Objekt“ leerte die Sanierungs-Richtwerte (Haken „Bäder“ = 0 €), die Staffel der Mietentwicklung und drei Auswahllisten.
+  - `investment-profile.js`: Eigenkapital (10 %) und Mietausfall (1 %) aus den Standardwerten kamen bei neuen Objekten nie an (KP/Miete beim Anlegen leer). Jetzt bei echter Eingabe in leere Felder.
+  - `bmf-modal.js` (v2257f): Die Euro-Felder wurden nur bei Wert > 0 gesetzt — das Fenster trug die Nebenkosten des **vorigen** Objekts (gemessen: 1.346.260 statt 1.327.000 € AK beim Ravensberger Weg, an die Arbeitshilfe geschickt).
+  - `deal-action.js`: der Miteigentumsanteil landete im RND-Wizard als „Einheit / Bezeichnung“.
+  - `rnd-wizard.js`: „41.5 %“, „1.92 %“, „+-111 €“, „über 32.8 Jahre“.
+  - `bmf-modal(-v292).js`: Hinweis nannte „Konservativ“ als BMF-Wert (ist „Amtlich“), Fußzeile Schritt 3. `grest-plz-lookup.js`: Dezimalkomma.
+- **Gemeldet, nicht geändert (fachlich/Steuer):**
+  1. Inventar wird in der Gesamtinvestition **zusätzlich** gezählt (`calc.js:898`), im BMF-Rechner und in der Inventar-Box aber vom Kaufpreis **abgezogen** („Immobilien-KP = KP − Inventar“).
+  2. `ji_e` (Sonstige 2.700 €) geht doppelt in den BMF-Kaufpreis: einmal als Nebenkosten, einmal über `ak_sonst` (`bmf-modal.js` `nkWeitere`): 201.960 statt 199.260 €.
+  3. Drei verschiedene 15-%-Grenzen: Reiter Investition, BMF-Schritt 3 (Pipeline) und BMF-Schritt 4 (`updateG15`, bmf-modal.js ~1418: nimmt die Sanierung als Nebenkosten und einen fremden Gebäudeanteil; Ravensberger: 182.290 € statt 148.160 €; vergleicht brutto mit netto). Reiter Investition und Steuer-Banner ziehen nach der Übernahme **richtig** nach.
+  4. Notarklausel Pane 4: Überschrift „(Konservativ — FA-freundlich)“ bei jeder Variante; „optimiert“/„amtlich“ haben keinen eigenen Text (`_renderKlauselText`).
+  5. Zwei „amtliche“ Zahlen im selben Fenster: Bodenabschlag-Reiter aus `/bmf/aufteilung` (74,82 %, fiktives Bj 1979), Schritt 3 aus der Pipeline (74,57 %).
+  6. Jacoby-Schritt 1 heißt „Kaufpreis ohne Nebenkosten“, der Wert enthält sie.
+  7. Makler 3,57 % aus den Standardwerten kommt nie ins Objekt; „Notar/Grundbuch 2,2 %“ steht im Objekt als Notar, daneben fest 0,5 % Grundbuch.
+  8. `css/rnd-styles.css:1278` `max-height: 915px !important` hebt die 92vh auf — unter ~995 px Fensterhöhe sind „Weiter“/„Anfrage senden“ des RND-Rechners nicht erreichbar (Datei gehört gerade der Hauptsitzung, v2258; im Drehbuch nur für den Lauf begrenzt).
+  9. „In Steuer-Werbungskosten übernehmen“ beim Inventar ist ohne Wirkung (`tax.js` liest `moebl_tax_active`, immer wahr).
+- **Marcels Rückmeldung „Schritt 4 und 5 sieht man die Karten nicht“ (10b) — Ursache:** in v2257e lag der Kegel in Kapitel 4 auf einer **ausgeblendeten** älteren Tabelle (17 s unsichtbar); nach dem ersten Fix schob `scrollIntoView` Spaltenkopf und Kartenkopf **unter die feste Kopfzeile** des BMF-Fensters. Jetzt rollt das Drehbuch den Rollbereich selbst (Ziel 14 px unter seiner Oberkante); in der Aufnahme sind Tabelle und Karten vollständig.
+- **Commit:** `6a25b6f2` (v2257), `4834af00`, `26a252f2`, `0dc3c8bc`, `23e88898`, `0506db3b`, `68448c9d`, `67c1522b` (v2257f), `7a58dff5`, `fb619ed4`, `3be539dc`, `00393001`, `144057f8` (v2259), `c436bd1c` (v2259a)
+- **Nachweis:**
+  - Prüfläufe im Studio mit Protokoll (300 ms) für alle sechs Module, Kegel je Zeile im Bild (Lücken nur beim Schließen von Fenstern); 10a nach v2258 erneut.
+  - Gesperrt 0×; gespielt nur `/bmf/aufteilung`, `/bmf/pipeline`, Verlauf. Kein `/ai/`, kein Marktbericht, keine Anfrage.
+  - DB vorher/nachher: Objekte 39/39, `tax_records` 583/583, Waisen 0, `ai_credits_log` 1662/1662, Pässe 148/148, `mb.market_reports` max 213/213, `api_keys` 7/7. Ravensberger Weg 38 und Bismarckstr. 27 (kurz kopiert, verworfen): `updated_at`, md5(data) und Steuerzeilen-Hash unverändert. Sicherung beider Zeilen unter `/root/backups/*-vor-reihe10-20261015.json`.
+- **Videos** (`Dateien/Messe/Videos/Videoreihe/`): 06 3:52 (7,4 MB), 07 3:31 (6,8 MB), 08 3:48 (9,5 MB), 09 3:29 (8,0 MB), 10a 3:49 (8,9 MB), 10b 4:28 (11,9 MB). Je Probe 25 s, Bildraster über das ganze Video angesehen.
+- **Kosten:** keine. BMF einmal echt gerechnet (LibreOffice, kein Kontingent).
+- **Rest:** die neun Meldungen oben; Ergänzungsvideo Modul 04 (optionale Felder Stufe 3) geplant in `Videoreihe.md`; im RND-Rechner (Schritt 8) stehen Marcels Kontaktdaten aus „Kontakt & Logo“ ~1 s im Bild.
+
 ### v2255–v2255h · Videoreihe Module 03, 04, 05 aufgenommen; Verkehrswert nur aus der Wertermittlung (15.10.2026, Staging)
 
 - **Was:**
