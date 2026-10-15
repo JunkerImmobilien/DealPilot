@@ -3507,10 +3507,15 @@ async function exportPdf(out) {
 
   // ---------- Stammdaten ----------
   sectionTitle('Objekt-Stammdaten', 60);
+  /* v2273 · hier standen die Rohschlüssel („mfh“, „renovierungsbeduerftig“) - gemessen Bericht 205.
+     Die Beschriftung kommt aus den Auswahlfeldern dieses Dokuments (#cond, #quality, #modern),
+     die Objektart aus einer kleinen Liste; Unbekanntes bleibt wie es ist. */
+  const _optText = (id, v) => { try { const o = [].find.call(document.querySelectorAll('#' + id + ' option'), (x) => x.value === String(v)); return o ? o.textContent.trim() : v; } catch (e) { return v; } };
+  const _ART = { mfh: 'Mehrfamilienhaus', efh: 'Einfamilienhaus', zfh: 'Zweifamilienhaus', wohnung: 'Eigentumswohnung', etw: 'Eigentumswohnung', dhh: 'Doppelhaushälfte', rh: 'Reihenhaus' };
   const col = (W - 2 * M) / 3; const rows = [
-    ['Objekttyp', ref.property_type], ['Wohnfläche', ref.living_area ? ref.living_area + ' m²' : null], ['Zimmer', ref.rooms],
+    ['Objekttyp', _ART[String(ref.property_type || '').toLowerCase()] || ref.property_type], ['Wohnfläche', ref.living_area ? ref.living_area + ' m²' : null], ['Zimmer', ref.rooms],
     ['Baujahr', ref.build_year], ['Etage', ref.floor], ['Energieklasse', ref.energy_class],
-    ['Zustand', ref.condition || '–'], ['Ausstattung', ref.quality || '–'], ['Modernisierung', ref.modernization || '–'],
+    ['Zustand', ref.condition ? _optText('cond', ref.condition) : '–'], ['Ausstattung', ref.quality ? _optText('quality', ref.quality) : '–'], ['Modernisierung', ref.modernization ? _optText('modern', ref.modernization) : '–'],
   ];
   if (ref.modernization_year) rows.push(['Modernisierungsjahr', ref.modernization_year]);
   if (ref.bathrooms) rows.push(['Badezimmer', ref.bathrooms]);
