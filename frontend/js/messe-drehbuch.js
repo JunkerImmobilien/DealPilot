@@ -2052,7 +2052,11 @@
     if (opt.nkm) { r6Setz('nkm', '900'); try { DealPilotInvestmentProfile.nachziehen('nkm'); } catch (e) {} }
     await warte(900);
     if (opt.kp) { try { if (typeof window.dpDarlehenNachziehen === 'function') window.dpDarlehenNachziehen(); } catch (e) {} }
-    if (opt.bwk) { try { DealPilotBwkProfil.einsetzen(true); } catch (e) {} }
+    /* GEMESSEN (Prueflauf 09): bwk-profil.js setzt die Standardwerte nur nach
+       ECHTEN Eingaben in Objektart/Wohnflaeche - gesetzte Felder loesen es
+       nicht aus, die Leiste blieb auf „sobald ... stehen". Hier geschieht,
+       was eine Eingabe von Hand ausloest (nur leere Felder). */
+    try { DealPilotBwkProfil.einsetzen(false); } catch (e) {}
     try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
     await warte(600);
   }
@@ -2352,12 +2356,13 @@
         await b2oZeile(s, 'Zwei Rechenwege', '<b>Detailliert</b> in Euro je Position — wie Banken und ImmoWertV — oder als <b>Prozent der Kaltmiete</b>, die Faustregel.');
       },
       async function (s) {   /* 4 · Standardwerte der Objektart */
+        try { DealPilotBwkProfil.leisteZeichnen(); } catch (e) {}
+        await warte(400);
         await zeige(function () { return q('#bwk-standard-bar'); }, 8);
         var tx = r6Text(q('#bwk-standard-bar .bwk-std-t'));
-        await b2oZeile(s, 'Standardwerte je Objektart', 'Für eine Eigentumswohnung: ' + (tx || '–') + '.');
-        var b = r6Knopf('#bwk-standard-bar', /Standardwerte einsetzen/);
-        if (b) { await zeige(function () { return r6Knopf('#bwk-standard-bar', /Standardwerte einsetzen/); }, 10); await warte(1300); b.click(); }
-        await warte(1200);
+        await b2oZeile(s, 'Standardwerte je Objektart', 'Schon eingesetzt, als Objektart und Wohnfläche standen — für eine Eigentumswohnung: ' + (tx || '–') + '.');
+        await zeige(function () { return r6Knopf('#bwk-standard-bar', /Standardwerte einsetzen/) || q('#bwk-standard-bar'); }, 10);
+        await b2oZeile(s, 'Standardwerte je Objektart', 'Eigene Zahlen gehen immer vor — aus Wirtschaftsplan oder Abrechnung. Der Knopf setzt die Standardwerte neu.');
       },
       async function (s) {   /* 5 · umlagefähig */
         await zeigeGruppe(feldVon('hg_ul'), feldVon('ul_sonst'), 8);
