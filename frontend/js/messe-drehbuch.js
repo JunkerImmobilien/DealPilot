@@ -2447,7 +2447,7 @@
   }
   function r6San15() {
     function t(id) { return r6Id(id); }
-    return { max: t('san_limit_max'), netto: t('san_limit_actual'), status: t('san_limit_status').replace(/^✓\s*/, ''), geb: wert('geb_ant') };
+    return { max: t('san_limit_max'), netto: t('san_limit_actual'), status: t('san_limit_status').replace(/^✓\s*/, '').replace(/(\d)\.(\d)%/g, '$1,$2 %'), geb: wert('geb_ant') };
   }
   function r6Wiz() { return q('.rnd-wiz-overlay'); }
   function r6TaxZeilen() { var h = q('#mand-tax-periods-host'); return h ? [].filter.call(h.querySelectorAll('div'), function (d) { return d.style.display === 'grid' && /\d{2}\.\d{2}\.\d{4}/.test(d.textContent) && d.textContent.length < 160; }) : []; }
@@ -2565,6 +2565,11 @@
   function r6Bmf() { return q('#bmfOverlay'); }
   function r6Sichtbar(w, sel) { return w ? [].filter.call(w.querySelectorAll(sel), function (x) { return x.offsetWidth > 0; })[0] || null : null; }
   function r6BmfPane() { return q('#bmfOverlay .bmfmo-pane.active'); }
+  /* GEMESSEN (Marcel: „Schritt 4 und 5 sieht man die Karten nicht"): scrollIntoView
+     legte Tabellen- und Kartenkopf UNTER die feste Kopfzeile des Fensters (Karte
+     ab y 139 = Oberkante des Rollbereichs, Spaltenköpfe verdeckt). Gerollt wird
+     deshalb der Rollbereich selbst, das Ziel 14 px unter seiner Oberkante. */
+  function r6BmfOben(e) { var bd = e && e.closest('.bmfmo-body'); if (!bd) return; bd.scrollTop += e.getBoundingClientRect().top - bd.getBoundingClientRect().top - 14; }
   async function r6BmfWeiter() { var b = q('#btnBmfNext'); if (b) b.click(); await warte(1600); }
   function r6BmfKarte(v) { return [].filter.call(document.querySelectorAll('#bmfOverlay [onclick*="_v292SelectVariant"]'), function (x) { return x.tagName !== 'INPUT' && new RegExp("'" + v + "'").test(x.getAttribute('onclick')); })[0] || null; }
   var _r6Vorher = null;
@@ -2616,7 +2621,7 @@
         await r6BmfWeiter();
         await warteAuf(function () { var p = r6BmfPane(); return p && p.id === 'p-afa' && r6Sichtbar(p, 'table'); }, 6000);
         await warte(600);
-        var tb = r6Sichtbar(r6BmfPane(), 'table'); if (tb) tb.scrollIntoView({ block: 'start' });
+        var tb = r6Sichtbar(r6BmfPane(), 'table'); r6BmfOben(tb && (tb.previousElementSibling || tb));
         await warte(400);
         await zeige(function () { return r6Sichtbar(r6BmfPane(), 'table'); }, 6);
         var tt = r6Inner(r6BmfPane());
@@ -2627,7 +2632,7 @@
         await r6BmfWeiter();
         await warteAuf(function () { var p = r6BmfPane(); return p && p.id === 'p-hebel' && r6BmfKarte('amtlich'); }, 6000);
         await warte(600);
-        var ka = r6BmfKarte('amtlich'); if (ka) ka.scrollIntoView({ block: 'start' });
+        r6BmfOben(r6BmfKarte('amtlich'));
         await warte(400);
         await zeige(function () { var a = r6BmfKarte('amtlich'), b = r6BmfKarte('aggressiv'); return a && b ? b2oHuelle(a, b) : (a || b); }, 6);
         var zb = r6Beginn(s, 'Schritt 4 · Du wählst', 'Vier Karten, jede mit Risiko-Score — grün ist die Arbeitshilfe, rot kann das Finanzamt beanstanden.');
