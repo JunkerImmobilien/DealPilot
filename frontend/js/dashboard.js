@@ -786,8 +786,15 @@
         col:avgZins==null?'var(--dp-card-ch)':(avgZins<=3?'var(--dp-green-txt)':avgZins<=4.5?'var(--dp-gold-txt)':'var(--dp-red-txt)'),
         click:'DealPilotDashboard.toggleZins()',
         tip:'Durchschnittlicher Sollzins aller Finanzierungen, gewichtet nach der jeweiligen Restschuld.\nKlick wechselt zum Zinsbindungs-Risiko.'}),
-      {l:'DSCR', v:(S.dscr==null?'\u2013':S.dscr.toFixed(2).replace('.',',')), sub:'Kapitaldienstdeckung', col:(S.dscr==null?'var(--dp-card-ch)':(S.dscr>=1.2?'var(--dp-green)':S.dscr>=1?'var(--dp-gold)':'var(--dp-red)')),
-       tip:'Schuldendienstdeckungsgrad: Miet\u00fcberschuss im Verh\u00e4ltnis zum Kapitaldienst (Zins + Tilgung). Ab 1,2 komfortabel.'},
+      /* v2240 \u00b7 Ampel nach den persoenlichen Mindest-Schwellen (DealPilotSchwellen), Einstufung im Kern */
+      (function(){
+        var sw = window.DealPilotSchwellen ? DealPilotSchwellen.get() : null;
+        var k = (S.dscr==null) ? null : (window.Dscr ? Dscr.classify(S.dscr, sw) : (S.dscr>=1.2?'good':S.dscr>=1?'warn':'bad'));
+        var ab = sw ? DealPilotSchwellen.fmtDscr(sw.dscrGruen) : '1,20';
+        return {l:'DSCR', v:(S.dscr==null?'\u2013':S.dscr.toFixed(2).replace('.',',')), sub:'Kapitaldienstdeckung',
+          col:(k==null?'var(--dp-card-ch)':(k==='good'?'var(--dp-green)':k==='warn'?'var(--dp-gold)':'var(--dp-red)')),
+          tip:'Schuldendienstdeckungsgrad: Miet\u00fcberschuss im Verh\u00e4ltnis zum Kapitaldienst (Zins + Tilgung). Ab '+ab+' gr\u00fcn (deine Mindest-Schwelle).'};
+      })(),
       {l:'Tilgungsfortschritt', v:!hasTilg?'\u2013':Math.max(0,tilgFort).toFixed(2).replace('.',',')+'\u00a0%', sub:'Darlehen getilgt', col:'var(--dp-gold)',
        tip:'Wie viel des urspr\u00fcnglichen Darlehens bereits getilgt wurde.'}
     ];

@@ -7,6 +7,19 @@
            4=Cashflow-Tabelle 5=KI-Analyse 6=Annahmen 7=Kontakt&QR
 ═══════════════════════════════════════════════════ */
 
+/* v2240 · Ampel-Schwellen fuer DSCR und LTV aus den Einstellungen
+   (DealPilotSchwellen; Vorgabe DSCR gruen ab 1,2 / gelb ab 1,0,
+   LTV gruen bis 90 / gelb bis 100). EINE Quelle fuer alle Seiten. */
+function _pdfSw() {
+  var s = window.DealPilotSchwellen ? DealPilotSchwellen.get()
+    : { dscrGruen: 1.2, dscrGelb: 1.0, ltvGruen: 90, ltvRot: 100 };
+  s.dscrGruenTxt = Number(s.dscrGruen).toFixed(2).replace(/0$/, '').replace('.', ',');
+  s.dscrGelbTxt  = Number(s.dscrGelb).toFixed(2).replace(/0$/, '').replace('.', ',');
+  s.ltvGruenTxt  = String(Math.round(Number(s.ltvGruen) * 10) / 10).replace('.', ',');
+  s.ltvRotTxt    = String(Math.round(Number(s.ltvRot) * 10) / 10).replace('.', ',');
+  return s;
+}
+
 /* ═══════════════════════════════════════════════════
    V63.86: html2canvas-Hybrid für 1:1-Tabellen-Capture
    Marcels Wunsch: Tab-Kennzahlen-Tabellen sollen pixel-perfekt
@@ -1225,7 +1238,9 @@ async function _exportPDFInner() {
   // 4 KPI-Tiles Reihe 2
   [
     { l: 'LTV',              v: pP(K.ltv, 1) },
-    { l: 'DSCR',             v: pN(K.dscr, 2) + (K.dscr >= 1.5 ? ' OK' : ' !') },
+    /* v2240 · „OK" ab der eingestellten Mindest-Schwelle (Vorgabe 1,2) - hier stand 1,5,
+       waehrend die Legende derselben Datei 1,2 als „gut" fuehrte */
+    { l: 'DSCR',             v: pN(K.dscr, 2) + (K.dscr >= _pdfSw().dscrGruen ? ' OK' : ' !') },
     { l: 'Faktor',           v: pN(K.fak, 1) },
     { l: 'Equity Multiple',  v: pN(K.em, 1) + 'x' }
   ].forEach(function(k, i) { kBox(doc, M + i * (tw4 + 3), cy, tw4, 18, k.l, k.v, C.GOLD); });
@@ -1730,22 +1745,22 @@ async function _exportPDFInner() {
               data.cell.styles.fontStyle = 'bold';
             }
           }
-          // LTV: > 100 rot, > 85 gold, sonst grün
+          // v2240: LTV rot ueber 100, gold ueber max_ltv (Einstellung, Vorgabe 90), sonst gruen
           if (label === 'LTV') {
             var lv = parseFloat(txt.replace('%', '').replace(',', '.'));
             if (!isNaN(lv)) {
-              if (lv > 100) data.cell.styles.textColor = [184, 98, 92];
-              else if (lv > 85) data.cell.styles.textColor = [184, 151, 64];
+              if (lv > _pdfSw().ltvRot) data.cell.styles.textColor = [184, 98, 92];
+              else if (lv > _pdfSw().ltvGruen) data.cell.styles.textColor = [184, 151, 64];
               else data.cell.styles.textColor = [63, 165, 108];
               data.cell.styles.fontStyle = 'bold';
             }
           }
-          // DSCR: < 1,0 rot, 1,0-1,2 gold, >= 1,2 grün
+          // v2240: DSCR rot unter dscrGelb, gold bis min_dscr (Einstellung, Vorgabe 1,0 / 1,2), sonst gruen
           if (label === 'DSCR') {
             var dv = parseFloat(txt.replace(',', '.'));
             if (!isNaN(dv)) {
-              if (dv < 1.0) data.cell.styles.textColor = [184, 98, 92];
-              else if (dv < 1.2) data.cell.styles.textColor = [184, 151, 64];
+              if (dv < _pdfSw().dscrGelb) data.cell.styles.textColor = [184, 98, 92];
+              else if (dv < _pdfSw().dscrGruen) data.cell.styles.textColor = [184, 151, 64];
               else data.cell.styles.textColor = [63, 165, 108];
               data.cell.styles.fontStyle = 'bold';
             }
@@ -1817,8 +1832,8 @@ async function _exportPDFInner() {
             if (rIdx === 4) {
               var dv = parseFloat(txt2.replace(',', '.'));
               if (!isNaN(dv)) {
-                if (dv < 1.0) data.cell.styles.textColor = [184, 98, 92];
-                else if (dv < 1.2) data.cell.styles.textColor = [184, 151, 64];
+                if (dv < _pdfSw().dscrGelb) data.cell.styles.textColor = [184, 98, 92];          /* v2240 */
+                else if (dv < _pdfSw().dscrGruen) data.cell.styles.textColor = [184, 151, 64];
                 else data.cell.styles.textColor = [63, 165, 108];
                 data.cell.styles.fontStyle = 'bold';
               }
@@ -2053,8 +2068,8 @@ async function _exportPDFInner() {
         if (ci === 12) {
           var lv = parseFloat(txt.replace('%', '').trim());
           if (!isNaN(lv)) {
-            if (lv > 100) d.cell.styles.textColor = [184, 98, 92];
-            else if (lv > 85) d.cell.styles.textColor = [184, 151, 64];
+            if (lv > _pdfSw().ltvRot) d.cell.styles.textColor = [184, 98, 92];          /* v2240 */
+            else if (lv > _pdfSw().ltvGruen) d.cell.styles.textColor = [184, 151, 64];
             else d.cell.styles.textColor = [63, 165, 108];
             d.cell.styles.fontStyle = 'bold';
           }
@@ -2074,7 +2089,7 @@ async function _exportPDFInner() {
     cy += 3.5;
     doc.text('CF v.St./J = NKM - Bewirt. n.uml. - Zinsen - Tilgung (was wirklich am Konto bleibt, vor Steuer)  \u00b7  CF n.St./J = NKM - Bewirt. n.uml. - Zinsen +/- Steuer (operativ, ohne Tilgung)', _tblM, cy);
     cy += 3.5;
-    doc.text('LTV-F\u00e4rbung: gr\u00fcn unter 85 %  \u00b7  gold 85-100 %  \u00b7  rot \u00fcber 100 %  \u00b7  Anschluss-Konditionen ab Jahr ' + g('d1_bindj') + ': ' + pP(v('anschl_z'), 1) + ' / ' + pP(v('anschl_t'), 1), _tblM, cy);
+    doc.text('LTV-F\u00e4rbung: gr\u00fcn bis ' + _pdfSw().ltvGruenTxt + ' %  \u00b7  gold ' + _pdfSw().ltvGruenTxt + '-' + _pdfSw().ltvRotTxt + ' %  \u00b7  rot \u00fcber ' + _pdfSw().ltvRotTxt + ' %  \u00b7  Anschluss-Konditionen ab Jahr ' + g('d1_bindj') + ': ' + pP(v('anschl_z'), 1) + ' / ' + pP(v('anschl_t'), 1), _tblM, cy);
     cy += 6;
     console.log('[pdf] V63.99 CF-Projektion 13-Spalten (ohne BWK n.u., ohne Sum-Row), finalY=' + cy);
   }
@@ -2381,16 +2396,18 @@ async function _exportPDFInner() {
         var x = matX + cIdx * cellW;
         var y = matY + rIdx * cellH;
         // Farbe basierend auf DSCR
+        /* v2240 · gruen/gold nach den Einstellungen, Stress-Band 0,8 fest */
+        var _sm = _pdfSw(), _smW = Math.min(0.8, _sm.dscrGelb);
         var fill;
-        if (d >= 1.2)      fill = [232, 246, 237]; // grün hell
-        else if (d >= 1.0) fill = [248, 240, 210]; // gold hell
-        else if (d >= 0.8) fill = [248, 220, 185]; // orange hell
-        else               fill = [248, 220, 215]; // rot hell
+        if (d >= _sm.dscrGruen)     fill = [232, 246, 237]; // grün hell
+        else if (d >= _sm.dscrGelb) fill = [248, 240, 210]; // gold hell
+        else if (d >= _smW)         fill = [248, 220, 185]; // orange hell
+        else                        fill = [248, 220, 215]; // rot hell
 
         var border;
-        if (d >= 1.2)      border = [63, 165, 108];
-        else if (d >= 1.0) border = C.GOLD;
-        else if (d >= 0.8) border = [220, 130, 80];
+        if (d >= _sm.dscrGruen)     border = [63, 165, 108];
+        else if (d >= _sm.dscrGelb) border = C.GOLD;
+        else if (d >= _smW)         border = [220, 130, 80];
         else               border = [184, 98, 92];
 
         doc.setFillColor(fill[0], fill[1], fill[2]);
@@ -2425,11 +2442,14 @@ async function _exportPDFInner() {
     doc.setTextColor(80, 75, 70);
     var legX = M;
     var legSpacing = 42;
+    /* v2240 · die Legende nennt die eingestellten Zahlen */
+    var _lg = _pdfSw();
+    var _lgW = Math.min(0.8, _lg.dscrGelb).toFixed(2).replace(/0$/, '').replace('.', ',');
     var legends = [
-      { color: [63, 165, 108],  bg: [232, 246, 237], label: 'DSCR >= 1,2 (gut)' },
-      { color: C.GOLD,  bg: [248, 240, 210], label: 'DSCR 1,0-1,2 (knapp)' },
-      { color: [220, 130, 80],  bg: [248, 220, 185], label: 'DSCR 0,8-1,0 (warn)' },
-      { color: [184, 98, 92],   bg: [248, 220, 215], label: 'DSCR < 0,8 (Stress)' }
+      { color: [63, 165, 108],  bg: [232, 246, 237], label: 'DSCR >= ' + _lg.dscrGruenTxt + ' (gut)' },
+      { color: C.GOLD,  bg: [248, 240, 210], label: 'DSCR ' + _lg.dscrGelbTxt + '-' + _lg.dscrGruenTxt + ' (knapp)' },
+      { color: [220, 130, 80],  bg: [248, 220, 185], label: 'DSCR ' + _lgW + '-' + _lg.dscrGelbTxt + ' (warn)' },
+      { color: [184, 98, 92],   bg: [248, 220, 215], label: 'DSCR < ' + _lgW + ' (Stress)' }
     ];
     legends.forEach(function(l, i) {
       doc.setFillColor(l.bg[0], l.bg[1], l.bg[2]);
@@ -2515,13 +2535,14 @@ async function _exportPDFInner() {
     function _statusPill(value, kind) {
       // kind = 'dscr' oder 'ltv'
       // Liefert {label, color: [r,g,b]}
+      var _ps = _pdfSw();   /* v2240 · Schwellen aus den Einstellungen */
       if (kind === 'dscr') {
-        if (value >= 1.2) return { label: 'SOLIDE',  rgb: [63, 165, 108] };
-        if (value >= 1.0) return { label: 'KNAPP',   rgb: C.GOLD };
+        if (value >= _ps.dscrGruen) return { label: 'SOLIDE',  rgb: [63, 165, 108] };
+        if (value >= _ps.dscrGelb) return { label: 'KNAPP',   rgb: C.GOLD };
         return                  { label: 'KRITISCH', rgb: [184, 98, 92] };
       } else {
-        if (value < 85)  return { label: 'SOLIDE',  rgb: [63, 165, 108] };
-        if (value <= 100) return { label: 'GRENZ',   rgb: C.GOLD };
+        if (value <= _ps.ltvGruen)  return { label: 'SOLIDE',  rgb: [63, 165, 108] };
+        if (value <= _ps.ltvRot) return { label: 'GRENZ',   rgb: C.GOLD };
         return                  { label: 'HEBEL HOCH', rgb: [184, 98, 92] };
       }
     }
@@ -2609,7 +2630,7 @@ async function _exportPDFInner() {
       data.ltvToday, ltvFmt, 'ltv', 100, [
         { value: 0,   label: '0%' },
         { value: 60,  label: '60%' },
-        { value: 85,  label: '85%' },
+        { value: _pdfSw().ltvGruen,  label: _pdfSw().ltvGruenTxt + '%' },   /* v2240 */
         { value: 100, label: '100%+' }
       ]);
 
@@ -2642,15 +2663,14 @@ async function _exportPDFInner() {
         doc.text(sub2, x + 5, y + 15.5);
       }
     }
-    function _dscrColor(v) {
-      if (v >= 1.2) return [63, 165, 108];
-      if (v >= 1.0) return C.GOLD;
+    function _dscrColor(v) {   /* v2240 · Schwellen aus den Einstellungen */
+      if (v >= _pdfSw().dscrGruen) return [63, 165, 108];
+      if (v >= _pdfSw().dscrGelb) return C.GOLD;
       return [184, 98, 92];
     }
     function _ltvColor(v) {
-      if (v < 60) return [63, 165, 108];
-      if (v <= 85) return [63, 165, 108];
-      if (v <= 100) return C.GOLD;
+      if (v <= _pdfSw().ltvGruen) return [63, 165, 108];
+      if (v <= _pdfSw().ltvRot) return C.GOLD;
       return [184, 98, 92];
     }
     var bindIdx = data.bindj || 10;
@@ -2779,8 +2799,8 @@ async function _exportPDFInner() {
       ezbIdx: bindIdx - 1,
       years: data.years,
       thresholdLines: [
-        { value: 1.2, color: [63, 165, 108], label: '>= 1,2 (gut)' },
-        { value: 1.0, color: C.GOLD, label: '1,0 (knapp)' }
+        { value: _pdfSw().dscrGruen, color: [63, 165, 108], label: '>= ' + _pdfSw().dscrGruenTxt + ' (gut)' },   /* v2240 */
+        { value: _pdfSw().dscrGelb, color: C.GOLD, label: _pdfSw().dscrGelbTxt + ' (knapp)' }
       ],
       formatY: function(v) { return v.toFixed(2).replace('.', ','); }
     });
@@ -2796,7 +2816,7 @@ async function _exportPDFInner() {
       ezbIdx: bindIdx - 1,
       years: data.years,
       thresholdLines: [
-        { value: 85, color: C.GOLD, label: '85 %' },
+        { value: _pdfSw().ltvGruen, color: C.GOLD, label: _pdfSw().ltvGruenTxt + ' %' },   /* v2240 */
         { value: 60, color: [63, 165, 108], label: '60 %' }
       ],
       formatY: function(v) { return v.toFixed(0) + ' %'; }

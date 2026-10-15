@@ -396,12 +396,16 @@
     var zins = _v('d1z');
     var isAussetzung = window.dpIsD1Tilgungsaussetzung();
 
+    /* v2240 · Schwellen aus den Einstellungen (DealPilotSchwellen; Vorgabe 1,2 / 90).
+       Hinweis: dieser Block ist seit V252-04 durch das return oben unerreichbar. */
+    var _sw = window.DealPilotSchwellen ? DealPilotSchwellen.get() : { dscrGruen: 1.2, dscrGelb: 1.0, ltvGruen: 90, ltvRot: 100 };
+    var _dG = String(_sw.dscrGruen).replace('.', ','), _dY = String(_sw.dscrGelb).replace('.', ',');
     // LTV
-    if (ltv > 100) {
-      recs.push({ type: 'warn', icon: '⚠', title: 'LTV über 100 % — kritisch',
-        text: 'Dein LTV liegt bei <b>' + ltv.toFixed(1) + ' %</b>. Banken bevorzugen LTV ≤ 90 %. ' +
+    if (ltv > _sw.ltvRot) {
+      recs.push({ type: 'warn', icon: '⚠', title: 'LTV über ' + _sw.ltvRot + ' % — kritisch',
+        text: 'Dein LTV liegt bei <b>' + ltv.toFixed(1) + ' %</b>. Deine Grenze liegt bei ' + _sw.ltvGruen + ' %. ' +
               'Prüfe, ob du mehr Eigenkapital einbringen kannst oder den Kaufpreis reduzieren kannst.' });
-    } else if (ltv > 90) {
+    } else if (ltv > _sw.ltvGruen) {
       recs.push({ type: 'gold', icon: '⚡', title: 'LTV grenzwertig (' + ltv.toFixed(1) + ' %)',
         text: 'Mit höherem LTV steigt der Zinssatz. Eine LTV-Reduktion auf ≤ 80 % bringt oft 0,2–0,4 % bessere Konditionen.' });
     } else if (ltv < 60) {
@@ -410,13 +414,13 @@
     }
 
     // DSCR
-    if (dscr < 1.0) {
-      recs.push({ type: 'warn', icon: '⚠', title: 'DSCR unter 1,0 — Mieten decken Rate nicht',
+    if (dscr < _sw.dscrGelb) {
+      recs.push({ type: 'warn', icon: '⚠', title: 'DSCR unter ' + _dY + ' — Mieten decken Rate nicht',
         text: 'DSCR = <b>' + dscr.toFixed(2) + '</b>. Die Mieteinnahmen decken den Kapitaldienst nicht. ' +
               'Optionen: Tilgung reduzieren, Eigenkapital erhöhen, oder Kaufpreis verhandeln.' });
-    } else if (dscr < 1.2) {
+    } else if (dscr < _sw.dscrGruen) {
       recs.push({ type: 'gold', icon: '⚡', title: 'DSCR knapp (' + dscr.toFixed(2) + ')',
-        text: 'Banken erwarten i.d.R. DSCR ≥ 1,2. Bei Mietausfall wird es eng. ' +
+        text: 'Deine Mindest-Schwelle liegt bei DSCR ≥ ' + _dG + '. Bei Mietausfall wird es eng. ' +
               'Erhöhung der Tilgung verschlechtert DSCR weiter — über Anschluss-Tilgung von 1,0 % nachdenken.' });
     }
 

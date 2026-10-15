@@ -298,7 +298,7 @@ window.DealPilotInvestmentProfile = (function() {
       (window.DealPilotBwkProfil ? DealPilotBwkProfil.einstellungenHtml() : ''),
 
       '<h3 class="ip-section">Persönliche Mindest-Schwellen</h3>',
-      '<p class="hint">Diese Werte erscheinen ab V63.77 als farbliche Marker in den Kennzahlen — „grün" wenn dein persönliches Ziel erreicht ist.</p>',
+      '<p class="hint">Diese Werte steuern die Ampeln für DSCR und LTV — Bank-Kacheln, Objektkarte, Cockpit, Bank-Charts, PDF und Quick-Check — sowie „Deine Kaufgrenzen" und die Cashflow-Ampel im Quick-Check. „Grün", wenn dein persönliches Ziel erreicht ist; beim DSCR gelb ab 1,0, beim LTV gelb bis 100 %.</p>',   /* v2240 */
       '<div class="ip-grid">',
         field('ip_min_dscr',            'Mindest-DSCR',           p.min_dscr,            '',      'z.B. 1,20'),
         field('ip_min_cashflow_vor_st', 'Mindest-Cashflow / Monat', p.min_cashflow_vor_st, '€',   'vor Steuer'),

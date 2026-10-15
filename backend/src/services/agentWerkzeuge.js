@@ -2462,7 +2462,11 @@ async function objekt_schnellblick(ctx, args) {
       kennzahlen_ampel: K ? rechenkerne.heuristikTeil('kennzahlenAmpel',
         { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
           dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0,
-          zielBmr: zielBmrLage, lageklasse: d.lageklasse || null }, nichtAnwendbar) : undefined,
+          zielBmr: zielBmrLage, lageklasse: d.lageklasse || null }, nichtAnwendbar,
+          /* v2243: Vorgabe-Schwellen 1,2 / 90 / 0 wie in der App ohne eigene
+             Einstellung - sonst sagte der Bot bei DSCR 1,3 "gelb", die App "gruen".
+             Die persoenlichen Werte liegen nur im Browser. */
+          {}) : undefined,
       kategorien: K ? rechenkerne.heuristikTeil('kategorien',
         { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
           dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0 },
