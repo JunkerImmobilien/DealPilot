@@ -2411,6 +2411,10 @@
 
   /* ── MODUL 10a · STEUER: AfA, ZEITRÄUME, RESTNUTZUNGSDAUER ───── */
   function r6Wiz() { return q('.rnd-wiz-overlay'); }
+  function r6TaxZeilen() { var h = q('#mand-tax-periods-host'); return h ? [].filter.call(h.querySelectorAll('div'), function (d) { return d.style.display === 'grid' && /\d{2}\.\d{2}\.\d{4}/.test(d.textContent) && d.textContent.length < 160; }) : []; }
+  /* Kacheln des Steuer-Moduls: .tax-item > .tax-label + .tax-val (tax.js) */
+  function r6TaxItem(re) { return [].filter.call(document.querySelectorAll('#s3-tax .tax-item'), function (x) { var l = x.querySelector('.tax-label'); return x.offsetWidth && l && re.test(r6Text(l)); })[0] || null; }
+  function r6TaxWert(re) { var i = r6TaxItem(re); return i ? r6Text(i.querySelector('.tax-val')).replace(/\s*▸$/, '') : null; }
   function r6WizTitel() { var h = r6Wiz() && r6Wiz().querySelector('h2,h3'); return h ? r6Text(h) : ''; }
   async function r6WizWeiter() {
     var w = r6Wiz(); if (!w) return false;
@@ -2428,7 +2432,7 @@
     },
     szenen: [
       async function (s) {   /* 1 · das Beispiel */
-        await r6Start({ kp: true, nkm: true, bwk: true, kaufdat: true });
+        await r6Start({ kp: true, nkm: true, bwk: true });   /* ohne Kaufdatum: ein volles Steuerjahr */
         await r6Beispiel(s, ' Gekauft für 180.000 €, vermietet für 900 € kalt — heute: der Reiter <b>Steuer</b>.');
       },
       async function (s) {   /* 2 · persönliche Steuer */
@@ -2440,20 +2444,17 @@
         await zeige(function () { return q('#s3-tax .v842-tax-link'); }, 10);
         await warte(1200);
         try { window._v842OpenTaxPeriods(); } catch (e) {}
-        await warteAuf(function () { return rhIm('.settings-modal', /^Steuerzeiträume verwalten$/); }, 6000);
+        await warteAuf(function () { return q('#mand-tax-periods-host') && r6TaxZeilen().length; }, 6000);
         kegelHoch(true);
+        var h = q('#mand-tax-periods-host'); if (h) h.scrollIntoView({ block: 'start' });
         await warte(800);
-        var kopf = rhIm('.settings-modal', /^Steuerzeiträume verwalten$/);
-        var tab = kopf && kopf.closest('div[class]') && (kopf.closest('section,.card,div[style]') || kopf.parentElement);
-        var box = kopf; for (var i = 0; i < 4 && box && !box.querySelector('table,[class*=row]'); i++) box = box.parentElement;
-        if (box) box.scrollIntoView({ block: 'center' });
-        await warte(500);
-        await zeige(function () { return box; }, 8);
-        var zeilen = box ? [].filter.call(box.querySelectorAll('tr,[class*=row]'), function (r) { return /\d{2}\.\d{2}\.\d{4}/.test(r.textContent) && /€/.test(r.textContent); }).slice(0, 2).map(function (r) {
-          var t = r6Text(r), d = t.match(/\d{2}\.\d{2}\.\d{4}/g) || [], z = /([\d.]+ €)/.exec(t);
-          return (d[0] ? 'ab ' + d[0] : '') + (z ? ': <b>' + z[1] + '</b>' : '');
-        }) : [];
-        await b2oZeile(s, 'Steuerzeiträume', 'Dein Einkommen je Zeitraum' + (zeilen.length ? ' — ' + zeilen.join(', ') : '') + '. Jedes Objekt bekommt automatisch den passenden, nach Kaufdatum.');
+        /* gemessen: die Zeilen sind DIVs mit display:grid (keine Tabelle) */
+        await zeige(function () { var z = r6TaxZeilen(), h2 = q('#mand-tax-periods-host'); return z.length && h2 ? b2oHuelle(h2.firstElementChild || h2, z[z.length - 1]) : h2; }, 8);
+        var zl = r6TaxZeilen().slice(0, 2).map(function (r) {
+          var c = [].map.call(r.children, function (x) { return r6Text(x); });
+          return c[0] + '–' + c[1] + ': <b>' + c[2] + '</b>' + (c[3] && c[3] !== '–' ? ' (' + c[3] + ')' : '');
+        });
+        await b2oZeile(s, 'Steuerzeiträume', 'Dein Einkommen je Zeitraum' + (zl.length ? ' — ' + zl.join(', ') : '') + '. Jedes Objekt bekommt automatisch den passenden, nach Kaufdatum.');
         r6EinstellungenZu();
         await warte(700);
       },
@@ -2488,9 +2489,12 @@
         await zeige(function () { var e = rhIm(r6Wiz(), /GESCHÄTZTE RESTNUTZUNGSDAUER/i); return e && (e.closest('div[style]') || e.parentElement); }, 8);
         await b2oZeile(s, 'Das Ergebnis', 'Geschätzte Restnutzungsdauer <b>' + (rnd ? rnd[1] + ' Jahre' : '–') + '</b>. ' + (urt ? '„' + urt[1].trim() + '“' : '') + (net ? ' — Netto-Vorteil ' + net[1] : '') + '.');
       },
-      async function (s) {   /* 7 · Anfrage: nur zeigen */
-        await zeige(function () { var w = r6Wiz(); return w && [].filter.call(w.querySelectorAll('button'), function (b) { return b.offsetWidth && /Anfrage senden/.test(b.textContent); })[0]; }, 10);
-        await b2oZeile(s, 'Gutachten anfragen', 'Lohnt es sich, geht von hier die <b>Anfrage</b> an einen Sachverständigen — mit allen Angaben. Bei einem Baujahr 1998 sagt DealPilot ehrlich: lieber nicht.');
+      async function (s) {   /* 7 · Anfrage: nur zeigen (NIE klicken) */
+        function knopf() { var w = r6Wiz(); return w && [].filter.call(w.querySelectorAll('button'), function (b) { return b.offsetWidth && /Anfrage senden/.test(b.textContent); })[0]; }
+        var k = knopf(); if (k) k.scrollIntoView({ block: 'center' });
+        await warte(500);
+        await zeige(knopf, 10);
+        await b2oZeile(s, 'Gutachten anfragen', 'Lohnt es sich, geht von hier die <b>Anfrage</b> an einen Sachverständigen — mit allen Angaben. Bei Baujahr ' + wert('baujahr') + ' sagt DealPilot ehrlich: lieber nicht.');
         var w = r6Wiz(); if (w) { var x = [].filter.call(w.querySelectorAll('button'), function (b) { return b.textContent.trim() === '×'; })[0]; if (x) x.click(); }
         kegelHoch(false);
         await warte(600);
@@ -2498,17 +2502,17 @@
         await warte(700);
       },
       async function (s) {   /* 8 · Steuer-Modul */
-        var e = rhIm('#s3-tax', /^Überschuss \/ Verlust V\+V \(diese Immobilie\)$/);
-        var box = e && e.closest('.card'); if (box) box.scrollIntoView({ block: 'start' });
+        var e = r6TaxItem(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/);
+        var box = e && (e.closest('.card') || e); if (box) box.scrollIntoView({ block: 'start' });
         await warte(500);
-        await zeige(function () { var x = rhIm('#s3-tax', /^Überschuss \/ Verlust V\+V \(diese Immobilie\)$/); return x && (x.closest('.tax-grid,.card') || x.parentElement); }, 8);
-        var ein = r6Neben('#s3-tax', /^Einnahmen V\+V/), wk = r6Neben('#s3-tax', /^Werbungskosten gesamt/), erg = r6Neben('#s3-tax', /^Überschuss \/ Verlust V\+V \(diese Immobilie\)$/);
-        await b2oZeile(s, 'Was im ersten Jahr übrig bleibt', 'Einnahmen <b>' + (ein || '–') + '</b>, Werbungskosten ' + (wk || '–') + ' — Zinsen, Bewirtschaftung, AfA. Ergebnis aus Vermietung: <b>' + (erg || '–') + '</b>.');
+        await zeige(function () { var x = r6TaxItem(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/); return x && (x.parentElement || x); }, 8);
+        var ein = r6TaxWert(/^Einnahmen V\+V/), wk = r6TaxWert(/^Werbungskosten gesamt/), erg = r6TaxWert(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/), nz = r6TaxWert(/^Steuer-(Nachzahlung|Erstattung)/);
+        await b2oZeile(s, 'Was im Jahr übrig bleibt', 'Einnahmen <b>' + (ein || '–') + '</b>, Werbungskosten ' + (wk || '–') + ' — Zinsen, Bewirtschaftung, AfA. Ergebnis aus Vermietung: <b>' + (erg || '–') + '</b>.');
         var w = rhIm('#s3-tax', /^STEUERVERLAUF/i) || rhIm('#s3-tax', /Steuerverlauf/i);
         if (w) { (w.closest('.card') || w).scrollIntoView({ block: 'start' }); await warte(400); }
         await zeige(function () { var x = rhIm('#s3-tax', /Steuerverlauf/i); return x && (x.closest('.card') || x.parentElement); }, 8);
         var sum = rhIm('#s3-tax', /^Summe über 15 Jahre:?$/);
-        await b2oZeile(s, 'Über 15 Jahre', 'Erstattung oder Nachzahlung — Jahr für Jahr, mit echter Progression' + (sum && sum.nextElementSibling ? '. Summe: <b>' + r6Text(sum.nextElementSibling) + '</b>' : '') + '. Die Kaufpreisaufteilung zeigt Modul 10b.', 600);
+        await b2oZeile(s, 'Über 15 Jahre', 'Grün Erstattung, rot Nachzahlung — Jahr für Jahr, mit echter Progression' + (sum && sum.nextElementSibling ? '. Summe: <b>' + r6Text(sum.nextElementSibling) + '</b>' : '') + '. Die Kaufpreisaufteilung zeigt Modul 10b.', 600);
       }
     ]
   };
