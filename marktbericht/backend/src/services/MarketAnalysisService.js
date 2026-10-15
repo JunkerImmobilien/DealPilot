@@ -6,7 +6,7 @@ import { median, quantile, iqrFilter, confidence, round, haversineMeters } from 
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { cfg, geomapEnabled } from '../lib/config.js';
 import { cacheGet, cacheSet } from '../lib/cache.js';
-import { segment } from '../lib/marktsegment.js';   /* v1314 */
+import { segment, istGewerbe, gewerbeSegment, istGrundstueck } from '../lib/marktsegment.js';   /* v1314, v2241 */
 
 // Cache-Lebensdauer fuer Markt-Ergebnisse (Reproduzierbarkeit + Credit-Ersparnis).
 // Konfigurierbar via MARKET_CACHE_TTL_MIN, Default 720 Min (12 h).
@@ -21,6 +21,15 @@ const MIN_SAMPLE = 8;
  * in beiden aus mfh pauschal ['Haus']. Gemessen gegen die echte API:
  * 22 Prozent zu hoch beim Kaufpreis, 7,6 Prozent zu hoch bei der Miete.
  * Jetzt EINE Quelle, und sie kennt den Unterschied zwischen Kauf und Miete. */
+/* v2241 · Leere Antwort mit Begruendung, dieselbe Form wie der
+   GeoMap-Fehlschlag in marketLevel(). */
+function keineDaten(listingType, note) {
+  return { listing_type: listingType, source: 'keine_daten', sample_size: 0,
+           median_per_sqm: null, q25_per_sqm: null, q75_per_sqm: null,
+           min_per_sqm: null, max_per_sqm: null, confidence: 0, comparables: [],
+           note, gesperrt: true };
+}
+
 // Konfidenz aus reiner Treffermenge (KPI liefert kein Werte-Array)
 function countConfidence(n) {
   if (!n) return 0;
@@ -35,6 +44,20 @@ export const MarketAnalysisService = {
   // Einheitlicher Einstieg: GeoMap-KPI bevorzugt, sonst Seed/DB.
   // listingType: 'kauf' | 'miete'. opts.listings = Anzahl Einzelobjekte (kostet je 1 Abruf).
   async marketLevel(ref, listingType, opts = {}) {
+    /* v2241 · Zwei Objektarten bekommen KEINE Wohnangebote mehr.
+       Ein unbebautes Grundstueck hat keine Wohnflaeche, und sein Wert ist
+       der Bodenwert (§ 40 ImmoWertV) — Kaufpreise je m² Wohnflaeche sind
+       dafuer kein Massstab. Gewerbe ohne bestimmbare Art (nur „Gewerbe")
+       hat keine Vergleichsklasse; der ganze Gewerbemarkt mischt Buero,
+       Laden und Halle. Beides fiel bisher auf ['Wohnung','Haus']. */
+    if (istGrundstueck(ref.property_type)) {
+      return keineDaten(listingType, 'Unbebautes Grundstück: keine Vergleichsangebote für Gebäude — '
+        + 'der Wert ergibt sich aus dem Bodenwert (§ 40 ImmoWertV).');
+    }
+    if ((istGewerbe(ref.property_type) || ref.gewerbe_art) && !gewerbeSegment(ref.gewerbe_art || ref.property_type)) {
+      return keineDaten(listingType, 'Gewerbeobjekt ohne bestimmbare Gewerbeart (Büro, Laden, Hotel, '
+        + 'Halle …) — ohne sie gibt es keine passende Vergleichsgruppe, und Wohnangebote sind keine.');
+    }
     // v558: Demo-Modus -> GeoMap ueberspringen, Seed-Daten nutzen (kostenlos testen).
     if (process.env.MB_DEMO === '1') {
       const sd = await this.comparables(ref, listingType);
@@ -62,7 +85,15 @@ export const MarketAnalysisService = {
     const offerType = listingType === 'miete' ? 'Miete' : 'Kauf';
     /* v1314: das Segment kennt Kauf und Miete getrennt - ein MFH wird
        gekauft als MFH, aber VERMIETET werden Wohnungen. */
-    const { objectClasses, objectTypes } = segment(ref.property_type, offerType);
+    /* v2241 · Gewerbe in der eigenen Kategorie und Klasse (GeoMap
+       objectCategories ['Gewerbe'], v1323 gemessen). Bis hier ging ein
+       Buero mit ['Wohnung','Haus'] in die Abfrage. */
+    const _gew = (istGewerbe(ref.property_type) || ref.gewerbe_art)
+      ? gewerbeSegment(ref.gewerbe_art || ref.property_type) : null;
+    const { objectClasses, objectTypes } = _gew
+      ? { objectClasses: _gew.objectClasses, objectTypes: undefined }
+      : segment(ref.property_type, offerType);
+    const objectCategories = _gew ? _gew.objectCategories : undefined;
     const wfl = ref.living_area && ref.living_area > 0 ? ref.living_area : null;
     const by = ref.build_year && ref.build_year > 1500 ? ref.build_year : null;
     // Hoehere Schwelle = stabilerer Median der engen Gruppe und seltenere Umschaltung
@@ -79,6 +110,7 @@ export const MarketAnalysisService = {
     const ck = [
       'gm', listingType, ref.lat != null ? ref.lat.toFixed(4) : '?', ref.lon != null ? ref.lon.toFixed(4) : '?',
       ref.property_type || '?', wfl ? Math.round(wfl / 5) * 5 : '?', by || '?', want,
+      _gew ? 'gew:' + _gew.gewerbe_art : '-',   /* v2241: Buero und Halle nie aus demselben Cache */
       /* WSEG10-4: Zustand MUSS in den Schluessel — sonst bekommt ein Neubau den
          zwischengespeicherten Wert des Altbaus an derselben Adresse. */
       ref.baustatus || ref.condition || '-', ref.first_time_use ? 'EB' : '-', ref.refurbished ? 'SAN' : '-',
@@ -93,7 +125,7 @@ export const MarketAnalysisService = {
       for (let i = 0; i < SAMPLES; i++) {
         const k = await GeoMapConnector.kpiCollection({   /* WSEG10-2: period mitgeben */
           lat: ref.lat, lon: ref.lon, radiusKm: st.radiusKm,
-          offerType, analyzedField: 'PREISPROQM', objectClasses, objectTypes,
+          offerType, analyzedField: 'PREISPROQM', objectClasses, objectTypes, objectCategories,
           filters: st.filters, period: st.period,
         });
         if (k && !k.error && k.median != null) rs.push(k);
@@ -156,7 +188,20 @@ export const MarketAnalysisService = {
       return z;
     };
 
-    const stages = [
+    /* v2241 · Fuer Gewerbe nur der Flaechenfilter. Baujahrband und
+       Zustandsfilter (erstbezug/saniert) sind am WOHNmarkt gemessen
+       (WSEG10-3); ob GeoMap sie im Segment Gewerbe ueberhaupt fuehrt, ist
+       nicht gemessen — ein Filter, der still nichts filtert, saehe aus wie
+       eine enge Vergleichsgruppe. Staging-Abnahmepunkt. */
+    const _gewStufen = _gew ? [
+      { label: 'eng', radiusKm: Math.min(3.5, cfg.geomap.radiusKm), period: _fenster(12),
+        filters: Object.assign({}, _flaeche(0.35)) },
+      { label: 'mittel', radiusKm: cfg.geomap.radiusKm, period: _fenster(24),
+        filters: Object.assign({}, _flaeche(0.50)) },
+      { label: 'weit', radiusKm: cfg.geomap.radiusKm * 1.6, period: _fenster(36),
+        filters: Object.assign({}, _flaeche(0.70)) },
+    ] : null;
+    const stages = _gewStufen || [
       { label: 'sehr eng', radiusKm: Math.min(3.0, cfg.geomap.radiusKm), period: _fenster(12),
         filters: Object.assign({}, _flaeche(0.25), _band(8), _zustand(true)) },
       { label: 'eng', radiusKm: Math.min(3.5, cfg.geomap.radiusKm), period: _fenster(12),
@@ -180,7 +225,9 @@ export const MarketAnalysisService = {
     }
     if (used) {
       used.versuche = versuche;
-      used.zeitfenster_monate = used.period === stages[0].period ? 12 : (used.period === stages[2].period ? 24 : 36);
+      used.zeitfenster_monate = _gew
+        ? ({ eng: 12, mittel: 24, weit: 36 }[used.label] || null)   /* v2241: eigene Stufen */
+        : (used.period === stages[0].period ? 12 : (used.period === stages[2].period ? 24 : 36));
       used.segmentierung = Object.keys(used.filters || {}).length ? used.filters : null;
     }
     if (!kpi || kpi.median == null) return null;
@@ -191,7 +238,7 @@ export const MarketAnalysisService = {
       /* WSEG12-4 · Die Beispielliste bekommt dieselben Filter wie der Median. */
       const mo = await GeoMapConnector.marketOffers({
         lat: ref.lat, lon: ref.lon, radiusKm: used.radiusKm, offerType, maxDetails: want,
-        filters: used.filters, period: used.period, objectClasses, objectTypes,
+        filters: used.filters, period: used.period, objectClasses, objectTypes, objectCategories,
       });
       comparables = (mo.offers || []).map((o) => ({
         property_type: o.property_type, living_area: o.living_area, build_year: o.build_year,
@@ -217,6 +264,10 @@ export const MarketAnalysisService = {
       /* WSEED-4 · Der GeoMap-Zweig ist die echte Quelle. Ohne diese Angabe
        * sieht ein Bericht aus GeoMap genauso aus wie einer aus dem Fallback. */
       datenherkunft: 'geomap',
+      /* v2241 · Das Segment reist an der Zahl mit. ValuationService rechnet
+         ein Gewerbeobjekt NUR mit `segment: 'gewerbe'`. */
+      segment: _gew ? 'gewerbe' : 'wohnen',
+      gewerbe_klasse: _gew ? _gew.objectClasses[0] : null,
       enthaelt_demodaten: false,
       quellen: { geomap: kpi.count || 0 },
       geomap_listings_fetched: comparables.length,

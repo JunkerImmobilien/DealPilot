@@ -1864,7 +1864,8 @@ window.DealPilotDealAction = (function() {
       'HOTEL':  'Hotel',
       'GEW':    'Gewerbe-/Industriegebäude',
       'Gewerbe':'Gewerbe-/Industriegebäude',  // V124-Legacy
-      'GAR':    'Garage / Stellplatz'
+      'GAR':    'Garage / Stellplatz',
+      'GRST':   'Unbebautes Grundstück'   /* v2241 */
     };
     if (prefill.objart) {
       prefill.objekt_typ = objartLabelMap[prefill.objart] || prefill.objart;

@@ -284,7 +284,10 @@ export const ErtragswertService = {
      * Barwertfaktor von 30 hiesse Mitkapitalisieren, die Kueche dreissigmal
      * zu bezahlen. Sie werden weiter unten mit eigener Dauer angesetzt. */
     const rohertrag = round0(mieteMarkt + gewerbe + stellplatz);
-    out.staffel.push({ pos: 'Rohertrag Wohnen (marktüblich erzielbar)', wert: round0(mieteMarkt) });
+    /* v2241: ein reines Gewerbeobjekt hat keinen Wohn-Rohertrag — eine
+       Zeile „Rohertrag Wohnen 0 €" waere eine Aussage ueber etwas, das es
+       nicht gibt. Mit Wohnmiete bleibt die Zeile wie immer. */
+    if (mieteMarkt || !gewerbe) out.staffel.push({ pos: 'Rohertrag Wohnen (marktüblich erzielbar)', wert: round0(mieteMarkt) });
     if (gewerbe) out.staffel.push({ pos: 'Rohertrag Gewerbe', wert: round0(gewerbe) });
     if (stellplatz) out.staffel.push({ pos: `Stellplätze (${spAnz} × ${spMiete} €/Monat)`, wert: stellplatz });
     /* v1057-WSON-2 · Diese Zeile stand im Rohertrag und wurde damit ueber
@@ -328,7 +331,11 @@ export const ErtragswertService = {
        * (137.000 statt rund 200.000). Die Zahl der Einheiten im Gebaeude
        * bleibt fuer die Objektart-Zuordnung relevant, nicht fuer die Kosten. */
       const _istEinheit = /etw|wohnung|whg|apartment/i.test(String(ein.objektart || ''));
-      const we = _istEinheit ? 1 : (pos(ein.anzahl_we) || 1);
+      /* v2241: ausdrueckliche 0 Wohneinheiten nur beim reinen Gewerbeobjekt
+         (dort traegt die Verwaltung 3 % des Gewerbe-Rohertrags). Sonst wie
+         bisher mindestens eine. */
+      const _nurGewerbe = ein.anzahl_we === 0 && gewerbe > 0 && !mieteMarkt;
+      const we = _istEinheit ? 1 : (pos(ein.anzahl_we) || (_nurGewerbe ? 0 : 1));
       const wfl = pos(ein.wohnflaeche_qm) || 0;
       /* v1047-WBWK-2 · Bei Wohnungseigentum gilt der hoehere Ansatz aus
        * Anlage 3 I.1 — WEG-Verwaltung, Eigentuemerversammlung,
@@ -465,7 +472,7 @@ export const ErtragswertService = {
       }
       }   /* v1048-WBWK-3 · Ende des Zweigs ohne Modellvorgabe */
 
-      if (!wfl) out.hinweise.push('Ohne Wohnfläche wurden keine Instandhaltungskosten angesetzt — das überschätzt den Ertragswert.');
+      if (!wfl && !(ein.anzahl_we === 0 && gewerbe > 0 && !mieteMarkt)) out.hinweise.push('Ohne Wohnfläche wurden keine Instandhaltungskosten angesetzt — das überschätzt den Ertragswert.');
     }
     bwkDetail.forEach((d) => out.staffel.push(d));
     out.staffel.push({ pos: '− Bewirtschaftungskosten', wert: -round0(bwk), summe: true });

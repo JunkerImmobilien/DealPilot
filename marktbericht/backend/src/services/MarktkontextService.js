@@ -36,7 +36,7 @@
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
 import { geomapEnabled } from '../lib/config.js';
 import { cacheGet, cacheSet } from '../lib/cache.js';
-import { segment, gewerbeSegment, istGewerbe } from '../lib/marktsegment.js';
+import { segment, gewerbeSegment, istGewerbe, istGrundstueck } from '../lib/marktsegment.js';
 
 /* Marktkontext ändert sich langsam — eine Woche Cache reicht. */
 const TTL_MS = (parseInt(process.env.MARKTKONTEXT_CACHE_TTL_MIN, 10) || 10080) * 60 * 1000;
@@ -149,8 +149,18 @@ export const MarktkontextService = {
        keinen Sinn - ein Ladenlokal hat keinen Brown Discount im selben
        Sinn, und "vermietet" ist im Gewerbe der Regelfall. Deshalb ein
        eigener, schlanker Zweig statt derselben acht Abfragen. */
-    const gewerbe = gewerbeSegment(ref.property_type);
-    if (gewerbe) return await gewerbeKontext(ref, gewerbe, radiusKm, period, ck);
+    /* v2241 · Hier stand `gewerbeSegment(ref.property_type)`. Der Mapper
+       lieferte `gewerbe`, das in GEWERBE_KLASSEN nicht vorkam — der Zweig
+       griff NIE, und ein Buero bekam den Wohn-Kontext (vermietet/frei,
+       Energieklassen am Wohnungsmarkt). Jetzt entscheidet die Gewerbeart.
+       Ist sie unbekannt, gibt es KEINEN Kontext statt des Wohn-Kontexts;
+       ein unbebautes Grundstueck hat ohnehin keinen. */
+    if (istGewerbe(ref.property_type) || ref.gewerbe_art) {
+      const gewerbe = gewerbeSegment(ref.gewerbe_art || ref.property_type);
+      if (!gewerbe) return null;
+      return await gewerbeKontext(ref, gewerbe, radiusKm, period, ck + '|' + gewerbe.gewerbe_art);
+    }
+    if (istGrundstueck(ref.property_type)) return null;
 
     const seg = segment(ref.property_type, 'Kauf');
     const gem = {

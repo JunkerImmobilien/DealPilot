@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-15T06:02:47.230Z",
+ "erzeugt_am": "2026-10-15T06:12:32.855Z",
  "quellen": {
   "voice-import": "1cb32debc249551e",
-  "objektart-felder": "b1481ff1f7c0b04d",
+  "objektart-felder": "816b7f6ac345b373",
   "storage": "2378edc29a71e1bf",
-  "index-html": "99de60cb86fdd43a",
+  "index-html": "6bcbe747d8850dcb",
   "grest": "114ed6834357a806"
  },
  "daten": {
@@ -97,6 +97,10 @@
     "pflicht": []
    },
    "GAR": {
+    "passt": [],
+    "pflicht": []
+   },
+   "GRST": {
     "passt": [],
     "pflicht": []
    }
@@ -689,6 +693,10 @@
      {
       "wert": "GAR",
       "text": "Garage / Stellplatz"
+     },
+     {
+      "wert": "GRST",
+      "text": "Unbebautes Grundstück"
      }
     ],
     "label": "Objektart"
