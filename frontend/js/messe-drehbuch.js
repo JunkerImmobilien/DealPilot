@@ -2409,7 +2409,46 @@
     ]
   };
 
-  /* ── MODUL 10a · STEUER: AfA, ZEITRÄUME, RESTNUTZUNGSDAUER ───── */
+  /* ── MODUL 10a/10b · STEUER AM MEHRFAMILIENHAUS ───────────────────
+     Marcel 15.10.2026: „ein Beispiel mit einem größeren Objekt … ein
+     Mehrfamilienhaus mit 6–8 Einheiten“ — Ravensberger Weg 38, Bielefeld
+     (8 WE, Bj 1978), ein ECHTES Objekt im Konto. Es wird nie geladen und nie
+     gespeichert: r6KopieStart legt eine KOPIE an (GET + POST /objects, wie
+     „Duplizieren“), deren Kennung landet über den fetch-Ersatz in
+     DPM_REIHE.angelegt und wird beim Aufräumen gelöscht, auch bei Esc. */
+  var R6_MFH = '72082555-b960-4868-a409-b241fbaf86ed';
+  async function r6KopieStart(id) {
+    DPM_REIHE.angelegt = []; DPM_REIHE.gesperrt = []; DPM_REIHE.gespielt = []; DPM_REIHE.geloescht = []; DPM_REIHE.abrufe = []; DPM_REIHE.fertig = null;
+    var sk = null; try { sk = Auth.getStorageKey('seq_') + new Date().getFullYear(); } catch (e) {}
+    var ls = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
+    _rh = { start: Date.now() - 1000, berichte: [], spr: 0, sprMax: 0, seqKey: sk, seq: sk ? ls(sk) : undefined,
+      merker: { dp_zielstufe: ls('dp_zielstufe'), dp_mb_auftraege: ls('dp_mb_auftraege'), dp_mb_pref_span: ls('dp_mb_pref_span'), qc_span_config: ls('qc_span_config') },
+      kacheln: ['dealpilot', 'import', 'voice', 'immometrica', 'gefuehrt'].filter(rhGewaehlt) };
+    await rhLaden();
+    rhSpion(); rhMikroAn();
+    try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
+    reiter('s0');
+    var o = await Auth.apiCall('/objects/' + id);
+    var d = JSON.parse(JSON.stringify((o && o.data) || {}));
+    ['_obj_seq', '_deal_won', '_deal_won_at', '_deal_lost'].forEach(function (k) { delete d[k]; });   /* wie dupSaved() */
+    var neu = await Auth.apiCall('/objects', { method: 'POST', body: { data: d, aiAnalysis: o.ai_analysis, photos: o.photos || [] } });
+    var nid = neu && (neu.id || (neu.data && neu.data.id) || (neu.object && neu.object.id));
+    if (nid && DPM_REIHE.angelegt.indexOf(nid) < 0) DPM_REIHE.angelegt.push(nid);
+    if (nid && typeof window.loadSaved === 'function') await window.loadSaved(nid);
+    await warteAuf(function () { return window._currentObjKey === nid && /Ravensberger|\S/.test(wert('str')); }, 9000);
+    await warte(900);
+    var m = q('.main-col'); if (m) m.scrollTop = 0;
+  }
+  async function r6MfhBeispiel(s, rest) {
+    var m = q('.main-col'); if (m) m.scrollTop = 0;
+    await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+    var we = wert('einheiten');
+    await b2oZeile(s, 'Das Beispiel', 'Ein Mehrfamilienhaus aus dem Bestand: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Wohnungen, ' : '') + de(zahl('wfl')) + ' m², Baujahr ' + wert('baujahr') + ', Kaufpreis ' + eur(zahl('kp')) + '.' + (rest || ''));
+  }
+  function r6San15() {
+    function t(id) { return r6Id(id); }
+    return { max: t('san_limit_max'), netto: t('san_limit_actual'), status: t('san_limit_status').replace(/^✓\s*/, ''), geb: wert('geb_ant') };
+  }
   function r6Wiz() { return q('.rnd-wiz-overlay'); }
   function r6TaxZeilen() { var h = q('#mand-tax-periods-host'); return h ? [].filter.call(h.querySelectorAll('div'), function (d) { return d.style.display === 'grid' && /\d{2}\.\d{2}\.\d{4}/.test(d.textContent) && d.textContent.length < 160; }) : []; }
   /* Kacheln des Steuer-Moduls: .tax-item > .tax-label + .tax-val (tax.js) */
@@ -2423,22 +2462,20 @@
     if (!b) return false;
     b.click(); await warte(500); return true;
   }
+  function r6WizZu() { var w = r6Wiz(); if (w) { var x = [].filter.call(w.querySelectorAll('button'), function (b) { return b.textContent.trim() === '×'; })[0]; try { if (x) x.click(); else w.remove(); } catch (e) {} } }
   DREHBUECHER['reihe-steuer'] = {
-    titel: 'Steuer: AfA, Zeiträume, Restnutzungsdauer', unterzeile: 'Was die Immobilie dir steuerlich bringt', objekt: null,
+    titel: 'Steuer: AfA, Zeiträume, Restnutzungsdauer', unterzeile: 'Was ein Mehrfamilienhaus dir steuerlich bringt', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
-    aufraeumen: function () {
-      var w = r6Wiz(); if (w) { var x = [].filter.call(w.querySelectorAll('button'), function (b) { return b.textContent.trim() === '×'; })[0]; try { if (x) x.click(); else w.remove(); } catch (e) {} }
-      r6EinstellungenZu(); rhAufraeumen();
-    },
+    aufraeumen: function () { r6WizZu(); r6EinstellungenZu(); rhAufraeumen(); },
     szenen: [
-      async function (s) {   /* 1 · das Beispiel */
-        await r6Start({ kp: true, nkm: true, bwk: true });   /* ohne Kaufdatum: ein volles Steuerjahr */
-        await r6Beispiel(s, ' Gekauft für 180.000 €, vermietet für 900 € kalt — heute: der Reiter <b>Steuer</b>.');
+      async function (s) {   /* 1 · das Beispiel (Kopie) */
+        await r6KopieStart(R6_MFH);
+        await r6MfhBeispiel(s, ' Heute: der Reiter <b>Steuer</b>.');
       },
       async function (s) {   /* 2 · persönliche Steuer */
         reiter('s3-tax'); await warte(900);
         await zeigeGruppe(feldVon('zve'), feldVon('grenz'), 8);
-        await b2oZeile(s, 'Deine persönliche Steuer', 'Zu versteuerndes Einkommen <b>' + eur(zahl('zve')) + '</b> — daraus rechnet DealPilot den Grenzsteuersatz nach § 32a selbst: <b>' + r6Pz(wert('grenz')) + ' %</b>.');
+        await b2oZeile(s, 'Deine persönliche Steuer', 'Grenzsteuersatz <b>' + r6Pz(wert('grenz')) + ' %</b> — DealPilot rechnet ihn nach § 32a selbst aus deinem zu versteuernden Einkommen.');
       },
       async function (s) {   /* 3 · Steuerzeiträume */
         await zeige(function () { return q('#s3-tax .v842-tax-link'); }, 10);
@@ -2454,21 +2491,20 @@
           var c = [].map.call(r.children, function (x) { return r6Text(x); });
           return c[0] + '–' + c[1] + ': <b>' + c[2] + '</b>' + (c[3] && c[3] !== '–' ? ' (' + c[3] + ')' : '');
         });
-        await b2oZeile(s, 'Steuerzeiträume', 'Dein Einkommen je Zeitraum' + (zl.length ? ' — ' + zl.join(', ') : '') + '. Jedes Objekt bekommt automatisch den passenden, nach Kaufdatum.');
+        await b2oZeile(s, 'Steuerzeiträume', 'Dein Einkommen je Zeitraum' + (zl.length ? ' — ' + zl.join(', ') : '') + '. Jedes Objekt bekommt automatisch den passenden.');
         r6EinstellungenZu();
         await warte(700);
       },
       async function (s) {   /* 4 · AfA */
         await zeigeGruppe(feldVon('afa_satz'), function () { return q('#afa_kalk') && q('#afa_kalk').closest('.f'); }, 8);
-        var n = (q('#afa_satz') || { options: [] }).options.length;
-        await b2oZeile(s, 'Die Abschreibung', 'AfA-Satz <b>' + r6Optionstext('afa_satz') + '</b>, Gebäudeanteil ' + wert('geb_ant') + ' % — das ergibt <b>' + r6Id('afa_kalk') + '</b> im Jahr.');
-        await b2oZeile(s, 'Die Abschreibung', 'Zur Wahl: 2,5 % vor 1925, 3 % für Neubauten ab 2023, 5 % degressiv — und ein <b>eigener Satz</b> mit Restnutzungsdauer.');
+        await b2oZeile(s, 'Die Abschreibung', 'AfA-Satz <b>' + r6Optionstext('afa_satz') + '</b>, Gebäudeanteil ' + r6Pz(wert('geb_ant')) + ' % — das ergibt <b>' + r6Id('afa_kalk') + '</b> im Jahr.');
+        await b2oZeile(s, 'Die Abschreibung', 'Bei Baujahr ' + wert('baujahr') + ' rechnet das Gesetz mit 50 Jahren Nutzung. Ist das Haus früher verbraucht, gilt ein <b>eigener Satz</b> — mit Gutachten.');
       },
       async function (s) {   /* 5 · eigener Satz -> Restnutzungsdauer ermitteln */
         var sel = q('#afa_satz'); if (sel) { sel.value = 'eigen'; sel.dispatchEvent(new Event('change', { bubbles: true })); }
         await warte(800);
         await zeige(function () { return q('#afa-eigen-box'); }, 8);
-        await b2oZeile(s, 'Eigener Satz', 'Mit kürzerer Restnutzungsdauer steigt die AfA: 100 ÷ Restnutzungsdauer. Das Finanzamt will dafür ein <b>Gutachten</b>.');
+        await b2oZeile(s, 'Eigener Satz', 'Aus der Restnutzungsdauer: 100 ÷ Jahre. Wie viele Jahre bleiben, schätzt DealPilot vorab.');
         await zeige(function () { return q('#afa-rnd-ermitteln'); }, 10);
         await warte(1300);
         var b = q('#afa-rnd-ermitteln'); if (b) b.click();
@@ -2476,39 +2512,47 @@
         kegelHoch(true);
         await warte(900);
         await zeige(function () { var w = r6Wiz(); return w && (w.querySelector('.rnd-wiz-modal,[class*=modal]') || w.firstElementChild); }, 6);
-        await b2oZeile(s, 'Restnutzungsdauer ermitteln', 'Neun Schritte, die Objektdaten sind schon da: ' + wert('str') + ' ' + wert('hnr') + ', Baujahr ' + wert('baujahr') + ', ' + wert('wfl') + ' m².');
+        await b2oZeile(s, 'Restnutzungsdauer ermitteln', 'Neun Schritte — die Objektdaten sind schon da: ' + wert('str') + ' ' + wert('hnr') + ', Baujahr ' + wert('baujahr') + ', ' + de(zahl('wfl')) + ' m².');
       },
       async function (s) {   /* 6 · durch den Wizard */
-        var zb = r6Beginn(s, 'Restnutzungsdauer ermitteln', 'Bauweise, Technik, Modernisierungen, Zustand der Gewerke, Schäden — Schritt für Schritt.');
+        var zb = r6Beginn(s, 'Restnutzungsdauer ermitteln', 'Bauweise, Technik, Modernisierungen, Zustand der Gewerke, Schäden — vorbelegt aus dem Objekt.');
         for (var i = 0; i < 8 && !/Schritt 9/.test(r6WizTitel()); i++) { if (!(await r6WizWeiter())) break; await warte(1100); }
         await warteAuf(function () { return /Schritt 9/.test(r6WizTitel()); }, 4000);
         await warte(700);
         var t = r6Inner(r6Wiz());
-        var rnd = /GESCHÄTZTE RESTNUTZUNGSDAUER[\s\S]*?(\d+)\s*Jahre/i.exec(t), urt = /(Gutachten lohnt[^\n]*)/.exec(t), net = /Netto-Vorteil\s*([−\-+]?[\d.]+\s*€)/.exec(t);
+        var rnd = /GESCHÄTZTE RESTNUTZUNGSDAUER[\s\S]*?([\d–\-]+)\s*Jahre/i.exec(t), urt = /(Gutachten lohnt[^\n]*)/.exec(t);
         await r6Ende(zb);
         await zeige(function () { var e = rhIm(r6Wiz(), /GESCHÄTZTE RESTNUTZUNGSDAUER/i); return e && (e.closest('div[style]') || e.parentElement); }, 8);
-        await b2oZeile(s, 'Das Ergebnis', 'Geschätzte Restnutzungsdauer <b>' + (rnd ? rnd[1] + ' Jahre' : '–') + '</b>. ' + (urt ? '„' + urt[1].trim() + '“' : '') + (net ? ' — Netto-Vorteil ' + net[1] : '') + '.');
+        await b2oZeile(s, 'Das Ergebnis', 'Geschätzte Restnutzungsdauer <b>' + (rnd ? rnd[1] + ' Jahre' : '–') + '</b> statt 50. ' + (urt ? '„' + urt[1].trim() + '“' : '') + '.');
       },
-      async function (s) {   /* 7 · Anfrage: nur zeigen (NIE klicken) */
+      async function (s) {   /* 7 · was es bringt */
+        var t = r6Inner(r6Wiz());
+        var red = /(?:Reduzierte|Verlängerte) AfA\s*([\d,]+ %)/.exec(t), mehr = /Mehr-AfA pro Jahr\s*([+−\-]?[\d.]+ €)/.exec(t), spar = /Steuerersparnis pro Jahr\s*([\d.]+ €)/.exec(t), net = /Netto-Vorteil\s*([−\-+]?[\d.]+ €)/.exec(t);
+        var e = rhIm(r6Wiz(), /^AfA-Vergleich$/i); if (e) e.scrollIntoView({ block: 'start' });
+        await warte(500);
+        await zeige(function () { var x = rhIm(r6Wiz(), /^AfA-Vergleich$/i); return x && (x.closest('table') || x.parentElement); }, 8);
+        await b2oZeile(s, 'Was das Gutachten bringt', 'AfA <b>' + (red ? red[1] : '–') + '</b> statt 2 %: ' + (mehr ? mehr[1] : '–') + ' Abschreibung mehr im Jahr, ' + (spar ? spar[1] : '–') + ' weniger Steuer. Nach Gutachterkosten: <b>' + (net ? net[1] : '–') + '</b>.');
+      },
+      async function (s) {   /* 8 · Anfrage: nur zeigen (NIE klicken) */
         function knopf() { var w = r6Wiz(); return w && [].filter.call(w.querySelectorAll('button'), function (b) { return b.offsetWidth && /Anfrage senden/.test(b.textContent); })[0]; }
         var k = knopf(); if (k) k.scrollIntoView({ block: 'center' });
         await warte(500);
         await zeige(knopf, 10);
-        await b2oZeile(s, 'Gutachten anfragen', 'Lohnt es sich, geht von hier die <b>Anfrage</b> an einen Sachverständigen — mit allen Angaben. Bei Baujahr ' + wert('baujahr') + ' sagt DealPilot ehrlich: lieber nicht.');
-        var w = r6Wiz(); if (w) { var x = [].filter.call(w.querySelectorAll('button'), function (b) { return b.textContent.trim() === '×'; })[0]; if (x) x.click(); }
+        await b2oZeile(s, 'Gutachten anfragen', 'Von hier geht die <b>Anfrage</b> an einen Sachverständigen — mit allen Angaben aus den neun Schritten. Im Video schicken wir sie nicht ab.');
+        r6WizZu();
         kegelHoch(false);
         await warte(600);
         var sel = q('#afa_satz'); if (sel) { sel.value = '2.0'; sel.dispatchEvent(new Event('change', { bubbles: true })); }
         await warte(700);
       },
-      async function (s) {   /* 8 · Steuer-Modul */
+      async function (s) {   /* 9 · Steuer-Modul */
         var e = r6TaxItem(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/);
         var box = e && (e.closest('.card') || e); if (box) box.scrollIntoView({ block: 'start' });
         await warte(500);
         await zeige(function () { var x = r6TaxItem(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/); return x && (x.parentElement || x); }, 8);
-        var ein = r6TaxWert(/^Einnahmen V\+V/), wk = r6TaxWert(/^Werbungskosten gesamt/), erg = r6TaxWert(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/), nz = r6TaxWert(/^Steuer-(Nachzahlung|Erstattung)/);
-        await b2oZeile(s, 'Was im Jahr übrig bleibt', 'Einnahmen <b>' + (ein || '–') + '</b>, Werbungskosten ' + (wk || '–') + ' — Zinsen, Bewirtschaftung, AfA. Ergebnis aus Vermietung: <b>' + (erg || '–') + '</b>.');
-        var w = rhIm('#s3-tax', /^STEUERVERLAUF/i) || rhIm('#s3-tax', /Steuerverlauf/i);
+        var ein = r6TaxWert(/^Einnahmen V\+V/), wk = r6TaxWert(/^Werbungskosten gesamt/), erg = r6TaxWert(/^Überschuss \/ Verlust V\+V \(diese Immobilie\)/);
+        await b2oZeile(s, 'Was im Jahr übrig bleibt', 'Mieteinnahmen <b>' + (ein || '–') + '</b>, Werbungskosten ' + (wk || '–') + ' — Zinsen, Bewirtschaftung, AfA. Ergebnis aus Vermietung: <b>' + (erg || '–') + '</b>.');
+        var w = rhIm('#s3-tax', /Steuerverlauf/i);
         if (w) { (w.closest('.card') || w).scrollIntoView({ block: 'start' }); await warte(400); }
         await zeige(function () { var x = rhIm('#s3-tax', /Steuerverlauf/i); return x && (x.closest('.card') || x.parentElement); }, 8);
         var sum = rhIm('#s3-tax', /^Summe über 15 Jahre:?$/);
@@ -2517,25 +2561,34 @@
     ]
   };
 
-  /* ── MODUL 10b · BMF-KAUFPREISAUFTEILUNG ──────────────────────── */
+  /* ── MODUL 10b · BMF-KAUFPREISAUFTEILUNG + 15-%-GRENZE (MFH) ───── */
   function r6Bmf() { return q('#bmfOverlay'); }
   function r6Sichtbar(w, sel) { return w ? [].filter.call(w.querySelectorAll(sel), function (x) { return x.offsetWidth > 0; })[0] || null : null; }
   function r6BmfPane() { return q('#bmfOverlay .bmfmo-pane.active'); }
   async function r6BmfWeiter() { var b = q('#btnBmfNext'); if (b) b.click(); await warte(1600); }
+  function r6BmfKarte(v) { return [].filter.call(document.querySelectorAll('#bmfOverlay [onclick*="_v292SelectVariant"]'), function (x) { return x.tagName !== 'INPUT' && new RegExp("'" + v + "'").test(x.getAttribute('onclick')); })[0] || null; }
+  var _r6Vorher = null;
   DREHBUECHER['reihe-bmf'] = {
-    titel: 'BMF-Kaufpreisaufteilung', unterzeile: 'Gebäude und Boden — Abschlag, Klausel, Absprünge', objekt: null,
+    titel: 'BMF-Kaufpreisaufteilung', unterzeile: 'Gebäude und Boden — Abschlag, Klausel, 15-%-Grenze', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
-    aufraeumen: function () { try { if (r6Bmf() && typeof window.closeBMFModal === 'function') window.closeBMFModal(); } catch (e) {} rhAufraeumen(); },
+    aufraeumen: function () { try { if (r6Bmf() && typeof window.closeBMFModal === 'function') window.closeBMFModal(); } catch (e) {} r6WizZu(); rhAufraeumen(); },
     szenen: [
-      async function (s) {   /* 1 · das Beispiel */
-        await r6Start({ kp: true, nkm: true, bwk: true, kaufdat: true, bmf: true });
-        await r6Beispiel(s, '');
-        await zeigeGruppe(feldVon('kaufdat'), feldVon('mea'), 8);
-        await b2oZeile(s, 'Was der Rechner braucht', 'Kaufdatum <b>02.11.2026</b>, Grundstück <b>' + de(zahl('gsfl')) + ' m²</b>, Miteigentumsanteil <b>' + wert('mea') + ' %</b> — dazu den Bodenrichtwert, den DealPilot selbst holt.');
+      async function (s) {   /* 1 · das Beispiel (Kopie), Sanierung 87.000 € */
+        await r6KopieStart(R6_MFH);
+        await r6MfhBeispiel(s, '');
+        reiter('s1'); await warte(700);
+        await zeige(r6Gruppe('san'), 10);
+        var zb = r6Beginn(s, 'Angenommen: eine Sanierung', 'In den ersten drei Jahren sollen 87.000 € in das Haus fließen.');
+        await tippeH('san', '87000', 90);
+        await warte(1400);
+        await r6Ende(zb);
+        _r6Vorher = r6San15();
+        await zeige(function () { return q('#san_limit_hint') && (q('#san_limit_hint').closest('.f') || q('#san_limit_hint')); }, 8);
+        await b2oZeile(s, 'Die 15-%-Grenze', 'Bei ' + r6Pz(_r6Vorher.geb) + ' % Gebäudeanteil: höchstens <b>' + _r6Vorher.max + '</b> netto in drei Jahren. ' + eur(zahl('san')) + ' brutto sind ' + _r6Vorher.netto + ' netto — ' + _r6Vorher.status + '.');
       },
       async function (s) {   /* 2 · BMF-Rechner öffnen, Schritt 1 */
         reiter('s3-tax'); await warte(800);
-        var b = r6Knopf('#s3-tax', /BMF-Rechner/) ; var bb = [].filter.call(document.querySelectorAll('#s3-tax button'), function (x) { return /openBMFModal/.test(x.getAttribute('onclick') || ''); })[0];
+        var bb = [].filter.call(document.querySelectorAll('#s3-tax button'), function (x) { return /openBMFModal/.test(x.getAttribute('onclick') || ''); })[0];
         await zeige(function () { return bb; }, 10);
         await b2oZeile(s, 'Der BMF-Rechner', 'Teilt den Kaufpreis in <b>Gebäude</b> und <b>Boden</b> — nach der Arbeitshilfe des Finanzministeriums. Nur das Gebäude wird abgeschrieben.');
         if (bb) bb.click(); else { try { openBMFModal(); } catch (e) {} }
@@ -2544,44 +2597,46 @@
         await warte(1000);
         await zeige(function () { var p = r6BmfPane(); return p && (p.querySelector('.bmfmo-ak-box,[class*=summary],[class*=box]') || p.firstElementChild); }, 6);
         var t = r6Inner(r6BmfPane());
-        var kp = /Brutto-Kaufpreis\s*\n?\s*([\d.]+ €)/.exec(t), nk = /\+\s*Nebenkosten\s*\n?\s*([\d.]+ €)/.exec(t), ak = /Prognose-AK[^\n]*\n?[^\d]*([\d.]+ €)/.exec(t);
-        await b2oZeile(s, 'Schritt 1 · Anschaffungskosten', 'Aus dem Reiter Investition: Kaufpreis ' + (kp ? kp[1] : '–') + ' + Nebenkosten ' + (nk ? nk[1] : '–') + ' = <b>' + (ak ? ak[1] : '–') + '</b>. Fahrten zum Objekt und Notar kommen hier dazu.');
+        var kp = /Brutto-Kaufpreis\s*\n?\s*([\d.]+ €)/.exec(t), nk = /\+\s*Nebenkosten\s*\n?\s*([\d.]+ €)/.exec(t);
+        await b2oZeile(s, 'Schritt 1 · Anschaffungskosten', 'Aus dem Reiter Investition: Kaufpreis ' + (kp ? kp[1] : '–') + ', Nebenkosten ' + (nk ? nk[1] : '–') + ' (in diesem Objekt nicht erfasst). Fahrten zum Objekt und Notar kämen hier dazu.');
       },
       async function (s) {   /* 3 · Schritt 2: amtliche Aufteilung */
         await r6BmfWeiter();
-        await warteAuf(function () { return rhIm('#bmfOverlay', /Nach Jacoby/); }, 8000);
+        await warteAuf(function () { return q('#bmfJacobyZeile') && /Jacoby/.test(q('#bmfJacobyZeile').textContent); }, 8000);
         await warte(600);
         await zeigeGruppe(function () { return q('#bmf_gsfl') && q('#bmf_gsfl').closest('div'); }, function () { return q('#bmf_mea') && q('#bmf_mea').closest('div'); }, 6);
         await b2oZeile(s, 'Schritt 2 · Die Aufteilung', 'Grundstück ' + wert('bmf_gsfl') + ' m², Bodenrichtwert <b>' + wert('bmf_brw') + ' €/m²</b>, Anteil ' + wert('bmf_mea') + ' % — alles aus dem Objekt übernommen.');
-        var j = rhIm('#bmfOverlay', /Nach Jacoby/), jt = j ? r6Text(j.closest('div') || j) : '';
-        var am = /([\d,]+)\s*%\s*Gebäude per Ertragswert/.exec(r6Inner(r6BmfPane())), jm = /Nach Jacoby[^:]*:\s*([\d,]+ %)/.exec(jt);
         var jz = q('#bmfJacobyZeile'); if (jz) jz.scrollIntoView({ block: 'center' });
         await warte(400);
-        await zeige(function () { return q('#bmfJacobyZeile') || rhIm('#bmfOverlay', /Nach Jacoby/); }, 8);
+        var jm = /Nach Jacoby[^:]*:\s*([\d,]+ %)/.exec(r6Text(q('#bmfJacobyZeile')));
+        await zeige(function () { return q('#bmfJacobyZeile'); }, 8);
         await b2oZeile(s, 'Schritt 2 · Die Aufteilung', 'Zum Vergleich rechnet DealPilot die umgekehrte Ertragswertmethode (BFH IX R 12/21) mit: <b>' + (jm ? jm[1] : '–') + ' Gebäude</b>.');
       },
       async function (s) {   /* 4 · Schritt 3: vier Varianten */
         await r6BmfWeiter();
         await warteAuf(function () { var p = r6BmfPane(); return p && p.id === 'p-afa' && r6Sichtbar(p, 'table'); }, 6000);
         await warte(600);
-        await zeige(function () { var p = r6BmfPane(); return p && r6Sichtbar(p, 'table'); }, 6);
+        var tb = r6Sichtbar(r6BmfPane(), 'table'); if (tb) tb.scrollIntoView({ block: 'start' });
+        await warte(400);
+        await zeige(function () { return r6Sichtbar(r6BmfPane(), 'table'); }, 6);
         var tt = r6Inner(r6BmfPane());
         var g = /Gebäude %\s+([\d,]+ %)\s+([\d,]+ %)\s+([\d,]+ %)\s+([\d,]+ %)/.exec(tt), a = /AfA Gebäude\/Jahr\s+([\d.]+ €)\s+([\d.]+ €)\s+([\d.]+ €)\s+([\d.]+ €)/.exec(tt);
         await b2oZeile(s, 'Schritt 3 · Amtlich und drei Abweichungen', 'Amtlich <b>' + (g ? g[1] : '–') + '</b> Gebäude — mit Boden −15/−20/−25 % bis ' + (g ? g[4] : '–') + '. AfA ' + (a ? a[1] + ' bis ' + a[4] : '–') + ' im Jahr.');
       },
       async function (s) {   /* 5 · Schritt 4: Variante wählen */
         await r6BmfWeiter();
-        await warteAuf(function () { var p = r6BmfPane(); return p && p.id === 'p-hebel'; }, 6000);
+        await warteAuf(function () { var p = r6BmfPane(); return p && p.id === 'p-hebel' && r6BmfKarte('amtlich'); }, 6000);
         await warte(600);
-        function karte(v) { return [].filter.call(document.querySelectorAll('#bmfOverlay [onclick*="_v292SelectVariant"]'), function (x) { return x.tagName !== 'INPUT' && new RegExp("'" + v + "'").test(x.getAttribute('onclick')); })[0] || null; }
-        await zeige(function () { var a = karte('amtlich'), b = karte('aggressiv'); return a && b ? b2oHuelle(a, b) : (a || b); }, 6);
+        var ka = r6BmfKarte('amtlich'); if (ka) ka.scrollIntoView({ block: 'start' });
+        await warte(400);
+        await zeige(function () { var a = r6BmfKarte('amtlich'), b = r6BmfKarte('aggressiv'); return a && b ? b2oHuelle(a, b) : (a || b); }, 6);
         var zb = r6Beginn(s, 'Schritt 4 · Du wählst', 'Vier Karten, jede mit Risiko-Score — grün ist die Arbeitshilfe, rot kann das Finanzamt beanstanden.');
         await warte(3200);
-        var o = karte('optimiert'); if (o) o.click();
+        var o = r6BmfKarte('optimiert'); if (o) o.click();
         await warte(900);
         await r6Ende(zb);
-        await zeige(function () { return karte('optimiert'); }, 8);
-        var kt = r6Text(karte('optimiert'));
+        await zeige(function () { return r6BmfKarte('optimiert'); }, 8);
+        var kt = r6Text(r6BmfKarte('optimiert'));
         var gp = /Gebäude\s*([\d,]+ %)/.exec(kt), af = /AfA Gebäude \/ Jahr\s*([\d.]+ €)/.exec(kt), sc = /Risiko Score (\d)/.exec(kt);
         await b2oZeile(s, 'Optimiert · Boden −20 %', 'Gebäude <b>' + (gp ? gp[1] : '–') + '</b>, AfA <b>' + (af ? af[1] : '–') + '</b> im Jahr' + (sc ? ' — Risiko-Score ' + sc[1] + ', gelb' : '') + '.');
       },
@@ -2590,39 +2645,44 @@
         await warteAuf(function () { var p = r6BmfPane(); return p && p.id === 'p-boden' && r6Sichtbar(p, 'table'); }, 6000);
         await warte(800);
         var p = r6BmfPane(); if (p) { var sc = p.closest('.bmfmo-body'); if (sc) sc.scrollTop = 0; }
-        await zeige(function () { var x = r6BmfPane(); return x && r6Sichtbar(x, 'table'); }, 6);
+        var tb = r6Sichtbar(r6BmfPane(), 'table'); if (tb) tb.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(function () { return r6Sichtbar(r6BmfPane(), 'table'); }, 6);
         var tt = r6Inner(r6BmfPane());
-        var kopf = /MIT\s+(\d+)\s*%\s*ABSCHLAG/i.exec(tt), bo = /davon Grund und Boden\s+([\d.]+ €)\s+([\d.]+ €)/.exec(tt), af = /AfA pro Jahr bei [\d,]+ %\s+([\d.]+ €)\s+([\d.]+ €)\s+([+−\-]?[\d.]+ €)/.exec(tt);
+        var kopf = /MIT\s+(\d+)\s*%\s*ABSCHLAG/i.exec(tt), bo = /davon Grund und Boden\s+([\d.]+ €)\s+([\d.]+ €)/.exec(tt), af = /AfA pro Jahr bei [\d,]+ %\s+([\d.]+ €)\s+([\d.]+ €)/.exec(tt);
         await b2oZeile(s, 'Bodenabschlag ' + (kopf ? kopf[1] : '20') + ' %', 'Die amtliche Zahl bleibt stehen, das Szenario daneben: Boden <b>' + (bo ? bo[2] : '–') + '</b> statt ' + (bo ? bo[1] : '–') + ', AfA <b>' + (af ? af[2] : '–') + '</b> statt ' + (af ? af[1] : '–') + ' im Jahr.');
       },
       async function (s) {   /* 7 · Notarklausel */
-        var k = rhIm('#bmfOverlay .bmfmo-pane.active', /^TEXT FÜR DEN KAUFVERTRAG$/i) || rhIm('#bmfOverlay .bmfmo-pane.active', /Text für den Kaufvertrag/i);
-        var box = k && (k.closest('div[class]') || k.parentElement); if (box) box.scrollIntoView({ block: 'center' });
+        var ta = q('#bmf-boden-klausel-text'); if (ta) ta.scrollIntoView({ block: 'center' });
         await warte(500);
-        await zeige(function () { var e = rhIm('#bmfOverlay .bmfmo-pane.active', /Text für den Kaufvertrag/i); var b = e; for (var i = 0; i < 3 && b && !/kopieren/i.test(b.textContent); i++) b = b.parentElement; return b || e; }, 8);
+        await zeige(function () { var e = q('#bmf-boden-klausel-text'); var b = e; for (var i = 0; i < 3 && b && !/kopieren/i.test(b.textContent); i++) b = b.parentElement; return b || e; }, 8);
         var kl = (q('#bmf-boden-klausel-text') || {}).value || '', kb = /Grund und Boden entfallen\s+([\d.,]+\s*€)/.exec(kl), kg = /Gebäude[^.]*?entfallen\s+([\d.,]+\s*€)/.exec(kl);
         await b2oZeile(s, 'Die Notarklausel', 'Der <b>Text für den Kaufvertrag</b> steht fertig da' + (kb && kg ? ': Boden ' + kb[1] + ', Gebäude ' + kg[1] : '') + ' — zum Kopieren für den Notar. Die Begründung gehört hinein.');
       },
       async function (s) {   /* 8 · Absprünge */
-        var b1 = r6Knopf('#bmfOverlay .bmfmo-pane.active', /Restnutzungsdauer berechnen/);
         await zeige(function () { return r6Knopf('#bmfOverlay .bmfmo-pane.active', /Restnutzungsdauer berechnen/) || r6BmfPane(); }, 8);
         await b2oZeile(s, 'Die Absprünge', '<b>Restnutzungsdauer berechnen</b> öffnet den Rechner aus Modul 10a. Dazu PDF der Aufteilung, die ausgefüllte BMF-Arbeitshilfe und das Original als Excel.');
       },
-      async function (s) {   /* 9 · Übernehmen */
+      async function (s) {   /* 9 · Übernehmen -> Reiter Steuer */
         var tb = q('#bmfOverlay .bmfmo-tab[data-pane="p-hebel"]'); if (tb) tb.click();
         await warte(1000);
-        var ub = r6Knopf('#bmfOverlay', /Übernehmen/);
-        await zeige(function () { return r6Knopf('#bmfOverlay', /Übernehmen/); }, 10);
+        await zeige(function () { return q('#btnBmfApply') || r6Knopf('#bmfOverlay', /Übernehmen/); }, 10);
         var zb = r6Beginn(s, 'Übernehmen', 'Ein Klick — der Gebäudeanteil der gewählten Variante geht in den Reiter Steuer.');
         await warte(2600);
-        if (ub) ub.click();
+        var ub = q('#btnBmfApply') || r6Knopf('#bmfOverlay', /Übernehmen/); if (ub) ub.click();
         await warteAuf(function () { return !r6Bmf() || !r6Bmf().classList.contains('open'); }, 5000);
         kegelHoch(false);
         await warte(1200);
         if (!q('#s3-tax.active')) reiter('s3-tax');
         await r6Ende(zb);
         await zeigeGruppe(feldVon('geb_ant'), function () { return q('#afa_kalk') && q('#afa_kalk').closest('.f'); }, 8);
-        await b2oZeile(s, 'Im Reiter Steuer', 'Gebäudeanteil <b>' + r6Pz(wert('geb_ant')) + ' %</b> — die Abschreibung steigt auf <b>' + r6Id('afa_kalk') + '</b> im Jahr.', 600);
+        await b2oZeile(s, 'Im Reiter Steuer', 'Gebäudeanteil <b>' + r6Pz(wert('geb_ant')) + ' %</b> statt ' + r6Pz((_r6Vorher || {}).geb) + ' % — die Abschreibung steigt auf <b>' + r6Id('afa_kalk') + '</b> im Jahr.');
+      },
+      async function (s) {   /* 10 · 15-%-Grenze nach der Übernahme */
+        reiter('s1'); await warte(900);
+        var n = r6San15(), v = _r6Vorher || {};
+        await zeige(function () { return q('#san_limit_hint') && (q('#san_limit_hint').closest('.f') || q('#san_limit_hint')); }, 8);
+        await b2oZeile(s, 'Die 15-%-Grenze zieht mit', 'Mehr Gebäude, höhere Grenze: <b>' + n.max + '</b> statt ' + (v.max || '–') + '. Die Sanierung (' + n.netto + ' netto) bleibt darunter — ' + n.status + '.', 600);
       }
     ]
   };
