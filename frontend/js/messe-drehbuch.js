@@ -1494,7 +1494,8 @@
   }
   function fehlt(s) { try { return DealPilotObjektReiter.fehltFuer(s); } catch (e) { return []; } }
   function stufeZeile(s) { return function () { var b = q('#oe-stufen [data-oe-stufe="' + s + '"]'); return b && b.closest('.oe-row'); }; }
-  function frei(s) { var r = stufeZeile(s)(); var m = r && /(\d+)\s*frei/.exec(r.textContent); return m ? m[1] : null; }
+  /* nur die Zelle „N frei" - gemessen las der ganze Zeilentext „Stufe 1" + „10 frei" als 110 */
+  function frei(s) { var r = stufeZeile(s)(), w = r && r.querySelector('.oe-w'); var m = w && /(\d+)\s*frei/.exec(w.textContent); return m ? m[1] : null; }
   function mbKarteH() { try { return DealPilotMB.letzter(); } catch (e) { return null; } }
 
   /* gemeinsamer Anfang: Merker sichern, Spion, „Neues Objekt" */
@@ -1572,7 +1573,25 @@
     kegelHoch(false);
     await warte(800);
   }
-  function kartenUebernehmen() { var b = [].filter.call(document.querySelectorAll('#avsec button'), function (x) { return /übernehmen/.test(x.textContent) && x.offsetWidth; })[0]; if (b) b.click(); return !!b; }
+  /* der Knopf der Karte; gemessen lag er bei einem Lauf mit 0 px Breite vor
+     - geklickt wird er trotzdem (der Handler hängt am Dokument). Was dabei
+     passiert ist, steht in DPM_REIHE.uebernahme. */
+  function kartenUebernehmen() {
+    var b = [].filter.call(document.querySelectorAll('#avsec [data-apply="dp"]'), function (x) { return /übernehmen/.test(x.textContent); });
+    var vis = b.filter(function (x) { return x.offsetWidth; })[0] || b[0];
+    if (vis) vis.click();
+    DPM_REIHE.uebernahme = (DPM_REIHE.uebernahme || []).concat([{ knoepfe: b.length, sichtbar: !!(vis && vis.offsetWidth), sv: wert('svwert') }]);
+    return !!vis;
+  }
+  /* die Stufe wählen, ohne zum ersten fehlenden Feld zu springen: der Knopf
+     „was fehlt" wechselt dafür den Reiter - gemessen sprang Stufe 2 nach
+     Investition, und alle folgenden Kegel lagen auf verborgenen Feldern */
+  async function stufeWaehlen(n) {
+    var p = q('#oab-dp-stufen [data-oe-ziel="' + n + '"]');
+    if (p) p.click(); else { try { DealPilotObjektReiter.zielSetzen(n); } catch (e) {} }
+    await warte(700);
+    if (!q('#s0.active')) reiter('s0');
+  }
   function kartenText(re) { var a = q('#avsec'); var t = a ? a.innerText.replace(/\s+/g, ' ') : ''; var m = re.exec(t); return m ? m[1].trim() : null; }
 
   /* ── MODUL 03 · DATENAUFNAHME: VIER WEGE ─────────────────────────── */
@@ -1596,7 +1615,8 @@
       async function (s) {   /* 3 · Exposé / Marktbericht */
         rhNur(['import']);
         await zeige(rhKachel('import'), 8);
-        await warte(900);
+        s.zeile('Weg 1 · ' + rhNameKachel('import'), 'Kachel anhaken, <b>Abrufen</b> — das Fenster öffnet sich.');
+        await warte(2900);
         var r = q('#oab-run'); if (r) r.click();
         await warteAuf(function () { return q('#oabi-ov #oabi-drop'); }, 5000);
         kegelHoch(true);
@@ -1615,7 +1635,8 @@
       async function (s) {   /* 4 · Sprache */
         rhNur(['voice']);
         await zeige(rhKachel('voice'), 8);
-        await warte(900);
+        s.zeile('Weg 2 · ' + rhNameKachel('voice'), 'Kachel anhaken, <b>Abrufen</b> — das Fenster öffnet sich.');
+        await warte(2900);
         var r = q('#oab-run'); if (r) r.click();
         await warteAuf(function () { return q('#oabi-ov #vi-live'); }, 6000);
         kegelHoch(true);
@@ -1634,7 +1655,8 @@
       async function (s) {   /* 5 · ImmoMetrica */
         rhNur(['immometrica']);
         await zeige(rhKachel('immometrica'), 8);
-        await warte(900);
+        s.zeile('Weg 3 · ' + rhNameKachel('immometrica'), 'Kachel anhaken, <b>Abrufen</b> — das Fenster öffnet sich.');
+        await warte(2900);
         var r = q('#oab-run'); if (r) r.click();
         await warteAuf(function () { return q('#imo-src .imo-pill'); }, 6000);
         kegelHoch(true);
@@ -1648,8 +1670,9 @@
         var o = q('#imo-list .imo-o[data-i="3"]'); if (o) o.click();
         await warte(900);
         await zeige(function () { return q('#imo-ov .imo-body') || q('#imo-detail'); }, 6);
-        var d = IMO_MIT.suche.items[3].dp;
-        await b2oZeile(s, 'Weg 3 · ' + rhNameKachel('immometrica'), 'Suche „' + IMO_MIT.searches[0].name + '“: <b>' + de(IMO_MIT.suche.count) + ' Treffer</b>. Ein Klick aufs Inserat — Ort, Fläche (' + de(d.wfl) + ' m²), Baujahr und Preis gehen ins Objekt.');
+        /* die Trefferzahl so, wie das Fenster sie zeigt („5 von 1.527 geladen") */
+        var nt = (function () { var e = rhIm('#imo-ov', /von\s+[\d.]+\s+geladen/); var m = e && /von\s+([\d.]+)\s+geladen/.exec(e.textContent); return m ? m[1] : null; })();
+        await b2oZeile(s, 'Weg 3 · ' + rhNameKachel('immometrica'), (nt ? 'Eine gespeicherte Suche: <b>' + nt + ' Treffer</b>. ' : '') + 'Ein Klick aufs Inserat — Ort, Fläche, Baujahr und Preis gehen ins Objekt.');
         var c = q('#imo-cancel'); if (c) c.click();
         kegelHoch(false);
         await warte(700);
@@ -1657,7 +1680,8 @@
       async function (s) {   /* 6 · Geführte Eingabe */
         rhNur(['gefuehrt']);
         await zeige(rhKachel('gefuehrt'), 8);
-        await warte(900);
+        s.zeile('Weg 4 · ' + rhNameKachel('gefuehrt'), 'Kachel anhaken, <b>Abrufen</b> — das Fenster öffnet sich.');
+        await warte(2900);
         var r = q('#oab-run'); if (r) r.click();
         await warteAuf(function () { return q('#oabi-ov #vi-rf-in'); }, 6000);
         kegelHoch(true);
@@ -1711,14 +1735,14 @@
       async function (s) {   /* 2 · Stufe 1 braucht */
         await zeige(function () { return q('#oab-dp-stufen'); }, 10);
         await b2oZeile(s, 'Stufe 1 · Einfach', 'Die Stufe wählst du oben an der DealPilot-Kachel — oder hier im Reiter.');
-        var b = q('#oe-stufen [data-oe-stufe="1"]'); if (b) b.click();
+        await stufeWaehlen(1);
         await warte(600);
         await zeige(function () { return q('#oe-fehlt'); }, 8);
         var l = feldNamen(fehlt(1));
         await b2oZeile(s, 'Stufe 1 braucht', '<b>' + l.length + ' Angaben</b>: ' + l.join(', ') + '.');
       },
       async function (s) {   /* 3 · ausfüllen, abrufen */
-        await zeige(function () { var e = document.getElementById('plz'); return e && e.closest('.card'); }, 8);
+        await zeige(function () { return b2oHuelle(feldVon('plz')(), feldVon('baujahr')()); }, 8);
         s.zeile('Stufe 1 · Einfach', 'Die Wohnung aus Modul 02: Sachsenstraße 18 in Herford.');
         await tippeH('plz', '32052'); await tippeH('ort', 'Herford'); await tippeH('str', 'Sachsenstraße', 60); await tippeH('hnr', '18');
         await tippeH('objart', 'ETW'); await tippeH('wfl', '100'); await tippeH('baujahr', '1998');
@@ -1747,12 +1771,12 @@
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         try { DealPilotObjektReiter.zielSetzen(2); } catch (e) {}
         await warte(600);
-        var b = q('#oe-stufen [data-oe-stufe="2"]'); if (b) b.click();
+        await stufeWaehlen(2);
         await warte(600);
         await zeige(function () { return q('#oe-fehlt'); }, 8);
         var l = feldNamen(fehlt(2));
         await b2oZeile(s, 'Stufe 2 · Mittel', 'Dazu <b>' + l.length + ' Angaben</b>: ' + l.join(', ') + '.');
-        await zeige(function () { var e = document.getElementById('zimmer'); return e && e.closest('.card'); }, 8);
+        await zeige(function () { return b2oHuelle(feldVon('zimmer')(), feldVon('standardstufe')()); }, 8);
         s.zeile('Stufe 2 · Mittel', 'Kaufpreis 180.000 €, Kaltmiete 900 € — dazu Zimmer, Etage, Zustand, Energie und Standardstufe.');
         await tippeH('kp', '180000', 40); await tippeH('nkm', '900', 40);
         await tippeH('zimmer', '3'); await tippeH('etage', '1');
@@ -1779,7 +1803,7 @@
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         try { DealPilotObjektReiter.zielSetzen(3); } catch (e) {}
         await warte(600);
-        var b = q('#oe-stufen [data-oe-stufe="3"]'); if (b) b.click();
+        await stufeWaehlen(3);
         await warte(700);
         await zeige(function () { return q('#oe-fehlt'); }, 8);
         var l = feldNamen(fehlt(3));
@@ -1897,7 +1921,7 @@
         await warte(900);
       },
       async function (s) {   /* 6 · Werte in den Feldern, Stufe 2 läuft */
-        await zeige(function () { var e = document.getElementById('plz'); return e && e.closest('.card'); }, 8);
+        await zeige(function () { return b2oHuelle(feldVon('plz')(), feldVon('ds2_energie')()); }, 8);
         var oa = (function () { var e = document.getElementById('objart'); return e && e.selectedIndex >= 0 ? e.options[e.selectedIndex].text : wert('objart'); })();
         s.zeile('In den Feldern', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + oa + ', ' + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + ' — und gleich startet die Stufe 2.');
         var mod = await warteAuf(function () { return q('#dp-mba .k'); }, 12000);
