@@ -38761,6 +38761,16 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Prod für v2191–v2197 (Rebuild backend und mb-backend; Migration 018 läuft beim Start).
 
 
+### v2248 · Stripe-Rechnungen geprüft und Checkouts nachgezogen (15.10.2026, Staging)
+- **Was:** Marcel: „prüfen ob jeder Kunde bei Stripe eine vernünftige Rechnung bekommt“.
+- **Gemessen (Live-Konto `acct_1TWXFdGefFev8arz`, lesend im Prod-Container):** 2 Kunden, beide eigene Testkonten; 1 bezahlte Rechnung `DEALPILOT-0001` (0,00 €), ein Kunde ohne Anschrift; 0 bezahlte Einmal-Checkouts. Keine aktiven Steuersätze, Stripe Tax „active“ (ungenutzt, `automatic_tax` aus). Portal: Rechnungsverlauf an, Adresse änderbar. Fußzeile trägt den § 19-Hinweis.
+  - **PDF gelesen:** Absender „Junker Immobilien, Hermannstr. 9, 32609 Hüllhorst“ — **keine Steuernummer** (§ 14 Abs. 4 Nr. 2 UStG verlangt Steuernummer oder USt-IdNr, auch beim Kleinunternehmer); Absendername ist die Marke, nicht der Unternehmer (Junker Solution, Inh. Marcel Junker); Spalten „zzgl. Steuern“; Papier „letter“ statt A4. → **Dashboard-Einstellungen, nur Marcel.**
+  - **Code:** Einmalkäufe (`credits.js`, Kontingent + Bewertungen) als `mode: 'payment'` ohne `invoice_creation` → keine Rechnung, nur Beleg. Abo-Checkout ohne `customer_update` → Anschrift landet nicht am Kunden. Seat-Checkout ohne Anschrift.
+- **Gebaut:** `invoice_creation` + Anschrift Pflicht + `customer_update` in beiden Einmal-Checkouts; Abo `customer_update` + `locale: 'de'`; Seats Anschrift Pflicht.
+- **Commit:** `963db402`, `8b8d2305`
+- **Nachweis:** Sandbox (Staging-Container, `sk_test`): Checkout payment mit Kunde, payment mit neuer E-Mail, Abo — alle drei von Stripe angenommen, `invoice_creation.enabled=true`; Sitzungen verfallen lassen, Probekunde gelöscht. Backend neu gebaut, `invoice_creation` 4× im Image.
+- **Rest:** Prod-Rollout v2248 (Freigabe). Marcel im Dashboard: Steuernummer, Unternehmername, A4, ggf. Stripe Tax aus. Ein echter Testkauf auf Prod danach am PDF prüfen.
+
 ### Prod-Rollout (22) · v2239–v2247d auf Produktion (15.10.2026)
 - **Was:** Freigabe Marcel („ja angleichen und dann rollout“). v2247d: Zinsbindungs-Empfehlung (`market-rates.js`) im Du. `main` per `--no-ff` mit `origin/staging`; Prod `git pull`, Rebuild `backend` + `mb-backend`, Migration 088.
 - **Commit:** `536db030` (v2247d), Merge `639a3b7f`
