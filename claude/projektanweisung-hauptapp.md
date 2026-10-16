@@ -38840,6 +38840,14 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2355 + v2356 + Prod-Rollout (42) · Liegenschaftszins NRW 2026 · Nachernte Umrechnungskoeffizient (16.10.2026)
+
+- **Was (v2355):** Liegenschaftszins NRW aus Grundstücksmarktdaten NRW Ausgabe 2026 (`lzs.csv`, Berichtsjahr 2025, Stichtag 31.12.2025, dl-de/zero-2-0): 502 Sätze, alle 73 Ausschüsse, neue Datei `lzs-swf-2026-nachernte.json` neben `lzs-nrw.json` (GMD 2025). Umwandler nachgebaut und am Vorjahrgang feldgleich geprüft (493/493); `findeZweig` liefert 502/502 den neuen Satz. Median-Änderung 0,0 Prozentpunkte, 32 neue Zweige. HE/HH/Dresden/Leipzig/NI und NRW-SWF der Großstädte führten 2026 schon; Berlin, Gütersloh-SWF, Offenbach-SWF ohne freien Jahrgang 2026 (keine Sperre — würde den älteren Wert verdrängen).
+- **Was (v2356):** Nachernte UK Fläche: SH-Werte Flensburg, Rendsburg-Eckernförde (5 Richtgrößen, 25-m²-Rundung), Schleswig-Flensburg, Neumünster; BW 33 bisher fehlende Ausschüsse (282 Gemeindesätze) mit genauem Sperrgrund, 10 „nicht untersucht" aufgelöst; BY/West/MV Sperren verfeinert, LK Rostock Stützstelle. DealPilot-Formel: 169 Tabellen aus 13 Ländern, b = −0,213 (Stadt −0,241), typ. Abweichung 1,5 %.
+- **Commit:** `6bd94a4e` (v2355), v2356, Merge `b51af458`.
+- **Nachweis:** Sicherung `mb-20261016-1834` (25 MB, 32 Tab.). `register-saat.mjs` Staging und Prod: Laufzeitregister LZS 3.038, UK 1.363 (Staging 1.366 inkl. 3 Platzhalter). Gegenprobe Prod-Container: HE/TH/Aachen Sperre, Bielefeld 0,59, Leer 0,97. Gold RC=0, `/auth/me` 401.
+- **Rest (Marcel):** Lizenz der SH-Legenden und Kiel/Trier (keine Angabe), Markgräflerland-Breisgau, Lübeck/Lauenburg/Ostholstein (Simon/Kleiber als Modell?), LK Esslingen (60 €), Leipzig/Dresden SWF 2026 nur nach Baujahr bzw. Regression aufgeteilt — übernehmen?
+
 ### Datenkorrektur 16.10.2026 · Nebenkosten aller Objekte des Kontos info@ aus dem Investmentprofil (Staging 39, Prod 25)
 
 - **Was:** Marcel: „ja kannst du machen mit den bestehenden Objekten, das sind nur Demo-Objekte". In allen Objekten des Kontos info@junker-immobilien.io die fünf Erwerbsnebenkosten aus dem Profil gesetzt: Notar 1,7 · Grundbuch 0,5 · Makler 3,57 · Sonstige 1,5 % (Profil, gemessen im Staging-Browser = config.js-Vorgaben; das Profil liegt nur in localStorage `dp_investment_profile`), Grunderwerbsteuer je PLZ über `grest-plz-lookup.js` (NW 6,5 · NI 5 · ST 5 · SN 5,5; ohne PLZ 6,5). Gebäudeanteil NICHT angefasst (amtlicher Wert, kein Profilwert — Ravensberger Weg 38 bleibt 74,82). Euro-Felder und `_kpis_*` rechnet die App beim nächsten Öffnen.
