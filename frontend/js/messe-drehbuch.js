@@ -3205,8 +3205,8 @@
   async function ue2PdfSeite(n) {
     var o = el('dpm-pdf');
     o.style.cssText = 'position:fixed;left:4%;right:4%;top:3%;bottom:4%;z-index:100002;background:#2b2b2b;border:2px solid ' + G + ';border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)';
-    o.innerHTML = '<iframe title="Investment-PDF" style="width:100%;height:100%;border:0" src="' + _ue2Pdf + '#page=' + n + '&toolbar=0&navpanes=0&view=Fit"></iframe>';
-    await warte(1800);
+    o.innerHTML = '<iframe title="Investment-PDF" style="width:100%;height:100%;border:0" src="' + _ue2Pdf + '#page=' + n + '&toolbar=0&navpanes=0&view=FitH"></iframe>';
+    await warte(4000);
   }
   DREHBUECHER['reihe-ueberblick2'] = {
     titel: 'Vom neuen Objekt zum DealScore', unterzeile: 'Der ganze Weg am Stück', objekt: null,
@@ -3523,8 +3523,20 @@
   };
   var _r15Vor = null;
 
-  /* ═══ VIDEOREIHE · SPEZIALMODUL 16 · STUFE 3 GENAUER (v2273) ═════════════
-     Videoreihe.md, Teil C (= Ergänzung zu Modul 04). KOPIE der Bismarckstr. 27,
+  /* ═══ VIDEOREIHE · SPEZIALMODUL 16 · STUFE 3 GENAUER (v2276) ═════════════
+     v2276 · Marcel 16.10.2026: „das Video mit Ertragswert wäre toll, wo alles drin
+     ist und auch amtlich - Beispiel anpassen". Das Beispiel ist jetzt eine KOPIE
+     der Westerfeldstr. 140, Bielefeld (MFH, 4 WE, Bj 1967): dort greift Anlage 2
+     (gemessen am Register: 2 Punkte RND 23,6 J., 6 Punkte 32,3 J.) und es gibt
+     einen Ertragswert mit amtlichem Liegenschaftszins (2,6 %, Oberer
+     Gutachterausschuss NRW). GEMESSEN: für Bielefeld ist KEIN Sachwertfaktor
+     hinterlegt (für MFH auch sonst bei keinem Objekt im Konto) - der Sachwert
+     bleibt vorläufig, und das Video sagt es. Angenommen im Lauf (nur an der
+     Kopie): Fassade gedämmt (< 5 Jahre, bleibt für den Bericht stehen),
+     Hinterland 250 m² à 5 €, zwei Garagen 36 m² Stufe 4, Reparaturen 25.000 €
+     (boG). Mit genau diesen Angaben ist der Stufe-3-Bericht EINMAL echt erzeugt
+     (DPM_REIHE_DATEN.westerfeld.mb[3]) - hier abgespielt.
+     Bis v2275 stand hier: KOPIE der Bismarckstr. 27,
      Detmold (MFH, 6 WE, Bj 1908 - Vierspänner, 9 Modernisierungspunkte,
      Standardstufe 4 stehen schon im Objekt), ohne Analyse und Ankauf-Stand, beim
      Aufräumen gelöscht. Im Lauf ANGENOMMEN (nur an der Kopie, im Untertitel so
@@ -3539,7 +3551,8 @@
      bewegen die Restnutzungsdauer NICHT, und für Mehrfamilienhäuser in Lippe
      führt der Ausschuss keinen Sachwertfaktor: der boG wirkt deshalb nicht im
      vorläufigen Sachwert. Das Drehbuch sagt beides, statt es zu verschweigen. */
-  var R16_BISMARCK = 'c5278bb5-7012-4e1b-8372-7e5cef3500a1', R16_BERICHT = 215;
+  var R16_OBJ = R11_WESTERFELD;   /* v2276 · die Berichtsnummer steht beim Mitschnitt: DPM_REIHE_DATEN.westerfeld.bericht3 */
+  function r16Bericht() { var D = window.DPM_REIHE_DATEN; return (D && D.westerfeld && D.westerfeld.bericht3) || null; }
   var _r16Iv = null;
   function r16Frame() { return q('#mbv-frame'); }
   function r16Doc() { var f = r16Frame(); try { return f && f.contentDocument; } catch (e) { return null; } }
@@ -3600,8 +3613,8 @@
     aufraeumen: function () { r16MbZu(); rhAufraeumen(); },
     szenen: [
       async function (s) {   /* 1 · das Beispiel */
-        await r6KopieStart(R16_BISMARCK, { ohneAnkauf: true, ohneAnalyse: true });
-        if (_rh) _rh.satz = 'bismarck';
+        await r6KopieStart(R16_OBJ, { ohneAnkauf: true, ohneAnalyse: true });
+        if (_rh) _rh.satz = 'westerfeld';
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
         var we = wert('einheiten');
@@ -3621,7 +3634,14 @@
         await warteAuf(b, 8000);
         r15Oben(a()); await warte(400);
         await zeigeGruppe(a, b, 6);
-        await b2oZeile(s, 'Vorab aus dem Register', 'Liegenschaftszins <b>' + (r16LeisteWert(/^Liegenschaftszins/) || '–') + '</b>, Sachwertfaktor ' + (r16LeisteWert(/^Sachwertfaktor/) || '–') + ', Nutzungsdauer ' + (r16LeisteWert(/^GND \/ RND/) || '–') + ' — vorab, ohne Kosten.');
+        /* v2276 · der Ausschuss steht in der Zeile (span[title]); ein Sachwertfaktor „1,00 · Standard" ist KEIN amtlicher Wert und wird so nicht genannt */
+        var lq = (function () { var r = r16Leiste(/^Liegenschaftszins/), e = r && r.querySelector('span[title]'); return e ? r6Text(e).replace(/Grundstuecksmarktdaten Nordrhein-Westfalen/, 'Grundstücksmarktdaten NRW') : null; })();
+        var swR = r16Leiste(/^Sachwertfaktor/), swStd = swR && /ohne Marktanpassung/.test(r6Text(swR));
+        await b2oZeile(s, 'Vorab aus dem Register', 'Liegenschaftszins <b>' + (r16LeisteWert(/^Liegenschaftszins/) || '–') + '</b>' + (lq ? ' (' + lq + ')' : '') + ', Nutzungsdauer ' + (r16LeisteWert(/^GND \/ RND/) || '–') + ' — vorab, ohne Kosten.');
+        if (swStd) {
+          await zeige(function () { return r16Leiste(/^Sachwertfaktor/); }, 6);
+          await b2oZeile(s, 'Sachwertfaktor', 'Für diesen Ort hat der Ausschuss <b>keinen</b> veröffentlicht. Beim Mehrfamilienhaus führt ohnehin der <b>Ertragswert</b> — der Sachwert bleibt vorläufig.');
+        } else await b2oZeile(s, 'Sachwertfaktor', (r16LeisteWert(/^Sachwertfaktor/) || '–') + ' — der Faktor wird im Bericht aus dem vorläufigen Sachwert abgelesen.');
       },
       async function (s) {   /* 4 · Modernisierung -> Punkte -> Restnutzungsdauer */
         var tab = function () { return q('#oe-gewerke'); };
@@ -3629,7 +3649,7 @@
         await zeigeGruppe(r16Gewerk('mod_aussenwand'), r16Gewerk('mod_grundriss'), 6);
         await b2oZeile(s, 'Optional: Modernisierung', 'Die Spalte „modernisiert“ ergibt die Punkte der Anlage 2: hier <b>' + wert('mod_punkte') + ' von 20</b>.');
         await zeige(r16Gewerk('mod_aussenwand'), 6);
-        var zb = r6Beginn(s, 'Ein Feld mehr', 'Angenommen, die Fassade wäre neu gedämmt …');
+        var zb = r6Beginn(s, 'Ein Feld mehr', 'Angenommen, die Fassade wurde vor drei Jahren gedämmt …');
         var vor = wert('mod_punkte'), rndVor = r16LeisteWert(/^GND \/ RND/);
         await warte(1600);
         await r16Setze('mod_aussenwand', '< 5 Jahre');
@@ -3640,11 +3660,11 @@
         var rr = function () { return r16Leiste(/^GND \/ RND/); };
         await zeigeGruppe(rr, function () { return r16Leiste(/^Modernisierungspunkte/); }, 6);
         /* die Leiste rechnet live (Register, ohne Kosten): bewegt sich die Restnutzungsdauer, steht es da - sonst der Grund */
-        if (bewegt) await b2oZeile(s, 'Was sich bewegt', 'Punkte <b>' + vor + ' → ' + nach + '</b>, Nutzungsdauer gesamt / rest <b>' + rndVor + ' → ' + rndNach + '</b> — weniger Alterswertminderung.');
+        if (bewegt) await b2oZeile(s, 'Was sich bewegt', 'Punkte <b>' + vor + ' → ' + nach + '</b>, Nutzungsdauer gesamt / rest <b>' + rndVor + ' → ' + rndNach + '</b> — nach Anlage 2. Längere Restnutzung: höherer Ertragswert, weniger Alterswertminderung im Sachwert.');
         else {
           await b2oZeile(s, 'Was sich bewegt', 'Punkte <b>' + vor + ' → ' + nach + '</b>, Nutzungsdauer bleibt <b>' + (rndNach || '–') + '</b>: Baujahr ' + wert('baujahr') + ' liegt hinter der Anlage 2. DealPilot rechnet nichts hoch — „sachverständig zu würdigen“.');
         }
-        await r16Setze('mod_aussenwand', 'Keine/Nie');
+        /* v2276 · die Dämmung bleibt stehen - der Bericht rechnet mit ihr */
         await warte(900);
       },
       async function (s) {   /* 5 · Standardstufe je Gewerk */
@@ -3697,12 +3717,14 @@
         await warteAuf(function () { var v = q('#oe-vw'); return v && v.offsetHeight > 20; }, 6000);   /* Prüflauf 16: Kegel 69 % */
         await zeige(function () { return q('#oe-vw'); }, 10);
         var opts = [].map.call((q('#oe-vw-wahl') || { options: [] }).options, function (o) { return r6Text(o); });
-        var sw = opts.filter(function (o) { return /^Sachwert/.test(o); })[0];
+        var sw = opts.filter(function (o) { return /^Sachwert/.test(o); })[0], ew = opts.filter(function (o) { return /^Ertragswert/.test(o); })[0];
+        function kurz(o) { return o.replace(/\s*·\s*\d{2}\.\d{2}\.\d{4}\s*·\s*/, ': '); }
         await warte(600);
-        await b2oZeile(s, 'Das Ergebnis', (sw ? '<b>' + sw.replace(/\s*·\s*\d{2}\.\d{2}\.\d{4}\s*·\s*/, ': ') + '</b>' : 'Sachwert') + '. Den Rechenweg zeigt der Marktbericht.');
+        /* v2276 · beide Verfahren, wenn der Bericht beide liefert (Westerfeldstr.) */
+        await b2oZeile(s, 'Das Ergebnis', (ew ? '<b>' + kurz(ew) + '</b>' + (sw ? ', ' + kurz(sw) : '') : (sw ? '<b>' + kurz(sw) + '</b>' : 'Sachwert')) + '. Den Rechenweg zeigt der Marktbericht.');
       },
       async function (s) {   /* 11 · Bodenwert mit Hinterland (Marktbericht-Fenster) */
-        await r16MbOeffnen(R16_BERICHT);
+        await r16MbOeffnen(r16Bericht());
         r16Aufklappen(/Rechenweg/);
         await warte(600);
         var bw = function () { var t = r16Mb('#wv-box .wv-rw'); return t || r16Mb('#wv-box .wv-boden'); };
@@ -3776,8 +3798,8 @@
     var u = blob.__url || (blob.__url = URL.createObjectURL(blob)); if (_r19.url.indexOf(u) < 0) _r19.url.push(u);
     var o = el('dpm-pdf');
     o.style.cssText = 'position:fixed;left:4%;right:4%;top:3%;bottom:4%;z-index:100002;background:#2b2b2b;border:2px solid ' + G + ';border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)';
-    o.innerHTML = '<iframe title="PDF" style="width:100%;height:100%;border:0" src="' + u + '#page=' + n + '&toolbar=0&navpanes=0&view=Fit"></iframe>';
-    await warte(1800);
+    o.innerHTML = '<iframe title="PDF" style="width:100%;height:100%;border:0" src="' + u + '#page=' + n + '&toolbar=0&navpanes=0&view=FitH"></iframe>';
+    await warte(4000);
   }
   function r19K() { return (window.State && State.kpis) || {}; }
   function r19Pz(n, st) { return n == null || !isFinite(n) ? '–' : de(n, st == null ? 2 : st) + ' %'; }
@@ -3901,8 +3923,8 @@
     if (!_r18.url) _r18.url = URL.createObjectURL(_r18.pdf);
     var o = el('dpm-pdf');
     o.style.cssText = 'position:fixed;left:4%;right:4%;top:3%;bottom:4%;z-index:100002;background:#2b2b2b;border:2px solid ' + G + ';border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)';
-    o.innerHTML = '<iframe title="Marktbericht-PDF" style="width:100%;height:100%;border:0" src="' + _r18.url + '#page=' + n + '&toolbar=0&navpanes=0&view=Fit"></iframe>';
-    await warte(1800);
+    o.innerHTML = '<iframe title="Marktbericht-PDF" style="width:100%;height:100%;border:0" src="' + _r18.url + '#page=' + n + '&toolbar=0&navpanes=0&view=FitH"></iframe>';
+    await warte(4000);
   }
   DREHBUECHER['reihe-marktbericht'] = {
     titel: 'Der Marktbericht', unterzeile: 'Lage, Vergleichsdaten, Wertermittlung, Quellen — und das PDF', objekt: null,
