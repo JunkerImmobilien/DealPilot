@@ -48,6 +48,53 @@ function _dpProfilWert(schluessel, rueckfall) {
   return rueckfall;
 }
 
+/* v2354 · NEBENKOSTEN AUS DEN EINSTELLUNGEN - auch fuer ein BESTEHENDES Objekt.
+   Marcel 15.10.2026: „die Werte immer aus den Einstellungen und dem Set ziehen".
+   Neue Objekte bekommen sie in setDefaults(). Ein gespeichertes Objekt traegt
+   bewusst gesetzte Werte - die werden nie still ueberschrieben, sondern hier
+   auf Knopfdruck, mit Anzeige vorher/nachher und „Rueckgaengig". Die
+   Grunderwerbsteuer: ist die Automatik an (grest_auto), der Satz des Bundeslands
+   aus der Postleitzahl, sonst der Satz des Profil-Bundeslands. */
+function _dpNkZiel() {
+  var gest = null;
+  try {
+    var IP = window.DealPilotInvestmentProfile, G = window.DealPilotGrest;
+    var auto = !(IP && IP.get && IP.get('grest_auto') === false);
+    var plz = (el('plz') && el('plz').value) || '';
+    if (auto && G && G.forPlz && plz) { var r = G.forPlz(plz); if (r && isFinite(r.rate)) gest = r.rate; }
+    if (gest == null) { var bl = IP && IP.get && IP.get('bundesland'); if (bl && G && G.rates && isFinite(G.rates[bl])) gest = G.rates[bl]; }
+  } catch (e) {}
+  return { notar_p: _dpProfilWert('notar_pct', 1.70), gba_p: _dpProfilWert('grundbuch_pct', 0.50),
+           makler_p: _dpProfilWert('maklerkosten', 0), ji_p: _dpProfilWert('sonstige_nk_pct', 1.50),
+           gest_p: gest != null ? gest : 6.50 };
+}
+window.dpNkAusEinstellungen = function () {
+  var NAMEN = { makler_p: 'Makler', notar_p: 'Notar', gba_p: 'Grundbuch', gest_p: 'Grunderwerbsteuer', ji_p: 'Sonstige' };
+  var ziel = _dpNkZiel(), vorher = {}, aenderung = [];
+  var de = function (x) { return String(Math.round(Number(x) * 100) / 100).replace('.', ','); };
+  Object.keys(NAMEN).forEach(function (id) {
+    var e = el(id); if (!e) return;
+    vorher[id] = e.value;
+    var alt = parseDe(e.value), neu = ziel[id];
+    if (Math.abs((alt || 0) - neu) > 1e-9) aenderung.push(NAMEN[id] + ' ' + (e.value === '' ? '–' : de(alt)) + ' → ' + de(neu) + ' %');
+    e.value = de(neu);
+    try { e.dispatchEvent(new Event('input', { bubbles: true })); } catch (x) {}
+  });
+  try { if (typeof calc === 'function') calc(); } catch (x) {}
+  var info = el('nk-aus-einst-info');
+  if (!info) return;
+  if (!aenderung.length) { info.textContent = 'Die Nebenkosten entsprechen schon deinen Einstellungen.'; return; }
+  info.innerHTML = 'Übernommen: ' + aenderung.join(' · ')
+    + ' <button type="button" class="btn btn-outline btn-sm" id="nk-rueckgaengig">Rückgängig</button>';
+  var rb = el('nk-rueckgaengig');
+  if (rb) rb.onclick = function () {
+    Object.keys(vorher).forEach(function (id) { var e = el(id); if (!e) return; e.value = vorher[id];
+      try { e.dispatchEvent(new Event('input', { bubbles: true })); } catch (x) {} });
+    try { if (typeof calc === 'function') calc(); } catch (x) {}
+    info.textContent = 'Zurückgenommen — die vorherigen Werte gelten wieder.';
+  };
+};
+
 function setDefaults() {
   /* v2261 · Alle fuenf Erwerbsnebenkosten aus den Einstellungen (Marcel 15.10.2026:
      „die Werte immer aus den Einstellungen und dem Set ziehen"). Bis hier: Notar aus

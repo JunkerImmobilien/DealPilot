@@ -38840,6 +38840,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### Prod-Rollout (40) · Module 17 und 21 neu aufgenommen (16.10.2026)
+
+- **Was:** Modul 17 mit dem Verhalten von v2351 (Dateikarte liest das echte Paket, v2352: Konto-Wissen bleibt hier). Modul 21 mit neu abgerufener Portfolio-Analyse (v2353): DSCR im Text 1,28 = Cockpit-Kachel (vorher 0,87 aus dem num()-Fehler). Meine 1,15 (v2305) war über alle 20 Objekte mit Darlehen gerechnet, das Cockpit rechnet über die 11 Bestandsobjekte — zwei Grundmengen, kein Widerspruch.
+- **Commit:** `64a7e93d` (v2352), `8d647dbc` (v2353), `0becbcac` (landing-videothek-3a), Merge `5d8da714`.
+- **Nachweis:** alle 27 Videothek-MP4s Prod = Staging (md5), `/auth/me` 401.
+- **Rest:** keiner aus der Videoreihe. Offen bei Marcel: Fachfragen Umrechnungskoeffizient (Zwischenwerte ohne Regel, HVL/PM „nicht festgestellt“, Cottbus, Sinsheim/Calw, BORIS-BW-Lizenz, DHH/RH NI), Sprach-Demo, DealPilot-Formel für LZS/SWF.
+
 ### Prod-Rollout (38) und (39) · Module 17/22 in der Videothek · Einzelobjekt-Sicherung ohne Konto-Wissen (16.10.2026)
 
 - **Was (38):** Modul 17 „Objekt übertragen" (Sicherungsdatei exportieren/importieren, Hinweis Mandanten-Freigabe) und Modul 22 „Telegram-Bot" als gekennzeichnete Nachstellung („Nachgestellt · Demo", echte Bot-Antworten aus einem Lauf im Staging-Container ohne Telegram-Versand). Marcel: „mach so wie du meinst und es richtig ist … zum Telegrambot … nachstellen, demo dummy". Videothek 27 Videos; MP4s auf Prod kopiert (md5 = Staging).
