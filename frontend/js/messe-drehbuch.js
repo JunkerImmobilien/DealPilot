@@ -4621,7 +4621,8 @@
         var o = (P.objekte || [])[0] || {};
         await b2oZeile(s, 'Was mitgeht', 'Alle <b>' + de(Object.keys(o.daten || {}).length) + ' Eingaben</b>, Steuer, Pilot-Analyse, Ankauf-Stand — und ein Lexikon, das jedes Kürzel erklärt. Lesbar auch ohne DealPilot.');
         await b2oZeile(s, 'Was hierbleibt', 'Dein <b>Konto</b>, Abo und Kontingent, Darstellung und Standardwerte. Fotos gehen mit, solange sie angehakt sind.');
-        if (P.wissen) await b2oZeile(s, 'Achtung beim Weitergeben', 'Das Paket trägt auch dein <b>Wissen</b> mit — eigene Ergänzung und Portfolio-Analyse —, selbst wenn nur ein Objekt drin ist.');
+        /* v2351: die Einzelsicherung laesst das Konto-Wissen weg - die Zeile sagt jetzt das. */
+        await b2oZeile(s, 'Sicher weitergeben', 'Bei einem einzelnen Objekt bleibt dein <b>Konto-Wissen</b> hier — eigene Ergänzung, Portfolio-Analyse, Lageprofil und Datenraum gehen nur mit der Sicherung <b>aller</b> Objekte mit.');
         var b = q('#dpm-dpkt'); if (b && b.parentNode) b.parentNode.removeChild(b);
       },
       async function (s) {   /* 6 · Import beim Empfänger */
