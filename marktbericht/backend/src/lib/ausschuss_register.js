@@ -431,6 +431,11 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                > Vergleichswertverfahren, das sie nicht tragen. Die
                                > Verdrahtung muss `verwendung` lesen. */
                             'vgf-be.json',
+                            /* v2279: Umrechnungskoeffizienten Grundstuecksgroesse
+                               (§ 19 ImmoWertV), Kennzahl umrechnungskoeffizient_flaeche.
+                               Erster Satz: Stadt Bielefeld (BORIS-NRW 2026). Gelesen
+                               von lib/umrechnung_flaeche.js. */
+                            'uk-flaeche-nw-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
@@ -516,6 +521,8 @@ export async function ladeAusDb(q, kennzahlen = ['liegenschaftszinssatz',
                                                'erbbauzinssatz',
                                                /* v1094-WKZ */
                                                'vergleichsfaktor',
+                                               /* v2279 */
+                                               'umrechnungskoeffizient_flaeche',
                                                'bodenpreisindex']) {
   if (typeof q !== 'function') return { geladen: 0, grund: 'kein_q' };
   try {

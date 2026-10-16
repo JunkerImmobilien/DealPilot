@@ -22,7 +22,9 @@ const PFLICHT = ['land_code', 'ags', 'ebene', 'gebiet_name', 'gaa_name', 'kennza
    > kommt. */
 const KENNZAHLEN = new Set(['liegenschaftszinssatz', 'sachwertfaktor', 'vergleichsfaktor',
   'erbbaurechtskoeffizient', 'erbbauzinssatz', 'bodenpreisindex', 'bodenpreisniveau',
-  'durchschnittspreis', 'preisentwicklung', 'rohertragsfaktor']);
+  'durchschnittspreis', 'preisentwicklung', 'rohertragsfaktor',
+  /* v2279: Umrechnungskoeffizient Grundstuecksgroesse (§ 19 ImmoWertV) */
+  'umrechnungskoeffizient_flaeche']);
 
 /* ══ v1975 · DIE EINHEIT IST DIE VERWECHSLUNGSPROBE ════════════════════
 

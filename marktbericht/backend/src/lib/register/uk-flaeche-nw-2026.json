@@ -1,0 +1,202 @@
+[
+  {
+    "land_code": "NW",
+    "ags": "05711",
+    "ebene": "kreis",
+    "gebiet_name": "Stadt Bielefeld",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_tabelle",
+      "bezug": "Bodenwert = Grundstücksfläche × Bodenrichtwert × Umrechnungskoeffizient",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "normgroesse_qm",
+      "tabellen": {
+        "600": {
+          "flaeche_qm": [
+            125,
+            150,
+            175,
+            200,
+            225,
+            250,
+            275,
+            300,
+            325,
+            350,
+            375,
+            400,
+            425,
+            450,
+            475,
+            500,
+            550,
+            600,
+            650,
+            700,
+            750,
+            800,
+            850,
+            900,
+            950,
+            1000,
+            1100,
+            1200,
+            1300,
+            1400,
+            1500
+          ],
+          "koeffizient": [
+            1.37,
+            1.32,
+            1.29,
+            1.26,
+            1.23,
+            1.2,
+            1.18,
+            1.16,
+            1.14,
+            1.13,
+            1.11,
+            1.09,
+            1.08,
+            1.07,
+            1.05,
+            1.04,
+            1.02,
+            1,
+            0.93,
+            0.87,
+            0.82,
+            0.78,
+            0.74,
+            0.7,
+            0.67,
+            0.64,
+            0.59,
+            0.55,
+            0.52,
+            0.49,
+            0.46
+          ]
+        },
+        "800": {
+          "flaeche_qm": [
+            350,
+            400,
+            450,
+            500,
+            550,
+            600,
+            650,
+            700,
+            750,
+            800,
+            850,
+            900,
+            950,
+            1000,
+            1100,
+            1200,
+            1300,
+            1400,
+            1500
+          ],
+          "koeffizient": [
+            1.32,
+            1.26,
+            1.2,
+            1.16,
+            1.13,
+            1.09,
+            1.07,
+            1.04,
+            1.02,
+            1,
+            0.95,
+            0.9,
+            0.86,
+            0.82,
+            0.75,
+            0.7,
+            0.65,
+            0.61,
+            0.58
+          ]
+        }
+      },
+      "zwischenwerte": "linear",
+      "zwischenwerte_wortlaut": "Für Flächenangaben zwischen den Flächenintervallen können die Umrechnungskoeffizienten durch lineare Interpolation ermittelt werden.",
+      "oberhalb": {
+        "regel": "normgroesse_plus_rest",
+        "rest_faktor": 0.1,
+        "formel_wortlaut": "(Normgröße + (Restfläche x 0,10)) / Grundstücksgröße",
+        "restflaeche": "Grundstücksgröße minus Normgröße",
+        "gegenprobe": "Die Formel trifft die Tabelle selbst oberhalb der Normgröße auf zwei Stellen: 1.500 m² bei Norm 600 -> (600 + 900 × 0,10) / 1.500 = 0,46; bei Norm 800 -> (800 + 700 × 0,10) / 1.500 = 0,58. Damit ist „Restfläche“ = Grundstücksgröße − Normgröße belegt."
+      },
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Eine Extrapolation über die unteren Schranken hinaus, ist statistisch nicht gegeben."
+      },
+      "pruefbeispiel": {
+        "wortlaut": "Beispiel für die Bodenwertberechnung eines bebaubaren Grundstücks im individuellen Wohnungsbau mit Übergröße (850 m²); keine zusätzliche Bebauung möglich, Normgröße 600: Bodenwert = Grundstücksfläche x Bodenrichtwert x Faktor = 850 m² x 300 €/m² x 0,74 = 188.700 € rd. 189.000 €",
+        "flaeche_qm": 850,
+        "normgroesse_qm": 600,
+        "brw_eur_qm": 300,
+        "koeffizient": 0.74,
+        "bodenwert_eur": 188700,
+        "seite": 2
+      }
+    },
+    "geltungsbereich": {
+      "nutzung": "individueller Wohnungsbau (Regelfall)",
+      "objektarten": [
+        "efh",
+        "zfh",
+        "dhh",
+        "rh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "max_vollgeschosse": 2,
+      "normgroessen_qm": [
+        600,
+        800
+      ],
+      "regelfall_wortlaut": [
+        "das Grundstück nach den Vorgaben der §§ 30 bzw. 34 BauGB zu beurteilen ist.",
+        "das Grundstück nach den Vorgaben des klassischen Wohnungsbaus bis max. 2 Vollgeschosse und Dachgeschoss bebaut oder zu bebauen ist.",
+        "der angegebene Bodenrichtwert bezieht sich auf die Normgröße 600 m² bzw. 800 m².",
+        "auf dem Grundstück nur eine Bebauungsmöglichkeit realisiert oder realisierbar ist, also keine zweite Bebauungsmöglichkeit zulässig.",
+        "für die vorhandene bzw. zukünftige Bebauung aufgrund der baurechtlichen Vorgaben, wie z. B. die Grundflächenzahl (GRZ) in Verbindung mit der Größe der überbaubaren Grundstücksfläche die Normgröße ausreicht."
+      ],
+      "ausserhalb_wortlaut": "Für alle anderen Fallkonstellationen, u. a. der Geschosswohnungsbau, übergroße Reihenhausgrundstücke etc. ist eine Rücksprache mit der Geschäftsstelle des Gutachterausschusses erforderlich, um einen entwicklungsstufenorientierten Bodenwert zu ermitteln und daraus einen individuellen, auf die Grundstücksgröße abgestimmten Umrechnungskoeffizienten abzuleiten.",
+      "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in der Stadt Bielefeld, www.gutachterausschuss.bielefeld.de"
+    },
+    "belege": [
+      "Fachinformation zur Anwendung der Umrechnungskoeffizienten – Individueller Wohnungsbau –, Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld, Anhang zu den Bodenrichtwerten 2026 in BORIS-NRW (PDF erstellt 27.07.2026, abgerufen 16.10.2026). Seite 1: Regelfall (fünf Bedingungen), Tabellen für Normgröße 600 m² (125 bis 1.500 m²) und 800 m² (350 bis 1.500 m²), lineare Interpolation, Extrapolation nur oberhalb nach (Normgröße + (Restfläche x 0,10)) / Grundstücksgröße, keine Extrapolation nach unten.",
+      "Seite 2: außerhalb des Regelfalls (u. a. Geschosswohnungsbau, übergroße Reihenhausgrundstücke) Rücksprache mit der Geschäftsstelle erforderlich. Anwendungsbeispiel nachgerechnet: 850 m² × 300 €/m² × 0,74 = 188.700 € — Tabellenwert 850 m² bei Normgröße 600 = 0,74 getroffen.",
+      "Gegenprobe der Extrapolationsformel an der Tabelle selbst: 1.500 m² Norm 600 -> (600 + 900 × 0,10) / 1.500 = 0,46 (Tabelle 0,46); Norm 800 -> (800 + 700 × 0,10) / 1.500 = 0,58 (Tabelle 0,58)."
+    ],
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/brw/2026/LGDBR_1_0510200_2026.pdf",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld, Fachinformation zur Anwendung der Umrechnungskoeffizienten – Individueller Wohnungsbau, Bodenrichtwerte 2026, über BORIS-NRW (www.boris.nrw.de), dl-de/by-2-0",
+    "lizenz_hinweis": "Das Dokument nennt selbst keine Lizenz. Es wird über BORIS-NRW als Anhang der Bodenrichtwerte bereitgestellt; BORIS-NRW stellt die Bodenrichtwerte unter dl-de/by-2-0 (connectors/boris/registry.js, v1071-WLIZ-1). Deshalb mit Namensnennung.",
+    "boris_nummer": "0510200",
+    "fundstelle": "S. 1 (Regelfall, Tabellen Normgröße 600 und 800 m², Interpolation, Extrapolation), S. 2 (außerhalb des Regelfalls, Berechnungsbeispiel)",
+    "stufe_grund": "Amtlich veröffentlichte Tabelle des örtlich zuständigen Ausschusses, Jahrgang 2026, mit eigener Anwendungsregel und Berechnungsbeispiel. Fallzahl im Dokument nicht genannt.",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), nur im Regelfall des individuellen Wohnungsbaus.",
+    "belege_meta": {
+      "dokument": "Fachinformation zur Anwendung der Umrechnungskoeffizienten – Individueller Wohnungsbau –",
+      "abgerufen_am": "2026-10-16",
+      "pdf_erstellt": "2026-07-27"
+    }
+  }
+]

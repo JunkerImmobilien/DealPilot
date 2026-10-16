@@ -19,6 +19,7 @@ import { CrossCheckService } from './CrossCheckService.js';
 import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js';
 /* v1070-WUK-4 · Umrechnungskoeffizienten und Hinterland-Abgrenzung. */
 import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js';
+import { groessenanpassung as ukAusRegister } from '../lib/umrechnung_flaeche.js';   /* v2280 */
 /* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
  * zustaendigen Grundstuecksmarktbericht. */
 import { gartenland as gartenlandVorschlag, zustaendig as gaaZustaendig,
@@ -838,8 +839,28 @@ export const ReportOrchestrator = {
        * dem BORIS-Datensatz), wurde aber nur fuer einen Hinweistext benutzt.
        * Jetzt rechnet sie mit. */
       let _uk = null;
+      /* v2280 · ZUERST DAS REGISTER (Kennzahl umrechnungskoeffizient_flaeche,
+       * § 19 ImmoWertV). Bis hier kannte der Bericht Koeffizienten nur fuer
+       * Minden-Luebbecke (fest in umrechnung_nrw.js) und rechnete jeden
+       * anderen Ort mit der vollen Flaeche zum vollen Richtwert - Bericht 216,
+       * Bielefeld: 1.570 m2 x 450 = 706.500 EUR bei 600 m2 Bezugsgroesse.
+       * Gilt die Tabelle fuer die Objektart NICHT (Bielefeld: Geschoss-
+       * wohnungsbau), wird nicht umgerechnet und nicht auf eine andere
+       * Tabelle ausgewichen - der Hinweis nennt den Weg zum Ausschuss. */
+      let _ukReg = null;
       try {
-        _uk = flaechenaufteilung({
+        _ukReg = ukAusRegister({
+          ags: ref.ags || null, objektart: ref.property_type,
+          flaeche_qm: ref.plot_area,
+          bezugsgroesse_qm: _flaeche ? _flaeche.richtwertgrundstueck_qm : null,
+          brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
+        });
+        step('uk-register: ' + (_ukReg.verfuegbar
+          ? 'Koeffizient ' + _ukReg.koeffizient_bauland + ' (' + _ukReg.quelle + ')'
+          : _ukReg.grund));
+      } catch (e) { _ukReg = null; }
+      try {
+        _uk = (_ukReg && (_ukReg.verfuegbar || _ukReg.grund !== 'kein_satz')) ? (_ukReg.verfuegbar ? _ukReg : null) : flaechenaufteilung({
           ags: ref.ags || null,
           brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
           flaeche_qm: ref.plot_area,
@@ -872,6 +893,8 @@ export const ReportOrchestrator = {
         }
         if (Number(ref.hinterland_qm) > 0) {
           const _man = manuelleAufteilung({
+            /* v2280: das Bauland behaelt die Groessenanpassung des Registers */
+            groesse: (_ukReg && _ukReg.verfuegbar) ? _ukReg : null,
             flaeche_qm: ref.plot_area, hinterland_qm: ref.hinterland_qm,
             /* v1073-WGAA-6 · Die eigene Angabe schlaegt den Vorschlag. */
             hinterland_eur_qm: ref.hinterland_eur_qm
@@ -925,6 +948,13 @@ export const ReportOrchestrator = {
        * als keiner (§ 10 ImmoWertV).
        *
        * Erst hier korrigierbar: `_uk` entsteht nach dem Hinweis. */
+      /* v2280 · Tabelle vorhanden, aber nicht anwendbar: das gehoert in den
+       * Flaechenhinweis, sonst sieht die volle Flaeche wie Absicht aus. */
+      if (_flaeche && _ukReg && !_ukReg.verfuegbar && _ukReg.nicht_angepasst && _ukReg.hinweis) {
+        _flaeche.hinweis = (_flaeche.hinweis ? _flaeche.hinweis + ' ' : '') + _ukReg.hinweis;
+        _flaeche.umrechnung_nicht_angewandt = { grund: _ukReg.grund, quelle: _ukReg.quelle,
+          quelle_url: _ukReg.quelle_url };
+      }
       if (_flaeche && _flaeche.hinweis && _uk && _uk.verfuegbar) {
         const _kopf = 'Das Grundstück ist mit ' + _flaeche.objekt_qm + ' m² um '
           + _flaeche.ueberschreitung_pct + ' % größer als das Bodenrichtwertgrundstück '
@@ -943,7 +973,10 @@ export const ReportOrchestrator = {
         if (_uk.gruen_qm > 0 && _uk.quelle_art === 'eigene Angabe') {
           _flaeche.hinweis = _kopf
             + 'Das Grundstück selbst ist mit ' + _uk.bodenwert_eur_qm
-            + ' €/m² angesetzt; hinzu kommen ' + _uk.gruen_qm
+            + ' €/m² angesetzt'
+            + (_uk.koeffizient_angewandt ? ' (Bodenrichtwert × Umrechnungskoeffizient '
+              + String(_uk.koeffizient_bauland).replace('.', ',') + ' des Ausschusses)' : '')
+            + '; hinzu kommen ' + _uk.gruen_qm
             + ' m² Hinterlandfläche zu ' + _uk.gruen_eur_qm
             + ' €/m² (eigene Angabe) — getrennte Bewertung nach § 41 ImmoWertV.';
         } else if (_uk.gruen_qm > 0) {

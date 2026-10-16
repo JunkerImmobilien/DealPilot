@@ -816,8 +816,8 @@ export function sachwert(ein, bodenwertErgebnis, param) {
   out.staffel.push({ pos: `Normalherstellungskosten (${kw} €/m² BGF × ${f.wert} m²)`, wert: Math.round(kw * f.wert) });
   if (_zfh !== 1) out.staffel.push({ pos: `× Korrekturfaktor Zweifamilienhaus`, detail: 'NHK 2010, SW-RL 2012 Anlage 1', faktor: _zfh, wert: null });
   if (korr !== 1) out.staffel.push({ pos: `× Korrektur Wohnungsgröße / Grundriss`, faktor: korr, wert: null });
-  out.staffel.push({ pos: `× Baupreisindex ${_index3}`, faktor: _index3, wert: null });
-  if (regional !== 1) out.staffel.push({ pos: `× Regionalfaktor ${regional}`, faktor: regional, wert: null });
+  out.staffel.push({ pos: `× Baupreisindex`, faktor: _index3, wert: null });   /* v2280: die Zahl zeigt die Spalte faktor - vorher doppelt (1.91 1,91) */
+  if (regional !== 1) out.staffel.push({ pos: `× Regionalfaktor`, faktor: regional, wert: null });
   /* v1074-WBTL-1 · Sonstige Bauteile (Gauben, Balkone, Vordaecher,
    * Terrassen) als HERSTELLUNGSKOSTEN zum Stichtag — sie unterliegen
    * derselben Alterswertminderung wie das Gebaeude und stehen deshalb VOR
@@ -856,12 +856,12 @@ export function sachwert(ein, bodenwertErgebnis, param) {
      ob sie nach Anlage 2 abgeleitet oder nur geschaetzt ist, aendert das
      Ergebnis um Zehntausende. */
   const _awmProzent = Math.round(((gnd - rnd) / gnd) * 1000) / 10;
-  let _awmDetail = herst.toLocaleString('de-DE') + ' \u20ac \u00d7 (' + gnd + ' \u2212 ' + rnd
+  let _awmDetail = herst.toLocaleString('de-DE') + ' \u20ac \u00d7 (' + gnd + ' \u2212 ' + String(rnd).replace('.', ',')
     + ') / ' + gnd + ' = ' + String(_awmProzent).replace('.', ',') + ' % '
     + '\u2014 linear nach \u00a7 38 Abs. 1 ImmoWertV';
   if (ein.rnd_hinweis) _awmDetail += '. ' + String(ein.rnd_hinweis);
   out.staffel.push({
-    pos: `\u2212 Alterswertminderung (${gnd - rnd} von ${gnd} Jahren)`,
+    pos: `\u2212 Alterswertminderung (${String(Math.round((gnd - rnd) * 10) / 10).replace('.', ',')} von ${gnd} Jahren)`,   /* v2280: Dezimalkomma */
     detail: _awmDetail,
     wert: -minderung, summe: true,
   });

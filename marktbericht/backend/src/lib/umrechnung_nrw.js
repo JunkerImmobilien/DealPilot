@@ -199,7 +199,7 @@ export function flaechenaufteilung({ ags, brw_eur_qm, flaeche_qm, bezugsgroesse_
  *
  * Der Wertansatz ist eine Eingabe. Vorgeschlagen wird der amtliche
  * Gruenflaechenwert des Ausschusses (5 EUR/m2), aber nur wo es einen gibt. */
-export function manuelleAufteilung({ flaeche_qm, hinterland_qm, hinterland_eur_qm, brw_eur_qm, ags, rentierlich }) {
+export function manuelleAufteilung({ flaeche_qm, hinterland_qm, hinterland_eur_qm, brw_eur_qm, ags, rentierlich, groesse }) {
   const fl = Number(flaeche_qm), hl = Number(hinterland_qm), brw = Number(brw_eur_qm);
   if (!(fl > 0) || !(brw > 0)) return { verfuegbar: false, grund: 'angaben_fehlen' };
   if (!(hl > 0)) return { verfuegbar: false, grund: 'kein_hinterland' };
@@ -219,17 +219,26 @@ export function manuelleAufteilung({ flaeche_qm, hinterland_qm, hinterland_eur_q
   }
 
   const bauland = Math.max(0, fl);
+  /* v2280 · Liegt fuer das Bauland eine Groessenanpassung aus dem Register
+     vor (lib/umrechnung_flaeche.js), behaelt es sie - das Hinterland kommt
+     HINZU, es ersetzt die Anpassung nicht. Vorher fiel sie hier still weg. */
+  const g = (groesse && groesse.verfuegbar && groesse.koeffizient_angewandt) ? groesse : null;
+  const bwQm = g ? g.bodenwert_eur_qm : brw;
   return {
     verfuegbar: true, quelle_art: 'eigene Angabe',
     bauland_qm: bauland, gruen_qm: hl,
-    bodenwert_eur_qm: brw, gruen_eur_qm: satz,
-    faktor: 1, koeffizient_angewandt: false,
+    bodenwert_eur_qm: bwQm, gruen_eur_qm: satz,
+    faktor: g ? g.faktor : 1, koeffizient_angewandt: !!g,
+    koeffizient_bauland: g ? g.koeffizient_bauland : null,
+    koeffizient_bezugsgroesse: g ? g.koeffizient_bezugsgroesse : null,
+    ...(g ? { quelle: g.quelle, quelle_url: g.quelle_url, quellenvermerk: g.quellenvermerk,
+              lizenz: g.lizenz, kennzahl: g.kennzahl, berichtsjahr: g.berichtsjahr } : {}),
     /* v1072-WREN-3 · Vorgabe: eine zusaetzliche Gartenflaeche wirft keinen
      * Ertrag ab. Wer sie vermietet, setzt den Haken. */
     rentierlich: rentierlich === true,
-    wert_bauland_eur: Math.round(bauland * brw),
+    wert_bauland_eur: Math.round(bauland * bwQm),
     wert_gruen_eur: Math.round(hl * satz),
-    wert_eur: Math.round(bauland * brw + hl * satz),
+    wert_eur: Math.round(bauland * bwQm + hl * satz),
     hinweis: 'Zusätzliche Grundstücksfläche von ' + hl + ' m² mit '
       + String(satz).replace('.', ',') + ' €/m² angesetzt (eigene Angabe). '
       + 'Sie unterliegt nicht der Bodenwertverzinsung des Hauptgrundstücks; '
