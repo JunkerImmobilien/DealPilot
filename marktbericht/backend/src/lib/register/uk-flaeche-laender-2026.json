@@ -7,7 +7,64 @@
     "gaa_name": "Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen (ZGGH)",
     "kennzahl": "umrechnungskoeffizient_flaeche",
     "zweig": "ifw",
-    "formel": {
+    "geltungsbereich": {
+      "nutzung": "individueller Wohnungsbau: unbebaute Eigenheimgrundstücke (freistehende Einfamilienhäuser/Zweifamilienhäuser sowie Reihenhäuser/Doppelhaushälften)",
+      "objektarten": [
+        "efh",
+        "zfh",
+        "dhh",
+        "rh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "brw_bis_eur_qm": 400,
+      "brw_wortlaut": "Nach ersten Untersuchungen konnte festgestellt werden, dass eine Wertrelevanz lediglich bei Grundstücken mit einem Bodenrichtwert bis zu 400 €/m² erkennbar war. Die Berücksichtigung von Grundstücken mit höheren Bodenrichtwerten (d. h. über 400 €/m²) führte zu keinem signifikanten Ergebnis.",
+      "rang": "landeswert_nachrangig",
+      "rang_wortlaut": "Die hier veröffentlichten wertrelevanten Daten hat die ZGGH anhand der von allen hessischen Gutachterausschüssen für Immobilienwerte ausgewerteten Kaufverträge errechnet. Sie wurden nicht von einem Gutachterausschuss beschlossen. Es handelt sich deshalb nicht um sonstige zur Wertermittlung erforderliche Daten gem. § 193 Abs. 5 BauGB. […] Bei der Erstellung von Verkehrswertgutachten sollten vorrangig die regional ermittelten und vom jeweiligen Gutachterausschuss beschlossenen wertrelevanten Daten in die Wertermittlung einfließen. Diese werden in den jeweiligen regionalen Immobilienmarktberichten veröffentlicht.",
+      "ausserhalb_wortlaut": "Bei Nutzung der in diesem Bericht genannten wertrelevanten Daten ist eine kritische sachverständige Würdigung erforderlich. Bei der Erstellung von Verkehrswertgutachten sollten vorrangig die regional ermittelten und vom jeweiligen Gutachterausschuss beschlossenen wertrelevanten Daten in die Wertermittlung einfließen.",
+      "ausserhalb_weg": "Örtlich zuständiger Gutachterausschuss für Immobilienwerte (regionale Immobilienmarktberichte kostenfrei über gds.hessen.de); landesweit: ZGGH, info.zggh@hvbg.hessen.de, gutachterausschuss.hessen.de"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Immobilienmarktbericht Hessen 2025 (ZGGH), Kap. 8 Einleitung S. 69-70 (Rang: nicht beschlossen, vorrangig regionale Daten), Kap. 8.1.1 S. 70 (Datengrundlage, Wertrelevanz bis 400 €/m²), Tab. 8.1.1 S. 71 (Tabelle 150-1.500 m², 650 m² = 1,00), Beispiel S. 72; Impressum S. 2 (Nutzung, Version 1.1 vom 18.12.2025)"
+      },
+      {
+        "art": "Stichtag der Tabelle",
+        "fundstelle": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg, Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten (Bodenrichtwerte 01.01.2024), Seite 2 von 2: dieselbe Tabelle (Datengrundlage 2008 und 2009, 2.785 Grundstücksflächen) mit „Stichtag: 01.01.2010“ und „Der Gutachterausschuss geht davon aus, dass die aufgeführten Umrechnungskoeffizienten mangels aktueller Untersuchungen hilfsweise weiterhin angenommen werden können.“ https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-09/0606057-gaa-kb-2024.pdf"
+      },
+      {
+        "art": "Nachrechnung",
+        "fundstelle": "Anwendungsbeispiel S. 72 mit der echten Funktion nachgerechnet: 1,05 / 0,98 = 1,0714; 110 × 1,0714 = 117,85 -> 118 €/m² (Dokument: 118 €/m²). Tabellenwerte 500 m² = 1,05 und 700 m² = 0,98 getroffen."
+      }
+    ],
+    "stufe": "E",
+    "stufe_grund": "Landesweite Auswertung der ZGGH, ausdrücklich NICHT vom Gutachterausschuss beschlossen und keine sonstigen erforderlichen Daten nach § 193 Abs. 5 BauGB; Daten 2008/2009 ohne GFZ-Bereinigung. Nur nachrangig nach den Daten des örtlichen Ausschusses (ImmoWertA zu § 9 Abs. 3 b).",
+    "stichtag": "2010-01-01",
+    "stichtag_hinweis": "Der Landesbericht nennt keinen Stichtag. 01.01.2010 steht wörtlich beim Gutachterausschuss Kassel/Waldeck-Frankenberg für genau diese Tabelle (gleiche Datengrundlage, gleiche 28 Werte). Der Stichtag liegt 16 Jahre zurück; die Tabelle gilt nur hilfsweise.",
+    "berichtsjahr": 2025,
+    "quelle_url": "https://www.buck-vermessung.de/wp-content/uploads/2026/01/immobilienmarktbericht-hessen-2025.pdf",
+    "quelle_hinweis": "Amtlich herausgegeben von der ZGGH (gutachterausschuss.hessen.de); die gelesene Datei ist eine unveränderte Kopie auf einem Fremdserver, weil der amtliche Link zum Abruf nicht erreichbar war. Eine Ausgabe 2026 des Landesberichts wurde am 16.10.2026 nicht gefunden.",
+    "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+    "lizenz_hinweis": "Wörtlich Impressum S. 2, weiter: „Die bereitgestellten Daten und Metadaten dürfen für kommerzielle und nicht kommerzielle Nutzung insbesondere 1. vervielfältigt, ausgedruckt, präsentiert, verändert, bearbeitet sowie an Dritte übermittelt werden, […] Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“ Inhaltlich entspricht das dl-de/zero-2-0; die Kennung selbst nennt das Dokument nicht. Ein Vermerk ist nicht verlangt — er wird trotzdem geführt und weist die Umformung aus.",
+    "quellenvermerk": "Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen (ZGGH), Immobilienmarktbericht Hessen 2025, Tab. 8.1.1 (Werte unverändert, für die Berechnung in eine Tabelle umgeformt)",
+    "fundstelle": "Kap. 8.1.1, S. 70-72 (Tab. 8.1.1 S. 71, Beispiel S. 72)",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), individueller Wohnungsbau bis 400 €/m², nur wenn der örtliche Ausschuss keinen eigenen Koeffizienten führt.",
+    "belege_meta": {
+      "dokument": "Immobilienmarktbericht Hessen 2025, Kap. 8.1.1 Grundstücksfläche",
+      "abgerufen_am": "2026-10-16",
+      "version": "1.1 vom 18.12.2025"
+    },
+    "vollstaendig": false,
+    "warum_kein_wert": "Der Immobilienmarktbericht Hessen führt eine landesweite Tabelle als Ersatz, sie beruht aber auf Kaufpreisen von 2008/09 und ist nach Angabe der Zentralen Geschäftsstelle nicht beschlossen; ein eigener Stichtag fehlt. Das trägt keinen amtlichen Landeswert (v2283). Maßgeblich sind die Umrechnungskoeffizienten des örtlichen Gutachterausschusses.",
+    "auflagen": "Werte nur zur Dokumentation hinterlegt; Quelle als unveränderte Kopie gelesen, amtlicher Link am 16.10.2026 nicht erreichbar.",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen (ZGGH), Jahrgang 2025",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {},
+    "formel_vorgemerkt": {
       "form": "flaeche_tabelle",
       "bezug": "Bodenwert (Objektfläche) = Bodenrichtwert × UK(Objektfläche) / UK(Fläche des Bodenrichtwertgrundstücks)",
       "wirkung": "multiplikativ",
@@ -98,9 +155,18 @@
         "rundung_eur_qm": 1,
         "seite": 72
       }
-    },
+    }
+  },
+  {
+    "land_code": "TH",
+    "ags": "16",
+    "ebene": "land",
+    "gebiet_name": "Thüringen (landesweit)",
+    "gaa_name": "Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Freistaats Thüringen",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
     "geltungsbereich": {
-      "nutzung": "individueller Wohnungsbau: unbebaute Eigenheimgrundstücke (freistehende Einfamilienhäuser/Zweifamilienhäuser sowie Reihenhäuser/Doppelhaushälften)",
+      "nutzung": "Eigenheimgrundstücke: unbebaute Grundstücke für freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften oder Reihenhäuser",
       "objektarten": [
         "efh",
         "zfh",
@@ -112,60 +178,55 @@
         "etw",
         "gewerbe"
       ],
-      "brw_bis_eur_qm": 400,
-      "brw_wortlaut": "Nach ersten Untersuchungen konnte festgestellt werden, dass eine Wertrelevanz lediglich bei Grundstücken mit einem Bodenrichtwert bis zu 400 €/m² erkennbar war. Die Berücksichtigung von Grundstücken mit höheren Bodenrichtwerten (d. h. über 400 €/m²) führte zu keinem signifikanten Ergebnis.",
+      "spanne_qm": [
+        300,
+        2000
+      ],
+      "brw_von_eur_qm": 20,
+      "brw_bis_eur_qm": 1000,
+      "brw_wortlaut": "… können nur für Grundstücksgrößen von 300 m² bis 2.000 m² und für Bodenwerte zwischen 20 EUR/m² und 1.000 EUR/m² verwendet werden.",
       "rang": "landeswert_nachrangig",
-      "rang_wortlaut": "Die hier veröffentlichten wertrelevanten Daten hat die ZGGH anhand der von allen hessischen Gutachterausschüssen für Immobilienwerte ausgewerteten Kaufverträge errechnet. Sie wurden nicht von einem Gutachterausschuss beschlossen. Es handelt sich deshalb nicht um sonstige zur Wertermittlung erforderliche Daten gem. § 193 Abs. 5 BauGB. […] Bei der Erstellung von Verkehrswertgutachten sollten vorrangig die regional ermittelten und vom jeweiligen Gutachterausschuss beschlossenen wertrelevanten Daten in die Wertermittlung einfließen. Diese werden in den jeweiligen regionalen Immobilienmarktberichten veröffentlicht.",
-      "ausserhalb_wortlaut": "Bei Nutzung der in diesem Bericht genannten wertrelevanten Daten ist eine kritische sachverständige Würdigung erforderlich. Bei der Erstellung von Verkehrswertgutachten sollten vorrangig die regional ermittelten und vom jeweiligen Gutachterausschuss beschlossenen wertrelevanten Daten in die Wertermittlung einfließen.",
-      "ausserhalb_weg": "Örtlich zuständiger Gutachterausschuss für Immobilienwerte (regionale Immobilienmarktberichte kostenfrei über gds.hessen.de); landesweit: ZGGH, info.zggh@hvbg.hessen.de, gutachterausschuss.hessen.de"
+      "rang_wortlaut": "Diese Umrechnungskoeffizienten können unter sachgerechter Würdigung verwendet werden, wenn keine geeigneten Umrechnungskoeffizienten des zuständigen Gutachterausschusses für Grundstückswerte vorliegen.",
+      "ausserhalb_wortlaut": "Über den tabellarisch aufgeführten Gültigkeitsbereich hinaus ist eine Extrapolation der Umrechnungskoeffizienten nicht sachgerecht.",
+      "ausserhalb_weg": "Örtlich zuständiger Gutachterausschuss für Grundstückswerte (Gebietszuständigkeiten: tlbg.thueringen.de/wertermittlung); landesweit: Zentrale Geschäftsstelle beim Thüringer Landesamt für Bodenmanagement und Geoinformation, Hohenwindenstraße 13a, 99086 Erfurt"
     },
     "belege": [
       {
         "art": "amtliche Veröffentlichung",
-        "fundstelle": "Immobilienmarktbericht Hessen 2025 (ZGGH), Kap. 8 Einleitung S. 69-70 (Rang: nicht beschlossen, vorrangig regionale Daten), Kap. 8.1.1 S. 70 (Datengrundlage, Wertrelevanz bis 400 €/m²), Tab. 8.1.1 S. 71 (Tabelle 150-1.500 m², 650 m² = 1,00), Beispiel S. 72; Impressum S. 2 (Nutzung, Version 1.1 vom 18.12.2025)"
-      },
-      {
-        "art": "Stichtag der Tabelle",
-        "fundstelle": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg, Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten (Bodenrichtwerte 01.01.2024), Seite 2 von 2: dieselbe Tabelle (Datengrundlage 2008 und 2009, 2.785 Grundstücksflächen) mit „Stichtag: 01.01.2010“ und „Der Gutachterausschuss geht davon aus, dass die aufgeführten Umrechnungskoeffizienten mangels aktueller Untersuchungen hilfsweise weiterhin angenommen werden können.“ https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-09/0606057-gaa-kb-2024.pdf"
+        "fundstelle": "Webseite „Umrechnungskoeffizienten: Fläche (Eigenheimgrundstücke)“ der Zentralen Geschäftsstelle (§ 198 BauGB, § 15 Abs. 3 ThürGAVO), Abschnitt 1 „Methodik“ (Regressionsmodell, 5.397 Kauffälle, Vertragsdatum 03.01.2018 bis 29.12.2022, 22 Landkreise/kreisfreie Städte), Abschnitt 2 „Umrechnungskoeffizienten“ (18 Werte 300-2.000 m², 700 m² = 1,000, lineare Interpolation, keine Extrapolation) und Beispielrechnung; abgerufen 16.10.2026"
       },
       {
         "art": "Nachrechnung",
-        "fundstelle": "Anwendungsbeispiel S. 72 mit der echten Funktion nachgerechnet: 1,05 / 0,98 = 1,0714; 110 × 1,0714 = 117,85 -> 118 €/m² (Dokument: 118 €/m²). Tabellenwerte 500 m² = 1,05 und 700 m² = 0,98 getroffen."
+        "fundstelle": "Beispielrechnung (Abschnitt 2) mit der echten Funktion nachgerechnet: 1,016 / 1,089 = 0,9330; 90 × 0,9330 = 83,97 EUR/m² (Dokument: 83,97 EUR/m²). Tabellenwerte 300 m² = 1,089 und 600 m² = 1,016 getroffen."
+      },
+      {
+        "art": "Nutzungsbedingungen",
+        "fundstelle": "Impressum tlbg.thueringen.de, Abschnitte „Rechte für Bild- und Textmaterial“ und „Urheberrecht“, abgerufen 16.10.2026"
       }
     ],
     "stufe": "E",
-    "stufe_grund": "Landesweite Auswertung der ZGGH, ausdrücklich NICHT vom Gutachterausschuss beschlossen und keine sonstigen erforderlichen Daten nach § 193 Abs. 5 BauGB; Daten 2008/2009 ohne GFZ-Bereinigung. Nur nachrangig nach den Daten des örtlichen Ausschusses (ImmoWertA zu § 9 Abs. 3 b).",
-    "stichtag": "2010-01-01",
-    "stichtag_hinweis": "Der Landesbericht nennt keinen Stichtag. 01.01.2010 steht wörtlich beim Gutachterausschuss Kassel/Waldeck-Frankenberg für genau diese Tabelle (gleiche Datengrundlage, gleiche 28 Werte). Der Stichtag liegt 16 Jahre zurück; die Tabelle gilt nur hilfsweise.",
-    "berichtsjahr": 2025,
-    "quelle_url": "https://www.buck-vermessung.de/wp-content/uploads/2026/01/immobilienmarktbericht-hessen-2025.pdf",
-    "quelle_hinweis": "Amtlich herausgegeben von der ZGGH (gutachterausschuss.hessen.de); die gelesene Datei ist eine unveränderte Kopie auf einem Fremdserver, weil der amtliche Link zum Abruf nicht erreichbar war. Eine Ausgabe 2026 des Landesberichts wurde am 16.10.2026 nicht gefunden.",
-    "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
-    "lizenz_hinweis": "Wörtlich Impressum S. 2, weiter: „Die bereitgestellten Daten und Metadaten dürfen für kommerzielle und nicht kommerzielle Nutzung insbesondere 1. vervielfältigt, ausgedruckt, präsentiert, verändert, bearbeitet sowie an Dritte übermittelt werden, […] Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“ Inhaltlich entspricht das dl-de/zero-2-0; die Kennung selbst nennt das Dokument nicht. Ein Vermerk ist nicht verlangt — er wird trotzdem geführt und weist die Umformung aus.",
-    "quellenvermerk": "Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen (ZGGH), Immobilienmarktbericht Hessen 2025, Tab. 8.1.1 (Werte unverändert, für die Berechnung in eine Tabelle umgeformt)",
-    "fundstelle": "Kap. 8.1.1, S. 70-72 (Tab. 8.1.1 S. 71, Beispiel S. 72)",
-    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), individueller Wohnungsbau bis 400 €/m², nur wenn der örtliche Ausschuss keinen eigenen Koeffizienten führt.",
+    "stufe_grund": "Landesweite Ableitung der Zentralen Geschäftsstelle (§ 198 BauGB), aktuelle Daten 2018-2022, 5.397 Fälle; ausdrücklich nachrangig zum örtlichen Ausschuss.",
+    "stichtag": "2022-12-29",
+    "stichtag_hinweis": "Die Seite nennt KEINEN Stichtag und kein Veröffentlichungsdatum (auch nicht im HTTP-Kopf). Eingetragen ist das letzte Vertragsdatum der Stichprobe („Maximum 29.12.2022“, Abschnitt 1) — das Ende des Auswertungszeitraums, kein vom Herausgeber genannter Stichtag. Beim Herausgeber zu erfragen.",
+    "berichtsjahr": 2026,
+    "berichtsjahr_hinweis": "Die Webseite trägt keinen Jahrgang; 2026 ist das Jahr des Abrufs.",
+    "quelle_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/flaeche-efh",
+    "lizenz": "ungeklärt für kommerzielle Nutzung — Impressum: „Die Verwendung von Bild- und/ oder Textmaterial dieser Homepage ist zulässig. Es ist ein Copyright-Vermerk ©GDI-Th anzubringen.“ Ebenda: „Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet.“",
+    "lizenz_hinweis": "Die Seite selbst nennt keine Lizenz und keine eigene Nutzungsregel. Das Impressum erlaubt die Verwendung des Textmaterials mit Vermerk ©GDI-Th, beschränkt aber Downloads und Kopien auf den privaten, nicht kommerziellen Gebrauch und verlangt für Vervielfältigung „außerhalb der Grenzen des Urheberrechtes“ die schriftliche Zustimmung. Ob die Wiedergabe von Koeffizienten in einem kostenpflichtigen Bericht darunter fällt, ist nicht entschieden — vor Kundeneinsatz beim TLBG klären.",
+    "quellenvermerk": "©GDI-Th — Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Freistaats Thüringen, Umrechnungskoeffizienten: Fläche (Eigenheimgrundstücke), tlbg.thueringen.de",
+    "fundstelle": "Webseite Umrechnungskoeffizienten: Fläche (Eigenheimgrundstücke), Abschnitte 1 und 2, Beispielrechnung",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), Eigenheimgrundstücke 300-2.000 m², nur wenn der örtliche Ausschuss keinen eigenen Koeffizienten führt.",
     "belege_meta": {
-      "dokument": "Immobilienmarktbericht Hessen 2025, Kap. 8.1.1 Grundstücksfläche",
-      "abgerufen_am": "2026-10-16",
-      "version": "1.1 vom 18.12.2025"
+      "dokument": "Umrechnungskoeffizienten: Fläche (Eigenheimgrundstücke)",
+      "abgerufen_am": "2026-10-16"
     },
     "vollstaendig": false,
-    "warum_kein_wert": "Der Immobilienmarktbericht Hessen führt eine landesweite Tabelle als Ersatz, sie beruht aber auf Kaufpreisen von 2008/09 und ist nach Angabe der Zentralen Geschäftsstelle nicht beschlossen; ein eigener Stichtag fehlt. Das trägt keinen amtlichen Landeswert (v2283). Maßgeblich sind die Umrechnungskoeffizienten des örtlichen Gutachterausschusses.",
-    "auflagen": "Werte nur zur Dokumentation hinterlegt; Quelle als unveränderte Kopie gelesen, amtlicher Link am 16.10.2026 nicht erreichbar.",
-    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen (ZGGH), Jahrgang 2025",
+    "warum_kein_wert": "Die landesweiten Umrechnungskoeffizienten des Thüringer Landesamts für Bodenmanagement und Geoinformation (TLBG) sind veröffentlicht, aber laut Impressum nur für den privaten, nicht kommerziellen Gebrauch freigegeben. Bis zur Klärung der Nutzungsrechte wird keine Zahl übernommen (v2283, Marcel 16.10.2026: amtlich nur, wo es auch so ist).",
+    "auflagen": "Werte im Satz nur zur späteren Freigabe hinterlegt; Klärung der kommerziellen Nutzung beim TLBG offen.",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Freistaats Thüringen, Jahrgang 2026",
     "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
-    "modellansaetze": {}
-  },
-  {
-    "land_code": "TH",
-    "ags": "16",
-    "ebene": "land",
-    "gebiet_name": "Thüringen (landesweit)",
-    "gaa_name": "Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Freistaats Thüringen",
-    "kennzahl": "umrechnungskoeffizient_flaeche",
-    "zweig": "ifw",
-    "formel": {
+    "modellansaetze": {},
+    "formel_vorgemerkt": {
       "form": "flaeche_tabelle",
       "bezug": "BW 2 = BW 1 * UK 2 / UK 1 (UK 1: Fläche des Bodenrichtwertgrundstücks, UK 2: Fläche des Wertermittlungsobjekts)",
       "wirkung": "multiplikativ",
@@ -237,68 +298,7 @@
         "rundung_eur_qm": 0.01,
         "seite": "Webseite, Abschnitt 2 „Umrechnungskoeffizienten“, Beispielrechnung"
       }
-    },
-    "geltungsbereich": {
-      "nutzung": "Eigenheimgrundstücke: unbebaute Grundstücke für freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften oder Reihenhäuser",
-      "objektarten": [
-        "efh",
-        "zfh",
-        "dhh",
-        "rh"
-      ],
-      "objektarten_ausgeschlossen": [
-        "mfh",
-        "etw",
-        "gewerbe"
-      ],
-      "spanne_qm": [
-        300,
-        2000
-      ],
-      "brw_von_eur_qm": 20,
-      "brw_bis_eur_qm": 1000,
-      "brw_wortlaut": "… können nur für Grundstücksgrößen von 300 m² bis 2.000 m² und für Bodenwerte zwischen 20 EUR/m² und 1.000 EUR/m² verwendet werden.",
-      "rang": "landeswert_nachrangig",
-      "rang_wortlaut": "Diese Umrechnungskoeffizienten können unter sachgerechter Würdigung verwendet werden, wenn keine geeigneten Umrechnungskoeffizienten des zuständigen Gutachterausschusses für Grundstückswerte vorliegen.",
-      "ausserhalb_wortlaut": "Über den tabellarisch aufgeführten Gültigkeitsbereich hinaus ist eine Extrapolation der Umrechnungskoeffizienten nicht sachgerecht.",
-      "ausserhalb_weg": "Örtlich zuständiger Gutachterausschuss für Grundstückswerte (Gebietszuständigkeiten: tlbg.thueringen.de/wertermittlung); landesweit: Zentrale Geschäftsstelle beim Thüringer Landesamt für Bodenmanagement und Geoinformation, Hohenwindenstraße 13a, 99086 Erfurt"
-    },
-    "belege": [
-      {
-        "art": "amtliche Veröffentlichung",
-        "fundstelle": "Webseite „Umrechnungskoeffizienten: Fläche (Eigenheimgrundstücke)“ der Zentralen Geschäftsstelle (§ 198 BauGB, § 15 Abs. 3 ThürGAVO), Abschnitt 1 „Methodik“ (Regressionsmodell, 5.397 Kauffälle, Vertragsdatum 03.01.2018 bis 29.12.2022, 22 Landkreise/kreisfreie Städte), Abschnitt 2 „Umrechnungskoeffizienten“ (18 Werte 300-2.000 m², 700 m² = 1,000, lineare Interpolation, keine Extrapolation) und Beispielrechnung; abgerufen 16.10.2026"
-      },
-      {
-        "art": "Nachrechnung",
-        "fundstelle": "Beispielrechnung (Abschnitt 2) mit der echten Funktion nachgerechnet: 1,016 / 1,089 = 0,9330; 90 × 0,9330 = 83,97 EUR/m² (Dokument: 83,97 EUR/m²). Tabellenwerte 300 m² = 1,089 und 600 m² = 1,016 getroffen."
-      },
-      {
-        "art": "Nutzungsbedingungen",
-        "fundstelle": "Impressum tlbg.thueringen.de, Abschnitte „Rechte für Bild- und Textmaterial“ und „Urheberrecht“, abgerufen 16.10.2026"
-      }
-    ],
-    "stufe": "E",
-    "stufe_grund": "Landesweite Ableitung der Zentralen Geschäftsstelle (§ 198 BauGB), aktuelle Daten 2018-2022, 5.397 Fälle; ausdrücklich nachrangig zum örtlichen Ausschuss.",
-    "stichtag": "2022-12-29",
-    "stichtag_hinweis": "Die Seite nennt KEINEN Stichtag und kein Veröffentlichungsdatum (auch nicht im HTTP-Kopf). Eingetragen ist das letzte Vertragsdatum der Stichprobe („Maximum 29.12.2022“, Abschnitt 1) — das Ende des Auswertungszeitraums, kein vom Herausgeber genannter Stichtag. Beim Herausgeber zu erfragen.",
-    "berichtsjahr": 2026,
-    "berichtsjahr_hinweis": "Die Webseite trägt keinen Jahrgang; 2026 ist das Jahr des Abrufs.",
-    "quelle_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/flaeche-efh",
-    "lizenz": "ungeklärt für kommerzielle Nutzung — Impressum: „Die Verwendung von Bild- und/ oder Textmaterial dieser Homepage ist zulässig. Es ist ein Copyright-Vermerk ©GDI-Th anzubringen.“ Ebenda: „Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet.“",
-    "lizenz_hinweis": "Die Seite selbst nennt keine Lizenz und keine eigene Nutzungsregel. Das Impressum erlaubt die Verwendung des Textmaterials mit Vermerk ©GDI-Th, beschränkt aber Downloads und Kopien auf den privaten, nicht kommerziellen Gebrauch und verlangt für Vervielfältigung „außerhalb der Grenzen des Urheberrechtes“ die schriftliche Zustimmung. Ob die Wiedergabe von Koeffizienten in einem kostenpflichtigen Bericht darunter fällt, ist nicht entschieden — vor Kundeneinsatz beim TLBG klären.",
-    "quellenvermerk": "©GDI-Th — Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Freistaats Thüringen, Umrechnungskoeffizienten: Fläche (Eigenheimgrundstücke), tlbg.thueringen.de",
-    "fundstelle": "Webseite Umrechnungskoeffizienten: Fläche (Eigenheimgrundstücke), Abschnitte 1 und 2, Beispielrechnung",
-    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), Eigenheimgrundstücke 300-2.000 m², nur wenn der örtliche Ausschuss keinen eigenen Koeffizienten führt.",
-    "belege_meta": {
-      "dokument": "Umrechnungskoeffizienten: Fläche (Eigenheimgrundstücke)",
-      "abgerufen_am": "2026-10-16"
-    },
-    "vollstaendig": false,
-    "warum_kein_wert": "Die landesweiten Umrechnungskoeffizienten des Thüringer Landesamts für Bodenmanagement und Geoinformation (TLBG) sind veröffentlicht, aber laut Impressum nur für den privaten, nicht kommerziellen Gebrauch freigegeben. Bis zur Klärung der Nutzungsrechte wird keine Zahl übernommen (v2283, Marcel 16.10.2026: amtlich nur, wo es auch so ist).",
-    "auflagen": "Werte im Satz nur zur späteren Freigabe hinterlegt; Klärung der kommerziellen Nutzung beim TLBG offen.",
-    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Freistaats Thüringen, Jahrgang 2026",
-    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
-    "modellansaetze": {}
+    }
   },
   {
     "land_code": "ST",

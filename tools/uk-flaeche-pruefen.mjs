@@ -31,6 +31,12 @@ for (const f of fs.readdirSync(ORDNER).filter((x) => x.endsWith('.json')).sort()
   for (const s of uk) {
     saetze++; laender.add(s.land_code);
     const wo = f + ' ' + (s.gebiet_name || s.ags) + '/' + s.zweig;
+    /* v2287b · Eine Sperre traegt KEINE rechenbare Formel. mb.param_modell kennt
+       kein vollstaendig-Feld - eine Sperre mit Tabelle kam dort als WERT an
+       (HE, TH, Aachen, Staging 16.10.2026). Vorgemerkte Tabellen: formel_vorgemerkt. */
+    if ((s.vollstaendig === false || s.warum_kein_wert) && s.formel && s.formel.form !== 'konstante') {
+      rot(wo + ': Sperre mit rechenbarer Formel (' + s.formel.form + ') - nach formel_vorgemerkt verschieben');
+    }
     if (s.vollstaendig === false) continue;   /* Sperre: Weg ohne Zahl */
     for (const k of ['quelle_url', 'lizenz', 'stichtag', 'fundstelle', 'quellenvermerk']) {
       if (!s[k]) rot(wo + ': ' + k + ' fehlt');
