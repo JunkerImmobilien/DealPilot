@@ -1595,6 +1595,8 @@ label.dp-required.qc-required::after {
           <div class="f"><label>Sonstige (%) <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· Bausachverständiger, Anfahrt, Gutachten</span> <button type="button" class="dp-tip" data-tip-id="tab2.sonstige" tabindex="-1" aria-label="Hilfe zu Sonstige Kaufnebenkosten"></button></label><div class="iw"><input id="ji_p" title="Bausachverständiger, Anfahrt, Gutachten, Behördengebühren" type="text" inputmode="decimal" value="0" step="0.01" class="tr" oninput="syncCostPct('ji')"><span class="sfx">%</span></div></div>
           <div class="f"><label>Sonstige (€)</label><div class="iw"><span class="pfx">€</span><input id="ji_e" type="text" inputmode="decimal" placeholder="0" step="1" class="trl" oninput="syncCostEur('ji')"></div></div>
         </div>
+        <!-- v2354 · Marcel: „die Werte immer aus den Einstellungen und dem Set ziehen". Fuer BESTEHENDE Objekte auf Knopfdruck - nie still: der Knopf zeigt, was sich aendert, und laesst sich zuruecknehmen. -->
+        <div class="dp-nk-profil" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:8px 0 2px"><button type="button" class="btn btn-outline btn-sm" id="nk-aus-einstellungen" onclick="window.dpNkAusEinstellungen && dpNkAusEinstellungen()">Nebenkosten aus den Einstellungen übernehmen</button><span id="nk-aus-einst-info" style="font-size:12px;color:var(--muted,#7A7370)"></span></div>
         <hr class="dvd">
         <div class="f mb8"><label>Summe Nebenkosten</label><div class="cf" id="nk_sum">—</div></div>
         <div class="total-bar"><span>Gesamtinvestition</span><span class="total-val" id="gi_val">€ —</span></div>
@@ -3751,7 +3753,7 @@ label.dp-required.qc-required::after {
 <!-- v1704 � Portfolio-Pilot: haengt sich ans Cockpit, sobald dessen Markup steht -->
 <script src="js/portfolio-pilot.js?v=v2304"></script>
 <script src="js/score-fx.js?v=464"></script>
-<script src="js/main.js?v=v2261"></script>
+<script src="js/main.js?v=v2354"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
   <script src="js/object-actions.js?v=v2256"></script>
