@@ -46,8 +46,9 @@
   }
   function nrLabel(v, D) {
     var k = (D.kategorien || []).filter(function (x) { return x.id === v.kategorie; })[0];
-    return (v.kategorie === 'ueberblick' ? 'Überblick ' + String(v.nr).replace('Ü', '') : 'Modul ' + v.nr)
-      + (k ? ' · ' + k.name : '');
+    /* 1a: "Überblick 1 · Überblick" sagte dasselbe zweimal */
+    if (v.kategorie === 'ueberblick') return 'Überblick ' + String(v.nr).replace('Ü', '') + ' · Der ganze Weg';
+    return 'Modul ' + v.nr + (k ? ' · ' + k.name : '');
   }
 
   /* ══ DealPilot live (Landing) ═════════════════════════════════════════ */
