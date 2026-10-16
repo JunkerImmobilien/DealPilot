@@ -38840,6 +38840,15 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### Prod-Rollout (38) und (39) · Module 17/22 in der Videothek · Einzelobjekt-Sicherung ohne Konto-Wissen (16.10.2026)
+
+- **Was (38):** Modul 17 „Objekt übertragen" (Sicherungsdatei exportieren/importieren, Hinweis Mandanten-Freigabe) und Modul 22 „Telegram-Bot" als gekennzeichnete Nachstellung („Nachgestellt · Demo", echte Bot-Antworten aus einem Lauf im Staging-Container ohne Telegram-Versand). Marcel: „mach so wie du meinst und es richtig ist … zum Telegrambot … nachstellen, demo dummy". Videothek 27 Videos; MP4s auf Prod kopiert (md5 = Staging).
+- **Was (39, v2351):** Beim Dreh von 17 gefunden: die .dpkt eines EINZELNEN Objekts trug das Konto-Wissen (eigene Ergänzung mit Firmenangaben, Portfolio-Analyse über alle Objekte, Lageprofil, Datenraum). Jetzt lässt `_dpSicherungsPaket(objektId)` diese vier Teile weg (Hinweis `wissen.hinweis_einzelobjekt`); allgemeines DealPilot-Wissen, Lexikon und Score-Stufen bleiben; die Sicherung aller Objekte unverändert. Drehbuchzeile 17 angepasst.
+- **Bestandsobjekte (Marcels Frage 3):** bewusst NICHT aus dem Investmentprofil neu gezogen — ein gespeichertes Objekt trägt eigene, bewusst gesetzte Werte; das Profil gilt für neue Objekte und leere Felder (`main.js` setDefaults, `investment-profile.js` applyToNewObject setIfEmpty).
+- **Commit:** Merge `ed119e2b` (38), `64a17012` (v2351), Merge `34be1e20` (39).
+- **Nachweis:** Prod: Modul 22 206 video/mp4, videos.json mit 17/22, storage.js v2351 mit `hinweis_einzelobjekt`, `/auth/me` 401.
+- **Rest:** Module 17 (neues Verhalten) und 21 (Portfolio-Analyse mit korrigiertem DSCR) werden neu aufgenommen (Agent).
+
 ### landing-videothek-2 + Prod-Rollout (37) · Videothek 25 Videos (16.10.2026)
 
 - **Was:** Videothek und „DealPilot live“ um 10c (RND-Rechner), 20 (Bankexport Portfolio), 21 (Portfolio-Cockpit und Pilot), 23 (15-%-Grenze), 24 (Bodenrichtwert und Unterlagen) ergänzt — `videos.json`, fünf WebP-Vorschaubilder, Buster `landing-videothek-2`. Neuaufnahmen 16/18/19/Ü2 lagen schon (md5 lokal = Staging = Prod). MP4s per scp auf Staging und Prod (`frontend/landing/medien/videothek/`, gitignored).
