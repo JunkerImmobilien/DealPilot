@@ -77,8 +77,8 @@
 .dpl-karte{position:relative;display:flex;flex-direction:column;border:1px solid var(--line);
   background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01));padding:24px 24px 20px}
 .dpl-karte::before{content:'';position:absolute;left:0;top:0;right:0;height:3px;background:var(--runway)}
-.dpl-karte .dpl-k-kick{display:flex;justify-content:space-between;gap:10px;font:700 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gdh)}
-.dpl-karte .dpl-k-kick span:last-child{color:var(--ddk)}
+.dpl-k-kick{display:flex;justify-content:space-between;gap:10px;font:700 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gdh)}
+.dpl-k-kick span:last-child{color:var(--ddk)}
 .dpl-karte h3{font:700 clamp(21px,2.1vw,27px)/1.15 var(--disp);color:#fff;margin:14px 0 6px;letter-spacing:-.01em}
 .dpl-karte .dpl-unter{font:500 14px/1.45 var(--body);color:var(--gdh);margin:0 0 14px}
 .dpl-karte .dpl-story{font-size:14.6px;line-height:1.62;color:var(--mdk);margin:0 0 16px}
@@ -194,7 +194,9 @@
 .vt-kino-t p{margin:0;color:var(--mdk);font-size:14.5px;line-height:1.6}
 .vt-zu{position:absolute;right:10px;top:10px;background:none;border:1px solid var(--line);color:#fff;width:34px;height:34px;cursor:pointer;font-size:18px;line-height:1}
 .vt-kino-n{display:flex;gap:8px;margin-top:auto;padding-top:10px;flex-wrap:wrap}
-.vt-kino-n .btn-l{padding:10px 14px;font-size:12px}
+.vt-kino-n button{background:none;border:1px solid var(--line);color:var(--gdh);font:700 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:11px 14px;cursor:pointer;transition:background .2s}
+.vt-kino-n button:hover{background:color-mix(in srgb,var(--gd) 14%,transparent)}  /* 1b: .btn-l ist ausserhalb von .sec-dark hell und war hier unlesbar */
+#fe-hero .lu-hero h2 .ac{color:var(--gdh)}
 
 /* Siegel im Vertrauensband: 64 px war Marcel zu klein (16.10.2026). */
 .tband-siegel img{width:84px;height:84px}

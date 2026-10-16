@@ -289,7 +289,7 @@
     kino.className = 'vt-kino'; kino.setAttribute('role', 'dialog'); kino.setAttribute('aria-modal', 'true');
     kino.innerHTML = '<div class="vt-kino-in"><video id="vtVideo" controls playsinline preload="metadata"></video>' +
       '<div class="vt-kino-t"><button class="vt-zu" id="vtZu" aria-label="Schließen">×</button><div id="vtKinoText"></div>' +
-      '<div class="vt-kino-n"><button class="btn-l" id="vtZur">‹ Vorheriges</button><button class="btn-l" id="vtVor">Nächstes ›</button></div></div></div>';
+      '<div class="vt-kino-n"><button id="vtZur">‹ Vorheriges</button><button id="vtVor">Nächstes ›</button></div></div></div>';
     document.body.appendChild(kino);
     var kv = kino.querySelector('#vtVideo'), aktuell = -1;
 
