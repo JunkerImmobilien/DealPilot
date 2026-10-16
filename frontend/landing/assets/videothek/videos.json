@@ -1,5 +1,5 @@
 {
-  "_hinweis": "landing-videothek-3 · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
+  "_hinweis": "landing-videothek-3a · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
   "stand": "2026-10-16",
   "basis_medien": "medien/videothek/",
   "basis_bilder": "assets/videothek/",
@@ -238,7 +238,7 @@
       "youtube": { "titel": "DealPilot Modul 16 · Stufe 3 genauer – Wertermittlung nach ImmoWertV", "tags": ["DealPilot", "Ertragswert", "Sachwert", "Liegenschaftszins", "ImmoWertV"], "youtube_id": null }
     },
     {
-      "id": "modul-17-objekt-uebertragen", "kategorie": "spezial", "nr": "17", "dauer": 173,
+      "id": "modul-17-objekt-uebertragen", "kategorie": "spezial", "nr": "17", "dauer": 180,
       "titel": "Objekt übertragen",
       "unterzeile": "Die DealPilot-Sicherung — was mitgeht und was nicht.",
       "story": "Ein Objekt soll zu jemand anderem: zur Partnerin, zum Steuerberater, in ein zweites Konto. DealPilot packt es in eine Sicherungsdatei mit allen Eingaben, Steuer, Pilot-Analyse und Ankauf-Stand — dazu ein Lexikon, das jedes Kürzel erklärt. Beim Empfänger wird daraus über den Import ein eigenes Objekt.",
@@ -286,7 +286,7 @@
       "youtube": { "titel": "DealPilot Modul 20 · Bankexport Portfolio – alle Darlehen für die Bank", "tags": ["DealPilot", "Bankexport", "Immobilienportfolio", "Finanzierung"], "youtube_id": null }
     },
     {
-      "id": "modul-21-portfolio-cockpit-und-pilot", "kategorie": "spezial", "nr": "21", "dauer": 179,
+      "id": "modul-21-portfolio-cockpit-und-pilot", "kategorie": "spezial", "nr": "21", "dauer": 175,
       "titel": "Portfolio-Cockpit und Pilot",
       "unterzeile": "Alle Objekte auf einer Seite — und ein Pilot, der sie kennt.",
       "story": "Das Portfolio-Cockpit zeigt deinen ganzen Bestand: Portfolio-Score, Kennzahlen über alle Objekte, Steuer und die Projektion in die Zukunft. Dazu der Portfolio-Pilot — eine Analyse, gegliedert und mit Zahlen, die deine Objekte beim Namen nennt. Und danach fragst du einfach weiter.",

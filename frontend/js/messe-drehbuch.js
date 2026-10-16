@@ -1368,7 +1368,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2305';   /* v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
+  var RH_BUSTER = 'v2353';   /* v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage/i;
@@ -4539,7 +4539,9 @@
     var felder = Object.keys(d).length, analyse = !!o.analyse, ankauf = !!o.ankauf_stand, mb = o.marktbericht ? ((o.marktbericht.verlauf || o.marktbericht.punkte || []).length || 1) : 0;
     var steuer = ['_taxYearlyOverrides', 'afa_satz', 'geb_ant'].filter(function (k) { return d[k] != null && d[k] !== ''; }).length;
     var lex = P.lexikon && P.lexikon.felder ? Object.keys(P.lexikon.felder).length : 0;
-    var WN = { projekt: 'Projektwissen', eigenes: 'deine eigene Ergänzung', portfolio_analyse: 'die Portfolio-Analyse', lage_profil: 'dein Lageprofil', datenraum: 'die Datenraum-Liste' }, w = P.wissen ? Object.keys(P.wissen).map(function (k) { return WN[k] || k; }) : [];
+    /* v2352 · seit v2351 trägt die Einzelobjekt-Sicherung kein Konto-Wissen mehr - die Karte liest, was WIRKLICH im Paket steht */
+    var KONTO = ['eigenes', 'portfolio_analyse', 'lage_profil', 'datenraum'], WN = { eigenes: 'eigene Ergänzung', portfolio_analyse: 'Portfolio-Analyse', lage_profil: 'Lageprofil', datenraum: 'Datenraum-Liste' };
+    var wk = P.wissen ? Object.keys(P.wissen) : [], kontoDrin = KONTO.filter(function (k) { return wk.indexOf(k) >= 0; }).map(function (k) { return WN[k]; }), projektDrin = wk.indexOf('projekt') >= 0;
     var c = document.createElement('div'); c.id = 'dpm-dpkt';
     c.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:760px;z-index:100002;background:#FDFCFA;color:#2A2727;border-radius:14px;border-top:3px solid var(--wl-c9a84c,#C9A84C);box-shadow:0 24px 70px rgba(0,0,0,.5);padding:24px 28px;font:14px/1.5 Inter,sans-serif';
     function z(k, v, ok) { return '<div style="display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-bottom:1px solid #EEE8DC"><span>' + k + '</span><b style="color:' + (ok === false ? '#B8625C' : '#2A2727') + '">' + v + '</b></div>'; }
@@ -4553,14 +4555,16 @@
       + z('Ankauf-Stand (Soll)', ankauf ? 'ja' : 'keiner')
       + z('Marktbericht-Verlauf', mb ? 'ja' : '–')
       + z('Feld-Lexikon', lex ? de(lex) + ' Einträge' : '–')
+      + (projektDrin ? z('Projektwissen (Score-Stufen, Begriffe)', 'ja') : '')
       + (P.fotos_enthalten ? z('Objektfotos', 'ja') : '')
       + '</div><div><div style="font-weight:700;color:#B8625C;margin:4px 0">Bleibt hier</div>'
       + z('Konto, Login, Passwort', 'nein', false)
       + z('Abo und Kontingent', 'nein', false)
       + z('Darstellung und Standardwerte', 'nein', false)
+      + (kontoDrin.length ? '' : z('Konto-Wissen (Ergänzung, Analysen, Lage)', 'nein', false))
       + (P.fotos_enthalten ? '' : z('Objektfotos', 'nur mit Häkchen', false))
       + '</div></div>'
-      + (w.length ? '<div style="margin-top:12px;padding:10px 12px;background:rgba(184,98,92,.07);border-left:3px solid #B8625C;border-radius:6px;font-size:12.5px;color:#4A4440"><b>Auch im Paket, auch bei einem einzelnen Objekt:</b> ' + w.join(', ') + '. Vor der Weitergabe beachten.</div>' : '');
+      + (kontoDrin.length ? '<div style="margin-top:12px;padding:10px 12px;background:rgba(184,98,92,.07);border-left:3px solid #B8625C;border-radius:6px;font-size:12.5px;color:#4A4440"><b>Auch im Paket:</b> ' + kontoDrin.join(', ') + '. Vor der Weitergabe beachten.</div>' : '');
     document.body.appendChild(c);
     return c;
   }

@@ -38840,6 +38840,15 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### Prod-Rollout (38) und (39) · Module 17/22 in der Videothek · Einzelobjekt-Sicherung ohne Konto-Wissen (16.10.2026)
+
+- **Was (38):** Modul 17 „Objekt übertragen" (Sicherungsdatei exportieren/importieren, Hinweis Mandanten-Freigabe) und Modul 22 „Telegram-Bot" als gekennzeichnete Nachstellung („Nachgestellt · Demo", echte Bot-Antworten aus einem Lauf im Staging-Container ohne Telegram-Versand). Marcel: „mach so wie du meinst und es richtig ist … zum Telegrambot … nachstellen, demo dummy". Videothek 27 Videos; MP4s auf Prod kopiert (md5 = Staging).
+- **Was (39, v2351):** Beim Dreh von 17 gefunden: die .dpkt eines EINZELNEN Objekts trug das Konto-Wissen (eigene Ergänzung mit Firmenangaben, Portfolio-Analyse über alle Objekte, Lageprofil, Datenraum). Jetzt lässt `_dpSicherungsPaket(objektId)` diese vier Teile weg (Hinweis `wissen.hinweis_einzelobjekt`); allgemeines DealPilot-Wissen, Lexikon und Score-Stufen bleiben; die Sicherung aller Objekte unverändert. Drehbuchzeile 17 angepasst.
+- **Bestandsobjekte (Marcels Frage 3):** bewusst NICHT aus dem Investmentprofil neu gezogen — ein gespeichertes Objekt trägt eigene, bewusst gesetzte Werte; das Profil gilt für neue Objekte und leere Felder (`main.js` setDefaults, `investment-profile.js` applyToNewObject setIfEmpty).
+- **Commit:** Merge `ed119e2b` (38), `64a17012` (v2351), Merge `34be1e20` (39).
+- **Nachweis:** Prod: Modul 22 206 video/mp4, videos.json mit 17/22, storage.js v2351 mit `hinweis_einzelobjekt`, `/auth/me` 401.
+- **Rest:** Module 17 (neues Verhalten) und 21 (Portfolio-Analyse mit korrigiertem DSCR) werden neu aufgenommen (Agent).
+
 ### landing-videothek-2 + Prod-Rollout (37) · Videothek 25 Videos (16.10.2026)
 
 - **Was:** Videothek und „DealPilot live“ um 10c (RND-Rechner), 20 (Bankexport Portfolio), 21 (Portfolio-Cockpit und Pilot), 23 (15-%-Grenze), 24 (Bodenrichtwert und Unterlagen) ergänzt — `videos.json`, fünf WebP-Vorschaubilder, Buster `landing-videothek-2`. Neuaufnahmen 16/18/19/Ü2 lagen schon (md5 lokal = Staging = Prod). MP4s per scp auf Staging und Prod (`frontend/landing/medien/videothek/`, gitignored).
@@ -38902,6 +38911,19 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Commits:** `990e9cf9` (v2280), v2281/a, `97385be3` (v2282), `cc31a14c` (v2283), `732b2b7e` (v2284, NI-Zone), `f3a8b8ae` (v2285), `4e1995d9` (v2285a Landing), `495d0d9c` (v2286 NRW), v2287/a, `e9f960e9` (v2287b).
 - **Nachweis:** `uk-flaeche-pruefen` sauber (206 Sätze, 97 Beispiele), `saat-pruefen --basislinie` grün, Gegenprobe im Staging-Container mit DB-Stand: HE/TH/Aachen keine Zahl, Bielefeld 0,59, Leer 0,97. Bielefeld EFH 1.570 m² → 0,4439 → 313.623 € statt 706.500 €.
 - **Rest:** Prod-Rollout (Code + `register-saat.mjs` auf Prod nach Sicherung). Näherung v2288 einbauen (Ableitung `tools/uk-naeherung-ableiten.mjs`: b Median −0,213 land, −0,25 Stadt; Hamburg amtlich −0,2496). Offene Bewertungsfragen an Marcel: Zwischenwerte ohne Interpolationsregel (Münster, Aachen u. a.), DHH/RH in NI, Bonn „nur für den Dienstgebrauch", Lippe-Bezug, Kauf/Genehmigung Saarbrücken, Bremerhaven, Saarland, Bremen (Zins/Faktor). Hamburg: BORIS-Abruf lieferte an einem Punkt keinen Wert — prüfen. Tiefe und WGFZ als eigene Kennzahlen (viele NRW-Ausschüsse).
+
+### v2352–v2353 · landing-videothek-3a · Module 17 und 21 neu aufgenommen (16.10.2026, Staging)
+
+- **Was:**
+  - v2352: Die Dateikarte in Modul 17 liest das Konto-Wissen aus dem Paket. Seit v2351 trägt die Einzelobjekt-Sicherung kein Konto-Wissen mehr. „Konto-Wissen“ steht jetzt unter „Bleibt hier“, das Projektwissen unter „Geht mit“.
+  - v2353: Die Portfolio-Analyse für Modul 21 ist EINMAL neu abgerufen (kein Kontingent). Sie nennt DSCR 1,28 wie die Cockpit-Kachel; der alte Mitschnitt nannte 0,87 (Zinsfehler bis v2305). Die Ablage in den Einstellungen wurde beantwortet, nicht geschrieben (gemessen unverändert). `RH_BUSTER` v2353.
+  - Videothek: Dauer 17 = 180 s, 21 = 175 s, Poster 17 neu, Buster `landing-videothek-3a`. MP4 auf Staging, md5 geprüft.
+- **Nicht getan:** MP4 auf Prod. Die Freigabe kam über den Koordinator, nicht von Marcel direkt.
+- **Commit:** `64a7e93d` (v2352), `8d647dbc` (v2353), `0becbcac` (landing-videothek-3a)
+- **Nachweis:**
+  - Je Aufnahme: Konferenzprüfung, Probe, Bildprüfung, Name/Adresse 0 Treffer.
+  - Datenbank vorher/nachher gleich; 39 Objekt-Hashes gleich dem Stand vom Mittag.
+- **Videos:** 17 3:00 (7,3 MB), 21 2:55 (6,1 MB).
 
 ### v2305 (Videoreihe) · v2350–v2350a · landing-videothek-3 · Module 17 und 22 aufgenommen, in der Videothek (16.10.2026, Staging)
 
