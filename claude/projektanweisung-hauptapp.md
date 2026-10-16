@@ -38903,6 +38903,29 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Nachweis:** `uk-flaeche-pruefen` sauber (206 Sätze, 97 Beispiele), `saat-pruefen --basislinie` grün, Gegenprobe im Staging-Container mit DB-Stand: HE/TH/Aachen keine Zahl, Bielefeld 0,59, Leer 0,97. Bielefeld EFH 1.570 m² → 0,4439 → 313.623 € statt 706.500 €.
 - **Rest:** Prod-Rollout (Code + `register-saat.mjs` auf Prod nach Sicherung). Näherung v2288 einbauen (Ableitung `tools/uk-naeherung-ableiten.mjs`: b Median −0,213 land, −0,25 Stadt; Hamburg amtlich −0,2496). Offene Bewertungsfragen an Marcel: Zwischenwerte ohne Interpolationsregel (Münster, Aachen u. a.), DHH/RH in NI, Bonn „nur für den Dienstgebrauch", Lippe-Bezug, Kauf/Genehmigung Saarbrücken, Bremerhaven, Saarland, Bremen (Zins/Faktor). Hamburg: BORIS-Abruf lieferte an einem Punkt keinen Wert — prüfen. Tiefe und WGFZ als eigene Kennzahlen (viele NRW-Ausschüsse).
 
+### v2305 (Videoreihe) · v2350–v2350a · landing-videothek-3 · Module 17 und 22 aufgenommen, in der Videothek (16.10.2026, Staging)
+
+- **Was:**
+  - `reihe-uebertragen` (17) an einer KOPIE der Westerfeldstr. 140:
+    - Die DealPilot-Sicherung (.dpkt) entsteht lokal. Der Download-Anker wird für den einen Aufruf abgefangen, die Rückfrage „veraltet – trotzdem exportieren?“ mit Ja beantwortet.
+    - Im Bild steht, was drin ist: 287 Eingaben, Steuer, Analyse, Ankauf-Stand, Lexikon 228, Fotos.
+    - Danach der Import derselben Datei im selben Konto. Kopie und Import werden beim Aufräumen gelöscht.
+  - `reihe-telegram` (22): eine NACHSTELLUNG im eigenen Chatfenster mit dem Vermerk „Nachgestellt · Demo“.
+    - Die Antworten sind ein Mitschnitt (`DPM_REIHE_DATEN.telegram`) aus EINEM Lauf des echten Bot-Agenten (`agentLauf.laufen`, `darfKosten: false`) im Staging-Container, ohne Telegram.
+    - Läufer: `scratchpad/mitschnitt-bot.js`, Muster `tools/agent-pruefung`.
+    - Werkzeuge: objekte_liste, soll_ist_lesen, objekt_anlegen. Das dort angelegte Objekt wurde sofort gelöscht (Objekte 39/39).
+  - Videothek: Einträge 17 und 22 in `videos.json`, zwei WebP-Poster, Buster `landing-videothek-3`. MP4 per scp auf Staging (md5 geprüft).
+- **Gemeldet (Produkt):** Auch eine Einzelobjekt-Sicherung trägt das ganze Paket-Wissen: Projektwissen, eigene Ergänzung („Junker Solution …“), Portfolio-Analyse über alle Objekte, Lageprofil, Datenraum-Liste. Bei der Weitergabe an Dritte geht das mit. Das Video sagt es offen.
+- **Eigener Fehler:** Mein Commit `15bfde55` heißt „v2305“, die Nummer war im Hauptstrang schon vergeben (`686aaf0c`). Danach v2350.
+- **Nicht getan:** MP4 auf Prod. Der Auftrag kam vom Koordinator; ein Eingriff auf Produktion braucht Marcels Freigabe direkt.
+- **Commit:** `15bfde55` (als „v2305“), `a1d643f5` (v2350), `247c42bb` (v2350a), `b4afe424` (landing-videothek-3)
+- **Nachweis:**
+  - Prüfläufe mit Protokoll für 17 und 22. Kegelziele nachgebessert, Kopien gelöscht, Anker-Klick und confirm wieder echt.
+  - Je Video: Konferenzprüfung, Probe, Bildprüfung je Bild, Name/Adresse 0 Treffer.
+  - Datenbank vorher/nachher gleich, alle 39 Objekt-Hashes gleich dem Stand vom Mittag, Zähler unverändert.
+- **Videos:** 17 2:52 (7,4 MB), 22 2:06 (4,9 MB).
+- **Kosten:** drei Modellaufrufe des Bot-Agenten (kein Kontingent, keine bezahlten Werkzeuge).
+
 ### v2283–v2304 · Videoreihe: Module 10c, 20, 21, 23, 24 gebaut und aufgenommen; RND-Rechner zeigt die Prüfpflicht (16.10.2026, Staging)
 
 - **Was:**
