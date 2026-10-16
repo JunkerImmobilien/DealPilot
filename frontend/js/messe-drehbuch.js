@@ -3804,7 +3804,7 @@
     try { await window.exportPDFBank({ ohneRueckfrage: true }); } catch (e) {} finally { api.save = _r19.save; _r19.save = null; r19MitKontakt(); }
     return fang;
   }
-  async function r19Seite(blob, n, oben) {   /* v2276d · oben = PDF-y von unten (FitH,top), gemessen an den Textpositionen der Bankfassung */
+  async function r19Seite(blob, n, oben) {   /* v2276e · oben = FitH,top. GEMESSEN (Testseite mit Marken je 40 pt): der Chrome-Viewer liest top in px bei 100 % VON OBEN (1 pt = 4/3 px), nicht in PDF-y von unten. Werte = Abstand von oben in pt × 4/3, an den Textpositionen der echten Bankfassung */
     var u = blob.__url || (blob.__url = URL.createObjectURL(blob)); if (_r19.url.indexOf(u) < 0) _r19.url.push(u);
     var o = el('dpm-pdf');
     o.style.cssText = 'position:fixed;left:4%;right:4%;top:3%;bottom:4%;z-index:100002;background:#2b2b2b;border:2px solid ' + G + ';border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)';
@@ -3852,21 +3852,21 @@
         zeige(null); kegelHoch(true);
         await r19Seite(bank, 1);
         await b2oZeile(s, 'Oben: deine Marke', 'Kopf mit Logo — mit Whitelabel steht hier deins, nicht unseres. Darunter Objekt, Foto und Stand.');
-        await r19Seite(bank, 1, 375);   /* INVESTITION 353 · FINANZIERUNG 202 */
+        await r19Seite(bank, 1, 627);   /* ab 470 pt: INVESTITION 489 … Darlehen 678 pt von oben */
         var K = r19K();
         await b2oZeile(s, 'Seite 1 · Objekt und Finanzierung', 'Kaufpreis <b>' + eur(K.kp) + '</b> mit jeder Nebenkostenzeile, Gesamtinvestition ' + eur(K.gi) + '. Eigenkapital ' + eur(K.ek) + ', Darlehen <b>' + eur(K.d1) + '</b> zu ' + r19Pz(K.d1z_pct) + '.');
       },
       async function (s) {   /* 5 · Kennzahlen */
         if (!_r19.bank) return;
-        await r19Seite(_r19.bank, 2, 700);   /* KENNZAHLEN 663 */
+        await r19Seite(_r19.bank, 2, 190);   /* ab 142 pt: Restschuld 159, KENNZAHLEN 179 */
         var K = r19K();
         await b2oZeile(s, 'Seite 2 · Kennzahlen', 'Bruttorendite <b>' + r19Pz(K.bmy) + '</b>, Nettorendite ' + r19Pz(K.nmy) + ', DSCR <b>' + de(K.dscr, 2) + '</b>, Beleihung ' + r19Pz(K.ltv, 1) + ', Cashflow ' + eur(K.cf_m) + ' im Monat.');
-        await r19Seite(_r19.bank, 2, 400);   /* VON DER WARMMIETE ZUM CASHFLOW 380 */
+        await r19Seite(_r19.bank, 2, 593);   /* ab 445 pt: WARMMIETE 462 … Cashflow/Monat 667 */
         await b2oZeile(s, 'Von der Warmmiete zum Cashflow', 'Darunter die Rechnung Zeile für Zeile: Miete, Bewirtschaftung, Zinsen, Tilgung, Steuer — am Ende <b>' + eur(K.cf_ns) + '</b> nach Steuern im Jahr.');
       },
       async function (s) {   /* 6 · drei Phasen */
         if (!_r19.bank) return;
-        await r19Seite(_r19.bank, 3, 455);   /* CASHFLOW JE PHASE 439 */
+        await r19Seite(_r19.bank, 3, 513);   /* ab 385 pt: CASHFLOW JE PHASE 403 … 586 */
         var K = r19K();
         await b2oZeile(s, 'Heute, Zinsbindung, Anschluss', 'Cashflow nach Steuern im Jahr: heute <b>' + eur(K.cf_ns) + '</b>, am Ende der Zinsbindung ' + eur(K.cf_ns_ezb) + ', in der Anschlussfinanzierung ' + eur(K.cf_ns_an) + '.');
       },
@@ -3930,7 +3930,7 @@
     try { await w.exportPdf(w._lastOut); } catch (e) {} finally { api.save = _r18.save; _r18.save = null; w._mbMarkenName = mk; }
     return fang;
   }
-  async function r18Seite(n, oben) {   /* v2276c · oben = PDF-y von unten (FitH,top): Deckblatt ab der Adresse */
+  async function r18Seite(n, oben) {   /* v2276c/e · oben = FitH,top in px von oben (siehe r19Seite): Deckblatt ab der Adresse */
     if (!_r18.pdf) return;
     if (!_r18.url) _r18.url = URL.createObjectURL(_r18.pdf);
     var o = el('dpm-pdf');
@@ -4021,7 +4021,7 @@
         if (!_r18.pdf) { await b2oZeile(s, 'Das PDF', 'Hier entsteht das PDF.'); return; }
         try { var tx = await _r18.pdf.text(), mm = /\/Type \/Pages[\s\S]{0,2000}?\/Count (\d+)/.exec(tx); _r18.seiten = mm ? Number(mm[1]) : null; DPM_REIHE.pdf18 = { bytes: _r18.pdf.size, seiten: _r18.seiten, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8) }; } catch (e) {}
         zeige(null); kegelHoch(true);
-        await r18Seite(1, 460);
+        await r18Seite(1, 507);   /* ab 380 pt: Adresse 394, Marktwert 671, Spanne 700 */
         await b2oZeile(s, 'Das PDF', 'Deckblatt mit Marktwert und Eckdaten' + (_r18.seiten ? ' — ' + _r18.seiten + ' Seiten' : '') + ': für die Bank, den Verkäufer oder deine Unterlagen.');
         await r18Seite(3);
         await b2oZeile(s, 'Im Dokument', 'Dieselben Kapitel wie am Bildschirm — Lage, Vergleichsdaten, Wertermittlung mit Rechenweg und Quellennachweis.', 600);
