@@ -44,15 +44,50 @@ const r4 = (x) => Math.round(x * 10000) / 10000;
 
 /** Koeffizient fuer EINE Flaeche nach der Regel des Satzes.
  *  -> { k, weg } oder { k: null, grund } */
+/* v2281 · DIE FORMEN, IN DENEN AUSSCHUESSE SIE VEROEFFENTLICHEN (gemessen an der
+   Recherche 16.10.2026, scratchpad uk-recherche.md):
+     flaeche_tabelle   Tabelle je Normgroesse (Bielefeld), Schluessel "*" = eine
+                       Tabelle fuer jede Bezugsgroesse (Quotient Objekt/Norm);
+                       zwischenwerte 'linear' oder 'stufen' (naechst kleinere Stufe)
+     flaeche_funktion  g(f) als Formel, UK = g(Objekt) / g(Norm):
+                         potenz  g = (f / basis_qm) ^ exponent        (Hamburg)
+                         log     g = a + b · ln(f)                     (Koeln)
+                         linear  g = a + b · f                         (Oberberg. Kreis)
+                       gueltig nur in spanne_qm [von, bis]
+     flaeche_eins      amtlich „kein Einfluss" / UK = 1 (Sachsen-Anhalt landesweit,
+                       Essen, Hoexter, Steinfurt) - nur innerhalb spanne_qm, wenn genannt
+   Alles andere: kein Koeffizient (form_unbekannt) - nie geraten. */
+function _funktionG(f, x) {
+  const t = f.typ;
+  if (t === 'potenz' && Number(f.basis_qm) > 0) return Math.pow(x / Number(f.basis_qm), Number(f.exponent));
+  if (t === 'log') return Number(f.a) + Number(f.b) * Math.log(x);
+  if (t === 'linear') return Number(f.a) + Number(f.b) * x;
+  return null;
+}
+
 export function koeffizientFuer(satz, flaecheQm, normgroesseQm) {
   const f = (satz && satz.formel) || {};
   const fl = Number(flaecheQm), norm = Number(normgroesseQm);
+  if (!(fl > 0)) return { k: null, grund: 'flaeche_fehlt' };
+  const sp = Array.isArray(f.spanne_qm) ? f.spanne_qm : null;
+  const inSpanne = (x) => !sp || ((sp[0] == null || x >= sp[0]) && (sp[1] == null || x <= sp[1]));
+
+  if (f.form === 'flaeche_eins') {
+    if (!inSpanne(fl) || !inSpanne(norm)) return { k: null, grund: 'ausserhalb_spanne', wortlaut: f.wortlaut || null };
+    return { k: 1, weg: 'amtlich kein Einfluss der Grundstücksgröße (Koeffizient 1)' };
+  }
+  if (f.form === 'flaeche_funktion') {
+    if (!inSpanne(fl) || !inSpanne(norm)) return { k: null, grund: 'ausserhalb_spanne', wortlaut: f.wortlaut || null };
+    const gF = _funktionG(f, fl), gN = _funktionG(f, norm);
+    if (!(gF > 0) || !(gN > 0)) return { k: null, grund: 'funktion_unbekannt' };
+    return { k: r4(gF / gN), weg: 'Formel des Ausschusses' + (f.formel_wortlaut ? ' (' + f.formel_wortlaut + ')' : '')
+      + ', ' + fl + ' m² gegen ' + norm + ' m²' };
+  }
   if (f.form !== 'flaeche_tabelle') return { k: null, grund: 'form_unbekannt' };
-  const tab = (f.tabellen || {})[String(norm)];
+  const tab = (f.tabellen || {})[String(norm)] || (f.tabellen || {})['*'];
   if (!tab) return { k: null, grund: 'normgroesse_nicht_in_tabelle' };
   const xs = tab.flaeche_qm, ys = tab.koeffizient;
   if (!Array.isArray(xs) || xs.length !== ys.length || xs.length < 2) return { k: null, grund: 'tabelle_defekt' };
-  if (!(fl > 0)) return { k: null, grund: 'flaeche_fehlt' };
   const min = xs[0], max = xs[xs.length - 1];
 
   if (fl < min) {
@@ -64,6 +99,7 @@ export function koeffizientFuer(satz, flaecheQm, normgroesseQm) {
       if (xs[i] === fl) return { k: ys[i], weg: 'Tabellenwert ' + fl + ' m²' };
       if (xs[i] > fl) {
         const x0 = xs[i - 1], x1 = xs[i], y0 = ys[i - 1], y1 = ys[i];
+        if (f.zwischenwerte === 'stufen') return { k: y0, weg: 'Stufe ab ' + x0 + ' m²' };
         const k = r4(y0 + (y1 - y0) * (fl - x0) / (x1 - x0));
         if (f.zwischenwerte !== 'linear') return { k: null, grund: 'keine_zwischenwerte' };
         return { k, weg: 'linear zwischen ' + x0 + ' m² (' + y0 + ') und ' + x1 + ' m² (' + y1 + ')' };
