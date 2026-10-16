@@ -78,7 +78,7 @@
   background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01));padding:24px 24px 20px}
 .dpl-karte::before{content:'';position:absolute;left:0;top:0;right:0;height:3px;background:var(--runway)}
 .dpl-k-kick{display:flex;justify-content:space-between;gap:10px;font:700 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gdh)}
-.dpl-k-kick span:last-child{color:var(--ddk)}
+.dpl-k-kick span:last-child{white-space:nowrap;color:var(--ddk)}
 .dpl-karte h3{font:700 clamp(21px,2.1vw,27px)/1.15 var(--disp);color:#fff;margin:14px 0 6px;letter-spacing:-.01em}
 .dpl-karte .dpl-unter{font:500 14px/1.45 var(--body);color:var(--gdh);margin:0 0 14px}
 .dpl-karte .dpl-story{font-size:14.6px;line-height:1.62;color:var(--mdk);margin:0 0 16px}
@@ -209,7 +209,11 @@
   .fe2-siegel{width:min(240px,70%)}
 }
 @media(max-width:700px){
-  .dpl-tabs{width:100%;overflow-x:auto}
+  .dpl-tabs{width:100%;overflow-x:auto;scrollbar-width:none}
+  .dpl-tabs::-webkit-scrollbar{display:none}
+  /* 1c: auf 375 px brach die Instrumentenzeile dreizeilig um */
+  .dpl-hud{gap:10px;font-size:9px;letter-spacing:.1em;white-space:nowrap}
+  .dpl-hud .dpl-flug{display:none}
   .dpl-tab{padding:10px 12px;font-size:9.5px;letter-spacing:.1em}
   .dpl-karte{padding:20px 18px 18px}
   .dpl-w{flex-basis:168px}
