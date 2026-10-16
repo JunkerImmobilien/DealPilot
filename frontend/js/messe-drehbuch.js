@@ -4021,7 +4021,7 @@
         if (!_r18.pdf) { await b2oZeile(s, 'Das PDF', 'Hier entsteht das PDF.'); return; }
         try { var tx = await _r18.pdf.text(), mm = /\/Type \/Pages[\s\S]{0,2000}?\/Count (\d+)/.exec(tx); _r18.seiten = mm ? Number(mm[1]) : null; DPM_REIHE.pdf18 = { bytes: _r18.pdf.size, seiten: _r18.seiten, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8) }; } catch (e) {}
         zeige(null); kegelHoch(true);
-        await r18Seite(1, 507);   /* ab 380 pt: Adresse 394, Marktwert 671, Spanne 700 */
+        await r18Seite(1, 573);   /* ab 430 pt: Eckdaten 450, Marktwert 671, Spanne 700 (sichtbar sind im Studio rund 290 pt) */
         await b2oZeile(s, 'Das PDF', 'Deckblatt mit Marktwert und Eckdaten' + (_r18.seiten ? ' — ' + _r18.seiten + ' Seiten' : '') + ': für die Bank, den Verkäufer oder deine Unterlagen.');
         await r18Seite(3);
         await b2oZeile(s, 'Im Dokument', 'Dieselben Kapitel wie am Bildschirm — Lage, Vergleichsdaten, Wertermittlung mit Rechenweg und Quellennachweis.', 600);
