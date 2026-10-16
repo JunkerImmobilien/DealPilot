@@ -38840,6 +38840,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2354 + Prod-Rollout (41) · Nebenkosten aus den Einstellungen für BESTEHENDE Objekte — auf Knopfdruck (16.10.2026)
+
+- **Was:** Marcel „die Werte immer aus den Einstellungen und dem Set ziehen" — für neue Objekte seit v2261 in `setDefaults()`. Für gespeicherte Objekte jetzt ein Knopf im Reiter Investition („Nebenkosten aus den Einstellungen übernehmen", `main.js` `dpNkAusEinstellungen()`): Notar, Grundbuch, Makler, Sonstige aus dem Investmentprofil, Grunderwerbsteuer nach PLZ (grest_auto) bzw. Profil-Bundesland. Nie still: Anzeige vorher → nachher je Feld, „Rückgängig". Bestehende Objekte werden NICHT automatisch überschrieben (bewusst gesetzte Werte, z. B. Ravensberger Weg 38).
+- **Commit:** `8653fa9a`, Merge siehe main.
+- **Nachweis:** Staging-Browser: Knopf vorhanden (btn-outline), main.js v2354, `_dpNkZiel()` = Notar 1,7 · Grundbuch 0,5 · Makler 3,57 · Sonstige 1,5 · GrESt 6,5. Nicht geklickt (geladenes Objekt ist echt). Prod: Knopf im ausgelieferten HTML, `/auth/me` 401.
+- **Rest:** Klick-Abnahme an einer Kopie.
+
 ### Prod-Rollout (40) · Module 17 und 21 neu aufgenommen (16.10.2026)
 
 - **Was:** Modul 17 mit dem Verhalten von v2351 (Dateikarte liest das echte Paket, v2352: Konto-Wissen bleibt hier). Modul 21 mit neu abgerufener Portfolio-Analyse (v2353): DSCR im Text 1,28 = Cockpit-Kachel (vorher 0,87 aus dem num()-Fehler). Meine 1,15 (v2305) war über alle 20 Objekte mit Darlehen gerechnet, das Cockpit rechnet über die 11 Bestandsobjekte — zwei Grundmengen, kein Widerspruch.
