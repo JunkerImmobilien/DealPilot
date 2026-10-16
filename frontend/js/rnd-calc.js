@@ -246,7 +246,8 @@
          2. Die RND wird auf hoechstens 70 % der GND gestreckt, bei
             nachgewiesener Kernsanierung auf bis zu 90 %.
          3. Die Parabel hat ihren Scheitel bei Alter = b*GND/(2a) und steigt
-            danach wieder. Ab Alter >= GND wird deshalb nicht extrapoliert.
+            danach wieder. Seit v2275 wird sie dort GEHALTEN (Plateau),
+            nie ueber den steigenden Ast fortgerechnet.
        Ohne 1. lieferte die Methode bei jungen Gebaeuden mehr RND als linear,
        ohne 3. bekam ein Haus von 1900 mehr RND als eines von 1964.          */
     const punkte = clampInt(modPoints, 0, 20);
@@ -256,16 +257,37 @@
     const kappe = gnd * quote;
 
     let rnd, rohwert = null, anwendbar = true, grenze = null, hinweis = null;
+    let alterFormel = alter;   /* v2275: hinter dem Scheitel = Scheitelalter */
 
     if (gnd <= 0) {
       rnd = 0; anwendbar = false; grenze = 'keine_gnd';
       hinweis = 'Ohne Gesamtnutzungsdauer keine Rechnung.';
     } else if (alter >= gnd) {
-      rnd = 0; anwendbar = false; grenze = 'ueber_gnd';
-      hinweis = 'Das Alter erreicht oder überschreitet die Gesamtnutzungsdauer. '
-              + 'Die Kurve der Anlage 2 liegt hier hinter ihrem Scheitel (Alter '
-              + round2(k.b * gnd / (2 * k.a)) + ' Jahre) und würde wieder steigen. '
-              + 'Es wird nicht extrapoliert.';
+      /* v2275 · PLATEAU HINTER DEM SCHEITEL — Marcels Entscheidung vom 16.10.2026
+       („Variante 1"). Anlage 2 regelt den Fall Alter >= GND nicht. Bis hier
+       lieferte der Kern dort keine Zahl (Basis 0, Auffang 10 Jahre) — ein
+       Haus mit 13 Modernisierungspunkten fiel so mit dem ersten Jahr ueber
+       der GND von 43,5 auf 10 Jahre. Jetzt wird die Kurve bis zu ihrem
+       Scheitel (Alter = b*GND/(2a), bei jeder Punktzahl hinter der GND)
+       fortgefuehrt und DAHINTER GEHALTEN — der Tiefpunkt der Parabel, nie
+       der wieder steigende Ast. Monoton (aelter nie mehr), stetig an der
+       GND, und die Modernisierung wirkt weiter (GND 80: 13 Punkte -> 43,5 J,
+       9 Punkte -> 34,3 J, 0 Punkte -> 11,75 J). Deckel 70/90 % und die
+       Untergrenze RND_MIN bleiben. Kennzeichnung bleibt: sachverstaendig
+       zu wuerdigen. */
+      const scheitel = k.b * gnd / (2 * k.a);
+      alterFormel = Math.min(alter, scheitel);
+      rohwert = (k.a * alterFormel * alterFormel / gnd) - (k.b * alterFormel) + (k.c * gnd);
+      rnd = Math.min(Math.max(0, rohwert), kappe);
+      grenze = 'plateau';
+      hinweis = 'Das Alter (' + alter + ' Jahre) erreicht oder überschreitet die Gesamtnutzungsdauer ('
+              + gnd + ' Jahre); Anlage 2 regelt diesen Fall nicht. '
+              + (alter > scheitel
+                  ? 'Die Kurve wird auf ihrem Tiefpunkt gehalten (Scheitel bei Alter ' + round2(scheitel)
+                    + ' Jahren) und nicht über den wieder steigenden Ast fortgerechnet. '
+                  : 'Die Kurve ist bis zu ihrem Tiefpunkt (Alter ' + round2(scheitel)
+                    + ' Jahre) fortgeführt und wird dahinter gehalten. ')
+              + 'Die Restnutzungsdauer ist sachverständig zu würdigen.';
     } else if (relAlter < k.rel) {
       rnd = Math.max(0, gnd - alter); anwendbar = false; grenze = 'unter_schwelle';
       hinweis = 'Relatives Alter ' + round2(relAlter) + ' % liegt unter der Schwelle von '
@@ -289,8 +311,8 @@
     // Formatiere wie im Original-Gutachten:
     // "1,2500 x 30 Jahre² / 70 Jahre - 2,6250 x 30 Jahre + 1,5250 * 70 Jahre = 44,07 Jahre"
     const formula = anwendbar
-      ? (fmtNum4(k.a) + ' × ' + alter + ' Jahre² / ' + gnd + ' Jahre - '
-         + fmtNum4(k.b) + ' × ' + alter + ' Jahre + '
+      ? (fmtNum4(k.a) + ' × ' + round2(alterFormel) + ' Jahre² / ' + gnd + ' Jahre - '
+         + fmtNum4(k.b) + ' × ' + round2(alterFormel) + ' Jahre + '
          + fmtNum4(k.c) + ' × ' + gnd + ' Jahre = '
          + fmtNum2(rohwert === null ? rnd : rohwert) + ' Jahre')
       : (grenze === 'unter_schwelle'
