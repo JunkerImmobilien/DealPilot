@@ -38840,6 +38840,12 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### Entscheidung Marcel 16.10.2026 · Nebenkosten aus den Einstellungen — so bleibt es
+
+- **Regel (wörtlich):** „es ändert sich erst, wenn man die Einstellungen ändert, die alten bleiben so" / „die Objekte können aber so jetzt bleiben, ist nur Demo". Eine dauerhafte automatische Übernahme in BESTEHENDE Objekte hat er ausdrücklich abgelehnt („nein").
+- **Damit gilt:** neue Objekte und leere Felder → aus dem Investmentprofil (`setDefaults`, `applyToNewObject`); bestehende Objekte behalten ihre Werte; Übernahme nur auf Knopfdruck („Nebenkosten aus den Einstellungen übernehmen", v2354, mit Rückgängig). Die einmalige Umstellung der Demo-Objekte des Kontos info@ (Staging 39, Prod 25) bleibt so stehen.
+- **Nicht bauen:** kein „Profilstand", der Bestandsobjekte beim Öffnen nachzieht (am 16.10. angefangen, auf Marcels „nein" verworfen, nichts committet).
+
 ### v2355 + v2356 + Prod-Rollout (42) · Liegenschaftszins NRW 2026 · Nachernte Umrechnungskoeffizient (16.10.2026)
 
 - **Was (v2355):** Liegenschaftszins NRW aus Grundstücksmarktdaten NRW Ausgabe 2026 (`lzs.csv`, Berichtsjahr 2025, Stichtag 31.12.2025, dl-de/zero-2-0): 502 Sätze, alle 73 Ausschüsse, neue Datei `lzs-swf-2026-nachernte.json` neben `lzs-nrw.json` (GMD 2025). Umwandler nachgebaut und am Vorjahrgang feldgleich geprüft (493/493); `findeZweig` liefert 502/502 den neuen Satz. Median-Änderung 0,0 Prozentpunkte, 32 neue Zweige. HE/HH/Dresden/Leipzig/NI und NRW-SWF der Großstädte führten 2026 schon; Berlin, Gütersloh-SWF, Offenbach-SWF ohne freien Jahrgang 2026 (keine Sperre — würde den älteren Wert verdrängen).
