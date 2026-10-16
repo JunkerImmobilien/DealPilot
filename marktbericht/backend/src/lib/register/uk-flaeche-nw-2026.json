@@ -198,7 +198,8 @@
       "dokument": "Fachinformation zur Anwendung der Umrechnungskoeffizienten – Individueller Wohnungsbau –",
       "abgerufen_am": "2026-10-16",
       "pdf_erstellt": "2026-07-27"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -255,7 +256,8 @@
       ],
       "bezug_wortlaut": "Der Bodenrichtwert für Grundstücke des individuellen bzw. mehrgeschossigen Wohnungsbaus bezieht sich auf eine Grundstückstiefe von rd. 35 Metern.",
       "seite": 2
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Bochum, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -354,7 +356,8 @@
         "rundung_eur_qm": 1,
         "seite": 2
       }
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Bundesstadt Bonn, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -390,7 +393,8 @@
     "boris_nummer": "0510500",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -598,7 +602,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte – Individueller Wohnungsbau (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -649,7 +654,8 @@
         "reihenhaus_151_350": "+5 %"
       },
       "hinweis": "Zeile „Ein-/Zweifamilienhausgrundstück über 1000 m² Baulandfläche“: −10 % gegen Reihenhausnorm 151–350 m², −5 % gegen Ein-/Zweifamilienhausnorm unter 1000 m²; vollständige Matrix S. 2"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -685,7 +691,8 @@
     "boris_nummer": "0510800",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -739,7 +746,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Essen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -776,7 +784,8 @@
     "boris_nummer": "0511000",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Gelsenkirchen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -813,7 +822,8 @@
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
     },
-    "auflagen": "Intern, nicht für Kundentexte: Quelle laut Dokument „In Anlehnung an die Umrechnungstabelle Sprengnetter Immobilienbewertung Marktdaten u. Praxishilfen, Band 4, Kapitel 3.10.2, GFZ-bereinigte Flächenumrechnungskoeffizienten“."
+    "auflagen": "Intern, nicht für Kundentexte: Quelle laut Dokument „In Anlehnung an die Umrechnungstabelle Sprengnetter Immobilienbewertung Marktdaten u. Praxishilfen, Band 4, Kapitel 3.10.2, GFZ-bereinigte Flächenumrechnungskoeffizienten“.",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -850,7 +860,8 @@
     "boris_nummer": "0511200",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Hamm, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -886,7 +897,8 @@
     "boris_nummer": "0511300",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Herne, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1012,7 +1024,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte – Individueller Wohnungsbau (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Köln, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1049,7 +1062,8 @@
     "boris_nummer": "0511500",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Krefeld, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1177,7 +1191,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte – Individueller Wohnungsbau (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Leverkusen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1219,7 +1234,8 @@
     "boris_nummer": "0511700",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Mönchengladbach, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1255,7 +1271,8 @@
     "boris_nummer": "0511800",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Mülheim an der Ruhr, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1350,7 +1367,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte – Misch- oder mehrgeschossige Bebauung (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Münster, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1386,7 +1404,8 @@
     "boris_nummer": "0512000",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Oberhausen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1505,7 +1524,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Remscheid, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1541,7 +1561,8 @@
     "boris_nummer": "0512200",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Klingenstadt Solingen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1650,7 +1671,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Wuppertal, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1745,7 +1767,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Arnsberg, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1781,7 +1804,8 @@
     "boris_nummer": "0520700",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Bergisch Gladbach, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1818,7 +1842,8 @@
     "boris_nummer": "0521000",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1854,7 +1879,8 @@
     "boris_nummer": "0521900",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1891,7 +1917,8 @@
     "boris_nummer": "0522200",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1928,7 +1955,8 @@
     "boris_nummer": "0522200",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -1965,7 +1993,8 @@
     "boris_nummer": "0522200",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2002,7 +2031,8 @@
     "boris_nummer": "0522500",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Düren, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2039,7 +2069,8 @@
     "boris_nummer": "0524300",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2076,7 +2107,8 @@
     "boris_nummer": "0524900",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Lippstadt, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2112,7 +2144,8 @@
     "boris_nummer": "0525200",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Lüdenscheid, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2188,7 +2221,8 @@
       ],
       "ausnahme": "Ausgenommen von der Anwendung der Umrechnungskoeffizienten sind sogenannte „Villengrundstücke“ in bevorzugten Lagen; das Grundstück darf nicht in weitere selbstständig bebaubare Grundstücke teilbar sein.",
       "seite": 2
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Minden, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2224,7 +2258,8 @@
     "boris_nummer": "0526400",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Moers, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2260,7 +2295,8 @@
     "boris_nummer": "0526700",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Neuss, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2296,7 +2332,8 @@
     "boris_nummer": "0527000",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2382,7 +2419,8 @@
       },
       "lesung": "Tabellenwerte im Rohtext verschoben gesetzt; Zuordnung mit der abgedruckten Formel gegengerechnet (z. B. 2.750 m²: 0,931; 3.000 m²: 0,872; 5.000 m²: 0,594).",
       "seite": 2
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Ratingen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2418,7 +2456,8 @@
     "boris_nummer": "0527600",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2461,7 +2500,8 @@
     "boris_nummer": "0527900",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Rheine, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2498,7 +2538,8 @@
     "boris_nummer": "0528200",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Universitätsstadt Siegen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2534,7 +2575,8 @@
     "boris_nummer": "0528900",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Velbert, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2571,7 +2613,8 @@
     "boris_nummer": "0529400",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Stadt Wesel, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2952,7 +2995,8 @@
       },
       "zwischenwerte_wortlaut": "Das Dokument nennt keine Regel für Zwischenwerte; zwischen den Tabellenwerten wird deshalb nicht gerechnet (nur die abgedruckten Flächen liefern einen Koeffizienten)."
     },
-    "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in der StädteRegion Aachen rechnet vorrangig über die Grundstückstiefe; die Flächentabelle gilt nur, wenn die Tiefenumrechnung nicht fachgerecht möglich ist. Das lässt sich ohne Kenntnis von Zuschnitt und Tiefe nicht prüfen — deshalb keine automatische Umrechnung (v2286)."
+    "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in der StädteRegion Aachen rechnet vorrangig über die Grundstückstiefe; die Flächentabelle gilt nur, wenn die Tiefenumrechnung nicht fachgerecht möglich ist. Das lässt sich ohne Kenntnis von Zuschnitt und Tiefe nicht prüfen — deshalb keine automatische Umrechnung (v2286).",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Städteregion Aachen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -2989,7 +3033,8 @@
     "boris_nummer": "0530100",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Städteregion Aachen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -3026,7 +3071,8 @@
     "boris_nummer": "0530100",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte in der Städteregion Aachen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -3062,7 +3108,8 @@
     "boris_nummer": "0530200",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Borken, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -3099,7 +3146,8 @@
     "boris_nummer": "0530300",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Coesfeld, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -3136,7 +3184,8 @@
     "boris_nummer": "0530400",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Düren, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -3239,7 +3288,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte – Individueller Wohnungsbau (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Ennepe-Ruhr-Kreis mit der Stadt Witten, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -3589,7 +3639,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte – Individueller Wohnungsbau (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -3698,7 +3749,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte – Individueller Wohnungsbau (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Euskirchen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -3734,7 +3786,8 @@
     "boris_nummer": "0530800",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -3771,7 +3824,8 @@
     "boris_nummer": "0530900",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Heinsberg, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -3879,7 +3933,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Herford und in der Stadt Herford, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -3976,7 +4031,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte – Individueller Wohnungsbau (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Hochsauerlandkreis, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4034,7 +4090,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Höxter, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4070,7 +4127,8 @@
     "boris_nummer": "0531300",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Kleve, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4126,7 +4184,8 @@
       ],
       "seite": 32,
       "widerspruch": "Beispiel S. 33: 500 m² gegen Richtwert „W I-II 600“ mit Faktor 103,8 / 100 = 1,038; nach der Tabelle wären 600 m² = 102,3, also 103,8 / 102,3 = 1,015."
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4162,7 +4221,8 @@
     "boris_nummer": "0531500",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Märkischen Kreis, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4198,7 +4258,8 @@
     "boris_nummer": "0531600",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Mettmann, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4435,7 +4496,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Rhein-Kreis Neuss ohne die Stadt Neuss, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4507,7 +4569,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Oberbergischen Kreis, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4544,7 +4607,8 @@
     "boris_nummer": "0532000",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Olpe, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4581,7 +4645,8 @@
     "boris_nummer": "0532100",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4617,7 +4682,8 @@
     "boris_nummer": "0532200",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Recklinghausen, in der Stadt Castrop-Rauxel und in der Stadt Herten, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4708,7 +4774,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte – Individueller Wohnungsbau (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Rheinisch-Bergischen Kreis, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4797,7 +4864,8 @@
     "belege_meta": {
       "dokument": "Grundstücksmarktbericht für den Rhein-Sieg-Kreis und die Stadt Troisdorf 2026",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Rhein-Sieg-Kreis und in der Stadt Troisdorf, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4834,7 +4902,8 @@
     "boris_nummer": "0532500",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Siegen-Wittgenstein, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4871,7 +4940,8 @@
     "boris_nummer": "0532600",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Soest, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4928,7 +4998,8 @@
     "belege_meta": {
       "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (BORIS-NRW, Bodenrichtwerte 2026)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Steinfurt, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -4964,7 +5035,8 @@
     "boris_nummer": "0532800",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Unna, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -5012,7 +5084,8 @@
       "rest_faktor_bis_1x_norm": 0.25,
       "rest_faktor_bis_2x_norm": 0.1,
       "geltung": "Ein- bis Dreifamilienhäuser; „ca.“-Werte"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Viersen, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -5128,7 +5201,8 @@
       },
       "spalten": "Bewertungsobjekt [m²] in derselben Klassenfolge",
       "seite": 2
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Warendorf, Jahrgang 2026"
   },
   {
     "land_code": "NW",
@@ -5165,6 +5239,7 @@
     "boris_nummer": "0533100",
     "belege_meta": {
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Der Gutachterausschuss für Grundstückswerte im Kreis Wesel, Jahrgang 2026"
   }
 ]

@@ -27,7 +27,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Braunschweig, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -57,7 +58,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Braunschweig, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -251,7 +253,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0910100_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-28"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Braunschweig, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -281,7 +284,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Braunschweig, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -311,7 +315,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -341,7 +346,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Braunschweig, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -371,7 +377,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -401,7 +408,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Braunschweig, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -431,7 +439,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Braunschweig, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -461,7 +470,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -491,7 +501,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Hameln-Hannover, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -655,7 +666,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0480150_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-17"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Sulingen-Verden, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -685,7 +697,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Hameln-Hannover, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -715,7 +728,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Hameln-Hannover, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -745,7 +759,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -908,7 +923,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0480150_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-17"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Sulingen-Verden, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -938,7 +954,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Hameln-Hannover, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -968,7 +985,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Braunschweig, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Braunschweig, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -1119,7 +1137,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0320010_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-02"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Otterndorf, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -1272,7 +1291,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -1425,7 +1445,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -1578,7 +1599,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -1731,7 +1753,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -1884,7 +1907,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -2037,7 +2061,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -2190,7 +2215,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -2343,7 +2369,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -2496,7 +2523,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -2649,7 +2677,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -2802,7 +2831,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -2955,7 +2985,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -3108,7 +3139,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -3261,7 +3293,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -3414,7 +3447,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -3567,7 +3601,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -3720,7 +3755,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -3873,7 +3909,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -4026,7 +4063,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -4179,7 +4217,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -4332,7 +4371,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -4485,7 +4525,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -4638,7 +4679,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -4791,7 +4833,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -4944,7 +4987,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -5097,7 +5141,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -5250,7 +5295,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -5403,7 +5449,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -5556,7 +5603,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -5709,7 +5757,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -5862,7 +5911,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -6015,7 +6065,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -6168,7 +6219,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -6321,7 +6373,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -6474,7 +6527,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -6627,7 +6681,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -6780,7 +6835,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -6933,7 +6989,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -7086,7 +7143,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -7239,7 +7297,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0875004_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -7269,7 +7328,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Lüneburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Lüneburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -7422,7 +7482,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0876013_grundstucksflache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -7575,7 +7636,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0870302_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -7726,7 +7788,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0320010_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-02"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Otterndorf, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -7877,7 +7940,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0320010_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-02"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Otterndorf, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -8028,7 +8092,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0320010_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-02"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Otterndorf, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -8179,7 +8244,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0320010_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-02"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Otterndorf, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -8330,7 +8396,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0320010_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-02"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Otterndorf, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -8481,7 +8548,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0320010_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-02"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Otterndorf, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -8632,7 +8700,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0320010_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-02"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Otterndorf, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -8783,7 +8852,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0320010_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-02"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Otterndorf, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -8934,7 +9004,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0320010_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-02"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Otterndorf, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -8964,7 +9035,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Otterndorf, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Otterndorf, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Otterndorf, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -9115,7 +9187,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0320010_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-02"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Otterndorf, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -9278,7 +9351,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0480150_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-17"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Sulingen-Verden, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -9429,7 +9503,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0320010_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-02"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Otterndorf, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -9592,7 +9667,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0876002_grundstucksflache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-19"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Lüneburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -9755,7 +9831,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0480150_flache)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-17"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Sulingen-Verden, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -9785,7 +9862,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -9956,7 +10034,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0210102_900m1,00)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-22"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Aurich, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -9986,7 +10065,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -10016,7 +10096,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -10187,7 +10268,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0210102_900m1,00)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-22"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Aurich, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -10217,7 +10299,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -10390,7 +10473,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0210102_900m1,00)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-22"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Aurich, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -10525,7 +10609,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0190912_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-04-17"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -10660,7 +10745,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0190912_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-04-17"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -10795,7 +10881,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0190912_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-04-17"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -10930,7 +11017,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0190912_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-04-17"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -10960,7 +11048,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -10990,7 +11079,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -11161,7 +11251,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0210102_900m1,00)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-22"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Aurich, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -11191,7 +11282,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -11362,7 +11454,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0210102_900m1,00)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-22"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Aurich, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -11497,7 +11590,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0170713_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-09-11"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -11632,7 +11726,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0170713_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-09-11"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -11767,7 +11862,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0170713_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-09-11"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -11797,7 +11893,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -11827,7 +11924,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Osnabrück-Meppen, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -11962,7 +12060,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0180813_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-30"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -11992,7 +12091,8 @@
     "lizenz": "dl-de/by-2-0",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
-    "weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    "weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -12163,7 +12263,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0210102_900m1,00)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-22"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Aurich, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -12299,7 +12400,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0120214_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-26"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -12435,7 +12537,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0150513_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-26"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -12563,7 +12666,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0190913_flac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-04-17"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -12707,7 +12811,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0430001wflac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-20"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Hameln-Hannover, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -12843,7 +12948,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0590110_Wflac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-05-26"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -12979,7 +13085,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0590110_Wflac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-05-26"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13115,7 +13222,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0590111_Mflac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-05-26"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13251,7 +13359,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0590111_Mflac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-05-26"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13387,7 +13496,8 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0590111_Mflac)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-05-26"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13424,7 +13534,8 @@
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
     "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
-    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0592024_ASBflac.pdf"
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0592024_ASBflac.pdf",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13461,7 +13572,8 @@
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
     "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
-    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0592024_ASBflac.pdf"
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0592024_ASBflac.pdf",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13498,7 +13610,8 @@
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
     "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
-    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0592024_ASBflac.pdf"
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0592024_ASBflac.pdf",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13535,7 +13648,8 @@
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
     "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
-    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0592024_ASBflac.pdf"
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0592024_ASBflac.pdf",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13572,7 +13686,8 @@
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
     "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
-    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590113_SOflac.pdf"
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590113_SOflac.pdf",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13609,7 +13724,8 @@
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
     "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
-    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590112_MKflac.pdf"
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590112_MKflac.pdf",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13646,7 +13762,8 @@
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
     "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
-    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590112_MKflac.pdf"
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590112_MKflac.pdf",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Northeim, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13683,7 +13800,8 @@
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
     "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
-    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0430094_flae_asb.pdf"
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0430094_flae_asb.pdf",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Hameln-Hannover, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13720,7 +13838,8 @@
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
     "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
-    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0430096_flae_g1.pdf"
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0430096_flae_g1.pdf",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Hameln-Hannover, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13757,7 +13876,8 @@
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
     "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
-    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0430097_flae_g2.pdf"
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0430097_flae_g2.pdf",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Hameln-Hannover, Jahrgang 2026"
   },
   {
     "land_code": "NI",
@@ -13827,6 +13947,7 @@
     "belege_meta": {
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0430093_flac)",
       "abgerufen_am": "2026-10-16"
-    }
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte Hameln-Hannover, Jahrgang 2026"
   }
 ]
