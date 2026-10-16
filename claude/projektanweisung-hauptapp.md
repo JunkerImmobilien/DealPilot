@@ -38881,6 +38881,45 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Nachweis:** `uk-flaeche-pruefen` sauber (206 Sätze, 97 Beispiele), `saat-pruefen --basislinie` grün, Gegenprobe im Staging-Container mit DB-Stand: HE/TH/Aachen keine Zahl, Bielefeld 0,59, Leer 0,97. Bielefeld EFH 1.570 m² → 0,4439 → 313.623 € statt 706.500 €.
 - **Rest:** Prod-Rollout (Code + `register-saat.mjs` auf Prod nach Sicherung). Näherung v2288 einbauen (Ableitung `tools/uk-naeherung-ableiten.mjs`: b Median −0,213 land, −0,25 Stadt; Hamburg amtlich −0,2496). Offene Bewertungsfragen an Marcel: Zwischenwerte ohne Interpolationsregel (Münster, Aachen u. a.), DHH/RH in NI, Bonn „nur für den Dienstgebrauch", Lippe-Bezug, Kauf/Genehmigung Saarbrücken, Bremerhaven, Saarland, Bremen (Zins/Faktor). Hamburg: BORIS-Abruf lieferte an einem Punkt keinen Wert — prüfen. Tiefe und WGFZ als eigene Kennzahlen (viele NRW-Ausschüsse).
 
+### v2283–v2304 · Videoreihe: Module 10c, 20, 21, 23, 24 gebaut und aufgenommen; RND-Rechner zeigt die Prüfpflicht (16.10.2026, Staging)
+
+- **Was:**
+  - Fünf Drehbücher in `messe-drehbuch.js` mit Studio-Einträgen. 10c, 23 und 24 laufen an Kopien, 20 und 21 am Konto (nur lesen, `rhNurStart`):
+    - `reihe-rnd` (10c, neu im Plan)
+    - `reihe-bankexport` (20)
+    - `reihe-cockpit` (21)
+    - `reihe-15pct` (23)
+    - `reihe-brw-unterlagen` (24)
+  - Mitschnitte und Sperren:
+    - Neuer Mitschnitt `portfolioPilot`: EIN echter `/ai/copilot`-Abruf, kein Kontingent, nur Tageszähler. Die Ablage `PUT /user-settings/portfolio_analyse` wird im Lauf beantwortet, nicht geschrieben; gemessen: unverändert.
+    - Die Geokodierung vor dem BORIS-Abruf (bezahlter Dienst) wird mit den Koordinaten aus Bericht 216 gespielt. BORIS selbst läuft echt (Open Data).
+- **App-Fehler behoben (gemessen):**
+  1. `rnd-wizard.js` (v2283):
+     - `rnd-calc.js` liefert seit v2073 `pruefung` und `grenzen`. Der Wizard zeigte beides nie.
+     - „Restnutzungsdauer übernehmen“ (v2274) setzte den Wert auch bei `uebernahme_gesperrt` (Bj 1905 / GND 80).
+     - Jetzt: Kasten „Sachverständig zu würdigen“ mit Begründung. Der Knopf ist gesperrt, die Texte stehen mit Dezimalkomma.
+  2. `calc.js` (v2301): 15-%-Status „52.8%“ → „52,8 %“.
+  3. `bodenrichtwert.js` (v2302): Stichtag „2026-01-01“ → „01.01.2026“.
+  4. `portfolio-pilot.js` (v2304): Markdown-Sternchen standen roh im Bild, jetzt Fettschrift.
+- **Eigener Fehler:** Mein Commit `32267d2e` heißt „v2285“. Die Nummer hatte der Ernte-Strang schon vergeben. Danach habe ich v2300–v2304 genutzt.
+- **Nicht gebaut, gemeldet:**
+  - 17 · Objekt übertragen: Eine Übertragung an einen anderen Nutzer gibt es nicht. Vorhanden sind Sicherung/Import per Datei, die Mandanten-Freigabe und die Netzwerk-Einreichung. Welcher Weg gemeint ist, entscheidet Marcel.
+  - 22 · Telegram-Bot: Telegram Web braucht eine Anmeldung und zeigt fremde Chats.
+- **Commits:**
+  - `f13bc6cc` (v2283), `36c76ed7` (v2283a)
+  - `32267d2e` (als „v2285“)
+  - `bc07a39a` (v2300), `0b5d704c` (v2301), `da42824c` (v2302), `f552b46d` (v2303), `f8d72ce6` (v2304)
+  - Ausgerollt per `git push` + `git pull --ff-only` auf Staging. `deploy-staging.ps1` brach ab, weil andere Agenten unbestätigte Änderungen im Arbeitsverzeichnis hatten. Konstanten, Buster und Serverstand habe ich je Commit selbst geprüft.
+- **Nachweis:**
+  - Prüfläufe mit Protokoll (300 ms) für alle fünf Module. Kegel ≥ 96 % der Messpunkte; Lücken nur beim Kopieren bzw. im Abspann.
+  - Gespielt: Geokodierung, `/ai/copilot`, Ablage der Analyse.
+  - Gesperrt: BMF-Vorlauf.
+  - Kopien gelöscht, `fetch` danach echt.
+  - Je Video: Konferenzprüfung, 25-s-Probe, Start per Leertaste, Bildprüfung auf Fremdfenster (je Bild), Name/Adresse 0 Treffer.
+  - Datenbank je Aufnahme vorher/nachher gleich, alle 39 Objekt-Hashes gleich dem Stand nach dem Mittag. `ai_credits_log` und `marktbericht_cost_log` unverändert; `user_settings.portfolio_analyse` unverändert (9.10.).
+- **Videos:** 10c 4:09 (10,2 MB) · 20 1:38 (3,8 MB) · 21 2:59 (6,0 MB) · 23 3:34 (8,4 MB) · 24 2:38 (6,4 MB).
+- **Rest:** 17 und 22 (siehe oben). Ravensberger Weg 38 echt geändert um 10:36 UTC (`geb_ant` 74,57 → 74,82), siehe v2279; nicht zurückgesetzt.
+
 ### v2279 · Modul 16 neu aufgenommen nach v2277/v2278 (Sachwert mit NHK 4.1, eine RND) (16.10.2026, Staging)
 
 - **Was:** Bericht 216 liegt in `mb.market_reports` noch mit dem Sachwert vor v2277 (927.000 €, RND 21); das Marktbericht-Fenster lädt ihn per GET `/reports/one`. `r16MbSpion` ersetzt im Lauf NUR `cross_check` durch den Mitschnitt (v2278) – kein Abruf, kein Schreiben in die Datenbank, Modul 18 (Bericht 205) unberührt. Modul 16 neu aufgenommen: 5:29, 12,8 MB.
