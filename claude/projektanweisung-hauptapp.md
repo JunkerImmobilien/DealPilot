@@ -38912,6 +38912,19 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Nachweis:** `uk-flaeche-pruefen` sauber (206 Sätze, 97 Beispiele), `saat-pruefen --basislinie` grün, Gegenprobe im Staging-Container mit DB-Stand: HE/TH/Aachen keine Zahl, Bielefeld 0,59, Leer 0,97. Bielefeld EFH 1.570 m² → 0,4439 → 313.623 € statt 706.500 €.
 - **Rest:** Prod-Rollout (Code + `register-saat.mjs` auf Prod nach Sicherung). Näherung v2288 einbauen (Ableitung `tools/uk-naeherung-ableiten.mjs`: b Median −0,213 land, −0,25 Stadt; Hamburg amtlich −0,2496). Offene Bewertungsfragen an Marcel: Zwischenwerte ohne Interpolationsregel (Münster, Aachen u. a.), DHH/RH in NI, Bonn „nur für den Dienstgebrauch", Lippe-Bezug, Kauf/Genehmigung Saarbrücken, Bremerhaven, Saarland, Bremen (Zins/Faktor). Hamburg: BORIS-Abruf lieferte an einem Punkt keinen Wert — prüfen. Tiefe und WGFZ als eigene Kennzahlen (viele NRW-Ausschüsse).
 
+### v2352–v2353 · landing-videothek-3a · Module 17 und 21 neu aufgenommen (16.10.2026, Staging)
+
+- **Was:**
+  - v2352: Die Dateikarte in Modul 17 liest das Konto-Wissen aus dem Paket. Seit v2351 trägt die Einzelobjekt-Sicherung kein Konto-Wissen mehr. „Konto-Wissen“ steht jetzt unter „Bleibt hier“, das Projektwissen unter „Geht mit“.
+  - v2353: Die Portfolio-Analyse für Modul 21 ist EINMAL neu abgerufen (kein Kontingent). Sie nennt DSCR 1,28 wie die Cockpit-Kachel; der alte Mitschnitt nannte 0,87 (Zinsfehler bis v2305). Die Ablage in den Einstellungen wurde beantwortet, nicht geschrieben (gemessen unverändert). `RH_BUSTER` v2353.
+  - Videothek: Dauer 17 = 180 s, 21 = 175 s, Poster 17 neu, Buster `landing-videothek-3a`. MP4 auf Staging, md5 geprüft.
+- **Nicht getan:** MP4 auf Prod. Die Freigabe kam über den Koordinator, nicht von Marcel direkt.
+- **Commit:** `64a7e93d` (v2352), `8d647dbc` (v2353), `0becbcac` (landing-videothek-3a)
+- **Nachweis:**
+  - Je Aufnahme: Konferenzprüfung, Probe, Bildprüfung, Name/Adresse 0 Treffer.
+  - Datenbank vorher/nachher gleich; 39 Objekt-Hashes gleich dem Stand vom Mittag.
+- **Videos:** 17 3:00 (7,3 MB), 21 2:55 (6,1 MB).
+
 ### v2305 (Videoreihe) · v2350–v2350a · landing-videothek-3 · Module 17 und 22 aufgenommen, in der Videothek (16.10.2026, Staging)
 
 - **Was:**
