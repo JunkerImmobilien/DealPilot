@@ -2243,6 +2243,20 @@ async function _dpSicherungsPaket(objektId) {
     paket.objekte = paket.objekte.filter(function (o) { return o.id === objektId; });
     paket.anzahl_objekte = paket.objekte.length;
     paket.auswahl = 'einzelnes Objekt';
+    /* v2351 · EIN OBJEKT NIMMT NUR SEIN EIGENES MIT. Gefunden beim Dreh von
+       Modul 17 (16.10.2026): die Einzelsicherung trug das Wissen des ganzen
+       Kontos - die eigene Ergaenzung (Firmenangaben), die Portfolio-Analyse
+       ueber ALLE Objekte, das Lageprofil und die Datenraum-Liste. Wer einem
+       Kaeufer oder Partner ein Objekt schickt, gab das mit. Marcel: „mach so
+       wie du meinst und es richtig ist". Das allgemeine DealPilot-Wissen
+       (wissen.projekt), Lexikon und Score-Stufen bleiben - sie machen die
+       Datei lesbar und sind nicht kontobezogen. Die Sicherung ALLER Objekte
+       traegt das Konto-Wissen weiter vollstaendig. */
+    if (paket.wissen && typeof paket.wissen === 'object') {
+      ['eigenes', 'portfolio_analyse', 'lage_profil', 'datenraum'].forEach(function (k) { delete paket.wissen[k]; });
+      paket.wissen.hinweis_einzelobjekt = 'Einzelobjekt-Sicherung: kontoweite Angaben (eigene Ergänzung, '
+        + 'Portfolio-Analyse, Lageprofil, Datenraum) sind bewusst nicht enthalten.';
+    }
   }
   return paket;
 }
