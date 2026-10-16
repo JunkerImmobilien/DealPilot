@@ -38840,6 +38840,14 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2305 + Prod-Rollout (36) · Portfolio-DSCR: Zinssätze mit Punkt wurden ×10 bzw. ×100 gelesen (16.10.2026)
+
+- **Was:** Die Portfolio-Analyse (Modul 21) nannte DSCR 0,87 bei Mieteinnahmen 344.100 €/Jahr und Cashflow vor Steuer +23.034 €/Jahr — rechnerisch unmöglich. Ursache: `dashboard.js` `num()` entfernt JEDEN Punkt als Tausendertrenner; Zins/Tilgung stehen im Konto gemischt („4,0" und „3.5", „2.50"). „3.5" wurde 35 %, „2.50" 250 %. Sieben Stellen auf `_pct()` umgestellt (Kapitaldienst/DSCR in `aggStats`, Tilgungs-/Zinssumme, Restschuld, mittlerer Zins, Objektwerte an die Portfolio-Analyse). `all-objects.js` (Punkt nur bei Komma entfernt) und das Bank-PDF (`parseDe`) lesen richtig — geprüft.
+- **Wirkung (Konto info@, 20 Objekte mit Darlehen):** Kapitaldienst 811.948 → 517.654 €/Jahr, Portfolio-DSCR 0,73 → 1,15.
+- **Commit:** `686aaf0c` (v2305), Merge `ae87a863`.
+- **Nachweis:** Prod: Buster dashboard.js v2305 und `_pct(o.d1z)` im ausgelieferten Code, `/auth/me` 401. Nachrechnung mit den DB-Werten (alter gegen neuen Leser).
+- **Rest:** Modul-21-Mitschnitt enthält noch die alte KI-Antwort (DSCR 0,87) — bei der nächsten Aufnahme neu abrufen. Die gemischte Schreibweise selbst (Eingabe „3.5") ist die Quelle — prüfen, wo sie entsteht (Import/Sprache?).
+
 ### Prod-Rollout (35) · v2279–v2304 · Umrechnungskoeffizient bundesweit, DealPilot-Formel, Landing/Videothek, Videoreihe (16.10.2026)
 
 - **Was:** Ernte Umrechnungskoeffizient Grundstücksgröße in allen Ländern abgeschlossen (1.080 Registersätze in 8 Dateien: NW 75, NI 121, BW 639, BY 96, Ost 51, West 88, Länder 9, Mainz 1; Werte nur, wo amtlich und lizenzrechtlich nutzbar; Sperren mit `sperre_grund` und Weg; 31 interne Stützstellen). DealPilot-Formel endgültig: 158 Tabellen aus 11 Ländern, b = −0,213 (Stadt −0,244), typ. Abweichung 1,3 %, 90 % unter 9,2 %. Kern: Rundungsregel (Kiel 25 m²), Formel-Ausschluss nach `sperre_grund`. Freiburg/Bruchsal gesperrt (BORIS-BW: kommerzielle Nutzung ausgeschlossen). Landing: DealPilot live, Videothek, F&E, Kanzlei Schmidt & Partner (Marcel: Genehmigung liegt vor, 16.10.). Videos 10c, 20, 21, 23, 24 aufgenommen; RND-Rechner sperrt „Übernehmen“ bei Prüfpflicht (Alter ≥ GND).
