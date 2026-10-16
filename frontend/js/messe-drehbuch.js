@@ -4041,6 +4041,141 @@
     ]
   };
 
+  /* ═══ VIDEOREIHE · MODUL 10c · DER RESTNUTZUNGSDAUER-RECHNER (v2283) ════════
+     Marcel 16.10.2026 („mach weiter … auch die Videos“): der Rechner nach
+     v2274/v2275 als eigenes Modul. Zwei KOPIEN, beide beim Aufräumen gelöscht:
+     Ravensberger Weg 38 (MFH, Bj 1978) - Rechner aus dem Reiter Steuer, Ergebnis
+     in ganzen Jahren mit Spanne ± 2, „übernehmen“ -> eigener AfA-Satz und die
+     Tafel Steuer vorher/nachher; danach Parkstr. 9 (Bj 1905): Alter über der
+     GND, Anlage 2 hält den Wert am Scheitel (v2275), „sachverständig zu
+     würdigen“, Übernahme gesperrt (v2283). Die Gutachten-Anfrage wird NIE
+     geklickt (RH_SPERRE sperrt /rnd-request ohnehin). */
+  async function r10cZweiteKopie(id) {
+    /* wie r6KopieStart, aber OHNE den Lauf neu aufzusetzen: die erste Kopie bleibt in DPM_REIHE.angelegt */
+    var o = await Auth.apiCall('/objects/' + id);
+    var d = JSON.parse(JSON.stringify((o && o.data) || {}));
+    ['_obj_seq', '_deal_won', '_deal_won_at', '_deal_lost', '_ankauf'].forEach(function (k) { delete d[k]; });
+    var neu = await Auth.apiCall('/objects', { method: 'POST', body: { data: d, aiAnalysis: null, photos: o.photos || [] } });
+    var nid = neu && (neu.id || (neu.data && neu.data.id) || (neu.object && neu.object.id));
+    if (nid && DPM_REIHE.angelegt.indexOf(nid) < 0) DPM_REIHE.angelegt.push(nid);
+    if (nid && typeof window.loadSaved === 'function') await window.loadSaved(nid);
+    await warteAuf(function () { return window._currentObjKey === nid && /\S/.test(wert('str')); }, 9000);
+    await warte(900);
+    var m = q('.main-col'); if (m) m.scrollTop = 0;
+  }
+  async function r10cRechnerAuf() {
+    reiter('s3-tax'); await warte(900);
+    var sel = q('#afa_satz'); if (sel && sel.value !== 'eigen') { sel.value = 'eigen'; sel.dispatchEvent(new Event('change', { bubbles: true })); }
+    await warte(800);
+    await zeige(function () { return q('#afa-rnd-ermitteln'); }, 10);
+    await warte(1100);
+    var b = q('#afa-rnd-ermitteln'); if (b) b.click();
+    await warteAuf(r6Wiz, 5000);
+    try { var wm = r6Wiz().querySelector('.rnd-wiz-modal'); if (wm) wm.style.setProperty('max-height', (innerHeight - 40) + 'px', 'important'); } catch (e) {}
+    kegelHoch(true);
+    await warte(700);
+  }
+  async function r10cDurch() {
+    for (var i = 0; i < 8 && !/Schritt 9/.test(r6WizTitel()); i++) { if (!(await r6WizWeiter())) break; await warte(900); }
+    await warteAuf(function () { return /Schritt 9/.test(r6WizTitel()); }, 4000);
+    await warte(900);
+  }
+  function r10cErgebnis() {
+    var t = r6Inner(r6Wiz());
+    var sp = /GESCHÄTZTE RESTNUTZUNGSDAUER[\s\S]*?(\d+(?:\s*[–\-]\s*\d+)?)\s*Jahre/i.exec(t), mw = /Modellwert\s*(\d+)\s*Jahre/.exec(t);
+    return { spanne: sp ? sp[1].replace(/\s*[–\-]\s*/, '–') : null, mitte: mw ? mw[1] : null };
+  }
+  function r10cKarte() { var e = rhIm(r6Wiz(), /^Geschätzte Restnutzungsdauer$/i); return e && e.parentElement; }
+  DREHBUECHER['reihe-rnd'] = {
+    titel: 'Der Restnutzungsdauer-Rechner', unterzeile: 'Ganze Jahre, Spanne, übernehmen — und wo die Anlage 2 endet', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { r6WizZu(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das Beispiel */
+        await r6KopieStart(R6_MFH, { ohneAnkauf: true, ohneAnalyse: true });
+        await r6MfhBeispiel(s, ' Heute: der <b>Restnutzungsdauer-Rechner</b>.');
+      },
+      async function (s) {   /* 2 · gesetzliche AfA */
+        reiter('s3-tax'); await warte(900);
+        await zeigeGruppe(feldVon('afa_satz'), function () { return q('#afa_kalk') && q('#afa_kalk').closest('.f'); }, 8);
+        await b2oZeile(s, 'Die gesetzliche AfA', 'Baujahr ' + wert('baujahr') + ': <b>' + r6Optionstext('afa_satz') + '</b> — das Gesetz unterstellt 50 Jahre. Ist das Haus früher verbraucht, gilt ein eigener Satz.');
+      },
+      async function (s) {   /* 3 · Rechner öffnen */
+        await r10cRechnerAuf();
+        await zeige(function () { var w = r6Wiz(); return w && (w.querySelector('.rnd-wiz-modal,[class*=modal]') || w.firstElementChild); }, 6);
+        await b2oZeile(s, 'Den Rechner öffnen', 'Reiter Steuer, „eigener Satz“, <b>Restnutzungsdauer ermitteln</b>. Die Objektdaten sind schon eingetragen.');
+      },
+      async function (s) {   /* 4 · die Schritte */
+        var zb = r6Beginn(s, 'Neun Schritte', 'Bauweise, Technik, Modernisierungen, Zustand der Gewerke, Schäden — jeder Schritt ist vorbelegt, du korrigierst nur.');
+        for (var i = 0; i < 8 && !/Schritt 9/.test(r6WizTitel()); i++) { if (!(await r6WizWeiter())) break; await warte(1300); }
+        await warteAuf(function () { return /Schritt 9/.test(r6WizTitel()); }, 4000);
+        await r6Ende(zb);
+      },
+      async function (s) {   /* 5 · Ergebnis in ganzen Jahren */
+        await warte(700);
+        await zeige(r10cKarte, 8);
+        var E = r10cErgebnis();
+        await b2oZeile(s, 'Das Ergebnis', '<b>' + (E.spanne || '–') + ' Jahre</b> — ganze Jahre, als Spanne: Modellwert ' + (E.mitte || '–') + ' Jahre, ± 2. Eine einzelne Zahl täte genauer, als eine Ersteinschätzung ist.');
+      },
+      async function (s) {   /* 6 · übernehmen -> eigener AfA-Satz, vorher/nachher */
+        var k = function () { return q('#rnd-uebernehmen'); };
+        var b = k(); if (b) b.scrollIntoView({ block: 'center' });
+        await warte(500);
+        await zeige(k, 10);
+        await b2oZeile(s, 'Übernehmen', 'Ein Klick: die Restnutzungsdauer wird dein <b>eigener AfA-Satz</b> — 100 ÷ Jahre.');
+        b = k(); if (b && !b.disabled) b.click();
+        await warteAuf(function () { var v = q('#rnd-uebernahme-vergleich'); return v && v.textContent.length > 20; }, 4000);
+        await warte(600);
+        await zeigeGruppe(function () { return q('#rnd-uebernehmen'); }, function () { return q('#rnd-uebernahme-vergleich'); }, 8);
+        var t = r6Inner(q('#rnd-uebernahme-vergleich'));
+        var afa = /AfA ([\d,]+ %) \(100 ÷ (\d+) Jahre\)/.exec(t), za = /AfA im Jahr\s+([\d.]+ €)\s+→\s+([\d.]+ €)/.exec(t), st = /Steuer im Jahr\s+([^\n→]+?)\s+→\s+([^\n]+)/.exec(t), vt = /(Steuervorteil|Steuernachteil) ([\d.]+ €) im Jahr/.exec(t);
+        await b2oZeile(s, 'Vorher und nachher', 'AfA ' + (afa ? '<b>' + afa[1] + '</b>' : '–') + (za ? ': ' + za[1] + ' → <b>' + za[2] + '</b> im Jahr' : '') + (st ? ', Steuer ' + st[1].trim() + ' → ' + st[2].trim() : '') + (vt ? ' — <b>' + vt[1] + ' ' + vt[2] + '</b> im Jahr.' : '.'));
+      },
+      async function (s) {   /* 7 · indikativ, kein Gutachten */
+        var e = function () { return rhIm(r6Wiz(), /^Ersteinschätzung — die verbindliche Berechnung steht im Gutachten$/) || r10cKarte(); };
+        var x = e(); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(500);
+        await zeige(e, 8);
+        await b2oZeile(s, 'Indikativ, kein Gutachten', 'Eine <b>Ersteinschätzung</b>. Das Finanzamt erkennt den kürzeren Satz nur mit Gutachten an — die Anfrage geht von hier, im Video nicht.');
+        r6WizZu();
+        kegelHoch(false);
+        await warte(800);
+      },
+      async function (s) {   /* 8 · im Reiter Steuer */
+        reiter('s3-tax'); await warte(700);
+        await zeigeGruppe(feldVon('afa_satz'), function () { return q('#afa-eigen-box') || q('#afa_kalk'); }, 8);
+        await b2oZeile(s, 'Im Reiter Steuer', 'Eigener Satz aus <b>' + (wert('afa_rnd_jahre') || '–') + ' Jahren</b> — AfA ' + (r6Id('afa_kalk') || '–') + ' im Jahr. Die Grundlage steht dabei: ' + (wert('afa_eigen_grundlage') || '–') + '.');
+      },
+      async function (s) {   /* 9 · ein Altbau */
+        var zb = r6Beginn(s, 'Und ein Altbau?', 'Ein zweites Haus aus dem Bestand — gebaut vor 1946.');
+        await r10cZweiteKopie(R11_PARK);
+        await r6Ende(zb);
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        var alter = new Date().getFullYear() - Number(wert('baujahr'));
+        await b2oZeile(s, 'Baujahr ' + wert('baujahr'), '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + alter + ' Jahre alt, älter als die Gesamtnutzungsdauer von 80 Jahren.');
+      },
+      async function (s) {   /* 10 · Plateau */
+        await r10cRechnerAuf();
+        var zb = r6Beginn(s, 'Derselbe Rechner', 'Gleiche Schritte, vorbelegt aus dem Objekt.');
+        await r10cDurch();
+        await r6Ende(zb);
+        await zeige(r10cKarte, 8);
+        var E = r10cErgebnis();
+        await b2oZeile(s, 'Am Scheitel gehalten', '<b>' + (E.spanne || '–') + ' Jahre</b>. Hinter der Gesamtnutzungsdauer rechnet die Anlage 2 nicht weiter — DealPilot hält den Wert am Tiefpunkt der Kurve, statt ihn wieder steigen zu lassen.');
+        var p = function () { return q('#rnd-pruefpflicht'); };
+        var x = p(); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(500);
+        await zeigeGruppe(p, function () { return q('#rnd-uebernehmen') || p(); }, 8);
+        var gs = q('#rnd-uebernehmen'), gesperrt = gs && gs.disabled;
+        await b2oZeile(s, 'Sachverständig zu würdigen', p() ? 'So steht es da, mit Begründung' + (gesperrt ? ' — und die Übernahme als AfA-Satz ist <b>gesperrt</b>, bis ein Sachverständiger urteilt.' : '.') : 'Die Kennzeichnung fehlt hier.');
+      },
+      async function (s) {   /* 11 · Schluss */
+        await b2oZeile(s, 'Ersteinschätzung in Minuten', 'Wie viele Jahre bleiben, was es steuerlich bringt — und wo die Rechnung endet. Für die Erklärung zählt das Gutachten.', 600);
+        r6WizZu(); kegelHoch(false);
+      }
+    ]
+  };
+
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0, _aktiv = null;
   function stopp() {
