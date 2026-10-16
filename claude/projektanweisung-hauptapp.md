@@ -38839,6 +38839,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2274 + v2275 · RND-Rechner ganze Jahre/Übernehmen; Anlage 2 Plateau hinter dem Scheitel; Paket vw-modul V4.2.6 (16.10.2026, Staging)
+
+- **Was:** v2274: RND-Rechner rechnet in ganzen Jahren, Knopf „Restnutzungsdauer übernehmen“ (eigener AfA-Satz, Steuer vorher/nachher), Feldraster in voller Breite. v2275: Marcels Entscheidung „Variante 1“ – bei Alter ≥ GND wird die Kurve der Anlage 2 bis zum Scheitel (b·GND/(2a)) gerechnet und dahinter GEHALTEN, statt Basis 0 (App) bzw. Auffang 10 (Marktbericht). GND 80: 13 Punkte 43,48 J, 9 Punkte 33,98 J, 4 Punkte 20,93 J, 0 Punkte 11,75 J. Geändert: `frontend/js/rnd-calc.js` (`grenze: plateau`, anwendbar), `marktbericht/backend/src/lib/anlage2.js` (`grund: plateau`), Buster rnd-calc v2275. Eigenständiges Paket `Dateien/vw-modul-v4-2-6.zip` (aus 4-2-5 gebaut, 45 Dateien, nur calc-rnd.js/CHANGELOG/index.html getauscht).
+- **Commit:** `aa0182f7` (v2274), `6053ffc1` (v2275).
+- **Nachweis:** `rnd-kerne-pruefen --modul` sauber (1.764 Fälle, drei Kerne gleich, monoton, ausgeliefert nie unter 10); Stichprobe Alter 79/80/95/120 in allen drei Kernen + rnd-einheitlich gleich und stetig an der GND. `rnd-gutachten-test` 3 Fehler – vorher identisch (technische RND Kabelsketal), nicht durch v2275.
+- **Rest:** mb-Backend auf Staging noch NICHT neu gebaut (Video-Agent nimmt gegen Staging auf) – danach `up -d --build mb-backend`. v2274/v2275 im Browser prüfen, dann Prod. Modul 18: PDF mit view=Fit zu klein (Text 5–6 px) – an den Agenten (FitH). Abspann „Wetterbericht gelesen“ ist Luftfahrt-Bild, Rückfrage an Marcel.
+
 ### v2273–v2273j · Videoreihe Spezialmodule 15, 16, 18, 19 gebaut und im Studio geprüft, KEINE Aufnahme (Bildschirm 1024 × 768); acht kleine App-Fehler behoben (16.10.2026, Staging)
 
 - **Was:**
