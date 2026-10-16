@@ -326,6 +326,17 @@ export const CrossCheckService = {
     const _bgfWhg = Number((p && p.bgf_direkt) || ref.bgf || 0);
 
     const _nhkTypWhg = (u) => (u > 20 ? '4.3' : (u > 6 ? '4.2' : '4.1'));
+    /* v2277 · Auch das MEHRFAMILIENHAUS bekommt seinen Typ aus der Zahl der
+       Wohnungen (Anlage 4: 4.1 bis 6 WE, 4.2 bis 20, 4.3 darueber). Bis hier
+       nur die Wohnung - beim MFH blieb nhk_typ leer, der Kern fand keinen
+       Kennwert, und der Bericht fiel still auf den vereinfachten EFH-Weg
+       (EFH-Kosten, Faktor 1,0, RND = GND - Alter). Gemessen an Bericht 216
+       (Westerfeldstr. 140, 4 WE): Sachwert mit 21 Jahren, Ertragswert mit
+       32,3 - zwei Restnutzungsdauern fuer ein Haus. Ohne Wohnungszahl kein
+       Typ: geraten wird nicht. */
+    const _istMfh = /mfh|mehrfamil/.test(_pt);
+    const _nhkTypAuto = () => ((istWohnung || (_istMfh && Number(ref.units) > 0))
+      ? _nhkTypWhg(Number(ref.units || 0)) : null);
     /* v1099-WQL: der Weg zur Quelle, unabhaengig davon, ob ein Wert
        gefunden wird. Genau dann zaehlt er am meisten.
 
@@ -346,7 +357,7 @@ export const CrossCheckService = {
     if (NHK_2010.geprueft && ref.property_type && (!istWohnung || _bgfWhg > 0)) {
       let _sw = nhkSachwert({   /* v1076-WLET-1 · weiter unten steht _sw = _sw2 */
         nhk_typ: (p && p.nhk_typ) || ref.nhk_typ
-          || (istWohnung ? _nhkTypWhg(Number(ref.units || 0)) : null), keller_dg: (p && p.keller_dg) || ref.keller_dg,
+          || _nhkTypAuto(), keller_dg: (p && p.keller_dg) || ref.keller_dg,
         standardstufe: (p && p.standardstufe) || ref.standardstufe,
         bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl, objektart: ref.property_type,
         zweifamilienhaus: ref.zweifamilienhaus === true,   /* v1427b-ZFH */
@@ -463,7 +474,7 @@ export const CrossCheckService = {
           const _sw2 = nhkSachwert({
 
             nhk_typ: (p && p.nhk_typ) || ref.nhk_typ
-              || (istWohnung ? _nhkTypWhg(Number(ref.units || 0)) : null),
+              || _nhkTypAuto(),
             keller_dg: (p && p.keller_dg) || ref.keller_dg,
             standardstufe: (p && p.standardstufe) || ref.standardstufe,
             bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl,
@@ -727,7 +738,19 @@ export const CrossCheckService = {
             + 'Vergleichswertverfahren.',
       };
       out.notes.push('Sachwert nicht ausgewiesen: Das vereinfachte Sachwertverfahren arbeitet mit den Normalherstellungskosten für Einfamilienhäuser (NHK 2010, Standardstufe 3) und dem EFH-Faustwert BGF ≈ Wohnfläche × 1,35. Für eine Eigentumswohnung ist das die falsche Grundlage – lieber keine Zahl als eine falsche. Der Ertragswert-Quercheck bleibt.');
+    } else if (_istMfh) {
+      /* v2277 · Der vereinfachte Weg unten rechnet mit EFH-Kosten und dem
+         EFH-Faustwert fuer die BGF - fuer ein Mehrfamilienhaus die falsche
+         Grundlage. Lieber keine Zahl als eine falsche. */
+      out.sachwert = { available: false,
+        grund: 'Sachwert nicht ausgewiesen: für ein Mehrfamilienhaus bestimmt die Zahl der '
+          + 'Wohnungen den NHK-Gebäudetyp (Anlage 4 ImmoWertV: 4.1 bis 6, 4.2 bis 20, 4.3 darüber). '
+          + 'Wohnungszahl und Standardstufe ergänzen, dann rechnet er.' };
+      out.notes.push('Sachwert nicht ausgewiesen: Mehrfamilienhaus ohne bestimmbaren NHK-Gebäudetyp.');
     } else if (wfl && buildYear) {
+      /* v2277 · Auch dieser Weg rechnet mit DER Restnutzungsdauer des
+         Berichts (Anlage 2, wenn Punkte vorliegen) - nicht mit GND - Alter. */
+      try { const _rE = _rndEinheitlich(GND_JAHRE); if (Number(_rE) > 0) rnd = _rE; } catch (e) {}
       const bgf = wfl * BGF_FAKTOR;
       const hkNeubau = bgf * NHK_EFH_BGF * BAUPREISINDEX;
       const alterswertfaktor = rnd != null ? rnd / GND_JAHRE : null;
