@@ -3625,7 +3625,7 @@
         await zeige(stufeZeile(3), 8);
         var nur3 = DealPilotObjektReiter.pflichtFuer(3).filter(function (id) { return DealPilotObjektReiter.pflichtFuer(2).indexOf(id) < 0 && !/^garagen_/.test(id); });
         /* v2273i · zusammengelegt (Länge): Status und die zusätzlichen Pflichtfelder in einer Zeile */
-        await b2oZeile(s, 'Stufe 3 · nur ' + nur3.length + ' Pflichtfelder mehr', 'Status <b>' + (fehlt(3).length ? fehlt(3).length + ' Angaben fehlen' : 'bereit') + '</b>. Zu Stufe 2 kommen nur: <b>' + feldNamen(nur3).join(', ') + '</b>.');
+        await b2oZeile(s, 'Stufe 3 · nur ' + nur3.length + ' Pflichtfelder mehr', 'Status <b>' + (fehlt(3).length ? fehlt(3).length + ' Angaben fehlen</b> (' + feldNamen(fehlt(3)).join(', ') + ' — kommt gleich)' : 'bereit</b>') + '. Zu Stufe 2 kommen nur: <b>' + feldNamen(nur3).join(', ') + '</b>.');
         await zeige(feldVon('bgf'), 10);
         await b2oZeile(s, 'Warum nur die?', 'Das ist das Minimum für Boden-, Sach- und Ertragswert. Alles andere hat einen Ansatz der ImmoWertV — es <b>verfeinert</b>.');
       },
@@ -3640,7 +3640,7 @@
         await b2oZeile(s, 'Vorab aus dem Register', 'Liegenschaftszins <b>' + (r16LeisteWert(/^Liegenschaftszins/) || '–') + '</b>' + (lq ? ' (' + lq + ')' : '') + ', Nutzungsdauer ' + (r16LeisteWert(/^GND \/ RND/) || '–') + ' — vorab, ohne Kosten.');
         if (swStd) {
           await zeige(function () { return r16Leiste(/^Sachwertfaktor/); }, 6);
-          await b2oZeile(s, 'Sachwertfaktor', 'Für diesen Ort hat der Ausschuss <b>keinen</b> veröffentlicht. Beim Mehrfamilienhaus führt ohnehin der <b>Ertragswert</b> — der Sachwert bleibt vorläufig.');
+          await b2oZeile(s, 'Sachwertfaktor', 'Für diesen Ort ist im Register noch <b>keiner</b> hinterlegt — gerechnet wird ohne Marktanpassung. Beim Mehrfamilienhaus führt ohnehin der <b>Ertragswert</b>.');
         } else await b2oZeile(s, 'Sachwertfaktor', (r16LeisteWert(/^Sachwertfaktor/) || '–') + ' — der Faktor wird im Bericht aus dem vorläufigen Sachwert abgelesen.');
       },
       async function (s) {   /* 4 · Modernisierung -> Punkte -> Restnutzungsdauer */
@@ -3660,7 +3660,7 @@
         var rr = function () { return r16Leiste(/^GND \/ RND/); };
         await zeigeGruppe(rr, function () { return r16Leiste(/^Modernisierungspunkte/); }, 6);
         /* die Leiste rechnet live (Register, ohne Kosten): bewegt sich die Restnutzungsdauer, steht es da - sonst der Grund */
-        if (bewegt) await b2oZeile(s, 'Was sich bewegt', 'Punkte <b>' + vor + ' → ' + nach + '</b>, Nutzungsdauer gesamt / rest <b>' + rndVor + ' → ' + rndNach + '</b> — nach Anlage 2. Längere Restnutzung: höherer Ertragswert, weniger Alterswertminderung im Sachwert.');
+        if (bewegt) await b2oZeile(s, 'Was sich bewegt', 'Punkte <b>' + vor + ' → ' + nach + '</b>, Nutzungsdauer gesamt / rest <b>' + rndVor + ' → ' + rndNach + '</b> — nach Anlage 2. Längere Restnutzung heißt: höherer Ertragswert.');
         else {
           await b2oZeile(s, 'Was sich bewegt', 'Punkte <b>' + vor + ' → ' + nach + '</b>, Nutzungsdauer bleibt <b>' + (rndNach || '–') + '</b>: Baujahr ' + wert('baujahr') + ' liegt hinter der Anlage 2. DealPilot rechnet nichts hoch — „sachverständig zu würdigen“.');
         }
@@ -3712,7 +3712,7 @@
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeige(stufeZeile(3), 8);
         await warte(900);   /* v2273i: Zeile „Jetzt abrufen“ gestrichen (Länge) - die Etappen erklären es */
-        await rhStufeAbrufen(3, function () { s.zeile('Stufe 3 · Wertermittlung', 'Bodenwert, Liegenschaftszins, Sachwert — Schritt für Schritt.'); });
+        await rhStufeAbrufen(3, function () { s.zeile('Stufe 3 · Wertermittlung', 'Bodenwert, Liegenschaftszins, Ertrags- und Sachwert — Schritt für Schritt.'); });
         await warteAuf(function () { var w = q('#oe-vw-wahl'); return w && w.options.length >= 1; }, 8000);
         await warteAuf(function () { var v = q('#oe-vw'); return v && v.offsetHeight > 20; }, 6000);   /* Prüflauf 16: Kegel 69 % */
         await zeige(function () { return q('#oe-vw'); }, 10);
@@ -3742,8 +3742,8 @@
         await zeige(e, 8);
         var bog = /objektspezifischen Grundstücksmerkmale \((-?[\d.]+ €)\) wirken im vorläufigen Sachwert nicht/.exec(no);
         if (ew.available) {
-          await b2oZeile(s, 'Ertragswert · führend', '<b>' + eur(ew.value_eur) + '</b>: Reinertrag ' + eur(ew.reinertrag_pa_eur) + ' im Jahr, Liegenschaftszins <b>' + de(ew.liegenschaftszins_pct, 1) + ' %</b>, Restnutzungsdauer <b>' + de(ew.restnutzungsdauer_jahre, 1) + ' Jahre</b> nach Anlage 2.');
-          await b2oZeile(s, 'Ertragswert · Boden', 'Dazu der Bodenwert ' + eur(ew.bodenwert_eur) + (bog ? ' — und hier wirkt der Abzug für die Reparaturen (' + bog[1].replace('-', '') + ').' : '.'));
+          /* v2276 · eine Zeile statt zwei (Länge) */
+          await b2oZeile(s, 'Ertragswert · führend', '<b>' + eur(ew.value_eur) + '</b>: Reinertrag ' + eur(ew.reinertrag_pa_eur) + ', Liegenschaftszins <b>' + de(ew.liegenschaftszins_pct, 1) + ' %</b>, Restnutzungsdauer <b>' + de(ew.restnutzungsdauer_jahre, 1) + ' J.</b>, Bodenwert ' + eur(ew.bodenwert_eur) + (bog ? ' — abzüglich der Reparaturen (' + bog[1].replace('-', '') + ').' : '.'));
         } else await b2oZeile(s, 'Ertragswert', 'Ein Strich: die Rechnung war hier nicht vollständig. Wo die Quelle endet, endet die Rechnung.');
         await r16Hin(k(), false);
         await zeige(k, 8);
