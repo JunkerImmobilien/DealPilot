@@ -350,6 +350,55 @@
     });
   }
 
+  /* v2274 · „Restnutzungsdauer übernehmen" - derselbe Weg wie die MFH-
+     Einheitenbewertung (mfh-einheiten.js): Auswahl „eigener Satz", RND ins Feld
+     afa_rnd_jahre, die App rechnet 100 ÷ RND. Vorher/nachher aus State.kpis. */
+  function _rndUebernehmen(btn) {
+    var rnd = parseInt(btn.getAttribute('data-rnd'), 10);
+    if (!(rnd > 0)) return;
+    var K = (global.State && global.State.kpis) || {};
+    var vor = { afa: Number(K.afa) || 0, steuer: Number(K.steuer) || 0, cf: Number(K.cf_ns) || 0 };
+    var sel = document.getElementById('afa_satz');
+    var feld = document.getElementById('afa_rnd_jahre');
+    if (sel && (!feld || sel.value !== 'eigen')) {
+      sel.value = 'eigen';
+      try { sel.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+      feld = document.getElementById('afa_rnd_jahre');
+    }
+    if (!feld) return;
+    var g = document.getElementById('afa_eigen_grundlage');
+    if (g && !g.value) g.value = 'RND-Ermittlung DealPilot (Anlage 2 ImmoWertV, indikativ)';
+    feld.value = String(rnd);
+    try { feld.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+    try { if (typeof global.calcNow === 'function') global.calcNow(); else if (typeof global.calc === 'function') global.calc(); } catch (e) {}
+    var K2 = (global.State && global.State.kpis) || {};
+    var nach = { afa: Number(K2.afa) || 0, steuer: Number(K2.steuer) || 0, cf: Number(K2.cf_ns) || 0 };
+    var eur = function (n) { return Math.round(n).toLocaleString('de-DE') + ' €'; };
+    var stTxt = function (n) { return n < 0 ? eur(-n) + ' Erstattung' : eur(n) + ' Belastung'; };
+    var vorteil = vor.steuer - nach.steuer;
+    var zeile = function (t, a, b, hervor) {
+      return '<tr><td style="padding:6px 8px;color:#6B6356">' + t + '</td><td style="padding:6px 8px;text-align:right">' + a + '</td>'
+        + '<td style="padding:6px 8px;text-align:center;color:var(--wl-9a7f33,#9a7f33)">→</td><td style="padding:6px 8px;text-align:right;font-weight:' + (hervor ? '700' : '500') + '">' + b + '</td></tr>';
+    };
+    var box = document.getElementById('rnd-uebernahme-vergleich');
+    if (box) box.innerHTML =
+      '<div style="font:600 10px/1 JetBrains Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--wl-9a7f33,#9a7f33);margin-bottom:6px">Übernommen · AfA ' + (100 / rnd).toFixed(2).replace('.', ',') + ' % (100 ÷ ' + rnd + ' Jahre)</div>'
+      + '<table style="margin:0 auto;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums">'
+      + '<tr><td></td><td style="padding:4px 8px;text-align:right;color:#8A8272;font-size:11px">vorher</td><td></td><td style="padding:4px 8px;text-align:right;color:#8A8272;font-size:11px">nachher</td></tr>'
+      + zeile('AfA im Jahr', eur(vor.afa), eur(nach.afa))
+      + zeile('Steuer im Jahr', stTxt(vor.steuer), stTxt(nach.steuer))
+      + zeile('Cashflow nach Steuer / Monat', eur(vor.cf / 12), eur(nach.cf / 12))
+      + '</table>'
+      + '<div style="margin-top:8px;font-weight:700;color:' + (vorteil >= 0 ? '#3FA56C' : '#B8625C') + '">'
+      + (vorteil >= 0 ? 'Steuervorteil ' : 'Steuernachteil ') + eur(Math.abs(vorteil)) + ' im Jahr</div>';
+    btn.disabled = true; btn.style.opacity = '.6'; btn.textContent = '✓ Übernommen — im Reiter Steuer als eigener AfA-Satz';
+    try { if (typeof global.toast === 'function') global.toast('✓ Restnutzungsdauer ' + rnd + ' Jahre übernommen · AfA ' + (100 / rnd).toFixed(2).replace('.', ',') + ' %'); } catch (e) {}
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('#rnd-uebernehmen') : null;
+    if (b && !b.disabled) { e.preventDefault(); _rndUebernehmen(b); }
+  });
+
   function renderCurrentStep() {
     const step = STEPS[currentStep - 1];
     document.getElementById('rnd-wiz-step-title').textContent =
@@ -1169,6 +1218,10 @@
   function renderStep9(body) {
     // Berechnung ausführen
     const result = computeFinalResult();
+    /* v2274 · Marcel 16.10.2026: „bei der Restnutzungsdauer nur ganze Jahre
+       angeben". Der Modellwert wird hier auf ganze Jahre gerundet - auch der
+       AfA-Vergleich rechnet damit, genau wie nach dem Übernehmen (100 ÷ RND). */
+    if (result && isFinite(Number(result.final_rnd))) result.final_rnd = Math.round(Number(result.final_rnd));
     const afa = computeAfaEstimate(result);
 
     // Result im State speichern (für submit-Hand-off)
@@ -1177,7 +1230,7 @@
 
     const m = result.methods;
     const RND = global.DealPilotRND;
-    const fmtJ = function (n) { return RND.fmtNum2(n).replace(',00', ''); };
+    const fmtJ = function (n) { var x = Number(n); return isFinite(x) ? String(Math.round(x)) : RND.fmtNum2(n).replace(',00', ''); };   /* v2274: ganze Jahre */
 
     // V194: Komplett neu — Hero-Box mit Animation + saubere Tabelle. KEINE Exports.
     var lohntText = (afa && afa.empfehlung) ? afa.empfehlung
@@ -1220,6 +1273,14 @@
       + '  <p style="margin:16px 0 0;font-size:12.5px;color:#6B6356;line-height:1.55;text-align:center;font-style:italic">'
       + escapeHtml(lohntText)
       + '  </p>'
+      /* v2274 · Übernehmen: setzt den eigenen AfA-Satz (100 ÷ RND) im Objekt und
+         zeigt die Steuerwirkung vorher/nachher hier im Überblick. */
+      + '  <div style="text-align:center;margin-top:16px">'
+      + '    <button type="button" id="rnd-uebernehmen" data-rnd="' + Math.round(Number(result.final_rnd) || 0) + '" '
+      + 'style="background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#1c1b18;border:0;border-radius:8px;padding:10px 20px;font:600 14px Inter,sans-serif;cursor:pointer">'
+      + 'Restnutzungsdauer ' + Math.round(Number(result.final_rnd) || 0) + ' Jahre übernehmen</button>'
+      + '    <div id="rnd-uebernahme-vergleich" style="margin-top:14px"></div>'
+      + '  </div>'
       + '</div>';
 
     // ─── Tabelle "Wie die Schätzung zustande kommt" ────────────────
@@ -1316,7 +1377,7 @@
   function _rndJ(x) { var r = Math.round(x * 10) / 10; return String(r).replace('.', ','); }
   function spanneAus(result) {
     try {
-      var mitte = Number(result && result.final_rnd);
+      var mitte = Math.round(Number(result && result.final_rnd));   /* v2274: ganze Jahre */
       if (!isFinite(mitte) || mitte <= 0) return null;
       var von = Math.max(0, mitte - RND_SPANNE_JAHRE), bis = mitte + RND_SPANNE_JAHRE;
       return { von: _rndJ(von), bis: _rndJ(bis), mitte: _rndJ(mitte), einzeln: false };
