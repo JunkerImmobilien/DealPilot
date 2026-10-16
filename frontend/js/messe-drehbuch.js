@@ -3928,12 +3928,12 @@
     try { await w.exportPdf(w._lastOut); } catch (e) {} finally { api.save = _r18.save; _r18.save = null; w._mbMarkenName = mk; }
     return fang;
   }
-  async function r18Seite(n) {
+  async function r18Seite(n, oben) {   /* v2276c · oben = PDF-y von unten (FitH,top): Deckblatt ab der Adresse */
     if (!_r18.pdf) return;
     if (!_r18.url) _r18.url = URL.createObjectURL(_r18.pdf);
     var o = el('dpm-pdf');
     o.style.cssText = 'position:fixed;left:4%;right:4%;top:3%;bottom:4%;z-index:100002;background:#2b2b2b;border:2px solid ' + G + ';border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)';
-    o.innerHTML = '<iframe title="Marktbericht-PDF" style="width:100%;height:100%;border:0" src="' + _r18.url + '#page=' + n + '&toolbar=0&navpanes=0&view=FitH"></iframe>';
+    o.innerHTML = '<iframe title="Marktbericht-PDF" style="width:100%;height:100%;border:0" src="' + _r18.url + '#page=' + n + '&toolbar=0&navpanes=0&view=FitH' + (oben ? ',' + oben : '') + '"></iframe>';
     await warte(4000);
   }
   DREHBUECHER['reihe-marktbericht'] = {
@@ -4019,7 +4019,7 @@
         if (!_r18.pdf) { await b2oZeile(s, 'Das PDF', 'Hier entsteht das PDF.'); return; }
         try { var tx = await _r18.pdf.text(), mm = /\/Type \/Pages[\s\S]{0,2000}?\/Count (\d+)/.exec(tx); _r18.seiten = mm ? Number(mm[1]) : null; DPM_REIHE.pdf18 = { bytes: _r18.pdf.size, seiten: _r18.seiten, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8) }; } catch (e) {}
         zeige(null); kegelHoch(true);
-        await r18Seite(1);
+        await r18Seite(1, 460);
         await b2oZeile(s, 'Das PDF', 'Deckblatt mit Marktwert und Eckdaten' + (_r18.seiten ? ' — ' + _r18.seiten + ' Seiten' : '') + ': für die Bank, den Verkäufer oder deine Unterlagen.');
         await r18Seite(3);
         await b2oZeile(s, 'Im Dokument', 'Dieselben Kapitel wie am Bildschirm — Lage, Vergleichsdaten, Wertermittlung mit Rechenweg und Quellennachweis.', 600);
