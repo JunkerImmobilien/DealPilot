@@ -34,6 +34,11 @@
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
   /* v475: %-Felder sauber parsen (Komma ODER Punkt als Dezimal, keine Tausenderpunkte) */
   function _pct(x){ var n=parseFloat(String(x==null?'':x).replace(',','.')); return isNaN(n)?0:n; }
+  /* v2305 · Zins- und Tilgungssaetze (d1z, d1t, d2z, d2t) laufen ueber _pct, nie ueber num():
+     num() entfernt jeden Punkt als Tausendertrenner - gespeichertes "3.5" wurde 35 %, "2.50" 250 %.
+     Gemessen 16.10.2026: Portfolio-DSCR 0,87 bei Cashflow vor Steuer +23.034 EUR/Jahr (Konto info@,
+     gemischte Schreibweise "4,0"/"3.5" in denselben Feldern). Betroffen: Kapitaldienst, Tilgung, Zins,
+     Restschuld, mittlerer Zins und die Objektwerte an die Portfolio-Analyse. */
   /* v475: Erwerbsnebenkosten in EURO — absolut falls vorhanden, sonst aus %-Feldern (wie calc.js Z.663) */
   function _nkEuro(o){ if(num(o&&o.nk)>0) return num(o.nk); var kp=_kpEuro(o); return kp*(_pct(o&&o.notar_p)+_pct(o&&o.gest_p)+_pct(o&&o.makler_p)+_pct(o&&o.gba_p)+_pct(o&&o.ji_p))/100; }
   /* v475: heutiges Datum DD.MM.YYYY */
@@ -218,7 +223,7 @@
   function _restschuldOf(o){
     var fromKpi = num(o._kpis_restschuld); if(fromKpi > 0) return fromKpi;
     var D = num(o.d1) + num(o.d2); if(D <= 0) return 0;
-    var zins = num(o.d1z)/100, tilg = num(o.d1t)/100; if(zins <= 0 || tilg <= 0) return D;
+    var zins = _pct(o.d1z)/100, tilg = _pct(o.d1t)/100; if(zins <= 0 || tilg <= 0) return D;
     var i = zins/12, A = D*(zins+tilg)/12, m = 0;
     var au = (o.d1_auszahl||'').toString().match(/(\d{1,2})[.\/](\d{4})/);
     if(au){ var mm = +au[1], yy = +au[2]; var now = new Date(); m = (now.getFullYear()-yy)*12 + (now.getMonth()+1-mm); }
@@ -539,7 +544,7 @@
     var rest=sum(_restschuldOf);
     var cfNsJ=sum(function(o){return num(o._kpis_cf_ns);});
     var cfVsJ=sum(function(o){var v=o._kpis_cf_vs; return (v!=null&&!isNaN(num(v)))?num(v):num(o._kpis_cf_ns);});
-    var kdSum=sum(function(o){return num(o.d1)*(num(o.d1z)+num(o.d1t))/100 + num(o.d2)*(num(o.d2z)+num(o.d2t))/100;});
+    var kdSum=sum(function(o){return num(o.d1)*(_pct(o.d1z)+_pct(o.d1t))/100 + num(o.d2)*(_pct(o.d2z)+_pct(o.d2t))/100;});
     var ekSum=sum(function(o){return num(o.ek);});
     var darlSum=sum(function(o){return num(o.d1)+num(o.d2);});
     // Nettomietrendite: IV-gewichtet ueber die kanonische KPI-Engine (window.DealKpis),
@@ -558,8 +563,8 @@
     /* v1802 · Tilgung und Zins getrennt. `kdSum` fuehrt beide zusammen als
        Kapitaldienst — fuer den DSCR richtig, fuer die Frage "wie hoch ist
        meine Gesamttilgung" nicht. Dieselbe Rechnung, nur einzeln. */
-    var tilgSum=sum(function(o){return num(o.d1)*num(o.d1t)/100 + num(o.d2)*num(o.d2t)/100;});
-    var zinsSum=sum(function(o){return num(o.d1)*num(o.d1z)/100 + num(o.d2)*num(o.d2z)/100;});
+    var tilgSum=sum(function(o){return num(o.d1)*_pct(o.d1t)/100 + num(o.d2)*_pct(o.d2t)/100;});
+    var zinsSum=sum(function(o){return num(o.d1)*_pct(o.d1z)/100 + num(o.d2)*_pct(o.d2z)/100;});
     return {
       n:arr.length, gi:giSum, kp:kpSum, ek:ekSum, darl:darlSum,
       mieteJ:mieteJ, mieteM:mieteJ/12, rest:rest,
@@ -714,7 +719,7 @@
     var restschuldOf=_restschuldOf;   // eine gemeinsame Restschuld-Funktion
     var roe=totalEk>0?(cfNsJ/totalEk*100):null;
     // Ø-Zins gewichtet nach Restschuld
-    var zw=0,zws=0; arr.forEach(function(o){var z=num(o.d1z),r=restschuldOf(o)||1; if(z>0){zw+=r;zws+=z*r;}});
+    var zw=0,zws=0; arr.forEach(function(o){var z=_pct(o.d1z),r=restschuldOf(o)||1; if(z>0){zw+=r;zws+=z*r;}});
     var avgZins=zw>0?zws/zw:null;
     var coc = totalEk>0 ? (cfVsJ/totalEk*100) : null;
     var roeMode=(window._dpRoeMode==='nach')?'nach':'vor';
@@ -2985,11 +2990,11 @@
            Darlehen werden einzeln genommen, weil sie verschiedene Saetze
            haben koennen. */
         tilgung_eur_jahr: (function () {
-          var t = num(o.d1) * num(o.d1t) / 100 + num(o.d2) * num(o.d2t) / 100;
+          var t = num(o.d1) * _pct(o.d1t) / 100 + num(o.d2) * _pct(o.d2t) / 100;
           return t > 0 ? Math.round(t) : null;
         })(),
         zins_eur_jahr: (function () {
-          var z = num(o.d1) * num(o.d1z) / 100 + num(o.d2) * num(o.d2z) / 100;
+          var z = num(o.d1) * _pct(o.d1z) / 100 + num(o.d2) * _pct(o.d2z) / 100;
           return z > 0 ? Math.round(z) : null;
         })(),
         zinsbindung_bis: o.d1_zbind || o.d1_zinsbindung || null,
