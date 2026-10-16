@@ -159,7 +159,10 @@ export function pruefeBeispiel(satz) {
    Saetze mit geltungsbereich.nur_ueber_tabellen_id greifen NIE ueber die
    AGS allein - ohne ID bleibt alles wie vor v2284. */
 export function satzFuer(ags, objektart, alle, tabellenIds) {
-  const t = alle || finde(KENNZAHL, ags);
+  /* v2288b · Platzhalter-Zeilen aus param_modell ({form: konstante, wert: null},
+     entschaerfte Sperren) sind keine Saetze - die Sperre selbst kommt aus der Datei. */
+  const t = (alle || finde(KENNZAHL, ags)).filter((s) => !(s && s.formel && s.formel.form === 'konstante'
+    && s.formel.wert == null && s.vollstaendig !== false && !s.warum_kein_wert));
   if (!t.length) return null;
   const art = artSchluessel(objektart);
   const ids = (Array.isArray(tabellenIds) ? tabellenIds : [tabellenIds]).map((x) => String(x || '').trim()).filter(Boolean);
