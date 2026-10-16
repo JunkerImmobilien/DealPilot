@@ -146,11 +146,34 @@ export function pruefeBeispiel(satz) {
 
 /** Satz fuer den Ort. Mehrere Saetze (Zweige) -> der, dessen Geltung die
  *  Objektart nennt; sonst der erste. */
-export function satzFuer(ags, objektart, alle) {
+/* v2284 · TABELLEN-ID DER BODENRICHTWERTZONE (BORIS-NI listeUmrechnungstabelle).
+   In NI haengt die Tabelle an der ZONE: in Goettingen fuehren W-Zonen 0590110,
+   M-Zonen 0590111, Aussenbereichszonen 0592024 ("nicht untersucht"). Ist die
+   ID der Zone bekannt (tabellenIds, String oder Liste), gilt:
+     - fuehren Saetze geltungsbereich.boris_tabellen, nur der Satz, der eine
+       dieser IDs enthaelt;
+     - trifft keiner, werden Saetze MIT boris_tabellen nicht genommen (die Zone
+       fuehrt eine andere oder keine Flaechentabelle) - es bleiben die ohne
+       (z. B. die Kreis-Sperre mit dem Weg).
+   Saetze mit geltungsbereich.nur_ueber_tabellen_id greifen NIE ueber die
+   AGS allein - ohne ID bleibt alles wie vor v2284. */
+export function satzFuer(ags, objektart, alle, tabellenIds) {
   const t = alle || finde(KENNZAHL, ags);
   if (!t.length) return null;
   const art = artSchluessel(objektart);
-  return t.find((s) => ((s.geltungsbereich || {}).objektarten || []).indexOf(art) >= 0) || t[0];
+  const ids = (Array.isArray(tabellenIds) ? tabellenIds : [tabellenIds]).map((x) => String(x || '').trim()).filter(Boolean);
+  /* Eine LISTE heisst: die Zone ist bekannt - auch leer (Zone ohne jede Tabelle). */
+  const bekannt = Array.isArray(tabellenIds) || ids.length > 0;
+  const tabs = (s) => ((s.geltungsbereich || {}).boris_tabellen || []);
+  let kand;
+  if (bekannt && t.some((s) => tabs(s).length)) {
+    const treffer = t.filter((s) => tabs(s).some((x) => ids.indexOf(x) >= 0));
+    kand = treffer.length ? treffer : t.filter((s) => !tabs(s).length);
+  } else {
+    kand = t.filter((s) => !(s.geltungsbereich || {}).nur_ueber_tabellen_id);
+  }
+  if (!kand.length) return null;
+  return kand.find((s) => ((s.geltungsbereich || {}).objektarten || []).indexOf(art) >= 0) || kand[0];
 }
 
 /**
@@ -158,9 +181,9 @@ export function satzFuer(ags, objektart, alle) {
  * umrechnung_nrw.flaechenaufteilung(), damit ErtragswertService.bodenwert()
  * sie ohne Aenderung liest.
  */
-export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm, saetze, ortsteile }) {
+export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm, saetze, ortsteile, tabellen_id }) {
   const nichts = (grund, hinweis, extra) => ({ verfuegbar: false, grund, hinweis, ...(extra || {}) });
-  const satz = satzFuer(ags, objektart, saetze);
+  const satz = satzFuer(ags, objektart, saetze, tabellen_id);   /* v2284: Tabellen-ID der Zone */
   if (!satz) return nichts('kein_satz');
   const fl = Number(flaeche_qm), bez = Number(bezugsgroesse_qm), brw = Number(brw_eur_qm);
   const g = satz.geltungsbereich || {};
@@ -172,6 +195,8 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
     lizenz: satz.lizenz || null, stufe: satz.stufe || null, stichtag: satz.stichtag || null,
     berichtsjahr: satz.berichtsjahr || null,
     kennzahl: KENNZAHL, ebene: satz.ebene || null,
+    boris_tabelle: ((satz.geltungsbereich || {}).boris_tabellen || []).find((x) =>
+      [].concat(tabellen_id || []).indexOf(x) >= 0) || null,   /* v2284 */
   };
   /* v2281 · Sperre (vollstaendig === false): der Ausschuss fuehrt keinen
      Koeffizienten oder er ist nicht verwendbar (Lizenz, kostenpflichtig, nur

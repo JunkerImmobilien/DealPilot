@@ -20,6 +20,7 @@ import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einhe
 /* v1070-WUK-4 · Umrechnungskoeffizienten und Hinterland-Abgrenzung. */
 import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js';
 import { groessenanpassung as ukAusRegister } from '../lib/umrechnung_flaeche.js';   /* v2280 */
+import { zustaendig as niZoneZustaendig, holeZonen as niZonenHolen, waehleZone as niZoneWaehlen } from '../connectors/boris/ni-zone.js';   /* v2284 */
 /* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
  * zustaendigen Grundstuecksmarktbericht. */
 import { gartenland as gartenlandVorschlag, zustaendig as gaaZustaendig,
@@ -420,6 +421,18 @@ export const ReportOrchestrator = {
       return lv;
     })().catch((e) => { step('boris: fehler ' + e.message); return null; });
 
+    /* v2284 · BODENRICHTWERTZONE NI/HB PARALLEL ABRUFEN. BORIS-D liefert dort
+     * die Flaeche des Richtwertgrundstuecks leer (gemessen 16.10.2026: Leer,
+     * Bremen), und die Umrechnungstabelle haengt an der ZONE. Der Abruf laeuft
+     * neben borisP her, damit er keine Zeit addiert; eine Frist (4 s) auf dem
+     * Ganzen, und ein Fehler liefert null - nie einen gekippten Bericht. */
+    const niZoneP = (async () => {
+      let land = null;
+      try { land = (await agsP)?.land_code || null; } catch (e) { land = null; }
+      if (!niZoneZustaendig(land)) return null;
+      return await niZonenHolen({ lat, lon, land, jahr: 2026, fristMs: 4000 });
+    })().catch(() => null);
+
     const [balanceBefore, sale, rent, micro, insights, macroBundle, zensus, landValue, marktkontext] =
       await Promise.all([balanceBeforeP, _zeit('sale', saleP), _zeit('rent', rentP), _zeit('micro', microP),
         _zeit('insights', insightsP), _zeit('macro', macroP.then((m) => m && m.macroRaw)).then(() => macroP), _zeit('zensus', zensusP),
@@ -611,15 +624,35 @@ export const ReportOrchestrator = {
      * Bewertung in Betracht. Wir setzen weiter die volle Flaeche an — aber
      * der Bericht sagt es, statt es zu verschweigen. */
     let _flaeche = null;
+    /* v2284 · Zone am Punkt waehlen: Bauland mit GENAU dem Richtwert, der
+     * gerechnet wird - sonst gehoeren Flaeche und Tabelle zu einer anderen Zone. */
+    let _niZone = null;
+    try {
+      const _nz = await niZoneP;
+      if (_nz && _nz.verfuegbar) {
+        const _w = niZoneWaehlen(_nz.zonen, (landValue && landValue.available) ? landValue.value_sqm : null);
+        _niZone = _w.zone ? { ..._w.zone, url: _nz.url, land: _nz.land } : null;
+        step('ni-zone: ' + _nz.ms + ' ms, ' + _nz.zonen.length + ' Zonen am Punkt, '
+          + (_niZone ? 'gewaehlt BRW ' + _niZone.brw_eur_qm + ' f' + (_niZone.flaeche_qm || '-')
+            + ' Tabellen ' + (_niZone.tabellen_ids.join('/') || '-') : 'keine Wahl (' + _w.grund + ')'));
+      } else if (_nz) step('ni-zone: ' + _nz.grund);
+    } catch (e) { _niZone = null; }
     try {
       const _bp2 = (landValue && landValue.properties_raw) || {};
-      const _refQm = parseFloat(String(_bp2['Fläche'] || _bp2.Flaeche || '').replace(',', '.'));
+      let _refQm = parseFloat(String(_bp2['Fläche'] || _bp2.Flaeche || '').replace(',', '.'));
+      let _refQuelle = null;
+      if (!(_refQm > 0) && _niZone && _niZone.flaeche_qm > 0) {   /* v2284 */
+        _refQm = _niZone.flaeche_qm;
+        _refQuelle = (_niZone.land === 'HB' ? 'BORIS-HB' : 'BORIS-NI') + ', Bodenrichtwertzone ' + (_niZone.bodenrichtwert_nummer || _niZone.zone_id);
+      }
       const _istQm = parseFloat(ref.plot_area);
       if (_refQm > 0 && _istQm > 0) {
         const _ueber = Math.round((_istQm / _refQm - 1) * 100);
         _flaeche = {
           richtwertgrundstueck_qm: _refQm, objekt_qm: _istQm, ueberschreitung_pct: _ueber,
           erheblich: _ueber >= 30,
+          bezugsgroesse_quelle: _refQuelle,   /* v2284: null = aus dem BORIS-Datensatz */
+          boris_tabellen: _niZone ? _niZone.tabellen_ids : null,
           geschosszahl: _bp2.Geschosszahl || null,
           lagebeurteilung: _bp2.Lagebeurteilung || null,
           umrechnungsvorschrift_url: _bp2['Link zur Umrechnungsvorschrift'] || null,
@@ -878,6 +911,7 @@ export const ReportOrchestrator = {
           flaeche_qm: ref.plot_area,
           bezugsgroesse_qm: _flaeche ? _flaeche.richtwertgrundstueck_qm : null,
           brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
+          tabellen_id: _niZone ? _niZone.tabellen_ids : null,   /* v2284: Tabelle der Zone */
           ortsteile: (function () {   /* v2283: Gebietsausschluesse innerhalb der AGS */
             const pr = (landValue && landValue.properties_raw) || {};
             const c = (typeof geo !== 'undefined' && geo && geo.components) || {};

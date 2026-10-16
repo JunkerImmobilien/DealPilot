@@ -173,9 +173,11 @@
         "normgroesse_qm": 800,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 106920,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 900 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -579,9 +581,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 130680,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 1100 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -831,9 +835,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 130680,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 1100 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -1040,9 +1046,11 @@
         "normgroesse_qm": 800,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 106920,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 900 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -1191,9 +1199,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -1342,9 +1352,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -1493,9 +1505,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -1644,9 +1658,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -1795,9 +1811,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -1946,9 +1964,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -2097,9 +2117,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -2248,9 +2270,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -2399,9 +2423,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -2550,9 +2576,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -2701,9 +2729,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -2852,9 +2882,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -3003,9 +3035,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -3154,9 +3188,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -3305,9 +3341,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -3456,9 +3494,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -3607,9 +3647,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -3758,9 +3800,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -3909,9 +3953,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -4060,9 +4106,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -4211,9 +4259,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -4362,9 +4412,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -4513,9 +4565,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -4664,9 +4718,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -4815,9 +4871,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -4966,9 +5024,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -5117,9 +5177,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -5268,9 +5330,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -5419,9 +5483,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -5570,9 +5636,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -5721,9 +5789,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -5872,9 +5942,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -6023,9 +6095,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -6174,9 +6248,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -6325,9 +6401,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -6476,9 +6554,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -6627,9 +6707,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -6778,9 +6860,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -6929,9 +7013,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -7080,9 +7166,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.96,
-        "bodenwert_eur": 138240,
-        "bodenwert_eur_qm_dokument": 115,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,96 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.96,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 115,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 115 €/m²): 120 €/m² × 0,96 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -7261,9 +7349,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.97,
-        "bodenwert_eur": 139680,
-        "bodenwert_eur_qm_dokument": 116,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,97 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.97,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 116,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²): 120 €/m² × 0,97 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -7412,9 +7502,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.98,
-        "bodenwert_eur": 141120,
-        "bodenwert_eur_qm_dokument": 118,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 118 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,98 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.98,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 118,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 118 €/m²): 120 €/m² × 0,98 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -7561,9 +7653,11 @@
         "normgroesse_qm": 800,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 106920,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 900 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -7710,9 +7804,11 @@
         "normgroesse_qm": 800,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 106920,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 900 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -7859,9 +7955,11 @@
         "normgroesse_qm": 800,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 106920,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 900 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -8008,9 +8106,11 @@
         "normgroesse_qm": 800,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 106920,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 900 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -8157,9 +8257,11 @@
         "normgroesse_qm": 800,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 106920,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 900 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -8306,9 +8408,11 @@
         "normgroesse_qm": 800,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 106920,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 900 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -8455,9 +8559,11 @@
         "normgroesse_qm": 800,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 106920,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 900 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -8604,9 +8710,11 @@
         "normgroesse_qm": 800,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 106920,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 900 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -8753,9 +8861,11 @@
         "normgroesse_qm": 800,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 106920,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 900 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -8932,9 +9042,11 @@
         "normgroesse_qm": 800,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 106920,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 900 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -9093,9 +9205,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 130680,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 1100 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -9242,9 +9356,11 @@
         "normgroesse_qm": 800,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 106920,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 900 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -9403,9 +9519,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.98,
-        "bodenwert_eur": 141120,
-        "bodenwert_eur_qm_dokument": 118,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 118 €/m²). bodenwert_eur = 1200 m² × 120 €/m² × 0,98 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.98,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 118,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 118 €/m²): 120 €/m² × 0,98 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -9564,9 +9682,11 @@
         "normgroesse_qm": 1000,
         "brw_eur_qm": 120,
         "koeffizient": 0.99,
-        "bodenwert_eur": 130680,
-        "bodenwert_eur_qm_dokument": 119,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²). bodenwert_eur = 1100 m² × 120 €/m² × 0,99 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.99,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 119,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 119 €/m²): 120 €/m² × 0,99 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -9763,9 +9883,11 @@
         "normgroesse_qm": 900,
         "brw_eur_qm": 120,
         "koeffizient": 0.97,
-        "bodenwert_eur": 128040,
-        "bodenwert_eur_qm_dokument": 116,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²). bodenwert_eur = 1100 m² × 120 €/m² × 0,97 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.97,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 116,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²): 120 €/m² × 0,97 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -9992,9 +10114,11 @@
         "normgroesse_qm": 900,
         "brw_eur_qm": 120,
         "koeffizient": 0.97,
-        "bodenwert_eur": 128040,
-        "bodenwert_eur_qm_dokument": 116,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²). bodenwert_eur = 1100 m² × 120 €/m² × 0,97 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.97,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 116,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²): 120 €/m² × 0,97 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -10191,9 +10315,11 @@
         "normgroesse_qm": 900,
         "brw_eur_qm": 120,
         "koeffizient": 0.97,
-        "bodenwert_eur": 128040,
-        "bodenwert_eur_qm_dokument": 116,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²). bodenwert_eur = 1100 m² × 120 €/m² × 0,97 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.97,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 116,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²): 120 €/m² × 0,97 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -10326,9 +10452,11 @@
         "normgroesse_qm": 1500,
         "brw_eur_qm": 120,
         "koeffizient": 0.7,
-        "bodenwert_eur": 252000,
-        "bodenwert_eur_qm_dokument": 84,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²). bodenwert_eur = 3000 m² × 120 €/m² × 0,7 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.7,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 84,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²): 120 €/m² × 0,7 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -10459,9 +10587,11 @@
         "normgroesse_qm": 1500,
         "brw_eur_qm": 120,
         "koeffizient": 0.7,
-        "bodenwert_eur": 252000,
-        "bodenwert_eur_qm_dokument": 84,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²). bodenwert_eur = 3000 m² × 120 €/m² × 0,7 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.7,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 84,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²): 120 €/m² × 0,7 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -10592,9 +10722,11 @@
         "normgroesse_qm": 1500,
         "brw_eur_qm": 120,
         "koeffizient": 0.7,
-        "bodenwert_eur": 252000,
-        "bodenwert_eur_qm_dokument": 84,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²). bodenwert_eur = 3000 m² × 120 €/m² × 0,7 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.7,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 84,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²): 120 €/m² × 0,7 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -10725,9 +10857,11 @@
         "normgroesse_qm": 1500,
         "brw_eur_qm": 120,
         "koeffizient": 0.7,
-        "bodenwert_eur": 252000,
-        "bodenwert_eur_qm_dokument": 84,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²). bodenwert_eur = 3000 m² × 120 €/m² × 0,7 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.7,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 84,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²): 120 €/m² × 0,7 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -10954,9 +11088,11 @@
         "normgroesse_qm": 900,
         "brw_eur_qm": 120,
         "koeffizient": 0.97,
-        "bodenwert_eur": 128040,
-        "bodenwert_eur_qm_dokument": 116,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²). bodenwert_eur = 1100 m² × 120 €/m² × 0,97 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.97,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 116,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²): 120 €/m² × 0,97 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -11153,9 +11289,11 @@
         "normgroesse_qm": 900,
         "brw_eur_qm": 120,
         "koeffizient": 0.97,
-        "bodenwert_eur": 128040,
-        "bodenwert_eur_qm_dokument": 116,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²). bodenwert_eur = 1100 m² × 120 €/m² × 0,97 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.97,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 116,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²): 120 €/m² × 0,97 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -11286,9 +11424,11 @@
         "normgroesse_qm": 1500,
         "brw_eur_qm": 120,
         "koeffizient": 0.7,
-        "bodenwert_eur": 252000,
-        "bodenwert_eur_qm_dokument": 84,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²). bodenwert_eur = 3000 m² × 120 €/m² × 0,7 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.7,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 84,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²): 120 €/m² × 0,7 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -11419,9 +11559,11 @@
         "normgroesse_qm": 1500,
         "brw_eur_qm": 120,
         "koeffizient": 0.7,
-        "bodenwert_eur": 252000,
-        "bodenwert_eur_qm_dokument": 84,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²). bodenwert_eur = 3000 m² × 120 €/m² × 0,7 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.7,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 84,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²): 120 €/m² × 0,7 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -11552,9 +11694,11 @@
         "normgroesse_qm": 1500,
         "brw_eur_qm": 120,
         "koeffizient": 0.7,
-        "bodenwert_eur": 252000,
-        "bodenwert_eur_qm_dokument": 84,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²). bodenwert_eur = 3000 m² × 120 €/m² × 0,7 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.7,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 84,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²): 120 €/m² × 0,7 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -11745,9 +11889,11 @@
         "normgroesse_qm": 1500,
         "brw_eur_qm": 120,
         "koeffizient": 0.7,
-        "bodenwert_eur": 252000,
-        "bodenwert_eur_qm_dokument": 84,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²). bodenwert_eur = 3000 m² × 120 €/m² × 0,7 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.7,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 84,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²): 120 €/m² × 0,7 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -11944,9 +12090,11 @@
         "normgroesse_qm": 900,
         "brw_eur_qm": 120,
         "koeffizient": 0.97,
-        "bodenwert_eur": 128040,
-        "bodenwert_eur_qm_dokument": 116,
-        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²). bodenwert_eur = 1100 m² × 120 €/m² × 0,97 (Koeffizient des Dokuments; Richtwertgrundstück = 1,00).",
+        "koeffizient_objekt": 0.97,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 116,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²): 120 €/m² × 0,97 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
         "seite": 1
       }
     },
@@ -12015,6 +12163,1670 @@
       "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0210102_900m1,00)",
       "abgerufen_am": "2026-10-16",
       "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-22"
+    }
+  },
+  {
+    "land_code": "NI",
+    "ags": "03451",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Ammerland – nur Zonen mit Tabelle DENIBR1226UW0214",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_tabelle",
+      "bezug": "Bodenwert je m² = Bodenrichtwert × UK(Fläche des Bewertungsgrundstücks) / UK(Fläche des Richtwertgrundstücks)",
+      "bezug_wortlaut": "Beispiel: Bodenrichtwert 120, W f1500; Fläche des Richtwertgrundstücks 1500 m²; individuelle Grundstücksfläche 3000 m²; Bodenrichtwert (3000 m²) = 120 €/m² * 0,70 / 1,00 = rd. 84 €/m²",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine_tabelle_quotient",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 1500,
+          "flaeche_qm": [
+            500,
+            750,
+            1000,
+            1500,
+            2000,
+            3000,
+            4000,
+            5000,
+            6000,
+            7000
+          ],
+          "koeffizient": [
+            1.9,
+            1.5,
+            1.25,
+            1,
+            0.85,
+            0.7,
+            0.6,
+            0.5,
+            0.4,
+            0.3
+          ]
+        }
+      },
+      "tabellen_hinweis": "Schlüssel „*“: eine Tabelle für jede Fläche des Richtwertgrundstücks. Die Normgröße steht nicht in der Tabelle, sondern an der Bodenrichtwertzone (BORIS-NI, Merkmal „f…“, im WFS boris:flaeche); das Dokument rechnet UK(Objekt) / UK(Richtwertgrundstück). Im Gebiet kommen diese Normgrößen vor (m², Zonen): 1500 10×.",
+      "zwischenwerte": "linear",
+      "zwischenwerte_wortlaut": "Das Dokument nennt keine Regel für Zwischenwerte. Der WFS-Datensatz führt die Tabelle mit stetigkeit = 1, nach VBORIS 2.0 „Interpolierbarkeit: … 1 = ja“ (S. 11, S. 49). Interpoliert wird linear zwischen den Stützstellen.",
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen oberhalb von 7000 m²."
+      },
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen unterhalb von 500 m²."
+      },
+      "pruefbeispiel": {
+        "wortlaut": "Beispiel: Bodenrichtwert 120, W f1500; Fläche des Richtwertgrundstücks 1500 m²; individuelle Grundstücksfläche 3000 m²; Bodenrichtwert (3000 m²) = 120 €/m² * 0,70 / 1,00 = rd. 84 €/m²",
+        "flaeche_qm": 3000,
+        "normgroesse_qm": 1500,
+        "brw_eur_qm": 120,
+        "koeffizient": 0.7,
+        "koeffizient_objekt": 0.7,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 84,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²): 120 €/m² × 0,7 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
+        "seite": 1
+      }
+    },
+    "geltungsbereich": {
+      "nutzung": "gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden",
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "dhh",
+        "rh",
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "objektarten_hinweis": "Das Dokument nennt nur Ein- und Zweifamilienhausgrundstücke. Doppelhaushälften und Reihenhäuser nennt es nicht; sie stehen deshalb unter ausgeschlossen, statt stillschweigend mitzurechnen.",
+      "regelfall_wortlaut": [
+        "Der Bodenwert von Grundstücken wird neben der Lage auch von der Größe des Baugrundstücks beeinflusst. Die nachfolgende Tabelle enthält Umrechnungskoeffizienten für das Wertverhältnis von gleichartigen Ein- und Zweifamilienhausgrundstücken, die eine nicht teilbare Einheit bilden, bei unterschiedlichen Grundstücksflächen"
+      ],
+      "zuordnung": "je Bodenrichtwertzone (BORIS-NI, listeUmrechnungstabelle). In diesem Gebiet ist die Tabelle zonenabhängig; der Satz greift nur, wenn die Bodenrichtwertzone des Objekts eine dieser Tabellen-IDs führt.",
+      "nur_ueber_tabellen_id": true,
+      "bodenrichtwertzonen": {
+        "anzahl": 10,
+        "nutzungen": "WA ASB 10×",
+        "normgroessen_qm": "1500 10×"
+      },
+      "boris_tabellen": [
+        "DENIBR1226UW0214"
+      ],
+      "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; die zur Bodenrichtwertzone gehörende Umrechnungstabelle zeigt BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug, Landkreis Ammerland, Umrechnungstabelle 0120214, S. 1 (einzige Seite): Tabelle „Fläche in m² / Umrechnungskoeffizient“ 500 bis 7000 m² (10 Stützstellen), Geltung „gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden“, Anwendungsbeispiel",
+        "url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0120214_flac.pdf"
+      },
+      {
+        "art": "maschinenlesbarer Datensatz",
+        "fundstelle": "WFS boris_2026_wfs, Feature-Typ boris:BR_UmrechnungstabelleWerte, gml:id DENIBR1226UW0214 (einflussgroesse FLAE, stetigkeit 1, umrechnungsart 1), abgerufen 16.10.2026; Werteliste Stelle für Stelle gleich dem Dokument",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR1226UW0214"
+      },
+      {
+        "art": "Zuordnung",
+        "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal (34.027 Zonen, Stichtag 2026-01-01, abgerufen 16.10.2026): im Gebiet 10 Bauland-Zonen der Art W/M mit Flächenangabe, davon 10 mit listeUmrechnungstabelle auf DENIBR1226UW0214; andere Zonen desselben Gebiets führen andere oder keine Flächentabelle – deshalb greift dieser Satz NUR über die Tabellen-ID der Bodenrichtwertzone"
+      },
+      {
+        "art": "Datenmodell",
+        "fundstelle": "AdV, VBORIS 2.0 Modellbeschreibung (Stand 17.09.2012), S. 11 und S. 49–50: stetigkeit „Interpolierbarkeit: 0 = nein (nur diskreter Parameter), 1 = ja“; umrechnungsart „1 = Umrechnungsfaktoren, 2 = Zu-/Abschläge“",
+        "url": "https://geodaten.leipzig.de/open_data/organisationseinheit/Amt_fuer_Geoinformation_und_Bodenordnung/Bodenrichtwerte/vboris-hauptdokument-2.0.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR1226UW0214",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0120214_flac.pdf",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz_hinweis": "Lizenz und Vermerk wörtlich aus den Nutzungsbedingungen der Gutachterausschüsse Niedersachsen (www.gag.niedersachsen.de/startseite/bodenrichtwerte/nutzungsbedingungen/nutzungsbedingungen-197308.html, abgerufen 16.10.2026): „Die Bodenrichtwertanwendung kann gemäß den Nutzungsbestimmungen der Datenlizenz Deutschland – Namensnennung – Version 2.0 unter Angabe der Quelle © Oberer Gutachterausschuss für Grundstückswerte Niedersachsen [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben.“ Die Umrechnungstabellen gehören zur Bodenrichtwertanwendung (jede Bodenrichtwertzone verweist auf ihre Tabelle). Die WFS-Capabilities von boris_2026_wfs nennen dieselbe Lizenz (Fees: „Datenlizenz Deutschland Namensnennung 2.0“, quelle „© GDI-NI“). Das Tabellen-PDF selbst trägt keinen Lizenzvermerk.",
+    "fundstelle": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug, Landkreis Ammerland, Umrechnungstabelle 0120214, S. 1; WFS boris_2026_wfs, BR_UmrechnungstabelleWerte DENIBR1226UW0214",
+    "stufe_grund": "Amtliche Tabelle des örtlich zuständigen Gutachterausschusses im BORIS-NI-Datensatz 2026, über die Bodenrichtwertzonen dem Gebiet zugeordnet; Anwendungsbeispiel im Dokument. Fallzahl nicht genannt.",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), nur Ein- und Zweifamilienhausgrundstücke.",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs + pdftotext, 16.10.2026)",
+    "belege_meta": {
+      "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0120214_flac)",
+      "abgerufen_am": "2026-10-16",
+      "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-26"
+    }
+  },
+  {
+    "land_code": "NI",
+    "ags": "03461",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Wesermarsch – nur Zonen mit Tabelle DENIBR1526UW0513",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_tabelle",
+      "bezug": "Bodenwert je m² = Bodenrichtwert × UK(Fläche des Bewertungsgrundstücks) / UK(Fläche des Richtwertgrundstücks)",
+      "bezug_wortlaut": "Beispiel: Bodenrichtwert 120, W f1500; Fläche des Richtwertgrundstücks 1500 m²; individuelle Grundstücksfläche 3000 m²; Bodenrichtwert (3000 m²) = 120 €/m² * 0,70 / 1,00 = rd. 84 €/m²",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine_tabelle_quotient",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 1500,
+          "flaeche_qm": [
+            500,
+            750,
+            1000,
+            1500,
+            2000,
+            3000,
+            4000,
+            5000,
+            6000,
+            7000
+          ],
+          "koeffizient": [
+            1.9,
+            1.5,
+            1.25,
+            1,
+            0.85,
+            0.7,
+            0.6,
+            0.5,
+            0.4,
+            0.3
+          ]
+        }
+      },
+      "tabellen_hinweis": "Schlüssel „*“: eine Tabelle für jede Fläche des Richtwertgrundstücks. Die Normgröße steht nicht in der Tabelle, sondern an der Bodenrichtwertzone (BORIS-NI, Merkmal „f…“, im WFS boris:flaeche); das Dokument rechnet UK(Objekt) / UK(Richtwertgrundstück). Im Gebiet kommen diese Normgrößen vor (m², Zonen): 1500 10×.",
+      "zwischenwerte": "linear",
+      "zwischenwerte_wortlaut": "Das Dokument nennt keine Regel für Zwischenwerte. Der WFS-Datensatz führt die Tabelle mit stetigkeit = 1, nach VBORIS 2.0 „Interpolierbarkeit: … 1 = ja“ (S. 11, S. 49). Interpoliert wird linear zwischen den Stützstellen.",
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen oberhalb von 7000 m²."
+      },
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen unterhalb von 500 m²."
+      },
+      "pruefbeispiel": {
+        "wortlaut": "Beispiel: Bodenrichtwert 120, W f1500; Fläche des Richtwertgrundstücks 1500 m²; individuelle Grundstücksfläche 3000 m²; Bodenrichtwert (3000 m²) = 120 €/m² * 0,70 / 1,00 = rd. 84 €/m²",
+        "flaeche_qm": 3000,
+        "normgroesse_qm": 1500,
+        "brw_eur_qm": 120,
+        "koeffizient": 0.7,
+        "koeffizient_objekt": 0.7,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 84,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 84 €/m²): 120 €/m² × 0,7 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
+        "seite": 1
+      }
+    },
+    "geltungsbereich": {
+      "nutzung": "gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden",
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "dhh",
+        "rh",
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "objektarten_hinweis": "Das Dokument nennt nur Ein- und Zweifamilienhausgrundstücke. Doppelhaushälften und Reihenhäuser nennt es nicht; sie stehen deshalb unter ausgeschlossen, statt stillschweigend mitzurechnen.",
+      "regelfall_wortlaut": [
+        "Der Bodenwert von Grundstücken wird neben der Lage auch von der Größe des Baugrundstücks beeinflusst. Die nachfolgende Tabelle enthält Umrechnungskoeffizienten für das Wertverhältnis von gleichartigen Ein- und Zweifamilienhausgrundstücken, die eine nicht teilbare Einheit bilden, bei unterschiedlichen Grundstücksflächen"
+      ],
+      "zuordnung": "je Bodenrichtwertzone (BORIS-NI, listeUmrechnungstabelle). In diesem Gebiet ist die Tabelle zonenabhängig; der Satz greift nur, wenn die Bodenrichtwertzone des Objekts eine dieser Tabellen-IDs führt.",
+      "nur_ueber_tabellen_id": true,
+      "bodenrichtwertzonen": {
+        "anzahl": 10,
+        "nutzungen": "W ASB 10×",
+        "normgroessen_qm": "1500 10×"
+      },
+      "boris_tabellen": [
+        "DENIBR1526UW0513"
+      ],
+      "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; die zur Bodenrichtwertzone gehörende Umrechnungstabelle zeigt BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug, Landkreis Wesermarsch, Umrechnungstabelle 0150513, S. 1 (einzige Seite): Tabelle „Fläche in m² / Umrechnungskoeffizient“ 500 bis 7000 m² (10 Stützstellen), Geltung „gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden“, Anwendungsbeispiel",
+        "url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0150513_flac.pdf"
+      },
+      {
+        "art": "maschinenlesbarer Datensatz",
+        "fundstelle": "WFS boris_2026_wfs, Feature-Typ boris:BR_UmrechnungstabelleWerte, gml:id DENIBR1526UW0513 (einflussgroesse FLAE, stetigkeit 1, umrechnungsart 1), abgerufen 16.10.2026; Werteliste Stelle für Stelle gleich dem Dokument",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR1526UW0513"
+      },
+      {
+        "art": "Zuordnung",
+        "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal (34.027 Zonen, Stichtag 2026-01-01, abgerufen 16.10.2026): im Gebiet 10 Bauland-Zonen der Art W/M mit Flächenangabe, davon 10 mit listeUmrechnungstabelle auf DENIBR1526UW0513; andere Zonen desselben Gebiets führen andere oder keine Flächentabelle – deshalb greift dieser Satz NUR über die Tabellen-ID der Bodenrichtwertzone"
+      },
+      {
+        "art": "Datenmodell",
+        "fundstelle": "AdV, VBORIS 2.0 Modellbeschreibung (Stand 17.09.2012), S. 11 und S. 49–50: stetigkeit „Interpolierbarkeit: 0 = nein (nur diskreter Parameter), 1 = ja“; umrechnungsart „1 = Umrechnungsfaktoren, 2 = Zu-/Abschläge“",
+        "url": "https://geodaten.leipzig.de/open_data/organisationseinheit/Amt_fuer_Geoinformation_und_Bodenordnung/Bodenrichtwerte/vboris-hauptdokument-2.0.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR1526UW0513",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0150513_flac.pdf",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz_hinweis": "Lizenz und Vermerk wörtlich aus den Nutzungsbedingungen der Gutachterausschüsse Niedersachsen (www.gag.niedersachsen.de/startseite/bodenrichtwerte/nutzungsbedingungen/nutzungsbedingungen-197308.html, abgerufen 16.10.2026): „Die Bodenrichtwertanwendung kann gemäß den Nutzungsbestimmungen der Datenlizenz Deutschland – Namensnennung – Version 2.0 unter Angabe der Quelle © Oberer Gutachterausschuss für Grundstückswerte Niedersachsen [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben.“ Die Umrechnungstabellen gehören zur Bodenrichtwertanwendung (jede Bodenrichtwertzone verweist auf ihre Tabelle). Die WFS-Capabilities von boris_2026_wfs nennen dieselbe Lizenz (Fees: „Datenlizenz Deutschland Namensnennung 2.0“, quelle „© GDI-NI“). Das Tabellen-PDF selbst trägt keinen Lizenzvermerk.",
+    "fundstelle": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug, Landkreis Wesermarsch, Umrechnungstabelle 0150513, S. 1; WFS boris_2026_wfs, BR_UmrechnungstabelleWerte DENIBR1526UW0513",
+    "stufe_grund": "Amtliche Tabelle des örtlich zuständigen Gutachterausschusses im BORIS-NI-Datensatz 2026, über die Bodenrichtwertzonen dem Gebiet zugeordnet; Anwendungsbeispiel im Dokument. Fallzahl nicht genannt.",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), nur Ein- und Zweifamilienhausgrundstücke.",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs + pdftotext, 16.10.2026)",
+    "belege_meta": {
+      "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0150513_flac)",
+      "abgerufen_am": "2026-10-16",
+      "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-01-26"
+    }
+  },
+  {
+    "land_code": "NI",
+    "ags": "03453",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Cloppenburg – nur Zonen mit Tabelle DENIBR1926UW0913",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_tabelle",
+      "bezug": "Bodenwert je m² = Bodenrichtwert × UK(Fläche des Bewertungsgrundstücks) / UK(Fläche des Richtwertgrundstücks)",
+      "bezug_wortlaut": "Beispiel: Bodenrichtwert 120, W f1000; Fläche des Richtwertgrundstücks 1000 m²; individuelle Grundstücksfläche 2000 m²; Bodenrichtwert (2000 m²) = 120 €/m² * 0,68 / 1,00 = rd. 82 €/m²",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine_tabelle_quotient",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 1000,
+          "flaeche_qm": [
+            500,
+            750,
+            1000,
+            1500,
+            2000,
+            3000
+          ],
+          "koeffizient": [
+            1.52,
+            1.2,
+            1,
+            0.8,
+            0.68,
+            0.56
+          ]
+        }
+      },
+      "tabellen_hinweis": "Schlüssel „*“: eine Tabelle für jede Fläche des Richtwertgrundstücks. Die Normgröße steht nicht in der Tabelle, sondern an der Bodenrichtwertzone (BORIS-NI, Merkmal „f…“, im WFS boris:flaeche); das Dokument rechnet UK(Objekt) / UK(Richtwertgrundstück). Im Gebiet kommen diese Normgrößen vor (m², Zonen): 1000 27×.",
+      "zwischenwerte": "linear",
+      "zwischenwerte_wortlaut": "Das Dokument nennt keine Regel für Zwischenwerte. Der WFS-Datensatz führt die Tabelle mit stetigkeit = 1, nach VBORIS 2.0 „Interpolierbarkeit: … 1 = ja“ (S. 11, S. 49). Interpoliert wird linear zwischen den Stützstellen.",
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen oberhalb von 3000 m²."
+      },
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen unterhalb von 500 m²."
+      },
+      "pruefbeispiel": {
+        "wortlaut": "Beispiel: Bodenrichtwert 120, W f1000; Fläche des Richtwertgrundstücks 1000 m²; individuelle Grundstücksfläche 2000 m²; Bodenrichtwert (2000 m²) = 120 €/m² * 0,68 / 1,00 = rd. 82 €/m²",
+        "flaeche_qm": 2000,
+        "normgroesse_qm": 1000,
+        "brw_eur_qm": 120,
+        "koeffizient": 0.68,
+        "koeffizient_objekt": 0.68,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 82,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 82 €/m²): 120 €/m² × 0,68 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
+        "seite": 1
+      }
+    },
+    "geltungsbereich": {
+      "nutzung": "gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden",
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "dhh",
+        "rh",
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "objektarten_hinweis": "Das Dokument nennt nur Ein- und Zweifamilienhausgrundstücke. Doppelhaushälften und Reihenhäuser nennt es nicht; sie stehen deshalb unter ausgeschlossen, statt stillschweigend mitzurechnen.",
+      "regelfall_wortlaut": [
+        "Der Bodenwert von Grundstücken wird neben der Lage auch von der Größe des Baugrundstücks beeinflusst. Die nachfolgende Tabelle enthält Umrechnungskoeffizienten für das Wertverhältnis von gleichartigen Ein- und Zweifamilienhausgrundstücken, die eine nicht teilbare Einheit bilden, bei unterschiedlichen Grundstücksflächen"
+      ],
+      "zuordnung": "je Bodenrichtwertzone (BORIS-NI, listeUmrechnungstabelle). In diesem Gebiet ist die Tabelle zonenabhängig; der Satz greift nur, wenn die Bodenrichtwertzone des Objekts eine dieser Tabellen-IDs führt.",
+      "nur_ueber_tabellen_id": true,
+      "bodenrichtwertzonen": {
+        "anzahl": 27,
+        "nutzungen": "MD 16×, WA EFH 5×, M 2×, MI 2×, WS EFH 1×, WA 1×",
+        "normgroessen_qm": "1000 27×"
+      },
+      "boris_tabellen": [
+        "DENIBR1926UW0913"
+      ],
+      "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg, www.gag.niedersachsen.de; die zur Bodenrichtwertzone gehörende Umrechnungstabelle zeigt BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug, Landkreis Cloppenburg, Umrechnungstabelle 0190913, S. 1 (einzige Seite): Tabelle „Fläche in m² / Umrechnungskoeffizient“ 500 bis 3000 m² (6 Stützstellen), Geltung „gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden“, Anwendungsbeispiel",
+        "url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0190913_flac.pdf"
+      },
+      {
+        "art": "maschinenlesbarer Datensatz",
+        "fundstelle": "WFS boris_2026_wfs, Feature-Typ boris:BR_UmrechnungstabelleWerte, gml:id DENIBR1926UW0913 (einflussgroesse FLAE, stetigkeit 1, umrechnungsart 1), abgerufen 16.10.2026; Werteliste Stelle für Stelle gleich dem Dokument",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR1926UW0913"
+      },
+      {
+        "art": "Zuordnung",
+        "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal (34.027 Zonen, Stichtag 2026-01-01, abgerufen 16.10.2026): im Gebiet 27 Bauland-Zonen der Art W/M mit Flächenangabe, davon 27 mit listeUmrechnungstabelle auf DENIBR1926UW0913; andere Zonen desselben Gebiets führen andere oder keine Flächentabelle – deshalb greift dieser Satz NUR über die Tabellen-ID der Bodenrichtwertzone"
+      },
+      {
+        "art": "Datenmodell",
+        "fundstelle": "AdV, VBORIS 2.0 Modellbeschreibung (Stand 17.09.2012), S. 11 und S. 49–50: stetigkeit „Interpolierbarkeit: 0 = nein (nur diskreter Parameter), 1 = ja“; umrechnungsart „1 = Umrechnungsfaktoren, 2 = Zu-/Abschläge“",
+        "url": "https://geodaten.leipzig.de/open_data/organisationseinheit/Amt_fuer_Geoinformation_und_Bodenordnung/Bodenrichtwerte/vboris-hauptdokument-2.0.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR1926UW0913",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0190913_flac.pdf",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz_hinweis": "Lizenz und Vermerk wörtlich aus den Nutzungsbedingungen der Gutachterausschüsse Niedersachsen (www.gag.niedersachsen.de/startseite/bodenrichtwerte/nutzungsbedingungen/nutzungsbedingungen-197308.html, abgerufen 16.10.2026): „Die Bodenrichtwertanwendung kann gemäß den Nutzungsbestimmungen der Datenlizenz Deutschland – Namensnennung – Version 2.0 unter Angabe der Quelle © Oberer Gutachterausschuss für Grundstückswerte Niedersachsen [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben.“ Die Umrechnungstabellen gehören zur Bodenrichtwertanwendung (jede Bodenrichtwertzone verweist auf ihre Tabelle). Die WFS-Capabilities von boris_2026_wfs nennen dieselbe Lizenz (Fees: „Datenlizenz Deutschland Namensnennung 2.0“, quelle „© GDI-NI“). Das Tabellen-PDF selbst trägt keinen Lizenzvermerk.",
+    "fundstelle": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug, Landkreis Cloppenburg, Umrechnungstabelle 0190913, S. 1; WFS boris_2026_wfs, BR_UmrechnungstabelleWerte DENIBR1926UW0913",
+    "stufe_grund": "Amtliche Tabelle des örtlich zuständigen Gutachterausschusses im BORIS-NI-Datensatz 2026, über die Bodenrichtwertzonen dem Gebiet zugeordnet; Anwendungsbeispiel im Dokument. Fallzahl nicht genannt.",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), nur Ein- und Zweifamilienhausgrundstücke.",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs + pdftotext, 16.10.2026)",
+    "belege_meta": {
+      "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0190913_flac)",
+      "abgerufen_am": "2026-10-16",
+      "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-04-17"
+    }
+  },
+  {
+    "land_code": "NI",
+    "ags": "03241",
+    "ebene": "kreis",
+    "gebiet_name": "Region Hannover – nur Zonen mit Tabelle DENIBR4326UW0001",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_tabelle",
+      "bezug": "Bodenwert je m² = Bodenrichtwert × UK(Fläche des Bewertungsgrundstücks) / UK(Fläche des Richtwertgrundstücks)",
+      "bezug_wortlaut": "Beispiel: Bodenrichtwert 120, W EFH f750; Fläche des Richtwertgrundstücks 750 m²; individuelle Grundstücksfläche 1100 m²; individueller Bodenwert (1100 m²) = 120 €/m² * 0,942 / 0,972 = rd. 116 €/m²",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine_tabelle_quotient",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 500,
+          "flaeche_qm": [
+            200,
+            300,
+            400,
+            500,
+            600,
+            700,
+            800,
+            900,
+            1000,
+            1100,
+            1200,
+            1300,
+            1400,
+            1500
+          ],
+          "koeffizient": [
+            1.122,
+            1.065,
+            1.026,
+            1,
+            0.984,
+            0.975,
+            0.969,
+            0.964,
+            0.955,
+            0.942,
+            0.92,
+            0.887,
+            0.843,
+            0.785
+          ]
+        }
+      },
+      "tabellen_hinweis": "Schlüssel „*“: eine Tabelle für jede Fläche des Richtwertgrundstücks. Die Normgröße steht nicht in der Tabelle, sondern an der Bodenrichtwertzone (BORIS-NI, Merkmal „f…“, im WFS boris:flaeche); das Dokument rechnet UK(Objekt) / UK(Richtwertgrundstück). Im Gebiet kommen diese Normgrößen vor (m², Zonen): 750 251×, 500 177×, 1000 31×, 250 4×, 400 3×, 900 3×, 200 1×, 300 1×, 350 1×, 1200 1×, 1250 1×, 1500 1×.",
+      "zwischenwerte": "linear",
+      "zwischenwerte_wortlaut": "Das Dokument nennt keine Regel für Zwischenwerte. Der WFS-Datensatz führt die Tabelle mit stetigkeit = 1, nach VBORIS 2.0 „Interpolierbarkeit: … 1 = ja“ (S. 11, S. 49). Interpoliert wird linear zwischen den Stützstellen.",
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen oberhalb von 1500 m²."
+      },
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen unterhalb von 200 m²."
+      },
+      "pruefbeispiel": {
+        "wortlaut": "Beispiel: Bodenrichtwert 120, W EFH f750; Fläche des Richtwertgrundstücks 750 m²; individuelle Grundstücksfläche 1100 m²; individueller Bodenwert (1100 m²) = 120 €/m² * 0,942 / 0,972 = rd. 116 €/m²",
+        "flaeche_qm": 1100,
+        "normgroesse_qm": 750,
+        "brw_eur_qm": 120,
+        "koeffizient": 0.9691,
+        "koeffizient_objekt": 0.942,
+        "koeffizient_norm": 0.972,
+        "bodenwert_eur_qm": 116,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²): 120 €/m² × 0,942 / 0,972. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
+        "seite": 1
+      }
+    },
+    "geltungsbereich": {
+      "nutzung": "gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden",
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "dhh",
+        "rh",
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "objektarten_hinweis": "Das Dokument nennt nur Ein- und Zweifamilienhausgrundstücke. Doppelhaushälften und Reihenhäuser nennt es nicht; sie stehen deshalb unter ausgeschlossen, statt stillschweigend mitzurechnen.",
+      "regelfall_wortlaut": [
+        "Der Bodenwert von Grundstücken wird neben der Lage auch von der Größe des Baugrundstücks beeinflusst. Die nachfolgende Tabelle enthält Umrechnungskoeffizienten für das Wertverhältnis von gleichartigen Ein- und Zweifamilienhausgrundstücken, die eine nicht teilbare Einheit bilden, bei unterschiedlichen Grundstücksflächen"
+      ],
+      "zuordnung": "je Bodenrichtwertzone (BORIS-NI, listeUmrechnungstabelle). In diesem Gebiet ist die Tabelle zonenabhängig; der Satz greift nur, wenn die Bodenrichtwertzone des Objekts eine dieser Tabellen-IDs führt.",
+      "nur_ueber_tabellen_id": true,
+      "bodenrichtwertzonen": {
+        "anzahl": 475,
+        "nutzungen": "W EFH 454×, SE 6×, M 4×, W ASB 4×, W 3×, MD 1×, SO 1×, MI 1×, SE WO 1×",
+        "normgroessen_qm": "750 251×, 500 177×, 1000 31×, 250 4×, 400 3×, 900 3×, 200 1×, 300 1×, 350 1×, 1200 1×, 1250 1×, 1500 1×"
+      },
+      "boris_tabellen": [
+        "DENIBR4326UW0001"
+      ],
+      "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; die zur Bodenrichtwertzone gehörende Umrechnungstabelle zeigt BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug, Umrechnungstabelle 0430001 (Region Hannover, z. B. f750), S. 1 (einzige Seite): Tabelle „Fläche in m² / Umrechnungskoeffizient“ 200 bis 1500 m² (14 Stützstellen), Geltung „gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden“, Anwendungsbeispiel",
+        "url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0430001wflac.pdf"
+      },
+      {
+        "art": "maschinenlesbarer Datensatz",
+        "fundstelle": "WFS boris_2026_wfs, Feature-Typ boris:BR_UmrechnungstabelleWerte, gml:id DENIBR4326UW0001 (einflussgroesse FLAE, stetigkeit 1, umrechnungsart 1), abgerufen 16.10.2026; Werteliste Stelle für Stelle gleich dem Dokument",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR4326UW0001"
+      },
+      {
+        "art": "Zuordnung",
+        "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal (34.027 Zonen, Stichtag 2026-01-01, abgerufen 16.10.2026): im Gebiet 467 Bauland-Zonen der Art W/M mit Flächenangabe, davon 467 mit listeUmrechnungstabelle auf DENIBR4326UW0001; andere Zonen desselben Gebiets führen andere oder keine Flächentabelle – deshalb greift dieser Satz NUR über die Tabellen-ID der Bodenrichtwertzone"
+      },
+      {
+        "art": "Datenmodell",
+        "fundstelle": "AdV, VBORIS 2.0 Modellbeschreibung (Stand 17.09.2012), S. 11 und S. 49–50: stetigkeit „Interpolierbarkeit: 0 = nein (nur diskreter Parameter), 1 = ja“; umrechnungsart „1 = Umrechnungsfaktoren, 2 = Zu-/Abschläge“",
+        "url": "https://geodaten.leipzig.de/open_data/organisationseinheit/Amt_fuer_Geoinformation_und_Bodenordnung/Bodenrichtwerte/vboris-hauptdokument-2.0.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR4326UW0001",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0430001wflac.pdf",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz_hinweis": "Lizenz und Vermerk wörtlich aus den Nutzungsbedingungen der Gutachterausschüsse Niedersachsen (www.gag.niedersachsen.de/startseite/bodenrichtwerte/nutzungsbedingungen/nutzungsbedingungen-197308.html, abgerufen 16.10.2026): „Die Bodenrichtwertanwendung kann gemäß den Nutzungsbestimmungen der Datenlizenz Deutschland – Namensnennung – Version 2.0 unter Angabe der Quelle © Oberer Gutachterausschuss für Grundstückswerte Niedersachsen [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben.“ Die Umrechnungstabellen gehören zur Bodenrichtwertanwendung (jede Bodenrichtwertzone verweist auf ihre Tabelle). Die WFS-Capabilities von boris_2026_wfs nennen dieselbe Lizenz (Fees: „Datenlizenz Deutschland Namensnennung 2.0“, quelle „© GDI-NI“). Das Tabellen-PDF selbst trägt keinen Lizenzvermerk.",
+    "fundstelle": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug, Umrechnungstabelle 0430001 (Region Hannover, z. B. f750), S. 1; WFS boris_2026_wfs, BR_UmrechnungstabelleWerte DENIBR4326UW0001",
+    "stufe_grund": "Amtliche Tabelle des örtlich zuständigen Gutachterausschusses im BORIS-NI-Datensatz 2026, über die Bodenrichtwertzonen dem Gebiet zugeordnet; Anwendungsbeispiel im Dokument. Fallzahl nicht genannt.",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), nur Ein- und Zweifamilienhausgrundstücke.",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs + pdftotext, 16.10.2026)",
+    "belege_meta": {
+      "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0430001wflac)",
+      "abgerufen_am": "2026-10-16",
+      "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-02-20"
+    }
+  },
+  {
+    "land_code": "NI",
+    "ags": "03159",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Göttingen – nur Zonen mit Tabelle DENIBR5526UW0110",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Northeim",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_tabelle",
+      "bezug": "Bodenwert je m² = Bodenrichtwert × UK(Fläche des Bewertungsgrundstücks) / UK(Fläche des Richtwertgrundstücks)",
+      "bezug_wortlaut": "Beispiel: Bodenrichtwert 120, W f800; Fläche des Richtwertgrundstücks 800 m²; individuelle Grundstücksfläche 1000 m²; Bodenrichtwert (1000 m²) = 120 €/m² * 0,94 / 1,00 = rd. 113 €/m²",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine_tabelle_quotient",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 800,
+          "flaeche_qm": [
+            300,
+            400,
+            500,
+            600,
+            700,
+            800,
+            900,
+            1000,
+            1100,
+            1200
+          ],
+          "koeffizient": [
+            1.13,
+            1.1,
+            1.07,
+            1.05,
+            1.02,
+            1,
+            0.97,
+            0.94,
+            0.92,
+            0.89
+          ]
+        }
+      },
+      "tabellen_hinweis": "Schlüssel „*“: eine Tabelle für jede Fläche des Richtwertgrundstücks. Die Normgröße steht nicht in der Tabelle, sondern an der Bodenrichtwertzone (BORIS-NI, Merkmal „f…“, im WFS boris:flaeche); das Dokument rechnet UK(Objekt) / UK(Richtwertgrundstück). Im Gebiet kommen diese Normgrößen vor (m², Zonen): 800 59×, 700 24×, 600 10×, 300 4×, 400 4×, 1000 4×, 500 3×, 900 3×, 1200 1×, 1500 1×.",
+      "zwischenwerte": "linear",
+      "zwischenwerte_wortlaut": "Das Dokument nennt keine Regel für Zwischenwerte. Der WFS-Datensatz führt die Tabelle mit stetigkeit = 1, nach VBORIS 2.0 „Interpolierbarkeit: … 1 = ja“ (S. 11, S. 49). Interpoliert wird linear zwischen den Stützstellen.",
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen oberhalb von 1200 m²."
+      },
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen unterhalb von 300 m²."
+      },
+      "pruefbeispiel": {
+        "wortlaut": "Beispiel: Bodenrichtwert 120, W f800; Fläche des Richtwertgrundstücks 800 m²; individuelle Grundstücksfläche 1000 m²; Bodenrichtwert (1000 m²) = 120 €/m² * 0,94 / 1,00 = rd. 113 €/m²",
+        "flaeche_qm": 1000,
+        "normgroesse_qm": 800,
+        "brw_eur_qm": 120,
+        "koeffizient": 0.94,
+        "koeffizient_objekt": 0.94,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 113,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 113 €/m²): 120 €/m² × 0,94 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
+        "seite": 1
+      }
+    },
+    "geltungsbereich": {
+      "nutzung": "gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden",
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "dhh",
+        "rh",
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "objektarten_hinweis": "Das Dokument nennt nur Ein- und Zweifamilienhausgrundstücke. Doppelhaushälften und Reihenhäuser nennt es nicht; sie stehen deshalb unter ausgeschlossen, statt stillschweigend mitzurechnen.",
+      "regelfall_wortlaut": [
+        "Der Bodenwert von Grundstücken wird neben der Lage auch von der Größe des Baugrundstücks beeinflusst. Die nachfolgende Tabelle enthält Umrechnungskoeffizienten für das Wertverhältnis von gleichartigen Ein- und Zweifamilienhausgrundstücken, die eine nicht teilbare Einheit bilden, bei unterschiedlichen Grundstücksflächen"
+      ],
+      "zuordnung": "je Bodenrichtwertzone (BORIS-NI, listeUmrechnungstabelle). In diesem Gebiet ist die Tabelle zonenabhängig; der Satz greift nur, wenn die Bodenrichtwertzone des Objekts eine dieser Tabellen-IDs führt.",
+      "nur_ueber_tabellen_id": true,
+      "bodenrichtwertzonen": {
+        "anzahl": 113,
+        "nutzungen": "W 78×, WA 32×, WR 2×, M 1×",
+        "normgroessen_qm": "800 59×, 700 24×, 600 10×, 300 4×, 400 4×, 1000 4×, 500 3×, 900 3×, 1200 1×, 1500 1×"
+      },
+      "boris_tabellen": [
+        "DENIBR5526UW0110"
+      ],
+      "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; die zur Bodenrichtwertzone gehörende Umrechnungstabelle zeigt BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Gutachterausschuss für Grundstückswerte Northeim, Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug, Umrechnungstabelle 0590110 (z. B. W f800), S. 1 (einzige Seite): Tabelle „Fläche in m² / Umrechnungskoeffizient“ 300 bis 1200 m² (10 Stützstellen), Geltung „gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden“, Anwendungsbeispiel",
+        "url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590110_Wflac.pdf"
+      },
+      {
+        "art": "maschinenlesbarer Datensatz",
+        "fundstelle": "WFS boris_2026_wfs, Feature-Typ boris:BR_UmrechnungstabelleWerte, gml:id DENIBR5526UW0110 (einflussgroesse FLAE, stetigkeit 1, umrechnungsart 1), abgerufen 16.10.2026; Werteliste Stelle für Stelle gleich dem Dokument",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR5526UW0110"
+      },
+      {
+        "art": "Zuordnung",
+        "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal (34.027 Zonen, Stichtag 2026-01-01, abgerufen 16.10.2026): im Gebiet 113 Bauland-Zonen der Art W/M mit Flächenangabe, davon 113 mit listeUmrechnungstabelle auf DENIBR5526UW0110; andere Zonen desselben Gebiets führen andere oder keine Flächentabelle – deshalb greift dieser Satz NUR über die Tabellen-ID der Bodenrichtwertzone"
+      },
+      {
+        "art": "Datenmodell",
+        "fundstelle": "AdV, VBORIS 2.0 Modellbeschreibung (Stand 17.09.2012), S. 11 und S. 49–50: stetigkeit „Interpolierbarkeit: 0 = nein (nur diskreter Parameter), 1 = ja“; umrechnungsart „1 = Umrechnungsfaktoren, 2 = Zu-/Abschläge“",
+        "url": "https://geodaten.leipzig.de/open_data/organisationseinheit/Amt_fuer_Geoinformation_und_Bodenordnung/Bodenrichtwerte/vboris-hauptdokument-2.0.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR5526UW0110",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590110_Wflac.pdf",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz_hinweis": "Lizenz und Vermerk wörtlich aus den Nutzungsbedingungen der Gutachterausschüsse Niedersachsen (www.gag.niedersachsen.de/startseite/bodenrichtwerte/nutzungsbedingungen/nutzungsbedingungen-197308.html, abgerufen 16.10.2026): „Die Bodenrichtwertanwendung kann gemäß den Nutzungsbestimmungen der Datenlizenz Deutschland – Namensnennung – Version 2.0 unter Angabe der Quelle © Oberer Gutachterausschuss für Grundstückswerte Niedersachsen [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben.“ Die Umrechnungstabellen gehören zur Bodenrichtwertanwendung (jede Bodenrichtwertzone verweist auf ihre Tabelle). Die WFS-Capabilities von boris_2026_wfs nennen dieselbe Lizenz (Fees: „Datenlizenz Deutschland Namensnennung 2.0“, quelle „© GDI-NI“). Das Tabellen-PDF selbst trägt keinen Lizenzvermerk.",
+    "fundstelle": "Gutachterausschuss für Grundstückswerte Northeim, Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug, Umrechnungstabelle 0590110 (z. B. W f800), S. 1; WFS boris_2026_wfs, BR_UmrechnungstabelleWerte DENIBR5526UW0110",
+    "stufe_grund": "Amtliche Tabelle des örtlich zuständigen Gutachterausschusses im BORIS-NI-Datensatz 2026, über die Bodenrichtwertzonen dem Gebiet zugeordnet; Anwendungsbeispiel im Dokument. Fallzahl nicht genannt.",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), nur Ein- und Zweifamilienhausgrundstücke.",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs + pdftotext, 16.10.2026)",
+    "belege_meta": {
+      "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0590110_Wflac)",
+      "abgerufen_am": "2026-10-16",
+      "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-05-26"
+    }
+  },
+  {
+    "land_code": "NI",
+    "ags": "03155",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Northeim – nur Zonen mit Tabelle DENIBR5926UW0110",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Northeim",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_tabelle",
+      "bezug": "Bodenwert je m² = Bodenrichtwert × UK(Fläche des Bewertungsgrundstücks) / UK(Fläche des Richtwertgrundstücks)",
+      "bezug_wortlaut": "Beispiel: Bodenrichtwert 120, W f800; Fläche des Richtwertgrundstücks 800 m²; individuelle Grundstücksfläche 1000 m²; Bodenrichtwert (1000 m²) = 120 €/m² * 0,94 / 1,00 = rd. 113 €/m²",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine_tabelle_quotient",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 800,
+          "flaeche_qm": [
+            300,
+            400,
+            500,
+            600,
+            700,
+            800,
+            900,
+            1000,
+            1100,
+            1200
+          ],
+          "koeffizient": [
+            1.13,
+            1.1,
+            1.07,
+            1.05,
+            1.02,
+            1,
+            0.97,
+            0.94,
+            0.92,
+            0.89
+          ]
+        }
+      },
+      "tabellen_hinweis": "Schlüssel „*“: eine Tabelle für jede Fläche des Richtwertgrundstücks. Die Normgröße steht nicht in der Tabelle, sondern an der Bodenrichtwertzone (BORIS-NI, Merkmal „f…“, im WFS boris:flaeche); das Dokument rechnet UK(Objekt) / UK(Richtwertgrundstück). Im Gebiet kommen diese Normgrößen vor (m², Zonen): 750 42×, 800 40×, 1000 40×, 850 36×, 900 33×, 700 26×, 950 25×, 650 19×, 1050 15×, 1100 14×, 350 11×, 300 10×, 600 10×, 400 6×, 1150 5×, 1200 5×, 250 4×, 550 4×, 450 3×, 1300 3×, 1250 2×, 500 1×, 1650 1×, 1750 1×, 2000 1×, 5000 1×.",
+      "zwischenwerte": "linear",
+      "zwischenwerte_wortlaut": "Das Dokument nennt keine Regel für Zwischenwerte. Der WFS-Datensatz führt die Tabelle mit stetigkeit = 1, nach VBORIS 2.0 „Interpolierbarkeit: … 1 = ja“ (S. 11, S. 49). Interpoliert wird linear zwischen den Stützstellen.",
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen oberhalb von 1200 m²."
+      },
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen unterhalb von 300 m²."
+      },
+      "pruefbeispiel": {
+        "wortlaut": "Beispiel: Bodenrichtwert 120, W f800; Fläche des Richtwertgrundstücks 800 m²; individuelle Grundstücksfläche 1000 m²; Bodenrichtwert (1000 m²) = 120 €/m² * 0,94 / 1,00 = rd. 113 €/m²",
+        "flaeche_qm": 1000,
+        "normgroesse_qm": 800,
+        "brw_eur_qm": 120,
+        "koeffizient": 0.94,
+        "koeffizient_objekt": 0.94,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 113,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 113 €/m²): 120 €/m² × 0,94 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
+        "seite": 1
+      }
+    },
+    "geltungsbereich": {
+      "nutzung": "gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden",
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "dhh",
+        "rh",
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "objektarten_hinweis": "Das Dokument nennt nur Ein- und Zweifamilienhausgrundstücke. Doppelhaushälften und Reihenhäuser nennt es nicht; sie stehen deshalb unter ausgeschlossen, statt stillschweigend mitzurechnen.",
+      "regelfall_wortlaut": [
+        "Der Bodenwert von Grundstücken wird neben der Lage auch von der Größe des Baugrundstücks beeinflusst. Die nachfolgende Tabelle enthält Umrechnungskoeffizienten für das Wertverhältnis von gleichartigen Ein- und Zweifamilienhausgrundstücken, die eine nicht teilbare Einheit bilden, bei unterschiedlichen Grundstücksflächen"
+      ],
+      "zuordnung": "je Bodenrichtwertzone (BORIS-NI, listeUmrechnungstabelle). In diesem Gebiet ist die Tabelle zonenabhängig; der Satz greift nur, wenn die Bodenrichtwertzone des Objekts eine dieser Tabellen-IDs führt.",
+      "nur_ueber_tabellen_id": true,
+      "bodenrichtwertzonen": {
+        "anzahl": 358,
+        "nutzungen": "WA 327×, WR 29×, WS 2×",
+        "normgroessen_qm": "750 42×, 800 40×, 1000 40×, 850 36×, 900 33×, 700 26×, 950 25×, 650 19×, 1050 15×, 1100 14×, 350 11×, 300 10×, 600 10×, 400 6×, 1150 5×, 1200 5×, 250 4×, 550 4×, 450 3×, 1300 3×, 1250 2×, 500 1×, 1650 1×, 1750 1×, 2000 1×, 5000 1×"
+      },
+      "boris_tabellen": [
+        "DENIBR5926UW0110"
+      ],
+      "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; die zur Bodenrichtwertzone gehörende Umrechnungstabelle zeigt BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Gutachterausschuss für Grundstückswerte Northeim, Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug, Umrechnungstabelle 0590110 (z. B. W f800), S. 1 (einzige Seite): Tabelle „Fläche in m² / Umrechnungskoeffizient“ 300 bis 1200 m² (10 Stützstellen), Geltung „gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden“, Anwendungsbeispiel",
+        "url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590110_Wflac.pdf"
+      },
+      {
+        "art": "maschinenlesbarer Datensatz",
+        "fundstelle": "WFS boris_2026_wfs, Feature-Typ boris:BR_UmrechnungstabelleWerte, gml:id DENIBR5926UW0110 (einflussgroesse FLAE, stetigkeit 1, umrechnungsart 1), abgerufen 16.10.2026; Werteliste Stelle für Stelle gleich dem Dokument",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR5926UW0110"
+      },
+      {
+        "art": "Zuordnung",
+        "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal (34.027 Zonen, Stichtag 2026-01-01, abgerufen 16.10.2026): im Gebiet 358 Bauland-Zonen der Art W/M mit Flächenangabe, davon 358 mit listeUmrechnungstabelle auf DENIBR5926UW0110; andere Zonen desselben Gebiets führen andere oder keine Flächentabelle – deshalb greift dieser Satz NUR über die Tabellen-ID der Bodenrichtwertzone"
+      },
+      {
+        "art": "Datenmodell",
+        "fundstelle": "AdV, VBORIS 2.0 Modellbeschreibung (Stand 17.09.2012), S. 11 und S. 49–50: stetigkeit „Interpolierbarkeit: 0 = nein (nur diskreter Parameter), 1 = ja“; umrechnungsart „1 = Umrechnungsfaktoren, 2 = Zu-/Abschläge“",
+        "url": "https://geodaten.leipzig.de/open_data/organisationseinheit/Amt_fuer_Geoinformation_und_Bodenordnung/Bodenrichtwerte/vboris-hauptdokument-2.0.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR5926UW0110",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590110_Wflac.pdf",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz_hinweis": "Lizenz und Vermerk wörtlich aus den Nutzungsbedingungen der Gutachterausschüsse Niedersachsen (www.gag.niedersachsen.de/startseite/bodenrichtwerte/nutzungsbedingungen/nutzungsbedingungen-197308.html, abgerufen 16.10.2026): „Die Bodenrichtwertanwendung kann gemäß den Nutzungsbestimmungen der Datenlizenz Deutschland – Namensnennung – Version 2.0 unter Angabe der Quelle © Oberer Gutachterausschuss für Grundstückswerte Niedersachsen [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben.“ Die Umrechnungstabellen gehören zur Bodenrichtwertanwendung (jede Bodenrichtwertzone verweist auf ihre Tabelle). Die WFS-Capabilities von boris_2026_wfs nennen dieselbe Lizenz (Fees: „Datenlizenz Deutschland Namensnennung 2.0“, quelle „© GDI-NI“). Das Tabellen-PDF selbst trägt keinen Lizenzvermerk.",
+    "fundstelle": "Gutachterausschuss für Grundstückswerte Northeim, Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug, Umrechnungstabelle 0590110 (z. B. W f800), S. 1; WFS boris_2026_wfs, BR_UmrechnungstabelleWerte DENIBR5926UW0110",
+    "stufe_grund": "Amtliche Tabelle des örtlich zuständigen Gutachterausschusses im BORIS-NI-Datensatz 2026, über die Bodenrichtwertzonen dem Gebiet zugeordnet; Anwendungsbeispiel im Dokument. Fallzahl nicht genannt.",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), nur Ein- und Zweifamilienhausgrundstücke.",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs + pdftotext, 16.10.2026)",
+    "belege_meta": {
+      "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0590110_Wflac)",
+      "abgerufen_am": "2026-10-16",
+      "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-05-26"
+    }
+  },
+  {
+    "land_code": "NI",
+    "ags": "03159",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Göttingen – nur Zonen mit Tabelle DENIBR5526UW0111",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Northeim",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_tabelle",
+      "bezug": "Bodenwert je m² = Bodenrichtwert × UK(Fläche des Bewertungsgrundstücks) / UK(Fläche des Richtwertgrundstücks)",
+      "bezug_wortlaut": "Beispiel: Bodenrichtwert 120, M f800; Fläche des Richtwertgrundstücks 800 m²; individuelle Grundstücksfläche 1200 m²; Bodenrichtwert (1200 m²) = 120 €/m² * 0,97 / 1,00 = rd. 116 €/m²",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine_tabelle_quotient",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 800,
+          "flaeche_qm": [
+            200,
+            400,
+            600,
+            800,
+            1000,
+            1200,
+            1400,
+            1600,
+            1800,
+            2000
+          ],
+          "koeffizient": [
+            1.09,
+            1.05,
+            1.02,
+            1,
+            0.98,
+            0.97,
+            0.95,
+            0.94,
+            0.93,
+            0.91
+          ]
+        }
+      },
+      "tabellen_hinweis": "Schlüssel „*“: eine Tabelle für jede Fläche des Richtwertgrundstücks. Die Normgröße steht nicht in der Tabelle, sondern an der Bodenrichtwertzone (BORIS-NI, Merkmal „f…“, im WFS boris:flaeche); das Dokument rechnet UK(Objekt) / UK(Richtwertgrundstück). Im Gebiet kommen diese Normgrößen vor (m², Zonen): 1000 155×, 800 24×, 700 17×, 500 9×, 600 4×, 400 3×, 1200 3×, 1500 1×.",
+      "zwischenwerte": "linear",
+      "zwischenwerte_wortlaut": "Das Dokument nennt keine Regel für Zwischenwerte. Der WFS-Datensatz führt die Tabelle mit stetigkeit = 1, nach VBORIS 2.0 „Interpolierbarkeit: … 1 = ja“ (S. 11, S. 49). Interpoliert wird linear zwischen den Stützstellen.",
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen oberhalb von 2000 m²."
+      },
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen unterhalb von 200 m²."
+      },
+      "pruefbeispiel": {
+        "wortlaut": "Beispiel: Bodenrichtwert 120, M f800; Fläche des Richtwertgrundstücks 800 m²; individuelle Grundstücksfläche 1200 m²; Bodenrichtwert (1200 m²) = 120 €/m² * 0,97 / 1,00 = rd. 116 €/m²",
+        "flaeche_qm": 1200,
+        "normgroesse_qm": 800,
+        "brw_eur_qm": 120,
+        "koeffizient": 0.97,
+        "koeffizient_objekt": 0.97,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 116,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²): 120 €/m² × 0,97 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
+        "seite": 1
+      }
+    },
+    "geltungsbereich": {
+      "nutzung": "gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden",
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "dhh",
+        "rh",
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "objektarten_hinweis": "Das Dokument nennt nur Ein- und Zweifamilienhausgrundstücke. Doppelhaushälften und Reihenhäuser nennt es nicht; sie stehen deshalb unter ausgeschlossen, statt stillschweigend mitzurechnen.",
+      "regelfall_wortlaut": [
+        "Der Bodenwert von Grundstücken wird neben der Lage auch von der Größe des Baugrundstücks beeinflusst. Die nachfolgende Tabelle enthält Umrechnungskoeffizienten für das Wertverhältnis von gleichartigen Ein- und Zweifamilienhausgrundstücken, die eine nicht teilbare Einheit bilden, bei unterschiedlichen Grundstücksflächen"
+      ],
+      "zuordnung": "je Bodenrichtwertzone (BORIS-NI, listeUmrechnungstabelle). In diesem Gebiet ist die Tabelle zonenabhängig; der Satz greift nur, wenn die Bodenrichtwertzone des Objekts eine dieser Tabellen-IDs führt.",
+      "nur_ueber_tabellen_id": true,
+      "bodenrichtwertzonen": {
+        "anzahl": 216,
+        "nutzungen": "M 163×, MI 38×, MD 14×, W 1×",
+        "normgroessen_qm": "1000 155×, 800 24×, 700 17×, 500 9×, 600 4×, 400 3×, 1200 3×, 1500 1×"
+      },
+      "boris_tabellen": [
+        "DENIBR5526UW0111"
+      ],
+      "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; die zur Bodenrichtwertzone gehörende Umrechnungstabelle zeigt BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Gutachterausschuss für Grundstückswerte Northeim, Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (M, MI, MD), Umrechnungstabelle 0590111, S. 1 (einzige Seite): Tabelle „Fläche in m² / Umrechnungskoeffizient“ 200 bis 2000 m² (10 Stützstellen), Geltung „gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden“, Anwendungsbeispiel",
+        "url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590111_Mflac.pdf"
+      },
+      {
+        "art": "maschinenlesbarer Datensatz",
+        "fundstelle": "WFS boris_2026_wfs, Feature-Typ boris:BR_UmrechnungstabelleWerte, gml:id DENIBR5526UW0111 (einflussgroesse FLAE, stetigkeit 1, umrechnungsart 1), abgerufen 16.10.2026; Werteliste Stelle für Stelle gleich dem Dokument",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR5526UW0111"
+      },
+      {
+        "art": "Zuordnung",
+        "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal (34.027 Zonen, Stichtag 2026-01-01, abgerufen 16.10.2026): im Gebiet 216 Bauland-Zonen der Art W/M mit Flächenangabe, davon 216 mit listeUmrechnungstabelle auf DENIBR5526UW0111; andere Zonen desselben Gebiets führen andere oder keine Flächentabelle – deshalb greift dieser Satz NUR über die Tabellen-ID der Bodenrichtwertzone"
+      },
+      {
+        "art": "Datenmodell",
+        "fundstelle": "AdV, VBORIS 2.0 Modellbeschreibung (Stand 17.09.2012), S. 11 und S. 49–50: stetigkeit „Interpolierbarkeit: 0 = nein (nur diskreter Parameter), 1 = ja“; umrechnungsart „1 = Umrechnungsfaktoren, 2 = Zu-/Abschläge“",
+        "url": "https://geodaten.leipzig.de/open_data/organisationseinheit/Amt_fuer_Geoinformation_und_Bodenordnung/Bodenrichtwerte/vboris-hauptdokument-2.0.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR5526UW0111",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590111_Mflac.pdf",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz_hinweis": "Lizenz und Vermerk wörtlich aus den Nutzungsbedingungen der Gutachterausschüsse Niedersachsen (www.gag.niedersachsen.de/startseite/bodenrichtwerte/nutzungsbedingungen/nutzungsbedingungen-197308.html, abgerufen 16.10.2026): „Die Bodenrichtwertanwendung kann gemäß den Nutzungsbestimmungen der Datenlizenz Deutschland – Namensnennung – Version 2.0 unter Angabe der Quelle © Oberer Gutachterausschuss für Grundstückswerte Niedersachsen [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben.“ Die Umrechnungstabellen gehören zur Bodenrichtwertanwendung (jede Bodenrichtwertzone verweist auf ihre Tabelle). Die WFS-Capabilities von boris_2026_wfs nennen dieselbe Lizenz (Fees: „Datenlizenz Deutschland Namensnennung 2.0“, quelle „© GDI-NI“). Das Tabellen-PDF selbst trägt keinen Lizenzvermerk.",
+    "fundstelle": "Gutachterausschuss für Grundstückswerte Northeim, Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (M, MI, MD), Umrechnungstabelle 0590111, S. 1; WFS boris_2026_wfs, BR_UmrechnungstabelleWerte DENIBR5526UW0111",
+    "stufe_grund": "Amtliche Tabelle des örtlich zuständigen Gutachterausschusses im BORIS-NI-Datensatz 2026, über die Bodenrichtwertzonen dem Gebiet zugeordnet; Anwendungsbeispiel im Dokument. Fallzahl nicht genannt.",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), nur Ein- und Zweifamilienhausgrundstücke.",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs + pdftotext, 16.10.2026)",
+    "belege_meta": {
+      "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0590111_Mflac)",
+      "abgerufen_am": "2026-10-16",
+      "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-05-26"
+    }
+  },
+  {
+    "land_code": "NI",
+    "ags": "03155",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Northeim – nur Zonen mit Tabelle DENIBR5926UW0111",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Northeim",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_tabelle",
+      "bezug": "Bodenwert je m² = Bodenrichtwert × UK(Fläche des Bewertungsgrundstücks) / UK(Fläche des Richtwertgrundstücks)",
+      "bezug_wortlaut": "Beispiel: Bodenrichtwert 120, M f800; Fläche des Richtwertgrundstücks 800 m²; individuelle Grundstücksfläche 1200 m²; Bodenrichtwert (1200 m²) = 120 €/m² * 0,97 / 1,00 = rd. 116 €/m²",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine_tabelle_quotient",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 800,
+          "flaeche_qm": [
+            200,
+            400,
+            600,
+            800,
+            1000,
+            1200,
+            1400,
+            1600,
+            1800,
+            2000
+          ],
+          "koeffizient": [
+            1.09,
+            1.05,
+            1.02,
+            1,
+            0.98,
+            0.97,
+            0.95,
+            0.94,
+            0.93,
+            0.91
+          ]
+        }
+      },
+      "tabellen_hinweis": "Schlüssel „*“: eine Tabelle für jede Fläche des Richtwertgrundstücks. Die Normgröße steht nicht in der Tabelle, sondern an der Bodenrichtwertzone (BORIS-NI, Merkmal „f…“, im WFS boris:flaeche); das Dokument rechnet UK(Objekt) / UK(Richtwertgrundstück). Im Gebiet kommen diese Normgrößen vor (m², Zonen): 1000 182×, 500 62×, 250 17×, 800 11×, 900 10×, 850 4×, 350 2×, 600 2×, 950 2×, 1100 2×, 1200 2×, 400 1×, 700 1×, 750 1×, 922 1×, 1150 1×.",
+      "zwischenwerte": "linear",
+      "zwischenwerte_wortlaut": "Das Dokument nennt keine Regel für Zwischenwerte. Der WFS-Datensatz führt die Tabelle mit stetigkeit = 1, nach VBORIS 2.0 „Interpolierbarkeit: … 1 = ja“ (S. 11, S. 49). Interpoliert wird linear zwischen den Stützstellen.",
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen oberhalb von 2000 m²."
+      },
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen unterhalb von 200 m²."
+      },
+      "pruefbeispiel": {
+        "wortlaut": "Beispiel: Bodenrichtwert 120, M f800; Fläche des Richtwertgrundstücks 800 m²; individuelle Grundstücksfläche 1200 m²; Bodenrichtwert (1200 m²) = 120 €/m² * 0,97 / 1,00 = rd. 116 €/m²",
+        "flaeche_qm": 1200,
+        "normgroesse_qm": 800,
+        "brw_eur_qm": 120,
+        "koeffizient": 0.97,
+        "koeffizient_objekt": 0.97,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 116,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²): 120 €/m² × 0,97 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
+        "seite": 1
+      }
+    },
+    "geltungsbereich": {
+      "nutzung": "gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden",
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "dhh",
+        "rh",
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "objektarten_hinweis": "Das Dokument nennt nur Ein- und Zweifamilienhausgrundstücke. Doppelhaushälften und Reihenhäuser nennt es nicht; sie stehen deshalb unter ausgeschlossen, statt stillschweigend mitzurechnen.",
+      "regelfall_wortlaut": [
+        "Der Bodenwert von Grundstücken wird neben der Lage auch von der Größe des Baugrundstücks beeinflusst. Die nachfolgende Tabelle enthält Umrechnungskoeffizienten für das Wertverhältnis von gleichartigen Ein- und Zweifamilienhausgrundstücken, die eine nicht teilbare Einheit bilden, bei unterschiedlichen Grundstücksflächen"
+      ],
+      "zuordnung": "je Bodenrichtwertzone (BORIS-NI, listeUmrechnungstabelle). In diesem Gebiet ist die Tabelle zonenabhängig; der Satz greift nur, wenn die Bodenrichtwertzone des Objekts eine dieser Tabellen-IDs führt.",
+      "nur_ueber_tabellen_id": true,
+      "bodenrichtwertzonen": {
+        "anzahl": 301,
+        "nutzungen": "MD 175×, MI 125×, MI ASB 1×",
+        "normgroessen_qm": "1000 182×, 500 62×, 250 17×, 800 11×, 900 10×, 850 4×, 350 2×, 600 2×, 950 2×, 1100 2×, 1200 2×, 400 1×, 700 1×, 750 1×, 922 1×, 1150 1×"
+      },
+      "boris_tabellen": [
+        "DENIBR5926UW0111"
+      ],
+      "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; die zur Bodenrichtwertzone gehörende Umrechnungstabelle zeigt BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Gutachterausschuss für Grundstückswerte Northeim, Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (M, MI, MD), Umrechnungstabelle 0590111, S. 1 (einzige Seite): Tabelle „Fläche in m² / Umrechnungskoeffizient“ 200 bis 2000 m² (10 Stützstellen), Geltung „gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden“, Anwendungsbeispiel",
+        "url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590111_Mflac.pdf"
+      },
+      {
+        "art": "maschinenlesbarer Datensatz",
+        "fundstelle": "WFS boris_2026_wfs, Feature-Typ boris:BR_UmrechnungstabelleWerte, gml:id DENIBR5926UW0111 (einflussgroesse FLAE, stetigkeit 1, umrechnungsart 1), abgerufen 16.10.2026; Werteliste Stelle für Stelle gleich dem Dokument",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR5926UW0111"
+      },
+      {
+        "art": "Zuordnung",
+        "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal (34.027 Zonen, Stichtag 2026-01-01, abgerufen 16.10.2026): im Gebiet 301 Bauland-Zonen der Art W/M mit Flächenangabe, davon 301 mit listeUmrechnungstabelle auf DENIBR5926UW0111; andere Zonen desselben Gebiets führen andere oder keine Flächentabelle – deshalb greift dieser Satz NUR über die Tabellen-ID der Bodenrichtwertzone"
+      },
+      {
+        "art": "Datenmodell",
+        "fundstelle": "AdV, VBORIS 2.0 Modellbeschreibung (Stand 17.09.2012), S. 11 und S. 49–50: stetigkeit „Interpolierbarkeit: 0 = nein (nur diskreter Parameter), 1 = ja“; umrechnungsart „1 = Umrechnungsfaktoren, 2 = Zu-/Abschläge“",
+        "url": "https://geodaten.leipzig.de/open_data/organisationseinheit/Amt_fuer_Geoinformation_und_Bodenordnung/Bodenrichtwerte/vboris-hauptdokument-2.0.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR5926UW0111",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590111_Mflac.pdf",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz_hinweis": "Lizenz und Vermerk wörtlich aus den Nutzungsbedingungen der Gutachterausschüsse Niedersachsen (www.gag.niedersachsen.de/startseite/bodenrichtwerte/nutzungsbedingungen/nutzungsbedingungen-197308.html, abgerufen 16.10.2026): „Die Bodenrichtwertanwendung kann gemäß den Nutzungsbestimmungen der Datenlizenz Deutschland – Namensnennung – Version 2.0 unter Angabe der Quelle © Oberer Gutachterausschuss für Grundstückswerte Niedersachsen [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben.“ Die Umrechnungstabellen gehören zur Bodenrichtwertanwendung (jede Bodenrichtwertzone verweist auf ihre Tabelle). Die WFS-Capabilities von boris_2026_wfs nennen dieselbe Lizenz (Fees: „Datenlizenz Deutschland Namensnennung 2.0“, quelle „© GDI-NI“). Das Tabellen-PDF selbst trägt keinen Lizenzvermerk.",
+    "fundstelle": "Gutachterausschuss für Grundstückswerte Northeim, Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (M, MI, MD), Umrechnungstabelle 0590111, S. 1; WFS boris_2026_wfs, BR_UmrechnungstabelleWerte DENIBR5926UW0111",
+    "stufe_grund": "Amtliche Tabelle des örtlich zuständigen Gutachterausschusses im BORIS-NI-Datensatz 2026, über die Bodenrichtwertzonen dem Gebiet zugeordnet; Anwendungsbeispiel im Dokument. Fallzahl nicht genannt.",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), nur Ein- und Zweifamilienhausgrundstücke.",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs + pdftotext, 16.10.2026)",
+    "belege_meta": {
+      "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0590111_Mflac)",
+      "abgerufen_am": "2026-10-16",
+      "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-05-26"
+    }
+  },
+  {
+    "land_code": "NI",
+    "ags": "03159",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Göttingen – nur Zonen mit Tabelle DENIBR6026UW0111",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Northeim",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_tabelle",
+      "bezug": "Bodenwert je m² = Bodenrichtwert × UK(Fläche des Bewertungsgrundstücks) / UK(Fläche des Richtwertgrundstücks)",
+      "bezug_wortlaut": "Beispiel: Bodenrichtwert 120, M f800; Fläche des Richtwertgrundstücks 800 m²; individuelle Grundstücksfläche 1200 m²; Bodenrichtwert (1200 m²) = 120 €/m² * 0,97 / 1,00 = rd. 116 €/m²",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine_tabelle_quotient",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 800,
+          "flaeche_qm": [
+            200,
+            400,
+            600,
+            800,
+            1000,
+            1200,
+            1400,
+            1600,
+            1800,
+            2000
+          ],
+          "koeffizient": [
+            1.09,
+            1.05,
+            1.02,
+            1,
+            0.98,
+            0.97,
+            0.95,
+            0.94,
+            0.93,
+            0.91
+          ]
+        }
+      },
+      "tabellen_hinweis": "Schlüssel „*“: eine Tabelle für jede Fläche des Richtwertgrundstücks. Die Normgröße steht nicht in der Tabelle, sondern an der Bodenrichtwertzone (BORIS-NI, Merkmal „f…“, im WFS boris:flaeche); das Dokument rechnet UK(Objekt) / UK(Richtwertgrundstück). Im Gebiet kommen diese Normgrößen vor (m², Zonen): 700 24×, 800 18×, 1000 15×, 400 5×, 600 5×, 300 3×, 500 3×, 1100 3×, 2000 1×, 3000 1×, 4000 1×, 7000 1×.",
+      "zwischenwerte": "linear",
+      "zwischenwerte_wortlaut": "Das Dokument nennt keine Regel für Zwischenwerte. Der WFS-Datensatz führt die Tabelle mit stetigkeit = 1, nach VBORIS 2.0 „Interpolierbarkeit: … 1 = ja“ (S. 11, S. 49). Interpoliert wird linear zwischen den Stützstellen.",
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen oberhalb von 2000 m²."
+      },
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Das Dokument nennt keine Regel für Flächen unterhalb von 200 m²."
+      },
+      "pruefbeispiel": {
+        "wortlaut": "Beispiel: Bodenrichtwert 120, M f800; Fläche des Richtwertgrundstücks 800 m²; individuelle Grundstücksfläche 1200 m²; Bodenrichtwert (1200 m²) = 120 €/m² * 0,97 / 1,00 = rd. 116 €/m²",
+        "flaeche_qm": 1200,
+        "normgroesse_qm": 800,
+        "brw_eur_qm": 120,
+        "koeffizient": 0.97,
+        "koeffizient_objekt": 0.97,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 116,
+        "rundung_eur_qm": 1,
+        "bodenwert_hinweis": "Das Dokument druckt nur den Bodenwert je m² (rd. 116 €/m²): 120 €/m² × 0,97 / 1,00. Geprüft wird dieser Wert je m² (auf 1 € gerundet) und beide Einzelkoeffizienten gegen die Tabelle.",
+        "seite": 1
+      }
+    },
+    "geltungsbereich": {
+      "nutzung": "gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden",
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "dhh",
+        "rh",
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "objektarten_hinweis": "Das Dokument nennt nur Ein- und Zweifamilienhausgrundstücke. Doppelhaushälften und Reihenhäuser nennt es nicht; sie stehen deshalb unter ausgeschlossen, statt stillschweigend mitzurechnen.",
+      "regelfall_wortlaut": [
+        "Der Bodenwert von Grundstücken wird neben der Lage auch von der Größe des Baugrundstücks beeinflusst. Die nachfolgende Tabelle enthält Umrechnungskoeffizienten für das Wertverhältnis von gleichartigen Ein- und Zweifamilienhausgrundstücken, die eine nicht teilbare Einheit bilden, bei unterschiedlichen Grundstücksflächen"
+      ],
+      "zuordnung": "je Bodenrichtwertzone (BORIS-NI, listeUmrechnungstabelle). In diesem Gebiet ist die Tabelle zonenabhängig; der Satz greift nur, wenn die Bodenrichtwertzone des Objekts eine dieser Tabellen-IDs führt.",
+      "nur_ueber_tabellen_id": true,
+      "bodenrichtwertzonen": {
+        "anzahl": 80,
+        "nutzungen": "MI 50×, MD 30×",
+        "normgroessen_qm": "700 24×, 800 18×, 1000 15×, 400 5×, 600 5×, 300 3×, 500 3×, 1100 3×, 2000 1×, 3000 1×, 4000 1×, 7000 1×"
+      },
+      "boris_tabellen": [
+        "DENIBR6026UW0111"
+      ],
+      "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; die zur Bodenrichtwertzone gehörende Umrechnungstabelle zeigt BORIS-NI (https://immobilienmarkt.niedersachsen.de)"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Gutachterausschuss für Grundstückswerte Northeim, Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (M, MI, MD), Umrechnungstabelle 0590111, S. 1 (einzige Seite): Tabelle „Fläche in m² / Umrechnungskoeffizient“ 200 bis 2000 m² (10 Stützstellen), Geltung „gleichartige Ein- und Zweifamilienhausgrundstücke, die eine nicht teilbare Einheit bilden“, Anwendungsbeispiel",
+        "url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590111_Mflac.pdf"
+      },
+      {
+        "art": "maschinenlesbarer Datensatz",
+        "fundstelle": "WFS boris_2026_wfs, Feature-Typ boris:BR_UmrechnungstabelleWerte, gml:id DENIBR6026UW0111 (einflussgroesse FLAE, stetigkeit 1, umrechnungsart 1), abgerufen 16.10.2026; Werteliste Stelle für Stelle gleich dem Dokument",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR6026UW0111"
+      },
+      {
+        "art": "Zuordnung",
+        "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal (34.027 Zonen, Stichtag 2026-01-01, abgerufen 16.10.2026): im Gebiet 80 Bauland-Zonen der Art W/M mit Flächenangabe, davon 80 mit listeUmrechnungstabelle auf DENIBR6026UW0111; andere Zonen desselben Gebiets führen andere oder keine Flächentabelle – deshalb greift dieser Satz NUR über die Tabellen-ID der Bodenrichtwertzone"
+      },
+      {
+        "art": "Datenmodell",
+        "fundstelle": "AdV, VBORIS 2.0 Modellbeschreibung (Stand 17.09.2012), S. 11 und S. 49–50: stetigkeit „Interpolierbarkeit: 0 = nein (nur diskreter Parameter), 1 = ja“; umrechnungsart „1 = Umrechnungsfaktoren, 2 = Zu-/Abschläge“",
+        "url": "https://geodaten.leipzig.de/open_data/organisationseinheit/Amt_fuer_Geoinformation_und_Bodenordnung/Bodenrichtwerte/vboris-hauptdokument-2.0.pdf"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR6026UW0111",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590111_Mflac.pdf",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz_hinweis": "Lizenz und Vermerk wörtlich aus den Nutzungsbedingungen der Gutachterausschüsse Niedersachsen (www.gag.niedersachsen.de/startseite/bodenrichtwerte/nutzungsbedingungen/nutzungsbedingungen-197308.html, abgerufen 16.10.2026): „Die Bodenrichtwertanwendung kann gemäß den Nutzungsbestimmungen der Datenlizenz Deutschland – Namensnennung – Version 2.0 unter Angabe der Quelle © Oberer Gutachterausschuss für Grundstückswerte Niedersachsen [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben.“ Die Umrechnungstabellen gehören zur Bodenrichtwertanwendung (jede Bodenrichtwertzone verweist auf ihre Tabelle). Die WFS-Capabilities von boris_2026_wfs nennen dieselbe Lizenz (Fees: „Datenlizenz Deutschland Namensnennung 2.0“, quelle „© GDI-NI“). Das Tabellen-PDF selbst trägt keinen Lizenzvermerk.",
+    "fundstelle": "Gutachterausschuss für Grundstückswerte Northeim, Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (M, MI, MD), Umrechnungstabelle 0590111, S. 1; WFS boris_2026_wfs, BR_UmrechnungstabelleWerte DENIBR6026UW0111",
+    "stufe_grund": "Amtliche Tabelle des örtlich zuständigen Gutachterausschusses im BORIS-NI-Datensatz 2026, über die Bodenrichtwertzonen dem Gebiet zugeordnet; Anwendungsbeispiel im Dokument. Fallzahl nicht genannt.",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), nur Ein- und Zweifamilienhausgrundstücke.",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs + pdftotext, 16.10.2026)",
+    "belege_meta": {
+      "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0590111_Mflac)",
+      "abgerufen_am": "2026-10-16",
+      "datenstand_wfs": "Jahrgang 2026, Stichtag 2026-01-01, Tabelle beginnt 2026-05-26"
+    }
+  },
+  {
+    "land_code": "NI",
+    "ags": "03153",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Goslar – nur Zonen mit Tabelle DENIBR0326UW2024",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Northeim",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Die Bodenrichtwertzone verweist auf die Umrechnungstabelle 0592024_ASBflac. Dort heißt es: „Die Abhängigkeit des Quadratmeterpreises von der Flächengröße wurde nicht untersucht. Sowohl der Einfluß der Flächengröße als auch der Umfang der als Baugrundstück zu definierenden Fläche sind jeweils für den Einzelfall sachverständig zu beurteilen.“ (Gutachterausschuss für Grundstückswerte Northeim, Umrechnungstabelle 0592024, „Bodenrichtwerte mit der Ergänzung zur Art der baulichen Nutzung „Außenbereich“ mit Flächenbezug (z. B. M ASB f1500)“, S. 1) Ein Umrechnungskoeffizient für die Grundstücksgröße liegt damit nicht vor. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte Northeim (www.gag.niedersachsen.de), Tabelle der Zone in BORIS-NI (https://immobilienmarkt.niedersachsen.de).",
+    "formel": null,
+    "geltungsbereich": {
+      "nur_ueber_tabellen_id": true,
+      "boris_tabellen": [
+        "DENIBR0326UW2024"
+      ],
+      "zuordnung": "nur Bodenrichtwertzonen, die diese Tabellen-ID führen"
+    },
+    "belege": [
+      {
+        "art": "Messung",
+        "fundstelle": "WFS boris_2026_wfs, BR_UmrechnungstabelleWerte gml:id DENIBR0326UW2024 (FLAE, Werteliste 500:1 1500:1 3000:1); zugeordnet 45 Bodenrichtwertzonen (M ASB 45×); Dokument 0592024_ASBflac, S. 1",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR0326UW2024",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs, 16.10.2026)",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
+    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0592024_ASBflac.pdf"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03159",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Göttingen – nur Zonen mit Tabelle DENIBR5526UW2024",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Northeim",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Die Bodenrichtwertzone verweist auf die Umrechnungstabelle 0592024_ASBflac. Dort heißt es: „Die Abhängigkeit des Quadratmeterpreises von der Flächengröße wurde nicht untersucht. Sowohl der Einfluß der Flächengröße als auch der Umfang der als Baugrundstück zu definierenden Fläche sind jeweils für den Einzelfall sachverständig zu beurteilen.“ (Gutachterausschuss für Grundstückswerte Northeim, Umrechnungstabelle 0592024, „Bodenrichtwerte mit der Ergänzung zur Art der baulichen Nutzung „Außenbereich“ mit Flächenbezug (z. B. M ASB f1500)“, S. 1) Ein Umrechnungskoeffizient für die Grundstücksgröße liegt damit nicht vor. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte Northeim (www.gag.niedersachsen.de), Tabelle der Zone in BORIS-NI (https://immobilienmarkt.niedersachsen.de).",
+    "formel": null,
+    "geltungsbereich": {
+      "nur_ueber_tabellen_id": true,
+      "boris_tabellen": [
+        "DENIBR5526UW2024"
+      ],
+      "zuordnung": "nur Bodenrichtwertzonen, die diese Tabellen-ID führen"
+    },
+    "belege": [
+      {
+        "art": "Messung",
+        "fundstelle": "WFS boris_2026_wfs, BR_UmrechnungstabelleWerte gml:id DENIBR5526UW2024 (FLAE, Werteliste 500:1 1500:1 3000:1); zugeordnet 67 Bodenrichtwertzonen (M ASB 66×, MI ASB 1×); Dokument 0592024_ASBflac, S. 1",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR5526UW2024",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs, 16.10.2026)",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
+    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0592024_ASBflac.pdf"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03255",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Holzminden – nur Zonen mit Tabelle DENIBR5726UW2024",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Northeim",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Die Bodenrichtwertzone verweist auf die Umrechnungstabelle 0592024_ASBflac. Dort heißt es: „Die Abhängigkeit des Quadratmeterpreises von der Flächengröße wurde nicht untersucht. Sowohl der Einfluß der Flächengröße als auch der Umfang der als Baugrundstück zu definierenden Fläche sind jeweils für den Einzelfall sachverständig zu beurteilen.“ (Gutachterausschuss für Grundstückswerte Northeim, Umrechnungstabelle 0592024, „Bodenrichtwerte mit der Ergänzung zur Art der baulichen Nutzung „Außenbereich“ mit Flächenbezug (z. B. M ASB f1500)“, S. 1) Ein Umrechnungskoeffizient für die Grundstücksgröße liegt damit nicht vor. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte Northeim (www.gag.niedersachsen.de), Tabelle der Zone in BORIS-NI (https://immobilienmarkt.niedersachsen.de).",
+    "formel": null,
+    "geltungsbereich": {
+      "nur_ueber_tabellen_id": true,
+      "boris_tabellen": [
+        "DENIBR5726UW2024"
+      ],
+      "zuordnung": "nur Bodenrichtwertzonen, die diese Tabellen-ID führen"
+    },
+    "belege": [
+      {
+        "art": "Messung",
+        "fundstelle": "WFS boris_2026_wfs, BR_UmrechnungstabelleWerte gml:id DENIBR5726UW2024 (FLAE, Werteliste 500:1 1500:1 3000:1); zugeordnet 94 Bodenrichtwertzonen (M ASB 94×); Dokument 0592024_ASBflac, S. 1",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR5726UW2024",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs, 16.10.2026)",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
+    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0592024_ASBflac.pdf"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03155",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Northeim – nur Zonen mit Tabelle DENIBR5926UW2024",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Northeim",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Die Bodenrichtwertzone verweist auf die Umrechnungstabelle 0592024_ASBflac. Dort heißt es: „Die Abhängigkeit des Quadratmeterpreises von der Flächengröße wurde nicht untersucht. Sowohl der Einfluß der Flächengröße als auch der Umfang der als Baugrundstück zu definierenden Fläche sind jeweils für den Einzelfall sachverständig zu beurteilen.“ (Gutachterausschuss für Grundstückswerte Northeim, Umrechnungstabelle 0592024, „Bodenrichtwerte mit der Ergänzung zur Art der baulichen Nutzung „Außenbereich“ mit Flächenbezug (z. B. M ASB f1500)“, S. 1) Ein Umrechnungskoeffizient für die Grundstücksgröße liegt damit nicht vor. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte Northeim (www.gag.niedersachsen.de), Tabelle der Zone in BORIS-NI (https://immobilienmarkt.niedersachsen.de).",
+    "formel": null,
+    "geltungsbereich": {
+      "nur_ueber_tabellen_id": true,
+      "boris_tabellen": [
+        "DENIBR5926UW2024"
+      ],
+      "zuordnung": "nur Bodenrichtwertzonen, die diese Tabellen-ID führen"
+    },
+    "belege": [
+      {
+        "art": "Messung",
+        "fundstelle": "WFS boris_2026_wfs, BR_UmrechnungstabelleWerte gml:id DENIBR5926UW2024 (FLAE, Werteliste 500:1 1500:1 3000:1); zugeordnet 178 Bodenrichtwertzonen (M ASB 177×, MD ASB 1×); Dokument 0592024_ASBflac, S. 1",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR5926UW2024",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs, 16.10.2026)",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
+    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0592024_ASBflac.pdf"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03153",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Goslar – nur Zonen mit Tabelle DENIBR0326UW0113",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Northeim",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Die Bodenrichtwertzone verweist auf die Umrechnungstabelle 0590113_SOflac. Dort heißt es: „Es wurden keine Umrechnungstabellen für unterschiedliche Grundstücksflächen ermittelt. Als Bezug ist die typische Flächengröße angegeben.“ (Gutachterausschuss für Grundstückswerte Northeim, Umrechnungstabelle 0590113, Bodenrichtwerte mit Flächenbezug z. B. SO f2000, S. 1) Ein Umrechnungskoeffizient für die Grundstücksgröße liegt damit nicht vor. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte Northeim (www.gag.niedersachsen.de), Tabelle der Zone in BORIS-NI (https://immobilienmarkt.niedersachsen.de).",
+    "formel": null,
+    "geltungsbereich": {
+      "nur_ueber_tabellen_id": true,
+      "boris_tabellen": [
+        "DENIBR0326UW0113"
+      ],
+      "zuordnung": "nur Bodenrichtwertzonen, die diese Tabellen-ID führen"
+    },
+    "belege": [
+      {
+        "art": "Messung",
+        "fundstelle": "WFS boris_2026_wfs, BR_UmrechnungstabelleWerte gml:id DENIBR0326UW0113 (FLAE, Werteliste 200:1 400:1 600:1 800:1 1000:1 1200:1 1400:1 1600:1 1800:1 2000:1); zugeordnet 2 Bodenrichtwertzonen (MI 1×, SO 1×); Dokument 0590113_SOflac, S. 1",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR0326UW0113",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs, 16.10.2026)",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
+    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590113_SOflac.pdf"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03155",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Northeim – nur Zonen mit Tabelle DENIBR5926UW0112",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Northeim",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Die Bodenrichtwertzone verweist auf die Umrechnungstabelle 0590112_MKflac. Dort heißt es: „Für Baugrundstücke in Kerngebieten (MK) wurden keine Umrechnungstabellen für unterschiedliche Grundstücksflächen ermittelt, als Bezug ist die typische Flächengröße angegeben.“ (Gutachterausschuss für Grundstückswerte Northeim, Umrechnungstabelle 0590112, S. 1) Ein Umrechnungskoeffizient für die Grundstücksgröße liegt damit nicht vor. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte Northeim (www.gag.niedersachsen.de), Tabelle der Zone in BORIS-NI (https://immobilienmarkt.niedersachsen.de).",
+    "formel": null,
+    "geltungsbereich": {
+      "nur_ueber_tabellen_id": true,
+      "boris_tabellen": [
+        "DENIBR5926UW0112"
+      ],
+      "zuordnung": "nur Bodenrichtwertzonen, die diese Tabellen-ID führen"
+    },
+    "belege": [
+      {
+        "art": "Messung",
+        "fundstelle": "WFS boris_2026_wfs, BR_UmrechnungstabelleWerte gml:id DENIBR5926UW0112 (FLAE, Werteliste 200:1 400:1 600:1 800:1 1000:1 1200:1 1400:1 1600:1 1800:1 2000:1); zugeordnet 47 Bodenrichtwertzonen (MK 44×, WB 3×); Dokument 0590112_MKflac, S. 1",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR5926UW0112",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs, 16.10.2026)",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
+    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590112_MKflac.pdf"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03159",
+    "ebene": "kreis",
+    "gebiet_name": "Landkreis Göttingen – nur Zonen mit Tabelle DENIBR6026UW0112",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Northeim",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Die Bodenrichtwertzone verweist auf die Umrechnungstabelle 0590112_MKflac. Dort heißt es: „Für Baugrundstücke in Kerngebieten (MK) wurden keine Umrechnungstabellen für unterschiedliche Grundstücksflächen ermittelt, als Bezug ist die typische Flächengröße angegeben.“ (Gutachterausschuss für Grundstückswerte Northeim, Umrechnungstabelle 0590112, S. 1) Ein Umrechnungskoeffizient für die Grundstücksgröße liegt damit nicht vor. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte Northeim (www.gag.niedersachsen.de), Tabelle der Zone in BORIS-NI (https://immobilienmarkt.niedersachsen.de).",
+    "formel": null,
+    "geltungsbereich": {
+      "nur_ueber_tabellen_id": true,
+      "boris_tabellen": [
+        "DENIBR6026UW0112"
+      ],
+      "zuordnung": "nur Bodenrichtwertzonen, die diese Tabellen-ID führen"
+    },
+    "belege": [
+      {
+        "art": "Messung",
+        "fundstelle": "WFS boris_2026_wfs, BR_UmrechnungstabelleWerte gml:id DENIBR6026UW0112 (FLAE, Werteliste 200:1 400:1 600:1 800:1 1000:1 1200:1 1400:1 1600:1 1800:1 2000:1); zugeordnet 16 Bodenrichtwertzonen (MK 16×); Dokument 0590112_MKflac, S. 1",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR6026UW0112",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs, 16.10.2026)",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
+    "weg": "Gutachterausschuss für Grundstückswerte Northeim, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0590112_MKflac.pdf"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03241",
+    "ebene": "kreis",
+    "gebiet_name": "Region Hannover – nur Zonen mit Tabelle DENIBR4326UW0094",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Die Bodenrichtwertzone verweist auf die Umrechnungstabelle 0430094_flae_asb. Dort heißt es: „Bei den bebauten Grundstücken im Außenbereich der ausgewählten Bodenrichtwertzone konnte keine Flächenabhängigkeit ermittelt werden. Der Bodenrichtwert bezieht sich ausschließlich auf die zum Wohnen genutzten Grundstücksflächen. … Überschießende Freiflächen können im Außenbereich regelmäßig nicht baulich genutzt werden und müssen daher gesondert betrachtet werden.“ (Umrechnungstabelle 0430094, Bodenrichtwerte im Außenbereich mit Flächenbezug, S. 1). Ein Koeffizient 1,00 würde die Freifläche zum vollen Richtwert ansetzen, was das Dokument ausdrücklich ausschließt. Ein Umrechnungskoeffizient für die Grundstücksgröße liegt damit nicht vor. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte Hameln-Hannover (www.gag.niedersachsen.de), Tabelle der Zone in BORIS-NI (https://immobilienmarkt.niedersachsen.de).",
+    "formel": null,
+    "geltungsbereich": {
+      "nur_ueber_tabellen_id": true,
+      "boris_tabellen": [
+        "DENIBR4326UW0094"
+      ],
+      "zuordnung": "nur Bodenrichtwertzonen, die diese Tabellen-ID führen"
+    },
+    "belege": [
+      {
+        "art": "Messung",
+        "fundstelle": "WFS boris_2026_wfs, BR_UmrechnungstabelleWerte gml:id DENIBR4326UW0094 (FLAE, Werteliste 500:1 1000:1 1500:1); zugeordnet 104 Bodenrichtwertzonen (W ASB 98×, M ASB 6×); Dokument 0430094_flae_asb, S. 1",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR4326UW0094",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs, 16.10.2026)",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
+    "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0430094_flae_asb.pdf"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03241",
+    "ebene": "kreis",
+    "gebiet_name": "Region Hannover – nur Zonen mit Tabelle DENIBR4326UW0096",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Die Bodenrichtwertzone verweist auf die Umrechnungstabelle 0430096_flae_g1. Dort heißt es: „Bei den Gewerbegrundstücken der ausgewählten Bodenrichtwertzone konnte keine Flächenabhängigkeit ermittelt werden.“ (Umrechnungstabelle 0430096, S. 1) Ein Umrechnungskoeffizient für die Grundstücksgröße liegt damit nicht vor. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte Hameln-Hannover (www.gag.niedersachsen.de), Tabelle der Zone in BORIS-NI (https://immobilienmarkt.niedersachsen.de).",
+    "formel": null,
+    "geltungsbereich": {
+      "nur_ueber_tabellen_id": true,
+      "boris_tabellen": [
+        "DENIBR4326UW0096"
+      ],
+      "zuordnung": "nur Bodenrichtwertzonen, die diese Tabellen-ID führen"
+    },
+    "belege": [
+      {
+        "art": "Messung",
+        "fundstelle": "WFS boris_2026_wfs, BR_UmrechnungstabelleWerte gml:id DENIBR4326UW0096 (FLAE, Werteliste 2000:1 5000:1 10000:1 20000:1 30000:1 40000:1); zugeordnet 1 Bodenrichtwertzonen (G 1×); Dokument 0430096_flae_g1, S. 1",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR4326UW0096",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs, 16.10.2026)",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
+    "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0430096_flae_g1.pdf"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03241",
+    "ebene": "kreis",
+    "gebiet_name": "Region Hannover – nur Zonen mit Tabelle DENIBR4326UW0097",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Die Bodenrichtwertzone verweist auf die Umrechnungstabelle 0430097_flae_g2. Dort heißt es: „Bei den Gewerbegrundstücken der ausgewählten Bodenrichtwertzone konnte keine Flächenabhängigkeit ermittelt werden.“ (Umrechnungstabelle 0430097, S. 1) Ein Umrechnungskoeffizient für die Grundstücksgröße liegt damit nicht vor. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte Hameln-Hannover (www.gag.niedersachsen.de), Tabelle der Zone in BORIS-NI (https://immobilienmarkt.niedersachsen.de).",
+    "formel": null,
+    "geltungsbereich": {
+      "nur_ueber_tabellen_id": true,
+      "boris_tabellen": [
+        "DENIBR4326UW0097"
+      ],
+      "zuordnung": "nur Bodenrichtwertzonen, die diese Tabellen-ID führen"
+    },
+    "belege": [
+      {
+        "art": "Messung",
+        "fundstelle": "WFS boris_2026_wfs, BR_UmrechnungstabelleWerte gml:id DENIBR4326UW0097 (FLAE, Werteliste 40000:1 50000:1 60000:1 70000:1 80000:1 90000:1); zugeordnet 1 Bodenrichtwertzonen (G 1×); Dokument 0430097_flae_g2, S. 1",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR4326UW0097",
+    "quelle_parser": "v2281b-ni (WFS boris_2026_wfs, 16.10.2026)",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "fundstelle": "WFS boris_2026_wfs, boris:BR_BodenrichtwertZonal und BR_UmrechnungstabelleWerte (Jahrgang 2026), abgerufen 16.10.2026",
+    "weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de; Bodenrichtwertzone und zugeordnete Umrechnungstabelle in BORIS-NI (https://immobilienmarkt.niedersachsen.de)",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0430097_flae_g2.pdf"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03241",
+    "ebene": "kreis",
+    "gebiet_name": "Region Hannover – nur Zonen mit Tabelle DENIBR4326UW0093",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_eins",
+      "spanne_qm": [
+        200,
+        1000
+      ],
+      "wortlaut": "„Der Bodenwert von Grundstücken des individuellen Wohnungsbaus wird neben der Lage häufig auch von der Größe des Baugrundstücks beeinflusst. Bei den Baugrundstücken der ausgewählten Bodenrichtwertzone wurde keine Flächenabhängigkeit festgestellt.“ (Umrechnungstabelle 0430093, S. 1)",
+      "spanne_hinweis": "Spanne aus der WFS-Werteliste (200 bis 1000 m², überall 1,00); das Dokument selbst nennt keine Spanne."
+    },
+    "geltungsbereich": {
+      "nutzung": "individueller Wohnungsbau",
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "dhh",
+        "rh",
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "nur_ueber_tabellen_id": true,
+      "boris_tabellen": [
+        "DENIBR4326UW0093"
+      ],
+      "zuordnung": "nur Bodenrichtwertzonen, die diese Tabellen-ID führen",
+      "bodenrichtwertzonen": {
+        "anzahl": 2,
+        "nutzungen": "W EFH 2×",
+        "normgroessen_qm": "200 1×, 300 1×"
+      },
+      "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, www.gag.niedersachsen.de"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Umrechnungstabelle 0430093, S. 1: „wurde keine Flächenabhängigkeit festgestellt“",
+        "url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0430093_flac.pdf"
+      },
+      {
+        "art": "maschinenlesbarer Datensatz",
+        "fundstelle": "WFS boris_2026_wfs, BR_UmrechnungstabelleWerte gml:id DENIBR4326UW0093, Werteliste 200–1000 m² je 1,00, abgerufen 16.10.2026",
+        "url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR4326UW0093"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://opendata.lgln.niedersachsen.de/doorman/noauth/boris_2026_wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=boris:BR_UmrechnungstabelleWerte&RESOURCEID=DENIBR4326UW0093",
+    "quelle_dokument_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/0430093_flac.pdf",
+    "lizenz": "dl-de/by-2-0",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz_hinweis": "Lizenz und Vermerk wörtlich aus den Nutzungsbedingungen der Gutachterausschüsse Niedersachsen (www.gag.niedersachsen.de/startseite/bodenrichtwerte/nutzungsbedingungen/nutzungsbedingungen-197308.html, abgerufen 16.10.2026): „Die Bodenrichtwertanwendung kann gemäß den Nutzungsbestimmungen der Datenlizenz Deutschland – Namensnennung – Version 2.0 unter Angabe der Quelle © Oberer Gutachterausschuss für Grundstückswerte Niedersachsen [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben.“ Die Umrechnungstabellen gehören zur Bodenrichtwertanwendung (jede Bodenrichtwertzone verweist auf ihre Tabelle). Die WFS-Capabilities von boris_2026_wfs nennen dieselbe Lizenz (Fees: „Datenlizenz Deutschland Namensnennung 2.0“, quelle „© GDI-NI“). Das Tabellen-PDF selbst trägt keinen Lizenzvermerk.",
+    "fundstelle": "Umrechnungstabelle 0430093, S. 1; WFS boris_2026_wfs, BR_UmrechnungstabelleWerte DENIBR4326UW0093",
+    "stufe_grund": "Amtliche Feststellung des Ausschusses für die zugeordneten Zonen.",
+    "quelle_parser": "v2284-ni (WFS boris_2026_wfs + pdftotext, 16.10.2026)",
+    "belege_meta": {
+      "dokument": "Umrechnungskoeffizienten für Bodenrichtwerte mit Flächenbezug (0430093_flac)",
+      "abgerufen_am": "2026-10-16"
     }
   }
 ]
