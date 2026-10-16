@@ -4653,26 +4653,35 @@
   "kennzahl": "umrechnungskoeffizient_flaeche",
   "zweig": "ifw",
   "vollstaendig": false,
-  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern keine Erläuterung zu den Bodenrichtwerten 2026 verlinkt. Gesucht am 2026-10-16: Feld „listeumrechnungstabellen“ der Bodenrichtwertzonen im WMS von BORIS-Bayern (leer bzw. „Keine Angabe“), der Mandantenpfad boris-bayern.de/mandanten/…/2026_2028/erlaeuterung.pdf (HTTP 404) und eine Websuche. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Roth; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "warum_kein_wert": "Für die Bodenrichtwerte 2026 ist über BORIS-Bayern keine Erläuterung verlinkt (boris-bayern.de/mandanten/roth/2026_2028/erlaeuterung.pdf (HTTP 404)). Unter dem Jahrgang 2024–2026 liegt nur eine Übersicht der land- und forstwirtschaftlichen Bodenrichtwerte 01.01.2024 (2 Seiten) – ohne Bauland und ohne Umrechnung. Die Seiten des Landratsamts (landratsamt-roth.de) sind ohne Skript nicht lesbar; die Websuche fand nur den Marktbericht 2018. Gesucht am 2026-10-16. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Roth, Landratsamt Roth; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "sperre_grund": "kein_dokument",
   "formel": null,
   "geltungsbereich": null,
-  "belege": [],
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Bodenrichtwerte zum Stand 01.01.2024, Landkreis Roth – Landwirtschaft und Forst (BORIS-Bayern)",
+    "fundstelle": "Volltext, alle 2 PDF-Seiten durchsucht",
+    "url": "https://www.boris-bayern.de/mandanten/roth/2024_2026/erlaeuterung.pdf",
+    "wortlaut": null
+   }
+  ],
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
   "stichtag": "2026-01-01",
   "berichtsjahr": 2026,
-  "quelle_url": "https://www.gutachterausschuesse-bayern.de/",
+  "quelle_url": "https://www.boris-bayern.de/mandanten/roth/2024_2026/erlaeuterung.pdf",
   "lizenz": "kein Wert - Lizenz nicht einschlägig",
   "quellenvermerk": "Gutachterausschuss des Landkreises Roth, Bodenrichtwerte 2026",
-  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Roth; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Roth, Landratsamt Roth; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "belege_meta": {
    "abgerufen_am": "2026-10-16",
    "seitenzaehlung": "PDF-Seite (nicht Druckseite)"
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Roth, Bodenrichtwerte 2026",
-  "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
+  "modellansaetze": {},
+  "fundstelle": "Volltext, alle 2 PDF-Seiten durchsucht"
  },
  {
   "land_code": "BY",
@@ -4684,26 +4693,43 @@
   "kennzahl": "umrechnungskoeffizient_flaeche",
   "zweig": "ifw",
   "vollstaendig": false,
-  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern keine Erläuterung zu den Bodenrichtwerten 2026 verlinkt. Gesucht am 2026-10-16: Feld „listeumrechnungstabellen“ der Bodenrichtwertzonen im WMS von BORIS-Bayern (leer bzw. „Keine Angabe“), der Mandantenpfad boris-bayern.de/mandanten/…/2026_2028/erlaeuterung.pdf (HTTP 404) und eine Websuche. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Weißenburg-Gunzenhausen; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
-  "sperre_grund": "kein_dokument",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2022/2023 des Ausschusses (53 Seiten, Bodenrichtwerte zum Stichtag 01.01.2024) und die Bodenrichtwertliste 01.01.2024 (BORIS-Bayern, 33 Seiten) enthalten keine Umrechnungskoeffizienten für die Grundstücksgröße – Umrechnungskoeffizienten führt der Bericht nur für Eigentumswohnungen. Für die Bodenrichtwerte 2026 ist keine Erläuterung verlinkt (boris-bayern.de/mandanten/weissenburg-gunzenhausen/2026_2028/erlaeuterung.pdf (HTTP 404)). Weg: Geschäftsstelle des Gutachterausschusses im Landratsamt Weißenburg-Gunzenhausen (landkreis-wug.de, Bauen und Wohnen, Gutachterausschuss); Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "sperre_grund": "keine_angabe",
   "formel": null,
   "geltungsbereich": null,
-  "belege": [],
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2022/2023, Gutachterausschuss des Landkreises Weißenburg-Gunzenhausen",
+    "fundstelle": "Volltext, alle 52 PDF-Seiten durchsucht",
+    "url": "https://www.landkreis-wug.de/timm/download.php?file=data/lk_docs/landratsamt/bauen-und-wohnen/gutachterausschuss/wug_immobilienmarktbericht_2022_2023.pdf",
+    "wortlaut": null
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Bodenrichtwerte Stand 01.01.2024 (BORIS-Bayern)",
+    "fundstelle": "Volltext, alle 33 PDF-Seiten durchsucht",
+    "url": "https://www.boris-bayern.de/mandanten/weissenburg-gunzenhausen/2024_2026/erlaeuterung.pdf",
+    "wortlaut": null
+   }
+  ],
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
-  "stichtag": "2026-01-01",
-  "berichtsjahr": 2026,
-  "quelle_url": "https://www.gutachterausschuesse-bayern.de/",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "stichtag": "2024-01-01",
+  "berichtsjahr": 2024,
+  "quelle_url": "https://www.landkreis-wug.de/timm/download.php?file=data/lk_docs/landratsamt/bauen-und-wohnen/gutachterausschuss/wug_immobilienmarktbericht_2022_2023.pdf",
+  "lizenz": "Dieser Bericht ist urheberrechtlich geschützt. Nachdruck oder sonstige Vervielfältigung sind nur für nichtkommerzielle Zwecke zu verwenden und nur mit vollständiger Quellenangabe gestattet.",
   "quellenvermerk": "Gutachterausschuss des Landkreises Weißenburg-Gunzenhausen, Bodenrichtwerte 2026",
-  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Weißenburg-Gunzenhausen; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "weg": "Geschäftsstelle des Gutachterausschusses im Landratsamt Weißenburg-Gunzenhausen (landkreis-wug.de, Bauen und Wohnen, Gutachterausschuss); Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "belege_meta": {
    "abgerufen_am": "2026-10-16",
-   "seitenzaehlung": "PDF-Seite (nicht Druckseite)"
+   "seitenzaehlung": "PDF-Seite (nicht Druckseite)",
+   "dokument": "Immobilienmarktbericht 2022/2023, Gutachterausschuss des Landkreises Weißenburg-Gunzenhausen"
   },
-  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Weißenburg-Gunzenhausen, Bodenrichtwerte 2026",
-  "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Weißenburg-Gunzenhausen, Bodenrichtwerte 2024",
+  "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
+  "modellansaetze": {},
+  "fundstelle": "Volltext, alle 52 PDF-Seiten durchsucht; Volltext, alle 33 PDF-Seiten durchsucht"
  },
  {
   "land_code": "BY",
@@ -4715,11 +4741,17 @@
   "kennzahl": "umrechnungskoeffizient_flaeche",
   "zweig": "ifw",
   "vollstaendig": false,
-  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern keine Erläuterung zu den Bodenrichtwerten 2026 verlinkt. Gesucht am 2026-10-16: Feld „listeumrechnungstabellen“ der Bodenrichtwertzonen im WMS von BORIS-Bayern (leer bzw. „Keine Angabe“), der Mandantenpfad boris-bayern.de/mandanten/…/2026_2028/erlaeuterung.pdf (HTTP 404) und eine Websuche. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Aschaffenburg; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern weder für 2026 noch für 2024 eine Erläuterung verlinkt (Mandantenpfad mit „-lkr“ und ohne: HTTP 404; „aschaffenburg“ ist die kreisfreie Stadt). landkreis-aschaffenburg.de ist ohne Skript nicht lesbar, die Websuche fand kein Dokument des Landkreis-Ausschusses. Gesucht am 2026-10-16. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Aschaffenburg, Landratsamt Aschaffenburg; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "sperre_grund": "kein_dokument",
   "formel": null,
   "geltungsbereich": null,
-  "belege": [],
+  "belege": [
+   {
+    "art": "Fundort",
+    "fundstelle": "BORIS-Bayern, Mandantenpfade aschaffenburg-lkr/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026",
+    "url": "https://www.boris-bayern.de/"
+   }
+  ],
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
   "stichtag": "2026-01-01",
@@ -4727,14 +4759,15 @@
   "quelle_url": "https://www.gutachterausschuesse-bayern.de/",
   "lizenz": "kein Wert - Lizenz nicht einschlägig",
   "quellenvermerk": "Gutachterausschuss des Landkreises Aschaffenburg, Bodenrichtwerte 2026",
-  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Aschaffenburg; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Aschaffenburg, Landratsamt Aschaffenburg; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "belege_meta": {
    "abgerufen_am": "2026-10-16",
    "seitenzaehlung": "PDF-Seite (nicht Druckseite)"
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Aschaffenburg, Bodenrichtwerte 2026",
-  "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
+  "modellansaetze": {},
+  "fundstelle": "BORIS-Bayern, Mandantenpfade aschaffenburg-lkr/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026"
  },
  {
   "land_code": "BY",
@@ -4746,26 +4779,35 @@
   "kennzahl": "umrechnungskoeffizient_flaeche",
   "zweig": "ifw",
   "vollstaendig": false,
-  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern keine Erläuterung zu den Bodenrichtwerten 2026 verlinkt. Gesucht am 2026-10-16: Feld „listeumrechnungstabellen“ der Bodenrichtwertzonen im WMS von BORIS-Bayern (leer bzw. „Keine Angabe“), der Mandantenpfad boris-bayern.de/mandanten/…/2026_2028/erlaeuterung.pdf (HTTP 404) und eine Websuche. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Bad Kissingen; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "warum_kein_wert": "Für 2026 ist über BORIS-Bayern keine Erläuterung verlinkt (boris-bayern.de/mandanten/bad-kissingen/2026_2028/erlaeuterung.pdf (HTTP 404)); unter 2024–2026 liegt nur die Übersicht der Forst-Bodenrichtwerte 01.01.2024 (1 Seite). landkreis-badkissingen.de ist ohne Skript nicht lesbar. Gesucht am 2026-10-16. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Bad Kissingen, Landratsamt Bad Kissingen; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "sperre_grund": "kein_dokument",
   "formel": null,
   "geltungsbereich": null,
-  "belege": [],
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Bodenrichtwerte FORST, Stand 01.01.2024 (BORIS-Bayern)",
+    "fundstelle": "Volltext, alle 1 PDF-Seiten durchsucht",
+    "url": "https://www.boris-bayern.de/mandanten/bad-kissingen/2024_2026/erlaeuterung.pdf",
+    "wortlaut": null
+   }
+  ],
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
   "stichtag": "2026-01-01",
   "berichtsjahr": 2026,
-  "quelle_url": "https://www.gutachterausschuesse-bayern.de/",
+  "quelle_url": "https://www.boris-bayern.de/mandanten/bad-kissingen/2024_2026/erlaeuterung.pdf",
   "lizenz": "kein Wert - Lizenz nicht einschlägig",
   "quellenvermerk": "Gutachterausschuss des Landkreises Bad Kissingen, Bodenrichtwerte 2026",
-  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Bad Kissingen; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Bad Kissingen, Landratsamt Bad Kissingen; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "belege_meta": {
    "abgerufen_am": "2026-10-16",
    "seitenzaehlung": "PDF-Seite (nicht Druckseite)"
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Bad Kissingen, Bodenrichtwerte 2026",
-  "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
+  "modellansaetze": {},
+  "fundstelle": "Volltext, alle 1 PDF-Seiten durchsucht"
  },
  {
   "land_code": "BY",
@@ -4777,26 +4819,36 @@
   "kennzahl": "umrechnungskoeffizient_flaeche",
   "zweig": "ifw",
   "vollstaendig": false,
-  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern keine Erläuterung zu den Bodenrichtwerten 2026 verlinkt. Gesucht am 2026-10-16: Feld „listeumrechnungstabellen“ der Bodenrichtwertzonen im WMS von BORIS-Bayern (leer bzw. „Keine Angabe“), der Mandantenpfad boris-bayern.de/mandanten/…/2026_2028/erlaeuterung.pdf (HTTP 404) und eine Websuche. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Rhön-Grabfeld; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
-  "sperre_grund": "kein_dokument",
+  "warum_kein_wert": "Die Bodenrichtwertliste 01.01.2026 des Ausschusses (rhoen-grabfeld.de, 10 Seiten) enthält keine Umrechnung für die Grundstücksgröße; über BORIS-Bayern ist für 2026 keine Erläuterung verlinkt. Weg: Geschäftsstelle des Gutachterausschusses im Landratsamt Rhön-Grabfeld (rhoen-grabfeld.de, Wohnen, Gutachterausschuss); Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "sperre_grund": "keine_angabe",
   "formel": null,
   "geltungsbereich": null,
-  "belege": [],
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Bodenrichtwertliste Stand 01.01.2026, Gutachterausschuss des Landkreises Rhön-Grabfeld",
+    "fundstelle": "Volltext, alle 10 PDF-Seiten durchsucht",
+    "url": "https://www.rhoen-grabfeld.de/fileadmin/user_upload/LKR/Wohnen/Gutachterausschuss/Bodenrichtwertliste_2026.pdf",
+    "wortlaut": null
+   }
+  ],
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
   "stichtag": "2026-01-01",
   "berichtsjahr": 2026,
-  "quelle_url": "https://www.gutachterausschuesse-bayern.de/",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.rhoen-grabfeld.de/fileadmin/user_upload/LKR/Wohnen/Gutachterausschuss/Bodenrichtwertliste_2026.pdf",
+  "lizenz": "Sämtliche Inhalte, Fotos, Texte und Graphiken sind urheberrechtlich geschützt. Sie dürfen ohne vorherige schriftliche Genehmigung weder ganz noch auszugsweise kopiert, verändert, vervielfältigt oder veröffentlicht werden.",
   "quellenvermerk": "Gutachterausschuss des Landkreises Rhön-Grabfeld, Bodenrichtwerte 2026",
-  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Rhön-Grabfeld; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "weg": "Geschäftsstelle des Gutachterausschusses im Landratsamt Rhön-Grabfeld (rhoen-grabfeld.de, Wohnen, Gutachterausschuss); Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "belege_meta": {
    "abgerufen_am": "2026-10-16",
-   "seitenzaehlung": "PDF-Seite (nicht Druckseite)"
+   "seitenzaehlung": "PDF-Seite (nicht Druckseite)",
+   "dokument": "Bodenrichtwertliste Stand 01.01.2026, Gutachterausschuss des Landkreises Rhön-Grabfeld"
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Rhön-Grabfeld, Bodenrichtwerte 2026",
-  "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
+  "modellansaetze": {},
+  "fundstelle": "Volltext, alle 10 PDF-Seiten durchsucht"
  },
  {
   "land_code": "BY",
@@ -4808,26 +4860,36 @@
   "kennzahl": "umrechnungskoeffizient_flaeche",
   "zweig": "ifw",
   "vollstaendig": false,
-  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern keine Erläuterung zu den Bodenrichtwerten 2026 verlinkt. Gesucht am 2026-10-16: Feld „listeumrechnungstabellen“ der Bodenrichtwertzonen im WMS von BORIS-Bayern (leer bzw. „Keine Angabe“), der Mandantenpfad boris-bayern.de/mandanten/…/2026_2028/erlaeuterung.pdf (HTTP 404) und eine Websuche. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Haßberge; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
-  "sperre_grund": "kein_dokument",
+  "warum_kein_wert": "Die Bodenrichtwertliste 01.01.2026 mit Erläuterungen (34 Seiten) nennt als Maßstab für Wohnbauflächen durchschnittliche Grundstücksflächen von 600–800 m², aber keine Umrechnungskoeffizienten für abweichende Größen; im Bewertungsfall seien sachverständige Anpassungen vorzunehmen. Weg: Geschäftsstelle des Gutachterausschusses im Landratsamt Haßberge (hassberge.de, Dienstleistungen, Gutachterausschuss); Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "sperre_grund": "keine_angabe",
   "formel": null,
   "geltungsbereich": null,
-  "belege": [],
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Bodenrichtwertliste 01.01.2026 mit Erläuterungen, Gutachterausschuss des Landkreises Haßberge",
+    "fundstelle": "PDF-S. 5",
+    "url": "https://www.hassberge.de/fileadmin/user_upload/Dienstleistungen/Gutachterausschuss/Bodenrichtwerte/Landkreis_Ha%C3%9Fberge/Bodenrichtwertliste_01.01.2026__P008147108_.pdf",
+    "wortlaut": "Als Maßstab werden durchschnittliche Grundstücksflächen von 600 – 800 m² zugrunde gelegt."
+   }
+  ],
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
   "stichtag": "2026-01-01",
   "berichtsjahr": 2026,
-  "quelle_url": "https://www.gutachterausschuesse-bayern.de/",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.hassberge.de/fileadmin/user_upload/Dienstleistungen/Gutachterausschuss/Bodenrichtwerte/Landkreis_Ha%C3%9Fberge/Bodenrichtwertliste_01.01.2026__P008147108_.pdf",
+  "lizenz": "Die Bodenrichtwertliste und alle Inhalte sind urheberrechtlich geschützt. … Jede Verwendung, insbesondere Vervielfältigungen und Veröffentlichungen – auch auszugsweise – ist nur mit schriftlicher Zustimmung des Gutachterausschusses gestattet.",
   "quellenvermerk": "Gutachterausschuss des Landkreises Haßberge, Bodenrichtwerte 2026",
-  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Haßberge; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "weg": "Geschäftsstelle des Gutachterausschusses im Landratsamt Haßberge (hassberge.de, Dienstleistungen, Gutachterausschuss); Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "belege_meta": {
    "abgerufen_am": "2026-10-16",
-   "seitenzaehlung": "PDF-Seite (nicht Druckseite)"
+   "seitenzaehlung": "PDF-Seite (nicht Druckseite)",
+   "dokument": "Bodenrichtwertliste 01.01.2026 mit Erläuterungen, Gutachterausschuss des Landkreises Haßberge"
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Haßberge, Bodenrichtwerte 2026",
-  "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
+  "modellansaetze": {},
+  "fundstelle": "PDF-S. 5"
  },
  {
   "land_code": "BY",
@@ -4839,11 +4901,17 @@
   "kennzahl": "umrechnungskoeffizient_flaeche",
   "zweig": "ifw",
   "vollstaendig": false,
-  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern keine Erläuterung zu den Bodenrichtwerten 2026 verlinkt. Gesucht am 2026-10-16: Feld „listeumrechnungstabellen“ der Bodenrichtwertzonen im WMS von BORIS-Bayern (leer bzw. „Keine Angabe“), der Mandantenpfad boris-bayern.de/mandanten/…/2026_2028/erlaeuterung.pdf (HTTP 404) und eine Websuche. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Kitzingen; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern weder für 2026 noch für 2024 eine Erläuterung verlinkt (Mandantenpfad kitzingen/2026_2028 und /2024_2026: HTTP 404). Gesucht am 2026-10-16 außerdem: kitzingen.de (21 Seiten, dort kein Dokument des Ausschusses) und Websuche nach Bodenrichtwert-Erläuterungen und Marktbericht. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Kitzingen, Landratsamt Kitzingen; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "sperre_grund": "kein_dokument",
   "formel": null,
   "geltungsbereich": null,
-  "belege": [],
+  "belege": [
+   {
+    "art": "Fundort",
+    "fundstelle": "BORIS-Bayern, Mandantenpfad kitzingen/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026",
+    "url": "https://www.boris-bayern.de/"
+   }
+  ],
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
   "stichtag": "2026-01-01",
@@ -4851,14 +4919,15 @@
   "quelle_url": "https://www.gutachterausschuesse-bayern.de/",
   "lizenz": "kein Wert - Lizenz nicht einschlägig",
   "quellenvermerk": "Gutachterausschuss des Landkreises Kitzingen, Bodenrichtwerte 2026",
-  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Kitzingen; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Kitzingen, Landratsamt Kitzingen; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "belege_meta": {
    "abgerufen_am": "2026-10-16",
    "seitenzaehlung": "PDF-Seite (nicht Druckseite)"
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Kitzingen, Bodenrichtwerte 2026",
-  "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
+  "modellansaetze": {},
+  "fundstelle": "BORIS-Bayern, Mandantenpfad kitzingen/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026"
  },
  {
   "land_code": "BY",
@@ -4870,11 +4939,17 @@
   "kennzahl": "umrechnungskoeffizient_flaeche",
   "zweig": "ifw",
   "vollstaendig": false,
-  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern keine Erläuterung zu den Bodenrichtwerten 2026 verlinkt. Gesucht am 2026-10-16: Feld „listeumrechnungstabellen“ der Bodenrichtwertzonen im WMS von BORIS-Bayern (leer bzw. „Keine Angabe“), der Mandantenpfad boris-bayern.de/mandanten/…/2026_2028/erlaeuterung.pdf (HTTP 404) und eine Websuche. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Miltenberg; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern weder für 2026 noch für 2024 eine Erläuterung verlinkt (Mandantenpfad miltenberg/2026_2028 und /2024_2026: HTTP 404). Gesucht am 2026-10-16 außerdem: landkreis-miltenberg.de (ohne Skript nicht lesbar) und Websuche nach Bodenrichtwert-Erläuterungen und Marktbericht. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Miltenberg, Landratsamt Miltenberg; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "sperre_grund": "kein_dokument",
   "formel": null,
   "geltungsbereich": null,
-  "belege": [],
+  "belege": [
+   {
+    "art": "Fundort",
+    "fundstelle": "BORIS-Bayern, Mandantenpfad miltenberg/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026",
+    "url": "https://www.boris-bayern.de/"
+   }
+  ],
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
   "stichtag": "2026-01-01",
@@ -4882,14 +4957,15 @@
   "quelle_url": "https://www.gutachterausschuesse-bayern.de/",
   "lizenz": "kein Wert - Lizenz nicht einschlägig",
   "quellenvermerk": "Gutachterausschuss des Landkreises Miltenberg, Bodenrichtwerte 2026",
-  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Miltenberg; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Miltenberg, Landratsamt Miltenberg; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "belege_meta": {
    "abgerufen_am": "2026-10-16",
    "seitenzaehlung": "PDF-Seite (nicht Druckseite)"
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Miltenberg, Bodenrichtwerte 2026",
-  "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
+  "modellansaetze": {},
+  "fundstelle": "BORIS-Bayern, Mandantenpfad miltenberg/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026"
  },
  {
   "land_code": "BY",
@@ -4901,11 +4977,17 @@
   "kennzahl": "umrechnungskoeffizient_flaeche",
   "zweig": "ifw",
   "vollstaendig": false,
-  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern keine Erläuterung zu den Bodenrichtwerten 2026 verlinkt. Gesucht am 2026-10-16: Feld „listeumrechnungstabellen“ der Bodenrichtwertzonen im WMS von BORIS-Bayern (leer bzw. „Keine Angabe“), der Mandantenpfad boris-bayern.de/mandanten/…/2026_2028/erlaeuterung.pdf (HTTP 404) und eine Websuche. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Main-Spessart; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern weder für 2026 noch für 2024 eine Erläuterung verlinkt (Mandantenpfad main-spessart/2026_2028 und /2024_2026: HTTP 404). Gesucht am 2026-10-16 außerdem: main-spessart.de (ohne Skript nicht lesbar; die Websuche fand nur Bekanntmachungen zum Stichtag 01.01.2024) und Websuche nach Bodenrichtwert-Erläuterungen und Marktbericht. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Main-Spessart, Landratsamt Main-Spessart; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "sperre_grund": "kein_dokument",
   "formel": null,
   "geltungsbereich": null,
-  "belege": [],
+  "belege": [
+   {
+    "art": "Fundort",
+    "fundstelle": "BORIS-Bayern, Mandantenpfad main-spessart/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026",
+    "url": "https://www.boris-bayern.de/"
+   }
+  ],
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
   "stichtag": "2026-01-01",
@@ -4913,14 +4995,15 @@
   "quelle_url": "https://www.gutachterausschuesse-bayern.de/",
   "lizenz": "kein Wert - Lizenz nicht einschlägig",
   "quellenvermerk": "Gutachterausschuss des Landkreises Main-Spessart, Bodenrichtwerte 2026",
-  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Main-Spessart; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Main-Spessart, Landratsamt Main-Spessart; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "belege_meta": {
    "abgerufen_am": "2026-10-16",
    "seitenzaehlung": "PDF-Seite (nicht Druckseite)"
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Main-Spessart, Bodenrichtwerte 2026",
-  "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
+  "modellansaetze": {},
+  "fundstelle": "BORIS-Bayern, Mandantenpfad main-spessart/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026"
  },
  {
   "land_code": "BY",
@@ -4932,11 +5015,17 @@
   "kennzahl": "umrechnungskoeffizient_flaeche",
   "zweig": "ifw",
   "vollstaendig": false,
-  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern keine Erläuterung zu den Bodenrichtwerten 2026 verlinkt. Gesucht am 2026-10-16: Feld „listeumrechnungstabellen“ der Bodenrichtwertzonen im WMS von BORIS-Bayern (leer bzw. „Keine Angabe“), der Mandantenpfad boris-bayern.de/mandanten/…/2026_2028/erlaeuterung.pdf (HTTP 404) und eine Websuche. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Neu-Ulm; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "warum_kein_wert": "Für diesen Ausschuss ist über BORIS-Bayern weder für 2026 noch für 2024 eine Erläuterung verlinkt (Mandantenpfad neu-ulm/2026_2028 und /2024_2026: HTTP 404). Gesucht am 2026-10-16 außerdem: landkreis-nu.de (ohne Skript nicht lesbar) und Websuche nach Bodenrichtwert-Erläuterungen und Marktbericht. Weg: Geschäftsstelle des Gutachterausschusses des Landkreises Neu-Ulm, Landratsamt Neu-Ulm; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "sperre_grund": "kein_dokument",
   "formel": null,
   "geltungsbereich": null,
-  "belege": [],
+  "belege": [
+   {
+    "art": "Fundort",
+    "fundstelle": "BORIS-Bayern, Mandantenpfad neu-ulm/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026",
+    "url": "https://www.boris-bayern.de/"
+   }
+  ],
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
   "stichtag": "2026-01-01",
@@ -4944,13 +5033,14 @@
   "quelle_url": "https://www.gutachterausschuesse-bayern.de/",
   "lizenz": "kein Wert - Lizenz nicht einschlägig",
   "quellenvermerk": "Gutachterausschuss des Landkreises Neu-Ulm, Bodenrichtwerte 2026",
-  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Neu-Ulm; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
+  "weg": "Geschäftsstelle des Gutachterausschusses des Landkreises Neu-Ulm, Landratsamt Neu-Ulm; Bodenrichtwerte (Einsicht gebührenfrei, Auskunft kostenpflichtig): www.bodenrichtwerte.bayern.de.",
   "belege_meta": {
    "abgerufen_am": "2026-10-16",
    "seitenzaehlung": "PDF-Seite (nicht Druckseite)"
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Neu-Ulm, Bodenrichtwerte 2026",
-  "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
+  "modellansaetze": {},
+  "fundstelle": "BORIS-Bayern, Mandantenpfad neu-ulm/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026"
  }
 ]
