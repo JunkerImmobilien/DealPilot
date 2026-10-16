@@ -4600,7 +4600,11 @@
           if (/\.csv$/.test(dl)) return;
           return _r17.klick.apply(this, arguments);
         };
-        try { await iexpDoExportJsonSingle(_r17.id); } catch (e) {}
+        /* Prüflauf 17: nach dem Klick schließt das Fenster - der Kegel bekommt das Objekt in der Liste (36 Messpunkte ohne Kegel) */
+        var exp = iexpDoExportJsonSingle(_r17.id);
+        await warte(400); kegelHoch(false);
+        zeige(function () { return q('aside.sidebar .sb-card') || q('aside.sidebar'); }, 8);
+        try { await exp; } catch (e) {}
         await warteAuf(function () { return _r17.text; }, 20000);
         HTMLAnchorElement.prototype.click = _r17.klick; _r17.klick = null;
         window.confirm = _r17.confirm; _r17.confirm = null;
@@ -4629,13 +4633,18 @@
         var zb = r6Beginn(s, 'Importiert', 'Die Datei wird gelesen, das Objekt neu angelegt …');
         try { if (typeof closeIexpModal === 'function') closeIexpModal(); } catch (e) {}
         kegelHoch(false);
+        zeige(function () { return q('aside.sidebar'); }, 6);
         try { await importJSON({ files: [new File([_r17.text || ''], _r17.name || 'Sicherung.dpkt', { type: 'application/json' })], value: '' }); } catch (e) {}
         await warteAuf(function () { return DPM_REIHE.angelegt.length > vorher; }, 15000);
         await warte(2500);
         await r6Ende(zb);
         var nid = DPM_REIHE.angelegt[DPM_REIHE.angelegt.length - 1];
-        var karte = function () { return [].filter.call(document.querySelectorAll('.sb-card'), function (c) { return c.offsetWidth && (c.getAttribute('data-key') === nid || c.getAttribute('data-id') === nid || (c.outerHTML.indexOf(nid) >= 0)); })[0] || null; };
-        await zeige(karte, 8);
+        /* Prüflauf 17: die Karte war über ihre Kennung nicht zu finden - jetzt wird das importierte Objekt geöffnet */
+        if (nid && typeof window.loadSaved === 'function') { try { await window.loadSaved(nid); } catch (e) {} }
+        await warteAuf(function () { return window._currentObjKey === nid && /\S/.test(wert('str')); }, 9000);
+        reiter('s0'); var mc = q('.main-col'); if (mc) mc.scrollTop = 0;
+        await warte(700);
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
         await b2oZeile(s, 'Ein eigenes Objekt', 'Beim Empfänger steht es als <b>eigenes Objekt</b> mit allen Eingaben und der Analyse — seine Änderungen berühren deins nicht.');
       },
       async function (s) {   /* 7 · die anderen Wege */
@@ -4742,6 +4751,7 @@
       async function (s) {   /* 5 · in der App */
         var zb = r6Beginn(s, 'In der App', 'Dasselbe Objekt erscheint im Portfolio — hier als Kopie mit denselben Angaben, nach dem Video gelöscht.');
         r22Zu(); kegelHoch(false);
+        zeige(function () { return q('aside.sidebar'); }, 6);   /* Prüflauf 22: ohne Ziel 34 Messpunkte ohne Kegel */
         var d = { objart: 'ETW', str: 'Musterstraße', hnr: '12', ort: 'Hannover', wfl: '85', zimmer: '4', etage: '2', vermstand: 'Vollvermietet' };
         var neu = await Auth.apiCall('/objects', { method: 'POST', body: { data: d, aiAnalysis: null, photos: [] } });
         var nid = neu && (neu.id || (neu.data && neu.data.id) || (neu.object && neu.object.id));
@@ -4751,7 +4761,7 @@
         await warte(800);
         reiter('s0'); var m = q('.main-col'); if (m) m.scrollTop = 0;
         await r6Ende(zb);
-        await zeigeGruppe(feldVon('str'), feldVon('wfl'), 8);
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
         await b2oZeile(s, 'Im Reiter Objekt', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + wert('wfl') + ' m². Der Rest kommt in der App oder im nächsten Satz an den Bot.', 600);
       }
     ]
