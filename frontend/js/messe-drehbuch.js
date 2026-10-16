@@ -4477,10 +4477,11 @@
         await b2oZeile(s, 'Steuer über alle Objekte', 'Die Einkommensteuer mit Progression — privat und je Gesellschaft, aus den echten Objektdaten. Was ein Objekt mehr bringt, sieht man im Ganzen.');
       },
       async function (s) {   /* 6 · Projektion */
-        var p = function () { return r21('#dp-charts-sec'); };
+        /* Aufnahme 21: der ganze Abschnitt ist 1.121 px hoch - der Kegel auf ihm scrollte bis zur Steuer-Mappe. Jetzt Kopf + erstes Diagramm. */
+        var p = function () { return r21('#dp-charts-sec .dp-charts-summary') || r21('#dp-charts-sec'); };
         var x = p(); if (x) x.scrollIntoView({ block: 'start' });
         await warte(500);
-        await zeige(p, 8);
+        await zeigeGruppe(p, function () { var c = r21('#dp-charts-sec .charts'); return c && (c.firstElementChild || c); }, 8);
         await b2oZeile(s, 'Die Projektion', 'Restschuld, Eigenkapital, Cashflow über 10, 20 oder 30 Jahre — eine vereinfachte Modellrechnung über den ganzen Bestand.');
       },
       async function (s) {   /* 7 · der Portfolio-Pilot */

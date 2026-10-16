@@ -160,7 +160,9 @@
     if (hint && hint.parentNode) hint.parentNode.removeChild(hint);
     var d = document.createElement('div');
     d.className = 'dp-pp-msg dp-pp-' + (role === 'assistant' ? 'a' : 'u');
-    d.innerHTML = esc(text).replace(/\n/g, '<br>');
+    /* v2304 · die Antwort kommt mit **fett** - gemessen im Video (Modul 21) standen die Sternchen roh da.
+       Erst escapen, dann nur dieses eine Muster wandeln. */
+    d.innerHTML = esc(text).replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
     log.appendChild(d);
     log.scrollTop = log.scrollHeight;
     return d;
