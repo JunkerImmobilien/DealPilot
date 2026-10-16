@@ -2,6 +2,7 @@
 // Formeln exakt nach Auftrag; Faktoren transparent & einzeln ausgewiesen.
 import { round } from '../lib/stats.js';
 import { istGewerbe, istGrundstueck } from '../lib/marktsegment.js';   /* v2241 */
+import { groessenanpassung as ukAusRegister } from '../lib/umrechnung_flaeche.js';   /* v2282 */
 
 // Zustands-/Energie-/Etagen-Faktoren (dokumentiert, anpassbar)
 // Zustand robust gemappt inkl. Synonyme & DealPilot-Werte ("gut", "saniert", ...).
@@ -328,15 +329,41 @@ export const ValuationService = {
       let landExcessValue = 0; let landComponent = null;
       if (isHouse && plotArea > 0 && brwSqm) {
         const excess = Math.max(0, plotArea - TYPICAL_PLOT_SQM);
-        const raw = excess * brwSqm * EXCESS_MARKET_FACTOR;
+        /* v2282 · Marcel 16.10.2026: „amtlich nur da, wo es auch so ist".
+           Liegt ein amtlicher Umrechnungskoeffizient vor (Register, oder ein
+           selbst eingetragener), ist die Mehrflaeche genau der Unterschied
+           zwischen dem angepassten Bodenwert und dem Bodenwert des
+           Richtwertgrundstuecks: Flaeche x BRW x UK - Bezugsgroesse x BRW.
+           Nur ohne Koeffizient bleibt der eigene Marktfaktor 0,40 - mit dem
+           Vermerk, dass er eine Festlegung von DealPilot ist. */
+        let _ukV = null;
+        if (_bezugBoris > 0 && excess > 0) {
+          const _eigen = Number(ref.uk_flaeche);
+          if (_eigen > 0 && _eigen < 3) {
+            _ukV = { koeffizient: _eigen, quelle: 'eigene Angabe' };
+          } else {
+            try {
+              const g = ukAusRegister({ ags: ref.ags || null, objektart: ref.property_type,
+                flaeche_qm: plotArea, bezugsgroesse_qm: _bezugBoris, brw_eur_qm: brwSqm });
+              if (g && g.verfuegbar) _ukV = { koeffizient: g.faktor, quelle: g.quelle, quelle_url: g.quelle_url || null };
+            } catch (e) { _ukV = null; }
+          }
+        }
+        const raw = _ukV
+          ? (plotArea * brwSqm * _ukV.koeffizient - _bezugBoris * brwSqm)
+          : excess * brwSqm * EXCESS_MARKET_FACTOR;
         landExcessValue = Math.round(_clamp(raw, 0, base * area * 0.35));
         landComponent = {
           plot_area_sqm: plotArea, typical_plot_sqm: TYPICAL_PLOT_SQM,
-          excess_sqm: excess, brw_sqm: brwSqm, market_factor: EXCESS_MARKET_FACTOR,
+          excess_sqm: excess, brw_sqm: brwSqm, market_factor: _ukV ? null : EXCESS_MARKET_FACTOR,
+          umrechnungskoeffizient: _ukV ? _ukV.koeffizient : null,
+          umrechnung_quelle: _ukV ? _ukV.quelle : null,
           value_eur: landExcessValue,
-          land_value_total_eur: Math.round(plotArea * brwSqm),
+          land_value_total_eur: Math.round(plotArea * brwSqm * (_ukV ? _ukV.koeffizient : 1)),
         };
-        if (landExcessValue > 0) {
+        if (landExcessValue > 0 && _ukV) {
+          out.notes.push(`Grundstücks-Mehrfläche: ${plotArea} m² × BRW ${brwSqm} €/m² × Umrechnungskoeffizient ${String(_ukV.koeffizient).replace('.', ',')} (${_ukV.quelle}) − ${TYPICAL_PLOT_SQM} m² Richtwertgrundstück × ${brwSqm} €/m² = +${landExcessValue.toLocaleString('de-DE')} € (additiv).`);
+        } else if (landExcessValue > 0) {
           out.notes.push(`Grundstücks-Mehrfläche: ${excess} m² über ${TYPICAL_PLOT_SQM} m² (${TYPICAL_QUELLE}) × BRW ${brwSqm} €/m² × Marktfaktor ${EXCESS_MARKET_FACTOR} = +${landExcessValue.toLocaleString('de-DE')} € (additiv). Der Marktfaktor ist eine Festlegung von DealPilot, keine Angabe des Gutachterausschusses.`);   /* v1071-WMFL-2 */
         }
       } else if (isHouse && plotArea > 0 && !brwSqm) {

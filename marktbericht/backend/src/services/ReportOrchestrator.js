@@ -178,6 +178,8 @@ export const ReportOrchestrator = {
       reconstruction_year: input.reconstruction_year ? Number(input.reconstruction_year) : null,
       mea_pct: input.mea_pct ? Number(input.mea_pct) : null,
       lzs_pct: input.lzs_pct ? Number(input.lzs_pct) : null,
+      /* v2282 · eigener Umrechnungskoeffizient Grundstuecksgroesse */
+      uk_flaeche: Number(input.uk_flaeche) > 0 ? Number(input.uk_flaeche) : null,
       brw_anpassung_pct: input.brw_anpassung_pct ? Number(input.brw_anpassung_pct) : null,
       brw_anpassung_grund: input.brw_anpassung_grund || null,
       gfz_koeff: input.gfz_koeff ? Number(input.gfz_koeff) : null,
@@ -848,7 +850,29 @@ export const ReportOrchestrator = {
        * wohnungsbau), wird nicht umgerechnet und nicht auf eine andere
        * Tabelle ausgewichen - der Hinweis nennt den Weg zum Ausschuss. */
       let _ukReg = null;
-      try {
+      /* v2282 · EIGENE ANGABE VOR DEM REGISTER - wie beim Liegenschaftszins
+       * (nutzerwert). Gekennzeichnet als eigene Angabe, nie als amtlich. */
+      const _ukEigen = Number(ref.uk_flaeche);
+      const _brwJetzt = (landValue && landValue.available) ? Number(landValue.value_sqm) : null;
+      if (_ukEigen > 0 && _ukEigen < 3 && Number(ref.plot_area) > 0 && _brwJetzt > 0) {
+        const _bwQm = Math.round(_brwJetzt * _ukEigen * 100) / 100;
+        _ukReg = {
+          verfuegbar: true, quelle_art: 'eigene Angabe',
+          bezugsgroesse_qm: _flaeche ? _flaeche.richtwertgrundstueck_qm : null,
+          bauland_qm: Number(ref.plot_area), gruen_qm: 0,
+          koeffizient_bauland: _ukEigen, koeffizient_bezugsgroesse: 1,
+          faktor: _ukEigen, bodenwert_eur_qm: _bwQm, gruen_eur_qm: 0,
+          wert_bauland_eur: Math.round(Number(ref.plot_area) * _bwQm), wert_gruen_eur: 0,
+          wert_eur: Math.round(Number(ref.plot_area) * _bwQm),
+          koeffizient_angewandt: true,
+          quelle: 'eigene Angabe', quelle_text: 'eigene Angabe',
+          hinweis: 'Der Bodenrichtwert wurde mit einem selbst eingetragenen Umrechnungskoeffizienten ('
+            + String(_ukEigen).replace('.', ',') + ') an die Grundstücksgröße angepasst — eigene Angabe, '
+            + 'nicht aus dem Register.',
+        };
+        step('uk-eigen: ' + _ukEigen);
+      }
+      if (!_ukReg) try {
         _ukReg = ukAusRegister({
           ags: ref.ags || null, objektart: ref.property_type,
           flaeche_qm: ref.plot_area,
@@ -954,6 +978,17 @@ export const ReportOrchestrator = {
         _flaeche.hinweis = (_flaeche.hinweis ? _flaeche.hinweis + ' ' : '') + _ukReg.hinweis;
         _flaeche.umrechnung_nicht_angewandt = { grund: _ukReg.grund, quelle: _ukReg.quelle,
           quelle_url: _ukReg.quelle_url };
+      }
+      /* v2282 · Variante A (Marcel 16.10.2026): ohne amtlichen Koeffizienten
+       * rechnet der Bodenwert weiter mit der vollen Flaeche - aber markiert,
+       * mit dem Weg zur Quelle und dem eigenen Eingabefeld. */
+      if (_flaeche && _flaeche.erheblich && !(_uk && _uk.verfuegbar && _uk.koeffizient_angewandt)) {
+        _flaeche.bodenwert_nicht_angepasst = true;
+        _flaeche.hinweis = (_flaeche.hinweis ? _flaeche.hinweis + ' ' : '')
+          + 'Der Bodenwert ist damit nicht an die Grundstücksgröße angepasst; Ertrags- und Sachwert sind '
+          + 'insoweit vorläufig. Liegt dir der Umrechnungskoeffizient des zuständigen Gutachterausschusses vor'
+          + (_flaeche.umrechnungsvorschrift_url ? ' (Umrechnungsvorschrift: ' + _flaeche.umrechnungsvorschrift_url + ')' : '')
+          + ', trag ihn unter „Umrechnungskoeffizient Grundstücksgröße“ ein.';
       }
       if (_flaeche && _flaeche.hinweis && _uk && _uk.verfuegbar) {
         const _kopf = 'Das Grundstück ist mit ' + _flaeche.objekt_qm + ' m² um '

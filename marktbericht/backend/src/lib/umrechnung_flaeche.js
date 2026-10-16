@@ -120,10 +120,28 @@ export function koeffizientFuer(satz, flaecheQm, normgroesseQm) {
 export function pruefeBeispiel(satz) {
   const b = satz && satz.formel && satz.formel.pruefbeispiel;
   if (!b) return { ok: null, grund: 'kein_beispiel' };
-  const r = koeffizientFuer(satz, b.flaeche_qm, b.normgroesse_qm);
-  const bw = r.k != null ? Math.round(b.flaeche_qm * b.brw_eur_qm * r.k) : null;
-  return { ok: r.k != null && Math.abs(r.k - b.koeffizient) < 0.005 && Math.abs(bw - b.bodenwert_eur) <= 1,
-           k: r.k, soll_k: b.koeffizient, bodenwert: bw, soll_bodenwert: b.bodenwert_eur };
+  /* v2281b · DERSELBE WEG WIE groessenanpassung(): Quotient UK(Objekt) / UK(Bezugsgroesse).
+     Bei einer Tabelle "*" (eine Tabelle fuer jede Bezugsgroesse: HE, TH, Bremen) ist
+     UK(Bezugsgroesse) nicht 1 - ohne den Quotienten traf kein Anwendungsbeispiel, das
+     zwischen zwei Groessen umrechnet. Fuer Tabellen je Normgroesse und Formeln ist der
+     Nenner 1, dort aendert sich nichts.
+     Viele Dokumente nennen nur den angepassten Bodenwert JE m² mit eigener Rundung
+     (HE „118 €/m²“, Bremen „rd. 159,-“, HH „rund 840 €/m²“): dafuer bodenwert_eur_qm
+     und rundung_eur_qm; die Einzelkoeffizienten des Beispiels (koeffizient_objekt,
+     koeffizient_norm) werden gegen die Tabelle selbst gehalten. */
+  const rF = koeffizientFuer(satz, b.flaeche_qm, b.normgroesse_qm);
+  const rN = koeffizientFuer(satz, b.normgroesse_qm, b.normgroesse_qm);
+  const k = rF.k != null && rN.k > 0 ? r4(rF.k / rN.k) : null;
+  const nah = (ist, soll, tol) => soll == null || (ist != null && Math.abs(ist - soll) <= tol);
+  const bw = k != null ? Math.round(b.flaeche_qm * b.brw_eur_qm * k) : null;
+  const st = Number(b.rundung_eur_qm) > 0 ? Number(b.rundung_eur_qm) : 0.01;
+  const bwQm = k != null ? Math.round((b.brw_eur_qm * k) / st) * st : null;
+  const hatSoll = b.bodenwert_eur != null || b.bodenwert_eur_qm != null;
+  return { ok: k != null && hatSoll && nah(k, b.koeffizient, 0.005)
+             && nah(rF.k, b.koeffizient_objekt, 0.0005) && nah(rN.k, b.koeffizient_norm, 0.0005)
+             && nah(bw, b.bodenwert_eur, 1) && nah(bwQm, b.bodenwert_eur_qm, 1e-6),
+           k, soll_k: b.koeffizient, bodenwert: bw, soll_bodenwert: b.bodenwert_eur,
+           bodenwert_qm: bwQm, soll_bodenwert_qm: b.bodenwert_eur_qm };
 }
 
 /** Satz fuer den Ort. Mehrere Saetze (Zweige) -> der, dessen Geltung die
@@ -185,6 +203,14 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
       + (g.ausserhalb_wortlaut ? 'Der Ausschuss: „' + g.ausserhalb_wortlaut + '“ ' : '')
       + (g.ausserhalb_weg ? 'Ansprechpartner: ' + g.ausserhalb_weg + '.' : ''),
       { ...herkunft, nicht_angepasst: true });
+  }
+  /* v2281 · Geltung nach Bodenrichtwert (Hessen: nur unter 400 EUR/m2). */
+  const brwBis = Number(g.brw_bis_eur_qm), brwVon = Number(g.brw_von_eur_qm);
+  if ((brwBis > 0 && brw > brwBis) || (brwVon > 0 && brw < brwVon)) {
+    return nichts('ausserhalb_brw', 'Die Umrechnungskoeffizienten des Ausschusses gelten nur für Bodenrichtwerte '
+      + (brwVon > 0 ? 'ab ' + brwVon + ' ' : '') + (brwBis > 0 ? 'bis ' + brwBis + ' ' : '') + '€/m²; hier '
+      + brw + ' €/m². Der Bodenwert ist nicht an die Grundstücksgröße angepasst.',
+      { ...herkunft, nicht_angepasst: fl !== bez });
   }
   if (fl === bez) {
     return nichts('gleich_bezugsgroesse', null, herkunft);

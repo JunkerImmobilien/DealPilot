@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-16T10:33:28.305Z",
+ "erzeugt_am": "2026-10-16T11:35:16.339Z",
  "quellen": {
   "voice-import": "f9a0e2b07802f171",
   "objektart-felder": "1e0549e54a17a054",
-  "storage": "3d17cfe7dcfd4e03",
-  "index-html": "aa512e6fabb26852",
+  "storage": "0e39554a69ade2d5",
+  "index-html": "89e10a10119d724c",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -633,6 +633,7 @@
    "grundriss",
    "mod_punkte",
    "sachwertfaktor",
+   "uk_flaeche",
    "stellplatz_miete_monat",
    "sonstige_jahr",
    "nhk_haus",
@@ -2283,6 +2284,11 @@
     "id": "sachwertfaktor",
     "kind": "text",
     "label": "Sachwertfaktor"
+   },
+   {
+    "id": "uk_flaeche",
+    "kind": "text",
+    "label": "Umrechnungskoeffizient Grundstücksgröße"
    },
    {
     "id": "stellplatz_miete_monat",

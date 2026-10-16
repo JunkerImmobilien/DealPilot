@@ -36,7 +36,11 @@ for (const f of fs.readdirSync(ORDNER).filter((x) => x.endsWith('.json')).sort()
       if (!s[k]) rot(wo + ': ' + k + ' fehlt');
     }
     const fm = s.formel || {};
-    for (const [norm, t] of Object.entries(fm.tabellen || {})) {
+    for (const [schl, t] of Object.entries(fm.tabellen || {})) {
+      /* v2281b · Tabelle "*" (eine fuer jede Bezugsgroesse): ihr 1,00-Punkt steht in
+         t.bezug_qm - ohne ihn ist die Normprobe nicht moeglich und der Satz rot. */
+      const norm = schl === '*' ? t.bezug_qm : schl;
+      if (!(Number(norm) > 0)) { rot(wo + ' Tabelle ' + schl + ': bezug_qm fehlt (1,00-Punkt der Tabelle)'); continue; }
       const xs = t.flaeche_qm || [], ys = t.koeffizient || [];
       if (xs.length !== ys.length) { rot(wo + ' Norm ' + norm + ': Achsen ungleich lang'); continue; }
       for (let i = 1; i < xs.length; i++) {

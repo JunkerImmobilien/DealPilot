@@ -2024,6 +2024,7 @@ function _mbBuildObjData() {
     aussenanlagen: val('aussenanlagen'),
     bes_bauteile: val('besBauteile'),
     sachwertfaktor: val('sachwertfaktor'),
+    uk_flaeche: val('ukFlaeche'),   /* v2282 */
     eq_elevator: (function () {
       var e = document.getElementById('elevator');
       if (!e) return null;

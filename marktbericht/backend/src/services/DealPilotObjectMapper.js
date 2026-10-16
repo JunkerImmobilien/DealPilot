@@ -399,6 +399,7 @@ export const DealPilotObjectMapper = {
         return felder.reduce((n, k) => n + (d[k] != null && String(d[k]).trim() !== '' ? 1 : 0), 0);
       })(),
       sachwertfaktor: dez(pick(d, ['sachwertfaktor'])),
+      uk_flaeche: dez(pick(d, ['uk_flaeche'])),   /* v2282 · eigener Umrechnungskoeffizient Grundstuecksgroesse */
       nhk_typ: (function () {
         const h = pick(d, ['nhk_haus']), g = pick(d, ['nhk_geschosse']), dd = pick(d, ['nhk_dach']);
         return (h && g != null && g !== '' && dd) ? (String(h) + '.' + String(g) + String(dd)) : null;

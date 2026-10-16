@@ -1306,6 +1306,29 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
                         quelle: r.quelle || null, quelle_url: r.quelle_url || null, jahrgang: r.berichtsjahr || r.jahrgang || null }
                     : null;
     } catch (e) { swfQuelle = { verfuegbar: false, grund: e.message }; }
+    /* v2282 · Umrechnungskoeffizient Grundstuecksgroesse: fuehrt der Ausschuss
+       (oder ein amtlicher Landeswert) einen, und gilt er fuer diese Objektart?
+       Die Zahl selbst entsteht erst im Bericht (Flaeche gegen Bezugsgroesse). */
+    let ukQuelle = null;
+    try {
+      const UKF = await import('../lib/umrechnung_flaeche.js');
+      const s = UKF.satzFuer(String(ags), m.property_type);
+      if (s) {
+        const g = s.geltungsbereich || {}, art = UKF.artSchluessel(m.property_type);
+        const sperre = s.vollstaendig === false || !!s.warum_kein_wert;
+        const anwendbar = !sperre && !((g.objektarten_ausgeschlossen || []).indexOf(art) >= 0
+          || (g.objektarten && art && g.objektarten.indexOf(art) < 0));
+        const f = s.formel || {};
+        ukQuelle = { verfuegbar: !sperre, anwendbar, ebene: s.ebene || null,
+          ausschuss: s.gaa_name || null, quelle_url: s.quelle_url || null, jahrgang: s.berichtsjahr || null,
+          form_text: f.form === 'flaeche_eins' ? 'kein Einfluss (1,00)' : f.form === 'flaeche_funktion' ? 'Formel vorhanden' : 'Tabelle vorhanden',
+          hinweis: sperre ? (s.warum_kein_wert || null)
+            : (!anwendbar ? 'Der Ausschuss führt Umrechnungskoeffizienten nur für ' + (g.nutzung || 'den Regelfall')
+              + ' — für diese Objektart nicht. ' + (g.ausserhalb_weg ? 'Ansprechpartner: ' + g.ausserhalb_weg + '.' : '') : null) };
+      } else {
+        ukQuelle = { verfuegbar: false, anwendbar: false, hinweis: null };
+      }
+    } catch (e) { ukQuelle = null; }
     const { BAUPREISINDEX_KONSTANTE } = await import('../services/CrossCheckService.js');
 
     res.json({
@@ -1323,6 +1346,7 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       rnd_hinweis: (rndHerkunft && rndHerkunft.hinweis) || null,
       gnd_quelle: (p.modellansaetze && (p.modellansaetze.gnd_jahre || p.modellansaetze.gesamtnutzungsdauer_jahre || p.modellansaetze.gnd)) ? 'register' : 'anlage1',
       sachwertfaktor_quelle: swfQuelle,
+      uk_flaeche_quelle: ukQuelle,   /* v2282 */
       baupreisindex: BAUPREISINDEX_KONSTANTE,
       objektart: m.property_type, ags: String(ags)
     });
