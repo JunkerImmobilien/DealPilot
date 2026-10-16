@@ -38839,6 +38839,15 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2279 · Modul 16 neu aufgenommen nach v2277/v2278 (Sachwert mit NHK 4.1, eine RND) (16.10.2026, Staging)
+
+- **Was:** Bericht 216 liegt in `mb.market_reports` noch mit dem Sachwert vor v2277 (927.000 €, RND 21); das Marktbericht-Fenster lädt ihn per GET `/reports/one`. `r16MbSpion` ersetzt im Lauf NUR `cross_check` durch den Mitschnitt (v2278) – kein Abruf, kein Schreiben in die Datenbank, Modul 18 (Bericht 205) unberührt. Modul 16 neu aufgenommen: 5:29, 12,8 MB.
+- **Gezeigt:** Ergebnis „Ertragswert 1.065.000 € · führend, Sachwert 1.061.881 €“; Sachwert-Zeile 1.061.881 € vorläufig ohne amtlichen Faktor; im Rechenweg NHK 825 €/m² × 507 m² = 418.275 €, × 1,91 = 798.905 €, Alterswertminderung (80 − 32,3)/80 → −476.347 €, Garage 17.953 €, Außenanlagen 13.620 €, Bodenwert 707.750 €. Gemessen im Prüflauf (Text des `#wv-box`, alle 300 ms): „927.000“, „21 Jahre“, „14,9“, „220.418“ kommen nirgends vor; Kegel bei 98 % der Messpunkte.
+- **Bild:** Ein einzelnes Bild (1/30 s) Desktop bei 275,3 s – aus der Rohaufnahme mit gleicher Zeitbasis entfernt (`-fps_mode cfr`), danach je Bild 0 Fremdfenster. Name/Adresse 0 Treffer.
+- **Gemeldet:** Der neue Sachwert-Rechenweg schreibt Dezimalpunkte und eine Doppelung: „Baupreisindex 1.91 1,91“, „(47.7 von 80 Jahren)“, „(80 − 32.3)“ – Text der Staffel im Kern (v2277), nicht im Drehbuch. Außerdem: Ravensberger Weg 38 (echtes Objekt) wurde um 10:36 UTC gespeichert, `geb_ant` 74,57 → 74,82, Version 54 → 55 – während meines Prüflaufs, aber nicht über meinen Tab (der Lauf schrieb nur an die Westerfeld-Kopie); im selben Fenster war ein App-Tab mit `?_=v2275` offen. Ursache nicht geklärt, nicht zurückgesetzt (Sicherung: `/root/backups/objekte-vor-aufnahme-20261016.json`).
+- **Commit:** `bdf8378d` (v2279)
+- **Nachweis:** DB vor und nach der Aufnahme gleich (Objekte info@ 39, Steuerzeilen, Pässe, Waisen 0, alle 39 Objekt-Hashes); Kopie gelöscht; kein Abruf nach außen (`ai_credits_log` 1692, `marktbericht_cost_log` 317 unverändert).
+
 ### v2276–v2276f · Videoreihe AUFGENOMMEN (18 Videos, 1920 × 1080); Modul 16 an der Westerfeldstr. mit Ertragswert; PDF seitenbreit (16.10.2026, Staging)
 
 - **Was:**
