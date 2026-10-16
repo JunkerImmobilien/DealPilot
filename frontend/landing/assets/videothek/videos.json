@@ -1,5 +1,5 @@
 {
-  "_hinweis": "landing-videothek-3a · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
+  "_hinweis": "landing-videothek-3b · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
   "stand": "2026-10-16",
   "basis_medien": "medien/videothek/",
   "basis_bilder": "assets/videothek/",
@@ -10,7 +10,7 @@
   ],
   "videos": [
     {
-      "id": "ueberblick-1-quick-boarding", "kategorie": "ueberblick", "nr": "Ü1", "dauer": 220,
+      "id": "ueberblick-1-quick-boarding", "kategorie": "ueberblick", "nr": "Ü1", "dauer": 222,
       "titel": "Quick Boarding",
       "unterzeile": "Vom Exposé zum ersten Urteil — in wenigen Minuten.",
       "story": "Ein Exposé landet im Postfach. Statt Tabelle aufzumachen, gehst du ins Quick Boarding: Daten aufnehmen, Marktwert und Spanne ablesen, Eigenkapital und Lage einstellen — und am Ende sagt dir der Co-Pilot, ob sich der zweite Blick lohnt.",
