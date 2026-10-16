@@ -344,7 +344,9 @@ export const ValuationService = {
           } else {
             try {
               const g = ukAusRegister({ ags: ref.ags || null, objektart: ref.property_type,
-                flaeche_qm: plotArea, bezugsgroesse_qm: _bezugBoris, brw_eur_qm: brwSqm });
+                flaeche_qm: plotArea, bezugsgroesse_qm: _bezugBoris, brw_eur_qm: brwSqm,
+                ortsteile: [((landValue && landValue.properties_raw) || {}).Ortsteil,
+                            ((landValue && landValue.properties_raw) || {}).Gemarkungsname].filter(Boolean) });   /* v2283 */
               if (g && g.verfuegbar) _ukV = { koeffizient: g.faktor, quelle: g.quelle, quelle_url: g.quelle_url || null };
             } catch (e) { _ukV = null; }
           }

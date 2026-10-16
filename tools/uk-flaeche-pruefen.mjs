@@ -37,20 +37,28 @@ for (const f of fs.readdirSync(ORDNER).filter((x) => x.endsWith('.json')).sort()
     }
     const fm = s.formel || {};
     for (const [schl, t] of Object.entries(fm.tabellen || {})) {
-      /* v2281b · Tabelle "*" (eine fuer jede Bezugsgroesse): ihr 1,00-Punkt steht in
-         t.bezug_qm - ohne ihn ist die Normprobe nicht moeglich und der Satz rot. */
-      const norm = schl === '*' ? t.bezug_qm : schl;
-      if (!(Number(norm) > 0)) { rot(wo + ' Tabelle ' + schl + ': bezug_qm fehlt (1,00-Punkt der Tabelle)'); continue; }
+      /* v2281b · Tabelle "*" (eine fuer jede Bezugsgroesse): steht ihr 1,00-Punkt in
+         t.bezug_qm, wird dort geprueft; sonst sucht ihn der Block unten selbst. */
+      const norm = schl === '*' && Number(t.bezug_qm) > 0 ? t.bezug_qm : schl;
       const xs = t.flaeche_qm || [], ys = t.koeffizient || [];
       if (xs.length !== ys.length) { rot(wo + ' Norm ' + norm + ': Achsen ungleich lang'); continue; }
       for (let i = 1; i < xs.length; i++) {
         if (!(xs[i] > xs[i - 1])) rot(wo + ' Norm ' + norm + ': Flaeche nicht steigend bei ' + xs[i]);
         if (ys[i] > ys[i - 1] + 1e-9) rot(wo + ' Norm ' + norm + ': Koeffizient steigt bei ' + xs[i] + ' m²');
       }
-      const kn = UK.koeffizientFuer(s, Number(norm), Number(norm));
+      /* v2281b · Schluessel "*" = EINE Tabelle fuer jede Bezugsgroesse (der Kern
+         rechnet UK(Objekt) / UK(Richtwertgrundstueck), BORIS-NI). Number('*')
+         ist NaN - geprueft wird dann am Bezugspunkt der Tabelle (Koeffizient 1,00). */
+      let normZ = Number(norm);
+      if (norm === '*') {
+        const i1 = ys.findIndex((y) => Math.abs(y - 1) < 0.005);
+        if (i1 < 0) { rot(wo + ' Tabelle *: kein Bezugspunkt mit Koeffizient 1,00'); continue; }
+        normZ = xs[i1];
+      }
+      const kn = UK.koeffizientFuer(s, normZ, normZ);
       if (kn.k == null || Math.abs(kn.k - 1) > 0.005) rot(wo + ' Norm ' + norm + ': Koeffizient bei der Normgroesse ' + kn.k + ' statt 1,00');
       const max = xs[xs.length - 1];
-      const kMax = UK.koeffizientFuer(s, max, Number(norm)), kDrueber = UK.koeffizientFuer(s, max + 1, Number(norm));
+      const kMax = UK.koeffizientFuer(s, max, normZ), kDrueber = UK.koeffizientFuer(s, max + 1, normZ);
       if (kDrueber.k != null && Math.abs(kDrueber.k - kMax.k) > 0.01) {
         rot(wo + ' Norm ' + norm + ': Regel oberhalb springt an der Tabellengrenze (' + kMax.k + ' -> ' + kDrueber.k + ')');
       }

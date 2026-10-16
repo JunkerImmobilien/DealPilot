@@ -158,7 +158,7 @@ export function satzFuer(ags, objektart, alle) {
  * umrechnung_nrw.flaechenaufteilung(), damit ErtragswertService.bodenwert()
  * sie ohne Aenderung liest.
  */
-export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm, saetze }) {
+export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm, saetze, ortsteile }) {
   const nichts = (grund, hinweis, extra) => ({ verfuegbar: false, grund, hinweis, ...(extra || {}) });
   const satz = satzFuer(ags, objektart, saetze);
   if (!satz) return nichts('kein_satz');
@@ -203,6 +203,29 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
       + (g.ausserhalb_wortlaut ? 'Der Ausschuss: „' + g.ausserhalb_wortlaut + '“ ' : '')
       + (g.ausserhalb_weg ? 'Ansprechpartner: ' + g.ausserhalb_weg + '.' : ''),
       { ...herkunft, nicht_angepasst: true });
+  }
+  /* v2283 · AUSGESCHLOSSENE GEBIETE INNERHALB DER AGS (Bremen: Oberneuland,
+     Borgfeld, St. Magnus). Sie haben keine eigene AGS - geprueft wird gegen
+     die Ortsangaben der BORIS-Antwort (Ortsteil, Gemarkung). Kennt der Bericht
+     den Ortsteil nicht, wird NICHT umgerechnet: eine Tabelle, deren Geltung
+     sich nicht pruefen laesst, gilt hier nicht. */
+  const _ausg = Array.isArray(g.gebiete_ausgeschlossen) ? g.gebiete_ausgeschlossen : [];
+  if (_ausg.length) {
+    const orte = (Array.isArray(ortsteile) ? ortsteile : [ortsteile])
+      .map((x) => String(x || '').trim().toLowerCase()).filter(Boolean);
+    /* voller Name vor der Klammer („St. Magnus (Lesumlage)" -> „st. magnus") -
+       nie nur das erste Wort, „st" steckt in „Osterholz". */
+    const kern = (x) => String(x).split('(')[0].trim().toLowerCase();
+    const treffer = _ausg.find((a) => orte.some((o) => o === kern(a) || o.indexOf(kern(a)) >= 0));
+    if (!orte.length || treffer) {
+      return nichts(treffer ? 'gebiet_ausgeschlossen' : 'ortsteil_unbekannt',
+        (treffer
+          ? 'Die Umrechnungskoeffizienten des Ausschusses gelten ausdrücklich nicht für ' + treffer + '. '
+          : 'Die Umrechnungskoeffizienten des Ausschusses gelten nicht für ' + _ausg.join(', ')
+            + '; der Ortsteil dieses Grundstücks ist nicht bekannt. ')
+        + 'Der Bodenwert ist nicht an die Grundstücksgröße angepasst.',
+        { ...herkunft, nicht_angepasst: fl !== bez });
+    }
   }
   /* v2281 · Geltung nach Bodenrichtwert (Hessen: nur unter 400 EUR/m2). */
   const brwBis = Number(g.brw_bis_eur_qm), brwVon = Number(g.brw_von_eur_qm);

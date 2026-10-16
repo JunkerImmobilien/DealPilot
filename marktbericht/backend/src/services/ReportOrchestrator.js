@@ -878,6 +878,12 @@ export const ReportOrchestrator = {
           flaeche_qm: ref.plot_area,
           bezugsgroesse_qm: _flaeche ? _flaeche.richtwertgrundstueck_qm : null,
           brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
+          ortsteile: (function () {   /* v2283: Gebietsausschluesse innerhalb der AGS */
+            const pr = (landValue && landValue.properties_raw) || {};
+            const c = (typeof geo !== 'undefined' && geo && geo.components) || {};
+            return [pr.Ortsteil, pr.Ortsteilname, pr.Gemarkungsname, pr.Stadtteil,
+                    c.suburb, c.city_district, c.quarter, c.neighbourhood].filter(Boolean);
+          })(),
         });
         step('uk-register: ' + (_ukReg.verfuegbar
           ? 'Koeffizient ' + _ukReg.koeffizient_bauland + ' (' + _ukReg.quelle + ')'
