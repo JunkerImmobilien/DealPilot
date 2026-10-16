@@ -252,6 +252,21 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
         { ...herkunft, nicht_angepasst: fl !== bez });
     }
   }
+  /* v2286 · TABELLE NACH HAUSTYP (Dortmund: freistehend 600, DH/RE 300, RM 200).
+     Der Ausschuss waehlt die Tabelle nach dem Haustyp, nicht nach der Zone.
+     Passt die Bezugsgroesse der Zone nicht zur Tabelle des Haustyps, oder ist
+     der Haustyp nicht eindeutig (DealPilot kennt kein Reihenend/-mittelhaus),
+     wird nicht umgerechnet. */
+  const _jeArt = g.normgroesse_je_objektart;
+  if (_jeArt && typeof _jeArt === 'object') {
+    const soll = Number(_jeArt[art]);
+    if (!(soll > 0) || soll !== bez) {
+      return nichts('haustyp_passt_nicht', 'Der Ausschuss wählt seine Umrechnungstabelle nach dem Haustyp'
+        + (soll > 0 ? ' (für diese Objektart Bezugsgröße ' + soll + ' m², die Zone nennt ' + bez + ' m²)'
+                    : ' — für diese Objektart ist die Tabelle nicht eindeutig') + '. Der Bodenwert ist nicht an die Grundstücksgröße angepasst.',
+        { ...herkunft, nicht_angepasst: fl !== bez });
+    }
+  }
   /* v2281 · Geltung nach Bodenrichtwert (Hessen: nur unter 400 EUR/m2). */
   const brwBis = Number(g.brw_bis_eur_qm), brwVon = Number(g.brw_von_eur_qm);
   if ((brwBis > 0 && brw > brwBis) || (brwVon > 0 && brw < brwVon)) {
