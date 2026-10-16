@@ -623,7 +623,11 @@
       ],
       "gebiete_ausgeschlossen_wortlaut": "Die Umrechnungsfaktoren dürfen nicht zur Umrechnung von gleichartigen Grundstücken in Oberneuland, Borgfeld und den bevorzugten Wohnlagen in St. Magnus (Lesumlage) verwendet werden. In diesen Bereichen zeigt sich tlw. ein deutlich abweichendes Marktverhalten.",
       "ausserhalb_wortlaut": "Die Umrechnungsfaktoren können als Anhaltswert dienen, um den Einfluss der Grundstücksgröße auf den Bodenwert zu berücksichtigen. Im Einzelfall sind u.a. auch Lage, Zuschnitt und bauliche Ausnutzbarkeit eines Grundstücks zu berücksichtigen. Die Umrechnungsfaktoren dürfen nicht zur Umrechnung von gleichartigen Grundstücken in Oberneuland, Borgfeld und den bevorzugten Wohnlagen in St. Magnus (Lesumlage) verwendet werden.",
-      "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Bremen bei GeoInformation Bremen, www.gutachterausschuss.bremen.de"
+      "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Bremen bei GeoInformation Bremen, www.gutachterausschuss.bremen.de",
+      "boris_tabellen": [
+        "DEHBBR0026UW0003"
+      ],
+      "boris_tabellen_hinweis": "v2285: Zonenkennung aus BORIS-HB (borishb_2026_wfs, listeUmrechnungstabelle). Ist die Zone bekannt, greift der Satz nur dort; ohne Zonenabruf bleibt die AGS-Zuordnung mit der Ortsteilpruefung."
     },
     "belege": [
       {

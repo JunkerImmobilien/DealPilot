@@ -473,6 +473,9 @@
    "alterswertminderung": "linear",
    "herstellungskosten": "NHK 2010, Anlage 4 ImmoWertV",
    "regionalfaktor": 1.75,
+   "baupreisindex": 1.911,
+   "baupreisindex_basis": "Mai 2010 = 1",
+   "baupreisindex_beleg": "Immobilienmarktbericht Hamburg 2026, S. 123 (PDF 125), Tabelle „Aktualisierungsfaktor für den Sachwertfaktor für Einfamilienhäuser“, Spalte „Baupreisindex Mai 2010 = 1“, Zeile Stichtag 01.01.2026: 1,911 (mit pdftotext -raw und -table gegengelesen, beide gleich; -layout verschiebt die Spalten). Das Modell interpoliert den Index „zum Modellstichtag“ (S. 117); die Zahl gilt also nur zum Stichtag dieses Satzes (2026-01-01). Ernte vom 16.10.2026.",
    "baupreisindex_stichtag": {
     "01.01.2026": 1.911,
     "basis": "Mai 2010 = 1"

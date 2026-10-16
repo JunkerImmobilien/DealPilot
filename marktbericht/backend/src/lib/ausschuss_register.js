@@ -439,6 +439,8 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                             /* v2281: Niedersachsen (BORIS-NI WFS, Umrechnungstabellen FLAE)
                                und amtliche Landes-/Stadtstaatwerte (HE, TH, ST, MV, RP, HH, HB, BE). */
                             'uk-flaeche-ni-2026.json', 'uk-flaeche-laender-2026.json',
+                            /* Ernte 16.10.2026 (LZS/SWF-Linie HB/SL/HH/RP/BY): Mainz, amtlich kein Einfluss der Grundstuecksgroesse (GMB 2025, S. 42-43). */
+                            'uk-flaeche-funde-ernte-lzs.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
