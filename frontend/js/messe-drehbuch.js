@@ -1368,7 +1368,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2273';   /* v2273: Belege-Mitschnitt (Modul 15) */
+  var RH_BUSTER = 'v2276a';   /* v2276a: Stufe-3-Mitschnitt Westerfeldstr. (Modul 16) */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage/i;
@@ -3635,7 +3635,7 @@
         r15Oben(a()); await warte(400);
         await zeigeGruppe(a, b, 6);
         /* v2276 · der Ausschuss steht in der Zeile (span[title]); ein Sachwertfaktor „1,00 · Standard" ist KEIN amtlicher Wert und wird so nicht genannt */
-        var lq = (function () { var r = r16Leiste(/^Liegenschaftszins/), e = r && r.querySelector('span[title]'); return e ? r6Text(e).replace(/Grundstuecksmarktdaten Nordrhein-Westfalen/, 'Grundstücksmarktdaten NRW') : null; })();
+        var lq = (function () { var r = r16Leiste(/^Liegenschaftszins/), e = r && r.querySelector('span[title]:not(.oe-st)'), t = e ? e.getAttribute('title') || '' : ''; return /Obere Gutachterausschuss[^,]*Nordrhein-Westfalen/.test(t) ? 'Oberer Gutachterausschuss NRW' : (e ? r6Text(e) : null); })();
         var swR = r16Leiste(/^Sachwertfaktor/), swStd = swR && /ohne Marktanpassung/.test(r6Text(swR));
         await b2oZeile(s, 'Vorab aus dem Register', 'Liegenschaftszins <b>' + (r16LeisteWert(/^Liegenschaftszins/) || '–') + '</b>' + (lq ? ' (' + lq + ')' : '') + ', Nutzungsdauer ' + (r16LeisteWert(/^GND \/ RND/) || '–') + ' — vorab, ohne Kosten.');
         if (swStd) {
@@ -3701,7 +3701,7 @@
       async function (s) {   /* 9 · boG über die Sanierung (angenommen) */
         reiter('s1'); await warte(900);
         await zeige(r6Gruppe('san'), 10);
-        var zb = r6Beginn(s, 'Optional: Besonderheiten (boG)', 'Angenommen: 25.000 € Reparaturen an der Fassade.');
+        var zb = r6Beginn(s, 'Optional: Besonderheiten (boG)', 'Angenommen: 25.000 € Reparaturen am Dach.');
         await tippeH('san', '25000', 100);
         await warte(900);
         await r6Ende(zb);
@@ -3733,20 +3733,30 @@
         var t = r6Inner(r16Mb('#wv-box')), g = /Grundstücksfläche × Bodenrichtwert\s*\n?\s*([^\n]+)\s*\n?\s*\t?([\d.]+ €)/.exec(t), h = /\+ Hinterlandfläche\s*\n?\s*([^\n]+)\s*\n?\s*\t?([\d.]+ €)/.exec(t), su = /Bodenwert\s*\t\s*([\d.]+ €)/.exec(t);
         await b2oZeile(s, 'Bodenwert · Rechenweg', (g ? g[1].trim() + ' = ' + g[2] : '–') + (h ? ', <b>Hinterland ' + h[1].trim() + ' = ' + h[2] + '</b>' : '') + ' — zusammen <b>' + (su ? su[1] : '–') + '</b>.');
       },
-      async function (s) {   /* 12 · Sachwert und was nicht wirkt */
-        var k = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return /^Sachwert/i.test(r6Text(x.querySelector('.wv-t'))); })[0]; };
+      async function (s) {   /* 12 · v2276: Ertragswert (führend), Sachwert (vorläufig), Quellen */
+        /* alles aus dem gespielten Bericht gelesen (= Bericht im Fenster), nichts angenommen */
+        var P = (window.DPM_REIHE_DATEN && _rh && DPM_REIHE_DATEN[_rh.satz] && DPM_REIHE_DATEN[_rh.satz].mb[3]) || {}, cc = P.cross_check || {}, sw = cc.sachwert || {}, ew = cc.ertragswert || {}, no = (cc.notes || []).join(' ');
+        function kv(re) { return function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return re.test(r6Text(x.querySelector('.wv-t'))); })[0]; }; }
+        var e = kv(/^Ertragswert/i), k = kv(/^Sachwert/i);
+        await r16Hin(e(), false);
+        await zeige(e, 8);
+        var bog = /objektspezifischen Grundstücksmerkmale \((-?[\d.]+ €)\) wirken im vorläufigen Sachwert nicht/.exec(no);
+        if (ew.available) {
+          await b2oZeile(s, 'Ertragswert · führend', '<b>' + eur(ew.value_eur) + '</b>: Reinertrag ' + eur(ew.reinertrag_pa_eur) + ' im Jahr, Liegenschaftszins <b>' + de(ew.liegenschaftszins_pct, 1) + ' %</b>, Restnutzungsdauer <b>' + de(ew.restnutzungsdauer_jahre, 1) + ' Jahre</b> nach Anlage 2.');
+          await b2oZeile(s, 'Ertragswert · Boden', 'Dazu der Bodenwert ' + eur(ew.bodenwert_eur) + (bog ? ' — und hier wirkt der Abzug für die Reparaturen (' + bog[1].replace('-', '') + ').' : '.'));
+        } else await b2oZeile(s, 'Ertragswert', 'Ein Strich: die Rechnung war hier nicht vollständig. Wo die Quelle endet, endet die Rechnung.');
         await r16Hin(k(), false);
         await zeige(k, 8);
-        /* alles aus dem gespielten Bericht gelesen (= Bericht 215 im Fenster), nichts angenommen */
-        var P = (window.DPM_REIHE_DATEN && _rh && DPM_REIHE_DATEN[_rh.satz] && DPM_REIHE_DATEN[_rh.satz].mb[3]) || {}, cc = P.cross_check || {}, sw = cc.sachwert || {}, no = (cc.notes || []).join(' ');
-        var kt = r6Text(k()), wv = /Sachwert\s*([\d.]+ €)/i.exec(kt), ohneSwf = /KEINE Marktanpassung/.test(no), bog = /objektspezifischen Grundstücksmerkmale \((-?[\d.]+ €)\) wirken im vorläufigen Sachwert nicht/.exec(no);
-        await b2oZeile(s, 'Sachwert', '<b>' + (wv ? wv[1] : '–') + '</b>: Bodenwert ' + (eur(sw.bodenwert_eur) || '–') + ' plus Gebäude ' + (eur(sw.gebaeude_sachwert_eur) || '–') + ', gemindert nach Restnutzungsdauer ' + (sw.restnutzungsdauer_jahre != null ? sw.restnutzungsdauer_jahre + ' von ' + (cc.restnutzungsdauer_herkunft && cc.restnutzungsdauer_herkunft.gnd_jahre || '–') + ' Jahren' : '–') + '.');
-        if (ohneSwf) await b2oZeile(s, 'Was deshalb nicht wirkt', 'Kein amtlicher <b>Sachwertfaktor</b> für diese Objektart — also keine Marktanpassung' + (bog ? ', und der Abzug von ' + bog[1].replace('-', '') + ' entfällt. DealPilot erfindet keinen Faktor.' : '.'));
-        var e = function () { var d = r16Doc(); return d && [].filter.call(d.querySelectorAll('#wv-box .wv-k'), function (x) { return /^Ertragswert/i.test(r6Text(x.querySelector('.wv-t'))); })[0]; };
-        await zeige(e, 8);
-        var ew = cc.ertragswert || {};
-        if (ew.available) await b2oZeile(s, 'Ertragswert', '<b>' + eur(ew.value_eur) + '</b> — Miete, Bewirtschaftung, Liegenschaftszins und Restnutzungsdauer.' + (bog ? ' Hier wirkt der Abzug für die Reparaturen.' : ''));
-        else await b2oZeile(s, 'Ertragswert', 'Ein Strich: die Rechnung war hier nicht vollständig. Wo die Quelle endet, endet die Rechnung.');
+        var ohneSwf = /KEINE Marktanpassung/.test(no);
+        await b2oZeile(s, 'Sachwert · zur Plausibilität', '<b>' + eur(sw.value_eur) + '</b>' + (ohneSwf ? ' — vorläufig: ohne amtlichen <b>Sachwertfaktor</b> keine Marktanpassung' + (bog ? ', der Abzug entfällt hier' : '') + '. DealPilot erfindet keinen Faktor.' : '.'));
+        var qn = function () { return r16Mb('#wv-box .wv-nachweis') || r16Mb('#wv-box .wv-hk'); };
+        if (qn()) {
+          await r16Hin(qn(), false);
+          await zeige(qn, 8);
+          var lk = (sw.sachwertfaktor_quelle_link || {}), q0 = ((cc.quellen_nachweis || P.quellen_nachweis || [])[0] || {});
+          var lzsWer = /Obere Gutachterausschuss[^,]*Nordrhein-Westfalen/.test(q0.vermerk || '') ? 'Oberer Gutachterausschuss NRW' : String(q0.vermerk || '').split(',')[0];
+          await b2oZeile(s, 'Quellennachweis', 'Liegenschaftszins: <b>' + (lzsWer || '–') + '</b>' + (/zero-2-0/.test(q0.vermerk || '') ? ' (dl-de/zero-2-0)' : '') + '. Wo ein Wert fehlt, steht der Weg dorthin' + (lk.stelle ? ' — beim Sachwertfaktor: ' + lk.stelle.replace(/ für Grundstückswerte in Nordrhein-Westfalen/, ' NRW') : '') + '.');
+        }
       },
       async function (s) {   /* 13 · je mehr, desto genauer */
         await zeige(function () { return r16Mb('#wv-box'); }, 6);
