@@ -4553,11 +4553,12 @@
       + z('Ankauf-Stand (Soll)', ankauf ? 'ja' : 'keiner')
       + z('Marktbericht-Verlauf', mb ? 'ja' : '–')
       + z('Feld-Lexikon', lex ? de(lex) + ' Einträge' : '–')
+      + (P.fotos_enthalten ? z('Objektfotos', 'ja') : '')
       + '</div><div><div style="font-weight:700;color:#B8625C;margin:4px 0">Bleibt hier</div>'
       + z('Konto, Login, Passwort', 'nein', false)
       + z('Abo und Kontingent', 'nein', false)
       + z('Darstellung und Standardwerte', 'nein', false)
-      + z('Fotos', P.fotos_enthalten ? 'ja' : 'nur mit Häkchen', P.fotos_enthalten ? true : false)
+      + (P.fotos_enthalten ? '' : z('Objektfotos', 'nur mit Häkchen', false))
       + '</div></div>'
       + (w.length ? '<div style="margin-top:12px;padding:10px 12px;background:rgba(184,98,92,.07);border-left:3px solid #B8625C;border-radius:6px;font-size:12.5px;color:#4A4440"><b>Auch im Paket, auch bei einem einzelnen Objekt:</b> ' + w.join(', ') + '. Vor der Weitergabe beachten.</div>' : '');
     document.body.appendChild(c);
@@ -4619,7 +4620,7 @@
         await zeige(function () { return q('#dpm-dpkt'); }, 6);
         var o = (P.objekte || [])[0] || {};
         await b2oZeile(s, 'Was mitgeht', 'Alle <b>' + de(Object.keys(o.daten || {}).length) + ' Eingaben</b>, Steuer, Pilot-Analyse, Ankauf-Stand — und ein Lexikon, das jedes Kürzel erklärt. Lesbar auch ohne DealPilot.');
-        await b2oZeile(s, 'Was hierbleibt', 'Dein <b>Konto</b>, Abo und Kontingent, Darstellung und Standardwerte. Fotos nur, wenn sie angehakt sind.');
+        await b2oZeile(s, 'Was hierbleibt', 'Dein <b>Konto</b>, Abo und Kontingent, Darstellung und Standardwerte. Fotos gehen mit, solange sie angehakt sind.');
         if (P.wissen) await b2oZeile(s, 'Achtung beim Weitergeben', 'Das Paket trägt auch dein <b>Wissen</b> mit — eigene Ergänzung und Portfolio-Analyse —, selbst wenn nur ein Objekt drin ist.');
         var b = q('#dpm-dpkt'); if (b && b.parentNode) b.parentNode.removeChild(b);
       },
