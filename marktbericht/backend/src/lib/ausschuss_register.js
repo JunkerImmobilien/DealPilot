@@ -331,6 +331,7 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                13072 war die letzte Luecke unter den im Register gefuehrten
                                MV-Landkreisen (13071, 13073, 13076 liegen). */
                             'lzs-swf-mv-rostock-2026-sperren.json',
+                            /* Nachernte 16.10.2026: Grundstuecksmarktdaten NRW, Ausgabe 2026 (lzs.csv, Berichtsjahr 2025), 502 Zinssaetze neben dem Vorjahrgang lzs-nrw.json - gleicher Zweigschluessel, findeZweig nimmt den juengeren Stichtag. */ 'lzs-swf-2026-nachernte.json',
                             /* ══ v1976 · DIE ERSTEN VERGLEICHSFAKTOREN ═══════════
 
                                Bis zum 08.10.2026 fuehrte das Register 0 Saetze mit
