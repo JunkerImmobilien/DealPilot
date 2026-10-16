@@ -4344,10 +4344,14 @@
         await warte(800);
         kegelHoch(true);
         await zeige(function () { var m = r24Ul(); return m && (m.querySelector('[class*=modal],[class*=box]') || m.firstElementChild); }, 6);
-        await b2oZeile(s, 'Je Unterlage die Stelle', 'DealPilot kennt die zuständigen Ämter aus seinem Register — mit Beleg, Gebühr und Weg. Wo noch keine hinterlegt ist, sucht es auf Knopfdruck.');
+        /* Prüflauf 24: für Bielefeld liegt im Register noch kein Amt - die Zeile sagt, was das Modal sagt */
+        var mt = r6Inner(r24Ul()), offen = /(\d+) von (\d+) Zuständigkeiten noch nicht ermittelt/.exec(mt);
+        await b2oZeile(s, 'Je Unterlage die Stelle', offen
+          ? 'Hier: <b>' + offen[1] + ' von ' + offen[2] + '</b> Zuständigkeiten noch nicht ermittelt. „Amt ermitteln“ sucht die Stelle — rund 20 Sekunden, dann steht sie im Register, mit Beleg.'
+          : 'Die zuständigen Ämter stehen schon im Register — mit Beleg, Gebühr und Weg.');
       },
       async function (s) {   /* 6 · Entwurf, nicht Versand */
-        var m = r24Ul(); var b = m && [].filter.call(m.querySelectorAll('button'), function (x) { return x.offsetWidth && /Entwurf|Antrag|Mail/i.test(x.textContent); })[0];
+        var m = r24Ul(); var b = m && [].filter.call(m.querySelectorAll('button'), function (x) { return x.offsetWidth && /Anschreiben|Entwurf|Antrag|Mail/i.test(x.textContent); })[0];
         if (b) { b.scrollIntoView({ block: 'center' }); await warte(400); await zeige(function () { return b; }, 8); }
         else await zeige(function () { var mm = r24Ul(); return mm && (mm.querySelector('#dp-ul-body') || mm.firstElementChild); }, 6);
         await b2oZeile(s, 'Entwurf, nicht Versand', 'Aus jeder Zeile wird ein fertiger Antrag — zum Kopieren oder für dein Mailprogramm. <b>DealPilot verschickt nichts</b>; im Video bleibt es hier.');
