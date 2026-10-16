@@ -578,7 +578,18 @@ export async function ladeAusDb(q, kennzahlen = ['liegenschaftszinssatz',
     const schluessel = (s) => [s.ags, s.kennzahl, s.zweig,
                                s.berichtsjahr ?? ''].join('|');
     const ausDb = new Set(rows.map(schluessel));
-    const behalten = _saat.filter((s) => !ausDb.has(schluessel(s)));
+    /* v2288a · SPERREN LEBEN IN DER DATEI. mb.param_modell kann keine Sperre
+       abbilden (kein vollstaendig-Feld, Sperren ohne formel werden nicht
+       eingespielt). Ersetzte eine DB-Zeile hier jeden Saatsatz mit gleichem
+       Schluessel, fiel die Sperre weg - gemessen 16.10.2026 an NI: die
+       Kreis-Sperre Goettingen teilt ags|kennzahl|zweig mit den Werten, die
+       nur ueber die Tabellenkennung der Zone greifen; ohne Sperre griff
+       ausserhalb der Zonen die DealPilot-Formel. Vorerst nur fuer die
+       Umrechnungskoeffizienten - bei Zins und Faktor wuerde eine stehende
+       Sperre neben einem Wert die Zweigwahl aendern (findeZweig). */
+    const _bleibtSperre = (s) => s.kennzahl === 'umrechnungskoeffizient_flaeche'
+      && (s.vollstaendig === false || !!s.warum_kein_wert);
+    const behalten = _saat.filter((s) => _bleibtSperre(s) || !ausDb.has(schluessel(s)));
     const zusammen = [...behalten, ...rows];
     const ersetzt = _saat.length - behalten.length;
 
