@@ -141,17 +141,37 @@ export function restnutzungsdauer({ gnd, alter, punkte = 0, kernsaniert = false 
      > bindend (BewG ist Steuerrecht), und ob DealPilot die Untergrenze
      > von 10 auf 24 Jahre hebt, ist eine Bewertungsentscheidung — sie
      > steht im Backlog, nicht in diesem Patch. */
+  /* v2275 · PLATEAU HINTER DEM SCHEITEL — Marcels Entscheidung vom 16.10.2026
+     („Variante 1"). Anlage 2 regelt den Fall Alter >= GND nicht. Bis hier
+     lieferte der Kern dort keine Zahl (Basis 0, Auffang 10 Jahre) — ein
+     Haus mit 13 Modernisierungspunkten fiel so mit dem ersten Jahr ueber
+     der GND von 43,5 auf 10 Jahre. Jetzt wird die Kurve bis zu ihrem
+     Scheitel (Alter = b*GND/(2a), bei jeder Punktzahl hinter der GND)
+     fortgefuehrt und DAHINTER GEHALTEN — der Tiefpunkt der Parabel, nie
+     der wieder steigende Ast. Monoton (aelter nie mehr), stetig an der
+     GND, und die Modernisierung wirkt weiter (GND 80: 13 Punkte -> 43,5 J,
+     9 Punkte -> 34,3 J, 0 Punkte -> 11,75 J). Deckel 70/90 % und die
+     Untergrenze RND_MIN bleiben. Kennzeichnung bleibt: sachverstaendig
+     zu wuerdigen. */
   if (A >= G) {
-    return { rnd: null, weg: null, grad: grad(p), punkte: p,
+    const scheitel = t.b * G / (2 * t.a);
+    const Af = Math.min(A, scheitel);
+    let rnd = (t.a * Af * Af) / G - t.b * Af + t.c * G;
+    const deckel = (kernsaniert ? 0.90 : 0.70) * G;
+    if (rnd > deckel) rnd = deckel;
+    if (rnd < 0) rnd = 0;
+    const s1 = Math.round(scheitel * 10) / 10;
+    return { rnd: Math.round(rnd * 10) / 10,
+             weg: 'Formel Anlage 2, auf dem Scheitel gehalten (Alter ' + s1 + ' J.)',
+             grad: grad(p), punkte: p,
              relatives_alter: Math.round(relAlter * 10) / 10,
-             grund: 'alter_ueber_gnd',
+             grund: 'plateau',
              hinweis: 'Das Alter (' + A + ' Jahre) erreicht oder '
-               + 'überschreitet die Gesamtnutzungsdauer (' + G + ' Jahre). '
-               + 'Die Kurve der Anlage 2 liegt hier hinter ihrem Scheitel '
-               + '(Alter ' + (Math.round(t.b * G / (2 * t.a) * 10) / 10)
-               + ' Jahre) und würde wieder steigen — es wird nicht '
-               + 'extrapoliert. Die Restnutzungsdauer ist sachverständig zu '
-               + 'würdigen.' };
+               + 'überschreitet die Gesamtnutzungsdauer (' + G + ' Jahre); '
+               + 'Anlage 2 regelt diesen Fall nicht. Die Kurve wird auf ihrem '
+               + 'Tiefpunkt (Scheitel bei Alter ' + s1 + ' Jahren) gehalten, '
+               + 'nicht über den wieder steigenden Ast fortgerechnet. Die '
+               + 'Restnutzungsdauer ist sachverständig zu würdigen.' };
   }
 
   let rnd;

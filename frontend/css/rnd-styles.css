@@ -1493,3 +1493,16 @@
   .dpdi-title { font-size: 17px !important; }
   .dpdi-table { font-size: 12px !important; }
 }
+
+/* v2274 · Marcel 16.10.2026: „nicht komplette Breite des Modals ausgenutzt".
+   Ab 900 px ist .rnd-wiz-body selbst ein Zwei-Spalten-Raster; das Feldraster
+   der Schritte (.rnd-wiz-grid) stand darin als EIN Kind und belegte nur die
+   linke Spalte - die Felder liefen auf halber Breite. Es spannt jetzt ueber
+   beide Spalten und verteilt seine Felder selbst (bis zu drei je Zeile). */
+@media (min-width: 900px) {
+  .rnd-wiz-body > .rnd-wiz-grid,
+  .rnd-wiz-body > .rnd-wiz-mod-row,
+  .rnd-wiz-body > .rnd-wiz-schaden-list { grid-column: 1 / -1; }
+  .rnd-wiz-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; }
+  .rnd-wiz-grid > .rnd-wiz-col-2, .rnd-wiz-grid > .rnd-wiz-section { grid-column: 1 / -1; }
+}
