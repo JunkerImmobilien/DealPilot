@@ -3804,11 +3804,11 @@
     try { await window.exportPDFBank({ ohneRueckfrage: true }); } catch (e) {} finally { api.save = _r19.save; _r19.save = null; r19MitKontakt(); }
     return fang;
   }
-  async function r19Seite(blob, n) {
+  async function r19Seite(blob, n, oben) {   /* v2276d · oben = PDF-y von unten (FitH,top), gemessen an den Textpositionen der Bankfassung */
     var u = blob.__url || (blob.__url = URL.createObjectURL(blob)); if (_r19.url.indexOf(u) < 0) _r19.url.push(u);
     var o = el('dpm-pdf');
     o.style.cssText = 'position:fixed;left:4%;right:4%;top:3%;bottom:4%;z-index:100002;background:#2b2b2b;border:2px solid ' + G + ';border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)';
-    o.innerHTML = '<iframe title="PDF" style="width:100%;height:100%;border:0" src="' + u + '#page=' + n + '&toolbar=0&navpanes=0&view=FitH"></iframe>';
+    o.innerHTML = '<iframe title="PDF" style="width:100%;height:100%;border:0" src="' + u + '#page=' + n + '&toolbar=0&navpanes=0&view=FitH' + (oben ? ',' + oben : '') + '"></iframe>';
     await warte(4000);
   }
   function r19K() { return (window.State && State.kpis) || {}; }
@@ -3852,19 +3852,21 @@
         zeige(null); kegelHoch(true);
         await r19Seite(bank, 1);
         await b2oZeile(s, 'Oben: deine Marke', 'Kopf mit Logo — mit Whitelabel steht hier deins, nicht unseres. Darunter Objekt, Foto und Stand.');
+        await r19Seite(bank, 1, 375);   /* INVESTITION 353 · FINANZIERUNG 202 */
         var K = r19K();
         await b2oZeile(s, 'Seite 1 · Objekt und Finanzierung', 'Kaufpreis <b>' + eur(K.kp) + '</b> mit jeder Nebenkostenzeile, Gesamtinvestition ' + eur(K.gi) + '. Eigenkapital ' + eur(K.ek) + ', Darlehen <b>' + eur(K.d1) + '</b> zu ' + r19Pz(K.d1z_pct) + '.');
       },
       async function (s) {   /* 5 · Kennzahlen */
         if (!_r19.bank) return;
-        await r19Seite(_r19.bank, 2);
+        await r19Seite(_r19.bank, 2, 700);   /* KENNZAHLEN 663 */
         var K = r19K();
         await b2oZeile(s, 'Seite 2 · Kennzahlen', 'Bruttorendite <b>' + r19Pz(K.bmy) + '</b>, Nettorendite ' + r19Pz(K.nmy) + ', DSCR <b>' + de(K.dscr, 2) + '</b>, Beleihung ' + r19Pz(K.ltv, 1) + ', Cashflow ' + eur(K.cf_m) + ' im Monat.');
+        await r19Seite(_r19.bank, 2, 400);   /* VON DER WARMMIETE ZUM CASHFLOW 380 */
         await b2oZeile(s, 'Von der Warmmiete zum Cashflow', 'Darunter die Rechnung Zeile für Zeile: Miete, Bewirtschaftung, Zinsen, Tilgung, Steuer — am Ende <b>' + eur(K.cf_ns) + '</b> nach Steuern im Jahr.');
       },
       async function (s) {   /* 6 · drei Phasen */
         if (!_r19.bank) return;
-        await r19Seite(_r19.bank, 3);
+        await r19Seite(_r19.bank, 3, 455);   /* CASHFLOW JE PHASE 439 */
         var K = r19K();
         await b2oZeile(s, 'Heute, Zinsbindung, Anschluss', 'Cashflow nach Steuern im Jahr: heute <b>' + eur(K.cf_ns) + '</b>, am Ende der Zinsbindung ' + eur(K.cf_ns_ezb) + ', in der Anschlussfinanzierung ' + eur(K.cf_ns_an) + '.');
       },
