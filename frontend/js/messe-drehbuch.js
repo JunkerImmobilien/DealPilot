@@ -4175,6 +4175,98 @@
     ]
   };
 
+  /* ═══ VIDEOREIHE · SPEZIALMODUL 23 · DIE 15-%-GRENZE (v2285) ═══════════════
+     Kapitelgerüst (Videoreihe.md): anschaffungsnahe Herstellungskosten -
+     Schwelle, netto/brutto, 3 Jahre, vor/nach BMF. KOPIE des Ravensberger Weg 38
+     (MFH, Sanierung 87.000 € brutto), beim Aufräumen gelöscht. Angenommen im
+     Lauf: netto statt brutto, dann 180.000 € Sanierung, dann der Gebäudeanteil
+     „optimiert" aus der Kaufpreisaufteilung (Mitschnitt Modul 10b, gelesen aus
+     DPM_REIHE_DATEN.bmf - für genau dieses Objekt gerechnet). Kein Abruf. */
+  function r23(id) { return r6Id(id); }
+  function r23Kv(id) { return function () { var e = document.getElementById(id); return e && (e.closest('.kv') || e); }; }
+  function r23Auf() { var d = q('#san_15pct_details'); if (d && !d.open) d.open = true; return d; }
+  DREHBUECHER['reihe-15pct'] = {
+    titel: 'Die 15-%-Grenze', unterzeile: 'Anschaffungsnahe Herstellungskosten — Schwelle, netto, drei Jahre', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das Beispiel */
+        await r6KopieStart(R6_MFH, { ohneAnkauf: true, ohneAnalyse: true });
+        await r6MfhBeispiel(s, ' Heute: die <b>15-%-Grenze</b>.');
+      },
+      async function (s) {   /* 2 · die Sanierung */
+        reiter('s1'); await warte(900);
+        var g = r6Gruppe('san'); var e = g(); if (e) e.scrollIntoView({ block: 'center' });
+        await warte(500);
+        await zeigeGruppe(g, feldVon('san_ust'), 8);
+        await b2oZeile(s, 'Die Sanierung', '<b>' + (eur(zahl('san')) || '–') + '</b> geplant, eingetragen <b>' + r6Optionstext('san_ust').replace(/\s*\(.*\)$/, '') + '</b>. In den ersten drei Jahren nach dem Kauf zählt das gegen eine Grenze.');
+      },
+      async function (s) {   /* 3 · die Grenze */
+        var d = r23Auf(); if (d) d.scrollIntoView({ block: 'start' });
+        await warte(700);
+        await zeigeGruppe(r23Kv('san_limit_max'), r23Kv('san_limit_status'), 8);
+        await b2oZeile(s, '15 % in drei Jahren', 'Höchstens <b>' + r23('san_limit_max') + '</b> netto (brutto ' + r23('san_limit_max_brutto') + '). Mehr, und die Kosten werden <b>Anschaffungskosten</b> — nur noch über die AfA, nicht sofort.');
+      },
+      async function (s) {   /* 4 · so wird gerechnet */
+        var b = q('#ahk_detail_block'), sicht = b && b.offsetHeight > 0;
+        if (sicht) {
+          await zeige(function () { return q('#ahk_detail_block'); }, 8);
+          await b2oZeile(s, 'So wird gerechnet', 'Gebäudeanteil <b>' + r23('ahk_geb_anteil') + '</b> vom Kaufpreis, plus anteilige Nebenkosten — die Gebäude-Anschaffungskosten. Davon 15 %: <b>' + r23('ahk_15pct') + '</b>.');
+        } else {
+          await zeige(r23Kv('san_limit_max'), 8);
+          await b2oZeile(s, 'So wird gerechnet', 'Gebäudeanteil ' + r6Pz(wert('geb_ant')) + ' % vom Kaufpreis plus anteilige Nebenkosten — davon 15 %.');
+        }
+      },
+      async function (s) {   /* 5 · netto */
+        await zeigeGruppe(r23Kv('san_brutto_val'), r23Kv('san_limit_actual'), 8);
+        await b2oZeile(s, 'Netto zählt', 'Das Gesetz misst <b>ohne Umsatzsteuer</b>: ' + r23('san_brutto_val') + (q('#san_ust_row') && q('#san_ust_row').offsetHeight ? ' − ' + r23('san_ust_val').replace(/^[−\-]\s*/, '') + ' Umsatzsteuer' : '') + ' = <b>' + r23('san_limit_actual') + '</b> maßgeblich. Status: <b>' + r23('san_limit_status').replace(/^✓\s*/, '') + '</b>.');
+      },
+      async function (s) {   /* 6 · als netto eingetragen */
+        await zeige(feldVon('san_ust'), 10);
+        var zb = r6Beginn(s, 'Angenommen: netto', 'Dieselbe Zahl, aber als Nettobetrag eingetragen …');
+        await warte(1300);
+        await tippeH('san_ust', 'netto', 600);
+        await warte(900);
+        await r6Ende(zb);
+        await zeigeGruppe(r23Kv('san_limit_actual'), r23Kv('san_limit_status'), 8);
+        await b2oZeile(s, 'Angenommen: netto', 'Jetzt zählt der volle Betrag: <b>' + r23('san_limit_actual') + '</b>. Status: <b>' + r23('san_limit_status').replace(/^✓\s*/, '') + '</b>. Brutto oder netto — die Angabe entscheidet mit.');
+      },
+      async function (s) {   /* 7 · über die Grenze */
+        var g = r6Gruppe('san'); var e = g(); if (e) e.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(g, 8);
+        var zb = r6Beginn(s, 'Angenommen: mehr Sanierung', '180.000 € netto in den ersten drei Jahren …');
+        await tippeH('san', '180000', 110);
+        await warte(1100);
+        await r6Ende(zb);
+        var d = r23Auf(); if (d) d.scrollIntoView({ block: 'start' });
+        await warte(500);
+        await zeigeGruppe(r23Kv('san_limit_actual'), r23Kv('san_limit_status'), 8);
+        await b2oZeile(s, 'Über der Grenze', '<b>' + r23('san_limit_actual') + '</b> gegen ' + r23('san_limit_max') + ': <b>' + r23('san_limit_status').replace(/^[✓⚠✕!]\s*/, '') + '</b>. Die Kosten gehen dann in die Abschreibung des Gebäudes.');
+        await zeige(feldVon('san_tax_years'), 10);
+        await b2oZeile(s, 'Steuerlich verteilt', 'Die Verteilung steht auf <b>' + r6Optionstext('san_tax_years') + '</b> — DealPilot wählt nach der Grenze: sofort oder über die Nutzungsdauer.');
+      },
+      async function (s) {   /* 8 · vor und nach der Kaufpreisaufteilung */
+        var B = window.DPM_REIHE_DATEN && DPM_REIHE_DATEN.bmf && DPM_REIHE_DATEN.bmf.pipeline && DPM_REIHE_DATEN.bmf.pipeline.phase5_varianten, opt = B && B.optimiert && B.optimiert.gebaeude_pct;
+        var vorMax = r23('san_limit_max'), vorAnt = wert('geb_ant');
+        reiter('s3-tax'); await warte(900);
+        await zeige(feldVon('geb_ant'), 10);
+        await b2oZeile(s, 'Der Gebäudeanteil', 'Die Grenze hängt am Gebäudeanteil: hier <b>' + r6Pz(vorAnt) + ' %</b>. Die Kaufpreisaufteilung (Modul 10b) kann ihn begründet anheben.');
+        if (opt) {
+          var zb = r6Beginn(s, 'Nach der Kaufpreisaufteilung', 'Variante „optimiert“ aus Modul 10b: ' + de(opt, 2) + ' % Gebäude …');
+          await tippeH('geb_ant', de(opt, 2), 140);
+          await warte(1000);
+          await r6Ende(zb);
+          reiter('s1'); await warte(800);
+          var d = r23Auf(); if (d) d.scrollIntoView({ block: 'start' });
+          await warte(500);
+          await zeigeGruppe(r23Kv('san_limit_max'), r23Kv('san_limit_status'), 8);
+          await b2oZeile(s, 'Vor und nach der Aufteilung', 'Grenze <b>' + vorMax + ' → ' + r23('san_limit_max') + '</b>. Status: <b>' + r23('san_limit_status').replace(/^[✓⚠✕!]\s*/, '') + '</b>. Mehr Gebäude heißt mehr Spielraum — und mehr AfA.', 600);
+        }
+      }
+    ]
+  };
+
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0, _aktiv = null;
   function stopp() {
