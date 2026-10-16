@@ -38840,6 +38840,39 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2280–v2287b · UMRECHNUNGSKOEFFIZIENT GRUNDSTÜCKSGRÖSSE (§ 19 ImmoWertV) — Register, Ernte, Eingabefeld, Datenbank (16.10.2026, Staging)
+
+**Auslöser.** Marcel 16.10.2026 zu Bericht 216 (Westerfeldstr. 140, Bielefeld): „das kann doch gar nicht sein, dass wir so einen großen Bodenwert in Bielefeld haben". Gerechnet war 1.570 m² × 450 €/m² = 706.500 € bei einem Richtwertgrundstück von 600 m² — ohne Umrechnung. Koeffizienten kannte der Bericht nur für Minden-Lübbecke (fest in `umrechnung_nrw.js`).
+
+**Rechtslage (Recherche, belegt in scratchpad uk-recherche.md):** § 40 ImmoWertV (Bodenwert aus BRW, Abweichungen berücksichtigen), § 19 (Umrechnungskoeffizienten, Grundstücksgröße ausdrücklich), § 41 (Teilflächen), § 9 Abs. 3 (sachverständige Schätzung nur ohne geeignete Daten, dokumentiert). ImmoWertA 2023: zu § 19/§ 41 „Keine Anmerkungen", Rangfolge örtlicher Ausschuss → Oberer Ausschuss/Landeswert → andere Quellen, Quelle angeben. **Bundesweite Tabellen gibt es nicht mehr** (VW-RL 2014 Anlage 2, WertR — seit 01.01.2022 gegenstandslos).
+
+**Marcels Entscheidungen 16.10.2026:**
+- „amtlich nur da, wo es auch so ist" — und: „wichtig ist, dass es sauber funktioniert".
+- **Variante A:** ohne amtlichen Koeffizienten volle Fläche, aber markiert (`bodenwert_nicht_angepasst`, Ertrags-/Sachwert insoweit vorläufig, Link zur Umrechnungsvorschrift, Hinweis aufs Eingabefeld).
+- Kunden tragen fehlende Werte selbst ein — Feld nur, wenn gebraucht.
+- Marktfaktor 0,4 (Mehrfläche in der Marktpreisindikation) nur noch ohne amtlichen Koeffizienten.
+- **Näherung als Stufe darunter** (folgt, v2288): eine DealPilot-Formel aus allen amtlichen Tabellen, gekennzeichnet als Näherung; Geschosszahl aus BORIS als Bedingung (nur bis II).
+- Ernte in ALLEN Ländern, Großstadt und ländlich.
+
+**Was steht (Code):**
+- Kennzahl `umrechnungskoeffizient_flaeche` im Register (Dateien `uk-flaeche-*.json`, SAATDATEIEN, `ladeAusDb`). Kern `lib/umrechnung_flaeche.js`: Formen `flaeche_tabelle` (je Normgröße oder `*` mit `bezug_qm`, Zwischenwerte linear/stufen, Regeln ober-/unterhalb wörtlich), `flaeche_funktion` (potenz/log/linear, `spanne_qm`), `flaeche_eins` (amtlich kein Einfluss). Koeffizient immer UK(Objekt)/UK(Bezugsgröße). Geltung: Objektarten, `brw_bis/von_eur_qm`, `gebiete_ausgeschlossen` (Ortsteil aus BORIS/Adresse; unbekannt → keine Zahl), `normgroesse_je_objektart` (Dortmund), `boris_tabellen` + Zonenabruf (NI/HB, `connectors/boris/ni-zone.js`, v2284). Sperre → kein Wert, Weg zur Quelle.
+- Bericht (`ReportOrchestrator`): eigene Angabe `uk_flaeche` → Register → Minden-Lübbecke-Rückfall; Hinterland behält die Anpassung des Baulands; Quellennachweis nennt den Koeffizienten (by-2-0). `ValuationService`: Mehrfläche amtlich = Fläche × BRW × UK − Bezugsgröße × BRW.
+- Eingabefeld „Umrechnungskoeffizient Grundstücksgröße" in Marktbericht-App (Experte, nur Haus mit Grundstück) und Haupt-App (neben Sachwertfaktor), Objekt-Reiter-Zeile „Umrechnung Grundstücksgröße" (`/wertparameter/zinssatz` liefert `uk_flaeche_quelle`).
+- Nebenbei: Sachwert-Rechenweg ohne doppelten Index, Dezimalkomma (nhk2010); Landing ohne die zwei Bewertungspartner-Logos/-Namen.
+
+**Ernte (Agenten, geprüft):** NW alle 72 Ausschüsse (75 Sätze, 20 Werte), NI über BORIS-NI-WFS (121, 84 Werte, zonenscharf), Länder/Stadtstaaten (HH Formel, Stadt Bremen, ST „= 1"; Sperren MV Genehmigung, RP kostenpflichtig, Bremerhaven, Berlin nur WGFZ; HE und TH bewusst gesperrt — HE nicht beschlossen/2008-09, TH Lizenz nur nicht kommerziell), Mainz „kein Einfluss". 97 amtliche Anwendungsbeispiele mit der echten Funktion getroffen. BW, BY, Osten, HE/RP/SL/SH örtlich: Ernte läuft (16.10. nachmittags).
+
+**Datenbank (Staging):** `register-saat.mjs` — 108 UK-Werte in `mb.param_modell`. Drei Fallen, alle behoben:
+1. `modellversion`, `quelle_parser`, `modellansaetze` sind NOT NULL — fehlten in den neuen Sätzen; `saat-pruefen` verlangt sie jetzt bei jedem Wert.
+2. `schreibeModelle` zeigte nur die ersten drei Verwerfungen; die Sperren füllten den Zähler → die echten Schreibfehler blieben unsichtbar. Jetzt eigener Zähler `schreibfehler`, immer gezeigt.
+3. **Eigener Fehler:** drei UK-Sperren (HE, TH, Aachen) trugen ihre Tabelle als `formel` — die Tabelle kennt kein Sperr-Feld, sie kamen als WERT an. Tabelle jetzt in `formel_vorgemerkt`, die drei Staging-Zeilen per UPDATE auf `{form: konstante, wert: null}` (nicht gelöscht), `uk-flaeche-pruefen` meldet jede Sperre mit rechenbarer Formel rot. Alt-Sperren der LZS/SWF-Dateien tragen nur `{form: konstante, wert: null}` — harmlos, unberührt.
+
+**Richtigstellung:** „BORIS-D liefert für NI/HB keine Fläche des Richtwertgrundstücks" (v2283) war falsch verallgemeinert — mein Messpunkt lag in einer Zone ohne Flächenbezug. Leer 900, Göttingen 600, Hannover 750, Braunschweig 1.000 m² kommen an (v2284).
+
+- **Commits:** `990e9cf9` (v2280), v2281/a, `97385be3` (v2282), `cc31a14c` (v2283), `732b2b7e` (v2284, NI-Zone), `f3a8b8ae` (v2285), `4e1995d9` (v2285a Landing), `495d0d9c` (v2286 NRW), v2287/a, `e9f960e9` (v2287b).
+- **Nachweis:** `uk-flaeche-pruefen` sauber (206 Sätze, 97 Beispiele), `saat-pruefen --basislinie` grün, Gegenprobe im Staging-Container mit DB-Stand: HE/TH/Aachen keine Zahl, Bielefeld 0,59, Leer 0,97. Bielefeld EFH 1.570 m² → 0,4439 → 313.623 € statt 706.500 €.
+- **Rest:** Prod-Rollout (Code + `register-saat.mjs` auf Prod nach Sicherung). Näherung v2288 einbauen (Ableitung `tools/uk-naeherung-ableiten.mjs`: b Median −0,213 land, −0,25 Stadt; Hamburg amtlich −0,2496). Offene Bewertungsfragen an Marcel: Zwischenwerte ohne Interpolationsregel (Münster, Aachen u. a.), DHH/RH in NI, Bonn „nur für den Dienstgebrauch", Lippe-Bezug, Kauf/Genehmigung Saarbrücken, Bremerhaven, Saarland, Bremen (Zins/Faktor). Hamburg: BORIS-Abruf lieferte an einem Punkt keinen Wert — prüfen. Tiefe und WGFZ als eigene Kennzahlen (viele NRW-Ausschüsse).
+
 ### v2279 · Modul 16 neu aufgenommen nach v2277/v2278 (Sachwert mit NHK 4.1, eine RND) (16.10.2026, Staging)
 
 - **Was:** Bericht 216 liegt in `mb.market_reports` noch mit dem Sachwert vor v2277 (927.000 €, RND 21); das Marktbericht-Fenster lädt ihn per GET `/reports/one`. `r16MbSpion` ersetzt im Lauf NUR `cross_check` durch den Mitschnitt (v2278) – kein Abruf, kein Schreiben in die Datenbank, Modul 18 (Bericht 205) unberührt. Modul 16 neu aufgenommen: 5:29, 12,8 MB.
