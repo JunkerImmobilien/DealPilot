@@ -128,7 +128,9 @@ for (const f of _dateien) {
     /* v2287 · mb.param_modell.modellversion ist NOT NULL - ein Wert ohne sie wird beim
        Einspielen (register-saat.mjs) still verworfen. Gemessen 16.10.2026: alle 111
        Umrechnungskoeffizienten mit Wert fehlten in der Tabelle, der Pruefer war gruen. */
-    if (!sperre && s.formel && !s.modellversion) fehler.push(`${wo}: modellversion fehlt (Datenbank verlangt sie)`);
+    for (const _k of ['modellversion', 'quelle_parser', 'modellansaetze']) {   /* v2287: NOT NULL in mb.param_modell */
+      if (!sperre && s.formel && s[_k] == null) fehler.push(`${wo}: ${_k} fehlt (Datenbank verlangt es)`);
+    }
     if (s.stufe && !/^[A-E]$/.test(s.stufe)) fehler.push(`${wo}: stufe ${s.stufe}`);
     if (!sperre && s.formel && s.formel.form === 'konstante' && !(typeof s.formel.wert === 'number' && isFinite(s.formel.wert))) fehler.push(`${wo}: formel.wert keine Zahl`);
     if (s.formel && s.kennzahl === 'liegenschaftszinssatz' && typeof s.formel.wert === 'number' && (s.formel.wert < -2 || s.formel.wert > 12)) fehler.push(`${wo}: Zins ${s.formel.wert} außerhalb -2–12 %`);   /* Frankfurt druckt negative Saetze (EFH zentral -0,1) */

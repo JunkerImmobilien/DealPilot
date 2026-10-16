@@ -127,6 +127,10 @@ export function machRepository(q) {
      * ohne Belege wird kein Modell gespeichert. */
     async schreibeModelle(modelle) {
       let uebernommen = 0; let verworfen = 0;
+      /* v2287 · Schreibfehler eigens zaehlen und IMMER zeigen. Der gemeinsame
+         Zaehler stand nach den Sperren (kein formel) schon ueber 3 - die NOT-NULL-
+         Fehler der Umrechnungskoeffizienten erschienen nie, 111 Saetze fehlten still. */
+      let schreibfehler = 0;
       for (const m of modelle) {
         if (!m.quelle_url || !m.kennzahl || !m.ags || !m.land_code
             || !m.formel || !m.belege || !m.belege.length) { verworfen++; continue; }
@@ -213,11 +217,12 @@ export function machRepository(q) {
           );
           uebernommen++;
         } catch (e) {
-          verworfen++;
-          if (verworfen <= 3) console.error('  Modell verworfen:', m.zweig, e.message);
+          verworfen++; schreibfehler++;
+          if (schreibfehler <= 5) console.error('  Modell verworfen:', m.kennzahl, m.ags, m.zweig, e.message);
         }
       }
-      return { uebernommen, verworfen };
+      if (schreibfehler) console.error('  Schreibfehler insgesamt: ' + schreibfehler);
+      return { uebernommen, verworfen, schreibfehler };
     },
 
     /** Modelle zu einem Gebiet, feinste Ebene zuerst. */

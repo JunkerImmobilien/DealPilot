@@ -153,7 +153,9 @@
     "vollstaendig": false,
     "warum_kein_wert": "Der Immobilienmarktbericht Hessen führt eine landesweite Tabelle als Ersatz, sie beruht aber auf Kaufpreisen von 2008/09 und ist nach Angabe der Zentralen Geschäftsstelle nicht beschlossen; ein eigener Stichtag fehlt. Das trägt keinen amtlichen Landeswert (v2283). Maßgeblich sind die Umrechnungskoeffizienten des örtlichen Gutachterausschusses.",
     "auflagen": "Werte nur zur Dokumentation hinterlegt; Quelle als unveränderte Kopie gelesen, amtlicher Link am 16.10.2026 nicht erreichbar.",
-    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen (ZGGH), Jahrgang 2025"
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen (ZGGH), Jahrgang 2025",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
   },
   {
     "land_code": "TH",
@@ -294,7 +296,9 @@
     "vollstaendig": false,
     "warum_kein_wert": "Die landesweiten Umrechnungskoeffizienten des Thüringer Landesamts für Bodenmanagement und Geoinformation (TLBG) sind veröffentlicht, aber laut Impressum nur für den privaten, nicht kommerziellen Gebrauch freigegeben. Bis zur Klärung der Nutzungsrechte wird keine Zahl übernommen (v2283, Marcel 16.10.2026: amtlich nur, wo es auch so ist).",
     "auflagen": "Werte im Satz nur zur späteren Freigabe hinterlegt; Klärung der kommerziellen Nutzung beim TLBG offen.",
-    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Freistaats Thüringen, Jahrgang 2026"
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Freistaats Thüringen, Jahrgang 2026",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
   },
   {
     "land_code": "ST",
@@ -349,7 +353,9 @@
       "abgerufen_am": "2026-10-16",
       "veroeffentlicht": "2026-03-04"
     },
-    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Jahrgang 2026"
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Jahrgang 2026",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
   },
   {
     "land_code": "MV",
@@ -388,7 +394,9 @@
       "dokument": "Landesgrundstücksmarktbericht Mecklenburg-Vorpommern 2025",
       "abgerufen_am": "2026-10-16"
     },
-    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Oberer Gutachterausschuss für Grundstückswerte im Land Mecklenburg-Vorpommern, Jahrgang 2025"
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Oberer Gutachterausschuss für Grundstückswerte im Land Mecklenburg-Vorpommern, Jahrgang 2025",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
   },
   {
     "land_code": "RP",
@@ -427,7 +435,9 @@
       "dokument": "Landesgrundstücksmarktbericht Rheinland-Pfalz 2025 (Online-Auszug Kap. 1-3)",
       "abgerufen_am": "2026-10-16"
     },
-    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Oberer Gutachterausschuss für Grundstückswerte für den Bereich des Landes Rheinland-Pfalz, Jahrgang 2025"
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Oberer Gutachterausschuss für Grundstückswerte für den Bereich des Landes Rheinland-Pfalz, Jahrgang 2025",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
   },
   {
     "land_code": "HH",
@@ -513,7 +523,9 @@
       "abgerufen_am": "2026-10-16",
       "pdf_erstellt": "2026-04-20"
     },
-    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Hamburg, Jahrgang 2026"
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Hamburg, Jahrgang 2026",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
   },
   {
     "land_code": "HB",
@@ -664,7 +676,9 @@
       "abgerufen_am": "2026-10-16",
       "pdf_geaendert": "2026-04-10"
     },
-    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Bremen, Jahrgang 2026"
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Bremen, Jahrgang 2026",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
   },
   {
     "land_code": "HB",
@@ -697,7 +711,9 @@
       "dokument": "Grundstücksmarktbericht 2026 Bremerhaven",
       "abgerufen_am": "2026-10-16"
     },
-    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Bremerhaven (Geschäftsstelle beim Vermessungs- und Katasteramt Bremerhaven), Jahrgang 2026"
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Bremerhaven (Geschäftsstelle beim Vermessungs- und Katasteramt Bremerhaven), Jahrgang 2026",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
   },
   {
     "land_code": "BE",
@@ -736,6 +752,8 @@
       "dokument": "Bodenrichtwerte 01.01.2026 – Erläuterung",
       "abgerufen_am": "2026-10-16"
     },
-    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Berlin, Jahrgang 2026"
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Berlin, Jahrgang 2026",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
   }
 ]

@@ -69,6 +69,8 @@
       "dokument": "Grundstücksmarktbericht Mainz 2025",
       "abgerufen_am": "2026-10-16",
       "redaktionsschluss": "2025-11-25"
-    }
+    },
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
   }
 ]
