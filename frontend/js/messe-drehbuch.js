@@ -1432,6 +1432,14 @@
       if (ref && DPM_REIHE.angelegt.indexOf(ref) >= 0) return rhJ({ history: rhVerlauf() });
     }
     if (/\/api\/v1\/immometrica\//.test(u)) { var a = _imoAntwort(u); if (a) return rhJ(a); }
+    /* v2300 · Modul 24: die Geokodierung vor dem BORIS-Abruf ist ein externer, bezahlter Dienst -
+       gespielt mit den Koordinaten aus dem gespeicherten Bericht desselben Objekts (_rh.geo).
+       Der BORIS-Abruf selbst (Open Data, GET) läuft echt. */
+    if (m === 'GET' && _rh.geo && /\/marktbericht\/geocode\?/.test(u)) return rhJ(JSON.parse(JSON.stringify(_rh.geo)));
+    /* v2300 · Modul 21: die Portfolio-Analyse ist EIN echter Abruf (Mitschnitt D.portfolioPilot);
+       ihre Ablage in den Einstellungen wird im Lauf beantwortet, nicht geschrieben. */
+    if (m === 'POST' && D.portfolioPilot && /\/ai\/copilot$/.test(u.split('?')[0]) && body && /GESAMTES Portfolio/.test(String(body.message || ''))) return rhJ(JSON.parse(JSON.stringify(D.portfolioPilot)));
+    if (m === 'PUT' && /\/user-settings\/portfolio_analyse/.test(u)) return rhJ({ ok: true, vorfuehrung: true });
     /* v2273 · Belege einlesen (Modul 15): die Auslese der beiden Beispielbelege, einmal echt */
     if (m === 'POST' && D.belege && /\/ai\/extract-beleg/.test(u)) return rhJ(JSON.parse(JSON.stringify(D.belege)));
     /* v2257 · BMF-Kaufpreisaufteilung (Modul 10b): einmal echt gerechnet, hier
@@ -4199,6 +4207,14 @@
         var g = r6Gruppe('san'); var e = g(); if (e) e.scrollIntoView({ block: 'center' });
         await warte(500);
         await zeigeGruppe(g, feldVon('san_ust'), 8);
+        /* Prüflauf 23: das Demo-Objekt trägt keine Sanierung (Modul 10b hatte sie im Lauf eingetippt) */
+        if (!zahl('san')) {
+          var zb = r6Beginn(s, 'Angenommen: eine Sanierung', 'Dach, Fenster, Bäder in den ersten drei Jahren — 87.000 € laut Angebot, brutto.');
+          await tippeH('san_ust', 'brutto', 300);
+          await tippeH('san', '87000', 110);
+          await warte(900);
+          await r6Ende(zb);
+        }
         await b2oZeile(s, 'Die Sanierung', '<b>' + (eur(zahl('san')) || '–') + '</b> geplant, eingetragen <b>' + r6Optionstext('san_ust').replace(/\s*\(.*\)$/, '') + '</b>. In den ersten drei Jahren nach dem Kauf zählt das gegen eine Grenze.');
       },
       async function (s) {   /* 3 · die Grenze */
@@ -4263,6 +4279,234 @@
           await zeigeGruppe(r23Kv('san_limit_max'), r23Kv('san_limit_status'), 8);
           await b2oZeile(s, 'Vor und nach der Aufteilung', 'Grenze <b>' + vorMax + ' → ' + r23('san_limit_max') + '</b>. Status: <b>' + r23('san_limit_status').replace(/^[✓⚠✕!]\s*/, '') + '</b>. Mehr Gebäude heißt mehr Spielraum — und mehr AfA.', 600);
         }
+      }
+    ]
+  };
+
+  /* ═══ VIDEOREIHE · SPEZIALMODUL 24 · BODENRICHTWERT UND UNTERLAGEN (v2300) ═══
+     Kapitelgerüst: Bodenrichtwert holen (BORIS) · Unterlagen bei den Ämtern -
+     nur bis vor die Bestellung · Restnutzungsdauer-Gutachten (nur zeigen).
+     KOPIE der Westerfeldstr. 140, beim Aufräumen gelöscht. Der BORIS-Abruf
+     läuft ECHT (Open Data, kostenlos, GET); die Geokodierung davor ist ein
+     bezahlter Dienst und wird mit den Koordinaten aus Bericht 216 desselben
+     Objekts gespielt (_rh.geo). Unterlagen: nur das Modal mit dem, was das
+     Register schon weiß (GET /aemter); keine Amtssuche (POST /amt), kein
+     Entwurf (POST /entwurf trägt den Kontonamen) - beides sperrt RH_SPERRE
+     ohnehin. Nichts wird verschickt. */
+  function r24Ul() { return q('#dp-unterlagen-modal'); }
+  function r24UlZu() { try { if (window.DealPilotUnterlagen) DealPilotUnterlagen.schliessen(); } catch (e) {} var m = r24Ul(); if (m && m.parentNode) m.parentNode.removeChild(m); }
+  DREHBUECHER['reihe-brw-unterlagen'] = {
+    titel: 'Bodenrichtwert und Unterlagen', unterzeile: 'BORIS, die zuständigen Ämter — und was DealPilot nicht verschickt', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { r24UlZu(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das Beispiel */
+        await r6KopieStart(R11_WESTERFELD, { ohneAnkauf: true, ohneAnalyse: true });
+        try { var R = DPM_REIHE_DATEN.westerfeld.mb[3].ref; if (_rh && R && R.lat != null) _rh.geo = { lat: R.lat, lon: R.lon }; } catch (e) {}
+        await r11Beispiel(s, ' Heute: <b>Bodenrichtwert</b> und <b>Unterlagen vom Amt</b>.');
+      },
+      async function (s) {   /* 2 · der Bodenrichtwert */
+        reiter('s0'); await warte(700);
+        var f = feldVon('brw'); var e = f(); if (e) e.scrollIntoView({ block: 'center' });
+        await warte(500);
+        await zeigeGruppe(f, function () { return q('#brw-boris-btn'); }, 8);
+        await b2oZeile(s, 'Der Bodenrichtwert', 'Er trägt den Bodenwert — und damit Ertrags- und Sachwert. Hier steht <b>' + (wert('brw') || '–') + ' €/m²</b>. Woher? Einmal neu abrufen.');
+      },
+      async function (s) {   /* 3 · BORIS abrufen */
+        var vor = wert('brw');
+        await zeige(function () { return q('#brw-boris-btn'); }, 10);
+        var zb = r6Beginn(s, 'Bodenrichtwert abrufen', 'Ein Klick: DealPilot fragt das Bodenrichtwert-Portal des Landes — kostenlos, amtlich.');
+        await tippeH('brw', '', 80);
+        await warte(900);
+        var b = q('#brw-boris-btn'); if (b) b.click();
+        await warteAuf(function () { return wert('brw') && !/sucht|läuft/i.test(r6Id('brw-ai-status')); }, 15000);
+        await warte(900);
+        await r6Ende(zb);
+        await zeigeGruppe(f2(), function () { return q('#brw-ai-status') || q('#brw-boris-btn'); }, 8);
+        function f2() { return feldVon('brw'); }
+        var st = r6Id('brw-ai-status');
+        await b2oZeile(s, 'Aus BORIS', '<b>' + (wert('brw') || '–') + ' €/m²</b>' + (st ? ' — ' + st.replace(/^✓\s*/, '') : '') + (vor && vor !== wert('brw') ? ' (vorher ' + vor + ')' : '') + '.');
+      },
+      async function (s) {   /* 4 · das Portal */
+        var p = function () { return [].filter.call(document.querySelectorAll('.btn-brw'), function (x) { return x.offsetWidth && /BORIS-Portal/.test(x.textContent); })[0] || null; };
+        await zeige(p, 10);
+        await b2oZeile(s, 'Zum Nachsehen', 'Der Knopf daneben öffnet das <b>BORIS-Portal</b> des Bundeslands — mit Karte, Zone und Stichtag.');
+      },
+      async function (s) {   /* 5 · Unterlagen beim Amt */
+        reiter('s8'); await warte(1200);
+        var am = function () { return r6Knopf('#s8', /Unterlagen beim Amt anfordern/); };
+        var k = am(); if (k) k.scrollIntoView({ block: 'center' });
+        await warte(500);
+        await zeige(function () { var b = am(); return b && (b.parentElement || b); }, 8);
+        await b2oZeile(s, 'Unterlagen vom Amt', 'Flurkarte, Grundbuch, Baulasten, Altlasten, Bauakte — in der Deal-Aktion, und im Reiter Objekt beim Bodenrichtwert.');
+        try { await window.DealPilotUnterlagen.oeffnen(); } catch (e) {}
+        await warteAuf(function () { var m = r24Ul(); return m && /Flurkarte|Grundbuch/.test(m.textContent); }, 8000);
+        await warte(800);
+        kegelHoch(true);
+        await zeige(function () { var m = r24Ul(); return m && (m.querySelector('[class*=modal],[class*=box]') || m.firstElementChild); }, 6);
+        await b2oZeile(s, 'Je Unterlage die Stelle', 'DealPilot kennt die zuständigen Ämter aus seinem Register — mit Beleg, Gebühr und Weg. Wo noch keine hinterlegt ist, sucht es auf Knopfdruck.');
+      },
+      async function (s) {   /* 6 · Entwurf, nicht Versand */
+        var m = r24Ul(); var b = m && [].filter.call(m.querySelectorAll('button'), function (x) { return x.offsetWidth && /Entwurf|Antrag|Mail/i.test(x.textContent); })[0];
+        if (b) { b.scrollIntoView({ block: 'center' }); await warte(400); await zeige(function () { return b; }, 8); }
+        else await zeige(function () { var mm = r24Ul(); return mm && (mm.querySelector('#dp-ul-body') || mm.firstElementChild); }, 6);
+        await b2oZeile(s, 'Entwurf, nicht Versand', 'Aus jeder Zeile wird ein fertiger Antrag — zum Kopieren oder für dein Mailprogramm. <b>DealPilot verschickt nichts</b>; im Video bleibt es hier.');
+        r24UlZu(); kegelHoch(false);
+        await warte(700);
+      },
+      async function (s) {   /* 7 · Restnutzungsdauer-Gutachten */
+        var g = function () { var h = [].filter.call(document.querySelectorAll('#s8 .dab-rh-n'), function (x) { return /^Gutachter/.test(r6Text(x)); })[0]; return h && h.closest('.dab-rail-head'); };
+        var x = g(); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(500);
+        await zeigeGruppe(g, function () { var h = g(); return h && h.nextElementSibling; }, 8);
+        await b2oZeile(s, 'Restnutzungsdauer-Gutachten', 'Die Ersteinschätzung macht der Rechner im Reiter Steuer (Modul 10c). Für das Finanzamt geht von hier die Anfrage an einen Gutachter — im Video nicht.', 600);
+      }
+    ]
+  };
+
+  /* ═══ VIDEOREIHE · SPEZIALMODULE 20 UND 21 · BANKEXPORT, COCKPIT (v2300) ═══
+     Beide laufen am KONTO, ohne Kopie: sie lesen nur. rhNurStart setzt den
+     Lauf auf wie r6KopieStart (Sperren, Merker, Mitschnitte), legt aber kein
+     Objekt an. Gesperrt bleibt alles aus RH_SPERRE, dazu die Ablage der
+     Portfolio-Analyse (PUT /user-settings/portfolio_analyse): im Lauf
+     beantwortet, nicht geschrieben. */
+  async function rhNurStart() {
+    DPM_REIHE.angelegt = []; DPM_REIHE.gesperrt = []; DPM_REIHE.gespielt = []; DPM_REIHE.geloescht = []; DPM_REIHE.abrufe = []; DPM_REIHE.fertig = null;
+    var ls = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
+    _rh = { start: Date.now() - 1000, berichte: [], spr: 0, sprMax: 0, seqKey: null, seq: undefined,
+      merker: { dp_zielstufe: ls('dp_zielstufe'), dp_mb_auftraege: ls('dp_mb_auftraege'), dp_mb_pref_span: ls('dp_mb_pref_span'), qc_span_config: ls('qc_span_config') },
+      kacheln: ['dealpilot', 'import', 'voice', 'immometrica', 'gefuehrt'].filter(rhGewaehlt) };
+    await rhLaden();
+    rhSpion(); rhMikroAn();
+  }
+  /* ── 20 · Bankexport Portfolio ── */
+  var _r20All;
+  function r20M() { return q('#bankexport-modal'); }
+  function r20Zu() { var m = r20M(); if (m && m.parentNode) m.parentNode.removeChild(m); if (_r20All !== undefined) { window._bankexportIncludeAll = _r20All; _r20All = undefined; } }
+  function r20Karte(re) { var m = r20M(); return m && [].filter.call(m.querySelectorAll('.bank-sum-card'), function (c) { return re.test(r6Text(c.querySelector('.bank-sum-label'))); })[0] || null; }
+  function r20Wert(re) { var c = r20Karte(re); return c ? r6Text(c.querySelector('.bank-sum-val')) : '–'; }
+  DREHBUECHER['reihe-bankexport'] = {
+    titel: 'Bankexport Portfolio', unterzeile: 'Alle Darlehen in einer Tabelle — für das Bankgespräch', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { r20Zu(); kegelHoch(false); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · der Einstieg */
+        await rhNurStart();
+        _r20All = window._bankexportIncludeAll;
+        var k = function () { return qs('.sb-act-item[onclick*="bankexport"]'); };
+        await zeige(k, 10);
+        await b2oZeile(s, 'Bankexport', 'Links unter den Aktionen: <b>Bankexport</b> — das ganze Portfolio so, wie eine Bank es für eine Anschlussfinanzierung sehen will.');
+      },
+      async function (s) {   /* 2 · die Summen */
+        window._bankexportIncludeAll = false;
+        try { await window.showBankexportView(); } catch (e) {}
+        await warteAuf(function () { return r20M() && r20Karte(/^Objekte mit Darlehen/); }, 8000);
+        await warte(700);
+        kegelHoch(true);
+        await zeige(function () { var m = r20M(); return m && m.querySelector('.bank-summary-grid'); }, 8);
+        await b2oZeile(s, 'Auf einen Blick', 'Objekte mit Darlehen <b>' + r20Wert(/^Objekte mit Darlehen/) + '</b>, ' + r20Wert(/^Anzahl Darlehen/) + ' Darlehen, Kaufpreise zusammen <b>' + r20Wert(/^Summe Kaufpreis/) + '</b>, Restschuld heute <b>' + r20Wert(/^Summe Restschuld/) + '</b>.');
+      },
+      async function (s) {   /* 3 · welche Objekte */
+        await zeige(function () { var m = r20M(); return m && m.querySelector('.bank-filter-bar'); }, 8);
+        await b2oZeile(s, 'Welche Objekte', 'Vorgabe: nur, was im <b>Bestand</b> ist — gewonnene Deals. Ein Häkchen nimmt alle Objekte dazu, eins je Zeile nimmt ein Darlehen heraus.');
+      },
+      async function (s) {   /* 4 · die Tabelle */
+        var t = function () { var m = r20M(); return m && m.querySelector('.bank-table thead'); };
+        var x = t(); if (x) x.scrollIntoView({ block: 'start' });
+        await warte(500);
+        await zeigeGruppe(t, function () { var m = r20M(); var r = m && m.querySelectorAll('.bank-table tbody tr'); return r && r.length ? r[Math.min(3, r.length - 1)] : null; }, 6);
+        var n = r20M() ? r20M().querySelectorAll('.bank-table tbody tr').length : 0;
+        await b2oZeile(s, 'Je Darlehen eine Zeile', n + ' Zeilen: Fläche, Nettokaltmiete, €/m², Bewirtschaftung, <b>Darlehenssumme, Zins, Tilgung, Kapitaldienst, Zinsbindung</b>, Restschuld heute und am Ende der Bindung.');
+      },
+      async function (s) {   /* 5 · Ausgabe */
+        var a = function () { var m = r20M(); return m && m.querySelector('.global-view-actions'); };
+        var x = a(); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(400);
+        await zeige(a, 8);
+        await b2oZeile(s, 'Für die Bank', '<b>PDF</b> zum Mitnehmen, <b>Excel</b> und CSV zum Weiterrechnen — dieselben Zahlen wie in den Objekten. Im Video laden wir nichts herunter.', 600);
+        r20Zu(); kegelHoch(false);
+      }
+    ]
+  };
+  /* ── 21 · Portfolio-Cockpit und Portfolio-Pilot ── */
+  function r21(sel) { return q('#dp-stage ' + sel); }
+  function r21T(sel) { return r6Inner(r21(sel)).replace(/\s+/g, ' '); }
+  function r21Zu() { try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {} }
+  DREHBUECHER['reihe-cockpit'] = {
+    titel: 'Portfolio-Cockpit und Pilot', unterzeile: 'Alle Objekte auf einer Seite — und ein Pilot, der sie kennt', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { r21Zu(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · Einstieg */
+        await rhNurStart();
+        await zeige(function () { return qs('.sb-act-item[onclick*="cockpit"]'); }, 10);
+        await b2oZeile(s, 'Das Portfolio-Cockpit', 'Links unter den Aktionen. Hier steht nicht ein Objekt, sondern <b>alle</b>.');
+        try { sbActionsAction('cockpit'); } catch (e) {}
+        await warteAuf(function () { return r21('#dp-pscore-hero .hbody'); }, 10000);
+        await warte(1200);
+      },
+      async function (s) {   /* 2 · der Portfolio-Score */
+        await zeige(function () { return r21('#dp-pscore-hero .hgate') || r21('#dp-pscore-hero'); }, 8);
+        var t = r21T('#dp-pscore-hero .hbody'), sc = /SCORE\s*(\d+)\s*\/\s*100\s*([A-ZÄÖÜ ]+?)\s*OBJEKTE/.exec(t), ob = /OBJEKTE\s*(\d+)/.exec(t), vol = /VOL\.\s*([\d,]+ Mio)/.exec(t), cf = /CF\/MON\s*([+−\-]?[\d.]+)/.exec(t);
+        await b2oZeile(s, 'Der Portfolio-Score', '<b>' + (sc ? sc[1] + ' · ' + sc[2].trim().charAt(0) + sc[2].trim().slice(1).toLowerCase() : '–') + '</b> über ' + (ob ? ob[1] : '–') + ' Objekte, Volumen ' + (vol ? vol[1] + ' €' : '–') + ', Cashflow ' + (cf ? cf[1] + ' €' : '–') + ' im Monat.');
+      },
+      async function (s) {   /* 3 · woraus er besteht */
+        await zeige(function () { return r21('#dp-pscore-hero .hbars'); }, 8);
+        var t = r21T('#dp-pscore-hero .hbars'), teile = [];
+        var re = /(Rendite|Finanzierung|Risiko & Vermietung|Lage & Diversifikation|Upside-Potenzial)\s*\d+\s*KPIs\s*(\d+)\/100/g, m;
+        while ((m = re.exec(t))) teile.push(m[1] + ' <b>' + m[2] + '</b>');
+        await b2oZeile(s, 'Fünf Bereiche', (teile.join(', ') || '–') + ' — dieselben Kennzahlen wie im einzelnen Objekt, gewichtet über den Bestand.');
+      },
+      async function (s) {   /* 4 · Kennzahlen aggregiert */
+        var o = function () { return r21('#dp-overview-strip'); };
+        var x = o(); if (x) x.scrollIntoView({ block: 'center' });
+        await warte(500);
+        await zeige(o, 8);
+        var t = r21T('#dp-overview-strip'), mi = /MIETEINNAHMEN \/ MONAT\s*([\d.,]+ €)/.exec(t), gi = /GESAMTINVESTITION\s*([\d.,]+ Mio €)/.exec(t), rs = /RESTSCHULD GESAMT\s*([\d.,]+ Mio €)/.exec(t);
+        await b2oZeile(s, 'Kennzahlen über alles', 'Mieteinnahmen <b>' + (mi ? mi[1] : '–') + '</b> im Monat, Gesamtinvestition ' + (gi ? gi[1] : '–') + ', Restschuld ' + (rs ? '<b>' + rs[1] + '</b>' : '–') + '. Ein Klick wechselt zwischen Bestand und Ankauf-Stand.');
+      },
+      async function (s) {   /* 5 · Steuer über alle Objekte */
+        var k = function () { return r21('#dp-steuerkette'); };
+        var x = k(); if (x) x.scrollIntoView({ block: 'start' });
+        await warte(500);
+        await zeige(k, 8);
+        await b2oZeile(s, 'Steuer über alle Objekte', 'Die Einkommensteuer mit Progression — privat und je Gesellschaft, aus den echten Objektdaten. Was ein Objekt mehr bringt, sieht man im Ganzen.');
+      },
+      async function (s) {   /* 6 · Projektion */
+        var p = function () { return r21('#dp-charts-sec'); };
+        var x = p(); if (x) x.scrollIntoView({ block: 'start' });
+        await warte(500);
+        await zeige(p, 8);
+        await b2oZeile(s, 'Die Projektion', 'Restschuld, Eigenkapital, Cashflow über 10, 20 oder 30 Jahre — eine vereinfachte Modellrechnung über den ganzen Bestand.');
+      },
+      async function (s) {   /* 7 · der Portfolio-Pilot */
+        var pp = function () { return q('#dp-pp'); };
+        var x = pp(); if (x) x.scrollIntoView({ block: 'start' });
+        await warte(500);
+        await zeige(function () { return q('#dp-pp .dp-pp-head') || pp(); }, 8);
+        await b2oZeile(s, 'Der Portfolio-Pilot', 'Er kennt die Vermögensbilanz und jedes Objekt darin. Ein Klick: die Analyse über alles.');
+      },
+      async function (s) {   /* 8 · die Analyse (Mitschnitt) */
+        var D = window.DPM_REIHE_DATEN;
+        if (!(D && D.portfolioPilot)) { await b2oZeile(s, 'Die Analyse', 'Hier läuft die Portfolio-Analyse.'); return; }
+        var g = q('#dp-pp-go');
+        await zeige(function () { return q('#dp-pp-go'); }, 10);
+        var zb = r6Beginn(s, 'Die Analyse', 'Vermögensbilanz, Ertrag, die einzelnen Objekte, Klumpenrisiken, Entwicklung — und was als Nächstes zu tun ist.');
+        if (g) g.click();
+        await warteAuf(function () { var l = q('#dp-pp-log'); return l && l.querySelectorAll('[class*=msg]').length >= 2 && !/denkt|analysiert/i.test(l.lastElementChild ? l.lastElementChild.textContent.slice(0, 40) : ''); }, 15000);
+        await warte(900);
+        await r6Ende(zb);
+        var log = function () { return q('#dp-pp-log'); };
+        var l = log(); if (l) l.scrollTop = 0;
+        await zeige(log, 6);
+        var txt = (D.portfolioPilot.reply || ''), h = (txt.match(/^\s*(?:#+\s*)?\d\.\s*[^\n]{3,60}/gm) || []).slice(0, 3).map(function (x) { return x.replace(/^\s*#*\s*/, '').replace(/\*/g, '').trim(); });
+        await b2oZeile(s, 'Gegliedert, mit Zahlen', (h.length ? h.join(' · ') : 'Vermögensbilanz · Ertragslage · die Objekte') + ' — gerechnet mit den Zahlen des Cockpits, nichts erfunden.');
+        if (l) { l.scrollTop = l.scrollHeight * 0.45; await warte(500); }
+        await b2oZeile(s, 'Die Objekte beim Namen', 'Welche tragen, welche belasten — mit Objekt und Zahl. Am Ende drei konkrete Schritte, priorisiert.');
+      },
+      async function (s) {   /* 9 · Fragen */
+        await zeige(function () { return q('#dp-pp-chips'); }, 8);
+        await b2oZeile(s, 'Und dann fragen', 'Schnellfragen oder eigene: „Welches Objekt zieht den Schnitt runter?“ — der Pilot antwortet zu jedem Objekt und zum Ganzen.', 600);
       }
     ]
   };
