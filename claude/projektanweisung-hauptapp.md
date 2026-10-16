@@ -38840,6 +38840,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### landing-videothek-2 + Prod-Rollout (37) · Videothek 25 Videos (16.10.2026)
+
+- **Was:** Videothek und „DealPilot live“ um 10c (RND-Rechner), 20 (Bankexport Portfolio), 21 (Portfolio-Cockpit und Pilot), 23 (15-%-Grenze), 24 (Bodenrichtwert und Unterlagen) ergänzt — `videos.json`, fünf WebP-Vorschaubilder, Buster `landing-videothek-2`. Neuaufnahmen 16/18/19/Ü2 lagen schon (md5 lokal = Staging = Prod). MP4s per scp auf Staging und Prod (`frontend/landing/medien/videothek/`, gitignored).
+- **Commit:** `fa9c22f0` (Agent), Merge siehe Prod-Rollout (37).
+- **Nachweis:** Staging-Browser: 25 Karten (2 Überblick, 11 Basis, 12 Erweitert), neue Videos spielen über 60 s, 390 px ohne Überlauf, Range-Abrufe 206.
+- **Rest:** Vorschaubilder 16/20/23/24 zeigen Demo-Adressen (wie die Videos selbst). Modul 21 trägt noch die KI-Antwort mit dem alten DSCR 0,87 (vor v2305).
+
 ### v2305 + Prod-Rollout (36) · Portfolio-DSCR: Zinssätze mit Punkt wurden ×10 bzw. ×100 gelesen (16.10.2026)
 
 - **Was:** Die Portfolio-Analyse (Modul 21) nannte DSCR 0,87 bei Mieteinnahmen 344.100 €/Jahr und Cashflow vor Steuer +23.034 €/Jahr — rechnerisch unmöglich. Ursache: `dashboard.js` `num()` entfernt JEDEN Punkt als Tausendertrenner; Zins/Tilgung stehen im Konto gemischt („4,0" und „3.5", „2.50"). „3.5" wurde 35 %, „2.50" 250 %. Sieben Stellen auf `_pct()` umgestellt (Kapitaldienst/DSCR in `aggStats`, Tilgungs-/Zinssumme, Restschuld, mittlerer Zins, Objektwerte an die Portfolio-Analyse). `all-objects.js` (Punkt nur bei Komma entfernt) und das Bank-PDF (`parseDe`) lesen richtig — geprüft.
