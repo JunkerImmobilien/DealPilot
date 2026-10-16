@@ -1060,10 +1060,12 @@
         await warteAuf(function () { return /KI-Analyse/.test(qcText('ai-source')) && qcText('ai-pros').length > 20; }, 9000);
         await warte(800);
         await zeige(function () { var n = qcEl('ai-negotiate-v'); return n && (n.parentElement || n); }, 8);
-        s.zeile('Die Pilot-Analyse', 'Der Pilot bleibt ehrlich: für deine <b>C-Lage</b> zu wenig Rendite — dein Ziel gäbe es erst bei <b>117.086 €</b>.');
+        /* v2370 · die Zahlen kamen hier als Text ins Drehbuch - jetzt aus der angezeigten Analyse gelesen (Regel 1) */
+        var kiT = qcText('ai-card') || '', kiZiel = /Kaufpreis von ([\d.]+ ?€)/.exec(qcText('ai-negotiate-v') || kiT), kiUnter = /([\d.]+ ?€)[^.\n]{0,20}unter de[rm] (?:geschätzten Marktwert|DealPilot-Marktbewertung)/.exec(kiT);
+        s.zeile('Die Pilot-Analyse', 'Der Pilot bleibt ehrlich: für deine <b>C-Lage</b> zu wenig Rendite' + (kiZiel ? ' — dein Ziel gäbe es erst bei <b>' + kiZiel[1] + '</b>' : '') + '.');
         await warte(6500);
         await zeige(function () { return qcEl('ai-card'); }, 6);
-        s.zeile('Die Pilot-Analyse', 'Und er sieht mehr: <b>39.000 € unter Marktwert</b> — als Renditeobjekt nein, als <b>Substanzkauf</b> interessant.');
+        s.zeile('Die Pilot-Analyse', 'Und er sieht mehr: ' + (kiUnter ? '<b>' + kiUnter[1] + ' unter Marktwert</b>' : 'einen Preis <b>unter Marktwert</b>') + ' — als Renditeobjekt nein, als <b>Substanzkauf</b> interessant.');
         await warte(5500);
         _kiFrei = null;
       },
