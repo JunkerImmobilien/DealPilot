@@ -1,12 +1,12 @@
 {
-  "_hinweis": "landing-videothek-1 · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
+  "_hinweis": "landing-videothek-2 · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
   "stand": "2026-10-16",
   "basis_medien": "medien/videothek/",
   "basis_bilder": "assets/videothek/",
   "kategorien": [
     { "id": "ueberblick", "name": "Überblick", "kurz": "Der ganze Weg am Stück", "text": "Für den ersten Eindruck: von der ersten Prüfung bis zum fertigen Investment-PDF, ohne Umweg." },
     { "id": "basis", "name": "Basis", "kurz": "Jeder Bereich der App", "text": "Die Basismodule 02 bis 10: ein Objekt anlegen, Daten aufnehmen, bewerten, rechnen. Für neue Piloten." },
-    { "id": "spezial", "name": "Erweitert", "kurz": "Tiefer ins Detail", "text": "Die Spezialmodule ab 11: Analyse, Scores, Bankunterlagen, Bestand, Steuer und Wertermittlung." }
+    { "id": "spezial", "name": "Erweitert", "kurz": "Tiefer ins Detail", "text": "Die Spezialmodule ab 11: Analyse, Scores, Bankunterlagen, Bestand, Steuer, Wertermittlung und Portfolio." }
   ],
   "videos": [
     {
@@ -154,6 +154,18 @@
       "youtube": { "titel": "DealPilot Modul 10b · BMF-Kaufpreisaufteilung", "tags": ["DealPilot", "Kaufpreisaufteilung", "BMF Arbeitshilfe", "Gebäudeanteil"], "youtube_id": null }
     },
     {
+      "id": "modul-10c-restnutzungsdauer-rechner", "kategorie": "basis", "nr": "10c", "dauer": 249,
+      "titel": "Der Restnutzungsdauer-Rechner",
+      "unterzeile": "Ganze Jahre, Spanne, übernehmen — und wo die Anlage 2 endet.",
+      "story": "Das Gesetz unterstellt 50 Jahre Nutzungsdauer — ist das Haus früher verbraucht, gilt ein eigener AfA-Satz. Der Rechner im Reiter Steuer führt dich in neun vorbelegten Schritten zur Restnutzungsdauer nach Anlage 2: als Spanne in ganzen Jahren, mit einem Klick übernommen, und du siehst, was der höhere Satz im Jahr an Steuer spart. Beim Altbau zeigt er ehrlich, wo das Modell endet: dort muss ein Sachverständiger ran.",
+      "nutzen": "In Minuten wissen, ob sich ein Restnutzungsdauer-Gutachten für dich lohnt.",
+      "kapitel": ["Die gesetzliche AfA", "Neun Schritte", "Das Ergebnis als Spanne", "Übernehmen", "Vorher und nachher", "Und ein Altbau?", "Sachverständig zu würdigen"],
+      "spruch": "Restflugzeit geschätzt — das Gutachten landet.",
+      "datei": "dealpilot-modul-10c-restnutzungsdauer-rechner.mp4",
+      "poster": "dealpilot-modul-10c-restnutzungsdauer-rechner.webp",
+      "youtube": { "titel": "DealPilot Modul 10c · Der Restnutzungsdauer-Rechner – AfA nach Anlage 2", "tags": ["DealPilot", "Restnutzungsdauer", "AfA", "Anlage 2", "Steuer Immobilie"], "youtube_id": null }
+    },
+    {
       "id": "modul-11-pilot-analyse", "kategorie": "spezial", "nr": "11", "dauer": 284,
       "titel": "Pilot-Analyse im Detail",
       "unterzeile": "Die KI-Einschätzung Abschnitt für Abschnitt — und was sie nicht tut.",
@@ -248,6 +260,54 @@
       "datei": "dealpilot-modul-19-das-bank-pdf.mp4",
       "poster": "dealpilot-modul-19-das-bank-pdf.webp",
       "youtube": { "titel": "DealPilot Modul 19 · Das Bank-PDF", "tags": ["DealPilot", "Bankunterlagen", "Investment Case", "Finanzierung"], "youtube_id": null }
+    },
+    {
+      "id": "modul-20-bankexport-portfolio", "kategorie": "spezial", "nr": "20", "dauer": 99,
+      "titel": "Bankexport Portfolio",
+      "unterzeile": "Alle Darlehen in einer Tabelle — für das Bankgespräch.",
+      "story": "Die Bank will deinen Bestand sehen, nicht jedes Objekt einzeln. Der Bankexport fasst alle Objekte mit Darlehen zusammen: Kaufpreise und Restschuld auf einen Blick, je Darlehen eine Zeile — fertig für das nächste Finanzierungsgespräch.",
+      "nutzen": "Deine Selbstauskunft zum Bestand, ohne eine Tabelle von Hand zu pflegen.",
+      "kapitel": ["Bankexport", "Auf einen Blick", "Welche Objekte", "Je Darlehen eine Zeile", "Für die Bank"],
+      "spruch": "Alle Maschinen gelistet — die Bank sieht die Flotte.",
+      "datei": "dealpilot-modul-20-bankexport-portfolio.mp4",
+      "poster": "dealpilot-modul-20-bankexport-portfolio.webp",
+      "youtube": { "titel": "DealPilot Modul 20 · Bankexport Portfolio – alle Darlehen für die Bank", "tags": ["DealPilot", "Bankexport", "Immobilienportfolio", "Finanzierung"], "youtube_id": null }
+    },
+    {
+      "id": "modul-21-portfolio-cockpit-und-pilot", "kategorie": "spezial", "nr": "21", "dauer": 179,
+      "titel": "Portfolio-Cockpit und Pilot",
+      "unterzeile": "Alle Objekte auf einer Seite — und ein Pilot, der sie kennt.",
+      "story": "Das Portfolio-Cockpit zeigt deinen ganzen Bestand: Portfolio-Score, Kennzahlen über alle Objekte, Steuer und die Projektion in die Zukunft. Dazu der Portfolio-Pilot — eine Analyse, gegliedert und mit Zahlen, die deine Objekte beim Namen nennt. Und danach fragst du einfach weiter.",
+      "nutzen": "Du steuerst den Bestand als Ganzes statt Objekt für Objekt.",
+      "kapitel": ["Das Portfolio-Cockpit", "Der Portfolio-Score", "Kennzahlen über alles", "Steuer über alle Objekte", "Die Projektion", "Der Portfolio-Pilot", "Und dann fragen"],
+      "spruch": "Die ganze Flotte im Blick — der Pilot fliegt mit.",
+      "datei": "dealpilot-modul-21-portfolio-cockpit-und-pilot.mp4",
+      "poster": "dealpilot-modul-21-portfolio-cockpit-und-pilot.webp",
+      "youtube": { "titel": "DealPilot Modul 21 · Portfolio-Cockpit und Portfolio-Pilot", "tags": ["DealPilot", "Immobilienportfolio", "Portfolio-Analyse", "KI", "Cashflow"], "youtube_id": null }
+    },
+    {
+      "id": "modul-23-die-15-prozent-grenze", "kategorie": "spezial", "nr": "23", "dauer": 215,
+      "titel": "Die 15-%-Grenze",
+      "unterzeile": "Anschaffungsnahe Herstellungskosten — Schwelle, netto, drei Jahre, Kaufpreisaufteilung.",
+      "story": "Wer kurz nach dem Kauf saniert, kann die Kosten sofort absetzen — oder muss sie über Jahrzehnte abschreiben. DealPilot rechnet die Grenze für dein Objekt aus: 15 Prozent des Gebäudeanteils in drei Jahren, netto gerechnet, und zeigt, wie sich die Schwelle nach der Kaufpreisaufteilung verschiebt.",
+      "nutzen": "Du planst die Sanierung so, dass sie steuerlich nicht kippt.",
+      "kapitel": ["Eine Sanierung", "15 % in drei Jahren", "So wird gerechnet", "Netto zählt", "Über der Grenze", "Der Gebäudeanteil", "Vor und nach der Aufteilung"],
+      "spruch": "Unter der Grenze geblieben — Steuer im Sinkflug.",
+      "datei": "dealpilot-modul-23-die-15-prozent-grenze.mp4",
+      "poster": "dealpilot-modul-23-die-15-prozent-grenze.webp",
+      "youtube": { "titel": "DealPilot Modul 23 · Die 15-%-Grenze – anschaffungsnahe Herstellungskosten", "tags": ["DealPilot", "anschaffungsnahe Herstellungskosten", "15-Prozent-Grenze", "Sanierung", "Steuer Immobilie"], "youtube_id": null }
+    },
+    {
+      "id": "modul-24-bodenrichtwert-und-unterlagen", "kategorie": "spezial", "nr": "24", "dauer": 158,
+      "titel": "Bodenrichtwert und Unterlagen",
+      "unterzeile": "BORIS, die zuständigen Ämter — und was DealPilot nicht verschickt.",
+      "story": "Den Bodenrichtwert holt DealPilot amtlich aus BORIS, mit Stichtag und Zone zum Nachsehen. Für Grundbuch, Bauakte und Flurkarte zeigt es je Unterlage die zuständige Stelle und bereitet die Anfrage als Entwurf vor — verschickt wird nichts ohne dich. Dazu der Weg zum Restnutzungsdauer-Gutachten.",
+      "nutzen": "Du weißt, wo jede Unterlage liegt, statt Behörden abzutelefonieren.",
+      "kapitel": ["Der Bodenrichtwert", "Aus BORIS", "Zum Nachsehen", "Unterlagen vom Amt", "Je Unterlage die Stelle", "Entwurf, nicht Versand", "Restnutzungsdauer-Gutachten"],
+      "spruch": "Boden unter den Rädern — Papiere an Bord.",
+      "datei": "dealpilot-modul-24-bodenrichtwert-und-unterlagen.mp4",
+      "poster": "dealpilot-modul-24-bodenrichtwert-und-unterlagen.webp",
+      "youtube": { "titel": "DealPilot Modul 24 · Bodenrichtwert und Unterlagen vom Amt", "tags": ["DealPilot", "Bodenrichtwert", "BORIS", "Grundbuch", "Bauakte"], "youtube_id": null }
     }
   ]
 }
