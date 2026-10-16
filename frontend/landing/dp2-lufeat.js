@@ -29,7 +29,7 @@
     {n:'3',t:'Bewerten','s':'// Co-Pilot',items:[
       ['Investor Deal Score','0&ndash;100 aus 24&nbsp;KPIs in f&uuml;nf Bereichen &mdash; mit anpassbaren Gewichten und lokaler Ampel-Bewertung ohne KI.'],
       ['Co-Pilot (KI)','Web-Recherche zu Lage und Markt, St&auml;rken &amp; Risiken, Verhandlungsempfehlung mit Zielpreis und fertiger Kaufpreis-Offerte als Text.'],
-      ['Marktdaten &amp; Marktwert','DealPilot-Marktbewertung, Bodenrichtwert (BORIS), automatischer Mietspiegel-Vergleich &mdash; Marktwert-Indikation &uuml;ber PriceHubble &amp; Sprengnetter.'],
+      ['Marktdaten &amp; Marktwert','DealPilot-Marktbewertung, Bodenrichtwert (BORIS), automatischer Mietspiegel-Vergleich &mdash; Marktwert-Indikation &uuml;ber unabh&auml;ngige Bewertungspartner.'],   /* v2285: Anbieter-Neutralitaet */
       ['RND-Gutachten','Restnutzungsdauer nach Sachverst&auml;ndigen-Methodik einsch&auml;tzen &mdash; und die Gutachten-Anfrage direkt aus der App stellen.']
     ]},
     {n:'4',t:'Exportieren',s:'// Bank &amp; Portfolio',items:[
