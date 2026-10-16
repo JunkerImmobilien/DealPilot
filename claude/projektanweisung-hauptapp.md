@@ -38947,6 +38947,19 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Nachweis:** `uk-flaeche-pruefen` sauber (206 Sätze, 97 Beispiele), `saat-pruefen --basislinie` grün, Gegenprobe im Staging-Container mit DB-Stand: HE/TH/Aachen keine Zahl, Bielefeld 0,59, Leer 0,97. Bielefeld EFH 1.570 m² → 0,4439 → 313.623 € statt 706.500 €.
 - **Rest:** Prod-Rollout (Code + `register-saat.mjs` auf Prod nach Sicherung). Näherung v2288 einbauen (Ableitung `tools/uk-naeherung-ableiten.mjs`: b Median −0,213 land, −0,25 Stadt; Hamburg amtlich −0,2496). Offene Bewertungsfragen an Marcel: Zwischenwerte ohne Interpolationsregel (Münster, Aachen u. a.), DHH/RH in NI, Bonn „nur für den Dienstgebrauch", Lippe-Bezug, Kauf/Genehmigung Saarbrücken, Bremerhaven, Saarland, Bremen (Zins/Faktor). Hamburg: BORIS-Abruf lieferte an einem Punkt keinen Wert — prüfen. Tiefe und WGFZ als eigene Kennzahlen (viele NRW-Ausschüsse).
 
+### v2370 · landing-videothek-3b · Überblick 1 (Quick Boarding) neu im Reihenrahmen (16.10.2026, Staging)
+
+- **Was:**
+  - REIHE `01` im Studio als „Überblick 1“ (art, nr, hinweis, weiter zu Ü2), dazu der Alias `ue1`.
+  - Im Drehbuch `quickcheck-rundgang` standen „117.086 €“ und „39.000 € unter Marktwert“ als Text. Jetzt werden beide aus der angezeigten Analyse gelesen.
+  - Im Prüflauf gemessen: die App rechnet weiter einen Zielpreis von 117.086 €, der Mitschnitt passt zum Stand.
+  - Neu aufgenommen: 3:42, 8,4 MB. Videothek: Dauer 222 s, Poster neu, Buster `landing-videothek-3b`, MP4 auf Staging (md5 geprüft).
+- **Nicht getan:** MP4 auf Prod. Die Freigabe kam über den Koordinator, nicht von Marcel direkt.
+- **Beobachtet:** Alle 39 Objekte von info@ tragen `updated_at` 16.10. 17:57:58 UTC, alle mit Version +1. Das ist die Sammeländerung „Nebenkosten aus dem Profil“ aus dem Hauptstrang, sie lag vor meiner Aufnahme. Während der Aufnahme blieb die Datenbank gleich.
+  - **Folge:** Videos, die vorher aufgenommen wurden, können andere Nebenkosten zeigen als die App jetzt.
+- **Commit:** `45aa57a8` (v2370), landing-videothek-3b (Commit danach)
+- **Nachweis:** Prüflauf mit Protokoll; Konferenzprüfung, Probe, Bildprüfung, Name/Adresse 0 Treffer; Datenbank vorher/nachher gleich; `fetch` danach echt.
+
 ### v2352–v2353 · landing-videothek-3a · Module 17 und 21 neu aufgenommen (16.10.2026, Staging)
 
 - **Was:**
