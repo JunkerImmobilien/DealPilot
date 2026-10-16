@@ -933,7 +933,7 @@ export const ReportOrchestrator = {
       try {
         const _minden = String(ref.ags || '').replace(/\D/g, '').startsWith('05770');
         const _frei = !_ukReg || _ukReg.grund === 'kein_satz'
-          || (_ukReg.grund === 'sperre' && !sperreSchliesstNaeherungAus(_ukReg.hinweis));
+          || (_ukReg.grund === 'sperre' && !sperreSchliesstNaeherungAus(_ukReg.hinweis, _ukReg.sperre_grund));
         if (!_minden && _frei && !(_ukReg && _ukReg.verfuegbar)) {
           const _pr = (landValue && landValue.properties_raw) || {};
           const _n = ukNaeherung({

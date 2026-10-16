@@ -444,6 +444,14 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                             /* Ernte 16.10.2026: Baden-Wuerttemberg (BORIS-BW-Fachinformationen, Marktberichte) -
                                Werte Heilbronn, Freiburg, Bruchsal; Sperren mit Weg fuer 65 weitere Ausschuesse (davon 7 Stadtkreise), 639 Saetze je Gemeinde. */
                             'uk-flaeche-bw-2026.json',
+                            /* Ernte 16.10.2026: Bayern (BORIS-Bayern, Erlaeuterungen von 85 Ausschuessen ueber das WMS-Feld
+                               listeumrechnungstabellen) - Wert Amberg (amtlich kein Einfluss); Sperren mit Weg fuer 95 Ausschuesse,
+                               davon 4 amtliche Tabellen mit Lizenzverbot als Stuetzstelle vorgemerkt (Fuerth, Landshut, FFB, Weilheim-Schongau). */
+                            'uk-flaeche-by-2026.json',
+                            /* Ernte 16.10.2026: Ost (BB alle 16 Ausschuesse, SN alle 13, MV Rostock + LUP) - Werte LDS, TF, CB, MOL
+                               (Tabellen/Potenz je Raum, Gemeinden des Berliner Umlands mit 8-stelliger AGS) und amtlich „kein Einfluss“
+                               BAR, HVL, LOS, P, PM; Sperren mit Weg, SN/Rostock als Stuetzstelle vorgemerkt (Lizenz). TH/ST: kein oertlicher Satz. */
+                            'uk-flaeche-ost-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

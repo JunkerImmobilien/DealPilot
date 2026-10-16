@@ -211,7 +211,8 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
         + Number(bezugsgroesse_qm) + ' m² Bezugsgröße). ' : '')
       + (satz.warum_kein_wert ? String(satz.warum_kein_wert) + ' ' : '')
       + (satz.quelle_url ? 'Quelle: ' + satz.gaa_name + ', ' + satz.quelle_url + '.' : ''),
-      { ...herkunft, nicht_angepasst: fl > 0 && Number(bezugsgroesse_qm) > 0 && fl !== Number(bezugsgroesse_qm) });
+      { ...herkunft, sperre_grund: satz.sperre_grund || null,
+        nicht_angepasst: fl > 0 && Number(bezugsgroesse_qm) > 0 && fl !== Number(bezugsgroesse_qm) });
   }
   if (!(fl > 0)) return nichts('flaeche_fehlt', null, herkunft);
   if (!(brw > 0)) return nichts('brw_fehlt', null, herkunft);
@@ -349,7 +350,12 @@ export function geschosse(t) {
 }
 
 /** Sperrgruende, bei denen der Ausschuss eine ANDERE Regel hat - dort keine Naeherung. */
-export function sperreSchliesstNaeherungAus(text) {
+/* v2289a · Vorrang hat der Grund-Code der Ernte (sperre_grund). Die Stichwortsuche
+   bleibt Rueckfall fuer Saetze ohne Code - sie traf auch zufaellige Zitate („-tiefe"). */
+const KEINE_NAEHERUNG_BEI = new Set(['nur_tiefe', 'nur_wgfz', 'nur_tiefe_wgfz', 'tiefe_und_wgfz',
+  'tiefe_und_flaeche_kombiniert', 'nicht_abbildbar', 'reihenwahl_nicht_ueber_ags', 'nur_einzelfall', 'kein_einfluss']);
+export function sperreSchliesstNaeherungAus(text, code) {
+  if (code) return KEINE_NAEHERUNG_BEI.has(String(code));
   return /tiefe|wgfz|\bgfz\b|geschossfl|kein(?:en|e)? einfluss|keine (?:flaechen)?abh|nicht flaechenabh|ausgeschlossen/i
     .test(String(text || ''));
 }
