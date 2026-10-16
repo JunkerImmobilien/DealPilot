@@ -1,0 +1,62 @@
+{
+  "stand": "2026-10-16",
+  "form": "UK(Objekt)/UK(Bezugsgroesse) = (Flaeche/Bezugsgroesse)^b",
+  "herkunft": "DealPilot-Naeherung aus amtlichen Umrechnungstabellen der Gutachterausschuesse (Register), Median der Exponenten je Tabelle",
+  "stufe": "D",
+  "gilt_fuer": {
+    "objektarten": [
+      "efh",
+      "zfh",
+      "dhh",
+      "rh"
+    ],
+    "max_vollgeschosse": 2,
+    "verhaeltnis_von": 0.5,
+    "verhaeltnis_bis": 2.5
+  },
+  "mindest_tabellen": 8,
+  "alle": {
+    "b": -0.213,
+    "b_q1": -0.224,
+    "b_q3": -0.11,
+    "tabellen": 109,
+    "laender": [
+      "HB",
+      "HH",
+      "NI",
+      "NW",
+      "RP",
+      "ST"
+    ],
+    "abweichung_median_pct": 1.024,
+    "abweichung_p90_pct": 10.423
+  },
+  "stadt": {
+    "b": -0.25,
+    "b_q1": -0.342,
+    "b_q3": -0.183,
+    "tabellen": 19,
+    "laender": [
+      "HB",
+      "HH",
+      "NI",
+      "NW",
+      "RP"
+    ],
+    "abweichung_median_pct": 2.49,
+    "abweichung_p90_pct": 19.584
+  },
+  "land": {
+    "b": -0.213,
+    "b_q1": -0.213,
+    "b_q3": -0.11,
+    "tabellen": 90,
+    "laender": [
+      "NI",
+      "NW",
+      "ST"
+    ],
+    "abweichung_median_pct": 0.624,
+    "abweichung_p90_pct": 10.423
+  }
+}

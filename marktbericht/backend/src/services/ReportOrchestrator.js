@@ -19,7 +19,8 @@ import { CrossCheckService } from './CrossCheckService.js';
 import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js';
 /* v1070-WUK-4 · Umrechnungskoeffizienten und Hinterland-Abgrenzung. */
 import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js';
-import { groessenanpassung as ukAusRegister } from '../lib/umrechnung_flaeche.js';   /* v2280 */
+import { groessenanpassung as ukAusRegister, naeherung as ukNaeherung,
+         sperreSchliesstNaeherungAus } from '../lib/umrechnung_flaeche.js';   /* v2280, v2288 */
 import { zustaendig as niZoneZustaendig, holeZonen as niZonenHolen, waehleZone as niZoneWaehlen } from '../connectors/boris/ni-zone.js';   /* v2284 */
 /* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
  * zustaendigen Grundstuecksmarktbericht. */
@@ -923,6 +924,32 @@ export const ReportOrchestrator = {
           ? 'Koeffizient ' + _ukReg.koeffizient_bauland + ' (' + _ukReg.quelle + ')'
           : _ukReg.grund));
       } catch (e) { _ukReg = null; }
+      /* v2288 · DIE DEALPILOT-FORMEL als Stufe unter dem amtlichen Wert -
+       * nur wo kein Registersatz greift (und nicht Minden-Luebbecke, das seine
+       * Tabelle fest im Code hat) oder wo eine Sperre KEINE andere Regel des
+       * Ausschusses nennt (Tiefe, WGFZ, kein Einfluss, Ausschluss). Gilt der
+       * Satz nur fuer eine andere Objektart, einen anderen Haustyp oder ein
+       * anderes Gebiet, sagt der Ausschuss etwas - dann keine Formel. */
+      try {
+        const _minden = String(ref.ags || '').replace(/\D/g, '').startsWith('05770');
+        const _frei = !_ukReg || _ukReg.grund === 'kein_satz'
+          || (_ukReg.grund === 'sperre' && !sperreSchliesstNaeherungAus(_ukReg.hinweis));
+        if (!_minden && _frei && !(_ukReg && _ukReg.verfuegbar)) {
+          const _pr = (landValue && landValue.properties_raw) || {};
+          const _n = ukNaeherung({
+            objektart: ref.property_type, flaeche_qm: ref.plot_area,
+            bezugsgroesse_qm: _flaeche ? _flaeche.richtwertgrundstueck_qm : null,
+            brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
+            geschosszahl: _pr.Geschosszahl || _pr.geschosszahl || _pr.GESCHOSSZAHL || null,
+          });
+          step('uk-dealpilot-formel: ' + (_n.verfuegbar ? 'Koeffizient ' + _n.koeffizient_bauland : _n.grund));
+          if (_n.verfuegbar) {
+            /* Der Weg zum Ausschuss bleibt sichtbar, wenn es einen gibt. */
+            if (_ukReg && _ukReg.hinweis) _n.hinweis += ' ' + _ukReg.hinweis;
+            _ukReg = _n;
+          }
+        }
+      } catch (e) { /* die Naeherung darf den Bericht nie kippen */ }
       try {
         _uk = (_ukReg && (_ukReg.verfuegbar || _ukReg.grund !== 'kein_satz')) ? (_ukReg.verfuegbar ? _ukReg : null) : flaechenaufteilung({
           ags: ref.ags || null,
@@ -1060,6 +1087,10 @@ export const ReportOrchestrator = {
             + _uk.bodenwert_eur_qm + ' €/m² angesetzt, die überschüssigen '
             + _uk.gruen_qm + ' m² wertmäßig als private Grünfläche ('
             + _uk.gruen_eur_qm + ' €/m²) — getrennte Bewertung nach § 41 ImmoWertV.';
+        } else if (_uk.naeherung) {
+          /* v2288 · Naeherung: ihr eigener Hinweis, nie „Koeffizient der Zone". */
+          _flaeche.bodenwert_naeherung = true;
+          _flaeche.hinweis = _kopf + _uk.hinweis;
         } else if (_uk.koeffizient_angewandt) {
           _flaeche.hinweis = _kopf
             + 'Der Bodenrichtwert ist deshalb über den Umrechnungskoeffizienten '

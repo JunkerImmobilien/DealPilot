@@ -24,6 +24,7 @@
 // umgerechnet, sondern der Weg zum Ausschuss genannt.
 
 import { finde } from './ausschuss_register.js';
+import { readFileSync } from 'node:fs';   /* v2288 */
 
 export const KENNZAHL = 'umrechnungskoeffizient_flaeche';
 
@@ -308,4 +309,88 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
   };
 }
 
-export default { KENNZAHL, artSchluessel, koeffizientFuer, pruefeBeispiel, satzFuer, groessenanpassung };
+/* ══ v2288 · DIE DEALPILOT-FORMEL — STUFE UNTER DEM AMTLICHEN WERT ══════
+   Marcel 16.10.2026: „wir bestimmen eine Formel fuer die Berechnung des
+   Koeffizienten, damit es naeherungsweise ist. Das waere dann eine Stufe
+   darunter" und: „da schreiben wir DealPilot-Formel … abgeleitet aus einer
+   DealPilot-Formel".
+
+     UK(Objekt) / UK(Bezugsgroesse) = (Flaeche / Bezugsgroesse) ^ b
+
+   b ist der Median der Exponenten aller amtlichen Flaechentabellen im
+   Register (tools/uk-naeherung-ableiten.mjs -> lib/uk-naeherung.json, nach
+   jeder Ernte neu). Hamburg fuehrt amtlich genau diese Form (b = -0,2496).
+
+   NIE amtlich: Herkunft „abgeleitet aus der DealPilot-Formel", Stufe D,
+   mit Tabellenzahl und typischer Abweichung. Nur Ein-/Zweifamilien-,
+   Doppel-, Reihenhaus, nur Zonen mit BEKANNTER Geschosszahl bis II, nur
+   0,5- bis 2,5-fache Bezugsgroesse. Wo der Ausschuss etwas anderes sagt
+   (Tiefe, WGFZ, kein Einfluss, Gebiet/Haustyp/Objektart ausgeschlossen),
+   entscheidet der Aufrufer, sie NICHT zu rufen. */
+let _NAEH = null;
+function naeherungsDaten() {
+  if (_NAEH !== null) return _NAEH;
+  try { _NAEH = JSON.parse(readFileSync(new URL('./uk-naeherung.json', import.meta.url), 'utf8')); }
+  catch (e) { _NAEH = false; }
+  return _NAEH;
+}
+
+/** Geschosszahl aus BORIS („II", "2", "I-II", "III") -> hoechste Zahl oder null. */
+export function geschosse(t) {
+  const s = String(t == null ? '' : t).toUpperCase().trim();
+  if (!s) return null;
+  const rom = { I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6, VII: 7, VIII: 8 };
+  const teile = s.split(/[^IVX0-9]+/).filter(Boolean)
+    .map((x) => (/^\d+$/.test(x) ? Number(x) : rom[x] || null)).filter((x) => x > 0);
+  return teile.length ? Math.max(...teile) : null;
+}
+
+/** Sperrgruende, bei denen der Ausschuss eine ANDERE Regel hat - dort keine Naeherung. */
+export function sperreSchliesstNaeherungAus(text) {
+  return /tiefe|wgfz|\bgfz\b|geschossfl|kein(?:en|e)? einfluss|keine (?:flaechen)?abh|nicht flaechenabh|ausgeschlossen/i
+    .test(String(text || ''));
+}
+
+export function naeherung({ objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm, geschosszahl }) {
+  const d = naeherungsDaten();
+  const nein = (grund, hinweis) => ({ verfuegbar: false, grund, hinweis: hinweis || null });
+  if (!d || !d.alle || !(Number(d.alle.b) < 0)) return nein('keine_formel');
+  const g = d.gilt_fuer || {};
+  const art = artSchluessel(objektart);
+  if ((g.objektarten || []).indexOf(art) < 0) return nein('objektart');
+  const gz = geschosse(geschosszahl);
+  if (gz == null) return nein('geschosszahl_unbekannt',
+    'Die Geschosszahl der Bodenrichtwertzone ist nicht bekannt — die DealPilot-Formel gilt nur für Zonen bis zwei Vollgeschosse.');
+  if (gz > (g.max_vollgeschosse || 2)) return nein('geschosse');
+  const fl = Number(flaeche_qm), bez = Number(bezugsgroesse_qm), brw = Number(brw_eur_qm);
+  if (!(fl > 0) || !(bez > 0) || !(brw > 0)) return nein('angaben_fehlen');
+  const r = fl / bez;
+  if (r < (g.verhaeltnis_von || 0.5) || r > (g.verhaeltnis_bis || 2.5)) return nein('ausserhalb_bereich',
+    'Die Grundstücksgröße liegt außerhalb des Bereichs, für den die DealPilot-Formel abgeleitet ist ('
+      + (g.verhaeltnis_von || 0.5) + '- bis ' + (g.verhaeltnis_bis || 2.5) + '-fache Bezugsgröße).');
+  if (fl === bez) return nein('gleich_bezugsgroesse');
+  const b = Number(d.alle.b);
+  const k = r4(Math.pow(r, b));
+  const bwQm = Math.round(brw * k * 100) / 100;
+  const de = (x) => String(x).replace('.', ',');
+  return {
+    verfuegbar: true, naeherung: true, stufe: d.stufe || 'D',
+    quelle_art: 'DealPilot-Formel', quelle: 'DealPilot-Formel', quelle_text: 'abgeleitet aus der DealPilot-Formel',
+    bezugsgroesse_qm: bez, bauland_qm: fl, gruen_qm: 0,
+    koeffizient_bauland: k, koeffizient_bezugsgroesse: 1, faktor: k,
+    bodenwert_eur_qm: bwQm, gruen_eur_qm: 0,
+    wert_bauland_eur: Math.round(fl * bwQm), wert_gruen_eur: 0, wert_eur: Math.round(fl * bwQm),
+    koeffizient_angewandt: true,
+    formel: { b, tabellen: d.alle.tabellen, laender: d.alle.laender, stand: d.stand,
+              abweichung_median_pct: d.alle.abweichung_median_pct, abweichung_p90_pct: d.alle.abweichung_p90_pct },
+    hinweis: 'Für diesen Ort liegt kein amtlicher Umrechnungskoeffizient vor. Der Bodenrichtwert ist deshalb mit einem '
+      + 'Koeffizienten angepasst, der aus der DealPilot-Formel abgeleitet ist: (' + fl + ' / ' + bez + ')^' + de(b)
+      + ' = ' + de(k) + '. Die Formel beruht auf ' + d.alle.tabellen + ' amtlichen Umrechnungstabellen der '
+      + 'Gutachterausschüsse (' + (d.alle.laender || []).join(', ') + ', Stand ' + d.stand + '); typische Abweichung '
+      + 'vom amtlichen Wert ' + de(Math.round(d.alle.abweichung_median_pct * 10) / 10) + ' %, in 90 % der Fälle unter '
+      + de(Math.round(d.alle.abweichung_p90_pct)) + ' %. Keine amtliche Zahl — liegt dir der Koeffizient des '
+      + 'zuständigen Ausschusses vor, trag ihn unter „Umrechnungskoeffizient Grundstücksgröße" ein.',
+  };
+}
+
+export default { KENNZAHL, artSchluessel, koeffizientFuer, pruefeBeispiel, satzFuer, groessenanpassung, naeherung, geschosse };

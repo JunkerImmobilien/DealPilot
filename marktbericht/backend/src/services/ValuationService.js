@@ -2,7 +2,7 @@
 // Formeln exakt nach Auftrag; Faktoren transparent & einzeln ausgewiesen.
 import { round } from '../lib/stats.js';
 import { istGewerbe, istGrundstueck } from '../lib/marktsegment.js';   /* v2241 */
-import { groessenanpassung as ukAusRegister } from '../lib/umrechnung_flaeche.js';   /* v2282 */
+import { groessenanpassung as ukAusRegister, naeherung as ukNaeherung } from '../lib/umrechnung_flaeche.js';   /* v2282, v2288 */
 
 // Zustands-/Energie-/Etagen-Faktoren (dokumentiert, anpassbar)
 // Zustand robust gemappt inkl. Synonyme & DealPilot-Werte ("gut", "saniert", ...).
@@ -348,6 +348,14 @@ export const ValuationService = {
                 ortsteile: [((landValue && landValue.properties_raw) || {}).Ortsteil,
                             ((landValue && landValue.properties_raw) || {}).Gemarkungsname].filter(Boolean) });   /* v2283 */
               if (g && g.verfuegbar) _ukV = { koeffizient: g.faktor, quelle: g.quelle, quelle_url: g.quelle_url || null };
+              /* v2288 · ohne amtlichen Wert die DealPilot-Formel (nicht bei Minden, nicht
+                 wo der Ausschuss eine andere Regel nennt - dann kommt g mit Grund zurueck). */
+              else if ((!g || g.grund === 'kein_satz') && !String(ref.ags || '').startsWith('05770')) {
+                const _pr = (landValue && landValue.properties_raw) || {};
+                const n = ukNaeherung({ objektart: ref.property_type, flaeche_qm: plotArea, bezugsgroesse_qm: _bezugBoris,
+                  brw_eur_qm: brwSqm, geschosszahl: _pr.Geschosszahl || _pr.geschosszahl || null });
+                if (n && n.verfuegbar) _ukV = { koeffizient: n.faktor, quelle: 'abgeleitet aus der DealPilot-Formel' };
+              }
             } catch (e) { _ukV = null; }
           }
         }
