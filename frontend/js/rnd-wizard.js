@@ -1283,7 +1283,8 @@
           if (!pr.erforderlich && !gr.length) return '';
           return '<div id="rnd-pruefpflicht" style="margin:16px auto 0;max-width:620px;text-align:left;padding:12px 16px;background:rgba(184,98,92,.07);border-left:3px solid #B8625C;border-radius:6px;font-size:12.5px;line-height:1.5;color:#4A4440">'
             + '<b style="color:#B8625C">Sachverständig zu würdigen</b>'
-            + gr.map(function (g) { return '<div style="margin-top:6px">' + escapeHtml(String(g.text)) + '</div>'; }).join('')
+            /* Dezimalkomma: der Kern schreibt round2() mit Punkt („11.75 Jahre“) - Tausender kommen in diesen Texten nicht vor */
+            + gr.map(function (g) { return '<div style="margin-top:6px">' + escapeHtml(String(g.text).replace(/(\d)\.(\d{1,2})(?!\d)/g, '$1,$2')) + '</div>'; }).join('')
             + (pr.uebernahme_gesperrt ? '<div style="margin-top:6px;font-weight:600">Übernahme als eigener AfA-Satz erst nach sachverständiger Beurteilung.</div>' : '')
             + '</div>';
         })()

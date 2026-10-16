@@ -4128,7 +4128,7 @@
         await warte(600);
         await zeigeGruppe(function () { return q('#rnd-uebernehmen'); }, function () { return q('#rnd-uebernahme-vergleich'); }, 8);
         var t = r6Inner(q('#rnd-uebernahme-vergleich'));
-        var afa = /AfA ([\d,]+ %) \(100 ÷ (\d+) Jahre\)/.exec(t), za = /AfA im Jahr\s+([\d.]+ €)\s+→\s+([\d.]+ €)/.exec(t), st = /Steuer im Jahr\s+([^\n→]+?)\s+→\s+([^\n]+)/.exec(t), vt = /(Steuervorteil|Steuernachteil) ([\d.]+ €) im Jahr/.exec(t);
+        var afa = /AfA ([\d,]+ %) \(100 ÷ (\d+) Jahre\)/i.exec(t), za = /AfA im Jahr\s+([\d.]+ €)\s+→\s+([\d.]+ €)/.exec(t), st = /Steuer im Jahr\s+([^\n→]+?)\s+→\s+([^\n]+)/.exec(t), vt = /(Steuervorteil|Steuernachteil) ([\d.]+ €) im Jahr/.exec(t);
         await b2oZeile(s, 'Vorher und nachher', 'AfA ' + (afa ? '<b>' + afa[1] + '</b>' : '–') + (za ? ': ' + za[1] + ' → <b>' + za[2] + '</b> im Jahr' : '') + (st ? ', Steuer ' + st[1].trim() + ' → ' + st[2].trim() : '') + (vt ? ' — <b>' + vt[1] + ' ' + vt[2] + '</b> im Jahr.' : '.'));
       },
       async function (s) {   /* 7 · indikativ, kein Gutachten */
@@ -4147,12 +4147,10 @@
         await b2oZeile(s, 'Im Reiter Steuer', 'Eigener Satz aus <b>' + (wert('afa_rnd_jahre') || '–') + ' Jahren</b> — AfA ' + (r6Id('afa_kalk') || '–') + ' im Jahr. Die Grundlage steht dabei: ' + (wert('afa_eigen_grundlage') || '–') + '.');
       },
       async function (s) {   /* 9 · ein Altbau */
-        var zb = r6Beginn(s, 'Und ein Altbau?', 'Ein zweites Haus aus dem Bestand — gebaut vor 1946.');
-        await r10cZweiteKopie(R11_PARK);
-        await r6Ende(zb);
+        await r10cZweiteKopie(R11_PARK);   /* Prüflauf: eigene Zeile während des Kopierens hatte keinen Kegel - die vorige bleibt stehen */
         await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
         var alter = new Date().getFullYear() - Number(wert('baujahr'));
-        await b2oZeile(s, 'Baujahr ' + wert('baujahr'), '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + alter + ' Jahre alt, älter als die Gesamtnutzungsdauer von 80 Jahren.');
+        await b2oZeile(s, 'Und ein Altbau?', 'Baujahr ' + wert('baujahr') + ': <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + alter + ' Jahre alt, älter als die Gesamtnutzungsdauer von 80 Jahren.');
       },
       async function (s) {   /* 10 · Plateau */
         await r10cRechnerAuf();
@@ -4170,6 +4168,7 @@
         await b2oZeile(s, 'Sachverständig zu würdigen', p() ? 'So steht es da, mit Begründung' + (gesperrt ? ' — und die Übernahme als AfA-Satz ist <b>gesperrt</b>, bis ein Sachverständiger urteilt.' : '.') : 'Die Kennzeichnung fehlt hier.');
       },
       async function (s) {   /* 11 · Schluss */
+        await zeige(r10cKarte, 8);
         await b2oZeile(s, 'Ersteinschätzung in Minuten', 'Wie viele Jahre bleiben, was es steuerlich bringt — und wo die Rechnung endet. Für die Erklärung zählt das Gutachten.', 600);
         r6WizZu(); kegelHoch(false);
       }
