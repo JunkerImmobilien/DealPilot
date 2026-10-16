@@ -155,6 +155,17 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
     berichtsjahr: satz.berichtsjahr || null,
     kennzahl: KENNZAHL, ebene: satz.ebene || null,
   };
+  /* v2281 · Sperre (vollstaendig === false): der Ausschuss fuehrt keinen
+     Koeffizienten oder er ist nicht verwendbar (Lizenz, kostenpflichtig, nur
+     Tiefe). Keine Zahl - der Weg zur Quelle, wie bei Zins und Faktor. */
+  if (satz.vollstaendig === false || satz.warum_kein_wert) {
+    return nichts('sperre', (fl > 0 && Number(bezugsgroesse_qm) > 0 && fl !== Number(bezugsgroesse_qm)
+      ? 'Der Bodenwert ist nicht an die Grundstücksgröße angepasst (' + fl + ' m² gegen '
+        + Number(bezugsgroesse_qm) + ' m² Bezugsgröße). ' : '')
+      + (satz.warum_kein_wert ? String(satz.warum_kein_wert) + ' ' : '')
+      + (satz.quelle_url ? 'Quelle: ' + satz.gaa_name + ', ' + satz.quelle_url + '.' : ''),
+      { ...herkunft, nicht_angepasst: fl > 0 && Number(bezugsgroesse_qm) > 0 && fl !== Number(bezugsgroesse_qm) });
+  }
   if (!(fl > 0)) return nichts('flaeche_fehlt', null, herkunft);
   if (!(brw > 0)) return nichts('brw_fehlt', null, herkunft);
   if (!(bez > 0)) {

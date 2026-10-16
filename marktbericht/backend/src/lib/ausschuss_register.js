@@ -436,6 +436,9 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Erster Satz: Stadt Bielefeld (BORIS-NRW 2026). Gelesen
                                von lib/umrechnung_flaeche.js. */
                             'uk-flaeche-nw-2026.json',
+                            /* v2281: Niedersachsen (BORIS-NI WFS, Umrechnungstabellen FLAE)
+                               und amtliche Landes-/Stadtstaatwerte (HE, TH, ST, MV, RP, HH, HB, BE). */
+                            'uk-flaeche-ni-2026.json', 'uk-flaeche-laender-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
