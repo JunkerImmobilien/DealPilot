@@ -22,7 +22,9 @@ const PFLICHT = ['land_code', 'ags', 'ebene', 'gebiet_name', 'gaa_name', 'kennza
    > kommt. */
 const KENNZAHLEN = new Set(['liegenschaftszinssatz', 'sachwertfaktor', 'vergleichsfaktor',
   'erbbaurechtskoeffizient', 'erbbauzinssatz', 'bodenpreisindex', 'bodenpreisniveau',
-  'durchschnittspreis', 'preisentwicklung', 'rohertragsfaktor']);
+  'durchschnittspreis', 'preisentwicklung', 'rohertragsfaktor',
+  /* v2279: Umrechnungskoeffizient Grundstuecksgroesse (§ 19 ImmoWertV) */
+  'umrechnungskoeffizient_flaeche']);
 
 /* ══ v1975 · DIE EINHEIT IST DIE VERWECHSLUNGSPROBE ════════════════════
 
@@ -123,6 +125,12 @@ for (const f of _dateien) {
       if (s[k] == null || s[k] === '' || (Array.isArray(s[k]) && !s[k].length)) fehler.push(`${wo}: ${k} fehlt`);
     }
     if (s.kennzahl && !KENNZAHLEN.has(s.kennzahl)) fehler.push(`${wo}: unbekannte kennzahl ${s.kennzahl}`);
+    /* v2287 · mb.param_modell.modellversion ist NOT NULL - ein Wert ohne sie wird beim
+       Einspielen (register-saat.mjs) still verworfen. Gemessen 16.10.2026: alle 111
+       Umrechnungskoeffizienten mit Wert fehlten in der Tabelle, der Pruefer war gruen. */
+    for (const _k of ['modellversion', 'quelle_parser', 'modellansaetze']) {   /* v2287: NOT NULL in mb.param_modell */
+      if (!sperre && s.formel && s[_k] == null) fehler.push(`${wo}: ${_k} fehlt (Datenbank verlangt es)`);
+    }
     if (s.stufe && !/^[A-E]$/.test(s.stufe)) fehler.push(`${wo}: stufe ${s.stufe}`);
     if (!sperre && s.formel && s.formel.form === 'konstante' && !(typeof s.formel.wert === 'number' && isFinite(s.formel.wert))) fehler.push(`${wo}: formel.wert keine Zahl`);
     if (s.formel && s.kennzahl === 'liegenschaftszinssatz' && typeof s.formel.wert === 'number' && (s.formel.wert < -2 || s.formel.wert > 12)) fehler.push(`${wo}: Zins ${s.formel.wert} außerhalb -2–12 %`);   /* Frankfurt druckt negative Saetze (EFH zentral -0,1) */

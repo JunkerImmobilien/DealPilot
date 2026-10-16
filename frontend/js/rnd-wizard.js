@@ -1273,12 +1273,27 @@
       + '  <p style="margin:16px 0 0;font-size:12.5px;color:#6B6356;line-height:1.55;text-align:center;font-style:italic">'
       + escapeHtml(lohntText)
       + '  </p>'
+      /* v2283 · DIE PRUEFPFLICHT IM BILD. rnd-calc.js liefert seit v2073 `pruefung`
+         (Sperre, wenn das Alter die GND erreicht) und `grenzen` (Plateau v2275,
+         30-%-Anker) - der Wizard zeigte beides nie, und „übernehmen" (v2274)
+         setzte den Wert auch dort, wo der Kern die Übernahme sperrt. Gemessen an
+         Bj 1905 / GND 80: Plateau, erforderlich, uebernahme_gesperrt. */
+      + (function () {
+          var pr = result.pruefung || {}, gr = (result.grenzen || []).filter(function (g) { return g && g.greift && g.text; });
+          if (!pr.erforderlich && !gr.length) return '';
+          return '<div id="rnd-pruefpflicht" style="margin:16px auto 0;max-width:620px;text-align:left;padding:12px 16px;background:rgba(184,98,92,.07);border-left:3px solid #B8625C;border-radius:6px;font-size:12.5px;line-height:1.5;color:#4A4440">'
+            + '<b style="color:#B8625C">Sachverständig zu würdigen</b>'
+            /* Dezimalkomma: der Kern schreibt round2() mit Punkt („11.75 Jahre“) - Tausender kommen in diesen Texten nicht vor */
+            + gr.map(function (g) { return '<div style="margin-top:6px">' + escapeHtml(String(g.text).replace(/(\d)\.(\d{1,2})(?!\d)/g, '$1,$2')) + '</div>'; }).join('')
+            + (pr.uebernahme_gesperrt ? '<div style="margin-top:6px;font-weight:600">Übernahme als eigener AfA-Satz erst nach sachverständiger Beurteilung.</div>' : '')
+            + '</div>';
+        })()
       /* v2274 · Übernehmen: setzt den eigenen AfA-Satz (100 ÷ RND) im Objekt und
          zeigt die Steuerwirkung vorher/nachher hier im Überblick. */
       + '  <div style="text-align:center;margin-top:16px">'
       + '    <button type="button" id="rnd-uebernehmen" data-rnd="' + Math.round(Number(result.final_rnd) || 0) + '" '
-      + 'style="background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#1c1b18;border:0;border-radius:8px;padding:10px 20px;font:600 14px Inter,sans-serif;cursor:pointer">'
-      + 'Restnutzungsdauer ' + Math.round(Number(result.final_rnd) || 0) + ' Jahre übernehmen</button>'
+      + 'style="background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#1c1b18;border:0;border-radius:8px;padding:10px 20px;font:600 14px Inter,sans-serif;cursor:pointer' + ((result.pruefung && result.pruefung.uebernahme_gesperrt) ? ';opacity:.55;cursor:not-allowed' : '') + '"' + ((result.pruefung && result.pruefung.uebernahme_gesperrt) ? ' disabled title="Sachverständig zu würdigen"' : '') + '>'
+      + ((result.pruefung && result.pruefung.uebernahme_gesperrt) ? 'Übernahme gesperrt — erst nach sachverständiger Beurteilung' : 'Restnutzungsdauer ' + Math.round(Number(result.final_rnd) || 0) + ' Jahre übernehmen') + '</button>'
       + '    <div id="rnd-uebernahme-vergleich" style="margin-top:14px"></div>'
       + '  </div>'
       + '</div>';

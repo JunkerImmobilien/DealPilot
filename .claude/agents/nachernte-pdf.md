@@ -1,6 +1,6 @@
 ---
 name: nachernte-pdf
-description: Arbeitet die vom Harvest-Takt gefundenen Marktbericht-PDFs ab (mb.gaa_documents, Status „neu“): prüft je Dokument, ob es einen neueren Jahrgang mit Liegenschaftszins oder Sachwertfaktor enthält, und übergibt die Funde als Arbeitsliste an register-ernte. Liest die Datenbank nur.
+description: Arbeitet die vom Harvest-Takt gefundenen Marktbericht-PDFs ab (mb.gaa_documents, Status „neu“): prüft je Dokument, ob es einen neueren Jahrgang mit Liegenschaftszins, Sachwertfaktor oder Umrechnungskoeffizienten für die Grundstücksgröße enthält, und übergibt die Funde als Arbeitsliste an register-ernte. Liest die Datenbank nur.
 tools: Read, Grep, Glob, Bash, WebFetch
 ---
 
@@ -21,7 +21,9 @@ Du bist die Nachernte für DealPilot. Antworte auf Deutsch.
    Seiten), ob das Register für diesen Ausschuss schon diesen Jahrgang führt
    (`marktbericht/backend/src/lib/register/*.json`, Feld `berichtsjahr`).
 3. Ergebnis als Tabelle: Dokument · Ausschuss · Jahrgang · im Register bis ·
-   LZS ja/nein mit Seite · SWF ja/nein mit Seite · Lizenz laut Impressum ·
+   LZS ja/nein mit Seite · SWF ja/nein mit Seite · UK Fläche ja/nein mit Seite
+   (Kennzahl `umrechnungskoeffizient_flaeche`, seit v2281; „nur Tiefe/WGFZ“ eigens
+   vermerken) · Lizenz laut Impressum ·
    Empfehlung (ernten / schon da / kein Wert drin / kostenpflichtig).
 
 ## Grenzen

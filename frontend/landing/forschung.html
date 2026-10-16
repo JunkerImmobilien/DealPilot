@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- v1559 · Score-Bereiche am Rechenkern korrigiert --><!-- DealPilot Leistungsumfang · v1543 -->
+<!DOCTYPE html><!-- landing-videothek-1 · F&E neu --><!-- v1559 · Score-Bereiche am Rechenkern korrigiert --><!-- DealPilot Leistungsumfang · v1543 -->
 <html lang="de"><head>
 <meta charset="utf-8">
 <meta name="google-site-verification" content="sjsXb3XudmYE75JCus789-lKn_IIX5jOySZx50Iy4i0">
@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="dp2.css?v=v1611">
 <link rel="stylesheet" href="dp2-teile.css?v=v2215b">
+<link rel="stylesheet" href="dp2-live.css?v=landing-videothek-1c"><!-- landing-videothek-1 -->
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
    Leistungsumfang aus frontend/landing/index.html Z.3266-3969 (18 Kapitel).
@@ -191,23 +192,24 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
   <a class="mark mark-gross" href="/"><span class="wort">Deal<b>Pilot</b></span></a>
   <button class="burger" aria-label="Menü"><span></span><span></span><span></span></button>
   <ul>
-    <li><a href="dp2.html#workflow">So funktioniert's</a></li>
-    <li><a href="dp2.html#features">Funktionen<i class="kar"></i></a>
+    <li><a href="index.html#workflow">So funktioniert's</a></li>
+    <li><a href="index.html#features">Funktionen<i class="kar"></i></a>
       <ul class="sub">
-        <li><a href="dp2.html#features"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Die 19 Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
-        <li><a href="leistungsumfang.html" class="hier"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 22 Kapitel ausführlich — was jedes Modul kann</span></span></a></li>
-        <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif — im Vergleich</span></span></a></li>
+        <li><a href="index.html#features"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Die 19 Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
+        <li><a href="leistungsumfang.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 22 Kapitel ausführlich — was jedes Modul kann</span></span></a></li>
+        <li><a href="index.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif — im Vergleich</span></span></a></li>
         <li><a href="api.html"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD — im Pro-Plan</span></span></a></li>
         <li><a href="forschung.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Forschung &amp; Entwicklung</b><span>Bescheinigtes Vorhaben: das ganze Portfolio im Blick</span></span></a></li>
       </ul></li>
-    <li><a href="dp2.html#stories">Stories</a></li>
-    <li><a href="dp2.html#pricing">Preise<i class="kar"></i></a>
+    <li><a href="index.html#stories">Stories</a></li>
+    <li><a href="videothek.html">Videothek</a></li>
+    <li><a href="index.html#pricing">Preise<i class="kar"></i></a>
       <ul class="sub">
-        <li><a href="dp2.html#pricing"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Einzelplatz</b><span>Vier Pakete von kostenlos bis Pro</span></span></a></li>
-        <li><a href="dp2.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Ihre Mandanten unter Ihrer Marke</span></span></a></li>
-        <li><a href="dp2.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
+        <li><a href="index.html#pricing"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Einzelplatz</b><span>Vier Pakete von kostenlos bis Pro</span></span></a></li>
+        <li><a href="index.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Ihre Mandanten unter Ihrer Marke</span></span></a></li>
+        <li><a href="index.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
       </ul></li>
-    <li><a href="dp2.html#partner">Partner</a></li>
+    <li><a href="index.html#partner">Partner</a></li>
     <li><a href="sicherheit.html">Sicherheit<i class="kar"></i></a>
       <ul class="sub">
         <li><a href="sicherheit.html"><svg class="ico si"><use href="#i-schild"/></svg><span><b>Daten &amp; Server</b><span>Hetzner, DSGVO, was gespeichert wird</span></span></a></li>
@@ -220,47 +222,131 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
 
 <main>
-  <!-- v2215 · F&E-Unterseite. Marcel 12./14.10.2026: „was passieren soll — nicht wie, weil es ein
-       Forschungsprojekt ist … und dass wir mit Steuerkanzleien zusammenarbeiten."
-       Quelle: E:\Portfolio Strategie (Antrag, Arbeitspakete). Bewusst NICHT hier: Methodik,
-       Suchverfahren, Zielfunktion, Schwellen, Messreihen, Förderbeträge. -->
-  <section class="sec sec-dark" id="fe-hero" style="padding-top:44px">
+  <!-- landing-videothek-1 · F&E-Unterseite neu. Marcel am 16.10.2026: "die Texte finde ich noch
+       nicht so gut ... das F und E-Siegel koennte groesser sein ... Schmidt und Partner ... dass das
+       von Steuerberaterkanzleien begleitet wird ... und wie das entstanden ist".
+       Quellen: eigene Posttexte zum Siegel (Fassung 3, 5, 6, 8, Kernabsatz), Antrag und Anlagen
+       (nur Problem und Richtung). Bewusst NICHT hier: Verfahren, Suchstrategie, Messwerte,
+       Schwellen, Zwischenergebnisse, Aktenzeichen, Stunden, Kosten, Namen von Personen.
+       Leitplanke aus den Posttexten: "Bescheinigt ist das Vorhaben, nicht das Produkt" und
+       "Steuerkanzleien sind Praxispartner, keine Forschungspartner". -->
+  <section class="sec sec-dark fe2" id="fe-hero" style="padding:56px 0 64px">
     <div class="wrap">
-      <div class="lu-hero">
-        <span class="eye">// Forschung &amp; Entwicklung</span>
-        <h2>Nicht das einzelne Objekt. <span class="ac">Der ganze Bestand.</span></h2>
-        <p class="lu-hero-lead">
-          Wer mehrere Immobilien besitzt, bekommt heute meist Tipps zu einzelnen Objekten.
-          In unserem Forschungsvorhaben entwickeln wir ein Verfahren, das das <strong>ganze Portfolio</strong> auf einmal betrachtet —
-          passend zur Lage des Investors.
-        </p>
-        <div class="fe-siegel">
-          <img src="assets/bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="72" height="72">
-          <div><b>Bescheinigtes Forschungsvorhaben</b>
-            <span>nach dem Forschungszulagengesetz · Laufzeit 2026 bis 2028</span></div>
+      <div class="fe2-grid" style="grid-template-columns:minmax(0,1.45fr) minmax(0,1fr)">
+        <div class="lu-hero">
+          <span class="eye">Forschung &amp; Entwicklung · 2026 bis 2028</span>
+          <h2>Nicht das einzelne Objekt. <span class="ac">Der ganze Bestand.</span></h2>
+          <p class="lu-hero-lead">
+            DealPilot rechnet heute jedes Objekt vollständig durch. In unserem Forschungsvorhaben gehen wir den
+            nächsten Schritt: Wir erforschen, ob sich ein <strong>ganzer Immobilienbestand gemeinsam</strong>
+            optimieren lässt — passend zum Investor, nachvollziehbar und mit Herkunft an jeder Zahl.
+          </p>
+          <div class="lu-hero-stats">
+            <div class="lhs"><b>2026–28</b><span>Laufzeit</span></div>
+            <div class="lhs"><b>10</b><span>Arbeitspakete</span></div>
+            <div class="lhs"><b>FuE</b><span>Siegel 2026 · BSFZ</span></div>
+          </div>
+        </div>
+        <div class="fe2-siegel" style="width:min(320px,100%)">
+          <img src="assets/bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="320" height="320">
+        </div>
+      </div>
+      <p class="fe-siegel-zeile">Die Bescheinigungsstelle Forschungszulage hat das Vorhaben im Auftrag des
+        Bundesforschungsministeriums als Forschung und Entwicklung nach dem Forschungszulagengesetz bescheinigt.
+        Bescheinigt ist das Vorhaben — nicht ein fertiges Produkt.</p>
+    </div>
+  </section>
+  <hr class="rws">
+
+  <section class="sec sec-dark lu-ed" id="fe-entstehung">
+    <div class="wrap">
+      <span class="eyebrow"><span class="anchor">01</span>Wie alles angefangen hat</span>
+      <h2>Entstanden an drei Schreibtischen — <span class="gold">und an einem Satz.</span></h2>
+      <div class="fe-weg">
+        <div class="fe-station">
+          <span class="fe-st-n">Der Gutachter</span>
+          <h3>Jede Zahl braucht eine Herkunft.</h3>
+          <p>DealPilot kommt aus der Gutachtenpraxis. In einem Gutachten muss jede Zahl belegt sein: welcher
+            Gutachterausschuss, welcher Stichtag, welches Modell. Genau diesen Maßstab haben wir in die App gebaut —
+            Objekt für Objekt.</p>
+        </div>
+        <div class="fe-station">
+          <span class="fe-st-n">Der Investor</span>
+          <h3>Die Probleme hatten wir zuerst.</h3>
+          <p>Wir kaufen selbst, finanzieren selbst und sitzen selbst mit der Bank am Tisch. Bevor wir eine Zeile
+            gebaut haben, haben wir mit vielen anderen Investoren gesprochen. Daraus wurde das Cockpit für den
+            einzelnen Deal: Cashflow, DSCR, Steuer, Deal Score und die Unterlage für die Bank.</p>
+        </div>
+        <div class="fe-station fe-station-gross">
+          <span class="fe-st-n">Die Kanzlei</span>
+          <p class="pull">„Optimier mir mal meinen Bestand. Wie machst du das?“</p>
+          <p>Diese Frage haben wir einem Steuerberater gestellt — als Gedankenspiel: Ein Mandant sitzt vor dir, über
+            100 Objekte, und sagt genau diesen Satz. Wo setzt du an?</p>
+          <p>Auf dem Tisch liegen Zahlen. Mieten, Darlehen, Abschreibungen, Kaufdaten. Was fehlt, ist der
+            Zusammenhang. Welche Frist läuft bei welchem Objekt? Was löst ein Verkauf bei den anderen aus? Welcher
+            Freibetrag wird heute verbraucht, den man in drei Jahren dringender bräuchte?</p>
+          <p>Die Beratung selbst ist der schöne Teil. Die Arbeit davor ist das Problem: jedes Objekt aufbereiten, jede
+            Wechselwirkung hinterfragen, jede Variante gegen alle anderen stellen. Also nimmt man sich die
+            offensichtlichen Themen vor, und der Rest geht unter. <strong>Nicht, weil jemand schlecht berät — sondern
+            weil diese Aufbereitung von Hand kaum zu leisten ist.</strong></p>
+        </div>
+        <div class="fe-station">
+          <span class="fe-st-n">Das Vorhaben</span>
+          <h3>Aus genau dieser Lücke ist es entstanden.</h3>
+          <p>Seit 2026 arbeiten wir daran, als bescheinigtes Forschungs- und Entwicklungsvorhaben. Drei Jahre, offener
+            Ausgang. Zwei Ansätze haben wir bereits verworfen — so sieht Forschung aus.</p>
         </div>
       </div>
     </div>
   </section>
   <hr class="rws">
 
-  <section class="sec sec-dark lu-ed" id="fe-ziel">
+  <section class="sec sec-dark lu-ed light" id="fe-frage">
     <div class="wrap">
-      <span class="eyebrow"><span class="anchor">01</span>Worum es geht</span>
-      <h2>Ein Bestand rein. Wenige belastbare Wege raus. <span class="gold">Jeder mit Fundstelle.</span></h2>
-      <p>
-        Ob ein Objekt privat gehalten oder in eine Gesellschaft überführt wird, ob man verkauft, verschenkt, überträgt oder umfinanziert —
-        jede dieser Entscheidungen wirkt auf alle anderen Objekte im Bestand und auf die persönliche Steuerlage.
-        Fristen wie die Spekulationsfrist laufen nebenher, und was für ein Objekt richtig ist, kann für das Portfolio falsch sein.
-      </p>
-      <p>
-        Das Vorhaben soll aus den Objektdaten, die in DealPilot ohnehin stehen, <strong>nachvollziehbare Strukturwege</strong> ableiten:
-        wenige, gut begründete Varianten, zugeschnitten auf das Profil des Investors — Einkommen, Ziele, Familie, Zeithorizont —
-        und jede mit Rechenweg, Annahmen und Quellen.
-      </p>
+      <span class="eyebrow"><span class="anchor">02</span>Was wir erforschen</span>
+      <h2>Neu ist nicht die Steuerlogik. <span class="gold">Die steht im Gesetz.</span></h2>
+      <p class="lead">Neu ist die Frage, ob sich ein ganzer Bestand überhaupt gemeinsam optimieren lässt.</p>
+      <p>Im Portfolio konkurriert jedes Objekt mit jedem anderen um dieselben knappen Größen: das zu versteuernde
+        Einkommen, die Drei-Objekt-Grenze, die 15-Prozent-Grenze, Freibeträge, Fristen. Und weil der Steuersatz auf die
+        Summe wirkt, verändert jede Entscheidung bei einem Objekt die Rechnung für alle anderen. <strong>Das Problem lässt
+        sich nicht in Einzelteile zerlegen.</strong></p>
+      <div class="fe-kette" aria-label="Alles hängt an allem">
+        <span>Abschreibung</span><i></i><span>Haltedauer</span><i></i><span>Spekulationsfrist</span><i></i>
+        <span>Drei-Objekt-Grenze</span><i></i><span>Freibeträge</span><i></i><span>Privat oder Gesellschaft?</span>
+      </div>
+      <div class="fe-matrix-wrap">
+        <div class="fe-matrix" id="feMatrix" aria-hidden="true"></div>
+        <div class="fe-matrix-t">
+          <b>Jede Zelle wirkt auf alle anderen.</b>
+          <p>Je Objekt und Jahr gibt es mehrere Möglichkeiten: privat halten, in eine Gesellschaft geben, verkaufen —
+            und wann. Bei 100 Objekten entstehen mehr Kombinationen, als sich je durchrechnen lassen. Und welche davon
+            richtig ist, kann heute niemand nachschlagen. Das zeigt sich erst nach Jahren.</p>
+        </div>
+      </div>
+      <h3>Und dann die zweite Frage: Was passt zu mir?</h3>
+      <p>Die eine richtige Lösung gibt es nicht. Wer auf laufenden Ertrag setzt, braucht eine andere Strategie als
+        jemand, der Vermögen aufbauen oder an die nächste Generation übergeben will. <strong>Derselbe Bestand. Zwei
+        Investoren. Zwei verschiedene richtige Antworten.</strong> Deshalb erforschen wir das Verfahren abhängig vom
+        Profil des Investors.</p>
+    </div>
+  </section>
+  <hr class="rws">
+
+  <section class="sec sec-dark lu-ed" id="fe-neu">
+    <div class="wrap">
+      <span class="eyebrow"><span class="anchor">03</span>Warum das neu ist</span>
+      <h2>Bestehende Werkzeuge lösen je ein Stück. <span class="gold">Keines das Ganze.</span></h2>
+      <div class="fe-abgr">
+        <div><b>Objektrechner und Tabellen</b><span>rechnen jedes Objekt für sich und zählen am Ende zusammen. Die Wechselwirkung zwischen den Objekten sehen sie nicht.</span></div>
+        <div><b>Bewertungsdienste</b><span>liefern je Objekt einen Wert. Eine Strategie für den Bestand ist nicht ihre Aufgabe.</span></div>
+        <div><b>Steueroptimierung für Wertpapiere</b><span>geht von gleichmäßigen Steuersätzen und einem einzigen Steuerpflichtigen aus. Im Immobilienbestand stimmt beides nicht.</span></div>
+        <div><b>Strukturplanung heute</b><span>ist Einzelfallarbeit von Hand — gründlich, aber bei vielen Objekten kaum vollständig zu leisten.</span></div>
+      </div>
       <div class="info-card">
-        <h4>Was es nicht ist</h4>
-        <p>Keine Steuer- und keine Anlageberatung und keine Empfehlung. Das Ergebnis ist die Grundlage für das Gespräch mit Steuerkanzlei und Bank — die Entscheidung bleibt beim Investor und seinen Beratern.</p>
+        <p><strong>Unser Vorhaben verbindet, was bisher getrennt ist:</strong> die Wechselwirkung zwischen den Objekten,
+          die progressive Steuer, mehrere Rechtsträger und die Fristen — und sucht darin nach der besten Lösung für
+          genau diesen Investor.</p>
+        <p>Wie das Verfahren im Einzelnen arbeitet, ist Gegenstand der Forschung und wird hier bewusst nicht beschrieben.</p>
       </div>
     </div>
   </section>
@@ -268,16 +354,25 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
   <section class="sec sec-dark lu-ed light" id="fe-kanzlei">
     <div class="wrap">
-      <span class="eyebrow"><span class="anchor">02</span>Mit Steuerkanzleien</span>
+      <span class="eyebrow"><span class="anchor">04</span>Begleitet von Steuerkanzleien</span>
       <h2>Gebaut für den Tisch, <span class="gold">an dem entschieden wird.</span></h2>
-      <p>
-        Wir arbeiten mit Steuerkanzleien zusammen. Sie prüfen die Annahmen, an denen ein Strukturweg hängt, und sie sind die Empfänger
-        des Ergebnisses: ein vorbereiteter Fall mit Rechenweg, Annahmen und Fundstellen, den die Kanzlei prüft, kommentiert und freigibt.
-      </p>
+      <div class="fe-partner">
+        <img src="assets/partner/schmidt-und-partner.png" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB" width="300" height="59" loading="lazy">
+        <p>DealPilot wird in der Praxis von Steuerberatungskanzleien begleitet — darunter die
+          <strong>Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB</strong> aus Hüllhorst. Die Kanzleien sagen
+          uns, wo es in der Praxis hakt, und prüfen, ob das Ergebnis dort ankommt, wo es gebraucht wird.
+          Die Forschung führen wir selbst durch.</p>
+      </div>
+      <p class="lead">Die Rollen bleiben klar: <strong>Die Beratung gehört in die Kanzlei.</strong> Wir wollen die
+        Aufbereitung liefern, damit dort wieder Zeit für das Gespräch ist.</p>
       <div class="fe-raster">
-        <div class="fe-kachel"><b>Für Investoren</b><span>Der Blick auf das Gesamtportfolio statt Einzeltipps — auch bei großen Beständen. Jeder Wert trägt seine Herkunft.</span></div>
-        <div class="fe-kachel"><b>Für Kanzleien</b><span>Ein Fall, der vorbereitet ankommt: Zahlen, Annahmen und Quellen an einer Stelle — prüfen statt zusammentragen.</span></div>
+        <div class="fe-kachel"><b>Für Investoren</b><span>Der Blick auf den ganzen Bestand statt Einzeltipps — auch bei großen Portfolios, und passend zu den eigenen Zielen. Jeder Wert trägt seine Herkunft.</span></div>
+        <div class="fe-kachel"><b>Für Kanzleien</b><span>Ein Fall, der vorbereitet ankommt: Zahlen, Annahmen und Quellen an einer Stelle. Prüfen statt zusammentragen — und dort ansetzen, wo es sich lohnt.</span></div>
         <div class="fe-kachel"><b>Für Banken</b><span>Eine Mappe, die Struktur und Kapitaldienst im Zusammenhang zeigt — nicht Objekt für Objekt.</span></div>
+      </div>
+      <div class="info-card">
+        <p><strong>Was es nicht ist:</strong> keine Steuer- und keine Anlageberatung und keine Empfehlung. Das Ergebnis ist
+          die Grundlage für das Gespräch mit Kanzlei und Bank — die Entscheidung bleibt beim Investor und seinen Beratern.</p>
       </div>
     </div>
   </section>
@@ -285,7 +380,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
   <section class="sec sec-dark lu-ed" id="fe-plan">
     <div class="wrap">
-      <span class="eyebrow"><span class="anchor">03</span>Was bis 2028 entsteht</span>
+      <span class="eyebrow"><span class="anchor">05</span>Was bis 2028 entsteht</span>
       <h2>Zehn Arbeitspakete, <span class="gold">ein Ziel.</span></h2>
       <div class="fe-plan">
         <div class="fe-ap"><span class="fe-zeit">2026</span><b>Woran sich eine gute Strategie messen lässt</b></div>
@@ -299,28 +394,27 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
         <div class="fe-ap"><span class="fe-zeit">2027 – 2028</span><b>Passend zu unterschiedlichen Investorenprofilen</b></div>
         <div class="fe-ap"><span class="fe-zeit">2027 – 2028</span><b>Prüfung an echten, unterschiedlichen Beständen</b></div>
       </div>
-      <p class="fe-fuss">Wie das Verfahren im Einzelnen arbeitet, ist Gegenstand der Forschung und wird hier bewusst nicht beschrieben.</p>
+      <p class="fe-fuss">Jedes Arbeitspaket folgt demselben Zyklus: Annahme, Versuch, Messung — fortführen oder verwerfen.</p>
     </div>
   </section>
   <hr class="rws">
 
   <section class="sec sec-dark lu-ed light" id="fe-heute">
     <div class="wrap">
-      <span class="eyebrow"><span class="anchor">04</span>Was es heute schon gibt</span>
+      <span class="eyebrow"><span class="anchor">06</span>Was es heute schon gibt</span>
       <h2>Die Grundlage <span class="gold">steht in DealPilot.</span></h2>
       <p>
         Das Vorhaben baut auf dem auf, was DealPilot heute je Objekt führt: Kaufpreisaufteilung, Restnutzungsdauer und AfA,
         Finanzierung, die Steuer Jahr für Jahr, Halter und Gesellschaften mit Überführung, Ankauf-Stand und Soll/Ist im Bestand.
+        Wie das aussieht, zeigen die Videos.
       </p>
-      <p><a href="leistungsumfang.html" style="color:var(--wl-c9a84c,#C9A84C);font-weight:600;text-decoration:none">Zum vollen Leistungsumfang →</a>
+      <p><a href="videothek.html" style="color:var(--wl-c9a84c,#C9A84C);font-weight:600;text-decoration:none">Zur Videothek →</a>
+         &nbsp;·&nbsp; <a href="leistungsumfang.html" style="color:var(--wl-c9a84c,#C9A84C);font-weight:600;text-decoration:none">Zum vollen Leistungsumfang →</a>
          &nbsp;·&nbsp; <a href="prozesskarte.html" style="color:var(--wl-c9a84c,#C9A84C);font-weight:600;text-decoration:none">Der Weg auf einer Karte →</a></p>
     </div>
   </section>
   <style>
     /* v2215 · F&E-Seite — Bausteine der Leistungsumfang-Seite, nur ergänzt */
-    #fe-hero .fe-siegel{display:flex;align-items:center;gap:14px;margin-top:22px}
-    #fe-hero .fe-siegel b{display:block;font:600 15px "Space Grotesk",sans-serif}
-    #fe-hero .fe-siegel span{font-size:13px;opacity:.8}
     .fe-raster{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:20px}
     .fe-kachel{padding:16px 18px;border-radius:14px;border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 40%,transparent)}
     .fe-kachel b{display:block;font:600 16px "Space Grotesk",sans-serif;margin-bottom:6px}
@@ -330,12 +424,60 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
     .fe-ap .fe-zeit{font:600 12px "JetBrains Mono",monospace;color:var(--wl-c9a84c,#C9A84C);letter-spacing:.06em}
     .fe-ap b{font-weight:500}
     .fe-fuss{margin-top:16px;font-size:13px;opacity:.75}
-    /* v2215a · auf hellem Abschnitt: dieselben Farben wie h2/p dort (gemessen rgb 26,19,5 / 74,68,54) */
     .light .fe-kachel{background:#fff}
     .light .fe-kachel b{color:#1a1305}
     .light .fe-kachel span{color:#4a4436;opacity:1}
     @media (max-width:560px){ .fe-ap{grid-template-columns:1fr;gap:2px} }
+
+    /* landing-videothek-1 · neue Bausteine der F&E-Seite */
+    #fe-hero .lu-hero h2{font-size:clamp(30px,4.6vw,48px)}
+    .fe-siegel-zeile{margin:34px 0 0;padding-top:18px;border-top:1px solid var(--line);font-size:13.5px;color:var(--mdk);max-width:80ch}
+    .fe-weg{display:grid;gap:0;margin-top:26px;border-left:2px solid var(--line);margin-left:6px}
+    .fe-station{position:relative;padding:0 0 30px 30px}
+    .fe-station::before{content:'';position:absolute;left:-8px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--ob);border:2px solid var(--gd)}
+    .fe-station-gross::before{background:var(--gd);box-shadow:0 0 0 6px color-mix(in srgb,var(--gd) 22%,transparent)}
+    .fe-st-n{font:700 10px/1 "JetBrains Mono",monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--gdh)}
+    .lu-ed .fe-station h3{margin:10px 0 8px}
+    .lu-ed .fe-station .pull{margin:14px 0 18px;font-size:clamp(24px,3vw,32px)}
+    .fe-kette{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:22px 0 28px}
+    .fe-kette span{font:600 12.5px/1 "JetBrains Mono",monospace;padding:9px 12px;border:1px solid color-mix(in srgb,var(--gd) 45%,transparent);background:#faf6ea;color:#1a1305;animation:feKette 6s infinite}
+    .fe-kette i{width:18px;height:2px;background:var(--gd)}
+    .fe-kette span:nth-of-type(2){animation-delay:1s}.fe-kette span:nth-of-type(3){animation-delay:2s}
+    .fe-kette span:nth-of-type(4){animation-delay:3s}.fe-kette span:nth-of-type(5){animation-delay:4s}.fe-kette span:nth-of-type(6){animation-delay:5s}
+    @keyframes feKette{0%,12%{background:var(--gd);color:#14100a}20%,100%{background:#faf6ea;color:#1a1305}}
+    .fe-matrix-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center;margin:8px 0 26px;padding:22px;background:#0b0a08;border:1px solid var(--line)}
+    .fe-matrix{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+    .fe-matrix span{aspect-ratio:1;display:grid;place-items:center;font:700 10px/1 "JetBrains Mono",monospace;color:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.08);animation:feZelle 7s infinite}
+    @keyframes feZelle{0%,8%{background:color-mix(in srgb,var(--gd) 85%,transparent);color:#14100a}18%,100%{background:transparent;color:rgba(255,255,255,.35)}}
+    .fe-matrix-t b{display:block;font:600 18px "Space Grotesk",sans-serif;color:#fff;margin-bottom:8px}
+    .lu-ed .fe-matrix-t p{color:rgba(255,255,255,.72);font-size:14.5px;margin:0}
+    .fe-abgr{display:grid;grid-template-columns:repeat(2,1fr);gap:0;border:1px solid var(--line);margin:22px 0}
+    .fe-abgr div{padding:18px 20px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .fe-abgr div:nth-child(2n){border-right:0}.fe-abgr div:nth-child(n+3){border-bottom:0}
+    .fe-abgr b{display:block;font:600 15px "Space Grotesk",sans-serif;color:#fff;margin-bottom:6px}
+    .fe-abgr span{font-size:14px;line-height:1.55;color:rgba(255,255,255,.7)}
+    .fe-partner{display:flex;align-items:center;gap:26px;flex-wrap:wrap;background:#fff;border:1px solid color-mix(in srgb,var(--gd) 35%,transparent);border-left:3px solid var(--gd);padding:22px 24px;margin:6px 0 22px}
+    .fe-partner img{width:240px;height:auto}
+    .lu-ed .fe-partner p{flex:1;min-width:240px;margin:0}
+    @media(max-width:820px){
+      .fe-matrix-wrap{grid-template-columns:1fr}
+      .fe-abgr{grid-template-columns:1fr}
+      .fe-abgr div{border-right:0!important;border-bottom:1px solid var(--line)!important}
+      .fe-abgr div:last-child{border-bottom:0!important}
+    }
+    @media(max-width:1080px){ #fe-hero .fe2-grid{grid-template-columns:1fr!important} }
+    @media(prefers-reduced-motion:reduce){ .fe-kette span,.fe-matrix span{animation:none} }
   </style>
+  <script>
+    /* landing-videothek-1 · die Belegungsmatrix: 6 Objekte x 10 Jahre. Die Buchstaben stehen fertig da,
+       die Bewegung ist nur der Lichtpunkt, der wandert (Animation nie Bedingung fuer Sichtbarkeit). */
+    (function () {
+      var m = document.getElementById('feMatrix'); if (!m) return;
+      var A = 'PPPGGPPEPGPPVPPGGPPPEPPGPPPPVPGPPEPPGPPPPGPPVPPEPPGPPPGPPPV', h = '';
+      for (var i = 0; i < 60; i++) h += '<span style="animation-delay:' + ((i * 37) % 70) / 10 + 's">' + A.charAt(i % A.length) + '</span>';
+      m.innerHTML = h;
+    })();
+  </script>
 </main>
 
 <footer class="footer"><div class="wrap">
@@ -346,12 +488,12 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
         Entwickelt von Junker Immobilien · Sachverständigenbüro &amp; Projektentwicklung.</p>
     </div>
     <div><h4>Produkt</h4>
-      <a href="#workflow">So funktioniert's</a><a href="#features">Funktionen</a>
-      <a href="leistungsumfang.html">Leistungsumfang</a><a href="#pricing">Preise</a>
-      <a href="api.html">API</a><a href="#app">App</a></div>
+      <a href="index.html#workflow">So funktioniert's</a><a href="index.html#features">Funktionen</a>
+      <a href="leistungsumfang.html">Leistungsumfang</a><a href="index.html#pricing">Preise</a>
+      <a href="api.html">API</a><a href="videothek.html">Videothek</a></div>
     <div><h4>Vertrauen</h4>
       <a href="sicherheit.html">Sicherheit &amp; Server</a><a href="fragen.html">Häufige Fragen</a>
-      <a href="#partner">Partner &amp; Datenquellen</a><a href="#feature-matrix">Cockpit-Matrix</a></div>
+      <a href="index.html#partner">Partner &amp; Datenquellen</a><a href="index.html#feature-matrix">Cockpit-Matrix</a></div>
     <div><h4>Kontakt</h4>
       <a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a>
       <a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a>
@@ -365,7 +507,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
 
 
-<script src="dp2-lufeat.js?v=v1565"></script>
+<script src="dp2-lufeat.js?v=v2285"></script>
 <script src="dp2.js?v=v1565"></script>
   <script src="assets/umgebung.js?v=v1644"></script><!-- v1644 · Landing zeigt auf DIE App, in der sie steht -->
 </body></html>

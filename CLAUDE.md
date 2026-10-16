@@ -257,7 +257,9 @@ seine Datei (gegen git, nicht gegen die Dateizeit). RC=0 ist sauber.
 | `objekt-mapper-pruefen.mjs` | Empfindlichkeit der Reiter-Objekt-Felder |
 | `prompt-lecks-pruefen.mjs` | 88 Felder kommen im Prompt an |
 | `gold-audit.py` | Whitelabel, gegen Basislinie (nur auf dem Server) |
-| `saat-pruefen.mjs --basislinie` | Register-Pflichtfelder (Quelle, Stichtag, Seite, Lizenz; SWF: GND + Baupreisindex als Zahl) gegen `tools/saat-basislinie.json` — läuft in `deploy-staging.ps1` mit, der Deckel darf nur sinken |
+| `saat-pruefen.mjs --basislinie` | Register-Pflichtfelder (Quelle, Stichtag, Seite, Lizenz; SWF: GND + Baupreisindex als Zahl) gegen `tools/saat-basislinie.json`; seit v2287 auch die NOT-NULL-Spalten von `mb.param_modell`: `modellversion`, `quelle_parser`, `modellansaetze` — läuft in `deploy-staging.ps1` mit, der Deckel darf nur sinken |
+| `uk-flaeche-pruefen.mjs` | jeden Umrechnungskoeffizienten (Grundstücksgröße) gegen das amtliche Anwendungsbeispiel mit der echten Funktion; Tabellen 1,00 an der Normgröße, fallend; **Sperre ohne rechenbare Formel** |
+| `uk-naeherung-ableiten.mjs` | leitet die DealPilot-Formel (Näherung) aus allen amtlichen Flächentabellen ab, nach jeder Ernte neu laufen lassen |
 
 **Agents für die Datenpflege** (`.claude/agents/`, seit v2176): `register-ernte`
 (Zins/Sachwertfaktor ins Register, nur Dateien), `nachernte-pdf` (die vom
@@ -616,6 +618,29 @@ Staging nachgemessen, alle drei offen, im Backlog unter B1):
 - **Die NRW-Bewirtschaftungskosten sind stichtagsabhängig** — das AGVGA-Modell
   schreibt die Ausgangswerte von 2002 über den VPI fort. Das hinterlegte Paar
   gilt nur für den 01.01.2015.
+
+**Umrechnungskoeffizient Grundstücksgröße (§ 19/§ 40 ImmoWertV, seit v2280).**
+Kennzahl `umrechnungskoeffizient_flaeche` im Register (`uk-flaeche-*.json`), Kern
+`lib/umrechnung_flaeche.js`. Marcels Regeln vom 16.10.2026:
+- **„Amtlich nur da, wo es auch so ist."** Ein Wert nur aus dem Dokument des
+  Ausschusses, in SEINEM Geltungsbereich (Objektart, Geschosszahl, BRW-Spanne,
+  Ortsteil, Haustyp, Tabellenkennung der Zone). Landeswert nur, wo ein Land ihn
+  ausdrücklich als Ersatz veröffentlicht und die Lizenz die Nutzung trägt
+  (HE und TH deshalb gesperrt). Bundesweite Tabellen gibt es seit 2022 nicht mehr.
+- **Variante A:** ohne Koeffizient volle Fläche, aber markiert („nicht an die
+  Grundstücksgröße angepasst", Ertrags-/Sachwert insoweit vorläufig, Link).
+- **Kunden tragen fehlende Werte selbst ein** (Feld `uk_flaeche`, wie Zins und
+  Faktor) — das Feld erscheint nur, wo es gebraucht wird; im Bericht „eigene Angabe".
+- **Stufe darunter: die DealPilot-Formel.** Wo kein amtlicher Wert vorliegt,
+  rechnet eine aus allen amtlichen Tabellen abgeleitete Näherung
+  (UK = (Fläche/Bezugsgröße)^b) — im Bericht IMMER als „abgeleitet aus der
+  DealPilot-Formel" gekennzeichnet, nie als amtlich. Nur Ein-/Zweifamilien-,
+  Doppel-, Reihenhaus, nur Zonen bis II Vollgeschosse (Geschosszahl aus BORIS),
+  nie wo der Ausschuss über Tiefe oder WGFZ rechnet. Marcel will dasselbe Prinzip
+  später auch für Liegenschaftszins und Sachwertfaktor prüfen.
+- **Eine Sperre trägt KEINE rechenbare `formel`** — `mb.param_modell` kennt kein
+  Sperr-Feld; eine Sperre mit Tabelle kam dort als WERT an (v2287b). Vorgemerkte
+  Tabellen stehen unter `formel_vorgemerkt`.
 
 **Die Namensnennung ist erfüllt — die frühere Sperre gilt nicht mehr.**
 Sätze unter `dl-de/by-2-0` verlangen eine Namensnennung, und die steht jetzt

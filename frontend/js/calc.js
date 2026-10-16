@@ -1059,9 +1059,9 @@ function _calcImmediate(){
     if (sanIst === 0) {
       sanStatusEl.innerHTML = '<span class="badge badge-muted">Keine Sanierung</span>';
     } else if (sanIstNetto <= sanLimit) {
-      sanStatusEl.innerHTML = '<span class="badge badge-green">✓ Unter Grenze ('+sanPct.toFixed(1)+'%) – voll abzugsfähig</span>';
+      sanStatusEl.innerHTML = '<span class="badge badge-green">✓ Unter Grenze ('+sanPct.toFixed(1).replace('.', ',')+' %) – voll abzugsfähig</span>';
     } else {
-      sanStatusEl.innerHTML = '<span class="badge badge-red">⚠ Über 15% ('+sanPct.toFixed(1)+'%) – anschaffungsnahe HK ('+_sanNd+' Jahre AfA)</span>';
+      sanStatusEl.innerHTML = '<span class="badge badge-red">⚠ Über 15 % ('+sanPct.toFixed(1).replace('.', ',')+' %) – anschaffungsnahe HK ('+_sanNd+' Jahre AfA)</span>';
     }
   }
   /* Die USt-Zeilen nur zeigen, wenn brutto gerechnet wird — sonst stünde

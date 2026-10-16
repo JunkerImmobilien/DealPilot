@@ -1573,6 +1573,13 @@ export const CrossCheckService = {
              out.ertragswert.liegenschaftszins_quelle_url, out.ertragswert.liegenschaftszins_lizenz,
              out.ertragswert.liegenschaftszins_berichtsjahr || null);
     }
+    /* v2280 · Der Umrechnungskoeffizient fuer die Grundstuecksgroesse ist eine
+       Registerzahl wie Zins und Faktor - steckt er im Bodenwert, wird er genannt. */
+    const _bwAuf = p.bodenwert && p.bodenwert.flaechenaufteilung;
+    if (_bwAuf && _bwAuf.koeffizient_angewandt && _bwAuf.quellenvermerk) {
+      _merke(_bwAuf.quellenvermerk, 'Umrechnungskoeffizient Grundstücksgröße',
+             _bwAuf.quelle_url, _bwAuf.lizenz, _bwAuf.berichtsjahr || null);
+    }
     out.quellen_nachweis = Array.from(_nachweis.values());
 
     return out;

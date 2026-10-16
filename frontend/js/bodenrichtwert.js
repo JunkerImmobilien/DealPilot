@@ -692,7 +692,7 @@
       var brwEl = _el('brw');
       if (brwEl) { brwEl.value = String(r.wert).replace('.', ','); brwEl.dispatchEvent(new Event('input', { bubbles: true })); }
       var extra = [];
-      if (r.stichtag) extra.push('Stichtag ' + r.stichtag);
+      if (r.stichtag) extra.push('Stichtag ' + String(r.stichtag).replace(/^(\d{4})-(\d{2})-(\d{2})$/, '$3.$2.$1'));   /* v2302: deutsches Datum statt ISO (Prüflauf Modul 24) */
       if (r.zone) extra.push('Zone ' + r.zone);
       /* v1838 · Die Nutzungsart gehört neben den Wert, nicht in die
          Antwort des Servers und von dort in den Papierkorb. */

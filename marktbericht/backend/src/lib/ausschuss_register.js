@@ -431,6 +431,31 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                > Vergleichswertverfahren, das sie nicht tragen. Die
                                > Verdrahtung muss `verwendung` lesen. */
                             'vgf-be.json',
+                            /* v2279: Umrechnungskoeffizienten Grundstuecksgroesse
+                               (§ 19 ImmoWertV), Kennzahl umrechnungskoeffizient_flaeche.
+                               Erster Satz: Stadt Bielefeld (BORIS-NRW 2026). Gelesen
+                               von lib/umrechnung_flaeche.js. */
+                            'uk-flaeche-nw-2026.json',
+                            /* v2281: Niedersachsen (BORIS-NI WFS, Umrechnungstabellen FLAE)
+                               und amtliche Landes-/Stadtstaatwerte (HE, TH, ST, MV, RP, HH, HB, BE). */
+                            'uk-flaeche-ni-2026.json', 'uk-flaeche-laender-2026.json',
+                            /* Ernte 16.10.2026 (LZS/SWF-Linie HB/SL/HH/RP/BY): Mainz, amtlich kein Einfluss der Grundstuecksgroesse (GMB 2025, S. 42-43). */
+                            'uk-flaeche-funde-ernte-lzs.json',
+                            /* Ernte 16.10.2026: Baden-Wuerttemberg (BORIS-BW-Fachinformationen, Marktberichte) -
+                               Werte Heilbronn, Freiburg, Bruchsal; Sperren mit Weg fuer 65 weitere Ausschuesse (davon 7 Stadtkreise), 639 Saetze je Gemeinde. */
+                            'uk-flaeche-bw-2026.json',
+                            /* Ernte 16.10.2026: Bayern (BORIS-Bayern, Erlaeuterungen von 85 Ausschuessen ueber das WMS-Feld
+                               listeumrechnungstabellen) - Wert Amberg (amtlich kein Einfluss); Sperren mit Weg fuer 95 Ausschuesse,
+                               davon 4 amtliche Tabellen mit Lizenzverbot als Stuetzstelle vorgemerkt (Fuerth, Landshut, FFB, Weilheim-Schongau). */
+                            'uk-flaeche-by-2026.json',
+                            /* Ernte 16.10.2026: Ost (BB alle 16 Ausschuesse, SN alle 13, MV Rostock + LUP) - Werte LDS, TF, CB, MOL
+                               (Tabellen/Potenz je Raum, Gemeinden des Berliner Umlands mit 8-stelliger AGS) und amtlich „kein Einfluss“
+                               BAR, HVL, LOS, P, PM; Sperren mit Weg, SN/Rostock als Stuetzstelle vorgemerkt (Lizenz). TH/ST: kein oertlicher Satz. */
+                            'uk-flaeche-ost-2026.json',
+                            /* Ernte 16.10.2026: West (HE alle 19 Ausschuesse, RP 11 ohne Mainz, SL 7, SH 15) - Werte AfB Limburg,
+                               LK Fulda, Wiesbaden, Trier, Kiel (Tabellen), Suedhessen amtlich „kein Einfluss“, Buedingen/Korbach/Giessen
+                               mit der von ihnen beschlossenen Landestabelle (Stufe C); Sperren mit Weg, WWT und RV Saarbruecken als Stuetzstelle. */
+                            'uk-flaeche-west-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
@@ -516,6 +541,8 @@ export async function ladeAusDb(q, kennzahlen = ['liegenschaftszinssatz',
                                                'erbbauzinssatz',
                                                /* v1094-WKZ */
                                                'vergleichsfaktor',
+                                               /* v2279 */
+                                               'umrechnungskoeffizient_flaeche',
                                                'bodenpreisindex']) {
   if (typeof q !== 'function') return { geladen: 0, grund: 'kein_q' };
   try {
@@ -566,7 +593,18 @@ export async function ladeAusDb(q, kennzahlen = ['liegenschaftszinssatz',
     const schluessel = (s) => [s.ags, s.kennzahl, s.zweig,
                                s.berichtsjahr ?? ''].join('|');
     const ausDb = new Set(rows.map(schluessel));
-    const behalten = _saat.filter((s) => !ausDb.has(schluessel(s)));
+    /* v2288a · SPERREN LEBEN IN DER DATEI. mb.param_modell kann keine Sperre
+       abbilden (kein vollstaendig-Feld, Sperren ohne formel werden nicht
+       eingespielt). Ersetzte eine DB-Zeile hier jeden Saatsatz mit gleichem
+       Schluessel, fiel die Sperre weg - gemessen 16.10.2026 an NI: die
+       Kreis-Sperre Goettingen teilt ags|kennzahl|zweig mit den Werten, die
+       nur ueber die Tabellenkennung der Zone greifen; ohne Sperre griff
+       ausserhalb der Zonen die DealPilot-Formel. Vorerst nur fuer die
+       Umrechnungskoeffizienten - bei Zins und Faktor wuerde eine stehende
+       Sperre neben einem Wert die Zweigwahl aendern (findeZweig). */
+    const _bleibtSperre = (s) => s.kennzahl === 'umrechnungskoeffizient_flaeche'
+      && (s.vollstaendig === false || !!s.warum_kein_wert);
+    const behalten = _saat.filter((s) => _bleibtSperre(s) || !ausDb.has(schluessel(s)));
     const zusammen = [...behalten, ...rows];
     const ersetzt = _saat.length - behalten.length;
 

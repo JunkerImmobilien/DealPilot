@@ -342,6 +342,12 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       { id: 'sachwertfaktor', label: 'Sachwertfaktor', typ: 'number', hilfe: 'sachwertfaktor',
         platzhalter: 'leer = aus der Parametertabelle',
         wenn: function () { return !istWohnung(); } },
+      /* v2282 · Marcel 16.10.2026: Kunden tragen fehlende amtliche Werte selbst
+         ein (wie Zins und Faktor). Nur bei Haeusern mit Grundstuecksflaeche -
+         eine Wohnung hat keinen eigenen Bodenwert nach Flaeche. */
+      { id: 'ukFlaeche', label: 'Umrechnungskoeffizient Grundstücksgröße', typ: 'number', hilfe: 'ukFlaeche',
+        platzhalter: 'leer = amtlicher Wert des Ausschusses',
+        wenn: function () { return !istWohnung() && Number(wert('plot')) > 0; } },
       { id: 'brwAnp', label: 'Bodenwert-Anpassung (%)', typ: 'number', hilfe: 'brwAnp' },
       { id: 'brwAnpGrund', label: 'Begr\u00fcndung der Anpassung', typ: 'text',
         pflichtWenn: function () { return !!wert('brwAnp'); } },
@@ -707,7 +713,7 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
      * ueberhaupt wirksam. */
     ['ptype', 'cond', 'units', 'garages', 'outdoor',
      'hinterlandFlaeche', 'garagenBgf',
-     'baustatus', 'mea', 'lzs', 'brwAnp', 'brwAnpGrund', 'sanierungsjahr', 'spMiete', 'brwManuell', 'brwStichtag', 'bgf', 'sachwertfaktor'].forEach(function (id) {
+     'baustatus', 'mea', 'lzs', 'brwAnp', 'brwAnpGrund', 'sanierungsjahr', 'spMiete', 'brwManuell', 'brwStichtag', 'bgf', 'sachwertfaktor', 'ukFlaeche', 'plot'].forEach(function (id) {
       var e = $(id);
       if (e && !e._wm) { e._wm = 1; e.addEventListener('change', function () { zeichnen(); ampel(); }); }
     });
@@ -951,6 +957,7 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       brw_anpassung_grund: pWert('brwAnpGrund') || null,
       bgf: parseFloat(pWert('bgf')) || null,
       sachwertfaktor: parseFloat(pWert('sachwertfaktor')) || null,
+      uk_flaeche: parseFloat(String(pWert('ukFlaeche') || '').replace(',', '.')) || null,   /* v2282 */
       stellplatz_miete_monat: parseFloat(pWert('spMiete')) || null,
       /* v1055-WFELD-1 · Seit v1047 stehen diese drei im Formular und wurden
        * nie mitgeschickt. app.js sammelt den Block nicht selbst ein, sondern

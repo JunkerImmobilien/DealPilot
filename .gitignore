@@ -90,3 +90,7 @@ backup_*.sql
 # Gegenlesung. Nichts Schuetzenswertes steht drin — die Anmeldung laeuft
 # ueber den SSH-Schluessel, und beide Server-IPs stehen ohnehin im
 # versionierten CLAUDE.md.
+
+# landing-videothek-1 · Erklaervideos der Landing (~190 MB) liegen NUR auf dem
+# Server (scp), nie im Git. Titel/Texte: frontend/landing/assets/videothek/videos.json
+frontend/landing/medien/

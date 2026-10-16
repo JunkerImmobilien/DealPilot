@@ -1,0 +1,231 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   dp2-live.css · landing-videothek-1 · DealPilot live, Videothek, F&E
+   ───────────────────────────────────────────────────────────────────────
+   Marcel am 16.10.2026: "die gesamten Videos auf die Landingpage packen,
+   dass dort immer irgendwo ein Video durchlaeuft, als Slider ... relativ
+   weit oben, nicht direkt am Header ... DealPilot Live ... geil animiert
+   ... umschalten Basis und Erweitert ... und eine extra Subpage."
+
+   Drei Teile, eine Datei, weil alle drei dieselben Bausteine tragen:
+     .dpl-*   der Abschnitt "DealPilot live" (index.html #live)
+     .vt-*    die Videothek (videothek.html)
+     .fe2-*   der F&E-Abschnitt (index.html #forschung, forschung.html)
+     .kz-*    die Kanzlei-Zeile im Partnerbereich
+
+   Gold steht NUR als Token (var(--gd), --gdh, --gdd, --runway, --line)
+   oder als color-mix auf das Token - keine harten Goldwerte, sonst
+   faerbt sich der Abschnitt beim Whitelabel nicht mit.
+   Inhalte kommen aus assets/videothek/videos.json (dp2-live.js).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ══ DealPilot live ═════════════════════════════════════════════════════ */
+.dpl{position:relative;overflow:hidden}
+.dpl::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(900px 420px at 78% 8%,color-mix(in srgb,var(--gd) 16%,transparent),transparent 70%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 56px);
+  opacity:.9}
+.dpl .wrap{position:relative}
+.dpl-kopf{display:flex;align-items:flex-end;justify-content:space-between;gap:26px;flex-wrap:wrap;margin-bottom:30px}
+.dpl-kopf .head{margin-bottom:0}
+
+/* Umschalter Ueberblick / Basis / Erweitert */
+.dpl-tabs{display:inline-flex;gap:0;border:1px solid var(--line);background:rgba(255,255,255,.02);padding:4px;border-radius:40px}
+.dpl-tab{font:700 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mdk);
+  background:none;border:0;padding:11px 16px;border-radius:30px;cursor:pointer;transition:color .25s,background .35s var(--e-weich);white-space:nowrap}
+.dpl-tab small{display:inline-block;margin-left:7px;font-size:9.5px;opacity:.7}
+.dpl-tab:hover{color:#fff}
+.dpl-tab[aria-selected="true"]{background:var(--runway);color:#14100a}
+.dpl-tab:focus-visible{outline:2px solid var(--gdh);outline-offset:2px}
+
+.dpl-buehne{display:grid;grid-template-columns:minmax(0,1.62fr) minmax(0,1fr);gap:22px;align-items:start}  /* 1a: stretch zog den Bildschirm auf Kartenhoehe, darunter stand ein schwarzes Feld */
+
+/* Der Bildschirm: Goldrahmen, Eckmarken, Instrumentenzeile */
+.dpl-schirm{position:relative;border:1px solid var(--line);background:#000;
+  box-shadow:0 40px 90px -40px color-mix(in srgb,var(--gd) 45%,transparent),0 0 0 6px rgba(255,255,255,.015)}
+.dpl-schirm::before,.dpl-schirm::after{content:'';position:absolute;width:18px;height:18px;z-index:3;pointer-events:none;border-color:var(--gdh)}
+.dpl-schirm::before{left:-1px;top:-1px;border-left:2px solid;border-top:2px solid}
+.dpl-schirm::after{right:-1px;bottom:-1px;border-right:2px solid;border-bottom:2px solid}
+.dpl-hud{display:flex;align-items:center;gap:14px;padding:10px 14px;border-bottom:1px solid var(--line);
+  font:700 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ddk);background:var(--ob1)}
+.dpl-live{display:inline-flex;align-items:center;gap:7px;color:#fff}
+.dpl-live i{width:8px;height:8px;border-radius:50%;background:#D8564C;box-shadow:0 0 0 0 rgba(216,86,76,.6);animation:dplPuls 1.8s infinite}
+@keyframes dplPuls{0%{box-shadow:0 0 0 0 rgba(216,86,76,.55)}70%{box-shadow:0 0 0 9px rgba(216,86,76,0)}100%{box-shadow:0 0 0 0 rgba(216,86,76,0)}}
+.dpl-hud .dpl-flug{color:var(--gdh)}
+.dpl-hud .dpl-zeit{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--mdk)}
+.dpl-bild{position:relative;aspect-ratio:1920/1022;background:#000;overflow:hidden}
+.dpl-bild video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;
+  transition:opacity .6s var(--e-weich),transform 1.2s var(--e-weich)}
+.dpl-bild.wechsel video{opacity:0;transform:scale(1.015)}
+.dpl-knopf{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
+  width:74px;height:74px;border-radius:50%;border:1px solid var(--gdh);cursor:pointer;
+  background:color-mix(in srgb,var(--ob) 70%,transparent);backdrop-filter:blur(6px);
+  display:grid;place-items:center;color:var(--gdh);transition:opacity .3s,transform .3s var(--e-weich)}
+.dpl-knopf:hover{transform:translate(-50%,-50%) scale(1.06)}
+.dpl-knopf svg{width:26px;height:26px;fill:currentColor;margin-left:4px}
+.dpl-schirm.laeuft .dpl-knopf{opacity:0;pointer-events:none}
+.dpl-fuss{display:flex;align-items:center;gap:12px;padding:10px 14px;border-top:1px solid var(--line);background:var(--ob1)}
+.dpl-bahn{flex:1;height:4px;background:rgba(255,255,255,.08);position:relative;cursor:pointer}
+.dpl-bahn i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--runway);transition:width .25s linear}
+.dpl-bahn::after{content:'';position:absolute;left:0;right:0;top:-8px;bottom:-8px}
+.dpl-mini{background:none;border:1px solid var(--line);color:var(--gdh);width:32px;height:32px;cursor:pointer;
+  display:grid;place-items:center;transition:background .2s}
+.dpl-mini:hover{background:color-mix(in srgb,var(--gd) 14%,transparent)}
+.dpl-mini svg{width:14px;height:14px;fill:currentColor}
+
+/* Die Bordkarte rechts: Geschichte zum Video */
+.dpl-karte{position:relative;display:flex;flex-direction:column;border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01));padding:24px 24px 20px}
+.dpl-karte::before{content:'';position:absolute;left:0;top:0;right:0;height:3px;background:var(--runway)}
+.dpl-k-kick{display:flex;justify-content:space-between;gap:10px;font:700 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gdh)}
+.dpl-k-kick span:last-child{white-space:nowrap;color:var(--ddk)}
+.dpl-karte h3{font:700 clamp(21px,2.1vw,27px)/1.15 var(--disp);color:#fff;margin:14px 0 6px;letter-spacing:-.01em}
+.dpl-karte .dpl-unter{font:500 14px/1.45 var(--body);color:var(--gdh);margin:0 0 14px}
+.dpl-karte .dpl-story{font-size:14.6px;line-height:1.62;color:var(--mdk);margin:0 0 16px}
+.dpl-gewinn{border-left:3px solid var(--gd);background:color-mix(in srgb,var(--gd) 9%,transparent);padding:10px 14px;margin:0 0 16px}
+.dpl-gewinn b{display:block;font:700 9.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gdh);margin-bottom:6px}
+.dpl-gewinn span{font-size:14px;line-height:1.5;color:#fff}
+.dpl-kapitel{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.dpl-kapitel span{font:600 10px/1 var(--mono);letter-spacing:.04em;color:var(--txtd);border:1px solid rgba(255,255,255,.12);padding:6px 9px;border-radius:20px}
+.dpl-spruch{margin-top:auto;padding-top:14px;border-top:1px dashed rgba(255,255,255,.14);
+  font:italic 500 20px/1.3 var(--ser);color:#fff}
+.dpl-aktion{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.dpl-aktion .btn-l{padding:11px 16px;font-size:12.5px}
+.dpl-karte .dpl-inhalt{transition:opacity .45s var(--e-weich),transform .45s var(--e-weich)}
+.dpl-karte.wechsel .dpl-inhalt{opacity:0;transform:translateY(10px)}
+
+/* Der Filmstreifen */
+.dpl-streifen{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:18px 2px 8px;margin-top:6px;scrollbar-width:thin}
+.dpl-w{flex:0 0 212px;scroll-snap-align:start;text-align:left;background:none;border:1px solid rgba(255,255,255,.1);padding:0;cursor:pointer;color:inherit;position:relative;transition:border-color .25s,transform .35s var(--e-weich)}
+.dpl-w:hover{border-color:var(--gd);transform:translateY(-3px)}
+.dpl-w.on{border-color:var(--gdh)}
+.dpl-w img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;filter:saturate(.8) brightness(.8);transition:filter .3s}
+.dpl-w:hover img,.dpl-w.on img{filter:none}
+.dpl-w .dpl-wt{display:block;padding:9px 10px 10px}
+.dpl-w .dpl-wn{font:700 9.5px/1 var(--mono);letter-spacing:.14em;color:var(--gdh)}
+.dpl-w b{display:block;font:600 13px/1.3 var(--body);color:#fff;margin-top:5px}
+.dpl-w .dpl-wd{position:absolute;right:6px;top:6px;font:700 9.5px/1 var(--mono);background:rgba(0,0,0,.72);color:#fff;padding:4px 6px}
+.dpl-w .dpl-wp{position:absolute;left:0;right:0;top:0;height:3px;background:transparent}
+.dpl-w.on .dpl-wp{background:linear-gradient(90deg,var(--gdh) var(--p,0%),rgba(255,255,255,.12) var(--p,0%))}
+.dpl-hinweis{margin:14px 0 0;font-size:12.5px;color:var(--ddk)}
+.dpl-hinweis a{color:var(--gdh)}
+
+/* ══ F&E-Abschnitt (Landing) ════════════════════════════════════════════ */
+.fe2{position:relative;overflow:hidden}
+.fe2::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(700px 500px at 14% 40%,color-mix(in srgb,var(--gd) 14%,transparent),transparent 70%)}
+.fe2 .wrap{position:relative}
+.fe2-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.5fr);gap:56px;align-items:center}
+.fe2-siegel{position:relative;width:min(300px,100%);aspect-ratio:1;margin:0 auto;display:grid;place-items:center}
+.fe2-siegel::before{content:'';position:absolute;inset:-14px;border-radius:50%;
+  background:conic-gradient(from 0deg,transparent 0 20%,var(--gdh) 32%,transparent 45% 70%,var(--gd) 82%,transparent 95%);
+  -webkit-mask:radial-gradient(circle,transparent 66%,#000 67%,#000 69%,transparent 70%);
+          mask:radial-gradient(circle,transparent 66%,#000 67%,#000 69%,transparent 70%);
+  animation:fe2Dreh 9s linear infinite}
+.fe2-siegel::after{content:'';position:absolute;inset:-34px;border-radius:50%;border:1px dashed color-mix(in srgb,var(--gd) 35%,transparent)}
+@keyframes fe2Dreh{to{transform:rotate(360deg)}}
+.fe2-siegel img{position:relative;width:100%;height:auto;border-radius:50%;background:#fff;padding:6px;
+  box-shadow:0 30px 80px -30px color-mix(in srgb,var(--gd) 60%,transparent)}
+.fe2-zitat{font:italic 500 clamp(24px,3vw,34px)/1.25 var(--ser);color:#fff;margin:6px 0 16px;border-left:3px solid var(--gd);padding-left:18px}
+.fe2 .fe2-text{color:var(--mdk);font-size:16px;line-height:1.7;margin:0 0 16px;max-width:62ch}
+.fe2 .fe2-text b{color:#fff;font-weight:600}
+.fe2-drei{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);margin:24px 0 22px}
+.fe2-drei > div{padding:18px 18px 16px;border-right:1px solid var(--line)}
+.fe2-drei > div:last-child{border-right:0}
+.fe2-drei b{display:block;font:700 9.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gdh);margin-bottom:9px}
+.fe2-drei span{font-size:14px;line-height:1.55;color:var(--txtd)}
+.fe2-fuss{font-size:12.5px;color:var(--ddk);margin:14px 0 0}
+
+/* Kanzlei-Zeile im Partnerbereich */
+.kz{display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:center;margin:30px auto 34px;max-width:880px;
+  padding:18px 24px;background:#fff;border:1px solid var(--cream-line);border-left:3px solid var(--gd)}
+.kz img{height:40px;width:auto}
+.kz p{margin:0;flex:1;min-width:240px;font-size:14.5px;line-height:1.55;color:var(--inkm)}
+.kz p b{color:var(--ink)}
+
+/* ══ Videothek (videothek.html) ═════════════════════════════════════════ */
+.vt-hero{padding:56px 0 34px}
+.vt-hero h1{font:700 clamp(32px,5vw,56px)/1.05 var(--disp);color:#fff;margin:14px 0 14px;letter-spacing:-.02em}
+.vt-hero h1 .ac{color:var(--gdh)}
+.vt-hero p{color:var(--mdk);font-size:17px;max-width:64ch;margin:0}
+.vt-zahlen{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.vt-zahlen div{border:1px solid var(--line);padding:12px 18px;min-width:120px}
+.vt-zahlen b{display:block;font:700 26px/1 var(--disp);color:var(--gdh)}
+.vt-zahlen span{display:block;margin-top:5px;font:700 9.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ddk)}
+.vt-leiste{position:sticky;top:var(--nav-h,74px);z-index:15;background:color-mix(in srgb,var(--ob) 92%,transparent);backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.vt-leiste .wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-top:12px;padding-bottom:12px}
+.vt-suche{margin-left:auto;background:rgba(255,255,255,.04);border:1px solid var(--line);color:#fff;font:500 14px var(--body);padding:10px 14px;min-width:220px}
+.vt-suche::placeholder{color:var(--ddk)}
+.vt-gruppe{padding:40px 0 10px}
+.vt-gruppe[hidden]{display:none}
+.vt-gk{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:14px}
+.vt-gk h2{font:700 clamp(22px,3vw,30px)/1.1 var(--disp);color:#fff;margin:0}
+.vt-gk span{font:700 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gdh)}
+.vt-gk p{flex-basis:100%;margin:4px 0 0;color:var(--mdk);font-size:14.5px}
+.vt-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.vt-k{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.09);text-align:left;color:inherit;cursor:pointer;padding:0;
+  display:flex;flex-direction:column;transition:border-color .25s,transform .35s var(--e-weich),box-shadow .35s}
+.vt-k:hover{border-color:var(--gd);transform:translateY(-4px);box-shadow:0 26px 50px -30px color-mix(in srgb,var(--gd) 55%,transparent)}
+.vt-k[hidden]{display:none}
+.vt-kb{position:relative;aspect-ratio:16/9;overflow:hidden;background:#000}
+.vt-kb img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--e-weich),filter .4s;filter:brightness(.82)}
+.vt-k:hover .vt-kb img{transform:scale(1.04);filter:none}
+.vt-kb .vt-nr{position:absolute;left:10px;top:10px;font:700 12px/1 var(--disp);background:var(--runway);color:#14100a;padding:6px 9px}
+.vt-kb .vt-d{position:absolute;right:10px;bottom:10px;font:700 10px/1 var(--mono);background:rgba(0,0,0,.75);color:#fff;padding:5px 7px}
+.vt-kb .vt-play{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;
+  border:1px solid var(--gdh);background:rgba(0,0,0,.45);display:grid;place-items:center;opacity:0;transition:opacity .3s}
+.vt-kb .vt-play svg{width:20px;height:20px;fill:var(--gdh);margin-left:3px}
+.vt-k:hover .vt-play{opacity:1}
+.vt-kt{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.vt-kt b{font:600 16px/1.3 var(--disp);color:#fff}
+.vt-kt .vt-u{font-size:13.5px;color:var(--gdh);line-height:1.4}
+.vt-kt .vt-s{font-size:13.5px;color:var(--mdk);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.vt-leer{padding:40px 0;color:var(--mdk)}
+
+/* Kino-Fenster */
+.vt-kino{position:fixed;inset:0;z-index:200;background:rgba(3,3,3,.86);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:24px}
+.vt-kino.auf{display:flex}
+.vt-kino-in{width:min(1180px,100%);max-height:100%;overflow:auto;background:var(--ob);border:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr)}
+.vt-kino video{width:100%;display:block;background:#000;aspect-ratio:1920/1022}
+.vt-kino-t{padding:22px 22px 20px;display:flex;flex-direction:column;gap:10px;position:relative}
+.vt-kino-t h3{font:700 22px/1.2 var(--disp);color:#fff;margin:0}
+.vt-kino-t .vt-u{color:var(--gdh);font-size:14px}
+.vt-kino-t p{margin:0;color:var(--mdk);font-size:14.5px;line-height:1.6}
+.vt-zu{position:absolute;right:10px;top:10px;background:none;border:1px solid var(--line);color:#fff;width:34px;height:34px;cursor:pointer;font-size:18px;line-height:1}
+.vt-kino-n{display:flex;gap:8px;margin-top:auto;padding-top:10px;flex-wrap:wrap}
+.vt-kino-n button{background:none;border:1px solid var(--line);color:var(--gdh);font:700 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:11px 14px;cursor:pointer;transition:background .2s}
+.vt-kino-n button:hover{background:color-mix(in srgb,var(--gd) 14%,transparent)}  /* 1b: .btn-l ist ausserhalb von .sec-dark hell und war hier unlesbar */
+#fe-hero .lu-hero h2 .ac{color:var(--gdh)}
+
+/* Siegel im Vertrauensband: 64 px war Marcel zu klein (16.10.2026). */
+.tband-siegel img{width:84px;height:84px}
+.tband-siegel a{display:contents;color:inherit}
+
+/* ══ Handy ══════════════════════════════════════════════════════════════ */
+@media(max-width:1080px){
+  .dpl-buehne{grid-template-columns:1fr}
+  .fe2-grid{grid-template-columns:1fr;gap:40px}
+  .fe2-siegel{width:min(240px,70%)}
+}
+@media(max-width:700px){
+  .dpl-tabs{width:100%;overflow-x:auto;scrollbar-width:none}
+  .dpl-tabs::-webkit-scrollbar{display:none}
+  /* 1c: auf 375 px brach die Instrumentenzeile dreizeilig um */
+  .dpl-hud{gap:10px;font-size:9px;letter-spacing:.1em;white-space:nowrap}
+  .dpl-hud .dpl-flug{display:none}
+  .dpl-tab{padding:10px 12px;font-size:9.5px;letter-spacing:.1em}
+  .dpl-karte{padding:20px 18px 18px}
+  .dpl-w{flex-basis:168px}
+  .fe2-drei{grid-template-columns:1fr}
+  .fe2-drei > div{border-right:0;border-bottom:1px solid var(--line)}
+  .fe2-drei > div:last-child{border-bottom:0}
+  .vt-suche{margin-left:0;min-width:0;width:100%}
+  .vt-kino{padding:0}
+  .vt-kino-in{grid-template-columns:1fr;height:100%}
+  .kz{padding:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .fe2-siegel::before,.dpl-live i{animation:none}
+  .dpl-bild video,.dpl-karte .dpl-inhalt{transition:none}
+}

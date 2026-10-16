@@ -1,0 +1,76 @@
+[
+  {
+    "land_code": "RP",
+    "ags": "07315000",
+    "ebene": "gemeinde",
+    "gebiet_name": "Stadt Mainz",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_eins",
+      "bezug": "Bodenwert = Grundstücksfläche × Bodenrichtwert × 1",
+      "wirkung": "multiplikativ",
+      "spanne_qm": [
+        150,
+        1000
+      ],
+      "spanne_wortlaut": "„Grundstücke kleiner als 150 m² oder größer als 1000 m² wurden dabei ausgesondert.“ (S. 42) — außerhalb dieser Spanne trägt die Untersuchung keine Aussage.",
+      "wortlaut": "„Es wurde keinerlei systematische Beziehung zwischen Flächengrößen und Kaufpreisen festgestellt. Auch aus gezielten Untersuchungen von Teilbereichen (Aufteilung in Gruppen gleicher Wertniveaus oder gleicher Grundstücksflächen) ergaben sich diesbezüglich keine verwertbaren Regelmäßigkeiten.“ (S. 43) — Fazit: „Eine direkte Abhängigkeit der Kaufpreise von unterschiedlichen Flächengrößen ließ sich für Mainz nicht belegen. […] Die pauschale Anwendung irgendwelcher Anpassungskoeffizienten kann somit für Mainz nicht empfohlen werden. Wie so oft in der Wertermittlung, kommt es auf eine genaue Betrachtung des Einzelfalles an.“ (S. 43)",
+      "bestaetigung_im_modell": "Das Sachwertfaktor-Modell desselben Berichts (S. 49) wendet es an: „beim Ansatz des Bodenwertes wurde auf eine Flächenanpassung verzichtet (Ausnahme: übergroße Grundstücke; s.a. ‚Bodenwertanpassung wegen abweichender Flächengrößen‘)“."
+    },
+    "geltungsbereich": {
+      "raeumlich": "Stadtgebiet Mainz",
+      "nutzung": "unbebautes, baureifes Land, als Bauplatz verkauft (Stichprobe über das ganze Stadtgebiet)",
+      "objektarten": [
+        "efh",
+        "zfh",
+        "dhh",
+        "rh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "ausschluss_grund": "Für Renditeobjekte rechnet der Ausschuss den Bodenwert über die WGFZ um (S. 41: Funktion auf Grundlage WertR Anlage 11, „für die Ableitung der Liegenschaftszinsen bei Kauffällen von Renditeobjekten in BRW-Zonen mit Angabe der durchschnittlichen WGFZ angewendet“). Ob die Flächenuntersuchung dort gilt, sagt der Bericht nicht — deshalb ausgeschlossen statt stillschweigend mitgerechnet.",
+      "rang": "oertlich",
+      "ausserhalb_wortlaut": "„Wie so oft in der Wertermittlung, kommt es auf eine genaue Betrachtung des Einzelfalles an.“ (S. 43); übergroße Grundstücke sind im Sachwertmodell ausdrücklich ausgenommen (S. 49).",
+      "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte für den Bereich der Stadt Mainz, Stadt Mainz, 60 - Bauamt, Postfach 3820, 55028 Mainz, 06131 12-4334, gutachterausschuss@stadt.mainz.de"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Grundstücksmarktbericht Mainz 2025, Kapitel „Bodenwertanpassung wegen abweichender Flächengrößen“, S. 42–43: Untersuchung der Geschäftsstelle für den Grundstücksmarktbericht 2014 über 1.008 Kaufverträge (Tabelle „Auswertung GMB 2014“: 432 / 343 / 233 Fälle mit Fläche kleiner / gleich / größer als das Richtwertnormgrundstück), Kaufpreise mittels Bodenpreisindex auf 2013 normiert, 150 bis 1.000 m²; Ergebnis: keine systematische Beziehung, pauschale Koeffizienten nicht empfohlen."
+      },
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Grundstücksmarktbericht Mainz 2025, S. 49 (Modell der Sachwertfaktoren): auf eine Flächenanpassung des Bodenwerts wurde verzichtet, Ausnahme übergroße Grundstücke."
+      },
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Grundstücksmarktbericht Mainz 2025, S. 41 (Bodenwertanpassung wegen abweichender Ausnutzung, WGFZ): eigene Umrechnungskoeffizienten liegen für Mainz nicht vor; hilfsweise WertR Anlage 11 für Renditeobjekte — hier NICHT übernommen (WertR ist kein zulässiger Ersatz)."
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Amtliche Feststellung des örtlich zuständigen Ausschusses im aktuellen Bericht (Jahrgang 2025) und dort im Sachwertmodell angewendet — aber die zugrunde liegende Untersuchung stammt aus dem Grundstücksmarktbericht 2014 (Kaufpreise auf 2013 normiert) und ist seither nicht erneuert worden. Deshalb B, nicht A.",
+    "fallzahl": 1008,
+    "stichtag": "2025-01-01",
+    "stichtag_hinweis": "Stichtag des Berichts 2025 (Berichtszeitraum 01.01.2024–31.12.2024, Redaktionsschluss 25.11.2025), in dem der Ausschuss die Feststellung unverändert als geltend veröffentlicht. Die Untersuchung selbst ist aus dem GMB 2014, Kaufpreise normiert auf 2013.",
+    "berichtsjahr": 2025,
+    "modellversion": "GMB 2025",
+    "quelle_url": "https://www.mainz.de/medien/internet/downloads/gutachterausschuss/Grundstuecksmarktbericht-2025.pdf",
+    "lizenz": "Nachdruck und Vervielfältigung sowie Speicherung auf Datenträgern sind nur mit Quellenangaben gestattet.",
+    "lizenz_hinweis": "Wörtlich aus dem Impressum (PDF-S. 4). Ausgenommen ist nur das Titelbild („unterliegt dem Urheberschutz und darf nur mit Genehmigung vervielfältigt werden“). Keine offene Datenlizenz genannt; Quellenangabe ist Pflicht.",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Mainz, Grundstücksmarktbericht Mainz 2025, S. 42–43",
+    "fundstelle": "S. 42–43 (Bodenwertanpassung wegen abweichender Flächengrößen), S. 49 (Sachwertmodell), S. 41 (WGFZ)",
+    "verwendung": "Bodenwert: keine Anpassung an die Grundstücksgröße (Koeffizient 1) zwischen 150 und 1.000 m², nur individueller Wohnungsbau; außerhalb Einzelfallprüfung beim Ausschuss.",
+    "belege_meta": {
+      "dokument": "Grundstücksmarktbericht Mainz 2025",
+      "abgerufen_am": "2026-10-16",
+      "redaktionsschluss": "2025-11-25"
+    },
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
+  }
+]

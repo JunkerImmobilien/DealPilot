@@ -662,7 +662,10 @@
    "regionalfaktor_hinweis": "1,75 fuer ganz Hamburg",
    "bodenwert": "objektspezifischer Bodenwert zum Modellstichtag",
    "standardstufe": "Standardstufe gemaess Anlage 4 der ImmoWertV, siehe IMB Seite 201",
-   "baupreisindex": "interpoliert zum Modellstichtag; Modellstichtag = Stichtag, auf das sich der Aktualisierungsfaktor bezieht",
+   "baupreisindex": 1.911,
+   "baupreisindex_basis": "Baupreisindex Mai 2010 = 1",
+   "baupreisindex_modell": "interpoliert zum Modellstichtag; Modellstichtag = Stichtag, auf das sich der Aktualisierungsfaktor bezieht",
+   "baupreisindex_beleg": "Immobilienmarktbericht Hamburg 2026, S. 123 (PDF 125), Tabelle „Aktualisierungsfaktor für den Sachwertfaktor für Einfamilienhäuser“, Spalte „Baupreisindex Mai 2010 = 1“, Zeile Stichtag 01.01.2026: 1,911 — mit pdftotext -raw und -table gegengelesen, beide gleich. Das Modell interpoliert den Index zum Modellstichtag (S. 117); die Zahl gilt nur zum Stichtag dieses Satzes (2026-01-01), für andere Stichtage steht sie unter aktualisierung. Ernte vom 16.10.2026.",
    "besondere_bauteile": "kein gesonderter Ansatz - Anlagen sind im ueblichen Umfang enthalten",
    "garagen_eur_stueck": 9000,
    "garagen_basisjahr": 2010,
@@ -749,7 +752,6 @@
      "untersuchungszeitraum": "1.1.2025 bis 1.1.2026"
     }
    },
-   "baupreisindex_basis": "Baupreisindex Mai 2010 = 1",
    "stichprobe_merkmale": {
     "NormBRW20_eur_m2": {
      "min": 250,

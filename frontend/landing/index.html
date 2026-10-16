@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- DealPilot Landing · v1553 -->
+<!DOCTYPE html><!-- DealPilot Landing · v1553 · landing-videothek-1 -->
 <html lang="de"><head>
 <meta charset="utf-8">
 <meta name="google-site-verification" content="sjsXb3XudmYE75JCus789-lKn_IIX5jOySZx50Iy4i0">
@@ -14,6 +14,8 @@
 <link rel="stylesheet" href="dp2-buehne.css?v=v1570">
 <!-- v1588: der Wechselschritt loest den bisherigen Ablauf ab -->
 <link rel="stylesheet" href="demo-wechsel.css?v=v1591">
+<!-- landing-videothek-1 · DealPilot live, F&E, Kanzlei-Zeile -->
+<link rel="stylesheet" href="dp2-live.css?v=landing-videothek-1c">
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
@@ -69,6 +71,7 @@
         <li><a href="forschung.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Forschung &amp; Entwicklung</b><span>Bescheinigtes Vorhaben: das ganze Portfolio im Blick</span></span></a></li>
       </ul></li>
     <li><a href="#stories">Stories</a></li>
+    <li><a href="videothek.html">Videothek</a></li>
     <li><a href="#pricing">Preise<i class="kar"></i></a>
       <ul class="sub">
         <li><a href="#pricing"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Einzelplatz</b><span>Vier Pakete von kostenlos bis Pro</span></span></a></li>
@@ -168,8 +171,8 @@
   <div><svg class="ico"><use href="#i-globus"/></svg>
     <div><b>Made in Germany</b><span>Entwickelt in Nordrhein-Westfalen</span></div></div>
   <!-- v1873 · FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage (BSFZ) — Marcel: "ergänze das auf der Landingpage" -->
-  <div class="tband-siegel"><img src="assets/bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="64" height="64" loading="lazy">
-    <div><b>FuE-Siegel 2026</b><span>Bescheinigungsstelle Forschungszulage (BSFZ)</span></div></div>
+  <div class="tband-siegel"><a href="forschung.html" aria-label="Forschung und Entwicklung"><img src="assets/bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="64" height="64" loading="lazy">
+    <div><b>FuE-Siegel 2026</b><span>Bescheinigungsstelle Forschungszulage (BSFZ)</span></div></a></div>
 </div></div></div>
 
 <!-- ══ WILLKOMMEN ════════════════════════════════════════════════════ -->
@@ -206,6 +209,16 @@
        derselben Rechenbasis wie auf demo-steuer.html. -->
   <div class="rv" data-wechsel></div>
 
+</div></section>
+
+<!-- ══ DEALPILOT LIVE ════════════════════════════════════════════════
+     landing-videothek-1 · Marcel am 16.10.2026: "relativ weit oben, nicht
+     direkt am Header, vielleicht danach erst, wie es erklaert ist, und dann
+     DealPilot Live". Deshalb steht er HINTER "Was DealPilot macht".
+     Gebaut von dp2-live.js aus assets/videothek/videos.json - hier steht
+     nur der Platz. Die Videos selbst liegen nicht im Git (medien/). ═══ -->
+<section class="sec sec-dark dpl" id="live"><div class="wrap">
+  <div id="dplRoot" data-start="ueberblick"></div>
 </div></section>
 
 <!-- ══ MODULE ════════════════════════════════════════════════════════ -->
@@ -553,18 +566,48 @@
   </div>
 </div></section>
 
+<!-- ══ FORSCHUNG & ENTWICKLUNG ══════════════════════════════════════
+     landing-videothek-1 · Marcel am 16.10.2026: "unter F und E ... die
+     Texte finde ich noch nicht so gut ... das Siegel koennte groesser sein
+     ... und wie das entstanden ist". Texte aus den eigenen Posttexten zum
+     Siegel (Fassung 5, Kernabsatz) und dem bescheinigten Vorhaben.
+     Bewusst NICHT hier: Verfahren, Messwerte, Schwellen, Aktenzeichen,
+     Stunden, Namen. Langfassung: forschung.html ═══════════════════════ -->
+<section class="sec sec-dark fe2" id="forschung"><div class="wrap">
+  <div class="fe2-grid">
+    <a class="fe2-siegel rv" href="forschung.html" aria-label="Zur Seite Forschung und Entwicklung">
+      <img src="assets/bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="300" height="300" loading="lazy"></a>
+    <div class="rv">
+      <div class="eye">Forschung &amp; Entwicklung · FuE-Siegel 2026</div>
+      <h2 style="font-size:clamp(26px,3.6vw,42px);margin:14px 0 18px">Ein Objekt rechnen kann jeder. <span class="ac" style="color:var(--gdh)">Einen ganzen Bestand aufstellen kaum jemand.</span></h2>
+      <p class="fe2-zitat">„Optimier mir mal meinen Bestand.“</p>
+      <p class="fe2-text">Mit diesem Satz fing es an — als Gedankenspiel mit einem Steuerberater: Ein Mandant mit über
+        100 Objekten sitzt vor dir und sagt genau das. Wo setzt du an? Die Zahlen liegen auf dem Tisch. Was fehlt, ist
+        der Zusammenhang. <b>Aus genau dieser Lücke ist unser Forschungsvorhaben entstanden.</b></p>
+      <div class="fe2-drei">
+        <div><b>Was wir erforschen</b><span>Ob sich ein ganzer Immobilienbestand gemeinsam optimieren lässt — passend zum Investor, statt Objekt für Objekt.</span></div>
+        <div><b>Warum das neu ist</b><span>Im Portfolio hängt alles an allem: Fristen, Grenzen, Freibeträge. Jede Entscheidung bei einem Objekt verändert die Rechnung für alle anderen.</span></div>
+        <div><b>Was du davon hast</b><span>Heute jedes Objekt mit Flugdaten. Morgen dein ganzer Bestand auf Kurs — aufbereitet für das Gespräch in der Kanzlei.</span></div>
+      </div>
+      <a class="btn-l" href="forschung.html">Die ganze Geschichte und das Vorhaben
+        <svg class="ico" style="width:14px;height:14px"><use href="#i-pfeil"/></svg></a>
+      <p class="fe2-fuss">Von der Bescheinigungsstelle Forschungszulage als Forschung und Entwicklung bescheinigt · Laufzeit 2026 bis 2028 · Analyse-Werkzeug, keine Steuerberatung.</p>
+    </div>
+  </div>
+</div></section>
+
 <!-- ══ PARTNER & DATENQUELLEN ════════════════════════════════════════ -->
 <section class="sec sec-paper" id="partner"><div class="wrap">
   <div class="head ctr rv"><div class="eye ctr">An Bord integriert</div>
     <h2>Partner &amp; <span class="ac">Datenquellen.</span></h2>
     <p>Von AVM-Bewertung über Finanzierung bis Gutachten und Technik — DealPilot arbeitet
-      mit etablierten Partnern zusammen.</p></div>
+      mit etablierten Partnern zusammen — und wird in der Praxis von Steuerberatungskanzleien begleitet.</p></div>
   <!-- v1540b: kein loading=lazy im Laufband - es laeuft dauerhaft,
        und beim Ankommen saehe man sonst Luecken statt Logos.
        Neun Logos zusammen: 130 KB. -->
   <div class="pmarq rv"><div class="pmarq-track">
-    <div class="plogo"><img src="assets/partner/pricehubble.png" alt="PriceHubble"></div>
-    <div class="plogo"><img src="assets/partner/sprengnetter.png" alt="Sprengnetter"></div>
+    <!-- v2285 · Anbieter-Neutralitaet (CLAUDE.md): die beiden Bewertungspartner
+         nie namentlich nach aussen - Logos aus dem Laufband genommen. -->
     <div class="plogo"><img src="assets/partner/immometrica.png" alt="ImmoMetrica"></div>
     <div class="plogo"><img src="assets/partner/realestatepilot.png" alt="RealEstatePilot"></div>
     <div class="plogo"><img src="assets/partner/onevoice.png" alt="OneVoice"></div>
@@ -572,7 +615,15 @@
     <div class="plogo"><img src="assets/partner/funck-it.png" alt="Funck IT"></div>
     <div class="plogo"><img src="assets/partner/christian-sperling.png" alt="Christian Sperling"></div>
     <div class="plogo"><img src="assets/partner/junker-immobilien.png" alt="Junker Immobilien"></div>
+    <!-- landing-videothek-1 · Logo von der Website der Kanzlei (sp-steuerberatung.de/img/logo.png) -->
+    <div class="plogo"><img src="assets/partner/schmidt-und-partner.png" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB"></div>
   </div></div>
+  <div class="kz rv">
+    <img src="assets/partner/schmidt-und-partner.png" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB" width="203" height="40" loading="lazy">
+    <p><b>Begleitet von Steuerberatungskanzleien.</b> DealPilot entsteht nicht im luftleeren Raum: Kanzleien wie
+      die <b>Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB</b> aus Hüllhorst sagen uns, wo es in der Praxis hakt.
+      Die Beratung bleibt in der Kanzlei — wir liefern die Aufbereitung.</p>
+  </div>
   <figure class="bildzeile rv">
     <img src="assets/bild/haus.jpg" alt="Mehrfamilienhaus in einer deutschen Wohnstraße" loading="lazy">
     <figcaption>Worum es geht: ein Bestandsobjekt, ehrlich gerechnet.</figcaption>
@@ -613,7 +664,7 @@
     <div><h4>Produkt</h4>
       <a href="#workflow">So funktioniert's</a><a href="#features">Funktionen</a>
       <a href="leistungsumfang.html">Leistungsumfang</a><a href="#pricing">Preise</a>
-      <a href="api.html">API</a><a href="#feature-matrix">Cockpit-Matrix</a></div>
+      <a href="api.html">API</a><a href="videothek.html">Videothek</a><a href="forschung.html">Forschung &amp; Entwicklung</a></div>
     <div><h4>Vertrauen</h4>
       <a href="sicherheit.html">Sicherheit &amp; Server</a><a href="fragen.html">Häufige Fragen</a>
       <a href="#partner">Partner &amp; Datenquellen</a><a href="#feature-matrix">Cockpit-Matrix</a></div>
@@ -640,6 +691,7 @@
 <script src="demo-steuer-daten.js?v=v1600"></script>
 <script src="demo-wechsel.js?v=v1600"></script>
 <script src="dp2.js?v=v1570"></script>
+<script src="dp2-live.js?v=landing-videothek-1b"></script><!-- landing-videothek-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz
      oben auf der Abgleichsliste:

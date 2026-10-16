@@ -164,6 +164,10 @@
   },
   "korrekturen": [],
   "modellansaetze": {
+   "gnd_jahre": 80,
+   "gnd_beleg": "Grundstücksmarktbericht Mainz 2025, S. 61, Kapitel „Preisgefüge im individuellen Wohnungsbau“, Abschnitt D: „Insgesamt gingen 213 Kauffälle Ein- und Zweifamilienhäuser aus dem Jahr 2024 in die Auswertung ein. Die Gesamtnutzungsdauer wurde pauschal mit 80 Jahren angenommen. Die bestimmenden Eigenschaften der untersuchten Kauffälle wurden im Kapitel ‚Sachwertfaktoren‘ unter Punkt A) dargelegt.“ — dieselben 213 Kauffälle wie die Sachwertfaktoren (S. 49/50). Im Kapitel Sachwertfaktoren selbst (S. 49–52) steht die GND nicht. Ernte vom 16.10.2026.",
+   "baupreisindex": null,
+   "baupreisindex_hinweis": "Im Bericht NICHT genannt: das Sachwertfaktor-Kapitel (S. 49–52) nennt keinen Baupreisindex als Modellansatz. S. 39 druckt zwar eine Reihe „Baupreisindex (Wohngebäude)“ (2010 = 100, Stichtag je 31.12.), aber ausdrücklich nur „zum Vergleich“ neben den Bodenpreisindizes — und die Spalte ist im Satz um eine Zeile versetzt. Daraus wird keine Zahl abgeleitet. Weg: Geschäftsstelle des Gutachterausschusses Mainz, gutachterausschuss@stadt.mainz.de, 06131 12-4334. Ernte vom 16.10.2026.",
    "modell": "ImmoWertV21, abgeleitet mit Sprengnetter-AKuK",
    "bezugsmassstab": "Bruttogrundfläche",
    "aussenanlagen": "im Allgemeinen 5 % des Gebäudesachwerts",

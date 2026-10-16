@@ -135,6 +135,11 @@
       lang: 'Gemessen werden alle Geschosse an den Außenkanten, einschließlich Wände, Treppenhaus, Keller und ausgebautem Dachgeschoss. Sie ist deshalb deutlich größer als die Wohnfläche: bei einem Einfamilienhaus grob das Anderthalbfache. Der Sachwert rechnet mit ihr, weil die Herstellungskosten je Quadratmeter Bruttogrundfläche angegeben sind. Steht sie in den Bauunterlagen, trag sie ein — jede Schätzung überträgt sich eins zu eins auf den Sachwert.',
       grund: 'DIN 277 · Anlage 4 ImmoWertV'
     },
+    ukFlaeche: {
+      kurz: 'Passt den Bodenrichtwert an die Größe deines Grundstücks an. Leer lassen — der Wert des Gutachterausschusses wird automatisch genommen, wo einer vorliegt.',
+      lang: 'Der Bodenrichtwert gilt für ein Richtwertgrundstück bestimmter Größe (oft 500 bis 800 m²). Ist dein Grundstück deutlich größer, ist der Quadratmeter weniger wert. Die Gutachterausschüsse veröffentlichen dafür Umrechnungskoeffizienten — Tabelle oder Formel, meist im Grundstücksmarktbericht oder als Anhang zum Bodenrichtwert (BORIS). Trag hier nur einen Wert ein, wenn der Bericht meldet, dass keiner hinterlegt ist, und du ihn beim zuständigen Ausschuss gefunden hast: den Koeffizienten für DEIN Grundstück im Verhältnis zur Bezugsgröße (z. B. 0,74). Er wird im Bericht als eigene Angabe gekennzeichnet.',
+      grund: '§ 19 und § 40 ImmoWertV'
+    },
     sachwertfaktor: {
       kurz: 'Rechnet den Sachwert auf das örtliche Marktniveau um. Leer lassen, wenn kein amtlicher Wert vorliegt.',
       lang: 'Der Sachwert aus Herstellungskosten und Bodenwert ist noch kein Marktwert — er sagt, was der Bau kosten würde, nicht was jemand zahlt. Der Sachwertfaktor stellt diese Verbindung her: in schwachen Märkten liegt er bei 0,7, in gefragten Lagen über 1,3. Er wird vom Gutachterausschuss aus tatsächlichen Kaufpreisen abgeleitet und steht im Grundstücksmarktbericht. Ohne ihn weist der Bericht nur den vorläufigen Sachwert aus, mit entsprechendem Hinweis.',

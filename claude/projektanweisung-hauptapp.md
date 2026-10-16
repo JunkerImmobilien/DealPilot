@@ -3268,6 +3268,7 @@ kein Nachweis steht, ist der Punkt nicht abgenommen.
 
 | Datum | Was | Commit | Nachweis | Rest |
 |---|---|---|---|---|
+| 16.10. | **`landing-videothek-1`–`1c`** — Landing: Abschnitt **„DealPilot live"** hinter „Was DealPilot macht" (stummer Video-Slider, Umschalter Überblick/Basis/Erweitert, Bordkarte mit Geschichte/Gewinn/Kapiteln/Spruch, Filmstreifen); neue Unterseite **`videothek.html`** (20 Videos nach Reihen, Suche, Kinofenster, Deep-Link `#<id>`); eine Quelle `landing/assets/videothek/videos.json` (inkl. YouTube-Titel/Schlagworte, `youtube_id` leer). **F&E** neu: Abschnitt `#forschung` auf der Landing mit Siegel 300 px (Band 64 → 84 px) und der Entstehung „Optimier mir mal meinen Bestand", `forschung.html` neu (Entstehung, Forschungsfrage, Abgrenzung, Kanzleien, Arbeitspakete). **Partner:** Schmidt & Partner Steuerberatungsgesellschaft PartG mbB (Hüllhorst) im Laufband + Kanzlei-Zeile + F&E-Seite, Logo von sp-steuerberatung.de/img/logo.png. Nav: Videothek auf index/forschung/api/leistungsumfang | `4e90056b`, `5c11f588`, `93313c20`, `c94d26ae` | Staging `https://staging.dealpilot.immo/`: Video läuft im Blick (`paused:false`, `currentTime` steigt, `readyState 4`), Reihenwechsel lädt Modul 02; Videothek-Suche „Bank" → 5 Treffer, Kinofenster spielt Modul 19, Hash gesetzt; MP4 mit Range → **206**, `video/mp4`; JSON `application/json`; 390-px-iframe: `scrollWidth = clientWidth = 375` auf allen drei Seiten, Instrumentenzeile 30 px einzeilig; `buster-ebenen-pruefen` SAUBER; gold-audit RC=0 (liest die Landing **nicht** mit — dp2-live.css trägt trotzdem nur Tokens) | **MP4s nicht im Git** (`frontend/landing/medien/` ignoriert, 193 MB per scp nur auf **Staging** unter `/opt/dealpilot/frontend/landing/medien/videothek/`) — für Prod eigener scp nötig. Ü1 ist `quickcheck-rundgang-studio` **ohne** Reihen-Intro. Offen bei Marcel: Kanzleiname auf der Seite freigeben; Sprengnetter/PriceHubble-Logos stehen weiter im Laufband (Altbestand, widerspricht der Anbieter-Neutralität); Steuerberater-Szene an den tatsächlichen Verlauf anpassen. |
 | 30.08. | **`v1176`–`v1179`** — das neue Preismodell an allen Anzeigestellen (19,99 / 39,99 / 79,99, Partner 99 mit Seats 24/19/15), Kontingente statt Litertank, die drei Stufen einheitlich benannt (Marktpreisindikation · Erweiterte Marktpreisindikation · Wertermittlung nach ImmoWertV, „ersetzt kein Gutachten"), Co-Pilot auf 5 Fragen für Free/Starter, dazu fünf Kleinigkeiten aus dem Testbericht | `dd226cb` `99b99db` `f137547` `27f319b` `7751bf0` | Im Browser nachgemessen: Karten 19,99/39,99/79,99 mit deutschem Komma, Kontingente 1/5/10/15, Matrix in beiden Fassungen, Co-Pilot-Pille „5 von 5 Fragen frei" im Prüfmodus `free` und „unbegrenzt" als Partner. Serverseitig gegengelesen: Vorzeichen der Preis-Einordnung, Bankexport-Sperre, Stufennamen | **Die Anzeige ist umgestellt, die Buchhaltung nicht** — `aiCreditsService.js` führt weiter Liter. Offen: Stripe-Preise (Dashboard), Migration der Tabelle `plans`, die drei Zähler, Einzelkauf am Knopf |
 | 30.08. | **`v1175`** — Marcels Wahl aus der Demo: **Fassung C** als Schnellauswahl (Gold, Karamell, Kupfer, Ziegel, Moos hell, Sand — Blau, Petrol, Schiefer fallen weg). Dazu sein Nachtrag „freier Farbregler": ein Farbton-Regler mit Regenbogenbahn, offen im Panel statt im Fenster des Systems | `3f4a6cc` | Bedienweg über alle drei Bedienelemente: Kachel → Regler springt auf 18° · Regler 200° → `#3F8EB5`, Kacheln aus · Farbkasten auf eine Kachelfarbe → Kachel an, Regler 69° · Zurücksetzen → 44°. Grenzen des Reglers einzeln geprüft: fast grau + 120° → `#267326` (ohne S-Boden hätte sich nichts bewegt), fast weiß + 300° → `#C875C8` (Deckel L 0,62), fast schwarz → `#732673` (Boden 0,30) | **Punkt 4 ist damit zu.** Alles Kühle kommt über Regler oder Farbkasten — nachgewiesen. Die drei Bedienelemente gehen durch **eine** Funktion (`akzentSetzen`); ausgelassen wird nur das, an dem gerade gezogen wird, sonst springt der Regler |
 | 30.08. | **`v1174`** — freier Akzentwähler im Darstellungs-Panel (Backlog Punkt 4, Marcels „beides"). Es gab hier keinen: die sechs `<input type=color>` im Panel gehören den Bereichsfarben, der einzige freie Wähler saß im Reseller-Portal und setzt die **Partner**-Marke. Dazu die Demo für die wärmeren Töne | `8e95bf5` | Bedienweg in allen vier Richtungen: Kachel → Wähler folgt · Wähler auf freie Farbe → Kachel aus, Wähler markiert · Wähler auf Kachelfarbe → Kachel an · Zurücksetzen → Gold. `localStorage` vor dem Reset-Test vollständig gesichert und danach zurückgeschrieben. Demo-Skript einmal echt gelaufen: 4 × 6 Kacheln, 22 Tabellenzeilen, kein Fehler | **Zwei Rücknahmen:** die Mindestkontrast-Regel ist seit `v1109` gebaut (mit `#F0D000` schwächster Textton **3,84**, nicht 2,57–2,98 — das sind Zahlen von vor v1109), und es gibt **keinen** Kontrastmangel in den heutigen sechs: auf Obsidian landet nicht der rohe Akzent, sondern ein aufgehellter Ton (5,48–9,58). **Die Tonwahl ist reiner Geschmack und liegt bei Marcel** |
@@ -38839,6 +38840,95 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2288–v2288b · DIE DEALPILOT-FORMEL (Näherung Umrechnungskoeffizient) + Sperren bleiben im Register (16.10.2026, Staging)
+
+- **Was:** Marcel: „wir bestimmen eine Formel … das wäre dann eine Stufe darunter" / „DealPilot-Formel … abgeleitet aus einer DealPilot-Formel" / „geschosszahl haben wir ja". `lib/umrechnung_flaeche.js` `naeherung()`: UK = (Fläche/Bezugsgröße)^b, b aus `lib/uk-naeherung.json` (erzeugt von `tools/uk-naeherung-ableiten.mjs`, Median der Exponenten aller amtlichen Tabellen, gleiche Tabellen einmal; Stand 109 Tabellen, b = −0,213, typ. Abweichung 1 %, 90 % unter 10 %; Stadt −0,25, Hamburg amtlich −0,2496). Nur efh/zfh/dhh/rh, nur bekannte Geschosszahl bis II (BORIS `Geschosszahl`, `geschosse()` liest „I-II"), 0,5–2,5-fache Bezugsgröße. Rangfolge im Bericht: eigene Angabe → Register → Minden-Lübbecke → DealPilot-Formel → Variante A. Nie, wo die Sperre eine andere Regel nennt (`sperreSchliesstNaeherungAus`: Tiefe, WGFZ, kein Einfluss, ausgeschlossen) oder der Satz Objektart/Haustyp/Gebiet ausschließt. Hinweistext „abgeleitet aus der DealPilot-Formel", Stufe D, Tabellenzahl, Genauigkeit, Weg zum Ausschuss. Marktpreisindikation: Mehrfläche über die Formel statt Faktor 0,40.
+- **Fund beim Ausrollen (v2288a):** Laufzeitregister 193 statt 206 UK-Sätze — `ladeAusDb` ersetzte jeden Saatsatz mit gleichem ags|kennzahl|zweig|berichtsjahr durch die DB-Zeile, auch SPERREN (NI-Kreis-Sperre Göttingen neben den Zonen-Werten) → dort griff die Formel statt der Sperre. Jetzt bleiben UK-Sperren aus der Datei stehen (nur diese Kennzahl, um findeZweig bei Zins/Faktor nicht zu verschieben). v2288b: `satzFuer` überspringt Platzhalter-Zeilen `{form: konstante, wert: null}`.
+- **Commit:** v2288, v2288a, v2288b (staging).
+- **Nachweis (Staging-Container, DB-Stand):** HE/TH/Aachen Sperre; Bielefeld 0,59; Leer 0,97; Göttingen ohne Zone Sperre, mit Zone 1/1,05; Braunschweig Sperre; Formel efh 1.200/600 Zone II → 0,8627, Zone III/unbekannt/mfh/2.000 m² → keine.
+- **Rest:** nach der laufenden Ernte (BW, BY, Osten, HE/RP/SL/SH) `node tools/uk-naeherung-ableiten.mjs` neu, Einspiellauf, dann Prod. Marcel will dasselbe Prinzip für Liegenschaftszins und Sachwertfaktor prüfen (eigener Baustein). „ACHTUNG: die Tabelle ersetzt mehr, als sie selbst führt" im Startlog ist Altbefund (3686 ersetzt / 3681 Zeilen) — klären.
+
+### v2280–v2287b · UMRECHNUNGSKOEFFIZIENT GRUNDSTÜCKSGRÖSSE (§ 19 ImmoWertV) — Register, Ernte, Eingabefeld, Datenbank (16.10.2026, Staging)
+
+**Auslöser.** Marcel 16.10.2026 zu Bericht 216 (Westerfeldstr. 140, Bielefeld): „das kann doch gar nicht sein, dass wir so einen großen Bodenwert in Bielefeld haben". Gerechnet war 1.570 m² × 450 €/m² = 706.500 € bei einem Richtwertgrundstück von 600 m² — ohne Umrechnung. Koeffizienten kannte der Bericht nur für Minden-Lübbecke (fest in `umrechnung_nrw.js`).
+
+**Rechtslage (Recherche, belegt in scratchpad uk-recherche.md):** § 40 ImmoWertV (Bodenwert aus BRW, Abweichungen berücksichtigen), § 19 (Umrechnungskoeffizienten, Grundstücksgröße ausdrücklich), § 41 (Teilflächen), § 9 Abs. 3 (sachverständige Schätzung nur ohne geeignete Daten, dokumentiert). ImmoWertA 2023: zu § 19/§ 41 „Keine Anmerkungen", Rangfolge örtlicher Ausschuss → Oberer Ausschuss/Landeswert → andere Quellen, Quelle angeben. **Bundesweite Tabellen gibt es nicht mehr** (VW-RL 2014 Anlage 2, WertR — seit 01.01.2022 gegenstandslos).
+
+**Marcels Entscheidungen 16.10.2026:**
+- „amtlich nur da, wo es auch so ist" — und: „wichtig ist, dass es sauber funktioniert".
+- **Variante A:** ohne amtlichen Koeffizienten volle Fläche, aber markiert (`bodenwert_nicht_angepasst`, Ertrags-/Sachwert insoweit vorläufig, Link zur Umrechnungsvorschrift, Hinweis aufs Eingabefeld).
+- Kunden tragen fehlende Werte selbst ein — Feld nur, wenn gebraucht.
+- Marktfaktor 0,4 (Mehrfläche in der Marktpreisindikation) nur noch ohne amtlichen Koeffizienten.
+- **Näherung als Stufe darunter** (folgt, v2288): eine DealPilot-Formel aus allen amtlichen Tabellen, gekennzeichnet als Näherung; Geschosszahl aus BORIS als Bedingung (nur bis II).
+- Ernte in ALLEN Ländern, Großstadt und ländlich.
+
+**Was steht (Code):**
+- Kennzahl `umrechnungskoeffizient_flaeche` im Register (Dateien `uk-flaeche-*.json`, SAATDATEIEN, `ladeAusDb`). Kern `lib/umrechnung_flaeche.js`: Formen `flaeche_tabelle` (je Normgröße oder `*` mit `bezug_qm`, Zwischenwerte linear/stufen, Regeln ober-/unterhalb wörtlich), `flaeche_funktion` (potenz/log/linear, `spanne_qm`), `flaeche_eins` (amtlich kein Einfluss). Koeffizient immer UK(Objekt)/UK(Bezugsgröße). Geltung: Objektarten, `brw_bis/von_eur_qm`, `gebiete_ausgeschlossen` (Ortsteil aus BORIS/Adresse; unbekannt → keine Zahl), `normgroesse_je_objektart` (Dortmund), `boris_tabellen` + Zonenabruf (NI/HB, `connectors/boris/ni-zone.js`, v2284). Sperre → kein Wert, Weg zur Quelle.
+- Bericht (`ReportOrchestrator`): eigene Angabe `uk_flaeche` → Register → Minden-Lübbecke-Rückfall; Hinterland behält die Anpassung des Baulands; Quellennachweis nennt den Koeffizienten (by-2-0). `ValuationService`: Mehrfläche amtlich = Fläche × BRW × UK − Bezugsgröße × BRW.
+- Eingabefeld „Umrechnungskoeffizient Grundstücksgröße" in Marktbericht-App (Experte, nur Haus mit Grundstück) und Haupt-App (neben Sachwertfaktor), Objekt-Reiter-Zeile „Umrechnung Grundstücksgröße" (`/wertparameter/zinssatz` liefert `uk_flaeche_quelle`).
+- Nebenbei: Sachwert-Rechenweg ohne doppelten Index, Dezimalkomma (nhk2010); Landing ohne die zwei Bewertungspartner-Logos/-Namen.
+
+**Ernte (Agenten, geprüft):** NW alle 72 Ausschüsse (75 Sätze, 20 Werte), NI über BORIS-NI-WFS (121, 84 Werte, zonenscharf), Länder/Stadtstaaten (HH Formel, Stadt Bremen, ST „= 1"; Sperren MV Genehmigung, RP kostenpflichtig, Bremerhaven, Berlin nur WGFZ; HE und TH bewusst gesperrt — HE nicht beschlossen/2008-09, TH Lizenz nur nicht kommerziell), Mainz „kein Einfluss". 97 amtliche Anwendungsbeispiele mit der echten Funktion getroffen. BW, BY, Osten, HE/RP/SL/SH örtlich: Ernte läuft (16.10. nachmittags).
+
+**Datenbank (Staging):** `register-saat.mjs` — 108 UK-Werte in `mb.param_modell`. Drei Fallen, alle behoben:
+1. `modellversion`, `quelle_parser`, `modellansaetze` sind NOT NULL — fehlten in den neuen Sätzen; `saat-pruefen` verlangt sie jetzt bei jedem Wert.
+2. `schreibeModelle` zeigte nur die ersten drei Verwerfungen; die Sperren füllten den Zähler → die echten Schreibfehler blieben unsichtbar. Jetzt eigener Zähler `schreibfehler`, immer gezeigt.
+3. **Eigener Fehler:** drei UK-Sperren (HE, TH, Aachen) trugen ihre Tabelle als `formel` — die Tabelle kennt kein Sperr-Feld, sie kamen als WERT an. Tabelle jetzt in `formel_vorgemerkt`, die drei Staging-Zeilen per UPDATE auf `{form: konstante, wert: null}` (nicht gelöscht), `uk-flaeche-pruefen` meldet jede Sperre mit rechenbarer Formel rot. Alt-Sperren der LZS/SWF-Dateien tragen nur `{form: konstante, wert: null}` — harmlos, unberührt.
+
+**Richtigstellung:** „BORIS-D liefert für NI/HB keine Fläche des Richtwertgrundstücks" (v2283) war falsch verallgemeinert — mein Messpunkt lag in einer Zone ohne Flächenbezug. Leer 900, Göttingen 600, Hannover 750, Braunschweig 1.000 m² kommen an (v2284).
+
+- **Commits:** `990e9cf9` (v2280), v2281/a, `97385be3` (v2282), `cc31a14c` (v2283), `732b2b7e` (v2284, NI-Zone), `f3a8b8ae` (v2285), `4e1995d9` (v2285a Landing), `495d0d9c` (v2286 NRW), v2287/a, `e9f960e9` (v2287b).
+- **Nachweis:** `uk-flaeche-pruefen` sauber (206 Sätze, 97 Beispiele), `saat-pruefen --basislinie` grün, Gegenprobe im Staging-Container mit DB-Stand: HE/TH/Aachen keine Zahl, Bielefeld 0,59, Leer 0,97. Bielefeld EFH 1.570 m² → 0,4439 → 313.623 € statt 706.500 €.
+- **Rest:** Prod-Rollout (Code + `register-saat.mjs` auf Prod nach Sicherung). Näherung v2288 einbauen (Ableitung `tools/uk-naeherung-ableiten.mjs`: b Median −0,213 land, −0,25 Stadt; Hamburg amtlich −0,2496). Offene Bewertungsfragen an Marcel: Zwischenwerte ohne Interpolationsregel (Münster, Aachen u. a.), DHH/RH in NI, Bonn „nur für den Dienstgebrauch", Lippe-Bezug, Kauf/Genehmigung Saarbrücken, Bremerhaven, Saarland, Bremen (Zins/Faktor). Hamburg: BORIS-Abruf lieferte an einem Punkt keinen Wert — prüfen. Tiefe und WGFZ als eigene Kennzahlen (viele NRW-Ausschüsse).
+
+### v2283–v2304 · Videoreihe: Module 10c, 20, 21, 23, 24 gebaut und aufgenommen; RND-Rechner zeigt die Prüfpflicht (16.10.2026, Staging)
+
+- **Was:**
+  - Fünf Drehbücher in `messe-drehbuch.js` mit Studio-Einträgen. 10c, 23 und 24 laufen an Kopien, 20 und 21 am Konto (nur lesen, `rhNurStart`):
+    - `reihe-rnd` (10c, neu im Plan)
+    - `reihe-bankexport` (20)
+    - `reihe-cockpit` (21)
+    - `reihe-15pct` (23)
+    - `reihe-brw-unterlagen` (24)
+  - Mitschnitte und Sperren:
+    - Neuer Mitschnitt `portfolioPilot`: EIN echter `/ai/copilot`-Abruf, kein Kontingent, nur Tageszähler. Die Ablage `PUT /user-settings/portfolio_analyse` wird im Lauf beantwortet, nicht geschrieben; gemessen: unverändert.
+    - Die Geokodierung vor dem BORIS-Abruf (bezahlter Dienst) wird mit den Koordinaten aus Bericht 216 gespielt. BORIS selbst läuft echt (Open Data).
+- **App-Fehler behoben (gemessen):**
+  1. `rnd-wizard.js` (v2283):
+     - `rnd-calc.js` liefert seit v2073 `pruefung` und `grenzen`. Der Wizard zeigte beides nie.
+     - „Restnutzungsdauer übernehmen“ (v2274) setzte den Wert auch bei `uebernahme_gesperrt` (Bj 1905 / GND 80).
+     - Jetzt: Kasten „Sachverständig zu würdigen“ mit Begründung. Der Knopf ist gesperrt, die Texte stehen mit Dezimalkomma.
+  2. `calc.js` (v2301): 15-%-Status „52.8%“ → „52,8 %“.
+  3. `bodenrichtwert.js` (v2302): Stichtag „2026-01-01“ → „01.01.2026“.
+  4. `portfolio-pilot.js` (v2304): Markdown-Sternchen standen roh im Bild, jetzt Fettschrift.
+- **Eigener Fehler:** Mein Commit `32267d2e` heißt „v2285“. Die Nummer hatte der Ernte-Strang schon vergeben. Danach habe ich v2300–v2304 genutzt.
+- **Nicht gebaut, gemeldet:**
+  - 17 · Objekt übertragen: Eine Übertragung an einen anderen Nutzer gibt es nicht. Vorhanden sind Sicherung/Import per Datei, die Mandanten-Freigabe und die Netzwerk-Einreichung. Welcher Weg gemeint ist, entscheidet Marcel.
+  - 22 · Telegram-Bot: Telegram Web braucht eine Anmeldung und zeigt fremde Chats.
+- **Commits:**
+  - `f13bc6cc` (v2283), `36c76ed7` (v2283a)
+  - `32267d2e` (als „v2285“)
+  - `bc07a39a` (v2300), `0b5d704c` (v2301), `da42824c` (v2302), `f552b46d` (v2303), `f8d72ce6` (v2304)
+  - Ausgerollt per `git push` + `git pull --ff-only` auf Staging. `deploy-staging.ps1` brach ab, weil andere Agenten unbestätigte Änderungen im Arbeitsverzeichnis hatten. Konstanten, Buster und Serverstand habe ich je Commit selbst geprüft.
+- **Nachweis:**
+  - Prüfläufe mit Protokoll (300 ms) für alle fünf Module. Kegel ≥ 96 % der Messpunkte; Lücken nur beim Kopieren bzw. im Abspann.
+  - Gespielt: Geokodierung, `/ai/copilot`, Ablage der Analyse.
+  - Gesperrt: BMF-Vorlauf.
+  - Kopien gelöscht, `fetch` danach echt.
+  - Je Video: Konferenzprüfung, 25-s-Probe, Start per Leertaste, Bildprüfung auf Fremdfenster (je Bild), Name/Adresse 0 Treffer.
+  - Datenbank je Aufnahme vorher/nachher gleich, alle 39 Objekt-Hashes gleich dem Stand nach dem Mittag. `ai_credits_log` und `marktbericht_cost_log` unverändert; `user_settings.portfolio_analyse` unverändert (9.10.).
+- **Videos:** 10c 4:09 (10,2 MB) · 20 1:38 (3,8 MB) · 21 2:59 (6,0 MB) · 23 3:34 (8,4 MB) · 24 2:38 (6,4 MB).
+- **Rest:** 17 und 22 (siehe oben). Ravensberger Weg 38 echt geändert um 10:36 UTC (`geb_ant` 74,57 → 74,82), siehe v2279; nicht zurückgesetzt.
+
+### v2279 · Modul 16 neu aufgenommen nach v2277/v2278 (Sachwert mit NHK 4.1, eine RND) (16.10.2026, Staging)
+
+- **Was:** Bericht 216 liegt in `mb.market_reports` noch mit dem Sachwert vor v2277 (927.000 €, RND 21); das Marktbericht-Fenster lädt ihn per GET `/reports/one`. `r16MbSpion` ersetzt im Lauf NUR `cross_check` durch den Mitschnitt (v2278) – kein Abruf, kein Schreiben in die Datenbank, Modul 18 (Bericht 205) unberührt. Modul 16 neu aufgenommen: 5:29, 12,8 MB.
+- **Gezeigt:** Ergebnis „Ertragswert 1.065.000 € · führend, Sachwert 1.061.881 €“; Sachwert-Zeile 1.061.881 € vorläufig ohne amtlichen Faktor; im Rechenweg NHK 825 €/m² × 507 m² = 418.275 €, × 1,91 = 798.905 €, Alterswertminderung (80 − 32,3)/80 → −476.347 €, Garage 17.953 €, Außenanlagen 13.620 €, Bodenwert 707.750 €. Gemessen im Prüflauf (Text des `#wv-box`, alle 300 ms): „927.000“, „21 Jahre“, „14,9“, „220.418“ kommen nirgends vor; Kegel bei 98 % der Messpunkte.
+- **Bild:** Ein einzelnes Bild (1/30 s) Desktop bei 275,3 s – aus der Rohaufnahme mit gleicher Zeitbasis entfernt (`-fps_mode cfr`), danach je Bild 0 Fremdfenster. Name/Adresse 0 Treffer.
+- **Gemeldet:** Der neue Sachwert-Rechenweg schreibt Dezimalpunkte und eine Doppelung: „Baupreisindex 1.91 1,91“, „(47.7 von 80 Jahren)“, „(80 − 32.3)“ – Text der Staffel im Kern (v2277), nicht im Drehbuch. Außerdem: Ravensberger Weg 38 (echtes Objekt) wurde um 10:36 UTC gespeichert, `geb_ant` 74,57 → 74,82, Version 54 → 55 – während meines Prüflaufs, aber nicht über meinen Tab (der Lauf schrieb nur an die Westerfeld-Kopie); im selben Fenster war ein App-Tab mit `?_=v2275` offen. Ursache nicht geklärt, nicht zurückgesetzt (Sicherung: `/root/backups/objekte-vor-aufnahme-20261016.json`).
+- **Commit:** `bdf8378d` (v2279)
+- **Nachweis:** DB vor und nach der Aufnahme gleich (Objekte info@ 39, Steuerzeilen, Pässe, Waisen 0, alle 39 Objekt-Hashes); Kopie gelöscht; kein Abruf nach außen (`ai_credits_log` 1692, `marktbericht_cost_log` 317 unverändert).
+
 ### v2276–v2276f · Videoreihe AUFGENOMMEN (18 Videos, 1920 × 1080); Modul 16 an der Westerfeldstr. mit Ertragswert; PDF seitenbreit (16.10.2026, Staging)
 
 - **Was:**
@@ -38860,6 +38950,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - DB vorher/nachher (Sicherung `/root/backups/objekte-vor-aufnahme-20261016.json`, 9,0 MB): Objekte info@ 39 (gesamt 43), `tax_records` 583, `tax_snapshots` 36, `tax_bemerkungen` 26, Pässe 148, Waisen 0, `usage_counters`-Hash gleich; alle 39 Objekte `version`/`updated_at`/md5(data)/md5(Analyse)/Steuer-Hashes unverändert.
 - **Kosten:** EIN Stufe-3-Bericht (216, freigegeben): `ai_credits_log` 1691 → 1692, `marktbericht_cost_log` 316 → 317. Alle Aufnahmeläufe ohne Abruf nach außen.
 - **Rest:** die fünf Meldungen; Ü2-Deckblatt zeigt seitenbreit nur den Titel (Kaufpreis/Eckdaten darunter); 16 ist mit 5:32 lang; mb-Backend-Neubau (Koordinator) kann jetzt laufen.
+
+### Prod-Rollout (34) · v2274–v2277 + v2278 (Staging) · eine RND für alle Verfahren auch beim MFH (16.10.2026)
+
+- **Was:** v2277: Bericht 216 (Westerfeldstr. 140, MFH 4 WE) rechnete den Sachwert mit RND 21 (GND − Alter), den Ertragswert mit 32,3 (Anlage 2). Ursache: `nhk_typ` wurde nur bei der WOHNUNG aus `units` abgeleitet; beim MFH blieb er leer, `nhk2010.sachwert` fand keinen Kennwert, und `CrossCheckService` fiel still auf den vereinfachten EFH-Weg (EFH-Kosten 835, BGF = Wfl × 1,35, Faktor 1,0, einfache RND). Jetzt: MFH mit Wohnungszahl → 4.1/4.2/4.3; MFH ohne Wohnungszahl → kein Sachwert; der vereinfachte Weg rechnet mit der einheitlichen RND. v2278: Modul-16-Mitschnitt – nur `cross_check.sachwert` + `comparison` aus DEMSELBEN Payload mit dem neuen Kern neu gerechnet (kein Abruf): vorläufiger Sachwert 1.061.881 € statt 927.000 €, Spanne 0,3 % statt 14,9 %.
+- **Commit:** `f1eba2f4` (v2277), `02a5ecd9` (v2278, nur Staging), Merge `9d8181b1` (v2274–v2277 + Videoreihe v2276–v2276f).
+- **Nachweis:** Sicherungen `haupt-/mb-20261016-0951` (14/25 MB, 73/32 Tab.). Prod: `_nhkTypAuto` und `plateau` im mb-Image, Buster rnd-calc v2275, Gold-Audit RC=0, `/auth/me` 401. `CrossCheckService.compute` mit Payload 216: Sachwert NHK 825 €/m², RND 32,3 = Ertragswert = Herkunft. RND-Rechner im Browser (Staging): Bj 1908 → Punktraster 12 J. (Plateau), ganze Jahre, Knopf „übernehmen“ sichtbar, Raster 1.085/1.141 px.
+- **Rest:** Knopf „übernehmen“ nicht geklickt (würde am offenen Objekt speichern) – Abnahme an einer Kopie. Modul 16 wird neu aufgenommen (Agent). Bericht 216 fachlich offen: Bodenwert ohne Umrechnung (1.570 m² gegen Richtwertgrundstück 600 m²), BWK-Quelle OGA Brandenburg für NRW, Deckblatt „mfh“ als Rohschlüssel, kein SWF Bielefeld im Register. Ravensberger Weg 38: gespeicherter Gebäudeanteil 74,57 % (amtlich 74,82 %) – Marcels Entscheidung.
 
 ### v2274 + v2275 · RND-Rechner ganze Jahre/Übernehmen; Anlage 2 Plateau hinter dem Scheitel; Paket vw-modul V4.2.6 (16.10.2026, Staging)
 

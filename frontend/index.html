@@ -1471,6 +1471,7 @@ label.dp-required.qc-required::after {
         <option value="19">umfassend modernisiert</option>
       </select></div></div>
       <div class="f"><label title="Marktanpassungsfaktor nach Paragraf 21 Abs. 3 ImmoWertV: er führt den vorläufigen Sachwert zum marktangepassten Sachwert. Er kommt vom örtlichen Gutachterausschuss und ist keine Schätzung — ohne Faktor bleibt der Sachwert vorläufig.">Sachwertfaktor</label><div class="iw"><input id="sachwertfaktor" type="text" inputmode="decimal" placeholder="leer = aus der Parametertabelle" class="tr"></div></div>
+      <div class="f" id="uk_flaeche_feld"><label title="Umrechnungskoeffizient nach Paragraf 19 ImmoWertV: passt den Bodenrichtwert an die Größe des Grundstücks an. Er kommt vom örtlichen Gutachterausschuss (Grundstücksmarktbericht oder BORIS-Anhang). Leer lassen, wenn DealPilot ihn aus dem Register holt — eintragen nur, wenn keiner hinterlegt ist.">Umrechnungskoeffizient Grundstücksgröße</label><div class="iw"><input id="uk_flaeche" type="text" inputmode="decimal" placeholder="leer = Wert des Ausschusses" class="tr"></div></div>
       <div class="f"><label title="Nur die Stellplatz- und Garagenmiete. Die Nettokaltmiete der Wohnung steht im Tab Miete und wird von dort übernommen — sie fehlt hier nicht, sie steht nur nicht zweimal. Die Bewirtschaftungskosten-Quoten rechnen auf dem GESAMTEN Rohertrag, also einschliesslich dieser Stellplätze.">Stellplatzmiete (€/Monat)</label><div class="iw"><span class="pfx">€</span><input id="stellplatz_miete_monat" type="text" inputmode="decimal" placeholder="je Stellplatz" class="trl"></div></div>
       <div class="f"><label>Sonstige Einnahmen (€/Jahr)</label><div class="iw"><span class="pfx">€</span><input id="sonstige_jahr" type="text" inputmode="decimal" placeholder="Werbefläche, Antennenanlage …" class="trl"></div></div>
     </div>
@@ -3590,7 +3591,7 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v2261"></script>
+  <script src="js/calc.js?v=v2301"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -3642,7 +3643,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v2261"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v2257"></script>
+<script src="js/storage.js?v=v2282"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v2269"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v2263e"></script>
@@ -3672,10 +3673,10 @@ label.dp-required.qc-required::after {
 <script src="js/import-export-modal.js?v=v1678"></script>
 <script src="js/quick-check.js?v=v2272"></script>
 <script src="js/qc-bridge.js?v=v2261"></script>
-<script src="js/bodenrichtwert.js?v=v1999"></script>
+<script src="js/bodenrichtwert.js?v=v2302"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v2245"></script>
-<script src="js/objekt-reiter.js?v=v2273"></script>
+<script src="js/objekt-reiter.js?v=v2282"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v2210"></script>
@@ -3694,7 +3695,7 @@ label.dp-required.qc-required::after {
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v2240"></script>
 <script src="js/prozess-atlas-gesamt.js?v=v2218f"></script>
-<script src="js/messe-drehbuch.js?v=v2276f"></script>
+<script src="js/messe-drehbuch.js?v=v2304"></script>
 <script src="js/hinweise.js?v=v2204"></script>
 <script src="js/pilot-tower.js?v=v2252"></script>
   <script src="js/dp-band-fix.js?v=1117"></script> <!-- v863-band-fix, v1117: 32/15 -->
@@ -3730,7 +3731,7 @@ label.dp-required.qc-required::after {
 <script src="js/avm-section.js?v=v2149"></script>
 <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte, klickbar = übernehmen -->
 <script src="js/marktwert-abschlag.js?v=v2237d"></script><!-- v2237 · Abschlag auf Angebotspreise -->
-<script src="js/dealpilot-mb.js?v=v2255"></script>
+<script src="js/dealpilot-mb.js?v=v2282"></script>
 <script src="js/mb-auftrag.js?v=v2191"></script>
   <script src="js/marktbericht-view.js?v=v2273h"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
@@ -3738,7 +3739,7 @@ label.dp-required.qc-required::after {
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
 <script src="js/rnd-gnd-table.js?v=v1426"></script>
 <script src="js/rnd-calc.js?v=v2275"></script>
-<script src="js/rnd-wizard.js?v=v2274"></script>
+<script src="js/rnd-wizard.js?v=v2283a"></script>
 <script src="js/free-lock.js?v=v2180"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=v2261"></script>
@@ -3748,7 +3749,7 @@ label.dp-required.qc-required::after {
 <script src="js/portfolio-spiegel.js?v=v1802"></script><!-- v1793: liest portfolioPayload() und legt es fuer den Bot ab - rechnet NICHTS -->
 
 <!-- v1704 � Portfolio-Pilot: haengt sich ans Cockpit, sobald dessen Markup steht -->
-<script src="js/portfolio-pilot.js?v=v2180"></script>
+<script src="js/portfolio-pilot.js?v=v2304"></script>
 <script src="js/score-fx.js?v=464"></script>
 <script src="js/main.js?v=v2261"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->

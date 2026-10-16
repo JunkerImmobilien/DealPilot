@@ -1,0 +1,759 @@
+[
+  {
+    "land_code": "HE",
+    "ags": "06",
+    "ebene": "land",
+    "gebiet_name": "Hessen (landesweit)",
+    "gaa_name": "Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen (ZGGH)",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "geltungsbereich": {
+      "nutzung": "individueller Wohnungsbau: unbebaute Eigenheimgrundstücke (freistehende Einfamilienhäuser/Zweifamilienhäuser sowie Reihenhäuser/Doppelhaushälften)",
+      "objektarten": [
+        "efh",
+        "zfh",
+        "dhh",
+        "rh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "brw_bis_eur_qm": 400,
+      "brw_wortlaut": "Nach ersten Untersuchungen konnte festgestellt werden, dass eine Wertrelevanz lediglich bei Grundstücken mit einem Bodenrichtwert bis zu 400 €/m² erkennbar war. Die Berücksichtigung von Grundstücken mit höheren Bodenrichtwerten (d. h. über 400 €/m²) führte zu keinem signifikanten Ergebnis.",
+      "rang": "landeswert_nachrangig",
+      "rang_wortlaut": "Die hier veröffentlichten wertrelevanten Daten hat die ZGGH anhand der von allen hessischen Gutachterausschüssen für Immobilienwerte ausgewerteten Kaufverträge errechnet. Sie wurden nicht von einem Gutachterausschuss beschlossen. Es handelt sich deshalb nicht um sonstige zur Wertermittlung erforderliche Daten gem. § 193 Abs. 5 BauGB. […] Bei der Erstellung von Verkehrswertgutachten sollten vorrangig die regional ermittelten und vom jeweiligen Gutachterausschuss beschlossenen wertrelevanten Daten in die Wertermittlung einfließen. Diese werden in den jeweiligen regionalen Immobilienmarktberichten veröffentlicht.",
+      "ausserhalb_wortlaut": "Bei Nutzung der in diesem Bericht genannten wertrelevanten Daten ist eine kritische sachverständige Würdigung erforderlich. Bei der Erstellung von Verkehrswertgutachten sollten vorrangig die regional ermittelten und vom jeweiligen Gutachterausschuss beschlossenen wertrelevanten Daten in die Wertermittlung einfließen.",
+      "ausserhalb_weg": "Örtlich zuständiger Gutachterausschuss für Immobilienwerte (regionale Immobilienmarktberichte kostenfrei über gds.hessen.de); landesweit: ZGGH, info.zggh@hvbg.hessen.de, gutachterausschuss.hessen.de"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Immobilienmarktbericht Hessen 2025 (ZGGH), Kap. 8 Einleitung S. 69-70 (Rang: nicht beschlossen, vorrangig regionale Daten), Kap. 8.1.1 S. 70 (Datengrundlage, Wertrelevanz bis 400 €/m²), Tab. 8.1.1 S. 71 (Tabelle 150-1.500 m², 650 m² = 1,00), Beispiel S. 72; Impressum S. 2 (Nutzung, Version 1.1 vom 18.12.2025)"
+      },
+      {
+        "art": "Stichtag der Tabelle",
+        "fundstelle": "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg, Erläuterungen zu den Bodenrichtwerten / Umrechnungskoeffizienten (Bodenrichtwerte 01.01.2024), Seite 2 von 2: dieselbe Tabelle (Datengrundlage 2008 und 2009, 2.785 Grundstücksflächen) mit „Stichtag: 01.01.2010“ und „Der Gutachterausschuss geht davon aus, dass die aufgeführten Umrechnungskoeffizienten mangels aktueller Untersuchungen hilfsweise weiterhin angenommen werden können.“ https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2025-09/0606057-gaa-kb-2024.pdf"
+      },
+      {
+        "art": "Nachrechnung",
+        "fundstelle": "Anwendungsbeispiel S. 72 mit der echten Funktion nachgerechnet: 1,05 / 0,98 = 1,0714; 110 × 1,0714 = 117,85 -> 118 €/m² (Dokument: 118 €/m²). Tabellenwerte 500 m² = 1,05 und 700 m² = 0,98 getroffen."
+      }
+    ],
+    "stufe": "E",
+    "stufe_grund": "Landesweite Auswertung der ZGGH, ausdrücklich NICHT vom Gutachterausschuss beschlossen und keine sonstigen erforderlichen Daten nach § 193 Abs. 5 BauGB; Daten 2008/2009 ohne GFZ-Bereinigung. Nur nachrangig nach den Daten des örtlichen Ausschusses (ImmoWertA zu § 9 Abs. 3 b).",
+    "stichtag": "2010-01-01",
+    "stichtag_hinweis": "Der Landesbericht nennt keinen Stichtag. 01.01.2010 steht wörtlich beim Gutachterausschuss Kassel/Waldeck-Frankenberg für genau diese Tabelle (gleiche Datengrundlage, gleiche 28 Werte). Der Stichtag liegt 16 Jahre zurück; die Tabelle gilt nur hilfsweise.",
+    "berichtsjahr": 2025,
+    "quelle_url": "https://www.buck-vermessung.de/wp-content/uploads/2026/01/immobilienmarktbericht-hessen-2025.pdf",
+    "quelle_hinweis": "Amtlich herausgegeben von der ZGGH (gutachterausschuss.hessen.de); die gelesene Datei ist eine unveränderte Kopie auf einem Fremdserver, weil der amtliche Link zum Abruf nicht erreichbar war. Eine Ausgabe 2026 des Landesberichts wurde am 16.10.2026 nicht gefunden.",
+    "lizenz": "Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung oder Bedingung erlaubt.",
+    "lizenz_hinweis": "Wörtlich Impressum S. 2, weiter: „Die bereitgestellten Daten und Metadaten dürfen für kommerzielle und nicht kommerzielle Nutzung insbesondere 1. vervielfältigt, ausgedruckt, präsentiert, verändert, bearbeitet sowie an Dritte übermittelt werden, […] Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“ Inhaltlich entspricht das dl-de/zero-2-0; die Kennung selbst nennt das Dokument nicht. Ein Vermerk ist nicht verlangt — er wird trotzdem geführt und weist die Umformung aus.",
+    "quellenvermerk": "Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen (ZGGH), Immobilienmarktbericht Hessen 2025, Tab. 8.1.1 (Werte unverändert, für die Berechnung in eine Tabelle umgeformt)",
+    "fundstelle": "Kap. 8.1.1, S. 70-72 (Tab. 8.1.1 S. 71, Beispiel S. 72)",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), individueller Wohnungsbau bis 400 €/m², nur wenn der örtliche Ausschuss keinen eigenen Koeffizienten führt.",
+    "belege_meta": {
+      "dokument": "Immobilienmarktbericht Hessen 2025, Kap. 8.1.1 Grundstücksfläche",
+      "abgerufen_am": "2026-10-16",
+      "version": "1.1 vom 18.12.2025"
+    },
+    "vollstaendig": false,
+    "warum_kein_wert": "Der Immobilienmarktbericht Hessen führt eine landesweite Tabelle als Ersatz, sie beruht aber auf Kaufpreisen von 2008/09 und ist nach Angabe der Zentralen Geschäftsstelle nicht beschlossen; ein eigener Stichtag fehlt. Das trägt keinen amtlichen Landeswert (v2283). Maßgeblich sind die Umrechnungskoeffizienten des örtlichen Gutachterausschusses.",
+    "auflagen": "Werte nur zur Dokumentation hinterlegt; Quelle als unveränderte Kopie gelesen, amtlicher Link am 16.10.2026 nicht erreichbar.",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Zentrale Geschäftsstelle der Gutachterausschüsse für Immobilienwerte des Landes Hessen (ZGGH), Jahrgang 2025",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {},
+    "formel_vorgemerkt": {
+      "form": "flaeche_tabelle",
+      "bezug": "Bodenwert (Objektfläche) = Bodenrichtwert × UK(Objektfläche) / UK(Fläche des Bodenrichtwertgrundstücks)",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine Tabelle für jede Bezugsgröße (Quotient)",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 650,
+          "flaeche_qm": [
+            150,
+            200,
+            250,
+            300,
+            350,
+            400,
+            450,
+            500,
+            550,
+            600,
+            650,
+            700,
+            750,
+            800,
+            850,
+            900,
+            950,
+            1000,
+            1050,
+            1100,
+            1150,
+            1200,
+            1250,
+            1300,
+            1350,
+            1400,
+            1450,
+            1500
+          ],
+          "koeffizient": [
+            1.35,
+            1.27,
+            1.22,
+            1.17,
+            1.14,
+            1.1,
+            1.08,
+            1.05,
+            1.03,
+            1.02,
+            1,
+            0.98,
+            0.97,
+            0.96,
+            0.94,
+            0.93,
+            0.92,
+            0.91,
+            0.9,
+            0.9,
+            0.89,
+            0.88,
+            0.87,
+            0.87,
+            0.86,
+            0.85,
+            0.85,
+            0.84
+          ]
+        }
+      },
+      "zwischenwerte": null,
+      "zwischenwerte_wortlaut": "Der Landesbericht sagt nichts zu Zwischenwerten (keine Interpolationsregel in Kap. 8.1.1). Deshalb rechnet der Kern nur auf den 50-m²-Stufen der Tabelle; dazwischen gibt es keinen Koeffizienten.",
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Tabelle beginnt bei 150 m² (Datengrundlage 100 m² - 2.000 m²); keine Regel für kleinere Flächen."
+      },
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": "Tabelle endet bei 1.500 m² (Datengrundlage 100 m² - 2.000 m²); keine Regel für größere Flächen."
+      },
+      "pruefbeispiel": {
+        "wortlaut": "Beispiel: Einfamilienhäuser. Bodenrichtwert: 110 €/m², Bodenrichtwertgrundstück Fläche 700 m², Vergleichsgrundstück: Fläche 500 m². Umrechnungskoeffizienten: 700 m² = 0,98, 500 m² = 1,05. Bodenwert (500 m²) = 1,05 / 0,98 x 110 €/m² = 118 €/m² (gerundet: ~120 €/m²)",
+        "flaeche_qm": 500,
+        "normgroesse_qm": 700,
+        "brw_eur_qm": 110,
+        "koeffizient_objekt": 1.05,
+        "koeffizient_norm": 0.98,
+        "bodenwert_eur_qm": 118,
+        "rundung_eur_qm": 1,
+        "seite": 72
+      }
+    }
+  },
+  {
+    "land_code": "TH",
+    "ags": "16",
+    "ebene": "land",
+    "gebiet_name": "Thüringen (landesweit)",
+    "gaa_name": "Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Freistaats Thüringen",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "geltungsbereich": {
+      "nutzung": "Eigenheimgrundstücke: unbebaute Grundstücke für freistehende Ein- und Zweifamilienhäuser, Doppelhaushälften oder Reihenhäuser",
+      "objektarten": [
+        "efh",
+        "zfh",
+        "dhh",
+        "rh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "spanne_qm": [
+        300,
+        2000
+      ],
+      "brw_von_eur_qm": 20,
+      "brw_bis_eur_qm": 1000,
+      "brw_wortlaut": "… können nur für Grundstücksgrößen von 300 m² bis 2.000 m² und für Bodenwerte zwischen 20 EUR/m² und 1.000 EUR/m² verwendet werden.",
+      "rang": "landeswert_nachrangig",
+      "rang_wortlaut": "Diese Umrechnungskoeffizienten können unter sachgerechter Würdigung verwendet werden, wenn keine geeigneten Umrechnungskoeffizienten des zuständigen Gutachterausschusses für Grundstückswerte vorliegen.",
+      "ausserhalb_wortlaut": "Über den tabellarisch aufgeführten Gültigkeitsbereich hinaus ist eine Extrapolation der Umrechnungskoeffizienten nicht sachgerecht.",
+      "ausserhalb_weg": "Örtlich zuständiger Gutachterausschuss für Grundstückswerte (Gebietszuständigkeiten: tlbg.thueringen.de/wertermittlung); landesweit: Zentrale Geschäftsstelle beim Thüringer Landesamt für Bodenmanagement und Geoinformation, Hohenwindenstraße 13a, 99086 Erfurt"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Webseite „Umrechnungskoeffizienten: Fläche (Eigenheimgrundstücke)“ der Zentralen Geschäftsstelle (§ 198 BauGB, § 15 Abs. 3 ThürGAVO), Abschnitt 1 „Methodik“ (Regressionsmodell, 5.397 Kauffälle, Vertragsdatum 03.01.2018 bis 29.12.2022, 22 Landkreise/kreisfreie Städte), Abschnitt 2 „Umrechnungskoeffizienten“ (18 Werte 300-2.000 m², 700 m² = 1,000, lineare Interpolation, keine Extrapolation) und Beispielrechnung; abgerufen 16.10.2026"
+      },
+      {
+        "art": "Nachrechnung",
+        "fundstelle": "Beispielrechnung (Abschnitt 2) mit der echten Funktion nachgerechnet: 1,016 / 1,089 = 0,9330; 90 × 0,9330 = 83,97 EUR/m² (Dokument: 83,97 EUR/m²). Tabellenwerte 300 m² = 1,089 und 600 m² = 1,016 getroffen."
+      },
+      {
+        "art": "Nutzungsbedingungen",
+        "fundstelle": "Impressum tlbg.thueringen.de, Abschnitte „Rechte für Bild- und Textmaterial“ und „Urheberrecht“, abgerufen 16.10.2026"
+      }
+    ],
+    "stufe": "E",
+    "stufe_grund": "Landesweite Ableitung der Zentralen Geschäftsstelle (§ 198 BauGB), aktuelle Daten 2018-2022, 5.397 Fälle; ausdrücklich nachrangig zum örtlichen Ausschuss.",
+    "stichtag": "2022-12-29",
+    "stichtag_hinweis": "Die Seite nennt KEINEN Stichtag und kein Veröffentlichungsdatum (auch nicht im HTTP-Kopf). Eingetragen ist das letzte Vertragsdatum der Stichprobe („Maximum 29.12.2022“, Abschnitt 1) — das Ende des Auswertungszeitraums, kein vom Herausgeber genannter Stichtag. Beim Herausgeber zu erfragen.",
+    "berichtsjahr": 2026,
+    "berichtsjahr_hinweis": "Die Webseite trägt keinen Jahrgang; 2026 ist das Jahr des Abrufs.",
+    "quelle_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/flaeche-efh",
+    "lizenz": "ungeklärt für kommerzielle Nutzung — Impressum: „Die Verwendung von Bild- und/ oder Textmaterial dieser Homepage ist zulässig. Es ist ein Copyright-Vermerk ©GDI-Th anzubringen.“ Ebenda: „Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet.“",
+    "lizenz_hinweis": "Die Seite selbst nennt keine Lizenz und keine eigene Nutzungsregel. Das Impressum erlaubt die Verwendung des Textmaterials mit Vermerk ©GDI-Th, beschränkt aber Downloads und Kopien auf den privaten, nicht kommerziellen Gebrauch und verlangt für Vervielfältigung „außerhalb der Grenzen des Urheberrechtes“ die schriftliche Zustimmung. Ob die Wiedergabe von Koeffizienten in einem kostenpflichtigen Bericht darunter fällt, ist nicht entschieden — vor Kundeneinsatz beim TLBG klären.",
+    "quellenvermerk": "©GDI-Th — Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Freistaats Thüringen, Umrechnungskoeffizienten: Fläche (Eigenheimgrundstücke), tlbg.thueringen.de",
+    "fundstelle": "Webseite Umrechnungskoeffizienten: Fläche (Eigenheimgrundstücke), Abschnitte 1 und 2, Beispielrechnung",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), Eigenheimgrundstücke 300-2.000 m², nur wenn der örtliche Ausschuss keinen eigenen Koeffizienten führt.",
+    "belege_meta": {
+      "dokument": "Umrechnungskoeffizienten: Fläche (Eigenheimgrundstücke)",
+      "abgerufen_am": "2026-10-16"
+    },
+    "vollstaendig": false,
+    "warum_kein_wert": "Die landesweiten Umrechnungskoeffizienten des Thüringer Landesamts für Bodenmanagement und Geoinformation (TLBG) sind veröffentlicht, aber laut Impressum nur für den privaten, nicht kommerziellen Gebrauch freigegeben. Bis zur Klärung der Nutzungsrechte wird keine Zahl übernommen (v2283, Marcel 16.10.2026: amtlich nur, wo es auch so ist).",
+    "auflagen": "Werte im Satz nur zur späteren Freigabe hinterlegt; Klärung der kommerziellen Nutzung beim TLBG offen.",
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Zentrale Geschäftsstelle der Gutachterausschüsse für Grundstückswerte des Freistaats Thüringen, Jahrgang 2026",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {},
+    "formel_vorgemerkt": {
+      "form": "flaeche_tabelle",
+      "bezug": "BW 2 = BW 1 * UK 2 / UK 1 (UK 1: Fläche des Bodenrichtwertgrundstücks, UK 2: Fläche des Wertermittlungsobjekts)",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine Tabelle für jede Bezugsgröße (Quotient)",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 700,
+          "flaeche_qm": [
+            300,
+            400,
+            500,
+            600,
+            700,
+            800,
+            900,
+            1000,
+            1100,
+            1200,
+            1300,
+            1400,
+            1500,
+            1600,
+            1700,
+            1800,
+            1900,
+            2000
+          ],
+          "koeffizient": [
+            1.089,
+            1.058,
+            1.035,
+            1.016,
+            1,
+            0.987,
+            0.975,
+            0.965,
+            0.955,
+            0.947,
+            0.939,
+            0.932,
+            0.926,
+            0.92,
+            0.914,
+            0.909,
+            0.904,
+            0.899
+          ]
+        }
+      },
+      "zwischenwerte": "linear",
+      "zwischenwerte_wortlaut": "Für Grundstücksflächen zwischen den angegebenen Intervallen können die Umrechnungskoeffizienten durch lineare Interpolation ermittelt werden.",
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Über den tabellarisch aufgeführten Gültigkeitsbereich hinaus ist eine Extrapolation der Umrechnungskoeffizienten nicht sachgerecht."
+      },
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": "Über den tabellarisch aufgeführten Gültigkeitsbereich hinaus ist eine Extrapolation der Umrechnungskoeffizienten nicht sachgerecht."
+      },
+      "funktion_wortlaut": "ln (PREI) = 1,771 + 0,782 x ln (BRW) - 0,101 x ln (FLAC), Bestimmtheitsmaß 0,676",
+      "pruefbeispiel": {
+        "wortlaut": "Ein Bodenrichtwert (BW1) von 90 EUR/m² bei einer Grundstücksfläche von 300 m² sowie ein Wertermittlungsobjekt mit einer Fläche von 600 m². UK 1 für Grundstücksgröße 300 m² = 1,089; UK 2 für Grundstücksgröße 600 m² = 1,016; BW 2 = 90 EUR/m² * 1,016 / 1,089 = 83,97 EUR/m² (rd. 84 EUR/m²)",
+        "flaeche_qm": 600,
+        "normgroesse_qm": 300,
+        "brw_eur_qm": 90,
+        "koeffizient_objekt": 1.016,
+        "koeffizient_norm": 1.089,
+        "bodenwert_eur_qm": 83.97,
+        "rundung_eur_qm": 0.01,
+        "seite": "Webseite, Abschnitt 2 „Umrechnungskoeffizienten“, Beispielrechnung"
+      }
+    }
+  },
+  {
+    "land_code": "ST",
+    "ags": "15",
+    "ebene": "land",
+    "gebiet_name": "Sachsen-Anhalt (landesweit)",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_eins",
+      "bezug": "Bodenwert = Grundstücksfläche × Bodenrichtwert × 1",
+      "wirkung": "multiplikativ",
+      "wortlaut": "Der Umrechnungskoeffizient für die Abhängigkeit des Bodenwertes von der Grundstücksgröße ist landesweit gleich eins. UKGrundstücksgröße = 1 (landesweit)"
+    },
+    "geltungsbereich": {
+      "nutzung": "Grundstücke des individuellen Wohnungsbaus",
+      "objektarten": [
+        "efh",
+        "zfh",
+        "dhh",
+        "rh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "rang": "oertlich",
+      "rang_wortlaut": "Ein Gutachterausschuss für das ganze Land: der Wert ist der des zuständigen Ausschusses, kein nachrangiger Landeswert.",
+      "ausserhalb_wortlaut": "Es ist im Einzelfall sachverständig zu prüfen, insbesondere bei großen Abweichungen des zu bewertenden Grundstücks von der Größe des Bodenrichtwertgrundstücks, ob eine individuelle Anpassung des Bodenwertes erforderlich ist. Darüber hinaus ist bei erheblicher Überschreitung der marktüblichen Grundstücksgröße § 41 ImmowertV anzuwenden.",
+      "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim Landesamt für Vermessung und Geoinformation (LVermGeo), geodatenportal.sachsen-anhalt.de"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "„Einfluss der Grundstücksgröße auf den Bodenwert bei Bauland“, veröffentlicht am 04.03.2026, Seite 1 (einseitig): Stichtag 01.07.2025, rund 10.000 Kauffälle Januar 2015 bis Juni 2025 aus allen Landkreisen und kreisfreien Städten, kein signifikanter Zusammenhang, „UKGrundstücksgröße = 1 (landesweit)“, Einzelfallprüfung und § 41 ImmoWertV"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Amtliche Untersuchung des einzigen, landesweit zuständigen Gutachterausschusses, Stichtag 01.07.2025, rund 10.000 Fälle. Amtlich festgestellt: kein Einfluss — das ist ein Wert (1), keine Sperre.",
+    "stichtag": "2025-07-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://geodatenportal.sachsen-anhalt.de/gfds/datei/anzeigen/id/634290,501/umrechnungskoeffizienten_bauland_einfluss_grundst_cksgr_e_260213.pdf",
+    "lizenz": "im Dokument keine Lizenzangabe",
+    "lizenz_hinweis": "Das einseitige PDF nennt weder Lizenz noch Nutzungsbedingungen. Die Nutzungsbedingungen des LVermGeo (V 5.0) stellen offene Daten unter dl-de/by-2-0 mit „© GeoBasis-DE / LVermGeo ST“; dass sie für dieses PDF gelten, ist nicht eigens ausgewiesen. Es wird keine Zahl aus einer Tabelle übernommen, nur die amtliche Feststellung „= 1“.",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Einfluss der Grundstücksgröße auf den Bodenwert bei Bauland (veröffentlicht 04.03.2026, Stichtag 01.07.2025), geodatenportal.sachsen-anhalt.de",
+    "fundstelle": "S. 1 (einseitiges Blatt)",
+    "verwendung": "Bodenwert: keine Anpassung an die Grundstücksgröße (Koeffizient 1); bei erheblicher Übergröße § 41 ImmoWertV.",
+    "belege_meta": {
+      "dokument": "Einfluss der Grundstücksgröße auf den Bodenwert bei Bauland",
+      "abgerufen_am": "2026-10-16",
+      "veroeffentlicht": "2026-03-04"
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Jahrgang 2026",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
+  },
+  {
+    "land_code": "MV",
+    "ags": "13",
+    "ebene": "land",
+    "gebiet_name": "Mecklenburg-Vorpommern (landesweit)",
+    "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Mecklenburg-Vorpommern",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Der Obere Gutachterausschuss veröffentlicht landesweite Umrechnungskoeffizienten für die Grundstücksgröße freistehender Ein- und Zweifamilienhäuser (Landesgrundstücksmarktbericht 2025, Abschn. 5.3, S. 86-87). Die Vervielfältigung ist nur mit Genehmigung des Herausgebers gestattet; eine Genehmigung liegt nicht vor. Die Werte stehen im Bericht selbst; der Ausschuss nennt eine aktuelle Untersuchung des örtlichen Gutachterausschusses „grundsätzlich vorzuziehen“.",
+    "geltungsbereich": {
+      "nutzung": "freistehende Ein- und Zweifamilienhäuser, ein Bauplatz je Grundstück, 200-3.000 m², Kauffälle 2018-2019",
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "ausserhalb_weg": "Geschäftsstelle des Oberen Gutachterausschusses beim Landesamt für innere Verwaltung M-V, Lübecker Straße 289, 19059 Schwerin, wertermittlung@laiv-mv.de, (0385) 588-56 033; vorrangig der örtliche Gutachterausschuss"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Landesgrundstücksmarktbericht Mecklenburg-Vorpommern 2025 (Stand 12.11.2025), Abschn. 5.3 „Umrechnungskoeffizienten (Grundstücksgröße)“ S. 86 (Modell, Anwendung: „mit Umsicht und Sachverstand und nicht formalmathematisch“, örtliche Untersuchung „grundsätzlich vorzuziehen“), Abb. 5.4 S. 87 (Tabelle); Vervielfältigungsvorbehalt Impressum S. 2"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2025,
+    "quelle_url": "https://www.laiv-mv.de/static/LAIV/Geoinformation/Dateien/Wertermittlung/LGMB_2025_Web.pdf",
+    "lizenz": "Vervielfältigung und Verbreitung des Landesgrundstücksmarktberichtes, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.",
+    "lizenz_hinweis": "Wörtlich Impressum. Keine offene Datenlizenz. Übernommen wird keine Zahl, nur der Weg zur Quelle. Eine Genehmigung für die Wiedergabe der Abb. 5.4 wäre beim Herausgeber zu erbitten.",
+    "quellenvermerk": null,
+    "fundstelle": "Abschn. 5.3, S. 86-87 (Abb. 5.4)",
+    "belege_meta": {
+      "dokument": "Landesgrundstücksmarktbericht Mecklenburg-Vorpommern 2025",
+      "abgerufen_am": "2026-10-16"
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Oberer Gutachterausschuss für Grundstückswerte im Land Mecklenburg-Vorpommern, Jahrgang 2025",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
+  },
+  {
+    "land_code": "RP",
+    "ags": "07",
+    "ebene": "land",
+    "gebiet_name": "Rheinland-Pfalz (landesweit)",
+    "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte für den Bereich des Landes Rheinland-Pfalz",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Grundstücksgrößen-Umrechnungskoeffizienten stehen im Landesgrundstücksmarktbericht Rheinland-Pfalz 2025, Kapitel 4 (Abschn. 4.5.4 ff.). Kapitel 4 ist kostenpflichtig (200,00 Euro zuzüglich Versandkosten); frei sind nur die Kapitel 1 bis 3. Werte, Geltungsbereich und Rang liegen uns deshalb nicht vor.",
+    "geltungsbereich": {
+      "ausserhalb_weg": "Bezug des vollständigen Landesgrundstücksmarktberichts 2025 (kostenpflichtig, 200,00 € zzgl. Versand) beim Oberen Gutachterausschuss für Grundstückswerte Rheinland-Pfalz, gutachterausschuesse.rlp.de; vorrangig der örtliche Gutachterausschuss"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Landesgrundstücksmarktbericht Rheinland-Pfalz 2025, Impressum (Vervielfältigung nur mit Erlaubnis, „Gebühr: 200,00 Euro zuzüglich Versandkosten“) und S. 9 („Die Kapitel 1 bis 3 stehen auf der Internetseite der Gutachterausschüsse kostenlos zum Download zur Verfügung.“)"
+      },
+      {
+        "art": "Verweis eines örtlichen Ausschusses",
+        "fundstelle": "Gutachterausschuss Westerwald-Taunus, Erläuterungen zu den zonalen BRW 2026 (Stichtag 01.01.2026), Seite 1 von 8, Abschn. 1 „Grundstücksgrößen-Umrechnungskoeffizienten (LGMB 2025, Kap.: 4.5.4 ff)“"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2025,
+    "quelle_url": "https://gutachterausschuesse.rlp.de/fileadmin/gutachterausschuss/pdf/LGMB-2025_Online_1_3.pdf",
+    "lizenz": "kostenpflichtig und genehmigungspflichtig — Vervielfältigung nur mit Erlaubnis des Herausgebers",
+    "lizenz_hinweis": "Wörtlich Impressum: „Vervielfältigung dieses Marktberichtes ist nur mit Erlaubnis des Herausgebers gestattet. […] Eine Wiedergabe von Daten jedweder Art ist nur mit Quellenangabe gestattet. Gebühr: 200,00 Euro zuzüglich Versandkosten“.",
+    "quellenvermerk": null,
+    "kostenpflichtig": true,
+    "fundstelle": "Kapitel 4, Abschn. 4.5.4 ff. (nicht im freien Auszug); Impressum und S. 9 des freien Auszugs",
+    "belege_meta": {
+      "dokument": "Landesgrundstücksmarktbericht Rheinland-Pfalz 2025 (Online-Auszug Kap. 1-3)",
+      "abgerufen_am": "2026-10-16"
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Oberer Gutachterausschuss für Grundstückswerte für den Bereich des Landes Rheinland-Pfalz, Jahrgang 2025",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
+  },
+  {
+    "land_code": "HH",
+    "ags": "02000",
+    "ebene": "kreis",
+    "gebiet_name": "Hamburg, Freie und Hansestadt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_funktion",
+      "typ": "potenz",
+      "basis_qm": 1000,
+      "exponent": -0.2496,
+      "formel_wortlaut": "UK = (f/1000)^-0,2496",
+      "spanne_qm": [
+        150,
+        null
+      ],
+      "wortlaut": "Auch bei sehr kleinen Grundstücken unter etwa 150 m² kann die Anwendung der Formel zu unangemessenen Werten führen. In derartigen Fällen ist der Einzelfall zu würdigen.",
+      "bezug": "Bodenwert/m² = Bodenrichtwert × UK(Objektfläche) / UK(Fläche des Bodenrichtwertgrundstücks, f-Angabe des Richtwerts)",
+      "wirkung": "multiplikativ",
+      "pruefbeispiel": {
+        "wortlaut": "Beispiel 1 (Einfamilienhausgrundstück): Ausgangsrichtwert 800 EFH eh f1000 (d.h. für ein 1.000 m² - Grundstück). Das zu betrachtende Grundstück hat eine Größe von 827 m². Umrechnungskoeffizient aus Formel (siehe Ziffer 5.1) für 1.000 m² = 1,0000; für 827 m² = 1,04855. Umrechnung: 800 €/m² x 1,04855 / 1,0000 = 838,04 €/m², rund 840 €/m²",
+        "flaeche_qm": 827,
+        "normgroesse_qm": 1000,
+        "brw_eur_qm": 800,
+        "koeffizient": 1.04855,
+        "koeffizient_objekt": 1.04855,
+        "koeffizient_norm": 1,
+        "bodenwert_eur_qm": 840,
+        "rundung_eur_qm": 10,
+        "seite": 15,
+        "hinweis": "Das Dokument druckt als Zwischenergebnis 838,04 €/m²; 800 × 1,04855 ergibt 838,84 €/m². Der Koeffizient 1,04855 und das Endergebnis „rund 840 €/m²“ stimmen, die Zwischenzahl ist ein Druckfehler. Geprüft wird gegen Koeffizient und Endergebnis."
+      }
+    },
+    "geltungsbereich": {
+      "nutzung": "Ein- und Zweifamilienhäuser, Reihen- und Atriumhäuser, auch mit teilgewerblicher Nutzung (EFH)",
+      "objektarten": [
+        "efh",
+        "zfh",
+        "dhh",
+        "rh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "rang": "oertlich",
+      "ausserhalb_wortlaut": "Bei größeren Grundstücken ist zu prüfen, ob wirklich das ganze Grundstück einen einheitlichen Bauplatz bildet, ob eine Teilung wirtschaftlich sinnvoll und möglich ist, oder ob Grundstücksteile keine Baulandqualität haben. Auch bei sehr kleinen Grundstücken unter etwa 150 m² kann die Anwendung der Formel zu unangemessenen Werten führen. In derartigen Fällen ist der Einzelfall zu würdigen.",
+      "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Hamburg (Landesbetrieb Geoinformation und Vermessung), www.hamburg.de/gutachterausschuss",
+      "mfh_hinweis": "Mehrfamilienhausgrundstücke rechnet Hamburg über die WGFZ (Abschn. 5.3, UK = WGFZ^0,8067) — nicht über die Fläche; diese Kennzahl gilt dafür nicht.",
+      "weitere_faktoren_hinweis": "Stellungs- und Straßenlagefaktoren (Abschn. 5.2: z. B. Doppelhaushälfte × 0,90, Hinterlage × 0,94) sind eigene Umrechnungen und hier NICHT enthalten; in den rm- und dh-Richtwerten sind sie bereits berücksichtigt."
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Erläuterung der Bodenrichtwerte zum 1.1.2026, Abschn. 3.4 S. 8 (Fläche des Bodenrichtwertgrundstücks), Abschn. 5.1 S. 11 (Einflussgröße Grundstücksgröße f, Normgröße 1.000 m², UK = (f/1000)^-0,2496, Anwendungsbereich, Anmerkung unter ca. 150 m²), Abschn. 5.13 Beispiel 1 S. 15"
+      },
+      {
+        "art": "Nachrechnung",
+        "fundstelle": "Beispiel 1, S. 15, mit der echten Funktion nachgerechnet: (827/1000)^-0,2496 = 1,04855 (Dokument 1,04855); 800 × 1,0486 = 838,88 -> rund 840 €/m² (Dokument: rund 840 €/m²). Die gedruckte Zwischenzahl 838,04 ist ein Druckfehler (richtig 838,84)."
+      },
+      {
+        "art": "Lizenz",
+        "fundstelle": "Transparenzportal Hamburg, Datensatz bodenrichtwerte-hamburg28 „Bodenrichtwerte Hamburg“, Ressource „Erläuterungen der Bodenrichtwerte zum Stichtag 01.01.2026“, license_id dl-de-by-2.0 (CKAN-API package_show, abgerufen 16.10.2026)"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Vom zuständigen Ausschuss abgeleitete und bei der Richtwertermittlung selbst verwendete Formel, Jahrgang 2026, mit Beispiel.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://www.hamburg.de/resource/blob/1169696/b67bfdea7b1d19a7e8c5776edad9d4f0/d-brw-erlaeuterungen-2026-data.pdf",
+    "quelle_hinweis": "Die gleichnamige Datei auf daten-hamburg.de/opendata/bodenrichtwerte/Erlaeuterungen war am 16.10.2026 nicht als PDF lesbar; frühere Ablagen dort trugen die Fassung zum 1.1.2025. Gelesen wurde die Datei unter hamburg.de (Kopf: „Erläuterung der Bodenrichtwerte zum 1.1.2026“, erstellt 20.04.2026).",
+    "lizenz": "dl-de/by-2-0",
+    "lizenz_hinweis": "Im PDF selbst steht keine Lizenz. Belegt über das Transparenzportal Hamburg: Datensatz „Bodenrichtwerte Hamburg“ (bodenrichtwerte-hamburg28), der die Erläuterung zum 01.01.2026 als Ressource führt, Lizenz „Datenlizenz Deutschland - Namensnennung - 2.0“.",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Hamburg, Erläuterung der Bodenrichtwerte zum 1.1.2026, Abschn. 5.1, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0)",
+    "fundstelle": "Abschn. 5.1 S. 11, Beispiel 1 Abschn. 5.13 S. 15",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV) für EFH-Grundstücke in Hamburg ab etwa 150 m².",
+    "belege_meta": {
+      "dokument": "Erläuterung der Bodenrichtwerte zum 1.1.2026",
+      "abgerufen_am": "2026-10-16",
+      "pdf_erstellt": "2026-04-20"
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Hamburg, Jahrgang 2026",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
+  },
+  {
+    "land_code": "HB",
+    "ags": "04011",
+    "ebene": "kreis",
+    "gebiet_name": "Bremen, Stadtgemeinde",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in Bremen",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "formel": {
+      "form": "flaeche_tabelle",
+      "bezug": "Bodenwert/m² = Bodenrichtwert : Faktor(Fläche des Richtwertgrundstücks) x Faktor(Objektfläche)",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine Tabelle für jede Bezugsgröße (Quotient); Faktoren im Dokument als Index (1.000 m² = 100,0), hier durch 100 geteilt",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 1000,
+          "flaeche_qm": [
+            200,
+            300,
+            400,
+            500,
+            600,
+            700,
+            800,
+            900,
+            1000,
+            1100,
+            1200,
+            1300,
+            1400,
+            1500,
+            1600,
+            1700,
+            1800,
+            1900,
+            2000,
+            2100,
+            2200,
+            2300,
+            2400,
+            2500
+          ],
+          "koeffizient": [
+            1.223,
+            1.19,
+            1.158,
+            1.128,
+            1.1,
+            1.073,
+            1.048,
+            1.023,
+            1,
+            0.978,
+            0.956,
+            0.936,
+            0.917,
+            0.898,
+            0.88,
+            0.863,
+            0.846,
+            0.83,
+            0.815,
+            0.8,
+            0.785,
+            0.772,
+            0.758,
+            0.745
+          ],
+          "index_wortlaut": "122,3 119,0 115,8 112,8 110,0 107,3 104,8 102,3 100,0 97,8 95,6 93,6 91,7 89,8 88,0 86,3 84,6 83,0 81,5 80,0 78,5 77,2 75,8 74,5"
+        }
+      },
+      "zwischenwerte": "linear",
+      "zwischenwerte_wortlaut": "Zwischenwerte können durch Interpolation ermittelt werden. (Art der Interpolation nicht genannt; BORIS-HB führt die Tabelle als stetig, stetigkeit = 1.)",
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Tabelle beginnt bei 200 m²; keine Regel für kleinere Flächen."
+      },
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": "Tabelle endet bei 2.500 m²; keine Regel für größere Flächen."
+      },
+      "pruefbeispiel": {
+        "wortlaut": "Beispiel: Ein 900 m² (Faktor 102,3) großes Grundstück soll bewertet werden. Es kann ein Bodenrichtwert herangezogen werden von 180,- €/m² für ein 400 m² (Faktor 115,8) großes Grundstück. Umrechnungsansatz: 180,- €/m² : 115,8 x 102,3 = rd. 159,- €/m²",
+        "flaeche_qm": 900,
+        "normgroesse_qm": 400,
+        "brw_eur_qm": 180,
+        "koeffizient_objekt": 1.023,
+        "koeffizient_norm": 1.158,
+        "bodenwert_eur_qm": 159,
+        "rundung_eur_qm": 1,
+        "seite": 1
+      }
+    },
+    "geltungsbereich": {
+      "nutzung": "gleichartige Baugrundstücke unterschiedlicher Größe im individuellen Wohnungsbau, ausschließlich Ein- und Zweifamilienhausgrundstücke (RH, DHH, EFH)",
+      "objektarten": [
+        "efh",
+        "zfh",
+        "dhh",
+        "rh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "rang": "oertlich",
+      "gebiete_ausgeschlossen": [
+        "Oberneuland",
+        "Borgfeld",
+        "St. Magnus (bevorzugte Wohnlagen, Lesumlage)"
+      ],
+      "gebiete_ausgeschlossen_wortlaut": "Die Umrechnungsfaktoren dürfen nicht zur Umrechnung von gleichartigen Grundstücken in Oberneuland, Borgfeld und den bevorzugten Wohnlagen in St. Magnus (Lesumlage) verwendet werden. In diesen Bereichen zeigt sich tlw. ein deutlich abweichendes Marktverhalten.",
+      "ausserhalb_wortlaut": "Die Umrechnungsfaktoren können als Anhaltswert dienen, um den Einfluss der Grundstücksgröße auf den Bodenwert zu berücksichtigen. Im Einzelfall sind u.a. auch Lage, Zuschnitt und bauliche Ausnutzbarkeit eines Grundstücks zu berücksichtigen. Die Umrechnungsfaktoren dürfen nicht zur Umrechnung von gleichartigen Grundstücken in Oberneuland, Borgfeld und den bevorzugten Wohnlagen in St. Magnus (Lesumlage) verwendet werden.",
+      "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Bremen bei GeoInformation Bremen, www.gutachterausschuss.bremen.de",
+      "boris_tabellen": [
+        "DEHBBR0026UW0003"
+      ],
+      "boris_tabellen_hinweis": "v2285: Zonenkennung aus BORIS-HB (borishb_2026_wfs, listeUmrechnungstabelle). Ist die Zone bekannt, greift der Satz nur dort; ohne Zonenabruf bleibt die AGS-Zuordnung mit der Ortsteilpruefung."
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Umrechnungstabelle 100003 „Umrechnungsfaktoren für Bodenrichtwerte mit Flächenbezug [Grundstücksgröße]“ für den Stichtag der Bodenrichtwertkarte 01.01.2026, Seite 1 (einseitig): Geltung, Ausschluss Oberneuland/Borgfeld/St. Magnus, Interpolation, Tabelle A 200-2.500 m² (1.000 m² = 100,0), Beispiel"
+      },
+      {
+        "art": "maschinenlesbare Gegenprobe",
+        "fundstelle": "BORIS Bremen 2026 WFS (opendata.lgln.niedersachsen.de/doorman/noauth/borishb_2026_wfs), Objekt DEHBBR0026UW0003, einflussgroesse FLAE, stetigkeit 1, 24 Wertepaare — alle 24 zeichengleich mit dem PDF"
+      },
+      {
+        "art": "Nachrechnung",
+        "fundstelle": "Beispiel S. 1 mit der echten Funktion nachgerechnet: 1,023 / 1,158 = 0,8834; 180 × 0,8834 = 159,01 -> rd. 159 €/m² (Dokument: rd. 159,- €/m²)."
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": "Tabelle des zuständigen Ausschusses zum Stichtag 01.01.2026, mit Beispiel; maschinenlesbar in BORIS-HB gegengeprüft.",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2026/1000003flac2026.pdf",
+    "lizenz": "dl-de/by-2-0",
+    "lizenz_hinweis": "Das PDF nennt keine Lizenz. Bereitgestellt über BORIS Bremen (Infrastruktur LGLN); die Capabilities des Dienstes „BORIS Bremen 2026 WFS“, der dieselbe Tabelle als DEHBBR0026UW0003 führt, sagen wörtlich: „Dieses Angebot kann gemäß der „Datenlizenz Deutschland Namensnennung 2.0“ (https://www.govdata.de/dl-de/by-2-0) genutzt werden.“ mit quelle „© GDI-NI“; AccessConstraints „Es gelten keine Beschränkungen.“ Achtung: der Grundstücksmarktbericht Bremen selbst steht unter „alle Rechte vorbehalten“ — diese Freigabe gilt für die BORIS-Daten, nicht für den Marktbericht.",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in Bremen, Umrechnungstabelle 100003 (Stichtag 01.01.2026), über BORIS Bremen, © GDI-NI, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0); Faktoren durch 100 geteilt",
+    "fundstelle": "Umrechnungstabelle 100003, S. 1",
+    "verwendung": "Bodenwert: Anpassung des Bodenrichtwerts an die Grundstücksgröße (§ 19 Abs. 1 ImmoWertV), EFH/ZFH/RH/DHH in der Stadtgemeinde Bremen — nicht in Oberneuland, Borgfeld und St. Magnus (Lesumlage).",
+    "belege_meta": {
+      "dokument": "Umrechnungstabelle 100003 – Umrechnungsfaktoren für Bodenrichtwerte mit Flächenbezug",
+      "abgerufen_am": "2026-10-16",
+      "pdf_geaendert": "2026-04-10"
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Bremen, Jahrgang 2026",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
+  },
+  {
+    "land_code": "HB",
+    "ags": "04012",
+    "ebene": "kreis",
+    "gebiet_name": "Bremerhaven, Stadt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in Bremerhaven (Geschäftsstelle beim Vermessungs- und Katasteramt Bremerhaven)",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Der Gutachterausschuss Bremerhaven veröffentlicht keinen Umrechnungskoeffizienten für die Grundstücksgröße: der Grundstücksmarktbericht 2026 führt im Inhaltsverzeichnis kein solches Kapitel (Kap. 5: Preisentwicklung, Vergleichsfaktoren, Sachwertfaktoren, Liegenschaftszinssätze), und BORIS Bremen 2026 führt Flächen-Umrechnungstabellen nur für die Stadtgemeinde Bremen.",
+    "geltungsbereich": {
+      "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Bremerhaven, Fährstraße 20, 27568 Bremerhaven, Tel. 0471 / 590-3334, Gutachterausschuss@magistrat.bremerhaven.de, www.gutachterausschuss.bremerhaven.de"
+    },
+    "belege": [
+      {
+        "art": "Verneinung mit Ort",
+        "fundstelle": "Grundstücksmarktbericht 2026 Bremerhaven, Inhaltsverzeichnis S. 2-3 (Kapitel 1-8, kein Abschnitt zu Umrechnungskoeffizienten der Grundstücksgröße); BORIS Bremen 2026 WFS, Typ BR_UmrechnungstabelleDatei/-Werte: Flächentabelle (FLAE) nur DEHBBR0026UW0003 der Stadtgemeinde Bremen, abgerufen 16.10.2026"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://www.buergerservice.bremen.de/sixcms/media.php/9/Grundst%C3%BCcksmarktbericht%202026.pdf",
+    "lizenz": "alle Rechte vorbehalten (Vervielfältigung, Nachdruck und Verbreitung auch auszugsweise nur mit Genehmigung des Herausgebers und unter Angabe der Quelle)",
+    "quellenvermerk": null,
+    "fundstelle": "Inhaltsverzeichnis S. 2-3",
+    "belege_meta": {
+      "dokument": "Grundstücksmarktbericht 2026 Bremerhaven",
+      "abgerufen_am": "2026-10-16"
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Bremerhaven (Geschäftsstelle beim Vermessungs- und Katasteramt Bremerhaven), Jahrgang 2026",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
+  },
+  {
+    "land_code": "BE",
+    "ags": "11000",
+    "ebene": "kreis",
+    "gebiet_name": "Berlin",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
+    "kennzahl": "umrechnungskoeffizient_flaeche",
+    "zweig": "ifw",
+    "vollstaendig": false,
+    "warum_kein_wert": "Der Berliner Gutachterausschuss rechnet nicht über die Grundstücksfläche, sondern nur über die WGFZ: die Bodenrichtwerte legen eine typische Bebauungsdichte (WGFZ) zugrunde, umgerechnet wird mit den 2004 veröffentlichten GFZ-Umrechnungskoeffizienten, und in den GFZ-Stufen 0,2 bis 0,7 hat der Ausschuss keine Umrechnung vorgenommen. Einen Umrechnungskoeffizienten für die Grundstücksgröße veröffentlicht er nicht (eigene Kennzahl WGFZ, noch nicht gebaut).",
+    "geltungsbereich": {
+      "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin, www.berlin.de/gutachterausschuss, Menüpunkt „Marktinformationen“ > „Daten zur Wertermittlung“ > „GFZ-Umrechnungskoeffizienten“"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Bodenrichtwerte 01.01.2026, Erläuterung (Stand 05.03.2026), Seite 2 / 9: Abschn. 3 („In den GFZ-Stufen 0,2 bis 0,7 hat der Gutachterausschuss keine Umrechnung der Kaufpreise vorgenommen.“) und Abschn. 4 (WGFZ, GFZ-Umrechnungskoeffizienten 2004)"
+      },
+      {
+        "art": "Verneinung mit Ort",
+        "fundstelle": "www.berlin.de/gutachterausschuss/marktinformationen/daten-zur-wertermittlung/ (abgerufen 16.10.2026): als Umrechnungskoeffizienten nur „GFZ-Umrechnungskoeffizienten“, keine für die Grundstücksfläche"
+      }
+    ],
+    "stufe": "A",
+    "stichtag": null,
+    "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+    "berichtsjahr": 2026,
+    "quelle_url": "https://www.berlin.de/gutachterausschuss/_assets/aservice/ainformationen-zu-den-bodenrichtwerten/brw-erlaeuterung-2026.pdf",
+    "lizenz": "dl-de/zero-2-0",
+    "lizenz_hinweis": "Stand des Registers für Berlin (seit 01.03.2025 dl-de/zero-2-0); für die Sperre ohne Belang, es wird keine Zahl übernommen.",
+    "quellenvermerk": null,
+    "nur_wgfz": true,
+    "fundstelle": "BRW-Erläuterung 2026, Seite 2 / 9",
+    "belege_meta": {
+      "dokument": "Bodenrichtwerte 01.01.2026 – Erläuterung",
+      "abgerufen_am": "2026-10-16"
+    },
+    "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Berlin, Jahrgang 2026",
+    "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
+    "modellansaetze": {}
+  }
+]

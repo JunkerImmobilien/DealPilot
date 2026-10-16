@@ -19,6 +19,9 @@ import { CrossCheckService } from './CrossCheckService.js';
 import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js';
 /* v1070-WUK-4 · Umrechnungskoeffizienten und Hinterland-Abgrenzung. */
 import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js';
+import { groessenanpassung as ukAusRegister, naeherung as ukNaeherung,
+         sperreSchliesstNaeherungAus } from '../lib/umrechnung_flaeche.js';   /* v2280, v2288 */
+import { zustaendig as niZoneZustaendig, holeZonen as niZonenHolen, waehleZone as niZoneWaehlen } from '../connectors/boris/ni-zone.js';   /* v2284 */
 /* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
  * zustaendigen Grundstuecksmarktbericht. */
 import { gartenland as gartenlandVorschlag, zustaendig as gaaZustaendig,
@@ -177,6 +180,8 @@ export const ReportOrchestrator = {
       reconstruction_year: input.reconstruction_year ? Number(input.reconstruction_year) : null,
       mea_pct: input.mea_pct ? Number(input.mea_pct) : null,
       lzs_pct: input.lzs_pct ? Number(input.lzs_pct) : null,
+      /* v2282 · eigener Umrechnungskoeffizient Grundstuecksgroesse */
+      uk_flaeche: Number(input.uk_flaeche) > 0 ? Number(input.uk_flaeche) : null,
       brw_anpassung_pct: input.brw_anpassung_pct ? Number(input.brw_anpassung_pct) : null,
       brw_anpassung_grund: input.brw_anpassung_grund || null,
       gfz_koeff: input.gfz_koeff ? Number(input.gfz_koeff) : null,
@@ -417,6 +422,18 @@ export const ReportOrchestrator = {
       return lv;
     })().catch((e) => { step('boris: fehler ' + e.message); return null; });
 
+    /* v2284 · BODENRICHTWERTZONE NI/HB PARALLEL ABRUFEN. BORIS-D liefert dort
+     * die Flaeche des Richtwertgrundstuecks leer (gemessen 16.10.2026: Leer,
+     * Bremen), und die Umrechnungstabelle haengt an der ZONE. Der Abruf laeuft
+     * neben borisP her, damit er keine Zeit addiert; eine Frist (4 s) auf dem
+     * Ganzen, und ein Fehler liefert null - nie einen gekippten Bericht. */
+    const niZoneP = (async () => {
+      let land = null;
+      try { land = (await agsP)?.land_code || null; } catch (e) { land = null; }
+      if (!niZoneZustaendig(land)) return null;
+      return await niZonenHolen({ lat, lon, land, jahr: 2026, fristMs: 4000 });
+    })().catch(() => null);
+
     const [balanceBefore, sale, rent, micro, insights, macroBundle, zensus, landValue, marktkontext] =
       await Promise.all([balanceBeforeP, _zeit('sale', saleP), _zeit('rent', rentP), _zeit('micro', microP),
         _zeit('insights', insightsP), _zeit('macro', macroP.then((m) => m && m.macroRaw)).then(() => macroP), _zeit('zensus', zensusP),
@@ -608,15 +625,35 @@ export const ReportOrchestrator = {
      * Bewertung in Betracht. Wir setzen weiter die volle Flaeche an — aber
      * der Bericht sagt es, statt es zu verschweigen. */
     let _flaeche = null;
+    /* v2284 · Zone am Punkt waehlen: Bauland mit GENAU dem Richtwert, der
+     * gerechnet wird - sonst gehoeren Flaeche und Tabelle zu einer anderen Zone. */
+    let _niZone = null;
+    try {
+      const _nz = await niZoneP;
+      if (_nz && _nz.verfuegbar) {
+        const _w = niZoneWaehlen(_nz.zonen, (landValue && landValue.available) ? landValue.value_sqm : null);
+        _niZone = _w.zone ? { ..._w.zone, url: _nz.url, land: _nz.land } : null;
+        step('ni-zone: ' + _nz.ms + ' ms, ' + _nz.zonen.length + ' Zonen am Punkt, '
+          + (_niZone ? 'gewaehlt BRW ' + _niZone.brw_eur_qm + ' f' + (_niZone.flaeche_qm || '-')
+            + ' Tabellen ' + (_niZone.tabellen_ids.join('/') || '-') : 'keine Wahl (' + _w.grund + ')'));
+      } else if (_nz) step('ni-zone: ' + _nz.grund);
+    } catch (e) { _niZone = null; }
     try {
       const _bp2 = (landValue && landValue.properties_raw) || {};
-      const _refQm = parseFloat(String(_bp2['Fläche'] || _bp2.Flaeche || '').replace(',', '.'));
+      let _refQm = parseFloat(String(_bp2['Fläche'] || _bp2.Flaeche || '').replace(',', '.'));
+      let _refQuelle = null;
+      if (!(_refQm > 0) && _niZone && _niZone.flaeche_qm > 0) {   /* v2284 */
+        _refQm = _niZone.flaeche_qm;
+        _refQuelle = (_niZone.land === 'HB' ? 'BORIS-HB' : 'BORIS-NI') + ', Bodenrichtwertzone ' + (_niZone.bodenrichtwert_nummer || _niZone.zone_id);
+      }
       const _istQm = parseFloat(ref.plot_area);
       if (_refQm > 0 && _istQm > 0) {
         const _ueber = Math.round((_istQm / _refQm - 1) * 100);
         _flaeche = {
           richtwertgrundstueck_qm: _refQm, objekt_qm: _istQm, ueberschreitung_pct: _ueber,
           erheblich: _ueber >= 30,
+          bezugsgroesse_quelle: _refQuelle,   /* v2284: null = aus dem BORIS-Datensatz */
+          boris_tabellen: _niZone ? _niZone.tabellen_ids : null,
           geschosszahl: _bp2.Geschosszahl || null,
           lagebeurteilung: _bp2.Lagebeurteilung || null,
           umrechnungsvorschrift_url: _bp2['Link zur Umrechnungsvorschrift'] || null,
@@ -838,8 +875,83 @@ export const ReportOrchestrator = {
        * dem BORIS-Datensatz), wurde aber nur fuer einen Hinweistext benutzt.
        * Jetzt rechnet sie mit. */
       let _uk = null;
+      /* v2280 · ZUERST DAS REGISTER (Kennzahl umrechnungskoeffizient_flaeche,
+       * § 19 ImmoWertV). Bis hier kannte der Bericht Koeffizienten nur fuer
+       * Minden-Luebbecke (fest in umrechnung_nrw.js) und rechnete jeden
+       * anderen Ort mit der vollen Flaeche zum vollen Richtwert - Bericht 216,
+       * Bielefeld: 1.570 m2 x 450 = 706.500 EUR bei 600 m2 Bezugsgroesse.
+       * Gilt die Tabelle fuer die Objektart NICHT (Bielefeld: Geschoss-
+       * wohnungsbau), wird nicht umgerechnet und nicht auf eine andere
+       * Tabelle ausgewichen - der Hinweis nennt den Weg zum Ausschuss. */
+      let _ukReg = null;
+      /* v2282 · EIGENE ANGABE VOR DEM REGISTER - wie beim Liegenschaftszins
+       * (nutzerwert). Gekennzeichnet als eigene Angabe, nie als amtlich. */
+      const _ukEigen = Number(ref.uk_flaeche);
+      const _brwJetzt = (landValue && landValue.available) ? Number(landValue.value_sqm) : null;
+      if (_ukEigen > 0 && _ukEigen < 3 && Number(ref.plot_area) > 0 && _brwJetzt > 0) {
+        const _bwQm = Math.round(_brwJetzt * _ukEigen * 100) / 100;
+        _ukReg = {
+          verfuegbar: true, quelle_art: 'eigene Angabe',
+          bezugsgroesse_qm: _flaeche ? _flaeche.richtwertgrundstueck_qm : null,
+          bauland_qm: Number(ref.plot_area), gruen_qm: 0,
+          koeffizient_bauland: _ukEigen, koeffizient_bezugsgroesse: 1,
+          faktor: _ukEigen, bodenwert_eur_qm: _bwQm, gruen_eur_qm: 0,
+          wert_bauland_eur: Math.round(Number(ref.plot_area) * _bwQm), wert_gruen_eur: 0,
+          wert_eur: Math.round(Number(ref.plot_area) * _bwQm),
+          koeffizient_angewandt: true,
+          quelle: 'eigene Angabe', quelle_text: 'eigene Angabe',
+          hinweis: 'Der Bodenrichtwert wurde mit einem selbst eingetragenen Umrechnungskoeffizienten ('
+            + String(_ukEigen).replace('.', ',') + ') an die Grundstücksgröße angepasst — eigene Angabe, '
+            + 'nicht aus dem Register.',
+        };
+        step('uk-eigen: ' + _ukEigen);
+      }
+      if (!_ukReg) try {
+        _ukReg = ukAusRegister({
+          ags: ref.ags || null, objektart: ref.property_type,
+          flaeche_qm: ref.plot_area,
+          bezugsgroesse_qm: _flaeche ? _flaeche.richtwertgrundstueck_qm : null,
+          brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
+          tabellen_id: _niZone ? _niZone.tabellen_ids : null,   /* v2284: Tabelle der Zone */
+          ortsteile: (function () {   /* v2283: Gebietsausschluesse innerhalb der AGS */
+            const pr = (landValue && landValue.properties_raw) || {};
+            const c = (typeof geo !== 'undefined' && geo && geo.components) || {};
+            return [pr.Ortsteil, pr.Ortsteilname, pr.Gemarkungsname, pr.Stadtteil,
+                    c.suburb, c.city_district, c.quarter, c.neighbourhood].filter(Boolean);
+          })(),
+        });
+        step('uk-register: ' + (_ukReg.verfuegbar
+          ? 'Koeffizient ' + _ukReg.koeffizient_bauland + ' (' + _ukReg.quelle + ')'
+          : _ukReg.grund));
+      } catch (e) { _ukReg = null; }
+      /* v2288 · DIE DEALPILOT-FORMEL als Stufe unter dem amtlichen Wert -
+       * nur wo kein Registersatz greift (und nicht Minden-Luebbecke, das seine
+       * Tabelle fest im Code hat) oder wo eine Sperre KEINE andere Regel des
+       * Ausschusses nennt (Tiefe, WGFZ, kein Einfluss, Ausschluss). Gilt der
+       * Satz nur fuer eine andere Objektart, einen anderen Haustyp oder ein
+       * anderes Gebiet, sagt der Ausschuss etwas - dann keine Formel. */
       try {
-        _uk = flaechenaufteilung({
+        const _minden = String(ref.ags || '').replace(/\D/g, '').startsWith('05770');
+        const _frei = !_ukReg || _ukReg.grund === 'kein_satz'
+          || (_ukReg.grund === 'sperre' && !sperreSchliesstNaeherungAus(_ukReg.hinweis, _ukReg.sperre_grund));
+        if (!_minden && _frei && !(_ukReg && _ukReg.verfuegbar)) {
+          const _pr = (landValue && landValue.properties_raw) || {};
+          const _n = ukNaeherung({
+            objektart: ref.property_type, flaeche_qm: ref.plot_area,
+            bezugsgroesse_qm: _flaeche ? _flaeche.richtwertgrundstueck_qm : null,
+            brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
+            geschosszahl: _pr.Geschosszahl || _pr.geschosszahl || _pr.GESCHOSSZAHL || null,
+          });
+          step('uk-dealpilot-formel: ' + (_n.verfuegbar ? 'Koeffizient ' + _n.koeffizient_bauland : _n.grund));
+          if (_n.verfuegbar) {
+            /* Der Weg zum Ausschuss bleibt sichtbar, wenn es einen gibt. */
+            if (_ukReg && _ukReg.hinweis) _n.hinweis += ' ' + _ukReg.hinweis;
+            _ukReg = _n;
+          }
+        }
+      } catch (e) { /* die Naeherung darf den Bericht nie kippen */ }
+      try {
+        _uk = (_ukReg && (_ukReg.verfuegbar || _ukReg.grund !== 'kein_satz')) ? (_ukReg.verfuegbar ? _ukReg : null) : flaechenaufteilung({
           ags: ref.ags || null,
           brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
           flaeche_qm: ref.plot_area,
@@ -872,6 +984,8 @@ export const ReportOrchestrator = {
         }
         if (Number(ref.hinterland_qm) > 0) {
           const _man = manuelleAufteilung({
+            /* v2280: das Bauland behaelt die Groessenanpassung des Registers */
+            groesse: (_ukReg && _ukReg.verfuegbar) ? _ukReg : null,
             flaeche_qm: ref.plot_area, hinterland_qm: ref.hinterland_qm,
             /* v1073-WGAA-6 · Die eigene Angabe schlaegt den Vorschlag. */
             hinterland_eur_qm: ref.hinterland_eur_qm
@@ -925,6 +1039,24 @@ export const ReportOrchestrator = {
        * als keiner (§ 10 ImmoWertV).
        *
        * Erst hier korrigierbar: `_uk` entsteht nach dem Hinweis. */
+      /* v2280 · Tabelle vorhanden, aber nicht anwendbar: das gehoert in den
+       * Flaechenhinweis, sonst sieht die volle Flaeche wie Absicht aus. */
+      if (_flaeche && _ukReg && !_ukReg.verfuegbar && _ukReg.nicht_angepasst && _ukReg.hinweis) {
+        _flaeche.hinweis = (_flaeche.hinweis ? _flaeche.hinweis + ' ' : '') + _ukReg.hinweis;
+        _flaeche.umrechnung_nicht_angewandt = { grund: _ukReg.grund, quelle: _ukReg.quelle,
+          quelle_url: _ukReg.quelle_url };
+      }
+      /* v2282 · Variante A (Marcel 16.10.2026): ohne amtlichen Koeffizienten
+       * rechnet der Bodenwert weiter mit der vollen Flaeche - aber markiert,
+       * mit dem Weg zur Quelle und dem eigenen Eingabefeld. */
+      if (_flaeche && _flaeche.erheblich && !(_uk && _uk.verfuegbar && _uk.koeffizient_angewandt)) {
+        _flaeche.bodenwert_nicht_angepasst = true;
+        _flaeche.hinweis = (_flaeche.hinweis ? _flaeche.hinweis + ' ' : '')
+          + 'Der Bodenwert ist damit nicht an die Grundstücksgröße angepasst; Ertrags- und Sachwert sind '
+          + 'insoweit vorläufig. Liegt dir der Umrechnungskoeffizient des zuständigen Gutachterausschusses vor'
+          + (_flaeche.umrechnungsvorschrift_url ? ' (Umrechnungsvorschrift: ' + _flaeche.umrechnungsvorschrift_url + ')' : '')
+          + ', trag ihn unter „Umrechnungskoeffizient Grundstücksgröße“ ein.';
+      }
       if (_flaeche && _flaeche.hinweis && _uk && _uk.verfuegbar) {
         const _kopf = 'Das Grundstück ist mit ' + _flaeche.objekt_qm + ' m² um '
           + _flaeche.ueberschreitung_pct + ' % größer als das Bodenrichtwertgrundstück '
@@ -943,7 +1075,10 @@ export const ReportOrchestrator = {
         if (_uk.gruen_qm > 0 && _uk.quelle_art === 'eigene Angabe') {
           _flaeche.hinweis = _kopf
             + 'Das Grundstück selbst ist mit ' + _uk.bodenwert_eur_qm
-            + ' €/m² angesetzt; hinzu kommen ' + _uk.gruen_qm
+            + ' €/m² angesetzt'
+            + (_uk.koeffizient_angewandt ? ' (Bodenrichtwert × Umrechnungskoeffizient '
+              + String(_uk.koeffizient_bauland).replace('.', ',') + ' des Ausschusses)' : '')
+            + '; hinzu kommen ' + _uk.gruen_qm
             + ' m² Hinterlandfläche zu ' + _uk.gruen_eur_qm
             + ' €/m² (eigene Angabe) — getrennte Bewertung nach § 41 ImmoWertV.';
         } else if (_uk.gruen_qm > 0) {
@@ -952,6 +1087,10 @@ export const ReportOrchestrator = {
             + _uk.bodenwert_eur_qm + ' €/m² angesetzt, die überschüssigen '
             + _uk.gruen_qm + ' m² wertmäßig als private Grünfläche ('
             + _uk.gruen_eur_qm + ' €/m²) — getrennte Bewertung nach § 41 ImmoWertV.';
+        } else if (_uk.naeherung) {
+          /* v2288 · Naeherung: ihr eigener Hinweis, nie „Koeffizient der Zone". */
+          _flaeche.bodenwert_naeherung = true;
+          _flaeche.hinweis = _kopf + _uk.hinweis;
         } else if (_uk.koeffizient_angewandt) {
           _flaeche.hinweis = _kopf
             + 'Der Bodenrichtwert ist deshalb über den Umrechnungskoeffizienten '

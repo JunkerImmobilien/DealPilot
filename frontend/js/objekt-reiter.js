@@ -362,6 +362,18 @@
                   : ' Der vorläufige Sachwert ist damit eine Herstellungskostenrechnung, kein Marktwert.')
           + ' Eigener Ansatz möglich:', knopf('eintragen', 'sachwertfaktor'));
       }
+      /* v2282 · Umrechnungskoeffizient Grundstuecksgroesse (§ 19 ImmoWertV) -
+         nur bei Haeusern mit Grundstueck. Amtlich nur, wo der Ausschuss ihn
+         fuehrt und er fuer diese Objektart gilt; sonst der Weg zur Quelle und
+         die Moeglichkeit, ihn selbst einzutragen. */
+      var uq = r.uk_flaeche_quelle, ukEigen = _v('uk_flaeche');
+      var _istWhg = /ETW|WOHN/.test(_v('objart').toUpperCase());
+      if (!_istWhg && uq) {
+        var _ukQ = uq.quelle_url ? ' · <a href="' + esc(uq.quelle_url) + '" target="_blank" rel="noopener">Quelle</a>' : '';
+        if (ukEigen) html += zeile('Umrechnung Grundstücksgröße', esc(ukEigen), st('b', 'eigener Ansatz') + (uq.verfuegbar ? 'statt des Werts des Ausschusses' : 'eigene Angabe') + _ukQ, knopf('ändern', 'uk_flaeche'));
+        else if (uq.verfuegbar && uq.anwendbar) html += zeile('Umrechnung Grundstücksgröße', uq.form_text || 'Tabelle vorhanden', st('a', uq.ebene === 'land' ? 'Landeswert' : 'Ausschuss') + '<span title="' + esc(uq.ausschuss || '') + '">' + esc(String(uq.ausschuss || '').split(',')[0]) + '</span>' + (uq.jahrgang ? ' · ' + esc(uq.jahrgang) : '') + _ukQ + ' — im Bericht aus Fläche und Bezugsgröße des Richtwertgrundstücks', '');
+        else html += zeile('Umrechnung Grundstücksgröße', '—', st('x', 'kein Wert') + esc(uq.hinweis || 'Für diesen Ort ist kein Umrechnungskoeffizient hinterlegt — der Bodenwert wird nicht an die Grundstücksgröße angepasst.') + _ukQ + ' Eigener Ansatz möglich:', knopf('eintragen', 'uk_flaeche'));
+      }
       var gq = r.gnd_quelle === 'register' ? st('a', 'Register') : st('b', 'Anlage 1');
       /* ══ v1965 · DIE RESTNUTZUNGSDAUER MIT IHRER HERKUNFT ════════════
 
@@ -1068,7 +1080,7 @@
       el.addEventListener('input', function () { spaeter(function () { zielAnwenden(); stufen(); fehlendeNachziehen(); }, 400); });
       el.addEventListener('change', function () { spaeter(function () { zielAnwenden(); stufen(); fehlendeNachziehen(); }, 150); });
     });
-    ['plz', 'ort', 'objart', 'baujahr', 'einheiten', 'nutzungsart', 'brw', 'brw_stichtag', 'lzs_pct', 'sachwertfaktor', 'brw_manuell'].forEach(function (id) {
+    ['plz', 'ort', 'objart', 'baujahr', 'einheiten', 'nutzungsart', 'brw', 'brw_stichtag', 'lzs_pct', 'sachwertfaktor', 'brw_manuell', 'uk_flaeche', 'gsfl'].forEach(function (id) {
       var el = $(id); if (!el) return;
       el.addEventListener('change', function () { spaeter(automatik); });
       el.addEventListener('input', function () { spaeter(automatik, 700); });
