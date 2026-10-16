@@ -3572,6 +3572,18 @@
              Kartendienst - im Lauf gesperrt, das PDF entsteht dann ohne die beiden Karten */
           if (/\/(static-map|streetview)\b/.test(p)) { DPM_REIHE.gesperrt.push('MB ' + m + ' ' + p); return Promise.resolve(new Response('', { status: 404 })); }
           if (m !== 'GET') { DPM_REIHE.gesperrt.push('MB ' + m + ' ' + p); return Promise.resolve(new Response('{"error":"Vorführung: Abruf gesperrt"}', { status: 503, headers: { 'Content-Type': 'application/json' } })); }
+          /* v2279 · Modul 16: gespeicherter Bericht 216 trägt noch den Sachwert vor v2277 (EFH-Notweg, RND 21).
+             Der Mitschnitt ist mit dem v2277-Kern neu gerechnet (v2278) - das Fenster zeigt dieselbe Rechnung
+             wie die App: cross_check aus dem Mitschnitt, alles andere aus der Datenbank. Kein Abruf, kein Schreiben. */
+          var rid = /\/reports\/one$/.test(p) ? (String(typeof u === 'string' ? u : (u && u.url) || '').match(/[?&]id=(\d+)/) || [])[1] : null, D16 = window.DPM_REIHE_DATEN && DPM_REIHE_DATEN.westerfeld;
+          if (rid && D16 && D16.bericht3 && Number(rid) === Number(D16.bericht3) && D16.mb && D16.mb[3] && D16.mb[3].cross_check) {
+            return echt.apply(this, arguments).then(function (r) { return r.json().then(function (j) {
+              var cc = JSON.parse(JSON.stringify(D16.mb[3].cross_check)), n = 0;
+              (function ers(o, t) { if (!o || typeof o !== 'object' || t > 3) return; if (o.cross_check) { o.cross_check = cc; n++; } Object.keys(o).forEach(function (k) { if (k !== 'cross_check') ers(o[k], t + 1); }); })(j, 0);
+              DPM_REIHE.gespielt.push('MB GET /reports/one ' + rid + ' cross_check×' + n);
+              return new Response(JSON.stringify(j), { status: r.status, headers: { 'Content-Type': 'application/json' } });
+            }); });
+          }
           return echt.apply(this, arguments);
         };
       } catch (e) {}
