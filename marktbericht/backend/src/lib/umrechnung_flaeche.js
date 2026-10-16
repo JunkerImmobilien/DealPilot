@@ -68,7 +68,7 @@ function _funktionG(f, x) {
 
 export function koeffizientFuer(satz, flaecheQm, normgroesseQm) {
   const f = (satz && satz.formel) || {};
-  const fl = Number(flaecheQm), norm = Number(normgroesseQm);
+  let fl = Number(flaecheQm); const norm = Number(normgroesseQm);
   if (!(fl > 0)) return { k: null, grund: 'flaeche_fehlt' };
   const sp = Array.isArray(f.spanne_qm) ? f.spanne_qm : null;
   const inSpanne = (x) => !sp || ((sp[0] == null || x >= sp[0]) && (sp[1] == null || x <= sp[1]));
@@ -85,6 +85,12 @@ export function koeffizientFuer(satz, flaecheQm, normgroesseQm) {
       + ', ' + fl + ' m² gegen ' + norm + ' m²' };
   }
   if (f.form !== 'flaeche_tabelle') return { k: null, grund: 'form_unbekannt' };
+  /* v2289b · Rundungsregel des Ausschusses vor dem Ablesen (Kiel: „auf volle 25 m2
+     runden"). Ohne sie lieferte eine Tabelle mit Stufen ohne Zwischenwerte fuer
+     670 m2 nichts, fuer 675 m2 einen Wert. */
+  const _rund = Number(f.rundung_flaeche_qm);
+  const _fl0 = fl;
+  if (_rund > 0) { fl = Math.round(fl / _rund) * _rund; }
   const tab = (f.tabellen || {})[String(norm)] || (f.tabellen || {})['*'];
   if (!tab) return { k: null, grund: 'normgroesse_nicht_in_tabelle' };
   const xs = tab.flaeche_qm, ys = tab.koeffizient;

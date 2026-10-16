@@ -17,46 +17,57 @@
   "mindest_tabellen": 8,
   "alle": {
     "b": -0.213,
-    "b_q1": -0.224,
-    "b_q3": -0.11,
-    "tabellen": 109,
+    "b_q1": -0.251,
+    "b_q3": -0.113,
+    "tabellen": 158,
     "laender": [
+      "BB",
+      "BW",
+      "BY",
       "HB",
+      "HE",
       "HH",
       "NI",
       "NW",
       "RP",
+      "SH",
       "ST"
     ],
-    "abweichung_median_pct": 1.024,
-    "abweichung_p90_pct": 10.423
+    "abweichung_median_pct": 1.269,
+    "abweichung_p90_pct": 9.212
   },
   "stadt": {
-    "b": -0.25,
-    "b_q1": -0.342,
-    "b_q3": -0.183,
-    "tabellen": 19,
+    "b": -0.244,
+    "b_q1": -0.273,
+    "b_q3": -0.198,
+    "tabellen": 51,
     "laender": [
+      "BW",
+      "BY",
       "HB",
       "HH",
       "NI",
       "NW",
       "RP"
     ],
-    "abweichung_median_pct": 2.49,
-    "abweichung_p90_pct": 19.584
+    "abweichung_median_pct": 1.719,
+    "abweichung_p90_pct": 6.312
   },
   "land": {
     "b": -0.213,
     "b_q1": -0.213,
-    "b_q3": -0.11,
-    "tabellen": 90,
+    "b_q3": -0.09,
+    "tabellen": 107,
     "laender": [
+      "BB",
+      "BW",
+      "HE",
       "NI",
       "NW",
+      "SH",
       "ST"
     ],
-    "abweichung_median_pct": 0.624,
-    "abweichung_p90_pct": 10.423
+    "abweichung_median_pct": 0.864,
+    "abweichung_p90_pct": 10.129
   }
 }

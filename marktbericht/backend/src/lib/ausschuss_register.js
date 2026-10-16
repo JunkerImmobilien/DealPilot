@@ -452,6 +452,10 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                (Tabellen/Potenz je Raum, Gemeinden des Berliner Umlands mit 8-stelliger AGS) und amtlich „kein Einfluss“
                                BAR, HVL, LOS, P, PM; Sperren mit Weg, SN/Rostock als Stuetzstelle vorgemerkt (Lizenz). TH/ST: kein oertlicher Satz. */
                             'uk-flaeche-ost-2026.json',
+                            /* Ernte 16.10.2026: West (HE alle 19 Ausschuesse, RP 11 ohne Mainz, SL 7, SH 15) - Werte AfB Limburg,
+                               LK Fulda, Wiesbaden, Trier, Kiel (Tabellen), Suedhessen amtlich „kein Einfluss“, Buedingen/Korbach/Giessen
+                               mit der von ihnen beschlossenen Landestabelle (Stufe C); Sperren mit Weg, WWT und RV Saarbruecken als Stuetzstelle. */
+                            'uk-flaeche-west-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
