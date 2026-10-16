@@ -1,5 +1,5 @@
 {
-  "_hinweis": "landing-videothek-2 · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
+  "_hinweis": "landing-videothek-3 · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
   "stand": "2026-10-16",
   "basis_medien": "medien/videothek/",
   "basis_bilder": "assets/videothek/",
@@ -238,6 +238,18 @@
       "youtube": { "titel": "DealPilot Modul 16 · Stufe 3 genauer – Wertermittlung nach ImmoWertV", "tags": ["DealPilot", "Ertragswert", "Sachwert", "Liegenschaftszins", "ImmoWertV"], "youtube_id": null }
     },
     {
+      "id": "modul-17-objekt-uebertragen", "kategorie": "spezial", "nr": "17", "dauer": 173,
+      "titel": "Objekt übertragen",
+      "unterzeile": "Die DealPilot-Sicherung — was mitgeht und was nicht.",
+      "story": "Ein Objekt soll zu jemand anderem: zur Partnerin, zum Steuerberater, in ein zweites Konto. DealPilot packt es in eine Sicherungsdatei mit allen Eingaben, Steuer, Pilot-Analyse und Ankauf-Stand — dazu ein Lexikon, das jedes Kürzel erklärt. Beim Empfänger wird daraus über den Import ein eigenes Objekt.",
+      "nutzen": "Du gibst ein Objekt vollständig weiter, ohne etwas abzutippen — und weißt, was dein Konto nicht verlässt.",
+      "kapitel": ["Die DealPilot-Sicherung", "Ein Objekt oder alle", "Die Datei entsteht", "Was mitgeht", "Was hierbleibt", "Beim Empfänger", "Und sonst"],
+      "spruch": "Übergabe an den Copiloten — mit allen Papieren.",
+      "datei": "dealpilot-modul-17-objekt-uebertragen.mp4",
+      "poster": "dealpilot-modul-17-objekt-uebertragen.webp",
+      "youtube": { "titel": "DealPilot Modul 17 · Objekt übertragen – die DealPilot-Sicherung", "tags": ["DealPilot", "Immobilie übertragen", "Sicherung", "Export", "Import"], "youtube_id": null }
+    },
+    {
       "id": "modul-18-der-marktbericht", "kategorie": "spezial", "nr": "18", "dauer": 222,
       "titel": "Der Marktbericht",
       "unterzeile": "Lage, Vergleichsdaten, Zensus, Wertermittlung, Quellen — und das PDF.",
@@ -284,6 +296,18 @@
       "datei": "dealpilot-modul-21-portfolio-cockpit-und-pilot.mp4",
       "poster": "dealpilot-modul-21-portfolio-cockpit-und-pilot.webp",
       "youtube": { "titel": "DealPilot Modul 21 · Portfolio-Cockpit und Portfolio-Pilot", "tags": ["DealPilot", "Immobilienportfolio", "Portfolio-Analyse", "KI", "Cashflow"], "youtube_id": null }
+    },
+    {
+      "id": "modul-22-telegram-bot", "kategorie": "spezial", "nr": "22", "dauer": 126,
+      "titel": "Der Telegram-Bot",
+      "unterzeile": "Dein Portfolio im Chat — fragen, vergleichen, anlegen. Nachgestellt, mit echten Antworten.",
+      "story": "Unterwegs schnell nachsehen, wie ein Objekt gegen den Plan steht, oder eine Wohnung per Satz anlegen: der DealPilot-Bot in Telegram antwortet aus deinem Portfolio. Im Video ist der Chat nachgestellt — die Antworten hat der Bot echt gegeben, mit dem Demo-Konto.",
+      "nutzen": "Du hast dein Portfolio auch ohne App dabei.",
+      "kapitel": ["Der Telegram-Bot", "Objekte erfragen", "Soll gegen Ist", "Ein Objekt anlegen", "In der App"],
+      "spruch": "Funkverkehr mit dem Tower — jederzeit, von überall.",
+      "datei": "dealpilot-modul-22-telegram-bot.mp4",
+      "poster": "dealpilot-modul-22-telegram-bot.webp",
+      "youtube": { "titel": "DealPilot Modul 22 · Der Telegram-Bot – Portfolio im Chat", "tags": ["DealPilot", "Telegram-Bot", "Immobilien Portfolio", "Soll-Ist"], "youtube_id": null }
     },
     {
       "id": "modul-23-die-15-prozent-grenze", "kategorie": "spezial", "nr": "23", "dauer": 215,

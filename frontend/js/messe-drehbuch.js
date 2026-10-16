@@ -1368,7 +1368,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2303';   /* v2303: Portfolio-Analyse (Modul 21); davor v2278 Modul-16-Sachwert */
+  var RH_BUSTER = 'v2305';   /* v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage/i;
@@ -4512,6 +4512,258 @@
       async function (s) {   /* 9 · Fragen */
         await zeige(function () { return q('#dp-pp-chips'); }, 8);
         await b2oZeile(s, 'Und dann fragen', 'Schnellfragen oder eigene: „Welches Objekt zieht den Schnitt runter?“ — der Pilot antwortet zu jedem Objekt und zum Ganzen.', 600);
+      }
+    ]
+  };
+
+  /* ═══ VIDEOREIHE · SPEZIALMODUL 17 · OBJEKT ÜBERTRAGEN (v2305) ═════════════
+     Marcel 16.10.2026: Hauptweg ist die DealPilot-Sicherung (.dpkt). KOPIE der
+     Westerfeldstr. 140 (mit Analyse und Ankauf-Stand). Exportiert wird die
+     Kopie - die Datei entsteht LOKAL, nichts wird heruntergeladen: der Klick
+     auf den Download-Anker wird für diesen einen Aufruf abgefangen. Die
+     Rückfrage „Analysen veraltet - trotzdem exportieren?" beantwortet der Lauf
+     mit Ja (window.confirm nur für diesen Aufruf). Danach der Import DERSELBEN
+     Datei im selben Konto: er legt ein zweites Objekt an, das beim Aufräumen
+     mit der Kopie gelöscht wird. Kein zweites Konto. */
+  var _r17 = null;
+  function r17Zu() {
+    try { if (typeof closeIexpModal === 'function') closeIexpModal(); } catch (e) {}
+    var m = q('#iexp-modal'); if (m && m.parentNode) m.parentNode.removeChild(m);
+    var b = q('#dpm-dpkt'); if (b && b.parentNode) b.parentNode.removeChild(b);
+    if (_r17 && _r17.klick) { HTMLAnchorElement.prototype.click = _r17.klick; _r17.klick = null; }
+    if (_r17 && _r17.confirm) { window.confirm = _r17.confirm; _r17.confirm = null; }
+  }
+  function r17Karte(re) { return [].filter.call(document.querySelectorAll('#iexp-modal .iexp-card'), function (c) { return c.offsetWidth && re.test(c.textContent); })[0] || null; }
+  function r17Blick(P, name, bytes) {
+    var o = (P.objekte || [])[0] || {}, d = o.daten || {};
+    var felder = Object.keys(d).length, analyse = !!o.analyse, ankauf = !!o.ankauf_stand, mb = o.marktbericht ? ((o.marktbericht.verlauf || o.marktbericht.punkte || []).length || 1) : 0;
+    var steuer = ['_taxYearlyOverrides', 'afa_satz', 'geb_ant'].filter(function (k) { return d[k] != null && d[k] !== ''; }).length;
+    var lex = P.lexikon && P.lexikon.felder ? Object.keys(P.lexikon.felder).length : 0;
+    var WN = { projekt: 'Projektwissen', eigenes: 'deine eigene Ergänzung', portfolio_analyse: 'die Portfolio-Analyse', lage_profil: 'dein Lageprofil', datenraum: 'die Datenraum-Liste' }, w = P.wissen ? Object.keys(P.wissen).map(function (k) { return WN[k] || k; }) : [];
+    var c = document.createElement('div'); c.id = 'dpm-dpkt';
+    c.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:760px;z-index:100002;background:#FDFCFA;color:#2A2727;border-radius:14px;border-top:3px solid var(--wl-c9a84c,#C9A84C);box-shadow:0 24px 70px rgba(0,0,0,.5);padding:24px 28px;font:14px/1.5 Inter,sans-serif';
+    function z(k, v, ok) { return '<div style="display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-bottom:1px solid #EEE8DC"><span>' + k + '</span><b style="color:' + (ok === false ? '#B8625C' : '#2A2727') + '">' + v + '</b></div>'; }
+    c.innerHTML = '<div style="font:600 10.5px/1 JetBrains Mono,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--wl-9a7f33,#9a7f33);margin-bottom:6px">Was in der Datei steckt</div>'
+      + '<div style="font:600 18px Space Grotesk,sans-serif;margin-bottom:12px">' + name.replace(/</g, '&lt;') + ' · ' + de(Math.round(bytes / 1024)) + ' KB</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 28px">'
+      + '<div><div style="font-weight:700;color:#3FA56C;margin:4px 0">Geht mit</div>'
+      + z('Eingaben des Objekts', de(felder) + ' Felder')
+      + z('Steuer (AfA, Gebäudeanteil, Jahre)', steuer ? 'ja' : '–')
+      + z('Pilot-Analyse', analyse ? 'ja' : 'keine')
+      + z('Ankauf-Stand (Soll)', ankauf ? 'ja' : 'keiner')
+      + z('Marktbericht-Verlauf', mb ? 'ja' : '–')
+      + z('Feld-Lexikon', lex ? de(lex) + ' Einträge' : '–')
+      + (P.fotos_enthalten ? z('Objektfotos', 'ja') : '')
+      + '</div><div><div style="font-weight:700;color:#B8625C;margin:4px 0">Bleibt hier</div>'
+      + z('Konto, Login, Passwort', 'nein', false)
+      + z('Abo und Kontingent', 'nein', false)
+      + z('Darstellung und Standardwerte', 'nein', false)
+      + (P.fotos_enthalten ? '' : z('Objektfotos', 'nur mit Häkchen', false))
+      + '</div></div>'
+      + (w.length ? '<div style="margin-top:12px;padding:10px 12px;background:rgba(184,98,92,.07);border-left:3px solid #B8625C;border-radius:6px;font-size:12.5px;color:#4A4440"><b>Auch im Paket, auch bei einem einzelnen Objekt:</b> ' + w.join(', ') + '. Vor der Weitergabe beachten.</div>' : '');
+    document.body.appendChild(c);
+    return c;
+  }
+  DREHBUECHER['reihe-uebertragen'] = {
+    titel: 'Objekt übertragen', unterzeile: 'Die DealPilot-Sicherung — was mitgeht und was nicht', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { r17Zu(); kegelHoch(false); rhAufraeumen(); _r17 = null; },
+    szenen: [
+      async function (s) {   /* 1 · das Beispiel */
+        await r6KopieStart(R11_WESTERFELD, {});
+        _r17 = { id: window._currentObjKey, text: null, name: null, klick: null, confirm: null };
+        await r11Beispiel(s, ' Heute: das Objekt <b>als Datei</b> weitergeben.');
+      },
+      async function (s) {   /* 2 · Export: die Sicherung */
+        try { openExportHub(); } catch (e) {}
+        await warteAuf(function () { return r17Karte(/DealPilot-Sicherung/); }, 5000);
+        kegelHoch(true); await warte(600);
+        await zeige(function () { return r17Karte(/DealPilot-Sicherung/); }, 8);
+        await b2oZeile(s, 'Die DealPilot-Sicherung', 'Eine Datei (<b>.dpkt</b>) mit allem, was das Objekt ausmacht — für dich als Sicherung oder für jemanden, der damit weiterarbeitet.');
+      },
+      async function (s) {   /* 3 · einzelnes Objekt wählen */
+        try { iexpExportJsonChoose(); } catch (e) {}
+        await warte(900);
+        try { await iexpExportJsonSingle(); } catch (e) {}
+        await warteAuf(function () { return q('#iexp-modal .iexp-obj-current'); }, 8000);
+        await warte(500);
+        await zeige(function () { return q('#iexp-modal .iexp-obj-current'); }, 8);
+        await b2oZeile(s, 'Ein Objekt oder alle', 'Hier das geladene: <b>' + wert('str') + ' ' + wert('hnr') + '</b>. Wahlweise mit Passwort verschlüsselt (AES-256).');
+      },
+      async function (s) {   /* 4 · die Datei entsteht (lokal) */
+        var zb = r6Beginn(s, 'Die Datei entsteht', 'Ein Klick — die Sicherung wird gebaut. Im Video laden wir sie nicht herunter, wir schauen hinein.');
+        _r17.klick = HTMLAnchorElement.prototype.click;
+        _r17.confirm = window.confirm;
+        window.confirm = function () { return true; };
+        HTMLAnchorElement.prototype.click = function () {
+          var dl = String(this.download || '');
+          if (/\.dpkt$/.test(dl) && /^blob:/.test(this.href)) { _r17.name = dl; var h = this.href; fetch(h).then(function (r) { return r.text(); }).then(function (t) { _r17.text = t; }); return; }
+          if (/\.csv$/.test(dl)) return;
+          return _r17.klick.apply(this, arguments);
+        };
+        /* Prüflauf 17: nach dem Klick schließt das Fenster - der Kegel bekommt das Objekt in der Liste (36 Messpunkte ohne Kegel) */
+        var exp = iexpDoExportJsonSingle(_r17.id);
+        await warte(400); kegelHoch(false);
+        zeige(function () { return q('aside.sidebar .sb-card') || q('aside.sidebar'); }, 8);
+        try { await exp; } catch (e) {}
+        await warteAuf(function () { return _r17.text; }, 20000);
+        HTMLAnchorElement.prototype.click = _r17.klick; _r17.klick = null;
+        window.confirm = _r17.confirm; _r17.confirm = null;
+        await r6Ende(zb);
+      },
+      async function (s) {   /* 5 · was drinsteckt */
+        var P = null; try { P = JSON.parse(_r17.text || 'null'); } catch (e) {}
+        if (!P) { await b2oZeile(s, 'Die Datei', 'Hier steht, was in der Datei steckt.'); return; }
+        kegelHoch(true);
+        r17Blick(P, _r17.name || 'Sicherung.dpkt', (_r17.text || '').length);
+        await warte(700);
+        await zeige(function () { return q('#dpm-dpkt'); }, 6);
+        var o = (P.objekte || [])[0] || {};
+        await b2oZeile(s, 'Was mitgeht', 'Alle <b>' + de(Object.keys(o.daten || {}).length) + ' Eingaben</b>, Steuer, Pilot-Analyse, Ankauf-Stand — und ein Lexikon, das jedes Kürzel erklärt. Lesbar auch ohne DealPilot.');
+        await b2oZeile(s, 'Was hierbleibt', 'Dein <b>Konto</b>, Abo und Kontingent, Darstellung und Standardwerte. Fotos gehen mit, solange sie angehakt sind.');
+        if (P.wissen) await b2oZeile(s, 'Achtung beim Weitergeben', 'Das Paket trägt auch dein <b>Wissen</b> mit — eigene Ergänzung und Portfolio-Analyse —, selbst wenn nur ein Objekt drin ist.');
+        var b = q('#dpm-dpkt'); if (b && b.parentNode) b.parentNode.removeChild(b);
+      },
+      async function (s) {   /* 6 · Import beim Empfänger */
+        try { openImportHub(); } catch (e) {}
+        await warteAuf(function () { return r17Karte(/JSON-Backup importieren|Sicherung/); }, 5000);
+        await warte(500);
+        await zeige(function () { return r17Karte(/JSON-Backup importieren|Sicherung/); }, 8);
+        await b2oZeile(s, 'Beim Empfänger', 'Er öffnet die Datei über <b>Import</b>. Im Video importieren wir sie ins selbe Konto — gleich wieder gelöscht.');
+        var vorher = DPM_REIHE.angelegt.length;
+        var zb = r6Beginn(s, 'Importiert', 'Die Datei wird gelesen, das Objekt neu angelegt …');
+        try { if (typeof closeIexpModal === 'function') closeIexpModal(); } catch (e) {}
+        kegelHoch(false);
+        zeige(function () { return q('aside.sidebar'); }, 6);
+        try { await importJSON({ files: [new File([_r17.text || ''], _r17.name || 'Sicherung.dpkt', { type: 'application/json' })], value: '' }); } catch (e) {}
+        await warteAuf(function () { return DPM_REIHE.angelegt.length > vorher; }, 15000);
+        await warte(2500);
+        await r6Ende(zb);
+        var nid = DPM_REIHE.angelegt[DPM_REIHE.angelegt.length - 1];
+        /* Prüflauf 17: die Karte war über ihre Kennung nicht zu finden - jetzt wird das importierte Objekt geöffnet */
+        if (nid && typeof window.loadSaved === 'function') { try { await window.loadSaved(nid); } catch (e) {} }
+        await warteAuf(function () { return window._currentObjKey === nid && /\S/.test(wert('str')); }, 9000);
+        reiter('s0'); var mc = q('.main-col'); if (mc) mc.scrollTop = 0;
+        await warte(700);
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        await b2oZeile(s, 'Ein eigenes Objekt', 'Beim Empfänger steht es als <b>eigenes Objekt</b> mit allen Eingaben und der Analyse — seine Änderungen berühren deins nicht.');
+      },
+      async function (s) {   /* 7 · die anderen Wege */
+        await zeige(function () { return qs('.sb-act-item[onclick*="cockpit"]') || q('aside.sidebar'); }, 8);
+        await b2oZeile(s, 'Und sonst', 'Mandanten eines Betreuers geben Objekte über die <b>Mandanten-Freigabe</b> frei. Ins Netzwerk reichst du ein Objekt aus der Deal-Aktion weiter — Modul 13.', 600);
+      }
+    ]
+  };
+
+  /* ═══ VIDEOREIHE · SPEZIALMODUL 22 · DER TELEGRAM-BOT (v2305) ══════════════
+     Marcel 16.10.2026: „vlt. kannst du einfach was nachstellen, demo dummy".
+     Der Bot läuft in Telegram, außerhalb der App - im Video steht deshalb
+     eine NACHSTELLUNG: ein eigenes Chatfenster (kein Telegram-Logo, kein
+     Bild des echten Dienstes) mit dem Vermerk „Nachgestellt · Demo“.
+     Die Antworten sind ECHT: der Agent des Bots (agentLauf, dieselben
+     Werkzeuge, dieselbe Datenbank) lief EINMAL im Staging-Container ohne
+     Telegram-Versand (Mitschnitt DPM_REIHE_DATEN.telegram, drei Fragen in
+     einem Gespräch). Das dort angelegte Objekt wurde sofort gelöscht. Im
+     Lauf wird es mit denselben Angaben in der App angelegt (Kopie) und beim
+     Aufräumen gelöscht. Keine Telefonnummer, kein Name, kein Chatverlauf. */
+  var _r22 = null;
+  function r22Zu() { var c = q('#dpm-tg'); if (c && c.parentNode) c.parentNode.removeChild(c); }
+  function r22Md(t) {
+    function e(x) { return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    return e(t).replace(/\*([^*\n]+)\*/g, '<b>$1</b>').replace(/(^|\s)_([^_\n]+)_(?=\s|$|[.,])/g, '$1<i>$2</i>').replace(/\n/g, '<br>');
+  }
+  function r22Fenster() {
+    var c = q('#dpm-tg'); if (c) return c;
+    c = document.createElement('div'); c.id = 'dpm-tg';
+    c.style.cssText = 'position:fixed;right:6%;top:6%;bottom:8%;width:540px;z-index:100002;display:flex;flex-direction:column;border-radius:18px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.08);background:#0f1418;font:14px/1.45 Inter,system-ui,sans-serif';
+    c.innerHTML =
+      '<div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:#17212b;color:#fff">'
+      + '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-b8932f,#b8932f));display:flex;align-items:center;justify-content:center;color:#1c1b18;font:700 15px Space Grotesk,sans-serif">DP</div>'
+      + '<div style="flex:1"><div style="font-weight:600">DealPilot-Bot</div><div style="font-size:12px;color:#8fa3b5">Bot · antwortet aus deinem Portfolio</div></div>'
+      + '<div style="font:600 10.5px/1 JetBrains Mono,monospace;letter-spacing:.12em;text-transform:uppercase;color:#1c1b18;background:var(--wl-e8cc7a,#E8CC7A);padding:6px 9px;border-radius:6px">Nachgestellt · Demo</div></div>'
+      + '<div id="dpm-tg-log" style="flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:10px;background:#0e1621"></div>'
+      + '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#17212b"><div id="dpm-tg-in" style="flex:1;min-height:20px;color:#cfd8e0;font-size:14px;padding:8px 12px;background:#242f3d;border-radius:18px">Nachricht</div>'
+      + '<div style="width:36px;height:36px;border-radius:50%;background:var(--wl-c9a84c,#C9A84C);display:flex;align-items:center;justify-content:center;color:#1c1b18;font-weight:700">➤</div></div>';
+    document.body.appendChild(c);
+    return c;
+  }
+  function r22Blase(wer, html) {
+    var log = q('#dpm-tg-log'); if (!log) return null;
+    var b = document.createElement('div');
+    b.className = 'dpm-tg-b';
+    b.style.cssText = 'max-width:86%;padding:9px 13px;border-radius:14px;font-size:13.5px;line-height:1.5;'
+      + (wer === 'ich' ? 'align-self:flex-end;background:#2b5278;color:#fff;border-bottom-right-radius:4px' : 'align-self:flex-start;background:#182533;color:#e9eef2;border-bottom-left-radius:4px');
+    b.innerHTML = html;
+    log.appendChild(b); log.scrollTop = log.scrollHeight;
+    return b;
+  }
+  async function r22Tippen(text) {
+    var i = q('#dpm-tg-in'); if (!i) return;
+    for (var k = 0; k < text.length; k += 2) { i.textContent = text.slice(0, k + 2); await warte(45); }
+    await warte(500); i.textContent = 'Nachricht';
+    r22Blase('ich', r22Md(text));
+  }
+  async function r22Antwort(nr) {
+    var D = window.DPM_REIHE_DATEN && DPM_REIHE_DATEN.telegram, d = D && D.dialog[nr];
+    var tip = r22Blase('bot', '<span style="color:#8fa3b5">schreibt …</span>');
+    await warte(1600);
+    if (tip && tip.parentNode) tip.parentNode.removeChild(tip);
+    return d ? r22Blase('bot', r22Md(d.antwort)) : r22Blase('bot', '–');
+  }
+  DREHBUECHER['reihe-telegram'] = {
+    titel: 'Der Telegram-Bot', unterzeile: 'Dein Portfolio im Chat — nachgestellt mit echten Antworten', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { r22Zu(); kegelHoch(false); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · Einordnung */
+        await rhNurStart();
+        _r22 = { neu: null };
+        r22Fenster(); kegelHoch(true);
+        await warte(600);
+        await zeige(function () { return q('#dpm-tg'); }, 6);
+        await b2oZeile(s, 'Der Telegram-Bot', 'Er läuft in Telegram, nicht in der App — hier <b>nachgestellt</b>. Die Antworten sind echt: der Bot hat sie einmal mit dem Demo-Konto gegeben.');
+      },
+      async function (s) {   /* 2 · Objekte erfragen */
+        var zb = r6Beginn(s, 'Objekte erfragen', 'Einfach schreiben, wie man fragt.');
+        await r22Tippen('Welche Objekte habe ich?');
+        var b = await r22Antwort(0);
+        await r6Ende(zb);
+        await zeige(function () { return b; }, 6);
+        var t = r6Text(b), n = /aktuell (\d+) Objekte/.exec(t);
+        await b2oZeile(s, 'Die Liste', (n ? '<b>' + n[1] + ' Objekte</b>' : 'Die Objekte') + ', die stärksten zuerst — mit Kaufpreis, DealScore und Investor-Score, dieselben Zahlen wie auf der Karte.');
+      },
+      async function (s) {   /* 3 · Steuer-Soll-Ist */
+        var zb = r6Beginn(s, 'Soll gegen Ist', 'Und ein einzelnes Objekt gegen den Plan beim Kauf …');
+        await r22Tippen('Wie steht die Parkstraße steuerlich gegen den Plan?');
+        var b = await r22Antwort(1);
+        await r6Ende(zb);
+        await zeige(function () { return b; }, 6);
+        var t = r6Text(b), cf = /Cashflow nach Steuer ist von ([−\-]?[\d.]+ EUR) \(Ankauf\) auf jetzt ([−\-]?[\d.]+ EUR)/.exec(t), k = /(\d+) von (\d+) vergleichbaren Kennzahlen besser/.exec(t);
+        await b2oZeile(s, 'Aus dem Ankauf-Stand', (cf ? 'Cashflow nach Steuer <b>' + cf[1] + ' → ' + cf[2] + '</b>' : 'Plan gegen heute') + (k ? ', ' + k[1] + ' von ' + k[2] + ' Kennzahlen besser' : '') + ' — derselbe Soll-Ist-Vergleich wie in Modul 14.');
+      },
+      async function (s) {   /* 4 · ein Objekt anlegen */
+        var zb = r6Beginn(s, 'Ein Objekt anlegen', 'Eine Wohnung, in einem Satz diktiert …');
+        await r22Tippen('Leg mir eine Eigentumswohnung in der Musterstraße 12 in Hannover an. 85 m², vier Zimmer, zweites Obergeschoss, vermietet.');
+        var b = await r22Antwort(2);
+        await r6Ende(zb);
+        await zeige(function () { return b; }, 6);
+        await b2oZeile(s, 'Angelegt — und nachgefragt', 'Der Bot übernimmt, was gesagt wurde, und fragt nur nach dem, was fehlt: Baujahr, Kaufpreis, Postleitzahl.');
+      },
+      async function (s) {   /* 5 · in der App */
+        var zb = r6Beginn(s, 'In der App', 'Dasselbe Objekt erscheint im Portfolio — hier als Kopie mit denselben Angaben, nach dem Video gelöscht.');
+        r22Zu(); kegelHoch(false);
+        zeige(function () { return q('aside.sidebar'); }, 6);   /* Prüflauf 22: ohne Ziel 34 Messpunkte ohne Kegel */
+        var d = { objart: 'ETW', str: 'Musterstraße', hnr: '12', ort: 'Hannover', wfl: '85', zimmer: '4', etage: '2', vermstand: 'Vollvermietet' };
+        var neu = await Auth.apiCall('/objects', { method: 'POST', body: { data: d, aiAnalysis: null, photos: [] } });
+        var nid = neu && (neu.id || (neu.data && neu.data.id) || (neu.object && neu.object.id));
+        if (nid && DPM_REIHE.angelegt.indexOf(nid) < 0) DPM_REIHE.angelegt.push(nid);
+        if (nid && typeof window.loadSaved === 'function') await window.loadSaved(nid);
+        await warteAuf(function () { return window._currentObjKey === nid && /\S/.test(wert('str')); }, 9000);
+        await warte(800);
+        reiter('s0'); var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await r6Ende(zb);
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        await b2oZeile(s, 'Im Reiter Objekt', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + wert('wfl') + ' m². Der Rest kommt in der App oder im nächsten Satz an den Bot.', 600);
       }
     ]
   };
