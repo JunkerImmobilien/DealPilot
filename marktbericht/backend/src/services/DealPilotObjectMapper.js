@@ -283,6 +283,19 @@ export const DealPilotObjectMapper = {
     return {
       address: buildAddress(d),
       property_type: mapPropertyType(pick(d, ['objart', 'objektart'])),
+      /* v2359 · Die genaue Hausart. mapPropertyType fasst EFH/ZFH/DHH/RH zu
+         „haus" zusammen - die Umrechnungskoeffizienten pruefen ihre Geltung
+         aber je Hausart (Bielefeld: nur Regelfall IfW, Dortmund: Tabelle je
+         Haustyp). Mit „haus" griff fuer App-Objekte weder der amtliche
+         Koeffizient noch die DealPilot-Formel. */
+      property_subtype: (function () {
+        const t = String(pick(d, ['objart', 'objektart']) || '').toLowerCase();
+        if (/dhh|doppel/.test(t)) return 'dhh';
+        if (/\brh\b|reihen/.test(t)) return 'rh';
+        if (/zfh|zweifam/.test(t)) return 'zfh';
+        if (/efh|einfam/.test(t)) return 'efh';
+        return null;
+      })(),
       /* v2241 · Die Unterart (buero, gesch, hotel, gew, laden, praxis …).
          Ohne sie misst der Bericht ein Buero am Wohnungsmarkt. */
       gewerbe_art: gewerbeArtAus(pick(d, ['objart', 'objektart'])),
