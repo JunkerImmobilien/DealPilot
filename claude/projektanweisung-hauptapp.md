@@ -38840,6 +38840,14 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### landing-tband-1 + Prod-Rollout (44) · Vertrauensleiste am Handy, Animation entfernt (17.10.2026)
+
+- **Was:** Marcel: „auf der Handy-Version ist Server in Deutschland mit dem Logo versetzt" — gemessen bei 390 px (iframe): Symbol des ersten Eintrags bei 26 px, die übrigen bei 50 px; `.tband-in > div:first-child{padding-left:0}` war nur für die Desktop-Zeile gedacht. Ab 1080 px jetzt alle 24 px. „Die Animation zur geführten Eingabe nach Was DealPilot macht kann raus" — `data-wechsel`-Platzhalter, `demo-wechsel.css/.js` aus `landing/index.html` entfernt (Einzelseite `demo-wechsel.html` bleibt).
+- **DSGVO:** „Server in Deutschland · DSGVO-konform" steht schon im Laufband und in der Vertrauensleiste. `datenschutz.html` nennt OpenAI; `sicherheit.html` nennt Stripe und Auftragsverarbeitung, aber nicht die KI-Verarbeitung — offen.
+- **Commit:** `415c117c`, Merge `0e8db6cc`.
+- **Nachweis:** Staging 390 px: Symbole 50/50/50/50, kein `data-wechsel`, kein Überlauf; Prod: Buster `landing-tband-1`, `/auth/me` 401.
+- **Rest:** Ein eigenes Video zur geführten Eingabe gibt es nicht (nur kurz in Modul 03) — bei Marcel nachgefragt.
+
 ### Prod-Rollout (43) · Überblick 1 „Quick Boarding" neu im Reihenrahmen (17.10.2026)
 
 - **Was:** Marcel fragte nach „Modul 01". In der Videothek lag noch die Studio-Aufnahme vom 14.10. (ohne Reihen-Intro/-Abspann, vor 1920×1080 und vor den Änderungen ab 15.10.). Neu gebaut und aufgenommen (v2370, Agent; 222 s), Videothek-Eintrag und Poster (`landing-videothek-3b`). Der Agent brach am 16.10. abends am Ausgabenlimit ab — Aufnahme, Staging-Kopie und Commits waren fertig, nur die Prod-Kopie fehlte.
