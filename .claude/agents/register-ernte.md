@@ -55,6 +55,23 @@ Jeder **Wert** zusätzlich:
 - Rechnet ein Ausschuss nur über die Tiefe oder die WGFZ: Sperre mit genau
   diesem Grund (wird später als eigene Kennzahl gebaut), nicht weglassen.
 
+## Alle Objekttypen, alle Werte (Marcel 17.10.2026)
+- „Wir müssen für die ganzen Objekttypen, die wir anbieten, auch alle Werte holen."
+  Je Ausschuss werden für **EFH, ZFH, DHH, RH, MFH, ETW und Gewerbe/gemischt**
+  geprüft: Liegenschaftszinssatz, Sachwertfaktor, Umrechnungskoeffizient Fläche
+  UND Umrechnungskoeffizient WGFZ. Was das Dokument für eine Objektart nicht
+  führt, wird als Sperre mit Fundstelle festgehalten — nie weggelassen.
+- **MFH-Sachwertfaktoren immer mit suchen.** Viele Ausschüsse leiten nur für den
+  individuellen Wohnungsbau ab (Bielefeld 2026: nur IfW) — dann eine Sperre
+  `sachwertfaktor`/`mfh` mit dem Satz des Dokuments, damit die Lücke messbar ist.
+- **WGFZ (v2361):** Kennzahl `umrechnungskoeffizient_wgfz`, Muster
+  `uk-wgfz-bielefeld-2026.json`, Formen `wgfz_tabelle` (Zeilen je BRW, `null` für
+  leere Zellen) und `wgfz_potenz`; Anwendungsbeispiel nach `anwendungsbeispiel`
+  (`brw_eur_qm, wgfz_norm, wgfz_objekt, ergebnis_eur_qm`); `node tools/uk-wgfz-pruefen.mjs`.
+  Übernimmt ein Ausschuss eine fremde Tabelle (z. B. VW-RL 2014) ausdrücklich in
+  SEIN Dokument, ist sie seine — dann Wert mit `herkunft`; ohne diesen Beschluss
+  bleibt die Regel oben: VW-RL nicht zulässig.
+
 ## Ablauf
 1. Lage messen, nicht annehmen: `node tools/saat-pruefen.mjs` zeigt je Datei,
    was fehlt; die Länderlage steht im Register (Dateien + `SAATDATEIEN` in
