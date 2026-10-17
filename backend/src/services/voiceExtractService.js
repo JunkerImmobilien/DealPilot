@@ -917,14 +917,40 @@ function _monatsFalle(text, felder) {
        „Miete 900 im Monat, Hausgeld 1.400" darf das Hausgeld nicht treffen. */
     const monat = /hausgeld[^.!?\n,;]{0,40}?(im monat|pro monat|monatlich|je monat|\/\s*monat|mtl\.?)/i.test(t)
       || /monatliche[sn]?\s+hausgeld/i.test(t);
-    if (!monat || !felder) return felder;
+    if (!felder) return felder;
+    /* v2364c · „Hausgeld X (im Monat), davon Y nicht umlagefaehig" wird FEST
+       gerechnet, nicht vom Modell: gemessen kam auf denselben Satz einmal
+       2400/17280 (Wache), einmal 240/1440 (Modell). Ein Satz, eine Rechnung. */
+    const auf = t.match(/hausgeld\D{0,25}?(\d[\d.]*(?:,\d+)?)\s*(?:€|euro|eur)?([^.!?\n]{0,30}?)davon\s+(\d[\d.]*(?:,\d+)?)\s*(?:€|euro|eur)?\s*nicht[\s-]*umlage/i);
+    if (auf && (felder.hg_ul != null || felder.hg_nul != null)) {
+      const zahl = (z) => parseFloat(String(z).replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'));
+      const ges = zahl(auf[1]), nul = zahl(auf[3]);
+      if (isFinite(ges) && isFinite(nul) && ges > nul && nul >= 0) {
+        const f = (monat || /monat|mtl/i.test(auf[2])) ? 12 : 1;
+        const k = Object.assign({}, felder, { hg_ul: String(Math.round((ges - nul) * f)), hg_nul: String(Math.round(nul * f)) });
+        try { console.log('[voice] Hausgeld-Aufteilung fest gerechnet:', ges, nul, 'x', f); } catch (e) {}
+        return k;
+      }
+    }
+    if (!monat) return felder;
     const kopie = Object.assign({}, felder);
     let geaendert = [];
+    /* v2364c · NUR WAS ALS MONATSBETRAG GESAGT WURDE. Gemessen 17.10.2026:
+       „Hausgeld 320 Euro im Monat, davon 120 Euro nicht umlagefaehig" - das
+       Modell lieferte richtig hg_ul 2400 / hg_nul 1440, die Wache nahm die
+       1440 (< 2.000) fuer einen Monatsbetrag und machte 17.280 daraus.
+       Monatlich ist ein Wert nur, wenn er im Text steht oder die Differenz
+       zweier genannter Zahlen ist (320 - 120 = 200). */
+    const zahlen = (t.match(/\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:,\d+)?/g) || [])
+      .map((z) => parseFloat(z.replace(/\./g, '').replace(',', '.'))).filter((z) => isFinite(z) && z > 0);
+    const gesagt = (v) => zahlen.some((a) => Math.abs(a - v) < 0.005)
+      || zahlen.some((a) => zahlen.some((b) => a > b && Math.abs(a - b - v) < 0.005));
     ['hg_ul', 'hg_nul'].forEach(function (id) {
       if (kopie[id] == null || kopie[id] === '') return;
       const roh = String(kopie[id]).trim();
       const v = parseFloat(roh.replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'));
       if (!isFinite(v) || v <= 0 || v >= 2000) return;
+      if (!gesagt(v)) return;   /* v2364c: schon umgerechnet */
       kopie[id] = String(Math.round(v * 12));
       geaendert.push(id + ' ' + v + ' -> ' + kopie[id]);
     });

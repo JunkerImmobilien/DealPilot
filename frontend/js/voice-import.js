@@ -3405,6 +3405,12 @@
     var k = {}; for (var s in e) { if (Object.prototype.hasOwnProperty.call(e, s)) k[s] = e[s]; }
     k._orig = e._orig || e;
     k.ids = e.ids.filter(function (id) {
+      /* v2364 · Die Frage nennt die Wohnfläche IMMER („Art und Wohnfläche"),
+         also gehört sie auch ohne bekannte Art in den Katalog. Gemessen am
+         17.10.2026 an einem neuen Objekt: „Eigentumswohnung, 100 Quadratmeter"
+         - der Katalog trug nur `objart`, die 100 m² fielen still weg, und am
+         Ende stand „Was ich nicht weiß: Wohnfläche". */
+      if (id === 'wfl' && !art) return true;
       if (id === 'einheiten') return !!art && OA.pflicht(art, id);   /* nur wo verlangt */
       return OA.passt(art, id) === true;
     });
@@ -5822,6 +5828,7 @@
        in 196 px - "Objekt · Detail" schon, und mehr braucht die Spalte
        nicht: welche Felder es sind, steht in der Frage selbst. */
     if (e.tiefe && e.bereich) return e.bereich;
+    if (e.kurz) return e.kurz;   /* v2364 · Nachfrage nach der Art (_rfArtNachziehen) */
     for (var i = 0; i < e.ids.length; i++) { if (RF_KURZ[e.ids[i]]) return RF_KURZ[e.ids[i]]; }
     return String(e.frage).split(/[?,–—]/)[0].slice(0, 22);
   }
@@ -9799,10 +9806,59 @@
      Der Dialog darf dabei NIE stehenbleiben: `_rfHalt` gibt false zurueck,
      wenn sich nichts rechnen laesst, und dann geht es weiter, als haette
      es den Halt nie gegeben. */
+  /* ═══ v2364 · STEHT DIE ART, WIRD DIE RESTLISTE NEU ZUGESCHNITTEN ═════
+     `rueckfragen()` schneidet die Bloecke EINMAL zu, beim Start. An einem
+     neuen Objekt ist die Art dann noch unbekannt, und `_rfNachArt` laesst
+     jedes typabhaengige Feld weg - mit dem Versprechen im Kommentar, es
+     werde „in der naechsten Runde gefragt, sobald die Art steht". Diese
+     Runde gab es nicht. Gemessen am 17.10.2026 (ETW, neues Objekt):
+     Zimmer und Vollgeschosse wurden nie gefragt, der Grundstuecksblock
+     fragte nur den Bodenrichtwert (kein Miteigentumsanteil), und die
+     Zustandsfrage sagte „des Objekts" statt „der Wohnung".
+
+     Jetzt, sobald die Art im Gespraech steht: die noch offenen Bloecke
+     werden aus ihrem Original neu zugeschnitten (an ihrem Platz, die
+     Spalte „Was schon steht" erkennt sie ueber `_orig` wieder), und was
+     dem schon beantworteten Objektblock jetzt fehlt (MFH: Wohneinheiten,
+     sonst Zimmer, Vollgeschosse), kommt als EINE Nachfrage direkt dran.
+     Einmal je Art. */
+  function _rfArtNachziehen() {
+    if (!_rf || !_rf.offen) return;
+    var f = _rf.data.fields || {};
+    var art = _rfArt(f);
+    if (!art || _rf.artZugeschnitten === art) return;
+    _rf.artZugeschnitten = art;
+    var gesagt = function (id) { var v = f[id]; return v !== undefined && v !== null && v !== ''; };
+    var nach = [];
+    for (var j = 0; j < _rf.i && j < _rf.offen.length; j++) {
+      var b = _rf.offen[j], o = b && (b._orig || b);
+      if (!o || !o.nachArt || o.ids.indexOf('objart') < 0) continue;
+      var k = _rfNachArt(_rfZuschnitt(o), f);
+      if (!k) continue;
+      var rest = k.ids.filter(function (id) { return id !== 'objart' && !gesagt(id) && !fieldHasValue(id); });
+      if (!rest.length) continue;
+      var NAME = { wfl: /^(BUERO|GESCH|HOTEL|GEW|GAR)$/.test(art) ? 'Fläche' : 'Wohnfläche', zimmer: 'Zimmer',
+                   einheiten: 'Zahl der Wohneinheiten', etagen_ges: 'Vollgeschosse' };
+      var teile = rest.map(function (id) { return NAME[id] || _rfFeldName(id); });
+      var liste = teile.length > 1 ? teile.slice(0, -1).join(', ') + ' und ' + teile[teile.length - 1] : teile[0];
+      nach.push({ et: o.et, ids: rest, rang: o.rang, kurz: 'Größe & Details',
+                  frage: 'Und noch zum Objekt: ' + liste + '?' });
+    }
+    var weiter = _rf.offen.slice(_rf.i).map(function (b) {
+      var o = b && (b._orig || b);
+      if (!o || !o.nachArt) return b;
+      return _rfNachArt(_rfZuschnitt(o), f);
+    }).filter(Boolean);
+    var neu = nach.concat(weiter);
+    _rfKatalogErgaenzen(neu);
+    _rf.offen = _rf.offen.slice(0, _rf.i).concat(_rfAufKatalog(neu, _rf.catalog));
+  }
+
   function _rfWeiter() {
     _fsStopHoeren();
     var vorher = _rf.offen[_rf.i];
     _rf.i++;
+    try { _rfArtNachziehen(); } catch (exA) { try { console.warn('[voice] Art nachziehen', exA); } catch (e3) {} }
     if (_rf.i >= _rf.offen.length) return _rfFertig();
     /* v1288: Direkt nach der Adresse faellt die Entscheidung ueber die
        Marktpreisindikation — dort weiss der Abruf genug ueber das WO, und
@@ -10832,6 +10888,54 @@
     return true;
   }
   /* Antwort verarbeiten - egal ob getippt oder gesprochen. */
+  /* v2364 · siehe _rfUebernehmen: ein unveraendert zurueckgegebener
+     Formularwert, der im Gespraech noch nicht steht */
+  function _rfEchoAusFormular(id, v) {
+    var f = _rf && _rf.data && _rf.data.fields;
+    if (f && f[id] !== undefined && f[id] !== null && f[id] !== '') return false;
+    var el = document.getElementById(id);
+    if (!el || el.type === 'checkbox') return false;
+    var w = String(el.value || '').trim();
+    if (!w) return false;
+    var s = String(v).trim();
+    var zahlig = /^[-\d\s.,%€]+$/;
+    if (zahlig.test(s) && zahlig.test(w)) {
+      var a = _rfNum(s), b = _rfNum(w);
+      return a !== null && b !== null && Math.abs(a - b) < 1e-9;
+    }
+    return s.toLowerCase() === w.toLowerCase();
+  }
+
+  /* v2364 · Zahlenfeld (inputmode decimal/numeric oder type=number) */
+  function _rfZahlenfeld(id) {
+    var el = document.getElementById(id);
+    if (!el) return false;
+    var im = String(el.getAttribute('inputmode') || '');
+    return im === 'decimal' || im === 'numeric' || el.type === 'number';
+  }
+  /* v2364 · steht die Zahl v in der Antwort? Deutsche und englische
+     Schreibweise (189.000 · 3,9 · 3.9), ohne Text keine Pruefung moeglich. */
+  function _rfZahlImText(v, txt) {
+    var s = String(txt || '');
+    if (!s) return true;
+    var ziel = _rfNum(String(v));
+    if (ziel === null || ziel === undefined || !isFinite(ziel)) return false;
+    var m = s.match(/\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:[.,]\d+)?/g) || [];
+    return m.some(function (z) {
+      var a = _rfNum(z), b = Number(String(z).replace(',', '.'));
+      return (a !== null && Math.abs(a - ziel) < 1e-9) || (isFinite(b) && Math.abs(b - ziel) < 1e-9);
+    });
+  }
+  /* v2364 · steht das Wort v in der Antwort? Kurze Codes (D, B, ETW) als
+     ganzes Wort, laengere ueber ihren Stamm (erste fuenf Buchstaben). */
+  function _rfWortImText(v, txt) {
+    var s = String(txt || '').toLowerCase();
+    if (!s) return true;
+    var w = String(v == null ? '' : v).toLowerCase().trim();
+    if (!w || w === 'true' || w === 'false') return false;
+    if (w.length <= 3) return new RegExp('(^|[^a-zäöüß])' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '($|[^a-zäöüß])').test(s);
+    return s.indexOf(w.slice(0, 5)) >= 0;
+  }
   function _rfUebernehmen(neu, ausSprache, txt) {
     _rfDenkt(false);
     var e = _rf.offen[_rf.i];
@@ -10865,6 +10969,33 @@
           if (_m) v = _m[0];
         }
       } catch (e2) {}
+      /* ═══ v2364 · EIN ECHO DES FORMULARS IST KEINE ANTWORT ═════════
+         `_rfKontext()` schickt alles mit, was im Formular steht, markiert
+         mit „[steht im Formular]". Gemessen am 17.10.2026: auf die
+         Adressfrage kamen Zins, Tilgung, Zinsbindung und alle vier
+         Nebenkostensaetze zurueck - unveraendert die Vorbelegung. Hier
+         galten sie damit als GESAGT: Etappe 2 stand auf 2/2, die Frage nach
+         den Kaufnebenkosten fiel weg, der Zwischenstand schrieb „von dir
+         genannt", und die Tabelle am Ende fuehrte sie als Sprachaufnahme.
+         Genau das, was v1273c verhindern sollte, nur ueber den Umweg Modell.
+
+         Verworfen wird nur, was NICHT gefragt war, im Gespraech noch nicht
+         steht und denselben Wert hat wie das Formular. Dabei geht nichts
+         verloren: der Wert steht ja schon im Feld. */
+      if (!gefragt && _rfEchoAusFormular(id, v)) return;
+      /* ═══ v2364 · EINE UNGEFRAGTE ZAHL MUSS GESAGT SEIN ════════════
+         Gemessen am 17.10.2026: auf „Zustand mittel, Energieklasse D" kam
+         ungefragt `san = "mittel"` zurueck (Sanierungskosten, ein Zahlenfeld),
+         in einem anderen Lauf Grundstueck, Hausgeld und Sanierung als 0 -
+         die Fragen danach fielen weg, weil sie schon „beantwortet" waren.
+         Nebenbei Gesagtes (v1299) bleibt erlaubt, aber nur, wenn die Zahl
+         wirklich in der Antwort steht. Fuer die GEFRAGTEN Felder gilt das
+         nicht - „nichts zu sanieren" ist dort eine echte 0. */
+      if (!gefragt && _rfZahlenfeld(id) && !_rfZahlImText(v, txt)) return;
+      /* Dasselbe fuer Auswahlwerte: auf „Zustand mittel, Energieklasse D"
+         kamen ungefragt Bevoelkerung „stabil", Nachfrage „mittel",
+         Entwicklung „begrenzt" - nichts davon war gesagt. */
+      if (!gefragt && !_rfZahlenfeld(id) && !_rfWortImText(v, txt)) return;
       /* ═══ v2054 · WAS SCHON SO DASTAND, IST KEINE NACHRICHT ════════
 
          GEMESSEN im Pruefläufer: nach jeder Antwort meldete der
@@ -11961,7 +12092,7 @@
         });
         if (_offen.length === 1) {
           var _f = {}; _f[_offen[0]] = _mz[1];
-          _rfUebernehmen(_f, ausSprache);
+          _rfUebernehmen(_f, ausSprache, text);   /* v2364: Text fuer die Zahlpruefung */
           return;
         }
       }
@@ -11971,7 +12102,7 @@
       body: { text: text, catalog: _rfKatalog(e, _rf.catalog), kontext: _rfKontext() }
     }).then(function (r) {
       var inp = $('vi-rf-in'); if (inp) inp.disabled = false;
-      _rfUebernehmen(r && r.fields, ausSprache);
+      _rfUebernehmen(r && r.fields, ausSprache, text);   /* v2364 */
     }).catch(function (err) {
       var inp = $('vi-rf-in'); if (inp) inp.disabled = false;
       _rfDenkt(false);
