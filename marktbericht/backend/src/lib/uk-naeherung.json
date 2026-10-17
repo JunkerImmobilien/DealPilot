@@ -1,5 +1,5 @@
 {
-  "stand": "2026-10-16",
+  "stand": "2026-10-17",
   "form": "UK(Objekt)/UK(Bezugsgroesse) = (Flaeche/Bezugsgroesse)^b",
   "herkunft": "DealPilot-Naeherung aus amtlichen Umrechnungstabellen der Gutachterausschuesse (Register), Median der Exponenten je Tabelle",
   "stufe": "D",
@@ -8,13 +8,25 @@
       "efh",
       "zfh",
       "dhh",
-      "rh"
+      "rh",
+      "mfh"
+    ],
+    "uebertragen_auf": [
+      "mfh"
     ],
     "max_vollgeschosse": 2,
     "verhaeltnis_von": 0.5,
-    "verhaeltnis_bis": 2.5
+    "verhaeltnis_bis": 3
   },
   "mindest_tabellen": 8,
+  "oberhalb": {
+    "ab": 2.5,
+    "bis": 3,
+    "rest_faktor": 0.531,
+    "tabellen": 35,
+    "abweichung_median_pct": 13.025,
+    "abweichung_p90_pct": 43.348
+  },
   "alle": {
     "b": -0.213,
     "b_q1": -0.258,

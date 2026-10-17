@@ -1350,13 +1350,15 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       try {
         const _art = UKF.artSchluessel(_ukArt);
         const _frei = !s || ((s.vollstaendig === false || !!s.warum_kein_wert)
-          && !UKF.sperreSchliesstNaeherungAus(s.warum_kein_wert, s.sperre_grund));
-        const _segment = ['efh', 'zfh', 'dhh', 'rh'].indexOf(_art) >= 0;
+          && !UKF.sperreSchliesstNaeherungAus(s.warum_kein_wert, s.sperre_grund))
+          || (_art === 'mfh' && ukQuelle && ukQuelle.verfuegbar && !ukQuelle.anwendbar);   /* v2360 */
+        const _segment = ['efh', 'zfh', 'dhh', 'rh', 'mfh'].indexOf(_art) >= 0;
         const _minden = String(agsFein).startsWith('05770');
         if (_frei && _segment && !_minden) {
           ukQuelle.naeherung = true;
           ukQuelle.naeherung_text = 'Im Bericht: abgeleitet aus der DealPilot-Formel (Näherung aus den amtlichen '
-            + 'Tabellen der Gutachterausschüsse), wenn die Bodenrichtwertzone bis zwei Vollgeschosse hat.';
+            + 'Tabellen der Gutachterausschüsse' + (_art === 'mfh' ? ', vom individuellen Wohnungsbau auf das Mehrfamilienhaus übertragen' : '')
+            + '), wenn die Bodenrichtwertzone bis zwei Vollgeschosse hat.';
         }
       } catch (e) { /* nur Auskunft */ }
     } catch (e) { ukQuelle = null; }

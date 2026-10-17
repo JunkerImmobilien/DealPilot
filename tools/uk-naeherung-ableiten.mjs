@@ -113,14 +113,46 @@ for (const [n, k] of [['alle', alle], ['stadt', stadt], ['land', land]]) {
 const beispiel = (b) => [0.5, 1.5, 2, 2.5].map((r) => r + 'x: ' + Math.round(Math.pow(r, b) * 1000) / 1000).join('  ');
 console.log('Beispiel stadt: ' + beispiel(stadt.b || alle.b) + '   land: ' + beispiel(land.b || alle.b));
 
+/* v2360 · ZWEITER AST JENSEITS DES 2,5-FACHEN. Dort fallen die amtlichen Tabellen
+   steiler (Mehrflaeche wie Hinterland). Je Tabelle mit Wert beim 3-Fachen der
+   Restfaktor c aus k(3)*3 = k(2,5)*2,5 + 0,5*c; Median ueber alle. Die Genauigkeit
+   wird mitgeschrieben - sie ist deutlich schlechter als unter dem 2,5-Fachen. */
+const restC = [], restPkt = [];
+{
+  const gesehen2 = new Set();
+  for (const datei of fs.readdirSync(ORDNER).filter((x) => x.startsWith('uk-') && x.endsWith('.json'))) {
+    for (const s of JSON.parse(fs.readFileSync(path.join(ORDNER, datei), 'utf8'))) {
+      const sperre = s.vollstaendig === false || !!s.warum_kein_wert;
+      const fm = !sperre ? s.formel : (s.nutzung_intern === 'stuetzstelle' ? s.formel_vorgemerkt : null);
+      if (!fm || fm.form !== 'flaeche_tabelle') continue;
+      const schl = JSON.stringify(fm); if (gesehen2.has(schl)) continue; gesehen2.add(schl);
+      for (const norm of normen(fm)) {
+        const satz = { ...s, formel: fm };
+        const kk = (r) => { const a = UK.koeffizientFuer(satz, Math.round(norm * r), norm), n = UK.koeffizientFuer(satz, norm, norm); return a.k != null && n.k > 0 ? a.k / n.k : null; };
+        const k25 = kk(2.5), k3 = kk(3);
+        if (k25 != null && k3 != null) { restC.push((3 * k3 - 2.5 * k25) / 0.5); restPkt.push(k3); }
+      }
+    }
+  }
+}
+const restFaktor = median(restC);
+const restAbw = restPkt.map((k3) => Math.abs(((Math.pow(2.5, alle.b) * 2.5 + 0.5 * restFaktor) / 3) / k3 - 1) * 100);
+console.log('oberhalb 2,5-fach: Restfaktor ' + r3(restFaktor) + ' aus ' + restC.length + ' Tabellen, typ. Abweichung beim 3-Fachen '
+  + r3(median(restAbw)) + ' % (90 %: ' + r3(quartil(restAbw, 0.9)) + ' %)');
 const MIN_TABELLEN = 8;
 const aus = {
   stand: new Date().toISOString().slice(0, 10),
   form: 'UK(Objekt)/UK(Bezugsgroesse) = (Flaeche/Bezugsgroesse)^b',
   herkunft: 'DealPilot-Naeherung aus amtlichen Umrechnungstabellen der Gutachterausschuesse (Register), Median der Exponenten je Tabelle',
   stufe: 'D',
-  gilt_fuer: { objektarten: ['efh', 'zfh', 'dhh', 'rh'], max_vollgeschosse: 2, verhaeltnis_von: 0.5, verhaeltnis_bis: 2.5 },
+  /* v2360 · Marcel 17.10.2026: „fuer Mehrfamilienhaeuser muessen wir die Formel fuer den
+     Koeffizienten auf jeden Fall mit hinzunehmen". mfh gilt als UEBERTRAGUNG aus dem
+     individuellen Wohnungsbau (die Tabellen sind IfW) - nur in Zonen bis II Vollgeschosse,
+     im Bericht ausdruecklich so gekennzeichnet. */
+  gilt_fuer: { objektarten: ['efh', 'zfh', 'dhh', 'rh', 'mfh'], uebertragen_auf: ['mfh'], max_vollgeschosse: 2, verhaeltnis_von: 0.5, verhaeltnis_bis: restC.length >= MIN_TABELLEN ? 3 : 2.5 },
   mindest_tabellen: MIN_TABELLEN,
+  oberhalb: restC.length >= MIN_TABELLEN ? { ab: 2.5, bis: 3, rest_faktor: r3(restFaktor), tabellen: restC.length,
+    abweichung_median_pct: r3(median(restAbw)), abweichung_p90_pct: r3(quartil(restAbw, 0.9)) } : null,
   alle, stadt: stadt.tabellen >= MIN_TABELLEN ? stadt : null, land: land.tabellen >= MIN_TABELLEN ? land : null,
 };
 if (!TROCKEN) { fs.writeFileSync(ZIEL, JSON.stringify(aus, null, 2) + '\n'); console.log('geschrieben: ' + path.relative(WURZEL, ZIEL)); }
