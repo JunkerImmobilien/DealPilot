@@ -10906,6 +10906,26 @@
     return s.toLowerCase() === w.toLowerCase();
   }
 
+  /* v2364 · Zahlenfeld (inputmode decimal/numeric oder type=number) */
+  function _rfZahlenfeld(id) {
+    var el = document.getElementById(id);
+    if (!el) return false;
+    var im = String(el.getAttribute('inputmode') || '');
+    return im === 'decimal' || im === 'numeric' || el.type === 'number';
+  }
+  /* v2364 · steht die Zahl v in der Antwort? Deutsche und englische
+     Schreibweise (189.000 · 3,9 · 3.9), ohne Text keine Pruefung moeglich. */
+  function _rfZahlImText(v, txt) {
+    var s = String(txt || '');
+    if (!s) return true;
+    var ziel = _rfNum(String(v));
+    if (ziel === null || ziel === undefined || !isFinite(ziel)) return false;
+    var m = s.match(/\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:[.,]\d+)?/g) || [];
+    return m.some(function (z) {
+      var a = _rfNum(z), b = Number(String(z).replace(',', '.'));
+      return (a !== null && Math.abs(a - ziel) < 1e-9) || (isFinite(b) && Math.abs(b - ziel) < 1e-9);
+    });
+  }
   function _rfUebernehmen(neu, ausSprache, txt) {
     _rfDenkt(false);
     var e = _rf.offen[_rf.i];
@@ -10953,6 +10973,15 @@
          steht und denselben Wert hat wie das Formular. Dabei geht nichts
          verloren: der Wert steht ja schon im Feld. */
       if (!gefragt && _rfEchoAusFormular(id, v)) return;
+      /* ═══ v2364 · EINE UNGEFRAGTE ZAHL MUSS GESAGT SEIN ════════════
+         Gemessen am 17.10.2026: auf „Zustand mittel, Energieklasse D" kam
+         ungefragt `san = "mittel"` zurueck (Sanierungskosten, ein Zahlenfeld),
+         in einem anderen Lauf Grundstueck, Hausgeld und Sanierung als 0 -
+         die Fragen danach fielen weg, weil sie schon „beantwortet" waren.
+         Nebenbei Gesagtes (v1299) bleibt erlaubt, aber nur, wenn die Zahl
+         wirklich in der Antwort steht. Fuer die GEFRAGTEN Felder gilt das
+         nicht - „nichts zu sanieren" ist dort eine echte 0. */
+      if (!gefragt && _rfZahlenfeld(id) && !_rfZahlImText(v, txt)) return;
       /* ═══ v2054 · WAS SCHON SO DASTAND, IST KEINE NACHRICHT ════════
 
          GEMESSEN im Pruefläufer: nach jeder Antwort meldete der
@@ -12049,7 +12078,7 @@
         });
         if (_offen.length === 1) {
           var _f = {}; _f[_offen[0]] = _mz[1];
-          _rfUebernehmen(_f, ausSprache);
+          _rfUebernehmen(_f, ausSprache, text);   /* v2364: Text fuer die Zahlpruefung */
           return;
         }
       }
@@ -12059,7 +12088,7 @@
       body: { text: text, catalog: _rfKatalog(e, _rf.catalog), kontext: _rfKontext() }
     }).then(function (r) {
       var inp = $('vi-rf-in'); if (inp) inp.disabled = false;
-      _rfUebernehmen(r && r.fields, ausSprache);
+      _rfUebernehmen(r && r.fields, ausSprache, text);   /* v2364 */
     }).catch(function (err) {
       var inp = $('vi-rf-in'); if (inp) inp.disabled = false;
       _rfDenkt(false);
