@@ -38840,6 +38840,27 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2361 · Umrechnung nach der WGFZ + landing-sicherheit-ki-1 (17.10.2026, Staging)
+
+- **Was:** Marcel: „beides und so wie es richtig ist nach ImmoWertV". Der GMB Bielefeld 2026 (Abschn. 4.7.5, S. 30 f.) und die BORIS-Fachinformation „Misch- oder mehrgeschossige Bebauung" (`LGDBR_2_0510200_2026.pdf`) rechnen **MFH-Grundstücke über die WGFZ**, nicht über die Fläche (Tabelle BRW 200–500 × WGFZ 0,4–3,0, aus der VW-RL 2014, lineare Interpolation, keine Extrapolation). Neuer Kern `lib/umrechnung_wgfz.js` (Kennzahl `umrechnungskoeffizient_wgfz`), Satz `uk-wgfz-bielefeld-2026.json`, Prüfer `tools/uk-wgfz-pruefen.mjs`. Zone-GFZ aus BORIS-NRW (Feld `Geschossflächenzahl`, gemessen: Siegfriedplatz III/1,0, Westerfeldstraße I–II ohne GFZ). Neues Feld `wgfz_objekt` (App, Objekt-Reiter, Marktbericht) — **keine Näherung** (BGF trennt Keller/DG nicht). Amtlich vor Näherung: greift die WGFZ, rechnet die DealPilot-Formel nicht zusätzlich über die Fläche.
+- **Sicherheitsseite:** „kein Datenabfluss in Drittstaaten" **stimmte nicht** (KI-Funktionen über OpenAI, USA, laut Datenschutzerklärung Abschn. 6). Berichtigt, dazu Absatz `#ki` nur mit dem, was die Datenschutzerklärung sagt.
+- **Commit:** `19fd5bc4` (v2361), `5b3b2b21` (Konstanten), `fc57c428` (Sicherheitsseite).
+- **Nachweis:** Anwendungsbeispiel 380 × 1,25/1,09 = 435,78 → 436 €/m² getroffen; im Staging-Container 800 m² × 450 €/m² × 1,21 = 435.600 € mit Schritt „GFZ-Umrechnung"; `saat-pruefen --basislinie`, `uk-flaeche-pruefen`, `buster-ebenen`, `objekt-mapper-pruefen` grün.
+- **Rest:** Prod-Rollout steht aus. `uk-wgfz-pruefen.mjs` läuft im Container nicht (Pfad). Ernte weiterer WGFZ-Tabellen läuft (Agent, `uk-wgfz-2026.json`). Staging-Abnahme: ein Bericht für ein MFH in einer Bielefelder MFH-Zone mit eingetragener WGFZ.
+
+### Prod-Rollout (46) · v2360 DealPilot-Formel für Mehrfamilienhäuser (17.10.2026)
+
+- **Was:** Marcel: „für Mehrfamilienhäuser müssen wir die Formel für den Koeffizienten auf jeden Fall mit hinzunehmen und anpassen". MFH als **Übertragung** aus dem individuellen Wohnungsbau (Zonen bis II VG), im Bericht so gekennzeichnet; greift auch, wo der amtliche Satz nur für den IfW gilt (Bielefeld). Zweiter Ast über dem 2,5-Fachen: Mehrfläche mit Restfaktor 0,531 (Median aus 35 Tabellen), gültig bis 3×, typ. Abweichung 13 %, 90 % unter 43 %.
+- **Befund für Marcel (nicht geändert):** Bielefelds eigene IfW-Tabelle fällt viel steiler als die bundesweite Formel (1.500 m² bei Norm 600: amtlich 0,46, Formel rund 0,82; Bielefelds Extrapolationsregel (Norm + Rest × 0,10)/Fläche ergäbe für 1.570 m² 0,44). Für die Westerfeldstraße 140 (BRW 2026 **490**, nicht 450) ist das eine Bewertungsfrage.
+- **Commit:** `43f31902`, Merge `686bac75`.
+- **Nachweis:** Sicherungen `/root/backups/mb-20261017-0835-v2360.sql.gz` (25 MB, 32 Tabellen) und `haupt-20261017-0835-v2360.sql.gz` (14 MB, 73 Tabellen; Nutzer `dealpilot`, DB `dealpilot_db` — der erste Versuch mit `postgres` ergab 20 Byte und wurde verworfen); Prod-Container: Westerfeld-Fall k 0,8097; Gold-Audit RC=0; `/auth/me` auf `app.dealpilot.immo` 401 (auf der Landing-Domain kommt 200 mit HTML — falscher Host, kein Befund).
+- **Rest:** keiner aus dem Paket.
+
+### Prod-Rollout (45) · v2357–v2359 (17.10.2026)
+
+- **Was:** Wertparameter-Endpunkt mit Gemeinde-AGS (v2357), Objekt-Reiter nennt die DealPilot-Formel (v2358), genaue Hausart EFH/ZFH/DHH/RH statt „haus" (v2359).
+- **Commit:** `a7da66dd`, `4cee1591`, `8f855e38`, Merge `e83efd26`.
+
 ### landing-tband-1 + Prod-Rollout (44) · Vertrauensleiste am Handy, Animation entfernt (17.10.2026)
 
 - **Was:** Marcel: „auf der Handy-Version ist Server in Deutschland mit dem Logo versetzt" — gemessen bei 390 px (iframe): Symbol des ersten Eintrags bei 26 px, die übrigen bei 50 px; `.tband-in > div:first-child{padding-left:0}` war nur für die Desktop-Zeile gedacht. Ab 1080 px jetzt alle 24 px. „Die Animation zur geführten Eingabe nach Was DealPilot macht kann raus" — `data-wechsel`-Platzhalter, `demo-wechsel.css/.js` aus `landing/index.html` entfernt (Einzelseite `demo-wechsel.html` bleibt).
