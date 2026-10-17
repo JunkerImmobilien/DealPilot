@@ -38840,6 +38840,14 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2364–v2364d · Geführte Eingabe repariert (17.10.2026, Staging) + Prod-Rollout (48) v2363
+
+- **Prod (48):** v2363 (WGFZ acht NRW-Ausschüsse), Merge `48db88a9`, Sicherungen `*-20261017-0921-r48.sql.gz` (14 MB/73, 25 MB/32), Prod-Container Köln 1,1623 / Düsseldorf 1,2074 / Bielefeld 1,1802, `/auth/me` 401.
+- **Geführte Eingabe (Patch des Video-Agenten eingespielt und erweitert):** v2364 Wohnfläche ohne Art behalten, Neuzuschnitt sobald die Art steht (Nachfrage „Zimmer und Vollgeschosse", ETW: MEA, „Zustand der Wohnung"), Formular-Echo verworfen · v2364a/b ungefragte Zahlen und Auswahlwerte nur, wenn sie in der Antwort stehen (gemessen: auf „Zustand mittel, Energieklasse D" kamen san/gsfl/mea/hg = 0 und Bevölkerung „stabil" usw. zurück); `_rfAuswerten` reicht den Antworttext jetzt durch · v2364c/d Hausgeld: die Monatswache rechnete 1.440 erneut × 12 = 17.280; „Hausgeld X (im Monat), davon Y nicht umlagefähig" wird fest gerechnet.
+- **Commit:** `6f6d690f`, `1046df57`, `f20e7a30`, `29f5cca8`, `d731f79f`.
+- **Nachweis:** voller Durchlauf auf Staging (ETW Bielefeld, 19 Fragen): Basis 5/5, Geld erst nach den eigenen Antworten 2/2, Feinschliff ohne Erfundenes 0/6 bis zur Frage, MEA gefragt, Hausgeld 2.400/1.440 (zweimal am Server-Endpunkt bestätigt). 4 Testobjekte auf Staging (Portfolio 40 → 44), nicht gelöscht.
+- **Rest:** Prod für v2364–v2364d steht aus (Freigabe). Video Modul 25 (Agent läuft, schreibt `DPM_ZEILEN` für den Sprecher mit). Stimmproben aller 13 OpenAI-Stimmen in `Dateien/Messe/Videos/Sprecher-Demo/Stimmproben/`. WGFZ-Ernte übrige Länder (Agent läuft).
+
 ### Prod-Rollout (47) · v2361/v2362 + Sicherheitsseite, Sprecher-Demo (17.10.2026)
 
 - **Was:** v2361 (WGFZ-Umrechnung, s. u.), landing-sicherheit-ki-1, und **v2362** nach Marcels Entscheidung: „wenn wir eigene Tabellen haben und es klar ist, die Werte, ansonsten die bundesweite Formel". Fällt ein MFH nur wegen der Objektart aus der IfW-Tabelle des Ausschusses, wird **diese** Tabelle übertragen (Stufe C, nicht amtlich, Wortlaut „Rücksprache" dabei) — die DealPilot-Formel nur ohne örtliche Tabelle. Kern `groessenanpassung({…, mfh_uebertragen: true})`, Aufrufer ReportOrchestrator und ValuationService; Objekt-Reiter sagt „Tabelle des Ausschusses, übertragen".
