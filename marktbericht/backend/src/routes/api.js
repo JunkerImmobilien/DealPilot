@@ -1218,9 +1218,21 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
     const agsInfo = await AgsResolver.fromPostcode(plz).catch(() => null);
     const ags = agsInfo && agsInfo.kreis_ags;
     if (!ags) return res.json({ verfuegbar: false, grund: 'Kein Gemeindeschluessel zur Postleitzahl ' + plz + '.' });
+    /* v2357 · DIE GEMEINDE, NICHT NUR DER KREIS. Hier fragte alles mit der
+       5-stelligen Kreiskennzahl; das Register fuehrt Saetze kreisfreier
+       Staedte und eigener Ausschuesse aber unter der 8-stelligen Gemeinde-AGS,
+       und die Kaskade sucht nur nach OBEN (8 -> 5 -> 3 -> 2). Gemessen an der
+       Westerfeldstr. 140, Bielefeld: Sachwertfaktor „kein Ausschuss
+       hinterlegt", obwohl unter 05711000 ein Satz des Bielefelder Ausschusses
+       liegt (fuer ein MFH richtig: „nur fuer Ein-/Zweifamilienhaeuser
+       abgeleitet"). Ist die PLZ eindeutig einer Gemeinde zugeordnet, gilt
+       deren AGS; sonst bleibt es beim Kreis. Der Bericht selbst rechnet schon
+       so (ReportOrchestrator, gemeindeEindeutig). */
+    const _gem = await AgsResolver.gemeindeEindeutig(plz, d.ort || d.city || null).catch(() => null);
+    const agsFein = (_gem && _gem.gemeinde_ags) || ags;
 
     const p = await WertParameterService.hole({
-      typ: 'lzs', ags: String(ags), objektart: m.property_type, anzahlWe: m.units || null,
+      typ: 'lzs', ags: String(agsFein), objektart: m.property_type, anzahlWe: m.units || null,
       objekt: { objart: d.objart, baujahr: m.build_year, einheiten: m.units,
                 haustyp: d.haustyp, nutzung: d.nutzungsart, lage: d.lage }
     });
@@ -1293,7 +1305,7 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
        Konstante ist (Backlog B1) - und als solche benannt wird. */
     let swfQuelle = null;
     try {
-      const r = GAA.sachwertfaktor({ ags: String(ags), objektart: m.property_type, sachwert_eur: null,
+      const r = GAA.sachwertfaktor({ ags: String(agsFein), objektart: m.property_type, sachwert_eur: null,
                                      baujahr: m.build_year, rnd_jahre: rndJ });
       /* Gemessen an Huellhorst/ETW: ohne Sachwert kommt `objektart_nicht_abgeleitet`
          mit ausschuss null zurueck — das ist KEINE Tabelle. Verfuegbar heisst:
@@ -1312,7 +1324,7 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
     let ukQuelle = null;
     try {
       const UKF = await import('../lib/umrechnung_flaeche.js');
-      const s = UKF.satzFuer(String(ags), m.property_type);
+      const s = UKF.satzFuer(String(agsFein), m.property_type);
       if (s) {
         const g = s.geltungsbereich || {}, art = UKF.artSchluessel(m.property_type);
         const sperre = s.vollstaendig === false || !!s.warum_kein_wert;
@@ -1348,7 +1360,7 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       sachwertfaktor_quelle: swfQuelle,
       uk_flaeche_quelle: ukQuelle,   /* v2282 */
       baupreisindex: BAUPREISINDEX_KONSTANTE,
-      objektart: m.property_type, ags: String(ags)
+      objektart: m.property_type, ags: String(agsFein)
     });
   } catch (e) { res.status(500).json({ verfuegbar: false, grund: e.message }); }
 });
