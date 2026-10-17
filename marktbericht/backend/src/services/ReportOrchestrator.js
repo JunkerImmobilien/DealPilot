@@ -468,15 +468,6 @@ export const ReportOrchestrator = {
       assessment.leerstand_zensus = ls < 3 ? 'niedrig' : ls < 6 ? 'moderat' : 'erhöht';
     }
 
-    // 6) Bewertung (inkl. Grundstuecks-Mehrflaechenkorrektur ueber BORIS-BRW)
-    const valuation = ValuationService.compute(ref, sale, rent, landValue);
-
-    /* WPARAM-1 · Wertermittlungsparameter nach der Abdeckungs-Kaskade
-     * (A amtlich kreisscharf ... D gesetzlicher Auffangwert, E Nutzereingabe).
-     * Faellt der Lesezugriff aus, rechnet der Quercheck mit seinen Pauschalen
-     * weiter — der Bericht darf an einem fehlenden Parameter nicht scheitern. */
-    let _wertParams = null;
-
     /* v1047-WAGS-1 · Ohne Schluessel laeuft die ganze Kaskade ins Leere.
      * ref.ags ist leer — das Formular kennt kein solches Feld. Der
      * Schluessel liegt aber zweimal vor:
@@ -495,6 +486,22 @@ export const ReportOrchestrator = {
         _agsWert = String((_ai && (_ai.gemeinde_ags || _ai.kreis_ags)) || '').replace(/\D/g, '');
       } catch (e) { /* ohne Schluessel bleibt es beim Auffangwert */ }
     }
+    /* v2365 · Die AGS gehoert VOR die Bewertung: ValuationService.compute() fragt
+       das Register nach dem Umrechnungskoeffizienten mit ref.ags - die stand bisher
+       erst ~70 Zeilen spaeter. Gemessen am 17.10.2026 (Bericht 217, Westerfeldstr.):
+       Bodenwert im Quercheck 0,4439 (Tabelle des Ausschusses), in der
+       Marktpreisindikation 0,8097 (Formel) - im selben Bericht. */
+    ref.ags = ref.ags || _agsWert || null;
+
+    // 6) Bewertung (inkl. Grundstuecks-Mehrflaechenkorrektur ueber BORIS-BRW)
+    const valuation = ValuationService.compute(ref, sale, rent, landValue);
+
+    /* WPARAM-1 · Wertermittlungsparameter nach der Abdeckungs-Kaskade
+     * (A amtlich kreisscharf ... D gesetzlicher Auffangwert, E Nutzereingabe).
+     * Faellt der Lesezugriff aus, rechnet der Quercheck mit seinen Pauschalen
+     * weiter — der Bericht darf an einem fehlenden Parameter nicht scheitern. */
+    let _wertParams = null;
+
     /* v1102-WORT - DER ORTSNAME IST EIN WERTMERKMAL, kein Beiwerk.
        Barnim druckt VIER Sachwertfaktor-Funktionen ab, eine je Region,
        und die Regionen sind ueber Gemeinden und Ortsteile definiert
