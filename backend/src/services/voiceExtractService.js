@@ -920,11 +920,22 @@ function _monatsFalle(text, felder) {
     if (!monat || !felder) return felder;
     const kopie = Object.assign({}, felder);
     let geaendert = [];
+    /* v2364c · NUR WAS ALS MONATSBETRAG GESAGT WURDE. Gemessen 17.10.2026:
+       „Hausgeld 320 Euro im Monat, davon 120 Euro nicht umlagefaehig" - das
+       Modell lieferte richtig hg_ul 2400 / hg_nul 1440, die Wache nahm die
+       1440 (< 2.000) fuer einen Monatsbetrag und machte 17.280 daraus.
+       Monatlich ist ein Wert nur, wenn er im Text steht oder die Differenz
+       zweier genannter Zahlen ist (320 - 120 = 200). */
+    const zahlen = (t.match(/\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:,\d+)?/g) || [])
+      .map((z) => parseFloat(z.replace(/\./g, '').replace(',', '.'))).filter((z) => isFinite(z) && z > 0);
+    const gesagt = (v) => zahlen.some((a) => Math.abs(a - v) < 0.005)
+      || zahlen.some((a) => zahlen.some((b) => a > b && Math.abs(a - b - v) < 0.005));
     ['hg_ul', 'hg_nul'].forEach(function (id) {
       if (kopie[id] == null || kopie[id] === '') return;
       const roh = String(kopie[id]).trim();
       const v = parseFloat(roh.replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'));
       if (!isFinite(v) || v <= 0 || v >= 2000) return;
+      if (!gesagt(v)) return;   /* v2364c: schon umgerechnet */
       kopie[id] = String(Math.round(v * 12));
       geaendert.push(id + ' ' + v + ' -> ' + kopie[id]);
     });
