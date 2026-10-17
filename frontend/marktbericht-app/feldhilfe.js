@@ -135,6 +135,11 @@
       lang: 'Gemessen werden alle Geschosse an den Außenkanten, einschließlich Wände, Treppenhaus, Keller und ausgebautem Dachgeschoss. Sie ist deshalb deutlich größer als die Wohnfläche: bei einem Einfamilienhaus grob das Anderthalbfache. Der Sachwert rechnet mit ihr, weil die Herstellungskosten je Quadratmeter Bruttogrundfläche angegeben sind. Steht sie in den Bauunterlagen, trag sie ein — jede Schätzung überträgt sich eins zu eins auf den Sachwert.',
       grund: 'DIN 277 · Anlage 4 ImmoWertV'
     },
+    wgfzObjekt: {   /* v2361 */
+      kurz: 'Die wertrelevante Geschossflächenzahl deines Grundstücks: oberirdische Geschossfläche geteilt durch die Grundstücksfläche.',
+      lang: 'Viele Bodenrichtwerte für Mehrfamilienhäuser gelten für eine bestimmte Ausnutzung (zum Beispiel WGFZ 1,0). Ist dein Grundstück dichter oder lockerer bebaut, rechnet DealPilot den Bodenrichtwert mit den Umrechnungskoeffizienten des Gutachterausschusses um. Gezählt werden alle oberirdischen Geschosse nach Außenmaßen, ein ausgebautes oder ausbaufähiges Dachgeschoss zu 75 Prozent, kein Keller. Ohne Angabe bleibt der Bodenwert insoweit unangepasst — DealPilot schätzt die WGFZ nicht.',
+      grund: '§ 16 Abs. 4 und § 40 ImmoWertV'
+    },
     ukFlaeche: {
       kurz: 'Passt den Bodenrichtwert an die Größe deines Grundstücks an. Leer lassen — der Wert des Gutachterausschusses wird automatisch genommen, wo einer vorliegt.',
       lang: 'Der Bodenrichtwert gilt für ein Richtwertgrundstück bestimmter Größe (oft 500 bis 800 m²). Ist dein Grundstück deutlich größer, ist der Quadratmeter weniger wert. Die Gutachterausschüsse veröffentlichen dafür Umrechnungskoeffizienten — Tabelle oder Formel, meist im Grundstücksmarktbericht oder als Anhang zum Bodenrichtwert (BORIS). Trag hier nur einen Wert ein, wenn der Bericht meldet, dass keiner hinterlegt ist, und du ihn beim zuständigen Ausschuss gefunden hast: den Koeffizienten für DEIN Grundstück im Verhältnis zur Bezugsgröße (z. B. 0,74). Er wird im Bericht als eigene Angabe gekennzeichnet.',

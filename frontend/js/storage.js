@@ -41,7 +41,7 @@ if (!window._pdfGold) {
  * die 828 m2 Hinterland von Objekt A beim Speichern an Objekt B kleben. */
 var WM_FIELDS = [
   'baustatus','bgf','standardstufe','grundriss','mod_punkte',
-  'sachwertfaktor','uk_flaeche','stellplatz_miete_monat','sonstige_jahr',   /* v2282: uk_flaeche */
+  'sachwertfaktor','uk_flaeche','wgfz_objekt','stellplatz_miete_monat','sonstige_jahr',   /* v2282: uk_flaeche, v2361: wgfz_objekt */
   'nhk_haus','nhk_geschosse','nhk_dach',
   'hinterland_qm','hinterland_eur_qm','hinterland_rentierlich',
   'garagen_bgf_qm','garagen_stufe','aussenanlagen_pct','aussenanlagen',

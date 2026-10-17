@@ -1472,6 +1472,8 @@ label.dp-required.qc-required::after {
       </select></div></div>
       <div class="f"><label title="Marktanpassungsfaktor nach Paragraf 21 Abs. 3 ImmoWertV: er führt den vorläufigen Sachwert zum marktangepassten Sachwert. Er kommt vom örtlichen Gutachterausschuss und ist keine Schätzung — ohne Faktor bleibt der Sachwert vorläufig.">Sachwertfaktor</label><div class="iw"><input id="sachwertfaktor" type="text" inputmode="decimal" placeholder="leer = aus der Parametertabelle" class="tr"></div></div>
       <div class="f" id="uk_flaeche_feld"><label title="Umrechnungskoeffizient nach Paragraf 19 ImmoWertV: passt den Bodenrichtwert an die Größe des Grundstücks an. Er kommt vom örtlichen Gutachterausschuss (Grundstücksmarktbericht oder BORIS-Anhang). Leer lassen, wenn DealPilot ihn aus dem Register holt — eintragen nur, wenn keiner hinterlegt ist.">Umrechnungskoeffizient Grundstücksgröße</label><div class="iw"><input id="uk_flaeche" type="text" inputmode="decimal" placeholder="leer = Wert des Ausschusses" class="tr"></div></div>
+      <!-- v2361 · WGFZ des Objekts (§ 16 Abs. 4 ImmoWertV) fuer die Umrechnung nach der Geschossflaechenzahl -->
+      <div class="f" id="wgfz_objekt_feld"><label title="Wertrelevante Geschossflächenzahl nach Paragraf 16 Abs. 4 ImmoWertV: Fläche aller oberirdischen Geschosse (Außenmaße, ausgebautes oder ausbaufähiges Dachgeschoss zu 75 Prozent, ohne Keller) geteilt durch die Grundstücksfläche. Weicht sie von der WGFZ der Bodenrichtwertzone ab, rechnet DealPilot den Bodenrichtwert mit den Umrechnungskoeffizienten des Gutachterausschusses um — vor allem bei Mehrfamilienhäusern.">WGFZ des Objekts</label><div class="iw"><input id="wgfz_objekt" type="text" inputmode="decimal" placeholder="z. B. 1,2 — oberirdische Geschossfläche / Grundstück" class="tr"></div></div>
       <div class="f"><label title="Nur die Stellplatz- und Garagenmiete. Die Nettokaltmiete der Wohnung steht im Tab Miete und wird von dort übernommen — sie fehlt hier nicht, sie steht nur nicht zweimal. Die Bewirtschaftungskosten-Quoten rechnen auf dem GESAMTEN Rohertrag, also einschliesslich dieser Stellplätze.">Stellplatzmiete (€/Monat)</label><div class="iw"><span class="pfx">€</span><input id="stellplatz_miete_monat" type="text" inputmode="decimal" placeholder="je Stellplatz" class="trl"></div></div>
       <div class="f"><label>Sonstige Einnahmen (€/Jahr)</label><div class="iw"><span class="pfx">€</span><input id="sonstige_jahr" type="text" inputmode="decimal" placeholder="Werbefläche, Antennenanlage …" class="trl"></div></div>
     </div>
@@ -3645,7 +3647,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v2261"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v2351"></script>
+<script src="js/storage.js?v=v2361"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v2269"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v2263e"></script>
@@ -3678,7 +3680,7 @@ label.dp-required.qc-required::after {
 <script src="js/bodenrichtwert.js?v=v2302"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v2245"></script>
-<script src="js/objekt-reiter.js?v=v2358"></script>
+<script src="js/objekt-reiter.js?v=v2361"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v2210"></script>
@@ -3733,9 +3735,9 @@ label.dp-required.qc-required::after {
 <script src="js/avm-section.js?v=v2149"></script>
 <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte, klickbar = übernehmen -->
 <script src="js/marktwert-abschlag.js?v=v2237d"></script><!-- v2237 · Abschlag auf Angebotspreise -->
-<script src="js/dealpilot-mb.js?v=v2282"></script>
+<script src="js/dealpilot-mb.js?v=v2361"></script>
 <script src="js/mb-auftrag.js?v=v2191"></script>
-  <script src="js/marktbericht-view.js?v=v2273h"></script>
+  <script src="js/marktbericht-view.js?v=v2361"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=W40"></script>
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->

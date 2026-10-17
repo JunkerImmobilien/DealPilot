@@ -376,6 +376,17 @@
         else if (uq.naeherung) html += zeile('Umrechnung Grundstücksgröße', 'DealPilot-Formel', st('b', 'Näherung') + esc(uq.naeherung_text || '') + (uq.hinweis ? ' ' + esc(uq.hinweis) : '') + _ukQ + ' Eigener Ansatz möglich:', knopf('eintragen', 'uk_flaeche'));
         else html += zeile('Umrechnung Grundstücksgröße', '—', st('x', 'kein Wert') + esc(uq.hinweis || 'Für diesen Ort ist kein Umrechnungskoeffizient hinterlegt — der Bodenwert wird nicht an die Grundstücksgröße angepasst.') + _ukQ + ' Eigener Ansatz möglich:', knopf('eintragen', 'uk_flaeche'));
       }
+      /* v2361 · Umrechnung nach der WGFZ (§ 16 Abs. 4 ImmoWertV): nur wo der Ausschuss
+         sie fuer diese Objektart fuehrt. Ob sie greift, entscheidet die Zone (GFZ im
+         Bodenrichtwert) - das sagt erst der Bericht. */
+      var wq = r.wgfz_quelle, wEigen = _v('wgfz_objekt');
+      if (!_istWhg && wq && wq.verfuegbar) {
+        var _wQ = wq.quelle_url ? ' · <a href="' + esc(wq.quelle_url) + '" target="_blank" rel="noopener">Quelle</a>' : '';
+        html += zeile('Umrechnung WGFZ', wEigen ? 'WGFZ ' + esc(wEigen) : 'Tabelle vorhanden',
+          st('a', 'Ausschuss') + esc(String(wq.ausschuss || '').split(',')[0]) + (wq.seite ? ' · ' + esc(wq.seite) : '') + _wQ
+          + (wEigen ? ' Greift, wenn die Bodenrichtwertzone eine GFZ nennt.' : ' Trag die WGFZ des Objekts ein — sonst bleibt der Bodenwert insoweit unangepasst.'),
+          knopf(wEigen ? 'ändern' : 'eintragen', 'wgfz_objekt'));
+      }
       var gq = r.gnd_quelle === 'register' ? st('a', 'Register') : st('b', 'Anlage 1');
       /* ══ v1965 · DIE RESTNUTZUNGSDAUER MIT IHRER HERKUNFT ════════════
 
@@ -1082,7 +1093,7 @@
       el.addEventListener('input', function () { spaeter(function () { zielAnwenden(); stufen(); fehlendeNachziehen(); }, 400); });
       el.addEventListener('change', function () { spaeter(function () { zielAnwenden(); stufen(); fehlendeNachziehen(); }, 150); });
     });
-    ['plz', 'ort', 'objart', 'baujahr', 'einheiten', 'nutzungsart', 'brw', 'brw_stichtag', 'lzs_pct', 'sachwertfaktor', 'brw_manuell', 'uk_flaeche', 'gsfl'].forEach(function (id) {
+    ['plz', 'ort', 'objart', 'baujahr', 'einheiten', 'nutzungsart', 'brw', 'brw_stichtag', 'lzs_pct', 'sachwertfaktor', 'brw_manuell', 'uk_flaeche', 'wgfz_objekt', 'gsfl'].forEach(function (id) {
       var el = $(id); if (!el) return;
       el.addEventListener('change', function () { spaeter(automatik); });
       el.addEventListener('input', function () { spaeter(automatik, 700); });

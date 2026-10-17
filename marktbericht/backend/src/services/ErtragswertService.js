@@ -136,7 +136,7 @@ export const ErtragswertService = {
     const koeff = pos(grund.gfz_koeff);
     if (koeff && koeff !== 1) {
       wert *= koeff;
-      out.schritte.push({ pos: 'GFZ-Umrechnung', detail: `× ${koeff}`, wert: round0(wert) });
+      out.schritte.push({ pos: 'GFZ-Umrechnung', detail: grund.gfz_detail || `× ${koeff}`, wert: round0(wert) });   /* v2361 */
     } else if (grund.brw_gfz && grund.obj_gfz && Number(grund.brw_gfz) !== Number(grund.obj_gfz)) {
       out.hinweise.push(`Die GFZ des Objekts (${grund.obj_gfz}) weicht von der des Richtwertgrundstücks (${grund.brw_gfz}) ab. Ohne Umrechnungskoeffizient aus dem Grundstücksmarktbericht wurde nicht umgerechnet — der Bodenwert ist insoweit ungenau.`);
     }

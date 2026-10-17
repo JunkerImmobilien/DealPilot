@@ -21,6 +21,7 @@ import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einhe
 import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js';
 import { groessenanpassung as ukAusRegister, naeherung as ukNaeherung,
          sperreSchliesstNaeherungAus } from '../lib/umrechnung_flaeche.js';   /* v2280, v2288 */
+import { wgfzAnpassung } from '../lib/umrechnung_wgfz.js';   /* v2361 */
 import { zustaendig as niZoneZustaendig, holeZonen as niZonenHolen, waehleZone as niZoneWaehlen } from '../connectors/boris/ni-zone.js';   /* v2284 */
 /* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
  * zustaendigen Grundstuecksmarktbericht. */
@@ -185,6 +186,9 @@ export const ReportOrchestrator = {
       lzs_pct: input.lzs_pct ? Number(input.lzs_pct) : null,
       /* v2282 · eigener Umrechnungskoeffizient Grundstuecksgroesse */
       uk_flaeche: Number(input.uk_flaeche) > 0 ? Number(input.uk_flaeche) : null,
+      /* v2361 · WGFZ des Objekts (oberirdische Geschossflaeche § 16 Abs. 4 / Grundstueck) */
+      wgfz_objekt: Number(String(input.wgfz_objekt == null ? '' : input.wgfz_objekt).replace(',', '.')) > 0
+        ? Number(String(input.wgfz_objekt).replace(',', '.')) : null,
       brw_anpassung_pct: input.brw_anpassung_pct ? Number(input.brw_anpassung_pct) : null,
       brw_anpassung_grund: input.brw_anpassung_grund || null,
       gfz_koeff: input.gfz_koeff ? Number(input.gfz_koeff) : null,
@@ -916,6 +920,7 @@ export const ReportOrchestrator = {
           bezugsgroesse_qm: _flaeche ? _flaeche.richtwertgrundstueck_qm : null,
           brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
           tabellen_id: _niZone ? _niZone.tabellen_ids : null,   /* v2284: Tabelle der Zone */
+          mfh_uebertragen: true,   /* v2362: oertliche Tabelle vor der bundesweiten Formel */
           ortsteile: (function () {   /* v2283: Gebietsausschluesse innerhalb der AGS */
             const pr = (landValue && landValue.properties_raw) || {};
             const c = (typeof geo !== 'undefined' && geo && geo.components) || {};
@@ -927,6 +932,23 @@ export const ReportOrchestrator = {
           ? 'Koeffizient ' + _ukReg.koeffizient_bauland + ' (' + _ukReg.quelle + ')'
           : _ukReg.grund));
       } catch (e) { _ukReg = null; }
+      /* v2361 · WGFZ-UMRECHNUNG (§ 16 Abs. 4, § 40 ImmoWertV). Fuehrt die Zone eine
+       * GFZ und der Ausschuss eine WGFZ-Tabelle (Bielefeld: Mehrfamilienhaus-
+       * grundstuecke), wird der BRW damit angepasst. Amtlich vor Naeherung: wo
+       * die WGFZ-Umrechnung greift, rechnet die DealPilot-Formel NICHT zusaetzlich
+       * ueber die Flaeche - sonst stuende der Groesseneffekt doppelt im Wert. */
+      let _wgfz = null;
+      try {
+        const _pw = (landValue && landValue.properties_raw) || {};
+        const _gz = parseFloat(String(_pw['Geschossflächenzahl'] || _pw.Geschossflaechenzahl || _pw.WGFZ || _pw.wgfz || '')
+          .replace(',', '.'));
+        _wgfz = wgfzAnpassung({
+          ags: ref.ags || null, objektart: ref.property_subtype || ref.property_type,
+          brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
+          wgfz_zone: _gz > 0 ? _gz : null, wgfz_objekt: ref.wgfz_objekt,
+        });
+        step('uk-wgfz: ' + (_wgfz.verfuegbar ? 'Faktor ' + _wgfz.faktor + ' (' + _wgfz.uk_objekt + '/' + _wgfz.uk_zone + ')' : _wgfz.grund));
+      } catch (e) { _wgfz = null; }
       /* v2288 · DIE DEALPILOT-FORMEL als Stufe unter dem amtlichen Wert -
        * nur wo kein Registersatz greift (und nicht Minden-Luebbecke, das seine
        * Tabelle fest im Code hat) oder wo eine Sperre KEINE andere Regel des
@@ -939,7 +961,7 @@ export const ReportOrchestrator = {
           || (_ukReg.grund === 'sperre' && !sperreSchliesstNaeherungAus(_ukReg.hinweis, _ukReg.sperre_grund))
           /* v2360 · MFH: die amtliche Tabelle gilt nur fuer den IfW - dann die Formel (Uebertragung) */
           || (_ukReg.grund === 'ausserhalb_geltung' && /mfh|mehrfam/i.test(String(ref.property_subtype || ref.property_type || '')));
-        if (!_minden && _frei && !(_ukReg && _ukReg.verfuegbar)) {
+        if (!_minden && _frei && !(_ukReg && _ukReg.verfuegbar) && !(_wgfz && _wgfz.verfuegbar)) {
           const _pr = (landValue && landValue.properties_raw) || {};
           const _n = ukNaeherung({
             objektart: ref.property_subtype || ref.property_type, flaeche_qm: ref.plot_area,
@@ -1025,7 +1047,12 @@ export const ReportOrchestrator = {
          * ueberhaupt angesetzt werden darf. Ohne diese Angabe rechnete eine
          * 50-m2-Wohnung mit 700 m2 Grundstueck. */
         ist_wohnung: /etw|wohnung|whg|apartment/i.test(String(ref.property_type || '')),
-        mea_pct: ref.mea_pct || null, gfz_koeff: ref.gfz_koeff || null,
+        mea_pct: ref.mea_pct || null,
+        /* v2361: eigene Angabe vor der amtlichen WGFZ-Umrechnung */
+        gfz_koeff: ref.gfz_koeff || (_wgfz && _wgfz.verfuegbar ? _wgfz.faktor : null),
+        gfz_detail: !ref.gfz_koeff && _wgfz && _wgfz.verfuegbar
+          ? 'WGFZ ' + String(_wgfz.wgfz_objekt).replace('.', ',') + ' statt ' + String(_wgfz.wgfz_zone).replace('.', ',')
+            + ': × ' + String(_wgfz.uk_objekt).replace('.', ',') + ' / ' + String(_wgfz.uk_zone).replace('.', ',') : null,
         beitrag_abzug_eur: ref.beitrag_abzug_eur || null,
         anpassung_pct: ref.brw_anpassung_pct || null,
         anpassung_grund: ref.brw_anpassung_grund || null,
@@ -1046,6 +1073,12 @@ export const ReportOrchestrator = {
        * Erst hier korrigierbar: `_uk` entsteht nach dem Hinweis. */
       /* v2280 · Tabelle vorhanden, aber nicht anwendbar: das gehoert in den
        * Flaechenhinweis, sonst sieht die volle Flaeche wie Absicht aus. */
+      /* v2361 · die WGFZ-Umrechnung (oder ihr Fehlen) gehoert sichtbar in den Bericht */
+      if (_wgfz && (_wgfz.verfuegbar || ['wgfz_objekt_fehlt', 'ausserhalb_brw', 'ausserhalb_wgfz', 'sperre'].indexOf(_wgfz.grund) >= 0)) {
+        if (_flaeche) _flaeche.wgfz = _wgfz;
+        const _tx = _wgfz.verfuegbar && ref.gfz_koeff ? null : _wgfz.hinweis;
+        if (_flaeche && _tx) _flaeche.hinweis = (_flaeche.hinweis ? _flaeche.hinweis + ' ' : '') + _tx;
+      }
       if (_flaeche && _ukReg && !_ukReg.verfuegbar && _ukReg.nicht_angepasst && _ukReg.hinweis) {
         _flaeche.hinweis = (_flaeche.hinweis ? _flaeche.hinweis + ' ' : '') + _ukReg.hinweis;
         _flaeche.umrechnung_nicht_angewandt = { grund: _ukReg.grund, quelle: _ukReg.quelle,

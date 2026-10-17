@@ -346,7 +346,8 @@ export const ValuationService = {
               const g = ukAusRegister({ ags: ref.ags || null, objektart: ref.property_subtype || ref.property_type,
                 flaeche_qm: plotArea, bezugsgroesse_qm: _bezugBoris, brw_eur_qm: brwSqm,
                 ortsteile: [((landValue && landValue.properties_raw) || {}).Ortsteil,
-                            ((landValue && landValue.properties_raw) || {}).Gemarkungsname].filter(Boolean) });   /* v2283 */
+                            ((landValue && landValue.properties_raw) || {}).Gemarkungsname].filter(Boolean),   /* v2283 */
+                mfh_uebertragen: true });   /* v2362 */
               if (g && g.verfuegbar) _ukV = { koeffizient: g.faktor, quelle: g.quelle, quelle_url: g.quelle_url || null };
               /* v2288 · ohne amtlichen Wert die DealPilot-Formel (nicht bei Minden, nicht
                  wo der Ausschuss eine andere Regel nennt - dann kommt g mit Grund zurueck). */

@@ -1351,7 +1351,15 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
         const _art = UKF.artSchluessel(_ukArt);
         const _frei = !s || ((s.vollstaendig === false || !!s.warum_kein_wert)
           && !UKF.sperreSchliesstNaeherungAus(s.warum_kein_wert, s.sperre_grund))
-          || (_art === 'mfh' && ukQuelle && ukQuelle.verfuegbar && !ukQuelle.anwendbar);   /* v2360 */
+          /* v2362: beim MFH gilt zuerst die oertliche Tabelle (uebertragen), die Formel nur ohne sie */
+          || (_art === 'mfh' && ukQuelle && ukQuelle.verfuegbar && !ukQuelle.anwendbar
+              && !((s.geltungsbereich || {}).objektarten || []).some((a) => ['efh', 'zfh', 'dhh', 'rh'].indexOf(a) >= 0));
+        if (_art === 'mfh' && ukQuelle && ukQuelle.verfuegbar && !ukQuelle.anwendbar && !_frei) {
+          ukQuelle.uebertragen = true;
+          ukQuelle.naeherung = true;
+          ukQuelle.naeherung_text = 'Im Bericht: die Tabelle des Ausschusses, auf das Mehrfamilienhaus übertragen '
+            + '(keine amtliche Angabe für diese Objektart).';
+        }
         const _segment = ['efh', 'zfh', 'dhh', 'rh', 'mfh'].indexOf(_art) >= 0;
         const _minden = String(agsFein).startsWith('05770');
         if (_frei && _segment && !_minden) {
@@ -1380,6 +1388,19 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       gnd_quelle: (p.modellansaetze && (p.modellansaetze.gnd_jahre || p.modellansaetze.gesamtnutzungsdauer_jahre || p.modellansaetze.gnd)) ? 'register' : 'anlage1',
       sachwertfaktor_quelle: swfQuelle,
       uk_flaeche_quelle: ukQuelle,   /* v2282 */
+      /* v2361 · fuehrt der Ausschuss eine WGFZ-Umrechnung fuer diese Objektart? */
+      wgfz_quelle: await (async () => {
+        try {
+          const WG = await import('../lib/umrechnung_wgfz.js');
+          const UKF2 = await import('../lib/umrechnung_flaeche.js');
+          const s = WG.satzFuer(String(agsFein), m.property_subtype || m.property_type);
+          if (!s || s.vollstaendig === false || s.warum_kein_wert) return null;
+          const arten = (s.geltungsbereich || {}).objektarten || [];
+          if (arten.length && arten.indexOf(UKF2.artSchluessel(m.property_subtype || m.property_type)) < 0) return null;
+          return { verfuegbar: true, ausschuss: s.gaa_name || s.ausschuss || null, quelle_url: s.quelle_url || null,
+            seite: s.seite || null, jahrgang: s.jahrgang || s.berichtsjahr || null };
+        } catch (e) { return null; }
+      })(),
       baupreisindex: BAUPREISINDEX_KONSTANTE,
       objektart: m.property_type, ags: String(agsFein)
     });

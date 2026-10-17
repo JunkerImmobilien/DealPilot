@@ -348,6 +348,11 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       { id: 'ukFlaeche', label: 'Umrechnungskoeffizient Grundstücksgröße', typ: 'number', hilfe: 'ukFlaeche',
         platzhalter: 'leer = amtlicher Wert des Ausschusses',
         wenn: function () { return !istWohnung() && Number(wert('plot')) > 0; } },
+      /* v2361 · WGFZ des Objekts - der Bodenrichtwert einer Zone mit GFZ wird damit
+         nach den Koeffizienten des Ausschusses umgerechnet (Mehrfamilienhaus). */
+      { id: 'wgfzObjekt', label: 'WGFZ des Objekts', typ: 'number', hilfe: 'wgfzObjekt',
+        platzhalter: 'z. B. 1,2',
+        wenn: function () { return !istWohnung() && Number(wert('plot')) > 0 && /mfh|mehrfam|gemischt|wgh|wohn.*gesch/i.test(wert('ptype')); } },
       { id: 'brwAnp', label: 'Bodenwert-Anpassung (%)', typ: 'number', hilfe: 'brwAnp' },
       { id: 'brwAnpGrund', label: 'Begr\u00fcndung der Anpassung', typ: 'text',
         pflichtWenn: function () { return !!wert('brwAnp'); } },
@@ -713,7 +718,7 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
      * ueberhaupt wirksam. */
     ['ptype', 'cond', 'units', 'garages', 'outdoor',
      'hinterlandFlaeche', 'garagenBgf',
-     'baustatus', 'mea', 'lzs', 'brwAnp', 'brwAnpGrund', 'sanierungsjahr', 'spMiete', 'brwManuell', 'brwStichtag', 'bgf', 'sachwertfaktor', 'ukFlaeche', 'plot'].forEach(function (id) {
+     'baustatus', 'mea', 'lzs', 'brwAnp', 'brwAnpGrund', 'sanierungsjahr', 'spMiete', 'brwManuell', 'brwStichtag', 'bgf', 'sachwertfaktor', 'ukFlaeche', 'wgfzObjekt', 'plot'].forEach(function (id) {
       var e = $(id);
       if (e && !e._wm) { e._wm = 1; e.addEventListener('change', function () { zeichnen(); ampel(); }); }
     });
@@ -958,6 +963,7 @@ window.MB_FELDHILFE = Object.assign(window.MB_FELDHILFE || {}, {
       bgf: parseFloat(pWert('bgf')) || null,
       sachwertfaktor: parseFloat(pWert('sachwertfaktor')) || null,
       uk_flaeche: parseFloat(String(pWert('ukFlaeche') || '').replace(',', '.')) || null,   /* v2282 */
+      wgfz_objekt: parseFloat(String(pWert('wgfzObjekt') || '').replace(',', '.')) || null,   /* v2361 */
       stellplatz_miete_monat: parseFloat(pWert('spMiete')) || null,
       /* v1055-WFELD-1 · Seit v1047 stehen diese drei im Formular und wurden
        * nie mitgeschickt. app.js sammelt den Block nicht selbst ein, sondern
