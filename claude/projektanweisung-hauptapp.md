@@ -38840,6 +38840,20 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### Entscheidung Marcel 16.10.2026 · Nebenkosten aus den Einstellungen — so bleibt es
+
+- **Regel (wörtlich):** „es ändert sich erst, wenn man die Einstellungen ändert, die alten bleiben so" / „die Objekte können aber so jetzt bleiben, ist nur Demo". Eine dauerhafte automatische Übernahme in BESTEHENDE Objekte hat er ausdrücklich abgelehnt („nein").
+- **Damit gilt:** neue Objekte und leere Felder → aus dem Investmentprofil (`setDefaults`, `applyToNewObject`); bestehende Objekte behalten ihre Werte; Übernahme nur auf Knopfdruck („Nebenkosten aus den Einstellungen übernehmen", v2354, mit Rückgängig). Die einmalige Umstellung der Demo-Objekte des Kontos info@ (Staging 39, Prod 25) bleibt so stehen.
+- **Nicht bauen:** kein „Profilstand", der Bestandsobjekte beim Öffnen nachzieht (am 16.10. angefangen, auf Marcels „nein" verworfen, nichts committet).
+
+### v2355 + v2356 + Prod-Rollout (42) · Liegenschaftszins NRW 2026 · Nachernte Umrechnungskoeffizient (16.10.2026)
+
+- **Was (v2355):** Liegenschaftszins NRW aus Grundstücksmarktdaten NRW Ausgabe 2026 (`lzs.csv`, Berichtsjahr 2025, Stichtag 31.12.2025, dl-de/zero-2-0): 502 Sätze, alle 73 Ausschüsse, neue Datei `lzs-swf-2026-nachernte.json` neben `lzs-nrw.json` (GMD 2025). Umwandler nachgebaut und am Vorjahrgang feldgleich geprüft (493/493); `findeZweig` liefert 502/502 den neuen Satz. Median-Änderung 0,0 Prozentpunkte, 32 neue Zweige. HE/HH/Dresden/Leipzig/NI und NRW-SWF der Großstädte führten 2026 schon; Berlin, Gütersloh-SWF, Offenbach-SWF ohne freien Jahrgang 2026 (keine Sperre — würde den älteren Wert verdrängen).
+- **Was (v2356):** Nachernte UK Fläche: SH-Werte Flensburg, Rendsburg-Eckernförde (5 Richtgrößen, 25-m²-Rundung), Schleswig-Flensburg, Neumünster; BW 33 bisher fehlende Ausschüsse (282 Gemeindesätze) mit genauem Sperrgrund, 10 „nicht untersucht" aufgelöst; BY/West/MV Sperren verfeinert, LK Rostock Stützstelle. DealPilot-Formel: 169 Tabellen aus 13 Ländern, b = −0,213 (Stadt −0,241), typ. Abweichung 1,5 %.
+- **Commit:** `6bd94a4e` (v2355), v2356, Merge `b51af458`.
+- **Nachweis:** Sicherung `mb-20261016-1834` (25 MB, 32 Tab.). `register-saat.mjs` Staging und Prod: Laufzeitregister LZS 3.038, UK 1.363 (Staging 1.366 inkl. 3 Platzhalter). Gegenprobe Prod-Container: HE/TH/Aachen Sperre, Bielefeld 0,59, Leer 0,97. Gold RC=0, `/auth/me` 401.
+- **Rest (Marcel):** Lizenz der SH-Legenden und Kiel/Trier (keine Angabe), Markgräflerland-Breisgau, Lübeck/Lauenburg/Ostholstein (Simon/Kleiber als Modell?), LK Esslingen (60 €), Leipzig/Dresden SWF 2026 nur nach Baujahr bzw. Regression aufgeteilt — übernehmen?
+
 ### Datenkorrektur 16.10.2026 · Nebenkosten aller Objekte des Kontos info@ aus dem Investmentprofil (Staging 39, Prod 25)
 
 - **Was:** Marcel: „ja kannst du machen mit den bestehenden Objekten, das sind nur Demo-Objekte". In allen Objekten des Kontos info@junker-immobilien.io die fünf Erwerbsnebenkosten aus dem Profil gesetzt: Notar 1,7 · Grundbuch 0,5 · Makler 3,57 · Sonstige 1,5 % (Profil, gemessen im Staging-Browser = config.js-Vorgaben; das Profil liegt nur in localStorage `dp_investment_profile`), Grunderwerbsteuer je PLZ über `grest-plz-lookup.js` (NW 6,5 · NI 5 · ST 5 · SN 5,5; ohne PLZ 6,5). Gebäudeanteil NICHT angefasst (amtlicher Wert, kein Profilwert — Ravensberger Weg 38 bleibt 74,82). Euro-Felder und `_kpis_*` rechnet die App beim nächsten Öffnen.
@@ -38932,6 +38946,19 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Commits:** `990e9cf9` (v2280), v2281/a, `97385be3` (v2282), `cc31a14c` (v2283), `732b2b7e` (v2284, NI-Zone), `f3a8b8ae` (v2285), `4e1995d9` (v2285a Landing), `495d0d9c` (v2286 NRW), v2287/a, `e9f960e9` (v2287b).
 - **Nachweis:** `uk-flaeche-pruefen` sauber (206 Sätze, 97 Beispiele), `saat-pruefen --basislinie` grün, Gegenprobe im Staging-Container mit DB-Stand: HE/TH/Aachen keine Zahl, Bielefeld 0,59, Leer 0,97. Bielefeld EFH 1.570 m² → 0,4439 → 313.623 € statt 706.500 €.
 - **Rest:** Prod-Rollout (Code + `register-saat.mjs` auf Prod nach Sicherung). Näherung v2288 einbauen (Ableitung `tools/uk-naeherung-ableiten.mjs`: b Median −0,213 land, −0,25 Stadt; Hamburg amtlich −0,2496). Offene Bewertungsfragen an Marcel: Zwischenwerte ohne Interpolationsregel (Münster, Aachen u. a.), DHH/RH in NI, Bonn „nur für den Dienstgebrauch", Lippe-Bezug, Kauf/Genehmigung Saarbrücken, Bremerhaven, Saarland, Bremen (Zins/Faktor). Hamburg: BORIS-Abruf lieferte an einem Punkt keinen Wert — prüfen. Tiefe und WGFZ als eigene Kennzahlen (viele NRW-Ausschüsse).
+
+### v2370 · landing-videothek-3b · Überblick 1 (Quick Boarding) neu im Reihenrahmen (16.10.2026, Staging)
+
+- **Was:**
+  - REIHE `01` im Studio als „Überblick 1“ (art, nr, hinweis, weiter zu Ü2), dazu der Alias `ue1`.
+  - Im Drehbuch `quickcheck-rundgang` standen „117.086 €“ und „39.000 € unter Marktwert“ als Text. Jetzt werden beide aus der angezeigten Analyse gelesen.
+  - Im Prüflauf gemessen: die App rechnet weiter einen Zielpreis von 117.086 €, der Mitschnitt passt zum Stand.
+  - Neu aufgenommen: 3:42, 8,4 MB. Videothek: Dauer 222 s, Poster neu, Buster `landing-videothek-3b`, MP4 auf Staging (md5 geprüft).
+- **Nicht getan:** MP4 auf Prod. Die Freigabe kam über den Koordinator, nicht von Marcel direkt.
+- **Beobachtet:** Alle 39 Objekte von info@ tragen `updated_at` 16.10. 17:57:58 UTC, alle mit Version +1. Das ist die Sammeländerung „Nebenkosten aus dem Profil“ aus dem Hauptstrang, sie lag vor meiner Aufnahme. Während der Aufnahme blieb die Datenbank gleich.
+  - **Folge:** Videos, die vorher aufgenommen wurden, können andere Nebenkosten zeigen als die App jetzt.
+- **Commit:** `45aa57a8` (v2370), landing-videothek-3b (Commit danach)
+- **Nachweis:** Prüflauf mit Protokoll; Konferenzprüfung, Probe, Bildprüfung, Name/Adresse 0 Treffer; Datenbank vorher/nachher gleich; `fetch` danach echt.
 
 ### v2352–v2353 · landing-videothek-3a · Module 17 und 21 neu aufgenommen (16.10.2026, Staging)
 
