@@ -343,7 +343,7 @@ export const ValuationService = {
             _ukV = { koeffizient: _eigen, quelle: 'eigene Angabe' };
           } else {
             try {
-              const g = ukAusRegister({ ags: ref.ags || null, objektart: ref.property_type,
+              const g = ukAusRegister({ ags: ref.ags || null, objektart: ref.property_subtype || ref.property_type,
                 flaeche_qm: plotArea, bezugsgroesse_qm: _bezugBoris, brw_eur_qm: brwSqm,
                 ortsteile: [((landValue && landValue.properties_raw) || {}).Ortsteil,
                             ((landValue && landValue.properties_raw) || {}).Gemarkungsname].filter(Boolean) });   /* v2283 */
@@ -352,7 +352,7 @@ export const ValuationService = {
                  wo der Ausschuss eine andere Regel nennt - dann kommt g mit Grund zurueck). */
               else if ((!g || g.grund === 'kein_satz') && !String(ref.ags || '').startsWith('05770')) {
                 const _pr = (landValue && landValue.properties_raw) || {};
-                const n = ukNaeherung({ objektart: ref.property_type, flaeche_qm: plotArea, bezugsgroesse_qm: _bezugBoris,
+                const n = ukNaeherung({ objektart: ref.property_subtype || ref.property_type, flaeche_qm: plotArea, bezugsgroesse_qm: _bezugBoris,
                   brw_eur_qm: brwSqm, geschosszahl: _pr.Geschosszahl || _pr.geschosszahl || null });
                 if (n && n.verfuegbar) _ukV = { koeffizient: n.faktor, quelle: 'abgeleitet aus der DealPilot-Formel' };
               }

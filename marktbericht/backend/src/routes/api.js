@@ -1324,9 +1324,10 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
     let ukQuelle = null;
     try {
       const UKF = await import('../lib/umrechnung_flaeche.js');
-      const s = UKF.satzFuer(String(agsFein), m.property_type);
+      const _ukArt = m.property_subtype || m.property_type;   /* v2359 */
+      const s = UKF.satzFuer(String(agsFein), _ukArt);
       if (s) {
-        const g = s.geltungsbereich || {}, art = UKF.artSchluessel(m.property_type);
+        const g = s.geltungsbereich || {}, art = UKF.artSchluessel(_ukArt);
         const sperre = s.vollstaendig === false || !!s.warum_kein_wert;
         const anwendbar = !sperre && !((g.objektarten_ausgeschlossen || []).indexOf(art) >= 0
           || (g.objektarten && art && g.objektarten.indexOf(art) < 0));
@@ -1347,7 +1348,7 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
          Bericht (BORIS) - deshalb „im Bericht, wenn die Zone bis II
          Vollgeschosse hat". */
       try {
-        const _art = UKF.artSchluessel(m.property_type);
+        const _art = UKF.artSchluessel(_ukArt);
         const _frei = !s || ((s.vollstaendig === false || !!s.warum_kein_wert)
           && !UKF.sperreSchliesstNaeherungAus(s.warum_kein_wert, s.sperre_grund));
         const _segment = ['efh', 'zfh', 'dhh', 'rh'].indexOf(_art) >= 0;

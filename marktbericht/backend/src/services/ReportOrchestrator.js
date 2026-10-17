@@ -105,6 +105,9 @@ export const ReportOrchestrator = {
       address: input.address,
       lat, lon,
       property_type: _oa.property_type || null,
+      /* v2359 · genaue Hausart (Mapper) oder der App-Code selbst (EFH/ZFH/DHH/RH) */
+      property_subtype: input.property_subtype
+        || (/^(efh|zfh|dhh|rh)$/i.test(String(input.property_type || '')) ? String(input.property_type).toLowerCase() : null),
       gewerbe_art: gewerbeArt(input.gewerbe_art) || _oa.gewerbe_art || null,
       usage_type: input.usage_type || null,
       living_area: input.living_area ? Number(input.living_area) : null,
@@ -908,7 +911,7 @@ export const ReportOrchestrator = {
       }
       if (!_ukReg) try {
         _ukReg = ukAusRegister({
-          ags: ref.ags || null, objektart: ref.property_type,
+          ags: ref.ags || null, objektart: ref.property_subtype || ref.property_type,
           flaeche_qm: ref.plot_area,
           bezugsgroesse_qm: _flaeche ? _flaeche.richtwertgrundstueck_qm : null,
           brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
@@ -937,7 +940,7 @@ export const ReportOrchestrator = {
         if (!_minden && _frei && !(_ukReg && _ukReg.verfuegbar)) {
           const _pr = (landValue && landValue.properties_raw) || {};
           const _n = ukNaeherung({
-            objektart: ref.property_type, flaeche_qm: ref.plot_area,
+            objektart: ref.property_subtype || ref.property_type, flaeche_qm: ref.plot_area,
             bezugsgroesse_qm: _flaeche ? _flaeche.richtwertgrundstueck_qm : null,
             brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
             geschosszahl: _pr.Geschosszahl || _pr.geschosszahl || _pr.GESCHOSSZAHL || null,
