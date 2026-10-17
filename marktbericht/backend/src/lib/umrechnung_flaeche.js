@@ -385,7 +385,12 @@ export function naeherung({ objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm,
       + (g.verhaeltnis_von || 0.5) + '- bis ' + (g.verhaeltnis_bis || 2.5) + '-fache Bezugsgröße).');
   if (fl === bez) return nein('gleich_bezugsgroesse');
   const b = Number(d.alle.b);
-  const k = r4(Math.pow(r, b));
+  /* v2360 · Zweiter Ast jenseits des 2,5-Fachen: dort fallen die amtlichen Tabellen
+     steiler, die Mehrflaeche wird wie Hinterland bewertet - bis 2,5 x die Potenz,
+     darueber je m2 der Restfaktor c (Median aus den Tabellen, uk-naeherung.json). */
+  const o = d.oberhalb && Number(d.oberhalb.rest_faktor) > 0 && r > Number(d.oberhalb.ab) ? d.oberhalb : null;
+  const k = o ? r4((Math.pow(Number(o.ab), b) * Number(o.ab) + (r - Number(o.ab)) * Number(o.rest_faktor)) / r)
+              : r4(Math.pow(r, b));
   const bwQm = Math.round(brw * k * 100) / 100;
   const de = (x) => String(x).replace('.', ',');
   return {
@@ -397,13 +402,24 @@ export function naeherung({ objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm,
     wert_bauland_eur: Math.round(fl * bwQm), wert_gruen_eur: 0, wert_eur: Math.round(fl * bwQm),
     koeffizient_angewandt: true,
     formel: { b, tabellen: d.alle.tabellen, laender: d.alle.laender, stand: d.stand,
-              abweichung_median_pct: d.alle.abweichung_median_pct, abweichung_p90_pct: d.alle.abweichung_p90_pct },
-    hinweis: 'Für diesen Ort liegt kein amtlicher Umrechnungskoeffizient vor. Der Bodenrichtwert ist deshalb mit einem '
-      + 'Koeffizienten angepasst, der aus der DealPilot-Formel abgeleitet ist: (' + fl + ' / ' + bez + ')^' + de(b)
-      + ' = ' + de(k) + '. Die Formel beruht auf ' + d.alle.tabellen + ' amtlichen Umrechnungstabellen der '
+              abweichung_median_pct: (o || d.alle).abweichung_median_pct, abweichung_p90_pct: (o || d.alle).abweichung_p90_pct,
+              zweiter_ast: o ? { ab: Number(o.ab), rest_faktor: Number(o.rest_faktor), tabellen: o.tabellen } : null },
+    uebertragen: (g.uebertragen_auf || []).indexOf(art) >= 0,
+    hinweis: ((g.uebertragen_auf || []).indexOf(art) >= 0
+      ? 'Für Mehrfamilienhäuser veröffentlicht der Ausschuss hier keinen Umrechnungskoeffizienten. Die DealPilot-Formel '
+        + 'ist aus den Tabellen des individuellen Wohnungsbaus abgeleitet und wird auf das Mehrfamilienhaus übertragen '
+        + '(Bodenrichtwertzone bis zwei Vollgeschosse). '
+      : '')
+      + ((g.uebertragen_auf || []).indexOf(art) >= 0 ? '' : 'Für diesen Ort liegt kein amtlicher Umrechnungskoeffizient vor. ')
+      + 'Der Bodenrichtwert ist deshalb mit einem '
+      + 'Koeffizienten angepasst, der aus der DealPilot-Formel abgeleitet ist: '
+      + (o ? 'bis zum ' + de(o.ab) + '-Fachen der Bezugsgröße (' + de(o.ab) + ')^' + de(b) + ', die Fläche darüber mit dem Restfaktor '
+             + de(o.rest_faktor) + ' (aus ' + o.tabellen + ' Tabellen, die so weit reichen), zusammen ' + de(k)
+           : '(' + fl + ' / ' + bez + ')^' + de(b) + ' = ' + de(k))
+      + '. Die Formel beruht auf ' + d.alle.tabellen + ' amtlichen Umrechnungstabellen der '
       + 'Gutachterausschüsse (' + (d.alle.laender || []).join(', ') + ', Stand ' + d.stand + '); typische Abweichung '
-      + 'vom amtlichen Wert ' + de(Math.round(d.alle.abweichung_median_pct * 10) / 10) + ' %, in 90 % der Fälle unter '
-      + de(Math.round(d.alle.abweichung_p90_pct)) + ' %. Keine amtliche Zahl — liegt dir der Koeffizient des '
+      + 'vom amtlichen Wert ' + de(Math.round((o || d.alle).abweichung_median_pct * 10) / 10) + ' %, in 90 % der Fälle unter '
+      + de(Math.round((o || d.alle).abweichung_p90_pct)) + ' %' + (o ? ' (oberhalb des 2,5-Fachen deutlich unsicherer)' : '') + '. Keine amtliche Zahl — liegt dir der Koeffizient des '
       + 'zuständigen Ausschusses vor, trag ihn unter „Umrechnungskoeffizient Grundstücksgröße" ein.',
   };
 }

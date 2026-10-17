@@ -350,7 +350,8 @@ export const ValuationService = {
               if (g && g.verfuegbar) _ukV = { koeffizient: g.faktor, quelle: g.quelle, quelle_url: g.quelle_url || null };
               /* v2288 · ohne amtlichen Wert die DealPilot-Formel (nicht bei Minden, nicht
                  wo der Ausschuss eine andere Regel nennt - dann kommt g mit Grund zurueck). */
-              else if ((!g || g.grund === 'kein_satz') && !String(ref.ags || '').startsWith('05770')) {
+              else if ((!g || g.grund === 'kein_satz' || (g.grund === 'ausserhalb_geltung' && /mfh|mehrfam/i.test(String(ref.property_type || ''))))
+                       && !String(ref.ags || '').startsWith('05770')) {   /* v2360: MFH -> Formel */
                 const _pr = (landValue && landValue.properties_raw) || {};
                 const n = ukNaeherung({ objektart: ref.property_subtype || ref.property_type, flaeche_qm: plotArea, bezugsgroesse_qm: _bezugBoris,
                   brw_eur_qm: brwSqm, geschosszahl: _pr.Geschosszahl || _pr.geschosszahl || null });

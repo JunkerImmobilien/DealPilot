@@ -936,7 +936,9 @@ export const ReportOrchestrator = {
       try {
         const _minden = String(ref.ags || '').replace(/\D/g, '').startsWith('05770');
         const _frei = !_ukReg || _ukReg.grund === 'kein_satz'
-          || (_ukReg.grund === 'sperre' && !sperreSchliesstNaeherungAus(_ukReg.hinweis, _ukReg.sperre_grund));
+          || (_ukReg.grund === 'sperre' && !sperreSchliesstNaeherungAus(_ukReg.hinweis, _ukReg.sperre_grund))
+          /* v2360 · MFH: die amtliche Tabelle gilt nur fuer den IfW - dann die Formel (Uebertragung) */
+          || (_ukReg.grund === 'ausserhalb_geltung' && /mfh|mehrfam/i.test(String(ref.property_subtype || ref.property_type || '')));
         if (!_minden && _frei && !(_ukReg && _ukReg.verfuegbar)) {
           const _pr = (landValue && landValue.properties_raw) || {};
           const _n = ukNaeherung({
