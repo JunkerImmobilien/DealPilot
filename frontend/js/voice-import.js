@@ -10926,6 +10926,16 @@
       return (a !== null && Math.abs(a - ziel) < 1e-9) || (isFinite(b) && Math.abs(b - ziel) < 1e-9);
     });
   }
+  /* v2364 · steht das Wort v in der Antwort? Kurze Codes (D, B, ETW) als
+     ganzes Wort, laengere ueber ihren Stamm (erste fuenf Buchstaben). */
+  function _rfWortImText(v, txt) {
+    var s = String(txt || '').toLowerCase();
+    if (!s) return true;
+    var w = String(v == null ? '' : v).toLowerCase().trim();
+    if (!w || w === 'true' || w === 'false') return false;
+    if (w.length <= 3) return new RegExp('(^|[^a-zäöüß])' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '($|[^a-zäöüß])').test(s);
+    return s.indexOf(w.slice(0, 5)) >= 0;
+  }
   function _rfUebernehmen(neu, ausSprache, txt) {
     _rfDenkt(false);
     var e = _rf.offen[_rf.i];
@@ -10982,6 +10992,10 @@
          wirklich in der Antwort steht. Fuer die GEFRAGTEN Felder gilt das
          nicht - „nichts zu sanieren" ist dort eine echte 0. */
       if (!gefragt && _rfZahlenfeld(id) && !_rfZahlImText(v, txt)) return;
+      /* Dasselbe fuer Auswahlwerte: auf „Zustand mittel, Energieklasse D"
+         kamen ungefragt Bevoelkerung „stabil", Nachfrage „mittel",
+         Entwicklung „begrenzt" - nichts davon war gesagt. */
+      if (!gefragt && !_rfZahlenfeld(id) && !_rfWortImText(v, txt)) return;
       /* ═══ v2054 · WAS SCHON SO DASTAND, IST KEINE NACHRICHT ════════
 
          GEMESSEN im Pruefläufer: nach jeder Antwort meldete der
