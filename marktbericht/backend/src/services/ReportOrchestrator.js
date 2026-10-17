@@ -920,6 +920,7 @@ export const ReportOrchestrator = {
           bezugsgroesse_qm: _flaeche ? _flaeche.richtwertgrundstueck_qm : null,
           brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
           tabellen_id: _niZone ? _niZone.tabellen_ids : null,   /* v2284: Tabelle der Zone */
+          mfh_uebertragen: true,   /* v2362: oertliche Tabelle vor der bundesweiten Formel */
           ortsteile: (function () {   /* v2283: Gebietsausschluesse innerhalb der AGS */
             const pr = (landValue && landValue.properties_raw) || {};
             const c = (typeof geo !== 'undefined' && geo && geo.components) || {};

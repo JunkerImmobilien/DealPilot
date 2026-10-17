@@ -1351,7 +1351,15 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
         const _art = UKF.artSchluessel(_ukArt);
         const _frei = !s || ((s.vollstaendig === false || !!s.warum_kein_wert)
           && !UKF.sperreSchliesstNaeherungAus(s.warum_kein_wert, s.sperre_grund))
-          || (_art === 'mfh' && ukQuelle && ukQuelle.verfuegbar && !ukQuelle.anwendbar);   /* v2360 */
+          /* v2362: beim MFH gilt zuerst die oertliche Tabelle (uebertragen), die Formel nur ohne sie */
+          || (_art === 'mfh' && ukQuelle && ukQuelle.verfuegbar && !ukQuelle.anwendbar
+              && !((s.geltungsbereich || {}).objektarten || []).some((a) => ['efh', 'zfh', 'dhh', 'rh'].indexOf(a) >= 0));
+        if (_art === 'mfh' && ukQuelle && ukQuelle.verfuegbar && !ukQuelle.anwendbar && !_frei) {
+          ukQuelle.uebertragen = true;
+          ukQuelle.naeherung = true;
+          ukQuelle.naeherung_text = 'Im Bericht: die Tabelle des Ausschusses, auf das Mehrfamilienhaus übertragen '
+            + '(keine amtliche Angabe für diese Objektart).';
+        }
         const _segment = ['efh', 'zfh', 'dhh', 'rh', 'mfh'].indexOf(_art) >= 0;
         const _minden = String(agsFein).startsWith('05770');
         if (_frei && _segment && !_minden) {

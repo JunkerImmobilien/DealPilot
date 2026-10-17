@@ -191,7 +191,8 @@ export function satzFuer(ags, objektart, alle, tabellenIds) {
  * umrechnung_nrw.flaechenaufteilung(), damit ErtragswertService.bodenwert()
  * sie ohne Aenderung liest.
  */
-export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm, saetze, ortsteile, tabellen_id }) {
+export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm, saetze, ortsteile, tabellen_id,
+                                    mfh_uebertragen }) {
   const nichts = (grund, hinweis, extra) => ({ verfuegbar: false, grund, hinweis, ...(extra || {}) });
   const satz = satzFuer(ags, objektart, saetze, tabellen_id);   /* v2284: Tabellen-ID der Zone */
   if (!satz) return nichts('kein_satz');
@@ -231,7 +232,16 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
   const erlaubt = g.objektarten || null;
   const ausgeschlossen = (g.objektarten_ausgeschlossen || []).indexOf(art) >= 0
     || (erlaubt && art && erlaubt.indexOf(art) < 0);
-  if (ausgeschlossen) {
+  /* v2362 · Marcel 17.10.2026: „wenn wir eigene Tabellen haben und es klar ist, die
+     Werte, ansonsten die bundesweite Formel." Ein MFH, das NUR wegen der Objektart
+     aus der Tabelle des Ausschusses faellt (Tabelle des individuellen Wohnungsbaus),
+     bekommt diese oertliche Tabelle UEBERTRAGEN - vor der bundesweiten DealPilot-
+     Formel, weil sie denselben Markt beschreibt. Nie amtlich: Stufe C, im Bericht
+     als Uebertragung benannt, mit dem Wortlaut des Ausschusses dazu. Der Aufrufer
+     schaltet es ein (mfh_uebertragen) - ein Kern liest keine Einstellungen. */
+  const _uebertragen = ausgeschlossen && art === 'mfh' && mfh_uebertragen === true
+    && (g.objektarten || []).some((a) => ['efh', 'zfh', 'dhh', 'rh'].indexOf(a) >= 0);
+  if (ausgeschlossen && !_uebertragen) {
     return nichts('ausserhalb_geltung',
       'Die Umrechnungskoeffizienten des Ausschusses gelten für ' + (g.nutzung || 'den Regelfall')
       + ', nicht für diese Objektart. Der Bodenwert ist deshalb NICHT an die Grundstücksgröße angepasst ('
@@ -301,7 +311,7 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
   const faktor = r4(kFl.k / kBez.k);
   const bwQm = Math.round(brw * faktor * 100) / 100;
   const wertBauland = Math.round(fl * bwQm);
-  return {
+  const _erg = {
     verfuegbar: true,
     bezugsgroesse_qm: bez,
     bauland_qm: fl, gruen_qm: 0,
@@ -316,6 +326,17 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
     hinweis: 'Der Bodenrichtwert wurde mit dem Umrechnungskoeffizienten des Ausschusses an die '
       + 'Grundstücksgröße angepasst: ' + fl + ' m² gegen ' + bez + ' m² Bezugsgröße, Koeffizient '
       + String(kFl.k).replace('.', ',') + ' (' + kFl.weg + '). Quelle: ' + herkunft.quelle_text + '.',
+  };
+  if (!_uebertragen) return _erg;
+  return {
+    ..._erg, uebertragen: true, amtlich: false, stufe: 'C',
+    quelle_art: 'Tabelle des Ausschusses, auf das Mehrfamilienhaus übertragen',
+    hinweis: 'Die Umrechnungskoeffizienten des Ausschusses gelten für den Bereich „' + (g.nutzung || 'individueller Wohnungsbau') + '“'
+      + ', nicht für Mehrfamilienhäuser'
+      + (g.ausserhalb_wortlaut ? ' („' + g.ausserhalb_wortlaut + '“)' : '') + '. Weil er für diesen Markt eine eigene Tabelle '
+      + 'führt, ist sie hier auf das Mehrfamilienhaus übertragen — das ist keine amtliche Angabe für diese Objektart: '
+      + fl + ' m² gegen ' + bez + ' m² Bezugsgröße, Koeffizient ' + String(kFl.k).replace('.', ',') + ' (' + kFl.weg
+      + '). Quelle der Tabelle: ' + herkunft.quelle_text + '.',
   };
 }
 
