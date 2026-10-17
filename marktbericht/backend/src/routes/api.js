@@ -1340,6 +1340,24 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       } else {
         ukQuelle = { verfuegbar: false, anwendbar: false, hinweis: null };
       }
+      /* v2358 · Greift im Bericht die DealPilot-Formel (Stufe D)? Dieselben
+         Bedingungen wie im ReportOrchestrator: kein Registersatz oder eine
+         Sperre ohne andere Regel des Ausschusses, Objektart aus dem
+         abgeleiteten Segment. Die Geschosszahl der Zone kennt erst der
+         Bericht (BORIS) - deshalb „im Bericht, wenn die Zone bis II
+         Vollgeschosse hat". */
+      try {
+        const _art = UKF.artSchluessel(m.property_type);
+        const _frei = !s || ((s.vollstaendig === false || !!s.warum_kein_wert)
+          && !UKF.sperreSchliesstNaeherungAus(s.warum_kein_wert, s.sperre_grund));
+        const _segment = ['efh', 'zfh', 'dhh', 'rh'].indexOf(_art) >= 0;
+        const _minden = String(agsFein).startsWith('05770');
+        if (_frei && _segment && !_minden) {
+          ukQuelle.naeherung = true;
+          ukQuelle.naeherung_text = 'Im Bericht: abgeleitet aus der DealPilot-Formel (Näherung aus den amtlichen '
+            + 'Tabellen der Gutachterausschüsse), wenn die Bodenrichtwertzone bis zwei Vollgeschosse hat.';
+        }
+      } catch (e) { /* nur Auskunft */ }
     } catch (e) { ukQuelle = null; }
     const { BAUPREISINDEX_KONSTANTE } = await import('../services/CrossCheckService.js');
 

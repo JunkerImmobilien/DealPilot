@@ -372,6 +372,8 @@
         var _ukQ = uq.quelle_url ? ' · <a href="' + esc(uq.quelle_url) + '" target="_blank" rel="noopener">Quelle</a>' : '';
         if (ukEigen) html += zeile('Umrechnung Grundstücksgröße', esc(ukEigen), st('b', 'eigener Ansatz') + (uq.verfuegbar ? 'statt des Werts des Ausschusses' : 'eigene Angabe') + _ukQ, knopf('ändern', 'uk_flaeche'));
         else if (uq.verfuegbar && uq.anwendbar) html += zeile('Umrechnung Grundstücksgröße', uq.form_text || 'Tabelle vorhanden', st('a', uq.ebene === 'land' ? 'Landeswert' : 'Ausschuss') + '<span title="' + esc(uq.ausschuss || '') + '">' + esc(String(uq.ausschuss || '').split(',')[0]) + '</span>' + (uq.jahrgang ? ' · ' + esc(uq.jahrgang) : '') + _ukQ + ' — im Bericht aus Fläche und Bezugsgröße des Richtwertgrundstücks', '');
+        /* v2358 · Greift im Bericht die DealPilot-Formel, sagt der Reiter es auch. */
+        else if (uq.naeherung) html += zeile('Umrechnung Grundstücksgröße', 'DealPilot-Formel', st('b', 'Näherung') + esc(uq.naeherung_text || '') + (uq.hinweis ? ' ' + esc(uq.hinweis) : '') + _ukQ + ' Eigener Ansatz möglich:', knopf('eintragen', 'uk_flaeche'));
         else html += zeile('Umrechnung Grundstücksgröße', '—', st('x', 'kein Wert') + esc(uq.hinweis || 'Für diesen Ort ist kein Umrechnungskoeffizient hinterlegt — der Bodenwert wird nicht an die Grundstücksgröße angepasst.') + _ukQ + ' Eigener Ansatz möglich:', knopf('eintragen', 'uk_flaeche'));
       }
       var gq = r.gnd_quelle === 'register' ? st('a', 'Register') : st('b', 'Anlage 1');
