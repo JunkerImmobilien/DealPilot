@@ -461,6 +461,8 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                umrechnungskoeffizient_wgfz, gelesen von lib/umrechnung_wgfz.js.
                                Erster Satz: Stadt Bielefeld (MFH-Grundstuecke, GMB 2026 S. 30-31). */
                             'uk-wgfz-bielefeld-2026.json',
+                            /* v2363: Ernte NRW 17.10.2026 - Bottrop, Duesseldorf, Bonn, Duisburg, Hagen, Muelheim (2), Koeln. */
+                            'uk-wgfz-nw-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

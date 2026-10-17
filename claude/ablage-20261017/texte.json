@@ -1,0 +1,13 @@
+[
+  { "ab": 0.6,   "bis": 9.6,   "text": "Modul zweiundzwanzig: Der Telegram-Bot. Dein Portfolio im Chat — fragen, vergleichen, anlegen." },
+  { "ab": 9.9,   "bis": 23.6,  "text": "Der Bot läuft in Telegram, nicht in der App. Hier zeigen wir ihn nachgestellt — die Antworten sind aber echt, er hat sie aus deinem Portfolio gegeben." },
+  { "ab": 23.9,  "bis": 31.9,  "text": "Du schreibst einfach so, wie du fragen würdest: Welche Objekte habe ich?" },
+  { "ab": 32.2,  "bis": 44.2,  "text": "Neununddreißig Objekte, die stärksten zuerst — mit Kaufpreis, DealScore und Investor-Score. Es sind dieselben Zahlen wie in der App." },
+  { "ab": 44.5,  "bis": 53.6,  "text": "Genauso fragst du ein einzelnes Objekt ab: Wie steht es heute, gemessen am Plan beim Kauf?" },
+  { "ab": 53.9,  "bis": 66.8,  "text": "Der Cashflow nach Steuer dreht von minus sechstausend auf plus siebenhundertfünfundsiebzig Euro. Acht von zehn Kennzahlen sind besser als geplant." },
+  { "ab": 67.1,  "bis": 75.5,  "text": "Ein neues Objekt legst du in einem einzigen Satz an — eine Wohnung, einfach diktiert." },
+  { "ab": 75.8,  "bis": 88.3,  "text": "Der Bot übernimmt, was du gesagt hast, und fragt nur nach dem, was noch fehlt: Baujahr, Kaufpreis, Postleitzahl." },
+  { "ab": 88.6,  "bis": 100.8, "text": "Und in der App? Dasselbe Objekt steht sofort in deinem Portfolio." },
+  { "ab": 101.1, "bis": 113.0, "text": "Musterstraße zwölf in Hannover, fünfundachtzig Quadratmeter. Den Rest ergänzt du in der App — oder im nächsten Satz an den Bot." },
+  { "ab": 113.6, "bis": 125.5, "text": "Funkverkehr mit dem Tower. Jederzeit, von überall." }
+]

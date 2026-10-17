@@ -42,6 +42,28 @@ function zeileBei(wgfz, uk, w) {
   return null;
 }
 
+/* v2363 · Matrix (Faktor je Objekt-WGFZ × Richtwert-WGFZ), bilinear, nur innerhalb
+   eines Teils und nur zwischen vier vorhandenen Zellen. */
+function matrixWert(f, wo, wz) {
+  const um = (achse, x) => {
+    for (let i = 0; i < achse.length; i++) {
+      if (Math.abs(achse[i] - x) < 1e-9) return [i, i, 0];
+      if (i + 1 < achse.length && achse[i] < x && x < achse[i + 1]) return [i, i + 1, (x - achse[i]) / (achse[i + 1] - achse[i])];
+    }
+    return null;
+  };
+  for (const t of f.teile || []) {
+    const a = um(t.objekt || [], wo), b = um(t.norm || [], wz);
+    if (!a || !b) continue;
+    const z = (i, j) => (t.werte[i] || [])[j];
+    const c = [z(a[0], b[0]), z(a[0], b[1]), z(a[1], b[0]), z(a[1], b[1])];
+    if (c.some((x) => x == null)) continue;
+    const o1 = c[0] + (c[1] - c[0]) * b[2], o2 = c[2] + (c[3] - c[2]) * b[2];
+    return o1 + (o2 - o1) * a[2];
+  }
+  return null;
+}
+
 /**
  * Koeffizient einer amtlichen Formel fuer (Bodenrichtwert, WGFZ).
  * → { k, weg } oder { k: null, grund }
@@ -54,6 +76,25 @@ export function koeffizientFuer(formel, brw, w) {
     const g = f.gilt || {};
     if ((g.wgfz_von != null && w < g.wgfz_von) || (g.wgfz_bis != null && w > g.wgfz_bis)) return { k: null, grund: 'ausserhalb_wgfz' };
     return { k: r2(Number(f.faktor || 1) * Math.pow(w, Number(f.exponent))), weg: 'Formel' };
+  }
+  /* v2363 · Verhaeltnisformeln der Ausschuesse (Ernte NRW 17.10.2026). Sie liefern
+     eine Wertzahl f(WGFZ); der Koeffizient ist f(Objekt)/f(Zone). UNGERUNDET -
+     die Dokumente rechnen mit der Funktion, nicht mit gerundeten Tabellenwerten. */
+  if (f.form === 'wgfz_wurzel') {   /* Bottrop: a·√w + b·w + c */
+    return { k: Number(f.a) * Math.sqrt(w) + Number(f.b) * w + Number(f.c), weg: 'Formel', funktion: true };
+  }
+  if (f.form === 'wgfz_polynom') {   /* Duesseldorf: Σ k_i · w^i */
+    const k = (f.koeffizienten || []).reduce((s, c, i) => s + Number(c) * Math.pow(w, i), 0);
+    return { k, weg: 'Formel', funktion: true };
+  }
+  if (f.form === 'wgfz_exp') {   /* Koeln: Wertzahl aus der Tabelle des Dokuments, sonst a·e^(b·w), ab Grenze linear */
+    const t = f.tabelle;
+    if (t && Array.isArray(t.wgfz) && w >= t.wgfz[0] && w <= t.wgfz[t.wgfz.length - 1]) {
+      const k = zeileBei(t.wgfz, t.wz, w);
+      if (k != null) return { k, weg: 'Wertzahl-Tabelle', funktion: true };
+    }
+    if (f.linear_ab != null && w >= Number(f.linear_ab)) return { k: w * Number(f.linear_faktor || 1), weg: 'Formel (linear)', funktion: true };
+    return { k: Number(f.faktor) * Math.exp(Number(f.exponent) * w), weg: 'Formel', funktion: true };
   }
   if (f.form !== 'wgfz_tabelle' || !Array.isArray(f.wgfz) || !Array.isArray(f.zeilen) || !f.zeilen.length) return { k: null, grund: 'keine_tabelle' };
   const zeilen = f.zeilen.slice().sort((a, b) => (a.brw ?? 0) - (b.brw ?? 0));
@@ -98,6 +139,26 @@ export function wgfzAnpassung({ ags, objektart, brw_eur_qm, wgfz_zone, wgfz_obje
       + 'des Objekts ist nicht angegeben — der Bodenwert ist insoweit nicht angepasst und vorläufig. Trag die WGFZ '
       + '(oberirdische Geschossfläche nach § 16 Abs. 4 ImmoWertV geteilt durch die Grundstücksfläche) ein.', { quelle, wgfz_zone: wz });
   if (Math.abs(wz - wo) < 1e-9) return nein('gleich_norm', null, { quelle, wgfz_zone: wz, wgfz_objekt: wo });
+  /* v2363 · Geltung des Ausschusses (WGFZ-Spanne) fuer BEIDE Werte - eine Tabelle,
+     die weiter reicht als der Text erlaubt, gilt nur im Text (Duisburg 0,7–1,7). */
+  const gb = s.geltungsbereich || {};
+  const draussen = [wz, wo].find((x) => (gb.wgfz_von != null && x < gb.wgfz_von - 1e-9) || (gb.wgfz_bis != null && x > gb.wgfz_bis + 1e-9));
+  if (draussen != null) return nein('ausserhalb_wgfz', 'Die Umrechnung des Gutachterausschusses gilt für eine WGFZ von '
+    + de(gb.wgfz_von ?? '–') + ' bis ' + de(gb.wgfz_bis ?? '–') + '; hier ' + de(draussen) + '. Eine Extrapolation ist nicht sachgerecht. '
+    + 'Der Bodenwert ist insoweit nicht angepasst.' + (gb.ausserhalb_wortlaut ? ' Der Ausschuss: ' + gb.ausserhalb_wortlaut : ''),
+    { quelle, wgfz_zone: wz, wgfz_objekt: wo });
+  /* v2363 · Matrix (Muelheim): der Faktor steht direkt fuer das Paar (Objekt, Zone). */
+  if ((s.formel || {}).form === 'wgfz_matrix') {
+    const m = matrixWert(s.formel, wo, wz);
+    if (m == null) return nein('ausserhalb_wgfz', 'Die Umrechnungstabelle des Gutachterausschusses führt für WGFZ '
+      + de(wo) + ' bei einer Richtwert-WGFZ von ' + de(wz) + ' keinen Wert; eine Extrapolation ist nicht sachgerecht.', { quelle, wgfz_zone: wz, wgfz_objekt: wo });
+    const fm = Math.round(m * 10000) / 10000, bw = Math.round(brw * m * 100) / 100;
+    return { verfuegbar: true, amtlich: true, stufe: 'A', wgfz_zone: wz, wgfz_objekt: wo, uk_zone: 1, uk_objekt: fm, faktor: fm,
+      bodenwert_eur_qm: bw, weg: 'Tabelle (Objekt-WGFZ × Richtwert-WGFZ)', quelle,
+      hinweis: 'Umrechnung nach der wertrelevanten Geschossflächenzahl (§ 16 Abs. 4, § 40 ImmoWertV) mit der Tabelle des '
+        + (s.ausschuss || s.gaa_name || 'Gutachterausschusses') + (s.seite ? ' (' + s.seite + ')' : '') + ': Faktor ' + de(fm)
+        + ' für WGFZ ' + de(wo) + ' bei Richtwert-WGFZ ' + de(wz) + (brw > 0 ? ' → ' + de(bw) + ' €/m²' : '') + '.' };
+  }
   const kz = koeffizientFuer(s.formel, brw, wz), ko = koeffizientFuer(s.formel, brw, wo);
   if (kz.k == null || ko.k == null) {
     const g = (kz.k == null ? kz : ko).grund;
@@ -105,16 +166,23 @@ export function wgfzAnpassung({ ags, objektart, brw_eur_qm, wgfz_zone, wgfz_obje
       + (g === 'ausserhalb_brw' ? 'diesen Bodenrichtwert (' + de(brw) + ' €/m²)' : 'die WGFZ ' + de(kz.k == null ? wz : wo))
       + ' nicht ab; eine Extrapolation ist nicht sachgerecht. Der Bodenwert ist insoweit nicht angepasst.', { quelle, wgfz_zone: wz, wgfz_objekt: wo });
   }
-  const faktor = ko.k / kz.k;
+  let faktor = ko.k / kz.k;
+  /* v2363 · Begrenzung des Ausschusses (Bottrop 0,70–1,30, Duesseldorf ±35 %) */
+  const bg = (s.formel || {}).begrenzung || {};
+  let begrenzt = false;
+  if (bg.uk_min != null && faktor < bg.uk_min) { faktor = Number(bg.uk_min); begrenzt = true; }
+  if (bg.uk_max != null && faktor > bg.uk_max) { faktor = Number(bg.uk_max); begrenzt = true; }
   const bwQm = Math.round(brw * faktor * 100) / 100;
+  const fx = (x) => de(ko.funktion ? Math.round(x * 1000) / 1000 : x);
   return {
     verfuegbar: true, amtlich: true, stufe: 'A',
-    wgfz_zone: wz, wgfz_objekt: wo, uk_zone: kz.k, uk_objekt: ko.k, faktor: Math.round(faktor * 10000) / 10000,
+    wgfz_zone: wz, wgfz_objekt: wo, uk_zone: Math.round(kz.k * 10000) / 10000, uk_objekt: Math.round(ko.k * 10000) / 10000,
+    faktor: Math.round(faktor * 10000) / 10000, begrenzt,
     bodenwert_eur_qm: bwQm, weg: ko.weg, quelle,
     hinweis: 'Umrechnung nach der wertrelevanten Geschossflächenzahl (§ 16 Abs. 4, § 40 ImmoWertV) mit den '
-      + 'Umrechnungskoeffizienten des ' + (s.ausschuss || 'Gutachterausschusses') + (s.seite ? ' (' + s.seite + ')' : '') + ': '
-      + de(brw) + ' €/m² × ' + de(ko.k) + ' / ' + de(kz.k) + ' = ' + de(bwQm) + ' €/m² (WGFZ Objekt ' + de(wo)
-      + ', Richtwertgrundstück ' + de(wz) + ').',
+      + 'Umrechnungskoeffizienten des ' + (s.ausschuss || s.gaa_name || 'Gutachterausschusses') + (s.seite ? ' (' + s.seite + ')' : '') + ': '
+      + de(brw) + ' €/m² × ' + fx(ko.k) + ' / ' + fx(kz.k) + (begrenzt ? ' (begrenzt auf ' + de(faktor) + ')' : '')
+      + ' = ' + de(bwQm) + ' €/m² (WGFZ Objekt ' + de(wo) + ', Richtwertgrundstück ' + de(wz) + ').',
   };
 }
 
@@ -122,10 +190,13 @@ export function wgfzAnpassung({ ags, objektart, brw_eur_qm, wgfz_zone, wgfz_obje
 export function pruefeBeispiel(s) {
   const b = s && s.anwendungsbeispiel;
   if (!b) return null;
-  const r = wgfzAnpassung({ ags: s.ags, objektart: ((s.geltungsbereich || {}).objektarten || [])[0] || null, brw_eur_qm: b.brw_eur_qm, wgfz_zone: b.wgfz_norm,
-    wgfz_objekt: b.wgfz_objekt, saetze: [s] });
+  const r = wgfzAnpassung({ ags: s.ags, objektart: ((s.geltungsbereich || {}).objektarten || [])[0] || null,
+    brw_eur_qm: b.brw_eur_qm != null ? b.brw_eur_qm : 100, wgfz_zone: b.wgfz_norm, wgfz_objekt: b.wgfz_objekt, saetze: [s] });
   if (!r.verfuegbar) return { ok: false, grund: r.grund };
-  return { ok: Math.abs(Math.round(r.bodenwert_eur_qm) - Number(b.ergebnis_eur_qm)) <= 1, ist: r.bodenwert_eur_qm, soll: b.ergebnis_eur_qm };
+  /* v2363 · Tabellenwert-Beispiele (kein Rechenbeispiel im Dokument): Faktor gegen uk_soll */
+  if (b.uk_soll != null) return { ok: Math.abs(r.faktor - Number(b.uk_soll)) <= Number(b.toleranz ?? 0.006), ist: r.faktor, soll: b.uk_soll };
+  const tol = Number(b.toleranz ?? 1);
+  return { ok: Math.abs(r.bodenwert_eur_qm - Number(b.ergebnis_eur_qm)) <= Math.max(tol, 1), ist: r.bodenwert_eur_qm, soll: b.ergebnis_eur_qm };
 }
 
 export default { KENNZAHL, koeffizientFuer, satzFuer, wgfzAnpassung, pruefeBeispiel };

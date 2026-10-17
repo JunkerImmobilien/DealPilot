@@ -643,7 +643,7 @@ Kennzahl `umrechnungskoeffizient_flaeche` im Register (`uk-flaeche-*.json`), Ker
   Kern `lib/umrechnung_wgfz.js`: BW = BRW × UK(WGFZ Objekt) / UK(WGFZ Zone), linear interpoliert, nie
   extrapoliert. Greift nur, wenn die Zone eine GFZ führt (BORIS-NRW-Feld `Geschossflächenzahl`) und der
   Nutzer die WGFZ des Objekts einträgt (`wgfz_objekt`, keine Näherung). **Amtlich vor Näherung:** wo sie
-  greift, rechnet die DealPilot-Formel nicht zusätzlich über die Fläche. Erster Satz Bielefeld (MFH).
+  greift, rechnet die DealPilot-Formel nicht zusätzlich über die Fläche. Sätze: Bielefeld + 8 NRW (`uk-wgfz-nw-2026.json`, Formen `wgfz_tabelle`, `wgfz_wurzel`, `wgfz_polynom`, `wgfz_exp`, `wgfz_matrix`).
 - **Eine Sperre trägt KEINE rechenbare `formel`** — `mb.param_modell` kennt kein
   Sperr-Feld; eine Sperre mit Tabelle kam dort als WERT an (v2287b). Vorgemerkte
   Tabellen stehen unter `formel_vorgemerkt`.
