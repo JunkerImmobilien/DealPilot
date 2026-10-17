@@ -2025,6 +2025,7 @@ function _mbBuildObjData() {
     bes_bauteile: val('besBauteile'),
     sachwertfaktor: val('sachwertfaktor'),
     uk_flaeche: val('ukFlaeche'),   /* v2282 */
+    wgfz_objekt: val('wgfzObjekt'),   /* v2361 */
     eq_elevator: (function () {
       var e = document.getElementById('elevator');
       if (!e) return null;

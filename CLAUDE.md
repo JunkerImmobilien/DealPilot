@@ -260,6 +260,7 @@ seine Datei (gegen git, nicht gegen die Dateizeit). RC=0 ist sauber.
 | `saat-pruefen.mjs --basislinie` | Register-Pflichtfelder (Quelle, Stichtag, Seite, Lizenz; SWF: GND + Baupreisindex als Zahl) gegen `tools/saat-basislinie.json`; seit v2287 auch die NOT-NULL-Spalten von `mb.param_modell`: `modellversion`, `quelle_parser`, `modellansaetze` — läuft in `deploy-staging.ps1` mit, der Deckel darf nur sinken |
 | `uk-flaeche-pruefen.mjs` | jeden Umrechnungskoeffizienten (Grundstücksgröße) gegen das amtliche Anwendungsbeispiel mit der echten Funktion; Tabellen 1,00 an der Normgröße, fallend; **Sperre ohne rechenbare Formel** |
 | `uk-naeherung-ableiten.mjs` | leitet die DealPilot-Formel (Näherung) aus allen amtlichen Flächentabellen ab, nach jeder Ernte neu laufen lassen |
+| `uk-wgfz-pruefen.mjs` | jeden Umrechnungskoeffizienten WGFZ (`uk-wgfz-*.json`) gegen sein amtliches Beispiel, 1,00 an der Norm, steigend; Sperre ohne Formel |
 
 **Agents für die Datenpflege** (`.claude/agents/`, seit v2176): `register-ernte`
 (Zins/Sachwertfaktor ins Register, nur Dateien), `nachernte-pdf` (die vom
@@ -638,6 +639,11 @@ Kennzahl `umrechnungskoeffizient_flaeche` im Register (`uk-flaeche-*.json`), Ker
   Doppel-, Reihenhaus, nur Zonen bis II Vollgeschosse (Geschosszahl aus BORIS),
   nie wo der Ausschuss über Tiefe oder WGFZ rechnet. Marcel will dasselbe Prinzip
   später auch für Liegenschaftszins und Sachwertfaktor prüfen.
+- **WGFZ-Umrechnung (§ 16 Abs. 4, § 40 ImmoWertV, seit v2361)** — Kennzahl `umrechnungskoeffizient_wgfz`,
+  Kern `lib/umrechnung_wgfz.js`: BW = BRW × UK(WGFZ Objekt) / UK(WGFZ Zone), linear interpoliert, nie
+  extrapoliert. Greift nur, wenn die Zone eine GFZ führt (BORIS-NRW-Feld `Geschossflächenzahl`) und der
+  Nutzer die WGFZ des Objekts einträgt (`wgfz_objekt`, keine Näherung). **Amtlich vor Näherung:** wo sie
+  greift, rechnet die DealPilot-Formel nicht zusätzlich über die Fläche. Erster Satz Bielefeld (MFH).
 - **Eine Sperre trägt KEINE rechenbare `formel`** — `mb.param_modell` kennt kein
   Sperr-Feld; eine Sperre mit Tabelle kam dort als WERT an (v2287b). Vorgemerkte
   Tabellen stehen unter `formel_vorgemerkt`.

@@ -479,6 +479,7 @@
     ['aussenanlagen_pct', 'aussenPct'], ['aussenanlagen', 'aussenanlagen'],
     ['bes_bauteile', 'besBauteile'], ['sachwertfaktor', 'sachwertfaktor'],
     ['uk_flaeche', 'ukFlaeche'],   /* v2282 */
+    ['wgfz_objekt', 'wgfzObjekt'],   /* v2361 */
     ['ausst_aussenwaende', 'ausstAussenwaende'], ['ausst_dach', 'ausstDach'],
     ['ausst_fenster', 'ausstFenster'], ['ausst_innenwaende', 'ausstInnenwaende'],
     ['ausst_decken', 'ausstDecken'], ['ausst_fussboeden', 'ausstFussboeden'],

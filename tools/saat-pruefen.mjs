@@ -24,7 +24,7 @@ const KENNZAHLEN = new Set(['liegenschaftszinssatz', 'sachwertfaktor', 'vergleic
   'erbbaurechtskoeffizient', 'erbbauzinssatz', 'bodenpreisindex', 'bodenpreisniveau',
   'durchschnittspreis', 'preisentwicklung', 'rohertragsfaktor',
   /* v2279: Umrechnungskoeffizient Grundstuecksgroesse (§ 19 ImmoWertV) */
-  'umrechnungskoeffizient_flaeche']);
+  'umrechnungskoeffizient_flaeche', 'umrechnungskoeffizient_wgfz']);   /* v2361 */
 
 /* ══ v1975 · DIE EINHEIT IST DIE VERWECHSLUNGSPROBE ════════════════════
 

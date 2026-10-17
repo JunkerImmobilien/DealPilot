@@ -457,6 +457,10 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                LK Fulda, Wiesbaden, Trier, Kiel (Tabellen), Suedhessen amtlich „kein Einfluss“, Buedingen/Korbach/Giessen
                                mit der von ihnen beschlossenen Landestabelle (Stufe C); Sperren mit Weg, WWT und RV Saarbruecken als Stuetzstelle. */
                             'uk-flaeche-west-2026.json',
+                            /* v2361: Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4 ImmoWertV), Kennzahl
+                               umrechnungskoeffizient_wgfz, gelesen von lib/umrechnung_wgfz.js.
+                               Erster Satz: Stadt Bielefeld (MFH-Grundstuecke, GMB 2026 S. 30-31). */
+                            'uk-wgfz-bielefeld-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
