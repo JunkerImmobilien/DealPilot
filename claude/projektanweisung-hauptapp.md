@@ -38840,6 +38840,13 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### Prod-Rollout (43) · Überblick 1 „Quick Boarding" neu im Reihenrahmen (17.10.2026)
+
+- **Was:** Marcel fragte nach „Modul 01". In der Videothek lag noch die Studio-Aufnahme vom 14.10. (ohne Reihen-Intro/-Abspann, vor 1920×1080 und vor den Änderungen ab 15.10.). Neu gebaut und aufgenommen (v2370, Agent; 222 s), Videothek-Eintrag und Poster (`landing-videothek-3b`). Der Agent brach am 16.10. abends am Ausgabenlimit ab — Aufnahme, Staging-Kopie und Commits waren fertig, nur die Prod-Kopie fehlte.
+- **Commit:** `45aa57a8` (v2370), `aa7e4406`, Journal `80725449`, Merge `15b5189a`.
+- **Nachweis:** md5 lokal = Staging = Prod (40a34818…), Abruf 206 video/mp4, videos.json Dauer 222, `/auth/me` 401.
+- **Rest:** keiner. Videoreihe vollständig (Ü1, Ü2, 02–10c, 11–24).
+
 ### Entscheidung Marcel 16.10.2026 · Nebenkosten aus den Einstellungen — so bleibt es
 
 - **Regel (wörtlich):** „es ändert sich erst, wenn man die Einstellungen ändert, die alten bleiben so" / „die Objekte können aber so jetzt bleiben, ist nur Demo". Eine dauerhafte automatische Übernahme in BESTEHENDE Objekte hat er ausdrücklich abgelehnt („nein").

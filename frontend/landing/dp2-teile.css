@@ -311,6 +311,10 @@
 @media(max-width:1080px){
   .tband-in,.vier{grid-template-columns:repeat(2,1fr)}
   .tband-siegel{grid-column:1 / -1;border-right:0}  /* v1873: fuenfter Eintrag allein in der letzten Zeile */
+  /* landing-tband-1 · Marcel 17.10.2026: „auf der Handy-Version ist Server in Deutschland mit dem Logo
+     versetzt". Gemessen bei 390 px: Symbol bei 26 px, die anderen bei 50 px - padding-left:0 des
+     ersten Eintrags gilt nur fuer die Desktop-Zeile, im Raster ab 1080 px fluchten alle gleich. */
+  .tband-in > div:first-child{padding-left:24px}
   .bpslide .bp{flex:0 0 calc(50% - 8px)}
 }
 @media(max-width:700px){
