@@ -136,7 +136,18 @@
     k.style.width = (r.width + pad * 2) + 'px'; k.style.height = (r.height + pad * 2) + 'px';
     k.classList.add('an');
   }
+  /* v2371 · Zeitmarken je Zeile (Marcel 17.10.2026: ein Sprecher soll später
+     genau auf die Untertitel gelegt werden). window.DPM_ZEILEN =
+     [{t_ms ab Beginn der ersten Szene, t_abs (Date.now), szene, kick, text}],
+     dazu DPM_ZEILEN_META {drehbuch, start_abs, ende_ms, tempo, studio}.
+     Text ohne HTML, so wie er im Bild steht. */
+  var _zt0 = 0;
+  function nurText(h) { var d = document.createElement('div'); d.innerHTML = String(h == null ? '' : h); return d.textContent.replace(/\s+/g, ' ').trim(); }
+  function zeileMerken(kick, text, i) {
+    try { var j = Date.now(); (window.DPM_ZEILEN = window.DPM_ZEILEN || []).push({ t_ms: _zt0 ? j - _zt0 : null, t_abs: j, szene: i + 1, kick: nurText(kick), text: nurText(text) }); } catch (e) {}
+  }
   function zeile(kick, text, i, n) {
+    zeileMerken(kick, text, i);
     if (STUDIO) { anStudio({ type: 'kapitel', kick: (_aktiv && _aktiv.titel) || 'DealPilot', titel: kick, text: text, i: i, n: n }); return; }
     var z = el('dpm-zeile');
     z.innerHTML = '<div class="k">' + kick + '</div><div class="t">' + text + '</div><div class="p">'
@@ -1427,6 +1438,14 @@
     if (/\/ai\/transcribe-chunk/.test(u)) { _rh.spr = Math.min(_rh.sprMax || D.sprache.text.length, (_rh.spr || 0) + 1); return rhJ({ text: D.sprache.text.slice(0, _rh.spr).join(' ') }); }
     if (/\/ai\/voice-quickmatch/.test(u)) { var ids = []; for (var i = 0; i < (_rh.spr || 0); i++) ids = ids.concat(D.sprache.ids[i] || []); return rhJ({ ids: ids }); }
     if (/\/ai\/extract-voice/.test(u)) return rhJ({ transcript: D.sprache.text.join(' '), fields: D.sprache.felder, unsicher: D.sprache.unsicher, kosten: null });
+    /* v2371 · Modul 25: jede getippte Antwort der geführten Eingabe, einmal echt ausgelesen
+       (D.gefuehrt25, Schlüssel = Antworttext). Im Mitschnitt-Lauf (?mitschnitt=25) geht der
+       Abruf echt hinaus und wird in DPM_REIHE.mitschnitt notiert - siehe rhSpion. */
+    if (/\/ai\/extract-text/.test(u) && body && _rh.mitschnitt) return null;
+    if (/\/ai\/extract-text/.test(u) && body && D.gefuehrt25 && _rh.gef25 && D.gefuehrt25[String(body.text || '').trim()]) {
+      var g25 = String(body.text || '').trim();
+      return rhJ({ transcript: g25, fields: JSON.parse(JSON.stringify(D.gefuehrt25[g25])), unsicher: [], kosten: null, modus: 'antwort' });
+    }
     if (/\/ai\/extract-text/.test(u) && body && String(body.text || '').trim() === D.gefuehrt.text) return rhJ({ transcript: D.gefuehrt.text, fields: D.gefuehrt.felder, unsicher: [], kosten: null, modus: 'antwort' });
     if (m === 'POST' && /\/marktbericht\/reports\/generate-stream/.test(u)) return rhStrom(body && body.wert_stufe >= 2 ? Number(body.wert_stufe) : 1);
     if (m === 'GET' && /\/marktbericht\/objects\/history\?/.test(u)) {
@@ -1462,6 +1481,15 @@
         if (m !== 'GET') DPM_REIHE.abrufe.push(m + ' ' + pfad);
         var a = rhAntwort(kurz, m, opt);
         if (a) { DPM_REIHE.gespielt.push(m + ' ' + pfad); return Promise.resolve(a); }
+        /* v2371 · Mitschnitt-Lauf Modul 25: NUR die Auslese der Antworten geht echt hinaus */
+        if (_rh.mitschnitt && m === 'POST' && /\/ai\/extract-text$/.test(pfad)) {
+          var mt = ''; try { mt = String(JSON.parse(opt.body).text || '').trim(); } catch (e) {}
+          var pm = echt.apply(this, arguments);
+          pm.then(function (r) { return r.clone().json(); }).then(function (j) {
+            (DPM_REIHE.mitschnitt = DPM_REIHE.mitschnitt || {})[mt] = (j && j.fields) || {};
+          }).catch(function () {});
+          return pm;
+        }
       }
       if (m !== 'GET' && RH_SPERRE.test(kurz) && ((lauf && _rh) || Date.now() < _rhNachlauf)) {
         DPM_REIHE.gesperrt.push(m + ' ' + pfad);
@@ -1485,7 +1513,8 @@
       if (!lauf) return _rhGum.apply(navigator.mediaDevices, arguments);
       try {
         var ac = new (window.AudioContext || window.webkitAudioContext)(), dst = ac.createMediaStreamDestination();
-        var osc = ac.createOscillator(), g = ac.createGain(); g.gain.value = 0.02; osc.connect(g); g.connect(dst); osc.start();
+        /* v2371 · Modul 25 tippt: ein stummer Strom (Freisprechen ist dort aus, der Ton haette sonst eine Sprechpause ausgeloest) */
+        var osc = ac.createOscillator(), g = ac.createGain(); g.gain.value = (_rh && _rh.stumm) ? 0 : 0.02; osc.connect(g); g.connect(dst); osc.start();
         _rhToene.push(ac); return Promise.resolve(dst.stream);
       } catch (e) { return Promise.reject(e); }
     };
@@ -4775,6 +4804,246 @@
     ]
   };
 
+  /* ═══ MODUL 25 · DIE GEFÜHRTE EINGABE (v2371) ═══════════════════════════
+     Marcel 17.10.2026: ein eigenes Video zur geführten Eingabe, Kategorie
+     Erweitert. Neues Objekt -> Datenaufnahme -> Kachel „Geführte Eingabe" ->
+     Frage für Frage getippt -> Zwischenstände Deal Score und Investor Deal
+     Score 2.0 -> Übersicht -> Objekt mit Score. Dieselbe Wohnung wie die
+     Module 02-05 (Sachsenstraße 18, 32052 Herford, ETW 100 m², Bj 1998,
+     180.000 €).
+     KEIN ABRUF JE DURCHGANG: die Auslese jeder Antwort (/ai/extract-text)
+     ist EINMAL echt erzeugt (?messe=reihe-gefuehrt&mitschnitt=25, Ergebnis in
+     DPM_REIHE.mitschnitt) und liegt in DPM_REIHE_DATEN.gefuehrt25; alles
+     andere unter /ai/ und der Marktbericht sperrt RH_SPERRE. Eingabetiefe
+     für den Lauf auf 1 - sonst hängt die Wertermittlung (Stufe 3) hinten an;
+     rhAufraeumen stellt sie zurück. Freisprechen aus (hier wird getippt), das
+     Mikrofon ist ohnehin ein stummer Strom. Das angelegte Objekt löscht
+     rhAufraeumen, wie in 03-05. Jeder Antwortschritt steht in DPM_REIHE.r25. */
+  var R25 = {
+    adresse: 'Sachsenstraße 18, 32052 Herford',
+    art: 'Eigentumswohnung, 100 Quadratmeter',
+    details: '3 Zimmer, 4 Vollgeschosse',
+    bjkp: 'Baujahr 1998, Kaufpreis 180.000 Euro',
+    miete: '750 Euro kalt im Monat',
+    fin: '40.000 Euro Eigenkapital, 3,8 Prozent Zins, 2 Prozent Tilgung, 10 Jahre fest',
+    einst: 'Übernimm die Werte aus den Einstellungen',
+    klasse: 'B-Lage',
+    lage: 'Region durchschnittlich, Straße gut',
+    zustand: 'Guter Zustand, Energieklasse C',
+    san: 'Keine Sanierung, die Einbauküche für 3.000 Euro',
+    grund: '1.200 Quadratmeter, Miteigentumsanteil 12 Prozent, kein Erbbaurecht',
+    hausgeld: '250 Euro im Monat, davon 100 nicht umlagefähig',
+    ausfall: 'Niedrig',
+    ort: 'Bevölkerung stabil, Nachfrage mittel, Wertsteigerung mittel, Entwicklung begrenzt',
+    weissNicht: 'Weiß ich nicht',
+    sicht: 'Ruhige Wohnlage nah am Zentrum, Risiko ist die Heizung von 1998'
+  };
+  function r25Frage() { var e = q('#oabi-ov .vi-rf-frage-txt'); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; }
+  function r25Bereich() { return b2oHuelle(q('#vi-rf-frage'), q('#oabi-ov .vi-rf-zeile')); }
+  function r25Uebersicht() { return [].filter.call(document.querySelectorAll('#oabi-ov button'), function (x) { return x.offsetWidth && /Zur Übersicht/.test(x.textContent); })[0] || null; }
+  function r25Karte(re) {
+    var k = [].filter.call(document.querySelectorAll('#vi-rf-chat .vi-rf-blase'), function (b) { return b.querySelector('.vi-sc') && re.test(b.textContent); });
+    return k[k.length - 1] || null;
+  }
+  function r25Score(b) {
+    var n = b && b.querySelector('.vi-sc-zahl-n'), p = b && b.querySelector('.vi-sc-pille');
+    var z = n ? parseInt(n.getAttribute('data-ziel'), 10) : NaN;
+    return isFinite(z) ? { n: z, wort: p ? p.textContent.trim() : '' } : null;
+  }
+  function r25StandZeile(re) {
+    var s = q('#vi-rf-stand'); if (!s) return null;
+    var e = [].filter.call(s.querySelectorAll('*'), function (x) { return x.offsetWidth && x.children.length >= 2 && re.test(x.textContent) && x.textContent.length < 90; });
+    e.sort(function (a, b) { return a.textContent.length - b.textContent.length; });
+    return e[0] || null;
+  }
+  /* eine Antwort tippen, abschicken und warten, bis die NÄCHSTE Frage steht
+     (Messhinweis: nach Adresse, Basis und Lage kommen Zwischenstände -
+     erst weiter, wenn sich die Frage wirklich geändert hat) */
+  async function r25Antwort(text, bisUebersicht) {
+    var f0 = r25Frage(), inp = q('#vi-rf-in'), t0 = Date.now();
+    if (!inp) { DPM_REIHE.r25 = (DPM_REIHE.r25 || []).concat([{ antwort: text, fehler: 'kein Eingabefeld' }]); return false; }
+    inp.value = ''; inp.dispatchEvent(new Event('input', { bubbles: true }));
+    for (var i = 0; i < text.length; i++) { inp.value = text.slice(0, i + 1); inp.dispatchEvent(new Event('input', { bubbles: true })); await warte(55); }
+    await warte(450);
+    var ok = q('#vi-rf-ok'); if (ok) ok.click();
+    await warte(500);
+    var weiter = await warteAuf(function () {
+      if (bisUebersicht) return r25Uebersicht();
+      var f = r25Frage(), e = q('#vi-rf-in');
+      return f && f !== f0 && e && !e.disabled;
+    }, 20000);
+    DPM_REIHE.r25 = (DPM_REIHE.r25 || []).concat([{ antwort: text, vorher: f0.slice(0, 60), nachher: (bisUebersicht ? 'Übersicht' : r25Frage().slice(0, 60)), ok: !!weiter, ms: Date.now() - t0 }]);
+    await warte(650);
+    return !!weiter;
+  }
+  /* mehrere Antworten am Stück, der Kegel auf Frage, Verlauf und Eingabe */
+  async function r25Reihe(liste) { for (var i = 0; i < liste.length; i++) { await zeige(r25Bereich, 6); await r25Antwort(liste[i]); } }
+  DREHBUECHER['reihe-gefuehrt'] = {
+    titel: 'Die geführte Eingabe', unterzeile: 'Frage für Frage zum fertigen Objekt — mit Zwischenständen', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: rhAufraeumen,
+    szenen: [
+      async function (s) {   /* 1 · neues Objekt, die Kachel */
+        await rhStart(0);
+        _rh.gef25 = 1; _rh.stumm = 1;
+        try { _rh.mitschnitt = new URLSearchParams(location.search).get('mitschnitt') === '25'; } catch (e) {}
+        try { DealPilotObjektReiter.zielSetzen(1); } catch (e) {}
+        await zeige(function () { return q('#oab-bar'); }, 8);
+        await b2oZeile(s, 'Ein neues Objekt', 'Leer angelegt. Oben im Reiter Objekt die Datenaufnahme — einer der Wege ist die <b>' + rhNameKachel('gefuehrt') + '</b>.');
+        rhNur(['gefuehrt']);
+        await zeige(function () { return b2oHuelle(rhKachel('gefuehrt')(), q('#oab-run')); }, 8);
+        await b2oZeile(s, 'Anhaken, Abrufen', 'Kachel anhaken, <b>Abrufen</b> — der Co-Pilot übernimmt das Fragen.');
+      },
+      async function (s) {   /* 2 · der Fahrplan */
+        var r = q('#oab-run'); if (r) r.click();
+        await warteAuf(function () { return q('#oabi-ov #vi-rf-in'); }, 6000);
+        kegelHoch(true);
+        /* hier wird getippt: Freisprechen aus (der Schalter ist versteckt, gelesen wird er weiter) */
+        var fs = q('#vi-rf-fs'); if (fs && fs.checked) { fs.checked = false; fs.dispatchEvent(new Event('change', { bubbles: true })); }
+        await warte(900);
+        var b1 = rhIm('#vi-rf-chat', /\d+\s*Fragen in\s*\d+\s*Etappen/), t1 = b1 ? b1.textContent : '';
+        var m = /(\d+)\s*Fragen in\s*(\d+)\s*Etappen:?\s*([^.]+)\./.exec(t1);
+        await zeige(function () { var e = rhIm('#vi-rf-chat', /Fragen in\s*\d+\s*Etappen/); return e && e.closest('.vi-rf-blase'); }, 8);
+        await b2oZeile(s, 'Der Fahrplan', m ? '<b>' + m[1] + ' Fragen in ' + m[2] + ' Etappen</b>: ' + m[3].trim() + '.' : 'Frage für Frage, in Etappen.');
+        await zeige(function () { return q('#vi-rf-stand'); }, 6);
+        await b2oZeile(s, 'Was schon steht', 'Rechts die Liste — sie füllt sich mit jeder Antwort. Sprechen geht genauso, hier wird getippt.');
+      },
+      async function (s) {   /* 3 · Adresse */
+        await zeige(r25Bereich, 6);
+        var zb = r6Beginn(s, 'Frage 1 · Adresse', 'Straße, Hausnummer, PLZ und Ort — in einem Satz.');
+        await r25Antwort(R25.adresse);
+        await r6Ende(zb);
+        var bl = function () { var e = rhIm('#vi-rf-chat', /Ich habe verstanden/); return e && e.closest('.vi-rf-blase'); };
+        await zeige(bl, 8);
+        var bt = (bl() || {}).textContent || '', gr = /([A-ZÄÖÜ][\wäöüß-]+)\s*·\s*Grunderwerbsteuer\s*([\d,]+\s*%)/.exec(bt);
+        await b2oZeile(s, 'Frage 1 · Adresse', 'DealPilot wiederholt, was es verstanden hat' + (gr ? ' — und kennt schon das Land: <b>' + gr[1] + ', Grunderwerbsteuer ' + gr[2] + '</b>' : '') + '. Ein „ja", und weiter.');
+        await zeige(r25Bereich, 6);
+        await r25Antwort('ja');
+      },
+      async function (s) {   /* 4 · Art, Größe, Details */
+        await zeige(r25Bereich, 6);
+        var zb = r6Beginn(s, 'Objekt und Größe', 'Art und Wohnfläche …');
+        await r25Antwort(R25.art);
+        await r6Ende(zb);
+        var f = r25Frage();
+        await zeige(function () { return q('#vi-rf-frage'); }, 8);
+        await b2oZeile(s, 'Die Art bestimmt die Fragen', 'Eine Eigentumswohnung — also fragt DealPilot nach: <b>' + f.replace(/^Und noch zum Objekt:\s*/, '') + '</b>');
+        await r25Reihe([R25.details, R25.bjkp]);
+      },
+      async function (s) {   /* 5 · Miete -> Deal Score */
+        await zeige(r25Bereich, 6);
+        var zb = r6Beginn(s, 'Die Miete', 'Kaltmiete und Zusatzeinnahmen im Monat …');
+        await r25Antwort(R25.miete);
+        await r6Ende(zb);
+        var k = function () { return r25Karte(/Deal Score\s*·\s*Zwischenstand/i); };
+        await warteAuf(k, 4000);
+        await warte(1200);
+        await zeige(k, 6);
+        var sc = r25Score(k()), kt = (k() || {}).textContent || '', cf = /Cashflow\s*([−\-+]?[\d.]+\s*€\/Mon)/.exec(kt);
+        await b2oZeile(s, 'Erster Zwischenstand', 'Nach der Basis schon der <b>Deal Score' + (sc ? ': ' + sc.n + ' · ' + sc.wort : '') + '</b>' + (cf ? ', Cashflow ' + cf[1].replace(/\s+/g, ' ') : '') + '. Was noch fehlt, schätzt DealPilot — und sagt dazu, was.', 1500);
+      },
+      async function (s) {   /* 6 · Geld */
+        await zeige(r25Bereich, 6);
+        var zb = r6Beginn(s, 'Etappe 2 · Geld', 'Eigenkapital, Zins, Tilgung, Zinsbindung — in einem Satz.');
+        await r25Antwort(R25.fin);
+        await r6Ende(zb);
+        var h = function () { var e = rhIm('#vi-rf-frage', /Aus deinen Einstellungen/); return e || q('#vi-rf-frage'); };
+        await zeige(h, 8);
+        var ht = (rhIm('#vi-rf-frage', /Aus deinen Einstellungen/) || {}).textContent || '', z = /zusammen\s*([\d.]+\s*€)\s*\(([\d,]+\s*%)\)/.exec(ht);
+        await b2oZeile(s, 'Aus deinen Einstellungen', 'Was du hinterlegt hast, schlägt DealPilot vor — die Kaufnebenkosten' + (z ? ', zusammen <b>' + z[1] + ' (' + z[2] + ')</b>' : '') + '. Ein Satz übernimmt sie.');
+        await zeige(r25Bereich, 6);
+        await r25Antwort(R25.einst);
+      },
+      async function (s) {   /* 7 · Lage & Zustand */
+        await zeige(r25Bereich, 6);
+        var zb = r6Beginn(s, 'Etappe 3 · Lage & Zustand', 'Lageklasse, Lage, Zustand, Sanierung, Grundstück — Auswahlfragen gehen auch per Klick.');
+        await r25Antwort(R25.klasse);
+        await r25Antwort(R25.lage);
+        await r6Ende(zb);
+        await r25Reihe([R25.zustand, R25.san]);
+        await zeige(r25Bereich, 6);
+        await r25Antwort(R25.grund);
+      },
+      async function (s) {   /* 8 · Investor Deal Score 2.0 */
+        var k = function () { return r25Karte(/Investor Deal Score 2\.0/i); };
+        await warteAuf(k, 4000);
+        await warte(1200);
+        await zeige(k, 6);
+        var sc = r25Score(k());
+        await b2oZeile(s, 'Investor Deal Score 2.0', 'Mit Lage und Zustand wird aus der Rechnung eine Einschätzung' + (sc ? ': <b>' + sc.n + ' · ' + sc.wort + '</b>' : '') + ' — derselbe Score wie in der Pilot-Analyse.');
+        var hb = function () { var c = k(), e = c && rhIm(c, /Was den Score hebt/i); return e && (e.parentElement || e); };
+        var he = hb(), ht = he ? he.textContent.replace(/\s+/g, ' ') : '', h1 = /([+]\d+)\s*([^()]+\([^)]+\))/.exec(ht);
+        await zeige(hb, 6);
+        await b2oZeile(s, 'Was den Score hebt', 'Dazu die Hebel' + (h1 ? ' — der erste: <b>' + h1[2].trim() + '</b>, ' + h1[1] + ' Punkte' : '') + '.');
+      },
+      async function (s) {   /* 9 · Feinschliff */
+        await zeige(r25Bereich, 6);
+        var zb = r6Beginn(s, 'Etappe 4 · Feinschliff', 'Das Hausgeld — so, wie man es kennt: im Monat.');
+        await r25Antwort(R25.hausgeld);
+        await r6Ende(zb);
+        var hz = function () { return r25StandZeile(/^\s*✓?\s*Hausgeld/); };
+        await zeige(function () { return hz() || q('#vi-rf-stand'); }, 8);
+        var hw = hz(), hv = hw ? hw.textContent.replace(/\s+/g, ' ').replace(/^\s*✓?\s*Hausgeld\s*/, '').trim() : '';
+        await b2oZeile(s, 'Aufs Jahr gerechnet', '250 € im Monat, davon 100 € nicht umlagefähig — in der Liste steht das Jahr' + (hv ? ': <b>' + hv + '</b>' : '') + ', umlagefähig und eigener Teil.');
+        await r25Reihe([R25.einst, R25.ausfall, R25.ort]);
+        await zeige(r25Bereich, 6);
+        var zb2 = r6Beginn(s, 'Überspringen', '„Weiß ich nicht" — und es geht weiter. Erfunden wird nichts.');
+        await r25Antwort(R25.weissNicht);
+        await r6Ende(zb2);
+        await r25Reihe([R25.einst]);
+      },
+      async function (s) {   /* 10 · deine Sicht, Ende der Fragen */
+        await zeige(r25Bereich, 6);
+        var zb = r6Beginn(s, 'Etappe 5 · Deine Sicht', 'Warum dieses Objekt, was könnte schiefgehen — in deinen Worten.');
+        await r25Antwort(R25.sicht, true);
+        await r6Ende(zb);
+        await zeige(function () { return q('#vi-rf-stand'); }, 6);
+        var kopf = (q('#vi-rf-stand .vi-rf-stand-kopf') || {}).textContent || '', n = /(\d+)\s*\/\s*(\d+)/.exec(kopf);
+        await b2oZeile(s, 'Alle Fragen durch', (n ? '<b>' + n[1] + ' von ' + n[2] + '</b> Angaben stehen' : 'Die Liste steht') + ' — abgehakt, was gesagt ist; übersprungen bleibt offen.');
+      },
+      async function (s) {   /* 11 · die Übersicht */
+        await zeige(r25Uebersicht, 8);
+        s.zeile('Zur Übersicht', 'Ein Klick — und alles steht in einer Tabelle.');
+        await warte(2600);
+        var u = r25Uebersicht(); if (u) u.click();
+        await warteAuf(function () { return q('#oabi-ov #oabi-result tr'); }, 6000);
+        await warte(800);
+        var zeilen = function () { return [].filter.call(document.querySelectorAll('#oabi-ov #oabi-result tr'), function (x) { return x.offsetWidth && x.querySelector('input[type=checkbox]'); }); };
+        await zeige(function () { return q('#oabi-ov #oabi-result') || q('#oabi-ov .oabi-modal'); }, 6);
+        await b2oZeile(s, 'Die Übersicht', '<b>' + zeilen().length + ' Werte</b>, jeder mit Herkunft — gesagt oder aus deinen Einstellungen. Du entscheidest, was ins Objekt geht.');
+        var ab = function () { return zeilen().filter(function (x) { return /Zinssatz|Tilgung/.test(x.textContent) && !x.querySelector('input[type=checkbox]').checked; }); };
+        var a = ab();
+        DPM_REIHE.r25ab = zeilen().filter(function (x) { return !x.querySelector('input[type=checkbox]').checked; }).map(function (x) { return x.textContent.replace(/\s+/g, ' ').trim().slice(0, 80); });
+        if (a.length) {
+          var a0 = a[0], a1 = a[a.length - 1];
+          await zeige(function () { return b2oHuelle(a0, a1); }, 6);
+          await b2oZeile(s, 'Abweichungen', 'Was vom Objekt abweicht, ist nicht vorgehakt — hier ' + (a.length === 2 ? 'Zins und Tilgung' : a.length + ' Werte') + '. Gesagt ist gesagt: anhaken.');
+          a.forEach(function (x) { var c = x.querySelector('input[type=checkbox]'); if (c && !c.checked) c.click(); });
+          await warte(1400);
+        }
+        await zeige(function () { return q('#oabi-apply'); }, 8);
+        s.zeile('Übernehmen', '<b>' + (((q('#oabi-apply') || {}).textContent || 'Übernehmen').trim()) + '</b> — die Werte gehen ins Objekt.');
+        await warte(3200);
+        var ap = q('#oabi-apply'); if (ap) ap.click();
+        kegelHoch(false);
+        await warteAuf(function () { var o = q('#oabi-ov'); return !o || !o.offsetWidth; }, 8000);
+        await warte(1500);
+      },
+      async function (s) {   /* 12 · das Objekt mit Score */
+        var key = window._currentObjKey;
+        var karte = function () { return qs('.sb-card[data-key="' + key + '"]'); };
+        await warteAuf(function () { var c = karte(); return c && c.querySelector('.sbc-mini-score-num'); }, 8000);
+        await warte(600);
+        await zeige(karte, 6);
+        var c = karte(), n = c && c.querySelector('.sbc-mini-score-num'), l = c && c.querySelector('.sbc-score-label');
+        await b2oZeile(s, 'Im Portfolio', 'Die Wohnung steht als Objekt — auf der Karte der Score' + (n ? ' <b>' + n.textContent.trim() + (l ? ' · ' + l.textContent.trim() : '') + '</b>' : '') + '.');
+        reiter('s0'); var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        await b2oZeile(s, 'Im Reiter Objekt', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + '. Miete, Finanzierung und Bewirtschaftung stehen in ihren Reitern.', 600);
+      }
+    ]
+  };
+
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0, _aktiv = null;
   function stopp() {
@@ -4813,10 +5082,12 @@
             });
           });
         } else { await warte(3200); karte(null); await warte(700); }
+        _zt0 = Date.now(); window.DPM_ZEILEN = []; window.DPM_ZEILEN_META = { drehbuch: name, start_abs: _zt0, ende_ms: null, tempo: TEMPO, studio: STUDIO };   /* v2371 */
         for (var i = 0; i < n; i++) {
           var ii = i;
           await D.szenen[i]({ zeile: function (k, t) { zeile(k, t, ii, n); } });
         }
+        try { window.DPM_ZEILEN_META.ende_ms = Date.now() - _zt0; } catch (e) {}
         /* v2235 · im Studio erst das Outro, dann aufräumen (es deckt den Rahmen) */
         if (STUDIO) { anStudio({ type: 'ende' }); await warte(1400); }
         _ziel = null; kegel(null); zeileWeg();
