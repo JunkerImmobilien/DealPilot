@@ -186,6 +186,10 @@ export const ReportOrchestrator = {
       lzs_pct: input.lzs_pct ? Number(input.lzs_pct) : null,
       /* v2282 · eigener Umrechnungskoeffizient Grundstuecksgroesse */
       uk_flaeche: Number(input.uk_flaeche) > 0 ? Number(input.uk_flaeche) : null,
+      /* v2367 · eigener Abschlag auf Angebotspreise aus dem Investmentprofil */
+      angebot_abschlag_pct: (input.angebot_abschlag_pct != null && input.angebot_abschlag_pct !== ''
+        && isFinite(Number(String(input.angebot_abschlag_pct).replace(',', '.'))))
+        ? Number(String(input.angebot_abschlag_pct).replace(',', '.')) : null,
       /* v2361 · WGFZ des Objekts (oberirdische Geschossflaeche § 16 Abs. 4 / Grundstueck) */
       wgfz_objekt: Number(String(input.wgfz_objekt == null ? '' : input.wgfz_objekt).replace(',', '.')) > 0
         ? Number(String(input.wgfz_objekt).replace(',', '.')) : null,

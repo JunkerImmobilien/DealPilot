@@ -1,0 +1,42 @@
+[
+  {
+    "land_code": "NW",
+    "ags": "05711000",
+    "ebene": "gemeinde",
+    "gebiet_name": "Stadt Bielefeld",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld",
+    "kennzahl": "rohertragsfaktor",
+    "zweig": "mfh",
+    "formel": { "form": "konstante", "wert": 19 },
+    "geltungsbereich": {
+      "objektarten": ["mfh"],
+      "nutzung": "Drei- und Mehrfamilienhäuser, Weiterverkauf",
+      "brw_von": 260, "brw_bis": 930, "baujahr_von": 1957, "baujahr_bis": 1997
+    },
+    "modellansaetze": {
+      "rohertragsfaktor_stichprobe": 45, "rohertragsfaktor_standardabweichung": 0.57,
+      "kaufpreis_eur_qm_mittel": 1820, "kaufpreis_eur_qm_sd": 519, "kaufpreis_vertraege": 56,
+      "wohnflaeche_qm_mittel": 343, "wohnflaeche_qm_sd": 136,
+      "brw_eur_qm_mittel": 469, "brw_eur_qm_sd": 121,
+      "rnd_jahre_mittel": 24, "rnd_jahre_sd": 11,
+      "nettokaltmiete_eur_qm_mittel": 7.7, "nettokaltmiete_eur_qm_sd": 1.7,
+      "liegenschaftszins_pct": 2.5, "datengrundlage_jahr": 2025
+    },
+    "belege": [
+      "Grundstücksmarktbericht 2026 für die Stadt Bielefeld, Abschn. 5.2.1, S. 44–45: Kennzahlen 2025 Drei- und Mehrfamilienhäuser — LZ 2,5 %, 56 Verträge, Ø Wohnfläche 343 m² (SD 136), Ø Bodenrichtwert 469 €/m² (SD 121), Ø Restnutzungsdauer 24 Jahre (SD 11), Ø Kaufpreis je m² Wohnfläche 1.820 € (SD 519), Ø Nettokaltmiete 7,7 €/m² (SD 1,7).",
+      "Abschn. 5.2.2, S. 45: Rohertragsfaktor Drei- und Mehrfamilienhäuser, Teilmarkt Weiterverkauf, Bodenrichtwert 260 bis 930 €/m², Baujahr 1957 bis 1997 — Stichprobe 45, Ø 19, Standardabweichung 0,57. Modell wie bei der Ableitung der Liegenschaftszinssätze."
+    ],
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "seite": "S. 44–45",
+    "fundstelle": "Kap. 5.2.1 und 5.2.2",
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://gars.nrw/images/user/GA_Bielefeld/pdf/GMB_10200_2026.pdf",
+    "quelle_parser": "manuell (pdftotext -layout, 18.10.2026)",
+    "lizenz": "dl-de/zero-2-0",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld, Grundstücksmarktbericht 2026, dl-de/zero-2-0",
+    "verwendung": "produkt",
+    "vollstaendig": true
+  }
+]

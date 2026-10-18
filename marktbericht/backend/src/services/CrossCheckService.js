@@ -826,9 +826,35 @@ export const CrossCheckService = {
     const _amtFuehrt = !!(p.amtliche_miete && p.amtliche_miete.verfuegbar
       && p.amtliche_miete.fuehrend !== false
       && ['agvga_nrw_2016'].indexOf(String(p.modellversion || '')) >= 0);
-    const mieteQm = _amtFuehrt ? p.amtliche_miete.miete_qm : rentSqm;
-    const mieteQuelle = _amtFuehrt
-      ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten';
+    const _refQm = _amtFuehrt ? p.amtliche_miete.miete_qm : rentSqm;
+    /* ══ v2367 · DIE IST-MIETE, WENN SIE MARKTUEBLICH IST (§ 31 Abs. 2 ImmoWertV) ══
+       Marcel 18.10.2026: „Ertragswert wird ja eigentlich immer mit der Ist-Miete
+       berechnet" - § 31 Abs. 2 verlangt die MARKTUEBLICH erzielbaren Ertraege;
+       eine Ist-Miete im marktueblichen Rahmen IST das, und die Liegenschaftszins-
+       saetze der Ausschuesse sind aus Kauffaellen mit ihren tatsaechlichen Mieten
+       abgeleitet (Bielefeld 2025: MFH Ø 7,70 €/m², Angebote 9,47) - § 10.
+       Gemessen am 17.10.2026, Westerfeldstr. 140: Angebotsmiete 9,47 €/m² ergab
+       810.000 €, die Ist-Miete 8,19 €/m² rund 726.000 € - der Kaufpreisschnitt
+       des Ausschusses (1.820 €/m² x 390 m²) liegt bei 709.800 €.
+       Rahmen: hoechstens 30 % unter oder ueber der Vergleichsmiete (amtlich,
+       sonst Angebotsmedian). Ausserhalb gilt die Vergleichsmiete; die Ueber-
+       oder Untervermietung ist ein besonderes objektspezifisches Merkmal
+       (§ 8 Abs. 3) und wird benannt, nicht stillschweigend kapitalisiert. */
+    const _wflIst = _num(ref.living_area);
+    const _istQm = (!ref.vacancy && _num(ref.monthly_net_rent) > 0 && _wflIst > 0 && !(ref.gewerbe && _num(ref.gewerbe.wfl_gewerbe)))
+      ? Math.round(_num(ref.monthly_net_rent) / _wflIst * 100) / 100 : null;
+    const _istAbw = (_istQm != null && _refQm > 0) ? (_istQm / _refQm - 1) : null;
+    const _istFuehrt = _istQm != null && (_refQm == null || Math.abs(_istAbw) <= 0.30);
+    const mieteQm = _istFuehrt ? _istQm : _refQm;
+    const mieteQuelle = _istFuehrt ? 'Ist-Miete (marktüblich, § 31 Abs. 2 ImmoWertV)'
+      : (_amtFuehrt ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten');
+    if (_istQm != null && !_istFuehrt) {
+      out.notes.push('Die Ist-Miete (' + String(_istQm).replace('.', ',') + ' €/m²) liegt '
+        + Math.abs(Math.round(_istAbw * 100)) + ' % ' + (_istAbw > 0 ? 'über' : 'unter') + ' der marktüblichen Miete ('
+        + String(Math.round(_refQm * 100) / 100).replace('.', ',') + ' €/m²). Der Ertragswert rechnet deshalb mit der '
+        + 'marktüblichen Miete (§ 31 Abs. 2 ImmoWertV); die ' + (_istAbw > 0 ? 'Über' : 'Unter') + 'vermietung ist für die '
+        + 'Restlaufzeit der Verträge als besonderes objektspezifisches Grundstücksmerkmal (§ 8 Abs. 3) zu würdigen.');
+    }
     /* v1207-WMIE-2 · DER WIDERSPRUCH GEHOERT BENANNT, NICHT VERSTECKT.
      *
      * Marcel las im eigenen Bericht "4,89 EUR/m2" neben dem Ertragswert und
@@ -1173,7 +1199,8 @@ export const CrossCheckService = {
            * erkennen koennen, welche auf Angaben beruht. */
           miete_quelle: mieteQuelle,
           miete_erfasst: !!(p && p.ist_miete_erfasst),
-          miete_modellkonform: mieteQuelle === 'Mietpreisübersicht des Gutachterausschusses',
+          miete_modellkonform: mieteQuelle === 'Mietpreisübersicht des Gutachterausschusses' || _istFuehrt,   /* v2367 */
+          miete_ist_qm: _istQm, miete_vergleich_qm: _refQm != null ? Math.round(_refQm * 100) / 100 : null,
           /* v1207-WMIE-2 · die angesetzte Miete war nirgends als Zahl sichtbar,
            * nur als Quellenname. Ohne sie kann das Dokument den Vergleich mit
            * dem amtlichen Wert nicht ausschreiben, ohne ihn neu herzuleiten —

@@ -414,6 +414,7 @@ export const DealPilotObjectMapper = {
       sachwertfaktor: dez(pick(d, ['sachwertfaktor'])),
       uk_flaeche: dez(pick(d, ['uk_flaeche'])),   /* v2282 · eigener Umrechnungskoeffizient Grundstuecksgroesse */
       wgfz_objekt: dez(pick(d, ['wgfz_objekt'])),   /* v2361 · WGFZ des Objekts (§ 16 Abs. 4 ImmoWertV) */
+      angebot_abschlag_pct: dez(pick(d, ['angebot_abschlag_pct'])),   /* v2367 · eigener Angebotsabschlag */
       nhk_typ: (function () {
         const h = pick(d, ['nhk_haus']), g = pick(d, ['nhk_geschosse']), dd = pick(d, ['nhk_dach']);
         return (h && g != null && g !== '' && dd) ? (String(h) + '.' + String(g) + String(dd)) : null;

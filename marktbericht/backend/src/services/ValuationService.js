@@ -2,6 +2,12 @@
 // Formeln exakt nach Auftrag; Faktoren transparent & einzeln ausgewiesen.
 import { round } from '../lib/stats.js';
 import { istGewerbe, istGrundstueck } from '../lib/marktsegment.js';   /* v2241 */
+import { finde as regFinde } from '../lib/ausschuss_register.js';   /* v2367 */
+
+/* v2367 · recherchierter Marktdurchschnitt des Abschlags auf Angebotspreise - DERSELBE
+   Wert wie frontend/js/config.js angebotAbschlagMarkt.pct (Stand Dezember 2025). Bei
+   jeder Nachrecherche BEIDE Stellen ziehen. */
+const ANGEBOT_ABSCHLAG_MARKT_PCT = 5.8;
 import { groessenanpassung as ukAusRegister, naeherung as ukNaeherung } from '../lib/umrechnung_flaeche.js';   /* v2282, v2288 */
 
 // Zustands-/Energie-/Etagen-Faktoren (dokumentiert, anpassbar)
@@ -411,7 +417,7 @@ export const ValuationService = {
       /* v2241: der bOM-Betrag ist Teil des Additivs — er wirkt nach den
          Faktoren und in Punktwert UND Spanne gleich. */
       const additive = parkingValue + landExcessValue + kostenAbzug;
-      const ev = base * area * factorProduct + additive;
+      let ev = base * area * factorProduct + additive;   /* v2367: let - der Angebotsabschlag mindert ihn */
       if (kostenAbzug) {
         out.notes.push((kostenAbzug < 0 ? 'Abzug' : 'Zuschlag') + ' besondere objektspezifische Grundstücksmerkmale: '
           + (kostenAbzug < 0 ? '− ' : '+ ') + Math.abs(kostenAbzug).toLocaleString('de-DE') + ' €'
@@ -434,6 +440,67 @@ export const ValuationService = {
         out.market_value.low = roundNice(ev * 0.9);
         out.market_value.high = roundNice(ev * 1.1);
         out.market_value.range_basis = 'pauschal';
+      }
+      /* ══ v2367 · ANGEBOTSPREISE SIND KEINE KAUFPREISE ═════════════════════════
+         § 25 Abs. 1 ImmoWertV: das Vergleichswertverfahren braucht Kaufpreise.
+         Die Indikation steht auf Angebotspreisen und lag ohne Abschlag zu hoch -
+         gemessen am 17.10.2026, Westerfeldstr. 140 (MFH Bielefeld): Angebotsmedian
+         2.178 €/m², Ø Kaufpreis der 56 MFH-Kauffaelle 2025 laut Ausschuss
+         1.820 €/m². Marcel 18.10.2026: „so, dass es den Normen und Gesetzen
+         entspricht und nah an der Realitaet ist".
+         Rangfolge des Abschlags:
+           1. eigene Angabe des Nutzers (Investmentprofil, angebot_abschlag_pct)
+           2. oertlich gemessen: Ø Kaufpreis der Kauffaelle des Ausschusses fuer
+              dieses Segment gegen den Angebotsmedian (0 bis 25 %)
+           3. recherchierter Marktdurchschnitt (5,8 %)
+         Die Rohwerte bleiben im Ergebnis (angebot_abschlag.roh). */
+      let _abPct = null, _abHerk = null, _rfSatz = null;
+      try {
+        const _art = String(ref.property_type || '').toLowerCase();
+        _rfSatz = (regFinde('rohertragsfaktor', ref.ags || null) || []).find((s) => s && s.vollstaendig !== false
+          && (((s.geltungsbereich || {}).objektarten || []).indexOf(_art) >= 0)) || null;
+        const _eigen = (ref.angebot_abschlag_pct == null || ref.angebot_abschlag_pct === '') ? NaN : Number(ref.angebot_abschlag_pct);
+        const _kpQm = _rfSatz ? Number((_rfSatz.modellansaetze || {}).kaufpreis_eur_qm_mittel) : NaN;
+        if (isFinite(_eigen) && _eigen >= 0 && _eigen < 50) { _abPct = _eigen; _abHerk = 'eigene Angabe'; }
+        else if (_kpQm > 0 && Number(sale.median_per_sqm) > 0) {
+          _abPct = round(Math.max(0, Math.min(25, (1 - _kpQm / Number(sale.median_per_sqm)) * 100)), 1);
+          _abHerk = 'örtlich gemessen: Ø Kaufpreis der Kauffälle des Gutachterausschusses ('
+            + Math.round(_kpQm).toLocaleString('de-DE') + ' €/m²) gegen den Median der Angebote ('
+            + Math.round(Number(sale.median_per_sqm)).toLocaleString('de-DE') + ' €/m²)';
+        } else { _abPct = ANGEBOT_ABSCHLAG_MARKT_PCT; _abHerk = 'Marktdurchschnitt'; }
+      } catch (e) { _abPct = ANGEBOT_ABSCHLAG_MARKT_PCT; _abHerk = 'Marktdurchschnitt'; }
+      if (_abPct > 0) {
+        const _f = 1 - _abPct / 100;
+        out.market_value.angebot_abschlag = { pct: _abPct, herkunft: _abHerk,
+          roh: { estimated: out.market_value.estimated, low: out.market_value.low, high: out.market_value.high } };
+        ev = ev * _f;
+        out.market_value.estimated = roundNice(ev);
+        if (out.market_value.low != null) out.market_value.low = roundNice(out.market_value.low * _f);
+        if (out.market_value.high != null) out.market_value.high = roundNice(out.market_value.high * _f);
+        out.notes.push('Abschlag auf Angebotspreise: ' + String(_abPct).replace('.', ',') + ' % (' + _abHerk + ').');
+      }
+      /* v2367 · AMTLICHE GEGENPROBE - wo der Ausschuss fuer dieses Segment einen
+         Rohertragsfaktor und den Ø Kaufpreis seiner Kauffaelle veroeffentlicht.
+         Rohertrag: Ist-Miete, sonst Angebotsmiete (gekennzeichnet). */
+      if (_rfSatz) {
+        const _ma = _rfSatz.modellansaetze || {};
+        const _rf = Number((_rfSatz.formel || {}).wert);
+        const _istJahr = (!ref.vacancy && Number(ref.monthly_net_rent) > 0) ? Number(ref.monthly_net_rent) * 12 : null;
+        const _mktJahr = (rent && Number(rent.median_per_sqm) > 0) ? Number(rent.median_per_sqm) * area * 12 : null;
+        const _roh = _istJahr || _mktJahr;
+        const _g = _rfSatz.geltungsbereich || {};
+        out.amtliche_gegenprobe = {
+          ausschuss: _rfSatz.gaa_name || null, quelle_url: _rfSatz.quelle_url || null, seite: _rfSatz.seite || null,
+          berichtsjahr: _rfSatz.berichtsjahr || null, datengrundlage_jahr: _ma.datengrundlage_jahr || null,
+          rohertragsfaktor: _rf > 0 ? _rf : null, rohertrag_eur: _roh ? Math.round(_roh) : null,
+          rohertrag_basis: _istJahr ? 'Ist-Miete' : (_mktJahr ? 'Angebotsmiete' : null),
+          wert_rohertragsfaktor_eur: (_rf > 0 && _roh) ? roundNice(_rf * _roh) : null,
+          kaufpreis_eur_qm_mittel: Number(_ma.kaufpreis_eur_qm_mittel) || null, kaufpreis_vertraege: _ma.kaufpreis_vertraege || null,
+          wert_kaufpreis_mittel_eur: (Number(_ma.kaufpreis_eur_qm_mittel) > 0 && area > 0) ? roundNice(Number(_ma.kaufpreis_eur_qm_mittel) * area) : null,
+          miete_eur_qm_mittel: _ma.nettokaltmiete_eur_qm_mittel || null,
+          geltung: { brw_von: _g.brw_von || null, brw_bis: _g.brw_bis || null, baujahr_von: _g.baujahr_von || null, baujahr_bis: _g.baujahr_bis || null },
+          hinweis: 'Durchschnittswerte des Gutachterausschusses aus tatsächlichen Kauffällen — eine Gegenprobe, kein Verkehrswert.',
+        };
       }
       out.market_value.basis_median_sqm = round(base / 5, 0) * 5; // €/m² auf 5er
       out.market_value.confidence = sale.confidence;
