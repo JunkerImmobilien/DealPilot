@@ -5005,11 +5005,22 @@
       async function (s) {   /* 10 · deine Sicht, Ende der Fragen */
         await zeige(r25Bereich, 6);
         var zb = r6Beginn(s, 'Etappe 5 · Deine Sicht', 'Warum dieses Objekt, was könnte schiefgehen — in deinen Worten.');
-        await r25Antwort(R25.sicht, true);
+        /* v2372 · GEMESSEN (18.10.): nach der letzten Pflichtfrage bietet der Co-Pilot erst die
+           Feinheiten an (_rfTiefeAnbieten, v1282) - „Zur Übersicht" kommt erst nach einem „Nein".
+           Vorher wartete das Drehbuch auf den Knopf, die Übersicht blieb leer, nichts kam ins Objekt. */
+        var fb = function () { var e = rhIm('#vi-rf-chat', /Feinheiten auch noch/); return e && (e.closest('.vi-rf-blase') || e); };
+        await r25Antwort(R25.sicht, function () { return fb() || r25Uebersicht(); });
         await r6Ende(zb);
         await zeige(function () { return q('#vi-rf-stand'); }, 6);
         var kopf = (q('#vi-rf-stand .vi-rf-stand-kopf') || {}).textContent || '', n = /(\d+)\s*\/\s*(\d+)/.exec(kopf);
         await b2oZeile(s, 'Alle Fragen durch', (n ? '<b>' + n[1] + ' von ' + n[2] + '</b> Angaben stehen' : 'Die Liste steht') + ' — abgehakt, was gesagt ist; übersprungen bleibt offen.');
+        if (fb() && !r25Uebersicht()) {
+          await zeige(fb, 8);
+          var fm = /(\d+)\s*weitere Angaben\s*in\s*(\d+)\s*Fragen/.exec(fb().textContent || '');
+          await b2oZeile(s, 'Feinheiten nach Wahl', 'Auf Wunsch geht es weiter ins Detail' + (fm ? ' — <b>' + fm[1] + ' Angaben in ' + fm[2] + ' Fragen</b>' : '') + '. Für heute reicht das Wichtigste: „Nein".');
+          await zeige(r25Bereich, 6);
+          await r25Antwort('Nein, das reicht', true);
+        }
       },
       async function (s) {   /* 11 · die Übersicht */
         await zeige(r25Uebersicht, 8);
