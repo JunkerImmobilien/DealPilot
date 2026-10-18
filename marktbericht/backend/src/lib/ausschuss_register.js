@@ -463,6 +463,9 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                             'uk-wgfz-bielefeld-2026.json',
                             /* v2363: Ernte NRW 17.10.2026 - Bottrop, Duesseldorf, Bonn, Duisburg, Hagen, Muelheim (2), Koeln. */
                             'uk-wgfz-nw-2026.json',
+                            /* v2366: Ernte 17.10.2026 - BE, HH, HE, BY, HB, NI: 18 Werte (Berlin, Frankfurt, Wiesbaden,
+                               Kassel, Giessen, Fulda, Offenbach, Muenchen, Regensburg, Bremen ...), 78 Sperren mit Weg. */
+                            'uk-wgfz-laender-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
