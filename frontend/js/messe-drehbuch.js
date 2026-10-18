@@ -5017,9 +5017,18 @@
         if (fb() && !r25Uebersicht()) {
           await zeige(fb, 8);
           var fm = /(\d+)\s*weitere Angaben\s*in\s*(\d+)\s*Fragen/.exec(fb().textContent || '');
-          await b2oZeile(s, 'Feinheiten nach Wahl', 'Auf Wunsch geht es weiter ins Detail' + (fm ? ' — <b>' + fm[1] + ' Angaben in ' + fm[2] + ' Fragen</b>' : '') + '. Für heute reicht das Wichtigste: „Nein".');
-          await zeige(r25Bereich, 6);
-          await r25Antwort('Nein, das reicht', true);
+          /* v2372b · GEMESSEN im Aufnahmelauf: ein getipptes „Nein" ging an das noch offene
+             Markt-Angebot („Nein, überspringen" - „ich hole nichts"), die Feinheiten-Frage blieb
+             stehen. Deshalb der Knopf oben: _rfFertig(true), ausdrücklich beendet. */
+          var fe = function () { var e = q('#vi-rf-ende'); return e && e.offsetWidth ? e : null; };
+          await b2oZeile(s, 'Feinheiten nach Wahl', 'Auf Wunsch geht es weiter ins Detail' + (fm ? ' — <b>' + fm[1] + ' Angaben in ' + fm[2] + ' Fragen</b>' : '') + '. Für heute reicht das Wichtigste.');
+          if (fe()) {
+            await zeige(fe, 8);
+            await b2oZeile(s, 'Fertig', 'Ein Klick auf <b>' + fe().textContent.trim() + '</b> — die Feinheiten bleiben für später.');
+            var fk = fe(); if (fk) fk.click();
+            await warteAuf(r25Uebersicht, 8000);
+            await warte(900);
+          }
         }
       },
       async function (s) {   /* 11 · die Übersicht */
