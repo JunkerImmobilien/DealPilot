@@ -1381,7 +1381,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2353';   /* v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
+  var RH_BUSTER = 'v2372';   /* v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage/i;
@@ -4868,11 +4868,12 @@
     var ok = q('#vi-rf-ok'); if (ok) ok.click();
     await warte(500);
     var weiter = await warteAuf(function () {
+      if (typeof bisUebersicht === 'function') return bisUebersicht();
       if (bisUebersicht) return r25Uebersicht();
       var f = r25Frage(), e = q('#vi-rf-in');
       return f && f !== f0 && e && !e.disabled;
     }, 20000);
-    DPM_REIHE.r25 = (DPM_REIHE.r25 || []).concat([{ antwort: text, vorher: f0.slice(0, 60), nachher: (bisUebersicht ? 'Übersicht' : r25Frage().slice(0, 60)), ok: !!weiter, ms: Date.now() - t0 }]);
+    DPM_REIHE.r25 = (DPM_REIHE.r25 || []).concat([{ antwort: text, vorher: f0.slice(0, 60), nachher: (bisUebersicht === true ? 'Übersicht' : r25Frage().slice(0, 60)), ok: !!weiter, ms: Date.now() - t0 }]);
     await warte(650);
     return !!weiter;
   }
@@ -4911,11 +4912,15 @@
       async function (s) {   /* 3 · Adresse */
         await zeige(r25Bereich, 6);
         var zb = r6Beginn(s, 'Frage 1 · Adresse', 'Straße, Hausnummer, PLZ und Ort — in einem Satz.');
-        await r25Antwort(R25.adresse);
-        await r6Ende(zb);
+        /* v2372 · GEMESSEN: nach der Adresse bleibt die Frage stehen (Rückfrage „Stimmt das so?") -
+           auf die nächste Frage zu warten kostete 20 s Stillstand im Bild. Gewartet wird auf die Rückfrage. */
         var bl = function () { var e = rhIm('#vi-rf-chat', /Ich habe verstanden/); return e && e.closest('.vi-rf-blase'); };
+        await r25Antwort(R25.adresse, bl);
+        await r6Ende(zb);
         await zeige(bl, 8);
-        var bt = (bl() || {}).textContent || '', gr = /([A-ZÄÖÜ][\wäöüß-]+)\s*·\s*Grunderwerbsteuer\s*([\d,]+\s*%)/.exec(bt);
+        /* v2372 · das Land steht in .vi-rf-zaehler; der Text der ganzen Blase klebt Ort und Land
+           ohne Leerzeichen aneinander (gemessen: „HerfordNordrhein-W…") */
+        var bz = bl() && bl().querySelector('.vi-rf-zaehler'), bt = bz ? bz.textContent.replace(/\s+/g, ' ').trim() : '', gr = /^(.+?)\s*·\s*Grunderwerbsteuer\s*([\d,]+\s*%)/.exec(bt);
         await b2oZeile(s, 'Frage 1 · Adresse', 'DealPilot wiederholt, was es verstanden hat' + (gr ? ' — und kennt schon das Land: <b>' + gr[1] + ', Grunderwerbsteuer ' + gr[2] + '</b>' : '') + '. Ein „ja", und weiter.');
         await zeige(r25Bereich, 6);
         await r25Antwort('ja');
@@ -4947,9 +4952,12 @@
         var zb = r6Beginn(s, 'Etappe 2 · Geld', 'Eigenkapital, Zins, Tilgung, Zinsbindung — in einem Satz.');
         await r25Antwort(R25.fin);
         await r6Ende(zb);
-        var h = function () { var e = rhIm('#vi-rf-frage', /Aus deinen Einstellungen/); return e || q('#vi-rf-frage'); };
+        /* v2372 · GEMESSEN: der Vorschlag steht in der Blase im Verlauf (.vi-rf-vorschlag),
+           #vi-rf-frage trägt nur den Fragetext (_rfFrageAnheften) - die Summe fiel weg */
+        var nkv = function () { var a = [].filter.call(document.querySelectorAll('#vi-rf-chat .vi-rf-vorschlag'), function (x) { return x.offsetWidth && /Notar|Grunderwerbsteuer/.test(x.textContent); }); return a[a.length - 1] || null; };
+        var h = function () { var e = nkv(); return (e && (e.closest('.vi-rf-blase') || e)) || q('#vi-rf-frage'); };
         await zeige(h, 8);
-        var ht = (rhIm('#vi-rf-frage', /Aus deinen Einstellungen/) || {}).textContent || '', z = /zusammen\s*([\d.]+\s*€)\s*\(([\d,]+\s*%)\)/.exec(ht);
+        var ht = (nkv() || {}).textContent || '', z = /zusammen\s*([\d.]+\s*€)\s*\(([\d,]+\s*%)\)/.exec(ht);
         await b2oZeile(s, 'Aus deinen Einstellungen', 'Was du hinterlegt hast, schlägt DealPilot vor — die Kaufnebenkosten' + (z ? ', zusammen <b>' + z[1] + ' (' + z[2] + ')</b>' : '') + '. Ein Satz übernimmt sie.');
         await zeige(r25Bereich, 6);
         await r25Antwort(R25.einst);
@@ -4984,7 +4992,9 @@
         var hz = function () { return r25StandZeile(/^\s*✓?\s*Hausgeld/); };
         await zeige(function () { return hz() || q('#vi-rf-stand'); }, 8);
         var hw = hz(), hv = hw ? hw.textContent.replace(/\s+/g, ' ').replace(/^\s*✓?\s*Hausgeld\s*/, '').trim() : '';
-        await b2oZeile(s, 'Aufs Jahr gerechnet', '250 € im Monat, davon 100 € nicht umlagefähig — in der Liste steht das Jahr' + (hv ? ': <b>' + hv + '</b>' : '') + ', umlagefähig und eigener Teil.');
+        /* v2372 · GEMESSEN: die Liste zeigt „1800 · 1200" ohne Einheit - im Text mit € und Tausenderpunkt */
+        var hm = /^([\d.]+)\s*·\s*([\d.]+)$/.exec(hv), hf = function (x) { var n = parseInt(String(x).replace(/\./g, ''), 10); return isFinite(n) ? n.toLocaleString('de-DE') + ' €' : x; };
+        await b2oZeile(s, 'Aufs Jahr gerechnet', '250 € im Monat, davon 100 € nicht umlagefähig — in der Liste steht das Jahr' + (hm ? ': <b>' + hf(hm[1]) + ' umlagefähig · ' + hf(hm[2]) + ' eigener Teil</b>.' : (hv ? ': <b>' + hv + '</b>, umlagefähig und eigener Teil.' : '.')));
         await r25Reihe([R25.einst, R25.ausfall, R25.ort]);
         await zeige(r25Bereich, 6);
         var zb2 = r6Beginn(s, 'Überspringen', '„Weiß ich nicht" — und es geht weiter. Erfunden wird nichts.');
