@@ -4931,7 +4931,9 @@
         await r25Antwort(R25.art);
         await r6Ende(zb);
         var f = r25Frage();
-        await zeige(function () { return q('#vi-rf-frage'); }, 8);
+        /* v2372c · GEMESSEN: #vi-rf-frage ist hier ausgeblendet (der Streifen erscheint erst, wenn die
+           Frage aus dem Verlauf gescrollt ist) - der Kegel blieb unsichtbar. Dann die letzte Co-Pilot-Blase. */
+        await zeige(function () { var e = q('#vi-rf-frage'); if (e && e.offsetWidth) return e; var b = document.querySelectorAll('#vi-rf-chat .vi-rf-blase.vi-rf-co'); return b[b.length - 1] || null; }, 8);
         await b2oZeile(s, 'Die Art bestimmt die Fragen', 'Eine Eigentumswohnung — also fragt DealPilot nach: <b>' + f.replace(/^Und noch zum Objekt:\s*/, '') + '</b>');
         await r25Reihe([R25.details, R25.bjkp]);
       },
@@ -5024,7 +5026,7 @@
           await b2oZeile(s, 'Feinheiten nach Wahl', 'Auf Wunsch geht es weiter ins Detail' + (fm ? ' — <b>' + fm[1] + ' Angaben in ' + fm[2] + ' Fragen</b>' : '') + '. Für heute reicht das Wichtigste.');
           if (fe()) {
             await zeige(fe, 8);
-            await b2oZeile(s, 'Fertig', 'Ein Klick auf <b>' + fe().textContent.trim() + '</b> — die Feinheiten bleiben für später.');
+            await b2oZeile(s, 'Fertig', 'Ein Klick auf <b>„' + fe().textContent.trim() + '“</b>: die Feinheiten bleiben für später.');
             var fk = fe(); if (fk) fk.click();
             await warteAuf(r25Uebersicht, 8000);
             await warte(900);
@@ -5046,6 +5048,9 @@
         DPM_REIHE.r25ab = zeilen().filter(function (x) { return !x.querySelector('input[type=checkbox]').checked; }).map(function (x) { return x.textContent.replace(/\s+/g, ' ').trim().slice(0, 80); });
         if (a.length) {
           var a0 = a[0], a1 = a[a.length - 1];
+          /* v2372c · GEMESSEN: die Zeilen lagen unter dem Rand (Kegel bei y 1203) - erst in die Mitte holen */
+          try { a0.scrollIntoView({ block: 'center' }); } catch (e) {}
+          await warte(300);
           await zeige(function () { return b2oHuelle(a0, a1); }, 6);
           await b2oZeile(s, 'Abweichungen', 'Was vom Objekt abweicht, ist nicht vorgehakt — hier ' + (a.length === 2 ? 'Zins und Tilgung' : a.length + ' Werte') + '. Gesagt ist gesagt: anhaken.');
           a.forEach(function (x) { var c = x.querySelector('input[type=checkbox]'); if (c && !c.checked) c.click(); });
@@ -5062,11 +5067,21 @@
       async function (s) {   /* 12 · das Objekt mit Score */
         var key = window._currentObjKey;
         var karte = function () { return qs('.sb-card[data-key="' + key + '"]'); };
-        await warteAuf(function () { var c = karte(); return c && c.querySelector('.sbc-mini-score-num'); }, 8000);
+        /* v2372c · GEMESSEN im Studio: die Objektliste ist dort nicht sichtbar (0 von 46 Karten mit
+           Fläche) - die Karte kam nie, die Zeile stand ohne Score. Dann zeigt der Reiter Bewertung beide Scores. */
+        await warteAuf(function () { var c = karte(); return c && c.querySelector('.sbc-mini-score-num'); }, 3000);
         await warte(600);
-        await zeige(karte, 6);
-        var c = karte(), n = c && c.querySelector('.sbc-mini-score-num'), l = c && c.querySelector('.sbc-score-label');
-        await b2oZeile(s, 'Im Portfolio', 'Die Wohnung steht als Objekt — auf der Karte der Score' + (n ? ' <b>' + n.textContent.trim() + (l ? ' · ' + l.textContent.trim() : '') + '</b>' : '') + '.');
+        if (karte() && karte().querySelector('.sbc-mini-score-num')) {
+          await zeige(karte, 6);
+          var c = karte(), n = c && c.querySelector('.sbc-mini-score-num'), l = c && c.querySelector('.sbc-score-label');
+          await b2oZeile(s, 'Im Portfolio', 'Die Wohnung steht als Objekt — auf der Karte der Score' + (n ? ' <b>' + n.textContent.trim() + (l ? ' · ' + l.textContent.trim() : '') + '</b>' : '') + '.');
+        } else {
+          reiter('s6'); await warte(1300);
+          await warteAuf(function () { return r12Karte(1)(); }, 6000);
+          await zeigeGruppe(function () { var k = r12Karte(0)(); return k && k.querySelector('.dpsh-headrow'); }, function () { var k = r12Karte(1)(); return k && k.querySelector('.dpsh-headrow'); }, 6);
+          var a = r12Kopf(0), b = r12Kopf(1);
+          await b2oZeile(s, 'Gespeichert', 'Die Wohnung steht als Objekt — im Reiter Bewertung: DealPilot Score <b>' + (a.score || '–') + ' · ' + r12Wort(a.wort) + '</b>, Investor-DealScore <b>' + (b.score || '–') + ' · ' + r12Wort(b.wort) + '</b>.');
+        }
         reiter('s0'); var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
         await b2oZeile(s, 'Im Reiter Objekt', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + '. Miete, Finanzierung und Bewirtschaftung stehen in ihren Reitern.', 600);
