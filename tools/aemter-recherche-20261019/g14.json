@@ -1,0 +1,359 @@
+[
+  {
+    "gemeinde": "Freiburg im Breisgau",
+    "plz_praefixe": ["79"],
+    "bundesland": "BW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Freiburg im Breisgau, Amt für Wohnraumentwicklung und Vermessung (AWV)",
+        "abteilung": "Liegenschaftskataster und Geoinformation (Bereich Vermessung)",
+        "email": "vermessung@freiburg.de",
+        "telefon": "0761 201-4201",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.freiburg.de/pb/-/205348/liegenschaftskataster-und-geoinformation/oe6012921",
+        "seiten": [
+          "https://www.freiburg.de/pb/-/205332/liegenschaftskataster---auszug-beantragen/vbid6008693",
+          "https://www.freiburg.de/pb/-/205348/amt-fuer-wohnraumentwicklung-und-vermessung-awv/oe6014696"
+        ],
+        "gebuehr": "Liegenschaftskarte bis DIN A3 20,00 EUR, bis DIN A0 40,00 EUR; Flurstücks-/Eigentumsnachweis 10,00 EUR",
+        "hinweis": "Hausanschrift Berliner Allee 1, 79114 Freiburg; der Antrag kann laut Stadt auch online gestellt werden.",
+        "beleg_zitat": "Beim Vermessungsamt der Stadt Freiburg erhalten Sie direkt gegen eine einmalige Gebühr amtliche Auszüge",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Kathrin Schonefeld", "funktion": "Abteilungsleitung", "email": "Kathrin.Schonefeld@freiburg.de", "telefon": "+49 761 2014270", "seite": "https://www.freiburg.de/pb/-/205348/liegenschaftskataster-und-geoinformation/oe6012921"}
+        ]
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Emmendingen - Grundbuchamt",
+        "abteilung": "Grundbuchamt (zentrales Grundbuchamt, übernimmt den Bezirk des aufgehobenen Grundbuchamts Freiburg i.Br.)",
+        "email": "poststelle@gbaemmendingen.justiz.bwl.de",
+        "telefon": "+49 7641 96587-600",
+        "kanal": "formular",
+        "antrag_url": "https://amtsgericht-emmendingen.justiz-bw.de/Grundbuchausdruck-bw,Lde/Startseite/Grundbuch/Antrag+Grundbuchamt+Emmendingen",
+        "quelle_url": "https://amtsgericht-emmendingen.justiz-bw.de/pb/,Lde/Startseite/Amtsgericht/Zustaendigkeit",
+        "seiten": [
+          "https://amtsgericht-emmendingen.justiz-bw.de/",
+          "https://amtsgericht-emmendingen.justiz-bw.de/pb/,Lde/Startseite/Grundbuchamt/Grundbucheinsicht+und+Grundbuchausdrucke",
+          "https://www.freiburg.de/pb/-/205332/einsicht-in-das-grundbuch-beantragen/vbid2164"
+        ],
+        "gebuehr": "Unbeglaubigter Ausdruck 10,00 EUR, beglaubigter Ausdruck 20,00 EUR (KV 17000/17001 GNotKG); Einsicht gebührenfrei",
+        "hinweis": "Liebensteinstraße 2, 79312 Emmendingen; Einsicht auch über die Grundbucheinsichtsstelle der Stadt Freiburg, berechtigtes Interesse nach § 12 GBO nötig.",
+        "beleg_zitat": "Grundbuchamt Freiburg i.Br.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Freiburg im Breisgau, Umweltschutzamt",
+        "abteilung": "Bodenschutz, Altlasten",
+        "email": "umweltschutzamt@freiburg.de",
+        "telefon": "+49 761 2016102",
+        "kanal": "portal",
+        "antrag_url": "https://www.service-bw.de/onlineantraege/onlineantrag?prozessKey=m40191.bak&regionIds=1977&regionName=Freiburg%20im%20Breisgau&ags=08311000&leistungId=1121&isLegacy=true&processIntegrationName=freiburg",
+        "quelle_url": "https://www.freiburg.de/pb/232773.html",
+        "seiten": [
+          "https://www.freiburg.de/pb/-/205348/bodenschutz-altlasten/oe6001228",
+          "https://www.freiburg.de/pb/-/205332/bodenschutz--und-altlastenkataster---auskunft-und-einsicht-beantragen/vbid2785"
+        ],
+        "gebuehr": "Mündliche und einfache schriftliche Auskünfte sowie Einsicht vor Ort kostenfrei; ausführliche Auskünfte kostenpflichtig",
+        "hinweis": "Fehrenbachallee 12, 79106 Freiburg (Rathaus im Stühlinger); auch per PDF-Formular möglich.",
+        "beleg_zitat": "im \"Bodenschutz- und Altlastenkataster\" beim Umweltschutzamt der Stadt Freiburg dokumentiert",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Sonja Dold", "funktion": "Kompetenzsachbearbeiterin", "email": "Sonja.Dold@freiburg.de", "telefon": "+49 761 2016182", "seite": "https://www.freiburg.de/pb/-/205348/bodenschutz-altlasten/oe6001228"},
+          {"name": "Nicole Gampp", "funktion": "", "email": "Nicole.Gampp@freiburg.de", "telefon": "+49 761 2016135", "seite": "https://www.freiburg.de/pb/-/205348/bodenschutz-altlasten/oe6001228"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Freiburg im Breisgau, Baurechtsamt",
+        "abteilung": "BeratungsZentrum Bauen (BZB)",
+        "email": "bzb@freiburg.de",
+        "telefon": "+49 761 2014390",
+        "kanal": "portal",
+        "antrag_url": "https://www.service-bw.de/onlineantraege/onlineantrag?prozessKey=m40169.baulastenverzeichniss_freiburg&regionIds=1977&regionName=Freiburg%20im%20Breisgau&ags=08311000&leistungId=6000548",
+        "quelle_url": "https://www.freiburg.de/pb/-/205332/baulastenverzeichnis---einsicht-nehmen/vbid6000548",
+        "seiten": [
+          "https://www.freiburg.de/pb/-/205348/beratungszentrum-bauen-bzb/oe6011808",
+          "https://www.freiburg.de/pb/-/205348/baurechtsamt/oe6013885"
+        ],
+        "gebuehr": "Einsicht kostenlos; Kopien/Abschriften nach Gebührensatzung",
+        "hinweis": "Fehrenbachallee 12, 79106 Freiburg; berechtigtes Interesse nach § 72 LBO BW nötig.",
+        "beleg_zitat": "Zuständige Stelle: BeratungsZentrum Bauen (BZB)",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Freiburg im Breisgau, Baurechtsamt",
+        "abteilung": "BeratungsZentrum Bauen (BZB)",
+        "email": "bzb@freiburg.de",
+        "telefon": "+49 761 2014390",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.freiburg.de/pb/-/205332/akteneinsicht-beantragen/vbid2739",
+        "seiten": [
+          "https://www.freiburg.de/pb/-/205348/beratungszentrum-bauen-bzb/oe6011808"
+        ],
+        "gebuehr": "nach Verwaltungsgebührensatzung der Stadt Freiburg",
+        "hinweis": "Akteneinsicht nur vor Ort bei der Baurechtsbehörde, Nichtbeteiligte müssen ein berechtigtes Interesse darlegen; die Seite nennt kein eigenes Bauaktenarchiv.",
+        "beleg_zitat": "Sie müssen die Akteneinsicht vor Ort bei der Baurechtsbehörde beantragen.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in Freiburg im Breisgau",
+        "abteilung": "Gutachterausschuss mit Geschäftsstelle (Amt für Wohnraumentwicklung und Vermessung)",
+        "email": "gutachterausschuss@freiburg.de",
+        "telefon": "0761 201-4220",
+        "kanal": "portal",
+        "antrag_url": "https://www.service-bw.de/onlineantraege/onlineantrag?prozessKey=m40169.universalbestellprozess_freiburg&regionIds=1977&regionName=Freiburg%20im%20Breisgau&ags=08311000&leistungId=6004357&processIntegrationName=freiburg",
+        "quelle_url": "https://www.freiburg.de/pb/1424099.html",
+        "seiten": [
+          "https://www.freiburg.de/pb/2011438.html"
+        ],
+        "gebuehr": "Immobilienmarktbericht PDF 47,60 EUR (40 EUR zzgl. 19 % USt); Druck 45,48 EUR inkl. Versand",
+        "hinweis": "Berliner Allee 1, 79114 Freiburg; gedruckte Ausgabe nur per E-Mail bestellbar.",
+        "beleg_zitat": "Kontakt Gutachterausschuss mit Geschäftsstelle Berliner Allee 1 79114 Freiburg Telefon 0761 201-4220",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ],
+    "offen": []
+  },
+  {
+    "gemeinde": "Ludwigshafen am Rhein",
+    "plz_praefixe": ["67"],
+    "bundesland": "RP",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Vermessungs- und Katasteramt Rheinpfalz",
+        "abteilung": "Liegenschaftskataster - Auskünfte und Beratung, Auszüge",
+        "email": "service-rpf@vermkv.rlp.de",
+        "telefon": "06341 149-0",
+        "kanal": "portal",
+        "antrag_url": "https://vermka-rheinpfalz.rlp.de/geodaten-geoshop/shops/bestellung-von-auszuegen-aus-dem-liegenschaftskataster",
+        "quelle_url": "https://lvermgeo.rlp.de/service/vermessungsbehoerden-in-rheinland-pfalz",
+        "seiten": [
+          "https://vermka-rheinpfalz.rlp.de/nuetzliche-links/ansprechpartner",
+          "https://vermka-rheinpfalz.rlp.de/ueber-uns/so-finden-sie-uns",
+          "https://vermka-rheinpfalz.rlp.de/produktinformationen/liegenschaftskataster/auszuege-und-daten-aus-der-liegenschaftskarte"
+        ],
+        "gebuehr": "Auszug Liegenschaftskarte bis DIN A3 28,00 EUR, bis DIN A0 51,00 EUR (Mindestgebühr 28,00 EUR je Antrag)",
+        "hinweis": "Sitz Pestalozzistraße 4, 76829 Landau in der Pfalz, Dienstort Neustadt a. d. W.; Besuch nur mit Termin; E-Mail auf der Seite als service-rpf(at)vermkv.rlp.de geschrieben.",
+        "beleg_zitat": "Kreisfreie Stadt Ludwigshafen am Rhein",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Ludwigshafen am Rhein - Grundbuchamt",
+        "abteilung": "Grundbuchamt",
+        "email": "Grundbuchsachen.aglu@zw.mjv.rlp.de",
+        "telefon": "0621 5616 0",
+        "kanal": "formular",
+        "antrag_url": "https://aglu.justiz.rlp.de/fileadmin/justiz/Gerichte/Ordentliche_Gerichte/Oberlandesgerichte/Pfalz/Dokumente/Allgemein/2023/gb_antrag_2023.pdf",
+        "quelle_url": "https://aglu.justiz.rlp.de/wir-ueber-uns/zustaendigkeiten",
+        "seiten": [
+          "https://aglu.justiz.rlp.de/service-informationen/informationen-abteilungen/grundbuchamt",
+          "https://aglu.justiz.rlp.de/"
+        ],
+        "gebuehr": "Unbeglaubigter Auszug 10,00 EUR, beglaubigter Auszug 20,00 EUR",
+        "hinweis": "Wittelsbachstraße 10, 67061 Ludwigshafen am Rhein; Antrag persönlich, per Post/Fax oder mit Antragsformular per E-Mail, nicht telefonisch oder formlos.",
+        "beleg_zitat": "Der Gerichtsbezirk umfasst neben der Stadt auch folgende Gemeinden",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Ludwigshafen am Rhein, Bereich Umwelt und Klima",
+        "abteilung": "Untere Bodenschutzbehörde",
+        "email": "umwelt@ludwigshafen.de",
+        "telefon": "0621 504-2937",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://ludwigshafen.de/standort-mit-zukunft/umwelt/bodenschutz",
+        "seiten": [],
+        "gebuehr": "",
+        "hinweis": "Bismarckstraße 29, 67059 Ludwigshafen; weitere Durchwahlen -3523 und -3461; das Altlastverdachtsflächenkataster wird bei Grundstückskäufen herangezogen.",
+        "beleg_zitat": "Der Bereich Umwelt setzt zur Verwaltung dieser Verdachtsflächen ein",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Ludwigshafen am Rhein, Bereich 4-17 Bauaufsicht",
+        "abteilung": "Baulastenverzeichnis",
+        "email": "baulastenauskunft@ludwigshafen.de",
+        "telefon": "0621 504-3184",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://ludwigshafen.de/buergerservice/dienstleistungen/baulastenauskunft",
+        "seiten": [
+          "https://ludwigshafen.de/verwaltung-politik/stadtverwaltung-rathaus/verwaltung/4-17-bereich-bauaufsicht"
+        ],
+        "gebuehr": "Schriftlicher Auszug je Flurstück 15 bis 50 EUR nach Verwaltungsaufwand; mündliche Auskunft kostenlos",
+        "hinweis": "Halbergstraße 1, 67061 Ludwigshafen; Antrag schriftlich oder per E-Mail, berechtigtes Interesse nötig, Vordrucke privater Anbieter sind laut Stadt nicht nötig.",
+        "beleg_zitat": "Anträge auf Baulastenauskünfte ausschließlich direkt bei der Bauaufsicht zu stellen sind",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Jacqueline Schmitt-Waibel", "funktion": "", "email": "baulastenauskunft@ludwigshafen.de", "telefon": "0621 504-3184", "seite": "https://ludwigshafen.de/buergerservice/dienstleistungen/baulastenauskunft"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Ludwigshafen am Rhein, Bereich 4-17 Bauaufsicht",
+        "abteilung": "Archiv der Bauaufsicht (Akteneinsicht)",
+        "email": "bauakteneinsicht@ludwigshafen.de",
+        "telefon": "0621 504-3205",
+        "kanal": "portal",
+        "antrag_url": "https://antrag-kommunal.service.rlp.de/civ.public/start.html?oe=00.00.LU&mode=cc&cc_key=10116_DatenauskunftundAkteneinsicht_Baugenehmigungsakten",
+        "quelle_url": "https://ludwigshafen.de/buergerservice/dienstleistungen/akteneinsicht",
+        "seiten": [
+          "https://ludwigshafen.de/verwaltung-politik/stadtverwaltung-rathaus/verwaltung/4-17-bereich-bauaufsicht"
+        ],
+        "gebuehr": "Beschaffung der Akte 45 EUR, Beratung optional 20 EUR, Kopien A4 s/w 0,20 EUR je Seite, Rechnungsstellung 15 EUR",
+        "hinweis": "Halbergstraße 1, 67061 Ludwigshafen; Eigentümernachweis (Grundbuchauszug, Grundsteuerbescheid oder Kaufvertrag) bzw. Vollmacht und Ausweis nötig, Termin erforderlich.",
+        "beleg_zitat": "Für die Akteneinsicht können Eigentümer*innen online einen Antrag stellen",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Nicole Busching", "funktion": "", "email": "", "telefon": "0621 504-3205", "seite": "https://ludwigshafen.de/buergerservice/dienstleistungen/akteneinsicht"},
+          {"name": "Manuela Ebli", "funktion": "", "email": "", "telefon": "0621 504-3190", "seite": "https://ludwigshafen.de/buergerservice/dienstleistungen/akteneinsicht"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte der Stadt Ludwigshafen am Rhein",
+        "abteilung": "Geschäftsstelle des Gutachterausschusses im Bereich 4-16 Geoinformation und Vermessung",
+        "email": "stadtvermessung@ludwigshafen.de",
+        "telefon": "",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://ludwigshafen.de/verwaltung-politik/stadtverwaltung-rathaus/verwaltung/4-16-bereich-geoinformation-und-vermessung",
+        "seiten": [
+          "https://lvermgeo.rlp.de/geodaten-geoshop/shops/grundstuecksmarktberichte"
+        ],
+        "gebuehr": "",
+        "hinweis": "Rheinuferstraße 9, 67061 Ludwigshafen; der Grundstücksmarktbericht wird laut LVermGeo direkt bei der Stadt erworben, Preis auf den Seiten nicht genannt.",
+        "beleg_zitat": "Geschäftsstelle des Gutachterausschusses",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ],
+    "offen": []
+  },
+  {
+    "gemeinde": "Saarbrücken",
+    "plz_praefixe": ["66"],
+    "bundesland": "SL",
+    "kreis": "Regionalverband Saarbrücken",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Landesamt für Vermessung, Geoinformation und Landentwicklung (LVGL)",
+        "abteilung": "Karten- und Geodatenvertrieb",
+        "email": "verkauf@lvgl.saarland.de",
+        "telefon": "+49 681 9712-356",
+        "kanal": "portal",
+        "antrag_url": "https://www.saarland.de/lvgl/DE/Onlineshop",
+        "quelle_url": "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/kataster/Liegenschaftskataster",
+        "seiten": [
+          "https://www.saarland.de/lvgl/DE/service/kontakt/adresseanfahrtverkaufvdh"
+        ],
+        "gebuehr": "nach dem Besonderen Gebührenverzeichnis des LVGL",
+        "hinweis": "Vertriebsstelle Von der Heydt 22, 66115 Saarbrücken; Eigentümerangaben nur bei berechtigtem Interesse.",
+        "beleg_zitat": "Auszüge aus der Liegenschaftskarte sind erhältlich im Onlineshop des LVGL",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Saarbrücken - Saarländisches Grundbuchamt",
+        "abteilung": "Saarländisches Grundbuchamt",
+        "email": "",
+        "telefon": "",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.saarland.de/agsb/DE/institution/wegweiser/sgba",
+        "seiten": [
+          "https://www.saarland.de/agsb/DE/home/home_node.html"
+        ],
+        "gebuehr": "",
+        "hinweis": "Hausanschrift Mainzer Str. 176, 66121 Saarbrücken; Anträge gelten erst mit Vorlage bei einer zuständigen Person als eingegangen (§ 13 GBO).",
+        "beleg_zitat": "Saarländisches Grundbuchamt Hausanschrift Mainzer Str. 176 66121 Saarbrücken",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Landesamt für Umwelt- und Arbeitsschutz (LUA)",
+        "abteilung": "Fachbereich 2.2 Bodenschutz",
+        "email": "lua@lua.saarland.de",
+        "telefon": "+49 681 8500-1163",
+        "kanal": "portal",
+        "antrag_url": "https://service.saarland.de/portaldeeplink?tsa_leistung_id=106484623",
+        "quelle_url": "https://service.saarland.de/portaldeeplink?tsa_leistung_id=106484623",
+        "seiten": [
+          "https://www.saarland.de/lua/DE/service/formulare/form_altlasten",
+          "https://www.saarland.de/SharedDocs/Kontaktdaten/DE/LUA/Gesch%C3%A4ftsbereich2/Fachbereich2.2"
+        ],
+        "gebuehr": "Gebühren gemäß Verwaltungsaufwand",
+        "hinweis": "LUA, Don-Bosco-Straße 1, Saarbrücken; für Nicht-Eigentümer ist eine Vollmacht des Eigentümers nötig, Bearbeitung in der Regel 2 bis 4 Wochen.",
+        "beleg_zitat": "Zuständig im Saarland: Landesamt für Umwelt- und Arbeitsschutz (LUA)",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "M. Haßdenteufel", "funktion": "Fachbereichsleitung", "email": "", "telefon": "+49 681 8500-1163", "seite": "https://www.saarland.de/SharedDocs/Kontaktdaten/DE/LUA/Gesch%C3%A4ftsbereich2/Fachbereich2.2"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Landeshauptstadt Saarbrücken, Untere Bauaufsicht",
+        "abteilung": "Untere Bauaufsicht (Baulastenauskunft)",
+        "email": "",
+        "telefon": "",
+        "kanal": "formular",
+        "antrag_url": "https://www.saarbruecken.de/leben_in_saarbruecken/planen_bauen_wohnen/digitaler_bauantrag",
+        "quelle_url": "https://www.saarbruecken.de/leben_in_saarbruecken/planen_bauen_wohnen/bauaufsicht",
+        "seiten": [
+          "https://www.saarbruecken.de/leben_in_saarbruecken/planen_bauen_wohnen/digitaler_bauantrag"
+        ],
+        "gebuehr": "",
+        "hinweis": "Formular \"Baulastenauskunft, Ergänzungsbogen\" auf der Seite Digitaler Bauantrag; für die übrigen Gemeinden des Regionalverbands ist dessen Untere Bauaufsicht zuständig, nicht die Stadt.",
+        "beleg_zitat": "Die Untere Bauaufsicht der Landeshauptstadt Saarbrücken ist nicht für das Gebiet des Regionalverbandes zuständig.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte für den Bereich der Landeshauptstadt Saarbrücken",
+        "abteilung": "Geschäftsstelle im Vermessungs- und Geoinformationsamt",
+        "email": "vermessungsamt@saarbruecken.de",
+        "telefon": "+49 681 905-1811",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.saarbruecken.de/leben_in_saarbruecken/planen_bauen_wohnen/gutachterausschuss",
+        "seiten": [
+          "https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/gutachterausschuesse/gutachterstadtsaarbruecken"
+        ],
+        "gebuehr": "",
+        "hinweis": "Gerberstraße 29, 66111 Saarbrücken; der Immobilienmarktbericht 2026 steht als PDF auf der Seite zum Download, ein Preis ist nicht genannt.",
+        "beleg_zitat": "über die Tätigkeit des Gutachterausschusses für den Bereich der Landeshauptstadt zu informieren",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Johannes Scholl", "funktion": "Vorsitzender des Gutachterausschusses (Vermessungsdirektor)", "email": "", "telefon": "", "seite": "https://www.saarbruecken.de/leben_in_saarbruecken/planen_bauen_wohnen/gutachterausschuss"}
+        ]
+      }
+    ],
+    "offen": [
+      "bauakte: Untere Bauaufsicht der Landeshauptstadt ist zuständig, aber auf saarbruecken.de fand sich keine Seite zu Bauaktenarchiv oder Einsicht in Altakten (nur Online-Einsicht laufender Bauanträge); Websuche war im Lauf ausgeschöpft.",
+      "grundbuch: Telefon, E-Mail und Gebühren des Saarländischen Grundbuchamts stehen auf den abgerufenen Seiten nicht."
+    ]
+  }
+]

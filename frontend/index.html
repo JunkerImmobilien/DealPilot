@@ -1428,6 +1428,34 @@ label.dp-required.qc-required::after {
     </div>
   </div>
 
+  <!-- ═══ v2430 · MIETERHÖHUNG UND ZIELBILD (optional) ═════════════════════
+       Marcel 19.10.2026: je Wohnung bis zu drei Mieten — Ist, Soll-Miete
+       (Mieter bleibt, normale Mieterhöhung) und Zielbild (nach Umbau oder
+       Neuvermietung). Freiwillig: „kann, nicht muss". Für ETW/EFH/ZFH hier am
+       Objekt; beim MFH je Wohnung im Fenster „Einheiten erfassen" — dann
+       zeigt diese Karte nur die Summe (potenzial.js objektKarte()).
+       Felder in storage.js FIELDS und resetFields. Eingetragen wird im
+       laufenden Objekt (Bestand), nicht im eingefrorenen Ankauf-Stand. -->
+  <div class="card" data-collapsible="zb-obj" data-collapse-title="Mieterhöhung und Zielbild (optional)" id="zb-karte">
+    <div class="ct-row">
+      <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="14" height="14"><use href="#i-trend"/></svg></span>Mieterhöhung und Zielbild <span class="oe-ct-hint">optional · kann, nicht muss</span></div>
+    </div>
+    <div id="zb-mfh-summe" style="display:none"></div>
+    <div id="zb-einzel">
+      <p class="sec-desc" style="margin:0 0 12px"><b>Soll-Miete</b> ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt — er bleibt wohnen. <b>Zielbild</b> ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Beides ist freiwillig. Score und Verkehrswert rechnen weiter mit dem Bestand; der Ertragswert je Stufe steht in der Pilot-Analyse und in beiden PDFs.</p>
+      <div class="g3">
+        <div class="f"><label title="Die ortsübliche Vergleichsmiete (Mietspiegel, § 558 BGB). Leer: DealPilot nimmt die Marktmiete aus dem Tab Miete.">Vergleichsmiete (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_vgl_qm" type="text" inputmode="decimal" placeholder="aus Tab Miete" class="trl"></div></div>
+        <div class="f"><label title="Eigene Angabe. Leer: DealPilot rechnet vor — bis zur Vergleichsmiete, höchstens Kappungsgrenze, frühestens 15 Monate nach der letzten Erhöhung.">Soll-Miete (Mieter bleibt, €/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_soll_qm" type="text" inputmode="decimal" placeholder="leer = gerechnet" class="trl"></div><div class="cf-hint" id="zb-soll-vorschlag"></div></div>
+        <div class="f"><label title="Leer: 15 Monate nach der letzten Erhöhung (Tab Miete, Mietvertrag).">Soll erreichbar ab</label><div class="iw"><input id="zb_soll_ab" type="month"></div></div>
+        <div class="f"><label title="Was nach Umbau oder Neuvermietung erzielbar ist.">Zielmiete (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_ziel_qm" type="text" inputmode="decimal" placeholder="z. B. 9,20" class="trl"></div></div>
+        <div class="f s2"><label>Zielbild ab wann</label><div class="iw"><input id="zb_ziel_wann" type="text" placeholder="z. B. bei Mieterwechsel, nach Sanierung 2027"></div></div>
+      </div>
+      <div class="card-title">Maßnahmen <span class="oe-ct-hint">mit Kosten und Modernisierungspunkten (Anlage 2 ImmoWertV)</span></div>
+      <div id="zb-massnahmen-host"></div>
+      <input type="hidden" id="zb_massnahmen">
+      <div class="dp-zb-sum" id="zb-summe"></div>
+    </div>
+  </div>
   <!-- ═══ v1136-WMTAB-1 · Wertermittlung am Objekt ═══════════════════════
        Seit v1121/v1134/v1135 stehen die Wertermittlungsangaben dauerhaft am
        Objekt und laufen in beide Richtungen — ansehen oder aendern konnte man
@@ -3564,7 +3592,7 @@ label.dp-required.qc-required::after {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="js/pdf-logo.js?v=v1634b"></script><!-- v1634 · muss VOR den PDF-Bausteinen stehen: waermt das Logo vor -->
 <script src="js/pdf-anlage-bmf.js?v=v1634c"></script>
-<script src="js/pdf-investment-bank.js?v=v2273b"></script>
+<script src="js/pdf-investment-bank.js?v=v2430"></script>
 <script src="js/bmf-modal.js?v=v2269"></script>
 <script src="js/bmf-modal-v292.js?v=v2269"></script>
 <script src="js/bmf-bodenabschlag.js?v=v2269"></script>
@@ -3599,7 +3627,7 @@ label.dp-required.qc-required::after {
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
-<script src="js/mietentwicklung.js?v=v2422"></script>
+<script src="js/mietentwicklung.js?v=v2430"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=v2261"></script>
 <script src="js/config.js?v=v2261"></script>
@@ -3625,7 +3653,7 @@ label.dp-required.qc-required::after {
   <script src="js/ueberfuehrung-wizard.js?v=v2180"></script>
   <script src="js/apikeys.js?v=811"></script>
   <script src="js/telegram-panel.js?v=v2421"></script>
-  <script src="js/unterlagen-modal.js?v=v2421"></script>
+  <script src="js/unterlagen-modal.js?v=v2441a"></script>
   <script src="js/standardwerte-karten.js?v=v2261"></script>
   <script src="js/settings.js?v=v2216c"></script>
 <script src="js/pricing-modal.js?v=v2132a"></script>
@@ -3645,14 +3673,14 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=v2254"></script>
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
-<script src="js/ui.js?v=v2261"></script>
+<script src="js/ui.js?v=v2430"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v2361"></script>
+<script src="js/storage.js?v=v2430"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v2269"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v2263e"></script>
 <script src="js/track-record.js?v=W39"></script>
-<script src="js/pdf.js?v=v2273b"></script>
+<script src="js/pdf.js?v=v2430"></script>
 <script src="js/auth.js?v=v2249"></script>
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
   <!-- v1370 (B5): nach dem 401-Handler, damit beide dieselbe Auth.apiCall umschliessen -->
@@ -3683,7 +3711,8 @@ label.dp-required.qc-required::after {
 <script src="js/objekt-reiter.js?v=v2403"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v2410"></script>
+<script src="js/mfh-einheiten.js?v=v2431"></script>
+<script src="js/potenzial.js?v=v2431"></script>
 <script src="js/mietvertrag-objekt.js?v=v2087"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>
@@ -3694,7 +3723,7 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v2240"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v2410"></script>
+<script src="js/help.js?v=v2430"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v2410"></script>
@@ -3758,10 +3787,10 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v2354"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v2376"></script>
+  <script src="js/object-actions.js?v=v2430"></script>
   <script src="js/dpsh-score-hero.js?v=v2263"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
-  <script src="js/voice-import.js?v=v2421"></script>
+  <script src="js/voice-import.js?v=v2430"></script>
   <!-- v1895: der sichtbare Vermerk an jedem pauschal angesetzten
        Bewirtschaftungsposten. Liest nur `_dp_herkunft`, rechnet nichts. -->
   <script src="js/bwk-vermerk.js?v=v1895b"></script>

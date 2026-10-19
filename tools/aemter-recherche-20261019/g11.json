@@ -1,0 +1,375 @@
+[
+  {
+    "gemeinde": "Frankfurt am Main",
+    "plz_praefixe": ["60", "65"],
+    "bundesland": "HE",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Amt für Bodenmanagement Limburg a. d. Lahn",
+        "abteilung": "Kundenservice (Katasterauszüge)",
+        "email": "kundenservice.afb-limburg@hvbg.hessen.de",
+        "telefon": "+49 611 535 6000",
+        "kanal": "portal",
+        "antrag_url": "https://www.gds.hessen.de",
+        "quelle_url": "https://verwaltungsportal.hessen.de/behoerde?org_id=L100001_9712048",
+        "seiten": [
+          "https://hvbg.hessen.de/ueber-uns/dienststellen/amt-fuer-bodenmanagement-limburg-a-d-lahn",
+          "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2022-08/alphabetische_liste_der_gemarkungen_mit_zustaendigem_amt.pdf",
+          "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2022-09/amtsbezirke_mit_adressen.pdf"
+        ],
+        "gebuehr": "",
+        "hinweis": "Laut Gemarkungsliste der HVBG sind alle Frankfurter Gemarkungen dem AfB Limburg zugeordnet; Auszüge auch online über Geodaten online (gds.hessen.de).",
+        "beleg_zitat": "Bockenheim Frankfurt am Main Kreisfreie Stadt Frankfurt am Main Limburg a. d. Lahn",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Frankfurt am Main",
+        "abteilung": "Grundbuchamt",
+        "email": "grundbuchamt@ag-frankfurt.justiz.hessen.de",
+        "telefon": "+49 69 1367 01",
+        "kanal": "formular",
+        "antrag_url": "",
+        "quelle_url": "https://ordentliche-gerichtsbarkeit.hessen.de/landgerichtsbezirk-frankfurt-am-main/amtsgericht-frankfurt-am-main/grundbuchamt",
+        "seiten": [
+          "https://ordentliche-gerichtsbarkeit.hessen.de/landgerichtsbezirk-frankfurt-am-main/amtsgericht-frankfurt-am-main",
+          "https://ordentliche-gerichtsbarkeit.hessen.de/themen-der-ordentlichen-gerichtsbarkeit/grundbuch-haus-und-wohnung"
+        ],
+        "gebuehr": "einfacher Grundbuchauszug 10 € (laut Seite des Amtsgerichts)",
+        "hinweis": "Zwei Standorte nach Katasterbezirk: Gerichtsgebäude A (Heiligkreuzgasse 34, Innenstadt u. a.) und Außenstelle Höchst (Zuckschwerdtstraße 58, u. a. Höchst, Nied, Schwanheim, Sossenheim); Anträge über die Formulare des Amtsgerichts.",
+        "beleg_zitat": "Heiligkreuzgasse 34",
+        "geteilt": true,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Regierungspräsidium Darmstadt",
+        "abteilung": "Abteilung Umwelt Frankfurt, Servicestelle Frankfurt (Bodenschutz)",
+        "email": "Bodenschutz-F@rpda.hessen.de",
+        "telefon": "+49 69 2714 5987",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://rp-darmstadt.hessen.de/umwelt-und-energie/gewaesser-und-bodenschutz/boden-grundwasserschaeden/altlasteninformationen",
+        "seiten": [
+          "https://rp-darmstadt.hessen.de/umwelt-und-energie/gewaesser-und-bodenschutz/boden-grundwasserschaeden/altlasten"
+        ],
+        "gebuehr": "25,00 € je ¼ Stunde Zeitaufwand, höchstens 600,00 €",
+        "hinweis": "Auskunft aus der Altflächendatei per E-Mail mit Gemarkung, Flur, Flurstück und Lageplan; bei personenbezogenen Daten Einverständnis des Eigentümers nötig.",
+        "beleg_zitat": "Gutleutstraße 114, 60327 Frankfurt am Main",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Frankfurt am Main, Bauaufsicht",
+        "abteilung": "Fachbereich Baulasten (Sachgebiet Beratung, Antragsannahme und Baulasten)",
+        "email": "",
+        "telefon": "069 212-37069",
+        "kanal": "portal",
+        "antrag_url": "https://portal-civ-bau.ekom21.de/civ-bau.public/start.html?oe=00.00.Bau.06.FFM&mode=cc&cc_key=Baulastabfrage",
+        "quelle_url": "https://www.bauaufsicht-frankfurt.de/service/baulastauskunft-online",
+        "seiten": [
+          "https://www.bauaufsicht-frankfurt.de/kontakt/ansprechpartner",
+          "https://www.bauaufsicht-frankfurt.de/bauberatung/beratung-antragsannahme-baulasten"
+        ],
+        "gebuehr": "20 € je abgefragtem Flurstück; Negativauskunft kostenfrei",
+        "hinweis": "Funktionspostfach steht auf der Seite nur spamgeschützt (baulasten@…stadt-frankfurt.de) und ist deshalb nicht übernommen.",
+        "beleg_zitat": "Die Gebühr für jedes abgefragte Flurstück beträgt 20,-- EUR.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Frankfurt am Main, Bauaufsicht",
+        "abteilung": "Archiv der Bauaufsicht",
+        "email": "",
+        "telefon": "069 212-44544",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.bauaufsicht-frankfurt.de/bauberatung/archiv",
+        "seiten": [
+          "https://www.bauaufsicht-frankfurt.de/kontakt/ansprechpartner",
+          "https://www.bauaufsicht-frankfurt.de/fileadmin/Downloads__alle/Merkblaetter/Merkblatt_Akteneinsicht_Abgeschlossene_Verfahren.pdf",
+          "https://www.bauaufsicht-frankfurt.de/fileadmin/Downloads__alle/Antraege_und_Formulare/Vollmachtvorlage_Archiv.pdf"
+        ],
+        "gebuehr": "Akteneinsicht in der Regel 36,50 € je Liegenschaft; digitale Unterlagen 0,87 € je MB, mindestens 36,50 €",
+        "hinweis": "Einsicht nur für Eigentümer oder Bevollmächtigte nach Terminvereinbarung per E-Mail; Postfach auf der Seite nur spamgeschützt (archiv-bauaufsicht@…stadt-frankfurt.de).",
+        "beleg_zitat": "Bauaufsicht Frankfurt am Main, Kurt-Schumacher-Straße 10, 60311 Frankfurt am Main",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Frankfurt am Main",
+        "abteilung": "Geschäftsstelle (beim Stadtvermessungsamt)",
+        "email": "gutachterausschuss.ffm@stadt-frankfurt.de",
+        "telefon": "+49 (69) 212 36781",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://hvbg.hessen.de/gutachterausschuss",
+        "seiten": [
+          "https://frankfurt.de/service-und-rathaus/verwaltung/aemter-und-institutionen/stadtvermessungsamt/gutachterausschuss-fuer-immobilienwerte"
+        ],
+        "gebuehr": "",
+        "hinweis": "frankfurt.de blockiert automatische Abrufe; Angaben aus der Übersicht der HVBG, die Seite der Stadt ist als weitere Seite genannt.",
+        "beleg_zitat": "Bauteil A, 6. Stock, Kurt-Schumacher-Str. 10, 60311 Frankfurt am Main",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ],
+    "offen": []
+  },
+  {
+    "gemeinde": "Wiesbaden",
+    "plz_praefixe": ["65"],
+    "bundesland": "HE",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Amt für Bodenmanagement Limburg a. d. Lahn",
+        "abteilung": "Kundenservice (Katasterauszüge)",
+        "email": "kundenservice.afb-limburg@hvbg.hessen.de",
+        "telefon": "+49 611 535 6000",
+        "kanal": "portal",
+        "antrag_url": "https://www.gds.hessen.de",
+        "quelle_url": "https://verwaltungsportal.hessen.de/behoerde?org_id=L100001_9712048",
+        "seiten": [
+          "https://hvbg.hessen.de/ueber-uns/dienststellen/amt-fuer-bodenmanagement-limburg-a-d-lahn",
+          "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2022-08/alphabetische_liste_der_gemarkungen_mit_zustaendigem_amt.pdf"
+        ],
+        "gebuehr": "",
+        "hinweis": "Laut Gemarkungsliste der HVBG sind alle Wiesbadener Gemarkungen dem AfB Limburg zugeordnet; Außenstelle Hofheim-Wallau, Nassaustraße 28.",
+        "beleg_zitat": "Breckenheim Wiesbaden Landeshauptstadt Wiesbaden Limburg a. d. Lahn",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Wiesbaden",
+        "abteilung": "Grundbuchamt",
+        "email": "grundbuchamt@ag-wiesbaden.justiz.hessen.de",
+        "telefon": "+49 611 3261 0",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://ordentliche-gerichtsbarkeit.hessen.de/landgerichtsbezirk-wiesbaden/amtsgericht-wiesbaden/grundbuchamt",
+        "seiten": [
+          "https://ordentliche-gerichtsbarkeit.hessen.de/landgerichtsbezirk-wiesbaden/amtsgericht-wiesbaden"
+        ],
+        "gebuehr": "einfacher Grundbuchausdruck 10,00 €, beglaubigt 20,00 €, Abschrift Grundakte 0,50 € je Seite",
+        "hinweis": "Formloser unterschriebener Antrag per Post, Fax oder E-Mail (eingescanntes PDF); berechtigtes Interesse erforderlich.",
+        "beleg_zitat": "Amtsgericht Wiesbaden, Grundbuchamt, Mainzer Str. 124, 65189 Wiesbaden",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Regierungspräsidium Darmstadt",
+        "abteilung": "Abteilung Umwelt Wiesbaden, Servicestelle Wiesbaden (Grundwasser und Boden)",
+        "email": "grundwasser.boden-wi@rpda.hessen.de",
+        "telefon": "+49 611 3309 2601",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://rp-darmstadt.hessen.de/umwelt-und-energie/gewaesser-und-bodenschutz/boden-grundwasserschaeden/altlasteninformationen",
+        "seiten": [
+          "https://www.wiesbaden.de/vv/produkte/36/Altlastenverdacht-von-Grundstuecken-Auskunft-einholen",
+          "https://www.wiesbaden.de/rathaus/formulare/altlastenverdacht-auskunft-einholen"
+        ],
+        "gebuehr": "25,00 € je ¼ Stunde Zeitaufwand, höchstens 600,00 €",
+        "hinweis": "Zusätzlich erteilt das Umweltamt der Landeshauptstadt Wiesbaden Auskunft zum Altlastenverdacht (Tel. 0611 312295 / 313957; gebührenfrei, wenn keine Hinweise vorliegen).",
+        "beleg_zitat": "Kreuzberger Ring 17 a + b, 65205 Wiesbaden",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Landeshauptstadt Wiesbaden, Bauaufsicht",
+        "abteilung": "Baulasten",
+        "email": "",
+        "telefon": "0611 316300",
+        "kanal": "portal",
+        "antrag_url": "https://portal-civ-bau.ekom21.de/civ-bau.public/start.html?oe=00.00.Bau.06.WiesbaStadt&mode=cc&cc_key=BaulastenauskunftWI",
+        "quelle_url": "https://www.wiesbaden.de/leben-wohnen/wohnen-bauen/bauaufsicht/service-bauaufsicht/baulastenauskunft-online",
+        "seiten": [
+          "https://www.wiesbaden.de/leben-wohnen/wohnen-bauen/bauaufsicht/service-bauaufsicht/baulasten",
+          "https://www.wiesbaden.de/vv/oe/05/63/Bauaufsicht"
+        ],
+        "gebuehr": "30 € je Flurstück",
+        "hinweis": "Auskünfte ausschließlich über das Baulastenportal der Stadt.",
+        "beleg_zitat": "Auskünfte zu Baulasten erhalten Sie ausschließlich über das Baulastenportal der Stadt Wiesbaden.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Landeshauptstadt Wiesbaden, Bauaufsicht",
+        "abteilung": "Archiv (Akteneinsicht Bauakten)",
+        "email": "",
+        "telefon": "0611 316509",
+        "kanal": "formular",
+        "antrag_url": "https://stadtverwaltung.wiesbaden.de:8443/civ.public/start.html?oe=00.00.WI.05.63.01.10&mode=cc&cc_key=BauaktenEinsicht",
+        "quelle_url": "https://www.wiesbaden.de/vv/produkte/63/Akteneinsicht-Bauakten-Archiv",
+        "seiten": [
+          "https://www.wiesbaden.de/leben-wohnen/wohnen-bauen/bauaufsicht/service-bauaufsicht/archiv-bauakten",
+          "https://www.wiesbaden.de/leben-wohnen/wohnen-bauen/bauaufsicht/service-bauaufsicht/akteneinsicht-archiv"
+        ],
+        "gebuehr": "gebührenpflichtig (Betrag auf der Seite nicht genannt)",
+        "hinweis": "Nur abgeschlossene Verfahren, nur Eigentümer oder schriftlich Bevollmächtigte; Tiefbau- und Entwässerungsakten beim Tiefbau- und Vermessungsamt.",
+        "beleg_zitat": "Die Akteneinsicht im Archiv ist nur in abgeschlossenen Verfahren möglich.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Immobilienwerte für den Bereich der Landeshauptstadt Wiesbaden",
+        "abteilung": "Geschäftsstelle beim Tiefbau- und Vermessungsamt",
+        "email": "gutachterausschuss@wiesbaden.de",
+        "telefon": "0611 316352",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.wiesbaden.de/vv/oe/03/66/Gutachterausschuss",
+        "seiten": [
+          "https://hvbg.hessen.de/gutachterausschuss"
+        ],
+        "gebuehr": "Immobilienmarktbericht 30 €; als PDF kostenfrei über gds.hessen.de",
+        "hinweis": "",
+        "beleg_zitat": "Gustav-Stresemann-Ring 15, 65189 Wiesbaden",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ],
+    "offen": []
+  },
+  {
+    "gemeinde": "Darmstadt",
+    "plz_praefixe": ["64"],
+    "bundesland": "HE",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Amt für Bodenmanagement Heppenheim",
+        "abteilung": "Kundenservice",
+        "email": "kundenservice.afb-heppenheim@hvbg.hessen.de",
+        "telefon": "+49 611 535 8100",
+        "kanal": "portal",
+        "antrag_url": "https://www.gds.hessen.de",
+        "quelle_url": "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2022-08/alphabetische_liste_der_gemarkungen_mit_zustaendigem_amt.pdf",
+        "seiten": [
+          "https://hvbg.hessen.de/ueber-uns/dienststellen/amt-fuer-bodenmanagement-heppenheim",
+          "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2022-09/amtsbezirke_mit_adressen.pdf"
+        ],
+        "gebuehr": "",
+        "hinweis": "Laut Gemarkungsliste der HVBG sind die Darmstädter Gemarkungen dem AfB Heppenheim (Odenwaldstraße 6, 64646 Heppenheim) zugeordnet.",
+        "beleg_zitat": "Darmstadt Bezirk 1 Darmstadt Kreisfreie Stadt Darmstadt Heppenheim",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Darmstadt",
+        "abteilung": "Grundbuchamt (Service-Stelle Gebäude D)",
+        "email": "",
+        "telefon": "+49 6151 992 0",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://ordentliche-gerichtsbarkeit.hessen.de/landgerichtsbezirk-darmstadt/amtsgericht-darmstadt",
+        "seiten": [
+          "https://ordentliche-gerichtsbarkeit.hessen.de/themen-der-ordentlichen-gerichtsbarkeit/grundbuch-haus-und-wohnung"
+        ],
+        "gebuehr": "",
+        "hinweis": "Grundbuchauszüge Mo–Fr 8:30–12:30 Uhr an der Service-Stelle in Gebäude D.",
+        "beleg_zitat": "Mathildenplatz 15, 64283 Darmstadt",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Regierungspräsidium Darmstadt",
+        "abteilung": "Servicestelle Darmstadt (Altlastenauskünfte)",
+        "email": "altlastenauskuenfte@rpda.hessen.de",
+        "telefon": "+49 6151 12 8125",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://rp-darmstadt.hessen.de/umwelt-und-energie/gewaesser-und-bodenschutz/boden-grundwasserschaeden/altlasteninformationen",
+        "seiten": [
+          "https://rp-darmstadt.hessen.de/umwelt-und-energie/gewaesser-und-bodenschutz/boden-grundwasserschaeden/altlasten"
+        ],
+        "gebuehr": "25,00 € je ¼ Stunde Zeitaufwand, höchstens 600,00 €",
+        "hinweis": "Auskunft aus der Altflächendatei per E-Mail; bei personenbezogenen Daten Einverständnis des Eigentümers nötig.",
+        "beleg_zitat": "Regierungspräsidium Darmstadt, Luisenplatz 2, 64283 Darmstadt",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Wissenschaftsstadt Darmstadt, Bauaufsichtsamt",
+        "abteilung": "Baulasten",
+        "email": "baulasten@darmstadt.de",
+        "telefon": "(06151) 13-2753",
+        "kanal": "formular",
+        "antrag_url": "https://rathaus.darmstadt.de/public/index.php?l=69&mr=20&smr=200&m=5663",
+        "quelle_url": "https://digitales-rathaus.darmstadt.de/kategorien/aemter-und-einrichtungen/baulasten",
+        "seiten": [
+          "https://digitales-rathaus.darmstadt.de/kategorien/kontaktpersonen/merkel-125",
+          "https://digitales-rathaus.darmstadt.de/kategorien/aemter-und-einrichtungen/bauaufsichtsamt"
+        ],
+        "gebuehr": "schriftliche Auskunft 5,00 € Bearbeitungsgebühr zzgl. 22,00 € je Flurstück; Vorsprache kostenfrei",
+        "hinweis": "Stadthaus West, Mina-Rees-Straße 12, 64295 Darmstadt; berechtigtes Interesse erforderlich.",
+        "beleg_zitat": "Wer ein berechtigtes Interesse darlegt, kann in das Baulastenverzeichnis Einsicht nehmen",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Merkel", "funktion": "Kontaktperson Baulasten", "email": "baulasten@darmstadt.de", "telefon": "(06151) 13-2753", "seite": "https://digitales-rathaus.darmstadt.de/kategorien/kontaktpersonen/merkel-125"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Wissenschaftsstadt Darmstadt, Bauaufsichtsamt",
+        "abteilung": "Akteneinsicht (Bauunterlagen u. a.)",
+        "email": "bauaufsicht@darmstadt.de",
+        "telefon": "",
+        "kanal": "formular",
+        "antrag_url": "https://rathaus.darmstadt.de/public/index.php?l=69&mr=20&smr=200&m=1625",
+        "quelle_url": "https://digitales-rathaus.darmstadt.de/kategorien/aemter-und-einrichtungen/akteneinsicht-bauunterlagen-u-a-",
+        "seiten": [
+          "https://digitales-rathaus.darmstadt.de/kategorien/aemter-und-einrichtungen/bauaufsichtsamt",
+          "https://digitales-rathaus.darmstadt.de/kategorien/kontaktpersonen/barnewald-11064",
+          "https://digitales-rathaus.darmstadt.de/kategorien/kontaktpersonen/boehme-10853"
+        ],
+        "gebuehr": "Ablichtungen gebührenpflichtig (laut Verwaltungskostenverzeichnis)",
+        "hinweis": "Antrag per Post oder eingescannt per E-Mail; Einsicht nur für Eigentümer oder Bevollmächtigte.",
+        "beleg_zitat": "Die Einsichtnahme ist Eigentümer*innen oder den von ihnen bevollmächtigten Personen vorbehalten.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Barnewald", "funktion": "Kontaktperson Akteneinsicht", "email": "bauaufsicht@darmstadt.de", "telefon": "(06151) 13-3462", "seite": "https://digitales-rathaus.darmstadt.de/kategorien/kontaktpersonen/barnewald-11064"},
+          {"name": "Böhme", "funktion": "Kontaktperson Akteneinsicht", "email": "bauaufsicht@darmstadt.de", "telefon": "(06151) 13-2643", "seite": "https://digitales-rathaus.darmstadt.de/kategorien/kontaktpersonen/boehme-10853"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Immobilienwerte für den Bereich der Wissenschaftsstadt Darmstadt",
+        "abteilung": "Geschäftsstelle (Vermessungsamt, Stadthaus West)",
+        "email": "info@gaa-darmstadt.de",
+        "telefon": "+49 (6151) 13-2619",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://hvbg.hessen.de/gutachterausschuss",
+        "seiten": [
+          "https://www.gaa-darmstadt.de/kontakt.html"
+        ],
+        "gebuehr": "",
+        "hinweis": "Auf der Kontaktseite verweist der Mail-Link auf gutachterausschuss@darmstadt.de, angezeigt wird info@gaa-darmstadt.de.",
+        "beleg_zitat": "Stadthaus West, Mina-Rees-Straße 10, 64295 Darmstadt",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Monika Koch", "funktion": "Geschäftsstellenleitung", "email": "", "telefon": "06151 13-2620", "seite": "https://www.gaa-darmstadt.de/kontakt.html"},
+          {"name": "Nora Hunkel", "funktion": "Allgemeine Auskünfte", "email": "", "telefon": "06151 13-2619", "seite": "https://www.gaa-darmstadt.de/kontakt.html"}
+        ]
+      }
+    ],
+    "offen": []
+  }
+]

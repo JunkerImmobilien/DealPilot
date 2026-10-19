@@ -373,6 +373,39 @@
         }
       ]
     },
+    /* v2430: Mieterhöhung und Zielbild (Marcel 19.10.2026) */
+    {
+      id: 'zielbild',
+      title: 'Mieterhöhung und Zielbild',
+      icon: 'i-trend',
+      desc: 'Ist, Soll-Miete und Zielbild — und was im Haus steckt',
+      sections: [
+        {
+          h: 'Drei Mieten je Wohnung',
+          body: '<strong>Ist</strong> ist, was heute gezahlt wird. Die <strong>Soll-Miete (Mieter bleibt)</strong> ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt. Das <strong>Zielbild</strong> ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Beides ist freiwillig — ohne Angaben ändert sich nichts.'
+        },
+        {
+          h: 'Wo du es einträgst',
+          body: 'Bei ETW, EFH und ZFH im Reiter Objekt, Karte „Mieterhöhung und Zielbild (optional)“. Beim Mehrfamilienhaus je Wohnung: „Einheiten erfassen“ → in der Liste <strong>Details</strong> → Blöcke Mietvertrag, Soll-Miete, Zielbild und Ertragswert. Die Karte im Reiter Objekt zeigt dann nur die Summe aus den Wohnungen. Eingetragen wird im laufenden Objekt (Bestand), nicht im eingefrorenen Ankauf-Stand. Auch die geführte Eingabe und die Spracheingabe fragen freiwillig danach.'
+        },
+        {
+          h: 'Wie DealPilot die Soll-Miete vorrechnet',
+          body: 'Ohne eigene Angabe: bis zur ortsüblichen Vergleichsmiete (§ 558 BGB; Vergleichsmiete an der Wohnung, sonst die Marktmiete aus dem Reiter Miete), frühestens 15 Monate nach der letzten Erhöhung, höchstens um die Kappungsgrenze — 15 % in drei Jahren, wo die Gemeinde in der Landesverordnung steht, sonst 20 %. Ist die Gemeinde unbekannt oder die Verordnung ausgelaufen, steht 20 % mit dem Hinweis, es zu prüfen. Eine Maßnahme mit Haken „bewohnt (§ 559)“ erhöht die Soll-Miete um 8 % der Kosten im Jahr, gedeckelt auf 3 €/m² (2 €/m² unter 7 €/m²) in sechs Jahren. Deine eigene Angabe überschreibt immer.'
+        },
+        {
+          h: 'Maßnahmen und Restnutzungsdauer',
+          body: 'Maßnahmen wählst du als Chips mit Kosten. Bad, Fenster, Böden/Innenausbau und Grundriss tragen Modernisierungspunkte nach Anlage 2 ImmoWertV — höchstens bis zum Maximum des Gewerks. Dach, Fassade, Heizung und Leitungen gehören dem ganzen Haus. Mieterhöhung und Zielbild rechnen mit der Restnutzungsdauer nach diesen Punkten, der Bestand mit der heutigen.'
+        },
+        {
+          h: 'Ertragswert je Stufe und Aufteilung',
+          body: 'DealPilot rechnet den Ertragswert für Bestand, Mieterhöhung und Zielbild mit demselben Rechenkern und denselben Ansätzen wie der Marktbericht Stufe 3 (Liegenschaftszins, Bewirtschaftung, Bodenwert); je Stufe wechseln nur Miete und Restnutzungsdauer. Kein Kontingent. Beim MFH zusätzlich je Wohnung — als Anteil am Haus oder, mit dem Haken „aufgeteilt“, als Eigentumswohnung mit dem Zins für Wohnungseigentum. Die Summe nach Aufteilung steht dem Haus als Ganzes gegenüber, abzüglich der Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung, eigene Angabe möglich). Alles ist ein <strong>Potenzialwert nach Mieterhöhung bzw. Zielbild, keine Verkehrswertermittlung</strong>.'
+        },
+        {
+          h: 'Wo es erscheint — und wo nicht',
+          body: 'In der Pilot-Analyse (Reiter „Ankauf · Bestand · Zielbild“ mit einem Absatz des Piloten), in beiden PDFs (Seite „Wertpotenzial“) und im Portfolio-Pilot („Wo steckt das meiste Potenzial?“). Die Mietentwicklung im Modus „Aus Wohnungen“ rechnet ab „erreichbar“ mit der Soll-Miete, das Zielbild nicht. Score, Verkehrswert und Marktbericht bleiben beim Bestand.'
+        }
+      ]
+    },
     {
       id: 'cockpit',
       title: 'Portfolio-Cockpit',

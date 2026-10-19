@@ -2269,6 +2269,18 @@
    * braucht sie, um markSvwertAvm() weiterhin NUR im Textfall zu rufen.
    * null heisst: nichts geschrieben, also auch nicht zaehlen. */
   function _wertSchreiben(id, it) {
+    /* v2430 · zwei Felder ohne sichtbares Formularfeld (voice-import.js):
+       der Modus der Mietentwicklung (verstecktes me_modus) und die
+       Wohnungsliste des MFH (geht nach _dpMfh, nicht in ein Feld). */
+    if (id === 'me_modus') {
+      var ME = window.MietEntwicklung, mv = String(it.raw || '').trim();
+      if (ME && typeof ME.setMode === 'function' && /^(prog|detail|einheiten)$/.test(mv)) { ME.setMode(mv); return 'select'; }
+      return null;
+    }
+    if (id === 'mfh_wohnungen') {
+      var PZ = window.DpPotenzial;
+      return (PZ && typeof PZ.wohnungenAusText === 'function' && PZ.wohnungenAusText(it.raw) > 0) ? 'text' : null;
+    }
     if (it.kind === 'star') {
       if (it.raw > 0 && window.StarRating && typeof StarRating.setRating === 'function') {
         StarRating.setRating(id, it.raw); return 'star';

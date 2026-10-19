@@ -55,6 +55,7 @@ const vorgaben = require('./botVorgabenService');   /* v1824 */
 const rechenkerne = require('./rechenkerne');       /* v1899: DealKpis/Dscr der App */
 const bewertungsText = require('./bewertungsText'); /* v1927: die KI-Einordnung */
 const avmHistorie = require('./avmHistoryService');  /* v1937: Marktpreisindikation */
+const ertragswertFreigabe = require('./ertragswertFreigabe');   /* v2431 */
 const config = require('../config');
 
 /* ═══ LESEN ═══════════════════════════════════════════════════════════ */
@@ -316,6 +317,92 @@ async function soll_ist_lesen(ctx, args) {
       + 'Kennzahlen, die zu einem der beiden Zeitpunkte fehlten, stehen nicht in der Liste und werden nicht geschätzt. '
       + 'Sind beide Pilot-Analysen gleich (gleich: true), wurde seit dem Ankauf keine neue abgerufen - sag das.'
   };
+}
+
+/* ══ v2430 · MIETERHOEHUNG UND ZIELBILD fuer den Portfolio-Piloten ══════
+   Marcel 19.10.2026: „Der Pilot kennt das Zielbild jedes Objekts." Das
+   Frontend legt das letzte Ergebnis im Objekt ab (`_potenzial`, storage.js):
+   Mieten je Stufe, Massnahmen, Kosten, Ertragswert je Stufe aus dem
+   Marktbericht-Dienst. Gerechnet wird hier NICHTS - gelesen wird, was im
+   Objekt steht, samt Stand. Ohne Ergebnis die Rohdaten je Wohnung. */
+function _potenzialKurz(d, frei) {
+  const p = d && d._potenzial;
+  let z = p && p.zusammenfassung ? p.zusammenfassung : null;
+  /* v2431 · Marcel 19.10.2026 (Geld): ein im Objekt gespeicherter Ertragswert geht nur
+     mit Stufe 3 hinaus (Tarif oder Bericht Stufe 3 fuer DIESES Objekt, ertragswertFreigabe).
+     Sonst werden Ertragswert, Restnutzungsdauer und Aufteilung ausgeblendet - auch wenn
+     sie frueher einmal gerechnet wurden (Testphase, Tarifwechsel). */
+  const gesperrt = !!(z && (z.ertragswert_gesperrt || frei === false));
+  if (z && gesperrt) {
+    const st = {};
+    Object.keys(z.stufen || {}).forEach((k) => { st[k] = Object.assign({}, z.stufen[k], { ertragswert: null, rnd: null }); });
+    z = Object.assign({}, z, { stufen: st, aufteilung: null });
+  }
+  const roh = [];
+  const e = d && d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : [];
+  e.forEach((w) => {
+    const soll = Number(String(w.soll || '').replace(/\./g, '').replace(',', '.')) || null;
+    const ziel = Number(String(w.ziel_qm || '').replace(',', '.')) || null;
+    const ml = Array.isArray(w.massnahmen) ? w.massnahmen : (w.massnahme ? [{ t: w.massnahme, k: w.kosten }] : []);
+    if (soll || ziel || ml.length) {
+      roh.push({ nr: w.nr || null, lage: w.lage || null, wfl: w.wfl || null, ist: w.ist || null, soll_monat: soll,
+        soll_ab: w.soll_ab || null, ziel_qm: ziel, ziel_wann: w.ziel_wann || null,
+        massnahmen: ml.map((m) => (m.t || '') + (m.k ? ' ' + m.k + ' EUR' : '') + (m.bewohnt ? ' (bewohnt, § 559)' : '')).join(', ') || null });
+    }
+  });
+  const obj = (d && (d.zb_soll_qm || d.zb_ziel_qm || d.zb_massnahmen))
+    ? { soll_qm: d.zb_soll_qm || null, soll_ab: d.zb_soll_ab || null, ziel_qm: d.zb_ziel_qm || null, ziel_wann: d.zb_ziel_wann || null,
+        massnahmen: (() => { try { return JSON.parse(d.zb_massnahmen || '[]').map((m) => (m.t || '') + (m.k ? ' ' + m.k + ' EUR' : '')).join(', ') || null; } catch (x) { return null; } })() }
+    : null;
+  if (!z && !roh.length && !obj) return null;
+  return {
+    stand: z ? z.stand : null,
+    kennzeichnung: 'Potenzialwert nach Mieterhoehung bzw. Zielbild, keine Verkehrswertermittlung. Score und Verkehrswert rechnen mit dem Bestand.',
+    stufen: z ? z.stufen : null,
+    aufteilung: z ? (z.aufteilung || null) : null,
+    kappung: z && z.kappung ? z.kappung.text : null,
+    wohnungen: z ? z.wohnungen : (roh.length ? roh : null),
+    am_objekt: obj,
+    ertragswert_gerechnet: !!(z && z.stufen && z.stufen.bestand && z.stufen.bestand.ertragswert != null),
+    ertragswert_gesperrt: gesperrt || undefined,
+    ertragswert_hinweis: gesperrt ? ertragswertFreigabe.HINWEIS_KURZ + '. ' + ertragswertFreigabe.HINWEIS_LANG : undefined,
+    potenzial_netto: (z && z.stufen && z.stufen.bestand && z.stufen.bestand.ertragswert != null)
+      ? (() => { const t = z.stufen.zielbild || z.stufen.mieterhoehung; return t && t.ertragswert != null ? Math.round(t.ertragswert - z.stufen.bestand.ertragswert - (t.kosten || 0)) : null; })()
+      : null
+  };
+}
+async function potenzial_lesen(ctx, args) {
+  const alle = !!(args && args.alle);
+  if (!alle) {
+    const id = await _findeObjekt(ctx, args);
+    if (!id) return { gefunden: false, hinweis: 'Kein Objekt zu dieser Angabe gefunden.' };
+    const o = await dialog.objektKontext(ctx.userId, id);
+    if (!o) return { gefunden: false };
+    ctx.merkeObjekt(id);
+    const d = o.daten || {};
+    let frei = false;
+    try { frei = (await ertragswertFreigabe.fuerObjekt(ctx.userId, String(o.objekt_id || id), d)).ok; } catch (e) { frei = false; }
+    const pz = _potenzialKurz(d, frei);
+    return { gefunden: true, id: o.objekt_id, adresse: _adrVon(o),
+      potenzial: pz,
+      so_sagen: pz ? null : 'Fuer dieses Objekt ist weder eine Soll-Miete noch ein Zielbild eingetragen. Das geht im Tab Objekt (ETW/EFH/ZFH) oder beim MFH je Wohnung im Fenster „Einheiten erfassen".' };
+  }
+  const r = await query('SELECT id, data FROM objects WHERE user_id = $1', [ctx.userId]);
+  const liste = [];
+  let darf = () => false;
+  try { darf = await ertragswertFreigabe.pruefer(ctx.userId); } catch (e) { darf = () => false; }
+  r.rows.forEach((z) => {
+    let d = z.data; if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { d = {}; } }
+    const pz = _potenzialKurz(d || {}, darf(String(z.id), d || {}));
+    if (!pz) return;
+    liste.push({ id: z.id, adresse: [d.str, d.hnr].filter(Boolean).join(' ') + (d.ort ? ', ' + d.ort : ''),
+      potenzial_netto: pz.potenzial_netto, ertragswert_gerechnet: pz.ertragswert_gerechnet, stufen: pz.stufen, aufteilung: pz.aufteilung,
+      wohnungen_mit_plan: Array.isArray(pz.wohnungen) ? pz.wohnungen.length : 0, stand: pz.stand });
+  });
+  liste.sort((a, b) => (b.potenzial_netto || 0) - (a.potenzial_netto || 0));
+  return { anzahl: liste.length, objekte: liste.slice(0, 40),
+    hinweis: 'Sortiert nach Wertzuwachs nach Kosten (Ertragswert Zielbild bzw. Mieterhoehung minus Bestand minus Massnahmenkosten). '
+      + 'Ohne gerechneten Ertragswert (ertragswert_gerechnet: false) nur die Mieten nennen; bei ertragswert_gesperrt: der Ertragswert je Stufe gehoert zu DealPilot Stufe 3, sachlich so sagen. Immer als Potenzialwert kennzeichnen, keine Verkehrswertermittlung.' };
 }
 
 async function pilot_analyse_lesen(ctx, args) {
@@ -3720,6 +3807,17 @@ const WERKZEUGE = [
     }, additionalProperties: false } },
 
   /* v2217 · Soll/Ist im Bot */
+  { name: 'potenzial_lesen', stufe: 'lesen', fn: potenzial_lesen,
+    beschreibung: 'Mieterhoehung und Zielbild (Potenzial): je Objekt Ist-, Soll-Miete (Mieter bleibt) und Zielmiete '
+      + '(nach Umbau/Neuvermietung), Massnahmen mit Kosten, Kappungsgrenze und der Ertragswert je Stufe '
+      + '(Bestand, Mieterhoehung, Zielbild) samt Aufteilung in Eigentumswohnungen. Mit alle=true eine Rangliste '
+      + 'ueber das ganze Portfolio nach Wertzuwachs. Nutze es bei "wo steckt das meiste Potenzial?", '
+      + '"was bringt die Sanierung?", "lohnt sich die Aufteilung?". Kostet nichts; rechnet nichts neu. '
+      + 'Immer als Potenzialwert kennzeichnen, keine Verkehrswertermittlung.',
+    parameter: { type: 'object', properties: Object.assign({}, OBJEKT_ARGS, {
+      alle: { type: 'boolean', description: 'true = alle Objekte mit Soll-Miete oder Zielbild, nach Potenzial sortiert' } }),
+      additionalProperties: false } },
+
   { name: 'soll_ist_lesen', stufe: 'lesen', fn: soll_ist_lesen,
     beschreibung: 'Soll/Ist EINES Bestandsobjekts: der beim Nutzen-/Lastenwechsel '
       + 'festgeschriebene Ankauf-Stand (Plan) gegen heute - Miete, Leerstand, Renditen, DSCR, '

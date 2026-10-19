@@ -148,6 +148,8 @@ var FIELDS = [
   'bspar_quote_min', 'bspar_dar_z', 'bspar_dar_t',
   // V23: Mietentwicklung Detail-Modus
   'mietspiegel','me_modus','me_soll','me_anz','me_int','me_pct',
+  /* v2430 · Mieterhoehung und Zielbild am Objekt (ETW/EFH/ZFH; beim MFH je Wohnung in _mfh) */
+  'zb_soll_qm','zb_soll_ab','zb_vgl_qm','zb_ziel_qm','zb_ziel_wann','zb_massnahmen',
   /* v2087 · Mietvertrag auf OBJEKTEBENE (Backlog N60.8-alt).
      Dieselben Namen wie in `_mfh.einheiten[]` - derselbe Begriff soll
      nicht zweimal anders heissen. Ohne diesen Eintrag waeren die drei
@@ -290,6 +292,9 @@ function collectData() {
      Fensters weg. `afa_rnd_jahre` bleibt unberuehrt: das ist die
      EINGABE des Nutzers, dies hier der VORSCHLAG des Wizards. */
   if (window._dpRnd && window._dpRnd.rnd_jahre) d._rnd = window._dpRnd;
+  /* v2430: das letzte Potenzial-Ergebnis (Ertragswert je Stufe) samt Pruefwert -
+     fuer PDF, Pilot-Analyse und Portfolio-Pilot ohne neuen Abruf. */
+  if (window._dpPotenzial && window._dpPotenzial.ergebnis) d._potenzial = window._dpPotenzial;
   /* v2214 · DIE JAHRESWERTE DER ANLAGE V (tax.js _taxYearlyOverrides).
      Gemessen 14.10.2026: sie lebten NUR im Fenster. Kein Ladeweg stellte sie
      wieder her, beim Objektwechsel wanderten sie ins naechste Objekt, und nach
@@ -532,7 +537,9 @@ function loadData(d) {
     'halter_seit', 'obj_herkunft',
     'verkehrswert_ueberf', 'ueberf_preis', 'gesellschafterdarlehen',
     'ueberf_restschuld', 'ueberf_rest_zins',
-    'ueberf_ende', '_ueberf_link'
+    'ueberf_ende', '_ueberf_link',
+    /* v2430: sonst erbt Objekt B Soll-Miete, Zielbild und Massnahmen von A */
+    'zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen'
   ].concat(WM_FIELDS);  /* v1136-WMTAB-1: dieselbe Falle, siehe Kommentar an WM_FIELDS */
   resetFields.forEach(function(id) {
     var e = document.getElementById(id);
@@ -618,6 +625,8 @@ function loadData(d) {
      geladene Objekt die Restnutzungsdauer des vorigen, und zwar eine,
      die zu seinen Bauteilen gar nicht passt. */
   window._dpRnd = (d._rnd && d._rnd.rnd_jahre) ? d._rnd : null;
+  /* v2430: Potenzial-Ergebnis. Fehlt es, ist es NULL (versteckte-felder-erben). */
+  window._dpPotenzial = (d._potenzial && d._potenzial.ergebnis) ? d._potenzial : null;
   /* v2214: Jahreswerte der Anlage V. Fehlen sie, sind sie LEER - sonst erbte
      das geladene Objekt die Eingaben des vorigen (gemessen). */
   try {
@@ -1125,6 +1134,8 @@ function _clearFormForNewObject() {
      neues Objekt den Stand des vorher geoeffneten (gemessen: 2026-1090
      "Unbenannt", offen, trug den Stand der Bismarckstr. 27). */
   window._dpAnkauf = null; window._dpAnkaufAuto = false; window._dpAnkaufRuhend = null;
+  /* v2430: Einheiten, RND-Vorschlag und Potenzial-Ergebnis gehoeren ebenfalls dem Objekt (versteckte-felder-erben). */
+  window._dpMfh = null; window._dpRnd = null; window._dpPotenzial = null;
   if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
     setTimeout(DealPilotWorkflow.renderProgressBar, 50);
   }
@@ -1247,6 +1258,8 @@ function _newObjLeeren() {
      neues Objekt den Stand des vorher geoeffneten (gemessen: 2026-1090
      "Unbenannt", offen, trug den Stand der Bismarckstr. 27). */
   window._dpAnkauf = null; window._dpAnkaufAuto = false; window._dpAnkaufRuhend = null;
+  /* v2430: Einheiten, RND-Vorschlag und Potenzial-Ergebnis gehoeren ebenfalls dem Objekt (versteckte-felder-erben). */
+  window._dpMfh = null; window._dpRnd = null; window._dpPotenzial = null;
   // V58: Workflow-Bar zurücksetzen + Outputs nullen
   if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
     setTimeout(DealPilotWorkflow.renderProgressBar, 50);

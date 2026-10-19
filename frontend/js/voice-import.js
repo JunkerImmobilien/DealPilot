@@ -157,6 +157,12 @@
     bwk_kp_pct: 'Bewirtschaftungskosten in Prozent vom Kaufpreis',
     mietspiegel: 'Mietspiegel in Euro pro m2', me_soll: 'Soll-Miete in Euro pro m2',
     me_anz: 'Anzahl Mieterhöhungen', me_int: 'Intervall Mieterhöhung in Jahren', me_pct: 'Mieterhöhung in Prozent',
+    /* v2430 · Mieterhoehung und Zielbild (freiwillig) */
+    zb_soll_qm: 'Soll-Miete nach normaler Mieterhöhung, der Mieter bleibt, in Euro pro m2 (nur wenn genannt)',
+    zb_ziel_qm: 'Zielmiete nach Umbau oder Neuvermietung in Euro pro m2 (nur wenn genannt)',
+    zb_vgl_qm: 'Ortsübliche Vergleichsmiete laut Mietspiegel in Euro pro m2',
+    zb_soll_ab: 'Ab wann die Soll-Miete erreichbar ist, als JJJJ-MM',
+    zb_ziel_wann: 'Wann das Zielbild erreicht wird, kurzer Text (z. B. bei Mieterwechsel)',
     ds2_zustand: 'Zustand des Objekts/der Wohnung', ds2_energie: 'Energieeffizienz/Energieklasse',
     ds2_mietausfall: 'Mietausfall-Risiko', ds2_marktmiete: 'Marktmiete in Euro pro m2',
     ds2_bevoelkerung: 'Bevölkerungsentwicklung am Standort', ds2_nachfrage: 'Nachfrage-Indikator am Standort',
@@ -506,6 +512,22 @@
        die es auf dieser Seite gar nicht gibt, und das Modell ordnete ins
        Leere zu. */
     sanKatalog().forEach(function (e) { if ($(e.id)) cat.push(e); });
+    /* v2430 · me_modus ist ein VERSTECKTES Feld und fiel deshalb oben heraus -
+       ansprechbar war der Modus der Mietentwicklung nie. Die Uebernahme setzt
+       ihn ueber MietEntwicklung.setMode (object-actions.js _wertSchreiben). */
+    if ($('me_modus')) cat.push({ id: 'me_modus', kind: 'select', label: 'Modus der Mietentwicklung',
+      options: [{ v: 'prog', t: 'Prognose (Steigerung pro Jahr)' }, { v: 'detail', t: 'Detail (Erhöhungs-Treppe)' }, { v: 'einheiten', t: 'Aus Wohnungen (je Mietvertrag)' }] });
+    /* v2430 · beim MFH: die Wohnungen samt Soll-Miete und Zielmiete. Bis hier
+       kannte die Spracheingabe `_dpMfh` gar nicht - Einheiten gingen nur von
+       Hand im Fenster. DpPotenzial.wohnungenAusText() uebernimmt sie. */
+    try {
+      if (window.DpMfhEinheiten && DpMfhEinheiten.artMitEinheiten && DpMfhEinheiten.artMitEinheiten()) {
+        cat.push({ id: 'mfh_wohnungen', kind: 'text', label: 'Wohnungen des Mehrfamilienhauses',
+          hint: 'Eine Zeile je genannter Wohnung im Format: Nr | Lage | Wohnfläche m2 | Ist-Kaltmiete Euro pro Monat (oder leer) | '
+            + 'Soll-Miete Euro pro Monat nach normaler Erhöhung (Mieter bleibt) | Zielmiete Euro pro m2 nach Umbau | letzte Mieterhöhung (MM/JJJJ). '
+            + 'Fehlendes leer lassen, nichts erfinden.' });
+      }
+    } catch (e) {}
     /* v1313 · Erbbaurecht. Die Checkbox steht NICHT in window.FIELDS - dort
        laufen nur die vier Zahlen; ein Haekchen geht ueber _erbpacht einen
        eigenen Speicherweg. Damit die KI „das ist Erbpacht“ trotzdem zuordnen
@@ -3018,6 +3040,12 @@
     { et: 4, ids: ['ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_wertsteigerung', 'ds2_entwicklung'],
       rang: 15, skalen: 1,
       frage: 'Wie entwickelt sich der Ort — Bevölkerung, Nachfrage, Wertsteigerung, Entwicklungsmöglichkeiten?' },
+    /* v2430 · MIETERHOEHUNG UND ZIELBILD - freiwillig („kann, nicht muss“).
+       `nurArt` trennt Objekt (ETW/EFH) und Wohnungsliste (MFH). */
+    { et: 4, ids: ['zb_soll_qm', 'zb_ziel_qm', 'zb_ziel_wann'], rang: 15, nurArt: 'einzel',
+      frage: 'Freiwillig: Siehst du Mietpotenzial? Was zahlt der Mieter nach einer normalen Mieterhöhung (Euro je m²), was wäre nach Umbau oder Neuvermietung drin, und wann? „Weiß ich nicht“ geht auch.' },
+    { et: 4, ids: ['mfh_wohnungen'], rang: 15, nurArt: 'mfh',
+      frage: 'Freiwillig, je Wohnung: Nummer oder Lage, Fläche, Ist-Kaltmiete, Soll-Miete nach normaler Erhöhung, Zielmiete nach Umbau (Euro je m²) und wann zuletzt erhöht wurde. „Weiß ich nicht“ geht auch.' },
     { et: 4, ids: ['kaufdat', 'wirtschaftlicher_uebergang'], rang: 10,
       frage: 'Wann wird gekauft, und ab wann gehören dir Mieten und Kosten?' },
     /* v1377b (C5): Das zu versteuernde Einkommen stand zwar in der
@@ -3309,6 +3337,12 @@
        der Wert noch in `fields`; ins Formular kommt er erst mit der
        Uebernahme am Ende. Nur das Formular zu lesen hiesse: die
        Nachfrage kommt eine Runde zu spaet oder gar nicht. */
+    /* v2430 · `nurArt`: 'mfh' nur bei Objektarten mit Einheiten, 'einzel' sonst. */
+    if (eintrag.nurArt) {
+      var _mit = false;
+      try { _mit = !!(window.DpMfhEinheiten && DpMfhEinheiten.artMitEinheiten && DpMfhEinheiten.artMitEinheiten(_rfArt(fields) || undefined)); } catch (eA) {}
+      if ((eintrag.nurArt === 'mfh') !== _mit) return false;
+    }
     if (eintrag.nurWenn) {
       var _cbEl = document.getElementById(eintrag.nurWenn);
       var _gesagt = fields ? fields[eintrag.nurWenn] : undefined;

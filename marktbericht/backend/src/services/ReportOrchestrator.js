@@ -63,6 +63,14 @@ export const ReportOrchestrator = {
     };
     step('START generate');
     const FAST = !!(input.fast || input.schnell); // Schnell-Modus: nur Kauf+Miete, kein KI-Text/keine Historie
+    /* v2430 · NUR DIE WERTBASIS fuer POST /potenzial (Zielbild, Marcel 19.10.2026).
+       Derselbe Weg bis zum Quercheck - Mapper, BORIS, Zins-Kaskade A-E/N, BWK, GND,
+       Bodenwert, Miete -, damit der Ertragswert "Bestand" DERSELBE ist wie im
+       Bericht Stufe 3. Weggelassen wird nur, was den Ertragswert nicht beruehrt:
+       kein Eintrag in mb.properties, keine Mikrolage, keine Preishistorie, kein
+       Marktkontext, kein GeoMap-Kontostand, kein KI-Text, kein Bericht. Die
+       Rueckgabe endet direkt nach CrossCheckService.compute (siehe unten). */
+    const NUR_WERT = !!(opts && opts.nurWertBasis);
     if (FAST) step('SCHNELL-MODUS: nur Marktwert+Spanne & Miete+Spanne (kein KI-Text, keine Preishistorie)');
 
     // 0) DealPilot-Objekt (.dpkt) als Quelle? -> Stammdaten + Score/KI uebernehmen.
@@ -318,7 +326,7 @@ export const ReportOrchestrator = {
 
     // 2) Property persistieren
     step('property: insert');
-    const prop = await q1(
+    const prop = NUR_WERT ? { id: null } : await q1(   /* v2430: kein Eintrag im Nur-Wert-Lauf */
       `INSERT INTO mb.properties
         (external_ref,address_id,property_type,usage_type,living_area,rooms,build_year,floor,
          condition,energy_class,purchase_price,monthly_net_rent,vacancy,lat,lon,geom,data)
@@ -345,18 +353,19 @@ export const ReportOrchestrator = {
     const _zeit = (name, p) => Promise.resolve(p).then(
       (v) => { _lz.push({ name, ms: Date.now() - _lzStart, ok: !!v && v.available !== false }); return v; },
       (e) => { _lz.push({ name, ms: Date.now() - _lzStart, ok: false }); throw e; });
-    const balanceBeforeP = GeoMapConnector.getBalance().catch(() => null);
+    const balanceBeforeP = NUR_WERT ? Promise.resolve(null) : GeoMapConnector.getBalance().catch(() => null);   /* v2430 */
 
     const saleP = MarketAnalysisService.saleLevel(ref)
       .then((r) => { step(`Vergleichspreise: ${r.sample_size} Objekte`); return r; });
     const rentP = MarketAnalysisService.rentLevel(ref)
       .then((r) => { step(`Vergleichsmieten: ${r.sample_size} Objekte`); return r; });
 
-    const microP = MicroLocationService.analyze(lat, lon, 2000)
+    /* v2430: die Mikrolage traegt nur die Verfahrenswahl, nicht den Ertragswert */
+    const microP = NUR_WERT ? Promise.resolve({ score: null }) : MicroLocationService.analyze(lat, lon, 2000)
       .then((r) => { step(`Mikrolage: Score ${r.score}`); return r; });
 
     // insights haengt an micro (braucht den Mikrolage-Output):
-    const insightsP = FAST
+    const insightsP = (FAST || NUR_WERT)   /* v2430 */
       ? Promise.resolve(null) // Schnell-Modus: keine GeoMap-Preishistorie-Abrufe
       : microP
       .then((m) => MarketInsightsService.derive(ref, m))
@@ -377,7 +386,7 @@ export const ReportOrchestrator = {
        direkten Zugriff haben. */
     const macroP = (async () => {
       const agsInfo = await agsP;
-      const macroRaw = await DestatisConnector.macro({ ags: agsInfo?.kreis_ags, city: geo?.components?.city, nurDb: FAST });
+      const macroRaw = await DestatisConnector.macro({ ags: agsInfo?.kreis_ags, city: geo?.components?.city, nurDb: FAST || NUR_WERT });   /* v2430 */
       step(`Makrolage: ${macroRaw.available ? 'ausgewertet' : 'keine Daten'}`);
       return { agsInfo, macroRaw };
     })().catch((e) => { step('macro: fehler ' + e.message); return { agsInfo: null, macroRaw: { available: false, reason: e.message } }; });
@@ -389,7 +398,7 @@ export const ReportOrchestrator = {
        am 11.09.2026, Guthaben vor und nach acht Abfragen unveraendert
        (257,115 -> 257,115). Nur Detail-Abrufe ziehen Geld.
        Faellt der Strang aus, fehlt der Kontext und sonst nichts. */
-    const kontextP = FAST
+    const kontextP = (FAST || NUR_WERT)   /* v2430 */
       ? Promise.resolve(null)
       : MarktkontextService.derive(ref)
           .then((k) => { if (k) step('Marktkontext ausgewertet'); return k; })
@@ -1501,6 +1510,15 @@ export const ReportOrchestrator = {
     }
 
     let crossCheck = CrossCheckService.compute(ref, landValue, rent, valuation, _wertParams);
+    /* v2430 · Nur-Wert-Lauf endet hier: ref, Parameter und Quercheck samt der
+       (nicht aufzaehlbaren) Ertragswert-Eingabe gehen an PotenzialService. */
+    if (NUR_WERT) {
+      step('nur-wert-basis: Ende nach dem Quercheck');
+      return { nur_wert_basis: true, ref, wert_params: _wertParams, cross_check: crossCheck,
+        ertragswert_eingabe: (crossCheck && crossCheck._ertragswertEingabe) || null,
+        land_value: landValue ? { available: !!landValue.available, value_sqm: landValue.value_sqm ?? null } : null,
+        trace, took_ms: Date.now() - t0 };
+    }
 
     /* v2241 · UNBEBAUTES GRUNDSTUECK: der Wert IST der Bodenwert.
        Er kommt aus demselben Kern wie in Ertrags- und Sachwert

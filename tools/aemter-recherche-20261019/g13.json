@@ -1,0 +1,423 @@
+[
+  {
+    "gemeinde": "Stuttgart",
+    "plz_praefixe": [
+      "70"
+    ],
+    "bundesland": "BW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Landeshauptstadt Stuttgart, Stadtmessungsamt (untere Vermessungsbehörde)",
+        "abteilung": "Abteilung Geobasisdaten und Liegenschaftskataster; Auszüge im Kundenzentrum, Kronenstraße 20, 70173 Stuttgart",
+        "email": "stadtmessungsamt@stuttgart.de",
+        "telefon": "0711 21659601",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.stuttgart.de/leben/bauen/rund-ums-grundstueck/liegenschaftskataster",
+        "seiten": [],
+        "gebuehr": "gebührenpflichtig (Betrag auf der Seite nicht genannt)",
+        "hinweis": "Auszüge gibt das Kundenzentrum des Stadtmessungsamts aus; berechtigtes Interesse ist nachzuweisen.",
+        "beleg_zitat": "bei der Landeshauptstadt Stuttgart als untere Vermessungsbehörde geführt",
+        "geteilt": false,
+        "ansprechpartner": [
+          {
+            "name": "Daniel Bohm",
+            "funktion": "Leitung Abteilung Geobasisdaten und Liegenschaftskataster",
+            "email": "",
+            "telefon": "",
+            "seite": "https://www.stuttgart.de/leben/bauen/rund-ums-grundstueck/liegenschaftskataster"
+          }
+        ]
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Grundbuchamt Böblingen bzw. Grundbuchamt Waiblingen (je nach Grundbuchbezirk)",
+        "abteilung": "Einsicht und Auszüge auch über die Grundbucheinsichtsstelle der Landeshauptstadt im Kundenzentrum des Stadtmessungsamts, Kronenstraße 20, 70173 Stuttgart",
+        "email": "poststelle.grundbucheinsicht@stuttgart.de",
+        "telefon": "0711 21659601",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.stuttgart.de/leben/bauen/rund-ums-grundstueck/grundbucheinsicht",
+        "seiten": [],
+        "gebuehr": "nach GNotKG (Abschriften üblich 10 € unbeglaubigt / 20 € beglaubigt)",
+        "hinweis": "Für Stuttgart sind zwei Grundbuchämter zuständig (Böblingen und Waiblingen); Eintragungen nur dort, Einsicht und Auszüge auch bei der städtischen Grundbucheinsichtsstelle.",
+        "beleg_zitat": "Für Stuttgarterinnen und Stuttgarter sind das Grundbuchamt Waiblingen und das Grundbuchamt Böblingen zuständig.",
+        "geteilt": true,
+        "ansprechpartner": [
+          {
+            "name": "Dr. Stephan Königer",
+            "funktion": "Leitung (Kundenzentrum / Grundbucheinsichtsstelle)",
+            "email": "",
+            "telefon": "",
+            "seite": "https://www.stuttgart.de/leben/bauen/rund-ums-grundstueck/grundbucheinsicht"
+          }
+        ]
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Landeshauptstadt Stuttgart, Amt für Umweltschutz (untere Bodenschutz- und Altlastenbehörde)",
+        "abteilung": "Sachgebiet Kommunale Altlasten, Gaisburgstraße 4, 70182 Stuttgart",
+        "email": "altlastenauskunft@stuttgart.de",
+        "telefon": "0711 216-88621",
+        "kanal": "email",
+        "antrag_url": "https://www.service-bw.de/web/guest/leistung?p_p_id=zustaendigestelle_WAR_suchegui&p_p_lifecycle=0&p_r_p_-358194435_id=6005795&p_r_p_-358194435_t=leistung&_zustaendigestelle_WAR_suchegui_ags=08111000&_zustaendigestelle_WAR_suchegui_rq=Stuttgart",
+        "quelle_url": "https://www.stuttgart.de/leben/umwelt/altlasten/altlasten-auskunft",
+        "seiten": [
+          "https://www.stuttgart.de/medien/ibs/auskunftsformular-altlastenanfragen-stuttgart-2025-27-60-euro.pdf",
+          "https://www.stuttgart.de/medien/ibs/bauen-fachaemter-kontaktdaten_stand_11_24.pdf"
+        ],
+        "gebuehr": "nach Aufwand, 27,60 € je angefangene 15 Minuten (laut Antragsformular)",
+        "hinweis": "Auskunft nur bei berechtigtem Interesse; Antrag per PDF-Formular, E-Mail oder online über service-bw.",
+        "beleg_zitat": "an das Amt für Umweltschutz zu schicken",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Landeshauptstadt Stuttgart, Baurechtsamt",
+        "abteilung": "Bürgerservice Bauen, Eberhardstraße 33, 70173 Stuttgart",
+        "email": "bsbauen@stuttgart.de",
+        "telefon": "0711 216-60100",
+        "kanal": "portal",
+        "antrag_url": "https://service.stuttgart.de/lhs-services/bs-bauen/",
+        "quelle_url": "https://www.stuttgart.de/leben/bauen/baurecht/bauakteneinsicht",
+        "seiten": [
+          "https://www.stuttgart.de/leben/bauen/baurecht/faqs-baurechtsamt"
+        ],
+        "gebuehr": "Auszug Baulastenverzeichnis 17,10 €",
+        "hinweis": "Auskunft nur digital und bei berechtigtem Interesse nach § 72 Abs. 4 LBO; Bestellung über den Online-Shop.",
+        "beleg_zitat": "Die Einsicht in das Baulastenverzeichnis erhalten Sie beim Bürgerservice Bauen.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Landeshauptstadt Stuttgart, Baurechtsamt",
+        "abteilung": "Bürgerservice Bauen (Bauaktenarchiv), Eberhardstraße 33, 70173 Stuttgart",
+        "email": "bsbauen@stuttgart.de",
+        "telefon": "0711 216-60100",
+        "kanal": "formular",
+        "antrag_url": "https://stuttgart.konsentas.de/form/13/",
+        "quelle_url": "https://www.stuttgart.de/leben/bauen/baurecht/bauakteneinsicht",
+        "seiten": [
+          "https://www.stuttgart.de/leben/bauen/baurecht/faqs-baurechtsamt"
+        ],
+        "gebuehr": "Pläne/Genehmigungsunterlagen ab 37,60 €; ganze Akte 28,50 € je angefangene Viertelstunde; Statik 53,60 €",
+        "hinweis": "Ob eine Akte ausgelagert ist, klärt die Telefonauskunft 0711 216-60100; Termin über das Online-Terminsystem.",
+        "beleg_zitat": "Über den Bürgerservice Bauen beim Baurechtsamt erhalten Sie Zugang zur Bauaktei.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Stuttgart, Geschäftsstelle beim Stadtmessungsamt",
+        "abteilung": "Abteilung Immobilienmarktanalyse und Wertermittlung, Kronenstraße 20, 70173 Stuttgart",
+        "email": "wertermittlung@stuttgart.de",
+        "telefon": "0711 21659576",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.stuttgart.de/leben/bauen/grundstueckswerte/gutachterausschuss",
+        "seiten": [
+          "https://www.stuttgart.de/leben/bauen/grundstueckswerte/Marktberichte-und-Dashboard"
+        ],
+        "gebuehr": "",
+        "hinweis": "Grundstücksmarktbericht jährlich, Quartalsberichte seit 2020 kostenfrei zum Download.",
+        "beleg_zitat": "Die Geschäftsstelle des Gutachterausschusses ist beim Stadtmessungsamt",
+        "geteilt": false,
+        "ansprechpartner": [
+          {
+            "name": "Steffen Bolenz",
+            "funktion": "Leitung Abteilung Immobilienmarktanalyse und Wertermittlung",
+            "email": "",
+            "telefon": "",
+            "seite": "https://www.stuttgart.de/leben/bauen/grundstueckswerte/gutachterausschuss"
+          }
+        ]
+      }
+    ],
+    "offen": [
+      "Grundbuch: welche Stadtteile zum Grundbuchamt Böblingen und welche zu Waiblingen gehören, steht nicht auf der amtlichen Stadtseite; eigene Kontaktseiten der beiden Grundbuchämter nicht abgerufen (Suchbudget erschöpft).",
+      "E-Mail-Adressen auf stuttgart.de sind per Skript verschleiert; sie wurden aus den mailto-Links der Seite dekodiert (altlastenauskunft@stuttgart.de steht zusätzlich im Klartext im städtischen Kontakt-PDF)."
+    ]
+  },
+  {
+    "gemeinde": "Karlsruhe",
+    "plz_praefixe": [
+      "76"
+    ],
+    "bundesland": "BW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Karlsruhe, Liegenschaftsamt (untere Vermessungsbehörde)",
+        "abteilung": "Kundenservice Liegenschaftskataster und Vermessung, Lammstraße 7 a, 76133 Karlsruhe",
+        "email": "lageplan@la.karlsruhe.de",
+        "telefon": "0721 133 6288",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://web1.karlsruhe.de/service/Buergerdienste/organisation.php?id=6052477",
+        "seiten": [
+          "https://web1.karlsruhe.de/service/Buergerdienste/leistung.php?id=359"
+        ],
+        "gebuehr": "nach Gebührenverordnung des Landes, abhängig von Format und Umfang",
+        "hinweis": "Persönliche Vorsprache nur nach Terminvereinbarung; ggf. Vollmacht erforderlich.",
+        "beleg_zitat": "Kundenservice Liegenschaftskataster und Vermessung",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Maulbronn - Grundbuchamt -",
+        "abteilung": "Frankfurter Straße 52, 75433 Maulbronn; Einsicht/Abschriften auch bei der Grundbucheinsichtsstelle der Stadt (Liegenschaftsamt, Lammstraße 7 a)",
+        "email": "poststelle@gbamaulbronn.justiz.bwl.de",
+        "telefon": "07043/9578-0",
+        "kanal": "email",
+        "antrag_url": "https://web1.karlsruhe.de/service/Buergerdienste/leistung.php?id=6002545",
+        "quelle_url": "https://web1.karlsruhe.de/service/Buergerdienste/leistung.php?id=6002545",
+        "seiten": [
+          "https://web1.karlsruhe.de/service/Buergerdienste/organisation.php?id=6016349",
+          "https://web1.karlsruhe.de/service/Buergerdienste/organisation.php?id=6029437"
+        ],
+        "gebuehr": "unbeglaubigte Abschrift 10 €, beglaubigte Abschrift 20 €",
+        "hinweis": "Städtische Grundbucheinsichtsstelle: grundbuch@la.karlsruhe.de, 0721 133 6247 (weitere Stellen in Durlach und Neureut).",
+        "beleg_zitat": "Die Stadtverwaltung Karlsruhe und das Grundbuchamt (hier: im Amtsgericht Maulbronn)",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Karlsruhe, Umwelt- und Arbeitsschutz (untere Bodenschutz- und Altlastenbehörde)",
+        "abteilung": "",
+        "email": "umwelt-arbeitsschutz@karlsruhe.de",
+        "telefon": "0721 133 3101",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://web1.karlsruhe.de/service/Buergerdienste/leistung.php?id=1121",
+        "seiten": [
+          "https://web1.karlsruhe.de/service/Buergerdienste/organisation.php?id=6028193"
+        ],
+        "gebuehr": "",
+        "hinweis": "Telefon ist das Sekretariat der Dienststelle.",
+        "beleg_zitat": "Die unteren Bodenschutz- und Altlastenbehörden bei den Stadt- und Landkreisen führen die Bodenschutz- und Altlastenkataster.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Karlsruhe, Liegenschaftsamt",
+        "abteilung": "Kundenservice Baulasteneinsicht und Erschließungsbeiträge, Lammstraße 7 a, 76133 Karlsruhe",
+        "email": "baulasten@la.karlsruhe.de",
+        "telefon": "0721 133 6279",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://web1.karlsruhe.de/service/Buergerdienste/organisation.php?id=6052459",
+        "seiten": [
+          "https://web1.karlsruhe.de/service/Buergerdienste/leistung.php?id=6024399"
+        ],
+        "gebuehr": "nach Gebührensatzung der Stadt Karlsruhe",
+        "hinweis": "In Karlsruhe führt das Liegenschaftsamt die Baulasteneinsicht, nicht das Bauordnungsamt; Vorsprache nur nach Termin.",
+        "beleg_zitat": "Kundenservice Baulasteneinsicht und Erschließungsbeiträge",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Karlsruhe, Bauordnungsamt",
+        "abteilung": "Team Akteneinsicht, Karl-Friedrich-Straße 14-18, 76133 Karlsruhe (Erdgeschoss Hinterhaus)",
+        "email": "akteneinsicht@boa.karlsruhe.de",
+        "telefon": "115",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.karlsruhe.de/mobilitaet-stadtbild/bauen-und-immobilien/bauordnung/akteneinsicht",
+        "seiten": [
+          "https://web1.karlsruhe.de/service/Buergerdienste/organisation.php?id=6027803"
+        ],
+        "gebuehr": "Einsicht Bauakte 54 €, Statik-Akte 108 €, Kopien extra (nur Kartenzahlung)",
+        "hinweis": "Einsicht nur nach Termin per E-Mail, mit Grundbuchauszug und Ausweis bzw. Vollmacht.",
+        "beleg_zitat": "können abgeschlossene Bauakten aus unserem Archiv einsehen und kopieren",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss Karlsruhe, Geschäftsstelle",
+        "abteilung": "Grundstücksbewertungsstelle und Geschäftsstelle des Gutachterausschusses, Karl-Friedrich-Straße 14-18, 76133 Karlsruhe",
+        "email": "gga@karlsruhe.de",
+        "telefon": "0721 133 3092",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://web1.karlsruhe.de/service/Buergerdienste/organisation.php?id=6008003",
+        "seiten": [
+          "https://www.karlsruhe.de/mobilitaet-stadtbild/bauen-und-immobilien/gutachterausschuss"
+        ],
+        "gebuehr": "Immobilienmarktbericht 50 € (PDF) je Exemplar",
+        "hinweis": "Marktbericht per E-Mail mit Rechnungsadresse und Berichtsjahr bestellen.",
+        "beleg_zitat": "Grundstücksbewertungsstelle und Geschäftsstelle des Gutachterausschusses",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ],
+    "offen": []
+  },
+  {
+    "gemeinde": "Mannheim",
+    "plz_praefixe": [
+      "68"
+    ],
+    "bundesland": "BW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Mannheim, Fachbereich Geoinformation und Stadtplanung",
+        "abteilung": "Abteilung Geobasisdaten, Glücksteinallee 11, 68163 Mannheim",
+        "email": "geoinformation@mannheim.de",
+        "telefon": "0621 293-7258",
+        "kanal": "formular",
+        "antrag_url": "https://www.mannheim.de/de/stadt-gestalten/verwaltung/aemter-fachbereiche-eigenbetriebe/geoinformation-und-stadtplanung/geobasisdaten/geobasisdaten-kontaktformular",
+        "quelle_url": "https://www.mannheim.de/de/stadt-gestalten/verwaltung/aemter-fachbereiche-eigenbetriebe/geoinformation-und-stadtplanung/geobasisdaten",
+        "seiten": [],
+        "gebuehr": "",
+        "hinweis": "Anfragen zum Liegenschaftskataster über das Kontaktformular der Abteilung Geobasisdaten; Auskunft Mo-Fr 8-16 Uhr.",
+        "beleg_zitat": "Sie haben Fragen rund um das Thema Liegenschaftskataster",
+        "geteilt": false,
+        "ansprechpartner": [
+          {
+            "name": "Holm Neumann",
+            "funktion": "Abteilungsleitung Geobasisdaten",
+            "email": "holm.neumann@mannheim.de",
+            "telefon": "0621 293-7259",
+            "seite": "https://www.mannheim.de/de/stadt-gestalten/verwaltung/aemter-fachbereiche-eigenbetriebe/geoinformation-und-stadtplanung/geobasisdaten"
+          }
+        ]
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Mannheim - Grundbuchamt -",
+        "abteilung": "Voltastraße 9, 68199 Mannheim",
+        "email": "Poststelle@GBAMannheim.justiz.bwl.de",
+        "telefon": "0621 292-1363",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.mannheim.de/de/grundbuchamt",
+        "seiten": [
+          "https://www.heidelberg.de/-/Behoerdenwegweiser/amtsgericht-mannheim---grundbuchamt--/oe6000662"
+        ],
+        "gebuehr": "",
+        "hinweis": "Einsicht nur bei dargelegtem berechtigtem Interesse; zweite Durchwahl -1456.",
+        "beleg_zitat": "Amtsgericht Mannheim - Grundbuchamt - Voltastr. 9 68199 Mannheim",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Mannheim, Fachbereich Klima, Natur, Umwelt (untere Bodenschutzbehörde)",
+        "abteilung": "Bodenschutz-, Altlasten- und Wasserbehörde, Glücksteinallee 11, 68163 Mannheim",
+        "email": "bodenschutzbehoerde@mannheim.de",
+        "telefon": "",
+        "kanal": "portal",
+        "antrag_url": "https://www.service-bw.de/zufi/leistungen/6017807?ags=08222000",
+        "quelle_url": "https://www.mannheim.de/de/service-bieten/umwelt/altlasten",
+        "seiten": [],
+        "gebuehr": "",
+        "hinweis": "Bearbeitungszeit laut Stadt derzeit bis zu 6 Wochen; Antrag online über service-bw.",
+        "beleg_zitat": "erteilt die untere Bodenschutzbehörde Auskünfte aus dem Altlastenkataster",
+        "geteilt": false,
+        "ansprechpartner": [
+          {
+            "name": "Frank Felgenträger",
+            "funktion": "Leiter Bodenschutz-, Altlasten- und Wasserbehörde",
+            "email": "",
+            "telefon": "",
+            "seite": "https://www.mannheim.de/de/service-bieten/umwelt/altlasten"
+          }
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Mannheim, Fachbereich Geoinformation und Stadtplanung",
+        "abteilung": "Abteilung Geobasisdaten (führt das Baulastenverzeichnis), Glücksteinallee 11, 68163 Mannheim",
+        "email": "geoinformation@mannheim.de",
+        "telefon": "0621 293-7258",
+        "kanal": "formular",
+        "antrag_url": "https://www.mannheim.de/de/stadt-gestalten/verwaltung/aemter-fachbereiche-eigenbetriebe/geoinformation-und-stadtplanung/geobasisdaten/geobasisdaten-kontaktformular",
+        "quelle_url": "https://www.mannheim.de/de/service-bieten/bauen-und-wohnen/bauen-und-baurecht/baulasten",
+        "seiten": [
+          "https://www.mannheim.de/de/stadt-gestalten/verwaltung/aemter-fachbereiche-eigenbetriebe/geoinformation-und-stadtplanung/geobasisdaten"
+        ],
+        "gebuehr": "gebührenpflichtig (Betrag auf der Seite nicht genannt)",
+        "hinweis": "Das Baulastenverzeichnis führt in Mannheim der Fachbereich Geoinformation, nicht die Baurechtsbehörde.",
+        "beleg_zitat": "Baulasten werden in das städtische Baulastenverzeichnis eingetragen, welches beim Fachbereich Geoinformation und Stadtplanung geführt wird",
+        "geteilt": false,
+        "ansprechpartner": [
+          {
+            "name": "Holm Neumann",
+            "funktion": "Abteilungsleitung Geobasisdaten",
+            "email": "holm.neumann@mannheim.de",
+            "telefon": "0621 293-7259",
+            "seite": "https://www.mannheim.de/de/stadt-gestalten/verwaltung/aemter-fachbereiche-eigenbetriebe/geoinformation-und-stadtplanung/geobasisdaten"
+          }
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "MARCHIVUM - Mannheims Archiv, Haus der Stadtgeschichte und Erinnerung",
+        "abteilung": "Bauakteneinsicht, Archivplatz 1, 68169 Mannheim",
+        "email": "bauakteneinsicht@mannheim.de",
+        "telefon": "0621 293-7735",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.mannheim.de/de/service-bieten/bauen-und-wohnen/bauen-und-baurecht/bauakteneinsicht",
+        "seiten": [
+          "https://www.marchivum.de/de/information/services/bauakteneinsicht"
+        ],
+        "gebuehr": "gebühren- und kostenpflichtig laut Gebührenordnung des MARCHIVUM",
+        "hinweis": "Bauakten aller nach 1945 errichteten oder umgebauten Gebäude; Einsicht nach Termin, per E-Mail mit Legitimation auch Kopien.",
+        "beleg_zitat": "Das MARCHIVUM verwahrt die Bauakten aller nach 1945 in Mannheim errichteten oder umgebauten Gebäude.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {
+            "name": "Giuseppe Castellaneta",
+            "funktion": "Bauakteneinsicht",
+            "email": "",
+            "telefon": "0621 293-7735",
+            "seite": "https://www.mannheim.de/de/service-bieten/bauen-und-wohnen/bauen-und-baurecht/bauakteneinsicht"
+          }
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss Mannheim, Geschäftsstelle",
+        "abteilung": "Fachbereich Geoinformation und Stadtplanung, Glücksteinallee 11, 68163 Mannheim",
+        "email": "gutachterausschuss@mannheim.de",
+        "telefon": "0621 293-7516",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.mannheim.de/de/stadt-gestalten/verwaltung/aemter-fachbereiche-eigenbetriebe/geoinformation-und-stadtplanung/geschaeftsstelle-gutachterausschuss",
+        "seiten": [
+          "https://www.mannheim.de/de/stadt-gestalten/planungskonzepte/grundstuecksmarktbericht",
+          "https://www.mannheim.de/sites/default/files/2025-02/Gutachterausschussgeb%C3%BChrensatzung.pdf"
+        ],
+        "gebuehr": "",
+        "hinweis": "Telefonisch Mo-Do 9-12 Uhr; derzeit hohes Arbeitsaufkommen laut Seite.",
+        "beleg_zitat": "Geschäftsstellenleitung Gutachterausschuss",
+        "geteilt": false,
+        "ansprechpartner": [
+          {
+            "name": "Dr. Philip Gärtner",
+            "funktion": "Geschäftsstellenleitung Gutachterausschuss",
+            "email": "",
+            "telefon": "",
+            "seite": "https://www.mannheim.de/de/stadt-gestalten/verwaltung/aemter-fachbereiche-eigenbetriebe/geoinformation-und-stadtplanung/geschaeftsstelle-gutachterausschuss"
+          }
+        ]
+      }
+    ],
+    "offen": [
+      "Grundbuch: Telefonangabe auf der Stadtseite '0621 292-1363 /-1456' — die erste Durchwahl übernommen."
+    ]
+  }
+]

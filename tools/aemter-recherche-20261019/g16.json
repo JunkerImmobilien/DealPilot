@@ -1,0 +1,372 @@
+[
+  {
+    "gemeinde": "Halle (Saale)",
+    "plz_praefixe": ["06"],
+    "bundesland": "ST",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), Standort Halle (Saale)",
+        "abteilung": "Geokompetenz-Center, Neustädter Passage 15, 06122 Halle (Saale)",
+        "email": "poststelle.halle.lvermgeo@sachsen-anhalt.de",
+        "telefon": "0345 6912-481",
+        "kanal": "portal",
+        "antrag_url": "https://www.lvermgeo.sachsen-anhalt.de/de/onlinedienst-vermessungsantrag.html",
+        "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-kontakt-adressen.html",
+        "seiten": [
+          "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-antrag-lika-auszug.html",
+          "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/10644,501/lvermgeo622.pdf"
+        ],
+        "gebuehr": "Liegenschaftskarte DIN A4/A3: 20,00 € Erstausfertigung, 4,00 € Mehrausfertigung (Gebührenblatt LVermGeo 650, Stand 03/25)",
+        "hinweis": "Antrag online oder mit Formular LVermGeo 622; Nichteigentümer müssen ein berechtigtes Interesse darlegen.",
+        "beleg_zitat": "Landesamt für Vermessung und Geoinformation Sachsen-Anhalt, Neustädter Passage 15, 06122 Halle (Saale)",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Halle (Saale)",
+        "abteilung": "Grundbuchamt, Thüringer Straße 16, 06112 Halle (Saale)",
+        "email": "",
+        "telefon": "+49 345 220-0",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://ag-hal.sachsen-anhalt.de/service/grundbuch",
+        "seiten": [
+          "https://ag-hal.sachsen-anhalt.de/",
+          "https://ag-hal.sachsen-anhalt.de/fileadmin/Bibliothek/Politik_und_Verwaltung/MJ/MJ/ag_hal/Dokumente/Grundbuch/Grundbuchauszugsantrag.pdf"
+        ],
+        "gebuehr": "Einsicht gebührenfrei; beglaubigter Ausdruck 20 €, unbeglaubigter Ausdruck 10 €",
+        "hinweis": "Antrag persönlich mit Ausweis oder schriftlich/per Fax mit Unterschrift; Anforderungen per Telefon oder E-Mail werden nicht berücksichtigt; Durchwahl je Gemarkung.",
+        "beleg_zitat": "Das Grundbuchamt ist zuständig für alle Eintragungen in das Grundbuch.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Halle (Saale)",
+        "abteilung": "Team Untere Wasser-/Bodenschutzbehörde, Neustädter Passage 18, 06122 Halle (Saale)",
+        "email": "",
+        "telefon": "+49 345 2214678",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://halle.de/serviceportal/dienstleistungen/leistung/altlasten-bodenveraenderungen-abwehren/7287863",
+        "seiten": [
+          "https://halle.de/verwaltung-stadtrat/stadtverwaltung/verwaltungsorganisation/oe-information/team-untere-wasser-bodenschutzbehoerde/349631981"
+        ],
+        "gebuehr": "23,00 bis 46,00 € je nach Bearbeitungsdauer, Zahlung per Rechnung",
+        "hinweis": "Antrag schriftlich und formlos mit Gemarkung, Flur, Flurstück; Nichteigentümer brauchen berechtigtes Interesse oder Einwilligung des Eigentümers.",
+        "beleg_zitat": "ein Antrag auf Auskunft aus dem Altlastenkataster gestellt werden",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Fr. Rujner", "funktion": "Sachbearbeiterin Bodenschutz", "email": "", "telefon": "+49 345 2214694", "seite": "https://halle.de/serviceportal/dienstleistungen/leistung/altlasten-bodenveraenderungen-abwehren/7287863"},
+          {"name": "Fr. Schobeß", "funktion": "Sachbearbeiterin Bodenschutz/Altbergbau", "email": "", "telefon": "+49 345 2214692", "seite": "https://halle.de/serviceportal/dienstleistungen/leistung/altlasten-bodenveraenderungen-abwehren/7287863"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Halle (Saale), untere Bauaufsichtsbehörde",
+        "abteilung": "Abteilung Baurecht, Team Baurechtsangelegenheiten, Neustädter Passage 18, 06122 Halle (Saale)",
+        "email": "baulasten@halle.de",
+        "telefon": "+49 345 2216371",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://halle.de/serviceportal/dienstleistungen/leistung/eintragung-einer-baulast-und-auskunft-aus-dem-baulastenverzeichnis/7291031",
+        "seiten": [
+          "https://halle.de/verwaltung-stadtrat/stadtverwaltung/verwaltungsorganisation/oe-information/team-baurechtangelegenheiten/349628655",
+          "https://include-st.zfinder.de/IWFileLoader?tsaid_fileId=418296873&"
+        ],
+        "gebuehr": "15,00 € je Abschrift (BauGVO i. V. m. AllGO LSA)",
+        "hinweis": "Auskunft formlos per Mail oder mit Antragsformular per Post; berechtigtes Interesse ist darzulegen (Notare, ÖbVI ausgenommen).",
+        "beleg_zitat": "Eine Auskunft aus dem Baulastenverzeichnis kann formlos per Mail an baulasten@halle.de",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Bunk", "funktion": "Sachbearbeiterin", "email": "", "telefon": "+49 345 2216381", "seite": "https://halle.de/serviceportal/dienstleistungen/leistung/eintragung-einer-baulast-und-auskunft-aus-dem-baulastenverzeichnis/7291031"},
+          {"name": "Frau Kühne", "funktion": "Sachbearbeiterin", "email": "", "telefon": "+49 345 2216380", "seite": "https://halle.de/serviceportal/dienstleistungen/leistung/eintragung-einer-baulast-und-auskunft-aus-dem-baulastenverzeichnis/7291031"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Halle (Saale), untere Bauaufsichtsbehörde",
+        "abteilung": "Abteilung Baurecht, Team Daten- und Bauaktenverwaltung, Neustädter Passage 18, 06122 Halle (Saale)",
+        "email": "bauakteneinsichten@halle.de",
+        "telefon": "+49 345 2216357",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://halle.de/leben-in-halle/bauen-und-wohnen/bauen/einsicht-in-bauakten-nehmen",
+        "seiten": [
+          "https://halle.de/verwaltung-stadtrat/stadtverwaltung/verwaltungsorganisation/oe-information/abteilung-baurecht/349627386",
+          "https://halle.de/kultur-tourismus/stadtgeschichte/stadtarchiv/benutzung"
+        ],
+        "gebuehr": "nach Verwaltungskostensatzung der Stadt Halle (Saale), Gebührenbescheid nach der Einsicht",
+        "hinweis": "Einsicht nur nach Terminvereinbarung; mitzubringen sind Grundbuchauszug (nicht älter als 6 Monate), Ausweis und ggf. Vollmacht; historische Bauakten liegen teils im Stadtarchiv.",
+        "beleg_zitat": "Die Vorsprache ist grundsätzlich nur nach vorheriger Terminvereinbarung möglich.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo",
+        "abteilung": "Geschäftsstelle Halle (Saale), Neustädter Passage 15, 06122 Halle (Saale)",
+        "email": "gaa.halle.lvermgeo@sachsen-anhalt.de",
+        "telefon": "0345 6912-481",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-adressen-gutachterausschuss.html",
+        "seiten": [
+          "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-gutachterausschuss.html"
+        ],
+        "gebuehr": "",
+        "hinweis": "Landesweit ein Gutachterausschuss; die Geschäftsstelle Halle ist zuständig für Stadt Halle (Saale), Saalekreis, Mansfeld-Südharz und Burgenlandkreis.",
+        "beleg_zitat": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt, Neustädter Passage 15, 06122 Halle (Saale)",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ],
+    "offen": []
+  },
+  {
+    "gemeinde": "Magdeburg",
+    "plz_praefixe": ["39"],
+    "bundesland": "ST",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), Standort Magdeburg",
+        "abteilung": "Geokompetenz-Center, Otto-von-Guericke-Straße 15, 39104 Magdeburg",
+        "email": "poststelle.magdeburg.lvermgeo@sachsen-anhalt.de",
+        "telefon": "0391 567-7864",
+        "kanal": "portal",
+        "antrag_url": "https://www.lvermgeo.sachsen-anhalt.de/de/onlinedienst-vermessungsantrag.html",
+        "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-kontakt-adressen.html",
+        "seiten": [
+          "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-antrag-lika-auszug.html",
+          "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/10644,501/lvermgeo622.pdf"
+        ],
+        "gebuehr": "Liegenschaftskarte DIN A4/A3: 20,00 € Erstausfertigung, 4,00 € Mehrausfertigung (Gebührenblatt LVermGeo 650, Stand 03/25)",
+        "hinweis": "Antrag online oder mit Formular LVermGeo 622; Nichteigentümer müssen ein berechtigtes Interesse darlegen.",
+        "beleg_zitat": "Landesamt für Vermessung und Geoinformation Sachsen-Anhalt, Otto-von-Guericke-Straße 15, 39104 Magdeburg",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Magdeburg",
+        "abteilung": "Grundbuchamt",
+        "email": "grundbuchamt.ag-md@justiz.sachsen-anhalt.de",
+        "telefon": "+49 391 606 6821",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://ag-md.sachsen-anhalt.de/service/grundbuchamt",
+        "seiten": [
+          "https://ag-md.sachsen-anhalt.de/",
+          "https://ag-md.sachsen-anhalt.de/amtsgericht/anschrift-e-mail-und-elektronische-einreichung-von-dokumenten"
+        ],
+        "gebuehr": "Einsicht gebührenfrei; beglaubigter Ausdruck 20 €, unbeglaubigter Ausdruck 10 €",
+        "hinweis": "Telefon und E-Mail laut Seite für Terminvereinbarung; Auszug schriftlich oder per Fax mit Unterschrift und Ausweiskopie; zuständig für Magdeburg einschließlich Pechau, Randau-Calenberge und Beyendorf.",
+        "beleg_zitat": "Grundstücke in der Landeshauptstadt Magdeburg einschließlich der eingemeindeten Ortschaften Pechau, Randau-Calenberge und Beyendorf",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Landeshauptstadt Magdeburg, Umweltamt",
+        "abteilung": "Untere Bodenschutzbehörde, Julius-Bremer-Straße 10, 39104 Magdeburg",
+        "email": "bodenschutz@ua.magdeburg.de",
+        "telefon": "",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.magdeburg.de/index.php?ModID=9&FID=37.4447.1&object=tx%2C37.6876.1",
+        "seiten": [
+          "https://www.magdeburg.de/B%C3%BCrger-Stadt/System/Altlasten.php?object=tx%2C37.8998.1&kuo=1&sub=0"
+        ],
+        "gebuehr": "",
+        "hinweis": "Auskunft bei berechtigtem Interesse; Durchwahl je Stadtgebiet (nördlich Albert-Vater-Straße 0391 540-2719, südlich 540-2738/-2737, östlich der Elbe 540-2715).",
+        "beleg_zitat": "Untere Bodenschutzbehörde, Julius-Bremer-Straße 10, 39104 Magdeburg",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Akkermann", "funktion": "Teamleiter Untere Bodenschutzbehörde", "email": "", "telefon": "", "seite": "https://www.magdeburg.de/index.php?ModID=9&FID=37.4447.1&object=tx%2C37.6876.1"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Landeshauptstadt Magdeburg, untere Bauaufsichtsbehörde",
+        "abteilung": "Fachdienst Bauordnungsamt und Denkmalschutz, An der Steinkuhle 6, 39128 Magdeburg",
+        "email": "bauordnungsamt@magdeburg.de",
+        "telefon": "+49 391 540-5169",
+        "kanal": "portal",
+        "antrag_url": "https://www.magdeburg.de/index.php?object=tx,698.8844&ModID=10&FID=37.825.1",
+        "quelle_url": "https://www.magdeburg.de/B%C3%BCrger-Stadt/Leben-in-Magdeburg/Planen-Bauen-Wohnen/Bauen/Fachdienst-Bauordnungsamt-und-Denkmalschutz.php?ModID=9&FID=37.58.1",
+        "seiten": [
+          "https://magdeburg.de/index.php?FID=698.46959.1&ModID=7&object=tx%7C698.46959.1"
+        ],
+        "gebuehr": "",
+        "hinweis": "Einsicht und Abschriften bei dargelegtem berechtigtem Interesse; Online-Antrag über den Dienst der Stadt.",
+        "beleg_zitat": "Das Baulastenverzeichnis wird von der unteren Bauaufsichtsbehörde geführt.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Landeshauptstadt Magdeburg, Stadtarchiv",
+        "abteilung": "Bauaktenarchiv (Archiv der kommunalen Bauaufsicht), Mittagstraße 16, 39124 Magdeburg",
+        "email": "",
+        "telefon": "+49 391 540-2896",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.magdeburg.de/Start/Wissenschaft-Bildung/Bibliotheken-Archive/Stadtarchiv",
+        "seiten": [
+          "https://www.magdeburg.de/B%C3%BCrger-Stadt/Ab-Oktober-keine-Einsicht-in-Bauakten-des-Stadtarchivs-m%C3%B6glich.php?object=tx,698.6.1&ModID=7&FID=698.49063.1&sNavID=1.100&NavID=37.367"
+        ],
+        "gebuehr": "",
+        "hinweis": "Termin telefonisch unter 0391 540-2896 oder 540-2267; Einsicht nur für Eigentümer oder Bevollmächtigte; eine ältere Meldung kündigte eine Schließung wegen Umzugs bis Jahresende 2025 an.",
+        "beleg_zitat": "Terminvereinbarung erwünscht unter",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo",
+        "abteilung": "Geschäftsstelle Magdeburg, Otto-von-Guericke-Straße 15, 39104 Magdeburg",
+        "email": "gaa.magdeburg.lvermgeo@sachsen-anhalt.de",
+        "telefon": "0391 567-7864",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-adressen-gutachterausschuss.html",
+        "seiten": [
+          "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-gutachterausschuss.html"
+        ],
+        "gebuehr": "",
+        "hinweis": "Landesweit ein Gutachterausschuss; die Geschäftsstelle Magdeburg ist zuständig für Magdeburg, Harz, Börde, Salzlandkreis sowie landesweite Auskünfte.",
+        "beleg_zitat": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Sachsen-Anhalt, Otto-von-Guericke-Straße 15, 39104 Magdeburg",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ],
+    "offen": []
+  },
+  {
+    "gemeinde": "Erfurt",
+    "plz_praefixe": ["99"],
+    "bundesland": "TH",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Thüringer Landesamt für Bodenmanagement und Geoinformation (TLBG)",
+        "abteilung": "Zweigstelle Erfurt (Liegenschaftskataster), Hohenwindenstraße 14, 99086 Erfurt",
+        "email": "kataster@tlbg.thueringen.de",
+        "telefon": "0361 57 4176-901",
+        "kanal": "portal",
+        "antrag_url": "https://tlbg-onlineshop.thueringen.de/onlineshop/",
+        "quelle_url": "https://tlbg.thueringen.de/liegenschaftskataster/kontakt",
+        "seiten": [
+          "https://tlbg.thueringen.de/liegenschaftskataster/alkis",
+          "https://tlbg.thueringen.de/kontakt"
+        ],
+        "gebuehr": "analoger Auszug bis DIN A3: 20,00 € je Blatt, größer bis DIN A0: 40,00 € (ThürVwKostO)",
+        "hinweis": "E-Mail ist die Referatsadresse Recherche und Service, keine eigene Adresse der Zweigstelle Erfurt.",
+        "beleg_zitat": "Zweigstelle Erfurt, Hohenwindenstraße 14, 99086 Erfurt",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Erfurt",
+        "abteilung": "Grundbuchamt, Rudolfstraße 46, 99092 Erfurt",
+        "email": "",
+        "telefon": "0361 573 555 002",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://gerichte.thueringen.de/gerichte-in-thueringen/landgericht-erfurt/amtsgericht-erfurt/das-gericht-und-seine-abteilungen/grundbuch",
+        "seiten": [
+          "https://gerichte.thueringen.de/gerichte-in-thueringen/landgericht-erfurt/amtsgericht-erfurt",
+          "https://gerichte.thueringen.de/media/tmmjv_gerichte/Oberlandesgericht/Startseite/Dokumente/Antrag_Grundbuchabschrift_allgemein.pdf"
+        ],
+        "gebuehr": "unbeglaubigter Auszug 10,00 €, beglaubigter Auszug 20,00 €",
+        "hinweis": "Antragsformular per Post mit Kopie des Personalausweises; telefonisch Mo–Fr 9–12 Uhr.",
+        "beleg_zitat": "nur Grundbuchauszüge für Gemarkungen (Orte) die zum Amtsgericht Erfurt gehören",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Landeshauptstadt Erfurt, Umwelt- und Naturschutzamt",
+        "abteilung": "Abteilung Wasser/Boden/Altlasten (untere Bodenschutzbehörde), Stauffenbergallee 18, 99085 Erfurt",
+        "email": "Umweltamt@Erfurt.de",
+        "telefon": "+49 361 655-2633",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.erfurt.de/ef/de/rathaus/bservice/leistungen/leistung-2095.htmc",
+        "seiten": [
+          "https://www.erfurt.de/ef/de/rathaus/sv/aemter/stelle-110.htmc",
+          "https://www.erfurt.de/ef/de/rathaus/sv/aemter/stelle-91.htmc"
+        ],
+        "gebuehr": "",
+        "hinweis": "Die Leistungsseite nennt keinen Antragsweg und keine Gebühr; E-Mail ist die allgemeine Adresse des Umwelt- und Naturschutzamts.",
+        "beleg_zitat": "Erteilung von Auskünften aus dem Altlastenkataster",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Landeshauptstadt Erfurt, Bauamt, untere Bauaufsicht",
+        "abteilung": "Bauaufsicht, Bauaufsichtliche Sonderverfahren",
+        "email": "bauaufsicht.bauamt@erfurt.de",
+        "telefon": "",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.erfurt.de/ef/de/rathaus/bservice/leistungen/leistung-2187.htmc",
+        "seiten": [
+          "https://www.erfurt.de/mam/ef/rathaus/buergerservice/form/60/60_03_19internet.pdf"
+        ],
+        "gebuehr": "25,00 € je Flurstück zzgl. Porto, auch bei Negativauskunft",
+        "hinweis": "Formloser Antrag oder Formular mit Nachweis des berechtigten Interesses; Sachbearbeitung nach Stadtteilen aufgeteilt (Frau Bauman, Herr Bedow, Frau Gentzsch).",
+        "beleg_zitat": "Bearbeitung von Anträgen auf Auszug aus dem Baulastenverzeichnis",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Bauman", "funktion": "Sachbearbeiterin (u. a. Azmannsdorf, Erfurt-Mitte, Melchendorf)", "email": "", "telefon": "+49 361 655-3506", "seite": "https://www.erfurt.de/ef/de/rathaus/bservice/leistungen/leistung-2187.htmc"},
+          {"name": "Herr Bedow", "funktion": "Sachbearbeiter (u. a. Erfurt-Nord, Gispersleben, Ilversgehofen, Stotternheim)", "email": "", "telefon": "+49 361 655-3536", "seite": "https://www.erfurt.de/ef/de/rathaus/bservice/leistungen/leistung-2187.htmc"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Landeshauptstadt Erfurt, Bauamt, untere Bauaufsicht",
+        "abteilung": "Archiv Bauaufsicht",
+        "email": "bauaufsicht.bauamt@erfurt.de",
+        "telefon": "+49 361 655-3522",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.erfurt.de/ef/de/rathaus/bservice/leistungen/leistung-2223.htmc",
+        "seiten": [],
+        "gebuehr": "gebührenpflichtig nach Verwaltungskostensatzung der Landeshauptstadt Erfurt (VerwKostEF)",
+        "hinweis": "Recherche in Bauakten nach Angaben im Antrag, Bereitstellung zur Einsicht, Kopien oder digitale Medien.",
+        "beleg_zitat": "Gewährung der Einsichtnahme in das Bauaktenarchiv",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Häßler", "funktion": "Sachbearbeiterin", "email": "bauaufsicht.bauamt@erfurt.de", "telefon": "+49 361 655-3522/3521", "seite": "https://www.erfurt.de/ef/de/rathaus/bservice/leistungen/leistung-2223.htmc"},
+          {"name": "Herr Schlieter", "funktion": "Sachbearbeiter", "email": "bauaufsicht.bauamt@erfurt.de", "telefon": "+49 361 655-3522/3521", "seite": "https://www.erfurt.de/ef/de/rathaus/bservice/leistungen/leistung-2223.htmc"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+        "abteilung": "Geschäftsstelle im TLBG, Hohenwindenstraße 13a, 99086 Erfurt",
+        "email": "gutachter.erfurt@tlbg.thueringen.de",
+        "telefon": "0361 57 4176-255",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://tlbg.thueringen.de/wertermittlung/kontakt",
+        "seiten": [],
+        "gebuehr": "",
+        "hinweis": "",
+        "beleg_zitat": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ],
+    "offen": []
+  }
+]

@@ -138,9 +138,16 @@ window.MietEntwicklung = (function() {
   function _mieteEinheit(e, y) {
     var leer = e.status === 'leer';
     var lauf = leer ? 0 : _staffelEinheit(e, y);
-    var sj = sollJahr();
+    /* v2430 · Marcel 19.10.2026: ab „erreichbar" je Wohnung mit der Soll-Miete
+       (Mieter bleibt). DpPotenzial liefert die Soll-Miete (eigene Angabe oder
+       gerechnet: Vergleichsmiete, Kappungsgrenze, § 559) und ihr Startjahr
+       (eigene Angabe > max(Soll-Jahr des Konfigurators, 15 Monate nach der
+       letzten Erhoehung) > nur die Frist). Ohne Termin gilt wie bisher das
+       Soll-Jahr. Das ZIELBILD geht bewusst NICHT hier hinein. */
+    var _P = window.DpPotenzial, _sp = (!leer && _P && _P.sollFuerMietentwicklung) ? _P.sollFuerMietentwicklung(e, _basisJahr()) : null;
+    var sj = (_sp && _sp.jahrIndex != null) ? _sp.jahrIndex : sollJahr();
     if (sj != null && y >= sj) {
-      var soll = _zahl(e.soll) || (leer ? _zahl(e.ist) : 0);
+      var soll = (_sp && _sp.miete) || _zahl(e.soll) || (leer ? _zahl(e.ist) : 0);
       /* v2422 · Marcel 19.10.2026: ist die Soll-Miete erreicht, laeuft
          danach die normale Prognose-Steigerung (`mietstg`) weiter - sonst
          bliebe die Wohnung ab dem Soll-Jahr fuer immer flach. */

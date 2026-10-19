@@ -1,0 +1,241 @@
+[
+  {
+    "gemeinde": "Berlin",
+    "plz_praefixe": ["10", "12", "13", "14"],
+    "bundesland": "BE",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Vermessungsamt des Bezirks, in dem das Flurstück liegt (Bezirksamt, Stadtentwicklungsamt - Vermessung)",
+        "abteilung": "Stadtentwicklungsamt - Vermessung",
+        "email": "",
+        "telefon": "",
+        "kanal": "portal",
+        "antrag_url": "https://liste-antraege.bda.service.berlin.de/intelliform/forms/default/bda/SenStadtWohn/liegenschaftskarte/index",
+        "quelle_url": "https://service.berlin.de/dienstleistung/324341/",
+        "seiten": [],
+        "gebuehr": "16,00 € je Blatt, zzgl. 2,00 € je Beglaubigung ab DIN A3; mit Grenzlängen zzgl. 32,00 € je angefangene halbe Stunde",
+        "hinweis": "Je Bezirk geteilt: zuständig ist das Vermessungsamt eines der zwölf Bezirksämter, in dem das Flurstück liegt; nicht amtlicher Ausdruck kostenlos über das Geoportal Berlin.",
+        "beleg_zitat": "Zuständig ist das Berliner Vermessungsamt, in dem das Antragsobjekt liegt.",
+        "geteilt": true,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Grundbuchamt beim örtlich zuständigen Amtsgericht (Charlottenburg, Köpenick, Kreuzberg, Lichtenberg, Mitte, Neukölln, Schöneberg, Spandau)",
+        "abteilung": "Grundbuchamt",
+        "email": "",
+        "telefon": "",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://service.berlin.de/dienstleistung/327196/",
+        "seiten": ["https://service.berlin.de/dienstleistung/326740/"],
+        "gebuehr": "einfache Abschrift 10,00 €, beglaubigte Abschrift 20,00 €",
+        "hinweis": "Acht Grundbuchämter nach Bezirken/Ortsteilen geteilt (z. B. Lichtenberg: Lichtenberg und Marzahn-Hellersdorf; Mitte: Mitte, Reinickendorf, Pankow; Schöneberg: Steglitz-Zehlendorf, Schöneberg, Friedenau; Kreuzberg: Friedrichshain-Kreuzberg, Tempelhof); Auszug laut Seite bei jedem Berliner Grundbuchamt beantragbar, berechtigtes Interesse nötig.",
+        "beleg_zitat": "Sie können den Auszug bei jedem Berliner Amtsgericht mit einem Grundbuchamt beantragen.",
+        "geteilt": true,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Umwelt- und Naturschutzamt des Bezirks, in dem die Fläche liegt (untere Bodenschutzbehörde)",
+        "abteilung": "Bodenbelastungskataster",
+        "email": "",
+        "telefon": "",
+        "kanal": "portal",
+        "antrag_url": "https://service.berlin.de/dienstleistung/353866/",
+        "quelle_url": "https://service.berlin.de/dienstleistung/353866/",
+        "seiten": [],
+        "gebuehr": "5,00 bis 500,00 €",
+        "hinweis": "Je Bezirk geteilt (Umwelt- und Naturschutzamt der zwölf Bezirke); liegt die Fläche in Zuständigkeit der Senatsverwaltung, wird weitergeleitet; nur Eigentümer oder Bevollmächtigte, mind. 4 Wochen Vorlauf.",
+        "beleg_zitat": "in dessen Bezirk sich die Fläche befindet",
+        "geteilt": true,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Bauaufsicht des örtlich zuständigen Bezirksamts",
+        "abteilung": "Bauaufsicht - Baulastenverzeichnis",
+        "email": "",
+        "telefon": "",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://service.berlin.de/dienstleistung/331635/",
+        "seiten": [],
+        "gebuehr": "Negativ-Bescheinigung 17,00 € je Grundstück; Abschriften vorhandener Baulasten 29,00 € je Grundstück",
+        "hinweis": "Je Bezirk geteilt (zwölf Bezirksämter); formloser schriftlicher Antrag mit Unterschrift per Post, Fax oder eingescannt per E-Mail, berechtigtes Interesse nötig.",
+        "beleg_zitat": "in dem örtlich zuständigen Bezirksamt, in welchem sich das jeweils betreffende Grundstück befindet",
+        "geteilt": true,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Bauaktenarchiv des örtlich zuständigen Bezirksamts (Stadtentwicklungsamt)",
+        "abteilung": "Stadtentwicklungsamt - Bauaktenarchiv",
+        "email": "",
+        "telefon": "",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://service.berlin.de/dienstleistung/331641/",
+        "seiten": [],
+        "gebuehr": "Mindestgebühr 36,00 €, ca. 25,00 € pro Akte (Rahmengebühr)",
+        "hinweis": "Je Bezirk geteilt (zwölf Bezirksämter); Standortangaben laut Seite nur über die Homepage des jeweiligen Bezirksamts, berechtigtes Interesse nötig.",
+        "beleg_zitat": "Zu konkreten Standortinformationen gelangen Sie zurzeit nur über die Homepage der Behörde",
+        "geteilt": true,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin, Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen",
+        "abteilung": "III E 2, Fehrbelliner Platz 4, 10707 Berlin",
+        "email": "gaa@senstadt.berlin.de",
+        "telefon": "(030) 90173-5239",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.berlin.de/gutachterausschuss/service/artikel.162086.php",
+        "seiten": [
+          "https://www.berlin.de/gutachterausschuss/service/artikel.162458.php",
+          "https://www.berlin.de/gutachterausschuss/marktinformationen/marktanalyse/artikel.175633.php",
+          "https://service.berlin.de/dienstleistung/325623/"
+        ],
+        "gebuehr": "",
+        "hinweis": "Zentral für ganz Berlin; Werte und abgeleitete Daten laut Seite nicht telefonisch, sondern über GAA Online bzw. die Marktinformationen.",
+        "beleg_zitat": "Die Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Berlin",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Kluge", "funktion": "Erstellung von Marktberichten (z. B. Grundstücksmarktbericht)", "email": "", "telefon": "(030) 90173-5220", "seite": "https://www.berlin.de/gutachterausschuss/service/artikel.162458.php"},
+          {"name": "Frau Sehnert", "funktion": "Allgemeine Anfragen, Antragstellung, Gutachten", "email": "", "telefon": "(030) 90173-5239", "seite": "https://www.berlin.de/gutachterausschuss/service/artikel.162458.php"}
+        ]
+      }
+    ]
+  },
+  {
+    "gemeinde": "Potsdam",
+    "plz_praefixe": ["14"],
+    "bundesland": "BB",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Landeshauptstadt Potsdam, Bereich Liegenschaftskataster",
+        "abteilung": "4451 Arbeitsgruppe Geodatenservice, Hegelallee 6-10, Haus 1, 14467 Potsdam",
+        "email": "Geodatenservice@Rathaus.Potsdam.de",
+        "telefon": "0331 289-3192",
+        "kanal": "portal",
+        "antrag_url": "https://dakapo.brandenburg.de/web/",
+        "quelle_url": "https://vv.potsdam.de/vv/produkte/173010100000009049.php",
+        "seiten": [
+          "https://vv.potsdam.de/vv/oe/173010100000025088.php",
+          "https://serviceportal.dikom-bb.de/landeshauptstadt-potsdam/einrichtung/4451-arbeitsgruppe-geodatenservice"
+        ],
+        "gebuehr": "Auszug Liegenschaftskarte A4/A3 22,00 € zzgl. 19 % USt (>A3 44,00 €); Flurstücks- und Eigentümernachweis 11,00 € zzgl. USt",
+        "hinweis": "Online über DAKAPO (BundID-Konto nötig); Klartext-Mail steht im Serviceportal, auf vv.potsdam.de nur verschleiert.",
+        "beleg_zitat": "4451 Arbeitsgruppe Geodatenservice",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Lorenz", "funktion": "Arbeitsgruppenleiterin", "email": "", "telefon": "0331 289-3195", "seite": "https://vv.potsdam.de/vv/oe/173010100000025088.php"}
+        ]
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Potsdam, Grundbuchamt",
+        "abteilung": "Grundbuchabteilung (Haupthaus Hegelallee), Hegelallee 8, 14467 Potsdam",
+        "email": "",
+        "telefon": "+49 331 2017 0",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://ordentliche-gerichtsbarkeit.brandenburg.de/ogb/de/amtsgericht-potsdam/uebersicht-geschaeftsverteilung/grundbuch/",
+        "seiten": ["https://ordentliche-gerichtsbarkeit.brandenburg.de/ogb/de/amtsgericht-potsdam/"],
+        "gebuehr": "",
+        "hinweis": "Grundbuchauszüge auf schriftlichen Antrag per Post oder Fax (Formulare AVR 270-272); Einsicht in Grundakten nur nach telefonischer Terminvereinbarung.",
+        "beleg_zitat": "Das Grundbuchamt Potsdam ist zuständig für alle Grundstücke, die im Bezirk des Amtsgerichts Potsdam liegen.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Landeshauptstadt Potsdam, untere Bodenschutzbehörde",
+        "abteilung": "4521 Arbeitsgruppe Untere Abfallwirtschafts- und Bodenschutzbehörde, Immissionsschutz",
+        "email": "Boden-Immission-Abfall@Rathaus.Potsdam.de",
+        "telefon": "",
+        "kanal": "formular",
+        "antrag_url": "",
+        "quelle_url": "https://vv.potsdam.de/vv/produkte/173010100000008263.php",
+        "seiten": ["https://serviceportal.dikom-bb.de/landeshauptstadt-potsdam/zentrale-dienstleistung/10895_altlasten-und-bodenschutzkataster-auskunft"],
+        "gebuehr": "kostenpflichtig nach Verwaltungsaufwand",
+        "hinweis": "Schriftlicher Antrag mit Formular, Onlineverfahren in Planung; Nicht-Eigentümer brauchen eine Vollmacht des Eigentümers.",
+        "beleg_zitat": "Die Auskunft aus dem Altlastenkataster ist kostenpflichtig",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Eggert", "funktion": "Sachbearbeiter Altlasten, Bodenschutz", "email": "", "telefon": "0331 289-1807", "seite": "https://vv.potsdam.de/vv/produkte/173010100000008263.php"},
+          {"name": "Herr Paulukat", "funktion": "Sachbearbeiter Altlasten, Bodenschutz", "email": "", "telefon": "0331 289-3764", "seite": "https://vv.potsdam.de/vv/produkte/173010100000008263.php"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Landeshauptstadt Potsdam, Bereich Untere Bauaufsichtsbehörde",
+        "abteilung": "4415 Arbeitsgruppe Ordnung und Recht, Hegelallee 6-10, Haus 1, 6. Etage, Zimmer 602",
+        "email": "Bauaufsicht@Rathaus.Potsdam.de",
+        "telefon": "0331 289-2648",
+        "kanal": "formular",
+        "antrag_url": "",
+        "quelle_url": "https://vv.potsdam.de/vv/produkte/173010100000003746.php",
+        "seiten": [
+          "https://vv.potsdam.de/vv/oe/173010100000008162.php",
+          "https://serviceportal.dikom-bb.de/landeshauptstadt-potsdam/einrichtung/4415-arbeitsgruppe-ordnung-und-recht"
+        ],
+        "gebuehr": "5-200 € (Tarifstelle 9.3 BbgBauGebO)",
+        "hinweis": "Formloser Antrag, empfohlen mit dem Formular \"Antrag auf Auskunft aus dem Baulastenverzeichnis\"; Onlinedienst über formulare.dikom-bb.de verlinkt.",
+        "beleg_zitat": "Landeshauptstadt Potsdam, Bereich Untere Bauaufsichtsbehörde, Arbeitsgruppe Ordnung und Recht",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Gottschalkson", "funktion": "Arbeitsgruppenleiterin Ordnung und Recht", "email": "", "telefon": "0331 289-2648", "seite": "https://vv.potsdam.de/vv/oe/173010100000008162.php"},
+          {"name": "Frau Kutzner", "funktion": "Sachbearbeiterin rechtliche Verfahren", "email": "", "telefon": "0331 289-2621", "seite": "https://vv.potsdam.de/vv/oe/173010100000008162.php"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Landeshauptstadt Potsdam, Bereich Untere Bauaufsichtsbehörde",
+        "abteilung": "4415 Arbeitsgruppe Ordnung und Recht",
+        "email": "Bauaufsicht@Rathaus.Potsdam.de",
+        "telefon": "0331 289-2648",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://vv.potsdam.de/vv/produkte/173010100000016543.php",
+        "seiten": ["https://vv.potsdam.de/vv/oe/173010100000008162.php"],
+        "gebuehr": "Kopien nach Tarifstellen 10.11.1 bis 10.11.7 BbgBauGebO",
+        "hinweis": "Bauakten ab ca. 1950, nur nach Terminabsprache und unter Aufsicht; Akten zum ehemaligen DDR-Grenzgebiet fehlen, Acta Specialia (18./19. Jh.) bei der unteren Denkmalschutzbehörde.",
+        "beleg_zitat": "Akteneinsicht in laufende und abgeschlossene bauaufsichtliche Verfahren",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Gottschalkson", "funktion": "Arbeitsgruppenleiterin Ordnung und Recht", "email": "", "telefon": "0331 289-2648", "seite": "https://vv.potsdam.de/vv/oe/173010100000008162.php"},
+          {"name": "Frau Kutzner", "funktion": "Sachbearbeiterin rechtliche Verfahren", "email": "", "telefon": "0331 289-2621", "seite": "https://vv.potsdam.de/vv/oe/173010100000008162.php"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in der Landeshauptstadt Potsdam",
+        "abteilung": "4403 Geschäftsstelle Gutachterausschuss, Hegelallee 6-10, Haus 1, 14467 Potsdam",
+        "email": "Gutachterausschuss@Rathaus.Potsdam.de",
+        "telefon": "0331 289-3182",
+        "kanal": "email",
+        "antrag_url": "https://gutachterausschuss.brandenburg.de/gaa/de/service/auskuenfte/",
+        "quelle_url": "https://vv.potsdam.de/vv/oe/173010100000025067.php",
+        "seiten": [
+          "https://vv.potsdam.de/vv/produkte/173010100000003703.php",
+          "https://serviceportal.dikom-bb.de/landeshauptstadt-potsdam/einrichtung/4403-geschaeftsstelle-gutachterausschuss",
+          "https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/grundstuecksmarktberichte/"
+        ],
+        "gebuehr": "Grundstücksmarktbericht als PDF 0,00 €, gedruckt 46,00 €",
+        "hinweis": "Bodenrichtwerte kostenfrei über BORIS Brandenburg (boris.brandenburg.de).",
+        "beleg_zitat": "4403 Geschäftsstelle Gutachterausschuss",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Schmidt", "funktion": "Geschäftsstellenleiterin Gutachterausschuss", "email": "", "telefon": "0331 289-3183", "seite": "https://vv.potsdam.de/vv/oe/173010100000025067.php"},
+          {"name": "Frau Mikus", "funktion": "Sachbearbeiterin Kaufpreissammlung", "email": "", "telefon": "0331 289-3182", "seite": "https://vv.potsdam.de/vv/oe/173010100000025067.php"}
+        ]
+      }
+    ]
+  }
+]

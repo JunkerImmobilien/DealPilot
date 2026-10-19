@@ -45,6 +45,60 @@ const OPENAI_URL = 'https://api.openai.com/v1/responses';
    nachrechnen: die beiden Saetze wurden jeweils zu ihrer Zeit
    gerechnet. Eine Neuberechnung mit heutigen Regeln wuerde nicht das
    Objekt messen, sondern unsere Regelaenderung. */
+/* v2430 · MIETERHOEHUNG UND ZIELBILD (Marcel 19.10.2026). Je Wohnung bis zu
+   drei Mieten: Ist, Soll-Miete (Mieter bleibt, normale Mieterhoehung) und
+   Zielbild (nach Umbau/Neuvermietung). Der Ertragswert je Stufe kommt aus dem
+   Marktbericht-Dienst (derselbe Kern wie Stufe 3) - hier wird nichts gerechnet.
+   Kennzeichnung: Potenzialwert, keine Verkehrswertermittlung. */
+function _potenzialBlock(pz) {
+  var z = [], e = function (n) { return n == null ? '-' : Math.round(n).toLocaleString('de-DE') + ' EUR'; };
+  z.push('');
+  z.push('## MIETERHOEHUNG UND ZIELBILD (Potenzial, keine Verkehrswertermittlung)');
+  z.push('Stufen: Bestand = heutige Ist-Miete; Mieterhoehung = Soll-Miete, der jetzige Mieter bleibt'
+    + ' (Paragraf 558 BGB bis zur Vergleichsmiete, Kappungsgrenze, 15 Monate nach der letzten Erhoehung;'
+    + ' Paragraf 559 bei Modernisierung im bewohnten Zustand); Zielbild = nach Umbau oder Neuvermietung.');
+  if (pz.kappung && pz.kappung.text) z.push(pz.kappung.text);
+  var st = pz.stufen || {};
+  z.push('');
+  z.push('Stufe | Kaltmiete/Monat | Kaltmiete/Jahr | Massnahmenkosten | Modernisierungspunkte plus | Bruttomietrendite | DSCR | Restnutzungsdauer | Ertragswert');
+  ['bestand', 'mieterhoehung', 'zielbild'].forEach(function (k) {
+    var x = st[k]; if (!x) return;
+    z.push(k + ' | ' + e(x.kaltmiete_monat) + ' | ' + e(x.kaltmiete_jahr) + ' | ' + e(x.kosten) + ' | ' + (x.punkte_plus || 0)
+      + ' | ' + (x.bmy != null ? x.bmy + ' %' : '-') + ' | ' + (x.dscr != null ? x.dscr : '-')
+      + ' | ' + (x.rnd != null ? Math.round(x.rnd) + ' J.' : '-') + ' | ' + (x.ertragswert != null ? e(x.ertragswert) : 'nicht gerechnet'));
+  });
+  /* v2431 · ohne Stufe 3 gibt es keinen Ertragswert (Marcel 19.10.2026) */
+  if (pz.ertragswert_gesperrt) z.push('Ertragswert je Stufe gibt es mit DealPilot Stufe 3 (Wertermittlung nach ImmoWertV); fuer dieses Objekt liegt sie nicht vor.'
+    + ' Nenne KEINEN Ertragswert, keine Restnutzungsdauer und kein Aufteilungspotenzial - nur Mieten, Massnahmen, Kosten, Rendite und Cashflow.'
+    + ' Ein sachlicher Halbsatz, dass der Ertragswert je Stufe mit Stufe 3 erscheint, genuegt; keine Werbung.');
+  else if (!pz.ertragswert_gerechnet) z.push('Die Ertragswerte sind fuer diesen Stand nicht gerechnet - nenne keine Ertragswerte, nur die Mieten.');
+  if (pz.aufteilung && pz.aufteilung.je_stufe && !pz.ertragswert_gesperrt) {
+    var a = pz.aufteilung;
+    z.push('Aufteilung in Eigentumswohnungen (Summe der Wohnungen als ETW, Zins ' + (a.zins_etw != null ? a.zins_etw + ' %' : '-')
+      + (a.zins_etw_ausschuss ? ' des ' + a.zins_etw_ausschuss.replace(/^Der\s+/, '') : '')
+      + (a.zins_haus != null ? ', Haus ' + a.zins_haus + ' %' : '')
+      + ', Kosten der Aufteilung ' + e(a.kosten) + '):');
+    Object.keys(a.je_stufe).forEach(function (k) {
+      var y = a.je_stufe[k];
+      /* v2431 · negativ = kein Potenzial, mit Begruendung statt Minusbetrag */
+      z.push('  ' + k + ': Summe ' + e(y.summe) + ', ' + (y.potenzial < 0 ? 'KEIN Aufteilungspotenzial (nach Kosten unter dem Haus als Ganzes)'
+        : 'Potenzial nach Kosten gegen Haus als Ganzes ' + e(y.potenzial)));
+    });
+    if (a.negativ_hinweis) z.push('  Begruendung (so wiedergeben, keinen Minusbetrag als Potenzial nennen): ' + a.negativ_hinweis);
+  }
+  if (Array.isArray(pz.wohnungen) && pz.wohnungen.length > 1) {
+    z.push('');
+    z.push('Wohnung | m2 | Ist/Monat | Soll/Monat (ab) | Ziel/Monat (wann) | Massnahmen');
+    pz.wohnungen.forEach(function (w) {
+      z.push((w.nr || '') + ' ' + (w.lage || '') + ' | ' + (w.wfl || '-') + ' | ' + (w.ist ? e(w.ist) : (w.status === 'leer' ? 'leer' : '-'))
+        + ' | ' + (w.soll != null ? e(w.soll) + (w.soll_ab ? ' (' + w.soll_ab + ')' : '') : '-')
+        + ' | ' + (w.ziel != null ? e(w.ziel) + (w.ziel_wann ? ' (' + w.ziel_wann + ')' : '') : '-')
+        + ' | ' + (w.massnahmen || '-'));
+    });
+  }
+  return z.join('\n');
+}
+
 function _ankaufBlock(ak) {
   var z = [];
   z.push('');
@@ -113,6 +167,7 @@ function buildPrompt(payload, opts) {
   const _me = payload.mietentwicklung || null;
   /* v2041 - der eingefrorene Ankauf-Stand samt fertiger Abweichung. */
   const _ak = payload.ankauf || null;
+  const _pz = payload.potenzial || null;   /* v2430 */
   const _wo = payload.wohnung || null;
   const _bo = payload.boden || null;
   const _ha = payload.halter || null;
@@ -655,6 +710,7 @@ function buildPrompt(payload, opts) {
        unten; hier steht nur der Aufruf, damit die Verkettung lesbar
        bleibt. */
     _ak ? _ankaufBlock(_ak) : '',
+    _pz ? _potenzialBlock(_pz) : '',   /* v2430 */
     _wo ? _zeilen('## WOHNUNGSDETAILS (fuer den Mietspiegel-Vergleich)', [
       ['Zimmer', _wo.zimmer], ['Baeder', _wo.baeder],
       ['Etage', _wo.etage], ['Etagen gesamt', _wo.etagen_gesamt],
@@ -1498,6 +1554,12 @@ function buildPrompt(payload, opts) {
     (_ak ? '   Liegt oben ein ANKAUF-STAND vor: vergleiche zusaetzlich die steuerliche Lage\n'
       + '   beim Ankauf mit heute (Zeile "Steuerwirkung p. a." und Cashflow n. Steuer der\n'
       + '   Abweichungstabelle) und erklaere die Bewegung. Gehoert nach "soll_ist_steuer".' : ''),
+    (_pz ? '17. Potenzial (Mieterhoehung und Zielbild) - liegt oben der Block MIETERHOEHUNG UND ZIELBILD vor:\n'
+      + '   4-7 Saetze: was ohne Mieterwechsel erreichbar ist und ab wann, was das Zielbild mit welchen\n'
+      + '   Massnahmen und Kosten bringt, die Ertragswerte je Stufe und der Wertzuwachs nach Kosten,\n'
+      + '   bei Aufteilung deren Wirkung (auch wenn sie negativ ist). Die schnellsten Hebel zuerst.\n'
+      + '   Nenne es ausdruecklich einen Potenzialwert, keine Verkehrswertermittlung; Score und\n'
+      + '   Verkehrswert bleiben beim Bestand. Zahlen NUR aus dem Block. Gehoert nach "potenzial_text".' : ''),
     '## STIL',
     '- Klar, professionell, wie ein ausführlicher Investment-Report',
     '- Mit Zahlen aus dem Deal arbeiten — konkret werden',
@@ -1596,6 +1658,7 @@ function buildPrompt(payload, opts) {
     '  ],',
     /* v2160 · Zielfelder fuer Aufgabe 16 (N62.6, vertieft v2166) */
     '  "steuer_zusammenfassung": "14-20 Saetze in der Gliederung von Aufgabe 16: Werbungskosten nach Art, Ergebnis und Steuerwirkung Jahr 1, Jahr der Wende und warum, Steuerlast danach in EUR, Folge fuer den Cashflow nach Steuer, Sanierung, Hinweis auf Steuerberater",',
+    _pz ? '  "potenzial_text": "4-7 Saetze nach Aufgabe 17 (Mieterhoehung, Zielbild, Ertragswert je Stufe, Wertzuwachs nach Kosten, Aufteilung); null ohne Block",' : '',   /* v2430 */
     _ak ? '  "soll_ist_steuer": "2-4 Saetze: steuerliche Lage beim Ankauf gegen heute, mit beiden Zahlen; null, wenn keine Steuerzahl zu beiden Zeitpunkten vorliegt",' : '',
     '  "anschlussfinanzierung": "Restschuld nach Zinsbindung + noetiger EK-Einsatz/Sondertilgung damit die Anschlussfinanzierung traegt, 4-6 Saetze mit Zahlen soweit ableitbar",',
     '  "score_vergleich": "Falls DealPilot-Score UND Investor Deal Score vorliegen und sich unterscheiden: erklaere Konvergenz/Divergenz und welche Zusatz-KPIs (Lage/Substanz/Upside) den Unterschied treiben, 4-6 Saetze. Sonst leer lassen.",',

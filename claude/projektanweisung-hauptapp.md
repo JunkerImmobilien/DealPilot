@@ -39017,6 +39017,154 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - Pilot-Antwort zu „Stufe 2“ und „Stufe C“.
 - Essen EFH Sachwertfaktor 1,33 im echten Bericht.
 
+### v2431/v2432 · Zielbild: Ertragswert nur mit Stufe 3, Aufteilung negativ mit Begründung (19.10.2026, Staging)
+
+**Was (Marcels zwei Entscheidungen vom 19.10.2026):**
+- **v2431 · Ertragswert an Stufe 3 gebunden (Geld).** Geprüft im Haupt-Backend, Proxy `POST /marktbericht/potenzial` (`services/ertragswertFreigabe.js`). Frei, wenn
+  - der **Tarif** Stufe 3 enthält: `KONTINGENT[plan].wev > 0` (pro, partner) oder laufende Testphase mit wev (`aiCreditsService.getStatus`). Einen Feature-Schlüssel dafür gibt es nicht — Stufe 3 hängt am Kontingent; ein erfundener Schlüssel wäre für jeden `false`. Einzeln gekaufte Wertermittlungen (Bank) zählen nicht als Tarif — mit ihnen zieht man den Bericht, und der gibt das Objekt frei;
+  - oder für **dieses Objekt** ein Bericht Stufe 3 vorliegt: `mb.object_snapshots` mit `data.ref.wert_stufe = '3'` (gemessen: 154 Stufe 3, 21 Stufe 2, 111 Stufe 1, 16 ohne Angabe = vor v1435), Nutzer + `external_ref` wie `/objects/history`, **und die Adresse des Berichts passt** (PLZ, Straße+Hausnummer) — sonst reichte die Kennung eines anderen, bezahlten Objekts. Neu: mb `GET /objects/stufe3` (intern, nicht im Proxy). Nicht am vorhandenen Ertragswert im Quercheck erkannt: vor dem Stufenschnitt trugen auch Stufe-2-Berichte einen.
+  - Sonst ruft der Proxy den Dienst gar nicht auf und meldet `ertragswert_gesperrt` (kein Kontingent, kein Rechnen). Frontend `potenzial.js` schickt `external_ref` mit; Tafel „Ankauf · Bestand · Zielbild" ohne Zeilen Ertragswert/Restnutzungsdauer, Hinweis „Ertragswert je Stufe mit DealPilot Stufe 3" + Knopf „Stufe 3 im Tab Objekt" (setzt Zielstufe 3, wechselt in den Tab, ruft nichts ab). PDFs (beide) ohne Ertragswert-Zeilen, Fuß mit Hinweis. Wohnungsfenster: Hinweis statt Kacheln; dabei behoben: `eur(null)` ergab dort „0 €". Pilot: Prompt-Block nennt keinen Ertragswert; `potenzial_lesen` blendet gespeicherte Ertragswerte ohne Freigabe aus (auch alte aus Testphase/Tarifwechsel). Ein gespeicherter Ertragswert gilt im Browser einen Tag, dann wird neu gefragt.
+- **v2432 · Aufteilung negativ.** (a) **Bielefeld führt einen eigenen ETW-Zins** — die 2,9 % SIND der örtliche Satz: Gutachterausschuss Stadt Bielefeld, Zweig `we_v` (vermietet; `we_s` selbstgenutzt 1,9 %), Register `lzs-swf-2026-nachernte.json`, Ebene kreis. „Oberer Gutachterausschuss NRW" ist nur der **Herausgeber** (Grundstücksmarktdaten NRW, Namensnennung). Der Registerweg geht in `WertParameterService.hole` schon vor jeder Landes-/Tabellenebene, `finde()` feinste Ebene zuerst — keine Änderung an der Kaskade nötig. Neu: `aufteilung.zins` trägt `ausschuss`/`zweig`/`ebene`, angezeigt wird der Ausschuss. (b) `je_stufe[s].negativ` + `aufteilung.negativ_hinweis` aus den Zahlen der Rechnung („…unter dem Wert des Hauses: Wohnungseigentums-Zins 2,9 % gegen 2,5 % für das Mehrfamilienhaus, dazu höhere Verwaltungskosten je Einheit."; Zinsvergleich nur, wenn der ETW-Zins wirklich höher liegt; liegt die Summe über dem Haus und frisst erst die Aufteilung den Abstand, sagt der Satz das). Tafel: „kein Potenzial" neutral statt Minus in Grün, Erklärung darunter; PDF: Zeile „Aufteilungspotenzial" mit „kein Potenzial", Erklärung vorn im Fuß; Pilot: „KEIN Aufteilungspotenzial" + Begründung.
+
+**Commit:** `53163697` (Backend), `84a7635e` (Frontend).
+
+**Nachweis:**
+- Container (Backend, Proxy-Handler direkt mit gestelltem Tarif, nichts geschrieben): echter Tarif Marcel → `tarif`; ohne Tarif Westerfeld-Kennung → `bericht` (Bericht 308); falsche Hausnummer / fremde Kennung / ohne Kennung → gesperrt; Proxy ohne Stufe 3 → `ertragswert_gesperrt` ohne Dienstaufruf; mit Bericht → Bestand **725.000 €** = `bericht_ertragswert` (Datensatz vom Nachmittag, 8,7 s), Aufteilung Bestand Summe 672.000 / Potenzial −60.200 → `negativ` mit Hinweis wie oben.
+- `liegenschaftszins` im mb-Container: ETW vermietet 2,9 % A `we_v`, selbstgenutzt 1,9 % A `we_s`, MFH 2,5 % A — alle Ausschuss Bielefeld.
+- Browser (eigener Tab, Westerfeld geladen, nichts bearbeitet): Proxy über Tarif frei, Bestand 780.000 € = Bericht-Abgleich desselben Laufs (heutiger Datensatz); gesperrter Fall und negative Aufteilung über eingesetzte Antwort dargestellt (Tafel, `pdfDaten`, `pilotPayload` → `ertragswert: null`), Knopf → Tab Objekt, Zielstufe 3 (danach zurückgesetzt).
+- `buster-ebenen-pruefen` SAUBER, `prompt-lecks-pruefen`, `objekt-mapper-pruefen`, `score-ketten-pruefen` RC 0, `frontend-konstanten` nachgezogen, Gold-Audit Staging RC 0, `node --check` je Datei.
+
+**Rest:**
+- **Ein Speichervorgang, den ich ausgelöst habe:** beim Laden von Westerfeld im eigenen Tab wurde das Objekt um 18:27:50 gespeichert (`updated_at`, `_at`; `_potenzial` ist NICHT drin, also vor dem Rechnen). Ich habe kein Feld geändert; vermutlich ergänzt das Laden die seit v2430 neuen leeren `zb_*`-Felder und speichert automatisch. Nicht weiter verfolgt — Marcel kurz gegenprüfen.
+- Wohnungsfenster mit gesperrtem Ertragswert nicht im Browser geöffnet (nur Code) — Staging-Abnahmepunkt mit einem Konto ohne Stufe 3.
+- `/ai/analyze` vertraut dem `potenzial`-Block aus dem Browser; gerechnet wird ein Ertragswert aber nur über den geprüften Proxy.
+- Fachlich offen für Marcel: Aufteilung rechnet mit dem ETW-Zins **vermietet** (2,9 %); verkauft man an Selbstnutzer, wäre `we_s` (1,9 %) der passende Satz — dann kippt das Bielefelder Ergebnis ins Positive.
+- Eine feinste Registerebene ohne ETW-Zweig fällt nicht auf eine gröbere Registerebene mit ETW-Zweig zurück (`finde()` nimmt die erste Ebene mit irgendeinem Satz) — für Bielefeld ohne Belang, als Befund notiert.
+
+### v2440–v2445 · Unterlagen beim Amt: zwei Ansprechpartner sichtbar, Abgleich mit unterlagen-app-v6, 342 Ämter eingespielt (19.10.2026, Staging)
+
+Marcel: *„Bitte im Tab Objekt ‚Unterlagen beim Amt anfordern' prüfen, da
+wollten wir die 2 Ansprechpartner ausweisen … ‚unterlagenapp' heißt das
+Paket"* und *„wir brauchen mehr Werte."*
+
+**Gemessen vorher:** Code für zwei Ansprechpartner war seit v2152 da — aber
+**0 von 27 Ämtern** in `unterlagen_aemter` hatten einen. Das Modal zeigte an
+jedem Objekt den Amtsweg („Keine zwei belegten Ansprechpersonen"). Gebaut
+und nie sichtbar: dieselbe Lage wie bei der `skala`.
+
+**Abgleich v6 gegen DealPilot (server.js, index.html, LIESMICH):**
+vorhanden seit v2151–v2153: Belegleser je Seite, KI-Auftrag wörtlich,
+`personenAus`, Kopie-Haken mit eigenem Endpunkt, CC im Briefkopf und
+mailto, Telefon, gewerbliche Portale, Neusuche bei Portal-Quelle.
+**Fehlte, jetzt gebaut:** zweite Adresssuche (`sucheAdresse`),
+`saeubereMail`, Kanal (`verfahren`), persönliches Postfach → Funktions-
+adresse, `istLokal` (wir riefen jede genannte URL ab, auch interne),
+„Als Empfänger nehmen" (hier nur in der Sitzung, nicht am gemeinsamen Amt).
+**Bewusst nicht:** Versand per SMTP, Auto-Senden, Vollmacht-Upload,
+Aufgaben, Telegram-Bot des Pakets (v5) — DealPilot verschickt nichts
+(routes/unterlagen.js), der Telegram-Teil wäre ein eigener Auftrag.
+
+**v2440** Namensprüfung: ein von der KI genannter Name muss auf einer
+selbst gelesenen Seite stehen, sonst fällt die Person (außer ihre Adresse
+ist belegt); je Person `seite` und `name_belegt`. Gemeindeweite Sätze
+`gemeinde-<kern>` mit PLZ-Leitbereich — Bielefeld hatte vier PLZ und je
+PLZ einen eigenen Satz. PLZ-genau geht vor.
+**v2441/a** Modal: zwei Karten nebeneinander (Name, Funktion, Telefon,
+E-Mail, Belegstand, Beleg-Seite, Kopie), Empfänger im Briefkopf wählbar.
+Buster `v2441a`, weil `v2441` schon in 84a7635e stand — ohne die Datei.
+**v2442** `tools/aemter-einspielen.mjs`: Recherche → echter
+`belegPruefen`/`belegSeiten`/`personenAus` im Container → Upsert;
+`--trocken` zählt. Geteilte Zuständigkeiten (Grundbuch Berlin, HH,
+Duisburg …) werden nicht gemeindeweit geschrieben.
+**v2443** Belegleser kennt ⚹/◦ (CMS von kassel.de, mainz.de, Potsdam,
+Duisburg, Wuppertal).
+**v2444/v2445 — ZWEI FEHLER, die erst der echte Lauf zeigte:**
+`gaa.stendal.lvermgeo@` galt als Person (Punkt im Konto) und stand als
+Ansprechpartner des Ausschusses Halle; die HVBG-Sammelseite lieferte für
+Frankfurt Personen aus `bad-homburg.de` und `giessen.de`. Jetzt: ein Teil
+mit Amtswort ist kein Name, aufgefüllt wird nur aus der Domain des Amts,
+der Einspielweg nimmt nur, wen die Recherche genannt hat.
+
+**Nachweis** 17 Recherche-Agenten, 60 Gemeinden (Objekt-Gemeinden + 50
+größte Städte). Einspiellauf: 342 Sätze, 212 Amtsadressen belegt, 15
+geteilt nicht geschrieben, 152 Personen geprüft, 43 verworfen. **Staging
+vorher 27 Ämter / 0 mit Ansprechpartner, nachher 369 / 104 (56 mit zwei),
+0 Personen ohne Namen.** `beleg-leser-pruefen.mjs` 108 Fälle RC=0 (lokal
+und im Container), Buster sauber, Sicherung
+`/root/backups/dealpilot-vor-v2442-20261019-1844.sql.gz` (49 MB).
+Im Browser: Leipzig 04155 zeigt den gemeindeweiten Satz mit Karte
+„Ansprechpartner 1 · Name auf der Seite · Beleg-Seite"; zwei Karten
+nebeneinander je 279 px gemessen.
+
+**Rest** Telegram-Teil aus v5 offen (Entscheidung Marcel). Alte KI-Sätze
+je PLZ (Bielefeld 33613, Bad Oeynhausen …) verdecken die besseren
+gemeindeweiten — „Neu suchen" oder Löschen der Altsätze wäre Marcels
+Entscheidung. Bauakte Kabelsketal, Rostock, Saarbrücken ohne amtliche
+Seite. Recherchedaten: `tools/aemter-recherche-20261019/`.
+
+---
+
+### v2430–v2430b · Mieterhöhung und Zielbild: Ertragswert je Stufe, MFH-Wohnungsfenster, Pilot, beide PDFs (19.10.2026, Staging)
+
+**Was (Marcels Entscheidungen vom 19.10.2026, Vorlage https://claude.ai/artifact/KThexeEAnjWQUPuvd9o1Rx):**
+- **Drei Mieten je Wohnung:** Ist · Soll-Miete (Mieter bleibt) · Zielbild (nach Umbau/Neuvermietung), beide freiwillig.
+- **Backend (mb):** `ReportOrchestrator.generate(…, { nurWertBasis: true })` läuft denselben Weg wie Stufe 3 bis `CrossCheckService.compute` — ohne Eintrag in `mb.properties`/`mb.market_reports`, ohne Mikrolage, Preishistorie, Marktkontext, GeoMap-Kontostand und KI. Der Quercheck legt die Eingabe des Ertragswert-Kerns nicht aufzählbar ab (`_ertragswertEingabe`, geht in keinen Bericht). `PotenzialService` ruft `ErtragswertService.ertragswert` je Stufe mit getauschtem Wohn-Rohertrag und RND nach Modernisierungspunkten (nie kürzer als der Bestand); die BWK-Quote wandert mit dem Rohertrag. Je Wohnung Anteil am Haus (nach Rohertrag) und als ETW (Zins der Kaskade für Wohnungseigentum, Bodenwertanteil nach MEA bzw. Fläche), Summe nach Aufteilung minus Aufteilungskosten. `POST /api/v1/marktbericht/potenzial` + Proxy im Haupt-Backend, ohne Kontingent.
+- **Frontend `potenzial.js` (DpPotenzial):** Soll-Miete = eigene Angabe oder gerechnet (§ 558 bis Vergleichsmiete — Wohnung, sonst `ds2_marktmiete`, sonst `me_soll` —, Kappungsgrenze aus `js/data/kappungsgrenzen.json` mit `kappung15`, Ablaufdatum je Gemeinde und `unsicher`, Rückfall 20 % „bitte prüfen“; frühestens 15 Monate nach `mv_letzte_erhoehung`; § 559 bei Haken „bewohnt“: 8 %, Deckel 3 bzw. 2 €/m²). Maßnahmen-Chips mit Kosten und Anlage-2-Gewinn je Gewerk (Punkte aus `DpMfhEinheiten`, keine zweite Tabelle). Ergebnis mit Prüfwert in `_dpPotenzial` (storage.js `_potenzial`), AGS über `/wertparameter/zinssatz`.
+- **MFH-Fenster:** Liste schlank (Nr, Lage, m², Zi., Ist, Status, „Details · Plan“). Wohnungsfenster mit Blöcken Stammdaten · Mietvertrag · Ist · Soll-Miete (Mieter bleibt) · Zielbild (Chips, Zielmiete, wann) · Ertragswert dieser Wohnung (als Eigentumswohnung / Anteil am Haus). Alte `massnahme`/`kosten` werden beim Lesen zur Liste und beim Speichern gespiegelt. Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung, eigene Angabe) neben dem Haken „aufgeteilt“.
+- **Tab Objekt:** Karte „Mieterhöhung und Zielbild (optional)“ (`zb_*` in FIELDS und resetFields); beim MFH nur die Summe aus den Wohnungen. `newObj` leert jetzt auch `_dpMfh`/`_dpRnd`/`_dpPotenzial` (vorher erbte ein neues Objekt das MFH des vorigen).
+- **Mietentwicklung „Aus Wohnungen“:** Soll-Miete je Wohnung ab „erreichbar“ (eigene Angabe > max(Soll-Jahr, Frist) > Frist), danach `mietstg`; Zielbild nicht.
+- **Pilot-Analyse:** Reiter „Ankauf · Bestand · Zielbild“ (Spalten Ankauf | Bestand | Mieterhöhung | Zielbild, Aufteilung, Absatz `potenzial_text`); „dein Soll / dein Ist“ entfernt. Payload `potenzial`, vor dem Abruf werden die Ertragswerte geholt (≤ 40 s). openaiService: Block, Aufgabe 17, Feld `potenzial_text`.
+- **PDFs:** Seite „Wertpotenzial“ im Bank-PDF (nach der Mieterliste) und im Investment-PDF (vor der KI-Analyse).
+- **Portfolio-Pilot:** Werkzeug `potenzial_lesen` (ein Objekt oder `alle: true` als Rangliste nach Wertzuwachs).
+- **Sprache/geführte Eingabe:** Bestandsaufnahme: `me_modus` war als verstecktes Feld nie im Katalog, `_dpMfh` kannte voice-import nicht. Jetzt freiwillige Frage (ETW/EFH: `zb_*`; MFH: `mfh_wohnungen` → `DpPotenzial.wohnungenAusText`), `me_modus` als Auswahl, Übernahme über `MietEntwicklung.setMode`.
+- **Hilfe:** Abschnitt „Mieterhöhung und Zielbild“.
+
+**Commit:** `34fcb113` (Backend), `c856a314` (Daten/MFH/Objekt/Mietentwicklung), `38a9a363` (Pilot), `58a8684b` (PDFs), `4fbf4102` (Sprache), `d39dbf55`, `9d644c26` (v2430a), `8c1ccfe6` (v2430b).
+
+**Nachweis:**
+- **Abgleich Ertragswert:** Westerfeldstr. 140 (Datensatz `ae155d38.json`, Probe vom Nachmittag, 2 Modernisierungspunkte) im Container über `nurWertBasis`: Bestand **725.000 €** = Bericht Stufe 3 (mb.market_reports 312: 725.000 €), LZS 2,5 % A, RND 23,6. Derselbe Lauf über den Proxy mit dem heutigen Datensatz (6 Punkte) ergibt 800.000 € — Bestand und `bericht_ertragswert` gleich, Unterschied allein durch die Punkte.
+- Laufzeit `/potenzial` über den Proxy 9 s.
+- Prüfer: `prompt-lecks-pruefen`, `objekt-mapper-pruefen`, `score-ketten-pruefen` (216), `rnd-kerne-pruefen` RC 0; `buster-ebenen-pruefen` SAUBER; `frontend-konstanten` nachgezogen; Gold-Audit Staging RC 0; `node --check` je Datei; Kappungsleser gegen die echte JSON (Bielefeld 15 % mit „Mieterschutzverordnung NRW“, Hüllhorst 20 %, Darmstadt 15 % „bitte prüfen“).
+- Browser (eigener Tab, Testobjekt „PRUEFUNG Zielbild 19.10.“ angelegt und über `delSaved` wieder gelöscht, Westerfeld `updated_at` unverändert 13:17:55): MFH-Fenster mit vier Blöcken, Soll aus Kappung/Vergleichsmiete, Chips und Punkte (+4 je Wohnung, +1 flächengewichtet); Ertragswert je Wohnung (ETW 2,9 % A); Mietentwicklung Faktor 1,0491 ab Jahr 1; Reiter „Ankauf · Bestand · Zielbild“ mit Aufteilung; Bank-PDF Seite 6 und Investment-PDF Seite 10 „Wertpotenzial“ angesehen (Spaltenüberlauf behoben in v2430a); ETW-Karte im Tab Objekt, Persistenz nach Neuladen (Prüfwert gleich); `potenzial_lesen` im Container: 13 Objekte mit Plan.
+
+**Rest / Fragen an Marcel:**
+- **Geld:** Der Ertragswert „Bestand“ ist derselbe wie im Bericht Stufe 3 (Kontingent „wev“), hier aber ohne Kontingent. Gewollt? Sonst Bindung an Tarif oder an einen vorhandenen Stufe-3-Bericht.
+- Aufteilung in NRW meist negativ: ETW-Zins des Oberen Gutachterausschusses 2,9 % gegen 2,5 % MFH (Bielefeld), dazu Anlage-3-Verwaltung je ETW. Das ist der amtliche Stand, kein Fehler — Marcel bitte fachlich ansehen.
+- Ändert sich irgendein Feld, ist das gespeicherte Ergebnis veraltet (Prüfwert über den ganzen Auftrag); PDF/Pilot rechnen dann neu (bis 40 s).
+- Sprache: echter Sprechlauf (KI) nicht bedient — Staging-Abnahmepunkt: MFH, „Weiß ich nicht“ und eine Wohnungsliste diktieren.
+- Pilot-Absatz `potenzial_text` nicht mit echter KI abgerufen (nur Darstellung) — Abnahmepunkt.
+- Mietentwicklung am Objekt (ETW/EFH) nutzt die Soll-Miete der Karte noch nicht (nur der MFH-Modus).
+
+### Prod-Rollout (54) · v2401–v2403, v2410, qc-v2420a, v2421/v2422, landing-videothek-4c (19.10.2026)
+
+**Was:**
+- **Stufe N:** v2401–v2403, siehe unten.
+- **Kanban:** v2410 Cockpit-Board raus, v2422 Kanban-Ansicht unter „Alle Objekte“ raus.
+- **Mietentwicklung:**
+  - „Aus Wohnungen“ ohne Staffel-Haken (v2410).
+  - Soll-Jahr als Kalenderjahr (v2410).
+  - Nach Erreichen der Soll-Miete läuft `mietstg` weiter (v2422, Marcel: „ja“).
+- **Quick Boarding qc-v2420a:**
+  - Umschalter Ist/Soll ausgeblendet.
+  - Stufen-Pillen.
+  - Nur Score-Kennzahlen.
+  - Parser „200.000“ korrigiert.
+  - Beleihung zieht das EK nach. Makler 3,57 % aus dem Profil bleibt drin (Marcel).
+- **v2421:** 53 Whitelabel-Tokens `--wl-C9A84C` usw. in Großbuchstaben → klein. Custom Properties sind groß/klein-empfindlich, `whitelabel-override.js` setzt sie klein; diese Stellen färbten sich beim Mandanten nie um.
+- **Videothek 4c:** Längen 10b/21.
+
+**Commit:** Prod-Merge `5d89d52b` (Stand staging `c328084c`).
+
+**Nachweis:**
+- Sicherung `main-20261019-1635-r54` (73 Tabellen, 14 MB) und `mb-…-r54` (32, 25 MB), beide angesehen.
+- `mb-backend` und `backend` neu gebaut.
+- `WertParameterService` mit `dealpilot_formel` im Container.
+- Gold-Audit RC 0, `auth/me` 401, Landing 200.
+
+**Rest:**
+- `*.mp4.alt-20261019` (4 Stück) liegen noch im öffentlichen Videothek-Ordner beider Server, wegräumen nach Marcels Abnahme.
+- Zielbild/Potenzial (Demo https://claude.ai/artifact/KThexeEAnjWQUPuvd9o1Rx) ist im Bau.
+
 ### qc-v2420–qc-v2420a · Quick Boarding: Ist/Soll-Umschalter weg, DealPilot-Stufen, nur Score-Kennzahlen, Beleihungsknöpfe (19.10.2026, Staging)
 
 - **Was:**

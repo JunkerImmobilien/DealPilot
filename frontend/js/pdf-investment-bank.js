@@ -1166,6 +1166,39 @@
       y += 6;
     }
 
+    /* ── v2430 · Wertpotenzial (Mieterhöhung und Zielbild) ──────────
+       Marcel 19.10.2026: „Der Investor zeigt der Bank das versteckte
+       Kapital im Haus." Gerechnet wird NICHT hier: Mieten und Kosten
+       stellt DpPotenzial zusammen, die Ertragswerte kommen aus dem
+       Marktbericht-Dienst (derselbe Kern wie Stufe 3). Ohne Soll-Miete
+       und Zielbild entfällt die Seite. */
+    /* Wie sauber(), aber das Euro-Zeichen bleibt (jsPDF-Standardschrift kennt es). */
+    function sauberE(t) { return String(t == null ? '' : t).replace(/[\u2013\u2014\u2212\u2011]/g, '-').replace(/[\u00a0\u202f]/g, ' ').replace(/[^\x00-\xFF\u20AC]/g, '').replace(/\s+/g, ' ').trim(); }
+    var PZ = window.DpPotenzial || null, PD = null;
+    try {
+      if (PZ && PZ.modell && PZ.modell().aktiv) {
+        await Promise.race([PZ.rechnen(), new Promise(function (f) { setTimeout(f, 40000); })]);
+        PD = PZ.pdfDaten();
+      }
+    } catch (e) { PD = null; }
+    if (PD) {
+      doc.addPage(); kopf('Wertpotenzial', (adr || 'Objekt') + ' · Mieterhöhung und Zielbild');
+      abschnitt('Wertpotenzial');
+      einleitung(sauberE(PD.satz_bank));
+      if (PD.art === 'mfh' && PD.wohnungen.length) {
+        tabelle([['WE', 30, 'l'], ['m²', 12], ['Ist €/M', 18], ['Mieterhöhung', 30], ['Ziel €/M', 18], ['Maßnahmen', 46, 'l']],
+          PD.wohnungen.map(function (w) {
+            return [sauberE(w.we).slice(0, 20), fmt(w.wfl, 0), sauberE(w.ist), sauberE(w.soll), sauberE(w.ziel), sauberE(w.massnahmen).slice(0, 34)];
+          }), { titel: 'Wertpotenzial' });
+      }
+      var spP = [['Kennzahl', 52, 'l']].concat(PD.spalten.map(function (k) { return [PD.titel[k], 30]; }));
+      tabelle(spP, PD.kennzahlen.map(function (z, n) { return { werte: z.map(function (x) { return sauberE(String(x)); }), fett: /^Ertragswert|^nach Aufteilung/.test(z[0]) }; }), { titel: 'Wertpotenzial' });
+      zeile('Kaufpreis', eur(K.kp));
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.4); doc.setTextColor(120);
+      doc.splitTextToSize(sauberE(PD.fuss), CW).forEach(function (t) { doc.text(t, L, y); y += 3.8; });
+      y += 6;
+    }
+
     /* ── Exit und Vermögenszuwachs ───────────────────────────── */
     var letzteZeile = rows.length ? rows[rows.length - 1] : null;
     if (da(K.exit_vkp) !== null || da(S.wert_basis) !== null) {

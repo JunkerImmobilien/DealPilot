@@ -28,6 +28,7 @@ import { AgsResolver } from '../connectors/AgsResolver.js';
    nachbaut, was hier schon steht. */
 import { WertParameterService, zinsHerkunft } from '../services/WertParameterService.js';
 import { DealPilotObjectMapper } from '../services/DealPilotObjectMapper.js';
+import { PotenzialService } from '../services/PotenzialService.js';   /* v2430 */
 /* v1968: `rnd as iwRnd` ist raus. Seit v1965 ruft diese Datei die
    Restnutzungsdauer ueber rnd-einheitlich.js; der Name war nur noch
    gebunden, nicht benutzt. `iwGnd` bleibt (Nutzung im Endpunkt
@@ -697,6 +698,32 @@ router.get('/objects/history', async (req, res) => {
       args
     );
     res.json({ key: key || null, ref: ref || null, count: r.length, history: r });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+/* ══ v2431 · GET /objects/stufe3?user_id=…[&ref=…] — liegt ein Bericht Stufe 3 vor? ══
+ * Marcel 19.10.2026: der Ertragswert im Zielbild gehoert zu Stufe 3 (Geld).
+ * Erkannt wird Stufe 3 an der Stufe, mit der der Bericht ABGERECHNET wurde:
+ * der Proxy schreibt sie seit v1435 in overrides.wert_stufe, der Orchestrator
+ * legt sie in data.ref.wert_stufe ab (gemessen 19.10.2026: 154 Stufe-3-,
+ * 21 Stufe-2-, 111 Stufe-1-Staende, 16 ohne Angabe = vor v1435).
+ * NICHT an einem vorhandenen Ertragswert im Quercheck: vor dem Stufenschnitt
+ * trugen auch Berichte Stufe 2 einen - die waeren eine Freigabe ohne Bezahlung.
+ * Nur LESEND, nur intern (der Haupt-Backend-Proxy ruft es, kein Weg von aussen).
+ * Die Adresse geht mit: der Proxy prueft, ob der Bericht zum Objekt passt. */
+router.get('/objects/stufe3', async (req, res) => {
+  const uid = _uidAus(req);
+  if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
+  const ref = req.query.ref ? String(req.query.ref).slice(0, 64) : null;
+  try {
+    const r = await q(
+      'SELECT DISTINCT ON (external_ref) external_ref, address, report_id, created_at'
+      + ' FROM mb.object_snapshots'
+      + " WHERE user_id = $1 AND external_ref IS NOT NULL AND (data->'ref'->>'wert_stufe') = '3'"
+      + (ref ? ' AND external_ref = $2' : '')
+      + ' ORDER BY external_ref, created_at DESC',
+      ref ? [uid, ref] : [uid]);
+    res.json({ ref: ref, count: r.length, berichte: r });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -1432,4 +1459,29 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       objektart: m.property_type, ags: String(agsFein)
     });
   } catch (e) { res.status(500).json({ verfuegbar: false, grund: e.message }); }
+});
+
+/* ══ v2430 · POST /potenzial — Ertragswert je Stufe (Bestand · Mieterhöhung · Zielbild) ══
+ * Marcel 19.10.2026. Die Basis kommt aus DEMSELBEN Weg wie der Bericht Stufe 3
+ * (ReportOrchestrator mit nurWertBasis: endet nach dem Quercheck, kein Eintrag in
+ * mb.properties/mb.market_reports, keine Mikrolage, keine KI). PotenzialService ruft
+ * denselben Kern mit getauschter Miete und Restnutzungsdauer.
+ * Body: { object, varianten, wohnungen, aufteilung } - siehe PotenzialService.rechne.
+ * Antwort traegt immer die Kennzeichnung „Potenzialwert …, keine Verkehrswertermittlung“. */
+router.post('/potenzial', async (req, res) => {
+  const t0 = Date.now();
+  try {
+    const body = req.body || {};
+    const obj = body.object || body.dealpilot || null;
+    if (!obj || typeof obj !== 'object') return res.status(400).json({ verfuegbar: false, grund: 'Kein Objekt im Aufruf.' });
+    const wb = await runLimited(() => ReportOrchestrator.generate(
+      { dealpilot: obj, wert_stufe: 3, user_id: _uidAus(req) || null }, { nurWertBasis: true }));
+    const out = await PotenzialService.rechne(wb, body);
+    out.took_ms = Date.now() - t0;
+    console.log('[req] POST /potenzial ' + (out.verfuegbar ? 'EW ' + (out.haus && out.haus.bestand && out.haus.bestand.wert) : 'nicht verfuegbar') + ' in ' + out.took_ms + 'ms');
+    res.json(out);
+  } catch (e) {
+    console.error('[req] /potenzial FEHLER:', e.message);
+    res.status(e.status && e.status < 500 ? 200 : 500).json({ verfuegbar: false, grund: e.message, kennzeichnung: PotenzialService.KENNZEICHNUNG });
+  }
 });

@@ -1,0 +1,451 @@
+[
+  {
+    "gemeinde": "Wuppertal",
+    "plz_praefixe": ["42"],
+    "bundesland": "NW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Wuppertal, Ressort 102 Vermessung, Katasteramt und Geodaten",
+        "abteilung": "Geodatenzentrum",
+        "email": "geodatenzentrum@stadt.wuppertal.de",
+        "telefon": "+49 202 563-5399",
+        "kanal": "formular",
+        "antrag_url": "https://formulare.wuppertal.de/metaform/Form-Solutions/sid/assistant/5587cff10cf2ac88b8a11a72",
+        "quelle_url": "https://www.wuppertal.de/vv/produkte/102/Liegenschaftskarte_Flurkarte_.php",
+        "seiten": ["https://www.wuppertal.de/vv/oe/102.php", "https://www.wuppertal.de/vv/produkte/102/Liegenschaftskataster.php"],
+        "gebuehr": "Auszug durch das Katasteramt bis DIN A3 30 €, bis DIN A0 60 €, Mehrausfertigung 10 €; Online-Selbstentnahme abweichend",
+        "hinweis": "Anschrift Johannes-Rau-Platz 1, 42275 Wuppertal; die Seite wird hinter einer Cloudflare-Prüfung ausgeliefert und war nur im Browser lesbar.",
+        "beleg_zitat": "Ein analoger oder PDF-Auszug aus der Liegenschaftskarte (Stadtgrundkarte oder Flurkarte) kostet",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Jacques Lewerenz", "funktion": "", "email": "Jacques.Lewerenz@stadt.wuppertal.de", "telefon": "+49 202 563-8022", "seite": "https://www.wuppertal.de/vv/personen/102.3101-Lewerenz-5026597.php"},
+          {"name": "Frau Yvonne Pussar", "funktion": "", "email": "Yvonne.Pussar@stadt.wuppertal.de", "telefon": "+49 202 563-5952", "seite": "https://www.wuppertal.de/vv/personen/102.3101-Pussar-5003563.php"}
+        ]
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Wuppertal",
+        "abteilung": "Grundbuch",
+        "email": "",
+        "telefon": "0202 498-0",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.ag-wuppertal.nrw.de/",
+        "seiten": ["https://www.ag-wuppertal.nrw.de/aufgaben/abteilungen/Grundbuch/index.php", "https://www.ag-wuppertal.nrw.de/kontakt/telefonliste/index.php"],
+        "gebuehr": "Ausdruck 10 €, amtlicher Ausdruck 20 € (GNotKG)",
+        "hinweis": "Antrag schriftlich, per Fax oder persönlich mit Antragsformular, Ausweis und ggf. Vollmacht; Rechnung über die Zentrale Zahlstelle Justiz.",
+        "beleg_zitat": "Eiland 2 / 42103 Wuppertal",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Wuppertal, Ressort 106 – Untere Bodenschutzbehörde",
+        "abteilung": "106.23 Untere Bodenschutzbehörde Altlastenkataster, Gefährdungsabschätzungen",
+        "email": "altlastenauskunft@stadt.wuppertal.de",
+        "telefon": "",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.wuppertal.de/vv/produkte/106/altlastenkataster__auskuenfte.php",
+        "seiten": [],
+        "gebuehr": "nach Zeitaufwand, höchstens 500 € (Tarifstelle 8.2.1 AVerwGebO NRW)",
+        "hinweis": "Formloser Antrag oder Formular mit Adresse, Gemarkung/Flur/Flurstück und ggf. Einverständniserklärung des Eigentümers; Bearbeitung in der Regel zwei Wochen.",
+        "beleg_zitat": "106.23 Untere Bodenschutzbehörde Altlastenkataster, Gefährdungsabschätzungen",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Vera Schmitt", "funktion": "", "email": "Vera.Schmitt@stadt.wuppertal.de", "telefon": "0202 563-4224", "seite": "https://www.wuppertal.de/vv/produkte/106/altlastenkataster__auskuenfte.php"},
+          {"name": "Frau Birgit Maus", "funktion": "Teamleiterin", "email": "birgit.maus@stadt.wuppertal.de", "telefon": "0202 563-6233", "seite": "https://www.wuppertal.de/vv/produkte/106/altlastenkataster__auskuenfte.php"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Wuppertal, Ressort 102 Vermessung, Katasteramt und Geodaten",
+        "abteilung": "Baulastenverzeichnis",
+        "email": "baulastenverzeichnis@stadt.wuppertal.de",
+        "telefon": "+49 202 563-6824",
+        "kanal": "portal",
+        "antrag_url": "https://formulare.wuppertal.de/metaform/Form-Solutions/sid/assistant/5ebbe662c2dcb513e136d4e8",
+        "quelle_url": "https://www.wuppertal.de/vv/produkte/102/Baulastenverzeichnis.php",
+        "seiten": ["https://www.wuppertal.de/102.13-Auszuege-Baulastenverzeichnis.pdf", "https://www.wuppertal.de/vv/personen/102370100000309537.php"],
+        "gebuehr": "unbelastetes Grundstück 30 €; belastet 50–200 € je nach Zahl der Baulasten und Bezugsart; Einsicht vor Ort gebührenfrei",
+        "hinweis": "In Wuppertal führt das Katasteramt (Ressort 102) das Baulastenverzeichnis, nicht die Bauaufsicht; berechtigtes Interesse nachweisen, Einsicht im Neubau Raum C-055.",
+        "beleg_zitat": "Für die Eintragung von neuen Baulasten ist die untere Bauaufsicht (Ressort 105) zuständig.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Florian Diester", "funktion": "", "email": "florian.diester@stadt.wuppertal.de", "telefon": "+49 202 563-4249", "seite": "https://www.wuppertal.de/vv/personen/102.1301-Diester-5008574.php"},
+          {"name": "Herr Jan Tayouri", "funktion": "", "email": "Jan.Tayouri@stadt.wuppertal.de", "telefon": "+49 202 563-6824", "seite": "https://www.wuppertal.de/vv/personen/102.1301-Tayouri-5002495.php"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Wuppertal, Ressort 105 Bauen und Wohnen",
+        "abteilung": "Bürgerservice Hausakten (Altaktenarchiv)",
+        "email": "altaktenarchiv@stadt.wuppertal.de",
+        "telefon": "0202 563-5971",
+        "kanal": "portal",
+        "antrag_url": "https://serviceportal.wuppertal.de/suche/-/vr-bis-detail/dienstleistung/1765340/show",
+        "quelle_url": "https://www.wuppertal.de/vv/produkte/105/hausakten.php",
+        "seiten": [],
+        "gebuehr": "",
+        "hinweis": "Einsicht nur für Eigentümer oder Bevollmächtigte (Grundbuchauszug, Ausweis, Vollmacht); Antrag ausschließlich online; Akten vor 1945 meist kriegszerstört.",
+        "beleg_zitat": "Einsicht in abgeschlossene Bauakten ab 1945, soweit vorhanden.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Ismail Polat", "funktion": "", "email": "ismail.polat@stadt.wuppertal.de", "telefon": "+49 202 563-4645", "seite": "https://www.wuppertal.de/vv/produkte/105/hausakten.php"},
+          {"name": "Herr Martin Störte", "funktion": "", "email": "martin.stoerte@stadt.wuppertal.de", "telefon": "+49 202 563-4421", "seite": "https://www.wuppertal.de/vv/produkte/105/hausakten.php"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Stadt Wuppertal",
+        "abteilung": "Geschäftsstelle (Ressort 102.01)",
+        "email": "gutachterausschuss@stadt.wuppertal.de",
+        "telefon": "+49 202 563-5982",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.wuppertal.de/vv/produkte/102/Grundstuecksmarktbericht.php",
+        "seiten": ["https://www.wuppertal.de/vv/oe/102.01.php", "https://www.boris.nrw.de"],
+        "gebuehr": "PDF über boris.nrw.de bzw. Open-Data-Portal; sonst nach VermWertKostO NRW",
+        "hinweis": "",
+        "beleg_zitat": "Der aktuelle Grundstücksmarktbericht und ältere Ausgaben sind als digitale PDF-Ausgaben",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Ricarda Baltz", "funktion": "", "email": "ricarda.baltz@stadt.wuppertal.de", "telefon": "+49 202 563-5982", "seite": "https://www.wuppertal.de/vv/personen/102.01-Baltz-5001383.php"}
+        ]
+      }
+    ]
+  },
+  {
+    "gemeinde": "Bielefeld",
+    "plz_praefixe": ["33"],
+    "bundesland": "NW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Bielefeld, Amt für Geoinformation und Kataster",
+        "abteilung": "Abteilung Geoinformationen, Verwaltung und Geschäftsstelle Gutachterausschuss, Abschnitt Geodatenmanagement",
+        "email": "geoinformationundkataster@bielefeld.de",
+        "telefon": "+49 521 51-3137",
+        "kanal": "portal",
+        "antrag_url": "https://service.bielefeld.de/detail/-/vr-bis-detail/dienstleistung/8459/show",
+        "quelle_url": "https://service.bielefeld.de/detail/-/vr-bis-detail/dienstleistung/8459/show",
+        "seiten": ["https://www.bielefeld.de/node/3035"],
+        "gebuehr": "durch Personal 30 € (bis DIN A3), 60 € (größer), Mehrausfertigung 10 €; Serviceportal 15 € je Ausfertigung",
+        "hinweis": "Online-Antrag nur mit BundID; persönliche Termine nur nach Vereinbarung.",
+        "beleg_zitat": "Technisches Rathaus, August-Bebel-Straße 92, 33602 Bielefeld",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Bielefeld",
+        "abteilung": "Grundbuchamt",
+        "email": "",
+        "telefon": "0521 549-0",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.ag-bielefeld.nrw.de/",
+        "seiten": ["https://www.ag-bielefeld.nrw.de/aufgaben/abteilungen/Grundbuchamt/index.php", "https://www.ag-bielefeld.nrw.de/kontakt/telefonliste/zvtelefonliste/grundbuch/index.php"],
+        "gebuehr": "Ausdruck 10 €, amtlicher Ausdruck 20 € (GNotKG)",
+        "hinweis": "Sachbearbeitung nach Gemarkung (Telefonliste Grundbuchamt); Einsichtsgeschäftsstelle Zimmer U1.325, 0521 549-2597.",
+        "beleg_zitat": "Gerichtstraße 6, 33602 Bielefeld",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Bielefeld, Umweltamt (untere Bodenschutzbehörde)",
+        "abteilung": "Abteilung Boden, Grundwasser und Techn. Umweltschutz, Abschnitt Abfall, Altlasten, Boden und Grundwasser",
+        "email": "altlastenauskunft@bielefeld.de",
+        "telefon": "+49 521 51-0",
+        "kanal": "portal",
+        "antrag_url": "https://service.bielefeld.de/detail/-/vr-bis-detail/dienstleistung/7264774/show",
+        "quelle_url": "https://service.bielefeld.de/detail/-/vr-bis-detail/dienstleistung/7264774/show",
+        "seiten": ["https://www.bielefeld.de/node/5149"],
+        "gebuehr": "einfache Auskunft (Altlast ja/nein) kostenfrei; ausführliche Auskunft 70 € je Stunde",
+        "hinweis": "Anschrift August-Bebel-Straße 75-77, 33602 Bielefeld; Online-Antrag mit BundID, auch per E-Mail.",
+        "beleg_zitat": "Auskunft über Altlasten gibt es beim Umweltamt.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Stefan Kühlmann", "funktion": "Umweltamt", "email": "stefan.kuehlmann@bielefeld.de", "telefon": "+49 521 51-6567", "seite": "https://www.bielefeld.de/node/5149"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Bielefeld, Bauamt",
+        "abteilung": "Bauberatung",
+        "email": "bauberatung@bielefeld.de",
+        "telefon": "+49 521 51-5600",
+        "kanal": "email",
+        "antrag_url": "https://www.bielefeld.de/sites/default/files/datei/2025/Antragsformular_Baulastauskunft2025_0.pdf",
+        "quelle_url": "https://www.bielefeld.de/sites/default/files/datei/2025/Antragsformular_Baulastauskunft2025_0.pdf",
+        "seiten": ["https://www.bielefeld.de/node/7257", "https://www.bielefeld.de/bauberatung"],
+        "gebuehr": "30 € je unbelastetes Grundstück; 50 € je Baulast, höchstens 200 € je Grundstück",
+        "hinweis": "Antrag als PDF per E-Mail, Betreff „Auszug aus dem Baulastenverzeichnis“ und Gemarkung; Nicht-Eigentümer weisen berechtigtes Interesse nach.",
+        "beleg_zitat": "Den Antrag senden Sie vorzugsweise als Datei im pdf-Format an bauberatung@bielefeld.de",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Bielefeld, Bauamt",
+        "abteilung": "Verwaltungsabteilung, Team Bauberatung (Hausaktenarchiv)",
+        "email": "bauberatung@bielefeld.de",
+        "telefon": "+49 521 51-5600",
+        "kanal": "portal",
+        "antrag_url": "https://service.bielefeld.de/detail/-/vr-bis-detail/dienstleistung/5525831/show",
+        "quelle_url": "https://service.bielefeld.de/detail/-/vr-bis-detail/dienstleistung/5525831/show",
+        "seiten": ["https://www.bielefeld.de/bauberatung"],
+        "gebuehr": "digitale Gesamtakte 40 € bis 100 Seiten (gestaffelt bis 80 €); Einsicht vor Ort 25 € erster Band, 6 € je weiterer",
+        "hinweis": "Technisches Rathaus, August-Bebel-Straße 92; Online-Antrag mit BundID.",
+        "beleg_zitat": "Die Bauberatung des Bauamtes führt das Hausaktenarchiv.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld",
+        "abteilung": "Geschäftsstelle (Amt für Geoinformation und Kataster)",
+        "email": "gutachterausschuss@bielefeld.de",
+        "telefon": "0521 51 26 76",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.gars.nrw/kontakt-bielefeld",
+        "seiten": ["https://www.gars.nrw/bielefeld/produkte-bielefeld/grundstuecksmarktbericht-bielefeld", "https://www.gars.nrw/images/user/GA_Bielefeld/pdf/GMB_10200_2026.pdf"],
+        "gebuehr": "Grundstücksmarktbericht als PDF kostenfrei; gedrucktes Exemplar 54 €",
+        "hinweis": "E-Mail-Adresse und Personen stehen im Grundstücksmarktbericht 2026, die Kontaktseite bietet nur ein Formular.",
+        "beleg_zitat": "August-Bebel-Straße 92 33602 Bielefeld",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Egon Strathoff", "funktion": "", "email": "", "telefon": "0521 - 51 26 78", "seite": "https://www.gars.nrw/images/user/GA_Bielefeld/pdf/GMB_10200_2026.pdf"},
+          {"name": "Frau Ulrike Wigger", "funktion": "", "email": "", "telefon": "0521 - 51 26 76", "seite": "https://www.gars.nrw/images/user/GA_Bielefeld/pdf/GMB_10200_2026.pdf"}
+        ]
+      }
+    ]
+  },
+  {
+    "gemeinde": "Münster",
+    "plz_praefixe": ["48"],
+    "bundesland": "NW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Münster, Vermessungs- und Katasteramt",
+        "abteilung": "Liegenschaftskataster",
+        "email": "katasteramt@stadt-muenster.de",
+        "telefon": "0251 492-6201",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.stadt-muenster.de/katasteramt/service/liegenschaftskataster",
+        "seiten": ["https://www.stadt-muenster.de/katasteramt/startseite", "https://www.stadt-muenster.de/katasteramt/service/liegenschaftskataster/liegenschaftskarte"],
+        "gebuehr": "",
+        "hinweis": "Stadthaus 3, Albersloher Weg 33, 48155 Münster; Gebühr und Bestellweg werden per Skript nachgeladen und waren nicht lesbar.",
+        "beleg_zitat": "Albersloher Weg 33",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Münster",
+        "abteilung": "Grundbuchamt",
+        "email": "",
+        "telefon": "0251 494-0",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.ag-muenster.nrw.de/",
+        "seiten": ["https://www.ag-muenster.nrw.de/aufgaben/abteilungen/Grundbuchamt/index.php"],
+        "gebuehr": "Ausdruck 10 €, amtlicher Ausdruck 20 € (GNotKG)",
+        "hinweis": "Antrag schriftlich, per Fax oder persönlich mit Antragsformular, Ausweis und ggf. Vollmacht.",
+        "beleg_zitat": "Gerichtsstraße 2, 48149 Münster",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Münster, Amt für Grünflächen, Umwelt und Nachhaltigkeit (untere Bodenschutzbehörde)",
+        "abteilung": "Kreislaufwirtschaft, Bodenschutz – Altlasten, Auskünfte",
+        "email": "umwelt@stadt-muenster.de",
+        "telefon": "",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.stadt-muenster.de/gruen/wasser-boden-luft/boden-und-abfall",
+        "seiten": [],
+        "gebuehr": "",
+        "hinweis": "Formloser Antrag mit Lageplan; Stadthaus 3, Albersloher Weg 33, 48155 Münster; ggf. Einverständnis des Eigentümers.",
+        "beleg_zitat": "an das Amt für Grünflächen, Umwelt und Nachhaltigkeit.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Diana Steiner", "funktion": "Altlasten, Auskünfte, vorsorgender Bodenschutz", "email": "SteinerD@stadt-muenster.de", "telefon": "02 51/4 92-67 78", "seite": "https://www.stadt-muenster.de/gruen/wasser-boden-luft/boden-und-abfall"},
+          {"name": "Christoph Lutte", "funktion": "Altlasten, Auskünfte, vorsorgender Bodenschutz", "email": "LutteC@stadt-muenster.de", "telefon": "0251/4 92-67 71", "seite": "https://www.stadt-muenster.de/gruen/wasser-boden-luft/boden-und-abfall"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Münster, Bauordnungsamt",
+        "abteilung": "Baulastenauskunft",
+        "email": "baulastenauskunft@stadt-muenster.de",
+        "telefon": "0251 492-6301",
+        "kanal": "portal",
+        "antrag_url": "https://bauportal.nrw/antraege",
+        "quelle_url": "https://www.stadt-muenster.de/bauordnungsamt/baulastenauskunft",
+        "seiten": ["https://www.stadt-muenster.de/bauordnungsamt/startseite"],
+        "gebuehr": "Negativauskunft 30 € je Flurstück; 50 € je Baulast, ab vier Baulasten 200 €",
+        "hinweis": "Antrag über Bauportal.NRW; per E-Mail nur übergangsweise bis 31.12.2026.",
+        "beleg_zitat": "Ein Antrag auf Auskunft aus dem Baulastenverzeichnis ist über das Bauportal.NRW zu stellen.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Rolf Lammerding", "funktion": "", "email": "", "telefon": "02 51/4 92-63 76", "seite": "https://www.stadt-muenster.de/bauordnungsamt/baulastenauskunft"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Münster, Bauordnungsamt",
+        "abteilung": "Bauaktenarchiv",
+        "email": "bauordnungsamt@stadt-muenster.de",
+        "telefon": "0251 492-6301",
+        "kanal": "formular",
+        "antrag_url": "https://formulare.stadt-muenster.de/metaform/Form-Solutions/sid/assistant/659524d8aae3433e16aa9a14",
+        "quelle_url": "https://www.stadt-muenster.de/bauordnungsamt/bauaktenarchiv",
+        "seiten": [],
+        "gebuehr": "digital je Aktenband 65 € (bis 100 S.), 85 €, 110 €; Papier 75 € (Bauakte), 85 € (Statik)",
+        "hinweis": "Ein Formular je Grundstück; Archiv fast vollständig digitalisiert.",
+        "beleg_zitat": "Das komplette Bauaktenarchiv des Bauordnungsamtes ist, bis auf wenige Restbestände, digitalisiert.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Stadt Münster",
+        "abteilung": "Geschäftsstelle",
+        "email": "gutachterausschuss@stadt-muenster.de",
+        "telefon": "0251 492-6214",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.stadt-muenster.de/gutachter/startseite",
+        "seiten": ["https://www.stadt-muenster.de/gutachter/services-und-downloads"],
+        "gebuehr": "",
+        "hinweis": "",
+        "beleg_zitat": "Albersloher Weg 33, 48155 Münster",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ]
+  },
+  {
+    "gemeinde": "Osnabrück",
+    "plz_praefixe": ["49"],
+    "bundesland": "NI",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "LGLN, Regionaldirektion Osnabrück-Meppen",
+        "abteilung": "Katasteramt Osnabrück",
+        "email": "katasteramt-os@lgln.niedersachsen.de",
+        "telefon": "0541 503-100",
+        "kanal": "portal",
+        "antrag_url": "https://maps.lgln.niedersachsen.de/katasterkarten-online/mapbender/application/katasterkarten-online",
+        "quelle_url": "https://www.lgln.niedersachsen.de/startseite/wir_uber_uns_amp_organisation/organisation_amp_kontakt/rd_osnabruck_meppen/katasteramt_osnabruck/katasteramt-osnabruck-50989.html",
+        "seiten": ["https://www.lgln.niedersachsen.de/startseite/vermessung_kataster/auskunfte_auszuge/liegenschaftskarte/liegenschaftskarte-50489.html"],
+        "gebuehr": "ab 20 € zzgl. USt (1:1000/1:2000), sonst ab 26 €; online bis 20 % günstiger",
+        "hinweis": "Die Katasteramtsseite nennt den Zuständigkeitsbereich nicht ausdrücklich; Zuordnung zur Stadt Osnabrück über Standort und Namen.",
+        "beleg_zitat": "Mercatorstraße 4 und 6, 49080 Osnabrück",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Osnabrück",
+        "abteilung": "Grundbuchamt",
+        "email": "",
+        "telefon": "0541 315-2322",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://amtsgericht-osnabrueck.niedersachsen.de/startseite/kontakt/telefonische_erreichbarkeit/kontaktinformationen-des-amtsgerichts-75221.html",
+        "seiten": ["https://amtsgericht-osnabrueck.niedersachsen.de/startseite/service/hinweis_zur_anforderung_von_grundbuchausdrucken_durch_internetdienstleister/hinweis-zur-anforderung-von-grundbuchausdrucken-durch-internetdienstleister-194234.html"],
+        "gebuehr": "",
+        "hinweis": "Die Poststelle agos-poststelle@justiz.niedersachsen.de nimmt laut Seite keine Verfahrensanträge an; Durchwahl Grundbuchamt 2322 zur Zentrale 0541/315.",
+        "beleg_zitat": "Kollegienwall 29-31",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Osnabrück, Fachbereich 68 – Umweltbehörde (untere Bodenschutzbehörde)",
+        "abteilung": "Umweltbehörde 68-2",
+        "email": "",
+        "telefon": "",
+        "kanal": "portal",
+        "antrag_url": "https://service.osnabrueck.de/home/-/egov-ws/od/5929/1444737",
+        "quelle_url": "https://service.osnabrueck.de/dienstleistungen/-/egov-bis-detail/dienstleistung/5929/show",
+        "seiten": ["https://service.osnabrueck.de/dienstleistungen/-/egov-bis-detail/einrichtung/1369/show"],
+        "gebuehr": "mündliche Erstauskunft kostenfrei; schriftliche Auskunft nach Aufwand",
+        "hinweis": "Standort Hannoversche Str. 6-8, 49084 Osnabrück; Online-Antrag mit Anmeldung im Serviceportal.",
+        "beleg_zitat": "Für schriftliche Auskünfte werden je nach Aufwand Gebühren erhoben.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Timmermann", "funktion": "", "email": "", "telefon": "0541 323-4145", "seite": "https://service.osnabrueck.de/dienstleistungen/-/egov-bis-detail/dienstleistung/5929/show"},
+          {"name": "Herr Heyne", "funktion": "", "email": "", "telefon": "0541 323-2339", "seite": "https://service.osnabrueck.de/dienstleistungen/-/egov-bis-detail/dienstleistung/5929/show"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Osnabrück, Fachbereich Städtebau (FB61)",
+        "abteilung": "Fachdienst Bauordnung und Denkmalpflege (61-7)",
+        "email": "bauordnung@osnabrueck.de",
+        "telefon": "",
+        "kanal": "portal",
+        "antrag_url": "https://service.osnabrueck.de/home/-/egov-ws/od/6370/1532620",
+        "quelle_url": "https://service.osnabrueck.de/dienstleistungen/-/egov-bis-detail/dienstleistung/6370/show",
+        "seiten": ["https://service.osnabrueck.de/dienstleistungen/-/egov-bis-detail/einrichtung/1361/show"],
+        "gebuehr": "30 € je Auskunft (BauGO, Stand 12.05.2022) zzgl. Kosten elektronischer Daten",
+        "hinweis": "Standort Lohstraße 6, 49074 Osnabrück.",
+        "beleg_zitat": "Gebühren nach der Baugebührenordnung (BauGO) von derzeit 30,00€ je Auskunft",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Meyer", "funktion": "", "email": "", "telefon": "0541 323-4269", "seite": "https://service.osnabrueck.de/dienstleistungen/-/egov-bis-detail/dienstleistung/6370/show"},
+          {"name": "Frau Neumann", "funktion": "", "email": "", "telefon": "0541 323-2681", "seite": "https://service.osnabrueck.de/dienstleistungen/-/egov-bis-detail/dienstleistung/6370/show"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Osnabrück, Fachbereich Städtebau (FB61)",
+        "abteilung": "Akteneinsicht",
+        "email": "akteneinsicht@osnabrueck.de",
+        "telefon": "0541 323-3399",
+        "kanal": "portal",
+        "antrag_url": "https://service.osnabrueck.de/home/-/egov-ws/fs/6371/1444536",
+        "quelle_url": "https://service.osnabrueck.de/dienstleistungen/-/egov-bis-detail/dienstleistung/6371/show",
+        "seiten": ["https://service.osnabrueck.de/dienstleistungen/-/egov-bis-detail/einrichtung/1021830/show"],
+        "gebuehr": "14 € je Liegenschaft zzgl. 2,50 € je Datei",
+        "hinweis": "Standort Lohstraße 6, 49074 Osnabrück; berechtigtes Interesse erforderlich.",
+        "beleg_zitat": "Personen mit berechtigtem Interesse können hier die Einsichtnahme in Bau- und Statikakten beantragen.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Schneider", "funktion": "", "email": "", "telefon": "", "seite": "https://service.osnabrueck.de/dienstleistungen/-/egov-bis-detail/einrichtung/1021830/show"},
+          {"name": "Herr Wischmeyer", "funktion": "", "email": "", "telefon": "", "seite": "https://service.osnabrueck.de/dienstleistungen/-/egov-bis-detail/einrichtung/1021830/show"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte Osnabrück-Meppen",
+        "abteilung": "Geschäftsstelle, LGLN Regionaldirektion Osnabrück-Meppen, Standort Osnabrück",
+        "email": "gag-os-mep@lgln.niedersachsen.de",
+        "telefon": "",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.lgln.niedersachsen.de/startseite/wir_uber_uns_amp_organisation/organisation_amp_kontakt/rd_osnabruck_meppen/geschaftsstelle_gutachterausschuss/geschaftsstelle-des-gutachterausschusses-osnabruck-meppen-103483.html",
+        "seiten": ["https://immobilienmarkt.niedersachsen.de"],
+        "gebuehr": "",
+        "hinweis": "Mercatorstraße 4 u. 6, 49080 Osnabrück; Marktdaten über immobilienmarkt.niedersachsen.de, zum Teil kostenfrei.",
+        "beleg_zitat": "zuständig für die Stadt und den Landkreis Osnabrück",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ]
+  }
+]

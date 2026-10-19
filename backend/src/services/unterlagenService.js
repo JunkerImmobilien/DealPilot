@@ -273,12 +273,121 @@ function mailsAufSeite(html) {
     .replace(/[‐-―−]/g, '-')              /* Gedankenstriche zu Bindestrich */
     .replace(/\s*[([{]\s*(at|ät)\s*[)\]}]\s*/gi, '@')
     .replace(/\s*[([{]\s*(dot|punkt)\s*[)\]}]\s*/gi, '.')
+    /* v2443 · ⚹ für @ und ◦ für den Punkt — so verschleiert das CMS von
+       kassel.de, mainz.de und vv.potsdam.de (Rechercheberichte vom
+       19.10.2026). Ohne diese Zeile galt dort jede Adresse als „steht
+       nicht auf der Seite". */
+    .replace(/\s*✹\s*/g, '@')
+    .replace(/([a-z0-9-])\s*◦\s*(?=[a-z0-9-])/gi, '$1.')
     .toLowerCase();
   const treffer = t.match(/[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+/g) || [];
   return [...new Set(treffer)]
     .filter(function (m) { return mailGueltig(m); })
     /* Eine Bilddatei ist keine Adresse: `logo@2x.png` trifft das Muster. */
     .filter(function (m) { return !/\.(png|jpe?g|gif|svg|webp|css|js|woff2?)$/.test(m); });
+}
+
+/* ══ v2440 · DER LESBARE TEXT EINER SEITE — FUER DIE NAMENSPRUEFUNG ════
+ *
+ * Vorlage v6 verlässt sich darauf, dass das Modell nur Personen nennt,
+ * die dort stehen. Das ist eine Bitte, keine Prüfung. Hier wird der
+ * Name gegen den Text der selbst abgerufenen Seite gehalten — dieselbe
+ * Strenge wie bei der Adresse: belegt ist, was WIR gelesen haben. */
+function seitenText(html) {
+  return String(html || '')
+    .replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/&#(\d+);/g, function (_, d) { return String.fromCharCode(+d); })
+    .replace(/&#x([0-9a-f]+);/gi, function (_, h) { return String.fromCharCode(parseInt(h, 16)); })
+    .replace(/&nbsp;/gi, ' ').replace(/&auml;/g, 'ä').replace(/&ouml;/g, 'ö').replace(/&uuml;/g, 'ü')
+    .replace(/&Auml;/g, 'Ä').replace(/&Ouml;/g, 'Ö').replace(/&Uuml;/g, 'Ü').replace(/&szlig;/g, 'ß')
+    .replace(/&amp;/gi, '&')
+    .replace(/<[^>]+>/g, ' ')
+    .normalize('NFKC')
+    .replace(/[­​-‍⁠﻿]/g, '')
+    .replace(/\s+/g, ' ')
+    .toLowerCase()
+    .slice(0, 400000);
+}
+
+/* Steht der Name auf einer der Seiten? Anreden und Titel zählen nicht
+   („Frau Dr. Anja Müller" -> anja, müller); JEDES übrige Namenswort
+   muss als ganzes Wort vorkommen. Liefert die URL der ersten Seite
+   oder ''. Umlaute werden beidseitig zu ae/oe/ue gefaltet — Ämter
+   schreiben „Mueller" und „Müller" gleichermaßen. */
+function _falte(s) {
+  return String(s || '').toLowerCase()
+    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+}
+function nameAufSeiten(name, texte) {
+  const woerter = _falte(name).replace(/[^a-z\s-]/g, ' ').split(/\s+/)
+    .filter(function (w) {
+      return w.length >= 2 && !/^(frau|herr|herrn|dr|prof|dipl|ing|med|rer|nat|jur|von|van|der|den|zu)$/.test(w);
+    });
+  if (!woerter.length) return '';
+  const urls = Object.keys(texte || {});
+  for (let i = 0; i < urls.length; i++) {
+    const t = ' ' + _falte(texte[urls[i]]).replace(/[^a-z0-9@.\s-]/g, ' ') + ' ';
+    const alle = woerter.every(function (w) {
+      return new RegExp('[\\s-]' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[\\s-]').test(t);
+    });
+    if (alle) return urls[i];
+  }
+  return '';
+}
+
+/* ══ v2440 · KEINE INTERNEN ADRESSEN ABRUFEN ═══════════════════════════
+ *
+ * Vorlage v6 hat `istLokal()`; unsere Fassung rief jede URL ab, die die
+ * Websuche nannte — auch `http://localhost:…` oder eine Adresse im
+ * Container-Netz. Eine Belegprüfung, die auf Zuruf interne Dienste
+ * abfragt, ist eine Tür nach innen. */
+function istLokal(url) {
+  try {
+    const h = new URL(url).hostname.toLowerCase();
+    return /^(localhost|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|0\.|\[?::1\]?$|\[?f[cd][0-9a-f]{2}:)/.test(h)
+      || !/\./.test(h);
+  } catch (e) { return true; }
+}
+
+/* ══ v2440 · GEMEINDEWEITE SAETZE ═══════════════════════════════════════
+ *
+ * `gemeinde_schluessel` ist „PLZ-Ort". Eine Großstadt hat dreißig
+ * Postleitzahlen — Bielefeld allein vier unter den Staging-Objekten
+ * (33602, 33613, 33647, 33719). Ein belegtes Bauamt für 33613 half
+ * 33602 nicht, obwohl es dasselbe Amt ist.
+ *
+ * Darum gibt es Sätze mit dem Schlüssel „gemeinde-<kernname>". Ihr
+ * `plz` trägt die PLZ-Leitbereiche (erste zwei Ziffern, kommagetrennt),
+ * und NUR wenn die PLZ des Objekts dort hineinfällt, gilt der Satz —
+ * sonst träfe „Frankfurt (Oder)" das Amt von Frankfurt am Main. Der
+ * PLZ-genaue Satz geht immer vor. Zuständigkeiten, die sich INNERHALB
+ * der Gemeinde teilen (Grundbuch in Berlin), bekommen keinen solchen
+ * Satz — dort sucht die Recherche je Adresse. */
+function ortKern(ort) {
+  return String(ort || '').toLowerCase()
+    .replace(/\s*[([].*$/, '')
+    .replace(/\s+(am|an der|an|im|in|ob der|bei)\s+.*$/, '')
+    .trim();
+}
+function gemeindeweitSchluessel(ort) {
+  const k = ortKern(ort).replace(/[^a-z0-9äöüß]+/g, '-').replace(/^-|-$/g, '');
+  return k ? 'gemeinde-' + k : '';
+}
+function _passtLeitbereich(satzPlz, plz) {
+  const p = String(plz || '').trim();
+  if (!/^\d{5}$/.test(p)) return false;
+  const liste = String(satzPlz || '').split(/[,\s]+/).filter(Boolean);
+  if (!liste.length) return false;
+  return liste.some(function (x) { return x.length <= 5 && p.indexOf(x) === 0; });
+}
+async function gemeindeweitFuer(plz, ort, art) {
+  const k = gemeindeweitSchluessel(ort);
+  if (!k) return [];
+  const r = await query(
+    'SELECT * FROM unterlagen_aemter WHERE gemeinde_schluessel = $1'
+      + (art ? ' AND art = $2' : '') + ' ORDER BY art',
+    art ? [k, art] : [k]);
+  return r.rows.filter(function (a) { return _passtLeitbereich(a.plz, plz); });
 }
 
 /* ══ v2152a · `seiten` HAT ZWEI FORMEN — UND BEIDE SIND GUELTIG ════════
@@ -351,10 +460,39 @@ function seitenLesen(seiten) {
  * Software, die von sich aus jemanden in Kopie setzt, verschickt Post
  * an Menschen, die der Absender nicht gewählt hat.
  */
+/* v2445 · Gehört die Adresse zur Domain des Amts? Verglichen werden die
+   letzten zwei Namensteile (`kreis-herford.de`), damit `bauamt.stadt.de`
+   und `stadt.de` zusammengehören. */
+function _stamm(host) {
+  const t = String(host || '').toLowerCase().replace(/^www\./, '').split('.').filter(Boolean);
+  return t.slice(-2).join('.');
+}
+function _gleicheDomain(mail, eigeneMail, quelleUrl) {
+  const d = _stamm(String(mail || '').split('@')[1]);
+  if (!d) return false;
+  if (eigeneMail) return d === _stamm(String(eigeneMail).split('@')[1]);
+  try { return d === _stamm(new URL(quelleUrl).hostname); } catch (e) { return false; }
+}
+
 function personenAus(roh, eigeneMail, belegDetail, quelleUrl) {
   const personen = [];
   const eigen = _s(eigeneMail).toLowerCase();
   const alle = (belegDetail && belegDetail.alle) || [];
+  const proSeite = (belegDetail && belegDetail.pro_seite) || [];
+  /* v2440 · Die Seitentexte, soweit gelesen (url -> Text). Nur dann gibt
+     es eine Namensprüfung — ohne gelesene Seite lässt sich ein Name
+     weder belegen noch widerlegen. */
+  const texte = (belegDetail && belegDetail.texte) || null;
+  const mitTexten = !!(texte && Object.keys(texte).length);
+
+  /* v2440 · AUF WELCHER SEITE steht die Adresse? Die erste Seite in der
+     Reihenfolge der Abrufe, die sie trägt. Das ist der Beleg, den das
+     Modal je Person verlinkt — „belegt" ohne Ort ist eine Behauptung. */
+  function seiteMit(mail) {
+    if (!mail) return '';
+    const s = proSeite.find(function (x) { return (x.mails || []).indexOf(mail) >= 0; });
+    return s ? s.url : '';
+  }
 
   function merke(p) {
     if (personen.length >= 2) return;
@@ -362,12 +500,26 @@ function personenAus(roh, eigeneMail, belegDetail, quelleUrl) {
     if (p.email && p.email === eigen) return;           /* ist schon Empfänger */
     if (p.email && personen.some((x) => x.email === p.email)) return;
     if (!p.email && personen.some((x) => x.name && x.name === p.name)) return;
+    const mailBelegt = !!(p.email && alle.indexOf(p.email) >= 0);
+    /* v2440 · DER NAME MUSS AUF DER SEITE STEHEN. Ein Modell, das nach
+       zwei Ansprechpersonen gefragt wird, kann zwei plausible Namen
+       liefern. Liegen gelesene Seiten vor und steht der Name auf keiner
+       davon, fällt die Person — es sei denn, ihre ADRESSE ist belegt. */
+    let nameSeite = '';
+    if (p.name && mitTexten) {
+      nameSeite = nameAufSeiten(p.name, texte);
+      if (!nameSeite && !mailBelegt) return;
+    }
     personen.push({
       name: p.name || '', funktion: p.funktion || '',
       email: p.email || '', telefon: p.telefon || '',
       /* Belegt heisst: WIR haben die Adresse auf einer Seite gefunden,
          die wir selbst abgerufen haben. Nicht: die KI hat sie genannt. */
-      bestaetigt: !!(p.email && alle.indexOf(p.email) >= 0),
+      bestaetigt: mailBelegt,
+      /* v2440 · Der Name stand wörtlich auf einer selbst gelesenen Seite. */
+      name_belegt: !!nameSeite,
+      /* v2440 · Die Seite, die den Beleg trägt (Adresse vor Name). */
+      seite: seiteMit(mailBelegt ? p.email : '') || nameSeite || '',
       kopie: false
     });
   }
@@ -389,7 +541,16 @@ function personenAus(roh, eigeneMail, belegDetail, quelleUrl) {
     .find(function (s) { return s.url === quelleUrl; })
     || ((belegDetail && belegDetail.pro_seite) || [])[0];
   ((seite && seite.mails) || []).forEach(function (m) {
-    if (istPersonenpostfach(m)) merke({ name: '', funktion: '', email: m, telefon: '' });
+    /* v2445 · NUR DIE DOMAIN DES AMTS. Gemessen am 19.10.2026: die
+       Übersichtsseite der hessischen Vermessungsverwaltung listet alle
+       Gutachterausschüsse des Landes — für Frankfurt kamen so
+       `…@bad-homburg.de` und `…@giessen.de` als „Ansprechpartner 1
+       und 2" an. Eine Adresse fremder Domain auf einer Sammelseite ist
+       keine Person DIESES Amts. Ohne eigene Adresse zählt der Server
+       der Quellseite. */
+    if (istPersonenpostfach(m) && _gleicheDomain(m, eigen, quelleUrl)) {
+      merke({ name: '', funktion: '', email: m, telefon: '' });
+    }
   });
 
   /* ══ v2153 · ENTWEDER ZWEI ODER KEINE ═══════════════════════════════
@@ -468,6 +629,16 @@ function istPersonenpostfach(email) {
      Prüfer hatte genau diesen Fall als einzigen roten. */
   const glatt = k.replace(/[._-]/g, '');
   if (/^(info|kontakt|post|poststelle|service|amt|buergerbuero|buergerservice|zentrale|mail|office|verwaltung|rathaus|stadt|gemeinde|kreis|bauamt|bauaufsicht|kataster|grundbuch|vermessung|rechnung|buchhaltung|invoice|datenschutz|presse|webmaster|noreply|abuse|support|hilfe|zentral|allgemein|sekretariat|geschaeftsstelle|team|anmeldung|fundbuero|standesamt|posteingang)/.test(glatt)) return false;
+  /* ══ v2444 · EIN TEIL MIT AMTSWORT IST KEIN NAME ═════════════════════
+     Gemessen am 19.10.2026 im Modal (Kabelsketal, Gutachterausschuss
+     LVermGeo Halle): `gaa.stendal.lvermgeo@…` und `gaa.magdeburg…@…`
+     erschienen als „Ansprechpartner 1 und 2" — Funktionspostfächer
+     ANDERER Standorte, nur weil das Konto Punkte trägt. Ein Konto, von
+     dem ein Teil ein Amtswort ist oder Ziffern trägt, ist keine Person. */
+  const teile = k.split(/[._-]+/).filter(Boolean);
+  if (teile.some(function (t) {
+    return /\d/.test(t) || /^(gaa|gag|gutachterausschuss|ga|lvermgeo|vermgeo|lgln|ldbv|tlbg|lgv|kataster|katasteramt|vermessung|vermessungsamt|geodaten|geoinformation|poststelle|post|info|kontakt|service|amt|stadt|gemeinde|kreis|landkreis|region|bauamt|bauaufsicht|bauordnung|bauordnungsamt|baulast|baulasten|bauakte|bauakten|bauaktenarchiv|archiv|umwelt|umweltamt|altlasten|altlastenauskunft|bodenschutz|ubb|grundbuch|grundbuchamt|grundbucheinsicht|verwaltung|zentrale|buero|team|sachgebiet|fachbereich|fachdienst|abteilung|referat|ressort|amtsgericht|ag|poststelle|kundenberatung|kundenzentrum|auskunft|wertermittlung|geschaeftsstelle|stadtmessungsamt|stadtplanung|planung|rd)$/.test(t);
+  })) return false;
   return /\./.test(k);
 }
 
@@ -506,6 +677,8 @@ async function belegPruefen(email, quelleUrl) {
   if (istGewerblich(quelleUrl)) {
     return { ok: false, grund: 'die Quelle ist ein gewerbliches Portal, keine amtliche Seite' };
   }
+  /* v2440 · keine internen Adressen (siehe istLokal) */
+  if (istLokal(quelleUrl)) return { ok: false, grund: 'die Quelle ist keine öffentliche Adresse' };
   let text = '';
   try {
     const a = await fetch(quelleUrl, {
@@ -571,9 +744,13 @@ async function belegPruefen(email, quelleUrl) {
  */
 async function belegSeiten(email, urls) {
   const seiten = [...new Set((urls || []).map(_link).filter(Boolean))]
-    .filter(function (u) { return !istGewerblich(u); })
+    .filter(function (u) { return !istGewerblich(u) && !istLokal(u); })
     .slice(0, 6);
-  if (!seiten.length) return { bestaetigt: false, alle: [], alternativen: [], pro_seite: [] };
+  if (!seiten.length) return { bestaetigt: false, alle: [], alternativen: [], pro_seite: [], texte: {} };
+  /* v2440 · Der lesbare Text je Seite, fuer die Namenspruefung in
+     `personenAus`. Er wird NICHT gespeichert — nur `pro_seite` geht in
+     die Datenbank. */
+  const texte = {};
   const funde = await Promise.all(seiten.map(async function (url) {
     try {
       const a = await fetch(url, {
@@ -586,7 +763,9 @@ async function belegSeiten(email, urls) {
       /* Ein PDF oder Bild hat keinen Text, den dieser Leser versteht —
          er wuerde Bytefolgen als Adressen deuten. */
       if (!/html|text|xml/.test(a.headers.get('content-type') || '')) return [];
-      return mailsAufSeite((await a.text()).slice(0, 2e6));
+      const roh = (await a.text()).slice(0, 2e6);
+      texte[url] = seitenText(roh);
+      return mailsAufSeite(roh);
     } catch (e) { return []; }
   }));
   const alle = [...new Set(funde.flat())];
@@ -599,8 +778,63 @@ async function belegSeiten(email, urls) {
     alternativen: andere.slice(0, 6),
     /* In der Reihenfolge der Seite — die erste genannte Stelle ist die
        zustaendige. Das ist die Grundlage fuer Ansprechpartner 1 und 2. */
-    pro_seite: seiten.map(function (url, i) { return { url: url, mails: funde[i] }; })
+    pro_seite: seiten.map(function (url, i) { return { url: url, mails: funde[i] }; }),
+    texte: texte
   };
+}
+
+/* ══ v2440 · EINE ADRESSE SAEUBERN (Vorlage v6 `saeubereMail`) ════════
+   Modelle setzen gern Sonder-Bindestriche in Domains; `mailGueltig`
+   prüft danach die Form. */
+function mailSauber(v) {
+  const m = String(v || '').normalize('NFKC')
+    .replace(/[­​-‍⁠﻿]/g, '')
+    .replace(/^\s*mailto:/i, '').trim()
+    .replace(/^[<\s]+|[>\s.,;]+$/g, '')
+    .replace(/[‐-―−﹘﹣－]/g, '-')
+    .toLowerCase();
+  return mailGueltig(m) ? m : '';
+}
+
+/* v2440 · Der Weg, den das Amt will (v6 `verfahren`). */
+function kanalAus(genannt, email, antragUrl) {
+  const k = ['email', 'portal', 'formular', 'post'];
+  if (k.indexOf(genannt) >= 0 && !(genannt === 'post' && email)) return genannt;
+  return antragUrl ? 'formular' : email ? 'email' : 'post';
+}
+
+/* v2440 · Die zweite Suche (v6 `sucheAdresse`), wörtlich in der Strenge. */
+async function adresseNachsuchen(behoerde, abteilung, u, adresse) {
+  if (!behoerde) return { email: '', quelle: '', seiten: [] };
+  /* Zeilen als Liste, mit join verbunden — keine Escape-Folgen im Quelltext. */
+  const prompt = [
+    'Gesucht ist die allgemeine E-Mail-Adresse (Funktionspostfach) dieser deutschen Behörde:',
+    '',
+    'Behörde: ' + behoerde + (abteilung ? ', ' + abteilung : ''),
+    'Zuständig für: ' + adresse,
+    'Anliegen: ' + u.name,
+    '',
+    'Die Website der Behörde zeigt die Adresse oft nicht im Text. Suche deshalb gezielt auch hier:',
+    '- Serviceportale und Websites der Städte und Gemeinden im selben Kreis (dort stehen die Ämter des Kreises mit E-Mail)',
+    '- Behördenverzeichnisse des Landes und Listen von Landesämtern',
+    '- Kontaktseite und Impressum der Behörde',
+    'Regeln: Nur offizielle Seiten, keine gewerblichen Bestellportale. Gib die Adresse nur an, wenn sie auf '
+      + 'einer dieser Seiten wörtlich steht; rate nicht. Funktionsadresse des Amts, kein persönliches Postfach. '
+      + 'Einfache Zeichen, normaler Bindestrich. Stelle keine Rückfragen.',
+    '',
+    'Antworte ausschließlich mit einem JSON-Objekt:',
+    '{"email":"","quelle":"URL der Seite, auf der die Adresse steht","seiten":["weitere offizielle Seiten mit dieser Adresse"]}'
+  ].join(String.fromCharCode(10));
+  try {
+    const antwort = await openaiService.callOpenAI(prompt, {});
+    const r = _findeJson(antwort && (antwort.text || antwort.output_text || antwort)) || {};
+    return {
+      email: mailSauber(r.email), quelle: _sauber(_link(r.quelle)),
+      seiten: (Array.isArray(r.seiten) ? r.seiten : []).map(_link).filter(Boolean).map(_sauber)
+    };
+  } catch (e) {
+    return { email: '', quelle: '', seiten: [] };
+  }
 }
 
 /* ═══ DIE RECHERCHE ═════════════════════════════════════════════════════
@@ -718,20 +952,43 @@ async function amtSuchen(art, ort, opts = {}) {
   if (!quelle) quelle = seiten.find((u) => !istGewerblich(u)) || '';
   if (!quelle) quelle = hinweisLinks.find((u) => !istGewerblich(u)) || '';
 
+  /* ══ v2440 · ZWEITE SUCHE NACH DER AMTSADRESSE (Vorlage v6 `sucheAdresse`)
+     Steht das Amt fest, aber keine Adresse, fragt v6 ein zweites Mal
+     gezielt nach dem Funktionspostfach — viele Kreisseiten verstecken es
+     hinter einem „E-Mail"-Link, im Serviceportal der Gemeinde steht es
+     offen. Gefunden zählt es nur mit amtlicher Quelle; der Beleg wird
+     danach genauso geprüft wie beim ersten Fund. */
+  let email = mailSauber(r.email);
+  let zweiteSeiten = [];
+  let zweitHinweis = '';
+  if (!email && !opts.ohneNachsuche) {
+    const k = await adresseNachsuchen(_s(r.behoerde), _s(r.abteilung), u, adresse);
+    if (k.email && k.quelle && !istGewerblich(k.quelle)) {
+      email = k.email;
+      zweiteSeiten = [k.quelle].concat(k.seiten);
+      quelle = k.quelle;
+      zweitHinweis = 'Allgemeine Adresse des Amts, in einer zweiten Suche gefunden.';
+    }
+  }
+  const antragUrl = _link(r.antragUrl);
+
   return {
     behoerde: _s(r.behoerde), abteilung: _s(r.abteilung),
     /* v1844 · Nur, was eine Adresse sein kann. Sonst leer — und leer heißt
-       im Modal „nur über das Portal" oder „keine Adresse", nie `mailto:`. */
-    email: mailGueltig(r.email) ? _s(r.email).toLowerCase() : '',
+       im Modal „nur über das Portal" oder „keine Adresse", nie `mailto:`.
+       v2440 · vorher gesäubert (Sonder-Bindestriche, mailto:, Klammern). */
+    email: email,
     telefon: _s(r.telefon),
-    kanal: ['email', 'portal', 'formular', 'post'].includes(_s(r.kanal)) ? _s(r.kanal) : 'email',
-    antrag_url: _link(r.antragUrl), quelle_url: _sauber(quelle),
+    /* v2440 · Der Weg wie in v6 (`verfahren`): „post" mit Adresse ist kein
+       Postweg, und ohne Angabe entscheidet, was vorliegt. */
+    kanal: kanalAus(_s(r.kanal), email, antragUrl),
+    antrag_url: antragUrl, quelle_url: _sauber(quelle),
     /* v2152 · ROH durchreichen. Der Zusammenbau braucht den Beleg, und
        der steht erst fest, wenn die Seiten gelesen sind — also eine
        Ebene weiter in `amtHolen`. Hier wird nichts entschieden. */
     _ansprechpartner_roh: Array.isArray(r.ansprechpartner) ? r.ansprechpartner : [],
-    seiten: [...new Set(seiten.concat(hinweisLinks))].map(_sauber).slice(0, 8),
-    gebuehr: _s(r.gebuehr), hinweis: _s(r.hinweis),
+    seiten: [...new Set(zweiteSeiten.concat(seiten, hinweisLinks).filter(Boolean))].map(_sauber).slice(0, 8),
+    gebuehr: _s(r.gebuehr), hinweis: [_s(r.hinweis), zweitHinweis].filter(Boolean).join(' '),
     kreis: _s(r.kreis), bundesland: _s(r.bundesland)
   };
 }
@@ -789,6 +1046,12 @@ async function amtHolen(userId, art, ort, opts = {}) {
       [schluessel, art]);
     if (vorhanden.rows.length) {
       return { gefunden: true, aus_register: true, amt: vorhanden.rows[0] };
+    }
+    /* v2440 · Danach der gemeindeweite Satz — nur im passenden
+       PLZ-Leitbereich (siehe gemeindeweitFuer). */
+    const weit = await gemeindeweitFuer(ort.plz, ort.ort, art);
+    if (weit.length) {
+      return { gefunden: true, aus_register: true, gemeindeweit: true, amt: weit[0] };
     }
   }
 
@@ -849,10 +1112,14 @@ async function amtHolen(userId, art, ort, opts = {}) {
    * einer Nebenseite heisst ausdruecklich „auf einer weiteren amtlichen
    * Seite", nicht „auf der Quellseite". Wer das zusammenwirft, verliert
    * genau die Unterscheidung, um die es hier geht. */
-  let belegDetail = { bestaetigt: false, alle: [], alternativen: [], pro_seite: [] };
+  let belegDetail = { bestaetigt: false, alle: [], alternativen: [], pro_seite: [], texte: {} };
   try {
-    const weitere = [gefunden.quelle_url].concat(gefunden.seiten || [])
-      .filter(function (u) { return u && u !== (gefunden._beleg_quelle || gefunden.quelle_url); });
+    /* v2440 · Die Quellseite wird jetzt MITGELESEN (vorher nur die
+       weiteren): die Namenspruefung der Ansprechpersonen braucht ihren
+       Text, und ohne sie stand die Quellseite nie in pro_seite. */
+    const bq = gefunden._beleg_quelle || gefunden.quelle_url;
+    const weitere = [bq, gefunden.quelle_url].concat(gefunden.seiten || [])
+      .filter(function (u, i, l) { return u && l.indexOf(u) === i; });
     if (gefunden.email && weitere.length) {
       belegDetail = await belegSeiten(gefunden.email, weitere);
       if (!beleg.ok && belegDetail.bestaetigt) {
@@ -860,6 +1127,24 @@ async function amtHolen(userId, art, ort, opts = {}) {
         beleg.grund = 'auf einer weiteren amtlichen Seite gefunden ('
           + (belegDetail.pro_seite.find(function (s) {
               return s.mails.includes(_s(gefunden.email).toLowerCase()); }) || {}).url + ')';
+      }
+      /* ══ v2440 · PERSOENLICHES POSTFACH -> FUNKTIONSADRESSE (Vorlage v6)
+         Nennt die Suche ein persönliches Postfach, und auf den gelesenen
+         Seiten steht GENAU EINE Funktionsadresse derselben Domain, wird
+         die genommen — die Person bleibt als Ansprechperson erhalten. */
+      const em = _s(gefunden.email).toLowerCase();
+      if (istPersonenpostfach(em)) {
+        const dom = em.slice(em.indexOf('@'));
+        const fkt = (belegDetail.alle || []).filter(function (m) {
+          return !istPersonenpostfach(m) && m.slice(m.indexOf('@')) === dom; });
+        if (fkt.length === 1) {
+          gefunden._ansprechpartner_roh = [{ name: '', funktion: '', email: em, telefon: '' }]
+            .concat(gefunden._ansprechpartner_roh || []);
+          gefunden.email = fkt[0];
+          beleg.ok = true;
+          beleg.grund = 'Funktionsadresse von derselben amtlichen Seite statt eines persönlichen Postfachs ('
+            + ((belegDetail.pro_seite.find(function (x) { return x.mails.includes(fkt[0]); }) || {}).url || '') + ')';
+        }
       }
     } else if (weitere.length) {
       /* Ohne eigene Adresse trotzdem lesen: die Fundliste ist dann der
@@ -1018,7 +1303,14 @@ async function aemterFuer(plz, ort) {
   const r = await query(
     `SELECT * FROM unterlagen_aemter WHERE gemeinde_schluessel = $1 ORDER BY art`,
     [schluessel]);
-  return r.rows;
+  /* v2440 · Was der PLZ-genaue Satz nicht abdeckt, darf der
+     gemeindeweite füllen (nur im passenden Leitbereich). */
+  const da = {};
+  r.rows.forEach(function (a) { da[a.art] = true; });
+  let weit = [];
+  try { weit = await gemeindeweitFuer(plz, ort); } catch (e) { weit = []; }
+  return r.rows.concat(weit.filter(function (a) { return !da[a.art]; })
+    .map(function (a) { return Object.assign({}, a, { gemeindeweit: true }); }));
 }
 
 module.exports = {
@@ -1029,5 +1321,9 @@ module.exports = {
   /* v2152 · der Zusammenbau der Ansprechpersonen */
   personenAus,
   /* v2152a · der Leser, der beide Formen von `seiten` versteht */
-  seitenLesen
+  seitenLesen,
+  /* v2440 · Namenspruefung, Schutz vor internen Adressen, gemeindeweite
+     Saetze, Adresssaeuberung, Kanal — fuer Pruefstrecke und Einspielweg */
+  seitenText, nameAufSeiten, istLokal, ortKern, gemeindeweitSchluessel,
+  gemeindeweitFuer, mailSauber, kanalAus
 };

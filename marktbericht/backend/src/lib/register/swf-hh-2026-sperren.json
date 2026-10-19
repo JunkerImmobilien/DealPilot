@@ -1,0 +1,40 @@
+[
+ {
+  "land_code": "HH",
+  "ags": "02000000",
+  "ebene": "land",
+  "gebiet_name": "Hamburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Immobilienmarktbericht Hamburg 2026 leitet einen Sachwertfaktor NUR für Einfamilienhäuser ab (Kap. 7.2.3 „Sachwertfaktor für Einfamilienhäuser“, S. 117 ff.; im Register als Formelwerk). Für Mehrfamilienhäuser führt Kap. 7.3 Gebäudefaktor (S. 130), Ertragsfaktor (S. 135), Liegenschaftszinssatz (S. 139), marktübliche Miete (S. 143) und Erbbaurechte (S. 146) — keinen Sachwertfaktor (Inhaltsverzeichnis S. 5). MFH werden in Hamburg im Ertragswertverfahren mit dem Liegenschaftszinssatz des Ausschusses bewertet. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Hamburg, Landesbetrieb Geoinformation und Vermessung (LGV), Neuenfelder Straße 19, 21109 Hamburg, Telefon 040 428 26-6000, gutachterausschuss@gv.hamburg.de, www.gutachterausschuss.hamburg.de (Impressum IMB 2026, S. 2). KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 21 Abs. 3 ImmoWertV verlangt den Wert des zuständigen Ausschusses.",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Hamburg, Landesbetrieb Geoinformation und Vermessung (LGV), Neuenfelder Straße 19, 21109 Hamburg, Telefon 040 428 26-6000, gutachterausschuss@gv.hamburg.de, www.gutachterausschuss.hamburg.de (Impressum IMB 2026, S. 2)",
+  "bestell_url": "https://www.gutachterausschuss.hamburg.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": []
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Immobilienmarktbericht Hamburg 2026, Inhaltsverzeichnis S. 4–5 (Kap. 7.2.3 S. 117, Kap. 7.3 S. 130–146)",
+    "url": "https://daten-hamburg.de/opendata/immobilienmarktberichte/IMB2026.pdf"
+   }
+  ],
+  "fundstelle": "IMB Hamburg 2026, S. 4–5",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://daten-hamburg.de/opendata/immobilienmarktberichte/IMB2026.pdf",
+  "modellversion": "Immobilienmarktbericht Hamburg 2026",
+  "quelle_parser": "v2440-hand (pdftotext, 19.10.2026, Agent register-ernte)"
+ }
+]

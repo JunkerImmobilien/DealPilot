@@ -1,0 +1,491 @@
+[
+  {
+    "gemeinde": "Hannover",
+    "plz_praefixe": ["30"],
+    "bundesland": "NI",
+    "kreis": "Region Hannover",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Landesamt für Geoinformation und Landesvermessung Niedersachsen (LGLN), Regionaldirektion Hameln-Hannover – Katasteramt Hannover",
+        "abteilung": "Auskünfte und Auszüge aus dem Liegenschaftskataster (Dorfstraße 19, 30519 Hannover)",
+        "email": "kundenberatung-rd-hm-h@lgln.niedersachsen.de",
+        "telefon": "0511 30245-333",
+        "kanal": "portal",
+        "antrag_url": "https://maps.lgln.niedersachsen.de/katasterkarten-online/mapbender/application/katasterkarten-online",
+        "quelle_url": "https://www.lgln.niedersachsen.de/startseite/wir_uber_uns_amp_organisation/organisation_amp_kontakt/rd_hameln_hannover/katasteramt_hannover/regionaldirektion-hannover-liegenschaftskataster-vermessung-ansprechpartner-219420.html",
+        "seiten": [
+          "https://www.lgln.niedersachsen.de/startseite/wir_uber_uns_amp_organisation/organisation_amp_kontakt/rd_hameln_hannover/katasteramt_hannover/katasteramt-hannover-51050.html",
+          "https://www.lgln.niedersachsen.de/startseite/vermessung_kataster/auskunfte_auszuge/liegenschaftskarte/liegenschaftskarte-50489.html"
+        ],
+        "gebuehr": "Liegenschaftskarte 1:1000/1:2000 ab 20 € zzgl. USt (nach DIN-Format); online über Katasterkarten-Online 20 % günstiger; Beglaubigung ab 12 €",
+        "hinweis": "Die angezeigte Funktionsadresse weicht vom Link im Quelltext ab (kundenberatung-h@lgln.niedersachsen.de); telefonisch Mo–Fr 8–12 Uhr, vor Ort nur nach Absprache.",
+        "beleg_zitat": "LGLN, Regionaldirektion Hameln-Hannover / Katasteramt Hannover / Dorfstraße 19 / 30519 Hannover",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Hannover – Grundbuchamt",
+        "abteilung": "Grundbuchamt (Volgersweg 1, 30175 Hannover)",
+        "email": "",
+        "telefon": "0511 347-0",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.amtsgericht-hannover.niedersachsen.de/startseite/kontakt/",
+        "seiten": [
+          "https://amtsgericht-hannover.niedersachsen.de/download/155936",
+          "https://amtsgericht-hannover.niedersachsen.de/startseite/service/elektronischer_rechtsverkehr_in_grundbuchsachen/elektronischer-rechtsverkehr-in-grundbuchsachen-216222.html"
+        ],
+        "gebuehr": "",
+        "hinweis": "Die Telefonliste des Grundbuchamts nennt je Grundbuchbezirk (z. B. Linden 0511 347 2204, List 0511 347 2213) eine eigene Durchwahl; die Poststelle agh-poststelle@justiz.niedersachsen.de nimmt keine wirksamen Anträge an.",
+        "beleg_zitat": "Telefonische Erreichbarkeit des Grundbuchamts",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Region Hannover – Untere Bodenschutzbehörde",
+        "abteilung": "Fachbereich Umwelt, Bodenschutz (Hildesheimer Straße 20, 30169 Hannover)",
+        "email": "Bodenschutz@region-hannover.de",
+        "telefon": "+49 511 616-21053",
+        "kanal": "formular",
+        "antrag_url": "https://region-hannover.gov.de/buergerservice/dienstleistungen/umweltinformationen-zu-altlasten-und-altlastverdaechtigen-flaechen-auskunft-900000301-0.html",
+        "quelle_url": "https://www.hannover.de/Leben-in-der-Region-Hannover/Umwelt-Nachhaltigkeit/Abfall-Bodenschutz/Altlasten/Altlasten-und-Verdachtsflächenverzeichnis",
+        "seiten": [
+          "https://www.hannover.de/Leben-in-der-Region-Hannover/Umwelt-Nachhaltigkeit/Abfall-Bodenschutz/Altlasten"
+        ],
+        "gebuehr": "nach Umfang der Informationen und Verwaltungsaufwand",
+        "hinweis": "Zuständig ist die Region, nicht die Landeshauptstadt; Auskunft in der Regel nur an Eigentümer oder Bevollmächtigte, Bearbeitung etwa ein Monat; zweite Nummer +49 511 616-22679.",
+        "beleg_zitat": "Die Region Hannover als Untere Bodenschutzbehörde führt das Altlastenkataster und erteilt daraus Auskünfte.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Landeshauptstadt Hannover – Fachbereich Planen und Stadtentwicklung, Bereich Bauordnung",
+        "abteilung": "Baulastenstelle (61.36); Kundenverkehr Kurt-Schumacher-Str. 24, Post Rudolf-Hillebrecht-Platz 1, 30159 Hannover",
+        "email": "baulasten@hannover-stadt.de",
+        "telefon": "+49 511 168-36411",
+        "kanal": "formular",
+        "antrag_url": "https://forms.hannover.gov.de/intelliform/forms/lhh_ozg/61/61/Baulastenauskunft/index",
+        "quelle_url": "https://hannover.gov.de/buergerservice/dienstleistungen/baulasten-eintragung-und-loeschung-900000146-0.html?myMedium=1",
+        "seiten": [
+          "https://hannover.gov.de/Bauen",
+          "https://www.hannover.de/Leben-in-der-Region-Hannover/Verwaltungen-Kommunen/Die-Verwaltung-der-Landeshauptstadt-Hannover/Dezernate-und-Fachbereiche-der-LHH/Stadtentwicklung-und-Bauen/Fachbereich-Planen-und-Stadtentwicklung/Bauordnung"
+        ],
+        "gebuehr": "",
+        "hinweis": "Die Stadt ist untere Bauaufsicht für das Stadtgebiet; Telefonsprechzeiten Mo und Mi 10–12 Uhr, Do 13–15 Uhr, weitere Nummern 168-48492 und 168-31030.",
+        "beleg_zitat": "Jeder, der ein berechtigtes Interesse darlegt, kann eine Auskunft aus dem Baulastenverzeichnis beantragen.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Landeshauptstadt Hannover – Bereich Bauordnung (61.3)",
+        "abteilung": "61.36 Bauakteneinsicht (Rudolf-Hillebrecht-Platz 1, 30159 Hannover)",
+        "email": "61.36.akteneinsicht@hannover-stadt.de",
+        "telefon": "+49 511 168-30912",
+        "kanal": "formular",
+        "antrag_url": "https://forms.hannover.gov.de/intelliform/forms/lhh_ozg/61/61/Bauakteneinsicht/index",
+        "quelle_url": "https://hannover.gov.de/buergerservice/dienstleistungen/bauaktenarchiv-900000217-0.html?myMedium=1",
+        "seiten": [
+          "https://hannover.gov.de/buergerservice/online/angebot/akteneinsicht-bauakten-antrag-1106-30810.html",
+          "https://hannover.gov.de/Bauen"
+        ],
+        "gebuehr": "gebührenpflichtig nach der Allgemeinen Gebührenordnung (kein Betrag genannt)",
+        "hinweis": "Einsicht für Eigentümer oder Bevollmächtigte mit Eigentumsnachweis, ggf. Vollmacht und Kostenübernahmeerklärung; telefonisch Mo–Fr 9–12 Uhr.",
+        "beleg_zitat": "61.36 Bauakteneinsicht",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte Hameln-Hannover – Geschäftsstelle beim LGLN, Regionaldirektion Hameln-Hannover",
+        "abteilung": "Geschäftsstelle Gutachterausschuss und Umlegungsausschuss (Dorfstraße 19, 30519 Hannover)",
+        "email": "gag-hm-h@lgln.niedersachsen.de",
+        "telefon": "0511 30245-427",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.lgln.niedersachsen.de/wir_ueber_uns/kontakte_informationen/rd_hameln/geschaeftsstelle_gutachterausschuss/regionaldirektion-hameln-hannover-51049.html",
+        "seiten": [
+          "https://www.gag.niedersachsen.de/startseite/gutachterausschusse/kontakt/kontakt-88078.html"
+        ],
+        "gebuehr": "",
+        "hinweis": "Der Gutachterausschuss ist für die Region Hannover zuständig; Öffnung nach vorheriger Terminvereinbarung.",
+        "beleg_zitat": "zuständig für die Region Hannover",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Birgit Schnittger", "funktion": "Geschäftsstelle des Gutachterausschusses", "email": "", "telefon": "0511 30245-427", "seite": "https://www.lgln.niedersachsen.de/wir_ueber_uns/kontakte_informationen/rd_hameln/geschaeftsstelle_gutachterausschuss/regionaldirektion-hameln-hannover-51049.html"},
+          {"name": "Sabine Ostendorp", "funktion": "Produktbestellung, schriftliche Bodenrichtwertauskünfte und Grundstücksmarktinformationen", "email": "", "telefon": "0511 30245-418", "seite": "https://www.lgln.niedersachsen.de/wir_ueber_uns/kontakte_informationen/rd_hameln/geschaeftsstelle_gutachterausschuss/regionaldirektion-hameln-hannover-51049.html"}
+        ]
+      }
+    ],
+    "offen": []
+  },
+  {
+    "gemeinde": "Braunschweig",
+    "plz_praefixe": ["38"],
+    "bundesland": "NI",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Landesamt für Geoinformation und Landesvermessung Niedersachsen (LGLN), Regionaldirektion Braunschweig-Wolfsburg – Katasteramt Braunschweig",
+        "abteilung": "Auskünfte und Auszüge aus dem Liegenschaftskataster (Wilhelmstraße 3, 38100 Braunschweig)",
+        "email": "Katasteramt-BS@lgln.niedersachsen.de",
+        "telefon": "0531 23485-300",
+        "kanal": "portal",
+        "antrag_url": "https://maps.lgln.niedersachsen.de/katasterkarten-online/mapbender/application/katasterkarten-online",
+        "quelle_url": "https://www.lgln.niedersachsen.de/startseite/wir_uber_uns_amp_organisation/organisation_amp_kontakt/rd_braunschweig_wolfsburg/katasteramt_braunschweig/katasteramt-braunschweig-kontakt-51187.html",
+        "seiten": [
+          "https://www.lgln.niedersachsen.de/startseite/wir_uber_uns_amp_organisation/organisation_amp_kontakt/rd_braunschweig_wolfsburg/katasteramt_braunschweig/katasteramt-braunschweig-50825.html",
+          "https://www.lgln.niedersachsen.de/startseite/vermessung_kataster/auskunfte_auszuge/liegenschaftskarte/liegenschaftskarte-50489.html"
+        ],
+        "gebuehr": "Liegenschaftskarte 1:1000/1:2000 ab 20 € zzgl. USt (nach DIN-Format); online über Katasterkarten-Online 20 % günstiger; Beglaubigung ab 12 €",
+        "hinweis": "Öffnungszeiten Mo, Di, Do 8–12 Uhr und nach Vereinbarung.",
+        "beleg_zitat": "LGLN, Regionaldirektion Braunschweig, Katasteramt Braunschweig, Wilhelmstraße 3, 38100 Braunschweig",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Braunschweig – Grundbuchamt",
+        "abteilung": "Grundbuchamt (An der Martinikirche 8, 38100 Braunschweig)",
+        "email": "",
+        "telefon": "0531 488-0",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.amtsgericht-braunschweig.niedersachsen.de/startseite/wir_uber_uns/unsere_zustandigkeiten/grundbuchamt/grundbuchamt-70695.html",
+        "seiten": [
+          "https://www.amtsgericht-braunschweig.niedersachsen.de/startseite/kontakt/"
+        ],
+        "gebuehr": "einfacher Ausdruck 10 €, amtlicher Ausdruck 20 €; Einsicht gebührenfrei",
+        "hinweis": "Ausdrucke nur auf schriftlichen Antrag, telefonische Antragstellung genügt nicht; berechtigtes Interesse ist darzulegen.",
+        "beleg_zitat": "Im Amtsgericht Braunschweig steht Ihnen ein Grundbucheinsichtsplatz im Zentralen Justizservice zur Verfügung.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Braunschweig – Fachbereich Umwelt (untere Bodenschutzbehörde)",
+        "abteilung": "Altlastenverzeichnis-Auskunft (Willy-Brandt-Platz 13, 38102 Braunschweig)",
+        "email": "umweltschutz@braunschweig.de",
+        "telefon": "0531 4701",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.braunschweig.de/leben/umwelt/boden/kontakt_boden/kontakt_altlastenverzeichnis_auskunft.php",
+        "seiten": [
+          "https://www.braunschweig.de/leben/umwelt/boden/index.php",
+          "https://www.braunschweig.de/leben/umwelt/boden/bodenschutzbehoerde.php"
+        ],
+        "gebuehr": "",
+        "hinweis": "Termine vor Ort vorübergehend nur nach Vereinbarung.",
+        "beleg_zitat": "Willy-Brandt-Platz 13, 38102 Braunschweig",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Schulz", "funktion": "Altlastenverzeichnis-Auskunft", "email": "sabine.schulz@braunschweig.de", "telefon": "0531 4706368", "seite": "https://www.braunschweig.de/leben/umwelt/boden/kontakt_boden/kontakt_altlastenverzeichnis_auskunft.php"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Braunschweig – Beratungsstelle Planen - Bauen - Umwelt (untere Bauaufsicht)",
+        "abteilung": "Baulastenverzeichnis",
+        "email": "",
+        "telefon": "0531 470-2161",
+        "kanal": "formular",
+        "antrag_url": "https://www.braunschweig.de/modulinhalte/formulare/12/Baulasten_Auskunft.php",
+        "quelle_url": "https://www.braunschweig.de/leben/stadtplanung_bauen/beratungsstelle/02Baulasten.php",
+        "seiten": [
+          "https://www.braunschweig.de/leben/stadtplanung_bauen/index.php"
+        ],
+        "gebuehr": "gebührenpflichtig (kein Betrag genannt)",
+        "hinweis": "Antrag schriftlich per Post oder E-Mail; in dringenden Fällen nach Antragstellung vorab Auskunft möglich.",
+        "beleg_zitat": "Auskunft aus dem Baulastenverzeichnis",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Bendler", "funktion": "Auskunft aus dem Baulastenverzeichnis", "email": "", "telefon": "(0531) 4 70-21 61", "seite": "https://www.braunschweig.de/leben/stadtplanung_bauen/beratungsstelle/02Baulasten.php"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Braunschweig – Abteilung Bauordnung",
+        "abteilung": "Bauaktenarchiv (Langer Hof 8, 5. Etage)",
+        "email": "",
+        "telefon": "(0531) 4 70-31 40",
+        "kanal": "formular",
+        "antrag_url": "https://www.braunschweig.de/modulinhalte/formulare/12/603_006_Akteneinsich.php",
+        "quelle_url": "https://www.braunschweig.de/leben/stadtplanung_bauen/beratungsstelle/bauaktenarchiv.php",
+        "seiten": [
+          "https://www.braunschweig.de/vv/produkte/III/60/60_3/60_32/bauakteneinsicht.php"
+        ],
+        "gebuehr": "",
+        "hinweis": "Eigentumsnachweis nötig, ggf. Vollmacht.",
+        "beleg_zitat": "stehen allen Berechtigten zur Einsichtnahme zur Verfügung",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Große", "funktion": "Bauaktenarchiv", "email": "", "telefon": "(0531) 4 70-31 40", "seite": "https://www.braunschweig.de/leben/stadtplanung_bauen/beratungsstelle/bauaktenarchiv.php"},
+          {"name": "Frau Derdouk", "funktion": "Bauaktenarchiv", "email": "", "telefon": "(0531) 4 70-31 42", "seite": "https://www.braunschweig.de/leben/stadtplanung_bauen/beratungsstelle/bauaktenarchiv.php"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg – Geschäftsstelle beim LGLN, Regionaldirektion Braunschweig-Wolfsburg",
+        "abteilung": "Geschäftsstelle, Standort Braunschweig (Wilhelmstraße 3, 38100 Braunschweig)",
+        "email": "gag-bs-wob@lgln.niedersachsen.de",
+        "telefon": "0531 23485-370",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.lgln.niedersachsen.de/wir_ueber_uns/kontakte_informationen/rd_braunschweig/geschaeftsstelle_gutachterausschuss/geschaeftsstelle-des-gutachterausschusses---ansprechpartner-101422.html",
+        "seiten": [
+          "https://www.gag.niedersachsen.de/startseite/gutachterausschusse/kontakt/kontakt-88078.html"
+        ],
+        "gebuehr": "",
+        "hinweis": "Durchwahl -370 gilt laut Seite für Braunschweig (Verkehrswertgutachten und Kaufpreissammlung); Zentrale 0531 23485-0.",
+        "beleg_zitat": "Wilhelmstraße 3",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ],
+    "offen": []
+  },
+  {
+    "gemeinde": "Bremen",
+    "plz_praefixe": ["28"],
+    "bundesland": "HB",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Landesamt GeoInformation Bremen",
+        "abteilung": "Auskunftsstelle – Geodatenservice (Lloydstraße 4, 28217 Bremen)",
+        "email": "geodatenservice@geo.bremen.de",
+        "telefon": "0421 361 78680",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.geo.bremen.de/auskunft/auskunftsstelle-geodatenservice-12359",
+        "seiten": [
+          "https://www.geo.bremen.de/produkte/katasterprodukte/auszuege-aus-dem-liegenschaftskataster-12272",
+          "https://www.geo.bremen.de/auskunft/kontaktformular-geodatenservice-12124"
+        ],
+        "gebuehr": "gebührenpflichtig (kein Betrag auf der Seite)",
+        "hinweis": "Auszug aus der Liegenschaftskarte auch online über service.bremen.de; persönlich Mi 9–15 Uhr oder nach Vereinbarung.",
+        "beleg_zitat": "Landesamt GeoInformation Bremen – Auskunftsstelle - Geodatenservice, Lloydstraße 4, 28217 Bremen",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Bremen – Grundbuchamt (Bremen-Nord: Amtsgericht Bremen-Blumenthal)",
+        "abteilung": "Grundbuchamt, Hans-Böckler-Str. 50 (Eingang Altonaer Str. 3), 28217 Bremen",
+        "email": "",
+        "telefon": "0421 361 57600",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.amtsgericht.bremen.de/abteilungen/grundbuchamt-1679",
+        "seiten": [
+          "https://www.amtsgericht-blumenthal.bremen.de/abteilungen/grundbuchamt-1661",
+          "https://www.amtsgericht.bremen.de/kontakt-1576"
+        ],
+        "gebuehr": "",
+        "hinweis": "Bremen-Nord führt das Grundbuchamt beim Amtsgericht Bremen-Blumenthal (Landrat-Christians-Str. 67, 28779 Bremen, 0421 361-7714, grundbuchamt@amtsgericht-blumenthal.bremen.de); Anträge schriftlich.",
+        "beleg_zitat": "innerhalb der Stadtgemeinde Bremen (ohne Bremen-Nord) liegen.",
+        "geteilt": true,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Die Senatorin für Umwelt, Klima und Wissenschaft – Bodenschutz und Altlasten",
+        "abteilung": "Referat 24, Altlastenauskunft (An der Reeperbahn 2, 28217 Bremen)",
+        "email": "altlastenauskunft@umwelt.bremen.de",
+        "telefon": "+49 421 36115895",
+        "kanal": "formular",
+        "antrag_url": "https://am.bremen.de/intelliform/forms/HB/standard/aag_auskunft_altlasten_grundwasserverunreinigung/aag_auskunft_altlasten_grundwasserverunreinigung/index",
+        "quelle_url": "https://umwelt.bremen.de/umwelt/boden-altlasten/grundstuecksbezogene-altlastenauskuenfte-30300",
+        "seiten": [
+          "https://umwelt.bremen.de/umwelt/boden-altlasten-24442"
+        ],
+        "gebuehr": "mindestens 77 € pro Grundstück, nach Aufwand",
+        "hinweis": "Bearbeitung in der Regel vier Wochen; für das Überseehafengebiet Bremerhaven gibt es eine Außenstelle.",
+        "beleg_zitat": "Anfragen zu grundstücksbezogenen Altlastenauskünften und Grundwasserverunreinigungen im stadtbremischen Gebiet",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Merle Christiansen", "funktion": "Referat 24, Altlastenauskunft", "email": "altlastenauskunft@umwelt.bremen.de", "telefon": "+49 421 36115895", "seite": "https://umwelt.bremen.de/umwelt/boden-altlasten/grundstuecksbezogene-altlastenauskuenfte-30300"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Die Senatorin für Bau, Mobilität und Stadtentwicklung – untere Bauaufsichtsbehörde",
+        "abteilung": "Bauordnung Mitte, Ost, West, Süd (Contrescarpe 72, 28195 Bremen); Bremen-Nord: Bauamt Bremen-Nord",
+        "email": "office@bau.bremen.de",
+        "telefon": "+49 421 361-0",
+        "kanal": "formular",
+        "antrag_url": "https://www.service.bremen.de/auskunft-aus-dem-baulastenverzeichnis-beantragen-196543",
+        "quelle_url": "https://www.service.bremen.de/auskunft-aus-dem-baulastenverzeichnis-beantragen-196543",
+        "seiten": [
+          "https://bau.bremen.de/bau/planen-und-bauen-2162094",
+          "https://bau.bremen.de/bau/planen-und-bauen/antraege-formulare-3555"
+        ],
+        "gebuehr": "17 €; bei positiver Auskunft zzgl. Kopien (1.–5. Seite 7 €, ab 6. Seite 4 €)",
+        "hinweis": "Bremen-Nord: Bauamt Bremen-Nord, Gerhard-Rohlfs-Straße 62, 28757 Bremen, +49 421 361-18666, bbn.office@bau.bremen.de; Antrag formlos oder mit Formular Baulastauskunft.",
+        "beleg_zitat": "Antrag bei der unteren Bauaufsichtsbehörde",
+        "geteilt": true,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Die Senatorin für Bau, Mobilität und Stadtentwicklung – Service-Center Bau",
+        "abteilung": "Bauaktenarchiv (Contrescarpe 72, 28195 Bremen); Bremen-Nord: Bauamt Bremen-Nord",
+        "email": "archiv@bau.bremen.de",
+        "telefon": "+49 421 361 15202",
+        "kanal": "portal",
+        "antrag_url": "https://www.service.bremen.de/einsicht-in-eine-abgeschlossene-bauakte-beantragen-185251",
+        "quelle_url": "https://www.service.bremen.de/einsicht-in-eine-abgeschlossene-bauakte-beantragen-185251",
+        "seiten": [
+          "https://bau.bremen.de/bau/planen-und-bauen-2162094"
+        ],
+        "gebuehr": "digitale Akte 52 € (inkl. 10 MB, je weitere 30 MB 30 €); Papierakte 63 € je Grundstück",
+        "hinweis": "Bremen-Nord: Bauamt Bremen-Nord, Gerhard-Rohlfs-Straße 62, 28757 Bremen, +49 421 361-18666, bbn.office@bau.bremen.de; Bearbeitung meist drei bis sechs Wochen.",
+        "beleg_zitat": "Das Bauvorhaben muss abgeschlossen sein.",
+        "geteilt": true,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in Bremen – Geschäftsstelle bei GeoInformation Bremen",
+        "abteilung": "Geschäftsstelle (Lloydstraße 4, 28217 Bremen)",
+        "email": "gutachterausschuss@geo.bremen.de",
+        "telefon": "0421 361-78689",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.gutachterausschuss.bremen.de/kontakt",
+        "seiten": [
+          "https://www.gutachterausschuss.bremen.de/"
+        ],
+        "gebuehr": "",
+        "hinweis": "Zuständig für die Stadtgemeinde Bremen, Bremerhaven hat einen eigenen Ausschuss; Grundstücksmarktbericht Bremen 2026 als PDF bestellbar.",
+        "beleg_zitat": "Lloydstraße 4 - 28217 Bremen",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ],
+    "offen": []
+  },
+  {
+    "gemeinde": "Oldenburg (Oldb)",
+    "plz_praefixe": ["26"],
+    "bundesland": "NI",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Landesamt für Geoinformation und Landesvermessung Niedersachsen (LGLN), Regionaldirektion Oldenburg-Cloppenburg – Katasteramt Oldenburg",
+        "abteilung": "Auskünfte und Auszüge aus dem Liegenschaftskataster (Stau 3, 26122 Oldenburg)",
+        "email": "Katasteramt-OL@lgln.niedersachsen.de",
+        "telefon": "0441 9215-500",
+        "kanal": "portal",
+        "antrag_url": "https://maps.lgln.niedersachsen.de/katasterkarten-online/mapbender/application/katasterkarten-online",
+        "quelle_url": "https://www.lgln.niedersachsen.de/startseite/wir_uber_uns_amp_organisation/organisation_amp_kontakt/rd_oldenburg_cloppenburg/katasteramt_oldenburg/katasteramt-oldenburg-51134.html",
+        "seiten": [
+          "https://www.lgln.niedersachsen.de/startseite/wir_uber_uns_amp_organisation/organisation_amp_kontakt/rd_oldenburg_cloppenburg/katasteramt_oldenburg/katasteramt-oldenburg-ansprechpartner-50901.html",
+          "https://www.lgln.niedersachsen.de/startseite/vermessung_kataster/auskunfte_auszuge/liegenschaftskarte/liegenschaftskarte-50489.html"
+        ],
+        "gebuehr": "Liegenschaftskarte 1:1000/1:2000 ab 20 € zzgl. USt (nach DIN-Format); online über Katasterkarten-Online 20 % günstiger; Beglaubigung ab 12 €",
+        "hinweis": "Vor Ort nur nach Terminvereinbarung; telefonisch Mo–Do 9–15 Uhr, Fr 9–12 Uhr.",
+        "beleg_zitat": "LGLN, Regionaldirektion Oldenburg-Cloppenburg, Katasteramt Oldenburg, Stau 3, 26122 Oldenburg (Oldb)",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Oldenburg – Grundbuchamt",
+        "abteilung": "Grundbuchsachen, zentrale Eingangsstelle (Hauptgebäude Elisabethstraße 8, 26135 Oldenburg)",
+        "email": "",
+        "telefon": "0441 220 3255",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://amtsgericht-oldenburg.niedersachsen.de/startseite/kontakt/ansprechpartner/ansprechpartnerinnen-und-ansprechpartner-80886.html",
+        "seiten": [
+          "https://amtsgericht-oldenburg.niedersachsen.de/startseite/kontakt/standorte/standorte-122843.html",
+          "https://www.amtsgericht-oldenburg.niedersachsen.de/startseite/kontakt/so_erreichen_sie_uns/"
+        ],
+        "gebuehr": "",
+        "hinweis": "Die Poststelle agol-poststelle@justiz.niedersachsen.de steht nur für Verwaltungsangelegenheiten zur Verfügung, nicht für Anträge.",
+        "beleg_zitat": "Hauptgebäude Elisabethstraße 8 26135 Oldenburg",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Oldenburg – Fachdienst Naturschutz und technischer Umweltschutz, Bodenschutzbehörde",
+        "abteilung": "Altlastenkataster (Industriestraße 1 h, 26121 Oldenburg)",
+        "email": "umwelt@stadt-oldenburg.de",
+        "telefon": "0441 235-2854",
+        "kanal": "formular",
+        "antrag_url": "https://serviceportal.oldenburg.de/buergerservice/dienstleistungen/altlasten-auskunft-aus-dem-altlastenkatastar-900000099-0.html?myMedium=1&auswahl=0",
+        "quelle_url": "https://www.oldenburg.de/startseite/stadtraum/umwelt/technischer-umweltschutz/bodenschutz/altlastenkataster.html",
+        "seiten": [
+          "https://serviceportal.oldenburg.de/buergerservice/dienstleistungen/altlasten-auskunft-aus-dem-altlastenkatastar-900000099-0.html?myMedium=1&auswahl=0"
+        ],
+        "gebuehr": "nach Aufwand, in der Regel 36 € pro Grundstück",
+        "hinweis": "Antrag schriftlich per Post, E-Mail oder Fax mit Formular, Vollmacht des Eigentümers und Flurstücksangaben.",
+        "beleg_zitat": "übersenden dies dem Fachdienst Naturschutz und technischer Umweltschutz, Bodenschutzbehörde",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Oldenburg – Fachdienst Bauordnung und Denkmalschutz",
+        "abteilung": "Bereich Bauverwaltung (Industriestr 1 a, Zimmer 132, 26121 Oldenburg)",
+        "email": "baulastauskunft@stadt-oldenburg.de",
+        "telefon": "0441 235-3324",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://serviceportal.oldenburg.de/buergerservice/dienstleistungen/einsicht-in-das-baulastenverzeichnis-beantragen-900000884-0.html?myMedium=1&auswahl=0",
+        "seiten": [],
+        "gebuehr": "30 € je Flurstück",
+        "hinweis": "Formloser schriftlicher Antrag per E-Mail mit Grundstücksangaben, Zahlungspflichtigem und Begründung der Antragsberechtigung; Bearbeitung etwa eine Woche.",
+        "beleg_zitat": "Die Baulastauskünfte können formlos schriftlich per E-Mail beim Ansprechpartner beantragt werden.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Claudia Zimny", "funktion": "Fachdienst Bauordnung und Denkmalschutz, Bereich Bauverwaltung", "email": "baulastauskunft@stadt-oldenburg.de", "telefon": "0441 235-3324", "seite": "https://serviceportal.oldenburg.de/buergerservice/dienstleistungen/einsicht-in-das-baulastenverzeichnis-beantragen-900000884-0.html?myMedium=1&auswahl=0"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Oldenburg – Fachdienst Bauordnung und Denkmalschutz",
+        "abteilung": "Bauakten (Industriestraße 1 a, 26121 Oldenburg)",
+        "email": "bauordnung@stadt-oldenburg.de",
+        "telefon": "0441 235-4444",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://serviceportal.oldenburg.de/buergerservice/dienstleistungen/einsicht-in-das-baulastenverzeichnis-beantragen-900000884-0.html?myMedium=1&auswahl=0",
+        "seiten": [],
+        "gebuehr": "",
+        "hinweis": "Eine eigene Leistungsseite zur Bauakteneinsicht wurde im Serviceportal nicht gefunden; die Zuständigkeit steht in der Beschreibung des Fachdienstes.",
+        "beleg_zitat": "Außerdem werden hier zentral die Bauakten aller Gebäude in der Stadt Oldenburg verwaltet.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg – Geschäftsstelle beim LGLN, Regionaldirektion Oldenburg-Cloppenburg",
+        "abteilung": "Geschäftsstelle, Bereich Stadt Oldenburg, Landkreise Ammerland und Wesermarsch",
+        "email": "gag-ol-clp@lgln.niedersachsen.de",
+        "telefon": "0441 9215-613",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.lgln.niedersachsen.de/wir_ueber_uns/kontakte_informationen/rd_oldenburg/geschaeftsstelle_gutachterausschuss/ansprechpartner-103225.html",
+        "seiten": [
+          "https://www.gag.niedersachsen.de/startseite/gutachterausschusse/kontakt/kontakt-88078.html"
+        ],
+        "gebuehr": "",
+        "hinweis": "Die Seite nennt keine Postadresse der Geschäftsstelle, nur Telefon je Bereich und das gemeinsame Postfach.",
+        "beleg_zitat": "Stadt Oldenburg, Landkreise Ammerland und Wesermarsch",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ],
+    "offen": []
+  }
+]
