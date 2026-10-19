@@ -5086,7 +5086,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -5162,7 +5162,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -5238,7 +5238,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -5314,7 +5314,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -5390,7 +5390,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -5466,7 +5466,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -5542,7 +5542,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -5618,7 +5618,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -5694,7 +5694,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -5770,7 +5770,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -5837,7 +5837,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -5904,7 +5904,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -5971,7 +5971,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6038,7 +6038,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6105,7 +6105,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6172,7 +6172,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6239,7 +6239,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6306,7 +6306,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6373,7 +6373,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6440,7 +6440,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6507,7 +6507,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6574,7 +6574,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6641,7 +6641,7 @@
   "auflagen": "Modellkonformität nach § 10 ImmoWertV: die Werte gelten NUR in dem Modell, in dem sie abgeleitet wurden (Bewirtschaftungskosten nach Anlage 3 ImmoWertV, RND nach der eigenen Modernisierungs-Punktetabelle des Ausschusses, beitragsfreier Bodenrichtwert zum Vertragszeitpunkt). Der Herausgeber schränkt selbst ein, Modellbeschreibung S. 2 wörtlich: „Der durchschnittliche Liegenschaftszinssatz als Ergebnis einer mathematisch-statistischen Analyse stellt einen Orientierungswert dar und muss entsprechend der Grundstücksmerkmale des jeweiligen Bewertungsobjektes sachverständig angewendet und ggf. angepasst werden.\" Quellenangabe vorsorglich Pflicht (Lizenz ungeklärt).",
   "verwendung": "produkt",
   "streuung": null,
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6683,7 +6683,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6741,7 +6741,7 @@
   "zweig": "we_v",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6799,7 +6799,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6857,7 +6857,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6915,7 +6915,7 @@
   "zweig": "we_v",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6973,7 +6973,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7031,7 +7031,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7089,7 +7089,7 @@
   "zweig": "we_v",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7147,7 +7147,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7205,7 +7205,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7263,7 +7263,7 @@
   "zweig": "we_v",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7321,7 +7321,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7379,7 +7379,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7437,7 +7437,7 @@
   "zweig": "we_v",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7495,7 +7495,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7553,7 +7553,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7611,7 +7611,7 @@
   "zweig": "we_v",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7669,7 +7669,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7727,7 +7727,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7785,7 +7785,7 @@
   "zweig": "we_v",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7843,7 +7843,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7901,7 +7901,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -7959,7 +7959,7 @@
   "zweig": "we_v",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8017,7 +8017,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8075,7 +8075,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8133,7 +8133,7 @@
   "zweig": "we_v",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8191,7 +8191,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8249,7 +8249,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8307,7 +8307,7 @@
   "zweig": "we_v",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8365,7 +8365,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8423,7 +8423,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8481,7 +8481,7 @@
   "zweig": "we_v",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8539,7 +8539,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,

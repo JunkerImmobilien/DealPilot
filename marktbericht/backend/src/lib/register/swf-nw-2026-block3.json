@@ -2470,7 +2470,7 @@
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "zweig": "ezfh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,
@@ -2520,7 +2520,7 @@
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "zweig": "rhdhh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,
@@ -2570,7 +2570,7 @@
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "zweig": "rmh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,
@@ -2620,7 +2620,7 @@
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "zweig": "ezfh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,
@@ -2670,7 +2670,7 @@
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "zweig": "rhdhh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,
@@ -2720,7 +2720,7 @@
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "zweig": "rmh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,
@@ -2770,7 +2770,7 @@
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "zweig": "ezfh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,
@@ -2820,7 +2820,7 @@
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "zweig": "rhdhh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,
@@ -2870,7 +2870,7 @@
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
   "zweig": "rmh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,
@@ -2921,7 +2921,7 @@
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden",
   "zweig": "ezfh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,
@@ -2972,7 +2972,7 @@
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden",
   "zweig": "rhdhh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,

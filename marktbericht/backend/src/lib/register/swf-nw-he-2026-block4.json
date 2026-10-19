@@ -1904,7 +1904,7 @@
   "ebene": "kreis",
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Kleve",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Kleve",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,
@@ -1949,7 +1949,7 @@
   "ebene": "kreis",
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Kleve",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Kleve",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,
@@ -2299,7 +2299,7 @@
   "ebene": "kreis",
   "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Rheinisch-Bergischen Kreis",
   "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Rheinisch-Bergischen Kreis",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "faktor",
    "wert": null,

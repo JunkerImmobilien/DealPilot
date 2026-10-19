@@ -9,7 +9,7 @@
     "zweig": "ezfh",
     "objektart": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhäuser",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "faktor",
       "wert": null,
@@ -68,7 +68,7 @@
     "zweig": "ezfh",
     "objektart": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhäuser",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "faktor",
       "wert": null,
@@ -127,7 +127,7 @@
     "zweig": "ezfh",
     "objektart": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhäuser",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "faktor",
       "wert": null,
@@ -186,7 +186,7 @@
     "zweig": "ezfh",
     "objektart": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhäuser",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "faktor",
       "wert": null,
@@ -245,7 +245,7 @@
     "zweig": "ezfh",
     "objektart": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhäuser",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "faktor",
       "wert": null,
@@ -304,7 +304,7 @@
     "zweig": "ezfh",
     "objektart": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhäuser",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "faktor",
       "wert": null,
@@ -363,7 +363,7 @@
     "zweig": "ezfh",
     "objektart": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhäuser",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "faktor",
       "wert": null,
@@ -422,7 +422,7 @@
     "zweig": "ezfh",
     "objektart": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhäuser",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "faktor",
       "wert": null,
@@ -481,7 +481,7 @@
     "zweig": "ezfh",
     "objektart": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhäuser",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "faktor",
       "wert": null,
@@ -540,7 +540,7 @@
     "zweig": "ezfh",
     "objektart": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhäuser",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "faktor",
       "wert": null,
@@ -599,7 +599,7 @@
     "zweig": "ezfh",
     "objektart": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhäuser",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "faktor",
       "wert": null,

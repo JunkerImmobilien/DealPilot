@@ -8,7 +8,7 @@
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhausgrundstücke (Dauerwohnen)",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante"
     },
     "korrekturen": [],
@@ -97,7 +97,7 @@
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "rhdhh",
     "objektart_bez": "Reihenhäuser und Doppelhaushälften (Dauerwohnen)",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante"
     },
     "korrekturen": [],
@@ -182,7 +182,7 @@
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "we_v",
     "objektart_bez": "Eigentumswohnungen (Dauerwohnen, Anlagen unter 20 Einheiten)",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante"
     },
     "korrekturen": [],
@@ -1349,7 +1349,7 @@
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhausgrundstücke (Dauerwohnen)",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante"
     },
     "korrekturen": [],
@@ -1438,7 +1438,7 @@
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "rhdhh",
     "objektart_bez": "Reihenhäuser und Doppelhaushälften (Dauerwohnen)",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante"
     },
     "korrekturen": [],
@@ -1523,7 +1523,7 @@
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "we_v",
     "objektart_bez": "Eigentumswohnungen (Dauerwohnen, Anlagen unter 20 Einheiten)",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante"
     },
     "korrekturen": [],
@@ -2690,7 +2690,7 @@
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhausgrundstücke (Dauerwohnen)",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante"
     },
     "korrekturen": [],
@@ -2779,7 +2779,7 @@
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "rhdhh",
     "objektart_bez": "Reihenhäuser und Doppelhaushälften (Dauerwohnen)",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante"
     },
     "korrekturen": [],
@@ -2864,7 +2864,7 @@
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "we_v",
     "objektart_bez": "Eigentumswohnungen (Dauerwohnen, Anlagen unter 20 Einheiten)",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante"
     },
     "korrekturen": [],
@@ -3368,7 +3368,7 @@
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
     "objektart_bez": "Ein- und Zweifamilienhausgrundstücke (Dauerwohnen)",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante"
     },
     "korrekturen": [],
@@ -3457,7 +3457,7 @@
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "rhdhh",
     "objektart_bez": "Reihenhäuser und Doppelhaushälften (Dauerwohnen)",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante"
     },
     "korrekturen": [],
@@ -3542,7 +3542,7 @@
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "we_v",
     "objektart_bez": "Eigentumswohnungen (Dauerwohnen, Anlagen unter 20 Einheiten)",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante"
     },
     "korrekturen": [],

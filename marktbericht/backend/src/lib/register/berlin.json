@@ -7,7 +7,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte in Berlin",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "stufen_1d",
    "achse_feld": "objektkaltmiete_eur_m2_monat",
    "achse_bez": "durchschnittliche monatliche Objektkaltmiete in EUR/m² Wohn-/Nutzfläche",

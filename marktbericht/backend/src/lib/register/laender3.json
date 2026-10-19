@@ -638,7 +638,7 @@
   "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der documenta Stadt Kassel",
   "kennzahl": "bodenpreisindex",
   "zweig": "baugrundstueck",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "matrix_kategorial",
    "liefert": "prozent",
    "liefert_einheit": "Indexpunkte, Basisjahr 2010 = 100",
