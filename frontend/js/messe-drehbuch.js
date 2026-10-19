@@ -1533,6 +1533,10 @@
        gespielt mit den Koordinaten aus dem gespeicherten Bericht desselben Objekts (_rh.geo).
        Der BORIS-Abruf selbst (Open Data, GET) läuft echt. */
     if (m === 'GET' && _rh.geo && /\/marktbericht\/geocode\?/.test(u)) return rhJ(JSON.parse(JSON.stringify(_rh.geo)));
+    /* v2388 · GEMESSEN im Prüflauf Modul 25 (19.10.2026): nach „Übernehmen" holt das Adressfeld
+       (adress-autocomplete.js _koordHolen) zweimal /marktbericht/geocode/autocomplete - Geoapify,
+       ein bezahlter Dienst, je Durchgang. Im Lauf wird nichts vorgeschlagen: leere Liste. */
+    if (m === 'GET' && /\/marktbericht\/geocode\/autocomplete/.test(u)) return rhJ({ results: [] });
     /* v2300 · Modul 21: die Portfolio-Analyse ist EIN echter Abruf (Mitschnitt D.portfolioPilot);
        ihre Ablage in den Einstellungen wird im Lauf beantwortet, nicht geschrieben. */
     if (m === 'POST' && D.portfolioPilot && /\/ai\/copilot$/.test(u.split('?')[0]) && body && /GESAMTES Portfolio/.test(String(body.message || ''))) return rhJ(JSON.parse(JSON.stringify(D.portfolioPilot)));
@@ -5070,6 +5074,11 @@
         await r25Antwort('ja');
       },
       async function (s) {   /* 4 · Art, Größe, Details */
+        /* v2388 · GEMESSEN: das Abruf-Angebot erscheint erst nach der Adress-Bestätigung - die
+           Kapitelzeile „Objekt und Größe" stand nur 1 s, dann kam „Auf Wunsch abrufen". Erst das
+           Angebot erledigen, dann die Frage. */
+        await warteAuf(r25AbrufBlase, 2500);
+        if (r25AbrufBlase()) await r25AbrufWeg();
         await zeige(r25Bereich, 6);
         var zb = r6Beginn(s, 'Objekt und Größe', 'Art und Wohnfläche …');
         await r25Antwort(R25.art);
@@ -5163,7 +5172,12 @@
         /* seit v2368 trägt die Liste die Einheit selbst - der Wert wird so gezeigt, wie er dort steht */
         var hw = hz(), hv = hw ? hw.textContent.replace(/\s+/g, ' ').replace(HZ, '').trim() : '';
         await b2oZeile(s, 'Umlagefähig und eigener Teil', 'Gesagt sind die Summe und der eigene Teil — in der Liste stehen beide Seiten getrennt' + (hv ? ': <b>' + hv + '</b>' : '') + '. In den Cashflow geht nur der nicht umlagefähige Teil.');
+        /* v2388 · GEMESSEN: ohne eigene Zeile stand „Umlagefähig und eigener Teil" 40 s über drei
+           ganz anderen Antworten */
+        await zeige(r25Bereich, 6);
+        var zb1 = r6Beginn(s, 'Annahmen und Standort', 'Mietsteigerung, Wertsteigerung, Leerstand, Mietausfall — und wie sich der Ort entwickelt.');
         await r25Reihe([R25.langfrist, R25.ausfall, R25.ort]);
+        await r6Ende(zb1);
         await zeige(r25Bereich, 6);
         var zb2 = r6Beginn(s, 'Überspringen', '„Weiß ich nicht" — und es geht weiter. Erfunden wird nichts.');
         await r25Antwort(R25.weissNicht);
@@ -5250,11 +5264,16 @@
         reiter('s6'); await warte(1300);
         await warteAuf(function () { return r12Karte(1)() && r12Kopf(1).score; }, 8000);
         await warte(600);
-        var kopf = function (i) { return function () { var k = r12Karte(i)(); return k && (k.querySelector('.dpsh-mainrow') || k.querySelector('.dpsh-headrow')); }; };
-        await zeigeGruppe(kopf(0), kopf(1), 8);
-        var a = r12Kopf(0), b = r12Kopf(1);
-        await b2oZeile(s, 'Zwei Scores', 'Deal Score <b>' + (a.score || '–') + ' · ' + r12Wort(a.wort) + '</b>, Investor Deal Score <b>' + (b.score || '–') + ' · ' + r12Wort(b.wort) + '</b> — dasselbe Objekt, zwei Gewichtungen.', 800);
-        var t1 = r12Teile(0), t2 = r12Teile(1);
+        /* v2388 · GEMESSEN im Prüflauf (Studio, 653 px App-Höhe): die beiden Köpfe (.dpsh-mainrow,
+           mit allen fünf Balken) sind zusammen höher als das Bild - der Ring des Deal Score lag
+           oben ausserhalb, die Zahl 60 war in „Zwei Scores" nicht zu sehen. Jetzt je Score der
+           Ring (.dpsh-colring: Ring + Stufe) einzeln; zusammen nur, wenn beide ins Bild passen. */
+        var ring = function (i) { return function () { var k = r12Karte(i)(); return k && (k.querySelector('.dpsh-colring') || k.querySelector('.dpsh-mainrow') || k.querySelector('.dpsh-headrow')); }; };
+        var passt = function (fa, fb) { var x = fa(), y = fb(); if (!x || !y) return false; var ra = rect(x), rb = rect(y); return Math.max(ra.bottom, rb.bottom) - Math.min(ra.top, rb.top) <= innerHeight - unten() - 70 - 24; };
+        var a = r12Kopf(0), b = r12Kopf(1), t1 = r12Teile(0), t2 = r12Teile(1);
+        DPM_REIHE.r25scores = { deal: a, investor: b, passt: passt(ring(0), ring(1)) };
+        await zeige(ring(0), 10);
+        await b2oZeile(s, 'Der Deal Score', 'Deal Score <b>' + (a.score || '–') + ' · ' + r12Wort(a.wort) + '</b> — gerechnet aus ' + (t1.length || 'den') + ' Kennzahlen des Objekts.', 800);
         var such = function (t, re) { return t.filter(function (x) { return re.test(x.name); })[0] || null; };
         var cf = such(t1, /^Cashflow/i), nr = such(t1, /Rendite/i);
         var balken = function (i) { return function () { var k = r12Karte(i)(), bb = k && k.querySelectorAll('.dpsh-cbar'); return bb && bb.length ? b2oHuelle(bb[0], bb[bb.length - 1]) : null; }; };
@@ -5266,13 +5285,18 @@
         var gn = function (x) { var m = /([\d,.]+)/.exec((x && x.gewicht) || ''); return m ? parseFloat(m[1].replace(',', '.')) : 0; };
         var vorn = t1.slice().sort(function (p, q2) { return gn(q2) - gn(p); }).slice(0, 2);
         var cfNr = cf && nr && vorn.indexOf(cf) >= 0 && vorn.indexOf(nr) >= 0;
-        await b2oZeile(s, 'Der Deal Score', cfNr
+        await b2oZeile(s, 'Seine Gewichte', cfNr
           ? 'Er schaut vor allem auf <b>Cashflow' + gw(cf) + '</b> und <b>Nettorendite' + gw(nr) + '</b> — hier ' + cf.note + ' und ' + nr.note + ' von 100 Punkten.'
           : 'Fünf Kennzahlen, deine Gewichte: ' + t1.map(function (x) { return x.name.replace(/\s*\(.*\)$/, '') + ' ' + x.gewicht + ': <b>' + x.note + '</b>'; }).join(' · ') + '.');
         var weitere = ['Finanzierung', 'Risiko', 'Lage', 'Upside'].map(function (nm) { var x = such(t2, new RegExp('^' + nm, 'i')); return x ? nm + ' <b>' + x.note + '</b>' : nm; });
+        await zeige(ring(1), 10);
+        await b2oZeile(s, 'Der Investor Deal Score', 'Investor Deal Score <b>' + (b.score || '–') + ' · ' + r12Wort(b.wort) + '</b> — dasselbe Objekt, andere Gewichtung.', 800);
         await zeige(balken(1), 8);
-        await b2oZeile(s, 'Der Investor Deal Score', 'Er bewertet zusätzlich Finanzierung, Risiko, Lage und Upside — hier ' + weitere.join(' · ') + '.');
-        await zeigeGruppe(kopf(0), kopf(1), 8);
+        await b2oZeile(s, 'Was er zusätzlich bewertet', 'Neben der Rendite auch Finanzierung, Risiko, Lage und Upside — hier ' + weitere.join(' · ') + '.');
+        /* beide Zahlen zum Schluss: zusammen, wenn sie ins Bild passen - sonst Urteil des Deal Score
+           (Stufe in der Zeile darunter) und der Ring des Investor Deal Score */
+        if (passt(ring(0), ring(1))) await zeigeGruppe(ring(0), ring(1), 10);
+        else await zeigeGruppe(function () { var k = r12Karte(0)(); return k && (k.querySelector('.dpsh-verdictbar') || k.querySelector('.dpsh-statstrip')); }, ring(1), 10);
         await b2oZeile(s, 'Von ' + r12Wort(a.wort) + ' zu ' + r12Wort(b.wort), 'Gleiche Zahlen, andere Gewichte: <b>' + (a.score || '–') + '</b> im Deal Score, <b>' + (b.score || '–') + '</b> im Investor Deal Score.', 1500);
       }
     ].map(function (f) { return function (s) { _r25s = s; return f(s); }; })
