@@ -606,6 +606,16 @@ function istPersonenpostfach(email) {
      Prüfer hatte genau diesen Fall als einzigen roten. */
   const glatt = k.replace(/[._-]/g, '');
   if (/^(info|kontakt|post|poststelle|service|amt|buergerbuero|buergerservice|zentrale|mail|office|verwaltung|rathaus|stadt|gemeinde|kreis|bauamt|bauaufsicht|kataster|grundbuch|vermessung|rechnung|buchhaltung|invoice|datenschutz|presse|webmaster|noreply|abuse|support|hilfe|zentral|allgemein|sekretariat|geschaeftsstelle|team|anmeldung|fundbuero|standesamt|posteingang)/.test(glatt)) return false;
+  /* ══ v2444 · EIN TEIL MIT AMTSWORT IST KEIN NAME ═════════════════════
+     Gemessen am 19.10.2026 im Modal (Kabelsketal, Gutachterausschuss
+     LVermGeo Halle): `gaa.stendal.lvermgeo@…` und `gaa.magdeburg…@…`
+     erschienen als „Ansprechpartner 1 und 2" — Funktionspostfächer
+     ANDERER Standorte, nur weil das Konto Punkte trägt. Ein Konto, von
+     dem ein Teil ein Amtswort ist oder Ziffern trägt, ist keine Person. */
+  const teile = k.split(/[._-]+/).filter(Boolean);
+  if (teile.some(function (t) {
+    return /\d/.test(t) || /^(gaa|gag|gutachterausschuss|ga|lvermgeo|vermgeo|lgln|ldbv|tlbg|lgv|kataster|katasteramt|vermessung|vermessungsamt|geodaten|geoinformation|poststelle|post|info|kontakt|service|amt|stadt|gemeinde|kreis|landkreis|region|bauamt|bauaufsicht|bauordnung|bauordnungsamt|baulast|baulasten|bauakte|bauakten|bauaktenarchiv|archiv|umwelt|umweltamt|altlasten|altlastenauskunft|bodenschutz|ubb|grundbuch|grundbuchamt|grundbucheinsicht|verwaltung|zentrale|buero|team|sachgebiet|fachbereich|fachdienst|abteilung|referat|ressort|amtsgericht|ag|poststelle|kundenberatung|kundenzentrum|auskunft|wertermittlung|geschaeftsstelle|stadtmessungsamt|stadtplanung|planung|rd)$/.test(t);
+  })) return false;
   return /\./.test(k);
 }
 

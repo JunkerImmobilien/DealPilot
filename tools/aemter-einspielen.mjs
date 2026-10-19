@@ -50,6 +50,9 @@ const { query } = require_('./db/pool');
 
 const argv = process.argv.slice(2);
 const TROCKEN = argv.includes('--trocken');
+/* v2444 · --personen-ersetzen: eine leere Personenliste ueberschreibt auch eine gefuellte
+   (nach einer Verschaerfung der Pruefung, wenn frueher Eingespieltes nicht mehr besteht). */
+const ERSETZEN = argv.includes('--personen-ersetzen');
 const dateien = argv.filter((a) => !a.startsWith('--'));
 if (!dateien.length) { console.error('Keine Eingabedatei.'); process.exit(2); }
 
@@ -134,7 +137,7 @@ async function einAmt(g, a) {
        bundesland = EXCLUDED.bundesland, beleg_ok = EXCLUDED.beleg_ok,
        beleg_grund = EXCLUDED.beleg_grund,
        ansprechpartner = CASE
-         WHEN jsonb_array_length(EXCLUDED.ansprechpartner) > 0
+         WHEN jsonb_array_length(EXCLUDED.ansprechpartner) > 0 OR $20
            THEN EXCLUDED.ansprechpartner
          ELSE unterlagen_aemter.ansprechpartner
        END,
@@ -145,7 +148,7 @@ async function einAmt(g, a) {
                       beleg_quelle: null, herkunft: 'Ämterliste v2442 (Recherche 19.10.2026)' }),
      s(a.gebuehr) || null, s(a.hinweis) || null, s(g.kreis) || null, s(g.bundesland) || null,
      !!beleg.ok, 'Ämterliste (Recherche 19.10.2026, von DealPilot nachgelesen): ' + beleg.grund,
-     JSON.stringify(personen)]);
+     JSON.stringify(personen), ERSETZEN]);
   z.geschrieben++;
 
   /* PLZ-genaue Altsätze derselben Gemeinde und Art: Personen nur

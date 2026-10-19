@@ -569,6 +569,14 @@ console.log('=== 8 · Namenspruefung, interne Adressen, gemeindeweite Saetze (v2
     ['Kreis als Aufzaehlung ist kein Punkt', function () {
       const m = U.mailsAufSeite('<li>◦ Bauakten</li><li>◦ Baulasten</li>');
       return m.length === 0 ? null : 'Fehlalarm: ' + m.join(','); }],
+    ['gaa.stendal.lvermgeo ist keine Person', function () {
+      return U.istPersonenpostfach('gaa.stendal.lvermgeo@sachsen-anhalt.de') ? 'als Person gezaehlt' : null; }],
+    ['kundenberatung-rd-hm-h ist keine Person', function () {
+      return U.istPersonenpostfach('kundenberatung-rd-hm-h@lgln.niedersachsen.de') ? 'als Person gezaehlt' : null; }],
+    ['amt62.kataster ist keine Person', function () {
+      return U.istPersonenpostfach('amt62.kataster@essen.de') ? 'als Person gezaehlt' : null; }],
+    ['sabine.schulz bleibt Person', function () {
+      return U.istPersonenpostfach('sabine.schulz@braunschweig.de') ? null : 'nicht erkannt'; }],
     ['localhost ist lokal', function () { return U.istLokal('http://localhost:3000/x') ? null : 'nicht erkannt'; }],
     ['Container-Name ist lokal', function () { return U.istLokal('http://mb-backend:4000/') ? null : 'nicht erkannt'; }],
     ['10er-Netz ist lokal', function () { return U.istLokal('http://10.0.0.5/') ? null : 'nicht erkannt'; }],
@@ -601,7 +609,7 @@ console.log('                Reihenfolge, 9 Postfacharten, zwei Gegenproben,');
 console.log('                13 Zusicherungen des Personen-Zusammenbaus (v2152),');
 console.log('                5 Formproben der Spalte seiten (v2152a),');
 console.log('                6 Stellen des KI-Auftrags am kommentarfreien Text,');
-console.log('                20 Proben Namenspruefung, Stern-Kreis-Schreibweise, interne Adressen, Kernname, Saeuberung, Kanal (v2440)');
+console.log('                24 Proben Namenspruefung, Amtswort im Konto, Stern-Kreis-Schreibweise, interne Adressen, Kernname, Saeuberung, Kanal (v2440)');
 console.log('  NICHT       : `belegSeiten()` selbst — die ruft echte Server ab.');
 console.log('                Dass sie die Seiten LIEST, ist hier bewiesen; dass sie');
 console.log('                sie ABRUFT, ist ein Staging-Abnahmepunkt.');
