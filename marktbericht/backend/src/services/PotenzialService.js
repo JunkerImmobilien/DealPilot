@@ -164,6 +164,28 @@ function etwEingabe(basis, ref, w, miete, lzs, bwk, rnd, anteil) {
   return { ein, bw: bwE };
 }
 
+/* v2431 · Warum die Aufteilung hier nichts bringt - in Marcels Worten, aus den
+   Zahlen DIESER Rechnung. Ein Satz, der nur sagt was stimmt: der Zinsvergleich nur,
+   wenn der ETW-Zins wirklich hoeher liegt; liegt die Summe ueber dem Haus und
+   frisst erst die Aufteilung den Abstand, sagt er genau das. */
+const pctDe = (v) => (v == null ? '–' : String(Math.round(Number(v) * 100) / 100).replace('.', ',') + ' %');
+const eurDe = (v) => Math.round(Number(v) || 0).toLocaleString('de-DE') + ' €';
+function negativHinweis(a, out, neg) {
+  const s = neg.indexOf('bestand') >= 0 ? 'bestand' : neg[0];
+  const zE = a.zins[s] && a.zins[s].pct != null ? Number(a.zins[s].pct) : null;
+  const zH = out.basis && out.basis.lzs_pct != null ? Number(out.basis.lzs_pct) : null;
+  const j = a.je_stufe[s];
+  const gruende = [];
+  if (zE != null && zH != null && zE > zH) gruende.push('Wohnungseigentums-Zins ' + pctDe(zE) + ' gegen ' + pctDe(zH) + ' für das Mehrfamilienhaus');
+  gruende.push('höhere Verwaltungskosten je Einheit');
+  if (j && !j.unter_haus) {
+    return 'Nach den amtlichen Zinssätzen liegt die Summe der Einzelwohnungen hier nur knapp über dem Wert des Hauses ('
+      + gruende.join(', dazu ') + '); nach den Kosten der Aufteilung von ' + eurDe(a.kosten_eur) + ' bleibt kein Potenzial.';
+  }
+  return 'Nach den amtlichen Zinssätzen liegt die Summe der Einzelwohnungen hier unter dem Wert des Hauses: '
+    + gruende.join(', dazu ') + '.';
+}
+
 export const PotenzialService = {
   KENNZEICHNUNG,
 
@@ -247,7 +269,12 @@ export const PotenzialService = {
           const lzs = await etwZins(ref, brw, rnd);
           if (!lzs || lzs.wert == null) { aOut.zins[s] = { verfuegbar: false, grund: (lzs && (lzs.rueckfrage || lzs.hinweis)) || 'kein Zins für Wohnungseigentum' }; continue; }
           const bwk = await etwBwk(ref, lzs);
+          /* v2431 · der AUSSCHUSS, nicht der Herausgeber: in NRW veroeffentlicht der
+             Obere Gutachterausschuss die Zinssaetze aller oertlichen Ausschuesse
+             (Grundstuecksmarktdaten NRW, Namensnennung) - der Satz selbst ist der
+             des oertlichen Ausschusses (Bielefeld: Zweig we_v, 2,9 %). */
           aOut.zins[s] = { pct: Number(lzs.wert), stufe: lzs.stufe || null, quelle: lzs.quelle || null,
+            ausschuss: lzs.ausschuss || null, zweig: lzs.zweig || null, ebene: lzs.register_ebene || lzs.ebene || null,
             etikett: lzs.zins_herkunft ? lzs.zins_herkunft.etikett : null, bwk_quote_pct: bwk ? bwk.pct : null };
           let summe = 0, vollst = true;
           out.wohnungen.forEach((r, i) => {
@@ -261,9 +288,14 @@ export const PotenzialService = {
             r.als_etw[s] = wert;
             if (wert == null) vollst = false; else summe += wert;
           });
-          aOut.je_stufe[s] = { summe: Math.round(summe), vollstaendig: vollst,
-            potenzial: Math.round(summe - aOut.kosten_eur - out.haus[s].wert) };
+          const pot = Math.round(summe - aOut.kosten_eur - out.haus[s].wert);
+          aOut.je_stufe[s] = { summe: Math.round(summe), vollstaendig: vollst, potenzial: pot,
+            /* v2431 · Marcel 19.10.2026: ein negatives Aufteilungspotenzial erscheint
+               nicht als Zahl, sondern mit seiner Erklaerung */
+            negativ: pot < 0, unter_haus: Math.round(summe) < Math.round(out.haus[s].wert) };
         }
+        const neg = Object.keys(aOut.je_stufe).filter((s) => aOut.je_stufe[s].negativ);
+        if (neg.length) aOut.negativ_hinweis = negativHinweis(aOut, out, neg);
         aOut.hinweis = 'Jede Wohnung als Eigentumswohnung mit dem Liegenschaftszins für Wohnungseigentum und ihrem Bodenwertanteil'
           + (out.wohnungen.some((r) => r.anteil_herkunft === 'Miteigentumsanteil') ? ' (Miteigentumsanteil)' : ' (nach Wohnfläche)')
           + '. Gewerbeeinheiten gehen mit ihrem Anteil am Hauswert in die Summe.';

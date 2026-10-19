@@ -502,10 +502,28 @@ router.post('/wertparameter/zinssatz', authenticate, async function (req, res) {
 /* v2430 · Zielbild/Potenzial: Ertragswert je Stufe (Bestand, Mieterhoehung, Zielbild).
    LESEND wie /wertparameter/zinssatz: kein Bericht, kein Kontingent, keine KI. Der
    Nutzer reist mit (fuer die Protokollzeile im MB-Dienst), nie aus dem Browser. */
+/* v2431 · Marcel 19.10.2026 (Geld): der Ertragswert gehoert zu Stufe 3. Gerechnet
+   wird nur mit Tarif Stufe 3 oder einem Bericht Stufe 3 fuer DIESES Objekt
+   (services/ertragswertFreigabe.js). Sonst fragt der Proxy den Dienst gar nicht
+   erst und meldet `ertragswert_gesperrt` - Mieten, Zielbild, Kosten und Rendite
+   rechnet das Frontend ohnehin selbst. Die Kennung kommt aus dem Body
+   (external_ref), gilt aber nur, wenn die Adresse des Berichts zum Objekt passt. */
+const ertragswertFreigabe = require('../services/ertragswertFreigabe');
 router.post('/potenzial', authenticate, async function (req, res) {
   try {
-    const body = Object.assign({}, req.body || {}, { user_id: req.user && req.user.id });
+    const b0 = req.body || {};
+    const obj = b0.object || b0.dealpilot || null;
+    const ref = b0.external_ref || (obj && (obj.id || obj.objId)) || null;
+    const fg = await ertragswertFreigabe.fuerObjekt(req.user.id, ref, obj);
+    if (!fg.ok) {
+      return res.json({ verfuegbar: false, ertragswert_gesperrt: true, freigabe: { ok: false, grund: fg.grund || null },
+        grund: ertragswertFreigabe.HINWEIS_KURZ, hinweis: ertragswertFreigabe.HINWEIS_LANG,
+        kennzeichnung: 'Potenzialwert nach Mieterhöhung bzw. Zielbild, keine Verkehrswertermittlung.',
+        stand: new Date().toISOString().slice(0, 10) });
+    }
+    const body = Object.assign({}, b0, { user_id: req.user && req.user.id });
     const out = await forward('POST', '/potenzial', { body: body });
+    if (out.data && typeof out.data === 'object') out.data.freigabe = { ok: true, weg: fg.weg, report_id: fg.report_id || null };
     res.status(out.status).json(out.data);
   } catch (e) { res.status(502).json({ verfuegbar: false, error: 'mb_unreachable', message: e.message }); }
 });

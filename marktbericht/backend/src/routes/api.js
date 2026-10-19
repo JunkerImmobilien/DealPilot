@@ -701,6 +701,32 @@ router.get('/objects/history', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+/* ══ v2431 · GET /objects/stufe3?user_id=…[&ref=…] — liegt ein Bericht Stufe 3 vor? ══
+ * Marcel 19.10.2026: der Ertragswert im Zielbild gehoert zu Stufe 3 (Geld).
+ * Erkannt wird Stufe 3 an der Stufe, mit der der Bericht ABGERECHNET wurde:
+ * der Proxy schreibt sie seit v1435 in overrides.wert_stufe, der Orchestrator
+ * legt sie in data.ref.wert_stufe ab (gemessen 19.10.2026: 154 Stufe-3-,
+ * 21 Stufe-2-, 111 Stufe-1-Staende, 16 ohne Angabe = vor v1435).
+ * NICHT an einem vorhandenen Ertragswert im Quercheck: vor dem Stufenschnitt
+ * trugen auch Berichte Stufe 2 einen - die waeren eine Freigabe ohne Bezahlung.
+ * Nur LESEND, nur intern (der Haupt-Backend-Proxy ruft es, kein Weg von aussen).
+ * Die Adresse geht mit: der Proxy prueft, ob der Bericht zum Objekt passt. */
+router.get('/objects/stufe3', async (req, res) => {
+  const uid = _uidAus(req);
+  if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
+  const ref = req.query.ref ? String(req.query.ref).slice(0, 64) : null;
+  try {
+    const r = await q(
+      'SELECT DISTINCT ON (external_ref) external_ref, address, report_id, created_at'
+      + ' FROM mb.object_snapshots'
+      + " WHERE user_id = $1 AND external_ref IS NOT NULL AND (data->'ref'->>'wert_stufe') = '3'"
+      + (ref ? ' AND external_ref = $2' : '')
+      + ' ORDER BY external_ref, created_at DESC',
+      ref ? [uid, ref] : [uid]);
+    res.json({ ref: ref, count: r.length, berichte: r });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 router.post('/verlauf-text', async (req, res) => {
   /* v1769: war parseInt(). users.id ist eine UUID — parseInt stuempelt
      sie zu ihrem Ziffernpraefix oder zu NaN, und dann sucht die Abfrage

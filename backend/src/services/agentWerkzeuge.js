@@ -55,6 +55,7 @@ const vorgaben = require('./botVorgabenService');   /* v1824 */
 const rechenkerne = require('./rechenkerne');       /* v1899: DealKpis/Dscr der App */
 const bewertungsText = require('./bewertungsText'); /* v1927: die KI-Einordnung */
 const avmHistorie = require('./avmHistoryService');  /* v1937: Marktpreisindikation */
+const ertragswertFreigabe = require('./ertragswertFreigabe');   /* v2431 */
 const config = require('../config');
 
 /* ═══ LESEN ═══════════════════════════════════════════════════════════ */
@@ -324,9 +325,19 @@ async function soll_ist_lesen(ctx, args) {
    Mieten je Stufe, Massnahmen, Kosten, Ertragswert je Stufe aus dem
    Marktbericht-Dienst. Gerechnet wird hier NICHTS - gelesen wird, was im
    Objekt steht, samt Stand. Ohne Ergebnis die Rohdaten je Wohnung. */
-function _potenzialKurz(d) {
+function _potenzialKurz(d, frei) {
   const p = d && d._potenzial;
-  const z = p && p.zusammenfassung ? p.zusammenfassung : null;
+  let z = p && p.zusammenfassung ? p.zusammenfassung : null;
+  /* v2431 · Marcel 19.10.2026 (Geld): ein im Objekt gespeicherter Ertragswert geht nur
+     mit Stufe 3 hinaus (Tarif oder Bericht Stufe 3 fuer DIESES Objekt, ertragswertFreigabe).
+     Sonst werden Ertragswert, Restnutzungsdauer und Aufteilung ausgeblendet - auch wenn
+     sie frueher einmal gerechnet wurden (Testphase, Tarifwechsel). */
+  const gesperrt = !!(z && (z.ertragswert_gesperrt || frei === false));
+  if (z && gesperrt) {
+    const st = {};
+    Object.keys(z.stufen || {}).forEach((k) => { st[k] = Object.assign({}, z.stufen[k], { ertragswert: null, rnd: null }); });
+    z = Object.assign({}, z, { stufen: st, aufteilung: null });
+  }
   const roh = [];
   const e = d && d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : [];
   e.forEach((w) => {
@@ -353,6 +364,8 @@ function _potenzialKurz(d) {
     wohnungen: z ? z.wohnungen : (roh.length ? roh : null),
     am_objekt: obj,
     ertragswert_gerechnet: !!(z && z.stufen && z.stufen.bestand && z.stufen.bestand.ertragswert != null),
+    ertragswert_gesperrt: gesperrt || undefined,
+    ertragswert_hinweis: gesperrt ? ertragswertFreigabe.HINWEIS_KURZ + '. ' + ertragswertFreigabe.HINWEIS_LANG : undefined,
     potenzial_netto: (z && z.stufen && z.stufen.bestand && z.stufen.bestand.ertragswert != null)
       ? (() => { const t = z.stufen.zielbild || z.stufen.mieterhoehung; return t && t.ertragswert != null ? Math.round(t.ertragswert - z.stufen.bestand.ertragswert - (t.kosten || 0)) : null; })()
       : null
@@ -367,16 +380,20 @@ async function potenzial_lesen(ctx, args) {
     if (!o) return { gefunden: false };
     ctx.merkeObjekt(id);
     const d = o.daten || {};
-    const pz = _potenzialKurz(d);
+    let frei = false;
+    try { frei = (await ertragswertFreigabe.fuerObjekt(ctx.userId, String(o.objekt_id || id), d)).ok; } catch (e) { frei = false; }
+    const pz = _potenzialKurz(d, frei);
     return { gefunden: true, id: o.objekt_id, adresse: _adrVon(o),
       potenzial: pz,
       so_sagen: pz ? null : 'Fuer dieses Objekt ist weder eine Soll-Miete noch ein Zielbild eingetragen. Das geht im Tab Objekt (ETW/EFH/ZFH) oder beim MFH je Wohnung im Fenster „Einheiten erfassen".' };
   }
   const r = await query('SELECT id, data FROM objects WHERE user_id = $1', [ctx.userId]);
   const liste = [];
+  let darf = () => false;
+  try { darf = await ertragswertFreigabe.pruefer(ctx.userId); } catch (e) { darf = () => false; }
   r.rows.forEach((z) => {
     let d = z.data; if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { d = {}; } }
-    const pz = _potenzialKurz(d || {});
+    const pz = _potenzialKurz(d || {}, darf(String(z.id), d || {}));
     if (!pz) return;
     liste.push({ id: z.id, adresse: [d.str, d.hnr].filter(Boolean).join(' ') + (d.ort ? ', ' + d.ort : ''),
       potenzial_netto: pz.potenzial_netto, ertragswert_gerechnet: pz.ertragswert_gerechnet, stufen: pz.stufen, aufteilung: pz.aufteilung,
@@ -385,7 +402,7 @@ async function potenzial_lesen(ctx, args) {
   liste.sort((a, b) => (b.potenzial_netto || 0) - (a.potenzial_netto || 0));
   return { anzahl: liste.length, objekte: liste.slice(0, 40),
     hinweis: 'Sortiert nach Wertzuwachs nach Kosten (Ertragswert Zielbild bzw. Mieterhoehung minus Bestand minus Massnahmenkosten). '
-      + 'Ohne gerechneten Ertragswert (ertragswert_gerechnet: false) nur die Mieten nennen. Immer als Potenzialwert kennzeichnen, keine Verkehrswertermittlung.' };
+      + 'Ohne gerechneten Ertragswert (ertragswert_gerechnet: false) nur die Mieten nennen; bei ertragswert_gesperrt: der Ertragswert je Stufe gehoert zu DealPilot Stufe 3, sachlich so sagen. Immer als Potenzialwert kennzeichnen, keine Verkehrswertermittlung.' };
 }
 
 async function pilot_analyse_lesen(ctx, args) {

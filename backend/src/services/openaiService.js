@@ -67,15 +67,24 @@ function _potenzialBlock(pz) {
       + ' | ' + (x.bmy != null ? x.bmy + ' %' : '-') + ' | ' + (x.dscr != null ? x.dscr : '-')
       + ' | ' + (x.rnd != null ? Math.round(x.rnd) + ' J.' : '-') + ' | ' + (x.ertragswert != null ? e(x.ertragswert) : 'nicht gerechnet'));
   });
-  if (!pz.ertragswert_gerechnet) z.push('Die Ertragswerte sind fuer diesen Stand nicht gerechnet - nenne keine Ertragswerte, nur die Mieten.');
-  if (pz.aufteilung && pz.aufteilung.je_stufe) {
+  /* v2431 · ohne Stufe 3 gibt es keinen Ertragswert (Marcel 19.10.2026) */
+  if (pz.ertragswert_gesperrt) z.push('Ertragswert je Stufe gibt es mit DealPilot Stufe 3 (Wertermittlung nach ImmoWertV); fuer dieses Objekt liegt sie nicht vor.'
+    + ' Nenne KEINEN Ertragswert, keine Restnutzungsdauer und kein Aufteilungspotenzial - nur Mieten, Massnahmen, Kosten, Rendite und Cashflow.'
+    + ' Ein sachlicher Halbsatz, dass der Ertragswert je Stufe mit Stufe 3 erscheint, genuegt; keine Werbung.');
+  else if (!pz.ertragswert_gerechnet) z.push('Die Ertragswerte sind fuer diesen Stand nicht gerechnet - nenne keine Ertragswerte, nur die Mieten.');
+  if (pz.aufteilung && pz.aufteilung.je_stufe && !pz.ertragswert_gesperrt) {
     var a = pz.aufteilung;
     z.push('Aufteilung in Eigentumswohnungen (Summe der Wohnungen als ETW, Zins ' + (a.zins_etw != null ? a.zins_etw + ' %' : '-')
+      + (a.zins_etw_ausschuss ? ' des ' + a.zins_etw_ausschuss.replace(/^Der\s+/, '') : '')
+      + (a.zins_haus != null ? ', Haus ' + a.zins_haus + ' %' : '')
       + ', Kosten der Aufteilung ' + e(a.kosten) + '):');
     Object.keys(a.je_stufe).forEach(function (k) {
       var y = a.je_stufe[k];
-      z.push('  ' + k + ': Summe ' + e(y.summe) + ', Potenzial nach Kosten gegen Haus als Ganzes ' + e(y.potenzial));
+      /* v2431 · negativ = kein Potenzial, mit Begruendung statt Minusbetrag */
+      z.push('  ' + k + ': Summe ' + e(y.summe) + ', ' + (y.potenzial < 0 ? 'KEIN Aufteilungspotenzial (nach Kosten unter dem Haus als Ganzes)'
+        : 'Potenzial nach Kosten gegen Haus als Ganzes ' + e(y.potenzial)));
     });
+    if (a.negativ_hinweis) z.push('  Begruendung (so wiedergeben, keinen Minusbetrag als Potenzial nennen): ' + a.negativ_hinweis);
   }
   if (Array.isArray(pz.wohnungen) && pz.wohnungen.length > 1) {
     z.push('');
