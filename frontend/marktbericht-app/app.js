@@ -1293,6 +1293,14 @@ function render(out) {
      Kundenbild - Anbieter-Neutralität: kein Dienstleistername nach außen. */
   $('aiMode').textContent = out.ai_mode ? '· ' + (out.ai_mode === 'schnell' ? 'Kurzfassung' : 'KI-Auswertung') + (out.ai_error ? ' (Text nicht verfügbar)' : '') : '';
   $('reportMd').innerHTML = mdToHtml(out.report_md || '');
+  /* v2387 · Stufe 1 (Schnellmodus) ist die Marktpreisindikation der Objektkarte -
+     kein Bericht, kein PDF. Den Marktbericht gibt es ab Stufe 2. */
+  try {
+    var _st1 = out.ai_mode === 'schnell';
+    if ($('pdfBtn')) $('pdfBtn').style.display = _st1 ? 'none' : '';
+    if (_st1) $('reportMd').innerHTML = '<p><b>Stufe 1 · Marktpreisindikation.</b> Sie steht auf der Objektkarte in DealPilot. '
+      + 'Einen Marktbericht mit Lage, Markt und Text gibt es ab <b>Stufe 2</b>, die Wertermittlung nach ImmoWertV in <b>Stufe 3</b>.</p>';
+  } catch (e) {}
   renderProvenance(out);
   window._lastOut = out;
   try { _installMbSaveObject(); } catch (e) {}
@@ -2360,7 +2368,10 @@ async function _mbLoadReportsList(opts){
   try{
     var res=await fetch(API + '/objects/history' + (qs?('?'+qs):''), { headers:_mbAuth() });
     var j=await res.json();
-    var reps=((j&&j.history)||[]).filter(function(h){ return h && h.report_id!=null; });
+    /* v2387 · Stufe 1 ist KEIN Bericht (Marcel 19.10.2026: „das, was jetzt auf der
+       Karte angezeigt wird … da wuerde ich gar keinen Bericht machen"). Ihre Werte
+       stehen weiter in mb.object_snapshots, in der Liste der Berichte stehen sie nicht. */
+    var reps=((j&&j.history)||[]).filter(function(h){ return h && h.report_id!=null && h.ai_mode!=='schnell'; });
     reps.sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); });
     if(!reps.length){
       host.innerHTML=head(0)+'<div class="mbrep-list"><div class="mbrep-empty">'
