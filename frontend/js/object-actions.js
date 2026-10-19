@@ -1724,8 +1724,38 @@
   /* ── Merge (Zeilen mit kind: input|select|star) ── */
   var _merged = {};   // id -> { label, value(display), raw, source, kind, emptyOnly, range? }
   var _addrChoice = null;
+  /* v2376 · Zahlen in der Uebernahme-Tabelle lesbar: „Kaltmiete 4321" stand ohne
+     Einheit und ohne Tausenderpunkt (Marcel 19.10.2026: „das wird bei allen
+     Uebergaben so sein"). EINE Stelle fuer alle Wege (Expose, Sprache, ImmoMetrica,
+     gefuehrte Eingabe): die Einheit kommt aus dem Formularfeld selbst (.iw > .pfx/.sfx
+     oder „(m²)"/„(%)" im Label). Nur reine Zahlen; Jahreszahlen und Zahlen ohne
+     Einheit bleiben unberuehrt (kein Intl auf Baujahr). raw bleibt unveraendert. */
+  function _anzeigeMitEinheit(id, display) {
+    try {
+      var t = String(display).trim();
+      if (!/^-?\d+([.,]\d+)?$/.test(t)) return display;
+      var el = document.getElementById(id); if (!el) return display;
+      var iw = el.closest ? el.closest('.iw') : null, einheit = '';
+      if (iw) {
+        var u = iw.querySelector('.pfx,.sfx,.unit');
+        if (u) einheit = String(u.textContent || '').trim();
+      }
+      if (!einheit) {
+        var f = el.closest ? el.closest('.f,.fg,.form-group') : null, l = f ? f.querySelector('label') : null;
+        var m = l ? /\((€[^)]*|%[^)]*|m²)\)/.exec(l.textContent || '') : null;
+        if (m) einheit = m[1];
+      }
+      if (!einheit || !/€|%|m²/.test(einheit)) return display;
+      var n = Number(t.indexOf(',') >= 0 ? t.replace(/\./g, '').replace(',', '.') : t);
+      if (!isFinite(n)) return display;
+      var nk = /€/.test(einheit) && Math.round(n) !== n ? 2 : 0;
+      var z = n.toLocaleString('de-DE', { minimumFractionDigits: nk, maximumFractionDigits: /%/.test(einheit) ? 3 : 2 });
+      return z + ' ' + einheit;
+    } catch (e) { return display; }
+  }
   function addRow(id, label, display, raw, source, kind, emptyOnly) {
     if (display == null || display === '' || raw == null || raw === '' || raw === 0 && kind === 'star') return;
+    if ((kind || 'input') === 'input') display = _anzeigeMitEinheit(id, display);
     if (_merged[id] && _merged[id].source === 'Marktbericht' && source !== 'Marktbericht') return;
     _merged[id] = { label: label, value: display, raw: raw, source: source, kind: kind || 'input', emptyOnly: !!emptyOnly };
   }
