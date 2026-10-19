@@ -2,7 +2,7 @@
   "stand": "2026-10-17",
   "form": "UK(Objekt)/UK(Bezugsgroesse) = (Flaeche/Bezugsgroesse)^b",
   "herkunft": "DealPilot-Naeherung aus amtlichen Umrechnungstabellen der Gutachterausschuesse (Register), Median der Exponenten je Tabelle",
-  "stufe": "D",
+  "stufe": "N",
   "gilt_fuer": {
     "objektarten": [
       "efh",

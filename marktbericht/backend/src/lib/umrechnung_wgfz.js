@@ -190,7 +190,7 @@ export function wgfzAnpassung({ ags, objektart, brw_eur_qm, wgfz_zone, wgfz_obje
   };
 }
 
-/* ══ v2375 · DIE DEALPILOT-FORMEL FUER DIE WGFZ (Stufe D) ════════════════════
+/* ══ v2375 · DIE DEALPILOT-FORMEL FUER DIE WGFZ (Stufe N) ════════════════════
    Abgeleitet aus allen amtlichen WGFZ-Tabellen des Registers
    (tools/uk-wgfz-naeherung-ableiten.mjs -> uk-wgfz-naeherung.json):
      UK(Objekt)/UK(Richtwert) = (WGFZ Objekt / WGFZ Richtwert)^b, b = 0,501
@@ -227,7 +227,7 @@ export function wgfzNaeherung({ objektart, brw_eur_qm, wgfz_zone, wgfz_objekt })
   const faktor = Math.round(Math.pow(r, b) * 10000) / 10000;
   const bwQm = brw > 0 ? Math.round(brw * faktor * 100) / 100 : null;
   return {
-    verfuegbar: true, amtlich: false, naeherung: true, stufe: N.stufe || 'D',
+    verfuegbar: true, amtlich: false, naeherung: true, stufe: N.stufe || 'N',
     wgfz_zone: wz, wgfz_objekt: wo, uk_zone: 1, uk_objekt: faktor, faktor, begrenzt: false,
     bodenwert_eur_qm: bwQm, weg: 'DealPilot-Formel (WGFZ)', exponent: b,
     quelle: { ausschuss: null, quelle_url: null, seite: null, jahrgang: N.stand || null, lizenz: null,

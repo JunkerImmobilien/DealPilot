@@ -144,7 +144,7 @@ const aus = {
   stand: new Date().toISOString().slice(0, 10),
   form: 'UK(Objekt)/UK(Bezugsgroesse) = (Flaeche/Bezugsgroesse)^b',
   herkunft: 'DealPilot-Naeherung aus amtlichen Umrechnungstabellen der Gutachterausschuesse (Register), Median der Exponenten je Tabelle',
-  stufe: 'D',
+  stufe: 'N',   /* v2401 · eigene Stufe N (DealPilot-Formel), vorher D */
   /* v2360 · Marcel 17.10.2026: „fuer Mehrfamilienhaeuser muessen wir die Formel fuer den
      Koeffizienten auf jeden Fall mit hinzunehmen". mfh gilt als UEBERTRAGUNG aus dem
      individuellen Wohnungsbau (die Tabellen sind IfW) - nur in Zonen bis II Vollgeschosse,

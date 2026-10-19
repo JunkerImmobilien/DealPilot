@@ -179,7 +179,7 @@ const aus = {
   form: 'UK(WGFZ Objekt)/UK(WGFZ Richtwert) = (WGFZ Objekt / WGFZ Richtwert)^b',
   herkunft: 'DealPilot-Naeherung aus allen amtlichen WGFZ-Umrechnungstabellen und -formeln des Registers (Werte und interne Stuetzstellen), Median der Exponenten je Kurve; gleiche Zahlenreihen einmal gezaehlt',
   kennzeichnung: 'abgeleitet aus der DealPilot-Formel (nie amtlich)',
-  stufe: 'D',
+  stufe: 'N',   /* v2401 · eigene Stufe N (DealPilot-Formel), vorher D */
   empfehlung: 'Ein Exponent fuer den Geschosswohnungsbau (b = ' + (gwb && gwb.b) + ' aus ' + (gwb && gwb.tabellen) + ' Kurven, ' + (gwb && gwb.laender.length) + ' Laender). '
     + 'Individueller Wohnungsbau getrennt waere flacher (b = ' + (ifw && ifw.b) + '), aber nur ' + (ifw && ifw.tabellen) + ' Kurven aus ' + (ifw && ifw.laender.join('/')) + ' - zu wenig; dort rechnen die Ausschuesse ueber die Flaeche, keine WGFZ-Naeherung. '
     + 'Gewerbe/Geschaeft nicht einbezogen (b = ' + (gewerbe && gewerbe.b) + ', fast proportional). '
