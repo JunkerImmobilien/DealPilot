@@ -7461,12 +7461,15 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
      Im Quick-Check gilt nur Stufe 1. Stufe 2 und 3 stehen da, damit die
      Kachel dieselbe ist - ausgegraut, durchgestrichen, mit Tooltip. -->
 <style id="qc-v2420-dp-stufen">
+/* .on und .qc-stufe-aus mit :root body - sonst verlieren sie gegen die
+   helle Kartei-Regel (body.dp-neue-karte …, gemessen: Pille 1 #2A2727
+   statt #050505, Pillen 2/3 opacity 1 statt .45). */
 .dp-pfbar .qc-dp-stufen{ display:inline-flex; gap:3px; margin-left:8px; vertical-align:middle; flex:0 0 auto; }
 .dp-pfbar .qc-dp-stufen .dp-pf-pille{ display:inline-grid; place-items:center; width:18px; height:18px; box-sizing:border-box; border-radius:50%;
   border:1px solid rgba(243,234,208,.45); font:600 10px/1 "JetBrains Mono",monospace; font-style:normal; color:#f3ead0; opacity:.75; cursor:default; }
 body.dp-neue-karte .dp-pfbar .qc-dp-stufen .dp-pf-pille{ border-color:#b9b2aa; color:#2A2727; opacity:1; }
-.dp-pfbar .qc-dp-stufen .dp-pf-pille.on{ background:var(--wl-c9a84c, #C9A84C); border-color:var(--wl-c9a84c, #C9A84C); color:#050505; opacity:1; }
-.dp-pfbar .qc-dp-stufen .dp-pf-pille.qc-stufe-aus{ opacity:.45; text-decoration:line-through; border-style:dashed; cursor:not-allowed; }
+:root body .dp-pfbar .qc-dp-stufen .dp-pf-pille.on{ background:var(--wl-c9a84c, #C9A84C); border-color:var(--wl-c9a84c, #C9A84C); color:#050505; opacity:1; }
+:root body .dp-pfbar .qc-dp-stufen .dp-pf-pille.qc-stufe-aus{ opacity:.45; text-decoration:line-through; border-style:dashed; cursor:not-allowed; }
 </style>
 <!-- ── v1665g · DIE KARTEI GILT AUCH HIER — ABER NUR SIE ──────────────
      Marcel: „ImmoMetrica, Expose, Marktbericht — das sieht nicht so aus
