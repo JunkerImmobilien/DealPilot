@@ -4135,6 +4135,14 @@
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 auto;min-height:0}',
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-chat,',
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-stand{height:100%;min-height:180px}',
+      /* v2379 · TEXT UEBER TEXT im Modul-25-Video (Marcel 19.10.2026). GEMESSEN bei
+         653 px Fensterhoehe: die Buehne schrumpft auf 193 px, ihre Rasterzeile blieb
+         aber „auto" = 220 px (min-height 180 + Inhalt) - Chat und „Was schon steht"
+         ragten 27 px aus der Buehne in Mikrofonzeile und Leiste. Die Zeile nimmt jetzt
+         genau die Buehnenhoehe, beide Spalten scrollen in sich. */
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{grid-template-rows:minmax(0,1fr)}',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-buehne > .vi-rf-chat,',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-buehne > .vi-rf-stand{min-height:0}',
       /* ═══ v1303 · Tablet: die Liste war breiter als das Gespräch ═════════
          Marcels Vorgabe vom 11.09.2026: „wichtig ist auch, dass beide
          Sprachaufzeichnungen für Tablet und Handy funktionieren."
