@@ -38859,6 +38859,61 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Video:** `Dateien/Messe/Videos/Videoreihe/Modul 25 - Gefuehrte Eingabe/DealPilot Modul 25 - Gefuehrte Eingabe.mp4` (8:53, 18,5 MB); vertont (onyx, Pirate-Vibe, Hochdeutsch, 38 Abschnitte, −16,3 LUFS) unter `Videoreihe-Sprecher/…` (25,1 MB) mit `texte.json` und STAND.md. Beide als MP4 auf Staging (md5 geprüft). Prod nicht angefasst.
 - **Rest:** In der App aufgefallen, nicht geändert: die Liste „Was schon steht“ beschriftet beim MFH die Bewirtschaftungskosten als „Hausgeld“; die Übersicht nennt getippte Antworten „Sprachaufzeichnung“; der Bodenrichtwert im Chat steht ohne Tausenderpunkt („1150 €/m²“); Zwischenstand-Wörter in Versalien („SCHWACH“, „GUT“) neben „Solide“/„Gut“ im Reiter. Der alte Rohschnitt `roh-modul-25.mp4` (Herford) liegt noch im Ordner.
 
+### v2368–v2394 · Geführte Eingabe, Marktbericht-Prüfung, Herkunftsstufen, Videothek mit Sprecher (19.10.2026) + Prod-Rollout (52), (52a)
+
+**Was:**
+- **Geführte Eingabe:**
+  - v2368: Einheiten in „Was schon steht“; „Nein, das reicht“ trifft das Feinheiten-Angebot.
+  - v2369/v2378: Abruf-Angebot und „Erklär mir das“ im Chat, ohne Symbole, nach der Wahl weg.
+  - v2379: Bei 653 px Höhe ragten Chat und Liste 27 px aus der Bühne („Text über Text“). Lösung: `grid-template-rows: minmax(0,1fr)`.
+  - v2376: Die Übernahme-Tabelle zeigt Zahlen mit Einheit und Tausenderpunkt.
+- **Bodenrichtwert:** v2370: gebührenpflichtiger BRW (Bayern, z. B. Stadt Nürnberg) mit Hinweis und Link zum Portal. Dazu die Ernte-Regel „kostenpflichtig = direkter Absprung“ in `register-ernte.md`.
+- **Marktbericht:**
+  - v2380–v2386 (Agent): Befunde der Prüfung 3 Objekte × 3 Stufen (Berichte 221–231) behoben, nämlich:
+    - Beschriftung „Kaufpreissammlung“
+    - LZS-Zweig für Häuser
+    - Ist-Miete im Band min(amtlich, Angebot)·0,7 bis max·1,3
+    - führendes Verfahren
+    - MFH-Korrekturen NHK
+    - `ze` im Rohertrag
+    - Abschlag nur auf den Angebotsteil
+    - PDF-Kommas, KI-Text
+  - v2387: Stufe 1 ist nur die Karte, kein Bericht, kein PDF; die Werte bleiben in `mb.object_snapshots`.
+  - v2390 (Agent): LZS-Ebenen unter A im Klartext mit dem Weg „genauer“; GND/BWK aus dem Zinssatz-Satz; BRW-Herkunft „eigene Angabe“; Pauschal-Sachwert vorläufig; C-Beschriftung.
+  - v2392: Feldhilfe zu § 256 neutral formuliert.
+  - v2394: ETW in einem Objekt mit ≤ 2 WE (Minden-Lübbecke) bekommt den amtlichen ZFH-Zins statt § 256 (Hüllhorst 3,0 % D → 2,4 % A, EW 432.000 → 410.000 €).
+- **WGFZ:**
+  - v2373/v2375 (Ernte): 106 Werte, 1.263 Sätze.
+  - v2375: Kern `wgfzNaeherung`, b = 0,498.
+  - v2377: Formel verdrahtet. Rangfolge: amtlich > örtliche Tabelle (auch übertragen) > Formel.
+  - v2378: `bericht_hinweis` für abgedruckte Tabellen.
+- **Übernahme:** v2393/a/b: Die Herkunftsstufe (A amtlich … vorläufig/Indikation) steht im Dropdown der Verkehrswert-Übernahme, dazu eine Pille mit Tooltip.
+- **Hilfe:** v2391: Hilfe und Pilot erklären Stufe 1/2/3 und die Herkunftsstufen A–E.
+- **Videothek:**
+  - `landing-videothek-4`: jedes Video mit und ohne Sprecher, Umschalter im Kinofenster.
+  - Modul 25 neu (MFH Fürth, DS 60 SOLIDE / IDS 79 GUT).
+
+**Commit:** Prod-Merge `af9eca4a` (52) und `b1ccda15` (52a: Gold-Literal der Pille → Token).
+
+**Nachweis:**
+- Prod-Sicherung `main-20261019-0906-r52` (73 Tabellen) und `mb-…-r52` (32).
+- Gold-Audit RC 0 (nach 52a; 52 hatte 1 neues Literal in `objekt-reiter.js`); `auth/me` 401.
+- 28 × `datei_ton`, alle 56 MP4 per md5 auf beiden Servern.
+- Staging-Läufe 263–266: W EW 725.000 / LZS 2,5 A / SW 526.864 vorläufig / MW 795.000; H EW 410.000 / LZS 2,4 A.
+
+**Rest:**
+- Die Videos 15, 23, 10b, 21 werden neu aufgenommen (Agent läuft).
+- Kleinigkeiten in der geführten Eingabe: beim MFH „Hausgeld“, getippte Antworten heißen „Sprachaufzeichnung“, BRW ohne Tausenderpunkt.
+- BW-WGFZ-Werte stützen sich allein auf die Aktennotiz zur Freigabe; das LGL-Infoblatt schließt die kommerzielle Nutzung aus.
+- Cottbus bleibt Sperre.
+- Gewerbe-Ertragswert liest die GND des Satzes noch nicht.
+
+**Marcels Entscheidungen 19.10.:**
+- LZS gibt es immer, gekennzeichnet (CLAUDE.md); kein Entfall des Ertragswerts.
+- Vorläufiger Sachwert darf führen.
+- NRW-BWK-Quote aus der Stichprobe gilt als Modellansatz.
+- Abgedruckte Tabellen privater Anbieter zählen, mit Verweis.
+
 ### v2390 · Marktbericht: Zinsherkunft im Klartext, GND/BWK des Zinssatzes, BRW-Herkunft, Pauschal-Sachwert vorläufig (19.10.2026, Staging, nicht ausgerollt)
 
 - **Was (Marcels Entscheidungen vom 19.10.2026):**
