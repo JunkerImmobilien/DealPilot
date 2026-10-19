@@ -2831,7 +2831,7 @@
       },
       async function (s) {   /* 8 · Absprünge */
         await zeige(function () { return r6Knopf('#bmfOverlay .bmfmo-pane.active', /Restnutzungsdauer berechnen/) || r6BmfPane(); }, 8);
-        await b2oZeile(s, 'Die Absprünge', '<b>Restnutzungsdauer berechnen</b> öffnet den Rechner aus Modul 10a. Dazu PDF der Aufteilung, die ausgefüllte BMF-Arbeitshilfe und das Original als Excel.');
+        await b2oZeile(s, 'Die Absprünge', '<b>Restnutzungsdauer berechnen</b> öffnet den Rechner aus Modul 10c. Dazu PDF der Aufteilung, die ausgefüllte BMF-Arbeitshilfe und das Original als Excel.');
       },
       async function (s) {   /* 9 · Übernehmen -> Reiter Steuer */
         var tb = q('#bmfOverlay .bmfmo-tab[data-pane="p-hebel"]'); if (tb) tb.click();
