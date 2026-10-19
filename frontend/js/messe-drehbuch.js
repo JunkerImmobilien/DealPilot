@@ -4818,26 +4818,71 @@
      für den Lauf auf 1 - sonst hängt die Wertermittlung (Stufe 3) hinten an;
      rhAufraeumen stellt sie zurück. Freisprechen aus (hier wird getippt), das
      Mikrofon ist ohnehin ein stummer Strom. Das angelegte Objekt löscht
-     rhAufraeumen, wie in 03-05. Jeder Antwortschritt steht in DPM_REIHE.r25. */
+     rhAufraeumen, wie in 03-05. Jeder Antwortschritt steht in DPM_REIHE.r25.
+
+     v2373 · NEUES BEISPIEL (Marcel 19.10.2026): ein Mehrfamilienhaus, das am Ende
+     im Reiter Bewertung mit Deal Score SOLIDE und Investor Deal Score GUT steht -
+     sichtbar „wandert" es von der einen Stufe zur anderen. Die Eingaben sind VORAB
+     mit den echten Kernen gerechnet (node + vm: deal-kpis.js DealKpis.compute,
+     dealscore.js computeFromKpis, dealscore2.js compute, score-tiers.js; beide Wege
+     - Zwischenstand im Chat wie voice-import _rfKennzahlen/_rfScore1/_rfScore2 und
+     Reiter Bewertung wie _buildDeal2FromState; Profil: Nebenkosten 12,27 %,
+     Mietausfall 1 %, Gewichte ab Werk):
+       6 WE, 420 m², Bj 1972, 3 VG, KP 590.000, NKM 3.150/Mon, BWK 17.500/J davon
+       8.500 nicht umlagefähig, EK 150.000, 3,6 % / 2 % / 10 J, Mietsteigerung 2 %,
+       Zustand gut, Energie D, B-Lage, Straße gut, Mietausfall niedrig, Bevölkerung
+       wachsend, Nachfrage stark, Wertsteigerung mittel, eine starke Entwicklungs-
+       möglichkeit (Dachgeschoss)
+       -> Cashflow v. St. +19 €/Mon, NMR 4,4 %, LTV 86,8 %, DSCR 1,32
+       -> Deal Score 64 SOLIDE (Cashflow 55, Rendite 79, LTV 58, DSCR 88, Potenzial 40)
+       -> Investor Deal Score 75 GUT (Rendite 54, Finanzierung 95, Risiko 88, Lage 77, Upside 69)
+     Empfindlichkeit gerechnet: Mietsteigerung 1,5 % statt 2 % -> 62/74, Energie E,
+     Zustand normal oder Bevölkerung stabil je -> DS2 74, Entwicklung begrenzt -> 73;
+     der eigene Teil 9.000 statt 8.500 -> 60/73; die drei schlechtesten Lesarten
+     zusammen -> 62/72. Im Bild steht immer, was die App rechnet
+     (Regel 1) - die Rechnung oben ist die Wahl der Eingaben, nicht der Text.
+     Der Mitschnitt gefuehrt25 muss zu DIESEN Antworttexten passen (Schlüssel = Text):
+     nach jeder Änderung hier ?messe=reihe-gefuehrt&mitschnitt=25 neu laufen lassen. */
   var R25 = {
-    adresse: 'Sachsenstraße 18, 32052 Herford',
-    art: 'Eigentumswohnung, 100 Quadratmeter',
-    details: '3 Zimmer, 4 Vollgeschosse',
-    bjkp: 'Baujahr 1998, Kaufpreis 180.000 Euro',
-    miete: '750 Euro kalt im Monat',
-    fin: '40.000 Euro Eigenkapital, 3,8 Prozent Zins, 2 Prozent Tilgung, 10 Jahre fest',
+    adresse: 'Sachsenstraße 20, 32052 Herford',
+    art: 'Mehrfamilienhaus, 420 Quadratmeter Wohnfläche',
+    details: '6 Wohneinheiten, 3 Vollgeschosse',
+    bjkp: 'Baujahr 1972, Kaufpreis 590.000 Euro',
+    miete: '3.150 Euro kalt im Monat',
+    fin: '150.000 Euro Eigenkapital, 3,6 Prozent Zins, 2 Prozent Tilgung, 10 Jahre fest',
     einst: 'Übernimm die Werte aus den Einstellungen',
     klasse: 'B-Lage',
     lage: 'Region durchschnittlich, Straße gut',
-    zustand: 'Guter Zustand, Energieklasse C',
-    san: 'Keine Sanierung, die Einbauküche für 3.000 Euro',
-    grund: '1.200 Quadratmeter, Miteigentumsanteil 12 Prozent, kein Erbbaurecht',
-    hausgeld: '250 Euro im Monat, davon 100 nicht umlagefähig',
+    zustand: 'Guter Zustand, Energieklasse D',
+    san: 'Keine Sanierung, nichts wird mitverkauft',
+    grund: '780 Quadratmeter, kein Erbbaurecht',
+    bwk: '17.500 Euro im Jahr, davon 8.500 nicht umlagefähig',
+    langfrist: 'Mietsteigerung 2 Prozent, Wertsteigerung 1,5 Prozent, Leerstand 2 Prozent',
     ausfall: 'Niedrig',
-    ort: 'Bevölkerung stabil, Nachfrage mittel, Wertsteigerung mittel, Entwicklung begrenzt',
+    ort: 'Bevölkerung wachsend, Nachfrage stark, Wertsteigerung mittel, eine starke Entwicklungsmöglichkeit: das Dachgeschoss',
     weissNicht: 'Weiß ich nicht',
-    sicht: 'Ruhige Wohnlage nah am Zentrum, Risiko ist die Heizung von 1998'
+    sicht: 'Sechs Wohnungen verteilen das Mietrisiko, Risiko ist das Dach von 1972'
   };
+  /* v2373 · v2369 stellt das Abruf-Angebot (Marktpreisindikation, Bodenrichtwert,
+     Lage) als Auswahl-Blase IN DEN CHAT (.vi-rf-abruf, Knöpfe .vi-rf-abruf-b[data-akt]).
+     Gewählt wird hier NUR „Nein, überspringen" (data-akt="ueberspringen") - jeder
+     andere Knopf wäre ein Abruf. Beim ersten Mal mit einer Zeile, danach still. */
+  var _r25s = null, _r25AbrufGesagt = 0;
+  function r25AbrufBlase() { var e = q('#vi-rf-chat .vi-rf-abruf'); return e && e.offsetWidth ? e : null; }
+  async function r25AbrufWeg() {
+    var b = r25AbrufBlase(); if (!b || !b.querySelector('.vi-rf-abruf-b[data-akt="ueberspringen"]')) return false;
+    var kn = [].map.call(b.querySelectorAll('.vi-rf-abruf-b'), function (x) { return x.getAttribute('data-akt') === 'ueberspringen' ? '' : ((x.firstChild && x.firstChild.nodeType === 3 ? x.firstChild.textContent : x.textContent) || '').trim(); }).filter(Boolean);
+    if (!_r25AbrufGesagt && _r25s) {
+      _r25AbrufGesagt = 1;
+      await zeige(r25AbrufBlase, 8);
+      await b2oZeile(_r25s, 'Auf Wunsch abrufen', 'Was DealPilot selbst holen kann, bietet es im Chat an' + (kn.length ? ' — <b>' + kn.join(' · ') + '</b>' : '') + '. Hier: <b>„Nein, überspringen“</b>.');
+    }
+    var n = r25AbrufBlase(), k = n && n.querySelector('.vi-rf-abruf-b[data-akt="ueberspringen"]');
+    DPM_REIHE.r25abruf = (DPM_REIHE.r25abruf || []).concat([{ angebot: kn, geklickt: k ? 'ueberspringen' : null, frage: r25Frage().slice(0, 60) }]);
+    if (k) k.click();
+    await warte(900);
+    return !!k;
+  }
   function r25Frage() { var e = q('#oabi-ov .vi-rf-frage-txt'); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; }
   function r25Bereich() { return b2oHuelle(q('#vi-rf-frage'), q('#oabi-ov .vi-rf-zeile')); }
   function r25Uebersicht() { return [].filter.call(document.querySelectorAll('#oabi-ov button'), function (x) { return x.offsetWidth && /Zur Übersicht/.test(x.textContent); })[0] || null; }
@@ -4860,6 +4905,9 @@
      (Messhinweis: nach Adresse, Basis und Lage kommen Zwischenstände -
      erst weiter, wenn sich die Frage wirklich geändert hat) */
   async function r25Antwort(text, bisUebersicht) {
+    /* v2373 · ein offenes Abruf-Angebot im Chat zuerst ausdrücklich überspringen (v2369, v2368:
+       sonst kann eine getippte Antwort beim Angebot statt bei der Frage landen) */
+    if (r25AbrufBlase()) { await r25AbrufWeg(); await zeige(r25Bereich, 6); }
     var f0 = r25Frage(), inp = q('#vi-rf-in'), t0 = Date.now();
     if (!inp) { DPM_REIHE.r25 = (DPM_REIHE.r25 || []).concat([{ antwort: text, fehler: 'kein Eingabefeld' }]); return false; }
     inp.value = ''; inp.dispatchEvent(new Event('input', { bubbles: true }));
@@ -4880,13 +4928,14 @@
   /* mehrere Antworten am Stück, der Kegel auf Frage, Verlauf und Eingabe */
   async function r25Reihe(liste) { for (var i = 0; i < liste.length; i++) { await zeige(r25Bereich, 6); await r25Antwort(liste[i]); } }
   DREHBUECHER['reihe-gefuehrt'] = {
-    titel: 'Die geführte Eingabe', unterzeile: 'Frage für Frage zum fertigen Objekt — mit Zwischenständen', objekt: null,
+    titel: 'Die geführte Eingabe', unterzeile: 'Ein Mehrfamilienhaus, Frage für Frage — bis zu Deal Score und Investor Deal Score', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
     aufraeumen: rhAufraeumen,
+    /* v2373 · jede Szene meldet ihr s an r25AbrufWeg (die Zeile zum Abruf-Angebot) */
     szenen: [
       async function (s) {   /* 1 · neues Objekt, die Kachel */
         await rhStart(0);
-        _rh.gef25 = 1; _rh.stumm = 1;
+        _rh.gef25 = 1; _rh.stumm = 1; _r25AbrufGesagt = 0;
         try { _rh.mitschnitt = new URLSearchParams(location.search).get('mitschnitt') === '25'; } catch (e) {}
         try { DealPilotObjektReiter.zielSetzen(1); } catch (e) {}
         await zeige(function () { return q('#oab-bar'); }, 8);
@@ -4934,7 +4983,7 @@
         /* v2372c · GEMESSEN: #vi-rf-frage ist hier ausgeblendet (der Streifen erscheint erst, wenn die
            Frage aus dem Verlauf gescrollt ist) - der Kegel blieb unsichtbar. Dann die letzte Co-Pilot-Blase. */
         await zeige(function () { var e = q('#vi-rf-frage'); if (e && e.offsetWidth) return e; var b = document.querySelectorAll('#vi-rf-chat .vi-rf-blase.vi-rf-co'); return b[b.length - 1] || null; }, 8);
-        await b2oZeile(s, 'Die Art bestimmt die Fragen', 'Eine Eigentumswohnung — also fragt DealPilot nach: <b>' + f.replace(/^Und noch zum Objekt:\s*/, '') + '</b>');
+        await b2oZeile(s, 'Die Art bestimmt die Fragen', 'Ein Mehrfamilienhaus — also fragt DealPilot nach: <b>' + f.replace(/^Und noch zum Objekt:\s*/, '') + '</b>');
         await r25Reihe([R25.details, R25.bjkp]);
       },
       async function (s) {   /* 5 · Miete -> Deal Score */
@@ -4988,16 +5037,18 @@
       },
       async function (s) {   /* 9 · Feinschliff */
         await zeige(r25Bereich, 6);
-        var zb = r6Beginn(s, 'Etappe 4 · Feinschliff', 'Das Hausgeld — so, wie man es kennt: im Monat.');
-        await r25Antwort(R25.hausgeld);
+        /* v2373 · Mehrfamilienhaus: kein Hausgeld, sondern die Bewirtschaftungskosten im Jahr
+           (_rfNachArt fragt beim MFH „wie viel davon ist nicht umlagefähig") */
+        var zb = r6Beginn(s, 'Etappe 4 · Feinschliff', 'Die Bewirtschaftungskosten im Jahr — und wie viel davon nicht umlagefähig ist.');
+        await r25Antwort(R25.bwk);
         await r6Ende(zb);
-        var hz = function () { return r25StandZeile(/^\s*✓?\s*Hausgeld/); };
+        var HZ = /^\s*✓?\s*(Hausgeld|Bewirtschaftung\w*)/;
+        var hz = function () { return r25StandZeile(HZ); };
         await zeige(function () { return hz() || q('#vi-rf-stand'); }, 8);
-        var hw = hz(), hv = hw ? hw.textContent.replace(/\s+/g, ' ').replace(/^\s*✓?\s*Hausgeld\s*/, '').trim() : '';
-        /* v2372 · GEMESSEN: die Liste zeigt „1800 · 1200" ohne Einheit - im Text mit € und Tausenderpunkt */
-        var hm = /^([\d.]+)\s*·\s*([\d.]+)$/.exec(hv), hf = function (x) { var n = parseInt(String(x).replace(/\./g, ''), 10); return isFinite(n) ? n.toLocaleString('de-DE') + ' €' : x; };
-        await b2oZeile(s, 'Aufs Jahr gerechnet', '250 € im Monat, davon 100 € nicht umlagefähig — in der Liste steht das Jahr' + (hm ? ': <b>' + hf(hm[1]) + ' umlagefähig · ' + hf(hm[2]) + ' eigener Teil</b>.' : (hv ? ': <b>' + hv + '</b>, umlagefähig und eigener Teil.' : '.')));
-        await r25Reihe([R25.einst, R25.ausfall, R25.ort]);
+        /* seit v2368 trägt die Liste die Einheit selbst - der Wert wird so gezeigt, wie er dort steht */
+        var hw = hz(), hv = hw ? hw.textContent.replace(/\s+/g, ' ').replace(HZ, '').trim() : '';
+        await b2oZeile(s, 'Umlagefähig und eigener Teil', 'Gesagt sind die Summe und der eigene Teil — in der Liste stehen beide Seiten getrennt' + (hv ? ': <b>' + hv + '</b>' : '') + '. In den Cashflow geht nur der nicht umlagefähige Teil.');
+        await r25Reihe([R25.langfrist, R25.ausfall, R25.ort]);
         await zeige(r25Bereich, 6);
         var zb2 = r6Beginn(s, 'Überspringen', '„Weiß ich nicht" — und es geht weiter. Erfunden wird nichts.');
         await r25Antwort(R25.weissNicht);
@@ -5064,29 +5115,39 @@
         await warteAuf(function () { var o = q('#oabi-ov'); return !o || !o.offsetWidth; }, 8000);
         await warte(1500);
       },
-      async function (s) {   /* 12 · das Objekt mit Score */
-        var key = window._currentObjKey;
-        var karte = function () { return qs('.sb-card[data-key="' + key + '"]'); };
-        /* v2372c · GEMESSEN im Studio: die Objektliste ist dort nicht sichtbar (0 von 46 Karten mit
-           Fläche) - die Karte kam nie, die Zeile stand ohne Score. Dann zeigt der Reiter Bewertung beide Scores. */
-        await warteAuf(function () { var c = karte(); return c && c.querySelector('.sbc-mini-score-num'); }, 3000);
-        await warte(600);
-        if (karte() && karte().querySelector('.sbc-mini-score-num')) {
-          await zeige(karte, 6);
-          var c = karte(), n = c && c.querySelector('.sbc-mini-score-num'), l = c && c.querySelector('.sbc-score-label');
-          await b2oZeile(s, 'Im Portfolio', 'Die Wohnung steht als Objekt — auf der Karte der Score' + (n ? ' <b>' + n.textContent.trim() + (l ? ' · ' + l.textContent.trim() : '') + '</b>' : '') + '.');
-        } else {
-          reiter('s6'); await warte(1300);
-          await warteAuf(function () { return r12Karte(1)(); }, 6000);
-          await zeigeGruppe(function () { var k = r12Karte(0)(); return k && k.querySelector('.dpsh-headrow'); }, function () { var k = r12Karte(1)(); return k && k.querySelector('.dpsh-headrow'); }, 6);
-          var a = r12Kopf(0), b = r12Kopf(1);
-          await b2oZeile(s, 'Gespeichert', 'Die Wohnung steht als Objekt — im Reiter Bewertung: DealPilot Score <b>' + (a.score || '–') + ' · ' + r12Wort(a.wort) + '</b>, Investor-DealScore <b>' + (b.score || '–') + ' · ' + r12Wort(b.wort) + '</b>.');
-        }
+      async function (s) {   /* 12 · das Objekt im Reiter Objekt */
+        /* v2373 · erst das Objekt, dann (Szene 13) der Reiter Bewertung - das Video endet dort */
         reiter('s0'); var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await warte(900);
         await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
-        await b2oZeile(s, 'Im Reiter Objekt', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + '. Miete, Finanzierung und Bewirtschaftung stehen in ihren Reitern.', 600);
+        var we = wert('einheiten');
+        await b2oZeile(s, 'Im Reiter Objekt', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Wohnungen, ' : '') + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + '. Miete, Finanzierung und Bewirtschaftung stehen in ihren Reitern.', 600);
+      },
+      async function (s) {   /* 13 · Reiter Bewertung: zwei Scores, zwei Gewichtungen */
+        /* v2373 · Marcel 19.10.2026: das Video endet im Reiter Bewertung, beide Scores groß im
+           Bild, und eine sachliche Szene, warum dasselbe Objekt einmal SOLIDE und einmal GUT ist.
+           Alle Zahlen aus den Karten (r12Kopf, r12Teile) - Gewichte eingeschlossen. */
+        reiter('s6'); await warte(1300);
+        await warteAuf(function () { return r12Karte(1)() && r12Kopf(1).score; }, 8000);
+        await warte(600);
+        var kopf = function (i) { return function () { var k = r12Karte(i)(); return k && (k.querySelector('.dpsh-mainrow') || k.querySelector('.dpsh-headrow')); }; };
+        await zeigeGruppe(kopf(0), kopf(1), 8);
+        var a = r12Kopf(0), b = r12Kopf(1);
+        await b2oZeile(s, 'Zwei Scores', 'Deal Score <b>' + (a.score || '–') + ' · ' + r12Wort(a.wort) + '</b>, Investor Deal Score <b>' + (b.score || '–') + ' · ' + r12Wort(b.wort) + '</b> — dasselbe Objekt, zwei Gewichtungen.', 800);
+        var t1 = r12Teile(0), t2 = r12Teile(1);
+        var such = function (t, re) { return t.filter(function (x) { return re.test(x.name); })[0] || null; };
+        var cf = such(t1, /^Cashflow/i), nr = such(t1, /Rendite/i);
+        var balken = function (i) { return function () { var k = r12Karte(i)(), bb = k && k.querySelectorAll('.dpsh-cbar'); return bb && bb.length ? b2oHuelle(bb[0], bb[bb.length - 1]) : null; }; };
+        await zeige(balken(0), 8);
+        var gw = function (x) { return x && x.gewicht ? ' (' + x.gewicht + ')' : ''; };
+        await b2oZeile(s, 'Der Deal Score', 'Er schaut vor allem auf <b>Cashflow' + gw(cf) + '</b> und <b>Nettorendite' + gw(nr) + '</b>' + (cf && nr ? ' — hier ' + cf.note + ' und ' + nr.note + ' von 100 Punkten' : '') + '.');
+        var weitere = ['Finanzierung', 'Risiko', 'Lage', 'Upside'].map(function (nm) { var x = such(t2, new RegExp('^' + nm, 'i')); return x ? nm + ' <b>' + x.note + '</b>' : nm; });
+        await zeige(balken(1), 8);
+        await b2oZeile(s, 'Der Investor Deal Score', 'Er bewertet zusätzlich Finanzierung, Risiko, Lage und Upside — hier ' + weitere.join(' · ') + '.');
+        await zeigeGruppe(kopf(0), kopf(1), 8);
+        await b2oZeile(s, 'Von ' + r12Wort(a.wort) + ' zu ' + r12Wort(b.wort), 'Gleiche Zahlen, andere Gewichte: <b>' + (a.score || '–') + '</b> im Deal Score, <b>' + (b.score || '–') + '</b> im Investor Deal Score.', 1500);
       }
-    ]
+    ].map(function (f) { return function (s) { _r25s = s; return f(s); }; })
   };
 
   /* ── Ablauf ───────────────────────────────────────────────────── */
