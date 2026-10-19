@@ -888,7 +888,11 @@ function _renderWertverfahren(d) {
              + (e.bodenwert_fehlt ? ' · <b>ohne Bodenwert gerechnet</b>' : '')
              /* v2367 · auf welcher Miete der Ertragswert steht */
              + (e.miete_qm != null ? ' · Miete ' + String(e.miete_qm).replace('.', ',') + ' €/m²'
-                + (/Ist-Miete/.test(e.miete_quelle || '') ? ' (Ist-Miete, marktüblich)' : (e.miete_quelle ? ' (' + esc(e.miete_quelle) + ')' : '')) : ''))
+                + (/Ist-Miete/.test(e.miete_quelle || '') ? ' (Ist-Miete, marktüblich)' : (e.miete_quelle ? ' (' + esc(e.miete_quelle) + ')' : '')) : '')
+             /* v2382 · das Band der Marktueblichkeit mit beiden Vergleichswerten */
+             + (e.miete_band ? ' · Band ' + String(e.miete_band.unten_qm).replace('.', ',') + '–' + String(e.miete_band.oben_qm).replace('.', ',') + ' €/m² ('
+                + [e.miete_band.amtlich_qm != null ? 'amtlich ' + String(e.miete_band.amtlich_qm).replace('.', ',') : null,
+                   e.miete_band.angebot_qm != null ? 'Angebot ' + String(e.miete_band.angebot_qm).replace('.', ',') : null].filter(Boolean).join(' · ') + ')' : ''))
           : (e.grund || ''),
         'ertrag', e.staffel)
     /* v1143-VORL \u00b7 Die Karte zeigte bei vorhandenem Sachwert eine LEERE
@@ -932,6 +936,12 @@ function _renderWertverfahren(d) {
         'sach', sw.staffel,
         (sw.available && !sw.marktangepasst) ? (sw.sachwertfaktor_hinweis || null) : null)
     + '</div>'
+    /* v2380 · welches Verfahren fuehrt - und wenn keines, warum (auch am Bildschirm) */
+    + ((cc.verfahrenswahl && (cc.verfahrenswahl.verfahren || cc.verfahrenswahl.nicht_gerechnet))
+        ? '<div class="wv-hk">' + (cc.verfahrenswahl.verfahren
+            ? 'Führendes Verfahren: ' + esc(({ sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren', vergleichswert: 'Vergleichswertverfahren', bodenwert: 'Bodenwert' })[cc.verfahrenswahl.verfahren] || cc.verfahrenswahl.verfahren) + ' — ' + esc(cc.verfahrenswahl.grund || '')
+            : 'Kein führendes Verfahren ausgewiesen. ' + esc(cc.verfahrenswahl.weg || '')) + '</div>'
+        : '')
     /* v1106-WQLS - derselbe Weg wie beim Liegenschaftszins, nur fuer den
        Sachwertfaktor. Er steht UNTER den drei Karten, weil er sich auf die
        Sachwertkarte bezieht und nicht auf den Bodenwert darueber. */
@@ -4192,7 +4202,9 @@ async function exportPdf(out) {
      * und sagt, warum die eine fuehrt. Er erscheint nur, wenn es wirklich
      * zwei verschiedene Zahlen gibt (miete_vergleich ist sonst null). */
     const _mvgl = cc.ertragswert && cc.ertragswert.miete_vergleich;
-    if (_mvgl) {
+    /* v2382 · Das Band der Marktueblichkeit steht im Bericht - beide Vergleichswerte und die Kanten. */
+    const _mbd = cc.ertragswert && cc.ertragswert.available && cc.ertragswert.miete_band;
+    if (_mvgl || _mbd) {
       /* Mieten IMMER mit zwei Nachkommastellen: 8,3 neben 6,66 in derselben
        * Spanne liest sich wie ein anderer Genauigkeitsgrad. Prozente dagegen
        * bekommen eine Stelle — 36,20 % taeuscht Genauigkeit vor, die nicht da ist. */
@@ -4200,17 +4212,18 @@ async function exportPdf(out) {
       const _pz = (v) => Number(v).toLocaleString("de-DE", { maximumFractionDigits: 1 });
       const _qm = (v) => _z2(v) + ' €/m²';
       const _ri = (p) => (p < 0 ? 'darunter' : 'darüber');
-      const _sp = (_mvgl.spanne_q25 != null && _mvgl.spanne_q75 != null)
+      const _sp = (_mvgl && _mvgl.spanne_q25 != null && _mvgl.spanne_q75 != null)
         ? _z2(_mvgl.spanne_q25) + '–' + _z2(_mvgl.spanne_q75) + ' €/m²' : null;
-      const _lage = (_mvgl.ausserhalb_spanne && _sp)
+      const _lage = (_mvgl && _mvgl.ausserhalb_spanne && _sp)
         ? ' und damit ' + _mvgl.ausserhalb_spanne + ' der Vergleichsspanne ' + _sp : '';
-      const _txt = _mvgl.amtlich_fuehrt
+      const _txt = (_mvgl && _mvgl.amtlich_fuehrt)
         ? 'Angesetzt sind ' + _qm(_mvgl.angesetzt_qm) + ' aus der Mietpreisübersicht des '
           + 'Gutachterausschusses — modellkonform zum Liegenschaftszinssatz aus derselben '
           + 'Quelle (§ 10 ImmoWertV). Die Vergleichsangebote liegen bei '
           + _qm(_mvgl.amtlich_qm) + ', also ' + _pz(Math.abs(_mvgl.abweichung_pct))
           + ' % ' + _ri(-_mvgl.abweichung_pct) + '. Beide Zahlen stehen hier bewusst '
           + 'nebeneinander.'
+        : !_mvgl ? ('Angesetzt sind ' + _qm(cc.ertragswert.miete_qm) + ' (' + (cc.ertragswert.miete_quelle || '') + ').')
         : 'Angesetzt sind ' + _qm(_mvgl.angesetzt_qm) + ' (' + _mvgl.angesetzt_quelle
           + '). Die amtliche Mietpreisübersicht nennt ' + _qm(_mvgl.amtlich_qm) + ' — '
           + _pz(Math.abs(_mvgl.abweichung_pct)) + ' % ' + _ri(_mvgl.abweichung_pct)
@@ -4218,8 +4231,15 @@ async function exportPdf(out) {
           + '§ 10 ImmoWertV wäre er nur, wenn auch der Liegenschaftszinssatz aus '
           + 'derselben Quelle stammt. Die Zahl oben ist ein Vergleichswert, kein '
           + 'Rechenschritt.';
+      const _bandT = _mbd ? (' Band der Marktüblichkeit ' + _z2(_mbd.unten_qm) + '–' + _z2(_mbd.oben_qm) + ' €/m² ('
+        + [_mbd.amtlich_qm != null ? 'amtliche Vergleichsmiete ' + _qm(_mbd.amtlich_qm) : null,
+           _mbd.angebot_qm != null ? 'Angebotsmiete ' + _qm(_mbd.angebot_qm) : null].filter(Boolean).join(', ')
+        + '; untere Kante × 0,7, obere × 1,3)'
+        + (_mbd.ist_qm != null ? ': die Ist-Miete von ' + _qm(_mbd.ist_qm) + ({ im_band: ' liegt im Band und gilt als marktüblich (§ 31 Abs. 2 ImmoWertV).',
+            ueber: ' liegt darüber — gerechnet wird die obere Kante; der Mehrertrag ist nur für die gesicherte Vertragslaufzeit als besonderes objektspezifisches Merkmal (§ 8 Abs. 3) zu würdigen.',
+            unter: ' liegt darunter — gerechnet wird die untere Kante; der Minderertrag ist nur für die gesicherte Vertragslaufzeit als besonderes objektspezifisches Merkmal (§ 8 Abs. 3) zu würdigen.' }[_mbd.lage] || '.') : '.')) : '';
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setCharSpace(0);
-      const _mt = doc.splitTextToSize(_txt, blockW - 10);
+      const _mt = doc.splitTextToSize(_txt + _bandT, blockW - 10);
       const _mh = 9.5 + _mt.length * 3;
       need(_mh + 4);
       doc.setFillColor(250, 248, 242); doc.roundedRect(M, y, blockW, _mh, 2, 2, 'F');
