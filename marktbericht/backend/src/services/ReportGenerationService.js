@@ -331,6 +331,47 @@ async function callOpenAI(payload, opts = {}) {
           + `Erfinde keine Zahl dazu.`;
       }
     }
+    /* ══ v2384 · FESTE AUSSAGEN, FERTIG FORMULIERT ═════════════════════════
+       Gemessen an den Pruefberichten 221/222 (19.10.2026):
+         - discount_to_market_pct = -76,8 wurde zu „Kaufpreis deutlich UNTERHALB
+           der Spanne, Abschlag 77 %" - der Kaufpreis lag 77 % DARUEBER. Das
+           Vorzeichen eines Abschlags ist fuer ein Modell keine Richtung.
+         - „Median 1.971 €/m²" - die Zahl steht nirgends im JSON (richtig: 1.570).
+         - In Stufe 1/2 hiess es „keine belastbaren Angaben zu Ertrag/Sachwert/
+           Liegenschaftszins" - die Verfahren gehoeren nur nicht zum Umfang.
+       Deshalb bekommt jede Gruppe die Richtung als WORT, den Median als fertige
+       Zahl und den Umfang als Satz. */
+    {
+      const _mv = (payload.valuation && payload.valuation.market_value) || {};
+      const _kp = Number(payload.ref && payload.ref.purchase_price);
+      const _est = Number(_mv.estimated);
+      const _fest = [];
+      if (_kp > 0 && _est > 0) {
+        const _abw = Math.round((_kp / _est - 1) * 1000) / 10;
+        _fest.push('Der Kaufpreis (' + fmt(_kp, ' €') + ') liegt '
+          + (Math.abs(_abw) < 0.5 ? 'auf Höhe der' : (Math.abs(_abw).toLocaleString('de-DE') + ' % '
+            + (_abw > 0 ? 'ÜBER der' : 'UNTER der')))
+          + ' Marktpreisindikation (' + fmt(_est, ' €') + ')'
+          + (_mv.low != null && _mv.high != null
+            ? (_kp > _mv.high ? ' und damit OBERHALB ihrer Spanne' : (_kp < _mv.low ? ' und damit UNTERHALB ihrer Spanne' : ' und damit innerhalb ihrer Spanne'))
+            : '') + '. Wenn du die Abweichung nennst, dann genau mit dieser Richtung; das Feld discount_to_market_pct ist ein Vorzeichen, keine Richtung.');
+      }
+      if (_mv.basis_median_sqm != null) {
+        _fest.push('Der Median der Vergleichsangebote beträgt ' + fmt(_mv.basis_median_sqm, ' €/m²')
+          + ((payload.sale && payload.sale.sample_size) ? ' bei ' + payload.sale.sample_size + ' Angeboten' : '')
+          + '. Wenn du einen Median nennst, dann diesen.');
+      }
+      if (payload.cross_check && payload.cross_check.nicht_im_umfang) {
+        _fest.push(g.id !== 'g1'
+          ? 'Ertragswert, Sachwert, Bodenwert und Liegenschaftszinssatz gehören nicht zu dieser Berichtsstufe (Stufe 3) und '
+            + 'werden in diesem Kapitel NICHT erwähnt — auch nicht als fehlend.'
+          : 'Ertragswert, Sachwert, Bodenwert und Liegenschaftszinssatz sind in dieser Berichtsstufe '
+          + 'NICHT ENTHALTEN (sie gehören zur Wertermittlung, Stufe 3). Schreibe dazu ausschließlich '
+          + '„in dieser Berichtsstufe nicht enthalten (Stufe 3)" — NIE „liegen nicht vor", „wurden nicht '
+          + 'ermittelt" oder „keine belastbaren Angaben".');
+      }
+      if (_fest.length) extra += '\n\nFESTE AUSSAGEN (verbindlich, Zahlen und Richtung exakt so): ' + _fest.join(' ');
+    }
     if (g.id === 'g4') {
       const D = kapitelD(payload);
       extra += '\n\nKAPITEL D - DREI TEILE, JE EIN ABSATZ, IN DIESER REIHENFOLGE. Nutze NUR diese fertig '
