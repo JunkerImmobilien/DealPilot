@@ -707,8 +707,12 @@
       + '<b>Gebäude gesamt:</b> ' + d.punkteGew.toFixed(1).replace('.', ',') + ' Punkte flächengewichtet'
       + (r > 0 ? ' · Restnutzungsdauer ' + r + ' Jahre' : '')
       + (d.s.hatSoll ? '<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">Soll-Miete wirkt ab Jahr '
-        + '<input class="mfh-in mfh-sm" id="mfh-soll-jahr" type="text" inputmode="numeric" value="' + esc(String(daten().sollAbJahr || '')) + '" placeholder="z. B. 3">'
-        + '<span style="font-size:12px;color:#6B6356">der Mietentwicklung (leer = kein Sprung)</span></div>' : '')
+        + '<input class="mfh-in mfh-sm" id="mfh-soll-jahr" type="text" inputmode="numeric" value="' + esc(String(daten().sollAbJahr || '')) + '" placeholder="z. B. 2028">'
+        /* v2410 - Kalenderjahr ODER Jahr der Mietentwicklung; ab 1900 gilt
+           der Wert als Kalenderjahr (mietentwicklung.js, sollJahr()). Beide
+           Bielefelder MFH trugen 2027/2028 - als Index gelesen griff die
+           Soll-Miete nie. */
+        + '<span style="font-size:12px;color:#6B6356">(Kalenderjahr wie 2028 oder Jahr der Mietentwicklung wie 3; leer = kein Sprung)</span></div>' : '')
       + '<div style="margin-top:8px;display:grid;gap:6px">'
       + '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uep" checked> Modernisierungsgrad ins Objekt übernehmen (<b>' + opt + ' Punkte</b>)</label>'
       + (r > 0 ? '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uer"> Restnutzungsdauer <b>' + r + ' Jahre</b> in die AfA übernehmen (eigener Satz ' + (100 / r).toFixed(2).replace('.', ',') + ' %)</label>' : '')
@@ -1014,7 +1018,10 @@
         /* Die angestrebte Entwicklung ergibt sich aus denselben zwei
            Zahlen. Sie NICHT mitzusetzen hiesse, den Nutzer dieselbe
            Rechnung von Hand machen zu lassen. */
-        if (s.ist > 0 && s.soll > s.ist) {
+        /* v2410 - NICHT, wenn ein Soll-Jahr steht: dann bringt der Sprung
+           (mietentwicklung.js, sollSprung) dieselben Prozent schon einmal
+           ein, und Detail rechnete Soll / Ist doppelt. */
+        if (s.ist > 0 && s.soll > s.ist && !(sollAb > 0)) {
           setzen('me_pct', (s.soll - s.ist) / s.ist * 100);
           meldung += ' · Entwicklung ' +
             (Math.round((s.soll - s.ist) / s.ist * 1000) / 10).toFixed(1).replace('.', ',') + ' %';
@@ -1043,7 +1050,22 @@
         }
       }
     }
-    if (typeof window.calc === 'function') window.calc();
+    /* ═══ v2410 · DIE WOHNUNGEN RECHNEN AUCH ═════════════════════════
+       Bis hier setzte das Uebernehmen `me_soll`/`me_pct` - Felder des
+       Detail-Modus -, den Modus selbst aber nicht. Im Prognose-Modus
+       (Auslieferungszustand) blieben beide wirkungslos, gemessen an
+       Westerfeldstr. 140: me_modus „detail" mit leerer Anzahl
+       Erhoehungen, also Faktor 1,0 auf alle Jahre.
+
+       Das Ziel ist „Aus Wohnungen": es liest genau das, was hier gerade
+       erhoben wurde (Ist, Staffel, Soll je Wohnung). Umgestellt wird
+       nur, wenn der Modus etwas zu rechnen hat, und die Meldung sagt es. */
+    var ME = window.MietEntwicklung;
+    if (list.length && ME && typeof ME.setMode === 'function' && typeof ME.einheitenNutzbar === 'function'
+        && ME.einheitenNutzbar() && (s.hatSoll || list.some(function (e) { return e.mv_in_mietentwicklung; }))) {
+      if (ME.getMode() !== 'einheiten') meldung += ' · Mietentwicklung: aus Wohnungen';
+      ME.setMode('einheiten');   /* ruft calc() selbst */
+    } else if (typeof window.calc === 'function') window.calc();
     schliessen(); knopf();
     if (typeof window.toast === 'function') window.toast('✓ ' + meldung);
   }
@@ -1055,6 +1077,8 @@
     var d = daten(), s = summe(d.einheiten || []), K = (window.State && window.State.kpis) || {};
     if (!ARTEN_MIT_EINHEITEN[(el('objart') && el('objart').value) || ''] || !s.hatSoll || !(K.kp > 0)) { host.style.display = 'none'; return; }
     var ist_j = (K.nkm_j || 0), ze_j = zahl(el('ze') && el('ze').value) * 12, soll_j = s.soll * 12 + ze_j;
+    var bmySoll = (window.DealKpis && typeof window.DealKpis.compute === 'function')
+      ? window.DealKpis.compute({ kp: K.kp, nkm: s.soll, ze: ze_j / 12 }).bmy : null;   /* v2410 */
     var dscrSoll = null;
     if (window.Dscr && window.Dscr.compute) dscrSoll = window.Dscr.compute({ nkm_j: s.soll * 12, ze_j: ze_j, zins_j: K.zins_j, tilg_j: K.tilg_j, bsv_j: K.d1IsAussetzung ? (K.bspar_j || 0) : 0, bwk_cf: K.bwk_cf }).brutto;
     function p(n) { return (n == null || !isFinite(n)) ? '—' : n.toFixed(2).replace('.', ',') + ' %'; }
@@ -1064,7 +1088,14 @@
     host.innerHTML = '<hr class="dvd"><div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Ist gegen Soll · ' + d.einheiten.length + ' Einheiten</div>' +
       '<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="font-size:11px;color:var(--muted,#8A8272)"><td></td><td style="text-align:right;padding:0 8px">Ist (heute)</td><td style="text-align:right">Soll</td></tr>' +
       z('Kaltmiete p. a.', eur(ist_j), eur(soll_j)) +
-      z('Bruttomietrendite', p(K.bmy) + '<div style="font-size:10.5px;color:var(--muted,#8A8272)">auf Kaufpreis</div>', p(K.gi > 0 ? soll_j / K.gi * 100 : null) + '<div style="font-size:10.5px;font-weight:400;color:var(--muted,#8A8272)">auf Gesamtinvestition</div>') +
+      /* v2410 - beide Spalten auf DERSELBEN Basis. Hier stand Ist = K.bmy
+         (auf Kaufpreis) gegen Soll = soll_j / K.gi (auf Gesamtinvestition):
+         der Soll-Wert lag damit allein durch den Nenner niedriger, um den
+         Anteil der Nebenkosten und Sanierung. Die Soll-Rendite kommt jetzt
+         aus demselben Kern wie die Ist-Rendite (DealKpis.compute, bmy =
+         (NKM + Zusatzeinnahmen) x 12 / Kaufpreis) - nicht nachgerechnet.
+         Die Zusatzeinnahmen stehen in beiden Spalten (K.nkm_j enthaelt sie). */
+      z('Bruttomietrendite', p(K.bmy) + '<div style="font-size:10.5px;color:var(--muted,#8A8272)">auf Kaufpreis</div>', p(bmySoll) + '<div style="font-size:10.5px;font-weight:400;color:var(--muted,#8A8272)">auf Kaufpreis</div>') +
       z('DSCR', f(K.dscr), f(dscrSoll)) +
       z('Leerstand', s.leer ? s.leer + ' WE' : '—', '—') +
       (s.kosten ? z('Maßnahmen', '', eur(s.kosten)) : '') +

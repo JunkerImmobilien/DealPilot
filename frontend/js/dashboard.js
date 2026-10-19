@@ -2356,19 +2356,29 @@
       + '<div class="sl"><span class="e">02</span><h2>Kennzahlen</h2><span class="tag">Portfolio \u00b7 aggregiert</span><span class="rule"></span></div>'
       + '<div id="dp-overview-strip" class="overview-strip" style="margin-bottom:13px"></div>'
       + '<div class="kpis" id="dp-health-strip"></div>'
+      /* v2410 \u00b7 19.10.2026 \u00b7 DAS KANBAN-BOARD IST ABGESCHALTET (Marcel: \u201edas
+         Kanban-Board erst mal rausnehmen"). Der Abschnitt \u201e03 Objekte"
+         (In Pruefung / Gewonnen / Verloren, kanbanCardHtml) wird nicht mehr
+         eingebaut; renderBoardOrCards() findet #dp-board nicht und kehrt
+         sofort zurueck. Der Code bleibt stehen, Daten sind nicht betroffen
+         (der Deal-Status lebt im Objekt). Die Abschnitte dahinter r\u00fccken
+         eine Nummer auf (03 Geteilte Objekte \u2026 08 Jahresabschluss).
+         Wiederherstellen: die zwei Zeilen unten wieder einkommentieren und
+         die Nummern zurueckziehen (help.js, prozess-atlas.js mitziehen).
       + '<div class="sl"><span class="e">03</span><h2>Objekte</h2><span class="tag">Kanban \u00b7 Karte antippen = aufklappen</span><span class="rule"></span></div>'
       + '<div class="gates" id="dp-board"></div>'
-      + '<div class="sl"><span class="e">04</span><h2>Geteilte Objekte</h2><span class="tag">Quick Boarding</span><span class="rule"></span></div>'
+      */
+      + '<div class="sl"><span class="e">03</span><h2>Geteilte Objekte</h2><span class="tag">Quick Boarding</span><span class="rule"></span></div>'
       + '<div id="dp-shared-passes" style="margin:0 0 4px"></div>'
       /* v1400 · Abschnitt 05 — die ECHTEN Zahlen, nicht die Modellprojektion.
          Deshalb steht er VOR „Projektion & Verlauf" und traegt kein
          „vereinfacht": er rechnet mit den steuerlichen Ergebnissen, die
          jedes Objekt selbst hinterlegt hat. */
-      + '<div class="sl"><span class="e">05</span><h2>Steuer \u00fcber alle Objekte</h2>'
+      + '<div class="sl"><span class="e">04</span><h2>Steuer \u00fcber alle Objekte</h2>'
       +   '<span class="tag" title="Rechnet mit den ECHTEN steuerlichen Ergebnissen deiner Objekte (Tab Steuern), nicht mit den pauschalen Annahmen der Modellprojektion.\n\nDie Objekte stehen in der Reihenfolge ihres Kaufs \u2014 jedes trifft auf das Einkommen, das die vorherigen bereits verschoben haben.\n\nGesellschaften werden getrennt gef\u00fchrt: K\u00f6rperschaftsteuer ist proportional und wirkt nicht auf dein privates Einkommen.">Echte Objektdaten \u00b7 \u00a7 32a / \u00a7 8 KStG</span>'
       +   '<span class="rule"></span></div>'
       + '<div id="dp-steuerkette" class="sk-wrap"></div>'
-      + '<details id="dp-charts-sec" open><summary class="sl dp-charts-summary"><span class="e">06</span><h2>Projektion &amp; Verlauf</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="yrs sl-yrs" id="dp-proj-years"><button data-y="10" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(10)">10 J.</button><button data-y="20" class="active" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(20)">20 J.</button><button data-y="30" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(30)">30 J.</button></span><span class="dp-charts-hint">ein-/ausblenden</span></summary>'
+      + '<details id="dp-charts-sec" open><summary class="sl dp-charts-summary"><span class="e">05</span><h2>Projektion &amp; Verlauf</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="yrs sl-yrs" id="dp-proj-years"><button data-y="10" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(10)">10 J.</button><button data-y="20" class="active" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(20)">20 J.</button><button data-y="30" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(30)">30 J.</button></span><span class="dp-charts-hint">ein-/ausblenden</span></summary>'
       + '<div class="charts">'
       + chartCard('dpc-cashflow','M3 17l6-6 4 4 8-8','Cashflow-Verlauf','vor / nach Steuer','\u20ac/Jahr')
       + chartCard('dpc-vermoegen','M3 3v18h18M7 14l4-4 3 3 5-6','Verm\u00f6gens-Schere','Wert vs. Restschuld \u2014 die F\u00e4rbung dazwischen ist dein Eigenkapital','Mio \u20ac')
@@ -2380,7 +2390,7 @@
       + chartCard('dpc-klumpen','M12 2a10 10 0 1 0 10 10H12z','Klumpenrisiko','Volumen nach Lage','Diversifikation')
       + chartCard('dpc-steuer','M9 14l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z','Steuer-Verlauf','Steuereffekt','10 Jahre',true)
       + '</div></details>'
-      + '<div class="sl"><span class="e">07</span><h2>Gesamt-Projektion</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="rule"></span></div>'
+      + '<div class="sl"><span class="e">06</span><h2>Gesamt-Projektion</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="rule"></span></div>'
       + '<div class="proj"><div class="ph"><span class="t">Cashflow &amp; Verm\u00f6gensaufbau</span><span class="tag">Modellprojektion</span></div>'
       + '<div class="pw"><table class="pt" id="dp-proj-table"></table></div></div>'
       /* v1215-mappe · Abschnitt 07 — der erste Export-Knopf im Cockpit.
@@ -2389,7 +2399,7 @@
          dem Jahr. Die Objektauswahl kann der Export bereits (opts.objectIds),
          die Oberflaeche dafuer fehlt noch — deshalb steht hier, dass ALLE
          Objekte des Jahres genommen werden, statt es offenzulassen. */
-      + '<div class="sl"><span class="e">08</span><h2>Steuer-Mappe</h2><span class="tag">Anlage V · § 21 EStG</span><span class="rule"></span></div>'
+      + '<div class="sl"><span class="e">07</span><h2>Steuer-Mappe</h2><span class="tag">Anlage V · § 21 EStG</span><span class="rule"></span></div>'
       + '<div class="dp-mappe">'
       +   '<div class="dp-mappe-t">Ein PDF über <b>alle</b> Objekte mit erfassten Steuerdaten — je Objekt eine Aufstellung der Werbungskosten, am Ende eine Zusammenfassung mit Summe.</div>'
       +   '<div class="dp-mappe-r">'
@@ -2413,7 +2423,7 @@
       /* v1735 · die Ueberschrift bekommt eine ID, damit sie zusammen mit der
          Box verschwinden kann — ohne sie bliebe eine Sektionsnummer ohne
          Inhalt stehen. */
-      + '<div class="sl" id="dp-abschluss-sl"><span class="e">09</span><h2>Jahresabschluss</h2><span class="tag">Bilanz · GuV · § 8 Abs. 2 KStG</span><span class="rule"></span></div>'
+      + '<div class="sl" id="dp-abschluss-sl"><span class="e">08</span><h2>Jahresabschluss</h2><span class="tag">Bilanz · GuV · § 8 Abs. 2 KStG</span><span class="rule"></span></div>'
       + '<div class="dp-mappe" id="dp-abschluss-box">'
       +   '<div class="dp-mappe-t">Für Objekte, die einer <b>GmbH oder UG</b> gehören: Bilanz und Gewinn- und Verlustrechnung über alle Objekte dieser Gesellschaft, dazu ein Anlagenspiegel je Objekt.</div>'
       +   '<div class="dp-mappe-r" id="dp-abschluss-r">'

@@ -380,8 +380,8 @@
       desc: 'Score, Kennzahlen, Steuer und Exporte über alle Objekte',
       sections: [
         {
-          h: 'Aufbau: neun Abschnitte von oben nach unten',
-          body: 'Das Cockpit zeigt dein Portfolio in nummerierten Abschnitten: <strong>01 Portfolio Score</strong> · <strong>02 Kennzahlen</strong> · <strong>03 Objekte</strong> · <strong>04 Geteilte Objekte</strong> · <strong>05 Steuer über alle Objekte</strong> · <strong>06 Projektion & Verlauf</strong> · <strong>07 Gesamt-Projektion</strong> · <strong>08 Steuer-Mappe</strong> · <strong>09 Jahresabschluss</strong>.\n\nOben rechts wählst du unter <strong>Objekt</strong> entweder „Alle Objekte“ oder ein einzelnes gewonnenes Objekt — Score und Kennzahlen rechnen dann nur dieses. Im Pro-Plan stehen daneben Filter-Knöpfe je Halter („Alle“ plus deine Mandanten).\n\n<strong>03 Objekte</strong> ist ein Board mit drei Spalten: „In Prüfung“, „Gewonnen“ und „Verloren“. <strong>04 Geteilte Objekte</strong> listet deine Quick-Boarding-Pässe; dort kannst du einen Pass „Verlängern“ oder „Beenden“. Geteilt wird im Objekt über „Quick Boarding teilen“.'
+          h: 'Aufbau: acht Abschnitte von oben nach unten',
+          body: 'Das Cockpit zeigt dein Portfolio in nummerierten Abschnitten: <strong>01 Portfolio Score</strong> · <strong>02 Kennzahlen</strong> · <strong>03 Geteilte Objekte</strong> · <strong>04 Steuer über alle Objekte</strong> · <strong>05 Projektion & Verlauf</strong> · <strong>06 Gesamt-Projektion</strong> · <strong>07 Steuer-Mappe</strong> · <strong>08 Jahresabschluss</strong>.\n\nOben rechts wählst du unter <strong>Objekt</strong> entweder „Alle Objekte“ oder ein einzelnes gewonnenes Objekt — Score und Kennzahlen rechnen dann nur dieses. Im Pro-Plan stehen daneben Filter-Knöpfe je Halter („Alle“ plus deine Mandanten).\n\n<strong>03 Geteilte Objekte</strong> listet deine Quick-Boarding-Pässe; dort kannst du einen Pass „Verlängern“ oder „Beenden“. Geteilt wird im Objekt über „Quick Boarding teilen“.'
         },
         {
           h: 'Portfolio Score — so wird er berechnet',
