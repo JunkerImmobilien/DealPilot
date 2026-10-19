@@ -939,16 +939,20 @@
          zwei Berichte derselben Art verglichen werden koennen. */
       var basis = { created_at: h.created_at, ai_mode: h.ai_mode,
                     fuehrend_grund: h.fuehrend_grund, fuehrend_quelle: h.fuehrend_quelle };
+      /* v2393 · Herkunftsstufe je Wert (Marcel 19.10.2026: „dass der Kunde sofort
+         weiss, wie weit er dem Wert trauen kann"). */
+      var _trE = h.lzs_stufe || null;
+      var _trS = h.sachwert_vorlaeufig ? 'V' : (h.swf_stufe || null);
       var fv = String(h.fuehrend || '');
       var e = Number(h.ertragswert_eur), s = Number(h.sachwert_eur), m = Number(h.market_value);
-      if (isFinite(e) && e > 0) liste.push(Object.assign({}, basis, { wert: e, art: 'Ertragswert', fuehrend: fv === 'ertragswert', weg: h.ertrag_weg || null }));
-      if (isFinite(s) && s > 0) liste.push(Object.assign({}, basis, { wert: s, art: 'Sachwert', fuehrend: fv === 'sachwert', weg: h.sachwert_weg || null }));
+      if (isFinite(e) && e > 0) liste.push(Object.assign({}, basis, { wert: e, art: 'Ertragswert', fuehrend: fv === 'ertragswert', weg: h.ertrag_weg || null, trau: _trE }));
+      if (isFinite(s) && s > 0) liste.push(Object.assign({}, basis, { wert: s, art: 'Sachwert', fuehrend: fv === 'sachwert', weg: h.sachwert_weg || null, trau: _trS }));
       /* v2256 · Vergleichswert als eigener Eintrag (Marcel 15.10.2026). Er
          ist nur dann amtlich, wenn ein Vergleichsfaktor des zustaendigen
          Ausschusses dahintersteht; sonst traegt er den Zusatz
          „Angebotspreise" und wird als Indikation uebernommen. */
       var vg = Number(h.vergleichswert_eur);
-      if (isFinite(vg) && vg > 0) liste.push(Object.assign({}, basis, { wert: vg, art: 'Vergleichswert', amtlich: !!h.vergleichsfaktor_amtlich, fuehrend: fv === 'vergleichswert' }));
+      if (isFinite(vg) && vg > 0) liste.push(Object.assign({}, basis, { wert: vg, art: 'Vergleichswert', amtlich: !!h.vergleichsfaktor_amtlich, fuehrend: fv === 'vergleichswert', trau: h.vergleichsfaktor_amtlich ? 'A' : 'I' }));
       /* v2255 · Der Marktwert im Verlauf ist der ROHE Wert aus Angebotspreisen
          (gemessen: Bericht 212, 246.000 €), die Karte zeigt ihn nach Abschlag
          (232.000 €). Hier ging bis v2254 der rohe Wert ins Feld - als
@@ -960,7 +964,7 @@
           var A = window.DealPilotAbschlag;
           if (A && typeof A.satz === 'function') { ab = A.satz(); mw = Math.round(m * (1 - ab / 100) / 1000) * 1000; }
         } catch (x) { ab = null; mw = m; }
-        liste.push(Object.assign({}, basis, { wert: mw, roh: m, abschlag: ab, art: 'Marktwert', fuehrend: false }));
+        liste.push(Object.assign({}, basis, { wert: mw, roh: m, abschlag: ab, art: 'Marktwert', fuehrend: false, trau: 'I' }));
       }
     });
     if (!liste.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
@@ -981,14 +985,16 @@
       var _art = h.art === 'Marktwert' ? 'Marktwertindikation'
         : (h.art === 'Vergleichswert' && !h.amtlich ? 'Vergleichswert (Angebotspreise)' : (h.art || 'Marktwertindikation'));
       var _ab = (h.art === 'Marktwert' && h.abschlag != null) ? ' (−' + String(h.abschlag).replace('.', ',') + ' %)' : '';
+      var _tr = _trauen(h.trau);
       return '<option value="' + i + '"' + _t + '>' + _art + ' · '
-        + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €' + _ab + _f + '</option>';
+        + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €' + _ab + _f + (_tr ? ' · ' + _tr.buchst + ' ' + _tr.kurz : '') + '</option>';
     };
     var _k0 = liste[0].art === 'Marktwert' ? 'Marktwertindikation' : (liste[0].art || 'Marktwertindikation');
     box.innerHTML = (liste.length > 1
       ? '<select id="oe-vw-wahl" aria-label="Marktbericht wählen">' + liste.map(opt).join('') + '</select><div id="oe-vw-diff"></div>'
       : '<span class="oe-q">' + _k0 + ' · '
         + _datum(liste[0].created_at) + ': <b>' + deNum(liste[0].wert) + ' €</b></span>')
+      + '<span id="oe-vw-trau"></span>'
       + '<button type="button" class="oe-btn" id="oe-vw-btn">' + _vwKnopf(liste[0]) + '</button>'
       + (liste.length > 1 ? '<span class="oe-q">' + liste.length + ' Berichte im Verlauf</span>' : '');
     box.style.display = '';
@@ -1002,9 +1008,35 @@
         var _i = parseInt(_s.value, 10) || 0;
         _unterschiedZeigen(liste, _i);
         var _b = $('oe-vw-btn'); if (_b && liste[_i]) _b.textContent = _vwKnopf(liste[_i]);   /* v2255 */
+        _trauZeigen(liste[_i]);   /* v2393 */
       });
     }
     _unterschiedZeigen(liste, _s ? (parseInt(_s.value, 10) || 0) : 0);
+    _trauZeigen(liste[_s ? (parseInt(_s.value, 10) || 0) : 0]);   /* v2393 */
+  }
+  /* v2393 · Wie weit traut man dem Wert? Dieselben Stufen wie in Bericht und Hilfe
+     („Herkunftsstufen A bis E"). Ertragswert: Stufe des Liegenschaftszinssatzes;
+     Sachwert: Stufe des Sachwertfaktors, ohne Faktor „vorläufig"; Marktwert und
+     Vergleichswert aus Angeboten: „Indikation". Statusfarben bleiben hart (Grün/Rot). */
+  var TRAUEN = {
+    A: { buchst: 'A', kurz: 'amtlich', farbe: '#3FA56C', lang: 'Amtlicher Wert des zuständigen Gutachterausschusses — belastbar.' },
+    B: { buchst: 'B', kurz: 'amtlich, regional', farbe: '#3FA56C', lang: 'Amtlich, aber aus dem Landesbericht — für den Kreis liegt kein eigener Wert vor. Genauer: den örtlichen Wert eintragen.' },
+    C: { buchst: 'C', kurz: 'abgeleitet', farbe: '#b8932f', lang: 'Abgeleitet — schmale Datenbasis, Nachbarwert desselben Ausschusses oder übertragene Tabelle. Mit dem örtlichen Wert wird es genauer.' },
+    D: { buchst: 'D', kurz: 'Auffangwert', farbe: '#B8625C', lang: 'Gesetzlicher Auffangwert (§ 256 BewG) — kein örtlicher Zins. Nur eine grobe Einordnung: trag den Liegenschaftszinssatz des Ausschusses ein.' },
+    E: { buchst: 'E', kurz: 'eigene Angabe', farbe: '#8a8378', lang: 'Mit deiner eigenen Angabe gerechnet.' },
+    V: { buchst: '', kurz: 'vorläufig', farbe: '#B8625C', lang: 'Vorläufig — ohne Sachwertfaktor des Ausschusses (keine Marktanpassung). Trag den Sachwertfaktor ein, wenn du ihn hast.' },
+    I: { buchst: '', kurz: 'Indikation', farbe: '#8a8378', lang: 'Indikation aus Angebotspreisen — kein Verfahren nach ImmoWertV.' }
+  };
+  function _trauen(code) { return code && TRAUEN[String(code).toUpperCase()] ? TRAUEN[String(code).toUpperCase()] : null; }
+  function _trauZeigen(h) {
+    var el = $('oe-vw-trau'); if (!el) return;
+    var t = h ? _trauen(h.trau) : null;
+    if (!t) { el.innerHTML = ''; return; }
+    el.innerHTML = '<span title="' + esc(t.lang + ' Mehr in der Hilfe unter „Herkunftsstufen A bis E".') + '" style="display:inline-flex;align-items:center;gap:6px;'
+      + 'padding:3px 10px;border-radius:99px;border:1px solid ' + t.farbe + ';color:' + t.farbe + ';font:600 11.5px Inter,system-ui,sans-serif;'
+      + 'white-space:nowrap;cursor:help;margin:0 6px">'
+      + '<i style="width:8px;height:8px;border-radius:50%;background:' + t.farbe + ';display:inline-block"></i>'
+      + (t.buchst ? 'Stufe ' + t.buchst + ' · ' : '') + esc(t.kurz) + '</span>';
   }
   /* v2255 · der Knopf sagt, ALS WAS übernommen wird */
   function _vwAmtlich(h) { return !!h && (h.art === 'Ertragswert' || h.art === 'Sachwert' || (h.art === 'Vergleichswert' && !!h.amtlich)); }   /* v2256 */
