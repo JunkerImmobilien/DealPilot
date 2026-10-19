@@ -38745,6 +38745,8 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .oe-st.a { color: #3FA56C; border-color: #3FA56C; }
 .oe-st.b { color: var(--wl-b8932f, #b8932f); border-color: var(--wl-C9A84C, #C9A84C); }
 .oe-st.x { color: #B8625C; border-color: #B8625C; }
+/* v2401 · Stufe N (DealPilot-Formel): zwischen Gold (B/C) und Rot (D), Statusfarbe - bewusst nicht tokenisiert */
+.oe-st.n { color: #B87A46; border-color: #B87A46; }
 .oe-btn { font: 11.5px Inter, system-ui, sans-serif; padding: 4px 9px; border-radius: 6px; border: 1px solid var(--wl-C9A84C, #C9A84C); background: transparent; color: var(--wl-b8932f, #b8932f); cursor: pointer; white-space: nowrap; }
 .oe-btn:hover { background: color-mix(in srgb, var(--wl-C9A84C, #C9A84C) 10%, transparent); }
 .oe-stufen { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }

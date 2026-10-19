@@ -829,6 +829,9 @@ function _renderWertverfahren(d) {
               ? ' <a href="' + esc(hk.weg.url) + '" target="_blank" rel="noopener">zur Quelle</a>' : '')
           + '</div>'
         : '')
+    /* v2401 \u00b7 Stufe N: der Rechenweg der DealPilot-Formel, sichtbar */
+    + (e.liegenschaftszins_formel_hinweis
+        ? '<div class="wv-quelle">' + esc(e.liegenschaftszins_formel_hinweis) + '</div>' : '')
     /* ═══ v1099b-WQL · DER WEG ZUR QUELLE, AUF DEM BILDSCHIRM ═══════════
        Marcels Vorgabe: "gib im Marktbericht bei den Liegenschaftszinsen
        und Sachwertfaktoren den Link an, wenn der Kunde die Adresse
@@ -4540,7 +4543,10 @@ async function exportPdf(out) {
          (amtlich, geringe Datenbasis) und den Nachbarwert. Seit v2390 kommt die
          Beschriftung aus `liegenschaftszins_herkunft`; das hier ist nur noch
          der Rueckfall fuer aeltere Berichte und behauptet keine Herkunft. */
-      C: 'indikativ, nicht objektgenau', D: 'gesetzlicher Auffangwert n. § 256 BewG',
+      C: 'indikativ, nicht objektgenau',
+      /* v2401 · Stufe N zwischen C und D */
+      N: 'abgeleitet aus der DealPilot-Formel, nicht amtlich',
+      D: 'gesetzlicher Auffangwert n. § 256 BewG',
       E: 'eigene Angabe' };
 
     doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...MUT);
@@ -4614,7 +4620,7 @@ async function exportPdf(out) {
     } else {
       /* Rueckfall fuer Berichte vor v2390 */
       _q = (_stufeTxt[_ew.liegenschaftszins_stufe] || _ew.liegenschaftszins_quelle || '–');
-      if (_ew.liegenschaftszins_rueckfall && _ew.liegenschaftszins_stufe !== 'D') {
+      if (_ew.liegenschaftszins_rueckfall && ['D', 'N'].indexOf(_ew.liegenschaftszins_stufe) < 0) {
         _q = 'Rückfallwert, nicht objektgenau zugeordnet';   /* v2381 */
       }
       if (_ew.liegenschaftszins_quelle && _stufeTxt[_ew.liegenschaftszins_stufe]) {
@@ -4633,6 +4639,8 @@ async function exportPdf(out) {
       _zeilen('Ertragswert insoweit indikativ — ' + (_zh.klartext || _zh.etikett) + '.', [150, 110, 100], true);
       if (_zh.weg && _zh.weg.text) _zeilen(_zh.weg.text + (_zh.weg.kosten ? ' ' + _zh.weg.kosten : ''), [140, 132, 118], false);
     }
+    /* v2401 · Stufe N: Rechenweg der DealPilot-Formel im PDF */
+    if (_ew.liegenschaftszins_formel_hinweis) _zeilen(String(_ew.liegenschaftszins_formel_hinweis).replace(/−/g, '-'), [140, 132, 118], false);
     /* ═══ v1099-WQL · WO DER LESER DEN WERT SELBST HOLT ═══════════════════
        Der Link steht IMMER da, nicht nur wenn ein Wert fehlt: er belegt
        die Zahl und laesst sie nachpruefen. Was er NICHT sagt: dass

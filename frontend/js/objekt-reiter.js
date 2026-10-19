@@ -52,17 +52,18 @@
     return '<div class="oe-row"><span class="oe-k">' + k + '</span><span class="oe-w">' + w + '</span><span class="oe-q">' + q + '</span><span>' + (aktion || '') + '</span></div>';
   }
   /* v1865 · Marcel: „nirgendwo ist beschrieben, wofür welche Stufe steht." Die
-     Bedeutung kommt aus WertParameterService (A/B/C/D/E), hier als Tooltip
-     an jeder Pille und als Legende unter der Leiste. */
+     Bedeutung kommt aus WertParameterService (A/B/C/N/D/E), hier als Tooltip
+     an jeder Pille und als Legende unter der Leiste. v2401: N zwischen C und D. */
   var STUFEN = {
     A: 'Stufe A — amtlich: vom zuständigen Gutachterausschuss für dieses Gebiet und diese Objektart abgeleitet.',
     B: 'Stufe B — amtlich, aber übergeordnet (Kreis- oder Landesebene) oder Modellansatz des Ausschusses; indikativ.',
     C: 'Stufe C — amtlicher Wert einer anderen Gemeinde desselben Ausschusses; indikativ.',
+    N: 'Stufe N — abgeleitet aus der DealPilot-Formel (aus den amtlichen Werten der Gutachterausschüsse), nicht amtlich; indikativ. Genauer: den Wert des Ausschusses eintragen.',
     D: 'Stufe D — gesetzlicher Auffangwert nach § 256 BewG, nicht marktabgeleitet.',
     E: 'Stufe E — eigene Angabe des Nutzers.'
   };
   function st(cls, txt) {
-    var m = String(txt || '').match(/^Stufe ([A-E])$/);
+    var m = String(txt || '').match(/^Stufe ([A-EN])$/);
     var tip = m && STUFEN[m[1]] ? ' title="' + esc(STUFEN[m[1]]) + '"' : '';
     return '<span class="oe-st ' + cls + '"' + tip + '>' + esc(txt) + '</span>';
   }
@@ -91,7 +92,7 @@
     + '(§ 7 Abs. 4 Satz 2 EStG) ist etwas anderes und entsteht nicht hier.</div>';
 
   var LEGENDE = '<div class="oe-legende"><b>Stufen:</b> A amtlich für Gebiet und Objektart · B amtlich, übergeordnet oder Modellansatz · '
-    + 'C amtlich aus einer Nachbargemeinde desselben Ausschusses · D gesetzlicher Auffangwert (§ 256 BewG) · E eigene Angabe. '
+    + 'C amtlich aus einer Nachbargemeinde desselben Ausschusses · N abgeleitet aus der DealPilot-Formel, nicht amtlich · D gesetzlicher Auffangwert (§ 256 BewG) · E eigene Angabe. '
     + 'Eingabetiefe 1/2/3 = Marktpreisindikation / erweiterte Indikation / Sach- und Ertragswert.</div>';
   function knopf(txt, feld) { return '<button type="button" class="oe-btn" data-oe-feld="' + feld + '">' + txt + '</button>'; }
 
@@ -332,12 +333,18 @@
       html += zeile('GND / RND', '—', 'Anlage 1/2 ImmoWertV — wird im Bericht aus Baujahr und Modernisierungspunkten abgeleitet', '');
     } else {
       var stufe = r.stufe || '?';
-      var cls = stufe === 'A' ? 'a' : (stufe === 'B' || stufe === 'C') ? 'b' : 'x';
+      var cls = stufe === 'A' ? 'a' : (stufe === 'B' || stufe === 'C') ? 'b' : stufe === 'N' ? 'n' : 'x';
       /* Die Quelle ist ein ganzer Satz (Ausschuss, Traeger, Lizenz) — in der
          Zeile steht der erste Teil, der Rest als Tooltip. */
       var qv = String(r.quelle || r.ausschuss || ''), qk = qv.split(',')[0];
       var q = st(cls, 'Stufe ' + stufe) + '<span title="' + esc(qv) + '">' + esc(qk) + '</span>' + (r.berichtsjahr ? ' · ' + esc(r.berichtsjahr) : '')
             + (r.zweig ? ' · ' + esc(r.zweig) : '') + (r.quelle_url ? ' · <a href="' + esc(r.quelle_url) + '" target="_blank" rel="noopener">Quelle</a>' : '');
+      /* v2401 · Stufe N: sagen, was es ist und wie es genauer geht (Rechenweg als Tooltip) */
+      if (stufe === 'N') {
+        var _zw = r.zins_herkunft && r.zins_herkunft.weg;
+        q += ' · <span title="' + esc(r.hinweis || '') + '">abgeleitet, nicht amtlich</span> — genauer: den Satz des Gutachterausschusses eintragen'
+          + (_zw && _zw.url ? ' (<a href="' + esc(_zw.url) + '" target="_blank" rel="noopener">' + esc(String(_zw.ausschuss || 'Ausschuss').split(',')[0]) + '</a>)' : '');
+      }
       var eigen = _v('lzs_pct');
       if (eigen) q = st('b', 'abweichend') + 'eigener Ansatz ' + esc(eigen) + ' % — amtlich ' + q;
       html += zeile('Liegenschaftszins', deNum(r.wert_pct, 2) + ' %', q, knopf(eigen ? 'ändern' : 'eintragen', 'lzs_pct'));
@@ -422,7 +429,8 @@
     /* v1865 · Stufe D ist der gesetzliche Auffangwert (§ 256 BewG) — ein Wert,
        aber keiner aus dem Register. Der Anfragen-Block muss das wissen, sonst
        nennt er eine Quelle, die der Bericht gar nicht benutzt (Parkstr. 9, MFH). */
-    _leiste = { zins: !!(r && r.verfuegbar && r.stufe && r.stufe !== 'D' && r.stufe !== 'E'), zinsStufe: (r && r.stufe) || null,
+    /* v2401 · Stufe N (DealPilot-Formel) ist wie D kein Satz des Ausschusses - der Anfragen-Block bleibt offen. */
+    _leiste = { zins: !!(r && r.verfuegbar && r.stufe && ['D', 'E', 'N'].indexOf(r.stufe) < 0), zinsStufe: (r && r.stufe) || null,
                 zinsGrund: (r && (r.quelle || r.grund)) || null,
                 swf: !!(r && r.sachwertfaktor_quelle && r.sachwertfaktor_quelle.verfuegbar),
                 ausschuss: (r && (r.ausschuss || r.quelle)) || null, swfHinweis: (r && r.sachwertfaktor_quelle && r.sachwertfaktor_quelle.hinweis) || null };
@@ -479,9 +487,9 @@
       var istZins = /liegenschaft|lzs/i.test(String(e.kennzahl) + e.name);
       if (istZins && _leiste && !_leiste.zins && _leiste.zinsStufe) {
         text += ' · <span title="' + esc(_leiste.zinsGrund || '') + '">nicht für die Objektart ' + esc(_v('objart').toUpperCase() || '?')
-              + ' — der Bericht nimmt den gesetzlichen Auffangwert (Stufe ' + esc(_leiste.zinsStufe) + ')</span>';
+              + ' — der Bericht nimmt ' + (_leiste.zinsStufe === 'N' ? 'die DealPilot-Formel (Stufe N)' : 'den gesetzlichen Auffangwert (Stufe ' + esc(_leiste.zinsStufe) + ')') + '</span>';
       }
-      zeilen.push('<div class="oe-qz' + ((istSwf && /nicht für diese Objektart/.test(text)) || (istZins && /Auffangwert/.test(text)) ? ' fehlt' : '') + '"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span title="' + esc(e.ausschuss || q.ausschuss || '') + '">' + text + '</span>' + link + '</div>');
+      zeilen.push('<div class="oe-qz' + ((istSwf && /nicht für diese Objektart/.test(text)) || (istZins && /Auffangwert|DealPilot-Formel/.test(text)) ? ' fehlt' : '') + '"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span title="' + esc(e.ausschuss || q.ausschuss || '') + '">' + text + '</span>' + link + '</div>');
     });
     fehlt.forEach(function (e) {
       zeilen.push('<div class="oe-qz fehlt"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span>nicht im Register — ' + esc(kurz(q && q.ausschuss) || 'Gutachterausschuss') + ' anfragen oder dem Grundstücksmarktbericht entnehmen</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">anfragen</button></div>');
@@ -1015,13 +1023,15 @@
     _trauZeigen(liste[_s ? (parseInt(_s.value, 10) || 0) : 0]);   /* v2393 */
   }
   /* v2393 · Wie weit traut man dem Wert? Dieselben Stufen wie in Bericht und Hilfe
-     („Herkunftsstufen A bis E"). Ertragswert: Stufe des Liegenschaftszinssatzes;
+     („Herkunftsstufen A bis E", seit v2401 mit N). Ertragswert: Stufe des Liegenschaftszinssatzes;
      Sachwert: Stufe des Sachwertfaktors, ohne Faktor „vorläufig"; Marktwert und
      Vergleichswert aus Angeboten: „Indikation". Statusfarben bleiben hart (Grün/Rot). */
   var TRAUEN = {
     A: { buchst: 'A', kurz: 'amtlich', farbe: '#3FA56C', lang: 'Amtlicher Wert des zuständigen Gutachterausschusses — belastbar.' },
     B: { buchst: 'B', kurz: 'amtlich, regional', farbe: '#3FA56C', lang: 'Amtlich, aber aus dem Landesbericht — für den Kreis liegt kein eigener Wert vor. Genauer: den örtlichen Wert eintragen.' },
     C: { buchst: 'C', kurz: 'abgeleitet', farbe: 'var(--wl-b8932f, #b8932f)', lang: 'Abgeleitet — schmale Datenbasis, Nachbarwert desselben Ausschusses oder übertragene Tabelle. Mit dem örtlichen Wert wird es genauer.' },
+    /* v2401 · N zwischen C (Gold) und D (Rot): Statusfarbe, bewusst nicht tokenisiert */
+    N: { buchst: 'N', kurz: 'DealPilot-Formel', farbe: '#B87A46', lang: 'Abgeleitet aus der DealPilot-Formel — aus den amtlichen Werten der Gutachterausschüsse gerechnet, nicht amtlich und nicht für diesen Ort ermittelt. Genauer: den Liegenschaftszinssatz des Ausschusses eintragen.' },
     D: { buchst: 'D', kurz: 'Auffangwert', farbe: '#B8625C', lang: 'Gesetzlicher Auffangwert (§ 256 BewG) — kein örtlicher Zins. Nur eine grobe Einordnung: trag den Liegenschaftszinssatz des Ausschusses ein.' },
     E: { buchst: 'E', kurz: 'eigene Angabe', farbe: '#8a8378', lang: 'Mit deiner eigenen Angabe gerechnet.' },
     V: { buchst: '', kurz: 'vorläufig', farbe: '#B8625C', lang: 'Vorläufig — ohne Sachwertfaktor des Ausschusses (keine Marktanpassung). Trag den Sachwertfaktor ein, wenn du ihn hast.' },
@@ -1032,7 +1042,7 @@
     var el = $('oe-vw-trau'); if (!el) return;
     var t = h ? _trauen(h.trau) : null;
     if (!t) { el.innerHTML = ''; return; }
-    el.innerHTML = '<span title="' + esc(t.lang + ' Mehr in der Hilfe unter „Herkunftsstufen A bis E".') + '" style="display:inline-flex;align-items:center;gap:6px;'
+    el.innerHTML = '<span title="' + esc(t.lang + ' Mehr in der Hilfe unter „Herkunftsstufen".') + '" style="display:inline-flex;align-items:center;gap:6px;'
       + 'padding:3px 10px;border-radius:99px;border:1px solid ' + t.farbe + ';color:' + t.farbe + ';font:600 11.5px Inter,system-ui,sans-serif;'
       + 'white-space:nowrap;cursor:help;margin:0 6px">'
       + '<i style="width:8px;height:8px;border-radius:50%;background:' + t.farbe + ';display:inline-block"></i>'
