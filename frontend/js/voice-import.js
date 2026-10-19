@@ -5481,6 +5481,25 @@
      hat, bekommt ihn nicht mehr gefragt — dann darf er in der Übersicht
      aber auch nicht FEHLEN. Eine Liste, die „was schon steht" heißt und
      ausgerechnet das Eingetippte verschweigt, ist keine Übersicht. */
+  /* v2368 · „Was schon steht" zeigte „1800 · 1200" ohne Einheit (Befund aus
+     der Modul-25-Aufnahme). Die Einheit steht im Klarnamen (KLAR_NAME) oder im
+     Katalog-Label in Klammern; nur an reine Zahlen gehaengt. */
+  function _rfMitEinheit(id, label, anzeige) {
+    try {
+      if (!/^-?[0-9]+(,[0-9]+)?$/.test(anzeige)) return anzeige;
+      var quelle = (typeof KLAR_NAME !== 'undefined' && KLAR_NAME[id]) || label || '';
+      var k = /\(([^)]*)\)\s*$/.exec(quelle); if (!k) return anzeige;
+      var e = k[1];
+      if (/€/.test(e)) {
+        var n = Number(anzeige.replace(',', '.'));
+        var t = (Math.abs(n) >= 1000 && Math.round(n) === n) ? n.toLocaleString('de-DE') : anzeige;
+        return t + ' ' + e;
+      }
+      if (/%/.test(e)) return anzeige + ' %';
+      if (/m²/.test(e)) return anzeige + ' m²';
+    } catch (x) {}
+    return anzeige;
+  }
   function _rfWerteZuBlock(e) {
     var out = [];
     (e.ids || []).forEach(function (id) {
@@ -5513,6 +5532,7 @@
       /* v1284: Zahlen lesbar - "3.5" ist ein Feldwert, "3,5" eine Angabe. */
       var anzeige = String(v);
       if (anzeige.indexOf(",") < 0 && /^-?[0-9]+\.[0-9]+$/.test(anzeige)) anzeige = anzeige.replace(".", ",");
+      anzeige = _rfMitEinheit(id, kat && kat.label, anzeige);   /* v2368 */
       out.push({ n: name, v: anzeige, f: ausFormular && !ausVorlauf, vorlauf: ausVorlauf });
     });
     return out;
@@ -11711,6 +11731,10 @@
               || a.art === 'brw' || a.art === 'lage';
         })
         && !_rf.konfliktOffen
+        /* v2368 · Steht zugleich das Feinheiten-Angebot offen, meint
+           „Nein, das reicht" / „fertig" DIESES - gemessen in der
+           Modul-25-Aufnahme landete es beim Markt-Angebot. */
+        && !(_rf.tiefeOffen && /(reicht|fertig|passt so|genug)/i.test(t))
         && /^(nein|nee|ne|nö|noe|nicht n(ö|oe)tig|lass (das|es)|brauch(e)? ich nicht|(ü|ue)berspring\w*|sp(ä|ae)ter)\b/i.test(t)) {
       _rfAktionKlick('ueberspringen');
       return true;
