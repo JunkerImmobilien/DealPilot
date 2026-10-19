@@ -1021,7 +1021,7 @@
   var TRAUEN = {
     A: { buchst: 'A', kurz: 'amtlich', farbe: '#3FA56C', lang: 'Amtlicher Wert des zuständigen Gutachterausschusses — belastbar.' },
     B: { buchst: 'B', kurz: 'amtlich, regional', farbe: '#3FA56C', lang: 'Amtlich, aber aus dem Landesbericht — für den Kreis liegt kein eigener Wert vor. Genauer: den örtlichen Wert eintragen.' },
-    C: { buchst: 'C', kurz: 'abgeleitet', farbe: '#b8932f', lang: 'Abgeleitet — schmale Datenbasis, Nachbarwert desselben Ausschusses oder übertragene Tabelle. Mit dem örtlichen Wert wird es genauer.' },
+    C: { buchst: 'C', kurz: 'abgeleitet', farbe: 'var(--wl-b8932f, #b8932f)', lang: 'Abgeleitet — schmale Datenbasis, Nachbarwert desselben Ausschusses oder übertragene Tabelle. Mit dem örtlichen Wert wird es genauer.' },
     D: { buchst: 'D', kurz: 'Auffangwert', farbe: '#B8625C', lang: 'Gesetzlicher Auffangwert (§ 256 BewG) — kein örtlicher Zins. Nur eine grobe Einordnung: trag den Liegenschaftszinssatz des Ausschusses ein.' },
     E: { buchst: 'E', kurz: 'eigene Angabe', farbe: '#8a8378', lang: 'Mit deiner eigenen Angabe gerechnet.' },
     V: { buchst: '', kurz: 'vorläufig', farbe: '#B8625C', lang: 'Vorläufig — ohne Sachwertfaktor des Ausschusses (keine Marktanpassung). Trag den Sachwertfaktor ein, wenn du ihn hast.' },
