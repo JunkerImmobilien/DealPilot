@@ -522,6 +522,68 @@ const quelle = fs.readFileSync(path.join(BASIS, 'services', 'unterlagenService.j
     + (ok ? '' : 'nicht im kommentarfreien Text: "' + p[1].slice(0, 40) + '"'));
 });
 
+/* ══ 8 · v2440 · NAME AUF DER SEITE, INTERNE ADRESSEN, GEMEINDEWEIT ══
+ *
+ * Die Vorlage v6 BITTET das Modell, nur Personen zu nennen, die dort
+ * stehen. Seit v2440 wird der Name gegen den Text der selbst gelesenen
+ * Seite gehalten. Geprueft wird beides: der echte Name bleibt, der
+ * erfundene faellt — und ohne gelesene Seite aendert sich nichts. */
+console.log('');
+console.log('=== 8 · Namenspruefung, interne Adressen, gemeindeweite Saetze (v2440) ===');
+{
+  const SEITE = 'https://stadt-xy.de/bauakten';
+  const TEXT = U.seitenText ? U.seitenText('<h2>Ansprechpartner</h2><p>Frau Anja M&uuml;ller<br>Bauaktenarchiv</p>'
+    + '<p>Herr Dr. Peter Schmidt-Lange, Sachgebietsleitung</p><p>bauakten@stadt-xy.de</p>') : '';
+  const BEL = { alle: ['bauakten@stadt-xy.de'], pro_seite: [{ url: SEITE, mails: ['bauakten@stadt-xy.de'] }],
+                texte: { [SEITE]: TEXT } };
+  [
+    ['Name mit Umlaut-Entity gefunden', function () {
+      return U.nameAufSeiten('Anja Müller', { [SEITE]: TEXT }) === SEITE ? null : 'nicht gefunden'; }],
+    ['Titel und Anrede zaehlen nicht', function () {
+      return U.nameAufSeiten('Herr Dr. Peter Schmidt-Lange', { [SEITE]: TEXT }) === SEITE ? null : 'nicht gefunden'; }],
+    ['Nachname allein im Fliesstext reicht nicht', function () {
+      return U.nameAufSeiten('Klaus Müller', { [SEITE]: TEXT }) === '' ? null : 'falscher Treffer'; }],
+    ['Wortteil ist kein Name', function () {
+      return U.nameAufSeiten('Anja Mül', { [SEITE]: TEXT }) === '' ? null : 'Wortteil traf'; }],
+    ['zwei echte Namen bleiben, mit Seite', function () {
+      const p = U.personenAus([{ name: 'Frau Anja Müller', funktion: 'Bauaktenarchiv' },
+                               { name: 'Peter Schmidt-Lange', funktion: 'Leitung' }],
+        'bauakten@stadt-xy.de', BEL, SEITE);
+      return (p.length === 2 && p[0].name_belegt && p[0].seite === SEITE) ? null
+        : 'n=' + p.length + ' belegt=' + (p[0] && p[0].name_belegt); }],
+    ['erfundener Name faellt bei gelesener Seite', function () {
+      const p = U.personenAus([{ name: 'Frau Anja Müller', funktion: 'x' },
+                               { name: 'Karl Erfunden', funktion: 'y' }],
+        'bauakten@stadt-xy.de', BEL, SEITE);
+      return (p.length === 1 && p[0].name === 'Frau Anja Müller') ? null : 'n=' + p.length; }],
+    ['belegte Adresse rettet Namen nicht noetig', function () {
+      const b2 = { alle: ['bauakten@stadt-xy.de', 'k.erfunden@stadt-xy.de'],
+                   pro_seite: [{ url: SEITE, mails: ['bauakten@stadt-xy.de', 'k.erfunden@stadt-xy.de'] }],
+                   texte: { [SEITE]: TEXT } };
+      const p = U.personenAus([{ name: 'Karl Erfunden', email: 'k.erfunden@stadt-xy.de' },
+                               { name: 'Anja Müller' }], 'bauakten@stadt-xy.de', b2, SEITE);
+      return (p.length === 2 && p[0].bestaetigt && p[0].seite === SEITE) ? null : 'n=' + p.length; }],
+    ['localhost ist lokal', function () { return U.istLokal('http://localhost:3000/x') ? null : 'nicht erkannt'; }],
+    ['Container-Name ist lokal', function () { return U.istLokal('http://mb-backend:4000/') ? null : 'nicht erkannt'; }],
+    ['10er-Netz ist lokal', function () { return U.istLokal('http://10.0.0.5/') ? null : 'nicht erkannt'; }],
+    ['Amtsseite ist nicht lokal', function () { return U.istLokal('https://www.bielefeld.de/bauamt') ? 'faelschlich lokal' : null; }],
+    ['Kernname Frankfurt am Main', function () { return U.ortKern('Frankfurt am Main') === 'frankfurt' ? null : U.ortKern('Frankfurt am Main'); }],
+    ['Kernname Halle (Saale)', function () { return U.gemeindeweitSchluessel('Halle (Saale)') === 'gemeinde-halle' ? null : U.gemeindeweitSchluessel('Halle (Saale)'); }],
+    ['Kernname Bad Oeynhausen bleibt', function () { return U.gemeindeweitSchluessel('Bad Oeynhausen') === 'gemeinde-bad-oeynhausen' ? null : 'falsch'; }],
+    ['Sonder-Bindestrich in Adresse', function () {
+      return U.mailSauber('mailto:bau‑amt@stadt–xy.de.') === 'bau-amt@stadt-xy.de' ? null : U.mailSauber('mailto:bau‑amt@stadt–xy.de.'); }],
+    ['Platzhalter bleibt leer', function () { return U.mailSauber('email') === '' ? null : 'nicht leer'; }],
+    ['Kanal post mit Adresse ist email', function () { return U.kanalAus('post', 'a@b.de', '') === 'email' ? null : U.kanalAus('post', 'a@b.de', ''); }],
+    ['Kanal ohne Angabe mit Formular', function () { return U.kanalAus('', '', 'https://x.de') === 'formular' ? null : 'falsch'; }]
+  ].forEach(function (pr) {
+    faelle++;
+    let fehler = null;
+    try { fehler = pr[1](); } catch (e) { fehler = 'wirft: ' + e.message; }
+    if (fehler) rot++;
+    console.log('  ' + (fehler ? 'ROT ' : 'ok  ') + pr[0].padEnd(42) + (fehler || ''));
+  });
+}
+
 console.log('');
 console.log('=== Deckung ===');
 console.log('  Dienst      : der ECHTE ' + BASIS + '/services/unterlagenService.js');
@@ -532,7 +594,8 @@ console.log('  Geprueft    : 19 Schreibweisen finden, 12 Fehlalarme vermeiden,')
 console.log('                Reihenfolge, 9 Postfacharten, zwei Gegenproben,');
 console.log('                13 Zusicherungen des Personen-Zusammenbaus (v2152),');
 console.log('                5 Formproben der Spalte seiten (v2152a),');
-console.log('                6 Stellen des KI-Auftrags am kommentarfreien Text');
+console.log('                6 Stellen des KI-Auftrags am kommentarfreien Text,');
+console.log('                18 Proben Namenspruefung, interne Adressen, Kernname, Saeuberung, Kanal (v2440)');
 console.log('  NICHT       : `belegSeiten()` selbst — die ruft echte Server ab.');
 console.log('                Dass sie die Seiten LIEST, ist hier bewiesen; dass sie');
 console.log('                sie ABRUFT, ist ein Staging-Abnahmepunkt.');
