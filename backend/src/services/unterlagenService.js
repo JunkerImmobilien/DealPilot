@@ -460,6 +460,20 @@ function seitenLesen(seiten) {
  * Software, die von sich aus jemanden in Kopie setzt, verschickt Post
  * an Menschen, die der Absender nicht gewählt hat.
  */
+/* v2445 · Gehört die Adresse zur Domain des Amts? Verglichen werden die
+   letzten zwei Namensteile (`kreis-herford.de`), damit `bauamt.stadt.de`
+   und `stadt.de` zusammengehören. */
+function _stamm(host) {
+  const t = String(host || '').toLowerCase().replace(/^www\./, '').split('.').filter(Boolean);
+  return t.slice(-2).join('.');
+}
+function _gleicheDomain(mail, eigeneMail, quelleUrl) {
+  const d = _stamm(String(mail || '').split('@')[1]);
+  if (!d) return false;
+  if (eigeneMail) return d === _stamm(String(eigeneMail).split('@')[1]);
+  try { return d === _stamm(new URL(quelleUrl).hostname); } catch (e) { return false; }
+}
+
 function personenAus(roh, eigeneMail, belegDetail, quelleUrl) {
   const personen = [];
   const eigen = _s(eigeneMail).toLowerCase();
@@ -527,7 +541,16 @@ function personenAus(roh, eigeneMail, belegDetail, quelleUrl) {
     .find(function (s) { return s.url === quelleUrl; })
     || ((belegDetail && belegDetail.pro_seite) || [])[0];
   ((seite && seite.mails) || []).forEach(function (m) {
-    if (istPersonenpostfach(m)) merke({ name: '', funktion: '', email: m, telefon: '' });
+    /* v2445 · NUR DIE DOMAIN DES AMTS. Gemessen am 19.10.2026: die
+       Übersichtsseite der hessischen Vermessungsverwaltung listet alle
+       Gutachterausschüsse des Landes — für Frankfurt kamen so
+       `…@bad-homburg.de` und `…@giessen.de` als „Ansprechpartner 1
+       und 2" an. Eine Adresse fremder Domain auf einer Sammelseite ist
+       keine Person DIESES Amts. Ohne eigene Adresse zählt der Server
+       der Quellseite. */
+    if (istPersonenpostfach(m) && _gleicheDomain(m, eigen, quelleUrl)) {
+      merke({ name: '', funktion: '', email: m, telefon: '' });
+    }
   });
 
   /* ══ v2153 · ENTWEDER ZWEI ODER KEINE ═══════════════════════════════

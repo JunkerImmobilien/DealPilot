@@ -100,6 +100,10 @@ async function einAmt(g, a) {
   const personen = U.personenAus(
     roh.map((p) => ({ name: s(p && p.name), funktion: s(p && p.funktion), email: s(p && p.email), telefon: s(p && p.telefon) })),
     email, detail, quelle).filter((p) => p.bestaetigt || p.name_belegt)
+    /* v2445 · im Einspielweg nur, wen die Recherche für DIESES Anliegen
+       genannt hat — kein Auffüllen aus Postfächern einer Sammelseite */
+    .filter((p) => roh.some((r) => r && ((p.email && U.mailSauber(r.email) === p.email)
+      || (p.name && s(r.name) === p.name))))
     /* v2153 noch einmal: eine einzelne nackte Adresse ist kein Ansprechpartner */
     .filter((p, i, l) => l.length >= 2 || !!p.name);
   z.personen_geprueft += personen.length;

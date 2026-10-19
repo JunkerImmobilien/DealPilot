@@ -577,6 +577,16 @@ console.log('=== 8 · Namenspruefung, interne Adressen, gemeindeweite Saetze (v2
       return U.istPersonenpostfach('amt62.kataster@essen.de') ? 'als Person gezaehlt' : null; }],
     ['sabine.schulz bleibt Person', function () {
       return U.istPersonenpostfach('sabine.schulz@braunschweig.de') ? null : 'nicht erkannt'; }],
+    ['fremde Domain der Sammelseite fuellt nicht auf', function () {
+      const Q2 = 'https://hvbg.hessen.de/gutachterausschuss';
+      const b3 = { alle: ['m.stauder@bad-homburg.de', 'h.lein@giessen.de'],
+                   pro_seite: [{ url: Q2, mails: ['m.stauder@bad-homburg.de', 'h.lein@giessen.de'] }] };
+      const p = U.personenAus([], 'gutachterausschuss@stadt-frankfurt.de', b3, Q2);
+      return p.length === 0 ? null : 'aufgefuellt: ' + p.map((x) => x.email).join(','); }],
+    ['eigene Domain fuellt weiter auf', function () {
+      const p = U.personenAus([], 'bauamt@stadt-xy.de', BEL.alle ? { alle: ['a.mueller@stadt-xy.de', 'b.schmidt@stadt-xy.de'],
+        pro_seite: [{ url: SEITE, mails: ['a.mueller@stadt-xy.de', 'b.schmidt@stadt-xy.de'] }] } : null, SEITE);
+      return p.length === 2 ? null : 'n=' + p.length; }],
     ['localhost ist lokal', function () { return U.istLokal('http://localhost:3000/x') ? null : 'nicht erkannt'; }],
     ['Container-Name ist lokal', function () { return U.istLokal('http://mb-backend:4000/') ? null : 'nicht erkannt'; }],
     ['10er-Netz ist lokal', function () { return U.istLokal('http://10.0.0.5/') ? null : 'nicht erkannt'; }],
@@ -609,7 +619,7 @@ console.log('                Reihenfolge, 9 Postfacharten, zwei Gegenproben,');
 console.log('                13 Zusicherungen des Personen-Zusammenbaus (v2152),');
 console.log('                5 Formproben der Spalte seiten (v2152a),');
 console.log('                6 Stellen des KI-Auftrags am kommentarfreien Text,');
-console.log('                24 Proben Namenspruefung, Amtswort im Konto, Stern-Kreis-Schreibweise, interne Adressen, Kernname, Saeuberung, Kanal (v2440)');
+console.log('                26 Proben Namenspruefung, Amtswort im Konto, fremde Domain, Stern-Kreis-Schreibweise, interne Adressen, Kernname, Saeuberung, Kanal (v2440)');
 console.log('  NICHT       : `belegSeiten()` selbst — die ruft echte Server ab.');
 console.log('                Dass sie die Seiten LIEST, ist hier bewiesen; dass sie');
 console.log('                sie ABRUFT, ist ein Staging-Abnahmepunkt.');
