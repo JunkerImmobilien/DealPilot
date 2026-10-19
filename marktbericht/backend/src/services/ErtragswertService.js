@@ -14,7 +14,7 @@ import { bewirtschaftungskosten as nrwBwk } from '../lib/nrw_modell.js';
 import {
   BWK_TABELLE, bwkAnsaetze, BWK_JAHRE, GND_TABELLE, MODELL,
   barwertfaktor, abzinsungsfaktor, gnd, rnd, lzsNach256,
-  istNeubau, istErstbezugNachSanierung, round0, round2,
+  istNeubau, istErstbezugNachSanierung, round0, round2, gndNachAnlage1Belegt,
 } from '../lib/immowertv.js';
 
 /* FIX-NUM: Number(null) ist 0, nicht NaN. Ohne diese Wache lieferte
@@ -42,12 +42,29 @@ const pos = (v) => { const n = num(v); return n != null && n > 0 ? n : null; };
    `deZahl` ist die eine Stelle dafuer. toLocaleString setzt zugleich den
    Tausenderpunkt richtig (1234 -> „1.234"), was bei €/m²-Werten ueber 1000
    vorher fehlte. */
+/* v2382 · Koeffizienten mit vier Stellen (0,4439 statt „0.4439") */
+function deZahl4(v) {
+  const n = num(v);
+  return n == null ? '–' : n.toLocaleString('de-DE', { maximumFractionDigits: 4 });
+}
 function deZahl(v) {
   const n = num(v);
   return n == null ? '–' : n.toLocaleString('de-DE');
 }
 
 export const ErtragswertService = {
+
+  /* v2390 · Herkunft des Bodenrichtwerts aus dem BORIS-Ergebnis, an EINER Stelle.
+       'boris'          amtlich ueber BORIS abgerufen
+       'eigene_angabe'  Rueckfall auf die DealPilot-Eingabe (source 'dealpilot-eingabe')
+       'manuell'        kein Bodenrichtwert verfuegbar
+     Vorher setzten drei Aufrufer `available ? 'boris'` und machten so aus der
+     eigenen Angabe einen amtlichen Wert - ohne Belastbarkeitsabzug. */
+  brwHerkunft(landValue) {
+    if (!landValue || !landValue.available) return 'manuell';
+    if (landValue.source === 'dealpilot-eingabe') return 'eigene_angabe';
+    return 'boris';
+  },
 
   /* ══════════════════════════════════════════════════════════════════════════
    * BODENWERT — Grundlage fuer Ertrags- UND Sachwert.
@@ -103,7 +120,7 @@ export const ErtragswertService = {
           : 'Grundstücksfläche × Bodenrichtwert',
         detail: `${_auf.bauland_qm} m² × ${deZahl(_auf.bodenwert_eur_qm)} €/m²`
           + (_auf.koeffizient_angewandt
-            ? ` (${deZahl(brw)} €/m² × ${_auf.koeffizient_bauland} / ${_auf.koeffizient_bezugsgroesse})`
+            ? ` (${deZahl(brw)} €/m² × ${deZahl4(_auf.koeffizient_bauland)} / ${deZahl4(_auf.koeffizient_bezugsgroesse)})`
             : ''),
         wert: round0(_auf.wert_bauland_eur),
       });
@@ -121,7 +138,7 @@ export const ErtragswertService = {
       out.schritte.push({
         pos: 'Grundstücksfläche × angepasster Bodenwert',
         detail: `${flaeche} m² × ${deZahl(_auf.bodenwert_eur_qm)} €/m²`
-          + ` (${deZahl(brw)} €/m² × ${_auf.koeffizient_bauland} / ${_auf.koeffizient_bezugsgroesse})`,
+          + ` (${deZahl(brw)} €/m² × ${deZahl4(_auf.koeffizient_bauland)} / ${deZahl4(_auf.koeffizient_bezugsgroesse)})`,
         wert: round0(wert),
       });
       out.hinweise.push(_auf.hinweis);
@@ -270,7 +287,10 @@ export const ErtragswertService = {
     const gewerbe = pos(ein.gewerbe_jahr) || 0;
     const spAnz = pos(ein.stellplatz_anz) || 0;
     const spMiete = pos(ein.stellplatz_miete_monat) || 0;
-    const stellplatz = round0(spAnz * spMiete * 12);
+    /* v2382 · Zusatzeinnahmen aus der Haupt-App (`ze`: Stellplatz, Garage etc.) sind Rohertrag.
+       Liegen sie vor, ersetzen sie die Stueckrechnung Anzahl x Miete - beides waere doppelt. */
+    const zusatz = pos(ein.zusatz_jahr) || 0;
+    const stellplatz = zusatz > 0 ? round0(zusatz) : round0(spAnz * spMiete * 12);
     const sonstige = pos(ein.sonstige_jahr) || 0;
 
     if (!mieteMarkt && !gewerbe) {
@@ -289,7 +309,9 @@ export const ErtragswertService = {
        nicht gibt. Mit Wohnmiete bleibt die Zeile wie immer. */
     if (mieteMarkt || !gewerbe) out.staffel.push({ pos: 'Rohertrag Wohnen (marktüblich erzielbar)', wert: round0(mieteMarkt) });
     if (gewerbe) out.staffel.push({ pos: 'Rohertrag Gewerbe', wert: round0(gewerbe) });
-    if (stellplatz) out.staffel.push({ pos: `Stellplätze (${spAnz} × ${spMiete} €/Monat)`, wert: stellplatz });
+    if (stellplatz) out.staffel.push({ pos: zusatz > 0
+      ? `Stellplätze/Garagen u. a. (Zusatzeinnahmen ${deZahl(round2(zusatz / 12))} €/Monat)`
+      : `Stellplätze (${spAnz} × ${spMiete} €/Monat)`, wert: stellplatz });
     /* v1057-WSON-2 · Diese Zeile stand im Rohertrag und wurde damit ueber
      * die volle Restnutzungsdauer kapitalisiert. Der Ansatz steht jetzt
      * weiter unten mit eigener Laufzeit. */
@@ -321,7 +343,12 @@ export const ErtragswertService = {
             + 'Angabe des Gutachterausschusses)'
           : 'Bewirtschaftungskosten (eigene Kalkulation)',
         wert: bwk });
-      out.hinweise.push('Die Bewirtschaftungskosten wurden aus der eigenen Objektkalkulation übernommen. Die ImmoWertV sieht dafür normierte Ansätze vor (Anlage 3) — die Abweichung ist gewollt, sollte im Dossier aber benannt werden.');
+      /* v2382 · Stammt die Quote vom Gutachterausschuss, ist sie keine „eigene Objektkalkulation". */
+      out.hinweise.push(ein.bwk_quote_herkunft
+        ? 'Die Bewirtschaftungskosten sind mit der Quote des Gutachterausschusses angesetzt ('
+          + (ein.bwk_quote_pct != null ? String(ein.bwk_quote_pct).replace('.', ',') + ' % ' : '')
+          + 'auf den gesamten Rohertrag einschließlich Stellplätzen) — modellkonform zu seinem Liegenschaftszinssatz (§ 10 ImmoWertV).'
+        : 'Die Bewirtschaftungskosten wurden aus der eigenen Objektkalkulation übernommen. Die ImmoWertV sieht dafür normierte Ansätze vor (Anlage 3) — die Abweichung ist gewollt, sollte im Dossier aber benannt werden.');
     } else {
       /* v1018 · Verwaltungskosten gelten je Wohneinheit — aber bewertet wird
        * bei einer Eigentumswohnung EINE Einheit, nicht das ganze Haus.
@@ -451,6 +478,7 @@ export const ErtragswertService = {
              + ')',
         wert: verwaltung });
       bwkDetail.push({ pos: `Instandhaltung (${wfl} m² × ${deZahl(iJeQm)} €`
+             + (spAnz ? ` + ${spAnz} Stellpl. × ${deZahl(iJeStp)} €` : '')   /* v2382 */
              + (instGewerbe > 0 ? ` + Gewerbe ${_instGewTeile.join(' + ')}` : '') + ')',   /* v2210 */
         detail: iHerkunft === 'Anlage 3' ? null : 'aus deiner Rücklage',
         wert: instand });
@@ -564,7 +592,7 @@ export const ErtragswertService = {
       return out;
     }
     out.nutzungsdauer = { gnd: G, rnd: R, modell: rndInfo ? rndInfo.modell : 'manuell', alter: rndInfo ? rndInfo.alter : null };
-    if (!GND_TABELLE.geprueft && !pos(ein.gnd_jahre)) {
+    if (!GND_TABELLE.geprueft && !pos(ein.gnd_jahre) && !gndNachAnlage1Belegt(ein.objektart)) {   /* v2382 */
       out.warnungen.push('Die Gesamtnutzungsdauer stammt aus einer noch nicht gegen Anlage 1 ImmoWertV verifizierten Tabelle.');
     }
 
@@ -621,6 +649,9 @@ export const ErtragswertService = {
     /* ── 7 · Belastbarkeit ──────────────────────────────────────────────── */
     out.belastbarkeit = belastbarkeit({
       lzsStufe, lzsGrund, bwkGeprueft: BWK_TABELLE.geprueft,
+      /* v2390 · die Ebene des Zinses (WPS.zinsHerkunft) - nur wenn er auch
+         angekommen ist; sonst rechnet dieser Kern mit § 256 selbst. */
+      lzsHerkunft: pos(ein.lzs_pct) ? (ein.lzs_herkunft || null) : null,
       bodenwertQuelle: bodenwertErgebnis?.quelle?.herkunft,
       hatWohnflaeche: !!pos(ein.wohnflaeche_qm),
       hatRnd: !!R,
@@ -647,7 +678,7 @@ function rundeSinnvoll(v) {
   return Math.round(v / step) * step;
 }
 
-function belastbarkeit({ lzsStufe, lzsGrund = null, bwkGeprueft, bodenwertQuelle,
+function belastbarkeit({ lzsStufe, lzsGrund = null, lzsHerkunft = null, bwkGeprueft, bodenwertQuelle,
                         hatWohnflaeche, hatRnd, warnungen }) {
   let p = 100;
   const abzuege = [];
@@ -666,11 +697,29 @@ function belastbarkeit({ lzsStufe, lzsGrund = null, bwkGeprueft, bodenwertQuelle
   }
   /* v1022 · Die Marktableitung nutzt echte Preise, der gesetzliche
    * Auffangwert gar keine. Der Abstand im Abzug muss das abbilden. */
-  if (stufe === 'C') { p -= 20; abzuege.push('Liegenschaftszinssatz marktabgeleitet, nicht amtlich (−20)'); }
+  /* v2390 · Stufe C ist hier fast nie eine Marktableitung, sondern ein
+   * amtlicher Satz mit duenner Datenbasis oder der Nachbarwert desselben
+   * Ausschusses. Der Text folgt der Herkunft, nicht dem Buchstaben. */
+  if (stufe === 'C') {
+    p -= 20;
+    abzuege.push('Liegenschaftszinssatz ' + ((lzsHerkunft && lzsHerkunft.etikett) || 'indikativ, nicht objektgenau') + ' (−20)');
+  }
+  /* v2390 · Landeswert, Bundesdurchschnitt oder Rueckfallwert auf Stufe A
+   * sind nicht der oertliche Satz - bisher ohne jeden Abzug. */
+  if (stufe === 'A' && lzsHerkunft
+      && ['landeswert', 'bundesdurchschnitt', 'regional', 'rueckfall'].indexOf(lzsHerkunft.ebene) >= 0) {
+    p -= 12;
+    abzuege.push('Liegenschaftszinssatz ' + lzsHerkunft.etikett + ', nicht der örtliche Satz (−12)');
+  }
   if (stufe === 'D') { p -= 40; abzuege.push('Liegenschaftszinssatz nur gesetzlicher Auffangwert (−40)'); }
   if (stufe === 'E') { p -= 10; abzuege.push('Liegenschaftszinssatz vom Nutzer gesetzt (−10)'); }
   if (!bwkGeprueft) { p -= 8; abzuege.push('Bewirtschaftungskosten-Tabelle ungeprüft (−8)'); }
-  if (bodenwertQuelle && bodenwertQuelle !== 'boris') { p -= 10; abzuege.push('Bodenrichtwert nicht amtlich abgerufen (−10)'); }
+  if (bodenwertQuelle && bodenwertQuelle !== 'boris') {
+    p -= 10;
+    abzuege.push(bodenwertQuelle === 'eigene_angabe'   /* v2390 */
+      ? 'Bodenrichtwert aus eigener Angabe, nicht amtlich abgerufen (−10)'
+      : 'Bodenrichtwert nicht amtlich abgerufen (−10)');
+  }
   if (!hatWohnflaeche) { p -= 8; abzuege.push('Wohnfläche fehlt (−8)'); }
   if (!hatRnd) { p -= 15; abzuege.push('Restnutzungsdauer geschätzt (−15)'); }
   if (warnungen > 2) { p -= 5; abzuege.push('mehrere Warnungen (−5)'); }

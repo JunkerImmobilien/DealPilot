@@ -21,7 +21,7 @@ import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einhe
 import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js';
 import { groessenanpassung as ukAusRegister, naeherung as ukNaeherung,
          sperreSchliesstNaeherungAus } from '../lib/umrechnung_flaeche.js';   /* v2280, v2288 */
-import { wgfzAnpassung } from '../lib/umrechnung_wgfz.js';   /* v2361 */
+import { wgfzAnpassung, wgfzNaeherung } from '../lib/umrechnung_wgfz.js';   /* v2361, v2377 */
 import { zustaendig as niZoneZustaendig, holeZonen as niZonenHolen, waehleZone as niZoneWaehlen } from '../connectors/boris/ni-zone.js';   /* v2284 */
 /* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
  * zustaendigen Grundstuecksmarktbericht. */
@@ -229,6 +229,7 @@ export const ReportOrchestrator = {
       grundriss: input.grundriss || null,
       /* v1057-WSON-6 */
       sonstige_jahr: input.sonstige_jahr ? Number(input.sonstige_jahr) : null,
+      zusatz_ertrag_jahr: input.zusatz_ertrag_jahr ? Number(input.zusatz_ertrag_jahr) : null,   /* v2382 · ze */
       sonstige_dauer_jahre: input.sonstige_dauer_jahre ? Number(input.sonstige_dauer_jahre) : null,
       mod_punkte: input.mod_punkte != null && input.mod_punkte !== ''
         ? Number(input.mod_punkte) : null,
@@ -273,6 +274,7 @@ export const ReportOrchestrator = {
       ausstattung: (input.ausstattung && typeof input.ausstattung === 'object') ? input.ausstattung : null,
       bauteile_hk: input.bauteile_hk ? Number(input.bauteile_hk) : null,
       bauteile_detail: (input.bauteile_detail && typeof input.bauteile_detail === 'object') ? input.bauteile_detail : null,
+      bauteile_unplausibel: (input.bauteile_unplausibel && typeof input.bauteile_unplausibel === 'object') ? input.bauteile_unplausibel : null,   /* v2383 */
       /* WBW26-3 · aus den Objekt-Tabs Bewirtschaftung und Miete */
       instandhaltung_ruecklage_jahr: input.instandhaltung_ruecklage_jahr
         ?? input.inst ?? input.instandhaltung ?? null,
@@ -852,7 +854,8 @@ export const ReportOrchestrator = {
 
     try {
       const _lzs = await WertParameterService.liegenschaftszins({
-        ags: _agsWert || null, objektart: ref.property_type, anzahlWe: ref.units,
+        /* v2381 · die genaue Hausart (zfh, dhh, rh, efh) - mit „haus" griff kein Zweig */
+        ags: _agsWert || null, objektart: ref.property_subtype || ref.property_type, anzahlWe: ref.units,
         brwSqm: landValue && landValue.available ? landValue.value_sqm : null,
         nutzerwert: ref.lzs_pct || null,
         objekt: {
@@ -860,7 +863,7 @@ export const ReportOrchestrator = {
              staffeln (buero, handel, hotel, gewerbe). Mit dem blossen
              `gewerbe` griff nur der allgemeine Gewerbezweig, und `gesch`
              las die Zweigwahl als Wohn- und Geschaeftshaus bis zum MFH. */
-          objart: (ref.gewerbe_art && zinsObjektart(ref.gewerbe_art)) || ref.property_type,
+          objart: (ref.gewerbe_art && zinsObjektart(ref.gewerbe_art)) || ref.property_subtype || ref.property_type,   /* v2381 */
           /* v1816 · Marcels Entscheidung: eine Eigentumswohnung ist
              standardmäßig VERMIETET — „Ist ja ein Kapitalrechner." Nur
              wenn der Nutzer ausdrücklich Eigennutzung angibt, gilt der
@@ -880,12 +883,38 @@ export const ReportOrchestrator = {
        * verfuegbare Ansatz: nicht nur modellkonform, sondern das Modell
        * dieses Ausschusses. Faellt sie aus, greift der Modellansatz. */
       let _bwkPct = null;
+      /* ══ v2390 · ZUERST DIE QUOTE DES SATZES, DESSEN ZINS GERECHNET WIRD ══
+         § 10 ImmoWertV: der Zins gilt nur mit den Ansaetzen, aus denen er
+         abgeleitet wurde. Bis hier kam die Quote ausschliesslich aus der
+         Tabelle `wert_parameter` (hole('bwk_pct')) - das Register wurde nie
+         gefragt. Gemessen am 19.10.2026, Loehner Str. 278 (Kreis Herford,
+         Zweifamilienhaus): Zins 1,8 % aus dem Satz 2025, BWK 28,1 % aus den
+         Grundstuecksmarktdaten 2024. Der Satz 2025 selbst fuehrt 27,7 %. */
+      const _bwkSatz = (_lzs && _lzs.aus_register && _lzs.modell_bwk_quote && !_lzs.ausserhalb_geltung)
+        ? _lzs.modell_bwk_quote : null;
+      if (_bwkSatz) {
+        _bwkPct = { wert: _bwkSatz.pct, stufe: _lzs.stufe,
+          quelle: (_lzs.ausschuss || _lzs.quelle || 'Gutachterausschuss')
+            + (_lzs.berichtsjahr ? ', Berichtsjahr ' + _lzs.berichtsjahr : '')
+            + ' — Modellansatz desselben Satzes wie der Liegenschaftszinssatz',
+          herkunft: 'lzs_satz' };
+      }
       try {
-        const _b = await WertParameterService.hole({
+        const _b = _bwkSatz ? null : await WertParameterService.hole({
           typ: 'bwk_pct', ags: _agsWert || null,
-          objektart: ref.property_type, anzahlWe: ref.units,
+          objektart: ref.property_subtype || ref.property_type, anzahlWe: ref.units,   /* v2381 */
         });
-        if (_b && _b.wert > 0) _bwkPct = _b;
+        /* v2381 · Gilt der Zinssatz des Ausschusses fuer dieses Objekt nicht, gilt auch seine
+           BWK-Quote nicht - sie stammt aus denselben Kauffaellen. Dann Anlage 3. */
+        /* v2390 · Eine Quote aus einer offenen Veroeffentlichung (seit v2390
+           liest die Kaskade sie ueberhaupt, vorher hiess die Kennzahl dort
+           `bwk_quote`) gilt nur zusammen mit einem Zins AUS DERSELBEN Quelle.
+           Eine bundesweite Quote neben einem oertlichen Zins waere ein
+           Modellbruch. */
+        const _odFremd = _b && _b.herkunft === 'opendata'
+          && !(_lzs && _lzs.herkunft === 'opendata' && _lzs.quelle === _b.quelle);
+        if (_odFremd) step('bwk-quote: Open-Data-Quote verworfen (' + (_b.quelle || '?') + ') - nicht dieselbe Quelle wie der Zins');
+        if (_b && _b.wert > 0 && !(_lzs && _lzs.ausserhalb_geltung) && !_odFremd) _bwkPct = _b;
       } catch (e) { /* ohne Quote bleibt es beim Modellansatz */ }
       step('bwk-quote: ' + (_bwkPct ? _bwkPct.wert + ' % (Stufe ' + _bwkPct.stufe + ')' : 'keine'));
 
@@ -988,6 +1017,33 @@ export const ReportOrchestrator = {
           }
         }
       } catch (e) { /* die Naeherung darf den Bericht nie kippen */ }
+      /* v2377 · DIE DEALPILOT-FORMEL FUER DIE WGFZ (Stufe D). Rangfolge nach Marcel
+       * (17./19.10.2026): amtliche WGFZ-Tabelle > oertliche Tabelle des Ausschusses
+       * (auch auf das MFH uebertragen, Stufe C) > Bundesformel. Fuehrt die Zone eine
+       * GFZ und steht die WGFZ des Objekts fest, ist die WGFZ das wertrelevante
+       * Merkmal (§ 16 Abs. 4) - dann ersetzt die WGFZ-Formel die Flaechen-Formel,
+       * nie beide zugleich (sonst stuende der Groesseneffekt doppelt im Wert). */
+      try {
+        const _ortTabelle = _ukReg && _ukReg.verfuegbar && !_ukReg.naeherung;
+        if (!(_wgfz && _wgfz.verfuegbar) && !_ortTabelle && (!_wgfz || ['kein_satz', 'sperre'].indexOf(_wgfz.grund) >= 0)) {
+          const _pw2 = (landValue && landValue.properties_raw) || {};
+          const _gz2 = parseFloat(String(_pw2['Geschossflächenzahl'] || _pw2.Geschossflaechenzahl || _pw2.WGFZ || _pw2.wgfz || '').replace(',', '.'));
+          const _wn = wgfzNaeherung({
+            objektart: ref.property_subtype || ref.property_type,
+            brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
+            wgfz_zone: _gz2 > 0 ? _gz2 : null, wgfz_objekt: ref.wgfz_objekt,
+          });
+          step('uk-wgfz-dealpilot-formel: ' + (_wn.verfuegbar ? 'Faktor ' + _wn.faktor : _wn.grund));
+          if (_wn.verfuegbar) {
+            /* Der Weg zum Ausschuss bleibt sichtbar (Sperre mit Fundstelle). */
+            if (_wgfz && _wgfz.hinweis) _wn.hinweis += ' ' + _wgfz.hinweis;
+            _wgfz = _wn;
+            if (_ukReg && _ukReg.naeherung) _ukReg = { verfuegbar: false, grund: 'wgfz_naeherung' };
+          } else if (_wn.grund === 'wgfz_objekt_fehlt' && !_wgfz) {
+            _wgfz = { verfuegbar: false, grund: 'wgfz_objekt_fehlt', naeherung: true, hinweis: _wn.hinweis };
+          }
+        }
+      } catch (e) { /* die Naeherung darf den Bericht nie kippen */ }
       try {
         _uk = (_ukReg && (_ukReg.verfuegbar || _ukReg.grund !== 'kein_satz')) ? (_ukReg.verfuegbar ? _ukReg : null) : flaechenaufteilung({
           ags: ref.ags || null,
@@ -1053,7 +1109,12 @@ export const ReportOrchestrator = {
         brw_sqm: landValue && landValue.available ? landValue.value_sqm : null,
         brw_stichtag: landValue ? landValue.stichtag : null,
         brw_zone: landValue ? landValue.zone : null,
-        brw_quelle: landValue && landValue.available ? 'boris' : 'manuell',
+        /* v2390 · die ECHTE Herkunft. Hier stand `available ? 'boris'` - auch
+           beim Rueckfall auf die eigene Eingabe (registry.js, source
+           'dealpilot-eingabe'). Der Bericht nannte sie dann amtlich, und der
+           Belastbarkeitsabzug fiel weg. Korrigiert war das nur im Weg fuer
+           unbebaute Grundstuecke (ValuationService.grundstueck). */
+        brw_quelle: ErtragswertService.brwHerkunft(landValue),
         /* WBW26-1 · ist_wohnung entscheidet, ob der volle Grundstueckswert
          * ueberhaupt angesetzt werden darf. Ohne diese Angabe rechnete eine
          * 50-m2-Wohnung mit 700 m2 Grundstueck. */
@@ -1063,7 +1124,9 @@ export const ReportOrchestrator = {
         gfz_koeff: ref.gfz_koeff || (_wgfz && _wgfz.verfuegbar ? _wgfz.faktor : null),
         gfz_detail: !ref.gfz_koeff && _wgfz && _wgfz.verfuegbar
           ? 'WGFZ ' + String(_wgfz.wgfz_objekt).replace('.', ',') + ' statt ' + String(_wgfz.wgfz_zone).replace('.', ',')
-            + ': × ' + String(_wgfz.uk_objekt).replace('.', ',') + ' / ' + String(_wgfz.uk_zone).replace('.', ',') : null,
+            + (_wgfz.naeherung   /* v2377 */
+              ? ': × ' + String(_wgfz.faktor).replace('.', ',') + ' (abgeleitet aus der DealPilot-Formel)'
+              : ': × ' + String(_wgfz.uk_objekt).replace('.', ',') + ' / ' + String(_wgfz.uk_zone).replace('.', ',')) : null,
         beitrag_abzug_eur: ref.beitrag_abzug_eur || null,
         anpassung_pct: ref.brw_anpassung_pct || null,
         anpassung_grund: ref.brw_anpassung_grund || null,
@@ -1107,7 +1170,10 @@ export const ReportOrchestrator = {
           + ', trag ihn unter „Umrechnungskoeffizient Grundstücksgröße“ ein.';
       }
       if (_flaeche && _flaeche.hinweis && _uk && _uk.verfuegbar) {
-        const _kopf = 'Das Grundstück ist mit ' + _flaeche.objekt_qm + ' m² um '
+        /* v2380 · Kundentext im deutschen Zahlenformat - hier stand „199.76 €/m² (450 €/m² × 0.4439)". */
+        const _dz = (x, n) => (Number.isFinite(Number(x))
+          ? Number(x).toLocaleString('de-DE', { maximumFractionDigits: n == null ? 2 : n }) : String(x));
+        const _kopf ='Das Grundstück ist mit ' + _flaeche.objekt_qm + ' m² um '
           + _flaeche.ueberschreitung_pct + ' % größer als das Bodenrichtwertgrundstück '
           + 'dieser Zone (' + _flaeche.richtwertgrundstueck_qm + ' m²). ';
         /* v1140b · Die beiden Aufteilungen sind NICHT dasselbe und dürfen
@@ -1123,19 +1189,19 @@ export const ReportOrchestrator = {
          * Modellvermerk gegen einen anderen getauscht. */
         if (_uk.gruen_qm > 0 && _uk.quelle_art === 'eigene Angabe') {
           _flaeche.hinweis = _kopf
-            + 'Das Grundstück selbst ist mit ' + _uk.bodenwert_eur_qm
+            + 'Das Grundstück selbst ist mit ' + _dz(_uk.bodenwert_eur_qm)
             + ' €/m² angesetzt'
             + (_uk.koeffizient_angewandt ? ' (Bodenrichtwert × Umrechnungskoeffizient '
-              + String(_uk.koeffizient_bauland).replace('.', ',') + ' des Ausschusses)' : '')
+              + _dz(_uk.koeffizient_bauland, 4) + ' des Ausschusses)' : '')
             + '; hinzu kommen ' + _uk.gruen_qm
-            + ' m² Hinterlandfläche zu ' + _uk.gruen_eur_qm
+            + ' m² Hinterlandfläche zu ' + _dz(_uk.gruen_eur_qm)
             + ' €/m² (eigene Angabe) — getrennte Bewertung nach § 41 ImmoWertV.';
         } else if (_uk.gruen_qm > 0) {
           _flaeche.hinweis = _kopf
             + 'Die Fläche bis zum 1,5-fachen der Bezugsgröße ist mit '
-            + _uk.bodenwert_eur_qm + ' €/m² angesetzt, die überschüssigen '
+            + _dz(_uk.bodenwert_eur_qm) + ' €/m² angesetzt, die überschüssigen '
             + _uk.gruen_qm + ' m² wertmäßig als private Grünfläche ('
-            + _uk.gruen_eur_qm + ' €/m²) — getrennte Bewertung nach § 41 ImmoWertV.';
+            + _dz(_uk.gruen_eur_qm) + ' €/m²) — getrennte Bewertung nach § 41 ImmoWertV.';
         } else if (_uk.naeherung) {
           /* v2288 · Naeherung: ihr eigener Hinweis, nie „Koeffizient der Zone". */
           _flaeche.bodenwert_naeherung = true;
@@ -1143,8 +1209,8 @@ export const ReportOrchestrator = {
         } else if (_uk.koeffizient_angewandt) {
           _flaeche.hinweis = _kopf
             + 'Der Bodenrichtwert ist deshalb über den Umrechnungskoeffizienten '
-            + 'der Zone auf ' + _uk.bodenwert_eur_qm + ' €/m² angepasst ('
-            + (landValue && landValue.value_sqm) + ' €/m² × ' + _uk.faktor + ').';
+            + 'der Zone auf ' + _dz(_uk.bodenwert_eur_qm) + ' €/m² angepasst ('
+            + _dz(landValue && landValue.value_sqm) + ' €/m² × ' + _dz(_uk.faktor, 4) + ').';
         }
       }
 
@@ -1200,6 +1266,18 @@ export const ReportOrchestrator = {
           bwk_quote_pct: _bwkPct ? _bwkPct.wert : null,
           bwk_quote_stufe: _bwkPct ? _bwkPct.stufe : null,
           bwk_quote_quelle: _bwkPct ? _bwkPct.quelle : null,
+          bwk_quote_aus_lzs_satz: !!(_bwkPct && _bwkPct.herkunft === 'lzs_satz'),   /* v2390 */
+          /* ── v2390 · DIE MODELLANSAETZE DES ZINSSATZES ──────────────────
+             Bis hier kam vom Register-Satz nur die Zahl. Seine GND (und, wo
+             gefuehrt, seine BWK-Quote) blieben liegen - der Ertragswert
+             rechnete immer mit Anlage 1. Jetzt reisen sie mit, samt Herkunft. */
+          lzs_gnd_jahre: (_lzs.aus_register && Number(_lzs.modell_gnd_jahre) > 0
+            && !_lzs.ausserhalb_geltung) ? Number(_lzs.modell_gnd_jahre) : null,
+          lzs_ausschuss: _lzs.ausschuss || null,
+          /* v2390 · Ebene in Klartext + der Weg zum genaueren Wert (WPS.zinsHerkunft) */
+          lzs_zins_herkunft: _lzs.zins_herkunft || null,
+          lzs_quelle_link: _lzs.quelle_link || null,
+          lzs_quelle_url: _lzs.quelle_url || null,
           modellversion: _lzs.modellversion || null,
           lzs_parameter_id: _lzs.parameter_id, lzs_hinweis: _lzs.hinweis,
           /* ── v1816 · DIE RUECKFRAGE REIST BIS IN DEN BERICHT ──────────
@@ -1558,6 +1636,17 @@ export const ReportOrchestrator = {
                   D: ['indikativ, gesetzlicher Auffangwert', 'nach § 256 BewG, nicht marktabgeleitet', true],
                   E: ['eigene Angabe', 'vom Nutzer gesetzt', true] }[st]
                 || ['indikativ', 'Herkunft nicht bestimmbar', true];
+        /* v2381 · Ein Rueckfallwert ist nie „amtlich" - auch wenn er aus der
+           Tabelle des Ausschusses stammt, ist er nicht der objektgenaue Satz. */
+        if (_wertParams && _wertParams.lzs_rueckfrage && !_wertParams.lzs_aus_register && (st === 'A' || st === 'B')) {
+          e = ['indikativ, Rückfallwert', 'Satz des Gutachterausschusses, aber nicht objektgenau zugeordnet', true];
+        }
+        /* v2390 · Die Tabelle oben ist nur noch der Rueckfall fuer alte
+           Datensaetze. Es gilt die HERKUNFT des Werts (WPS.zinsHerkunft) -
+           sie unterscheidet Register-C (amtlich, duenne Datenbasis) vom
+           Nachbarwert und vom Landeswert, was der Buchstabe nicht kann. */
+        var _zh = (_wertParams && _wertParams.lzs_zins_herkunft) || null;
+        if (_zh) e = [_zh.etikett, _zh.klartext, !!_zh.indikativ];
         /* v1099b-WQL · Der Weg zur Quelle geht auch an den BILDSCHIRM.
          * Im PDF steht er seit v1099; die Web-Ansicht las `wertermittlung_
          * herkunft` und hatte das Feld nicht. Ein Link, den nur das PDF
@@ -1572,6 +1661,10 @@ export const ReportOrchestrator = {
           _qlnk = _qa;
         } catch (e) { _qlnk = null; }
         return { stufe: st, kurz: e[0], lang: e[1], indikativ: e[2],
+                 /* v2390 · unter A: woher, dass es genauer geht, und wie */
+                 ebene: _zh ? _zh.ebene : null, unter_a: _zh ? !!_zh.unter_a : null,
+                 weg: _zh ? _zh.weg : null,
+                 ertragswert_hinweis: _zh ? _zh.ertragswert_hinweis : null,
                  liegenschaftszins_pct: _wertParams ? _wertParams.lzs_pct : null,
                  quelle: _wertParams ? _wertParams.lzs_quelle : null,
                  quelle_link: _qlnk };

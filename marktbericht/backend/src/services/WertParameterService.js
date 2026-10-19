@@ -41,8 +41,28 @@ export function parameterObjektart(objektart, anzahlWe = null) {
   if (/dhh|doppelhaus/.test(k)) return 'dhh';
   if (/^rh$|reihen/.test(k)) return 'rh';
   if (/mfh|mehrfamilien/.test(k)) return Number(anzahlWe) > 6 ? 'mfh_ueber6' : 'mfh_bis6';
-  if (/haus|villa/.test(k)) return 'efh';
+  /* v2381 · „haus" ohne Hausart ist KEIN Einfamilienhaus: Hiddenhausen (ZFH)
+     bekam hier still den EFH-Satz 1,7 % statt des ZFH-Satzes. Ohne Hausart
+     trifft nur ein Satz fuer alle Objektarten. */
+  if (/villa/.test(k)) return 'efh';
+  if (/haus/.test(k)) return 'haus';
   return 'mfh_bis6';
+}
+
+/* v2381 · Ausschuesse, die Wohnungseigentum in Objekten mit hoechstens zwei
+   Wohneinheiten ausdruecklich aus ihrer Eigentumswohnungs-Auswertung nehmen.
+   Nur mit belegtem Wortlaut; die Stadt Minden (05770024) hat einen eigenen
+   Ausschuss und steht deshalb NICHT darunter. */
+const ETW_KLEINOBJEKT_AUSGENOMMEN = {
+  '05770': 'Der Gutachterausschuss für Grundstückswerte im Kreis Minden-Lübbecke wertet nur '
+    + 'die typischen am Markt gehandelten Eigentumswohnungen aus, „also Wohnungen in Objekten mit '
+    + 'mehr als zwei Wohneinheiten" (Grundstücksmarktbericht 2025); Wohnungseigentum in '
+    + 'Zweifamilienhäusern ist ausgenommen.',
+};
+export function etwKleinobjektAusgenommen(ags) {
+  const a = String(ags || '').replace(/\D/g, '');
+  if (a.startsWith('05770024')) return null;
+  return ETW_KLEINOBJEKT_AUSGENOMMEN[a.slice(0, 5)] || null;
 }
 
 /** AGS-Kette vom Kreis aufwaerts: 05770 -> 057 (Bezirk) -> 05 (Land) -> 00000 (Bund). */
@@ -117,6 +137,8 @@ async function nachbarwert(ags8, art, tag) {
     modellversion: r.modellversion || MODELL.IMMOWERTV_2021,
     fallzahl: r.fallzahl != null ? Number(r.fallzahl) : null,
     ebene: 'gutachterausschuss',
+    /* v2390 · eindeutig erkennbar, nicht aus dem Hinweistext erraten */
+    nachbarwert: true, herkunft_ort: ort || null, ausschuss: r.gaa || null,
     hinweis: 'Fuer diese Gemeinde hat der Gutachterausschuss keinen eigenen '
       + 'Liegenschaftszinssatz abgeleitet. Verwendet wird der Wert fuer '
       + ort + ' (N = ' + (r.fallzahl || '?') + ') aus dem Bericht desselben '
@@ -277,6 +299,62 @@ export const WertParameterService = {
      *   > Eine Lücke, die sagt was ihr fehlt, ist keine Lücke mehr,
      *   > sondern der nächste Schritt. */
     let _rueckfrage = null;
+    /* ══ v2381 · GELTUNGSBEREICH VOR ZWEIG (§ 10 ImmoWertV) ══════════════
+       Hueellhorst (ETW in einem Objekt mit hoechstens zwei Wohneinheiten)
+       bekam den Zweig `we_v` des Kreises Minden-Luebbecke - derselbe
+       Ausschuss nimmt solche Wohnungen aber aus seiner Eigentumswohnungs-
+       Auswertung heraus. Dann gilt der Satz nicht: kein amtlicher Wert,
+       kein Nachbarzweig - v2394: AUSSER dem ZFH-Zins desselben Ausschusses, siehe unten.
+       Gerechnet wird mit dem gesetzlichen Auffangwert (Stufe D), als solcher
+       gekennzeichnet. */
+    if (typ === 'lzs' && ags && art === 'etw') {
+      const _we = Number((objekt && objekt.einheiten) != null ? objekt.einheiten : anzahlWe);
+      const _aus = etwKleinobjektAusgenommen(ags);
+      if (_aus && Number.isFinite(_we) && _we > 0 && _we <= 2) {
+        /* v2394 · Marcel 19.10.2026: „warum ist fuer Huellhorst nicht amtlich? wir
+           haben doch alle Werte." Der Ausschuss nimmt Wohnungseigentum in Objekten
+           mit hoechstens zwei WE aus SEINER ETW-Auswertung - wirtschaftlich ist das
+           Objekt ein Zweifamilienhaus, und dafuer fuehrt derselbe Ausschuss einen
+           amtlichen Zins. Den nehmen wir (Stufe A), mit Begruendung. Nur wenn es den
+           nicht gibt, bleibt es beim Auffangwert. */
+        try {
+          const regZ = zinssatzFuerObjekt(
+            { finde: regFinde, lagenFuer: regLagen, abruf: regZins },
+            String(ags), { ...(objekt || {}), objart: 'zfh', einheiten: _we });
+          if (regZ && regZ.verfuegbar) {
+            return {
+              wert: Number(regZ.wert_pct), min: null, max: null,
+              stufe: regZ.stufe || 'A', stufe_roh: regZ.stufe || 'A',
+              quelle: regZ.quellenvermerk || regZ.ausschuss || 'Gutachterausschuss',
+              quelle_url: regZ.quelle_url || null, parameter_id: null,
+              modellversion: MODELL.IMMOWERTV_2021, fallzahl: null, ebene: 'gaa',
+              zweig: regZ.zweig, lage: regZ.lage || null,
+              berichtsjahr: regZ.berichtsjahr || null, stichtag: regZ.stichtag || null,
+              modellansaetze: regZ.modellansaetze || null,
+              modell_gnd_jahre: regZ.modell_gnd_jahre ?? null,
+              modell_bwk_quote: regZ.modell_bwk_quote || null,
+              ausschuss: regZ.ausschuss || null, register_fallzahl: regZ.fallzahl ?? null,
+              register_ebene: regZ.register_ebene || null, register_ags: regZ.register_ags || null,
+              lizenz: regZ.lizenz || null, aus_register: true,
+              hinweis: _aus + ' Die Wohnung liegt in einem Objekt mit ' + _we + ' Wohneinheiten und '
+                + 'ist damit wirtschaftlich Teil eines Zweifamilienhauses; gerechnet wird mit dem '
+                + 'amtlichen Liegenschaftszinssatz des Ausschusses für Zweifamilienhäuser (§ 10 ImmoWertV).',
+            };
+          }
+        } catch (e) { /* weiter zum Auffangwert */ }
+        const fb = lzsNach256(objektart, brwSqm, anzahlWe);
+        return {
+          wert: fb.pct, min: null, max: null, stufe: 'D',
+          quelle: '§ 256 BewG', quelle_url: null, parameter_id: null,
+          modellversion: MODELL.IMMOWERTV_2021, fallzahl: null, ebene: 'bund',
+          hinweis: fb.hinweis, ausserhalb_geltung: true,
+          rueckfrage: { grund: 'ausserhalb_geltung', fehlt: null, auswahl: [], zweig: null,
+            hinweis: _aus + ' Der Liegenschaftszinssatz für Wohnungseigentum gilt für dieses '
+              + 'Objekt deshalb nicht (§ 10 ImmoWertV); ein anderer Zweig wird nicht übertragen. '
+              + 'Einen amtlichen Wert für diesen Fall kann nur der Ausschuss selbst nennen.' },
+        };
+      }
+    }
     if (typ === 'lzs' && ags) {
       try {
         const reg = zinssatzFuerObjekt(
@@ -295,6 +373,15 @@ export const WertParameterService = {
             berichtsjahr: reg.berichtsjahr || null,
             stichtag: reg.stichtag || null,
             modellansaetze: reg.modellansaetze || null,
+            /* v2390 · die Modellansaetze DIESES Satzes als Zahl (§ 10 ImmoWertV):
+               mit ihnen rechnet der Ertragswert, wenn er diesen Zins nutzt. */
+            modell_gnd_jahre: reg.modell_gnd_jahre ?? null,
+            modell_bwk_quote: reg.modell_bwk_quote || null,
+            ausschuss: reg.ausschuss || null,
+            register_fallzahl: reg.fallzahl ?? null,
+            register_ebene: reg.register_ebene || null,
+            register_ags: reg.register_ags || null,
+            lizenz: reg.lizenz || null,
             hinweis: [reg.begruendung, reg.stufe_grund].filter(Boolean).join(' '),
             aus_register: true,
           };
@@ -383,7 +470,7 @@ export const WertParameterService = {
           fallzahl: row.fallzahl != null ? Number(row.fallzahl) : null,
           ebene,
           hinweis: _str.herabgestuft ? _str.hinweis
-                                     : hinweisZurStufe(_str.qualitaet, ebene, row.fallzahl),
+                                     : hinweisZurStufe(_str.qualitaet, ebene, row.fallzahl, row.quelle_text),
           einordnung: _odEinordnung,   /* v1063-WOD-4 */
           rueckfrage: _rueckfrage,   /* v1816 */
         };
@@ -457,94 +544,40 @@ export const WertParameterService = {
                             objekt = null }) {
     const eigen = Number(nutzerwert);
     if (Number.isFinite(eigen) && eigen > 0) {
-      return {
+      return mitZinsHerkunft({
         wert: eigen, stufe: 'E', quelle: 'eigene Angabe', parameter_id: null,
         modellversion: MODELL.IMMOWERTV_2021, fallzahl: null, min: null, max: null,
         hinweis: 'Liegenschaftszinssatz manuell gesetzt. Für das Dossier bitte die Herkunft angeben (Grundstücksmarktbericht, Jahr).',
-      };
+      });
     }
     /* v1099-WQL: Der Weg zur Quelle haengt an JEDER Antwort - auch an der
-       leeren. Gerade dann ist er die einzige Auskunft, die wir geben. */
-    return this.mitQuelle(
+       leeren. Gerade dann ist er die einzige Auskunft, die wir geben.
+       v2390: und jede Antwort sagt, auf welcher EBENE der Wert steht. */
+    return mitZinsHerkunft(this.mitQuelle(
       /* v1816 · `objekt` traegt die Angaben, die der Gutachterausschuss zum
          Staffeln braucht: Haustyp (freistehend/DHH/Reihenhaus), Nutzung
          (vermietet ist der Standard — es ist ein Kapitalanlagerechner),
          Baujahr, Restnutzungsdauer, Lage, Stadtteil. Ohne sie kommt eine
          Rueckfrage statt eines Wertes, und das ist richtig so. */
       await this.hole({ typ: 'lzs', ags, objektart, anzahlWe, stichtag, brwSqm, objekt }),
-      ags, 'liegenschaftszinssatz');
+      ags, 'liegenschaftszinssatz'));
 
   },
+  /* ═══ v2390 · ENTFERNT: markableitung() und ableitungSpeichern() ═══════
+     Hier stand die „Stufe C aus eigener Marktableitung": eine Bisektion des
+     impliziten Zinses aus Marktpreisen und eine Funktion, die den Median als
+     Stufe C in mb.wert_parameter SCHRIEB. Beide hatten keinen einzigen
+     Aufrufer (grep ueber marktbericht/, tools/, frontend/ am 19.10.2026),
+     und ableitungSpeichern() haette beim ersten Aufruf geworfen: sie rief
+     `q1`, das in dieser Datei nie importiert war.
 
-  /* ═══════════════════════════════════════════════════════════════════════
-   * STUFE C — marktabgeleiteter Liegenschaftszins.
-   * ───────────────────────────────────────────────────────────────────────
-   * Gesucht ist der Zinssatz, bei dem das Ertragswertverfahren den tatsaechlich
-   * gezahlten Marktpreis trifft. Eindimensionale Nullstellensuche ueber die
-   * Barwertformel — keine erfundenen Koeffizienten, jeder Schritt nachrechenbar.
-   *
-   * Ein Punktraster mit Zuschlaegen fuer Lage, Baujahr und Zustand waere die
-   * Alternative gewesen. Dafuer muesste man die Koeffizienten erfinden; das
-   * Ergebnis saehe aus wie eine Messung und waere eine Meinung mit
-   * Nachkommastelle.
-   *
-   * ZIRKELSCHLUSS: aus dem eigenen Objekt zurueckgerechnet ist der Wert
-   * wertlos — der Ertragswert traefe zwangslaeufig wieder den Marktwert.
-   * Deshalb NUR aus dem regionalen Aggregat ANDERER Objekte, Median, N >= 10.
-   *
-   * Belegt am Coswig-Fall: Marktwert 312.000, Reinertrag 6.676, Bodenwert
-   * 8.015, RND 80 -> impliziter Zins 1,5 %. Der gesetzliche Auffangwert nach
-   * § 256 sagt 3,0 % — genau das Doppelte, und daher der Verfahrens-Spread.
-   * ═══════════════════════════════════════════════════════════════════════ */
-  markableitung({ marktwert, reinertrag, bodenwert = 0, rnd }) {
-    const MW = Number(marktwert), RE = Number(reinertrag), BW = Number(bodenwert) || 0, N = Number(rnd);
-    if (![MW, RE, N].every(Number.isFinite) || MW <= 0 || RE <= 0 || N <= 0) return null;
+     Gefaehrlicher als der Absturz war die Beschriftung, die sie hinterliess:
+     „Stufe C = aus eigener Marktableitung" stand im Bericht auch bei
+     amtlichen Saetzen mit duenner Datenbasis und beim Nachbarwert desselben
+     Ausschusses. Die Beschriftung kommt seit v2390 aus der Herkunft des
+     Werts (zinsHerkunft unten), nicht aus dem Buchstaben.
+     Wer die Ableitung zurueckholen will: git log -S ableitungSpeichern. */
 
-    const ertragswertBei = (p) => {
-      const q = 1 + p / 100;
-      const qn = Math.pow(q, N);
-      const V = (qn - 1) / (qn * (q - 1));
-      return (RE - BW * p / 100) * V + BW;
-    };
-    // Monoton fallend in p -> Bisektion ist sicher.
-    if (ertragswertBei(0.2) < MW) return null;   // selbst bei 0,2 % zu niedrig
-    if (ertragswertBei(12) > MW) return null;    // selbst bei 12 % zu hoch
-    let lo = 0.2, hi = 12;
-    for (let i = 0; i < 60; i++) {
-      const m = (lo + hi) / 2;
-      if (ertragswertBei(m) > MW) lo = m; else hi = m;
-    }
-    const p = Math.round(((lo + hi) / 2) * 100) / 100;
-    return (p >= 0.3 && p <= 9) ? p : null;   // Plausibilitaetsband
-  },
-
-  /**
-   * Stufe C aus dem regionalen Aggregat bilden und ablegen.
-   * Nur ab MIN_FALLZAHL_C, Median, ohne das anfragende Objekt.
-   */
-  async ableitungSpeichern({ ags, objektart, werte, ausschlussObjektId = null }) {
-    const gueltig = (werte || []).filter((w) => Number.isFinite(w) && w >= 0.3 && w <= 9);
-    if (gueltig.length < MIN_FALLZAHL_C) {
-      return { angelegt: false, grund: `nur ${gueltig.length} Faelle, noetig sind ${MIN_FALLZAHL_C}` };
-    }
-    const sortiert = gueltig.slice().sort((a, b) => a - b);
-    // Raender trimmen: ein Ausreisser darf keinen Kreis kippen.
-    const trim = Math.floor(sortiert.length * 0.1);
-    const kern = sortiert.slice(trim, sortiert.length - trim || undefined);
-    const mid = Math.floor(kern.length / 2);
-    const median = kern.length % 2 ? kern[mid] : (kern[mid - 1] + kern[mid]) / 2;
-
-    const r = await q1(
-      `INSERT INTO mb.wert_parameter
-         (ags, ags_ebene, objektart, typ, wert, wert_min, wert_max, einheit, qualitaet,
-          fallzahl, quelle_text, modellversion, gueltig_von)
-       VALUES ($1,'kreis',$2,'lzs',$3,$4,$5,'prozent','C',$6,$7,'immowertv2021',CURRENT_DATE)
-       ON CONFLICT DO NOTHING RETURNING id`,
-      [String(ags).slice(0, 5), objektart, Math.round(median * 100) / 100,
-       kern[0], kern[kern.length - 1], kern.length,
-       `Marktableitung aus ${kern.length} Vergleichsfaellen (Median, Raender getrimmt) — indikativ, kein amtlicher Wert`]);
-    return { angelegt: !!r, id: r ? r.id : null, wert: median, fallzahl: kern.length };
-  },
 
   /** Sachwertfaktor — Stufe 2, hier nur vorbereitet. */
   async sachwertfaktor({ ags, objektart, anzahlWe, stichtag, nutzerwert = null }) {
@@ -638,22 +671,134 @@ export const WertParameterService = {
   },
 };
 
-/* Etikett fuer Bericht und PDF. Der Nutzer muss auf einen Blick sehen,
- * womit gerechnet wurde und wie weit er der Zahl trauen kann. */
-export const STUFEN_ETIKETT = {
-  A: { kurz: 'amtlich', lang: 'amtlicher Wert des zustaendigen Gutachterausschusses', indikativ: false },
-  B: { kurz: 'amtlich, regional', lang: 'amtlicher Wert auf Landesebene — fuer den Kreis liegt keiner vor', indikativ: false },
-  C: { kurz: 'indikativ, marktabgeleitet', lang: 'aus dem regionalen Marktgeschehen zurueckgerechnet, kein amtlicher Wert', indikativ: true },
-  D: { kurz: 'indikativ, gesetzlicher Auffangwert', lang: 'gesetzlicher Auffangwert nach § 256 BewG — nicht marktabgeleitet, liegt in der Regel unter dem oertlichen Niveau', indikativ: true },
-  E: { kurz: 'eigene Angabe', lang: 'vom Nutzer gesetzt', indikativ: true },
+/* ═══ v2390 · DIE HERKUNFT DES LIEGENSCHAFTSZINSSATZES, AN EINER STELLE ══
+   Marcel am 19.10.2026: „Es gibt immer einen Wert, das bleibt so." Ein
+   Ertragswert entfaellt nicht, nur weil kein oertlicher Zins vorliegt. ABER
+   jede Ebene unterhalb des objektgenauen amtlichen Satzes (A) wird im
+   Bericht deutlich ausgewiesen: WOHER der Wert kommt (in Klartext), DASS es
+   genauer geht, und WIE (oertlichen Satz im Feld `lzs_pct` eintragen, mit
+   Name und Link des zustaendigen Ausschusses). Ein Wert unter A heisst nie
+   „amtlich" ohne Zusatz, und der Ertragswert damit ist „insoweit indikativ".
+
+   Hier stand `STUFEN_ETIKETT` (A–E, ein Text je Buchstabe) - ohne einen
+   einzigen Leser, aber mit einer zweiten, abweichenden Wahrheit: „C =
+   marktabgeleitet". Stufe C ist in diesem Dienst fast nie eine
+   Marktableitung, sondern ein amtlicher Satz mit duenner Datenbasis
+   (Register, Dresden N = 4) oder der Nachbarwert desselben Ausschusses.
+   Der Buchstabe sagt, WIE BELASTBAR - die Ebene sagt, WOHER. Gelesen wird
+   jetzt die Herkunft, nicht der Buchstabe.
+
+   Ebenen (`ebene`):
+     amtlich             objektgenauer Satz des zustaendigen Ausschusses (A)
+     amtlich_streuung    derselbe, amtlich, aber breit gestreut (B) - kein
+                         Ebenenwechsel, deshalb nicht „unter A"
+     landeswert          Satz auf Landesebene (Oberer GAA, Tabelle `land`)
+     bundesdurchschnitt  Tabelle/Open Data auf Bundesebene
+     regional            Tabelle auf Bezirksebene
+     rueckfall           Satz des Ausschusses, nicht objektgenau zugeordnet
+     amtlich_duenn       amtlich, geringe Datenbasis (Register-C, Tabelle-C)
+     marktableitung      Tabellenzeile aus eigener Marktableitung (Altbestand)
+     nachbarwert         Nachbarwert desselben Ausschusses
+     uebertragen         offene Veroeffentlichung, Stufe C (uebertragen)
+     auffangwert         gesetzlicher Auffangwert § 256 BewG (D)
+     eigene_angabe       vom Nutzer gesetzt (E) */
+const _N = (n) => (n != null && Number.isFinite(Number(n)) && Number(n) > 0 ? ' (N = ' + Number(n) + ')' : '');
+const _EBENE_TEXT = {
+  amtlich: ['amtlich', 'amtlicher Liegenschaftszinssatz des zuständigen Gutachterausschusses'],
+  amtlich_streuung: ['amtlich, große Streuung', 'amtlicher Satz des zuständigen Gutachterausschusses mit großer Streuung'],
+  landeswert: ['Landeswert', 'Landeswert — für diesen Ort liegt kein Liegenschaftszinssatz des örtlichen Gutachterausschusses vor'],
+  bundesdurchschnitt: ['Bundesdurchschnitt', 'Bundesdurchschnitt — kein Satz des örtlichen Gutachterausschusses'],
+  regional: ['regionaler Wert', 'regionaler Wert — für den Kreis liegt kein eigener Satz vor'],
+  rueckfall: ['Rückfallwert, nicht objektgenau', 'Satz des Gutachterausschusses, der sich diesem Objekt nicht genau zuordnen ließ'],
+  amtlich_duenn: ['amtlich, geringe Datenbasis', 'amtlich veröffentlicht, aber aus wenigen Kauffällen abgeleitet'],
+  marktableitung: ['aus eigener Marktableitung, nicht amtlich', 'aus dem regionalen Marktgeschehen zurückgerechnet, kein amtlicher Wert'],
+  nachbarwert: ['Nachbarwert desselben Ausschusses', 'amtlicher Satz desselben Gutachterausschusses, aber für einen anderen Ort ermittelt'],
+  uebertragen: ['übertragen, nicht örtlich', 'aus einer offenen Veröffentlichung übertragen, nicht für diesen Ort ermittelt'],
+  auffangwert: ['gesetzlicher Auffangwert § 256 BewG', 'gesetzlicher Auffangwert nach § 256 BewG — nicht marktabgeleitet; er kann deutlich vom örtlichen Satz abweichen'],
+  eigene_angabe: ['eigene Angabe', 'vom Nutzer gesetzt'],
 };
 
-function hinweisZurStufe(qualitaet, ebene, fallzahl) {
+export function zinsHerkunft(a) {
+  if (!a || a.wert == null) return null;
+  const st = String(a.stufe || '').toUpperCase();
+  const eb = String(a.ebene || '').toLowerCase();
+  const q = String(a.quelle || '');
+  let ebene;
+  if (st === 'E') ebene = 'eigene_angabe';
+  else if (st === 'D') ebene = 'auffangwert';
+  else if (a.nachbarwert) ebene = 'nachbarwert';
+  else if (a.aus_register) {
+    /* Ein Register-Satz auf Landesebene mit zweistelligem Schluessel ist ein
+       Landeswert (Oberer GAA Brandenburg, Sachsen-Anhalt). Hamburg fuehrt
+       `land` mit achtstelligem Schluessel - dort IST das Land der Ort. */
+    const rAgs = String(a.register_ags || '').replace(/\D/g, '');
+    if (String(a.register_ebene || '') === 'land' && rAgs.length > 0 && rAgs.length <= 2) ebene = 'landeswert';
+    else if (st === 'C') ebene = 'amtlich_duenn';
+    else if (st === 'B') ebene = 'amtlich_streuung';
+    else ebene = 'amtlich';
+  } else if (a.herkunft === 'opendata') {
+    ebene = eb === 'bund' ? 'bundesdurchschnitt' : eb === 'land' ? 'landeswert'
+      : st === 'C' ? 'uebertragen' : 'amtlich';
+  } else {
+    ebene = eb === 'bund' ? 'bundesdurchschnitt' : eb === 'land' ? 'landeswert'
+      : eb === 'bezirk' ? 'regional'
+      : st === 'C' ? (/marktableitung/i.test(q) ? 'marktableitung' : 'amtlich_duenn')
+      : st === 'B' ? (a.herabgestuft ? 'amtlich_streuung' : 'regional')
+      : 'amtlich';
+  }
+  /* Der Ausschuss fuehrt einen Satz, er gilt fuer dieses Objekt aber nicht
+     objektgenau (Rueckfrage offen, Tabelle statt Register): nie „amtlich". */
+  if ((ebene === 'amtlich' || ebene === 'amtlich_streuung') && a.rueckfrage && !a.aus_register) ebene = 'rueckfall';
+
+  const unterA = ['landeswert', 'bundesdurchschnitt', 'regional', 'rueckfall', 'amtlich_duenn',
+    'marktableitung', 'nachbarwert', 'uebertragen', 'auffangwert'].indexOf(ebene) >= 0;
+  const t = _EBENE_TEXT[ebene];
+  const n = a.fallzahl != null ? a.fallzahl : a.register_fallzahl;
+  let etikett = t[0];
+  if (ebene === 'amtlich_duenn' || ebene === 'marktableitung') etikett += _N(n);
+  if (ebene === 'nachbarwert' && a.herkunft_ort) {
+    etikett += ' (' + a.herkunft_ort + (Number(n) > 0 ? ', N = ' + Number(n) : '') + ')';
+  }
+
+  const ql = a.quelle_link || null;
+  const stelle = (ql && ql.stelle) || a.ausschuss || null;
+  const url = (ql && ql.url) || a.quelle_url || null;
+  const weg = unterA ? {
+    feld: 'lzs_pct',
+    ausschuss: stelle,
+    url,
+    kosten: (ql && ql.satz && ql.satz.kosten) || null,
+    text: 'Genauer geht es mit dem örtlichen Liegenschaftszinssatz des zuständigen '
+      + 'Gutachterausschusses' + (stelle ? ' (' + stelle + ')' : '') + ': im Feld '
+      + '„Liegenschaftszinssatz" eintragen, dann rechnet der Ertragswert damit.',
+  } : null;
+  return {
+    ebene, etikett, klartext: t[1], unter_a: unterA,
+    indikativ: unterA || ebene === 'eigene_angabe',
+    ertragswert_hinweis: unterA
+      ? 'Ertragswert insoweit indikativ: der Liegenschaftszinssatz ist ein ' + etikett
+        + ', nicht der örtliche Satz des zuständigen Gutachterausschusses.'
+      : null,
+    weg,
+  };
+}
+
+/* Haengt die Herkunft an die Antwort, ohne sie sonst zu veraendern. */
+function mitZinsHerkunft(a) {
+  if (!a || a.wert == null) return a;
+  return { ...a, zins_herkunft: zinsHerkunft(a) };
+}
+
+function hinweisZurStufe(qualitaet, ebene, fallzahl, quelleText = null) {
   switch (qualitaet) {
     case 'A': return '';
     case 'B': return `Regionaler Wert (${ebene}) — für den konkreten Kreis liegt noch kein amtlicher Wert vor.`;
-    case 'C': return `Aus eigener Marktableitung abgeleitet (N = ${fallzahl}). Kein amtlicher Wert des Gutachterausschusses.`;
-    case 'D': return 'Gesetzlicher Auffangwert nach § 256 BewG — nicht marktabgeleitet. Er liegt in der Regel unter dem örtlichen Liegenschaftszinssatz und führt damit zu einem eher hohen Ertragswert.';
+    /* v2390 · C in der Tabelle ist nur dann eine Marktableitung, wenn die
+       Zeile es selbst sagt - sonst amtlich mit geringer Datenbasis. */
+    case 'C': return /marktableitung/i.test(String(quelleText || ''))
+      ? `Aus eigener Marktableitung abgeleitet${_N(fallzahl)}. Kein amtlicher Wert des Gutachterausschusses.`
+      : `Amtlich veröffentlicht, aber aus geringer Datenbasis abgeleitet${_N(fallzahl)} — indikativ.`;
+    case 'D': return 'Gesetzlicher Auffangwert nach § 256 BewG — nicht marktabgeleitet. Er kann deutlich vom örtlichen Liegenschaftszinssatz abweichen (gemessen 03.10.2026: Dresden 0,54 %, Hannover 0,90 % gegen 3,0 %).';
     default:  return '';
   }
 }

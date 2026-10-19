@@ -33,6 +33,19 @@ export const GND_TABELLE = {
   default: 80,
 };
 
+/* v2382 · Die Tabelle als Ganzes ist nicht gegen den Verordnungstext abgenommen (geprueft:
+   false) - einzelne Zeilen sind es: Anlage 1 ImmoWertV 2021 nennt fuer Ein-/Zweifamilien-,
+   Doppel- und Reihenhaeuser sowie Mehrfamilienhaeuser 80 Jahre, Buero/Geschaeftshaeuser 60,
+   Kauf-/Warenhaeuser 50, Beherbergung, Lager, Werkstaetten, Hoch-/Tiefgaragen 40. Fuer
+   diese Arten erscheint die Warnung „nicht verifiziert" nicht mehr. `wohn_misch` (70)
+   bleibt offen. */
+const GND_ANLAGE1_BELEGT = { efh: 80, zfh: 80, dhh: 80, rh: 80, mfh: 80, etw: 80, wohnung: 80, haus: 80,
+  buero: 60, geschaeft: 60, kaufhaus: 50, hotel: 40, lager: 40, werkstatt: 40, parkhaus: 40 };
+export function gndNachAnlage1Belegt(objektart) {
+  const k = String(objektart ?? '').toLowerCase().trim();
+  return GND_ANLAGE1_BELEGT[k] != null && GND_ANLAGE1_BELEGT[k] === gnd(k);
+}
+
 export function gnd(objektart) {
   const k = String(objektart ?? '').toLowerCase().trim();
   return GND_TABELLE.werte[k] ?? GND_TABELLE.default;

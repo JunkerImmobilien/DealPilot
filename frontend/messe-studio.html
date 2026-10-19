@@ -149,8 +149,8 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     '23': { hinweis: 'Vorführung · Kopie eines Demo-Objekts · angenommene Beträge', messe: 'reihe-15pct', titel: 'Die 15-%-Grenze', unter: 'Anschaffungsnahe Herstellungskosten — Schwelle, netto, drei Jahre, Kaufpreisaufteilung.',
             spruch: 'Unter der Grenze geblieben —', spruch2: 'Steuer im Sinkflug.', weiter: 'Modul 24 · Bodenrichtwert und Unterlagen' },
     /* v2371 · Modul 25 (Erweitert): die geführte Eingabe, Frage für Frage */
-    '25': { hinweis: 'Vorführung · Beispieldaten · getippt · aufgezeichnete Auslese der Antworten', messe: 'reihe-gefuehrt', titel: 'Die geführte Eingabe', unter: 'Frage für Frage zum fertigen Objekt — mit Zwischenständen.',
-            spruch: 'Der Co-Pilot fragt,', spruch2: 'du fliegst.', weiter: 'Modul 12 · Bewertung und KPIs' },
+    '25': { hinweis: 'Vorführung · Beispieldaten · getippt · aufgezeichnete Auslese der Antworten', messe: 'reihe-gefuehrt', titel: 'Die geführte Eingabe', unter: 'Ein Mehrfamilienhaus, Frage für Frage — bis zu Deal Score und Investor Deal Score.',
+            spruch: 'Frage für Frage beantwortet —', spruch2: 'das Objekt ist vollständig erfasst.', weiter: 'Modul 12 · Bewertung und KPIs' },
     /* v2263 · Überblick (Ebene A): art statt „Modul", nr im Intro */
     'ue2': { art: 'Überblick', nr: '2', hinweis: 'Vorführung · Kopie eines Demo-Objekts · aufgezeichnete Marktbewertung', messe: 'reihe-ueberblick2', titel: 'Vom neuen Objekt zum DealScore und Investment-PDF', unter: 'Der ganze Weg am Stück — in fünf Minuten.',
             spruch: 'Vom ersten Eintrag', spruch2: 'bis zur Bankmappe.', weiter: 'Basismodule 02–10 · jeder Bereich im Detail' }
@@ -209,10 +209,16 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     document.getElementById('fort').style.width = ((m.i + 1) / stufen * 100) + '%';
     var neuNr = String(m.i + 1);
     if (nr.textContent !== neuNr) { nr.textContent = neuNr; nr.classList.remove('wechsel'); void nr.offsetWidth; nr.classList.add('wechsel'); }
-    document.getElementById('kick').textContent = m.kick || '';
-    document.getElementById('titel').textContent = m.titel || '';
-    document.getElementById('zeile').innerHTML = m.text || '';
-    txt.classList.remove('wechsel'); void txt.offsetWidth; txt.classList.add('wechsel');
+    /* v2374b · nur bei NEUEM Text setzen und die Einblendung nur dann neu anstossen -
+       sonst startet jede wiederholte Nachricht das Hereinfahren (bandWechsel) erneut */
+    var sig = (m.kick || '') + '|' + (m.titel || '') + '|' + (m.text || '');
+    if (txt.getAttribute('data-sig') !== sig) {
+      txt.setAttribute('data-sig', sig);
+      document.getElementById('kick').textContent = m.kick || '';
+      document.getElementById('titel').textContent = m.titel || '';
+      document.getElementById('zeile').innerHTML = m.text || '';
+      txt.classList.remove('wechsel'); void txt.offsetWidth; txt.classList.add('wechsel');
+    }
     band.classList.add('an');
   }
 

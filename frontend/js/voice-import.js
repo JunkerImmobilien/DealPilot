@@ -4135,6 +4135,14 @@
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{flex:1 1 auto;min-height:0}',
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-chat,',
       '.oabi-ov.vi-mode.vi-dialog .vi-rf-stand{height:100%;min-height:180px}',
+      /* v2379 · TEXT UEBER TEXT im Modul-25-Video (Marcel 19.10.2026). GEMESSEN bei
+         653 px Fensterhoehe: die Buehne schrumpft auf 193 px, ihre Rasterzeile blieb
+         aber „auto" = 220 px (min-height 180 + Inhalt) - Chat und „Was schon steht"
+         ragten 27 px aus der Buehne in Mikrofonzeile und Leiste. Die Zeile nimmt jetzt
+         genau die Buehnenhoehe, beide Spalten scrollen in sich. */
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-buehne{grid-template-rows:minmax(0,1fr)}',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-buehne > .vi-rf-chat,',
+      '.oabi-ov.vi-mode.vi-dialog .vi-rf-buehne > .vi-rf-stand{min-height:0}',
       /* ═══ v1303 · Tablet: die Liste war breiter als das Gespräch ═════════
          Marcels Vorgabe vom 11.09.2026: „wichtig ist auch, dass beide
          Sprachaufzeichnungen für Tablet und Handy funktionieren."
@@ -5481,6 +5489,25 @@
      hat, bekommt ihn nicht mehr gefragt — dann darf er in der Übersicht
      aber auch nicht FEHLEN. Eine Liste, die „was schon steht" heißt und
      ausgerechnet das Eingetippte verschweigt, ist keine Übersicht. */
+  /* v2368 · „Was schon steht" zeigte „1800 · 1200" ohne Einheit (Befund aus
+     der Modul-25-Aufnahme). Die Einheit steht im Klarnamen (KLAR_NAME) oder im
+     Katalog-Label in Klammern; nur an reine Zahlen gehaengt. */
+  function _rfMitEinheit(id, label, anzeige) {
+    try {
+      if (!/^-?[0-9]+(,[0-9]+)?$/.test(anzeige)) return anzeige;
+      var quelle = (typeof KLAR_NAME !== 'undefined' && KLAR_NAME[id]) || label || '';
+      var k = /\(([^)]*)\)\s*$/.exec(quelle); if (!k) return anzeige;
+      var e = k[1];
+      if (/€/.test(e)) {
+        var n = Number(anzeige.replace(',', '.'));
+        var t = (Math.abs(n) >= 1000 && Math.round(n) === n) ? n.toLocaleString('de-DE') : anzeige;
+        return t + ' ' + e;
+      }
+      if (/%/.test(e)) return anzeige + ' %';
+      if (/m²/.test(e)) return anzeige + ' m²';
+    } catch (x) {}
+    return anzeige;
+  }
   function _rfWerteZuBlock(e) {
     var out = [];
     (e.ids || []).forEach(function (id) {
@@ -5513,6 +5540,7 @@
       /* v1284: Zahlen lesbar - "3.5" ist ein Feldwert, "3,5" eine Angabe. */
       var anzeige = String(v);
       if (anzeige.indexOf(",") < 0 && /^-?[0-9]+\.[0-9]+$/.test(anzeige)) anzeige = anzeige.replace(".", ",");
+      anzeige = _rfMitEinheit(id, kat && kat.label, anzeige);   /* v2368 */
       out.push({ n: name, v: anzeige, f: ausFormular && !ausVorlauf, vorlauf: ausVorlauf });
     });
     return out;
@@ -7441,6 +7469,15 @@
     var akt = (_rf.aktionen || []).slice().sort(function (a, b) {
       return (b.art.indexOf('knf_') === 0 ? 1 : 0) - (a.art.indexOf('knf_') === 0 ? 1 : 0);
     });
+    /* v2369 · Die Abrufe (Markt, erweitert, Bodenrichtwert, Lage) stehen als
+       Auswahl IM CHAT, nicht in der Leiste darunter. Marcel zum Modul-25-Video:
+       die Anzeige „Soll ich das jetzt fuer dich abrufen?" ist im Weg, der
+       Investor Deal Score war nicht zu sehen - „als Auswahl ohne KI-Icons …
+       und es ist danach weg. Dann haben wir mehr Platz fuer den Chat." */
+    var _holAkt = akt.filter(function (a) { return a.art === 'markt' || a.art === 'markt2' || a.art === 'brw' || a.art === 'lage'; });
+    try { _rfAbrufImChat(_holAkt); } catch (x) {}
+    /* v2378 · „Erklär mir das" steht an der Frage im Chat, nicht in der Leiste. */
+    akt = akt.filter(function (a) { return _holAkt.indexOf(a) < 0 && a.art !== 'erklaer'; });
 
     /* Die Frage steht immer da — auch ohne Angebot. Wer nach einer langen
        Auskunft wieder hinsieht, muss nicht nach oben scrollen, um zu
@@ -7604,6 +7641,86 @@
       b.addEventListener('focus', zeig);
     });
   }
+  /* v2378 · Klickweg der Erklaer-Knoepfe in der Frageblase - EIN Zuhoerer am
+     Dokument, nur fuer die aktuelle Frage (alte Blasen sind Verlauf). */
+  var _rfErklGebunden = false;
+  function _rfErklKlickBinden() {
+    if (!document.getElementById('vi-rf-erkl-css')) {
+      var st = document.createElement('style'); st.id = 'vi-rf-erkl-css';
+      st.textContent = '.vi-rf-erkl{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}'
+        + '.vi-rf-erkl-b{padding:4px 10px;border-radius:99px;cursor:pointer;border:1px solid rgba(42,39,39,.22);'
+        + 'background:rgba(255,255,255,.7);color:#2A2727;font:500 12px Inter,system-ui,sans-serif}'
+        + '.vi-rf-erkl-b:hover{border-color:var(--wl-c9a84c, #C9A84C)}'
+        + '.vi-rf-erkl-b.leise{border-color:transparent;background:transparent;color:#6b6257}'
+        + '.vi-rf-blase:not(.vi-rf-dran-blase) .vi-rf-erkl{display:none}';
+      document.head.appendChild(st);
+    }
+    if (_rfErklGebunden) return;
+    _rfErklGebunden = true;
+    document.addEventListener('click', function (ev) {
+      var b = ev.target && ev.target.closest ? ev.target.closest('[data-erkl]') : null;
+      if (!b) return;
+      var blase = b.closest('.vi-rf-blase');
+      if (blase && !blase.classList.contains('vi-rf-dran-blase')) return;
+      var reihe = b.closest('.vi-rf-erkl'); if (reihe) reihe.remove();
+      _rfAktionKlick(b.getAttribute('data-erkl'), null);
+    });
+  }
+
+  /* v2369 · Das Abruf-Angebot als Auswahl im Chat. EINE Blase je Angebot;
+     aendert sich die Auswahl, wird sie an Ort und Stelle neu beschriftet
+     (kein Springen), ist nichts mehr offen, verschwindet sie ganz. */
+  function _rfAbrufImChat(hol) {
+    var chat = $('vi-rf-chat'); if (!chat) return;
+    var alt = chat.querySelector('.vi-rf-abruf');
+    if (!hol || !hol.length) { if (alt) alt.remove(); return; }
+    if (!document.getElementById('vi-rf-abruf-css')) {
+      var st = document.createElement('style'); st.id = 'vi-rf-abruf-css';
+      st.textContent = [
+        '.vi-rf-abruf .vi-rf-abruf-o{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}',
+        '.vi-rf-abruf-b{padding:6px 12px;border-radius:99px;cursor:pointer;white-space:nowrap;',
+        '  border:1px solid var(--wl-c9a84c, #C9A84C);background:rgba(255,255,255,.7);color:#2A2727;',
+        '  font:600 12.5px Inter,system-ui,sans-serif;transition:background .12s ease}',
+        '.vi-rf-abruf-b:hover{background:var(--wl-c9a84c, rgba(201,168,76,.18))}',
+        '.vi-rf-abruf-b.nein{border-color:rgba(42,39,39,.22);font-weight:500;color:#6b6257}',
+        '.vi-rf-abruf-b i{font-style:normal;opacity:.6;margin-left:5px;font-weight:400}',
+        '.vi-rf-abruf-t{margin-top:6px;font-size:12px;opacity:.75}'
+      ].join('');
+      document.head.appendChild(st);
+    }
+    var sig = hol.map(function (a) { return a.art + ':' + (a.frei == null ? '' : a.frei); }).join('|');
+    /* Nach einer Wahl ist die Auswahl weg - auch wenn ein zweiter Abruf
+       noch offen steht. Er kommt erst wieder, wenn sich das Angebot aendert. */
+    if (_rf && _rf.abrufWeg === sig) { if (alt) alt.remove(); return; }
+    var d = alt;
+    if (!d) {
+      d = document.createElement('div');
+      d.className = 'vi-rf-blase vi-rf-co vi-rf-abruf';
+      chat.appendChild(d);
+    } else if (d.getAttribute('data-sig') === sig) return;
+    d.setAttribute('data-sig', sig);
+    var txt = hol.filter(function (a) { return a.txt; })[0];
+    d.innerHTML = '<div class="vi-rf-wer">Co-Pilot</div>Soll ich das für dich abrufen?' +
+      '<div class="vi-rf-abruf-o">' +
+      hol.map(function (a) {
+        return '<button type="button" class="vi-rf-abruf-b" data-akt="' + escH(a.art) + '"' +
+          (a.hinweis ? ' title="' + escH(a.hinweis) + '"' : '') + '>' + escH(a.knopf) +
+          (a.frei != null ? '<i>' + escH(String(a.frei)) + ' frei</i>' : '') + '</button>';
+      }).join('') +
+      '<button type="button" class="vi-rf-abruf-b nein" data-akt="ueberspringen">Nein, überspringen</button>' +
+      '</div>' + (txt ? '<div class="vi-rf-abruf-t">' + txt.txt + '</div>' : '');
+    [].slice.call(d.querySelectorAll('.vi-rf-abruf-b')).forEach(function (b) {
+      b.addEventListener('click', function () {
+        var art = b.getAttribute('data-akt');
+        d.remove();
+        if (_rf) _rf.abrufWeg = hol.filter(function (a) { return a.art !== art; })
+          .map(function (a) { return a.art + ':' + (a.frei == null ? '' : a.frei); }).join('|');
+        _rfAktionKlick(art, null);
+      });
+    });
+    if (!alt) _rfAnsEnde(chat, true);
+  }
+
   /* EIN Klickweg für alle Angebote. Vorher hatte jedes seinen eigenen —
      und der des Markt-Angebots vergass, den Dialog fortzusetzen (v1290).
 
@@ -8528,10 +8645,21 @@
     if (_fs.an && _fs.stream) _fsHoeren(true);
   }
   function _rfBrwHolen() {
-    var adr = { plz: _rfFeld('plz'), ort: _rfFeld('ort'), str: _rfFeld('str') };
+    /* v2374 · mit Hausnummer - ohne sie traf die Geokodierung „Fürth" im Saarland (bodenrichtwert.js) */
+    var adr = { plz: _rfFeld('plz'), ort: _rfFeld('ort'), str: _rfFeld('str'), hnr: _rfFeld('hnr') };
     _rfMelden('', true);
     return Promise.resolve(window.DealPilotBrw.borisHolen(adr)).then(function (r) {
       _rfDenkt(false);
+      /* v2370 · Gebuehrenpflichtig: der Wert existiert, der Ausschuss gibt ihn nur
+         gegen Gebuehr heraus - Link zum Portal statt "nichts geliefert". */
+      if (r && r.grund === 'gebuehr') {
+        _rfBlase('co', 'Der Bodenrichtwert liegt vor' + (r.zone ? ' (Zone ' + escH(String(r.zone)) + ')' : '') +
+          ', wird hier aber <b>nur gegen Gebühr</b> herausgegeben. ' +
+          '<a href="' + escH(r.link) + '" target="_blank" rel="noopener">Dort abrufen →</a> — ' +
+          'sag mir den Wert, wenn du ihn hast, sonst überspringen wir ihn.');
+        if (_fs.an && _fs.stream) _fsHoeren(true);
+        return;
+      }
       if (!r || !r.ok) {
         _rfBlase('co', 'Der amtliche Abruf hat nichts geliefert' +
           (r && r.fehler ? ' (' + escH(r.fehler) + ')' : '') +
@@ -9773,7 +9901,11 @@
         try { _rfAktion('erklaer',
           'Was die Angabe bedeutet und wozu DealPilot sie braucht.',
           'Erklär mir das'); } catch (x) {}
-        return '';
+        /* v2378 · Marcel: „das Erklär mir das kannst du im Chatverlauf fragen".
+           Steht jetzt AN der Frage im Chat (Textknoepfe), nicht in der Leiste. */
+        _rfErklKlickBinden();
+        return '<div class="vi-rf-erkl"><button type="button" class="vi-rf-erkl-b" data-erkl="erklaer">Erklär mir das</button>'
+          + '<button type="button" class="vi-rf-erkl-b leise" data-erkl="erklaer_nie" title="Ich biete die Erklärung nicht mehr an — fragen kannst du trotzdem jederzeit.">Nicht mehr anzeigen</button></div>';
       })() +
       _rfAbrufAngebot(e) +
       '<div class="vi-rf-zaehler">Frage ' + (_rf.i + 1) + ' von ' + _rf.offen.length +
@@ -11711,6 +11843,10 @@
               || a.art === 'brw' || a.art === 'lage';
         })
         && !_rf.konfliktOffen
+        /* v2368 · Steht zugleich das Feinheiten-Angebot offen, meint
+           „Nein, das reicht" / „fertig" DIESES - gemessen in der
+           Modul-25-Aufnahme landete es beim Markt-Angebot. */
+        && !(_rf.tiefeOffen && /(reicht|fertig|passt so|genug)/i.test(t))
         && /^(nein|nee|ne|nö|noe|nicht n(ö|oe)tig|lass (das|es)|brauch(e)? ich nicht|(ü|ue)berspring\w*|sp(ä|ae)ter)\b/i.test(t)) {
       _rfAktionKlick('ueberspringen');
       return true;

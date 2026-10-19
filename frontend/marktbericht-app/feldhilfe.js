@@ -127,7 +127,7 @@
     },
     lzs: {
       kurz: 'Liegenschaftszinssatz in Prozent. Die größte Stellschraube im ganzen Verfahren — ein halber Punkt verschiebt den Ertragswert um rund acht Prozent.',
-      lang: 'Er stammt aus dem Grundstücksmarktbericht des örtlichen Gutachterausschusses. Liegt keiner vor, greift der gesetzliche Auffangwert nach § 256 BewG — der ist nicht marktabgeleitet, liegt in der Regel darunter und erzeugt damit einen eher hohen Ertragswert. Die verwendete Stufe steht im Ergebnis und im PDF.',
+      lang: 'Er stammt aus dem Grundstücksmarktbericht des örtlichen Gutachterausschusses. Liegt keiner vor, greift der gesetzliche Auffangwert nach § 256 BewG — er ist nicht marktabgeleitet und kann je nach Lage deutlich vom örtlichen Wert abweichen; der Bericht weist ihn deshalb als Auffangwert aus und sagt, wie es genauer geht. Die verwendete Stufe steht im Ergebnis und im PDF.',
       grund: '§ 21 Abs. 2 ImmoWertV; § 256 BewG'
     },
     bgf: {

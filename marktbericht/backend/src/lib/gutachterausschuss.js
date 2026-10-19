@@ -671,19 +671,52 @@ function ausRegisterRechnen(o, ags) {
      stehen, gewinnt der spezifischste zuerst. Ein Text statt einer Zahl
      ("gemaess Anlage 1 ImmoWertV") ergibt weiterhin `null`, und null ist
      eine Antwort: dann druckt der Bericht keine Zahl. */
-  const _gndRoh = (_ma.gnd_jahre != null) ? _ma.gnd_jahre
-                : (_ma.gesamtnutzungsdauer_jahre != null) ? _ma.gesamtnutzungsdauer_jahre
-                : (_ma.gnd != null) ? _ma.gnd
-                : null;
-  const _gndZahl = Number(_gndRoh);
-  r.modell_gnd_jahre = (_gndRoh == null || !Number.isFinite(_gndZahl) || _gndZahl <= 0)
-                         ? null : _gndZahl;
+  /* v2390 · dieselbe Regel jetzt als gemeinsamer Helfer - der
+     Liegenschaftszinssatz liest sie seitdem ebenfalls (gndAusModellansaetzen). */
+  r.modell_gnd_jahre = gndAusModellansaetzen(_ma);
   r.modell_gnd_hinweis = _ma.gnd_hinweis || _ma.hinweis || null;
   r.modell_gnd_beleg = _ma.gnd_beleg || null;
   r.modell_gnd_warnung = _ma.gnd_warnung || null;
   r.modellansaetze = _ma;
 
   return r;
+}
+
+/* ═══ v2390 · MODELLANSAETZE EINES SATZES ALS ZAHL ═══════════════════════
+   Die Gesamtnutzungsdauer in den drei Schreibweisen der Rezepte (v1130):
+
+       gnd_jahre  >  gesamtnutzungsdauer_jahre  >  gnd
+
+   BEWUSST NICHT gelesen: `gesamtnutzungsdauer` (ohne _jahre). So heisst in
+   den NRW-Open-Data-Saetzen die mittlere GND der KAUFFAELLE, eine
+   Stichprobenkennzahl - gemessen am 19.10.2026: Werte wie 43, 53, 81, 82
+   neben der Modell-GND 80. Ein Mittelwert ist kein Modellansatz.
+   Ein Text ("gemaess Anlage 1") ergibt null - null ist eine Antwort. */
+export function gndAusModellansaetzen(ma) {
+  const m = ma || {};
+  const roh = (m.gnd_jahre != null) ? m.gnd_jahre
+            : (m.gesamtnutzungsdauer_jahre != null) ? m.gesamtnutzungsdauer_jahre
+            : (m.gnd != null) ? m.gnd
+            : null;
+  const z = Number(roh);
+  return (roh == null || typeof roh === 'boolean' || !Number.isFinite(z) || z <= 0) ? null : z;
+}
+
+/* Die Bewirtschaftungskostenquote des Satzes in Prozent des Rohertrags:
+
+       bwk_pct  >  bewirtschaftungskostenquote  >  bewirtschaftungskosten_quote
+
+   Sie stammt aus denselben Kauffaellen wie der Zinssatz (v1049-WBWK-1) und
+   ist damit der Ansatz, mit dem der Ausschuss den Zins abgeleitet hat.
+   Nur Zahlen zwischen 5 und 60 - ein Bruch (0,27) oder eine Eurosumme ist
+   kein Prozentwert und wird nicht geraten. */
+export function bwkQuoteAusModellansaetzen(ma) {
+  const m = ma || {};
+  for (const k of ['bwk_pct', 'bewirtschaftungskostenquote', 'bewirtschaftungskosten_quote']) {
+    const v = m[k];
+    if (typeof v === 'number' && Number.isFinite(v) && v >= 5 && v <= 60) return { pct: v, feld: k };
+  }
+  return null;
 }
 
 export function sachwertfaktor(o) {
@@ -849,6 +882,20 @@ export function liegenschaftszinssatz(arg = {}) {
       marktmiete_eur_qm: m.marktmiete_eur_qm ?? null,
       bezug: m.bezug ?? null,
     },
+    /* ═══ v2390 · DIE MODELLANSAETZE DES SATZES REISEN MIT ════════════════
+       Hier stand nur `modell` (vier umbenannte Felder). `zweigwahl.js` und
+       der WertParameterService lesen aber `modellansaetze` - und bekamen
+       null. Die GND des Zinssatz-Modells kam deshalb nie im Ertragswert an,
+       er rechnete immer mit Anlage 1. § 10 ImmoWertV: der Zins gilt nur mit
+       den Ansaetzen, aus denen er abgeleitet wurde. */
+    modellansaetze: s.modellansaetze || null,
+    modell_gnd_jahre: gndAusModellansaetzen(s.modellansaetze),
+    modell_bwk_quote: bwkQuoteAusModellansaetzen(s.modellansaetze),
+    quelle_url: s.quelle_url || null,
+    /* v2390 · auf welcher Ebene der Satz gilt: ein Landeswert (Oberer
+       Gutachterausschuss, ags zweistellig) ist nicht der oertliche Satz. */
+    register_ebene: s.ebene || null,
+    register_ags: s.ags != null ? String(s.ags) : null,
     quellenvermerk: s.quellenvermerk || null,
     lizenz: s.lizenz || null,
     herkunft: 'register',

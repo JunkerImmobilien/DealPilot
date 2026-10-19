@@ -24,6 +24,7 @@
    ════════════════════════════════════════════════════════════════════ */
 import { finde } from './ausschuss_register.js';
 import { artSchluessel } from './umrechnung_flaeche.js';
+import { readFileSync } from 'node:fs';   /* v2375 */
 
 export const KENNZAHL = 'umrechnungskoeffizient_wgfz';
 
@@ -157,7 +158,8 @@ export function wgfzAnpassung({ ags, objektart, brw_eur_qm, wgfz_zone, wgfz_obje
       bodenwert_eur_qm: bw, weg: 'Tabelle (Objekt-WGFZ × Richtwert-WGFZ)', quelle,
       hinweis: 'Umrechnung nach der wertrelevanten Geschossflächenzahl (§ 16 Abs. 4, § 40 ImmoWertV) mit der Tabelle des '
         + (s.ausschuss || s.gaa_name || 'Gutachterausschusses') + (s.seite ? ' (' + s.seite + ')' : '') + ': Faktor ' + de(fm)
-        + ' für WGFZ ' + de(wo) + ' bei Richtwert-WGFZ ' + de(wz) + (brw > 0 ? ' → ' + de(bw) + ' €/m²' : '') + '.' };
+        + ' für WGFZ ' + de(wo) + ' bei Richtwert-WGFZ ' + de(wz) + (brw > 0 ? ' → ' + de(bw) + ' €/m²' : '') + '.'
+        + (s.bericht_hinweis ? ' ' + s.bericht_hinweis : '') };
   }
   const kz = koeffizientFuer(s.formel, brw, wz), ko = koeffizientFuer(s.formel, brw, wo);
   if (kz.k == null || ko.k == null) {
@@ -182,7 +184,60 @@ export function wgfzAnpassung({ ags, objektart, brw_eur_qm, wgfz_zone, wgfz_obje
     hinweis: 'Umrechnung nach der wertrelevanten Geschossflächenzahl (§ 16 Abs. 4, § 40 ImmoWertV) mit den '
       + 'Umrechnungskoeffizienten des ' + (s.ausschuss || s.gaa_name || 'Gutachterausschusses') + (s.seite ? ' (' + s.seite + ')' : '') + ': '
       + de(brw) + ' €/m² × ' + fx(ko.k) + ' / ' + fx(kz.k) + (begrenzt ? ' (begrenzt auf ' + de(faktor) + ')' : '')
-      + ' = ' + de(bwQm) + ' €/m² (WGFZ Objekt ' + de(wo) + ', Richtwertgrundstück ' + de(wz) + ').',
+      + ' = ' + de(bwQm) + ' €/m² (WGFZ Objekt ' + de(wo) + ', Richtwertgrundstück ' + de(wz) + ').'
+      /* v2378 · abgedruckte und angewandte Tabellen: der Verweis steht darunter (Marcel 19.10.) */
+      + (s.bericht_hinweis ? ' ' + s.bericht_hinweis : ''),
+  };
+}
+
+/* ══ v2375 · DIE DEALPILOT-FORMEL FUER DIE WGFZ (Stufe D) ════════════════════
+   Abgeleitet aus allen amtlichen WGFZ-Tabellen des Registers
+   (tools/uk-wgfz-naeherung-ableiten.mjs -> uk-wgfz-naeherung.json):
+     UK(Objekt)/UK(Richtwert) = (WGFZ Objekt / WGFZ Richtwert)^b, b = 0,501
+   (Geschosswohnungsbau, 75 Kurven aus 14 Laendern, Abweichung Median 3,7 %,
+   P90 14,9 %). Nur fuer die Objektarten der Datei (MFH, ETW, gemischt), nur im
+   Gueltigkeitsbereich, keine Extrapolation. Im Bericht IMMER „abgeleitet aus der
+   DealPilot-Formel", nie amtlich. Die Rangfolge (amtlich > oertliche Tabelle,
+   auch uebertragen > diese Formel) setzt der Aufrufer. */
+let _WN = null;
+function _wn() {
+  if (_WN) return _WN;
+  try { _WN = JSON.parse(readFileSync(new URL('./uk-wgfz-naeherung.json', import.meta.url), 'utf8')); }
+  catch (e) { _WN = {}; }
+  return _WN;
+}
+export function wgfzNaeherung({ objektart, brw_eur_qm, wgfz_zone, wgfz_objekt }) {
+  const nein = (grund, hinweis) => ({ verfuegbar: false, grund, hinweis: hinweis || null, naeherung: true });
+  const N = _wn(), g = N.gilt_fuer || {}, kl = N.gwb || {};
+  const b = Number(kl.b);
+  if (!(b > 0) || !(Number(kl.tabellen) >= Number(N.mindest_tabellen || 8))) return nein('keine_formel');
+  const art = artSchluessel(objektart);
+  if ((g.objektarten || []).indexOf(art) < 0) return nein('objektart');
+  const wz = Number(wgfz_zone), wo = Number(wgfz_objekt), brw = Number(brw_eur_qm);
+  if (!(wz > 0)) return nein('wgfz_zone_fehlt');
+  if (!(wo > 0)) return nein('wgfz_objekt_fehlt', 'Die Bodenrichtwertzone führt eine WGFZ von ' + de(wz) + '. Mit der WGFZ '
+    + 'des Objekts (§ 16 Abs. 4 ImmoWertV) ließe sich der Bodenwert daran anpassen — trag sie ein.');
+  if (Math.abs(wz - wo) < 1e-9) return nein('gleich_norm');
+  const r = wo / wz;
+  const raus = [wz, wo].some((x) => x < g.wgfz_von - 1e-9 || x > g.wgfz_bis + 1e-9)
+    || r < g.verhaeltnis_von - 1e-9 || r > g.verhaeltnis_bis + 1e-9;
+  if (raus) return nein('ausserhalb_formel', 'Die DealPilot-Formel für die WGFZ gilt für eine WGFZ von ' + de(g.wgfz_von) + ' bis '
+    + de(g.wgfz_bis) + ' und ein Verhältnis Objekt/Richtwert von ' + de(g.verhaeltnis_von) + ' bis ' + de(g.verhaeltnis_bis)
+    + '; hier WGFZ ' + de(wo) + ' zu ' + de(wz) + '. Eine Extrapolation ist nicht sachgerecht — der Bodenwert ist insoweit nicht angepasst.');
+  const faktor = Math.round(Math.pow(r, b) * 10000) / 10000;
+  const bwQm = brw > 0 ? Math.round(brw * faktor * 100) / 100 : null;
+  return {
+    verfuegbar: true, amtlich: false, naeherung: true, stufe: N.stufe || 'D',
+    wgfz_zone: wz, wgfz_objekt: wo, uk_zone: 1, uk_objekt: faktor, faktor, begrenzt: false,
+    bodenwert_eur_qm: bwQm, weg: 'DealPilot-Formel (WGFZ)', exponent: b,
+    quelle: { ausschuss: null, quelle_url: null, seite: null, jahrgang: N.stand || null, lizenz: null,
+      quellenvermerk: 'abgeleitet aus der DealPilot-Formel (' + (kl.tabellen || '?') + ' amtliche Tabellen aus ' + ((kl.laender || []).length) + ' Ländern)' },
+    hinweis: 'Umrechnung nach der wertrelevanten Geschossflächenzahl (§ 16 Abs. 4, § 40 ImmoWertV), abgeleitet aus der '
+      + 'DealPilot-Formel — der Gutachterausschuss veröffentlicht hier keine eigenen Umrechnungskoeffizienten: '
+      + '(' + de(wo) + ' / ' + de(wz) + ')^' + de(b) + ' = ' + de(faktor)
+      + (bwQm != null ? ' → ' + de(brw) + ' €/m² × ' + de(faktor) + ' = ' + de(bwQm) + ' €/m²' : '')
+      + '. Die Formel ist aus ' + (kl.tabellen || '?') + ' amtlichen Tabellen abgeleitet (typische Abweichung '
+      + de(Math.round(Number(kl.abweichung_median_pct) * 10) / 10) + ' %); sie ist nicht amtlich, der Bodenwert insoweit vorläufig.',
   };
 }
 
@@ -199,4 +254,4 @@ export function pruefeBeispiel(s) {
   return { ok: Math.abs(r.bodenwert_eur_qm - Number(b.ergebnis_eur_qm)) <= Math.max(tol, 1), ist: r.bodenwert_eur_qm, soll: b.ergebnis_eur_qm };
 }
 
-export default { KENNZAHL, koeffizientFuer, satzFuer, wgfzAnpassung, pruefeBeispiel };
+export default { KENNZAHL, koeffizientFuer, satzFuer, wgfzAnpassung, wgfzNaeherung, pruefeBeispiel };

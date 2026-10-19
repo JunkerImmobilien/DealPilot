@@ -528,6 +528,11 @@ eine selbst ausgerechnete Zahl.
   Verfahren nicht.
 - **Wo die Quelle endet, endet die Rechnung.**
 - **Kein Treffer heißt kein Wert** — nie ein Nachbarkreis, nie ein Landesmittel.
+  **Ausnahme Liegenschaftszins (Marcel 19.10.2026):** dort gibt es IMMER einen
+  Wert (Kaskade bis Landes-/Bundeswert und § 256 BewG, Stufe B–D), damit der
+  Ertragswert rechnet — aber jede Ebene unter A wird im Bericht ausgewiesen, mit
+  dem Satz, dass es genauer geht (örtlichen Zins eintragen, Weg zum Ausschuss).
+  Für Sachwertfaktor, UK und alle übrigen Werte gilt die Regel unverändert.
 - Jede Zahl trägt Herkunft: Stufe A–E, Modellvermerk, `indikativ`, Ausschuss.
 - Eine Restnutzungsdauer für alle Verfahren.
 - BWK-Quoten stehen auf dem **gesamten** Rohertrag inklusive Stellplätzen.

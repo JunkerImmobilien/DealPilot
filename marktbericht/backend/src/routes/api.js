@@ -598,6 +598,13 @@ router.get('/objects/history', async (req, res) => {
               (SELECT jsonb_agg(jsonb_build_object('pos', e->>'pos', 'wert', e->>'wert'))
                  FROM jsonb_array_elements(coalesce(data->'cross_check'->'sachwert'->'staffel', '[]'::jsonb)) e)
                 AS sachwert_weg,
+              /* v2393 . WIE WEIT TRAUT MAN DEM WERT? Marcel 19.10.2026: die Herkunfts-
+                 stufe A bis E schon bei der Uebergabe zeigen - man schaut nicht immer
+                 in den Marktbericht. Ertragswert: Stufe des Liegenschaftszinssatzes;
+                 Sachwert: Stufe des Sachwertfaktors bzw. vorlaeufig. Keine Backticks hier. */
+              data->'cross_check'->'ertragswert'->>'liegenschaftszins_stufe' AS lzs_stufe,
+              (data->'cross_check'->'sachwert'->>'vorlaeufig')::boolean AS sachwert_vorlaeufig,
+              data->'cross_check'->'sachwert'->'sachwertfaktor'->>'stufe' AS swf_stufe,
               /* v1965: das FUEHRENDE Verfahren. Marcel am 08.10.2026:
                  „welcher ist jetzt der fuehrende? Vielleicht sollte man das
                  dann mit in dem Dropdown mit angeben."

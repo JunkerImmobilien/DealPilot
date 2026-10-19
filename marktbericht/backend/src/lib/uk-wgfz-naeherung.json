@@ -1,0 +1,1402 @@
+{
+  "stand": "2026-10-19",
+  "form": "UK(WGFZ Objekt)/UK(WGFZ Richtwert) = (WGFZ Objekt / WGFZ Richtwert)^b",
+  "herkunft": "DealPilot-Naeherung aus allen amtlichen WGFZ-Umrechnungstabellen und -formeln des Registers (Werte und interne Stuetzstellen), Median der Exponenten je Kurve; gleiche Zahlenreihen einmal gezaehlt",
+  "kennzeichnung": "abgeleitet aus der DealPilot-Formel (nie amtlich)",
+  "stufe": "D",
+  "empfehlung": "Ein Exponent fuer den Geschosswohnungsbau (b = 0.498 aus 80 Kurven, 15 Laender). Individueller Wohnungsbau getrennt waere flacher (b = 0.342), aber nur 6 Kurven aus BY/NW - zu wenig; dort rechnen die Ausschuesse ueber die Flaeche, keine WGFZ-Naeherung. Gewerbe/Geschaeft nicht einbezogen (b = 0.805, fast proportional). Mit dem Bodenrichtwert steigt b in den Tabellen mit BRW-Zeilen deutlich (VW-RL-Typ), getragen von nur 22 Kurven aus NW/HE/HB - als Befund dokumentiert, nicht getrennt.",
+  "gilt_fuer": {
+    "verhaeltnis_von": 0.5,
+    "verhaeltnis_bis": 2,
+    "wgfz_von": 0.4,
+    "wgfz_bis": 3,
+    "keine_extrapolation": "Nur wenn die Bodenrichtwertzone eine WGFZ fuehrt und WGFZ Objekt / WGFZ Richtwert zwischen 0,5 und 2,0 liegt, beide WGFZ zwischen 0,4 und 3,0. Ausserhalb: keine Anpassung, Hinweis.",
+    "objektarten": [
+      "mfh",
+      "etw",
+      "gemischt"
+    ],
+    "objektarten_hinweis": "Ein-/Zweifamilienhaeuser rechnen die meisten Ausschuesse ueber die Flaeche; nur wo die Zone ausschliesslich die WGFZ fuehrt, gilt die Klasse ifw."
+  },
+  "mindest_tabellen": 8,
+  "alle": {
+    "b": 0.494,
+    "b_q1": 0.37,
+    "b_q3": 0.561,
+    "b_min": 0,
+    "b_max": 1.185,
+    "tabellen": 86,
+    "uebernahmen": 252,
+    "punkte": 14740,
+    "laender": [
+      "BB",
+      "BE",
+      "BW",
+      "BY",
+      "HB",
+      "HE",
+      "HH",
+      "MV",
+      "NI",
+      "NW",
+      "RP",
+      "SH",
+      "SN",
+      "ST",
+      "TH"
+    ],
+    "wgfz_median_von": 0.4,
+    "wgfz_median_bis": 3,
+    "abweichung_median_pct": 3.562,
+    "abweichung_p90_pct": 14.602
+  },
+  "ifw": {
+    "b": 0.342,
+    "b_q1": 0.229,
+    "b_q3": 0.413,
+    "b_min": 0.163,
+    "b_max": 0.519,
+    "tabellen": 6,
+    "uebernahmen": 6,
+    "punkte": 521,
+    "laender": [
+      "BY",
+      "NW"
+    ],
+    "wgfz_median_von": 0.2,
+    "wgfz_median_bis": 1.175,
+    "abweichung_median_pct": 3.593,
+    "abweichung_p90_pct": 9.915,
+    "zu_wenige_kurven": true
+  },
+  "gwb": {
+    "b": 0.498,
+    "b_q1": 0.379,
+    "b_q3": 0.576,
+    "b_min": 0,
+    "b_max": 1.185,
+    "tabellen": 80,
+    "uebernahmen": 246,
+    "punkte": 14219,
+    "laender": [
+      "BB",
+      "BE",
+      "BW",
+      "BY",
+      "HB",
+      "HE",
+      "HH",
+      "MV",
+      "NI",
+      "NW",
+      "RP",
+      "SH",
+      "SN",
+      "ST",
+      "TH"
+    ],
+    "wgfz_median_von": 0.4,
+    "wgfz_median_bis": 3,
+    "abweichung_median_pct": 3.549,
+    "abweichung_p90_pct": 14.576
+  },
+  "gewerbe_nicht_in_der_formel": {
+    "b": 0.805,
+    "b_q1": 0.745,
+    "b_q3": 0.956,
+    "b_min": 0.398,
+    "b_max": 1,
+    "tabellen": 6,
+    "uebernahmen": 6,
+    "punkte": 819,
+    "laender": [
+      "BE",
+      "BY",
+      "HE",
+      "HH",
+      "NW"
+    ],
+    "wgfz_median_von": 0.75,
+    "wgfz_median_bis": 3.1,
+    "abweichung_median_pct": 3.839,
+    "abweichung_p90_pct": 14.805
+  },
+  "nur_werte": {
+    "b": 0.487,
+    "b_q1": 0.39,
+    "b_q3": 0.551,
+    "b_min": 0,
+    "b_max": 1.185,
+    "tabellen": 67,
+    "uebernahmen": 193,
+    "punkte": 11760,
+    "laender": [
+      "BB",
+      "BE",
+      "BW",
+      "BY",
+      "HB",
+      "HE",
+      "NW",
+      "RP",
+      "SH",
+      "ST"
+    ],
+    "wgfz_median_von": 0.4,
+    "wgfz_median_bis": 3,
+    "abweichung_median_pct": 3.331,
+    "abweichung_p90_pct": 13.927
+  },
+  "stadt": {
+    "b": 0.508,
+    "b_q1": 0.414,
+    "b_q3": 0.607,
+    "b_min": 0.125,
+    "b_max": 1.185,
+    "tabellen": 76,
+    "uebernahmen": 228,
+    "punkte": 13430,
+    "laender": [
+      "BB",
+      "BE",
+      "BW",
+      "BY",
+      "HB",
+      "HE",
+      "HH",
+      "MV",
+      "NI",
+      "NW",
+      "RP",
+      "SH",
+      "SN",
+      "ST"
+    ],
+    "wgfz_median_von": 0.4,
+    "wgfz_median_bis": 3,
+    "abweichung_median_pct": 3.325,
+    "abweichung_p90_pct": 14.032
+  },
+  "land": {
+    "b": 0.291,
+    "b_q1": 0.16,
+    "b_q3": 0.423,
+    "b_min": 0,
+    "b_max": 0.495,
+    "tabellen": 10,
+    "uebernahmen": 24,
+    "punkte": 1310,
+    "laender": [
+      "HE",
+      "NW",
+      "TH"
+    ],
+    "wgfz_median_von": 0.4,
+    "wgfz_median_bis": 2.4,
+    "abweichung_median_pct": 3.661,
+    "abweichung_p90_pct": 10.746
+  },
+  "brw_niveau": [
+    {
+      "von": 0,
+      "bis": 250,
+      "b": 0.137,
+      "b_q1": 0.137,
+      "b_q3": 0.661,
+      "b_min": 0.137,
+      "b_max": 1.185,
+      "tabellen": 3,
+      "uebernahmen": 14,
+      "punkte": 447,
+      "laender": [
+        "HB",
+        "HE",
+        "NW"
+      ],
+      "wgfz_median_von": 0.4,
+      "wgfz_median_bis": 2.2,
+      "abweichung_median_pct": 0.812,
+      "abweichung_p90_pct": 48.431
+    },
+    {
+      "von": 250,
+      "bis": 350,
+      "b": 0.37,
+      "b_q1": 0.287,
+      "b_q3": 0.404,
+      "b_min": 0.26,
+      "b_max": 0.97,
+      "tabellen": 6,
+      "uebernahmen": 35,
+      "punkte": 945,
+      "laender": [
+        "HB",
+        "HE",
+        "NW"
+      ],
+      "wgfz_median_von": 0.4,
+      "wgfz_median_bis": 2.6,
+      "abweichung_median_pct": 2.374,
+      "abweichung_p90_pct": 23.182
+    },
+    {
+      "von": 350,
+      "bis": 450,
+      "b": 0.44,
+      "b_q1": 0.44,
+      "b_q3": 0.475,
+      "b_min": 0.44,
+      "b_max": 0.509,
+      "tabellen": 3,
+      "uebernahmen": 23,
+      "punkte": 413,
+      "laender": [
+        "HE",
+        "NW"
+      ],
+      "wgfz_median_von": 0.6,
+      "wgfz_median_bis": 2.8,
+      "abweichung_median_pct": 0.435,
+      "abweichung_p90_pct": 3.206
+    },
+    {
+      "von": 450,
+      "bis": 10000,
+      "b": 0.586,
+      "b_q1": 0.523,
+      "b_q3": 0.654,
+      "b_min": 0.446,
+      "b_max": 0.836,
+      "tabellen": 10,
+      "uebernahmen": 28,
+      "punkte": 2038,
+      "laender": [
+        "HB",
+        "NW"
+      ],
+      "wgfz_median_von": 0.4,
+      "wgfz_median_bis": 4,
+      "abweichung_median_pct": 2.572,
+      "abweichung_p90_pct": 11.165
+    }
+  ],
+  "quer": {
+    "ifw_mit_gesamt_b": {
+      "b": 0.494,
+      "b_q1": 0.229,
+      "b_q3": 0.413,
+      "b_min": 0.163,
+      "b_max": 0.519,
+      "tabellen": 6,
+      "uebernahmen": 6,
+      "punkte": 521,
+      "laender": [
+        "BY",
+        "NW"
+      ],
+      "wgfz_median_von": 0.2,
+      "wgfz_median_bis": 1.175,
+      "abweichung_median_pct": 3.488,
+      "abweichung_p90_pct": 15.438
+    },
+    "gwb_mit_gesamt_b": {
+      "b": 0.494,
+      "b_q1": 0.379,
+      "b_q3": 0.576,
+      "b_min": 0,
+      "b_max": 1.185,
+      "tabellen": 80,
+      "uebernahmen": 246,
+      "punkte": 14219,
+      "laender": [
+        "BB",
+        "BE",
+        "BW",
+        "BY",
+        "HB",
+        "HE",
+        "HH",
+        "MV",
+        "NI",
+        "NW",
+        "RP",
+        "SH",
+        "SN",
+        "ST",
+        "TH"
+      ],
+      "wgfz_median_von": 0.4,
+      "wgfz_median_bis": 3,
+      "abweichung_median_pct": 3.566,
+      "abweichung_p90_pct": 14.548
+    }
+  },
+  "kurven": [
+    {
+      "wo": "NW Stadt Bielefeld [geschosswohnungsbau] BRW 200",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 200,
+      "b": 0.137,
+      "punkte": 115,
+      "uebernommen_von": [
+        "NW Stadt Bielefeld [geschosswohnungsbau] BRW 200",
+        "BW Bischweier [mfh] BRW 200",
+        "BW Forbach [mfh] BRW 200",
+        "BW Gaggenau [mfh] BRW 200",
+        "BW Gernsbach [mfh] BRW 200",
+        "BW Kuppenheim [mfh] BRW 200",
+        "BW Loffenau [mfh] BRW 200",
+        "BW Weisenbach [mfh] BRW 200",
+        "HE Kassel, documenta-Stadt [mfh] BRW 200",
+        "HE Gießen, Universitätsstadt [mfh] BRW 200"
+      ]
+    },
+    {
+      "wo": "NW Stadt Bielefeld [geschosswohnungsbau] BRW 250",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 250,
+      "b": 0.26,
+      "punkte": 125,
+      "uebernommen_von": [
+        "NW Stadt Bielefeld [geschosswohnungsbau] BRW 250",
+        "BW Bischweier [mfh] BRW 250",
+        "BW Forbach [mfh] BRW 250",
+        "BW Gaggenau [mfh] BRW 250",
+        "BW Gernsbach [mfh] BRW 250",
+        "BW Kuppenheim [mfh] BRW 250",
+        "BW Loffenau [mfh] BRW 250",
+        "BW Weisenbach [mfh] BRW 250",
+        "HE Kassel, documenta-Stadt [mfh] BRW 250",
+        "HE Gießen, Universitätsstadt [mfh] BRW 250"
+      ]
+    },
+    {
+      "wo": "NW Stadt Bielefeld [geschosswohnungsbau] BRW 300",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 300,
+      "b": 0.37,
+      "punkte": 146,
+      "uebernommen_von": [
+        "NW Stadt Bielefeld [geschosswohnungsbau] BRW 300",
+        "BW Bischweier [mfh] BRW 300",
+        "BW Forbach [mfh] BRW 300",
+        "BW Gaggenau [mfh] BRW 300",
+        "BW Gernsbach [mfh] BRW 300",
+        "BW Kuppenheim [mfh] BRW 300",
+        "BW Loffenau [mfh] BRW 300",
+        "BW Weisenbach [mfh] BRW 300",
+        "HE Kassel, documenta-Stadt [mfh] BRW 300",
+        "HE Gießen, Universitätsstadt [mfh] BRW 300"
+      ]
+    },
+    {
+      "wo": "NW Stadt Bielefeld [geschosswohnungsbau] BRW 350",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 350,
+      "b": 0.44,
+      "punkte": 141,
+      "uebernommen_von": [
+        "NW Stadt Bielefeld [geschosswohnungsbau] BRW 350",
+        "BW Bischweier [mfh] BRW 350",
+        "BW Forbach [mfh] BRW 350",
+        "BW Gaggenau [mfh] BRW 350",
+        "BW Gernsbach [mfh] BRW 350",
+        "BW Kuppenheim [mfh] BRW 350",
+        "BW Loffenau [mfh] BRW 350",
+        "BW Weisenbach [mfh] BRW 350",
+        "HE Kassel, documenta-Stadt [mfh] BRW 350",
+        "HE Gießen, Universitätsstadt [mfh] BRW 350"
+      ]
+    },
+    {
+      "wo": "NW Stadt Bielefeld [geschosswohnungsbau] BRW 400",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 400,
+      "b": 0.509,
+      "punkte": 141,
+      "uebernommen_von": [
+        "NW Stadt Bielefeld [geschosswohnungsbau] BRW 400",
+        "BW Bischweier [mfh] BRW 400",
+        "BW Forbach [mfh] BRW 400",
+        "BW Gaggenau [mfh] BRW 400",
+        "BW Gernsbach [mfh] BRW 400",
+        "BW Kuppenheim [mfh] BRW 400",
+        "BW Loffenau [mfh] BRW 400",
+        "BW Weisenbach [mfh] BRW 400",
+        "HE Kassel, documenta-Stadt [mfh] BRW 400",
+        "HE Gießen, Universitätsstadt [mfh] BRW 400"
+      ]
+    },
+    {
+      "wo": "NW Stadt Bielefeld [geschosswohnungsbau] BRW 450",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 450,
+      "b": 0.566,
+      "punkte": 151,
+      "uebernommen_von": [
+        "NW Stadt Bielefeld [geschosswohnungsbau] BRW 450",
+        "BW Bischweier [mfh] BRW 450",
+        "BW Forbach [mfh] BRW 450",
+        "BW Gaggenau [mfh] BRW 450",
+        "BW Gernsbach [mfh] BRW 450",
+        "BW Kuppenheim [mfh] BRW 450",
+        "BW Loffenau [mfh] BRW 450",
+        "BW Weisenbach [mfh] BRW 450",
+        "HE Kassel, documenta-Stadt [mfh] BRW 450",
+        "HE Gießen, Universitätsstadt [mfh] BRW 450"
+      ]
+    },
+    {
+      "wo": "NW Stadt Bielefeld [geschosswohnungsbau] BRW 500",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 500,
+      "b": 0.624,
+      "punkte": 151,
+      "uebernommen_von": [
+        "NW Stadt Bielefeld [geschosswohnungsbau] BRW 500",
+        "BW Bischweier [mfh] BRW 500",
+        "BW Forbach [mfh] BRW 500",
+        "BW Gaggenau [mfh] BRW 500",
+        "BW Gernsbach [mfh] BRW 500",
+        "BW Kuppenheim [mfh] BRW 500",
+        "BW Loffenau [mfh] BRW 500",
+        "BW Weisenbach [mfh] BRW 500",
+        "HE Kassel, documenta-Stadt [mfh] BRW 500",
+        "HE Gießen, Universitätsstadt [mfh] BRW 500"
+      ]
+    },
+    {
+      "wo": "BW Heilbronn, Stadtkreis [alle]",
+      "land": "BW",
+      "klasse": "alle",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.314,
+      "punkte": 235
+    },
+    {
+      "wo": "BW Karlsruhe, Stadtkreis [mfh]",
+      "land": "BW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.556,
+      "punkte": 179
+    },
+    {
+      "wo": "BW Heidelberg, Stadtkreis [alle]",
+      "land": "BW",
+      "klasse": "alle",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.534,
+      "punkte": 225
+    },
+    {
+      "wo": "BW Tübingen, Universitätsstadt [alle]",
+      "land": "BW",
+      "klasse": "alle",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.507,
+      "punkte": 115
+    },
+    {
+      "wo": "BW Bühl [mfh]",
+      "land": "BW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.436,
+      "punkte": 159,
+      "uebernommen_von": [
+        "BW Bühl [mfh]",
+        "BW Bühlertal [mfh]",
+        "BW Hügelsheim [mfh]",
+        "BW Lichtenau [mfh]",
+        "BW Ottersweier [mfh]",
+        "BW Sinzheim [mfh]",
+        "BW Rheinmünster [mfh]"
+      ]
+    },
+    {
+      "wo": "BW Plüderhausen [alle]",
+      "land": "BW",
+      "klasse": "alle",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.512,
+      "punkte": 125,
+      "uebernommen_von": [
+        "BW Plüderhausen [alle]",
+        "BW Schorndorf [alle]",
+        "BW Urbach [alle]",
+        "BW Winterbach [alle]",
+        "BW Remshalden [alle]",
+        "NI Stadt Salzgitter [mfh] Tab. 0050003",
+        "NW Stadt Duisburg [mfh]",
+        "NW Stadt Dinslaken [mfh]",
+        "NW Stadt Oberhausen [mfh]",
+        "NW Stadt Moers [mfh]",
+        "NW Stadt Gelsenkirchen [mfh]",
+        "NW Stadt Arnsberg [mfh]",
+        "NW Rhein-Erft-Kreis [mfh]",
+        "NW Kreis Euskirchen [alle]",
+        "SH Ostholstein, Kreis [alle]",
+        "SH Lübeck, Hansestadt [alle]",
+        "SH Herzogtum Lauenburg, Kreis [alle]"
+      ]
+    },
+    {
+      "wo": "BW Magstadt [mfh]",
+      "land": "BW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.255,
+      "punkte": 133,
+      "uebernommen_von": [
+        "BW Magstadt [mfh]",
+        "BW Sindelfingen [mfh]"
+      ]
+    },
+    {
+      "wo": "BW Achern [mfh]",
+      "land": "BW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.458,
+      "punkte": 151,
+      "uebernommen_von": [
+        "BW Achern [mfh]",
+        "BW Bad Peterstal-Griesbach [mfh]",
+        "BW Kappelrodeck [mfh]",
+        "BW Lautenbach [mfh]",
+        "BW Lauf [mfh]",
+        "BW Oberkirch [mfh]",
+        "BW Oppenau [mfh]",
+        "BW Ottenhöfen im Schwarzwald [mfh]",
+        "BW Renchen [mfh]",
+        "BW Sasbach [mfh]",
+        "BW Sasbachwalden [mfh]",
+        "BW Seebach [mfh]",
+        "BW Rheinau [mfh]"
+      ]
+    },
+    {
+      "wo": "BE Berlin [mfh]",
+      "land": "BE",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.821,
+      "punkte": 209
+    },
+    {
+      "wo": "BE Berlin [gewerbe]",
+      "land": "BE",
+      "klasse": "gewerbe",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.785,
+      "punkte": 90
+    },
+    {
+      "wo": "HH Hamburg, Freie und Hansestadt [mfh]",
+      "land": "HH",
+      "klasse": "gwb",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.806,
+      "punkte": 185
+    },
+    {
+      "wo": "HH Hamburg, Freie und Hansestadt [gewerbe]",
+      "land": "HH",
+      "klasse": "gewerbe",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.825,
+      "punkte": 179
+    },
+    {
+      "wo": "HH Hamburg, Freie und Hansestadt [geschaeftshaus]",
+      "land": "HH",
+      "klasse": "gewerbe",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 1,
+      "punkte": 172
+    },
+    {
+      "wo": "HE Frankfurt am Main, Stadt [mfh]",
+      "land": "HE",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.652,
+      "punkte": 232
+    },
+    {
+      "wo": "HE Wiesbaden, Landeshauptstadt [mfh] BRW 300",
+      "land": "HE",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 300,
+      "b": 0.415,
+      "punkte": 186,
+      "uebernommen_von": [
+        "HE Wiesbaden, Landeshauptstadt [mfh] BRW 300",
+        "HE Wiesbaden, Landeshauptstadt [mfh] BRW 1000"
+      ]
+    },
+    {
+      "wo": "HE Fulda, Stadt [alle]",
+      "land": "HE",
+      "klasse": "alle",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.416,
+      "punkte": 187
+    },
+    {
+      "wo": "HE Offenbach am Main, Stadt [mfh]",
+      "land": "HE",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.553,
+      "punkte": 216
+    },
+    {
+      "wo": "HE Offenbach am Main, Stadt [gewerbe]",
+      "land": "HE",
+      "klasse": "gewerbe",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.398,
+      "punkte": 176
+    },
+    {
+      "wo": "HE Gießen, Landkreis (ohne Universitätsstadt Gießen — eigener Ausschuss) [mfh] BRW 200",
+      "land": "HE",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 200,
+      "b": 0.137,
+      "punkte": 115,
+      "uebernommen_von": [
+        "HE Gießen, Landkreis (ohne Universitätsstadt Gießen — eigener Ausschuss) [mfh] BRW 200",
+        "HE Lahn-Dill-Kreis [mfh] BRW 200",
+        "HE Marburg-Biedenkopf, Landkreis (ohne Universitätsstadt Marburg — eigener Ausschuss) [mfh] BRW 200"
+      ]
+    },
+    {
+      "wo": "HE Gießen, Landkreis (ohne Universitätsstadt Gießen — eigener Ausschuss) [mfh] BRW 250",
+      "land": "HE",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 250,
+      "b": 0.26,
+      "punkte": 125,
+      "uebernommen_von": [
+        "HE Gießen, Landkreis (ohne Universitätsstadt Gießen — eigener Ausschuss) [mfh] BRW 250",
+        "HE Lahn-Dill-Kreis [mfh] BRW 250",
+        "HE Marburg-Biedenkopf, Landkreis (ohne Universitätsstadt Marburg — eigener Ausschuss) [mfh] BRW 250"
+      ]
+    },
+    {
+      "wo": "HE Gießen, Landkreis (ohne Universitätsstadt Gießen — eigener Ausschuss) [mfh] BRW 300",
+      "land": "HE",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 300,
+      "b": 0.37,
+      "punkte": 146,
+      "uebernommen_von": [
+        "HE Gießen, Landkreis (ohne Universitätsstadt Gießen — eigener Ausschuss) [mfh] BRW 300",
+        "HE Lahn-Dill-Kreis [mfh] BRW 300",
+        "HE Marburg-Biedenkopf, Landkreis (ohne Universitätsstadt Marburg — eigener Ausschuss) [mfh] BRW 300",
+        "NI Stadt Buchholz in der Nordheid [mfh] Tab. 0871025",
+        "NI Jesteburg [mfh] Tab. 0871025",
+        "NI Neu Wulmstorf [mfh] Tab. 0871025",
+        "NI Seevetal [mfh] Tab. 0871025",
+        "NI Stadt Winsen (Luhe) [mfh] Tab. 0871025",
+        "NI Hansestadt Lüneburg [mfh] Tab. 0871025"
+      ]
+    },
+    {
+      "wo": "HE Gießen, Landkreis (ohne Universitätsstadt Gießen — eigener Ausschuss) [mfh] BRW 350",
+      "land": "HE",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 350,
+      "b": 0.44,
+      "punkte": 131,
+      "uebernommen_von": [
+        "HE Gießen, Landkreis (ohne Universitätsstadt Gießen — eigener Ausschuss) [mfh] BRW 350",
+        "HE Lahn-Dill-Kreis [mfh] BRW 350",
+        "HE Marburg-Biedenkopf, Landkreis (ohne Universitätsstadt Marburg — eigener Ausschuss) [mfh] BRW 350"
+      ]
+    },
+    {
+      "wo": "BY München, kreisfreie Stadt [ifw]",
+      "land": "BY",
+      "klasse": "ifw",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.519,
+      "punkte": 36
+    },
+    {
+      "wo": "BY München, kreisfreie Stadt [mfh]",
+      "land": "BY",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.845,
+      "punkte": 179
+    },
+    {
+      "wo": "BY Regensburg, kreisfreie Stadt [mfh]",
+      "land": "BY",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.532,
+      "punkte": 225
+    },
+    {
+      "wo": "BY Regensburg, kreisfreie Stadt [ifw]",
+      "land": "BY",
+      "klasse": "ifw",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.411,
+      "punkte": 209
+    },
+    {
+      "wo": "BY Regensburg, kreisfreie Stadt [gewerbe]",
+      "land": "BY",
+      "klasse": "gewerbe",
+      "quelle": "wert",
+      "brw": null,
+      "b": 1,
+      "punkte": 179
+    },
+    {
+      "wo": "HB Bremen, Stadtgemeinde [mfh] BRW 100",
+      "land": "HB",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 100,
+      "b": 1.185,
+      "punkte": 217
+    },
+    {
+      "wo": "HB Bremen, Stadtgemeinde [mfh] BRW 300",
+      "land": "HB",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 300,
+      "b": 0.97,
+      "punkte": 217
+    },
+    {
+      "wo": "HB Bremen, Stadtgemeinde [mfh] BRW 500",
+      "land": "HB",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 500,
+      "b": 0.836,
+      "punkte": 217
+    },
+    {
+      "wo": "HB Bremen, Stadtgemeinde [mfh] BRW 700",
+      "land": "HB",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 700,
+      "b": 0.737,
+      "punkte": 217
+    },
+    {
+      "wo": "HB Bremen, Stadtgemeinde [mfh] BRW 900",
+      "land": "HB",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 900,
+      "b": 0.664,
+      "punkte": 217
+    },
+    {
+      "wo": "HB Bremen, Stadtgemeinde [mfh] BRW 1100",
+      "land": "HB",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 1100,
+      "b": 0.605,
+      "punkte": 217
+    },
+    {
+      "wo": "HB Bremen, Stadtgemeinde [mfh] BRW 1300",
+      "land": "HB",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 1300,
+      "b": 0.556,
+      "punkte": 217
+    },
+    {
+      "wo": "HB Bremen, Stadtgemeinde [mfh] BRW 1500",
+      "land": "HB",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 1500,
+      "b": 0.511,
+      "punkte": 217
+    },
+    {
+      "wo": "HB Bremen, Stadtgemeinde [mfh] BRW 1700",
+      "land": "HB",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 1700,
+      "b": 0.478,
+      "punkte": 217
+    },
+    {
+      "wo": "HB Bremen, Stadtgemeinde [mfh] BRW 1900",
+      "land": "HB",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": 1900,
+      "b": 0.446,
+      "punkte": 217
+    },
+    {
+      "wo": "NI Braunschweig. Stadt [mfh] Tab. 0012002",
+      "land": "NI",
+      "klasse": "gwb",
+      "quelle": "stuetzstelle (NI zonenabhaengig)",
+      "brw": null,
+      "b": 0.324,
+      "punkte": 179,
+      "uebernommen_von": [
+        "NI Braunschweig. Stadt [mfh] Tab. 0012002",
+        "NI Wolfsburg, Stadt [mfh] Tab. 0910004"
+      ]
+    },
+    {
+      "wo": "NI Bovenden FL [mfh] Tab. 0590120",
+      "land": "NI",
+      "klasse": "gwb",
+      "quelle": "stuetzstelle (NI zonenabhaengig)",
+      "brw": null,
+      "b": 0.904,
+      "punkte": 21,
+      "uebernommen_von": [
+        "NI Bovenden FL [mfh] Tab. 0590120",
+        "NI Göttingen ST [mfh] Tab. 0590120",
+        "NI Hann. Münden ST [mfh] Tab. 0590120",
+        "NI Rosdorf [mfh] Tab. 0590120"
+      ]
+    },
+    {
+      "wo": "NI Hannover, Landeshauptst. [mfh] Tab. 0430008",
+      "land": "NI",
+      "klasse": "gwb",
+      "quelle": "stuetzstelle (NI zonenabhaengig)",
+      "brw": null,
+      "b": 0.304,
+      "punkte": 123
+    },
+    {
+      "wo": "NI Hannover, Landeshauptst. [mfh] Tab. 0430009",
+      "land": "NI",
+      "klasse": "gwb",
+      "quelle": "stuetzstelle (NI zonenabhaengig)",
+      "brw": null,
+      "b": 0.238,
+      "punkte": 126,
+      "uebernommen_von": [
+        "NI Hannover, Landeshauptst. [mfh] Tab. 0430009",
+        "NI Barsinghausen, Stadt [mfh] Tab. 0430009",
+        "NI Burgdorf, Stadt [mfh] Tab. 0430009",
+        "NI Garbsen, Stadt [mfh] Tab. 0430009",
+        "NI Gehrden, Stadt [mfh] Tab. 0430009",
+        "NI Hemmingen, Stadt [mfh] Tab. 0430009",
+        "NI Isernhagen [mfh] Tab. 0430009",
+        "NI Laatzen, Stadt [mfh] Tab. 0430009",
+        "NI Langenhagen, Stadt [mfh] Tab. 0430009",
+        "NI Lehrte, Stadt [mfh] Tab. 0430009",
+        "NI Neustadt a. Rbge., Stadt [mfh] Tab. 0430009",
+        "NI Pattensen, Stadt [mfh] Tab. 0430009",
+        "NI Ronnenberg, Stadt [mfh] Tab. 0430009",
+        "NI Seelze, Stadt [mfh] Tab. 0430009",
+        "NI Springe, Stadt [mfh] Tab. 0430009",
+        "NI Wunstorf, Stadt [mfh] Tab. 0430009"
+      ]
+    },
+    {
+      "wo": "NI Hannover, Landeshauptst. [mfh] Tab. 0430007",
+      "land": "NI",
+      "klasse": "gwb",
+      "quelle": "stuetzstelle (NI zonenabhaengig)",
+      "brw": null,
+      "b": 0.382,
+      "punkte": 134
+    },
+    {
+      "wo": "NI Bendestorf [mfh] Tab. 0871024",
+      "land": "NI",
+      "klasse": "gwb",
+      "quelle": "stuetzstelle (NI zonenabhaengig)",
+      "brw": null,
+      "b": 0.138,
+      "punkte": 123,
+      "uebernommen_von": [
+        "NI Bendestorf [mfh] Tab. 0871024",
+        "NI Stadt Buchholz in der Nordheid [mfh] Tab. 0871024",
+        "NI Seevetal [mfh] Tab. 0871024",
+        "NI Stelle [mfh] Tab. 0871024",
+        "NI Tostedt [mfh] Tab. 0871024",
+        "NI Vierhöfen [mfh] Tab. 0871024",
+        "NI Stadt Winsen (Luhe) [mfh] Tab. 0871024",
+        "NI Adendorf [mfh] Tab. 0871024",
+        "NI Amelinghausen [mfh] Tab. 0871024",
+        "NI Flecken Bardowick [mfh] Tab. 0871024",
+        "NI Embsen [mfh] Tab. 0871024",
+        "NI Lüdersburg [mfh] Tab. 0871024",
+        "NI Hansestadt Lüneburg [mfh] Tab. 0871024",
+        "NI Reppenstedt [mfh] Tab. 0871024",
+        "NI Scharnebeck [mfh] Tab. 0871024",
+        "NI Vögelsen [mfh] Tab. 0871024",
+        "NI Wendisch Evern [mfh] Tab. 0871024"
+      ]
+    },
+    {
+      "wo": "NI Stadt Buchholz in der Nordheid [mfh] Tab. 0871026",
+      "land": "NI",
+      "klasse": "gwb",
+      "quelle": "stuetzstelle (NI zonenabhaengig)",
+      "brw": null,
+      "b": 0.624,
+      "punkte": 151,
+      "uebernommen_von": [
+        "NI Stadt Buchholz in der Nordheid [mfh] Tab. 0871026",
+        "NI Neu Wulmstorf [mfh] Tab. 0871026",
+        "NI Seevetal [mfh] Tab. 0871026",
+        "NI Stadt Winsen (Luhe) [mfh] Tab. 0871026",
+        "NI Hansestadt Lüneburg [mfh] Tab. 0871026",
+        "NI Reppenstedt [mfh] Tab. 0871026"
+      ]
+    },
+    {
+      "wo": "NW Stadt Bottrop [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.531,
+      "punkte": 213
+    },
+    {
+      "wo": "NW Landeshauptstadt Düsseldorf [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.736,
+      "punkte": 227
+    },
+    {
+      "wo": "NW Bundesstadt Bonn [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.699,
+      "punkte": 197
+    },
+    {
+      "wo": "NW Stadt Hagen [wohnen]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.419,
+      "punkte": 149
+    },
+    {
+      "wo": "NW Stadt Mülheim an der Ruhr [ifw]",
+      "land": "NW",
+      "klasse": "ifw",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.163,
+      "punkte": 122
+    },
+    {
+      "wo": "NW Stadt Mülheim an der Ruhr [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.542,
+      "punkte": 369
+    },
+    {
+      "wo": "NW Stadt Mülheim an der Ruhr [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.611,
+      "punkte": 577
+    },
+    {
+      "wo": "NW Stadt Köln [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.487,
+      "punkte": 146
+    },
+    {
+      "wo": "NW Stadt Dinslaken [ifw]",
+      "land": "NW",
+      "klasse": "ifw",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.215,
+      "punkte": 67
+    },
+    {
+      "wo": "NW Klingenstadt Solingen [alle]",
+      "land": "NW",
+      "klasse": "alle",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.42,
+      "punkte": 149
+    },
+    {
+      "wo": "NW Stadt Leverkusen [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.363,
+      "punkte": 108
+    },
+    {
+      "wo": "NW Stadt Münster [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.452,
+      "punkte": 27
+    },
+    {
+      "wo": "NW Ennepe-Ruhr-Kreis (mit Stadt Witten) [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.137,
+      "punkte": 115
+    },
+    {
+      "wo": "NW Kreis Lippe (mit Stadt Detmold) [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.323,
+      "punkte": 141
+    },
+    {
+      "wo": "NW Stadt Moers [ifw]",
+      "land": "NW",
+      "klasse": "ifw",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.272,
+      "punkte": 34
+    },
+    {
+      "wo": "NW Stadt Neuss [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.49,
+      "punkte": 31
+    },
+    {
+      "wo": "NW Stadt Neuss [gewerbe]",
+      "land": "NW",
+      "klasse": "gewerbe",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.731,
+      "punkte": 23
+    },
+    {
+      "wo": "NW Stadt Wuppertal [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.5,
+      "punkte": 237
+    },
+    {
+      "wo": "NW Stadt Mönchengladbach [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.549,
+      "punkte": 237
+    },
+    {
+      "wo": "NW Stadt Herne [ifw]",
+      "land": "NW",
+      "klasse": "ifw",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.413,
+      "punkte": 53
+    },
+    {
+      "wo": "NW Stadt Herne [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.501,
+      "punkte": 259
+    },
+    {
+      "wo": "NW Stadt Remscheid [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.518,
+      "punkte": 217
+    },
+    {
+      "wo": "NW Stadt Aachen (Städteregion Aachen) [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.519,
+      "punkte": 172
+    },
+    {
+      "wo": "NW Hochsauerlandkreis (ohne Stadt Arnsberg) [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.492,
+      "punkte": 156
+    },
+    {
+      "wo": "NW Kreis Höxter [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0,
+      "punkte": 125
+    },
+    {
+      "wo": "NW Stadt Gütersloh [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.483,
+      "punkte": 227
+    },
+    {
+      "wo": "NW Stadt Paderborn [alle]",
+      "land": "NW",
+      "klasse": "alle",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.563,
+      "punkte": 106
+    },
+    {
+      "wo": "NW Kreis Viersen [alle]",
+      "land": "NW",
+      "klasse": "alle",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.495,
+      "punkte": 125
+    },
+    {
+      "wo": "BB Birkenwerder (Landkreis Oberhavel, Gebiet A) [alle]",
+      "land": "BB",
+      "klasse": "alle",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.419,
+      "punkte": 187,
+      "uebernommen_von": [
+        "BB Birkenwerder (Landkreis Oberhavel, Gebiet A) [alle]",
+        "BB Glienicke/Nordbahn (Landkreis Oberhavel, Gebiet A) [alle]",
+        "BB Hennigsdorf, Stadt (Landkreis Oberhavel, Gebiet A) [alle]",
+        "BB Hohen Neuendorf, Stadt (Landkreis Oberhavel, Gebiet A) [alle]",
+        "BB Landkreis Oberhavel (übrige Fälle) (Landkreis Oberhavel) [alle]"
+      ]
+    },
+    {
+      "wo": "BB Fürstenberg/Havel, Stadt (Landkreis Oberhavel, Gebiet C) [alle]",
+      "land": "BB",
+      "klasse": "alle",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.37,
+      "punkte": 187,
+      "uebernommen_von": [
+        "BB Fürstenberg/Havel, Stadt (Landkreis Oberhavel, Gebiet C) [alle]",
+        "BB Gransee, Stadt (Amt Gransee) (Landkreis Oberhavel, Gebiet C) [alle]",
+        "BB Großwoltersdorf (Amt Gransee) (Landkreis Oberhavel, Gebiet C) [alle]",
+        "BB Schönermark (Amt Gransee) (Landkreis Oberhavel, Gebiet C) [alle]",
+        "BB Sonnenberg (Amt Gransee) (Landkreis Oberhavel, Gebiet C) [alle]",
+        "BB Stechlin (Amt Gransee) (Landkreis Oberhavel, Gebiet C) [alle]",
+        "BB Kremmen, Stadt (Landkreis Oberhavel, Gebiet C) [alle]",
+        "BB Zehdenick, Stadt (Landkreis Oberhavel, Gebiet C) [alle]"
+      ]
+    },
+    {
+      "wo": "BB Oranienburg, Stadt (Landkreis Oberhavel) [alle]",
+      "land": "BB",
+      "klasse": "alle",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.125,
+      "punkte": 187
+    },
+    {
+      "wo": "BB Landeshauptstadt Potsdam [mfh]",
+      "land": "BB",
+      "klasse": "gwb",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.657,
+      "punkte": 186
+    },
+    {
+      "wo": "BB Stadt Cottbus/Chóśebuz [alle]",
+      "land": "BB",
+      "klasse": "alle",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.53,
+      "punkte": 179
+    },
+    {
+      "wo": "SN Stadt Leipzig [mfh]",
+      "land": "SN",
+      "klasse": "gwb",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.812,
+      "punkte": 255
+    },
+    {
+      "wo": "SN Landeshauptstadt Dresden [mfh]",
+      "land": "SN",
+      "klasse": "gwb",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.736,
+      "punkte": 250
+    },
+    {
+      "wo": "ST Halle (Saale), Stadt [mfh]",
+      "land": "ST",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.339,
+      "punkte": 190,
+      "uebernommen_von": [
+        "ST Halle (Saale), Stadt [mfh]",
+        "ST Magdeburg, Landeshauptstadt [mfh]",
+        "ST Sachsen-Anhalt (übrige Gemeinden) [mfh]"
+      ]
+    },
+    {
+      "wo": "TH Thüringen [mfh]",
+      "land": "TH",
+      "klasse": "gwb",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.23,
+      "punkte": 131
+    },
+    {
+      "wo": "MV Hanse- und Universitätsstadt Rostock [mfh]",
+      "land": "MV",
+      "klasse": "gwb",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 0.772,
+      "punkte": 179
+    },
+    {
+      "wo": "SH Kiel, Landeshauptstadt [mfh]",
+      "land": "SH",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.517,
+      "punkte": 172
+    },
+    {
+      "wo": "SH Flensburg, Stadt [mfh]",
+      "land": "SH",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.482,
+      "punkte": 179
+    },
+    {
+      "wo": "RP Trier, kreisfreie Stadt [mfh]",
+      "land": "RP",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.496,
+      "punkte": 172
+    }
+  ]
+}

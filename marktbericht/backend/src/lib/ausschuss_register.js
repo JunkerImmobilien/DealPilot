@@ -466,6 +466,11 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                             /* v2366: Ernte 17.10.2026 - BE, HH, HE, BY, HB, NI: 18 Werte (Berlin, Frankfurt, Wiesbaden,
                                Kassel, Giessen, Fulda, Offenbach, Muenchen, Regensburg, Bremen ...), 78 Sperren mit Weg. */
                             'uk-wgfz-laender-2026.json',
+                            /* v2373: Ernte 18.10.2026 - WGFZ fuer NRW (uebrige 75 Ausschuesse: 23 Werte, u. a. Solingen,
+                               Leverkusen, Muenster, Herne, Neuss, Wuppertal, Moenchengladbach, Lippe), BW (Wert nur Heilbronn,
+                               sonst Sperren je Gemeinde, Lizenz/Gebuehr) und BB/SN/ST/TH/MV/SH/RP/SL (Werte Oberhavel,
+                               Halle, Magdeburg, Kiel, Ostholstein, Luebeck, Hzgt. Lauenburg). */
+                            'uk-wgfz-nw2-2026.json', 'uk-wgfz-bw-2026.json', 'uk-wgfz-ost-west-2026.json',
                             /* v2367: MFH-Kennzahlen (Rohertragsfaktor, Ø Kaufpreis/Miete der Kauffaelle) - Gegenprobe zur Angebotsindikation. */
                             'mfh-kennzahlen-2026.json',
                            ];

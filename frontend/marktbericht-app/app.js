@@ -787,7 +787,10 @@ function _renderWertverfahren(d) {
   var box = document.createElement('div');
   box.id = 'wv-box';
   var bodenZeile = lv.available
-    ? eur(lv.value_sqm) + '/m\u00b2 \u00b7 amtlich \u00b7 Stichtag ' + (lv.stichtag || '\u2013')
+    ? eur(lv.value_sqm) + '/m\u00b2 \u00b7 '
+      /* v2390 \u00b7 der Rueckfall auf die eigene Eingabe ist nicht amtlich */
+      + (lv.source === 'dealpilot-eingabe' ? 'eigene Angabe, nicht \u00fcber BORIS abgerufen' : 'amtlich')
+      + ' \u00b7 Stichtag ' + (lv.stichtag || '\u2013')
     : 'kein amtlicher Bodenrichtwert verf\u00fcgbar';
 
   box.innerHTML =
@@ -815,7 +818,17 @@ function _renderWertverfahren(d) {
         : '')
     + (hk.kurz ? '<div class="wv-hk">Liegenschaftszinssatz: '
         + (hk.liegenschaftszins_pct != null ? String(hk.liegenschaftszins_pct).replace('.', ',') + ' % \u00b7 ' : '')
-        + hk.kurz + (hk.indikativ ? ' (indikativ)' : '') + '</div>' : '')
+        + esc(hk.kurz) + (hk.indikativ && !/indikativ/.test(hk.kurz) ? ' (indikativ)' : '') + '</div>' : '')
+    /* v2390 · Unter A: woher (Klartext), dass es genauer geht, und wie.
+       Marcel 19.10.2026: der Wert bleibt, aber er steht als das da, was er ist. */
+    + (hk.unter_a
+        ? '<div class="wv-quelle"><b>Ertragswert insoweit indikativ.</b> '
+          + esc(hk.lang || '') + '. '
+          + (hk.weg && hk.weg.text ? esc(hk.weg.text) : '')
+          + (hk.weg && hk.weg.url && !(hk.quelle_link && hk.quelle_link.url)
+              ? ' <a href="' + esc(hk.weg.url) + '" target="_blank" rel="noopener">zur Quelle</a>' : '')
+          + '</div>'
+        : '')
     /* ═══ v1099b-WQL · DER WEG ZUR QUELLE, AUF DEM BILDSCHIRM ═══════════
        Marcels Vorgabe: "gib im Marktbericht bei den Liegenschaftszinsen
        und Sachwertfaktoren den Link an, wenn der Kunde die Adresse
@@ -866,8 +879,9 @@ function _renderWertverfahren(d) {
     + karte('vgl', (cc.comparison && cc.comparison.bezeichnung) || 'Marktpreisindikation',
         eur(v),
         ((cc.comparison && cc.comparison.basis) === 'kaufpreise'
-          ? 'amtliche Grundlage · § 20, § 25 ImmoWertV'
-          : 'Angebotspreise aus Portalen — keine Kaufpreise (§ 25 ImmoWertV)')
+          ? 'amtlicher Vergleichsfaktor · § 20, § 25 ImmoWertV'
+          /* v2380 · Angebotspreise heissen so, auch wenn irgendwo eine amtliche Grundlage existiert */
+          : 'Angebotspreise (Marktdurchschnitt), keine Kaufpreise (§ 25 ImmoWertV)')
           /* v2367 · Abschlag auf Angebotspreise und amtliche Gegenprobe sichtbar */
           + _mpZusatz(d),
         'vergleich')
@@ -885,9 +899,16 @@ function _renderWertverfahren(d) {
         e.available
           ? ('Reinertrag ' + eur(e.reinertrag_pa_eur) + ' p. a.'
              + (e.bodenwert_fehlt ? ' · <b>ohne Bodenwert gerechnet</b>' : '')
+             /* v2390 · Zins unter A: die Karte sagt es selbst */
+             + (e.indikativ_wegen_zins && e.liegenschaftszins_herkunft
+                ? ' · <b>insoweit indikativ</b> (Zins: ' + esc(e.liegenschaftszins_herkunft.etikett) + ')' : '')
              /* v2367 · auf welcher Miete der Ertragswert steht */
              + (e.miete_qm != null ? ' · Miete ' + String(e.miete_qm).replace('.', ',') + ' €/m²'
-                + (/Ist-Miete/.test(e.miete_quelle || '') ? ' (Ist-Miete, marktüblich)' : (e.miete_quelle ? ' (' + esc(e.miete_quelle) + ')' : '')) : ''))
+                + (/Ist-Miete/.test(e.miete_quelle || '') ? ' (Ist-Miete, marktüblich)' : (e.miete_quelle ? ' (' + esc(e.miete_quelle) + ')' : '')) : '')
+             /* v2382 · das Band der Marktueblichkeit mit beiden Vergleichswerten */
+             + (e.miete_band ? ' · Band ' + String(e.miete_band.unten_qm).replace('.', ',') + '–' + String(e.miete_band.oben_qm).replace('.', ',') + ' €/m² ('
+                + [e.miete_band.amtlich_qm != null ? 'amtlich ' + String(e.miete_band.amtlich_qm).replace('.', ',') : null,
+                   e.miete_band.angebot_qm != null ? 'Angebot ' + String(e.miete_band.angebot_qm).replace('.', ',') : null].filter(Boolean).join(' · ') + ')' : ''))
           : (e.grund || ''),
         'ertrag', e.staffel)
     /* v1143-VORL \u00b7 Die Karte zeigte bei vorhandenem Sachwert eine LEERE
@@ -915,7 +936,10 @@ function _renderWertverfahren(d) {
            * Lauf, bei dem ueberhaupt ein Faktor griff (EFH Hiddenhausen,
            * 0,925 Stufe A) \u2014 vorher gab es keinen Fall, der die Zeile
            * erreicht haette. Beide Formen werden jetzt gelesen. */
-          ? (sw.marktangepasst
+          ? (sw.pauschal   /* v2390 · vereinfachter Sachwert, nicht im Vergleich */
+              ? 'vereinfachter Sachwert (Pauschalansatz), vorläufig · kein Marktwert'
+                + (sw.fehlt && sw.fehlt.length ? ' · es fehlt: ' + sw.fehlt.join(', ') : '')
+            : sw.marktangepasst
               ? ('marktangepasst' + (function () {
                   var f = sw.sachwertfaktor;
                   var z = (f && typeof f === 'object') ? f.wert : f;
@@ -931,6 +955,12 @@ function _renderWertverfahren(d) {
         'sach', sw.staffel,
         (sw.available && !sw.marktangepasst) ? (sw.sachwertfaktor_hinweis || null) : null)
     + '</div>'
+    /* v2380 · welches Verfahren fuehrt - und wenn keines, warum (auch am Bildschirm) */
+    + ((cc.verfahrenswahl && (cc.verfahrenswahl.verfahren || cc.verfahrenswahl.nicht_gerechnet))
+        ? '<div class="wv-hk">' + (cc.verfahrenswahl.verfahren
+            ? 'Führendes Verfahren: ' + esc(({ sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren', vergleichswert: 'Vergleichswertverfahren', bodenwert: 'Bodenwert' })[cc.verfahrenswahl.verfahren] || cc.verfahrenswahl.verfahren) + ' — ' + esc(cc.verfahrenswahl.grund || '')
+            : 'Kein führendes Verfahren ausgewiesen. ' + esc(cc.verfahrenswahl.weg || '')) + '</div>'
+        : '')
     /* v1106-WQLS - derselbe Weg wie beim Liegenschaftszins, nur fuer den
        Sachwertfaktor. Er steht UNTER den drei Karten, weil er sich auf die
        Sachwertkarte bezieht und nicht auf den Bodenwert darueber. */
@@ -1282,6 +1312,14 @@ function render(out) {
      Kundenbild - Anbieter-Neutralität: kein Dienstleistername nach außen. */
   $('aiMode').textContent = out.ai_mode ? '· ' + (out.ai_mode === 'schnell' ? 'Kurzfassung' : 'KI-Auswertung') + (out.ai_error ? ' (Text nicht verfügbar)' : '') : '';
   $('reportMd').innerHTML = mdToHtml(out.report_md || '');
+  /* v2387 · Stufe 1 (Schnellmodus) ist die Marktpreisindikation der Objektkarte -
+     kein Bericht, kein PDF. Den Marktbericht gibt es ab Stufe 2. */
+  try {
+    var _st1 = out.ai_mode === 'schnell';
+    if ($('pdfBtn')) $('pdfBtn').style.display = _st1 ? 'none' : '';
+    if (_st1) $('reportMd').innerHTML = '<p><b>Stufe 1 · Marktpreisindikation.</b> Sie steht auf der Objektkarte in DealPilot. '
+      + 'Einen Marktbericht mit Lage, Markt und Text gibt es ab <b>Stufe 2</b>, die Wertermittlung nach ImmoWertV in <b>Stufe 3</b>.</p>';
+  } catch (e) {}
   renderProvenance(out);
   window._lastOut = out;
   try { _installMbSaveObject(); } catch (e) {}
@@ -1614,7 +1652,9 @@ function renderAssessment(d) {
   let extra = '';
   if (lv && lv.available && lv.value_sqm != null) {
     const stich = lv.stichtag ? ' · Stichtag ' + String(lv.stichtag).slice(0, 10) : '';
-    extra = `<div class="assess rate-neutral"><div class="l">Bodenrichtwert (amtlich)${lv.source ? ' · ' + lv.source : ''}${stich}</div>
+    /* v2390 · Der Rueckfall auf die eigene Eingabe stand hier als „(amtlich) · dealpilot-eingabe". */
+    const _lvEigen = lv.source === 'dealpilot-eingabe';
+    extra = `<div class="assess rate-neutral"><div class="l">${_lvEigen ? 'Bodenrichtwert (eigene Angabe, nicht über BORIS abgerufen)' : 'Bodenrichtwert (amtlich)' + (lv.source ? ' · ' + lv.source : '')}${stich}</div>
        <div class="v" style="text-transform:none;"><span class="dot" style="background:var(--gold);"></span>${new Intl.NumberFormat('de-DE').format(lv.value_sqm)} €/m²</div></div>`;
   }
 
@@ -2349,7 +2389,10 @@ async function _mbLoadReportsList(opts){
   try{
     var res=await fetch(API + '/objects/history' + (qs?('?'+qs):''), { headers:_mbAuth() });
     var j=await res.json();
-    var reps=((j&&j.history)||[]).filter(function(h){ return h && h.report_id!=null; });
+    /* v2387 · Stufe 1 ist KEIN Bericht (Marcel 19.10.2026: „das, was jetzt auf der
+       Karte angezeigt wird … da wuerde ich gar keinen Bericht machen"). Ihre Werte
+       stehen weiter in mb.object_snapshots, in der Liste der Berichte stehen sie nicht. */
+    var reps=((j&&j.history)||[]).filter(function(h){ return h && h.report_id!=null && h.ai_mode!=='schnell'; });
     reps.sort(function(a,b){ return new Date(b.created_at)-new Date(a.created_at); });
     if(!reps.length){
       host.innerHTML=head(0)+'<div class="mbrep-list"><div class="mbrep-empty">'
@@ -3821,7 +3864,9 @@ async function exportPdf(out) {
   // ---------- Bodenrichtwert (BORIS) ----------
   const lv = d.land_value;
   if (lv && lv.available && lv.value_sqm != null) {
-    sectionTitle('Bodenrichtwert (amtlich)');
+    /* v2390 · eigene Angabe heisst nicht amtlich */
+    const _lvEigenPdf = lv.source === 'dealpilot-eingabe';
+    sectionTitle(_lvEigenPdf ? 'Bodenrichtwert (eigene Angabe)' : 'Bodenrichtwert (amtlich)');
     need(30);
     doc.setFillColor(...INK); doc.roundedRect(M, y, blockW, 26, 2, 2, 'F');
     doc.setFillColor(...GOLD); doc.roundedRect(M, y, 2.5, 26, 1, 1, 'F');
@@ -3835,6 +3880,7 @@ async function exportPdf(out) {
     if (lv.nutzung) info.push('Nutzung ' + lv.nutzung);
     if (lv.stichtag) info.push('Stichtag ' + lv.stichtag);
     if (lv.used_year) info.push('Jahrgang ' + lv.used_year);
+    if (_lvEigenPdf) info.unshift('eigene Angabe, nicht über BORIS abgerufen');   /* v2390 */
     doc.text(info.join('  ·  '), M + 60, y + 9);
     doc.setTextColor(210, 210, 216); doc.setFontSize(9);
     /* v1602 · Der Bodenwert stand hier ohne jede Stufenpruefung im PDF.
@@ -3868,7 +3914,11 @@ async function exportPdf(out) {
       doc.setFontSize(8); doc.setTextColor(120, 113, 100);
       doc.text('Im Marktwert berücksichtigt: +' + euro(lcomp.value_eur) + ' Mehrflächen-Bodenwert (' +
         Math.round(lcomp.excess_sqm).toLocaleString('de-DE') + ' m² über typischem Grundstück von ' + lcomp.typical_plot_sqm +
-        ' m², Marktfaktor ' + lcomp.market_factor + ').', M, y);
+        /* v2380 · mit amtlichem Koeffizienten ist market_factor null - hier stand „Marktfaktor null“ */
+        (lcomp.market_factor != null
+          ? ' m², Marktfaktor ' + String(lcomp.market_factor).replace('.', ',')
+          : ' m², Umrechnungskoeffizient ' + String(lcomp.umrechnungskoeffizient).replace('.', ',')
+            + (lcomp.umrechnung_quelle ? ' · ' + lcomp.umrechnung_quelle : '')) + ').', M, y);
       y += 7;
     }
   }
@@ -3972,7 +4022,12 @@ async function exportPdf(out) {
     const _vglBasis = (cc.comparison && cc.comparison.basis) || 'angebote';
     const _vglAmtlich = _vglBasis === 'kaufpreise';
     const _vglTitel = _vglAmtlich ? 'VERGLEICHSWERT · AMTLICH' : 'MARKTPREIS AUS ANGEBOTEN';
-    card3(M, _vglTitel, cc.comparison.vergleichswert_eur, [
+    const _amtV = (cc.comparison && cc.comparison.amtlicher_vergleich) || null;   /* v2380 */
+    card3(M, _vglTitel, cc.comparison.vergleichswert_eur, _vglAmtlich ? [
+      _amtV && _amtV.rechnung ? _amtV.rechnung : null,
+      'Amtlicher Vergleichsfaktor aus der Kaufpreissammlung (§ 20, § 25 ImmoWertV)',
+      (cc.comparison.angebotswert_eur ? 'zum Vergleich Angebotspreise: ' + Math.round(cc.comparison.angebotswert_eur).toLocaleString('de-DE') + ' €' : null),
+    ] : [
       mv.basis_median_sqm ? Math.round(mv.basis_median_sqm).toLocaleString('de-DE') + ' €/m² Median' : null,
       (d.sale && d.sale.sample_size) ? d.sale.sample_size + ' Vergleichsangebote' : null,
       /* v2367 · Abschlag und amtliche Gegenprobe auch im PDF */
@@ -3990,7 +4045,7 @@ async function exportPdf(out) {
         : null,
       _vglAmtlich
         ? 'Amtliche Grundlage aus der Kaufpreissammlung (§ 20, § 25 ImmoWertV)'
-        : 'Angebotspreise — keine beurkundeten Kaufpreise (§ 25 ImmoWertV)',
+        : 'Angebotspreise (Marktdurchschnitt), keine Kaufpreise (§ 25 ImmoWertV)',
       /* v1061-WTXT-1 · Hier stand der rohe Bezeichner: "Immobilienrichtwerte:
        * nicht_beschlossen". Ein Datenbankwert im Kundenbericht. */
       (!_irwOk && cc.irw) ? ({
@@ -4005,6 +4060,9 @@ async function exportPdf(out) {
        * zeigte "ohne Bodenwert · Gebäude – · RND undefined J." neben einer
        * korrekten Staffel. Jetzt liefert der Rechenkern sie. */
       sw.hinweis_kurz || null,
+      /* v2390 · beim Pauschalansatz steht da, was zum Sachwert nach NHK 2010 fehlt */
+      sw.pauschal ? ('vereinfachter Sachwert, vorläufig'
+        + (sw.fehlt && sw.fehlt.length ? ' · es fehlt: ' + sw.fehlt.join(', ') : '')) : null,
       sw.bodenwert_eur != null ? 'Bodenwert ' + euro(sw.bodenwert_eur) : 'ohne Bodenwert',
       sw.gebaeude_sachwert_eur != null ? 'Gebäude ' + euro(sw.gebaeude_sachwert_eur) : null,
       (sw.restnutzungsdauer_jahre != null && sw.gesamtnutzungsdauer_jahre != null)
@@ -4042,6 +4100,9 @@ async function exportPdf(out) {
     card3(M + 2 * (cardW + 6), 'ERTRAGSWERT · INDIKATIV', ew.available ? ew.value_eur : null, ew.available ? [
       'Rohertrag ' + euro(ew.rohertrag_pa_eur) + ' p.a.',
       'Reinertrag ' + euro(ew.reinertrag_pa_eur) + ' p.a.',
+      /* v2390 · Zins unter A: Ertragswert insoweit indikativ, mit Ebene */
+      (ew.indikativ_wegen_zins && ew.liegenschaftszins_herkunft)
+        ? 'insoweit indikativ · Zins: ' + ew.liegenschaftszins_herkunft.etikett : null,
       /* v1205 · Liegenschaftszins und Vervielfaeltiger sind Dezimalzahlen und
          standen als rohe JS-Werte da: „LZ 2.56 % · V 23.02". Zwei Zeilen
          darueber laufen Rohertrag und Reinertrag schon durch euro(), also
@@ -4069,6 +4130,20 @@ async function exportPdf(out) {
       doc.text(_vwT, M + 5, y + 9.8);
       y += _vwH + 4;
       doc.setFontSize(8);
+    } else if (_vw && _vw.nicht_gerechnet) {
+      /* v2380 · Das fuehrende Verfahren wird nur genannt, wenn es gerechnet wurde.
+         Sonst steht da, welches es waere und was ihm fehlt. */
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setCharSpace(0);
+      const _vwT = doc.splitTextToSize(String(_vw.weg || '') + (_vw.grund ? ' ' + _vw.grund : ''), blockW - 10);
+      const _vwH = 8.5 + _vwT.length * 3.1;
+      need(_vwH + 4);
+      doc.setFillColor(247, 243, 233); doc.roundedRect(M, y, blockW, _vwH, 2, 2, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.4); doc.setTextColor(...TXT);
+      doc.text('Kein führendes Verfahren ausgewiesen', M + 5, y + 5);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setTextColor(...MUT);
+      doc.text(_vwT, M + 5, y + 9.8);
+      y += _vwH + 4;
+      doc.setFontSize(8);
     }
     if (cc.comparison.spread_pct != null) {
       doc.setFontSize(8); doc.setTextColor(...TXT);
@@ -4090,7 +4165,9 @@ async function exportPdf(out) {
         + (sp <= 15 ? 'die beiden stützen sich gegenseitig (hohe Plausibilität der Indikation).'
           : sp <= 30 ? 'moderate Abweichung; Objektbesonderheiten prüfen.'
           : 'große Abweichung; Wert nur mit weiterer Prüfung verwenden.')
-        + (_swDraussen ? ' Der vorläufige Sachwert bleibt außen vor: ohne Sachwertfaktor ist er kein Marktwert.' : ''),
+        + (_swDraussen ? ((cc.sachwert && cc.sachwert.pauschal)   /* v2390 */
+          ? ' Der vereinfachte Sachwert (Pauschalansatz) bleibt außen vor: ohne NHK-Kennwert und Sachwertfaktor ist er kein Marktwert.'
+          : ' Der vorläufige Sachwert bleibt außen vor: ohne Sachwertfaktor ist er kein Marktwert.') : ''),
         W - 2 * M);
       need(_spT.length * 3.6 + 4);
       doc.text(_spT, M, y + 3);
@@ -4168,7 +4245,9 @@ async function exportPdf(out) {
      * und sagt, warum die eine fuehrt. Er erscheint nur, wenn es wirklich
      * zwei verschiedene Zahlen gibt (miete_vergleich ist sonst null). */
     const _mvgl = cc.ertragswert && cc.ertragswert.miete_vergleich;
-    if (_mvgl) {
+    /* v2382 · Das Band der Marktueblichkeit steht im Bericht - beide Vergleichswerte und die Kanten. */
+    const _mbd = cc.ertragswert && cc.ertragswert.available && cc.ertragswert.miete_band;
+    if (_mvgl || _mbd) {
       /* Mieten IMMER mit zwei Nachkommastellen: 8,3 neben 6,66 in derselben
        * Spanne liest sich wie ein anderer Genauigkeitsgrad. Prozente dagegen
        * bekommen eine Stelle — 36,20 % taeuscht Genauigkeit vor, die nicht da ist. */
@@ -4176,17 +4255,18 @@ async function exportPdf(out) {
       const _pz = (v) => Number(v).toLocaleString("de-DE", { maximumFractionDigits: 1 });
       const _qm = (v) => _z2(v) + ' €/m²';
       const _ri = (p) => (p < 0 ? 'darunter' : 'darüber');
-      const _sp = (_mvgl.spanne_q25 != null && _mvgl.spanne_q75 != null)
+      const _sp = (_mvgl && _mvgl.spanne_q25 != null && _mvgl.spanne_q75 != null)
         ? _z2(_mvgl.spanne_q25) + '–' + _z2(_mvgl.spanne_q75) + ' €/m²' : null;
-      const _lage = (_mvgl.ausserhalb_spanne && _sp)
+      const _lage = (_mvgl && _mvgl.ausserhalb_spanne && _sp)
         ? ' und damit ' + _mvgl.ausserhalb_spanne + ' der Vergleichsspanne ' + _sp : '';
-      const _txt = _mvgl.amtlich_fuehrt
+      const _txt = (_mvgl && _mvgl.amtlich_fuehrt)
         ? 'Angesetzt sind ' + _qm(_mvgl.angesetzt_qm) + ' aus der Mietpreisübersicht des '
           + 'Gutachterausschusses — modellkonform zum Liegenschaftszinssatz aus derselben '
           + 'Quelle (§ 10 ImmoWertV). Die Vergleichsangebote liegen bei '
           + _qm(_mvgl.amtlich_qm) + ', also ' + _pz(Math.abs(_mvgl.abweichung_pct))
           + ' % ' + _ri(-_mvgl.abweichung_pct) + '. Beide Zahlen stehen hier bewusst '
           + 'nebeneinander.'
+        : !_mvgl ? ('Angesetzt sind ' + _qm(cc.ertragswert.miete_qm) + ' (' + (cc.ertragswert.miete_quelle || '') + ').')
         : 'Angesetzt sind ' + _qm(_mvgl.angesetzt_qm) + ' (' + _mvgl.angesetzt_quelle
           + '). Die amtliche Mietpreisübersicht nennt ' + _qm(_mvgl.amtlich_qm) + ' — '
           + _pz(Math.abs(_mvgl.abweichung_pct)) + ' % ' + _ri(_mvgl.abweichung_pct)
@@ -4194,8 +4274,15 @@ async function exportPdf(out) {
           + '§ 10 ImmoWertV wäre er nur, wenn auch der Liegenschaftszinssatz aus '
           + 'derselben Quelle stammt. Die Zahl oben ist ein Vergleichswert, kein '
           + 'Rechenschritt.';
+      const _bandT = _mbd ? (' Band der Marktüblichkeit ' + _z2(_mbd.unten_qm) + '–' + _z2(_mbd.oben_qm) + ' €/m² ('
+        + [_mbd.amtlich_qm != null ? 'amtliche Vergleichsmiete ' + _qm(_mbd.amtlich_qm) : null,
+           _mbd.angebot_qm != null ? 'Angebotsmiete ' + _qm(_mbd.angebot_qm) : null].filter(Boolean).join(', ')
+        + '; untere Kante × 0,7, obere × 1,3)'
+        + (_mbd.ist_qm != null ? ': die Ist-Miete von ' + _qm(_mbd.ist_qm) + ({ im_band: ' liegt im Band und gilt als marktüblich (§ 31 Abs. 2 ImmoWertV).',
+            ueber: ' liegt darüber — gerechnet wird die obere Kante; der Mehrertrag ist nur für die gesicherte Vertragslaufzeit als besonderes objektspezifisches Merkmal (§ 8 Abs. 3) zu würdigen.',
+            unter: ' liegt darunter — gerechnet wird die untere Kante; der Minderertrag ist nur für die gesicherte Vertragslaufzeit als besonderes objektspezifisches Merkmal (§ 8 Abs. 3) zu würdigen.' }[_mbd.lage] || '.') : '.')) : '';
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setCharSpace(0);
-      const _mt = doc.splitTextToSize(_txt, blockW - 10);
+      const _mt = doc.splitTextToSize(_txt + _bandT, blockW - 10);
       const _mh = 9.5 + _mt.length * 3;
       need(_mh + 4);
       doc.setFillColor(250, 248, 242); doc.roundedRect(M, y, blockW, _mh, 2, 2, 'F');
@@ -4215,7 +4302,7 @@ async function exportPdf(out) {
      * spiegel — im Prod-Bericht endet Seite 4 mit "Kein Gutachten n. § 194 Bau".
      * Jetzt auf die Blockbreite umbrochen. Bei einer Zeile ist y += 5 + 1*3 = 8,
      * also exakt der alte Wert; nur laengere Fussnoten schieben nach. */
-    const _fn = doc.splitTextToSize('Vereinfachte Verfahren n. ImmoWertV-Logik (indikativ): NHK 2010 ' +       /* v1061-WFUS-1 · Die Fussnote nannte 835 EUR/m2 (Stufe 3), gerechnet
+    let _fnS = ('Vereinfachte Verfahren n. ImmoWertV-Logik (indikativ): NHK 2010 ' +       /* v1061-WFUS-1 · Die Fussnote nannte 835 EUR/m2 (Stufe 3), gerechnet
        * wurde mit 985 (Stufe 4). Wie bei Quote und Zinssatz: aus dem
        * Ergebnis nehmen, nicht aus der Annahme. */
 ((cc.sachwert && cc.sachwert.available && cc.sachwert.nhk_eur_qm_bgf)
@@ -4226,17 +4313,17 @@ async function exportPdf(out) {
        * Ernte stammenden 23,5 Prozent und 3,0 statt 2,2. Eine Annahme, die
        * etwas anderes behauptet als die Rechnung, ist schlimmer als keine.
        * Jetzt aus dem Ergebnis, mit Rueckfall auf die Annahme. */
-      cc.assumptions.baupreisindex_2010_heute + ' · BWK '
+      String(cc.assumptions.baupreisindex_2010_heute).replace('.', ',') + ' · BWK '   /* v2382: Komma */
       + ((cc.ertragswert && cc.ertragswert.available && cc.ertragswert.rohertrag_pa_eur > 0)
           ? (Math.round(cc.ertragswert.bwk_pa_eur / cc.ertragswert.rohertrag_pa_eur * 1000) / 10)
               .toLocaleString('de-DE')
-          : Math.round(cc.assumptions.bwk_quote * 100)) + ' % · Liegenschaftszins '
+          : (cc.assumptions.bwk_quote != null ? Math.round(cc.assumptions.bwk_quote * 100) : '–')) + ' % · Liegenschaftszins '
       /* v1052-WFUS-1 · v1050 hat die Quote aus dem Ergebnis geholt, den
        * Zinssatz nicht. Die Fussnote nannte weiter 3 %, gerechnet wurden
        * 2,2 %. Eine Datei, zwei Stellen — schon wieder. */
       + (((cc.ertragswert && cc.ertragswert.available && cc.ertragswert.liegenschaftszins_pct != null)
           ? cc.ertragswert.liegenschaftszins_pct
-          : (cc.assumptions.liegenschaftszins * 100)).toLocaleString('de-DE'))
+          : (cc.assumptions.liegenschaftszins != null ? cc.assumptions.liegenschaftszins * 100 : '–')).toLocaleString('de-DE'))
       + ' % · ' + ((cc.sachwert && cc.sachwert.vorlaeufig)
         ? 'ohne Sachwertfaktor'   /* v1061-WFUS-2 */
         /* v1150-WFUS · Dieselbe Falle wie beim Zinssatz (v1052), eine Zeile
@@ -4260,7 +4347,7 @@ async function exportPdf(out) {
             var z = (f && typeof f === 'object') ? f.wert : f;
             var s = (f && typeof f === 'object') ? f.stufe : null;
             var q = (f && typeof f === 'object') ? f.quelle : null;
-            if (z == null) return String(cc.assumptions.sachwertfaktor);
+            if (z == null) return (cc.assumptions.sachwertfaktor != null ? String(cc.assumptions.sachwertfaktor).replace('.', ',') : '–');   /* v2382 */
             /* v1150b · Die Quelle nur, wenn sie kurz ist. Gemessen am
              * Prüfobjekt liefert der amtliche Weg
              * "Grundstücksmarktbericht 2026 für den Kreis Herford, 5.1.2
@@ -4273,7 +4360,16 @@ async function exportPdf(out) {
             var qk = (q && q.length <= 26) ? q : null;
             return String(z).replace('.', ',')
               + (s ? ' (Stufe ' + s + (qk ? ' · ' + qk : '') + ')' : '');
-          })()) + '. Kein Gutachten n. § 194 BauGB.', blockW);
+          })()) + '. Kein Gutachten n. § 194 BauGB.');
+    /* v2385 · Nur nennen, was gerechnet wurde: ohne Sachwert keine NHK-/Faktorangabe
+       (H stand bei „NHK 2010 null €/m²" und „Sachwertfaktor –"), ohne Ertragswert keine BWK/Zins. */
+    if (!(cc.sachwert && cc.sachwert.available)) {
+      _fnS = _fnS.replace(/NHK 2010 .*? · BWK /, 'BWK ').replace(/ · (ohne Sachwertfaktor|Sachwertfaktor [^.]*?). Kein Gutachten/, '. Kein Gutachten');
+    }
+    if (!(cc.ertragswert && cc.ertragswert.available)) {
+      _fnS = _fnS.replace(/ · BWK .*? % · Liegenschaftszins .*? % · /, ' · ').replace(/: BWK .*? % · Liegenschaftszins .*? %/, '');
+    }
+    const _fn = doc.splitTextToSize(_fnS, blockW);
     doc.text(_fn, M, y + 3);
     y += 5 + _fn.length * 3;
   }
@@ -4440,7 +4536,11 @@ async function exportPdf(out) {
     need(70);
 
     const _stufeTxt = { A: 'amtlich, kreisscharf', B: 'amtlich, regional',
-      C: 'aus eigener Marktableitung', D: 'gesetzlicher Auffangwert n. § 256 BewG',
+      /* v2390 · C war hier „aus eigener Marktableitung" - falsch fuer Register-C
+         (amtlich, geringe Datenbasis) und den Nachbarwert. Seit v2390 kommt die
+         Beschriftung aus `liegenschaftszins_herkunft`; das hier ist nur noch
+         der Rueckfall fuer aeltere Berichte und behauptet keine Herkunft. */
+      C: 'indikativ, nicht objektgenau', D: 'gesetzlicher Auffangwert n. § 256 BewG',
       E: 'eigene Angabe' };
 
     doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...MUT);
@@ -4491,72 +4591,98 @@ async function exportPdf(out) {
     /* Herkunft des Zinssatzes — die Zahl, an der alles haengt */
     /* v1050-WSPN-1 · Der Kasten wird hoeher, wenn eine Streuung vorliegt —
      * sonst steht die Spanne im Nichts. */
+    /* ═══ v2390 · DER KASTEN WAECHST MIT SEINEM INHALT ════════════════════
+       Bis hier stand er fest bei 15 oder 21 mm, und Link (y+15,5/18,5) und
+       Spanne (y+17,5) lagen uebereinander. Aufgefallen ist das nie, weil der
+       Link nie ankam (`liegenschaftszins_quelle_link` war immer null, seit
+       v2390 behoben). Jetzt werden die Zeilen zuerst gesammelt, dann
+       gezeichnet - Hoehe = Summe der Zeilen.
+
+       Und: die Herkunft steht in KLARTEXT der Ebene (WPS.zinsHerkunft) -
+       Landeswert, Bundesdurchschnitt, Nachbarwert desselben Ausschusses,
+       amtlich mit geringer Datenbasis, gesetzlicher Auffangwert. Unter A
+       folgen „Ertragswert insoweit indikativ" und der Weg zum oertlichen
+       Satz. Marcel 19.10.2026: ein Wert unter A heisst nie „amtlich" ohne
+       Zusatz. */
+    const _zh = _ew.liegenschaftszins_herkunft || null;
     const _hatStreuung = _ew.streuung_pct != null && _ew.streuung_pct > 0;
-    const _kastenH = _hatStreuung ? 21 : 15;
-    doc.setFillColor(245, 243, 238); doc.roundedRect(M, y, blockW, _kastenH, 2, 2, 'F');
-    doc.setFillColor(...GOLD); doc.roundedRect(M, y, 1.6, _kastenH, 0.8, 0.8, 'F');
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(120, 113, 100);
-    doc.text('LIEGENSCHAFTSZINSSATZ', M + 5, y + 5, { charSpace: 0.3 });
-    /* WPDF12-2 · charSpace wirkt sonst in den Folgeaufrufen weiter — die
-     * Abzugszeile erschien gesperrt und brach nicht mehr um. */
-    doc.setCharSpace(0);
-    doc.setFontSize(9); doc.setTextColor(...TXT);
-    doc.text(String(_ew.liegenschaftszins_pct).replace('.', ',') + ' %', M + 5, y + 11.5);
+    /* v1050-WSPN-2 · Die Herkunft nennt auch den Ausschuss. */
+    let _q;
+    if (_zh && _zh.etikett) {
+      _q = _zh.etikett;
+      if (_ew.liegenschaftszins_quelle && !_zh.unter_a) _q += ' · ' + String(_ew.liegenschaftszins_quelle).split(',')[0];
+    } else {
+      /* Rueckfall fuer Berichte vor v2390 */
+      _q = (_stufeTxt[_ew.liegenschaftszins_stufe] || _ew.liegenschaftszins_quelle || '–');
+      if (_ew.liegenschaftszins_rueckfall && _ew.liegenschaftszins_stufe !== 'D') {
+        _q = 'Rückfallwert, nicht objektgenau zugeordnet';   /* v2381 */
+      }
+      if (_ew.liegenschaftszins_quelle && _stufeTxt[_ew.liegenschaftszins_stufe]) {
+        _q += ' · ' + String(_ew.liegenschaftszins_quelle).split(',')[0];
+      }
+    }
     doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
-    doc.setTextColor(110, 110, 118);
-    /* v1050-WSPN-2 · Die Herkunft nennt jetzt auch den Ausschuss. Der
-     * Stufenbuchstabe stand hier noch nie — _stufeTxt uebersetzt ihn seit
-     * jeher in Klartext. */
-    let _q = (_stufeTxt[_ew.liegenschaftszins_stufe] || _ew.liegenschaftszins_quelle || '–');
-    if (_ew.liegenschaftszins_quelle && _stufeTxt[_ew.liegenschaftszins_stufe]) {
-      _q += ' · ' + String(_ew.liegenschaftszins_quelle).split(',')[0];
+    const _qZeilen = doc.splitTextToSize('Herkunft: ' + _q, blockW - 40);
+    /* Zusatzzeilen: [Text, Farbe, Schrift] */
+    const _zz = [];
+    const _zeilen = (txt, farbe, fett) => {
+      doc.setFont('helvetica', fett ? 'bold' : 'normal'); doc.setFontSize(6.5);
+      doc.splitTextToSize(String(txt), blockW - 10).forEach((l) => _zz.push([l, farbe, fett]));
+    };
+    if (_zh && _zh.unter_a) {
+      _zeilen('Ertragswert insoweit indikativ — ' + (_zh.klartext || _zh.etikett) + '.', [150, 110, 100], true);
+      if (_zh.weg && _zh.weg.text) _zeilen(_zh.weg.text + (_zh.weg.kosten ? ' ' + _zh.weg.kosten : ''), [140, 132, 118], false);
     }
-    doc.text(doc.splitTextToSize('Herkunft: ' + _q, blockW - 40), M + 30, y + 11.5);
-
     /* ═══ v1099-WQL · WO DER LESER DEN WERT SELBST HOLT ═══════════════════
-       Marcels Vorgabe vom 13.09.2026: „gib im Marktbericht bei den
-       Liegenschaftszinsen und Sachwertfaktoren den Link an, wenn der Kunde
-       die Adresse eingegeben hat."
-
        Der Link steht IMMER da, nicht nur wenn ein Wert fehlt: er belegt
-       die Zahl und laesst sie nachpruefen. Wo keine Zahl steht, ist er die
-       einzige Auskunft, die wir geben koennen - und damit die wichtigste.
-
-       Was er NICHT sagt: dass DealPilot den Wert liefert. Der Satz nennt
-       den Ausschuss, der ihn fuehrt. */
+       die Zahl und laesst sie nachpruefen. Was er NICHT sagt: dass
+       DealPilot den Wert liefert. Der Satz nennt den Ausschuss. */
     var _ql = _ew.liegenschaftszins_quelle_link;
-    if (_ql && _ql.satz) {
-      doc.setFontSize(6.5); doc.setTextColor(140, 132, 118);
-      var _zl = _ql.satz.text + (_ql.satz.kosten ? ' ' + _ql.satz.kosten : '');
-      doc.text(doc.splitTextToSize(_zl, blockW - 10), M + 5, y + 15.5);
-      doc.setTextColor(120, 110, 140);
-      doc.text(doc.splitTextToSize(_ql.url, blockW - 10), M + 5, y + 18.5);
-      doc.setTextColor(110, 110, 118);
+    var _url = (_ql && _ql.url) || (_zh && _zh.weg && _zh.weg.url) || null;
+    if (_ql && _ql.satz && !(_zh && _zh.unter_a)) {
+      _zeilen(_ql.satz.text + (_ql.satz.kosten ? ' ' + _ql.satz.kosten : ''), [140, 132, 118], false);
     }
-
+    if (_url) _zeilen(_url, [120, 110, 140], false);
     /* Die Spanne. Ein Mittelwert, dessen Standardabweichung die Haelfte
      * seines Betrags ausmacht, ist ohne sie eine Behauptung. */
     if (_hatStreuung) {
-      doc.setFontSize(6.8); doc.setTextColor(140, 132, 118);
       const _lo = _ew.liegenschaftszins_min, _hi = _ew.liegenschaftszins_max;
       let _sp = 'Streuung ±' + String(_ew.streuung_pct).replace('.', ',') + ' % des Mittelwerts';
       if (_lo != null && _hi != null) {
         _sp = 'Spanne ' + String(_lo).replace('.', ',') + ' bis ' + String(_hi).replace('.', ',')
           + ' % · Angabe des Gutachterausschusses';
       }
-      /* v1083b-WPDF-4 · Wenn die Streuung den Wert herabgestuft hat, gehoert
-       * der MASSSTAB daneben. "Zu unsicher" ohne Angabe, woran gemessen
-       * wurde, ist keine Begruendung. Wohnen wird absolut gemessen
-       * (Punkte), Gewerbe relativ (Prozent) — das ist eine Festlegung von
-       * DealPilot, nicht des Ausschusses, und muss darum dastehen. */
+      /* v1083b-WPDF-4 · Hat die Streuung den Wert herabgestuft, gehoert der
+       * MASSSTAB daneben (Festlegung von DealPilot, nicht des Ausschusses). */
       var _lg = d.cross_check && d.cross_check.ertragswert && d.cross_check.ertragswert.lzs;
       if (_lg && _lg.grund === 'streuung' && _lg.streuung_pp != null) {
-        _sp += ' \u00b7 \u00b1' + String(_lg.streuung_pp).replace('.', ',') + ' Punkte, '
-          + (_lg.massstab === 'absolut' ? 'Ma\u00dfstab 1,5 Punkte' : 'Ma\u00dfstab 25 %')
+        _sp += ' · ±' + String(_lg.streuung_pp).replace('.', ',') + ' Punkte, '
+          + (_lg.massstab === 'absolut' ? 'Maßstab 1,5 Punkte' : 'Maßstab 25 %')
           + ' (DealPilot)';
       }
-      doc.text(_sp, M + 5, y + 17.5);
+      _zeilen(_sp, [140, 132, 118], false);
     }
+    const _kastenH = 13 + Math.max(0, _qZeilen.length - 1) * 3.2 + _zz.length * 3.1 + (_zz.length ? 1.5 : 0);
+    need(_kastenH + 4 + _HR);
+    doc.setFillColor(245, 243, 238); doc.roundedRect(M, y, blockW, _kastenH, 2, 2, 'F');
+    doc.setFillColor(...GOLD); doc.roundedRect(M, y, 1.6, _kastenH, 0.8, 0.8, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(120, 113, 100);
+    doc.text('LIEGENSCHAFTSZINSSATZ', M + 5, y + 5, { charSpace: 0.3 });
+    /* WPDF12-2 · charSpace wirkt sonst in den Folgeaufrufen weiter. */
+    doc.setCharSpace(0);
+    doc.setFontSize(9); doc.setTextColor(...TXT);
+    doc.text(String(_ew.liegenschaftszins_pct).replace('.', ',') + ' %', M + 5, y + 11.5);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+    doc.setTextColor(110, 110, 118);
+    doc.text(_qZeilen, M + 30, y + 11.5);
+    let _zy = y + 11.5 + Math.max(0, _qZeilen.length - 1) * 3.2 + 4;
+    _zz.forEach((z) => {
+      doc.setFont('helvetica', z[2] ? 'bold' : 'normal'); doc.setFontSize(6.5);
+      doc.setTextColor(...z[1]);
+      doc.text(z[0], M + 5, _zy);
+      _zy += 3.1;
+    });
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(110, 110, 118);
     y += _kastenH + 4;
 
     /* v1062-WZIN-3 · Die Anpassung nach Paragraf 33 lag vollstaendig im

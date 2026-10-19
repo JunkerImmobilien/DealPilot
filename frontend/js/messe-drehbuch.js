@@ -128,10 +128,47 @@
     }
     return { left: x, top: y, width: r.width, height: r.height, bottom: y + r.height, right: x + r.width };
   }
+  /* v2374b · DER RAHMEN NUR UM DEN SICHTBAREN TEIL. GEMESSEN im Mitschnitt-Lauf Modul 25
+     (DPM_KEGEL_MESSUNG, 300-ms-Proben): die Score-Karten im Chat sind 472 bzw. 667 px hoch,
+     der Chat (#vi-rf-chat, overflow auto) zeigt 400 px. Der Kegel rahmte das GANZE Element -
+     beim Investor Deal Score von y 104 an, der Chat beginnt bei 278: der Rahmen lag über
+     Kopf und Eingabe, in 44 von 47 Proben. rect() kennt nur iframes, keine Scrollbehälter.
+     sichtRect schneidet mit jedem Vorfahren, der überläuft (auto/scroll/hidden/clip), auch
+     über iframe-Grenzen. null = ganz verdeckt. */
+  function docVersatz(d) {
+    var x = 0, y = 0;
+    while (d && d !== document) { var fe = d.defaultView.frameElement; if (!fe) break; var fr = fe.getBoundingClientRect(); x += fr.left + fe.clientLeft; y += fr.top + fe.clientTop; d = fe.ownerDocument; }
+    return { x: x, y: y };
+  }
+  function sichtRect(e) {
+    if (!e || !e.getBoundingClientRect) return null;
+    var r = rect(e), L = r.left, T = r.top, R = r.right, B = r.bottom, node = e, d = e.ownerDocument;
+    while (d) {
+      var w = d.defaultView, o = docVersatz(d);
+      /* ein fest positioniertes Element entkommt dem Überlauf seiner Vorfahren */
+      for (var c = node, s = node.parentElement; s && s !== d.documentElement && s !== d.body; c = s, s = s.parentElement) {
+        if (w.getComputedStyle(c).position === 'fixed') break;
+        var cs = w.getComputedStyle(s);
+        if (/auto|scroll|hidden|clip/.test(cs.overflowY + ' ' + cs.overflowX)) {
+          var sr = s.getBoundingClientRect();
+          L = Math.max(L, sr.left + o.x + s.clientLeft); T = Math.max(T, sr.top + o.y + s.clientTop);
+          R = Math.min(R, sr.left + o.x + s.clientLeft + s.clientWidth); B = Math.min(B, sr.top + o.y + s.clientTop + s.clientHeight);
+        }
+      }
+      if (d === document) break;
+      var fe = w.frameElement; if (!fe) break;
+      /* der Inhalt eines iframes endet an dessen Rand */
+      var fr = fe.getBoundingClientRect(), of = docVersatz(fe.ownerDocument);
+      L = Math.max(L, fr.left + of.x); T = Math.max(T, fr.top + of.y); R = Math.min(R, fr.right + of.x); B = Math.min(B, fr.bottom + of.y);
+      node = fe; d = fe.ownerDocument;
+    }
+    if (R - L < 2 || B - T < 2) return null;
+    return { left: L, top: T, width: R - L, height: B - T, right: R, bottom: B, voll: r };
+  }
   function kegel(ziel, pad) {
     var k = el('dpm-kegel');
     if (!ziel) { k.classList.remove('an'); return; }
-    var r = rect(ziel); pad = pad == null ? 10 : pad;
+    var r = sichtRect(ziel) || rect(ziel); pad = pad == null ? 10 : pad;
     k.style.left = (r.left - pad) + 'px'; k.style.top = (r.top - pad) + 'px';
     k.style.width = (r.width + pad * 2) + 'px'; k.style.height = (r.height + pad * 2) + 'px';
     k.classList.add('an');
@@ -182,7 +219,7 @@
     var z = q('#dpm-zeile'); if (!z || !z.classList.contains('an')) return;
     var t = HAFT && zielEl();
     if (!t) { if (z.classList.contains('haft')) { z.classList.remove('haft'); z.style.left = z.style.top = ''; } linie(null); return; }
-    var r = rect(t), pad = _pad, W = innerWidth, H = innerHeight;
+    var r = sichtRect(t) || rect(t), pad = _pad, W = innerWidth, H = innerHeight;   /* v2374b: sichtbarer Teil */
     r = { left: r.left - pad, top: r.top - pad, right: r.right + pad, bottom: r.bottom + pad };
     var neu = !z.classList.contains('haft');
     z.classList.add('haft');
@@ -201,14 +238,26 @@
     /* v2234c · Seitenwechsel: springen statt gleiten - gemessen lief die Karte
        sonst 0,15-0,3 s quer ueber das Feld, das sie erklaert */
     var spring = neu || (_lz && _lz.k !== o.k);
+    /* v2374b · DIE KARTE ZAPPELTE. Marcel live: „Der Text … zappelt rum, wird immer hin und her
+       eingeblendet." GEMESSEN (100-ms-Proben, 20 s, eine Zeile): kein Seitenwechsel, aber die
+       Karte bewegte sich in 46 von 200 Proben - sie wurde in jedem 200-ms-Takt neu ans Ziel
+       gerechnet, und das Ziel (Chat, Liste) wächst und rückt mit jeder Antwort; jede neue
+       Lage startete das 0,6-s-Gleiten neu. Jetzt bleibt sie stehen, solange dieselbe Seite
+       passt, sie das Ziel nicht verdeckt und die neue Lage weniger als 90 px entfernt ist.
+       Die Linie folgt dem Ziel weiter (linieNach). */
+    if (!spring && _lz && _lz.x != null && Math.abs(_lz.x - o.x) < 90 && Math.abs(_lz.y - o.y) < 90
+        && _lz.y + h <= H - RAND && _lz.x + w <= W - RAND
+        && !(_lz.x < r.right && _lz.x + w > r.left && _lz.y < r.bottom && _lz.y + h > r.top)) { o.x = _lz.x; o.y = _lz.y; }
     if (spring) { z.style.transition = 'opacity .4s'; }
-    z.style.left = Math.round(o.x) + 'px'; z.style.top = Math.round(o.y) + 'px';
+    var nx = Math.round(o.x) + 'px', ny = Math.round(o.y) + 'px';
+    if (z.style.left !== nx) z.style.left = nx;
+    if (z.style.top !== ny) z.style.top = ny;
     if (spring) { void z.offsetWidth; z.style.transition = ''; }
     /* v2234b · die Linie wird aus dem AKTUELLEN Kartenrechteck gezogen und
        waehrend des Gleitens (0,6 s) in jedem Bild nachgefuehrt. GEMESSEN: aus
        der Zielposition gerechnet hing sie beim Szenenwechsel lose neben der
        Karte, die noch unterwegs war. */
-    _lz = { k: o.k, r: r }; linieNach();
+    _lz = { k: o.k, r: r, x: o.x, y: o.y }; linieNach();
     var bis = Date.now() + 750;
     (function nach() { linieNach(); if (Date.now() < bis) requestAnimationFrame(nach); })();
   }
@@ -264,7 +313,20 @@
     }
     return document.scrollingElement;
   }
+  /* v2374b · liegt das Ziel in einem INNEREN Scrollbehälter (Chat, Liste) und ist dort
+     beschnitten, wird dieser gerollt: ein Ziel, das höher ist als der Behälter, mit seiner
+     Oberkante an dessen Oberkante (dort steht die Zahl), sonst mittig. Gemessen mit dem
+     Behälter, nicht mit dem Fenster. true = gerollt. */
+  function holenInnen(e) {
+    var s = scroller(e); if (!s || s === document.scrollingElement || s.ownerDocument !== e.ownerDocument) return false;
+    var er = e.getBoundingClientRect(), sr = s.getBoundingClientRect(), top = sr.top + s.clientTop, hoch = s.clientHeight;
+    if (er.top >= top - 1 && er.bottom <= top + hoch + 1) return false;
+    var d = er.height > hoch - 16 ? er.top - top - 8 : (er.top + er.height / 2) - (top + hoch / 2);
+    if (Math.abs(d) < 4) return false;
+    s.scrollTop += d; return true;
+  }
   function holen(e, sanft) {
+    if (holenInnen(e)) return;
     var r = rect(e), s = scroller(e), mitte = (70 + innerHeight - unten()) / 2;
     var d = r.height > innerHeight - 260 ? r.top - 80 : (r.top + r.height / 2) - mitte;
     /* v2222b · immer sofort: sanftes Scrollen brauchte gemessen bis zu 3 s,
@@ -276,8 +338,10 @@
     if (_folge) return;
     _folge = setInterval(function () {
       var z = zielEl(); if (!z) { kegel(null); platziere(); return; }
-      var r = rect(z);
-      if (!frei(r) && _nachScroll < 3 && Date.now() - _letzterScroll > 1200) {
+      var r = rect(z), sv = sichtRect(z);
+      /* v2374b · auch ein im Behälter beschnittenes Ziel ist nicht frei */
+      var beschnitten = !sv || (sv.height < Math.min(r.height, innerHeight) - 6);
+      if ((!frei(r) || beschnitten) && _nachScroll < 3 && Date.now() - _letzterScroll > 1200) {
         _nachScroll++; _letzterScroll = Date.now();
         holen(z, false);
       }
@@ -285,6 +349,16 @@
       platziere();
     }, 200);
   }
+  /* v2374a · Messpunkt für den Prüflauf: Ziel, Kegel (Soll laut Stil, Ist im Bild) und der
+     sichtbare Ausschnitt des nächsten Scrollbehälters - so lässt sich messen, OB und WARUM der
+     Rahmen nicht passt (Versatz, Nachlauf, abgeschnittenes Ziel). Liest nur. */
+  window.DPM_KEGEL_MESSUNG = function () {
+    var z = zielEl(), k = q('#dpm-kegel'); if (!z || !k) return null;
+    var r = rect(z), sv = sichtRect(z), ki = k.getBoundingClientRect(), sc = scroller(z), sr = sc && sc !== document.scrollingElement ? sc.getBoundingClientRect() : { top: 0, bottom: innerHeight, left: 0, right: innerWidth };
+    var f = function (o) { return { x: Math.round(o.left), y: Math.round(o.top), w: Math.round(o.width != null ? o.width : o.right - o.left), h: Math.round(o.height != null ? o.height : o.bottom - o.top) }; };
+    return { ziel: f(r), sichtbar: sv ? f(sv) : null, pad: _pad, kegelStil: { x: parseFloat(k.style.left), y: parseFloat(k.style.top), w: parseFloat(k.style.width), h: parseFloat(k.style.height) }, kegelIst: f(ki),
+      sicht: f(sr), scroller: sc ? (sc.id || sc.className || sc.tagName).toString().slice(0, 40) : null, zielName: (z.id || z.className || z.tagName).toString().slice(0, 40) };
+  };
   async function zeige(ziel, pad) {
     _ziel = ziel || null; _pad = pad == null ? 10 : pad;
     /* v2219d · Szenenwechsel: die alte Zeile geht mit dem alten Ziel (sie stand
@@ -294,7 +368,7 @@
     /* nur scrollen, wenn das Ziel nicht frei sichtbar ist - sonst schiebt es den
        Umschalter oben aus dem Bild; unten liegt die Zeile (rund 160 px) */
     _nachScroll = 0; _letzterScroll = 0;
-    if (z && !frei(rect(z))) { _letzterScroll = Date.now(); holen(z, true); }
+    if (z && (!frei(rect(z)) || !sichtRect(z) || sichtRect(z).height < Math.min(rect(z).height, innerHeight) - 6)) { _letzterScroll = Date.now(); holen(z, true); }   /* v2374b */
     folgen();
     await warte(750);
   }
@@ -1169,7 +1243,8 @@
   function b2oHuelle(a, b) {
     if (!a || !b) return a || b || null;
     /* v2273 · rect() statt getBoundingClientRect: Ziele im Marktbericht-Fenster (iframe) lagen sonst um die Lage des Fensters verschoben (Prüflauf 16: Kegel 5 %) */
-    var ra = rect(a), rb = rect(b), h = el('dpm-huelle');
+    /* v2374b · der SICHTBARE Teil beider Ziele (sichtRect), sonst ragt die Hülle aus dem Chat */
+    var ra = sichtRect(a) || rect(a), rb = sichtRect(b) || rect(b), h = el('dpm-huelle');
     h.style.cssText = 'position:fixed;pointer-events:none;visibility:hidden;left:' + Math.min(ra.left, rb.left) + 'px;top:' + Math.min(ra.top, rb.top) + 'px;width:' + (Math.max(ra.right, rb.right) - Math.min(ra.left, rb.left)) + 'px;height:' + (Math.max(ra.bottom, rb.bottom) - Math.min(ra.top, rb.top)) + 'px';
     return h;
   }
@@ -1381,7 +1456,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2372';   /* v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
+  var RH_BUSTER = 'v2374b';   /* v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage/i;
@@ -1441,7 +1516,8 @@
     /* v2371 · Modul 25: jede getippte Antwort der geführten Eingabe, einmal echt ausgelesen
        (D.gefuehrt25, Schlüssel = Antworttext). Im Mitschnitt-Lauf (?mitschnitt=25) geht der
        Abruf echt hinaus und wird in DPM_REIHE.mitschnitt notiert - siehe rhSpion. */
-    if (/\/ai\/extract-text/.test(u) && body && _rh.mitschnitt) return null;
+    /* v2374 · im Mitschnitt-Lauf geht nur hinaus, was noch keinen Eintrag hat (geänderte Antworttexte) */
+    if (/\/ai\/extract-text/.test(u) && body && _rh.mitschnitt && !(D.gefuehrt25 && D.gefuehrt25[String(body.text || '').trim()])) return null;
     if (/\/ai\/extract-text/.test(u) && body && D.gefuehrt25 && _rh.gef25 && D.gefuehrt25[String(body.text || '').trim()]) {
       var g25 = String(body.text || '').trim();
       return rhJ({ transcript: g25, fields: JSON.parse(JSON.stringify(D.gefuehrt25[g25])), unsicher: [], kosten: null, modus: 'antwort' });
@@ -1457,6 +1533,10 @@
        gespielt mit den Koordinaten aus dem gespeicherten Bericht desselben Objekts (_rh.geo).
        Der BORIS-Abruf selbst (Open Data, GET) läuft echt. */
     if (m === 'GET' && _rh.geo && /\/marktbericht\/geocode\?/.test(u)) return rhJ(JSON.parse(JSON.stringify(_rh.geo)));
+    /* v2388 · GEMESSEN im Prüflauf Modul 25 (19.10.2026): nach „Übernehmen" holt das Adressfeld
+       (adress-autocomplete.js _koordHolen) zweimal /marktbericht/geocode/autocomplete - Geoapify,
+       ein bezahlter Dienst, je Durchgang. Im Lauf wird nichts vorgeschlagen: leere Liste. */
+    if (m === 'GET' && /\/marktbericht\/geocode\/autocomplete/.test(u)) return rhJ({ results: [] });
     /* v2300 · Modul 21: die Portfolio-Analyse ist EIN echter Abruf (Mitschnitt D.portfolioPilot);
        ihre Ablage in den Einstellungen wird im Lauf beantwortet, nicht geschrieben. */
     if (m === 'POST' && D.portfolioPilot && /\/ai\/copilot$/.test(u.split('?')[0]) && body && /GESAMTES Portfolio/.test(String(body.message || ''))) return rhJ(JSON.parse(JSON.stringify(D.portfolioPilot)));
@@ -1489,6 +1569,13 @@
             (DPM_REIHE.mitschnitt = DPM_REIHE.mitschnitt || {})[mt] = (j && j.fields) || {};
           }).catch(function () {});
           return pm;
+        }
+        /* v2373a · ... und die Geokodierung vor dem Bodenrichtwert (Fürth): einmal echt, dann als
+           DPM_REIHE_DATEN.gefuehrt25geo gespielt (_rh.geo, wie Modul 24). BORIS selbst ist ein freies GET. */
+        if (_rh.mitschnitt && m === 'GET' && /\/marktbericht\/geocode$/.test(pfad)) {
+          var pg = echt.apply(this, arguments);
+          pg.then(function (r) { return r.clone().json(); }).then(function (j) { DPM_REIHE.mitschnittGeo = j; }).catch(function () {});
+          return pg;
         }
       }
       if (m !== 'GET' && RH_SPERRE.test(kurz) && ((lauf && _rh) || Date.now() < _rhNachlauf)) {
@@ -4818,26 +4905,81 @@
      für den Lauf auf 1 - sonst hängt die Wertermittlung (Stufe 3) hinten an;
      rhAufraeumen stellt sie zurück. Freisprechen aus (hier wird getippt), das
      Mikrofon ist ohnehin ein stummer Strom. Das angelegte Objekt löscht
-     rhAufraeumen, wie in 03-05. Jeder Antwortschritt steht in DPM_REIHE.r25. */
+     rhAufraeumen, wie in 03-05. Jeder Antwortschritt steht in DPM_REIHE.r25.
+
+     v2373a · NEUES BEISPIEL (Marcel 19.10.2026): ein Mehrfamilienhaus in FÜRTH, das am
+     Ende im Reiter Bewertung mit Deal Score SOLIDE und Investor Deal Score GUT steht -
+     sichtbar „wandert" es von der einen Stufe zur anderen. Erst Herford (v2373), dann
+     Nürnberg verworfen: Fürther Str. 112 liegt in BORIS-Zone 262239, deren Wert in
+     Bayern gebührenpflichtig ist (reason wert_gebuehrenpflichtig) - Marcel will den
+     Bodenrichtwert-Abruf im Video ZEIGEN. Gemessen am Staging-Endpunkt
+     /api/v1/marktbericht/boris?land=BY: Dambacher Straße (Fürth-Südstadt, Straßenpunkt
+     49,46616 / 10,98334 - borisHolen geokodiert OHNE Hausnummer) -> 1.150 €/m²,
+     Wohnbaufläche, Zone 522, Stichtag 01.01.2026.
+     Die Eingaben sind VORAB mit den echten Kernen gerechnet (node + vm: deal-kpis.js
+     DealKpis.compute, dealscore.js computeFromKpis, dealscore2.js compute,
+     score-tiers.js; beide Wege - Zwischenstand im Chat wie voice-import
+     _rfKennzahlen/_rfScore1/_rfScore2 und Reiter Bewertung wie _buildDeal2FromState;
+     Profil: Makler 3,57 + Notar 1,7 + Grundbuch 0,5 + GrESt 3,5 (Bayern, die App nimmt
+     sie über DealPilotGrest.forPlz aus der PLZ) = 9,27 %, Mietausfall 1 %, Gewichte ab Werk):
+       6 WE, 420 m², Bj 1970, 3 VG, KP 1.000.000 (2.381 €/m²), NKM 4.410/Mon (10,50 €/m²)
+       + 360 für sechs Stellplätze, BWK 22.000/J davon 10.500 nicht umlagefähig,
+       EK 200.000, 3,6 % / 1,5 % / 10 J, Mietsteigerung 2,5 %, Wertsteigerung 2 %,
+       Leerstand 1 %, Zustand gut, Energie C, B-Lage, Region und Straße gut, Mietausfall
+       niedrig, Bevölkerung wachsend, Nachfrage sehr stark, Wertsteigerung hoch, eine
+       starke Entwicklungsmöglichkeit (Dachgeschoss), Grundstück 600 m²
+       -> Cashflow v. St. +57 €/Mon, NMR 4,2 %, Bruttorendite 5,7 %, LTV 89,3 %, DSCR 1,26
+       -> Deal Score 64 SOLIDE (Cashflow 64, Rendite 74, LTV 52, DSCR 84, Potenzial 40)
+       -> Investor Deal Score 75 (Reiter) / 76 (Chat) GUT (Rendite 52, Finanzierung 91,
+          Risiko 91, Lage 83, Upside 80)
+     Empfindlichkeit gerechnet: Mietsteigerung 1,5 % -> 63/75; Wertsteigerung mittel oder
+     Entwicklung begrenzt -> DS2 74; alle drei zusammen -> 64/73; eigener Teil 11.000 ->
+     61/75; Miete 4.300 -> 55/72; GrESt 6,5 statt 3,5 -> 52/72. KIPPT: Tilgung 2 % statt
+     1,5 % -> 44/68, ohne die Stellplätze -> 40/66 - beide Auslesen im Mitschnitt prüfen.
+     Im Bild steht immer, was die App rechnet (Regel 1) - die Rechnung oben ist die Wahl
+     der Eingaben, nicht der Text.
+     Der Mitschnitt gefuehrt25 muss zu DIESEN Antworttexten passen (Schlüssel = Text):
+     nach jeder Änderung hier ?messe=reihe-gefuehrt&mitschnitt=25 neu laufen lassen. */
   var R25 = {
-    adresse: 'Sachsenstraße 18, 32052 Herford',
-    art: 'Eigentumswohnung, 100 Quadratmeter',
-    details: '3 Zimmer, 4 Vollgeschosse',
-    bjkp: 'Baujahr 1998, Kaufpreis 180.000 Euro',
-    miete: '750 Euro kalt im Monat',
-    fin: '40.000 Euro Eigenkapital, 3,8 Prozent Zins, 2 Prozent Tilgung, 10 Jahre fest',
+    adresse: 'Dambacher Straße 60, 90763 Fürth',
+    art: 'Mehrfamilienhaus, 420 Quadratmeter Wohnfläche',
+    details: '6 Wohneinheiten, 3 Vollgeschosse',
+    bjkp: 'Baujahr 1970, Kaufpreis 1.000.000 Euro',
+    miete: '4.410 Euro kalt im Monat, dazu 360 Euro für sechs Stellplätze',
+    fin: '200.000 Euro Eigenkapital, 3,6 Prozent Zins, 1,5 Prozent Tilgung, 10 Jahre fest',
     einst: 'Übernimm die Werte aus den Einstellungen',
     klasse: 'B-Lage',
-    lage: 'Region durchschnittlich, Straße gut',
+    lage: 'Region gut, Straße gut',
     zustand: 'Guter Zustand, Energieklasse C',
-    san: 'Keine Sanierung, die Einbauküche für 3.000 Euro',
-    grund: '1.200 Quadratmeter, Miteigentumsanteil 12 Prozent, kein Erbbaurecht',
-    hausgeld: '250 Euro im Monat, davon 100 nicht umlagefähig',
+    san: 'Keine Sanierung, nichts wird mitverkauft',
+    grund: '600 Quadratmeter, kein Erbbaurecht',
+    bwk: '22.000 Euro im Jahr, davon 10.500 nicht umlagefähig',
+    langfrist: 'Mietsteigerung 2,5 Prozent, Wertsteigerung 2 Prozent, Leerstand 1 Prozent',
     ausfall: 'Niedrig',
-    ort: 'Bevölkerung stabil, Nachfrage mittel, Wertsteigerung mittel, Entwicklung begrenzt',
+    ort: 'Bevölkerung wachsend, Nachfrage sehr stark, Wertsteigerung hoch, Entwicklungsmöglichkeiten: eine starke',
     weissNicht: 'Weiß ich nicht',
-    sicht: 'Ruhige Wohnlage nah am Zentrum, Risiko ist die Heizung von 1998'
+    sicht: 'Dafür spricht: sechs Wohnungen verteilen das Mietrisiko, das Dachgeschoss lässt sich ausbauen. Das Risiko: das Dach von 1970'
   };
+  /* v2373 · v2369 stellt das Abruf-Angebot (Marktpreisindikation, Bodenrichtwert,
+     Lage) als Auswahl-Blase IN DEN CHAT (.vi-rf-abruf, Knöpfe .vi-rf-abruf-b[data-akt]).
+     Gewählt wird hier NUR „Nein, überspringen" (data-akt="ueberspringen") - jeder
+     andere Knopf wäre ein Abruf. Beim ersten Mal mit einer Zeile, danach still. */
+  var _r25s = null, _r25AbrufGesagt = 0;
+  function r25AbrufBlase() { var e = q('#vi-rf-chat .vi-rf-abruf'); return e && e.offsetWidth ? e : null; }
+  async function r25AbrufWeg() {
+    var b = r25AbrufBlase(); if (!b || !b.querySelector('.vi-rf-abruf-b[data-akt="ueberspringen"]')) return false;
+    var kn = [].map.call(b.querySelectorAll('.vi-rf-abruf-b'), function (x) { return x.getAttribute('data-akt') === 'ueberspringen' ? '' : ((x.firstChild && x.firstChild.nodeType === 3 ? x.firstChild.textContent : x.textContent) || '').trim(); }).filter(Boolean);
+    if (!_r25AbrufGesagt && _r25s) {
+      _r25AbrufGesagt = 1;
+      await zeige(r25AbrufBlase, 8);
+      await b2oZeile(_r25s, 'Auf Wunsch abrufen', 'Was DealPilot selbst holen kann, bietet es im Chat an' + (kn.length ? ' — <b>' + kn.join(' · ') + '</b>' : '') + '. Hier: <b>„Nein, überspringen“</b>.');
+    }
+    var n = r25AbrufBlase(), k = n && n.querySelector('.vi-rf-abruf-b[data-akt="ueberspringen"]');
+    DPM_REIHE.r25abruf = (DPM_REIHE.r25abruf || []).concat([{ angebot: kn, geklickt: k ? 'ueberspringen' : null, frage: r25Frage().slice(0, 60) }]);
+    if (k) k.click();
+    await warte(900);
+    return !!k;
+  }
   function r25Frage() { var e = q('#oabi-ov .vi-rf-frage-txt'); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; }
   function r25Bereich() { return b2oHuelle(q('#vi-rf-frage'), q('#oabi-ov .vi-rf-zeile')); }
   function r25Uebersicht() { return [].filter.call(document.querySelectorAll('#oabi-ov button'), function (x) { return x.offsetWidth && /Zur Übersicht/.test(x.textContent); })[0] || null; }
@@ -4860,6 +5002,9 @@
      (Messhinweis: nach Adresse, Basis und Lage kommen Zwischenstände -
      erst weiter, wenn sich die Frage wirklich geändert hat) */
   async function r25Antwort(text, bisUebersicht) {
+    /* v2373 · ein offenes Abruf-Angebot im Chat zuerst ausdrücklich überspringen (v2369, v2368:
+       sonst kann eine getippte Antwort beim Angebot statt bei der Frage landen) */
+    if (r25AbrufBlase()) { await r25AbrufWeg(); await zeige(r25Bereich, 6); }
     var f0 = r25Frage(), inp = q('#vi-rf-in'), t0 = Date.now();
     if (!inp) { DPM_REIHE.r25 = (DPM_REIHE.r25 || []).concat([{ antwort: text, fehler: 'kein Eingabefeld' }]); return false; }
     inp.value = ''; inp.dispatchEvent(new Event('input', { bubbles: true }));
@@ -4880,14 +5025,17 @@
   /* mehrere Antworten am Stück, der Kegel auf Frage, Verlauf und Eingabe */
   async function r25Reihe(liste) { for (var i = 0; i < liste.length; i++) { await zeige(r25Bereich, 6); await r25Antwort(liste[i]); } }
   DREHBUECHER['reihe-gefuehrt'] = {
-    titel: 'Die geführte Eingabe', unterzeile: 'Frage für Frage zum fertigen Objekt — mit Zwischenständen', objekt: null,
+    titel: 'Die geführte Eingabe', unterzeile: 'Ein Mehrfamilienhaus, Frage für Frage — bis zu Deal Score und Investor Deal Score', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
     aufraeumen: rhAufraeumen,
+    /* v2373 · jede Szene meldet ihr s an r25AbrufWeg (die Zeile zum Abruf-Angebot) */
     szenen: [
       async function (s) {   /* 1 · neues Objekt, die Kachel */
         await rhStart(0);
-        _rh.gef25 = 1; _rh.stumm = 1;
+        _rh.gef25 = 1; _rh.stumm = 1; _r25AbrufGesagt = 0;
         try { _rh.mitschnitt = new URLSearchParams(location.search).get('mitschnitt') === '25'; } catch (e) {}
+        /* v2373a · Geokodierung für den Bodenrichtwert-Abruf aus dem Mitschnitt (nie im Mitschnitt-Lauf selbst) */
+        if (!_rh.mitschnitt && window.DPM_REIHE_DATEN && DPM_REIHE_DATEN.gefuehrt25geo) _rh.geo = JSON.parse(JSON.stringify(DPM_REIHE_DATEN.gefuehrt25geo));
         try { DealPilotObjektReiter.zielSetzen(1); } catch (e) {}
         await zeige(function () { return q('#oab-bar'); }, 8);
         await b2oZeile(s, 'Ein neues Objekt', 'Leer angelegt. Oben im Reiter Objekt die Datenaufnahme — einer der Wege ist die <b>' + rhNameKachel('gefuehrt') + '</b>.');
@@ -4926,13 +5074,20 @@
         await r25Antwort('ja');
       },
       async function (s) {   /* 4 · Art, Größe, Details */
+        /* v2388 · GEMESSEN: das Abruf-Angebot erscheint erst nach der Adress-Bestätigung - die
+           Kapitelzeile „Objekt und Größe" stand nur 1 s, dann kam „Auf Wunsch abrufen". Erst das
+           Angebot erledigen, dann die Frage. */
+        await warteAuf(r25AbrufBlase, 2500);
+        if (r25AbrufBlase()) await r25AbrufWeg();
         await zeige(r25Bereich, 6);
         var zb = r6Beginn(s, 'Objekt und Größe', 'Art und Wohnfläche …');
         await r25Antwort(R25.art);
         await r6Ende(zb);
         var f = r25Frage();
-        await zeige(function () { return q('#vi-rf-frage'); }, 8);
-        await b2oZeile(s, 'Die Art bestimmt die Fragen', 'Eine Eigentumswohnung — also fragt DealPilot nach: <b>' + f.replace(/^Und noch zum Objekt:\s*/, '') + '</b>');
+        /* v2372c · GEMESSEN: #vi-rf-frage ist hier ausgeblendet (der Streifen erscheint erst, wenn die
+           Frage aus dem Verlauf gescrollt ist) - der Kegel blieb unsichtbar. Dann die letzte Co-Pilot-Blase. */
+        await zeige(function () { var e = q('#vi-rf-frage'); if (e && e.offsetWidth) return e; var b = document.querySelectorAll('#vi-rf-chat .vi-rf-blase.vi-rf-co'); return b[b.length - 1] || null; }, 8);
+        await b2oZeile(s, 'Die Art bestimmt die Fragen', 'Ein Mehrfamilienhaus — also fragt DealPilot nach: <b>' + f.replace(/^Und noch zum Objekt:\s*/, '') + '</b>');
         await r25Reihe([R25.details, R25.bjkp]);
       },
       async function (s) {   /* 5 · Miete -> Deal Score */
@@ -4969,6 +5124,26 @@
         await r25Antwort(R25.lage);
         await r6Ende(zb);
         await r25Reihe([R25.zustand, R25.san]);
+        /* v2373a · Marcel: der Bodenrichtwert-Abruf wird GEZEIGT (frei, BORIS Bayern liefert in
+           Fürth den Wert). Gewählt wird nur der Knopf data-akt="brw"; Markt und Lage bleiben
+           übersprungen (r25AbrufWeg). Ergebnis und Fehler stehen in DPM_REIHE.r25brw. */
+        var bk = function () { var b = r25AbrufBlase(), k = b && b.querySelector('.vi-rf-abruf-b[data-akt="brw"]'); return k && k.offsetWidth ? k : null; };
+        await warteAuf(bk, 5000);
+        if (bk()) {
+          var kl = ((bk().firstChild && bk().firstChild.nodeType === 3 ? bk().firstChild.textContent : bk().textContent) || '').trim();
+          await zeige(r25AbrufBlase, 8);
+          await b2oZeile(s, 'Der Bodenrichtwert', 'Beim Grundstück bietet DealPilot den amtlichen Bodenrichtwert an — aus BORIS, ohne Kosten. Ein Klick auf <b>„' + kl + '“</b>.');
+          var bkn = bk(); if (bkn) bkn.click();
+          var bw = function () { var e = rhIm('#vi-rf-chat', /amtlicher Bodenrichtwert/); return e && e.closest('.vi-rf-blase'); };
+          var bf = function () { var e = rhIm('#vi-rf-chat', /Abruf (hat nichts geliefert|ist fehlgeschlagen)/); return e && e.closest('.vi-rf-blase'); };
+          await warteAuf(function () { return bw() || bf(); }, 15000);
+          var bt = (bw() || {}).textContent || '', bm = /([\d.,]+)\s*€\/m²/.exec(bt), bh = /(BORIS[^\n]*?)(?:Herkunft|$)/.exec(bt.replace(/\s+/g, ' '));
+          DPM_REIHE.r25brw = { ok: !!bw(), text: (bw() || bf() || {}).textContent ? String((bw() || bf()).textContent).replace(/\s+/g, ' ').slice(0, 160) : null };
+          if (bw()) {
+            await zeige(bw, 8);
+            await b2oZeile(s, 'Amtlich, mit Herkunft', (bm ? '<b>' + bm[1] + ' €/m²</b>' : 'Der Bodenrichtwert') + (bh ? ' — ' + bh[1].trim() : '') + '. Den Wert holt DealPilot, die Fläche sagst du.');
+          }
+        }
         await zeige(r25Bereich, 6);
         await r25Antwort(R25.grund);
       },
@@ -4986,16 +5161,23 @@
       },
       async function (s) {   /* 9 · Feinschliff */
         await zeige(r25Bereich, 6);
-        var zb = r6Beginn(s, 'Etappe 4 · Feinschliff', 'Das Hausgeld — so, wie man es kennt: im Monat.');
-        await r25Antwort(R25.hausgeld);
+        /* v2373 · Mehrfamilienhaus: kein Hausgeld, sondern die Bewirtschaftungskosten im Jahr
+           (_rfNachArt fragt beim MFH „wie viel davon ist nicht umlagefähig") */
+        var zb = r6Beginn(s, 'Etappe 4 · Feinschliff', 'Die Bewirtschaftungskosten im Jahr — und wie viel davon nicht umlagefähig ist.');
+        await r25Antwort(R25.bwk);
         await r6Ende(zb);
-        var hz = function () { return r25StandZeile(/^\s*✓?\s*Hausgeld/); };
+        var HZ = /^\s*✓?\s*(Hausgeld|Bewirtschaftung\w*)/;
+        var hz = function () { return r25StandZeile(HZ); };
         await zeige(function () { return hz() || q('#vi-rf-stand'); }, 8);
-        var hw = hz(), hv = hw ? hw.textContent.replace(/\s+/g, ' ').replace(/^\s*✓?\s*Hausgeld\s*/, '').trim() : '';
-        /* v2372 · GEMESSEN: die Liste zeigt „1800 · 1200" ohne Einheit - im Text mit € und Tausenderpunkt */
-        var hm = /^([\d.]+)\s*·\s*([\d.]+)$/.exec(hv), hf = function (x) { var n = parseInt(String(x).replace(/\./g, ''), 10); return isFinite(n) ? n.toLocaleString('de-DE') + ' €' : x; };
-        await b2oZeile(s, 'Aufs Jahr gerechnet', '250 € im Monat, davon 100 € nicht umlagefähig — in der Liste steht das Jahr' + (hm ? ': <b>' + hf(hm[1]) + ' umlagefähig · ' + hf(hm[2]) + ' eigener Teil</b>.' : (hv ? ': <b>' + hv + '</b>, umlagefähig und eigener Teil.' : '.')));
-        await r25Reihe([R25.einst, R25.ausfall, R25.ort]);
+        /* seit v2368 trägt die Liste die Einheit selbst - der Wert wird so gezeigt, wie er dort steht */
+        var hw = hz(), hv = hw ? hw.textContent.replace(/\s+/g, ' ').replace(HZ, '').trim() : '';
+        await b2oZeile(s, 'Umlagefähig und eigener Teil', 'Gesagt sind die Summe und der eigene Teil — in der Liste stehen beide Seiten getrennt' + (hv ? ': <b>' + hv + '</b>' : '') + '. In den Cashflow geht nur der nicht umlagefähige Teil.');
+        /* v2388 · GEMESSEN: ohne eigene Zeile stand „Umlagefähig und eigener Teil" 40 s über drei
+           ganz anderen Antworten */
+        await zeige(r25Bereich, 6);
+        var zb1 = r6Beginn(s, 'Annahmen und Standort', 'Mietsteigerung, Wertsteigerung, Leerstand, Mietausfall — und wie sich der Ort entwickelt.');
+        await r25Reihe([R25.langfrist, R25.ausfall, R25.ort]);
+        await r6Ende(zb1);
         await zeige(r25Bereich, 6);
         var zb2 = r6Beginn(s, 'Überspringen', '„Weiß ich nicht" — und es geht weiter. Erfunden wird nichts.');
         await r25Antwort(R25.weissNicht);
@@ -5024,7 +5206,7 @@
           await b2oZeile(s, 'Feinheiten nach Wahl', 'Auf Wunsch geht es weiter ins Detail' + (fm ? ' — <b>' + fm[1] + ' Angaben in ' + fm[2] + ' Fragen</b>' : '') + '. Für heute reicht das Wichtigste.');
           if (fe()) {
             await zeige(fe, 8);
-            await b2oZeile(s, 'Fertig', 'Ein Klick auf <b>' + fe().textContent.trim() + '</b> — die Feinheiten bleiben für später.');
+            await b2oZeile(s, 'Fertig', 'Ein Klick auf <b>„' + fe().textContent.trim() + '“</b>: die Feinheiten bleiben für später.');
             var fk = fe(); if (fk) fk.click();
             await warteAuf(r25Uebersicht, 8000);
             await warte(900);
@@ -5041,13 +5223,21 @@
         var zeilen = function () { return [].filter.call(document.querySelectorAll('#oabi-ov #oabi-result tr'), function (x) { return x.offsetWidth && x.querySelector('input[type=checkbox]'); }); };
         await zeige(function () { return q('#oabi-ov #oabi-result') || q('#oabi-ov .oabi-modal'); }, 6);
         await b2oZeile(s, 'Die Übersicht', '<b>' + zeilen().length + ' Werte</b>, jeder mit Herkunft — gesagt oder aus deinen Einstellungen. Du entscheidest, was ins Objekt geht.');
-        var ab = function () { return zeilen().filter(function (x) { return /Zinssatz|Tilgung/.test(x.textContent) && !x.querySelector('input[type=checkbox]').checked; }); };
+        /* v2374 · GEMESSEN im Mitschnitt-Lauf Fürth: nicht vorgehakt waren SIEBEN Werte -
+           Grunderwerbsteuer 3,5 (Objekt 6,5), Miet-/Wertsteigerung, Leerstand, AfA, Grenzsteuersatz,
+           Zins. Nur Zins/Tilgung anzuhaken liess die bayerische GrESt und die gesagten Annahmen
+           draussen - der Reiter Bewertung rechnete mit 12,27 % Nebenkosten. Angehakt wird alles. */
+        var ab = function () { return zeilen().filter(function (x) { return !x.querySelector('input[type=checkbox]').checked; }); };
         var a = ab();
         DPM_REIHE.r25ab = zeilen().filter(function (x) { return !x.querySelector('input[type=checkbox]').checked; }).map(function (x) { return x.textContent.replace(/\s+/g, ' ').trim().slice(0, 80); });
         if (a.length) {
           var a0 = a[0], a1 = a[a.length - 1];
+          /* v2372c · GEMESSEN: die Zeilen lagen unter dem Rand (Kegel bei y 1203) - erst in die Mitte holen */
+          try { a0.scrollIntoView({ block: 'center' }); } catch (e) {}
+          await warte(300);
           await zeige(function () { return b2oHuelle(a0, a1); }, 6);
-          await b2oZeile(s, 'Abweichungen', 'Was vom Objekt abweicht, ist nicht vorgehakt — hier ' + (a.length === 2 ? 'Zins und Tilgung' : a.length + ' Werte') + '. Gesagt ist gesagt: anhaken.');
+          var anm = a.map(function (x) { return String(x.textContent || '').replace(/\s+/g, ' ').trim().split(/\s*(?:%|in Prozent|im Objekt)/)[0].trim(); }).filter(Boolean);
+          await b2oZeile(s, 'Abweichungen', 'Was vom Objekt abweicht, ist nicht vorgehakt — hier ' + (a.length === 1 ? 'ein Wert' : a.length + ' Werte') + (anm.length ? ', darunter <b>' + anm.slice(0, 3).join(', ') + '</b>' : '') + '. Gesagt ist gesagt: anhaken.');
           a.forEach(function (x) { var c = x.querySelector('input[type=checkbox]'); if (c && !c.checked) c.click(); });
           await warte(1400);
         }
@@ -5059,19 +5249,57 @@
         await warteAuf(function () { var o = q('#oabi-ov'); return !o || !o.offsetWidth; }, 8000);
         await warte(1500);
       },
-      async function (s) {   /* 12 · das Objekt mit Score */
-        var key = window._currentObjKey;
-        var karte = function () { return qs('.sb-card[data-key="' + key + '"]'); };
-        await warteAuf(function () { var c = karte(); return c && c.querySelector('.sbc-mini-score-num'); }, 8000);
-        await warte(600);
-        await zeige(karte, 6);
-        var c = karte(), n = c && c.querySelector('.sbc-mini-score-num'), l = c && c.querySelector('.sbc-score-label');
-        await b2oZeile(s, 'Im Portfolio', 'Die Wohnung steht als Objekt — auf der Karte der Score' + (n ? ' <b>' + n.textContent.trim() + (l ? ' · ' + l.textContent.trim() : '') + '</b>' : '') + '.');
+      async function (s) {   /* 12 · das Objekt im Reiter Objekt */
+        /* v2373 · erst das Objekt, dann (Szene 13) der Reiter Bewertung - das Video endet dort */
         reiter('s0'); var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await warte(900);
         await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
-        await b2oZeile(s, 'Im Reiter Objekt', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + '. Miete, Finanzierung und Bewirtschaftung stehen in ihren Reitern.', 600);
+        var we = wert('einheiten');
+        await b2oZeile(s, 'Im Reiter Objekt', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — ' + (we ? we + ' Wohnungen, ' : '') + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + '. Miete, Finanzierung und Bewirtschaftung stehen in ihren Reitern.', 600);
+      },
+      async function (s) {   /* 13 · Reiter Bewertung: zwei Scores, zwei Gewichtungen */
+        /* v2373 · Marcel 19.10.2026: das Video endet im Reiter Bewertung, beide Scores groß im
+           Bild, und eine sachliche Szene, warum dasselbe Objekt einmal SOLIDE und einmal GUT ist.
+           Alle Zahlen aus den Karten (r12Kopf, r12Teile) - Gewichte eingeschlossen. */
+        reiter('s6'); await warte(1300);
+        await warteAuf(function () { return r12Karte(1)() && r12Kopf(1).score; }, 8000);
+        await warte(600);
+        /* v2388 · GEMESSEN im Prüflauf (Studio, 653 px App-Höhe): die beiden Köpfe (.dpsh-mainrow,
+           mit allen fünf Balken) sind zusammen höher als das Bild - der Ring des Deal Score lag
+           oben ausserhalb, die Zahl 60 war in „Zwei Scores" nicht zu sehen. Jetzt je Score der
+           Ring (.dpsh-colring: Ring + Stufe) einzeln; zusammen nur, wenn beide ins Bild passen. */
+        var ring = function (i) { return function () { var k = r12Karte(i)(); return k && (k.querySelector('.dpsh-colring') || k.querySelector('.dpsh-mainrow') || k.querySelector('.dpsh-headrow')); }; };
+        var passt = function (fa, fb) { var x = fa(), y = fb(); if (!x || !y) return false; var ra = rect(x), rb = rect(y); return Math.max(ra.bottom, rb.bottom) - Math.min(ra.top, rb.top) <= innerHeight - unten() - 70 - 24; };
+        var a = r12Kopf(0), b = r12Kopf(1), t1 = r12Teile(0), t2 = r12Teile(1);
+        DPM_REIHE.r25scores = { deal: a, investor: b, passt: passt(ring(0), ring(1)) };
+        await zeige(ring(0), 10);
+        await b2oZeile(s, 'Der Deal Score', 'Deal Score <b>' + (a.score || '–') + ' · ' + r12Wort(a.wort) + '</b> — gerechnet aus ' + (t1.length || 'den') + ' Kennzahlen des Objekts.', 800);
+        var such = function (t, re) { return t.filter(function (x) { return re.test(x.name); })[0] || null; };
+        var cf = such(t1, /^Cashflow/i), nr = such(t1, /Rendite/i);
+        var balken = function (i) { return function () { var k = r12Karte(i)(), bb = k && k.querySelectorAll('.dpsh-cbar'); return bb && bb.length ? b2oHuelle(bb[0], bb[bb.length - 1]) : null; }; };
+        await zeige(balken(0), 8);
+        var gw = function (x) { return x && x.gewicht ? ' (' + x.gewicht + ')' : ''; };
+        /* v2374 · GEMESSEN im Demo-Konto: die Gewichte sind dort NICHT die ab Werk (30/25/15/15/15),
+           sondern 20/22/14/14/30 - Potenzial wiegt am meisten. „Vor allem Cashflow und Rendite"
+           sagt die Zeile deshalb nur, wenn die beiden wirklich vorn liegen; sonst alle fünf. */
+        var gn = function (x) { var m = /([\d,.]+)/.exec((x && x.gewicht) || ''); return m ? parseFloat(m[1].replace(',', '.')) : 0; };
+        var vorn = t1.slice().sort(function (p, q2) { return gn(q2) - gn(p); }).slice(0, 2);
+        var cfNr = cf && nr && vorn.indexOf(cf) >= 0 && vorn.indexOf(nr) >= 0;
+        await b2oZeile(s, 'Seine Gewichte', cfNr
+          ? 'Er schaut vor allem auf <b>Cashflow' + gw(cf) + '</b> und <b>Nettorendite' + gw(nr) + '</b> — hier ' + cf.note + ' und ' + nr.note + ' von 100 Punkten.'
+          : 'Fünf Kennzahlen, deine Gewichte: ' + t1.map(function (x) { return x.name.replace(/\s*\(.*\)$/, '') + ' ' + x.gewicht + ': <b>' + x.note + '</b>'; }).join(' · ') + '.');
+        var weitere = ['Finanzierung', 'Risiko', 'Lage', 'Upside'].map(function (nm) { var x = such(t2, new RegExp('^' + nm, 'i')); return x ? nm + ' <b>' + x.note + '</b>' : nm; });
+        await zeige(ring(1), 10);
+        await b2oZeile(s, 'Der Investor Deal Score', 'Investor Deal Score <b>' + (b.score || '–') + ' · ' + r12Wort(b.wort) + '</b> — dasselbe Objekt, andere Gewichtung.', 800);
+        await zeige(balken(1), 8);
+        await b2oZeile(s, 'Was er zusätzlich bewertet', 'Neben der Rendite auch Finanzierung, Risiko, Lage und Upside — hier ' + weitere.join(' · ') + '.');
+        /* beide Zahlen zum Schluss: zusammen, wenn sie ins Bild passen - sonst Urteil des Deal Score
+           (Stufe in der Zeile darunter) und der Ring des Investor Deal Score */
+        if (passt(ring(0), ring(1))) await zeigeGruppe(ring(0), ring(1), 10);
+        else await zeigeGruppe(function () { var k = r12Karte(0)(); return k && (k.querySelector('.dpsh-verdictbar') || k.querySelector('.dpsh-statstrip')); }, ring(1), 10);
+        await b2oZeile(s, 'Von ' + r12Wort(a.wort) + ' zu ' + r12Wort(b.wort), 'Gleiche Zahlen, andere Gewichte: <b>' + (a.score || '–') + '</b> im Deal Score, <b>' + (b.score || '–') + '</b> im Investor Deal Score.', 1500);
       }
-    ]
+    ].map(function (f) { return function (s) { _r25s = s; return f(s); }; })
   };
 
   /* ── Ablauf ───────────────────────────────────────────────────── */

@@ -533,6 +533,12 @@
        Marcel hat den Ortskern am 08.10.2026 ausdruecklich erlaubt -
        fuer die Marktpreisindikation. Was fehlte, war die Angabe. */
     var _ortskern = !str;
+    /* v2374 · DIE HAUSNUMMER GEHOERT IN DIE ANFRAGE. Die geführte Eingabe gab nur Straße,
+       PLZ und Ort mit. GEMESSEN am 19.10.2026: „Dambacher Straße, 90763 Fürth" geokodierte
+       der Dienst nach „Fürth, 66564 Ottweiler" (Saarland, Konfidenz 0,5), und BORIS lieferte
+       11 EUR/m² aus Zone 4310500 - mit Hausnummer traf er Fürth-Südstadt (Zone 522, 1.150). */
+    var hnr = String(adr.hnr || '').trim();
+    if (str && hnr && str.indexOf(hnr) < 0) str = str + ' ' + hnr;
     var addr = [str, (plz + ' ' + ort).trim()].filter(Boolean).join(', ');
     if (!addr) return { ok: false, grund: 'keine_adresse', fehler: 'Keine Adresse' };
     var g = await fetch(_apiBase() + '/marktbericht/geocode?address=' + encodeURIComponent(addr), {
@@ -541,6 +547,13 @@
     var gd = await g.json().catch(function () { return null; });
     if (!g.ok || !gd || gd.lat == null || gd.lon == null) {
       return { ok: false, grund: 'geocode', fehler: 'Adresse nicht geokodierbar' };
+    }
+    /* v2374 · Ein Punkt mit ANDERER Postleitzahl ist nicht diese Adresse (siehe oben:
+       Ottweiler statt Fürth). Lieber kein Wert als der eines anderen Landes. Ohne PLZ in
+       der Antwort bleibt es beim alten Verhalten. */
+    var _gp = gd.components && gd.components.postcode ? String(gd.components.postcode).trim() : '';
+    if (_gp && /^\d{5}$/.test(plz) && _gp !== plz) {
+      return { ok: false, grund: 'geocode', fehler: 'Adresse nicht eindeutig gefunden (PLZ ' + _gp + ' statt ' + plz + ')' };
     }
     /* ═══ v1388-WLAND · DAS LAND MITGEBEN ════════════════════════════════
        Marcels Befund: „wir haben eigentlich alle 16 Bundeslaender abgedeckt
@@ -579,6 +592,16 @@
     var bd = await b.json().catch(function () { return null; });
     if (!b.ok || !bd) {
       return { ok: false, grund: 'boris', fehler: (bd && (bd.error || bd.message)) || ('Fehler ' + b.status) };
+    }
+    /* v2370 · Gebuehrenpflichtig ist KEIN fehlender Wert: die Zone ist da, der
+       Ausschuss nennt den Wert nur gegen Gebuehr (z. B. Stadt Nuernberg). Marcel:
+       „den Link dann dazu ausgeben … ist gebuehrenpflichtig und dann mit dem Link
+       dahin" - damit der Nutzer direkt den Absprung findet. */
+    if (bd.reason === 'wert_gebuehrenpflichtig') {
+      var _blG = _plzToBundesland(plz);
+      return { ok: false, grund: 'gebuehr', zone: bd.zone || null, stichtag: bd.stichtag || null,
+               fehler: bd.note || 'Der Bodenrichtwert liegt vor, wird aber nur gegen Gebühr herausgegeben.',
+               link: (_blG && BORIS_URLS[_blG] ? BORIS_URLS[_blG] : BORIS_FALLBACK).url };
     }
     if (!(bd.available && bd.value_sqm != null && bd.value_sqm > 0)) {
       return { ok: false, grund: 'kein_wert', fehler: 'Kein amtlicher Bodenrichtwert für diese Lage' };
@@ -681,6 +704,18 @@
     _setStatus('Bodenrichtwert wird abgerufen …', '');
     try {
       var r = await borisHolen({ plz: plz, ort: ort, str: str });
+      if (!r.ok && r.grund === 'gebuehr') {
+        /* v2370 · Hinweis unter dem Feld MIT Link zum Portal, nicht als Fehler. */
+        var st = _el('brw-ai-status');
+        if (st) {
+          st.className = 'brw-ai-status';
+          st.innerHTML = 'ⓘ Gebührenpflichtig: ' + _escHtml(r.fehler) + ' '
+            + '<a href="' + _escHtml(r.link) + '" target="_blank" rel="noopener">Bodenrichtwert dort abrufen →</a>'
+            + ' — danach den Wert hier eintragen.';
+        }
+        if (typeof toast === 'function') toast('Bodenrichtwert in diesem Land nur gegen Gebühr — Link unter dem Feld');
+        return;
+      }
       if (!r.ok) {
         var msg = (r.grund === 'nicht_verfuegbar' || r.grund === 'kein_wert')
           ? '⚠ ' + r.fehler + (r.grund === 'kein_wert' ? ' — bitte Portal prüfen' : '')
