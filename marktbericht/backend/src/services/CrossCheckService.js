@@ -1741,8 +1741,11 @@ export const CrossCheckService = {
              out.sachwert.sachwertfaktor_quelle_url, out.sachwert.sachwertfaktor_lizenz,
              out.sachwert.sachwertfaktor_berichtsjahr);
     }
+    /* v2385 · Ein Auffangwert (D) oder eine eigene Angabe (E) ist keine Registerzahl - H nannte
+       „§ 256 BewG (Liegenschaftszinssatz) · Lizenz nicht hinterlegt" als Quellennachweis. */
     if (out.ertragswert && out.ertragswert.available
-        && out.ertragswert.liegenschaftszins_pct != null) {
+        && out.ertragswert.liegenschaftszins_pct != null
+        && ['D', 'E'].indexOf(String(out.ertragswert.liegenschaftszins_stufe || '')) < 0) {
       _merke(out.ertragswert.liegenschaftszins_quellenvermerk, 'Liegenschaftszinssatz',
              out.ertragswert.liegenschaftszins_quelle_url, out.ertragswert.liegenschaftszins_lizenz,
              out.ertragswert.liegenschaftszins_berichtsjahr || null);

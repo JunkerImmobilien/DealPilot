@@ -4259,7 +4259,7 @@ async function exportPdf(out) {
      * spiegel — im Prod-Bericht endet Seite 4 mit "Kein Gutachten n. § 194 Bau".
      * Jetzt auf die Blockbreite umbrochen. Bei einer Zeile ist y += 5 + 1*3 = 8,
      * also exakt der alte Wert; nur laengere Fussnoten schieben nach. */
-    const _fn = doc.splitTextToSize('Vereinfachte Verfahren n. ImmoWertV-Logik (indikativ): NHK 2010 ' +       /* v1061-WFUS-1 · Die Fussnote nannte 835 EUR/m2 (Stufe 3), gerechnet
+    let _fnS = ('Vereinfachte Verfahren n. ImmoWertV-Logik (indikativ): NHK 2010 ' +       /* v1061-WFUS-1 · Die Fussnote nannte 835 EUR/m2 (Stufe 3), gerechnet
        * wurde mit 985 (Stufe 4). Wie bei Quote und Zinssatz: aus dem
        * Ergebnis nehmen, nicht aus der Annahme. */
 ((cc.sachwert && cc.sachwert.available && cc.sachwert.nhk_eur_qm_bgf)
@@ -4317,7 +4317,16 @@ async function exportPdf(out) {
             var qk = (q && q.length <= 26) ? q : null;
             return String(z).replace('.', ',')
               + (s ? ' (Stufe ' + s + (qk ? ' · ' + qk : '') + ')' : '');
-          })()) + '. Kein Gutachten n. § 194 BauGB.', blockW);
+          })()) + '. Kein Gutachten n. § 194 BauGB.');
+    /* v2385 · Nur nennen, was gerechnet wurde: ohne Sachwert keine NHK-/Faktorangabe
+       (H stand bei „NHK 2010 null €/m²" und „Sachwertfaktor –"), ohne Ertragswert keine BWK/Zins. */
+    if (!(cc.sachwert && cc.sachwert.available)) {
+      _fnS = _fnS.replace(/NHK 2010 .*? · BWK /, 'BWK ').replace(/ · (ohne Sachwertfaktor|Sachwertfaktor [^.]*?). Kein Gutachten/, '. Kein Gutachten');
+    }
+    if (!(cc.ertragswert && cc.ertragswert.available)) {
+      _fnS = _fnS.replace(/ · BWK .*? % · Liegenschaftszins .*? % · /, ' · ').replace(/: BWK .*? % · Liegenschaftszins .*? %/, '');
+    }
+    const _fn = doc.splitTextToSize(_fnS, blockW);
     doc.text(_fn, M, y + 3);
     y += 5 + _fn.length * 3;
   }
