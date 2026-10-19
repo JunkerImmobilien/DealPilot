@@ -38840,6 +38840,20 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### landing-videothek-4c · Videoreihe 10b und 21 vertont und ausgeliefert (19.10.2026, Staging + Prod-MP4, Video-Agent)
+
+- **Was:** Fortsetzung von v2395vr (Übergabe 19.10., OFFEN 2). Die neu aufgenommenen Module 10b (4:29) und 21 (3:00) vertont, je mit und ohne Sprecher ausgeliefert. `videos.json` Dauer 10b 263 → 269, 21 175 → 180 (gemessen 269,37 / 180,20 s), Buster `landing-videothek-4b` → `4c` (`dp2-live.js`, `landing/index.html`, `landing/videothek.html`). Sprechtexte und Zeitmarken in `claude/ablage-20261019-video/m10b|m21/`.
+- **Befund — die Übergabe stimmte bei den WAV-Clips nicht:** die vorhandenen Clips 10b (18.10.) waren mit `tts2.mjs` im **Investor-Ton** gesprochen, nicht mit Pirate-Vibe; für 21 lagen ebenfalls nur Investor-Clips vor. „Nur zwei Zeilen neu“ hätte zwei Stimmfarben in einem Video ergeben. Außerdem hatte das neue Bild von 10b mehr geänderte Zahlen als die Grenze: Nebenkosten 170.748 € jetzt erfasst (alter Satz „in diesem Objekt nicht erfasst“ falsch), Steuerersparnis 9.352 € (alt „rund achttausendzweihundert“), AfA 22.420 € (alt „rund neunzehntausendsiebenhundert“), Absprung Modul 10c (alt 10a). **Deshalb alle 31 Clips neu** (18 + 13, plus einmal das 10b-Intro gekürzt), onyx, `gpt-4o-mini-tts`, Pirate-Vibe (`tts3.mjs`), im Container `dealpilot-backend` auf Staging. Schlüssel nie ausgegeben.
+- **Stichbilder 21** (14 Vollbilder + Untertitelband aller 12 Szenen angesehen): keine Erweiterungs-Hinweise, keine Überlagerung; Cockpit 7,39 Mio € / 28.675 €/Monat, Analyse 7.390.151 € und 344.100 €/Jahr, Abspann „Weiter: Modul 22 · Der Telegram-Bot“.
+- **Nachweis:**
+  - `pruefe.mjs`: alle Clips enden mindestens 0,15 s vor dem nächsten Bildwechsel, Tempo durchweg 1,0 (keine Straffung). Gleiche Abschnittszahl wie vorher (10b 17 Wechsel, 21 12).
+  - Lautheit −16,4 LUFS (beide). Größen: 10b 12,3 MB / mit Sprecher 16,6 MB; 21 7,0 MB / 9,9 MB.
+  - md5 lokal = Staging = Prod für alle vier MP4 (`6eff14e2…`, `fc3fc678…`, `7568a6d9…`, `366d7864…`); alte Fassungen auf beiden Servern als `*.mp4.alt-20261019` (nicht gelöscht). Auf Prod nur die MP4s, kein Code/git/DB/Container.
+  - Videothek `staging.dealpilot.immo/videothek.html`: lädt `dp2-live.js` und `videos.json` mit `?v=landing-videothek-4c`; 10b und 21 spielen mit und ohne Sprecher (Umschalter `#vtTon`, Dauer 269,37 / 180,2 s, Audio-Bytes nur in der Sprecher-Fassung).
+- **Deploy:** `deploy-staging.ps1` brach ab, weil ein paralleler Agent unversionierte Änderungen im Arbeitsverzeichnis hat (Marktbericht-Backend, `objekt-reiter.js`, `help.js`). Ausgerollt deshalb mit dem Server-Schritt des Skripts von Hand (Zweig `staging`, keine verfolgten Änderungen, `git pull --ff-only` → `0862fc06`); die lokalen Prüfer (Frontend-Konstanten, Saat-Basislinie, Register-Abgleich) liefen dabei nicht — der Commit berührt keine ihrer Quellen.
+- **Commit:** `0862fc06` (Code), dieser Journal-Eintrag separat.
+- **Rest:** `videos.json`/Buster auf Prod kommen mit dem nächsten Prod-Merge (bis dahin nennt die Prod-Videothek 4:23 / 2:55 bei den neuen Dateien). Die `.alt-20261019`-Dateien liegen im öffentlich ausgelieferten Ordner — nach Abnahme löschen. Die Reihe spricht jetzt in zwei Stimmfarben: Pirate-Vibe 10b, 15, 21, 23, 25, Investor-Ton der Rest.
+
 ### v2395 / v2395a / v2395vr–vr3 · landing-videothek-4b · Videoreihe 10b, 15, 21, 23: Fehler im Bild (19.10.2026, Staging, Video-Agent)
 
 - **Was:** Vier Befunde aus der Vertonung (`Videoreihe-Sprecher/STAND.md`), dazu drei, die erst die Prüfläufe zeigten.
@@ -38964,7 +38978,8 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 
 **OFFEN — so geht es weiter:**
 1. **Stufe N und LZS-Formel** (Agent, v2400 ff.): Der Zwischenstand steht im Journal-Eintrag „Zwischenstand Stufe N“ (falls vorhanden). Ziel: alle ~15 Stellen (Kaskade, Ertragswert-Abzug, Web, PDF, Übernahme-Pille, Hilfe, Verlauf), dazu die LZS-Formel vor § 256. Danach Deploy auf Staging (Rebuild `mb-backend`), Prüfung, Prod.
-2. **Videos 10b und 21:** Beide sind neu AUFGENOMMEN, aber noch nicht vertont oder hochgeladen.
+2. **Videos 10b und 21:** ✓ **Erledigt am 19.10.2026 (`landing-videothek-4c`, Commit `0862fc06`)** — vertont, auf Staging und Prod hochgeladen, siehe Journal-Eintrag „landing-videothek-4c“. Der Rest dieses Punkts ist der Stand davor:
+   Beide sind neu AUFGENOMMEN, aber noch nicht vertont oder hochgeladen.
    - 10b: 4:29, Grenze 157.543 € → 168.155 €, Stichbilder geprüft.
    - 21: 3:00, Stichbilder noch nicht angesehen.
    - Die Dateien liegen unter `Dateien/Messe/Videos/Videoreihe/Modul 10b …` bzw. `Modul 21 …`.

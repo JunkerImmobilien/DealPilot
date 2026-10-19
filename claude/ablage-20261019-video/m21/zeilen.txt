@@ -7,7 +7,7 @@ i|Modul einundzwanzig: Portfolio-Cockpit und Pilot.
 5|Die Projektion: Restschuld, Eigenkapital und Cashflow über zehn, zwanzig oder dreißig Jahre — eine vereinfachte Modellrechnung über den ganzen Bestand.
 6|Der Portfolio-Pilot kennt die Vermögensbilanz und jedes Objekt darin. Ein Klick — und du hast die Analyse über alles.
 7|Vermögensbilanz, Ertrag, die einzelnen Objekte, Klumpenrisiken, Entwicklung — und was als Nächstes zu tun ist.
-8|Gegliedert und mit Zahlen — gerechnet mit den Zahlen des Cockpits, nichts erfunden.
+8|Gegliedert und mit Zahlen: sieben Komma drei neun Millionen investiert, dreihundertvierundvierzigtausend Euro Miete im Jahr — die Zahlen des Cockpits, nichts erfunden.
 9|Er nennt die Objekte beim Namen: Welche tragen, welche belasten — mit Objekt und Zahl. Am Ende stehen drei konkrete Schritte, priorisiert.
 10|Und dann fragst du: per Schnellfrage oder ganz eigen — etwa, welches Objekt den Schnitt runterzieht. Der Pilot antwortet zu jedem Objekt und zum Ganzen.
-11|Die ganze Flotte im Blick — der Pilot fliegt mit. Weiter geht's mit dem nächsten Modul.
+11|Die ganze Flotte im Blick — der Pilot fliegt mit. Weiter mit Modul zweiundzwanzig: dem Telegram-Bot.
