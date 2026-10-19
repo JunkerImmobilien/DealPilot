@@ -21,7 +21,7 @@ import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einhe
 import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js';
 import { groessenanpassung as ukAusRegister, naeherung as ukNaeherung,
          sperreSchliesstNaeherungAus } from '../lib/umrechnung_flaeche.js';   /* v2280, v2288 */
-import { wgfzAnpassung } from '../lib/umrechnung_wgfz.js';   /* v2361 */
+import { wgfzAnpassung, wgfzNaeherung } from '../lib/umrechnung_wgfz.js';   /* v2361, v2377 */
 import { zustaendig as niZoneZustaendig, holeZonen as niZonenHolen, waehleZone as niZoneWaehlen } from '../connectors/boris/ni-zone.js';   /* v2284 */
 /* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
  * zustaendigen Grundstuecksmarktbericht. */
@@ -993,6 +993,33 @@ export const ReportOrchestrator = {
           }
         }
       } catch (e) { /* die Naeherung darf den Bericht nie kippen */ }
+      /* v2377 · DIE DEALPILOT-FORMEL FUER DIE WGFZ (Stufe D). Rangfolge nach Marcel
+       * (17./19.10.2026): amtliche WGFZ-Tabelle > oertliche Tabelle des Ausschusses
+       * (auch auf das MFH uebertragen, Stufe C) > Bundesformel. Fuehrt die Zone eine
+       * GFZ und steht die WGFZ des Objekts fest, ist die WGFZ das wertrelevante
+       * Merkmal (§ 16 Abs. 4) - dann ersetzt die WGFZ-Formel die Flaechen-Formel,
+       * nie beide zugleich (sonst stuende der Groesseneffekt doppelt im Wert). */
+      try {
+        const _ortTabelle = _ukReg && _ukReg.verfuegbar && !_ukReg.naeherung;
+        if (!(_wgfz && _wgfz.verfuegbar) && !_ortTabelle && (!_wgfz || ['kein_satz', 'sperre'].indexOf(_wgfz.grund) >= 0)) {
+          const _pw2 = (landValue && landValue.properties_raw) || {};
+          const _gz2 = parseFloat(String(_pw2['Geschossflächenzahl'] || _pw2.Geschossflaechenzahl || _pw2.WGFZ || _pw2.wgfz || '').replace(',', '.'));
+          const _wn = wgfzNaeherung({
+            objektart: ref.property_subtype || ref.property_type,
+            brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
+            wgfz_zone: _gz2 > 0 ? _gz2 : null, wgfz_objekt: ref.wgfz_objekt,
+          });
+          step('uk-wgfz-dealpilot-formel: ' + (_wn.verfuegbar ? 'Faktor ' + _wn.faktor : _wn.grund));
+          if (_wn.verfuegbar) {
+            /* Der Weg zum Ausschuss bleibt sichtbar (Sperre mit Fundstelle). */
+            if (_wgfz && _wgfz.hinweis) _wn.hinweis += ' ' + _wgfz.hinweis;
+            _wgfz = _wn;
+            if (_ukReg && _ukReg.naeherung) _ukReg = { verfuegbar: false, grund: 'wgfz_naeherung' };
+          } else if (_wn.grund === 'wgfz_objekt_fehlt' && !_wgfz) {
+            _wgfz = { verfuegbar: false, grund: 'wgfz_objekt_fehlt', naeherung: true, hinweis: _wn.hinweis };
+          }
+        }
+      } catch (e) { /* die Naeherung darf den Bericht nie kippen */ }
       try {
         _uk = (_ukReg && (_ukReg.verfuegbar || _ukReg.grund !== 'kein_satz')) ? (_ukReg.verfuegbar ? _ukReg : null) : flaechenaufteilung({
           ags: ref.ags || null,
@@ -1068,7 +1095,9 @@ export const ReportOrchestrator = {
         gfz_koeff: ref.gfz_koeff || (_wgfz && _wgfz.verfuegbar ? _wgfz.faktor : null),
         gfz_detail: !ref.gfz_koeff && _wgfz && _wgfz.verfuegbar
           ? 'WGFZ ' + String(_wgfz.wgfz_objekt).replace('.', ',') + ' statt ' + String(_wgfz.wgfz_zone).replace('.', ',')
-            + ': × ' + String(_wgfz.uk_objekt).replace('.', ',') + ' / ' + String(_wgfz.uk_zone).replace('.', ',') : null,
+            + (_wgfz.naeherung   /* v2377 */
+              ? ': × ' + String(_wgfz.faktor).replace('.', ',') + ' (abgeleitet aus der DealPilot-Formel)'
+              : ': × ' + String(_wgfz.uk_objekt).replace('.', ',') + ' / ' + String(_wgfz.uk_zone).replace('.', ',')) : null,
         beitrag_abzug_eur: ref.beitrag_abzug_eur || null,
         anpassung_pct: ref.brw_anpassung_pct || null,
         anpassung_grund: ref.brw_anpassung_grund || null,
