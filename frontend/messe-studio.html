@@ -209,10 +209,16 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     document.getElementById('fort').style.width = ((m.i + 1) / stufen * 100) + '%';
     var neuNr = String(m.i + 1);
     if (nr.textContent !== neuNr) { nr.textContent = neuNr; nr.classList.remove('wechsel'); void nr.offsetWidth; nr.classList.add('wechsel'); }
-    document.getElementById('kick').textContent = m.kick || '';
-    document.getElementById('titel').textContent = m.titel || '';
-    document.getElementById('zeile').innerHTML = m.text || '';
-    txt.classList.remove('wechsel'); void txt.offsetWidth; txt.classList.add('wechsel');
+    /* v2374b · nur bei NEUEM Text setzen und die Einblendung nur dann neu anstossen -
+       sonst startet jede wiederholte Nachricht das Hereinfahren (bandWechsel) erneut */
+    var sig = (m.kick || '') + '|' + (m.titel || '') + '|' + (m.text || '');
+    if (txt.getAttribute('data-sig') !== sig) {
+      txt.setAttribute('data-sig', sig);
+      document.getElementById('kick').textContent = m.kick || '';
+      document.getElementById('titel').textContent = m.titel || '';
+      document.getElementById('zeile').innerHTML = m.text || '';
+      txt.classList.remove('wechsel'); void txt.offsetWidth; txt.classList.add('wechsel');
+    }
     band.classList.add('an');
   }
 
