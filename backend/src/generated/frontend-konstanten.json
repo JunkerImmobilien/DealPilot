@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-19T16:34:45.640Z",
+ "erzeugt_am": "2026-10-19T17:51:28.968Z",
  "quellen": {
-  "voice-import": "49a1bdc5c8a829f8",
+  "voice-import": "98d0a58f56a54cdc",
   "objektart-felder": "1e0549e54a17a054",
-  "storage": "8fc68110ac0b7941",
-  "index-html": "15fd8192584658de",
+  "storage": "22c1a92b2860815c",
+  "index-html": "3dbb0e071d02608f",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -371,6 +371,26 @@
    {
     "et": 4,
     "ids": [
+     "zb_soll_qm",
+     "zb_ziel_qm",
+     "zb_ziel_wann"
+    ],
+    "rang": 15,
+    "nurArt": "einzel",
+    "frage": "Freiwillig: Siehst du Mietpotenzial? Was zahlt der Mieter nach einer normalen Mieterhöhung (Euro je m²), was wäre nach Umbau oder Neuvermietung drin, und wann? „Weiß ich nicht“ geht auch."
+   },
+   {
+    "et": 4,
+    "ids": [
+     "mfh_wohnungen"
+    ],
+    "rang": 15,
+    "nurArt": "mfh",
+    "frage": "Freiwillig, je Wohnung: Nummer oder Lage, Fläche, Ist-Kaltmiete, Soll-Miete nach normaler Erhöhung, Zielmiete nach Umbau (Euro je m²) und wann zuletzt erhöht wurde. „Weiß ich nicht“ geht auch."
+   },
+   {
+    "et": 4,
+    "ids": [
      "kaufdat",
      "wirtschaftlicher_uebergang"
     ],
@@ -554,6 +574,12 @@
    "me_anz",
    "me_int",
    "me_pct",
+   "zb_soll_qm",
+   "zb_soll_ab",
+   "zb_vgl_qm",
+   "zb_ziel_qm",
+   "zb_ziel_wann",
+   "zb_massnahmen",
    "mv_art",
    "mv_beginn",
    "mv_letzte_erhoehung",
@@ -1539,6 +1565,31 @@
     "id": "me_pct",
     "kind": "text",
     "label": "Angestrebte Entwicklung"
+   },
+   {
+    "id": "zb_soll_qm",
+    "kind": "text",
+    "label": "Soll-Miete (Mieter bleibt, €/m²)"
+   },
+   {
+    "id": "zb_soll_ab",
+    "kind": "text",
+    "label": "Soll erreichbar ab"
+   },
+   {
+    "id": "zb_vgl_qm",
+    "kind": "text",
+    "label": "Vergleichsmiete (€/m²)"
+   },
+   {
+    "id": "zb_ziel_qm",
+    "kind": "text",
+    "label": "Zielmiete (€/m²)"
+   },
+   {
+    "id": "zb_ziel_wann",
+    "kind": "text",
+    "label": "Zielbild ab wann"
    },
    {
     "id": "mv_art",

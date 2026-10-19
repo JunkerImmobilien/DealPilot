@@ -309,7 +309,7 @@
   }
 
   /* ── Modal mit vier Schritten ───────────────────────────────────── */
-  var _arbeit = [], _geb = {}, _schritt = 0, _weg = false;
+  var _arbeit = [], _geb = {}, _schritt = 0, _weg = false, _auftK = null;   /* v2430: _auftK Kosten der Aufteilung */
 
   function selHtml(attrs, wert, opts) {
     return '<select class="mfh-in mfh-sel" ' + attrs + '>'
@@ -337,7 +337,11 @@
       + '<div style="margin-top:12px;padding:9px 11px;border:1px solid #E6E0D3;border-radius:8px;background:#FBFAF7;font-size:13px">'
         + '<label style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="mfh-weg"' + (_weg ? ' checked' : '') + '>'
         + '<span><b>In Wohnungseigentum aufgeteilt</b> (Teilungserklärung nach WEG)<div style="font-size:11.5px;color:#8A8272">'
-        + 'Dann ist jede Einheit einzeln verkäuflich — für Bank und Exit ein Unterschied. Die Rechnung bleibt davon unberührt.</div></span></label></div>'
+        + 'Dann ist jede Einheit einzeln verkäuflich — für Bank und Exit ein Unterschied. Score und Cashflow bleiben unberührt; das Wertpotenzial (Pilot-Analyse, PDF) zeigt zusätzlich jede Wohnung als Eigentumswohnung und die Summe nach Aufteilung.</div></span></label>'
+        /* v2430 · Kosten der Aufteilung, eigene Angabe mit Vorbelegung */
+        + '<div style="margin:8px 0 0 21px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">Kosten der Aufteilung '
+        + '<input class="mfh-in mfh-md" id="mfh-auftk" inputmode="decimal" style="width:120px" value="' + esc(_auftK == null ? '' : String(_auftK)) + '" placeholder="' + (((window.DpPotenzial && window.DpPotenzial.AUFTEILUNG_JE_WE) || 1800) * Math.max(1, _arbeit.filter(function (x) { return x.art !== 'gewerbe'; }).length)).toLocaleString('de-DE') + ' (Vorbelegung)"> €'
+        + '<span style="font-size:11.5px;color:#8A8272">Notar, Grundbuch, Teilungserklärung, Abgeschlossenheit · leer = Vorbelegung 1.800 € je Wohnung · schon aufgeteilt: 0</span></div></div>'
       + '<div class="cf-hint" style="margin-top:8px">Gebäudepunkte: <b id="mfh-geb-p">—</b> von 20 (Anlage 2). Dach, Außenwand, Leitungen und Heizung kann eine einzelne Wohnung nicht abweichend haben.</div>';
   }
 
@@ -353,23 +357,19 @@
         + '" inputmode="' + (typ || 'text') + '">';
     }
     function sel(k, opts) { return selHtml('data-i="' + i + '" data-k="' + k + '"', e[k], opts); }
+    /* v2430 · Marcel 19.10.2026: „Anlegen geht schnell, planen passiert in der
+       Wohnung." Die Liste fuehrt nur noch Nr, Lage, Flaeche, Zimmer, Ist-Miete
+       und Status. Art, Zustand, Soll-Miete, Zielbild und Massnahmen stehen im
+       Wohnungsfenster (\u2026). Die Daten bleiben dieselben Felder. */
+    var _plan = (zahl(e.soll) > 0 || zahl(e.ziel_qm) > 0 || (Array.isArray(e.massnahmen) && e.massnahmen.length) || String(e.massnahme || '').trim());
     return '<tr>' +
-      '<td>' + inp('nr', 44, String(i + 1)) + '</td>' +
+      '<td>' + inp('nr', 44, String(i + 1)) + (e.art === 'gewerbe' ? '<div class="mfh-tag">Gewerbe</div>' : '') + '</td>' +
       '<td>' + inp('lage', 86, 'EG links') + '</td>' +
-      '<td>' + sel('art', [['wohnen', 'Wohnen'], ['gewerbe', 'Gewerbe']]) +
-        /* v2210 · Nur bei Gewerbe: die Nutzungsart entscheidet die Instandhaltung (Anlage 3 ImmoWertV). */
-        (e.art === 'gewerbe' ? '<div style="margin-top:4px">' + sel('nutzung_gew', GEWERBE_NUTZUNG) + '</div>' : '') + '</td>' +
       '<td>' + inp('wfl', 60, 'm²', 'decimal') + '</td>' +
       '<td>' + inp('zimmer', 44, '', 'decimal') + '</td>' +
       '<td>' + inp('ist', 72, '€/Mon', 'decimal') + '</td>' +
-      '<td>' + inp('soll', 72, '€/Mon', 'decimal') + '</td>' +
       '<td>' + sel('status', [['vermietet', 'vermietet'], ['leer', 'leer']]) + '</td>' +
-      '<td>' + sel('zustand', ZUSTAND) + '</td>' +
-      '<td>' + inp('massnahme', 110, 'z. B. Bad neu') + '</td>' +
-      '<td>' + inp('kosten', 70, '€', 'decimal') + '</td>' +
-      /* v2021 - der Weg ins Wohnungsfenster. Die Zeile bleibt der
-         Ueberblick; alles Weitere steht dahinter. */
-      '<td style="white-space:nowrap"><button type="button" data-det="' + i + '" title="Alle Angaben zu dieser Wohnung" style="border:1px solid var(--wl-c9a84c, #C9A84C);background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;color:var(--wl-9a7f33, #9a7f33);margin-right:4px">\u2026</button>' +
+      '<td style="white-space:nowrap"><button type="button" data-det="' + i + '" class="mfh-det' + (_plan ? ' mit-plan' : '') + '" title="Mietvertrag, Soll-Miete, Zielbild und Ertragswert dieser Wohnung">Details' + (_plan ? ' · Plan' : '') + '</button> ' +
       '<button type="button" data-dup="' + i + '" title="Zeile duplizieren" style="border:1px solid #E6E0D3;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer">⧉</button> ' +
       '<button type="button" data-del="' + i + '" title="Zeile löschen" style="border:1px solid #E6E0D3;background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;color:#B8625C">✕</button></td>' +
       '</tr>';
@@ -420,162 +420,228 @@
   function wohnungOeffnen(i) {
     var e = _arbeit[i]; if (!e) return;
     wSchliessen();
-    function f(k, label, ph, typ, breit) {
+    var P = window.DpPotenzial || null;
+    /* v2430 · alte Felder massnahme/kosten werden zur Liste (migrationsfrei) */
+    var _ml = P ? P.massnahmenVon(e).map(function (m) { var c = Object.assign({}, m); delete c.alt; return c; }) : [];
+    e.massnahmen = _ml;
+    function f(k, label, ph, typ, breit, extra) {
       return '<label class="mfh-we-f' + (breit ? ' mfh-we-breit' : '') + '"><span>' + esc(label) + '</span>'
         + '<input data-wk="' + k + '" value="' + esc(e[k] == null ? '' : e[k]) + '" placeholder="' + esc(ph || '')
-        + '" inputmode="' + (typ || 'text') + '"></label>';
+        + '" inputmode="' + (typ || 'text') + '"' + (extra || '') + '></label>';
     }
     function s(k, label, opts) {
       return '<label class="mfh-we-f"><span>' + esc(label) + '</span>'
         + selHtml('data-wk="' + k + '"', e[k], opts) + '</label>';
     }
-    function d(k, label) {
+    function d(k, label, typ) {
       return '<label class="mfh-we-f"><span>' + esc(label) + '</span>'
-        + '<input type="date" data-wk="' + k + '" value="' + esc(e[k] || '') + '"></label>';
+        + '<input type="' + (typ || 'date') + '" data-wk="' + k + '" value="' + esc(e[k] || '') + '"></label>';
     }
+    function blk(cls, titel, inhalt) { return '<section class="mfh-we-blk ' + cls + '"><div class="mfh-we-blk-t">' + titel + '</div>' + inhalt + '</section>'; }
     var titel = (e.lage || e.nr || (i + 1));
     var ov = document.createElement("div"); ov.id = "mfh-we-ov";
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(42,39,39,.60);z-index:99999;display:flex;align-items:center;justify-content:center;padding:14px';
-    ov.innerHTML = '<div class="mfh-we-karte">' +
-      '<div class="mfh-we-kopf"><b>Wohnung ' + esc(String(titel)) + '</b>'
-        + '<button type="button" id="mfh-we-zu" aria-label="Schlie\u00dfen">\u2715</button></div>' +
+    ov.innerHTML = '<div class="mfh-we-karte" role="dialog" aria-modal="true" aria-label="Wohnung ' + esc(String(titel)) + '">' +
+      '<div class="mfh-we-kopf"><div><b>Wohnung ' + esc(String(e.nr || (i + 1))) + (e.lage ? ' · ' + esc(e.lage) : '') + '</b>'
+        + '<span class="mfh-we-unter" id="mfh-we-unter"></span></div>'
+        + '<button type="button" id="mfh-we-zu" aria-label="Schließen">✕</button></div>' +
       '<div class="mfh-we-leib">' +
-        '<h4>Stammdaten</h4><div class="mfh-we-raster">' +
+        blk('', 'Stammdaten', '<div class="mfh-we-raster">' +
           f('nr', 'Nummer', String(i + 1)) +
           f('lage', 'Lage im Haus', 'EG links') +
           s('art', 'Art', [['wohnen', 'Wohnen'], ['gewerbe', 'Gewerbe']]) +
-          f('wfl', 'Wohnfl\u00e4che (m\u00b2)', '', 'decimal') +
+          f('wfl', 'Wohnfläche (m²)', '', 'decimal') +
           f('zimmer', 'Zimmer', '', 'decimal') +
-          f('etage', 'Etage', 'z.\u202fB. 2. OG') +
-          f('balkon_qm', 'Balkon/Terrasse (m\u00b2)', '', 'decimal') +
-          f('keller', 'Keller / Abstellraum', 'z.\u202fB. Kellerabteil 4') +
-          f('stellplatz', 'Stellplatz / Garage', 'z.\u202fB. TG-Platz 7') +
+          f('etage', 'Etage', 'z. B. 2. OG') +
+          f('balkon_qm', 'Balkon/Terrasse (m²)', '', 'decimal') +
+          f('keller', 'Keller / Abstellraum', 'z. B. Kellerabteil 4') +
+          f('stellplatz', 'Stellplatz / Garage', 'z. B. TG-Platz 7') +
+          s('zustand', 'Gesamtzustand', ZUSTAND) +
+          (_weg ? f('mea_anteil', 'Miteigentumsanteil (z. B. 125 von 1000)', 'optional', 'decimal') : '') +
         '</div>' +
-        /* v2210 \u00b7 erscheint nur, wenn die Einheit Gewerbe ist */
+        /* v2210 · erscheint nur, wenn die Einheit Gewerbe ist */
         '<div id="mfh-we-gew-box"><h4>Gewerbe</h4>' +
-          '<p class="mfh-we-hint">Die Fl\u00e4che gilt hier als <b>Nutzfl\u00e4che</b>. F\u00fcr den Ertragswert z\u00e4hlt die <b>markt\u00fcbliche</b> Miete (\u00a7 31 Abs. 2 ImmoWertV). ' +
+          '<p class="mfh-we-hint">Die Fläche gilt hier als <b>Nutzfläche</b>. Für den Ertragswert zählt die <b>marktübliche</b> Miete (§ 31 Abs. 2 ImmoWertV). ' +
           'Fehlt sie, setzt der Marktbericht die Ist-Miete an und kennzeichnet das Ergebnis als indikativ.</p>' +
           '<div class="mfh-we-raster">' +
             s('nutzung_gew', 'Nutzungsart', GEWERBE_NUTZUNG) +
-            f('markt_qm', 'Markt\u00fcbliche Miete (\u20ac/m\u00b2 \u00b7 Monat)', 'optional', 'decimal') +
-          '</div></div>' +
-        '<h4>Miete</h4><div class="mfh-we-raster">' +
-          f('ist', 'Ist-Kaltmiete (\u20ac/Monat)', '', 'decimal') +
-          f('soll', 'Soll-Kaltmiete (\u20ac/Monat)', '', 'decimal') +
-          s('status', 'Status', [['vermietet', 'vermietet'], ['leer', 'leer']]) +
-          f('nk_vorauszahlung', 'NK-Vorauszahlung (\u20ac/Monat)', '', 'decimal') +
-          f('stellplatz_miete', 'Stellplatzmiete (\u20ac/Monat)', '', 'decimal') +
-        '</div>' +
-        '<h4>Mietvertrag</h4>' +
-        '<p class="mfh-we-hint">Staffel- und Indexmiete tragen ihre n\u00e4chste Erh\u00f6hung schon im Vertrag \u2014 sie sind ein <b>Termin</b>, kein Potenzial.<br>' +
-          '<b>K\u00fcndigungsverzicht</b> hei\u00dft: <i>beide</i> Seiten verzichten bis zu diesem Datum auf die ordentliche K\u00fcndigung ' +
-          '(zul\u00e4ssig bis vier Jahre ab Vertragsschluss, bei Staffelmiete \u00a7 557a Abs. 3 BGB). F\u00fcr dich zweischneidig: ' +
-          'Mietsicherheit auf der einen Seite \u2014 keine Eigenbedarfs- oder Verwertungsk\u00fcndigung auf der anderen.</p>' +
-        '<div class="mfh-we-raster">' +
-          s('mv_art', 'Vertragsart', MIETVERTRAG_ARTEN) +
-          d('mv_beginn', 'Mietbeginn') +
-          d('mv_letzte_erhoehung', 'Letzte Erh\u00f6hung') +
-          d('mv_naechste_anpassung', 'N\u00e4chste Anpassung (Staffel/Index)') +
-          f('mv_kaution', 'Kaution (\u20ac)', '', 'decimal') +
-          d('mv_befristet_bis', 'Befristet bis') +
-          d('mv_kuendigungsverzicht_bis', 'K\u00fcndigungsverzicht bis') +
-          f('mv_mieter', 'Mieter (Name, optional)', '') +
-          f('mv_notiz', 'Notiz zum Vertrag', '', 'text', true) +
-        '</div>' +
-        /* v2023 - DIE ERHOEHUNG WIRD KONKRET.
-           Marcel: „bei all dem, wo wir feststellen koennen, wann wir
-           erhoehen und wie hoch die Erhoehung sein wird, waere es
-           super, wenn wir das mit angeben koennten."
-           Ein Datum ohne Betrag ist ein Termin ohne Inhalt - man kann
-           damit nichts fortschreiben. Die Felder erscheinen NUR bei
-           Staffel und Index: bei einem unbefristeten Vertrag waere
-           „naechste Erhoehung 3 %" eine Behauptung, keine Angabe. */
-        '<div id="mfh-we-erh-box" style="display:none">' +
-          '<h4>Geplante Erh\u00f6hungen</h4>' +
-          /* v2025 - eine Indexmiete steht der HOEHE nach nicht fest. */
-          '<div id="mfh-we-index-warn" class="mfh-we-warn" style="display:none">' +
-            '<b>Indexmiete \u2014 die H\u00f6he ist eine Annahme.</b> Der <i>Termin</i> steht im Vertrag, ' +
-            'die H\u00f6he ergibt sich erst aus dem Verbraucherpreisindex. Was du hier eintr\u00e4gst, ' +
-            'rechnet DealPilot als <b>Annahme</b> fort und kennzeichnet sie auch in der Mietentwicklung.' +
-          '</div>' +
-          '<p class="mfh-we-hint">Nur bei <b>Staffel-</b> und <b>Indexmiete</b>: hier steht die Erh\u00f6hung vorher fest. ' +
-            'Mit diesen Angaben kann DealPilot die Ist-Miete fortschreiben \u2014 und sie in die ' +
-            '<b>Mietentwicklung</b> des Objekts einrechnen.</p>' +
+            f('markt_qm', 'Marktübliche Miete (€/m² · Monat)', 'optional', 'decimal') +
+          '</div></div>') +
+        blk('', 'Mietvertrag · Ist',
           '<div class="mfh-we-raster">' +
-            s('mv_erhoehung_art', 'Erh\u00f6hung angeben als', [['', '\u2013'], ['prozent', 'Prozent'], ['betrag', 'Euro je Monat']]) +
-            f('mv_erhoehung_wert', 'N\u00e4chste Erh\u00f6hung (H\u00f6he)', 'z.\u202fB. 3 oder 45', 'decimal') +
-            f('mv_rhythmus_jahre', 'Rhythmus (alle \u2026 Jahre)', 'z.\u202fB. 2', 'decimal') +
-            f('mv_stufen_offen', 'Noch offene Stufen', 'z.\u202fB. 3', 'decimal') +
+            f('ist', 'Ist-Kaltmiete (€/Monat)', '', 'decimal') +
+            s('status', 'Status', [['vermietet', 'vermietet'], ['leer', 'leer']]) +
+            f('nk_vorauszahlung', 'NK-Vorauszahlung (€/Monat)', '', 'decimal') +
+            f('stellplatz_miete', 'Stellplatzmiete (€/Monat)', '', 'decimal') +
+            s('mv_art', 'Vertragsart', MIETVERTRAG_ARTEN) +
+            d('mv_beginn', 'Mietbeginn') +
+            d('mv_letzte_erhoehung', 'Letzte Erhöhung') +
+            d('mv_naechste_anpassung', 'Nächste Anpassung (Staffel/Index)') +
+            f('mv_kaution', 'Kaution (€)', '', 'decimal') +
+            d('mv_befristet_bis', 'Befristet bis') +
+            d('mv_kuendigungsverzicht_bis', 'Kündigungsverzicht bis') +
+            f('mv_mieter', 'Mieter (Name, optional)', '') +
+            f('mv_notiz', 'Notiz zum Vertrag', '', 'text', true) +
           '</div>' +
-          '<label class="mfh-we-haken"><input type="checkbox" data-wkb="mv_in_mietentwicklung"' +
-            (e.mv_in_mietentwicklung ? ' checked' : '') + '>' +
-            '<span>Diese Staffel in die <b>Mietentwicklung</b> des Objekts einrechnen</span></label>' +
-        '</div>' +
-        '<h4>Zustand</h4><div class="mfh-we-raster">' +
-          s('zustand', 'Gesamtzustand', ZUSTAND) +
-          f('massnahme', 'Geplante Ma\u00dfnahme', 'z.\u202fB. Bad neu') +
-          f('kosten', 'Kosten (\u20ac)', '', 'decimal') +
-        '</div>' +
-        /* v2023 - HIER STAND EIN FELD FUER EINE EIGENE RESTNUTZUNGSDAUER.
-
-           Marcel: „nimm mal bitte die Restnutzungsdauer bei den
-           Einheiten raus. Wir haben ja dann noch Zustand je Einheit.
-           Das wird passend uebertragen … also das ist alles valide."
-
-           Er hat recht. Schritt 3 des Konfigurators erfasst den Zustand
-           je Einheit nach Anlage 2 ImmoWertV, Schritt 4 rechnet daraus
-           Punkte und Restnutzungsdauer - je Einheit UND
-           flaechengewichtet aufs Gebaeude. Ein zweites Feld waere eine
-           ZWEITE Zahl zur selben Groesse.
-
-           Ich habe es gebaut, weil es gewuenscht war, ohne zu messen,
-           dass der Weg dafuer schon existiert. Das Feld war nicht
-           falsch - es war ueberfluessig, und bei einer Bewertung ist
-           das dasselbe. */
+          '<p class="mfh-we-hint">Staffel- und Indexmiete tragen ihre nächste Erhöhung schon im Vertrag — sie sind ein <b>Termin</b>, kein Potenzial. ' +
+            '<b>Kündigungsverzicht</b> heißt: <i>beide</i> Seiten verzichten bis zu diesem Datum auf die ordentliche Kündigung (bei Staffelmiete höchstens vier Jahre, § 557a Abs. 3 BGB).</p>' +
+          /* v2023 - die Erhoehung wird konkret, nur bei Staffel und Index */
+          '<div id="mfh-we-erh-box" style="display:none">' +
+            '<h4>Geplante Erhöhungen</h4>' +
+            '<div id="mfh-we-index-warn" class="mfh-we-warn" style="display:none">' +
+              '<b>Indexmiete — die Höhe ist eine Annahme.</b> Der <i>Termin</i> steht im Vertrag, ' +
+              'die Höhe ergibt sich erst aus dem Verbraucherpreisindex. Was du hier einträgst, ' +
+              'rechnet DealPilot als <b>Annahme</b> fort und kennzeichnet sie auch in der Mietentwicklung.' +
+            '</div>' +
+            '<div class="mfh-we-raster">' +
+              s('mv_erhoehung_art', 'Erhöhung angeben als', [['', '–'], ['prozent', 'Prozent'], ['betrag', 'Euro je Monat']]) +
+              f('mv_erhoehung_wert', 'Nächste Erhöhung (Höhe)', 'z. B. 3 oder 45', 'decimal') +
+              f('mv_rhythmus_jahre', 'Rhythmus (alle … Jahre)', 'z. B. 2', 'decimal') +
+              f('mv_stufen_offen', 'Noch offene Stufen', 'z. B. 3', 'decimal') +
+            '</div>' +
+            '<label class="mfh-we-haken"><input type="checkbox" data-wkb="mv_in_mietentwicklung"' +
+              (e.mv_in_mietentwicklung ? ' checked' : '') + '>' +
+              '<span>Diese Staffel in die <b>Mietentwicklung</b> des Objekts einrechnen</span></label>' +
+          '</div>') +
+        /* v2430 · SOLL-MIETE (MIETER BLEIBT) — Marcel 19.10.2026: „normale
+           Mieterhoehung", freiwillig. DealPilot rechnet vor (§ 558 bis zur
+           Vergleichsmiete, Kappungsgrenze, 15 Monate; § 559 bei Massnahmen im
+           bewohnten Zustand); eine eigene Angabe ueberschreibt. */
+        blk('soll', 'Soll-Miete (Mieter bleibt) <span class="mfh-we-kann">kann, nicht muss</span>',
+          '<div class="mfh-we-raster">' +
+            f('vgl_qm', 'Vergleichsmiete €/m² (Mietspiegel)', '', 'decimal') +
+            f('soll', 'Soll-Miete (€/Monat, eigene Angabe)', '', 'decimal') +
+            d('soll_ab', 'Erreichbar ab (eigene Angabe)', 'month') +
+          '</div><div class="mfh-we-ergebnis" id="mfh-we-soll"></div>') +
+        /* v2430 · ZIELBILD — nach Umbau oder Neuvermietung. Massnahmen als
+           Chips mit Kosten und Modernisierungspunkten (Anlage 2). */
+        blk('ziel', 'Zielbild · nach Umbau <span class="mfh-we-kann">kann, nicht muss</span>',
+          '<div id="mfh-we-mass"></div>' +
+          '<div class="mfh-we-raster">' +
+            f('ziel_qm', 'Zielmiete (€/m²)', 'z. B. 9,20', 'decimal') +
+            f('ziel_wann', 'Wann', 'z. B. bei Mieterwechsel') +
+          '</div><div class="mfh-we-ergebnis" id="mfh-we-ziel"></div>') +
+        blk('ew', 'Ertragswert dieser Wohnung',
+          '<div class="mfh-we-schalter" role="group" aria-label="Bewertungsart">'
+            + '<button type="button" data-ewart="etw">als Eigentumswohnung</button><button type="button" data-ewart="haus">Anteil am Haus</button></div>'
+            + '<div id="mfh-we-ew"></div>') +
         '<h4>Bilder</h4>' +
-        '<p class="mfh-we-hint">H\u00f6chstens ' + WOHNUNG_FOTOS_MAX + ' Bilder je Wohnung, automatisch verkleinert.</p>' +
+        '<p class="mfh-we-hint">Höchstens ' + WOHNUNG_FOTOS_MAX + ' Bilder je Wohnung, automatisch verkleinert.</p>' +
         '<div id="mfh-we-bilder" class="mfh-we-bilder"></div>' +
         '<input type="file" id="mfh-we-datei" accept="image/*" multiple style="display:none">' +
-        '<button type="button" class="btn btn-outline btn-sm" id="mfh-we-bild-neu">Bilder hinzuf\u00fcgen</button>' +
+        '<button type="button" class="btn btn-outline btn-sm" id="mfh-we-bild-neu">Bilder hinzufügen</button>' +
       '</div>' +
       '<div class="mfh-we-fuss"><button type="button" class="btn" id="mfh-we-ok">Fertig</button></div>' +
     '</div>';
     document.body.appendChild(ov);
-    ov.addEventListener("click", function (ev) { if (ev.target === ov) { wSchliessen(); zeichnen(); } });
-    el("mfh-we-zu").onclick = function () { wSchliessen(); zeichnen(); };
-    el("mfh-we-ok").onclick = function () { wSchliessen(); zeichnen(); };
+    function zu() { if (P) P.massnahmenSpiegeln(e); wSchliessen(); zeichnen(); }
+    ov.addEventListener("click", function (ev) { if (ev.target === ov) zu(); });
+    el("mfh-we-zu").onclick = zu;
+    el("mfh-we-ok").onclick = zu;
+    ov.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') zu(); });
+
+    /* ── Rechnungen der Blöcke (nichts davon ist ein Ertragswert) ── */
+    var _ewArt = _weg ? 'etw' : 'haus';
+    function opts() { return { einheiten: _arbeit, gebaeude: _geb, aufgeteilt: _weg, aufteilungskosten: _auftK }; }
+    function aktualisieren() {
+      var wfl = zahl(e.wfl), ist = e.status === 'leer' ? 0 : zahl(e.ist);
+      var u = el('mfh-we-unter');
+      if (u) u.textContent = (wfl ? Math.round(wfl) + ' m²' : '') + (zahl(e.zimmer) ? ' · ' + e.zimmer + ' Zimmer' : '') + ' · ' + (e.status === 'leer' ? 'leer' : 'vermietet')
+        + (ist && wfl ? ' · Ist ' + (ist / wfl).toFixed(2).replace('.', ',') + ' €/m²' : '');
+      if (!P) return;
+      var m = P.modell(opts());
+      var w = m.wohnungen.filter(function (x) { return x.i === i; })[0];
+      var hS = el('mfh-we-soll');
+      if (hS) {
+        var so = w ? w.soll : null;
+        if (!w || e.status === 'leer' || !(ist > 0)) hS.innerHTML = '<p class="mfh-we-hint">Leer stehend oder ohne Ist-Miete: keine Soll-Miete, die Wohnung geht direkt ins Zielbild.</p>';
+        else hS.innerHTML = (so && so.miete != null
+            ? '<div class="mfh-we-kv"><div><span>Soll-Miete</span><b class="c-soll">' + eur(so.miete) + '/Monat' + (wfl ? ' · ' + (so.miete / wfl).toFixed(2).replace('.', ',') + ' €/m²' : '') + '</b></div>'
+              + '<div><span>erreichbar ab</span><b>' + esc(so.ab_text || '—') + '</b></div>'
+              + '<div><span>Herkunft</span><b>' + esc(so.herkunft || '') + (so.grenze ? ' · ' + esc(so.grenze) : '') + '</b></div></div>'
+              + (so.umlage559 ? '<p class="mfh-we-hint">Darin Modernisierungsumlage § 559 BGB: ' + eur(so.umlage559.monat) + '/Monat (8 % von ' + eur(so.umlage559.kosten) + (so.umlage559.gedeckelt ? ', gedeckelt auf ' + so.umlage559.kappe_qm + ' €/m²' : '') + ').</p>' : '')
+              + (so.hinweise && so.hinweise.length ? '<p class="mfh-we-hint" style="color:#B8625C">Hinweis: ' + esc(so.hinweise.join(', ')) + '.</p>' : '')
+            : '<p class="mfh-we-hint">' + esc((so && so.grund) || 'Keine Soll-Miete.') + ' Eine Vergleichsmiete hier oder die Marktmiete im Tab Miete lässt DealPilot vorrechnen.</p>')
+          + '<p class="mfh-we-hint">' + esc(m.kappung.text) + (so && so.ab_herkunft ? ' Termin: ' + esc(so.ab_herkunft) + '.' : '') + '</p>';
+      }
+      var hZ = el('mfh-we-ziel');
+      if (hZ && w) {
+        var pkt = w.plus_ziel || 0;
+        hZ.innerHTML = '<div class="mfh-we-kv">'
+          + '<div><span>Zielmiete</span><b class="c-ziel">' + (w.ziel != null ? eur(w.ziel) + '/Monat' : '—') + '</b></div>'
+          + '<div><span>Kosten gesamt</span><b>' + eur(w.kosten) + '</b></div>'
+          + '<div><span>Modernisierungspunkte</span><b>' + (pkt ? '+' + pkt : '0') + ' (Anlage 2)</b></div></div>'
+          + '<p class="mfh-we-hint">Dach, Fassade, Heizung und Leitungen gehören dem Haus (Schritt 1). Die Zielmiete fließt nicht in die Mietentwicklung — nur in Pilot-Analyse und PDF.</p>';
+      }
+      ewZeichnen(m);
+    }
+    function ewZeichnen(m) {
+      var h = el('mfh-we-ew'); if (!h || !P) return;
+      ov.querySelectorAll('[data-ewart]').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-ewart') === _ewArt ? 'true' : 'false');
+        if (b.getAttribute('data-ewart') === 'etw') { b.disabled = !_weg; b.title = _weg ? '' : 'Nur mit dem Haken „aufgeteilt“ in Schritt 1'; }
+      });
+      if (!m.aktiv) { h.innerHTML = '<p class="mfh-we-hint">Erst eine Soll-Miete oder ein Zielbild eintragen — dann rechnet DealPilot den Ertragswert je Stufe.</p>'; return; }
+      var r = P.ergebnis(opts()), we = r ? P.wohnungErgebnis(r, m, i) : null;
+      var feld = _ewArt === 'etw' ? 'als_etw' : 'anteil_am_haus';
+      var werte = we && we[feld] ? we[feld] : null;
+      var z = r && r.aufteilung && r.aufteilung.zins && r.aufteilung.zins.bestand;
+      h.innerHTML = (werte
+          ? '<div class="mfh-we-ew3"><div><span>Bestand</span><b>' + eur(werte.bestand) + '</b></div>'
+            + '<div><span>Mieterhöhung</span><b class="c-soll">' + (werte.mieterhoehung != null ? eur(werte.mieterhoehung) : '—') + '</b></div>'
+            + '<div><span>Zielbild</span><b class="c-ziel">' + (werte.zielbild != null ? eur(werte.zielbild) : '—') + '</b></div></div>'
+            + '<p class="mfh-we-hint">' + (_ewArt === 'etw'
+                ? 'Zins ' + (z && z.pct != null ? String(z.pct).replace('.', ',') + ' % (Wohnungseigentum, Stufe ' + esc(z.stufe || '?') + ')' : '—') + ' · Bodenwertanteil nach ' + esc(we.anteil_herkunft || 'Fläche')
+                : 'Anteil am Ertragswert des Hauses nach dem Anteil am Rohertrag')
+              + ' · ' + esc(P.KENNZEICHNUNG) + '</p>'
+          : '<p class="mfh-we-hint">' + (P.ergebnisVeraltet() ? 'Die Angaben haben sich geändert. ' : '') + 'Der Ertragswert kommt aus demselben Rechenkern wie der Marktbericht Stufe 3 (kein Kontingent).</p>')
+        + '<button type="button" class="btn btn-outline btn-sm" id="mfh-we-ew-los">Ertragswerte rechnen</button>';
+      el('mfh-we-ew-los').onclick = function () {
+        var b = el('mfh-we-ew-los'); b.disabled = true; b.textContent = 'wird gerechnet …';
+        P.rechnen(Object.assign(opts(), { erzwingen: true })).then(function (res) {
+          if (res && !res.verfuegbar && typeof window.toast === 'function') window.toast('Ertragswert: ' + (res.grund || 'nicht verfügbar'));
+          ewZeichnen(P.modell(opts()));
+        });
+      };
+    }
+    ov.querySelectorAll('[data-ewart]').forEach(function (b) {
+      b.onclick = function () { if (b.disabled) return; _ewArt = b.getAttribute('data-ewart'); ewZeichnen(P.modell(opts())); };
+    });
+    if (P) P.massnahmenBinden(el('mfh-we-mass'), e.massnahmen, { e: e, geb: _geb, fuerEinheit: true, geaendert: function () { aktualisieren(); } });
     /* Jede Eingabe landet sofort im Einheiten-Objekt - es wird als
        Ganzes gespeichert, also braucht es keine Feldliste. */
     ov.querySelectorAll("[data-wk]").forEach(function (inp) {
       var k = inp.getAttribute("data-wk");
-      inp.addEventListener("input", function () { e[k] = inp.value; });
-      inp.addEventListener("change", function () { e[k] = inp.value; });
+      inp.addEventListener("input", function () { e[k] = inp.value; aktualisieren(); });
+      inp.addEventListener("change", function () { e[k] = inp.value; aktualisieren(); });
     });
     /* v2023 - Haken schreiben true/false, nicht .value ("on"). */
     ov.querySelectorAll("[data-wkb]").forEach(function (box) {
       var k = box.getAttribute("data-wkb");
       box.addEventListener("change", function () { e[k] = box.checked; });
     });
-    /* v2023 - der RND-Haken ist entfallen; dafuer schaltet die
-       Vertragsart die Erhoehungsfelder. */
     var vArt = ov.querySelector('[data-wk="mv_art"]');
     function erhoehungZeigen() {
       var box = el('mfh-we-erh-box'); if (!box) return;
       var a = vArt ? vArt.value : '';
-      var planbar = (a === 'staffel' || a === 'index');
-      box.style.display = planbar ? '' : 'none';
-      /* v2025 - nur bei Index, nicht bei Staffel: die Staffel STEHT im
-         Vertrag, da ist nichts anzunehmen. */
+      box.style.display = (a === 'staffel' || a === 'index') ? '' : 'none';
       var warn = el('mfh-we-index-warn');
       if (warn) warn.style.display = (a === 'index') ? '' : 'none';
     }
     if (vArt) vArt.addEventListener("change", erhoehungZeigen);
     erhoehungZeigen();
-    /* v2210 · Gewerbe-Block nur bei Art = Gewerbe */
     var gArt = ov.querySelector('[data-wk="art"]');
     function gewerbeZeigen() { var b = el('mfh-we-gew-box'); if (b) b.style.display = (gArt && gArt.value === 'gewerbe') ? '' : 'none'; }
     if (gArt) gArt.addEventListener("change", gewerbeZeigen);
     gewerbeZeigen();
+    /* Vorgaben sichtbar machen: was DealPilot ohne eigene Angabe ansetzt. */
+    if (P) {
+      var m0 = P.modell(opts());
+      var vglIn = ov.querySelector('[data-wk="vgl_qm"]');
+      if (vglIn && m0.vgl && m0.vgl.qm) vglIn.placeholder = String(m0.vgl.qm).replace('.', ',') + ' (' + m0.vgl.herkunft + ')';
+      if (P.kappungLaden) P.kappungLaden().then(function () { return P.agsHolen ? P.agsHolen() : null; }).then(aktualisieren);
+    }
+    aktualisieren();
     bilderZeichnen(e);
     el("mfh-we-bild-neu").onclick = function () { el("mfh-we-datei").click(); };
     el("mfh-we-datei").onchange = function (ev) { bilderAufnehmen(e, ev.target.files); };
@@ -626,16 +692,13 @@
   }
 
   function schritt2() {
-    return '<div style="font-size:12.5px;color:#6B6356;margin-bottom:10px">Ähnliche Wohnungen mit ⧉ duplizieren. Übernommen werden Fläche, Einheitenzahl und Ist-Kaltmiete der vermieteten Einheiten.</div>'
-      /* v1628 · KEIN min-width MEHR. Es war die Ursache des
-         Seitwaerts-Scrollens: 1080 px fest, egal wie breit das Modal
-         wirklich ist. Jetzt feste Aufteilung in Prozent - die Tabelle
-         kann gar nicht mehr breiter werden als ihr Platz. */
+    return '<div style="font-size:12.5px;color:#6B6356;margin-bottom:10px">Hier nur das Nötigste. <b>Details</b> öffnet die Wohnung: Mietvertrag, Soll-Miete (Mieter bleibt), Zielbild mit Maßnahmen und den Ertragswert. Ähnliche Wohnungen mit ⧉ duplizieren. Übernommen werden Fläche, Einheitenzahl und Ist-Kaltmiete der vermieteten Einheiten.</div>'
+      /* v1628 · KEIN min-width - feste Aufteilung in Prozent. v2430: sieben Spalten. */
       + '<table class="mfh-tab"><colgroup>'
-      + ['6%','12%','8%','6%','5%','9%','9%','8%','10%','11%','8%','8%'].map(function (w) {
+      + ['9%','22%','11%','8%','14%','14%','22%'].map(function (w) {
           return '<col style="width:' + w + '">'; }).join('')
       + '</colgroup><thead><tr style="text-align:left;color:#8A8272">'
-      + '<th>Nr.</th><th>Lage</th><th>Art</th><th>m²</th><th>Zi.</th><th title="Aktuelle Nettokaltmiete dieser Einheit, in Euro pro Monat">Ist-Miete<br><small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th title="Erzielbare Nettokaltmiete nach Modernisierung, in Euro pro Monat">Soll-Miete<br><small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th>Status</th><th>Qualität</th><th>Maßnahme</th><th>Kosten</th><th></th></tr></thead>'
+      + '<th>Nr.</th><th>Lage</th><th>m²</th><th>Zi.</th><th title="Aktuelle Nettokaltmiete dieser Einheit, in Euro pro Monat">Ist-Miete<br><small style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7">&euro;/Monat</small></th><th>Status</th><th></th></tr></thead>'
       + '<tbody id="mfh-zeilen">' + _arbeit.map(zeileHtml).join('') + '</tbody></table>'
       + '<div style="margin-top:8px"><button type="button" id="mfh-neu" class="btn btn-outline btn-sm">+ Einheit</button></div>';
   }
@@ -812,6 +875,32 @@
       '  border-radius:50%;border:1px solid #E6E0D3;background:#fff;color:#B8625C;cursor:pointer;',
       '  font-size:11px;line-height:1;padding:0}',
       '#mfh-we-ov .mfh-we-fuss{padding:12px 18px;border-top:1px solid rgba(42,39,39,.10);text-align:right}',
+      /* v2430 · Bloecke wie in der freigegebenen Vorlage: Mietvertrag, Soll (blau), Zielbild (gruen), Ertragswert (Gold) */
+      '#mfh-we-ov .mfh-we-kopf .mfh-we-unter{display:block;font-size:12px;color:#8A8272;font-weight:400;margin-top:2px}',
+      '#mfh-we-ov .mfh-we-blk{border:1px solid #EFE7D6;border-radius:12px;padding:12px 14px;margin:0 0 12px;display:grid;gap:10px}',
+      '#mfh-we-ov .mfh-we-blk-t{display:flex;align-items:center;gap:8px;font:600 11.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#6B6356}',
+      '#mfh-we-ov .mfh-we-blk-t::before{content:"";width:8px;height:8px;border-radius:2px;background:#8A8272;flex:0 0 auto}',
+      '#mfh-we-ov .mfh-we-blk.soll .mfh-we-blk-t{color:#3d6fa8}#mfh-we-ov .mfh-we-blk.soll .mfh-we-blk-t::before{background:#3d6fa8}',
+      '#mfh-we-ov .mfh-we-blk.ziel .mfh-we-blk-t{color:#2f7d55}#mfh-we-ov .mfh-we-blk.ziel .mfh-we-blk-t::before{background:#2f7d55}',
+      '#mfh-we-ov .mfh-we-blk.ew .mfh-we-blk-t{color:var(--wl-9a7f33, #9a7f33)}#mfh-we-ov .mfh-we-blk.ew .mfh-we-blk-t::before{background:var(--wl-c9a84c, #C9A84C)}',
+      '#mfh-we-ov .mfh-we-blk.soll{border-color:color-mix(in srgb,#3d6fa8 22%,#EFE7D6)}#mfh-we-ov .mfh-we-blk.ziel{border-color:color-mix(in srgb,#2f7d55 22%,#EFE7D6)}',
+      '#mfh-we-ov .mfh-we-kann{font:500 10.5px "JetBrains Mono",monospace;letter-spacing:0;text-transform:none;color:#2f7d55;border:1px solid #2f7d55;border-radius:999px;padding:1px 7px}',
+      '#mfh-we-ov .mfh-we-kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 14px}',
+      '#mfh-we-ov .mfh-we-kv div{display:grid;gap:1px}#mfh-we-ov .mfh-we-kv span,#mfh-we-ov .mfh-we-ew3 span{font-size:11.5px;color:#8A8272}',
+      '#mfh-we-ov .mfh-we-kv b{font:500 14px Inter,sans-serif;font-variant-numeric:tabular-nums}',
+      '#mfh-we-ov .c-soll{color:#3d6fa8}#mfh-we-ov .c-ziel{color:#2f7d55}',
+      '#mfh-we-ov .mfh-we-ew3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 8px}',
+      '#mfh-we-ov .mfh-we-ew3 div{border:1px solid #EFE7D6;border-radius:8px;padding:8px 10px;display:grid;gap:1px}',
+      '#mfh-we-ov .mfh-we-ew3 b{font:600 15px "Space Grotesk",sans-serif;font-variant-numeric:tabular-nums}',
+      '@media(max-width:480px){#mfh-we-ov .mfh-we-ew3{grid-template-columns:minmax(0,1fr)}}',
+      '#mfh-we-ov .mfh-we-schalter{display:inline-flex;border:1px solid #E6E0D3;border-radius:999px;overflow:hidden;width:fit-content}',
+      '#mfh-we-ov .mfh-we-schalter button{font:500 12px "JetBrains Mono",monospace;background:#fff;color:#6B6356;border:0;padding:6px 12px;cursor:pointer}',
+      '#mfh-we-ov .mfh-we-schalter button[aria-pressed="true"]{background:var(--wl-c9a84c, #C9A84C);color:#050505}',
+      '#mfh-we-ov .mfh-we-schalter button:disabled{opacity:.45;cursor:not-allowed}',
+      '#mfh-we-ov .mfh-we-ergebnis .mfh-we-hint:last-child{margin-bottom:0}',
+      '#mfh-modal .mfh-det{border:1px solid var(--wl-c9a84c, #C9A84C);background:#fff;border-radius:6px;padding:5px 8px;cursor:pointer;color:var(--wl-9a7f33, #9a7f33);font:500 12px Inter,sans-serif}',
+      '#mfh-modal .mfh-det.mit-plan{background:color-mix(in srgb,#2f7d55 8%,#fff);border-color:#2f7d55;color:#2f7d55}',
+      '#mfh-modal .mfh-tag{font:500 10px "JetBrains Mono",monospace;color:#8A8272;margin-top:2px}',
       '@media(max-width:560px){#mfh-we-ov .mfh-we-raster{grid-template-columns:minmax(0,1fr)}}',
       '#mfh-modal .mfh-karte{background:#fff;border-radius:14px;max-width:1180px;width:100%;',
       '  max-height:92vh;display:flex;flex-direction:column;position:relative;',
@@ -885,6 +974,7 @@
     _arbeit = JSON.parse(JSON.stringify(d.einheiten || []));
     _geb = JSON.parse(JSON.stringify(d.gebaeude || {}));
     _weg = !!d.aufgeteilt;
+    _auftK = (d.aufteilungskosten != null && String(d.aufteilungskosten).trim() !== '') ? d.aufteilungskosten : null;   /* v2430 */
     _schritt = schritt || 0;
     if (!_arbeit.length) _arbeit.push({ nr: '1', art: 'wohnen', status: 'vermietet' });
     var m = document.createElement('div'); m.id = 'mfh-modal';
@@ -916,7 +1006,7 @@
       '<button type="button" id="mfh-ok" class="btn btn-outline btn-sm">Speichern</button>' +
       '<button type="button" id="mfh-weiter" class="btn btn-sm mfh-haupt">Weiter ›</button></div></div>';
     document.body.appendChild(m);
-    m.addEventListener('input', function (ev) { var t = ev.target; if (t.dataset && t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme(); punkteZeigen(); } });
+    m.addEventListener('input', function (ev) { var t = ev.target; if (t.id === 'mfh-auftk') { _auftK = String(t.value || '').trim() === '' ? null : t.value; return; } if (t.dataset && t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme(); punkteZeigen(); } });
     m.addEventListener('change', function (ev) {
       var t = ev.target; if (t.tagName !== 'SELECT') return;
       if (t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme();
@@ -970,12 +1060,13 @@
   function setzen(id, wert) { var e = el(id); if (!e) return; e.value = String(Math.round(wert * 100) / 100).replace('.', ','); try { e.dispatchEvent(new Event('input', { bubbles: true })); } catch (x) {} }
 
   function uebernehmen() {
+    if (window.DpPotenzial) _arbeit.forEach(function (e) { if (Array.isArray(e.massnahmen) || e.massnahme || e.kosten) window.DpPotenzial.massnahmenSpiegeln(e); });   /* v2430 */
     var list = _arbeit.filter(function (e) { return zahl(e.wfl) > 0 || zahl(e.ist) > 0 || String(e.lage || '').trim(); });
     var d = ergebnisDaten();
     var jahrFeld = el('mfh-soll-jahr');
     var sollAb = jahrFeld ? Math.round(zahl(jahrFeld.value)) : Math.round(zahl(daten().sollAbJahr));
     var wegFeld = el('mfh-weg');
-    window._dpMfh = { einheiten: list, gebaeude: _geb, gnd: gnd(), aufgeteilt: wegFeld ? wegFeld.checked : _weg, sollAbJahr: sollAb > 0 ? sollAb : null, stand: new Date().toISOString().slice(0, 10) };
+    window._dpMfh = { einheiten: list, gebaeude: _geb, gnd: gnd(), aufgeteilt: wegFeld ? wegFeld.checked : _weg, sollAbJahr: sollAb > 0 ? sollAb : null, aufteilungskosten: _auftK, stand: new Date().toISOString().slice(0, 10) };   /* v2430: aufteilungskosten */
     var s = summe(list), meldung = list.length + ' Einheiten übernommen';
     if (list.length) {
       if (s.flaeche > 0) setzen('wfl', s.flaeche);
@@ -1067,6 +1158,7 @@
       ME.setMode('einheiten');   /* ruft calc() selbst */
     } else if (typeof window.calc === 'function') window.calc();
     schliessen(); knopf();
+    try { if (window.DpPotenzial) window.DpPotenzial.objektKarte(); } catch (x) {}   /* v2430 */
     if (typeof window.toast === 'function') window.toast('✓ ' + meldung);
   }
 
@@ -1129,7 +1221,9 @@
     if (art == null) art = (el('objart') && el('objart').value) || '';
     return !!ARTEN_MIT_EINHEITEN[art];
   }
-  window.DpMfhEinheiten = { oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
+  window.DpMfhEinheiten = { /* v2430: Punkte-Helfer fuer potenzial.js - keine zweite Tabelle */
+    punkteVon: punkteVon, maxPunkte: maxPunkte, labelVon: labelVon, punkteObjekt: punkteObjekt, WE_IDS: WE_IDS, GEB_IDS: GEB_IDS,
+    oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
     /* v2087: die elf Vertragsformen mitexportiert. Der Reiter Miete
        braucht dieselbe Liste fuer die Objektebene (Backlog N60.8-alt) -
        eine zweite Liste dort waere der Anfang der Abweichung. */
