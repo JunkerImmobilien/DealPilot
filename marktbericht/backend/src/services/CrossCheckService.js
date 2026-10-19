@@ -147,11 +147,18 @@ export const CrossCheckService = {
         }[_rf.fehlt || _rf.grund] || 'eine Angabe';
         const _auswahl = (Array.isArray(_rf.auswahl) && _rf.auswahl.length)
           ? ' Der Ausschuss führt: ' + _rf.auswahl.slice(0, 12).join(', ') + '.' : '';
-        out.notes.push('Für diesen Ort liegt ein amtlicher Liegenschaftszinssatz '
+        /* v2381 · Der Rueckfall heisst so und traegt seine Herkunft - nie „Stufe A" ohne Zusatz. */
+        const _rfArt = (params && params.lzs_stufe === 'D')
+          ? 'dem gesetzlichen Auffangwert nach § 256 BewG (Stufe D, kein Wert des Gutachterausschusses)'
+          : 'einem Rückfallwert' + ((params && params.lzs_quelle) ? ' (' + String(params.lzs_quelle).split(',')[0] + ')' : '')
+            + ' — nicht dem objektgenau zugeordneten amtlichen Satz';
+        out.notes.push(_rf.grund === 'ausserhalb_geltung'
+          ? ('Kein amtlicher Liegenschaftszinssatz für dieses Objekt: ' + _rf.hinweis
+            + ' Gerechnet wurde deshalb mit ' + _rfArt + '.')
+          : ('Für diesen Ort liegt ein amtlicher Liegenschaftszinssatz '
           + 'des Gutachterausschusses vor, konnte aber nicht zugeordnet werden: '
           + _was + ' fehlt.' + _auswahl + ' ' + _rf.hinweis
-          + ' Gerechnet wurde deshalb mit dem Rückfallwert '
-          + ((params && params.lzs_stufe) ? '(Stufe ' + params.lzs_stufe + ')' : '') + '.');
+          + ' Gerechnet wurde deshalb mit ' + _rfArt + '.'));
         out.liegenschaftszins_rueckfrage = _rf;
       }
     } catch (e) { /* ein Hinweis darf den Bericht nie kippen */ }
@@ -1167,6 +1174,10 @@ export const CrossCheckService = {
           reinertrag_pa_eur: hol('= Reinertrag'),
           liegenschaftszins_pct: kern.lzs ? kern.lzs.pct : lzsPct,
           liegenschaftszins_stufe: kern.lzs ? kern.lzs.stufe : null,
+          /* v2381 · Rueckfall: der Ausschuss fuehrt einen Satz, er liess sich aber nicht
+             objektgenau zuordnen oder gilt hier nicht - das ist nie „amtlich". */
+          liegenschaftszins_rueckfall: !!(p.lzs_rueckfrage && !p.lzs_aus_register),
+          liegenschaftszins_ausserhalb_geltung: !!(p.lzs_rueckfrage && p.lzs_rueckfrage.grund === 'ausserhalb_geltung'),
           /* v1050-WSTR-2 · Ohne diese vier Zeilen bleibt die Spanne im PDF
            * leer — die Kaskade kennt sie, die Karte sah sie nie. */
           streuung_pct: _num(p.lzs_streuung_pct),

@@ -41,8 +41,28 @@ export function parameterObjektart(objektart, anzahlWe = null) {
   if (/dhh|doppelhaus/.test(k)) return 'dhh';
   if (/^rh$|reihen/.test(k)) return 'rh';
   if (/mfh|mehrfamilien/.test(k)) return Number(anzahlWe) > 6 ? 'mfh_ueber6' : 'mfh_bis6';
-  if (/haus|villa/.test(k)) return 'efh';
+  /* v2381 · „haus" ohne Hausart ist KEIN Einfamilienhaus: Hiddenhausen (ZFH)
+     bekam hier still den EFH-Satz 1,7 % statt des ZFH-Satzes. Ohne Hausart
+     trifft nur ein Satz fuer alle Objektarten. */
+  if (/villa/.test(k)) return 'efh';
+  if (/haus/.test(k)) return 'haus';
   return 'mfh_bis6';
+}
+
+/* v2381 · Ausschuesse, die Wohnungseigentum in Objekten mit hoechstens zwei
+   Wohneinheiten ausdruecklich aus ihrer Eigentumswohnungs-Auswertung nehmen.
+   Nur mit belegtem Wortlaut; die Stadt Minden (05770024) hat einen eigenen
+   Ausschuss und steht deshalb NICHT darunter. */
+const ETW_KLEINOBJEKT_AUSGENOMMEN = {
+  '05770': 'Der Gutachterausschuss für Grundstückswerte im Kreis Minden-Lübbecke wertet nur '
+    + 'die typischen am Markt gehandelten Eigentumswohnungen aus, „also Wohnungen in Objekten mit '
+    + 'mehr als zwei Wohneinheiten" (Grundstücksmarktbericht 2025); Wohnungseigentum in '
+    + 'Zweifamilienhäusern ist ausgenommen.',
+};
+export function etwKleinobjektAusgenommen(ags) {
+  const a = String(ags || '').replace(/\D/g, '');
+  if (a.startsWith('05770024')) return null;
+  return ETW_KLEINOBJEKT_AUSGENOMMEN[a.slice(0, 5)] || null;
 }
 
 /** AGS-Kette vom Kreis aufwaerts: 05770 -> 057 (Bezirk) -> 05 (Land) -> 00000 (Bund). */
@@ -277,6 +297,31 @@ export const WertParameterService = {
      *   > Eine Lücke, die sagt was ihr fehlt, ist keine Lücke mehr,
      *   > sondern der nächste Schritt. */
     let _rueckfrage = null;
+    /* ══ v2381 · GELTUNGSBEREICH VOR ZWEIG (§ 10 ImmoWertV) ══════════════
+       Hueellhorst (ETW in einem Objekt mit hoechstens zwei Wohneinheiten)
+       bekam den Zweig `we_v` des Kreises Minden-Luebbecke - derselbe
+       Ausschuss nimmt solche Wohnungen aber aus seiner Eigentumswohnungs-
+       Auswertung heraus. Dann gilt der Satz nicht: kein amtlicher Wert,
+       kein Nachbarzweig (auch nicht `zfh`), sondern der Weg zur Quelle.
+       Gerechnet wird mit dem gesetzlichen Auffangwert (Stufe D), als solcher
+       gekennzeichnet. */
+    if (typ === 'lzs' && ags && art === 'etw') {
+      const _we = Number((objekt && objekt.einheiten) != null ? objekt.einheiten : anzahlWe);
+      const _aus = etwKleinobjektAusgenommen(ags);
+      if (_aus && Number.isFinite(_we) && _we > 0 && _we <= 2) {
+        const fb = lzsNach256(objektart, brwSqm, anzahlWe);
+        return {
+          wert: fb.pct, min: null, max: null, stufe: 'D',
+          quelle: '§ 256 BewG', quelle_url: null, parameter_id: null,
+          modellversion: MODELL.IMMOWERTV_2021, fallzahl: null, ebene: 'bund',
+          hinweis: fb.hinweis, ausserhalb_geltung: true,
+          rueckfrage: { grund: 'ausserhalb_geltung', fehlt: null, auswahl: [], zweig: null,
+            hinweis: _aus + ' Der Liegenschaftszinssatz für Wohnungseigentum gilt für dieses '
+              + 'Objekt deshalb nicht (§ 10 ImmoWertV); ein anderer Zweig wird nicht übertragen. '
+              + 'Einen amtlichen Wert für diesen Fall kann nur der Ausschuss selbst nennen.' },
+        };
+      }
+    }
     if (typ === 'lzs' && ags) {
       try {
         const reg = zinssatzFuerObjekt(

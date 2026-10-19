@@ -852,7 +852,8 @@ export const ReportOrchestrator = {
 
     try {
       const _lzs = await WertParameterService.liegenschaftszins({
-        ags: _agsWert || null, objektart: ref.property_type, anzahlWe: ref.units,
+        /* v2381 · die genaue Hausart (zfh, dhh, rh, efh) - mit „haus" griff kein Zweig */
+        ags: _agsWert || null, objektart: ref.property_subtype || ref.property_type, anzahlWe: ref.units,
         brwSqm: landValue && landValue.available ? landValue.value_sqm : null,
         nutzerwert: ref.lzs_pct || null,
         objekt: {
@@ -860,7 +861,7 @@ export const ReportOrchestrator = {
              staffeln (buero, handel, hotel, gewerbe). Mit dem blossen
              `gewerbe` griff nur der allgemeine Gewerbezweig, und `gesch`
              las die Zweigwahl als Wohn- und Geschaeftshaus bis zum MFH. */
-          objart: (ref.gewerbe_art && zinsObjektart(ref.gewerbe_art)) || ref.property_type,
+          objart: (ref.gewerbe_art && zinsObjektart(ref.gewerbe_art)) || ref.property_subtype || ref.property_type,   /* v2381 */
           /* v1816 · Marcels Entscheidung: eine Eigentumswohnung ist
              standardmäßig VERMIETET — „Ist ja ein Kapitalrechner." Nur
              wenn der Nutzer ausdrücklich Eigennutzung angibt, gilt der
@@ -883,9 +884,11 @@ export const ReportOrchestrator = {
       try {
         const _b = await WertParameterService.hole({
           typ: 'bwk_pct', ags: _agsWert || null,
-          objektart: ref.property_type, anzahlWe: ref.units,
+          objektart: ref.property_subtype || ref.property_type, anzahlWe: ref.units,   /* v2381 */
         });
-        if (_b && _b.wert > 0) _bwkPct = _b;
+        /* v2381 · Gilt der Zinssatz des Ausschusses fuer dieses Objekt nicht, gilt auch seine
+           BWK-Quote nicht - sie stammt aus denselben Kauffaellen. Dann Anlage 3. */
+        if (_b && _b.wert > 0 && !(_lzs && _lzs.ausserhalb_geltung)) _bwkPct = _b;
       } catch (e) { /* ohne Quote bleibt es beim Modellansatz */ }
       step('bwk-quote: ' + (_bwkPct ? _bwkPct.wert + ' % (Stufe ' + _bwkPct.stufe + ')' : 'keine'));
 
@@ -1561,6 +1564,11 @@ export const ReportOrchestrator = {
                   D: ['indikativ, gesetzlicher Auffangwert', 'nach § 256 BewG, nicht marktabgeleitet', true],
                   E: ['eigene Angabe', 'vom Nutzer gesetzt', true] }[st]
                 || ['indikativ', 'Herkunft nicht bestimmbar', true];
+        /* v2381 · Ein Rueckfallwert ist nie „amtlich" - auch wenn er aus der
+           Tabelle des Ausschusses stammt, ist er nicht der objektgenaue Satz. */
+        if (_wertParams && _wertParams.lzs_rueckfrage && !_wertParams.lzs_aus_register && (st === 'A' || st === 'B')) {
+          e = ['indikativ, Rückfallwert', 'Satz des Gutachterausschusses, aber nicht objektgenau zugeordnet', true];
+        }
         /* v1099b-WQL · Der Weg zur Quelle geht auch an den BILDSCHIRM.
          * Im PDF steht er seit v1099; die Web-Ansicht las `wertermittlung_
          * herkunft` und hatte das Feld nicht. Ein Link, den nur das PDF

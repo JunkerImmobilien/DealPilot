@@ -4532,6 +4532,10 @@ async function exportPdf(out) {
      * Stufenbuchstabe stand hier noch nie — _stufeTxt uebersetzt ihn seit
      * jeher in Klartext. */
     let _q = (_stufeTxt[_ew.liegenschaftszins_stufe] || _ew.liegenschaftszins_quelle || '–');
+    /* v2381 · Ein Rueckfallwert steht nie als „amtlich" da. */
+    if (_ew.liegenschaftszins_rueckfall && _ew.liegenschaftszins_stufe !== 'D') {
+      _q = 'Rückfallwert, nicht objektgenau zugeordnet';
+    }
     if (_ew.liegenschaftszins_quelle && _stufeTxt[_ew.liegenschaftszins_stufe]) {
       _q += ' · ' + String(_ew.liegenschaftszins_quelle).split(',')[0];
     }
