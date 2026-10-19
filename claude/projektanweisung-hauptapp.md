@@ -38859,6 +38859,44 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Video:** `Dateien/Messe/Videos/Videoreihe/Modul 25 - Gefuehrte Eingabe/DealPilot Modul 25 - Gefuehrte Eingabe.mp4` (8:53, 18,5 MB); vertont (onyx, Pirate-Vibe, Hochdeutsch, 38 Abschnitte, −16,3 LUFS) unter `Videoreihe-Sprecher/…` (25,1 MB) mit `texte.json` und STAND.md. Beide als MP4 auf Staging (md5 geprüft). Prod nicht angefasst.
 - **Rest:** In der App aufgefallen, nicht geändert: die Liste „Was schon steht“ beschriftet beim MFH die Bewirtschaftungskosten als „Hausgeld“; die Übersicht nennt getippte Antworten „Sprachaufzeichnung“; der Bodenrichtwert im Chat steht ohne Tausenderpunkt („1150 €/m²“); Zwischenstand-Wörter in Versalien („SCHWACH“, „GUT“) neben „Solide“/„Gut“ im Reiter. Der alte Rohschnitt `roh-modul-25.mp4` (Herford) liegt noch im Ordner.
 
+### v2396–v2396g · Register und Datenbank: Datei-Sperre gewinnt, Waisen weg, Zweigwahl ohne Zufall (19.10.2026, Staging)
+
+**Was:** Befunde der Prüfung zu `6dde1282`.
+- **v2396 Mischweg** (`ausschuss_register.js` `ladeAusDb`): eine DB-Zeile gilt nur, wenn die Datei unter dem VOLLEN Schlüssel (mit URL) einen Wert führt. Dann trägt sie den Satz der Datei plus `formel`/`korrekturen`/`modellansaetze` der Zeile. So bleiben `streuung`, `verwendung`, `auflagen`, `objektart`, `baujahr_von/bis`, `vollstaendig`, `unvollstaendig_grund` und `stufe_grund` erhalten, ohne Migration. Steht im Mischschlüssel eine Sperre, gewinnt die Sperre. Eine fremde URL ist eine Waise, die Datei gewinnt. Beides wird protokolliert. `DB_KENNZAHLEN` ist exportiert.
+- **v2396a `register-saat`:** Sperren werden nicht mehr eingespielt. Verwaiste Zeilen werden immer gemeldet (ueber_sperre / url_wechsel / ohne_datei). `--aufraeumen` löscht und schreibt, `--nur-aufraeumen` löscht nur.
+- **v2396b:** 135 Sperren (99 LZS, 35 SWF, 1 BPI, 11 Dateien) führen ihre Formel jetzt als `formel_vorgemerkt`. `saat-pruefen` wird rot bei Sperre mit `formel`.
+- **v2396c Zweigwahl:** Reihenend-, Reihenmittel- und Reihenhaus ohne Angabe werden getrennt. Bei Gleichstand kommt eine Rückfrage `haustyp`/`bauweise` statt der Ladereihenfolge. Der Mapper liest `haustyp` aus `nhk_haus` (2 = Reihenendhaus, 3 = Mittelhaus). `ref.haustyp` wurde seit v1816 gelesen, aber nie gesetzt.
+- **v2396d:** Eine Zeile aus `mb.wert_parameter` (NW, Jahrgang 2024) und der Nachbarwert gelten nur, wenn das Register für die AGS keinen neueren Jahrgang führt, auch keine Sperre. Gilt die Zeile, steht „Jahrgang 2024“ dabei.
+- **v2396e:** Der § 256-Hinweis ist richtiggestellt: der Satz liegt im Median 0,7–0,9 PP ÜBER dem örtlichen Satz, der Ertragswert fällt also eher zu niedrig aus.
+- **v2396f:** neues Werkzeug `tools/register-db-abgleich.mjs`, nur SELECT, mit sechs Regeln und Deckung. Es steht im `deploy-staging.ps1` und blockiert nicht, meldet aber laut.
+- **v2396g (Zusatzbefund):** Der Register-Sachwertfaktor bekam `property_type` = „haus“. Damit erhielt jedes App-Haus außerhalb eines Ausschussmoduls `objektart_nicht_abgeleitet`. Jetzt wird zuerst `property_subtype` gelesen.
+
+**Commit:** `af731057` `79b631d3` `cb0fa901` `b226c22c` `f929f7cd` `32192b6f` `f542218f` `e83149bc`, Rebuild `mb-backend` auf Staging.
+
+**Nachweis:**
+- Abgleich Staging vorher: ROT, 138 DB-Werte über Sperren (99 LZS, 35 SWF, 1 BPI, 3 UK).
+- Sicherung `mb-20261019-0956-vor-v2396-aufraeumen.sql.gz` (33 MB, Kopf geprüft).
+- `--nur-aufraeumen`: 4.234 → 4.096 Zeilen. Abgleich nachher sauber, 4.088 von 4.088 Zeilen abgeglichen (100 %).
+- Wegwerf-Container alt gegen neu:
+  - München SWF ezfh/rmh: 1,15/1,20 → `datensatz_unvollstaendig`.
+  - 1.393 Datei-Sperren: vorher 133 als Wert, nachher alle `datensatz_unvollstaendig`.
+  - Essen mit künstlicher Alt-URL: `objektart_nicht_abgeleitet` → 1,33/1,47.
+  - Raster Zweigwahl (126.825 Fälle): Reihenfolge entschied 72 → 0, nur Dresden geändert.
+- Berichte 298–305 im neuen Image:
+  - W, L, H unverändert (W EW 725.000 / LZS 2,5 A / SW 526.864 vorläufig; L SWF 0,936; H EW 410.000 / LZS 2,4 A).
+  - München EZFH: SWF gesperrt (mit altem Mischweg 0,87 aus der DB-Zeile).
+  - Essen EFH: SWF 1,33 A.
+  - Dresden RH: Rückfrage Hausart; mit Hausform 3 1,25 %, mit Hausform 2 1,31 %.
+- Prüfer `saat-pruefen --basislinie`, `uk-flaeche`, `uk-wgfz`, `rnd-kerne`, `objekt-mapper`: alle RC 0.
+- Prod nur gelesen: 135 über Sperre + 2 Essen-Waisen (ids 3027, 3028) = 137 Zeilen, danach 4.096.
+
+**Rest:**
+- **Prod wartet auf Freigabe:** Merge, Rebuild, `pg_dump` beider DBs, dann `register-saat.mjs --trocken --aufraeumen` (soll 137 zeigen), dann `--nur-aufraeumen`, dann den Abgleich.
+- v2396g ändert den Sachwert vieler App-Häuser (amtlicher Faktor statt vorläufig) — **Marcel abnehmen lassen**.
+- Dresden-RH ohne Hausform fällt jetzt auf § 256 (Rückfrage). Ob das Formular die Hausform beim RH sichtbar abfragt, ist eine Produktfrage.
+- 107 Werte (WGFZ, Rohertragsfaktor) stehen noch nicht in `mb.param_modell`. `ladeAusDb` liest sie nicht, sie wirken aus der Datei.
+- `tools/kettenpruefung-v1095.mjs` ist seit Langem kaputt (Pfad `/app/lib`), nicht angefasst.
+
 ### v2368–v2394 · Geführte Eingabe, Marktbericht-Prüfung, Herkunftsstufen, Videothek mit Sprecher (19.10.2026) + Prod-Rollout (52), (52a)
 
 **Was:**
