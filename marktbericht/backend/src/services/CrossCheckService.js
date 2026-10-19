@@ -144,6 +144,9 @@ export const CrossCheckService = {
           lage: 'die Lage', stadtteil: 'der Stadtteil',
           restnutzungsdauer: 'die Restnutzungsdauer', baujahr: 'das Baujahr',
           objektart: 'die Objektart',
+          /* v2396 · Rueckfragen statt Zufall bei gleich passenden Zweigen (Dresden) */
+          haustyp: 'die Hausart (Reihenend- oder Reihenmittelhaus)',
+          bauweise: 'die Bauweise (offen oder geschlossen)',
         }[_rf.fehlt || _rf.grund] || 'eine Angabe';
         const _auswahl = (Array.isArray(_rf.auswahl) && _rf.auswahl.length)
           ? ' Der Ausschuss führt: ' + _rf.auswahl.slice(0, 12).join(', ') + '.' : '';
@@ -437,7 +440,13 @@ export const CrossCheckService = {
           ags: (p && p.ags) || ref.ags || null,
           sachwert_eur: _sw.vorlaeufiger_sachwert_eur,
           rnd_jahre: _sw.restnutzungsdauer_jahre,
-          objektart: ref.property_type,
+          /* v2396 · DIE HAUSART, NICHT „haus". mapPropertyType fasst EFH, ZFH,
+             DHH und RH zu „haus" zusammen, und dafuer fuehrt ZWEIG_VORZUG
+             keinen Eintrag: jedes App-Haus ausserhalb eines Ausschussmoduls
+             bekam objektart_nicht_abgeleitet — gemessen am 19.10.2026 an Essen
+             (Register 1,33), Muenchen und Dresden. Der Subtyp steht seit
+             v2359 im reportInput und wurde nur fuer die Umrechnung gelesen. */
+          objektart: ref.property_subtype || ref.property_type,
           /* v1073-WGAA-2 · Herford braucht zwei weitere Groessen: die
            * Lagequalitaet ueber den Bodenrichtwert und die
            * Bruttogrundflaeche. Minden-Luebbecke ignoriert beide — der

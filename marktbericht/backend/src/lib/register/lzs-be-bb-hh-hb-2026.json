@@ -2667,7 +2667,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -2740,7 +2740,7 @@
   "zweig": "etw",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -2813,7 +2813,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -2886,7 +2886,7 @@
   "zweig": "rhdhh",
   "objektart": "rhdhh",
   "objektart_bez": "Reihenhäuser und Doppelhaushälften",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -4194,7 +4194,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -4267,7 +4267,7 @@
   "zweig": "rhdhh",
   "objektart": "rhdhh",
   "objektart_bez": "Reihenhäuser und Doppelhaushälften",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -4340,7 +4340,7 @@
   "zweig": "wgh",
   "objektart": "wgh",
   "objektart_bez": "Wohn- und Geschäftshäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6212,7 +6212,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser (< 20 % Gewerbemietanteil)",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -6285,7 +6285,7 @@
   "zweig": "wgh",
   "objektart": "wgh",
   "objektart_bez": "Wohn- und Geschäftshäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8382,7 +8382,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8455,7 +8455,7 @@
   "zweig": "etw",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8528,7 +8528,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8601,7 +8601,7 @@
   "zweig": "rhdhh",
   "objektart": "rhdhh",
   "objektart_bez": "Reihenhäuser und Doppelhaushälften",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8674,7 +8674,7 @@
   "zweig": "etw",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8730,7 +8730,7 @@
   "zweig": "ezfh",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8786,7 +8786,7 @@
   "zweig": "rhdhh",
   "objektart": "rhdhh",
   "objektart_bez": "Reihenhäuser und Doppelhaushälften",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8842,7 +8842,7 @@
   "zweig": "etw",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8898,7 +8898,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Wohngebäude (Mehrfamilienhäuser)",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -8954,7 +8954,7 @@
   "zweig": "wgh",
   "objektart": "wgh",
   "objektart_bez": "Büro- und Geschäftshäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -9010,7 +9010,7 @@
   "zweig": "etw",
   "objektart": "etw",
   "objektart_bez": "Wohnungseigentum",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,
@@ -9066,7 +9066,7 @@
   "zweig": "mfh",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "konstante",
    "liefert": "prozent",
    "wert": null,

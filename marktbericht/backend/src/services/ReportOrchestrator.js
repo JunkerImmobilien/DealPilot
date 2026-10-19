@@ -109,6 +109,10 @@ export const ReportOrchestrator = {
       /* v2359 · genaue Hausart (Mapper) oder der App-Code selbst (EFH/ZFH/DHH/RH) */
       property_subtype: input.property_subtype
         || (/^(efh|zfh|dhh|rh)$/i.test(String(input.property_type || '')) ? String(input.property_type).toLowerCase() : null),
+      /* v2396 · Reihenend-/Reihenmittelhaus (Mapper aus nhk_haus). Gelesen
+         wurde `ref.haustyp` seit v1816 in der Zweigwahl — gesetzt hat es
+         hier niemand, die Angabe kam also nie an. */
+      haustyp: input.haustyp || null,
       gewerbe_art: gewerbeArt(input.gewerbe_art) || _oa.gewerbe_art || null,
       usage_type: input.usage_type || null,
       living_area: input.living_area ? Number(input.living_area) : null,

@@ -66,6 +66,12 @@ const ART_RANG = {
   efh:        ['efh', 'ezfh'],
   dhh:        ['efh_dhh_reh', 'rhdhh', 'efh', 'ezfh'],
   reh:        ['efh_dhh_reh', 'efh_rmh', 'rhdhh', 'efh', 'ezfh'],
+  /* v2396 · Reihenmittelhaus und Reihenhaus ohne Angabe, ob End- oder
+     Mittelhaus. Bis v2395 hiess jedes Reihenhaus `reh` — Dresden fuehrt
+     beide getrennt (0,86 % End-/Doppelhaus, 0,64 % Mittelhaus), und welcher
+     griff, entschied die Ladereihenfolge. */
+  rmh:        ['efh_dhh_reh', 'efh_rmh', 'rhdhh', 'efh', 'ezfh'],
+  rh:         ['efh_dhh_reh', 'efh_rmh', 'rhdhh', 'efh', 'ezfh'],
   villa:      ['efh_villa', 'altbauvilla', 'efh'],
   zfh:        ['zfh', 'ezfh', 'efh'],
   dreifh:     ['dreifh', 'mfh'],
@@ -88,8 +94,27 @@ const ART_RANG = {
 /* Die VARIANTE, die zur Art gehört — sie darf nie quer gelesen werden.
  * Ein `efh_frei` ist kein Reihenhaus, auch wenn beide mit `efh` anfangen. */
 const VARIANTE_ZU_TYP = {
-  frei: ['efh', 'zfh'], dhh_reh: ['dhh', 'reh'], rmh: ['reh'],
+  frei: ['efh', 'zfh'], dhh_reh: ['dhh', 'reh', 'rh'], rmh: ['reh', 'rmh', 'rh'],
   villa: ['villa'], offen: ['mfh'], geschl: ['mfh'],
+};
+
+/* v2396 · Fuer welchen Typ ist eine Variante die GENAUE? `rmh` laesst
+   VARIANTE_ZU_TYP auch fuer das Reihenendhaus zu (fuehrt ein Ausschuss nur
+   den Mittelhaus-Satz, bleibt das wie bisher) — fuehrt er beide, gewinnt
+   die genaue. Ein Reihenhaus ohne Angabe (`rh`) ist fuer keine genau: dann
+   entscheidet nicht die Reihenfolge, sondern eine Rueckfrage. */
+const VARIANTE_GENAU = {
+  frei: ['efh', 'zfh'], dhh_reh: ['dhh', 'reh'], rmh: ['rmh'], villa: ['villa'],
+};
+
+/* v2396 · Was fehlt, wenn zwei gleich genaue Zweige sich nur in der
+   Variante unterscheiden — dieselbe Form wie die Rueckfragen nach Lage,
+   Stadtteil und Baujahr. */
+const VARIANTE_FRAGE = {
+  dhh_reh: { fehlt: 'haustyp', wort: 'Reihenendhaus / Doppelhaushälfte' },
+  rmh:     { fehlt: 'haustyp', wort: 'Reihenmittelhaus' },
+  offen:   { fehlt: 'bauweise', wort: 'offene Bauweise' },
+  geschl:  { fehlt: 'bauweise', wort: 'geschlossene Bauweise' },
 };
 
 /* ── Einen Schlüssel des Registers zerlegen ──────────────────────────────
@@ -168,10 +193,15 @@ export function typVon({ objart, haustyp, nutzung, einheiten }) {
   }
   if (/teileigentum/.test(a)) return 'teileigentum';
   if (a === 'dhh' || /doppelhaus/.test(a) || h === 'dhh') return 'dhh';
-  if (a === 'rh' || /reihen/.test(a) || h === 'rh') return 'reh';
+  /* v2396 · End- und Mittelhaus getrennt; „Reihenhaus" ohne Angabe ist `rh`
+     (bis v2395: alles `reh`, und Dresden entschied per Ladereihenfolge). */
+  const reihe = (x) => (/reihenmittel|mittelhaus|^rmh$/.test(x) ? 'rmh'
+    : /reihenend|endhaus|^reh$/.test(x) ? 'reh' : null);
+  if (a === 'rh' || /reihen/.test(a) || /^r[em]h$/.test(a) || /^(rh|reh|rmh)$/.test(h) || /reihen/.test(h)) {
+    return reihe(h) || reihe(a) || 'rh';
+  }
   if (/^efh|einfamilien/.test(a)) {
     if (h === 'dhh') return 'dhh';
-    if (h === 'rh') return 'reh';
     if (h === 'villa') return 'villa';
     return 'efh';
   }
@@ -221,9 +251,10 @@ function passtBaujahr(d, bj, geschwisterGrenzen) {
 }
 
 /* Wie genau ist ein Zweig? Mehr Einschränkungen = genauer = Vorrang. */
-function genauigkeit(d) {
+function genauigkeit(d, typ) {
   let g = 0;
   if (d.variante) g += 4;
+  if (d.variante && typ && (VARIANTE_GENAU[d.variante] || []).includes(typ)) g += 1;   /* v2396 */
   if (d.rnd_von != null || d.rnd_bis != null) g += 3;
   if (d.bj_klasse) g += 2;
   if (d.lage) g += 2;
@@ -358,7 +389,52 @@ export function waehle(zweige, obj = {}) {
     /* Der genaueste gewinnt. Bei Gleichstand der erste — aber dann ist es
        derselbe Grad an Genauigkeit, also keine stille Entscheidung
        zwischen Ungleichen. */
-    nachRnd.sort((a, b) => genauigkeit(b) - genauigkeit(a));
+    /* v2396 · DER GLEICHSTAND WAR EINE STILLE ENTSCHEIDUNG.
+       Hier stand: „Bei Gleichstand der erste — aber dann ist es derselbe
+       Grad an Genauigkeit, also keine stille Entscheidung zwischen
+       Ungleichen." Gemessen am 19.10.2026 ueber 445 Gebiete x 19 Objekt-
+       arten x RND x Baujahr (126.825 Faelle): in 72 entschied die
+       REIHENFOLGE der Zweige, alle in Dresden — Reihenhaus 0,64 % (Mittel-
+       haus) oder 0,86 % (End-/Doppelhaus), MFH offen oder geschlossen.
+       Gleich genau heisst nicht gleich: die Saetze gelten fuer
+       verschiedene Haeuser. Jetzt wird gefragt, nicht gewuerfelt.
+       Die Sortierung ist stabil UND hat einen Schluessel als letzte
+       Entscheidung — das Ergebnis haengt nicht mehr an der Ladereihenfolge. */
+    /* Reihenhaus ohne Angabe, und der Ausschuss fuehrt End- UND Mittelhaus:
+       auch ein genaueres RND-Band der einen Variante entscheidet das nicht
+       (Dresden, RND 70: das Band gibt es nur fuer End-/Doppelhaus). */
+    if (typ === 'rh' && nachRnd.some((d) => d.variante === 'rmh')
+        && nachRnd.some((d) => d.variante === 'dhh_reh')) {
+      const _z = nachRnd.filter((d) => d.variante === 'rmh' || d.variante === 'dhh_reh').map((d) => d.zweig);
+      return { rueckfrage: 'haustyp', fehlt: 'haustyp',
+        auswahl: [VARIANTE_FRAGE.dhh_reh.wort, VARIANTE_FRAGE.rmh.wort], zweige: _z,
+        hinweis: 'Der Gutachterausschuss führt getrennte Liegenschaftszinssätze für '
+               + 'Reihenend- und Reihenmittelhäuser (' + _z.join(', ') + '). Bitte angeben, '
+               + 'ob es ein Reihenendhaus oder ein Reihenmittelhaus ist — gewählt wird nicht nach Zufall.' };
+    }
+    const _bw = String(obj.bauweise || '').toLowerCase();
+    if (/offen|geschl/.test(_bw)) {
+      const _t = nachRnd.filter((d) => d.variante === (/geschl/.test(_bw) ? 'geschl' : 'offen'));
+      if (_t.length) nachRnd = _t;
+    }
+    nachRnd.sort((a, b) => (genauigkeit(b, typ) - genauigkeit(a, typ))
+      || (a.zweig < b.zweig ? -1 : a.zweig > b.zweig ? 1 : 0));
+    const _gleich = nachRnd.filter((d) => genauigkeit(d, typ) === genauigkeit(nachRnd[0], typ));
+    if (_gleich.length > 1) {
+      const vars = [...new Set(_gleich.map((d) => d.variante || ''))];
+      const fragen = vars.map((v) => VARIANTE_FRAGE[v]).filter(Boolean);
+      const fehlt = (fragen.length === vars.length && new Set(fragen.map((f) => f.fehlt)).size === 1)
+        ? fragen[0].fehlt : 'zweig';
+      return { rueckfrage: fehlt === 'zweig' ? 'zweig_mehrdeutig' : fehlt, fehlt,
+        auswahl: fehlt === 'zweig' ? _gleich.map((d) => d.zweig) : fragen.map((f) => f.wort),
+        zweige: _gleich.map((d) => d.zweig),
+        hinweis: 'Der Gutachterausschuss führt für dieses Objekt mehrere gleich passende '
+               + 'Liegenschaftszinssätze (' + _gleich.map((d) => d.zweig).join(', ') + '). '
+               + (fehlt === 'haustyp' ? 'Bitte angeben, ob es ein Reihenendhaus oder ein Reihenmittelhaus ist'
+                  : fehlt === 'bauweise' ? 'Bitte die Bauweise angeben (offen oder geschlossen)'
+                  : 'Welcher gilt, lässt sich aus den Angaben nicht entscheiden')
+               + ' — gewählt wird nicht nach Zufall.' };
+    }
     const sieger = nachRnd[0];
     const teile = [];
     if (sieger.variante) teile.push(sieger.variante);

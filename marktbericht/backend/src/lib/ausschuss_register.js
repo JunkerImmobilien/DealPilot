@@ -550,17 +550,22 @@ export function ladeSaat(dateien = SAATDATEIEN) {
  * Erfolg und nur, wenn die Tabelle ueberhaupt etwas liefert — eine leere
  * Tabelle darf ein gefuelltes Register nicht loeschen.
  */
-export async function ladeAusDb(q, kennzahlen = ['liegenschaftszinssatz',
-                                               'sachwertfaktor',
-                                               'bodenpreisniveau',
-                                               'durchschnittspreis',
-                                               'preisentwicklung',
-                                               'erbbauzinssatz',
-                                               /* v1094-WKZ */
-                                               'vergleichsfaktor',
-                                               /* v2279 */
-                                               'umrechnungskoeffizient_flaeche',
-                                               'bodenpreisindex']) {
+/* v2396 · Die Kennzahlen, die der Server aus mb.param_modell holt — als
+   eigene Konstante, damit tools/register-db-abgleich.mjs DIESELBE Liste
+   prueft statt einer Abschrift. */
+export const DB_KENNZAHLEN = Object.freeze(['liegenschaftszinssatz',
+                                            'sachwertfaktor',
+                                            'bodenpreisniveau',
+                                            'durchschnittspreis',
+                                            'preisentwicklung',
+                                            'erbbauzinssatz',
+                                            /* v1094-WKZ */
+                                            'vergleichsfaktor',
+                                            /* v2279 */
+                                            'umrechnungskoeffizient_flaeche',
+                                            'bodenpreisindex']);
+
+export async function ladeAusDb(q, kennzahlen = [...DB_KENNZAHLEN]) {
   if (typeof q !== 'function') return { geladen: 0, grund: 'kein_q' };
   try {
     const rows = await q(
@@ -607,23 +612,85 @@ export async function ladeAusDb(q, kennzahlen = ['liegenschaftszinssatz',
      * Der Schluessel ist derselbe wie der Eindeutigkeitsschluessel der
      * Tabelle. Das ist kein Zufall, sondern die Bedingung dafuer, dass
      * "ersetzen" ueberhaupt eine wohldefinierte Bedeutung hat. */
-    const schluessel = (s) => [s.ags, s.kennzahl, s.zweig,
-                               s.berichtsjahr ?? ''].join('|');
-    const ausDb = new Set(rows.map(schluessel));
-    /* v2288a · SPERREN LEBEN IN DER DATEI. mb.param_modell kann keine Sperre
-       abbilden (kein vollstaendig-Feld, Sperren ohne formel werden nicht
-       eingespielt). Ersetzte eine DB-Zeile hier jeden Saatsatz mit gleichem
-       Schluessel, fiel die Sperre weg - gemessen 16.10.2026 an NI: die
-       Kreis-Sperre Goettingen teilt ags|kennzahl|zweig mit den Werten, die
-       nur ueber die Tabellenkennung der Zone greifen; ohne Sperre griff
-       ausserhalb der Zonen die DealPilot-Formel. Vorerst nur fuer die
-       Umrechnungskoeffizienten - bei Zins und Faktor wuerde eine stehende
-       Sperre neben einem Wert die Zweigwahl aendern (findeZweig). */
-    const _bleibtSperre = (s) => s.kennzahl === 'umrechnungskoeffizient_flaeche'
-      && (s.vollstaendig === false || !!s.warum_kein_wert);
-    const behalten = _saat.filter((s) => _bleibtSperre(s) || !ausDb.has(schluessel(s)));
-    const zusammen = [...behalten, ...rows];
-    const ersetzt = _saat.length - behalten.length;
+    /* ═══ v2396 · DIE DATEI IST DIE QUELLE, DIE TABELLE NUR DER WERT ═══════
+       Bis v2395 ersetzte jede DB-Zeile JEDEN Saatsatz mit demselben
+       Mischschluessel (ags|kennzahl|zweig|jahr). Drei Fehler, gemessen am
+       19.10.2026 an Staging (tools/register-db-abgleich.mjs):
+
+         1  DB-WERT UEBER SPERRE: 138 Zeilen (99 LZS, 35 SWF, 1 BPI, 3 UK).
+            Muenchen 09162000 Sachwertfaktor EZFH 1,15 / RMH 1,38 kam an,
+            obwohl sued-nord.json dort eine Sperre fuehrt — die Sperre trug
+            noch eine formel, register-saat spielte sie als Wert ein, und
+            die Tabelle kennt kein vollstaendig-Feld.
+            v2288a hielt Sperren nur fuer die Umrechnungskoeffizienten.
+         2  WAISEN NACH URL-WECHSEL: der Tabellenschluessel traegt die URL,
+            der Mischschluessel nicht. Essen 05113000 (Prod) stand mit
+            alter und neuer URL je zweimal da; waehleAusGruppe gab bei
+            gleichem Jahrgang null.
+         3  FELDVERLUST: die Zeile ersetzte den Satz GANZ — streuung,
+            verwendung, auflagen, objektart, baujahr_von/bis,
+            unvollstaendig_grund, stufe_grund gingen verloren, weil
+            param_modell sie nicht fuehrt.
+
+       Die Regel jetzt, je DB-Zeile:
+         · Fuehrt die Datei unter dem VOLLEN Tabellenschluessel (mit URL)
+           einen Wert, ist die Zeile dieser Wert: Satz der Datei, darauf
+           die Wertspalten der Tabelle (formel, korrekturen,
+           modellansaetze). Alle anderen Felder kommen aus der Datei.
+         · Sonst, fuehrt die Datei unter dem Mischschluessel eine Sperre:
+           die Sperre gewinnt, die Zeile faellt weg (protokolliert).
+         · Sonst, fuehrt die Datei den Mischschluessel mit anderer URL:
+           die Zeile ist eine Waise, die Datei gewinnt (protokolliert).
+         · Sonst (Schluessel in keiner Datei): die Zeile bleibt —
+           register-db-abgleich.mjs meldet sie, register-saat --aufraeumen
+           loescht sie.
+       Saatsaetze bleiben stehen, wenn keine Zeile sie ersetzt; Sperren
+       ersetzt nie eine Zeile. */
+    const _zw = (s) => s.zweig || 'standard';
+    const misch = (s) => [s.ags, s.kennzahl, _zw(s), s.berichtsjahr ?? ''].join('|');
+    const voll = (s) => [misch(s), s.quelle_url || ''].join('|');
+    const _istSperre = (s) => s.vollstaendig === false || !!s.warum_kein_wert;
+    const dateiVoll = new Map();      /* voller Schluessel -> Wertsatz der Datei */
+    const dateiMisch = new Map();     /* Mischschluessel -> Saetze der Datei */
+    for (const s of _saat) {
+      if (!s || !s.kennzahl) continue;
+      const m = misch(s);
+      if (!dateiMisch.has(m)) dateiMisch.set(m, []);
+      dateiMisch.get(m).push(s);
+      if (!_istSperre(s)) dateiVoll.set(voll(s), s);
+    }
+    const _WERTSPALTEN = ['formel', 'korrekturen', 'modellansaetze'];
+    const ersetzteSaat = new Set();
+    const nutzbar = [];
+    const verworfen = { ueber_sperre: [], waise_url: [] };
+    const ohneDatei = [];
+    for (const r of rows) {
+      const d = dateiVoll.get(voll(r));
+      if (d) {
+        const z = { ...d };
+        for (const k of _WERTSPALTEN) if (r[k] != null) z[k] = r[k];
+        z.id = r.id ?? null;
+        z._aus_db = true;
+        ersetzteSaat.add(d);
+        nutzbar.push(z);
+        continue;
+      }
+      const gl = dateiMisch.get(misch(r));
+      if (gl && gl.some(_istSperre)) { verworfen.ueber_sperre.push(voll(r)); continue; }
+      if (gl) { verworfen.waise_url.push(voll(r)); continue; }
+      ohneDatei.push(voll(r));
+      nutzbar.push({ ...r, _aus_db: true });
+    }
+    if (verworfen.ueber_sperre.length || verworfen.waise_url.length) {
+      console.warn(`[register] ${verworfen.ueber_sperre.length} DB-Zeile(n) ueber einer Datei-Sperre`
+        + ` und ${verworfen.waise_url.length} mit fremder URL ignoriert - Datei gewinnt.`
+        + ' Abgleich: node tools/register-db-abgleich.mjs; aufraeumen: register-saat.mjs --aufraeumen');
+      [...verworfen.ueber_sperre, ...verworfen.waise_url].slice(0, 5)
+        .forEach((k) => console.warn('[register]    · ' + k));
+    }
+    const behalten = _saat.filter((s) => !ersetzteSaat.has(s));
+    const zusammen = [...behalten, ...nutzbar];
+    const ersetzt = ersetzteSaat.size;
 
     _index = indizieren(zusammen);
     _herkunft = behalten.length ? 'param_modell+saatdatei' : 'param_modell';
@@ -635,9 +702,14 @@ export async function ladeAusDb(q, kennzahlen = ['liegenschaftszinssatz',
                 * Zusammenfuehrung — beim v1094-Rollout war genau das der
                 * Fall. Sie gehoert ins Startlog. */
                ersetzt,
+               /* v2396 · was die Datei gegen die Tabelle gewonnen hat */
+               verworfen: { ueber_sperre: verworfen.ueber_sperre.length,
+                            waise_url: verworfen.waise_url.length },
+               ohne_datei: ohneDatei.length,
                je_kennzahl: jeKennzahl(zusammen),
-               db_fuehrt: [...ausDb].sort() };
+               db_fuehrt: [...new Set(rows.map(misch))].sort() };
     return { geladen: rows.length, aus_saat: behalten.length,
+             verworfen: _stand.verworfen, ohne_datei: ohneDatei.length,
              herkunft: _herkunft, je_kennzahl: _stand.je_kennzahl };
   } catch (e) {
     console.error('[register] param_modell nicht lesbar:', e.message);

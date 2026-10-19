@@ -419,6 +419,18 @@ export const DealPilotObjectMapper = {
         const h = pick(d, ['nhk_haus']), g = pick(d, ['nhk_geschosse']), dd = pick(d, ['nhk_dach']);
         return (h && g != null && g !== '' && dd) ? (String(h) + '.' + String(g) + String(dd)) : null;
       })(),
+      /* v2396 · Reihenend- oder Reihenmittelhaus fuer die Zweigwahl des
+         Liegenschaftszinssatzes. Dresden fuehrt beide getrennt (0,86 % End-/
+         Doppelhaus, 0,64 % Mittelhaus); ohne Angabe fragt der Bericht jetzt
+         nach, statt per Ladereihenfolge zu waehlen. Die Angabe steht schon
+         im Formular: Hausform (nhk_haus) 2 = Doppelhaus/Reihenendhaus,
+         3 = Reihenmittelhaus. */
+      haustyp: (function () {
+        const t = String(pick(d, ['objart', 'objektart']) || '').toLowerCase();
+        if (!/\brh\b|reihen/.test(t)) return null;
+        const h = String(pick(d, ['nhk_haus']) || '');
+        return h === '3' ? 'rmh' : (h === '2' ? 'reh' : null);
+      })(),
       hinterland_qm: num(pick(d, ['hinterland_qm'])),
       hinterland_eur_qm: dez(pick(d, ['hinterland_eur_qm'])),
       hinterland_rentierlich: /^(ja|true|1)$/i.test(String(pick(d, ['hinterland_rentierlich']) || '')),

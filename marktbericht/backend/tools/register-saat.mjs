@@ -30,13 +30,25 @@
      docker exec dealpilot-mb-backend node /app/tools/register-saat.mjs --trocken
      docker exec dealpilot-mb-backend node /app/tools/register-saat.mjs
      docker exec dealpilot-mb-backend node /app/tools/register-saat.mjs --nur=HE
+     docker exec dealpilot-mb-backend node /app/tools/register-saat.mjs --trocken --aufraeumen
+     docker exec dealpilot-mb-backend node /app/tools/register-saat.mjs --aufraeumen   (v2396)
+     docker exec dealpilot-mb-backend node /app/tools/register-saat.mjs --nur-aufraeumen  (nur loeschen)
+
+   v2396: Sperren werden NICHT eingespielt; verwaiste Zeilen (kein Datei-Wert
+   unter dem vollen Schluessel) werden immer gemeldet und mit --aufraeumen
+   geloescht. Vorher pg_dump (CLAUDE.md, Abschnitt Server).
    ═══════════════════════════════════════════════════════════════════════ */
 
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 
+/* v2396 · --aufraeumen loescht verwaiste Zeilen (kein Gegenstueck unter dem
+   vollen Schluessel in den Dateien). Mit --trocken nur zaehlen. */
 const TROCKEN = process.argv.includes('--trocken');
+/* --nur-aufraeumen: NUR die verwaisten Zeilen loeschen, nichts schreiben (fuer Prod). */
+const NUR_AUFRAEUMEN = process.argv.includes('--nur-aufraeumen');
+const AUFRAEUMEN = NUR_AUFRAEUMEN || process.argv.includes('--aufraeumen');
 const NUR = (process.argv.find((a) => a.startsWith('--nur=')) || '').slice(6).toUpperCase();
 
 const DIR = fileURLToPath(new URL('../src/lib/register/', import.meta.url));
@@ -98,6 +110,29 @@ if (NUR) console.log(`Filter --nur=${NUR}`);
 console.log(`Datensätze          : ${saetze.length}`);
 
 if (!saetze.length) { console.error('ABBRUCH: keine Datensätze.'); process.exit(1); }
+
+/* ── 1b · SPERREN GEHEN NICHT IN DIE TABELLE — v2396 ───────────────────
+   mb.param_modell kennt kein vollstaendig-Feld. Eine Sperre, die noch eine
+   formel trug, kam hier durch die Pflichtfeldpruefung und stand danach als
+   WERT in der Tabelle — gemessen am 19.10.2026 an Staging: 135 Zeilen
+   (99 LZS, 35 SWF, 1 BPI), darunter Muenchen 09162000 Sachwertfaktor
+   EZFH 1,15 / RMH 1,38 gegen die Sperre in sued-nord.json. Die Sperre
+   lebt in der Datei; ladeAusDb() liest sie von dort. */
+const _istSperre = (m) => m.vollstaendig === false || !!m.warum_kein_wert;
+const sperren = saetze.filter(_istSperre);
+const alleSaetze = saetze;
+saetze = saetze.filter((m) => !_istSperre(m));
+{
+  const jeKz = {};
+  sperren.forEach((m) => { jeKz[m.kennzahl] = (jeKz[m.kennzahl] || 0) + 1; });
+  const mitFormel = sperren.filter((m) => m.formel).length;
+  console.log(`Sperren             : ${sperren.length} — bleiben in der Datei, werden NICHT eingespielt`
+    + (sperren.length ? ' (' + Object.keys(jeKz).sort().map((k) => k + ' ' + jeKz[k]).join(' · ') + ')' : ''));
+  if (mitFormel) {
+    console.log(`   davon ${mitFormel} mit rechenbarer formel — gehört nach formel_vorgemerkt (saat-pruefen wird rot)`);
+  }
+  console.log(`Werte zum Einspielen: ${saetze.length}`);
+}
 
 /* Unter 90 % Dateideckung ist der Lauf nicht aussagekräftig — dann hat das
    Werkzeug ein Problem, nicht das Register. Dieselbe Schwelle wie beim
@@ -181,7 +216,7 @@ console.log('Kennzahlen:', Object.keys(nachKennzahl).sort()
    wer zwei Sätze mit demselben Schlüssel einliefert, hat eine
    unterscheidende Angabe nicht in den Schlüssel gelegt. Das zu melden,
    NACHDEM einer den anderen gelöscht hat, hilft niemandem. */
-const _schl = (m) => [m.land_code, m.ags, m.kennzahl, m.zweig,
+const _schl = (m) => [m.land_code, m.ags, m.kennzahl, m.zweig || 'standard',
   (m.berichtsjahr == null ? -1 : m.berichtsjahr), m.quelle_url].join('');
 const _nachSchl = new Map();
 saetze.forEach((m) => {
@@ -209,16 +244,73 @@ if (_dubletten.length) {
 }
 console.log('keine Dublette — jeder Satz hat seinen eigenen Platz.');
 
+/* ── 3b · VERWAISTE ZEILEN — v2396 ─────────────────────────────────────
+   Der Tabellenschluessel traegt die quelle_url. Wechselt sie in der Datei,
+   schreibt ON CONFLICT eine NEUE Zeile, und die alte bleibt stehen —
+   gemessen an Essen 05113000 (Prod): zwei Zeilen je Zweig, alte und neue
+   URL. Dasselbe gilt fuer jede Zeile, deren Satz zur Sperre wurde.
+   Verwaist heisst: unter dem vollen Schluessel fuehrt KEINE Datei einen
+   Wert. Gemeldet wird immer (auch --trocken), geloescht nur mit
+   --aufraeumen. Mit --nur nur Zeilen dieses Landes. */
+const { q } = await import('../src/lib/db.js');
+const _dbSchl = (r) => [r.land_code, r.ags, r.kennzahl, r.zweig || 'standard',
+  (r.berichtsjahr == null ? -1 : r.berichtsjahr), r.quelle_url].join('\u0001');
+const _wertSchl = new Set(saetze.map(_schl));
+const _mischD = (m) => [m.ags, m.kennzahl, m.zweig || 'standard', m.berichtsjahr == null ? -1 : m.berichtsjahr].join('|');
+const _sperrMisch = new Set(sperren.map(_mischD));
+const _alleMisch = new Set(alleSaetze.map(_mischD));
+let _dbZeilen = null;
+try {
+  _dbZeilen = await q(`SELECT id, land_code, ags, kennzahl, zweig, berichtsjahr, quelle_url
+                         FROM mb.param_modell`);
+} catch (e) {
+  console.error(`Tabelle nicht lesbar: ${e.message}`);
+  if (!TROCKEN) process.exit(1);
+}
+let verwaist = [];
+if (_dbZeilen) {
+  verwaist = _dbZeilen.filter((r) => (!NUR || String(r.land_code).toUpperCase() === NUR)
+                                     && !_wertSchl.has(_dbSchl(r)));
+  const grund = (r) => (_sperrMisch.has(_mischD(r)) ? 'ueber_sperre'
+                       : _alleMisch.has(_mischD(r)) ? 'url_wechsel' : 'ohne_datei');
+  const jeGrund = {}; const jeKz = {};
+  verwaist.forEach((r) => {
+    const g = grund(r); jeGrund[g] = (jeGrund[g] || 0) + 1;
+    jeKz[r.kennzahl] = (jeKz[r.kennzahl] || 0) + 1;
+  });
+  console.log('');
+  console.log('═══ VERWAISTE ZEILEN (Tabelle ohne Datei-Wert) ═══');
+  console.log(`mb.param_modell: ${_dbZeilen.length} Zeilen · verwaist ${verwaist.length}`
+    + (verwaist.length ? '  (' + Object.keys(jeGrund).sort().map((k) => k + ' ' + jeGrund[k]).join(' · ') + ')' : ''));
+  if (verwaist.length) {
+    console.log('   je Kennzahl: ' + Object.keys(jeKz).sort().map((k) => k + ' ' + jeKz[k]).join(' · '));
+    verwaist.slice(0, 8).forEach((r) => console.log(`   · id=${r.id} ${r.land_code}/${r.ags} ${r.kennzahl}/${r.zweig}`
+      + ` ${r.berichtsjahr ?? '-'} ${grund(r)} …${String(r.quelle_url).slice(-50)}`));
+    if (!AUFRAEUMEN) console.log('   -> loeschen mit --aufraeumen (vorher pg_dump, siehe CLAUDE.md)');
+  }
+}
+
 if (TROCKEN) {
   console.log('');
-  console.log('Trockenlauf — es wird nichts geschrieben.');
+  console.log(`Trockenlauf — es wird nichts geschrieben${AUFRAEUMEN ? ` (--aufraeumen wuerde ${verwaist.length} Zeilen loeschen)` : ''}.`);
   process.exit(0);
 }
 
 /* ── 4 · Schreiben ─────────────────────────────────────────────────── */
-const { q } = await import('../src/lib/db.js');
 const { machRepository } = await import('../src/connectors/opendata/param-repository.js');
 const repo = machRepository(q);
+
+if (AUFRAEUMEN && verwaist.length) {
+  const ids = verwaist.map((r) => Number(r.id));
+  const weg = await q(`DELETE FROM mb.param_modell WHERE id = ANY($1::bigint[]) RETURNING id`, [ids]);
+  console.log(`AUFGERAEUMT: ${weg.length} von ${ids.length} verwaisten Zeilen geloescht.`);
+  if (weg.length !== ids.length) { console.error('✗ Loeschzahl weicht ab.'); process.exit(1); }
+}
+if (NUR_AUFRAEUMEN) {
+  const rest = await q('SELECT count(*)::int AS n FROM mb.param_modell');
+  console.log(`--nur-aufraeumen: nichts geschrieben · mb.param_modell jetzt ${rest[0].n} Zeilen.`);
+  process.exit(0);
+}
 
 const laender = Object.keys(nachLand).sort();
 const lauf = await repo.laufStart('v1751-register-saat-voll', laender);
@@ -266,8 +358,17 @@ console.log(`ohne Link ${fehlt[0].ohne_link} · ohne Quellenvermerk ${fehlt[0].o
 
    Der Exit-Code hing dabei an `uebernommen > 0`: ein einziger
    durchgekommener Satz machte den Lauf grün. */
+/* v2396 · Gezaehlt wird jetzt am SCHLUESSEL, nicht an der Gesamtzahl: mit
+   --nur stehen andere Laender in der Tabelle, und verwaiste Zeilen ohne
+   --aufraeumen ebenfalls. Beide verfaelschten die Gesamtzahl in die
+   positive Richtung und machten den Vergleich wertlos. */
 const _soll = saetze.length - r.verworfen;
-const _ist = n[0].n;
+const _nachher = await q(`SELECT land_code, ags, kennzahl, zweig, berichtsjahr, quelle_url
+                            FROM mb.param_modell`);
+const _ist = _nachher.filter((z) => _wertSchl.has(_dbSchl(z))).length;
+const _restWaisen = _nachher.filter((z) => (!NUR || String(z.land_code).toUpperCase() === NUR)
+                                         && !_wertSchl.has(_dbSchl(z))).length;
+console.log(`verwaiste Zeilen danach: ${_restWaisen}${_restWaisen && !AUFRAEUMEN ? ' (--aufraeumen nicht gesetzt)' : ''}`);
 console.log('');
 if (_ist === _soll) {
   console.log(`✓ SOLL = IST : ${_soll} Sätze eingeliefert, ${_ist} in der Tabelle.`);

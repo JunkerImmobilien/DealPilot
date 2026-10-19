@@ -125,6 +125,13 @@ for (const f of _dateien) {
       if (s[k] == null || s[k] === '' || (Array.isArray(s[k]) && !s[k].length)) fehler.push(`${wo}: ${k} fehlt`);
     }
     if (s.kennzahl && !KENNZAHLEN.has(s.kennzahl)) fehler.push(`${wo}: unbekannte kennzahl ${s.kennzahl}`);
+    /* v2396 · EINE SPERRE TRAEGT KEINE RECHENBARE formel (CLAUDE.md).
+       Gemessen am 19.10.2026: 135 Sperren (99 LZS, 35 SWF, 1 BPI) trugen
+       noch eine, register-saat spielte sie als WERT ein, und die Tabelle
+       ueberstimmte die Sperre — Muenchen Sachwertfaktor 1,15 / 1,38. Eine
+       vorgemerkte Tabelle steht unter formel_vorgemerkt. Die Basislinie
+       fuehrt diese Regel nicht: jeder Treffer ist rot. */
+    if (sperre && s.formel) fehler.push(`${wo}: Sperre traegt formel — gehoert nach formel_vorgemerkt`);
     /* v2287 · mb.param_modell.modellversion ist NOT NULL - ein Wert ohne sie wird beim
        Einspielen (register-saat.mjs) still verworfen. Gemessen 16.10.2026: alle 111
        Umrechnungskoeffizienten mit Wert fehlten in der Tabelle, der Pruefer war gruen. */

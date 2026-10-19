@@ -3267,7 +3267,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich der Landeshauptstadt München",
   "kennzahl": "sachwertfaktor",
   "zweig": "ezfh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "baender_1d",
    "liefert": "faktor",
    "achse_feld": "sachwert",
@@ -3648,7 +3648,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich der Landeshauptstadt München",
   "kennzahl": "sachwertfaktor",
   "zweig": "rmh",
-  "formel": {
+  "formel_vorgemerkt": {
    "form": "baender_1d",
    "liefert": "faktor",
    "achse_feld": "sachwert",

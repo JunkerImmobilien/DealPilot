@@ -38840,6 +38840,27 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2395 / v2395a / v2395vr–vr3 · landing-videothek-4b · Videoreihe 10b, 15, 21, 23: Fehler im Bild (19.10.2026, Staging, Video-Agent)
+
+- **Was:** Vier Befunde aus der Vertonung (`Videoreihe-Sprecher/STAND.md`), dazu drei, die erst die Prüfläufe zeigten.
+  1. **Modul 15 — „Einnahmen 39.652 €“ und „gegen Einnahmen 41.396 €“ bei gleichem Ergebnis:** kein Datenfehler, zwei Einnahmebegriffe der App. Die Quick-Zeile des Steuerformulars (`tax.js _renderQuickForm`) beschriftet die Spalte „Einnahmen V+V“, zeigt dort aber nur `einnahmen_km` (Kaltmiete); die umlagefähigen NK fehlen auf beiden Seiten (Spalte „Bewirtschaftung“ = `nk_n_umlf + betr_sonst`). Die Detail-Summe nennt `einnahmen_km + einnahmen_nk`. Das Drehbuch sagt jetzt „Kaltmiete“ und zeigt im Detail-Modus die beiden Einnahmezeilen als eigene Zeile (`r15DetFest`). Die App ist **nicht** geändert.
+  2. **Modul 23 gegen 10b — 138.380 € gegen 137.917 €:** zwei Objektstände des Ravensberger Weg 38 (`geb_ant` 74,82 % / 74,57 %), beide **ohne** Nebenkosten. Gemessen am 19.10.: das Objekt trägt seit dem 16.10. abends (updated_at 17:57 UTC) Nebenkosten 13,77 % = 170.748 €. Richtig ist die Grenze **mit** den anteiligen Nebenkosten (Anschaffungskosten des Gebäudes): **157.543 €** — App (`calc.js` Z. 1002 ff.) und BMF-Pipeline (`phase9_15pct.amtlich.max`) rechnen identisch. Rechenfehler keiner.
+  3. **Modul 23 Abspann** sachlich: „Die Grenze vor der Sanierung kennen — netto, drei Jahre, am Gebäudeanteil.“
+  4. **Modul 21 Abspann** „Weiter: Modul 22 · Der Telegram-Bot“ (vorher 23). Ebenso **10b** „Weiter: Modul 10c“ (vorher 11, 10c übersprungen).
+  5. Prüflauf 10b: der **BMF-Mitschnitt** war ohne Nebenkosten gerechnet — Schritt 3 zeigte AfA 18.451 €, der Bodenabschlag-Reiter (lokal) 21.006 € im selben Video; Schritt 1 sagte fest „Nebenkosten 170.748 € (in diesem Objekt nicht erfasst)“. Mitschnitt neu (je ein echter Aufruf `/bmf/aufteilung` und `/bmf/pipeline` mit den Körpern aus dem Lauf, LibreOffice, kein Kontingent, SHA-256 Browser = Datei), Satz nur noch bei 0 €. Absprung „Rechner aus Modul 10c“ statt 10a.
+  6. Prüflauf 21: Cockpit **7,39 Mio** Gesamtinvestition, mitgeschnittene Analyse 6.717.219 € — unter der Zeile „nichts erfunden“. Analyse EINMAL neu abgerufen (`/ai/copilot`, Körper aus dem Lauf, Ablage nicht geschrieben). „Gegliedert, mit Zahlen“ zeigt jetzt je Abschnitt Überschrift + ersten Posten statt nackter Überschriften mit Doppelpunkt.
+  7. Modul 23 Szene 4: Gebäudeanteil aus `geb_ant` (74,82 %) statt `#ahk_geb_anteil` (auf ganze Prozent gerundet, „75 %“).
+- **Commit:** `6ae09e88` (v2395), `9d9a13cc` (v2395a), `07126269` (v2395vr), `b6cacba9` (v2395vr2), `93dc1c03` (v2395vr3), `88d14d81` (landing-videothek-4b). **Namensraum:** „v2395“ wurde parallel von zwei anderen Strängen vergeben (`b0849b4e`, `6dde1282`) — meine Folgecommits heißen deshalb `v2395vr*`.
+- **Nachweis:**
+  - Prüfläufe 15, 23, 10b (zweimal), 21 (zweimal) im Studio mit 300-ms-Protokoll und eigenem Mitschreiber UNTER dem Drehbuch (fetch/XHR/Beacon vor dem Start umwickelt): hinaus gingen nur Schreibwege am eigenen Testobjekt (`POST/PUT/DELETE /objects`, `tax-records`, `tax-snapshots`), `portfolio-spiegel`, `wertparameter/zinssatz`, `ausstattung/vorschlag`; **kein** KI-, BMF-, Geokodier- oder Marktbericht-Abruf (gespielt bzw. gesperrt). Danach Drehbuch-Spion weg, `getUserMedia` nativ, `qc_span_config` und `dp_zielstufe` unverändert. 0 Treffer Anbieternamen/Kontakt im Bild.
+  - DB nach jedem Lauf: 50 Objekte, Hash über (id, updated_at) unverändert, Sicherung `/root/backups/objekte-v2395-vor.json` (559 KB) = md5 der Quellzeilen Ravensberger Weg und Parkstr. danach. Testobjekte: 7 angelegt, 7 gelöscht.
+  - Aufnahmen in eigenem Chrome-Fenster (`--new-window`), Probe dunkel (YAVG 21,1), Stichbilder alle 30 s angesehen.
+- **Videos:** 15 → 4:51 (11,0 MB; Sprecher 16,4 MB), 23 → 3:35 (8,5 MB; Sprecher 12,5 MB), onyx Pirate-Vibe, −16,5 LUFS. Auf Staging UND Produktion (`/opt/dealpilot/frontend/landing/medien/videothek/`), md5 = lokal. `videos.json` 15: dauer 291.
+- **Rest:**
+  - **10b und 21 nicht neu aufgenommen:** die Aufnahme 10b wurde vom Rechner wegen Speichermangels abgebrochen (Fenster danach geschlossen, DB sauber, altes Video unverändert). Drehbuch und Mitschnitte sind fertig auf Staging; bis zur Aufnahme zeigt 10b noch 137.917 € ohne Nebenkosten — also eine ANDERE Grenze als das neue Modul 23.
+  - Gemeldet, nicht geändert (App): Quick-Spalte „Einnahmen V+V“ zeigt nur die Kaltmiete; `#ahk_geb_anteil` rundet auf ganze Prozent; die MP4-Adressen der Videothek tragen keinen Buster.
+  - Andere Videos am Ravensberger Weg (vor dem 16.10. abends aufgenommen) zeigen Zahlen ohne Nebenkosten — nicht geprüft.
+
 ### v2388 · Modul 25 „Die geführte Eingabe“ neu aufgenommen (MFH Fürth), vertont, in der Videothek (19.10.2026, Staging, Video-Agent)
 
 - **Was:** Prüflauf im Studio mit 300-ms-Protokoll (Kapitelband, Kegel per `DPM_KEGEL_MESSUNG`, Überdeckung Chat/Liste gegen Mikrofonzeile, jeder `fetch`/XHR/Beacon im App-Fenster). Vier Befunde, in `v2388` behoben (`frontend/js/messe-drehbuch.js`, Buster `v2388`):
@@ -38858,6 +38879,99 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
   - Stichbilder alle 30 s selbst angesehen: keine Überlagerung, Scores im Bild, kein „du fliegst“.
 - **Video:** `Dateien/Messe/Videos/Videoreihe/Modul 25 - Gefuehrte Eingabe/DealPilot Modul 25 - Gefuehrte Eingabe.mp4` (8:53, 18,5 MB); vertont (onyx, Pirate-Vibe, Hochdeutsch, 38 Abschnitte, −16,3 LUFS) unter `Videoreihe-Sprecher/…` (25,1 MB) mit `texte.json` und STAND.md. Beide als MP4 auf Staging (md5 geprüft). Prod nicht angefasst.
 - **Rest:** In der App aufgefallen, nicht geändert: die Liste „Was schon steht“ beschriftet beim MFH die Bewirtschaftungskosten als „Hausgeld“; die Übersicht nennt getippte Antworten „Sprachaufzeichnung“; der Bodenrichtwert im Chat steht ohne Tausenderpunkt („1150 €/m²“); Zwischenstand-Wörter in Versalien („SCHWACH“, „GUT“) neben „Solide“/„Gut“ im Reiter. Der alte Rohschnitt `roh-modul-25.mp4` (Herford) liegt noch im Ordner.
+
+### v2396–v2396g · Register und Datenbank: Datei-Sperre gewinnt, Waisen weg, Zweigwahl ohne Zufall (19.10.2026, Staging)
+
+**Was:** Befunde der Prüfung zu `6dde1282`.
+- **v2396 Mischweg** (`ausschuss_register.js` `ladeAusDb`): eine DB-Zeile gilt nur, wenn die Datei unter dem VOLLEN Schlüssel (mit URL) einen Wert führt. Dann trägt sie den Satz der Datei plus `formel`/`korrekturen`/`modellansaetze` der Zeile. So bleiben `streuung`, `verwendung`, `auflagen`, `objektart`, `baujahr_von/bis`, `vollstaendig`, `unvollstaendig_grund` und `stufe_grund` erhalten, ohne Migration. Steht im Mischschlüssel eine Sperre, gewinnt die Sperre. Eine fremde URL ist eine Waise, die Datei gewinnt. Beides wird protokolliert. `DB_KENNZAHLEN` ist exportiert.
+- **v2396a `register-saat`:** Sperren werden nicht mehr eingespielt. Verwaiste Zeilen werden immer gemeldet (ueber_sperre / url_wechsel / ohne_datei). `--aufraeumen` löscht und schreibt, `--nur-aufraeumen` löscht nur.
+- **v2396b:** 135 Sperren (99 LZS, 35 SWF, 1 BPI, 11 Dateien) führen ihre Formel jetzt als `formel_vorgemerkt`. `saat-pruefen` wird rot bei Sperre mit `formel`.
+- **v2396c Zweigwahl:** Reihenend-, Reihenmittel- und Reihenhaus ohne Angabe werden getrennt. Bei Gleichstand kommt eine Rückfrage `haustyp`/`bauweise` statt der Ladereihenfolge. Der Mapper liest `haustyp` aus `nhk_haus` (2 = Reihenendhaus, 3 = Mittelhaus). `ref.haustyp` wurde seit v1816 gelesen, aber nie gesetzt.
+- **v2396d:** Eine Zeile aus `mb.wert_parameter` (NW, Jahrgang 2024) und der Nachbarwert gelten nur, wenn das Register für die AGS keinen neueren Jahrgang führt, auch keine Sperre. Gilt die Zeile, steht „Jahrgang 2024“ dabei.
+- **v2396e:** Der § 256-Hinweis ist richtiggestellt: der Satz liegt im Median 0,7–0,9 PP ÜBER dem örtlichen Satz, der Ertragswert fällt also eher zu niedrig aus.
+- **v2396f:** neues Werkzeug `tools/register-db-abgleich.mjs`, nur SELECT, mit sechs Regeln und Deckung. Es steht im `deploy-staging.ps1` und blockiert nicht, meldet aber laut.
+- **v2396g (Zusatzbefund):** Der Register-Sachwertfaktor bekam `property_type` = „haus“. Damit erhielt jedes App-Haus außerhalb eines Ausschussmoduls `objektart_nicht_abgeleitet`. Jetzt wird zuerst `property_subtype` gelesen.
+
+**Commit:** `af731057` `79b631d3` `cb0fa901` `b226c22c` `f929f7cd` `32192b6f` `f542218f` `e83149bc`, Rebuild `mb-backend` auf Staging.
+
+**Nachweis:**
+- Abgleich Staging vorher: ROT, 138 DB-Werte über Sperren (99 LZS, 35 SWF, 1 BPI, 3 UK).
+- Sicherung `mb-20261019-0956-vor-v2396-aufraeumen.sql.gz` (33 MB, Kopf geprüft).
+- `--nur-aufraeumen`: 4.234 → 4.096 Zeilen. Abgleich nachher sauber, 4.088 von 4.088 Zeilen abgeglichen (100 %).
+- Wegwerf-Container alt gegen neu:
+  - München SWF ezfh/rmh: 1,15/1,20 → `datensatz_unvollstaendig`.
+  - 1.393 Datei-Sperren: vorher 133 als Wert, nachher alle `datensatz_unvollstaendig`.
+  - Essen mit künstlicher Alt-URL: `objektart_nicht_abgeleitet` → 1,33/1,47.
+  - Raster Zweigwahl (126.825 Fälle): Reihenfolge entschied 72 → 0, nur Dresden geändert.
+- Berichte 298–305 im neuen Image:
+  - W, L, H unverändert (W EW 725.000 / LZS 2,5 A / SW 526.864 vorläufig; L SWF 0,936; H EW 410.000 / LZS 2,4 A).
+  - München EZFH: SWF gesperrt (mit altem Mischweg 0,87 aus der DB-Zeile).
+  - Essen EFH: SWF 1,33 A.
+  - Dresden RH: Rückfrage Hausart; mit Hausform 3 1,25 %, mit Hausform 2 1,31 %.
+- Prüfer `saat-pruefen --basislinie`, `uk-flaeche`, `uk-wgfz`, `rnd-kerne`, `objekt-mapper`: alle RC 0.
+- Prod nur gelesen: 135 über Sperre + 2 Essen-Waisen (ids 3027, 3028) = 137 Zeilen, danach 4.096.
+
+**Rest:**
+- **Prod wartet auf Freigabe:** Merge, Rebuild, `pg_dump` beider DBs, dann `register-saat.mjs --trocken --aufraeumen` (soll 137 zeigen), dann `--nur-aufraeumen`, dann den Abgleich.
+- v2396g ändert den Sachwert vieler App-Häuser (amtlicher Faktor statt vorläufig) — **Marcel abnehmen lassen**.
+- Dresden-RH ohne Hausform fällt jetzt auf § 256 (Rückfrage). Ob das Formular die Hausform beim RH sichtbar abfragt, ist eine Produktfrage.
+- 107 Werte (WGFZ, Rohertragsfaktor) stehen noch nicht in `mb.param_modell`. `ladeAusDb` liest sie nicht, sie wirken aus der Datei.
+- `tools/kettenpruefung-v1095.mjs` ist seit Langem kaputt (Pfad `/app/lib`), nicht angefasst.
+
+### v2368–v2394 · Geführte Eingabe, Marktbericht-Prüfung, Herkunftsstufen, Videothek mit Sprecher (19.10.2026) + Prod-Rollout (52), (52a)
+
+**Was:**
+- **Geführte Eingabe:**
+  - v2368: Einheiten in „Was schon steht“; „Nein, das reicht“ trifft das Feinheiten-Angebot.
+  - v2369/v2378: Abruf-Angebot und „Erklär mir das“ im Chat, ohne Symbole, nach der Wahl weg.
+  - v2379: Bei 653 px Höhe ragten Chat und Liste 27 px aus der Bühne („Text über Text“). Lösung: `grid-template-rows: minmax(0,1fr)`.
+  - v2376: Die Übernahme-Tabelle zeigt Zahlen mit Einheit und Tausenderpunkt.
+- **Bodenrichtwert:** v2370: gebührenpflichtiger BRW (Bayern, z. B. Stadt Nürnberg) mit Hinweis und Link zum Portal. Dazu die Ernte-Regel „kostenpflichtig = direkter Absprung“ in `register-ernte.md`.
+- **Marktbericht:**
+  - v2380–v2386 (Agent): Befunde der Prüfung 3 Objekte × 3 Stufen (Berichte 221–231) behoben, nämlich:
+    - Beschriftung „Kaufpreissammlung“
+    - LZS-Zweig für Häuser
+    - Ist-Miete im Band min(amtlich, Angebot)·0,7 bis max·1,3
+    - führendes Verfahren
+    - MFH-Korrekturen NHK
+    - `ze` im Rohertrag
+    - Abschlag nur auf den Angebotsteil
+    - PDF-Kommas, KI-Text
+  - v2387: Stufe 1 ist nur die Karte, kein Bericht, kein PDF; die Werte bleiben in `mb.object_snapshots`.
+  - v2390 (Agent): LZS-Ebenen unter A im Klartext mit dem Weg „genauer“; GND/BWK aus dem Zinssatz-Satz; BRW-Herkunft „eigene Angabe“; Pauschal-Sachwert vorläufig; C-Beschriftung.
+  - v2392: Feldhilfe zu § 256 neutral formuliert.
+  - v2394: ETW in einem Objekt mit ≤ 2 WE (Minden-Lübbecke) bekommt den amtlichen ZFH-Zins statt § 256 (Hüllhorst 3,0 % D → 2,4 % A, EW 432.000 → 410.000 €).
+- **WGFZ:**
+  - v2373/v2375 (Ernte): 106 Werte, 1.263 Sätze.
+  - v2375: Kern `wgfzNaeherung`, b = 0,498.
+  - v2377: Formel verdrahtet. Rangfolge: amtlich > örtliche Tabelle (auch übertragen) > Formel.
+  - v2378: `bericht_hinweis` für abgedruckte Tabellen.
+- **Übernahme:** v2393/a/b: Die Herkunftsstufe (A amtlich … vorläufig/Indikation) steht im Dropdown der Verkehrswert-Übernahme, dazu eine Pille mit Tooltip.
+- **Hilfe:** v2391: Hilfe und Pilot erklären Stufe 1/2/3 und die Herkunftsstufen A–E.
+- **Videothek:**
+  - `landing-videothek-4`: jedes Video mit und ohne Sprecher, Umschalter im Kinofenster.
+  - Modul 25 neu (MFH Fürth, DS 60 SOLIDE / IDS 79 GUT).
+
+**Commit:** Prod-Merge `af9eca4a` (52) und `b1ccda15` (52a: Gold-Literal der Pille → Token).
+
+**Nachweis:**
+- Prod-Sicherung `main-20261019-0906-r52` (73 Tabellen) und `mb-…-r52` (32).
+- Gold-Audit RC 0 (nach 52a; 52 hatte 1 neues Literal in `objekt-reiter.js`); `auth/me` 401.
+- 28 × `datei_ton`, alle 56 MP4 per md5 auf beiden Servern.
+- Staging-Läufe 263–266: W EW 725.000 / LZS 2,5 A / SW 526.864 vorläufig / MW 795.000; H EW 410.000 / LZS 2,4 A.
+
+**Rest:**
+- Die Videos 15, 23, 10b, 21 werden neu aufgenommen (Agent läuft).
+- Kleinigkeiten in der geführten Eingabe: beim MFH „Hausgeld“, getippte Antworten heißen „Sprachaufzeichnung“, BRW ohne Tausenderpunkt.
+- BW-WGFZ-Werte stützen sich allein auf die Aktennotiz zur Freigabe; das LGL-Infoblatt schließt die kommerzielle Nutzung aus.
+- Cottbus bleibt Sperre.
+- Gewerbe-Ertragswert liest die GND des Satzes noch nicht.
+
+**Marcels Entscheidungen 19.10.:**
+- LZS gibt es immer, gekennzeichnet (CLAUDE.md); kein Entfall des Ertragswerts.
+- Vorläufiger Sachwert darf führen.
+- NRW-BWK-Quote aus der Stichprobe gilt als Modellansatz.
+- Abgedruckte Tabellen privater Anbieter zählen, mit Verweis.
 
 ### v2390 · Marktbericht: Zinsherkunft im Klartext, GND/BWK des Zinssatzes, BRW-Herkunft, Pauschal-Sachwert vorläufig (19.10.2026, Staging, nicht ausgerollt)
 

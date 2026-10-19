@@ -1928,7 +1928,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Kassel",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "wgh",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
       "wert": null,
@@ -2334,7 +2334,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Universitätsstadt Gießen",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "wgh",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
       "wert": null,
@@ -2642,7 +2642,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
       "wert": null,
@@ -2695,7 +2695,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "mfh",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
       "wert": null,
@@ -2748,7 +2748,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "etw",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
       "wert": null,
@@ -5266,7 +5266,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
       "wert": null,
@@ -5588,7 +5588,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
       "wert": null,
@@ -5910,7 +5910,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
       "wert": null,
@@ -6232,7 +6232,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
-    "formel": {
+    "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
       "wert": null,
