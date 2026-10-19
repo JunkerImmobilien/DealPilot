@@ -39017,6 +39017,36 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - Pilot-Antwort zu „Stufe 2“ und „Stufe C“.
 - Essen EFH Sachwertfaktor 1,33 im echten Bericht.
 
+### Prod-Rollout (54) · v2401–v2403, v2410, qc-v2420a, v2421/v2422, landing-videothek-4c (19.10.2026)
+
+**Was:**
+- **Stufe N:** v2401–v2403, siehe unten.
+- **Kanban:** v2410 Cockpit-Board raus, v2422 Kanban-Ansicht unter „Alle Objekte“ raus.
+- **Mietentwicklung:**
+  - „Aus Wohnungen“ ohne Staffel-Haken (v2410).
+  - Soll-Jahr als Kalenderjahr (v2410).
+  - Nach Erreichen der Soll-Miete läuft `mietstg` weiter (v2422, Marcel: „ja“).
+- **Quick Boarding qc-v2420a:**
+  - Umschalter Ist/Soll ausgeblendet.
+  - Stufen-Pillen.
+  - Nur Score-Kennzahlen.
+  - Parser „200.000“ korrigiert.
+  - Beleihung zieht das EK nach. Makler 3,57 % aus dem Profil bleibt drin (Marcel).
+- **v2421:** 53 Whitelabel-Tokens `--wl-C9A84C` usw. in Großbuchstaben → klein. Custom Properties sind groß/klein-empfindlich, `whitelabel-override.js` setzt sie klein; diese Stellen färbten sich beim Mandanten nie um.
+- **Videothek 4c:** Längen 10b/21.
+
+**Commit:** Prod-Merge `5d89d52b` (Stand staging `c328084c`).
+
+**Nachweis:**
+- Sicherung `main-20261019-1635-r54` (73 Tabellen, 14 MB) und `mb-…-r54` (32, 25 MB), beide angesehen.
+- `mb-backend` und `backend` neu gebaut.
+- `WertParameterService` mit `dealpilot_formel` im Container.
+- Gold-Audit RC 0, `auth/me` 401, Landing 200.
+
+**Rest:**
+- `*.mp4.alt-20261019` (4 Stück) liegen noch im öffentlichen Videothek-Ordner beider Server, wegräumen nach Marcels Abnahme.
+- Zielbild/Potenzial (Demo https://claude.ai/artifact/KThexeEAnjWQUPuvd9o1Rx) ist im Bau.
+
 ### qc-v2420–qc-v2420a · Quick Boarding: Ist/Soll-Umschalter weg, DealPilot-Stufen, nur Score-Kennzahlen, Beleihungsknöpfe (19.10.2026, Staging)
 
 - **Was:**
