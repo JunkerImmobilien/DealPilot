@@ -3159,6 +3159,66 @@ async function _exportPDFInner() {
   setPdfProgress(70);
 
   /* ══════════════════════════════════════════════════
+     SEITE 4c · v2430: WERTPOTENZIAL (Mieterhöhung und Zielbild)
+     Nur wenn Soll-Miete oder Zielbild eingetragen sind. Gerechnet wird
+     hier nichts: DpPotenzial stellt Mieten und Kosten zusammen, die
+     Ertragswerte kommen aus dem Marktbericht-Dienst (derselbe Kern wie
+     Stufe 3). Kennzeichnung: Potenzialwert, keine Verkehrswertermittlung.
+  ══════════════════════════════════════════════════ */
+  try {
+    var _PZ = window.DpPotenzial || null, _PD = null;
+    if (_PZ && _PZ.modell && _PZ.modell().aktiv) {
+      await Promise.race([_PZ.rechnen(), new Promise(function (f) { setTimeout(f, 40000); })]);
+      _PD = _PZ.pdfDaten();
+    }
+    if (_PD) {
+      var _pc = function (t) { return String(t == null ? '' : t).replace(/[–—−‑]/g, '-').replace(/[  ]/g, ' ').replace(/[^\x00-\xFF€]/g, '').replace(/\s+/g, ' ').trim(); };
+      cy = newPage('Wertpotenzial');
+      cy = secH(doc, cy, 'Wertpotenzial · Mieterhöhung und Zielbild', M, CW);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.6); doc.setTextColor.apply(doc, C.CH);
+      doc.splitTextToSize(_pc(_PD.satz_invest + ' ' + _PD.satz_bank), CW).forEach(function (t) { doc.text(t, M, cy + 3); cy += 4.4; });
+      cy += 4;
+      var _tab = function (kopf, breiten, zeilen, fettRe) {
+        var fak = CW / breiten.reduce(function (a, b) { return a + b; }, 0), rh = 5.8;
+        var zeichne = function (werte, istKopf, idx) {
+          var x = M;
+          doc.setFillColor.apply(doc, istKopf ? C.CH : (idx % 2 === 0 ? C.SURF : C.WHITE));
+          doc.setDrawColor.apply(doc, C.BORDER); doc.setLineWidth(0.2);
+          doc.rect(M, cy, CW, rh, istKopf ? 'F' : 'FD');
+          var fett = !istKopf && fettRe && fettRe.test(String(werte[0]));
+          doc.setFont('helvetica', (istKopf || fett) ? 'bold' : 'normal'); doc.setFontSize(istKopf ? 7 : 8);
+          werte.forEach(function (w, i) {
+            var bw = breiten[i] * fak;
+            if (istKopf) doc.setTextColor.apply(doc, C.GOLD);
+            else if (kopf[i] === 'Mieterhöhung') doc.setTextColor(61, 111, 168);
+            else if (kopf[i] === 'Zielbild' || kopf[i] === 'Ziel €/M') doc.setTextColor(47, 125, 85);
+            else doc.setTextColor.apply(doc, C.CH);
+            var t = _pc(w);
+            if (i === 0 || /Maßnahmen/.test(kopf[i])) doc.text(doc.splitTextToSize(t, bw - 3)[0] || '', x + 2, cy + rh - 1.8);
+            else doc.text(t, x + bw - 2, cy + rh - 1.8, { align: 'right' });
+            x += bw;
+          });
+          cy += rh;
+        };
+        zeichne(kopf, true, 0);
+        zeilen.forEach(function (z, n) {
+          if (cy > 270) { cy = newPage('Wertpotenzial · Fortsetzung'); zeichne(kopf, true, 0); }
+          zeichne(z, false, n);
+        });
+        cy += 5;
+      };
+      if (_PD.art === 'mfh' && _PD.wohnungen.length) {
+        _tab(['WE', 'm²', 'Ist €/M', 'Mieterhöhung', 'Ziel €/M', 'Maßnahmen'], [30, 11, 18, 30, 18, 48],
+          _PD.wohnungen.map(function (w) { return [w.we, String(Math.round(w.wfl || 0)), w.ist, w.soll, w.ziel, w.massnahmen]; }));
+      }
+      _tab(['Kennzahl'].concat(_PD.spalten.map(function (k) { return _PD.titel[k]; })), [58].concat(_PD.spalten.map(function () { return 30; })),
+        _PD.kennzahlen, /^Ertragswert|^nach Aufteilung/);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.MID);
+      doc.splitTextToSize(_pc(_PD.fuss), CW).forEach(function (t) { doc.text(t, M, cy); cy += 3.6; });
+    }
+  } catch (e) { try { console.warn('[pdf] Wertpotenzial', e); } catch (x) {} }
+
+  /* ══════════════════════════════════════════════════
      SEITE 5: KI-INVESTMENT-ANALYSE (optional)
   ══════════════════════════════════════════════════ */
   // Check if user wants KI in PDF
