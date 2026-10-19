@@ -38840,6 +38840,25 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2388 · Modul 25 „Die geführte Eingabe“ neu aufgenommen (MFH Fürth), vertont, in der Videothek (19.10.2026, Staging, Video-Agent)
+
+- **Was:** Prüflauf im Studio mit 300-ms-Protokoll (Kapitelband, Kegel per `DPM_KEGEL_MESSUNG`, Überdeckung Chat/Liste gegen Mikrofonzeile, jeder `fetch`/XHR/Beacon im App-Fenster). Vier Befunde, in `v2388` behoben (`frontend/js/messe-drehbuch.js`, Buster `v2388`):
+  1. **Scores nicht im Bild:** „Zwei Scores“ rahmte beide `.dpsh-mainrow` (mit allen Balken) — zusammen höher als die App (653 px), der Ring des Deal Score lag oben außerhalb, die 60 war nicht zu sehen. Jetzt je Score der Ring (`.dpsh-colring`) einzeln mit eigener Zeile, die Gewichte danach; zum Schluss beide Ringe nur, wenn sie passen, sonst Urteil des Deal Score + Ring des Investor Deal Score.
+  2. **Bezahlter Abruf je Durchgang:** nach „Übernehmen“ gingen zwei `GET /marktbericht/geocode/autocomplete` hinaus (Geoapify, aus `adress-autocomplete.js _koordHolen`). `rhAntwort` spielt im Lauf eine leere Liste — gilt für alle Reihen-Drehbücher.
+  3. „Objekt und Größe“ stand nur 1 s (das Abruf-Angebot kam danach): Szene 4 erledigt erst das Angebot.
+  4. „Umlagefähig und eigener Teil“ stand 40 s über drei anderen Antworten: eigene Zeile „Annahmen und Standort“.
+  Das Drehbuch zeigte nirgends auf `.vi-dran-btn`; „Erklär mir das“ wird nie geklickt, im Abruf-Angebot nur „Nein, überspringen“ und „Bodenrichtwert holen“.
+- **Commit:** `a4f8ce96` (v2388), `115b29bd` (landing-videothek-3c: Eintrag, Poster), dazu `landing-videothek-4a` (Sprecher-Fassung, `datei_ton`).
+- **Nachweis:**
+  - Prüflauf 2 (nach v2388): rund 1.700 Proben, Überdeckung Chat/Liste–Mikrofonzeile **0**, alle 20 Antworten angekommen, `gesperrt` leer; hinaus gingen nur `POST/PUT/DELETE` am eigenen Testobjekt, `tax-records`/`tax-snapshots` dazu, `POST /marktbericht/wertparameter/zinssatz` (DB-Abfrage) und das freie BORIS-GET; **kein** KI-, Geokodier- oder Autocomplete-Abruf (22 gespielt). Danach `fetch` und `getUserMedia` wieder nativ, `dp_zielstufe` zurück auf 1.
+  - Bodenrichtwert in Fürth kommt an: **1.150 €/m²**, BORIS 01.01.2026, Zone 522.
+  - **Reiter Bewertung live: Deal Score 60 · SOLIDE, Investor Deal Score 79 · GUT** (Gewichte im Demo-Konto 20/22/14/14/30; Zwischenstände im Chat 39 · Schwach und 73 · Gut).
+  - Testobjekte: 4 angelegt (zwei Prüfläufe, zwei Aufnahmen), 4 gelöscht; DB danach: 0 Objekte mit „Dambacher“, keins von heute.
+  - Aufnahme 1 im Gruppen-Tab **verworfen**: das Hinweisfeld der Erweiterung „Claude is active in this tab group“ lag die ganze Zeit mitten über dem Untertitel. Aufnahme 2 in einem eigenen Fenster (`chrome --new-window`), 6-s-Probe sauber, Start per Leertaste, Fenster danach geschlossen.
+  - Stichbilder alle 30 s selbst angesehen: keine Überlagerung, Scores im Bild, kein „du fliegst“.
+- **Video:** `Dateien/Messe/Videos/Videoreihe/Modul 25 - Gefuehrte Eingabe/DealPilot Modul 25 - Gefuehrte Eingabe.mp4` (8:53, 18,5 MB); vertont (onyx, Pirate-Vibe, Hochdeutsch, 38 Abschnitte, −16,3 LUFS) unter `Videoreihe-Sprecher/…` (25,1 MB) mit `texte.json` und STAND.md. Beide als MP4 auf Staging (md5 geprüft). Prod nicht angefasst.
+- **Rest:** In der App aufgefallen, nicht geändert: die Liste „Was schon steht“ beschriftet beim MFH die Bewirtschaftungskosten als „Hausgeld“; die Übersicht nennt getippte Antworten „Sprachaufzeichnung“; der Bodenrichtwert im Chat steht ohne Tausenderpunkt („1150 €/m²“); Zwischenstand-Wörter in Versalien („SCHWACH“, „GUT“) neben „Solide“/„Gut“ im Reiter. Der alte Rohschnitt `roh-modul-25.mp4` (Herford) liegt noch im Ordner.
+
 ### v2390 · Marktbericht: Zinsherkunft im Klartext, GND/BWK des Zinssatzes, BRW-Herkunft, Pauschal-Sachwert vorläufig (19.10.2026, Staging, nicht ausgerollt)
 
 - **Was (Marcels Entscheidungen vom 19.10.2026):**
