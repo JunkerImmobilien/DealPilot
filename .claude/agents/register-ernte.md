@@ -72,6 +72,18 @@ Jeder **Wert** zusätzlich:
   SEIN Dokument, ist sie seine — dann Wert mit `herkunft`; ohne diesen Beschluss
   bleibt die Regel oben: VW-RL nicht zulässig.
 
+## Gebührenpflichtig heißt: Absprung mitliefern (Marcel 19.10.2026)
+- „Wenn die irgendwie gebührenpflichtig sind, dass wir die dann auch abrufen
+  können und die Leute dann direkt den Absprung finden." Gilt für Berichte,
+  Einzelauskünfte UND Bodenrichtwerte (Bayern: Stadt Nürnberg u. a. geben den
+  BRW nur gegen Gebühr heraus).
+- Ist ein Wert nur gegen Gebühr zu haben: Sperre mit `zugang: 'kostenpflichtig'`,
+  dem **direkten Link** zur Bestell-/Abrufseite (nicht zur Startseite), der Gebühr,
+  soweit genannt, und der zuständigen Stelle — in `quelle_url` bzw. in
+  `lib/quellen_links.js` (`warum_kein_wert`). Keine Zahl ohne Beleg.
+- Die App zeigt das unter dem Feld als „Gebührenpflichtig … dort abrufen →"
+  (v2370, `bodenrichtwert.js`); ohne Link endet der Nutzer dort im Leeren.
+
 ## Ablauf
 1. Lage messen, nicht annehmen: `node tools/saat-pruefen.mjs` zeigt je Datei,
    was fehlt; die Länderlage steht im Register (Dateien + `SAATDATEIEN` in
