@@ -294,6 +294,33 @@ if ($standFern -ne $standLokal) {
 }
 Write-Host "   [ok] Serverstand geprueft: $($standFern.Substring(0,10)) == lokal $($standLokal.Substring(0,10))" -ForegroundColor Green
 
+# --- 8) v2396 - Register-Dateien gegen mb.param_modell ----------------
+# Am 19.10.2026 lief die Verknuepfung an vier Stellen auseinander (DB-Wert
+# ueber Datei-Sperre, Waisen nach URL-Wechsel, Feldverlust) und kein
+# Pruefer sah es: saat-pruefen liest nur die Dateien. Der Abgleich liest
+# die Tabelle (nur SELECT). NICHT blockierend - das Ausrollen ist an dieser
+# Stelle schon geschehen -, aber laut: ROT und "nicht erreichbar" stehen
+# in Rot da, nicht als Fussnote.
+if (Test-Path "tools\register-db-abgleich.mjs") {
+    $abgl = node tools/register-db-abgleich.mjs "--ssh=$SERVER" 2>&1
+    $abglRc = $LASTEXITCODE
+    if ($abglRc -eq 0) {
+        Write-Host "   [ok] Register gegen Datenbank: sauber" -ForegroundColor Green
+        $abgl | Select-String "DECKUNG" | Out-Host
+    } elseif ($abglRc -eq 2) {
+        Write-Host ""
+        Write-Host "   [!!] REGISTER-ABGLEICH NICHT GELAUFEN: Datenbank nicht erreichbar." -ForegroundColor Red
+        $abgl | Out-Host
+        Write-Host "        node tools/register-db-abgleich.mjs --ssh=$SERVER" -ForegroundColor Yellow
+    } else {
+        Write-Host ""
+        Write-Host "   [!!] REGISTER UND DATENBANK WEICHEN AB:" -ForegroundColor Red
+        $abgl | Select-String "DECKUNG|ROT|ERGEBNIS" | Out-Host
+        Write-Host "        node tools/register-db-abgleich.mjs --ssh=$SERVER --liste" -ForegroundColor Yellow
+        Write-Host "        aufraeumen: docker exec dealpilot-mb-backend node /app/tools/register-saat.mjs --aufraeumen (vorher pg_dump)" -ForegroundColor Yellow
+    }
+}
+
 Write-Host ""
 Write-Host "Fertig. Im Browser Strg+Shift+R." -ForegroundColor Green
 Write-Host ""
