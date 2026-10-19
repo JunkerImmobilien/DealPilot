@@ -39017,6 +39017,29 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - Pilot-Antwort zu „Stufe 2“ und „Stufe C“.
 - Essen EFH Sachwertfaktor 1,33 im echten Bericht.
 
+### v2410 · Kanban raus, „Aus Wohnungen" ohne Staffel-Haken, Ist/Soll auf gleicher Basis (19.10.2026, Staging)
+
+**Was (drei Aufträge von Marcel):**
+1. **Portfolio-Cockpit ohne Kanban-Board.** Abschnitt „03 Objekte" (In Prüfung / Gewonnen / Verloren) wird in `dashboard.js` `ensureMarkup()` nicht mehr gebaut, die zwei Zeilen stehen kommentiert mit Grund und Datum. `renderBoardOrCards()` findet `#dp-board` nicht und kehrt zurück, `kanbanCardHtml` bleibt stehen. Keine Daten berührt (der Deal-Status lebt im Objekt). Die Abschnitte rücken auf: 03 Geteilte Objekte … 08 Jahresabschluss. Mitgezogen: `help.js` („acht Abschnitte", Board-Satz weg), `prozess-atlas.js`. Messe-Drehbuch 21 (`reihe-cockpit`) greift nicht auf das Board zu, nur auf `#dp-pscore-hero`, `#dp-overview-strip`, `#dp-steuerkette`, `#dp-charts-sec`, `#dp-pp`. **Nicht angefasst:** die Kanban-Ansicht unter „Alle Objekte" (`all-objects-views.js`) — ein anderes Board.
+2. **„Aus Wohnungen" im Tab Miete.** Ursache gemessen (API, nur GET) an Westerfeldstr. 140 Bielefeld (MFH, `ae155d38…`): vier Wohnungen mit Ist 799/799/799/798 und Soll 950/850/880/840, Vertragsart unbefristet, **kein** Haken `mv_in_mietentwicklung`. `einheitenNutzbar()` verlangte genau diesen Haken — den das Wohnungsfenster aber nur bei Staffel/Index zeigt. Mit gewöhnlichen Verträgen war der Knopf **nie** freizuschalten. Jetzt reicht eine vermietete Wohnung mit Ist-Miete. Im Modus rechnet jede Wohnung ihre Staffel, ab dem Soll-Jahr ihre Soll-Miete (nie unter der Staffel, Leerstand im Ist nicht mit); der pauschale `sollSprung` entfällt in diesem Modus (sonst doppelt).
+   **Zweiter Befund, gleiche Wirkung:** beide Bielefelder MFH tragen `sollAbJahr` 2028 bzw. 2027 — Kalenderjahre in einem Feld, das den Index meint („z. B. 3"). Der Sprung griff dadurch in keinem Betrachtungszeitraum. Ab 1900 gilt der Wert jetzt als Kalenderjahr (Index = Jahr − Basisjahr, dasselbe Basisjahr wie `calc.js`), das Feld sagt es dazu.
+   **Dritter Befund:** Westerfeld stand auf Detail mit leerer „Anzahl Erhöhungen" → Faktor 1,0 auf alle Jahre. `uebernehmen()` setzte `me_soll`/`me_pct`, aber nie den Modus; jetzt stellt es auf „Aus Wohnungen" (mit Meldung im Toast), wenn Soll-Mieten oder Staffel-Haken da sind, und setzt `me_pct` nicht mehr, wenn ein Soll-Jahr steht (Detail rechnete Soll ÷ Ist sonst zweimal).
+3. **MFH-Tafel „Ist gegen Soll":** Soll-Bruttomietrendite stand auf Gesamtinvestition, Ist auf Kaufpreis. Jetzt beide auf Kaufpreis; die Soll-Zahl kommt aus `DealKpis.compute({kp, nkm: Soll, ze})`, nicht nachgerechnet. **Die Annahme „Zusatzeinnahmen nur im Soll" stimmte nicht** — `K.nkm_j` ist (NKM + ZE) × 12, die ZE stehen in beiden Spalten (gemessen: Ist 39.420 € = 3.195 × 12 + 1.080).
+
+**Commit:** `25d04e9a` (Buster index.html: mietentwicklung, mfh-einheiten, help, prozess-atlas, dashboard → v2410).
+
+**Nachweis:**
+- Prüflauf gegen die echte `mietentwicklung.js` mit dem Westerfeld-Datensatz (Node, 12 Fälle grün): Freigabe ohne Haken, `sollJahr(2028)` = 3 bei Basis 2025, Faktor 3.520/3.195 = 1,1017 ab dem Sprung, keine Doppelung im Modus, Leerstand, relativer Wert bleibt Index, ohne Ist-Miete gesperrt.
+- Staging-Browser (eigener Tab, kein Objekt geladen, nichts gespeichert, Westerfeld-`updated_at` vorher/nachher gleich 13:17:55): Cockpit mit 01–08 ohne `#dp-board`, kein „Kanban" im Text. Westerfeld-Daten nur im Speicher: Knopf frei („0 mit Staffel, 4 mit Soll-Miete"), nach Klick Modus `einheiten`, Tabelle 39.420 € → 43.320 € ab 2028, Kopfzeile nennt die Soll-Miete. Tafel: 7,23 % / 7,95 % beide „auf Kaufpreis".
+- `buster-ebenen-pruefen.mjs`: SAUBER.
+
+**Rest:**
+- `uebernehmen()` (Modus-Umstellung, `me_pct`) nicht im Browser bedient — Staging-Abnahmepunkt: Konfigurator an einem MFH öffnen, „Übernehmen", Toast muss „Mietentwicklung: aus Wohnungen" nennen.
+- Im Modus „Aus Wohnungen" steigen Wohnungen ohne Staffel bis zur Soll-Miete und danach **gar nicht** (Doktrin v2024). Produktfrage an Marcel, ob danach die Prognose-Steigerung weiterlaufen soll.
+- Die Mietentwicklungs-Tabelle beschriftet Index f als „Jahr f", die Projektion in `calc.js` führt denselben Wert als Jahr f + 1 (Kalender Basis + f). Altbestand, nicht angefasst.
+- `_jahreBis()` (Staffeltermine) misst ab heute, nicht ab Basisjahr — bei Kauf in der Vergangenheit kommen Staffelstufen ein Jahr zu früh. Altbestand.
+- Marcels offener Westerfeld-Tab läuft noch mit altem Code: **erst speichern, dann neu laden.** Die gespeicherten Daten brauchen keine Änderung — 2028 wird jetzt richtig gelesen; „Aus Wohnungen" wählt er selbst.
+
 ### v2400–v2403 · Stufe N · DealPilot-Formel als eigene Herkunftsstufe, LZS-Formel in der Kaskade (19.10.2026, Staging)
 
 **Was (Marcel 19.10.2026 freigegeben, Auftrag aus dem Zwischenstand unten):**
