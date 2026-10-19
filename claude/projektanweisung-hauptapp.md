@@ -39017,6 +39017,37 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - Pilot-Antwort zu „Stufe 2“ und „Stufe C“.
 - Essen EFH Sachwertfaktor 1,33 im echten Bericht.
 
+### v2430–v2430b · Mieterhöhung und Zielbild: Ertragswert je Stufe, MFH-Wohnungsfenster, Pilot, beide PDFs (19.10.2026, Staging)
+
+**Was (Marcels Entscheidungen vom 19.10.2026, Vorlage https://claude.ai/artifact/KThexeEAnjWQUPuvd9o1Rx):**
+- **Drei Mieten je Wohnung:** Ist · Soll-Miete (Mieter bleibt) · Zielbild (nach Umbau/Neuvermietung), beide freiwillig.
+- **Backend (mb):** `ReportOrchestrator.generate(…, { nurWertBasis: true })` läuft denselben Weg wie Stufe 3 bis `CrossCheckService.compute` — ohne Eintrag in `mb.properties`/`mb.market_reports`, ohne Mikrolage, Preishistorie, Marktkontext, GeoMap-Kontostand und KI. Der Quercheck legt die Eingabe des Ertragswert-Kerns nicht aufzählbar ab (`_ertragswertEingabe`, geht in keinen Bericht). `PotenzialService` ruft `ErtragswertService.ertragswert` je Stufe mit getauschtem Wohn-Rohertrag und RND nach Modernisierungspunkten (nie kürzer als der Bestand); die BWK-Quote wandert mit dem Rohertrag. Je Wohnung Anteil am Haus (nach Rohertrag) und als ETW (Zins der Kaskade für Wohnungseigentum, Bodenwertanteil nach MEA bzw. Fläche), Summe nach Aufteilung minus Aufteilungskosten. `POST /api/v1/marktbericht/potenzial` + Proxy im Haupt-Backend, ohne Kontingent.
+- **Frontend `potenzial.js` (DpPotenzial):** Soll-Miete = eigene Angabe oder gerechnet (§ 558 bis Vergleichsmiete — Wohnung, sonst `ds2_marktmiete`, sonst `me_soll` —, Kappungsgrenze aus `js/data/kappungsgrenzen.json` mit `kappung15`, Ablaufdatum je Gemeinde und `unsicher`, Rückfall 20 % „bitte prüfen“; frühestens 15 Monate nach `mv_letzte_erhoehung`; § 559 bei Haken „bewohnt“: 8 %, Deckel 3 bzw. 2 €/m²). Maßnahmen-Chips mit Kosten und Anlage-2-Gewinn je Gewerk (Punkte aus `DpMfhEinheiten`, keine zweite Tabelle). Ergebnis mit Prüfwert in `_dpPotenzial` (storage.js `_potenzial`), AGS über `/wertparameter/zinssatz`.
+- **MFH-Fenster:** Liste schlank (Nr, Lage, m², Zi., Ist, Status, „Details · Plan“). Wohnungsfenster mit Blöcken Stammdaten · Mietvertrag · Ist · Soll-Miete (Mieter bleibt) · Zielbild (Chips, Zielmiete, wann) · Ertragswert dieser Wohnung (als Eigentumswohnung / Anteil am Haus). Alte `massnahme`/`kosten` werden beim Lesen zur Liste und beim Speichern gespiegelt. Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung, eigene Angabe) neben dem Haken „aufgeteilt“.
+- **Tab Objekt:** Karte „Mieterhöhung und Zielbild (optional)“ (`zb_*` in FIELDS und resetFields); beim MFH nur die Summe aus den Wohnungen. `newObj` leert jetzt auch `_dpMfh`/`_dpRnd`/`_dpPotenzial` (vorher erbte ein neues Objekt das MFH des vorigen).
+- **Mietentwicklung „Aus Wohnungen“:** Soll-Miete je Wohnung ab „erreichbar“ (eigene Angabe > max(Soll-Jahr, Frist) > Frist), danach `mietstg`; Zielbild nicht.
+- **Pilot-Analyse:** Reiter „Ankauf · Bestand · Zielbild“ (Spalten Ankauf | Bestand | Mieterhöhung | Zielbild, Aufteilung, Absatz `potenzial_text`); „dein Soll / dein Ist“ entfernt. Payload `potenzial`, vor dem Abruf werden die Ertragswerte geholt (≤ 40 s). openaiService: Block, Aufgabe 17, Feld `potenzial_text`.
+- **PDFs:** Seite „Wertpotenzial“ im Bank-PDF (nach der Mieterliste) und im Investment-PDF (vor der KI-Analyse).
+- **Portfolio-Pilot:** Werkzeug `potenzial_lesen` (ein Objekt oder `alle: true` als Rangliste nach Wertzuwachs).
+- **Sprache/geführte Eingabe:** Bestandsaufnahme: `me_modus` war als verstecktes Feld nie im Katalog, `_dpMfh` kannte voice-import nicht. Jetzt freiwillige Frage (ETW/EFH: `zb_*`; MFH: `mfh_wohnungen` → `DpPotenzial.wohnungenAusText`), `me_modus` als Auswahl, Übernahme über `MietEntwicklung.setMode`.
+- **Hilfe:** Abschnitt „Mieterhöhung und Zielbild“.
+
+**Commit:** `34fcb113` (Backend), `c856a314` (Daten/MFH/Objekt/Mietentwicklung), `38a9a363` (Pilot), `58a8684b` (PDFs), `4fbf4102` (Sprache), `d39dbf55`, `9d644c26` (v2430a), `8c1ccfe6` (v2430b).
+
+**Nachweis:**
+- **Abgleich Ertragswert:** Westerfeldstr. 140 (Datensatz `ae155d38.json`, Probe vom Nachmittag, 2 Modernisierungspunkte) im Container über `nurWertBasis`: Bestand **725.000 €** = Bericht Stufe 3 (mb.market_reports 312: 725.000 €), LZS 2,5 % A, RND 23,6. Derselbe Lauf über den Proxy mit dem heutigen Datensatz (6 Punkte) ergibt 800.000 € — Bestand und `bericht_ertragswert` gleich, Unterschied allein durch die Punkte.
+- Laufzeit `/potenzial` über den Proxy 9 s.
+- Prüfer: `prompt-lecks-pruefen`, `objekt-mapper-pruefen`, `score-ketten-pruefen` (216), `rnd-kerne-pruefen` RC 0; `buster-ebenen-pruefen` SAUBER; `frontend-konstanten` nachgezogen; Gold-Audit Staging RC 0; `node --check` je Datei; Kappungsleser gegen die echte JSON (Bielefeld 15 % mit „Mieterschutzverordnung NRW“, Hüllhorst 20 %, Darmstadt 15 % „bitte prüfen“).
+- Browser (eigener Tab, Testobjekt „PRUEFUNG Zielbild 19.10.“ angelegt und über `delSaved` wieder gelöscht, Westerfeld `updated_at` unverändert 13:17:55): MFH-Fenster mit vier Blöcken, Soll aus Kappung/Vergleichsmiete, Chips und Punkte (+4 je Wohnung, +1 flächengewichtet); Ertragswert je Wohnung (ETW 2,9 % A); Mietentwicklung Faktor 1,0491 ab Jahr 1; Reiter „Ankauf · Bestand · Zielbild“ mit Aufteilung; Bank-PDF Seite 6 und Investment-PDF Seite 10 „Wertpotenzial“ angesehen (Spaltenüberlauf behoben in v2430a); ETW-Karte im Tab Objekt, Persistenz nach Neuladen (Prüfwert gleich); `potenzial_lesen` im Container: 13 Objekte mit Plan.
+
+**Rest / Fragen an Marcel:**
+- **Geld:** Der Ertragswert „Bestand“ ist derselbe wie im Bericht Stufe 3 (Kontingent „wev“), hier aber ohne Kontingent. Gewollt? Sonst Bindung an Tarif oder an einen vorhandenen Stufe-3-Bericht.
+- Aufteilung in NRW meist negativ: ETW-Zins des Oberen Gutachterausschusses 2,9 % gegen 2,5 % MFH (Bielefeld), dazu Anlage-3-Verwaltung je ETW. Das ist der amtliche Stand, kein Fehler — Marcel bitte fachlich ansehen.
+- Ändert sich irgendein Feld, ist das gespeicherte Ergebnis veraltet (Prüfwert über den ganzen Auftrag); PDF/Pilot rechnen dann neu (bis 40 s).
+- Sprache: echter Sprechlauf (KI) nicht bedient — Staging-Abnahmepunkt: MFH, „Weiß ich nicht“ und eine Wohnungsliste diktieren.
+- Pilot-Absatz `potenzial_text` nicht mit echter KI abgerufen (nur Darstellung) — Abnahmepunkt.
+- Mietentwicklung am Objekt (ETW/EFH) nutzt die Soll-Miete der Karte noch nicht (nur der MFH-Modus).
+
 ### Prod-Rollout (54) · v2401–v2403, v2410, qc-v2420a, v2421/v2422, landing-videothek-4c (19.10.2026)
 
 **Was:**
