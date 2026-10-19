@@ -112,7 +112,7 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     '10a': { hinweis: 'Vorführung · Beispieldaten', messe: 'reihe-steuer', titel: 'Steuer: AfA, Zeiträume, Restnutzungsdauer', unter: 'Was ein Mehrfamilienhaus dir steuerlich bringt — und wann ein Gutachten lohnt.',
             spruch: 'Abschreibung an Bord,', spruch2: 'Steuer im Steigflug.', weiter: 'Modul 10b · BMF-Kaufpreisaufteilung' },
     '10b': { hinweis: 'Vorführung · Beispieldaten · aufgezeichnete BMF-Berechnung', messe: 'reihe-bmf', titel: 'BMF-Kaufpreisaufteilung', unter: 'Gebäude und Boden — Bodenabschlag, Notarklausel, 15-%-Grenze.',
-            spruch: 'Gebäude und Boden getrennt —', spruch2: 'sauber gelandet.', weiter: 'Modul 11 · Pilot-Analyse im Detail' },
+            spruch: 'Gebäude und Boden getrennt —', spruch2: 'sauber gelandet.', weiter: 'Modul 10c · Der Restnutzungsdauer-Rechner' },   /* v2395: vorher Modul 11 - 10c übersprungen */
     /* v2283 · Modul 10c (Restnutzungsdauer-Rechner nach v2274/v2275) */
     '10c': { hinweis: 'Vorführung · Kopien zweier Demo-Objekte · nichts wird angefragt', messe: 'reihe-rnd', titel: 'Der Restnutzungsdauer-Rechner', unter: 'Ganze Jahre, Spanne, übernehmen — und wo die Anlage 2 endet.',
             spruch: 'Restflugzeit geschätzt —', spruch2: 'das Gutachten landet.', weiter: 'Modul 11 · Pilot-Analyse im Detail' },
@@ -143,11 +143,13 @@ body{background:radial-gradient(70% 60% at 18% 8%,color-mix(in srgb,var(--g) 16%
     '20': { hinweis: 'Vorführung · Demo-Konto · nichts wird heruntergeladen', messe: 'reihe-bankexport', titel: 'Bankexport Portfolio', unter: 'Alle Darlehen in einer Tabelle — für das Bankgespräch.',
             spruch: 'Alle Maschinen gelistet —', spruch2: 'die Bank sieht die Flotte.', weiter: 'Modul 21 · Portfolio-Cockpit und Pilot' },
     '21': { hinweis: 'Vorführung · Demo-Konto · aufgezeichnete Analyse', messe: 'reihe-cockpit', titel: 'Portfolio-Cockpit und Pilot', unter: 'Alle Objekte auf einer Seite — und ein Pilot, der sie kennt.',
-            spruch: 'Die ganze Flotte im Blick —', spruch2: 'der Pilot fliegt mit.', weiter: 'Modul 23 · Die 15-%-Grenze' },
+            spruch: 'Die ganze Flotte im Blick —', spruch2: 'der Pilot fliegt mit.', weiter: 'Modul 22 · Der Telegram-Bot' },   /* v2395: vorher Modul 23 - 22 übersprungen */
     '24': { hinweis: 'Vorführung · Kopie eines Demo-Objekts · nichts wird bestellt', messe: 'reihe-brw-unterlagen', titel: 'Bodenrichtwert und Unterlagen', unter: 'BORIS, die zuständigen Ämter — und was DealPilot nicht verschickt.',
             spruch: 'Boden unter den Rädern —', spruch2: 'Papiere an Bord.', weiter: 'Basismodule 02–10 · jeder Bereich im Detail' },
     '23': { hinweis: 'Vorführung · Kopie eines Demo-Objekts · angenommene Beträge', messe: 'reihe-15pct', titel: 'Die 15-%-Grenze', unter: 'Anschaffungsnahe Herstellungskosten — Schwelle, netto, drei Jahre, Kaufpreisaufteilung.',
-            spruch: 'Unter der Grenze geblieben —', spruch2: 'Steuer im Sinkflug.', weiter: 'Modul 24 · Bodenrichtwert und Unterlagen' },
+            /* v2395 · Marcel 19.10.2026: sachlicher Text, kein Wortspiel. Vorher „Unter der Grenze geblieben —
+               Steuer im Sinkflug" - das letzte Szenario (180.000 €) liegt aber ÜBER der Grenze. */
+            spruch: 'Die Grenze vor der Sanierung kennen —', spruch2: 'netto, drei Jahre, am Gebäudeanteil.', weiter: 'Modul 24 · Bodenrichtwert und Unterlagen' },
     /* v2371 · Modul 25 (Erweitert): die geführte Eingabe, Frage für Frage */
     '25': { hinweis: 'Vorführung · Beispieldaten · getippt · aufgezeichnete Auslese der Antworten', messe: 'reihe-gefuehrt', titel: 'Die geführte Eingabe', unter: 'Ein Mehrfamilienhaus, Frage für Frage — bis zu Deal Score und Investor Deal Score.',
             spruch: 'Frage für Frage beantwortet —', spruch2: 'das Objekt ist vollständig erfasst.', weiter: 'Modul 12 · Bewertung und KPIs' },

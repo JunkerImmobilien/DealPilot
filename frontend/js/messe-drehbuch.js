@@ -3485,6 +3485,7 @@
   }
   function r15Det(re) { var b = r15Box(); return b ? [].filter.call(b.querySelectorAll('tr'), function (t) { return t.offsetWidth && t.firstElementChild && re.test(r6Text(t.firstElementChild).replace(/\s*ℹ\s*$/, '')); })[0] || null : null; }
   function r15DetWert(re) { var t = r15Det(re), i = t && t.querySelector('input'); return i && i.value ? eur(Number(i.value)) : null; }
+  function r15DetFest(re) { var t = r15Det(re), f = t && t.querySelector('.ytf-readonly'); return f ? r6Text(f) : null; }   /* v2395 · übernommene Werte ohne Eingabefeld */
   function r15Gruppe(re) { var b = r15Box(); return b ? [].filter.call(b.querySelectorAll('tr,div'), function (t) { return t.offsetWidth && t.children.length <= 2 && re.test(r6Text(t)); }).pop() || null : null; }
   function r15Summe(re) { var t = r6Inner(r15Box()), m = re.exec(t); return m ? m[1].trim() : null; }
   function r15Oben(e) { if (!e) return; var s = scroller(e); if (s) s.scrollTop += rect(e).top - 110; }
@@ -3560,7 +3561,10 @@
         var zl = function () { return r15Zeile(R15_JAHR); };
         await zeige(zl, 6);
         var c = r15Zellen(R15_JAHR);
-        await b2oZeile(s, 'Das Jahr ' + R15_JAHR, 'Einnahmen <b>' + (c[1] || '–') + '</b>, Schuldzinsen ' + (c[2] || '–') + ', AfA ' + (c[3] || '–') + ' — Ergebnis <b>' + (c[6] || '–') + '</b>, Steuer-Effekt <b>' + (c[7] || '–') + '</b>.');
+        /* v2395 · die Spalte heißt „Einnahmen V+V", trägt aber nur die KALTMIETE (tax.js _renderQuickForm:
+           einnahmen_km; die umlagefähigen NK fehlen dort auf beiden Seiten). Der Detail-Modus nennt als
+           „Einnahmen V+V" Kaltmiete + NK - im Video standen so 39.652 und 41.396 € bei gleichem Ergebnis. */
+        await b2oZeile(s, 'Das Jahr ' + R15_JAHR, 'Kaltmiete <b>' + (c[1] || '–') + '</b>, Schuldzinsen ' + (c[2] || '–') + ', AfA ' + (c[3] || '–') + ' — Ergebnis <b>' + (c[6] || '–') + '</b>, Steuer-Effekt <b>' + (c[7] || '–') + '</b>.');
       },
       async function (s) {   /* 4 · was man einträgt */
         var f = function () { var t = r15Zeile(R15_JAHR); return t && t.querySelector('input'); };
@@ -3590,6 +3594,14 @@
         r15Oben(er()); await warte(400);
         await zeige(er, 8);
         await b2oZeile(s, 'Erhaltungsaufwand', 'In ' + R15_JAHR + ' eingetragen: <b>' + (r15DetWert(/^Erhaltungsaufwendungen/) || '–') + '</b> für Reparaturen. In den ersten drei Jahren nach dem Kauf zählt dabei die 15-%-Grenze — Modul 10b zeigt sie.');
+        /* v2395 · Einnahmen im Detail: Kaltmiete + umlagefähige NK (durchlaufender Posten, auch als Kosten) */
+        var km = function () { return r15Det(/^Kaltmiete$/); }, nkr = function () { return r15Det(/^Nebenkosten \(umlagefähig\)$/); };
+        var kmW = r15DetFest(/^Kaltmiete$/), nkW = r15DetFest(/^Nebenkosten \(umlagefähig\)$/), einW = r15Summe(/Einnahmen V\+V:\s*([^\n]+)/);
+        if (km() && kmW && nkW && einW) {
+          r15Oben(km()); await warte(400);
+          await zeigeGruppe(km, nkr, 6);
+          await b2oZeile(s, 'Die Einnahmen', 'Einnahmen V+V <b>' + einW + '</b>: Kaltmiete ' + kmW + ' plus umlagefähige Nebenkosten ' + nkW + ' — die gehen als Kosten wieder ab. Die Jahreszeile zeigt nur die Kaltmiete.');
+        }
         var sm = function () { return rhIm(r15Box(), /^Werbungskosten gesamt:?$/); };
         var sb = function () { var e = sm(); return e && (e.closest('div[style*=grid],div[class]') || e.parentElement); };
         r15Oben(sb()); await warte(400);
@@ -4622,7 +4634,12 @@
         var log = function () { return q('#dp-pp-log'); };
         var l = log(); if (l) l.scrollTop = 0;
         await zeige(log, 6);
-        var txt = (D.portfolioPilot.reply || ''), h = (txt.match(/^\s*(?:#+\s*)?\d\.\s*[^\n]{3,60}/gm) || []).slice(0, 3).map(function (x) { return x.replace(/^\s*#*\s*/, '').replace(/\*/g, '').trim(); });
+        /* v2395 · vorher nur die Überschriften („1. Vermögensbilanz heute: · 2. Ertragslage: ·") - unter
+           „mit Zahlen" stand keine Zahl. Jetzt je Abschnitt Überschrift + erster Posten, aus der Antwort gelesen. */
+        var txt = (D.portfolioPilot.reply || ''), ab = txt.split(/^\s*(?:#+\s*)?\d\.\s+/m).slice(1, 3), h = ab.map(function (a) {
+          var kopf = /^\**([^*\n:]{3,50})\**:?/.exec(a), p = /^\s*[-•]\s*\**([^*\n:]{3,40})\**:\s*([^\n(]{2,40})/m.exec(a);
+          return kopf && p ? kopf[1].trim() + ': <b>' + p[1].trim() + ' ' + p[2].trim().replace(/\s*EUR\b/g, ' €') + '</b>' : null;
+        }).filter(Boolean);
         await b2oZeile(s, 'Gegliedert, mit Zahlen', (h.length ? h.join(' · ') : 'Vermögensbilanz · Ertragslage · die Objekte') + ' — gerechnet mit den Zahlen des Cockpits, nichts erfunden.');
         if (l) { l.scrollTop = l.scrollHeight * 0.45; await warte(500); }
         await b2oZeile(s, 'Die Objekte beim Namen', 'Welche tragen, welche belasten — mit Objekt und Zahl. Am Ende drei konkrete Schritte, priorisiert.');
