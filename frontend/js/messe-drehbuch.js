@@ -1456,7 +1456,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2374b';   /* v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
+  var RH_BUSTER = 'v2395vr';   /* v2395: BMF-Mitschnitt Ravensberger Weg mit Nebenkosten neu; v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage/i;
@@ -2766,7 +2766,9 @@
         await zeige(function () { var p = r6BmfPane(); return p && (p.querySelector('.bmfmo-ak-box,[class*=summary],[class*=box]') || p.firstElementChild); }, 6);
         var t = r6Inner(r6BmfPane());
         var kp = /Brutto-Kaufpreis\s*\n?\s*([\d.]+ €)/.exec(t), nk = /\+\s*Nebenkosten\s*\n?\s*([\d.]+ €)/.exec(t);
-        await b2oZeile(s, 'Schritt 1 · Anschaffungskosten', 'Aus dem Reiter Investition: Kaufpreis ' + (kp ? kp[1] : '–') + ', Nebenkosten ' + (nk ? nk[1] : '–') + ' (in diesem Objekt nicht erfasst). Fahrten zum Objekt und Notar kämen hier dazu.');
+        /* v2395 · „(in diesem Objekt nicht erfasst)" stand fest im Text - das Demo-Objekt trägt seit dem 16.10. Nebenkosten (170.748 €) */
+        var nkNull = !nk || /^0 €$/.test(nk[1]);
+        await b2oZeile(s, 'Schritt 1 · Anschaffungskosten', 'Aus dem Reiter Investition: Kaufpreis ' + (kp ? kp[1] : '–') + ', Nebenkosten ' + (nk ? nk[1] : '–') + (nkNull ? ' (in diesem Objekt nicht erfasst).' : ' — Grunderwerbsteuer, Notar, Grundbuch, Makler. Sie zählen anteilig zum Gebäude: für die AfA und die 15-%-Grenze.'));
       },
       async function (s) {   /* 3 · Schritt 2: amtliche Aufteilung */
         await r6BmfWeiter();
@@ -4357,7 +4359,8 @@
         var b = q('#ahk_detail_block'), sicht = b && b.offsetHeight > 0;
         if (sicht) {
           await zeige(function () { return q('#ahk_detail_block'); }, 8);
-          await b2oZeile(s, 'So wird gerechnet', 'Gebäudeanteil <b>' + r23('ahk_geb_anteil') + '</b> vom Kaufpreis, plus anteilige Nebenkosten — die Gebäude-Anschaffungskosten. Davon 15 %: <b>' + r23('ahk_15pct') + '</b>.');
+          /* v2395 · #ahk_geb_anteil zeigt den Anteil auf ganze Prozent gerundet („75 %"), Szene 8 sagt 74,82 % - beide aus geb_ant */
+          await b2oZeile(s, 'So wird gerechnet', 'Gebäudeanteil <b>' + r6Pz(wert('geb_ant')) + ' %</b> vom Kaufpreis, plus anteilige Nebenkosten — die Gebäude-Anschaffungskosten. Davon 15 %: <b>' + r23('ahk_15pct') + '</b>.');
         } else {
           await zeige(r23Kv('san_limit_max'), 8);
           await b2oZeile(s, 'So wird gerechnet', 'Gebäudeanteil ' + r6Pz(wert('geb_ant')) + ' % vom Kaufpreis plus anteilige Nebenkosten — davon 15 %.');
