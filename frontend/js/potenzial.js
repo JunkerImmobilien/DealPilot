@@ -454,6 +454,7 @@
       var dscr = k === 'bestand' ? (K.dscr != null ? K.dscr : null)
         : ((window.Dscr && window.Dscr.compute) ? window.Dscr.compute({ nkm_j: nkm * 12, ze_j: ze * 12, zins_j: K.zins_j, tilg_j: K.tilg_j,
             bsv_j: K.d1IsAussetzung ? (K.bspar_j || 0) : 0, bwk_cf: K.bwk_cf }).brutto : null);
+      if (dscr === 0 && !(K.zins_j > 0 || K.tilg_j > 0)) dscr = null;   /* v2430a: ohne Darlehen kein DSCR (die Kerne liefern 0) */
       var cfB = K.cf_op != null ? K.cf_op / 12 : null;
       out[k] = { miete_j: nkm * 12, miete_qm: m.wfl > 0 ? nkm / m.wfl : null, bmy: bmy, dscr: dscr,
         cf_m: cfB == null ? null : cfB + (nkm - basisNkm), kosten: s.kosten || 0, plus: s.plus || 0 };
@@ -613,7 +614,7 @@
     d.satz_invest = 'Drei Stufen der Mietentwicklung mit Ertragswert je Stufe' + (r && r.aufteilung ? ' und der Wirkung einer Aufteilung in Eigentumswohnungen.' : '.');
     d.wohnungen = m.wohnungen.map(function (w) {
       return { we: (w.nr ? w.nr + ' ' : '') + (w.lage || ''), wfl: w.wfl, ist: w.ist > 0 ? eur(w.ist) : (w.status === 'leer' ? 'leer' : '—'),
-        soll: w.soll && w.soll.miete > w.ist ? eur(w.soll.miete) + (w.soll.ab_text ? ' · ' + w.soll.ab_text : '') : '—',
+        soll: w.soll && w.soll.miete > w.ist ? eur(w.soll.miete) + (w.soll.ab ? ' · ' + (w.soll.ab <= heuteYm() ? 'sofort' : monatText(w.soll.ab)) : '') : '—',   /* v2430a: kurz - lange Termintexte liefen im PDF in die Nachbarspalten */
         ziel: w.ziel != null ? eur(w.ziel) : '—',
         massnahmen: w.massnahmen.map(function (x) { return x.t; }).join(', ') || '—' };
     });
