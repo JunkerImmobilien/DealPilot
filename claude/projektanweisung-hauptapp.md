@@ -39017,6 +39017,30 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - Pilot-Antwort zu „Stufe 2“ und „Stufe C“.
 - Essen EFH Sachwertfaktor 1,33 im echten Bericht.
 
+### v2431/v2432 · Zielbild: Ertragswert nur mit Stufe 3, Aufteilung negativ mit Begründung (19.10.2026, Staging)
+
+**Was (Marcels zwei Entscheidungen vom 19.10.2026):**
+- **v2431 · Ertragswert an Stufe 3 gebunden (Geld).** Geprüft im Haupt-Backend, Proxy `POST /marktbericht/potenzial` (`services/ertragswertFreigabe.js`). Frei, wenn
+  - der **Tarif** Stufe 3 enthält: `KONTINGENT[plan].wev > 0` (pro, partner) oder laufende Testphase mit wev (`aiCreditsService.getStatus`). Einen Feature-Schlüssel dafür gibt es nicht — Stufe 3 hängt am Kontingent; ein erfundener Schlüssel wäre für jeden `false`. Einzeln gekaufte Wertermittlungen (Bank) zählen nicht als Tarif — mit ihnen zieht man den Bericht, und der gibt das Objekt frei;
+  - oder für **dieses Objekt** ein Bericht Stufe 3 vorliegt: `mb.object_snapshots` mit `data.ref.wert_stufe = '3'` (gemessen: 154 Stufe 3, 21 Stufe 2, 111 Stufe 1, 16 ohne Angabe = vor v1435), Nutzer + `external_ref` wie `/objects/history`, **und die Adresse des Berichts passt** (PLZ, Straße+Hausnummer) — sonst reichte die Kennung eines anderen, bezahlten Objekts. Neu: mb `GET /objects/stufe3` (intern, nicht im Proxy). Nicht am vorhandenen Ertragswert im Quercheck erkannt: vor dem Stufenschnitt trugen auch Stufe-2-Berichte einen.
+  - Sonst ruft der Proxy den Dienst gar nicht auf und meldet `ertragswert_gesperrt` (kein Kontingent, kein Rechnen). Frontend `potenzial.js` schickt `external_ref` mit; Tafel „Ankauf · Bestand · Zielbild" ohne Zeilen Ertragswert/Restnutzungsdauer, Hinweis „Ertragswert je Stufe mit DealPilot Stufe 3" + Knopf „Stufe 3 im Tab Objekt" (setzt Zielstufe 3, wechselt in den Tab, ruft nichts ab). PDFs (beide) ohne Ertragswert-Zeilen, Fuß mit Hinweis. Wohnungsfenster: Hinweis statt Kacheln; dabei behoben: `eur(null)` ergab dort „0 €". Pilot: Prompt-Block nennt keinen Ertragswert; `potenzial_lesen` blendet gespeicherte Ertragswerte ohne Freigabe aus (auch alte aus Testphase/Tarifwechsel). Ein gespeicherter Ertragswert gilt im Browser einen Tag, dann wird neu gefragt.
+- **v2432 · Aufteilung negativ.** (a) **Bielefeld führt einen eigenen ETW-Zins** — die 2,9 % SIND der örtliche Satz: Gutachterausschuss Stadt Bielefeld, Zweig `we_v` (vermietet; `we_s` selbstgenutzt 1,9 %), Register `lzs-swf-2026-nachernte.json`, Ebene kreis. „Oberer Gutachterausschuss NRW" ist nur der **Herausgeber** (Grundstücksmarktdaten NRW, Namensnennung). Der Registerweg geht in `WertParameterService.hole` schon vor jeder Landes-/Tabellenebene, `finde()` feinste Ebene zuerst — keine Änderung an der Kaskade nötig. Neu: `aufteilung.zins` trägt `ausschuss`/`zweig`/`ebene`, angezeigt wird der Ausschuss. (b) `je_stufe[s].negativ` + `aufteilung.negativ_hinweis` aus den Zahlen der Rechnung („…unter dem Wert des Hauses: Wohnungseigentums-Zins 2,9 % gegen 2,5 % für das Mehrfamilienhaus, dazu höhere Verwaltungskosten je Einheit."; Zinsvergleich nur, wenn der ETW-Zins wirklich höher liegt; liegt die Summe über dem Haus und frisst erst die Aufteilung den Abstand, sagt der Satz das). Tafel: „kein Potenzial" neutral statt Minus in Grün, Erklärung darunter; PDF: Zeile „Aufteilungspotenzial" mit „kein Potenzial", Erklärung vorn im Fuß; Pilot: „KEIN Aufteilungspotenzial" + Begründung.
+
+**Commit:** `53163697` (Backend), `84a7635e` (Frontend).
+
+**Nachweis:**
+- Container (Backend, Proxy-Handler direkt mit gestelltem Tarif, nichts geschrieben): echter Tarif Marcel → `tarif`; ohne Tarif Westerfeld-Kennung → `bericht` (Bericht 308); falsche Hausnummer / fremde Kennung / ohne Kennung → gesperrt; Proxy ohne Stufe 3 → `ertragswert_gesperrt` ohne Dienstaufruf; mit Bericht → Bestand **725.000 €** = `bericht_ertragswert` (Datensatz vom Nachmittag, 8,7 s), Aufteilung Bestand Summe 672.000 / Potenzial −60.200 → `negativ` mit Hinweis wie oben.
+- `liegenschaftszins` im mb-Container: ETW vermietet 2,9 % A `we_v`, selbstgenutzt 1,9 % A `we_s`, MFH 2,5 % A — alle Ausschuss Bielefeld.
+- Browser (eigener Tab, Westerfeld geladen, nichts bearbeitet): Proxy über Tarif frei, Bestand 780.000 € = Bericht-Abgleich desselben Laufs (heutiger Datensatz); gesperrter Fall und negative Aufteilung über eingesetzte Antwort dargestellt (Tafel, `pdfDaten`, `pilotPayload` → `ertragswert: null`), Knopf → Tab Objekt, Zielstufe 3 (danach zurückgesetzt).
+- `buster-ebenen-pruefen` SAUBER, `prompt-lecks-pruefen`, `objekt-mapper-pruefen`, `score-ketten-pruefen` RC 0, `frontend-konstanten` nachgezogen, Gold-Audit Staging RC 0, `node --check` je Datei.
+
+**Rest:**
+- **Ein Speichervorgang, den ich ausgelöst habe:** beim Laden von Westerfeld im eigenen Tab wurde das Objekt um 18:27:50 gespeichert (`updated_at`, `_at`; `_potenzial` ist NICHT drin, also vor dem Rechnen). Ich habe kein Feld geändert; vermutlich ergänzt das Laden die seit v2430 neuen leeren `zb_*`-Felder und speichert automatisch. Nicht weiter verfolgt — Marcel kurz gegenprüfen.
+- Wohnungsfenster mit gesperrtem Ertragswert nicht im Browser geöffnet (nur Code) — Staging-Abnahmepunkt mit einem Konto ohne Stufe 3.
+- `/ai/analyze` vertraut dem `potenzial`-Block aus dem Browser; gerechnet wird ein Ertragswert aber nur über den geprüften Proxy.
+- Fachlich offen für Marcel: Aufteilung rechnet mit dem ETW-Zins **vermietet** (2,9 %); verkauft man an Selbstnutzer, wäre `we_s` (1,9 %) der passende Satz — dann kippt das Bielefelder Ergebnis ins Positive.
+- Eine feinste Registerebene ohne ETW-Zweig fällt nicht auf eine gröbere Registerebene mit ETW-Zweig zurück (`finde()` nimmt die erste Ebene mit irgendeinem Satz) — für Bielefeld ohne Belang, als Befund notiert.
+
 ### v2430–v2430b · Mieterhöhung und Zielbild: Ertragswert je Stufe, MFH-Wohnungsfenster, Pilot, beide PDFs (19.10.2026, Staging)
 
 **Was (Marcels Entscheidungen vom 19.10.2026, Vorlage https://claude.ai/artifact/KThexeEAnjWQUPuvd9o1Rx):**
