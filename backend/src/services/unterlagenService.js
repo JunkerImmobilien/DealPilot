@@ -273,6 +273,12 @@ function mailsAufSeite(html) {
     .replace(/[‐-―−]/g, '-')              /* Gedankenstriche zu Bindestrich */
     .replace(/\s*[([{]\s*(at|ät)\s*[)\]}]\s*/gi, '@')
     .replace(/\s*[([{]\s*(dot|punkt)\s*[)\]}]\s*/gi, '.')
+    /* v2443 · ⚹ für @ und ◦ für den Punkt — so verschleiert das CMS von
+       kassel.de, mainz.de und vv.potsdam.de (Rechercheberichte vom
+       19.10.2026). Ohne diese Zeile galt dort jede Adresse als „steht
+       nicht auf der Seite". */
+    .replace(/\s*✹\s*/g, '@')
+    .replace(/([a-z0-9-])\s*◦\s*(?=[a-z0-9-])/gi, '$1.')
     .toLowerCase();
   const treffer = t.match(/[a-z0-9._%+-]+@[a-z0-9-]+(?:\.[a-z0-9-]+)+/g) || [];
   return [...new Set(treffer)]

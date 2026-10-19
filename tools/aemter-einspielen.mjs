@@ -90,9 +90,15 @@ async function einAmt(g, a) {
   }
   if (beleg.ok) z.belegt++;
 
+  /* Streng: im Einspielweg bleibt nur, wessen Adresse ODER Name wir auf
+     einer selbst gelesenen Seite gefunden haben. personenAus prüft den
+     Namen nur, wenn überhaupt eine Seite lesbar war — war keine lesbar,
+     wäre die Person sonst ungeprüft durchgekommen. */
   const personen = U.personenAus(
     roh.map((p) => ({ name: s(p && p.name), funktion: s(p && p.funktion), email: s(p && p.email), telefon: s(p && p.telefon) })),
-    email, detail, quelle);
+    email, detail, quelle).filter((p) => p.bestaetigt || p.name_belegt)
+    /* v2153 noch einmal: eine einzelne nackte Adresse ist kein Ansprechpartner */
+    .filter((p, i, l) => l.length >= 2 || !!p.name);
   z.personen_geprueft += personen.length;
   z.personen_verworfen += Math.max(0, roh.length - personen.length);
   if (personen.length) z.mit_personen++;

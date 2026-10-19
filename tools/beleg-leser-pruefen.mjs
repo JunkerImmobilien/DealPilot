@@ -563,6 +563,12 @@ console.log('=== 8 · Namenspruefung, interne Adressen, gemeindeweite Saetze (v2
       const p = U.personenAus([{ name: 'Karl Erfunden', email: 'k.erfunden@stadt-xy.de' },
                                { name: 'Anja Müller' }], 'bauakten@stadt-xy.de', b2, SEITE);
       return (p.length === 2 && p[0].bestaetigt && p[0].seite === SEITE) ? null : 'n=' + p.length; }],
+    ['Stern-Kreis-Schreibweise (kassel.de)', function () {
+      const m = U.mailsAufSeite('<p>bauaufsicht✹kassel◦de</p>');
+      return m.indexOf('bauaufsicht@kassel.de') >= 0 ? null : 'gefunden: ' + m.join(','); }],
+    ['Kreis als Aufzaehlung ist kein Punkt', function () {
+      const m = U.mailsAufSeite('<li>◦ Bauakten</li><li>◦ Baulasten</li>');
+      return m.length === 0 ? null : 'Fehlalarm: ' + m.join(','); }],
     ['localhost ist lokal', function () { return U.istLokal('http://localhost:3000/x') ? null : 'nicht erkannt'; }],
     ['Container-Name ist lokal', function () { return U.istLokal('http://mb-backend:4000/') ? null : 'nicht erkannt'; }],
     ['10er-Netz ist lokal', function () { return U.istLokal('http://10.0.0.5/') ? null : 'nicht erkannt'; }],
@@ -595,7 +601,7 @@ console.log('                Reihenfolge, 9 Postfacharten, zwei Gegenproben,');
 console.log('                13 Zusicherungen des Personen-Zusammenbaus (v2152),');
 console.log('                5 Formproben der Spalte seiten (v2152a),');
 console.log('                6 Stellen des KI-Auftrags am kommentarfreien Text,');
-console.log('                18 Proben Namenspruefung, interne Adressen, Kernname, Saeuberung, Kanal (v2440)');
+console.log('                20 Proben Namenspruefung, Stern-Kreis-Schreibweise, interne Adressen, Kernname, Saeuberung, Kanal (v2440)');
 console.log('  NICHT       : `belegSeiten()` selbst — die ruft echte Server ab.');
 console.log('                Dass sie die Seiten LIEST, ist hier bewiesen; dass sie');
 console.log('                sie ABRUFT, ist ein Staging-Abnahmepunkt.');
