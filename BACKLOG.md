@@ -873,6 +873,8 @@ einer Entscheidung von Marcel und ist nicht blockiert, sondern **unbeantwortet**
 
 #### N61.6 · Das Unterlagen-Modul ergänzen — Marcel meint N51
 
+> **✅ 19.10.2026 · v2440–v2445 (5bd2ab68, 7d727070 u. a.):** Marcel fragte erneut („unterlagenapp … die 2 Ansprechpartner ausweisen“). Gemessen: Code da, aber **0 von 27 Ämtern** mit Ansprechpartner. Abgleich v6 vollständig (fehlend gebaut: zweite Adresssuche, saeubereMail, Kanal, Personenpostfach→Funktion, istLokal, Empfänger wählbar), Modal zeigt zwei Karten mit Beleg-Seite, 342 Ämter für 60 Gemeinden eingespielt → **369 Ämter, 104 mit Ansprechpartner (56 mit zwei)**. Offen: Telegram-Teil aus v5 (Entscheidung Marcel), alte PLZ-Sätze verdecken gemeindeweite. Journal v2440–v2445.
+
 > **✅ laut Code erledigt (Aufräumen 13.10.2026):** N51 ist mit v2151 (Beleg je Seite, seiten.pro_seite), v2152 (Ansprechpartner 1 und 2 je Amt, Kopie-Haken) und v2153 (Amtsweg oder zwei Ansprechpartner, Telefon) gebaut. Offen bleibt nur der Hinweis unten: vw-modul-v4-2-2/-v4-2-5.zip stehen in keiner Backlog-Zeile.
 
 **Marcel:** *„und ich hatte auch ein paket reingegeben um die unterlagen
@@ -7361,6 +7363,8 @@ belegten Einstiege:
 ---
 
 ### N51 · ⚠ TEILS ERLEDIGT — am Code nachgemessen 12.10.2026
+
+> **✅ Nachtrag 19.10.2026 (v2440–v2445):** jetzt auch SICHTBAR — vorher hatte kein Amt in der Datenbank Ansprechpartner. Siehe N61.6 und Journal v2440–v2445.
 
 > **✅ Nachtrag 13.10.2026:** beide offenen Dinge sind seit v2151–v2153 gebaut (Ansprechpartner 1/2 mit Beleg je Person, Belegprüfung je Seite, Kopie-Haken).
 

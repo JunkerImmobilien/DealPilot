@@ -1,0 +1,262 @@
+[
+  {
+    "gemeinde": "Kassel",
+    "plz_praefixe": ["34"],
+    "bundesland": "HE",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Amt für Bodenmanagement Korbach",
+        "abteilung": "Außenstelle Hofgeismar, Manteuffel-Anlage 4, 34369 Hofgeismar",
+        "email": "info.afb-korbach@hvbg.hessen.de",
+        "telefon": "+49 (611) 535-4160",
+        "kanal": "portal",
+        "antrag_url": "https://www.gds.hessen.de/",
+        "quelle_url": "https://www.kassel.de/service/produkte/kassel/Vermessung-und-Geoinformation/lageplan-zum-bauantrag.php",
+        "seiten": [
+          "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2022-09/folder_ihr_partner_fuer_-_afb_korbach.pdf",
+          "https://hvbg.hessen.de/sites/hvbg.hessen.de/files/2022-09/amtsbezirke_mit_adressen.pdf",
+          "https://hvbg.hessen.de/liegenschaftskataster/liegenschaftskataster-ausgaben"
+        ],
+        "gebuehr": "",
+        "hinweis": "Die Stadt Kassel führt kein Liegenschaftskataster; laut HVBG-Faltblatt gehört die Stadt Kassel zum Bezirk des AfB Korbach, Ausgaben auch über Geodaten online.",
+        "beleg_zitat": "Lagepläne zum Bauantrag erhalten Sie ausschließlich beim Amt für Bodenmanagement (AfB) Korbach, Außenstelle Hofgeismar.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Kassel",
+        "abteilung": "Grundbuchamt (Nebengebäude), Friedrichstraße 32-34, 34117 Kassel; Post: Frankfurter Straße 9, 34117 Kassel",
+        "email": "grundbuchamt@ag-kassel.justiz.hessen.de",
+        "telefon": "+49 561 912 1904",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://ordentliche-gerichtsbarkeit.hessen.de/landgerichtsbezirk-kassel/amtsgericht-kassel/grundbuchamt",
+        "seiten": [
+          "https://ordentliche-gerichtsbarkeit.hessen.de/landgerichtsbezirk-kassel/amtsgericht-kassel/zustaendigkeiten",
+          "https://ordentliche-gerichtsbarkeit.hessen.de/landgerichtsbezirk-kassel/amtsgericht-kassel"
+        ],
+        "gebuehr": "Grundbuchauszug 10,00 € unbeglaubigt, 20,00 € beglaubigt",
+        "hinweis": "Berechtigtes Interesse nötig; Auszugsantrag schriftlich mit Unterschrift oder per E-Mail. Die Zweigstelle Hofgeismar führt nur die Grundbücher der Nordkreis-Gemeinden, nicht der Stadt Kassel.",
+        "beleg_zitat": "Das Grundbuchamt befindet sich im Nebengebäude der Hauptstelle des Amtsgerichts Kassel, Friedrichstraße 32 - 34",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Kassel, Umwelt- und Gartenamt",
+        "abteilung": "Untere Wasser- und Bodenschutzbehörde, Friedrich-Ebert-Straße 16, 34117 Kassel",
+        "email": "umweltschutz@kassel.de",
+        "telefon": "",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.kassel.de/service/produkte/kassel/umwelt-und-gartenamt/umweltschutz/informationen-ueber-altlasten-und-risikoflaechen-in-kassel.php",
+        "seiten": [
+          "https://www.kassel.de/service/oe/Dezernate_-_DEZ/VI_-_Dezernat_VI_-_Stadtentwicklung__Bauen__Klimaschutz__Umwelt_und_Verkehr/67_-_Umwelt-_und_Gartenamt/672_-_Umweltschutz/6722_-_Untere_Wasser-_und_Bodenschutzbehoerde/6722-Untere-Wasser-und-Bodenschutzbehoerde.php",
+          "https://www.hlnug.de/themen/altlasten/altflaechendatei.html"
+        ],
+        "gebuehr": "in der Regel gebührenpflichtig, nach Aufwand",
+        "hinweis": "Schriftliche Anfrage mit Stadtteil, Straße, Hausnummer, möglichst Flur/Flurstück und Lageplan; das Kontaktformular gilt nicht als Antrag. E-Mail auf der Seite verschleiert dargestellt.",
+        "beleg_zitat": "Wenn Sie ein Grundstück erwerben oder veräußern wollen, erhalten Sie bei uns eine Altlastenauskunft.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Claudia Hartwig", "funktion": "", "email": "claudia.hartwig@kassel.de", "telefon": "0561 787-3125", "seite": "https://www.kassel.de/service/produkte/kassel/umwelt-und-gartenamt/umweltschutz/informationen-ueber-altlasten-und-risikoflaechen-in-kassel.php"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Kassel, Amt Stadtplanung, Bauaufsicht und Denkmalschutz",
+        "abteilung": "Bauaufsicht, Verwaltungsabteilung; Rathaus, Obere Königsstraße 8, 34117 Kassel",
+        "email": "bauaufsicht@kassel.de",
+        "telefon": "",
+        "kanal": "portal",
+        "antrag_url": "https://www.kassel.de/civ-Baulastenauskunft",
+        "quelle_url": "https://www.kassel.de/service/produkte/kassel/stadtplanung-bauaufsicht-und-denkmalschutz/baulasten.php",
+        "seiten": [
+          "https://www.kassel.de/rathaus-und-politik/digitales-rathaus/Informationsblatt-Baulasten.pdf"
+        ],
+        "gebuehr": "Auskunft bei bestehender Baulast 30 € je Grundstück, Negativzeugnis 15 € je Grundstück",
+        "hinweis": "Die Stadt rät ausdrücklich von Anträgen über Drittanbieter ab; Sprechzeiten nur nach Terminvereinbarung.",
+        "beleg_zitat": "Die Notwendigkeit von Baulasten stellt in der Regel die Bauaufsicht im Baugenehmigungsverfahren fest.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Katja Kölbel", "funktion": "", "email": "katja.koelbel@kassel.de", "telefon": "0561 787-6305", "seite": "https://www.kassel.de/service/produkte/kassel/stadtplanung-bauaufsicht-und-denkmalschutz/baulasten.php"},
+          {"name": "Cristina Perez Wenzel", "funktion": "", "email": "cristina.perezwenzel@kassel.de", "telefon": "0561 787-6066", "seite": "https://www.kassel.de/service/produkte/kassel/stadtplanung-bauaufsicht-und-denkmalschutz/baulasten.php"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Kassel, Amt Stadtplanung, Bauaufsicht und Denkmalschutz",
+        "abteilung": "Bauaufsicht, Bauakteneinsicht; Rathaus, Obere Königsstraße 8, 34117 Kassel",
+        "email": "bauakteneinsicht@kassel.de",
+        "telefon": "",
+        "kanal": "portal",
+        "antrag_url": "https://antragsportal.stadt-kassel.de/civ.public/start.html?oe=00.00.KS&mode=cc&cc_key=Posteingang&V.Z.D.StelleString=Bauakteneinsicht",
+        "quelle_url": "https://www.kassel.de/service/produkte/kassel/stadtplanung-bauaufsicht-und-denkmalschutz/akteneinsicht-abzuege-aus-bauakten.php",
+        "seiten": [
+          "https://www.kassel.de/service/media/Dateien_und_Verzeichnisse/Antrag_auf_Akteneinsicht.pdf"
+        ],
+        "gebuehr": "Grundgebühr mindestens 12,50 €, je Blatt A4 0,30 €, A3 0,60 €, größere Pläne 5-10 €",
+        "hinweis": "Antragsformular mit Nachweisen nur über den digitalen Posteingang; Bearbeitung bis zu zwei Wochen.",
+        "beleg_zitat": "Bitte beachten Sie, dass nur Anträge bearbeitet werden",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Qendresa Sadriu", "funktion": "", "email": "qendresa.sadriu@kassel.de", "telefon": "0561 787-2608", "seite": "https://www.kassel.de/service/produkte/kassel/stadtplanung-bauaufsicht-und-denkmalschutz/akteneinsicht-abzuege-aus-bauakten.php"},
+          {"name": "Natascha Weidemann", "funktion": "", "email": "natascha.weidemann@kassel.de", "telefon": "0561 787-6323", "seite": "https://www.kassel.de/service/produkte/kassel/stadtplanung-bauaufsicht-und-denkmalschutz/akteneinsicht-abzuege-aus-bauakten.php"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Kassel",
+        "abteilung": "Geschäftsstelle beim Magistrat der Stadt Kassel, Friedrich-Ebert-Straße 160, 34119 Kassel",
+        "email": "gutachterausschuss@kassel.de",
+        "telefon": "0561 787 7002",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.kassel.de/service/media/Dateien_und_Verzeichnisse/immobilienmarktberichte/Immobilienmarktbericht-Stadt-Kassel-2026.pdf",
+        "seiten": [],
+        "gebuehr": "Immobilienmarktbericht digital kostenfrei, Farbdruck 35 €",
+        "hinweis": "Angaben aus dem Impressum des Immobilienmarktberichts 2026 (weitere Nummern 787 7003, 787 6273); ältere Berichte nennen die Sickingenstraße 7.",
+        "beleg_zitat": "Geschäftsstelle des Gutachterausschusses beim Magistrat der Stadt Kassel Friedrich-Ebert-Straße 160, 34119 Kassel",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Birsel Kilic", "funktion": "Geschäftsstellenleiterin", "email": "", "telefon": "", "seite": "https://www.kassel.de/service/media/Dateien_und_Verzeichnisse/immobilienmarktberichte/Immobilienmarktbericht-Stadt-Kassel-2026.pdf"}
+        ]
+      }
+    ]
+  },
+  {
+    "gemeinde": "Mainz",
+    "plz_praefixe": ["55"],
+    "bundesland": "RP",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Vermessungs- und Katasteramt Rheinhessen-Nahe",
+        "abteilung": "Servicestelle, Ostdeutsche Straße 28, 55232 Alzey",
+        "email": "vermka-rhn@vermkv.rlp.de",
+        "telefon": "06731 494-1000",
+        "kanal": "portal",
+        "antrag_url": "https://geoshop.rlp.de/auszug_liegenschaftskarte.html",
+        "quelle_url": "https://vermka-rheinhessen-nahe.rlp.de/produktinformationen/liegenschaftskataster/auszuege-und-daten-aus-der-liegenschaftskarte",
+        "seiten": [
+          "https://www.mainz.de/vv/produkte/bauamt/lageplan-bauantrag-beantragen",
+          "https://vermka-rheinhessen-nahe.rlp.de/ueber-uns/so-finden-sie-uns",
+          "https://lvermgeo.rlp.de/geodaten-geoshop/bestellung-von-auszuegen-aus-dem-liegenschaftskataster"
+        ],
+        "gebuehr": "Liegenschaftskarte bis DIN A3 28,00 €, Mindestgebühr 28,00 € je Antrag",
+        "hinweis": "Zuständigkeit für Mainz belegt über die Seite der Stadt Mainz; Einsicht und Auszüge auch bei ÖbVI und Kommunalverwaltungen, die Stadt Mainz fertigt Lagepläne aus der Stadtgrundkarte.",
+        "beleg_zitat": "kontaktieren Sie bitte das zuständige Vermessungs- und Katasteramt Rheinhessen-Nahe",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Mainz",
+        "abteilung": "Grundbuchamt, Diether-von-Isenburg-Straße, 55116 Mainz",
+        "email": "agmz@ko.mjv.rlp.de",
+        "telefon": "06131 141-0",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://agmz.justiz.rlp.de/service-informationen/grundbuchamt",
+        "seiten": [
+          "https://agmz.justiz.rlp.de/"
+        ],
+        "gebuehr": "Grundbuchauszug 10,00 € unbeglaubigt, 20,00 € beglaubigt",
+        "hinweis": "Antrag persönlich mit Ausweis oder schriftlich per Post, Fax oder Antragsformular per E-Mail; formlose E-Mails und Telefonanfragen werden nicht bearbeitet. Die E-Mail ist die allgemeine des Gerichts.",
+        "beleg_zitat": "schriftlichen Antrag per Post, per Telefax oder mit Antragsformular per E-Mail an das Grundbuchamt",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Landeshauptstadt Mainz, Grün- und Umweltamt",
+        "abteilung": "Sachgebiet Bodenschutz, Haus C, Geschwister-Scholl-Straße 4, 55131 Mainz",
+        "email": "bodenschutzbehoerde@stadt.mainz.de",
+        "telefon": "",
+        "kanal": "formular",
+        "antrag_url": "https://www.mainz.de/vv/medien/internet/Verdachtsflaechenkataster-Auskunft-beantragen-Formular.pdf",
+        "quelle_url": "https://www.mainz.de/vv/produkte/gruen_und_naturschutz/altlasten-oder-bodenschutzkataster-auskunft-beantragen",
+        "seiten": [
+          "https://www.mainz.de/vv/oe/sachgebiet-bodenschutz",
+          "https://www.mainz.de/angebote-entdecken/umwelt--und-naturschutz/boden-und-altlasten/boden-altlasten"
+        ],
+        "gebuehr": "29,00 bis 855,00 € nach Verwaltungsaufwand",
+        "hinweis": "Schriftlicher Antrag mit Formular, Nichteigentümer brauchen eine Vollmacht; Online-Verfahren in Planung.",
+        "beleg_zitat": "Die Zuständigkeit obliegt der Bodenschutzbehörde nach länderspezifischer Verwaltungsstruktur.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Tobias Fischer", "funktion": "Altlasten- und Verdachtsflächenauskünfte", "email": "", "telefon": "06131 12-2292", "seite": "https://www.mainz.de/vv/produkte/gruen_und_naturschutz/altlasten-oder-bodenschutzkataster-auskunft-beantragen"},
+          {"name": "Frau Karolin Bachsleitner", "funktion": "Altlasten- und Verdachtsflächenauskünfte", "email": "", "telefon": "06131 12-2037", "seite": "https://www.mainz.de/vv/produkte/gruen_und_naturschutz/altlasten-oder-bodenschutzkataster-auskunft-beantragen"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Landeshauptstadt Mainz, Bauamt",
+        "abteilung": "Sachgebiet Rechtsangelegenheiten und Sonderaufgaben, Zitadelle Bau C, Am 87er Denkmal, 55131 Mainz",
+        "email": "bauamt-bauaufsicht@stadt.mainz.de",
+        "telefon": "06131 12-3894",
+        "kanal": "formular",
+        "antrag_url": "",
+        "quelle_url": "https://www.mainz.de/vv/produkte/bauamt/baulastenverzeichnis-auskunft-beantragen",
+        "seiten": [
+          "https://www.mainz.de/vv/oe/abteilung-bauaufsicht",
+          "https://www.mainz.de/vv/online-dienste-citygov/bauamt/lageplan-mit-baulasteinzeichnung-online-antrag"
+        ],
+        "gebuehr": "25 € bei Baulast, 15 € ohne Baulast",
+        "hinweis": "Formular per Post, Fax oder E-Mail, keine telefonische Auskunft, Bearbeitung ca. 3 Wochen; nur für das Stadtgebiet, Nachbargemeinden: Kreisverwaltung Mainz-Bingen.",
+        "beleg_zitat": "Wir können Ihnen keine telefonische Auskunft geben.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Ammon", "funktion": "Baulastauskunft", "email": "", "telefon": "06131 12-3894", "seite": "https://www.mainz.de/vv/produkte/bauamt/baulastenverzeichnis-auskunft-beantragen"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Landeshauptstadt Mainz, Bauamt",
+        "abteilung": "Sachgebiet Personal, Allgemeine Verwaltung und Gremiendienst (Servicestelle Bauakten), Zitadelle Bau C, Raum 115, Am 87er Denkmal, 55131 Mainz",
+        "email": "",
+        "telefon": "",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.mainz.de/vv/produkte/bauamt/akteneinsicht-in-archivierte-bauakten-beantragen",
+        "seiten": [
+          "https://www.mainz.de/vv/oe/servicestelle-bauakten"
+        ],
+        "gebuehr": "mindestens 30 €, höchstens 600 €, zzgl. Kopien",
+        "hinweis": "Termin vorab vereinbaren; die Sachbearbeitung ist nach Stadtteilen auf mehrere Personen verteilt (auf der Seite aufgelistet).",
+        "beleg_zitat": "Bitte nehmen Sie frühzeitig Kontakt zur Terminvereinbarung auf.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Markus Schöfer", "funktion": "Sachgebietsleitung; Altstadt, Finthen, Lerchenberg", "email": "markus.schoefer@stadt.mainz.de", "telefon": "06131 12-3199", "seite": "https://www.mainz.de/vv/produkte/bauamt/akteneinsicht-in-archivierte-bauakten-beantragen"},
+          {"name": "Dirk Jansen", "funktion": "Digitalisierung der Bauakten, Akteneinsichten", "email": "dirk.jansen@stadt.mainz.de", "telefon": "06131 12-2270", "seite": "https://www.mainz.de/vv/produkte/bauamt/akteneinsicht-in-archivierte-bauakten-beantragen"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte für den Bereich der Landeshauptstadt Mainz",
+        "abteilung": "Geschäftsstelle des Gutachterausschusses (Bauamt), Zitadelle Bau C, Raum 205, Am 87er Denkmal, 55131 Mainz",
+        "email": "gutachterausschuss@stadt.mainz.de",
+        "telefon": "06131 12-3647",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.mainz.de/vv/oe/geschaeftsstelle-des-gutachterausschusses-bauamt",
+        "seiten": [
+          "https://www.mainz.de/service-nutzen/dezernate-und-aemter/aemter/gutachterausschuss/grundstuecksmarktbericht",
+          "https://www.mainz.de/service-nutzen/dezernate-und-aemter/aemter/gutachterausschuss/downloads",
+          "https://www.mainz.de/vv/produkte/bauamt/bodenrichtwerte-auskunft-beantragen"
+        ],
+        "gebuehr": "",
+        "hinweis": "Grundstücksmarktbericht 2025 als PDF zum Download, ein Preis ist auf der Seite nicht genannt.",
+        "beleg_zitat": "Zitadelle, Bau C, Am 87er Denkmal, 55131 Mainz",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Sandra Dusch", "funktion": "Sachgebietsleitung, Geschäftsstellenleitung des Gutachterausschusses", "email": "sandra.dusch@stadt.mainz.de", "telefon": "06131 12-3647", "seite": "https://www.mainz.de/service-nutzen/dezernate-und-aemter/aemter/gutachterausschuss/grundstuecksmarktbericht"}
+        ]
+      }
+    ]
+  }
+]

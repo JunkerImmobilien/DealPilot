@@ -1,0 +1,507 @@
+[
+  {
+    "gemeinde": "Essen",
+    "plz_praefixe": ["45"],
+    "bundesland": "NW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Essen, Amt für Geoinformation, Vermessung und Kataster",
+        "abteilung": "Vermessungsunterlagen, Katasterauskunft, Katasterarchiv, Lindenallee 10, 45127 Essen",
+        "email": "kataster@amt62.essen.de",
+        "telefon": "+49 201 88-62542",
+        "kanal": "portal",
+        "antrag_url": "https://geoshop.essen.de/",
+        "quelle_url": "https://service.essen.de/detail/-/vr-bis-detail/dienstleistung/41347/show",
+        "seiten": ["https://service.essen.de/detail/-/vr-bis-detail/dienstleistung/41382/show"],
+        "gebuehr": "bis DIN A3: 30,00 € (Geoshop 15,00 €); größer als DIN A3: 60,00 €",
+        "hinweis": "Auszüge aus der Liegenschaftskarte ohne berechtigtes Interesse; persönliche Beratung nur nach Terminabsprache.",
+        "beleg_zitat": "Vermessungsunterlagen, Katasterauskunft, Katasterarchiv",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Essen – Grundbuchamt",
+        "abteilung": "Grundbuchamt, Zweigertstraße 52, 45130 Essen",
+        "email": "",
+        "telefon": "0201 803-0",
+        "kanal": "post",
+        "antrag_url": "https://www.ag-essen.nrw.de/infos/Formulare/030_ZT_Grundbuch/Erstellung_einer_Grundbuchabschrift.pdf",
+        "quelle_url": "https://www.ag-essen.nrw.de/aufgaben/abteilungen/Grundbuchamt/index.php",
+        "seiten": [
+          "https://www.ag-essen.nrw.de/aufgaben/gerichtsbezirk/index.php",
+          "https://www.ag-essen.nrw.de/kontakt/index.php",
+          "https://www.ag-essen-borbeck.nrw.de/aufgaben/gerichtsbezirk/index.php",
+          "https://www.ag-essen-steele.nrw.de/aufgaben/gerichtsbezirk/index.php"
+        ],
+        "gebuehr": "Ausdruck 10,00 €, amtlicher Ausdruck 20,00 € (GNotKG)",
+        "hinweis": "Drei Grundbuchämter im Stadtgebiet: AG Essen-Borbeck (u. a. Bedingrade, Bergeborbeck, Bochold, Borbeck, Dellwig, Frintrop, Gerschede, Schönebeck, Vogelheim), AG Essen-Steele (u. a. Burgaltendorf, Byfang, Freisenbruch, Horst, Kray, Kupferdreh, Leithe, Steele, Überruhr), übrige Stadtteile AG Essen.",
+        "beleg_zitat": "Amtsgericht Essen-Borbeck und das Amtsgericht Essen-Steele eigene Grundbuchabteilungen haben",
+        "geteilt": true,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Essen, Amt für Geoinformation, Vermessung und Kataster – Altlastenkataster",
+        "abteilung": "Altlastenkataster, Deutschlandhaus, Lindenallee 10, 45127 Essen",
+        "email": "altlasten@amt62.essen.de",
+        "telefon": "+49 201 88-62139",
+        "kanal": "portal",
+        "antrag_url": "https://service.essen.de/home/-/egov-ws/fs/101300/3126630",
+        "quelle_url": "https://service.essen.de/detail/-/vr-bis-detail/dienstleistung/101300/show",
+        "seiten": [
+          "https://www.essen.de/organisationen/detail_1536858.de.html",
+          "https://www.essen.de/organisationen/detail_1189222.de.html"
+        ],
+        "gebuehr": "Kurzauskunft kostenfrei, ausführliche Auskunft gebührenpflichtig",
+        "hinweis": "Antrag nur durch Eigentümer oder Bevollmächtigte mit Eigentumsnachweis; die Untere Bodenschutzbehörde selbst sitzt im Umweltamt (Natorpstraße 27).",
+        "beleg_zitat": "Antrag auf Erstellung einer Altlastenauskunft",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Wiethe, Iris", "funktion": "Altlastenkataster SGL", "email": "iris.wiethe@amt62.essen.de", "telefon": "+49 201 88-62130", "seite": "https://www.essen.de/organisationen/detail_1536858.de.html"},
+          {"name": "Bopp, Marion", "funktion": "Altlastenkataster", "email": "marion.bopp@amt62.essen.de", "telefon": "+49 201 88-62137", "seite": "https://www.essen.de/organisationen/detail_1536858.de.html"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Essen, Amt für Stadtplanung und Bauordnung",
+        "abteilung": "Baulasten, Registratur, Bauaktenarchiv, Teilungsgenehmigungen, Abgeschlossenheitsbescheinigungen; Deutschlandhaus, Lindenallee 10, 45127 Essen",
+        "email": "baulasten@essen.de",
+        "telefon": "",
+        "kanal": "email",
+        "antrag_url": "https://geoportal.essen.de/baulasteninformation/",
+        "quelle_url": "https://service.essen.de/detail/-/vr-bis-detail/dienstleistung/41653/show",
+        "seiten": [
+          "https://www.essen.de/organisationen/detail_1592637.de.html",
+          "https://service.essen.de/detail/-/vr-bis-detail/einrichtung/11574/show"
+        ],
+        "gebuehr": "50 € je Grundstück und eingetragener Baulast, max. 200 € je Grundstück; ohne Baulast 30 € je Grundstück",
+        "hinweis": "Formloser Antrag mit berechtigtem Interesse per Post, Fax oder E-Mail; der Geoportal-Abruf zeigt nur, ob eine Baulast besteht.",
+        "beleg_zitat": "Baulasten, Registratur, Bauaktenarchiv, Teilungsgenehmigungen, Abgeschlossenheitsbescheinigungen",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Franco Albano", "funktion": "Baulasten", "email": "", "telefon": "+49 201 88-63151", "seite": "https://www.essen.de/organisationen/detail_1592637.de.html"},
+          {"name": "Herr Kevin Ingenpaß", "funktion": "Baulasten", "email": "", "telefon": "+49 201 88-63152", "seite": "https://www.essen.de/organisationen/detail_1592637.de.html"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Essen, Amt für Stadtplanung und Bauordnung",
+        "abteilung": "Registratur, Bauaktenarchiv; Deutschlandhaus, Lindenallee 10, 45127 Essen",
+        "email": "Bauaktenarchiv@essen.de",
+        "telefon": "",
+        "kanal": "formular",
+        "antrag_url": "https://service.essen.de:443/detail/-/vr-bis-detail/dokument/113733/download?_19_WAR_vrportlet_priv_r_p_action=vr-bis-detail-dienstleistung-show",
+        "quelle_url": "https://service.essen.de/detail/-/vr-bis-detail/dienstleistung/43121/show",
+        "seiten": ["https://www.essen.de/organisationen/detail_1592637.de.html"],
+        "gebuehr": "laut Datei „Gebührenerhebung im Bauaktenarchiv ab 01.07.2026“",
+        "hinweis": "Einsicht nur nach Terminabsprache für Eigentümer, Bevollmächtigte und Verwaltungen.",
+        "beleg_zitat": "Einsichtnahmen können nur nach vorheriger Terminabsprache wahrgenommen werden!",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Reino Dullinger", "funktion": "Registratur, Bauaktenarchiv", "email": "", "telefon": "+49 201 88-63162", "seite": "https://www.essen.de/organisationen/detail_1592637.de.html"},
+          {"name": "Herr Dirk Heibert", "funktion": "Registratur, Bauaktenarchiv", "email": "", "telefon": "+49 201 88-63163", "seite": "https://www.essen.de/organisationen/detail_1592637.de.html"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Stadt Essen",
+        "abteilung": "Geschäftsstelle, Lindenallee 8, 45121 Essen, 2. Obergeschoss",
+        "email": "gutachterausschuss@essen.de",
+        "telefon": "+49 201 88-68505",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.essen.de/organisationen/detail_1188572.de.html",
+        "seiten": [
+          "https://service.essen.de/detail/-/vr-bis-detail/einrichtung/11576/show",
+          "https://www.gars.nrw/essen"
+        ],
+        "gebuehr": "",
+        "hinweis": "Grundstücksmarktbericht über BORIS NRW / gars.nrw.",
+        "beleg_zitat": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in der Stadt Essen",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Cordula Schnackers", "funktion": "Geschäftsstelle Gutachterausschuss, Mietspiegel der Stadt Essen", "email": "Cordula.Schnackers@amt68.essen.de", "telefon": "+49 201 88-68505", "seite": "https://www.essen.de/organisationen/detail_1188572.de.html"},
+          {"name": "Gabriele Wennersheide", "funktion": "Geschäftsstelle Gutachterausschuss, Mietspiegel der Stadt Essen", "email": "Gabriele.Wennersheide@amt68.essen.de", "telefon": "+49 201 88-68502", "seite": "https://www.essen.de/organisationen/detail_1188572.de.html"}
+        ]
+      }
+    ]
+  },
+  {
+    "gemeinde": "Mülheim an der Ruhr",
+    "plz_praefixe": ["45"],
+    "bundesland": "NW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Mülheim an der Ruhr, Amt für Geodaten, Kataster und Wohnbauförderung (Amt 62)",
+        "abteilung": "Katasterauskunft, Technisches Rathaus, Hans-Böckler-Platz 5, 45468 Mülheim an der Ruhr",
+        "email": "Katasterauskunft@muelheim-ruhr.de",
+        "telefon": "",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.muelheim-ruhr.de/cms/liegenschaftskarte.html",
+        "seiten": [
+          "https://www.muelheim-ruhr.de/cms/liegenschaftskataster_auskunft1.html",
+          "https://www.muelheim-ruhr.de/cms/liegenschaftskataster1.html"
+        ],
+        "gebuehr": "30 €, jede weitere Mehrausfertigung 10 € (VermWertKostO NRW)",
+        "hinweis": "Bestellung per E-Mail mit Rechnungsadresse, Lage, Lieferform (Papier/PDF) und Maßstab.",
+        "beleg_zitat": "30 Euro, jede weitere Mehrausfertigung 10 Euro (nach VermWertKostO NRW)",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Lennart Gayk", "funktion": "Kontakt Liegenschaftskarte", "email": "", "telefon": "", "seite": "https://www.muelheim-ruhr.de/cms/liegenschaftskarte.html"}
+        ]
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Mülheim an der Ruhr – Grundbuchamt",
+        "abteilung": "Grundbuchsachen, Georgstraße 13, 45468 Mülheim an der Ruhr",
+        "email": "",
+        "telefon": "0208 4509-0",
+        "kanal": "post",
+        "antrag_url": "http://www.justiz.nrw/BS/formulare/grundbuch/index.php",
+        "quelle_url": "https://www.ag-muelheim.nrw.de/aufgaben/abteilungen/Grundbuchamt/index.php",
+        "seiten": [
+          "https://www.ag-muelheim.nrw.de/aufgaben/gerichtsbezirk/index.php",
+          "https://www.ag-muelheim.nrw.de/kontakt/index.php",
+          "https://www.ag-muelheim.nrw.de/kontakt/telefonliste/index.php"
+        ],
+        "gebuehr": "Ausdruck 10,00 €, amtlicher Ausdruck 20,00 € (GNotKG)",
+        "hinweis": "",
+        "beleg_zitat": "ist zuständig für die kreisfreie Stadt Mülheim an der Ruhr",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Mülheim an der Ruhr, Untere Bodenschutzbehörde (70-3)",
+        "abteilung": "Altlastenkataster, Hans-Böckler-Platz 5, 45468 Mülheim an der Ruhr",
+        "email": "",
+        "telefon": "",
+        "kanal": "formular",
+        "antrag_url": "https://www1.muelheim-ruhr.de/buergerservice/formulare/auskunft-altlastenkataster/184012",
+        "quelle_url": "https://cms.muelheim-ruhr.de/auskunft-aus-dem-altlastenkataster",
+        "seiten": [
+          "https://cms.muelheim-ruhr.de/aaa_ansprechpartner/450",
+          "https://www.muelheim-ruhr.de/cms/bodenschutz_und_altlasten1.html"
+        ],
+        "gebuehr": "einfache Auskunft kostenfrei, sonst nach Aufwand 50–500 €",
+        "hinweis": "Auskunft für Eigentümer oder Bevollmächtigte mit schriftlicher Einverständniserklärung.",
+        "beleg_zitat": "Die Untere Bodenschutzbehörde führt seit über 15 Jahren das Altlastenkataster.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Andreas Haltermann", "funktion": "Sachbearbeiter Altlasten, Grundwasserkataster", "email": "Andreas.Haltermann@muelheim-ruhr.de", "telefon": "+49 208 455 7085", "seite": "https://cms.muelheim-ruhr.de/aaa_ansprechpartner/450"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Mülheim an der Ruhr, Amt für Bauaufsicht und Denkmalpflege (63)",
+        "abteilung": "63-2.2 Auskünfte Baulasten, Grundstücksteilung; Technisches Rathaus, Hans-Böckler-Platz 5, 45468 Mülheim an der Ruhr",
+        "email": "",
+        "telefon": "0208 455-6331",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://cms.muelheim-ruhr.de/stadtraum/planen-und-bauen/service-bauen/leitfaden-fuer-das-baugenehmigungsverfahren/baulasten",
+        "seiten": ["https://cms.muelheim-ruhr.de/aaa_abteilung/129"],
+        "gebuehr": "",
+        "hinweis": "Weitere Durchwahl 0208 455-6328; bei Anfragen Gemarkung, Flur, Flurstück und Adresse bereithalten.",
+        "beleg_zitat": "Baulasten werden mit der Eintragung in das Baulastenverzeichnis wirksam.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Petra Skrzypczak", "funktion": "Baulasten", "email": "", "telefon": "", "seite": "https://cms.muelheim-ruhr.de/stadtraum/planen-und-bauen/service-bauen/leitfaden-fuer-das-baugenehmigungsverfahren/baulasten"},
+          {"name": "Björn Kleinbrahm", "funktion": "Baulasten", "email": "", "telefon": "", "seite": "https://cms.muelheim-ruhr.de/stadtraum/planen-und-bauen/service-bauen/leitfaden-fuer-das-baugenehmigungsverfahren/baulasten"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Mülheim an der Ruhr, Amt für Bauaufsicht und Denkmalpflege (63)",
+        "abteilung": "63-2.1 Akteneinsichten Archiv; Technisches Rathaus, Hans-Böckler-Platz 5, 45468 Mülheim an der Ruhr",
+        "email": "",
+        "telefon": "0208 455 6310",
+        "kanal": "portal",
+        "antrag_url": "https://terminvergabe.muelheim-ruhr.de/select2?md=8",
+        "quelle_url": "https://cms.muelheim-ruhr.de/stadtraum/planen-und-bauen/service-bauen/bauakteneinsicht-bauaufsicht",
+        "seiten": [
+          "https://cms.muelheim-ruhr.de/aaa_abteilung/129",
+          "https://www.muelheim-ruhr.de/cms/neu_online-terminvergabe_fuer_die_akteneinsichtnahme_bei_der_unteren_bauaufsichtsbehoerde.html"
+        ],
+        "gebuehr": "kostenpflichtig, nach Anzahl der Bauakten",
+        "hinweis": "Nur Eigentümer und Bevollmächtigte mit Ausweis und Grundbuchauszug oder Vollmacht; Termin online, weitere Durchwahl 0208 455 6317.",
+        "beleg_zitat": "Die Akteneinsicht vor Ort ist kostenpflichtig und richtet sich nach der Anzahl der Bauakten.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Stadt Mülheim an der Ruhr",
+        "abteilung": "Geschäftsstelle (62-01), Technisches Rathaus, Hans-Böckler-Platz 5, 45468 Mülheim an der Ruhr",
+        "email": "Gutachterausschuss@muelheim-ruhr.de",
+        "telefon": "0208 455-6205",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.muelheim-ruhr.de/cms/gutachterausschuss.html",
+        "seiten": [
+          "https://www.gars.nrw/muelheim-ruhr/erreichbarkeit-mh",
+          "https://cms.muelheim-ruhr.de/aaa_abteilung/76"
+        ],
+        "gebuehr": "",
+        "hinweis": "Sprechzeiten nach telefonischer Vereinbarung; Produkte unter gars.nrw/muelheim-ruhr.",
+        "beleg_zitat": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mülheim an der Ruhr",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Ltd. städt. Vermessungsdirektor Dipl.-Ing. M. Lincke", "funktion": "Vorsitzender", "email": "", "telefon": "", "seite": "https://www.gars.nrw/muelheim-ruhr/erreichbarkeit-mh"},
+          {"name": "Dipl.-Ing. A. Lülf", "funktion": "Geschäftsführerin", "email": "", "telefon": "", "seite": "https://www.gars.nrw/muelheim-ruhr/erreichbarkeit-mh"}
+        ]
+      }
+    ]
+  },
+  {
+    "gemeinde": "Oberhausen",
+    "plz_praefixe": ["46"],
+    "bundesland": "NW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Oberhausen, Geodaten, Liegenschaftskataster",
+        "abteilung": "Liegenschaftskataster, Bodenordnung; Technisches Rathaus, Bahnhofstraße 66, Gebäude A, 46042 Oberhausen",
+        "email": "katasterauskunft@oberhausen.de",
+        "telefon": "0208 825-2521",
+        "kanal": "email",
+        "antrag_url": "https://serviceportal.oberhausen.de:443/suche/-/vr-bis-detail/dokument/26698/download?_19_WAR_vrportlet_priv_r_p_action=vr-bis-detail-dienstleistung-show",
+        "quelle_url": "https://serviceportal.oberhausen.de/suche/-/vr-bis-detail/dienstleistung/26768/show",
+        "seiten": [
+          "https://www.oberhausen.de/de/index/leben-in-oberhausen/bauen-wohnen/wohnen/katastertechnische_auskunft.php",
+          "https://serviceportal.oberhausen.de/suche/-/vr-bis-detail/dienstleistung/26891/show"
+        ],
+        "gebuehr": "30,00 € bis DIN A3",
+        "hinweis": "",
+        "beleg_zitat": "30,00 Euro bis DIN A3",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Dirk Wohlan", "funktion": "Liegenschaftskarte", "email": "", "telefon": "", "seite": "https://serviceportal.oberhausen.de/suche/-/vr-bis-detail/dienstleistung/26768/show"},
+          {"name": "Frau Vera Vinalmont", "funktion": "Liegenschaftskarte", "email": "", "telefon": "", "seite": "https://serviceportal.oberhausen.de/suche/-/vr-bis-detail/dienstleistung/26768/show"}
+        ]
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Oberhausen – Grundbuchamt",
+        "abteilung": "Grundbuchamt, Friedensplatz 1, 46045 Oberhausen",
+        "email": "",
+        "telefon": "0208 8586-1",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.ag-oberhausen.nrw.de/aufgaben/abteilungen/Grundbuchamt/index.php",
+        "seiten": [
+          "https://www.ag-oberhausen.nrw.de/aufgaben/gerichtsbezirk/index.php",
+          "https://www.ag-oberhausen.nrw.de/kontakt/index.php"
+        ],
+        "gebuehr": "Ausdruck 10,00 €, amtlicher Ausdruck 20,00 € (GNotKG)",
+        "hinweis": "",
+        "beleg_zitat": "Der Bezirk des Amtsgerichts Oberhausen umfasst das Stadtgebiet Oberhausen.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Oberhausen, Umweltschutz – Bodenschutz und Altlasten (Untere Bodenschutzbehörde)",
+        "abteilung": "Fachbereich Bodenschutz und Altlasten, Technisches Rathaus, Bahnhofstr. 66, 46042 Oberhausen",
+        "email": "fachbereich.altlasten@oberhausen.de",
+        "telefon": "0208 825-3588",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.oberhausen.de/de/index/leben-in-oberhausen/bauen-wohnen/wohnen/bodenschutz.php",
+        "seiten": [],
+        "gebuehr": "",
+        "hinweis": "Antragsweg und Gebühren der Altlastenauskunft auf der Seite nicht genannt.",
+        "beleg_zitat": "Stadt Oberhausen, Umweltschutz, Bodenschutz und Altlasten, Technisches Rathaus, Bahnhofstr. 66",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Oberhausen, Bauordnung (Bereich 5-3)",
+        "abteilung": "Verwaltungs- u. Baurechtsangelegenheiten 5-3-20, Bahnhofstraße 66, 46145 Oberhausen",
+        "email": "bauordnung@oberhausen.de",
+        "telefon": "0208 825-3405",
+        "kanal": "portal",
+        "antrag_url": "https://serviceportal.oberhausen.de/suche/-/vr-bis-detail/dienstleistung/23962/show",
+        "quelle_url": "https://serviceportal.oberhausen.de/suche/-/vr-bis-detail/dienstleistung/23962/show",
+        "seiten": [],
+        "gebuehr": "schriftliche Auskunft 50–150 € je Grundstück; kein Baulastenblatt 30 € je Grundstück",
+        "hinweis": "Online-Antrag „Baulastauskunft“ im Serviceportal mit Anmeldung.",
+        "beleg_zitat": "Schriftliche Auskunft aus dem Baulastenverzeichnis",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Timo Guthoff", "funktion": "Verwaltung", "email": "timo.guthoff@oberhausen.de", "telefon": "0208 825-2764", "seite": "https://serviceportal.oberhausen.de/suche/-/vr-bis-detail/dienstleistung/23962/show"},
+          {"name": "Frau Jenny Mae Adams", "funktion": "Verwaltung", "email": "jennymae.adams@oberhausen.de", "telefon": "0208 825-2946", "seite": "https://serviceportal.oberhausen.de/suche/-/vr-bis-detail/dienstleistung/23962/show"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Oberhausen, Bauordnung – Hausaktenarchiv",
+        "abteilung": "Hausaktenarchiv, Bahnhofstraße 66, 46145 Oberhausen",
+        "email": "hausaktenarchiv@oberhausen.de",
+        "telefon": "",
+        "kanal": "email",
+        "antrag_url": "https://tevis.krzn.de/tevisweb360/",
+        "quelle_url": "https://serviceportal.oberhausen.de/suche/-/vr-bis-detail/dienstleistung/26894/show",
+        "seiten": [],
+        "gebuehr": "Kopien gebührenpflichtig",
+        "hinweis": "Per E-Mail Ausweis, Eigentumsnachweis (max. ein halbes Jahr alt) und ggf. Vollmacht einreichen; Termin über die Online-Terminvergabe.",
+        "beleg_zitat": "Die Kopieerstellungen sind gebührenpflichtig",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Martin Schmidt", "funktion": "Hausaktenarchiv", "email": "", "telefon": "", "seite": "https://serviceportal.oberhausen.de/suche/-/vr-bis-detail/dienstleistung/26894/show"},
+          {"name": "Herr Patrick Feuerbaum", "funktion": "Hausaktenarchiv", "email": "", "telefon": "", "seite": "https://serviceportal.oberhausen.de/suche/-/vr-bis-detail/dienstleistung/26894/show"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Stadt Oberhausen",
+        "abteilung": "Geschäftsstelle, Technisches Rathaus, Zimmer A301-A312, Bahnhofstraße 66, 46145 Oberhausen",
+        "email": "",
+        "telefon": "",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.gars.nrw/oberhausen/erreichbarkeit-ob",
+        "seiten": ["https://www.gars.nrw/oberhausen"],
+        "gebuehr": "",
+        "hinweis": "E-Mail-Adresse auf der Seite nur per JavaScript sichtbar, daher nicht übernommen.",
+        "beleg_zitat": "Technisches Rathaus Zimmer A301-A312 Bahnhofstraße 66 46145 Oberhausen",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Michael Steinke", "funktion": "Vorsitzender und Geschäftsführer", "email": "", "telefon": "0208 825-2327", "seite": "https://www.gars.nrw/oberhausen/erreichbarkeit-ob"},
+          {"name": "Klemens Küppers", "funktion": "", "email": "", "telefon": "0208 825-3269", "seite": "https://www.gars.nrw/oberhausen/erreichbarkeit-ob"}
+        ]
+      }
+    ]
+  },
+  {
+    "gemeinde": "Gelsenkirchen",
+    "plz_praefixe": ["45"],
+    "bundesland": "NW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Gelsenkirchen, Referat 62 – Vermessung und Kataster",
+        "abteilung": "62/2 Liegenschaftskataster und Medienservice, Rathaus Buer, Goldbergstraße 12, 45894 Gelsenkirchen",
+        "email": "katasterauskunft@gelsenkirchen.de",
+        "telefon": "+49 (209) 169-4319",
+        "kanal": "portal",
+        "antrag_url": "https://serviceportal.gelsenkirchen.de/extension/service/auth-call/c323f1ff-6589-4b02-9b36-c4649c9c91ee",
+        "quelle_url": "https://www.gelsenkirchen.de/de/rathaus/politik_und_verwaltung/Vorstandsbereiche_und_Dienststellen/33488-62-2-liegenschaftskataster-und-medienservice",
+        "seiten": ["https://www.gelsenkirchen.de/de/rathaus/politik_und_verwaltung/Vorstandsbereiche_und_Dienststellen/31275-referat-62-vermessung-und-kataster"],
+        "gebuehr": "",
+        "hinweis": "Geoshop (digitale Katasterauskunft) im Serviceportal.",
+        "beleg_zitat": "Aus diesem System können Kartenauszüge und Eigentümernachweise bereitgestellt werden.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Martin Dicks", "funktion": "Abteilungsleitung", "email": "martin.dicks@gelsenkirchen.de", "telefon": "+49 (209) 169-4890", "seite": "https://www.gelsenkirchen.de/de/rathaus/politik_und_verwaltung/Vorstandsbereiche_und_Dienststellen/33488-62-2-liegenschaftskataster-und-medienservice"}
+        ]
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Gelsenkirchen – Grundbuchamt",
+        "abteilung": "Grundbuchamt, Bochumer Straße 79, 45886 Gelsenkirchen",
+        "email": "",
+        "telefon": "0209 14899-0",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.ag-gelsenkirchen.nrw.de/aufgaben/abteilungen/Grundbuchamt/index.php",
+        "seiten": [
+          "https://www.ag-gelsenkirchen.nrw.de/aufgaben/gerichtsbezirk/index.php",
+          "https://www.ag-gelsenkirchen.nrw.de/kontakt/index.php"
+        ],
+        "gebuehr": "Ausdruck 10,00 €, amtlicher Ausdruck 20,00 € (GNotKG)",
+        "hinweis": "Seit 01.01.2016 für das ganze Stadtgebiet zuständig, das AG Gelsenkirchen-Buer ist aufgehoben.",
+        "beleg_zitat": "Ab dem 01.Januar.2016 ist das Amtsgericht Gelsenkirchen für das ganze Gebiet der Stadt Gelsenkirchen zuständig",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Gelsenkirchen, Referat 60 – Umwelt (Altlasten und Bodenschutz)",
+        "abteilung": "Dienstgebäude Rathausplatz (ehem. Finanzamt Buer), Rathausplatz 1, 45894 Gelsenkirchen",
+        "email": "",
+        "telefon": "",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.gelsenkirchen.de/de/Infrastruktur/Umwelt/Altlasten_und_Bodenschutz/",
+        "seiten": ["https://www.gelsenkirchen.de/de/Infrastruktur/Umwelt/Altlasten_und_Bodenschutz/Boden-_und_Altlasteninformationssystem/"],
+        "gebuehr": "",
+        "hinweis": "Antragsweg und Gebühren der Altlastenauskunft auf der Seite nicht genannt; Bezeichnung „Untere Bodenschutzbehörde“ steht dort nicht wörtlich.",
+        "beleg_zitat": "Dienstgebäude Rathausplatz (ehem. Finanzamt Buer)",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Nicolas Sedlmayr", "funktion": "Abteilungsleiter", "email": "nicolas.sedlmayr@gelsenkirchen.de", "telefon": "+49 (209) 169-4037", "seite": "https://www.gelsenkirchen.de/de/Infrastruktur/Umwelt/Altlasten_und_Bodenschutz/"},
+          {"name": "Dr. Martina Antes", "funktion": "", "email": "martina.antes@gelsenkirchen.de", "telefon": "+49 (209) 169-4121", "seite": "https://www.gelsenkirchen.de/de/Infrastruktur/Umwelt/Altlasten_und_Bodenschutz/"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Gelsenkirchen, Referat 63 – Bauordnung und Bauverwaltung",
+        "abteilung": "63/1.1 Nord / Ost / West und Baulasten, Rathaus Buer, Goldbergstraße 12, 45894 Gelsenkirchen",
+        "email": "referat.bauordnung@gelsenkirchen.de",
+        "telefon": "+49 (209) 169-4848",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.gelsenkirchen.de/de/rathaus/politik_und_verwaltung/Vorstandsbereiche_und_Dienststellen/33500-63-1-ordnungsbehoerdliche-abteilung",
+        "seiten": [
+          "https://www.gelsenkirchen.de/de/rathaus/politik_und_verwaltung/Vorstandsbereiche_und_Dienststellen/33501-63-11-nord-ost-west-und-baulasten",
+          "https://www.gelsenkirchen.de/de/rathaus/politik_und_verwaltung/Vorstandsbereiche_und_Dienststellen/31276-referat-63-bauordnung-und-bauverwaltung"
+        ],
+        "gebuehr": "gebührenpflichtig (Höhe nicht genannt)",
+        "hinweis": "Nur nach Terminvereinbarung (telefonisch oder per E-Mail).",
+        "beleg_zitat": "Auf Wunsch erhalten Sie schriftliche Baulastenauskünfte, für die eine Gebühr zu entrichten ist.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "David Pentos", "funktion": "Teamleitung", "email": "david.pentos@gelsenkirchen.de", "telefon": "+49 (209) 169-4415", "seite": "https://www.gelsenkirchen.de/de/rathaus/politik_und_verwaltung/Vorstandsbereiche_und_Dienststellen/33501-63-11-nord-ost-west-und-baulasten"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Gelsenkirchen, Referat 63 – Bauordnung und Bauverwaltung",
+        "abteilung": "63/1.3 Verwaltung und Hausaktenregistratur, Rathaus Buer, Goldbergstraße 12, 45894 Gelsenkirchen",
+        "email": "referat.bauordnung@gelsenkirchen.de",
+        "telefon": "+49 (209) 169-4848",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.gelsenkirchen.de/de/rathaus/politik_und_verwaltung/Vorstandsbereiche_und_Dienststellen/33500-63-1-ordnungsbehoerdliche-abteilung",
+        "seiten": ["https://www.gelsenkirchen.de/de/rathaus/politik_und_verwaltung/Vorstandsbereiche_und_Dienststellen/33571-63-13-verwaltung-und-hausaktenregistratur"],
+        "gebuehr": "Einsichtnahme und Kopien gebührenpflichtig (Höhe nicht genannt)",
+        "hinweis": "Akteneinsicht für Eigentümer oder Bevollmächtigte, Terminvereinbarung erforderlich.",
+        "beleg_zitat": "hält eine Hausaktenregistratur mit etwa 45.000 Hausakten genehmigter Gebäude vor",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Ralf Robenek", "funktion": "Teamleitung", "email": "ralf.robenek@gelsenkirchen.de", "telefon": "+49 (209) 169-4599", "seite": "https://www.gelsenkirchen.de/de/rathaus/politik_und_verwaltung/Vorstandsbereiche_und_Dienststellen/33571-63-13-verwaltung-und-hausaktenregistratur"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Stadt Gelsenkirchen",
+        "abteilung": "Geschäftsstelle, Rathaus Gelsenkirchen-Buer, Goldbergstraße 12, 45894 Gelsenkirchen",
+        "email": "",
+        "telefon": "0209/169 42 83",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.gars.nrw/gelsenkirchen/erreichbarkeit-ge",
+        "seiten": ["https://www.gars.nrw/gelsenkirchen"],
+        "gebuehr": "",
+        "hinweis": "E-Mail-Adresse auf der Seite nur per JavaScript sichtbar, daher nicht übernommen; Telefon ist die Durchwahl für allgemeine Fragen.",
+        "beleg_zitat": "Rathaus Gelsenkirchen- Buer, Goldbergstraße 12, 45894 Gelsenkirchen",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Warmbrunn", "funktion": "Allgemeine Fragen, Gutachten, Grundstücksmarktbericht, Kaufpreissammlung", "email": "", "telefon": "0209/169 42 83", "seite": "https://www.gars.nrw/gelsenkirchen/erreichbarkeit-ge"},
+          {"name": "Herr Hoppe", "funktion": "Mietspiegel", "email": "", "telefon": "0209/169 54 43", "seite": "https://www.gars.nrw/gelsenkirchen/erreichbarkeit-ge"}
+        ]
+      }
+    ],
+    "offen": []
+  }
+]

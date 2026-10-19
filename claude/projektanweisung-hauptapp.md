@@ -39041,6 +39041,69 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - Fachlich offen für Marcel: Aufteilung rechnet mit dem ETW-Zins **vermietet** (2,9 %); verkauft man an Selbstnutzer, wäre `we_s` (1,9 %) der passende Satz — dann kippt das Bielefelder Ergebnis ins Positive.
 - Eine feinste Registerebene ohne ETW-Zweig fällt nicht auf eine gröbere Registerebene mit ETW-Zweig zurück (`finde()` nimmt die erste Ebene mit irgendeinem Satz) — für Bielefeld ohne Belang, als Befund notiert.
 
+### v2440–v2445 · Unterlagen beim Amt: zwei Ansprechpartner sichtbar, Abgleich mit unterlagen-app-v6, 342 Ämter eingespielt (19.10.2026, Staging)
+
+Marcel: *„Bitte im Tab Objekt ‚Unterlagen beim Amt anfordern' prüfen, da
+wollten wir die 2 Ansprechpartner ausweisen … ‚unterlagenapp' heißt das
+Paket"* und *„wir brauchen mehr Werte."*
+
+**Gemessen vorher:** Code für zwei Ansprechpartner war seit v2152 da — aber
+**0 von 27 Ämtern** in `unterlagen_aemter` hatten einen. Das Modal zeigte an
+jedem Objekt den Amtsweg („Keine zwei belegten Ansprechpersonen"). Gebaut
+und nie sichtbar: dieselbe Lage wie bei der `skala`.
+
+**Abgleich v6 gegen DealPilot (server.js, index.html, LIESMICH):**
+vorhanden seit v2151–v2153: Belegleser je Seite, KI-Auftrag wörtlich,
+`personenAus`, Kopie-Haken mit eigenem Endpunkt, CC im Briefkopf und
+mailto, Telefon, gewerbliche Portale, Neusuche bei Portal-Quelle.
+**Fehlte, jetzt gebaut:** zweite Adresssuche (`sucheAdresse`),
+`saeubereMail`, Kanal (`verfahren`), persönliches Postfach → Funktions-
+adresse, `istLokal` (wir riefen jede genannte URL ab, auch interne),
+„Als Empfänger nehmen" (hier nur in der Sitzung, nicht am gemeinsamen Amt).
+**Bewusst nicht:** Versand per SMTP, Auto-Senden, Vollmacht-Upload,
+Aufgaben, Telegram-Bot des Pakets (v5) — DealPilot verschickt nichts
+(routes/unterlagen.js), der Telegram-Teil wäre ein eigener Auftrag.
+
+**v2440** Namensprüfung: ein von der KI genannter Name muss auf einer
+selbst gelesenen Seite stehen, sonst fällt die Person (außer ihre Adresse
+ist belegt); je Person `seite` und `name_belegt`. Gemeindeweite Sätze
+`gemeinde-<kern>` mit PLZ-Leitbereich — Bielefeld hatte vier PLZ und je
+PLZ einen eigenen Satz. PLZ-genau geht vor.
+**v2441/a** Modal: zwei Karten nebeneinander (Name, Funktion, Telefon,
+E-Mail, Belegstand, Beleg-Seite, Kopie), Empfänger im Briefkopf wählbar.
+Buster `v2441a`, weil `v2441` schon in 84a7635e stand — ohne die Datei.
+**v2442** `tools/aemter-einspielen.mjs`: Recherche → echter
+`belegPruefen`/`belegSeiten`/`personenAus` im Container → Upsert;
+`--trocken` zählt. Geteilte Zuständigkeiten (Grundbuch Berlin, HH,
+Duisburg …) werden nicht gemeindeweit geschrieben.
+**v2443** Belegleser kennt ⚹/◦ (CMS von kassel.de, mainz.de, Potsdam,
+Duisburg, Wuppertal).
+**v2444/v2445 — ZWEI FEHLER, die erst der echte Lauf zeigte:**
+`gaa.stendal.lvermgeo@` galt als Person (Punkt im Konto) und stand als
+Ansprechpartner des Ausschusses Halle; die HVBG-Sammelseite lieferte für
+Frankfurt Personen aus `bad-homburg.de` und `giessen.de`. Jetzt: ein Teil
+mit Amtswort ist kein Name, aufgefüllt wird nur aus der Domain des Amts,
+der Einspielweg nimmt nur, wen die Recherche genannt hat.
+
+**Nachweis** 17 Recherche-Agenten, 60 Gemeinden (Objekt-Gemeinden + 50
+größte Städte). Einspiellauf: 342 Sätze, 212 Amtsadressen belegt, 15
+geteilt nicht geschrieben, 152 Personen geprüft, 43 verworfen. **Staging
+vorher 27 Ämter / 0 mit Ansprechpartner, nachher 369 / 104 (56 mit zwei),
+0 Personen ohne Namen.** `beleg-leser-pruefen.mjs` 108 Fälle RC=0 (lokal
+und im Container), Buster sauber, Sicherung
+`/root/backups/dealpilot-vor-v2442-20261019-1844.sql.gz` (49 MB).
+Im Browser: Leipzig 04155 zeigt den gemeindeweiten Satz mit Karte
+„Ansprechpartner 1 · Name auf der Seite · Beleg-Seite"; zwei Karten
+nebeneinander je 279 px gemessen.
+
+**Rest** Telegram-Teil aus v5 offen (Entscheidung Marcel). Alte KI-Sätze
+je PLZ (Bielefeld 33613, Bad Oeynhausen …) verdecken die besseren
+gemeindeweiten — „Neu suchen" oder Löschen der Altsätze wäre Marcels
+Entscheidung. Bauakte Kabelsketal, Rostock, Saarbrücken ohne amtliche
+Seite. Recherchedaten: `tools/aemter-recherche-20261019/`.
+
+---
+
 ### v2430–v2430b · Mieterhöhung und Zielbild: Ertragswert je Stufe, MFH-Wohnungsfenster, Pilot, beide PDFs (19.10.2026, Staging)
 
 **Was (Marcels Entscheidungen vom 19.10.2026, Vorlage https://claude.ai/artifact/KThexeEAnjWQUPuvd9o1Rx):**

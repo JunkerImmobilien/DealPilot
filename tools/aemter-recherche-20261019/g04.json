@@ -1,0 +1,453 @@
+[
+  {
+    "gemeinde": "Hamburg",
+    "plz_praefixe": ["20", "21", "22", "27"],
+    "bundesland": "HH",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Landesbetrieb Geoinformation und Vermessung (LGV)",
+        "abteilung": "Abteilung B 3 Liegenschaftsdaten, Neuenfelder Straße 19, 21109 Hamburg",
+        "email": "lgvalkis-hilfe@gv.hamburg.de",
+        "telefon": "040 42826 5720",
+        "kanal": "portal",
+        "antrag_url": "https://serviceportal.hamburg.de/HamburgGateway/Service/Entry/AFM-BstfFK",
+        "quelle_url": "https://www.hamburg.de/service/info/11400170/",
+        "seiten": [
+          "https://www.hamburg.de/service/info/11313693/",
+          "https://serviceportal.hamburg.de/HamburgGateway/Service/Entry/GS",
+          "https://www.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-stadtentwicklung-und-wohnen/aktuelles/pressemeldungen/neuer-digital-service-liegenschaftskataster-und-baulastenverzeichnis-auszuege-ab-sofort-ausschliesslich-online-957670"
+        ],
+        "gebuehr": "nach GebOVerm (Gebührenordnung für das amtliche Vermessungswesen), Betrag auf der Seite nicht genannt",
+        "hinweis": "Bestellung nur online; per E-Mail, Post, Fax oder Telefon nicht möglich; die E-Mail-Adresse ist nur Support für die Online-Portale.",
+        "beleg_zitat": "Abteilung B 3 Liegenschaftsdaten, Neuenfelder Straße 19, 21109 Hamburg",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Grundbuchämter bei den Amtsgerichten Hamburg (Mitte), Altona, Barmbek, Bergedorf, Blankenese, Harburg, St. Georg, Wandsbek",
+        "abteilung": "Grundbuchamt des für die Belegenheit zuständigen Amtsgerichts",
+        "email": "",
+        "telefon": "",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://justiz.hamburg.de/gerichte/amtsgericht-hamburg/verfahrensarten-und-services/verfahrensarten/grundbuchamt-636944",
+        "seiten": [
+          "https://www.hamburg.de/service/info/111158374/n0/",
+          "https://www.hamburg.de/service/info/11807693/n0/",
+          "https://www.hamburg.de/service/info/11807723/n0/"
+        ],
+        "gebuehr": "einfacher Ausdruck 10 €, beglaubigter Ausdruck 20 €; Einsicht vor Ort kostenfrei",
+        "hinweis": "Zuständigkeit nach Stadtteil auf mehrere Amtsgerichte verteilt; das zuständige Gericht über den Behördenfinder (Suchwort 'Grundbuchsachen') ermitteln; Antrag nicht per E-Mail.",
+        "beleg_zitat": "Die für Grundbuchangelegenheiten zuständigen Abteilungen eines Gerichts werden als Grundbuchamt bezeichnet.",
+        "geteilt": true,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Behörde für Umwelt, Klima, Energie und Agrarwirtschaft (BUKEA)",
+        "abteilung": "Altlasthinweiskataster, Neuenfelder Straße 19, 21109 Hamburg",
+        "email": "Altlasthinweiskataster@bukea.hamburg.de",
+        "telefon": "",
+        "kanal": "email",
+        "antrag_url": "https://dokumente.hamburg.de/resource/blob/165432/afdf5bdbf037fafd2e3cba5f49724aab/d-antrag-kataster-data.pdf",
+        "quelle_url": "https://www.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen/boden-und-geologie/altlasten/altlasthinweiskataster-hamburg-165434",
+        "seiten": [],
+        "gebuehr": "Gebühren und Auslagen nach der Umweltgebührenordnung möglich, Betrag nicht genannt",
+        "hinweis": "PDF-Antrag vorzugsweise per E-Mail senden (alternativ Post/Fax); Bearbeitung derzeit über sieben Wochen, telefonische Nachfragen unerwünscht.",
+        "beleg_zitat": "speichert Daten über Bodenbelastungen im Altlasthinweiskataster",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Landesbetrieb Geoinformation und Vermessung (LGV)",
+        "abteilung": "Abteilung B 3 Liegenschaftsdaten, Neuenfelder Straße 19, 21109 Hamburg",
+        "email": "lgvalkis-hilfe@gv.hamburg.de",
+        "telefon": "040 42826 5720",
+        "kanal": "portal",
+        "antrag_url": "https://serviceportal.hamburg.de/HamburgGateway/Service/Entry/AFM-BstfFK",
+        "quelle_url": "https://www.hamburg.de/service/info/111092794/",
+        "seiten": [
+          "https://www.hamburg.de/service/info/111099952/"
+        ],
+        "gebuehr": "abhängig von der Anzahl der Flurstücke, nach GebOVerm",
+        "hinweis": "Reine Einsicht in Hamburg nicht möglich, nur Auszüge über das Online-Portal; Eintragung/Löschung von Baulasten macht die Bauprüfabteilung des Bezirksamts.",
+        "beleg_zitat": "Landesbetrieb Geoinformation und Vermessung (LGV), Abteilung B 3 Liegenschaftsdaten",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Bezirksämter Hamburg (Bauprüfung / Bauaktenarchiv) - Altona, Bergedorf, Eimsbüttel, Hamburg-Mitte, Hamburg-Nord, Harburg, Wandsbek",
+        "abteilung": "Bauaktenarchiv der Bauprüfabteilung des für den Bauort zuständigen Bezirksamts",
+        "email": "",
+        "telefon": "",
+        "kanal": "formular",
+        "antrag_url": "https://driveport.de/termine/?MA=21",
+        "quelle_url": "https://www.hamburg.de/service/info/11254021/n0/",
+        "seiten": [],
+        "gebuehr": "Einsichtnahme je Band 40 €, Kopien je nach Aufwand extra",
+        "hinweis": "Zuständigkeit je Bezirksamt nach Bauort; Termin schriftlich oder telefonisch, Online-Terminbuchung (antrag_url) nur für das Bezirksamt Eimsbüttel.",
+        "beleg_zitat": "Die Akten von Bauvorhaben werden im Bauaktenarchiv aufbewahrt.",
+        "geteilt": true,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in Hamburg, Geschäftsstelle beim Landesbetrieb Geoinformation und Vermessung (LGV)",
+        "abteilung": "Abteilung W 1 Marktinformation, Neuenfelder Straße 19, 21109 Hamburg",
+        "email": "gutachterausschuss@gv.hamburg.de",
+        "telefon": "+49 40 42826-6000",
+        "kanal": "formular",
+        "antrag_url": "https://serviceportal.hamburg.de/HamburgGateway/Service/Entry/AFM_GGAHH",
+        "quelle_url": "https://www.hamburg.de/service/info/11258532/",
+        "seiten": [],
+        "gebuehr": "nach GebOVerm, Betrag auf der Seite nicht genannt",
+        "hinweis": "Telefonisch Mo-Fr 9-12 Uhr; persönliche Vorsprache nicht möglich.",
+        "beleg_zitat": "Die Geschäftsstelle des Gutachterausschusses für Grundstückswerte erteilt entsprechende Auskünfte",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ]
+  },
+  {
+    "gemeinde": "Kiel",
+    "plz_praefixe": ["24"],
+    "bundesland": "SH",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Landesamt für Vermessung und Geoinformation Schleswig-Holstein (LVermGeo SH), Standort Kiel",
+        "abteilung": "Abteilung 3 - Liegenschaftskataster, Kronshagener Weg 107, 24116 Kiel",
+        "email": "Poststelle-Kiel@LVermGeo.landsh.de",
+        "telefon": "0431 23763-0",
+        "kanal": "formular",
+        "antrag_url": "https://geoserver.gdi-sh.de/formular/",
+        "quelle_url": "https://www.schleswig-holstein.de/DE/landesregierung/ministerien-behoerden/LVERMGEOSH/Kontakt",
+        "seiten": [
+          "https://www.schleswig-holstein.de/DE/landesregierung/ministerien-behoerden/LVERMGEOSH/Service/serviceLiegenschaftskataster/serviceLiegenschaftskataster_mehrLesen",
+          "https://www.kiel.de/de/politik_verwaltung/service/_leistung.php?id=8963180"
+        ],
+        "gebuehr": "nach Vermessungsgebührenverordnung (VermGebVO), Betrag nicht genannt",
+        "hinweis": "Kundencenter Kiel Mo-Fr 8-12 Uhr und nach Terminvereinbarung; Standort Kiel ist zuständig für Plön, Rendsburg-Eckernförde, Kiel und Neumünster.",
+        "beleg_zitat": "Standort Kiel zuständig für die Kreise Plön, Rendsburg-Eckernförde und die kreisfreien Städte Kiel",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Kiel - Grundbuchamt",
+        "abteilung": "Grundbuchamt, Deliusstraße 22, 24114 Kiel, Erdgeschoss",
+        "email": "Grundbuch@AG-Kiel.LandSH.de",
+        "telefon": "0431 604-0",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.schleswig-holstein.de/DE/justiz/gerichte-und-justizbehoerden/AmtsgerichteSH/AGKiel/Aufgaben/Grundbuch",
+        "seiten": [
+          "https://www.schleswig-holstein.de/DE/justiz/gerichte-und-justizbehoerden/AmtsgerichteSH/AGKiel"
+        ],
+        "gebuehr": "unbeglaubigter Auszug 10 €, beglaubigter Auszug 20 €",
+        "hinweis": "Antrag per Post, MeinJustizpostfach, E-Mail, Fax oder persönlich nach Termin; wegen Umbau wird schriftliche Antragstellung bevorzugt.",
+        "beleg_zitat": "das Amtsgericht für die in seinem Bezirk liegenden Grundstücke zuständig",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Landeshauptstadt Kiel, Umweltschutzamt",
+        "abteilung": "Sachbereich untere Bodenschutzbehörde (uBB), Altlasten, Holstenstraße 104, 24103 Kiel",
+        "email": "altlasten@kiel.de",
+        "telefon": "0431 901-3991",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.kiel.de/de/politik_verwaltung/service/_organisationseinheit.php?id=9032744",
+        "seiten": [
+          "https://www.kiel.de/de/politik_verwaltung/service/_leistung.php?id=8968274"
+        ],
+        "gebuehr": "nach Verwaltungsaufwand (IZG-SH-Kostenverordnung)",
+        "hinweis": "Schriftlicher Antrag mit Flurstücksangaben, bei Nicht-Eigentümern Vollmacht; Bearbeitung in der Regel 2-4 Wochen; Online-Antrag über das Landesportal am.schleswig-holstein.de.",
+        "beleg_zitat": "Umweltschutzamt, Sachbereich untere Bodenschutzbehörde (uBB), Altlasten",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Landeshauptstadt Kiel, Amt für Bauordnung, Vermessung und Geoinformation",
+        "abteilung": "Geodatenservice / Baulastenauskünfte, Fleethörn 9, 24103 Kiel (Rathaus)",
+        "email": "baulasten@kiel.de",
+        "telefon": "0431 901-2678",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.kiel.de/de/politik_verwaltung/service/_organisationseinheit.php?id=232805751",
+        "seiten": [
+          "https://www.kiel.de/de/politik_verwaltung/service/_leistung.php?id=8963240",
+          "https://www.kiel.de/de/politik_verwaltung/service/_zustaendigkeitsfinder/amt_fuer_bauordnung/merkblatt_kiel_bauordnungsamt_bauberatung.pdf"
+        ],
+        "gebuehr": "nach Baugebührenverordnung (BauGebVO), Betrag nicht genannt",
+        "hinweis": "Termine nur nach telefonischer Vereinbarung; das Merkblatt Bauberatung nennt für Baulastauskünfte abweichend 0431 901-1893.",
+        "beleg_zitat": "Geodatenservice / Baulastenauskünfte",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Landeshauptstadt Kiel, Amt für Bauordnung, Vermessung und Geoinformation",
+        "abteilung": "Bauaktenarchiv, Fleethörn 9, 24103 Kiel",
+        "email": "bauaktenarchiv@kiel.de",
+        "telefon": "0431 901-2654",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.kiel.de/de/politik_verwaltung/service/_zustaendigkeitsfinder/amt_fuer_bauordnung/merkblatt_kiel_bauordnungsamt_bauberatung.pdf",
+        "seiten": [
+          "https://www.kiel.de/de/politik_verwaltung/service/_leistung.php?id=8953104"
+        ],
+        "gebuehr": "25 € je Aktenband (Einsicht/Kopie)",
+        "hinweis": "Einsicht nur mit schriftlichem Eigentumsnachweis (in der Regel nicht älter als drei Monate) bzw. Einverständnis des Eigentümers; Online-Terminbuchung über kiel.de.",
+        "beleg_zitat": "Im Bauaktenarchiv der Landeshauptstadt Kiel sind Genehmigungsunterlagen von Gebäuden archiviert.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Kiel",
+        "abteilung": "Geschäftsstelle des Gutachterausschusses, Andreas-Gayk-Straße 23-25, 24103 Kiel",
+        "email": "gutachterausschuss@kiel.de",
+        "telefon": "0431 901-2530",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.kiel.de/de/politik_verwaltung/service/_organisationseinheit.php?id=223509431",
+        "seiten": [
+          "https://www.schleswig-holstein.de/gaa/DE/Kontakt/gakontaktStart",
+          "http://gutachterausschuss-kiel.de/"
+        ],
+        "gebuehr": "",
+        "hinweis": "Die Landesseite der Gutachterausschüsse nennt als Telefon 0431 901-2538.",
+        "beleg_zitat": "Geschäftsstelle des Gutachterausschusses",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ]
+  },
+  {
+    "gemeinde": "Lübeck",
+    "plz_praefixe": ["23"],
+    "bundesland": "SH",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Landesamt für Vermessung und Geoinformation Schleswig-Holstein (LVermGeo SH), Standort Lübeck",
+        "abteilung": "Abteilung 4 - Liegenschaftskataster, Brolingstraße 53 b-d, 23554 Lübeck",
+        "email": "Poststelle-Luebeck@LVermGeo.landsh.de",
+        "telefon": "0451 30090-0",
+        "kanal": "formular",
+        "antrag_url": "https://geoserver.gdi-sh.de/formular/",
+        "quelle_url": "https://www.schleswig-holstein.de/DE/landesregierung/ministerien-behoerden/LVERMGEOSH/Kontakt",
+        "seiten": [
+          "https://www.schleswig-holstein.de/DE/landesregierung/ministerien-behoerden/LVERMGEOSH/Service/serviceLiegenschaftskataster/serviceLiegenschaftskataster_mehrLesen"
+        ],
+        "gebuehr": "",
+        "hinweis": "Kundencenter Lübeck Mo-Fr 8-12 Uhr; Auszüge auch über das Bestellformular des Landesamts.",
+        "beleg_zitat": "Standort Lübeck zuständig für die Kreise Herzogtum Lauenburg, Ostholstein, Stormarn und die kreisfreie Stadt Lübeck",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Lübeck - Grundbuchamt",
+        "abteilung": "Grundbuchamt, Am Burgfeld 7, 23568 Lübeck",
+        "email": "Grundbuch@AG-Luebeck.LandSH.de",
+        "telefon": "0451 371-2525",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.schleswig-holstein.de/DE/justiz/gerichte-und-justizbehoerden/AmtsgerichteSH/AGLuebeck/Aufgaben/Grundbuch",
+        "seiten": [
+          "https://www.schleswig-holstein.de/DE/justiz/gerichte-und-justizbehoerden/AmtsgerichteSH/AGLuebeck"
+        ],
+        "gebuehr": "unbeglaubigter Auszug 10 €, beglaubigter Auszug 20 €",
+        "hinweis": "Telefon ist der Servicepoint (mittwochs geschlossen); Antrag per Post, MeinJustizpostfach, E-Mail, Fax oder persönlich.",
+        "beleg_zitat": "das Amtsgericht für die in seinem Bezirk liegenden Grundstücke zuständig",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Hansestadt Lübeck, Bereich Umwelt-, Natur- und Verbraucherschutz (untere Bodenschutzbehörde)",
+        "abteilung": "Natur- und Gesundheitlicher Umweltschutz, Kronsforder Allee 2-6, 23560 Lübeck",
+        "email": "altlastenauskuenfte@luebeck.de",
+        "telefon": "0451 115",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.luebeck.de/de/buergerservice/leistungen/leistungen/auskunft-aus-dem-altlasten-oder-bodenschutzkataster-beantragen-675?lid=8968274",
+        "seiten": [
+          "https://www.luebeck.de/de/rathaus/verwaltung/umwelt-natur-und-verbraucherschutz/boden/altlastenbearbeitung"
+        ],
+        "gebuehr": "nach Verwaltungsaufwand (IZG-SH-Kostenverordnung)",
+        "hinweis": "Schriftform erforderlich, Online-Antrag in Planung; Telefon ist die Behördenrufnummer 115.",
+        "beleg_zitat": "E-Mail altlastenauskuenfte@luebeck.de Auskunft Altlastenkataster",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Hansestadt Lübeck, Bereich Stadtplanung und Bauordnung",
+        "abteilung": "Baulastenverzeichnis, Mühlendamm 12, 23552 Lübeck",
+        "email": "baulastenauskunft@luebeck.de",
+        "telefon": "0451 115",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.luebeck.de/de/buergerservice/leistungen/leistungen/einsicht-in-das-baulastenverzeichnis-beantragen-566?lid=8963240",
+        "seiten": [],
+        "gebuehr": "nach Baugebührenverordnung (BauGebVO), Betrag nicht genannt",
+        "hinweis": "Auskunft nur auf schriftlichen Antrag bei Nachweis eines berechtigten Interesses; Telefon ist die Behördenrufnummer 115.",
+        "beleg_zitat": "Stadtplanung und Bauordnung; Baulastenverzeichnis Anschrift Mühlendamm 12 23552 Lübeck",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Hansestadt Lübeck, Bereich Stadtplanung und Bauordnung",
+        "abteilung": "Registratur, Bauaktenarchiv, Mühlendamm 22, 23552 Lübeck",
+        "email": "bauaktenarchiv@luebeck.de",
+        "telefon": "0451 115",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.luebeck.de/de/buergerservice/leistungen/leistungen/einsicht-in-die-bauakte-beantragen-382?lid=311845931",
+        "seiten": [],
+        "gebuehr": "Auszüge/Abschriften je Seite 0,50 € bis DIN B4, 1,00 € bei größerem Format",
+        "hinweis": "Termine per E-Mail an bauaktenarchiv@luebeck.de; telefonisch Mo, Di, Do 8-12 Uhr; Formulare Vollmacht und Kostenübernahmeerklärung auf der Seite.",
+        "beleg_zitat": "Stadtplanung und Bauordnung; Registratur, Bauaktenarchiv Anschrift Mühlendamm 22 23552 Lübeck",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck, Geschäftsstelle beim LVermGeo SH",
+        "abteilung": "Geschäftsstelle, Brolingstraße 53 b-d, 23554 Lübeck",
+        "email": "Poststelle-Luebeck@LVermGeo.landsh.de",
+        "telefon": "0451 30090-406",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaLuebeck",
+        "seiten": [
+          "https://www.schleswig-holstein.de/gaa/DE/Kontakt/gakontaktStart"
+        ],
+        "gebuehr": "",
+        "hinweis": "Die Hansestadt hat die Geschäftsstelle per Vertrag dem LVermGeo SH übertragen; Grundstücksmarktübersichten 2002-2025 auf der Seite.",
+        "beleg_zitat": "Die Hansestadt Lübeck hat via Vertrag die Zuständigkeit zur Einrichtung und Unterhaltung der Geschäftsstelle",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ]
+  },
+  {
+    "gemeinde": "Rostock",
+    "plz_praefixe": ["18"],
+    "bundesland": "MV",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Hanse- und Universitätsstadt Rostock, Kataster-, Vermessungs- und Liegenschaftsamt",
+        "abteilung": "Sachgebiet Katasterbenutzung / Kommunale Geodaten, An der Jägerbäk 3, 18069 Rostock",
+        "email": "",
+        "telefon": "+49 381 381-6222",
+        "kanal": "portal",
+        "antrag_url": "https://www.geocms.com/geoshop-rostock/liegenschaftskataster.html",
+        "quelle_url": "https://rathaus.rostock.de/de/service/dienstleistungen/liegenschaftskarte_auskunft_beantragen/401130",
+        "seiten": [
+          "https://rathaus.rostock.de/de/service/dienstleistungen/liegenschaftskataster_auszug_beantragen/401125"
+        ],
+        "gebuehr": "DIN A4 15 € (mit Bodenschätzung 18 €, mit Luftbild 29 €), DIN A3 20 €",
+        "hinweis": "Auszug im Geoshop des Katasteramts, digital per Download nach Bezahlung; Einsicht über GeoPortal.MV kostenfrei.",
+        "beleg_zitat": "Kataster-, Vermessungs- und Liegenschaftsamt | Sachgebiet Katasterbenutzung / Kommunale Geodaten",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Rostock - Grundbuchamt",
+        "abteilung": "Zochstraße 13, 18057 Rostock",
+        "email": "",
+        "telefon": "(0381) 4957-0",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.mv-justiz.de/gerichte-und-staatsanwaltschaften/ordentliche-gerichte/amtsgericht-rostock/",
+        "seiten": [
+          "https://www.mv-justiz.de/gerichte-und-staatsanwaltschaften/ordentliche-gerichte/amtsgericht-rostock/Formulare/",
+          "https://www.mv-justiz.de/static/MVJ/Zentrale%20Formulare/Amtsgerichte/Allgemeine_Fragen_zur_Beantragung_von_Grundbuchausdrucken.pdf"
+        ],
+        "gebuehr": "unbeglaubigter Ausdruck 10 €, beglaubigter Ausdruck 20 €",
+        "hinweis": "Antrag persönlich oder schriftlich per Post/Fax; telefonische Anträge und E-Mail sind laut Landesmerkblatt nicht möglich.",
+        "beleg_zitat": "Amtsgericht Rostock Zochstraße 13 18057 Rostock Telefon: (0381) 4957-0",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Hanse- und Universitätsstadt Rostock, Amt für Umwelt- und Klimaschutz",
+        "abteilung": "Abteilung Wasser und Boden (Altlastenmanagement), An der Jägerbäk 3, 18069 Rostock",
+        "email": "",
+        "telefon": "0381 3817320",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://rathaus.rostock.de/de/service/aemter/amt_fuer_umwelt_und_klimaschutz/wasser_und_boden/altlastenmanagement/251225",
+        "seiten": [
+          "https://rathaus.rostock.de/de/service/aemter/amt_fuer_umwelt_und_klimaschutz/wasser_und_boden/altlastenuntersuchung/251239"
+        ],
+        "gebuehr": "",
+        "hinweis": "Keine eigene Leistungsseite zur Altlastenauskunft gefunden; die Seite Altlastenmanagement nennt die Abteilung Wasser und Boden als Kontakt, E-Mail nur über Kontaktformular.",
+        "beleg_zitat": "Kontakt Amt für Umwelt- und Klimaschutz Abteilung Wasser und Boden",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Martin Brosinski", "funktion": "Sachbearbeiter, Abteilung Wasser und Boden", "email": "", "telefon": "0381 3817320", "seite": "https://rathaus.rostock.de/de/service/aemter/amt_fuer_umwelt_und_klimaschutz/wasser_und_boden/altlastenmanagement/251225"},
+          {"name": "Katharina Katharina Häusler", "funktion": "Sachbearbeiter/in, Abteilung Wasser und Boden", "email": "", "telefon": "0381 3817340", "seite": "https://rathaus.rostock.de/de/service/aemter/amt_fuer_umwelt_und_klimaschutz/wasser_und_boden/altlastenmanagement/251225"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Hanse- und Universitätsstadt Rostock, Bauamt (untere Bauaufsichtsbehörde)",
+        "abteilung": "Sachgebiet Haushalt, Zentrale Ausschreibungsstelle für Bauleistungen, Bauarchiv, Holbeinplatz 14, 18069 Rostock",
+        "email": "",
+        "telefon": "+49 381 381-6336",
+        "kanal": "portal",
+        "antrag_url": "https://antraege.mv-serviceportal.de/automation?pre_os=120219406&pre_pst=106250963&pre_area=4407",
+        "quelle_url": "https://rathaus.rostock.de/de/service/dienstleistungen/baulast_auskunft_aus_dem_baulastenverzeichnis_beantragen/403205",
+        "seiten": [],
+        "gebuehr": "je unbelastetem Flurstück 15 €, je belastetem 25 €, max. 100 € je Grundstück, mindestens 25 €",
+        "hinweis": "Antrag mit Nachweisen (Grundbuchauszug, Grundsteuerbescheid oder Vollmacht) einreichen.",
+        "beleg_zitat": "Bauamt | Sachgebiet Haushalt, Zentrale Ausschreibungsstelle für Bauleistungen, Bauarchiv Adresse Holbeinplatz 14",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Maria Rohde", "funktion": "Sachbearbeiterin", "email": "", "telefon": "+49 381 381-6336", "seite": "https://rathaus.rostock.de/de/service/dienstleistungen/baulast_auskunft_aus_dem_baulastenverzeichnis_beantragen/403205"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock, Geschäftsstelle im Kataster-, Vermessungs- und Liegenschaftsamt",
+        "abteilung": "Sachgebiet Wertermittlung - Geschäftsstelle Gutachterausschuss, An der Jägerbäk 3, 18069 Rostock",
+        "email": "",
+        "telefon": "+49 381 381-6276",
+        "kanal": "portal",
+        "antrag_url": "https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html",
+        "quelle_url": "https://rathaus.rostock.de/de/service/dienstleistungen/grundstuecksmarktbericht_einsehen/401686",
+        "seiten": [
+          "https://rathaus.rostock.de/de/service/dienstleistungen/bodenrichtwerte_auskunft_erhalten/402940",
+          "https://rathaus.rostock.de/de/service/dienstleistungen/kaufpreissammlung_des_gutachterausschusses_auskunft_beantragen/401408"
+        ],
+        "gebuehr": "Grundstücksmarktbericht digital kostenfrei, Druckausgabe 30-60 €",
+        "hinweis": "Gedruckte Exemplare schriftlich bei der Geschäftsstelle beantragen.",
+        "beleg_zitat": "Kataster-, Vermessungs- und Liegenschaftsamt | Sachgebiet Wertermittlung - Geschäftsstelle Gutachterausschuss",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ],
+    "offen": [
+      "bauakte: im Dienstleistungs- und Ämter-A-Z von rathaus.rostock.de keine Leistungsseite zur Bauakteneinsicht gefunden; das Bauamt führt ein Sachgebiet mit 'Bauarchiv' (Holbeinplatz 14, Tel. +49 381 381-6336, siehe Baulasten-Eintrag), die Zuständigkeit für Bauakteneinsicht ist aber nicht wörtlich belegt. Websuche-Budget war erschöpft."
+    ]
+  }
+]

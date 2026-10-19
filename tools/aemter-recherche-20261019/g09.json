@@ -1,0 +1,447 @@
+[
+  {
+    "gemeinde": "Dortmund",
+    "plz_praefixe": ["44"],
+    "bundesland": "NW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Dortmund, Vermessungs- und Katasteramt",
+        "abteilung": "Katasterauskunft",
+        "email": "katasteramt@dortmund.de",
+        "telefon": "+49 231 50-23838",
+        "kanal": "portal",
+        "antrag_url": "https://rathaus.dortmund.de/apps/geo-shop/",
+        "quelle_url": "https://www.dortmund.de/services/flurkarte-stadtgrundkarte.html",
+        "seiten": ["https://www.dortmund.de/themen/planen-und-bauen/katasterauskunft/"],
+        "gebuehr": "gebührenpflichtig, Höhe laut Gebühreninformation der Stadt",
+        "hinweis": "Alternativ PDF-Formular 'Antrag Katasterunterlagen'; Anschrift Märkische Str. 24-26, 44141 Dortmund.",
+        "beleg_zitat": "Sie erreichen unser Dienstgebäude Märkische Straße 24-26",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Dortmund",
+        "abteilung": "Grundbuchamt",
+        "email": "",
+        "telefon": "0231 926-23025",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.ag-dortmund.nrw.de/aufgaben/abteilungen/Grundbuchamt/index.php",
+        "seiten": ["https://www.ag-dortmund.nrw.de/aufgaben/abteilungen/index.php", "https://www.ag-dortmund.nrw.de/kontakt/telefonliste/index.php", "https://www.ag-dortmund.nrw.de/aufgaben/gerichtsbezirk/index.php"],
+        "gebuehr": "Ausdruck 10 €, amtlicher Ausdruck 20 € (GNotKG)",
+        "hinweis": "Antrag schriftlich, per Fax oder persönlich mit Formular; Standort Gerichtsplatz 1, Gericht Gerichtsstraße 22, 44135 Dortmund; zuständig für die kreisfreie Stadt Dortmund.",
+        "beleg_zitat": "Rechtsverhältnisse an Grundstücken, Wohnungseigentum und Erbbaurechten.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Dortmund, Umweltamt",
+        "abteilung": "Untere Bodenschutzbehörde, Altlastenauskunft",
+        "email": "altlastenauskunft@stadtdo.de",
+        "telefon": "+49 231 50-25422",
+        "kanal": "portal",
+        "antrag_url": "https://rathaus.dortmund.de/api/prefill-service/v1/redirect/KFAS_60_0001",
+        "quelle_url": "https://www.dortmund.de/services/altlastenkataster.html",
+        "seiten": ["https://www.dortmund.de/themen/planen-und-bauen/infrastruktur-und-umwelt/boden/"],
+        "gebuehr": "55 € ohne Eintrag, 133 € mit Eintrag, besonderer Aufwand 56 €/Std.",
+        "hinweis": "Brückstr. 45, 44135 Dortmund; Vorsprache nur nach Termin; Eigentumsnachweis oder Vollmacht nötig.",
+        "beleg_zitat": "Die Untere Bodenschutzbehörde der Stadt Dortmund ist dazu verpflichtet, ein Bodenschutz- und Altlastenkataster",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Metzing", "funktion": "Altlastenauskunft", "email": "", "telefon": "+49 231 50-24312", "seite": "https://www.dortmund.de/services/altlastenkataster.html"},
+          {"name": "Frau Paul", "funktion": "Altlastenauskunft", "email": "", "telefon": "+49 231 50-25911", "seite": "https://www.dortmund.de/services/altlastenkataster.html"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Dortmund, Vermessungs- und Katasteramt",
+        "abteilung": "Baulastenverzeichnis",
+        "email": "katasteramt@dortmund.de",
+        "telefon": "+49 231 50-23838",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.dortmund.de/services/auszug-aus-dem-baulastenverzeichnis.html",
+        "seiten": ["https://www.dortmund.de/themen/planen-und-bauen/bauordnung/baulasten/"],
+        "gebuehr": "gebührenpflichtig, Höhe laut Gebühreninformation der Stadt",
+        "hinweis": "In Dortmund führt das Vermessungs- und Katasteramt (nicht die Bauaufsicht) das Baulastenverzeichnis; Antrag persönlich oder schriftlich.",
+        "beleg_zitat": "werden beim Vermessungs- und Katasteramt archiviert und bilden das Baulastenverzeichnis.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Dortmund, Stadtplanungs- und Bauordnungsamt",
+        "abteilung": "Bauaktenarchiv",
+        "email": "bauaktenarchiv@stadtdo.de",
+        "telefon": "+49 231 50-27530",
+        "kanal": "portal",
+        "antrag_url": "https://rathaus.dortmund.de/api/prefill-service/v1/redirect/KFAS_StA61_0001",
+        "quelle_url": "https://www.dortmund.de/services/bauakteneinsicht.html",
+        "seiten": [],
+        "gebuehr": "gebührenpflichtig nach Verwaltungsgebührensatzung",
+        "hinweis": "Freistuhl 7, 44137 Dortmund; Einsicht nur nach Termin, Papierakten lagern extern.",
+        "beleg_zitat": "Stadt Dortmund - Stadtplanungs- und Bauordnungsamt - Bauaktenarchiv",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Stadt Dortmund",
+        "abteilung": "Geschäftsstelle beim Vermessungs- und Katasteramt",
+        "email": "gutachterausschuss@stadtdo.de",
+        "telefon": "+49 231 50-26662",
+        "kanal": "portal",
+        "antrag_url": "https://www.boris.nrw.de",
+        "quelle_url": "https://www.dortmund.de/themen/planen-und-bauen/gutachterausschuss-fuer-grundstueckswerte/",
+        "seiten": ["https://www.dortmund.de/services/bodenrichtwert.html"],
+        "gebuehr": "Downloads laut Seite kostenfrei",
+        "hinweis": "Grundstücksmarktbericht über BORIS NRW abrufbar; Märkische Str. 24-26, 44141 Dortmund.",
+        "beleg_zitat": "Die Geschäftsstelle für den Gutachterausschuss Dortmund ist beim städtischen Vermessungs- und Katasteramt eingerichtet.",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ]
+  },
+  {
+    "gemeinde": "Bochum",
+    "plz_praefixe": ["44"],
+    "bundesland": "NW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Bochum, Amt für Geoinformation, Liegenschaften und Kataster",
+        "abteilung": "Katasterauskunft",
+        "email": "katasterauskunft@bochum.de",
+        "telefon": "0234 910-3816",
+        "kanal": "formular",
+        "antrag_url": "https://formulardienst.bochum.de/forms/findform?shortname=F103&formtecid=3&areashortname=Amt11",
+        "quelle_url": "https://www.bochum.de/Amt-fuer-Geoinformation-Liegenschaften-und-Kataster/Dienstleistungen-und-Infoseiten/Liegenschaftskataster",
+        "seiten": ["https://www.bochum.de/Amt-fuer-Geoinformation-Liegenschaften-und-Kataster/Liegenschaftskarte-Flurkarte"],
+        "gebuehr": "bis DIN A3 30 €, größer 60 €, Mehrausfertigung 10 €",
+        "hinweis": "Technisches Rathaus, Hans-Böckler-Straße 19, Zimmer 5.1.490.",
+        "beleg_zitat": "Das Katasteramt erstellt gegen eine Gebühr Auszüge aus der Liegenschaftskarte in analoger Form",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Oesmaa", "funktion": "Katasterführung und -bereitstellung", "email": "", "telefon": "0234 910-3816", "seite": "https://www.bochum.de/Amt-fuer-Geoinformation-Liegenschaften-und-Kataster/Dienstleistungen-und-Infoseiten/Liegenschaftskataster"}
+        ]
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Bochum",
+        "abteilung": "Grundbuchamt",
+        "email": "",
+        "telefon": "0234 967-0",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.ag-bochum.nrw.de/aufgaben/abteilungen/Grundbuchamt/index.php",
+        "seiten": ["https://www.ag-bochum.nrw.de/behoerde/Auszuege/index.php", "https://www.ag-bochum.nrw.de/aufgaben/gerichtsbezirk/index.php", "https://www.ag-bochum.nrw.de/kontakt/telefonliste/index.php"],
+        "gebuehr": "Ausdruck 10 €, amtlicher Ausdruck 20 € (GNotKG)",
+        "hinweis": "Josef-Neuberger-Str. 1, 44787 Bochum; Durchwahlen je Gemarkung in der Telefonliste (auch Wattenscheid).",
+        "beleg_zitat": "Der Amtsgerichtsbezirk Bochum umfasst ausschließlich die kreisfreie Stadt Bochum.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Bochum, Umwelt- und Grünflächenamt",
+        "abteilung": "Untere Bodenschutzbehörde",
+        "email": "altlastenauskunft@bochum.de",
+        "telefon": "0234 910-1112",
+        "kanal": "formular",
+        "antrag_url": "https://formulardienst.bochum.de/forms/findform?shortname=F019&formtecid=3&areashortname=AMT11",
+        "quelle_url": "https://www.bochum.de/Umwelt--und-Gruenflaechenamt/Dienstleistungen-und-Infos/Auskuenfte-aus-dem-Altlastenkataster",
+        "seiten": ["https://www.bochum.de/Umwelt--und-Gruenflaechenamt/Dienstleistungen-und-Infos/Untere-Bodenschutzbehoerde"],
+        "gebuehr": "nach Zeitaufwand, mindestens 50 €, höchstens 500 €",
+        "hinweis": "Technisches Rathaus, Hans-Böckler-Straße 19; Eigentumsnachweis oder Vollmacht nötig.",
+        "beleg_zitat": "Sie möchten eine Auskunft aus dem Altlastenkataster der Unteren Bodenschutzbehörde beantragen.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Waschnewski", "funktion": "Sachbearbeiterin", "email": "altlastenauskunft@bochum.de", "telefon": "0234 910-1112", "seite": "https://www.bochum.de/Umwelt--und-Gruenflaechenamt/Dienstleistungen-und-Infos/Auskuenfte-aus-dem-Altlastenkataster"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Bochum, Bauordnungsamt",
+        "abteilung": "Baulasten und Grundstücksteilungen",
+        "email": "",
+        "telefon": "",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://www.bochum.de/Bauordnungsamt/Dienstleistungen-und-Infos/Auskunft-aus-dem-Baulastenverzeichnis",
+        "seiten": ["https://www.bochum.de/Bauordnungsamt/Herr-Floetemann", "https://www.bochum.de/Bauordnungsamt/Frau-Laubstein"],
+        "gebuehr": "Einsicht frei; schriftlich 50–200 € je belastetem, 30 € je unbelastetem Grundstück",
+        "hinweis": "Technisches Rathaus, Zimmer 1.1.140; schriftliche Auskunft formlos oder per E-Mail, Einsicht nach Termin.",
+        "beleg_zitat": "Sie möchten Einsicht in das Baulastenverzeichnis oder eine schriftliche Auskunft aus dem Baulastenverzeichnis.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Laubstein", "funktion": "Sachbearbeiterin Baulasten und Grundstücksteilungen", "email": "SLaubstein@bochum.de", "telefon": "0234 910-3428", "seite": "https://www.bochum.de/Bauordnungsamt/Dienstleistungen-und-Infos/Auskunft-aus-dem-Baulastenverzeichnis"},
+          {"name": "Herr Flötemann", "funktion": "Sachbearbeiter Baulasten und Grundstücksteilungen", "email": "UFloetemann@bochum.de", "telefon": "0234 910-34 46", "seite": "https://www.bochum.de/Bauordnungsamt/Dienstleistungen-und-Infos/Auskunft-aus-dem-Baulastenverzeichnis"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Bochum, Bauordnungsamt",
+        "abteilung": "Bau- und Statikaktenarchiv",
+        "email": "Bauaktenarchiv@bochum.de",
+        "telefon": "0234 910-3410",
+        "kanal": "formular",
+        "antrag_url": "https://formulardienst.bochum.de/forms/findform?shortname=F026&formtecid=3&areashortname=Amt11",
+        "quelle_url": "https://www.bochum.de/bauordnung/Dienstleistungen-und-Infos/Akteneinsicht-Bau--und-Statikakten",
+        "seiten": [],
+        "gebuehr": "nach Allgemeiner Verwaltungsgebührensatzung; Bereitstellungsgebühr fällt mit Antrag an",
+        "hinweis": "Online-Antrag erfordert BundID mit Online-Ausweisfunktion; Akten liegen vier Wochen bereit.",
+        "beleg_zitat": "Die Gebühren richten sich nach der Allgemeinen Verwaltungsgebührensatzung der Stadt Bochum.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Kotte", "funktion": "Bauordnungsamt, Bauaktenarchiv", "email": "bauaktenarchiv@bochum.de", "telefon": "0234 910-3410", "seite": "https://www.bochum.de/bauordnung/Dienstleistungen-und-Infos/Akteneinsicht-Bau--und-Statikakten"},
+          {"name": "Herr Libowski", "funktion": "Bauordnungsamt, Bauaktenarchiv", "email": "bauaktenarchiv@bochum.de", "telefon": "0234 910-3410", "seite": "https://www.bochum.de/bauordnung/Dienstleistungen-und-Infos/Akteneinsicht-Bau--und-Statikakten"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Stadt Bochum",
+        "abteilung": "Geschäftsstelle",
+        "email": "gutachterausschuss@bochum.de",
+        "telefon": "0234 910-1917",
+        "kanal": "portal",
+        "antrag_url": "https://www.boris.nrw.de",
+        "quelle_url": "https://www.bochum.de/Amt-fuer-Geoinformation-Liegenschaften-und-Kataster/Dienstleistungen-und-Infoseiten/Gutachterauschuss-fuer-Grundstueckswerte-in-der-Stadt-Bochum",
+        "seiten": ["https://www.bochum.de/Amt-fuer-Geoinformation-Liegenschaften-und-Kataster/Dienstleistungen-und-Infos/Bodenrichtwerte-/-Bodenrichtwertkarte"],
+        "gebuehr": "",
+        "hinweis": "Technisches Rathaus, Hans-Böckler-Straße 19, Zimmer 4.1.430; Grundstücksmarktbericht über BORIS NRW.",
+        "beleg_zitat": "Die Geschäftsstelle des Gutachterausschusses arbeitet nach Weisung des Gutachterausschusses oder dessen Vorsitzenden.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Lausberg", "funktion": "Geschäftsführerin Gutachterausschuss", "email": "TLausberg@bochum.de", "telefon": "0234 910-1917", "seite": "https://www.bochum.de/Amt-fuer-Geoinformation-Liegenschaften-und-Kataster/Dienstleistungen-und-Infoseiten/Gutachterauschuss-fuer-Grundstueckswerte-in-der-Stadt-Bochum"}
+        ]
+      }
+    ]
+  },
+  {
+    "gemeinde": "Hagen",
+    "plz_praefixe": ["58"],
+    "bundesland": "NW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Hagen, Fachbereich Geoinformation und Liegenschaftskataster",
+        "abteilung": "Geodatenzentrum",
+        "email": "",
+        "telefon": "02331/207-5692",
+        "kanal": "portal",
+        "antrag_url": "https://www.hagen.de/irj/portal/ODALK",
+        "quelle_url": "https://www.hagen.de/unser-service/planen-bauen-und-wohnen/auszuege/",
+        "seiten": ["https://www.hagen.de/aus-dem-rathaus/fachbereiche-und-aemter/fachbereiche-a-z/fachbereich-geoinformation-und-liegenschaftskataster/"],
+        "gebuehr": "kostenpflichtig nach VermWertKostO NRW",
+        "hinweis": "Berliner Platz 22, 58089 Hagen; E-Mail nur über Kontaktformular.",
+        "beleg_zitat": "Auszügen aus dem ALKIS, die nicht online erstellt werden, ist immer kostenpflichtig.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Hagen",
+        "abteilung": "Grundbuchamt",
+        "email": "",
+        "telefon": "02331 985-665",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.ag-hagen.nrw.de/aufgaben/abteilungen/Grundbuch/index.php",
+        "seiten": ["https://www.ag-hagen.nrw.de/aufgaben/gerichtsbezirk/index.php", "https://www.ag-hagen.nrw.de/kontakt/telefonliste/index.php"],
+        "gebuehr": "Ausdruck 10 €, amtlicher Ausdruck 20 € (GNotKG)",
+        "hinweis": "Heinitzstr. 42, 58097 Hagen; Antrag schriftlich, per Fax oder persönlich mit Formular.",
+        "beleg_zitat": "Das Amtsgericht Hagen ist zuständig für die kreisfreie Stadt Hagen.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Hagen, Umweltamt",
+        "abteilung": "Untere Bodenschutzbehörde",
+        "email": "",
+        "telefon": "",
+        "kanal": "portal",
+        "antrag_url": "https://services.hagen.de/meine-services/?quickLink=ODFK&id=09040412",
+        "quelle_url": "https://www.hagen.de/aus-dem-rathaus/fachbereiche-und-aemter/fachbereiche-a-z/umweltamt/",
+        "seiten": [],
+        "gebuehr": "einfache Auskunft z. Zt. 55 €",
+        "hinweis": "Rathausstraße 11, 58095 Hagen; Kontakt über 'Postfach Altlasten' (Kontaktformular), keine Telefonnummer auf der Seite.",
+        "beleg_zitat": "hat ein Recht auf detaillierte Auskunft aus dem Kataster.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Hagen, Fachbereich Stadtentwicklung, -planung und Bauordnung",
+        "abteilung": "Untere Bauaufsicht",
+        "email": "",
+        "telefon": "02331/207-2821",
+        "kanal": "portal",
+        "antrag_url": "",
+        "quelle_url": "https://www.hagen.de/unser-service/planen-bauen-und-wohnen/bauantraege-und-bauberatung/",
+        "seiten": ["https://www.hagen.de/aus-dem-rathaus/fachbereiche-und-aemter/fachbereiche-a-z/fachbereich-stadtentwicklung-planung-und-bauordnung/"],
+        "gebuehr": "Negativauskunft 30 €, Positivauskunft 50–150 € je Grundstück",
+        "hinweis": "Online-Formular 'Antrag auf Auskunft aus dem Baulastenverzeichnis' (services.hagen.de, ID 08030425) und Online-Negativauskunft auf der Quellseite; Rathaus I, Rathausstraße 11.",
+        "beleg_zitat": "Auskünfte aus dem Baulastenverzeichnis sind jedoch kostenpflichtig.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Hagen, Fachbereich Geoinformation und Liegenschaftskataster",
+        "abteilung": "Geodatenzentrum, Bauaktenarchiv",
+        "email": "bauakten@stadt-hagen.de",
+        "telefon": "02331/207-2623",
+        "kanal": "portal",
+        "antrag_url": "https://www.hagen.de/irj/portal/ODFK?id=08050405",
+        "quelle_url": "https://www.hagen.de/unser-service/planen-bauen-und-wohnen/auszuege/",
+        "seiten": [],
+        "gebuehr": "nach Verwaltungsgebührensatzung, Tarifstelle 23",
+        "hinweis": "Akten digitalisiert und als PDF bereitgestellt; Vor-Ort-Einsicht nur ausnahmsweise; Berliner Platz 22, Zimmer B.104.",
+        "beleg_zitat": "Die Akten wurden inzwischen digitalisiert und liegen als PDF-Dateien vor.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+        "abteilung": "Geschäftsstelle beim Fachbereich Geoinformation und Liegenschaftskataster",
+        "email": "gutachterausschuss@stadt-hagen.de",
+        "telefon": "02331 / 207-5585",
+        "kanal": "portal",
+        "antrag_url": "https://www.gars.nrw/hagen/produkte-ha/grundstuecksmarktbericht-ha",
+        "quelle_url": "https://www.gars.nrw/kontakt-ha",
+        "seiten": ["https://www.gars.nrw/hagen/gutachterausschuss-ha/geschaeftsstelle-ha", "https://www.hagen.de/aus-dem-rathaus/fachbereiche-und-aemter/fachbereiche-a-z/fachbereich-geoinformation-und-liegenschaftskataster/"],
+        "gebuehr": "",
+        "hinweis": "Berliner Platz 22, 58089 Hagen; E-Mail-Adresse steht auf der Fachbereichsseite von hagen.de.",
+        "beleg_zitat": "Berliner Platz 22 58089 Hagen",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ]
+  },
+  {
+    "gemeinde": "Hamm",
+    "plz_praefixe": ["59"],
+    "bundesland": "NW",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Stadt Hamm, Vermessungs- und Katasteramt",
+        "abteilung": "Kataster / Geodaten (Bautechnisches Bürgeramt)",
+        "email": "katasteramt@stadt.hamm.de",
+        "telefon": "02381 17-4211",
+        "kanal": "portal",
+        "antrag_url": "https://formularserver.hamm.de/metaform/Form-Solutions/sid/assistant/6038afe57d7542239451574c",
+        "quelle_url": "https://serviceportal.hamm.de/detail/-/vr-bis-detail/dienstleistung/1345/show",
+        "seiten": ["https://www.hamm.de/btba/liegenschaftskarte-online", "https://www.hamm.de/planen-bauen-wohnen/bautechnisches-buergeramt/katasterauskunft/uebersicht"],
+        "gebuehr": "PDF Abrufverfahren 15 €, bis DIN A3 30 €, größer 60 €",
+        "hinweis": "Gustav-Heinemann-Straße 10, 59065 Hamm; Bestellung online mit E-Payment.",
+        "beleg_zitat": "Amtliche Auszüge aus dem Liegenschaftskataster sind gebührenpflichtig.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Knöpke", "funktion": "Kataster / Geodaten", "email": "", "telefon": "02381 17-4211", "seite": "https://serviceportal.hamm.de/detail/-/vr-bis-detail/dienstleistung/1345/show"},
+          {"name": "Frau Denysenko", "funktion": "Kataster / Geodaten", "email": "", "telefon": "02381 17-4207", "seite": "https://serviceportal.hamm.de/detail/-/vr-bis-detail/dienstleistung/1345/show"}
+        ]
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Hamm",
+        "abteilung": "Grundbuchamt",
+        "email": "",
+        "telefon": "02381 909-0",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.ag-hamm.nrw.de/aufgaben/abteilungen/Grundbuchamt/index.php",
+        "seiten": ["https://www.ag-hamm.nrw.de/kontakt/telefonliste/index.php"],
+        "gebuehr": "Ausdruck 10 €, amtlicher Ausdruck 20 € (GNotKG)",
+        "hinweis": "Borbergstraße 1, 59065 Hamm; Durchwahlen 02381 909-146 bis -150 laut Telefonliste.",
+        "beleg_zitat": "Einen Grundbuchausdruck können Sie schriftlich bzw. per Fax oder persönlich beim Grundbuchamt beantragen.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Hamm, Vermessungs- und Katasteramt",
+        "abteilung": "KRIS/UIS, Kartographie (62.4)",
+        "email": "katasteramt@stadt.hamm.de",
+        "telefon": "",
+        "kanal": "portal",
+        "antrag_url": "https://formularserver.hamm.de/metaform/Form-Solutions/sid/assistant/5ed75e9bc2dcd05b32987a80",
+        "quelle_url": "https://serviceportal.hamm.de/detail/-/vr-bis-detail/dienstleistung/2148/show",
+        "seiten": [],
+        "gebuehr": "Auskunft 52,50 €; Stellungnahme 52,50–500 € nach Aufwand",
+        "hinweis": "In Hamm erteilt das Vermessungs- und Katasteramt (KRIS/UIS) die Auskunft aus dem Altlastenkataster; Gustav-Heinemann-Straße 10.",
+        "beleg_zitat": "Auskunft aus dem Altlastenkataster/Stellungnahmen bezüglich Altlasten",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Sütering", "funktion": "", "email": "felix.suetering@stadt.hamm.de", "telefon": "02381 17-4231", "seite": "https://serviceportal.hamm.de/detail/-/vr-bis-detail/dienstleistung/2148/show"},
+          {"name": "Herr Wittkamp", "funktion": "Abteilungsleitung KRIS/UIS, Kartographie", "email": "wittkamp@stadt.hamm.de", "telefon": "02381 17-4240", "seite": "https://serviceportal.hamm.de/detail/-/vr-bis-detail/dienstleistung/2148/show"}
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Hamm, Bautechnisches Bürgeramt",
+        "abteilung": "Baulastenauskunft",
+        "email": "bauordnungsamt@stadt.hamm.de",
+        "telefon": "02381 17-4324",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://serviceportal.hamm.de/suche/-/egov-bis-detail/dienstleistung/1362/show",
+        "seiten": [],
+        "gebuehr": "50 € je belastetem, 30 € je unbelastetem Grundstück",
+        "hinweis": "Gustav-Heinemann-Straße 10, 59065 Hamm.",
+        "beleg_zitat": "Für jedes belastete Grundstück fallen Gebühren in Höhe von 50 € an",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Frau Schulte", "funktion": "Servicetelefon, Baulastenauskünfte", "email": "", "telefon": "02381 17-4324", "seite": "https://serviceportal.hamm.de/suche/-/egov-bis-detail/dienstleistung/1362/show"}
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Hamm, Vermessungs- und Katasteramt",
+        "abteilung": "Kataster / Geodaten, Bauaktenarchiv",
+        "email": "",
+        "telefon": "02381 17-0",
+        "kanal": "portal",
+        "antrag_url": "https://formularserver.hamm.de:443/metaform/Form-Solutions/sid/assistant/67d006446c25076c952053d3",
+        "quelle_url": "https://www.hamm.de/btba/bauaktenarchiv",
+        "seiten": [],
+        "gebuehr": "komplette Bauakte 48 € bis 100 Seiten; Einsicht 26 € je angefangene halbe Stunde; Kopie 1 €/Seite",
+        "hinweis": "In Hamm führt das Vermessungs- und Katasteramt das Bauaktenarchiv; Bearbeitung bis zu 2 Wochen.",
+        "beleg_zitat": "die Bearbeitungszeit von Anträgen auf Bauakteneinsicht kann bis zu 2 Wochen dauern",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Wrobel", "funktion": "Kataster / Geodaten", "email": "", "telefon": "02381 17-4238", "seite": "https://www.hamm.de/btba/bauaktenarchiv"},
+          {"name": "Frau Yildiz", "funktion": "Kataster / Geodaten", "email": "", "telefon": "02381 17-4239", "seite": "https://www.hamm.de/btba/bauaktenarchiv"}
+        ]
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte in der Stadt Hamm",
+        "abteilung": "Geschäftsstelle",
+        "email": "",
+        "telefon": "02381 17-4202",
+        "kanal": "portal",
+        "antrag_url": "https://www.boris.nrw.de/boris-nrw/?lang=de",
+        "quelle_url": "https://www.hamm.de/geschaeftsstelle-des-gutachterausschusses-fuer-grundstueckswerte/grundstuecksmarktbericht",
+        "seiten": ["https://www.hamm.de/geschaeftsstelle-des-gutachterausschusses-fuer-grundstueckswerte/uebersicht"],
+        "gebuehr": "",
+        "hinweis": "Gustav-Heinemann-Straße 10, 59065 Hamm; Grundstücksmarktbericht über BORIS NRW oder bei der Geschäftsstelle.",
+        "beleg_zitat": "Der Gutachterausschuss in der Stadt Hamm ist 1963 aufgrund des Bundesbaugesetzes von 1960 eingerichtet worden.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {"name": "Herr Brummel", "funktion": "", "email": "", "telefon": "02381 17-4202", "seite": "https://www.hamm.de/geschaeftsstelle-des-gutachterausschusses-fuer-grundstueckswerte/grundstuecksmarktbericht"},
+          {"name": "Frau Frerich", "funktion": "", "email": "", "telefon": "02381 17-4263", "seite": "https://www.hamm.de/geschaeftsstelle-des-gutachterausschusses-fuer-grundstueckswerte/grundstuecksmarktbericht"}
+        ]
+      }
+    ]
+  }
+]

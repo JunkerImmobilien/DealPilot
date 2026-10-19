@@ -1,0 +1,402 @@
+[
+  {
+    "gemeinde": "München",
+    "plz_praefixe": ["80", "81"],
+    "bundesland": "BY",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Amt für Digitalisierung, Breitband und Vermessung München",
+        "abteilung": "",
+        "email": "poststelle@adbv-m.bayern.de",
+        "telefon": "+49 89 21638-0",
+        "kanal": "portal",
+        "antrag_url": "https://geodatenonline.bayern.de/geodatenonline/",
+        "quelle_url": "https://www.bayernportal.de/dokumente/behoerde/85554490229",
+        "seiten": [
+          "https://www.gesetze-bayern.de/Content/Document/BayVermBezV-1",
+          "https://www.ldbv.bayern.de/produkte/liegenschaftsinformationen/flurkarte.html",
+          "https://www.adbv-muenchen.de/"
+        ],
+        "gebuehr": "Auszug PDF bis DIN A3: 25,00 € am Amt, 20,00 € online über GeodatenOnline",
+        "hinweis": "Amtsbezirk laut BayVermBezV: kreisfreie Stadt München und Landkreis München; Anschrift Prinzregentenstr. 5, 80538 München.",
+        "beleg_zitat": "Prinzregentenstr. 5 80538 München",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht München",
+        "abteilung": "Grundbuchamt (Justizgebäude Infanteriestraße 5, 80797 München)",
+        "email": "poststelle@ag-m.bayern.de",
+        "telefon": "089 / 5597-06",
+        "kanal": "formular",
+        "antrag_url": "https://www.bayernportal.de/dokumente/behoerde/19443725155/leistungen?rekursiv=true",
+        "quelle_url": "https://www.justiz.bayern.de/gerichte-und-behoerden/amtsgerichte/muenchen/kontakt.php",
+        "seiten": [
+          "https://www.justiz.bayern.de/gerichte-und-behoerden/amtsgerichte/muenchen/verfahren_08.php",
+          "https://www.justiz.bayern.de/media/images/behoerden-und-gerichte/amtsgerichte/muenchen/antrag_grundbuchausdruck.pdf"
+        ],
+        "gebuehr": "Einfacher Ausdruck 10 €, amtlicher Ausdruck 20 €, Teilauszug 20 € je Grundbuchblatt",
+        "hinweis": "Kein Online-Antrag; Formular als PDF bzw. über das BayernPortal, telefonisch keine Auskünfte zum Grundbuchinhalt; die Poststellen-Adresse eröffnet keinen Zugang für formbedürftige Erklärungen.",
+        "beleg_zitat": "Grundbuch-, Register-, Wohnungseigentums-, Insolvenz-, Zwangsvollstreckungs-, sowie Zwangsversteigerungssachen bearbeitet.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Landeshauptstadt München, Referat für Klima- und Umweltschutz",
+        "abteilung": "Sachgebiet Altlasten, Abbrüche (Bayerstraße 28a, 80335 München)",
+        "email": "altlastenauskunft.rku@muenchen.de",
+        "telefon": "",
+        "kanal": "email",
+        "antrag_url": "https://stadt.muenchen.de/dms/Home/Stadtverwaltung/Referat-fuer-Klima-und-Umweltschutz/Dokumente/Altlasten/antrag_auskunft_avk.pdf",
+        "quelle_url": "https://stadt.muenchen.de/service/info/sachgebiet-altlasten-abbruche/1074272/",
+        "seiten": [
+          "https://stadt.muenchen.de/service/suche/altlasten/"
+        ],
+        "gebuehr": "In der Regel kostenfrei, umfangreichere Auskünfte gegebenenfalls kostenpflichtig",
+        "hinweis": "Antrag schriftlich per Post oder per E-Mail mit dem PDF-Formular.",
+        "beleg_zitat": "dem Referat für Klima- und Umweltschutz (Sachgebiet Altlasten, Abbrüche) über ein Grundstück vorliegen",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Landeshauptstadt München, Referat für Stadtplanung und Bauordnung – Lokalbaukommission (LBK)",
+        "abteilung": "Servicezentrum der Lokalbaukommission (Blumenstraße 19, 80331 München)",
+        "email": "plan.ha4-beratungszentrum@muenchen.de",
+        "telefon": "(089) 233 96484",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://stadt.muenchen.de/infos/kontakt-plan.html",
+        "seiten": [
+          "https://stadt.muenchen.de/infos/zentrale-aufgaben-lokalbaukommission.html"
+        ],
+        "gebuehr": "",
+        "hinweis": "In Bayern gibt es kein Baulastenverzeichnis",
+        "beleg_zitat": "Die LBK berät zum Baurecht, erteilt Baugenehmigungen und denkmalschutzrechtliche Erlaubnisse.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Landeshauptstadt München, Lokalbaukommission (LBK)",
+        "abteilung": "Registratur Bauvorhaben / Zentralregistratur (Blumenstraße 19, 80331 München; Post: Blumenstraße 28b)",
+        "email": "plan.ha4-zentralregistratur@muenchen.de",
+        "telefon": "+49 89 233-20788",
+        "kanal": "formular",
+        "antrag_url": "https://stadt.muenchen.de/dam/jcr:8932c1b1-6fc5-4dbb-b26c-fa3a3354e886/formular_akteneinsicht_2020_web.pdf",
+        "quelle_url": "https://stadt.muenchen.de/service/info/registratur-bauvorhaben/10317260/",
+        "seiten": [
+          "https://stadt.muenchen.de/infos/lbk-zentralregistratur.html",
+          "https://stadt.muenchen.de/service/suche/akteneinsicht/",
+          "https://stadt.muenchen.de/buergerservice/terminvereinbarung.html#/services/10317257/locations/10234374"
+        ],
+        "gebuehr": "10 € pro Anwesen",
+        "hinweis": "Kein Online-Antrag; Antrag auf Akteneinsicht als PDF-Formular, Einsicht mit Termin.",
+        "beleg_zitat": "Die Lokalbaukommission lagert mehr als 300.000 Bauakten in der hauseigenen Zentralregistratur.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte im Bereich der Landeshauptstadt München",
+        "abteilung": "Kommunalreferat, Bewertungsamt, Geschäftsstelle des Gutachterausschusses (Marsstraße 22, 80335 München)",
+        "email": "gutachterausschuss@muenchen.de",
+        "telefon": "+49 89 233-787378",
+        "kanal": "email",
+        "antrag_url": "",
+        "quelle_url": "https://stadt.muenchen.de/service/info/bewertungsamt-geschaftsstelle-des-gutachterausschusses-bodenrichtwertauskunft/1075224/",
+        "seiten": [
+          "https://stadt.muenchen.de/infos/gutachterausschussmuenchen.html",
+          "https://stadt.muenchen.de/infos/immobilienmarktbericht.html"
+        ],
+        "gebuehr": "Immobilienmarktbericht gegen Gebühr (Betrag auf der Seite nicht genannt)",
+        "hinweis": "Marktbericht als PDF über www.bodenrichtwerte-muenchen.de oder per Bestellformular bei der Geschäftsstelle; der Ausschuss ist nur für das Stadtgebiet zuständig.",
+        "beleg_zitat": "Kommunalreferat Bewertungsamt Geschäftsstelle des Gutachterausschusses Bodenrichtwertauskunft Marsstraße 22 80335 München",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ]
+  },
+  {
+    "gemeinde": "Augsburg",
+    "plz_praefixe": ["86"],
+    "bundesland": "BY",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Amt für Digitalisierung, Breitband und Vermessung Augsburg",
+        "abteilung": "",
+        "email": "poststelle@adbv-a.bayern.de",
+        "telefon": "+49 821 242290-0",
+        "kanal": "portal",
+        "antrag_url": "https://geodatenonline.bayern.de/geodatenonline/",
+        "quelle_url": "https://www.bayernportal.de/dokumente/behoerde/12332197245",
+        "seiten": [
+          "https://www.gesetze-bayern.de/Content/Document/BayVermBezV-1",
+          "https://www.ldbv.bayern.de/produkte/liegenschaftsinformationen/flurkarte.html",
+          "https://www.adbv-augsburg.de/"
+        ],
+        "gebuehr": "Auszug PDF bis DIN A3: 25,00 € am Amt, 20,00 € online über GeodatenOnline",
+        "hinweis": "Amtsbezirk laut BayVermBezV: kreisfreie Stadt Augsburg und Landkreis Augsburg; Anschrift Fronhof 12, 86152 Augsburg.",
+        "beleg_zitat": "Fronhof 12 86152 Augsburg",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Augsburg",
+        "abteilung": "Grundbuchamt (Justizgebäude Am Alten Einlaß 1, 86150 Augsburg, Zimmer 015 und 016)",
+        "email": "Poststelle.gba@ag-a.bayern.de",
+        "telefon": "0821 / 3105-2132",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.justiz.bayern.de/gerichte-und-behoerden/amtsgerichte/augsburg/verfahren_09.php",
+        "seiten": [
+          "https://www.justiz.bayern.de/gerichte-und-behoerden/amtsgerichte/augsburg/kontakt.php"
+        ],
+        "gebuehr": "Einfache Abschrift 10 €, amtliche Abschrift 20 €",
+        "hinweis": "Weitere Durchwahlen -2966, -2193, -2197, -2214; persönliche Vorsprache nur nach Terminvereinbarung; die E-Mail eröffnet keinen Zugang für formbedürftige Erklärungen.",
+        "beleg_zitat": "Das Grundbuchamt ist zuständig für sämtliche Eintragungen in das Grundbuch",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Augsburg, Umweltamt",
+        "abteilung": "Untere Bodenschutzbehörde (Schießgrabenstr. 4, 86150 Augsburg)",
+        "email": "umweltamt@augsburg.de",
+        "telefon": "0821 324-7322",
+        "kanal": "email",
+        "antrag_url": "https://www.augsburg.de/altlastenauskunft",
+        "quelle_url": "https://www.augsburg.de/umwelt-soziales/umwelt/bodenschutz/altlastenauskuenfte",
+        "seiten": [
+          "https://www.augsburg.de/buergerservice-rathaus/buergerservice/dienste-a-z/aemterweise/leistungen-umweltamt/altlasten",
+          "https://www.augsburg.de/buergerservice-rathaus/buergerservice/dienste-a-z/aemterweise/leistungen-umweltamt/formulare-umweltamt"
+        ],
+        "gebuehr": "ab 50 €, je nach Umfang",
+        "hinweis": "Anfrage mit Gemarkung und Flurnummer und/oder Adresse; ohne Eigentum Vollmacht des Eigentümers nötig, Bearbeitung 2–4 Wochen.",
+        "beleg_zitat": "vor einem Grundstückskauf oder auch einer Umnutzung bei der Unteren Bodenschutzbehörde",
+        "geteilt": false,
+        "ansprechpartner": [
+          {
+            "name": "Hans Peter Koch",
+            "funktion": "Leiter",
+            "email": "",
+            "telefon": "",
+            "seite": "https://www.augsburg.de/umwelt-soziales/umwelt/bodenschutz/altlastenauskuenfte"
+          }
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Augsburg, Bauordnungsamt mit Unterer Denkmalschutzbehörde",
+        "abteilung": "Hermanstraße 17, 86150 Augsburg (Post: Imhofstraße 7, 86159 Augsburg)",
+        "email": "bauordnungsamt@augsburg.de",
+        "telefon": "0821 324-12899",
+        "kanal": "formular",
+        "antrag_url": "",
+        "quelle_url": "https://www.augsburg.de/buergerservice-rathaus/buergerservice/aemter-behoerden/staedtische-dienststellen/b/bauordnungsamt-mit-unterer-denkmalschutzbehoerde",
+        "seiten": [
+          "https://www.augsburg.de/buergerservice-rathaus/wohnen-und-bauen/bauordnung"
+        ],
+        "gebuehr": "",
+        "hinweis": "In Bayern gibt es kein Baulastenverzeichnis",
+        "beleg_zitat": "Zur allgemeinen Kontaktaufnahme nutzen Sie bitte vorrangig unser Kontaktformular.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {
+            "name": "Hans Seidel",
+            "funktion": "Leiter",
+            "email": "",
+            "telefon": "",
+            "seite": "https://www.augsburg.de/buergerservice-rathaus/buergerservice/aemter-behoerden/staedtische-dienststellen/b/bauordnungsamt-mit-unterer-denkmalschutzbehoerde"
+          }
+        ]
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Augsburg, Stadtarchiv Augsburg (historische Bauakten) / Bauordnungsamt (neuere Bauakten)",
+        "abteilung": "Einsicht in Bauakten",
+        "email": "",
+        "telefon": "0821 324-34170",
+        "kanal": "portal",
+        "antrag_url": "https://stadt-augsburg.termine-reservieren.online/select2?md=17",
+        "quelle_url": "https://www.augsburg.de/kultur/stadtarchiv-augsburg/einsicht-in-bauakten",
+        "seiten": [
+          "https://www.augsburg.de/buergerservice-rathaus/buergerservice/aemter-behoerden/staedtische-dienststellen/b/bauordnungsamt-mit-unterer-denkmalschutzbehoerde"
+        ],
+        "gebuehr": "35 € Einsichtsgebühr",
+        "hinweis": "Bauakten bis 2024 im Stadtarchiv, neuere digital beim Bauordnungsamt; das Bauaktenarchiv wurde im Zweiten Weltkrieg fast vollständig zerstört, Termin nur online mit Ausweis und Eigentumsnachweis.",
+        "beleg_zitat": "Ein Termin für die Bauakteneinsicht kann nur online über die Terminreservierung der Stadt gebucht werden.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss der kreisfreien Stadt Augsburg",
+        "abteilung": "Geschäftsstelle beim Geodatenamt (Maximilianstr. 6 a, Welserpassage, 86150 Augsburg)",
+        "email": "gutachterausschuss@augsburg.de",
+        "telefon": "0821 324-9363",
+        "kanal": "portal",
+        "antrag_url": "http://www.boris-bayern.de/",
+        "quelle_url": "https://www.augsburg.de/buergerservice-rathaus/buergerservice/dienste-a-z/aemterweise/leistungen-geodatenamt/gutachterausschuss-der-kreisfreien-stadt-augsburg-1",
+        "seiten": [],
+        "gebuehr": "Immobilienmarktbericht gegen Gebühr, ausschließlich online (Betrag auf der Seite nicht genannt)",
+        "hinweis": "",
+        "beleg_zitat": "Geschäftsstelle, die beim Geodatenamt angesiedelt ist",
+        "geteilt": false,
+        "ansprechpartner": [
+          {
+            "name": "Kurt Knauer",
+            "funktion": "Leitung",
+            "email": "",
+            "telefon": "",
+            "seite": "https://www.augsburg.de/buergerservice-rathaus/buergerservice/dienste-a-z/aemterweise/leistungen-geodatenamt/gutachterausschuss-der-kreisfreien-stadt-augsburg-1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "gemeinde": "Nürnberg",
+    "plz_praefixe": ["90"],
+    "bundesland": "BY",
+    "kreis": "kreisfrei",
+    "aemter": [
+      {
+        "art": "flurkarte",
+        "behoerde": "Amt für Digitalisierung, Breitband und Vermessung Nürnberg",
+        "abteilung": "",
+        "email": "poststelle@adbv-n.bayern.de",
+        "telefon": "+49 911 462595-0",
+        "kanal": "portal",
+        "antrag_url": "https://geodatenonline.bayern.de/geodatenonline/",
+        "quelle_url": "https://www.bayernportal.de/dokumente/behoerde/43221103241",
+        "seiten": [
+          "https://www.gesetze-bayern.de/Content/Document/BayVermBezV-1",
+          "https://www.ldbv.bayern.de/produkte/liegenschaftsinformationen/flurkarte.html",
+          "https://www.adbv-nuernberg.de/"
+        ],
+        "gebuehr": "Auszug PDF bis DIN A3: 25,00 € am Amt, 20,00 € online über GeodatenOnline",
+        "hinweis": "Amtsbezirk laut BayVermBezV: kreisfreie Städte Nürnberg und Fürth sowie Landkreis Nürnberger Land; Anschrift Flaschenhofstraße 59, 90402 Nürnberg.",
+        "beleg_zitat": "Flaschenhofstraße 59 90402 Nürnberg",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "grundbuch",
+        "behoerde": "Amtsgericht Nürnberg",
+        "abteilung": "Grundbuchamt (Gebäude Flaschenhofstraße 35, 90402 Nürnberg)",
+        "email": "poststelle@ag-n.bayern.de",
+        "telefon": "0911 / 321-01",
+        "kanal": "post",
+        "antrag_url": "",
+        "quelle_url": "https://www.justiz.bayern.de/gerichte-und-behoerden/amtsgerichte/nuernberg/verfahren_09.php",
+        "seiten": [
+          "https://www.justiz.bayern.de/gerichte-und-behoerden/amtsgerichte/nuernberg/kontakt.php"
+        ],
+        "gebuehr": "Einfacher Ausdruck 10 €, amtlicher Ausdruck 20 €, Teilauszug 20 €",
+        "hinweis": "Telefon ist die Vermittlung des Amtsgerichts; die Poststellen-Adresse eröffnet keinen Zugang für Erklärungen in Rechtssachen.",
+        "beleg_zitat": "Es ist zuständig für alle Eintragungen in das Grundbuch.",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "altlasten",
+        "behoerde": "Stadt Nürnberg, Umweltamt",
+        "abteilung": "Altlasten (Bauhof 2, 90402 Nürnberg)",
+        "email": "",
+        "telefon": "09 11 / 2 31-1 48 70",
+        "kanal": "formular",
+        "antrag_url": "https://online-service2.nuernberg.de/intelliform/forms/n/325_uwa/325_uwa_d_altlasten/index",
+        "quelle_url": "https://www.nuernberg.de/internet/umweltamt/altlasten.html",
+        "seiten": [
+          "https://www.nuernberg.de/internet/umweltamt/kontakt.html",
+          "https://online-service2.nuernberg.de/intelliform/forms/n/325_uwa/325_uwa_f_ausku_altlastendatenbank/show"
+        ],
+        "gebuehr": "Nach Zeitaufwand, Stundensatz 76,00 € (Stand August 2026)",
+        "hinweis": "Auskunft aus der Altlastendatenbank per Online-Assistent oder Formular (Post, E-Mail, Fax); kein Funktionspostfach angegeben, nur Kontaktformular; Bearbeitung meist 1–2 Wochen.",
+        "beleg_zitat": "Für Grundstücke im Stadtgebiet Nürnberg können Sie den Antrag beim Umweltamt der Stadt Nürnberg stellen.",
+        "geteilt": false,
+        "ansprechpartner": [
+          {
+            "name": "Herr Heinel",
+            "funktion": "Altlastenmanagement",
+            "email": "",
+            "telefon": "09 11 / 2 31-1 45 60",
+            "seite": "https://www.nuernberg.de/internet/umweltamt/altlasten.html"
+          },
+          {
+            "name": "Frau Schneeweis",
+            "funktion": "Altlastenauskünfte",
+            "email": "",
+            "telefon": "09 11 / 2 31-1 48 70",
+            "seite": "https://www.nuernberg.de/internet/umweltamt/altlasten.html"
+          }
+        ]
+      },
+      {
+        "art": "baulasten",
+        "behoerde": "Stadt Nürnberg, Bauordnungsbehörde",
+        "abteilung": "Johannesgasse 3, 90402 Nürnberg",
+        "email": "",
+        "telefon": "09 11 / 2 31 - 30 00",
+        "kanal": "formular",
+        "antrag_url": "",
+        "quelle_url": "https://www.nuernberg.de/internet/bauordnung/kontakt.html",
+        "seiten": [
+          "https://www.nuernberg.de/internet/bauordnung/",
+          "https://www.nuernberg.de/internet/bauordnung/auskuenfte.html"
+        ],
+        "gebuehr": "",
+        "hinweis": "In Bayern gibt es kein Baulastenverzeichnis",
+        "beleg_zitat": "Postanschrift: Stadt Nürnberg, Bauordnungsbehörde, Johannesgasse 3, 90402 Nürnberg",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "bauakte",
+        "behoerde": "Stadt Nürnberg, Bauordnungsbehörde",
+        "abteilung": "Bauarchiv (Bauhof 5, Untergeschoss, Zi. U/11, Zugang Johannesgasse 3, 90402 Nürnberg)",
+        "email": "",
+        "telefon": "09 11 / 2 31-43 27",
+        "kanal": "portal",
+        "antrag_url": "https://termine-reservieren.de/termine/bsnuernberg/select2?md=19",
+        "quelle_url": "https://www.nuernberg.de/internet/bauordnung/bauregistratur.html",
+        "seiten": [
+          "https://www.nuernberg.de/imperia/md/bauordnung/dokumente/bob/formblatt_bauregistratur_vollmacht.pdf",
+          "https://www.nuernberg.de/internet/bauordnung/elektronische_bauakte.html"
+        ],
+        "gebuehr": "Bereitstellungsgebühr für Akteneinsichten 35,00 € ab 01.07.2026, zuzüglich Ablichtungen",
+        "hinweis": "Persönliche Akteneinsicht nur mit Termin über das Terminreservierungssystem; kein Funktionspostfach, nur Kontaktformular.",
+        "beleg_zitat": "erteilte Genehmigungen und Baupläne bestehender Gebäude im Stadtgebiet Nürnberg verwaltet",
+        "geteilt": false,
+        "ansprechpartner": []
+      },
+      {
+        "art": "gutachterausschuss",
+        "behoerde": "Gutachterausschuss für Grundstückswerte im Bereich der kreisfreien Stadt Nürnberg",
+        "abteilung": "Geschäftsstelle beim Amt für Geoinformation und Bodenordnung (Bauhof 5, 90402 Nürnberg)",
+        "email": "",
+        "telefon": "0911 / 231 44 53",
+        "kanal": "formular",
+        "antrag_url": "",
+        "quelle_url": "https://www.nuernberg.de/internet/gutachterausschuss/",
+        "seiten": [
+          "https://www.nuernberg.de/internet/geoinformation_bodenordnung/grundstuecksmarktbericht.html",
+          "https://www.nuernberg.de/internet/geoinformation_bodenordnung/kontakt.html"
+        ],
+        "gebuehr": "Grundstücksmarktbericht 60 € (digital und analog)",
+        "hinweis": "Bestellung online oder per Bestellformular (PDF); kein Funktionspostfach angegeben, nur Kontaktformular.",
+        "beleg_zitat": "Gutachterausschuss für Grundstückswerte im Bereich der kreisfreien Stadt Nürnberg",
+        "geteilt": false,
+        "ansprechpartner": []
+      }
+    ]
+  }
+]
