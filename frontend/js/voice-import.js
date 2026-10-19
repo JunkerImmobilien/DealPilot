@@ -8614,6 +8614,16 @@
     _rfMelden('', true);
     return Promise.resolve(window.DealPilotBrw.borisHolen(adr)).then(function (r) {
       _rfDenkt(false);
+      /* v2370 · Gebuehrenpflichtig: der Wert existiert, der Ausschuss gibt ihn nur
+         gegen Gebuehr heraus - Link zum Portal statt "nichts geliefert". */
+      if (r && r.grund === 'gebuehr') {
+        _rfBlase('co', 'Der Bodenrichtwert liegt vor' + (r.zone ? ' (Zone ' + escH(String(r.zone)) + ')' : '') +
+          ', wird hier aber <b>nur gegen Gebühr</b> herausgegeben. ' +
+          '<a href="' + escH(r.link) + '" target="_blank" rel="noopener">Dort abrufen →</a> — ' +
+          'sag mir den Wert, wenn du ihn hast, sonst überspringen wir ihn.');
+        if (_fs.an && _fs.stream) _fsHoeren(true);
+        return;
+      }
       if (!r || !r.ok) {
         _rfBlase('co', 'Der amtliche Abruf hat nichts geliefert' +
           (r && r.fehler ? ' (' + escH(r.fehler) + ')' : '') +

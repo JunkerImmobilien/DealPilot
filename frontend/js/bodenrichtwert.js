@@ -580,6 +580,16 @@
     if (!b.ok || !bd) {
       return { ok: false, grund: 'boris', fehler: (bd && (bd.error || bd.message)) || ('Fehler ' + b.status) };
     }
+    /* v2370 · Gebuehrenpflichtig ist KEIN fehlender Wert: die Zone ist da, der
+       Ausschuss nennt den Wert nur gegen Gebuehr (z. B. Stadt Nuernberg). Marcel:
+       „den Link dann dazu ausgeben … ist gebuehrenpflichtig und dann mit dem Link
+       dahin" - damit der Nutzer direkt den Absprung findet. */
+    if (bd.reason === 'wert_gebuehrenpflichtig') {
+      var _blG = _plzToBundesland(plz);
+      return { ok: false, grund: 'gebuehr', zone: bd.zone || null, stichtag: bd.stichtag || null,
+               fehler: bd.note || 'Der Bodenrichtwert liegt vor, wird aber nur gegen Gebühr herausgegeben.',
+               link: (_blG && BORIS_URLS[_blG] ? BORIS_URLS[_blG] : BORIS_FALLBACK).url };
+    }
     if (!(bd.available && bd.value_sqm != null && bd.value_sqm > 0)) {
       return { ok: false, grund: 'kein_wert', fehler: 'Kein amtlicher Bodenrichtwert für diese Lage' };
     }
@@ -681,6 +691,18 @@
     _setStatus('Bodenrichtwert wird abgerufen …', '');
     try {
       var r = await borisHolen({ plz: plz, ort: ort, str: str });
+      if (!r.ok && r.grund === 'gebuehr') {
+        /* v2370 · Hinweis unter dem Feld MIT Link zum Portal, nicht als Fehler. */
+        var st = _el('brw-ai-status');
+        if (st) {
+          st.className = 'brw-ai-status';
+          st.innerHTML = 'ⓘ Gebührenpflichtig: ' + _escHtml(r.fehler) + ' '
+            + '<a href="' + _escHtml(r.link) + '" target="_blank" rel="noopener">Bodenrichtwert dort abrufen →</a>'
+            + ' — danach den Wert hier eintragen.';
+        }
+        if (typeof toast === 'function') toast('Bodenrichtwert in diesem Land nur gegen Gebühr — Link unter dem Feld');
+        return;
+      }
       if (!r.ok) {
         var msg = (r.grund === 'nicht_verfuegbar' || r.grund === 'kein_wert')
           ? '⚠ ' + r.fehler + (r.grund === 'kein_wert' ? ' — bitte Portal prüfen' : '')
