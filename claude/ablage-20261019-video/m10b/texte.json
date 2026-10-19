@@ -1,0 +1,20 @@
+[
+  {"ab":0.6,"bis":10.77,"text":"Modul zehn b: Die BMF-Kaufpreisaufteilung. Gebäude und Boden — Bodenabschlag, Notarklausel und Fünfzehn-Prozent-Grenze."},
+  {"ab":11.07,"bis":26.17,"text":"Das Beispiel ist wieder das Mehrfamilienhaus aus dem Bestand: Ravensberger Weg achtunddreißig in Bielefeld, acht Wohnungen, Kaufpreis eins Komma zwei vier Millionen Euro."},
+  {"ab":26.47,"bis":37.03,"text":"Angenommen, in den ersten drei Jahren sollen siebenundachtzigtausend Euro in das Haus fließen."},
+  {"ab":37.33,"bis":54.17,"text":"Dann greift die Fünfzehn-Prozent-Grenze: Beim heutigen Gebäudeanteil sind höchstens rund hundertachtunddreißigtausend Euro netto in drei Jahren erlaubt. Die Sanierung liegt deutlich darunter — voll abzugsfähig."},
+  {"ab":54.47,"bis":69.93,"text":"Der BMF-Rechner teilt den Kaufpreis in Gebäude und Boden — nach der Arbeitshilfe des Finanzministeriums. Abgeschrieben wird nur das Gebäude."},
+  {"ab":70.23,"bis":89.8,"text":"Schritt eins, die Anschaffungskosten: Kaufpreis aus dem Reiter Investition. Nebenkosten sind in diesem Objekt nicht erfasst — Fahrten zum Objekt und Notar kämen hier dazu."},
+  {"ab":90.1,"bis":103.07,"text":"Schritt zwei, die Aufteilung: Grundstück, Bodenrichtwert und Anteil — alles aus dem Objekt übernommen."},
+  {"ab":103.37,"bis":120.3,"text":"Zum Vergleich rechnet DealPilot die umgekehrte Ertragswertmethode mit, nach der Rechtsprechung des Bundesfinanzhofs: knapp achtzig Prozent Gebäude."},
+  {"ab":120.6,"bis":138.1,"text":"Schritt drei: amtlich knapp fünfundsiebzig Prozent Gebäude. Mit Bodenabschlägen von fünfzehn, zwanzig oder fünfundzwanzig Prozent steigt der Anteil — und mit ihm die AfA."},
+  {"ab":138.4,"bis":151.13,"text":"Schritt vier: Du wählst. Vier Karten, jede mit Risiko-Score — grün ist die Arbeitshilfe, rot kann das Finanzamt beanstanden."},
+  {"ab":151.43,"bis":165.37,"text":"Optimiert, mit zwanzig Prozent Bodenabschlag: rund achttausendzweihundert Euro Steuerersparnis — bei Risiko-Score drei, also gelb."},
+  {"ab":165.67,"bis":180.43,"text":"Die amtliche Zahl bleibt stehen, das Szenario daneben: weniger Boden, mehr Gebäude — und eine höhere AfA im Jahr."},
+  {"ab":180.73,"bis":196.27,"text":"Den Text für den Kaufvertrag gibt es fertig dazu — Boden und Gebäude, zum Kopieren für den Notar. Die Begründung gehört mit hinein."},
+  {"ab":196.57,"bis":213.4,"text":"Die Absprünge: „Restnutzungsdauer berechnen\" öffnet den Rechner aus Modul zehn a. Dazu das PDF der Aufteilung, die ausgefüllte BMF-Arbeitshilfe und das Original als Excel."},
+  {"ab":213.7,"bis":224.4,"text":"Übernehmen — ein Klick, und der Gebäudeanteil der gewählten Variante geht in den Reiter Steuer."},
+  {"ab":224.7,"bis":237.53,"text":"Im Reiter Steuer steigt der Gebäudeanteil auf knapp achtzig Prozent — und die Abschreibung auf rund neunzehntausendsiebenhundert Euro im Jahr."},
+  {"ab":237.83,"bis":253.83,"text":"Die Fünfzehn-Prozent-Grenze zieht mit: mehr Gebäude, höhere Grenze. Die Sanierung bleibt darunter — voll abzugsfähig."},
+  {"ab":254.13,"bis":263.07,"text":"Gebäude und Boden getrennt — sauber gelandet. Weiter mit Modul elf: der Pilot-Analyse."}
+]

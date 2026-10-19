@@ -1,0 +1,149 @@
+diff --git a/assets/rnd/rnd-calc.js b/assets/rnd/rnd-calc.js
+index ceef361..7b4a38a 100644
+--- a/assets/rnd/rnd-calc.js
++++ b/assets/rnd/rnd-calc.js
+@@ -20,6 +20,10 @@
+ (function (global) {
+   'use strict';
+ 
++  /* v3.2.0-B · dieselbe Untergrenze wie vw/js/calc-rnd.js (RND_MIN) und
++     DealPilot marktbericht/backend/src/lib/rnd-einheitlich.js. */
++  const RND_MIN = 10;
++
+   // PUNKTRASTER-KOEFFIZIENTEN (Anlage 2 ImmoWertV) — unverändert
+   const PUNKTRASTER_KOEFF = [
+     { a: 1.2500, b: 2.6250, c: 1.5250, rel: 60 },
+@@ -198,11 +202,20 @@
+       rnd = 0; anwendbar = false; grenze = 'keine_gnd';
+       hinweis = 'Ohne Gesamtnutzungsdauer keine Rechnung.';
+     } else if (alter >= gnd) {
+-      rnd = 0; anwendbar = false; grenze = 'ueber_gnd';
+-      hinweis = 'Das Alter erreicht oder ueberschreitet die Gesamtnutzungsdauer. '
+-              + 'Die Kurve der Anlage 2 liegt hier hinter ihrem Scheitel (Alter '
+-              + round2(k.b * gnd / (2 * k.a)) + ' Jahre) und wuerde wieder steigen. '
+-              + 'Es wird nicht extrapoliert.';
++      /* v3.2.0-B · PLATEAU wie im Gutachten-Modul V4.2.6 (vw/js/calc-rnd.js).
++         Marcels Entscheidung (Variante B, 18./19.10.2026): die Kurve wird bis
++         zu ihrem Scheitel (Alter = b*GND/(2a), bei jeder Punktzahl HINTER der
++         GND) weitergerechnet und dahinter auf dem Scheitelwert GEHALTEN - nie
++         der wieder steigende Ast. Stetig an der GND, monoton im Alter. */
++      const scheitel = k.b * gnd / (2 * k.a);
++      const alterF = Math.min(alter, scheitel);
++      rohwert = (k.a * alterF * alterF / gnd) - (k.b * alterF) + (k.c * gnd);
++      rnd = Math.max(0, rohwert);
++      if (rnd > kappe) rnd = kappe;
++      grenze = 'plateau';
++      hinweis = 'Alter ' + alter + ' Jahre >= Gesamtnutzungsdauer ' + gnd + ' Jahre: Anlage 2 regelt '
++              + 'diesen Fall nicht. Die Kurve wird auf ihrem Tiefpunkt (Scheitel bei Alter '
++              + round2(scheitel) + ' Jahren) gehalten - wie im Gutachten. Sachverstaendig zu wuerdigen.';
+     } else if (relAlter < k.rel) {
+       rnd = Math.max(0, gnd - alter); anwendbar = false; grenze = 'unter_schwelle';
+       hinweis = 'Relatives Alter ' + round2(relAlter) + ' % liegt unter der Schwelle von '
+@@ -221,6 +234,18 @@
+       }
+     }
+ 
++    /* v3.2.0-B · Untergrenze wie im Gutachten-Modul (V4.2.4/V4.2.5, RND_MIN 10,
++       nach oben begrenzt durch GND - 10) - nur im Formelzweig, nach dem
++       70/90-%-Deckel. Unter der Altersschwelle gilt GND - Alter ohne Boden. */
++    if (anwendbar && gnd > 0) {
++      const _boden = Math.min(gnd - RND_MIN, Math.max(rnd, RND_MIN));
++      if (Math.abs(_boden - rnd) > 1e-9) {
++        hinweis = (hinweis ? hinweis + ' ' : '') + 'Angesetzt ' + round2(_boden)
++                + ' Jahre (Untergrenze ' + RND_MIN + ' Jahre, wie im Gutachten).';
++        rnd = _boden;
++      }
++    }
++
+     const awm = gnd > 0 ? ((gnd - rnd) / gnd) * 100 : 0;
+ 
+     // Formatiere wie im Original-Gutachten:
+@@ -417,17 +442,30 @@
+     const grenzen = [];
+     const basisTechnisch = Math.max(0, gnd - alter);
+ 
++    /* v3.2.0-B · ANLAGE 2 FUEHRT - wie im Gutachten-Modul V4.2.6, dessen
++       Endwert standardmaessig das Punktraster ist (verfahrenGewaehlt ||
++       punktraster). Marcels Entscheidung Variante B: Website und Gutachten
++       sollen dieselbe Zahl nennen.
++         - Formel anwendbar (auch jenseits der GND, Plateau): Punktraster.
++         - unter der Altersschwelle: Anlage 2 sagt selbst GND - Alter.
++         - technisches Verfahren: nur noch Plausibilitaet (Hinweis bei
++           Faktor 2 Abweichung), nicht Leitwert.
++       Bis v3.1.x fuehrte das technische Verfahren; der Wechsel zwischen
++       beiden Verfahren an der Altersschwelle erzeugte den gemessenen Sprung
++       (1978: 29-35, 1979: 19-23). Anlage 2 allein springt nicht: ueber GND
++       60/70/80 x 21 Punktzahlen x jedes Alter gibt es 2 Faelle, in denen ein
++       Jahr aelter mehr ergibt, um 0,14 bzw. 0,04 Jahre (gemessen am Modul). */
+     let final, finalSource, verfahren;
+-    if (basisTechnisch > 0) {
+-      final = recommendedNachSchaden;
+-      verfahren = 'technisch';
+-      finalSource = applySchadensAbschlag && schadensInfo.gesamtAbschlag_pct > 0
+-        ? 'technische Alterswertminderung + Schadensabschlag (-' + schadensInfo.gesamtAbschlag_pct + '%)'
+-        : 'technische Alterswertminderung (vorrangig)';
+-    } else if (punktraster.anwendbar && punktraster.restnutzungsdauer > 0) {
++    if (punktraster.anwendbar && punktraster.restnutzungsdauer > 0) {
+       final = punktraster.restnutzungsdauer;
+       verfahren = 'punktraster';
+-      finalSource = 'Punktrastermethode - technisch nicht mehr ableitbar (Alter >= GND)';
++      finalSource = punktraster.grenze === 'plateau'
++        ? 'Punktrastermethode Anlage 2 ImmoWertV - Kurve auf ihrem Scheitel gehalten (Alter >= GND)'
++        : 'Punktrastermethode Anlage 2 ImmoWertV (wie im Gutachten)';
++    } else if (punktraster.grenze === 'unter_schwelle' && basisTechnisch > 0) {
++      final = basisTechnisch;
++      verfahren = 'gnd_minus_alter';
++      finalSource = 'Anlage 2 ImmoWertV unter der Altersschwelle: Gesamtnutzungsdauer - Alter';
+     } else {
+       final = 0;
+       verfahren = 'keines';
+@@ -452,6 +490,19 @@
+       });
+     }
+ 
++    /* v3.2.0-B · Das technische Verfahren als Plausibilitaet. Weicht es um
++       mehr als den Faktor 2 vom Leitwert ab, wird gemeldet, nicht gerechnet. */
++    const techWert = recommendedNachSchaden;
++    if (final > 0 && techWert > 0 && (techWert / final > 2 || final / techWert > 2)) {
++      grenzen.push({
++        greift: true, art: 'technisch_abweichung',
++        text: 'Die technische Ermittlung ueber die Gewerke ergibt ' + round2(techWert) + ' Jahre und weicht '
++            + 'um mehr als den Faktor 2 vom Leitwert (' + round2(final) + ' Jahre, Anlage 2) ab. '
++            + 'Modernisierungsangaben pruefen; sachverstaendig wuerdigen.',
++        quelle: 'Plausibilitaetspruefung - technisches Verfahren'
++      });
++    }
++
+     /* Plausibilitaetsanker 30 % der GND. Paragraf 185 Abs. 3 Satz 5 BewG:
+        "Die Restnutzungsdauer eines noch nutzbaren Gebaeudes betraegt regelmaessig
+        mindestens 30 Prozent der wirtschaftlichen Gesamtnutzungsdauer."
+diff --git a/assets/rnd/rnd-spanne.js b/assets/rnd/rnd-spanne.js
+index f2d1a38..dfcc9a0 100644
+--- a/assets/rnd/rnd-spanne.js
++++ b/assets/rnd/rnd-spanne.js
+@@ -268,6 +268,12 @@
+     var gndMax = Number(result.input && result.input.gnd) || 0;
+     if (!(obergrenze > 0)) obergrenze = gndMax;
+     if (obergrenze > 0 && bis > obergrenze) bis = Math.floor(obergrenze);
++    /* v3.2.0-B · Fuehrt Anlage 2, ist die Obergrenze der Leitwert selbst. Mit
++       Math.floor lag die Spanne dann IMMER unter dem Gutachtenwert (29,81 ->
++       27 bis 29) und versprach mehr Abschreibung, als das Gutachten hergibt.
++       Die obere Kante reicht deshalb mindestens bis zum aufgerundeten
++       Leitwert - die Zahl des Gutachtens liegt immer in der Spanne. */
++    if (result.verfahren === 'punktraster' && bis < Math.ceil(leit)) bis = Math.ceil(leit);
+ 
+     if (von < 1) von = 1;
+     if (bis < von + 1) { von = Math.max(1, bis - 1); }
+@@ -595,6 +601,12 @@
+    ---------------------------------------------------------------------
+    Die Regel
+    ---------------------------------------------------------------------
++   >>> v3.2.0-B (19.10.2026): ABGELOEST. Marcels Entscheidung Variante B -
++       Anlage 2 fuehrt, wie im Gutachten-Modul V4.2.6; jenseits der GND das
++       Plateau; das technische Verfahren ist Plausibilitaet. Die Wahl steht
++       jetzt in calcAll() (rnd-calc.js). Die Regel unten ist die bis v3.1.x
++       und bleibt als Begruendungsspur stehen. leitwertAn() wirkt unter B
++       nur noch als Obergrenze und aendert den Leitwert nicht mehr.
+      1. Das technische Verfahren fuehrt. Es ist das einzige, das den
+         Zustand der neun Gewerke einzeln bewertet.
+ 

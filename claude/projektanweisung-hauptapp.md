@@ -38918,6 +38918,113 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - 107 Werte (WGFZ, Rohertragsfaktor) stehen noch nicht in `mb.param_modell`. `ladeAusDb` liest sie nicht, sie wirken aus der Datei.
 - `tools/kettenpruefung-v1095.mjs` ist seit Langem kaputt (Pfad `/app/lib`), nicht angefasst.
 
+### ⏸ ÜBERGABE 19.10.2026 (Pause auf Marcels Wunsch) · Prod-Rollout (53) und was offen ist
+
+**Prod-Rollout (53)** — Merge `2b3ab2c1` (Stand staging `ccda2d97`).
+- **Inhalt:**
+  - v2395 · Geführte Eingabe: „Bewirtschaftung“ statt „Hausgeld“ beim Haus; Herkunft „Geführte Eingabe“; BRW mit Tausenderpunkt.
+  - v2396–v2396g · Register gegen Datenbank:
+    - Datei-Sperre gewinnt immer.
+    - Waisen nach URL-Wechsel.
+    - Dresden: Rückfrage Endhaus/Mittelhaus statt Ladereihenfolge.
+    - Felder der Datei an DB-Zeilen.
+    - `wert_parameter` 2024 nur ohne neueren Registersatz.
+    - § 256-Text richtiggestellt.
+    - **Hausart statt „haus“ an den Register-Sachwertfaktor:** Ändert den Sachwert vieler App-Häuser, jetzt amtlich statt vorläufig.
+    - Werkzeug `tools/register-db-abgleich.mjs`, läuft im Staging-Deploy.
+  - Videothek 4b mit den neuen Modulen 15 und 23.
+- **Nachweis:**
+  - Sicherung `main-20261019-1028-r53` (73 Tabellen) und `mb-…-r53` (32).
+  - `register-saat --trocken --aufraeumen` zeigte 137 (135 über Sperre, 2 URL-Wechsel Essen). `--nur-aufraeumen` löschte 137 von 137, `mb.param_modell` hat jetzt 4.096 Zeilen.
+  - `register-db-abgleich --ssh=prod`: sauber.
+  - Gold-Audit RC 0, `auth/me` 401.
+- **Konto:** `majunker@gmx.net` wurde auf Prod gelöscht.
+  - Marcel per `!`, `DELETE 1`. Nachgeprüft: users, objects, subscriptions je 0.
+  - Das Stripe-Abo war seit 15.10. gekündigt (`cancel_at_period_end`) und läuft im Stripe-Konto aus.
+
+**Messungen dieses Tages, die man wieder braucht:**
+- **DealPilot-Formeln, Leave-one-Land-out** (`tools/*-naeherung-ableiten.mjs`):
+
+  | Formel | Median | P90 | Bewertung |
+  |---|---|---|---|
+  | UK Fläche | 1,6 % | 10,6 % | — |
+  | WGFZ | 3,5 % | 14,8 % | — |
+  | LZS Wohnen | 0,62 PP | 1,61 PP | besser als § 256 (0,84/1,74) in 7 von 11 Ländern; schlechter in TH, ST, SH, MV |
+  | SWF | 13,7 % | 30,6 % | lohnt NICHT, Faktor hängt am örtlichen Markt |
+
+- **Lernkurve** bei 25 % bis 100 % der Ausschüsse: ab ~50 % flach. Mehr Ernte macht die Formeln kaum genauer, bringt aber mehr Deckung auf Stufe A. Deshalb weiterernten.
+- **§ 256 BewG** liegt im Median 0,7 bis 0,9 PP ÜBER dem örtlichen Wohnzins. Der Ertragswert fällt damit eher zu niedrig aus.
+
+**Marcels Entscheidungen 19.10. (zusätzlich zu den oben genannten):**
+- **Stufe N:** neue Stufe „N · DealPilot-Formel“ zwischen C und D. D heißt nur noch „gesetzlicher Auffangwert § 256 BewG“.
+- **LZS-Formel:** wird verdrahtet, aber nur, wo sie genauer ist als § 256. Nie bei einer Sperre oder einem Ausschusswert.
+- **ETW in Objekt mit ≤ 2 WE (Minden-Lübbecke):** amtlicher ZFH-Zins des Ausschusses (v2394).
+- **Weiterernten:** ja.
+- **Videos:** jedes Video mit UND ohne Sprecher (Videothek-Umschalter, Standard: mit).
+
+**OFFEN — so geht es weiter:**
+1. **Stufe N und LZS-Formel** (Agent, v2400 ff.): Der Zwischenstand steht im Journal-Eintrag „Zwischenstand Stufe N“ (falls vorhanden). Ziel: alle ~15 Stellen (Kaskade, Ertragswert-Abzug, Web, PDF, Übernahme-Pille, Hilfe, Verlauf), dazu die LZS-Formel vor § 256. Danach Deploy auf Staging (Rebuild `mb-backend`), Prüfung, Prod.
+2. **Videos 10b und 21:** Beide sind neu AUFGENOMMEN, aber noch nicht vertont oder hochgeladen.
+   - 10b: 4:29, Grenze 157.543 € → 168.155 €, Stichbilder geprüft.
+   - 21: 3:00, Stichbilder noch nicht angesehen.
+   - Die Dateien liegen unter `Dateien/Messe/Videos/Videoreihe/Modul 10b …` bzw. `Modul 21 …`.
+   - Vertonung: Werkzeuge stehen in `claude/ablage-20261019-video/werkzeug/` (`analyse.sh` → `setze.mjs`/`baue.mjs` → `ttsrun3.sh` onyx mit Pirate-Vibe → `pruefe.mjs` → `mische.sh`). Die Sprechtexte als Vorlage liegen in `…/m10b/zeilen.txt` und `…/m21/zeilen.txt`. Der volle Arbeitsstand mit den WAV-Clips liegt in `Dateien/Messe/Videos/vertonung-arbeitsstand-20261019/`.
+   - Neu zu sprechen ist nur:
+     - 10b: die Grenze („gut hundertsiebenundfünfzigtausend“) und der Abspann „Weiter mit Modul zehn c“.
+     - 21: die Zahlenzeile (Gesamtinvestition 7,39 Mio., Mieteinnahmen 344.100 €/Jahr) und der Abspann „Weiter mit Modul zweiundzwanzig: dem Telegram-Bot“.
+   - Danach scp auf Staging und Prod, md5 prüfen. In `videos.json` die Dauern ändern (10b 263 → 269, 21 175 → 180), Buster `landing-videothek-4c`, STAND.md nachtragen.
+   - Bis dahin zeigt das alte 10b auf beiden Servern noch 137.917 €.
+   - Die alten Fassungen liegen gesichert in `Dateien/Messe/Videos/alt-vor-v2395/`.
+   - Vor jeder Aufnahme den freien Speicher prüfen (unter ~2 GB nicht starten). Aufgenommen wird im EIGENEN Chrome-Fenster, nicht in der Tab-Gruppe, sonst liegt das Hinweisfeld der Erweiterung im Bild.
+3. **App-Fehler aus der Videoarbeit** (nach den Aufnahmen beheben, `calc.js`/`tax.js` werden dort gefilmt):
+   - `tax.js` `_renderQuickForm`: „Einnahmen V+V“ zeigt nur die Kaltmiete.
+   - `calc.js:1129` `#ahk_geb_anteil` rundet auf ganze Prozent (75 statt 74,82).
+   - Videothek-MP4 ohne Buster (Cache zeigt alte Fassung).
+   - Abspann Modul 24 verweist auf „02–10“, obwohl es Modul 25 gibt.
+   - Ältere Videos am Demo-Objekt Ravensberger Weg (vor 16.10. abends) zeigen vermutlich Zahlen ohne Kaufnebenkosten: nachprüfen.
+4. **Ernte:**
+   - BW-WGFZ stützt sich allein auf die Aktennotiz zur Freigabe; das LGL-Infoblatt sagt „kommerzielle Nutzung ausgeschlossen“. Von Marcel freigegeben, rechtlich im Blick behalten.
+   - 91 BW-Flächen-Stützstellen sind aus demselben Grund gesperrt und ließen sich genauso freigeben.
+   - Cottbus bleibt Sperre (zwei Spalten ohne Zuordnung).
+   - Lizenz offen: Kiel, Ostholstein, Lübeck, Lauenburg, ST.
+   - NI-zonenabhängige WGFZ-Tabellen (Kern prüft die Tabellenkennung der Zone nicht).
+5. **Kern WGFZ:**
+   - `begrenzung` im Matrix-Zweig.
+   - Tabellenform ohne Rundung.
+   - Zonen-, Ortsteil- und gebietsabhängige Geltung.
+6. **Gewerbe-Ertragswert** liest die GND des Zinssatz-Satzes noch nicht.
+7. `tools/kettenpruefung-v1095.mjs` ist kaputt (falscher Pfad).
+8. **Dresden-Reihenhaus ohne Hausform:** rechnet § 256 und zeigt eine Rückfrage. Produktfrage, ob das Formular die Hausform deutlicher abfragt.
+9. **Versionsnummern:** v2373/v2374/v2395 wurden heute von parallelen Strängen doppelt vergeben, die Video-Commits heißen deshalb `v2395vr*`. **Ab v2400 sauber zählen.**
+
+**Abnahmepunkte im Browser (noch nicht gemessen):**
+- Stufen-Beschriftung (A–E, N) in Web und PDF.
+- Pilot-Antwort zu „Stufe 2“ und „Stufe C“.
+- Essen EFH Sachwertfaktor 1,33 im echten Bericht.
+
+### v2400 · Zwischenstand Stufe N (DealPilot-Formel Liegenschaftszins) — angehalten (19.10.2026, nur Repo, kein Deploy)
+
+**Auftrag (Marcel 19.10.2026 freigegeben):** neue Herkunftsstufe **N · DealPilot-Formel** zwischen C und D (D heißt danach nur noch „gesetzlicher Auffangwert § 256 BewG"); UK-Fläche-, WGFZ- und LZS-Formel tragen N; LZS-Formel in der Kaskade vor § 256, nach allen amtlichen Ebenen, nur Wohnen, RND 5–80, nur in Ländern, in denen sie gemessen genauer ist als § 256, nie bei Ausschusswert oder Sperre. Marcel hat pausiert, Stand angehalten.
+
+**Erledigt:**
+- `lib/lzs_naeherung.js` (Commit `94a5184f`): `lzsNaeherung()`, `lzsNaeherungLaender()`, `lzsFamilie()`, `lzsStadt()`. Länder aus `pruefung.je_land` (Formel-Median < § 256-Median): **BB BW HE NI NW RP SN**; TH ST SH MV und ungemessene Länder (BY SL HB HH BE) → nein. Stadt = Stadtstaat oder 8-stellige AGS auf `000` (kreisfreie Stadt; bei 5-stelliger AGS 0). Ohne Wirkung, solange `lzs-naeherung.json` `verdrahtet: false` führt; kein Aufrufer.
+- Funktionslauf: Bielefeld MFH RND 30 → 3,01 % (1,723 + 1,484 + 0,087 × 3 − 0,463); TH und BY → `land_nicht_besser`; Gewerbe → `keine_wohnnutzung`; RND 90 → `rnd_ausserhalb`.
+
+**Offen (nichts davon angefangen, nichts halb geändert):**
+- `lzs-naeherung.json`: `stufe` N, `verdrahtet` true; dasselbe im Erzeuger `tools/lzs-naeherung-ableiten.mjs` (sonst schreibt der nächste Lauf D zurück).
+- `WertParameterService.js`: `RANG` mit N; vor dem letzten § 256-Rückfall die Formel, **nur wenn `regFinde('liegenschaftszinssatz', ags)` leer ist** (Sperre oder Rückfrage → § 256 mit Weg zur Quelle) und kein Registerfehler; `zinsHerkunft()` neue Ebene `dealpilot_formel` (unter A, Etikett „DealPilot-Formel (N), aus 984 amtlichen Zinssätzen abgeleitet, typische Abweichung 0,6 Prozentpunkte", Weg mit Ausschuss-Link wie bei D); `hinweisZurStufe` N; Kopfkommentar.
+- `ErtragswertService.js:714` Abzug N (Vorschlag −25, zwischen C −20 und D −40).
+- `CrossCheckService.js:154` (`_rfArt`) und `:1859` (N nicht in den Quellennachweis).
+- `ReportOrchestrator.js:1636` Tabelle mit N; `:1205`/`:1024` Kommentare.
+- `routes/api.js` Kommentare 602/636/1351; Reiter-Route: bei Stufe N mit `rndJ` neu rechnen (sonst Reiter und Bericht verschieden).
+- `ReportGenerationService.js:523` und `KiGegenrechnungService.js:149`: der KI die Stufe mit Klartext geben, nicht nur den Buchstaben. `ui.js:3108` nur Feldliste, keine Änderung nötig.
+- UK/WGFZ: `uk-naeherung.json`, `uk-wgfz-naeherung.json`, `umrechnung_flaeche.js:418`, `umrechnung_wgfz.js:230` und die beiden Erzeuger (`uk-naeherung-ableiten.mjs:147`, `uk-wgfz-naeherung-ableiten.mjs:182`) auf N.
+- Frontend: `marktbericht-app/app.js` `_stufeTxt` (4538) und `:4617`; `objekt-reiter.js` `STUFEN`, Regex `[A-E]` in `st()`, Klasse für N (CSS `.oe-st.n` in `css/style.css` bei 38747, Farbe zwischen Gold und Rot), `_leiste.zins` (425) und Text 482, `TRAUEN` N, Verweise „Herkunftsstufen A bis E"; `help.js:339/342` N ergänzen, D umformulieren.
+- Buster: `index.html` (objekt-reiter, help, style.css), `marktbericht-app/index.html` (app.js), iframe-Ziel in `marktbericht-view.js`; danach `buster-ebenen-pruefen`.
+- Prüfstrecke komplett (siehe Auftrag): Funktionsläufe A/B/C/N/D/E mit echten AGS, darunter ein Ort ohne Registersatz in NW/NI/HE (→ N), TH (→ D), eine Sperre in einem N-Land (→ D mit Hinweis); W/L/H unverändert (`chk.mjs` im Scratchpad der Sitzung).
+
+**Nächste Schritte:** JSON + Erzeuger → Kaskade + `zinsHerkunft` → Abzug/CrossCheck/Orchestrator → UK/WGFZ auf N → Frontend + Buster → Prüfstrecke → Commits einzeln → Deploy erst nach „Deploy frei" (dann mb-backend neu bauen, Frontend per `git pull`).
+
 ### v2368–v2394 · Geführte Eingabe, Marktbericht-Prüfung, Herkunftsstufen, Videothek mit Sprecher (19.10.2026) + Prod-Rollout (52), (52a)
 
 **Was:**
