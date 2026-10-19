@@ -866,8 +866,9 @@ function _renderWertverfahren(d) {
     + karte('vgl', (cc.comparison && cc.comparison.bezeichnung) || 'Marktpreisindikation',
         eur(v),
         ((cc.comparison && cc.comparison.basis) === 'kaufpreise'
-          ? 'amtliche Grundlage · § 20, § 25 ImmoWertV'
-          : 'Angebotspreise aus Portalen — keine Kaufpreise (§ 25 ImmoWertV)')
+          ? 'amtlicher Vergleichsfaktor · § 20, § 25 ImmoWertV'
+          /* v2380 · Angebotspreise heissen so, auch wenn irgendwo eine amtliche Grundlage existiert */
+          : 'Angebotspreise (Marktdurchschnitt), keine Kaufpreise (§ 25 ImmoWertV)')
           /* v2367 · Abschlag auf Angebotspreise und amtliche Gegenprobe sichtbar */
           + _mpZusatz(d),
         'vergleich')
@@ -3868,7 +3869,11 @@ async function exportPdf(out) {
       doc.setFontSize(8); doc.setTextColor(120, 113, 100);
       doc.text('Im Marktwert berücksichtigt: +' + euro(lcomp.value_eur) + ' Mehrflächen-Bodenwert (' +
         Math.round(lcomp.excess_sqm).toLocaleString('de-DE') + ' m² über typischem Grundstück von ' + lcomp.typical_plot_sqm +
-        ' m², Marktfaktor ' + lcomp.market_factor + ').', M, y);
+        /* v2380 · mit amtlichem Koeffizienten ist market_factor null - hier stand „Marktfaktor null“ */
+        (lcomp.market_factor != null
+          ? ' m², Marktfaktor ' + String(lcomp.market_factor).replace('.', ',')
+          : ' m², Umrechnungskoeffizient ' + String(lcomp.umrechnungskoeffizient).replace('.', ',')
+            + (lcomp.umrechnung_quelle ? ' · ' + lcomp.umrechnung_quelle : '')) + ').', M, y);
       y += 7;
     }
   }
@@ -3972,7 +3977,12 @@ async function exportPdf(out) {
     const _vglBasis = (cc.comparison && cc.comparison.basis) || 'angebote';
     const _vglAmtlich = _vglBasis === 'kaufpreise';
     const _vglTitel = _vglAmtlich ? 'VERGLEICHSWERT · AMTLICH' : 'MARKTPREIS AUS ANGEBOTEN';
-    card3(M, _vglTitel, cc.comparison.vergleichswert_eur, [
+    const _amtV = (cc.comparison && cc.comparison.amtlicher_vergleich) || null;   /* v2380 */
+    card3(M, _vglTitel, cc.comparison.vergleichswert_eur, _vglAmtlich ? [
+      _amtV && _amtV.rechnung ? _amtV.rechnung : null,
+      'Amtlicher Vergleichsfaktor aus der Kaufpreissammlung (§ 20, § 25 ImmoWertV)',
+      (cc.comparison.angebotswert_eur ? 'zum Vergleich Angebotspreise: ' + Math.round(cc.comparison.angebotswert_eur).toLocaleString('de-DE') + ' €' : null),
+    ] : [
       mv.basis_median_sqm ? Math.round(mv.basis_median_sqm).toLocaleString('de-DE') + ' €/m² Median' : null,
       (d.sale && d.sale.sample_size) ? d.sale.sample_size + ' Vergleichsangebote' : null,
       /* v2367 · Abschlag und amtliche Gegenprobe auch im PDF */
@@ -3990,7 +4000,7 @@ async function exportPdf(out) {
         : null,
       _vglAmtlich
         ? 'Amtliche Grundlage aus der Kaufpreissammlung (§ 20, § 25 ImmoWertV)'
-        : 'Angebotspreise — keine beurkundeten Kaufpreise (§ 25 ImmoWertV)',
+        : 'Angebotspreise (Marktdurchschnitt), keine Kaufpreise (§ 25 ImmoWertV)',
       /* v1061-WTXT-1 · Hier stand der rohe Bezeichner: "Immobilienrichtwerte:
        * nicht_beschlossen". Ein Datenbankwert im Kundenbericht. */
       (!_irwOk && cc.irw) ? ({
@@ -4065,6 +4075,20 @@ async function exportPdf(out) {
       doc.setFillColor(...GOLD); doc.roundedRect(M, y, 1.6, _vwH, 0.8, 0.8, 'F');
       doc.setFont('helvetica', 'bold'); doc.setFontSize(7.4); doc.setTextColor(...TXT);
       doc.text('Führendes Verfahren: ' + _vwName, M + 5, y + 5);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setTextColor(...MUT);
+      doc.text(_vwT, M + 5, y + 9.8);
+      y += _vwH + 4;
+      doc.setFontSize(8);
+    } else if (_vw && _vw.nicht_gerechnet) {
+      /* v2380 · Das fuehrende Verfahren wird nur genannt, wenn es gerechnet wurde.
+         Sonst steht da, welches es waere und was ihm fehlt. */
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setCharSpace(0);
+      const _vwT = doc.splitTextToSize(String(_vw.weg || '') + (_vw.grund ? ' ' + _vw.grund : ''), blockW - 10);
+      const _vwH = 8.5 + _vwT.length * 3.1;
+      need(_vwH + 4);
+      doc.setFillColor(247, 243, 233); doc.roundedRect(M, y, blockW, _vwH, 2, 2, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.4); doc.setTextColor(...TXT);
+      doc.text('Kein führendes Verfahren ausgewiesen', M + 5, y + 5);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setTextColor(...MUT);
       doc.text(_vwT, M + 5, y + 9.8);
       y += _vwH + 4;

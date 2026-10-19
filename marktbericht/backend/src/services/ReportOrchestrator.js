@@ -1107,7 +1107,10 @@ export const ReportOrchestrator = {
           + ', trag ihn unter „Umrechnungskoeffizient Grundstücksgröße“ ein.';
       }
       if (_flaeche && _flaeche.hinweis && _uk && _uk.verfuegbar) {
-        const _kopf = 'Das Grundstück ist mit ' + _flaeche.objekt_qm + ' m² um '
+        /* v2380 · Kundentext im deutschen Zahlenformat - hier stand „199.76 €/m² (450 €/m² × 0.4439)". */
+        const _dz = (x, n) => (Number.isFinite(Number(x))
+          ? Number(x).toLocaleString('de-DE', { maximumFractionDigits: n == null ? 2 : n }) : String(x));
+        const _kopf ='Das Grundstück ist mit ' + _flaeche.objekt_qm + ' m² um '
           + _flaeche.ueberschreitung_pct + ' % größer als das Bodenrichtwertgrundstück '
           + 'dieser Zone (' + _flaeche.richtwertgrundstueck_qm + ' m²). ';
         /* v1140b · Die beiden Aufteilungen sind NICHT dasselbe und dürfen
@@ -1123,19 +1126,19 @@ export const ReportOrchestrator = {
          * Modellvermerk gegen einen anderen getauscht. */
         if (_uk.gruen_qm > 0 && _uk.quelle_art === 'eigene Angabe') {
           _flaeche.hinweis = _kopf
-            + 'Das Grundstück selbst ist mit ' + _uk.bodenwert_eur_qm
+            + 'Das Grundstück selbst ist mit ' + _dz(_uk.bodenwert_eur_qm)
             + ' €/m² angesetzt'
             + (_uk.koeffizient_angewandt ? ' (Bodenrichtwert × Umrechnungskoeffizient '
-              + String(_uk.koeffizient_bauland).replace('.', ',') + ' des Ausschusses)' : '')
+              + _dz(_uk.koeffizient_bauland, 4) + ' des Ausschusses)' : '')
             + '; hinzu kommen ' + _uk.gruen_qm
-            + ' m² Hinterlandfläche zu ' + _uk.gruen_eur_qm
+            + ' m² Hinterlandfläche zu ' + _dz(_uk.gruen_eur_qm)
             + ' €/m² (eigene Angabe) — getrennte Bewertung nach § 41 ImmoWertV.';
         } else if (_uk.gruen_qm > 0) {
           _flaeche.hinweis = _kopf
             + 'Die Fläche bis zum 1,5-fachen der Bezugsgröße ist mit '
-            + _uk.bodenwert_eur_qm + ' €/m² angesetzt, die überschüssigen '
+            + _dz(_uk.bodenwert_eur_qm) + ' €/m² angesetzt, die überschüssigen '
             + _uk.gruen_qm + ' m² wertmäßig als private Grünfläche ('
-            + _uk.gruen_eur_qm + ' €/m²) — getrennte Bewertung nach § 41 ImmoWertV.';
+            + _dz(_uk.gruen_eur_qm) + ' €/m²) — getrennte Bewertung nach § 41 ImmoWertV.';
         } else if (_uk.naeherung) {
           /* v2288 · Naeherung: ihr eigener Hinweis, nie „Koeffizient der Zone". */
           _flaeche.bodenwert_naeherung = true;
@@ -1143,8 +1146,8 @@ export const ReportOrchestrator = {
         } else if (_uk.koeffizient_angewandt) {
           _flaeche.hinweis = _kopf
             + 'Der Bodenrichtwert ist deshalb über den Umrechnungskoeffizienten '
-            + 'der Zone auf ' + _uk.bodenwert_eur_qm + ' €/m² angepasst ('
-            + (landValue && landValue.value_sqm) + ' €/m² × ' + _uk.faktor + ').';
+            + 'der Zone auf ' + _dz(_uk.bodenwert_eur_qm) + ' €/m² angepasst ('
+            + _dz(landValue && landValue.value_sqm) + ' €/m² × ' + _dz(_uk.faktor, 4) + ').';
         }
       }
 

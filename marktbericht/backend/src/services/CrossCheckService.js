@@ -1430,14 +1430,64 @@ export const CrossCheckService = {
        bereits mit `verfuegbar: false` an. Hier wird deshalb nur noch
        `verfuegbar` gefragt — die Entscheidung fällt an der Stelle, die
        den Satz gelesen hat. */
-    const _vglKaufpreise =
-      !!(p.amtlicher_vergleichsfaktor && p.amtlicher_vergleichsfaktor.verfuegbar)
-      || !!(p.register_vergleichsfaktor && p.register_vergleichsfaktor.verfuegbar)
-      || !!(p.irw && p.irw.verfuegbar && Number(p.irw.wert_qm) > 0);
+    /* ══ v2380 · DIE BESCHRIFTUNG FOLGT DEM, WAS GERECHNET WURDE ══════════
+       Bis hier hiess `vergleichswert_eur` „Vergleichswert · amtliche
+       Grundlage aus der Kaufpreissammlung", sobald IRGENDEINE amtliche
+       Grundlage existierte - auch ausserhalb ihres Anwendungsbereichs
+       (Hueellhorst: Vergleichsfaktor fuer ETW in Objekten > 2 WE, 50-120 m²)
+       oder ganz ohne Einfluss auf die Zahl (Hiddenhausen: Immobilienrichtwert
+       1.700 €/m², gerechnet wurde der Angebotsmedian). Die Zahl war in allen
+       drei Pruefberichten (220-231) der Angebotsmedian minus Abschlag.
+       Jetzt: amtlich heisst es nur, wenn ein amtlicher Wert IM
+       Anwendungsbereich vorliegt UND die Zahl aus ihm gebildet wird.
+       Der Immobilienrichtwert wird hier nicht angewandt (dafuer fehlen die
+       Umrechnungskoeffizienten der Anlage) - er bleibt Auskunft. */
+    let _amtVgl = null;
+    const _avf = p.amtlicher_vergleichsfaktor, _rvf = p.register_vergleichsfaktor;
+    if (_avf && _avf.verfuegbar && _avf.fuehrend !== false && !_avf.ausserhalb_grenzen
+        && Number(_avf.wert_eur) > 0) {
+      _amtVgl = { wert_eur: Math.round(Number(_avf.wert_eur)), faktor_qm: _avf.faktor_qm || null,
+        rechnung: _avf.rechnung || null, quelle: _avf.quelle || null, ausschuss: _avf.ausschuss || null,
+        art: 'vergleichsfaktor' };
+    } else if (_rvf && _rvf.verfuegbar && Number(_rvf.wert_eur) > 0) {
+      _amtVgl = { wert_eur: Math.round(Number(_rvf.wert_eur)), faktor_qm: _rvf.faktor_qm || null,
+        rechnung: _rvf.rechenweg || null, quelle: _rvf.quelle_url || null, ausschuss: _rvf.ausschuss || null,
+        art: 'vergleichsfaktor_register' };
+    }
+    const _vglKaufpreise = !!_amtVgl;
     out.verfahrenswahl = fuehrendesVerfahren({
       objektart: ref.property_type, wohneinheiten: ref.units, nutzung: ref.usage_type,
       vergleichsbasis: _vglKaufpreise ? 'kaufpreise' : null,
     });
+    /* v2380 · KEIN FUEHRENDES VERFAHREN, DAS NICHT GERECHNET WURDE.
+       Hueellhorst (ETW ohne BGF, Bericht 223): „Fuehrend: Sachwertverfahren"
+       stand neben einem Sachwert, der gar nicht ausgewiesen war. Dann wird
+       das Verfahren benannt, das fuehren WUERDE, und was ihm fehlt. */
+    if (out.verfahrenswahl && out.verfahrenswahl.verfahren) {
+      const _vk = out.verfahrenswahl.verfahren;
+      const _gerechnet = _vk === 'sachwert' ? !!(out.sachwert && out.sachwert.available)
+        : _vk === 'ertragswert' ? !!(out.ertragswert && out.ertragswert.available)
+          : _vk === 'vergleichswert' ? _vglKaufpreise : true;
+      if (!_gerechnet) {
+        const _gGrund = String((_vk === 'sachwert' ? (out.sachwert && out.sachwert.grund)
+          : (out.ertragswert && out.ertragswert.grund)) || '').trim();
+        const _fehltWas = (_vk === 'sachwert' && istWohnung && !(_bgfWhg > 0))
+          ? 'die Brutto-Grundfläche (BGF)'
+          : _vk === 'vergleichswert' ? 'ein amtlicher Vergleichsfaktor im Anwendungsbereich'
+            : ('eine Pflichtangabe' + (_gGrund ? ' (' + _gGrund.replace(/\.$/, '') + ')' : ''));
+        const _vName = { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren',
+          vergleichswert: 'Vergleichswertverfahren' }[_vk];
+        out.verfahrenswahl = {
+          verfahren: null, waere: _vk, nicht_gerechnet: true,
+          fehlt: _vk === 'sachwert' && istWohnung && !(_bgfWhg > 0) ? 'bgf' : null,
+          grund: out.verfahrenswahl.grund,
+          quelle: out.verfahrenswahl.quelle || null,
+          weg: 'Führend wäre das ' + _vName + '; es konnte nicht gerechnet werden, weil '
+            + _fehltWas.replace(/\.$/, '') + ' fehlt. Kein Verfahren rechnet halb — '
+            + 'mit dieser Angabe wird es ausgewiesen.',
+        };
+      }
+    }
     if (out.verfahrenswahl && out.verfahrenswahl.grund) {
       /* v1971: ohne fuehrendes Verfahren steht das AUCH im Bericht —
          „—" als Verfahrensname war eine Leerstelle, die wie ein Fehler
@@ -1509,7 +1559,7 @@ export const CrossCheckService = {
     out.restnutzungsdauer_herkunft = _rndHerkunft;
     out.available = true;
       const vals = [
-        ['vergleichswert', vgl],
+        ['vergleichswert', _amtVgl ? _amtVgl.wert_eur : vgl],   /* v2380 */
         /* v1056-WSPR-1 · Ein vorlaeufiger Sachwert gehoert NICHT in den
          * Spread. Er ist eine Herstellungskostenrechnung; ihn gegen zwei
          * Marktwerte zu stellen misst Aepfel gegen Birnen und meldet dann
@@ -1538,15 +1588,21 @@ export const CrossCheckService = {
          > sie bricht jeden gespeicherten Bericht und das Wertanker-
          > Dropdown. Die Beschriftung ist das, was der Kunde liest — sie
          > wird korrigiert, der Schluessel bleibt. */
+      /* v2380: liegt ein amtlicher Vergleichsfaktor im Anwendungsbereich vor,
+         IST die Zahl der amtliche Wert; der Angebotswert bleibt daneben stehen. */
       out.comparison = {
-        vergleichswert_eur: vgl,
+        vergleichswert_eur: _amtVgl ? _amtVgl.wert_eur : vgl,
         basis: _vglKaufpreise ? 'kaufpreise' : 'angebote',
-        bezeichnung: _vglKaufpreise ? 'Vergleichswert' : 'Marktpreisindikation aus Angeboten',
+        bezeichnung: _vglKaufpreise ? 'Vergleichswert (amtlicher Vergleichsfaktor)'
+          : 'Marktpreisindikation aus Angebotspreisen',
         basis_hinweis: _vglKaufpreise
-          ? 'Amtliche Grundlage aus der Kaufpreissammlung (§ 20, § 25 Abs. 1 ImmoWertV).'
-          : 'Angebotspreise aus Immobilienportalen, Median €/m². Keine beurkundeten '
-            + 'Kaufpreise — § 25 Abs. 1 ImmoWertV verlangt für das '
-            + 'Vergleichswertverfahren Kaufpreise.',
+          ? 'Amtlicher Vergleichsfaktor des Gutachterausschusses, abgeleitet aus der '
+            + 'Kaufpreissammlung (§ 20, § 25 Abs. 1 ImmoWertV)'
+            + (_amtVgl.rechnung ? ': ' + _amtVgl.rechnung : '') + '.'
+          : 'Angebotspreise (Marktdurchschnitt), keine Kaufpreise — § 25 Abs. 1 '
+            + 'ImmoWertV verlangt für das Vergleichswertverfahren Kaufpreise.',
+        amtlicher_vergleich: _amtVgl,
+        angebotswert_eur: vgl,
         sachwert_eur: out.sachwert.available ? out.sachwert.value_eur : null,
         ertragswert_eur: out.ertragswert.available ? out.ertragswert.value_eur : null,
         min_eur: nums.length ? Math.min(...nums) : null,
