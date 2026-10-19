@@ -8610,7 +8610,8 @@
     if (_fs.an && _fs.stream) _fsHoeren(true);
   }
   function _rfBrwHolen() {
-    var adr = { plz: _rfFeld('plz'), ort: _rfFeld('ort'), str: _rfFeld('str') };
+    /* v2374 · mit Hausnummer - ohne sie traf die Geokodierung „Fürth" im Saarland (bodenrichtwert.js) */
+    var adr = { plz: _rfFeld('plz'), ort: _rfFeld('ort'), str: _rfFeld('str'), hnr: _rfFeld('hnr') };
     _rfMelden('', true);
     return Promise.resolve(window.DealPilotBrw.borisHolen(adr)).then(function (r) {
       _rfDenkt(false);

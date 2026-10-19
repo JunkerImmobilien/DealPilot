@@ -1381,7 +1381,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2372';   /* v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
+  var RH_BUSTER = 'v2374';   /* v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage/i;
@@ -1441,7 +1441,8 @@
     /* v2371 · Modul 25: jede getippte Antwort der geführten Eingabe, einmal echt ausgelesen
        (D.gefuehrt25, Schlüssel = Antworttext). Im Mitschnitt-Lauf (?mitschnitt=25) geht der
        Abruf echt hinaus und wird in DPM_REIHE.mitschnitt notiert - siehe rhSpion. */
-    if (/\/ai\/extract-text/.test(u) && body && _rh.mitschnitt) return null;
+    /* v2374 · im Mitschnitt-Lauf geht nur hinaus, was noch keinen Eintrag hat (geänderte Antworttexte) */
+    if (/\/ai\/extract-text/.test(u) && body && _rh.mitschnitt && !(D.gefuehrt25 && D.gefuehrt25[String(body.text || '').trim()])) return null;
     if (/\/ai\/extract-text/.test(u) && body && D.gefuehrt25 && _rh.gef25 && D.gefuehrt25[String(body.text || '').trim()]) {
       var g25 = String(body.text || '').trim();
       return rhJ({ transcript: g25, fields: JSON.parse(JSON.stringify(D.gefuehrt25[g25])), unsicher: [], kosten: null, modus: 'antwort' });
@@ -4876,9 +4877,9 @@
     bwk: '22.000 Euro im Jahr, davon 10.500 nicht umlagefähig',
     langfrist: 'Mietsteigerung 2,5 Prozent, Wertsteigerung 2 Prozent, Leerstand 1 Prozent',
     ausfall: 'Niedrig',
-    ort: 'Bevölkerung wachsend, Nachfrage sehr stark, Wertsteigerung hoch, eine starke Entwicklungsmöglichkeit: das Dachgeschoss',
+    ort: 'Bevölkerung wachsend, Nachfrage sehr stark, Wertsteigerung hoch, Entwicklungsmöglichkeiten: eine starke',
     weissNicht: 'Weiß ich nicht',
-    sicht: 'Sechs Wohnungen verteilen das Mietrisiko, Risiko ist das Dach von 1970'
+    sicht: 'Dafür spricht: sechs Wohnungen verteilen das Mietrisiko, das Dachgeschoss lässt sich ausbauen. Das Risiko: das Dach von 1970'
   };
   /* v2373 · v2369 stellt das Abruf-Angebot (Marktpreisindikation, Bodenrichtwert,
      Lage) als Auswahl-Blase IN DEN CHAT (.vi-rf-abruf, Knöpfe .vi-rf-abruf-b[data-akt]).
@@ -5133,7 +5134,11 @@
         var zeilen = function () { return [].filter.call(document.querySelectorAll('#oabi-ov #oabi-result tr'), function (x) { return x.offsetWidth && x.querySelector('input[type=checkbox]'); }); };
         await zeige(function () { return q('#oabi-ov #oabi-result') || q('#oabi-ov .oabi-modal'); }, 6);
         await b2oZeile(s, 'Die Übersicht', '<b>' + zeilen().length + ' Werte</b>, jeder mit Herkunft — gesagt oder aus deinen Einstellungen. Du entscheidest, was ins Objekt geht.');
-        var ab = function () { return zeilen().filter(function (x) { return /Zinssatz|Tilgung/.test(x.textContent) && !x.querySelector('input[type=checkbox]').checked; }); };
+        /* v2374 · GEMESSEN im Mitschnitt-Lauf Fürth: nicht vorgehakt waren SIEBEN Werte -
+           Grunderwerbsteuer 3,5 (Objekt 6,5), Miet-/Wertsteigerung, Leerstand, AfA, Grenzsteuersatz,
+           Zins. Nur Zins/Tilgung anzuhaken liess die bayerische GrESt und die gesagten Annahmen
+           draussen - der Reiter Bewertung rechnete mit 12,27 % Nebenkosten. Angehakt wird alles. */
+        var ab = function () { return zeilen().filter(function (x) { return !x.querySelector('input[type=checkbox]').checked; }); };
         var a = ab();
         DPM_REIHE.r25ab = zeilen().filter(function (x) { return !x.querySelector('input[type=checkbox]').checked; }).map(function (x) { return x.textContent.replace(/\s+/g, ' ').trim().slice(0, 80); });
         if (a.length) {
@@ -5142,7 +5147,8 @@
           try { a0.scrollIntoView({ block: 'center' }); } catch (e) {}
           await warte(300);
           await zeige(function () { return b2oHuelle(a0, a1); }, 6);
-          await b2oZeile(s, 'Abweichungen', 'Was vom Objekt abweicht, ist nicht vorgehakt — hier ' + (a.length === 2 ? 'Zins und Tilgung' : a.length + ' Werte') + '. Gesagt ist gesagt: anhaken.');
+          var anm = a.map(function (x) { return String(x.textContent || '').replace(/\s+/g, ' ').trim().split(/\s*(?:%|in Prozent|im Objekt)/)[0].trim(); }).filter(Boolean);
+          await b2oZeile(s, 'Abweichungen', 'Was vom Objekt abweicht, ist nicht vorgehakt — hier ' + (a.length === 1 ? 'ein Wert' : a.length + ' Werte') + (anm.length ? ', darunter <b>' + anm.slice(0, 3).join(', ') + '</b>' : '') + '. Gesagt ist gesagt: anhaken.');
           a.forEach(function (x) { var c = x.querySelector('input[type=checkbox]'); if (c && !c.checked) c.click(); });
           await warte(1400);
         }
@@ -5179,7 +5185,15 @@
         var balken = function (i) { return function () { var k = r12Karte(i)(), bb = k && k.querySelectorAll('.dpsh-cbar'); return bb && bb.length ? b2oHuelle(bb[0], bb[bb.length - 1]) : null; }; };
         await zeige(balken(0), 8);
         var gw = function (x) { return x && x.gewicht ? ' (' + x.gewicht + ')' : ''; };
-        await b2oZeile(s, 'Der Deal Score', 'Er schaut vor allem auf <b>Cashflow' + gw(cf) + '</b> und <b>Nettorendite' + gw(nr) + '</b>' + (cf && nr ? ' — hier ' + cf.note + ' und ' + nr.note + ' von 100 Punkten' : '') + '.');
+        /* v2374 · GEMESSEN im Demo-Konto: die Gewichte sind dort NICHT die ab Werk (30/25/15/15/15),
+           sondern 20/22/14/14/30 - Potenzial wiegt am meisten. „Vor allem Cashflow und Rendite"
+           sagt die Zeile deshalb nur, wenn die beiden wirklich vorn liegen; sonst alle fünf. */
+        var gn = function (x) { var m = /([\d,.]+)/.exec((x && x.gewicht) || ''); return m ? parseFloat(m[1].replace(',', '.')) : 0; };
+        var vorn = t1.slice().sort(function (p, q2) { return gn(q2) - gn(p); }).slice(0, 2);
+        var cfNr = cf && nr && vorn.indexOf(cf) >= 0 && vorn.indexOf(nr) >= 0;
+        await b2oZeile(s, 'Der Deal Score', cfNr
+          ? 'Er schaut vor allem auf <b>Cashflow' + gw(cf) + '</b> und <b>Nettorendite' + gw(nr) + '</b> — hier ' + cf.note + ' und ' + nr.note + ' von 100 Punkten.'
+          : 'Fünf Kennzahlen, deine Gewichte: ' + t1.map(function (x) { return x.name.replace(/\s*\(.*\)$/, '') + ' ' + x.gewicht + ': <b>' + x.note + '</b>'; }).join(' · ') + '.');
         var weitere = ['Finanzierung', 'Risiko', 'Lage', 'Upside'].map(function (nm) { var x = such(t2, new RegExp('^' + nm, 'i')); return x ? nm + ' <b>' + x.note + '</b>' : nm; });
         await zeige(balken(1), 8);
         await b2oZeile(s, 'Der Investor Deal Score', 'Er bewertet zusätzlich Finanzierung, Risiko, Lage und Upside — hier ' + weitere.join(' · ') + '.');

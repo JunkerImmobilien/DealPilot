@@ -533,6 +533,12 @@
        Marcel hat den Ortskern am 08.10.2026 ausdruecklich erlaubt -
        fuer die Marktpreisindikation. Was fehlte, war die Angabe. */
     var _ortskern = !str;
+    /* v2374 · DIE HAUSNUMMER GEHOERT IN DIE ANFRAGE. Die geführte Eingabe gab nur Straße,
+       PLZ und Ort mit. GEMESSEN am 19.10.2026: „Dambacher Straße, 90763 Fürth" geokodierte
+       der Dienst nach „Fürth, 66564 Ottweiler" (Saarland, Konfidenz 0,5), und BORIS lieferte
+       11 EUR/m² aus Zone 4310500 - mit Hausnummer traf er Fürth-Südstadt (Zone 522, 1.150). */
+    var hnr = String(adr.hnr || '').trim();
+    if (str && hnr && str.indexOf(hnr) < 0) str = str + ' ' + hnr;
     var addr = [str, (plz + ' ' + ort).trim()].filter(Boolean).join(', ');
     if (!addr) return { ok: false, grund: 'keine_adresse', fehler: 'Keine Adresse' };
     var g = await fetch(_apiBase() + '/marktbericht/geocode?address=' + encodeURIComponent(addr), {
@@ -541,6 +547,13 @@
     var gd = await g.json().catch(function () { return null; });
     if (!g.ok || !gd || gd.lat == null || gd.lon == null) {
       return { ok: false, grund: 'geocode', fehler: 'Adresse nicht geokodierbar' };
+    }
+    /* v2374 · Ein Punkt mit ANDERER Postleitzahl ist nicht diese Adresse (siehe oben:
+       Ottweiler statt Fürth). Lieber kein Wert als der eines anderen Landes. Ohne PLZ in
+       der Antwort bleibt es beim alten Verhalten. */
+    var _gp = gd.components && gd.components.postcode ? String(gd.components.postcode).trim() : '';
+    if (_gp && /^\d{5}$/.test(plz) && _gp !== plz) {
+      return { ok: false, grund: 'geocode', fehler: 'Adresse nicht eindeutig gefunden (PLZ ' + _gp + ' statt ' + plz + ')' };
     }
     /* ═══ v1388-WLAND · DAS LAND MITGEBEN ════════════════════════════════
        Marcels Befund: „wir haben eigentlich alle 16 Bundeslaender abgedeckt
