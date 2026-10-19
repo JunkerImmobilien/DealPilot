@@ -103,7 +103,7 @@ async function nachbarwert(ags8, art, tag) {
   try {
     rows = await q(
       `SELECT p.wert, p.wert_min, p.wert_max, p.fallzahl, p.quelle_text,
-              p.quelle_url, p.modellversion, p.ags AS herkunft_ags,
+              p.quelle_url, p.modellversion, p.ags AS herkunft_ags, p.stichtag,
               s.name AS gaa, n.name AS herkunft_ort
          FROM mb.gaa_sources s
          JOIN mb.wert_parameter p ON p.ags = ANY(s.ags_liste)
@@ -139,6 +139,9 @@ async function nachbarwert(ags8, art, tag) {
     ebene: 'gutachterausschuss',
     /* v2390 · eindeutig erkennbar, nicht aus dem Hinweistext erraten */
     nachbarwert: true, herkunft_ort: ort || null, ausschuss: r.gaa || null,
+    /* v2396 · Jahrgang der Tabellenzeile, damit der Aufrufer ihn gegen das Register haelt */
+    berichtsjahr: r.stichtag ? (r.stichtag instanceof Date ? r.stichtag.getFullYear()
+                                                          : Number(String(r.stichtag).slice(0, 4))) : null,
     hinweis: 'Fuer diese Gemeinde hat der Gutachterausschuss keinen eigenen '
       + 'Liegenschaftszinssatz abgeleitet. Verwendet wird der Wert fuer '
       + ort + ' (N = ' + (r.fallzahl || '?') + ') aus dem Bericht desselben '
@@ -407,6 +410,35 @@ export const WertParameterService = {
     const _odRechen = (_od && _od.wert != null) ? _od : null;
     const _odEinordnung = (_od && _od.einordnung) ? _od.einordnung : null;
 
+    /* ══ v2396 · ZWEI WAHRHEITEN: mb.wert_parameter GEGEN DAS REGISTER ════
+       mb.wert_parameter fuehrt nur NW, 530 Zinssaetze, alle zum Stichtag
+       31.12.2024 und ohne gueltig_bis — sie bestehen also jede Datumspruefung
+       und kamen als Stufe A an, sobald der Registerweg keinen Wert lieferte
+       (Rueckfrage, Sperre, Zweig fehlt). Das Register fuehrt fuer dieselben
+       Kreise laengst den Jahrgang 2025 (Oberbergischer Kreis 05374, Coesfeld
+       05513, Mettmann 05170008: lzs-swf-2026-nachernte.json).
+       Regel: eine Zeile der Tabelle gilt nur, wenn das Register fuer diese
+       AGS keinen NEUEREN Jahrgang fuehrt — auch nicht als Sperre (dann hat
+       der Ausschuss neu veroeffentlicht, und der alte Wert ist nicht mehr
+       der des Stichtags, § 10 ImmoWertV). Gilt sie, traegt sie ihren
+       Jahrgang sichtbar. */
+    let _regJahr = null;
+    if (typ === 'lzs' && ags) {
+      try {
+        for (const s of (regFinde('liegenschaftszinssatz', String(ags)) || [])) {
+          const j = Number(s.berichtsjahr);
+          if (Number.isFinite(j) && j > 0 && (_regJahr == null || j > _regJahr)) _regJahr = j;
+        }
+      } catch (e) { _regJahr = null; }
+    }
+    const _jahrVon = (st) => {
+      if (st == null) return null;
+      if (st instanceof Date) return st.getFullYear();
+      const m = /^(\d{4})/.exec(String(st));
+      return m ? Number(m[1]) : null;
+    };
+    let _veraltet = null;
+
     for (const { ags: a, ebene } of agsKette(ags)) {
       let rows = [];
       try {
@@ -433,6 +465,11 @@ export const WertParameterService = {
 
       for (const row of rows) {
         if (row.qualitaet === 'C' && Number(row.fallzahl || 0) < MIN_FALLZAHL_C) continue;
+        const _rowJahr = _jahrVon(row.stichtag);
+        if (_regJahr != null && _rowJahr != null && _regJahr > _rowJahr) {
+          if (!_veraltet) _veraltet = { jahrgang: _rowJahr, register_jahrgang: _regJahr, ags: a };
+          continue;   /* v2396 · das Register fuehrt einen neueren Jahrgang */
+        }
         /* v1048-WSTR-2 · Ein amtlicher Mittelwert mit grosser Streuung ist
          * nicht objektscharf belastbar. Kreis Minden-Luebbecke, Eigentums-
          * wohnungen: 2,2 Prozent bei einer Standardabweichung von 1,1.
@@ -469,8 +506,13 @@ export const WertParameterService = {
           modellversion: row.modellversion || MODELL.IMMOWERTV_2021,
           fallzahl: row.fallzahl != null ? Number(row.fallzahl) : null,
           ebene,
-          hinweis: _str.herabgestuft ? _str.hinweis
-                                     : hinweisZurStufe(_str.qualitaet, ebene, row.fallzahl, row.quelle_text),
+          /* v2396 · der Jahrgang der Tabellenzeile, sichtbar */
+          berichtsjahr: _rowJahr,
+          jahrgang_hinweis: _rowJahr ? 'Jahrgang ' + _rowJahr + ' (Parametertabelle, Stichtag '
+            + String(row.stichtag instanceof Date ? row.stichtag.toISOString() : row.stichtag).slice(0, 10) + ')' : null,
+          hinweis: (_rowJahr ? 'Jahrgang ' + _rowJahr + '. ' : '')
+                 + (_str.herabgestuft ? _str.hinweis
+                                      : hinweisZurStufe(_str.qualitaet, ebene, row.fallzahl, row.quelle_text)),
           einordnung: _odEinordnung,   /* v1063-WOD-4 */
           rueckfrage: _rueckfrage,   /* v1816 */
         };
@@ -509,7 +551,12 @@ export const WertParameterService = {
     }
 
     if (typ === 'lzs' && NACHBARWERT_AN) {
-      const nb = await nachbarwert(a8(ags), art, tag);
+      let nb = await nachbarwert(a8(ags), art, tag);
+      /* v2396 · auch der Nachbarwert stammt aus mb.wert_parameter (Jahrgang 2024) */
+      if (nb && _regJahr != null && nb.berichtsjahr != null && _regJahr > nb.berichtsjahr) {
+        if (!_veraltet) _veraltet = { jahrgang: nb.berichtsjahr, register_jahrgang: _regJahr, ags: nb.herkunft_ort };
+        nb = null;
+      }
       if (nb) { nb.einordnung = _odEinordnung; nb.rueckfrage = _rueckfrage; return nb; }
     }
 
@@ -527,6 +574,8 @@ export const WertParameterService = {
         quelle: '§ 256 BewG', quelle_url: null, parameter_id: null,
         modellversion: MODELL.IMMOWERTV_2021, fallzahl: null, ebene: 'bund',
         hinweis: fb.hinweis,
+        /* v2396 · eine aeltere Tabellenzeile wurde bewusst uebergangen */
+        wert_parameter_uebergangen: _veraltet,
         einordnung: _odEinordnung,   /* v1063-WOD-6 */
         /* v1816 · WARUM es der Auffangwert wurde, obwohl das Register
            etwas fuehrt. Ohne diese Zeile sieht der Bericht aus, als gaebe
