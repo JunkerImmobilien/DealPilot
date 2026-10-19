@@ -128,10 +128,47 @@
     }
     return { left: x, top: y, width: r.width, height: r.height, bottom: y + r.height, right: x + r.width };
   }
+  /* v2374b · DER RAHMEN NUR UM DEN SICHTBAREN TEIL. GEMESSEN im Mitschnitt-Lauf Modul 25
+     (DPM_KEGEL_MESSUNG, 300-ms-Proben): die Score-Karten im Chat sind 472 bzw. 667 px hoch,
+     der Chat (#vi-rf-chat, overflow auto) zeigt 400 px. Der Kegel rahmte das GANZE Element -
+     beim Investor Deal Score von y 104 an, der Chat beginnt bei 278: der Rahmen lag über
+     Kopf und Eingabe, in 44 von 47 Proben. rect() kennt nur iframes, keine Scrollbehälter.
+     sichtRect schneidet mit jedem Vorfahren, der überläuft (auto/scroll/hidden/clip), auch
+     über iframe-Grenzen. null = ganz verdeckt. */
+  function docVersatz(d) {
+    var x = 0, y = 0;
+    while (d && d !== document) { var fe = d.defaultView.frameElement; if (!fe) break; var fr = fe.getBoundingClientRect(); x += fr.left + fe.clientLeft; y += fr.top + fe.clientTop; d = fe.ownerDocument; }
+    return { x: x, y: y };
+  }
+  function sichtRect(e) {
+    if (!e || !e.getBoundingClientRect) return null;
+    var r = rect(e), L = r.left, T = r.top, R = r.right, B = r.bottom, node = e, d = e.ownerDocument;
+    while (d) {
+      var w = d.defaultView, o = docVersatz(d);
+      /* ein fest positioniertes Element entkommt dem Überlauf seiner Vorfahren */
+      for (var c = node, s = node.parentElement; s && s !== d.documentElement && s !== d.body; c = s, s = s.parentElement) {
+        if (w.getComputedStyle(c).position === 'fixed') break;
+        var cs = w.getComputedStyle(s);
+        if (/auto|scroll|hidden|clip/.test(cs.overflowY + ' ' + cs.overflowX)) {
+          var sr = s.getBoundingClientRect();
+          L = Math.max(L, sr.left + o.x + s.clientLeft); T = Math.max(T, sr.top + o.y + s.clientTop);
+          R = Math.min(R, sr.left + o.x + s.clientLeft + s.clientWidth); B = Math.min(B, sr.top + o.y + s.clientTop + s.clientHeight);
+        }
+      }
+      if (d === document) break;
+      var fe = w.frameElement; if (!fe) break;
+      /* der Inhalt eines iframes endet an dessen Rand */
+      var fr = fe.getBoundingClientRect(), of = docVersatz(fe.ownerDocument);
+      L = Math.max(L, fr.left + of.x); T = Math.max(T, fr.top + of.y); R = Math.min(R, fr.right + of.x); B = Math.min(B, fr.bottom + of.y);
+      node = fe; d = fe.ownerDocument;
+    }
+    if (R - L < 2 || B - T < 2) return null;
+    return { left: L, top: T, width: R - L, height: B - T, right: R, bottom: B, voll: r };
+  }
   function kegel(ziel, pad) {
     var k = el('dpm-kegel');
     if (!ziel) { k.classList.remove('an'); return; }
-    var r = rect(ziel); pad = pad == null ? 10 : pad;
+    var r = sichtRect(ziel) || rect(ziel); pad = pad == null ? 10 : pad;
     k.style.left = (r.left - pad) + 'px'; k.style.top = (r.top - pad) + 'px';
     k.style.width = (r.width + pad * 2) + 'px'; k.style.height = (r.height + pad * 2) + 'px';
     k.classList.add('an');
@@ -182,7 +219,7 @@
     var z = q('#dpm-zeile'); if (!z || !z.classList.contains('an')) return;
     var t = HAFT && zielEl();
     if (!t) { if (z.classList.contains('haft')) { z.classList.remove('haft'); z.style.left = z.style.top = ''; } linie(null); return; }
-    var r = rect(t), pad = _pad, W = innerWidth, H = innerHeight;
+    var r = sichtRect(t) || rect(t), pad = _pad, W = innerWidth, H = innerHeight;   /* v2374b: sichtbarer Teil */
     r = { left: r.left - pad, top: r.top - pad, right: r.right + pad, bottom: r.bottom + pad };
     var neu = !z.classList.contains('haft');
     z.classList.add('haft');
@@ -201,14 +238,26 @@
     /* v2234c · Seitenwechsel: springen statt gleiten - gemessen lief die Karte
        sonst 0,15-0,3 s quer ueber das Feld, das sie erklaert */
     var spring = neu || (_lz && _lz.k !== o.k);
+    /* v2374b · DIE KARTE ZAPPELTE. Marcel live: „Der Text … zappelt rum, wird immer hin und her
+       eingeblendet." GEMESSEN (100-ms-Proben, 20 s, eine Zeile): kein Seitenwechsel, aber die
+       Karte bewegte sich in 46 von 200 Proben - sie wurde in jedem 200-ms-Takt neu ans Ziel
+       gerechnet, und das Ziel (Chat, Liste) wächst und rückt mit jeder Antwort; jede neue
+       Lage startete das 0,6-s-Gleiten neu. Jetzt bleibt sie stehen, solange dieselbe Seite
+       passt, sie das Ziel nicht verdeckt und die neue Lage weniger als 90 px entfernt ist.
+       Die Linie folgt dem Ziel weiter (linieNach). */
+    if (!spring && _lz && _lz.x != null && Math.abs(_lz.x - o.x) < 90 && Math.abs(_lz.y - o.y) < 90
+        && _lz.y + h <= H - RAND && _lz.x + w <= W - RAND
+        && !(_lz.x < r.right && _lz.x + w > r.left && _lz.y < r.bottom && _lz.y + h > r.top)) { o.x = _lz.x; o.y = _lz.y; }
     if (spring) { z.style.transition = 'opacity .4s'; }
-    z.style.left = Math.round(o.x) + 'px'; z.style.top = Math.round(o.y) + 'px';
+    var nx = Math.round(o.x) + 'px', ny = Math.round(o.y) + 'px';
+    if (z.style.left !== nx) z.style.left = nx;
+    if (z.style.top !== ny) z.style.top = ny;
     if (spring) { void z.offsetWidth; z.style.transition = ''; }
     /* v2234b · die Linie wird aus dem AKTUELLEN Kartenrechteck gezogen und
        waehrend des Gleitens (0,6 s) in jedem Bild nachgefuehrt. GEMESSEN: aus
        der Zielposition gerechnet hing sie beim Szenenwechsel lose neben der
        Karte, die noch unterwegs war. */
-    _lz = { k: o.k, r: r }; linieNach();
+    _lz = { k: o.k, r: r, x: o.x, y: o.y }; linieNach();
     var bis = Date.now() + 750;
     (function nach() { linieNach(); if (Date.now() < bis) requestAnimationFrame(nach); })();
   }
@@ -264,7 +313,20 @@
     }
     return document.scrollingElement;
   }
+  /* v2374b · liegt das Ziel in einem INNEREN Scrollbehälter (Chat, Liste) und ist dort
+     beschnitten, wird dieser gerollt: ein Ziel, das höher ist als der Behälter, mit seiner
+     Oberkante an dessen Oberkante (dort steht die Zahl), sonst mittig. Gemessen mit dem
+     Behälter, nicht mit dem Fenster. true = gerollt. */
+  function holenInnen(e) {
+    var s = scroller(e); if (!s || s === document.scrollingElement || s.ownerDocument !== e.ownerDocument) return false;
+    var er = e.getBoundingClientRect(), sr = s.getBoundingClientRect(), top = sr.top + s.clientTop, hoch = s.clientHeight;
+    if (er.top >= top - 1 && er.bottom <= top + hoch + 1) return false;
+    var d = er.height > hoch - 16 ? er.top - top - 8 : (er.top + er.height / 2) - (top + hoch / 2);
+    if (Math.abs(d) < 4) return false;
+    s.scrollTop += d; return true;
+  }
   function holen(e, sanft) {
+    if (holenInnen(e)) return;
     var r = rect(e), s = scroller(e), mitte = (70 + innerHeight - unten()) / 2;
     var d = r.height > innerHeight - 260 ? r.top - 80 : (r.top + r.height / 2) - mitte;
     /* v2222b · immer sofort: sanftes Scrollen brauchte gemessen bis zu 3 s,
@@ -276,8 +338,10 @@
     if (_folge) return;
     _folge = setInterval(function () {
       var z = zielEl(); if (!z) { kegel(null); platziere(); return; }
-      var r = rect(z);
-      if (!frei(r) && _nachScroll < 3 && Date.now() - _letzterScroll > 1200) {
+      var r = rect(z), sv = sichtRect(z);
+      /* v2374b · auch ein im Behälter beschnittenes Ziel ist nicht frei */
+      var beschnitten = !sv || (sv.height < Math.min(r.height, innerHeight) - 6);
+      if ((!frei(r) || beschnitten) && _nachScroll < 3 && Date.now() - _letzterScroll > 1200) {
         _nachScroll++; _letzterScroll = Date.now();
         holen(z, false);
       }
@@ -290,9 +354,9 @@
      Rahmen nicht passt (Versatz, Nachlauf, abgeschnittenes Ziel). Liest nur. */
   window.DPM_KEGEL_MESSUNG = function () {
     var z = zielEl(), k = q('#dpm-kegel'); if (!z || !k) return null;
-    var r = rect(z), ki = k.getBoundingClientRect(), sc = scroller(z), sr = sc && sc !== document.scrollingElement ? sc.getBoundingClientRect() : { top: 0, bottom: innerHeight, left: 0, right: innerWidth };
+    var r = rect(z), sv = sichtRect(z), ki = k.getBoundingClientRect(), sc = scroller(z), sr = sc && sc !== document.scrollingElement ? sc.getBoundingClientRect() : { top: 0, bottom: innerHeight, left: 0, right: innerWidth };
     var f = function (o) { return { x: Math.round(o.left), y: Math.round(o.top), w: Math.round(o.width != null ? o.width : o.right - o.left), h: Math.round(o.height != null ? o.height : o.bottom - o.top) }; };
-    return { ziel: f(r), pad: _pad, kegelStil: { x: parseFloat(k.style.left), y: parseFloat(k.style.top), w: parseFloat(k.style.width), h: parseFloat(k.style.height) }, kegelIst: f(ki),
+    return { ziel: f(r), sichtbar: sv ? f(sv) : null, pad: _pad, kegelStil: { x: parseFloat(k.style.left), y: parseFloat(k.style.top), w: parseFloat(k.style.width), h: parseFloat(k.style.height) }, kegelIst: f(ki),
       sicht: f(sr), scroller: sc ? (sc.id || sc.className || sc.tagName).toString().slice(0, 40) : null, zielName: (z.id || z.className || z.tagName).toString().slice(0, 40) };
   };
   async function zeige(ziel, pad) {
@@ -304,7 +368,7 @@
     /* nur scrollen, wenn das Ziel nicht frei sichtbar ist - sonst schiebt es den
        Umschalter oben aus dem Bild; unten liegt die Zeile (rund 160 px) */
     _nachScroll = 0; _letzterScroll = 0;
-    if (z && !frei(rect(z))) { _letzterScroll = Date.now(); holen(z, true); }
+    if (z && (!frei(rect(z)) || !sichtRect(z) || sichtRect(z).height < Math.min(rect(z).height, innerHeight) - 6)) { _letzterScroll = Date.now(); holen(z, true); }   /* v2374b */
     folgen();
     await warte(750);
   }
@@ -1179,7 +1243,8 @@
   function b2oHuelle(a, b) {
     if (!a || !b) return a || b || null;
     /* v2273 · rect() statt getBoundingClientRect: Ziele im Marktbericht-Fenster (iframe) lagen sonst um die Lage des Fensters verschoben (Prüflauf 16: Kegel 5 %) */
-    var ra = rect(a), rb = rect(b), h = el('dpm-huelle');
+    /* v2374b · der SICHTBARE Teil beider Ziele (sichtRect), sonst ragt die Hülle aus dem Chat */
+    var ra = sichtRect(a) || rect(a), rb = sichtRect(b) || rect(b), h = el('dpm-huelle');
     h.style.cssText = 'position:fixed;pointer-events:none;visibility:hidden;left:' + Math.min(ra.left, rb.left) + 'px;top:' + Math.min(ra.top, rb.top) + 'px;width:' + (Math.max(ra.right, rb.right) - Math.min(ra.left, rb.left)) + 'px;height:' + (Math.max(ra.bottom, rb.bottom) - Math.min(ra.top, rb.top)) + 'px';
     return h;
   }
@@ -1391,7 +1456,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2374';   /* v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
+  var RH_BUSTER = 'v2374b';   /* v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage/i;
