@@ -229,6 +229,7 @@ export const ReportOrchestrator = {
       grundriss: input.grundriss || null,
       /* v1057-WSON-6 */
       sonstige_jahr: input.sonstige_jahr ? Number(input.sonstige_jahr) : null,
+      zusatz_ertrag_jahr: input.zusatz_ertrag_jahr ? Number(input.zusatz_ertrag_jahr) : null,   /* v2382 · ze */
       sonstige_dauer_jahre: input.sonstige_dauer_jahre ? Number(input.sonstige_dauer_jahre) : null,
       mod_punkte: input.mod_punkte != null && input.mod_punkte !== ''
         ? Number(input.mod_punkte) : null,

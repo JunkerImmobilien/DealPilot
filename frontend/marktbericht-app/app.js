@@ -4250,17 +4250,17 @@ async function exportPdf(out) {
        * Ernte stammenden 23,5 Prozent und 3,0 statt 2,2. Eine Annahme, die
        * etwas anderes behauptet als die Rechnung, ist schlimmer als keine.
        * Jetzt aus dem Ergebnis, mit Rueckfall auf die Annahme. */
-      cc.assumptions.baupreisindex_2010_heute + ' · BWK '
+      String(cc.assumptions.baupreisindex_2010_heute).replace('.', ',') + ' · BWK '   /* v2382: Komma */
       + ((cc.ertragswert && cc.ertragswert.available && cc.ertragswert.rohertrag_pa_eur > 0)
           ? (Math.round(cc.ertragswert.bwk_pa_eur / cc.ertragswert.rohertrag_pa_eur * 1000) / 10)
               .toLocaleString('de-DE')
-          : Math.round(cc.assumptions.bwk_quote * 100)) + ' % · Liegenschaftszins '
+          : (cc.assumptions.bwk_quote != null ? Math.round(cc.assumptions.bwk_quote * 100) : '–')) + ' % · Liegenschaftszins '
       /* v1052-WFUS-1 · v1050 hat die Quote aus dem Ergebnis geholt, den
        * Zinssatz nicht. Die Fussnote nannte weiter 3 %, gerechnet wurden
        * 2,2 %. Eine Datei, zwei Stellen — schon wieder. */
       + (((cc.ertragswert && cc.ertragswert.available && cc.ertragswert.liegenschaftszins_pct != null)
           ? cc.ertragswert.liegenschaftszins_pct
-          : (cc.assumptions.liegenschaftszins * 100)).toLocaleString('de-DE'))
+          : (cc.assumptions.liegenschaftszins != null ? cc.assumptions.liegenschaftszins * 100 : '–')).toLocaleString('de-DE'))
       + ' % · ' + ((cc.sachwert && cc.sachwert.vorlaeufig)
         ? 'ohne Sachwertfaktor'   /* v1061-WFUS-2 */
         /* v1150-WFUS · Dieselbe Falle wie beim Zinssatz (v1052), eine Zeile
@@ -4284,7 +4284,7 @@ async function exportPdf(out) {
             var z = (f && typeof f === 'object') ? f.wert : f;
             var s = (f && typeof f === 'object') ? f.stufe : null;
             var q = (f && typeof f === 'object') ? f.quelle : null;
-            if (z == null) return String(cc.assumptions.sachwertfaktor);
+            if (z == null) return (cc.assumptions.sachwertfaktor != null ? String(cc.assumptions.sachwertfaktor).replace('.', ',') : '–');   /* v2382 */
             /* v1150b · Die Quelle nur, wenn sie kurz ist. Gemessen am
              * Prüfobjekt liefert der amtliche Weg
              * "Grundstücksmarktbericht 2026 für den Kreis Herford, 5.1.2

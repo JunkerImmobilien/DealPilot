@@ -35,7 +35,7 @@ import { fuehrendesVerfahren, angepassterZins } from '../lib/verfahrenswahl.js';
 import { sachwertfaktor as swfNachTabelle } from '../lib/gutachterausschuss.js';
 /* v2241 · Gewerbe und Grundstueck: eine Quelle fuer die Objektart. */
 import { istGewerbe, istGrundstueck, gewerbeArt, gewerbeAnlage3, gewerbeGndSchluessel } from '../lib/marktsegment.js';
-import { gnd as gndNachArt, GND_TABELLE } from '../lib/immowertv.js';
+import { gnd as gndNachArt, GND_TABELLE, gndNachAnlage1Belegt } from '../lib/immowertv.js';
 import { schaetzung as rndSchaetzung } from '../lib/rnd-einheitlich.js';
 
 // ---- Annahmen (dokumentiert, anpassbar) ----
@@ -850,17 +850,54 @@ export const CrossCheckService = {
     const _wflIst = _num(ref.living_area);
     const _istQm = (!ref.vacancy && _num(ref.monthly_net_rent) > 0 && _wflIst > 0 && !(ref.gewerbe && _num(ref.gewerbe.wfl_gewerbe)))
       ? Math.round(_num(ref.monthly_net_rent) / _wflIst * 100) / 100 : null;
+    /* ══ v2382 · DAS BAND DER MARKTUEBLICHKEIT (Marcel 19.10.2026) ═════════
+       Die Mietpreisuebersicht bildet weitgehend BESTANDSmieten ab; marktueblich
+       im Sinne von § 27 Abs. 1 / § 31 Abs. 2 ImmoWertV ist die bei
+       Neuvermietung erzielbare Miete. Keine der beiden Quellen ist allein der
+       Massstab. Band: untere Kante = min(amtlich, Angebot) x 0,7, obere Kante
+       = max(amtlich, Angebot) x 1,3; fehlt eine Quelle, zaehlt die andere.
+       Ist-Miete im Band -> Ist-Miete. Darueber/darunter -> die jeweilige
+       Kante; der Mehr-/Minderertrag ist ein besonderes objektspezifisches
+       Grundstuecksmerkmal (§ 8 Abs. 3), nur fuer die gesicherte Restlaufzeit
+       des Vertrags. Bis v2381 lag der Rahmen bei ±30 % um EINE Zahl, und
+       die Notiz nannte die Angebotsmiete „marktueblich". */
+    const _amtQmBand = (p.amtliche_miete && p.amtliche_miete.verfuegbar && _num(p.amtliche_miete.miete_qm))
+      ? _num(p.amtliche_miete.miete_qm) : null;
+    const _angQmBand = rentSqm > 0 ? rentSqm : null;
+    const _bandQ = [_amtQmBand, _angQmBand].filter((x) => x != null);
+    const _band = _bandQ.length ? {
+      unten_qm: Math.round(Math.min(..._bandQ) * 0.7 * 100) / 100,
+      oben_qm: Math.round(Math.max(..._bandQ) * 1.3 * 100) / 100,
+      amtlich_qm: _amtQmBand, angebot_qm: _angQmBand != null ? Math.round(_angQmBand * 100) / 100 : null,
+      regel: 'untere Kante = min(amtliche Vergleichsmiete, Angebotsmiete) × 0,7; obere Kante = max(…) × 1,3',
+    } : null;
+    const _istLage = (_istQm != null && _band)
+      ? (_istQm > _band.oben_qm ? 'ueber' : (_istQm < _band.unten_qm ? 'unter' : 'im_band')) : null;
     const _istAbw = (_istQm != null && _refQm > 0) ? (_istQm / _refQm - 1) : null;
-    const _istFuehrt = _istQm != null && (_refQm == null || Math.abs(_istAbw) <= 0.30);
-    const mieteQm = _istFuehrt ? _istQm : _refQm;
+    const _istFuehrt = _istQm != null && (_band == null || _istLage === 'im_band');
+    const _kante = _istLage === 'ueber' ? _band.oben_qm : (_istLage === 'unter' ? _band.unten_qm : null);
+    const mieteQm = _istFuehrt ? _istQm : (_kante != null ? _kante : _refQm);
     const mieteQuelle = _istFuehrt ? 'Ist-Miete (marktüblich, § 31 Abs. 2 ImmoWertV)'
-      : (_amtFuehrt ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten');
-    if (_istQm != null && !_istFuehrt) {
-      out.notes.push('Die Ist-Miete (' + String(_istQm).replace('.', ',') + ' €/m²) liegt '
-        + Math.abs(Math.round(_istAbw * 100)) + ' % ' + (_istAbw > 0 ? 'über' : 'unter') + ' der marktüblichen Miete ('
-        + String(Math.round(_refQm * 100) / 100).replace('.', ',') + ' €/m²). Der Ertragswert rechnet deshalb mit der '
-        + 'marktüblichen Miete (§ 31 Abs. 2 ImmoWertV); die ' + (_istAbw > 0 ? 'Über' : 'Unter') + 'vermietung ist für die '
-        + 'Restlaufzeit der Verträge als besonderes objektspezifisches Grundstücksmerkmal (§ 8 Abs. 3) zu würdigen.');
+      : (_kante != null ? (_istLage === 'ueber' ? 'obere' : 'untere') + ' Kante des Marktüblichkeitsbandes'
+        : (_amtFuehrt ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten'));
+    if (_band) {
+      _band.ist_qm = _istQm; _band.lage = _istLage;
+      out.miete_band = _band;
+    }
+    const _dq = (x) => String(Math.round(x * 100) / 100).replace('.', ',');
+    const _bandText = _band ? ('Band der Marktüblichkeit ' + _dq(_band.unten_qm) + ' bis ' + _dq(_band.oben_qm) + ' €/m² ('
+      + [_band.amtlich_qm != null ? 'amtliche Vergleichsmiete ' + _dq(_band.amtlich_qm) + ' €/m²' : null,
+        _band.angebot_qm != null ? 'Angebotsmiete ' + _dq(_band.angebot_qm) + ' €/m²' : null].filter(Boolean).join(', ')
+      + '; untere Kante × 0,7, obere × 1,3)') : '';
+    if (_istQm != null && _band) {
+      out.notes.push(_istFuehrt
+        ? ('Die Ist-Miete (' + _dq(_istQm) + ' €/m²) liegt im ' + _bandText + ' und gilt als marktüblich '
+          + '(§ 31 Abs. 2 ImmoWertV); der Ertragswert rechnet mit ihr.')
+        : ('Die Ist-Miete (' + _dq(_istQm) + ' €/m²) liegt ' + (_istLage === 'ueber' ? 'über' : 'unter') + ' dem '
+          + _bandText + '. Der Ertragswert rechnet mit der ' + (_istLage === 'ueber' ? 'oberen' : 'unteren')
+          + ' Kante (' + _dq(_kante) + ' €/m²). Der ' + (_istLage === 'ueber' ? 'Mehr' : 'Minder') + 'ertrag ist nach '
+          + '§ 8 Abs. 3 ImmoWertV als besonderes objektspezifisches Grundstücksmerkmal zu würdigen — nur für die '
+          + 'gesicherte Restlaufzeit des Mietvertrags; ohne bekannte Laufzeit ist er nicht angesetzt.'));
     }
     /* v1207-WMIE-2 · DER WIDERSPRUCH GEHOERT BENANNT, NICHT VERSTECKT.
      *
@@ -1040,6 +1077,7 @@ export const CrossCheckService = {
         rnd_jahre: (_num(ref.mod_punkte) != null ? null : rnd),
         /* v1057-WSON-7 */
         sonstige_jahr: _num(ref.sonstige_jahr),
+        zusatz_jahr: _num(ref.zusatz_ertrag_jahr),   /* v2382 · Stellplatz/Garage aus `ze`, IM Rohertrag */
         sonstige_dauer_jahre: _num(ref.sonstige_dauer_jahre),
         mod_punkte: _num(ref.mod_punkte),
         /* v1052-WA2-2 · Kernsanierung nur, wenn die Punkte sie auch tragen.
@@ -1122,8 +1160,9 @@ export const CrossCheckService = {
          * Der Ausschuss rechnet mit dem normierten Kaufpreis, der 'typische
          * Nebengebaeude wie Garagen' enthaelt — Stellplaetze gehoeren also
          * in die Bezugsgroesse. */
-        const _spEinnahme = (_num(p.stellplatz_miete_monat) || 0)
-          * ((_num(ref.garages) || 0) + (_num(ref.outdoor_parking) || 0)) * 12;
+        /* v2382 · `ze` (Stellplatz/Garage etc.) ersetzt die Stueckrechnung - beides waere doppelt. */
+        const _spEinnahme = _num(ref.zusatz_ertrag_jahr) || ((_num(p.stellplatz_miete_monat) || 0)
+          * ((_num(ref.garages) || 0) + (_num(ref.outdoor_parking) || 0)) * 12);
         ein.bwk_gesamt_jahr = Math.round((rohertrag + _spEinnahme) * _quote / 100);
         ein.bwk_bezugsgroesse_jahr = Math.round(rohertrag + _spEinnahme);
         ein.bwk_quote_herkunft = p.bwk_quote_quelle || null;
@@ -1212,6 +1251,7 @@ export const CrossCheckService = {
           miete_erfasst: !!(p && p.ist_miete_erfasst),
           miete_modellkonform: mieteQuelle === 'Mietpreisübersicht des Gutachterausschusses' || _istFuehrt,   /* v2367 */
           miete_ist_qm: _istQm, miete_vergleich_qm: _refQm != null ? Math.round(_refQm * 100) / 100 : null,
+          miete_band: _band || null,   /* v2382 · beide Vergleichswerte und das Band */
           /* v1207-WMIE-2 · die angesetzte Miete war nirgends als Zahl sichtbar,
            * nur als Quellenname. Ohne sie kann das Dokument den Vergleich mit
            * dem amtlichen Wert nicht ausschreiben, ohne ihn neu herzuleiten —
@@ -1221,6 +1261,7 @@ export const CrossCheckService = {
           /* v1063-WOD-8 · dritte Station der Kette */
           liegenschaftszins_einordnung: p.lzs_einordnung || null,
           restnutzungsdauer_jahre: kern.nutzungsdauer ? kern.nutzungsdauer.rnd : rnd,
+          gesamtnutzungsdauer_jahre: kern.nutzungsdauer ? kern.nutzungsdauer.gnd : null,   /* v2382 */
           vervielfaeltiger: kern.barwertfaktor,
           bodenwert_eur: bwErgebnis.vollstaendig ? bwErgebnis.wert : null,
           value_eur: kern.wert,
@@ -1374,7 +1415,7 @@ export const CrossCheckService = {
             indikativ: _gHerk !== 'marktueblich',
           };
           out.notes.push('Ertragswert Gewerbe: Gesamtnutzungsdauer ' + _gndG + ' Jahre (Anlage 1 ImmoWertV'
-            + (GND_TABELLE.geprueft ? '' : ', Tabellenstand nicht gegen den Verordnungstext verifiziert')
+            + ((GND_TABELLE.geprueft || gndNachAnlage1Belegt(gewerbeGndSchluessel(_artG) || (_flaechenEin && _flaechenEin.lager_logistik ? 'lager' : 'buero'))) ? '' : ', Tabellenstand nicht gegen den Verordnungstext verifiziert')
             + '), Restnutzungsdauer ' + _rndG + ' Jahre geschätzt (GND minus Alter; Anlage 2 gilt für Wohngebäude). '
             + (_gHerk === 'marktueblich' ? 'Rohertrag aus der eingegebenen marktüblichen Gewerbemiete.'
               : 'Rohertrag = Ist-Miete, nicht auf Marktüblichkeit geprüft (§ 31 Abs. 2 ImmoWertV) — der Ertragswert ist indikativ.'));
@@ -1550,12 +1591,18 @@ export const CrossCheckService = {
       if (p.amtliche_miete.verfuegbar && rentSqm > 0) {
         const _ab = Math.round((rentSqm / p.amtliche_miete.miete_qm - 1) * 100);
         out.amtliche_miete.abweichung_pct = _ab;
+        /* v2382 · Die Notiz sagt, womit der Ertragswert WIRKLICH rechnet. Hier stand fest
+           „der Ertragswert folgt ihr deshalb" - auch wenn er mit der Ist-Miete rechnete (H: 10,00 €/m²). */
+        const _ewA = out.ertragswert && out.ertragswert.available ? out.ertragswert : null;
         out.notes.push('Die Angebotsmiete liegt mit '
-          + String(rentSqm).replace('.', ',') + ' €/m² um ' + (_ab > 0 ? '+' : '') + _ab
-          + ' % über der Mietpreisübersicht des Gutachterausschusses ('
-          + String(p.amtliche_miete.miete_qm).replace('.', ',') + ' €/m²). '
-          + 'Der Liegenschaftszinssatz wurde auf Grundlage der amtlichen Übersicht '
-          + 'abgeleitet; der Ertragswert folgt ihr deshalb (§ 10 ImmoWertV).');
+          + String(Math.round(rentSqm * 100) / 100).replace('.', ',') + ' €/m² um ' + Math.abs(_ab)
+          + ' % ' + (_ab >= 0 ? 'über' : 'unter') + ' der Mietpreisübersicht des Gutachterausschusses ('
+          + String(p.amtliche_miete.miete_qm).replace('.', ',') + ' €/m²); die Übersicht bildet weitgehend Bestandsmieten ab. '
+          + (_ewA && _ewA.miete_qm != null
+            ? 'Der Ertragswert rechnet mit ' + String(_ewA.miete_quelle || 'der angesetzten Miete').replace(/^Ist-Miete/, 'der Ist-Miete')
+              + ' (' + String(Math.round(_ewA.miete_qm * 100) / 100).replace('.', ',') + ' €/m²)'
+              + (_amtFuehrt ? '; der Liegenschaftszinssatz ist auf Grundlage der amtlichen Übersicht abgeleitet (§ 10 ImmoWertV)' : '') + '.'
+            : ''));
       }
     }
     if (p.flaeche) {
@@ -1567,6 +1614,23 @@ export const CrossCheckService = {
     /* v1083-WRND-3 · Auch auf oberster Ebene, damit PDF und Verlauf die
      * Herkunft lesen koennen, ohne in den Sachwertblock zu greifen — der
      * fehlt bei Objektarten ohne Sachwertverfahren ganz. */
+    /* v2382 · Rechnet nur der Ertragswert (ETW ohne BGF), blieb die Herkunft leer -
+       die Restnutzungsdauer stand im Rechenweg, ihre Ableitung nirgends. Dieselbe
+       Ableitung wie im Sachwert (eine RND fuer alle Verfahren); weicht sie von der
+       des Ertragswerts ab, wird DESSEN Zahl mit ihrer Quelle genannt. */
+    if (!_rndHerkunft.quelle && out.ertragswert && out.ertragswert.available
+        && out.ertragswert.restnutzungsdauer_jahre != null) {
+      const _ewR = Number(out.ertragswert.restnutzungsdauer_jahre);
+      const _ewG = Number(out.ertragswert.gesamtnutzungsdauer_jahre) || GND_JAHRE;
+      const _e = rndEinheitlich(ref, _ewG);
+      if (_e && _e.quelle === 'anlage2' && Math.abs(Number(_e.rnd) - _ewR) < 0.05) {
+        _rndHerkunft.gnd_jahre = _e.gnd_jahre;
+        _rndMerke('anlage2', _e.grund || null, _ewR, _e.hinweis);
+      } else {
+        _rndHerkunft.gnd_jahre = _ewG;
+        _rndMerke('geschaetzt', 'nur_ertragswert', _ewR, _SCHAETZUNG);
+      }
+    }
     out.restnutzungsdauer_herkunft = _rndHerkunft;
     out.available = true;
       const vals = [
@@ -1675,6 +1739,26 @@ export const CrossCheckService = {
              _bwAuf.quelle_url, _bwAuf.lizenz, _bwAuf.berichtsjahr || null);
     }
     out.quellen_nachweis = Array.from(_nachweis.values());
+
+    /* v2382 · `assumptions` nennt, womit GERECHNET wurde. Bis hier standen die Vorgaben des
+       vereinfachten EFH-Wegs (835 €/m², BGF-Faktor 1,35, Faktor 1,0, BWK 23 %, Zins 3 %) auch
+       dann da, wenn NHK-Kern, Ausschuss-Quote und Registerzins rechneten. Die Vorgaben bleiben
+       unter `vorgaben_vereinfacht` lesbar; die Felder oben tragen das Ergebnis oder null. */
+    try {
+      const _a = out.assumptions, _sw = out.sachwert || {}, _ew = out.ertragswert || {};
+      _a.vorgaben_vereinfacht = { nhk_efh_bgf_eur: NHK_EFH_BGF, bgf_faktor: BGF_FAKTOR, sachwertfaktor: SACHWERTFAKTOR,
+        bwk_quote: BWK_QUOTE, liegenschaftszins: LIEGENSCHAFTSZINS };
+      const _vereinfacht = _sw.available && _sw.nhk_eur_qm_bgf == null;
+      _a.nhk_efh_bgf_eur = _sw.available ? (_sw.nhk_eur_qm_bgf != null ? _sw.nhk_eur_qm_bgf : NHK_EFH_BGF) : null;
+      _a.bgf_faktor = _vereinfacht ? BGF_FAKTOR : null;
+      const _swf = _sw.sachwertfaktor; const _swfZ = (_swf && typeof _swf === 'object') ? _swf.wert : _swf;
+      _a.sachwertfaktor = _sw.available ? (_swfZ != null ? _swfZ : (_sw.vorlaeufig ? null : SACHWERTFAKTOR)) : null;
+      _a.gnd_jahre = _sw.available && _sw.gnd_jahre ? _sw.gnd_jahre : (_rndHerkunft.gnd_jahre || GND_JAHRE);
+      _a.bwk_quote = (_ew.available && _ew.rohertrag_pa_eur > 0) ? Math.round(_ew.bwk_pa_eur / _ew.rohertrag_pa_eur * 1000) / 1000 : null;
+      _a.liegenschaftszins = (_ew.available && _ew.liegenschaftszins_pct != null) ? Number(_ew.liegenschaftszins_pct) / 100 : null;
+      if (_ew.available && _ew.liegenschaftszins_pct != null) _a.liegenschaftszins_pct_effektiv = Number(_ew.liegenschaftszins_pct);
+      if (_ew.available) _a.liegenschaftszins_stufe = _ew.liegenschaftszins_stufe || _a.liegenschaftszins_stufe;
+    } catch (e) { /* die Fussnote darf den Bericht nie kippen */ }
 
     return out;
 

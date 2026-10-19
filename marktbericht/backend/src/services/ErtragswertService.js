@@ -14,7 +14,7 @@ import { bewirtschaftungskosten as nrwBwk } from '../lib/nrw_modell.js';
 import {
   BWK_TABELLE, bwkAnsaetze, BWK_JAHRE, GND_TABELLE, MODELL,
   barwertfaktor, abzinsungsfaktor, gnd, rnd, lzsNach256,
-  istNeubau, istErstbezugNachSanierung, round0, round2,
+  istNeubau, istErstbezugNachSanierung, round0, round2, gndNachAnlage1Belegt,
 } from '../lib/immowertv.js';
 
 /* FIX-NUM: Number(null) ist 0, nicht NaN. Ohne diese Wache lieferte
@@ -42,6 +42,11 @@ const pos = (v) => { const n = num(v); return n != null && n > 0 ? n : null; };
    `deZahl` ist die eine Stelle dafuer. toLocaleString setzt zugleich den
    Tausenderpunkt richtig (1234 -> „1.234"), was bei €/m²-Werten ueber 1000
    vorher fehlte. */
+/* v2382 · Koeffizienten mit vier Stellen (0,4439 statt „0.4439") */
+function deZahl4(v) {
+  const n = num(v);
+  return n == null ? '–' : n.toLocaleString('de-DE', { maximumFractionDigits: 4 });
+}
 function deZahl(v) {
   const n = num(v);
   return n == null ? '–' : n.toLocaleString('de-DE');
@@ -103,7 +108,7 @@ export const ErtragswertService = {
           : 'Grundstücksfläche × Bodenrichtwert',
         detail: `${_auf.bauland_qm} m² × ${deZahl(_auf.bodenwert_eur_qm)} €/m²`
           + (_auf.koeffizient_angewandt
-            ? ` (${deZahl(brw)} €/m² × ${_auf.koeffizient_bauland} / ${_auf.koeffizient_bezugsgroesse})`
+            ? ` (${deZahl(brw)} €/m² × ${deZahl4(_auf.koeffizient_bauland)} / ${deZahl4(_auf.koeffizient_bezugsgroesse)})`
             : ''),
         wert: round0(_auf.wert_bauland_eur),
       });
@@ -121,7 +126,7 @@ export const ErtragswertService = {
       out.schritte.push({
         pos: 'Grundstücksfläche × angepasster Bodenwert',
         detail: `${flaeche} m² × ${deZahl(_auf.bodenwert_eur_qm)} €/m²`
-          + ` (${deZahl(brw)} €/m² × ${_auf.koeffizient_bauland} / ${_auf.koeffizient_bezugsgroesse})`,
+          + ` (${deZahl(brw)} €/m² × ${deZahl4(_auf.koeffizient_bauland)} / ${deZahl4(_auf.koeffizient_bezugsgroesse)})`,
         wert: round0(wert),
       });
       out.hinweise.push(_auf.hinweis);
@@ -270,7 +275,10 @@ export const ErtragswertService = {
     const gewerbe = pos(ein.gewerbe_jahr) || 0;
     const spAnz = pos(ein.stellplatz_anz) || 0;
     const spMiete = pos(ein.stellplatz_miete_monat) || 0;
-    const stellplatz = round0(spAnz * spMiete * 12);
+    /* v2382 · Zusatzeinnahmen aus der Haupt-App (`ze`: Stellplatz, Garage etc.) sind Rohertrag.
+       Liegen sie vor, ersetzen sie die Stueckrechnung Anzahl x Miete - beides waere doppelt. */
+    const zusatz = pos(ein.zusatz_jahr) || 0;
+    const stellplatz = zusatz > 0 ? round0(zusatz) : round0(spAnz * spMiete * 12);
     const sonstige = pos(ein.sonstige_jahr) || 0;
 
     if (!mieteMarkt && !gewerbe) {
@@ -289,7 +297,9 @@ export const ErtragswertService = {
        nicht gibt. Mit Wohnmiete bleibt die Zeile wie immer. */
     if (mieteMarkt || !gewerbe) out.staffel.push({ pos: 'Rohertrag Wohnen (marktüblich erzielbar)', wert: round0(mieteMarkt) });
     if (gewerbe) out.staffel.push({ pos: 'Rohertrag Gewerbe', wert: round0(gewerbe) });
-    if (stellplatz) out.staffel.push({ pos: `Stellplätze (${spAnz} × ${spMiete} €/Monat)`, wert: stellplatz });
+    if (stellplatz) out.staffel.push({ pos: zusatz > 0
+      ? `Stellplätze/Garagen u. a. (Zusatzeinnahmen ${deZahl(round2(zusatz / 12))} €/Monat)`
+      : `Stellplätze (${spAnz} × ${spMiete} €/Monat)`, wert: stellplatz });
     /* v1057-WSON-2 · Diese Zeile stand im Rohertrag und wurde damit ueber
      * die volle Restnutzungsdauer kapitalisiert. Der Ansatz steht jetzt
      * weiter unten mit eigener Laufzeit. */
@@ -321,7 +331,12 @@ export const ErtragswertService = {
             + 'Angabe des Gutachterausschusses)'
           : 'Bewirtschaftungskosten (eigene Kalkulation)',
         wert: bwk });
-      out.hinweise.push('Die Bewirtschaftungskosten wurden aus der eigenen Objektkalkulation übernommen. Die ImmoWertV sieht dafür normierte Ansätze vor (Anlage 3) — die Abweichung ist gewollt, sollte im Dossier aber benannt werden.');
+      /* v2382 · Stammt die Quote vom Gutachterausschuss, ist sie keine „eigene Objektkalkulation". */
+      out.hinweise.push(ein.bwk_quote_herkunft
+        ? 'Die Bewirtschaftungskosten sind mit der Quote des Gutachterausschusses angesetzt ('
+          + (ein.bwk_quote_pct != null ? String(ein.bwk_quote_pct).replace('.', ',') + ' % ' : '')
+          + 'auf den gesamten Rohertrag einschließlich Stellplätzen) — modellkonform zu seinem Liegenschaftszinssatz (§ 10 ImmoWertV).'
+        : 'Die Bewirtschaftungskosten wurden aus der eigenen Objektkalkulation übernommen. Die ImmoWertV sieht dafür normierte Ansätze vor (Anlage 3) — die Abweichung ist gewollt, sollte im Dossier aber benannt werden.');
     } else {
       /* v1018 · Verwaltungskosten gelten je Wohneinheit — aber bewertet wird
        * bei einer Eigentumswohnung EINE Einheit, nicht das ganze Haus.
@@ -451,6 +466,7 @@ export const ErtragswertService = {
              + ')',
         wert: verwaltung });
       bwkDetail.push({ pos: `Instandhaltung (${wfl} m² × ${deZahl(iJeQm)} €`
+             + (spAnz ? ` + ${spAnz} Stellpl. × ${deZahl(iJeStp)} €` : '')   /* v2382 */
              + (instGewerbe > 0 ? ` + Gewerbe ${_instGewTeile.join(' + ')}` : '') + ')',   /* v2210 */
         detail: iHerkunft === 'Anlage 3' ? null : 'aus deiner Rücklage',
         wert: instand });
@@ -564,7 +580,7 @@ export const ErtragswertService = {
       return out;
     }
     out.nutzungsdauer = { gnd: G, rnd: R, modell: rndInfo ? rndInfo.modell : 'manuell', alter: rndInfo ? rndInfo.alter : null };
-    if (!GND_TABELLE.geprueft && !pos(ein.gnd_jahre)) {
+    if (!GND_TABELLE.geprueft && !pos(ein.gnd_jahre) && !gndNachAnlage1Belegt(ein.objektart)) {   /* v2382 */
       out.warnungen.push('Die Gesamtnutzungsdauer stammt aus einer noch nicht gegen Anlage 1 ImmoWertV verifizierten Tabelle.');
     }
 
