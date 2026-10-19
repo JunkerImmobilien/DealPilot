@@ -4650,15 +4650,15 @@
       /* v1378 (C2): Der Wozu-Satz ist Erklaerung, kein Inhalt - er steht
          abgesetzt und leiser als die Frage, damit er sie nicht ueberlagert. */
       '.vi-rf-wozu{margin:9px 0 2px;padding:8px 11px;border-radius:8px;',
-      '  border-left:3px solid var(--wl-C9A84C,#C9A84C);',
+      '  border-left:3px solid var(--wl-c9a84c,#C9A84C);',
       '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);',
       '  font:400 12px/1.5 Inter,system-ui,sans-serif;opacity:.88}',
       '.vi-rf-wozu b{font:600 9.5px/1 "JetBrains Mono",ui-monospace,monospace;',
       '  text-transform:uppercase;letter-spacing:.05em;opacity:.6;margin-right:6px}',
       /* Der Tonknopf traegt den Zustand als Farbe mit - ein Schalter, dem
          man nicht ansieht, wo er steht, wird zweimal gedrueckt. */
-      '#vi-rf-ton[data-ton="lernen"]{border-color:var(--wl-C9A84C,#C9A84C);',
-      '  color:var(--wl-C9A84C,#C9A84C)}',
+      '#vi-rf-ton[data-ton="lernen"]{border-color:var(--wl-c9a84c,#C9A84C);',
+      '  color:var(--wl-c9a84c,#C9A84C)}',
       '#vi-rf-ton[data-ton="profi"]{border-color:#3FA56C;color:#3FA56C}',
 
       /* v1376 (C7): zwei Werte nebeneinander. Beide gleich gross, beide mit

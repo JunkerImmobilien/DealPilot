@@ -993,7 +993,7 @@ export const ReportOrchestrator = {
         });
         step('uk-wgfz: ' + (_wgfz.verfuegbar ? 'Faktor ' + _wgfz.faktor + ' (' + _wgfz.uk_objekt + '/' + _wgfz.uk_zone + ')' : _wgfz.grund));
       } catch (e) { _wgfz = null; }
-      /* v2288 · DIE DEALPILOT-FORMEL als Stufe unter dem amtlichen Wert -
+      /* v2288 · DIE DEALPILOT-FORMEL als Stufe unter dem amtlichen Wert (seit v2401 Stufe N) -
        * nur wo kein Registersatz greift (und nicht Minden-Luebbecke, das seine
        * Tabelle fest im Code hat) oder wo eine Sperre KEINE andere Regel des
        * Ausschusses nennt (Tiefe, WGFZ, kein Einfluss, Ausschluss). Gilt der
@@ -1021,7 +1021,7 @@ export const ReportOrchestrator = {
           }
         }
       } catch (e) { /* die Naeherung darf den Bericht nie kippen */ }
-      /* v2377 · DIE DEALPILOT-FORMEL FUER DIE WGFZ (Stufe D). Rangfolge nach Marcel
+      /* v2377 · DIE DEALPILOT-FORMEL FUER DIE WGFZ (Stufe N seit v2401, vorher D). Rangfolge nach Marcel
        * (17./19.10.2026): amtliche WGFZ-Tabelle > oertliche Tabelle des Ausschusses
        * (auch auf das MFH uebertragen, Stufe C) > Bundesformel. Fuehrt die Zone eine
        * GFZ und steht die WGFZ des Objekts fest, ist die WGFZ das wertrelevante
@@ -1284,6 +1284,9 @@ export const ReportOrchestrator = {
           lzs_quelle_url: _lzs.quelle_url || null,
           modellversion: _lzs.modellversion || null,
           lzs_parameter_id: _lzs.parameter_id, lzs_hinweis: _lzs.hinweis,
+          /* v2401 · Stufe N: Formel, Datenbasis und Rechenweg; bei D, warum es keine Formel wurde */
+          lzs_formel: _lzs.stufe === 'N' ? (_lzs.formel || null) : null,
+          lzs_formel_nicht: _lzs.dealpilot_formel_nicht || null,
           /* ── v1816 · DIE RUECKFRAGE REIST BIS IN DEN BERICHT ──────────
            *
            * Liegt fuer diesen Ort ein amtlicher Zinssatz vor, fehlt aber
@@ -1637,6 +1640,8 @@ export const ReportOrchestrator = {
         var e = { A: ['amtlich', 'amtlicher Wert des zustaendigen Gutachterausschusses', false],
                   B: ['amtlich, regional', 'amtlicher Wert auf Landesebene', false],
                   C: ['indikativ, marktabgeleitet', 'aus dem regionalen Marktgeschehen zurueckgerechnet', true],
+                  /* v2401 · Stufe N zwischen C und D */
+                  N: ['abgeleitet aus der DealPilot-Formel (N)', 'aus den amtlichen Liegenschaftszinssaetzen der Gutachterausschuesse abgeleitet, nicht amtlich', true],
                   D: ['indikativ, gesetzlicher Auffangwert', 'nach § 256 BewG, nicht marktabgeleitet', true],
                   E: ['eigene Angabe', 'vom Nutzer gesetzt', true] }[st]
                 || ['indikativ', 'Herkunft nicht bestimmbar', true];

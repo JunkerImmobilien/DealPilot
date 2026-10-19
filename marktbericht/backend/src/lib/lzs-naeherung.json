@@ -3,9 +3,9 @@
   "form": "LZS [%] = c + a_ETW + a_MFH + a_WGH + r * min(80, max(5, RND))/10 + s * Stadt",
   "herkunft": "DealPilot-Naeherung aus allen amtlichen Liegenschaftszinssaetzen des Registers (Wohnnutzung, juengster Jahrgang je Zweig), kleinste Quadrate",
   "kennzeichnung": "abgeleitet aus der DealPilot-Formel (nie amtlich)",
-  "stufe": "D",
-  "stufe_hinweis": "Rang: unter jedem amtlichen Satz und unter dem Landeswert, ueber § 256 BewG. Eigene Stufe empfohlen (Bericht 19.10.2026).",
-  "verdrahtet": false,
+  "stufe": "N",
+  "stufe_hinweis": "Stufe N (v2401): unter jedem amtlichen Satz und unter dem Landeswert, ueber § 256 BewG (D). Nur in Laendern, in denen sie gemessen genauer ist (pruefung.je_land), nie wo das Register fuer die AGS einen Satz fuehrt.",
+  "verdrahtet": true,
   "gilt_fuer": {
     "familien": {
       "EZFH": "Ein-/Zweifamilien-, Doppel-, Reihenhaus",

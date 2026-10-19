@@ -1,0 +1,18 @@
+i|Modul zehn b: Die BMF-Kaufpreisaufteilung — Bodenabschlag, Notarklausel und Fünfzehn-Prozent-Grenze.
+0|Das Beispiel ist wieder das Mehrfamilienhaus aus dem Bestand: Ravensberger Weg achtunddreißig in Bielefeld, acht Wohnungen, Kaufpreis eins Komma zwei vier Millionen Euro.
+1|Angenommen, in den ersten drei Jahren sollen siebenundachtzigtausend Euro in das Haus fließen.
+2|Dann greift die Fünfzehn-Prozent-Grenze: höchstens gut hundertsiebenundfünfzigtausend Euro netto in drei Jahren. Die Sanierung liegt deutlich darunter — voll abzugsfähig.
+3|Der BMF-Rechner teilt den Kaufpreis in Gebäude und Boden — nach der Arbeitshilfe des Finanzministeriums. Abgeschrieben wird nur das Gebäude.
+4|Schritt eins, die Anschaffungskosten: Kaufpreis aus dem Reiter Investition, dazu gut hundertsiebzigtausend Euro Nebenkosten — Grunderwerbsteuer, Notar, Grundbuch, Makler. Sie zählen anteilig zum Gebäude.
+5|Schritt zwei, die Aufteilung: Grundstück, Bodenrichtwert und Anteil — alles aus dem Objekt übernommen.
+6|Zum Vergleich rechnet DealPilot die umgekehrte Ertragswertmethode mit, nach der Rechtsprechung des Bundesfinanzhofs: knapp achtzig Prozent Gebäude.
+7|Schritt drei: amtlich knapp fünfundsiebzig Prozent Gebäude. Mit Bodenabschlägen von fünfzehn, zwanzig oder fünfundzwanzig Prozent steigt der Anteil — und mit ihm die AfA.
+8|Schritt vier: Du wählst. Vier Karten, jede mit Risiko-Score — grün ist die Arbeitshilfe, rot kann das Finanzamt beanstanden.
+9|Optimiert, mit zwanzig Prozent Bodenabschlag: rund neuntausenddreihundert Euro Steuerersparnis — bei Risiko-Score drei, also gelb.
+10|Die amtliche Zahl bleibt stehen, das Szenario daneben: weniger Boden, mehr Gebäude — und eine höhere AfA im Jahr.
+11|Den Text für den Kaufvertrag gibt es fertig dazu — Boden und Gebäude, zum Kopieren für den Notar. Die Begründung gehört mit hinein.
+12|Die Absprünge: „Restnutzungsdauer berechnen" öffnet den Rechner aus Modul zehn c. Dazu das PDF der Aufteilung, die ausgefüllte BMF-Arbeitshilfe und das Original als Excel.
+13|Übernehmen — ein Klick, und der Gebäudeanteil der gewählten Variante geht in den Reiter Steuer.
+14|Im Reiter Steuer: knapp achtzig Prozent Gebäude — und rund zweiundzwanzigtausendvierhundert Euro Abschreibung im Jahr.
+15|Die Fünfzehn-Prozent-Grenze zieht mit: gut hundertachtundsechzigtausend statt hundertsiebenundfünfzigtausend Euro. Die Sanierung bleibt darunter — voll abzugsfähig.
+16|Gebäude und Boden getrennt — sauber gelandet. Weiter mit Modul zehn c: dem Restnutzungsdauer-Rechner.

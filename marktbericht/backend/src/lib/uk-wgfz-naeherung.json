@@ -3,7 +3,7 @@
   "form": "UK(WGFZ Objekt)/UK(WGFZ Richtwert) = (WGFZ Objekt / WGFZ Richtwert)^b",
   "herkunft": "DealPilot-Naeherung aus allen amtlichen WGFZ-Umrechnungstabellen und -formeln des Registers (Werte und interne Stuetzstellen), Median der Exponenten je Kurve; gleiche Zahlenreihen einmal gezaehlt",
   "kennzeichnung": "abgeleitet aus der DealPilot-Formel (nie amtlich)",
-  "stufe": "D",
+  "stufe": "N",
   "empfehlung": "Ein Exponent fuer den Geschosswohnungsbau (b = 0.498 aus 80 Kurven, 15 Laender). Individueller Wohnungsbau getrennt waere flacher (b = 0.342), aber nur 6 Kurven aus BY/NW - zu wenig; dort rechnen die Ausschuesse ueber die Flaeche, keine WGFZ-Naeherung. Gewerbe/Geschaeft nicht einbezogen (b = 0.805, fast proportional). Mit dem Bodenrichtwert steigt b in den Tabellen mit BRW-Zeilen deutlich (VW-RL-Typ), getragen von nur 22 Kurven aus NW/HE/HB - als Befund dokumentiert, nicht getrennt.",
   "gilt_fuer": {
     "verhaeltnis_von": 0.5,

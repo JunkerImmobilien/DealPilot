@@ -38840,6 +38840,20 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### landing-videothek-4c · Videoreihe 10b und 21 vertont und ausgeliefert (19.10.2026, Staging + Prod-MP4, Video-Agent)
+
+- **Was:** Fortsetzung von v2395vr (Übergabe 19.10., OFFEN 2). Die neu aufgenommenen Module 10b (4:29) und 21 (3:00) vertont, je mit und ohne Sprecher ausgeliefert. `videos.json` Dauer 10b 263 → 269, 21 175 → 180 (gemessen 269,37 / 180,20 s), Buster `landing-videothek-4b` → `4c` (`dp2-live.js`, `landing/index.html`, `landing/videothek.html`). Sprechtexte und Zeitmarken in `claude/ablage-20261019-video/m10b|m21/`.
+- **Befund — die Übergabe stimmte bei den WAV-Clips nicht:** die vorhandenen Clips 10b (18.10.) waren mit `tts2.mjs` im **Investor-Ton** gesprochen, nicht mit Pirate-Vibe; für 21 lagen ebenfalls nur Investor-Clips vor. „Nur zwei Zeilen neu“ hätte zwei Stimmfarben in einem Video ergeben. Außerdem hatte das neue Bild von 10b mehr geänderte Zahlen als die Grenze: Nebenkosten 170.748 € jetzt erfasst (alter Satz „in diesem Objekt nicht erfasst“ falsch), Steuerersparnis 9.352 € (alt „rund achttausendzweihundert“), AfA 22.420 € (alt „rund neunzehntausendsiebenhundert“), Absprung Modul 10c (alt 10a). **Deshalb alle 31 Clips neu** (18 + 13, plus einmal das 10b-Intro gekürzt), onyx, `gpt-4o-mini-tts`, Pirate-Vibe (`tts3.mjs`), im Container `dealpilot-backend` auf Staging. Schlüssel nie ausgegeben.
+- **Stichbilder 21** (14 Vollbilder + Untertitelband aller 12 Szenen angesehen): keine Erweiterungs-Hinweise, keine Überlagerung; Cockpit 7,39 Mio € / 28.675 €/Monat, Analyse 7.390.151 € und 344.100 €/Jahr, Abspann „Weiter: Modul 22 · Der Telegram-Bot“.
+- **Nachweis:**
+  - `pruefe.mjs`: alle Clips enden mindestens 0,15 s vor dem nächsten Bildwechsel, Tempo durchweg 1,0 (keine Straffung). Gleiche Abschnittszahl wie vorher (10b 17 Wechsel, 21 12).
+  - Lautheit −16,4 LUFS (beide). Größen: 10b 12,3 MB / mit Sprecher 16,6 MB; 21 7,0 MB / 9,9 MB.
+  - md5 lokal = Staging = Prod für alle vier MP4 (`6eff14e2…`, `fc3fc678…`, `7568a6d9…`, `366d7864…`); alte Fassungen auf beiden Servern als `*.mp4.alt-20261019` (nicht gelöscht). Auf Prod nur die MP4s, kein Code/git/DB/Container.
+  - Videothek `staging.dealpilot.immo/videothek.html`: lädt `dp2-live.js` und `videos.json` mit `?v=landing-videothek-4c`; 10b und 21 spielen mit und ohne Sprecher (Umschalter `#vtTon`, Dauer 269,37 / 180,2 s, Audio-Bytes nur in der Sprecher-Fassung).
+- **Deploy:** `deploy-staging.ps1` brach ab, weil ein paralleler Agent unversionierte Änderungen im Arbeitsverzeichnis hat (Marktbericht-Backend, `objekt-reiter.js`, `help.js`). Ausgerollt deshalb mit dem Server-Schritt des Skripts von Hand (Zweig `staging`, keine verfolgten Änderungen, `git pull --ff-only` → `0862fc06`); die lokalen Prüfer (Frontend-Konstanten, Saat-Basislinie, Register-Abgleich) liefen dabei nicht — der Commit berührt keine ihrer Quellen.
+- **Commit:** `0862fc06` (Code), dieser Journal-Eintrag separat.
+- **Rest:** `videos.json`/Buster auf Prod kommen mit dem nächsten Prod-Merge (bis dahin nennt die Prod-Videothek 4:23 / 2:55 bei den neuen Dateien). Die `.alt-20261019`-Dateien liegen im öffentlich ausgelieferten Ordner — nach Abnahme löschen. Die Reihe spricht jetzt in zwei Stimmfarben: Pirate-Vibe 10b, 15, 21, 23, 25, Investor-Ton der Rest.
+
 ### v2395 / v2395a / v2395vr–vr3 · landing-videothek-4b · Videoreihe 10b, 15, 21, 23: Fehler im Bild (19.10.2026, Staging, Video-Agent)
 
 - **Was:** Vier Befunde aus der Vertonung (`Videoreihe-Sprecher/STAND.md`), dazu drei, die erst die Prüfläufe zeigten.
@@ -38917,6 +38931,175 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - Dresden-RH ohne Hausform fällt jetzt auf § 256 (Rückfrage). Ob das Formular die Hausform beim RH sichtbar abfragt, ist eine Produktfrage.
 - 107 Werte (WGFZ, Rohertragsfaktor) stehen noch nicht in `mb.param_modell`. `ladeAusDb` liest sie nicht, sie wirken aus der Datei.
 - `tools/kettenpruefung-v1095.mjs` ist seit Langem kaputt (Pfad `/app/lib`), nicht angefasst.
+
+### ⏸ ÜBERGABE 19.10.2026 (Pause auf Marcels Wunsch) · Prod-Rollout (53) und was offen ist
+
+**Prod-Rollout (53)** — Merge `2b3ab2c1` (Stand staging `ccda2d97`).
+- **Inhalt:**
+  - v2395 · Geführte Eingabe: „Bewirtschaftung“ statt „Hausgeld“ beim Haus; Herkunft „Geführte Eingabe“; BRW mit Tausenderpunkt.
+  - v2396–v2396g · Register gegen Datenbank:
+    - Datei-Sperre gewinnt immer.
+    - Waisen nach URL-Wechsel.
+    - Dresden: Rückfrage Endhaus/Mittelhaus statt Ladereihenfolge.
+    - Felder der Datei an DB-Zeilen.
+    - `wert_parameter` 2024 nur ohne neueren Registersatz.
+    - § 256-Text richtiggestellt.
+    - **Hausart statt „haus“ an den Register-Sachwertfaktor:** Ändert den Sachwert vieler App-Häuser, jetzt amtlich statt vorläufig.
+    - Werkzeug `tools/register-db-abgleich.mjs`, läuft im Staging-Deploy.
+  - Videothek 4b mit den neuen Modulen 15 und 23.
+- **Nachweis:**
+  - Sicherung `main-20261019-1028-r53` (73 Tabellen) und `mb-…-r53` (32).
+  - `register-saat --trocken --aufraeumen` zeigte 137 (135 über Sperre, 2 URL-Wechsel Essen). `--nur-aufraeumen` löschte 137 von 137, `mb.param_modell` hat jetzt 4.096 Zeilen.
+  - `register-db-abgleich --ssh=prod`: sauber.
+  - Gold-Audit RC 0, `auth/me` 401.
+- **Konto:** `majunker@gmx.net` wurde auf Prod gelöscht.
+  - Marcel per `!`, `DELETE 1`. Nachgeprüft: users, objects, subscriptions je 0.
+  - Das Stripe-Abo war seit 15.10. gekündigt (`cancel_at_period_end`) und läuft im Stripe-Konto aus.
+
+**Messungen dieses Tages, die man wieder braucht:**
+- **DealPilot-Formeln, Leave-one-Land-out** (`tools/*-naeherung-ableiten.mjs`):
+
+  | Formel | Median | P90 | Bewertung |
+  |---|---|---|---|
+  | UK Fläche | 1,6 % | 10,6 % | — |
+  | WGFZ | 3,5 % | 14,8 % | — |
+  | LZS Wohnen | 0,62 PP | 1,61 PP | besser als § 256 (0,84/1,74) in 7 von 11 Ländern; schlechter in TH, ST, SH, MV |
+  | SWF | 13,7 % | 30,6 % | lohnt NICHT, Faktor hängt am örtlichen Markt |
+
+- **Lernkurve** bei 25 % bis 100 % der Ausschüsse: ab ~50 % flach. Mehr Ernte macht die Formeln kaum genauer, bringt aber mehr Deckung auf Stufe A. Deshalb weiterernten.
+- **§ 256 BewG** liegt im Median 0,7 bis 0,9 PP ÜBER dem örtlichen Wohnzins. Der Ertragswert fällt damit eher zu niedrig aus.
+
+**Marcels Entscheidungen 19.10. (zusätzlich zu den oben genannten):**
+- **Stufe N:** neue Stufe „N · DealPilot-Formel“ zwischen C und D. D heißt nur noch „gesetzlicher Auffangwert § 256 BewG“.
+- **LZS-Formel:** wird verdrahtet, aber nur, wo sie genauer ist als § 256. Nie bei einer Sperre oder einem Ausschusswert.
+- **ETW in Objekt mit ≤ 2 WE (Minden-Lübbecke):** amtlicher ZFH-Zins des Ausschusses (v2394).
+- **Weiterernten:** ja.
+- **Videos:** jedes Video mit UND ohne Sprecher (Videothek-Umschalter, Standard: mit).
+
+**OFFEN — so geht es weiter:**
+1. **Stufe N und LZS-Formel** (Agent, v2400 ff.): Der Zwischenstand steht im Journal-Eintrag „Zwischenstand Stufe N“ (falls vorhanden). Ziel: alle ~15 Stellen (Kaskade, Ertragswert-Abzug, Web, PDF, Übernahme-Pille, Hilfe, Verlauf), dazu die LZS-Formel vor § 256. Danach Deploy auf Staging (Rebuild `mb-backend`), Prüfung, Prod.
+2. **Videos 10b und 21:** ✓ **Erledigt am 19.10.2026 (`landing-videothek-4c`, Commit `0862fc06`)** — vertont, auf Staging und Prod hochgeladen, siehe Journal-Eintrag „landing-videothek-4c“. Der Rest dieses Punkts ist der Stand davor:
+   Beide sind neu AUFGENOMMEN, aber noch nicht vertont oder hochgeladen.
+   - 10b: 4:29, Grenze 157.543 € → 168.155 €, Stichbilder geprüft.
+   - 21: 3:00, Stichbilder noch nicht angesehen.
+   - Die Dateien liegen unter `Dateien/Messe/Videos/Videoreihe/Modul 10b …` bzw. `Modul 21 …`.
+   - Vertonung: Werkzeuge stehen in `claude/ablage-20261019-video/werkzeug/` (`analyse.sh` → `setze.mjs`/`baue.mjs` → `ttsrun3.sh` onyx mit Pirate-Vibe → `pruefe.mjs` → `mische.sh`). Die Sprechtexte als Vorlage liegen in `…/m10b/zeilen.txt` und `…/m21/zeilen.txt`. Der volle Arbeitsstand mit den WAV-Clips liegt in `Dateien/Messe/Videos/vertonung-arbeitsstand-20261019/`.
+   - Neu zu sprechen ist nur:
+     - 10b: die Grenze („gut hundertsiebenundfünfzigtausend“) und der Abspann „Weiter mit Modul zehn c“.
+     - 21: die Zahlenzeile (Gesamtinvestition 7,39 Mio., Mieteinnahmen 344.100 €/Jahr) und der Abspann „Weiter mit Modul zweiundzwanzig: dem Telegram-Bot“.
+   - Danach scp auf Staging und Prod, md5 prüfen. In `videos.json` die Dauern ändern (10b 263 → 269, 21 175 → 180), Buster `landing-videothek-4c`, STAND.md nachtragen.
+   - Bis dahin zeigt das alte 10b auf beiden Servern noch 137.917 €.
+   - Die alten Fassungen liegen gesichert in `Dateien/Messe/Videos/alt-vor-v2395/`.
+   - Vor jeder Aufnahme den freien Speicher prüfen (unter ~2 GB nicht starten). Aufgenommen wird im EIGENEN Chrome-Fenster, nicht in der Tab-Gruppe, sonst liegt das Hinweisfeld der Erweiterung im Bild.
+3. **App-Fehler aus der Videoarbeit** (nach den Aufnahmen beheben, `calc.js`/`tax.js` werden dort gefilmt):
+   - `tax.js` `_renderQuickForm`: „Einnahmen V+V“ zeigt nur die Kaltmiete.
+   - `calc.js:1129` `#ahk_geb_anteil` rundet auf ganze Prozent (75 statt 74,82).
+   - Videothek-MP4 ohne Buster (Cache zeigt alte Fassung).
+   - Abspann Modul 24 verweist auf „02–10“, obwohl es Modul 25 gibt.
+   - Ältere Videos am Demo-Objekt Ravensberger Weg (vor 16.10. abends) zeigen vermutlich Zahlen ohne Kaufnebenkosten: nachprüfen.
+4. **Ernte:**
+   - BW-WGFZ stützt sich allein auf die Aktennotiz zur Freigabe; das LGL-Infoblatt sagt „kommerzielle Nutzung ausgeschlossen“. Von Marcel freigegeben, rechtlich im Blick behalten.
+   - 91 BW-Flächen-Stützstellen sind aus demselben Grund gesperrt und ließen sich genauso freigeben.
+   - Cottbus bleibt Sperre (zwei Spalten ohne Zuordnung).
+   - Lizenz offen: Kiel, Ostholstein, Lübeck, Lauenburg, ST.
+   - NI-zonenabhängige WGFZ-Tabellen (Kern prüft die Tabellenkennung der Zone nicht).
+5. **Kern WGFZ:**
+   - `begrenzung` im Matrix-Zweig.
+   - Tabellenform ohne Rundung.
+   - Zonen-, Ortsteil- und gebietsabhängige Geltung.
+6. **Gewerbe-Ertragswert** liest die GND des Zinssatz-Satzes noch nicht.
+7. `tools/kettenpruefung-v1095.mjs` ist kaputt (falscher Pfad).
+8. **Dresden-Reihenhaus ohne Hausform:** rechnet § 256 und zeigt eine Rückfrage. Produktfrage, ob das Formular die Hausform deutlicher abfragt.
+9. **Versionsnummern:** v2373/v2374/v2395 wurden heute von parallelen Strängen doppelt vergeben, die Video-Commits heißen deshalb `v2395vr*`. **Ab v2400 sauber zählen.**
+
+**Abnahmepunkte im Browser (noch nicht gemessen):**
+- Stufen-Beschriftung (A–E, N) in Web und PDF.
+- Pilot-Antwort zu „Stufe 2“ und „Stufe C“.
+- Essen EFH Sachwertfaktor 1,33 im echten Bericht.
+
+### qc-v2420–qc-v2420a · Quick Boarding: Ist/Soll-Umschalter weg, DealPilot-Stufen, nur Score-Kennzahlen, Beleihungsknöpfe (19.10.2026, Staging)
+
+- **Was:**
+  1. **„Ist-Soll-Schieber unten"** = der Umschalter „Ist · heute | Soll · Ankauf-Stand" aus `ankauf-ansicht.js`. Sein Wirt `#ank-ansicht-host` steht in `index.html` HINTER `#s-quick` und wurde von keinem Modus ausgeblendet; trägt das zuletzt geladene Objekt einen Ankauf-Stand, lag er im Quick Boarding direkt unter dem iframe (gemessen: y = Unterkante `#s-quick`, volle Breite, `display:flex`). Im QC-Dokument selbst gibt es keinen Ist/Soll-Regler. Jetzt `body.qc-standalone-active #ank-ansicht-host{display:none}` im Stilblock von `qc-bridge.js`; im Objekt bleibt er. Der Schalter „Stand: Bestand | Ankauf" in der Seitenleiste ist der Listenfilter und bleibt.
+  2. **DealPilot-Kachel der Datenaufnahme** trägt die drei Stufenpillen wie im Tab Objekt (Maße aus der Haupt-App per `getComputedStyle`: 18 px, 1 px `#b9b2aa`, 600 10px JetBrains Mono, `.on` Gold). Stufe 1 gilt, 2 und 3 ausgegraut/durchgestrichen mit Tooltip „im Quick-Check nicht verfügbar – im Tab Objekt". Eigenes Markup und CSS im QC-Dokument, `objekt-reiter.js` nicht angefasst.
+  3. **Karte zeigt nur, was in den Score eingeht** (`DealScore.computeFromKpis`: `cf_m`, `nmy`, `ltv`, `dscr`, `wp_kpi`): Cashflow/Mo, Nettomietrendite, LTV, DSCR, Wertpuffer (Marktwert − KP, ohne Abruf „—"). Bruttomietrendite, EK-Rendite, Bewirtschaftung von der Karte (gerechnet weiter in `score.kpi`). **Parser-Fehler behoben:** `n()` in `_dpPilotScore` las „200.000" als 200 — gemessen: Bruttorendite 5.400 %, Darlehen 0, Score 65 bei KP 200.000/Miete 900. Jetzt `QcEngine.num`.
+  4. **Beleihungsknöpfe:** Die Knopfrechnung war richtig (Darlehen = Quote × KP, Nebenkosten aus EK). Falsch war, dass das EK nur beim Klick und beim Tippen des KP gesetzt wurde — eine spätere PLZ (andere Grunderwerbsteuer) ließ das alte EK stehen, der Knopf blieb markiert. Jetzt EIN Weg `_ekNachziehen()` in `updateAll`: EK folgt KP/PLZ/Nebenkosten, solange es vom Knopf stammt; ein getipptes oder importiertes EK bleibt, dann ist kein Knopf markiert. Satz darunter „Darlehen = 80 % des Kaufpreises · Nebenkosten (x %) aus Eigenkapital", Tooltip mit den Bausteinen. Die 13,77 % ohne PLZ = 6,5 GrESt + 1,7 Notar + 0,5 Grundbuch + **3,57 Makler** + 1,5 Sonstige (Makler aus Marcels Einstellungen). `deal-kpis.js` nicht geändert.
+- **Commit:** `31f85f80`, `eff4b9a0`, dieser Eintrag (IFRAME_SRC `qc-v2420a`)
+- **Nachweis (eigener Tab, `/passes/`-Aufrufe im Tab abgefangen, nichts gespeichert):** KP 200.000 ohne PLZ → EK 27.540; Knopf 80 → 67.540; PLZ 80331 (3,5 %) → 61.540, Knopf bleibt 80; KP 250.000 → 76.925; EK 60.000 getippt → kein Knopf, Satz „Darlehen = 86,8 %"; Knopf 90 → 51.925. Score-Kennzahlen danach Bruttorendite 4,3 %, LTV 90 %. Karte: fünf Kacheln, Desktop eine Reihe, 390 px drei Spalten ohne Überlauf (scrollWidth 316 < 333). Pillen gemessen: 1 Gold/`#050505`, 2/3 opacity .45 + line-through. `#ank-ansicht-host` im QC-Modus `display:none` (nach Ablauf des 5-min-Caches von `qc-bridge.js`). Inline-Skripte `node --check` 0 Fehler, Stilblöcke ausgeglichen, `buster-ebenen-pruefen` SAUBER.
+- **Rest:** Der Buster von `qc-bridge.js` in `index.html` steht noch auf `v2367` (index.html lag bei einem anderen Strang) — die Datei kommt über `max-age=300, must-revalidate` trotzdem nach höchstens 5 min an; beim nächsten Anfassen von `index.html` hochziehen. Der LTV auf der Karte bezieht sich nach einem Marktwert-Abruf auf den Marktwert (`svw`), der Knopf auf den Kaufpreis — gewollt (wie im Objekt), steht im Tooltip. Der Träger `qc_knk` in `qc-bridge.js` hat weiter die Vorgabe „10,5" (nicht gelesen, da `knk` nicht in `FIELDS`). `style.css` führt die Pillen-Gold-Tokens als `--wl-C9A84C` (Großschreibung), `whitelabel-override.js` setzt `--wl-c9a84c` — dort färbt sich das Gold beim Mandanten vermutlich nicht um; nicht angefasst (fremder Strang).
+
+### v2410 · Kanban raus, „Aus Wohnungen" ohne Staffel-Haken, Ist/Soll auf gleicher Basis (19.10.2026, Staging)
+
+**Was (drei Aufträge von Marcel):**
+1. **Portfolio-Cockpit ohne Kanban-Board.** Abschnitt „03 Objekte" (In Prüfung / Gewonnen / Verloren) wird in `dashboard.js` `ensureMarkup()` nicht mehr gebaut, die zwei Zeilen stehen kommentiert mit Grund und Datum. `renderBoardOrCards()` findet `#dp-board` nicht und kehrt zurück, `kanbanCardHtml` bleibt stehen. Keine Daten berührt (der Deal-Status lebt im Objekt). Die Abschnitte rücken auf: 03 Geteilte Objekte … 08 Jahresabschluss. Mitgezogen: `help.js` („acht Abschnitte", Board-Satz weg), `prozess-atlas.js`. Messe-Drehbuch 21 (`reihe-cockpit`) greift nicht auf das Board zu, nur auf `#dp-pscore-hero`, `#dp-overview-strip`, `#dp-steuerkette`, `#dp-charts-sec`, `#dp-pp`. **Nicht angefasst:** die Kanban-Ansicht unter „Alle Objekte" (`all-objects-views.js`) — ein anderes Board.
+2. **„Aus Wohnungen" im Tab Miete.** Ursache gemessen (API, nur GET) an Westerfeldstr. 140 Bielefeld (MFH, `ae155d38…`): vier Wohnungen mit Ist 799/799/799/798 und Soll 950/850/880/840, Vertragsart unbefristet, **kein** Haken `mv_in_mietentwicklung`. `einheitenNutzbar()` verlangte genau diesen Haken — den das Wohnungsfenster aber nur bei Staffel/Index zeigt. Mit gewöhnlichen Verträgen war der Knopf **nie** freizuschalten. Jetzt reicht eine vermietete Wohnung mit Ist-Miete. Im Modus rechnet jede Wohnung ihre Staffel, ab dem Soll-Jahr ihre Soll-Miete (nie unter der Staffel, Leerstand im Ist nicht mit); der pauschale `sollSprung` entfällt in diesem Modus (sonst doppelt).
+   **Zweiter Befund, gleiche Wirkung:** beide Bielefelder MFH tragen `sollAbJahr` 2028 bzw. 2027 — Kalenderjahre in einem Feld, das den Index meint („z. B. 3"). Der Sprung griff dadurch in keinem Betrachtungszeitraum. Ab 1900 gilt der Wert jetzt als Kalenderjahr (Index = Jahr − Basisjahr, dasselbe Basisjahr wie `calc.js`), das Feld sagt es dazu.
+   **Dritter Befund:** Westerfeld stand auf Detail mit leerer „Anzahl Erhöhungen" → Faktor 1,0 auf alle Jahre. `uebernehmen()` setzte `me_soll`/`me_pct`, aber nie den Modus; jetzt stellt es auf „Aus Wohnungen" (mit Meldung im Toast), wenn Soll-Mieten oder Staffel-Haken da sind, und setzt `me_pct` nicht mehr, wenn ein Soll-Jahr steht (Detail rechnete Soll ÷ Ist sonst zweimal).
+3. **MFH-Tafel „Ist gegen Soll":** Soll-Bruttomietrendite stand auf Gesamtinvestition, Ist auf Kaufpreis. Jetzt beide auf Kaufpreis; die Soll-Zahl kommt aus `DealKpis.compute({kp, nkm: Soll, ze})`, nicht nachgerechnet. **Die Annahme „Zusatzeinnahmen nur im Soll" stimmte nicht** — `K.nkm_j` ist (NKM + ZE) × 12, die ZE stehen in beiden Spalten (gemessen: Ist 39.420 € = 3.195 × 12 + 1.080).
+
+**Commit:** `25d04e9a` (Buster index.html: mietentwicklung, mfh-einheiten, help, prozess-atlas, dashboard → v2410).
+
+**Nachweis:**
+- Prüflauf gegen die echte `mietentwicklung.js` mit dem Westerfeld-Datensatz (Node, 12 Fälle grün): Freigabe ohne Haken, `sollJahr(2028)` = 3 bei Basis 2025, Faktor 3.520/3.195 = 1,1017 ab dem Sprung, keine Doppelung im Modus, Leerstand, relativer Wert bleibt Index, ohne Ist-Miete gesperrt.
+- Staging-Browser (eigener Tab, kein Objekt geladen, nichts gespeichert, Westerfeld-`updated_at` vorher/nachher gleich 13:17:55): Cockpit mit 01–08 ohne `#dp-board`, kein „Kanban" im Text. Westerfeld-Daten nur im Speicher: Knopf frei („0 mit Staffel, 4 mit Soll-Miete"), nach Klick Modus `einheiten`, Tabelle 39.420 € → 43.320 € ab 2028, Kopfzeile nennt die Soll-Miete. Tafel: 7,23 % / 7,95 % beide „auf Kaufpreis".
+- `buster-ebenen-pruefen.mjs`: SAUBER.
+
+**Rest:**
+- `uebernehmen()` (Modus-Umstellung, `me_pct`) nicht im Browser bedient — Staging-Abnahmepunkt: Konfigurator an einem MFH öffnen, „Übernehmen", Toast muss „Mietentwicklung: aus Wohnungen" nennen.
+- Im Modus „Aus Wohnungen" steigen Wohnungen ohne Staffel bis zur Soll-Miete und danach **gar nicht** (Doktrin v2024). Produktfrage an Marcel, ob danach die Prognose-Steigerung weiterlaufen soll.
+- Die Mietentwicklungs-Tabelle beschriftet Index f als „Jahr f", die Projektion in `calc.js` führt denselben Wert als Jahr f + 1 (Kalender Basis + f). Altbestand, nicht angefasst.
+- `_jahreBis()` (Staffeltermine) misst ab heute, nicht ab Basisjahr — bei Kauf in der Vergangenheit kommen Staffelstufen ein Jahr zu früh. Altbestand.
+- Marcels offener Westerfeld-Tab läuft noch mit altem Code: **erst speichern, dann neu laden.** Die gespeicherten Daten brauchen keine Änderung — 2028 wird jetzt richtig gelesen; „Aus Wohnungen" wählt er selbst.
+
+### v2400–v2403 · Stufe N · DealPilot-Formel als eigene Herkunftsstufe, LZS-Formel in der Kaskade (19.10.2026, Staging)
+
+**Was (Marcel 19.10.2026 freigegeben, Auftrag aus dem Zwischenstand unten):**
+- **Neue Stufe N zwischen C und D.** D heißt nur noch „gesetzlicher Auffangwert § 256 BewG". N tragen die LZS-Formel (v2401) sowie die UK-Flächen- und die WGFZ-Formel (v2402: `uk-naeherung.json`, `uk-wgfz-naeherung.json`, Rückfälle in `umrechnung_flaeche.js`/`umrechnung_wgfz.js`, beide Erzeuger).
+- **v2401 · Kaskade (`WertParameterService.js`).** `lzs-naeherung.json` und Erzeuger: `stufe` N, `verdrahtet` true. N wird versucht, wenn alle amtlichen Ebenen leer sind — und nur wenn das Register für die AGS **keinen** Satz führt (Wert, Sperre oder Rückfrage → D mit Weg zum Ausschuss), kein Registerfehler, kein Open-Data-Wert, kein Nachbarwert; Wohnen, RND 5–80, Länder BB BW HE NI NW RP SN.
+  - **Befund beim ersten Lauf:** `mb.wert_parameter` führt § 256 selbst als Zeile (Qualität D, Ebene bund, `00000`, 7 Objektarten). Darmstadt EFH kam darüber als D an, bevor die Kaskade den Rückfall am Ende erreichte. N wird deshalb VOR jeder D-Zeile der Tabelle versucht (`_versucheN()`) und noch einmal vor dem gerechneten Auffangwert; alles andere bleibt in seiner Reihenfolge.
+  - D trägt `dealpilot_formel_nicht` (Grund + Hinweis: `register_fuehrt_satz`, `land_nicht_besser`, `rnd_ausserhalb`, `keine_wohnnutzung` …).
+  - `zinsHerkunft()`: Ebene `dealpilot_formel` (unter A), Etikett „abgeleitet aus der DealPilot-Formel (N)", Klartext mit 984 Sätzen und 0,6 Prozentpunkten aus der JSON, Weg mit Ausschuss-Link; `hinweisZurStufe` N; `RANG` mit N; Kopfkommentar.
+  - Ertragswert: Belastbarkeit N −25 (C −20, D −40). CrossCheck: N nicht im Quellennachweis; Rechenweg (N) bzw. Grund ohne Formel (D) in den Hinweisen; `liegenschaftszins_formel(_hinweis/_nicht)`. Orchestrator: Tabelle `wertermittlung_herkunft` mit N, `lzs_formel`, `lzs_formel_nicht`. `api.js`: Reiter-Route rechnet bei N mit der RND des Objekts nach (sonst Reiter und Bericht verschieden) und liefert `zins_herkunft` und `formel`; Kommentare. KI: Verlaufstext und Gegenrechnung bekommen die Stufe im Klartext (`zinsstufeKlartext`).
+- **v2403 · Frontend.** `marktbericht-app/app.js`: `_stufeTxt` mit N, Rechenweg in Web-Ansicht und PDF (U+2212 ersetzt). `objekt-reiter.js`: `STUFEN`/`TRAUEN` mit N, Regex `[A-EN]`, Klasse `n`, Zinszeile „abgeleitet, nicht amtlich — genauer: Satz des Ausschusses eintragen" mit Link, Anfragen-Block bleibt bei N offen, Legende. `style.css`: `.oe-st.n` als Statusfarbe `#B87A46` (zwischen Gold und Rot, nicht tokenisiert). `help.js`: N als eigene Stufe, D nur noch Auffangwert, Überschrift „Herkunftsstufen A bis E und N". Buster v2403: `style.css`, `objekt-reiter.js`, `help.js`, `marktbericht-view.js` (index.html), `app.js` (marktbericht-app), iframe-Ziel. Frontend-Konstanten neu.
+
+**Commit:** `94a5184f` (v2400, Modul), `49839996` (v2401), `cece6019` (v2402), `b466b0a2` (v2403), `fe33f509` (v2401a).
+
+**Nachweis:**
+- Prüfer: `saat-pruefen --basislinie`, `uk-flaeche-pruefen` (121 Beispiele), `uk-wgfz-pruefen` (106), `rnd-kerne-pruefen`, `score-ketten-pruefen` (216 Punkte), `objekt-mapper-pruefen` alle RC 0; `buster-ebenen-pruefen` SAUBER; `frontend-konstanten --pruefen` aktuell; Gold-Audit auf Staging RC 0; `node --check` je Datei.
+- Funktionsläufe (Arbeitsstand im Container unter `/tmp/pr2401`, echtes Register und echte `mb.wert_parameter`): A Bielefeld 05711000 MFH 2,5 % · A Hüllhorst 05770016 ETW in ZFH 2,4 % · B Kreis Dithmarschen 01051004 EFH 3,4 % „amtlich, große Streuung" · C Ulm 08421000 ZFH 1,1 % „amtlich, geringe Datenbasis (N = 11)" · **N Darmstadt 06411000** EFH RND 40 1,61 %, MFH RND 25 2,96 %, ETW ohne RND 1,86 % (mittlere RND 43), ZFH RND 30 1,52 % · **N Offenbach 06413000** ZFH 1,52 % · **N BW 08115001** EFH 2,07 % · D Darmstadt RND 90 (`rnd_ausserhalb`), Gewerbe (`keine_wohnnutzung`) · D BY 09272116 und MV 13003000 (`land_nicht_besser`) · TH Erfurt direkt `land_nicht_besser` (Median 1,22 gegen 0,70) · **D nur Sperre** NI 03153002, RP 07111000, SN 14511000, BB 12062024 (`register_fuehrt_satz`, Rückfrage `datensatz_unvollstaendig`, Weg zum Ausschuss) · E eigene Angabe 3,1 %.
+- Deckung gemessen über 10.730 Gemeinden (Zensus-AGS): ohne jeden Registersatz HE 2 · BW 1.040 · BY 63 · MV 471; nur Sperren SH 820 · NI 88 · HE 1 · RP 2.300 · BW 13 · BY 1.993 · BB 63 · MV 112 · SN 417 · TH 43. **N wirkt damit heute fast nur in BW** — NW, NI, SN, RP, BB führen überall einen Satz oder eine Sperre.
+- Testobjekte vorher (alter Container, Bericht 310/311) = nachher (neu gebaut, 312/313): **W EW 725.000, LZS 2,5 % A**, SW 526.864 vorläufig, MW 795.000; **H EW 410.000, LZS 2,4 % A**, MW 281.000.
+- Bericht mit N (Prüfbericht 316, W-Daten nach Darmstadt versetzt): LZS 2,95 % N, Herkunft „abgeleitet aus der DealPilot-Formel (N)", Rechenweg im Bericht, Quellennachweis leer, Hinweis „Ertragswert insoweit indikativ". Belastbarkeit am Kern: C 72 / N 67 / D 52. Reiter-Route Darmstadt MFH: N 2,93 % mit RND 21 aus derselben Ableitung.
+
+**Rest:**
+- Browser-Abnahme durch Marcel (Staging): Reiter Objekt an einem BW-Objekt ohne Registersatz (Pille „Stufe N" in Kupfer, Tooltip, Link zum Ausschuss), Marktbericht-Web und PDF (Herkunftszeile, Rechenweg), Verkehrswert-Dropdown „N DealPilot-Formel", Hilfe „Herkunftsstufen A bis E und N".
+- Prüfbericht 316 zeigt einen Darmstädter Bodenwert von 1,73 Mio. € (BORIS, `brw` ohne `brw_manuell` wird nicht übernommen) und deshalb „Gebäudereinertrag null" — kein Befund zu N, aber der Ertragswert-RND dort (21) weicht vom Sachwert-RND (23,6) ab; im Liquidationsfall prüfen.
+- **Behoben in v2401a:** die Reiter-Route fragte mit `property_type` („haus") — Erfurt EFH bekam § 256 mit 4,0 % (MFH-Satz), der Bericht 2,5 %. Jetzt `property_subtype || property_type` wie im Orchestrator; nachgemessen Erfurt EFH D 2,5 %. Offen bleibt der Grundbefund aus v2380: `parameterObjektart` fällt eine unbekannte Art still auf `mfh_bis6`.
+- Ein anderer Strang hat `help.js` nach v2403 erneut geändert (Cockpit-Abschnitte, nicht committet) — dessen Commit braucht einen eigenen Buster über v2403.
+- Prod-Rollout nur nach Freigabe (mb-backend und backend neu bauen, keine Migration).
+
+### v2400 · Zwischenstand Stufe N (DealPilot-Formel Liegenschaftszins) — **erledigt in v2401–v2403** (Eintrag darüber; 19.10.2026)
+
+**Auftrag (Marcel 19.10.2026 freigegeben):** neue Herkunftsstufe **N · DealPilot-Formel** zwischen C und D (D heißt danach nur noch „gesetzlicher Auffangwert § 256 BewG"); UK-Fläche-, WGFZ- und LZS-Formel tragen N; LZS-Formel in der Kaskade vor § 256, nach allen amtlichen Ebenen, nur Wohnen, RND 5–80, nur in Ländern, in denen sie gemessen genauer ist als § 256, nie bei Ausschusswert oder Sperre. Marcel hat pausiert, Stand angehalten.
+
+**Erledigt:**
+- `lib/lzs_naeherung.js` (Commit `94a5184f`): `lzsNaeherung()`, `lzsNaeherungLaender()`, `lzsFamilie()`, `lzsStadt()`. Länder aus `pruefung.je_land` (Formel-Median < § 256-Median): **BB BW HE NI NW RP SN**; TH ST SH MV und ungemessene Länder (BY SL HB HH BE) → nein. Stadt = Stadtstaat oder 8-stellige AGS auf `000` (kreisfreie Stadt; bei 5-stelliger AGS 0). Ohne Wirkung, solange `lzs-naeherung.json` `verdrahtet: false` führt; kein Aufrufer.
+- Funktionslauf: Bielefeld MFH RND 30 → 3,01 % (1,723 + 1,484 + 0,087 × 3 − 0,463); TH und BY → `land_nicht_besser`; Gewerbe → `keine_wohnnutzung`; RND 90 → `rnd_ausserhalb`.
+
+**Offen (nichts davon angefangen, nichts halb geändert):**
+- `lzs-naeherung.json`: `stufe` N, `verdrahtet` true; dasselbe im Erzeuger `tools/lzs-naeherung-ableiten.mjs` (sonst schreibt der nächste Lauf D zurück).
+- `WertParameterService.js`: `RANG` mit N; vor dem letzten § 256-Rückfall die Formel, **nur wenn `regFinde('liegenschaftszinssatz', ags)` leer ist** (Sperre oder Rückfrage → § 256 mit Weg zur Quelle) und kein Registerfehler; `zinsHerkunft()` neue Ebene `dealpilot_formel` (unter A, Etikett „DealPilot-Formel (N), aus 984 amtlichen Zinssätzen abgeleitet, typische Abweichung 0,6 Prozentpunkte", Weg mit Ausschuss-Link wie bei D); `hinweisZurStufe` N; Kopfkommentar.
+- `ErtragswertService.js:714` Abzug N (Vorschlag −25, zwischen C −20 und D −40).
+- `CrossCheckService.js:154` (`_rfArt`) und `:1859` (N nicht in den Quellennachweis).
+- `ReportOrchestrator.js:1636` Tabelle mit N; `:1205`/`:1024` Kommentare.
+- `routes/api.js` Kommentare 602/636/1351; Reiter-Route: bei Stufe N mit `rndJ` neu rechnen (sonst Reiter und Bericht verschieden).
+- `ReportGenerationService.js:523` und `KiGegenrechnungService.js:149`: der KI die Stufe mit Klartext geben, nicht nur den Buchstaben. `ui.js:3108` nur Feldliste, keine Änderung nötig.
+- UK/WGFZ: `uk-naeherung.json`, `uk-wgfz-naeherung.json`, `umrechnung_flaeche.js:418`, `umrechnung_wgfz.js:230` und die beiden Erzeuger (`uk-naeherung-ableiten.mjs:147`, `uk-wgfz-naeherung-ableiten.mjs:182`) auf N.
+- Frontend: `marktbericht-app/app.js` `_stufeTxt` (4538) und `:4617`; `objekt-reiter.js` `STUFEN`, Regex `[A-E]` in `st()`, Klasse für N (CSS `.oe-st.n` in `css/style.css` bei 38747, Farbe zwischen Gold und Rot), `_leiste.zins` (425) und Text 482, `TRAUEN` N, Verweise „Herkunftsstufen A bis E"; `help.js:339/342` N ergänzen, D umformulieren.
+- Buster: `index.html` (objekt-reiter, help, style.css), `marktbericht-app/index.html` (app.js), iframe-Ziel in `marktbericht-view.js`; danach `buster-ebenen-pruefen`.
+- Prüfstrecke komplett (siehe Auftrag): Funktionsläufe A/B/C/N/D/E mit echten AGS, darunter ein Ort ohne Registersatz in NW/NI/HE (→ N), TH (→ D), eine Sperre in einem N-Land (→ D mit Hinweis); W/L/H unverändert (`chk.mjs` im Scratchpad der Sitzung).
+
+**Nächste Schritte:** JSON + Erzeuger → Kaskade + `zinsHerkunft` → Abzug/CrossCheck/Orchestrator → UK/WGFZ auf N → Frontend + Buster → Prüfstrecke → Commits einzeln → Deploy erst nach „Deploy frei" (dann mb-backend neu bauen, Frontend per `git pull`).
 
 ### v2368–v2394 · Geführte Eingabe, Marktbericht-Prüfung, Herkunftsstufen, Videothek mit Sprecher (19.10.2026) + Prod-Rollout (52), (52a)
 

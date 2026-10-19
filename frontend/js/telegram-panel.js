@@ -326,7 +326,7 @@
       var box = document.createElement('div');
       box.id = 'dptg-trennen';
       box.style.cssText = 'margin:10px 0;padding:12px 14px;border-radius:10px;'
-        + 'border:1px solid var(--wl-B8625C,#B8625C);background:rgba(184,98,92,.08);'
+        + 'border:1px solid var(--wl-b8625c,#B8625C);background:rgba(184,98,92,.08);'
         + 'font-size:13px;line-height:1.5';
       box.innerHTML = '<b>Verbindung wirklich trennen?</b><br>'
         + 'Dabei wird auch der <b>Chatverlauf</b> im Bot gelöscht — Adressen, '

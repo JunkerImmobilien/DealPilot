@@ -14805,7 +14805,7 @@ header.hdr {
 .plan-einzel-l { flex: 1 1 auto; min-width: 0; font-size: 13px; }
 .plan-einzel-p {
   flex: 0 0 auto; font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 13px; font-weight: 600; color: var(--wl-C9A84C, #C9A84C);
+  font-size: 13px; font-weight: 600; color: var(--wl-c9a84c, #C9A84C);
 }
 @media (max-width: 520px) {
   .plan-einzel-row { flex-wrap: wrap; }
@@ -37932,7 +37932,7 @@ body.hdr-collapsed .hdr-score-mini span {
    ploetzlich fremdes Gold im Kopf hat. */
 body.hdr-collapsed .hdr-score-mini-green b { color: #5ed992; }
 body.hdr-collapsed .hdr-score-mini-green    { border-color: rgba(63, 165, 108, .40); }
-body.hdr-collapsed .hdr-score-mini-gold  b { color: var(--wl-E8C964, #E8C964); }
+body.hdr-collapsed .hdr-score-mini-gold  b { color: var(--wl-e8c964, #E8C964); }
 /* Gold NICHT als rgba: 201,168,76 ist das Marken-Gold, und als Zahlenwert
    faerbt es sich beim Mandanten nicht um — der Gold-Audit hat genau diese
    eine Zeile gefunden (RC=1), sie war der erste solche Treffer in
@@ -38732,7 +38732,7 @@ table.oe-gewerke td.oe-g { font-weight: 600; white-space: nowrap; }
 table.oe-gewerke td.oe-wg { font: 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); text-align: right; }
 table.oe-gewerke select { width: 100%; min-width: 0; }
 table.oe-gewerke .oe-leer { color: var(--muted2, #9A9390); }
-table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(--wl-C9A84C, #C9A84C); color: var(--muted, #7A7370); }
+table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(--wl-c9a84c, #C9A84C); color: var(--muted, #7A7370); }
 .oe-gew-hint { margin: 2px 0 10px; }
 .oe-auto { border: 1px solid var(--border-g, #e9dcb3); background: var(--karte, #FBF6E9); border-radius: 10px; overflow: hidden; margin-top: 4px; }
 .oe-auto .oe-row { display: grid; grid-template-columns: 1.2fr 0.9fr 1.8fr auto; gap: 8px; align-items: center; padding: 8px 12px; border-top: 1px solid var(--border-g, #e9dcb3); font-size: 12.5px; }
@@ -38743,15 +38743,17 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .oe-auto .oe-q a { color: inherit; text-decoration: underline; }
 .oe-st { display: inline-block; font: 10px "JetBrains Mono", monospace; padding: 1px 6px; border-radius: 4px; border: 1px solid; margin-right: 6px; vertical-align: middle; }
 .oe-st.a { color: #3FA56C; border-color: #3FA56C; }
-.oe-st.b { color: var(--wl-b8932f, #b8932f); border-color: var(--wl-C9A84C, #C9A84C); }
+.oe-st.b { color: var(--wl-b8932f, #b8932f); border-color: var(--wl-c9a84c, #C9A84C); }
 .oe-st.x { color: #B8625C; border-color: #B8625C; }
-.oe-btn { font: 11.5px Inter, system-ui, sans-serif; padding: 4px 9px; border-radius: 6px; border: 1px solid var(--wl-C9A84C, #C9A84C); background: transparent; color: var(--wl-b8932f, #b8932f); cursor: pointer; white-space: nowrap; }
-.oe-btn:hover { background: color-mix(in srgb, var(--wl-C9A84C, #C9A84C) 10%, transparent); }
+/* v2401 · Stufe N (DealPilot-Formel): zwischen Gold (B/C) und Rot (D), Statusfarbe - bewusst nicht tokenisiert */
+.oe-st.n { color: #B87A46; border-color: #B87A46; }
+.oe-btn { font: 11.5px Inter, system-ui, sans-serif; padding: 4px 9px; border-radius: 6px; border: 1px solid var(--wl-c9a84c, #C9A84C); background: transparent; color: var(--wl-b8932f, #b8932f); cursor: pointer; white-space: nowrap; }
+.oe-btn:hover { background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent); }
 .oe-stufen { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
-.oe-stufen .oe-btn.solid { background: linear-gradient(110deg, var(--wl-E8CC7A, #E8CC7A), var(--wl-C9A84C, #C9A84C) 55%, var(--wl-b8932f, #b8932f)); color: #050505; border-color: transparent; font-weight: 600; }
+.oe-stufen .oe-btn.solid { background: linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f)); color: #050505; border-color: transparent; font-weight: 600; }
 .oe-stufen .oe-btn[disabled] { opacity: .5; cursor: not-allowed; }
 .oe-stufen .oe-stufen-hint { font-size: 11.5px; color: var(--muted, #7A7370); flex-basis: 100%; }
-.oe-hint3 { border: 1px dashed var(--wl-C9A84C, #C9A84C); border-radius: 8px; padding: 8px 12px; background: color-mix(in srgb, var(--wl-C9A84C, #C9A84C) 7%, transparent); }
+.oe-hint3 { border: 1px dashed var(--wl-c9a84c, #C9A84C); border-radius: 8px; padding: 8px 12px; background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent); }
 .oe-lage-vergleich { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 2px 0 12px; }
 .oe-lage-vergleich .oe-box { background: var(--creme, #FDFCFA); border: 1px solid var(--border, #E0DBD3); border-radius: 8px; padding: 9px 12px; font-size: 12.5px; }
 .oe-lage-vergleich .oe-box h5 { margin: 0 0 5px; font: 500 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); letter-spacing: .04em; }
@@ -38769,13 +38771,13 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .oe-ziel { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 0 0 6px; }
 .oe-ziel-lbl { font: 500 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); letter-spacing: .04em; margin-right: 4px; }
 .oe-ziel-btn { font: 12px Inter, system-ui, sans-serif; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--border, #E0DBD3); background: transparent; color: var(--text, #2A2727); cursor: pointer; }
-.oe-ziel-btn.on { border-color: var(--wl-C9A84C, #C9A84C); background: color-mix(in srgb, var(--wl-C9A84C, #C9A84C) 14%, transparent); font-weight: 600; }
+.oe-ziel-btn.on { border-color: var(--wl-c9a84c, #C9A84C); background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent); font-weight: 600; }
 .oe-ziel-hint { margin: 0 0 8px; }
 .oe-stufen .oe-btn.oe-unvollstaendig { opacity: .55; border-style: dashed; }
 .oe-fehlt { border: 1px dashed #B8625C; border-radius: 8px; padding: 8px 12px; margin-top: 8px; font-size: 12.5px; background: color-mix(in srgb, #B8625C 6%, transparent); }
 .oe-fehlt b { color: #B8625C; }
 .oe-fehlt .oe-chip { display: inline-block; margin: 3px 4px 0 0; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border, #E0DBD3); background: #fff; cursor: pointer; font-size: 12px; }
-.oe-fehlt .oe-chip:hover { border-color: var(--wl-C9A84C, #C9A84C); }
+.oe-fehlt .oe-chip:hover { border-color: var(--wl-c9a84c, #C9A84C); }
 /* v1972 - die Chip-Regel hing an `.oe-fehlt`. Die acht Modernisierungs-Chips
    der Automatik-Leiste liegen aber in `.oe-chips` innerhalb einer `.oe-q`,
    also NICHT unter diesem Anker - sie waeren unformatiert geblieben. Gemessen
@@ -38784,7 +38786,7 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
    mit gleicher Spezifitaet. */
 .oe-chips { display: inline-block; margin-top: 2px; }
 .oe-chips .oe-chip { display: inline-block; margin: 3px 4px 0 0; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border, #E0DBD3); background: #fff; cursor: pointer; font-size: 12px; }
-.oe-chips .oe-chip:hover { border-color: var(--wl-C9A84C, #C9A84C); }
+.oe-chips .oe-chip:hover { border-color: var(--wl-c9a84c, #C9A84C); }
 /* Leer heisst: hier fehlt die Angabe, die die Anlage 2 braucht. Rot und Gruen
    bleiben in jeder Marke gleich - Statusfarben werden nicht tokenisiert. */
 /* == v1978 - DIE LEEREN CHIPS WAREN NICHT ZU ERKENNEN ================
@@ -38854,7 +38856,7 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .f[data-oe-stufe-min].oe-stufe-aus { display: none !important; }
 
 /* v1852b · Eingabetiefe im Reiterkopf, Übernahme am Verkehrswert */
-.oe-kopf { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 6px 0 14px; padding: 10px 14px; border: 1px solid var(--border-g, #e9dcb3); border-left: 3px solid var(--wl-C9A84C, #C9A84C); border-radius: 10px; background: var(--karte, #FBF6E9); }
+.oe-kopf { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 6px 0 14px; padding: 10px 14px; border: 1px solid var(--border-g, #e9dcb3); border-left: 3px solid var(--wl-c9a84c, #C9A84C); border-radius: 10px; background: var(--karte, #FBF6E9); }
 .oe-kopf .oe-ziel { margin: 0; }
 .oe-kopf .oe-ziel-hint { margin: 0; flex: 1 1 260px; font-size: 12px; }
 .oe-vw { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; font-size: 12px; }
@@ -38866,7 +38868,7 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .oe-ziel-btn small { font-size: 10.5px; color: var(--muted, #7A7370); font-weight: 400; }
 .oe-ziel-btn.on small { color: inherit; }
 .oe-kopf-cb { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
-.oe-kopf-cb input { accent-color: var(--wl-C9A84C, #C9A84C); }
+.oe-kopf-cb input { accent-color: var(--wl-c9a84c, #C9A84C); }
 .oe-karte[data-oe-detail].oe-aus { display: none !important; }
 .oe-karte .card-title { margin-top: 10px; }
 
@@ -38890,7 +38892,7 @@ html body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):n
 /* v1855 · Abruf-Karte unten: drei Kacheln */
 .oe-abruf { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .oe-tile { border: 1px solid var(--border-g, #e9dcb3); border-radius: 10px; padding: 12px 14px; background: var(--karte, #FBF6E9); display: flex; flex-direction: column; gap: 6px; min-height: 150px; }
-.oe-tile.on { border-color: var(--wl-C9A84C, #C9A84C); box-shadow: 0 0 0 2px color-mix(in srgb, var(--wl-C9A84C, #C9A84C) 20%, transparent); }
+.oe-tile.on { border-color: var(--wl-c9a84c, #C9A84C); box-shadow: 0 0 0 2px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 20%, transparent); }
 .oe-tile h4 { margin: 0; font: 600 13.5px "Space Grotesk", Inter, sans-serif; }
 .oe-tile .oe-tile-sub { font-size: 12px; color: var(--muted, #7A7370); flex: 1 1 auto; }
 .oe-tile .oe-tile-meta { font: 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); }
@@ -38915,18 +38917,18 @@ html body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):n
 
 /* v1858 · Abruf als Zeilen im Leisten-Raster; Stufenpillen in der Pre-Flight-Kachel */
 .oe-abruf-box .oe-abruf { display: block; }
-.oe-abruf-zeilen .oe-row.on { background: color-mix(in srgb, var(--wl-C9A84C, #C9A84C) 9%, transparent); }
+.oe-abruf-zeilen .oe-row.on { background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent); }
 .oe-abruf-zeilen .oe-k { font-weight: 600; }
 .dp-pf-stufen { display: inline-flex; gap: 3px; margin-left: 8px; vertical-align: middle; }
 .dp-pf-pille { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(243,234,208,.45); font: 600 10px "JetBrains Mono", monospace; font-style: normal; color: #f3ead0; cursor: pointer; opacity: .75; }
-.dp-pf-pille.on { background: var(--wl-C9A84C, #C9A84C); border-color: var(--wl-C9A84C, #C9A84C); color: #050505; opacity: 1; }
+.dp-pf-pille.on { background: var(--wl-c9a84c, #C9A84C); border-color: var(--wl-c9a84c, #C9A84C); color: #050505; opacity: 1; }
 .dp-pf-pille.fehlt { border-style: dashed; }
-.dp-pf-pille:hover { opacity: 1; border-color: var(--wl-C9A84C, #C9A84C); }
+.dp-pf-pille:hover { opacity: 1; border-color: var(--wl-c9a84c, #C9A84C); }
 
 /* v1858 · Hover-Hilfe an jedem Feld; gelbe i-Knoepfe weichen, wenn sie an ist */
 .dp-feldhilfe-an .dp-tip { display: none !important; }
-.dp-feldhilfe-popup { position: absolute; z-index: 10060; max-width: 360px; background: #050505; color: #f3ead0; border: 1px solid var(--wl-C9A84C, #C9A84C); border-radius: 10px; padding: 10px 12px; font: 12.5px/1.45 Inter, system-ui, sans-serif; box-shadow: 0 12px 32px rgba(0,0,0,.35); pointer-events: none; }
-.dp-feldhilfe-titel { font: 600 13px "Space Grotesk", Inter, sans-serif; color: var(--wl-C9A84C, #C9A84C); margin-bottom: 4px; }
+.dp-feldhilfe-popup { position: absolute; z-index: 10060; max-width: 360px; background: #050505; color: #f3ead0; border: 1px solid var(--wl-c9a84c, #C9A84C); border-radius: 10px; padding: 10px 12px; font: 12.5px/1.45 Inter, system-ui, sans-serif; box-shadow: 0 12px 32px rgba(0,0,0,.35); pointer-events: none; }
+.dp-feldhilfe-titel { font: 600 13px "Space Grotesk", Inter, sans-serif; color: var(--wl-c9a84c, #C9A84C); margin-bottom: 4px; }
 .dp-feldhilfe-par { font: 10px "JetBrains Mono", monospace; color: #c9bfa6; margin-left: 6px; }
 .dp-feldhilfe-body { opacity: .95; }
 .dp-feldhilfe-leer { opacity: .6; font-style: italic; }
@@ -38939,7 +38941,7 @@ html body input[type="checkbox"]:not(.ji-switch input):not(.toggle-slim input):n
 /* v1859 · Kopf-Score: das Wort traegt die Stufenfarbe, nicht Grau (Marcel: „kann man nicht lesen") */
 body.hdr-collapsed .hdr-score-mini span { opacity: 1; font-weight: 600; }
 body.hdr-collapsed .hdr-score-mini-top span, body.hdr-collapsed .hdr-score-mini-green span { color: #5ed992; }
-body.hdr-collapsed .hdr-score-mini-gold span { color: var(--wl-E8C964, #E8C964); }
+body.hdr-collapsed .hdr-score-mini-gold span { color: var(--wl-e8c964, #E8C964); }
 body.hdr-collapsed .hdr-score-mini-red span { color: #e8a09a; }
 .hdr-score-mini span { opacity: 1; }
 .hdr-score-mini-top span, .hdr-score-mini-green span { color: #3FA56C; }
@@ -39063,7 +39065,7 @@ body .sec .cf-phase-sub { color: #8a837c !important; }
 .oe-kopf .oe-abruf-box .card-title { margin: 0 0 4px; font-size: 11px; }
 .oe-kopf .oe-abruf-zeilen { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; border: 0 !important; background: none !important; border-radius: 0; }
 .oe-kopf .oe-abruf-zeilen .oe-row { display: grid !important; grid-template-columns: minmax(0, 1fr) auto !important; grid-template-areas: "k a" "w a" !important; gap: 2px 8px !important; padding: 6px 10px !important; border: 1px solid var(--border-g, #e9dcb3) !important; border-radius: 8px; background: #fff; align-items: center !important; }
-.oe-kopf .oe-abruf-zeilen .oe-row.on { border-color: var(--wl-C9A84C, #C9A84C) !important; background: color-mix(in srgb, var(--wl-C9A84C, #C9A84C) 8%, #fff); }
+.oe-kopf .oe-abruf-zeilen .oe-row.on { border-color: var(--wl-c9a84c, #C9A84C) !important; background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, #fff); }
 .oe-kopf .oe-abruf-zeilen .oe-k { font-size: 12px; padding: 0; }
 .oe-kopf .oe-abruf-zeilen .oe-w { font-size: 11px; padding: 0; display: flex; align-items: center; gap: 6px; }
 .oe-kopf .oe-abruf-zeilen .oe-q-kompakt { display: none; }
@@ -39089,7 +39091,7 @@ body .dp-pf-tile.on .dp-pf-led { background: #3FA56C !important; border-color: #
 .dp-steuer-hinweise .dp-sh-warn { font-weight: 700; color: #B8625C; }
 .dp-steuer-hinweise .dp-sh-txt { color: #5f5955; flex: 1 1 260px; }
 .dp-steuer-hinweise .dp-sh-btn { margin-left: auto; }
-.dp-steuer-hinweise[open] .dp-sh-btn { background: var(--wl-C9A84C, #C9A84C); color: #050505; }
+.dp-steuer-hinweise[open] .dp-sh-btn { background: var(--wl-c9a84c, #C9A84C); color: #050505; }
 .dp-steuer-hinweise[open] > summary { margin-bottom: 10px; }
 body .f.dp-oa-aus { opacity: .62; }
 body .f.dp-oa-aus:hover, body .f.dp-oa-aus:focus-within { opacity: 1; }
@@ -39732,7 +39734,7 @@ header.hdr .hdr-v61-row1 .hdr-mobile-menu.active span:nth-child(3) {
     position: sticky;
     left: 0;
     z-index: 2;
-    background: var(--wl-FBF6E9, #FBF6E9);
+    background: var(--wl-fbf6e9, #FBF6E9);
   }
 }
 

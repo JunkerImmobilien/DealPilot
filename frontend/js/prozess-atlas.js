@@ -76,8 +76,8 @@
           ein: ['Mieten', 'Kosten', 'Marktberichte'], aus: ['Soll/Ist-Abweichung', 'Wertverlauf'],
           ziel: { tab: 's0' }, beleg: 'frontend/js/ankauf-ansicht.js:sollSpeichern' },
         { id: 'be3', s: 2, z: 2, t: 'Portfolio steuern', k: 'Portfolio-Cockpit',
-          d: 'Alle Objekte zusammen: Portfolio Score, Kennzahlen, Kanban, Steuer über alle Objekte, Projektion, Steuer-Mappe und Jahresabschluss.',
-          unter: [['01 Portfolio Score', 'So setzt sich der Score zusammen.'], ['03 Objekte', 'Kanban — Karte antippen zum Aufklappen.'], ['05 Steuer über alle Objekte', ''], ['08 Steuer-Mappe', 'Anlage V · § 21 EStG.'], ['09 Jahresabschluss', 'Bilanz · GuV.']],
+          d: 'Alle Objekte zusammen: Portfolio Score, Kennzahlen, geteilte Objekte, Steuer über alle Objekte, Projektion, Steuer-Mappe und Jahresabschluss.',
+          unter: [['01 Portfolio Score', 'So setzt sich der Score zusammen.'], ['04 Steuer über alle Objekte', ''], ['07 Steuer-Mappe', 'Anlage V · § 21 EStG.'], ['08 Jahresabschluss', 'Bilanz · GuV.']],
           ein: ['alle Objekte'], aus: ['Portfolio Score', 'Gesamt-Projektion', 'Steuer-Mappe'],
           ziel: { aktion: 'cockpit' }, beleg: 'frontend/js/ui.js:setMainView' }
       ],

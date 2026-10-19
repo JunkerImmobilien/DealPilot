@@ -352,7 +352,7 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
    Register (tools/uk-naeherung-ableiten.mjs -> lib/uk-naeherung.json, nach
    jeder Ernte neu). Hamburg fuehrt amtlich genau diese Form (b = -0,2496).
 
-   NIE amtlich: Herkunft „abgeleitet aus der DealPilot-Formel", Stufe D,
+   NIE amtlich: Herkunft „abgeleitet aus der DealPilot-Formel", Stufe N (v2401, vorher D),
    mit Tabellenzahl und typischer Abweichung. Nur Ein-/Zweifamilien-,
    Doppel-, Reihenhaus, nur Zonen mit BEKANNTER Geschosszahl bis II, nur
    0,5- bis 2,5-fache Bezugsgroesse. Wo der Ausschuss etwas anderes sagt
@@ -415,7 +415,7 @@ export function naeherung({ objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm,
   const bwQm = Math.round(brw * k * 100) / 100;
   const de = (x) => String(x).replace('.', ',');
   return {
-    verfuegbar: true, naeherung: true, stufe: d.stufe || 'D',
+    verfuegbar: true, naeherung: true, stufe: d.stufe || 'N',
     quelle_art: 'DealPilot-Formel', quelle: 'DealPilot-Formel', quelle_text: 'abgeleitet aus der DealPilot-Formel',
     bezugsgroesse_qm: bez, bauland_qm: fl, gruen_qm: 0,
     koeffizient_bauland: k, koeffizient_bezugsgroesse: 1, faktor: k,

@@ -32,7 +32,7 @@
      quickcheck-app.html am Browser-Cache vorbeikommt. Das qcpm-Overlay
      (ab Zeile ~348), auf das sich der Nicht-anfassen-Vermerk in
      CLAUDE.md bezieht, ist unberuehrt. */
-  var IFRAME_SRC = 'quickcheck-app.html?v=v2367';
+  var IFRAME_SRC = 'quickcheck-app.html?v=qc-v2420a';
   // qb-buffer: Zwischenspeicher-Pass. Score erreichbar -> Snapshot -> EIN Pass (debounced),
   //   ohne echtes Objekt (object_id NULL). 'Als Objekt speichern' legt erst dann ein Portfolio-Objekt an.
   var _bufState = { code:null, timer:0, lastSig:'', busy:false };
@@ -70,7 +70,18 @@
       if (document.getElementById('qc-bridge-style')) return;
       var st = document.createElement('style');
       st.id = 'qc-bridge-style';
-      st.textContent = 'body.qc-standalone-active #s-quick::before{content:none !important;display:none !important;}';
+      /* qc-v2420 · DER „IST/SOLL-SCHIEBER UNTEN" IM QUICK BOARDING
+         Marcel: „im Quickcheck sind immer noch unten Ist-Soll so ein
+         Schieber. Der soll raus." Gemessen: #ank-ansicht-host (der
+         Umschalter „Ist · heute | Soll · Ankauf-Stand" aus
+         ankauf-ansicht.js) steht in index.html HINTER #s-quick und wird
+         von keinem Modus ausgeblendet. Traegt das zuletzt geladene Objekt
+         einen Ankauf-Stand, liegt er im Quick Boarding direkt unter dem
+         iframe (gemessen y = Unterkante #s-quick, volle Breite, flex).
+         Ein Quick Boarding ist ein neues Objekt - es hat keinen
+         Ankauf-Stand. Ausgeblendet NUR in diesem Modus; im Objekt bleibt er. */
+      st.textContent = 'body.qc-standalone-active #s-quick::before{content:none !important;display:none !important;}'
+        + 'body.qc-standalone-active #ank-ansicht-host{display:none !important;}';
       (document.head || document.documentElement).appendChild(st);
     } catch (e) {}
   })();

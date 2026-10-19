@@ -302,7 +302,7 @@ body::before {
 
 .kpis {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(5, 1fr);   /* qc-v2420: fuenf Score-Groessen */
   gap: 0.4rem;
   padding: 0.8rem 1.5rem 1rem;
   border-top: 1px solid color-mix(in srgb, var(--gold, #C9A84C) 12%, transparent);
@@ -3397,13 +3397,16 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
       </div>
 
       <div class="kpis">
-        <div class="kpi" id="kpi-bmr"><div class="l">Bruttomietr.</div><div class="v">—</div><div class="h">Ziel ≥5%</div></div>
-        <div class="kpi" id="kpi-nmr"><div class="l">Nettomietr.</div><div class="v">—</div><div class="h">Ziel ≥3%</div></div>
-        <div class="kpi" id="kpi-ekr"><div class="l">EK-Rendite</div><div class="v">—</div><div class="h">Ziel ≥7%</div></div>
+        <!-- qc-v2420 · Marcel: nur die Groessen, die der Score wirklich verwendet.
+             DealScore.computeFromKpis liest cf_m, nmy, ltv, dscr und wp_kpi
+             (dealscore.js computeFromKpis) - Brutto-, EK-Rendite und
+             Bewirtschaftungsquote gehen NICHT ein und sind von der Karte
+             genommen. Gerechnet werden sie weiter (score.kpi), nur nicht gezeigt. -->
         <div class="kpi" id="kpi-cf"><div class="l">Cashflow/Mo</div><div class="v">—</div><div class="h">Ziel ≥0€</div></div>
-        <div class="kpi" id="kpi-dscr"><div class="l">DSCR</div><div class="v">—</div><div class="h">Ziel ≥1,2</div></div>
+        <div class="kpi" id="kpi-nmr"><div class="l">Nettomietr.</div><div class="v">—</div><div class="h">Ziel ≥3%</div></div>
         <div class="kpi" id="kpi-ltv"><div class="l">LTV</div><div class="v">—</div><div class="h">Ziel &lt;90%</div></div>
-        <div class="kpi" id="kpi-bwk"><div class="l">Bewirtsch.</div><div class="v">—</div><div class="h">18-35%</div></div>
+        <div class="kpi" id="kpi-dscr"><div class="l">DSCR</div><div class="v">—</div><div class="h">Ziel ≥1,2</div></div>
+        <div class="kpi" id="kpi-wp"><div class="l">Wertpuffer</div><div class="v">—</div><div class="h">Marktwert − KP</div></div>
       </div>
 
 
@@ -3422,7 +3425,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
       <div class="dp-pf-seg"><span class="dp-pf-grouplbl">Marktbewertung</span><div class="dp-pf-row"><!-- v833-chip-order: DealPilot zuerst -->
         <label class="qc7-src dp-pf-tile" data-src="dpmb" title="Marktpreisbewertung">
           <input type="checkbox" value="dpmb" onchange="QcApp.toggleSource(this)" style="display:none">
-          <span class="dp-pf-logo dp">Deal<b>Pilot</b></span><span class="dp-pf-led"></span>
+          <span class="dp-pf-logo dp">Deal<b>Pilot</b></span><span class="dp-pf-stufen qc-dp-stufen" title="Stufe der Marktbewertung: im Quick-Check gilt Stufe 1 (Einfach)" onclick="event.preventDefault();event.stopPropagation()"><!-- qc-v2420: dieselben drei Pillen wie im Tab Objekt (object-actions.js #oab-dp-stufen), hier nur Stufe 1 --><i class="dp-pf-pille on" data-qc-stufe="1" title="Stufe 1 · Einfach — gilt im Quick-Check">1</i><i class="dp-pf-pille qc-stufe-aus" data-qc-stufe="2" aria-disabled="true" title="Stufe 2 · Mittel — im Quick-Check nicht verfügbar – im Tab Objekt">2</i><i class="dp-pf-pille qc-stufe-aus" data-qc-stufe="3" aria-disabled="true" title="Stufe 3 · Ausgiebig — im Quick-Check nicht verfügbar – im Tab Objekt">3</i></span><span class="dp-pf-led"></span>
         </label>
         <label class="qc7-src dp-pf-tile" data-src="spr" title="Sprengnetter">
           <input type="checkbox" value="spr" onchange="QcApp.toggleSource(this)" style="display:none">
@@ -3644,6 +3647,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
       <button class="ltv-btn" data-ltv="85" onclick="QcApp.setLtv(85, this)">85%</button>
       <button class="ltv-btn" data-ltv="80" onclick="QcApp.setLtv(80, this)">80%</button>
     </div>
+    <div class="qc-ltv-satz" id="qc-ltv-satz" style="font:500 11.5px/1.35 'DM Sans',system-ui,sans-serif;color:#6b6660;margin:-4px 2px 10px">Darlehen = 100 % des Kaufpreises · Nebenkosten aus Eigenkapital</div><!-- qc-v2420 -->
     <div class="row row-4">
       <div class="field">
         <label class="req" for="qc_kp">Kaufpreis (€)</label>
@@ -3814,6 +3818,12 @@ window._qcKnkPct = function () {
       if (G2 && G2.rates && bl && isFinite(G2.rates[bl])) grest = Number(G2.rates[bl]);
     }
   } catch (e) {}
+  /* qc-v2420 · die Bausteine festhalten, damit der Satz unter den
+     Beleihungsknoepfen sagen kann, WORAUS die Quote besteht. Gemessen ohne
+     PLZ: 13,77 % = 6,5 GrESt + 1,7 Notar + 0,5 Grundbuch + 3,57 Makler
+     + 1,5 Sonstige - der Makler kommt aus den Einstellungen (Profil). */
+  window._qcKnkTeile = { grest: grest, notar: notar, gb: gb, makler: makler, sonst: sonst,
+    plz: (((document.getElementById('qc_plz') || {}).value || '').trim().length === 5) };
   return Math.round((grest + notar + gb + makler + sonst) * 100) / 100;
 };
 </script>
@@ -4195,31 +4205,76 @@ const QcApp = (function() {
     scheduleUpdate();
   }
 
+  /* qc-v2420 · DIE BELEIHUNGSKNOEPFE HALTEN IHRE QUOTE
+     Marcel: „bei der Beleihung, dass die die falschen Werte ins Eigenkapital
+     schreiben." Die Rechnung des Knopfs selbst war richtig (Darlehen = Quote
+     x Kaufpreis, Nebenkosten aus Eigenkapital - bankueblich). Falsch war:
+       - das EK wurde NUR beim Klick und beim Tippen des Kaufpreises gesetzt.
+         Kam danach die PLZ (Grunderwerbsteuer 6,5 -> z. B. 5,0 %), blieb das
+         alte EK stehen, der Knopf aber markiert - „80 %" war dann keine 80 %.
+       - ein selbst getipptes EK liess den Knopf markiert stehen.
+       - die Karte rechnet den LTV gegen den Marktwert, sobald einer abgerufen
+         ist (deal-kpis.js, svw), der Knopf gegen den Kaufpreis - ohne Hinweis.
+     Jetzt: EIN Weg (_ekNachziehen), gerufen bei jeder Neuberechnung. Er setzt
+     das EK nach der aktiven Quote, solange es von hier stammt (leer oder
+     unser letzter Wert). Ein selbst getipptes oder importiertes EK bleibt -
+     dann ist kein Knopf mehr markiert. Darunter steht, was gerechnet wird. */
+  function _ekAuto(kp) {
+    const knkPct = window._qcKnkPct();   /* v2254: war fest 10,5 */
+    return Math.round(kp * (1 - _ltv / 100) + kp * knkPct / 100);
+  }
+  function _ltvKnoepfe(aktiv) {
+    document.querySelectorAll('.ltv-btn').forEach(b => b.classList.toggle('active', aktiv && Number(b.getAttribute('data-ltv')) === _ltv));
+  }
+  function _ekNachziehen() {
+    const ekInp = document.getElementById('qc_ek');
+    if (!ekInp) return;
+    const kp = QcEngine.num(document.getElementById('qc_kp') ? document.getElementById('qc_kp').value : '');
+    const cur = (ekInp.value || '').trim();
+    const vonHier = ekInp.dataset.userSet !== '1' && (cur === '' || cur === (ekInp.dataset.qcAutoEk || ''));
+    if (vonHier && kp) {
+      const v = String(_ekAuto(kp));
+      if (cur !== v) ekInp.value = v;
+      ekInp.dataset.qcAutoEk = v;
+    }
+    _ltvKnoepfe(vonHier);
+    _ltvSatz(vonHier, kp);
+  }
+  function _pctDe(x) { return String(Math.round(x * 100) / 100).replace('.', ','); }
+  function _ltvSatz(vonHier, kp) {
+    const el = document.getElementById('qc-ltv-satz');
+    if (!el) return;
+    if (!kp) { el.textContent = 'Darlehen = ' + _ltv + ' % des Kaufpreises · Nebenkosten aus Eigenkapital'; el.title = ''; return; }
+    const knk = window._qcKnkPct(), T = window._qcKnkTeile || {};
+    const ek = QcEngine.num(document.getElementById('qc_ek').value) || 0;
+    const darl = Math.max(0, kp * (1 + knk / 100) - ek);
+    const q = darl / kp * 100;
+    let t = vonHier
+      ? 'Darlehen = ' + _ltv + ' % des Kaufpreises · Nebenkosten (' + _pctDe(knk) + ' %) aus Eigenkapital'
+      : 'Eigenkapital frei eingetragen · Darlehen = ' + _pctDe(Math.round(q * 10) / 10) + ' % des Kaufpreises';
+    if (!T.plz) t += ' · ohne PLZ mit 6,5 % Grunderwerbsteuer';
+    el.textContent = t;
+    el.title = 'Kaufnebenkosten ' + _pctDe(knk) + ' % = Grunderwerbsteuer ' + _pctDe(T.grest || 0) + ' % + Notar ' + _pctDe(T.notar || 0)
+      + ' % + Grundbuch ' + _pctDe(T.gb || 0) + ' % + Makler ' + _pctDe(T.makler || 0) + ' % + Sonstige ' + _pctDe(T.sonst || 0)
+      + ' % (Sätze aus deinen Einstellungen, wie im Objekt).'
+      + ' Der LTV auf der Karte bezieht sich auf den Marktwert, sobald einer abgerufen ist.';
+  }
   function setLtv(pct, btnEl) {
     _ltv = pct;
-    document.querySelectorAll('.ltv-btn').forEach(b => b.classList.remove('active'));
-    btnEl.classList.add('active');
-    const inputs = QcEngine.getInputs();
-    const kp = QcEngine.num(inputs.kp);
-    if (kp) {
-      const ekInp = document.getElementById('qc_ek');
-      /* v2230 · der Beleihungsknopf ist eine ausdrückliche Wahl - er setzt
-         das Eigenkapital neu, auch wenn es vorher importiert/gesprochen war
-         (gemessen: 80 % geklickt, EK blieb 32.000 €, Score unverändert) */
-      if (btnEl) delete ekInp.dataset.userSet;
-      if (!ekInp.dataset.userSet) {
-        const knkPct = window._qcKnkPct();   /* v2254: war fest 10,5 */
-        const ekKpPart = kp * (1 - pct / 100);
-        const ekNk = kp * knkPct / 100;
-        ekInp.value = String(Math.round(ekKpPart + ekNk));
-        scheduleUpdate();
-      }
-    }
+    const ekInp = document.getElementById('qc_ek');
+    /* v2230 · der Beleihungsknopf ist eine ausdrückliche Wahl - er setzt
+       das Eigenkapital neu, auch wenn es vorher importiert/gesprochen war
+       (gemessen: 80 % geklickt, EK blieb 32.000 €, Score unverändert).
+       qc-v2420: dazu den Wert leeren, damit _ekNachziehen ihn als eigenen nimmt. */
+    if (btnEl && ekInp) { delete ekInp.dataset.userSet; ekInp.value = ''; }
+    _ekNachziehen();
+    scheduleUpdate();
   }
 
   function scheduleUpdate() { clearTimeout(_updateTimer); _updateTimer = setTimeout(updateAll, 50); }
 
   function updateAll() {
+    try { _ekNachziehen(); } catch (_e) {}   /* qc-v2420: EK folgt KP/PLZ/Nebenkosten, solange es von hier stammt */
     const inputs = QcEngine.getInputs();
     /* v969n: DealPilot Score (V1) im iframe. DealKpis -> computeFromKpis.
        Fallback: QcEngine.computeScore.
@@ -4333,13 +4388,28 @@ const QcApp = (function() {
     });
 
     const k = gated ? {} : (score.kpi || {});
-    setKpi('kpi-bmr',  k.bmr != null ? k.bmr.toString().replace('.', ',') + '%' : null, 'bmr');
+    /* qc-v2420 · nur die fuenf Groessen, die DealScore.computeFromKpis liest
+       (Cashflow, Nettomietrendite, LTV, DSCR, Wertpuffer). Brutto-, EK-Rendite
+       und Bewirtschaftungsquote stehen weiter in score.kpi, aber nicht mehr
+       auf der Karte. */
+    setKpi('kpi-cf',   k.cfMon != null ? (k.cfMon >= 0 ? '+' : '') + k.cfMon.toLocaleString('de-DE') + '€' : null, 'cfMon');
     setKpi('kpi-nmr',  k.nmr != null ? k.nmr.toString().replace('.', ',') + '%' : null, 'nmr');
-    setKpi('kpi-ekr',  k.ekr != null ? k.ekr.toString().replace('.', ',') + '%' : null, 'ekr');
-    setKpi('kpi-cf',   k.cfMon != null ? (k.cfMon >= 0 ? '+' : '') + k.cfMon + '€' : null, 'cfMon');
-    setKpi('kpi-dscr', k.dscr != null ? k.dscr.toString().replace('.', ',') : null, 'dscr');
     setKpi('kpi-ltv',  k.ltvPct != null ? k.ltvPct + '%' : null, 'ltvPct');
-    setKpi('kpi-bwk',  k.bwkPctOfNkm != null ? k.bwkPctOfNkm + '%' : null, 'bwk');
+    setKpi('kpi-dscr', k.dscr != null ? k.dscr.toString().replace('.', ',') : null, 'dscr');
+    /* Wertpuffer = Marktwert - Kaufpreis. Ohne Marktwert (kein Abruf) gibt es
+       keinen - dann ein Strich, keine Null. Der Score nimmt max(0, …); gezeigt
+       wird die echte Differenz, damit ein Kaufpreis UEBER dem Marktwert nicht
+       als „0 €" erscheint. */
+    (function () {
+      const el = document.getElementById('kpi-wp'); if (!el) return;
+      const v = el.querySelector('.v'), h = el.querySelector('.h');
+      el.classList.remove('good', 'mid', 'bad');
+      if (k.wpDiff == null) { v.textContent = '—'; if (h) h.textContent = 'mit Marktwert'; return; }
+      const r = Math.round(k.wpDiff / 100) * 100;
+      v.textContent = (r > 0 ? '+' : r < 0 ? '−' : '') + Math.abs(r).toLocaleString('de-DE') + '€';
+      if (h) h.textContent = 'Marktwert − KP';
+      el.classList.add(r > 0 ? 'good' : r < 0 ? 'bad' : 'mid');
+    })();
 
     /* v1233 · Rechenweg. Die Zahlen kommen ALLE aus score.kpi und den Eingaben —
        hier wird nichts nachgerechnet. Eine zweite Rechnung waere eine zweite
@@ -6830,20 +6900,17 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
 <script id="qc-autoek">
 (function(){
   function _num(x){ return parseFloat(String(x||"").replace(/\./g,"").replace(",",".")) || 0; }
+  /* qc-v2420: das EK setzt jetzt EIN Weg (QcApp._ekNachziehen in updateAll).
+     Hier stand eine zweite Rechnung, die nur beim Tippen des Kaufpreises lief
+     und die PLZ nie sah. Uebrig bleibt der Anstoss zur Neuberechnung. */
   function autoEk(){
-    var kpEl=document.getElementById("qc_kp"), ekEl=document.getElementById("qc_ek");
-    if(!kpEl||!ekEl||ekEl.dataset.userSet==="1") return;
-    var kp=_num(kpEl.value); if(!kp) return;
-    var act=document.querySelector(".ltv-btn.active");
-    var pct=act?parseFloat(act.getAttribute("data-ltv")):100; if(isNaN(pct)) pct=100;
-    ekEl.value=String(Math.round(kp*(1-pct/100)+kp*window._qcKnkPct()/100));   /* v2254 */
     try{ if(window.QcApp&&QcApp.scheduleUpdate) QcApp.scheduleUpdate(); }catch(_){}
   }
   function ready(){
     var kpEl=document.getElementById("qc_kp"), ekEl=document.getElementById("qc_ek");
     if(!kpEl||!ekEl){ setTimeout(ready,200); return; }
     kpEl.addEventListener("input", autoEk);
-    ekEl.addEventListener("input", function(){ ekEl.dataset.userSet="1"; });
+    ekEl.addEventListener("input", function(){ ekEl.dataset.userSet="1"; autoEk(); });   /* qc-v2420: Knopf-Markierung und Satz nachziehen */
     function _clr(e){ var f=e.target&&e.target.closest&&e.target.closest(".field.qc-missing-hl"); if(f) f.classList.remove("qc-missing-hl"); }
     document.addEventListener("input",_clr,true); document.addEventListener("change",_clr,true);
     autoEk();
@@ -6985,9 +7052,8 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 #qb-bp .cb .bar{ flex:1;height:6px;border-radius:99px;background:var(--ctrack);overflow:hidden; }
 #qb-bp .cb .bar i{ display:block;height:100%;border-radius:99px;transition:width .5s cubic-bezier(.2,.7,.2,1); }
 #qb-bp .cb .cv{ font-weight:700;font-size:12px;width:24px;text-align:right; }
-#qb-bp .kt{ display:grid;grid-template-columns:repeat(7,1fr);border-top:1px solid var(--cline); }
-@media(max-width:760px){ #qb-bp .kt{grid-template-columns:repeat(4,1fr)} }
-@media(max-width:460px){ #qb-bp .kt{grid-template-columns:repeat(2,1fr)} }
+#qb-bp .kt{ display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--cline); }   /* qc-v2420: fuenf Score-Groessen */
+@media(max-width:460px){ #qb-bp .kt{grid-template-columns:repeat(3,1fr)} }
 #qb-bp .kt .k{ position:relative;padding:10px 5px;text-align:center;border-left:2px dashed var(--cline); }
 #qb-bp .kt .k:first-child{ border-left:0; }
 #qb-bp .kt .k::before,#qb-bp .kt .k::after{ content:"";position:absolute;left:-6px;width:11px;height:11px;border-radius:50%;background:#050505; }
@@ -7129,8 +7195,9 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   /* v2191: die Teilnoten heissen sub-rendite/-cashflow/-ltv/-risiko/-potenzial (Z. 3320-3352). Hier standen sicherheit/finanzierung/effizienz - drei Balken zeigten immer einen Strich. */
   var CATS=['rendite','cashflow','ltv','risiko','potenzial'];
   var CATL={rendite:'Rendite',cashflow:'Cashflow',ltv:'LTV',risiko:'Risiko',potenzial:'Potenzial'};
-  var KPI=[['kpi-bmr','Bruttomietr.','\u22655%'],['kpi-nmr','Nettomietr.','\u22653%'],['kpi-ekr','EK-Rendite','\u22657%'],
-           ['kpi-cf','Cashflow/Mo','\u22650\u20ac'],['kpi-dscr','DSCR','\u22651,2'],['kpi-ltv','LTV','<90%'],['kpi-bwk','Bewirtsch.','18\u201335%']];
+  /* qc-v2420: nur die fuenf Groessen, die in den Score eingehen (DealScore.computeFromKpis) */
+  var KPI=[['kpi-cf','Cashflow/Mo','\u22650\u20ac'],['kpi-nmr','Nettomietr.','\u22653%'],['kpi-ltv','LTV','<90%'],
+           ['kpi-dscr','DSCR','\u22651,2'],['kpi-wp','Wertpuffer','Marktwert \u2212 KP']];
   function tc(s){return s>=70?'#3FA56C':s>=50?window._qcGold('--gold', '#C9A84C'):'#B8625C';}
   function th(s){return s>=70?'#5BD98E':s>=50?window._qcGold('--gold-hi', '#E8CC7A'):'#D9685F';}
   function tl(s){ /* v1863: dieselbe Kette wie die Haupt-App (hier stand STARK/SOLIDE/SCHWACH bei 70/50) */
@@ -7209,6 +7276,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
       var txt=sv?(sv.textContent||'\u2014'):'\u2014'; var col='';
       try{ if(sv){ var c=getComputedStyle(sv).color; if(c) col='color:'+c; } }catch(e){}
       var hz=(window._qcSwHint&&window._qcSwHint(k[0]))||k[2]; /* v2240: eingestellte Schwelle */
+      if(k[0]==='kpi-wp'){ var sh=src?src.querySelector('.h'):null; if(sh&&sh.textContent) hz=sh.textContent; }   /* qc-v2420 */
       return '<div class="k"><div class="l">'+k[1]+'</div><div class="v" style="'+col+'">'+txt+'</div><div class="h">'+hz+'</div></div>';
     }).join(''); }
     var ht=document.getElementById('qb-htier');
@@ -7336,7 +7404,13 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 /* v969n: DealPilot Score (V1) im QC-iframe. Inputs -> DealKpis (SSoT) -> computeFromKpis = die Karte. */
 (function(){
   'use strict';
-  function n(v){ var x=parseFloat(String(v==null?"":v).replace(",", ".")); return isFinite(x)?x:0; }
+  /* qc-v2420 · DER PARSER LAS „200.000" ALS 200. Gemessen auf Staging:
+     Kaufpreis 200.000, Miete 900 -> Bruttorendite 5.400 %, Darlehen 0,
+     Score 65 - unauffaellig nur, weil die Karte bis zur letzten
+     Pflichtangabe gesperrt ist. Hier stand parseFloat(v.replace(",", ".")),
+     das den Tausenderpunkt als Dezimalpunkt nimmt. Jetzt derselbe Leser wie
+     ueberall im Quick-Check (QcEngine.num: „200.000" = 200000, „3,8" = 3,8). */
+  function n(v){ var x=(typeof QcEngine!=='undefined'&&QcEngine.num)?QcEngine.num(v):parseFloat(String(v==null?"":v).replace(",", ".")); return (x!=null&&isFinite(x))?x:0; }
   function r1(x){ return (x==null)?null:Math.round(x*10)/10; }
   window._dpPilotScore = function(inputs, avm){
     var i = inputs||{};
@@ -7363,7 +7437,11 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
             dscr:(k.dscr!=null)?Math.round(k.dscr*100)/100:null, ltvPct:Math.round(k.ltv),
             bwkPctOfNkm:(bwkPct!=null)?Math.round(bwkPct):null,
             gesamt:Math.round(gesamt), ekValue:Math.round(ek||0),
-            darlehen:Math.round(darlehen), knkPct:Math.round(knk*1000)/10 } };
+            darlehen:Math.round(darlehen), knkPct:Math.round(knk*1000)/10,
+            /* qc-v2420: Wertpuffer wie im Score (mw - kp), nur mit Marktwert;
+               ltvKpPct = Darlehen/Kaufpreis - die Basis der Beleihungsknoepfe */
+            wpDiff:(mw>0)?Math.round(mw-kp):null, ltvBasis:(mw>0)?'marktwert':'kaufpreis',
+            ltvKpPct:Math.round(darlehen/kp*1000)/10 } };
   };
 })();
 </script>
@@ -7371,6 +7449,28 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
        Gestaltung der Datenaufnahme muss hier NOCH EINMAL geladen werden.
        Zuletzt, damit sie die eingebetteten Stile ueberstimmt. -->
   <link rel="stylesheet" href="css/datenaufnahme.css?v=v1954a">
+<!-- qc-v2420 · DIE DEALPILOT-KACHEL MIT DEN DREI STUFEN
+     Marcel: die Kachel soll aussehen wie im Tab Objekt. Dort baut sie
+     object-actions.js (render, #oab-dp-stufen), die Pillen kommen aus
+     objekt-reiter.js (pillenIn) und ihre Gestalt aus style.css - das
+     Stylesheet wirkt hier NICHT (eigenes Dokument). Gemessen in der
+     Haupt-App per getComputedStyle (Kartei „Buetten", helle Leiste):
+       .dp-pf-stufen   flex, gap 3px, margin-left 8px
+       .dp-pf-pille    18x18, rund, 1px #b9b2aa, 600 10px JetBrains Mono, #2A2727
+       .dp-pf-pille.on Gold-Grund, Gold-Rand, #050505
+     Im Quick-Check gilt nur Stufe 1. Stufe 2 und 3 stehen da, damit die
+     Kachel dieselbe ist - ausgegraut, durchgestrichen, mit Tooltip. -->
+<style id="qc-v2420-dp-stufen">
+/* .on und .qc-stufe-aus mit :root body - sonst verlieren sie gegen die
+   helle Kartei-Regel (body.dp-neue-karte …, gemessen: Pille 1 #2A2727
+   statt #050505, Pillen 2/3 opacity 1 statt .45). */
+.dp-pfbar .qc-dp-stufen{ display:inline-flex; gap:3px; margin-left:8px; vertical-align:middle; flex:0 0 auto; }
+.dp-pfbar .qc-dp-stufen .dp-pf-pille{ display:inline-grid; place-items:center; width:18px; height:18px; box-sizing:border-box; border-radius:50%;
+  border:1px solid rgba(243,234,208,.45); font:600 10px/1 "JetBrains Mono",monospace; font-style:normal; color:#f3ead0; opacity:.75; cursor:default; }
+body.dp-neue-karte .dp-pfbar .qc-dp-stufen .dp-pf-pille{ border-color:#b9b2aa; color:#2A2727; opacity:1; }
+:root body .dp-pfbar .qc-dp-stufen .dp-pf-pille.on{ background:var(--wl-c9a84c, #C9A84C); border-color:var(--wl-c9a84c, #C9A84C); color:#050505; opacity:1; }
+:root body .dp-pfbar .qc-dp-stufen .dp-pf-pille.qc-stufe-aus{ opacity:.45; text-decoration:line-through; border-style:dashed; cursor:not-allowed; }
+</style>
 <!-- ── v1665g · DIE KARTEI GILT AUCH HIER — ABER NUR SIE ──────────────
      Marcel: „ImmoMetrica, Expose, Marktbericht — das sieht nicht so aus
      wie im Tab Objekt."

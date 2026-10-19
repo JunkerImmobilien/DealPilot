@@ -64,11 +64,59 @@ window.MietEntwicklung = (function() {
     return _einheiten().some(function (e) { return e && e.mv_in_mietentwicklung; });
   }
 
-  /** Gibt es ueberhaupt Wohnungen mit Haken? */
+  /* v2410 · 19.10.2026 · FREIGABE OHNE STAFFEL-HAKEN.
+     Marcel: „ich habe in Bielefeld in einem MFH die Mietvertraege und
+     Soll-Mieten angegeben, aber leider wurde im Tab Miete das ‚aus
+     Wohnungen' nicht freigegeben."
+
+     GEMESSEN (API, nur gelesen) an Westerfeldstr. 140 Bielefeld: vier
+     Wohnungen, Ist 799/799/799/798, Soll 950/850/880/840, Vertragsart
+     dreimal „unbefristet", einmal leer - und bei KEINER der Haken
+     `mv_in_mietentwicklung`. Hier stand bis v2409:
+
+         return e && e.mv_in_mietentwicklung && _zahl(e.ist) > 0;
+
+     Der Haken steht im Wohnungsfenster aber NUR bei Staffel- und
+     Indexmiete (`#mfh-we-erh-box`). Ein MFH mit gewoehnlichen
+     Vertraegen konnte den Knopf also NIE freischalten - egal, wie
+     vollstaendig Ist und Soll gepflegt waren.
+
+     Jetzt genuegt eine vermietete Wohnung mit Ist-Miete. Wohnungen
+     ohne Staffel bleiben auf ihrer Ist-Miete (keine erfundene
+     Steigerung, v2024), die Soll-Miete greift je Wohnung ab dem Jahr
+     aus dem Konfigurator (`_mieteEinheit`). */
   function einheitenNutzbar() {
     return _einheiten().some(function (e) {
-      return e && e.mv_in_mietentwicklung && _zahl(e.ist) > 0;
+      return e && e.status !== 'leer' && _zahl(e.ist) > 0;
     });
+  }
+  /* v2410 · DAS SOLL-JAHR IST OFT EIN KALENDERJAHR.
+     Das Feld im Konfigurator fragt „Soll-Miete wirkt ab Jahr ... (z. B. 3)"
+     und meint den Index der Mietentwicklung. Gemessen in beiden
+     Bielefelder MFH auf Staging: 2028 und 2027 - Kalenderjahre. Als
+     Index gelesen hiess das „ab Jahr 2028 der Rechnung", also nie: der
+     Sprung lief in keinem Betrachtungszeitraum an, ohne Meldung.
+
+     Ab 1900 gilt der Wert deshalb als Kalenderjahr und wird auf den
+     Index umgerechnet. Index f gehoert zum Kalenderjahr Basisjahr + f
+     (calc.js: Jahr cal = Basis + y - 1 rechnet mit factor(y - 1));
+     das Basisjahr ist dasselbe wie dort (`DealPilotAnteilig.getBaseYear`,
+     sonst das laufende Jahr). */
+  function _basisJahr() {
+    try {
+      if (window.DealPilotAnteilig && typeof DealPilotAnteilig.getBaseYear === 'function') {
+        var by = DealPilotAnteilig.getBaseYear();
+        if (by) return by;
+      }
+    } catch (e) {}
+    return new Date().getFullYear();
+  }
+  function sollJahr() {
+    var d = window._dpMfh;
+    var j = Math.round(Number(d && d.sollAbJahr) || 0);
+    if (!(j > 0)) return null;
+    if (j >= 1900) j = Math.max(1, j - _basisJahr());
+    return j;
   }
   function _zahl(v) {
     var n = parseFloat(String(v == null ? '' : v).replace(',', '.'));
@@ -82,8 +130,25 @@ window.MietEntwicklung = (function() {
     var j = (d.getTime() - Date.now()) / (365.25 * 86400000);
     return j < 0 ? 0 : j;
   }
-  /** Monatsmiete EINER Einheit im Jahr y. */
+  /** Monatsmiete EINER Einheit im Jahr y.
+   *  v2410 - mit Soll-Miete ab dem Soll-Jahr (je Wohnung, nie unter der
+   *  eigenen Staffel) und ohne Leerstand im Ist: dieselbe Summe, die der
+   *  Konfigurator als `nkm` ins Objekt schreibt (summe(): leer zaehlt
+   *  beim Ist nicht, beim Soll mit Rueckfall auf die Ist-Miete). */
   function _mieteEinheit(e, y) {
+    var leer = e.status === 'leer';
+    var lauf = leer ? 0 : _staffelEinheit(e, y);
+    var sj = sollJahr();
+    if (sj != null && y >= sj) {
+      var soll = _zahl(e.soll) || (leer ? _zahl(e.ist) : 0);
+      /* v2422 · Marcel 19.10.2026: ist die Soll-Miete erreicht, laeuft
+         danach die normale Prognose-Steigerung (`mietstg`) weiter - sonst
+         bliebe die Wohnung ab dem Soll-Jahr fuer immer flach. */
+      if (soll > lauf) return soll * Math.pow(1 + _v('mietstg') / 100, y - sj);
+    }
+    return lauf;
+  }
+  function _staffelEinheit(e, y) {
     var basis = _zahl(e.ist);
     if (!basis) return 0;
     if (!e.mv_in_mietentwicklung) return basis;   /* ohne Haken: unveraendert */
@@ -163,7 +228,7 @@ window.MietEntwicklung = (function() {
   function sollSprung() {
     var d = window._dpMfh;
     if (!d || !Array.isArray(d.einheiten) || !d.einheiten.length) return null;
-    var jahr = Math.round(Number(d.sollAbJahr) || 0);
+    var jahr = sollJahr();   /* v2410: Kalenderjahr wird umgerechnet */
     if (!(jahr > 0)) return null;
     function z(v) { if (v == null || String(v).trim() === '') return 0; var n = (typeof window.parseDe === 'function') ? window.parseDe(String(v)) : parseFloat(String(v).replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : 0; }
     var ist = 0, soll = 0;
@@ -177,6 +242,10 @@ window.MietEntwicklung = (function() {
 
   function factor(y) {
     if (y <= 0) return 1.0;
+    /* v2410 - „Aus Wohnungen" rechnet die Soll-Miete JE WOHNUNG selbst
+       (`_mieteEinheit`); der pauschale Sprung kaeme sonst ein zweites
+       Mal obendrauf. */
+    if (getMode() === 'einheiten') return _basisFaktor(y);
     var _s = sollSprung();
     var _auf = (_s && y >= _s.jahr) ? _s.faktor : 1.0;
     if (_auf !== 1.0) return _basisFaktor(y) * _auf;
@@ -219,7 +288,9 @@ window.MietEntwicklung = (function() {
     var alle = _einheiten().filter(function (e) { return _zahl(e.ist) > 0; });
     var mit = alle.filter(function (e) { return e.mv_in_mietentwicklung; });
     var index = mit.filter(function (e) { return e.mv_art === 'index'; });
+    var soll = _einheiten().filter(function (e) { return _zahl(e.soll) > 0; });   /* v2410 */
     return { gesamt: alle.length, mit: mit.length, index: index.length,
+             soll: soll.length, soll_ab: sollJahr(), soll_roh: Math.round(Number(window._dpMfh && window._dpMfh.sollAbJahr) || 0),
              miete_heute: _summeEinheiten(0) };
   }
 
@@ -305,9 +376,10 @@ window.MietEntwicklung = (function() {
       btnE.disabled = !nutzbar;
       if (nutzbar) btnE.style.removeProperty('opacity');
       else btnE.style.setProperty('opacity', '.45', 'important');
+      var _st = nutzbar ? einheitenStand() : null;   /* v2410 */
       btnE.title = nutzbar
-        ? ('Aus den Mietverträgen der einzelnen Wohnungen (' + einheitenStand().mit + ' mit Staffel)')
-        : 'Keine Wohnung ist für die Mietentwicklung angehakt — im MFH-Konfigurator je Wohnung setzen.';
+        ? ('Aus den Mietverträgen der einzelnen Wohnungen (' + _st.mit + ' mit Staffel, ' + _st.soll + ' mit Soll-Miete)')
+        : 'Noch keine vermietete Wohnung mit Ist-Miete — im MFH-Konfigurator je Wohnung eintragen.';
     }
     if (blkP && blkD) {
       blkP.style.display = mode === 'prog' ? '' : 'none';
@@ -357,12 +429,17 @@ window.MietEntwicklung = (function() {
        erreicht ihn nicht. */
     if (getMode() === 'einheiten') {
       var st = einheitenStand();
-      var kopf = '<div class="me-herkunft">Gerechnet aus <b>' + st.mit + '</b> von ' + st.gesamt
-        + ' Wohnungen mit hinterlegtem Mietvertrag.'
+      /* v2410 - die Soll-Miete steht mit dabei, sonst sagt der Kopf
+         „bleiben auf ihrer Ist-Miete", waehrend die Tabelle ab dem
+         Soll-Jahr springt. */
+      var kopf = '<div class="me-herkunft">Gerechnet aus ' + st.gesamt + ' Wohnungen, <b>' + st.mit
+        + '</b> davon mit Staffel- oder Indexvertrag.'
         + (st.gesamt > st.mit
             ? ' Die \u00fcbrigen ' + (st.gesamt - st.mit) + ' bleiben auf ihrer Ist-Miete \u2014 f\u00fcr sie'
-              + ' wird <b>keine</b> Steigerung angenommen.'
+              + ' wird <b>keine</b> Steigerung angenommen' + (st.soll && st.soll_ab ? ', bis ihre Soll-Miete greift' : '') + '.'
             : '')
+        + (st.soll && st.soll_ab ? (st.soll_roh >= 1900 ? ' Ab ' + st.soll_roh : ' Ab Jahr ' + st.soll_ab) + ' gilt je Wohnung die <b>Soll-Miete</b> (' + st.soll + ' Wohnungen).' : '')
+        + (st.soll && !st.soll_ab ? ' Soll-Mieten sind erfasst, aber ohne Jahr \u2014 sie gehen noch nicht ein (Konfigurator, Schritt 4).' : '')
         + '</div>';
       if (st.index > 0) {
         kopf += '<div class="me-herkunft me-herkunft-annahme">\u26a0 <b>' + st.index
@@ -493,7 +570,8 @@ window.MietEntwicklung = (function() {
     /* v2024 - fuer die Oberflaeche: wie viele Wohnungen zaehlen mit?
        Ohne diese Zeile waere der dritte Modus gebaut und unerreichbar. */
     einheitenStand: einheitenStand,
-    einheitenNutzbar: einheitenNutzbar
+    einheitenNutzbar: einheitenNutzbar,
+    sollJahr: sollJahr   /* v2410 */
   };
 })();
 
