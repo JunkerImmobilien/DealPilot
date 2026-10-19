@@ -624,7 +624,7 @@
       ['DSCR', function (k) { return kz[k].dscr != null ? dez(kz[k].dscr, 2) : '—'; }],
       ['Maßnahmenkosten', function (k) { return kz[k].kosten ? eur(kz[k].kosten) : '—'; }],
       ['Restnutzungsdauer', function (k) { return H[k] && H[k].rnd != null ? dez(H[k].rnd, 0) + ' J.' : '—'; }],
-      ['Ertragswert (Haus als Ganzes)', function (k) { return H[k] && H[k].wert != null ? eur(H[k].wert) : '—'; }]
+      [m.art === 'mfh' ? 'Ertragswert (Haus als Ganzes)' : 'Ertragswert', function (k) { return H[k] && H[k].wert != null ? eur(H[k].wert) : '—'; }]
     ].map(function (z) { return [z[0]].concat(d.spalten.map(z[1])); });
     if (r && r.verfuegbar && r.aufteilung && r.aufteilung.je_stufe && r.aufteilung.je_stufe.bestand) {
       var n = m.wohnungen.filter(function (w) { return w.art !== 'gewerbe'; }).length;
@@ -685,7 +685,9 @@
       '.dp-zb-chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}',
       '.dp-zb-chip{font:500 12px Inter,sans-serif;border:1px solid #E6DCC2;border-radius:999px;padding:4px 10px;background:#fff;color:#2A2727;cursor:pointer}',
       '.dp-zb-chip em{font-style:normal;color:#6c6450;margin-left:2px}',
-      '.dp-zb-chip.on{border-color:#2f7d55;color:#2f7d55;background:color-mix(in srgb,#2f7d55 7%,#fff)}',
+      /* v2430b: style.css faerbt Knoepfe in Karten golden (gemessen: Rahmen Gold 30 %, Grund weiss) -
+         der gewaehlte Chip war vom freien nicht zu unterscheiden. Darum mit Anker und !important. */
+      '#zb-karte .dp-zb-chip.on,#mfh-we-ov .dp-zb-chip.on,.dp-zb-chip.on{border-color:#2f7d55 !important;color:#2f7d55 !important;background:color-mix(in srgb,#2f7d55 9%,#fff) !important;font-weight:600 !important}',
       '.dp-zb-chip:focus-visible{outline:2px solid var(--wl-c9a84c, #C9A84C);outline-offset:2px}',
       '.dp-zb-mz{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end;padding:6px 0;border-bottom:1px dashed #E6DCC2;font-size:12.5px}',
       '.dp-zb-mz .dp-zb-mt{font-weight:600;min-width:110px}',
@@ -729,6 +731,9 @@
   var _objListe = null;
   function objektKarte() {
     var karte = el('zb-karte'); if (!karte) return;
+    /* v2430b · die Gemeinde gleich holen (Leseroute, kein Kontingent) - sonst
+       stand bis zum ersten Rechnen „20 %, Gemeinde noch nicht ermittelt". */
+    if (!agsJetzt() && wert('plz')) agsHolen().then(function (a) { if (a) { try { objektSumme(); } catch (e) {} } });
     var mfh = artMitEinheiten() && window._dpMfh && Array.isArray(window._dpMfh.einheiten) && window._dpMfh.einheiten.length;
     var sumHost = el('zb-mfh-summe'), einzel = el('zb-einzel');
     if (mfh) {
