@@ -5857,6 +5857,11 @@
        nicht: welche Felder es sind, steht in der Frage selbst. */
     if (e.tiefe && e.bereich) return e.bereich;
     if (e.kurz) return e.kurz;   /* v2364 · Nachfrage nach der Art (_rfArtNachziehen) */
+    /* v2395 · Beim Haus (MFH, EFH ...) heisst der Block nicht „Hausgeld" - gefragt
+       werden dort die Bewirtschaftungskosten (Befund Modul-25-Aufnahme). */
+    if (e.ids.indexOf('hg_ul') >= 0) {
+      try { if (!/etw|wohnung/i.test(String(_rfFeld('objart') || ''))) return 'Bewirtschaftung'; } catch (x) {}
+    }
     for (var i = 0; i < e.ids.length; i++) { if (RF_KURZ[e.ids[i]]) return RF_KURZ[e.ids[i]]; }
     return String(e.frage).split(/[?,–—]/)[0].slice(0, 22);
   }
@@ -8673,7 +8678,7 @@
       var herkunft = 'BORIS' + (r.stichtag ? ' ' + r.stichtag : '') + (r.zone ? ' · Zone ' + r.zone : '') +
                      ((_rf && _rf.zentrum) ? ' · Ortszentrum (Näherung)' : '');
       _rfSetzen('brw', String(r.wert).replace('.', ','), herkunft, { konflikt: true });
-      _rfBlase('co', '<b>' + escH(String(r.wert).replace('.', ',')) + ' €/m²</b> — amtlicher Bodenrichtwert. ' +
+      _rfBlase('co', '<b>' + escH(Number(r.wert).toLocaleString('de-DE')) + ' €/m²</b> — amtlicher Bodenrichtwert. ' +   /* v2395: Tausenderpunkt */
         '<span style="opacity:.7">' + escH(herkunft) + '</span>' +
         '<div class="vi-rf-zaehler">Herkunft steht in der Übersicht — nicht „Sprachaufzeichnung".</div>');
       _rfStandZeichnen();
@@ -10845,6 +10850,9 @@
        die auch übernommen werden — eine Herkunft ohne Wert ist eine
        Behauptung über ein leeres Feld. */
     try { _herkunftMerken(_rf.quelle, _rf.data && _rf.data.fields); } catch (e) {}
+    /* v2395 · getippte wie gesprochene Antworten heissen in der Uebersicht nach
+       ihrem Weg - nicht pauschal „Sprachaufzeichnung" */
+    try { if (_rf.data) _rf.data._weg = 'gefuehrt'; } catch (e) {}
     showResults(_rf.OA, _rf.data, _rf.catalog);
     _rf = null;
   }
@@ -12544,7 +12552,7 @@
   function showResults(OA, data, catalog) {
     var fields = (data && data.fields) || {};
     var unsicher = (data && data.unsicher) || [];
-    var S = 'Sprachaufzeichnung';
+    var S = (data && data._weg === 'gefuehrt') ? 'Geführte Eingabe' : 'Sprachaufzeichnung';   /* v2395 */
     /* v1288: Was der Co-Pilot SELBST geholt hat, traegt seine eigene
        Herkunft — BORIS mit Stichtag, Marktpreisindikation, Einstellungen.
        Eine abgerufene Zahl als „Sprachaufzeichnung" auszuweisen waere
