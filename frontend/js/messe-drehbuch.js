@@ -1490,6 +1490,13 @@
           }).catch(function () {});
           return pm;
         }
+        /* v2373a · ... und die Geokodierung vor dem Bodenrichtwert (Fürth): einmal echt, dann als
+           DPM_REIHE_DATEN.gefuehrt25geo gespielt (_rh.geo, wie Modul 24). BORIS selbst ist ein freies GET. */
+        if (_rh.mitschnitt && m === 'GET' && /\/marktbericht\/geocode$/.test(pfad)) {
+          var pg = echt.apply(this, arguments);
+          pg.then(function (r) { return r.clone().json(); }).then(function (j) { DPM_REIHE.mitschnittGeo = j; }).catch(function () {});
+          return pg;
+        }
       }
       if (m !== 'GET' && RH_SPERRE.test(kurz) && ((lauf && _rh) || Date.now() < _rhNachlauf)) {
         DPM_REIHE.gesperrt.push(m + ' ' + pfad);
@@ -4820,48 +4827,58 @@
      Mikrofon ist ohnehin ein stummer Strom. Das angelegte Objekt löscht
      rhAufraeumen, wie in 03-05. Jeder Antwortschritt steht in DPM_REIHE.r25.
 
-     v2373 · NEUES BEISPIEL (Marcel 19.10.2026): ein Mehrfamilienhaus, das am Ende
-     im Reiter Bewertung mit Deal Score SOLIDE und Investor Deal Score GUT steht -
-     sichtbar „wandert" es von der einen Stufe zur anderen. Die Eingaben sind VORAB
-     mit den echten Kernen gerechnet (node + vm: deal-kpis.js DealKpis.compute,
-     dealscore.js computeFromKpis, dealscore2.js compute, score-tiers.js; beide Wege
-     - Zwischenstand im Chat wie voice-import _rfKennzahlen/_rfScore1/_rfScore2 und
-     Reiter Bewertung wie _buildDeal2FromState; Profil: Nebenkosten 12,27 %,
-     Mietausfall 1 %, Gewichte ab Werk):
-       6 WE, 420 m², Bj 1972, 3 VG, KP 590.000, NKM 3.150/Mon, BWK 17.500/J davon
-       8.500 nicht umlagefähig, EK 150.000, 3,6 % / 2 % / 10 J, Mietsteigerung 2 %,
-       Zustand gut, Energie D, B-Lage, Straße gut, Mietausfall niedrig, Bevölkerung
-       wachsend, Nachfrage stark, Wertsteigerung mittel, eine starke Entwicklungs-
-       möglichkeit (Dachgeschoss)
-       -> Cashflow v. St. +19 €/Mon, NMR 4,4 %, LTV 86,8 %, DSCR 1,32
-       -> Deal Score 64 SOLIDE (Cashflow 55, Rendite 79, LTV 58, DSCR 88, Potenzial 40)
-       -> Investor Deal Score 75 GUT (Rendite 54, Finanzierung 95, Risiko 88, Lage 77, Upside 69)
-     Empfindlichkeit gerechnet: Mietsteigerung 1,5 % statt 2 % -> 62/74, Energie E,
-     Zustand normal oder Bevölkerung stabil je -> DS2 74, Entwicklung begrenzt -> 73;
-     der eigene Teil 9.000 statt 8.500 -> 60/73; die drei schlechtesten Lesarten
-     zusammen -> 62/72. Im Bild steht immer, was die App rechnet
-     (Regel 1) - die Rechnung oben ist die Wahl der Eingaben, nicht der Text.
+     v2373a · NEUES BEISPIEL (Marcel 19.10.2026): ein Mehrfamilienhaus in FÜRTH, das am
+     Ende im Reiter Bewertung mit Deal Score SOLIDE und Investor Deal Score GUT steht -
+     sichtbar „wandert" es von der einen Stufe zur anderen. Erst Herford (v2373), dann
+     Nürnberg verworfen: Fürther Str. 112 liegt in BORIS-Zone 262239, deren Wert in
+     Bayern gebührenpflichtig ist (reason wert_gebuehrenpflichtig) - Marcel will den
+     Bodenrichtwert-Abruf im Video ZEIGEN. Gemessen am Staging-Endpunkt
+     /api/v1/marktbericht/boris?land=BY: Dambacher Straße (Fürth-Südstadt, Straßenpunkt
+     49,46616 / 10,98334 - borisHolen geokodiert OHNE Hausnummer) -> 1.150 €/m²,
+     Wohnbaufläche, Zone 522, Stichtag 01.01.2026.
+     Die Eingaben sind VORAB mit den echten Kernen gerechnet (node + vm: deal-kpis.js
+     DealKpis.compute, dealscore.js computeFromKpis, dealscore2.js compute,
+     score-tiers.js; beide Wege - Zwischenstand im Chat wie voice-import
+     _rfKennzahlen/_rfScore1/_rfScore2 und Reiter Bewertung wie _buildDeal2FromState;
+     Profil: Makler 3,57 + Notar 1,7 + Grundbuch 0,5 + GrESt 3,5 (Bayern, die App nimmt
+     sie über DealPilotGrest.forPlz aus der PLZ) = 9,27 %, Mietausfall 1 %, Gewichte ab Werk):
+       6 WE, 420 m², Bj 1970, 3 VG, KP 1.000.000 (2.381 €/m²), NKM 4.410/Mon (10,50 €/m²)
+       + 360 für sechs Stellplätze, BWK 22.000/J davon 10.500 nicht umlagefähig,
+       EK 200.000, 3,6 % / 1,5 % / 10 J, Mietsteigerung 2,5 %, Wertsteigerung 2 %,
+       Leerstand 1 %, Zustand gut, Energie C, B-Lage, Region und Straße gut, Mietausfall
+       niedrig, Bevölkerung wachsend, Nachfrage sehr stark, Wertsteigerung hoch, eine
+       starke Entwicklungsmöglichkeit (Dachgeschoss), Grundstück 600 m²
+       -> Cashflow v. St. +57 €/Mon, NMR 4,2 %, Bruttorendite 5,7 %, LTV 89,3 %, DSCR 1,26
+       -> Deal Score 64 SOLIDE (Cashflow 64, Rendite 74, LTV 52, DSCR 84, Potenzial 40)
+       -> Investor Deal Score 75 (Reiter) / 76 (Chat) GUT (Rendite 52, Finanzierung 91,
+          Risiko 91, Lage 83, Upside 80)
+     Empfindlichkeit gerechnet: Mietsteigerung 1,5 % -> 63/75; Wertsteigerung mittel oder
+     Entwicklung begrenzt -> DS2 74; alle drei zusammen -> 64/73; eigener Teil 11.000 ->
+     61/75; Miete 4.300 -> 55/72; GrESt 6,5 statt 3,5 -> 52/72. KIPPT: Tilgung 2 % statt
+     1,5 % -> 44/68, ohne die Stellplätze -> 40/66 - beide Auslesen im Mitschnitt prüfen.
+     Im Bild steht immer, was die App rechnet (Regel 1) - die Rechnung oben ist die Wahl
+     der Eingaben, nicht der Text.
      Der Mitschnitt gefuehrt25 muss zu DIESEN Antworttexten passen (Schlüssel = Text):
      nach jeder Änderung hier ?messe=reihe-gefuehrt&mitschnitt=25 neu laufen lassen. */
   var R25 = {
-    adresse: 'Sachsenstraße 20, 32052 Herford',
+    adresse: 'Dambacher Straße 60, 90763 Fürth',
     art: 'Mehrfamilienhaus, 420 Quadratmeter Wohnfläche',
     details: '6 Wohneinheiten, 3 Vollgeschosse',
-    bjkp: 'Baujahr 1972, Kaufpreis 590.000 Euro',
-    miete: '3.150 Euro kalt im Monat',
-    fin: '150.000 Euro Eigenkapital, 3,6 Prozent Zins, 2 Prozent Tilgung, 10 Jahre fest',
+    bjkp: 'Baujahr 1970, Kaufpreis 1.000.000 Euro',
+    miete: '4.410 Euro kalt im Monat, dazu 360 Euro für sechs Stellplätze',
+    fin: '200.000 Euro Eigenkapital, 3,6 Prozent Zins, 1,5 Prozent Tilgung, 10 Jahre fest',
     einst: 'Übernimm die Werte aus den Einstellungen',
     klasse: 'B-Lage',
-    lage: 'Region durchschnittlich, Straße gut',
-    zustand: 'Guter Zustand, Energieklasse D',
+    lage: 'Region gut, Straße gut',
+    zustand: 'Guter Zustand, Energieklasse C',
     san: 'Keine Sanierung, nichts wird mitverkauft',
-    grund: '780 Quadratmeter, kein Erbbaurecht',
-    bwk: '17.500 Euro im Jahr, davon 8.500 nicht umlagefähig',
-    langfrist: 'Mietsteigerung 2 Prozent, Wertsteigerung 1,5 Prozent, Leerstand 2 Prozent',
+    grund: '600 Quadratmeter, kein Erbbaurecht',
+    bwk: '22.000 Euro im Jahr, davon 10.500 nicht umlagefähig',
+    langfrist: 'Mietsteigerung 2,5 Prozent, Wertsteigerung 2 Prozent, Leerstand 1 Prozent',
     ausfall: 'Niedrig',
-    ort: 'Bevölkerung wachsend, Nachfrage stark, Wertsteigerung mittel, eine starke Entwicklungsmöglichkeit: das Dachgeschoss',
+    ort: 'Bevölkerung wachsend, Nachfrage sehr stark, Wertsteigerung hoch, eine starke Entwicklungsmöglichkeit: das Dachgeschoss',
     weissNicht: 'Weiß ich nicht',
-    sicht: 'Sechs Wohnungen verteilen das Mietrisiko, Risiko ist das Dach von 1972'
+    sicht: 'Sechs Wohnungen verteilen das Mietrisiko, Risiko ist das Dach von 1970'
   };
   /* v2373 · v2369 stellt das Abruf-Angebot (Marktpreisindikation, Bodenrichtwert,
      Lage) als Auswahl-Blase IN DEN CHAT (.vi-rf-abruf, Knöpfe .vi-rf-abruf-b[data-akt]).
@@ -4937,6 +4954,8 @@
         await rhStart(0);
         _rh.gef25 = 1; _rh.stumm = 1; _r25AbrufGesagt = 0;
         try { _rh.mitschnitt = new URLSearchParams(location.search).get('mitschnitt') === '25'; } catch (e) {}
+        /* v2373a · Geokodierung für den Bodenrichtwert-Abruf aus dem Mitschnitt (nie im Mitschnitt-Lauf selbst) */
+        if (!_rh.mitschnitt && window.DPM_REIHE_DATEN && DPM_REIHE_DATEN.gefuehrt25geo) _rh.geo = JSON.parse(JSON.stringify(DPM_REIHE_DATEN.gefuehrt25geo));
         try { DealPilotObjektReiter.zielSetzen(1); } catch (e) {}
         await zeige(function () { return q('#oab-bar'); }, 8);
         await b2oZeile(s, 'Ein neues Objekt', 'Leer angelegt. Oben im Reiter Objekt die Datenaufnahme — einer der Wege ist die <b>' + rhNameKachel('gefuehrt') + '</b>.');
@@ -5020,6 +5039,26 @@
         await r25Antwort(R25.lage);
         await r6Ende(zb);
         await r25Reihe([R25.zustand, R25.san]);
+        /* v2373a · Marcel: der Bodenrichtwert-Abruf wird GEZEIGT (frei, BORIS Bayern liefert in
+           Fürth den Wert). Gewählt wird nur der Knopf data-akt="brw"; Markt und Lage bleiben
+           übersprungen (r25AbrufWeg). Ergebnis und Fehler stehen in DPM_REIHE.r25brw. */
+        var bk = function () { var b = r25AbrufBlase(), k = b && b.querySelector('.vi-rf-abruf-b[data-akt="brw"]'); return k && k.offsetWidth ? k : null; };
+        await warteAuf(bk, 5000);
+        if (bk()) {
+          var kl = ((bk().firstChild && bk().firstChild.nodeType === 3 ? bk().firstChild.textContent : bk().textContent) || '').trim();
+          await zeige(r25AbrufBlase, 8);
+          await b2oZeile(s, 'Der Bodenrichtwert', 'Beim Grundstück bietet DealPilot den amtlichen Bodenrichtwert an — aus BORIS, ohne Kosten. Ein Klick auf <b>„' + kl + '“</b>.');
+          var bkn = bk(); if (bkn) bkn.click();
+          var bw = function () { var e = rhIm('#vi-rf-chat', /amtlicher Bodenrichtwert/); return e && e.closest('.vi-rf-blase'); };
+          var bf = function () { var e = rhIm('#vi-rf-chat', /Abruf (hat nichts geliefert|ist fehlgeschlagen)/); return e && e.closest('.vi-rf-blase'); };
+          await warteAuf(function () { return bw() || bf(); }, 15000);
+          var bt = (bw() || {}).textContent || '', bm = /([\d.,]+)\s*€\/m²/.exec(bt), bh = /(BORIS[^\n]*?)(?:Herkunft|$)/.exec(bt.replace(/\s+/g, ' '));
+          DPM_REIHE.r25brw = { ok: !!bw(), text: (bw() || bf() || {}).textContent ? String((bw() || bf()).textContent).replace(/\s+/g, ' ').slice(0, 160) : null };
+          if (bw()) {
+            await zeige(bw, 8);
+            await b2oZeile(s, 'Amtlich, mit Herkunft', (bm ? '<b>' + bm[1] + ' €/m²</b>' : 'Der Bodenrichtwert') + (bh ? ' — ' + bh[1].trim() : '') + '. Den Wert holt DealPilot, die Fläche sagst du.');
+          }
+        }
         await zeige(r25Bereich, 6);
         await r25Antwort(R25.grund);
       },
