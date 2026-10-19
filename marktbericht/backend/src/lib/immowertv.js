@@ -255,8 +255,15 @@ export function lzsNach256(objektart, brwSqm = null, anzahlWe = null) {
     + `(${R.verkehrswert.norm}). `
     + `Fuer die ${R.erbschaft.zweck} gilt stattdessen ${R.erbschaft.norm}: `
     + `${R.erbschaft.zusatz}. `
-    + 'Weil der Satz unter dem oertlichen Liegenschaftszinssatz liegt, faellt '
-    + 'der Ertragswert mit ihm eher hoch aus.';
+    /* v2396 · Hier stand „Weil der Satz unter dem oertlichen
+       Liegenschaftszinssatz liegt, faellt der Ertragswert mit ihm eher hoch
+       aus." Gemessen am 19.10.2026 gegen die amtlichen Registersaetze liegt
+       § 256 im Median 0,7 bis 0,9 Prozentpunkte DARUEBER — der Ertragswert
+       faellt mit ihm also eher zu NIEDRIG aus. Der Satz behauptete die
+       Richtung, die es nicht ist. */
+    + 'Der Satz liegt in der Regel ueber dem oertlichen Liegenschaftszinssatz '
+    + '(gemessen im Median 0,7 bis 0,9 Prozentpunkte), der Ertragswert faellt '
+    + 'mit ihm deshalb eher zu niedrig aus.';
 
   const brw = Number(brwSqm);
   if (istEfh && Number.isFinite(brw) && brw > 500) {
