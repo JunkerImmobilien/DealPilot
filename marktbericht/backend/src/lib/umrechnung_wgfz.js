@@ -158,7 +158,8 @@ export function wgfzAnpassung({ ags, objektart, brw_eur_qm, wgfz_zone, wgfz_obje
       bodenwert_eur_qm: bw, weg: 'Tabelle (Objekt-WGFZ × Richtwert-WGFZ)', quelle,
       hinweis: 'Umrechnung nach der wertrelevanten Geschossflächenzahl (§ 16 Abs. 4, § 40 ImmoWertV) mit der Tabelle des '
         + (s.ausschuss || s.gaa_name || 'Gutachterausschusses') + (s.seite ? ' (' + s.seite + ')' : '') + ': Faktor ' + de(fm)
-        + ' für WGFZ ' + de(wo) + ' bei Richtwert-WGFZ ' + de(wz) + (brw > 0 ? ' → ' + de(bw) + ' €/m²' : '') + '.' };
+        + ' für WGFZ ' + de(wo) + ' bei Richtwert-WGFZ ' + de(wz) + (brw > 0 ? ' → ' + de(bw) + ' €/m²' : '') + '.'
+        + (s.bericht_hinweis ? ' ' + s.bericht_hinweis : '') };
   }
   const kz = koeffizientFuer(s.formel, brw, wz), ko = koeffizientFuer(s.formel, brw, wo);
   if (kz.k == null || ko.k == null) {
@@ -183,7 +184,9 @@ export function wgfzAnpassung({ ags, objektart, brw_eur_qm, wgfz_zone, wgfz_obje
     hinweis: 'Umrechnung nach der wertrelevanten Geschossflächenzahl (§ 16 Abs. 4, § 40 ImmoWertV) mit den '
       + 'Umrechnungskoeffizienten des ' + (s.ausschuss || s.gaa_name || 'Gutachterausschusses') + (s.seite ? ' (' + s.seite + ')' : '') + ': '
       + de(brw) + ' €/m² × ' + fx(ko.k) + ' / ' + fx(kz.k) + (begrenzt ? ' (begrenzt auf ' + de(faktor) + ')' : '')
-      + ' = ' + de(bwQm) + ' €/m² (WGFZ Objekt ' + de(wo) + ', Richtwertgrundstück ' + de(wz) + ').',
+      + ' = ' + de(bwQm) + ' €/m² (WGFZ Objekt ' + de(wo) + ', Richtwertgrundstück ' + de(wz) + ').'
+      /* v2378 · abgedruckte und angewandte Tabellen: der Verweis steht darunter (Marcel 19.10.) */
+      + (s.bericht_hinweis ? ' ' + s.bericht_hinweis : ''),
   };
 }
 

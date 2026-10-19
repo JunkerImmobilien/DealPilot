@@ -7468,7 +7468,8 @@
        und es ist danach weg. Dann haben wir mehr Platz fuer den Chat." */
     var _holAkt = akt.filter(function (a) { return a.art === 'markt' || a.art === 'markt2' || a.art === 'brw' || a.art === 'lage'; });
     try { _rfAbrufImChat(_holAkt); } catch (x) {}
-    akt = akt.filter(function (a) { return _holAkt.indexOf(a) < 0; });
+    /* v2378 · „Erklär mir das" steht an der Frage im Chat, nicht in der Leiste. */
+    akt = akt.filter(function (a) { return _holAkt.indexOf(a) < 0 && a.art !== 'erklaer'; });
 
     /* Die Frage steht immer da — auch ohne Angebot. Wer nach einer langen
        Auskunft wieder hinsieht, muss nicht nach oben scrollen, um zu
@@ -7632,6 +7633,32 @@
       b.addEventListener('focus', zeig);
     });
   }
+  /* v2378 · Klickweg der Erklaer-Knoepfe in der Frageblase - EIN Zuhoerer am
+     Dokument, nur fuer die aktuelle Frage (alte Blasen sind Verlauf). */
+  var _rfErklGebunden = false;
+  function _rfErklKlickBinden() {
+    if (!document.getElementById('vi-rf-erkl-css')) {
+      var st = document.createElement('style'); st.id = 'vi-rf-erkl-css';
+      st.textContent = '.vi-rf-erkl{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}'
+        + '.vi-rf-erkl-b{padding:4px 10px;border-radius:99px;cursor:pointer;border:1px solid rgba(42,39,39,.22);'
+        + 'background:rgba(255,255,255,.7);color:#2A2727;font:500 12px Inter,system-ui,sans-serif}'
+        + '.vi-rf-erkl-b:hover{border-color:var(--wl-c9a84c, #C9A84C)}'
+        + '.vi-rf-erkl-b.leise{border-color:transparent;background:transparent;color:#6b6257}'
+        + '.vi-rf-blase:not(.vi-rf-dran-blase) .vi-rf-erkl{display:none}';
+      document.head.appendChild(st);
+    }
+    if (_rfErklGebunden) return;
+    _rfErklGebunden = true;
+    document.addEventListener('click', function (ev) {
+      var b = ev.target && ev.target.closest ? ev.target.closest('[data-erkl]') : null;
+      if (!b) return;
+      var blase = b.closest('.vi-rf-blase');
+      if (blase && !blase.classList.contains('vi-rf-dran-blase')) return;
+      var reihe = b.closest('.vi-rf-erkl'); if (reihe) reihe.remove();
+      _rfAktionKlick(b.getAttribute('data-erkl'), null);
+    });
+  }
+
   /* v2369 · Das Abruf-Angebot als Auswahl im Chat. EINE Blase je Angebot;
      aendert sich die Auswahl, wird sie an Ort und Stelle neu beschriftet
      (kein Springen), ist nichts mehr offen, verschwindet sie ganz. */
@@ -9866,7 +9893,11 @@
         try { _rfAktion('erklaer',
           'Was die Angabe bedeutet und wozu DealPilot sie braucht.',
           'Erklär mir das'); } catch (x) {}
-        return '';
+        /* v2378 · Marcel: „das Erklär mir das kannst du im Chatverlauf fragen".
+           Steht jetzt AN der Frage im Chat (Textknoepfe), nicht in der Leiste. */
+        _rfErklKlickBinden();
+        return '<div class="vi-rf-erkl"><button type="button" class="vi-rf-erkl-b" data-erkl="erklaer">Erklär mir das</button>'
+          + '<button type="button" class="vi-rf-erkl-b leise" data-erkl="erklaer_nie" title="Ich biete die Erklärung nicht mehr an — fragen kannst du trotzdem jederzeit.">Nicht mehr anzeigen</button></div>';
       })() +
       _rfAbrufAngebot(e) +
       '<div class="vi-rf-zaehler">Frage ' + (_rf.i + 1) + ' von ' + _rf.offen.length +
