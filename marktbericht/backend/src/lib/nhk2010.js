@@ -815,7 +815,11 @@ export function sachwert(ein, bodenwertErgebnis, param) {
   if (_zfh !== 1) out.zfh_korrektur = _zfh;
   out.staffel.push({ pos: `Normalherstellungskosten (${kw} €/m² BGF × ${f.wert} m²)`, wert: Math.round(kw * f.wert) });
   if (_zfh !== 1) out.staffel.push({ pos: `× Korrekturfaktor Zweifamilienhaus`, detail: 'NHK 2010, SW-RL 2012 Anlage 1', faktor: _zfh, wert: null });
-  if (korr !== 1) out.staffel.push({ pos: `× Korrektur Wohnungsgröße / Grundriss`, faktor: korr, wert: null });
+  /* v2383 · mit den Angaben, aus denen der Faktor entsteht */
+  if (korr !== 1) out.staffel.push({ pos: `× Korrektur Wohnungsgröße / Grundriss`, faktor: korr, wert: null,
+    detail: [ein.wohnflaeche_je_we ? `Ø ${String(ein.wohnflaeche_je_we).replace('.', ',')} m² Wohnfläche je WE` : null,
+             ein.grundriss ? `Grundriss ${ein.grundriss}` : null].filter(Boolean).join(', ') + ' (NHK 2010, Anlage 4)' });
+  if (korr !== 1) out.korrektur_wohnung = { faktor: korr, wohnflaeche_je_we: ein.wohnflaeche_je_we || null, grundriss: ein.grundriss || null };
   out.staffel.push({ pos: `× Baupreisindex`, faktor: _index3, wert: null });   /* v2280: die Zahl zeigt die Spalte faktor - vorher doppelt (1.91 1,91) */
   if (regional !== 1) out.staffel.push({ pos: `× Regionalfaktor`, faktor: regional, wert: null });
   /* v1074-WBTL-1 · Sonstige Bauteile (Gauben, Balkone, Vordaecher,

@@ -274,6 +274,7 @@ export const ReportOrchestrator = {
       ausstattung: (input.ausstattung && typeof input.ausstattung === 'object') ? input.ausstattung : null,
       bauteile_hk: input.bauteile_hk ? Number(input.bauteile_hk) : null,
       bauteile_detail: (input.bauteile_detail && typeof input.bauteile_detail === 'object') ? input.bauteile_detail : null,
+      bauteile_unplausibel: (input.bauteile_unplausibel && typeof input.bauteile_unplausibel === 'object') ? input.bauteile_unplausibel : null,   /* v2383 */
       /* WBW26-3 · aus den Objekt-Tabs Bewirtschaftung und Miete */
       instandhaltung_ruecklage_jahr: input.instandhaltung_ruecklage_jahr
         ?? input.inst ?? input.instandhaltung ?? null,

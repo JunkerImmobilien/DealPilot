@@ -175,6 +175,8 @@ export function fuehrendesVerfahren({ objektart, wohneinheiten = null, nutzung =
  * Wer andere Gewichte fuer richtig haelt, sieht sie und kann sie ersetzen.
  * ════════════════════════════════════════════════════════════════════════ */
 
+const NEUTRAL_TEXT = { alter: 'das Gebäudealter ist mittel', wohnlage: 'die Wohnlage ist durchschnittlich',
+  nutzung: 'die Nutzung ist gemischt', wohneinheiten: 'die Zahl der Wohneinheiten ist mittel', groesse: 'die Größe entspricht dem Normobjekt' };   /* v2383 */
 export const MERKMALE = [
   {
     id: 'alter', gewicht: 0.30,
@@ -243,7 +245,10 @@ export function angepassterZins({
     const m = MERKMALE.find((x) => x.id === id);
     teile.push({ id, gewicht: m.gewicht, richtung,
       beitrag_pct: Math.round(m.gewicht * richtung * stabw * 1000) / 1000,
-      text: richtung > 0 ? m.hoch : m.runter });
+      /* v2383 · Richtung 0 ist NEUTRAL: hier stand bei Beitrag 0 „die Wohnlage ist
+         ueberdurchschnittlich" - eine Begruendung fuer einen Abschlag, der nicht stattfand. */
+      neutral: richtung === 0,
+      text: richtung > 0 ? m.hoch : (richtung < 0 ? m.runter : (NEUTRAL_TEXT[id] || 'durchschnittlich') + ' — kein Zu- oder Abschlag') });
   };
 
   /* Alter: der Bericht nennt "alt / sehr alt" und "sehr neu". */

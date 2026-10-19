@@ -428,13 +428,21 @@ export const DealPilotObjectMapper = {
       aussenanlagen: num(pick(d, ['aussenanlagen'])),
       bes_bauteile: num(pick(d, ['bes_bauteile'])),
       ausstattung: gewerkeAus(d),
+      /* v2383 · Die Felder sind Euro (Formular: „Balkone (€)"). Ein Betrag unter 100 € ist keine
+         Herstellungskostenangabe, sondern fast sicher eine STUECKZAHL (gemessen: btl_balkone = 2 und 1).
+         Er wird nicht gerechnet und im Bericht benannt. */
+      bauteile_unplausibel: (function () {
+        const o = {}; BTL.forEach((k) => { const v = num(d[k]); if (v != null && v > 0 && v < 100) o[k.replace(/^btl_/, '')] = v; });
+        return Object.keys(o).length ? o : null;
+      })(),
       bauteile_hk: (function () {
-        const s = BTL.reduce((a, k) => a + (num(d[k]) || 0), 0);
+        const s = BTL.reduce((a, k) => { const v = num(d[k]) || 0; return a + (v >= 100 ? v : 0); }, 0);
         return s > 0 ? Math.round(s) : null;
       })(),
       bauteile_detail: (function () {
-        const o = { gauben: num(d.btl_gauben), balkone: num(d.btl_balkone), vordaecher: num(d.btl_vordach),
-                    terrassen: num(d.btl_terrassen), sonstige: num(d.btl_sonstige) };
+        const g = (v) => { const n = num(v); return n != null && n >= 100 ? n : null; };   /* v2383 */
+        const o = { gauben: g(d.btl_gauben), balkone: g(d.btl_balkone), vordaecher: g(d.btl_vordach),
+                    terrassen: g(d.btl_terrassen), sonstige: g(d.btl_sonstige) };
         return Object.values(o).some((v) => v) ? o : null;
       })(),
       /* Ertragswert (Stufe 3) */

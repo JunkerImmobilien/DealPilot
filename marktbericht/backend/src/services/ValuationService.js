@@ -473,11 +473,17 @@ export const ValuationService = {
         const _f = 1 - _abPct / 100;
         out.market_value.angebot_abschlag = { pct: _abPct, herkunft: _abHerk,
           roh: { estimated: out.market_value.estimated, low: out.market_value.low, high: out.market_value.high } };
-        ev = ev * _f;
+        /* v2383 · Der Abschlag trifft nur den Teil, der aus ANGEBOTSPREISEN kommt. Mehrflaechen-
+           Bodenwert (Bodenrichtwert), Stellplatzwert und bOM-Betrag sind keine Angebotspreise -
+           bis v2382 wurden sie mit abgeschlagen (W: 15,9 % auch auf 43.615 € Bodenwert). */
+        const _addAb = additive || 0;
+        out.market_value.angebot_abschlag.nicht_abgeschlagen_eur = Math.round(_addAb);
+        ev = (ev - _addAb) * _f + _addAb;
         out.market_value.estimated = roundNice(ev);
-        if (out.market_value.low != null) out.market_value.low = roundNice(out.market_value.low * _f);
-        if (out.market_value.high != null) out.market_value.high = roundNice(out.market_value.high * _f);
-        out.notes.push('Abschlag auf Angebotspreise: ' + String(_abPct).replace('.', ',') + ' % (' + _abHerk + ').');
+        if (out.market_value.low != null) out.market_value.low = roundNice((out.market_value.low - _addAb) * _f + _addAb);
+        if (out.market_value.high != null) out.market_value.high = roundNice((out.market_value.high - _addAb) * _f + _addAb);
+        out.notes.push('Abschlag auf Angebotspreise: ' + String(_abPct).replace('.', ',') + ' % (' + _abHerk + ')'
+          + (_addAb ? ' — nur auf den Angebotsanteil; Mehrflächen-Bodenwert, Stellplätze und besondere Merkmale (' + Math.round(_addAb).toLocaleString('de-DE') + ' €) bleiben unberührt' : '') + '.');
       }
       /* v2367 · AMTLICHE GEGENPROBE - wo der Ausschuss fuer dieses Segment einen
          Rohertragsfaktor und den Ø Kaufpreis seiner Kauffaelle veroeffentlicht.

@@ -342,6 +342,12 @@ export const CrossCheckService = {
        32,3 - zwei Restnutzungsdauern fuer ein Haus. Ohne Wohnungszahl kein
        Typ: geraten wird nicht. */
     const _istMfh = /mfh|mehrfamil/.test(_pt);
+    /* v2383 · Nur beim MFH und nur mit den Angaben: Wohnflaeche je WE aus Wohnflaeche/Einheiten,
+       Grundrissart aus dem Formular (einspaenner ... vierspaenner). Ohne Angabe Faktor 1,0. */
+    const _mfhKorr = (_istMfh && Number(ref.units) > 0 && Number(wfl) > 0)
+      ? { wohnflaeche_je_we: Math.round(Number(wfl) / Number(ref.units) * 10) / 10,
+          grundriss: (p && p.grundriss) || ref.grundriss || null }
+      : (_istMfh ? { grundriss: (p && p.grundriss) || ref.grundriss || null } : {});
     const _nhkTypAuto = () => ((istWohnung || (_istMfh && Number(ref.units) > 0))
       ? _nhkTypWhg(Number(ref.units || 0)) : null);
     /* v1099-WQL: der Weg zur Quelle, unabhaengig davon, ob ein Wert
@@ -368,6 +374,9 @@ export const CrossCheckService = {
         standardstufe: (p && p.standardstufe) || ref.standardstufe,
         bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl, objektart: ref.property_type,
         zweifamilienhaus: ref.zweifamilienhaus === true,   /* v1427b-ZFH */
+        /* v2383 · Korrekturfaktoren NHK 2010 Anlage 4 fuer Mehrfamilienhaeuser (Wohnungsgroesse,
+           Grundrissart) - der Kern konnte sie seit jeher, sie kamen nie an. */
+        ..._mfhKorr,
         baupreisindex: BAUPREISINDEX, regionalfaktor: (p && p.regionalfaktor) || null,
         /* v1056-WRND-1 · Bisher bekam der Sachwert die alte Schaetzung,
          * waehrend der Ertragswert seit v1052 nach Anlage 2 rechnet: 38
@@ -487,6 +496,7 @@ export const CrossCheckService = {
             bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl,
             objektart: ref.property_type, baupreisindex: BAUPREISINDEX,
             zweifamilienhaus: ref.zweifamilienhaus === true,   /* v1427b-ZFH · zweiter Lauf */
+            ..._mfhKorr,   /* v2383 · zweiter Lauf */
             regionalfaktor: (p && p.regionalfaktor) || null,
             gnd_jahre: _gndSw, rnd_jahre: _rndEinheitlich(_gndSw),
         /* v1337: der Hinweis steht NACH rnd_jahre - _rndEinheitlich()
@@ -741,10 +751,9 @@ export const CrossCheckService = {
           : 'Sachwert nicht ausgewiesen: für eine Eigentumswohnung wird die '
             + 'Bruttogrundfläche der Wohnung benötigt. Die Näherung aus der '
             + 'Wohnfläche ist im Mehrfamilienhaus zu ungenau (Treppenhaus, Keller, '
-            + 'Gemeinschaftsflächen). Beim Wohnungseigentum führt ohnehin das '
-            + 'Vergleichswertverfahren.',
+            + 'Gemeinschaftsflächen). Brutto-Grundfläche (BGF) ergänzen, dann rechnet er.',   /* v2383: „führt ohnehin das Vergleichswertverfahren" stimmte bei ETW in Objekten bis 2 WE nicht */
       };
-      out.notes.push('Sachwert nicht ausgewiesen: Das vereinfachte Sachwertverfahren arbeitet mit den Normalherstellungskosten für Einfamilienhäuser (NHK 2010, Standardstufe 3) und dem EFH-Faustwert BGF ≈ Wohnfläche × 1,35. Für eine Eigentumswohnung ist das die falsche Grundlage – lieber keine Zahl als eine falsche. Der Ertragswert-Quercheck bleibt.');
+      out.notes.push(_bgfWhg > 0 ? out.sachwert.grund : 'Sachwert nicht ausgewiesen: Für eine Eigentumswohnung fehlt die Brutto-Grundfläche (BGF); eine Näherung aus der Wohnfläche wäre im Mehrfamilienhaus zu ungenau — lieber keine Zahl als eine falsche. Mit der BGF rechnet das Sachwertverfahren nach NHK 2010. Der Ertragswert bleibt.');   /* v2383 */
     } else if (_istMfh) {
       /* v2277 · Der vereinfachte Weg unten rechnet mit EFH-Kosten und dem
          EFH-Faustwert fuer die BGF - fuer ein Mehrfamilienhaus die falsche
@@ -1632,6 +1641,13 @@ export const CrossCheckService = {
       }
     }
     out.restnutzungsdauer_herkunft = _rndHerkunft;
+    /* v2383 · Plausibilitaet der Bauteil-Betraege (Euro-Felder mit Stueckzahl befuellt) */
+    if (ref.bauteile_unplausibel) {
+      const _bu = Object.keys(ref.bauteile_unplausibel).map((k) => k + ' = ' + ref.bauteile_unplausibel[k]);
+      out.bauteile_unplausibel = ref.bauteile_unplausibel;
+      out.notes.push('Sonstige Bauteile nicht angesetzt: ' + _bu.join(', ') + ' € ist als Herstellungskosten unplausibel '
+        + '(vermutlich eine Stückzahl). Das Feld erwartet den Betrag in Euro zum Stichtag.');
+    }
     out.available = true;
       const vals = [
         ['vergleichswert', _amtVgl ? _amtVgl.wert_eur : vgl],   /* v2380 */
