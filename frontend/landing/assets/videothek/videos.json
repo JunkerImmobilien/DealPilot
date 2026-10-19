@@ -1,6 +1,6 @@
 {
   "_hinweis": "landing-videothek-3b · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
-  "stand": "2026-10-16",
+  "stand": "2026-10-19",
   "basis_medien": "medien/videothek/",
   "basis_bilder": "assets/videothek/",
   "kategorien": [
@@ -332,6 +332,42 @@
       "datei": "dealpilot-modul-24-bodenrichtwert-und-unterlagen.mp4",
       "poster": "dealpilot-modul-24-bodenrichtwert-und-unterlagen.webp",
       "youtube": { "titel": "DealPilot Modul 24 · Bodenrichtwert und Unterlagen vom Amt", "tags": ["DealPilot", "Bodenrichtwert", "BORIS", "Grundbuch", "Bauakte"], "youtube_id": null }
+    },
+    {
+     "id": "modul-25-gefuehrte-eingabe",
+     "kategorie": "spezial",
+     "nr": "25",
+     "dauer": 533,
+     "titel": "Die geführte Eingabe",
+     "unterzeile": "Ein Mehrfamilienhaus, Frage für Frage — bis zu Deal Score und Investor Deal Score.",
+     "story": "Ein neues Objekt, leer angelegt. Statt Felder zu suchen, fragt dich der Co-Pilot durch: Adresse, Größe, Miete, Finanzierung, Lage, Zustand, Kosten — in fünf Etappen, getippt oder gesprochen. Unterwegs zeigt er Zwischenstände, holt auf Wunsch den amtlichen Bodenrichtwert und schlägt vor, was du in deinen Einstellungen hinterlegt hast. Am Ende entscheidest du in einer Übersicht, was ins Objekt geht — und siehst im Reiter Bewertung beide Scores.",
+     "nutzen": "Ein vollständiges Objekt in wenigen Minuten, ohne ein Formular zu kennen.",
+     "kapitel": [
+      "Der Fahrplan",
+      "Adresse und Land",
+      "Die Art bestimmt die Fragen",
+      "Erster Zwischenstand",
+      "Aus deinen Einstellungen",
+      "Der Bodenrichtwert",
+      "Investor Deal Score 2.0",
+      "Überspringen",
+      "Die Übersicht",
+      "Zwei Scores"
+     ],
+     "spruch": "Frage für Frage beantwortet — das Objekt ist vollständig erfasst.",
+     "datei": "dealpilot-modul-25-gefuehrte-eingabe.mp4",
+     "poster": "dealpilot-modul-25-gefuehrte-eingabe.webp",
+     "youtube": {
+      "titel": "DealPilot Modul 25 · Die geführte Eingabe",
+      "tags": [
+       "DealPilot",
+       "Immobilien",
+       "Objekterfassung",
+       "Deal Score",
+       "Mehrfamilienhaus"
+      ],
+      "youtube_id": null
+     }
     }
   ]
 }
