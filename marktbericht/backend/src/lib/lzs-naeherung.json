@@ -18,12 +18,12 @@
     "nicht": "Gewerbe, Buero, Handel, Sonderimmobilien; nie wo der Ausschuss einen Wert fuehrt (auch keinen gesperrten: dann Weg zum Ausschuss)"
   },
   "koeffizienten": {
-    "c": 1.723,
-    "ETW": 0.225,
-    "MFH": 1.484,
-    "WGH": 2.5,
-    "je_10_jahre_rnd": 0.087,
-    "stadt": -0.463
+    "c": 1.682,
+    "ETW": 0.245,
+    "MFH": 1.487,
+    "WGH": 2.478,
+    "je_10_jahre_rnd": 0.093,
+    "stadt": -0.429
   },
   "rnd_ersatz": {
     "EZFH": 37,
@@ -32,8 +32,8 @@
     "WGH": 31
   },
   "daten": {
-    "saetze": 984,
-    "ausschuesse": 129,
+    "saetze": 1011,
+    "ausschuesse": 132,
     "laender": [
       "BB",
       "BW",
@@ -51,118 +51,101 @@
   "pruefung": {
     "methode": "Leave-one-Land-out (massgeblich) und Leave-one-Ausschuss-out; |Naeherung - amtlich| in Prozentpunkten",
     "lolo": {
-      "median_pp": 0.621,
-      "p90_pp": 1.614
+      "median_pp": 0.625,
+      "p90_pp": 1.571
     },
     "loao": {
-      "median_pp": 0.522,
-      "p90_pp": 1.541
+      "median_pp": 0.543,
+      "p90_pp": 1.554
     },
     "in_stichprobe": {
-      "median_pp": 0.513,
-      "p90_pp": 1.417
+      "median_pp": 0.533,
+      "p90_pp": 1.433
     },
     "bewg256_lolo": {
       "median_pp": 0.84,
-      "p90_pp": 1.737
+      "p90_pp": 1.75
     },
     "besser_als_256_in_laendern": "7 von 11",
     "je_land": {
       "NW": {
         "saetze": 480,
-        "formel_median_pp": 0.631,
+        "formel_median_pp": 0.609,
         "bewg256_median_pp": 1
       },
       "HE": {
         "saetze": 66,
-        "formel_median_pp": 0.525,
+        "formel_median_pp": 0.538,
         "bewg256_median_pp": 0.7
       },
       "NI": {
         "saetze": 125,
-        "formel_median_pp": 0.424,
+        "formel_median_pp": 0.426,
         "bewg256_median_pp": 0.5
       },
       "TH": {
         "saetze": 47,
-        "formel_median_pp": 1.218,
+        "formel_median_pp": 1.226,
         "bewg256_median_pp": 0.7
       },
       "ST": {
         "saetze": 48,
-        "formel_median_pp": 1.721,
+        "formel_median_pp": 1.727,
         "bewg256_median_pp": 0.9
       },
       "SH": {
         "saetze": 16,
-        "formel_median_pp": 0.885,
+        "formel_median_pp": 0.894,
         "bewg256_median_pp": 0.62
       },
       "BB": {
         "saetze": 83,
-        "formel_median_pp": 0.519,
+        "formel_median_pp": 0.541,
         "bewg256_median_pp": 0.7
       },
       "SN": {
         "saetze": 42,
-        "formel_median_pp": 1.375,
+        "formel_median_pp": 1.338,
         "bewg256_median_pp": 1.76
       },
       "BW": {
-        "saetze": 58,
+        "saetze": 85,
         "formel_median_pp": 0.249,
         "bewg256_median_pp": 0.77
       },
       "RP": {
         "saetze": 11,
-        "formel_median_pp": 0.537,
+        "formel_median_pp": 0.575,
         "bewg256_median_pp": 1.22
       },
       "MV": {
         "saetze": 8,
-        "formel_median_pp": 2.061,
+        "formel_median_pp": 2.08,
         "bewg256_median_pp": 1.55
       }
     }
   },
   "bewg256_gegen_amtlich": {
     "EZFH": {
-      "saetze": 352,
+      "saetze": 363,
       "amtlich_median_pct": 1.8,
       "bewg256_minus_amtlich_pp": 0.7
     },
     "ETW": {
-      "saetze": 247,
+      "saetze": 249,
       "amtlich_median_pct": 2.2,
       "bewg256_minus_amtlich_pp": 0.8
     },
     "MFH": {
-      "saetze": 268,
+      "saetze": 280,
       "amtlich_median_pct": 3.1,
       "bewg256_minus_amtlich_pp": 0.9
     },
     "WGH": {
-      "saetze": 117,
+      "saetze": 119,
       "amtlich_median_pct": 4.2,
       "bewg256_minus_amtlich_pp": -0.2
     }
   },
-  "lernkurve": {
-    "25%": {
-      "median_pp": 0.65,
-      "p90_pp": 1.745
-    },
-    "50%": {
-      "median_pp": 0.621,
-      "p90_pp": 1.634
-    },
-    "75%": {
-      "median_pp": 0.616,
-      "p90_pp": 1.615
-    },
-    "100%": {
-      "median_pp": 0.621,
-      "p90_pp": 1.614
-    }
-  }
+  "lernkurve": null
 }
