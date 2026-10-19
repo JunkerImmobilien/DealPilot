@@ -285,6 +285,16 @@
       platziere();
     }, 200);
   }
+  /* v2374a · Messpunkt für den Prüflauf: Ziel, Kegel (Soll laut Stil, Ist im Bild) und der
+     sichtbare Ausschnitt des nächsten Scrollbehälters - so lässt sich messen, OB und WARUM der
+     Rahmen nicht passt (Versatz, Nachlauf, abgeschnittenes Ziel). Liest nur. */
+  window.DPM_KEGEL_MESSUNG = function () {
+    var z = zielEl(), k = q('#dpm-kegel'); if (!z || !k) return null;
+    var r = rect(z), ki = k.getBoundingClientRect(), sc = scroller(z), sr = sc && sc !== document.scrollingElement ? sc.getBoundingClientRect() : { top: 0, bottom: innerHeight, left: 0, right: innerWidth };
+    var f = function (o) { return { x: Math.round(o.left), y: Math.round(o.top), w: Math.round(o.width != null ? o.width : o.right - o.left), h: Math.round(o.height != null ? o.height : o.bottom - o.top) }; };
+    return { ziel: f(r), pad: _pad, kegelStil: { x: parseFloat(k.style.left), y: parseFloat(k.style.top), w: parseFloat(k.style.width), h: parseFloat(k.style.height) }, kegelIst: f(ki),
+      sicht: f(sr), scroller: sc ? (sc.id || sc.className || sc.tagName).toString().slice(0, 40) : null, zielName: (z.id || z.className || z.tagName).toString().slice(0, 40) };
+  };
   async function zeige(ziel, pad) {
     _ziel = ziel || null; _pad = pad == null ? 10 : pad;
     /* v2219d · Szenenwechsel: die alte Zeile geht mit dem alten Ziel (sie stand
