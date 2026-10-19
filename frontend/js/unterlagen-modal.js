@@ -267,7 +267,12 @@
 
   function _amtZeile(a) {
     var t = '<b>' + _esc(a.behoerde) + '</b>'
-      + (a.abteilung ? ' · ' + _esc(a.abteilung) : '');
+      + (a.abteilung ? ' · ' + _esc(a.abteilung) : '')
+      /* v2441 · Ein gemeindeweiter Satz (v2440) gilt für jede PLZ der
+         Gemeinde. Das steht dabei, damit niemand ihn für eine
+         adressgenaue Recherche hält. */
+      + (a.gemeindeweit || /^gemeinde-/.test(String(a.gemeinde_schluessel || ''))
+          ? ' <span style="font-size:11px;color:#6f6960">(für die ganze Gemeinde hinterlegt)</span>' : '');
     if (a.email) t += '<br>' + _esc(a.email);
     /* ══ v2153 · DIE TELEFONNUMMER FEHLTE GANZ ═══════════════════════════
 
@@ -285,7 +290,12 @@
 
        Bei einem Amt ist die Nummer oft der schnellere Weg als eine
        E-Mail, auf die in zwei Wochen jemand antwortet. */
-    if (a.telefon) t += '<br>' + _esc(a.telefon);
+    /* v2441 · mit Beschriftung und als Wählverweis — eine nackte Nummer
+       neben einer Adresse liest sich wie ein Aktenzeichen. */
+    if (a.telefon) {
+      t += '<br>Telefon <a href="tel:' + _esc(String(a.telefon).replace(/[^0-9+]/g, ''))
+        + '" style="color:#2A2727">' + _esc(a.telefon) + '</a>';
+    }
     /* ══ v1971c · DER PORTAL-LINK WAR KEIN LINK ═══════════════════════════
 
        Hier stand:
@@ -343,45 +353,64 @@
        Stellen) und hat kein eigenes Stylesheet. Klassen hätten hier
        nirgends gegriffen — und ein nachträglich eingehängtes <style>
        verliert gegen die Blätter, die im BODY hängen. */
+    /* ══ v2441 · ZWEI KARTEN NEBENEINANDER, JE PERSON DER BELEG ═════════
+
+       Marcel am 19.10.2026: „da wollten wir die 2 Ansprechpartner
+       ausweisen, wenn es geht". Vorlage v6 (`personenHtml`): je Person
+       eine Karte, „1. Ansprechperson" / „2. Ansprechperson", ab 560 px
+       zwei Spalten.
+
+       Neu gegenüber v2152: die BELEG-SEITE je Person (`p.seite`, seit
+       v2440 vom Backend gesetzt) und der Unterschied „Adresse belegt"
+       gegen „Name auf der Seite" — der Name kann stehen, ohne dass dort
+       eine Adresse steht. Ohne Ort wäre „belegt" eine Behauptung. */
     if (Array.isArray(a.ansprechpartner) && a.ansprechpartner.length) {
-      var _S_BOX = 'margin-top:9px;padding:8px 10px;border-radius:8px;'
-        + 'background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 28%, transparent)';
-      var _S_ZEILE = 'font-size:12.5px;line-height:1.5';
-      var _S_KLEIN = 'font-size:12px;color:#6f6960';
-      t += '<div style="' + _S_BOX + '">'
-        + '<div style="font-size:11px;letter-spacing:.04em;text-transform:uppercase;'
-        + 'color:#6f6960;margin-bottom:5px">Ansprechpartner laut Quellseite</div>';
+      var _S_KARTE = 'flex:1 1 210px;min-width:0;padding:9px 11px;border-radius:8px;background:#FFFFFF;'
+        + 'border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent)';
+      var _S_KLEIN = 'font-size:12px;color:#6f6960;overflow-wrap:anywhere';
+      var _S_MARKE = 'font:600 10px/1.2 \'JetBrains Mono\',ui-monospace,monospace;letter-spacing:.06em;'
+        + 'text-transform:uppercase;color:var(--wl-b8932f, #b8932f)';
+      t += '<div style="margin-top:9px">'
+        + '<div style="' + _S_MARKE + ';margin-bottom:6px">Ansprechpartner laut amtlicher Seite</div>'
+        + '<div style="display:flex;flex-wrap:wrap;gap:8px">';
       a.ansprechpartner.forEach(function (p, i) {
-        t += '<div style="' + _S_ZEILE + (i ? ';margin-top:7px' : '') + '">'
-          + '<div>' + (i + 1) + '. <b>' + _esc(p.name || p.email || '—') + '</b>'
-          + (p.funktion ? ' <span style="' + _S_KLEIN + '">· ' + _esc(p.funktion) + '</span>' : '')
+        t += '<div style="' + _S_KARTE + '">'
+          + '<div style="' + _S_MARKE + '">Ansprechpartner ' + (i + 1) + '</div>'
+          + '<div style="font-weight:600;font-size:13px;color:#2A2727;margin-top:3px;overflow-wrap:anywhere">'
+          + _esc(p.name || 'Name nicht genannt') + '</div>'
+          + (p.funktion ? '<div style="' + _S_KLEIN + '">' + _esc(p.funktion) + '</div>' : '');
+        if (p.telefon) {
+          t += '<div style="' + _S_KLEIN + ';margin-top:3px">Telefon '
+            + '<a href="tel:' + _esc(String(p.telefon).replace(/[^0-9+]/g, '')) + '" style="color:#2A2727">'
+            + _esc(p.telefon) + '</a></div>';
+        }
+        t += '<div style="' + _S_KLEIN + '">'
+          + (p.email ? 'E-Mail ' + _esc(p.email) : 'keine E-Mail-Adresse genannt') + '</div>';
+        /* Der Belegstand je PERSON, nicht je Amt. */
+        t += '<div style="font-size:11.5px;margin-top:4px">'
+          + (p.bestaetigt
+              ? '<span style="color:var(--ok,#3FA56C)">✓ Adresse auf der Seite</span>'
+              : p.name_belegt
+                ? '<span style="color:var(--ok,#3FA56C)">✓ Name auf der Seite</span>'
+                : '<span style="color:var(--warn,#D8954C)">⚠ nur genannt, nicht nachgelesen</span>')
+          + (p.seite
+              ? ' · <a href="' + _esc(p.seite) + '" target="_blank" rel="noopener" style="color:#2A2727">Beleg-Seite</a>'
+              : '')
           + '</div>';
         if (p.email) {
-          t += '<div style="' + _S_KLEIN + '">' + _esc(p.email)
-            /* Der Belegstand je PERSON, nicht je Amt. Eine Adresse, die
-               nur die Recherche genannt hat, sieht sonst genauso aus
-               wie eine, die wir selbst auf der Seite gefunden haben. */
-            + (p.bestaetigt
-                ? ' <span style="color:var(--ok,#3FA56C)">✓ belegt</span>'
-                : ' <span style="color:var(--warn,#D8954C)">⚠ nur genannt</span>')
-            + '</div>';
-        }
-        if (p.telefon) t += '<div style="' + _S_KLEIN + '">' + _esc(p.telefon) + '</div>';
-        if (p.email) {
           t += '<label style="display:inline-flex;align-items:center;gap:5px;'
-            + 'margin-top:3px;font-size:12px;cursor:pointer">'
+            + 'margin-top:5px;font-size:12px;cursor:pointer;color:#2A2727">'
             + '<input type="checkbox"' + (p.kopie ? ' checked' : '')
             + ' onchange="DealPilotUnterlagen.kopieSetzen(' + Number(a.id) + ',' + i + ',this)">'
-            + 'in Kopie</label>';
+            + 'in Kopie setzen</label>';
         } else {
           /* Ein Häkchen an einem Namen ohne Postfach wäre ein
              Versprechen, das der Versand nicht halten kann. */
-          t += '<div style="' + _S_KLEIN + ';opacity:.8">keine Adresse genannt — '
-            + 'kann nicht in Kopie</div>';
+          t += '<div style="' + _S_KLEIN + ';opacity:.8;margin-top:4px">ohne Adresse — nicht in Kopie</div>';
         }
         t += '</div>';
       });
-      t += '</div>';
+      t += '</div></div>';
     } else {
       /* ══ v2153 · KEINE ZWEI PERSONEN → DER AMTSWEG, AUSDRUECKLICH ═════
 
@@ -491,19 +520,19 @@
     if (!body) return;
     body.innerHTML = '<div style="font-size:13px;line-height:1.6;color:#2A2727">'
       + '<div style="color:#6f6960;font-size:12.5px;margin-bottom:8px">'
-      + 'An: <b>' + _esc(amt && amt.email ? amt.email : '— keine Adresse —') + '</b>'
-      + (amt && !amt.beleg_ok
+      + 'An: <b id="dp-ul-an">' + _esc(_empfaenger(amt) || '— keine Adresse —') + '</b>'
+      + (amt && !amt.beleg_ok && _empfaenger(amt) === amt.email
           ? ' <span style="color:var(--warn,#D8954C)">(nicht belegt — bitte prüfen)</span>'
           : '')
+      + _empfaengerWahl(amt)
       /* v2152 · Der CC steht im Briefkopf, nicht nur im mailto-Link.
          Wer in Kopie geht, muss es VOR dem Senden sehen können — ein
          Empfänger, der erst im Mailprogramm auftaucht, ist eine
          Überraschung, und bei Post an Ämter eine unangenehme. */
       + (function () {
           var cc = _kopienVon(amt);
-          return cc.length
-            ? '<div style="margin-top:3px">Kopie an: <b>' + _esc(cc.join(', ')) + '</b></div>'
-            : '';
+          return '<div id="dp-ul-kopie" style="margin-top:3px">'
+            + (cc.length ? 'Kopie an: <b>' + _esc(cc.join(', ')) + '</b>' : '') + '</div>';
         })()
       + '</div>'
       + '<div style="margin-bottom:6px"><b>Betreff:</b> ' + _esc(r.betreff) + '</div>'
@@ -513,7 +542,7 @@
       + '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
       + '<button type="button" style="' + _KNOPF_GOLD + '"'
       + ' onclick="DealPilotUnterlagen.kopieren()">In die Zwischenablage</button>'
-      + (amt && amt.email
+      + (amt && _empfaenger(amt)
           ? '<button type="button" style="' + _KNOPF_HELL + '"'
             /* v2152 · Die angehakten Adressen gehen als CC mit, als JSON
                und nicht als Komma-Liste: eine Adresse mit Sonderzeichen
@@ -522,8 +551,9 @@
                das braucht ein onclick-Attribut — der Browser dekodiert
                es vor dem Auswerten zurück. Ein zusätzliches `replace`
                darauf fände nichts mehr und sähe nur nach Sorgfalt aus. */
-            + ' onclick="DealPilotUnterlagen.mailOeffnen(\'' + _esc(amt.email) + '\','
-            + _esc(JSON.stringify(_kopienVon(amt))) + ')">'
+            /* v2441 · Empfänger und Kopie liest mailOeffnen beim Klick aus
+               der Wahl im Briefkopf, nicht aus dem Stand beim Aufbau. */
+            + ' onclick="DealPilotUnterlagen.mailOeffnen(null,null,\'' + _esc(amt.art) + '\')">'
             + 'Im Mailprogramm öffnen</button>'
           : '')
       + '<button type="button" style="' + _KNOPF_HELL + '"'
@@ -543,7 +573,14 @@
     }
   }
 
-  function mailOeffnen(adresse, kopien) {
+  function mailOeffnen(adresse, kopien, art) {
+    /* v2441 · Mit Art: Empfänger aus der Wahl, Kopie ohne den Empfänger. */
+    if (art && _amtJeArt[art]) {
+      var _a = _amtJeArt[art];
+      adresse = _empfaenger(_a);
+      kopien = _kopienVon(_a);
+      if (!adresse) return;
+    }
     var t = document.getElementById('dp-ul-brief');
     var betreff = '';
     var kopf = document.querySelector('#dp-ul-body b');
@@ -613,9 +650,60 @@
   /* Die angehakten Adressen eines Amts — eine Stelle, zwei Aufrufer
      (Briefkopf und mailto). */
   function _kopienVon(amt) {
+    var an = _empfaenger(amt);
     return ((amt && Array.isArray(amt.ansprechpartner)) ? amt.ansprechpartner : [])
-      .filter(function (p) { return p.kopie && p.email && p.email !== amt.email; })
+      .filter(function (p) { return p.kopie && p.email && p.email !== amt.email && p.email !== an; })
       .map(function (p) { return p.email; });
+  }
+
+  /* ══ v2441 · WER IST EMPFAENGER? (Vorlage v6 „Als Empfänger nehmen") ═
+
+     Standard ist die Amtsadresse — sie kommt an, auch wenn die Person
+     im Urlaub ist. Eine Ansprechperson mit Adresse lässt sich im
+     Briefkopf zum Empfänger machen; die Wahl lebt nur in dieser
+     Sitzung und ändert am Amt NICHTS (v6 schrieb sie in den Datensatz —
+     bei einer gemeinsamen Ämterliste hiesse das, dass ein Nutzer für
+     alle umstellt). Steht das Amt ohne eigene Adresse da, ist die erste
+     Person mit Adresse der Vorschlag. */
+  var _empfaengerJeArt = {};
+  function _empfaenger(amt) {
+    if (!amt) return '';
+    var w = _empfaengerJeArt[amt.art];
+    var personen = Array.isArray(amt.ansprechpartner) ? amt.ansprechpartner : [];
+    if (w && (w === amt.email || personen.some(function (p) { return p.email === w; }))) return w;
+    if (amt.email) return amt.email;
+    var erste = personen.find(function (p) { return !!p.email; });
+    return erste ? erste.email : '';
+  }
+  function _empfaengerWahl(amt) {
+    var personen = (amt && Array.isArray(amt.ansprechpartner) ? amt.ansprechpartner : [])
+      .filter(function (p) { return !!p.email; });
+    if (!personen.length) return '';
+    var an = _empfaenger(amt);
+    var wahl = [];
+    if (amt.email) wahl.push({ mail: amt.email, text: 'Amtsadresse' });
+    personen.forEach(function (p, i) {
+      wahl.push({ mail: p.email, text: 'Ansprechpartner ' + (i + 1) + (p.name ? ' (' + p.name + ')' : '') });
+    });
+    return '<div style="display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:4px">'
+      + wahl.map(function (w) {
+          return '<label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;color:#2A2727">'
+            + '<input type="radio" name="dp-ul-empf"' + (w.mail === an ? ' checked' : '')
+            + ' onchange="DealPilotUnterlagen.empfaengerSetzen(\'' + _esc(amt.art) + '\',this.value)"'
+            + ' value="' + _esc(w.mail) + '">' + _esc(w.text) + '</label>';
+        }).join('')
+      + '</div>';
+  }
+  function empfaengerSetzen(art, mail) {
+    _empfaengerJeArt[art] = mail;
+    var amt = _amtJeArt[art];
+    var an = document.getElementById('dp-ul-an');
+    if (an) an.textContent = _empfaenger(amt);
+    var kk = document.getElementById('dp-ul-kopie');
+    if (kk) {
+      var cc = _kopienVon(amt);
+      kk.innerHTML = cc.length ? 'Kopie an: <b>' + _esc(cc.join(', ')) + '</b>' : '';
+    }
   }
 
   function zurueck() { _aufbauen(); }
@@ -661,6 +749,8 @@
     kopieren: kopieren, mailOeffnen: mailOeffnen, zurueck: zurueck,
     /* v2152 · Ohne Export ruft das onchange der Kopie-Kästchen ins Leere
        — derselbe Fehler wie v1843 beim Abrufen-Knopf. */
-    kopieSetzen: kopieSetzen
+    kopieSetzen: kopieSetzen,
+    /* v2441 · die Empfängerwahl im Briefkopf */
+    empfaengerSetzen: empfaengerSetzen
   };
 })();
