@@ -341,8 +341,8 @@
     "modellversion": "GMB 2024",
     "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/datei/anzeigen/id/482187,501/liegenschaftszinzs_tze_rohertragsfaktoren_landkreise.pdf",
     "quelle_parser": "v1084-WREZ",
-    "quellenvermerk": null,
-    "lizenz": "ungeklaert - Wertblatt und Erlaeuterungen ohne Lizenzangabe. Die Nutzungsbedingungen des LVermGeo V 5.0 (01.03.2024) erfassen in Nr. 1 die Daten der Grundstueckswertermittlung ausdruecklich; offene Daten laufen unter dl-de/by-2-0 mit \"(c) GeoBasis-DE / LVermGeo ST\", nichtoffene unter einem eigenen Quellenvermerk. Die Open-Data-Liste nennt die Grundstueckswertermittlung nicht, die Blaetter sind aber kostenfrei abrufbar - Zuordnung offen. In BEIDEN Zweigen ist eine Namensnennung verlangt. Vor Kundeneinsatz klaeren.",
+    "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Liegenschaftszinssätze und Rohertragsfaktoren – Landkreise, Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt (Landesamt für Vermessung und Geoinformation Sachsen-Anhalt)",
+    "lizenz": "kein Lizenzvermerk im Dokument. Es gelten die Nutzungsbedingungen des LVermGeo Sachsen-Anhalt V 5.0 (Stand 01.03.2024, https://www.lvermgeo.sachsen-anhalt.de/de/datei/anzeigen/id/3567,501/nutzungsbedingungen_b.pdf), Nr. 1: „Auch Daten der Grundstückswertermittlung entsprechend Kapitel 3, Teil 1 des Baugesetzbuches (BauGB) und der Verordnung über den Gutachterausschuss für Grundstückswerte sind ,Daten‘ im Sinne der folgenden Bestimmungen.“ Nr. 2: „Offene Daten des LVermGeo dürfen frei genutzt werden unter der Lizenz ,Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (www.govdata.de/dl-de/by-2-0). Der Bereitsteller … ist mit ,© GeoBasis-DE / LVermGeo ST‘ zu bezeichnen.“ Das Blatt ist kostenfrei, ohne Personenbezug und ohne Rechte Dritter veröffentlicht — damit offene Daten nach Nr. 2 (dl-de/by-2-0, Namensnennung). Bestätigung beim LVermGeo (service.lvermgeo@sachsen-anhalt.de) empfohlen.",
     "fundstelle": "Datenblatt „Liegenschaftszinssätze und Rohertragsfaktoren“, Abschnitte I Mittelzentren und Oberzentrum Dessau, II Grundzentren, III Dörfer"
   },
   {

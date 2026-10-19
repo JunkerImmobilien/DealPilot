@@ -331,6 +331,19 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                13072 war die letzte Luecke unter den im Register gefuehrten
                                MV-Landkreisen (13071, 13073, 13076 liegen). */
                             'lzs-swf-mv-rostock-2026-sperren.json',
+                            /* Ernte 19.10.2026 (Agent register-ernte): BW-Nachernte - Bodensee West,
+                               suedwestl. Schwarzwald-Baar-Kreis (Trendformeln je RND, ETW nach Hausgroesse),
+                               Waiblingen/Korb, Bruchsal Jahrgang 2025 (Werte und ihre Sperren). */
+                            'lzs-swf-bw-2026-nachernte.json',
+                            /* Ernte 19.10.2026: BW-Sperren mit Bezugsweg (kostenpflichtig / genehmigungspflichtig):
+                               Pforzheim, Reutlingen, Sindelfingen, Ludwigsburg, Schwaebisch Gmuend, Baiersbronn,
+                               Mittleres Remstal, Biberach-Mitte, LK Esslingen, Oberes Gaeu (nur SWF).
+                               ACHTUNG Stufe N: 97 Gemeinden ohne Registersatz bekommen damit einen Satz und
+                               fallen von N auf D mit Weg (v2401: nie N bei Sperre). Eigene Datei, damit die
+                               Entscheidung eine Zeile ist. */
+                            'lzs-swf-bw-2026-wege.json',
+                            /* Ernte 19.10.2026: Hamburg leitet Sachwertfaktoren nur fuer EFH ab - MFH als Sperre (IMB 2026, Kap. 7.3). */
+                            'swf-hh-2026-sperren.json',
                             /* Nachernte 16.10.2026: Grundstuecksmarktdaten NRW, Ausgabe 2026 (lzs.csv, Berichtsjahr 2025), 502 Zinssaetze neben dem Vorjahrgang lzs-nrw.json - gleicher Zweigschluessel, findeZweig nimmt den juengeren Stichtag. */ 'lzs-swf-2026-nachernte.json',
                             /* ══ v1976 · DIE ERSTEN VERGLEICHSFAKTOREN ═══════════
 
