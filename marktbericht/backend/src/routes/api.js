@@ -1239,10 +1239,12 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
     const _gem = await AgsResolver.gemeindeEindeutig(plz, d.ort || d.city || null).catch(() => null);
     const agsFein = (_gem && _gem.gemeinde_ags) || ags;
 
+    /* v2401a · die genaue Hausart wie im Bericht (ReportOrchestrator, v2381): mit „haus" fiel
+       § 256 hier auf den MFH-Satz 4,0 % (gemessen Erfurt EFH), der Bericht rechnete 2,5 %. */
     const _zObjekt = { objart: d.objart, baujahr: m.build_year, einheiten: m.units,
                 haustyp: d.haustyp, nutzung: d.nutzungsart, lage: d.lage };
     let p = await WertParameterService.hole({
-      typ: 'lzs', ags: String(agsFein), objektart: m.property_type, anzahlWe: m.units || null,
+      typ: 'lzs', ags: String(agsFein), objektart: m.property_subtype || m.property_type, anzahlWe: m.units || null,
       objekt: _zObjekt
     });
     if (!p || p.wert == null) {
@@ -1312,7 +1314,7 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
     if (p && p.stufe === 'N' && rndJ != null && Number.isFinite(Number(rndJ))) {
       try {
         const p2 = await WertParameterService.hole({
-          typ: 'lzs', ags: String(agsFein), objektart: m.property_type, anzahlWe: m.units || null,
+          typ: 'lzs', ags: String(agsFein), objektart: m.property_subtype || m.property_type, anzahlWe: m.units || null,
           objekt: { ..._zObjekt, restnutzungsdauer: Number(rndJ) } });
         if (p2 && p2.wert != null) p = p2;
       } catch (e) { /* bleibt bei der ersten Antwort */ }
