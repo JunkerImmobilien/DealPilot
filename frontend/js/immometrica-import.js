@@ -130,7 +130,7 @@
          der Ausweg eine Zeile bleiben. Gold als Rahmen, nicht als Flaeche:
          er ist ein Angebot, keine Hauptaktion. */
       '.imo-mehr{font:11px ui-monospace,monospace;margin-left:6px;padding:3px 9px;cursor:pointer;'
-        + 'border:1px solid var(--gold,var(--wl-C9A84C,#C9A84C));border-radius:999px;'
+        + 'border:1px solid var(--gold,var(--wl-c9a84c,#C9A84C));border-radius:999px;'
         + 'background:transparent;color:var(--ch2,#5B5550)}',
       '.imo-mehr:hover{background:var(--gold-bg,rgba(201,168,76,.12))}',
       '.imo-mehr[disabled]{opacity:.55;cursor:default}',

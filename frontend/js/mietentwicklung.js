@@ -141,7 +141,10 @@ window.MietEntwicklung = (function() {
     var sj = sollJahr();
     if (sj != null && y >= sj) {
       var soll = _zahl(e.soll) || (leer ? _zahl(e.ist) : 0);
-      if (soll > lauf) return soll;
+      /* v2422 · Marcel 19.10.2026: ist die Soll-Miete erreicht, laeuft
+         danach die normale Prognose-Steigerung (`mietstg`) weiter - sonst
+         bliebe die Wohnung ab dem Soll-Jahr fuer immer flach. */
+      if (soll > lauf) return soll * Math.pow(1 + _v('mietstg') / 100, y - sj);
     }
     return lauf;
   }

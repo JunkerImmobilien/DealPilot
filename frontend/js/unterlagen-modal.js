@@ -49,12 +49,12 @@
   var _KNOPF_BASIS = 'font:600 12.5px/1 Inter,system-ui,sans-serif;padding:9px 14px;'
     + 'border-radius:8px;cursor:pointer;white-space:nowrap;';
   var _KNOPF_GOLD = _KNOPF_BASIS
-    + 'background:linear-gradient(110deg,var(--wl-E8CC7A,#E8CC7A),var(--wl-C9A84C,#C9A84C) 55%,var(--wl-b8932f,#b8932f));'
+    + 'background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));'
     + 'color:#050505;border:1px solid var(--wl-b8932f,#b8932f);';
   var _KNOPF_HELL = _KNOPF_BASIS
-    + 'background:#FFFFFF;color:#2A2727;border:1px solid var(--wl-C9A84C,#C9A84C);';
+    + 'background:#FFFFFF;color:#2A2727;border:1px solid var(--wl-c9a84c,#C9A84C);';
   var _KNOPF_DUNKEL = _KNOPF_BASIS
-    + 'background:#050505;color:#f3ead0;border:1px solid var(--wl-C9A84C,#C9A84C);';
+    + 'background:#050505;color:#f3ead0;border:1px solid var(--wl-c9a84c,#C9A84C);';
   var _KNOPF_AUS = 'opacity:.45;cursor:not-allowed;';
 
   function _esc(s) {
@@ -128,12 +128,12 @@
      * ein Mandant es umfärben darf. Grün und Rot bleiben hart (Statusfarben
      * nie tokenisieren). */
     hu.innerHTML = '<div style="background:#FBF6E9;color:#2A2727;'
-      + 'border:1px solid var(--wl-C9A84C,#C9A84C);'
+      + 'border:1px solid var(--wl-c9a84c,#C9A84C);'
       + 'border-radius:14px;max-width:860px;width:100%;padding:0;overflow:hidden;'
       + 'box-shadow:0 24px 64px rgba(5,5,5,.45)">'
       + '<div style="display:flex;align-items:center;gap:12px;padding:16px 20px;'
       + 'background:#050505;color:#FDFCFA;'
-      + 'border-bottom:2px solid var(--wl-C9A84C,#C9A84C)">'
+      + 'border-bottom:2px solid var(--wl-c9a84c,#C9A84C)">'
       + '<div style="flex:1 1 auto">'
       + '<div style="font-family:\'Space Grotesk\',sans-serif;font-size:17px;font-weight:600;'
       + 'color:#FDFCFA">Unterlagen beim Amt anfordern</div>'
@@ -220,7 +220,7 @@
     var offen = _arten.filter(function (a) { return !_amtJeArt[a.id]; }).length;
     h += '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;'
       + 'margin-bottom:12px;padding:10px 14px;background:#FFFFFF;'
-      + 'border:1px solid var(--wl-C9A84C,#C9A84C);border-radius:10px">'
+      + 'border:1px solid var(--wl-c9a84c,#C9A84C);border-radius:10px">'
       + '<div style="flex:1 1 240px;font-size:12.5px;line-height:1.5;color:#2A2727">'
       + (offen
           ? '<b>' + offen + ' von ' + _arten.length + '</b> Zuständigkeiten noch nicht ermittelt. '

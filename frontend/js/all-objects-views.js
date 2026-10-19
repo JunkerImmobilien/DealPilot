@@ -9,7 +9,11 @@
   
   function getView() {
     try {
-      return localStorage.getItem(STORAGE_VIEW_KEY) || 'cards';
+      /* v2422 · Marcel 19.10.2026: die Kanban-Ansicht ist erst mal raus
+         (wie das Board im Cockpit, v2410). Ein gemerktes 'kanban' faellt
+         auf die Karten zurueck; der Code der Ansicht bleibt stehen. */
+      var v = localStorage.getItem(STORAGE_VIEW_KEY) || 'cards';
+      return v === 'kanban' ? 'cards' : v;
     } catch(e) { return 'cards'; }
   }
   
@@ -260,7 +264,7 @@
       '<div class="ao-view-switch">' +
         '<button class="ao-view-btn' + (v === 'cards' ? ' active' : '') + '" onclick="DealPilotAllObjects.setViewAndRender(\'cards\')"><span style="margin-right:6px">▦</span>Karten</button>' +
         '<button class="ao-view-btn' + (v === 'list' ? ' active' : '') + '" onclick="DealPilotAllObjects.setViewAndRender(\'list\')"><span style="margin-right:6px">≡</span>Liste</button>' +
-        '<button class="ao-view-btn' + (v === 'kanban' ? ' active' : '') + '" onclick="DealPilotAllObjects.setViewAndRender(\'kanban\')"><span style="margin-right:6px">⊞</span>Kanban</button>' +
+        /* v2422: Knopf „Kanban" abgeschaltet, siehe getView() */
       '</div>' +
       (v !== 'kanban' ? (
         '<div class="ao-filter-pills">' +

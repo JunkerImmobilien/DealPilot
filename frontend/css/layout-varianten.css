@@ -8103,7 +8103,7 @@ html body .sb-act-item.sb-act-feedback {
   }
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar .dpl-marke-handy .dpl-wm i {
     font-style: normal !important;
-    color: var(--wl-A98D40, #A98D40) !important;
+    color: var(--wl-a98d40, #A98D40) !important;
   }
 }
 
@@ -8201,7 +8201,7 @@ html[data-dp-layout][data-dp-layout] body nav.tabs button.tab {
   color: rgb(233, 227, 214) !important;
 }
 html[data-dp-layout][data-dp-layout] body nav.tabs button.tab.active {
-  color: var(--wl-C9A84C, #C9A84C) !important;
+  color: var(--wl-c9a84c, #C9A84C) !important;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
@@ -8292,12 +8292,12 @@ html[data-dp-layout][data-dp-layout] body nav.tabs button.tab.active {
 
 /* ── D · die Score-Anzeige wie am Schreibtisch ───────────────────────────── */
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-mini-score-num {
-    color: var(--wl-C9A84C, #C9A84C) !important;
-    fill: var(--wl-C9A84C, #C9A84C) !important;
+    color: var(--wl-c9a84c, #C9A84C) !important;
+    fill: var(--wl-c9a84c, #C9A84C) !important;
     font-weight: 800 !important;
   }
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-score-label {
-    color: var(--wl-C9A84C, #C9A84C) !important;
+    color: var(--wl-c9a84c, #C9A84C) !important;
     font-size: 10.5px !important;
   }
   html[data-dp-layout][data-dp-layout] body aside.sidebar#sidebar #sb-list .sb-card .sbc-arrow {

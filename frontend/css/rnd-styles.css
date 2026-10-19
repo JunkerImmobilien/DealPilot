@@ -524,7 +524,7 @@
   display: flex; flex-direction: column;
   overflow: hidden;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  border: 1px solid var(--wl-C9A84C, #C9A84C);
+  border: 1px solid var(--wl-c9a84c, #C9A84C);
 }
 
 /* Kopf — Obsidian, Gold-Titel, Creme-Untertitel */
@@ -532,14 +532,14 @@
   display: flex; align-items: flex-start; justify-content: space-between;
   padding: 18px 28px 14px;
   background: #050505;
-  border-bottom: 2.5px solid var(--wl-C9A84C, #C9A84C);
+  border-bottom: 2.5px solid var(--wl-c9a84c, #C9A84C);
 }
 .rnd-wiz-title h2 {
   margin: 0;
   font-family: 'Space Grotesk', 'Inter', sans-serif;  /* v2258: DealPilot-Schrift statt Cormorant */
   font-size: 23px;
   font-weight: 600;
-  color: var(--wl-C9A84C, #C9A84C);
+  color: var(--wl-c9a84c, #C9A84C);
   letter-spacing: 0.02em;
 }
 .rnd-wiz-sub {
@@ -566,8 +566,8 @@
   line-height: 1;
 }
 .rnd-wiz-close:hover {
-  border-color: var(--wl-C9A84C, #C9A84C);
-  color: var(--wl-C9A84C, #C9A84C);
+  border-color: var(--wl-c9a84c, #C9A84C);
+  color: var(--wl-c9a84c, #C9A84C);
   background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);  /* v1875a: Gold-Audit */
 }
 
