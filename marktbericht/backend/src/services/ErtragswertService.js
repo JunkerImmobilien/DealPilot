@@ -54,6 +54,18 @@ function deZahl(v) {
 
 export const ErtragswertService = {
 
+  /* v2390 · Herkunft des Bodenrichtwerts aus dem BORIS-Ergebnis, an EINER Stelle.
+       'boris'          amtlich ueber BORIS abgerufen
+       'eigene_angabe'  Rueckfall auf die DealPilot-Eingabe (source 'dealpilot-eingabe')
+       'manuell'        kein Bodenrichtwert verfuegbar
+     Vorher setzten drei Aufrufer `available ? 'boris'` und machten so aus der
+     eigenen Angabe einen amtlichen Wert - ohne Belastbarkeitsabzug. */
+  brwHerkunft(landValue) {
+    if (!landValue || !landValue.available) return 'manuell';
+    if (landValue.source === 'dealpilot-eingabe') return 'eigene_angabe';
+    return 'boris';
+  },
+
   /* ══════════════════════════════════════════════════════════════════════════
    * BODENWERT — Grundlage fuer Ertrags- UND Sachwert.
    *
@@ -637,6 +649,9 @@ export const ErtragswertService = {
     /* ── 7 · Belastbarkeit ──────────────────────────────────────────────── */
     out.belastbarkeit = belastbarkeit({
       lzsStufe, lzsGrund, bwkGeprueft: BWK_TABELLE.geprueft,
+      /* v2390 · die Ebene des Zinses (WPS.zinsHerkunft) - nur wenn er auch
+         angekommen ist; sonst rechnet dieser Kern mit § 256 selbst. */
+      lzsHerkunft: pos(ein.lzs_pct) ? (ein.lzs_herkunft || null) : null,
       bodenwertQuelle: bodenwertErgebnis?.quelle?.herkunft,
       hatWohnflaeche: !!pos(ein.wohnflaeche_qm),
       hatRnd: !!R,
@@ -663,7 +678,7 @@ function rundeSinnvoll(v) {
   return Math.round(v / step) * step;
 }
 
-function belastbarkeit({ lzsStufe, lzsGrund = null, bwkGeprueft, bodenwertQuelle,
+function belastbarkeit({ lzsStufe, lzsGrund = null, lzsHerkunft = null, bwkGeprueft, bodenwertQuelle,
                         hatWohnflaeche, hatRnd, warnungen }) {
   let p = 100;
   const abzuege = [];
@@ -682,11 +697,29 @@ function belastbarkeit({ lzsStufe, lzsGrund = null, bwkGeprueft, bodenwertQuelle
   }
   /* v1022 · Die Marktableitung nutzt echte Preise, der gesetzliche
    * Auffangwert gar keine. Der Abstand im Abzug muss das abbilden. */
-  if (stufe === 'C') { p -= 20; abzuege.push('Liegenschaftszinssatz marktabgeleitet, nicht amtlich (−20)'); }
+  /* v2390 · Stufe C ist hier fast nie eine Marktableitung, sondern ein
+   * amtlicher Satz mit duenner Datenbasis oder der Nachbarwert desselben
+   * Ausschusses. Der Text folgt der Herkunft, nicht dem Buchstaben. */
+  if (stufe === 'C') {
+    p -= 20;
+    abzuege.push('Liegenschaftszinssatz ' + ((lzsHerkunft && lzsHerkunft.etikett) || 'indikativ, nicht objektgenau') + ' (−20)');
+  }
+  /* v2390 · Landeswert, Bundesdurchschnitt oder Rueckfallwert auf Stufe A
+   * sind nicht der oertliche Satz - bisher ohne jeden Abzug. */
+  if (stufe === 'A' && lzsHerkunft
+      && ['landeswert', 'bundesdurchschnitt', 'regional', 'rueckfall'].indexOf(lzsHerkunft.ebene) >= 0) {
+    p -= 12;
+    abzuege.push('Liegenschaftszinssatz ' + lzsHerkunft.etikett + ', nicht der örtliche Satz (−12)');
+  }
   if (stufe === 'D') { p -= 40; abzuege.push('Liegenschaftszinssatz nur gesetzlicher Auffangwert (−40)'); }
   if (stufe === 'E') { p -= 10; abzuege.push('Liegenschaftszinssatz vom Nutzer gesetzt (−10)'); }
   if (!bwkGeprueft) { p -= 8; abzuege.push('Bewirtschaftungskosten-Tabelle ungeprüft (−8)'); }
-  if (bodenwertQuelle && bodenwertQuelle !== 'boris') { p -= 10; abzuege.push('Bodenrichtwert nicht amtlich abgerufen (−10)'); }
+  if (bodenwertQuelle && bodenwertQuelle !== 'boris') {
+    p -= 10;
+    abzuege.push(bodenwertQuelle === 'eigene_angabe'   /* v2390 */
+      ? 'Bodenrichtwert aus eigener Angabe, nicht amtlich abgerufen (−10)'
+      : 'Bodenrichtwert nicht amtlich abgerufen (−10)');
+  }
   if (!hatWohnflaeche) { p -= 8; abzuege.push('Wohnfläche fehlt (−8)'); }
   if (!hatRnd) { p -= 15; abzuege.push('Restnutzungsdauer geschätzt (−15)'); }
   if (warnungen > 2) { p -= 5; abzuege.push('mehrere Warnungen (−5)'); }

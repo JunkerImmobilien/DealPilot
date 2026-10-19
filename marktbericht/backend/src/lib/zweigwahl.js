@@ -559,7 +559,11 @@ export function zinssatzFuerObjekt(deps, ags, obj = {}) {
     ausschuss: r.ausschuss || null, stufe_grund: r.stufe_grund || null,
     quellenvermerk: r.quellenvermerk || null, quelle_url: r.quelle_url || null,
     berichtsjahr: r.berichtsjahr || null, stichtag: r.stichtag || null,
-    modellansaetze: r.modellansaetze || null, roh: r };
+    modellansaetze: r.modellansaetze || null,
+    /* v2390 · GND und BWK-Quote des Satzes als Zahl, Datenbasis, Lizenz */
+    modell_gnd_jahre: r.modell_gnd_jahre ?? null, modell_bwk_quote: r.modell_bwk_quote || null,
+    fallzahl: r.fallzahl ?? null, lizenz: r.lizenz || null,
+    register_ebene: r.register_ebene || null, register_ags: r.register_ags || null, roh: r };
 }
 
 export default { dekodiere, typVon, waehle, zinssatzFuerObjekt };

@@ -161,10 +161,11 @@ export const ValuationService = {
       return v;
     }
     const q = Object.assign({}, bw.quelle || {});
-    /* Der Orchestrator setzt `brw_quelle: 'boris'`, sobald landValue
-       verfuegbar ist — auch fuer den Rueckfall auf die eigene Eingabe
-       (registry.js: source 'dealpilot-eingabe'). Hier zaehlt die echte
-       Herkunft: eine eigene Angabe ist kein amtlicher Wert. */
+    /* Bis v2390 setzte der Orchestrator `brw_quelle: 'boris'`, sobald landValue
+       verfuegbar war — auch fuer den Rueckfall auf die eigene Eingabe
+       (registry.js: source 'dealpilot-eingabe'). Seit v2390 liefert
+       ErtragswertService.brwHerkunft() die echte Herkunft ('eigene_angabe');
+       diese Zeile bleibt als Absicherung fuer aeltere Bodenwert-Ergebnisse. */
     if (landValue && landValue.source === 'dealpilot-eingabe') q.herkunft = 'eigene_angabe';
     v.vergleichswert_gesperrt = { grund: 'grundstueck',
       hinweis: 'Unbebautes Grundstück: Vergleichs-, Ertrags- und Sachwert entfallen; der Wert ist der Bodenwert.' };

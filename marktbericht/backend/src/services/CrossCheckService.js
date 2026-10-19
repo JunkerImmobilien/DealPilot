@@ -245,6 +245,9 @@ export const CrossCheckService = {
      * ein Verfahrens-Spread von 192 % heraus. Ein falsch gerechneter Quercheck
      * ist schlechter als keiner, das steht schon im Kommentar unten. */
     let _nhkFertig = false;
+    /* v2390 · Warum der NHK-Kern nichts lieferte (Gebaeudetyp, Standardstufe,
+       Kennwert) - der vereinfachte Pauschalweg unten muss es sagen koennen. */
+    let _nhkGrundFehlt = null;
     /* WNHK-5 · Sobald die NHK-Tabelle steht, rechnet der richtige Sachwert.
      * Bis dahin bleibt der bisherige vereinfachte Weg fuer Haeuser. */
     /* v1047-WSWE-1 · Wohnungen zugelassen, sobald eine BGF vorliegt.
@@ -702,6 +705,8 @@ export const CrossCheckService = {
          * out.comparison und den Spread. Frueher aussteigen hiesse, den
          * Sachwert zu haben und die Gegenueberstellung zu verlieren. */
         _nhkFertig = true;
+      } else {
+        _nhkGrundFehlt = _sw.grund || null;   /* v2390 */
       }
     }
 
@@ -787,6 +792,30 @@ export const CrossCheckService = {
           value_eur: sachwert,
           bodenwert_fehlt: bodenwert == null,
         };
+        /* ══ v2390 · DER PAUSCHALWEG IST VORLAEUFIG ═══════════════════════
+           835 €/m² BGF × Wohnfläche × 1,35 × Baupreisindex, Faktor 1,0: das
+           ist weder ein NHK-Kennwert der richtigen Tabelle noch marktangepasst.
+           Bis hier fehlte `vorlaeufig` - die Zahl zaehlte deshalb im Spread,
+           in Min/Max und als „gerechnetes" fuehrendes Verfahren mit, obwohl
+           der vorlaeufige NHK-Sachwert ohne Faktor laengst draussen blieb.
+           Marcel 19.10.2026: raus aus Spread und Wahl, und sagen, was fehlt. */
+        const _fehltSw = [];
+        if (!((p && p.nhk_typ) || ref.nhk_typ)) _fehltSw.push('Gebäudetyp nach NHK 2010');
+        if (!((p && p.standardstufe) || ref.standardstufe)) _fehltSw.push('Standardstufe');
+        const _fehltTxt = _fehltSw.length ? _fehltSw.join(' und ')
+          : (_nhkGrundFehlt ? String(_nhkGrundFehlt).replace(/\.$/, '') : 'ein Kostenkennwert der NHK 2010');
+        Object.assign(out.sachwert, {
+          vorlaeufig: true, pauschal: true,
+          bezeichnung: 'vereinfachter Sachwert (Pauschalansatz), vorläufig',
+          hinweis_kurz: 'Pauschalansatz ohne NHK-Kennwert und ohne Marktanpassung — kein Marktwert',
+          fehlt: _fehltSw.length ? _fehltSw : null,
+          grund_vorlaeufig: 'Vereinfachter Sachwert (Pauschalansatz 835 €/m² BGF, BGF aus der '
+            + 'Wohnfläche genähert, Sachwertfaktor 1,0), vorläufig: der Sachwert nach NHK 2010 '
+            + 'ließ sich nicht rechnen — es fehlt ' + _fehltTxt + '. Mit dieser Angabe rechnet '
+            + 'das Sachwertverfahren; bis dahin bleibt diese Zahl aus Verfahrensvergleich '
+            + 'und Verfahrenswahl heraus.',
+        });
+        out.notes.push(out.sachwert.grund_vorlaeufig);
         if (bodenwert == null) out.notes.push('Sachwert OHNE Bodenwert (Grundstücksfläche oder Bodenrichtwert fehlt) – nur Gebäudesachwert ausgewiesen.');
         /* v2241 · Derselbe Grundsatz wie im NHK-Kern (nhk2010.js): bOM wirken
            NACH der Marktanpassung, und dieser Weg hat keine. Ohne den Satz
@@ -1052,7 +1081,7 @@ export const CrossCheckService = {
       const bwErgebnis = p.bodenwert
         ? p.bodenwert
         : { vollstaendig: bodenwert != null, wert: bodenwert,
-            quelle: { brw_sqm: brw, herkunft: brw ? 'boris' : 'manuell' } };
+            quelle: { brw_sqm: brw, herkunft: brw ? ErtragswertService.brwHerkunft(landValue) : 'manuell' } };   /* v2390 */
 
       const ein = {
         objektart: ref.property_type, baujahr: buildYear, baustatus: ref.baustatus || 'bestand',
@@ -1100,6 +1129,9 @@ export const CrossCheckService = {
           && (_num(ref.mod_punkte) || 0) >= 18,
         sanierungsjahr: _num(ref.modernization_year) || _num(ref.reconstruction_year) || null,
         lzs_pct: lzsPct, lzs_quelle: p.lzs_quelle || 'pauschal', lzs_stufe: p.lzs_stufe || null,
+        /* v2390 · Ebene in Klartext fuer die Belastbarkeit (C ist nicht „marktabgeleitet") */
+        lzs_herkunft: p.lzs_zins_herkunft
+          ? { ebene: p.lzs_zins_herkunft.ebene, etikett: p.lzs_zins_herkunft.etikett } : null,
         /* v1083b-WSTU-7 · DAS FEHLENDE GLIED. Der Orchestrator setzt
          * lzs_herabgestuft seit v1050 — der CrossCheckService reichte es nie
          * durch. Der Ertragswert bekam also nur DASS der Wert auf B steht,
@@ -1193,6 +1225,29 @@ export const CrossCheckService = {
         ein.bwk_betrieb_nul_jahr = _num(p.bwk_betrieb_nul_jahr);
       }
 
+      /* ══ v2390 · DIE GND DES ZINSSATZ-MODELLS ══════════════════════════
+         Der Ertragswert nahm die Gesamtnutzungsdauer immer nach Anlage 1
+         (`gnd(objektart)` im Kern) - die GND des Registersatzes, dessen Zins
+         er nutzt, kam nie an (GAA lieferte `modell` statt `modellansaetze`,
+         der Orchestrator reichte nichts durch). § 10 ImmoWertV: der Zins gilt
+         nur im Modell, aus dem er abgeleitet wurde.
+         Wie beim Sachwert seit v1338 wird die Restnutzungsdauer im RICHTIGEN
+         Rahmen NEU abgeleitet (Anlage 2 aus Baujahr und Punkten, sonst die
+         Schaetzung im selben Rahmen) - keine fertige Zahl umgerechnet. Mit
+         Punkten leitet der Kern selbst ab (rnd_jahre bleibt null). */
+      const _gndLzs = _num(p.lzs_gnd_jahre);
+      let _gndEwQuelle = 'anlage1_immowertv';
+      if (_gndLzs) {
+        ein.gnd_jahre = _gndLzs;
+        _gndEwQuelle = 'modell_liegenschaftszins';
+        if (ein.rnd_jahre != null) {
+          try {
+            const _eL = rndEinheitlich(ref, _gndLzs);
+            if (_eL && Number(_eL.rnd) > 0) ein.rnd_jahre = Number(_eL.rnd);
+          } catch (e) { /* bleibt bei der Schaetzung des Berichts */ }
+        }
+      }
+
       const kern = ErtragswertService.ertragswert(ein, bwErgebnis);
       out.ertragswert_kern = kern;
 
@@ -1243,7 +1298,10 @@ export const CrossCheckService = {
            *
            * WertParameterService haengt das Feld an jede Antwort; hier geht
            * es nur weiter. */
-          liegenschaftszins_quelle_link: kern.lzs ? (kern.lzs.quelle_link || null) : null,
+          /* v2390 · `kern.lzs` fuehrt kein quelle_link (ErtragswertService
+             setzt nur pct/quelle/stufe) - das Feld war deshalb IMMER null,
+             und der Link im PDF-Zinskasten erschien nie. */
+          liegenschaftszins_quelle_link: p.lzs_quelle_link || (kern.lzs ? (kern.lzs.quelle_link || null) : null),
           /* v1107-WNACH - derselbe Grund wie beim Sachwertfaktor. */
           liegenschaftszins_quellenvermerk: kern.lzs ? (kern.lzs.quellenvermerk || kern.lzs.quelle || null) : null,
           liegenschaftszins_lizenz: kern.lzs ? (kern.lzs.lizenz || null) : null,
@@ -1271,6 +1329,17 @@ export const CrossCheckService = {
           liegenschaftszins_einordnung: p.lzs_einordnung || null,
           restnutzungsdauer_jahre: kern.nutzungsdauer ? kern.nutzungsdauer.rnd : rnd,
           gesamtnutzungsdauer_jahre: kern.nutzungsdauer ? kern.nutzungsdauer.gnd : null,   /* v2382 */
+          /* v2390 · woher die GND des Ertragswerts kommt */
+          gnd_quelle: _gndEwQuelle,
+          gnd_hinweis: _gndLzs
+            ? 'Gesamtnutzungsdauer ' + _gndLzs + ' Jahre aus dem Modell des Liegenschaftszinssatzes'
+              + (p.lzs_ausschuss ? ' (' + p.lzs_ausschuss + ')' : '') + ' — die Restnutzungsdauer '
+              + 'ist in diesem Rahmen neu abgeleitet (§ 10 ImmoWertV).'
+            : null,
+          /* v2390 · Ebene des Zinses in Klartext, Weg zum oertlichen Satz */
+          liegenschaftszins_herkunft: p.lzs_zins_herkunft || null,
+          indikativ_wegen_zins: !!(p.lzs_zins_herkunft && p.lzs_zins_herkunft.unter_a),
+          bwk_aus_zinssatz: !!p.bwk_quote_aus_lzs_satz,
           vervielfaeltiger: kern.barwertfaktor,
           bodenwert_eur: bwErgebnis.vollstaendig ? bwErgebnis.wert : null,
           value_eur: kern.wert,
@@ -1283,6 +1352,34 @@ export const CrossCheckService = {
         };
         kern.warnungen.forEach((w) => { if (out.notes.indexOf(w) < 0) out.notes.push(w); });
         kern.hinweise.forEach((h) => { if (out.notes.indexOf(h) < 0) out.notes.push(h); });
+        /* v2390 · Zins unter A: Ertragswert insoweit indikativ, und der Weg */
+        const _zh = p.lzs_zins_herkunft;
+        if (_zh && _zh.unter_a && _zh.ertragswert_hinweis) {
+          out.notes.push(_zh.ertragswert_hinweis + (_zh.weg && _zh.weg.text ? ' ' + _zh.weg.text : '')
+            + (_zh.weg && _zh.weg.url ? ' Quelle: ' + _zh.weg.url : ''));
+        }
+        if (out.ertragswert.gnd_hinweis) out.notes.push(out.ertragswert.gnd_hinweis);
+        /* v2390 · EINE RESTNUTZUNGSDAUER FUER ALLE VERFAHREN - ausser die
+           Modelle der beiden Ausschusssaetze verlangen verschiedene GND.
+           Dann rechnet jedes Verfahren in SEINEM Modell (§ 10), und der
+           Bericht sagt es, statt es zu verstecken. */
+        const _gSw = out.sachwert && out.sachwert.available ? Number(out.sachwert.gesamtnutzungsdauer_jahre) : null;
+        const _gEw = Number(out.ertragswert.gesamtnutzungsdauer_jahre);
+        if (_gSw > 0 && _gEw > 0 && _gSw !== _gEw) {
+          out.gnd_abweichung = {
+            sachwert_gnd_jahre: _gSw, ertragswert_gnd_jahre: _gEw,
+            sachwert_rnd_jahre: out.sachwert.restnutzungsdauer_jahre != null ? out.sachwert.restnutzungsdauer_jahre : null,
+            ertragswert_rnd_jahre: out.ertragswert.restnutzungsdauer_jahre,
+            sachwert_quelle: out.sachwert.gnd_quelle || null, ertragswert_quelle: _gndEwQuelle,
+            hinweis: 'Zwei Gesamtnutzungsdauern: der Sachwert rechnet mit ' + _gSw + ' Jahren ('
+              + (out.sachwert.gnd_quelle === 'modell_gutachterausschuss' ? 'Modell des Sachwertfaktors' : 'Anlage 1 ImmoWertV')
+              + '), der Ertragswert mit ' + _gEw + ' Jahren ('
+              + (_gndEwQuelle === 'modell_liegenschaftszins' ? 'Modell des Liegenschaftszinssatzes' : 'Anlage 1 ImmoWertV')
+              + '). Jedes Verfahren folgt dem Modell, aus dem sein Ausschusswert abgeleitet wurde '
+              + '(§ 10 ImmoWertV); die Restnutzungsdauer ist je Modell aus denselben Angaben abgeleitet.',
+          };
+          out.notes.push(out.gnd_abweichung.hinweis);
+        }
       } else {
         out.ertragswert = { available: false, grund: (kern.warnungen[0] || 'Ertragswert nicht berechenbar.') };
       }
@@ -1361,7 +1458,7 @@ export const CrossCheckService = {
         const bwErgebnisG = p.bodenwert
           ? p.bodenwert
           : { vollstaendig: bodenwert != null, wert: bodenwert,
-              quelle: { brw_sqm: brw, herkunft: brw ? 'boris' : 'manuell' } };
+              quelle: { brw_sqm: brw, herkunft: brw ? ErtragswertService.brwHerkunft(landValue) : 'manuell' } };   /* v2390 */
         const einG = {
           objektart: 'gewerbe', baujahr: buildYear, baustatus: ref.baustatus || 'bestand',
           wohnflaeche_qm: _flW, anzahl_we: _gew ? (_num(_gew.n_wohnen) || 0) : 0,
@@ -1526,7 +1623,8 @@ export const CrossCheckService = {
        das Verfahren benannt, das fuehren WUERDE, und was ihm fehlt. */
     if (out.verfahrenswahl && out.verfahrenswahl.verfahren) {
       const _vk = out.verfahrenswahl.verfahren;
-      const _gerechnet = _vk === 'sachwert' ? !!(out.sachwert && out.sachwert.available)
+      /* v2390 · der Pauschal-Sachwert fuehrt nicht - er ist kein Sachwert nach NHK 2010. */
+      const _gerechnet = _vk === 'sachwert' ? !!(out.sachwert && out.sachwert.available && !out.sachwert.pauschal)
         : _vk === 'ertragswert' ? !!(out.ertragswert && out.ertragswert.available)
           : _vk === 'vergleichswert' ? _vglKaufpreise : true;
       if (!_gerechnet) {
@@ -1534,6 +1632,10 @@ export const CrossCheckService = {
           : (out.ertragswert && out.ertragswert.grund)) || '').trim();
         const _fehltWas = (_vk === 'sachwert' && istWohnung && !(_bgfWhg > 0))
           ? 'die Brutto-Grundfläche (BGF)'
+          : (_vk === 'sachwert' && out.sachwert && out.sachwert.pauschal)   /* v2390 */
+            ? ((out.sachwert.fehlt && out.sachwert.fehlt.length)
+              ? 'die Angabe ' + out.sachwert.fehlt.join(' und ')
+              : 'ein Kostenkennwert der NHK 2010')
           : _vk === 'vergleichswert' ? 'ein amtlicher Vergleichsfaktor im Anwendungsbereich'
             : ('eine Pflichtangabe' + (_gGrund ? ' (' + _gGrund.replace(/\.$/, '') + ')' : ''));
         const _vName = { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren',

@@ -27,7 +27,10 @@ export const KENNZAHL_ZU_TYP = {
   liegenschaftszinssatz: 'lzs',
   sachwertfaktor: 'sachwertfaktor',
   vergleichsfaktor: 'vergleichsfaktor',
-  bewirtschaftungskostenquote: 'bwk_quote',
+  /* v2390 · Hier stand 'bwk_quote'. Die Kaskade fragt aber `bwk_pct`
+     (ReportOrchestrator, hole({ typ: 'bwk_pct' })) - die Open-Data-Ebene
+     griff fuer die Quote deshalb nie, egal wie voll die Tabelle war. */
+  bewirtschaftungskostenquote: 'bwk_pct',
   marktmiete: 'marktmiete',
   restnutzungsdauer: 'rnd',
   gesamtnutzungsdauer: 'gnd',

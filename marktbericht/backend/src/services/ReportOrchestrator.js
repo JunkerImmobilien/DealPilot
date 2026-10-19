@@ -883,14 +883,38 @@ export const ReportOrchestrator = {
        * verfuegbare Ansatz: nicht nur modellkonform, sondern das Modell
        * dieses Ausschusses. Faellt sie aus, greift der Modellansatz. */
       let _bwkPct = null;
+      /* ══ v2390 · ZUERST DIE QUOTE DES SATZES, DESSEN ZINS GERECHNET WIRD ══
+         § 10 ImmoWertV: der Zins gilt nur mit den Ansaetzen, aus denen er
+         abgeleitet wurde. Bis hier kam die Quote ausschliesslich aus der
+         Tabelle `wert_parameter` (hole('bwk_pct')) - das Register wurde nie
+         gefragt. Gemessen am 19.10.2026, Loehner Str. 278 (Kreis Herford,
+         Zweifamilienhaus): Zins 1,8 % aus dem Satz 2025, BWK 28,1 % aus den
+         Grundstuecksmarktdaten 2024. Der Satz 2025 selbst fuehrt 27,7 %. */
+      const _bwkSatz = (_lzs && _lzs.aus_register && _lzs.modell_bwk_quote && !_lzs.ausserhalb_geltung)
+        ? _lzs.modell_bwk_quote : null;
+      if (_bwkSatz) {
+        _bwkPct = { wert: _bwkSatz.pct, stufe: _lzs.stufe,
+          quelle: (_lzs.ausschuss || _lzs.quelle || 'Gutachterausschuss')
+            + (_lzs.berichtsjahr ? ', Berichtsjahr ' + _lzs.berichtsjahr : '')
+            + ' — Modellansatz desselben Satzes wie der Liegenschaftszinssatz',
+          herkunft: 'lzs_satz' };
+      }
       try {
-        const _b = await WertParameterService.hole({
+        const _b = _bwkSatz ? null : await WertParameterService.hole({
           typ: 'bwk_pct', ags: _agsWert || null,
           objektart: ref.property_subtype || ref.property_type, anzahlWe: ref.units,   /* v2381 */
         });
         /* v2381 · Gilt der Zinssatz des Ausschusses fuer dieses Objekt nicht, gilt auch seine
            BWK-Quote nicht - sie stammt aus denselben Kauffaellen. Dann Anlage 3. */
-        if (_b && _b.wert > 0 && !(_lzs && _lzs.ausserhalb_geltung)) _bwkPct = _b;
+        /* v2390 · Eine Quote aus einer offenen Veroeffentlichung (seit v2390
+           liest die Kaskade sie ueberhaupt, vorher hiess die Kennzahl dort
+           `bwk_quote`) gilt nur zusammen mit einem Zins AUS DERSELBEN Quelle.
+           Eine bundesweite Quote neben einem oertlichen Zins waere ein
+           Modellbruch. */
+        const _odFremd = _b && _b.herkunft === 'opendata'
+          && !(_lzs && _lzs.herkunft === 'opendata' && _lzs.quelle === _b.quelle);
+        if (_odFremd) step('bwk-quote: Open-Data-Quote verworfen (' + (_b.quelle || '?') + ') - nicht dieselbe Quelle wie der Zins');
+        if (_b && _b.wert > 0 && !(_lzs && _lzs.ausserhalb_geltung) && !_odFremd) _bwkPct = _b;
       } catch (e) { /* ohne Quote bleibt es beim Modellansatz */ }
       step('bwk-quote: ' + (_bwkPct ? _bwkPct.wert + ' % (Stufe ' + _bwkPct.stufe + ')' : 'keine'));
 
@@ -1085,7 +1109,12 @@ export const ReportOrchestrator = {
         brw_sqm: landValue && landValue.available ? landValue.value_sqm : null,
         brw_stichtag: landValue ? landValue.stichtag : null,
         brw_zone: landValue ? landValue.zone : null,
-        brw_quelle: landValue && landValue.available ? 'boris' : 'manuell',
+        /* v2390 · die ECHTE Herkunft. Hier stand `available ? 'boris'` - auch
+           beim Rueckfall auf die eigene Eingabe (registry.js, source
+           'dealpilot-eingabe'). Der Bericht nannte sie dann amtlich, und der
+           Belastbarkeitsabzug fiel weg. Korrigiert war das nur im Weg fuer
+           unbebaute Grundstuecke (ValuationService.grundstueck). */
+        brw_quelle: ErtragswertService.brwHerkunft(landValue),
         /* WBW26-1 · ist_wohnung entscheidet, ob der volle Grundstueckswert
          * ueberhaupt angesetzt werden darf. Ohne diese Angabe rechnete eine
          * 50-m2-Wohnung mit 700 m2 Grundstueck. */
@@ -1237,6 +1266,18 @@ export const ReportOrchestrator = {
           bwk_quote_pct: _bwkPct ? _bwkPct.wert : null,
           bwk_quote_stufe: _bwkPct ? _bwkPct.stufe : null,
           bwk_quote_quelle: _bwkPct ? _bwkPct.quelle : null,
+          bwk_quote_aus_lzs_satz: !!(_bwkPct && _bwkPct.herkunft === 'lzs_satz'),   /* v2390 */
+          /* ── v2390 · DIE MODELLANSAETZE DES ZINSSATZES ──────────────────
+             Bis hier kam vom Register-Satz nur die Zahl. Seine GND (und, wo
+             gefuehrt, seine BWK-Quote) blieben liegen - der Ertragswert
+             rechnete immer mit Anlage 1. Jetzt reisen sie mit, samt Herkunft. */
+          lzs_gnd_jahre: (_lzs.aus_register && Number(_lzs.modell_gnd_jahre) > 0
+            && !_lzs.ausserhalb_geltung) ? Number(_lzs.modell_gnd_jahre) : null,
+          lzs_ausschuss: _lzs.ausschuss || null,
+          /* v2390 · Ebene in Klartext + der Weg zum genaueren Wert (WPS.zinsHerkunft) */
+          lzs_zins_herkunft: _lzs.zins_herkunft || null,
+          lzs_quelle_link: _lzs.quelle_link || null,
+          lzs_quelle_url: _lzs.quelle_url || null,
           modellversion: _lzs.modellversion || null,
           lzs_parameter_id: _lzs.parameter_id, lzs_hinweis: _lzs.hinweis,
           /* ── v1816 · DIE RUECKFRAGE REIST BIS IN DEN BERICHT ──────────
@@ -1600,6 +1641,12 @@ export const ReportOrchestrator = {
         if (_wertParams && _wertParams.lzs_rueckfrage && !_wertParams.lzs_aus_register && (st === 'A' || st === 'B')) {
           e = ['indikativ, Rückfallwert', 'Satz des Gutachterausschusses, aber nicht objektgenau zugeordnet', true];
         }
+        /* v2390 · Die Tabelle oben ist nur noch der Rueckfall fuer alte
+           Datensaetze. Es gilt die HERKUNFT des Werts (WPS.zinsHerkunft) -
+           sie unterscheidet Register-C (amtlich, duenne Datenbasis) vom
+           Nachbarwert und vom Landeswert, was der Buchstabe nicht kann. */
+        var _zh = (_wertParams && _wertParams.lzs_zins_herkunft) || null;
+        if (_zh) e = [_zh.etikett, _zh.klartext, !!_zh.indikativ];
         /* v1099b-WQL · Der Weg zur Quelle geht auch an den BILDSCHIRM.
          * Im PDF steht er seit v1099; die Web-Ansicht las `wertermittlung_
          * herkunft` und hatte das Feld nicht. Ein Link, den nur das PDF
@@ -1614,6 +1661,10 @@ export const ReportOrchestrator = {
           _qlnk = _qa;
         } catch (e) { _qlnk = null; }
         return { stufe: st, kurz: e[0], lang: e[1], indikativ: e[2],
+                 /* v2390 · unter A: woher, dass es genauer geht, und wie */
+                 ebene: _zh ? _zh.ebene : null, unter_a: _zh ? !!_zh.unter_a : null,
+                 weg: _zh ? _zh.weg : null,
+                 ertragswert_hinweis: _zh ? _zh.ertragswert_hinweis : null,
                  liegenschaftszins_pct: _wertParams ? _wertParams.lzs_pct : null,
                  quelle: _wertParams ? _wertParams.lzs_quelle : null,
                  quelle_link: _qlnk };
