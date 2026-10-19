@@ -39017,6 +39017,40 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - Pilot-Antwort zu „Stufe 2“ und „Stufe C“.
 - Essen EFH Sachwertfaktor 1,33 im echten Bericht.
 
+### Prod-Rollout (55) · Zielbild v2430–v2432, Unterlagen v2440–v2445, Kappungsgrenzen, BW-Nachernte, LZS-Formel v2404 (19.10.2026)
+
+**Was:**
+- Mieterhöhung und Zielbild mit Ertragswert je Stufe (nur mit Stufe 3).
+- Unterlagen: zwei Ansprechpartner.
+- `frontend/js/data/kappungsgrenzen.json` (821 Gemeinden, 16 Länder).
+- BW-Nachernte: 63 LZS-Werte, 590 Wege-Sperren, HH-SWF-MFH-Sperre, Lizenzen SH/ST.
+- v2404: LZS-Formel neu abgeleitet (1.011 Sätze, c 1,682, gleiche Länder).
+
+**Commit:** Prod-Merge `67d447bf` (Stand staging `54ed07e8`).
+
+**Nachweis:**
+- Sicherung `main-20261019-1905-r55` (73 Tabellen, 14 MB) und `mb-…-r55` (32 Tabellen, 25 MB).
+- `mb-backend` und `backend` neu gebaut. Gold-Audit RC 0, `auth/me` 401.
+- `register-saat`: erst `--trocken`, dann echt. 4.266 Sätze, SOLL = IST, `register-db-abgleich --ssh=prod` sauber.
+- `tools/aemter-einspielen.mjs` im Backend-Container mit `tools/aemter-recherche-20261019/g*.json`: erst trocken, dann echt.
+  - 342 Sätze geschrieben, 156 Personen geprüft, 39 verworfen.
+  - Prod vorher 0 Ämter, nachher 342, davon 101 mit Ansprechpartnern (55 mit zwei).
+- Staging vorab:
+  - `mb-20261019-1854-vor-ernte-bw` gesichert.
+  - `register-saat`: 4.096 → 4.266 Sätze.
+  - Abgleich sauber.
+
+**Rest:**
+- Fragen an Marcel:
+  - SH-Portalklausel (18 Werte) und Kiel „nicht kommerziell“: behalten oder sperren?
+  - Ulm Jahrgang 2026: deckt die Genehmigung ihn?
+  - Aufteilung mit dem ETW-Zins vermietet (2,9 %) oder selbstgenutzt (1,9 %)?
+  - Telegram-Teil aus unterlagen-app-v5.
+  - Alte KI-Sätze je PLZ verdecken die gemeindeweiten.
+- Westerfeld (Staging) wurde beim bloßen Laden durch einen Agenten um 18:27 gespeichert. Hinzugekommen sind nur die leeren `zb_*`-Felder. Ursache vermutlich `dpTabSwitchSave` (save-before-switch).
+- In `dealpilot-backend:/tmp/aemter` liegen auf Prod noch die Recherche-JSONs. Root-Rechte fehlen, beim nächsten Rebuild sind sie weg.
+- `*.mp4.alt-20261019` im Videothek-Ordner wegräumen nach Abnahme.
+
 ### v2431/v2432 · Zielbild: Ertragswert nur mit Stufe 3, Aufteilung negativ mit Begründung (19.10.2026, Staging)
 
 **Was (Marcels zwei Entscheidungen vom 19.10.2026):**
