@@ -1083,6 +1083,14 @@ function _buildAIPayload() {
        fertig, aus zwei Saetzen persistierter `_kpis_*` - jede von den
        echten Kernen zu ihrer Zeit. Das Modell soll vergleichen, nicht
        nachrechnen; sonst rechnete es alte Daten mit heutigen Regeln. */
+    /* v2430 · Mieterhoehung und Zielbild: Ist/Soll/Zielbild je Wohnung,
+       Massnahmen, Kosten, Kappungsgrenze und - wenn gerechnet - der
+       Ertragswert je Stufe aus dem Marktbericht-Dienst. null ohne Angaben
+       (dann fragt der Prompt nichts dazu). */
+    potenzial: (function () {
+      try { return (window.DpPotenzial && DpPotenzial.pilotPayload) ? DpPotenzial.pilotPayload() : null; }
+      catch (e) { return null; }
+    })(),
     ankauf: (function () {
       var AK = window.DealPilotAnkauf;
       if (!AK || !AK.vorhanden()) return null;
@@ -1568,6 +1576,13 @@ async function _runAIServer(btn) {
       'KI recherchiert Makro-/Mikrolage, Mietspiegel und Marktdaten…</span>' +
     '</div>';
   try {
+    /* v2430 · Ertragswerte je Stufe vorher holen (kein Kontingent, keine KI),
+       damit der Pilot sie nennen kann. Hoechstens 40 s - danach ohne. */
+    try {
+      if (window.DpPotenzial && DpPotenzial.modell && DpPotenzial.modell().aktiv) {
+        await Promise.race([DpPotenzial.rechnen(), new Promise(function (r) { setTimeout(r, 40000); })]);
+      }
+    } catch (e) {}
     var payload = _buildAIPayload();
     /* v2013 - die Fotos, verkleinert. Gemessen liegen sie als
        data:image/jpeg;base64 im Objekt, bis 1,8 MB je Objekt - roh
@@ -2050,11 +2065,11 @@ function _renderAIServerAnalysis(a) {
     var schlechter = a.zeilen.filter(function (z) { return z.richtung === 'schlechter'; }).length;
     var besser = a.zeilen.filter(function (z) { return z.richtung === 'besser'; }).length;
     return '<div class="abw-tafel-host" style="margin:0">'
-      + '<div class="abw-kopf"><h4>Soll/Ist-Abgleich <span class="abw-sub">Bestand gegen Ankauf</span></h4>'
+      + '<div class="abw-kopf"><h4>Ankauf gegen Bestand <span class="abw-sub">eingefrorener Stand gegen heute</span></h4>'
       + '<div class="abw-stand">Ankauf-Stand vom <b>' + t + '</b></div></div>'
       + '<p style="margin:0 0 12px;font:400 12.5px/1.6 Inter,system-ui,sans-serif">'
-      + '<b>Ankauf</b> ist der Stand beim Nutzen-/Lastenwechsel \u2014 dein <b>Soll</b>. '
-      + '<b>Bestand</b> ist, wie das Objekt heute dasteht \u2014 dein <b>Ist</b>. '
+      + '<b>Ankauf</b> ist der Stand beim Nutzen-/Lastenwechsel. '   /* v2430: dein Soll/dein Ist raus - Soll heisst jetzt die Soll-Miete (Mieter bleibt) */
+      + '<b>Bestand</b> ist, wie das Objekt heute dasteht. '
       + (besser || schlechter
           ? ('Von ' + a.zeilen.length + ' vergleichbaren Kennzahlen stehen <b>' + besser
              + '</b> besser und <b>' + schlechter + '</b> schlechter als beim Ankauf.')
@@ -2073,6 +2088,16 @@ function _renderAIServerAnalysis(a) {
       + '</div></div>';
   }
   var _siHtml = _sollIstHtml();
+  /* v2430 · Ankauf · Bestand · Zielbild: die Tafel aus DpPotenzial (rechnet keinen
+     Ertragswert selbst - der kommt aus dem Marktbericht-Dienst) und der Absatz des
+     Piloten (potenzial_text). Ohne Soll-Miete und Zielbild bleibt es beim Abgleich. */
+  var _potHtml = (function () {
+    var PZ = window.DpPotenzial; var t = '';
+    try { t = PZ && PZ.tafelHtml ? PZ.tafelHtml() : ''; } catch (e) { t = ''; }
+    if (!t) return '';
+    return '<div class="dp-pa-card">' + sec('', I.bank, 'ANKAUF \u00b7 BESTAND \u00b7 ZIELBILD') + '<div data-dp-pot-wirt="1">' + t + '</div>'
+      + (has(a.potenzial_text) ? '<div style="margin-top:12px">' + sec('', I.bank, 'PILOT: WAS IM HAUS STECKT') + p(a.potenzial_text) + '</div>' : '') + '</div>';
+  })();
   /* v2217 · Marcel 14.10.2026: „haben wir die Pilot-Analyse des Objektes für
      den Soll-Stand? … wenn wir das Objekt in Bestand überführen, möchte ich
      das gegenüberstellen." Gemessen: alle 11 Ankauf-Stände auf Staging tragen
@@ -2170,7 +2195,7 @@ function _renderAIServerAnalysis(a) {
       tab('steuer', 'Steuer', false) +   /* v2160 */
       /* v2042 - nur wenn ein Ankauf-Stand vorliegt: ohne ihn gibt es
          nichts abzugleichen, und ein leerer Reiter verspricht etwas. */
-      (_siHtml ? tab('si', 'Soll/Ist-Abgleich', false) : '') +
+      (_siHtml || _potHtml ? tab('si', 'Ankauf \u00b7 Bestand \u00b7 Zielbild', false) : '') +   /* v2430 */
       /* v2171 · Hier stand seit v2155 der Reiter „Quellen". Marcel am
          13.10.2026: „nur unter der Pilot Analyse faellt der Reiter Quellen
          weg. ueberall soll das sonst bleiben woher die daten kommen."
@@ -2185,7 +2210,7 @@ function _renderAIServerAnalysis(a) {
       panel('verh', pV, false) +
       panel('bank', pK, false) +
       panel('steuer', pSt, false) +
-      (_siHtml ? panel('si', _siHtml, false) : '') +
+      (_siHtml || _potHtml ? panel('si', _potHtml + (_potHtml && _siHtml ? '<div style="margin-top:12px"></div>' : '') + _siHtml, false) : '') +   /* v2430 */
       panel('verlauf', '<div class="dp-pa-card" id="dp-pa-verlauf-body"><p class="dp-pa-p" style="color:#8b8678">Lade Marktbericht-Verlauf \u2026</p></div>', false) +
     '</div>' +
   '</div>';
