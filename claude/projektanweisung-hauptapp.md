@@ -38840,6 +38840,17 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2365–v2367a · Westerfeldstr. Stufe 3 durchgerechnet, Ist-Miete, Angebotsabschlag, Gegenprobe (18.10.2026) + Prod-Rollouts (49), (50)
+
+- **Prod (49):** v2364–v2364d geführte Eingabe, Merge `84da9d57`. **Prod (50):** v2365 + v2366, Merge `6092459a`, Sicherungen `*-20261018-0944-r50.sql.gz` (14 MB/73, 25 MB/32), Berlin-WGFZ im Prod-Container 1,3093, `/auth/me` 401.
+- **v2365:** `ValuationService.compute()` lief VOR der AGS-Zuweisung → die Marktpreisindikation fand nie einen amtlichen Umrechnungskoeffizienten (Bericht 217: Quercheck 0,4439, Indikation 0,8097 im selben Bericht). AGS-Auflösung vorgezogen.
+- **v2366:** WGFZ-Ernte BE/HH/HE/BY/HB/NI, 18 Werte, 78 Sperren, 27 Beispiele getroffen.
+- **v2367/a (Marcel: „so, dass es den Normen und Gesetzen entspricht und nah an der Realität ist"):** Ertragswert mit Ist-Miete, wenn ≤ 30 % von der Vergleichsmiete entfernt (§ 31 Abs. 2, § 10), sonst Vergleichsmiete + Hinweis § 8 Abs. 3. Angebotsabschlag im Bericht selbst (eigene Angabe > örtlich gemessen aus Ø Kaufpreis des Ausschusses gegen Angebotsmedian, 0–25 % > 5,8 %); Karten ziehen ihn nicht doppelt ab. Amtliche Gegenprobe `valuation.amtliche_gegenprobe` (Rohertragsfaktor × Rohertrag, Ø Kaufpreis × Wfl), Satz `mfh-kennzahlen-2026.json` (Bielefeld MFH: RoF 19, 1.820 €/m², 7,70 €/m², GMB 2026 S. 44–45). Web-Karten und PDF zeigen Abschlag, Gegenprobe, Mietbasis.
+- **Westerfeldstr. 140 (Bericht 220, Staging):** Bodenwert 313.623 € (0,4439, Bielefelder Tabelle übertragen) · Ertragswert 720.000 € (Ist 8,19 €/m², LZS 2,5 %, RND 23,6, V 17,67) · Sachwert 558.727 € vorläufig (kein MFH-SWF) · Indikation 785.000 € (675–860 Tsd., Abschlag 16,4 %) · Gegenprobe 730.000 € / 710.000 € · Kaufpreis 545.000 €.
+- **Eigener Fehler:** BRW „490" für die Westerfeldstraße war eine falsche Koordinate (Nachbarzone); richtig Zone 5400, 450 €/m². Und: ich habe den Messe-Studio-Tab des Video-Agenten umgeleitet (Aufnahme Modul 25 ggf. unterbrochen, Agent informiert).
+- **Commit:** `ccbff0f0`, `8659ad88`, `96c03883`, `83d0631c`.
+- **Rest:** Prod für v2367/a (Freigabe). Ansicht im Browser nicht gesehen (Browser durch Video-Agenten belegt) — `_mpZusatz` mit den Daten von Bericht 220 per Node geprüft; Staging-Abnahmepunkt. Vertonung aller 27 Videos fertig in `Dateien/Messe/Videos/Videoreihe-Sprecher/` (Abnahme durch Marcel). RND-Website: Entscheidung an den anderen Chat.
+
 ### v2364–v2364d · Geführte Eingabe repariert (17.10.2026, Staging) + Prod-Rollout (48) v2363
 
 - **Prod (48):** v2363 (WGFZ acht NRW-Ausschüsse), Merge `48db88a9`, Sicherungen `*-20261017-0921-r48.sql.gz` (14 MB/73, 25 MB/32), Prod-Container Köln 1,1623 / Düsseldorf 1,2074 / Bielefeld 1,1802, `/auth/me` 401.

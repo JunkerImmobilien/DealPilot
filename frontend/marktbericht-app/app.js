@@ -686,6 +686,26 @@ function _renderGegenrechnung(d) {
   wrap.appendChild(box);
 }
 
+/* v2367 · Zusatzzeile der Marktpreisindikation: Abschlag auf Angebotspreise und die
+   amtliche Gegenprobe aus den Kauffaellen des Ausschusses (Rohertragsfaktor,
+   Ø Kaufpreis). Ohne Daten: leer. */
+function _mpZusatz(d) {
+  var mv = (d.valuation && d.valuation.market_value) || {}, g = (d.valuation && d.valuation.amtliche_gegenprobe) || null;
+  var de = function (n) { return Math.round(n).toLocaleString('de-DE') + ' €'; };
+  var t = '';
+  if (mv.angebot_abschlag && mv.angebot_abschlag.pct > 0) {
+    t += '<br>inkl. ' + String(mv.angebot_abschlag.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise'
+      + (/rtlich/.test(mv.angebot_abschlag.herkunft || '') ? ' (aus den Kauffällen des Gutachterausschusses)'
+        : (/eigene/.test(mv.angebot_abschlag.herkunft || '') ? ' (dein Wert)' : ' (Marktdurchschnitt)'));
+  }
+  if (g && (g.wert_rohertragsfaktor_eur || g.wert_kaufpreis_mittel_eur)) {
+    var teile = [];
+    if (g.wert_rohertragsfaktor_eur) teile.push('Rohertragsfaktor ' + String(g.rohertragsfaktor).replace('.', ',') + ' × ' + de(g.rohertrag_eur) + ' = ' + de(g.wert_rohertragsfaktor_eur));
+    if (g.wert_kaufpreis_mittel_eur) teile.push('Ø Kaufpreis ' + de(g.kaufpreis_eur_qm_mittel).replace(' €', ' €/m²') + ' = ' + de(g.wert_kaufpreis_mittel_eur));
+    t += '<br>Gegenprobe aus Kauffällen des Gutachterausschusses' + (g.datengrundlage_jahr ? ' (' + g.datengrundlage_jahr + ')' : '') + ': ' + teile.join(' · ');
+  }
+  return t;
+}
 function _renderWertverfahren(d) {
   var wrap = document.getElementById('resultBody');
   if (!wrap) return;
@@ -847,7 +867,9 @@ function _renderWertverfahren(d) {
         eur(v),
         ((cc.comparison && cc.comparison.basis) === 'kaufpreise'
           ? 'amtliche Grundlage · § 20, § 25 ImmoWertV'
-          : 'Angebotspreise aus Portalen — keine Kaufpreise (§ 25 ImmoWertV)'),
+          : 'Angebotspreise aus Portalen — keine Kaufpreise (§ 25 ImmoWertV)')
+          /* v2367 · Abschlag auf Angebotspreise und amtliche Gegenprobe sichtbar */
+          + _mpZusatz(d),
         'vergleich')
     /* ── v1200 · Die Karte verschwieg, WIE gerechnet wurde ─────────────────
        Sie zeigte nur „Reinertrag 3.767 € p. a.". Dass ohne Bodenwert
@@ -862,7 +884,10 @@ function _renderWertverfahren(d) {
     + karte('ert', 'Ertragswert', e.available ? eur(e.value_eur) : '–',
         e.available
           ? ('Reinertrag ' + eur(e.reinertrag_pa_eur) + ' p. a.'
-             + (e.bodenwert_fehlt ? ' · <b>ohne Bodenwert gerechnet</b>' : ''))
+             + (e.bodenwert_fehlt ? ' · <b>ohne Bodenwert gerechnet</b>' : '')
+             /* v2367 · auf welcher Miete der Ertragswert steht */
+             + (e.miete_qm != null ? ' · Miete ' + String(e.miete_qm).replace('.', ',') + ' €/m²'
+                + (/Ist-Miete/.test(e.miete_quelle || '') ? ' (Ist-Miete, marktüblich)' : (e.miete_quelle ? ' (' + esc(e.miete_quelle) + ')' : '')) : ''))
           : (e.grund || ''),
         'ertrag', e.staffel)
     /* v1143-VORL \u00b7 Die Karte zeigte bei vorhandenem Sachwert eine LEERE
@@ -3950,6 +3975,13 @@ async function exportPdf(out) {
     card3(M, _vglTitel, cc.comparison.vergleichswert_eur, [
       mv.basis_median_sqm ? Math.round(mv.basis_median_sqm).toLocaleString('de-DE') + ' €/m² Median' : null,
       (d.sale && d.sale.sample_size) ? d.sale.sample_size + ' Vergleichsangebote' : null,
+      /* v2367 · Abschlag und amtliche Gegenprobe auch im PDF */
+      (mv.angebot_abschlag && mv.angebot_abschlag.pct > 0)
+        ? 'inkl. ' + String(mv.angebot_abschlag.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise' : null,
+      (d.valuation && d.valuation.amtliche_gegenprobe && d.valuation.amtliche_gegenprobe.wert_rohertragsfaktor_eur)
+        ? 'Gegenprobe Kauffälle: ' + Math.round(d.valuation.amtliche_gegenprobe.wert_rohertragsfaktor_eur).toLocaleString('de-DE') + ' € (Rohertragsfaktor)'
+          + (d.valuation.amtliche_gegenprobe.wert_kaufpreis_mittel_eur ? ' · ' + Math.round(d.valuation.amtliche_gegenprobe.wert_kaufpreis_mittel_eur).toLocaleString('de-DE') + ' € (Ø Kaufpreis)' : '')
+        : null,
       /* v1971: BEIDE Zeilen, nicht die eine ODER die andere. Der
          Immobilienrichtwert ist eine Auskunft fuer sich; der
          Paragraf-25-Hinweis haengt daran, woraus die ZAHL gebildet ist. */

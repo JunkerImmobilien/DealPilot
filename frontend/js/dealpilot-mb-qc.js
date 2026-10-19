@@ -210,6 +210,15 @@ if (!window._wlc) {
     }
     /* v2237 · Angebotspreise -> realistischer Marktwert (Satz aus den Einstellungen,
        sonst recherchierter Marktdurchschnitt). Zwilling: dealpilot-mb.js / -qc.js */
+    /* v2367 · Zieht der Marktbericht den Abschlag schon selbst ab (angebot_abschlag),
+       uebernimmt die Karte ihn nur - nie ein zweites Mal abziehen. */
+    try {
+      var _ab = mv && mv.angebot_abschlag;
+      if (_ab && _ab.pct != null) {
+        out.abschlag = { pct: _ab.pct, roh: { low: _ab.roh && _ab.roh.low, med: _ab.roh && _ab.roh.estimated, high: _ab.roh && _ab.roh.high },
+                         quelle: /eigene/.test(_ab.herkunft || '') ? 'dein Wert' : (/rtlich/.test(_ab.herkunft || '') ? 'örtliche Kauffälle' : 'Marktdurchschnitt') };
+      }
+    } catch (e) {}
     try { if (global.DealPilotAbschlag) global.DealPilotAbschlag.anwenden(out); } catch (e) {}
     return out;
   }
