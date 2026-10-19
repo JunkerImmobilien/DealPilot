@@ -39017,7 +39017,34 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - Pilot-Antwort zu „Stufe 2“ und „Stufe C“.
 - Essen EFH Sachwertfaktor 1,33 im echten Bericht.
 
-### v2400 · Zwischenstand Stufe N (DealPilot-Formel Liegenschaftszins) — angehalten (19.10.2026, nur Repo, kein Deploy)
+### v2400–v2403 · Stufe N · DealPilot-Formel als eigene Herkunftsstufe, LZS-Formel in der Kaskade (19.10.2026, Staging)
+
+**Was (Marcel 19.10.2026 freigegeben, Auftrag aus dem Zwischenstand unten):**
+- **Neue Stufe N zwischen C und D.** D heißt nur noch „gesetzlicher Auffangwert § 256 BewG". N tragen die LZS-Formel (v2401) sowie die UK-Flächen- und die WGFZ-Formel (v2402: `uk-naeherung.json`, `uk-wgfz-naeherung.json`, Rückfälle in `umrechnung_flaeche.js`/`umrechnung_wgfz.js`, beide Erzeuger).
+- **v2401 · Kaskade (`WertParameterService.js`).** `lzs-naeherung.json` und Erzeuger: `stufe` N, `verdrahtet` true. N wird versucht, wenn alle amtlichen Ebenen leer sind — und nur wenn das Register für die AGS **keinen** Satz führt (Wert, Sperre oder Rückfrage → D mit Weg zum Ausschuss), kein Registerfehler, kein Open-Data-Wert, kein Nachbarwert; Wohnen, RND 5–80, Länder BB BW HE NI NW RP SN.
+  - **Befund beim ersten Lauf:** `mb.wert_parameter` führt § 256 selbst als Zeile (Qualität D, Ebene bund, `00000`, 7 Objektarten). Darmstadt EFH kam darüber als D an, bevor die Kaskade den Rückfall am Ende erreichte. N wird deshalb VOR jeder D-Zeile der Tabelle versucht (`_versucheN()`) und noch einmal vor dem gerechneten Auffangwert; alles andere bleibt in seiner Reihenfolge.
+  - D trägt `dealpilot_formel_nicht` (Grund + Hinweis: `register_fuehrt_satz`, `land_nicht_besser`, `rnd_ausserhalb`, `keine_wohnnutzung` …).
+  - `zinsHerkunft()`: Ebene `dealpilot_formel` (unter A), Etikett „abgeleitet aus der DealPilot-Formel (N)", Klartext mit 984 Sätzen und 0,6 Prozentpunkten aus der JSON, Weg mit Ausschuss-Link; `hinweisZurStufe` N; `RANG` mit N; Kopfkommentar.
+  - Ertragswert: Belastbarkeit N −25 (C −20, D −40). CrossCheck: N nicht im Quellennachweis; Rechenweg (N) bzw. Grund ohne Formel (D) in den Hinweisen; `liegenschaftszins_formel(_hinweis/_nicht)`. Orchestrator: Tabelle `wertermittlung_herkunft` mit N, `lzs_formel`, `lzs_formel_nicht`. `api.js`: Reiter-Route rechnet bei N mit der RND des Objekts nach (sonst Reiter und Bericht verschieden) und liefert `zins_herkunft` und `formel`; Kommentare. KI: Verlaufstext und Gegenrechnung bekommen die Stufe im Klartext (`zinsstufeKlartext`).
+- **v2403 · Frontend.** `marktbericht-app/app.js`: `_stufeTxt` mit N, Rechenweg in Web-Ansicht und PDF (U+2212 ersetzt). `objekt-reiter.js`: `STUFEN`/`TRAUEN` mit N, Regex `[A-EN]`, Klasse `n`, Zinszeile „abgeleitet, nicht amtlich — genauer: Satz des Ausschusses eintragen" mit Link, Anfragen-Block bleibt bei N offen, Legende. `style.css`: `.oe-st.n` als Statusfarbe `#B87A46` (zwischen Gold und Rot, nicht tokenisiert). `help.js`: N als eigene Stufe, D nur noch Auffangwert, Überschrift „Herkunftsstufen A bis E und N". Buster v2403: `style.css`, `objekt-reiter.js`, `help.js`, `marktbericht-view.js` (index.html), `app.js` (marktbericht-app), iframe-Ziel. Frontend-Konstanten neu.
+
+**Commit:** `94a5184f` (v2400, Modul), `49839996` (v2401), `cece6019` (v2402), `b466b0a2` (v2403), `fe33f509` (v2401a).
+
+**Nachweis:**
+- Prüfer: `saat-pruefen --basislinie`, `uk-flaeche-pruefen` (121 Beispiele), `uk-wgfz-pruefen` (106), `rnd-kerne-pruefen`, `score-ketten-pruefen` (216 Punkte), `objekt-mapper-pruefen` alle RC 0; `buster-ebenen-pruefen` SAUBER; `frontend-konstanten --pruefen` aktuell; Gold-Audit auf Staging RC 0; `node --check` je Datei.
+- Funktionsläufe (Arbeitsstand im Container unter `/tmp/pr2401`, echtes Register und echte `mb.wert_parameter`): A Bielefeld 05711000 MFH 2,5 % · A Hüllhorst 05770016 ETW in ZFH 2,4 % · B Kreis Dithmarschen 01051004 EFH 3,4 % „amtlich, große Streuung" · C Ulm 08421000 ZFH 1,1 % „amtlich, geringe Datenbasis (N = 11)" · **N Darmstadt 06411000** EFH RND 40 1,61 %, MFH RND 25 2,96 %, ETW ohne RND 1,86 % (mittlere RND 43), ZFH RND 30 1,52 % · **N Offenbach 06413000** ZFH 1,52 % · **N BW 08115001** EFH 2,07 % · D Darmstadt RND 90 (`rnd_ausserhalb`), Gewerbe (`keine_wohnnutzung`) · D BY 09272116 und MV 13003000 (`land_nicht_besser`) · TH Erfurt direkt `land_nicht_besser` (Median 1,22 gegen 0,70) · **D nur Sperre** NI 03153002, RP 07111000, SN 14511000, BB 12062024 (`register_fuehrt_satz`, Rückfrage `datensatz_unvollstaendig`, Weg zum Ausschuss) · E eigene Angabe 3,1 %.
+- Deckung gemessen über 10.730 Gemeinden (Zensus-AGS): ohne jeden Registersatz HE 2 · BW 1.040 · BY 63 · MV 471; nur Sperren SH 820 · NI 88 · HE 1 · RP 2.300 · BW 13 · BY 1.993 · BB 63 · MV 112 · SN 417 · TH 43. **N wirkt damit heute fast nur in BW** — NW, NI, SN, RP, BB führen überall einen Satz oder eine Sperre.
+- Testobjekte vorher (alter Container, Bericht 310/311) = nachher (neu gebaut, 312/313): **W EW 725.000, LZS 2,5 % A**, SW 526.864 vorläufig, MW 795.000; **H EW 410.000, LZS 2,4 % A**, MW 281.000.
+- Bericht mit N (Prüfbericht 316, W-Daten nach Darmstadt versetzt): LZS 2,95 % N, Herkunft „abgeleitet aus der DealPilot-Formel (N)", Rechenweg im Bericht, Quellennachweis leer, Hinweis „Ertragswert insoweit indikativ". Belastbarkeit am Kern: C 72 / N 67 / D 52. Reiter-Route Darmstadt MFH: N 2,93 % mit RND 21 aus derselben Ableitung.
+
+**Rest:**
+- Browser-Abnahme durch Marcel (Staging): Reiter Objekt an einem BW-Objekt ohne Registersatz (Pille „Stufe N" in Kupfer, Tooltip, Link zum Ausschuss), Marktbericht-Web und PDF (Herkunftszeile, Rechenweg), Verkehrswert-Dropdown „N DealPilot-Formel", Hilfe „Herkunftsstufen A bis E und N".
+- Prüfbericht 316 zeigt einen Darmstädter Bodenwert von 1,73 Mio. € (BORIS, `brw` ohne `brw_manuell` wird nicht übernommen) und deshalb „Gebäudereinertrag null" — kein Befund zu N, aber der Ertragswert-RND dort (21) weicht vom Sachwert-RND (23,6) ab; im Liquidationsfall prüfen.
+- **Behoben in v2401a:** die Reiter-Route fragte mit `property_type` („haus") — Erfurt EFH bekam § 256 mit 4,0 % (MFH-Satz), der Bericht 2,5 %. Jetzt `property_subtype || property_type` wie im Orchestrator; nachgemessen Erfurt EFH D 2,5 %. Offen bleibt der Grundbefund aus v2380: `parameterObjektart` fällt eine unbekannte Art still auf `mfh_bis6`.
+- Ein anderer Strang hat `help.js` nach v2403 erneut geändert (Cockpit-Abschnitte, nicht committet) — dessen Commit braucht einen eigenen Buster über v2403.
+- Prod-Rollout nur nach Freigabe (mb-backend und backend neu bauen, keine Migration).
+
+### v2400 · Zwischenstand Stufe N (DealPilot-Formel Liegenschaftszins) — **erledigt in v2401–v2403** (Eintrag darüber; 19.10.2026)
 
 **Auftrag (Marcel 19.10.2026 freigegeben):** neue Herkunftsstufe **N · DealPilot-Formel** zwischen C und D (D heißt danach nur noch „gesetzlicher Auffangwert § 256 BewG"); UK-Fläche-, WGFZ- und LZS-Formel tragen N; LZS-Formel in der Kaskade vor § 256, nach allen amtlichen Ebenen, nur Wohnen, RND 5–80, nur in Ländern, in denen sie gemessen genauer ist als § 256, nie bei Ausschusswert oder Sperre. Marcel hat pausiert, Stand angehalten.
 

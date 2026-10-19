@@ -529,11 +529,26 @@ eine selbst ausgerechnete Zahl.
 - **Wo die Quelle endet, endet die Rechnung.**
 - **Kein Treffer heißt kein Wert** — nie ein Nachbarkreis, nie ein Landesmittel.
   **Ausnahme Liegenschaftszins (Marcel 19.10.2026):** dort gibt es IMMER einen
-  Wert (Kaskade bis Landes-/Bundeswert und § 256 BewG, Stufe B–D), damit der
+  Wert (Kaskade bis Landes-/Bundeswert, DealPilot-Formel und § 256 BewG,
+  Stufe B–D), damit der
   Ertragswert rechnet — aber jede Ebene unter A wird im Bericht ausgewiesen, mit
   dem Satz, dass es genauer geht (örtlichen Zins eintragen, Weg zum Ausschuss).
   Für Sachwertfaktor, UK und alle übrigen Werte gilt die Regel unverändert.
-- Jede Zahl trägt Herkunft: Stufe A–E, Modellvermerk, `indikativ`, Ausschuss.
+- **Stufe N · DealPilot-Formel (seit v2401, Marcel 19.10.2026)** — zwischen C
+  und D; D heißt nur noch „gesetzlicher Auffangwert § 256 BewG". N tragen die
+  UK-Flächen-, die WGFZ- und die LZS-Formel; nie amtlich, im Bericht immer
+  „abgeleitet aus der DealPilot-Formel". Die **LZS-Formel**
+  (`lib/lzs_naeherung.js`) greift nur: Wohnnutzung, RND 5–80, in den Ländern,
+  in denen sie gemessen genauer ist als § 256 (BB BW HE NI NW RP SN, aus
+  `lzs-naeherung.json` `pruefung.je_land`), und **nie, wenn das Register für
+  die AGS einen Satz führt** — auch keinen gesperrten und keinen mit
+  Rückfrage (dann § 256 mit Weg zum Ausschuss). Sie wird vor jeder
+  § 256-Zeile von `mb.wert_parameter` versucht (die Tabelle führt § 256
+  selbst als Qualität D, Ebene bund). Belastbarkeit −25 (C −20, D −40).
+  Gemessen 19.10.2026: wirksam fast nur in BW (1.040 Gemeinden ohne
+  Registersatz) und zwei Orten in HE; NW, NI, SN, RP, BB haben überall einen
+  Satz oder eine Sperre.
+- Jede Zahl trägt Herkunft: Stufe A–E und N, Modellvermerk, `indikativ`, Ausschuss.
 - Eine Restnutzungsdauer für alle Verfahren.
 - BWK-Quoten stehen auf dem **gesamten** Rohertrag inklusive Stellplätzen.
 - Verwaltungskosten je **bewerteter** Einheit.
