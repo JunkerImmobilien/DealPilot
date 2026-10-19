@@ -304,13 +304,44 @@ export const WertParameterService = {
        bekam den Zweig `we_v` des Kreises Minden-Luebbecke - derselbe
        Ausschuss nimmt solche Wohnungen aber aus seiner Eigentumswohnungs-
        Auswertung heraus. Dann gilt der Satz nicht: kein amtlicher Wert,
-       kein Nachbarzweig (auch nicht `zfh`), sondern der Weg zur Quelle.
+       kein Nachbarzweig - v2394: AUSSER dem ZFH-Zins desselben Ausschusses, siehe unten.
        Gerechnet wird mit dem gesetzlichen Auffangwert (Stufe D), als solcher
        gekennzeichnet. */
     if (typ === 'lzs' && ags && art === 'etw') {
       const _we = Number((objekt && objekt.einheiten) != null ? objekt.einheiten : anzahlWe);
       const _aus = etwKleinobjektAusgenommen(ags);
       if (_aus && Number.isFinite(_we) && _we > 0 && _we <= 2) {
+        /* v2394 · Marcel 19.10.2026: „warum ist fuer Huellhorst nicht amtlich? wir
+           haben doch alle Werte." Der Ausschuss nimmt Wohnungseigentum in Objekten
+           mit hoechstens zwei WE aus SEINER ETW-Auswertung - wirtschaftlich ist das
+           Objekt ein Zweifamilienhaus, und dafuer fuehrt derselbe Ausschuss einen
+           amtlichen Zins. Den nehmen wir (Stufe A), mit Begruendung. Nur wenn es den
+           nicht gibt, bleibt es beim Auffangwert. */
+        try {
+          const regZ = zinssatzFuerObjekt(
+            { finde: regFinde, lagenFuer: regLagen, abruf: regZins },
+            String(ags), { ...(objekt || {}), objart: 'zfh', einheiten: _we });
+          if (regZ && regZ.verfuegbar) {
+            return {
+              wert: Number(regZ.wert_pct), min: null, max: null,
+              stufe: regZ.stufe || 'A', stufe_roh: regZ.stufe || 'A',
+              quelle: regZ.quellenvermerk || regZ.ausschuss || 'Gutachterausschuss',
+              quelle_url: regZ.quelle_url || null, parameter_id: null,
+              modellversion: MODELL.IMMOWERTV_2021, fallzahl: null, ebene: 'gaa',
+              zweig: regZ.zweig, lage: regZ.lage || null,
+              berichtsjahr: regZ.berichtsjahr || null, stichtag: regZ.stichtag || null,
+              modellansaetze: regZ.modellansaetze || null,
+              modell_gnd_jahre: regZ.modell_gnd_jahre ?? null,
+              modell_bwk_quote: regZ.modell_bwk_quote || null,
+              ausschuss: regZ.ausschuss || null, register_fallzahl: regZ.fallzahl ?? null,
+              register_ebene: regZ.register_ebene || null, register_ags: regZ.register_ags || null,
+              lizenz: regZ.lizenz || null, aus_register: true,
+              hinweis: _aus + ' Die Wohnung liegt in einem Objekt mit ' + _we + ' Wohneinheiten und '
+                + 'ist damit wirtschaftlich Teil eines Zweifamilienhauses; gerechnet wird mit dem '
+                + 'amtlichen Liegenschaftszinssatz des Ausschusses für Zweifamilienhäuser (§ 10 ImmoWertV).',
+            };
+          }
+        } catch (e) { /* weiter zum Auffangwert */ }
         const fb = lzsNach256(objektart, brwSqm, anzahlWe);
         return {
           wert: fb.pct, min: null, max: null, stufe: 'D',
