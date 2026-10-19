@@ -7461,6 +7461,14 @@
     var akt = (_rf.aktionen || []).slice().sort(function (a, b) {
       return (b.art.indexOf('knf_') === 0 ? 1 : 0) - (a.art.indexOf('knf_') === 0 ? 1 : 0);
     });
+    /* v2369 · Die Abrufe (Markt, erweitert, Bodenrichtwert, Lage) stehen als
+       Auswahl IM CHAT, nicht in der Leiste darunter. Marcel zum Modul-25-Video:
+       die Anzeige „Soll ich das jetzt fuer dich abrufen?" ist im Weg, der
+       Investor Deal Score war nicht zu sehen - „als Auswahl ohne KI-Icons …
+       und es ist danach weg. Dann haben wir mehr Platz fuer den Chat." */
+    var _holAkt = akt.filter(function (a) { return a.art === 'markt' || a.art === 'markt2' || a.art === 'brw' || a.art === 'lage'; });
+    try { _rfAbrufImChat(_holAkt); } catch (x) {}
+    akt = akt.filter(function (a) { return _holAkt.indexOf(a) < 0; });
 
     /* Die Frage steht immer da — auch ohne Angebot. Wer nach einer langen
        Auskunft wieder hinsieht, muss nicht nach oben scrollen, um zu
@@ -7624,6 +7632,60 @@
       b.addEventListener('focus', zeig);
     });
   }
+  /* v2369 · Das Abruf-Angebot als Auswahl im Chat. EINE Blase je Angebot;
+     aendert sich die Auswahl, wird sie an Ort und Stelle neu beschriftet
+     (kein Springen), ist nichts mehr offen, verschwindet sie ganz. */
+  function _rfAbrufImChat(hol) {
+    var chat = $('vi-rf-chat'); if (!chat) return;
+    var alt = chat.querySelector('.vi-rf-abruf');
+    if (!hol || !hol.length) { if (alt) alt.remove(); return; }
+    if (!document.getElementById('vi-rf-abruf-css')) {
+      var st = document.createElement('style'); st.id = 'vi-rf-abruf-css';
+      st.textContent = [
+        '.vi-rf-abruf .vi-rf-abruf-o{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}',
+        '.vi-rf-abruf-b{padding:6px 12px;border-radius:99px;cursor:pointer;white-space:nowrap;',
+        '  border:1px solid var(--wl-c9a84c, #C9A84C);background:rgba(255,255,255,.7);color:#2A2727;',
+        '  font:600 12.5px Inter,system-ui,sans-serif;transition:background .12s ease}',
+        '.vi-rf-abruf-b:hover{background:var(--wl-c9a84c, rgba(201,168,76,.18))}',
+        '.vi-rf-abruf-b.nein{border-color:rgba(42,39,39,.22);font-weight:500;color:#6b6257}',
+        '.vi-rf-abruf-b i{font-style:normal;opacity:.6;margin-left:5px;font-weight:400}',
+        '.vi-rf-abruf-t{margin-top:6px;font-size:12px;opacity:.75}'
+      ].join('');
+      document.head.appendChild(st);
+    }
+    var sig = hol.map(function (a) { return a.art + ':' + (a.frei == null ? '' : a.frei); }).join('|');
+    /* Nach einer Wahl ist die Auswahl weg - auch wenn ein zweiter Abruf
+       noch offen steht. Er kommt erst wieder, wenn sich das Angebot aendert. */
+    if (_rf && _rf.abrufWeg === sig) { if (alt) alt.remove(); return; }
+    var d = alt;
+    if (!d) {
+      d = document.createElement('div');
+      d.className = 'vi-rf-blase vi-rf-co vi-rf-abruf';
+      chat.appendChild(d);
+    } else if (d.getAttribute('data-sig') === sig) return;
+    d.setAttribute('data-sig', sig);
+    var txt = hol.filter(function (a) { return a.txt; })[0];
+    d.innerHTML = '<div class="vi-rf-wer">Co-Pilot</div>Soll ich das für dich abrufen?' +
+      '<div class="vi-rf-abruf-o">' +
+      hol.map(function (a) {
+        return '<button type="button" class="vi-rf-abruf-b" data-akt="' + escH(a.art) + '"' +
+          (a.hinweis ? ' title="' + escH(a.hinweis) + '"' : '') + '>' + escH(a.knopf) +
+          (a.frei != null ? '<i>' + escH(String(a.frei)) + ' frei</i>' : '') + '</button>';
+      }).join('') +
+      '<button type="button" class="vi-rf-abruf-b nein" data-akt="ueberspringen">Nein, überspringen</button>' +
+      '</div>' + (txt ? '<div class="vi-rf-abruf-t">' + txt.txt + '</div>' : '');
+    [].slice.call(d.querySelectorAll('.vi-rf-abruf-b')).forEach(function (b) {
+      b.addEventListener('click', function () {
+        var art = b.getAttribute('data-akt');
+        d.remove();
+        if (_rf) _rf.abrufWeg = hol.filter(function (a) { return a.art !== art; })
+          .map(function (a) { return a.art + ':' + (a.frei == null ? '' : a.frei); }).join('|');
+        _rfAktionKlick(art, null);
+      });
+    });
+    if (!alt) _rfAnsEnde(chat, true);
+  }
+
   /* EIN Klickweg für alle Angebote. Vorher hatte jedes seinen eigenen —
      und der des Markt-Angebots vergass, den Dialog fortzusetzen (v1290).
 
