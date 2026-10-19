@@ -987,7 +987,7 @@
       var _ab = (h.art === 'Marktwert' && h.abschlag != null) ? ' (−' + String(h.abschlag).replace('.', ',') + ' %)' : '';
       var _tr = _trauen(h.trau);
       return '<option value="' + i + '"' + _t + '>' + _art + ' · '
-        + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €' + _ab + _f + (_tr ? ' · ' + _tr.buchst + ' ' + _tr.kurz : '') + '</option>';
+        + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €' + _ab + _f + (_tr ? ' · ' + (_tr.buchst ? _tr.buchst + ' ' : '') + _tr.kurz : '') + '</option>';
     };
     var _k0 = liste[0].art === 'Marktwert' ? 'Marktwertindikation' : (liste[0].art || 'Marktwertindikation');
     box.innerHTML = (liste.length > 1
