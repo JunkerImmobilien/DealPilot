@@ -26,7 +26,7 @@ import { AgsResolver } from '../connectors/AgsResolver.js';
 /* v1846 · fuer POST /wertparameter/zinssatz — der amtliche Zins und die
    RND nach Anlage 2 als LESEROUTE, damit das Haupt-Backend (Jacoby) nicht
    nachbaut, was hier schon steht. */
-import { WertParameterService } from '../services/WertParameterService.js';
+import { WertParameterService, zinsHerkunft } from '../services/WertParameterService.js';
 import { DealPilotObjectMapper } from '../services/DealPilotObjectMapper.js';
 /* v1968: `rnd as iwRnd` ist raus. Seit v1965 ruft diese Datei die
    Restnutzungsdauer ueber rnd-einheitlich.js; der Name war nur noch
@@ -599,7 +599,8 @@ router.get('/objects/history', async (req, res) => {
                  FROM jsonb_array_elements(coalesce(data->'cross_check'->'sachwert'->'staffel', '[]'::jsonb)) e)
                 AS sachwert_weg,
               /* v2393 . WIE WEIT TRAUT MAN DEM WERT? Marcel 19.10.2026: die Herkunfts-
-                 stufe A bis E schon bei der Uebergabe zeigen - man schaut nicht immer
+                 stufe A bis E (v2401: dazu N, DealPilot-Formel, zwischen C und D)
+                 schon bei der Uebergabe zeigen - man schaut nicht immer
                  in den Marktbericht. Ertragswert: Stufe des Liegenschaftszinssatzes;
                  Sachwert: Stufe des Sachwertfaktors bzw. vorlaeufig. Keine Backticks hier. */
               data->'cross_check'->'ertragswert'->>'liegenschaftszins_stufe' AS lzs_stufe,
@@ -633,7 +634,7 @@ router.get('/objects/history', async (req, res) => {
                  Mitgeliefert wird auch die HERKUNFT: ein amtlicher Satz
                  des Gutachterausschusses und ein Rueckfall sind nicht
                  dasselbe, und genau das muss die Analyse sagen koennen.
-                 Die Stufe traegt A-E, dazu der Zweig des Ausschusses, der
+                 Die Stufe traegt A-E und N (v2401), dazu der Zweig des Ausschusses, der
                  Jahrgang und ob der Satz aus dem Register kam.
 
                  KEINE BACKTICKS IN DIESEM KOMMENTAR. Er steht in einem
@@ -1238,10 +1239,11 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
     const _gem = await AgsResolver.gemeindeEindeutig(plz, d.ort || d.city || null).catch(() => null);
     const agsFein = (_gem && _gem.gemeinde_ags) || ags;
 
-    const p = await WertParameterService.hole({
+    const _zObjekt = { objart: d.objart, baujahr: m.build_year, einheiten: m.units,
+                haustyp: d.haustyp, nutzung: d.nutzungsart, lage: d.lage };
+    let p = await WertParameterService.hole({
       typ: 'lzs', ags: String(agsFein), objektart: m.property_type, anzahlWe: m.units || null,
-      objekt: { objart: d.objart, baujahr: m.build_year, einheiten: m.units,
-                haustyp: d.haustyp, nutzung: d.nutzungsart, lage: d.lage }
+      objekt: _zObjekt
     });
     if (!p || p.wert == null) {
       return res.json({ verfuegbar: false, grund: (p && (p.rueckfrage || p.hinweis)) || 'Kein Zinssatz ermittelbar.',
@@ -1303,6 +1305,18 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       rndHerkunft = restnutzungsdauerEinheitlich(_rndRef, gndJ);
       rndJ = rndHerkunft && rndHerkunft.rnd != null ? rndHerkunft.rnd : null;
     } catch (e) { rndJ = null; rndHerkunft = null; }
+    /* v2401 · Stufe N (DealPilot-Formel) haengt an der Restnutzungsdauer. Die erste
+       Abfrage oben kannte sie noch nicht und rechnete mit der mittleren RND der
+       Objektart - der Bericht rechnet mit der RND des Objekts. Ohne diese zweite
+       Abfrage zeigten Reiter und Bericht fuer dasselbe Objekt zwei Zinssaetze. */
+    if (p && p.stufe === 'N' && rndJ != null && Number.isFinite(Number(rndJ))) {
+      try {
+        const p2 = await WertParameterService.hole({
+          typ: 'lzs', ags: String(agsFein), objektart: m.property_type, anzahlWe: m.units || null,
+          objekt: { ..._zObjekt, restnutzungsdauer: Number(rndJ) } });
+        if (p2 && p2.wert != null) p = p2;
+      } catch (e) { /* bleibt bei der ersten Antwort */ }
+    }
 
     /* v1851 · Die Automatik-Leiste im Reiter Objekt zeigt neben dem Zins auch,
        ob der Ausschuss SACHWERTFAKTOREN fuehrt. Der Faktor selbst haengt am
@@ -1348,7 +1362,7 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       } else {
         ukQuelle = { verfuegbar: false, anwendbar: false, hinweis: null };
       }
-      /* v2358 · Greift im Bericht die DealPilot-Formel (Stufe D)? Dieselben
+      /* v2358 · Greift im Bericht die DealPilot-Formel (Stufe N seit v2401)? Dieselben
          Bedingungen wie im ReportOrchestrator: kein Registersatz oder eine
          Sperre ohne andere Regel des Ausschusses, Objektart aus dem
          abgeleiteten Segment. Die Geschosszahl der Zone kennt erst der
@@ -1385,6 +1399,10 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       quelle_url: p.quelle_url || null, zweig: p.zweig || null, lage: p.lage || null,
       berichtsjahr: p.berichtsjahr || null, stichtag: p.stichtag || null,
       ausschuss: p.quelle || null,
+      /* v2401 · Herkunft im Klartext (Ebene, Etikett, Weg zum Ausschuss) - auch fuer N */
+      zins_herkunft: (() => { try { return zinsHerkunft(WertParameterService.mitQuelle(p, String(agsFein), 'liegenschaftszinssatz')); } catch (e) { return null; } })(),
+      formel: p.stufe === 'N' ? (p.formel || null) : null,
+      hinweis: p.stufe === 'N' ? (p.hinweis || null) : undefined,
       gnd_jahre: Number(gndJ) || null,
       /* v1965: erst auf ABWESENHEIT pruefen, dann rechnen. `rnd_jahre: 0`
          ist ein Befund und kein fehlender Wert. */

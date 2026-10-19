@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* lzs-naeherung-ableiten.mjs (v2395, nur Datei, NICHT verdrahtet) — misst, ob sich
+/* lzs-naeherung-ableiten.mjs (v2395; seit v2401 verdrahtet als Stufe N, lib/lzs_naeherung.js) — misst, ob sich
    aus allen amtlichen Liegenschaftszinssaetzen des Registers eine DealPilot-
    NAEHERUNG ableiten laesst, die GENAUER ist als der heutige Rueckfall
    (§ 256 BewG, Stufe D). Marcel 16.10.2026: dasselbe Prinzip wie beim
@@ -162,9 +162,9 @@ const aus = {
   form: 'LZS [%] = c + a_ETW + a_MFH + a_WGH + r * min(80, max(5, RND))/10 + s * Stadt',
   herkunft: 'DealPilot-Naeherung aus allen amtlichen Liegenschaftszinssaetzen des Registers (Wohnnutzung, juengster Jahrgang je Zweig), kleinste Quadrate',
   kennzeichnung: 'abgeleitet aus der DealPilot-Formel (nie amtlich)',
-  stufe: 'D',
-  stufe_hinweis: 'Rang: unter jedem amtlichen Satz und unter dem Landeswert, ueber § 256 BewG. Eigene Stufe empfohlen (Bericht 19.10.2026).',
-  verdrahtet: false,
+  stufe: 'N',
+  stufe_hinweis: 'Stufe N (v2401): unter jedem amtlichen Satz und unter dem Landeswert, ueber § 256 BewG (D). Nur in Laendern, in denen sie gemessen genauer ist (pruefung.je_land), nie wo das Register fuer die AGS einen Satz fuehrt.',
+  verdrahtet: true,
   gilt_fuer: {
     familien: { EZFH: 'Ein-/Zweifamilien-, Doppel-, Reihenhaus', ETW: 'Wohnungseigentum', MFH: 'Drei- und Mehrfamilienhaus', WGH: 'Wohn- und Geschaeftshaus' },
     rnd_von: RND_VON, rnd_bis: RND_BIS,

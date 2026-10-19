@@ -153,6 +153,9 @@ export const CrossCheckService = {
         /* v2381 · Der Rueckfall heisst so und traegt seine Herkunft - nie „Stufe A" ohne Zusatz. */
         const _rfArt = (params && params.lzs_stufe === 'D')
           ? 'dem gesetzlichen Auffangwert nach § 256 BewG (Stufe D, kein Wert des Gutachterausschusses)'
+          /* v2401 · N tritt mit offener Rueckfrage nie auf (WertParameterService) - falls doch, beim Namen */
+          : (params && params.lzs_stufe === 'N')
+          ? 'einem aus der DealPilot-Formel abgeleiteten Wert (Stufe N, nicht amtlich)'
           : 'einem Rückfallwert' + ((params && params.lzs_quelle) ? ' (' + String(params.lzs_quelle).split(',')[0] + ')' : '')
             + ' — nicht dem objektgenau zugeordneten amtlichen Satz';
         out.notes.push(_rf.grund === 'ausserhalb_geltung'
@@ -1347,6 +1350,10 @@ export const CrossCheckService = {
             : null,
           /* v2390 · Ebene des Zinses in Klartext, Weg zum oertlichen Satz */
           liegenschaftszins_herkunft: p.lzs_zins_herkunft || null,
+          /* v2401 · Stufe N: die Formel mit Datenbasis und Rechenweg; bei D der Grund ohne Formel */
+          liegenschaftszins_formel: p.lzs_formel || null,
+          liegenschaftszins_formel_hinweis: p.lzs_stufe === 'N' ? (p.lzs_hinweis || null) : null,
+          liegenschaftszins_formel_nicht: p.lzs_formel_nicht || null,
           indikativ_wegen_zins: !!(p.lzs_zins_herkunft && p.lzs_zins_herkunft.unter_a),
           bwk_aus_zinssatz: !!p.bwk_quote_aus_lzs_satz,
           vervielfaeltiger: kern.barwertfaktor,
@@ -1367,6 +1374,11 @@ export const CrossCheckService = {
           out.notes.push(_zh.ertragswert_hinweis + (_zh.weg && _zh.weg.text ? ' ' + _zh.weg.text : '')
             + (_zh.weg && _zh.weg.url ? ' Quelle: ' + _zh.weg.url : ''));
         }
+        /* v2401 · N nennt seinen Rechenweg; D sagt, warum es keine DealPilot-Formel wurde
+           (Ausschuss fuehrt einen Satz oder hat gesperrt, Land gemessen nicht besser, RND ausserhalb). */
+        if (p.lzs_stufe === 'N' && p.lzs_hinweis && out.notes.indexOf(p.lzs_hinweis) < 0) out.notes.push(p.lzs_hinweis);
+        if (p.lzs_stufe === 'D' && p.lzs_formel_nicht && p.lzs_formel_nicht.hinweis
+            && out.notes.indexOf(p.lzs_formel_nicht.hinweis) < 0) out.notes.push(p.lzs_formel_nicht.hinweis);
         if (out.ertragswert.gnd_hinweis) out.notes.push(out.ertragswert.gnd_hinweis);
         /* v2390 · EINE RESTNUTZUNGSDAUER FUER ALLE VERFAHREN - ausser die
            Modelle der beiden Ausschusssaetze verlangen verschiedene GND.
@@ -1853,10 +1865,11 @@ export const CrossCheckService = {
              out.sachwert.sachwertfaktor_berichtsjahr);
     }
     /* v2385 · Ein Auffangwert (D) oder eine eigene Angabe (E) ist keine Registerzahl - H nannte
-       „§ 256 BewG (Liegenschaftszinssatz) · Lizenz nicht hinterlegt" als Quellennachweis. */
+       „§ 256 BewG (Liegenschaftszinssatz) · Lizenz nicht hinterlegt" als Quellennachweis.
+       v2401 · Ebenso die DealPilot-Formel (N): sie nennt keinen Ausschuss, also keine Namensnennung. */
     if (out.ertragswert && out.ertragswert.available
         && out.ertragswert.liegenschaftszins_pct != null
-        && ['D', 'E'].indexOf(String(out.ertragswert.liegenschaftszins_stufe || '')) < 0) {
+        && ['N', 'D', 'E'].indexOf(String(out.ertragswert.liegenschaftszins_stufe || '')) < 0) {
       _merke(out.ertragswert.liegenschaftszins_quellenvermerk, 'Liegenschaftszinssatz',
              out.ertragswert.liegenschaftszins_quelle_url, out.ertragswert.liegenschaftszins_lizenz,
              out.ertragswert.liegenschaftszins_berichtsjahr || null);

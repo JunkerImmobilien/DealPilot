@@ -146,7 +146,13 @@ export const KiGegenrechnungService = {
       },
       parameter: {
         liegenschaftszins_pct: params ? n(params.lzs_pct) : null,
-        liegenschaftszins_herkunft: params ? (params.lzs_stufe || params.lzs_quelle) : null,
+        /* v2401 · Stufe im Klartext (A amtlich ... N DealPilot-Formel ... D § 256), nicht nur der Buchstabe */
+        liegenschaftszins_herkunft: params ? (((params.lzs_zins_herkunft && params.lzs_zins_herkunft.etikett)
+          ? 'Stufe ' + (params.lzs_stufe || '?') + ': ' + params.lzs_zins_herkunft.etikett
+          : ({ A: 'Stufe A: amtlich', B: 'Stufe B: amtlich, grosse Streuung oder regional',
+               C: 'Stufe C: indikativ', N: 'Stufe N: abgeleitet aus der DealPilot-Formel, nicht amtlich',
+               D: 'Stufe D: gesetzlicher Auffangwert Paragraf 256 BewG', E: 'Stufe E: eigene Angabe' }[params.lzs_stufe]))
+          || params.lzs_stufe || params.lzs_quelle || null) : null,
       },
       kaufpreis_eur: n(ref.purchase_price),
       ist_kaltmiete_monat_eur: n(ref.monthly_net_rent),

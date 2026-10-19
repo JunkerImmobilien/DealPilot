@@ -523,6 +523,20 @@ const VTXT_NAMEN = {
   lzs_pct: 'Liegenschaftszins (%)', lzs_stufe: 'Herkunftsstufe Zins', fuehrend: 'fuehrendes Verfahren',
   bevoelkerung_trend_pct: 'Bevoelkerungstrend (% p.a.)'
 };
+/* v2401 · Die KI bekommt die Herkunftsstufe des Zinses im Klartext, nicht nur
+   den Buchstaben - sonst liest sie „N" als nichts oder als „amtlich". */
+const ZINSSTUFE_KLARTEXT = {
+  A: 'A (amtlich, Satz des zustaendigen Gutachterausschusses)',
+  B: 'B (amtlich, grosse Streuung oder regional)',
+  C: 'C (indikativ: amtlich mit geringer Datenbasis oder Nachbarwert desselben Ausschusses)',
+  N: 'N (abgeleitet aus der DealPilot-Formel, nicht amtlich)',
+  D: 'D (gesetzlicher Auffangwert nach Paragraf 256 BewG)',
+  E: 'E (eigene Angabe des Nutzers)',
+};
+export function zinsstufeKlartext(st) {
+  const s = String(st == null ? '' : st).trim().toUpperCase();
+  return ZINSSTUFE_KLARTEXT[s] || (s || null);
+}
 export async function generateVerlaufText(payload) {
   if (!aiEnabled()) return { text: '', error: 'KI im mb-Backend nicht aktiv.' };
   const p = payload || {};
@@ -533,7 +547,7 @@ export async function generateVerlaufText(payload) {
   if (series.length < 2) return { text: '', error: 'Zu wenig Berichte.' };
   const lines = series.map((row, i) => {
     const parts = felder.filter((k) => row[k] != null && row[k] !== '')
-      .map((k) => (VTXT_NAMEN[k] || labels[k] || k) + '=' + row[k]);
+      .map((k) => (VTXT_NAMEN[k] || labels[k] || k) + '=' + (k === 'lzs_stufe' ? zinsstufeKlartext(row[k]) : row[k]));
     return 'Bericht ' + (i + 1) + ' (' + (row.date || '?') + '): ' + parts.join(', ');
   }).join('\n');
   const o = p.objekt || {};

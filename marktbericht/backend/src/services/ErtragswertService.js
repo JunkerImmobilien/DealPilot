@@ -256,7 +256,7 @@ export const ErtragswertService = {
    *   bwk_modus               'normiert' | 'manuell'
    *   bwk_verwaltung_je_we, bwk_instandhaltung_je_qm, bwk_mietausfall_pct,
    *   bwk_betrieb_nul_jahr, bwk_gesamt_jahr (nur bei 'manuell')
-   *   lzs_pct, lzs_quelle, lzs_stufe   ('A'|'B'|'C'|'D')
+   *   lzs_pct, lzs_quelle, lzs_stufe   ('A'|'B'|'C'|'N'|'D'|'E'; N = DealPilot-Formel, v2401)
    *   gnd_jahre, rnd_jahre             (optional, sonst abgeleitet)
    *   bog_eur, bog_grund
    * }
@@ -711,6 +711,10 @@ function belastbarkeit({ lzsStufe, lzsGrund = null, lzsHerkunft = null, bwkGepru
     p -= 12;
     abzuege.push('Liegenschaftszinssatz ' + lzsHerkunft.etikett + ', nicht der örtliche Satz (−12)');
   }
+  /* v2401 · Stufe N (DealPilot-Formel): gemessen genauer als § 256 BewG
+   * (typ. Abweichung 0,6 gegen 0,8 Prozentpunkte), aber nie amtlich und nicht
+   * fuer diesen Ort ermittelt - deshalb zwischen C (−20) und D (−40). */
+  if (stufe === 'N') { p -= 25; abzuege.push('Liegenschaftszinssatz abgeleitet aus der DealPilot-Formel, nicht amtlich (−25)'); }
   if (stufe === 'D') { p -= 40; abzuege.push('Liegenschaftszinssatz nur gesetzlicher Auffangwert (−40)'); }
   if (stufe === 'E') { p -= 10; abzuege.push('Liegenschaftszinssatz vom Nutzer gesetzt (−10)'); }
   if (!bwkGeprueft) { p -= 8; abzuege.push('Bewirtschaftungskosten-Tabelle ungeprüft (−8)'); }
