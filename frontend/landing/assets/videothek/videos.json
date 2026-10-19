@@ -17,7 +17,7 @@
       "nutzen": "In Minuten entscheiden, ob ein Angebot deine Zeit wert ist.",
       "kapitel": ["Datenaufnahme", "Marktwert und Spanne", "Eigenkapital", "Lage", "Pilot-Analyse", "Als Objekt speichern"],
       "spruch": "Erst rechnen, dann boarden.",
-      "datei": "dealpilot-ueberblick-1-quick-boarding.mp4",
+      "datei": "dealpilot-ueberblick-1-quick-boarding.mp4", "datei_ton": "dealpilot-ueberblick-1-quick-boarding-sprecher.mp4",
       "poster": "dealpilot-ueberblick-1-quick-boarding.webp",
       "youtube": { "titel": "DealPilot Überblick 1 · Quick Boarding – vom Exposé zum ersten Urteil", "tags": ["DealPilot", "Immobilien", "Kapitalanlage", "Quick Check", "Exposé prüfen"], "youtube_id": null }
     },
@@ -29,7 +29,7 @@
       "nutzen": "Der komplette Flugplan eines Ankaufs, ohne ein einziges Mal die Daten abzutippen.",
       "kapitel": ["Objekt anlegen", "Marktbewertung", "Investition", "Miete", "Finanzierung", "Bewirtschaftung", "Steuer", "Kennzahlen", "DealScore", "Investment-PDF"],
       "spruch": "Vom ersten Eintrag bis zur Bankmappe.",
-      "datei": "dealpilot-ueberblick-2-objekt-bis-investment-pdf.mp4",
+      "datei": "dealpilot-ueberblick-2-objekt-bis-investment-pdf.mp4", "datei_ton": "dealpilot-ueberblick-2-objekt-bis-investment-pdf-sprecher.mp4",
       "poster": "dealpilot-ueberblick-2-objekt-bis-investment-pdf.webp",
       "youtube": { "titel": "DealPilot Überblick 2 · Vom neuen Objekt zum DealScore und Investment-PDF", "tags": ["DealPilot", "Mehrfamilienhaus", "DealScore", "Investment-PDF", "Immobilienanalyse"], "youtube_id": null }
     },
@@ -41,7 +41,7 @@
       "nutzen": "Nichts doppelt erfassen: was geprüft ist, steht im Objekt.",
       "kapitel": ["Quick Boarding", "Als Objekt speichern", "Was mitwandert", "Die Reiter", "Neues Objekt"],
       "spruch": "Boarding abgeschlossen. Dein Objekt ist an Bord.",
-      "datei": "dealpilot-modul-02-quick-boarding-zum-objekt.mp4",
+      "datei": "dealpilot-modul-02-quick-boarding-zum-objekt.mp4", "datei_ton": "dealpilot-modul-02-quick-boarding-zum-objekt-sprecher.mp4",
       "poster": "dealpilot-modul-02-quick-boarding-zum-objekt.webp",
       "youtube": { "titel": "DealPilot Modul 02 · Vom Quick Boarding zum Objekt", "tags": ["DealPilot", "Immobilien", "Objekt anlegen"], "youtube_id": null }
     },
@@ -53,7 +53,7 @@
       "nutzen": "Du wählst den Weg, der zu deinem Material passt.",
       "kapitel": ["Exposé", "Sprache", "ImmoMetrica", "Geführte Eingabe"],
       "spruch": "Vier Wege an Bord. Einer reicht für den Start.",
-      "datei": "dealpilot-modul-03-datenaufnahme-vier-wege.mp4",
+      "datei": "dealpilot-modul-03-datenaufnahme-vier-wege.mp4", "datei_ton": "dealpilot-modul-03-datenaufnahme-vier-wege-sprecher.mp4",
       "poster": "dealpilot-modul-03-datenaufnahme-vier-wege.webp",
       "youtube": { "titel": "DealPilot Modul 03 · Datenaufnahme: vier Wege", "tags": ["DealPilot", "Exposé auslesen", "Spracheingabe", "ImmoMetrica"], "youtube_id": null }
     },
@@ -65,7 +65,7 @@
       "nutzen": "So genau wie nötig — und immer klar, woher die Zahl kommt.",
       "kapitel": ["Pflichtfelder je Stufe", "Stufe 1", "Stufe 2", "Stufe 3 amtlich", "Abschlag auf Angebotspreise"],
       "spruch": "Drei Stufen Steigflug. Ab Stufe 3 amtlich.",
-      "datei": "dealpilot-modul-04-marktbewertung-drei-stufen.mp4",
+      "datei": "dealpilot-modul-04-marktbewertung-drei-stufen.mp4", "datei_ton": "dealpilot-modul-04-marktbewertung-drei-stufen-sprecher.mp4",
       "poster": "dealpilot-modul-04-marktbewertung-drei-stufen.webp",
       "youtube": { "titel": "DealPilot Modul 04 · Marktbewertung in drei Stufen", "tags": ["DealPilot", "Marktwert", "ImmoWertV", "Verkehrswert"], "youtube_id": null }
     },
@@ -77,7 +77,7 @@
       "nutzen": "Vom gesprochenen Satz zur Markteinschätzung, ohne Formular.",
       "kapitel": ["Sprache starten", "Live-Mitschrift", "Übersicht", "Übernahme", "Bewertung Stufe 2"],
       "spruch": "Erzählt, bewertet, eingeordnet. Klar zum Start.",
-      "datei": "dealpilot-modul-05-sprache-und-stufe-2.mp4",
+      "datei": "dealpilot-modul-05-sprache-und-stufe-2.mp4", "datei_ton": "dealpilot-modul-05-sprache-und-stufe-2-sprecher.mp4",
       "poster": "dealpilot-modul-05-sprache-und-stufe-2.webp",
       "youtube": { "titel": "DealPilot Modul 05 · Komplettbeispiel: Sprache und Stufe 2", "tags": ["DealPilot", "Spracheingabe", "Marktbewertung"], "youtube_id": null }
     },
@@ -89,7 +89,7 @@
       "nutzen": "Die Gesamtinvestition stimmt, bevor du über Rendite sprichst.",
       "kapitel": ["Kaufpreis", "Nebenkosten", "Standardwerte", "Sanierung", "15-%-Grenze", "Inventar"],
       "spruch": "Alles an Bord gewogen. Die Investition steht.",
-      "datei": "dealpilot-modul-06-investition.mp4",
+      "datei": "dealpilot-modul-06-investition.mp4", "datei_ton": "dealpilot-modul-06-investition-sprecher.mp4",
       "poster": "dealpilot-modul-06-investition.webp",
       "youtube": { "titel": "DealPilot Modul 06 · Investition", "tags": ["DealPilot", "Kaufnebenkosten", "Grunderwerbsteuer", "15-Prozent-Grenze"], "youtube_id": null }
     },
@@ -101,7 +101,7 @@
       "nutzen": "Du siehst, ob die Miete trägt — heute und in zehn Jahren.",
       "kapitel": ["Ist-Miete", "Marktmiete", "Leerstand", "Vertragsart", "Mietentwicklung"],
       "spruch": "Die Miete trägt. Steigflug eingeplant.",
-      "datei": "dealpilot-modul-07-miete-und-mietvertrag.mp4",
+      "datei": "dealpilot-modul-07-miete-und-mietvertrag.mp4", "datei_ton": "dealpilot-modul-07-miete-und-mietvertrag-sprecher.mp4",
       "poster": "dealpilot-modul-07-miete-und-mietvertrag.webp",
       "youtube": { "titel": "DealPilot Modul 07 · Miete und Mietvertrag", "tags": ["DealPilot", "Marktmiete", "Indexmiete"], "youtube_id": null }
     },
@@ -113,7 +113,7 @@
       "nutzen": "Eine Finanzierung, die du der Bank erklären kannst.",
       "kapitel": ["Konditionen", "Zuschlag nach Beleihung", "Marktdaten", "Eigenkapital", "Rate und Restschuld", "Standardwerte"],
       "spruch": "Zins verstanden, Schub berechnet.",
-      "datei": "dealpilot-modul-08-finanzierung.mp4",
+      "datei": "dealpilot-modul-08-finanzierung.mp4", "datei_ton": "dealpilot-modul-08-finanzierung-sprecher.mp4",
       "poster": "dealpilot-modul-08-finanzierung.webp",
       "youtube": { "titel": "DealPilot Modul 08 · Finanzierung", "tags": ["DealPilot", "Baufinanzierung", "Zins", "Beleihung"], "youtube_id": null }
     },
@@ -125,7 +125,7 @@
       "nutzen": "Laufende Kosten ehrlich gerechnet, nicht geschätzt.",
       "kapitel": ["Zwei Rechenwege", "Hausgeld", "Grundsteuer", "Rücklage", "Mietausfall", "Zusammenfassung"],
       "spruch": "Laufende Kosten im Blick — ruhiger Reiseflug.",
-      "datei": "dealpilot-modul-09-bewirtschaftung.mp4",
+      "datei": "dealpilot-modul-09-bewirtschaftung.mp4", "datei_ton": "dealpilot-modul-09-bewirtschaftung-sprecher.mp4",
       "poster": "dealpilot-modul-09-bewirtschaftung.webp",
       "youtube": { "titel": "DealPilot Modul 09 · Bewirtschaftung", "tags": ["DealPilot", "Hausgeld", "Bewirtschaftungskosten"], "youtube_id": null }
     },
@@ -137,7 +137,7 @@
       "nutzen": "Du weißt vorher, ob sich ein Restnutzungsdauer-Gutachten rechnet.",
       "kapitel": ["Grenzsteuersatz", "Steuerzeiträume", "AfA", "Restnutzungsdauer-Rechner", "Steuerergebnis über 15 Jahre"],
       "spruch": "Abschreibung an Bord, Steuer im Steigflug.",
-      "datei": "dealpilot-modul-10a-steuer-afa-restnutzungsdauer.mp4",
+      "datei": "dealpilot-modul-10a-steuer-afa-restnutzungsdauer.mp4", "datei_ton": "dealpilot-modul-10a-steuer-afa-restnutzungsdauer-sprecher.mp4",
       "poster": "dealpilot-modul-10a-steuer-afa-restnutzungsdauer.webp",
       "youtube": { "titel": "DealPilot Modul 10a · Steuer: AfA, Zeiträume, Restnutzungsdauer", "tags": ["DealPilot", "AfA", "Restnutzungsdauer", "Anlage 2 ImmoWertV"], "youtube_id": null }
     },
@@ -149,7 +149,7 @@
       "nutzen": "Ein höherer Gebäudeanteil heißt mehr Abschreibung — sauber begründet.",
       "kapitel": ["Anschaffungskosten", "Amtliche Aufteilung", "Vier Varianten", "Bodenabschlag", "Notarklausel", "Übernehmen"],
       "spruch": "Gebäude und Boden getrennt — sauber gelandet.",
-      "datei": "dealpilot-modul-10b-bmf-kaufpreisaufteilung.mp4",
+      "datei": "dealpilot-modul-10b-bmf-kaufpreisaufteilung.mp4", "datei_ton": "dealpilot-modul-10b-bmf-kaufpreisaufteilung-sprecher.mp4",
       "poster": "dealpilot-modul-10b-bmf-kaufpreisaufteilung.webp",
       "youtube": { "titel": "DealPilot Modul 10b · BMF-Kaufpreisaufteilung", "tags": ["DealPilot", "Kaufpreisaufteilung", "BMF Arbeitshilfe", "Gebäudeanteil"], "youtube_id": null }
     },
@@ -161,7 +161,7 @@
       "nutzen": "In Minuten wissen, ob sich ein Restnutzungsdauer-Gutachten für dich lohnt.",
       "kapitel": ["Die gesetzliche AfA", "Neun Schritte", "Das Ergebnis als Spanne", "Übernehmen", "Vorher und nachher", "Und ein Altbau?", "Sachverständig zu würdigen"],
       "spruch": "Restflugzeit geschätzt — das Gutachten landet.",
-      "datei": "dealpilot-modul-10c-restnutzungsdauer-rechner.mp4",
+      "datei": "dealpilot-modul-10c-restnutzungsdauer-rechner.mp4", "datei_ton": "dealpilot-modul-10c-restnutzungsdauer-rechner-sprecher.mp4",
       "poster": "dealpilot-modul-10c-restnutzungsdauer-rechner.webp",
       "youtube": { "titel": "DealPilot Modul 10c · Der Restnutzungsdauer-Rechner – AfA nach Anlage 2", "tags": ["DealPilot", "Restnutzungsdauer", "AfA", "Anlage 2", "Steuer Immobilie"], "youtube_id": null }
     },
@@ -173,7 +173,7 @@
       "nutzen": "Eine zweite Meinung mit Begründung — die Entscheidung bleibt bei dir.",
       "kapitel": ["Gesamturteil", "Stärken und Risiken", "Szenarien", "Lage", "Offerte", "Bank und Steuer", "Was der Pilot nicht tut"],
       "spruch": "Der Co-Pilot hat gesprochen — entscheiden tust du.",
-      "datei": "dealpilot-modul-11-pilot-analyse.mp4",
+      "datei": "dealpilot-modul-11-pilot-analyse.mp4", "datei_ton": "dealpilot-modul-11-pilot-analyse-sprecher.mp4",
       "poster": "dealpilot-modul-11-pilot-analyse.webp",
       "youtube": { "titel": "DealPilot Modul 11 · Pilot-Analyse im Detail", "tags": ["DealPilot", "KI Immobilienanalyse", "Co-Pilot"], "youtube_id": null }
     },
@@ -185,7 +185,7 @@
       "nutzen": "Du verstehst jede Zahl hinter dem Score — und kannst sie anpassen.",
       "kapitel": ["Kennzahlen und Formeln", "Eigene Grenzen", "DealScore", "Investor-Profile", "Investor Deal Score", "Warum zwei Scores"],
       "spruch": "Alle Instrumente im Blick — Score-Dial auf Grün.",
-      "datei": "dealpilot-modul-12-bewertung-und-kpis.mp4",
+      "datei": "dealpilot-modul-12-bewertung-und-kpis.mp4", "datei_ton": "dealpilot-modul-12-bewertung-und-kpis-sprecher.mp4",
       "poster": "dealpilot-modul-12-bewertung-und-kpis.webp",
       "youtube": { "titel": "DealPilot Modul 12 · Bewertung und KPIs", "tags": ["DealPilot", "DSCR", "Cashflow", "DealScore"], "youtube_id": null }
     },
@@ -197,7 +197,7 @@
       "nutzen": "Vom guten Score zur vollständigen Bankmappe.",
       "kapitel": ["Bereit für die Bank", "Was fehlt", "Deal-Status", "Unterlagen", "Ämter", "Netzwerk"],
       "spruch": "Checkliste abgehakt — bereit zum Abflug.",
-      "datei": "dealpilot-modul-13-deal-aktion.mp4",
+      "datei": "dealpilot-modul-13-deal-aktion.mp4", "datei_ton": "dealpilot-modul-13-deal-aktion-sprecher.mp4",
       "poster": "dealpilot-modul-13-deal-aktion.webp",
       "youtube": { "titel": "DealPilot Modul 13 · Deal-Aktion", "tags": ["DealPilot", "Bankunterlagen", "Finanzierungsunterlagen"], "youtube_id": null }
     },
@@ -209,7 +209,7 @@
       "nutzen": "Du siehst, ob dein Objekt hält, was der Ankauf versprochen hat.",
       "kapitel": ["Gewonnen", "Ankauf-Stand", "Soll und Ist", "Kennzahlen im Vergleich", "Pilot damals und heute"],
       "spruch": "Gelandet. Jetzt zählt der Reiseflug.",
-      "datei": "dealpilot-modul-14-ankauf-in-den-bestand.mp4",
+      "datei": "dealpilot-modul-14-ankauf-in-den-bestand.mp4", "datei_ton": "dealpilot-modul-14-ankauf-in-den-bestand-sprecher.mp4",
       "poster": "dealpilot-modul-14-ankauf-in-den-bestand.webp",
       "youtube": { "titel": "DealPilot Modul 14 · Vom Ankauf in den Bestand", "tags": ["DealPilot", "Bestandsimmobilie", "Soll-Ist-Vergleich"], "youtube_id": null }
     },
@@ -221,7 +221,7 @@
       "nutzen": "Die Anlage V vorbereitet, statt Belege zu sortieren.",
       "kapitel": ["Soll und Ist", "Steuerformular pro Jahr", "Erhaltungsaufwand", "Belege einlesen"],
       "spruch": "Logbuch geführt — jedes Jahr sauber verbucht.",
-      "datei": "dealpilot-modul-15-steuer-im-bestand.mp4",
+      "datei": "dealpilot-modul-15-steuer-im-bestand.mp4", "datei_ton": "dealpilot-modul-15-steuer-im-bestand-sprecher.mp4",
       "poster": "dealpilot-modul-15-steuer-im-bestand.webp",
       "youtube": { "titel": "DealPilot Modul 15 · Steuer im Bestand", "tags": ["DealPilot", "Anlage V", "Vermietung Steuer", "Belege"], "youtube_id": null }
     },
@@ -233,7 +233,7 @@
       "nutzen": "Je mehr du weißt, desto genauer der Wert — und jede Zahl mit Fundstelle.",
       "kapitel": ["Pflichtfelder", "Register des Gutachterausschusses", "Modernisierung und RND", "Standardstufe", "Ertragswert und Sachwert", "Quellennachweis"],
       "spruch": "Mehr Daten an Bord — präziser Landeanflug.",
-      "datei": "dealpilot-modul-16-stufe-3-genauer.mp4",
+      "datei": "dealpilot-modul-16-stufe-3-genauer.mp4", "datei_ton": "dealpilot-modul-16-stufe-3-genauer-sprecher.mp4",
       "poster": "dealpilot-modul-16-stufe-3-genauer.webp",
       "youtube": { "titel": "DealPilot Modul 16 · Stufe 3 genauer – Wertermittlung nach ImmoWertV", "tags": ["DealPilot", "Ertragswert", "Sachwert", "Liegenschaftszins", "ImmoWertV"], "youtube_id": null }
     },
@@ -245,7 +245,7 @@
       "nutzen": "Du gibst ein Objekt vollständig weiter, ohne etwas abzutippen — und weißt, was dein Konto nicht verlässt.",
       "kapitel": ["Die DealPilot-Sicherung", "Ein Objekt oder alle", "Die Datei entsteht", "Was mitgeht", "Was hierbleibt", "Beim Empfänger", "Und sonst"],
       "spruch": "Übergabe an den Copiloten — mit allen Papieren.",
-      "datei": "dealpilot-modul-17-objekt-uebertragen.mp4",
+      "datei": "dealpilot-modul-17-objekt-uebertragen.mp4", "datei_ton": "dealpilot-modul-17-objekt-uebertragen-sprecher.mp4",
       "poster": "dealpilot-modul-17-objekt-uebertragen.webp",
       "youtube": { "titel": "DealPilot Modul 17 · Objekt übertragen – die DealPilot-Sicherung", "tags": ["DealPilot", "Immobilie übertragen", "Sicherung", "Export", "Import"], "youtube_id": null }
     },
@@ -257,7 +257,7 @@
       "nutzen": "Der Markt rund um dein Objekt, auf einen Blick und belegbar.",
       "kapitel": ["Score und Marktwert", "Lage", "Bodenrichtwert", "Zensus", "Vergleichspreise", "Wertermittlung", "PDF"],
       "spruch": "Wetterbericht gelesen — Kurs bestätigt.",
-      "datei": "dealpilot-modul-18-der-marktbericht.mp4",
+      "datei": "dealpilot-modul-18-der-marktbericht.mp4", "datei_ton": "dealpilot-modul-18-der-marktbericht-sprecher.mp4",
       "poster": "dealpilot-modul-18-der-marktbericht.webp",
       "youtube": { "titel": "DealPilot Modul 18 · Der Marktbericht", "tags": ["DealPilot", "Marktbericht", "Bodenrichtwert", "Zensus"], "youtube_id": null }
     },
@@ -269,7 +269,7 @@
       "nutzen": "Ein Investment Case, den die Bank nicht erst übersetzen muss.",
       "kapitel": ["Fassung wählen", "Objekt und Finanzierung", "Kennzahlen", "Phasen und Exit", "Belastungsprobe", "Annahmen"],
       "spruch": "Flugplan eingereicht — die Bank fliegt mit.",
-      "datei": "dealpilot-modul-19-das-bank-pdf.mp4",
+      "datei": "dealpilot-modul-19-das-bank-pdf.mp4", "datei_ton": "dealpilot-modul-19-das-bank-pdf-sprecher.mp4",
       "poster": "dealpilot-modul-19-das-bank-pdf.webp",
       "youtube": { "titel": "DealPilot Modul 19 · Das Bank-PDF", "tags": ["DealPilot", "Bankunterlagen", "Investment Case", "Finanzierung"], "youtube_id": null }
     },
@@ -281,7 +281,7 @@
       "nutzen": "Deine Selbstauskunft zum Bestand, ohne eine Tabelle von Hand zu pflegen.",
       "kapitel": ["Bankexport", "Auf einen Blick", "Welche Objekte", "Je Darlehen eine Zeile", "Für die Bank"],
       "spruch": "Alle Maschinen gelistet — die Bank sieht die Flotte.",
-      "datei": "dealpilot-modul-20-bankexport-portfolio.mp4",
+      "datei": "dealpilot-modul-20-bankexport-portfolio.mp4", "datei_ton": "dealpilot-modul-20-bankexport-portfolio-sprecher.mp4",
       "poster": "dealpilot-modul-20-bankexport-portfolio.webp",
       "youtube": { "titel": "DealPilot Modul 20 · Bankexport Portfolio – alle Darlehen für die Bank", "tags": ["DealPilot", "Bankexport", "Immobilienportfolio", "Finanzierung"], "youtube_id": null }
     },
@@ -293,7 +293,7 @@
       "nutzen": "Du steuerst den Bestand als Ganzes statt Objekt für Objekt.",
       "kapitel": ["Das Portfolio-Cockpit", "Der Portfolio-Score", "Kennzahlen über alles", "Steuer über alle Objekte", "Die Projektion", "Der Portfolio-Pilot", "Und dann fragen"],
       "spruch": "Die ganze Flotte im Blick — der Pilot fliegt mit.",
-      "datei": "dealpilot-modul-21-portfolio-cockpit-und-pilot.mp4",
+      "datei": "dealpilot-modul-21-portfolio-cockpit-und-pilot.mp4", "datei_ton": "dealpilot-modul-21-portfolio-cockpit-und-pilot-sprecher.mp4",
       "poster": "dealpilot-modul-21-portfolio-cockpit-und-pilot.webp",
       "youtube": { "titel": "DealPilot Modul 21 · Portfolio-Cockpit und Portfolio-Pilot", "tags": ["DealPilot", "Immobilienportfolio", "Portfolio-Analyse", "KI", "Cashflow"], "youtube_id": null }
     },
@@ -305,7 +305,7 @@
       "nutzen": "Du hast dein Portfolio auch ohne App dabei.",
       "kapitel": ["Der Telegram-Bot", "Objekte erfragen", "Soll gegen Ist", "Ein Objekt anlegen", "In der App"],
       "spruch": "Funkverkehr mit dem Tower — jederzeit, von überall.",
-      "datei": "dealpilot-modul-22-telegram-bot.mp4",
+      "datei": "dealpilot-modul-22-telegram-bot.mp4", "datei_ton": "dealpilot-modul-22-telegram-bot-sprecher.mp4",
       "poster": "dealpilot-modul-22-telegram-bot.webp",
       "youtube": { "titel": "DealPilot Modul 22 · Der Telegram-Bot – Portfolio im Chat", "tags": ["DealPilot", "Telegram-Bot", "Immobilien Portfolio", "Soll-Ist"], "youtube_id": null }
     },
@@ -317,7 +317,7 @@
       "nutzen": "Du planst die Sanierung so, dass sie steuerlich nicht kippt.",
       "kapitel": ["Eine Sanierung", "15 % in drei Jahren", "So wird gerechnet", "Netto zählt", "Über der Grenze", "Der Gebäudeanteil", "Vor und nach der Aufteilung"],
       "spruch": "Unter der Grenze geblieben — Steuer im Sinkflug.",
-      "datei": "dealpilot-modul-23-die-15-prozent-grenze.mp4",
+      "datei": "dealpilot-modul-23-die-15-prozent-grenze.mp4", "datei_ton": "dealpilot-modul-23-die-15-prozent-grenze-sprecher.mp4",
       "poster": "dealpilot-modul-23-die-15-prozent-grenze.webp",
       "youtube": { "titel": "DealPilot Modul 23 · Die 15-%-Grenze – anschaffungsnahe Herstellungskosten", "tags": ["DealPilot", "anschaffungsnahe Herstellungskosten", "15-Prozent-Grenze", "Sanierung", "Steuer Immobilie"], "youtube_id": null }
     },
@@ -329,7 +329,7 @@
       "nutzen": "Du weißt, wo jede Unterlage liegt, statt Behörden abzutelefonieren.",
       "kapitel": ["Der Bodenrichtwert", "Aus BORIS", "Zum Nachsehen", "Unterlagen vom Amt", "Je Unterlage die Stelle", "Entwurf, nicht Versand", "Restnutzungsdauer-Gutachten"],
       "spruch": "Boden unter den Rädern — Papiere an Bord.",
-      "datei": "dealpilot-modul-24-bodenrichtwert-und-unterlagen.mp4",
+      "datei": "dealpilot-modul-24-bodenrichtwert-und-unterlagen.mp4", "datei_ton": "dealpilot-modul-24-bodenrichtwert-und-unterlagen-sprecher.mp4",
       "poster": "dealpilot-modul-24-bodenrichtwert-und-unterlagen.webp",
       "youtube": { "titel": "DealPilot Modul 24 · Bodenrichtwert und Unterlagen vom Amt", "tags": ["DealPilot", "Bodenrichtwert", "BORIS", "Grundbuch", "Bauakte"], "youtube_id": null }
     },

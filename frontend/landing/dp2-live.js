@@ -21,7 +21,14 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-3c';
+  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-4';
+  /* landing-videothek-4 · Jedes Video gibt es mit und ohne Sprecher (Marcel 19.10.2026:
+     „die Videos muss es vertont und unvertont geben"). videos.json traegt je Eintrag
+     `datei_ton`; die Wahl merkt sich der Browser, Standard: mit Sprecher. */
+  var TON = true;
+  try { TON = localStorage.getItem('dp_vt_ton') !== '0'; } catch (e) {}
+  function datei(v) { return (TON && v && v.datei_ton) ? v.datei_ton : v.datei; }
+  function tonText() { return TON ? 'Mit Sprecher ✓' : 'Ohne Sprecher'; }
   var ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>';
   var PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h4.5v16H6zM13.5 4H18v16h-4.5z"/></svg>';
@@ -131,7 +138,7 @@
       setTimeout(function () {
         vid.setAttribute('poster', D.basis_bilder + v.poster);
         vid.preload = scharf ? 'metadata' : 'none';
-        vid.src = D.basis_medien + v.datei;
+        vid.src = D.basis_medien + datei(v);
         karteFuellen(v);
         $('dplFlug').textContent = 'Flug DP-' + String(v.nr).replace('Ü', 'U');
         $('dplZeit').textContent = '0:00 / ' + mmss(v.dauer);
@@ -289,16 +296,27 @@
     kino.className = 'vt-kino'; kino.setAttribute('role', 'dialog'); kino.setAttribute('aria-modal', 'true');
     kino.innerHTML = '<div class="vt-kino-in"><video id="vtVideo" controls playsinline preload="metadata"></video>' +
       '<div class="vt-kino-t"><button class="vt-zu" id="vtZu" aria-label="Schließen">×</button><div id="vtKinoText"></div>' +
-      '<div class="vt-kino-n"><button id="vtZur">‹ Vorheriges</button><button id="vtVor">Nächstes ›</button></div></div></div>';
+      '<div class="vt-kino-n"><button id="vtZur">‹ Vorheriges</button><button id="vtVor">Nächstes ›</button>' +
+      '<button id="vtTon" aria-pressed="' + (TON ? 'true' : 'false') + '" title="Zwischen der Fassung mit Sprecher und der ohne Ton wechseln">' + tonText() + '</button></div></div></div>';
     document.body.appendChild(kino);
     var kv = kino.querySelector('#vtVideo'), aktuell = -1;
+    /* landing-videothek-4 · Umschalten mit/ohne Sprecher - Stelle im Video bleibt */
+    kino.querySelector('#vtTon').addEventListener('click', function () {
+      TON = !TON;
+      try { localStorage.setItem('dp_vt_ton', TON ? '1' : '0'); } catch (e) {}
+      this.textContent = tonText(); this.setAttribute('aria-pressed', TON ? 'true' : 'false');
+      if (aktuell < 0) return;
+      var v = V[aktuell], t = kv.currentTime || 0, lief = !kv.paused;
+      kv.src = D.basis_medien + datei(v);
+      kv.addEventListener('loadedmetadata', function f() { kv.removeEventListener('loadedmetadata', f); try { kv.currentTime = t; } catch (e) {} if (lief) { var p = kv.play(); if (p && p.catch) p.catch(function () {}); } });
+    });
 
     function oeffne(id, ohneHash) {
       var i = -1; V.forEach(function (v, j) { if (v.id === id) i = j; });
       if (i < 0) return;
       aktuell = i; var v = V[i];
       kv.setAttribute('poster', D.basis_bilder + v.poster);
-      kv.src = D.basis_medien + v.datei;
+      kv.src = D.basis_medien + datei(v);
       kino.querySelector('#vtKinoText').innerHTML =
         '<div class="dpl-k-kick"><span>' + esc(nrLabel(v, D)) + '</span><span>' + mmss(v.dauer) + ' Min.</span></div>' +
         '<h3>' + esc(v.titel) + '</h3><div class="vt-u">' + esc(v.unterzeile) + '</div>' +
