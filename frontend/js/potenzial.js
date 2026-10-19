@@ -37,6 +37,12 @@
   if (window.DpPotenzial) return;
 
   var KENNZEICHNUNG = 'Potenzialwert nach Mieterhöhung bzw. Zielbild, keine Verkehrswertermittlung.';
+  /* v2431 · Marcel 19.10.2026 (Geld): Ertragswert nur mit Stufe 3 - geprueft im
+     Haupt-Backend (services/ertragswertFreigabe.js). Ohne Freigabe kommt
+     `ertragswert_gesperrt` zurueck; Mieten, Zielbild, Kosten und Rendite bleiben. */
+  var GESPERRT_KURZ = 'Ertragswert je Stufe mit DealPilot Stufe 3';
+  var GESPERRT_LANG = 'Der Ertragswert gehört zur Wertermittlung nach ImmoWertV (Stufe 3). Er erscheint hier, sobald für dieses Objekt ein Marktbericht Stufe 3 vorliegt oder dein Tarif Stufe 3 enthält.';
+  function gesperrt(r) { return !!(r && r.ertragswert_gesperrt); }
   var KAPP_URL = 'js/data/kappungsgrenzen.json';
   var AUFTEILUNG_JE_WE = 1800;   /* Vorbelegung: Notar, Grundbuch, Teilungserklärung, Abgeschlossenheit */
   var PRAEFIX = { '01': 'SH', '02': 'HH', '03': 'NI', '04': 'HB', '05': 'NW', '06': 'HE', '07': 'RP', '08': 'BW',
@@ -375,7 +381,8 @@
       var s = m.stufen[k]; if (!s) return;
       varianten.push({ key: k, miete_wohnen_jahr: Math.round(wohnMiete(k)), mod_punkte_plus: s.plus, kosten: Math.round(s.kosten) });
     });
-    var body = { object: obj, varianten: varianten };
+    /* v2431 · die Objektkennung: an ihr haengt ein schon vorliegender Bericht Stufe 3 */
+    var body = { object: obj, varianten: varianten, external_ref: (typeof window._currentObjKey === 'string' && window._currentObjKey) || null };
     if (m.art === 'mfh') {
       body.wohnungen = m.wohnungen.map(function (w) {
         var sm = (w.soll && w.soll.miete > w.ist) ? w.soll.miete : w.ist;
@@ -399,7 +406,10 @@
       if (!body) return null;
       var h = hash(JSON.stringify(body));
       var alt = window._dpPotenzial;
-      if (!opts.erzwingen && alt && alt.hash === h && alt.ergebnis && alt.ergebnis.verfuegbar) return alt.ergebnis;
+      /* v2431 · ein gespeicherter Ertragswert gilt einen Tag: aendert sich die
+         Freigabe (Tarif, Testphase), fragt der naechste Tag den Dienst neu. */
+      var frisch = alt && alt.stand && (Date.now() - Date.parse(alt.stand)) < 864e5;
+      if (!opts.erzwingen && alt && alt.hash === h && alt.ergebnis && alt.ergebnis.verfuegbar && frisch) return alt.ergebnis;
       if (_lauf && _lauf.h === h) return _lauf.p;
       if (!window.Auth || typeof Auth.apiCall !== 'function') return null;
       var key = window._currentObjKey || null;
@@ -485,9 +495,13 @@
         dscr: kz[k] && kz[k].dscr != null ? Math.round(kz[k].dscr * 100) / 100 : null,
         ertragswert: h[k] ? h[k].wert : null, rnd: h[k] ? h[k].rnd : null };
     });
+    if (gesperrt(r)) { z.ertragswert_gesperrt = true; z.ertragswert_hinweis = GESPERRT_KURZ + '. ' + GESPERRT_LANG; }
     if (r && r.aufteilung && r.aufteilung.je_stufe) {
+      var zb = r.aufteilung.zins && r.aufteilung.zins.bestand;
       z.aufteilung = { kosten: r.aufteilung.kosten_eur, je_stufe: r.aufteilung.je_stufe,
-        zins_etw: r.aufteilung.zins && r.aufteilung.zins.bestand ? r.aufteilung.zins.bestand.pct : null };
+        zins_etw: zb ? zb.pct : null, zins_etw_ausschuss: zb ? zb.ausschuss || null : null,
+        zins_haus: r.basis ? r.basis.lzs_pct : null,
+        negativ_hinweis: r.aufteilung.negativ_hinweis || null };   /* v2431 */
     }
     z.wohnungen = m.wohnungen.slice(0, 30).map(function (w) {
       return { nr: w.nr, lage: w.lage, wfl: w.wfl, status: w.status, ist: Math.round(w.ist),
@@ -504,6 +518,11 @@
     var z = zusammenfassung(m, r);
     z.ertragswert_gerechnet = !!(r && r.verfuegbar);
     if (r && r.basis) z.zins = { pct: r.basis.lzs_pct, stufe: r.basis.lzs_stufe };
+    if (!r) {
+      /* v2431 · noch nichts gerechnet: ohne Freigabe keine Ertragswerte erwaehnen */
+      var alt = window._dpPotenzial;
+      if (alt && gesperrt(alt.ergebnis)) { z.ertragswert_gesperrt = true; z.ertragswert_hinweis = GESPERRT_KURZ + '. ' + GESPERRT_LANG; }
+    }
     return z;
   }
 
@@ -526,7 +545,12 @@
       '.dp-pot .dp-pot-kz{font:500 11px "JetBrains Mono",monospace;color:#2f7d55;border:1px solid #2f7d55;border-radius:999px;padding:1px 8px;margin-left:8px;white-space:nowrap}',
       '.dp-pot .dp-pot-knopf{border:1px solid var(--wl-c9a84c, #C9A84C);background:#fff;color:#1d1a14;border-radius:8px;padding:6px 12px;font:600 12px Inter,sans-serif;cursor:pointer}',
       '.dp-pot .dp-pot-knopf:focus-visible{outline:2px solid var(--wl-c9a84c, #C9A84C);outline-offset:2px}',
-      '.dp-pot tr.dp-pot-sum td{font-weight:700;border-top:2px solid #E6DCC2}'
+      '.dp-pot tr.dp-pot-sum td{font-weight:700;border-top:2px solid #E6DCC2}',
+      /* v2431 */
+      '.dp-pot .dp-pot-stufe3{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:10px 0 0;padding:10px 12px;border:1px solid #E6DCC2;border-radius:10px;background:#FBF6E9;font-size:12.5px;color:#4a4436}',
+      '.dp-pot .dp-pot-stufe3 b{color:#1d1a14;flex:1 1 100%}',
+      '.dp-pot .dp-pot-stufe3 span{flex:1 1 260px}',
+      '.dp-pot td.dp-pot-neg{color:#6c6450 !important;font-weight:500 !important;white-space:normal}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -555,6 +579,10 @@
       ['Restnutzungsdauer', function (x, k) { var h = H[k]; return h && h.rnd != null ? dez(h.rnd, 0) + ' J.' : '—'; }],
       ['Ertragswert', function (x, k) { var h = H[k]; return h && h.wert != null ? '<b>' + eur(h.wert) + '</b>' : '—'; }]
     ];
+    /* v2431 · ohne Stufe 3 keine Ertragswert-Zeilen (auch die Restnutzungsdauer
+       kommt aus dem Kern) - statt „—" als scheinbarer Wert steht der Hinweis unten. */
+    var zu = gesperrt(r);
+    if (zu) rows = rows.filter(function (row) { return row[0] !== 'Ertragswert' && row[0] !== 'Restnutzungsdauer'; });
     var html = '<div class="dp-pot">' + LEG + '<div class="dp-pot-scroll"><table><thead><tr><th>Kennzahl</th>'
       + cols.map(function (c) { return '<th class="' + c.c + '">' + c.t + '</th>'; }).join('') + '</tr></thead><tbody>'
       + rows.map(function (row) {
@@ -575,7 +603,10 @@
       + (r && r.verfuegbar && r.basis ? 'Liegenschaftszins ' + pct(r.basis.lzs_pct) + (r.basis.lzs_stufe ? ' (Stufe ' + esc(r.basis.lzs_stufe) + ')' : '')
           + ', Bewirtschaftung, Gesamtnutzungsdauer und Bodenwert wie im Marktbericht Stufe 3; je Stufe wechseln Miete und Restnutzungsdauer (Anlage 2 ImmoWertV). ' : '')
       + 'Cashflow und DSCR bei gleicher Finanzierung und gleichen Kosten. ' + esc(m.kappung.text) + '</p>';
-    if (!r || !r.verfuegbar) {
+    if (zu) {
+      html += '<div class="dp-pot-stufe3"><b>' + esc(GESPERRT_KURZ) + '</b><span>' + esc(GESPERRT_LANG) + '</span>'
+        + '<button type="button" class="dp-pot-knopf" data-dp-pot-stufe3="1">Stufe 3 im Tab Objekt</button></div>';
+    } else if (!r || !r.verfuegbar) {
       var grund = window._dpPotenzial && window._dpPotenzial.ergebnis && !window._dpPotenzial.ergebnis.verfuegbar ? window._dpPotenzial.ergebnis.grund : '';
       html += '<p class="dp-pot-hin">' + (ergebnisVeraltet() ? 'Die Angaben haben sich geändert — die Ertragswerte sind neu zu rechnen. ' : (grund ? esc(grund) + ' ' : ''))
         + '<button type="button" class="dp-pot-knopf" data-dp-pot-rechnen="1">Ertragswerte rechnen</button></p>';
@@ -588,12 +619,23 @@
     var z = function (t, f) { return '<tr><td>' + t + '</td>' + sc.map(function (c) { return '<td class="' + c.c + '">' + f(c.k) + '</td>'; }).join('') + '</tr>'; };
     var n = m.wohnungen.filter(function (w) { return w.art !== 'gewerbe'; }).length;
     var zi = a.zins && a.zins.bestand && a.zins.bestand.pct != null ? pct(a.zins.bestand.pct) : '—';
+    /* v2431 · Herkunft des ETW-Zinses: der oertliche Ausschuss (in NRW veroeffentlicht
+       ueber den Oberen Gutachterausschuss) */
+    var zA = a.zins && a.zins.bestand && a.zins.bestand.ausschuss ? String(a.zins.bestand.ausschuss).replace(/^Der\s+/, '') : '';
     return '<div class="dp-pot-scroll" style="margin-top:12px"><table><thead><tr><th>Aufteilung</th>' + sc.map(function (c) { return '<th class="' + c.c + '">' + c.t + '</th>'; }).join('') + '</tr></thead><tbody>'
       + z('Haus als Ganzes', function (k) { return H[k] ? eur(H[k].wert) : '—'; })
       + z(n + ' Eigentumswohnungen (Summe, Zins ' + zi + ')', function (k) { var s = a.je_stufe[k]; return s ? eur(s.summe) + (s.vollstaendig ? '' : '*') : '—'; })
       + z('− Kosten der Aufteilung', function () { return eur(-a.kosten_eur); })
-      + '<tr class="dp-pot-sum"><td>Aufteilungspotenzial</td>' + sc.map(function (c) { var s = a.je_stufe[c.k]; return '<td class="' + c.c + '">' + (s ? (s.potenzial >= 0 ? '+' : '') + eur(s.potenzial) : '—') + '</td>'; }).join('') + '</tr>'
-      + '</tbody></table></div><p class="dp-pot-hin">' + esc(a.hinweis || '') + ' Kosten der Aufteilung: ' + esc(m.aufteilungskosten_herkunft || a.kosten_herkunft || '') + '.</p>';
+      /* v2431 · Marcel 19.10.2026: ein negatives Potenzial nicht als Zahl mit Minus
+         in Gruen, sondern als „kein Potenzial" mit der Erklaerung darunter */
+      + '<tr class="dp-pot-sum"><td>Aufteilungspotenzial</td>' + sc.map(function (c) {
+          var s = a.je_stufe[c.k];
+          if (s && s.potenzial < 0) return '<td class="dp-pot-neg">kein Potenzial</td>';
+          return '<td class="' + c.c + '">' + (s ? '+' + eur(s.potenzial) : '—') + '</td>'; }).join('') + '</tr>'
+      + '</tbody></table></div>'
+      + (a.negativ_hinweis ? '<p class="dp-pot-hin" style="color:#4a4436">' + esc(a.negativ_hinweis) + '</p>' : '')
+      + '<p class="dp-pot-hin">' + esc(a.hinweis || '') + (zA ? ' Zins für Wohnungseigentum: ' + esc(zA) + '.' : '')
+      + ' Kosten der Aufteilung: ' + esc(m.aufteilungskosten_herkunft || a.kosten_herkunft || '') + '.</p>';
   }
 
   /* ── Daten für beide PDFs (Bank und Investment) ─────────────────────── */
@@ -611,7 +653,10 @@
     d.satz_bank = (S.mieterhoehung ? 'Ohne Mieterwechsel ist ' + (abs.length ? 'ab ' + monatText(abs[0]) + ' ' : '') + 'ein Mehrertrag von ' + eur(mehr1) + ' p. a. erreichbar' : 'Eine Mieterhöhung im Bestand ist nicht angesetzt')
       + (S.zielbild ? (S.mieterhoehung ? ', mit den geplanten Maßnahmen weitere ' : '; mit den geplanten Maßnahmen ') + eur(mehr2) + ' p. a.' : '.')
       + (S.zielbild && S.zielbild.kosten ? ' Maßnahmenkosten ' + eur(S.zielbild.kosten) + '.' : '');
-    d.satz_invest = 'Drei Stufen der Mietentwicklung mit Ertragswert je Stufe' + (r && r.aufteilung ? ' und der Wirkung einer Aufteilung in Eigentumswohnungen.' : '.');
+    var zu = gesperrt(r);   /* v2431 */
+    d.ertragswert_gesperrt = zu;
+    d.satz_invest = zu ? 'Drei Stufen der Mietentwicklung mit Kosten und Rendite je Stufe.'
+      : 'Drei Stufen der Mietentwicklung mit Ertragswert je Stufe' + (r && r.aufteilung ? ' und der Wirkung einer Aufteilung in Eigentumswohnungen.' : '.');
     d.wohnungen = m.wohnungen.map(function (w) {
       return { we: (w.nr ? w.nr + ' ' : '') + (w.lage || ''), wfl: w.wfl, ist: w.ist > 0 ? eur(w.ist) : (w.status === 'leer' ? 'leer' : '—'),
         soll: w.soll && w.soll.miete > w.ist ? eur(w.soll.miete) + (w.soll.ab ? ' · ' + (w.soll.ab <= heuteYm() ? 'sofort' : monatText(w.soll.ab)) : '') : '—',   /* v2430a: kurz - lange Termintexte liefen im PDF in die Nachbarspalten */
@@ -625,17 +670,24 @@
       ['Maßnahmenkosten', function (k) { return kz[k].kosten ? eur(kz[k].kosten) : '—'; }],
       ['Restnutzungsdauer', function (k) { return H[k] && H[k].rnd != null ? dez(H[k].rnd, 0) + ' J.' : '—'; }],
       [m.art === 'mfh' ? 'Ertragswert (Haus als Ganzes)' : 'Ertragswert', function (k) { return H[k] && H[k].wert != null ? eur(H[k].wert) : '—'; }]
-    ].map(function (z) { return [z[0]].concat(d.spalten.map(z[1])); });
+    ].filter(function (z) { return !zu || (z[0] !== 'Restnutzungsdauer' && !/^Ertragswert/.test(z[0])); })   /* v2431 */
+      .map(function (z) { return [z[0]].concat(d.spalten.map(z[1])); });
     if (r && r.verfuegbar && r.aufteilung && r.aufteilung.je_stufe && r.aufteilung.je_stufe.bestand) {
       var n = m.wohnungen.filter(function (w) { return w.art !== 'gewerbe'; }).length;
       d.kennzahlen.push(['nach Aufteilung (' + n + ' ETW, abzgl. ' + eur(r.aufteilung.kosten_eur) + ')'].concat(d.spalten.map(function (k) {
         var s = r.aufteilung.je_stufe[k]; return s ? eur(s.summe - r.aufteilung.kosten_eur) : '—'; })));
+      /* v2431 · Aufteilungspotenzial: positiv als Zahl, negativ als Wort - die Erklaerung steht im Fuss */
+      d.kennzahlen.push(['Aufteilungspotenzial'].concat(d.spalten.map(function (k) {
+        var s = r.aufteilung.je_stufe[k]; return !s ? '—' : (s.potenzial < 0 ? 'kein Potenzial' : '+' + eur(s.potenzial)); })));
+      d.aufteilung_hinweis = r.aufteilung.negativ_hinweis || null;
     }
     d.fuss = KENNZEICHNUNG + ' Verkehrswert nach ImmoWertV und Score rechnen mit dem Bestand.'
       + (r && r.verfuegbar && r.basis ? ' Liegenschaftszins ' + pct(r.basis.lzs_pct) + ' (Haus)'
         + (r.aufteilung && r.aufteilung.zins && r.aufteilung.zins.bestand && r.aufteilung.zins.bestand.pct != null ? ' bzw. ' + pct(r.aufteilung.zins.bestand.pct) + ' (Wohnungseigentum)' : '')
-        + ', Restnutzungsdauer nach Modernisierungspunkten (Anlage 2 ImmoWertV).' : ' Ertragswerte nicht gerechnet.')
+        + ', Restnutzungsdauer nach Modernisierungspunkten (Anlage 2 ImmoWertV).'
+        : (zu ? ' ' + GESPERRT_KURZ + ' (Wertermittlung nach ImmoWertV).' : ' Ertragswerte nicht gerechnet.'))
       + ' ' + m.kappung.text;
+    if (d.aufteilung_hinweis) d.fuss = 'Aufteilung: ' + d.aufteilung_hinweis + ' ' + d.fuss;
     d.gerechnet = !!(r && r.verfuegbar);
     return d;
   }
@@ -796,6 +848,17 @@
     }
     /* Der Knopf „Ertragswerte rechnen" steht in fremden Ansichten (Pilot-
        Analyse) — ein delegierter Behandler erreicht jede. */
+    /* v2431 · der vorhandene Weg zu Stufe 3: Zielstufe 3 setzen und in den Tab
+       Objekt wechseln, wo die Pflichtfelder und der Abruf stehen. Abgerufen
+       (und abgerechnet) wird hier NICHTS. */
+    document.addEventListener('click', function (ev) {
+      var b = ev.target && ev.target.closest ? ev.target.closest('[data-dp-pot-stufe3]') : null;
+      if (!b) return;
+      var R = window.DealPilotObjektReiter;
+      try { if (R && typeof R.zielSetzen === 'function') R.zielSetzen(3); } catch (e) {}
+      try { if (typeof window.switchTab === 'function') window.switchTab(0); } catch (e) {}
+      setTimeout(function () { var z = el('oe-ziel-status'); if (z && z.scrollIntoView) z.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 250);
+    });
     document.addEventListener('click', function (ev) {
       var b = ev.target && ev.target.closest ? ev.target.closest('[data-dp-pot-rechnen]') : null;
       if (!b) return;
@@ -804,7 +867,7 @@
         var host = b.closest('[data-dp-pot-wirt]');
         if (host) host.innerHTML = tafelHtml();
         else { b.disabled = false; b.textContent = (r && r.verfuegbar) ? 'gerechnet — Ansicht neu öffnen' : 'nicht verfügbar'; }
-        if (r && !r.verfuegbar && typeof window.toast === 'function') window.toast('Ertragswert: ' + (r.grund || 'nicht verfügbar'));
+        if (r && !r.verfuegbar && !gesperrt(r) && typeof window.toast === 'function') window.toast('Ertragswert: ' + (r.grund || 'nicht verfügbar'));
       });
     });
   }
@@ -868,7 +931,7 @@
 
   window.DpPotenzial = {
     wohnungenAusText: wohnungenAusText, _datumAus: datumAus,
-    KENNZEICHNUNG: KENNZEICHNUNG, MASSNAHMEN: MASSNAHMEN, AUFTEILUNG_JE_WE: AUFTEILUNG_JE_WE,
+    KENNZEICHNUNG: KENNZEICHNUNG, GESPERRT_KURZ: GESPERRT_KURZ, GESPERRT_LANG: GESPERRT_LANG, gesperrt: gesperrt, MASSNAHMEN: MASSNAHMEN, AUFTEILUNG_JE_WE: AUFTEILUNG_JE_WE,
     kappung: kappung, kappungLaden: kappungLaden, agsHolen: agsHolen,
     massnahmenVon: massnahmenVon, massnahmenSpiegeln: massnahmenSpiegeln, massnahmenBinden: massnahmenBinden,
     punkteGewinn: punkteGewinn, sollFuer: sollFuer, umlage559: umlage559,

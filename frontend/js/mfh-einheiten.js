@@ -586,12 +586,20 @@
       var feld = _ewArt === 'etw' ? 'als_etw' : 'anteil_am_haus';
       var werte = we && we[feld] ? we[feld] : null;
       var z = r && r.aufteilung && r.aufteilung.zins && r.aufteilung.zins.bestand;
+      /* v2431 · eur(null) ergab hier „0 €" (Math.round(null)) - ein fehlender Wert sah aus wie ein Wert */
+      var eurN = function (v) { return v != null && isFinite(v) ? eur(v) : '—'; };
+      /* v2431 · ohne Stufe 3 kein Ertragswert: der Hinweis statt der Kacheln */
+      if (P.gesperrt && P.gesperrt(r)) {
+        h.innerHTML = '<p class="mfh-we-hint"><b>' + esc(P.GESPERRT_KURZ) + '</b> · ' + esc(P.GESPERRT_LANG)
+          + ' Stufe 3 wählst du im Tab Objekt.</p>'
+          + '<button type="button" class="btn btn-outline btn-sm" id="mfh-we-ew-los">Erneut prüfen</button>';
+      } else
       h.innerHTML = (werte
-          ? '<div class="mfh-we-ew3"><div><span>Bestand</span><b>' + eur(werte.bestand) + '</b></div>'
-            + '<div><span>Mieterhöhung</span><b class="c-soll">' + (werte.mieterhoehung != null ? eur(werte.mieterhoehung) : '—') + '</b></div>'
-            + '<div><span>Zielbild</span><b class="c-ziel">' + (werte.zielbild != null ? eur(werte.zielbild) : '—') + '</b></div></div>'
+          ? '<div class="mfh-we-ew3"><div><span>Bestand</span><b>' + eurN(werte.bestand) + '</b></div>'
+            + '<div><span>Mieterhöhung</span><b class="c-soll">' + eurN(werte.mieterhoehung) + '</b></div>'
+            + '<div><span>Zielbild</span><b class="c-ziel">' + eurN(werte.zielbild) + '</b></div></div>'
             + '<p class="mfh-we-hint">' + (_ewArt === 'etw'
-                ? 'Zins ' + (z && z.pct != null ? String(z.pct).replace('.', ',') + ' % (Wohnungseigentum, Stufe ' + esc(z.stufe || '?') + ')' : '—') + ' · Bodenwertanteil nach ' + esc(we.anteil_herkunft || 'Fläche')
+                ? 'Zins ' + (z && z.pct != null ? String(z.pct).replace('.', ',') + ' % (Wohnungseigentum, Stufe ' + esc(z.stufe || '?') + (z.ausschuss ? ', ' + esc(String(z.ausschuss).replace(/^Der\s+/, '')) : '') + ')' : '—') + ' · Bodenwertanteil nach ' + esc(we.anteil_herkunft || 'Fläche')
                 : 'Anteil am Ertragswert des Hauses nach dem Anteil am Rohertrag')
               + ' · ' + esc(P.KENNZEICHNUNG) + '</p>'
           : '<p class="mfh-we-hint">' + (P.ergebnisVeraltet() ? 'Die Angaben haben sich geändert. ' : '') + 'Der Ertragswert kommt aus demselben Rechenkern wie der Marktbericht Stufe 3 (kein Kontingent).</p>')
@@ -599,7 +607,7 @@
       el('mfh-we-ew-los').onclick = function () {
         var b = el('mfh-we-ew-los'); b.disabled = true; b.textContent = 'wird gerechnet …';
         P.rechnen(Object.assign(opts(), { erzwingen: true })).then(function (res) {
-          if (res && !res.verfuegbar && typeof window.toast === 'function') window.toast('Ertragswert: ' + (res.grund || 'nicht verfügbar'));
+          if (res && !res.verfuegbar && !res.ertragswert_gesperrt && typeof window.toast === 'function') window.toast('Ertragswert: ' + (res.grund || 'nicht verfügbar'));
           ewZeichnen(P.modell(opts()));
         });
       };
