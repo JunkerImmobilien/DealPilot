@@ -1262,6 +1262,15 @@ export const CrossCheckService = {
 
       const kern = ErtragswertService.ertragswert(ein, bwErgebnis);
       out.ertragswert_kern = kern;
+      /* v2430 · Die Eingabe des Kerns reist NICHT AUFZAEHLBAR mit: sie geht in
+         keinen Bericht und kein JSON, steht aber dem Nur-Wert-Lauf (POST /potenzial)
+         zur Verfuegung. Dort rechnet derselbe Kern mit getauschter Miete und RND -
+         keine zweite Aufbereitung derselben Eingabe. */
+      try {
+        Object.defineProperty(out, '_ertragswertEingabe', { enumerable: false, configurable: true, writable: true,
+          value: { ein: Object.assign({}, ein), bodenwert: bwErgebnis, wohnflaeche_wohnen: wflWohnen,
+                   miete_qm: mieteQm, miete_quelle: mieteQuelle || null, gnd_quelle: _gndEwQuelle } });
+      } catch (e) { /* nur Zusatz */ }
 
       if (kern.vollstaendig && kern.wert != null && _ertragUnterdruecken) {
         /* v1072-WERT-2 · Der Rechenweg bleibt, die Zahl nicht. */

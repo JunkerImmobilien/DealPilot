@@ -28,6 +28,7 @@ import { AgsResolver } from '../connectors/AgsResolver.js';
    nachbaut, was hier schon steht. */
 import { WertParameterService, zinsHerkunft } from '../services/WertParameterService.js';
 import { DealPilotObjectMapper } from '../services/DealPilotObjectMapper.js';
+import { PotenzialService } from '../services/PotenzialService.js';   /* v2430 */
 /* v1968: `rnd as iwRnd` ist raus. Seit v1965 ruft diese Datei die
    Restnutzungsdauer ueber rnd-einheitlich.js; der Name war nur noch
    gebunden, nicht benutzt. `iwGnd` bleibt (Nutzung im Endpunkt
@@ -1432,4 +1433,29 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
       objektart: m.property_type, ags: String(agsFein)
     });
   } catch (e) { res.status(500).json({ verfuegbar: false, grund: e.message }); }
+});
+
+/* ══ v2430 · POST /potenzial — Ertragswert je Stufe (Bestand · Mieterhöhung · Zielbild) ══
+ * Marcel 19.10.2026. Die Basis kommt aus DEMSELBEN Weg wie der Bericht Stufe 3
+ * (ReportOrchestrator mit nurWertBasis: endet nach dem Quercheck, kein Eintrag in
+ * mb.properties/mb.market_reports, keine Mikrolage, keine KI). PotenzialService ruft
+ * denselben Kern mit getauschter Miete und Restnutzungsdauer.
+ * Body: { object, varianten, wohnungen, aufteilung } - siehe PotenzialService.rechne.
+ * Antwort traegt immer die Kennzeichnung „Potenzialwert …, keine Verkehrswertermittlung“. */
+router.post('/potenzial', async (req, res) => {
+  const t0 = Date.now();
+  try {
+    const body = req.body || {};
+    const obj = body.object || body.dealpilot || null;
+    if (!obj || typeof obj !== 'object') return res.status(400).json({ verfuegbar: false, grund: 'Kein Objekt im Aufruf.' });
+    const wb = await runLimited(() => ReportOrchestrator.generate(
+      { dealpilot: obj, wert_stufe: 3, user_id: _uidAus(req) || null }, { nurWertBasis: true }));
+    const out = await PotenzialService.rechne(wb, body);
+    out.took_ms = Date.now() - t0;
+    console.log('[req] POST /potenzial ' + (out.verfuegbar ? 'EW ' + (out.haus && out.haus.bestand && out.haus.bestand.wert) : 'nicht verfuegbar') + ' in ' + out.took_ms + 'ms');
+    res.json(out);
+  } catch (e) {
+    console.error('[req] /potenzial FEHLER:', e.message);
+    res.status(e.status && e.status < 500 ? 200 : 500).json({ verfuegbar: false, grund: e.message, kennzeichnung: PotenzialService.KENNZEICHNUNG });
+  }
 });

@@ -499,6 +499,16 @@ router.post('/wertparameter/zinssatz', authenticate, async function (req, res) {
   try { const out = await forward('POST', '/wertparameter/zinssatz', { body: req.body || {} }); res.status(out.status).json(out.data); }
   catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }
 });
+/* v2430 · Zielbild/Potenzial: Ertragswert je Stufe (Bestand, Mieterhoehung, Zielbild).
+   LESEND wie /wertparameter/zinssatz: kein Bericht, kein Kontingent, keine KI. Der
+   Nutzer reist mit (fuer die Protokollzeile im MB-Dienst), nie aus dem Browser. */
+router.post('/potenzial', authenticate, async function (req, res) {
+  try {
+    const body = Object.assign({}, req.body || {}, { user_id: req.user && req.user.id });
+    const out = await forward('POST', '/potenzial', { body: body });
+    res.status(out.status).json(out.data);
+  } catch (e) { res.status(502).json({ verfuegbar: false, error: 'mb_unreachable', message: e.message }); }
+});
 router.post('/ausstattung/vorschlag', authenticate, async function (req, res) {
   try { const out = await forward('POST', '/ausstattung/vorschlag', { body: req.body || {} }); res.status(out.status).json(out.data); }
   catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }
