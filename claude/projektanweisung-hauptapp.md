@@ -38840,6 +38840,27 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### v2395 / v2395a / v2395vr–vr3 · landing-videothek-4b · Videoreihe 10b, 15, 21, 23: Fehler im Bild (19.10.2026, Staging, Video-Agent)
+
+- **Was:** Vier Befunde aus der Vertonung (`Videoreihe-Sprecher/STAND.md`), dazu drei, die erst die Prüfläufe zeigten.
+  1. **Modul 15 — „Einnahmen 39.652 €“ und „gegen Einnahmen 41.396 €“ bei gleichem Ergebnis:** kein Datenfehler, zwei Einnahmebegriffe der App. Die Quick-Zeile des Steuerformulars (`tax.js _renderQuickForm`) beschriftet die Spalte „Einnahmen V+V“, zeigt dort aber nur `einnahmen_km` (Kaltmiete); die umlagefähigen NK fehlen auf beiden Seiten (Spalte „Bewirtschaftung“ = `nk_n_umlf + betr_sonst`). Die Detail-Summe nennt `einnahmen_km + einnahmen_nk`. Das Drehbuch sagt jetzt „Kaltmiete“ und zeigt im Detail-Modus die beiden Einnahmezeilen als eigene Zeile (`r15DetFest`). Die App ist **nicht** geändert.
+  2. **Modul 23 gegen 10b — 138.380 € gegen 137.917 €:** zwei Objektstände des Ravensberger Weg 38 (`geb_ant` 74,82 % / 74,57 %), beide **ohne** Nebenkosten. Gemessen am 19.10.: das Objekt trägt seit dem 16.10. abends (updated_at 17:57 UTC) Nebenkosten 13,77 % = 170.748 €. Richtig ist die Grenze **mit** den anteiligen Nebenkosten (Anschaffungskosten des Gebäudes): **157.543 €** — App (`calc.js` Z. 1002 ff.) und BMF-Pipeline (`phase9_15pct.amtlich.max`) rechnen identisch. Rechenfehler keiner.
+  3. **Modul 23 Abspann** sachlich: „Die Grenze vor der Sanierung kennen — netto, drei Jahre, am Gebäudeanteil.“
+  4. **Modul 21 Abspann** „Weiter: Modul 22 · Der Telegram-Bot“ (vorher 23). Ebenso **10b** „Weiter: Modul 10c“ (vorher 11, 10c übersprungen).
+  5. Prüflauf 10b: der **BMF-Mitschnitt** war ohne Nebenkosten gerechnet — Schritt 3 zeigte AfA 18.451 €, der Bodenabschlag-Reiter (lokal) 21.006 € im selben Video; Schritt 1 sagte fest „Nebenkosten 170.748 € (in diesem Objekt nicht erfasst)“. Mitschnitt neu (je ein echter Aufruf `/bmf/aufteilung` und `/bmf/pipeline` mit den Körpern aus dem Lauf, LibreOffice, kein Kontingent, SHA-256 Browser = Datei), Satz nur noch bei 0 €. Absprung „Rechner aus Modul 10c“ statt 10a.
+  6. Prüflauf 21: Cockpit **7,39 Mio** Gesamtinvestition, mitgeschnittene Analyse 6.717.219 € — unter der Zeile „nichts erfunden“. Analyse EINMAL neu abgerufen (`/ai/copilot`, Körper aus dem Lauf, Ablage nicht geschrieben). „Gegliedert, mit Zahlen“ zeigt jetzt je Abschnitt Überschrift + ersten Posten statt nackter Überschriften mit Doppelpunkt.
+  7. Modul 23 Szene 4: Gebäudeanteil aus `geb_ant` (74,82 %) statt `#ahk_geb_anteil` (auf ganze Prozent gerundet, „75 %“).
+- **Commit:** `6ae09e88` (v2395), `9d9a13cc` (v2395a), `07126269` (v2395vr), `b6cacba9` (v2395vr2), `93dc1c03` (v2395vr3), `88d14d81` (landing-videothek-4b). **Namensraum:** „v2395“ wurde parallel von zwei anderen Strängen vergeben (`b0849b4e`, `6dde1282`) — meine Folgecommits heißen deshalb `v2395vr*`.
+- **Nachweis:**
+  - Prüfläufe 15, 23, 10b (zweimal), 21 (zweimal) im Studio mit 300-ms-Protokoll und eigenem Mitschreiber UNTER dem Drehbuch (fetch/XHR/Beacon vor dem Start umwickelt): hinaus gingen nur Schreibwege am eigenen Testobjekt (`POST/PUT/DELETE /objects`, `tax-records`, `tax-snapshots`), `portfolio-spiegel`, `wertparameter/zinssatz`, `ausstattung/vorschlag`; **kein** KI-, BMF-, Geokodier- oder Marktbericht-Abruf (gespielt bzw. gesperrt). Danach Drehbuch-Spion weg, `getUserMedia` nativ, `qc_span_config` und `dp_zielstufe` unverändert. 0 Treffer Anbieternamen/Kontakt im Bild.
+  - DB nach jedem Lauf: 50 Objekte, Hash über (id, updated_at) unverändert, Sicherung `/root/backups/objekte-v2395-vor.json` (559 KB) = md5 der Quellzeilen Ravensberger Weg und Parkstr. danach. Testobjekte: 7 angelegt, 7 gelöscht.
+  - Aufnahmen in eigenem Chrome-Fenster (`--new-window`), Probe dunkel (YAVG 21,1), Stichbilder alle 30 s angesehen.
+- **Videos:** 15 → 4:51 (11,0 MB; Sprecher 16,4 MB), 23 → 3:35 (8,5 MB; Sprecher 12,5 MB), onyx Pirate-Vibe, −16,5 LUFS. Auf Staging UND Produktion (`/opt/dealpilot/frontend/landing/medien/videothek/`), md5 = lokal. `videos.json` 15: dauer 291.
+- **Rest:**
+  - **10b und 21 nicht neu aufgenommen:** die Aufnahme 10b wurde vom Rechner wegen Speichermangels abgebrochen (Fenster danach geschlossen, DB sauber, altes Video unverändert). Drehbuch und Mitschnitte sind fertig auf Staging; bis zur Aufnahme zeigt 10b noch 137.917 € ohne Nebenkosten — also eine ANDERE Grenze als das neue Modul 23.
+  - Gemeldet, nicht geändert (App): Quick-Spalte „Einnahmen V+V“ zeigt nur die Kaltmiete; `#ahk_geb_anteil` rundet auf ganze Prozent; die MP4-Adressen der Videothek tragen keinen Buster.
+  - Andere Videos am Ravensberger Weg (vor dem 16.10. abends aufgenommen) zeigen Zahlen ohne Nebenkosten — nicht geprüft.
+
 ### v2388 · Modul 25 „Die geführte Eingabe“ neu aufgenommen (MFH Fürth), vertont, in der Videothek (19.10.2026, Staging, Video-Agent)
 
 - **Was:** Prüflauf im Studio mit 300-ms-Protokoll (Kapitelband, Kegel per `DPM_KEGEL_MESSUNG`, Überdeckung Chat/Liste gegen Mikrofonzeile, jeder `fetch`/XHR/Beacon im App-Fenster). Vier Befunde, in `v2388` behoben (`frontend/js/messe-drehbuch.js`, Buster `v2388`):
