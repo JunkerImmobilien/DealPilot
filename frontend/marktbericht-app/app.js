@@ -706,6 +706,206 @@ function _mpZusatz(d) {
   }
   return t;
 }
+
+/* v2542m · Marktpreise & Wertpotenzial · Verlauf
+   Die Pilot-Analyse ruft "Marktpreise" ab (v2542) und speichert jeden Abruf je
+   Objekt (mb.potenzial_abrufe, external_ref = window._currentObjKey der Haupt-App).
+   Der Bericht zeigt den letzten Abruf und den Verlauf - in der Web-Ansicht UND
+   im PDF, aus EINEM Modell (_mvModell), damit beide dasselbe sagen.
+   Kennung: out.external_ref (frisch erzeugter Bericht, ReportOrchestrator gibt
+   sie zurueck) > external_ref der Listenzeile (Bericht aus "Vorhandene
+   Marktberichte", /reports/one liefert sie nicht mit) > _mbRef() (?ref bzw.
+   Objektwahl). Ohne Kennung oder ohne Abrufe: kein Abschnitt.
+   Keine Quellennamen nach aussen: "Angebote am Ort". */
+var _mbRidRef = Object.create(null);   /* report_id -> external_ref aus der Berichtsliste */
+var _MV_STUFEN = [['bestand', 'Bestand'], ['mieterhoehung', 'Mieterhöhung'], ['zielbild', 'Zielbild']];
+function _mvZahl(n) { if (n == null || n === '') return null; var x = Number(n); return isFinite(x) ? x : null; }
+function _mvNum(n, dez) {
+  var x = _mvZahl(n); if (x == null) return null;
+  dez = dez || 0;
+  return x.toLocaleString('de-DE', { minimumFractionDigits: dez, maximumFractionDigits: dez });
+}
+function _mvEur(n) { var t = _mvNum(n, 0); return t == null ? '–' : t + ' €'; }
+function _mvQm(m, dez) { var t = m ? _mvNum(m.median_qm, dez) : null; return t == null ? '–' : t + ' €/m²'; }
+function _mvSpanne(a, b, dez, einheit) {
+  var ta = _mvNum(a, dez), tb = _mvNum(b, dez);
+  return (ta == null || tb == null) ? '–' : ta + ' – ' + tb + ' ' + einheit;
+}
+function _mvDatum(s) {
+  var d = new Date(s);
+  return isNaN(d.getTime()) ? '–' : d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+function _mvRef(out) {
+  if (!out) return null;
+  if (out.external_ref) return String(out.external_ref);
+  var rid = out.report_id;
+  if (rid != null && Object.prototype.hasOwnProperty.call(_mbRidRef, String(rid))) {
+    return _mbRidRef[String(rid)] ? String(_mbRidRef[String(rid)]) : null;   /* Liste kennt den Bericht: ihre Antwort gilt, auch "ohne Objekt" */
+  }
+  return _mbRef();
+}
+/* Holt den Verlauf einmal je Bericht (gemerkt an out._mvVerlauf). Ein Fehler
+   wird NICHT gemerkt - der PDF-Export versucht es dann noch einmal. */
+async function _mvLaden(out) {
+  if (!out) return null;
+  if (out._mvVerlauf !== undefined) return out._mvVerlauf;
+  var ref = _mvRef(out);
+  if (!ref) { out._mvVerlauf = null; return null; }
+  try {
+    var r = await fetch(API + '/potenzial/markt/verlauf?external_ref=' + encodeURIComponent(ref), { headers: _mbAuth() });
+    if (!r.ok) return null;
+    var j = await r.json();
+    var v = (j && Array.isArray(j.abrufe) && j.abrufe.length) ? j : null;
+    out._mvVerlauf = v;
+    return v;
+  } catch (e) { return null; }
+}
+function _mvModell(v) {
+  if (!v || !Array.isArray(v.abrufe) || !v.abrufe.length) return null;
+  var neu = v.abrufe[0] || {}, dn = neu.daten || {}, mk = dn.markt || {}, st = dn.stufen || {};
+  var markt = [];
+  [['kauf_haus', 'Kauf Haus / Mehrfamilienhaus', 0], ['kauf_etw', 'Kauf Eigentumswohnung', 0], ['miete', 'Angebotsmiete (kalt)', 2]].forEach(function (z) {
+    var m = mk[z[0]];
+    if (!m || _mvZahl(m.median_qm) == null) return;
+    var ang = [];
+    if (_mvZahl(m.angebote) != null) ang.push(_mvNum(m.angebote, 0) + ' Angebote');
+    if (_mvZahl(m.radius_km) != null) ang.push(_mvNum(m.radius_km, (Number(m.radius_km) % 1) ? 1 : 0) + ' km Umkreis');
+    markt.push([z[1], _mvQm(m, z[2]), _mvSpanne(m.q25_qm, m.q75_qm, z[2], '€/m²'), ang.join(' · ') || '–']);
+  });
+  var mitEw = _MV_STUFEN.some(function (s) { return st[s[0]] && _mvZahl(st[s[0]].ertragswert) != null; });
+  var stufen = [];
+  _MV_STUFEN.forEach(function (s) {
+    var x = st[s[0]];
+    if (!x) return;
+    var ew = _mvZahl(x.ertragswert), mpi = _mvZahl(x.mpi_angebote), rf = _mvZahl(x.rohertragsfaktor_x_miete);
+    if (ew == null && mpi == null && rf == null) return;
+    var sp = Array.isArray(x.mpi_spanne) ? x.mpi_spanne : [];
+    var z = [s[1]];
+    if (mitEw) z.push(_mvEur(ew));
+    z.push(_mvEur(mpi), _mvSpanne(sp[0], sp[1], 0, '€'), _mvEur(rf));
+    stufen.push(z);
+  });
+  var em = dn.etw_markt;
+  if (em && _mvZahl(em.summe_bestand) != null) {
+    var ze = ['Aufteilung in Eigentumswohnungen (Summe)'];
+    if (mitEw) ze.push('–');
+    ze.push(_mvEur(em.summe_bestand), _mvSpanne(em.summe_low, em.summe_high, 0, '€'), '–');
+    stufen.push(ze);
+  }
+  var kopfStufen = ['Stufe'].concat(mitEw ? ['Ertragswert'] : []).concat(['Marktpreisindikation', 'Spanne', 'Rohertragsfaktor × Miete']);
+  var verlauf = v.abrufe.map(function (a) {
+    var d = (a && a.daten) || {}, m = d.markt || {}, b = (d.stufen || {}).bestand || {};
+    return [_mvDatum(a && a.abgerufen_am), _mvQm(m.kauf_haus, 0), _mvQm(m.kauf_etw, 0), _mvQm(m.miete, 2), _mvEur(b.mpi_angebote)];
+  });
+  var e = v.einordnung || {};
+  var satz = e.text || (v.abrufe.length === 1
+    ? 'Erst ein Abruf – ab dem zweiten zeigt der Verlauf, wie sich Preise und Mieten entwickeln.' : '');
+  var ab = _mvZahl(mk.abschlag_pct);
+  var intro = 'Abrufe aus der Pilot-Analyse: Angebotspreise und Angebotsmieten am Ort (aktueller Marktdurchschnitt). '
+    + 'Die Marktpreisindikation setzt einen Abschlag auf die Angebotspreise an'
+    + (ab != null && ab > 0 ? ' (im letzten Abruf ' + _mvNum(ab, (ab % 1) ? 1 : 0) + ' %)' : '')
+    + '. Sie ist eine Einordnung am Markt, keine Verkehrswertermittlung nach § 194 BauGB.';
+  return {
+    titel: 'Marktpreise & Wertpotenzial · Verlauf', intro: intro,
+    datum: _mvDatum(neu.abgerufen_am), anzahl: v.abrufe.length,
+    kopfMarkt: ['Markt am Ort', 'Median', 'Spanne (Q25–Q75)', 'Angebote · Umkreis'], markt: markt,
+    kopfStufen: kopfStufen, stufen: stufen,
+    kopfVerlauf: ['Abruf', 'Kauf Haus', 'Kauf ETW', 'Angebotsmiete', 'MPI Bestand'],
+    verlauf: v.abrufe.length >= 2 ? verlauf : [], satz: satz
+  };
+}
+function _mvHtml(Mo) {
+  if (!Mo) return '';
+  var esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+  var tab = function (kopf, rows) {
+    if (!rows.length) return '';
+    return '<table class="data-table" style="font-size:12px;margin-top:6px"><thead><tr>'
+      + kopf.map(function (k, i) { return '<th' + (i ? ' style="text-align:right"' : '') + '>' + esc(k) + '</th>'; }).join('')
+      + '</tr></thead><tbody>'
+      + rows.map(function (r) {
+        return '<tr>' + r.map(function (c, i) { return '<td' + (i ? ' style="text-align:right;white-space:nowrap"' : '') + '>' + esc(c) + '</td>'; }).join('') + '</tr>';
+      }).join('')
+      + '</tbody></table>';
+  };
+  var unter = function (t) {
+    return '<div style="font-size:12.5px;font-weight:600;margin:14px 0 2px">' + esc(t) + '</div>';
+  };
+  return '<div style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--wl-c9a84c, #C9A84C)">'
+    + esc(Mo.titel) + '</div>'
+    + '<div style="font-size:11.5px;opacity:.75;margin:5px 0 4px">' + esc(Mo.intro) + '</div>'
+    + unter('Letzter Abruf · ' + Mo.datum)
+    + tab(Mo.kopfMarkt, Mo.markt)
+    + tab(Mo.kopfStufen, Mo.stufen)
+    + unter('Verlauf · ' + Mo.anzahl + (Mo.anzahl === 1 ? ' Abruf' : ' Abrufe'))
+    + tab(Mo.kopfVerlauf, Mo.verlauf)
+    + (Mo.satz ? '<div style="font-size:11.5px;margin-top:9px;opacity:.85">' + esc(Mo.satz) + '</div>' : '');
+}
+async function _renderMarktVerlauf(out) {
+  var alt = document.getElementById('mv-box');
+  if (alt) alt.remove();
+  var v = await _mvLaden(out);
+  if (window._lastOut !== out) return;          /* inzwischen ein anderer Bericht geoeffnet */
+  var Mo = _mvModell(v);
+  var wrap = document.getElementById('resultBody');
+  if (!Mo || !wrap) return;
+  var alt2 = document.getElementById('mv-box');
+  if (alt2) alt2.remove();
+  var box = document.createElement('div');
+  box.id = 'mv-box';
+  box.style.cssText = 'margin-top:22px;padding:13px 15px;border-radius:8px;border:1px solid rgba(128,128,128,.22)';
+  box.innerHTML = _mvHtml(Mo);
+  wrap.appendChild(box);
+}
+/* jsPDF-Standardschrift kennt nur WinAnsi: Minus, Pfeile, Vergleichszeichen umschreiben, Rest weg. */
+function _mvWin(s) {
+  return String(s == null ? '' : s)
+    .replace(/−/g, '-').replace(/→/g, '->').replace(/≥/g, 'ab ').replace(/≤/g, 'bis ')
+    .replace(/[   ]/g, ' ')
+    .replace(/[^\x00-\xff€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ]/g, '');
+}
+/* PDF-Block. c = { doc-Umgebung aus exportPdf }: M, W, GOLD, INK, TXT, MUT,
+   getY/setY (y lebt in exportPdf), need, sectionTitle. */
+function _mvPdf(doc, v, c) {
+  var Mo = _mvModell(v);
+  if (!Mo) return false;
+  var M = c.M, B = c.W - 2 * c.M;
+  var para = function (t, gr, farbe, fett) {
+    if (!t) return;
+    doc.setFont('helvetica', fett ? 'bold' : 'normal'); doc.setFontSize(gr); doc.setTextColor.apply(doc, farbe);
+    var lh = gr * 0.42;
+    var zl = doc.splitTextToSize(_mvWin(t), B);
+    c.need(zl.length * lh + 3);
+    doc.text(zl, M, c.getY() + lh);
+    c.setY(c.getY() + zl.length * lh + 2.5);
+  };
+  var tab = function (kopf, rows) {
+    if (!rows.length) return;
+    c.need(Math.min(rows.length * 6 + 10, 240));
+    var cs = {};
+    for (var i = 1; i < kopf.length; i++) cs[i] = { halign: 'right' };
+    doc.autoTable({
+      startY: c.getY(), margin: { left: M, right: M },
+      head: [kopf.map(_mvWin)], body: rows.map(function (r) { return r.map(_mvWin); }),
+      headStyles: { fillColor: c.INK, textColor: 255, fontSize: 7.6 },
+      styles: { fontSize: 7.8, cellPadding: 1.6, textColor: c.TXT },
+      columnStyles: cs,
+      alternateRowStyles: { fillColor: [245, 244, 240] },
+    });
+    c.setY(doc.lastAutoTable.finalY + 4);
+  };
+  c.sectionTitle(_mvWin(Mo.titel), 90);
+  para(Mo.intro, 8.2, c.MUT);
+  c.setY(c.getY() + 1);
+  para('Letzter Abruf · ' + Mo.datum, 9.5, c.INK, true);
+  tab(Mo.kopfMarkt, Mo.markt);
+  tab(Mo.kopfStufen, Mo.stufen);
+  para('Verlauf · ' + Mo.anzahl + (Mo.anzahl === 1 ? ' Abruf' : ' Abrufe'), 9.5, c.INK, true);
+  tab(Mo.kopfVerlauf, Mo.verlauf);
+  para(Mo.satz, 8.2, c.TXT);
+  doc.setFont('helvetica', 'normal'); doc.setTextColor.apply(doc, c.TXT);
+  c.setY(c.getY() + 2);
+  return true;
+}
 function _renderWertverfahren(d) {
   var wrap = document.getElementById('resultBody');
   if (!wrap) return;
@@ -1324,11 +1524,12 @@ function render(out) {
       + 'Einen Marktbericht mit Lage, Markt und Text gibt es ab <b>Stufe 2</b>, die Wertermittlung nach ImmoWertV in <b>Stufe 3</b>.</p>';
   } catch (e) {}
   window._lastOut = out;
+  try { _renderMarktVerlauf(out).catch(function () {}); } catch (e) {}   /* v2542m */
   try { _installMbSaveObject(); } catch (e) {}
   try { if (out && out.object_key) _mbLoadReportsList({ key: out.object_key }); } catch (e) {}
   // Letzte Ausgabe lokal sichern (ohne grosse Karten) -> jederzeit gratis neu ladbar.
   try {
-    const slim = Object.assign({}, out); delete slim._covMap; delete slim._lightMap;
+    const slim = Object.assign({}, out); delete slim._covMap; delete slim._lightMap; delete slim._mvVerlauf;
     localStorage.setItem('mb_last_out', JSON.stringify(slim));
     const _lb = document.getElementById('loadLastBtn'); if (_lb) _lb.style.display = '';
   } catch (e) { /* Quota o.ae. ignorieren */ }
@@ -2406,6 +2607,7 @@ var _MB_DOC_ICO = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" s
   + '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>';
 
 function _mbRepRow(h){
+  try { if (h && h.report_id != null) _mbRidRef[String(h.report_id)] = h.external_ref || null; } catch (e) {} /* v2542m */
   var kz = h.object_label
     ? '<span class="mbrep-kz">'+String(h.object_label).replace(/</g,'&lt;')+'</span>'
     : '<span class="mbrep-kz none">ohne Objekt</span>';
@@ -5277,6 +5479,13 @@ async function exportPdf(out) {
     }
     y += 2;
   }
+
+  // ---------- v2542m · Marktpreise & Wertpotenzial · Verlauf ----------
+  try {
+    const _mvV = await _mvLaden(out);
+    if (_mvV) _mvPdf(doc, _mvV, { M, W, GOLD, INK, TXT, MUT, need, sectionTitle,
+      getY: () => y, setY: (v) => { y = v; } });
+  } catch (e) { console.warn('[mb] Marktpreis-Verlauf im PDF:', e && e.message); }
 
   // ---------- Bericht (Fließtext) ----------
   if (out.report_md) {
