@@ -1559,7 +1559,8 @@
     if (m === 'POST' && D.zielbild26 && !_rh.mitschnitt26 && _aktiv === DREHBUECHER['reihe-zielbild']) {
       var p26 = u.split('?')[0];
       if (/\/marktbericht\/potenzial$/.test(p26)) { var k26 = r26Schluessel(body), a26 = k26 && D.zielbild26.potenzial && D.zielbild26.potenzial[k26]; if (a26) return rhJ(JSON.parse(JSON.stringify(a26))); }
-      if (/\/ai\/analyze$/.test(p26) && D.zielbild26.analyse) return rhJ(JSON.parse(JSON.stringify(D.zielbild26.analyse)));
+      /* v2481p · Mitschnitt-Lauf ?mitschnitt=26ki: NUR die Pilot-Analyse geht echt hinaus (Ertragswerte und Marktpreise gespielt) */
+      if (/\/ai\/analyze$/.test(p26) && D.zielbild26.analyse && !_rh.mitschnitt26ki) return rhJ(JSON.parse(JSON.stringify(D.zielbild26.analyse)));
       /* v2481m · Marktpreise (v2542): der Abruf bucht 1 × erweiterte Marktpreisindikation - nur gespielt */
       if (/\/marktbericht\/potenzial\/markt$/.test(p26) && D.zielbild26.markt && D.zielbild26.markt.post) { _rh.markt26 = true; return rhJ(JSON.parse(JSON.stringify(D.zielbild26.markt.post))); }
     }
@@ -1576,6 +1577,12 @@
     window.fetch = function (url, opt) {
       var u = typeof url === 'string' ? url : (url && url.url) || '', m = String((opt && opt.method) || 'GET').toUpperCase();
       var kurz = u.replace(location.origin, ''), pfad = kurz.split('?')[0];
+      /* v2481p · Modul 27: die zwei gespeicherten Objekte werden nur gelesen - jeder Schreibweg
+         an Objekt und Steuer wird beantwortet (200), nicht geschrieben (r27Gesperrt) */
+      if (r27Gesperrt(m, pfad)) {
+        try { DPM_REIHE.gesperrt.push(m + ' ' + pfad); } catch (e) {}
+        return Promise.resolve(new Response(JSON.stringify(m === 'PUT' && /\/objects\//.test(pfad) ? { id: window._currentObjKey, ok: true, vorfuehrung: true } : { ok: true, vorfuehrung: true }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+      }
       if (lauf && _rh) {
         if (m !== 'GET') DPM_REIHE.abrufe.push(m + ' ' + pfad);
         var a = rhAntwort(kurz, m, opt);
@@ -1592,7 +1599,7 @@
         /* v2373a · ... und die Geokodierung vor dem Bodenrichtwert (Fürth): einmal echt, dann als
            DPM_REIHE_DATEN.gefuehrt25geo gespielt (_rh.geo, wie Modul 24). BORIS selbst ist ein freies GET. */
         /* v2480 · Mitschnitt-Lauf Modul 26: Ertragswert je Stufe und Pilot-Analyse gehen echt hinaus */
-        if (_rh.mitschnitt26 && m === 'POST' && /\/marktbericht\/potenzial$|\/ai\/analyze$/.test(pfad)) {
+        if ((_rh.mitschnitt26 && m === 'POST' && /\/marktbericht\/potenzial$|\/ai\/analyze$/.test(pfad)) || (_rh.mitschnitt26ki && m === 'POST' && /\/ai\/analyze$/.test(pfad) && !(DPM_REIHE.mitschnitt26 && DPM_REIHE.mitschnitt26.analyse))) {
           var mk = /potenzial$/.test(pfad) ? r26Schluessel(opt && opt.body) : null;
           var p26 = echt.apply(this, arguments);
           p26.then(function (r) { return r.clone().json(); }).then(function (j) {
@@ -5370,10 +5377,18 @@
      Erzeugt im Mitschnitt-Lauf ?messe=reihe-zielbild&mitschnitt=26: nur diese beiden
      gehen dann echt hinaus und landen in DPM_REIHE.mitschnitt26. Nach jeder Änderung an
      R26 oder an den Eingaben der Szenen neu erzeugen - sonst passt er nicht zum Endstand.
+     v2481p · ?mitschnitt=26ki: NUR /ai/analyze geht echt hinaus, Ertragswerte und Marktpreise
+     kommen aus dem vorhandenen Mitschnitt (für Änderungen, die nur den Analyse-Auftrag berühren,
+     z. B. das Kaufdatum: es reist nicht im Auftrag an /marktbericht/potenzial mit).
      Gezeigt wird ein PDF (Bankfassung, lokal erzeugt, Nutzungszähler gesperrt). */
   var R26 = {
     kuerzel: 'DEMO Zielbild MFH', str: 'Teutoburger Straße', hnr: '60', plz: '33604', ort: 'Bielefeld',
     baujahr: '1962', gsfl: '640', kp: '505000', etagen: '3', zbJahr: '2028',
+    /* v2481p · Marcel 20.10.2026: ein Kaufdatum, damit die Pilot-Tafel „Ankauf 2025 · Bestand heute ·
+       Mieterhöhung · Zielbild 2028" zeigt. GEMESSEN (potenzial.js tafelHtml): das Jahr über „Bestand"
+       kommt aus #kaufdat, die Spalte „Ankauf" aber nur aus einem festgeschriebenen Ankauf-Stand
+       (DealPilotAnkauf.stand(), nur bei gewonnen) - deshalb nach dem Übernehmen gewonnen + festgeschrieben. */
+    kaufdat: '2025-01-01',
     /* nr, lage, wfl, zimmer, ist (leer = ''), status - Marcel 20.10.2026: eine DEUTLICHE Entwicklung,
        Ist 5,90-6,40 EUR/m2 (an der unteren Kante des Marktueblichkeitsbands, klar unter der Vergleichsmiete; die Kappung fuehrt auf 6,8-7,4), letzte Erhoehungen lange her */
     we: [['1', 'EG links', '68', '3', '408', 'vermietet'], ['2', 'EG rechts', '58', '2', '360', 'vermietet'],
@@ -5453,14 +5468,19 @@
   DREHBUECHER['reihe-zielbild'] = {
     titel: 'Mieterhöhung und Zielbild', unterzeile: 'Ein Mehrfamilienhaus, Wohnung für Wohnung — Ist, Soll und Zielbild bis zum Wertpotenzial', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
-    aufraeumen: function () { if (_r26.wahl) { clearInterval(_r26.wahl); _r26.wahl = null; } [].forEach.call(document.querySelectorAll('.dpm-wahl'), function (b) { b.classList.remove('dpm-wahl'); ['background', 'color', 'font-weight'].forEach(function (p) { b.style.removeProperty(p); }); }); var w = q('#mfh-we-ov'); if (w) w.remove(); var m = q('#mfh-modal'); if (m) m.remove(); r19Zu(); rhAufraeumen(); },
+    aufraeumen: function () { if (_r26.wahl) { clearInterval(_r26.wahl); _r26.wahl = null; } [].forEach.call(document.querySelectorAll('.dpm-wahl'), function (b) { b.classList.remove('dpm-wahl'); ['background', 'color', 'font-weight'].forEach(function (p) { b.style.removeProperty(p); }); }); var w = q('#mfh-we-ov'); if (w) w.remove(); var m = q('#mfh-modal'); if (m) m.remove(); r19Zu();
+      /* v2481p · Gewonnen-Status und Ankauf-Stand gehören nur zum erfundenen Objekt (es wird gelöscht) */
+      try { if (window.DealPilotAnkauf) DealPilotAnkauf.verwerfen(); } catch (e) {}
+      var dw = q('#_deal_won_state'); if (dw) dw.value = 'false'; var da = q('#_deal_won_at_state'); if (da) da.value = '';
+      rhAufraeumen(); },
     szenen: [
       async function (s) {   /* 1 · das Haus */
         await rhStart(0);
         try { _rh.mitschnitt26 = new URLSearchParams(location.search).get('mitschnitt') === '26'; } catch (e) {}
-        if (_rh.mitschnitt26) DPM_REIHE.mitschnitt26 = { potenzial: {}, analyse: null };
+        try { _rh.mitschnitt26ki = new URLSearchParams(location.search).get('mitschnitt') === '26ki'; } catch (e) {}   /* v2481p */
+        if (_rh.mitschnitt26 || _rh.mitschnitt26ki) DPM_REIHE.mitschnitt26 = { potenzial: {}, analyse: null };
         [['kuerzel', R26.kuerzel], ['plz', R26.plz], ['ort', R26.ort], ['str', R26.str], ['hnr', R26.hnr], ['objart', 'MFH'],
-         ['baujahr', R26.baujahr], ['gsfl', R26.gsfl], ['etagen_ges', R26.etagen]].forEach(function (x) { r6Setz(x[0], x[1]); });
+         ['baujahr', R26.baujahr], ['gsfl', R26.gsfl], ['etagen_ges', R26.etagen], ['kaufdat', R26.kaufdat]].forEach(function (x) { r6Setz(x[0], x[1]); });
         r6Setz('kp', R26.kp); try { DealPilotInvestmentProfile.nachziehen('kp'); } catch (e) {}
         await warte(900);
         try { if (typeof window.dpDarlehenNachziehen === 'function') window.dpDarlehenNachziehen(); } catch (e) {}
@@ -5469,7 +5489,7 @@
         await warte(700);
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
-        await b2oZeile(s, 'Das Beispiel', 'Ein erfundenes Mehrfamilienhaus: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — Baujahr ' + wert('baujahr') + ', Kaufpreis <b>' + eur(zahl('kp')) + '</b>.');
+        await b2oZeile(s, 'Das Beispiel', 'Ein erfundenes Mehrfamilienhaus: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — Baujahr ' + wert('baujahr') + ', Kaufpreis <b>' + eur(zahl('kp')) + '</b>' + (datum(wert('kaufdat')) ? ', gekauft am <b>' + datum(wert('kaufdat')) + '</b>' : '') + '.');
         await zeige(function () { var b = q('#mfh-oeffnen'); return b && b.offsetWidth ? b : null; }, 10);
         await b2oZeile(s, 'Einheiten erfassen', 'Bei einem Mehrfamilienhaus erscheint unter der Wohnfläche <b>„Einheiten erfassen“</b> — jede Wohnung einzeln.');
       },
@@ -5643,6 +5663,19 @@
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeigeGruppe(feldVon('wfl'), feldVon('einheiten'), 8);
         await b2oZeile(s, 'Im Objekt', 'Übernommen: <b>' + wert('einheiten') + ' Einheiten</b>, ' + wert('wfl') + ' m², Kaltmiete <b>' + eur(zahl('nkm')) + '</b> im Monat' + (/aus Wohnungen/.test(tt || '') ? ' — und die Mietentwicklung steht auf <b>„aus Wohnungen“</b>' : '') + '.');
+        /* v2481p · das Haus ist seit dem Kaufdatum im Bestand: gewonnen + Ankauf-Stand zum Kaufdatum
+           festgeschrieben (wie unter Deal-Aktion „Gewonnen", Modul 14). Ohne ihn hat die Pilot-Tafel
+           keine Spalte „Ankauf". Nur im Lauf, nur am erfundenen Objekt; aufraeumen nimmt beides zurück. */
+        var kd = wert('kaufdat');
+        if (/^\d{4}-\d{2}-\d{2}$/.test(kd || '') && window.DealPilotAnkauf) {
+          var dw = q('#_deal_won_state'); if (dw) dw.value = 'true';
+          var da = q('#_deal_won_at_state'); if (da) da.value = kd + 'T00:00:00.000Z';
+          try { DealPilotAnkauf.festschreiben(kd); } catch (e) { DPM_REIHE.r26ankauf = 'FEHLER ' + (e && e.message); }
+          DPM_REIHE.r26ankauf = DPM_REIHE.r26ankauf || (DealPilotAnkauf.stand() ? { stichtag: DealPilotAnkauf.stand().stichtag, nkm: DealPilotAnkauf.stand().kurz.nkm } : null);
+          await warte(600);
+          await zeige(feldVon('kaufdat'), 10);
+          await b2oZeile(s, 'Im Bestand seit ' + kd.slice(0, 4), 'Gekauft am <b>' + datum(kd) + '</b>. Der Stand beim Kauf ist festgeschrieben — die Pilot-Analyse stellt ihn später neben Bestand, Mieterhöhung und Zielbild.');
+        }
       },
       async function (s) {   /* 11 · Tab Miete: Mietentwicklung aus Wohnungen */
         reiter('s2'); await warte(1200);
@@ -5696,7 +5729,7 @@
         /* v2488vr · Mitschnitt-Lauf: HALT vor dem einen KI-Abruf, wenn der Ertragswert nicht
            Bestand < Mieterhöhung < Zielbild steigt - sonst wäre der bezahlte Abruf für Zahlen,
            die so nicht ins Video gehören. Ergebnis in DPM_REIHE.r26halt. */
-        if (_rh && _rh.mitschnitt26) {
+        if (_rh && (_rh.mitschnitt26 || _rh.mitschnitt26ki)) {
           var r0 = null; try { r0 = await window.DpPotenzial.rechnen(); } catch (e) {}
           var H = (r0 && r0.haus) || {}, w3 = ['bestand', 'mieterhoehung', 'zielbild'].map(function (k) { return H[k] ? H[k].wert : null; });
           DPM_REIHE.r26halt = { werte: w3, ok: w3[0] != null && w3[1] != null && w3[2] != null && w3[0] < w3[1] && w3[1] < w3[2] };
@@ -5842,6 +5875,273 @@
         reiter('s0'); var m = q('.main-col'); if (m) m.scrollTop = 0; await warte(700);
         await zeige(function () { var b = q('#mfh-oeffnen'); return b && b.offsetWidth ? b : null; }, 10);
         await b2oZeile(s, 'Ist, Soll, Zielbild', 'Je Wohnung erfasst, je Stufe bewertet und am Markt gespiegelt — in Mietentwicklung, Pilot-Analyse, Bewertung und PDF. Gerechnet wird mit dem Bestand, das Potenzial steht daneben.', 1500);
+      }
+    ]
+  };
+
+  /* ═══ VIDEOREIHE · MODUL 27 · STEUERVERLAUF MIT WENDEPUNKT (v2481p) ═══════
+     Marcel 20.10.2026: die Grafik aus v2544 (steuer-verlauf.js) - wann ein
+     Objekt steuerlich positiv wird. Vorlage Funktionshandbuch 14 und 13.
+     Paradefall DEMO-DT4 Bismarckstr. 27, Detmold; Gegenbild DEMO-BI1
+     Westerfeldstr. 140, Bielefeld. BEIDE SIND GESPEICHERTE OBJEKTE UND
+     WERDEN NICHT VERÄNDERT: es gibt keine Kopie, das Drehbuch LIEST nur.
+     GEMESSEN (20.10.2026, eigener Tab mit Sperre): schon das LADEN schreibt -
+     PUT /objects/<id> (Autospeichern) und POST /tax-snapshots/<id>, jeder
+     Reiterwechsel noch einmal PUT /objects. Deshalb beantwortet der Spion im
+     Lauf jedes Nicht-GET an /objects, /tax-records, /tax-snapshots und
+     /tax-periods selbst (200, nichts geschrieben, DPM_REIHE.gesperrt) - mit
+     Erfolg statt Fehler, sonst stünde „Fehler beim Speichern" im Bild.
+     Nach dem Lauf bleibt die Sperre in DIESEM Tab, solange eins der beiden
+     Objekte geladen ist (ein späteres Autospeichern schriebe den im Lauf
+     umgeschalteten Zustand). Kein KI-Abruf: die Pilot-Analyse ist die
+     gespeicherte. Jede Zahl liest das Drehbuch aus der Grafik, dem Tooltip,
+     dem Steuerformular oder DpSteuerVerlauf.reihe() - keine steht im Text. */
+  var R27_DT = 'c5278bb5-7012-4e1b-8372-7e5cef3500a1', R27_BI = R11_WESTERFELD;
+  var _r27 = { schutz: [] };
+  function r27Gesperrt(m, pfad) {
+    if (m === 'GET' || !_r27.schutz.length || !/\/api\/v1\/(objects|tax-records|tax-snapshots|tax-periods)(\/|$)/.test(pfad)) return false;
+    if (lauf && _aktiv === DREHBUECHER['reihe-steuerverlauf']) return true;
+    return !lauf && _r27.schutz.indexOf(window._currentObjKey) >= 0;
+  }
+  async function r27Laden(id, kuerzel) {
+    if (_r27.schutz.indexOf(id) < 0) _r27.schutz.push(id);
+    try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
+    reiter('s0');
+    if (typeof window.loadSaved === 'function') await window.loadSaved(id);
+    await warteAuf(function () { return window._currentObjKey === id && /\S/.test(wert('str')); }, 9000);
+    if (wert('kuerzel') !== kuerzel) { DPM_REIHE.r27fehler = 'falsches Objekt: ' + wert('kuerzel'); stopp(); throw 'stopp'; }
+    await warte(900);
+    var m = q('.main-col'); if (m) m.scrollTop = 0;
+  }
+  function r27Host() { var h = q('#tax-verlauf-chart'); return h && h.offsetWidth ? h : null; }
+  function r27PaHost() { var p = r11Panel(); var h = p && p.querySelector('[data-dp-steuerverlauf]'); return h && h.offsetWidth ? h : null; }
+  function r27Zahl(i, host) { return function () { var h = (host || r27Host)(); var z = h && h.querySelectorAll('.dp-stv-z'); return z && z[i] || null; }; }
+  function r27ZahlW(i, host) { var z = r27Zahl(i, host)(); return z ? { t: r6Text(z.querySelector('span')), w: r6Text(z.querySelector('b')), u: r6Text(z.querySelector('em')) } : { t: '', w: '–', u: '' }; }
+  function r27Sel(sel, host) { return function () { var h = (host || r27Host)(); return h ? h.querySelector(sel) : null; }; }
+  function r27Reihe() { try { return window.DpSteuerVerlauf ? DpSteuerVerlauf.reihe() : null; } catch (e) { return null; } }
+  function r27Idx(jahr) { var R = r27Reihe() || []; for (var i = 0; i < R.length; i++) if (R[i].jahr === jahr) return i; return -1; }
+  function r27Hit(jahr, host) { return function () { var h = (host || r27Host)(); var i = r27Idx(jahr); return h && i >= 0 ? h.querySelector('.hit[data-i="' + i + '"]') : null; }; }
+  /* Tooltip wie mit der Maus: mousemove auf die Trefferfläche des Jahres (steuer-verlauf.js hört darauf) */
+  function r27Zeigen(jahr, host) {
+    var t = r27Hit(jahr, host)(); if (!t) return null;
+    var b = t.getBoundingClientRect();
+    t.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: b.left + b.width / 2, clientY: b.top + b.height * 0.3 }));
+    var tip = (host || r27Host)().querySelector('.dp-stv-tip');
+    var o = {}; if (tip) [].forEach.call(tip.querySelectorAll('div'), function (d) { var s = d.querySelectorAll('span'); if (s.length === 2) o[r6Text(s[0])] = r6Text(s[1]); });
+    return o;
+  }
+  function r27TipWeg() { [].forEach.call(document.querySelectorAll('.dp-stv-tip'), function (t) { t.style.display = 'none'; }); }
+  /* Ereignislinien: Jahr über die Lage der Linie (x1 = linke Kante der Trefferfläche dieses Jahres) */
+  function r27Ereignisse(host) {
+    var h = (host || r27Host)(), R = r27Reihe() || []; if (!h) return [];
+    var hits = [].slice.call(h.querySelectorAll('.hit')), txt = h.querySelectorAll('text.evt');
+    return [].map.call(h.querySelectorAll('line.ev'), function (l, k) {
+      var x = parseFloat(l.getAttribute('x1')), i = -1;
+      hits.forEach(function (t, j) { if (Math.abs(parseFloat(t.getAttribute('x')) - x) < 0.3) i = j; });
+      return { jahr: i >= 0 && R[i] ? R[i].jahr : null, text: txt[k] ? r6Text(txt[k]) : '', linie: l, beschr: txt[k] || l };
+    });
+  }
+  function r27Oben(e, px) { if (!e) return; var s = scroller(e); if (s) s.scrollTop += rect(e).top - (px || 110); }
+  function r27Eur(v) { return (v < 0 ? '−' : '+') + ' ' + Math.round(Math.abs(v)).toLocaleString('de-DE') + ' €'; }
+
+  DREHBUECHER['reihe-steuerverlauf'] = {
+    titel: 'Steuerverlauf mit Wendepunkt', unterzeile: 'Wann ein Objekt steuerlich positiv wird — und warum das der Zeitpunkt fürs nächste Investment ist', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () {
+      r27TipWeg();
+      try { if (typeof window.setTaxFormMode === 'function' && window._taxFormMode === 'detail') window.setTaxFormMode('quick'); } catch (e) {}
+      rhAufraeumen();
+    },
+    szenen: [
+      async function (s) {   /* 1 · das Beispiel */
+        await rhNurStart();
+        await r27Laden(R27_DT, 'DEMO-DT4');
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        var we = wert('einheiten');
+        await b2oZeile(s, 'Das Beispiel', 'Ein Mehrfamilienhaus aus dem Bestand: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + (we ? ' — ' + we + ' Wohnungen' : '') + ', Kaufpreis <b>' + eur(zahl('kp')) + '</b>, gekauft am <b>' + datum(wert('kaufdat')) + '</b>.');
+        await zeige(feldVon('kaufdat'), 10);
+        await b2oZeile(s, 'Die Frage', 'Wann wird dieses Haus steuerlich positiv — ab wann zahlst du darauf Steuern? DealPilot zeigt es im Reiter Steuer auf einen Blick.', 800);
+      },
+      async function (s) {   /* 2 · Reiter Steuer: die Grafik, was V+V heißt */
+        reiter('s3-tax'); await warte(1500);
+        await warteAuf(r27Host, 6000);
+        r27Oben(q('#tax-timeline-header'), 90); await warte(500);
+        await zeige(function () { var k = q('#tax-timeline-header'); return k; }, 8);
+        await b2oZeile(s, 'Steuerverlauf', 'Neu im Reiter Steuer: <b>' + r6Text(q('#tax-timeline-header')).replace(/^\s*/, '') + '</b>.');
+        await zeige(r27Sel('.dp-stv-fuss'), 8);
+        await b2oZeile(s, 'Was ist das Ergebnis aus V+V?', 'Einnahmen aus Vermietung minus Werbungskosten: Zinsen, Abschreibung, Bewirtschaftung, Erhaltung. Negativ senkt es deine Steuer — positiv zahlst du darauf.', 1500);
+        var R = r27Reihe() || [];
+        r27Oben(r27Sel('.dp-stv-leg')(), 90); await warte(400);
+        await zeige(r27Sel('.dp-stv-ch svg'), 6);
+        await b2oZeile(s, 'Ein Balken je Jahr', (R.length ? '<b>' + R[0].jahr + ' bis ' + R[R.length - 1].jahr + '</b>, die ganze Haltedauer. ' : '') + 'Grün: Verlust, das Finanzamt erstattet. Gold: Gewinn, Steuer fällig. Die Linie: Cashflow nach Steuern.', 1000);
+      },
+      async function (s) {   /* 3 · der Wendepunkt */
+        var R = r27Reihe() || [], A = window.DpSteuerVerlauf ? DpSteuerVerlauf.auswerten(R) : {};
+        DPM_REIHE.r27dt = { reihe: R.map(function (r) { return [r.jahr, Math.round(r.erg), Math.round(r.steuer), r.cf == null ? null : Math.round(r.cf)]; }), auswertung: A };
+        r27Oben(r27Host(), 90); await warte(400);
+        var z0 = r27ZahlW(0);
+        await zeige(r27Zahl(0), 8);
+        await b2oZeile(s, z0.t.charAt(0) + z0.t.slice(1).toLowerCase() + ' ' + z0.w, 'Erst ' + z0.u + ' dreht das Ergebnis ins Plus. Ab hier zahlst du auf dieses Objekt Steuern.');
+        await zeigeGruppe(r27Sel('text.wpt'), r27Sel('line.wp'), 8);
+        await b2oZeile(s, 'Die Linie', '„' + r6Text(r27Sel('text.wpt')()) + '“ — gestrichelt im Bild, links grün, rechts gold.');
+        if (A.wende > 0) {
+          await zeigeGruppe(r27Hit(R[0].jahr), r27Hit(R[A.wende - 1].jahr), 4);
+          var j1 = R[A.wende - 1].jahr, rz = r15Zellen(j1);
+          DPM_REIHE.r27quick = { jahr: j1, zellen: rz };
+          await b2oZeile(s, 'Warum am Anfang Verluste?', (rz.length >= 4 ? 'In ' + j1 + ': Zinsen <b>' + rz[2] + '</b>, Abschreibung <b>' + rz[3] + '</b> — dazu Sanierung als Erhaltungsaufwand. ' : '') + 'Die Zinsen sind am Anfang am höchsten, die Abschreibung läuft jedes Jahr gleich.', 1500);
+        }
+      },
+      async function (s) {   /* 4 · Tooltip je Jahr */
+        var R = r27Reihe() || [], A = DpSteuerVerlauf.auswerten(R);
+        if (A.wende > 0) {
+          var jv = R[A.wende - 1].jahr, jw = R[A.wende].jahr;
+          var tv = r27Zeigen(jv); await warte(300);
+          await zeige(r27Sel('.dp-stv-tip'), 8);
+          DPM_REIHE.r27tip = { vor: tv };
+          await b2oZeile(s, 'Je Jahr der Tooltip · ' + jv, 'Einnahmen <b>' + (tv['Einnahmen'] || '–') + '</b>, Werbungskosten <b>' + (tv['Werbungskosten'] || '–') + '</b> — Ergebnis <b>' + (tv['Ergebnis V+V'] || '–') + '</b>, Erstattung <b>' + (tv['Erstattung'] || '–') + '</b>.', 1000);
+          var tw = r27Zeigen(jw); await warte(300);
+          await zeige(r27Sel('.dp-stv-tip'), 8);
+          DPM_REIHE.r27tip.wende = tw;
+          await b2oZeile(s, jw + ' · der Wendepunkt', 'Einnahmen <b>' + (tw['Einnahmen'] || '–') + '</b> statt ' + (tv['Einnahmen'] || '–') + ' — Ergebnis <b>' + (tw['Ergebnis V+V'] || '–') + '</b>, Steuer <b>' + (tw['Steuer'] || '–') + '</b>.' + (tw['Cashflow nach Steuern'] ? ' Cashflow nach Steuern ' + tw['Cashflow nach Steuern'] + '.' : ''), 1000);
+          r27TipWeg();
+        }
+      },
+      async function (s) {   /* 5 · die übrigen Kennzahlen und der Satz */
+        r27Oben(r27Host(), 90); await warte(400);
+        var z1 = r27ZahlW(1), z2 = r27ZahlW(2);
+        await zeige(r27Zahl(1), 8);
+        await b2oZeile(s, 'Erstattungen bis dahin', '<b>' + z1.w + '</b> in den Jahren ' + z1.u + ' — so viel hat das Haus deine Steuer gesenkt.');
+        await zeige(r27Zahl(2), 8);
+        await b2oZeile(s, 'Steuern ab dem Wendepunkt', '<b>' + z2.w + '</b> von ' + z2.u + ' — mit deinem Grenzsteuersatz gerechnet.');
+        await zeige(r27Sel('.dp-stv-satz'), 8);
+        await b2oZeile(s, 'Der Satz dazu', 'DealPilot fasst das Bild in Worte: wie lange das Haus deine Steuer senkt — und ab wann du darauf zahlst.', 800);
+      },
+      async function (s) {   /* 6 · Erklärkarte: der Zeitpunkt fürs nächste Investment */
+        await zeigeGruppe(r27Sel('text.wpt'), r27Sel('line.wp'), 8);
+        await b2oZeile(s, 'Der Zeitpunkt fürs nächste Investment', 'Ab dem Wendepunkt kostet das Haus Steuern. Ein weiteres Objekt mit Anfangsverlusten — Zinsen, AfA, Sanierung — oder geplanter Erhaltungsaufwand gleicht das aus.', 2000);
+      },
+      async function (s) {   /* 7 · Ereignislinien: Zinsbindung, § 23 */
+        var E = r27Ereignisse();
+        DPM_REIHE.r27ev = E.map(function (e) { return [e.jahr, e.text]; });
+        var zb = E.filter(function (e) { return /Zinsbindung/.test(e.text); })[0], st = E.filter(function (e) { return /23/.test(e.text); })[0];
+        if (zb) {
+          await zeigeGruppe(function () { return zb.beschr; }, function () { return zb.linie; }, 8);
+          var a = r15Zellen(zb.jahr - 1), b = r15Zellen(zb.jahr);
+          DPM_REIHE.r27zins = { vor: a, nach: b };
+          var zv = a[2], zn = b[2], mehr = (function () { var p = function (x) { return parseFloat(String(x || '').replace(/[^\d,-]/g, '').replace(/\./g, '').replace(',', '.')); }; return p(zn) > p(zv); })();
+          await b2oZeile(s, 'Zinsbindung endet ' + zb.jahr, 'Kauf ' + String(wert('kaufdat')).slice(0, 4) + ' plus ' + wert('d1_bindj') + ' Jahre Zinsbindung.' + (mehr ? ' Danach rechnet DealPilot mit dem Anschlusszins: Zinsen ' + (zb.jahr - 1) + ' <b>' + zv + '</b>, ' + zb.jahr + ' <b>' + zn + '</b> — der Balken wird kleiner.' : ''));
+        }
+        if (st) {
+          await zeigeGruppe(function () { return st.beschr; }, function () { return st.linie; }, 8);
+          await b2oZeile(s, 'Die 10-Jahres-Frist · ' + st.jahr, 'Im Privatvermögen ist ein Verkaufsgewinn nach zehn Jahren steuerfrei (§ 23 EStG), gezählt von Kauf bis Verkauf. Bei einer GmbH gilt das nicht — dort fehlt die Linie.', 1500);
+        }
+      },
+      async function (s) {   /* 8 · die Jahres-Kärtchen */
+        var tl = function () { var b = q('#tax-timeline-box'); return b && b.offsetWidth ? b : null; };
+        r27Oben(tl(), 140); await warte(400);
+        await zeige(tl, 8);
+        var su = /Summe über (\d+) Jahre:\s*([^\n]+)/.exec(String((tl() || {}).innerText || ''));
+        DPM_REIHE.r27summe = su ? [su[1], su[2]] : null;
+        await b2oZeile(s, 'Die Jahres-Kärtchen', 'Darunter dieselben Jahre als Kärtchen: Erstattung grün, Nachzahlung rot' + (su ? ' — Summe über ' + su[1] + ' Jahre: <b>' + su[2].trim() + '</b>' : '') + '.');
+      },
+      async function (s) {   /* 9 · Werbungskosten im Detail eines Verlustjahres */
+        var R = r27Reihe() || [], A = DpSteuerVerlauf.auswerten(R);
+        var J = A.wende > 0 ? R[A.wende - 1].jahr : (R[0] && R[0].jahr);
+        r15Modus(1); await warte(900);
+        await r15Jahr(J);
+        var kopf = function () { var b = r15Box(); return b && b.querySelector('select'); };
+        r15Oben(kopf()); await warte(400);
+        await zeigeGruppe(function () { var b = r15Box(); return b && b.querySelector('.ytf-mode-btn.active'); }, kopf, 8);
+        await b2oZeile(s, 'Werbungskosten im Detail · ' + J, 'Ein Jahr, jede Kostenart einzeln — gegliedert wie die Anlage V, jede Zeile mit Bemerkung.');
+        var bem = function (re) { var t = r15Det(re); var i = t && [].filter.call(t.querySelectorAll('input,textarea'), function (x) { return x.type !== 'number' && x.value; })[0]; return i ? i.value : ''; };
+        var kurz = function (t, n) { t = String(t || ''); return t.length > n ? t.slice(0, n - 1).replace(/\s+\S*$/, '') + ' …' : t; };
+        var er = function () { return r15Det(/^Erhaltungsaufwendungen/); };
+        var ew = r15DetWert(/^Erhaltungsaufwendungen/), eb = bem(/^Erhaltungsaufwendungen/);
+        if (er() && ew) {
+          r15Oben(er()); await warte(400);
+          await zeige(er, 6);
+          await b2oZeile(s, 'Erhaltungsaufwand', '<b>' + ew + '</b>' + (eb ? ' — „' + kurz(eb, 110) + '“' : '') + '.', 1200);
+          if (/3-Jahres-Frist|Drei-Jahres-Frist/i.test(eb)) await b2oZeile(s, 'Warum dieser Termin?', 'Nach Ende der Drei-Jahres-Frist ist es sofort absetzbar. Davor zählt die 15-%-Grenze — Modul 23 zeigt sie.', 1000);
+        }
+        var bw = r15DetWert(/^Bewegliche Wirtschaftsgüter/), bb = bem(/^Bewegliche Wirtschaftsgüter/);
+        if (bw) {
+          var bwz = function () { return r15Det(/^Bewegliche Wirtschaftsgüter/); };
+          r15Oben(bwz()); await warte(300);
+          await zeige(bwz, 6);
+          await b2oZeile(s, 'Bewegliche Wirtschaftsgüter', '<b>' + bw + '</b>' + (bb ? ' — „' + kurz(bb, 90) + '“' : '') + '. Über zehn Jahre, getrennt vom Gebäude.');
+        }
+        var wk = r15Summe(/Werbungskosten gesamt:\s*([^\n]+)/), ein = r15Summe(/Einnahmen V\+V:\s*([^\n]+)/), erg = r15Summe(/Verlust\/Überschuss V\+V:\s*([^\n]+)/), eff = r15Summe(/Steuer-Effekt:\s*([^\n]+)/);
+        DPM_REIHE.r27detail = { jahr: J, erhaltung: ew, bem: eb, bewegl: bw, wk: wk, ein: ein, erg: erg, eff: eff };
+        var sum = function () { var b = r15Box(); return b ? [].filter.call(b.querySelectorAll('div'), function (d) { return d.offsetWidth && d.children.length <= 12 && /Werbungskosten gesamt/.test(d.textContent) && /Steuer-Effekt/.test(d.textContent); }).pop() || null : null; };
+        if (wk && sum()) {
+          r15Oben(sum(), 260); await warte(400);
+          await zeige(sum, 8);
+          await b2oZeile(s, 'Das Jahr ' + J + ' in Summe', 'Werbungskosten <b>' + wk + '</b>, Einnahmen <b>' + ein + '</b> — Ergebnis <b>' + erg + '</b>, Steuer-Effekt <b>' + eff + '</b>: genau der Balken ' + J + '.', 800);
+          await b2oZeile(s, 'Eine Rechnung', 'Was hier steht, rechnet die Grafik mit — dieselben Jahreswerte wie das Steuerformular, kein zweiter Weg.');
+        }
+        r15Modus(0); await warte(600);
+      },
+      async function (s) {   /* 10 · Pilot-Analyse, Unterreiter Steuer (gespeicherte Analyse, kein Abruf) */
+        reiter('s5'); await warte(1500);
+        await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 8000);
+        await r11PaTab(/^Steuer$/);
+        await warteAuf(r27PaHost, 5000);
+        var karte = function () { var h = r27PaHost(); return h && h.closest('.dp-pa-card'); };
+        r27Oben(karte(), 90); await warte(500);
+        await zeige(karte, 8);
+        var p0 = r27ZahlW(0, r27PaHost), p1 = r27ZahlW(1, r27PaHost);
+        DPM_REIHE.r27pa = [p0, p1];
+        await b2oZeile(s, 'Pilot-Analyse · Steuer', 'Dieselbe Grafik steht in der Pilot-Analyse: positiv ab <b>' + p0.w + '</b>, Erstattungen bis dahin <b>' + p1.w + '</b>.', 800);
+      },
+      async function (s) {   /* 11 · Gegenbild Westerfeldstr. 140 */
+        await r27Laden(R27_BI, 'DEMO-BI1');
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        await b2oZeile(s, 'Das Gegenbild', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — Kaufpreis <b>' + eur(zahl('kp')) + '</b>, gekauft am <b>' + datum(wert('kaufdat')) + '</b>.');
+        reiter('s3-tax'); await warte(1500);
+        await warteAuf(r27Host, 6000);
+        r27Oben(r27Host(), 90); await warte(500);
+        var R = r27Reihe() || [], A = DpSteuerVerlauf.auswerten(R), z0 = r27ZahlW(0);
+        await zeige(r27Zahl(0), 8);
+        await b2oZeile(s, 'Positiv ab ' + z0.w, z0.u.charAt(0).toUpperCase() + z0.u.slice(1) + ': kein Verlustjahr' + (R[0] && R[0].steuer < 0 ? ', Steuer ' + R[0].jahr + ' <b>' + eur(-R[0].steuer) + '</b>' : '') + '.');
+        /* der Knick: Jahre NACH dem Wendepunkt, in denen erstattet wird (zusammenhängend, das erste Band) */
+        var k0 = -1, k1 = -1;
+        for (var i = Math.max(A.wende, 0) + 1; i < R.length; i++) { if (R[i].steuer > 0) { if (k0 < 0) k0 = i; k1 = i; } else if (k0 >= 0) break; }
+        DPM_REIHE.r27bi = { reihe: R.map(function (r) { return [r.jahr, Math.round(r.erg), Math.round(r.steuer)]; }), auswertung: A, knick: k0 >= 0 ? [R[k0].jahr, R[k1].jahr] : null };
+        if (k0 >= 0) {
+          await zeigeGruppe(r27Hit(R[k0].jahr), r27Hit(R[k1].jahr), 4);
+          var bs = []; for (var j = k0; j <= k1; j++) bs.push(r27Eur(R[j].steuer));
+          await b2oZeile(s, 'Der gesteuerte Knick', R[k0].jahr + (k1 > k0 ? ' bis ' + R[k1].jahr : '') + ' werden zur Erstattung: <b>' + bs.join(' · ') + '</b>.', 800);
+          var tk = r27Zeigen(R[k0].jahr); await warte(300);
+          await zeige(r27Sel('.dp-stv-tip'), 8);
+          await b2oZeile(s, R[k0].jahr + ' im Tooltip', 'Werbungskosten <b>' + (tk['Werbungskosten'] || '–') + '</b>, Ergebnis <b>' + (tk['Ergebnis V+V'] || '–') + '</b>, Erstattung <b>' + (tk['Erstattung'] || '–') + '</b>.');
+          r27TipWeg();
+          /* woher: Erhaltungsaufwand im Detail dieses Jahres, mit Bemerkung */
+          r15Modus(1); await warte(900); await r15Jahr(R[k0].jahr);
+          var er = function () { return r15Det(/^Erhaltungsaufwendungen/); };
+          var ew = r15DetWert(/^Erhaltungsaufwendungen/), et = er(), ei = et && [].filter.call(et.querySelectorAll('input,textarea'), function (x) { return x.type !== 'number' && x.value; })[0];
+          DPM_REIHE.r27bi.erhaltung = [ew, ei ? ei.value : ''];
+          if (et && ew) {
+            r15Oben(et); await warte(400);
+            await zeige(er, 6);
+            var eb = ei ? ei.value : '';
+            await b2oZeile(s, 'Woher', 'Erhaltungsaufwand ' + R[k0].jahr + ': <b>' + ew + '</b>' + (eb ? ' — „' + (eb.length > 100 ? eb.slice(0, 99).replace(/\s+\S*$/, '') + ' …' : eb) + '“' : '') + '.', 1000);
+          }
+          r15Modus(0); await warte(600);
+          r27Oben(r27Host(), 90); await warte(400);
+          if (k1 + 1 < R.length && R[k1 + 1].steuer < 0) {
+            await zeige(r27Hit(R[k1 + 1].jahr), 4);
+            await b2oZeile(s, 'Ab ' + R[k1 + 1].jahr + ' wieder Steuer', '<b>' + eur(-R[k1 + 1].steuer) + '</b> im Jahr ' + R[k1 + 1].jahr + '.');
+          }
+          await zeigeGruppe(r27Hit(R[k0].jahr), r27Hit(R[k1].jahr), 4);
+          await b2oZeile(s, 'Geplant, nicht zufällig', 'Die Maßnahmen liegen in den Jahren mit Steuerlast — nach der Drei-Jahres-Frist, sonst griffe die 15-%-Grenze. Die Grafik zeigt, wo eine Maßnahme die Kurve dreht.', 1500);
+        }
+      },
+      async function (s) {   /* 12 · Schluss: keine Steuerberatung */
+        await zeige(r27Sel('.dp-stv-fuss'), 8);
+        await b2oZeile(s, 'Keine Steuerberatung', 'DealPilot rechnet mit deinen Eingaben und deinem Grenzsteuersatz. Was du aus dem Wendepunkt machst, besprichst du mit deinem Steuerberater.', 1200);
+        r27Oben(r27Host(), 90); await warte(400);
+        await zeige(r27Sel('.dp-stv-ch svg'), 6);
+        await b2oZeile(s, 'Steuerverlauf mit Wendepunkt', 'Wann das Haus steuerlich positiv wird — und wann es Zeit fürs nächste Investment ist.', 1000);
       }
     ]
   };
