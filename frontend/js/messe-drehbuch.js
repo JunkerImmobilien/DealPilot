@@ -5438,16 +5438,16 @@
   /* jsPDF: Seite mit „Wertpotenzial" im Kopf finden (Seitenzahl ab 1) */
   var _r26 = { pdf: null, seite: null };
   async function r26Bank() {
-    var fang = null, seite = null, api = window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API;
+    var fang = null, seite = null, seiteN = null, api = window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API;
     if (!api || typeof window.exportPDFBank !== 'function') return null;
     r19OhneKontakt();
     _r19.save = api.save;
     api.save = function () {
-      try { var P = this.internal.pages; for (var n = 1; n < P.length; n++) { if (seite == null && /\((WERTPOTENZIAL|Wertpotenzial)[^)]*\) Tj/.test((P[n] || []).join('\n'))) seite = n; } } catch (e) {}
+      try { var P = this.internal.pages; for (var n = 1; n < P.length; n++) { if (/\((WERTPOTENZIAL|Wertpotenzial)[^)]*\) Tj/.test((P[n] || []).join('\n'))) { if (seite == null) seite = seiteN = n; else if (n === seiteN + 1) seiteN = n; } } } catch (e) {}
       fang = this.output('blob'); return this;
     };
     try { await window.exportPDFBank({ ohneRueckfrage: true }); } catch (e) {} finally { api.save = _r19.save; _r19.save = null; r19MitKontakt(); }
-    _r26.seite = seite;
+    _r26.seite = seite; _r26.seiteN = seiteN;   /* v2481o · letzte Seite mit dem Kopf „Wertpotenzial" (Fortsetzung) */
     return fang;
   }
   DREHBUECHER['reihe-zielbild'] = {
@@ -5831,7 +5831,9 @@
         await b2oZeile(s, 'Seite Wertpotenzial', 'Oben die Wohnungen: Ist, Mieterhöhung mit Termin, Zielmiete und Maßnahmen.');
         await r19Seite(bank, _r26.seite || 1, 330);   /* v2481g · gemessen: ab 330 px die ganze Wertbrücke (v2543: Wertüberleitung - Lage im Stichbild nachmessen) */
         await b2oZeile(s, 'Die Wertüberleitung', 'Auch im PDF: vom Bestand über Mieterhöhung und Zielbild, minus Maßnahmen — bis zum Potenzial netto.');
-        await r19Seite(bank, _r26.seite || 1, 720);   /* die Kennzahlen je Stufe mit Ertragswert und Aufteilung */
+        /* v2481o · GEMESSEN im Video v2481n: bei 720 px auf der Seite stand nur noch der leere Seitenfuß -
+           seit der Wertüberleitung (v2543) stehen die Kennzahlen je Stufe auf der Fortsetzungsseite */
+        if (_r26.seiteN && _r26.seiteN > (_r26.seite || 1)) await r19Seite(bank, _r26.seiteN, 0); else await r19Seite(bank, _r26.seite || 1, 720);
         await b2oZeile(s, 'Kennzahlen je Stufe', 'Miete, Rendite, DSCR, Miete im Ertragswert und Ertragswert je Stufe — gekennzeichnet als Potenzialwert, keine Verkehrswertermittlung.', 1500);
         var o = q('#dpm-pdf'); if (o && o.parentNode) o.parentNode.removeChild(o);
         kegelHoch(false);
