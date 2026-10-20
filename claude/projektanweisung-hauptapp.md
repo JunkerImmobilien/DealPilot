@@ -39017,6 +39017,37 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - Pilot-Antwort zu „Stufe 2“ und „Stufe C“.
 - Essen EFH Sachwertfaktor 1,33 im echten Bericht.
 
+### Prod-Rollout (56) · qc-v2450, v2460–v2466a, v2470–v2472, Ulm 2026, SH-Freigaben (20.10.2026)
+
+**Was:**
+- **Quick Boarding:** Die Beleihungsknöpfe beziehen sich auf KP + NK, 100 % heißt 0 € EK (Marcel). Der LTV auf der Karte steht auf derselben Basis.
+- **Quick Boarding:** Nur noch ein Scrollbalken.
+- **Quick Boarding:** 13 Heuristik-Fälle korrigiert.
+- **Tab Bewertung:** neue Karte „Mieterhöhung und Zielbild · Wertpotenzial“.
+- **PDF-Prüfung:** 12 PDFs (Bank- und Investment-Fassungen), danach 0 Befunde.
+- **Telegram:** `/unterlagen` mit Entwurf, verschickt nichts.
+- **Register:**
+  - Ulm Jahrgang 2026: 9 LZS-Werte, 8 Sperren.
+  - SH/Kiel mit Feld `nutzungsfreigabe`, von Marcel am 20.10. freigegeben.
+- **Ämter (nur Staging):** 27 PLZ-Einträge, die gemeindeweite überdeckten, ersetzt. Vorher gesichert in `main-20261020-0629-vor-aemter-plz`. 5 Anfragen umgehängt. Prod hatte solche Einträge nicht.
+- **Videothek:** Die 4 `*.alt-20261019` sind auf beiden Servern gelöscht; die lokalen Kopien in `Dateien/Messe/Videos/alt-vor-v2395/` sind laut md5 gleich.
+
+**Commit:** Prod-Merge `c1ba43e0` (Stand staging `2d1f8566`).
+
+**Nachweis:**
+- Sicherung `main-20261020-0712-r56` (73 Tabellen, 14 MB) und `mb-…-r56` (32 Tabellen, 25 MB).
+- Rebuild von mb-backend und backend. Gold-Audit RC 0, `auth/me` 401.
+- `register-saat` lief erst trocken, dann echt: 4.275 Sätze, SOLL = IST, Abgleich auf Prod und Staging sauber.
+
+**Rest:**
+- Telegram: Auf Prod ist noch kein Bot eingetragen. @Dealpilot_junker_bot hängt mit seinem Webhook an Staging; ein Webhook gilt je Token.
+- Fragen an Marcel:
+  - Ämtersuche ohne Kontingent – so lassen?
+  - Soll „knapp unter Ziel“ unter 90 % ein anderes Wort bekommen?
+  - RND 32 J. im Wertpotenzial gegen 35 J. in der Mieterliste.
+  - Warmmiete im Bank-PDF anders als im Investment-PDF.
+- MFH-Video „Mieterhöhung und Zielbild“ wird als Nächstes aufgenommen.
+
 ### v2470–v2472 · Unterlagen beim Amt im Telegram-Bot (Telegram-Teil aus unterlagen-app-v5) (20.10.2026, Staging)
 
 Marcel: *„ja das wäre top"* — der in v2440–v2445 offen gelassene Telegram-Teil.
