@@ -1459,7 +1459,7 @@
   var RH_BUSTER = 'v2395vr3';   /* v2395vr3: Portfolio-Analyse neu (Modul 21); v2395: BMF-Mitschnitt Ravensberger Weg mit Nebenkosten neu; v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
-  var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage/i;
+  var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage|\/marktbericht\/potenzial/i;
   /* v2263 · dazu Netzwerk-Einreichung, Partner-Anfrage, Ämter-Anfragen (Modul 13) und
      der Portfolio-Spiegel: eine gewonnene KOPIE (Modul 14) ginge sonst als zweites
      Objekt in die Zahlen des Telegram-Bots (gemessen: 12 statt 11 Objekte). */
@@ -1549,6 +1549,13 @@
     if (m === 'POST' && D.bmf && _aktiv === DREHBUECHER['reihe-bmf'] && /\/bmf\/(aufteilung|pipeline)/.test(u) && !(body && (body.include_pdf || body.include_file))) {
       return rhJ(JSON.parse(JSON.stringify(/pipeline/.test(u) ? D.bmf.pipeline : D.bmf.aufteilung)));
     }
+    /* v2480 · Modul 26: Ertragswert je Stufe (Schlüssel = Auftrag ohne Objektkennung) und die
+       Pilot-Analyse - einmal echt (?mitschnitt=26), hier gespielt. Fehlt ein Schlüssel, sperrt RH_SPERRE. */
+    if (m === 'POST' && D.zielbild26 && !_rh.mitschnitt26 && _aktiv === DREHBUECHER['reihe-zielbild']) {
+      var p26 = u.split('?')[0];
+      if (/\/marktbericht\/potenzial$/.test(p26)) { var k26 = r26Schluessel(body), a26 = k26 && D.zielbild26.potenzial && D.zielbild26.potenzial[k26]; if (a26) return rhJ(JSON.parse(JSON.stringify(a26))); }
+      if (/\/ai\/analyze$/.test(p26) && D.zielbild26.analyse) return rhJ(JSON.parse(JSON.stringify(D.zielbild26.analyse)));
+    }
     return null;
   }
   function rhSpion() {
@@ -1572,6 +1579,16 @@
         }
         /* v2373a · ... und die Geokodierung vor dem Bodenrichtwert (Fürth): einmal echt, dann als
            DPM_REIHE_DATEN.gefuehrt25geo gespielt (_rh.geo, wie Modul 24). BORIS selbst ist ein freies GET. */
+        /* v2480 · Mitschnitt-Lauf Modul 26: Ertragswert je Stufe und Pilot-Analyse gehen echt hinaus */
+        if (_rh.mitschnitt26 && m === 'POST' && /\/marktbericht\/potenzial$|\/ai\/analyze$/.test(pfad)) {
+          var mk = /potenzial$/.test(pfad) ? r26Schluessel(opt && opt.body) : null;
+          var p26 = echt.apply(this, arguments);
+          p26.then(function (r) { return r.clone().json(); }).then(function (j) {
+            var M = DPM_REIHE.mitschnitt26 = DPM_REIHE.mitschnitt26 || { potenzial: {}, analyse: null };
+            if (mk) M.potenzial[mk] = j; else M.analyse = j;
+          }).catch(function () {});
+          return p26;
+        }
         if (_rh.mitschnitt && m === 'GET' && /\/marktbericht\/geocode$/.test(pfad)) {
           var pg = echt.apply(this, arguments);
           pg.then(function (r) { return r.clone().json(); }).then(function (j) { DPM_REIHE.mitschnittGeo = j; }).catch(function () {});
@@ -5320,6 +5337,364 @@
         await b2oZeile(s, 'Von ' + r12Wort(a.wort) + ' zu ' + r12Wort(b.wort), 'Gleiche Zahlen, andere Gewichte: <b>' + (a.score || '–') + '</b> im Deal Score, <b>' + (b.score || '–') + '</b> im Investor Deal Score.', 1500);
       }
     ].map(function (f) { return function (s) { _r25s = s; return f(s); }; })
+  };
+
+  /* ═══ VIDEOREIHE · MODUL 26 · MIETERHÖHUNG UND ZIELBILD (v2480) ═════════
+     Marcel 20.10.2026: „Ein Video mit einem Mehrfamilienhaus, und auch die
+     einzelnen Einheiten mit allem eingetragen, mit Soll und Zielbild, und auch
+     die Übernahme in Miete gezeigt, sowie in der Pilot-Analyse das Zielbild."
+     Ein ERFUNDENES Haus (R26), „Neues Objekt", beim Aufräumen gelöscht (auch bei Esc).
+     KEIN ABRUF JE DURCHGANG, zwei Mitschnitte (DPM_REIHE_DATEN.zielbild26):
+       potenzial[schluessel]  POST /marktbericht/potenzial (Ertragswert je Stufe;
+                              der Dienst geokodiert - ein bezahlter Dienst). Schlüssel =
+                              Varianten + Wohnungen + Aufteilung des Auftrags, ohne die
+                              Objektkennung (die ist je Lauf neu).
+       analyse                POST /ai/analyze, EINMAL echt (Marcel: ein echter Abruf).
+     Erzeugt im Mitschnitt-Lauf ?messe=reihe-zielbild&mitschnitt=26: nur diese beiden
+     gehen dann echt hinaus und landen in DPM_REIHE.mitschnitt26. Nach jeder Änderung an
+     R26 oder an den Eingaben der Szenen neu erzeugen - sonst passt er nicht zum Endstand.
+     Gezeigt wird ein PDF (Bankfassung, lokal erzeugt, Nutzungszähler gesperrt). */
+  var R26 = {
+    kuerzel: 'DEMO Zielbild MFH', str: 'Teutoburger Straße', hnr: '60', plz: '33604', ort: 'Bielefeld',
+    baujahr: '1962', gsfl: '640', kp: '590000', etagen: '3',
+    /* nr, lage, wfl, zimmer, ist (leer = ''), status */
+    we: [['1', 'EG links', '68', '3', '420', 'vermietet'], ['2', 'EG rechts', '58', '2', '455', 'vermietet'],
+         ['3', '1. OG links', '68', '3', '480', 'vermietet'], ['4', '1. OG rechts', '58', '2', '470', 'vermietet'],
+         ['5', '2. OG links', '68', '3', '', 'leer'], ['6', '2. OG rechts', '58', '2', '440', 'vermietet']],
+    /* Mietvertrag und Plan je Wohnung (Index in we) */
+    plan: {
+      0: { mv_art: 'unbefristet', mv_beginn: '2016-04-01', mv_letzte_erhoehung: '2024-05-01', vgl_qm: '7,80',
+           mass: [['bad', '14000'], ['boeden', '6000']], ziel_qm: '9,50', ziel_wann: 'bei Mieterwechsel' },
+      1: { mv_art: 'unbefristet', mv_beginn: '2019-09-01', mv_letzte_erhoehung: '2025-10-01', vgl_qm: '8,20',
+           mass: [['fenster', '5500'], ['bad', '12000']], ziel_qm: '10,00', ziel_wann: 'bei Mieterwechsel' },
+      2: { mv_art: 'unbefristet', mv_letzte_erhoehung: '2024-09-01', vgl_qm: '7,80' },
+      3: { mv_art: 'unbefristet', mv_letzte_erhoehung: '2025-03-01', vgl_qm: '8,20' },
+      4: { mass: [['renovierung', '9000'], ['boeden', '5000']], ziel_qm: '9,80', ziel_wann: 'Neuvermietung' },
+      5: { mv_art: 'unbefristet', mv_letzte_erhoehung: '2023-11-01', vgl_qm: '8,20' }
+    }
+  };
+  function r26Mfh(sel) { return q('#mfh-modal ' + sel); }
+  function r26We(sel) { return q('#mfh-we-ov ' + sel); }
+  function r26Zelle(i, k) { return r26Mfh('[data-i="' + i + '"][data-k="' + k + '"]'); }
+  /* tippen wie von Hand: Zeichen für Zeichen mit input-Ereignis (die Fenster hören am Behälter) */
+  async function r26Tippe(e, text, ms) {
+    if (!e) return; text = String(text == null ? '' : text);
+    function los(t) { e.dispatchEvent(new Event(t, { bubbles: true })); }
+    if (e.tagName === 'SELECT' || e.type === 'date' || e.type === 'month') { e.value = text; los('input'); los('change'); await warte(ms || 260); return; }
+    e.value = ''; los('input');
+    for (var i = 0; i < text.length; i++) { e.value = text.slice(0, i + 1); los('input'); await warte(ms || 70); }
+    los('change');
+  }
+  function r26Kv(sel) {   /* .mfh-we-kv / .mfh-we-ew3: Beschriftung -> Wert */
+    var o = {}; [].forEach.call(document.querySelectorAll(sel + ' > div'), function (d) { var a = d.querySelector('span'), b = d.querySelector('b'); if (a && b) o[r6Text(a)] = r6Text(b); }); return o;
+  }
+  function r26Summe() { return r6Text(q('#mfh-summe')); }
+  /* der Auftrag ohne Objektkennung - Schlüssel des Mitschnitts */
+  function r26Schluessel(body) {
+    try { var b = typeof body === 'string' ? JSON.parse(body) : body; return JSON.stringify({ v: b.varianten || null, w: b.wohnungen || null, a: b.aufteilung ? { aktiv: !!b.aufteilung.aktiv, k: b.aufteilung.kosten_eur } : null }); } catch (e) { return null; }
+  }
+  async function r26WohnungAuf(i) {
+    var b = r26Mfh('[data-det="' + i + '"]'); if (b) b.click();
+    await warteAuf(function () { return r26We('.mfh-we-karte'); }, 4000);
+    await warte(700);
+    var l = r26We('.mfh-we-leib'); if (l) l.scrollTop = 0;
+  }
+  function r26Block(cls) { return function () { return r26We('.mfh-we-blk' + (cls ? '.' + cls : '')); }; }
+  function r26BlockTitel(re) { return function () { return [].filter.call(document.querySelectorAll('#mfh-we-ov .mfh-we-blk'), function (b) { var t = b.querySelector('.mfh-we-blk-t'); return t && re.test(r6Text(t)); })[0] || null; }; }
+  async function r26Feld(k, v, ms) { await r26Tippe(r26We('[data-wk="' + k + '"]'), v, ms); }
+  async function r26Massnahmen(liste) {
+    for (var j = 0; j < liste.length; j++) {
+      var c = r26We('[data-zb-chip="' + liste[j][0] + '"]'); if (c && !c.classList.contains('on')) c.click();
+      await warte(450);
+      var n = [].filter.call(document.querySelectorAll('#mfh-we-ov [data-zb-k]'), function () { return true; }).length;
+      await r26Tippe(r26We('[data-zb-k="' + (n - 1) + '"]'), liste[j][1], 60);
+    }
+  }
+  async function r26WohnungZu() { var ok = r26We('#mfh-we-ok'); if (ok) ok.click(); await warteAuf(function () { return !q('#mfh-we-ov'); }, 3000); await warte(500); }
+  /* Ertragswerte dieser Wohnung: Knopf, dann warten, bis die Kacheln stehen */
+  async function r26Ertragswert() {
+    var b = r26We('#mfh-we-ew-los'); if (b) b.click();
+    await warteAuf(function () { return r26We('.mfh-we-ew3') || (r26We('#mfh-we-ew .mfh-we-hint b') && /Stufe 3/.test(r6Text(r26We('#mfh-we-ew')))); }, 45000);
+    await warte(600);
+  }
+  /* jsPDF: Seite mit „Wertpotenzial" im Kopf finden (Seitenzahl ab 1) */
+  var _r26 = { pdf: null, seite: null };
+  async function r26Bank() {
+    var fang = null, seite = null, api = window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API;
+    if (!api || typeof window.exportPDFBank !== 'function') return null;
+    r19OhneKontakt();
+    _r19.save = api.save;
+    api.save = function () {
+      try { var P = this.internal.pages; for (var n = 1; n < P.length; n++) { if (seite == null && /\((WERTPOTENZIAL|Wertpotenzial)[^)]*\) Tj/.test((P[n] || []).join('\n'))) seite = n; } } catch (e) {}
+      fang = this.output('blob'); return this;
+    };
+    try { await window.exportPDFBank({ ohneRueckfrage: true }); } catch (e) {} finally { api.save = _r19.save; _r19.save = null; r19MitKontakt(); }
+    _r26.seite = seite;
+    return fang;
+  }
+  DREHBUECHER['reihe-zielbild'] = {
+    titel: 'Mieterhöhung und Zielbild', unterzeile: 'Ein Mehrfamilienhaus, Wohnung für Wohnung — Ist, Soll und Zielbild bis zum Wertpotenzial', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { var w = q('#mfh-we-ov'); if (w) w.remove(); var m = q('#mfh-modal'); if (m) m.remove(); r19Zu(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das Haus */
+        await rhStart(0);
+        try { _rh.mitschnitt26 = new URLSearchParams(location.search).get('mitschnitt') === '26'; } catch (e) {}
+        if (_rh.mitschnitt26) DPM_REIHE.mitschnitt26 = { potenzial: {}, analyse: null };
+        [['kuerzel', R26.kuerzel], ['plz', R26.plz], ['ort', R26.ort], ['str', R26.str], ['hnr', R26.hnr], ['objart', 'MFH'],
+         ['baujahr', R26.baujahr], ['gsfl', R26.gsfl], ['etagen_ges', R26.etagen]].forEach(function (x) { r6Setz(x[0], x[1]); });
+        r6Setz('kp', R26.kp); try { DealPilotInvestmentProfile.nachziehen('kp'); } catch (e) {}
+        await warte(900);
+        try { if (typeof window.dpDarlehenNachziehen === 'function') window.dpDarlehenNachziehen(); } catch (e) {}
+        try { DealPilotBwkProfil.einsetzen(false); } catch (e) {}
+        try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
+        await warte(700);
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeigeGruppe(feldVon('plz'), feldVon('baujahr'), 8);
+        await b2oZeile(s, 'Das Beispiel', 'Ein erfundenes Mehrfamilienhaus: <b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — Baujahr ' + wert('baujahr') + ', Kaufpreis <b>' + eur(zahl('kp')) + '</b>.');
+        await zeige(function () { var b = q('#mfh-oeffnen'); return b && b.offsetWidth ? b : null; }, 10);
+        await b2oZeile(s, 'Einheiten erfassen', 'Bei einem Mehrfamilienhaus erscheint unter der Wohnfläche <b>„Einheiten erfassen“</b> — jede Wohnung einzeln.');
+      },
+      async function (s) {   /* 2 · Schritt 1: das Haus, der Haken „aufgeteilt" */
+        var b = q('#mfh-oeffnen'); if (b) b.click();
+        await warteAuf(function () { return r26Mfh('#mfh-body'); }, 4000);
+        kegelHoch(true); await warte(700);
+        await zeige(function () { return r26Mfh('#mfh-body table'); }, 6);
+        await b2oZeile(s, 'Schritt 1 · Das Haus', 'Der Zustand nach Anlage 2: Dach, Fassade, Leitungen, Heizung fürs ganze Haus — hier noch nichts modernisiert.');
+        var w = r26Mfh('#mfh-weg');
+        await zeige(function () { var x = r26Mfh('#mfh-weg'); return x && x.closest('div'); }, 8);
+        if (w && !w.checked) w.click();
+        await b2oZeile(s, 'In Wohnungseigentum aufgeteilt', 'Ein Haken — dann zeigt DealPilot jede Wohnung auch als <b>Eigentumswohnung</b>, die Aufteilungskosten mit Vorbelegung.');
+      },
+      async function (s) {   /* 3 · Schritt 2: sechs Wohnungen */
+        var wb = r26Mfh('#mfh-weiter'); if (wb) wb.click();
+        await warteAuf(function () { return r26Zelle(0, 'nr'); }, 3000);
+        await warte(500);
+        await zeige(function () { return r26Mfh('.mfh-tab'); }, 6);
+        var zb = r6Beginn(s, 'Schritt 2 · Die Wohnungen', 'Nummer, Lage, Fläche, Zimmer, Ist-Miete, Status — nur das Nötigste.');
+        for (var i = 0; i < R26.we.length; i++) {
+          if (i > 0) { var nb = r26Mfh('#mfh-neu'); if (nb) nb.click(); await warteAuf(function () { return r26Zelle(i, 'nr'); }, 2000); }
+          var r = R26.we[i];
+          var nr = r26Zelle(i, 'nr'); if (nr && nr.value !== r[0]) await r26Tippe(nr, r[0], 60);
+          await r26Tippe(r26Zelle(i, 'lage'), r[1], 55);
+          await r26Tippe(r26Zelle(i, 'wfl'), r[2], 60);
+          await r26Tippe(r26Zelle(i, 'zimmer'), r[3], 60);
+          if (r[4]) await r26Tippe(r26Zelle(i, 'ist'), r[4], 60);
+          await r26Tippe(r26Zelle(i, 'status'), r[5]);
+        }
+        await r6Ende(zb);
+        await zeige(function () { return b2oHuelle(r26Mfh('.mfh-tab'), r26Mfh('#mfh-summe')); }, 6);
+        var su = r26Summe(), sm = /(\d+) Einheiten.*?·\s*([\d.]+ m²).*?Ist ([\d.]+ €)\/Monat/.exec(su), le = /Leerstand (\d+) WE/.exec(su);
+        await b2oZeile(s, 'Sechs Wohnungen', sm ? '<b>' + sm[1] + ' Einheiten, ' + sm[2] + '</b>, Ist-Miete <b>' + sm[3] + '</b> im Monat' + (le ? ' — ' + le[1] + ' Wohnung steht leer' : '') + '.' : su);
+        await zeige(function () { return r26Mfh('[data-det="0"]'); }, 8);
+        await b2oZeile(s, 'Details', 'Alles Weitere steht in der Wohnung: <b>Details</b> öffnet Mietvertrag, Soll-Miete, Zielbild und Ertragswert.');
+      },
+      async function (s) {   /* 4 · Wohnung 1: Mietvertrag */
+        await r26WohnungAuf(0);
+        var P = R26.plan[0];
+        await zeige(r26BlockTitel(/^Mietvertrag/), 6);
+        var zb = r6Beginn(s, 'Wohnung 1 · Der Mietvertrag', 'Vertragsart, Mietbeginn — und das Datum der letzten Erhöhung.');
+        await r26Feld('mv_art', P.mv_art); await r26Feld('mv_beginn', P.mv_beginn); await r26Feld('mv_letzte_erhoehung', P.mv_letzte_erhoehung);
+        await r6Ende(zb);
+        await b2oZeile(s, 'Die Frist', 'Letzte Erhöhung am <b>' + datum(P.mv_letzte_erhoehung) + '</b>: die nächste ist frühestens 15 Monate später möglich (§ 558 BGB).');
+      },
+      async function (s) {   /* 5 · Wohnung 1: Soll-Miete */
+        var P = R26.plan[0];
+        await zeige(r26Block('soll'), 6);
+        var zb = r6Beginn(s, 'Wohnung 1 · Soll-Miete', 'Der Mieter bleibt. Eingetragen wird nur die Vergleichsmiete aus dem Mietspiegel …');
+        await r26Feld('vgl_qm', P.vgl_qm, 90);
+        await warteAuf(function () { return r26Kv('#mfh-we-soll .mfh-we-kv')['Soll-Miete']; }, 6000);
+        await r6Ende(zb);
+        var kv = r26Kv('#mfh-we-soll .mfh-we-kv'), kt = (function () { var h = document.querySelectorAll('#mfh-we-soll .mfh-we-hint'); return h.length ? r6Text(h[h.length - 1]) : ''; })();
+        var kg = /Kappungsgrenze (\d+) %/.exec(kt), vo = /steht in der ([^(.]+?)\s*\(/.exec(kt);
+        await zeige(function () { return r26We('#mfh-we-soll'); }, 6);
+        await b2oZeile(s, 'Der Vorschlag von DealPilot', 'Vergleichsmiete <b>' + P.vgl_qm + ' €/m²</b> — DealPilot rechnet die Soll-Miete: <b>' + (kv['Soll-Miete'] || '–') + '</b>, ' + (kv['Herkunft'] || '').replace(/^gerechnet \(§ 558\) · /, '') + '.');
+        await b2oZeile(s, 'Die Kappungsgrenze', (kg ? '<b>' + kg[1] + ' % in drei Jahren</b>' : 'Die Kappungsgrenze') + (vo ? ' — Bielefeld steht in der <b>' + vo[1] + '</b>' : '') + '. DealPilot setzt sie je Gemeinde selbst. Erreichbar ab: <b>' + (kv['erreichbar ab'] || '–') + '</b>.');
+      },
+      async function (s) {   /* 6 · Wohnung 1: Zielbild */
+        var P = R26.plan[0];
+        await zeige(r26Block('ziel'), 6);
+        var zb = r6Beginn(s, 'Wohnung 1 · Zielbild', 'Nach Umbau oder Mieterwechsel: Maßnahmen als Chips, jede mit Kosten.');
+        await r26Massnahmen(P.mass);
+        await r26Feld('ziel_qm', P.ziel_qm, 90); await r26Feld('ziel_wann', P.ziel_wann, 45);
+        await r6Ende(zb);
+        var kv = r26Kv('#mfh-we-ziel .mfh-we-kv');
+        await zeige(function () { return r26We('#mfh-we-ziel'); }, 6);
+        await b2oZeile(s, 'Kosten und Punkte', 'Bad und Böden: <b>' + (kv['Kosten gesamt'] || '–') + '</b>, ' + (kv['Modernisierungspunkte'] || '–').replace(/\s*\(Anlage 2\)/, '') + ' Modernisierungspunkte nach Anlage 2. Zielmiete <b>' + P.ziel_qm + ' €/m²</b> = <b>' + (kv['Zielmiete'] || '–') + '</b>.');
+      },
+      async function (s) {   /* 7 · Wohnung 1: Ertragswert */
+        await zeige(r26Block('ew'), 6);
+        var zb = r6Beginn(s, 'Ertragswert dieser Wohnung', 'Derselbe Rechenkern wie der Marktbericht Stufe 3 — je Stufe: Bestand, Mieterhöhung, Zielbild.');
+        await r26Ertragswert();
+        await r6Ende(zb);
+        var gesp = !r26We('.mfh-we-ew3');
+        DPM_REIHE.r26ew = (DPM_REIHE.r26ew || []).concat([{ we: 1, gesperrt: gesp, text: r6Text(r26We('#mfh-we-ew')).slice(0, 200) }]);
+        if (gesp) { await b2oZeile(s, 'Ertragswert mit Stufe 3', 'Der Ertragswert gehört zur Wertermittlung (Stufe 3) — ohne sie bleibt es bei Mieten, Kosten und Rendite.'); return; }
+        var e3 = r26Kv('#mfh-we-ew .mfh-we-ew3'), zt = r6Text(r26We('#mfh-we-ew .mfh-we-hint')), zi = /Zins ([\d,]+ %)/.exec(zt);
+        await zeige(function () { return r26We('#mfh-we-ew'); }, 6);
+        await b2oZeile(s, 'Als Eigentumswohnung', 'Bestand <b>' + (e3['Bestand'] || '–') + '</b>, mit Mieterhöhung <b>' + (e3['Mieterhöhung'] || '–') + '</b>, im Zielbild <b>' + (e3['Zielbild'] || '–') + '</b>' + (zi ? ' — Zins ' + zi[1] + ' für Wohnungseigentum' : '') + '.');
+        var ha = r26We('[data-ewart="haus"]'); if (ha) ha.click();
+        await warte(700);
+        var h3 = r26Kv('#mfh-we-ew .mfh-we-ew3');
+        await b2oZeile(s, 'Oder als Anteil am Haus', 'Umgeschaltet: <b>' + (h3['Bestand'] || '–') + '</b> · <b>' + (h3['Mieterhöhung'] || '–') + '</b> · <b>' + (h3['Zielbild'] || '–') + '</b> — der Anteil am Ertragswert des ganzen Hauses.');
+        await r26WohnungZu();
+      },
+      async function (s) {   /* 8 · Wohnung 2 */
+        await r26WohnungAuf(1);
+        var P = R26.plan[1];
+        await zeige(r26BlockTitel(/^Mietvertrag/), 6);
+        var zb = r6Beginn(s, 'Wohnung 2', 'Zuletzt erhöht im <b>' + datum(P.mv_letzte_erhoehung).slice(3) + '</b>, Vergleichsmiete <b>' + P.vgl_qm + ' €/m²</b>.');
+        await r26Feld('mv_art', P.mv_art); await r26Feld('mv_beginn', P.mv_beginn); await r26Feld('mv_letzte_erhoehung', P.mv_letzte_erhoehung);
+        await zeige(r26Block('soll'), 6);
+        await r26Feld('vgl_qm', P.vgl_qm, 80);
+        await warteAuf(function () { return r26Kv('#mfh-we-soll .mfh-we-kv')['Soll-Miete']; }, 6000);
+        await r6Ende(zb);
+        var kv = r26Kv('#mfh-we-soll .mfh-we-kv');
+        await zeige(function () { return r26We('#mfh-we-soll'); }, 6);
+        await b2oZeile(s, 'Hier begrenzt der Mietspiegel', 'Soll-Miete <b>' + (kv['Soll-Miete'] || '–') + '</b> — ' + (kv['Herkunft'] || '').replace(/^gerechnet \(§ 558\) · /, '') + ', nicht die Kappung. Erreichbar ab <b>' + (kv['erreichbar ab'] || '–') + '</b>.');
+        await zeige(r26Block('ziel'), 6);
+        var zb2 = r6Beginn(s, 'Wohnung 2 · Zielbild', 'Fenster und Bad, danach 10 €/m² bei Mieterwechsel.');
+        await r26Massnahmen(P.mass);
+        await r26Feld('ziel_qm', P.ziel_qm, 80); await r26Feld('ziel_wann', P.ziel_wann, 40);
+        await r6Ende(zb2);
+        var kz = r26Kv('#mfh-we-ziel .mfh-we-kv');
+        await zeige(function () { return r26We('#mfh-we-ziel'); }, 6);
+        await b2oZeile(s, 'Wohnung 2 · Zielbild', 'Zielmiete <b>' + (kz['Zielmiete'] || '–') + '</b>, Maßnahmen <b>' + (kz['Kosten gesamt'] || '–') + '</b>, ' + (kz['Modernisierungspunkte'] || '–').replace(/\s*\(Anlage 2\)/, '') + ' Punkte.');
+        await r26WohnungZu();
+      },
+      async function (s) {   /* 9 · die übrigen Wohnungen, zügig */
+        await zeige(function () { return r26Mfh('.mfh-tab'); }, 6);
+        var zb = r6Beginn(s, 'Die übrigen Wohnungen', 'Dasselbe zügig: Vergleichsmiete und letzte Erhöhung — die leere Wohnung bekommt nur ein Zielbild.');
+        for (var i = 2; i < R26.we.length; i++) {
+          var P = R26.plan[i]; if (!P) continue;
+          await r26WohnungAuf(i);
+          if (P.mv_art) { await zeige(r26BlockTitel(/^Mietvertrag/), 6); await r26Feld('mv_art', P.mv_art); await r26Feld('mv_letzte_erhoehung', P.mv_letzte_erhoehung); }
+          if (P.vgl_qm) { await zeige(r26Block('soll'), 6); await r26Feld('vgl_qm', P.vgl_qm, 60); await warte(500); }
+          if (P.mass) { await zeige(r26Block('ziel'), 6); await r26Massnahmen(P.mass); await r26Feld('ziel_qm', P.ziel_qm, 60); await r26Feld('ziel_wann', P.ziel_wann, 35); await warte(500); }
+          await r26WohnungZu();
+          await zeige(function () { return r26Mfh('.mfh-tab'); }, 6);
+        }
+        await r6Ende(zb);
+        await zeige(function () { return b2oHuelle(r26Mfh('.mfh-tab'), r26Mfh('#mfh-summe')); }, 6);
+        var n = [].filter.call(document.querySelectorAll('#mfh-modal .mfh-det.mit-plan'), function () { return true; }).length;
+        await b2oZeile(s, 'Sechs Wohnungen, sechs Pläne', '<b>' + n + ' Wohnungen</b> tragen jetzt einen Plan — „Details · Plan“. Gerechnet wird je Wohnung, nicht pauschal.');
+      },
+      async function (s) {   /* 10 · Ergebnis, Übernehmen */
+        var wb = r26Mfh('#mfh-weiter'); if (wb) wb.click(); await warte(500);
+        wb = r26Mfh('#mfh-weiter'); if (wb) wb.click();
+        await warteAuf(function () { return r26Mfh('#mfh-uep'); }, 3000);
+        await warte(600);
+        await zeige(function () { return r26Mfh('#mfh-body'); }, 6);
+        var et = r6Text(r26Mfh('#mfh-body')), rg = /Restnutzungsdauer (\d+) Jahre/.exec(et), pg = /Gebäude gesamt:\s*([\d,]+) Punkte/.exec(et);
+        await b2oZeile(s, 'Schritt 4 · Ergebnis', 'Heute ' + (pg ? '<b>' + pg[1] + ' Punkte</b> nach Anlage 2' : 'die Punkte nach Anlage 2') + (rg ? ', Restnutzungsdauer <b>' + rg[1] + ' Jahre</b>' : '') + ' — Score und Verkehrswert rechnen weiter mit dem Bestand.');
+        await zeige(function () { return r26Mfh('#mfh-weiter'); }, 8);
+        s.zeile('Übernehmen', 'Ein Klick: Fläche, Einheiten, Ist-Miete und die Pläne gehen ins Objekt.');
+        await warte(3200);
+        DPM_REIHE.r26toast = null;
+        var tw = window.toast, tt = null;
+        window.toast = function (m) { tt = m; try { DPM_REIHE.r26toast = String(m); } catch (e) {} return tw.apply(this, arguments); };
+        wb = r26Mfh('#mfh-weiter'); if (wb) wb.click();
+        await warteAuf(function () { return !q('#mfh-modal'); }, 5000);
+        window.toast = tw;
+        kegelHoch(false);
+        await warte(1600);
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeigeGruppe(feldVon('wfl'), feldVon('einheiten'), 8);
+        await b2oZeile(s, 'Im Objekt', 'Übernommen: <b>' + wert('einheiten') + ' Einheiten</b>, ' + wert('wfl') + ' m², Kaltmiete <b>' + eur(zahl('nkm')) + '</b> im Monat' + (/aus Wohnungen/.test(tt || '') ? ' — und die Mietentwicklung steht auf <b>„aus Wohnungen“</b>' : '') + '.');
+      },
+      async function (s) {   /* 11 · Tab Miete: Mietentwicklung aus Wohnungen */
+        reiter('s2'); await warte(1200);
+        var ME = window.MietEntwicklung;
+        var knopf = function () { var b = q('#me-mode-einheiten'); return b && b.offsetWidth ? b : null; };
+        await warteAuf(knopf, 4000);
+        await zeige(function () { var b = knopf(); return b && b.parentElement; }, 8);
+        if (ME && ME.getMode && ME.getMode() !== 'einheiten') {
+          await b2oZeile(s, 'Tab Miete · Mietentwicklung', 'Drei Wege, die Miete fortzuschreiben — für das Mehrfamilienhaus der dritte: <b>„Aus Wohnungen“</b>.');
+          var k = knopf(); if (k && !k.disabled) k.click();
+          await warte(900);
+        } else {
+          await b2oZeile(s, 'Tab Miete · Mietentwicklung', 'Der Modus steht schon: <b>„Aus Wohnungen“</b> — jede Wohnung rechnet ihre eigene Miete.');
+        }
+        var tw = function () { return q('#me_table_wrap'); };
+        await warteAuf(function () { return q('#me_table_wrap table'); }, 4000);
+        await zeige(tw, 8);
+        var zeilen = [].filter.call(document.querySelectorAll('#me_table_wrap tbody tr'), function () { return true; });
+        var z0 = zeilen[0] ? r6Text(zeilen[0].cells[1]) : null, hz = zeilen.filter(function (r) { return r.classList.contains('me-row-hike'); })[0];
+        var hj = hz ? r6Text(hz.cells[0]).replace(/\s*⬆/, '') : null, hv = hz ? r6Text(hz.cells[1]) : null, hp = hz && hz.previousElementSibling ? r6Text(hz.previousElementSibling.cells[1]) : z0;
+        DPM_REIHE.r26me = { modus: ME && ME.getMode ? ME.getMode() : null, z0: z0, sprung: hj, vor: hp, nach: hv };
+        await b2oZeile(s, 'Der Sprung zur Soll-Miete', (hz ? 'In <b>' + hj + '</b> greifen die Soll-Mieten: Kaltmiete von <b>' + hp + '</b> auf <b>' + hv + '</b> im Jahr' : 'Ab ihrem Termin rechnet jede Wohnung mit ihrer Soll-Miete') + '. Das Zielbild bleibt draußen — es ist ein Plan, kein Vertrag.');
+      },
+      async function (s) {   /* 12 · Pilot-Analyse */
+        reiter('s5'); await warte(1200);
+        var btn = function () { var b = q('#ai-btn'); return b && b.offsetWidth ? b : null; };
+        await zeige(btn, 10);
+        var zb = r6Beginn(s, 'Pilot-Analyse', 'Der Pilot liest alles — auch die Pläne je Wohnung und die Ertragswerte je Stufe.');
+        var b = btn(); if (b) b.click();
+        await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 120000);
+        await r6Ende(zb);
+        await warte(900);
+        var t = [].filter.call(document.querySelectorAll('#ai-content .dp-pa-tab'), function (x) { return x.offsetWidth && /Zielbild/.test(r6Text(x)); })[0];
+        await zeige(function () { return t; }, 8);
+        await b2oZeile(s, 'Ein eigener Reiter', 'Neben Briefing, Risiko und Bank: <b>„' + (t ? r6Text(t) : 'Ankauf · Bestand · Zielbild') + '“</b>.');
+        await r11PaTab(/Zielbild/);
+        var tab = function () { var p = r11Panel(); return p && p.querySelector('[data-dp-pot-wirt] table'); };
+        await zeige(tab, 6);
+        var T = tab(), kopf = T ? [].map.call(T.querySelectorAll('thead th'), function (x) { return r6Text(x); }).filter(Boolean) : [];
+        var zeile = function (re) { var r = T && [].filter.call(T.querySelectorAll('tbody tr'), function (x) { return re.test(r6Text(x.cells[0])); })[0]; return r ? [].map.call(r.cells, function (c) { return r6Text(c); }) : null; };
+        var ew = zeile(/^Ertragswert/), km = zeile(/^Kaltmiete p\. a\./);
+        DPM_REIHE.r26pa = { kopf: kopf, ertragswert: ew, kaltmiete: km };
+        await b2oZeile(s, 'Vier Spalten', kopf.join(' · ') + (km ? ' — Kaltmiete im Jahr von <b>' + km[kopf.indexOf('Bestand') >= 0 ? kopf.indexOf('Bestand') : 1] + '</b> bis <b>' + km[km.length - 1] + '</b>' : '') + '.');
+        if (ew) await b2oZeile(s, 'Ertragswert je Stufe', 'Bestand <b>' + ew[kopf.indexOf('Bestand')] + '</b>, mit Mieterhöhung <b>' + ew[kopf.length - 2] + '</b>, im Zielbild <b>' + ew[kopf.length - 1] + '</b> — Potenzialwert, keine Verkehrswertermittlung.');
+        var auf = function () { var p = r11Panel(); var x = p && [].filter.call(p.querySelectorAll('[data-dp-pot-wirt] table'), function (y) { return /Aufteilung|Eigentumswohnung/i.test(r6Text(y)); })[1]; return x || null; };
+        var au = auf();
+        if (au) {
+          await zeige(auf, 6);
+          var at = r6Text(au), neg = /kein Potenzial/i.test(at);
+          await b2oZeile(s, 'Nach der Aufteilung', neg ? 'Jede Wohnung als Eigentumswohnung, die Summe gegen das Haus — hier <b>kein Potenzial</b>, und DealPilot sagt warum.' : 'Jede Wohnung als Eigentumswohnung, die Summe nach Aufteilungskosten gegen den Wert des Hauses.');
+        }
+        var pt = function () { var p = r11Panel(); var e = p && rhIm(p, /^\s*PILOT: WAS IM HAUS STECKT\s*$/); return e && (e.closest('div[style*="margin-top:12px"]') || e.parentElement); };
+        if (pt()) {
+          await zeige(pt, 6);
+          await b2oZeile(s, 'Der Pilot dazu', 'Ein Absatz in ganzen Sätzen: was im Haus steckt, welche Wohnung den größten Hebel hat — und was davon nur Plan ist.', 1200);
+        }
+      },
+      async function (s) {   /* 13 · Tab Bewertung: Wertpotenzial */
+        reiter('s6'); await warte(1400);
+        var k = function () { var x = q('#card-wertpotenzial'); return x && x.offsetWidth ? x : null; };
+        await warteAuf(function () { var x = k(); return x && !/wird gerechnet/i.test(x.textContent); }, 45000);
+        var kopf = function () { var x = k(); return x && (x.querySelector('.ct') || x); };
+        await zeige(kopf, 8);
+        await b2oZeile(s, 'Tab Bewertung', 'Dieselben Zahlen im Reiter Bewertung: die Karte <b>„' + r6Text(kopf()).replace(/\s*Potenzialwert.*$/i, '') + '“</b>.');
+        var br = function () { var x = k(); var sv = x && x.querySelector('svg'); return sv || null; };
+        if (br()) {
+          await zeige(br, 8);
+          var kt = r6Text(k()), pn = /Potenzial netto\s*([+−-]?[\d.]+ €)/.exec(kt);
+          await b2oZeile(s, 'Die Wertbrücke', 'Vom Bestand über Mieterhöhung und Zielbild, abzüglich der Maßnahmen' + (pn ? ' — <b>Potenzial netto ' + pn[1] + '</b>' : '') + '.');
+        }
+      },
+      async function (s) {   /* 14 · Bank-PDF: Seite Wertpotenzial */
+        reiter('s8'); await warte(1200);
+        var zeileFn = function () { var e = rhIm('#s8', /^\s*Investment-PDF/); return e && (e.closest('[class*=row]') || e.parentElement); };
+        await warteAuf(zeileFn, 5000);
+        await zeige(zeileFn, 8);
+        var zb = r6Beginn(s, 'Das Bank-PDF', 'Und für die Bank: das Bank-PDF bekommt eine eigene Seite „Wertpotenzial“.');
+        var bank = await r26Bank();
+        await r6Ende(zb);
+        if (!bank) return;
+        _r26.pdf = bank;
+        try { var tx = await bank.text(); DPM_REIHE.pdf26 = { bytes: bank.size, seite: _r26.seite, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8) }; } catch (e) {}
+        zeige(null); kegelHoch(true);
+        await r19Seite(bank, _r26.seite || 1);
+        await b2oZeile(s, 'Seite Wertpotenzial', 'Die Wohnungen mit Ist, Mieterhöhung und Zielmiete, die Ertragswerte je Stufe und die Wertbrücke — gekennzeichnet als Potenzialwert.', 1500);
+        var o = q('#dpm-pdf'); if (o && o.parentNode) o.parentNode.removeChild(o);
+        kegelHoch(false);
+      },
+      async function (s) {   /* 15 · Schluss */
+        reiter('s0'); var m = q('.main-col'); if (m) m.scrollTop = 0; await warte(700);
+        await zeige(function () { var b = q('#mfh-oeffnen'); return b && b.offsetWidth ? b : null; }, 10);
+        await b2oZeile(s, 'Ist, Soll, Zielbild', 'Je Wohnung erfasst, je Stufe bewertet — in Mietentwicklung, Pilot-Analyse, Bewertung und PDF. Gerechnet wird mit dem Bestand, das Potenzial steht daneben.', 1200);
+      }
+    ]
   };
 
   /* ── Ablauf ───────────────────────────────────────────────────── */
