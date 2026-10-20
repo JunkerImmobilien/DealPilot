@@ -60,7 +60,9 @@
       '#dpm-kegel{position:fixed;z-index:10070;pointer-events:none;border-radius:14px;box-shadow:0 0 0 9999px rgba(5,5,5,.58),0 0 0 3px ' + GH + ',0 0 40px 6px ' + mix(GH, 45) + ';transition:all .7s cubic-bezier(.5,0,.2,1);opacity:0}',
       '#dpm-kegel.an{opacity:1}',
       /* v2481k · die gewählte Option sichtbar markiert halten (Modul 26, „Aus Wohnungen") */
-      '.dpm-wahl{outline:3px solid ' + GH + '!important;outline-offset:4px!important;box-shadow:0 0 22px 6px ' + mix(GH, 60) + '!important;animation:dpmWahl 1.1s ease-in-out infinite alternate}',
+      /* v2481l · gemessen am Prüflauf: nur ein Rahmen ging im Goldrand des Kegels unter, der Knopf
+         blieb weiß wie seine Nachbarn - jetzt zusätzlich gefüllt (Gold, dunkle Schrift) */
+      '.dpm-wahl{background:' + GH + '!important;color:#050505!important;font-weight:700!important;outline:3px solid ' + GH + '!important;outline-offset:4px!important;box-shadow:0 0 22px 6px ' + mix(GH, 60) + '!important;animation:dpmWahl 1.1s ease-in-out infinite alternate}',
       '@keyframes dpmWahl{from{outline-offset:3px}to{outline-offset:7px}}',
       '#dpm-zeile{position:fixed;z-index:10072;left:50%;bottom:34px;transform:translate(-50%,20px);max-width:min(980px,92vw);padding:16px 26px 18px;border-radius:16px;background:rgba(10,9,7,.94);border:1px solid ' + mix(G, 60) + ';box-shadow:0 20px 60px rgba(0,0,0,.6);opacity:0;transition:opacity .4s,transform .4s;text-align:center}',
       '#dpm-zeile.an{opacity:1;transform:translate(-50%,0)}',
