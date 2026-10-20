@@ -2330,14 +2330,14 @@ function buildDs2Prompt(payload) {
     '      "sources": [ { "label": "Qualifizierter Mietspiegel Herford 2024", "url": "https://www.herford.de/mietspiegel", "amtlich": true },',
     '                   { "label": "IHK Ostwestfalen, Immobilienmarktbericht 2025", "amtlich": true },',
     '                   { "label": "Aktueller Marktdurchschnitt (Angebotsmieten), Stand 2026" } ]'
-      + (_belege ? ',\n      "vergleich_text": "<dein Wert> liegt <x> % <ueber/unter> dem aktuellen Marktdurchschnitt von <Median von oben>; zur amtlichen Vergleichsmiete von <Wert von oben, oder: keine amtliche>: <x> % <ueber/unter>.",'
+      + (_belege ? ',\n      "vergleich_text": "Der Pilot-Wert <Wert> liegt <x> % <ueber/unter> dem aktuellen Marktdurchschnitt von <Median von oben>; zur amtlichen Vergleichsmiete von <Wert von oben, oder: keine amtliche>: <x> % <ueber/unter>.",'
         + '\n      "stuetzt_sich_auf": ["amtliche_vergleichsmiete", "marktdurchschnitt"] },' : ' },'),
     '    "ds2_mietausfall": { "value": "niedrig",',
     '      "reasoning": "Kein amtlicher Mietspiegel fuer Huellhorst; Einschaetzung aus Kreisdaten",',
     '      "source": "Kreis Minden-Luebbecke, Wohnungsmarktbeobachtung",',
     '      "sources": [ { "label": "Kreis Minden-Luebbecke, Wohnungsmarktbeobachtung 2025", "amtlich": true },',
     '                   { "label": "IT.NRW Bevoelkerungsvorausberechnung", "amtlich": true } ]'
-      + (_belege ? ',\n      "vergleich_text": "Deine Einstufung <Stufe> gegen den Anhalt aus dem Zensus 2022 (<Anhalt von oben>, marktaktiver Leerstand <Wert von oben>): <passt/weicht ab, weil ...>.",'
+      + (_belege ? ',\n      "vergleich_text": "Die Pilot-Einstufung <Stufe in Worten> gegen den Anhalt aus dem Zensus 2022 (<Anhalt von oben>, marktaktiver Leerstand <Wert von oben>): <passt/weicht ab, weil ...>.",'
         + '\n      "stuetzt_sich_auf": ["leerstand_zensus", "bevoelkerung"] }' : ' }'),
     '  }',
     '}'
@@ -2533,7 +2533,9 @@ async function suggestDs2Fields(payload, opts) {
           _url = '';
           console.log('[v2500 ds2-suggest] Portalquelle neutralisiert: ' + label + (url ? ' ' + url : ''));
         }
-        if (out.some(function (x) { return x.label === anzeige; })) return;
+        /* v2500b · Dubletten auch bei abweichender Schreibweise (zweiter Lauf: zweimal Marktdurchschnitt) */
+        const _flach = function (t) { return String(t).toLowerCase().replace(/stand|[^a-z0-9äöü]/g, ''); };
+        if (out.some(function (x) { return _flach(x.label) === _flach(anzeige); })) return;
         const e = { label: anzeige };
         if (_url) e.url = _url;
         if (amtlich) e.amtlich = true;
@@ -2559,7 +2561,12 @@ async function suggestDs2Fields(payload, opts) {
     const _BELEG_SCHLUESSEL = ['amtliche_vergleichsmiete', 'marktdurchschnitt', 'marktueblichkeitsband', 'ertragswert_miete', 'ist_miete', 'leerstand_zensus', 'bevoelkerung'];
     const _zusatz = {};
     if (payload.mietbelege) {
-      if (sugg.vergleich_text) _zusatz.vergleich_text = _neutral(sugg.vergleich_text).slice(0, 400);
+      /* Der Text ist an den NUTZER gerichtet: der Wert der Recherche ist nicht "dein" Wert,
+         und Enum-Schluessel (sehr_niedrig) gehoeren in Worte (gemessen im zweiten Lauf). */
+      if (sugg.vergleich_text) _zusatz.vergleich_text = _neutral(sugg.vergleich_text)
+        .replace(/^Dein(e)? (Wert|Einstufung)/, function (x, e, w) { return w === 'Wert' ? 'Der Pilot-Wert' : 'Die Pilot-Einstufung'; })
+        .replace(/sehr_niedrig/g, 'sehr niedrig').replace(/erhoeht/g, 'erhöht')
+        .slice(0, 400);
       if (Array.isArray(sugg.stuetzt_sich_auf)) {
         _zusatz.stuetzt_sich_auf = sugg.stuetzt_sich_auf.map(String).filter(function (k, i, a) {
           return _BELEG_SCHLUESSEL.indexOf(k) >= 0 && a.indexOf(k) === i;
