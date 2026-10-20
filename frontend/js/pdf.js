@@ -3112,7 +3112,7 @@ async function _exportPDFInner() {
       kvT(doc, M, cy, CW, [
         ['1. Tilgung-vom-Mieter (Schulden abgebaut durch Miete)',           pE(cumT)],
         ['2. Cashflow-\u00dcberschuss (Konto-Reserve, n. Tilgung+Steuer)', pE(cumC)],
-        ['3. Steuervorteil (kumulierte Erstattung aus V+V-Verlusten)',     pE(stv)],
+        [stv < 0 ? '3. Steuerlast (kumulierte Mehrsteuer)' : '3. Steuervorteil (kumulierte Erstattung aus V+V-Verlusten)', pE(stv, true)],   /* v2463: negativ hiess es trotzdem „Steuervorteil" */
         ['4. Wertsteigerung ' + pP(v('wertstg'), 1) + ' p.a.',              pE(wzg)],
         ['= GESAMT Verm\u00f6genszuwachs (1+2+3+4)',                       pE(ges, true)]
       ], [4]);

@@ -775,6 +775,9 @@
     var ek = num('ek'), d1 = num('d1');
     var fotos = await bilderLaden(5);
     var d2an = el('d2_enable') && el('d2_enable').checked, d2 = d2an ? num('d2') : null;
+    /* v2461 · gemessen (Hüllhorst): Haken an, aber kein Betrag - im PDF stand
+       „Darlehen II -" mit Zins, Rate 0,00 € und „Mischzins". Ohne Betrag kein Block. */
+    if (d2an && !(d2 > 0)) { d2an = false; d2 = null; }
 
     /* ── Seite 1 ─────────────────────────────────────────────── */
     kopf('Investment Case', (adr || 'Objekt ohne Anschrift') + ' · Finanzierungsunterlage · Stand ' + heute());
@@ -1161,9 +1164,12 @@
         var x = L;
         doc.setFont('helvetica', kopfzeile ? 'bold' : 'normal'); doc.setFontSize(kopfzeile ? 7.4 : 8.4);
         doc.setTextColor(kopfzeile ? 110 : 40);
+        /* v2461 · gemessen: „1.134 leer" (Status klebte an der Soll-Miete) und die
+           Lage hart nach 18 Zeichen abgeschnitten („EG / OG — Hauptwoh"). */
         werte.forEach(function (w, i) {
-          var bw = spM[i][1] * fakM;
-          if (i <= 1 || i === 5) doc.text(String(w), x, y); else doc.text(String(w), x + bw - 1, y, { align: 'right' });
+          var bw = spM[i][1] * fakM, t = String(w), platzB = bw - (i === 5 ? 4 : 2);
+          if (doc.getTextWidth(t) > platzB) { while (t.length > 1 && doc.getTextWidth(t + '...') > platzB) t = t.slice(0, -1); t = t.replace(/[\s,;·-]+$/, '') + '...'; }
+          if (i <= 1) doc.text(t, x, y); else if (i === 5) doc.text(t, x + 3, y); else doc.text(t, x + bw - 1, y, { align: 'right' });
           x += bw;
         });
         doc.setDrawColor(kopfzeile ? G[0] : 236, kopfzeile ? G[1] : 232, kopfzeile ? G[2] : 223);
@@ -1173,8 +1179,8 @@
       mZeile(spM.map(function (s) { return s[0]; }), true);
       MFH.zeilen.forEach(function (z) {
         if (y > H - 30) { doc.addPage(); kopf('Einheiten und Zustand', 'Fortsetzung'); mZeile(spM.map(function (s) { return s[0]; }), true); }
-        mZeile([z.e.nr || '', (z.e.lage || '').slice(0, 18), z.fl ? fmt(z.fl, 0) : '-',
-          z.e.ist ? fmt(Number(String(z.e.ist).replace(',', '.')), 0) : '-',
+        mZeile([z.e.nr || '', sauber(z.e.lage || ''), z.fl ? fmt(z.fl, 0) : '-',
+          (z.e.ist && Number(String(z.e.ist).replace(',', '.')) > 0) ? fmt(Number(String(z.e.ist).replace(',', '.')), 0) : '-',
           z.e.soll ? fmt(Number(String(z.e.soll).replace(',', '.')), 0) : '-',
           z.e.status === 'leer' ? 'leer' : 'vermietet',
           z.punkte + ' P.' + (z.geerbt === 4 ? '*' : ''), z.rnd != null ? Math.round(z.rnd) + ' J.' : '-']);

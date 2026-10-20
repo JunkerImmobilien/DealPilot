@@ -785,13 +785,20 @@ if (!window._wlc) {
 
     // Bar-Skalierung — V63.65: 5 Bars statt 4
     var chartH = 250;
-    function yFromVal(v) { return 50 + (1 - (v / total)) * 250; }
+    /* v2465 · gemessen (Hüllhorst, Steuerlast -26 T€): die Wertsteigerung begann
+       ÜBER dem Cashflow statt unter der Steuerlast (Math.max(0, taxBar)), lief
+       damit 26 T€ über die Gesamtsumme hinaus und wurde oben abgeschnitten; die
+       Steuerlast hing in der Luft. Jetzt laufende Summe MIT Vorzeichen, und die
+       Achse reicht bis zum höchsten Zwischenstand. */
+    var after2 = tilgEffektiv + cfVstSum, after3 = after2 + taxBar;
+    var yTop = Math.max(total, tilgEffektiv, after2, after3) || 1;
+    function yFromVal(v) { return 50 + (1 - (v / yTop)) * 250; }
 
     var n = cfRows.length;
     var bar1Top = yFromVal(tilgEffektiv);
-    var bar2Top = yFromVal(tilgEffektiv + cfVstSum);
-    var bar3Top = yFromVal(tilgEffektiv + cfVstSum + Math.max(0, taxBar));
-    var bar4Top = yFromVal(tilgEffektiv + cfVstSum + Math.max(0, taxBar) + ws);
+    var bar2Top = yFromVal(after2);
+    var bar3Top = yFromVal(after3);
+    var bar4Top = yFromVal(after3 + ws);
 
     var bar1H = 300 - bar1Top;
     var bar2H = bar1Top - bar2Top;
@@ -841,10 +848,10 @@ if (!window._wlc) {
               '</g>' +
               // Y-Labels
               '<g font-family="DM Sans" font-size="10.5" fill="#7A7370" font-weight="500" text-anchor="end">' +
-                '<text x="68" y="54">' + _fmtK(total) + '</text>' +
-                '<text x="68" y="119">' + _fmtK(total * 0.75) + '</text>' +
-                '<text x="68" y="184">' + _fmtK(total * 0.5) + '</text>' +
-                '<text x="68" y="249">' + _fmtK(total * 0.25) + '</text>' +
+                '<text x="68" y="54">' + _fmtK(yTop) + '</text>' +
+                '<text x="68" y="119">' + _fmtK(yTop * 0.75) + '</text>' +
+                '<text x="68" y="184">' + _fmtK(yTop * 0.5) + '</text>' +
+                '<text x="68" y="249">' + _fmtK(yTop * 0.25) + '</text>' +
                 '<text x="68" y="304">0 €</text>' +
               '</g>' +
               // Baseline
@@ -875,7 +882,7 @@ if (!window._wlc) {
                   :
                   // Steuerlast — orangener Bar nach unten (negativer Beitrag)
                   '<g filter="url(#bc-wf-shadow)">' +
-                    '<rect x="' + bar3X + '" y="' + bar3Top.toFixed(1) + '" width="' + barW + '" height="' + Math.max(bar3MinH, Math.abs(taxBar) / total * chartH).toFixed(1) + '" rx="6" fill="#B8625C" opacity="0.65"/>' +
+                    '<rect x="' + bar3X + '" y="' + bar2Top.toFixed(1) + '" width="' + barW + '" height="' + Math.max(bar3MinH, bar3Top - bar2Top).toFixed(1) + '" rx="6" fill="#B8625C" opacity="0.65"/>' +
                   '</g>')
                 : '<text x="' + (bar3X + barW/2) + '" y="295" font-family="DM Sans" font-size="10" fill="#9C9590" text-anchor="middle">– 0 € –</text>') +
               '<line x1="' + (bar3X + barW) + '" y1="' + bar3Top.toFixed(1) + '" x2="' + bar4X + '" y2="' + bar3Top.toFixed(1) + '" stroke="#2A2727" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.40"/>' +
@@ -915,7 +922,7 @@ if (!window._wlc) {
                 '<text x="' + (bar1X + barW/2) + '" y="' + (bar1Top + Math.min(30, bar1H/2 + 5)).toFixed(1) + '" font-size="14" fill="#1A1414">' + _fmtK(tilgEffektiv, true) + '</text>' +
                 (bar2H > 18 ? '<text x="' + (bar2X + barW/2) + '" y="' + (bar2Top + Math.min(30, bar2H/2 + 5)).toFixed(1) + '" font-size="14" fill="#FAFAF7">' + _fmtK(cfVstSum, true) + '</text>' : '') +
                 // V63.85 BUG #3: Steuer-Wert IMMER zeigen — Label ÜBER dem Bar (nicht in ihm)
-                (Math.abs(taxBar) > 50 ? '<text x="' + (bar3X + barW/2) + '" y="' + (bar3TopRender - 6).toFixed(1) + '" font-size="13" fill="#1A1414" font-weight="700">' + _fmtK(taxBar, true) + '</text>' : '') +
+                (Math.abs(taxBar) > 50 ? '<text x="' + (bar3X + barW/2) + '" y="' + ((taxBar < 0 ? bar2Top : bar3TopRender) - 6).toFixed(1) + '" font-size="13" fill="#1A1414" font-weight="700">' + _fmtK(taxBar, true) + '</text>' : '') +
                 '<text x="' + (bar4X + barW/2) + '" y="' + (bar4Top + Math.min(30, bar4H/2 + 5)).toFixed(1) + '" font-size="14" fill="#FAFAF7">' + _fmtK(ws, true) + '</text>' +
                 '<text x="' + (bar5X + barW5/2) + '" y="' + (bar5Top + bar5H/2 - 5).toFixed(1) + '" font-size="20" fill="#FAFAF7" font-family="Cormorant Garamond">' + _fmtK(total, true) + '</text>' +
                 '<text x="' + (bar5X + barW5/2) + '" y="' + (bar5Top + bar5H/2 + 55).toFixed(1) + '" font-size="11" fill="' + window._wlc('#FFE9A0') + '" font-weight="500">Multiple ' + multipleStr + '</text>' +
