@@ -2229,11 +2229,15 @@ async function analyzeLage(payload, opts) {
  * Liefert pro Feld einen vorgeschlagenen Wert (passend zu den Enum-Optionen)
  * + kurze Begründung. Nutzt Web-Search für Lage/Markt-Recherche.
  */
-async function suggestDs2Fields(payload, opts) {
+/* v2500 · Der Prompt ist eine eigene Funktion, damit
+   tools/prompt-lecks-pruefen.mjs die ECHTE Fassung pruefen kann (kommen
+   die belegten Vergleichswerte an?) - ohne Modellaufruf. */
+function buildDs2Prompt(payload) {
   const { fields, fieldSpecs, context } = payload;
   const adresse = context.adresse || [context.strasse, context.hausnr, context.plz, context.ort]
     .filter(Boolean).join(' ');
   if (!adresse) throw new Error('Keine Adresse im Context');
+  const _belege = payload.mietbelege && typeof payload.mietbelege === 'object' ? payload.mietbelege : null;
 
   // Felder-Beschreibung für den Prompt
   const fieldDescs = fields.map(fid => {
@@ -2295,8 +2299,16 @@ async function suggestDs2Fields(payload, opts) {
     '  - Ein qualifizierter Mietspiegel (§ 558d BGB) hat Vorrang vor einem einfachen.',
     '  - NICHT raten: ein Mietspiegel, den du nicht belegen kannst, wird nicht genannt.',
     '',
+    /* v2500 · Die belegten Vergleichswerte aus DealPilots eigenen Daten
+       (mietBelegeService). Steht nur da, wenn sie gesammelt wurden - und
+       die Regeln zu "vergleich_text"/"stuetzt_sich_auf" NUR mit ihnen
+       (regel-ohne-daten: eine Regel, die Felder erklaert, die nicht im
+       Prompt stehen, laesst das Modell glauben, es habe sie). */
+    _belege ? _mietBelegeBlock(_belege) : '',
     '',
     'WICHTIG:',
+    '  - Nenne in "reasoning"' + (_belege ? ', "vergleich_text"' : '') + ' und in den "label" der Quellen KEINEN Namen eines',
+    '    Immobilienportals oder Datenanbieters. Angebotsmieten heissen "aktueller Marktdurchschnitt".',
     '  - ENUM-Werte EXAKT so wie angegeben (keine Übersetzung, keine Kreativität)',
     '  - Bei Unsicherheit: konservativ, eher mittlere Kategorie wählen',
     '  - Wenn ein Feld nicht sinnvoll bestimmbar ist (z.B. weil Kontext fehlt): null als value',
@@ -2317,15 +2329,89 @@ async function suggestDs2Fields(payload, opts) {
     '      "source": "Mietspiegel Herford 2024",',
     '      "sources": [ { "label": "Qualifizierter Mietspiegel Herford 2024", "url": "https://www.herford.de/mietspiegel", "amtlich": true },',
     '                   { "label": "IHK Ostwestfalen, Immobilienmarktbericht 2025", "amtlich": true },',
-    '                   { "label": "Angebotsmieten der Portale, Stand 2026" } ] },',
+    '                   { "label": "Aktueller Marktdurchschnitt (Angebotsmieten), Stand 2026" } ]'
+      + (_belege ? ',\n      "vergleich_text": "9,50 EUR/m2 liegt 6 % ueber dem aktuellen Marktdurchschnitt von 8,96 EUR/m2 und innerhalb der amtlichen Spanne.",'
+        + '\n      "stuetzt_sich_auf": ["amtliche_vergleichsmiete", "marktdurchschnitt"] },' : ' },'),
     '    "ds2_mietausfall": { "value": "niedrig",',
     '      "reasoning": "Kein amtlicher Mietspiegel fuer Huellhorst; Einschaetzung aus Kreisdaten",',
     '      "source": "Kreis Minden-Luebbecke, Wohnungsmarktbeobachtung",',
     '      "sources": [ { "label": "Kreis Minden-Luebbecke, Wohnungsmarktbeobachtung 2025", "amtlich": true },',
-    '                   { "label": "IT.NRW Bevoelkerungsvorausberechnung", "amtlich": true } ] }',
+    '                   { "label": "IT.NRW Bevoelkerungsvorausberechnung", "amtlich": true } ]'
+      + (_belege ? ',\n      "vergleich_text": "Zensus 2022 (Stichtag 15.05.2022): marktaktiver Leerstand 1,2 % in der Gemeinde - passt zu niedrig; die Bevoelkerung des Kreises waechst um 0,3 % im Jahr.",'
+        + '\n      "stuetzt_sich_auf": ["leerstand_zensus", "bevoelkerung"] }' : ' }'),
     '  }',
     '}'
   ].filter(Boolean).join('\n');
+  return prompt;
+}
+
+/* v2500 · Der Block der belegten Vergleichswerte. Jede Zeile traegt ihren
+   Schluessel in eckigen Klammern - das Modell nennt ihn in
+   "stuetzt_sich_auf", und die Anzeige markiert, worauf es sich stuetzt.
+   Fehlt ein Wert, steht er ausdruecklich als fehlend da: sonst fuellt das
+   Modell die Luecke mit einer recherchierten Zahl und stellt sie neben
+   gemessene (v2157, Zensus). */
+function _mietBelegeBlock(b) {
+  const z = function (n, d) { return n == null ? '–' : Number(n).toFixed(d == null ? 2 : d).replace('.', ','); };
+  const dat = function (s) { return s ? String(s).slice(8, 10) + '.' + String(s).slice(5, 7) + '.' + String(s).slice(0, 4) : null; };
+  const L = [];
+  L.push('BELEGTE VERGLEICHSWERTE (aus DealPilots eigenen Daten, GEMESSEN — vor jeder Web-Recherche nutzen):');
+  if (b.bericht) L.push('  Marktbericht vom ' + (dat(b.bericht.datum) || '?') + (b.bericht.stufe ? ', Stufe ' + b.bericht.stufe : ''));
+  const a = b.amtlich || {};
+  if (!a.fehlt && a.wert_qm != null) {
+    L.push('  [amtliche_vergleichsmiete] ' + z(a.wert_qm) + ' EUR/m2 — Mietpreisuebersicht des Gutachterausschusses'
+      + (a.quelle ? ' (' + a.quelle + ')' : '') + '. Amtlich; bildet weitgehend Bestandsmieten ab.'
+      + (a.ausserhalb ? ' ACHTUNG: Objekt liegt ausserhalb der Tabelle, nur als Vergleich.' : ''));
+  } else {
+    L.push('  [amtliche_vergleichsmiete] liegt NICHT vor' + (a.grund ? ' (' + a.grund + ')' : '') + '. Erfinde keine; ein amtlicher Mietspiegel nur, wenn du ihn belegen kannst.');
+  }
+  const m = b.markt || {};
+  if (!m.fehlt && m.wert_qm != null) {
+    L.push('  [marktdurchschnitt] ' + z(m.wert_qm) + ' EUR/m2 Median der Angebotsmieten'
+      + (m.q25_qm != null && m.q75_qm != null ? ' (mittlere Haelfte ' + z(m.q25_qm) + ' bis ' + z(m.q75_qm) + ')' : '')
+      + (m.anzahl != null ? ', ' + m.anzahl + ' Angebote' : '') + (m.umkreis_km != null ? ' im Umkreis von ' + z(m.umkreis_km, 1) + ' km' : '')
+      + (m.stand ? ', Stand ' + dat(m.stand) : '') + '. Angebotsmieten, keine Abschluesse; ein Abschlag fuer Mieten ist nicht gemessen.'
+      + (m.trend_pct_pa != null ? ' Entwicklung ' + z(m.trend_pct_pa, 1) + ' % pro Jahr.' : ''));
+  } else {
+    L.push('  [marktdurchschnitt] liegt NICHT vor' + (m.grund ? ' (' + m.grund + ')' : '') + '.');
+  }
+  if (b.band) L.push('  [marktueblichkeitsband] ' + z(b.band.unten_qm) + ' bis ' + z(b.band.oben_qm) + ' EUR/m2 (Wertermittlung: amtlich/Angebot x 0,7 bis x 1,3)'
+    + (b.band.lage ? ', Ist-Miete liegt ' + ({ unter: 'unterhalb', im: 'im Band', ueber: 'oberhalb', 'über': 'oberhalb' }[b.band.lage] || b.band.lage) : ''));
+  if (b.ertrag) L.push('  [ertragswert_miete] ' + z(b.ertrag.wert_qm) + ' EUR/m2 im Ertragswert angesetzt' + (b.ertrag.quelle ? ' (' + b.ertrag.quelle + ')' : ''));
+  if (b.ist_qm != null) L.push('  [ist_miete] ' + z(b.ist_qm) + ' EUR/m2 (Angabe des Investors)');
+  L.push('');
+  L.push('MIETAUSFALL — BELEGTE DATEN:');
+  const lz = b.leerstand || {};
+  if (!lz.fehlt) {
+    L.push('  [leerstand_zensus] Zensus 2022, Stichtag 15.05.2022, ' + lz.ebene + ' ' + (lz.name || '') + ': '
+      + (lz.marktaktiv_pct != null ? 'marktaktiver Leerstand ' + z(lz.marktaktiv_pct, 1) + ' %' : 'marktaktiver Leerstand nicht ausgewiesen')
+      + (lz.gesamt_pct != null ? ', Gesamtleerstand ' + z(lz.gesamt_pct, 1) + ' %' : '')
+      + (lz.dauerleer_anteil_pct != null ? ', davon ' + z(lz.dauerleer_anteil_pct, 1) + ' % seit ueber 12 Monaten (Dauerleerstand, kein Mietausfall)' : '')
+      + (lz.anhalt ? '. Anhalt: ' + lz.anhalt.wort : '') + '.');
+    L.push('    Der Wert ist vom Mai 2022 — einen juengeren amtlichen Leerstand je Gemeinde gibt es nicht. Nenne das Jahr.');
+  } else {
+    L.push('  [leerstand_zensus] liegt NICHT vor. Nenne keine Leerstandsquote als Zensuswert.');
+  }
+  const bv = b.bevoelkerung || {};
+  if (!bv.fehlt && bv.trend_pct_pa != null) {
+    L.push('  [bevoelkerung] Kreis: ' + (bv.trend_pct_pa >= 0 ? '+' : '') + z(bv.trend_pct_pa, 2) + ' % pro Jahr' + (bv.stand ? ' (Stand ' + bv.stand + ')' : '') + ', Regionaldatenbank');
+  } else {
+    L.push('  [bevoelkerung] liegt NICHT vor.');
+  }
+  L.push('  Haushaltsentwicklung: liegt NICHT vor. Angebotsdauer von Mietangeboten: liegt NICHT vor. Fuer beides keine Zahl nennen.');
+  L.push('');
+  L.push('ZU DEN BELEGEN:');
+  L.push('  - "vergleich_text": 1-2 Saetze je Feld, die deinen Wert den belegten Werten oben gegenueberstellen —');
+  L.push('    mit den Zahlen von oben, nichts neu rechnen ausser der Abweichung in Prozent.');
+  L.push('  - "stuetzt_sich_auf": die Schluessel in eckigen Klammern, auf die du dich stuetzt (nur vorhandene).');
+  L.push('  - Weicht deine Marktmiete um mehr als 15 % vom [marktdurchschnitt] ab, begruende das.');
+  L.push('  - Beim Mietausfall stellst du deine Einstufung dem [leerstand_zensus] gegenueber (mit "Zensus 2022").');
+  return L.join('\n');
+}
+
+async function suggestDs2Fields(payload, opts) {
+  const { fields, fieldSpecs, context } = payload;
+  const prompt = buildDs2Prompt(payload);
 
   const r = await callOpenAI(prompt, Object.assign({ maxTokens: 2500 }, opts || {}));
   const parsed = extractJson(r.text);
@@ -2375,7 +2461,9 @@ async function suggestDs2Fields(payload, opts) {
       if (_ortWorte.some(function (w) { return hostFlach.indexOf(w.replace(/-/g, '')) >= 0; })) return true;
       return _AMTSSTELLEN.test(host);
     };
-    const _PORTALE = /(immoportal|immowelt|immobilienscout|immoscout|immonet|wohnungsboerse|homeday|mietspiegel\.(com|net|org)|meinestadt|wohnen-im-alter|kalaydo|ebay)/i;
+    const _PORTALE = /(immoportal|immowelt|immobilienscout|immoscout|immonet|wohnungsboerse|homeday|mietspiegel\.(com|net|org)|meinestadt|wohnen-im-alter|kalaydo|ebay|miete-aktuell|wohnpreis|mietpreise\.|immopreise|immo-?kompass|capital\.de|wohnungsmarkt24)/i;
+    /* v2500 · Bewertungs- und Datenanbieter nie namentlich (CLAUDE.md) */
+    const _ANBIETER = /(sprengnetter|pricehubble|geomap|on-?geo|f\+b|empirica|bulwiengesa|value ag|vdp research|europace|homeday)/i;
     const _quellen = (function () {
       const roh = Array.isArray(sugg.sources) ? sugg.sources : [];
       const out = [];
@@ -2419,14 +2507,30 @@ async function suggestDs2Fields(payload, opts) {
             'immonet': 'Immonet', 'immoportal': 'immoportal', 'homeday': 'Homeday',
             'wohnungsboerse': 'Wohnungsboerse', 'miete-aktuell': 'miete-aktuell.de'
           };
-          const portal = bekannt[herkunft] || herkunft;
+          void bekannt; void herkunft;   /* v2500: der Portalname geht nicht mehr nach aussen */
           anzeige = label.replace(/mietspiegel/ig, 'Mietpreisuebersicht').slice(0, 120);
-          if (portal && anzeige.toLowerCase().indexOf(portal.toLowerCase()) < 0) {
-            anzeige = (anzeige + ' (' + portal + ')').slice(0, 120);
-          }
         }
+        /* ══ v2500 · KEIN PORTALNAME NACH AUSSEN (Marcel 14.10.2026) ═══════
+           „bitte auch keine Quelle wie ImmobilienScout angeben" - bis hierher
+           haengte v1242d den Portalnamen sogar an („Mietpreisuebersicht
+           (ImmobilienScout24)") und verlinkte die Portalseite. Eine
+           Portalquelle heisst jetzt „Aktueller Marktdurchschnitt
+           (Angebotsmieten)", ohne Link; Etikett und Link bleiben nur im
+           Server-Protokoll. Mehrere Portale fallen zu EINEM Eintrag zusammen. */
+        const _istAnbieter = !amtlich && (_ANBIETER.test(label) || _ANBIETER.test(url));
+        const _istPortal = !amtlich && (_istAnbieter || _PORTALE.test(url) || _PORTALE.test(label));
+        let _url = url;
+        if (_istPortal) {
+          const _jahr = (label.match(/\b(20\d\d)\b/) || [])[1];
+          anzeige = _istAnbieter
+            ? 'Unabhängiger Bewertungspartner' + (_jahr ? ' (' + _jahr + ')' : '')
+            : 'Aktueller Marktdurchschnitt (Angebotsmieten' + (_jahr ? ', ' + _jahr : '') + ')';
+          _url = '';
+          console.log('[v2500 ds2-suggest] Portalquelle neutralisiert: ' + label + (url ? ' ' + url : ''));
+        }
+        if (out.some(function (x) { return x.label === anzeige; })) return;
         const e = { label: anzeige };
-        if (url) e.url = url;
+        if (_url) e.url = _url;
         if (amtlich) e.amtlich = true;
         out.push(e);
       });
@@ -2438,25 +2542,43 @@ async function suggestDs2Fields(payload, opts) {
        waehrend die Liste daneben schon „Mietpreisuebersicht (ImmobilienScout24)"
        sagt. Zwei Namen fuer dieselbe Quelle sind schlimmer als der falsche
        allein. */
-    const _quelleKurz = ((_quellen[0] && _quellen[0].label) || sugg.source || 'KI-Marktbewertung').toString().slice(0, 80);
+    /* v2500 · auch der Text: ein Portal- oder Anbietername im Satz wird
+       ersetzt, nicht nur in der Quellenliste. */
+    const _neutral = function (t) {
+      return String(t || '')
+        .replace(/\b(ImmobilienScout\s?24|Immobilien\s?Scout\s?24|ImmoScout\s?24|ImmoScout|Immowelt|Immonet|immoportal|Wohnungsb(oe|ö)rse|Homeday|meinestadt(\.de)?|miete-aktuell(\.de)?|mietspiegel\.(com|net|org)|wohnpreis(\.de)?)\b/gi, 'aktueller Marktdurchschnitt')
+        .replace(/\b(Sprengnetter|PriceHubble|GeoMap|on-geo)\b/gi, 'unabhängiger Bewertungspartner');
+    };
+    const _quelleKurz = _neutral(((_quellen[0] && _quellen[0].label) || sugg.source || 'KI-Marktbewertung').toString()).slice(0, 80);
+    /* v2500 · die zwei neuen Felder - nur mit Belegen im Prompt verlangt */
+    const _BELEG_SCHLUESSEL = ['amtliche_vergleichsmiete', 'marktdurchschnitt', 'marktueblichkeitsband', 'ertragswert_miete', 'ist_miete', 'leerstand_zensus', 'bevoelkerung'];
+    const _zusatz = {};
+    if (payload.mietbelege) {
+      if (sugg.vergleich_text) _zusatz.vergleich_text = _neutral(sugg.vergleich_text).slice(0, 400);
+      if (Array.isArray(sugg.stuetzt_sich_auf)) {
+        _zusatz.stuetzt_sich_auf = sugg.stuetzt_sich_auf.map(String).filter(function (k, i, a) {
+          return _BELEG_SCHLUESSEL.indexOf(k) >= 0 && a.indexOf(k) === i;
+        });
+      }
+    }
     if (spec && Array.isArray(spec.values)) {
       if (spec.values.indexOf(sugg.value) >= 0) {
-        cleaned[fid] = {
+        cleaned[fid] = Object.assign({
           value: sugg.value,
-          reasoning: (sugg.reasoning || '').toString().slice(0, 200),
+          reasoning: _neutral(sugg.reasoning).slice(0, 200),
           source: _quelleKurz,
           sources: _quellen
-        };
+        }, _zusatz);
       }
     } else {
       const n = typeof sugg.value === 'number' ? sugg.value : parseFloat(sugg.value);
       if (!isNaN(n)) {
-        cleaned[fid] = {
+        cleaned[fid] = Object.assign({
           value: n,
-          reasoning: (sugg.reasoning || '').toString().slice(0, 200),
+          reasoning: _neutral(sugg.reasoning).slice(0, 200),
           source: _quelleKurz,
           sources: _quellen
-        };
+        }, _zusatz);
       }
     }
   });
@@ -3810,6 +3932,7 @@ module.exports = {
   analyze,
   analyzeLage,
   suggestDs2Fields,
+  buildDs2Prompt,     /* v2500 · fuer tools/prompt-lecks-pruefen.mjs */
   suggestQcFields,
   extractExpose,
   extractMarketData,

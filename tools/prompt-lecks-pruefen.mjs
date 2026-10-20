@@ -721,6 +721,70 @@ regelFelder.forEach(function (r) {
     + (ok ? '' : '   <- Regel ohne Daten'));
 });
 
+/* ══ v2500 · PILOT-MIETPREIS-ANALYSE (buildDs2Prompt) ════════════════
+ * Die belegten Vergleichswerte (mietBelegeService.js) muessen im Prompt
+ * ankommen, und die Regeln zu "vergleich_text"/"stuetzt_sich_auf" duerfen
+ * NUR mit ihnen dastehen (Regel ohne Daten). Echte Funktion, unver-
+ * wechselbare Werte, Gegenprobe ohne Belege. */
+console.log('\n=== Pilot-Mietpreis-Analyse (buildDs2Prompt) ===');
+let ds2Rot = 0;
+if (typeof openai.buildDs2Prompt !== 'function') {
+  console.log('  ROT buildDs2Prompt() ist nicht exportiert');
+  ds2Rot++;
+} else {
+  const ds2Basis = {
+    fields: ['ds2_marktmiete', 'ds2_mietausfall'],
+    fieldSpecs: { ds2_marktmiete: { type: 'number', label: 'Marktmiete' }, ds2_mietausfall: { label: 'Mietausfall', values: ['niedrig', 'mittel'] } },
+    context: { adresse: 'Pruefweg 1, 32609 Pruefstadt', ort: 'Pruefstadt', plz: '32609', wohnflaeche: 82, nettokaltmiete: 500 },
+    mietbelege: {
+      bericht: { datum: '2026-10-19', stufe: 3 },
+      amtlich: { wert_qm: 4.37, quelle: 'PRUEF-GMB-2025' },
+      markt: { wert_qm: 8.13, q25_qm: 7.17, q75_qm: 9.19, anzahl: 23, umkreis_km: 4.5, stand: '2026-10-19', trend_pct_pa: 2.7 },
+      band: { unten_qm: 3.07, oben_qm: 11.93, lage: 'im' },
+      ertrag: { wert_qm: 6.11, quelle: 'PRUEF-ERTRAGSMIETE' },
+      ist_qm: 6.09,
+      leerstand: { ebene: 'Gemeinde', name: 'PRUEF-GEMEINDE', marktaktiv_pct: 1.3, gesamt_pct: 3.9, dauerleer_anteil_pct: 61.7, anhalt: { wert: 'sehr_niedrig', wort: 'Sehr niedrig' } },
+      bevoelkerung: { trend_pct_pa: 0.37, stand: 2025 },
+      haushalte: { fehlt: true }, angebotsdauer_miete: { fehlt: true }
+    }
+  };
+  let ds2Txt = '';
+  try { ds2Txt = openai.buildDs2Prompt(JSON.parse(JSON.stringify(ds2Basis))); } catch (e) { ds2Txt = 'FEHLER ' + e.message; }
+  [
+    ['amtliche Vergleichsmiete', '4,37'], ['amtliche Quelle', 'PRUEF-GMB-2025'],
+    ['Marktdurchschnitt Median', '8,13'], ['Marktdurchschnitt Q25', '7,17'], ['Marktdurchschnitt Anzahl', '23 Angebote'],
+    ['Marktdurchschnitt Umkreis', '4,5 km'], ['Mietentwicklung', '2,7 %'],
+    ['Band unten', '3,07'], ['Band oben', '11,93'], ['Ertragsmiete', 'PRUEF-ERTRAGSMIETE'], ['Ist-Miete', '6,09'],
+    ['Zensus Gemeinde', 'PRUEF-GEMEINDE'], ['Zensus marktaktiv', '1,3 %'], ['Zensus gesamt', '3,9 %'], ['Zensus Dauerleerstand', '61,7 %'],
+    ['Zensus Stichtag', '15.05.2022'], ['Bevoelkerung', '0,37 %'], ['Antwortfeld vergleich_text', '"vergleich_text"'],
+    ['Antwortfeld stuetzt_sich_auf', '"stuetzt_sich_auf"'], ['Schluessel leerstand_zensus', '[leerstand_zensus]']
+  ].forEach(function (p) {
+    const ok = ds2Txt.indexOf(p[1]) >= 0;
+    if (!ok) ds2Rot++;
+    console.log('  ' + (ok ? 'ok  ' : 'ROT ') + p[0].padEnd(30) + p[1]);
+  });
+  /* Gegenprobe: ohne Belege duerfen weder Werte noch die Regeln dastehen */
+  const ohne = JSON.parse(JSON.stringify(ds2Basis)); delete ohne.mietbelege;
+  let ohneTxt = '';
+  try { ohneTxt = openai.buildDs2Prompt(ohne); } catch (e) { ohneTxt = 'FEHLER ' + e.message; }
+  [['Wert ohne Belege', '8,13'], ['Regel ohne Belege', '"stuetzt_sich_auf"'], ['Regel ohne Belege', '"vergleich_text"']].forEach(function (p) {
+    const weg = ohneTxt.indexOf(p[1]) < 0 && ohneTxt.indexOf('FEHLER') !== 0;
+    if (!weg) ds2Rot++;
+    console.log('  ' + (weg ? 'ok  ' : 'ROT ') + ('Gegenprobe: ' + p[0]).padEnd(30) + p[1] + (weg ? ' verschwindet' : ' BLEIBT'));
+  });
+  /* fehlende Werte stehen ausdruecklich als fehlend da */
+  const leer = JSON.parse(JSON.stringify(ds2Basis));
+  leer.mietbelege.amtlich = { fehlt: true, grund: 'anderer_ausschuss' };
+  leer.mietbelege.leerstand = { fehlt: true };
+  let leerTxt = '';
+  try { leerTxt = openai.buildDs2Prompt(leer); } catch (e) { leerTxt = 'FEHLER ' + e.message; }
+  [['amtlich fehlt benannt', '[amtliche_vergleichsmiete] liegt NICHT vor'], ['Zensus fehlt benannt', '[leerstand_zensus] liegt NICHT vor']].forEach(function (p) {
+    const ok = leerTxt.indexOf(p[1]) >= 0;
+    if (!ok) ds2Rot++;
+    console.log('  ' + (ok ? 'ok  ' : 'ROT ') + p[0].padEnd(30) + p[1]);
+  });
+}
+
 /* ══ DECKUNG ═════════════════════════════════════════════════════════ */
 const ui = fs.readFileSync(path.join(WURZEL, 'frontend', 'js', 'ui.js'), 'utf8');
 const bauAnfang = ui.indexOf('function _buildAIPayload');
@@ -735,6 +799,7 @@ console.log('  Regelbloecke          : ' + regelFelder.length + ', ohne Daten: '
 console.log('  Typproben             : ' + typProben.length + ', rot: ' + typRot);
 console.log('  Ohne-Profil-Proben    : 3, rot: ' + ohneRot);
 console.log('  Alles-Vorgabe-Proben  : 4, rot: ' + vorgabeRot);
+console.log('  Mietpreis-Analyse     : 25 Stellen (20 Werte, 3 Gegenproben, 2 Fehlt-Proben), rot: ' + ds2Rot);
 console.log('  buildPrompt           : die ECHTE Funktion aus openaiService.js');
 console.log('  _buildAIPayload       : ' + (bau ? bau.split('\n').length + ' Zeilen gelesen'
   : 'NICHT GEFUNDEN — die Feldliste unten ist dann nicht abgeglichen'));
@@ -750,10 +815,10 @@ console.log('  Feldnamen im Sender   : ~' + gesendet.size
   + ' (geprueft werden ' + ERWARTET.length + ' Stellen gezielt, nicht alle)');
 
 const rc = (rot > 0 || blind > 0 || ohneDaten > 0 || typRot > 0 || ohneRot > 0
-  || vorgabeRot > 0) ? 1 : 0;
+  || vorgabeRot > 0 || ds2Rot > 0) ? 1 : 0;
 console.log('\n' + (rc === 0
   ? 'SAUBER — jedes belegte Feld kommt im Prompt an.'
   : 'ROT — ' + rot + ' Feld(er) verschwinden, ' + blind + ' blinde Probe(n), '
     + ohneDaten + ' Regel(n) ohne Daten, ' + typRot + ' Typprobe(n) rot, '
-    + (ohneRot + vorgabeRot) + ' Profil-Probe(n) rot.'));
+    + (ohneRot + vorgabeRot) + ' Profil-Probe(n) rot, ' + ds2Rot + ' Mietpreis-Stelle(n) rot.'));
 process.exit(rc);
