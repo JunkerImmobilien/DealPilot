@@ -3306,7 +3306,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<link rel="stylesheet" href="css/avsec-streifen.css?v=v1881c">
+<link rel="stylesheet" href="css/avsec-streifen.css?v=v2490">
 <style id="v2198a-lange-woerter">
 /* v2198a · Responsive-Check 320 px: „Bewirtschaftungskosten“ (22 Zeichen, ein Wort) im
    Kartentitel war 191 px breit bei 152 px Platz und schob die Seite 20 px quer
@@ -5611,7 +5611,14 @@ const QcApp = (function() {
     var _ab = window.DealPilotAbschlag;
     var mw = null, mwGrund = null;
     if (mwRoh > 0 && window.QcHeuristik && QcHeuristik.marktwertBereinigt) {
-      var b = QcHeuristik.marktwertBereinigt(mwRoh, mwArt, _ab ? _ab.satz() : null, _ab ? _ab.quelle() : null);
+      /* v2490 · Der Satz, den die KARTE zeigt (vom Bericht: oertlich gemessen, eigener
+         Wert oder Marktdurchschnitt) - nicht der Satz aus den Einstellungen. Bis v2489
+         stand im Urteil „5,8 % (aktueller Marktdurchschnitt)", gerechnet wurde aber mit
+         dem Kartenwert nach 15,9 % (Bielefeld MFH, oertlich gemessen). */
+      var _kAb = (_mcAkt && _mcAkt.abschlag && _mcAkt.abschlag.pct != null) ? _mcAkt.abschlag : null;
+      var b = QcHeuristik.marktwertBereinigt(mwRoh, mwArt,
+        _kAb ? _kAb.pct : (_ab ? _ab.satz() : null),
+        _kAb ? (_ab && _ab.herkunftText ? _ab.herkunftText(_kAb) : null) : (_ab ? _ab.quelle() : null));
       if (b) { mw = b.bereinigt; mwGrund = b.abschlag_pct > 0 ? b.grund : null; }
       /* v2238a · dieselbe Zahl wie auf der Karte: dort ist der bereinigte Wert
          auf volle 1.000 € gerundet (gemessen: Karte 178.000 €, Urteil 178.038 €) */
@@ -7026,8 +7033,8 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
      und holt sein Branding ueber ji_token (same-origin). -->
   <script src="js/whitelabel-override.js?v=v2149"></script>
   <script src="js/qc-whitelabel.js?v=W33"></script>
-  <script src="js/marktwert-abschlag.js?v=v2237d"></script><!-- v2237 -->
-  <script src="js/dealpilot-mb-qc.js?v=v2367"></script>
+  <script src="js/marktwert-abschlag.js?v=v2490"></script><!-- v2237 -->
+  <script src="js/dealpilot-mb-qc.js?v=v2490"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
 <!-- qc-embedded-decouple (v683): Auto-Hoehen-Rueckkopplung kappen, wenn im iframe -->
 <style id="qc-embedded-decouple-style">

@@ -485,6 +485,13 @@ export const ValuationService = {
         if (out.market_value.high != null) out.market_value.high = roundNice((out.market_value.high - _addAb) * _f + _addAb);
         out.notes.push('Abschlag auf Angebotspreise: ' + String(_abPct).replace('.', ',') + ' % (' + _abHerk + ')'
           + (_addAb ? ' — nur auf den Angebotsanteil; Mehrflächen-Bodenwert, Stellplätze und besondere Merkmale (' + Math.round(_addAb).toLocaleString('de-DE') + ' €) bleiben unberührt' : '') + '.');
+      } else if (_abPct === 0) {
+        /* v2490 · Auch ein Satz von 0 % (örtlich gemessen oder eigene Angabe) steht im
+           Ergebnis. Ohne ihn hielten Karte und Verlauf den Wert für roh und zogen den
+           Marktdurchschnitt von 5,8 % selbst ab - der Abschlag, den der Bericht bewusst
+           NICHT gemacht hat. */
+        out.market_value.angebot_abschlag = { pct: 0, herkunft: _abHerk, nicht_abgeschlagen_eur: 0,
+          roh: { estimated: out.market_value.estimated, low: out.market_value.low, high: out.market_value.high } };
       }
       /* v2367 · AMTLICHE GEGENPROBE - wo der Ausschuss fuer dieses Segment einen
          Rohertragsfaktor und den Ø Kaufpreis seiner Kauffaelle veroeffentlicht.

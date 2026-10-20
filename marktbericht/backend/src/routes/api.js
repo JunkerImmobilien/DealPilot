@@ -607,6 +607,15 @@ router.get('/objects/history', async (req, res) => {
               data->'cross_check'->'ertragswert'->>'liegenschaftszins_stufe' AS lzs_stufe,
               (data->'cross_check'->'sachwert'->>'vorlaeufig')::boolean AS sachwert_vorlaeufig,
               data->'cross_check'->'sachwert'->'sachwertfaktor'->>'stufe' AS swf_stufe,
+              /* v2490 · Seit v2367 zieht der Bericht den Angebotsabschlag selbst ab;
+                 market_value ist dann schon bereinigt. Der Verlauf im Reiter Objekt
+                 zog ihn ein zweites Mal ab (Westerfeldstr. 140: 795.000 nach 15,9 Prozent,
+                 im Verlauf 749.000 mit minus 5,8 Prozent). Satz und Rohwert gehen jetzt
+                 mit; fehlen sie (Bericht vor v2367), ist market_value noch roh.
+                 Keine Backticks hier. */
+              (data->'valuation'->'market_value'->'angebot_abschlag'->>'pct')::numeric AS angebot_abschlag_pct,
+              data->'valuation'->'market_value'->'angebot_abschlag'->>'herkunft' AS angebot_abschlag_herkunft,
+              (data->'valuation'->'market_value'->'angebot_abschlag'->'roh'->>'estimated')::numeric AS market_value_roh,
               /* v1965: das FUEHRENDE Verfahren. Marcel am 08.10.2026:
                  „welcher ist jetzt der fuehrende? Vielleicht sollte man das
                  dann mit in dem Dropdown mit angeben."

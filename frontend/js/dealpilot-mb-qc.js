@@ -160,7 +160,15 @@ if (!window._wlc) {
      nie in der Marktbewertung an. Einen Zustand fuehrt der Quick-Check
      nicht; seit v2241 nimmt der Bericht dafuer auch nicht mehr still
      „gepflegt" an (DealPilotObjectMapper), sondern weist ihn als fehlend aus. */
-  function inputs() { return { plz: vIn('qc_plz'), ort: vIn('qc_ort'), str: vIn('qc_str'), hnr: vIn('qc_hnr'), objektart: vIn('qc_objektart'), wfl: numDe(vIn('qc_wfl')), baujahr: numDe(vIn('qc_bj') || vIn('qc_baujahr')), kp: numDe(vIn('qc_kp')) }; }
+  function inputs() {
+    var o = { plz: vIn('qc_plz'), ort: vIn('qc_ort'), str: vIn('qc_str'), hnr: vIn('qc_hnr'), objektart: vIn('qc_objektart'), wfl: numDe(vIn('qc_wfl')), baujahr: numDe(vIn('qc_bj') || vIn('qc_baujahr')), kp: numDe(vIn('qc_kp')) };
+    /* v2490 · eigener Angebotsabschlag aus den Einstellungen - wie im Reiter Objekt
+       (dealpilot-mb.js). Fehlte bis v2489: der Quick-Check rechnete trotz eigenem
+       Wert mit dem oertlichen Satz oder dem Marktdurchschnitt. */
+    try { var _e = global.DealPilotAbschlag && global.DealPilotAbschlag.eigen ? global.DealPilotAbschlag.eigen() : null;
+      if (_e != null) o.angebot_abschlag_pct = _e; } catch (e) {}
+    return o;
+  }
 
   function mapCard(d) {
     d = d || {};

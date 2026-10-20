@@ -213,8 +213,9 @@ if (!window._wlc) {
     } catch (e) {}
     /* v2367 · eigener Abschlag auf Angebotspreise (Investmentprofil) - nur wenn gesetzt;
        sonst waehlt der Marktbericht selbst (oertliche Kauffaelle oder Marktdurchschnitt). */
-    try { var _IP = window.DealPilotInvestmentProfile, _ab = _IP && _IP.get ? _IP.get('angebot_abschlag_pct') : null;
-      if (_ab != null && _ab !== '') o.angebot_abschlag_pct = _ab; } catch (e) {}
+    /* v2490 · eine Stelle fuer beide Abrufe: DealPilotAbschlag.eigen() (auch im QC-iframe) */
+    try { var _A = window.DealPilotAbschlag, _ab = (_A && _A.eigen) ? _A.eigen() : null;
+      if (_ab != null) o.angebot_abschlag_pct = _ab; } catch (e) {}
     return o;
   }
 

@@ -991,11 +991,18 @@
          (DealPilotAbschlag, Satz aus den Einstellungen, sonst Marktdurchschnitt). */
       if (isFinite(m) && m > 0) {
         var ab = null, mw = m;
-        try {
+        /* v2490 · Seit v2367 zieht der BERICHT den Abschlag ab (örtlich gemessen,
+           eigener Wert oder Marktdurchschnitt) - market_value ist dann schon
+           bereinigt und der Satz steht in angebot_abschlag_pct. Bis hier wurde
+           er ein zweites Mal abgezogen (Westerfeldstr. 140: Karte 795.000 nach
+           15,9 %, Verlauf 749.000 „−5,8 %"). Nur Berichte vor v2367 sind roh. */
+        var abB = (h.angebot_abschlag_pct != null && h.angebot_abschlag_pct !== '') ? Number(h.angebot_abschlag_pct) : NaN;
+        if (isFinite(abB)) { ab = abB; mw = m; }
+        else try {
           var A = window.DealPilotAbschlag;
           if (A && typeof A.satz === 'function') { ab = A.satz(); mw = Math.round(m * (1 - ab / 100) / 1000) * 1000; }
         } catch (x) { ab = null; mw = m; }
-        liste.push(Object.assign({}, basis, { wert: mw, roh: m, abschlag: ab, art: 'Marktwert', fuehrend: false, trau: 'I' }));
+        liste.push(Object.assign({}, basis, { wert: mw, roh: (isFinite(abB) && Number(h.market_value_roh) > 0) ? Number(h.market_value_roh) : m, abschlag: ab, art: 'Marktwert', fuehrend: false, trau: 'I' }));
       }
     });
     if (!liste.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
@@ -1015,7 +1022,7 @@
          mit dem Abschlag dahinter */
       var _art = h.art === 'Marktwert' ? 'Marktwertindikation'
         : (h.art === 'Vergleichswert' && !h.amtlich ? 'Vergleichswert (Angebotspreise)' : (h.art || 'Marktwertindikation'));
-      var _ab = (h.art === 'Marktwert' && h.abschlag != null) ? ' (−' + String(h.abschlag).replace('.', ',') + ' %)' : '';
+      var _ab = (h.art === 'Marktwert' && h.abschlag > 0) ? ' (−' + String(h.abschlag).replace('.', ',') + ' %)' : '';
       var _tr = _trauen(h.trau);
       return '<option value="' + i + '"' + _t + '>' + _art + ' · '
         + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €' + _ab + _f + (_tr ? ' · ' + (_tr.buchst ? _tr.buchst + ' ' : '') + _tr.kurz : '') + '</option>';
