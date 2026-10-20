@@ -1204,7 +1204,7 @@
       });
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
       doc.text('Anlage 2 ImmoWertV: Modernisierungspunkte je Einheit; * = Zustand vollständig vom Gebäude übernommen. '
-        + 'Die Restnutzungsdauer gilt für das Gebäude (unten).', L, y + 1);
+        + 'RND: eine für das Gebäude (unten).', L, y + 1);
       y += 10;
 
       abschnitt('Ist gegen Soll');
