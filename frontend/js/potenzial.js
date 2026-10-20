@@ -785,13 +785,19 @@
       '#card-wertpotenzial .dp-pot table td:last-child,#card-wertpotenzial .dp-pot table th:last-child{white-space:normal}',
       '#card-wertpotenzial .dp-wp-we td:last-child{min-width:160px;text-align:left}',
       '#card-wertpotenzial .dp-wp-we th:last-child{text-align:left}',
-      '@media (max-width:640px){#card-wertpotenzial .dp-wp-k b{font-size:17px}#card-wertpotenzial .dp-wp-kacheln{grid-template-columns:repeat(2,minmax(0,1fr))}}'
+      '@media (max-width:640px){#card-wertpotenzial .dp-wp-k b{font-size:17px}#card-wertpotenzial .dp-wp-kacheln{grid-template-columns:repeat(2,minmax(0,1fr))}'
+        + '#card-wertpotenzial .dp-pot th,#card-wertpotenzial .dp-pot td{padding:5px 3px;font-size:11.5px;white-space:normal}'
+        + '#card-wertpotenzial .dp-pot thead th{font-size:9px;letter-spacing:.04em}#card-wertpotenzial .dp-pot td:first-child{min-width:92px}}'
     ].join('');
     document.head.appendChild(s);
   }
-  function brueckeSvg(br) {
+  /* v2460a · gemessen bei 390 px: mit fester viewBox 760 schrumpfte die Schrift
+     auf rund 4 px. Die Zeichenfläche nimmt jetzt die echte Breite der Karte,
+     die Schrift bleibt in Pixeln. */
+  function brueckeSvg(br, breite) {
     var A = brueckeAchse(br);
-    var W = 760, H = 270, L = 58, R = 10, T = 22, U = 44;
+    var W = Math.max(330, Math.min(760, Math.round(breite || 760))), eng = W < 560;
+    var H = eng ? 250 : 270, L = eng ? 50 : 58, R = 6, T = 22, U = 44;
     var y = function (v) { return T + (H - T - U) * (1 - (v - A.min) / ((A.max - A.min) || 1)); };
     var n = br.stufen.length, gap = (W - L - R) / n, bw = Math.min(70, gap * 0.62), s = '';
     A.ticks.forEach(function (t) {
@@ -811,6 +817,7 @@
       s += '<text class="lab" x="' + (x + bw / 2).toFixed(1) + '" y="' + (top - 6).toFixed(1) + '" text-anchor="middle">' + esc(lab) + '</text>';
       var worte = String(st.t).split(' '), zeilen = [];
       worte.forEach(function (w) { var l = zeilen[zeilen.length - 1]; if (l && (l + ' ' + w).length <= 13) zeilen[zeilen.length - 1] = l + ' ' + w; else zeilen.push(w); });
+      if (eng) { zeilen = []; worte.forEach(function (w) { var l = zeilen[zeilen.length - 1]; if (l && (l + ' ' + w).length <= 9) zeilen[zeilen.length - 1] = l + ' ' + w; else zeilen.push(w); }); }
       zeilen.slice(0, 2).forEach(function (z, j) {
         s += '<text class="cat" x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - U + 17 + j * 13) + '" text-anchor="middle">' + esc(z) + '</text>';
       });
@@ -819,7 +826,7 @@
       + (br.mieterhoehung != null ? ', nach Mieterhöhung ' + esc(eur(br.mieterhoehung)) : '') + (br.zielbild != null ? ', Zielbild ' + esc(eur(br.zielbild)) : '')
       + ', Maßnahmen ' + esc(eur(br.kosten)) + ', Potenzial netto ' + esc(eur(br.netto)) + '">' + s + '</svg>';
   }
-  function bewertungHtml() {
+  function bewertungHtml(breite) {
     var m = modell(); if (!m.aktiv) return '';
     var d = pdfDaten(); if (!d) return '';
     var r = ergebnis();
@@ -839,7 +846,7 @@
             return '<div class="dp-wp-k ' + k.art + (k.art === 'netto' && k.w < 0 ? ' neg' : '') + '"><span>' + esc(k.t) + '</span><b>' + (k.art === 'netto' && k.w > 0 ? '+' : '') + esc(eur(k.w)) + '</b>'
               + (k.unter ? '<em>' + esc(k.unter) + '</em>' : '') + '</div>';
           }).join('') + '</div>'
-        + '<div class="dp-wp-h">Wertbrücke</div>' + brueckeSvg(d.bruecke)
+        + '<div class="dp-wp-h">Wertbrücke</div>' + brueckeSvg(d.bruecke, breite)
         + '<p class="dp-wp-achse">Achse beginnt bei ' + esc(tEur(brueckeAchse(d.bruecke).min)) + ' · Beträge in Tausend Euro, gerundet.</p>';
     }
     html += '<div class="dp-wp-h">Kennzahlen je Stufe</div><div class="dp-pot-scroll"><table><thead><tr><th>Kennzahl</th>'
@@ -887,7 +894,9 @@
       var nach = el('avm-history-host');
       if (nach && nach.parentNode === sec) sec.insertBefore(karte, nach.nextSibling); else sec.appendChild(karte);
     }
-    karte.innerHTML = bewertungHtml();
+    var breite = karte.clientWidth ? karte.clientWidth - 40 : 760;
+    karte.innerHTML = bewertungHtml(breite);
+    karte._dpWpBreite = breite;
     /* Einmal je Stand selbst rechnen (kein Kontingent; ohne Stufe 3 sagt der
        Dienst „gesperrt" und es bleibt beim Hinweis). */
     var r = ergebnis(), alt = window._dpPotenzial;
@@ -1089,6 +1098,11 @@
   window.addEventListener('dp:object-ready', function () { setTimeout(objektKarte, 300); setTimeout(function () { try { bewertungKarte(); } catch (e) {} }, 400); });
   /* v2460 · Tab Bewertung: beim Öffnen des Tabs, nach jedem Ertragswert-Lauf
      und auf Knopfdruck neu zeichnen. */
+  var _bwRs = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(_bwRs);
+    _bwRs = setTimeout(function () { var k = el('card-wertpotenzial'); if (k && k.clientWidth && Math.abs((k.clientWidth - 40) - (k._dpWpBreite || 0)) > 40) { try { bewertungKarte(); } catch (e) {} } }, 250);
+  });
   window.addEventListener('dp:potenzial', function () { setTimeout(function () { try { bewertungKarte(); } catch (e) {} }, 0); });
   document.addEventListener('click', function (ev) {
     var t = ev.target && ev.target.closest ? ev.target.closest('[data-target-sec="s6"],[data-dp-wp-rechnen]') : null;
