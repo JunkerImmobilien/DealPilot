@@ -2376,7 +2376,7 @@ function _mietBelegeBlock(b) {
     L.push('  [marktdurchschnitt] liegt NICHT vor' + (m.grund ? ' (' + m.grund + ')' : '') + '.');
   }
   if (b.band) L.push('  [marktueblichkeitsband] ' + z(b.band.unten_qm) + ' bis ' + z(b.band.oben_qm) + ' EUR/m2 (Wertermittlung: amtlich/Angebot x 0,7 bis x 1,3)'
-    + (b.band.lage ? ', Ist-Miete liegt ' + ({ unter: 'unterhalb', im: 'im Band', ueber: 'oberhalb', 'über': 'oberhalb' }[b.band.lage] || b.band.lage) : ''));
+    + (b.band.lage ? ', Ist-Miete liegt ' + ({ unter: 'unterhalb', im_band: 'im Band', ueber: 'oberhalb' }[b.band.lage] || b.band.lage) : ''));
   if (b.ertrag) L.push('  [ertragswert_miete] ' + z(b.ertrag.wert_qm) + ' EUR/m2 im Ertragswert angesetzt' + (b.ertrag.quelle ? ' (' + b.ertrag.quelle + ')' : ''));
   if (b.ist_qm != null) L.push('  [ist_miete] ' + z(b.ist_qm) + ' EUR/m2 (Angabe des Investors)');
   L.push('');
