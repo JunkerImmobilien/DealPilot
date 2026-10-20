@@ -5691,7 +5691,7 @@ const QcApp = (function() {
     /* Die Schwachpunkte als Verhandlungsargument — sie standen schon
        vorher im Rat, nur in einem der drei Zweige. */
     var argumente = (cons && cons.length)
-      ? cons.slice(0, 2).map(function (c) { return c.replace(/<\/?strong>/g, '"'); }).join(' · ')
+      ? cons.slice(0, 2).map(function (c) { return c.replace(/<strong>/g, '„').replace(/<\/strong>/g, '“'); }).join(' · ')   /* qc-v2450: deutsche Anführungszeichen */
       : '';
 
     /* v2238 · Marcel 14.10.2026: der Wertpuffer gehört auch in die Überschrift.
@@ -5766,7 +5766,7 @@ const QcApp = (function() {
           _zu = QcHeuristik.zielUrteil(k.bmr, _zbmr, inputs.lageklasse);
         }
       } catch (e) { _zu = null; }
-      parts.push(`Die Bruttomietrendite von <strong>${k.bmr.toString().replace('.', ',')}%</strong> liegt`);
+      parts.push(`Die Bruttomietrendite von <strong>${(Math.round(k.bmr * 10) / 10).toFixed(1).replace('.', ',')} %</strong> liegt`);   /* qc-v2450: wie Pro/Contra („6,0 %“ statt „6%“) */
       if (_zu) {
         parts.push(`<strong>${_zu.wort}</strong> von ${_zu.ziel.toFixed(2).replace(/0$/, '').replace(/\.$/, '').replace('.', ',')} %`   /* qc-v2450: 3,75 statt 3,8 */
           + (_zu.klasse ? ` für die ${_zu.klasse}-Lage` : '') + `. ${_zu.satz}`);
