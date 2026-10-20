@@ -307,7 +307,15 @@ export const ErtragswertService = {
     /* v2241: ein reines Gewerbeobjekt hat keinen Wohn-Rohertrag — eine
        Zeile „Rohertrag Wohnen 0 €" waere eine Aussage ueber etwas, das es
        nicht gibt. Mit Wohnmiete bleibt die Zeile wie immer. */
-    if (mieteMarkt || !gewerbe) out.staffel.push({ pos: 'Rohertrag Wohnen (marktüblich erzielbar)', wert: round0(mieteMarkt) });
+    /* v2520 · bei Leerstand steht im Rechenweg, worauf die Miete steht */
+    const _auf = ein.miete_aufteilung && pos(ein.miete_aufteilung.wfl_leer) ? ein.miete_aufteilung : null;
+    const _aufDetail = _auf
+      ? `${_auf.herkunft_vermietet === 'ist_im_band' ? 'Ist-Miete' : (_auf.herkunft_vermietet === 'obere_kante' ? 'obere Bandkante' : 'untere Bandkante')}`
+        + ` auf vermieteter Fläche ${deZahl(_auf.wfl_vermietet)} m² × ${deZahl(_auf.qm_vermietet)} €/m²`
+        + ` + leere Fläche ${deZahl(_auf.wfl_leer)} m² mit marktüblicher Miete ${deZahl(_auf.qm_leer)} €/m² (je × 12)`
+      : null;
+    if (mieteMarkt || !gewerbe) out.staffel.push(Object.assign({ pos: 'Rohertrag Wohnen (marktüblich erzielbar)', wert: round0(mieteMarkt) },
+      _aufDetail ? { detail: _aufDetail } : {}));
     if (gewerbe) out.staffel.push({ pos: 'Rohertrag Gewerbe', wert: round0(gewerbe) });
     if (stellplatz) out.staffel.push({ pos: zusatz > 0
       ? `Stellplätze/Garagen u. a. (Zusatzeinnahmen ${deZahl(round2(zusatz / 12))} €/Monat)`

@@ -135,11 +135,16 @@ function bestandsBasis(basis, wl) {
   });
   const summeRoh = zeilen.reduce((a, z) => a + (z ? z.roh : 0), 0);
   if (!(summeRoh > 0) || !(rB > 0)) return null;
-  /* Der Unterschied zwischen Haus und Wohnungen entsteht beim Leerstand: der
-     Bestand teilt die Ist-Miete der vermieteten Wohnungen durch die GESAMTE
-     Wohnflaeche (Demo-MFH 5,99 statt 7,31 €/m²). Er geht deshalb zuerst auf die
-     leeren Wohnungen - hoechstens bis zur marktueblichen Miete, nie unter null -,
-     erst der Rest anteilig auf alle. So bleibt die vermietete Wohnung bei ihrer
+  /* Der Unterschied zwischen Haus und Wohnungen geht zuerst auf die leeren
+     Wohnungen - hoechstens bis zur marktueblichen Miete, nie unter null -, erst
+     der Rest anteilig auf alle.
+     v2520: Seit der Bestand selbst leer = Vergleichsmiete rechnet (Ist-Miete nur
+     auf der vermieteten Flaeche, CrossCheckService), ist dieser Unterschied klein:
+     er stammt nur noch aus der Bandpruefung JE Wohnung gegen die des Hauses
+     (Demo-MFH: WE 1 mit 6,18 €/m² unter der Kante 6,64, das Haus mit 7,31 im
+     Band - 375 €/Jahr; die leere WE 5 traegt 9,04 statt 9,48 €/m²). Bis v2519
+     waren es rund 5.000 €/Jahr, weil der Bestand die Ist-Miete durch die GESAMTE
+     Wohnflaeche teilte (5,99 statt 7,31 €/m²). So bleibt die vermietete Wohnung bei ihrer
      geprueften Ist-Miete, und das Zielbild mit voller Vermietung zur Zielmiete
      ergibt genau die Summe der Zielmieten. */
   const verm = zeilen.filter((z) => z && z.herkunft !== 'leer_marktueblich');
@@ -169,6 +174,7 @@ function eineStufe(basis, ref, basisKern, miete, plus) {
   if (miete != null && miete >= 0) {
     bwkNachziehen(ein, miete);
     ein.miete_markt_jahr = Math.round(miete);
+    ein.miete_aufteilung = null;   /* v2520 · die Aufteilung vermietet/leer gilt nur im Bestand */
   }
   let k = ErtragswertService.ertragswert(ein, basis.bodenwert);
   /* Untergrenze: die Stufe rechnet nie mit einer kürzeren RND als der Bestand. */

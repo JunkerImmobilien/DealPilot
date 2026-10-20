@@ -911,8 +911,35 @@ export const CrossCheckService = {
        oder Untervermietung ist ein besonderes objektspezifisches Merkmal
        (§ 8 Abs. 3) und wird benannt, nicht stillschweigend kapitalisiert. */
     const _wflIst = _num(ref.living_area);
-    const _istQm = (!ref.vacancy && _num(ref.monthly_net_rent) > 0 && _wflIst > 0 && !(ref.gewerbe && _num(ref.gewerbe.wfl_gewerbe)))
-      ? Math.round(_num(ref.monthly_net_rent) / _wflIst * 100) / 100 : null;
+    /* ══ v2520 · LEERSTAND: IST-MIETE NUR AUF DIE VERMIETETE FLAECHE ═══════
+       Marcel 20.10.2026: der Rohertrag steht mit der marktueblich erzielbaren
+       Miete fuer ALLE Einheiten (§ 31 Abs. 2 ImmoWertV). Die Ist-Miete gehoert
+       deshalb nur auf die Flaeche, fuer die sie gezahlt wird, und wird dort gegen
+       das Band geprueft; leere Einheiten gehen mit der Vergleichsmiete ein.
+       Bis v2519 teilte der Kern die Ist-Miete durch die GESAMTE Wohnflaeche,
+       die leere Wohnung eingeschlossen - gemessen am Demo-MFH (378 m², WE 5 mit
+       68 m² leer): 5,99 statt 7,31 €/m², damit unter der unteren Bandkante und
+       der Rohertrag rund 5.000 €/Jahr zu niedrig.
+       Quelle: die MFH-Einheiten (DealPilotObjectMapper.leerstandAus, nur mit
+       mindestens einer leeren UND einer vermieteten Wohnung, ohne Gewerbe).
+       Ohne diese Angabe - oder ohne Vergleichsmiete fuer die leere Flaeche -
+       rechnet alles wie bisher. Die Einheitenflaechen werden auf die
+       Wohnflaeche des Objekts umgelegt, damit die Summe dieselbe bleibt. */
+    const _lsR = (ref.leerstand && typeof ref.leerstand === 'object' && !(ref.gewerbe && _num(ref.gewerbe.wfl_gewerbe))
+      && _num(ref.leerstand.wfl_leer) && _num(ref.leerstand.wfl_vermietet) && _num(ref.leerstand.ist_monat_vermietet)
+      && _wflIst > 0 && _refQm > 0) ? ref.leerstand : null;
+    const _ls = _lsR ? (function () {
+      const f = _wflIst / (_lsR.wfl_leer + _lsR.wfl_vermietet);
+      const wflV = Math.round(_lsR.wfl_vermietet * f * 100) / 100;
+      return { wfl_vermietet: wflV, wfl_leer: Math.round((_wflIst - wflV) * 100) / 100,
+               n_leer: _lsR.n_leer || null, n_vermietet: _lsR.n_vermietet || null,
+               ist_monat_vermietet: _lsR.ist_monat_vermietet, flaeche_umgelegt: Math.abs(f - 1) > 0.005,
+               leer_qm: Math.round(_refQm * 100) / 100 };
+    })() : null;
+    const _istQm = _ls
+      ? Math.round(_ls.ist_monat_vermietet / _ls.wfl_vermietet * 100) / 100
+      : ((!ref.vacancy && _num(ref.monthly_net_rent) > 0 && _wflIst > 0 && !(ref.gewerbe && _num(ref.gewerbe.wfl_gewerbe)))
+        ? Math.round(_num(ref.monthly_net_rent) / _wflIst * 100) / 100 : null);
     /* ══ v2382 · DAS BAND DER MARKTUEBLICHKEIT (Marcel 19.10.2026) ═════════
        Die Mietpreisuebersicht bildet weitgehend BESTANDSmieten ab; marktueblich
        im Sinne von § 27 Abs. 1 / § 31 Abs. 2 ImmoWertV ist die bei
@@ -940,9 +967,11 @@ export const CrossCheckService = {
     const _istFuehrt = _mnb.fuehrt;
     const _kante = _mnb.kante;
     const mieteQm = _mnb.qm;
-    const mieteQuelle = _istFuehrt ? 'Ist-Miete (marktüblich, § 31 Abs. 2 ImmoWertV)'
+    const mieteQuelle = (_istFuehrt ? 'Ist-Miete (marktüblich, § 31 Abs. 2 ImmoWertV)'
       : (_kante != null ? (_istLage === 'ueber' ? 'obere' : 'untere') + ' Kante des Marktüblichkeitsbandes'
-        : (_amtFuehrt ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten'));
+        : (_amtFuehrt ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten')))
+      /* v2520 · bei Leerstand gilt die Zahl nur fuer die vermietete Flaeche */
+      + (_ls ? ' auf der vermieteten Fläche; leere Fläche mit der Vergleichsmiete' : '');
     if (_band) {
       _band.ist_qm = _istQm; _band.lage = _istLage;
       out.miete_band = _band;
@@ -961,6 +990,15 @@ export const CrossCheckService = {
           + ' Kante (' + _dq(_kante) + ' €/m²). Der ' + (_istLage === 'ueber' ? 'Mehr' : 'Minder') + 'ertrag ist nach '
           + '§ 8 Abs. 3 ImmoWertV als besonderes objektspezifisches Grundstücksmerkmal zu würdigen — nur für die '
           + 'gesicherte Restlaufzeit des Mietvertrags; ohne bekannte Laufzeit ist er nicht angesetzt.'));
+    }
+    if (_ls) {
+      out.notes.push('Leerstand: Die Ist-Miete (' + _dq(_ls.ist_monat_vermietet) + ' €/Monat) bezieht sich auf die vermietete Fläche von '
+        + _dq(_ls.wfl_vermietet) + ' m²' + (_ls.n_vermietet ? ' (' + _ls.n_vermietet + ' Wohnung' + (_ls.n_vermietet === 1 ? '' : 'en') + ')' : '')
+        + ' und ist dort gegen das Band geprüft. Die leere Fläche von ' + _dq(_ls.wfl_leer) + ' m²'
+        + (_ls.n_leer ? ' (' + _ls.n_leer + ' Wohnung' + (_ls.n_leer === 1 ? '' : 'en') + ')' : '')
+        + ' geht mit der marktüblichen Miete von ' + _dq(_ls.leer_qm) + ' €/m² in den Rohertrag ein (§ 31 Abs. 2 ImmoWertV: '
+        + 'marktüblich erzielbarer Ertrag für alle Einheiten).'
+        + (_ls.flaeche_umgelegt ? ' Die Flächen der Einheiten sind auf die Wohnfläche des Objekts umgelegt.' : ''));
     }
     /* v1207-WMIE-2 · DER WIDERSPRUCH GEHOERT BENANNT, NICHT VERSTECKT.
      *
@@ -1062,7 +1100,18 @@ export const CrossCheckService = {
 
     if (!_gewObjekt && wfl && mieteQm && rnd != null && !_gewSperre && wflWohnen > 0) {
       /* v1059-WMIET-6 · v2210: nur der Wohnteil */
-      const rohertrag = Math.round(mieteQm * wflWohnen * 12);
+      /* v2520 · bei Leerstand: vermietete Flaeche x gewaehlte Miete (Band) +
+         leere Flaeche x Vergleichsmiete. Ohne Leerstandsangabe wie bisher. */
+      const _aufteilung = _ls ? {
+        wfl_vermietet: _ls.wfl_vermietet, qm_vermietet: mieteQm,
+        jahr_vermietet: Math.round(mieteQm * _ls.wfl_vermietet * 12),
+        wfl_leer: _ls.wfl_leer, qm_leer: _ls.leer_qm,
+        jahr_leer: Math.round(_ls.leer_qm * _ls.wfl_leer * 12),
+        n_vermietet: _ls.n_vermietet, n_leer: _ls.n_leer,
+        herkunft_vermietet: _istFuehrt ? 'ist_im_band' : (_istLage === 'ueber' ? 'obere_kante' : 'untere_kante'),
+      } : null;
+      const rohertrag = _aufteilung ? (_aufteilung.jahr_vermietet + _aufteilung.jahr_leer)
+        : Math.round(mieteQm * wflWohnen * 12);
       const lzsPct = _num(p.lzs_pct) != null ? Number(p.lzs_pct) : LIEGENSCHAFTSZINS * 100;
       /* ── v1198 · „unvollstaendig" ist eine ENTSCHEIDUNG, kein Fehlen ──────
          Hier stand:
@@ -1122,6 +1171,7 @@ export const CrossCheckService = {
         gewerbe_flaechen: _gew ? _gew.flaechen : null,
         gewerbe_ohne_nutzung_qm: _gew ? _num(_gew.ohne_nutzung_qm) : null,
         miete_markt_qm: mieteQm, miete_quelle: mieteQuelle,   /* v1059-WMIET-7 */
+        miete_aufteilung: _aufteilung,   /* v2520 · vermietet/leer im Rechenweg */
         /* v1048-WSPL-1 · Vorher nur ref.garages — die Aussenstellplaetze
          * fielen unter den Tisch. Das PDF meldete "1 Stellpl." bei einem
          * Objekt mit einer Garage UND zwei Aussenplaetzen. */
@@ -1284,7 +1334,9 @@ export const CrossCheckService = {
           value: { ein: Object.assign({}, ein), bodenwert: bwErgebnis, wohnflaeche_wohnen: wflWohnen,
                    miete_qm: mieteQm, miete_quelle: mieteQuelle || null, gnd_quelle: _gndEwQuelle,
                    /* v2488 · Band und Vergleichsmiete fuer die Bestandsbasis je Wohnung */
-                   miete_band: _band || null, markt_qm: _refQm > 0 ? _refQm : null } });
+                   miete_band: _band || null, markt_qm: _refQm > 0 ? _refQm : null,
+                   /* v2520 · der Bestand trennt vermietete und leere Flaeche */
+                   miete_aufteilung: _aufteilung } });
       } catch (e) { /* nur Zusatz */ }
 
       if (kern.vollstaendig && kern.wert != null && _ertragUnterdruecken) {
@@ -1355,6 +1407,7 @@ export const CrossCheckService = {
           miete_modellkonform: mieteQuelle === 'Mietpreisübersicht des Gutachterausschusses' || _istFuehrt,   /* v2367 */
           miete_ist_qm: _istQm, miete_vergleich_qm: _refQm != null ? Math.round(_refQm * 100) / 100 : null,
           miete_band: _band || null,   /* v2382 · beide Vergleichswerte und das Band */
+          miete_aufteilung: _aufteilung,   /* v2520 · vermietete/leere Flaeche */
           /* v1207-WMIE-2 · die angesetzte Miete war nirgends als Zahl sichtbar,
            * nur als Quellenname. Ohne sie kann das Dokument den Vergleich mit
            * dem amtlichen Wert nicht ausschreiben, ohne ihn neu herzuleiten —
