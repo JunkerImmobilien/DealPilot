@@ -1456,7 +1456,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2395vr3';   /* v2395vr3: Portfolio-Analyse neu (Modul 21); v2395: BMF-Mitschnitt Ravensberger Weg mit Nebenkosten neu; v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
+  var RH_BUSTER = 'v2481g';   /* v2481g: Modul 26 Mieterhoehung und Zielbild (zielbild26); v2395vr3: Portfolio-Analyse neu (Modul 21); v2395: BMF-Mitschnitt Ravensberger Weg mit Nebenkosten neu; v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage|\/marktbericht\/potenzial/i;
@@ -5670,11 +5670,16 @@
         var sp = kopf.slice(1);   /* ohne die Spalte „Kennzahl" */
         await b2oZeile(s, (sp.length === 3 ? 'Drei Stufen' : sp.length + ' Spalten') + ' nebeneinander', sp.join(' · ') + (km ? ' — Kaltmiete im Jahr von <b>' + km[kopf.indexOf('Bestand') >= 0 ? kopf.indexOf('Bestand') : 1] + '</b> bis <b>' + km[km.length - 1] + '</b>' : '') + '.');
         if (ew) await b2oZeile(s, 'Ertragswert je Stufe', 'Bestand <b>' + ew[kopf.indexOf('Bestand')] + '</b>, mit Mieterhöhung <b>' + ew[kopf.length - 2] + '</b>, im Zielbild <b>' + ew[kopf.length - 1] + '</b> — Potenzialwert, keine Verkehrswertermittlung.');
-        var auf = function () { var p = r11Panel(); var x = p && [].filter.call(p.querySelectorAll('[data-dp-pot-wirt] table'), function (y) { return /Aufteilung|Eigentumswohnung/i.test(r6Text(y)); })[1]; return x || null; };
+        /* v2481g · GEMESSEN: die Aufteilung steht als ZEILEN in derselben Tafel, nicht als eigene Tabelle - gezeigt werden diese Zeilen samt Begründung */
+        var auf = function () {
+          var p = r11Panel(); if (!p) return null;
+          var z = [].filter.call(p.querySelectorAll('[data-dp-pot-wirt] tr'), function (r) { return r.offsetWidth && /Aufteilung/i.test(r6Text(r.cells[0] || r)); });
+          return z.length ? b2oHuelle(z[0], z[z.length - 1]) : null;
+        };
         var au = auf();
         if (au) {
           await zeige(auf, 6);
-          var at = r6Text(au), neg = /kein Potenzial/i.test(at);
+          var at = [].map.call(r11Panel().querySelectorAll('[data-dp-pot-wirt] tr'), function (r) { return /Aufteilung/i.test(r6Text(r.cells[0] || r)) ? r6Text(r) : ''; }).join(' '), neg = /kein Potenzial/i.test(at);
           await b2oZeile(s, 'Nach der Aufteilung', neg ? 'Jede Wohnung als Eigentumswohnung, die Summe gegen das Haus — hier <b>kein Potenzial</b>, und DealPilot sagt warum.' : 'Jede Wohnung als Eigentumswohnung, die Summe nach Aufteilungskosten gegen den Wert des Hauses.');
         }
         var pt = function () { var p = r11Panel(); var e = p && rhIm(p, /^\s*PILOT: WAS IM HAUS STECKT\s*$/); return e && (e.closest('div[style*="margin-top:12px"]') || e.parentElement); };
@@ -5711,8 +5716,10 @@
         zeige(null); kegelHoch(true);
         await r19Seite(bank, _r26.seite || 1);
         await b2oZeile(s, 'Seite Wertpotenzial', 'Oben die Wohnungen: Ist, Mieterhöhung mit Termin, Zielmiete und Maßnahmen.');
-        await r19Seite(bank, _r26.seite || 1, 560);
-        await b2oZeile(s, 'Ertragswert und Wertbrücke', 'Darunter die Ertragswerte je Stufe und die Wertbrücke — gekennzeichnet als Potenzialwert, keine Verkehrswertermittlung.', 1500);
+        await r19Seite(bank, _r26.seite || 1, 330);   /* v2481g · gemessen: ab 330 px die ganze Wertbrücke */
+        await b2oZeile(s, 'Die Wertbrücke', 'Vom Bestand über Mieterhöhung und Zielbild, minus Maßnahmen — bis zum Potenzial netto.');
+        await r19Seite(bank, _r26.seite || 1, 720);   /* die Kennzahlen je Stufe mit Ertragswert und Aufteilung */
+        await b2oZeile(s, 'Kennzahlen je Stufe', 'Miete, Rendite, DSCR, Miete im Ertragswert und Ertragswert je Stufe — gekennzeichnet als Potenzialwert, keine Verkehrswertermittlung.', 1500);
         var o = q('#dpm-pdf'); if (o && o.parentNode) o.parentNode.removeChild(o);
         kegelHoch(false);
       },
