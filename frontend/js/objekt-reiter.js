@@ -329,8 +329,8 @@
       var _q = _DM.modQuelle();
       if (_q === 'felder') mpQ += '<br>Beim MFH nach deiner Wahl aus diesen acht Feldern, nicht aus den Einheiten. Dieselbe Zahl rechnen Marktbericht, Ertragswert, Wertpotenzial und Mieterliste.';
       mpQ += '<br><span class="oe-chips">Punkte aus: '
-        + '<span class="oe-chip' + (_q === 'einheiten' ? '' : ' fehlt') + '" data-oe-modquelle="">den Einheiten (Konfigurator)</span>'
-        + '<span class="oe-chip' + (_q === 'felder' ? '' : ' fehlt') + '" data-oe-modquelle="felder">den acht Feldern</span></span>';
+        + '<span class="oe-chip' + (_q === 'einheiten' ? ' gewaehlt' : '') + '" data-oe-modquelle="" role="button" aria-pressed="' + (_q === 'einheiten') + '">den Einheiten (Konfigurator)</span>'
+        + '<span class="oe-chip' + (_q === 'felder' ? ' gewaehlt' : '') + '" data-oe-modquelle="felder" role="button" aria-pressed="' + (_q === 'felder') + '">den acht Feldern</span></span>';
     }
     var mpZeile = zeile('Modernisierungspunkte', mp ? mp.total + ' von 20' : '—', mpQ, '');
     if (!o.plz) {

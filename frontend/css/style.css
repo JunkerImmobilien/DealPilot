@@ -38841,6 +38841,9 @@ table.oe-gewerke select.oe-vorschlag { border-style: dashed; border-color: var(-
 .oe-d-neu { color: #2f6b4a; }
 .oe-d-and { color: #6b5a2a; }
 .oe-chips .oe-chip.fehlt::before { content: "+ "; }
+/* v2540 · Umschalter „Punkte aus“ (objekt-reiter.js): die gewählte Option, nicht als Fehler */
+.oe-chips .oe-chip.gewaehlt { border-color: var(--wl-c9a84c, #C9A84C); background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, #fff); color: #2A2727; font-weight: 700; cursor: default; }
+.oe-chips .oe-chip.gewaehlt::before { content: "✓ "; }
 .f.oe-pflicht-fehlt input, .f.oe-pflicht-fehlt select { border-color: #B8625C !important; box-shadow: 0 0 0 2px color-mix(in srgb, #B8625C 18%, transparent); }
 .oe-anfragen { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border, #E0DBD3); }
 .oe-anfragen-lbl { font: 500 10.5px "JetBrains Mono", monospace; color: var(--muted, #7A7370); letter-spacing: .04em; }
