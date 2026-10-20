@@ -399,6 +399,13 @@ window.MietEntwicklung = (function() {
       blkP.style.display = mode === 'prog' ? '' : 'none';
       blkD.style.display = mode === 'detail' ? '' : 'none';
     }
+    /* v2481 · GEMESSEN (Drehbuch Modul 26, Studio): im Modus „Aus Wohnungen" war die Tabelle
+       NIE zu sehen - #me_table_wrap steht in index.html INNERHALB von #me-block-detail, und der
+       Block ist ausserhalb von „Detail" display:none. Gerechnet und gefuellt wurde sie (1.652
+       Zeichen HTML), gezeigt nicht. Sie wandert hinter den Block und gilt fuer beide Modi. */
+    var wrapT = document.getElementById('me_table_wrap');
+    if (wrapT && blkD && wrapT.parentNode === blkD) blkD.parentNode.insertBefore(wrapT, blkD.nextSibling);
+    if (wrapT) wrapT.style.display = (mode === 'detail' || mode === 'einheiten') ? '' : 'none';
     /* v2025 - die Tabelle gilt auch fuer den dritten Modus. Vorher lief
        sie nur bei `detail`, und „Aus Wohnungen" zeigte gar keine. */
     if (mode === 'detail' || mode === 'einheiten') {

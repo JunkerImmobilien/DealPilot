@@ -5575,7 +5575,7 @@
           await zeige(function () { return r26Mfh('.mfh-tab'); }, 6);
         }
         await r6Ende(zb);
-        await zeige(function () { return b2oHuelle(r26Mfh('.mfh-tab'), r26Mfh('#mfh-summe')); }, 6);
+        await zeige(function () { return r26Mfh('.mfh-tab'); }, 6);
         var n = [].filter.call(document.querySelectorAll('#mfh-modal .mfh-det.mit-plan'), function () { return true; }).length;
         await b2oZeile(s, 'Jede Wohnung für sich', '<b>' + n + ' Wohnungen</b> mit Zielbild („Details · Plan“), die übrigen mit Vergleichsmiete — gerechnet wird je Wohnung, nicht pauschal.');
       },
@@ -5616,13 +5616,11 @@
         var knopf = function () { var b = q('#me-mode-einheiten'); return b && b.offsetWidth ? b : null; };
         await warteAuf(knopf, 4000);
         await zeige(function () { var b = knopf(); return b && b.parentElement; }, 8);
-        if (ME && ME.getMode && ME.getMode() !== 'einheiten') {
-          await b2oZeile(s, 'Tab Miete · Mietentwicklung', 'Drei Wege, die Miete fortzuschreiben — für das Mehrfamilienhaus der dritte: <b>„Aus Wohnungen“</b>.');
-          var k = knopf(); if (k && !k.disabled) k.click();
-          await warte(900);
-        } else {
-          await b2oZeile(s, 'Tab Miete · Mietentwicklung', 'Der Modus steht schon: <b>„Aus Wohnungen“</b> — jede Wohnung rechnet ihre eigene Miete.');
-        }
+        var schon = !!(ME && ME.getMode && ME.getMode() === 'einheiten' && knopf() && knopf().classList.contains('active'));
+        await b2oZeile(s, 'Tab Miete · Mietentwicklung', schon ? 'Das Übernehmen hat den Modus schon gesetzt: <b>„Aus Wohnungen“</b> — jede Wohnung rechnet ihre eigene Miete.' : 'Drei Wege, die Miete fortzuschreiben — für das Mehrfamilienhaus der dritte: <b>„Aus Wohnungen“</b>.');
+        /* ein Klick auch dann, wenn der Modus schon steht: er zeichnet die Tabelle (setMietModus) */
+        var k = knopf(); if (k && !k.disabled) k.click();
+        await warte(900);
         var tw = function () { return q('#me_table_wrap'); };
         await warteAuf(function () { return q('#me_table_wrap table'); }, 4000);
         await zeige(tw, 8);
