@@ -30,13 +30,20 @@ export function bevoelkerungTrend(reihe) {
     .map((x) => ({ jahr: Number(x.jahr), wert: Number(x.wert) }))
     .sort((a, b) => a.jahr - b.jahr);
   if (r.length < 2) return null;
-  let logSumme = 0, jahre = 0, bruch = false;
+  /* von/bis sind die Jahre, die WIRKLICH gerechnet sind, und `jahre` die
+     Zahl der Jahresschritte darin. Gemessen am 20.10.2026: die Gemeinde-
+     reihe Huellhorst in mb.makro_werte fuehrt nur 2014, 2023, 2024, 2025 -
+     der Schritt 2014 -> 2023 ueberspannt den Bruch und faellt weg; es
+     bleiben zwei Jahre. „2014-2025" darueber zu schreiben waere falsch. */
+  let logSumme = 0, jahre = 0, bruch = false, von = null, bis = null;
   for (let i = 1; i < r.length; i++) {
     const a = r[i - 1], b = r[i];
     if (a.jahr <= ZENSUS_BRUCH.vor && b.jahr >= ZENSUS_BRUCH.nach) { bruch = true; continue; }
     logSumme += Math.log(b.wert / a.wert);
     jahre += b.jahr - a.jahr;
+    if (von == null) von = a.jahr;
+    bis = b.jahr;
   }
   if (!(jahre > 0)) return null;
-  return { v: (Math.exp(logSumme / jahre) - 1) * 100, von: r[0].jahr, bis: r[r.length - 1].jahr, bruch_ausgelassen: bruch };
+  return { v: (Math.exp(logSumme / jahre) - 1) * 100, von, bis, jahre, bruch_ausgelassen: bruch };
 }

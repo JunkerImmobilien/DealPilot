@@ -203,7 +203,7 @@ export const DestatisConnector = {
     /* v2165 · aus den Atlas-Zeilen. Jahr je Kennzahl wird mitgegeben. */
     const jahre = {};
     /* v2510 · auch fuer den Bevoelkerungstrend: Zeitraum von-bis */
-    if (metrics.bevoelkerung_trend != null) { jahre.bevoelkerung = bev[bev.length - 1].year; jahre.bevoelkerung_von = bev[0].year;
+    if (metrics.bevoelkerung_trend != null) { jahre.bevoelkerung = _bt.bis; jahre.bevoelkerung_von = _bt.von;   /* v2540: die gerechneten Jahre */
       if (_bt.bruch_ausgelassen) jahre.bevoelkerung_bruch = true; }   /* v2540 */
     const neueste = (rows, schl, spalte) => {
       const r = (rows || []).filter((z) => z.schl === schl && z.werte[spalte] != null)
@@ -266,13 +266,17 @@ export const DestatisConnector = {
     /* v2540 · Jahresschritte, der Zensus-Sprung 2021/2022 ausgelassen (lib/bevoelkerung_trend.js) */
     const trend = (bev) => bevoelkerungTrend(bev);
     const tg = trend(reihe('bevoelkerung_gemeinde', gr).filter((r) => r.jahr >= now - 12));
-    const tk = tg ? null : trend(reihe('bevoelkerung').filter((r) => r.jahr >= now - 12));
-    const t = tg || tk;
+    const tk = trend(reihe('bevoelkerung').filter((r) => r.jahr >= now - 12));
+    /* v2540 · Gemeinde vor Kreis - aber nicht, wenn die Gemeindereihe nach dem
+       ausgelassenen Zensus-Sprung kuerzer als sechs Jahre ist und der Kreis
+       laenger (Huellhorst: Gemeinde 2 Jahre, Kreis 10). */
+    const _gNutzen = tg && (tg.jahre >= 6 || !tk || tk.jahre <= tg.jahre);
+    const t = _gNutzen ? tg : tk;
     if (t) {
       metrics.bevoelkerung_trend = t.v; jahre.bevoelkerung = t.bis; jahre.bevoelkerung_von = t.von;   /* v2510: von-Jahr */
       if (t.bruch_ausgelassen) jahre.bevoelkerung_bruch = true;   /* v2540 */
-      ebenen.bevoelkerung = tg ? 'Gemeinde' : 'Kreis';
-      if (tg) tables.bevoelkerung = '12411-01-01-5';
+      ebenen.bevoelkerung = _gNutzen ? 'Gemeinde' : 'Kreis';
+      if (_gNutzen) tables.bevoelkerung = '12411-01-01-5';
     }
     const ein = neueste('einkommen_je_ew');
     if (ein && ein.wert > 0) {
