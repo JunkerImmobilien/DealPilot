@@ -84,7 +84,11 @@ export async function messeLage({ adresse, plz, ort }) {
       out.felder.ds2_bevoelkerung = { wert: Math.round(tr * 100) / 100, einheit: '%/Jahr', stufe: stufe('ds2_bevoelkerung', tr),
         quelle: SCHWELLEN.ds2_bevoelkerung.quelle, schwelle: SCHWELLEN.ds2_bevoelkerung.text,
         stand: macroRaw.jahre && macroRaw.jahre.bevoelkerung || null,
-        zusatz: macroRaw.metrics.wanderungssaldo != null ? 'Wanderungssaldo ' + (Math.round(macroRaw.metrics.wanderungssaldo * 1000) / 10) + ' je 1.000 EW' : null };
+        /* v2501 · wanderungssaldo steht in PROZENT (je 10.000 EW / 100,
+           stubConnectors.js:259). Hier stand * 1000 / 10 - das ergab je
+           1.000 EW das Zehnfache: Minden-Luebbecke „34.3 je 1.000 EW" statt
+           3,4 (gemessen 20.10.2026). Dazu deutsches Komma. */
+        zusatz: macroRaw.metrics.wanderungssaldo != null ? 'Wanderungssaldo ' + String(Math.round(macroRaw.metrics.wanderungssaldo * 100) / 10).replace('.', ',') + ' je 1.000 EW' : null };
     }
   }
   if (micro && micro.score != null && micro.source !== 'none') {
@@ -92,10 +96,17 @@ export async function messeLage({ adresse, plz, ort }) {
       quelle: SCHWELLEN.mikrolage.quelle, schwelle: SCHWELLEN.mikrolage.text };
   }
   if (zensus && zensus.available) {
-    const ls = zensus.leerstandsquote_marktaktiv != null ? zensus.leerstandsquote_marktaktiv : null;
+    /* v2501 · Die oberste Ebene von lookupDb() traegt den KREIS-Wert. Hier
+       stand sie unter dem Etikett „(Gemeinde …)", sobald es eine Gemeinde
+       gab: Huellhorst zeigte 2 % (Kreis Minden-Luebbecke) als Gemeindewert,
+       die Gemeinde selbst hat 1,2 % (gemessen 20.10.2026). Jetzt Gemeinde
+       vor Kreis, und das Etikett nennt die Ebene, deren Wert es ist. */
+    const _gm = zensus.gemeinde && zensus.gemeinde.leerstandsquote_marktaktiv != null ? zensus.gemeinde : null;
+    const ls = _gm ? _gm.leerstandsquote_marktaktiv
+      : (zensus.leerstandsquote_marktaktiv != null ? zensus.leerstandsquote_marktaktiv : null);
     if (ls != null) {
       out.felder.ds2_nachfrage = { wert: ls, einheit: '% Leerstand', stufe: stufe('ds2_nachfrage', ls),
-        quelle: SCHWELLEN.ds2_nachfrage.quelle + (zensus.gemeinde ? ' (Gemeinde ' + zensus.gemeinde.name + ')' : ' (Kreis)'),
+        quelle: SCHWELLEN.ds2_nachfrage.quelle + (_gm ? ' (Gemeinde ' + _gm.name + ')' : ' (Kreis' + (zensus.kreis_name ? ' ' + zensus.kreis_name : '') + ')'),
         schwelle: SCHWELLEN.ds2_nachfrage.text, stand: '15.05.2022' };
     }
   }
