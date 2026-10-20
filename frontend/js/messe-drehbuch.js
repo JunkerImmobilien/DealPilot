@@ -5356,21 +5356,22 @@
      Gezeigt wird ein PDF (Bankfassung, lokal erzeugt, Nutzungszähler gesperrt). */
   var R26 = {
     kuerzel: 'DEMO Zielbild MFH', str: 'Teutoburger Straße', hnr: '60', plz: '33604', ort: 'Bielefeld',
-    baujahr: '1962', gsfl: '640', kp: '590000', etagen: '3',
-    /* nr, lage, wfl, zimmer, ist (leer = ''), status */
-    we: [['1', 'EG links', '68', '3', '420', 'vermietet'], ['2', 'EG rechts', '58', '2', '455', 'vermietet'],
-         ['3', '1. OG links', '68', '3', '480', 'vermietet'], ['4', '1. OG rechts', '58', '2', '470', 'vermietet'],
-         ['5', '2. OG links', '68', '3', '', 'leer'], ['6', '2. OG rechts', '58', '2', '440', 'vermietet']],
+    baujahr: '1962', gsfl: '640', kp: '430000', etagen: '3',
+    /* nr, lage, wfl, zimmer, ist (leer = ''), status - Marcel 20.10.2026: eine DEUTLICHE Entwicklung,
+       Ist klar unter der Vergleichsmiete (4,80-5,50 EUR/m2), letzte Erhoehungen lange her */
+    we: [['1', 'EG links', '68', '3', '340', 'vermietet'], ['2', 'EG rechts', '58', '2', '310', 'vermietet'],
+         ['3', '1. OG links', '68', '3', '365', 'vermietet'], ['4', '1. OG rechts', '58', '2', '280', 'vermietet'],
+         ['5', '2. OG links', '68', '3', '', 'leer'], ['6', '2. OG rechts', '58', '2', '318', 'vermietet']],
     /* Mietvertrag und Plan je Wohnung (Index in we) */
     plan: {
-      0: { mv_art: 'unbefristet', mv_beginn: '2016-04-01', mv_letzte_erhoehung: '2024-05-01', vgl_qm: '7,80',
+      0: { mv_art: 'unbefristet', mv_beginn: '2012-04-01', mv_letzte_erhoehung: '2019-04-01', vgl_qm: '7,80',
            mass: [['bad', '14000'], ['boeden', '6000']], ziel_qm: '9,50', ziel_wann: 'bei Mieterwechsel' },
-      1: { mv_art: 'unbefristet', mv_beginn: '2019-09-01', mv_letzte_erhoehung: '2025-10-01', vgl_qm: '8,20',
+      1: { mv_art: 'unbefristet', mv_beginn: '2015-09-01', mv_letzte_erhoehung: '2020-02-01', vgl_qm: '8,20',
            mass: [['fenster', '5500'], ['bad', '12000']], ziel_qm: '10,00', ziel_wann: 'bei Mieterwechsel' },
-      2: { mv_art: 'unbefristet', mv_letzte_erhoehung: '2024-09-01', vgl_qm: '7,80' },
-      3: { mv_art: 'unbefristet', mv_letzte_erhoehung: '2025-03-01', vgl_qm: '8,20' },
-      4: { mass: [['renovierung', '9000'], ['boeden', '5000']], ziel_qm: '9,80', ziel_wann: 'Neuvermietung' },
-      5: { mv_art: 'unbefristet', mv_letzte_erhoehung: '2023-11-01', vgl_qm: '8,20' }
+      2: { mv_art: 'unbefristet', mv_letzte_erhoehung: '2019-10-01', vgl_qm: '7,80' },
+      3: { mv_art: 'unbefristet', mv_letzte_erhoehung: '2018-07-01', vgl_qm: '8,20', mass: [['bad', '11000'], ['boeden', '5000']], ziel_qm: '9,50', ziel_wann: 'bei Mieterwechsel' },
+      4: { mass: [['renovierung', '9000'], ['boeden', '5000'], ['bad', '11000']], ziel_qm: '9,80', ziel_wann: 'Neuvermietung' },
+      5: { mv_art: 'unbefristet', mv_letzte_erhoehung: '2020-11-01', vgl_qm: '8,20' }
     }
   };
   function r26Mfh(sel) { return q('#mfh-modal ' + sel); }
@@ -5551,7 +5552,8 @@
         await r6Ende(zb);
         var kv = r26Kv('#mfh-we-soll .mfh-we-kv');
         await zeige(function () { return r26We('#mfh-we-soll'); }, 6);
-        await b2oZeile(s, 'Hier begrenzt der Mietspiegel', 'Soll-Miete <b>' + (kv['Soll-Miete'] || '–') + '</b> — ' + (kv['Herkunft'] || '').replace(/^gerechnet \(§ 558\) · /, '') + ', nicht die Kappung. Erreichbar ab <b>' + (kv['erreichbar ab'] || '–') + '</b>.');
+        var kap2 = /Kappung/.test(kv['Herkunft'] || '');
+        await b2oZeile(s, kap2 ? 'Wieder die Kappungsgrenze' : 'Hier begrenzt der Mietspiegel', 'Soll-Miete <b>' + (kv['Soll-Miete'] || '–') + '</b> — ' + (kv['Herkunft'] || '').replace(/^gerechnet \(§ 558\) · /, '') + (kap2 ? ': die Miete liegt weit unter dem Mietspiegel' : ', nicht die Kappung') + '. Erreichbar ab <b>' + (kv['erreichbar ab'] || '–') + '</b>.');
         await zeige(r26Block('ziel'), 6);
         var zb2 = r6Beginn(s, 'Wohnung 2 · Zielbild', 'Fenster und Bad, danach 10 €/m² bei Mieterwechsel.');
         await r26Massnahmen(P.mass);
@@ -5564,7 +5566,7 @@
       },
       async function (s) {   /* 9 · die übrigen Wohnungen, zügig */
         await zeige(function () { return r26Mfh('.mfh-tab'); }, 6);
-        var zb = r6Beginn(s, 'Die übrigen Wohnungen', 'Dasselbe zügig: Vergleichsmiete und letzte Erhöhung — die leere Wohnung bekommt nur ein Zielbild.');
+        var zb = r6Beginn(s, 'Die übrigen Wohnungen', 'Dasselbe zügig: Vergleichsmiete, letzte Erhöhung, wo geplant ein Zielbild — die leere Wohnung bekommt nur das Zielbild.');
         for (var i = 2; i < R26.we.length; i++) {
           var P = R26.plan[i]; if (!P) continue;
           await r26WohnungAuf(i);
