@@ -5644,6 +5644,15 @@
         var btn = function () { var b = q('#ai-btn'); return b && b.offsetWidth ? b : null; };
         await zeige(btn, 10);
         var zb = r6Beginn(s, 'Pilot-Analyse', 'Der Pilot liest alles — auch die Pläne je Wohnung und die Ertragswerte je Stufe.');
+        /* v2488vr · Mitschnitt-Lauf: HALT vor dem einen KI-Abruf, wenn der Ertragswert nicht
+           Bestand < Mieterhöhung < Zielbild steigt - sonst wäre der bezahlte Abruf für Zahlen,
+           die so nicht ins Video gehören. Ergebnis in DPM_REIHE.r26halt. */
+        if (_rh && _rh.mitschnitt26) {
+          var r0 = null; try { r0 = await window.DpPotenzial.rechnen(); } catch (e) {}
+          var H = (r0 && r0.haus) || {}, w3 = ['bestand', 'mieterhoehung', 'zielbild'].map(function (k) { return H[k] ? H[k].wert : null; });
+          DPM_REIHE.r26halt = { werte: w3, ok: w3[0] != null && w3[1] != null && w3[2] != null && w3[0] < w3[1] && w3[1] < w3[2] };
+          if (!DPM_REIHE.r26halt.ok) { stopp(); throw 'stopp'; }
+        }
         var b = btn(); if (b) b.click();
         await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 120000);
         await r6Ende(zb);
