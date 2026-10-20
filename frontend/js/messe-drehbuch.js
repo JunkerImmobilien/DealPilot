@@ -59,6 +59,9 @@
     st.textContent = [
       '#dpm-kegel{position:fixed;z-index:10070;pointer-events:none;border-radius:14px;box-shadow:0 0 0 9999px rgba(5,5,5,.58),0 0 0 3px ' + GH + ',0 0 40px 6px ' + mix(GH, 45) + ';transition:all .7s cubic-bezier(.5,0,.2,1);opacity:0}',
       '#dpm-kegel.an{opacity:1}',
+      /* v2481k · die gewählte Option sichtbar markiert halten (Modul 26, „Aus Wohnungen") */
+      '.dpm-wahl{outline:3px solid ' + GH + '!important;outline-offset:4px!important;box-shadow:0 0 22px 6px ' + mix(GH, 60) + '!important;animation:dpmWahl 1.1s ease-in-out infinite alternate}',
+      '@keyframes dpmWahl{from{outline-offset:3px}to{outline-offset:7px}}',
       '#dpm-zeile{position:fixed;z-index:10072;left:50%;bottom:34px;transform:translate(-50%,20px);max-width:min(980px,92vw);padding:16px 26px 18px;border-radius:16px;background:rgba(10,9,7,.94);border:1px solid ' + mix(G, 60) + ';box-shadow:0 20px 60px rgba(0,0,0,.6);opacity:0;transition:opacity .4s,transform .4s;text-align:center}',
       '#dpm-zeile.an{opacity:1;transform:translate(-50%,0)}',
       /* v2234 · Karte am Feld */
@@ -5430,7 +5433,7 @@
   DREHBUECHER['reihe-zielbild'] = {
     titel: 'Mieterhöhung und Zielbild', unterzeile: 'Ein Mehrfamilienhaus, Wohnung für Wohnung — Ist, Soll und Zielbild bis zum Wertpotenzial', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
-    aufraeumen: function () { var w = q('#mfh-we-ov'); if (w) w.remove(); var m = q('#mfh-modal'); if (m) m.remove(); r19Zu(); rhAufraeumen(); },
+    aufraeumen: function () { if (_r26.wahl) { clearInterval(_r26.wahl); _r26.wahl = null; } [].forEach.call(document.querySelectorAll('.dpm-wahl'), function (b) { b.classList.remove('dpm-wahl'); }); var w = q('#mfh-we-ov'); if (w) w.remove(); var m = q('#mfh-modal'); if (m) m.remove(); r19Zu(); rhAufraeumen(); },
     szenen: [
       async function (s) {   /* 1 · das Haus */
         await rhStart(0);
@@ -5611,15 +5614,30 @@
         var ME = window.MietEntwicklung;
         var knopf = function () { var b = q('#me-mode-einheiten'); return b && b.offsetWidth ? b : null; };
         await warteAuf(knopf, 4000);
-        await zeige(function () { var b = knopf(); return b && b.parentElement; }, 8);
+        /* v2481k · Marcel 20.10.2026: „das geht sehr schnell mit dem ‚Aus Wohnungen', und man sieht
+           nicht genau, welches ausgewählt wurde." Jetzt: erst der ganze Schalter (Rahmen, stehen
+           lassen), dann der eine Knopf, Klick, und die gewählte Option trägt einige Sekunden eine
+           eigene Markierung (.dpm-wahl). Die Modi liest die Zeile live aus den Knöpfen. */
+        var modi = [].map.call(document.querySelectorAll('.me-mode-toggle .me-mode-btn'), function (b) { return b.offsetWidth ? r6Text(b) : null; }).filter(Boolean);
+        await zeige(function () { var b = knopf(); return b && b.parentElement; }, 10);
+        await b2oZeile(s, 'Tab Miete · Mietentwicklung', (modi.length ? modi.length + ' Wege, die Miete fortzuschreiben: ' + modi.map(function (x) { return '„' + x + '“'; }).join(', ') : 'Mehrere Wege, die Miete fortzuschreiben') + '. Für das Mehrfamilienhaus der letzte.', 1800);
+        await zeige(knopf, 10);
         var schon = !!(ME && ME.getMode && ME.getMode() === 'einheiten' && knopf() && knopf().classList.contains('active'));
-        await b2oZeile(s, 'Tab Miete · Mietentwicklung', schon ? 'Das Übernehmen hat den Modus schon gesetzt: <b>„Aus Wohnungen“</b> — jede Wohnung rechnet ihre eigene Miete.' : 'Drei Wege, die Miete fortzuschreiben — für das Mehrfamilienhaus der dritte: <b>„Aus Wohnungen“</b>.');
+        await b2oZeile(s, '„' + (knopf() ? r6Text(knopf()) : 'Aus Wohnungen') + '“', schon ? 'Das Übernehmen hat ihn schon vorgewählt — ein Klick, und die Tabelle rechnet je Wohnung.' : 'Ein Klick, und die Tabelle rechnet je Wohnung.', 1200);
         /* ein Klick auch dann, wenn der Modus schon steht: er zeichnet die Tabelle (setMietModus) */
         var k = knopf(); if (k && !k.disabled) k.click();
+        var wahl = function () { var b = knopf(); if (b && !b.classList.contains('dpm-wahl')) b.classList.add('dpm-wahl'); return b; };
+        wahl(); _r26.wahl = setInterval(wahl, 300);
         await warte(900);
+        DPM_REIHE.r26wahl = { aktiv: !!(knopf() && knopf().classList.contains('active')), markiert: !!(knopf() && knopf().classList.contains('dpm-wahl')), modus: ME && ME.getMode ? ME.getMode() : null };
+        await zeige(knopf, 10);
+        await b2oZeile(s, 'Gewählt: „' + (knopf() ? r6Text(knopf()) : 'Aus Wohnungen') + '“', 'Der Knopf ist aktiv — die Mietentwicklung des Hauses kommt jetzt aus den einzelnen Wohnungen.', 2500);
+        clearInterval(_r26.wahl); _r26.wahl = null;
+        [].forEach.call(document.querySelectorAll('.dpm-wahl'), function (b) { b.classList.remove('dpm-wahl'); });
         var tw = function () { return q('#me_table_wrap'); };
         await warteAuf(function () { return q('#me_table_wrap table'); }, 4000);
         await zeige(tw, 8);
+        await b2oZeile(s, 'Was sich geändert hat', 'Statt einer pauschalen Steigerung fürs ganze Haus: je Wohnung die Ist-Miete und die Soll-Miete nach Mieterhöhung, jede mit ihrem eigenen Termin.', 2500);
         var zeilen = [].filter.call(document.querySelectorAll('#me_table_wrap tbody tr'), function (r) { return r.cells.length >= 4; });
         /* die erste Zeile, deren Faktor mehr springt als die Prognose-Steigerung: dort greifen die Soll-Mieten */
         var fx = function (r) { return parseFloat(r6Text(r.cells[3]).replace(',', '.')) || 0; }, stg = (parseFloat(wert('mietstg').replace(',', '.')) || 0) / 100;
