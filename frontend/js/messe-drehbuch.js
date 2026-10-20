@@ -2361,7 +2361,7 @@
       },
       async function (s) {   /* 5 · Mietausfall-Risiko (v2481h: ohne Zensus-Kasten) */
         await zeige(r6Gruppe('ds2_mietausfall'), 10);
-        await b2oZeile(s, 'Mietausfall-Risiko', 'Die Stufe übernimmst du per Klick aus der Pilot-Mietpreis-Analyse — oder wählst sie selbst: hier <b>' + (r6Optionstext('ds2_mietausfall') || '–') + '</b>.');
+        await b2oZeile(s, 'Mietausfall-Risiko', 'Die Stufe übernimmst du per Klick aus der Pilot-Mietpreis-Analyse — oder wählst sie selbst' + (wert('ds2_mietausfall') ? ': hier <b>' + r6Optionstext('ds2_mietausfall') + '</b>' : ' — hier noch offen') + '.');
       },
       async function (s) {   /* 6 · Mietvertrag */
         await zeigeGruppe(feldVon('mv_art'), feldVon('mv_letzte_erhoehung'), 8);
