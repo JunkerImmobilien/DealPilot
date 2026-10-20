@@ -5626,7 +5626,7 @@
         await zeige(tw, 8);
         var zeilen = [].filter.call(document.querySelectorAll('#me_table_wrap tbody tr'), function (r) { return r.cells.length >= 4; });
         /* die erste Zeile, deren Faktor mehr springt als die Prognose-Steigerung: dort greifen die Soll-Mieten */
-        var fx = function (r) { return parseFloat(r6Text(r.cells[3]).replace(',', '.')) || 0; }, stg = (zahl('mietstg') || 0) / 100;
+        var fx = function (r) { return parseFloat(r6Text(r.cells[3]).replace(',', '.')) || 0; }, stg = (parseFloat(wert('mietstg').replace(',', '.')) || 0) / 100;
         var hz = null, vorF = 1;
         for (var j = 0; j < zeilen.length && !hz; j++) { var f = fx(zeilen[j]); if (f / vorF - 1 > stg + 0.005) hz = zeilen[j]; vorF = f; }
         var hj = hz ? r6Text(hz.cells[0]).replace(/\s*⬆/, '') : null, hv = hz ? r6Text(hz.cells[1]) : null;
