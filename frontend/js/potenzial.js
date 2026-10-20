@@ -504,8 +504,12 @@
         kosten: Math.round(m.stufen[k].kosten || 0), punkte_plus: m.stufen[k].plus || 0,
         bmy: kz[k] && kz[k].bmy != null ? Math.round(kz[k].bmy * 100) / 100 : null,
         dscr: kz[k] && kz[k].dscr != null ? Math.round(kz[k].dscr * 100) / 100 : null,
-        ertragswert: h[k] ? h[k].wert : null, rnd: h[k] ? h[k].rnd : null };
+        ertragswert: h[k] ? h[k].wert : null, rnd: h[k] ? h[k].rnd : null,
+        /* v2488 · die Miete, mit der der Ertragswert der Stufe rechnet, und ihre Anhebung gegen den Bestand */
+        rohertrag_ertragswert: h[k] && h[k].miete_wohnen_jahr != null ? Math.round(h[k].miete_wohnen_jahr) : null,
+        anhebung_ertragswert: h[k] && h[k].anhebung_jahr != null ? Math.round(h[k].anhebung_jahr) : null };
     });
+    if (r && r.basis && r.basis.bestandsbasis) z.ertragswert_basis = r.basis.bestandsbasis.hinweis;   /* v2488 */
     if (gesperrt(r)) { z.ertragswert_gesperrt = true; z.ertragswert_hinweis = GESPERRT_KURZ + '. ' + GESPERRT_LANG; }
     if (r && r.aufteilung && r.aufteilung.je_stufe) {
       var zb = r.aufteilung.zins && r.aufteilung.zins.bestand;
@@ -680,8 +684,11 @@
       ['DSCR', function (k) { return kz[k].dscr != null ? dez(kz[k].dscr, 2) : '—'; }],
       ['Maßnahmenkosten', function (k) { return kz[k].kosten ? eur(kz[k].kosten) : '—'; }],
       ['Restnutzungsdauer', function (k) { return H[k] && H[k].rnd != null ? dez(H[k].rnd, 0) + ' J.' : '—'; }],
+      /* v2488 · die Miete im Ertragswert (Wohnen) und ihre Anhebung - erklärt, warum sie von der Kaltmiete abweicht */
+      ['Miete im Ertragswert p. a.', function (k) { return H[k] && H[k].miete_wohnen_jahr != null ? eur(H[k].miete_wohnen_jahr) : '—'; }],
+      ['davon Anhebung gegen Bestand', function (k) { return k === 'bestand' || !H[k] || H[k].anhebung_jahr == null ? '—' : '+' + eur(H[k].anhebung_jahr); }],
       [m.art === 'mfh' ? 'Ertragswert (Haus als Ganzes)' : 'Ertragswert', function (k) { return H[k] && H[k].wert != null ? eur(H[k].wert) : '—'; }]
-    ].filter(function (z) { return !zu || (z[0] !== 'Restnutzungsdauer' && !/^Ertragswert/.test(z[0])); })   /* v2431 */
+    ].filter(function (z) { return !zu || (z[0] !== 'Restnutzungsdauer' && !/^Ertragswert|^Miete im Ertragswert|^davon Anhebung/.test(z[0])); })   /* v2431, v2488 */
       .map(function (z) { return [z[0]].concat(d.spalten.map(z[1])); });
     if (r && r.verfuegbar && r.aufteilung && r.aufteilung.je_stufe && r.aufteilung.je_stufe.bestand) {
       var n = m.wohnungen.filter(function (w) { return w.art !== 'gewerbe'; }).length;
@@ -696,6 +703,7 @@
       + (r && r.verfuegbar && r.basis ? ' Liegenschaftszins ' + pct(r.basis.lzs_pct) + ' (Haus)'
         + (r.aufteilung && r.aufteilung.zins && r.aufteilung.zins.bestand && r.aufteilung.zins.bestand.pct != null ? ' bzw. ' + pct(r.aufteilung.zins.bestand.pct) + ' (Wohnungseigentum, vermietet)' : '')
         + ', Restnutzungsdauer nach Modernisierungspunkten (Anlage 2 ImmoWertV).'
+        + (r.basis.bestandsbasis && r.basis.bestandsbasis.hinweis ? ' ' + r.basis.bestandsbasis.hinweis : '')   /* v2488 */
         : (zu ? ' ' + GESPERRT_KURZ + ' (Wertermittlung nach ImmoWertV).' : ' Ertragswerte nicht gerechnet.'))
       + ' ' + m.kappung.text;
     if (d.aufteilung_hinweis) d.fuss = 'Aufteilung: ' + d.aufteilung_hinweis + ' ' + d.fuss;

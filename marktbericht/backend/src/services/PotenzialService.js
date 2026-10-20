@@ -25,6 +25,7 @@
 import { ErtragswertService } from './ErtragswertService.js';
 import { WertParameterService } from './WertParameterService.js';
 import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js';
+import { mieteNachBand } from './CrossCheckService.js';   /* v2488 · dieselbe Bandregel wie der Bestand */
 
 export const KENNZEICHNUNG = 'Potenzialwert nach Mieterhöhung bzw. Zielbild, keine Verkehrswertermittlung.';
 const STUFEN = ['mieterhoehung', 'zielbild'];
@@ -89,6 +90,77 @@ function kernZusammenfassung(k) {
     lzs_stufe: k.lzs ? k.lzs.stufe : null,
     warnungen: Array.isArray(k.warnungen) ? k.warnungen.slice(0, 4) : [],
   };
+}
+
+/* ══ v2488 · EINE BASIS FUER ALLE STUFEN (20.10.2026) ═══════════════════════
+   Gemessen am Demo-MFH (6 WE, 378 m², eine leer, Ist 5,99 €/m²): Bestand
+   545.000 €, Mieterhöhung 535.000 € - die Stufe lag UNTER dem Bestand, obwohl
+   die Miete stieg. Der Bestand rechnete mit der Wertermittlungs-Miete (Ist unter
+   dem Band -> untere Kante 6,64 €/m² auf alle 378 m², die leere Wohnung
+   eingeschlossen), die Stufen mit der tatsaechlichen Miete aus dem Browser
+   (leer = 0, ohne Bandpruefung).
+   Jetzt je Wohnung:
+     Basis (roh)  vermietet: Ist-Miete nach der Bandregel des Bestands
+                  (mieteNachBand, je €/m²); leer: Vergleichsmiete des Bestands
+     Basis        so verteilt, dass die Summe EXAKT dem Bestands-Rohertrag
+                  entspricht (Bestand = Bericht Stufe 3): der Unterschied zuerst
+                  auf die leeren Wohnungen, der Rest anteilig
+     Stufe        Basis + max(0, min(Stufenmiete, obere Bandkante) - Basis roh)
+                  (leer: gegen die Basis selbst, also max(Basis, Stufenmiete))
+   Die Anhebung ist damit genau die Mehrmiete der Wohnung gegen ihre eigene
+   gepruefte Basis - bei Angleichung 1 dasselbe wie max(Basis, Stufenmiete).
+   Ueber der oberen Kante wird nichts kapitalisiert (§ 8 Abs. 3 ImmoWertV, wie
+   im Bestand). Eine Stufe unterschreitet den Bestand nie. */
+const r2 = (x) => Math.round(x * 100) / 100;
+function bestandsBasis(basis, wl) {
+  const band = basis.miete_band || null;
+  const markt = zahl(basis.markt_qm) || zahl(basis.miete_qm);
+  const rB = Number(basis.ein.miete_markt_jahr) || 0;
+  const zeilen = wl.map((w) => {
+    if (!w || w.art === 'gewerbe' || !(Number(w.wfl) > 0)) return null;
+    const wfl = Number(w.wfl);
+    const ist = zahl(w.miete_jahr && w.miete_jahr.bestand) || 0;
+    let qm, herkunft, istQm = null;
+    if (ist > 0) {
+      istQm = r2(ist / 12 / wfl);
+      const r = mieteNachBand(istQm, band, markt);
+      qm = r.qm != null ? r.qm : istQm;
+      herkunft = r.fuehrt ? 'ist_im_band' : (r.lage === 'ueber' ? 'obere_kante' : 'untere_kante');
+    } else {
+      qm = markt; herkunft = 'leer_marktueblich';
+    }
+    if (!(qm > 0)) return null;
+    return { wfl, ist, ist_qm: istQm, qm, herkunft, roh: qm * wfl * 12,
+             kappe: band && band.oben_qm > 0 ? band.oben_qm * wfl * 12 : Infinity };
+  });
+  const summeRoh = zeilen.reduce((a, z) => a + (z ? z.roh : 0), 0);
+  if (!(summeRoh > 0) || !(rB > 0)) return null;
+  /* Der Unterschied zwischen Haus und Wohnungen entsteht beim Leerstand: der
+     Bestand teilt die Ist-Miete der vermieteten Wohnungen durch die GESAMTE
+     Wohnflaeche (Demo-MFH 5,99 statt 7,31 €/m²). Er geht deshalb zuerst auf die
+     leeren Wohnungen - hoechstens bis zur marktueblichen Miete, nie unter null -,
+     erst der Rest anteilig auf alle. So bleibt die vermietete Wohnung bei ihrer
+     geprueften Ist-Miete, und das Zielbild mit voller Vermietung zur Zielmiete
+     ergibt genau die Summe der Zielmieten. */
+  const verm = zeilen.filter((z) => z && z.herkunft !== 'leer_marktueblich');
+  const leer = zeilen.filter((z) => z && z.herkunft === 'leer_marktueblich');
+  const sV = verm.reduce((a, z) => a + z.roh, 0), sL = leer.reduce((a, z) => a + z.roh, 0);
+  const pool = leer.length ? Math.max(0, Math.min(sL, rB - sV)) : 0;
+  const fV = sV > 0 ? (rB - pool) / sV : 1;
+  const fL = sL > 0 ? (sV > 0 ? pool : rB) / sL : 1;
+  verm.forEach((z) => { z.basis = z.roh * fV; });
+  leer.forEach((z) => { z.basis = z.roh * fL; z.basis_qm = r2(z.basis / 12 / z.wfl); });
+  return { zeilen, faktor: fV, faktor_leer: leer.length ? fL : null, rohertrag: rB };
+}
+/** Wertermittlungs-Miete einer Wohnung in der Stufe s. */
+function stufenMiete(z, w, s) {
+  if (!z) return null;
+  if (s === 'bestand') return z.basis;
+  const m = zahl(w.miete_jahr && w.miete_jahr[s]);
+  if (m == null || !(m > z.ist)) return z.basis;           /* keine Anhebung -> Basis */
+  /* leer: max(Basis, Stufenmiete); vermietet: die Mehrmiete gegen die eigene gepruefte Miete */
+  const bezug = z.herkunft === 'leer_marktueblich' ? z.basis : z.roh;
+  return z.basis + Math.max(0, Math.min(m, z.kappe) - bezug);
 }
 
 function eineStufe(basis, ref, basisKern, miete, plus) {
@@ -169,6 +241,7 @@ function etwEingabe(basis, ref, w, miete, lzs, bwk, rnd, anteil) {
    wenn der ETW-Zins wirklich hoeher liegt; liegt die Summe ueber dem Haus und
    frisst erst die Aufteilung den Abstand, sagt er genau das. */
 const pctDe = (v) => (v == null ? '–' : String(Math.round(Number(v) * 100) / 100).replace('.', ',') + ' %');
+const pctQm = (v) => (v == null ? '–' : String(Math.round(Number(v) * 100) / 100).replace('.', ',') + ' €/m²');
 const eurDe = (v) => Math.round(Number(v) || 0).toLocaleString('de-DE') + ' €';
 function negativHinweis(a, out, neg) {
   const s = neg.indexOf('bestand') >= 0 ? 'bestand' : neg[0];
@@ -231,27 +304,69 @@ export const PotenzialService = {
     };
     out.haus = { bestand };
     const varianten = Array.isArray(auftrag.varianten) ? auftrag.varianten : [];
+    const wl = (Array.isArray(auftrag.wohnungen) ? auftrag.wohnungen : []).filter((w) => w && Number(w.wfl) > 0);
+    /* v2488 · ohne Wohnungsliste (ETW, Einzelobjekt): EINE Wohnung = das Objekt,
+       Ist aus der Eingabe des Berichts, Stufenmiete aus der Variante. */
+    const wlB = wl.some((w) => w.art !== 'gewerbe') ? wl : [{ art: 'wohnen', wfl: zahl(basis.wohnflaeche_wohnen) || zahl(basis.ein.wohnflaeche_qm),
+      miete_jahr: Object.assign({ bestand: (!ref.vacancy && zahl(ref.monthly_net_rent) > 0) ? zahl(ref.monthly_net_rent) * 12 : 0 },
+        ...varianten.filter((v) => v && STUFEN.indexOf(v.key) >= 0).map((v) => ({ [v.key]: zahl(v.miete_wohnen_jahr) }))) }];
+    const bb = bestandsBasis(basis, wlB);
+    const anhebungN = (s) => (bb ? bb.zeilen.filter((z, i) => z && stufenMiete(z, wlB[i], s) > z.basis + 0.5).length : 0);
+    bestand.anhebung_jahr = 0;
     for (const v of varianten) {
       if (!v || STUFEN.indexOf(v.key) < 0) continue;
-      const m = zahl(v.miete_wohnen_jahr);
+      let m = zahl(v.miete_wohnen_jahr);
       if (m == null) continue;
+      if (bb) m = bb.zeilen.reduce((a, z, i) => a + (z ? stufenMiete(z, wlB[i], v.key) : 0), 0);
+      else m = Math.max(m, Number(basis.ein.miete_markt_jahr) || 0);   /* ohne Basis: nie unter dem Bestand */
       const z = eineStufe(basis, ref, kB, m, zahl(v.mod_punkte_plus) || 0);
-      if (z) { z.kosten = zahl(v.kosten) || 0; out.haus[v.key] = z; }
+      if (z) {
+        z.kosten = zahl(v.kosten) || 0;
+        z.anhebung_jahr = Math.round(z.miete_wohnen_jahr - bestand.miete_wohnen_jahr);   /* v2488 */
+        z.anhebung_wohnungen = anhebungN(v.key);
+        out.haus[v.key] = z;
+      }
+    }
+    if (bb) {
+      const leer = bb.zeilen.filter((z) => z && z.herkunft === 'leer_marktueblich').length;
+      out.basis.bestandsbasis = {
+        rohertrag_wohnen: bb.rohertrag, angleichung: Math.round(bb.faktor * 10000) / 10000,
+        angleichung_leer: bb.faktor_leer != null ? Math.round(bb.faktor_leer * 10000) / 10000 : null,
+        wohnungen: bb.zeilen.filter(Boolean).length, leer,
+        band_unten_qm: basis.miete_band ? basis.miete_band.unten_qm : null,
+        band_oben_qm: basis.miete_band ? basis.miete_band.oben_qm : null,
+        markt_qm: zahl(basis.markt_qm),
+        hinweis: 'Alle Stufen bauen auf der Miete des Bestands auf: je Wohnung die Ist-Miete im Band der Marktüblichkeit'
+          + (basis.miete_band ? ' (' + pctQm(basis.miete_band.unten_qm) + ' bis ' + pctQm(basis.miete_band.oben_qm) + ')' : '')
+          + ', darunter oder darüber die Bandkante' + (leer ? ', leere Wohnungen mit dem Teil des Bestands-Rohertrags, der danach bleibt (höchstens die marktübliche Miete)' : '')
+          + '. Mieterhöhung und Zielbild rechnen die Mehrmiete der Wohnung hinzu, oberhalb des Bandes nichts.',
+      };
     }
 
     /* ── je Wohnung ─────────────────────────────────────────────────── */
-    const wl = (Array.isArray(auftrag.wohnungen) ? auftrag.wohnungen : []).filter((w) => w && Number(w.wfl) > 0);
     if (wl.length) {
       const flSum = wl.reduce((a, w) => a + Number(w.wfl), 0);
       const meaSum = wl.reduce((a, w) => a + (Number(w.mea_pct) > 0 ? Number(w.mea_pct) : 0), 0);
       const stufenAlle = ['bestand'].concat(STUFEN).filter((s) => out.haus[s]);
       /* Anteil am Haus: der Hauswert der Stufe nach dem Anteil am Rohertrag */
+      /* v2488 · die Wertermittlungs-Miete je Wohnung und Stufe (Gewerbe: Browser-Miete) */
+      const bbW = bb && wlB === wl ? bb : null;
+      const mieteW = (w, i, s) => {
+        const z = bbW ? bbW.zeilen[i] : null;
+        return z ? stufenMiete(z, w, s) : (zahl(w.miete_jahr && w.miete_jahr[s]) || 0);
+      };
       const summeMiete = {};
-      stufenAlle.forEach((s) => { summeMiete[s] = wl.reduce((a, w) => a + (zahl(w.miete_jahr && w.miete_jahr[s]) || 0), 0); });
-      out.wohnungen = wl.map((w) => {
+      stufenAlle.forEach((s) => { summeMiete[s] = wl.reduce((a, w, i) => a + mieteW(w, i, s), 0); });
+      out.wohnungen = wl.map((w, i) => {
         const r = { nr: w.nr || null, art: w.art || 'wohnen', wfl: Number(w.wfl), anteil_am_haus: {} };
+        const z = bbW ? bbW.zeilen[i] : null;
+        if (z) {
+          r.basis_herkunft = z.herkunft; r.ist_qm = z.ist_qm; r.basis_qm = r2(z.basis / 12 / z.wfl);
+          r.miete_jahr = {};
+          stufenAlle.forEach((s) => { r.miete_jahr[s] = Math.round(mieteW(w, i, s)); });
+        }
         stufenAlle.forEach((s) => {
-          const mw = zahl(w.miete_jahr && w.miete_jahr[s]) || 0;
+          const mw = mieteW(w, i, s);
           r.anteil_am_haus[s] = summeMiete[s] > 0 ? Math.round(out.haus[s].wert * mw / summeMiete[s]) : null;
         });
         r.anteil = meaSum > 0 && Number(w.mea_pct) > 0 ? Number(w.mea_pct) / meaSum : Number(w.wfl) / flSum;
@@ -279,7 +394,7 @@ export const PotenzialService = {
           let summe = 0, vollst = true;
           out.wohnungen.forEach((r, i) => {
             const w = wl[i];
-            const mw = zahl(w.miete_jahr && w.miete_jahr[s]) || 0;
+            const mw = mieteW(w, i, s);
             if (r.art === 'gewerbe') { summe += r.anteil_am_haus[s] || 0; r.als_etw = r.als_etw || {}; r.als_etw[s] = null; return; }
             const e = etwEingabe(basis, ref, w, mw, lzs, bwk, rnd, r.anteil);
             const k = mw > 0 ? ErtragswertService.ertragswert(e.ein, e.bw) : null;

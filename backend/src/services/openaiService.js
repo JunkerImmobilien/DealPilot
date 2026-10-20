@@ -60,13 +60,18 @@ function _potenzialBlock(pz) {
   if (pz.kappung && pz.kappung.text) z.push(pz.kappung.text);
   var st = pz.stufen || {};
   z.push('');
-  z.push('Stufe | Kaltmiete/Monat | Kaltmiete/Jahr | Massnahmenkosten | Modernisierungspunkte plus | Bruttomietrendite | DSCR | Restnutzungsdauer | Ertragswert');
+  z.push('Stufe | Kaltmiete/Monat | Kaltmiete/Jahr | Massnahmenkosten | Modernisierungspunkte plus | Bruttomietrendite | DSCR | Restnutzungsdauer | Miete im Ertragswert/Jahr (Anhebung gegen Bestand) | Ertragswert');
   ['bestand', 'mieterhoehung', 'zielbild'].forEach(function (k) {
     var x = st[k]; if (!x) return;
     z.push(k + ' | ' + e(x.kaltmiete_monat) + ' | ' + e(x.kaltmiete_jahr) + ' | ' + e(x.kosten) + ' | ' + (x.punkte_plus || 0)
       + ' | ' + (x.bmy != null ? x.bmy + ' %' : '-') + ' | ' + (x.dscr != null ? x.dscr : '-')
-      + ' | ' + (x.rnd != null ? Math.round(x.rnd) + ' J.' : '-') + ' | ' + (x.ertragswert != null ? e(x.ertragswert) : 'nicht gerechnet'));
+      + ' | ' + (x.rnd != null ? Math.round(x.rnd) + ' J.' : '-')
+      + ' | ' + (x.rohertrag_ertragswert != null ? e(x.rohertrag_ertragswert) + (x.anhebung_ertragswert ? ' (+' + e(x.anhebung_ertragswert) + ')' : '') : '-')   /* v2488 */
+      + ' | ' + (x.ertragswert != null ? e(x.ertragswert) : 'nicht gerechnet'));
   });
+  /* v2488 · warum die Miete im Ertragswert von der Kaltmiete abweicht (Band, Leerstand) */
+  if (pz.ertragswert_basis && !pz.ertragswert_gesperrt) z.push('Miete im Ertragswert: ' + pz.ertragswert_basis
+    + ' Weicht sie von der Kaltmiete ab, so erklaeren; die Anhebung ist der Mehrertrag, auf dem der Wertzuwachs der Stufe beruht.');
   /* v2431 · ohne Stufe 3 gibt es keinen Ertragswert (Marcel 19.10.2026) */
   if (pz.ertragswert_gesperrt) z.push('Ertragswert je Stufe gibt es mit DealPilot Stufe 3 (Wertermittlung nach ImmoWertV); fuer dieses Objekt liegt sie nicht vor.'
     + ' Nenne KEINEN Ertragswert, keine Restnutzungsdauer und kein Aufteilungspotenzial - nur Mieten, Massnahmen, Kosten, Rendite und Cashflow.'

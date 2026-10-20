@@ -91,6 +91,19 @@ const LIEGENSCHAFTSZINS = 0.03;   // EFH-typisch 2,5–3,5 % -> 3,0 %
 
 const _num = (v) => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
 
+/* v2488 · DIE BANDREGEL ALS EINE FUNKTION (Marcel 20.10.2026: jede Stufe baut auf
+   derselben Basis wie der Bestand). Bis v2487 stand sie nur inline in compute();
+   PotenzialService braucht sie je WOHNUNG. Band nach v2382: untere Kante =
+   min(amtlich, Angebot) x 0,7, obere = max(...) x 1,3. Ist im Band -> Ist,
+   darueber/darunter -> die Kante, ohne Ist -> die Vergleichsmiete. */
+export function mieteNachBand(istQm, band, refQm) {
+  const lage = (istQm != null && band)
+    ? (istQm > band.oben_qm ? 'ueber' : (istQm < band.unten_qm ? 'unter' : 'im_band')) : null;
+  const fuehrt = istQm != null && (band == null || lage === 'im_band');
+  const kante = lage === 'ueber' ? band.oben_qm : (lage === 'unter' ? band.unten_qm : null);
+  return { qm: fuehrt ? istQm : (kante != null ? kante : refQm), lage, fuehrt, kante };
+}
+
 export const CrossCheckService = {
   // ref: Objektdaten; landValue: BORIS ({available, value_sqm}); rent: GeoMap-Mietstats;
   // valuation: Ergebnis des Vergleichswertverfahrens (fuer die Gegenueberstellung)
@@ -921,12 +934,12 @@ export const CrossCheckService = {
       amtlich_qm: _amtQmBand, angebot_qm: _angQmBand != null ? Math.round(_angQmBand * 100) / 100 : null,
       regel: 'untere Kante = min(amtliche Vergleichsmiete, Angebotsmiete) × 0,7; obere Kante = max(…) × 1,3',
     } : null;
-    const _istLage = (_istQm != null && _band)
-      ? (_istQm > _band.oben_qm ? 'ueber' : (_istQm < _band.unten_qm ? 'unter' : 'im_band')) : null;
+    const _mnb = mieteNachBand(_istQm, _band, _refQm);   /* v2488 · eine Regel, auch je Wohnung */
+    const _istLage = _mnb.lage;
     const _istAbw = (_istQm != null && _refQm > 0) ? (_istQm / _refQm - 1) : null;
-    const _istFuehrt = _istQm != null && (_band == null || _istLage === 'im_band');
-    const _kante = _istLage === 'ueber' ? _band.oben_qm : (_istLage === 'unter' ? _band.unten_qm : null);
-    const mieteQm = _istFuehrt ? _istQm : (_kante != null ? _kante : _refQm);
+    const _istFuehrt = _mnb.fuehrt;
+    const _kante = _mnb.kante;
+    const mieteQm = _mnb.qm;
     const mieteQuelle = _istFuehrt ? 'Ist-Miete (marktüblich, § 31 Abs. 2 ImmoWertV)'
       : (_kante != null ? (_istLage === 'ueber' ? 'obere' : 'untere') + ' Kante des Marktüblichkeitsbandes'
         : (_amtFuehrt ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten'));
@@ -1269,7 +1282,9 @@ export const CrossCheckService = {
       try {
         Object.defineProperty(out, '_ertragswertEingabe', { enumerable: false, configurable: true, writable: true,
           value: { ein: Object.assign({}, ein), bodenwert: bwErgebnis, wohnflaeche_wohnen: wflWohnen,
-                   miete_qm: mieteQm, miete_quelle: mieteQuelle || null, gnd_quelle: _gndEwQuelle } });
+                   miete_qm: mieteQm, miete_quelle: mieteQuelle || null, gnd_quelle: _gndEwQuelle,
+                   /* v2488 · Band und Vergleichsmiete fuer die Bestandsbasis je Wohnung */
+                   miete_band: _band || null, markt_qm: _refQm > 0 ? _refQm : null } });
       } catch (e) { /* nur Zusatz */ }
 
       if (kern.vollstaendig && kern.wert != null && _ertragUnterdruecken) {
