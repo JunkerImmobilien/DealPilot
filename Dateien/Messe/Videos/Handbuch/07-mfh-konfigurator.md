@@ -63,7 +63,7 @@ stammen aus dem Gutachten; Flächen, Mieten, Verträge und Maßnahmen sind **Dem
    `js/data/kappungsgrenzen.json`). Die Summe für die 6 Wohnungen ist nach der Befüllung nicht neu gemessen — **Zahl live zeigen**; es ist
    dieselbe Zahl in Summenzeile, Wohnungsfenster, „Ist gegen Soll" im Bank-PDF und Ist/Soll-Karte.
 2. **Schritt 4 · Restnutzungsdauer des Hauses:** Punkte des Hauses = flächengewichtete Punkte der Einheiten, auf
-   ganze Punkte gerundet → **3 Punkte** (flächengewichtet 3,4; das Gutachten vergibt 2,2), **RND 25,7 Jahre** (Bericht 326);
+   ganze Punkte gerundet → **3 Punkte** (flächengewichtet 3,4; das Gutachten vergibt 2,2), **RND 25,7 Jahre** (Bericht 327);
    nach dem Zielbild 5,7 Punkte. Dieselbe Zahl steht in der Zinssatz-Zeile des
    Reiters Objekt, im Wertpotenzial und in der Mieterliste des Bank-PDF.
 3. **„Übernehmen"** schreibt die Summe ins Objekt und stellt die Mietentwicklung auf **„Aus Wohnungen"** (Toast
@@ -75,7 +75,7 @@ stammen aus dem Gutachten; Flächen, Mieten, Verträge und Maßnahmen sind **Dem
    gedeckelt auf 3 €/m² (2 €/m² unter 7 €/m² Ausgangsmiete) in sechs Jahren.
 5. **Haken „aufgeteilt"**: jede Wohnung erscheint zusätzlich als Eigentumswohnung mit dem Zins für vermietetes
    Wohnungseigentum (Bielefeld 2,9 %, Ausschuss Stadt Bielefeld, gegen 2,5 % für das MFH). An der Westerfeldstr.
-   (Abruf 6, 6 WE) z. B. WE 1: Ertragswert 126.000 €, Marktpreisindikation 180.000 € als ETW; ETW-Markt 2.604 €/m²
+   (Abruf 7, 6 WE) z. B. WE 1: Ertragswert 126.000 €, Marktpreisindikation 180.000 € als ETW; ETW-Markt 2.604 €/m²
    gegen 2.164 €/m² als Haus. Ob nach Kosten je Wohnung Potenzial bleibt, live zeigen (Begründung steht dabei).
 
 **Gegenbild — Bismarckstr. 27, Detmold (6 WE, Bj 1908):** zwei Wohnungen „leer". Seit v2520 rechnet der Ertragswert
@@ -87,7 +87,7 @@ Ist 0 € (vorher 836 €; die Objektmiete 3.670 € enthielt sie schon nicht).
 einem Vertrag; WE 5 leer (Komplettrenovierung 28.000 €). Gewerbe rechnet der Ertragswert getrennt.
 
 Belegt: Wohnungen, Mieten, Garagen, Zielbild, leeres Soll, 3 Punkte (3,4) demo-geschichten D (Befüllung 20.10.2026);
-RND 25,7 J. Bericht 326 (20.10.); 5,7 Punkte und WE 1 126.000/180.000 € demo-geschichten 8 Schritt 4–5 (Abruf 6);
+RND 25,7 J. Bericht 327 (20.10.); 5,7 Punkte und WE 1 126.000/180.000 € demo-geschichten 8 Schritt 4–5 (Abruf 7);
 39.420 € nachgerechnet (3.195 + 90) × 12; Kappung Bielefeld 15 % Journal v2430 und
 demo-geschichten B Punkt 4; § 559 8 % / 3 bzw. 2 €/m² help.js („Wie DealPilot die Soll-Miete vorrechnet");
 1.800 €/WE help.js; Zins 2,9/2,5 % Journal v2432; Leerstand Journal v2520/v2540; Bismarckstr. WE 2 Korrektur zu Geschichte 2;

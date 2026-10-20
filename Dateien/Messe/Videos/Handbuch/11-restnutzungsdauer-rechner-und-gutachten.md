@@ -45,7 +45,7 @@ Bismarckstr. 27 (1908).
 
 **Mit Gutachten — Westerfeldstr. 140, Bielefeld (Bj ca. 1967):** Das Nutzungsdauergutachten vom 28.05.2025 kommt auf
 **16 Jahre** → AfA **6,25 %**. DealPilot kommt im Modell mit den 6 Wohnungen auf **25,7 Jahre** (3 Punkte aus den
-Einheiten, Bericht 326; vorher 23,6 J. mit 2 Punkten bei 4 WE). Der Unterschied ist die
+Einheiten, Bericht 327; vorher 23,6 J. mit 2 Punkten bei 4 WE). Der Unterschied ist die
 **Gesamtnutzungsdauer** (Gutachten 67 Jahre bei Gebäudestandard 2,4, Modell 80 Jahre), nicht die Punkte — genau das ist
 der Mehrwert des Sachverständigen.
 
@@ -64,7 +64,7 @@ Am Markt 18 (DEMO-KK2) — Gutachten **26 J.** gegen Modell 32,4 J. → AfA **3,
 **3,03 %**, Kauf 14.08.2024, Bestand; Modell heute 30,9 J., AfA 1.677 €/Jahr. Beides darf als App-Stand gezeigt werden.
 
 Belegt: Ravensberger/Parkstr. Videoreihe.md „Stand 16.10.2026 nachmittags", 10c; Westerfeld Geschichte 4 und Korrektur
-(25,7 J., 3 Punkte, Bericht 326 vom 20.10.); Tabelle Geschichte 5; Am Markt 18 / Alexanderstr. Geschichten 5, 11, 12 (Eintrag 20.10.) und C.8/C.9; Schritte
+(25,7 J., 3 Punkte, Bericht 327 vom 20.10.); Tabelle Geschichte 5; Am Markt 18 / Alexanderstr. Geschichten 5, 11, 12 (Eintrag 20.10.) und C.8/C.9; Schritte
 `rnd-wizard.js:31–113`; „Sachverständig zu würdigen" `rnd-wizard.js:1285`.
 
 ## 4 · Was man daraus liest — Fragen am Stand

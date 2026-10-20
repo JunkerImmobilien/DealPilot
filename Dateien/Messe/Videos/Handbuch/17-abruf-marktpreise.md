@@ -31,7 +31,7 @@ als Eigentumswohnung. Jeder Abruf wird mit Datum gespeichert, so entsteht ein **
 | Wohnungen | im MFH-Konfigurator erfasst: 6 WE (4 × 70 m², 2 × 55 m²; eingetragen 20.10.) |
 | Kontingent | 1 × erweiterte Marktpreisindikation frei |
 
-Ergebnis des **Abrufs 6 vom 20.10.2026** (nach der Befüllung, 6 WE):
+Ergebnis des **Abrufs 7 vom 20.10.2026** (nach der Befüllung, 6 WE):
 
 | Markt am Ort | Median | Spanne (Q25–Q75) | Angebote · Umkreis |
 |---|---:|---:|---:|
@@ -42,7 +42,7 @@ Ergebnis des **Abrufs 6 vom 20.10.2026** (nach der Befüllung, 6 WE):
 | Je Stufe (Marktpreisindikation) | Bestand | Mieterhöhung | Zielbild |
 |---|---:|---:|---:|
 | aus Angebotspreisen | 820.000 € | 820.000 € | 895.000 € |
-| Ertragswert (zum Vergleich) | 745.000 € | 815.000 € | 915.000 € |
+| Ertragswert (zum Vergleich) | 740.000 € | 810.000 € | 910.000 € |
 
 Abschlag auf Angebotspreise 15,9 % (örtlich gemessen). Je Wohnung als Eigentumswohnung, z. B. **WE 1: Ertragswert
 126.000 €, Marktpreisindikation 180.000 €**; die übrigen Wohnungen und die Summe live zeigen. Grundlage: Angebote für
@@ -53,7 +53,7 @@ mögliche Aufteilungsgewinn — abzüglich der Kosten der Aufteilung je Wohnung.
 Ist-Miete des Hauses (8,19 €/m²): Hier steckt Mieterhöhungspotenzial, gebremst durch die Kappungsgrenze von 15 % in Bielefeld.
 Das Zielbild liegt bei der Marktpreisindikation höher (895.000 €), weil es mit dem Zustand „modernisiert" rechnet.
 
-Belegt: Markt-, Stufen- und Wohnungszahlen — demo-geschichten.md Geschichte 8 Schritte 3–5 (Abruf 6 vom 20.10.2026, 6 WE;
+Belegt: Markt-, Stufen- und Wohnungszahlen — demo-geschichten.md Geschichte 8 Schritte 3–5 (Abruf 7 vom 20.10.2026, 6 WE;
 ersetzt den ersten Abruf mit 4 WE: ETW 2.505 €/m², 805/805/880 T€, 243.000 € je Wohnung); Ist-Miete 3.195 € / 390 m² = 8,19 €/m² nachgerechnet; Ist-Miete 8,19 €/m² und Kappung 15 % — demo-geschichten.md Abschnitt B;
 Rückfragetext — `frontend/js/potenzial.js`.
 

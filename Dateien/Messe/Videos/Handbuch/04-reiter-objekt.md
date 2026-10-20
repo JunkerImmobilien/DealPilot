@@ -46,13 +46,13 @@ Was die App zeigt:
 | Sachwertfaktor | im Register kein Satz für Bielefeld MFH → Sachwert „vorläufig", Weg zur Landestabelle | kein Nachbarkreis, kein Landesmittel |
 | Modernisierungspunkte / RND | Punkte aus **den Einheiten** (6 WE): **3 Punkte** (flächengewichtet 3,4) → RND **25,7 J.** · aus den acht Feldern: Zahl live zeigen | Anlage 2 bewertet das Gebäude: eine Punktzahl, eine Restnutzungsdauer; beim MFH wählst du die Quelle |
 
-Danach Stufe 3 abrufen: Bericht 326 (20.10.2026, 6 WE) — Ertragswert **745.000 €**, Marktpreisindikation **820.000 €**, Sachwert **560.519 €**, Liegenschaftszins 2,5 % Stufe A, RND 25,7 J. Im Feld Verkehrswert erscheinen „Ertragswert · Datum · Betrag", „Sachwert · …", „Marktwert · …" — welche Zahl als Verkehrswert gilt, entscheidest du. Die Karte nennt beim Marktwert den Abschlag, z. B. „inkl. 15,9 % Abschlag auf Angebotspreise (örtlich gemessen)".
+Danach Stufe 3 abrufen: Bericht 327 (20.10.2026, 6 WE) — Ertragswert **740.000 €**, Marktpreisindikation **820.000 €**, Sachwert **560.519 €**, Liegenschaftszins 2,5 % Stufe A, RND 25,7 J. Im Feld Verkehrswert erscheinen „Ertragswert · Datum · Betrag", „Sachwert · …", „Marktwert · …" — welche Zahl als Verkehrswert gilt, entscheidest du. Die Karte nennt beim Marktwert den Abschlag, z. B. „inkl. 15,9 % Abschlag auf Angebotspreise (örtlich gemessen)".
 
 **Zweites Beispiel ETW (Karte Mieterhöhung und Zielbild):** Hermannstr. 9, Hüllhorst, mit Soll und Zielbild → Ertragswert Bestand / Mieterhöhung / Zielbild 262 / 313 / 355 T€ (gemessen v2460, Stufe 3 vorhanden).
 
 **Stufe N (Kupferpille):** Wo der Ausschuss keinen Zins führt (fast nur Baden-Württemberg), steht „abgeleitet, nicht amtlich — genauer: Satz des Ausschusses eintragen" mit Link.
 
-Belegt: BRW Videoreihe.md Modul 24 (v2300er-Stand); Grundstück/Bodenwert/14,6 % demo-geschichten 4; LZS 2,5 % A Journal v2431/v2432 und v2401 (Testobjekt W); Sachwertfaktor Bielefeld Videoreihe.md Modul 16 „fachlich offen"; 3 Punkte / RND 25,7 J. demo-geschichten Korrektur zu Geschichte 4 und D (Befüllung 20.10., 6 WE); Bericht 326 Messung nach der Befüllung 20.10.2026 (ersetzt Bericht 308 mit 4 WE und Bericht 325 ohne Stellplätze); Abschlag 15,9 % Journal v2490; Hüllhorst Journal v2460–v2466a; Stufe N Journal v2400–v2403. Die Punkte aus den acht Feldern sind nach der Befüllung nicht neu gemessen — live zeigen.
+Belegt: BRW Videoreihe.md Modul 24 (v2300er-Stand); Grundstück/Bodenwert/14,6 % demo-geschichten 4; LZS 2,5 % A Journal v2431/v2432 und v2401 (Testobjekt W); Sachwertfaktor Bielefeld Videoreihe.md Modul 16 „fachlich offen"; 3 Punkte / RND 25,7 J. demo-geschichten Korrektur zu Geschichte 4 und D (Befüllung 20.10., 6 WE); Bericht 327 Messung nach der Befüllung 20.10.2026 (ersetzt Bericht 308 mit 4 WE und Bericht 325 ohne Stellplätze); Abschlag 15,9 % Journal v2490; Hüllhorst Journal v2460–v2466a; Stufe N Journal v2400–v2403. Die Punkte aus den acht Feldern sind nach der Befüllung nicht neu gemessen — live zeigen.
 
 ## 4 · Was man daraus liest — Fragen am Stand
 

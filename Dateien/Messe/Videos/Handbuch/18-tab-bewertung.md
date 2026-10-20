@@ -44,35 +44,35 @@ und LTV (soll sinken). Waterfall — Gewinn aus Tilgung, Cashflow, Steuer, Werts
 |---|---|
 | Kaufpreis | 545.000 € |
 | Wohnungen | im MFH-Konfigurator: 6 WE, Soll von DealPilot gerechnet, Zielbild 9,50 €/m² fertig 2030 |
-| Marktbericht | Stufe 3 liegt vor (Bericht 326 vom 20.10.2026, Liegenschaftszins 2,5 % Stufe A, RND 25,7 J.) |
+| Marktbericht | Stufe 3 liegt vor (Bericht 327 vom 20.10.2026, Liegenschaftszins 2,5 % Stufe A, RND 25,7 J.) |
 | Abruf „Marktpreise" | Nr. 6 vom 20.10.2026 |
 
 1. **Reiter Bewertung öffnen.** Score-Dial 78 · Gut (DealPilot Score), Investor Deal Score 74 · Gut.
 2. **Kennzahlen lesen.** Bruttomietrendite 7,23 %, DSCR 1,67, Beleihung 83,3 % (Objektliste 20.10.2026); Nettomietrendite am 16.10. 5,36 % — nach der Befüllung (Nebenkosten neu) live zeigen.
 3. **Karte Wertpotenzial.** Die Wertüberleitung läuft Bestand → Mieterhöhung → Zielbild, jede Stufe in Markenfarbe (Bestand Obsidian, Mieterhöhung helles Gold,
    Zielbild dunkles Gold, Maßnahmenkosten gedämpftes Rot; Grün und Rot nur fürs Ergebnis).
-4. **Kennzahlen je Stufe** (Abruf 6 vom 20.10.2026, nach der Befüllung):
+4. **Kennzahlen je Stufe** (Abruf 7 vom 20.10.2026, nach der Befüllung):
 
 | | Bestand | Mieterhöhung | Zielbild |
 |---|---:|---:|---:|
-| Ertragswert | 745.000 € | 815.000 € | 915.000 € |
+| Ertragswert | 740.000 € | 810.000 € | 910.000 € |
 | Marktpreisindikation (Angebotspreise) | 820.000 € | 820.000 € | 895.000 € |
 | Rohertragsfaktor × Miete | Zahl live zeigen | Zahl live zeigen | Zahl live zeigen |
 
    Maßnahmenkosten bis zum Zielbild 62.000 €, Modernisierungspunkte 3 → 5,7.
 
 5. **Aufteilung:** je Wohnung als Eigentumswohnung mit dem Zins für **vermietete** ETW (Bielefeld 2,9 %, Gutachterausschuss Stadt Bielefeld).
-   Je Wohnung Ertragswert und Marktpreisindikation, z. B. WE 1: 126.000 € / 180.000 € (Abruf 6). Ob nach den Kosten je Wohnung Potenzial bleibt,
+   Je Wohnung Ertragswert und Marktpreisindikation, z. B. WE 1: 126.000 € / 180.000 € (Abruf 7). Ob nach den Kosten je Wohnung Potenzial bleibt,
    live zeigen — die Begründung steht dabei (ETW-Zins 2,9 % gegen 2,5 % fürs Mehrfamilienhaus, höhere Verwaltungskosten je Einheit).
 
 **Achtung, zwei Zahlenstände:** Am 20.10. vormittags (v2460) zeigte der Tab an Westerfeld **780.000 / 865.000 / 1.105.000 €** und
 „Potenzial netto +257.000 € nach 68.000 € Maßnahmen" — gemessen mit einem Zielbild, das nur im Prüf-Tab gesetzt war.
 Mit **v2541** wurde nachgerechnet und vier echte Fehler behoben (unter anderem rechnete der Bestand die Restnutzungsdauer linear, das Zielbild nach Anlage 2 —
-das erzeugte ein scheinbares Potenzial). Der Zwischenstand 740.000 / 755.000 / 755.000 € (v2543, 4 WE, ohne Zielmiete) ist ebenfalls überholt. **Es gilt Abruf 6 nach der Befüllung:
-745.000 / 815.000 / 915.000 €** (6 WE, Zielmiete 9,50 €/m², fertig 2030).
+das erzeugte ein scheinbares Potenzial). Der Zwischenstand 740.000 / 755.000 / 755.000 € (v2543, 4 WE, ohne Zielmiete) ist ebenfalls überholt. **Es gilt Abruf 7 nach der Befüllung:
+740.000 / 810.000 / 910.000 €** (6 WE, Zielmiete 9,50 €/m², fertig 2030).
 
 Belegt: Scores, DSCR, Beleihung — Objektliste Staging 20.10.2026 (`dealpilot_score` 78, `ds2_score_persist` 74, `dscr` 1,669, `ltv` 83,3); Bruttomietrendite
-`bmy` 7,233; Nettomietrendite — Videoreihe.md Modul 19 (16.10.); Stufenwerte — Geschichte 8 Schritt 4 (Abruf 6), alter Stand Journal v2541–v2543d; Liegenschaftszins 2,5 % A — Geschichte 8 Schritt 6; Zins ETW 2,9 % und Begründung — Journal v2431/v2432; alter Stand — Journal v2460–v2466a.
+`bmy` 7,233; Nettomietrendite — Videoreihe.md Modul 19 (16.10.); Stufenwerte — Geschichte 8 Schritt 4 (Abruf 7), alter Stand Journal v2541–v2543d; Liegenschaftszins 2,5 % A — Geschichte 8 Schritt 6; Zins ETW 2,9 % und Begründung — Journal v2431/v2432; alter Stand — Journal v2460–v2466a.
 
 ## 4 · Was man daraus liest — Fragen am Stand
 

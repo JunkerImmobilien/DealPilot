@@ -49,7 +49,7 @@ Was die Bankfassung zeigt (Aufnahme Modul 19 vom 16.10.2026, nachgezogen nach de
 | 2 | Bruttomietrendite **7,23 %**, DSCR **1,67**, Beleihung **83,3 %**, Cashflow nach Steuern **8.119 €/Jahr**; Nettomietrendite und Cashflow je Monat: Zahl live zeigen |
 | Phasen | Zahl live zeigen (am 16.10. 6.234 / 7.061 / 7.724 €, vor der Befüllung) |
 | Exit | 2,0 % Wertsteigerung, Equity Multiple 5,3 |
-| Mieterliste | 6 Wohnungen und Garagen; „Restnutzungsdauer des Gebäudes (Anlage 2, indikativ)" — Zahl live zeigen (Bericht 326: 25,7 J.) |
+| Mieterliste | 6 Wohnungen und Garagen; „Restnutzungsdauer des Gebäudes (Anlage 2, indikativ)" — Zahl live zeigen (Bericht 327: 25,7 J.) |
 | Warmmiete | Zahl live zeigen (rechnerisch 50.052 € im Jahr) — seit v2484 in Bankfassung, Investment-PDF und App dieselbe Zahl |
 | Wertpotenzial | Wertüberleitung Bestand → Mieterhöhung → Zielbild; Tabelle, Kaufpreis und Fußnote bleiben zusammen |
 

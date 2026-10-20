@@ -27,14 +27,14 @@ Die Deal-Aktion ist das Gate vor dem Abflug. Hier entscheidest du, was aus dem O
 | 1 | Reiter Deal-Aktion öffnen | — | Westerfeld trägt einen Ankauf-Stand (gekauft 01.01.2025), steht also auf „Gewonnen"; ein Ankaufobjekt wie Lindenhof 14 steht auf „Offen" |
 | 2 | Block „Bereit für die Bank?" | Stufe im Reiter Objekt: 3 | Zählt Score-Felder und Stufe-3-Pflichtfelder; fehlende Felder als Liste mit Sprung. Zahl live zeigen |
 | 3 | PDFs herunterladen → Investment-PDF | Fassung „Bankfassung" | Rückfrage mit drei Fassungen, danach das PDF (Inhalt → Handbuch 20) |
-| 4 | Marktberichte | — | Liste der Berichte zum Objekt; für Westerfeld liegen Stufe-3-Berichte vor (aktuell Bericht 326 vom 20.10., 6 WE) |
+| 4 | Marktberichte | — | Liste der Berichte zum Objekt; für Westerfeld liegen Stufe-3-Berichte vor (aktuell Bericht 327 vom 20.10., 6 WE) |
 | 5 | Bordkarte & Unterlagen | Häkchen setzen | Checkliste fürs Bankgespräch, je Zeile abhakbar |
 | 6 | Unterlagen beim Amt anfordern | — | Fenster mit den sechs Unterlagen und dem zuständigen Amt (Handbuch 25) — **nichts wird verschickt** |
 | 7 | Dein Netzwerk | — | Partnerkarten; im Video nur bis vor das Absenden |
 
 Warum zwei Listen in „Bereit für die Bank?": der Score braucht andere Angaben (Zins, Tilgung, Lage …) als die Wertermittlung (Grundstück, Bodenrichtwert, BGF …). Erst beides zusammen macht die Mappe vollständig (Kommentar v2079 in `deal-action-readycheck.js`).
 
-**Belegt:** Aufbau und Beschriftungen aus `deal-action-boarding.js` Z. 130–180 und `help.js` („Deal-Aktion — Status, PDFs und Bank", „Alte Berichte wiederfinden"); Pflichtfeld-Staffel 6/13/20 aus `deal-action-readycheck.js` Z. 150–155; Bericht 326 (20.10.2026, nach der Befüllung, 6 WE). Alle übrigen Zahlen live zeigen.
+**Belegt:** Aufbau und Beschriftungen aus `deal-action-boarding.js` Z. 130–180 und `help.js` („Deal-Aktion — Status, PDFs und Bank", „Alte Berichte wiederfinden"); Pflichtfeld-Staffel 6/13/20 aus `deal-action-readycheck.js` Z. 150–155; Bericht 327 (20.10.2026, nach der Befüllung, 6 WE). Alle übrigen Zahlen live zeigen.
 
 ## 4 · Was man daraus liest — Fragen am Stand
 

@@ -31,7 +31,7 @@ Rechenkernen wie der Rest der App, der Pilot ordnet sie ein. Die Analyse ist im 
 | Kaufpreis | 545.000 € |
 | Objektart | Mehrfamilienhaus, 6 Wohneinheiten (laut Gutachten, eingetragen 20.10.), Baujahr ca. 1967 |
 | Gekauft | 01.01.2025 (Ankauf-Stand liegt vor) |
-| Marktbericht | Stufe 3 Bericht 326 vom 20.10.2026, Abruf „Marktpreise" Nr. 6 vom 20.10.2026 (6 WE) |
+| Marktbericht | Stufe 3 Bericht 327 vom 20.10.2026, Abruf „Marktpreise" Nr. 7 vom 20.10.2026 (6 WE) |
 
 1. **Pilot-Analyse starten.** Die Analyse liest Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, den Marktwert und den Ankauf-Stand.
 2. **Briefing:** Gesamturteil und Empfehlung (Kaufen / Prüfen / Nicht kaufen) — Text live zeigen.
@@ -39,12 +39,12 @@ Rechenkernen wie der Rest der App, der Pilot ordnet sie ein. Die Analyse ist im 
    gegenüber 545.000 € Kaufpreis. Die Offerte begründet der Pilot aus Zielrendite, Cashflow-Grenze und Marktwert.
 4. **Bank:** Argumente für das Bankgespräch (DSCR, Beleihung, Wertpuffer).
 5. **Steuer:** AfA mit Gutachten (6,25 %), Steuerverlauf, Hinweis auf die 15-%-Grenze bis Ende 2027.
-6. **Ankauf · Bestand · Zielbild:** Spalten mit Jahr je Stufe. Abruf 6 vom 20.10.2026 nach der Befüllung (6 WE, Zielmiete
+6. **Ankauf · Bestand · Zielbild:** Spalten mit Jahr je Stufe. Abruf 7 vom 20.10.2026 nach der Befüllung (6 WE, Zielmiete
    9,50 €/m², Zielbild fertig 2030):
 
 | | Bestand | Mieterhöhung | Zielbild 2030 |
 |---|---:|---:|---:|
-| Ertragswert | 745.000 € | 815.000 € | 915.000 € |
+| Ertragswert | 740.000 € | 810.000 € | 910.000 € |
 | Marktpreisindikation | 820.000 € | 820.000 € | 895.000 € |
 | Rohertragsfaktor × Miete | Zahl live zeigen | Zahl live zeigen | Zahl live zeigen |
 
@@ -53,7 +53,7 @@ Rechenkernen wie der Rest der App, der Pilot ordnet sie ein. Die Analyse ist im 
 7. **Co-Pilot-Pille „Welche Felder fehlen?"** — Antwort sofort aus der App, ohne KI.
 
 Belegt: Offerte 530.000 € — Videoreihe.md (Modul 11, Mitschnitt vom 15.10.2026, 4 WE — mit 6 WE neu anfragen, Zahl live zeigen); Stufenwerte —
-demo-geschichten.md Geschichte 8 Schritt 4 (Abruf 6 vom 20.10.2026, 6 WE; ersetzt 740/755/755 und 805/805/880 T€ mit 4 WE);
+demo-geschichten.md Geschichte 8 Schritt 4 (Abruf 7 vom 20.10.2026, 6 WE; ersetzt 740/755/755 und 805/805/880 T€ mit 4 WE);
 AfA 6,25 % — demo-geschichten.md Geschichte 4; Reiternamen — `frontend/js/ui.js` (`dp-pa-rail`). Urteil, Texte: live zeigen.
 
 ## 4 · Was man daraus liest — Fragen am Stand
