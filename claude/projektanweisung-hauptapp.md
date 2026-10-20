@@ -41343,3 +41343,49 @@ Pakete v2148–v2156.
 - „Kaufkraftindex" ist das verfügbare Einkommen je EW gegen den Bundeswert (Kreis) — so erläutert, keine GfK-Kaufkraft.
 - PDF-Zeile „Entwicklungsmöglichkeiten" zeigt `assessment.entwicklung` — das ist die Preisentwicklung (steigend/stabil), nicht die Entwicklungsmöglichkeiten des Formulars. Nicht angefasst, Bezeichnung an Marcel.
 - Live-Rückfall der Makrolage (Kreis nicht in der Tabelle) unverändert — nur Kreisebene.
+
+### v2540–v2540d · Bandprüfung je Wohnung, ETW nach § 28, Zensus-Sprung im Bevölkerungstrend, Punkte-Quelle beim MFH, Bank-PDF-Fußnote mit Tabelle (20.10.2026, Staging)
+
+**Was.** Marcels Antworten vom 20.10.2026 auf die offenen Punkte: „1. so wie es sein muss musst du recherchieren 2. ja 3. so dass es richtig ist nach ImmoWertV und den Quellen 4. konfigurierbar machen 5. welcher Vorschlag? 6. so dass es richtig ist 7. so lassen 8. ja bitte — dann alles im Browser prüfen".
+
+**Recherche** (ImmoWertA-Hessen 21.02.2024 = Muster-ImmoWertA, FK Städtebau 20.09.2023; Destatis/WISTA 6/2025):
+- ImmoWertA 31.4: bei vorübergehendem Leerstand die marktüblich erzielbaren Erträge — v2520 war richtig. Mietausfall bis Wiedervermietung/Herrichtung stehen NICHT in ImmoWertV/ImmoWertA (Fachpraxis unter § 8 Abs. 3) → benannt, ohne Angabe nicht angesetzt.
+- ImmoWertA 31.2 a/b: Marktüblichkeit je Mietverhältnis (Erhöhungsmöglichkeiten gibt es nur je Vertrag); Saldierung über das Haus deckt der Text nicht.
+- § 28: vEW = (RE − BW × LZ) × KF + BW; „Ertragswert = Bodenwert" ist die Liquidationsannahme des § 43 — bei Wohnungseigentum unmöglich.
+- Bevölkerung: 12411 bis 2021 auf Basis Zensus 2011, ab 2022 Zensus 2022 (Bruch 2021/2022). Amtliche Rückrechnung 2012–2021 nur für Kreise (Statistikportal, Stand 23.09.2025), nicht für Gemeinden.
+
+**Gebaut:**
+- **v2540 · Bandprüfung je Wohnung** (`DealPilotObjectMapper.einheitenMieteAus` → `ref.einheiten_miete`, durch den Orchestrator gereicht; `CrossCheckService` je Wohnung `mieteNachBand` auf ihre eigene Fläche, Flächen auf die Objekt-Wohnfläche umgelegt, leer = Vergleichsmiete). `miete_aufteilung.herkunft_vermietet = 'je_wohnung'` mit `einheiten`; Rechenweg-Zeile „Ist-Miete je Wohnung im Band; WE 1 6,65 statt 6,15 €/m² (untere Bandkante) · …"; `miete_band.je_wohnung` für den PDF-Absatz. Ohne Einheitenliste oder ohne Band wie bisher.
+- **v2540 · ETW** (`ErtragswertService`): negativer Gebäudereinertrag bei Wohnung → Formel des § 28 weiter (Hinweis § 43); Haus behält den Kurzweg, jetzt gerundet + `wert_ungerundet`.
+- **v2540/a · Bevölkerungstrend** (`lib/bevoelkerung_trend.js`, beide Wege in `stubConnectors.js`): geometrisches Mittel der Jahresschritte, Schritt 2021→2022 ausgelassen; von/bis = die wirklich gerechneten Jahre; Gemeinde vor Kreis nur mit ≥ 6 Jahresschritten (sonst der längere Kreis). Erläuterung und Quellenvermerk nennen das Auslassen (Methode DealPilot, nicht amtlich).
+- **v2540/b · Punkte-Quelle beim MFH**: verstecktes Feld `mod_quelle` (gespeichert über `WM_FIELDS`), `DpMfhEinheiten.modQuelle()/hatEinheiten()`; `hausPunkte()` gibt bei „felder" null (dann gilt `mod_punkte`), Mieterliste rechnet mit denselben Punkten, „Übernehmen" überschreibt nicht. Umschalter in der Zeile Modernisierungspunkte (Reiter Objekt, Stufe 3), Klasse `.oe-chip.gewaehlt` (Gold über `--wl-c9a84c`, Haken) — zuerst trug die nicht gewählte Option die Fehlerklasse `fehlt` (rot, „+"), im Browser gesehen und in v2540b ersetzt.
+- **v2540 · Bank-PDF**: Kennzahlentabelle, Kaufpreis und Fußnote bleiben zusammen (Höhe vorab gerechnet, sonst geschlossen auf die nächste Seite).
+- **v2540c/d · Marktbericht-PDF** (im Browser gefunden): Miet-Absatz nannte den Hausdurchschnitt („7,51 €/m² liegt im Band") → nennt die angepassten Wohnungen; Rechenweg-Unterzeilen liefen ungebrochen über den Rand (Ertragswert) bzw. wurden bei 120 Zeichen abgeschnitten (Sachwert), U+2212 aus `nhk2010.js` kam ins PDF → Umbruch (max. 4 Zeilen), ASCII-Minus; „Im Marktwert berücksichtigt: … Mehrflächen-Bodenwert" war 265 mm breit → umgebrochen.
+- **Punkt 5:** Einen ausformulierten Vorschlag gab es nicht. Die Einstellung existiert (Standardwerte → Marktbewertung → Angebotsabschlag, Set „Vorsichtig" 9 %) — an Marcel erklärt.
+
+**Commit:** `56db3ddc` (v2540), `a4365dfa` (v2540a), `d37fbc2e` (v2540b), `c8a8dafb` (v2540c), `be07e6d1` (v2540d). Buster: mfh-einheiten, storage, pdf-investment-bank v2540; objekt-reiter, style.css v2540b; marktbericht-app/app.js v2540d.
+
+**Nachweis — Funktionslauf im mb-Container** (alt `/app/src` gegen neu, `nurWertBasis`, danach im neu gebauten Container gleich):
+
+| Fall | vorher EW / Rohertrag | nachher EW / Rohertrag | Angleichung Potenzial |
+|---|---|---|---|
+| Demo-MFH (WE 5 leer) | 610.000 / 34.929 | 610.000 / 35.301 (WE 1 6,18 → 6,64) | 1 / leer 1 (vorher leer 0,953) |
+| Demo voll vermietet | 580.000 / 32.841 | 585.000 / 33.196 | 1 (vorher 0,989) |
+| Ist über Band (15 €) | 875.000 | 875.000 („6 Wohnungen 12,34 statt 15") | 1 |
+| Demo 2 leer | 635.000 | 640.000 | 1 |
+| Westerfeld / Hüllhorst / ETW / ETW leer | 725.000 / 410.000 / 49.500 / 79.000 | unverändert | — |
+
+Potenzial Demo: Bestand/MH/ZB 610.000/625.000/805.000 → 610.000/630.000/805.000. ETW mit negativem Gebäudereinertrag (Bodenwertanteil 69.558 €, Rohertrag 2.563 €): vorher 69.558 € = Bodenwert, ungerundet; nachher **51.000 €** (51.227) nach § 28; Haus 69.500 €. Bevölkerung: Minden-Lübbecke 0,298 → **0,028 %/J** (Kreis; Gemeindereihe Hüllhorst in `mb.makro_werte` nur 2014, 2023–2025), Bielefeld 0,045 → **0,128 %/J**.
+
+**Nachweis — Browser** (Staging, eigener Tab, Schreibzugriffe auf /objects und `dpTabSwitchSave` gesperrt; Westerfeld `updated_at` vorher = nachher 11:46:06):
+- Reiter Objekt (Stufe 3): Umschalter echt geklickt in beide Richtungen — Einheiten 3 Punkte / RND 26 J., acht Felder 2 Punkte / RND 24 J.; `DealPilotMB.inputs().mod_punkte` folgt; `collectData()` trägt `mod_quelle`.
+- Bank-PDF Westerfeld (jsPDF protokolliert, pdf.js gerendert und angesehen): Tabelle/Kaufpreis/Fußnote auf einer Seite; mit 2×/3×/4×/6× Wohnungsliste erzwungen: Block geschlossen auf der Folgeseite bzw. passt — in keinem Fall getrennt. (Erste Deutung „6× läuft über" war ein Filterfehler meinerseits: Seite 8 bei y 28,5 ist der leere Kopf — zurückgenommen.)
+- Marktbericht 324 (Stufe 3, Westerfeld-Daten mit WE 1 = 600 € und WE 4 leer, `external_ref` null): Web-Rechenweg „Ist-Miete je Wohnung im Band; WE 1 6,65 statt 6,15 €/m² …", EW 730.000 €; Makrolage „Bevölkerungsentwicklung · Bielefeld, Stadt, 2014–2025 +0,13 % p. a.", Quellennachweis mit dem Zensus-Satz; PDF 10 Seiten, 0 Zeilen außerhalb des Blatts, 0 × U+2212, Erläuterung S. 8, Miet-Absatz je Wohnung (mit `je_wohnung` im Speicher, s. Rest).
+- Tab Bewertung: Karte Wertpotenzial mit „Miete im Ertragswert", „davon Anhebung", Hinweis zum Band je Wohnung (Abnahmepunkt aus v2488 erledigt).
+- Prüfläufe: `objekt-mapper-pruefen`, `prompt-lecks-pruefen`, `rnd-kerne-pruefen`, `score-ketten-pruefen` (216), `buster-ebenen-pruefen` RC 0; Gold-Audit Staging RC 0; `node --check` je Datei.
+
+**Rest:**
+- **Kontingent „wev" auf Staging ist aufgebraucht** — Bericht 324 war der letzte. Deshalb ist der PDF-Miet-Absatz je Wohnung nur mit gesetztem `je_wohnung` im Speicher gedruckt (Werte wie vom Dienst gerechnet), nicht an einem neu erzeugten Bericht. Bericht 324 steht ohne Objekt in Marcels Staging-Liste.
+- Amtliche Kreis-Rückrechnung 2012–2021 (Statistikportal) wäre genauer als das Auslassen des Sprungs — braucht einen Import in `mb.makro_werte` (Datenbank-Eingriff, Freigabe Marcel).
+- Gemeindereihen in `mb.makro_werte` haben Lücken (Hüllhorst 2015–2022 fehlen) — Import-Frage des Lage-Strangs.
+- Messe-Modul 26: Zahlen ändern sich durch v2540 (Mieterhöhung 625 → 630 T€), Mitschnitt `zielbild26` und Aufnahme stehen an.
