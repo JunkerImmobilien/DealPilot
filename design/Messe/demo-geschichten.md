@@ -234,7 +234,7 @@ je Wohnung). **Einzige Ausnahme: Parkstr. WE 1** (Staffelmiete, Kaution, Beginn,
 **Marktbericht-DB:** Berichte gibt es zu allen zehn Objekten, **Stufe 3** nur zu Westerfeld (217–220, 308), Parkstr. (172, 174, 205)
 und Bismarckstr. (158). Einen **Abruf „Marktpreise"** (`mb.potenzial_abrufe`) hat nur **Westerfeld** (Nr. 3, 20.10.).
 Das Staging-Kontingent für neue Stufe-3-Berichte ist laut Journal (v2540) **aufgebraucht**.
-*(Stand nach der Befüllung, siehe Abschnitt D: Kontingent aufgefüllt, Westerfeld hat Bericht **325** (Stufe 3, 6 WE) und Abruf **6**.)*
+*(Stand nach der Befüllung, siehe Abschnitt D: Kontingent aufgefüllt, Westerfeld hat Bericht **326** (Stufe 3, 6 WE, mit Garagen) und Abruf **6**.)*
 
 ### A.1 · Lücken je Objekt (Feldnamen)
 
@@ -289,7 +289,7 @@ der Rechenkern gibt dort bewusst keine RND, und der Ertragswert (332.000 €) li
 Geschichte, aber nicht „das Beispiel, an dem alles funktioniert". Gohliser (12 WE) hat dieselbe Altbau-Sperre und keinen Stufe-3-Bericht.
 
 **Umbau auf 6 WE erledigt (20.10.2026, Abschnitt D):** Bericht 308 und Abruf 3 gelten für 4 WE und sind überholt; für 6 WE gelten
-**Bericht 325** (Stufe 3) und **Abruf 6** („Marktpreise"). Die Mitschnitte zeigen noch 4 WE. **Teutoburger Str. 60 bleibt das Video-Objekt** und wird nicht angeglichen.
+**Bericht 326** (Stufe 3) und **Abruf 6** („Marktpreise"). Die Mitschnitte zeigen noch 4 WE. **Teutoburger Str. 60 bleibt das Video-Objekt** und wird nicht angeglichen.
 
 ### B.1 · Eintragsliste Westerfeldstr. 140 (Demo-Annahmen gekennzeichnet)
 
@@ -482,7 +482,7 @@ neu: Castrop-Rauxel 300 km, Ibbenbüren 180 km, Kabelsketal 800 km je Fahrt (Dem
   beim Zeigen die richtige Zahl nennen. Neu und heikel: Stufe-3-Bericht (14.10.) Ertragswert **332.000 €** (RND 10 J., LZS 2,9 % Stufe A),
   Sachwert 295.000 €, Marktpreisindikation 487.000 € (416.000–570.000) bei 780.000 € Kaufpreis; Beleihung auf den Marktwert **131 %**.
 - **4 · Westerfeld:** AfA jetzt **5.609 €/Jahr** (war 5.371), Steuer 2026 **2.104 €** Nachzahlung (Stand 20.10. nach Befüllung). Seit 20.10.
-  kommen die Modernisierungspunkte aus den 6 Wohnungen (**3 Punkte**, flächengewichtet 3,4; Gutachten 2,2); Bericht 325: RND **25,7 J.**,
+  kommen die Modernisierungspunkte aus den 6 Wohnungen (**3 Punkte**, flächengewichtet 3,4; Gutachten 2,2); Bericht 326: RND **25,7 J.**,
   LZS 2,5 % (Stufe A). Bericht 308 (23,6 J., 2 Punkte, 4 WE) ist überholt.
 - **5–7:** unverändert gültig; die Werbungskosten aus Geschichte 7 sind die Grundlage der Vorschläge in B und C.
 
@@ -510,8 +510,8 @@ Aufteilung in ETW, Bank- und Investment-PDF, Marktbericht Stufe 3, Quick Boardin
    Maßnahmenkosten bis zum Zielbild 62.000 €, Modernisierungspunkte 3 → 5,7.
 5. **Aufteilung in ETW:** je Wohnung Ertragswert und Marktpreisindikation als Eigentumswohnung (WE 1: 126.000 € / 180.000 €).
    „2.164 €/m² als Haus, 2.604 €/m² als Wohnung — der Abstand ist der Aufteilungsgewinn, abzüglich der Kosten je Wohnung."
-6. **Bank-PDF und Investment-PDF** ziehen — Mieterliste, Haus-RND, Wertüberleitung; dazu **Bericht 325** (Stufe 3, 20.10., 6 WE):
-   Ertragswert **725.000 €**, Sachwert **560.519 €**, Bodenwert 313.623 €, Liegenschaftszins 2,5 % Stufe A, RND 25,7 J. (3 Punkte).
+6. **Bank-PDF und Investment-PDF** ziehen — Mieterliste, Haus-RND, Wertüberleitung; dazu **Bericht 326** (Stufe 3, 20.10., 6 WE mit Garagen):
+   Ertragswert **745.000 €**, Marktpreisindikation **820.000 €**, Sachwert **560.519 €**, Bodenwert 313.623 €, Liegenschaftszins 2,5 % Stufe A, RND 25,7 J. (3 Punkte).
 
 **Die Zahl, die hängen bleibt:** **820.000 €** Marktpreisindikation für ein Haus, das für **545.000 €** gekauft wurde (Abruf 6, 20.10., 6 WE).
 
@@ -534,7 +534,7 @@ Aufteilung in ETW, Bank- und Investment-PDF, Marktbericht Stufe 3, Quick Boardin
 
 1. **MFH-Konfigurator:** EG-Ladenlokal 240 m², **2.640 € von 5.242 €** Monatsmiete = **50 %**; WE 5 leer (Komplettrenovierung 28.000 €).
 2. **Marktbericht:** Spanne „sehr weit" — 745.000 bis 1.370.000 €. „Je gemischter das Haus, desto ehrlicher die Spanne."
-3. **Kennzahlen:** Score 66, DSCR 1,17 — trägt sich, aber knapp. Cashflow n. St. seit 20.10. **6.633 €** (war 5.155; Werbungskosten 2027/2028 eingetragen).
+3. **Kennzahlen:** Score 62 (nach der Befüllung, 20.10.), DSCR 1,17 — trägt sich, aber knapp. Cashflow n. St. seit 20.10. **6.633 €** (war 5.155; Werbungskosten 2027/2028 eingetragen).
 4. **Pilot-Analyse:** nach dem Gewerberisiko fragen (Antwort live).
 
 **Die Zahl:** **50 %** der Miete hängen an einem Vertrag.
@@ -645,7 +645,7 @@ so ergeben sich 3 Punkte (3,4 gewichtet) statt 4, Gutachten 2,2. Objekt: `mod_qu
 `garagen` 1 → 4, `stellplatz_miete_monat` 30 (Demo, = `ze` 90 / 3 vermietete Garagen), `umlagef` 976 (Summe NK), `hg_ul` **11.376**
 (nicht 11.700: die App koppelt `umlagef` = (`hg_ul` + Grundsteuer 336) / 12), Mietentwicklung jetzt „aus Wohnungen", Zimmer 16.
 Werbungskosten 2027 2.321 · 2028 18.549 · 2029 18.429 · 2030 18.549 (Bad/Böden WE 1, 3, 4 nach Ende der Drei-Jahres-Frist).
-**Bericht 325** (Stufe 3) wurde vor dem Nachtrag von Garagen/Stellplatzmiete erzeugt: er rechnet ohne Stellplätze (Regel v2541).
+**Bericht 325** (Stufe 3) wurde vor dem Nachtrag von Garagen/Stellplatzmiete erzeugt und rechnet ohne Stellplätze (Regel v2541) – **ersetzt durch Bericht 326** (745.000 €, mit Stellplätzen).
 
 **Übrige Objekte:** Kürzel siehe A.2; Werbungskosten wie in C (Summen ohne `sonst_bewegl_wg`): Gohliser 2024 361 (statt 2.915), 2027/2028 2.915,
 2030/2031 40.915 · Ravensberger 2020 2.147, 2021 2.321, 2022 2.441, 2023 2.321, 2027 2.321 · Bismarck 2023 1.568, 2025 5.922, 2026 15.681
