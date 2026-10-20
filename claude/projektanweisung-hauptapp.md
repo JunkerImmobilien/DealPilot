@@ -39017,6 +39017,36 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - Pilot-Antwort zu „Stufe 2“ und „Stufe C“.
 - Essen EFH Sachwertfaktor 1,33 im echten Bericht.
 
+### v2470–v2472 · Unterlagen beim Amt im Telegram-Bot (Telegram-Teil aus unterlagen-app-v5) (20.10.2026, Staging)
+
+Marcel: *„ja das wäre top"* — der in v2440–v2445 offen gelassene Telegram-Teil.
+
+**Was:**
+- **Ablauf im Bot:** `/unterlagen`, „Unterlagen für Objekt 3 anfordern", „hol die Flurkarte für die Parkstraße" →
+  1. Objekt: Bezug auf die letzte Liste („Objekt 3", „/unterlagen 3"), Adresse (`objektRaten`), „dafür" = letztes Objekt — sonst nummerierte Liste.
+  2. Übersicht je Unterlage (Reihenfolge `ARTEN`, 1–6): Amt, Kanal, Empfänger mit Belegstand, Portal-Link, Telefon, Gebühr, Ansprechpartner 1/2 mit Belegstand und Kopie, Vorgangsstand („Entwurf vom …", „schon angefragt am …").
+  3. Nummer → Anschreiben: Kopf (An, Kopie, Portal, Betreff als `<code>`), Brief als `<pre>` (ein Tipp kopiert ihn), Hinweis „DealPilot verschickt nichts". Eine Unterlage im Satz genannt und Amt bekannt → Entwurf sofort.
+  4. „verschickt" → Vorgang `gesendet`. „suche 2" / „suche alle" → `amtHolen` nur für fehlende. Andere Nachricht → Zustand verlassen, normal weiter. Frist 30 Min., `/abbrechen`.
+- **Ein Kern:** `unterlagenService.entwurfAnlegen()` und `anfrageStatus()` — das SQL lag in `routes/unterlagen.js`; Web-Route und Bot gehen jetzt denselben Weg (Eigentumsprüfung am Objekt im Dienst). Neu `services/telegramUnterlagenService.js` (nur Darstellung und Zustand, sendet selbst nichts, bekommt `sag()` vom Webhook).
+- **Webhook:** Einstieg vor dem Listenmuster, Zustand `unterlagen` in `telegram_dialog`, HTML mit Rückfall auf Klartext (`senden` schluckt Fehler — eine abgelehnte HTML-Nachricht wäre still weg), Links nur http(s), Verlauf bekommt nur eine Notiz (Geldsperre liest die letzte Botzeile), Foto beendet den Zustand. Hilfetext + `/unterlagen`.
+- **Geld:** gemessen — das Modal ruft `/unterlagen/amt` ohne Kontingent und ohne Feature-Schlüssel. Der Bot genauso: kein erfundener Schlüssel (wäre für jeden `false`), kein Co-Pilot-Kontingent (kein Modellaufruf, wie die Objektliste).
+- **v2471** `help.js`: ein Satz zum Bot, Buster `v2471`.
+- **Aus v5 übernommen:** Ablauf Objekt → Lage je Unterlage → Anschreiben, Lagebericht (fertig / ohne Adresse / schon angefragt), „hier komme ich allein nicht weiter", Rückmeldung nach dem Versand. **Weggelassen:** Versand (SMTP, „senden"-Knöpfe, Auto-Senden), Vollmacht-PDF in den Chat, Aufgaben, KI-`verstehe()`, Long Polling, Kopplung über `TELEGRAM_CHAT_ID`.
+
+**Commit:** `ca8ecb13` (v2470/v2471), `c2f2ebbe` (v2472 Prüfstrecke).
+
+**Nachweis:**
+- `tools/agent-pruefung/pruef-telegram-unterlagen.js` im Staging-Container: **57 Prüfungen, 0 fehlgeschlagen** — Erkennen (8 ja / 6 nein), Escape und Tag-Bilanz, Teilung < 4096; Ablauf an Gohliser Str. 42, Leipzig (6 Ämter): Liste → Übersicht → Entwurf (Betreff = `anschreiben()`, Vorgang mit Amt-Id) → „verschickt" → `gesendet`; Suche an einer Gemeinde ohne Ämter mit gestellter Recherche (6×); **echter Webhook-Handler** mit gestelltem `fetch`: nur `sendMessage`/`sendChatAction`, kein anderer Netzaufruf, Dialogzeile vorher gesichert und danach gleich, 2 Vorgänge gelöscht. Keine Telegram-Nachricht, keine Recherche, keine Anfrage an ein Amt.
+- Web-Route nach dem Umzug im Container: eigenes Objekt → Vorgang `entwurf`, fremdes Objekt → kein Vorgang, PUT `gesendet` mit Datum, unbekannter Status/Art 400, aufgeräumt. `pruef-unterlagen.js` 45/45.
+- Staging-Bot: kein Token in der Umgebung (`printenv` ohne TELEGRAM-Variable) — der Token liegt je Nutzer in den Zugangsdaten. `getWebhookInfo` (nur lesend): `@Dealpilot_junker_bot` zeigt auf `app.staging.dealpilot.immo`, 1 verknüpfter Chat. `auth/me` 401, `buster-ebenen` SAUBER, `node --check` je Datei.
+
+**Rest:**
+- Ob Prod denselben Bot-Token führt, ist nicht gemessen (Prod nicht angefasst). Telegram kennt je Token EINEN Webhook — läge derselbe Token auch auf Prod, bekäme der Prod-Bot zurzeit nichts. Marcel prüfen lassen (Einstellungen → Telegram-Bot auf Prod) oder einen eigenen Staging-Bot anlegen.
+- mailto als Knopf geht nicht (Inline-Knöpfe nur http(s)/tg://); die Adresse öffnet beim Antippen das Mailprogramm, Betreff und Brief per Tipp kopierbar. Im echten Chat nicht gesehen — Abnahmepunkt für Marcel.
+- Die Ämtersuche kostet im Web wie im Bot kein Kontingent, obwohl sie eine KI-Websuche ist — Produktentscheidung Marcel.
+- „Neu suchen" (erzwingen) und das Kopie-Häkchen gibt es nur im Modal.
+- Prod nicht freigegeben (Rebuild backend nötig).
+
 ### Prod-Rollout (55) · Zielbild v2430–v2432, Unterlagen v2440–v2445, Kappungsgrenzen, BW-Nachernte, LZS-Formel v2404 (19.10.2026)
 
 **Was:**
