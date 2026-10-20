@@ -156,7 +156,7 @@ var FIELDS = [
      Felder im Formular sichtbar und wuerden NICHT gespeichert: diese
      Liste ist die Einsammelstelle, und was hier fehlt, verschwindet
      beim Speichern lautlos. */
-  'mv_art','mv_beginn','mv_letzte_erhoehung',
+  'mv_art','mv_beginn','mv_letzte_erhoehung','mv_letzte_erhoehung_betrag',   /* v2545 */
   // V36: DealScore 2.0 Zusatzangaben
   'ds2_zustand','ds2_energie','ds2_mietausfall','ds2_marktmiete',
   'ds2_bevoelkerung','ds2_nachfrage','ds2_marktfaktor',

@@ -238,23 +238,40 @@
     r.ab = ab;
     r.ab_text = ab ? (ab <= heuteYm() ? 'sofort' : monatText(ab)) : (letzte ? '' : 'sofort (letzte Erhöhung nicht eingetragen)');
     r.ab_herkunft = /^\d{4}-\d{2}/.test(e.soll_ab || '') ? 'eigene Angabe' : (frist ? '15 Monate nach der letzten Erhöhung (§ 558 Abs. 1 BGB)' : null);
+    /* v2545 · DREI-JAHRES-ANRECHNUNG (§ 558 Abs. 3 BGB) — Marcel 20.10.2026.
+       Die Kappungsgrenze gilt auf die Miete DREI JAHRE VOR dem Wirksamwerden
+       der neuen Erhoehung, nicht auf die heutige. Lag die letzte Erhoehung in
+       diesem Fenster, wird ihre Hoehe (`mv_letzte_erhoehung_betrag`, €/Monat;
+       bei mehreren die Summe, ohne § 559 und Betriebskosten) von der Ist-Miete
+       abgezogen. Ohne Hoehe bleibt die Rechnung beim Ist - mit Hinweis, denn
+       dann ist der Spielraum zu gross gerechnet. */
+    var basisK = ist;
+    var betragL = zahl(e.mv_letzte_erhoehung_betrag);
+    var imFenster = /^\d{4}-\d{2}/.test(letzte) && letzte.slice(0, 7) > plusMonate(ab || heuteYm(), -36);
+    if (imFenster && betragL > 0 && betragL < ist) {
+      basisK = ist - betragL; r.kapp_basis = basisK; r.kapp_angerechnet = betragL;
+    } else if (imFenster && !(betragL > 0)) {
+      r.hinweise.push('die letzte Erhöhung liegt in den drei Jahren der Kappungsgrenze — ihre Höhe eintragen, sonst ist der Spielraum zu groß gerechnet');
+    }
     var eigen = zahl(e.soll);
     if (eigen > 0) {
       r.miete = eigen; r.herkunft = 'eigene Angabe';
-      var kc = ctx.kapp && ctx.kapp.pct ? ist * (1 + ctx.kapp.pct / 100) + u.monat : null;
+      var kc = ctx.kapp && ctx.kapp.pct ? basisK * (1 + ctx.kapp.pct / 100) + u.monat : null;
       if (kc && eigen > kc + 0.5) r.hinweise.push('liegt über der Kappungsgrenze (' + ctx.kapp.pct + ' % in 3 Jahren)');
       return r;
     }
     var vgl = zahl(e.vgl_qm) || zahl(ctx.vgl_qm);
     var m558 = ist;
     if (vgl > 0 && wfl > 0) {
-      var ziel = vgl * wfl, kappe = ist * (1 + ((ctx.kapp && ctx.kapp.pct) || 20) / 100);
+      var ziel = vgl * wfl, kappe = basisK * (1 + ((ctx.kapp && ctx.kapp.pct) || 20) / 100);
       m558 = Math.max(ist, Math.min(ziel, kappe));
-      r.grenze = (kappe < ziel) ? 'Kappungsgrenze ' + ((ctx.kapp && ctx.kapp.pct) || 20) + ' %' : 'Vergleichsmiete';
+      r.grenze = (kappe < ziel) ? 'Kappungsgrenze ' + ((ctx.kapp && ctx.kapp.pct) || 20) + ' %' + (r.kapp_angerechnet ? ' (letzte Erhöhung angerechnet)' : '') : 'Vergleichsmiete';
       r.vgl_qm = vgl; r.vgl_herkunft = zahl(e.vgl_qm) ? 'eigene Angabe' : (ctx.vgl_herkunft || 'am Objekt');
     }
     if (m558 <= ist + 0.01 && !(u.monat > 0)) {
-      r.grund = vgl > 0 ? 'Die Miete liegt schon an der Vergleichsmiete.' : 'Keine Vergleichsmiete eingetragen.';
+      r.grund = !(vgl > 0) ? 'Keine Vergleichsmiete eingetragen.'
+        : (kappe <= ist + 0.01 && vgl * wfl > ist + 0.01) ? 'Die Kappungsgrenze ist durch die letzte Erhöhung ausgeschöpft.'
+        : 'Die Miete liegt schon an der Vergleichsmiete.';
       return r;
     }
     r.miete = Math.round((m558 + u.monat) * 100) / 100;
@@ -323,7 +340,7 @@
       var wflO = zahl(wert('wfl')), istO = zahl(wert('nkm'));
       var eO = { ist: istO, wfl: wflO, status: istO > 0 ? 'vermietet' : 'leer',
         soll: zahl(wert('zb_soll_qm')) > 0 && wflO > 0 ? zahl(wert('zb_soll_qm')) * wflO : 0,
-        soll_ab: wert('zb_soll_ab'), vgl_qm: 0, mv_letzte_erhoehung: wert('mv_letzte_erhoehung'),
+        soll_ab: wert('zb_soll_ab'), vgl_qm: 0, mv_letzte_erhoehung: wert('mv_letzte_erhoehung'), mv_letzte_erhoehung_betrag: wert('mv_letzte_erhoehung_betrag'),
         massnahmen: objektMassnahmen() };
       var sO = sollFuer(eO, ctx);
       var zQ = zahl(wert('zb_ziel_qm'));
@@ -1300,7 +1317,7 @@
     var s = w.soll || {};
     var vor = el('zb-soll-vorschlag');
     if (vor) vor.innerHTML = s.herkunft && s.herkunft !== 'eigene Angabe' && s.miete
-      ? 'DealPilot rechnet vor: <b>' + eur2(s.miete / (m.wfl || 1)) + '/m²</b> (' + esc(s.grenze || s.herkunft) + ')' + (s.ab_text ? ', erreichbar ' + esc(s.ab_text) : '') + '. Eigene Angabe überschreibt.'
+      ? 'DealPilot rechnet vor: <b>' + eur2(s.miete / (m.wfl || 1)) + '/m²</b> (' + esc(s.grenze || s.herkunft) + ')' + (s.ab_text ? ', erreichbar ' + esc(s.ab_text) : '') + '. Eigene Angabe überschreibt.' + (s.hinweise && s.hinweise.length ? ' Hinweis: ' + esc(s.hinweise.join(', ')) + '.' : '')
       : (s.grund && s.grund !== 'leer' ? esc(s.grund) : (s.hinweise && s.hinweise.length ? 'Hinweis: ' + esc(s.hinweise.join(', ')) : ''));
     host.innerHTML = !m.aktiv ? 'Ohne Angaben bleibt alles beim Bestand.'
       : 'Ist <b>' + eur(m.stufen.bestand.miete_m) + '</b>/Monat'
@@ -1309,7 +1326,7 @@
         + '<br>' + esc(m.kappung.text) + ' Die Ertragswerte stehen in der Pilot-Analyse (Reiter „Ankauf · Bestand · Zielbild") und in beiden PDFs.';
   }
   function bindeObjektFelder() {
-    ['zb_soll_qm', 'zb_ziel_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_wann', 'zb_fertig_jahr', 'kaufdat', 'nkm', 'wfl', 'ds2_marktmiete', 'me_soll', 'mv_letzte_erhoehung'].forEach(function (id) {
+    ['zb_soll_qm', 'zb_ziel_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_wann', 'zb_fertig_jahr', 'kaufdat', 'nkm', 'wfl', 'ds2_marktmiete', 'me_soll', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag'].forEach(function (id) {
       var e = el(id); if (!e || e._dpZb) return; e._dpZb = true;
       e.addEventListener('input', function () { objektSumme(); });
       e.addEventListener('change', function () { objektSumme(); });

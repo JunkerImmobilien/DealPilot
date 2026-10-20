@@ -199,6 +199,23 @@ if (Test-Path "tools\saat-pruefen.mjs") {
     Write-Host "   [ok] Register-Pflichtfelder (Basislinie)"
 }
 
+# v2545 - Kappungsgrenzen (Paragraf 558 Abs. 3 BGB) der Laender. Marcel am
+# 20.10.2026: "vor dem 25.11. pruefen, ob Hessen verlaengert". Statt einer
+# Erinnerung, die an einer Sitzung haengt, zeigt jedes Ausrollen die
+# Verordnungen, die in 120 Tagen auslaufen. Fehler = Abbruch, Hinweis = gelb.
+if (Test-Path "tools\kappungsgrenzen-pruefen.mjs") {
+    $kapp = node tools/kappungsgrenzen-pruefen.mjs 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        $kapp | Select-Object -Last 15
+        Write-Host ""
+        Write-Host "ABBRUCH: frontend/js/data/kappungsgrenzen.json verletzt den Vertrag." -ForegroundColor Red
+        Write-Host ""
+        exit 1
+    }
+    $kapp | Select-String "laeuft am" | ForEach-Object { Write-Host ("   [!] Kappung " + $_.Line.Trim()) -ForegroundColor Yellow }
+    Write-Host "   [ok] Kappungsgrenzen-Liste"
+}
+
 # --- 4) Was geht raus? ------------------------------------------------
 git fetch origin $ZWEIG --quiet
 PruefeExit "git fetch"

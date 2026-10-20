@@ -833,6 +833,7 @@ function _buildAIPayload() {
                 zimmer: zahl(e.zimmer) || null,
                 vertragsart: e.mv_art || null,
                 letzte_erhoehung: e.mv_letzte_erhoehung || null,
+                letzte_erhoehung_betrag: zahl(e.mv_letzte_erhoehung_betrag) || null,   /* v2545 */
                 naechste_anpassung: e.mv_naechste_anpassung || null,
                 befristet_bis: e.mv_befristet_bis || null,
                 /* v2023a - `rnd_eigen`/`rnd_jahre` sind hier entfallen.

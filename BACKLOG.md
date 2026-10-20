@@ -36,6 +36,13 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N77 · Kappungsgrenzen HE und BW — Wiedervorlage (20.10.2026)
+
+Marcel 20.10.2026: „vor dem 25.11. prüfen, ob Hessen verlängert". Beide Nachfolge-Verordnungen sind am 20.10. nur **Entwurf in der Anhörung**, nichts verkündet. Belege stehen in `frontend/js/data/kappungsgrenzen.json` unter `unsicher_grund`.
+- **HE (Mieterschutzverordnung, gilt bis 25.11.2026):** Der Entwurf mit 71 Gemeinden ist seit 24.09.2026 in der Anhörung, das Kabinett soll Mitte November entscheiden. **Ab Mitte November das GVBl. prüfen.** Ohne Verkündung bis zum 25.11. gilt ab dem 26.11. keine 15-%-Kappung. DealPilot rechnet dann von selbst mit 20 % und zeigt den Hinweis „ausgelaufen". Bei Verkündung die 71 Gemeinden mit AGS eintragen. Zur Wirksamkeit der Verlängerung läuft noch ein Streit (AG Frankfurt, 33029 C 130/25).
+- **BW (KappVO und MietBegrenzVO, gelten bis 31.12.2026):** Der Ministerrat hat die Entwürfe am 22.09.2026 freigegeben. Neu sollen Mannheim, Konstanz und Kehl dazukommen. **Im Dezember das GBl. prüfen.**
+- Seit v2545 meldet `deploy-staging.ps1` jede Verordnung, die in 120 Tagen ausläuft (`kappungsgrenzen-pruefen.mjs`).
+
 ### N76 · Messe-Rundgang und Abschlag — Reste nach Prod-Rollout (21) (14.10.2026)
 > Prod = Staging auf v2238a (`1fc4be87`). Video `Dateien/Messe/Videos/quickcheck-rundgang-studio_2026-10-14.mp4` (220 s) ist fertig.
 1. **Abnahme Marcel auf Prod:** Quick-Check mit DealPilot-Abruf und C-Lage — Karte mit „inkl. 5,8 % Abschlag“, Überschrift „· aber … unter Marktwert“, Pilot-Analyse mit zwei Sichten.

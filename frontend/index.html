@@ -1950,6 +1950,9 @@ label.dp-required.qc-required::after {
           <div class="iw"><input id="mv_beginn" type="date"></div></div>
         <div class="f"><label title="Wann die Miete zuletzt erhöht wurde. Daran hängen die Kappungsgrenze und bei Indexmieten die Frist bis zur nächsten Anpassung.">Letzte Erhöhung</label>
           <div class="iw"><input id="mv_letzte_erhoehung" type="date"></div></div>
+        <!-- v2545 · Hoehe der letzten Erhoehung: die Kappungsgrenze gilt auf die Miete drei Jahre vorher (§ 558 Abs. 3 BGB) -->
+        <div class="f"><label title="Um wie viel Euro im Monat die Miete bei der letzten Erhöhung gestiegen ist (bei mehreren in den letzten drei Jahren: die Summe, ohne Modernisierungsumlage und Betriebskosten). Die Kappungsgrenze gilt auf die Miete vor drei Jahren — ohne diese Angabe rechnet DealPilot den Spielraum zu groß.">Letzte Erhöhung um</label>
+          <div class="iw"><span class="pfx">€</span><input id="mv_letzte_erhoehung_betrag" type="text" inputmode="decimal" placeholder="€/Monat" class="trl"></div></div>
         <p class="hint" id="mv-objekt-mfh-hinweis" style="display:none"></p>
       </div>
       <div class="card"><div class="ct ct-pro me-header"><!-- V316-miete-header -->
@@ -3677,9 +3680,9 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=v2254"></script>
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
-<script src="js/ui.js?v=v2544"></script>
+<script src="js/ui.js?v=v2545"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v2541"></script>
+<script src="js/storage.js?v=v2545"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v2269"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v2263e"></script>
@@ -3715,8 +3718,8 @@ label.dp-required.qc-required::after {
 <script src="js/objekt-reiter.js?v=v2540b"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v2541"></script>
-<script src="js/potenzial.js?v=v2543b"></script>
+<script src="js/mfh-einheiten.js?v=v2545"></script>
+<script src="js/potenzial.js?v=v2545"></script>
 <script src="js/mietvertrag-objekt.js?v=v2087"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>

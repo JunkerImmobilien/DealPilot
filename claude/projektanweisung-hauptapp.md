@@ -41439,3 +41439,29 @@ Potenzial Demo: Bestand/MH/ZB 610.000/625.000/805.000 → 610.000/630.000/805.00
 - Die Pilot-Tafel zeigt beim Demo-MFH „Bestand" ohne Jahr (kein Kaufdatum im Drehbuch) und keine Spalte „Ankauf".
 - Im Ordner liegen zwei Rohaufnahmen (`roh-modul-26.mp4` mit leerem PDF-Bild, `roh-modul-26b.mp4`).
 - Videothek/Landing nicht nachgezogen, Prod nicht angefasst.
+
+### v2545 · Kappungsgrenze mit Drei-Jahres-Anrechnung, Wiedervorlage HE/BW (20.10.2026, Staging)
+
+**Was.** Marcel (20.10.2026) fragte, warum unter der Soll-Miete 414 € stehen, und sagte zu beiden Vorschlägen „ja beides machen". Die Kappungsgrenze (§ 558 Abs. 3 BGB) rechnete bisher immer von der heutigen Ist-Miete aus. Richtig ist die Miete drei Jahre vor dem Wirksamwerden der neuen Erhöhung.
+- Neues Feld `mv_letzte_erhoehung_betrag` (€/Monat):
+  - je Wohnung im MFH-Fenster (Mietvertrag · Ist)
+  - am Objekt im Tab Miete, Karte Mietvertrag, mit FIELDS-Eintrag in storage.js
+  - im Pilot-Prompt (`letzte_erhoehung_betrag`)
+- `sollFuer()`: Liegt die letzte Erhöhung in den 36 Monaten vor dem Soll-Termin, rechnet die Kappung auf Ist minus Betrag.
+  - Ohne Betrag erscheint ein Hinweis, denn dann ist der Spielraum zu groß gerechnet.
+  - Ist die Grenze ausgeschöpft, lautet der Grund „Die Kappungsgrenze ist durch die letzte Erhöhung ausgeschöpft."
+  - Die Prüfung einer eigenen Soll-Miete läuft auf derselben Basis.
+- `kappungsgrenzen.json`: `unsicher_grund` für HE und BW auf den Stand vom 20.10. gebracht. Beide Nachfolge-VO sind nur Entwurf (Agent, amtliche Pressemitteilungen).
+- `deploy-staging.ps1` führt `kappungsgrenzen-pruefen.mjs` aus: Fehler bricht ab, auslaufende Verordnungen erscheinen gelb. Backlog N77 hält die Wiedervorlage fest (HE ab Mitte November, BW im Dezember).
+
+**Nachweis.** Funktionslauf `sollFuer` mit Ist 345 €, 50 m², Vergleichsmiete 9 €/m², Kappung 20 %:
+- ohne Erhöhung: 414 €
+- Erhöhung 2025 ohne Betrag: 414 € mit Hinweis
+- Erhöhung 2025 um 45 €: 360 €
+- Erhöhung 2022 um 45 €: 414 € (außerhalb der drei Jahre)
+- Erhöhung 300 → 360 €: keine Soll-Miete, Grund „ausgeschöpft"
+- eigene Soll-Miete 420 €: Hinweis „über der Kappungsgrenze"
+
+`buster-ebenen-pruefen`, `objekt-mapper-pruefen`, `prompt-lecks-pruefen` und `kappungsgrenzen-pruefen` laufen mit RC 0.
+
+**Rest.** Mehrere Erhöhungen in drei Jahren gehen nur als Summe in ein Feld. Wer bis drei Jahre nach der letzten Erhöhung wartet, hätte wieder vollen Spielraum; DealPilot schlägt diesen späteren Termin nicht vor. Die Liste der 71 hessischen Gemeinden ist nicht eingetragen (Entwurf).
