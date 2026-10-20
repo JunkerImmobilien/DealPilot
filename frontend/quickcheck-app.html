@@ -5386,12 +5386,11 @@ const QcApp = (function() {
           if (zs.leer >= 7)        cons.push(`Leerstand <strong>${_de(zs.leer, 1)} %</strong> (Zensus 2022, ${wo}) — erhöhtes Vermietungsrisiko`);
           else if (zs.leer <= 2.5) pros.push(`Leerstand nur <strong>${_de(zs.leer, 1)} %</strong> (Zensus 2022, ${wo}) — angespannter Mietmarkt`);
         }
-        const _nkmQ = QcEngine.num(inputs.nkm), _wflQ = QcEngine.num(inputs.wfl);
-        if (zs && zs.miete && _nkmQ && _wflQ) {
-          const ist = _nkmQ / _wflQ;
-          if (ist > zs.miete * 1.3)       cons.push(`Miete <strong>${_de(ist, 2)} €/m²</strong> liegt deutlich über dem Zensus-Mittel (${_de(zs.miete, 2)} €/m², Bestandsmieten) — Risiko bei Mieterwechsel`);
-          else if (ist < zs.miete * 0.85) pros.push(`Miete <strong>${_de(ist, 2)} €/m²</strong> unter dem Zensus-Mittel (${_de(zs.miete, 2)} €/m²) — Luft nach oben`);
-        }
+        /* v2502 · Marcel 20.10.2026: die Zensus-Bestandsmiete (Stichtag 2022,
+           alle Bestandsvertraege) ist kein Massstab fuer die Marktmiete - der
+           Vergleich Ist-Miete gegen Zensus-Mittel („Luft nach oben“ /
+           „Risiko bei Mieterwechsel“) ist deshalb raus. Der Leerstand oben
+           bleibt: er ist ein Risiko-, kein Mietwert. */
         if (_c.macroRaw != null && _c.makroGemessen) {
           const m10 = _de(_c.macroRaw / 10, 1);
           if (_c.macroRaw >= 60)      pros.push(`Makrolage <strong>${m10}/10</strong> aus amtlichen Kreisdaten (${_c.makroGemessen} von 4 Kennzahlen)`);
