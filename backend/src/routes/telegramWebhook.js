@@ -41,6 +41,7 @@ const openai = require('../services/openaiService');
 const { copilotKontingent } = require('./ai');
 const agent = require('../services/agentLauf');
 const objectService = require('../services/objectService');
+const tgUnterlagen = require('../services/telegramUnterlagenService');  // v2470
 
 const TG = 'https://api.telegram.org/bot';
 const PROVIDER = 'telegram';
@@ -63,8 +64,13 @@ const HILFE =
   + '„leg mir ein Objekt an" — dann sprich einfach drauf los, '
   + 'schick ein Foto vom Exposé oder tippe\n'
   + '„setz die Zimmerzahl auf 5"\n\n'
+  /* v2470 · Unterlagen beim Amt (Telegram-Teil aus unterlagen-app-v5) */
+  + '*Unterlagen beim Amt*\n'
+  + '„Unterlagen für Objekt 3 anfordern" · „hol die Flurkarte für die Parkstraße"\n'
+  + 'Ich zeige Amt, Kanal, Gebühr und Ansprechpartner und schreibe den '
+  + 'Entwurf — verschicken tust du selbst.\n\n'
   + '_Befehle gehen auch: /neu · /objekte · /portfolio · /marktpreis · '
-  + '/abbrechen · /stop_';
+  + '/unterlagen · /abbrechen · /stop_';
 
 /* Eine lesende Telegram-Abfrage (getFile). Eigene Funktion, weil `senden`
    bewusst jeden Fehler schluckt — hier muss ein Fehler ankommen, sonst
@@ -137,6 +143,61 @@ async function sendenLang(token, chatId, text) {
 async function botSagt(token, chatId, userId, text) {
   await sendenLang(token, chatId, text);
   await verlaufMerken(chatId, userId, 'assistant', text);
+}
+
+/* ── v2470 · UNTERLAGEN BEIM AMT: DER BEHAELTER FUER DEN DIENST ─────────
+ *
+ * `telegramUnterlagenService` sendet selbst nichts — er bekommt hier
+ * seine Sendefunktion und die Zustands-Helfer. Dadurch laeuft er in der
+ * Pruefstrecke mit einer gestellten `sag()`, ohne Telegram.
+ *
+ * Er schreibt HTML (Telegram `parse_mode: HTML`), weil Briefe und
+ * Adressen Unterstriche und Sternchen tragen, die Markdown zerlegen.
+ * `senden` schluckt jeden Fehler — eine HTML-Nachricht, die Telegram
+ * ablehnt, waere dann still verschwunden. Deshalb hier mit Rueckfall:
+ * lehnt Telegram ab, geht derselbe Text ohne Auszeichnung raus.
+ *
+ * Der Verlauf bekommt nur eine kurze Notiz, nie den Brief: die
+ * Geldsperre in agentAntwort liest die letzte Botzeile. */
+async function sendenHtml(token, chatId, html) {
+  let ok = false;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 10000);
+    try {
+      const r = await fetch(TG + token + '/sendMessage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text: html, parse_mode: 'HTML',
+          disable_web_page_preview: true }),
+        signal: ctrl.signal
+      });
+      const j = await r.json().catch(() => ({}));
+      ok = Boolean(j && j.ok);
+      if (!ok) console.warn('[telegram v2470] HTML abgelehnt: ' + String((j && j.description) || r.status).slice(0, 160));
+    } finally { clearTimeout(t); }
+  } catch (e) { ok = false; }
+  if (!ok) {
+    const roh = String(html).replace(/<[^>]+>/g, '')
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+    await senden(token, chatId, roh, { parse_mode: undefined, disable_web_page_preview: true });
+  }
+}
+
+function unterlagenKontext(token, chatId, userId, z) {
+  return {
+    userId: userId,
+    z: z,
+    sag: async function (text, o) {
+      if (o && o.html) return sendenHtml(token, chatId, text);
+      return senden(token, chatId, text, { parse_mode: undefined, disable_web_page_preview: true });
+    },
+    setze: (s) => zustandSetzen(chatId, userId, s),
+    merkeListe: (ids) => listeMerken(chatId, userId, ids, 'objekte'),
+    merkeObjekt: (id) => objektMerken(chatId, userId, id),
+    notiz: (t) => verlaufMerken(chatId, userId, 'assistant', t),
+    tippt: () => tgGet(token, 'sendChatAction', { chat_id: chatId, action: 'typing' })
+  };
 }
 
 /* ── Der Agent antwortet ─────────────────────────────────────────────────
@@ -809,7 +870,13 @@ async function beantworten(token, chatId, userId, text, msg) {
 
   /* ── Befehle, die immer gelten ───────────────────────────────────── */
   if (/^\/abbrechen|^(abbrechen|abbruch|vergiss es|lass gut sein)\b/i.test(text.trim())) {
-    if (z && z.modus) {
+    if (z && z.modus === tgUnterlagen.MODUS) {
+      /* v2470 · Nur der Zustand faellt, nicht das Gedaechtnis — und der
+         Satz sagt nicht "Entwurf verworfen": der Briefentwurf bleibt als
+         Vorgang am Objekt stehen. */
+      await zustandSetzen(chatId, userId, { modus: null });
+      await senden(token, chatId, 'Abgebrochen.');
+    } else if (z && z.modus) {
       await zustandLoeschen(chatId, userId);
       await senden(token, chatId, 'Abgebrochen. Der Entwurf ist verworfen.');
     } else {
@@ -863,6 +930,29 @@ async function beantworten(token, chatId, userId, text, msg) {
     }
     await aufnehmen(token, chatId, userId, text, z.entwurf);
     return;
+  }
+
+  /* ── v2470 · Unterlagen beim Amt: laufender Zustand ──────────────────
+   *
+   * Eine Sprachnachricht wird erst unten transkribiert und kommt dann als
+   * Text wieder hier an. Ein Foto beendet den Zustand: der Fotoweg unten
+   * liest `z0.entwurf` als Objektentwurf und wuerde sonst den Zustand
+   * dieser Strecke als Objektdaten nehmen.
+   *
+   * Gehoert die Nachricht nicht hierher (eine Frage zwischendurch), gibt
+   * `weiter` false zurueck, hat den Zustand schon verlassen, und es geht
+   * ganz normal weiter. */
+  let _userGemerkt = false;
+  if (z && z.modus === tgUnterlagen.MODUS && !(msg && (msg.voice || msg.audio))) {
+    if (msg && (msg.photo || msg.document)) {
+      await zustandSetzen(chatId, userId, { modus: null });
+      z.modus = null;
+    } else if (text && tgUnterlagen.aktiv(z)) {
+      await verlaufMerken(chatId, userId, 'user', text);
+      _userGemerkt = true;
+      if (await tgUnterlagen.weiter(unterlagenKontext(token, chatId, userId, z), text)) return;
+      z.modus = null;
+    }
   }
 
   /* ── Sprachnachricht ──────────────────────────────────────────────────
@@ -1026,7 +1116,7 @@ async function beantworten(token, chatId, userId, text, msg) {
 
   if (!text) return;
 
-  await verlaufMerken(chatId, userId, 'user', text);
+  if (!_userGemerkt) await verlaufMerken(chatId, userId, 'user', text);
 
   /* ── v1798 · ZUERST DER BEZUG, DANN DIE ABSICHT ───────────────────────
    *
@@ -1061,6 +1151,15 @@ async function beantworten(token, chatId, userId, text, msg) {
    * Alles andere geht an den Agenten. Auch Marktpreis, Score und
    * Portfolio: dort beginnen die Rueckfragen, und genau die konnte die
    * Musterweiche nie. */
+  /* v2470 · Unterlagen beim Amt — VOR der Liste, denn „Übersicht der
+     Unterlagen" traefe sonst das Listenmuster. Ein Zustand, kein Modell:
+     kein Co-Pilot-Kontingent, wie die Objektliste. */
+  const ulWunsch = (was.art !== 'anlegen') ? tgUnterlagen.erkenne(text) : null;
+  if (ulWunsch) {
+    await tgUnterlagen.start(unterlagenKontext(token, chatId, userId, z), text, bezugObjektId, ulWunsch);
+    return;
+  }
+
   if (was.art === 'liste') {
     const liste = await dialog.objekteListe(userId, 40);
     if (!liste.length) {
