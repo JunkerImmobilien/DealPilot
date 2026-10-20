@@ -1228,10 +1228,17 @@ async function _exportPDFInner() {
   doc.setFillColor.apply(doc, C.SURF2); doc.setDrawColor.apply(doc, C.BORDER);
   doc.setLineWidth(0.5); doc.roundedRect(M, cy, CW, 12, 2, 2, 'FD');
   doc.setFillColor.apply(doc, C.GOLD); doc.rect(M, cy, 3, 12, 'F');
+  /* v2463 · gemessen mit einer langen Anschrift: der Objektname lief 74 mm über
+     den rechten Rand und durch die Angaben rechts. Jetzt passt er in den Platz
+     links neben den Angaben (sonst „..."), und die Angaben halten 3 mm Abstand. */
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+  var _odW = doc.getTextWidth(objDetail);
   doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor.apply(doc, C.CH);
-  doc.text(objName, M + 7, cy + 8);
+  var _onT = String(objName), _onMax = CW - 7 - _odW - 9;
+  if (doc.getTextWidth(_onT) > _onMax) { while (_onT.length > 1 && doc.getTextWidth(_onT + '...') > _onMax) _onT = _onT.slice(0, -1); _onT = _onT.replace(/[\s,;·-]+$/, '') + '...'; }
+  doc.text(_onT, M + 7, cy + 8);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor.apply(doc, C.MID);
-  doc.text(objDetail, W - M, cy + 8, { align: 'right' });
+  doc.text(objDetail, W - M - 3, cy + 8, { align: 'right' });
   cy += 15;
 
   // 4 dunkle KPI-Tiles Reihe 1

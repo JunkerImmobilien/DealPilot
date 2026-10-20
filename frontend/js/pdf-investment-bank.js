@@ -556,7 +556,11 @@
       doc.setDrawColor(G[0], G[1], G[2]); doc.setLineWidth(0.8); doc.line(L, y, W - R, y); doc.setLineWidth(0.2);
       y += 10;
       doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(26, 26, 26); doc.text(titel, L, y); y += 5.5;
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(110); doc.text(unter, L, y);
+      /* v2461 · lange Anschrift: der Untertitel lief bis 100 mm über den Rand */
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(110);
+      var _u = String(unter || '');
+      if (doc.getTextWidth(_u) > CW) { while (_u.length > 1 && doc.getTextWidth(_u + '...') > CW) _u = _u.slice(0, -1); _u = _u.replace(/[\s,;·-]+$/, '') + '...'; }
+      doc.text(_u, L, y);
       y += 10;
     }
     function abschnitt(t) {
@@ -582,7 +586,12 @@
       doc.setTextColor(o.summe ? 26 : (o.klein ? 110 : 50));
       doc.text(label, L + (o.einzug ? 4 : 0), y);
       if (o.summe) doc.setTextColor(GD[0], GD[1], GD[2]); else doc.setTextColor(26, 26, 26);
-      doc.text(String(wert), W - R, y, { align: 'right' });
+      /* v2461 · ein langer Wert (Anschrift) lief nach links über das Etikett und
+         aus der Seite (gemessen: x = -10,9 mm). Er bricht jetzt rechtsbündig um. */
+      var _wMax = CW - doc.getTextWidth(label) - (o.einzug ? 4 : 0) - 6;
+      var _wz = doc.getTextWidth(String(wert)) > _wMax ? doc.splitTextToSize(String(wert), Math.max(40, _wMax)) : [String(wert)];
+      _wz.forEach(function (t, j) { doc.text(t, W - R, y + j * 4.2, { align: 'right' }); });
+      y += (_wz.length - 1) * 4.2;
       if (!o.summe) { doc.setDrawColor(236, 232, 223); doc.setLineWidth(0.15); doc.line(L, y + 2, W - R, y + 2); doc.setLineWidth(0.2); }
       y += o.summe ? 8 : 6.1;
     }
