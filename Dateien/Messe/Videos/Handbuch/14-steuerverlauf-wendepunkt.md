@@ -1,7 +1,7 @@
 # 14 · Steuerverlauf mit Wendepunkt — wann das Objekt steuerlich positiv wird
 
 > Stand 20.10.2026 (Staging bis v2544, NEU in v2544, Commit `47322445`). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
-> Video: noch keins (Vorschlag: Ergänzung zu Modul 15 `reihe-steuer-bestand` oder eigenes Kurzvideo) ·
+> Video: **Modul 27 „Steuerverlauf mit Wendepunkt“** (`reihe-steuerverlauf`, Studio `?modul=27`, v2481p–r, 20.10.2026) ·
 > Messe-Geschichten: 3 Gohliser „Im Jahr 6 investieren", 15 Steuerberater (design/Messe/demo-geschichten.md) ·
 > Vorlage: design/Vorschläge/steuerverlauf-demo.html
 

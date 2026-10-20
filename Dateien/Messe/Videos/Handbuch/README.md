@@ -93,7 +93,7 @@ Pilot-Offerte mit 6 WE. Die Mitschnitte (Ü2, Modul 26) zeigen Westerfeld noch m
 | 11 | [Restnutzungsdauer-Rechner und RND-Gutachten](11-restnutzungsdauer-rechner-und-gutachten.md) | 10c | `reihe-rnd` | 4, 5, 11, 12 |
 | 12 | [BMF-Kaufpreisaufteilung](12-bmf-kaufpreisaufteilung.md) | 10b | `reihe-bmf` | 4, 12 |
 | 13 | [Werbungskosten im Detail, Belege, 15-%-Grenze, Finanzamt-PDF](13-werbungskosten-und-15-prozent-grenze.md) | 15 · 23 | `reihe-steuer-bestand`, `reihe-15pct` | 3, 3b, 7, 15 |
-| 14 | [Steuerverlauf mit Wendepunkt (neu, v2544)](14-steuerverlauf-wendepunkt.md) | — (noch kein Video; Vorlage `design/Vorschläge/steuerverlauf-demo.html`) | — | 3, 15 |
+| 14 | [Steuerverlauf mit Wendepunkt (neu, v2544)](14-steuerverlauf-wendepunkt.md) | 27 | `reihe-steuerverlauf` | 3, 15 |
 | 15 | [DealScore und Investor Deal Score](15-deal-score-und-investor-deal-score.md) | 12 | `reihe-bewertung` | 9 |
 | 16 | [Pilot-Analyse](16-pilot-analyse.md) | 11 | `reihe-pilot` | 8, 10 |
 | 17 | [Abruf „Marktpreise" mit Verlauf](17-abruf-marktpreise.md) | 26 (Teil) | `reihe-zielbild` | 8 |
