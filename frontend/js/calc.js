@@ -3763,14 +3763,14 @@ function renderCFCalc(mode){
     if (!w || !u || !k || w.getAttribute('data-v2484')) return;
     w.setAttribute('data-v2484', '1');
     var lab = function (id, html) { var e = document.getElementById(id); if (e && e.parentNode && e.parentNode.firstElementChild) e.parentNode.firstElementChild.innerHTML = html; };
-    lab('cr-wm', '<b>Warmmiete / Jahr</b> <span class="cf-hint">(Nettokaltmiete + Nebenkostenvorauszahlungen der Mieter)</span>');
-    lab('cr-bwk-ul', '– Nebenkostenvorauszahlungen <span class="cf-hint">(durchlaufend, mit den umlagefähigen Kosten verrechnet)</span>');
+    lab('cr-wm', '<b>Warmmiete / Jahr</b> <span class="cf-hint">(NKM + NK-Vorauszahlungen)</span>');
+    lab('cr-bwk-ul', '– NK-Vorauszahlungen der Mieter <span class="cf-hint">(durchlaufend, mit den umlagefähigen Kosten verrechnet)</span>');
     lab('cr-kaltmiete', '<b>= Kaltmiete inkl. Zusatzeinnahmen / Jahr</b>');
     var ref = k.parentNode;
     var z1 = document.createElement('div'); z1.className = 'kv kv-step';
     z1.innerHTML = '<span><b>= Nettokaltmiete / Jahr</b></span><span class="kv-v" id="cr-nkm-netto">—</span>';
     var z2 = document.createElement('div'); z2.className = 'kv';
-    z2.innerHTML = '<span>+ Zusatzeinnahmen <span class="cf-hint">(Stellplatz, Garage u. a.)</span></span><span class="kv-v" id="cr-ze">—</span>';
+    z2.innerHTML = '<span>+ Zusatzeinnahmen <span class="cf-hint">(Stellplatz, Garage)</span></span><span class="kv-v" id="cr-ze">—</span>';
     ref.parentNode.insertBefore(z1, ref); ref.parentNode.insertBefore(z2, ref);
   }
   var data;

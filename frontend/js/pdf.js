@@ -1295,10 +1295,11 @@ async function _exportPDFInner() {
   var _bsparY_p2 = (State.bsparRate_m || 0) * 12;
   var _hasBspar_p2 = _bsparY_p2 > 0;
   var _cfRows = [
-    ['Warmmiete / Jahr (NKM + NK-Vorausz.)',     pE(warmmiete_now)],
+    ['Warmmiete / Jahr (NKM + NK-Vorauszahlungen)', pE(warmmiete_now)],
     ['- NK-Vorauszahlungen der Mieter',   '- ' + pE(nkv_now)],
-    ['+ Zusatzeinnahmen (Stellpl. u. a.)', '+ ' + pE(ze_now)],
-    ['= Kaltmiete inkl. Zusatzeinnahmen',        pE(kaltmiete_now, true)],
+    ['= Nettokaltmiete / Jahr',                  pE(nkm_now - ze_now, true)],
+    ['+ Zusatzeinnahmen (Stellplatz, Garage)', '+ ' + pE(ze_now)],
+    ['= Kaltmiete inkl. Zusatzeinnahmen / Jahr', pE(kaltmiete_now, true)],
     ['- nicht umlagef\u00e4hige BWK',     '- ' + pE(bwk_nul_now)],
     ['= NOI (Net Operating Income)',             pE(noi_now, true)],
     ['- Zinsen / Jahr',                   '- ' + pE(K.zins_j)],
@@ -1318,7 +1319,7 @@ async function _exportPDFInner() {
   _cfRows.push(['\u00b1 Steuern / Jahr',                    (_stP2 > 0.5 ? '+ ' : (_stP2 < -0.5 ? '- ' : '')) + pE(Math.abs(_stP2))]);
   _cfRows.push(['= CF nach Steuern / Jahr (operativ)',      pE(K.cf_ns, true)]);
   _cfRows.push(['= CF nach Steuern / Monat',                pE(K.cf_ns_m || (K.cf_ns/12), true)]);
-  kvT(doc, M, cy, hw, _cfRows, [3, 5, 7, 9, 11, 12]);   /* v2484: eine Zeile mehr (Zusatzeinnahmen) */
+  kvT(doc, M, cy, hw, _cfRows, [2, 4, 6, 8, 10, 12, 13]);   /* v2484: zwei Zeilen mehr (Nettokaltmiete, Zusatzeinnahmen) */
 
   cy = secH(doc, cyA, 'Alle Kennzahlen', M + hw + 5, hw);
   kvT(doc, M + hw + 5, cy, hw, [

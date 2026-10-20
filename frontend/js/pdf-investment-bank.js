@@ -981,15 +981,15 @@
        (Westerfeld 41.147 €), im Investment-PDF NKM + ZE + umlagefaehige Kosten
        (39.756 €). Die Kette endet unveraendert bei der Kaltmiete inkl. Zuschlaege. */
     var _warm = da(K.warm_j) !== null ? K.warm_j : null;
-    zeile('Warmmiete / Jahr (Nettokaltmiete + Nebenkostenvorauszahlungen)', eur(_warm));
+    zeile('Warmmiete / Jahr (NKM + NK-Vorauszahlungen)', eur(_warm));
     /* v2273 · hier stand „abzüglich umlagefähiger Bewirtschaftung“ (K.bwk_ul) - die Kette ging
        nicht auf: Westerfeldstr. 140 Warmmiete 41.147 − 336 ≠ Kaltmiete 39.420. Die Warmmiete
        enthält die Umlagen der Mieter (calc.js wm_m = nkm + ze + uf), abgezogen werden also
        diese; die umlagefähigen Kosten stehen weiter unten im Block Bewirtschaftung. */
-    zeile('abzüglich Nebenkostenvorauszahlungen der Mieter', da(K.nk_vz_j) === null ? '-' : '- ' + eur(K.nk_vz_j), { einzug: true });
+    zeile('abzüglich NK-Vorauszahlungen der Mieter', da(K.nk_vz_j) === null ? '-' : '- ' + eur(K.nk_vz_j), { einzug: true });
     zeile('Nettokaltmiete / Jahr', eur(K.nkm_netto_j));
-    if (da(K.ze_j) && K.ze_j > 0) zeile('zuzüglich Zusatzeinnahmen (Stellplatz, Garage u. a.)', '+ ' + eur(K.ze_j), { einzug: true });
-    zeile('Kaltmiete / Jahr inkl. Zusatzeinnahmen', eur(K.nkm_j), { fett: true });
+    if (da(K.ze_j) && K.ze_j > 0) zeile('zuzüglich Zusatzeinnahmen (Stellplatz, Garage)', '+ ' + eur(K.ze_j), { einzug: true });
+    zeile('Kaltmiete inkl. Zusatzeinnahmen / Jahr', eur(K.nkm_j), { fett: true });
     zeile('abzüglich nicht umlagefähiger Bewirtschaftung', da(K.bwk_cf) === null ? '-' : '- ' + eur(K.bwk_cf), { einzug: true });
     zeile('Betriebsergebnis (NOI)', da(K.nkm_j) === null ? '-' : eur(K.nkm_j - (K.bwk_cf || 0)), { fett: true });
     zeile('abzüglich Zinsen', da(K.zins_j) === null ? '-' : '- ' + eur(K.zins_j), { einzug: true });
