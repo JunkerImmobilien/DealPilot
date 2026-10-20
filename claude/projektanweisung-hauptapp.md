@@ -39153,6 +39153,37 @@ Aufteilung Demo: vorher 453.500* / 476.000* (WE 5 ohne Wert, unvollständig), je
 - Ertragswert der leeren WE 5 als ETW im Bestand 69.558 € (nicht auf 500 gerundet) — der Kern greift dort offenbar auf den Bodenwertanteil; unverändert übernommen.
 - Anzeige im Tab Bewertung/PDF nur per `node --check` geprüft, nicht im Browser angesehen (Staging-Abnahmepunkt); die Messe-Mitschnitte (Modul 26) zeigen bis zur Neuaufnahme die alten Zahlen.
 
+### v2520 · Ertragswert bei Leerstand: Ist-Miete nur auf der vermieteten Fläche (20.10.2026, Staging)
+
+**Was.** Marcels Entscheidung vom 20.10.2026 zum Rest aus v2488: bei Leerstand bezieht der Ertragswert die Ist-Miete nur auf die **vermietete** Fläche und prüft sie dort gegen das Marktüblichkeitsband; leere Einheiten gehen mit der marktüblichen Miete (Vergleichsmiete, dieselbe wie `mieteNachBand` ohne Ist) in den Rohertrag ein — Grundsatz: Rohertrag mit marktüblich erzielbarer Miete für alle Einheiten (§ 31 Abs. 2 ImmoWertV). Bis v2519 teilte `CrossCheckService` die Ist-Miete durch die gesamte Wohnfläche inkl. Leerstand (Demo-MFH 5,99 statt 7,31 €/m² → untere Bandkante).
+
+- **`DealPilotObjectMapper.leerstandAus(d)`** → `ref.leerstand` `{n_leer, n_vermietet, wfl_leer, wfl_vermietet, ist_monat_vermietet}` aus `_mfh_einheiten` (bzw. `_mfh.einheiten`). Nur mit mindestens einer leeren UND einer vermieteten Wohnung, jede Einheit mit Fläche, **ohne Gewerbe** (das rechnet v2210 getrennt). Leer = Status „leer" oder keine Ist-Miete (wie `gewerbeAus` und `PotenzialService`). Vermietungsstand „Leer" (ganzes Objekt) gewinnt → `null`. `ReportOrchestrator` reicht `leerstand` durch (sonst käme es wie WREF-1 nie an).
+- **`CrossCheckService`** (Wohnen-Zweig, Mietwahl): mit `ref.leerstand` und einer Vergleichsmiete ist Ist €/m² = Ist der vermieteten / vermietete Fläche; die Einheitenflächen werden auf die Wohnfläche des Objekts umgelegt (Summe bleibt). Rohertrag = vermietete Fläche × Miete nach Band + leere Fläche × Vergleichsmiete. `miete_quelle` endet auf „… auf der vermieteten Fläche; leere Fläche mit der Vergleichsmiete", ein Hinweis nennt beide Flächen. Neu `miete_aufteilung` im Ergebnis und in `_ertragswertEingabe`. **Ohne Leerstandsangabe alles wie bisher** (gleicher Code-Pfad). Nebenwirkung: „Teilweise leer" mit Einheitenliste setzte bisher `vacancy` → Vergleichsmiete auf alles; jetzt rechnet auch dort die Ist-Miete der vermieteten Fläche.
+- **`ErtragswertService`:** Zeile „Rohertrag Wohnen (marktüblich erzielbar)" trägt `detail` „Ist-Miete auf vermieteter Fläche 310 m² × 7,31 €/m² + leere Fläche 68 m² mit marktüblicher Miete 9,48 €/m² (je × 12)" (bzw. „untere/obere Bandkante …"). Web (`rechenweg()`) und PDF zeigen `z.detail` schon — **`marktbericht-app/app.js` nicht angefasst**.
+- **`PotenzialService`:** Stufen setzen `miete_aufteilung = null` (die Aufteilung gilt nur im Bestand). Verteilung unverändert und weiter exakt (Summe Bestandsbasis = Bestands-Rohertrag): der Rest „zuerst auf die leeren Wohnungen" ist jetzt klein, er stammt nur noch aus der Bandprüfung je Wohnung gegen die des Hauses (Demo: WE 1 mit 6,18 €/m² unter der Kante 6,64, das Haus mit 7,31 im Band — 375 €/Jahr; WE 5 trägt 9,04 statt 9,48 €/m², Angleichung leer 0,953 statt 0,331).
+
+**Commit:** `fe109399` (v2520). Mapper und Orchestrator mit offenen fremden Hunks (Lage-Strang v2515) — nur die eigenen Hunks per `git update-index --cacheinfo` gestaget, die fremden liegen weiter offen im Arbeitsbaum.
+
+**Nachweis — Funktionslauf im mb-Container**, alter (`/app/src`, `8bce4ee8`) gegen neuen Stand an denselben Eingaben, `nurWertBasis` (kein Bericht in der DB), danach im neu gebauten Container wiederholt (gleiche Werte):
+
+| Fall | vorher EW / Rohertrag | nachher EW / Rohertrag | Mietansatz nachher |
+|---|---|---|---|
+| Demo-MFH (6 WE, WE 5 leer) | 545.000 / 30.119 | **610.000** / 34.929 | Ist 7,31 im Band auf 310 m² + 68 m² × 9,48 |
+| Demo-MFH, 2 leer (WE 3+5) | 545.000 / 30.119 | **635.000** / 36.903 | Ist 7,38 im Band auf 242 m² + 136 m² × 9,48 |
+| Demo ohne Leerstand | 580.000 | 580.000 | unverändert |
+| Ist über Band (15 €/m²) | 875.000 | 875.000 | unverändert |
+| Westerfeldstr. 140 (gespeichert, voll) | 725.000 | 725.000 | unverändert |
+| Westerfeld (Potenzial-Auftrag) | 780.000 | 780.000 | unverändert |
+| Hüllhorst (chk-Eingabe) | 410.000 | 410.000 | unverändert |
+| ETW vermietet / ETW leer | 49.500 / 79.000 | 49.500 / 79.000 | unverändert |
+
+Potenzial Demo: Bestand/Mieterhöhung/Zielbild 545.000/565.000/805.000 → **610.000/625.000/805.000**; 2 leer → 635.000/645.000/825.000. Bestand = `bericht_ertragswert` in allen Fällen. `node --check` je Datei; `rnd-kerne-pruefen`, `score-ketten-pruefen` (216), `objekt-mapper-pruefen`, `prompt-lecks-pruefen` RC 0. Staging: `git pull --ff-only` + `docker compose … up -d --build mb-backend backend`, **Neubau 09:03:41–09:04:12 UTC (11:03–11:04 MESZ)**.
+
+**Rest:**
+- Gewerbe-MFH mit leeren Wohnungen: unverändert (Wohnteil dort ohnehin mit der Vergleichsmiete, v2210).
+- Anzeige des Details im Bericht nur über die Datenkette geprüft (Web/PDF rendern `z.detail` bereits), nicht im Browser angesehen — Staging-Abnahmepunkt; die Messe-Mitschnitte mit Demo-MFH zeigen bis zur Neuaufnahme 545.000 € im Bestand.
+- Bandprüfung je Wohnung (v2488) gegen die des Hauses: kleine Abweichung bleibt (s. o.). Ob die vermieteten Wohnungen bei einem Haus im Band einzeln an die Kante gehoben werden sollen, ist eine Bewertungsfrage an Marcel.
+
 ### Prod-Rollout (56) · qc-v2450, v2460–v2466a, v2470–v2472, Ulm 2026, SH-Freigaben (20.10.2026)
 
 **Was:**
