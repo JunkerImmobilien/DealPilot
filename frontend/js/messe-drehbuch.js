@@ -1560,6 +1560,13 @@
       var p26 = u.split('?')[0];
       if (/\/marktbericht\/potenzial$/.test(p26)) { var k26 = r26Schluessel(body), a26 = k26 && D.zielbild26.potenzial && D.zielbild26.potenzial[k26]; if (a26) return rhJ(JSON.parse(JSON.stringify(a26))); }
       if (/\/ai\/analyze$/.test(p26) && D.zielbild26.analyse) return rhJ(JSON.parse(JSON.stringify(D.zielbild26.analyse)));
+      /* v2481m · Marktpreise (v2542): der Abruf bucht 1 × erweiterte Marktpreisindikation - nur gespielt */
+      if (/\/marktbericht\/potenzial\/markt$/.test(p26) && D.zielbild26.markt && D.zielbild26.markt.post) { _rh.markt26 = true; return rhJ(JSON.parse(JSON.stringify(D.zielbild26.markt.post))); }
+    }
+    /* v2481m · ... und der Verlauf dazu: vor dem gespielten Abruf leer, danach der Mitschnitt
+       (das Objekt ist je Lauf neu, ein echter GET fände nie etwas) */
+    if (m === 'GET' && D.zielbild26 && !_rh.mitschnitt26 && _aktiv === DREHBUECHER['reihe-zielbild'] && /\/marktbericht\/potenzial\/markt\/verlauf/.test(u)) {
+      return rhJ(_rh.markt26 && D.zielbild26.markt && D.zielbild26.markt.verlauf ? JSON.parse(JSON.stringify(D.zielbild26.markt.verlauf)) : { abrufe: [], einordnung: null });
     }
     return null;
   }
@@ -1593,6 +1600,17 @@
             if (mk) M.potenzial[mk] = j; else M.analyse = j;
           }).catch(function () {});
           return p26;
+        }
+        /* v2481m · Mitschnitt-Lauf: der EINE Marktpreis-Abruf (bucht 1 × erweiterte MPI) und
+           der Verlauf danach - nur EIN POST je Lauf, ein zweiter wird gesperrt */
+        if (_rh.mitschnitt26 && ((m === 'POST' && /\/marktbericht\/potenzial\/markt$/.test(pfad) && !(DPM_REIHE.mitschnitt26 && DPM_REIHE.mitschnitt26.markt && DPM_REIHE.mitschnitt26.markt.post)) || (m === 'GET' && /\/marktbericht\/potenzial\/markt\/verlauf$/.test(pfad)))) {
+          var istPost = m === 'POST', pm26 = echt.apply(this, arguments);
+          pm26.then(function (r) { return r.clone().json(); }).then(function (j) {
+            var M = DPM_REIHE.mitschnitt26 = DPM_REIHE.mitschnitt26 || { potenzial: {}, analyse: null };
+            M.markt = M.markt || { post: null, verlauf: null };
+            if (istPost) M.markt.post = j; else if (M.markt.post) M.markt.verlauf = j;
+          }).catch(function () {});
+          return pm26;
         }
         if (_rh.mitschnitt && m === 'GET' && /\/marktbericht\/geocode$/.test(pfad)) {
           var pg = echt.apply(this, arguments);
@@ -5355,7 +5373,7 @@
      Gezeigt wird ein PDF (Bankfassung, lokal erzeugt, Nutzungszähler gesperrt). */
   var R26 = {
     kuerzel: 'DEMO Zielbild MFH', str: 'Teutoburger Straße', hnr: '60', plz: '33604', ort: 'Bielefeld',
-    baujahr: '1962', gsfl: '640', kp: '505000', etagen: '3',
+    baujahr: '1962', gsfl: '640', kp: '505000', etagen: '3', zbJahr: '2028',
     /* nr, lage, wfl, zimmer, ist (leer = ''), status - Marcel 20.10.2026: eine DEUTLICHE Entwicklung,
        Ist 5,90-6,40 EUR/m2 (an der unteren Kante des Marktueblichkeitsbands, klar unter der Vergleichsmiete; die Kappung fuehrt auf 6,8-7,4), letzte Erhoehungen lange her */
     we: [['1', 'EG links', '68', '3', '408', 'vermietet'], ['2', 'EG rechts', '58', '2', '360', 'vermietet'],
@@ -5465,6 +5483,16 @@
         await zeige(function () { var x = r26Mfh('#mfh-weg'); return x && x.closest('div'); }, 8);
         if (w && !w.checked) w.click();
         await b2oZeile(s, 'In Wohnungseigentum aufgeteilt', 'Ein Haken — dann zeigt DealPilot jede Wohnung auch als <b>Eigentumswohnung</b>, die Aufteilungskosten mit Vorbelegung.');
+        /* v2481m · v2541: das Jahr, in dem das Zielbild erreicht ist (gespiegelt nach zb_fertig_jahr) */
+        var zj = function () { var x = r26Mfh('#mfh-zbjahr'); return x && x.offsetWidth ? x : null; };
+        if (zj()) {
+          await zeige(function () { var x = zj(); return x && x.parentElement; }, 8);
+          var zbz = r6Beginn(s, 'Zielbild fertig (Jahr)', 'Wann ist der Plan umgesetzt? Hier <b>' + R26.zbJahr + '</b>.');
+          await r26Tippe(zj(), R26.zbJahr, 120);
+          await r6Ende(zbz);
+          var zjw = (q('#zb_fertig_jahr') || {}).value || '';
+          await b2oZeile(s, 'Ein Jahr je Stufe', 'Ankauf, Mieterhöhung und Zielbild bekommen je ein Jahr' + (zjw ? ' — das Zielbild <b>' + zjw + '</b>' : '') + '. Es steht über den Spalten in Pilot-Analyse und PDF.', 800);
+        }
       },
       async function (s) {   /* 3 · Schritt 2: sechs Wohnungen */
         var wb = r26Mfh('#mfh-weiter'); if (wb) wb.click();
@@ -5510,6 +5538,9 @@
         await zeige(function () { return r26We('#mfh-we-soll'); }, 6);
         await b2oZeile(s, 'Der Vorschlag von DealPilot', 'Vergleichsmiete <b>' + P.vgl_qm + ' €/m²</b> — DealPilot rechnet die Soll-Miete: <b>' + (kv['Soll-Miete'] || '–') + '</b>, ' + (kv['Herkunft'] || '').replace(/^gerechnet \(§ 558\) · /, '') + '.');
         await b2oZeile(s, 'Die Kappungsgrenze', (kg ? '<b>' + kg[1] + ' % in drei Jahren</b>' : 'Die Kappungsgrenze') + (vo ? ' — Bielefeld steht in der <b>' + vo[1] + '</b>' : '') + '. DealPilot setzt sie je Gemeinde selbst. Erreichbar ab: <b>' + (kv['erreichbar ab'] || '–') + '</b>.');
+        /* v2481m · Erklärkarte: was die Soll-Miete ist (keine Zahl, nur die Regel) */
+        await zeige(function () { return r26We('#mfh-we-soll'); }, 6);
+        await b2oZeile(s, 'Was „Soll-Miete“ heißt', 'Die Miete, die der Vermieter ohne Umbau verlangen darf: höchstens die Vergleichsmiete, höchstens die Kappungsgrenze — und frühestens 15 Monate nach der letzten Erhöhung.', 1500);
       },
       async function (s) {   /* 6 · Wohnung 1: Zielbild */
         var P = R26.plan[0];
@@ -5521,6 +5552,8 @@
         var kv = r26Kv('#mfh-we-ziel .mfh-we-kv');
         await zeige(function () { return r26We('#mfh-we-ziel'); }, 6);
         await b2oZeile(s, 'Kosten und Punkte', 'Bad und Böden: <b>' + (kv['Kosten gesamt'] || '–') + '</b>, ' + (kv['Modernisierungspunkte'] || '–').replace(/\s*\(Anlage 2\)/, '') + ' Modernisierungspunkte nach Anlage 2. Zielmiete <b>' + P.ziel_qm + ' €/m²</b> = <b>' + (kv['Zielmiete'] || '–') + '</b>.');
+        /* v2481m · Erklärkarte: Soll gegen Zielbild */
+        await b2oZeile(s, 'Soll und Zielbild', 'Die Soll-Miete gibt der laufende Vertrag her. Das Zielbild ist ein Plan: Umbau, Kosten, neue Miete nach Mieterwechsel — mit Punkten, die die Restnutzungsdauer verlängern.', 1500);
       },
       async function (s) {   /* 7 · Wohnung 1: Ertragswert */
         await zeige(r26Block('ew'), 6);
@@ -5679,11 +5712,20 @@
         await zeige(tab, 6);
         var T = tab(), kopf = T ? [].map.call(T.querySelectorAll('thead th'), function (x) { return r6Text(x); }).filter(Boolean) : [];
         var zeile = function (re) { var r = T && [].filter.call(T.querySelectorAll('tbody tr'), function (x) { return re.test(r6Text(x.cells[0])); })[0]; return r ? [].map.call(r.cells, function (c) { return r6Text(c); }) : null; };
-        var ew = zeile(/^Ertragswert/), km = zeile(/^Kaltmiete p\. a\./);
-        DPM_REIHE.r26pa = { kopf: kopf, ertragswert: ew, kaltmiete: km };
+        var ew = zeile(/^Ertragswert/), km = zeile(/^Kaltmiete p\. a\./), mpi = zeile(/^Marktpreisindikation/), rf = zeile(/^Rohertragsfaktor/);
+        /* v2481m · seit v2541 tragen die Köpfe ein Jahr („Bestand 2026", „Zielbild Jahr offen") - Spalte per Muster */
+        var sx = function (re) { for (var i = 1; i < kopf.length; i++) if (re.test(kopf[i])) return i; return -1; };
+        var iB = sx(/^Bestand/), iM = sx(/^Mieterh/), iZ = sx(/^Zielbild/), iA = sx(/^Ankauf/);
+        DPM_REIHE.r26pa = { kopf: kopf, ertragswert: ew, kaltmiete: km, mpi: mpi, rf: rf };
         var sp = kopf.slice(1);   /* ohne die Spalte „Kennzahl" */
-        await b2oZeile(s, (sp.length === 3 ? 'Drei Stufen' : sp.length + ' Spalten') + ' nebeneinander', sp.join(' · ') + (km ? ' — Kaltmiete im Jahr von <b>' + km[kopf.indexOf('Bestand') >= 0 ? kopf.indexOf('Bestand') : 1] + '</b> bis <b>' + km[km.length - 1] + '</b>' : '') + '.');
-        if (ew) await b2oZeile(s, 'Ertragswert je Stufe', 'Bestand <b>' + ew[kopf.indexOf('Bestand')] + '</b>, mit Mieterhöhung <b>' + ew[kopf.length - 2] + '</b>, im Zielbild <b>' + ew[kopf.length - 1] + '</b> — Potenzialwert, keine Verkehrswertermittlung.');
+        await b2oZeile(s, sp.length + ' Spalten nebeneinander', sp.join(' · ') + (km && iB > 0 ? ' — Kaltmiete im Jahr von <b>' + km[iB] + '</b> bis <b>' + km[iZ > 0 ? iZ : km.length - 1] + '</b>' : '') + '.', 800);
+        var kz = function () { var t = tab(); return t && t.querySelector('thead'); };
+        if (kz()) { await zeige(kz, 6); await b2oZeile(s, 'Jede Stufe hat ihr Jahr', (iA > 0 ? '<b>' + kopf[iA] + '</b> aus dem Kaufdatum, ' : '') + (iM > 0 ? '<b>' + kopf[iM] + '</b> ab dem frühesten Termin der Soll-Mieten, ' : '') + (iZ > 0 ? '<b>' + kopf[iZ] + '</b> aus dem eingetragenen Jahr.' : ''), 1000); }
+        var zr = function (re) { return function () { var t = tab(); var r = t && [].filter.call(t.querySelectorAll('tbody tr'), function (x) { return re.test(r6Text(x.cells[0])); })[0]; return r || null; }; };
+        if (ew && iB > 0) { await zeige(zr(/^Ertragswert/), 6); await b2oZeile(s, 'Ertragswert je Stufe', 'Bestand <b>' + ew[iB] + '</b>, mit Mieterhöhung <b>' + ew[iM] + '</b>, im Zielbild <b>' + ew[iZ] + '</b> — Potenzialwert, keine Verkehrswertermittlung.', 1000); }
+        if (mpi && iB > 0) { await zeige(function () { var a = zr(/^Marktpreisindikation/)(), b = zr(/^Rohertragsfaktor/)(); return a && b ? b2oHuelle(a, b) : a; }, 6);
+          await b2oZeile(s, 'Daneben der Markt', 'Marktpreisindikation aus Angeboten: Bestand <b>' + mpi[iB] + '</b>, Zielbild <b>' + mpi[iZ] + '</b>' + (rf ? ' — und als Gegenprobe Rohertragsfaktor × Miete: <b>' + rf[iB] + '</b> bis <b>' + rf[iZ] + '</b>' : '') + '.', 1500);
+          await b2oZeile(s, 'Zwei Blickwinkel', 'Der Ertragswert rechnet aus der Miete. Die Marktpreisindikation sagt, was vergleichbare Häuser am Ort im Angebot kosten — abzüglich des üblichen Abschlags.', 1500); }
         /* v2481g · GEMESSEN: die Aufteilung steht als ZEILEN in derselben Tafel, nicht als eigene Tabelle - gezeigt werden diese Zeilen samt Begründung */
         var auf = function () {
           var p = r11Panel(); if (!p) return null;
@@ -5702,6 +5744,51 @@
           await b2oZeile(s, 'Der Pilot dazu', 'Ein Absatz in ganzen Sätzen: was im Haus steckt, welche Wohnung den größten Hebel hat — und was davon nur Plan ist.', 1200);
         }
       },
+      async function (s) {   /* 12b · Pilot-Analyse: Abschnitt Marktpreise (v2481m) */
+        /* v2481m · Abschnitt „Marktpreise" (v2542): Abruf mit Rückfrage. Bucht 1 × erweiterte MPI -
+           im Lauf NUR gespielt (rhAntwort), im Mitschnitt-Lauf genau einmal echt. */
+        var mk = function () { var p = r11Panel(); var x = p && p.querySelector('[data-dp-pot-markt]'); return x && x.offsetWidth ? x : null; };
+        var mkKnopf = function (a) { var x = mk(); var b = x && x.querySelector('[' + a + ']'); return b && b.offsetWidth ? b : null; };
+        if (mk() && mkKnopf('data-dp-markt-abruf')) {
+          await zeige(function () { var x = mk(); return x && (x.querySelector('.dp-markt-kopf') || x); }, 8);
+          await b2oZeile(s, 'Marktpreise', 'Darunter der Abschnitt <b>„Marktpreise“</b>: Kaufpreise und Angebotsmieten am Ort, je Stufe und je Wohnung — mit Spannen.', 1000);
+          await zeige(function () { return mkKnopf('data-dp-markt-abruf'); }, 10);
+          s.zeile('Abrufen', 'Ein Klick auf <b>„' + r6Text(mkKnopf('data-dp-markt-abruf')) + '“</b> …');
+          await warte(2600);
+          var ab = mkKnopf('data-dp-markt-abruf'); if (ab) ab.click();
+          await warteAuf(function () { return mkKnopf('data-dp-markt-ja'); }, 4000);
+          await zeige(function () { var b = mkKnopf('data-dp-markt-ja'); return b && (b.closest('.dp-pot-stufe3') || b); }, 8);
+          await b2oZeile(s, 'Erst die Rückfrage', 'Der Abruf kostet <b>1 × erweiterte Marktpreisindikation</b> aus dem Kontingent — DealPilot fragt vorher. Das Ergebnis bleibt gespeichert.', 1200);
+          var ja = mkKnopf('data-dp-markt-ja'); if (ja) ja.click();
+          var mt = function () { var x = mk(); return x && x.querySelectorAll('table').length >= 3 ? x : null; };
+          await warteAuf(mt, 60000);
+          await warte(900);
+          var tabs = function (i) { return function () { var x = mk(); var t = x && x.querySelectorAll('table')[i]; return t || null; }; };
+          var T0 = tabs(0)(), zz = function (T, re) { var r = T && [].filter.call(T.querySelectorAll('tbody tr'), function (x) { return re.test(r6Text(x.cells[0])); })[0]; return r ? [].map.call(r.cells, function (c) { return r6Text(c); }) : null; };
+          var kh = zz(T0, /^Kaufpreis (Mehrfam|Haus)/), ke = zz(T0, /^Kaufpreis Eigentum/), am = zz(T0, /^Angebotsmiete/);
+          DPM_REIHE.r26markt = { haus: kh, etw: ke, miete: am };
+          if (T0) {
+            await zeige(tabs(0), 6);
+            await b2oZeile(s, 'Markt am Ort', (kh ? 'Mehrfamilienhäuser im Angebot: Median <b>' + kh[1] + '</b>' : '') + (ke ? ', Eigentumswohnungen <b>' + ke[1] + '</b>' : '') + (am ? ', Angebotsmiete <b>' + am[1] + '</b>' : '') + ' — jeweils mit Spanne und Zahl der Angebote.', 1500);
+          }
+          var T1 = tabs(1)(), m1 = zz(T1, /^Marktpreisindikation/), e1 = zz(T1, /^Ertragswert/);
+          if (T1 && m1) {
+            await zeige(tabs(1), 6);
+            await b2oZeile(s, 'Je Stufe', 'Marktpreisindikation <b>' + m1.slice(1).join('</b> · <b>') + '</b>' + (e1 ? ' — neben dem Ertragswert ' + e1.slice(1).join(' · ') : '') + '.', 1500);
+          }
+          var T2 = (function () { var x = mk(); return x && [].filter.call(x.querySelectorAll('table'), function (t) { return /Je Wohnung als ETW/.test(r6Text(t.querySelector('thead') || t)); })[0]; })();
+          if (T2) {
+            var su = zz(T2, /^Summe/);
+            await zeige(function () { var x = mk(); return x && [].filter.call(x.querySelectorAll('table'), function (t) { return /Je Wohnung als ETW/.test(r6Text(t.querySelector('thead') || t)); })[0]; }, 6);
+            await b2oZeile(s, 'Je Wohnung als Eigentumswohnung', 'Jede Wohnung einzeln am ETW-Markt: gleiches Baujahr, gleiche Flächenklasse' + (su && su[3] ? ' — zusammen <b>' + su[3] + '</b>' + (su[2] && su[2] !== '—' ? ', als Ertragswert ' + su[2] : '') : '') + '.', 1500);
+          }
+          var T3 = (function () { var x = mk(); return x && [].filter.call(x.querySelectorAll('table'), function (t) { return /Verlauf/.test(r6Text(t.querySelector('thead') || t)); })[0]; })();
+          if (T3) {
+            await zeige(function () { var x = mk(); var t = x && [].filter.call(x.querySelectorAll('table'), function (t) { return /Verlauf/.test(r6Text(t.querySelector('thead') || t)); })[0]; return t ? (t.closest('.dp-pot-scroll') || t) : null; }, 6);
+            await b2oZeile(s, 'Der Verlauf', 'Jeder Abruf bleibt mit Datum stehen — mehrere ergeben den Verlauf, und er geht mit in den Marktbericht.', 1200);
+          }
+        }
+      },
       async function (s) {   /* 13 · Tab Bewertung: Wertpotenzial */
         reiter('s6'); await warte(1400);
         var k = function () { var x = q('#card-wertpotenzial'); return x && x.offsetWidth ? x : null; };
@@ -5709,11 +5796,20 @@
         var kopf = function () { var x = k(); return x && (x.querySelector('.ct') || x); };
         await zeige(kopf, 8);
         await b2oZeile(s, 'Tab Bewertung', 'Dieselben Zahlen im Reiter Bewertung: die Karte <b>„' + r6Text(kopf()).replace(/\s*Potenzialwert.*$/i, '') + '“</b>.');
-        var br = function () { var x = k(); var sv = x && x.querySelector('svg'); return sv || null; };
-        if (br()) {
-          await zeige(br, 8);
-          var kt = r6Text(k()), pn = /Potenzial netto\s*([+−-]?[\d.]+ €)/.exec(kt);
-          await b2oZeile(s, 'Die Wertbrücke', 'Vom Bestand über Mieterhöhung und Zielbild, abzüglich der Maßnahmen' + (pn ? ' — <b>Potenzial netto ' + pn[1] + '</b>' : '') + '.');
+        /* v2481m · v2543: „Wertüberleitung" (table.dp-wp-ueb) statt Wertbrücke - Zeilen live gelesen */
+        var ue = function () { var x = k(); return x && x.querySelector('table.dp-wp-ueb'); };
+        if (ue()) {
+          await zeige(ue, 8);
+          var uz = [].map.call(ue().querySelectorAll('tr'), function (r) { var l = r.querySelector('td.l'), v = r.querySelector('td.v'); return { t: l ? r6Text(l.childNodes[0] || l) : '', v: v ? r6Text(v) : '', cls: r.className }; });
+          var un = uz.filter(function (z) { return /netto/.test(z.cls); })[0], ub = uz[0];
+          DPM_REIHE.r26ueb = uz;
+          await b2oZeile(s, 'Die Wertüberleitung', 'Zeile für Zeile: ' + (ub && ub.v ? 'vom Ertragswert im Bestand (<b>' + ub.v + '</b>)' : 'vom Ertragswert im Bestand') + ' über die Mehrwerte aus Mieterhöhung und Zielbild, abzüglich der Maßnahmen.', 1500);
+          if (un) { await zeige(function () { var t = ue(); return t && t.querySelector('tr.netto'); }, 8); await b2oZeile(s, 'Potenzial netto', '<b>' + un.v + '</b> — die Balken stehen um null: was den Wert hebt, nach rechts, was ihn kostet, nach links.', 1200); }
+        }
+        var kpm = function () { var x = k(); var r = x && [].filter.call(x.querySelectorAll('table:not(.dp-wp-ueb) tbody tr'), function (r) { return /^Marktpreisindikation/.test(r6Text(r.cells[0] || r)); })[0]; return r ? (r.closest('table') || r) : null; };
+        if (kpm()) {
+          await zeige(kpm, 6);
+          await b2oZeile(s, 'Kennzahlen je Stufe', 'Miete, Rendite, DSCR und Ertragswert je Stufe — und darunter die Marktpreisindikation, als Gegenprobe zum Ertragswert.', 1200);
         }
       },
       async function (s) {   /* 14 · Bank-PDF: Seite Wertpotenzial */
@@ -5730,8 +5826,8 @@
         zeige(null); kegelHoch(true);
         await r19Seite(bank, _r26.seite || 1);
         await b2oZeile(s, 'Seite Wertpotenzial', 'Oben die Wohnungen: Ist, Mieterhöhung mit Termin, Zielmiete und Maßnahmen.');
-        await r19Seite(bank, _r26.seite || 1, 330);   /* v2481g · gemessen: ab 330 px die ganze Wertbrücke */
-        await b2oZeile(s, 'Die Wertbrücke', 'Vom Bestand über Mieterhöhung und Zielbild, minus Maßnahmen — bis zum Potenzial netto.');
+        await r19Seite(bank, _r26.seite || 1, 330);   /* v2481g · gemessen: ab 330 px die ganze Wertbrücke (v2543: Wertüberleitung - Lage im Stichbild nachmessen) */
+        await b2oZeile(s, 'Die Wertüberleitung', 'Auch im PDF: vom Bestand über Mieterhöhung und Zielbild, minus Maßnahmen — bis zum Potenzial netto.');
         await r19Seite(bank, _r26.seite || 1, 720);   /* die Kennzahlen je Stufe mit Ertragswert und Aufteilung */
         await b2oZeile(s, 'Kennzahlen je Stufe', 'Miete, Rendite, DSCR, Miete im Ertragswert und Ertragswert je Stufe — gekennzeichnet als Potenzialwert, keine Verkehrswertermittlung.', 1500);
         var o = q('#dpm-pdf'); if (o && o.parentNode) o.parentNode.removeChild(o);
@@ -5740,7 +5836,7 @@
       async function (s) {   /* 15 · Schluss */
         reiter('s0'); var m = q('.main-col'); if (m) m.scrollTop = 0; await warte(700);
         await zeige(function () { var b = q('#mfh-oeffnen'); return b && b.offsetWidth ? b : null; }, 10);
-        await b2oZeile(s, 'Ist, Soll, Zielbild', 'Je Wohnung erfasst, je Stufe bewertet — in Mietentwicklung, Pilot-Analyse, Bewertung und PDF. Gerechnet wird mit dem Bestand, das Potenzial steht daneben.', 1200);
+        await b2oZeile(s, 'Ist, Soll, Zielbild', 'Je Wohnung erfasst, je Stufe bewertet und am Markt gespiegelt — in Mietentwicklung, Pilot-Analyse, Bewertung und PDF. Gerechnet wird mit dem Bestand, das Potenzial steht daneben.', 1500);
       }
     ]
   };
