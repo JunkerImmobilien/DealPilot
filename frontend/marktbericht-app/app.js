@@ -5010,7 +5010,9 @@ async function exportPdf(out) {
     y = doc.lastAutoTable.finalY + 6;
     /* v2518 · woraus jede Einstufung kommt und wo ihre Grenzen liegen -
        Modellannahmen von DealPilot, keine amtlichen Werte */
-    const _stN = ar.filter((r) => r[3] && r[3].basis).map((r) => r[0].replace(/\s*\(.*$/, '') + ': ' + r[3].basis + ' — ' + r[3].schwelle);
+    /* Helvetica (WinAnsi) kennt ≥ ≤ − nicht - jsPDF gaebe die Zeile sonst als Zeichensalat aus */
+    const _pdfZ = (t) => String(t || '').replace(/≥/g, 'ab ').replace(/≤/g, 'bis ').replace(/−/g, '-');
+    const _stN = ar.filter((r) => r[3] && r[3].basis).map((r) => r[0].replace(/\s*\(.*$/, '') + ': ' + r[3].basis + ' – ' + _pdfZ(r[3].schwelle));
     if (_stN.length) { doc.setFontSize(6.5); doc.setTextColor(...MUT);
       const _sl = doc.splitTextToSize('Einstufung (Modellannahme DealPilot, fünf Stufen): ' + _stN.join(' · '), W - 2 * M);
       need(3 * _sl.length + 2); doc.text(_sl, M, y); y += 3 * _sl.length + 2; }
