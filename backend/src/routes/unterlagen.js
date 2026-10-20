@@ -87,27 +87,13 @@ router.post('/entwurf', async (req, res, next) => {
     if (!unterlagen.ARTEN_MAP[art]) {
       return res.status(400).json({ error: 'Unbekannte Unterlagenart.' });
     }
-    const brief = unterlagen.anschreiben(art, b.objekt || {}, b.absender || {});
-
-    let anfrage = null;
-    const objektId = String(b.objekt_id || '').trim();
-    if (objektId && /^[0-9a-f-]{36}$/i.test(objektId)) {
-      /* Das Objekt muss ihm gehören. Ein Vorgang an einem fremden Objekt
-         wäre ein Leck, auch wenn nur ein Briefentwurf daran hängt. */
-      const o = await query(
-        `SELECT id FROM objects WHERE id = $1 AND user_id = $2`,
-        [objektId, req.user.id]);
-      if (o.rows.length) {
-        const amtId = Number(b.amt_id) || null;
-        const r = await query(
-          `INSERT INTO unterlagen_anfragen
-             (user_id, objekt_id, art, amt_id, betreff, anschreiben, status)
-           VALUES ($1,$2,$3,$4,$5,$6,'entwurf') RETURNING *`,
-          [req.user.id, objektId, art, amtId, brief.betreff, brief.text]);
-        anfrage = r.rows[0];
-      }
-    }
-    res.json({ betreff: brief.betreff, text: brief.text, anfrage: anfrage });
+    /* v2470 · Der Vorgang liegt im Dienst (entwurfAnlegen) — derselbe Weg
+       wie im Telegram-Bot. Die Eigentumsprüfung am Objekt steht dort. */
+    const r = await unterlagen.entwurfAnlegen(req.user.id, {
+      art: art, objekt_id: b.objekt_id, amt_id: b.amt_id,
+      objekt: b.objekt || {}, absender: b.absender || {}
+    });
+    res.json(r);
   } catch (e) { next(e); }
 });
 
@@ -131,17 +117,13 @@ router.get('/objekt/:id', async (req, res, next) => {
 router.put('/anfrage/:id', async (req, res, next) => {
   try {
     const status = String((req.body || {}).status || '').trim();
-    if (!['entwurf', 'gesendet', 'erledigt', 'abgebrochen'].includes(status)) {
+    if (!unterlagen.ANFRAGE_STATUS.includes(status)) {
       return res.status(400).json({ error: 'Unbekannter Status.' });
     }
-    const r = await query(
-      `UPDATE unterlagen_anfragen
-          SET status = $3,
-              gesendet_am = CASE WHEN $3 = 'gesendet' THEN now() ELSE gesendet_am END
-        WHERE id = $1 AND user_id = $2 RETURNING *`,
-      [Number(req.params.id) || 0, req.user.id, status]);
-    if (!r.rows.length) return res.status(404).json({ error: 'Vorgang nicht gefunden.' });
-    res.json({ anfrage: r.rows[0] });
+    /* v2470 · über den Dienst, derselbe Weg wie „verschickt" im Bot */
+    const a = await unterlagen.anfrageStatus(req.user.id, req.params.id, status);
+    if (!a) return res.status(404).json({ error: 'Vorgang nicht gefunden.' });
+    res.json({ anfrage: a });
   } catch (e) { next(e); }
 });
 

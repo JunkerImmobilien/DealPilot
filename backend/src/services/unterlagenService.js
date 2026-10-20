@@ -1313,8 +1313,60 @@ async function aemterFuer(plz, ort) {
     .map(function (a) { return Object.assign({}, a, { gemeindeweit: true }); }));
 }
 
+/* ═══ v2470 · DER VORGANG: ENTWURF ABLEGEN, STATUS SETZEN ════════════════
+ *
+ * Bis v2445 stand beides als SQL direkt in routes/unterlagen.js. Seit der
+ * Telegram-Bot denselben Weg geht (Marcel 20.10.2026: Telegram-Teil aus
+ * unterlagen-app-v5), liegt es hier — sonst gäbe es zwei INSERTs, und der
+ * zweite prüft irgendwann nicht mehr, ob das Objekt dem Nutzer gehört.
+ *
+ *   > Zwei Eingänge, ein Kern. Der Bot ist ein zweiter Behälter für
+ *   > denselben Vorgang, keine zweite Regel.
+ *
+ * Verschickt wird auch hier NICHTS: es entsteht ein Briefentwurf und eine
+ * Zeile mit status 'entwurf'. */
+const _UUID = /^[0-9a-f-]{36}$/i;
+async function entwurfAnlegen(userId, opts) {
+  const o = opts || {};
+  const art = String(o.art || '').trim();
+  if (!ARTEN_MAP[art]) throw new Error('Unbekannte Unterlagenart: ' + art);
+  const brief = anschreiben(art, o.objekt || {}, o.absender || {});
+  let anfrage = null;
+  const objektId = String(o.objekt_id || '').trim();
+  if (userId && objektId && _UUID.test(objektId)) {
+    /* Das Objekt muss ihm gehören. Ein Vorgang an einem fremden Objekt
+       wäre ein Leck, auch wenn nur ein Briefentwurf daran hängt. */
+    const own = await query(
+      'SELECT id FROM objects WHERE id = $1 AND user_id = $2', [objektId, userId]);
+    if (own.rows.length) {
+      const amtId = Number(o.amt_id) || null;
+      const r = await query(
+        `INSERT INTO unterlagen_anfragen
+           (user_id, objekt_id, art, amt_id, betreff, anschreiben, status)
+         VALUES ($1,$2,$3,$4,$5,$6,'entwurf') RETURNING *`,
+        [userId, objektId, art, amtId, brief.betreff, brief.text]);
+      anfrage = r.rows[0];
+    }
+  }
+  return { betreff: brief.betreff, text: brief.text, anfrage: anfrage };
+}
+
+const ANFRAGE_STATUS = ['entwurf', 'gesendet', 'erledigt', 'abgebrochen'];
+async function anfrageStatus(userId, anfrageId, status) {
+  if (ANFRAGE_STATUS.indexOf(status) < 0) throw new Error('Unbekannter Status.');
+  const r = await query(
+    `UPDATE unterlagen_anfragen
+        SET status = $3,
+            gesendet_am = CASE WHEN $3 = 'gesendet' THEN now() ELSE gesendet_am END
+      WHERE id = $1 AND user_id = $2 RETURNING *`,
+    [Number(anfrageId) || 0, userId, status]);
+  return r.rows[0] || null;
+}
+
 module.exports = {
   ARTEN, ARTEN_MAP, gemeindeSchluessel, istGewerblich, mailGueltig,
+  /* v2470 · Vorgang ablegen und Status setzen — Web-Route und Telegram-Bot */
+  entwurfAnlegen, anfrageStatus, ANFRAGE_STATUS,
   amtSuchen, amtHolen, aemterFuer, belegPruefen, anschreiben,
   /* v2151 · fuer die Pruefstrecke und kuenftige Aufrufer */
   mailsAufSeite, istPersonenpostfach, belegSeiten,

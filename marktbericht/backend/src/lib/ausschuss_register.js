@@ -486,6 +486,11 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                             'uk-wgfz-nw2-2026.json', 'uk-wgfz-bw-2026.json', 'uk-wgfz-ost-west-2026.json',
                             /* v2367: MFH-Kennzahlen (Rohertragsfaktor, Ø Kaufpreis/Miete der Kauffaelle) - Gegenprobe zur Angebotsindikation. */
                             'mfh-kennzahlen-2026.json',
+                            /* Ernte 20.10.2026: Gutachterausschuss Ulm, Immobilienmarktbericht 2026 (Genehmigung vom
+                               23.09.2026, laut Marcel Junker auch fuer Jahrgang 2026). 9 Zinssaetze (loesen die Saetze 2025
+                               in lzs-bw.json ab - juengster Jahrgang gilt), Sachwertfaktor nur als Diagramm ohne Gleichung
+                               (Sperren), keine Umrechnungskoeffizienten Flaeche (Sperren). */
+                            'lzs-swf-uk-ulm-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

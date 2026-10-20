@@ -3647,7 +3647,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
       <button class="ltv-btn" data-ltv="85" onclick="QcApp.setLtv(85, this)">85%</button>
       <button class="ltv-btn" data-ltv="80" onclick="QcApp.setLtv(80, this)">80%</button>
     </div>
-    <div class="qc-ltv-satz" id="qc-ltv-satz" style="font:500 11.5px/1.35 'DM Sans',system-ui,sans-serif;color:#6b6660;margin:-4px 2px 10px">Darlehen = 100 % des Kaufpreises · Nebenkosten aus Eigenkapital</div><!-- qc-v2420 -->
+    <div class="qc-ltv-satz" id="qc-ltv-satz" style="font:500 11.5px/1.35 'DM Sans',system-ui,sans-serif;color:#6b6660;margin:-4px 2px 10px">Darlehen = 100 % von Kaufpreis + Nebenkosten</div><!-- qc-v2420, qc-v2450 -->
     <div class="row row-4">
       <div class="field">
         <label class="req" for="qc_kp">Kaufpreis (€)</label>
@@ -3942,7 +3942,7 @@ const QcEngine = (function() {
     const gesamt = kp * (1 + knkPct / 100);
     const ekValue = ek != null ? ek : gesamt * 0.20;
     const darlehen = Math.max(0, gesamt - ekValue);
-    const ltvPct = darlehen / kp * 100;
+    const ltvPct = darlehen / gesamt * 100;   /* qc-v2450: wie die Beleihungsknoepfe auf Kaufpreis + Nebenkosten */
     const ekr = ekValue > 0 ? ((nkm * 12) - nulY - (darlehen * zins / 100)) / ekValue * 100 : 0;
     const annu = darlehen * (zins + tilg) / 100;
     const annuMon = annu / 12;
@@ -4219,9 +4219,17 @@ const QcApp = (function() {
      das EK nach der aktiven Quote, solange es von hier stammt (leer oder
      unser letzter Wert). Ein selbst getipptes oder importiertes EK bleibt -
      dann ist kein Knopf mehr markiert. Darunter steht, was gerechnet wird. */
+  /* qc-v2450 · DIE QUOTE GILT AUF DIE GESAMTINVESTITION
+     Marcel 20.10.2026: „bei 180.000 € Kaufpreis und 100 % Finanzierung wären
+     das 0 € Eigenkapital, da passt was nicht." Bis qc-v2420a hiess 100 %
+     „Darlehen = Kaufpreis, Nebenkosten aus EK" - gemessen KP 180.000 ohne
+     PLZ: EK 24.786 € bei „100 %". Jetzt: Darlehen = Quote x (Kaufpreis +
+     Nebenkosten), EK = Rest. 100 % = Vollfinanzierung inkl. Nebenkosten =
+     0 € EK. Die Karte rechnet den LTV auf derselben Basis (ekInklNkLtv in
+     _dpPilotScore), damit Knopf und Kachel dieselbe Zahl zeigen. */
   function _ekAuto(kp) {
     const knkPct = window._qcKnkPct();   /* v2254: war fest 10,5 */
-    return Math.round(kp * (1 - _ltv / 100) + kp * knkPct / 100);
+    return Math.round(kp * (1 + knkPct / 100) * (1 - _ltv / 100));
   }
   function _ltvKnoepfe(aktiv) {
     document.querySelectorAll('.ltv-btn').forEach(b => b.classList.toggle('active', aktiv && Number(b.getAttribute('data-ltv')) === _ltv));
@@ -4244,20 +4252,20 @@ const QcApp = (function() {
   function _ltvSatz(vonHier, kp) {
     const el = document.getElementById('qc-ltv-satz');
     if (!el) return;
-    if (!kp) { el.textContent = 'Darlehen = ' + _ltv + ' % des Kaufpreises · Nebenkosten aus Eigenkapital'; el.title = ''; return; }
+    if (!kp) { el.textContent = 'Darlehen = ' + _ltv + ' % von Kaufpreis + Nebenkosten'; el.title = ''; return; }
     const knk = window._qcKnkPct(), T = window._qcKnkTeile || {};
     const ek = QcEngine.num(document.getElementById('qc_ek').value) || 0;
     const darl = Math.max(0, kp * (1 + knk / 100) - ek);
-    const q = darl / kp * 100;
+    const q = darl / (kp * (1 + knk / 100)) * 100;   /* qc-v2450: auf die Gesamtinvestition */
     let t = vonHier
-      ? 'Darlehen = ' + _ltv + ' % des Kaufpreises · Nebenkosten (' + _pctDe(knk) + ' %) aus Eigenkapital'
-      : 'Eigenkapital frei eingetragen · Darlehen = ' + _pctDe(Math.round(q * 10) / 10) + ' % des Kaufpreises';
+      ? 'Darlehen = ' + _ltv + ' % von Kaufpreis + Nebenkosten (' + _pctDe(knk) + ' %)' + (_ltv >= 100 ? ' · kein Eigenkapital' : '')
+      : 'Eigenkapital frei eingetragen · Darlehen = ' + _pctDe(Math.round(q * 10) / 10) + ' % von Kaufpreis + Nebenkosten';
     if (!T.plz) t += ' · ohne PLZ mit 6,5 % Grunderwerbsteuer';
     el.textContent = t;
     el.title = 'Kaufnebenkosten ' + _pctDe(knk) + ' % = Grunderwerbsteuer ' + _pctDe(T.grest || 0) + ' % + Notar ' + _pctDe(T.notar || 0)
       + ' % + Grundbuch ' + _pctDe(T.gb || 0) + ' % + Makler ' + _pctDe(T.makler || 0) + ' % + Sonstige ' + _pctDe(T.sonst || 0)
       + ' % (Sätze aus deinen Einstellungen, wie im Objekt).'
-      + ' Der LTV auf der Karte bezieht sich auf den Marktwert, sobald einer abgerufen ist.';
+      + ' Der LTV auf der Karte steht auf derselben Basis: Darlehen geteilt durch Kaufpreis + Nebenkosten.';
   }
   function setLtv(pct, btnEl) {
     _ltv = pct;
@@ -5259,30 +5267,52 @@ const QcApp = (function() {
     const k = score.kpi;
     const pros = [], cons = [];
 
-    if (k.bmr >= 5)        pros.push(`Bruttomietrendite <strong>${k.bmr.toString().replace('.', ',')}%</strong> liegt über dem Zielwert`);
-    else if (k.bmr >= 4)   pros.push(`Bruttomietrendite mit ${k.bmr.toString().replace('.', ',')}% solide`);
-    else                   cons.push(`Bruttomietrendite <strong>${k.bmr.toString().replace('.', ',')}%</strong> unter Zielwert — Verhandlungsbedarf`);
-    if (k.nmr >= 3)        pros.push(`Nettomietrendite <strong>${k.nmr.toString().replace('.', ',')}%</strong> erreicht das Ziel`);
-    else                   cons.push(`Nettomietrendite <strong>${k.nmr.toString().replace('.', ',')}%</strong> zu niedrig`);
+    /* qc-v2450 · PRO/CONTRA AM SELBEN MASSSTAB WIE DAS URTEIL
+       Gemessen am 20.10.2026 (ETW Bielefeld, B-Lage, 4,6 % brutto): Pro
+       „Bruttomietrendite mit 4,6% solide", Urteil darueber „Nicht kaufen —
+       Rendite unter deinem Ziel für die B-Lage". Ist eine Lageklasse gewaehlt,
+       misst die Zeile jetzt an deren Ziel (QcHeuristik.zielUrteil - dieselbe
+       Quelle wie Urteil und Meinung); ohne Klasse an den festen 4/5 %, und sie
+       sagt, woran. „liegt über dem Zielwert" nannte keinen Zielwert. */
+    const _p1 = x => (Math.round(x * 10) / 10).toFixed(1).replace('.', ',') + ' %';
+    const _cfT = x => (x > 0 ? '+' : '') + Math.round(x).toLocaleString('de-DE') + ' €/Mo';
+    let _zuB = null;
+    try {
+      const _zb = (window.DealPilotLageProfil && inputs.lageklasse) ? window.DealPilotLageProfil.zielBmr(inputs.lageklasse) : null;
+      if (_zb != null && window.QcHeuristik && QcHeuristik.zielUrteil) _zuB = QcHeuristik.zielUrteil(k.bmr, _zb, inputs.lageklasse);
+    } catch (_e) { _zuB = null; }
+    if (_zuB) {
+      const _zt = `Bruttomietrendite <strong>${_p1(k.bmr)}</strong> ${_zuB.wort} (${_zuB.ziel.toFixed(2).replace(/0$/, '').replace(/\.$/, '').replace('.', ',')} %${_zuB.klasse ? ' für die ' + _zuB.klasse + '-Lage' : ''})`;
+      if (_zuB.ampel === 'gruen') pros.push(_zt); else cons.push(_zt);
+    }
+    else if (k.bmr >= 5)   pros.push(`Bruttomietrendite <strong>${_p1(k.bmr)}</strong> — gut (ab 5 %)`);
+    else if (k.bmr >= 4)   pros.push(`Bruttomietrendite <strong>${_p1(k.bmr)}</strong> — solide (4 bis 5 %)`);
+    else                   cons.push(`Bruttomietrendite <strong>${_p1(k.bmr)}</strong> unter 4 % — Verhandlungsbedarf`);
+    if (k.nmr >= 3)        pros.push(`Nettomietrendite <strong>${_p1(k.nmr)}</strong> — gut (ab 3 %)`);
+    else                   cons.push(`Nettomietrendite <strong>${_p1(k.nmr)}</strong> zu niedrig (unter 3 %)`);
     /* v2240 · Alle Ampeln: DSCR, LTV und Cashflow gegen die persoenlichen
        Mindest-Schwellen (Vorgabe 1,2 / 90 / 0). Hier standen eigene
        Grenzen (DSCR 1,3/1,1, LTV 95/105). */
     const _S = window._qcSw();
     const _cfS = (_S.cfGruen > 0 ? '+' : '') + Math.round(_S.cfGruen).toLocaleString('de-DE');
-    if (k.cfMon >= _S.cfGruen + 100) pros.push(`Cashflow <strong>${k.cfMon >= 0 ? '+' : ''}${k.cfMon} €/Mo</strong> ist solide positiv`);
-    else if (k.cfMon >= _S.cfGruen)  pros.push(_S.cfGruen === 0 ? `Cashflow knapp positiv (+${k.cfMon} €/Mo)` : `Cashflow ${k.cfMon >= 0 ? '+' : ''}${k.cfMon} €/Mo erreicht dein Minimum (${_cfS} €)`);
-    else if (k.cfMon >= 0)           cons.push(`Cashflow <strong>+${k.cfMon} €/Mo</strong> unter deinem Minimum (${_cfS} €)`);
-    else                             cons.push(`Cashflow <strong>${k.cfMon} €/Mo</strong> — Zuzahlung nötig`);
+    if (k.cfMon >= _S.cfGruen + 100) pros.push(`Cashflow <strong>${_cfT(k.cfMon)}</strong> ist solide positiv`);
+    else if (k.cfMon >= _S.cfGruen)  pros.push(_S.cfGruen === 0 ? (k.cfMon > 0 ? `Cashflow knapp positiv (${_cfT(k.cfMon)})` : `Cashflow ausgeglichen (0 €/Mo)`) : `Cashflow ${_cfT(k.cfMon)} erreicht dein Minimum (${_cfS} €)`);
+    else if (k.cfMon >= 0)           cons.push(`Cashflow <strong>${_cfT(k.cfMon)}</strong> unter deinem Minimum (${_cfS} €)`);
+    else                             cons.push(`Cashflow <strong>${_cfT(k.cfMon)}</strong> — Zuzahlung nötig`);
     if (k.dscr != null) {
       if (k.dscr >= _S.dscrGruen)     pros.push(`DSCR <strong>${k.dscr.toString().replace('.', ',')}</strong> — Bank-tauglich`);
       else if (k.dscr >= _S.dscrGelb) cons.push(`DSCR <strong>${k.dscr.toString().replace('.', ',')}</strong> grenzwertig für die Bank`);
       else                            cons.push(`DSCR <strong>${k.dscr.toString().replace('.', ',')}</strong> kritisch — Finanzierung schwierig`);
     }
-    if (k.ltvPct <= _S.ltvGruen)     pros.push(`Beleihung <strong>${k.ltvPct}%</strong> in solidem Rahmen`);
-    else if (k.ltvPct <= _S.ltvRot)  cons.push(`Beleihung <strong>${k.ltvPct}%</strong> leicht erhöht`);
-    else                             cons.push(`Beleihung <strong>${k.ltvPct}%</strong> — Vollfinanzierung+`);
-    if (k.bwkPctOfNkm <= 25) pros.push(`Bewirtschaftung <strong>${k.bwkPctOfNkm}%</strong> der NKM — schlank`);
-    else if (k.bwkPctOfNkm > 35) cons.push(`Bewirtschaftung <strong>${k.bwkPctOfNkm}%</strong> der NKM hoch`);
+    /* qc-v2450: der LTV steht auf Kaufpreis + Nebenkosten (wie die Knoepfe).
+       „in solidem Rahmen" bei 90 % stand neben „Punkte kosten vor allem der
+       LTV" - beides stimmt, wenn der Satz sagt, WORAN er misst. */
+    const _lg = String(Math.round(_S.ltvGruen * 10) / 10).replace('.', ',');
+    if (k.ltvPct <= _S.ltvGruen)     pros.push(`Beleihung <strong>${k.ltvPct} %</strong> im Rahmen deines Maximal-LTV (${_lg} %)`);
+    else if (k.ltvPct <= _S.ltvRot)  cons.push(`Beleihung <strong>${k.ltvPct} %</strong> über deinem Maximal-LTV (${_lg} %)`);
+    else                             cons.push(`Beleihung <strong>${k.ltvPct} %</strong> — mehr als Kaufpreis und Nebenkosten finanziert`);
+    if (k.bwkPctOfNkm <= 25) pros.push(`Bewirtschaftung <strong>${k.bwkPctOfNkm} %</strong> der Nettokaltmiete — schlank`);
+    else if (k.bwkPctOfNkm > 35) cons.push(`Bewirtschaftung <strong>${k.bwkPctOfNkm} %</strong> der Nettokaltmiete — hoch (üblich 18 bis 35 %)`);
 
     // AVM-Daten einfließen lassen (provider-aware: PriceHubble + Sprengnetter)
     let avmAnalysis = '';
@@ -5599,6 +5629,11 @@ const QcApp = (function() {
       dscr: QcEngine.num(k.dscr) || 0, ltv: QcEngine.num(k.ltvPct) || 0,
       bewirtPctNkm: QcEngine.num(k.bwkPctOfNkm) || 0,
       marktwert: mw, marktwert_grund: mwGrund,
+      /* qc-v2450: die Teilnoten des Scores (DealScore-Schluessel) - damit der
+         Grund „Punkte kosten vor allem …" eine Groesse nennt, die im Score
+         steckt; und die Objektart fuer die Pruefliste (kein Hausgeld beim MFH). */
+      teilnoten: (score.sub && ('potenzial' in score.sub || 'risiko' in score.sub)) ? score.sub : null,
+      objektart: inputs.objektart || null,
       /* ══ v1956 · DIE ZIELRENDITE DER GEWAEHLTEN LAGEKLASSE ═════════
          Marcel: „dann geht im Quick-Check in unsere Bewertung mit ein,
          um wie viel ich den Kaufpreis verhandeln muss, damit ich
@@ -5649,14 +5684,14 @@ const QcApp = (function() {
       /* v2226 · die Lage kippt das Urteil, nicht den Score (qc-heuristik) */
       'NICHT KAUFEN': { ton: 'bad', zeichen: '📍',
                     kopf: 'Nicht kaufen — Rendite unter deinem Ziel für die ' + ((e.lage && e.lage.klasse) || '') + '-Lage',
-                    kurz: 'passt nicht zu deiner Lage-Vorgabe' }
+                    kurz: 'gemessen an deiner Lage-Vorgabe zu teuer' }   /* qc-v2450: „zu kaufen ist passt nicht" */
     };
     var w = WORTE[e.verdict] || WORTE.PRUEFEN;
 
     /* Die Schwachpunkte als Verhandlungsargument — sie standen schon
        vorher im Rat, nur in einem der drei Zweige. */
     var argumente = (cons && cons.length)
-      ? cons.slice(0, 2).map(function (c) { return c.replace(/<\/?strong>/g, '"'); }).join(' · ')
+      ? cons.slice(0, 2).map(function (c) { return c.replace(/<strong>/g, '„').replace(/<\/strong>/g, '“'); }).join(' · ')   /* qc-v2450: deutsche Anführungszeichen */
       : '';
 
     /* v2238 · Marcel 14.10.2026: der Wertpuffer gehört auch in die Überschrift.
@@ -5687,7 +5722,9 @@ const QcApp = (function() {
     const wfl = QcEngine.num(inputs.wfl);
     const ort = inputs.ort || 'unbekannter Ort';
     const kp = QcEngine.num(inputs.kp);
-    parts.push(`Eine <strong>${objArt}</strong> in <strong>${ort}</strong>${wfl ? ' mit ' + wfl + ' m²' : ''} für <strong>${fmt0(kp)} €</strong> zu kaufen ist`);
+    /* qc-v2450: „Eine EFH", „Eine MFH" - das Haus ist saechlich */
+    const _art = ({ EFH: 'Ein', MFH: 'Ein', ZFH: 'Ein', RH: 'Ein', Gewerbe: 'Ein' })[objArt] || 'Eine';
+    parts.push(`${_art} <strong>${objArt}</strong> in <strong>${ort}</strong>${wfl ? ' mit ' + wfl + ' m²' : ''} für <strong>${fmt0(kp)} €</strong> zu kaufen ist`);
     
     // Bewertung
     /* v1945: dieselbe Quelle wie Verdict und Verhandlungsrat. Hier stand
@@ -5729,9 +5766,9 @@ const QcApp = (function() {
           _zu = QcHeuristik.zielUrteil(k.bmr, _zbmr, inputs.lageklasse);
         }
       } catch (e) { _zu = null; }
-      parts.push(`Die Bruttomietrendite von <strong>${k.bmr.toString().replace('.', ',')}%</strong> liegt`);
+      parts.push(`Die Bruttomietrendite von <strong>${(Math.round(k.bmr * 10) / 10).toFixed(1).replace('.', ',')} %</strong> liegt`);   /* qc-v2450: wie Pro/Contra („6,0 %“ statt „6%“) */
       if (_zu) {
-        parts.push(`<strong>${_zu.wort}</strong> von ${_zu.ziel.toFixed(1).replace('.', ',')} %`
+        parts.push(`<strong>${_zu.wort}</strong> von ${_zu.ziel.toFixed(2).replace(/0$/, '').replace(/\.$/, '').replace('.', ',')} %`   /* qc-v2450: 3,75 statt 3,8 */
           + (_zu.klasse ? ` für die ${_zu.klasse}-Lage` : '') + `. ${_zu.satz}`);
       } else {
         if (k.bmr >= 5.5) parts.push(`<strong>über dem deutschen Durchschnitt</strong> (~4,5%).`);
@@ -5743,9 +5780,11 @@ const QcApp = (function() {
 
     if (k.cfMon != null) {
       if (k.cfMon < 0) {
-        parts.push(`Der monatliche Cashflow von <strong>${k.cfMon} €</strong> bedeutet, dass du jeden Monat aus eigener Tasche zulegst — über 10 Jahre sind das ${fmt0(Math.abs(k.cfMon * 120))} €.`);
+        parts.push(`Der monatliche Cashflow von <strong>${fmt0(k.cfMon)} €</strong> bedeutet, dass du jeden Monat aus eigener Tasche zulegst — über 10 Jahre sind das ${fmt0(Math.abs(k.cfMon * 120))} €.`);
+      } else if (k.cfMon === 0) {
+        parts.push(`Der Cashflow ist <strong>ausgeglichen</strong> — Miete und Kosten heben sich auf, ein Puffer bleibt nicht.`);
       } else {
-        parts.push(`Der positive Cashflow von <strong>+${k.cfMon} €/Mo</strong> deckt die laufenden Kosten ab.`);
+        parts.push(`Der positive Cashflow von <strong>+${fmt0(k.cfMon)} €/Mo</strong> deckt Kapitaldienst und nicht umlagefähige Kosten.`);
       }
     }
 
@@ -5753,8 +5792,12 @@ const QcApp = (function() {
 
     // Tilgung-Status
     if (k.darlehen && k.annuMon) {
-      const tilgPaRel = (k.darlehen * QcEngine.num(inputs.tilg) / 100);
-      const jahreBisHalbiert = Math.round(50 / QcEngine.num(inputs.tilg));
+      /* qc-v2450: hier stand 50 / Tilgung - das ist die Laufzeit OHNE
+         Zinseszins. Bei der Annuitaet waechst die Tilgung: 3,8 % Zins und
+         1,5 % Tilgung halbieren das Darlehen nach rund 22 Jahren, nicht 33.
+         (1 + z)^n = 1 + 0,5 z / t */
+      const _z = (QcEngine.num(inputs.zins) || 3.8) / 100, _t = (QcEngine.num(inputs.tilg) || 1.5) / 100;
+      const jahreBisHalbiert = Math.round(Math.log(1 + 0.5 * _z / _t) / Math.log(1 + _z));
       parts.push(`Mit der gewählten Tilgung von <strong>${inputs.tilg}%</strong> dauert es etwa <strong>${jahreBisHalbiert} Jahre</strong> bis das Darlehen zur Hälfte getilgt ist.`);
     }
 
@@ -5765,7 +5808,12 @@ const QcApp = (function() {
     /* Nur der ERSTE Satz des Rats — der ganze steht zwei Zentimeter
        darueber in der Verhandlungs-Empfehlung. Zweimal derselbe Text macht
        die Box laenger und nicht klarer. */
-    var _ratKurz = String(_u.rat).replace(/<\/?strong>/g, '').split(/(?<=\.)\s/)[0];
+    /* qc-v2450: bei verfehlter Lage-Rendite war der erste Satz des Rats
+       („Für die B-Lage zu wenig Rendite …") dieselbe Aussage wie der Satz zur
+       Bruttomietrendite drei Zeilen darueber. Dann gilt der erste Satz, der
+       etwas Neues sagt. */
+    var _saetze = String(_u.rat).replace(/<\/?strong>/g, '').split(/(?<=\.)\s/);
+    var _ratKurz = _saetze.filter(function (x) { return !/^(Für die [A-C]-Lage zu wenig Rendite|Deine Zielrendite erreicht er)/.test(x); })[0] || _saetze[0];
     parts.push(`<strong>Empfehlung:</strong> ` + _ratKurz);
 
     return parts.join(' ');
@@ -6969,7 +7017,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
-  <script src="js/qc-heuristik.js?v=v2240"></script>
+  <script src="js/qc-heuristik.js?v=qc-v2450"></script>
   <script src="js/dealscore.js?v=v2191"></script>
   <script src="js/avm-section.js?v=v2149"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->
@@ -7421,7 +7469,12 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     var gesamt=kp*(1+knk), ek=n(i.ek), darlehen=Math.max(0,gesamt-ek);
     var k = window.DealKpis.compute({ kp:kp, nk:kp*knk, nkm:nkm, ze:0,
       bwk_ul:hgY*(1-split), bwk_nul:hgY*split, d1:darlehen, d1z:(n(i.zins)||3.8), d1t:(n(i.tilg)||1.5),
-      ek:ek, svw:(avm&&avm.marktwert)||0, afa:0, grenz:0 });
+      ek:ek, svw:(avm&&avm.marktwert)||0, afa:0, grenz:0,
+      /* qc-v2450: LTV gegen Kaufpreis + Nebenkosten (deal-kpis.js, wie der Haken
+         ek_inkl_nk im Objekt) - dieselbe Basis wie die Beleihungsknoepfe. Bis
+         qc-v2420a stand er gegen den Marktwert bzw. den Kaufpreis - mit der neuen
+         Knopfrechnung haette „100 %“ auf der Karte 114 % gezeigt (KP 180.000, NK 13,77 %). */
+      ekInklNkLtv:true });
     var mw = (avm&&avm.marktwert)||0;
     var K = { kp:kp, cf_m:k.cf_m, nmy:k.nmy, ltv:k.ltv, dscr:k.dscr, wp_kpi:(mw>kp?mw-kp:0), mstg:1.5 };
     var r = window.DealScore.computeFromKpis(K);
@@ -7440,7 +7493,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
             darlehen:Math.round(darlehen), knkPct:Math.round(knk*1000)/10,
             /* qc-v2420: Wertpuffer wie im Score (mw - kp), nur mit Marktwert;
                ltvKpPct = Darlehen/Kaufpreis - die Basis der Beleihungsknoepfe */
-            wpDiff:(mw>0)?Math.round(mw-kp):null, ltvBasis:(mw>0)?'marktwert':'kaufpreis',
+            wpDiff:(mw>0)?Math.round(mw-kp):null, ltvBasis:'gesamtinvestition',
             ltvKpPct:Math.round(darlehen/kp*1000)/10 } };
   };
 })();

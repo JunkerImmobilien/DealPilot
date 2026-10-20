@@ -1,6 +1,6 @@
 'use strict';
 /* ═══════════════════════════════════════════════════════════════════════════
- * qc-heuristik.js — v1925
+ * qc-heuristik.js — v1925 · qc-v2450 (Texte, Teilnoten, Prüfliste je Objektart)
  *
  * DIE BEWERTUNG DES QUICK-CHECKS, als reine Funktion.
  *
@@ -178,6 +178,29 @@ window.QcHeuristik = (function () {
     if (!isFinite(n)) return '—';
     return Math.round(n).toLocaleString('de-DE') + ' €';
   }
+  /* qc-v2450 · Cashflow mit Vorzeichen und Tausenderpunkt („-1.250 €/Monat") */
+  function _eurMon(n) {
+    var r = Math.round(+n || 0);
+    return (r > 0 ? '+' : '') + r.toLocaleString('de-DE') + ' €/Monat';
+  }
+  /* qc-v2450 · Ein Zielpreis wird auf volle 1.000 € ABgerundet gezeigt und
+     gerechnet - „unter 281.149 €" ist eine Scheingenauigkeit, und ein
+     aufgerundeter Zielpreis laege ueber dem, was der Deal traegt. */
+  function _rund1000(x) { return Math.floor(x / 1000) * 1000; }
+
+  /* qc-v2450 · WAS VOR DEM KAUF ZU PRUEFEN IST, HAENGT AM OBJEKT
+     Hier stand fuer JEDES Objekt „Hausgeld-Aufstellung, Eigentuemerprotokolle
+     der letzten 3 Jahre" - beim Ein- und Mehrfamilienhaus gibt es weder
+     Hausgeld noch eine Eigentuemerversammlung. Ohne Objektart (Telegram-Bot,
+     alte Aufrufer) bleibt die ETW-Liste, wie bisher. */
+  function _pruefliste(objektart) {
+    var a = String(objektart || '').toUpperCase();
+    if (a === 'MFH' || a === 'GEWERBE')
+      return 'Mietverträge und Mieterliste, Betriebskostenabrechnungen, Zustand von Dach, Heizung und Leitungen, Energieausweis';
+    if (a === 'EFH' || a === 'DHH' || a === 'RH' || a === 'ZFH')
+      return 'Mietvertrag, Betriebskostenabrechnung, Zustand von Dach, Heizung und Fenstern, Energieausweis';
+    return 'Hausgeldabrechnung und Wirtschaftsplan, Eigentümerprotokolle der letzten 3 Jahre, Energieausweis';
+  }
 
   /* ── 1 · DIE EINSCHAETZUNG ──────────────────────────────────────────────
    * Woertlich aus quick-check.js (qcCalc, Z. 747–754). Die Reihenfolge ist
@@ -190,8 +213,9 @@ window.QcHeuristik = (function () {
     var msgs = [];
     if (bmr < 4) msgs.push('Bruttorendite unter 4% — preislich teuer für die Region oder Miete zu niedrig.');
     if (nmr < 2) msgs.push('Nettorendite unter 2% — nach Bewirtschaftungskosten bleibt sehr wenig.');
-    if (cfMon < 0) msgs.push('Negativer Cashflow von ' + Math.round(cfMon) + ' €/Mon — Deal kostet dich Geld jeden Monat.');
-    if (dscr > 0 && dscr < 1.0) msgs.push('DSCR < 1,0 — Mieteinnahmen decken nicht mal die Bankrate.');
+    /* qc-v2450: „Negativer Cashflow von -124" war eine doppelte Verneinung */
+    if (cfMon < 0) msgs.push('Negativer Cashflow (' + _eurMon(cfMon) + ') — der Deal kostet dich jeden Monat Geld.');
+    if (dscr > 0 && dscr < 1.0) msgs.push('DSCR unter 1,0 — die Mieteinnahmen decken nicht einmal die Bankrate.');
     if (bewirtPctNkm > 35) msgs.push('Bewirtschaftungskosten über 35% der NKM — IVD-Empfehlung wäre 18-35%.');
     if (ekr > 8 && cfMon > 100) msgs.push('Sehr starke EK-Rendite und positiver Cashflow — solider Deal.');
     if (msgs.length === 0) msgs.push('Solide Eckdaten ohne offensichtliche Probleme. Im vollen Objekt-Modus siehst du den vollständigen Investor Deal Score 2.0 mit ~22 KPIs.');
@@ -304,8 +328,50 @@ window.QcHeuristik = (function () {
    * kein zweiter Maßstab. Was nicht anwendbar ist, kann auch nicht
    * schwach sein und wird übersprungen.
    */
+  /* ── qc-v2450 · DER GRUND MUSS IM SCORE STECKEN ─────────────────────────
+     GEMESSEN am 20.10.2026 (ETW 120.000 €, Miete 650 €, Hausgeld 220 €,
+     LTV 90 %, Score 67): „Der Score bleibt im Mittelfeld, und zwar wegen
+     Bewirtschaftungsquote (34 %) und LTV (90 %)". Die Bewirtschaftungsquote
+     geht in DealScore.computeFromKpis gar nicht ein (Cashflow, NMR, LTV,
+     DSCR, Wertpuffer) - der genannte Grund war keiner. Der eigentliche,
+     der Wertpuffer ohne Marktwert (30 von 100 Punkten), kam nicht vor.
+     Liefert der Aufrufer die TEILNOTEN des Scores (`d.teilnoten`, Schluessel
+     wie in DealScore: cashflow, rendite, ltv, risiko, potenzial), werden
+     genau sie gereiht. Ohne sie (Telegram-Bot) bleibt der alte Weg. */
+  var TEILNOTEN = [
+    ['cashflow',  'Cashflow'],
+    ['rendite',   'Nettomietrendite'],
+    ['ltv',       'LTV'],
+    ['risiko',    'DSCR'],
+    ['potenzial', 'Wertpuffer']
+  ];
+  function _teilnotenPunkte(d, na) {
+    var t = d.teilnoten, liste = [];
+    TEILNOTEN.forEach(function (x) {
+      var p = t[x[0]];
+      if (p == null || !isFinite(+p)) return;            /* Barkauf: LTV/DSCR entfallen */
+      if (x[0] === 'ltv' && na.ltv) return;
+      if (x[0] === 'risiko' && na.dscr) return;
+      var wert;
+      if (x[0] === 'cashflow') wert = _eurMon(d.cfMon);
+      else if (x[0] === 'rendite') wert = _kpiText('prozent', +d.nmr || 0);
+      else if (x[0] === 'ltv') wert = _kpiText('prozent0', +d.ltv || 0);
+      else if (x[0] === 'risiko') wert = _kpiText('zahl2', +d.dscr || 0);
+      else wert = (isFinite(+d.marktwert) && +d.marktwert > 0)
+        ? ((+d.marktwert >= +d.kp ? '+' : '') + _fmtEur(+d.marktwert - (+d.kp || 0)))
+        : 'kein Marktwert abgerufen';
+      liste.push({ id: x[0], was: x[1], wert: wert + ', ' + Math.round(+p) + ' von 100 Punkten', guete: (+p) / 100 });
+    });
+    return liste;
+  }
+
   function schwaechstePunkte(d, nichtAnwendbar, wieviele) {
     var na = nichtAnwendbar || {};
+    if (d && d.teilnoten && typeof d.teilnoten === 'object') {
+      var tl = _teilnotenPunkte(d, na);
+      tl.sort(function (a, b) { return a.guete - b.guete; });
+      return tl.slice(0, wieviele || 2);
+    }
     var quelle = { bmr: d.bmr, nmr: d.nmr, ekr: d.ekr, cf: d.cfMon,
                    dscr: d.dscr, ltv: d.ltv, bwk: d.bewirtPctNkm };
     var liste = [];
@@ -332,6 +398,23 @@ window.QcHeuristik = (function () {
       .join(s.length > 1 ? ' und ' : '');
   }
 
+  /* qc-v2450 · Was man an der schwaechsten Groesse TUN kann. Vorher stand
+     unter jedem Grund dieselbe Liste (Hausgeld, Protokolle, Energieausweis) -
+     auch wenn der Grund der LTV war. */
+  function _hebel(d, na) {
+    var s = schwaechstePunkte(d, na, 2).filter(function (x) { return x.guete < 0.75; });
+    var h = [];
+    s.forEach(function (x) {
+      if (x.id === 'ltv') h.push('mehr Eigenkapital senkt den LTV');
+      else if (x.id === 'potenzial') h.push((isFinite(+d.marktwert) && +d.marktwert > 0)
+        ? 'der Preis liegt kaum unter dem Marktwert' : 'ein Marktwert-Abruf zeigt, ob ein Wertpuffer da ist');
+      else if (x.id === 'cashflow' || x.id === 'risiko' || x.id === 'cf' || x.id === 'dscr') h.push('Miete, Zins und Tilgung entscheiden über Cashflow und DSCR');
+      else if (x.id === 'rendite' || x.id === 'nmr' || x.id === 'bwk') h.push('Miete und nicht umlagefähige Kosten prüfen');
+    });
+    var u = h.filter(function (x, i) { return h.indexOf(x) === i; });
+    return u.length ? (u.join('; ').replace(/^./, function (c) { return c.toUpperCase(); }) + '. ') : '';
+  }
+
   /* ── 3 · DIE KAUFEMPFEHLUNG ─────────────────────────────────────────────
    * Woertlich aus quick-check.js (_renderQcRecommendation, Z. 909–953).
    * `betont` zeichnet den Kaufpreis aus — im Browser `<strong>`, im Chat
@@ -342,6 +425,8 @@ window.QcHeuristik = (function () {
     var score = +d.score;
     var kp = +d.kp || 0, cfMon = +d.cfMon || 0;
     var ziel = zielKaufpreis(d);
+    if (ziel < kp) ziel = _rund1000(ziel);                /* qc-v2450 */
+    var liste = _pruefliste(d.objektart);
     var markt = +d.marktwert;
     var ueberMarkt = (isFinite(markt) && markt > 0 && kp > markt);
     var verdict, farbklasse, advice;
@@ -352,8 +437,7 @@ window.QcHeuristik = (function () {
       advice = 'Die Kennzahlen passen — Kauf bei ' + b(_fmtEur(kp)) + ' ist gerechtfertigt. ' +
                (isFinite(markt) && markt > 0
                  ? 'Der Preis liegt auch nicht über dem Marktwert. ' : '') +
-               'Vor Kaufvertrag noch: Bonität checken, Hausgeld-Aufstellung anfordern, ' +
-               'Eigentümerprotokolle der letzten 3 Jahre prüfen, Energieausweis verifizieren.';
+               'Vor dem Kaufvertrag noch: Finanzierungszusage einholen und ' + liste + ' prüfen.';
     } else if (score >= SCHWELLE.kaufen && ueberMarkt) {
       /* ── v1939 · DER SCORE SAGT JA, DER MARKT SAGT ZU TEUER ──────────
        *
@@ -420,9 +504,9 @@ window.QcHeuristik = (function () {
         farbklasse = 'qc-rec-gold';
         var diffPct = Math.round((1 - ziel / kp) * 100);
         var diffEur = Math.round(kp - ziel);
-        advice = 'Aktuell solide aber mit Spielraum. Bei einem Kaufpreis von ' + b(_fmtEur(ziel)) + ' ' +
-                 '(' + diffPct + '% Nachlass = ' + _fmtEur(diffEur) + ' weniger) wäre der Deal klar gut. ' +
-                 'Empfehlung: Verhandle den KP runter oder schau ob du die Miete steigern kannst.';
+        advice = 'Solide, aber mit Spielraum beim Preis. Bei einem Kaufpreis von ' + b(_fmtEur(ziel)) + ' ' +
+                 '(' + diffPct + ' % Nachlass = ' + _fmtEur(diffEur) + ' weniger) trägt sich der Deal deutlich besser. ' +
+                 'Empfehlung: den Kaufpreis herunterhandeln oder prüfen, ob sich die Miete steigern lässt.';
       } else {
         /* ── v1939 · DER GRUND IST DAS WICHTIGE ──────────────────────────
          * Marcel: „wenn es geprüft werden muss soll es da stehen. aber
@@ -436,10 +520,10 @@ window.QcHeuristik = (function () {
         advice = 'Solide Kennzahlen, und der Preis ist nicht das Problem — er liegt schon ' +
                  'unter dem, was dieser Deal tragen würde' +
                  ((isFinite(markt) && markt > 0) ? ' und auch nicht über dem Marktwert' : '') + '. ' +
-                 'Der Score bleibt trotzdem im Mittelfeld, und zwar wegen ' +
-                 (schwach ? b(schwach) : 'des Zusammenspiels der Teilnoten — keine einzelne Größe fällt heraus') + '. ' +
-                 'Deshalb nicht am Preis ansetzen, sondern genau da nachsehen: ' +
-                 'Hausgeld-Aufstellung, Eigentümerprotokolle der letzten 3 Jahre, Energieausweis.';
+                 'Der Score bleibt trotzdem im Mittelfeld, ' +
+                 (schwach ? 'Punkte kosten vor allem ' + b(schwach) : 'weil keine Teilnote heraussticht — es ist das Zusammenspiel') + '. ' +
+                 _hebel(d, na) +
+                 'Vor dem Kauf: ' + liste + ' prüfen.';
       }
     } else if (score >= SCHWELLE.kritisch) {
       verdict = 'KRITISCH';
@@ -448,22 +532,27 @@ window.QcHeuristik = (function () {
         var diffPct2 = Math.round((1 - ziel / kp) * 100);
         var diffEur2 = Math.round(kp - ziel);
         advice = 'Die Kennzahlen sind zu schwach. Damit es ein Investment wird, müsste der Kaufpreis auf ' +
-                 b(_fmtEur(ziel)) + ' (' + diffPct2 + '% Nachlass = ' + _fmtEur(diffEur2) + ' weniger) runter — ' +
+                 b(_fmtEur(ziel)) + ' (' + diffPct2 + ' % Nachlass = ' + _fmtEur(diffEur2) + ' weniger) sinken — ' +
                  'oder die Miete deutlich steigen. ' +
-                 (cfMon < 0 ? 'Negativer Cashflow von ' + Math.round(cfMon) + ' €/Mon ist ein klares Warnsignal. ' : '') +
-                 'Eher passen oder hart verhandeln.';
+                 (cfMon < 0 ? 'Der Cashflow ist negativ (' + _eurMon(cfMon) + ') — ein klares Warnsignal. ' : '') +
+                 'Eher absagen oder hart verhandeln.';
       } else {
-        advice = 'Die Kennzahlen sind schwach trotz angemessenem Preis — die Schwäche kommt aus anderen Faktoren ' +
-                 '(Bewirtschaftung, Finanzierung, LTV). ' +
-                 (cfMon < 0 ? 'Negativer Cashflow von ' + Math.round(cfMon) + ' €/Mon. ' : '') +
-                 'Empfehlung: EK erhöhen, bessere Konditionen verhandeln oder anderes Objekt suchen.';
+        /* qc-v2450: hier stand die Aufzaehlung „(Bewirtschaftung, Finanzierung,
+           LTV)" - derselbe Nicht-Grund, den v1939 im PRUEFEN-Zweig ersetzt hat. */
+        var schwach2 = _schwachSatz(d, na);
+        advice = 'Die Kennzahlen sind schwach, obwohl der Preis angemessen ist' +
+                 (schwach2 ? ' — Punkte kosten vor allem ' + b(schwach2) : '') + '. ' +
+                 (cfMon < 0 ? 'Der Cashflow ist negativ (' + _eurMon(cfMon) + '). ' : '') +
+                 'Empfehlung: mehr Eigenkapital, bessere Konditionen oder ein anderes Objekt.';
       }
     } else {
       verdict = 'PASS';
       farbklasse = 'qc-rec-red';
-      advice = 'Klares Pass. Die Kennzahlen sind so weit weg von solide, dass auch starkes Verhandeln das nicht rettet. ' +
-               (ziel < kp ? 'Bei einem Kaufpreis unter ' + b(_fmtEur(ziel)) + ' könnte man drüber reden. ' : '') +
-               'Empfehlung: Such ein anderes Objekt mit besserer Substanz.';
+      /* qc-v2450: „Klares Pass" ist kein Deutsch, und „bessere Substanz" meint
+         das Gebaeude - geurteilt wird hier aber ueber die Zahlen. */
+      advice = 'Klare Absage — die Kennzahlen sind so weit von solide entfernt, dass auch starkes Verhandeln das nicht rettet. ' +
+               (ziel < kp ? 'Erst bei einem Kaufpreis um ' + b(_fmtEur(ziel)) + ' käme die Rechnung in Reichweite. ' : '') +
+               'Empfehlung: weitersuchen.';
     }
 
     /* ── v2226 · DIE LAGE GEHÖRT INS URTEIL, NICHT IN DEN SCORE ──────────
@@ -489,16 +578,18 @@ window.QcHeuristik = (function () {
       if (zu && (zu.ampel === 'rot' || zu.ampel === 'gelb')) {
         /* ungerundet: derselbe Wert wie kpForBmr in zielKaufpreis - sonst
            stünden 131.000 € und 131.314 € im selben Absatz */
-        var kpLage = Math.round((+d.nkm * 12) / (zu.ziel / 100));
+        var kpLage = _rund1000((+d.nkm * 12) / (zu.ziel / 100));   /* qc-v2450: wie ziel abgerundet */
         var pct = function (x) { return (Math.round(x * 10) / 10).toFixed(1).replace('.', ',') + ' %'; };
+        /* qc-v2450: das Ziel mit zwei Stellen wie im Skalensatz (v2148c) - sonst „3,8 %" bei gerechneten 3,75 */
+        var zielT = zu.ziel.toFixed(2).replace(/0$/, '').replace(/\.$/, '').replace('.', ',') + ' %';
         var lageSatz = 'Für die ' + zu.klasse + '-Lage zu wenig Rendite: ' + b(pct(bmrIst)) + ' brutto statt deiner ' +
-                       pct(zu.ziel) + ' (' + zu.wort + '). ';
+                       zielT + ' (' + zu.wort + '). ';
         var preisSatz = (kpLage > 0 && kpLage < kp)
           ? 'Deine Zielrendite erreicht er erst bei einem Kaufpreis von ' + b(_fmtEur(kpLage)) + ' oder darunter. ' : '';
         var trotzdem = '';
         if (score >= SCHWELLE.verhandeln) {
           trotzdem = 'Rechnerisch trägt der Deal trotzdem' + (score >= SCHWELLE.kaufen ? ' gut' : '') + ': Score ' + Math.round(score) +
-                     (cfMon >= 0 ? ', Cashflow +' + Math.round(cfMon) + ' €/Monat' : '') +
+                     (cfMon >= 0 ? ', Cashflow ' + _eurMon(cfMon) : '') +
                      ((+d.dscr > 0) ? ', DSCR ' + (+d.dscr).toFixed(2).replace('.', ',') : '') +
                      ' — er passt nur nicht zu deinem Maßstab für diese Lage. ';
         }
@@ -720,7 +811,10 @@ window.QcHeuristik = (function () {
        1,15 ist dort die EINZIGE eigene Grenze. */
     var wort, satz;
     if (amp === 'rot')       { wort = 'deutlich unter deinem Ziel'; satz = 'Entweder der Preis muss fallen oder die Miete steigen.'; }
-    else if (amp === 'gelb') { wort = 'knapp unter deinem Ziel';    satz = 'Erreichbar über den Preis oder die Miete — die Lücke ist klein.'; }
+    /* qc-v2450: „die Lücke ist klein" stand auch bei 77 % des Ziels (2,9 statt
+       3,75 %) - dort muesste der Preis um 22 % fallen. Das Wort bleibt (es haengt
+       an der Ampel), der Satz sagt die Groesse nur, wo sie stimmt. */
+    else if (amp === 'gelb') { wort = 'knapp unter deinem Ziel';    satz = (q >= 0.9) ? 'Erreichbar über den Preis oder die Miete — die Lücke ist klein.' : 'Erreichbar über den Preis oder die Miete — dafür muss sich spürbar etwas bewegen.'; }
     else if (q >= 1.15)      { wort = 'deutlich über deinem Ziel';  satz = 'Das ist Spielraum — beim Preis oder bei der Qualität des Objekts.'; }
     else                     { wort = 'am Ziel';                    satz = 'Genau das, was du für diese Lage angesetzt hast.'; }
     return {

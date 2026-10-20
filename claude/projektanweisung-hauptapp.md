@@ -39017,6 +39017,140 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - Pilot-Antwort zu „Stufe 2“ und „Stufe C“.
 - Essen EFH Sachwertfaktor 1,33 im echten Bericht.
 
+### v2470–v2472 · Unterlagen beim Amt im Telegram-Bot (Telegram-Teil aus unterlagen-app-v5) (20.10.2026, Staging)
+
+Marcel: *„ja das wäre top"* — der in v2440–v2445 offen gelassene Telegram-Teil.
+
+**Was:**
+- **Ablauf im Bot:** `/unterlagen`, „Unterlagen für Objekt 3 anfordern", „hol die Flurkarte für die Parkstraße" →
+  1. Objekt: Bezug auf die letzte Liste („Objekt 3", „/unterlagen 3"), Adresse (`objektRaten`), „dafür" = letztes Objekt — sonst nummerierte Liste.
+  2. Übersicht je Unterlage (Reihenfolge `ARTEN`, 1–6): Amt, Kanal, Empfänger mit Belegstand, Portal-Link, Telefon, Gebühr, Ansprechpartner 1/2 mit Belegstand und Kopie, Vorgangsstand („Entwurf vom …", „schon angefragt am …").
+  3. Nummer → Anschreiben: Kopf (An, Kopie, Portal, Betreff als `<code>`), Brief als `<pre>` (ein Tipp kopiert ihn), Hinweis „DealPilot verschickt nichts". Eine Unterlage im Satz genannt und Amt bekannt → Entwurf sofort.
+  4. „verschickt" → Vorgang `gesendet`. „suche 2" / „suche alle" → `amtHolen` nur für fehlende. Andere Nachricht → Zustand verlassen, normal weiter. Frist 30 Min., `/abbrechen`.
+- **Ein Kern:** `unterlagenService.entwurfAnlegen()` und `anfrageStatus()` — das SQL lag in `routes/unterlagen.js`; Web-Route und Bot gehen jetzt denselben Weg (Eigentumsprüfung am Objekt im Dienst). Neu `services/telegramUnterlagenService.js` (nur Darstellung und Zustand, sendet selbst nichts, bekommt `sag()` vom Webhook).
+- **Webhook:** Einstieg vor dem Listenmuster, Zustand `unterlagen` in `telegram_dialog`, HTML mit Rückfall auf Klartext (`senden` schluckt Fehler — eine abgelehnte HTML-Nachricht wäre still weg), Links nur http(s), Verlauf bekommt nur eine Notiz (Geldsperre liest die letzte Botzeile), Foto beendet den Zustand. Hilfetext + `/unterlagen`.
+- **Geld:** gemessen — das Modal ruft `/unterlagen/amt` ohne Kontingent und ohne Feature-Schlüssel. Der Bot genauso: kein erfundener Schlüssel (wäre für jeden `false`), kein Co-Pilot-Kontingent (kein Modellaufruf, wie die Objektliste).
+- **v2471** `help.js`: ein Satz zum Bot, Buster `v2471`.
+- **Aus v5 übernommen:** Ablauf Objekt → Lage je Unterlage → Anschreiben, Lagebericht (fertig / ohne Adresse / schon angefragt), „hier komme ich allein nicht weiter", Rückmeldung nach dem Versand. **Weggelassen:** Versand (SMTP, „senden"-Knöpfe, Auto-Senden), Vollmacht-PDF in den Chat, Aufgaben, KI-`verstehe()`, Long Polling, Kopplung über `TELEGRAM_CHAT_ID`.
+
+**Commit:** `ca8ecb13` (v2470/v2471), `c2f2ebbe` (v2472 Prüfstrecke).
+
+**Nachweis:**
+- `tools/agent-pruefung/pruef-telegram-unterlagen.js` im Staging-Container: **57 Prüfungen, 0 fehlgeschlagen** — Erkennen (8 ja / 6 nein), Escape und Tag-Bilanz, Teilung < 4096; Ablauf an Gohliser Str. 42, Leipzig (6 Ämter): Liste → Übersicht → Entwurf (Betreff = `anschreiben()`, Vorgang mit Amt-Id) → „verschickt" → `gesendet`; Suche an einer Gemeinde ohne Ämter mit gestellter Recherche (6×); **echter Webhook-Handler** mit gestelltem `fetch`: nur `sendMessage`/`sendChatAction`, kein anderer Netzaufruf, Dialogzeile vorher gesichert und danach gleich, 2 Vorgänge gelöscht. Keine Telegram-Nachricht, keine Recherche, keine Anfrage an ein Amt.
+- Web-Route nach dem Umzug im Container: eigenes Objekt → Vorgang `entwurf`, fremdes Objekt → kein Vorgang, PUT `gesendet` mit Datum, unbekannter Status/Art 400, aufgeräumt. `pruef-unterlagen.js` 45/45.
+- Staging-Bot: kein Token in der Umgebung (`printenv` ohne TELEGRAM-Variable) — der Token liegt je Nutzer in den Zugangsdaten. `getWebhookInfo` (nur lesend): `@Dealpilot_junker_bot` zeigt auf `app.staging.dealpilot.immo`, 1 verknüpfter Chat. `auth/me` 401, `buster-ebenen` SAUBER, `node --check` je Datei.
+
+**Rest:**
+- Ob Prod denselben Bot-Token führt, ist nicht gemessen (Prod nicht angefasst). Telegram kennt je Token EINEN Webhook — läge derselbe Token auch auf Prod, bekäme der Prod-Bot zurzeit nichts. Marcel prüfen lassen (Einstellungen → Telegram-Bot auf Prod) oder einen eigenen Staging-Bot anlegen.
+- mailto als Knopf geht nicht (Inline-Knöpfe nur http(s)/tg://); die Adresse öffnet beim Antippen das Mailprogramm, Betreff und Brief per Tipp kopierbar. Im echten Chat nicht gesehen — Abnahmepunkt für Marcel.
+- Die Ämtersuche kostet im Web wie im Bot kein Kontingent, obwohl sie eine KI-Websuche ist — Produktentscheidung Marcel.
+- „Neu suchen" (erzwingen) und das Kopie-Häkchen gibt es nur im Modal.
+- Prod nicht freigegeben (Rebuild backend nötig).
+
+### qc-v2450–qc-v2450a · Quick Boarding: Beleihung auf Kaufpreis + Nebenkosten, ein Scrollbalken, Heuristik-Texte (20.10.2026, Staging)
+
+- **Was (drei Aufträge von Marcel):**
+  1. **Beleihung.** Marcel: „bei 180.000 € Kaufpreis und 100 % Finanzierung wären das 0 € Eigenkapital, da passt was nicht.“ Bis qc-v2420a hieß der Knopf „Darlehen = Quote × Kaufpreis, Nebenkosten aus EK“ (KP 180.000 ohne PLZ, 100 % → EK 24.786 €). Jetzt `_ekAuto`: **EK = (1 − p) × (KP + NK)**, Darlehen = p × (KP + NK); 100 % = 0 € EK. Satz darunter „Darlehen = 80 % von Kaufpreis + Nebenkosten (13,77 %)“, bei 100 % „· kein Eigenkapital“. Die Karte rechnet den LTV auf **derselben Basis**: `_dpPilotScore` übergibt `ekInklNkLtv:true` an `DealKpis.compute` (der Parameter, den im Objekt der Haken `ek_inkl_nk` setzt) — `deal-kpis.js` **nicht geändert**. Damit gilt nach einem Marktwert-Abruf nicht mehr der Marktwert als LTV-Basis (bewusst: Knopf und Kachel zeigen dieselbe Zahl). Rückfall `computeScore` ebenso auf GI.
+  2. **Zwei Scrollbalken.** Gemessen in einem Fenster mit Bruchteil-Zoom (devicePixelRatio 0,64): iframe 2.323 px, Dokument darin `scrollHeight` 2.325 → 2 px Überhang und **ein eigener Balken von 17 px** im iframe, daneben der von `.main-col`. Ursache in `qc-bridge.js` `sizeFrame`: Hysterese (erst ab 8 px nachziehen) + `documentElement.scrollHeight`, das die Bruchteilhöhe **abrundet** (body 2.336,48 → 2.336) und **nie kleiner als das iframe** wird. Zweiter Befund derselben Ursache: nach 390 px zurück auf 1.366 px blieb das iframe 3.871 px hoch bei 2.336 px Inhalt — **1.535 px leerer Grund**. Jetzt: gemessen wird die Unterkante des `body` (aufgerundet, mit Rand), ohne Hysterese, auch nach unten; das iframe-Dokument trägt `overflow-y:hidden` (gescrollt wird nur `.main-col`). Dritter Befund: der `ResizeObserver` hing nach erneutem Öffnen (src mit `_t`) am **verworfenen** Dokument (Merker `_qcRO` am iframe) — jetzt je Dokument (`_qcRODoc`). qcpm-Overlay unberührt. Lösung „iframe auf Inhaltshöhe“ statt „iframe füllt den Bereich und scrollt selbst“: so war es schon gebaut (Modale/Toasts im iframe, Mausrad über dem iframe), es fehlte nur die genaue Höhe.
+  3. **Heuristik und Texte** (`qc-heuristik.js` = gespiegelter Kern, Pro/Contra und Meinung im QC). 13 Beispiele vorher/nachher durchgespielt (Tabelle im Bericht an Marcel). Behoben: (a) „Der Score bleibt im Mittelfeld wegen **Bewirtschaftungsquote** (34 %)“ — die geht in `DealScore.computeFromKpis` gar nicht ein; der echte Grund (Wertpuffer ohne Marktwert, 30/100) kam nicht vor. Neu: `d.teilnoten` (Schlüssel wie DealScore) → „Punkte kosten vor allem Wertpuffer (kein Marktwert abgerufen, 30 von 100 Punkten) und LTV (90 %, 50 von 100 Punkten)“ plus passender Hebel; ohne Teilnoten (Telegram-Bot) der alte Weg. (b) Prüfliste je Objektart — „Hausgeld-Aufstellung, Eigentümerprotokolle“ stand auch beim EFH/MFH. (c) „Klares Pass“ → „Klare Absage“, „bessere Substanz“ → „weitersuchen“. (d) Zielpreise auf 1.000 € abgerundet („unter 281.149 €“). (e) KRITISCH-Zweig nannte „(Bewirtschaftung, Finanzierung, LTV)“ als Grund → schwächste Teilnoten. (f) Lage-Ziel mit zwei Stellen (3,75 statt „3,8 %“, v2148c). (g) gelber Satz „die Lücke ist klein“ nur ab 90 % des Ziels (bei 77 % stand er auch). (h) QC: Pro „Bruttomietrendite mit 4,6% solide“ neben „Nicht kaufen — Rendite unter deinem Ziel“ → misst jetzt am Lage-Ziel (`zielUrteil`), ohne Klasse an 4/5 % mit Angabe. (i) LTV-Zeile „in solidem Rahmen“ → „im Rahmen deines Maximal-LTV (90 %)“. (j) „Eine EFH/MFH“ → „Ein“. (k) „zu kaufen ist passt nicht zu deiner Lage-Vorgabe“ → „ist gemessen an deiner Lage-Vorgabe zu teuer“. (l) Empfehlungssatz der Meinung wiederholte den Lagesatz → erster neue Satz des Rats. (m) Cashflow mit Tausenderpunkt, „6,0 %“ statt „6%“, deutsche Anführungszeichen. (n) Tilgungsdauer „50 / Tilgung“ (33 Jahre bis zur Hälfte) → Annuitätenformel (22 Jahre bei 3,8/1,5) — im Hauptweg derzeit nicht sichtbar (`annuMon` fehlt in `_dpPilotScore`), nur im Rückfall.
+  - **Nebenfund Spiegel:** `rechenkerne-spiegeln` erzeugte auch `rnd-calc.js` neu — dessen Spiegel lag seit **v2275 (16.10.)** hinter der Frontend-Datei (Plateau hinter dem Scheitel). Mitcommittet, Backend neu gebaut.
+- **Commit:** `35a861f8` (qc-v2450), `5d015cbf` (qc-v2450a), dieser Eintrag. Buster: `qc-heuristik.js` → qc-v2450 (index.html, quickcheck-app.html), `qc-bridge.js` → qc-v2450a, IFRAME_SRC qc-v2450a. Staging per `git pull` (deploy-staging.ps1 brach an fremden ungetrackten Dateien ab) + `docker compose … up -d --build backend`.
+- **Nachweis (eigener Tab, `/passes/` im Tab abgefangen, nichts gespeichert):**
+  - Beleihung im Haupt-App-iframe (Marcels Einstellungen): ohne PLZ NK 13,77 % → GI 204.786; 100 % → EK 0, 80 % → EK 40.957 (= 20 % von GI). PLZ 80331: NK 10,77 % → GI 199.386; 100 % → 0, 80 % → 39.877, Kachel LTV 100 % / 80 %. PLZ 32609: 0 / 40.957, Kachel 100 % / 80 %. Knopf bleibt markiert, Satz stimmt.
+  - Scrollbalken (Messkabine, gleich-Origin-iframe): 1366×768, 1280×720, 1024×768, 390×844 und zurück auf 1366 — iframe = ⌈Inhalt⌉ (2436/2435,47 · 2436 · 2474/2473,63 · 3746/3745,05 · 2436), iframe-Dokument `scrollHeight` = `clientHeight`, **Balken innen 0**, keine inneren Scroller; einziger Balken `.main-col` (4–5 px). Echtes Fenster DPR 0,9: leer 2326/2325,42, gefüllt 2951/2950,54, Balken innen 0. Nach Schließen/Öffnen beobachtet der RO das neue Dokument. Mausrad über dem iframe scrollt `.main-col` (scrollTop 0 → 500).
+  - Prüfläufe: `rechenkerne-spiegeln` RC 0, `score-ketten-pruefen` RC 0 (216 Punkte), `zielurteil-pruefen` RC 0, `buster-ebenen-pruefen` SAUBER, Inline-Skripte `node --check` 16/0.
+- **Rest:**
+  - `QcHeuristik.kategorien()` (nur im alten Quick-Check-Tab `quick-check.js`, heute hinter dem iframe unerreichbar) beschreibt Skalen eines älteren Scores: „Rendite = BMR 40 % / NMR 40 % / EKR 20 %“, Cashflow „+300 = 100“, LTV in Stufen 30/60/80/90 — DealScore rechnet NMR allein, Cashflow −200…+200, LTV linear (110 − LTV) × 2,5; die fünfte Kategorie zeigt die Potenzial-Punkte unter „Effizienz/Bewirtschaftung“. Nicht angefasst.
+  - Das Wort „knapp unter deinem Ziel“ gilt für die ganze gelbe Spanne (75–97 % des Ziels) und ist an `zielurteil-pruefen` gebunden; nur der Satz dahinter unterscheidet jetzt. Produktfrage an Marcel, ob unter 90 % ein anderes Wort gelten soll.
+  - Die Score-Werte verschieben sich durch die neue Knopfrechnung (bei gleichem Knopf weniger EK): z. B. ETW 120.000/650 € bei 90 %: Score 67 → 63.
+  - `backend/src/generated/frontend-konstanten.json` von `tools/frontend-konstanten.mjs` neu erzeugt (Hash `voice-import` aus fremdem Strang) — nicht committet.
+  - Ohne Lageklasse misst die BMR-Zeile an festen 4/5 %, die Meinung an 4,5/5,5 % „Bundesdurchschnitt“ — zwei Skalen, aber keine widersprechenden Aussagen in den 13 Beispielen.
+
+### v2460–v2466a · Wertpotenzial im Tab Bewertung, Wertbrücke, Prüfung beider PDFs (20.10.2026, Staging)
+
+**Was (Marcel 20.10.2026):** „Das Zielbild und das, was du ins Investment-PDF überführst, muss auch unter den Tab Bewertung." und „Bitte auch nochmal Textformatierung und Grafiken im Investment-PDF Bankfassung prüfen."
+
+- **v2460 · Tab Bewertung (`s6`):** Karte `#card-wertpotenzial` „Mieterhöhung und Zielbild · Wertpotenzial", per JS hinter `#avm-history-host` gesetzt (index.html nur Buster). Inhalt = `DpPotenzial.pdfDaten()` — keine zweite Rechnung: Satz der Bankfassung, Wohnungsliste (Ist/Mieterhöhung/Zielmiete/Maßnahmen), Ertragswert-Kacheln (Bestand/Mieterhöhung/Zielbild/Potenzial netto), **Wertbrücke** als SVG, Kennzahlen je Stufe inkl. Aufteilung vor/nach + Kaufpreis, Begründung „kein Potenzial", Hinweis „Aufteilung mit dem Zins für **vermietete** ETW" (Marcel bestätigt 20.10.), Stufe-3-Hinweis wie v2431, Kennzeichnung im Fuß. Erscheint nur bei Soll oder Zielbild; rechnet beim Öffnen des Tabs einmal je Stand selbst (kein Kontingent). Neu in `potenzial.js`: `brueckeDaten()`/`brueckeAchse()` — dieselben Zahlen zeichnen Tab und beide PDFs. Label „vermietet" auch in Tafel und PDF-Fuß; „Kaltmiete p. a. ohne Zuschläge", wenn Zuschläge existieren.
+- **v2460a–c · 390 px:** Wertbrücke nimmt die echte Kartenbreite (vorher fester viewBox 760 → Schrift ≈ 4 px), kurze Achsentexte, Tabellen ohne Abschneiden. Gemessen im gleich-Origin-iframe 390 px: `scrollWidth` 387 = `innerWidth`, beide Tabellenhüllen 329/329. Hell und Obsidian: Inhaltsfläche in beiden Skins hell, Karte `#2A2727` auf `#FFFFFF` wie die Nachbarkarte (getComputedStyle).
+- **v2466/v2466a · `tabellen-karten.js`:** der Schalter „Alle n Spalten" stand am Schreibtisch über jeder Tabelle in einem `.sec` — `.sec button:not(…)` (neun `:not()`) setzt `display:inline-flex !important` und schlägt die Blattregel; jetzt Inline-`!important` je Breite.
+
+**PDF-Prüfung** (eigener Tab, pdf.js 3.11.174 aus cdnjs im Tab gerendert, jsPDF-`text()` mitprotokolliert: Platzhalter, Zeichen außerhalb WinAnsi, Rand, Höhe). Objekte: MFH Westerfeldstr. 140 mit Zielbild + Aufteilung (im Speicher gesetzt), ETW Hermannstr. 9 mit Soll/Zielbild, EFH (Löhner Str. 278, Objektart im Speicher auf EFH), lange Anschrift (80 Zeichen). Je Bankfassung, Investment hell, Investment Obsidian = 12 PDFs, alle Seiten angesehen.
+
+| Fassung | Seite | Fehler | Ursache | Behoben |
+|---|---|---|---|---|
+| Bank | KI-Analyse | „[object Object]" als Kaufpreis-Offerte | KI liefert Objekt `{empfohlen,…}` | v2461 |
+| Bank | Ertrag, Phasen | „Steuern + 771 €" zwischen gleichen Cashflows 8.119 € | `K.steuer` = anteiliges Jahr 1, Cashflows Volljahr | v2461 (Differenz wie App V352) |
+| Bank | Cashflow je Phase | Spalte ging nicht auf (Warmmiete − … ≠ CF) | Warmmiete statt Kaltmiete | v2461 |
+| Bank | Kennzahlen je Phase | „+1.968" ohne €, Rate mit „+" | `sauber()` warf € weg | v2461 |
+| Bank | Zinsänderungsrisiko | „Mehrbelastung 346,41 €" neben „+110 €" | `zaer_m` ist Mehrzins auf Restschuld | v2461 (Beschriftung, „Prozentpunkte") |
+| Bank | Mieterliste, Wertpotenzial | „950 vermietet", „1.121 € Bad…", Maßnahmen/Lage hart abgeschnitten | linksbündige Spalte ohne Abstand, `slice()` | v2461 (3 mm, „...", Umbruch) |
+| Bank | Vermögensaufbau | Achse „1.034k" | Englisch | v2461 (T€) |
+| Bank | Finanzierung | „Darlehen II -" mit Zins, Rate 0,00 €, Mischzins | Haken ohne Betrag | v2461b |
+| Bank | alle Köpfe, Objekt | Untertitel bis 100 mm über Rand, Anschrift bei x = −10,9 mm | keine Begrenzung | v2461c |
+| Beide | Wertpotenzial | keine Wertbrücke | fehlte | v2462/v2464 |
+| Invest | S.2 Kacheln | Beschriftung kaum lesbar, Lücke in Reihe 1, „CF/Monat n.St." zeigte v.St. | Farbe 90/85/80 auf Obsidian, 3 Kacheln/4 Spalten, `K.cf_m` | v2463 |
+| Invest | S.2, S.4 | Steuern ± falsch (wie Bank), „Ende Zinsbindung" vor Steuern neben „Heute" nach | `K.steuer`/`ster_*`, `K.cf_ezb` | v2463 |
+| Invest | S.3 | „Monatliche Rate +1.968", Wertpuffer-Text auf dem Rahmen | `pE(x, 2)` = Vorzeichen | v2463 |
+| Invest | CF-Projektion | Fortsetzungsseite ohne Kopf/Fuß/Nummer (alle Nummern danach −1), „NKM/Mo n", Fußnote 9 mm über Rand und sachlich falsch („ohne Tilgung") | autoTable ohne `didDrawPage` | v2463 |
+| Invest | Bank-Cockpit | „>= 1,2 (gut)" im Seitenfuß, „1,0 (knapp)" außerhalb der Seite, LTV-80 %-Linie im DSCR-Diagramm | `thresholdLines` weiteten die Achse nicht | v2463 |
+| Invest | Vermögensaufbau | „' 46.092 €" (U+2212), Untertexte nach einer Zeile abgeschnitten, Diagramme in Times | Minuszeichen, `[0]`, `font-family` an `<g>` | v2463/v2463a |
+| Invest | Vermögenszuwachs | „15 Jahre", Wertsteigerung 245.567 gegen 345.023, „davon statisch 0", „Steuervorteil −25.935" | Feld `btj` leer, `K.nkm_m` gibt es nicht | v2463/v2463b |
+| Invest | Stress-Test | „+5.0 pp" | Punkt | v2463 |
+| Invest | Wertpotenzial | Maßnahmen abgeschnitten, „kein Potenzial" blau/grün, kein Kaufpreis | `splitTextToSize()[0]`, Spaltenfarbe | v2464 |
+| Invest | Annahmen | „ Jahre", AfA 2,00 % fest (Objekt 6,25 %), Gebäudeanteil „31,71" statt 32 | `g('btj')`, Konstante, `pP(d||2)` | v2463 |
+| Invest | S.2 | Objektname 74 mm über den Rand | keine Begrenzung | v2463c |
+| App + PDF | Wasserfall | bei Steuerlast begann die Wertsteigerung über dem Cashflow und lief oben aus dem Diagramm | `Math.max(0, taxBar)` | v2465a |
+| App + PDF | Wasserfall | Unterzeilen liefen ineinander, „1055k €" | Ersatzschrift breiter, Englisch | v2465 |
+
+**Commit:** `8281b4ba`, `ce1ff699`, `e2adfc0a`, `1a7844f3`, `de217fe7`, `5ca76104`, `f24c8b7d`.
+
+**Nachweis:**
+- Schlusslauf nach dem letzten Ausrollen: 4 Fälle × 3 Fassungen = 12 PDFs, Protokoll **0 Befunde** (vorher u. a. `[object Object]`, U+2212, Text bei y 295/334 mm, Ränder bis 325 mm); Sichtprüfung je Fall (Wertpotenzial, Wasserfall, lange Anschrift).
+- Tab Bewertung Westerfeld: Bestand 780.000 / Mieterhöhung 865.000 / Zielbild 1.105.000 €, Potenzial netto +257.000 € nach 68.000 € Maßnahmen, Aufteilung „kein Potenzial" mit Begründung, Zins 2,90 % vermietet (Bielefeld). Hüllhorst ETW 262/313/355 T€.
+- Keine Objekte gespeichert: im Prüftab `Auth.apiCall`/`fetch` für Schreibzugriffe auf `/objects` gesperrt, `dpTabSwitchSave`/`saveObj` stillgelegt; `updated_at` der vier Objekte vorher = nachher. Kein Testobjekt angelegt. `dp_chrome_hell` nach der Hell-Messung auf `0` zurück, Hilfsspeicher entfernt, Tab geschlossen.
+- `buster-ebenen-pruefen` SAUBER, `prompt-lecks-pruefen` RC 0, `frontend-konstanten` RC 0, Gold-Audit Staging RC 0, `node --check` je Datei.
+
+**Rest:**
+- `frontend-konstanten.json` neu erzeugt, aber nicht committet (Hash `voice-import` aus fremdem Strang, wie qc-v2450).
+- Fachlich, nicht Formatierung: Restnutzungsdauer Bestand im Wertpotenzial 32 J. (Ertragswert-Kern) gegen 35 J. in der Mieterliste (MFH-Anlage-2, flächengewichtet) — zwei Kerne, zwei Zahlen; Marcel ansehen.
+- Investment-PDF Seite 2 rechnet „Warmmiete" als Kaltmiete + umlagefähige Kosten (39.756), die Bankfassung seit v2273 mit den Umlagen der Mieter (41.147) — beide in sich schlüssig, aber verschieden.
+- Erste Zeile der CF-Projektion (Rumpfjahr) zeigt CF n.St. mit der Jahr-1-Steuer, Seite 2 das Volljahr — so gewollt (V351), steht aber ohne Hinweis nebeneinander.
+- Kein echter EFH-Datensatz im Konto: EFH über die Objektart im Speicher geprüft.
+
+### Prod-Rollout (55) · Zielbild v2430–v2432, Unterlagen v2440–v2445, Kappungsgrenzen, BW-Nachernte, LZS-Formel v2404 (19.10.2026)
+
+**Was:**
+- Mieterhöhung und Zielbild mit Ertragswert je Stufe (nur mit Stufe 3).
+- Unterlagen: zwei Ansprechpartner.
+- `frontend/js/data/kappungsgrenzen.json` (821 Gemeinden, 16 Länder).
+- BW-Nachernte: 63 LZS-Werte, 590 Wege-Sperren, HH-SWF-MFH-Sperre, Lizenzen SH/ST.
+- v2404: LZS-Formel neu abgeleitet (1.011 Sätze, c 1,682, gleiche Länder).
+
+**Commit:** Prod-Merge `67d447bf` (Stand staging `54ed07e8`).
+
+**Nachweis:**
+- Sicherung `main-20261019-1905-r55` (73 Tabellen, 14 MB) und `mb-…-r55` (32 Tabellen, 25 MB).
+- `mb-backend` und `backend` neu gebaut. Gold-Audit RC 0, `auth/me` 401.
+- `register-saat`: erst `--trocken`, dann echt. 4.266 Sätze, SOLL = IST, `register-db-abgleich --ssh=prod` sauber.
+- `tools/aemter-einspielen.mjs` im Backend-Container mit `tools/aemter-recherche-20261019/g*.json`: erst trocken, dann echt.
+  - 342 Sätze geschrieben, 156 Personen geprüft, 39 verworfen.
+  - Prod vorher 0 Ämter, nachher 342, davon 101 mit Ansprechpartnern (55 mit zwei).
+- Staging vorab:
+  - `mb-20261019-1854-vor-ernte-bw` gesichert.
+  - `register-saat`: 4.096 → 4.266 Sätze.
+  - Abgleich sauber.
+
+**Rest:**
+- Fragen an Marcel:
+  - SH-Portalklausel (18 Werte) und Kiel „nicht kommerziell“: behalten oder sperren?
+  - Ulm Jahrgang 2026: deckt die Genehmigung ihn?
+  - Aufteilung mit dem ETW-Zins vermietet (2,9 %) oder selbstgenutzt (1,9 %)?
+  - Telegram-Teil aus unterlagen-app-v5.
+  - Alte KI-Sätze je PLZ verdecken die gemeindeweiten.
+- Westerfeld (Staging) wurde beim bloßen Laden durch einen Agenten um 18:27 gespeichert. Hinzugekommen sind nur die leeren `zb_*`-Felder. Ursache vermutlich `dpTabSwitchSave` (save-before-switch).
+- In `dealpilot-backend:/tmp/aemter` liegen auf Prod noch die Recherche-JSONs. Root-Rechte fehlen, beim nächsten Rebuild sind sie weg.
+- `*.mp4.alt-20261019` im Videothek-Ordner wegräumen nach Abnahme.
+
 ### v2431/v2432 · Zielbild: Ertragswert nur mit Stufe 3, Aufteilung negativ mit Begründung (19.10.2026, Staging)
 
 **Was (Marcels zwei Entscheidungen vom 19.10.2026):**

@@ -634,7 +634,7 @@
           return '<td class="' + c.c + '">' + (s ? '+' + eur(s.potenzial) : '—') + '</td>'; }).join('') + '</tr>'
       + '</tbody></table></div>'
       + (a.negativ_hinweis ? '<p class="dp-pot-hin" style="color:#4a4436">' + esc(a.negativ_hinweis) + '</p>' : '')
-      + '<p class="dp-pot-hin">' + esc(a.hinweis || '') + (zA ? ' Zins für Wohnungseigentum: ' + esc(zA) + '.' : '')
+      + '<p class="dp-pot-hin">' + esc(a.hinweis || '') + (zA ? ' Zins für vermietetes Wohnungseigentum: ' + esc(zA) + '.' : '')
       + ' Kosten der Aufteilung: ' + esc(m.aufteilungskosten_herkunft || a.kosten_herkunft || '') + '.</p>';
   }
 
@@ -664,7 +664,7 @@
         massnahmen: w.massnahmen.map(function (x) { return x.t; }).join(', ') || '—' };
     });
     d.kennzahlen = [
-      ['Kaltmiete p. a.', function (k) { return eur(kz[k].miete_j); }],
+      [zahl(wert('ze')) > 0 ? 'Kaltmiete p. a. ohne Zuschläge' : 'Kaltmiete p. a.', function (k) { return eur(kz[k].miete_j); }],   /* v2460: Zuschläge (Stellplatz) stehen nicht in den Stufen */
       ['Bruttomietrendite', function (k) { return kz[k].bmy != null ? pct(kz[k].bmy) : '—'; }],
       ['DSCR', function (k) { return kz[k].dscr != null ? dez(kz[k].dscr, 2) : '—'; }],
       ['Maßnahmenkosten', function (k) { return kz[k].kosten ? eur(kz[k].kosten) : '—'; }],
@@ -683,13 +683,240 @@
     }
     d.fuss = KENNZEICHNUNG + ' Verkehrswert nach ImmoWertV und Score rechnen mit dem Bestand.'
       + (r && r.verfuegbar && r.basis ? ' Liegenschaftszins ' + pct(r.basis.lzs_pct) + ' (Haus)'
-        + (r.aufteilung && r.aufteilung.zins && r.aufteilung.zins.bestand && r.aufteilung.zins.bestand.pct != null ? ' bzw. ' + pct(r.aufteilung.zins.bestand.pct) + ' (Wohnungseigentum)' : '')
+        + (r.aufteilung && r.aufteilung.zins && r.aufteilung.zins.bestand && r.aufteilung.zins.bestand.pct != null ? ' bzw. ' + pct(r.aufteilung.zins.bestand.pct) + ' (Wohnungseigentum, vermietet)' : '')
         + ', Restnutzungsdauer nach Modernisierungspunkten (Anlage 2 ImmoWertV).'
         : (zu ? ' ' + GESPERRT_KURZ + ' (Wertermittlung nach ImmoWertV).' : ' Ertragswerte nicht gerechnet.'))
       + ' ' + m.kappung.text;
     if (d.aufteilung_hinweis) d.fuss = 'Aufteilung: ' + d.aufteilung_hinweis + ' ' + d.fuss;
     d.gerechnet = !!(r && r.verfuegbar);
+    /* v2460 · Wertbrücke und Ertragswert-Kacheln - dieselben Zahlen für den
+       Tab Bewertung und beide PDFs (gezeichnet wird je Ausgabe, gerechnet hier). */
+    d.bruecke = zu ? null : brueckeDaten(m, r);
+    d.kaufpreis = zahl(wert('kp')) || ((window.State && window.State.kpis && window.State.kpis.kp) || null);
+    d.zins_etw = (r && r.verfuegbar && r.aufteilung && r.aufteilung.zins && r.aufteilung.zins.bestand) ? r.aufteilung.zins.bestand : null;
     return d;
+  }
+
+  /* ── v2460 · Wertbrücke: Bestand → Mieterhöhung → Zielbild → Kosten → netto ──
+     Nur mit gerechnetem Ertragswert (Stufe 3). Jede Stufe ist ein Balken von a
+     nach b; Summenbalken (`summe`) stehen auf null, Schritte schweben. */
+  function brueckeDaten(m, r) {
+    if (!r || !r.verfuegbar || gesperrt(r) || !r.haus || !r.haus.bestand || r.haus.bestand.wert == null) return null;
+    var H = r.haus, S = m.stufen;
+    var B = H.bestand.wert;
+    var Sw = S.mieterhoehung && H.mieterhoehung && H.mieterhoehung.wert != null ? H.mieterhoehung.wert : null;
+    var Zw = S.zielbild && H.zielbild && H.zielbild.wert != null ? H.zielbild.wert : null;
+    if (Sw == null && Zw == null) return null;
+    var top = Zw != null ? Zw : Sw;
+    var kosten = (Zw != null ? S.zielbild.kosten : S.mieterhoehung.kosten) || 0;
+    var netto = top - B - kosten;
+    var st = [{ t: 'Bestand', a: 0, b: B, art: 'bestand', summe: true, wert: B }];
+    if (Sw != null) st.push({ t: 'Mieterhöhung', a: B, b: Sw, art: 'soll', wert: Sw - B, schritt: true });
+    if (Zw != null) st.push({ t: Sw != null ? 'Umbau, Wechsel' : 'Zielbild', a: Sw != null ? Sw : B, b: Zw, art: 'ziel', wert: Zw - (Sw != null ? Sw : B), schritt: true });
+    st.push({ t: Zw != null ? 'Zielbild' : 'nach Erhöhung', a: 0, b: top, art: Zw != null ? 'ziel' : 'soll', summe: true, wert: top });
+    if (kosten > 0) st.push({ t: '− Maßnahmen', a: top - kosten, b: top, art: 'kosten', wert: -kosten, schritt: true });
+    st.push({ t: 'Potenzial netto', a: B, b: B + netto, art: netto >= 0 ? 'netto' : 'kosten', wert: netto, schritt: true });
+    return { stufen: st, bestand: B, mieterhoehung: Sw, zielbild: Zw, top: top, kosten: kosten, netto: netto,
+      kacheln: [
+        { t: 'Ertragswert Bestand', w: B, art: 'bestand' },
+        Sw != null ? { t: 'Ertragswert Mieterhöhung', w: Sw, art: 'soll' } : null,
+        Zw != null ? { t: 'Ertragswert Zielbild', w: Zw, art: 'ziel' } : null,
+        { t: 'Potenzial netto', w: netto, art: 'netto', unter: kosten > 0 ? 'nach ' + eur(kosten) + ' Maßnahmenkosten' : 'ohne Maßnahmenkosten' }
+      ].filter(Boolean) };
+  }
+  /** Achse der Brücke: Untergrenze glatt unter dem kleinsten Stand, Obergrenze
+      darüber. Die Achse beginnt NICHT bei null (sonst verschwinden die Schritte) -
+      deshalb trägt jede Ausgabe die Achsenwerte mit. */
+  function brueckeAchse(br) {
+    var werte = [];
+    br.stufen.forEach(function (s) { if (!s.summe) { werte.push(s.a, s.b); } else werte.push(s.b); });
+    var lo = Math.min.apply(null, werte), hi = Math.max.apply(null, werte);
+    var span = Math.max(hi - lo, Math.abs(hi) * 0.05, 1);
+    var roh = span / 4, p = Math.pow(10, Math.floor(Math.log(roh) / Math.LN10)), f = roh / p;
+    var schritt = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+    var min = Math.floor((lo - span * 0.25) / schritt) * schritt;
+    if (min < 0) min = 0;
+    var max = Math.ceil((hi + span * 0.08) / schritt) * schritt;
+    var ticks = []; for (var v = min; v <= max + 1e-6; v += schritt) ticks.push(v);
+    return { min: min, max: max, ticks: ticks };
+  }
+  function tEur(n, vz) { var s = Math.round(Math.abs(n) / 1000).toLocaleString('de-DE') + ' T€'; return (n < 0 ? '− ' : (vz ? '+ ' : '')) + s; }
+
+  /* ── v2460 · Tab Bewertung: Abschnitt „Mieterhöhung und Zielbild" ──────
+     Marcel 20.10.2026: „Das Zielbild und das, was du ins Investment-PDF
+     überführst, muss auch unter den Tab Bewertung." Inhalt = die PDF-Seite
+     (pdfDaten), dazu die Wertbrücke. Ohne Soll-Miete und Zielbild keine Karte.
+     Die Karte wird hier gebaut und hinter die Bewertungshistorie gesetzt -
+     index.html bleibt unberührt. */
+  function bwStil() {
+    if (el('dp-wp-stil')) return;
+    var s = document.createElement('style'); s.id = 'dp-wp-stil';
+    s.textContent = [
+      '#card-wertpotenzial{color:#2A2727}',
+      '#card-wertpotenzial .dp-wp-kz{font:600 9.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#2f7d55;border:1px solid #2f7d55;border-radius:999px;padding:1px 8px;margin-left:auto;white-space:nowrap}',
+      '#card-wertpotenzial .ct{display:flex;align-items:center;gap:8px;flex-wrap:wrap}',
+      '#card-wertpotenzial .dp-wp-satz{font:400 13px/1.55 Inter,system-ui,sans-serif;color:#2A2727;margin:0 0 10px;max-width:78ch}',
+      '#card-wertpotenzial .dp-wp-h{font:700 10px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:#6B645A;margin:18px 0 8px}',
+      '#card-wertpotenzial .dp-wp-kacheln{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:4px 0 6px}',
+      '#card-wertpotenzial .dp-wp-k{border-top:2px solid #D9D2C3;padding:8px 2px 2px;display:grid;gap:2px;min-width:0}',
+      '#card-wertpotenzial .dp-wp-k span{font:500 10.5px Inter,system-ui,sans-serif;color:#6B645A;text-transform:uppercase;letter-spacing:.04em}',
+      '#card-wertpotenzial .dp-wp-k b{font:700 20px "Space Grotesk",Inter,sans-serif;font-variant-numeric:tabular-nums;color:#2A2727;overflow-wrap:anywhere}',
+      '#card-wertpotenzial .dp-wp-k em{font:400 11.5px Inter,sans-serif;font-style:normal;color:#6B645A}',
+      '#card-wertpotenzial .dp-wp-k.soll{border-color:#3d6fa8}#card-wertpotenzial .dp-wp-k.soll b{color:#3d6fa8}',
+      '#card-wertpotenzial .dp-wp-k.ziel{border-color:#2f7d55}#card-wertpotenzial .dp-wp-k.ziel b{color:#2f7d55}',
+      '#card-wertpotenzial .dp-wp-k.netto{border-color:var(--wl-c9a84c, #C9A84C)}',
+      '#card-wertpotenzial .dp-wp-k.neg b{color:#B8625C}',
+      '#card-wertpotenzial svg.dp-wp-br{display:block;width:100%;max-width:860px;height:auto;margin:6px 0 2px}',
+      '#card-wertpotenzial svg.dp-wp-br text{font-family:Inter,system-ui,sans-serif}',
+      '#card-wertpotenzial svg.dp-wp-br .ax{font:500 10px "JetBrains Mono",monospace;fill:#8A8272}',
+      '#card-wertpotenzial svg.dp-wp-br .gl{stroke:#EEE8DC;stroke-width:1}',
+      '#card-wertpotenzial svg.dp-wp-br .vb{stroke:#B8B0A0;stroke-width:1;stroke-dasharray:3 3}',
+      '#card-wertpotenzial svg.dp-wp-br .lab{font-size:12px;font-weight:600;fill:#2A2727}',
+      '#card-wertpotenzial svg.dp-wp-br .cat{font-size:11px;fill:#6B645A}',
+      '#card-wertpotenzial svg.dp-wp-br.eng .cat{font-size:10px}#card-wertpotenzial svg.dp-wp-br.eng .lab{font-size:10.5px}',
+      '#card-wertpotenzial svg.dp-wp-br .b-bestand{fill:#8a8272}',
+      '#card-wertpotenzial svg.dp-wp-br .b-soll{fill:#3d6fa8}',
+      '#card-wertpotenzial svg.dp-wp-br .b-ziel{fill:#2f7d55}',
+      '#card-wertpotenzial svg.dp-wp-br .b-kosten{fill:#B8625C}',
+      '#card-wertpotenzial svg.dp-wp-br .b-netto{fill:var(--wl-c9a84c, #C9A84C)}',
+      '#card-wertpotenzial .dp-wp-achse{font:400 11px Inter,sans-serif;color:#8A8272;margin:0 0 4px}',
+      '#card-wertpotenzial .dp-pot td.dp-pot-neg{color:#6B645A !important;font-weight:500 !important}',
+      '#card-wertpotenzial .dp-wp-fuss{font:400 11.5px/1.5 Inter,sans-serif;color:#6B645A;margin:12px 0 0;padding-top:10px;border-top:1px solid #F0ECE4}',
+      '#card-wertpotenzial .dp-wp-neg{font:400 12.5px/1.5 Inter,sans-serif;color:#4a4436;background:#FBF6E9;border-left:3px solid #D9D2C3;padding:8px 12px;margin:8px 0 0}',
+      '#card-wertpotenzial .dp-pot table td:last-child,#card-wertpotenzial .dp-pot table th:last-child{white-space:normal}',
+      '#card-wertpotenzial .dp-wp-we td:last-child{min-width:160px;text-align:left}',
+      '#card-wertpotenzial .dp-wp-we th:last-child{text-align:left}',
+      '@media (max-width:640px){#card-wertpotenzial .dp-wp-k b{font-size:17px}#card-wertpotenzial .dp-wp-kacheln{grid-template-columns:repeat(2,minmax(0,1fr))}'
+        + '#card-wertpotenzial .dp-pot th,#card-wertpotenzial .dp-pot td{padding:5px 3px;font-size:11px;white-space:normal}#card-wertpotenzial .dp-pot td:not(:first-child):not(.dp-pot-neg){white-space:nowrap}'
+        + '#card-wertpotenzial .dp-pot thead th{font-size:9px;letter-spacing:.04em}#card-wertpotenzial .dp-pot td:first-child{min-width:92px}}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+  /* v2460a · gemessen bei 390 px: mit fester viewBox 760 schrumpfte die Schrift
+     auf rund 4 px. Die Zeichenfläche nimmt jetzt die echte Breite der Karte,
+     die Schrift bleibt in Pixeln. */
+  function brueckeSvg(br, breite) {
+    var A = brueckeAchse(br);
+    var W = Math.max(330, Math.min(760, Math.round(breite || 760))), eng = W < 560;
+    var H = eng ? 250 : 270, L = eng ? 50 : 58, R = 6, T = 22, U = 44;
+    var y = function (v) { return T + (H - T - U) * (1 - (v - A.min) / ((A.max - A.min) || 1)); };
+    var n = br.stufen.length, gap = (W - L - R) / n, bw = Math.min(70, gap * 0.62), s = '';
+    A.ticks.forEach(function (t) {
+      s += '<line class="gl" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(t).toFixed(1) + '" y2="' + y(t).toFixed(1) + '"/>'
+        + '<text class="ax" x="' + (L - 6) + '" y="' + (y(t) + 3.5).toFixed(1) + '" text-anchor="end">' + esc(tEur(t)) + '</text>';
+    });
+    br.stufen.forEach(function (st, i) {
+      var x = L + i * gap + (gap - bw) / 2;
+      var lo = st.summe ? A.min : Math.min(st.a, st.b), hi = st.summe ? st.b : Math.max(st.a, st.b);
+      var top = y(hi), bot = y(lo), h = Math.max(2, bot - top);
+      s += '<rect class="b-' + st.art + '" x="' + x.toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="2"' + (st.summe && st.art === 'bestand' ? ' opacity=".85"' : '') + '/>';
+      if (i < n - 1 && !br.stufen[i + 1].summe && br.stufen[i + 1].t !== 'Potenzial netto') {
+        var yv = y(st.summe ? st.b : st.b);
+        s += '<line class="vb" x1="' + (x + bw).toFixed(1) + '" x2="' + (x + gap).toFixed(1) + '" y1="' + yv.toFixed(1) + '" y2="' + yv.toFixed(1) + '"/>';
+      }
+      var lab = st.summe ? tEur(st.wert) : tEur(st.wert, true);
+      s += '<text class="lab" x="' + (x + bw / 2).toFixed(1) + '" y="' + (top - 6).toFixed(1) + '" text-anchor="middle">' + esc(lab) + '</text>';
+      var worte = String(st.t).split(' '), zeilen = [];
+      worte.forEach(function (w) { var l = zeilen[zeilen.length - 1]; if (l && (l + ' ' + w).length <= 13) zeilen[zeilen.length - 1] = l + ' ' + w; else zeilen.push(w); });
+      var KURZ = { 'Mieterhöhung': 'Erhöhung', 'Umbau, Wechsel': 'Umbau', '− Maßnahmen': 'Kosten', 'Potenzial netto': 'netto', 'nach Erhöhung': 'Erhöhung' };
+      if (eng && KURZ[st.t]) worte = [KURZ[st.t]];
+      if (eng) { zeilen = []; worte.forEach(function (w) { var l = zeilen[zeilen.length - 1]; if (l && (l + ' ' + w).length <= 9) zeilen[zeilen.length - 1] = l + ' ' + w; else zeilen.push(w); }); }
+      zeilen.slice(0, 2).forEach(function (z, j) {
+        s += '<text class="cat" x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - U + 17 + j * 13) + '" text-anchor="middle">' + esc(z) + '</text>';
+      });
+    });
+    return '<svg class="dp-wp-br' + (eng ? ' eng' : '') + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Wertbrücke: Ertragswert Bestand ' + esc(eur(br.bestand))
+      + (br.mieterhoehung != null ? ', nach Mieterhöhung ' + esc(eur(br.mieterhoehung)) : '') + (br.zielbild != null ? ', Zielbild ' + esc(eur(br.zielbild)) : '')
+      + ', Maßnahmen ' + esc(eur(br.kosten)) + ', Potenzial netto ' + esc(eur(br.netto)) + '">' + s + '</svg>';
+  }
+  function bewertungHtml(breite) {
+    var m = modell(); if (!m.aktiv) return '';
+    var d = pdfDaten(); if (!d) return '';
+    var r = ergebnis();
+    var cls = { mieterhoehung: 'c-soll', zielbild: 'c-ziel', bestand: '' };
+    var html = '<div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trending-up"/></svg></span>Mieterhöhung und Zielbild · Wertpotenzial'
+      + '<span class="dp-wp-kz" title="' + esc(KENNZEICHNUNG) + '">Potenzialwert</span></div>'
+      + '<p class="dp-wp-satz">' + esc(d.satz_bank) + '</p><div class="dp-pot">' + LEG;
+    if (d.art === 'mfh' && d.wohnungen.length) {
+      html += '<div class="dp-wp-h">Wohnungen · Ist, Soll-Miete und Zielbild</div><div class="dp-pot-scroll"><table class="dp-wp-we"><thead><tr><th>WE</th><th>m²</th><th>Ist / Monat</th><th class="c-soll">Mieterhöhung</th><th class="c-ziel">Zielmiete</th><th>Maßnahmen</th></tr></thead><tbody>'
+        + d.wohnungen.map(function (w) {
+            return '<tr><td>' + esc(w.we || '—') + '</td><td>' + esc(dez(w.wfl, 0)) + '</td><td>' + esc(w.ist) + '</td><td class="c-soll">' + esc(w.soll) + '</td><td class="c-ziel">' + esc(w.ziel) + '</td><td>' + esc(w.massnahmen) + '</td></tr>';
+          }).join('') + '</tbody></table></div>';
+    }
+    if (d.bruecke) {
+      html += '<div class="dp-wp-h">Ertragswert je Stufe</div><div class="dp-wp-kacheln">'
+        + d.bruecke.kacheln.map(function (k) {
+            return '<div class="dp-wp-k ' + k.art + (k.art === 'netto' && k.w < 0 ? ' neg' : '') + '"><span>' + esc(k.t) + '</span><b>' + (k.art === 'netto' && k.w > 0 ? '+' : '') + esc(eur(k.w)) + '</b>'
+              + (k.unter ? '<em>' + esc(k.unter) + '</em>' : '') + '</div>';
+          }).join('') + '</div>'
+        + '<div class="dp-wp-h">Wertbrücke</div>' + brueckeSvg(d.bruecke, breite)
+        + '<p class="dp-wp-achse">Achse beginnt bei ' + esc(tEur(brueckeAchse(d.bruecke).min)) + ' · Beträge in Tausend Euro, gerundet.</p>';
+    }
+    html += '<div class="dp-wp-h">Kennzahlen je Stufe</div><div class="dp-pot-scroll"><table><thead><tr><th>Kennzahl</th>'
+      + d.spalten.map(function (k) { return '<th class="' + cls[k] + '">' + esc(d.titel[k]) + '</th>'; }).join('') + '</tr></thead><tbody>'
+      + d.kennzahlen.map(function (z) {
+          var fett = /^Ertragswert|^nach Aufteilung/.test(z[0]);
+          return '<tr' + (fett ? ' class="dp-pot-sum"' : '') + '><td>' + esc(z[0]) + '</td>' + z.slice(1).map(function (v, i) {
+            var neg = v === 'kein Potenzial';
+            return '<td class="' + (neg ? 'dp-pot-neg' : cls[d.spalten[i]]) + '">' + esc(v) + '</td>';
+          }).join('') + '</tr>';
+        }).join('')
+      + (d.kaufpreis ? '<tr><td>Kaufpreis</td><td>' + esc(eur(d.kaufpreis)) + '</td>' + d.spalten.slice(1).map(function () { return '<td></td>'; }).join('') + '</tr>' : '')
+      + '</tbody></table></div>';
+    if (d.aufteilung_hinweis) html += '<p class="dp-wp-neg"><b>Aufteilung:</b> ' + esc(d.aufteilung_hinweis) + '</p>';
+    if (d.zins_etw && d.zins_etw.pct != null) {
+      html += '<p class="dp-pot-hin">Aufteilung gerechnet mit dem Liegenschaftszins für <b>vermietete</b> Eigentumswohnungen: ' + esc(pct(d.zins_etw.pct))
+        + (d.zins_etw.ausschuss ? ' (' + esc(String(d.zins_etw.ausschuss).replace(/^Der\s+/, '')) + ')' : '') + '.</p>';
+    }
+    if (d.ertragswert_gesperrt) {
+      html += '<div class="dp-pot-stufe3"><b>' + esc(GESPERRT_KURZ) + '</b><span>' + esc(GESPERRT_LANG) + '</span>'
+        + '<button type="button" class="dp-pot-knopf" data-dp-pot-stufe3="1">Stufe 3 im Tab Objekt</button></div>';
+    } else if (!d.gerechnet) {
+      var lauf = !!_bwLauf;
+      var grund = window._dpPotenzial && window._dpPotenzial.ergebnis && !window._dpPotenzial.ergebnis.verfuegbar ? window._dpPotenzial.ergebnis.grund : '';
+      html += '<p class="dp-pot-hin">' + (lauf ? 'Die Ertragswerte werden gerechnet (bis 40 Sekunden) …'
+          : (ergebnisVeraltet() ? 'Die Angaben haben sich geändert — die Ertragswerte sind neu zu rechnen. ' : (grund ? esc(grund) + ' ' : ''))
+            + ' <button type="button" class="dp-pot-knopf" data-dp-wp-rechnen="1">Ertragswerte rechnen</button>') + '</p>';
+    }
+    /* Die Aufteilungs-Erklärung steht oben schon hervorgehoben - im Fuss nicht noch einmal. */
+    var fuss = d.aufteilung_hinweis ? String(d.fuss).replace('Aufteilung: ' + d.aufteilung_hinweis + ' ', '') : d.fuss;
+    html += '</div><p class="dp-wp-fuss">' + esc(fuss) + '</p>';
+    void r;
+    return html;
+  }
+  var _bwLauf = null, _bwVersucht = {};
+  function bewertungKarte() {
+    var sec = el('s6'); if (!sec) return;
+    var karte = el('card-wertpotenzial');
+    var m = null; try { m = modell(); } catch (e) { m = null; }
+    if (!m || !m.aktiv) { if (karte) karte.remove(); return; }
+    bwStil(); stilEinhaengen();
+    if (!karte) {
+      karte = document.createElement('div');
+      karte.className = 'card'; karte.id = 'card-wertpotenzial';
+      var nach = el('avm-history-host');
+      if (nach && nach.parentNode === sec) sec.insertBefore(karte, nach.nextSibling); else sec.appendChild(karte);
+    }
+    var breite = karte.clientWidth ? karte.clientWidth - 40 : 760;
+    karte.innerHTML = bewertungHtml(breite);
+    karte._dpWpBreite = breite;
+    /* Einmal je Stand selbst rechnen (kein Kontingent; ohne Stufe 3 sagt der
+       Dienst „gesperrt" und es bleibt beim Hinweis). */
+    var r = ergebnis(), alt = window._dpPotenzial;
+    var zu = !r && alt && gesperrt(alt.ergebnis) && !ergebnisVeraltet();
+    if (!r && !zu && !_bwLauf && sec.classList.contains('active')) {
+      var h = ''; try { h = hash(JSON.stringify(auftrag(m))); } catch (e) {}
+      if (h && !_bwVersucht[h]) { _bwVersucht[h] = 1; bwRechnen(); }
+    }
+  }
+  function bwRechnen() {
+    var key = window._currentObjKey || null;
+    _bwLauf = rechnen().then(function (r) {
+      _bwLauf = null;
+      if ((window._currentObjKey || null) === key) { try { bewertungKarte(); } catch (e) {} }
+      return r;
+    }, function () { _bwLauf = null; });
+    try { bewertungKarte(); } catch (e) {}
   }
 
   /* ── Mietentwicklung: Soll je Wohnung und ihr Startjahr ─────────────── */
@@ -871,7 +1098,21 @@
       });
     });
   }
-  window.addEventListener('dp:object-ready', function () { setTimeout(objektKarte, 300); });
+  window.addEventListener('dp:object-ready', function () { setTimeout(objektKarte, 300); setTimeout(function () { try { bewertungKarte(); } catch (e) {} }, 400); });
+  /* v2460 · Tab Bewertung: beim Öffnen des Tabs, nach jedem Ertragswert-Lauf
+     und auf Knopfdruck neu zeichnen. */
+  var _bwRs = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(_bwRs);
+    _bwRs = setTimeout(function () { var k = el('card-wertpotenzial'); if (k && k.clientWidth && Math.abs((k.clientWidth - 40) - (k._dpWpBreite || 0)) > 40) { try { bewertungKarte(); } catch (e) {} } }, 250);
+  });
+  window.addEventListener('dp:potenzial', function () { setTimeout(function () { try { bewertungKarte(); } catch (e) {} }, 0); });
+  document.addEventListener('click', function (ev) {
+    var t = ev.target && ev.target.closest ? ev.target.closest('[data-target-sec="s6"],[data-dp-wp-rechnen]') : null;
+    if (!t) return;
+    if (t.hasAttribute('data-dp-wp-rechnen')) { _bwVersucht = {}; bwRechnen(); return; }
+    setTimeout(function () { try { bewertungKarte(); } catch (e) {} }, 120);
+  });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
   /* ── Sprache / geführte Eingabe: Wohnungen aus einer Antwort ───────────
@@ -937,6 +1178,7 @@
     punkteGewinn: punkteGewinn, sollFuer: sollFuer, umlage559: umlage559,
     modell: modell, rechnen: rechnen, ergebnis: ergebnis, ergebnisVeraltet: ergebnisVeraltet,
     wohnungErgebnis: wohnungErgebnis, kennzahlen: kennzahlen, tafelHtml: tafelHtml, pdfDaten: pdfDaten, pilotPayload: pilotPayload,
+    brueckeDaten: brueckeDaten, brueckeAchse: brueckeAchse, bewertungKarte: bewertungKarte, bewertungHtml: bewertungHtml,
     sollFuerMietentwicklung: sollFuerMietentwicklung, objektKarte: objektKarte,
     _hash: hash, _auftrag: auftrag
   };
