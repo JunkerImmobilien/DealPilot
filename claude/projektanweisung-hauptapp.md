@@ -39184,6 +39184,28 @@ Potenzial Demo: Bestand/Mieterhöhung/Zielbild 545.000/565.000/805.000 → **610
 - Anzeige des Details im Bericht nur über die Datenkette geprüft (Web/PDF rendern `z.detail` bereits), nicht im Browser angesehen — Staging-Abnahmepunkt; die Messe-Mitschnitte mit Demo-MFH zeigen bis zur Neuaufnahme 545.000 € im Bestand.
 - Bandprüfung je Wohnung (v2488) gegen die des Hauses: kleine Abweichung bleibt (s. o.). Ob die vermieteten Wohnungen bei einem Haus im Band einzeln an die Kante gehoben werden sollen, ist eine Bewertungsfrage an Marcel.
 
+### v2530 · Wertpotenzial-Fußnote endet vor dem Seitenfuß, Fließtext seitensicher (20.10.2026, Staging)
+
+**Was.** Befund aus dem Video-Strang (20.10.2026): in der Bankfassung lief die Fußnote der Seite Wertpotenzial ab „Aufteilung: Nach den amtlichen Zinssätzen …" samt dem v2488-Satz „Alle Stufen bauen auf der Miete des Bestands auf …" ohne jede Prüfung über die Fußlinie (H − 16), über die Zeile „Investment Case · erstellt am … Seite 6 von 10" und endete abgeschnitten am Papierrand. Die Schleife `splitTextToSize(PD.fuss).forEach(text; y += 3,8)` kannte keine Seitengrenze. Die Investment-Fassung prüfte zwar (`cy > 280`), setzte nach dem Seitenwechsel aber in der Schrift von `pageTpl()` weiter.
+
+- **`pdf-investment-bank.js` · `absatz(t, o)`:** Umbruch per `splitTextToSize`, vor **jeder** Zeile Prüfung gegen `TEXT_UNTEN = H − 20` (Fußlinie 281, Fußtext 285,5), bei Platzmangel neue Seite mit `kopf(_titel, _unter)` und **dieselbe Schrift neu gesetzt** (`kopf()` stellt sie um). Darüber laufen jetzt: `einleitung()`, Einordnung des Scores, MFH-Hinweis zur Soll-Miete, Wertbrücken-Unterzeile, Fußnote Wertpotenzial, KI-Analyse (Listen, Fazit, Freitext, Sprachmodell-Hinweis), Gründe, Grundlagen und Hinweise. Vorher hatten KI-Analyse und Gründe zwar eine Seitenprüfung, schrieben nach dem Wechsel aber in der Kopfschrift (9 pt grau) weiter. Die Seite Wertpotenzial setzt `_titel`/`_unter`, damit die Fortsetzung denselben Kopf trägt.
+- **`pdf.js` · `_absatz(t, o)`** im Block Wertpotenzial: dieselbe Regel gegen `_TEXT_UNTEN = 280` (Fußbalken ab 285), Fortsetzung über `newPage('Wertpotenzial · Fortsetzung')` mit Schrift neu gesetzt; Einleitungssatz, Wertbrücken-Unterzeile und Fußnote laufen darüber.
+- **Fußnote in zwei Absätzen** (beide PDFs): erst „Aufteilung: …", dann Kennzeichnung/Zins/RND/Bestandsbasis/Kappung; 7,2 bzw. 7 pt, Zeilenabstand 3,5/3,4 mm. Der Text selbst bleibt (er kommt aus `potenzial.js`/`PotenzialService`, nicht aus dem PDF).
+- Buster `pdf-investment-bank.js`, `pdf.js` → v2530 (nur `index.html` lädt sie).
+
+**Commit:** `78490230` (v2530).
+
+**Nachweis** (eigener Tab auf Staging, jsPDF-Konstruktor umhüllt: jedes `text()` mit Seite/x/y protokolliert, `save()` abgefangen; pdf.js 3.11.174 aus cdnjs gerendert und angesehen):
+- **Demo-MFH** (R26 im Speicher auf dem geladenen Objekt: Teutoburger Str. 60, 6 WE / 378 m², WE 5 leer, Soll-Miete je WE, Zielbild mit Maßnahmen 78.500 €, aufgeteilt; Aufteilung „kein Potenzial" in allen drei Stufen, Bestand/MH/ZB 555.000 / 575.000 / 755.000 €): Bankfassung 10 S. — die Seite Wertpotenzial endet mit „Kaufpreis" bei y ≈ 266, die Fußnote geht **geschlossen auf S. 7 mit Kopf „Wertpotenzial"** weiter, danach Exit und Diagramme; Investment hell und Obsidian 12 S., Fußnote auf S. 11 vor dem Fußbalken. Größtes y außerhalb des Fußes: Bank 274,5 mm, Investment 275,4 mm.
+- **Westerfeldstr. 140** (gespeicherter Stand, nur gelesen): Bank 10 S., Investment hell/Obsidian je 12 S.; größtes y 267,7 / 275,4 mm.
+- Protokoll über alle 6 PDFs: **0 Befunde** (kein Text unter der Fußlinie außer dem Fuß selbst, kein x außerhalb 0–210 mm, keine Platzhalter `undefined`/`NaN`/`[object`).
+- Nichts gespeichert: `fetch`/`Auth.apiCall` für Nicht-GET auf `/objects` gesperrt, `dpTabSwitchSave`/`saveObj` stillgelegt; gesperrt wurden nur `dpTabSwitchSave` (2×) und `POST /objects/track-usage` (6×), kein Objekt-Schreibzugriff. Tab geschlossen, Video-Tabs nicht angefasst.
+- `node --check` beide Dateien, `buster-ebenen-pruefen` SAUBER, Gold-Audit Staging RC 0. Staging per `git pull --ff-only` (nur Frontend).
+
+**Rest:**
+- Die Fortsetzung der Bank-Fußnote steht allein oben auf der Folgeseite (die Tabelle endet knapp über dem Fuß). Lesbar und vollständig, aber getrennt von ihrer Tabelle — ob die Fußnote lieber mit der Kennzahlentabelle zusammen umbrechen soll, wäre eine Gestaltungsfrage.
+- In `pdf.js` laufen die übrigen Fließtexte (außerhalb Wertpotenzial) weiter über eigene Schleifen; der Helfer `_absatz` ist lokal im Block. Ein seitenweiter Helfer für das ganze Investment-PDF wäre der nächste Schritt, wenn dort ein weiterer Befund auftaucht.
+
 ### Prod-Rollout (56) · qc-v2450, v2460–v2466a, v2470–v2472, Ulm 2026, SH-Freigaben (20.10.2026)
 
 **Was:**
