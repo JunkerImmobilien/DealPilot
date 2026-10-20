@@ -1479,6 +1479,101 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
  * denselben Kern mit getauschter Miete und Restnutzungsdauer.
  * Body: { object, varianten, wohnungen, aufteilung } - siehe PotenzialService.rechne.
  * Antwort traegt immer die Kennzeichnung „Potenzialwert …, keine Verkehrswertermittlung“. */
+/* ══ v2542 · ABRUF „MARKTPREISE" (Pilot-Analyse) UND SEIN VERLAUF ════════════
+   Marcel 20.10.2026: abrufbar aus dem Tab Pilot-Analyse, kostet Guthaben
+   (1 × erweiterte Marktpreisindikation - abgerechnet im Haupt-Backend, das erst
+   nach der Kontingentprüfung hierher ruft), geht mit in den Marktbericht, und
+   mehrere Abrufe über die Zeit werden als Verlauf bewertet.
+   Gespeichert wird, was der Abruf gemessen hat (mb.potenzial_abrufe), der
+   Verlauf rechnet nichts nach, er vergleicht die gespeicherten Zahlen. */
+function _abrufKurz(out) {
+  const h = out.haus || {};
+  const stufe = (s) => (h[s] ? { ertragswert: h[s].wert ?? null, mpi_angebote: h[s].mpi_angebote ?? null,
+    mpi_spanne: h[s].mpi_angebote_spanne || null, rohertragsfaktor_x_miete: h[s].mpi_rohertrag ? h[s].mpi_rohertrag.wert : null,
+    miete_jahr: h[s].miete_wohnen_jahr ?? null, rnd: h[s].rnd ?? null } : null);
+  return { kennzeichnung: out.kennzeichnung || null, ags: out.ags || null,
+    stufen: { bestand: stufe('bestand'), mieterhoehung: stufe('mieterhoehung'), zielbild: stufe('zielbild') },
+    markt: out.markt || null, mpi: out.mpi || null, etw_markt: out.etw_markt || null,
+    wohnungen: (out.wohnungen || []).map((w) => ({ nr: w.nr, art: w.art, wfl: w.wfl, mpi_etw: w.mpi_etw || null, als_etw: w.als_etw || null })),
+    lzs_pct: out.basis ? out.basis.lzs_pct : null };
+}
+/** Einordnung des Verlaufs: je Kennzahl die Veränderung gegen den ersten und den vorigen Abruf. */
+function _verlaufEinordnung(zeilen) {
+  if (!zeilen || zeilen.length < 2) return { genug: false, text: zeilen && zeilen.length === 1
+    ? 'Erst ein Abruf - ab dem zweiten zeigt der Verlauf, wie sich Preise und Mieten entwickeln.' : null, kennzahlen: [] };
+  const alt = zeilen[zeilen.length - 1], neu = zeilen[0];   /* zeilen: neueste zuerst */
+  const tage = Math.max(1, Math.round((new Date(neu.abgerufen_am) - new Date(alt.abgerufen_am)) / 864e5));
+  const get = (z, pfad) => pfad.reduce((o, k) => (o == null ? null : o[k]), z.daten);
+  const K = [
+    ['Kaufpreis Haus (Median €/m²)', ['markt', 'kauf_haus', 'median_qm']],
+    ['Kaufpreis Eigentumswohnung (Median €/m²)', ['markt', 'kauf_etw', 'median_qm']],
+    ['Angebotsmiete (Median €/m²)', ['markt', 'miete', 'median_qm']],
+    ['Marktpreisindikation Bestand', ['stufen', 'bestand', 'mpi_angebote']],
+    ['Ertragswert Bestand', ['stufen', 'bestand', 'ertragswert']],
+  ];
+  const kennzahlen = K.map(([t, p]) => {
+    const a = Number(get(alt, p)), b = Number(get(neu, p));
+    if (!(a > 0) || !(b > 0)) return null;
+    const pct = (b / a - 1) * 100;
+    const jahr = tage >= 90 ? (Math.pow(b / a, 365 / tage) - 1) * 100 : null;
+    return { kennzahl: t, von: a, bis: b, pct: Math.round(pct * 10) / 10, pct_jahr: jahr != null ? Math.round(jahr * 10) / 10 : null,
+      richtung: Math.abs(pct) < 2 ? 'stabil' : (pct > 0 ? 'steigend' : 'fallend') };
+  }).filter(Boolean);
+  const dt = (d) => new Date(d).toLocaleDateString('de-DE');
+  const teile = kennzahlen.filter((k) => /^Kaufpreis|^Angebotsmiete/.test(k.kennzahl))
+    .map((k) => k.kennzahl.replace(/ \(Median €\/m²\)/, '') + ' ' + (k.pct > 0 ? '+' : '') + String(k.pct).replace('.', ',') + ' % (' + k.richtung + ')');
+  return { genug: true, tage, seit: alt.abgerufen_am, abrufe: zeilen.length, kennzahlen,
+    text: teile.length ? 'Seit dem ' + dt(alt.abgerufen_am) + ' (' + zeilen.length + ' Abrufe, ' + tage + ' Tage): ' + teile.join(', ') + '.'
+      + (tage < 90 ? ' Der Zeitraum ist kurz; Angebotsdaten schwanken - erst über mehrere Monate ist eine Richtung belastbar.' : '') : null };
+}
+router.post('/potenzial/markt', async (req, res) => {
+  const t0 = Date.now();
+  try {
+    const body = req.body || {};
+    const uid = _uidAus(req);
+    if (!uid) return res.status(400).json({ verfuegbar: false, grund: 'Ohne Nutzer kein Abruf.' });
+    const obj = body.object || body.dealpilot || null;
+    if (!obj || typeof obj !== 'object') return res.status(400).json({ verfuegbar: false, grund: 'Kein Objekt im Aufruf.' });
+    const wb = await runLimited(() => ReportOrchestrator.generate(
+      { dealpilot: obj, wert_stufe: 3, user_id: uid }, { nurWertBasis: true }));
+    const out = await PotenzialService.rechne(wb, Object.assign({}, body, { markt: true }));
+    /* Ohne Freigabe Stufe 3 (Haupt-Backend, ertragswertFreigabe) keine Ertragswerte -
+       weder in der Antwort noch im gespeicherten Abruf (v2431-Regel). */
+    if (body.ohne_ertragswert) {
+      Object.values(out.haus || {}).forEach((h) => { if (h) { h.wert = null; h.ertragswert_gesperrt = true; } });
+      (out.wohnungen || []).forEach((w) => { delete w.als_etw; delete w.anteil_am_haus; });
+      delete out.aufteilung;
+      out.ertragswert_gesperrt = true;
+    }
+    const kurz = _abrufKurz(out);
+    const ref = body.external_ref ? String(body.external_ref).slice(0, 80) : null;
+    const adr = (wb.ref && wb.ref.address) ? String(wb.ref.address).slice(0, 200) : null;
+    const ins = await q('INSERT INTO mb.potenzial_abrufe (user_id, external_ref, adresse, ags, objektart, daten) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, abgerufen_am',
+      [uid, ref, adr, out.ags || null, (wb.ref && wb.ref.property_type) || null, JSON.stringify(kurz)]);
+    const zeilen = await q('SELECT id, abgerufen_am, daten FROM mb.potenzial_abrufe WHERE user_id = $1 AND external_ref IS NOT DISTINCT FROM $2 ORDER BY abgerufen_am DESC LIMIT 24', [uid, ref]);
+    out.abruf = { id: ins[0] && ins[0].id, abgerufen_am: ins[0] && ins[0].abgerufen_am };
+    out.verlauf = { abrufe: zeilen.map((z) => ({ id: z.id, abgerufen_am: z.abgerufen_am, markt: z.daten.markt || null,
+      bestand: z.daten.stufen && z.daten.stufen.bestand, etw_summe: z.daten.etw_markt ? z.daten.etw_markt.summe_bestand : null })),
+      einordnung: _verlaufEinordnung(zeilen) };
+    out.took_ms = Date.now() - t0;
+    console.log('[req] POST /potenzial/markt ' + (out.verfuegbar ? 'ok' : 'nicht verfuegbar') + ' Abruf ' + (out.abruf.id || '-') + ' in ' + out.took_ms + 'ms');
+    res.json(out);
+  } catch (e) {
+    console.error('[req] /potenzial/markt FEHLER:', e.message);
+    res.status(500).json({ verfuegbar: false, grund: e.message });
+  }
+});
+router.get('/potenzial/markt/verlauf', async (req, res) => {
+  try {
+    const uid = _uidAus(req);
+    if (!uid) return res.status(400).json({ abrufe: [], grund: 'Ohne Nutzer kein Verlauf.' });
+    const ref = req.query.external_ref ? String(req.query.external_ref).slice(0, 80) : null;
+    const zeilen = await q('SELECT id, abgerufen_am, adresse, daten FROM mb.potenzial_abrufe WHERE user_id = $1 AND external_ref IS NOT DISTINCT FROM $2 ORDER BY abgerufen_am DESC LIMIT 24', [uid, ref]);
+    res.json({ abrufe: zeilen.map((z) => ({ id: z.id, abgerufen_am: z.abgerufen_am, adresse: z.adresse, daten: z.daten })),
+      einordnung: _verlaufEinordnung(zeilen) });
+  } catch (e) { res.status(500).json({ abrufe: [], grund: e.message }); }
+});
+
 router.post('/potenzial', async (req, res) => {
   const t0 = Date.now();
   try {

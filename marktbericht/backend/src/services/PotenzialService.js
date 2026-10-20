@@ -481,39 +481,6 @@ export const PotenzialService = {
                nicht als Zahl, sondern mit seiner Erklaerung */
             negativ: pot < 0, unter_haus: Math.round(summe) < Math.round(out.haus[s].wert) };
         }
-        /* v2541 · je Wohnung: Marktpreisindikation als Eigentumswohnung aus den
-           Angeboten für WOHNUNGEN am Ort (Segment „Wohnung", eigener Abruf je
-           Flächenklasse, gecacht), derselbe Kern wie der Bericht einer ETW. */
-        /* v2542 · nur im abgerechneten Abruf „Marktpreise" (auftrag.markt) - jeder Abruf
-           je Flaechenklasse ist ein Marktdaten-Aufruf (Marcel 20.10.2026: „kostet Guthaben") */
-        if (auftrag.markt === true) try {
-          const cache = {};
-          const mit = (p, ms) => Promise.race([p, new Promise((ok) => setTimeout(() => ok(null), ms))]);
-          let summeB = 0, summeZ = 0, vollB = true, vollZ = true, median = null, n = null;
-          for (let i = 0; i < out.wohnungen.length; i++) {
-            const r = out.wohnungen[i];
-            if (r.art === 'gewerbe') continue;
-            const fl = Math.round(Number(r.wfl));
-            const refW = { property_type: 'etw', living_area: fl, units: 1, plot_area: null, garden_area: null,
-              garages: 0, outdoor_parking: 0, purchase_price: null, monthly_net_rent: null, bom_eur: null, bom_grund: null, floor: null, vacancy: false };
-            const key = String(Math.round(fl / 10));
-            if (!(key in cache)) {
-              cache[key] = await mit(MarketAnalysisService.saleLevel(Object.assign({}, ref, refW)).catch(() => null), 20000);
-            }
-            const saleW = cache[key];
-            const wbW = { ref: Object.assign({}, ref, refW), sale: saleW, rent: wb.rent, land_value_roh: null };
-            const b = mpiAngebote(wbW, null);
-            const z = out.haus.zielbild ? mpiAngebote(wbW, ZIELBILD_REF()) : null;
-            r.mpi_etw = { bestand: b ? b.wert : null, zielbild: z ? z.wert : null,
-              median_qm: b ? b.median_qm : null, abschlag_pct: b ? b.abschlag_pct : null,
-              stichprobe: saleW ? (saleW.sample_size ?? null) : null };
-            if (b) { summeB += b.wert; median = median || b.median_qm; n = n || (saleW && saleW.sample_size); } else vollB = false;
-            if (out.haus.zielbild) { if (z) summeZ += z.wert; else vollZ = false; }
-          }
-          aOut.mpi_etw = { summe_bestand: vollB ? Math.round(summeB) : null, summe_zielbild: out.haus.zielbild && vollZ ? Math.round(summeZ) : null,
-            median_qm: median, stichprobe: n,
-            hinweis: 'Je Wohnung: Angebotspreise für Eigentumswohnungen am Ort × Wohnfläche, Objektfaktoren und Abschlag auf Angebotspreise wie im Bericht; Zielbild mit Zustand „modernisiert".' };
-        } catch (e) { aOut.mpi_etw = { fehler: 'Marktpreisindikation je Wohnung nicht verfügbar' }; }
         const neg = Object.keys(aOut.je_stufe).filter((s) => aOut.je_stufe[s].negativ);
         if (neg.length) aOut.negativ_hinweis = negativHinweis(aOut, out, neg);
         aOut.hinweis = 'Jede Wohnung als Eigentumswohnung mit dem Liegenschaftszins für Wohnungseigentum und ihrem Bodenwertanteil'
@@ -521,6 +488,68 @@ export const PotenzialService = {
           + '. Gewerbeeinheiten gehen mit ihrem Anteil am Hauswert in die Summe.';
         out.aufteilung = aOut;
       }
+
+      /* ── v2541/v2542 · je Wohnung: Marktpreisindikation als Eigentumswohnung ──
+         Aus den Angeboten für WOHNUNGEN am Ort (Segment „Wohnung", eigener Abruf
+         je Flächenklasse, gecacht), derselbe Kern wie der Bericht einer ETW, mit
+         Spanne aus den Quartilen. Nur im abgerechneten Abruf „Marktpreise"
+         (auftrag.markt) - jeder Abruf je Flächenklasse ist ein Marktdaten-Aufruf
+         (Marcel 20.10.2026: „kostet Guthaben"). Unabhängig davon, ob das Haus als
+         „aufgeteilt" markiert ist: Marcel will den Wert je Wohnung sehen. */
+      if (auftrag.markt === true) try {
+        const cache = {};
+        const mit = (p, ms) => Promise.race([p, new Promise((ok) => setTimeout(() => ok(null), ms))]);
+        let summeB = 0, summeZ = 0, summeL = 0, summeH = 0, vollB = true, vollZ = true, ersteSale = null;
+        for (let i = 0; i < out.wohnungen.length; i++) {
+          const r = out.wohnungen[i];
+          if (r.art === 'gewerbe') continue;
+          const fl = Math.round(Number(r.wfl));
+          const refW = { property_type: 'etw', living_area: fl, units: 1, plot_area: null, garden_area: null,
+            garages: 0, outdoor_parking: 0, purchase_price: null, monthly_net_rent: null, bom_eur: null, bom_grund: null, floor: null, vacancy: false };
+          const key = String(Math.round(fl / 10));
+          if (!(key in cache)) {
+            cache[key] = await mit(MarketAnalysisService.saleLevel(Object.assign({}, ref, refW)).catch(() => null), 20000);
+          }
+          const saleW = cache[key];
+          if (saleW && !ersteSale) ersteSale = saleW;
+          const wbW = { ref: Object.assign({}, ref, refW), sale: saleW, rent: wb.rent, land_value_roh: null };
+          const b = mpiAngebote(wbW, null);
+          const z = out.haus.zielbild ? mpiAngebote(wbW, ZIELBILD_REF()) : null;
+          r.mpi_etw = { bestand: b ? b.wert : null, low: b ? b.low : null, high: b ? b.high : null, zielbild: z ? z.wert : null,
+            median_qm: saleW ? Math.round(Number(saleW.median_per_sqm) || 0) || null : null,
+            q25_qm: saleW && saleW.q25_per_sqm != null ? Math.round(saleW.q25_per_sqm) : null,
+            q75_qm: saleW && saleW.q75_per_sqm != null ? Math.round(saleW.q75_per_sqm) : null,
+            abschlag_pct: b ? b.abschlag_pct : null, stichprobe: saleW ? (saleW.sample_size ?? null) : null };
+          if (b) { summeB += b.wert; summeL += (b.low != null ? b.low : b.wert); summeH += (b.high != null ? b.high : b.wert); } else vollB = false;
+          if (out.haus.zielbild) { if (z) summeZ += z.wert; else vollZ = false; }
+        }
+        out.etw_markt = { summe_bestand: vollB ? Math.round(summeB) : null, summe_low: vollB ? Math.round(summeL) : null, summe_high: vollB ? Math.round(summeH) : null,
+          summe_zielbild: out.haus.zielbild && vollZ ? Math.round(summeZ) : null,
+          median_qm: ersteSale ? Math.round(Number(ersteSale.median_per_sqm) || 0) || null : null,
+          q25_qm: ersteSale && ersteSale.q25_per_sqm != null ? Math.round(ersteSale.q25_per_sqm) : null,
+          q75_qm: ersteSale && ersteSale.q75_per_sqm != null ? Math.round(ersteSale.q75_per_sqm) : null,
+          stichprobe: ersteSale ? (ersteSale.sample_size ?? null) : null,
+          hinweis: 'Je Wohnung: Angebotspreise für Eigentumswohnungen am Ort (gleiches Baujahr, Flächenklasse der Wohnung) × Wohnfläche, Objektfaktoren und Abschlag auf Angebotspreise wie im Bericht; Spanne aus dem unteren und oberen Quartil; Zielbild mit Zustand „modernisiert".' };
+        if (out.aufteilung) out.aufteilung.mpi_etw = out.etw_markt;
+      } catch (e) { out.etw_markt = { fehler: 'Marktpreisindikation je Wohnung nicht verfügbar' }; }
+    }
+
+    /* ── v2542 · die Marktdaten des Abrufs, vollständig: Kauf €/m² (Haus-Segment),
+       Angebotsmiete €/m², je mit Quartilen und Zahl der Angebote ─────────────── */
+    if (auftrag.markt === true) {
+      const s = wb.sale || {}, rt = wb.rent || {};
+      const rnd0 = (v) => (v == null || !Number.isFinite(Number(v)) ? null : Math.round(Number(v)));
+      const rnd2 = (v) => (v == null || !Number.isFinite(Number(v)) ? null : Math.round(Number(v) * 100) / 100);
+      out.markt = {
+        kauf_haus: s.median_per_sqm ? { median_qm: rnd0(s.median_per_sqm), q25_qm: rnd0(s.q25_per_sqm), q75_qm: rnd0(s.q75_per_sqm),
+          angebote: s.sample_size ?? null, radius_km: s.used_radius_m ? s.used_radius_m / 1000 : null, gruppe: s.comparable_group || null, segment: ref.property_type || null } : null,
+        miete: rt.median_per_sqm ? { median_qm: rnd2(rt.median_per_sqm), q25_qm: rnd2(rt.q25_per_sqm), q75_qm: rnd2(rt.q75_per_sqm),
+          angebote: rt.sample_size ?? null, radius_km: rt.used_radius_m ? rt.used_radius_m / 1000 : null } : null,
+        kauf_etw: out.etw_markt && out.etw_markt.median_qm ? { median_qm: out.etw_markt.median_qm, q25_qm: out.etw_markt.q25_qm,
+          q75_qm: out.etw_markt.q75_qm, angebote: out.etw_markt.stichprobe } : null,
+        abschlag_pct: out.mpi && out.mpi.angebote ? out.mpi.angebote.abschlag_pct : null,
+        stand: new Date().toISOString(),
+      };
     }
     return out;
   },

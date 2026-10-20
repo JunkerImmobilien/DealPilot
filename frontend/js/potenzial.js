@@ -607,6 +607,11 @@
       '.dp-pot .dp-pot-stufe3 b{color:#1d1a14;flex:1 1 100%}',
       '.dp-pot .dp-pot-stufe3 span{flex:1 1 260px}',
       '.dp-pot td.dp-pot-neg{color:#6c6450 !important;font-weight:500 !important;white-space:normal}',
+      /* v2542 · Abschnitt Marktpreise */
+      '.dp-pot .dp-markt{border-top:1px solid #E6DCC2;padding-top:12px;display:grid;gap:6px}',
+      '.dp-pot .dp-markt-kopf{display:grid;gap:2px}.dp-pot .dp-markt-kopf b{font:700 12px "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#6c6450}',
+      '.dp-pot .dp-markt-kopf span{font-size:12px;color:#6c6450;max-width:80ch}',
+      '.dp-pot .dp-markt .dp-pot-knopf{justify-self:start}',
       '.dp-pot th .dp-pot-jahr{display:block;font:400 10px "JetBrains Mono",monospace;letter-spacing:.04em;color:#8A8272;text-transform:none}'   /* v2541 */
     ].join('');
     document.head.appendChild(s);
@@ -672,12 +677,112 @@
     if (zu) {
       html += '<div class="dp-pot-stufe3"><b>' + esc(GESPERRT_KURZ) + '</b><span>' + esc(GESPERRT_LANG) + '</span>'
         + '<button type="button" class="dp-pot-knopf" data-dp-pot-stufe3="1">Stufe 3 im Tab Objekt</button></div>';
+    }
+    if (!o.ohneMarkt) html += '<div data-dp-pot-markt="1" style="margin-top:16px">' + marktHtml() + '</div>';   /* v2542 */
+    if (zu) {
+      /* oben */
     } else if (!r || !r.verfuegbar) {
       var grund = window._dpPotenzial && window._dpPotenzial.ergebnis && !window._dpPotenzial.ergebnis.verfuegbar ? window._dpPotenzial.ergebnis.grund : '';
       html += '<p class="dp-pot-hin">' + (ergebnisVeraltet() ? 'Die Angaben haben sich geändert — die Ertragswerte sind neu zu rechnen. ' : (grund ? esc(grund) + ' ' : ''))
         + '<button type="button" class="dp-pot-knopf" data-dp-pot-rechnen="1">Ertragswerte rechnen</button></p>';
     }
     return html + '</div>';
+  }
+  /* ══ v2542 · ABRUF „MARKTPREISE" UND VERLAUF (Tab Pilot-Analyse) ═════════════
+     Marcel 20.10.2026: Spannen, Mieten und €/m² vollumfänglich; abrufbar aus der
+     Pilot-Analyse, kostet 1 × erweiterte Marktpreisindikation, geht mit in den
+     Marktbericht, mehrere Abrufe werden als Verlauf bewertet. Gespeichert wird im
+     Marktbericht-Dienst (mb.potenzial_abrufe); hier wird nur angezeigt. */
+  var _markt = { key: null, laedt: false, daten: null, einordnung: null, abrufe: [], zustand: 'ruhe', fehler: null };
+  function marktKey() { return (typeof window._currentObjKey === 'string' && window._currentObjKey) || null; }
+  function marktVerlaufLaden(neuZeichnen) {
+    var key = marktKey();
+    if (!key || !window.Auth || typeof Auth.apiCall !== 'function') return;
+    if (_markt.laedt && _markt.key === key) return;
+    _markt.laedt = true; _markt.key = key;
+    Auth.apiCall('/marktbericht/potenzial/markt/verlauf?external_ref=' + encodeURIComponent(key)).then(function (r) {
+      _markt.laedt = false;
+      if (marktKey() !== key) return;
+      _markt.abrufe = (r && r.abrufe) || [];
+      _markt.daten = _markt.abrufe.length ? _markt.abrufe[0] : null;
+      _markt.einordnung = (r && r.einordnung) || null;
+      if (neuZeichnen !== false) marktNeuZeichnen();
+    }, function () { _markt.laedt = false; });
+  }
+  function marktNeuZeichnen() { var h = document.querySelectorAll('[data-dp-pot-markt]'); for (var i = 0; i < h.length; i++) h[i].innerHTML = marktHtml(); }
+  function spanne(a, b, f) { return a != null && b != null ? f(a) + ' – ' + f(b) : '—'; }
+  function marktHtml() {
+    var key = marktKey();
+    if (_markt.key !== key) { _markt.daten = null; _markt.abrufe = []; _markt.einordnung = null; _markt.zustand = 'ruhe'; marktVerlaufLaden(); }
+    var knopf = '<button type="button" class="dp-pot-knopf" data-dp-markt-abruf="1">' + (_markt.daten ? 'Marktpreise neu abrufen' : 'Marktpreise abrufen') + '</button>';
+    var kopf = '<div class="dp-markt-kopf"><b>Marktpreise</b><span>Kaufpreise und Angebotsmieten am Ort, Marktpreisindikation je Stufe und je Wohnung — mit Spannen. '
+      + 'Ein Abruf kostet 1 × erweiterte Marktpreisindikation aus deinem Kontingent und bleibt gespeichert; mehrere Abrufe ergeben den Verlauf.</span></div>';
+    if (_markt.zustand === 'frage') {
+      return '<div class="dp-markt">' + kopf + '<div class="dp-pot-stufe3"><b>Jetzt abrufen?</b><span>Kostet 1 × erweiterte Marktpreisindikation. Ergebnis und Datum werden gespeichert und erscheinen auch im Marktbericht.</span>'
+        + '<button type="button" class="dp-pot-knopf" data-dp-markt-ja="1">Ja, abrufen</button> <button type="button" class="dp-pot-knopf" data-dp-markt-nein="1">Abbrechen</button></div></div>';
+    }
+    if (_markt.zustand === 'laeuft') return '<div class="dp-markt">' + kopf + '<p class="dp-pot-hin">Marktpreise werden abgerufen …</p></div>';
+    if (!_markt.daten) return '<div class="dp-markt">' + kopf + (_markt.fehler ? '<p class="dp-pot-hin" style="color:#7a3f3a">' + esc(_markt.fehler) + '</p>' : '')
+      + '<p class="dp-pot-hin">Für dieses Objekt liegt noch kein Abruf vor.</p>' + knopf + '</div>';
+    var D = _markt.daten.daten || {}, M = D.markt || {}, S = D.stufen || {};
+    var dt = new Date(_markt.daten.abgerufen_am).toLocaleDateString('de-DE');
+    var qm0 = function (v) { return v == null ? '—' : Math.round(v).toLocaleString('de-DE') + ' €/m²'; };
+    var qm2 = function (v) { return v == null ? '—' : eur2(v) + '/m²'; };
+    var zm = function (t, x, f, zus) { return '<tr><td>' + t + '</td><td>' + (x ? f(x.median_qm) : '—') + '</td><td>' + (x ? spanne(x.q25_qm, x.q75_qm, f) : '—') + '</td><td>'
+      + (x && x.angebote != null ? x.angebote + (x.radius_km ? ' · ' + dez(x.radius_km, 1).replace(',0', '') + ' km' : '') : '—') + (zus || '') + '</td></tr>'; };
+    var html = '<div class="dp-markt">' + kopf + '<p class="dp-pot-hin" style="margin-top:0">Abruf vom <b>' + esc(dt) + '</b>'
+      + (M.abschlag_pct != null ? ' · Abschlag auf Angebotspreise ' + esc(String(M.abschlag_pct).replace('.', ',')) + ' %' : '') + '</p>'
+      + '<div class="dp-pot-scroll"><table><thead><tr><th>Markt am Ort</th><th>Median</th><th>Spanne (Q25–Q75)</th><th>Angebote · Umkreis</th></tr></thead><tbody>'
+      + zm('Kaufpreis ' + (M.kauf_haus && /mfh|mehrfam/i.test(M.kauf_haus.segment || '') ? 'Mehrfamilienhaus' : 'Haus/Objekt'), M.kauf_haus, qm0)
+      + zm('Kaufpreis Eigentumswohnung', M.kauf_etw, qm0)
+      + zm('Angebotsmiete', M.miete, qm2)
+      + '</tbody></table></div>';
+    var sp = ['bestand', 'mieterhoehung', 'zielbild'].filter(function (k) { return S[k]; });
+    var T = { bestand: 'Bestand', mieterhoehung: 'Mieterhöhung', zielbild: 'Zielbild' };
+    html += '<div class="dp-pot-scroll" style="margin-top:10px"><table><thead><tr><th>Je Stufe</th>' + sp.map(function (k) { return '<th>' + T[k] + '</th>'; }).join('') + '</tr></thead><tbody>'
+      + '<tr><td>Ertragswert</td>' + sp.map(function (k) { return '<td>' + (S[k].ertragswert != null ? eur(S[k].ertragswert) : '—') + '</td>'; }).join('') + '</tr>'
+      + '<tr><td>Marktpreisindikation (Angebote)</td>' + sp.map(function (k) { return '<td><b>' + (S[k].mpi_angebote != null ? eur(S[k].mpi_angebote) : '—') + '</b></td>'; }).join('') + '</tr>'
+      + '<tr><td>Spanne</td>' + sp.map(function (k) { var s = S[k].mpi_spanne; return '<td>' + (s ? spanne(s[0], s[1], eur) : '—') + '</td>'; }).join('') + '</tr>'
+      + '<tr><td>Rohertragsfaktor × Miete</td>' + sp.map(function (k) { return '<td>' + (S[k].rohertragsfaktor_x_miete != null ? eur(S[k].rohertragsfaktor_x_miete) : '—') + '</td>'; }).join('') + '</tr>'
+      + '</tbody></table></div>';
+    var W = (D.wohnungen || []).filter(function (w) { return w.art !== 'gewerbe' && w.mpi_etw; });
+    if (W.length) {
+      html += '<div class="dp-pot-scroll" style="margin-top:10px"><table><thead><tr><th>Je Wohnung als ETW</th><th>m²</th><th>Ertragswert</th><th>Marktpreisindikation</th><th>Spanne</th><th>€/m² (Median)</th></tr></thead><tbody>'
+        + W.map(function (w) { var e = w.mpi_etw;
+            return '<tr><td>' + esc(w.nr || '') + '</td><td>' + dez(w.wfl, 0) + '</td><td>' + (w.als_etw && w.als_etw.bestand != null ? eur(w.als_etw.bestand) : '—') + '</td><td><b>'
+              + (e.bestand != null ? eur(e.bestand) : '—') + '</b></td><td>' + spanne(e.low, e.high, eur) + '</td><td>' + qm0(e.median_qm) + '</td></tr>'; }).join('')
+        + (D.etw_markt && D.etw_markt.summe_bestand != null ? '<tr class="dp-pot-sum"><td>Summe</td><td></td><td>' + (D.wohnungen.some(function (w) { return w.als_etw; })
+            ? eur(D.wohnungen.reduce(function (a, w) { return a + ((w.als_etw && w.als_etw.bestand) || 0); }, 0)) : '—') + '</td><td>' + eur(D.etw_markt.summe_bestand) + '</td><td>'
+            + spanne(D.etw_markt.summe_low, D.etw_markt.summe_high, eur) + '</td><td></td></tr>' : '')
+        + '</tbody></table></div>';
+    }
+    var Z = _markt.abrufe || [], E = _markt.einordnung;
+    html += '<div class="dp-pot-scroll" style="margin-top:10px"><table><thead><tr><th>Verlauf</th><th>Kauf Haus</th><th>Kauf ETW</th><th>Angebotsmiete</th><th>Marktpreisindikation</th></tr></thead><tbody>'
+      + Z.slice(0, 12).map(function (z) { var d = z.daten || {}, m = d.markt || {}, b = d.stufen && d.stufen.bestand;
+          return '<tr><td>' + esc(new Date(z.abgerufen_am).toLocaleDateString('de-DE')) + '</td><td>' + qm0(m.kauf_haus && m.kauf_haus.median_qm) + '</td><td>'
+            + qm0(m.kauf_etw && m.kauf_etw.median_qm) + '</td><td>' + qm2(m.miete && m.miete.median_qm) + '</td><td>' + (b && b.mpi_angebote != null ? eur(b.mpi_angebote) : '—') + '</td></tr>'; }).join('')
+      + '</tbody></table></div>'
+      + (E && E.text ? '<p class="dp-pot-hin" style="color:#4a4436">' + esc(E.text) + '</p>' : '')
+      + '<p class="dp-pot-hin">Angebotspreise und -mieten, keine Kaufpreise; die Marktpreisindikation zieht den Abschlag auf Angebotspreise ab. Zielbild mit Zustand „modernisiert". '
+      + 'Je Wohnung: Angebote für Eigentumswohnungen gleichen Baujahrs in der Flächenklasse der Wohnung.</p>' + knopf + '</div>';
+    return html;
+  }
+  function marktAbrufen() {
+    var m = modell(); if (!m.aktiv) return;
+    var body = auftrag(m, {}); if (!body) return;
+    _markt.zustand = 'laeuft'; _markt.fehler = null; marktNeuZeichnen();
+    var key = marktKey();
+    Auth.apiCall('/marktbericht/potenzial/markt', { method: 'POST', body: body }).then(function (r) {
+      _markt.zustand = 'ruhe';
+      if (marktKey() !== key) return;
+      if (!r || r.error) { _markt.fehler = (r && (r.message || r.error)) || 'Abruf nicht möglich.'; marktNeuZeichnen(); return; }
+      if (typeof window.toast === 'function') window.toast('✓ Marktpreise abgerufen' + (r._kontingent && r._kontingent.charged ? ' · 1 × erweiterte Marktpreisindikation' : ''));
+      _markt.key = null; marktVerlaufLaden();
+    }, function (e) {
+      _markt.zustand = 'ruhe';
+      _markt.fehler = /kontingent|402/i.test(String(e && e.message)) ? 'Für den Abruf ist dein Kontingent „erweiterte Marktpreisindikation" aufgebraucht.' : ('Abruf nicht möglich: ' + ((e && e.message) || 'Dienst nicht erreichbar'));
+      marktNeuZeichnen();
+    });
   }
   function aufteilungHtml(m, r, cols) {
     var a = r.aufteilung, H = r.haus;
@@ -1178,6 +1283,13 @@
       try { if (R && typeof R.zielSetzen === 'function') R.zielSetzen(3); } catch (e) {}
       try { if (typeof window.switchTab === 'function') window.switchTab(0); } catch (e) {}
       setTimeout(function () { var z = el('oe-ziel-status'); if (z && z.scrollIntoView) z.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 250);
+    });
+    /* v2542 · Abruf „Marktpreise": erst fragen (kostet Kontingent), dann abrufen */
+    document.addEventListener('click', function (ev) {
+      var t = ev.target && ev.target.closest ? ev.target : null; if (!t) return;
+      if (t.closest('[data-dp-markt-abruf]')) { _markt.zustand = 'frage'; marktNeuZeichnen(); return; }
+      if (t.closest('[data-dp-markt-nein]')) { _markt.zustand = 'ruhe'; marktNeuZeichnen(); return; }
+      if (t.closest('[data-dp-markt-ja]')) { marktAbrufen(); return; }
     });
     document.addEventListener('click', function (ev) {
       var b = ev.target && ev.target.closest ? ev.target.closest('[data-dp-pot-rechnen]') : null;
