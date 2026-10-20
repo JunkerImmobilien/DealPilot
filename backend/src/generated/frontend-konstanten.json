@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-20T08:49:57.441Z",
+ "erzeugt_am": "2026-10-20T08:59:06.521Z",
  "quellen": {
   "voice-import": "4d1160a61b89e852",
   "objektart-felder": "1e0549e54a17a054",
-  "storage": "22c1a92b2860815c",
-  "index-html": "56dfb1c61e6052ed",
+  "storage": "fa6252931a76b7af",
+  "index-html": "01e39e2a986afbc4",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -618,6 +618,7 @@
    "balkon_flae",
    "_avm_state",
    "_mb_state",
+   "_lage_herkunft",
    "einheiten",
    "san_tax_active",
    "san_tax_years",

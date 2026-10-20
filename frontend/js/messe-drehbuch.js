@@ -2341,11 +2341,11 @@
         await zeige(function () { return q('#miete_qm') && q('#miete_qm').closest('.f'); }, 10);
         await b2oZeile(s, 'Pro Quadratmeter', 'Bezogen auf die Wohnfläche aus dem Reiter Objekt: <b>' + r6Id('miete_qm') + '</b> — der Stellplatz zählt mit.');
       },
-      async function (s) {   /* 3 · Zensus-Miete */
-        await warteAuf(function () { return q('#dp-zi-miete .dp-zi-z'); }, 5000);
-        await zeige(function () { return q('#dp-zi-miete'); }, 8);
-        var g = r6Neben('#dp-zi-miete', /^Gemeinde/), bj = r6Neben('#dp-zi-miete', /^Baujahr/);
-        await b2oZeile(s, 'Was der Bestand zahlt', 'Zensus 2022: in der Gemeinde <b>' + (g || '–') + '</b>' + (bj ? ', für dieses Baujahr ' + bj : '') + ' — laufende Verträge, keine Neuvermietung.');
+      async function (s) {   /* 3 · Pilot-Mietpreis-Analyse (v2481h: der Zensus-Kasten ist seit v2500 raus) */
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeige(function () { return q('#ki-miete-box'); }, 8);
+        /* NICHT geklickt: die Recherche ist ein KI-Abruf (je Durchgang Geld) - ein Mitschnitt dafür fehlt noch */
+        await b2oZeile(s, 'Pilot-Mietpreis-Analyse', 'Ganz oben im Reiter: DealPilot recherchiert die <b>marktübliche Miete</b> für Adresse und Fläche, mit Vergleichswerten — und schätzt das <b>Mietausfall-Risiko</b>.');
       },
       async function (s) {   /* 4 · Marktmiete */
         await zeige(r6Gruppe('ds2_marktmiete'), 10);
@@ -2359,15 +2359,9 @@
         await r6Ende(zb);
         await b2oZeile(s, 'Die Marktmiete', 'Marktmiete <b>' + wert('ds2_marktmiete') + ' €/m²</b> gegen deine ' + r6Id('miete_qm') + ' — der Abstand fließt in den Investor Deal Score.');
       },
-      async function (s) {   /* 5 · Mietausfall-Risiko aus dem Leerstand */
-        await warteAuf(function () { return q('#dp-zi-leer .dp-zi-z'); }, 5000);
-        await zeige(function () { return q('#dp-zi-leer'); }, 8);
-        var l = r6Neben('#dp-zi-leer', /^Marktaktiver Leerstand/), st = r6Neben('#dp-zi-leer', /^Anhalt/);
-        await b2oZeile(s, 'Mietausfall-Risiko', 'Marktaktiver Leerstand in Herford: <b>' + (l || '–') + '</b> — Anhalt <b>' + (st || '–') + '</b>. Ein Klick übernimmt die Stufe.');
-        var b = q('#dp-zi-leer .dp-zi-btn'); if (b) b.click();
-        await warte(1000);
+      async function (s) {   /* 5 · Mietausfall-Risiko (v2481h: ohne Zensus-Kasten) */
         await zeige(r6Gruppe('ds2_mietausfall'), 10);
-        await b2oZeile(s, 'Mietausfall-Risiko', 'Übernommen: <b>' + r6Optionstext('ds2_mietausfall') + '</b>.');
+        await b2oZeile(s, 'Mietausfall-Risiko', 'Die Stufe übernimmst du per Klick aus der Pilot-Mietpreis-Analyse — oder wählst sie selbst: hier <b>' + (r6Optionstext('ds2_mietausfall') || '–') + '</b>.');
       },
       async function (s) {   /* 6 · Mietvertrag */
         await zeigeGruppe(feldVon('mv_art'), feldVon('mv_letzte_erhoehung'), 8);
