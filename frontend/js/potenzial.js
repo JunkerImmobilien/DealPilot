@@ -827,7 +827,8 @@
     /* v2541 · Jahr je Stufe: im Spaltenkopf beider PDFs und der Karte im Tab Bewertung */
     var JA = jahre(m);
     d.jahre = JA;
-    d.titel_jahr = { bestand: JA.ankauf ? 'Bestand ' + JA.ankauf : 'Bestand', mieterhoehung: 'Mieterhöhung' + (JA.mieterhoehung ? ' ' + JA.mieterhoehung : ''),
+    /* v2543a · Bestand ist der Stand HEUTE (das Kaufjahr steht in der Fußzeile und in der Pilot-Tafel unter „Ankauf") */
+    d.titel_jahr = { bestand: 'Bestand ' + new Date().getFullYear(), mieterhoehung: 'Mieterhöhung' + (JA.mieterhoehung ? ' ' + JA.mieterhoehung : ''),
       zielbild: 'Zielbild' + (JA.zielbild ? ' ' + JA.zielbild : '') };
     d.titel = d.titel_jahr;   /* Spaltenköpfe in Karte und beiden PDFs; ohne Jahr nennt die Fußzeile „offen" */
     var mehr1 = S.mieterhoehung ? (S.mieterhoehung.miete_m - S.bestand.miete_m) * 12 : 0;
@@ -1075,8 +1076,10 @@
     return '<div class="dp-pot-scroll"><table class="dp-wp-ueb" aria-label="Wertüberleitung: Ertragswert je Stufe und Potenzial netto"><tbody>'
       + Z.map(function (z) {
           var farbe = z.netto ? (z.w >= 0 ? '#2f7d55' : '#B8625C') : STUFE_FARBE[z.art];
-          var wert = z.netto ? '<span class="' + (z.w >= 0 ? 'pos' : 'neg') + '">' + (z.w > 0 ? '+ ' : '') + esc(eur(z.w)) + '</span>'
-            : (z.schritt && z.w > 0 ? '+ ' : '') + esc(eur(z.w));
+          /* v2543a · ein Vorzeichen-Stil: „+ 15.000 €" / „− 48.000 €" */
+          var vz = function (n) { return (n < 0 ? '− ' : (n > 0 ? '+ ' : '')) + esc(eur(Math.abs(n))); };
+          var wert = z.netto ? '<span class="' + (z.w >= 0 ? 'pos' : 'neg') + '">' + vz(z.w) + '</span>'
+            : (z.schritt ? vz(z.w) : esc(eur(z.w)));
           return '<tr class="' + (z.summe ? 'summe' : '') + (z.netto ? ' netto' : '') + '"><td class="l">' + (z.netto ? '' : '<i class="dot" style="background:' + farbe + '"></i>') + esc(z.t)
             + (z.klein ? '<small>' + esc(z.klein) + '</small>' : '') + '</td><td class="bar">' + (z.schritt ? bar(z.w, farbe) : '') + '</td><td class="v">' + wert + '</td></tr>';
         }).join('') + '</tbody></table></div>';
