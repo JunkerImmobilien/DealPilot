@@ -5899,6 +5899,10 @@
   var R27_DT = 'c5278bb5-7012-4e1b-8372-7e5cef3500a1', R27_BI = R11_WESTERFELD;
   var _r27 = { schutz: [] };
   function r27Gesperrt(m, pfad) {
+    /* v2481p · GEMESSEN im ersten Prüflauf (20.10.2026): beim Laden rechnet der Unterreiter
+       „Marktbericht-Verlauf" der Pilot-Analyse einen KI-Text (POST /marktbericht/verlauf-text,
+       OpenAI, dem Nutzer nicht berechnet) - zwei Abrufe je Durchgang. Im Lauf beantwortet. */
+    if (m === 'POST' && /\/marktbericht\/verlauf-text$/.test(pfad) && lauf && _aktiv === DREHBUECHER['reihe-steuerverlauf']) return true;
     if (m === 'GET' || !_r27.schutz.length || !/\/api\/v1\/(objects|tax-records|tax-snapshots|tax-periods)(\/|$)/.test(pfad)) return false;
     if (lauf && _aktiv === DREHBUECHER['reihe-steuerverlauf']) return true;
     return !lauf && _r27.schutz.indexOf(window._currentObjKey) >= 0;
@@ -5978,7 +5982,7 @@
       async function (s) {   /* 3 · der Wendepunkt */
         var R = r27Reihe() || [], A = window.DpSteuerVerlauf ? DpSteuerVerlauf.auswerten(R) : {};
         DPM_REIHE.r27dt = { reihe: R.map(function (r) { return [r.jahr, Math.round(r.erg), Math.round(r.steuer), r.cf == null ? null : Math.round(r.cf)]; }), auswertung: A };
-        r27Oben(r27Host(), 90); await warte(400);
+        r27Oben(r27Host(), 110); await warte(400);
         var z0 = r27ZahlW(0);
         await zeige(r27Zahl(0), 8);
         await b2oZeile(s, z0.t.charAt(0) + z0.t.slice(1).toLowerCase() + ' ' + z0.w, 'Erst ' + z0.u + ' dreht das Ergebnis ins Plus. Ab hier zahlst du auf dieses Objekt Steuern.');
@@ -6007,12 +6011,12 @@
         }
       },
       async function (s) {   /* 5 · die übrigen Kennzahlen und der Satz */
-        r27Oben(r27Host(), 90); await warte(400);
+        r27Oben(r27Host(), 110); await warte(400);
         var z1 = r27ZahlW(1), z2 = r27ZahlW(2);
         await zeige(r27Zahl(1), 8);
-        await b2oZeile(s, 'Erstattungen bis dahin', '<b>' + z1.w + '</b> in den Jahren ' + z1.u + ' — so viel hat das Haus deine Steuer gesenkt.');
+        await b2oZeile(s, 'Erstattungen bis dahin', '<b>' + z1.w + '</b> in den Jahren ' + z1.u.replace('–', ' bis ') + ' — so viel hat das Haus deine Steuer gesenkt.');
         await zeige(r27Zahl(2), 8);
-        await b2oZeile(s, 'Steuern ab dem Wendepunkt', '<b>' + z2.w + '</b> von ' + z2.u + ' — mit deinem Grenzsteuersatz gerechnet.');
+        await b2oZeile(s, 'Steuern ab dem Wendepunkt', '<b>' + z2.w + '</b> von ' + z2.u.replace('–', ' bis ') + ' — mit deinem Grenzsteuersatz gerechnet.');
         await zeige(r27Sel('.dp-stv-satz'), 8);
         await b2oZeile(s, 'Der Satz dazu', 'DealPilot fasst das Bild in Worte: wie lange das Haus deine Steuer senkt — und ab wann du darauf zahlst.', 800);
       },
@@ -6061,7 +6065,7 @@
           r15Oben(er()); await warte(400);
           await zeige(er, 6);
           await b2oZeile(s, 'Erhaltungsaufwand', '<b>' + ew + '</b>' + (eb ? ' — „' + kurz(eb, 110) + '“' : '') + '.', 1200);
-          if (/3-Jahres-Frist|Drei-Jahres-Frist/i.test(eb)) await b2oZeile(s, 'Warum dieser Termin?', 'Nach Ende der Drei-Jahres-Frist ist es sofort absetzbar. Davor zählt die 15-%-Grenze — Modul 23 zeigt sie.', 1000);
+          if (/3-Jahres-Frist|Drei-Jahres-Frist/i.test(eb)) await b2oZeile(s, 'Warum dieser Termin?', 'Nach dem Ende der Drei-Jahres-Frist zählt die 15-%-Grenze nicht mehr. Davor hätte die Sanierung zu Herstellungskosten werden können — Modul 23 zeigt die Grenze.', 1000);
         }
         var bw = r15DetWert(/^Bewegliche Wirtschaftsgüter/), bb = bem(/^Bewegliche Wirtschaftsgüter/);
         if (bw) {
@@ -6099,7 +6103,7 @@
         await b2oZeile(s, 'Das Gegenbild', '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('ort') + ' — Kaufpreis <b>' + eur(zahl('kp')) + '</b>, gekauft am <b>' + datum(wert('kaufdat')) + '</b>.');
         reiter('s3-tax'); await warte(1500);
         await warteAuf(r27Host, 6000);
-        r27Oben(r27Host(), 90); await warte(500);
+        r27Oben(r27Host(), 110); await warte(500);
         var R = r27Reihe() || [], A = DpSteuerVerlauf.auswerten(R), z0 = r27ZahlW(0);
         await zeige(r27Zahl(0), 8);
         await b2oZeile(s, 'Positiv ab ' + z0.w, z0.u.charAt(0).toUpperCase() + z0.u.slice(1) + ': kein Verlustjahr' + (R[0] && R[0].steuer < 0 ? ', Steuer ' + R[0].jahr + ' <b>' + eur(-R[0].steuer) + '</b>' : '') + '.');
@@ -6127,10 +6131,10 @@
             await b2oZeile(s, 'Woher', 'Erhaltungsaufwand ' + R[k0].jahr + ': <b>' + ew + '</b>' + (eb ? ' — „' + (eb.length > 100 ? eb.slice(0, 99).replace(/\s+\S*$/, '') + ' …' : eb) + '“' : '') + '.', 1000);
           }
           r15Modus(0); await warte(600);
-          r27Oben(r27Host(), 90); await warte(400);
+          r27Oben(r27Host(), 110); await warte(400);
           if (k1 + 1 < R.length && R[k1 + 1].steuer < 0) {
             await zeige(r27Hit(R[k1 + 1].jahr), 4);
-            await b2oZeile(s, 'Ab ' + R[k1 + 1].jahr + ' wieder Steuer', '<b>' + eur(-R[k1 + 1].steuer) + '</b> im Jahr ' + R[k1 + 1].jahr + '.');
+            await b2oZeile(s, 'Ab ' + R[k1 + 1].jahr + ' wieder Steuer', 'Steuer <b>' + eur(-R[k1 + 1].steuer) + '</b> im Jahr ' + R[k1 + 1].jahr + ' — der Balken ist wieder gold.');
           }
           await zeigeGruppe(r27Hit(R[k0].jahr), r27Hit(R[k1].jahr), 4);
           await b2oZeile(s, 'Geplant, nicht zufällig', 'Die Maßnahmen liegen in den Jahren mit Steuerlast — nach der Drei-Jahres-Frist, sonst griffe die 15-%-Grenze. Die Grafik zeigt, wo eine Maßnahme die Kurve dreht.', 1500);
@@ -6139,7 +6143,7 @@
       async function (s) {   /* 12 · Schluss: keine Steuerberatung */
         await zeige(r27Sel('.dp-stv-fuss'), 8);
         await b2oZeile(s, 'Keine Steuerberatung', 'DealPilot rechnet mit deinen Eingaben und deinem Grenzsteuersatz. Was du aus dem Wendepunkt machst, besprichst du mit deinem Steuerberater.', 1200);
-        r27Oben(r27Host(), 90); await warte(400);
+        r27Oben(r27Host(), 110); await warte(400);
         await zeige(r27Sel('.dp-stv-ch svg'), 6);
         await b2oZeile(s, 'Steuerverlauf mit Wendepunkt', 'Wann das Haus steuerlich positiv wird — und wann es Zeit fürs nächste Investment ist.', 1000);
       }
