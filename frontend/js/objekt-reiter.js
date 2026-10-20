@@ -149,8 +149,21 @@
     var mod = { dach: _v('mod_dach'), fenster: _v('mod_fenster'), leitungen: _v('mod_leitungen'), heizung: _v('mod_heizung'),
                 aussenwand: _v('mod_aussenwand'), baeder: _v('mod_baeder'), innenausbau: _v('mod_innenausbau'), grundriss: _v('mod_grundriss') };
     var n = 0; Object.keys(mod).forEach(function (k) { if (mod[k]) n++; });
-    if (!n) return null;
-    try { var p = W.modPunkte(mod); return { total: p.total, elements: p.elements, angaben: n }; } catch (e) { return null; }
+    /* ══ v2483 · BEIM MFH ZAEHLEN DIE EINHEITEN ═════════════════════════
+       Ein Haus, zwei Punktzahlen: der Konfigurator fuehrt Fenster, Baeder,
+       Innenausbau und Grundriss JE WOHNUNG, die acht Felder hier nur einmal.
+       Gemessen an Westerfeldstr. 140: hier 6 Punkte (Fenster „> 20 Jahre"),
+       im Konfigurator 7 (Fenster „teilweise erneuert") - Wertpotenzial 32 J.,
+       Mieterliste 35 J. Sind Einheiten erfasst, gelten ihre flaechengewich-
+       teten Punkte (DpMfhEinheiten.hausPunkte) - fuer das Feld mod_punkte und
+       damit fuer jeden, der es liest. */
+    var hp = null;
+    try { hp = (window.DpMfhEinheiten && typeof DpMfhEinheiten.hausPunkte === 'function') ? DpMfhEinheiten.hausPunkte() : null; } catch (e) { hp = null; }
+    if (!n && !hp) return null;
+    var p0 = null;
+    try { p0 = n ? W.modPunkte(mod) : null; } catch (e) { p0 = null; }
+    if (hp) return { total: hp.punkte, elements: p0 ? p0.elements : null, angaben: n, mfh: hp };
+    return p0 ? { total: p0.total, elements: p0.elements, angaben: n } : null;
   }
 
   /* Die Punkte wandern ins Feld mod_punkte (Select mit festen Stufen): die
@@ -307,6 +320,8 @@
     var mpQ = (mp && mp.total > 0 ? st('a', 'Anlage 2 greift') : st('x', 'Anlage 2 greift nicht'))
       + 'Die Punkte entstehen aus der Spalte „modernisiert" der Gewerke-Tabelle (Anlage 2 ImmoWertV) und tragen die Restnutzungsdauer. Klick springt zum Feld:'
       + '<br>' + mpChips;
+    if (mp && mp.mfh) mpQ = st('a', 'Anlage 2 greift') + 'Aus den ' + mp.mfh.einheiten + ' Einheiten des MFH-Konfigurators, flächengewichtet ('
+      + deNum(mp.mfh.gewichtet, 1) + ' Punkte, angesetzt ' + mp.total + '). Dieselbe Zahl rechnen Marktbericht, Ertragswert und Wertpotenzial.';   /* v2483 */
     var mpZeile = zeile('Modernisierungspunkte', mp ? mp.total + ' von 20' : '—', mpQ, '');
     if (!o.plz) {
       box.innerHTML = brwZeile() + zeile('Liegenschaftszins', '—', 'PLZ eintragen — dann holt DealPilot den amtlichen Satz', '')
@@ -316,6 +331,14 @@
     box.innerHTML = brwZeile() + zeile('Liegenschaftszins', '…', 'wird aus dem Register gelesen', '') + mpZeile;
     var r = await api('/marktbericht/wertparameter/zinssatz', { object: o });
     if (lauf !== _autoLauf) return;
+    /* v2483 · die RND des Hauses fuer Mieterliste und Bankfassung (mfh-einheiten.js
+       hausRnd): dieselbe Zahl wie diese Zeile, nicht ein zweiter Weg */
+    try {
+      window._dpHausRnd = (r && r.verfuegbar && r.rnd_jahre != null)
+        ? { key: (typeof window._currentObjKey === 'string' && window._currentObjKey) || null, baujahr: Number(o.baujahr) || null,
+            punkte: o.mod_punkte, gnd: r.gnd_jahre || null, gnd_quelle: r.gnd_quelle || null, rnd: Number(r.rnd_jahre), quelle: r.rnd_quelle || null }
+        : null;
+    } catch (e) {}
     /* v2273 · gemessen Bismarckstr. 27 (Bj 1908, 9 Punkte): die Zeile sagte „Anlage 2
        greift", die Zeile GND / RND darüber „Anlage 2 wurde nicht angewandt“. Rechnet
        der Endpunkt den Rückfall, sagt das jetzt auch die Punkte-Zeile. */
@@ -411,7 +434,7 @@
          Beim Rueckfall steht auch, WARUM, denn das ist die Antwort auf
          Marcels Frage „wo muss ich die Eingaben machen": die
          Modernisierungspunkte sind der einzige Hebel. */
-      var rndTxt = (r.rnd_jahre == null) ? '—' : deNum(r.rnd_jahre, (r.rnd_jahre % 1 ? 1 : 0));
+      var rndTxt = (r.rnd_jahre == null) ? '—' : deNum(Math.round(r.rnd_jahre), 0);   /* v2483 · ganze Jahre wie Mieterliste, Wertpotenzial und PDFs */
       var rndQ = r.rnd_quelle === 'anlage2' ? st('a', 'Anlage 2')
               : r.rnd_quelle === 'geschaetzt' ? st('b', 'geschätzt') : '';
       var rndSatz = r.rnd_hinweis ? esc(r.rnd_hinweis)

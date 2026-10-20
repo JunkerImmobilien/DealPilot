@@ -1281,8 +1281,13 @@ async function _exportPDFInner() {
   var bwk_ul_now = K.bwk_ul || 0;
   var bwk_nul_now = K.bwk_nul || 0;
   var nkm_now = K.nkm_j;
-  var warmmiete_now = nkm_now + bwk_ul_now;
-  var kaltmiete_now = warmmiete_now - bwk_ul_now;  // = nkm_now
+  /* v2484 · EINE Warmmiete (wie Bankfassung und App): Nettokaltmiete +
+     Nebenkostenvorauszahlungen der Mieter, Zusatzeinnahmen getrennt. Hier
+     stand NKM + ZE + umlagefaehige KOSTEN (Westerfeld 39.756 statt 41.147 in
+     der Bankfassung). Kaltmiete, NOI und alles darunter bleiben gleich. */
+  var nkv_now = K.nk_vz_j || 0, ze_now = K.ze_j || 0;
+  var warmmiete_now = (K.warm_j != null) ? K.warm_j : (nkm_now - ze_now + nkv_now);
+  var kaltmiete_now = nkm_now;
   var noi_now = kaltmiete_now - bwk_nul_now;
   var cf_nz_now = noi_now - K.zins_j;
   var cf_vst_now = cf_nz_now - K.tilg_j;
@@ -1290,9 +1295,10 @@ async function _exportPDFInner() {
   var _bsparY_p2 = (State.bsparRate_m || 0) * 12;
   var _hasBspar_p2 = _bsparY_p2 > 0;
   var _cfRows = [
-    ['Warmmiete / Jahr (Kalt + UL-Erstattung)',  pE(warmmiete_now)],
-    ['- Umlagef. BWK (durchlaufend)',     '- ' + pE(bwk_ul_now)],
-    ['= Kaltmiete (NKM + ZE)',                   pE(kaltmiete_now, true)],
+    ['Warmmiete / Jahr (NKM + NK-Vorausz.)',     pE(warmmiete_now)],
+    ['- NK-Vorauszahlungen der Mieter',   '- ' + pE(nkv_now)],
+    ['+ Zusatzeinnahmen (Stellpl. u. a.)', '+ ' + pE(ze_now)],
+    ['= Kaltmiete inkl. Zusatzeinnahmen',        pE(kaltmiete_now, true)],
     ['- nicht umlagef\u00e4hige BWK',     '- ' + pE(bwk_nul_now)],
     ['= NOI (Net Operating Income)',             pE(noi_now, true)],
     ['- Zinsen / Jahr',                   '- ' + pE(K.zins_j)],
@@ -1312,7 +1318,7 @@ async function _exportPDFInner() {
   _cfRows.push(['\u00b1 Steuern / Jahr',                    (_stP2 > 0.5 ? '+ ' : (_stP2 < -0.5 ? '- ' : '')) + pE(Math.abs(_stP2))]);
   _cfRows.push(['= CF nach Steuern / Jahr (operativ)',      pE(K.cf_ns, true)]);
   _cfRows.push(['= CF nach Steuern / Monat',                pE(K.cf_ns_m || (K.cf_ns/12), true)]);
-  kvT(doc, M, cy, hw, _cfRows, [2, 4, 6, 8, 10, 11]);
+  kvT(doc, M, cy, hw, _cfRows, [3, 5, 7, 9, 11, 12]);   /* v2484: eine Zeile mehr (Zusatzeinnahmen) */
 
   cy = secH(doc, cyA, 'Alle Kennzahlen', M + hw + 5, hw);
   kvT(doc, M + hw + 5, cy, hw, [

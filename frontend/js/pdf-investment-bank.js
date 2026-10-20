@@ -975,13 +975,21 @@
     /* ── Ertragsrechnung ─────────────────────────────────────── */
     platz(46, 'Ertrag und Cashflow', (adr || 'Objekt') + ' · laufendes Jahr');
     abschnitt('Von der Warmmiete zum Cashflow');
-    zeile('Warmmiete / Jahr (Kaltmiete und Umlagen)', eur(K.wm_j));
+    /* v2484 · EINE Warmmiete in beiden PDFs und der App: Nettokaltmiete +
+       Nebenkostenvorauszahlungen der Mieter (calc.js warm_j). Zusatzeinnahmen
+       (Stellplatz, Garage) stehen getrennt. Hier stand K.wm_j = NKM + ZE + Umlagen
+       (Westerfeld 41.147 €), im Investment-PDF NKM + ZE + umlagefaehige Kosten
+       (39.756 €). Die Kette endet unveraendert bei der Kaltmiete inkl. Zuschlaege. */
+    var _warm = da(K.warm_j) !== null ? K.warm_j : null;
+    zeile('Warmmiete / Jahr (Nettokaltmiete + Nebenkostenvorauszahlungen)', eur(_warm));
     /* v2273 · hier stand „abzüglich umlagefähiger Bewirtschaftung“ (K.bwk_ul) - die Kette ging
        nicht auf: Westerfeldstr. 140 Warmmiete 41.147 − 336 ≠ Kaltmiete 39.420. Die Warmmiete
        enthält die Umlagen der Mieter (calc.js wm_m = nkm + ze + uf), abgezogen werden also
        diese; die umlagefähigen Kosten stehen weiter unten im Block Bewirtschaftung. */
-    zeile('abzüglich Umlagen der Mieter', (da(K.wm_j) === null || da(K.nkm_j) === null) ? '-' : '- ' + eur(K.wm_j - K.nkm_j), { einzug: true });
-    zeile('Kaltmiete / Jahr (netto, inkl. Zuschläge)', eur(K.nkm_j), { fett: true });
+    zeile('abzüglich Nebenkostenvorauszahlungen der Mieter', da(K.nk_vz_j) === null ? '-' : '- ' + eur(K.nk_vz_j), { einzug: true });
+    zeile('Nettokaltmiete / Jahr', eur(K.nkm_netto_j));
+    if (da(K.ze_j) && K.ze_j > 0) zeile('zuzüglich Zusatzeinnahmen (Stellplatz, Garage u. a.)', '+ ' + eur(K.ze_j), { einzug: true });
+    zeile('Kaltmiete / Jahr inkl. Zusatzeinnahmen', eur(K.nkm_j), { fett: true });
     zeile('abzüglich nicht umlagefähiger Bewirtschaftung', da(K.bwk_cf) === null ? '-' : '- ' + eur(K.bwk_cf), { einzug: true });
     zeile('Betriebsergebnis (NOI)', da(K.nkm_j) === null ? '-' : eur(K.nkm_j - (K.bwk_cf || 0)), { fett: true });
     zeile('abzüglich Zinsen', da(K.zins_j) === null ? '-' : '- ' + eur(K.zins_j), { einzug: true });
@@ -1167,7 +1175,7 @@
     if (MFH && MFH.zeilen.length) {
       platz(56, 'Einheiten und Zustand', (adr || 'Objekt') + ' · ' + MFH.zeilen.length + ' Einheiten');
       abschnitt('Mieterliste');
-      var spM = [['Nr.', 14], ['Lage', 30], ['m²', 16], ['Ist €/M', 20], ['Soll €/M', 20], ['Status', 20], ['Anlage 2', 20], ['RND', 16]];
+      var spM = [['Nr.', 14], ['Lage', 30], ['m²', 16], ['Ist €/M', 20], ['Soll €/M', 20], ['Status', 20], ['Anlage 2', 22]];   /* v2483: keine RND je Einheit - eine fuer das Haus, unten */
       var fakM = CW / spM.reduce(function (a, s) { return a + s[1]; }, 0);
       function mZeile(werte, kopfzeile) {
         var x = L;
@@ -1192,11 +1200,11 @@
           (z.e.ist && Number(String(z.e.ist).replace(',', '.')) > 0) ? fmt(Number(String(z.e.ist).replace(',', '.')), 0) : '-',
           z.e.soll ? fmt(Number(String(z.e.soll).replace(',', '.')), 0) : '-',
           z.e.status === 'leer' ? 'leer' : 'vermietet',
-          z.punkte + ' P.' + (z.geerbt === 4 ? '*' : ''), z.rnd != null ? Math.round(z.rnd) + ' J.' : '-']);
+          z.punkte + ' P.' + (z.geerbt === 4 ? '*' : '')]);
       });
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
       doc.text('Anlage 2 ImmoWertV: Modernisierungspunkte je Einheit; * = Zustand vollständig vom Gebäude übernommen. '
-        + 'RND = Restnutzungsdauer (indikativ, kein Gutachten).', L, y + 1);
+        + 'Die Restnutzungsdauer gilt für das Gebäude (unten).', L, y + 1);
       y += 10;
 
       abschnitt('Ist gegen Soll');
@@ -1208,8 +1216,11 @@
       zeile('Rechtliche Einheit', MFH.aufgeteilt ? 'in Wohnungseigentum aufgeteilt (WEG)' : 'ungeteiltes Gebäude');
       if (MFH.s.leer) zeile('Leerstand', MFH.s.leer + ' Einheiten / ' + fmt(MFH.s.leerFl, 0) + ' m²');
       if (MFH.s.kosten) zeile('Geplante Maßnahmen', eur(MFH.s.kosten));
-      zeile('Modernisierungsgrad (flächengewichtet)', fmt(MFH.punkteGew, 1) + ' von 20 Punkten');
-      if (MFH.rndGew > 0) zeile('Restnutzungsdauer (flächengewichtet)', Math.round(MFH.rndGew) + ' Jahre', { summe: true });
+      /* v2483 · eine RND fuer das Haus: aus den ganzen Punkten des Hauses, dieselbe Zahl wie
+         Wertpotenzial, Ertragswert und Marktbericht (DpMfhEinheiten.berichtDaten -> hausRnd) */
+      zeile('Modernisierungsgrad (flächengewichtet)', fmt(MFH.punkteGew, 1) + ' von 20 Punkten, angesetzt ' + MFH.hausPunkte + ' Punkte');
+      if (MFH.rndGew > 0) zeile('Restnutzungsdauer des Gebäudes (Anlage 2, indikativ)', Math.round(MFH.rndGew) + ' Jahre'
+        + (MFH.rndInfo && MFH.rndInfo.gnd ? ' (GND ' + MFH.rndInfo.gnd + ')' : ''), { summe: true });
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7.6); doc.setTextColor(130);
       var hin = MFH.sollAbJahr
         ? 'Die Cashflow-Rechnung setzt die Soll-Miete ab Jahr ' + MFH.sollAbJahr + ' an; davor und danach gilt die hinterlegte Mietentwicklung.'

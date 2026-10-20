@@ -811,21 +811,21 @@
     r.geerbteGewerke = GEB_IDS.concat(WE_IDS).map(function (id) { return { id: id, label: labelVon(id), stufe: (d.gebaeude || {})[id] || '0', punkte: punkteVon(id, (d.gebaeude || {})[id] || '0') }; });
     return r;
   }
-  function optionFuer(p) { var o = [0, 4, 8, 14, 19], b = o[0]; o.forEach(function (x) { if (Math.abs(x - p) < Math.abs(b - p)) b = x; }); return b; }
-  function schritt4() {
+    function schritt4() {
     if (!_arbeit.length) return '<div class="cf-hint">Noch keine Einheit erfasst.</div>';
     var d = ergebnisDaten();
     var rows = d.zeilen.map(function (z) {
       return '<tr><td style="padding:5px 8px 5px 0">' + esc((z.e.nr ? 'Nr. ' + z.e.nr : '') + (z.e.lage ? ' · ' + z.e.lage : '')) + '</td>'
         + '<td style="text-align:right;padding:5px 8px">' + (z.fl ? Math.round(z.fl) + ' m²' : '—') + '</td>'
-        + '<td style="text-align:right;padding:5px 8px">' + z.punkte + ' P.<span style="color:#8A8272;font-size:11px">' + (z.geerbt === WE_IDS.length ? ' · ganz geerbt' : (z.geerbt ? ' · ' + z.geerbt + ' geerbt' : ' · eigen')) + '</span></td>'
-        + '<td style="text-align:right;padding:5px 0;font-weight:600">' + (z.rnd != null ? Math.round(z.rnd) + ' J.' : '—') + '</td></tr>';
+        + '<td style="text-align:right;padding:5px 0 5px 8px">' + z.punkte + ' P.<span style="color:#8A8272;font-size:11px">' + (z.geerbt === WE_IDS.length ? ' · ganz geerbt' : (z.geerbt ? ' · ' + z.geerbt + ' geerbt' : ' · eigen')) + '</span></td>'
+        + '</tr>';
     }).join('');
-    var opt = optionFuer(d.punkteGew), r = Math.round(d.rndGew);
-    return '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="text-align:left;color:#8A8272;font-size:11px"><th>Einheit</th><th style="text-align:right">Fläche</th><th style="text-align:right">Anlage 2</th><th style="text-align:right">Restnutzungsdauer</th></tr></thead><tbody>' + rows + '</tbody></table>'
+    /* v2483 · eine RND fuer das Haus (siehe auswerten) - die Spalte je Einheit ist weg */
+    var opt = d.hausPunkte, r = Math.round(d.rndGew);
+    return '<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="text-align:left;color:#8A8272;font-size:11px"><th>Einheit</th><th style="text-align:right">Fläche</th><th style="text-align:right">Anlage 2</th></tr></thead><tbody>' + rows + '</tbody></table>'
       + '<div style="margin-top:12px;padding:10px 12px;border:1px solid #E6E0D3;border-radius:8px;background:#FBFAF7;font-size:13px">'
-      + '<b>Gebäude gesamt:</b> ' + d.punkteGew.toFixed(1).replace('.', ',') + ' Punkte flächengewichtet'
-      + (r > 0 ? ' · Restnutzungsdauer ' + r + ' Jahre' : '')
+      + '<b>Gebäude gesamt:</b> ' + d.punkteGew.toFixed(1).replace('.', ',') + ' Punkte flächengewichtet, angesetzt <b>' + opt + ' Punkte</b>'
+      + (r > 0 ? ' · Restnutzungsdauer des Gebäudes <b>' + r + ' Jahre</b>' : '')
       + (d.s.hatSoll ? '<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">Soll-Miete wirkt ab Jahr '
         + '<input class="mfh-in mfh-sm" id="mfh-soll-jahr" type="text" inputmode="numeric" value="' + esc(String(daten().sollAbJahr || '')) + '" placeholder="z. B. 2028">'
         /* v2410 - Kalenderjahr ODER Jahr der Mietentwicklung; ab 1900 gilt
@@ -834,7 +834,7 @@
            Soll-Miete nie. */
         + '<span style="font-size:12px;color:#6B6356">(Kalenderjahr wie 2028 oder Jahr der Mietentwicklung wie 3; leer = kein Sprung)</span></div>' : '')
       + '<div style="margin-top:8px;display:grid;gap:6px">'
-      + '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uep" checked> Modernisierungsgrad ins Objekt übernehmen (<b>' + opt + ' Punkte</b>)</label>'
+      + '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uep" checked> Modernisierungsgrad ins Objekt übernehmen (<b>' + opt + ' Punkte</b> — gilt dann für Marktbericht, Ertragswert und Wertpotenzial)</label>'
       + (r > 0 ? '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uer"> Restnutzungsdauer <b>' + r + ' Jahre</b> in die AfA übernehmen (eigener Satz ' + (100 / r).toFixed(2).replace('.', ',') + ' %)</label>' : '')
       + '</div></div>'
       /* ── v2095a · DIE ZAHL TRÄGT IHREN STICHTAG ──────────────────────
@@ -848,12 +848,13 @@
        * denselben Stichtag (eine Basis je Auswertung), also steht er
        * einmal unter der Tabelle statt elfmal darin. */
       + (function () {
-          var i = (d.zeilen[0] || {}).rndInfo;
+          var i = d.rndInfo;   /* v2483 · die RND des Hauses */
           if (!i || !i.stichtag) return '';
           return '<div class="cf-hint" style="margin-top:6px">Stichtag <b>'
             + esc(i.stichtag.split('-').reverse().join('.')) + '</b>'
             + (i.stichtag_herkunft ? ' — ' + esc(i.stichtag_herkunft) : '')
             + ' · GND ' + esc(String(i.gnd)) + ' Jahre'
+            + (i.quelle === 'marktbericht' ? (i.gnd_quelle === 'register' ? ' aus dem Modell des Liegenschaftszinssatzes' : ' nach Anlage 1 ImmoWertV') + ' · gerechnet vom Marktbericht-Dienst wie Bericht und Wertpotenzial' : '')
             + (i.kernsaniert ? ' · Kernsanierung angesetzt' : '')
             + '</div>';
         })()
@@ -1183,11 +1184,20 @@
          Herleitung - und das faellt erst im fertigen Dokument auf. */
       var _zurueck = inObjektZurueck();
       if (_zurueck.length) meldung += ' · ' + _zurueck.join(', ') + ' ins Objekt übernommen';
+      /* v2483 · die GENAUE Punktzahl des Hauses, nicht die naechste der fuenf
+         festen Stufen (optionFuer machte aus 7 Punkten 8). Fehlt die Option,
+         bekommt sie eine eigene - wie objekt-reiter.js modPunkteSchreiben. */
       if (el('mfh-uep') && el('mfh-uep').checked && el('mod_punkte')) {
-        el('mod_punkte').value = String(optionFuer(d.punkteGew));
-        try { el('mod_punkte').dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {}
-        meldung += ' · Modernisierungsgrad ' + optionFuer(d.punkteGew) + ' P.';
+        var _mpSel = el('mod_punkte'), _mpV = String(d.hausPunkte);
+        if (!Array.prototype.some.call(_mpSel.options || [], function (o) { return o.value === _mpV; })) {
+          var _o = document.createElement('option'); _o.value = _mpV; _o.textContent = _mpV + ' Punkte (aus den Einheiten)'; _o.setAttribute('data-oe-auto', '1'); _mpSel.appendChild(_o);
+        }
+        _mpSel.value = _mpV;
+        try { _mpSel.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {}
+        meldung += ' · Modernisierungsgrad ' + _mpV + ' P.';
       }
+      /* v2483 · die Zinssatz-Zeile (und mit ihr window._dpHausRnd) zu den neuen Punkten nachziehen */
+      try { if (window.DealPilotObjektReiter && typeof DealPilotObjektReiter.automatik === 'function') setTimeout(DealPilotObjektReiter.automatik, 200); } catch (x) {}
       if (el('mfh-uer') && el('mfh-uer').checked && d.rndGew > 0) {
         var r = Math.round(d.rndGew), sel = el('afa_satz'), feld = el('afa_rnd_jahre');
         if (!feld && sel && window.DpAfaEigen) { sel.value = 'eigen'; try { sel.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {} feld = el('afa_rnd_jahre'); }
@@ -1284,7 +1294,7 @@
   }
   window.DpMfhEinheiten = { /* v2430: Punkte-Helfer fuer potenzial.js - keine zweite Tabelle */
     punkteVon: punkteVon, maxPunkte: maxPunkte, labelVon: labelVon, punkteObjekt: punkteObjekt, WE_IDS: WE_IDS, GEB_IDS: GEB_IDS,
-    oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
+    oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, hausPunkte: hausPunkte /* v2483 */, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
     /* v2087: die elf Vertragsformen mitexportiert. Der Reiter Miete
        braucht dieselbe Liste fuer die Objektebene (Backlog N60.8-alt) -
        eine zweite Liste dort waere der Anfang der Abweichung. */

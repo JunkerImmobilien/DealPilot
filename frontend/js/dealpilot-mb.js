@@ -203,6 +203,14 @@ if (!window._wlc) {
         });
       }
     } catch (e) {}
+    /* v2483 · beim MFH mit erfassten Einheiten sind DEREN flaechengewichtete Punkte die
+       Punkte des Hauses (Anlage 2) - auch wenn das Feld mod_punkte noch den alten Stand
+       traegt (gespeichert vor v2483, oder nach einer Aenderung der acht mod_*-Felder).
+       Eine Punktzahl, eine Restnutzungsdauer: Bericht, Wertpotenzial, Mieterliste. */
+    try {
+      var _hp = (window.DpMfhEinheiten && typeof window.DpMfhEinheiten.hausPunkte === 'function') ? window.DpMfhEinheiten.hausPunkte() : null;
+      if (_hp && _hp.punkte != null) o.mod_punkte = String(_hp.punkte);
+    } catch (e) {}
     /* v2367 · eigener Abschlag auf Angebotspreise (Investmentprofil) - nur wenn gesetzt;
        sonst waehlt der Marktbericht selbst (oertliche Kauffaelle oder Marktdurchschnitt). */
     try { var _IP = window.DealPilotInvestmentProfile, _ab = _IP && _IP.get ? _IP.get('angebot_abschlag_pct') : null;

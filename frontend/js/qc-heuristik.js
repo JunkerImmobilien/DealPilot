@@ -814,7 +814,14 @@ window.QcHeuristik = (function () {
     /* qc-v2450: „die Lücke ist klein" stand auch bei 77 % des Ziels (2,9 statt
        3,75 %) - dort muesste der Preis um 22 % fallen. Das Wort bleibt (es haengt
        an der Ampel), der Satz sagt die Groesse nur, wo sie stimmt. */
-    else if (amp === 'gelb') { wort = 'knapp unter deinem Ziel';    satz = (q >= 0.9) ? 'Erreichbar über den Preis oder die Miete — die Lücke ist klein.' : 'Erreichbar über den Preis oder die Miete — dafür muss sich spürbar etwas bewegen.'; }
+    /* v2485 · Marcel 20.10.2026 („ja" zu einem deutlicheren Wort): „knapp" nur
+       ab 90 % des Ziels. Darunter (75-90 %) heisst es „deutlich unter", die Ampel
+       bleibt GELB - 0,9 liegt auf keiner Ampelgrenze (0,75 / 0,96875), und die
+       Satzgrenze war schon dieselbe (qc-v2450). */
+    else if (amp === 'gelb') {
+      if (q >= 0.9) { wort = 'knapp unter deinem Ziel';    satz = 'Erreichbar über den Preis oder die Miete — die Lücke ist klein.'; }
+      else          { wort = 'deutlich unter deinem Ziel'; satz = 'Erreichbar über den Preis oder die Miete — dafür muss sich spürbar etwas bewegen.'; }
+    }
     else if (q >= 1.15)      { wort = 'deutlich über deinem Ziel';  satz = 'Das ist Spielraum — beim Preis oder bei der Qualität des Objekts.'; }
     else                     { wort = 'am Ziel';                    satz = 'Genau das, was du für diese Lage angesetzt hast.'; }
     return {
