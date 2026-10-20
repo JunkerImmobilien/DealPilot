@@ -51,7 +51,8 @@ function feld(id, wert, einheit, zusatz) {
     quelle: QUELLE[id], schwelle: schwelleText(SKALA[id]) }, zusatz || {});
 }
 
-const ebeneText = (eb, name) => eb + (name ? ' ' + name : '');
+/* amtliche Namensform („Bielefeld, kreisfreie Stadt") bleibt, wie sie ist */
+const ebeneText = (eb, name) => (name && name.indexOf(',') >= 0) ? name : eb + (name ? ' ' + name : '');
 
 export async function messeLage({ adresse, plz, ort, objektart }) {
   const t0 = Date.now();
