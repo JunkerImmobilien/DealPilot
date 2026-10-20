@@ -39066,6 +39066,57 @@ Marcel: *„ja das wäre top"* — der in v2440–v2445 offen gelassene Telegram
   - `backend/src/generated/frontend-konstanten.json` von `tools/frontend-konstanten.mjs` neu erzeugt (Hash `voice-import` aus fremdem Strang) — nicht committet.
   - Ohne Lageklasse misst die BMR-Zeile an festen 4/5 %, die Meinung an 4,5/5,5 % „Bundesdurchschnitt“ — zwei Skalen, aber keine widersprechenden Aussagen in den 13 Beispielen.
 
+### v2460–v2466a · Wertpotenzial im Tab Bewertung, Wertbrücke, Prüfung beider PDFs (20.10.2026, Staging)
+
+**Was (Marcel 20.10.2026):** „Das Zielbild und das, was du ins Investment-PDF überführst, muss auch unter den Tab Bewertung." und „Bitte auch nochmal Textformatierung und Grafiken im Investment-PDF Bankfassung prüfen."
+
+- **v2460 · Tab Bewertung (`s6`):** Karte `#card-wertpotenzial` „Mieterhöhung und Zielbild · Wertpotenzial", per JS hinter `#avm-history-host` gesetzt (index.html nur Buster). Inhalt = `DpPotenzial.pdfDaten()` — keine zweite Rechnung: Satz der Bankfassung, Wohnungsliste (Ist/Mieterhöhung/Zielmiete/Maßnahmen), Ertragswert-Kacheln (Bestand/Mieterhöhung/Zielbild/Potenzial netto), **Wertbrücke** als SVG, Kennzahlen je Stufe inkl. Aufteilung vor/nach + Kaufpreis, Begründung „kein Potenzial", Hinweis „Aufteilung mit dem Zins für **vermietete** ETW" (Marcel bestätigt 20.10.), Stufe-3-Hinweis wie v2431, Kennzeichnung im Fuß. Erscheint nur bei Soll oder Zielbild; rechnet beim Öffnen des Tabs einmal je Stand selbst (kein Kontingent). Neu in `potenzial.js`: `brueckeDaten()`/`brueckeAchse()` — dieselben Zahlen zeichnen Tab und beide PDFs. Label „vermietet" auch in Tafel und PDF-Fuß; „Kaltmiete p. a. ohne Zuschläge", wenn Zuschläge existieren.
+- **v2460a–c · 390 px:** Wertbrücke nimmt die echte Kartenbreite (vorher fester viewBox 760 → Schrift ≈ 4 px), kurze Achsentexte, Tabellen ohne Abschneiden. Gemessen im gleich-Origin-iframe 390 px: `scrollWidth` 387 = `innerWidth`, beide Tabellenhüllen 329/329. Hell und Obsidian: Inhaltsfläche in beiden Skins hell, Karte `#2A2727` auf `#FFFFFF` wie die Nachbarkarte (getComputedStyle).
+- **v2466/v2466a · `tabellen-karten.js`:** der Schalter „Alle n Spalten" stand am Schreibtisch über jeder Tabelle in einem `.sec` — `.sec button:not(…)` (neun `:not()`) setzt `display:inline-flex !important` und schlägt die Blattregel; jetzt Inline-`!important` je Breite.
+
+**PDF-Prüfung** (eigener Tab, pdf.js 3.11.174 aus cdnjs im Tab gerendert, jsPDF-`text()` mitprotokolliert: Platzhalter, Zeichen außerhalb WinAnsi, Rand, Höhe). Objekte: MFH Westerfeldstr. 140 mit Zielbild + Aufteilung (im Speicher gesetzt), ETW Hermannstr. 9 mit Soll/Zielbild, EFH (Löhner Str. 278, Objektart im Speicher auf EFH), lange Anschrift (80 Zeichen). Je Bankfassung, Investment hell, Investment Obsidian = 12 PDFs, alle Seiten angesehen.
+
+| Fassung | Seite | Fehler | Ursache | Behoben |
+|---|---|---|---|---|
+| Bank | KI-Analyse | „[object Object]" als Kaufpreis-Offerte | KI liefert Objekt `{empfohlen,…}` | v2461 |
+| Bank | Ertrag, Phasen | „Steuern + 771 €" zwischen gleichen Cashflows 8.119 € | `K.steuer` = anteiliges Jahr 1, Cashflows Volljahr | v2461 (Differenz wie App V352) |
+| Bank | Cashflow je Phase | Spalte ging nicht auf (Warmmiete − … ≠ CF) | Warmmiete statt Kaltmiete | v2461 |
+| Bank | Kennzahlen je Phase | „+1.968" ohne €, Rate mit „+" | `sauber()` warf € weg | v2461 |
+| Bank | Zinsänderungsrisiko | „Mehrbelastung 346,41 €" neben „+110 €" | `zaer_m` ist Mehrzins auf Restschuld | v2461 (Beschriftung, „Prozentpunkte") |
+| Bank | Mieterliste, Wertpotenzial | „950 vermietet", „1.121 € Bad…", Maßnahmen/Lage hart abgeschnitten | linksbündige Spalte ohne Abstand, `slice()` | v2461 (3 mm, „...", Umbruch) |
+| Bank | Vermögensaufbau | Achse „1.034k" | Englisch | v2461 (T€) |
+| Bank | Finanzierung | „Darlehen II -" mit Zins, Rate 0,00 €, Mischzins | Haken ohne Betrag | v2461b |
+| Bank | alle Köpfe, Objekt | Untertitel bis 100 mm über Rand, Anschrift bei x = −10,9 mm | keine Begrenzung | v2461c |
+| Beide | Wertpotenzial | keine Wertbrücke | fehlte | v2462/v2464 |
+| Invest | S.2 Kacheln | Beschriftung kaum lesbar, Lücke in Reihe 1, „CF/Monat n.St." zeigte v.St. | Farbe 90/85/80 auf Obsidian, 3 Kacheln/4 Spalten, `K.cf_m` | v2463 |
+| Invest | S.2, S.4 | Steuern ± falsch (wie Bank), „Ende Zinsbindung" vor Steuern neben „Heute" nach | `K.steuer`/`ster_*`, `K.cf_ezb` | v2463 |
+| Invest | S.3 | „Monatliche Rate +1.968", Wertpuffer-Text auf dem Rahmen | `pE(x, 2)` = Vorzeichen | v2463 |
+| Invest | CF-Projektion | Fortsetzungsseite ohne Kopf/Fuß/Nummer (alle Nummern danach −1), „NKM/Mo n", Fußnote 9 mm über Rand und sachlich falsch („ohne Tilgung") | autoTable ohne `didDrawPage` | v2463 |
+| Invest | Bank-Cockpit | „>= 1,2 (gut)" im Seitenfuß, „1,0 (knapp)" außerhalb der Seite, LTV-80 %-Linie im DSCR-Diagramm | `thresholdLines` weiteten die Achse nicht | v2463 |
+| Invest | Vermögensaufbau | „' 46.092 €" (U+2212), Untertexte nach einer Zeile abgeschnitten, Diagramme in Times | Minuszeichen, `[0]`, `font-family` an `<g>` | v2463/v2463a |
+| Invest | Vermögenszuwachs | „15 Jahre", Wertsteigerung 245.567 gegen 345.023, „davon statisch 0", „Steuervorteil −25.935" | Feld `btj` leer, `K.nkm_m` gibt es nicht | v2463/v2463b |
+| Invest | Stress-Test | „+5.0 pp" | Punkt | v2463 |
+| Invest | Wertpotenzial | Maßnahmen abgeschnitten, „kein Potenzial" blau/grün, kein Kaufpreis | `splitTextToSize()[0]`, Spaltenfarbe | v2464 |
+| Invest | Annahmen | „ Jahre", AfA 2,00 % fest (Objekt 6,25 %), Gebäudeanteil „31,71" statt 32 | `g('btj')`, Konstante, `pP(d||2)` | v2463 |
+| Invest | S.2 | Objektname 74 mm über den Rand | keine Begrenzung | v2463c |
+| App + PDF | Wasserfall | bei Steuerlast begann die Wertsteigerung über dem Cashflow und lief oben aus dem Diagramm | `Math.max(0, taxBar)` | v2465a |
+| App + PDF | Wasserfall | Unterzeilen liefen ineinander, „1055k €" | Ersatzschrift breiter, Englisch | v2465 |
+
+**Commit:** `8281b4ba`, `ce1ff699`, `e2adfc0a`, `1a7844f3`, `de217fe7`, `5ca76104`, `f24c8b7d`.
+
+**Nachweis:**
+- Schlusslauf nach dem letzten Ausrollen: 4 Fälle × 3 Fassungen = 12 PDFs, Protokoll **0 Befunde** (vorher u. a. `[object Object]`, U+2212, Text bei y 295/334 mm, Ränder bis 325 mm); Sichtprüfung je Fall (Wertpotenzial, Wasserfall, lange Anschrift).
+- Tab Bewertung Westerfeld: Bestand 780.000 / Mieterhöhung 865.000 / Zielbild 1.105.000 €, Potenzial netto +257.000 € nach 68.000 € Maßnahmen, Aufteilung „kein Potenzial" mit Begründung, Zins 2,90 % vermietet (Bielefeld). Hüllhorst ETW 262/313/355 T€.
+- Keine Objekte gespeichert: im Prüftab `Auth.apiCall`/`fetch` für Schreibzugriffe auf `/objects` gesperrt, `dpTabSwitchSave`/`saveObj` stillgelegt; `updated_at` der vier Objekte vorher = nachher. Kein Testobjekt angelegt. `dp_chrome_hell` nach der Hell-Messung auf `0` zurück, Hilfsspeicher entfernt, Tab geschlossen.
+- `buster-ebenen-pruefen` SAUBER, `prompt-lecks-pruefen` RC 0, `frontend-konstanten` RC 0, Gold-Audit Staging RC 0, `node --check` je Datei.
+
+**Rest:**
+- `frontend-konstanten.json` neu erzeugt, aber nicht committet (Hash `voice-import` aus fremdem Strang, wie qc-v2450).
+- Fachlich, nicht Formatierung: Restnutzungsdauer Bestand im Wertpotenzial 32 J. (Ertragswert-Kern) gegen 35 J. in der Mieterliste (MFH-Anlage-2, flächengewichtet) — zwei Kerne, zwei Zahlen; Marcel ansehen.
+- Investment-PDF Seite 2 rechnet „Warmmiete" als Kaltmiete + umlagefähige Kosten (39.756), die Bankfassung seit v2273 mit den Umlagen der Mieter (41.147) — beide in sich schlüssig, aber verschieden.
+- Erste Zeile der CF-Projektion (Rumpfjahr) zeigt CF n.St. mit der Jahr-1-Steuer, Seite 2 das Volljahr — so gewollt (V351), steht aber ohne Hinweis nebeneinander.
+- Kein echter EFH-Datensatz im Konto: EFH über die Objektart im Speicher geprüft.
+
 ### Prod-Rollout (55) · Zielbild v2430–v2432, Unterlagen v2440–v2445, Kappungsgrenzen, BW-Nachernte, LZS-Formel v2404 (19.10.2026)
 
 **Was:**
