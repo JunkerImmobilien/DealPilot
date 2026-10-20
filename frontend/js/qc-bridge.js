@@ -32,7 +32,7 @@
      quickcheck-app.html am Browser-Cache vorbeikommt. Das qcpm-Overlay
      (ab Zeile ~348), auf das sich der Nicht-anfassen-Vermerk in
      CLAUDE.md bezieht, ist unberuehrt. */
-  var IFRAME_SRC = 'quickcheck-app.html?v=qc-v2420a';
+  var IFRAME_SRC = 'quickcheck-app.html?v=qc-v2450';
   // qb-buffer: Zwischenspeicher-Pass. Score erreichbar -> Snapshot -> EIN Pass (debounced),
   //   ohne echtes Objekt (object_id NULL). 'Als Objekt speichern' legt erst dann ein Portfolio-Objekt an.
   var _bufState = { code:null, timer:0, lastSig:'', busy:false };
@@ -136,13 +136,37 @@
     host.dataset.qcIframe = '1';
     _frame = document.getElementById('qc-v17-frame');
 
-    function sizeFrame() {  // qb-szf: Hysterese, kein +4 (kein Aufaddieren)
+    /* qc-v2450 · EIN SCROLLBALKEN, NICHT ZWEI
+       Marcel 20.10.2026: auf kleineren Bildschirmen zwei Scrollleisten im
+       Quick Boarding - die von .main-col und die des iframe-Dokuments.
+       GEMESSEN (Staging, Fenster mit Bruchteil-Zoom, devicePixelRatio 0,64):
+       Dokument im iframe scrollHeight 2325, iframe 2323 px hoch -> 2 px
+       Ueberhang und ein eigener Balken von 17 px. Ursache war die
+       Hysterese hier (erst ab 8 px Abweichung nachziehen) zusammen mit
+       documentElement.scrollHeight, das (a) die Bruchteilhoehe des Inhalts
+       ABRUNDET (body 2336,48 px -> 2336) und (b) nie kleiner als das
+       iframe selbst wird. Zweiter Befund aus (b): nach 390 px zurueck auf
+       1366 px blieb das iframe 3871 px hoch bei 2336 px Inhalt - 1.535 px
+       leerer Grund unter dem Quick-Check.
+       Jetzt: gemessen wird der INHALT (Unterkante body, aufgerundet, mit
+       Rand), nicht der Viewport. Er haengt nicht von der iframe-Hoehe ab,
+       deshalb braucht es keine Hysterese mehr - das iframe folgt genau,
+       auch nach unten. Das iframe-Dokument selbst scrollt nie
+       (overflow-y:hidden am <html>), gescrollt wird nur .main-col. */
+    function _inhaltHoehe(doc) {
+      var b = doc && doc.body; if (!b) return 0;
+      var w = doc.defaultView, cs = w.getComputedStyle(b);
+      var unten = b.getBoundingClientRect().bottom + (w.pageYOffset || 0) + (parseFloat(cs.marginBottom) || 0);
+      return Math.ceil(unten);
+    }
+    function sizeFrame() {
       try {
         var doc = _frame.contentDocument || (_frame.contentWindow && _frame.contentWindow.document);
-        var ch = doc && doc.documentElement ? doc.documentElement.scrollHeight : 0;
+        if (doc && doc.documentElement && doc.documentElement.style.overflowY !== 'hidden') doc.documentElement.style.overflowY = 'hidden';
+        var ch = _inhaltHoehe(doc);
         if (ch && ch > 0) {
           var cur = parseInt(_frame.style.height, 10) || 0;
-          if (Math.abs(ch - cur) > 8) { _frame.style.height = ch + 'px'; }
+          if (ch !== cur) { _frame.style.height = ch + 'px'; }
           return;
         }
         var top = _frame.getBoundingClientRect().top;
@@ -154,9 +178,15 @@
     function _attachContentObserver() {
       try {
         var doc = _frame.contentDocument || (_frame.contentWindow && _frame.contentWindow.document);
-        if (doc && window.ResizeObserver && doc.documentElement && !_frame._qcRO) {
+        /* qc-v2450: der Beobachter haengt am DOKUMENT. Beim erneuten Oeffnen
+           laedt das iframe neu (src + _t) - der alte Merker _qcRO hielt den
+           Beobachter am verworfenen Dokument fest, das neue wurde nie beobachtet. */
+        if (doc && window.ResizeObserver && doc.body && _frame._qcRODoc !== doc) {
+          if (_frame._qcRO) { try { _frame._qcRO.disconnect(); } catch (e2) {} }
           _frame._qcRO = new ResizeObserver(function () { if (_frame._qcRaf) return; _frame._qcRaf = requestAnimationFrame(function(){ _frame._qcRaf = 0; sizeFrame(); }); });
           _frame._qcRO.observe(doc.documentElement);
+          _frame._qcRO.observe(doc.body);
+          _frame._qcRODoc = doc;
         }
       } catch (e) {}
     }
