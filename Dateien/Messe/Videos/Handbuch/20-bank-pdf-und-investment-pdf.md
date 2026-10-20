@@ -1,6 +1,6 @@
 # 20 · Bank-PDF und Investment-PDF
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 19 „Das Bank-PDF" (`DREHBUECHER`-Schlüssel `reihe-bankpdf`), Überblick 2 Kapitel 10 (`reihe-ueberblick2`) ·
 > Messe-Geschichten: 13 Musterstr. (Bank-PDF), 8 Westerfeld Schritt 6 (design/Messe/demo-geschichten.md)
 
@@ -41,27 +41,28 @@ Cashflow über die Phasen, Mieterliste, Wertpotenzial, Belastungsprobe und Annah
 | Darlehen | 472.415 € zu 4,00 % |
 | Fassung | Bankfassung |
 
-Was die Bankfassung zeigt (Stand Modul 19, aufgenommen 16.10.2026):
+Was die Bankfassung zeigt (Aufnahme Modul 19 vom 16.10.2026, nachgezogen nach der Befüllung vom 20.10.2026):
 
 | Seite | Inhalt |
 |---|---|
 | 1 | Kaufpreis 545.000 € mit jeder Nebenkostenzeile, **Gesamtinvestition 592.415 €**, EK 120.000 €, Darlehen 472.415 € zu 4,00 % |
-| 2 | Bruttomietrendite **7,23 %**, Nettomietrendite **5,36 %**, DSCR **1,67**, Beleihung **83,3 %**, Cashflow **677 €/Monat**, nach Steuern **6.234 €/Jahr** |
-| Phasen | Cashflow nach Steuern 6.234 / 7.061 / 7.724 € |
+| 2 | Bruttomietrendite **7,23 %**, DSCR **1,67**, Beleihung **83,3 %**, Cashflow nach Steuern **8.119 €/Jahr**; Nettomietrendite und Cashflow je Monat: Zahl live zeigen |
+| Phasen | Zahl live zeigen (am 16.10. 6.234 / 7.061 / 7.724 €, vor der Befüllung) |
 | Exit | 2,0 % Wertsteigerung, Equity Multiple 5,3 |
-| Mieterliste | „Restnutzungsdauer des Gebäudes (Anlage 2, indikativ) 35 Jahre (GND 80)" |
-| Warmmiete | 40.067 € im Jahr — seit v2484 in Bankfassung, Investment-PDF und App dieselbe Zahl |
+| Mieterliste | 6 Wohnungen und Garagen; „Restnutzungsdauer des Gebäudes (Anlage 2, indikativ)" — Zahl live zeigen (Bericht 326: 25,7 J.) |
+| Warmmiete | Zahl live zeigen (rechnerisch 50.052 € im Jahr) — seit v2484 in Bankfassung, Investment-PDF und App dieselbe Zahl |
 | Wertpotenzial | Wertüberleitung Bestand → Mieterhöhung → Zielbild; Tabelle, Kaufpreis und Fußnote bleiben zusammen |
 
 **Warum die Warmmiete jetzt überall gleich ist:** Bis v2483 rechnete die Bankfassung mit den Umlagen der Mieter (41.147 €), das Investment-PDF
 mit den umlagefähigen Kosten (39.756 €). Seit v2484 gilt eine Definition: Warmmiete = Nettokaltmiete + Nebenkostenvorauszahlungen der Mieter,
 Stellplatz und Garage als Zusatzeinnahmen getrennt.
 
-**Zweites Beispiel, Musterstr. 12, Leipzig (ETW, Geschichte 13):** DSCR **1,04**, Cashflow nach Steuern **−213 €/Jahr**, Erstattung 2025 **1.687 €**,
+**Zweites Beispiel, Musterstr. 12, Leipzig (ETW, Geschichte 13):** DSCR **1,04**, Cashflow nach Steuern **−275 €/Jahr**, Erstattung 2025 **1.705 €**,
 Bankbewertung 220.000 €, Marktpreisindikation 243.000 € (218.000–269.000) bei 189.000 € Kaufpreis — „das ist die Mappe, die ich der Bank gebe".
 
-Belegt: Seiten 1–2, Phasen, Exit — Videoreihe.md (Modul 19); Haus-RND 35 J. und Warmmiete 40.067 € — Journal v2483–v2485 (Nachweis-Tabelle);
-Seitenzahlen Bank 10 / Investment 12 — Journal v2530; Musterstr. — demo-geschichten.md Geschichte 13. Neu nach v2541: live gegenprüfen.
+Belegt: Seite 1 und Exit — Videoreihe.md (Modul 19); DSCR, Beleihung, Bruttomietrendite, Cashflow n. St. — Objektliste Staging 20.10.2026
+(`dscr` 1,669, `ltv` 83,3, `bmy` 7,233, `cf_ns` 8.119,25); Warmmiete rechnerisch (3.195 + 976) × 12, Definition Journal v2483–v2485;
+Seitenzahlen Bank 10 / Investment 12 — Journal v2530; Musterstr. — Geschichte 13 (Stand 20.10.) und Objektliste (`cf_ns` −275,46).
 
 ## 4 · Was man daraus liest — Fragen am Stand
 

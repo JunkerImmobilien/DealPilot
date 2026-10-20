@@ -1,6 +1,6 @@
 # 15 · Deal Score und Investor Deal Score
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 12 „Bewertung und KPIs" (`DREHBUECHER`-Schlüssel `reihe-bewertung`), Modul 25 „Die geführte Eingabe" (`reihe-gefuehrt`), Überblick 2 (`reihe-ueberblick2`) ·
 > Messe-Geschichten: 8 Westerfeld, 9 Lindenhof, 3b Parkstr. (design/Messe/demo-geschichten.md)
 
@@ -55,7 +55,7 @@ Optimistisch, Lage-Fokus, Cashflow-Fokus, Sicherheit.
 |---|---|---|
 | 1 | Westerfeldstr. 140 in der Seitenleiste öffnen | Karte mit Ring |
 | 2 | Reiter **Bewertung** | DealPilot Score **78 · Gut**, Investor Deal Score **74 · Gut** |
-| 3 | Zum Vergleich Lindenhof 14, Castrop-Rauxel öffnen | **23 · Kritisch** / **40 · Schwach** — DSCR 0,74, Cashflow n. St. −21.444 €/Jahr, Beleihung 94 % |
+| 3 | Zum Vergleich Lindenhof 14, Castrop-Rauxel öffnen | **20 · Kritisch** / **39 · Schwach** — DSCR 0,74, Cashflow n. St. −13.431 €/Jahr, Beleihung 94 % |
 | 4 | Parkstr. 9, Bad Oeynhausen öffnen | **28 · Kritisch** / **58 · Solide** — hier gehen die Scores weit auseinander |
 | 5 | Einstellungen → Deal Score → Profil „Konservativ" wählen, zurück in Bewertung | Zahl live zeigen (Profil danach zurück auf „Ausgewogen") |
 
@@ -67,8 +67,8 @@ ist der Investor Deal Score (heute 58), nicht der DealPilot Score.
 (Cashflow −742 €/Mon), Investor Deal Score Zwischenstand 73 · Gut; am Ende im Reiter Bewertung
 **Deal Score 60 · Solide, Investor Deal Score 79 · Gut**.
 
-Belegt: Westerfeld 78/74, Gohliser 79/78, Lindenhof 23/40, Parkstr. 28/58 — Inventur in demo-geschichten.md
-(Fortschreibung A, gemessen 20.10.2026); Lindenhof-Kennzahlen Geschichte 9; Parkstr.-Hinweis „Korrekturen an den Geschichten 1–7";
+Belegt: Westerfeld 78/74, Gohliser 79/78, Lindenhof 20/39, Parkstr. 28/58 — Objektliste Staging nach der Befüllung
+(`dealpilot_score` / `ds2_score_persist`, gemessen 20.10.2026); Lindenhof-Kennzahlen Geschichte 9 und Objektliste (`cf_ns` −13.431, `ltv` 94,5); Parkstr.-Hinweis „Korrekturen an den Geschichten 1–7";
 Modul 25 — Videoreihe.md „Modul 25"; Gewichte und Skalen — `frontend/js/help.js` (Kennzahlen verstehen, Quick-Check).
 Profilwechsel: Zahl live zeigen.
 

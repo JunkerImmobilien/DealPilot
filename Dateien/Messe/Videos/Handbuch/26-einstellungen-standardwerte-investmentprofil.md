@@ -1,6 +1,6 @@
 # 26 · Einstellungen, Standardwerte und Investmentprofil
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: noch kein eigenes Video (Standardwerte kommen in Modul 06 und 08 vor: `reihe-investition`, `reihe-finanzierung`) ·
 > Messe-Geschichte: — (Lageklassen in Ü1/Quick Boarding; Angebotsabschlag in Geschichte 8)
 

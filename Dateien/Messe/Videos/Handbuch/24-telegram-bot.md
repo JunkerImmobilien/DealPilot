@@ -1,6 +1,6 @@
 # 24 · Der Telegram-Bot — DealPilot in der Hosentasche
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 22 · Der Telegram-Bot (`reihe-telegram`, `?modul=22`, 2:06) — **nachgestellt**: eigenes Chatfenster mit Vermerk „Nachgestellt · Demo", Antworten aus einem echten Lauf des Bots ·
 > Messe-Geschichte: 14 „Unterlagen beim Amt per Telegram" (design/Messe/demo-geschichten.md)
 

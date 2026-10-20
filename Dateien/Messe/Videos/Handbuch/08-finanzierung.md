@@ -1,6 +1,6 @@
 # 08 · Finanzierung — Darlehen, Marktzins, Bausparvertrag, DSCR
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 08 „Finanzierung" (`DREHBUECHER`-Schlüssel `reihe-finanzierung`, Studio `?modul=08`), Modul 19 Bank-PDF
 > (`reihe-bankpdf`) · Messe-Geschichten: 2 Bismarckstr. (DSCR unter 1), 9 Lindenhof, 13 Musterstr. (DSCR 1,04)
 > (design/Messe/demo-geschichten.md)
@@ -48,8 +48,8 @@ Bundesanleihe, dem Aufschlag der Banken und deiner Beleihung.
 - DSCR **1,67** — die Miete deckt den Kapitaldienst 1,67-mal. Ab 1,2 gilt das als bankseitig solide, ab 1,5 als sehr
   solide.
 - Beleihung **83,3 %** — im DealPilot-Rahmen „solide" (unter 85 %).
-- Cashflow **677 €/Monat**, nach Steuern **6.234 €/Jahr**; in den drei Phasen (heute / Ende Zinsbindung /
-  Anschluss) 6.234 / 7.061 / 7.724 €.
+- Cashflow nach Steuern seit der Befüllung **8.119 €/Jahr** (vorher 6.234 €); Cashflow je Monat und die drei Phasen
+  (heute / Ende Zinsbindung / Anschluss): Zahl live zeigen.
 - Darlehen = Gesamtinvestition − Eigenkapital (592.415 − 120.000 = 472.415 €) — passt es nicht, gleicht einer der
   beiden Knöpfe aus.
 
@@ -64,9 +64,9 @@ Anschlusslücke unsichtbar. Kommt die Zuteilung erst nach Bindungsende, zeigt di
 **Gegenbild — Bismarckstr. 27, Detmold:** DSCR heute **0,97** — unter 1: die Miete trägt den Kapitaldienst nicht.
 **Musterstr. 12, Leipzig (ETW):** DSCR **1,04** — trägt gerade so.
 
-Belegt: Westerfeld-Zahlen Videoreihe.md „15 · … 19 · Das Bank-PDF" (Prüflauf 16.10.2026); Marktzins/Rate/Restschuld
+Belegt: DSCR 1,67 und Cashflow n. St. 8.119 € Objektliste Staging nach der Befüllung (gemessen 20.10.2026, `dscr` 1,669, `cf_ns` 8.119,25, `ltv` 83,3); übrige Westerfeld-Zahlen Videoreihe.md „15 · … 19 · Das Bank-PDF" (Prüflauf 16.10.2026); Marktzins/Rate/Restschuld
 Videoreihe.md „Aufgenommen 16.10.2026", Modul 08; Schwellen DSCR/LTV help.js („DSCR", „LTV"); BSV im DSCR help.js
-und CLAUDE.md (Rechenkern `Dscr.compute`); Bismarckstr. Korrektur Geschichte 2; Musterstr. Geschichte 13.
+und CLAUDE.md (Rechenkern `Dscr.compute`); Bismarckstr. 0,97 und Musterstr. 1,04 Objektliste Staging 20.10.2026 (`dscr` 0,965 / 1,040), Korrektur Geschichte 2 und Geschichte 13.
 
 ## 4 · Was man daraus liest — Fragen am Stand
 

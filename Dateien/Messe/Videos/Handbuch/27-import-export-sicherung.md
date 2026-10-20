@@ -1,6 +1,6 @@
 # 27 · Import, Export, Sicherung und Objekt übertragen
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 17 · Objekt übertragen (`reihe-uebertragen`, `?modul=17`, 3:00) ·
 > Messe-Geschichte: — (design/Messe/demo-geschichten.md)
 

@@ -1,6 +1,6 @@
 # 09 · Bewirtschaftung — was das Objekt im Betrieb kostet
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 09 „Bewirtschaftung" (`DREHBUECHER`-Schlüssel `reihe-bewirtschaftung`, Studio `?modul=09`) ·
 > Messe-Geschichten: 2 Bismarckstr. (Instandhaltung +40 %), 9 Lindenhof (Vorgabewerte bei 24 WE) (design/Messe/demo-geschichten.md)
 
@@ -31,7 +31,7 @@ mindert deinen Cashflow. Wo du noch keine eigenen Zahlen hast, schlägt DealPilo
 
 ## 3 · Schritt für Schritt — Beispiel Bismarckstr. 27, Detmold (MFH, 6 WE, eigene Werte)
 
-Die Bismarckstr. ist das einzige Demo-MFH mit **eigenen** Bewirtschaftungswerten statt Vorgaben.
+Die Bismarckstr. ist das Demo-MFH mit den vollständigsten **eigenen** Bewirtschaftungswerten (seit 20.10. ohne Tausenderpunkt gespeichert).
 
 | Feld | Wert |
 |---|---|
@@ -41,18 +41,19 @@ Die Bismarckstr. ist das einzige Demo-MFH mit **eigenen** Bewirtschaftungswerten
 
 **Was die App zeigt:** Die 16.380 € laufen durch (Mieter zahlen sie über die Vorauszahlung), der Cashflow sieht nur
 2.442 + 11.763 €. Die Instandhaltung liegt **40 % über dem Plan vom Kauf (8.402 €)** — die Dachreparatur. Zusammen mit
-zwei leeren Wohnungen drückt das den DSCR auf **0,97** und den Cashflow nach Steuern auf **−9.205 €/Jahr**.
+zwei leeren Wohnungen drückt das den DSCR auf **0,97** und den Cashflow nach Steuern auf **−9.627 €/Jahr**.
 
-**Zum Vergleich — Westerfeldstr. 140 (Vorgabewerte):** umlagefähig 143,92 €/Monat, Grundsteuer 336 €,
-nicht umlagefähig 7.680 €/Jahr — dieselben Vorgaben wie in fast allen Demo-Objekten. Für die Messe reicht das; bei
+**Zum Vergleich — Westerfeldstr. 140 (seit 20.10. nachgetragen):** umlagefähig `hg_ul` 11.376 €/Jahr, Vorauszahlung der
+Mieter 976 €/Monat (Summe der Nebenkosten der 6 Wohnungen; die App koppelt (11.376 + Grundsteuer 336) / 12 = 976),
+nicht umlagefähig 7.680 €/Jahr (Vorgabe). In den übrigen Demo-Objekten stehen weiter die Vorgaben; bei
 Lindenhof 14 (24 WE, 1.696 m²) wirken 143,92 €/Monat Vorauszahlung sichtbar zu niedrig — dort **nicht** über die
 Warmmiete sprechen.
 
-Achtung Datensatz: In der Bismarckstr. stehen die Werte mit Tausenderpunkt („16.380") im Feld. Vor dem Zeigen live
-prüfen, dass die App 16.380 und nicht 16,38 liest.
+Erledigt 20.10.: In der Bismarckstr. standen die Werte mit Tausenderpunkt („16.380") im Feld; seit der Befüllung werden
+`hg_nul` 2.442 und `eigen_r` 11.763 ohne Punkt gelesen — daher der Cashflow −9.627 € statt −9.205 €.
 
 Belegt: Bismarckstr.-Werte demo-geschichten A.1 und C.3; Plan/Ist Instandhaltung Geschichte 2; DSCR 0,97 und
-−9.205 € Korrektur zu Geschichte 2; Westerfeld/Lindenhof-Vorgaben A.2; Standardwerte und Faktor 1,60 help.js
+−9.627 € Korrektur zu Geschichte 2 und Objektliste Staging 20.10.2026; Westerfeld `hg_ul`/`umlagef` demo-geschichten D; Lindenhof-Vorgaben A.2; Standardwerte und Faktor 1,60 help.js
 („Bewirtschaftung — Kosten je Objektart", „Lageklassen A · B · C und Bewirtschaftung je Objektart").
 
 ## 4 · Was man daraus liest — Fragen am Stand

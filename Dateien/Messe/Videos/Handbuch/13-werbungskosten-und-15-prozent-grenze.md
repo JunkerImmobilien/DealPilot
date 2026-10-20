@@ -1,6 +1,6 @@
 # 13 · Werbungskosten im Detail, Belege, Finanzamt-PDF und die 15-%-Grenze
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 15 „Steuer im Bestand" (`DREHBUECHER`-Schlüssel `reihe-steuer-bestand`, Studio `?modul=15`), Modul 23
 > „Die 15-%-Grenze" (`reihe-15pct`, `?modul=23`) · Messe-Geschichten: 3 Gohliser (im Jahr 6 investieren), 3b Parkstr.,
 > 7 Werbungskosten im Detail, 15 „Die Mappe für den Steuerberater" (design/Messe/demo-geschichten.md)
@@ -49,7 +49,8 @@ die Sanierung über Jahrzehnte ab statt sofort.
 
 Jede Zeile trägt ihre Herkunft. **Bewusst nicht eingetragen:** Hausverwaltung — sie steckt schon in der Bewirtschaftung.
 Die Rechnung des Nutzungsdauergutachtens gehört als sonstige Kosten hinein (Betrag aus der Rechnung, nicht schätzen —
-noch nicht erfasst).
+noch nicht erfasst, die Rechnung liegt nicht im Repo). **Eingetragen seit 20.10.:** 2027 2.321 € · 2028 18.549 € ·
+2029 18.429 € · 2030 18.549 € (Bad und Böden WE 1, 3, 4 nach Ende der Drei-Jahres-Frist).
 
 ### b) Die 15-%-Grenze — Ravensberger Weg 38, Bielefeld (wie in Modul 23)
 
@@ -68,16 +69,18 @@ Grenze. Mit dem BMF-optimierten Gebäudeanteil (74,82 → 79,86 %) steigt die Gr
   Einnahmen 39.652 €, Schuldzinsen 25.344 €, AfA 8.947 €, Ergebnis −49.847 €, Steuer-Effekt +16.311 € (Stand der
   Aufnahme); zwei eingelesene Beispielbelege (Dachrinne 2.189,60 €, Wohngebäudeversicherung 1.386,40 €) heben die
   Bewirtschaftung von 7.757 auf 11.333 € und den Steuer-Effekt auf +17.073 €.
-- **Gohliser Str. 42, Leipzig** (Kauf 23.12.2024): die Steuer aus dem Objekt steigt 2025 6.052 € · 2026 6.919 € ·
-  2027 14.355 € · 2028 15.290 € — 2029 werden 40.000 € Fassade und Dach als Erhaltungsaufwand geplant → **−553 €
-  (Erstattung)**; 2030 wieder 17.224 €. Deshalb 2029, nicht 2025: in den ersten drei Jahren gilt die 15-%-Grenze.
+- **Gohliser Str. 42, Leipzig** (Kauf 23.12.2024): die Steuer aus dem Objekt steigt 2025 6.046 € · 2026 6.913 € ·
+  2027 13.130 € · 2028 14.066 € — 2029 werden 40.000 € Fassade und Dach als Erhaltungsaufwand geplant → **553 €
+  Erstattung**; 2030 (40 €) und 2031 (1.040 €) bleiben dank je vier Bädern als Erhaltungsaufwand niedrig. Deshalb 2029, nicht 2025: in den ersten drei Jahren gilt die 15-%-Grenze.
 - **Westerfeldstr. 140** (Kauf 01.01.2025): Grenze rechnerisch rund **13.400 € netto** (545.000 € × 1,1227 × 14,64 % ×
-  15 %) — eine einzige Wohnungssanierung für 16.000 € würde sie reißen. Deshalb Modernisierung erst ab 2028.
+  15 %) — eine einzige Wohnungssanierung für 16.000 € würde sie reißen. Deshalb Modernisierung erst ab 2028; in der App
+  drehen 2028–2030 damit zur Erstattung (2028 +3.586 €, 2029 +3.313 €, 2030 +3.135 €).
   **Rechnerisch, ohne Gewähr — der Steuerberater prüft.**
 
 Belegt: a) demo-geschichten B.1 Tabelle Werbungskosten und Geschichte 7; b) Videoreihe.md „Stand 16.10.2026
 nachmittags", Modul 23; c) Parkstr. Korrektur 3b und Videoreihe.md Modul 15 (Prüflauf 16.10.); Gohliser Korrektur zu
-Geschichte 3 (`tax_records`); Westerfeld-Grenze demo-geschichten B.1 („Warum erst ab 2028"); Bedienung help.js
+Geschichte 3 („Neu gemessen nach der Befüllung") und `DpSteuerVerlauf.reihe()` am 20.10.2026; Westerfeld-Grenze demo-geschichten B.1 („Warum erst ab 2028"); Westerfeld-Werbungskosten 2027–2030 demo-geschichten D;
+Erstattungen 2028–2030 gemessen `DpSteuerVerlauf.reihe()` am 20.10.2026 (Staging, ohne Speichern); Bedienung help.js
 („Werbungskosten je Jahr und Sanierung verteilen", „Finanzamt-PDF und Anlage V", „Belege einlesen (KI)").
 
 ## 4 · Was man daraus liest — Fragen am Stand

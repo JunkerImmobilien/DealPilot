@@ -1,6 +1,6 @@
 # 19 · Marktbericht Stufe 1, 2 und 3
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 18 „Der Marktbericht" (`DREHBUECHER`-Schlüssel `reihe-marktbericht`), Modul 04 „Marktbewertung in drei Stufen" (`reihe-stufen`), Modul 16 „Stufe 3 genauer" (`reihe-stufe3`) ·
 > Messe-Geschichten: 3b Parkstr., 8 Westerfeld, 9 Lindenhof, 11 Alexanderstr. (design/Messe/demo-geschichten.md)
 
@@ -57,8 +57,9 @@ Was der Bericht zeigt:
 10 Jahren, damit trägt der Ertragswert wenig. Genau das sagt der Bericht offen — und die Beleihung auf den Marktwert liegt bei 131 %.
 Eine gute Geschichte für „DealPilot zeigt auch, was unbequem ist".
 
-**Zweites Beispiel, Westerfeldstr. 140, Bielefeld (MFH), Bericht 308 (Stufe 3, 19.10.2026):** Ertragswert **710.000 €**, Sachwert **536.435 €**,
-Liegenschaftszins **2,5 % Stufe A** (Gutachterausschuss Stadt Bielefeld), Restnutzungsdauer 23,6 Jahre. Für Bielefeld liegt im Register kein Sachwertfaktor
+**Zweites Beispiel, Westerfeldstr. 140, Bielefeld (MFH, 6 WE), Bericht 326 (Stufe 3, 20.10.2026):** Ertragswert **745.000 €**,
+Marktpreisindikation **820.000 €**, Sachwert **560.519 €**, Liegenschaftszins **2,5 % Stufe A** (Gutachterausschuss Stadt Bielefeld),
+Restnutzungsdauer 25,7 Jahre (3 Modernisierungspunkte aus den Wohnungen). Für Bielefeld liegt im Register kein Sachwertfaktor
 für MFH — der Sachwert ist deshalb **vorläufig** (Faktor 1,0), und der Bericht verweist auf die Landestabelle als Weg zur Quelle.
 Seit v2542 trägt der Bericht den Abschnitt **„Marktpreise & Wertpotenzial · Verlauf"** (Web und PDF) mit dem Abruf vom 20.10.2026.
 
@@ -67,8 +68,8 @@ im Prüfbericht vom 20.10.: Bevölkerungsentwicklung Bielefeld, Stadt, 2014–20
 Mietausfallrisiko niedrig (1,7 % marktaktiver Leerstand laut Zensus 2022). Darunter der Quellenvermerk „© Statistische Ämter des Bundes und der Länder,
 Regionaldatenbank Deutschland" mit Lizenz dl-de/by-2-0 und dem Hinweis, was DealPilot umgerechnet hat.
 
-Belegt: Bericht 205 — Videoreihe.md (Modul 18); Parkstr.-Stammdaten und 131 % — demo-geschichten.md Geschichte 3b und Korrekturen; Bericht 308 —
-Geschichte 8 Schritt 6 und Korrektur 4; Sachwertfaktor Bielefeld fehlt — Videoreihe.md (Modul 16, Nachtrag); Makrolage — Journal v2510–v2518 und v2540
+Belegt: Bericht 205 — Videoreihe.md (Modul 18); Parkstr.-Stammdaten und 131 % — demo-geschichten.md Geschichte 3b und Korrekturen; Bericht 326 —
+Messung nach der Befüllung 20.10.2026 (ersetzt Bericht 308 mit 4 WE und Bericht 325 ohne Stellplätze), RND/Punkte Korrektur 4; Sachwertfaktor Bielefeld fehlt — Videoreihe.md (Modul 16, Nachtrag); Makrolage — Journal v2510–v2518 und v2540
 (Prüfberichte 322/323/324, nicht am Kundenobjekt). Neuer Abruf an einem Messe-Objekt: Staging-Kontingent für Stufe 3 ist aufgebraucht — gespeicherte Berichte zeigen.
 
 ## 4 · Was man daraus liest — Fragen am Stand

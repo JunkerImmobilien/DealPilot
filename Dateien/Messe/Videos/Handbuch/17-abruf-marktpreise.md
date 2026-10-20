@@ -1,6 +1,6 @@
 # 17 · Abruf „Marktpreise" mit Verlauf
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 26 „Mieterhöhung und Zielbild" (`DREHBUECHER`-Schlüssel `reihe-zielbild`; Abruf dort als Mitschnitt) ·
 > Messe-Geschichte: 8 Westerfeld, Schritt 3 und 5 (design/Messe/demo-geschichten.md)
 
@@ -28,32 +28,34 @@ als Eigentumswohnung. Jeder Abruf wird mit Datum gespeichert, so entsteht ein **
 |---|---|
 | Objektart | Mehrfamilienhaus, Baujahr ca. 1967 |
 | Adresse | Westerfeldstr. 140, Bielefeld |
-| Wohnungen | im MFH-Konfigurator erfasst (Stand im Konto: 4 WE) |
+| Wohnungen | im MFH-Konfigurator erfasst: 6 WE (4 × 70 m², 2 × 55 m²; eingetragen 20.10.) |
 | Kontingent | 1 × erweiterte Marktpreisindikation frei |
 
-Ergebnis des Abrufs vom **20.10.2026** (einmal echt, mit Marcels Freigabe):
+Ergebnis des **Abrufs 6 vom 20.10.2026** (nach der Befüllung, 6 WE):
 
 | Markt am Ort | Median | Spanne (Q25–Q75) | Angebote · Umkreis |
 |---|---:|---:|---:|
 | Kauf Mehrfamilienhaus | 2.164 €/m² | 1.848–2.396 €/m² | 78 · 5 km |
-| Kauf Eigentumswohnung | 2.505 €/m² | 2.302–2.745 €/m² | 38 |
+| Kauf Eigentumswohnung | 2.604 €/m² | 2.482–2.926 €/m² | 56 |
 | Angebotsmiete | 9,50 €/m² | 7,96–11,24 €/m² | 163 · 8 km |
 
 | Je Stufe (Marktpreisindikation) | Bestand | Mieterhöhung | Zielbild |
 |---|---:|---:|---:|
-| aus Angebotspreisen | 805.000 € | 805.000 € | 880.000 € |
+| aus Angebotspreisen | 820.000 € | 820.000 € | 895.000 € |
+| Ertragswert (zum Vergleich) | 745.000 € | 815.000 € | 915.000 € |
 
-Je Wohnung als Eigentumswohnung: **243.000 €** (Spanne 223.000–267.000 €), Summe **972.000 €**. Grundlage: Angebote für
+Abschlag auf Angebotspreise 15,9 % (örtlich gemessen). Je Wohnung als Eigentumswohnung, z. B. **WE 1: Ertragswert
+126.000 €, Marktpreisindikation 180.000 €**; die übrigen Wohnungen und die Summe live zeigen. Grundlage: Angebote für
 Eigentumswohnungen gleichen Baujahrs in der Flächenklasse der Wohnung.
 
-**Was man sieht und warum:** Das Haus kostet am Markt 2.164 €/m², eine einzelne Wohnung 2.505 €/m². Der Abstand ist der
+**Was man sieht und warum:** Das Haus kostet am Markt 2.164 €/m², eine einzelne Wohnung 2.604 €/m². Der Abstand ist der
 mögliche Aufteilungsgewinn — abzüglich der Kosten der Aufteilung je Wohnung. Die Angebotsmiete (9,50 €/m²) liegt über der
 Ist-Miete des Hauses (8,19 €/m²): Hier steckt Mieterhöhungspotenzial, gebremst durch die Kappungsgrenze von 15 % in Bielefeld.
-Das Zielbild liegt bei der Marktpreisindikation höher (880.000 €), weil es mit dem Zustand „modernisiert" rechnet.
+Das Zielbild liegt bei der Marktpreisindikation höher (895.000 €), weil es mit dem Zustand „modernisiert" rechnet.
 
-Belegt: Markt- und Wohnungszahlen — Journal v2541–v2543d (Nachweis „ein echter Abruf Marktpreise"); Stufenwerte 805/805/880 T€ —
-demo-geschichten.md Geschichte 8 Schritt 4; Ist-Miete 8,19 €/m² und Kappung 15 % — demo-geschichten.md Abschnitt B;
-Rückfragetext — `frontend/js/potenzial.js`. Hinweis: Stand mit 4 WE; nach dem Umbau auf 6 WE neu abrufen und live zeigen.
+Belegt: Markt-, Stufen- und Wohnungszahlen — demo-geschichten.md Geschichte 8 Schritte 3–5 (Abruf 6 vom 20.10.2026, 6 WE;
+ersetzt den ersten Abruf mit 4 WE: ETW 2.505 €/m², 805/805/880 T€, 243.000 € je Wohnung); Ist-Miete 3.195 € / 390 m² = 8,19 €/m² nachgerechnet; Ist-Miete 8,19 €/m² und Kappung 15 % — demo-geschichten.md Abschnitt B;
+Rückfragetext — `frontend/js/potenzial.js`.
 
 ## 4 · Was man daraus liest — Fragen am Stand
 
@@ -81,8 +83,8 @@ Rückfragetext — `frontend/js/potenzial.js`. Hinweis: Stand mit 4 WE; nach dem
 | 1 | Pilot-Analyse → Ankauf · Bestand · Zielbild | Unterreiter | Unter Ankauf, Bestand und Zielbild liegt der Abschnitt Marktpreise. |
 | 2 | Rückfrage im Seiteninhalt | „Marktpreise abrufen" | Vorher fragt DealPilot nach: Der Abruf kostet eine erweiterte Marktpreisindikation aus deinem Kontingent. |
 | 3 | Tabelle Markt am Ort | „Ja, abrufen" | Median, Spanne, Zahl der Angebote, Umkreis — der aktuelle Marktdurchschnitt am Ort. |
-| 4 | Je Stufe 805/805/880 T€ | — | Daraus eine Marktpreisindikation je Stufe: Bestand, Mieterhöhung, Zielbild. |
-| 5 | Je Wohnung 243.000 € | Zeile Wohnung | Beim Mehrfamilienhaus jede Wohnung als Eigentumswohnung — der Abstand zum Haus ist dein Aufteilungs-Spielraum. |
+| 4 | Je Stufe 820/820/895 T€ | — | Daraus eine Marktpreisindikation je Stufe: Bestand, Mieterhöhung, Zielbild. |
+| 5 | WE 1 als ETW 180.000 € | Zeile Wohnung | Beim Mehrfamilienhaus jede Wohnung als Eigentumswohnung — der Abstand zum Haus ist dein Aufteilungs-Spielraum. |
 | 6 | Verlauf | — | Jeder Abruf bleibt mit Datum stehen. So siehst du, wohin sich der Markt bewegt. |
 | 7 | Marktbericht, Abschnitt Marktpreise & Verlauf | Marktbericht öffnen | Dieselben Zahlen stehen auch im Marktbericht — im Web und im PDF. |
 
@@ -92,7 +94,7 @@ Was verlangt der Markt am Ort heute? Das beantwortet der Abruf Marktpreise. Du f
 Ankauf, Bestand und Zielbild.
 Bevor etwas abgebucht wird, fragt DealPilot nach: Der Abruf kostet eine erweiterte Marktpreisindikation aus deinem Kontingent.
 Dann kommt der aktuelle Marktdurchschnitt. Für die Westerfeldstraße in Bielefeld: Mehrfamilienhäuser um zweitausendeinhundertvierundsechzig
-Euro je Quadratmeter, Eigentumswohnungen um zweitausendfünfhundertfünf, Angebotsmieten um neun Euro fünfzig — jeweils mit Spanne,
+Euro je Quadratmeter, Eigentumswohnungen um zweitausendsechshundertvier, Angebotsmieten um neun Euro fünfzig — jeweils mit Spanne,
 Zahl der Angebote und Umkreis.
 Daraus rechnet DealPilot eine Marktpreisindikation für jede Stufe und beim Mehrfamilienhaus für jede einzelne Wohnung.
 Der Abstand zwischen Haus und Wohnung zeigt dir, wo eine Aufteilung Spielraum hätte.

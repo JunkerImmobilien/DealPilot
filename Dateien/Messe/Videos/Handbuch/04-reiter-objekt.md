@@ -1,6 +1,6 @@
 # 04 · Reiter Objekt — Eingabetiefe, Verkehrswert-Parameter, Bodenrichtwert, WGFZ, Modernisierungspunkte
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen. Video: Modul 04 (`reihe-stufen`), Modul 16 (`reihe-stufe3`), Modul 24 (`reihe-brw-unterlagen`), Überblick 2 Kapitel 1–2 (`reihe-ueberblick2`) · Messe-Geschichte(n): 8 (Westerfeldstr. 140, „Ein Haus, alle Hebel"), 4 (RND-Gutachten Westerfeld) (design/Messe/demo-geschichten.md).
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen"). Video: Modul 04 (`reihe-stufen`), Modul 16 (`reihe-stufe3`), Modul 24 (`reihe-brw-unterlagen`), Überblick 2 Kapitel 1–2 (`reihe-ueberblick2`) · Messe-Geschichte(n): 8 (Westerfeldstr. 140, „Ein Haus, alle Hebel"), 4 (RND-Gutachten Westerfeld) (design/Messe/demo-geschichten.md).
 
 ## 1 · Wozu
 
@@ -24,7 +24,7 @@ Der Reiter Objekt ist das Logbuch deines Objekts: Adresse, Objektart, Fläche, B
 
 **Pflichtfelder je Stufe** (`help.js`): Stufe 1 Adresse, Objektart, Wohnfläche, Baujahr · Stufe 2 dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe · Stufe 3 dazu Nutzungsart, Grundstücksfläche, Bodenrichtwert, Bruttogrundfläche; bei ETW Miteigentumsanteil, bei EFH/ZFH/DHH/RH Hausform (NHK), Geschosse, Dachausbildung. Felder mit dem Schild „optional" verfeinern nur.
 
-## 3 · Schritt für Schritt — Beispiel Westerfeldstr. 140, Bielefeld (MFH, Bj 1967)
+## 3 · Schritt für Schritt — Beispiel Westerfeldstr. 140, Bielefeld (MFH, Bj 1967, Kürzel DEMO-BI1, 6 WE)
 
 | Feld | Wert |
 |---|---|
@@ -33,7 +33,7 @@ Der Reiter Objekt ist das Logbuch deines Objekts: Adresse, Objektart, Fläche, B
 | Baujahr | 1967 |
 | Grundstücksfläche | 1.570 m² |
 | Bodenrichtwert | **Bodenrichtwert abrufen** → 450 €/m² |
-| Modernisierung | acht Felder des Reiters bzw. Einheiten des Konfigurators |
+| Modernisierung | Punkte aus **den Einheiten** (`mod_quelle` einheiten, seit 20.10. gespeichert) |
 | WGFZ des Objekts | leer (nur mit GFZ der Zone und Geschossfläche aus der Bauakte) |
 
 Was die App zeigt:
@@ -44,15 +44,15 @@ Was die App zeigt:
 | Bodenwert | 1.570 × 450 = 706.500 € — mehr als der Kaufpreis | deshalb nur 14,6 % Gebäude in der BMF-Aufteilung (siehe [12](12-bmf-kaufpreisaufteilung.md)) |
 | Liegenschaftszins | 2,5 % · Stufe **A** (MFH, Gutachterausschuss Stadt Bielefeld) | amtlich für Gebiet und Objektart |
 | Sachwertfaktor | im Register kein Satz für Bielefeld MFH → Sachwert „vorläufig", Weg zur Landestabelle | kein Nachbarkreis, kein Landesmittel |
-| Modernisierungspunkte / RND | Punkte aus **den Einheiten**: 3 Punkte → RND 26 J. · aus **den acht Feldern**: 2 Punkte → RND 24 J. | Anlage 2 bewertet das Gebäude: eine Punktzahl, eine Restnutzungsdauer; beim MFH wählst du die Quelle |
+| Modernisierungspunkte / RND | Punkte aus **den Einheiten** (6 WE): **3 Punkte** (flächengewichtet 3,4) → RND **25,7 J.** · aus den acht Feldern: Zahl live zeigen | Anlage 2 bewertet das Gebäude: eine Punktzahl, eine Restnutzungsdauer; beim MFH wählst du die Quelle |
 
-Danach Stufe 3 abrufen: Bericht 308 (19.10.2026) — Ertragswert **710.000 €**, Sachwert **536.435 €**, Liegenschaftszins 2,5 % Stufe A. Im Feld Verkehrswert erscheinen „Ertragswert · Datum · Betrag", „Sachwert · …", „Marktwert · …" — welche Zahl als Verkehrswert gilt, entscheidest du. Die Karte nennt beim Marktwert den Abschlag, z. B. „inkl. 15,9 % Abschlag auf Angebotspreise (örtlich gemessen)".
+Danach Stufe 3 abrufen: Bericht 326 (20.10.2026, 6 WE) — Ertragswert **745.000 €**, Marktpreisindikation **820.000 €**, Sachwert **560.519 €**, Liegenschaftszins 2,5 % Stufe A, RND 25,7 J. Im Feld Verkehrswert erscheinen „Ertragswert · Datum · Betrag", „Sachwert · …", „Marktwert · …" — welche Zahl als Verkehrswert gilt, entscheidest du. Die Karte nennt beim Marktwert den Abschlag, z. B. „inkl. 15,9 % Abschlag auf Angebotspreise (örtlich gemessen)".
 
 **Zweites Beispiel ETW (Karte Mieterhöhung und Zielbild):** Hermannstr. 9, Hüllhorst, mit Soll und Zielbild → Ertragswert Bestand / Mieterhöhung / Zielbild 262 / 313 / 355 T€ (gemessen v2460, Stufe 3 vorhanden).
 
 **Stufe N (Kupferpille):** Wo der Ausschuss keinen Zins führt (fast nur Baden-Württemberg), steht „abgeleitet, nicht amtlich — genauer: Satz des Ausschusses eintragen" mit Link.
 
-Belegt: BRW Videoreihe.md Modul 24 (v2300er-Stand); Grundstück/Bodenwert/14,6 % demo-geschichten 4; LZS 2,5 % A Journal v2431/v2432 und v2401 (Testobjekt W); Sachwertfaktor Bielefeld Videoreihe.md Modul 16 „fachlich offen"; Punkte 3/26 und 2/24 Journal v2540 (Browser-Nachweis 20.10.); Bericht 308 demo-geschichten 8 Schritt 6; Abschlag 15,9 % Journal v2490; Hüllhorst Journal v2460–v2466a; Stufe N Journal v2400–v2403. **Achtung:** v2483 maß an einem früheren Datenstand 7 Punkte/RND 35 — die Zahl hängt am Datenstand, live zeigen.
+Belegt: BRW Videoreihe.md Modul 24 (v2300er-Stand); Grundstück/Bodenwert/14,6 % demo-geschichten 4; LZS 2,5 % A Journal v2431/v2432 und v2401 (Testobjekt W); Sachwertfaktor Bielefeld Videoreihe.md Modul 16 „fachlich offen"; 3 Punkte / RND 25,7 J. demo-geschichten Korrektur zu Geschichte 4 und D (Befüllung 20.10., 6 WE); Bericht 326 Messung nach der Befüllung 20.10.2026 (ersetzt Bericht 308 mit 4 WE und Bericht 325 ohne Stellplätze); Abschlag 15,9 % Journal v2490; Hüllhorst Journal v2460–v2466a; Stufe N Journal v2400–v2403. Die Punkte aus den acht Feldern sind nach der Befüllung nicht neu gemessen — live zeigen.
 
 ## 4 · Was man daraus liest — Fragen am Stand
 

@@ -1,6 +1,6 @@
 # 22 · Bestand gegen Ankauf — Soll und Ist
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 14 · Vom Ankauf in den Bestand (`reihe-bestand`, `?modul=14`, 2:39) und Modul 15 · Steuer im Bestand (`reihe-steuer-bestand`, `?modul=15`, 4:34) ·
 > Messe-Geschichten: 1 (Ravensberger Weg 38), 2 (Bismarckstr. 27), 3b (Parkstr. 9) — mit den Korrekturen vom 20.10.2026 (design/Messe/demo-geschichten.md)
 
@@ -24,10 +24,10 @@ Beim Kauf rechnest du einen Plan. Im Reiseflug zeigt sich, ob das Objekt liefert
 |---|---:|---:|
 | Nettokaltmiete / Monat | 4.910 € | **5.500 €** (+12 %) |
 | DSCR | 1,22 | **1,37** |
-| Cashflow nach Steuern / Jahr | 5.577 € | **9.684 €** |
+| Cashflow nach Steuern / Jahr | 5.577 € | **10.739 €** |
 | Steuerwirkung / Jahr | 2.257 € | **−721 €** |
 
-Warum sinkt die Steuerwirkung? Mehr Miete heißt mehr zu versteuerndes Ergebnis. Genau dort beginnt die Frage „Wo investiere ich?" → Handbuch 14 (Wendepunkt). Zusatz: die Wohnungen tragen eine Soll-Miete (703 €) unter der Ist-Miete (717 €) — die Mieterhöhung zeigt deshalb **keine Anhebung**. Satz am Stand: „Wo nichts mehr geht, sagt DealPilot das auch."
+Warum sinkt die Steuerwirkung? Mehr Miete heißt mehr zu versteuerndes Ergebnis. Genau dort beginnt die Frage „Wo investiere ich?" → Handbuch 14 (Wendepunkt). Zusatz: seit 20.10. ist das eigene Soll der Wohnungen leer (vorher 703 € unter Ist 717 €) — DealPilot rechnet die Mieterhöhung selbst bis Marktmiete/Kappungsgrenze. Was sie jetzt zeigt: live zeigen.
 
 ### b) „Unter Plan" — Bismarckstr. 27, Detmold (MFH, 6 WE, Bj 1908, gekauft 01.07.2023)
 
@@ -36,7 +36,7 @@ Warum sinkt die Steuerwirkung? Mehr Miete heißt mehr zu versteuerndes Ergebnis.
 | Nettokaltmiete / Monat | 4.506 € | **3.670 €** (zwei Einheiten leer) |
 | Instandhaltung / Jahr | 8.402 € | **11.763 €** (+40 %, Dachreparatur) |
 | DSCR | 1,18 | **0,97** |
-| Cashflow nach Steuern / Jahr | −1.644 € | **−9.205 €** |
+| Cashflow nach Steuern / Jahr | −1.644 € | **−9.627 €** |
 
 DSCR unter 1: die Miete trägt den Kapitaldienst nicht mehr. Die Tafel zeigt die zwei Ursachen — Leerstand und Instandhaltung; welche Wohnung leer steht, zeigt der MFH-Konfigurator (Handbuch 07).
 
@@ -48,11 +48,11 @@ DSCR unter 1: die Miete trägt den Kapitaldienst nicht mehr. Die Tafel zeigt die
 | Miete je m² | 5,44 € | **7,48 €** |
 | Leere Einheiten | 1 | **0** |
 | DSCR | 0,90 | **1,23** |
-| Cashflow nach Steuern / Jahr | −6.193 € | **+775 €** |
+| Cashflow nach Steuern / Jahr | −6.193 € | **+873 €** |
 
 Steuer 2025: Sanierung der leeren Wohnung als Erhaltungsaufwand sofort abgesetzt — **Erstattung 16.458 €** (unter der 15-%-Grenze, Handbuch 13). **Achtung Score:** heute Investor Deal Score **58**, DealPilot-Score **28** — beim Zeigen die richtige Zahl nennen.
 
-**Belegt:** Tabellen a–c aus demo-geschichten.md Geschichten 1, 2, 3b, korrigiert nach „Korrekturen an den Geschichten 1–7 (gemessen 20.10.2026)" (Ravensberger Steuerwirkung −721 €, Soll 703 < Ist 717; Bismarck CF −9.205 €; Parkstr. Erstattung 16.458 €, Scores 58/28). Ablauf aus `help.js` Abschnitt „Bestand: Soll und Ist", Gruppen aus `abweichung.js` Z. 104. Modul 15 maß am 16.10. an der Kopie Parkstr. 9 die Steuerwirkung geplant 4.555 € / heute 1.008 € und CF n. St. 748 € — der aktuelle Stand (775 €) ist live zu zeigen.
+**Belegt:** Tabellen a–c aus demo-geschichten.md Geschichten 1, 2, 3b, korrigiert nach „Korrekturen an den Geschichten 1–7 (gemessen 20.10.2026)" (Ravensberger Steuerwirkung −721 €, Soll seit 20.10. leer; Parkstr. Erstattung 16.458 €, Scores 58/28); Cashflow n. St. Ravensberger 10.739 €, Bismarck −9.627 €, Parkstr. 873 € und DSCR 1,37 / 0,97 / 1,23 aus der Objektliste Staging nach der Befüllung (gemessen 20.10.2026). Ablauf aus `help.js` Abschnitt „Bestand: Soll und Ist", Gruppen aus `abweichung.js` Z. 104. Modul 15 maß am 16.10. an der Kopie Parkstr. 9 die Steuerwirkung geplant 4.555 € / heute 1.008 € und CF n. St. 748 € — der aktuelle Stand ist 873 €.
 
 ## 4 · Was man daraus liest — Fragen am Stand
 

@@ -1,6 +1,6 @@
 # 10 · Steuer-Grundlagen — zvE, Grenzsteuersatz, AfA, Steuerwirkung
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 10a „Steuer: AfA, Zeiträume, Restnutzungsdauer" (`DREHBUECHER`-Schlüssel `reihe-steuer`, Studio `?modul=10a`) ·
 > Messe-Geschichten: 4 Westerfeldstr. (AfA per Gutachten), 6 GmbH, 15 „Die Mappe für den Steuerberater"
 > (design/Messe/demo-geschichten.md)
@@ -40,7 +40,8 @@ das Objekt. So steht im Cashflow nach Steuern deine Zahl, nicht ein pauschaler P
 
 - **AfA / Jahr 5.609 €.** Klein, weil der Boden hier teurer ist als der Kaufpreis: 1.570 m² × 450 €/m² = 706.500 €
   Bodenwert. Jeder Prozentpunkt Gebäudeanteil ist AfA-Basis.
-- **Steuer aus dem Objekt 2026: 2.346 €** (mit Werbungskosten). Das Objekt ist vom ersten Jahr an steuerlich positiv.
+- **Steuer aus dem Objekt 2026: 2.104 €** (mit Werbungskosten, Stand nach der Befüllung). Das Objekt ist vom ersten Jahr
+  an steuerlich positiv; 2028–2030 drehen die Bäder und Böden (Erhaltungsaufwand) die Jahre zur Erstattung.
 - Ohne Gutachten (2 %, 50 Jahre) wäre die AfA rund ein Drittel davon — die Rechnung aus Geschichte 4 (Standard 1.719 €
   gegen 5.371 €, Stand 14.10.) zeigt den Hebel: rund 1.530 € weniger Steuer im Jahr, 16 Jahre lang.
 
@@ -56,7 +57,7 @@ Steuerjahr nimmt das zvE des Zeitraums, der zur Jahresmitte gilt.
 Körperschaftsteuer + Soli; privat wären es rund 814 €. Keine Erstattung bei Verlust.
 
 Belegt: zvE/42 % demo-geschichten A.2; 14,6 %, 1.570 × 450 = 706.500 € Geschichte 4; AfA 5.609 € und Steuer 2026
-2.346 € Korrektur zu Geschichte 4; 1.719/5.371/1.530 € Geschichte 4 (Stand 14.10.); Gutachten-Datum Geschichte 4;
+2.104 € Korrektur zu Geschichte 4 (Stand 20.10. nach Befüllung), Steuer 2026 auch in `DpSteuerVerlauf.reihe()` gemessen (20.10.); 1.719/5.371/1.530 € Geschichte 4 (Stand 14.10.); Gutachten-Datum Geschichte 4;
 GmbH Geschichte 6; Tarif/Reihenfolge/Zeiträume help.js („Grenzsteuersatz und Steuerwirkung", „Steuerzeiträume").
 
 ## 4 · Was man daraus liest — Fragen am Stand

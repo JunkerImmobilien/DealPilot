@@ -1,6 +1,6 @@
 # 06 · Miete — Mietstruktur, Warmmiete, Mietentwicklung, Marktmiete, Pilot-Mietpreis-Analyse
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen. Video: Modul 07 (`reihe-miete`; Szenen 3 und 5 warten noch auf die seit v2500 entfernten Zensus-Kästen — Drehbuch anpassen), Überblick 2 Kapitel 4 (`reihe-ueberblick2`), Modul 26 (`reihe-zielbild`) für „Aus Wohnungen" · Messe-Geschichte(n): 1 (Ravensberger Weg 38, Miete +12 %), 8 (Westerfeldstr. 140) (design/Messe/demo-geschichten.md).
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen"). Video: Modul 07 (`reihe-miete`; Szenen 3 und 5 warten noch auf die seit v2500 entfernten Zensus-Kästen — Drehbuch anpassen), Überblick 2 Kapitel 4 (`reihe-ueberblick2`), Modul 26 (`reihe-zielbild`) für „Aus Wohnungen" · Messe-Geschichte(n): 1 (Ravensberger Weg 38, Miete +12 %), 8 (Westerfeldstr. 140) (design/Messe/demo-geschichten.md).
 
 ## 1 · Wozu
 
@@ -19,14 +19,14 @@ Die Miete ist der Treibstoff jedes Investments. Im Reiter Miete trägst du ein, 
 
 **Warmmiete (seit v2484 festgelegt):** Nettokaltmiete + Nebenkostenvorauszahlungen der Mieter. Zusatzeinnahmen (Stellplatz, Garage) stehen getrennt. Dieselbe Kette in App, Bank-PDF und Investment-PDF.
 
-## 3 · Schritt für Schritt — Beispiel Westerfeldstr. 140, Bielefeld (MFH, 4 WE im Konto)
+## 3 · Schritt für Schritt — Beispiel Westerfeldstr. 140, Bielefeld (MFH, DEMO-BI1, 6 WE laut Gutachten)
 
 | Feld | Wert |
 |---|---|
-| Nettokaltmiete / Monat | 3.195 € (Wohnungen 799 / 799 / 799 / 798 €) |
-| Zusätzliche Einnahmen / Monat | 90 € (Garagen) |
-| Soll-Miete je Wohnung (Konfigurator) | 950 / 850 / 880 / 840 € = 3.520 € |
-| Soll ab | 2028 (Kalenderjahr) |
+| Nettokaltmiete / Monat | 3.195 € (Wohnungen 590 / 600 / 585 / 585 / 415 / 420 €; 4 × 70 m² + 2 × 55 m²) |
+| Zusätzliche Einnahmen / Monat | 90 € (4 Garagen à 30 €, drei vermietet) |
+| Soll-Miete je Wohnung (Konfigurator) | **leer** — DealPilot rechnet selbst bis Marktmiete/Kappungsgrenze |
+| Zielbild | 9,50 €/m² für WE 1, 3, 4, 5; fertig 2030 |
 | Mietentwicklung | **Aus Wohnungen** |
 
 Was die App zeigt:
@@ -34,10 +34,10 @@ Was die App zeigt:
 | Anzeige | Wert | Warum |
 |---|---|---|
 | Mieteinnahmen im Jahr (NKM + Zusatz) | 39.420 € = (3.195 + 90) × 12 | Zusatzeinnahmen stehen in Ist und Soll |
-| ab 2028 | **43.320 €** = (3.520 + 90) × 12 | jede Wohnung erreicht ihre Soll-Miete im Soll-Jahr; danach läuft die Mietsteigerung weiter |
-| Freigabe „Aus Wohnungen" | „0 mit Staffel, 4 mit Soll-Miete" | eine vermietete Wohnung mit Ist-Miete genügt (v2410) |
-| Warmmiete / Jahr | 40.067 € | eine Definition in App, Bank- und Investment-PDF (v2484) |
-| Bruttomietrendite Ist / Soll (MFH-Tafel) | 7,23 % / 7,95 % — beide auf den Kaufpreis | gleiche Basis für den Vergleich |
+| nach der Mieterhöhung | Zahl live zeigen | die vom Gesetz gedeckelte Soll-Miete je Wohnung; danach läuft die Mietsteigerung weiter |
+| Freigabe „Aus Wohnungen" | Zahl live zeigen (6 Wohnungen, alle vermietet) | eine vermietete Wohnung mit Ist-Miete genügt (v2410) |
+| Warmmiete / Jahr | Zahl live zeigen — rechnerisch (3.195 + 976) × 12 = 50.052 € | eine Definition in App, Bank- und Investment-PDF (v2484); NK-Vorauszahlungen seit 20.10. 976 €/Monat statt 143,92 € |
+| Bruttomietrendite Ist (MFH-Tafel) | 7,23 % auf den Kaufpreis; Soll live zeigen | gleiche Basis für den Vergleich |
 
 ## 3b · Beispiel Pilot-Mietpreis-Analyse: Hermannstr. 9, Hüllhorst (ETW)
 
@@ -53,7 +53,7 @@ Knopf **Mietpreis recherchieren**. Der Pilot bekommt zuerst die belegten Verglei
 
 Ergebnis eines echten Laufs: Marktmiete **7,66 €/m²** — „5 % unter dem Marktdurchschnitt 8,06, 59 % über der amtlichen 4,83"; ein Häkchen markiert, worauf sich die KI stützt. Den Zensus-Anhalt beim Mietausfall-Risiko übernimmst du mit „Zensus-Anhalt übernehmen".
 
-Belegt: Westerfeld-Mieten, 39.420/43.320 €, „0 mit Staffel, 4 mit Soll-Miete", 7,23/7,95 % Journal v2410; Warmmiete 40.067 € Journal v2483–v2485 (Tabelle „nachher"); Hüllhorst-Vergleichswerte und 7,66 €/m² Journal v2500–v2501 (Container-Nachweis, Lauf 2). „Mietsteigerung läuft nach dem Soll weiter" Journal Prod-Rollout (54) v2422.
+Belegt: Westerfeld-Mieten je Wohnung, Garagen, NK 976 €, leeres Soll, Zielbild demo-geschichten D (Befüllung 20.10.2026); 39.420 € = (3.195 + 90) × 12 und 7,23 % = 39.420 / 545.000 nachgerechnet (Ist-Summe und Zusatz unverändert); Definition Warmmiete Journal v2483–v2485; Hüllhorst-Vergleichswerte und 7,66 €/m² Journal v2500–v2501 (Container-Nachweis, Lauf 2). „Mietsteigerung läuft nach dem Soll weiter" Journal Prod-Rollout (54) v2422.
 
 ## 4 · Was man daraus liest — Fragen am Stand
 
@@ -83,7 +83,7 @@ Belegt: Westerfeld-Mieten, 39.420/43.320 €, „0 mit Staffel, 4 mit Soll-Miete
 | 1 | Karte Mietstruktur | Nettokaltmiete eintragen | Nettokaltmiete, Stellplätze, Nebenkostenvorauszahlungen — DealPilot rechnet Warmmiete und Jahreswerte. |
 | 2 | „= Warmmiete / Jahr" | — | Warmmiete heißt: Nettokaltmiete plus Vorauszahlungen der Mieter. Überall dieselbe Rechnung. |
 | 3 | Mietentwicklung | Aus Wohnungen | Beim Mehrfamilienhaus rechnet jede Wohnung ihre eigene Soll-Miete. |
-| 4 | Tabelle Mietentwicklung | — | 39.420 € heute, ab 2028 43.320 € — wenn die Soll-Mieten erreicht sind. |
+| 4 | Tabelle Mietentwicklung | — | 39.420 € heute — danach steigt die Miete mit jeder erlaubten Erhöhung bis zum Zielbild 2030. |
 | 5 | Karte Marktmiete + Mietausfall | Mietpreis recherchieren | Der Pilot recherchiert die Marktmiete — gestützt auf belegte Vergleichswerte. |
 | 6 | Tabelle Vergleichswerte | — | Amtlich, Markt, Wertermittlung: jede Zeile mit Herkunft. Ein Häkchen zeigt, worauf sich der Pilot stützt. |
 
@@ -91,7 +91,7 @@ Belegt: Westerfeld-Mieten, 39.420/43.320 €, „0 mit Staffel, 4 mit Soll-Miete
 
 Miete ist der Treibstoff jedes Investments. Im Reiter Miete trägst du ein, was heute fließt: die Nettokaltmiete, Einnahmen aus Garagen und Stellplätzen und die Nebenkostenvorauszahlungen deiner Mieter. Daraus rechnet DealPilot die Warmmiete — und zwar überall gleich, in der App wie in beiden PDFs.
 
-Darunter legst du fest, wie sich die Miete entwickelt. Mit Prognose steigt sie gleichmäßig. Mit Detail planst du einzelne Erhöhungen. Beim Mehrfamilienhaus wählst du „Aus Wohnungen". In der Westerfeldstraße bringen vier Wohnungen und die Garagen heute neununddreißigtausendvierhundertzwanzig Euro im Jahr. Ab zweitausendachtundzwanzig erreichen die Wohnungen ihre Soll-Mieten — dann sind es dreiundvierzigtausenddreihundertzwanzig Euro.
+Darunter legst du fest, wie sich die Miete entwickelt. Mit Prognose steigt sie gleichmäßig. Mit Detail planst du einzelne Erhöhungen. Beim Mehrfamilienhaus wählst du „Aus Wohnungen". In der Westerfeldstraße bringen sechs Wohnungen und die Garagen heute neununddreißigtausendvierhundertzwanzig Euro im Jahr. Danach rechnet DealPilot jede erlaubte Mieterhöhung selbst — bis zum Zielbild im Jahr zweitausenddreißig.
 
 Und was ist marktüblich? Ein Klick auf „Mietpreis recherchieren" startet die Pilot-Mietpreis-Analyse. Der Pilot bekommt zuerst die belegten Werte aus DealPilots Daten: die amtliche Vergleichsmiete des Gutachterausschusses, den aktuellen Marktdurchschnitt der Angebotsmieten und das Marktüblichkeitsband aus der Wertermittlung. Jede Zeile trägt ihre Herkunft, und ein Häkchen zeigt, worauf sich die Einschätzung stützt. So weißt du, ob deine Miete Luft nach oben hat.
 

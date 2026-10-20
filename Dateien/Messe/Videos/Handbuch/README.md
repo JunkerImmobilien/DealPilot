@@ -25,9 +25,36 @@ Das Handbuch hat zwei Leser:
 **Zahlen:** Jede Zahl stammt aus dem Code, dem Journal (`claude/projektanweisung-hauptapp.md`),
 `design/Messe/demo-geschichten.md`, `Dateien/Messe/Videos/Videoreihe.md` oder einem echten Lauf. Fehlt ein
 Beleg, steht dort **„Zahl live zeigen"** — die Eingaben stehen trotzdem vollständig da. Die Zahlen
-verschieben sich mit jeder Version (zuletzt v2541–v2543 im Tab Bewertung) — **vor der Messe am Objekt
-gegenprüfen**. Gilt eine Zahl aus der Inventur als nur **vorgeschlagen** (Eintragsliste B.1/C in den
-Demo-Geschichten), ist sie im Objekt noch nicht eingetragen und darf nicht als App-Ergebnis gezeigt werden.
+verschieben sich mit jeder Version und jedem Speicherstand — Stand siehe unten. Die Eintragslisten B.1/C der
+Demo-Geschichten sind seit dem 20.10.2026 eingetragen (Abschnitt D); was dort weiter offen steht, ist im Objekt nicht
+gespeichert und darf nicht als App-Ergebnis gezeigt werden.
+
+## Stand der Zahlen: 20.10.2026 nach Befüllung
+
+Am 20.10.2026 wurden die Demo-Objekte auf Staging befüllt und korrigiert (`design/Messe/demo-geschichten.md`, Abschnitt D
+und die nachgezogenen Geschichten 2, 3, 4, 8–15). Die Dateien 02–25 sind danach nachgezogen; jede geänderte Zahl nennt
+ihren Beleg in der „Belegt:"-Zeile. Gemessen am selben Tag über die Objektliste (`/objects`: `dealpilot_score`,
+`ds2_score_persist`, `cf_ns`, `dscr`, `ltv`) und für den Steuerverlauf über `DpSteuerVerlauf.auswerten(DpSteuerVerlauf.reihe())`
+in einem eigenen Tab mit gesperrten Schreibwegen (nichts gespeichert).
+
+- **Kürzel:** Westerfeldstr. 140 = `DEMO-BI1` (vorher `DEMO-LE1`), Am Markt 18 = `DEMO-KK2`, Musterstr. 12 = `DEMO-LE3`,
+  Alexanderstr. 11 = `DEMO-BI4`.
+- **Westerfeldstr. 140:** 6 Wohnungen laut Gutachten (4 × 70 m² + 2 × 55 m², Ist 3.195 €/Monat), 4 Garagen à 30 €,
+  Punkte aus den Wohnungen (3), Zielbild fertig 2030. Bericht 326 (Stufe 3): Ertragswert 745.000 €, Marktpreisindikation
+  820.000 €, Sachwert 560.519 €, LZS 2,5 % Stufe A, RND 25,7 J. Abruf „Marktpreise" 6: Ertragswert 745/815/915 T€,
+  Marktpreisindikation 820/820/895 T€, ETW 2.604 €/m². Score 78, DSCR 1,67, Cashflow n. St. 8.119 €.
+- **Score / Cashflow n. St. / DSCR:** Bismarckstr. 33 / −9.627 € / 0,97 · Ravensberger 76 / 10.739 € / 1,37 · Gohliser
+  79 / 10.826 € / 1,34 · Parkstr. 28 / 873 € / 1,23 · Musterstr. 62 / −275 € / 1,04 · Am Markt 18 65 / 1.848 € / 1,78 ·
+  Alexanderstr. 70 / 905 € / 1,60 · Lindenhof 20 / −13.431 € / 0,74 · Hauptstr. 62 / 6.633 € / 1,17.
+- **Am Markt 18 und Alexanderstr. 11** laufen als Bestand (Kauf 06.05.2024 bzw. 14.08.2024), AfA 3,85 % bzw. 3,03 % aus
+  den Gutachten.
+- **Steuerverlauf Bismarckstr. 27** (mit den neuen Werbungskosten): steuerlich positiv ab 2027 nach vier Verlustjahren,
+  Erstattungen bis dahin 30.922 €, Steuern ab dem Wendepunkt −50.327 € (2027–2042). Der frühere Messwert 24.807 € /
+  −51.739 € galt vor der Änderung der Werbungskosten.
+
+**Weiter „Zahl live zeigen":** alles, was nach der Befüllung nicht neu gemessen wurde — Soll-Mieten der Westerfeld-Wohnungen
+(seit 20.10. von DealPilot gerechnet), Rohertragsfaktor-Zeile, Nettomietrendite und Phasen im Bank-PDF, Portfolio-Cockpit,
+Pilot-Offerte mit 6 WE. Die Mitschnitte (Ü2, Modul 26) zeigen Westerfeld noch mit 4 WE.
 
 ## Sprache — was gilt
 

@@ -1,6 +1,6 @@
 # 25 · Unterlagen beim Amt anfordern
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 24 · Bodenrichtwert und Unterlagen (`reihe-brw-unterlagen`, `?modul=24`, 2:38) ·
 > Messe-Geschichte: 14 „Unterlagen beim Amt per Telegram" (design/Messe/demo-geschichten.md)
 
@@ -35,7 +35,7 @@ Vor dem Kauf und für die Bank brauchst du Papiere, die nur Ämter haben: Grundb
 Wo für eine Gemeinde noch kein Amt bekannt ist, steht das ehrlich da („noch nicht ermittelt"); die Suche im Fenster (auch „Neu suchen") lässt die Ämter recherchieren; übernommen wird nur, was an der amtlichen Seite belegt ist.
 
 **Belegt:** Arten aus `unterlagenService.js` Z. 46 ff.; zwei Karten, Belegstand und Leipzig 04155 mit gemeindeweitem Satz aus Journal v2440–v2445; Ablauf Entwurf → „verschickt" → gesendet und Gohliser Str. 42 mit 6 Ämtern aus Journal v2470–v2472. Gebühren, Namen und Kanäle live zeigen.
-**Modul 24 (16.10.)** zeigte für Bielefeld „6 von 6 noch nicht ermittelt" — seither wurden am 19.10. **342 Ämter** eingespielt (Staging 369, 104 mit Ansprechpartner). Vor der Messe live prüfen, was für die Westerfeldstr. 140 jetzt steht.
+**Modul 24 (16.10.)** zeigte für Bielefeld „6 von 6 noch nicht ermittelt" — seither wurden am 19.10. **342 Ämter** eingespielt (Staging 369, 104 mit Ansprechpartner). Was für die Westerfeldstr. 140 jetzt steht: live zeigen.
 
 ## 4 · Was man daraus liest — Fragen am Stand
 

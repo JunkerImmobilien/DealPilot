@@ -1,6 +1,6 @@
 # 01 · Konto, Anmeldung, Testphase und Kontingent
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen. Video: noch keins (neu vorgeschlagen) · Messe-Geschichte(n): keine eigene — Einstieg für jeden Besucher (design/Messe/demo-geschichten.md, Übersicht „Welche Geschichte für welchen Besucher").
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen"). Video: noch keins (neu vorgeschlagen) · Messe-Geschichte(n): keine eigene — Einstieg für jeden Besucher (design/Messe/demo-geschichten.md, Übersicht „Welche Geschichte für welchen Besucher").
 
 ## 1 · Wozu
 

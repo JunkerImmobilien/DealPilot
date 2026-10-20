@@ -1,6 +1,6 @@
 # 03 · Quick Boarding (Quick-Check) — mit DealPilot-Marktbewertung und Abschlag auf Angebotspreise
 
-> Stand 20.10.2026 (Staging bis v2544, Quick Boarding qc-v2485). Zahlen vor der Messe live gegenprüfen. Video: Überblick 1 / Modul 01 (`quickcheck-rundgang`), ältere Fassungen `quickcheck`, `quickcheck-tippen`; Übergang ins Objekt Modul 02 (`boarding-zum-objekt`) · Messe-Geschichte(n): 11 (Alexanderstr. 11, Einsteiger), 9 (Lindenhof 14, „Score sagt Nein") (design/Messe/demo-geschichten.md).
+> Stand 20.10.2026 (Staging bis v2544, Quick Boarding qc-v2485). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen"). Video: Überblick 1 / Modul 01 (`quickcheck-rundgang`), ältere Fassungen `quickcheck`, `quickcheck-tippen`; Übergang ins Objekt Modul 02 (`boarding-zum-objekt`) · Messe-Geschichte(n): 11 (Alexanderstr. 11, Einsteiger), 9 (Lindenhof 14, „Score sagt Nein") (design/Messe/demo-geschichten.md).
 
 ## 1 · Wozu
 
@@ -55,7 +55,7 @@ Belegt: Ü1-Messwerte Videoreihe.md „Überblick 1 · Quick Boarding im Reihenr
 ## 3b · Kurzbeispiele für den Stand
 
 - **Alexanderstr. 11, Bielefeld (ETW, Geschichte 11):** 65 m², 129.000 € → Ampel und Urteil in einer Minute; der Marktbericht Stufe 1 liegt bei 158.000 € (145.000–166.000), rund 29.000 € über dem Kaufpreis.
-- **Lindenhof 14, Castrop-Rauxel (MFH, Geschichte 9):** dieselbe Adresse in einer Minute; im Objekt Score 23 · KRITISCH, DSCR 0,74, Marktpreisindikation 1.535.000 € gegen 2,45 Mio. € Angebot.
+- **Lindenhof 14, Castrop-Rauxel (MFH, Geschichte 9):** dieselbe Adresse in einer Minute; im Objekt Score 20 · KRITISCH, DSCR 0,74 (Stand 20.10. nach Befüllung), Marktpreisindikation 1.535.000 € gegen 2,45 Mio. € Angebot.
 
 ## 4 · Was man daraus liest — Fragen am Stand
 

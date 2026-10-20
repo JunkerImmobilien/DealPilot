@@ -1,6 +1,6 @@
 # 07 · MFH-Konfigurator — Wohnung für Wohnung
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 26 „Mieterhöhung und Zielbild" (`DREHBUECHER`-Schlüssel `reihe-zielbild`, Studio `?modul=26`) ·
 > Messe-Geschichten: 2 Bismarckstr. (Leerstand), 8 Westerfeldstr. „Ein Haus, alle Hebel", 10 Hauptstr. (Gewerbe) (design/Messe/demo-geschichten.md)
 
@@ -40,51 +40,57 @@ Eigentumswohnung. Das ist dein Flugplan für das Haus, nicht nur die Momentaufna
 
 ## 3 · Schritt für Schritt — Beispiel Westerfeldstr. 140, Bielefeld (MFH, Bj ca. 1967, KP 545.000 €)
 
-**Stand im Konto (gespeichert):** vier Wohnungen. Das Nutzungsdauergutachten nennt sechs — die Eintragsliste B.1
-in demo-geschichten.md ist ein **Vorschlag**, nicht eingetragen. Gezeigt wird deshalb der gespeicherte Stand.
+**Stand im Konto (gespeichert seit 20.10.2026, Kürzel DEMO-BI1):** sechs Wohnungen wie im Nutzungsdauergutachten
+(EG / 1. OG / DG je links und rechts). Anzahl, Lage, Zimmer, Bad 2019 + Böden 2024 EG rechts, Keller und 4 Garagen
+stammen aus dem Gutachten; Flächen, Mieten, Verträge und Maßnahmen sind **Demo-Annahmen** (das Gutachten nennt sie nicht).
 
 | Schritt | Feld | Wert (gespeichert) |
 |---|---|---|
-| 2 | Wohnungen | 4 |
-| 2 | Ist-Miete je Wohnung | 799 · 799 · 799 · 798 € |
+| 2 | Wohnungen | 6 (4 × 70 m², 2 × 55 m², zusammen 390 m²) |
+| 2 | Ist-Miete je Wohnung | 590 · 600 · 585 · 585 · 415 · 420 € |
 | 2 | Summe Ist (Haus) | 3.195 €/Monat |
-| Details | Mietvertrag | unbefristet (kein Staffel-/Index-Haken) |
-| Details | eigene Soll-Miete | im gespeicherten Stand 950 · 850 · 880 · 840 € (Summe 3.520 €) |
+| 2 | Stellplätze | Garage 1–3 an WE 1–3, je 30 €; 4 Garagen am Haus |
+| Details | Mietvertrag | alle vermietet, unbefristet (kein Staffel-/Index-Haken) |
+| Details | eigene Soll-Miete | **leer** — DealPilot rechnet selbst |
+| Details | Zielbild | Bad + Böden in WE 1, 3, 4 (je 16.000 €) und WE 5 (14.000 €), Zielmiete 9,50 €/m²; WE 3 „bewohnt (§ 559)"; Haus fertig 2030 |
 | 1 | Gebäude-Gewerke | Dach 0 · Heizung „teilweise" · Leitungen 0 · Außenwand „teilweise" |
 
 **Was die App zeigt:**
 
-1. **Summenzeile Soll.** Mit den eigenen Soll-Mieten 3.520 €/Monat. Lässt du die eigene Soll leer, rechnet DealPilot
+1. **Summenzeile Soll.** Die eigene Soll ist seit 20.10. leer, also rechnet DealPilot
    selbst: bis zur ortsüblichen Vergleichsmiete (§ 558 BGB), frühestens 15 Monate nach der letzten Erhöhung,
    höchstens um die **Kappungsgrenze — in Bielefeld 15 % in drei Jahren** (Mieterschutzverordnung NRW, aus
-   `js/data/kappungsgrenzen.json`). Gemessen ergab das **4 × 880,43 € = 3.521,72 €** — dieselbe Zahl in Summenzeile,
-   Wohnungsfenster, „Ist gegen Soll" im Bank-PDF und Ist/Soll-Karte.
+   `js/data/kappungsgrenzen.json`). Die Summe für die 6 Wohnungen ist nach der Befüllung nicht neu gemessen — **Zahl live zeigen**; es ist
+   dieselbe Zahl in Summenzeile, Wohnungsfenster, „Ist gegen Soll" im Bank-PDF und Ist/Soll-Karte.
 2. **Schritt 4 · Restnutzungsdauer des Hauses:** Punkte des Hauses = flächengewichtete Punkte der Einheiten, auf
-   ganze Punkte gerundet → **7 Punkte, RND 35 Jahre (GND 80)**. Dieselbe Zahl steht in der Zinssatz-Zeile des
+   ganze Punkte gerundet → **3 Punkte** (flächengewichtet 3,4; das Gutachten vergibt 2,2), **RND 25,7 Jahre** (Bericht 326);
+   nach dem Zielbild 5,7 Punkte. Dieselbe Zahl steht in der Zinssatz-Zeile des
    Reiters Objekt, im Wertpotenzial und in der Mieterliste des Bank-PDF.
 3. **„Übernehmen"** schreibt die Summe ins Objekt und stellt die Mietentwicklung auf **„Aus Wohnungen"** (Toast
-   nennt das). Ab dem Soll-Jahr steigt die Miete in der Tabelle von 39.420 € auf 43.320 € im Jahr (inkl.
-   Zusatzeinnahmen).
+   nennt das). Die Tabelle startet bei 39.420 € im Jahr (inkl. Zusatzeinnahmen); die Jahre danach
+   live zeigen.
 4. **Zielbild** je Wohnung: Maßnahme als Chip (Bad, Fenster, Böden/Innenausbau, Grundriss tragen Punkte nach
    Anlage 2, höchstens bis zum Maximum des Gewerks; Dach, Fassade, Heizung, Leitungen gehören dem Haus) mit Kosten
    und Zielmiete. Eine Maßnahme mit Haken **„bewohnt (§ 559)"** erhöht die Soll-Miete um 8 % der Kosten im Jahr,
    gedeckelt auf 3 €/m² (2 €/m² unter 7 €/m² Ausgangsmiete) in sechs Jahren.
 5. **Haken „aufgeteilt"**: jede Wohnung erscheint zusätzlich als Eigentumswohnung mit dem Zins für vermietetes
    Wohnungseigentum (Bielefeld 2,9 %, Ausschuss Stadt Bielefeld, gegen 2,5 % für das MFH). An der Westerfeldstr.
-   ergibt das „kein Potenzial" — mit Begründung (höherer ETW-Zins, höhere Verwaltung je Einheit).
+   (Abruf 6, 6 WE) z. B. WE 1: Ertragswert 126.000 €, Marktpreisindikation 180.000 € als ETW; ETW-Markt 2.604 €/m²
+   gegen 2.164 €/m² als Haus. Ob nach Kosten je Wohnung Potenzial bleibt, live zeigen (Begründung steht dabei).
 
 **Gegenbild — Bismarckstr. 27, Detmold (6 WE, Bj 1908):** zwei Wohnungen „leer". Seit v2520 rechnet der Ertragswert
 die Ist-Miete nur auf der **vermieteten** Fläche und setzt leere Wohnungen mit der marktüblichen Miete an; seit
-v2540 wird jede Wohnung einzeln gegen das Marktüblichkeitsband geprüft. Achtung im Datensatz: WE 2 steht „leer",
-trägt aber Ist 836 € (Widerspruch, A.1) — vor dem Zeigen klären.
+v2540 wird jede Wohnung einzeln gegen das Marktüblichkeitsband geprüft. WE 2 steht „leer" und trägt seit 20.10.
+Ist 0 € (vorher 836 €; die Objektmiete 3.670 € enthielt sie schon nicht).
 
 **Gegenbild — Hauptstr. 51, Ibbenbüren (WGH):** Ladenlokal 240 m² mit 2.640 € von 5.242 € Monatsmiete = 50 % an
 einem Vertrag; WE 5 leer (Komplettrenovierung 28.000 €). Gewerbe rechnet der Ertragswert getrennt.
 
-Belegt: Ist-Mieten und Soll 950/850/880/840 Journal v2410; 3.520 / 3.521,72 / 4 × 880,43 Journal v2486;
-7 Punkte / 35 J. / GND 80 Journal v2483; 39.420 → 43.320 € Journal v2410; Kappung Bielefeld 15 % Journal v2430 und
+Belegt: Wohnungen, Mieten, Garagen, Zielbild, leeres Soll, 3 Punkte (3,4) demo-geschichten D (Befüllung 20.10.2026);
+RND 25,7 J. Bericht 326 (20.10.); 5,7 Punkte und WE 1 126.000/180.000 € demo-geschichten 8 Schritt 4–5 (Abruf 6);
+39.420 € nachgerechnet (3.195 + 90) × 12; Kappung Bielefeld 15 % Journal v2430 und
 demo-geschichten B Punkt 4; § 559 8 % / 3 bzw. 2 €/m² help.js („Wie DealPilot die Soll-Miete vorrechnet");
-1.800 €/WE help.js; Zins 2,9/2,5 % Journal v2432; Leerstand Journal v2520/v2540; Bismarckstr. A.1;
+1.800 €/WE help.js; Zins 2,9/2,5 % Journal v2432; Leerstand Journal v2520/v2540; Bismarckstr. WE 2 Korrektur zu Geschichte 2;
 Hauptstr. Geschichte 10.
 
 ## 4 · Was man daraus liest — Fragen am Stand

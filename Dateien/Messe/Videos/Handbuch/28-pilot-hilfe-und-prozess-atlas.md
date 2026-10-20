@@ -1,6 +1,6 @@
 # 28 · Der Pilot auf F1, der Prozess-Atlas und der Rundgang
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: noch kein Video · Messe-Geschichte: — (gut als Einstieg für jeden Besucher)
 
 ## 1 · Wozu

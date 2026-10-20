@@ -1,6 +1,6 @@
 # 05 · Investition — Kaufpreis, Kaufnebenkosten, Sanierung, Inventar
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen. Video: Modul 06 (`reihe-investition`), Modul 23 (`reihe-15pct`), Überblick 2 Kapitel 3 (`reihe-ueberblick2`) · Messe-Geschichte(n): 3b (Parkstr. 9, Sanierung unter der 15-%-Grenze), 15 (Steuerberater-Rundgang) (design/Messe/demo-geschichten.md).
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen"). Video: Modul 06 (`reihe-investition`), Modul 23 (`reihe-15pct`), Überblick 2 Kapitel 3 (`reihe-ueberblick2`) · Messe-Geschichte(n): 3b (Parkstr. 9, Sanierung unter der 15-%-Grenze), 15 (Steuerberater-Rundgang) (design/Messe/demo-geschichten.md).
 
 ## 1 · Wozu
 
@@ -38,9 +38,9 @@ Was die App zeigt:
 
 ## 3b · Beispiel Westerfeldstr. 140, Bielefeld (wie im Bank-PDF)
 
-Kaufpreis **545.000 €** mit jeder Nebenkostenzeile → Gesamtinvestition **592.415 €**; finanziert mit 120.000 € Eigenkapital und 472.415 € Darlehen zu 4,00 %. Die 15-%-Grenze liegt hier rechnerisch bei rund 13.400 € netto, weil der Gebäudeanteil nur 14,6 % beträgt — eine einzige Wohnungssanierung für 16.000 € würde sie in den ersten drei Jahren reißen.
+Kaufpreis **545.000 €** mit jeder Nebenkostenzeile → Gesamtinvestition **592.415 €**; finanziert mit 120.000 € Eigenkapital und 472.415 € Darlehen zu 4,00 %. Die 15-%-Grenze liegt hier rechnerisch bei rund 13.400 € netto, weil der Gebäudeanteil nur 14,6 % beträgt — eine einzige Wohnungssanierung für 16.000 € (Bad 11.000 € + Böden 5.000 €, so im Zielbild von WE 1, 3 und 4 eingetragen) würde sie in den ersten drei Jahren reißen.
 
-Belegt: Modul-06-Eingaben `frontend/js/messe-drehbuch.js:2254ff` (`reihe-investition`: kp 180000, inv_kueche 6000, inv_moebel 2500), 24.786 € / 13,8 % Videoreihe.md „Aufgenommen 16.10.2026" (Modul 02/08), 220.786 € Videoreihe.md Module 06–10, Zusammensetzung 13,77 % Journal qc-v2420a; Westerfeld Videoreihe.md Modul 19; 15-%-Grenze demo-geschichten B.1 („rechnerisch, ohne Gewähr"). Sanierungssumme 16.000 € ist abgeleitet, nicht abgelesen — live zeigen.
+Belegt: Modul-06-Eingaben `frontend/js/messe-drehbuch.js:2254ff` (`reihe-investition`: kp 180000, inv_kueche 6000, inv_moebel 2500), 24.786 € / 13,8 % Videoreihe.md „Aufgenommen 16.10.2026" (Modul 02/08), 220.786 € Videoreihe.md Module 06–10, Zusammensetzung 13,77 % Journal qc-v2420a; Westerfeld Videoreihe.md Modul 19; 15-%-Grenze demo-geschichten B.1 („rechnerisch, ohne Gewähr"). Sanierungssumme 16.000 € je Wohnung demo-geschichten D (Zielbild WE 1, 3, 4, eingetragen 20.10.2026).
 
 ## 4 · Was man daraus liest — Fragen am Stand
 

@@ -1,6 +1,6 @@
 # 23 · Portfolio-Cockpit, Portfolio-Pilot, Bankexport und Track Record
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 21 · Portfolio-Cockpit und Pilot (`reihe-cockpit`, `?modul=21`, 2:55) und Modul 20 · Bankexport Portfolio (`reihe-bankexport`, `?modul=20`, 1:38) ·
 > Messe-Geschichten: Übersicht „Welche Geschichte für welchen Besucher" — Kapitalanleger mit Bestand (design/Messe/demo-geschichten.md)
 
@@ -18,7 +18,7 @@ Das Cockpit ist der Blick auf die ganze Flotte: ein **Portfolio Score**, Mietein
 
 ## 3 · Schritt für Schritt — Beispiel Demo-Konto (11 Objekte)
 
-| Schritt | Klick | Was die App zeigt (gemessen im Modul 21/20) |
+| Schritt | Klick | Was die App zeigt (gemessen im Modul 21/20 am 16.10. — vor der Befüllung vom 20.10.; Portfolio-Zahlen live zeigen) |
 |---|---|---|
 | 1 | Aktionen → Portfolio-Cockpit | **01 Portfolio Score 69 · Solide**, 11 Objekte, Kaufpreise **6,38 Mio. €** |
 | 2 | 02 Kennzahlen, Kachel Bestand ⇄ | Mieteinnahmen **28.675 € / Monat** (netto kalt) |
@@ -32,7 +32,7 @@ Das Cockpit ist der Blick auf die ganze Flotte: ein **Portfolio Score**, Mietein
 
 So rechnet der Portfolio Score: nur Objekte mit Status Gewonnen und gespeichertem Score; je Objekt zählt der Investor Deal Score, sonst der DealPilot Score; der Gesamtwert ist **nach Kaufpreis gewichtet** — ein großes Objekt zählt mehr. Die fünf Balken darunter (Rendite, Finanzierung, Risiko & Vermietung, Lage & Diversifikation, Upside-Potenzial) entstehen genauso.
 
-**Belegt:** Schritte 1–4 aus Videoreihe.md, Abschnitt „Stand 16.10.2026 nachmittags" (Modul 21: 69 · Solide, 11 Objekte, 6,38 Mio €, +1.920 €/Monat, Mieten 28.675 €/Monat) und „Neu aufgenommen 16.10.2026 spät" (DSCR 1,28); Schritt 9 aus Modul 20 ebendort. Abschnitte aus `help.js` („Aufbau", „Portfolio Score", „Kennzahlen", „Steuer über alle Objekte", „Projektion", „Steuer-Mappe") und Journal v2410 (Kanban raus). Rangliste: Journal v2430 (`potenzial_lesen`, „13 Objekte mit Plan" im Container). Zahlen vor der Messe neu ablesen — seither haben sich Objekte geändert.
+**Belegt:** Schritte 1–4 aus Videoreihe.md, Abschnitt „Stand 16.10.2026 nachmittags" (Modul 21: 69 · Solide, 11 Objekte, 6,38 Mio €, +1.920 €/Monat, Mieten 28.675 €/Monat) und „Neu aufgenommen 16.10.2026 spät" (DSCR 1,28); Schritt 9 aus Modul 20 ebendort. Abschnitte aus `help.js` („Aufbau", „Portfolio Score", „Kennzahlen", „Steuer über alle Objekte", „Projektion", „Steuer-Mappe") und Journal v2410 (Kanban raus). Rangliste: Journal v2430 (`potenzial_lesen`, „13 Objekte mit Plan" im Container). Seit der Befüllung vom 20.10. haben sich Objekte geändert (Am Markt 18 und Alexanderstr. jetzt Bestand, neue Werbungskosten, Westerfeld 6 WE) — Portfolio-Zahlen live zeigen.
 
 ## 4 · Was man daraus liest — Fragen am Stand
 

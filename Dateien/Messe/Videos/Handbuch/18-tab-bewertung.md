@@ -1,6 +1,6 @@
 # 18 · Tab Bewertung
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 12 „Bewertung und KPIs" (`DREHBUECHER`-Schlüssel `reihe-bewertung`), Modul 26 „Mieterhöhung und Zielbild" (`reihe-zielbild`), Überblick 2 Kapitel 8–9 (`reihe-ueberblick2`) ·
 > Messe-Geschichten: 8 Westerfeld (Schritt 4–5), 13 Musterstr. (design/Messe/demo-geschichten.md)
 
@@ -43,34 +43,36 @@ und LTV (soll sinken). Waterfall — Gewinn aus Tilgung, Cashflow, Steuer, Werts
 | Feld | Wert |
 |---|---|
 | Kaufpreis | 545.000 € |
-| Wohnungen | im MFH-Konfigurator (Stand im Konto: 4 WE) mit Soll-Miete je Wohnung |
-| Marktbericht | Stufe 3 liegt vor (Bericht 308, Liegenschaftszins 2,5 % Stufe A) |
-| Abruf „Marktpreise" | 20.10.2026 |
+| Wohnungen | im MFH-Konfigurator: 6 WE, Soll von DealPilot gerechnet, Zielbild 9,50 €/m² fertig 2030 |
+| Marktbericht | Stufe 3 liegt vor (Bericht 326 vom 20.10.2026, Liegenschaftszins 2,5 % Stufe A, RND 25,7 J.) |
+| Abruf „Marktpreise" | Nr. 6 vom 20.10.2026 |
 
 1. **Reiter Bewertung öffnen.** Score-Dial 78 · Gut (DealPilot Score), Investor Deal Score 74 · Gut.
-2. **Kennzahlen lesen.** Bruttomietrendite 7,23 %, Nettomietrendite 5,36 %, DSCR 1,67, Beleihung 83,3 % (Stand Modul 19 vom 16.10.2026; live gegenprüfen).
+2. **Kennzahlen lesen.** Bruttomietrendite 7,23 %, DSCR 1,67, Beleihung 83,3 % (Objektliste 20.10.2026); Nettomietrendite am 16.10. 5,36 % — nach der Befüllung (Nebenkosten neu) live zeigen.
 3. **Karte Wertpotenzial.** Die Wertüberleitung läuft Bestand → Mieterhöhung → Zielbild, jede Stufe in Markenfarbe (Bestand Obsidian, Mieterhöhung helles Gold,
    Zielbild dunkles Gold, Maßnahmenkosten gedämpftes Rot; Grün und Rot nur fürs Ergebnis).
-4. **Kennzahlen je Stufe** (Stand 20.10.2026, v2543):
+4. **Kennzahlen je Stufe** (Abruf 6 vom 20.10.2026, nach der Befüllung):
 
 | | Bestand | Mieterhöhung | Zielbild |
 |---|---:|---:|---:|
-| Ertragswert | 740.000 € | 755.000 € | 755.000 € |
-| Marktpreisindikation (Angebotspreise) | 805.000 € | 805.000 € | 880.000 € |
-| Rohertragsfaktor × Miete | 730.000 € | 745.000 € | 745.000 € |
+| Ertragswert | 745.000 € | 815.000 € | 915.000 € |
+| Marktpreisindikation (Angebotspreise) | 820.000 € | 820.000 € | 895.000 € |
+| Rohertragsfaktor × Miete | Zahl live zeigen | Zahl live zeigen | Zahl live zeigen |
+
+   Maßnahmenkosten bis zum Zielbild 62.000 €, Modernisierungspunkte 3 → 5,7.
 
 5. **Aufteilung:** je Wohnung als Eigentumswohnung mit dem Zins für **vermietete** ETW (Bielefeld 2,9 %, Gutachterausschuss Stadt Bielefeld).
-   In Bielefeld fällt die Aufteilung im Ertragswert **„kein Potenzial"** aus — mit Begründung: ETW-Zins 2,9 % gegen 2,5 % fürs Mehrfamilienhaus,
-   dazu höhere Verwaltungskosten je Einheit.
+   Je Wohnung Ertragswert und Marktpreisindikation, z. B. WE 1: 126.000 € / 180.000 € (Abruf 6). Ob nach den Kosten je Wohnung Potenzial bleibt,
+   live zeigen — die Begründung steht dabei (ETW-Zins 2,9 % gegen 2,5 % fürs Mehrfamilienhaus, höhere Verwaltungskosten je Einheit).
 
 **Achtung, zwei Zahlenstände:** Am 20.10. vormittags (v2460) zeigte der Tab an Westerfeld **780.000 / 865.000 / 1.105.000 €** und
 „Potenzial netto +257.000 € nach 68.000 € Maßnahmen" — gemessen mit einem Zielbild, das nur im Prüf-Tab gesetzt war.
 Mit **v2541** wurde nachgerechnet und vier echte Fehler behoben (unter anderem rechnete der Bestand die Restnutzungsdauer linear, das Zielbild nach Anlage 2 —
-das erzeugte ein scheinbares Potenzial). **Es gilt der neue Stand 740.000 / 755.000 / 755.000 €.** Das Zielbild liegt gleichauf mit der
-Mieterhöhung, weil die Zielmiete im Objekt noch nicht eingetragen ist; nach dem Eintrag (Vorschlag 9,50 €/m², fertig 2030) **live zeigen**.
+das erzeugte ein scheinbares Potenzial). Der Zwischenstand 740.000 / 755.000 / 755.000 € (v2543, 4 WE, ohne Zielmiete) ist ebenfalls überholt. **Es gilt Abruf 6 nach der Befüllung:
+745.000 / 815.000 / 915.000 €** (6 WE, Zielmiete 9,50 €/m², fertig 2030).
 
-Belegt: Scores — demo-geschichten.md Inventur A; Kennzahlen — Videoreihe.md Modul 19 (Bank-PDF Seite 2); Stufenwerte — Journal v2541–v2543d
-und Geschichte 8; Liegenschaftszins 2,5 % A — Geschichte 8 Schritt 6; Zins ETW 2,9 % und Begründung — Journal v2431/v2432; alter Stand — Journal v2460–v2466a.
+Belegt: Scores, DSCR, Beleihung — Objektliste Staging 20.10.2026 (`dealpilot_score` 78, `ds2_score_persist` 74, `dscr` 1,669, `ltv` 83,3); Bruttomietrendite
+`bmy` 7,233; Nettomietrendite — Videoreihe.md Modul 19 (16.10.); Stufenwerte — Geschichte 8 Schritt 4 (Abruf 6), alter Stand Journal v2541–v2543d; Liegenschaftszins 2,5 % A — Geschichte 8 Schritt 6; Zins ETW 2,9 % und Begründung — Journal v2431/v2432; alter Stand — Journal v2460–v2466a.
 
 ## 4 · Was man daraus liest — Fragen am Stand
 
@@ -111,10 +113,10 @@ Deine eigenen Mindestwerte stehen als Marker daneben.
 Der Rechenweg zeigt jede Zeile von der Warmmiete bis zum Cashflow nach Steuern — heute, am Ende der Zinsbindung und in der Anschlussfinanzierung.
 Der Stress-Test spielt durch, was passiert, wenn die Zinsen steigen und die Miete sinkt.
 Hast du eine Mieterhöhung oder ein Zielbild geplant, erscheint die Karte Wertpotenzial. Für die Westerfeldstraße in Bielefeld: Ertragswert heute
-siebenhundertvierzigtausend Euro, nach der Mieterhöhung siebenhundertfünfundfünfzigtausend. Daneben die Marktpreisindikation aus Angebotspreisen
+siebenhundertfünfundvierzigtausend Euro, nach der Mieterhöhung achthundertfünfzehntausend, nach dem Umbau neunhundertfünfzehntausend. Daneben die Marktpreisindikation aus Angebotspreisen
 und der amtliche Rohertragsfaktor mal Miete — drei Blickwinkel auf denselben Plan.
-Und auch ein Nein steht da mit Grund: Die Aufteilung in Eigentumswohnungen bringt hier im Ertragswert nichts, weil der amtliche Zins für vermietete
-Wohnungen höher liegt als der fürs ganze Haus.
+Und die Aufteilung steht daneben: jede Wohnung als Eigentumswohnung, mit Ertragswert und Marktpreis — und mit Grund, wenn sie sich nicht lohnt,
+etwa weil der amtliche Zins für vermietete Wohnungen höher liegt als der fürs ganze Haus.
 Wichtig: Das sind Potenzialwerte. Eine Verkehrswertermittlung ersetzen sie nicht.
 
 ## Querverweise

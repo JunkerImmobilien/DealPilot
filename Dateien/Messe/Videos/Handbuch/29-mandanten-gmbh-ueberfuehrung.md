@@ -1,6 +1,6 @@
 # 29 · Mandanten, GmbH als Halter, Überführung und Jahresabschluss
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: noch kein Video (Kandidat „Mandanten/GmbH-Halter" in Videoreihe.md) ·
 > Messe-Geschichte: 6 „Überführung in die GmbH" — Am Markt 9 und Hölderlinstr. (design/Messe/demo-geschichten.md)
 

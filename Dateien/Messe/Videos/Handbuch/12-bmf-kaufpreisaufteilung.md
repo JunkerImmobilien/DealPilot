@@ -1,6 +1,6 @@
 # 12 · BMF-Kaufpreisaufteilung — wie viel vom Kaufpreis ist Gebäude?
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 10b „BMF-Kaufpreisaufteilung" (`DREHBUECHER`-Schlüssel `reihe-bmf`, Studio `?modul=10b`) ·
 > Messe-Geschichten: 4 Westerfeldstr. (zweite Hebelstelle), 3b Parkstr., 12 Am Markt 18, 15 Steuerberater
 > (design/Messe/demo-geschichten.md)
@@ -51,13 +51,13 @@ der Kaufpreis (545.000 €). Die Arbeitshilfe gibt nur **14,6 % Gebäude**; die 
 ein Gutachten zur Kaufpreisaufteilung doppelt.
 
 **Der Abgleich — Am Markt 18, Kabelsketal (ETW):** DealPilot nach BMF-Arbeitshilfe **95,1 %**, die echte
-Kaufpreisaufteilung (Gutachten im Repo) **94,35 %** — praktisch deckungsgleich. Im Objekt steht noch 95,14 %;
-der Gutachtenwert ist nicht eingetragen.
+Kaufpreisaufteilung (Gutachten im Repo) **94,35 %** — praktisch deckungsgleich. Seit 20.10.2026 steht der Gutachtenwert
+**94,35 %** im Objekt (KPT S. 6), dazu Grundstück 3.878 m² und MEA 1,511 % (15,11/1.000, KPT S. 3/5).
 
 **Altbau — Parkstr. 9, Bad Oeynhausen:** Gebäudeanteil nach BMF-Arbeitshilfe **54,3 %**.
 
 Belegt: Ravensberger-Zahlen Videoreihe.md „Stand v2268" und „Aufgenommen 16.10.2026" (10b); Varianten/Reiter help.js
-(„BMF-Rechner", „Varianten, Bodenabschlag und Ausgabe"); Westerfeld Geschichte 4; Am Markt 18 Geschichten 5, 12 und C.8;
+(„BMF-Rechner", „Varianten, Bodenabschlag und Ausgabe"); Westerfeld Geschichte 4; Am Markt 18 Geschichten 5, 12 (Eintrag 20.10.) und C.8;
 Parkstr. Geschichte 3b.
 
 ## 4 · Was man daraus liest — Fragen am Stand

@@ -1,6 +1,6 @@
 # 11 · Restnutzungsdauer-Rechner und RND-Gutachten
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 10c „Der Restnutzungsdauer-Rechner" (`DREHBUECHER`-Schlüssel `reihe-rnd`, Studio `?modul=10c`), Teil von
 > Modul 10a (`reihe-steuer`) · Messe-Geschichten: 4 Westerfeldstr. (Gutachten), 5 RND-Abgleich, 11 Alexanderstr.,
 > 12 Am Markt 18 (design/Messe/demo-geschichten.md)
@@ -44,7 +44,8 @@ kein Fehler: Wo die Anlage 2 endet, erfindet DealPilot keine Zahl. Dasselbe gilt
 Bismarckstr. 27 (1908).
 
 **Mit Gutachten — Westerfeldstr. 140, Bielefeld (Bj ca. 1967):** Das Nutzungsdauergutachten vom 28.05.2025 kommt auf
-**16 Jahre** → AfA **6,25 %**. Der Rechner kommt im Modell auf **23,6 Jahre** (2 Punkte). Der Unterschied ist die
+**16 Jahre** → AfA **6,25 %**. DealPilot kommt im Modell mit den 6 Wohnungen auf **25,7 Jahre** (3 Punkte aus den
+Einheiten, Bericht 326; vorher 23,6 J. mit 2 Punkten bei 4 WE). Der Unterschied ist die
 **Gesamtnutzungsdauer** (Gutachten 67 Jahre bei Gebäudestandard 2,4, Modell 80 Jahre), nicht die Punkte — genau das ist
 der Mehrwert des Sachverständigen.
 
@@ -57,13 +58,13 @@ der Mehrwert des Sachverständigen.
 | Am Markt 18, Kabelsketal | 1994 | 32,4 J | ≈ 500 € | knapp |
 | Musterstr. 12, Leipzig | 1998 | 52 J | 0 € | bleibt bei 2 % |
 
-**Zwei echte Gutachten liegen im Repo, sind aber im Objekt NICHT eingetragen** (Entscheidung Marcel offen):
-Am Markt 18 — Gutachten **26 J.** gegen Modell 32,4 J. (wäre 3,85 %); Alexanderstr. 11 — Gutachten **33 J.**
-(Bj 1976, GND 80, 2 Punkte, Stichtag 14.08.2024; wäre 3,03 %), Modell heute 30,9 J. Am Stand also als „Gutachten liegt
-vor" erzählen, nicht als App-Stand zeigen.
+**Zwei echte Gutachten liegen im Repo und sind seit 20.10.2026 im Objekt eingetragen:**
+Am Markt 18 (DEMO-KK2) — Gutachten **26 J.** gegen Modell 32,4 J. → AfA **3,85 %**, Kauf 06.05.2024 (= Stichtag), also
+**Bestand**; Alexanderstr. 11 (DEMO-BI4) — Gutachten **33 J.** (Bj 1976, GND 80, 2 Punkte, Stichtag 14.08.2024) → AfA
+**3,03 %**, Kauf 14.08.2024, Bestand; Modell heute 30,9 J., AfA 1.677 €/Jahr. Beides darf als App-Stand gezeigt werden.
 
 Belegt: Ravensberger/Parkstr. Videoreihe.md „Stand 16.10.2026 nachmittags", 10c; Westerfeld Geschichte 4 und Korrektur
-(23,6 J.); Tabelle Geschichte 5; Am Markt 18 / Alexanderstr. Geschichten 5, 11, 12 und C.8/C.9; Schritte
+(25,7 J., 3 Punkte, Bericht 326 vom 20.10.); Tabelle Geschichte 5; Am Markt 18 / Alexanderstr. Geschichten 5, 11, 12 (Eintrag 20.10.) und C.8/C.9; Schritte
 `rnd-wizard.js:31–113`; „Sachverständig zu würdigen" `rnd-wizard.js:1285`.
 
 ## 4 · Was man daraus liest — Fragen am Stand

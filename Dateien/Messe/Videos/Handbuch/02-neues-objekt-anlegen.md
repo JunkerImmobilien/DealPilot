@@ -1,6 +1,6 @@
 # 02 · Neues Objekt anlegen — Checkliste, Datenaufnahme, Sprache, geführte Eingabe, Import
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen. Video: Modul 02 (`boarding-zum-objekt`), Modul 03 (`reihe-datenaufnahme`), Modul 05 (`reihe-sprache-stufe2`), Modul 25 (`reihe-gefuehrt`), Überblick 2 Kapitel 1 (`reihe-ueberblick2`); ältere Einzelvideos `sprache`, `immometrica` · Messe-Geschichte(n): 8 (Westerfeldstr. 140) als Startpunkt, 11 (Alexanderstr. 11) für Einsteiger (design/Messe/demo-geschichten.md).
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen"). Video: Modul 02 (`boarding-zum-objekt`), Modul 03 (`reihe-datenaufnahme`), Modul 05 (`reihe-sprache-stufe2`), Modul 25 (`reihe-gefuehrt`), Überblick 2 Kapitel 1 (`reihe-ueberblick2`); ältere Einzelvideos `sprache`, `immometrica` · Messe-Geschichte(n): 8 (Westerfeldstr. 140) als Startpunkt, 11 (Alexanderstr. 11) für Einsteiger (design/Messe/demo-geschichten.md).
 
 ## 1 · Wozu
 
@@ -26,7 +26,7 @@ Reihenfolge beim Abrufen: erst Dokumente und Sprache, dann die Marktbewertung. F
 | Straße, Hausnummer | Westerfeldstr. 140 |
 | PLZ, Ort | (PLZ live), Bielefeld |
 | Objektart | Mehrfamilienhaus |
-| Einheiten | 4 Wohneinheiten (Stand im Konto; Gutachten nennt 6 — siehe Hinweis unten) |
+| Einheiten | 6 Wohneinheiten wie im Nutzungsdauergutachten (EG / 1. OG / DG je links und rechts; Kürzel DEMO-BI1) |
 | Baujahr | 1967 |
 | Kaufpreis | 545.000 € |
 
@@ -53,7 +53,7 @@ Was die App zeigt (im Video gemessen): Fahrplan **18 Fragen in 5 Etappen**; Baye
 
 Kaufpreis 180.000 € → Nebenkosten **24.786 € (13,8 %)**, Marktzins **4,28 %**, Darlehen 180.000 € / Eigenkapital 24.786 €, Score **49 · Schwach** (Aufnahme 16.10.2026).
 
-Belegt: Westerfeld-Stammdaten Videoreihe.md (Ü2) und demo-geschichten 4/8; Modul-25-Eingaben `frontend/js/messe-drehbuch.js:4997` (`R25`), Messwerte Videoreihe.md „Modul 25 · Die geführte Eingabe"; Modul-02-Zahlen Videoreihe.md „Aufgenommen 16.10.2026". Westerfeld 4 statt 6 WE: demo-geschichten A.1.
+Belegt: Westerfeld-Stammdaten Videoreihe.md (Ü2) und demo-geschichten 4/8; Modul-25-Eingaben `frontend/js/messe-drehbuch.js:4997` (`R25`), Messwerte Videoreihe.md „Modul 25 · Die geführte Eingabe"; Modul-02-Zahlen Videoreihe.md „Aufgenommen 16.10.2026". Westerfeld 6 WE seit der Befüllung vom 20.10.2026: demo-geschichten D. Die Mitschnitte (Ü2, Modul 26) zeigen noch 4 WE.
 
 ## 4 · Was man daraus liest — Fragen am Stand
 

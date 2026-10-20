@@ -1,6 +1,6 @@
 # 16 · Pilot-Analyse
 
-> Stand 20.10.2026 (Staging bis v2544). Zahlen vor der Messe live gegenprüfen.
+> Stand 20.10.2026 (Staging bis v2544). Zahlen nachgezogen nach der Befüllung vom 20.10.2026 (README, „Stand der Zahlen").
 > Video: Modul 11 „Pilot-Analyse im Detail" (`DREHBUECHER`-Schlüssel `reihe-pilot`), Modul 26 „Mieterhöhung und Zielbild" (`reihe-zielbild`, Reiter Ankauf · Bestand · Zielbild) ·
 > Messe-Geschichten: 8 Westerfeld (Schritt 3–4), 10 Hauptstr. (Gewerberisiko), 1 Ravensberger (Soll/Ist) (design/Messe/demo-geschichten.md)
 
@@ -24,14 +24,14 @@ Rechenkernen wie der Rest der App, der Pilot ordnet sie ein. Die Analyse ist im 
   Verhandlungsempfehlung, Kaufpreis-Offerte, Bankargumente).
 - Ton und Tiefe stellst du unter **Einstellungen → Co-Pilot (KI)** ein (kurz/mittel/ausführlich; sachlich/beratend/kritisch; eigenes Wissen).
 
-## 3 · Schritt für Schritt — Beispiel Westerfeldstr. 140, Bielefeld (MFH, 4 WE, Bj 1967)
+## 3 · Schritt für Schritt — Beispiel Westerfeldstr. 140, Bielefeld (MFH, 6 WE, Bj 1967, DEMO-BI1)
 
 | Feld | Wert |
 |---|---|
 | Kaufpreis | 545.000 € |
-| Objektart | Mehrfamilienhaus, 4 Wohneinheiten (Stand im Konto), Baujahr ca. 1967 |
+| Objektart | Mehrfamilienhaus, 6 Wohneinheiten (laut Gutachten, eingetragen 20.10.), Baujahr ca. 1967 |
 | Gekauft | 01.01.2025 (Ankauf-Stand liegt vor) |
-| Marktbericht | Stufe 3 vom 19.10.2026, Abruf „Marktpreise" vom 20.10.2026 |
+| Marktbericht | Stufe 3 Bericht 326 vom 20.10.2026, Abruf „Marktpreise" Nr. 6 vom 20.10.2026 (6 WE) |
 
 1. **Pilot-Analyse starten.** Die Analyse liest Investition, Miete, Finanzierung, Bewirtschaftung, Steuer, den Marktwert und den Ankauf-Stand.
 2. **Briefing:** Gesamturteil und Empfehlung (Kaufen / Prüfen / Nicht kaufen) — Text live zeigen.
@@ -39,20 +39,21 @@ Rechenkernen wie der Rest der App, der Pilot ordnet sie ein. Die Analyse ist im 
    gegenüber 545.000 € Kaufpreis. Die Offerte begründet der Pilot aus Zielrendite, Cashflow-Grenze und Marktwert.
 4. **Bank:** Argumente für das Bankgespräch (DSCR, Beleihung, Wertpuffer).
 5. **Steuer:** AfA mit Gutachten (6,25 %), Steuerverlauf, Hinweis auf die 15-%-Grenze bis Ende 2027.
-6. **Ankauf · Bestand · Zielbild:** Spalten mit Jahr je Stufe. Gemessen am 20.10.2026 (v2543):
+6. **Ankauf · Bestand · Zielbild:** Spalten mit Jahr je Stufe. Abruf 6 vom 20.10.2026 nach der Befüllung (6 WE, Zielmiete
+   9,50 €/m², Zielbild fertig 2030):
 
-| | Ankauf 2025 | Mieterhöhung 2026 | Zielbild (Jahr offen) |
+| | Bestand | Mieterhöhung | Zielbild 2030 |
 |---|---:|---:|---:|
-| Ertragswert | 740.000 € | 755.000 € | 755.000 € |
-| Marktpreisindikation | 805.000 € | 805.000 € | 880.000 € |
-| Rohertragsfaktor × Miete | 730.000 € | 745.000 € | 745.000 € |
+| Ertragswert | 745.000 € | 815.000 € | 915.000 € |
+| Marktpreisindikation | 820.000 € | 820.000 € | 895.000 € |
+| Rohertragsfaktor × Miete | Zahl live zeigen | Zahl live zeigen | Zahl live zeigen |
 
-   Warum das Zielbild beim Ertragswert gleich bleibt: die Zielmiete (`zb_ziel_qm`) ist noch nicht eingetragen, „Jahr offen" heißt,
-   das Fertigjahr fehlt. Nach dem Eintrag (Vorschlag 9,50 €/m², fertig 2030, Geschichte 8 / B.1) **live zeigen**.
+   Maßnahmenkosten bis zum Zielbild 62.000 €, Modernisierungspunkte 3 → 5,7. Das Jahr der Mieterhöhung live zeigen.
    Darunter der Abschnitt **Marktpreise** (siehe [17](17-abruf-marktpreise.md)).
 7. **Co-Pilot-Pille „Welche Felder fehlen?"** — Antwort sofort aus der App, ohne KI.
 
-Belegt: Offerte 530.000 € — Videoreihe.md (Modul 11, Mitschnitt vom 15.10.2026); Pilot-Tafel — Journal v2541–v2543d (Nachweis Browser, Westerfeld);
+Belegt: Offerte 530.000 € — Videoreihe.md (Modul 11, Mitschnitt vom 15.10.2026, 4 WE — mit 6 WE neu anfragen, Zahl live zeigen); Stufenwerte —
+demo-geschichten.md Geschichte 8 Schritt 4 (Abruf 6 vom 20.10.2026, 6 WE; ersetzt 740/755/755 und 805/805/880 T€ mit 4 WE);
 AfA 6,25 % — demo-geschichten.md Geschichte 4; Reiternamen — `frontend/js/ui.js` (`dp-pa-rail`). Urteil, Texte: live zeigen.
 
 ## 4 · Was man daraus liest — Fragen am Stand
