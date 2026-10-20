@@ -773,6 +773,7 @@
       '#card-wertpotenzial svg.dp-wp-br .vb{stroke:#B8B0A0;stroke-width:1;stroke-dasharray:3 3}',
       '#card-wertpotenzial svg.dp-wp-br .lab{font-size:12px;font-weight:600;fill:#2A2727}',
       '#card-wertpotenzial svg.dp-wp-br .cat{font-size:11px;fill:#6B645A}',
+      '#card-wertpotenzial svg.dp-wp-br.eng .cat{font-size:10px}#card-wertpotenzial svg.dp-wp-br.eng .lab{font-size:10.5px}',
       '#card-wertpotenzial svg.dp-wp-br .b-bestand{fill:#8a8272}',
       '#card-wertpotenzial svg.dp-wp-br .b-soll{fill:#3d6fa8}',
       '#card-wertpotenzial svg.dp-wp-br .b-ziel{fill:#2f7d55}',
@@ -786,7 +787,7 @@
       '#card-wertpotenzial .dp-wp-we td:last-child{min-width:160px;text-align:left}',
       '#card-wertpotenzial .dp-wp-we th:last-child{text-align:left}',
       '@media (max-width:640px){#card-wertpotenzial .dp-wp-k b{font-size:17px}#card-wertpotenzial .dp-wp-kacheln{grid-template-columns:repeat(2,minmax(0,1fr))}'
-        + '#card-wertpotenzial .dp-pot th,#card-wertpotenzial .dp-pot td{padding:5px 3px;font-size:11.5px;white-space:normal}'
+        + '#card-wertpotenzial .dp-pot th,#card-wertpotenzial .dp-pot td{padding:5px 3px;font-size:11px;white-space:normal}#card-wertpotenzial .dp-pot td:not(:first-child):not(.dp-pot-neg){white-space:nowrap}'
         + '#card-wertpotenzial .dp-pot thead th{font-size:9px;letter-spacing:.04em}#card-wertpotenzial .dp-pot td:first-child{min-width:92px}}'
     ].join('');
     document.head.appendChild(s);
@@ -817,12 +818,14 @@
       s += '<text class="lab" x="' + (x + bw / 2).toFixed(1) + '" y="' + (top - 6).toFixed(1) + '" text-anchor="middle">' + esc(lab) + '</text>';
       var worte = String(st.t).split(' '), zeilen = [];
       worte.forEach(function (w) { var l = zeilen[zeilen.length - 1]; if (l && (l + ' ' + w).length <= 13) zeilen[zeilen.length - 1] = l + ' ' + w; else zeilen.push(w); });
+      var KURZ = { 'Mieterhöhung': 'Erhöhung', 'Umbau, Wechsel': 'Umbau', '− Maßnahmen': 'Kosten', 'Potenzial netto': 'netto', 'nach Erhöhung': 'Erhöhung' };
+      if (eng && KURZ[st.t]) worte = [KURZ[st.t]];
       if (eng) { zeilen = []; worte.forEach(function (w) { var l = zeilen[zeilen.length - 1]; if (l && (l + ' ' + w).length <= 9) zeilen[zeilen.length - 1] = l + ' ' + w; else zeilen.push(w); }); }
       zeilen.slice(0, 2).forEach(function (z, j) {
         s += '<text class="cat" x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - U + 17 + j * 13) + '" text-anchor="middle">' + esc(z) + '</text>';
       });
     });
-    return '<svg class="dp-wp-br" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Wertbrücke: Ertragswert Bestand ' + esc(eur(br.bestand))
+    return '<svg class="dp-wp-br' + (eng ? ' eng' : '') + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Wertbrücke: Ertragswert Bestand ' + esc(eur(br.bestand))
       + (br.mieterhoehung != null ? ', nach Mieterhöhung ' + esc(eur(br.mieterhoehung)) : '') + (br.zielbild != null ? ', Zielbild ' + esc(eur(br.zielbild)) : '')
       + ', Maßnahmen ' + esc(eur(br.kosten)) + ', Potenzial netto ' + esc(eur(br.netto)) + '">' + s + '</svg>';
   }
