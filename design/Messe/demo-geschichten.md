@@ -234,6 +234,7 @@ je Wohnung). **Einzige Ausnahme: Parkstr. WE 1** (Staffelmiete, Kaution, Beginn,
 **Marktbericht-DB:** Berichte gibt es zu allen zehn Objekten, **Stufe 3** nur zu Westerfeld (217–220, 308), Parkstr. (172, 174, 205)
 und Bismarckstr. (158). Einen **Abruf „Marktpreise"** (`mb.potenzial_abrufe`) hat nur **Westerfeld** (Nr. 3, 20.10.).
 Das Staging-Kontingent für neue Stufe-3-Berichte ist laut Journal (v2540) **aufgebraucht**.
+*(Stand nach der Befüllung, siehe Abschnitt D: Kontingent aufgefüllt, Westerfeld hat Bericht **325** (Stufe 3, 6 WE) und Abruf **6**.)*
 
 ### A.1 · Lücken je Objekt (Feldnamen)
 
@@ -262,8 +263,9 @@ Das Staging-Kontingent für neue Stufe-3-Berichte ist laut Journal (v2540) **auf
 - **Vorgabewerte in allen zehn Objekten gleich:** `ze` 90, `umlagef` 143,92, `grundsteuer` 336, `weg_r` 798; bei den MFH
   außer Bismarckstr. zusätzlich `hg_ul` 0 und `hg_nul` 7.680 — gleich für 390 m² und für 1.696 m². Für die Messe reicht das,
   solange niemand nach der Warmmiete fragt; bei Lindenhof sind 143,92 €/Monat Nebenkosten-Vorauszahlung für 24 Wohnungen sichtbar falsch.
-- **`DEMO-LE1` steht viermal** (Westerfeld, Alexanderstr., Am Markt 18, Musterstr.). Vorschlag: `DEMO-BI1` (Westerfeld), `DEMO-BI2` (Alexanderstr.),
-  `DEMO-SK1` (Am Markt 18, Saalekreis), `DEMO-LE3` (Musterstr.) — Entscheidung Marcel.
+- **`DEMO-LE1` stand viermal** (Westerfeld, Alexanderstr., Am Markt 18, Musterstr.). **Entschieden (Marcel 20.10.) und eingetragen:**
+  `DEMO-BI1` Westerfeld, `DEMO-KK2` Am Markt 18, `DEMO-LE3` Musterstr., `DEMO-BI4` Alexanderstr.; die übrigen bleiben
+  (`DEMO-LE2` Gohliser, `DEMO-BI3` Ravensberger, `DEMO-DT4` Bismarck, `DEMO-IB5` Hauptstr., `DEMO-BO6` Parkstr., `DEMO-HH1` Lindenhof).
 - **Tausenderpunkte in Zahlenfeldern** (Bismarck, Parkstr., Musterstr.). Vor dem Eintragen messen, wie die App „147.000" liest
   (Falle „Punkt ist kein Tausender") — beim Nachtragen ohne Punkt schreiben.
 - `zve` 90.000 und Grenzsteuersatz 42 % stehen überall gleich — gewollt (ein Investor), so sagen.
@@ -286,8 +288,8 @@ Das Staging-Kontingent für neue Stufe-3-Berichte ist laut Journal (v2540) **auf
 der Rechenkern gibt dort bewusst keine RND, und der Ertragswert (332.000 €) liegt weit unter dem Kaufpreis. Das trägt eine
 Geschichte, aber nicht „das Beispiel, an dem alles funktioniert". Gohliser (12 WE) hat dieselbe Altbau-Sperre und keinen Stufe-3-Bericht.
 
-**Achtung beim Umbau auf 6 WE:** alle gespeicherten Zahlen (Bericht 308, Abruf 3, Mitschnitte) gelten für 4 WE. Nach dem Eintragen
-neu abrufen — das braucht Kontingent auf Staging (aufgebraucht). **Teutoburger Str. 60 bleibt das Video-Objekt** und wird nicht angeglichen.
+**Umbau auf 6 WE erledigt (20.10.2026, Abschnitt D):** Bericht 308 und Abruf 3 gelten für 4 WE und sind überholt; für 6 WE gelten
+**Bericht 325** (Stufe 3) und **Abruf 6** („Marktpreise"). Die Mitschnitte zeigen noch 4 WE. **Teutoburger Str. 60 bleibt das Video-Objekt** und wird nicht angeglichen.
 
 ### B.1 · Eintragsliste Westerfeldstr. 140 (Demo-Annahmen gekennzeichnet)
 
@@ -462,18 +464,26 @@ neu: Castrop-Rauxel 300 km, Ibbenbüren 180 km, Kabelsketal 800 km je Fahrt (Dem
 
 ## Korrekturen an den Geschichten 1–7 (gemessen 20.10.2026)
 
-- **1 · Ravensberger:** Steuerwirkung 2025 jetzt **−721 €** (Erstattung; war −716). Die Einheiten tragen Soll 703 € unter Ist 717 € —
-  die Mieterhöhung zeigt dort **keine Anhebung**. Als Satz: „Wo nichts mehr geht, sagt DealPilot das auch." DealPilot-Score 83.
-- **2 · Bismarckstr.:** DSCR 0,97, Cashflow n. St. **−9.205 €/Jahr** (war −9.643); Erstattung 2024–2026 rund **7.100–7.200 €/Jahr**.
+- **1 · Ravensberger:** Steuerwirkung 2025 jetzt **−721 €** (Erstattung; war −716). ~~Die Einheiten tragen Soll 703 € unter Ist 717 €~~ —
+  **seit 20.10. ist das eigene Soll der Einheiten leer** (war 703/587 € unter Ist): DealPilot rechnet die Mieterhöhung selbst bis
+  Marktmiete/Kappungsgrenze. Der Satz „Wo nichts mehr geht …" gilt damit nicht mehr — live zeigen, was die Mieterhöhung jetzt sagt.
+  Cashflow und DSCR unverändert (10.739 €, 1,37). Score: Inventur 83, der Kern `DealScore.computeFromKpis(State.kpis)` liefert 76 —
+  bei unveränderten Kennzahlen, also nicht durch die Befüllung; vor dem Zeigen auf der Karte ablesen.
+- **2 · Bismarckstr.:** DSCR 0,97, Cashflow n. St. **−9.627 €/Jahr** (war −9.205; seit 20.10. werden `hg_nul` 2.442 und `eigen_r` 11.763
+  ohne Tausenderpunkt gelesen); Erstattung 2023 **3.869 €**, 2024 **7.220 €**, 2025 **8.374 €** (Dachreparatur), 2026 **11.459 €** (Bad WE 6).
+  WE 2 steht leer und trägt jetzt Ist 0 € (war 836 €; die Objektmiete 3.670 € enthielt sie schon nicht).
   Stufe-3-Bericht vom 04.10.: Sachwert 623.000 €, Bodenwert 476.000 €; Marktpreisindikation 935.000 € (745.000–1.105.000, 13.10.).
 - **3 · Gohliser:** Die Tabelle ist überholt. Gespeicherte Zeitreihe (`tax_records`): 2025 **6.052 €** · 2026 **6.919 €** · 2027 **14.355 €** ·
   2028 **15.290 €** · **2029 −553 € (Erstattung)** · 2030 **17.224 €**. Die Aussage hält: im Jahr der Investition dreht das Jahr ins Plus,
-  der Sprung beträgt jetzt rund 15.800 €.
+  der Sprung beträgt jetzt rund 15.800 €. **Neu gemessen nach der Befüllung (20.10.):** 2024 **2.374 €** · 2025 **6.046 €** · 2026 **6.913 €** ·
+  2027 **13.130 €** · 2028 **14.066 €** · **2029 −553 €** · 2030 **40 €** · 2031 **1.040 €** (2030/2031 je vier Bäder als Erhaltungsaufwand).
+  Der Sprung 2028 → 2029 beträgt rund **14.600 €**. Achtung: 2024 rechnet das Modell mit voller Jahresmiete, obwohl nur acht Tage Besitz.
 - **3b · Parkstr.:** Erstattung 2025 **16.458 €** (war 16.329). „DealScore 59" ist der **DS2 (heute 58)**; der DealPilot-Score steht bei **28** —
   beim Zeigen die richtige Zahl nennen. Neu und heikel: Stufe-3-Bericht (14.10.) Ertragswert **332.000 €** (RND 10 J., LZS 2,9 % Stufe A),
   Sachwert 295.000 €, Marktpreisindikation 487.000 € (416.000–570.000) bei 780.000 € Kaufpreis; Beleihung auf den Marktwert **131 %**.
-- **4 · Westerfeld:** AfA jetzt **5.609 €/Jahr** (war 5.371), Steuer 2026 **2.346 €** mit Werbungskosten. Modell-RND des Assistenten
-  23,6 J. (2 Punkte); Bericht 308: RND 23,6 J., LZS 2,5 % (Stufe A).
+- **4 · Westerfeld:** AfA jetzt **5.609 €/Jahr** (war 5.371), Steuer 2026 **2.104 €** Nachzahlung (Stand 20.10. nach Befüllung). Seit 20.10.
+  kommen die Modernisierungspunkte aus den 6 Wohnungen (**3 Punkte**, flächengewichtet 3,4; Gutachten 2,2); Bericht 325: RND **25,7 J.**,
+  LZS 2,5 % (Stufe A). Bericht 308 (23,6 J., 2 Punkte, 4 WE) ist überholt.
 - **5–7:** unverändert gültig; die Werbungskosten aus Geschichte 7 sind die Grundlage der Vorschläge in B und C.
 
 ---
@@ -492,24 +502,25 @@ Aufteilung in ETW, Bank- und Investment-PDF, Marktbericht Stufe 3, Quick Boardin
    „Die Punkte des Hauses kommen aus den Wohnungen — das Bad von 2019 im EG rechts zählt anteilig, so wie der Sachverständige rechnet."
    Mit **„Aus Wohnungen"** die Miete ins Objekt übernehmen.
 2. **Reiter Miete → Mieterhöhung und Zielbild:** Soll mit Jahr (Kappungsgrenze 15 % in Bielefeld), Zielbild 9,50 €/m², fertig 2030.
-3. **Pilot-Analyse → Abruf „Marktpreise"** (kostet Guthaben; einmal vor der Messe abrufen). Gemessen am 20.10.:
-   Angebotsmieten Median **9,50 €/m²** (7,96–11,24, 163 Angebote, 8 km), Kauf MFH **2.164 €/m²** (78 Angebote, 5 km),
-   Kauf ETW **2.505 €/m²** (38 Angebote). Der Verlauf zeigt jeden weiteren Abruf. Keine Quelle nennen — „aktueller Marktdurchschnitt".
-4. **Tab Bewertung → Wertüberleitung:** Bestand → Mieterhöhung → Zielbild, mit Jahren. Abruf 20.10.:
-   Ertragswert **740.000 € / 755.000 € / 755.000 €**, Marktpreisindikation **805.000 € / 805.000 € / 880.000 €**.
-   (Zielbild-Ertragswert = Mieterhöhung, weil `zb_ziel_qm` noch leer ist — nach dem Eintrag aus B.1 live zeigen.)
-5. **Aufteilung in ETW:** je Wohnung Ertragswert und Marktpreisindikation als Eigentumswohnung.
-   „2.164 €/m² als Haus, 2.505 €/m² als Wohnung — der Abstand ist der Aufteilungsgewinn, abzüglich der Kosten je Wohnung."
-6. **Bank-PDF und Investment-PDF** ziehen — Mieterliste, Haus-RND, Wertüberleitung; dazu Bericht Stufe 3 (19.10.:
-   Ertragswert 710.000 €, Sachwert 536.435 €, Liegenschaftszins 2,5 % Stufe A).
+3. **Pilot-Analyse → Abruf „Marktpreise"** (kostet Guthaben). **Abruf 6 vom 20.10. (6 WE):**
+   Angebotsmieten Median **9,50 €/m²** (7,96–11,24, 163 Angebote, 8 km), Kauf MFH **2.164 €/m²** (1.848–2.396, 78 Angebote, 5 km),
+   Kauf ETW **2.604 €/m²** (2.482–2.926, 56 Angebote), Abschlag auf Angebotspreise 15,9 %. Keine Quelle nennen — „aktueller Marktdurchschnitt".
+4. **Tab Bewertung → Wertüberleitung:** Bestand → Mieterhöhung → Zielbild (2030), mit Jahren. Abruf 6:
+   Ertragswert **745.000 € / 815.000 € / 915.000 €**, Marktpreisindikation **820.000 € / 820.000 € / 895.000 €**,
+   Maßnahmenkosten bis zum Zielbild 62.000 €, Modernisierungspunkte 3 → 5,7.
+5. **Aufteilung in ETW:** je Wohnung Ertragswert und Marktpreisindikation als Eigentumswohnung (WE 1: 126.000 € / 180.000 €).
+   „2.164 €/m² als Haus, 2.604 €/m² als Wohnung — der Abstand ist der Aufteilungsgewinn, abzüglich der Kosten je Wohnung."
+6. **Bank-PDF und Investment-PDF** ziehen — Mieterliste, Haus-RND, Wertüberleitung; dazu **Bericht 325** (Stufe 3, 20.10., 6 WE):
+   Ertragswert **725.000 €**, Sachwert **560.519 €**, Bodenwert 313.623 €, Liegenschaftszins 2,5 % Stufe A, RND 25,7 J. (3 Punkte).
 
-**Die Zahl, die hängen bleibt:** **805.000 €** Marktpreisindikation für ein Haus, das für **545.000 €** gekauft wurde (Abruf 20.10., Stand mit 4 WE) — nach dem Umbau auf 6 WE live zeigen.
+**Die Zahl, die hängen bleibt:** **820.000 €** Marktpreisindikation für ein Haus, das für **545.000 €** gekauft wurde (Abruf 6, 20.10., 6 WE).
 
 ### 9 · „Der Score sagt Nein — zu welchem Preis Ja?" — Lindenhof 14, Castrop-Rauxel (Ankauf)
 
 **Für:** Kapitalanleger in der Ankaufphase, Makler. **Aufhänger:** „24 Wohnungen für 2,45 Mio. — klingt nach Rendite, rechnet aber nicht."
 
-1. **Objektkarte:** Score **23**, KRITISCH. DSCR **0,74**, Cashflow n. St. **−21.444 €/Jahr**, Beleihung **94 %**.
+1. **Objektkarte:** Score **23**, KRITISCH. DSCR **0,74**, Cashflow n. St. **−13.431 €/Jahr** (war −21.444; seit 20.10. mit
+   Werbungskosten 2027 von 72.616 €, davon 70.000 € Erhaltung), Beleihung **94 %**.
 2. **Marktbericht Stufe 1** (04.10.): Marktpreisindikation **1.535.000 €** (1.290.000–1.815.000) — rund **915.000 €** unter dem Angebotspreis.
 3. **Quick Boarding:** dieselbe Adresse in einer Minute, Beleihung auf Kaufpreis plus Nebenkosten.
 4. **MFH-Konfigurator:** drei leere Wohnungen, sechs mit „Bad und Leitungen" — „das ist die Liste für die Preisverhandlung".
@@ -523,7 +534,7 @@ Aufteilung in ETW, Bank- und Investment-PDF, Marktbericht Stufe 3, Quick Boardin
 
 1. **MFH-Konfigurator:** EG-Ladenlokal 240 m², **2.640 € von 5.242 €** Monatsmiete = **50 %**; WE 5 leer (Komplettrenovierung 28.000 €).
 2. **Marktbericht:** Spanne „sehr weit" — 745.000 bis 1.370.000 €. „Je gemischter das Haus, desto ehrlicher die Spanne."
-3. **Kennzahlen:** Score 66, DSCR 1,17 — trägt sich, aber knapp.
+3. **Kennzahlen:** Score 66, DSCR 1,17 — trägt sich, aber knapp. Cashflow n. St. seit 20.10. **6.633 €** (war 5.155; Werbungskosten 2027/2028 eingetragen).
 4. **Pilot-Analyse:** nach dem Gewerberisiko fragen (Antwort live).
 
 **Die Zahl:** **50 %** der Miete hängen an einem Vertrag.
@@ -535,8 +546,9 @@ Aufteilung in ETW, Bank- und Investment-PDF, Marktbericht Stufe 3, Quick Boardin
 1. **Quick Boarding** mit Adresse, 65 m², 129.000 € — Ampel und Urteil in einer Minute.
 2. **Marktbericht Stufe 1:** Marktpreisindikation **158.000 €** (145.000–166.000) — rund **29.000 €** über dem Kaufpreis.
 3. **Kennzahlen:** Score 70 (GUT), DSCR 1,60.
-4. **Steuer:** RND-Gutachten 33 J. (Bj 1976, 2 Punkte, Stichtag 14.08.2024) → AfA **3,03 % statt 2 %**; das Modell sagt heute 30,9 J.
-   „Das Modell zeigt, wo sich ein Gutachten lohnt; das Gutachten setzt die Zahl." (nach Eintrag aus C.9)
+4. **Steuer:** RND-Gutachten 33 J. (Bj 1976, 2 Punkte, Stichtag 14.08.2024) → AfA **3,03 % statt 2 %** (eingetragen 20.10., Kauf
+   jetzt 14.08.2024 = Stichtag, also **Bestand**); das Modell sagt heute 30,9 J. AfA 1.677 €/Jahr, Cashflow n. St. 905 €.
+   „Das Modell zeigt, wo sich ein Gutachten lohnt; das Gutachten setzt die Zahl."
 
 **Die Zahl:** **29.000 €** unter der Marktpreisindikation.
 
@@ -545,7 +557,8 @@ Aufteilung in ETW, Bank- und Investment-PDF, Marktbericht Stufe 3, Quick Boardin
 **Für:** Steuerberater, Kapitalanleger mit Bestand. **Aufhänger:** „Zwei echte Gutachten neben der App — und die App liegt daneben, wo sie soll."
 
 1. **Steuer → BMF-Aufteilung:** DealPilot 95,1 % Gebäude, Kaufpreisaufteilung (Gutachten) **94,35 %** — praktisch deckungsgleich.
-2. **RND:** Gutachten **26 J.** gegen Modell 32,4 J. → AfA 3,85 % (nach Eintrag aus C.8).
+   Seit 20.10. steht **94,35 %** im Objekt (KPT S. 6), dazu Grundstück 3.878 m² und MEA 1,511 % (15,11/1.000, KPT S. 3/5).
+2. **RND:** Gutachten **26 J.** gegen Modell 32,4 J. → AfA **3,85 %** (eingetragen 20.10.; Kauf jetzt 06.05.2024 = Stichtag, also **Bestand**).
 3. **Marktbericht Stufe 1:** Marktpreisindikation **76.000 €** (70.500–84.500) bei **110.911 €** Kaufpreis — ehrlich zeigen: teuer gekauft.
 4. **Werbungskosten-PDF:** jede Zeile mit Bemerkung, Gutachterkosten als Werbungskosten.
 
@@ -555,7 +568,7 @@ Aufteilung in ETW, Bank- und Investment-PDF, Marktbericht Stufe 3, Quick Boardin
 
 **Für:** Bank/Finanzierer, Einsteiger. **Aufhänger:** „Cashflow fast null — ist das schlecht?"
 
-1. **Kennzahlen:** DSCR **1,04**, Cashflow n. St. **−213 €/Jahr**, Erstattung 2025 **1.687 €**.
+1. **Kennzahlen:** DSCR **1,04**, Cashflow n. St. **−275 €/Jahr**, Erstattung 2025 **1.705 €** (Stand 20.10.).
 2. **Bankbewertung 220.000 €**, Marktpreisindikation **243.000 €** (218.000–269.000) bei 189.000 € Kaufpreis.
 3. **Bank-PDF:** Beleihung, Kapitaldienst, Mieterliste — „das ist die Mappe, die ich der Bank gebe".
 4. **Leipzig:** Kappungsgrenze 15 % und Mietpreisbremse bis 30.06.2027 — die Mieterhöhung rechnet damit.
@@ -575,7 +588,8 @@ zuständigen Ämter (Grundbuch, Bauakte, Flurkarte, Baulasten) mit Kanal und Geb
 **Für:** Steuerberater/Steuerfokus.
 1. **Westerfeld:** RND-Gutachten → AfA 6,25 %; Gebäudeanteil 14,6 %; 15-%-Grenze rund 13.400 € → Modernisierung erst ab 2028.
 2. **Parkstr.:** 45.000 € Sanierung 2025 sofort abgesetzt, Erstattung **16.458 €**.
-3. **Bismarckstr.:** Küche als bewegliches Wirtschaftsgut (10 Jahre), Bad als Erhaltung — nach dem 30.06.2026 (nach Eintrag aus C.3).
+3. **Bismarckstr.:** Küche als bewegliches Wirtschaftsgut (10 Jahre, 400 € in 2026, 800 € ab 2027), Bad 13.000 € als Erhaltung —
+   nach dem 30.06.2026 (eingetragen 20.10.); Erstattung 2026 **11.459 €**.
 4. **Werbungskosten-PDF** und Anlage V: jede Zeile mit Bemerkung.
 5. **GmbH (Geschichte 6):** keine Erstattung bei Verlust.
 
@@ -589,13 +603,51 @@ zuständigen Ämter (Grundbuch, Bauakte, Flurkarte, Baulasten) mit Kanal und Geb
 |---|---|---|---|
 | **Einsteiger** | 11 Alexanderstr. (Quick Boarding) | 13 Musterstr., 7 Werbungskosten | 29.000 € unter Markt |
 | **Kapitalanleger mit Bestand** | 1 Ravensberger (Plan/Ist) | 2 Bismarckstr., 3b Parkstr. | Miete +12 % seit 2020 |
-| **MFH-Investor** | 8 Westerfeld (alle Hebel) | 3 Gohliser, 9 Lindenhof | 805.000 € Marktpreisindikation zu 545.000 € Kauf |
+| **MFH-Investor** | 8 Westerfeld (alle Hebel) | 3 Gohliser, 9 Lindenhof | 820.000 € Marktpreisindikation zu 545.000 € Kauf |
 | **Bank / Finanzierer** | 13 Musterstr. (Bank-PDF) | 2 Bismarckstr. (DSCR < 1), 9 Lindenhof | DSCR 1,04 |
 | **Steuerberater / Steuerfokus** | 15 Rundgang | 4 + 5 RND, 12 Am Markt 18, 6 GmbH | 16.458 € Erstattung |
 | **Makler / Partner** | 10 Hauptstr. (Gewerberisiko) | 9 Lindenhof (Verhandlung), 14 Telegram | 50 % an einem Mieter |
 
 ## Was vor der Messe noch fehlt (Stand 20.10.2026)
 
-- Einträge aus **B.1** und **C** — danach Westerfeld neu abrufen (Bericht Stufe 3 und „Marktpreise"); **Staging-Kontingent ist leer**.
-- Entscheidung Marcel: Kürzel (A.2), Kaufdatum Am Markt 18 / Alexanderstr. (Gutachten-Stichtag), Parkstr. WE 1 `rnd_eigen` entfernen.
+- ~~Einträge aus B.1 und C, Westerfeld neu abrufen, Kürzel, Kaufdatum, Parkstr. WE 1 `rnd_eigen`~~ — **erledigt 20.10.**, siehe D.
+- Rechnungen der Gutachten (Westerfeld Nutzungsdauergutachten, Am Markt 18 RND + KPT, Alexanderstr. RND) als `sonst_kosten` — Beträge liegen nicht im Repo.
+- Offen aus C, nicht entschieden: `me_anz`/`me_int` (Ravensberger, Bismarck), `umlagef`/`hg_ul` Lindenhof, Gewerbe-Mietvertrag Hauptstr.,
+  Wohnungs-Detailfelder Gohliser; `gsfl` Musterstr./Alexanderstr. (jetzt leer — kein Bodenwert, bis die Teilungserklärung da ist).
+- Mitschnitte (Modul 26 u. a.) zeigen Westerfeld noch mit 4 WE.
 - Teutoburger Str. 60 (Video-Objekt) nicht verändern, solange Modul 26 aufgenommen wird.
+
+---
+
+## D · Befüllung 20.10.2026 (Staging, über den Speicherweg der App)
+
+Sicherung vorher: `/root/backups/haupt-demo-20261020-1623-vor-befuellen.sql.gz` (6,8 MB; `objects`, `tax_records`, `tax_bemerkungen`).
+Geschrieben im Browser über `loadSaved()` → Feld + `input`/`change` → `saveObj()`; Einheiten über `window._dpMfh` und bei Westerfeld
+den Konfigurator (Schritt 4, „Übernehmen", ohne „Maßnahmen als Sanierung" und ohne „RND in die AfA"); Werbungskosten über
+`_setYearOverride`/`dpWkUebernehmen` und `_taxYearlyBemerkungen`. Jede Zeile per SQL nachgelesen.
+
+**Westerfeldstr. 140 (DEMO-BI1), 6 WE.** Anzahl, Lage, Zimmerzahl (Grundrisse S. 20/21: EG/OG je 3 Zi., DG je 2 Zi.),
+Bad 2019 + Böden 2024 EG rechts (S. 28), Keller (S. 17), 4 Reihengaragen (S. 1/18) aus dem Gutachten; **Flächen, Mieten, Verträge,
+MEA, NK, Maßnahmen sind Demo-Annahmen** (Summe 390 m², Ist 3.195 €/Monat wie bisher — das Gutachten nennt weder Flächen noch Mieten).
+
+| nr | lage | wfl | Zi. | ist | Gewerke fenster/bad/innen/grundriss | Maßnahmen (bewohnt) | ziel_qm / ziel_wann | MEA | Stellplatz | NK | mv_beginn / letzte Erh. | Kaution |
+|---|---|---:|---:|---:|---|---|---|---|---|---:|---|---:|
+| 1 | EG links | 70 | 3 | 590 | 0/0/0/0 | Bad 11.000, Böden 5.000 (nein) | 9,50 / 2028 | 180 | Garage 1, 30 € | 175 | 2011-05-01 / 2023-07-01 | 1.770 |
+| 2 | EG rechts | 70 | 3 | 600 | 0/h/h/0 | — | — | 180 | Garage 2, 30 € | 175 | 2019-09-01 / 2024-01-01 | 1.800 |
+| 3 | 1. OG links | 70 | 3 | 585 | 0/0/0/0 | Bad 11.000, Böden 5.000 (**ja**, § 559) | 9,50 / 2029 | 180 | Garage 3, 30 € | 175 | 2008-03-01 / 2023-07-01 | 1.755 |
+| 4 | 1. OG rechts | 70 | 3 | 585 | 0/0/0/0 | Bad 11.000, Böden 5.000 (nein) | 9,50 / 2030 | 180 | — | 175 | 2015-10-01 / 2023-07-01 | 1.755 |
+| 5 | DG links | 55 | 2 | 415 | 0/0/0/0 | Bad 10.000, Böden 4.000 (nein) | 9,50 / bei Mieterwechsel | 140 | — | 138 | 2004-06-01 / 2022-01-01 | 1.245 |
+| 6 | DG rechts | 55 | 2 | 420 | 0/0/0/0 | — | — | 140 | — | 138 | 2017-02-01 / 2023-07-01 | 1.260 |
+
+Alle vermietet, unbefristet, Kellerraum; `vgl_qm` und `soll` leer (DealPilot rechnet bis Marktmiete/Kappung). **Abweichung von B.1:**
+Fenster je Wohnung „0" statt „h" — das Gutachten vergibt für die Fenster von 2004 nur 0,2 von 2 Punkten (S. 27/28), „h" wären 1;
+so ergeben sich 3 Punkte (3,4 gewichtet) statt 4, Gutachten 2,2. Objekt: `mod_quelle` einheiten, `mod_punkte` 3, `zb_fertig_jahr` 2030,
+`garagen` 1 → 4, `stellplatz_miete_monat` 30 (Demo, = `ze` 90 / 3 vermietete Garagen), `umlagef` 976 (Summe NK), `hg_ul` **11.376**
+(nicht 11.700: die App koppelt `umlagef` = (`hg_ul` + Grundsteuer 336) / 12), Mietentwicklung jetzt „aus Wohnungen", Zimmer 16.
+Werbungskosten 2027 2.321 · 2028 18.549 · 2029 18.429 · 2030 18.549 (Bad/Böden WE 1, 3, 4 nach Ende der Drei-Jahres-Frist).
+**Bericht 325** (Stufe 3) wurde vor dem Nachtrag von Garagen/Stellplatzmiete erzeugt: er rechnet ohne Stellplätze (Regel v2541).
+
+**Übrige Objekte:** Kürzel siehe A.2; Werbungskosten wie in C (Summen ohne `sonst_bewegl_wg`): Gohliser 2024 361 (statt 2.915), 2027/2028 2.915,
+2030/2031 40.915 · Ravensberger 2020 2.147, 2021 2.321, 2022 2.441, 2023 2.321, 2027 2.321 · Bismarck 2023 1.568, 2025 5.922, 2026 15.681
+(+ 400 bewegl. WG), 2027 2.561 (+ 800) · Parkstr. 2024 20 (statt 2.081), 2027 2.081, 2028 24.081 · Musterstr. 2024 353 (statt 1.472), 2027 1.472 ·
+Am Markt 18 2024 1.119, 2025/2026 je 964 · Alexanderstr. 2024 719, 2025/2026 je 683 · Lindenhof 2027 72.616, 2028 40.248 · Hauptstr. 2027 30.107, 2028 14.203.
