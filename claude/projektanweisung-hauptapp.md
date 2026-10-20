@@ -39072,6 +39072,38 @@ Marcel (20.10.2026): *„Das muss eindeutig sein, bitte so machen, dass es passt
 
 **Rest:** (a) Produktentscheidung Abschlag im Profil (Vorschlag an Marcel). (b) Örtliche Sätze gibt es nur für Bielefeld MFH — jede weitere Ernte von `rohertragsfaktor` mit `kaufpreis_eur_qm_mittel` macht den Satz dort örtlich. (c) Testaufrufe am mb-Backend haben drei Berichte ohne Nutzer in `mb.market_reports`/`object_snapshots` hinterlassen (Staging, unsichtbar für Nutzer).
 
+### v2488 · Mieterhöhung und Zielbild bauen auf der Bestandsbasis auf (20.10.2026, Staging)
+
+**Was.** Befund aus dem Video-Strang am Demo-MFH (R26, 6 WE, 378 m², WE 5 leer, Ist 2.265 €/Monat): Ertragswert Bestand 545.000 €, **Mieterhöhung 530.000 €** — die Stufe lag unter dem Bestand, obwohl die Miete stieg. Ursache in `PotenzialService.rechne()`: der Bestand nimmt die Wertermittlungs-Miete (`ein.miete_markt_jahr`: Ist 5,99 €/m² unter dem Band → untere Kante 6,64 €/m² auf **alle** 378 m², die leere Wohnung eingeschlossen = 30.119 €), die Stufen nahmen die tatsächliche Miete aus dem Browser (leer = 0, ohne Bandprüfung = 29.035 €). Entscheidung Hauptchat: jede Stufe baut auf derselben Basis wie der Bestand und unterschreitet ihn nie.
+
+- **`CrossCheckService`:** die Bandregel (v2382) als `mieteNachBand(istQm, band, refQm)` exportiert und im Kern selbst benutzt — Verhalten unverändert (gleiche Bestandswerte gemessen). `_ertragswertEingabe` führt zusätzlich `miete_band` und `markt_qm` (Vergleichsmiete). Keine zweite Rechnung.
+- **`PotenzialService` · Bestandsbasis je Wohnung:** vermietet = Ist €/m² nach `mieteNachBand`, leer = Vergleichsmiete. Die Summe ist **exakt** der Bestands-Rohertrag (Bestand = Bericht Stufe 3): der Unterschied zwischen Haus und Wohnungen geht **zuerst auf die leeren Wohnungen** (höchstens bis zur marktüblichen Miete, nie unter null), erst der Rest anteilig auf alle. Begründung: er entsteht genau dort — der Bestand teilt die Ist-Miete der vermieteten Wohnungen durch die gesamte Wohnfläche (5,99 statt 7,31 €/m²). Demo: WE 5 trägt im Bestand 2.563 €/Jahr (3,14 €/m²), die vermieteten bleiben bei ihrer geprüften Ist-Miete (Angleichung 1,0).
+- **Stufe je Wohnung** = Basis + max(0, min(Stufenmiete, obere Bandkante) − eigene geprüfte Miete); leer: max(Basis, Stufenmiete). Bei Angleichung 1 ist das genau die Regel „max(Bestandsbasis, Miete der Stufe)". Über der oberen Kante wird nichts kapitalisiert (§ 8 Abs. 3, wie im Bestand). Keine Anhebung (Stufenmiete ≤ Ist) → Basis. Ohne Wohnungsliste (ETW/Einzel) dieselbe Rechnung mit einer Wohnung = Objekt.
+- **Gleiche Basis** für `anteil_am_haus` und die Aufteilung (ETW je Wohnung); Gewerbe weiter mit seiner Miete.
+- **Neu im Ergebnis:** je Stufe `anhebung_jahr`, `anhebung_wohnungen` (neben `rohertrag`, `miete_wohnen_jahr`); je Wohnung `basis_herkunft` (`ist_im_band`/`untere_kante`/`obere_kante`/`leer_marktueblich`), `ist_qm`, `basis_qm`, `miete_jahr` je Stufe; `basis.bestandsbasis` (Rohertrag, Angleichung, Band, Vergleichsmiete, Hinweissatz).
+- **Anzeige (nur Felder ergänzt, kein Umbau):** `potenzial.js` `pdfDaten()` — Zeilen „Miete im Ertragswert p. a." und „davon Anhebung gegen Bestand" (Tab Bewertung, Bank- und Investment-PDF), Hinweissatz im Fuß; bei Sperre (ohne Stufe 3) ausgeblendet. `zusammenfassung()` → Pilot: `rohertrag_ertragswert`, `anhebung_ertragswert`, `ertragswert_basis`; `openaiService` zeigt die Spalte und den Satz, `agentWerkzeuge` reicht sie durch (bei Sperre null). Buster `potenzial.js` v2488 (nur index.html lädt sie).
+
+**Commit:** `ce3f585b` (v2488).
+
+**Nachweis — Funktionslauf im mb-Container**, alter (`git show HEAD~`) und neuer `PotenzialService` an **derselben** Basis (`ReportOrchestrator.generate(…, { nurWertBasis: true })`), Ertragswert in €:
+
+| Fall | Stufe | alt Miete EW / Wert | neu Miete EW (Anhebung) / Wert |
+|---|---|---|---|
+| Demo-MFH (1 leer) | Bestand | 30.119 / 545.000 | 30.119 / **545.000** |
+| | Mieterhöhung | 29.035 / 530.000 | 31.595 (+1.476, 4 WE) / **565.000** |
+| | Zielbild | 40.488 / 805.000 | 40.488 (+10.369) / **805.000** |
+| ohne Leerstand (WE 5 zu 470 €) | Bestand / MH / ZB | 580.000 / 605.000 / 805.000 | 580.000 / 600.000 / 800.000 |
+| Ist über Band (15 €/m², Band bis 12,34) | Bestand / MH / ZB | 875.000 / 1.090.000 / 1.475.000 | 875.000 / 875.000 / 1.090.000 (nur RND 16 → 25,5) |
+| Westerfeldstr. 140 (gespeicherter Stand) | Bestand / MH | 780.000 / 865.000 | **780.000** / 865.000 |
+| ETW ohne Wohnungsliste | Bestand / MH / ZB | 49.500 / 53.500 / 111.000 | 49.500 / 53.500 / 111.000 |
+
+Aufteilung Demo: vorher 453.500* / 476.000* (WE 5 ohne Wert, unvollständig), jetzt 528.058 / 545.558 / 752.000 vollständig. Bestand in allen Fällen = `bericht_ertragswert`. `node --check` je Datei; `rnd-kerne-pruefen`, `score-ketten-pruefen` (216), `prompt-lecks-pruefen`, `objekt-mapper-pruefen`, `buster-ebenen-pruefen` RC 0. Staging per `git pull --ff-only` + `docker compose … up -d --build mb-backend backend`, Nachlauf im neu gebauten Container gleich.
+
+**Rest:**
+- **Ursache im Bestand selbst (Bewertungsfrage an Marcel):** `CrossCheckService` rechnet die Ist €/m² des Hauses über die GESAMTE Wohnfläche, auch die leeren Wohnungen (Demo 5,99 statt 7,31 €/m² auf der vermieteten Fläche) — damit rutscht ein Haus mit Leerstand unter die untere Bandkante, und der Bestand liegt rund 5.000 €/Jahr unter „vermietete Ist + leer marktüblich" (35.300 €). Nicht geändert, weil es den Bericht Stufe 3 ändert; v2488 hält den Bestand bewusst fest.
+- Ertragswert der leeren WE 5 als ETW im Bestand 69.558 € (nicht auf 500 gerundet) — der Kern greift dort offenbar auf den Bodenwertanteil; unverändert übernommen.
+- Anzeige im Tab Bewertung/PDF nur per `node --check` geprüft, nicht im Browser angesehen (Staging-Abnahmepunkt); die Messe-Mitschnitte (Modul 26) zeigen bis zur Neuaufnahme die alten Zahlen.
+
 ### Prod-Rollout (56) · qc-v2450, v2460–v2466a, v2470–v2472, Ulm 2026, SH-Freigaben (20.10.2026)
 
 **Was:**
