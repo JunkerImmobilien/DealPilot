@@ -90,6 +90,7 @@ const LIEGENSCHAFTSZINS = 0.03;   // EFH-typisch 2,5–3,5 % -> 3,0 %
  * die Zahl fuer eine Aussage haelt, die sie nicht ist. */
 
 const _num = (v) => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
+const BAND_OBEN = 1.15;   /* v2541 · obere Kante des Marktueblichkeitsbandes (bis v2540: 1,3) */
 
 /* v2488 · DIE BANDREGEL ALS EINE FUNKTION (Marcel 20.10.2026: jede Stufe baut auf
    derselben Basis wie der Bestand). Bis v2487 stand sie nur inline in compute();
@@ -957,9 +958,10 @@ export const CrossCheckService = {
     const _bandQ = [_amtQmBand, _angQmBand].filter((x) => x != null);
     const _band = _bandQ.length ? {
       unten_qm: Math.round(Math.min(..._bandQ) * 0.7 * 100) / 100,
-      oben_qm: Math.round(Math.max(..._bandQ) * 1.3 * 100) / 100,
+      /* v2541 · obere Kante × 1,15 statt × 1,3 (Marcel 20.10.2026; Pruefbericht: 12,35 €/m² lag in Bielefeld 2,7σ ueber dem Ø der MFH-Kauffaelle 7,70 ± 1,70) */
+      oben_qm: Math.round(Math.max(..._bandQ) * BAND_OBEN * 100) / 100, faktor_oben: BAND_OBEN,
       amtlich_qm: _amtQmBand, angebot_qm: _angQmBand != null ? Math.round(_angQmBand * 100) / 100 : null,
-      regel: 'untere Kante = min(amtliche Vergleichsmiete, Angebotsmiete) × 0,7; obere Kante = max(…) × 1,3',
+      regel: 'untere Kante = min(amtliche Vergleichsmiete, Angebotsmiete) × 0,7; obere Kante = max(…) × 1,15',
     } : null;
     const _mnb = mieteNachBand(_istQm, _band, _refQm);   /* v2488 · eine Regel, auch je Wohnung */
     const _istLage = _mnb.lage;
@@ -991,7 +993,11 @@ export const CrossCheckService = {
         }
         const iq = r2(Number(e.ist_monat) / Number(e.wfl));
         const r = mieteNachBand(iq, _band, _refQm);
-        return { nr: e.nr, wfl: fl, ist_qm: iq, qm: r2(r.qm), jahr: Math.round(r.qm * fl * 12),
+        /* v2541 · im Band die VERTRAGSMIETE selbst (× Flaechenfaktor), nicht die auf Cent
+           gerundeten €/m² hochgerechnet - Westerfeld: 799 € / 97,5 m² = 8,1949 -> 8,19 ergab
+           9.582 statt 9.588 €/Jahr je Wohnung (Pruefbericht 20.10.2026). Bandkante: qm × Flaeche. */
+        return { nr: e.nr, wfl: fl, ist_qm: iq, qm: r2(r.qm),
+                 jahr: r.fuehrt ? Math.round(Number(e.ist_monat) * 12 * f) : Math.round(r.qm * fl * 12),
                  herkunft: r.fuehrt ? 'ist_im_band' : (r.lage === 'ueber' ? 'obere_kante' : 'untere_kante') };
       });
       const v = zeilen.filter((z) => z.herkunft !== 'leer_marktueblich'), l = zeilen.filter((z) => z.herkunft === 'leer_marktueblich');
@@ -1022,7 +1028,7 @@ export const CrossCheckService = {
     const _bandText = _band ? ('Band der Marktüblichkeit ' + _dq(_band.unten_qm) + ' bis ' + _dq(_band.oben_qm) + ' €/m² ('
       + [_band.amtlich_qm != null ? 'amtliche Vergleichsmiete ' + _dq(_band.amtlich_qm) + ' €/m²' : null,
         _band.angebot_qm != null ? 'Angebotsmiete ' + _dq(_band.angebot_qm) + ' €/m²' : null].filter(Boolean).join(', ')
-      + '; untere Kante × 0,7, obere × 1,3)') : '';
+      + '; untere Kante × 0,7, obere × 1,15)') : '';
     const _dqJ = (x) => String(Math.round(x * 100) / 100).replace('.', ',');
     if (_je) {
       /* v2540 · je Wohnung: welche Wohnung an welche Kante, in einem Satz */
@@ -1253,7 +1259,9 @@ export const CrossCheckService = {
          * ist (`if (!R)`). Mit vorgegebener Dauer blieb es bei der
          * Schaetzung, obwohl die Punkte durchgereicht wurden — der Wert
          * kam an und wurde trotzdem nicht benutzt. */
-        rnd_jahre: (_num(ref.mod_punkte) != null ? null : rnd),
+        /* v2541 · ohne Punkte die RND nach Anlage 2 mit 0 Punkten (rndEinheitlich) statt der
+           linearen Schaetzung `rnd` - gemessen: Herkunft sagte 18 J. (Anlage 2), gerechnet wurde 16 */
+        rnd_jahre: (_num(ref.mod_punkte) != null ? null : (function () { try { const r = _rndEinheitlich(GND_JAHRE); return Number(r) > 0 ? Number(r) : rnd; } catch (e) { return rnd; } })()),
         /* v1057-WSON-7 */
         sonstige_jahr: _num(ref.sonstige_jahr),
         zusatz_jahr: _num(ref.zusatz_ertrag_jahr),   /* v2382 · Stellplatz/Garage aus `ze`, IM Rohertrag */

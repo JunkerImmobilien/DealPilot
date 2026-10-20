@@ -1026,6 +1026,27 @@ export const ReportOrchestrator = {
         });
         step('uk-wgfz: ' + (_wgfz.verfuegbar ? 'Faktor ' + _wgfz.faktor + ' (' + _wgfz.uk_objekt + '/' + _wgfz.uk_zone + ')' : _wgfz.grund));
       } catch (e) { _wgfz = null; }
+      /* v2541 · MFH: WGFZ VOR FLAECHE (Marcel 20.10.2026). Bielefeld schreibt zur
+         Flaechentabelle selbst „nicht fuer Geschosswohnungsbau ... Ruecksprache
+         erforderlich"; beim Mehrfamilienhaus ist die WGFZ das wertrelevante Merkmal
+         (§ 16 Abs. 4). Greift die WGFZ-Umrechnung, entfaellt die (uebertragene)
+         Flaechentabelle - nie beide, sonst stuende der Groesseneffekt doppelt im Wert.
+         Fehlt die WGFZ des Objekts, bleibt die Uebertragung (Stufe C, v2362) mit dem
+         Hinweis, dass der Ausschuss dafuer die WGFZ verlangt. */
+      try {
+        const _istMfh = /mfh|mehrfam/i.test(String(ref.property_subtype || ref.property_type || ''));
+        if (_istMfh && _wgfz && _wgfz.verfuegbar && _ukReg && _ukReg.verfuegbar) {
+          step('uk-flaeche: entfaellt beim MFH, die WGFZ-Umrechnung greift');
+          _ukReg = { verfuegbar: false, grund: 'wgfz_vor_flaeche',
+            hinweis: 'Beim Mehrfamilienhaus rechnet der Bodenwert über die WGFZ (§ 16 Abs. 4 ImmoWertV); die Umrechnung über die Grundstücksgröße entfällt.' };
+        } else if (_istMfh && _ukReg && _ukReg.verfuegbar && _ukReg.uebertragen) {
+          _ukReg.hinweis = (_ukReg.hinweis ? _ukReg.hinweis + ' ' : '')
+            + 'Der Gutachterausschuss verlangt für den Geschosswohnungsbau Rücksprache bzw. die Umrechnung über die WGFZ: '
+            + (_wgfz && _wgfz.grund === 'wgfz_objekt_fehlt'
+              ? 'die WGFZ des Objekts im Reiter Objekt eintragen, dann rechnet der Bodenwert über die WGFZ.'
+              : 'für diese Zone liegt keine Geschossflächenzahl oder keine WGFZ-Tabelle vor, deshalb bleibt die übertragene Flächentabelle (vorläufig).');
+        }
+      } catch (e) { /* die Rangfolge darf den Bericht nie kippen */ }
       /* v2288 · DIE DEALPILOT-FORMEL als Stufe unter dem amtlichen Wert (seit v2401 Stufe N) -
        * nur wo kein Registersatz greift (und nicht Minden-Luebbecke, das seine
        * Tabelle fest im Code hat) oder wo eine Sperre KEINE andere Regel des
@@ -1541,6 +1562,10 @@ export const ReportOrchestrator = {
       return { nur_wert_basis: true, ref, wert_params: _wertParams, cross_check: crossCheck,
         ertragswert_eingabe: (crossCheck && crossCheck._ertragswertEingabe) || null,
         land_value: landValue ? { available: !!landValue.available, value_sqm: landValue.value_sqm ?? null } : null,
+        /* v2541 · Marktpreisindikation je Stufe/Wohnung (PotenzialService): die Indikation
+           des Bestands samt Gegenprobe und die Marktdaten, aus denen sie entsteht -
+           bis v2540 lief ValuationService hier mit und das Ergebnis wurde verworfen. */
+        valuation: valuation || null, sale: sale || null, rent: rent || null, land_value_roh: landValue || null,
         trace, took_ms: Date.now() - t0 };
     }
 

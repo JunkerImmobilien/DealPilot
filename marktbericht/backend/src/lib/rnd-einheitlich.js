@@ -97,28 +97,26 @@ export function restnutzungsdauerEinheitlich(ref = {}, gnd = GND_JAHRE_STANDARD)
      > Sanierungsjahr) duerfen zu Recht keine Null sein. Fuer die Punkte
      > gilt eine eigene Pruefung — eine Punktzahl darf 0 sein. */
   const _mpRoh = Number(ref.mod_punkte);
-  const mp = Number.isFinite(_mpRoh) && _mpRoh >= 0 ? _mpRoh : null;
+  const _mpAngabe = Number.isFinite(_mpRoh) && _mpRoh >= 0 && !(ref.mod_punkte === null || ref.mod_punkte === undefined || ref.mod_punkte === '') ? _mpRoh : null;
   const _angaben = Number(ref.mod_angaben) || 0;
-  if (mp == null) {
-    if (_angaben > 0) {
-      return erg('geschaetzt', 'punkte_nicht_berechnet', fallback,
-        SCHAETZUNG_TEXT + ' Für ' + _angaben + ' der acht Bauteile liegt eine '
-        + 'Angabe vor, die Modernisierungspunkte nach Anlage 2 sind dafür aber '
-        + 'nicht hinterlegt. Das Objekt einmal im Reiter Objekt öffnen und '
-        + 'speichern setzt sie; danach rechnet der Bericht nach Anlage 2.');
-    }
-    return erg('geschaetzt', 'kein_modernisierungsgrad', fallback,
-      SCHAETZUNG_TEXT + ' Es wurde kein Modernisierungsgrad erfasst. Mit '
-      + 'Modernisierungspunkten fällt die Restnutzungsdauer regelmäßig höher '
-      + 'aus, und mit ihr der Gebäudesachwert.');
-  }
-  if (_angaben === 0 && mp === 0) {
-    /* Punkte „0" ohne eine einzige Antwort ist kein Befund, sondern ein
-       Vorgabewert — hier gilt weiter die Schaetzung. */
-    return erg('geschaetzt', 'kein_modernisierungsgrad', fallback,
-      SCHAETZUNG_TEXT + ' Es wurde kein Modernisierungsgrad erfasst (0 Punkte '
-      + 'ohne Angabe zu den Bauteilen).');
-  }
+  /* ══ v2541 · OHNE PUNKTE: ANLAGE 2 MIT 0 PUNKTEN (Marcel 20.10.2026) ════
+     Bis v2540 rechneten die Faelle „kein Modernisierungsgrad" und „Punkte
+     nicht berechnet" die RND LINEAR (GND - Alter). Das Wertpotenzial rechnete
+     im Zielbild dagegen nach Anlage 2 mit 0 + Massnahmenpunkten - ein Teil des
+     Potenzials entstand nur aus dem Methodenwechsel (gemessen Demo-MFH, Baujahr
+     1962: Bestand 16 J. linear, Anlage 2 mit 0 Punkten 18 J., +20.000 EUR
+     scheinbares Potenzial; „Ist ueber Band" +45.000 EUR).
+     Anlage 2 ImmoWertV fuehrt 0 Punkte ausdruecklich als „nicht modernisiert";
+     die Liegenschaftszinssaetze (Bielefeld MFH: RND der Stichprobe 24 +- 11 J.)
+     sind mit der nach Anlage 2 bestimmten RND abgeleitet - § 10 Modellkonformitaet.
+     Entscheidung: ohne Angabe gilt Anlage 2 mit 0 Punkten, in JEDER Stufe und
+     jedem Verfahren, mit Hinweis, dass Punkte die RND erhoehen koennen. */
+  const _ohnePunkte = _mpAngabe == null || (_angaben === 0 && _mpAngabe === 0);
+  const mp = _ohnePunkte ? 0 : _mpAngabe;
+  const _ohneText = !_ohnePunkte ? ''
+    : (_mpAngabe == null && _angaben > 0
+      ? ' Für ' + _angaben + ' der acht Bauteile liegt eine Angabe vor, die Modernisierungspunkte sind aber nicht hinterlegt (Objekt im Reiter Objekt öffnen und speichern); angesetzt sind 0 Punkte („nicht modernisiert").'
+      : ' Es wurde kein Modernisierungsgrad erfasst; angesetzt sind 0 Punkte („nicht modernisiert"). Mit eingetragenen Modernisierungen fällt die Restnutzungsdauer höher aus.');
   const kern = /kernsaniert/i.test(String(ref.modernization || '')) && mp >= 18;
   const bj = kern && _num(ref.modernization_year) > 1500
     ? _num(ref.modernization_year) : _num(ref.build_year);
@@ -133,7 +131,7 @@ export function restnutzungsdauerEinheitlich(ref = {}, gnd = GND_JAHRE_STANDARD)
      verweigert (Alter >= GND), ist das der haeufigste Fall, und der
      Leser des Berichts hat ein Recht auf die Begruendung. */
   if (!(a2 && a2.rnd != null)) {
-    const _g = (a2 && a2.grund) || 'anlage2_ohne_ergebnis';
+    const _g = (a2 && a2.grund) || (_ohnePunkte ? 'kein_modernisierungsgrad' : 'anlage2_ohne_ergebnis');
     const _h = (a2 && a2.hinweis)
       ? SCHAETZUNG_TEXT + ' ' + a2.hinweis
       : SCHAETZUNG_TEXT + ' Die Berechnung nach Anlage 2 lieferte kein Ergebnis.';
@@ -183,10 +181,10 @@ export function restnutzungsdauerEinheitlich(ref = {}, gnd = GND_JAHRE_STANDARD)
      > ist. Dieselbe Klammer fuehrt `schaetzung()`. */
   const _mitBoden = Math.min(GND - RND_MIN, Math.max(a2.rnd, RND_MIN));
   const _gebodet = Math.abs(_mitBoden - a2.rnd) > 1e-9;
-  return erg('anlage2', null, _mitBoden,
+  return erg('anlage2', _ohnePunkte ? 'ohne_punkte_null' : null, _mitBoden,
     'Restnutzungsdauer nach Anlage 2 ImmoWertV bei einer Gesamtnutzungsdauer von '
     + GND + ' Jahren, aus ' + mp + ' Modernisierungspunkten'
-    + (kern ? ' (Kernsanierung)' : '') + '.'
+    + (kern ? ' (Kernsanierung)' : '') + '.' + _ohneText
     + (_gebodet ? ' Das Modell ergibt ' + a2.rnd + ' Jahre; angesetzt ist die '
         + 'Untergrenze von ' + RND_MIN + ' Jahren.' : ''));
 }

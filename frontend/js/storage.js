@@ -149,7 +149,7 @@ var FIELDS = [
   // V23: Mietentwicklung Detail-Modus
   'mietspiegel','me_modus','me_soll','me_anz','me_int','me_pct',
   /* v2430 · Mieterhoehung und Zielbild am Objekt (ETW/EFH/ZFH; beim MFH je Wohnung in _mfh) */
-  'zb_soll_qm','zb_soll_ab','zb_vgl_qm','zb_ziel_qm','zb_ziel_wann','zb_massnahmen',
+  'zb_soll_qm','zb_soll_ab','zb_vgl_qm','zb_ziel_qm','zb_ziel_wann','zb_massnahmen','zb_fertig_jahr',   /* v2541 */
   /* v2087 · Mietvertrag auf OBJEKTEBENE (Backlog N60.8-alt).
      Dieselben Namen wie in `_mfh.einheiten[]` - derselbe Begriff soll
      nicht zweimal anders heissen. Ohne diesen Eintrag waeren die drei
@@ -542,7 +542,7 @@ function loadData(d) {
     'ueberf_restschuld', 'ueberf_rest_zins',
     'ueberf_ende', '_ueberf_link',
     /* v2430: sonst erbt Objekt B Soll-Miete, Zielbild und Massnahmen von A */
-    'zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen'
+    'zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen', 'zb_fertig_jahr'
   ].concat(WM_FIELDS);  /* v1136-WMTAB-1: dieselbe Falle, siehe Kommentar an WM_FIELDS */
   resetFields.forEach(function(id) {
     var e = document.getElementById(id);

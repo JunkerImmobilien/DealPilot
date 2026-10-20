@@ -4358,7 +4358,7 @@ async function exportPdf(out) {
       const _bandT = _mbd ? (' Band der Marktüblichkeit ' + _z2(_mbd.unten_qm) + '–' + _z2(_mbd.oben_qm) + ' €/m² ('
         + [_mbd.amtlich_qm != null ? 'amtliche Vergleichsmiete ' + _qm(_mbd.amtlich_qm) : null,
            _mbd.angebot_qm != null ? 'Angebotsmiete ' + _qm(_mbd.angebot_qm) : null].filter(Boolean).join(', ')
-        + '; untere Kante × 0,7, obere × 1,3)'
+        + '; untere Kante × 0,7, obere × ' + (_mbd.faktor_oben ? String(_mbd.faktor_oben).replace('.', ',') : '1,3') + ')'   /* v2541: Faktor aus dem Bericht, alte Berichte 1,3 */
         /* v2540 · je Wohnung geprueft (CrossCheckService miete_band.je_wohnung): die Wohnungen nennen,
            die an eine Kante gehen - nicht den Hausdurchschnitt „liegt im Band" */
         + (_mbd.je_wohnung ? ': geprüft je Wohnung (ImmoWertA 31.2). '

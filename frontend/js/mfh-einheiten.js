@@ -360,6 +360,10 @@
         + '<div style="margin:8px 0 0 21px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">Kosten der Aufteilung '
         + '<input class="mfh-in mfh-md" id="mfh-auftk" inputmode="decimal" style="width:120px" value="' + esc(_auftK == null ? '' : String(_auftK)) + '" placeholder="' + (((window.DpPotenzial && window.DpPotenzial.AUFTEILUNG_JE_WE) || 1800) * Math.max(1, _arbeit.filter(function (x) { return x.art !== 'gewerbe'; }).length)).toLocaleString('de-DE') + ' (Vorbelegung)"> €'
         + '<span style="font-size:11.5px;color:#8A8272">Notar, Grundbuch, Teilungserklärung, Abgeschlossenheit · leer = Vorbelegung 1.800 € je Wohnung · schon aufgeteilt: 0</span></div></div>'
+      /* v2541 · Jahr, in dem das Zielbild erreicht ist - dasselbe Feld wie im Reiter Objekt (zb_fertig_jahr) */
+      + '<div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">Zielbild fertig (Jahr) '
+        + '<input class="mfh-in mfh-md" id="mfh-zbjahr" inputmode="numeric" maxlength="4" style="width:80px" value="' + esc((el('zb_fertig_jahr') && el('zb_fertig_jahr').value) || '') + '" placeholder="z. B. 2028">'
+        + '<span style="font-size:11.5px;color:#8A8272">für Pilot-Analyse und PDF · leer = offen</span></div>'
       + '<div class="cf-hint" style="margin-top:8px">Gebäudepunkte: <b id="mfh-geb-p">—</b> von 20 (Anlage 2). Dach, Außenwand, Leitungen und Heizung kann eine einzelne Wohnung nicht abweichend haben.</div>';
   }
 
@@ -1100,7 +1104,9 @@
       '<button type="button" id="mfh-ok" class="btn btn-outline btn-sm">Speichern</button>' +
       '<button type="button" id="mfh-weiter" class="btn btn-sm mfh-haupt">Weiter ›</button></div></div>';
     document.body.appendChild(m);
-    m.addEventListener('input', function (ev) { var t = ev.target; if (t.id === 'mfh-auftk') { _auftK = String(t.value || '').trim() === '' ? null : t.value; return; } if (t.dataset && t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme(); punkteZeigen(); } });
+    m.addEventListener('input', function (ev) { var t = ev.target; if (t.id === 'mfh-auftk') { _auftK = String(t.value || '').trim() === '' ? null : t.value; return; }
+      /* v2541 · Spiegel auf das Feld im Reiter Objekt (gespeichert ueber storage.js) */
+      if (t.id === 'mfh-zbjahr') { var _zj = el('zb_fertig_jahr'); if (_zj) { _zj.value = String(t.value || '').replace(/[^0-9]/g, '').slice(0, 4); try { _zj.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {} } return; } if (t.dataset && t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme(); punkteZeigen(); } });
     m.addEventListener('change', function (ev) {
       var t = ev.target; if (t.tagName !== 'SELECT') return;
       if (t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme();

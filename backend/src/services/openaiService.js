@@ -60,15 +60,31 @@ function _potenzialBlock(pz) {
   if (pz.kappung && pz.kappung.text) z.push(pz.kappung.text);
   var st = pz.stufen || {};
   z.push('');
-  z.push('Stufe | Kaltmiete/Monat | Kaltmiete/Jahr | Massnahmenkosten | Modernisierungspunkte plus | Bruttomietrendite | DSCR | Restnutzungsdauer | Miete im Ertragswert/Jahr (Anhebung gegen Bestand) | Ertragswert');
+  /* v2541 · Jahr je Stufe und beide Marktpreisindikationen (Marcel 20.10.2026) */
+  z.push('Stufe | Jahr | Kaltmiete/Monat | Kaltmiete/Jahr | Massnahmenkosten | Modernisierungspunkte plus | Bruttomietrendite | DSCR | Restnutzungsdauer | Miete im Ertragswert/Jahr (Anhebung gegen Bestand) | Ertragswert | Marktpreisindikation (Angebote) | Rohertragsfaktor x Miete');
   ['bestand', 'mieterhoehung', 'zielbild'].forEach(function (k) {
     var x = st[k]; if (!x) return;
-    z.push(k + ' | ' + e(x.kaltmiete_monat) + ' | ' + e(x.kaltmiete_jahr) + ' | ' + e(x.kosten) + ' | ' + (x.punkte_plus || 0)
+    z.push(k + ' | ' + (x.jahr ? x.jahr : (k === 'zielbild' ? 'offen' : '-')) + ' | ' + e(x.kaltmiete_monat) + ' | ' + e(x.kaltmiete_jahr) + ' | ' + e(x.kosten) + ' | ' + (x.punkte_plus || 0)
       + ' | ' + (x.bmy != null ? x.bmy + ' %' : '-') + ' | ' + (x.dscr != null ? x.dscr : '-')
       + ' | ' + (x.rnd != null ? Math.round(x.rnd) + ' J.' : '-')
       + ' | ' + (x.rohertrag_ertragswert != null ? e(x.rohertrag_ertragswert) + (x.anhebung_ertragswert ? ' (+' + e(x.anhebung_ertragswert) + ')' : '') : '-')   /* v2488 */
-      + ' | ' + (x.ertragswert != null ? e(x.ertragswert) : 'nicht gerechnet'));
+      + ' | ' + (x.ertragswert != null ? e(x.ertragswert) : 'nicht gerechnet')
+      + ' | ' + (x.marktpreisindikation_angebote != null ? e(x.marktpreisindikation_angebote) : '-')
+      + ' | ' + (x.rohertragsfaktor_x_miete != null ? e(x.rohertragsfaktor_x_miete) : '-'));
   });
+  /* v2541 · die Jahre: woher sie kommen, und was „offen" heisst */
+  if (pz.jahre) z.push('Jahre: Bestand ab Kaufdatum' + (pz.jahre.ankauf ? ' ' + pz.jahre.ankauf : ' (nicht eingetragen)')
+    + (pz.jahre.mieterhoehung ? ', Mieterhoehung ab ' + pz.jahre.mieterhoehung + ' (' + (pz.jahre.mieterhoehung_herkunft || '') + ')' : '')
+    + ', Zielbild ' + (pz.jahre.zielbild ? pz.jahre.zielbild + ' (Angabe des Nutzers)' : 'ohne Jahr (offen) - dann kein Jahr erfinden, sondern sagen, dass es offen ist') + '.'
+    + ' Nenne zu jeder Stufe, fuer welches Jahr sie gilt.');
+  if (pz.marktpreisindikation && !pz.ertragswert_gesperrt) {
+    var M = pz.marktpreisindikation;
+    if (M.angebote && M.angebote.verfuegbar) z.push('Marktpreisindikation (Angebote): ' + (M.angebote.hinweis || '')
+      + (M.angebote.abschlag_pct != null ? ' Abschlag auf Angebotspreise ' + M.angebote.abschlag_pct + ' %.' : '')
+      + ' Stelle sie dem Ertragswert gegenueber (beides nennen, Abweichung einordnen), ohne eine der beiden Zahlen als Verkehrswert zu bezeichnen.');
+    if (M.rohertragsfaktor && M.rohertragsfaktor.verfuegbar) z.push('Rohertragsfaktor ' + M.rohertragsfaktor.faktor + ' des '
+      + String(M.rohertragsfaktor.ausschuss || 'Gutachterausschusses').replace(/^Der\s+/, '') + ' x Jahresnettokaltmiete der Stufe: Durchschnitt aus Kauffaellen, eine Gegenprobe.');
+  }
   /* v2488 · warum die Miete im Ertragswert von der Kaltmiete abweicht (Band, Leerstand) */
   if (pz.ertragswert_basis && !pz.ertragswert_gesperrt) z.push('Miete im Ertragswert: ' + pz.ertragswert_basis
     + ' Weicht sie von der Kaltmiete ab, so erklaeren; die Anhebung ist der Mehrertrag, auf dem der Wertzuwachs der Stufe beruht.');
@@ -90,6 +106,12 @@ function _potenzialBlock(pz) {
         : 'Potenzial nach Kosten gegen Haus als Ganzes ' + e(y.potenzial)));
     });
     if (a.negativ_hinweis) z.push('  Begruendung (so wiedergeben, keinen Minusbetrag als Potenzial nennen): ' + a.negativ_hinweis);
+    /* v2541 · dieselben Wohnungen nach Angebotspreisen fuer Eigentumswohnungen (nur nach dem Abruf „Marktpreise") */
+    var me = a.marktpreisindikation_etw;
+    if (me && me.summe_bestand != null) z.push('  Nach Angebotspreisen fuer Eigentumswohnungen am Ort (Median ' + (me.median_qm != null ? me.median_qm + ' EUR/m2' : '-')
+      + (me.stichprobe ? ', ' + me.stichprobe + ' Angebote' : '') + '): Summe heute ' + e(me.summe_bestand)
+      + (me.summe_zielbild != null ? ', im Zielbild ' + e(me.summe_zielbild) : '')
+      + '. Wohnungseigentum wird am Markt regelmaessig ueber Vergleichspreise gehandelt - diese Summe neben die Ertragswert-Summe stellen und den Unterschied erklaeren.');
   }
   if (Array.isArray(pz.wohnungen) && pz.wohnungen.length > 1) {
     z.push('');

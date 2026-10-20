@@ -168,11 +168,15 @@ export const IrwConnector = {
       const st = verf && text(verf.properties && verf.properties.STATUS);
       return {
         verfuegbar: false,
-        grund: st ? 'nicht_beschlossen' : 'kein_treffer',
+        /* v2541 · Status „Richtwerte verfuegbar" heisst: beschlossen, aber hier kein Richtwert
+           fuer diese Objektart - der Text sagte das Gegenteil (Pruefbericht 20.10.2026) */
+        grund: st && !/verf(ue|ü)gbar/i.test(st) ? 'nicht_beschlossen' : 'kein_treffer',
         status: st,
         gemeinde: verf && text(verf.properties && verf.properties.GENA),
         ags: verf && text(verf.properties && verf.properties.GESL),
-        hinweis: st
+        hinweis: st && /verf(ue|ü)gbar/i.test(st)
+          ? `Für ${(verf && text(verf.properties.GENA)) || 'diese Gemeinde'} liegen Immobilienrichtwerte vor, an dieser Stelle aber keiner für diese Objektart. Der Vergleichswert stützt sich daher auf Angebotspreise.`
+          : st
           ? `Für ${(verf && text(verf.properties.GENA)) || 'diese Gemeinde'} hat der Gutachterausschuss `
             + `noch keine Immobilienrichtwerte beschlossen (${st}). Der Vergleichswert stützt sich `
             + 'daher weiterhin auf Angebotspreise.'

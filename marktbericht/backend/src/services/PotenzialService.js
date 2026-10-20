@@ -26,6 +26,39 @@ import { ErtragswertService } from './ErtragswertService.js';
 import { WertParameterService } from './WertParameterService.js';
 import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js';
 import { mieteNachBand } from './CrossCheckService.js';   /* v2488 · dieselbe Bandregel wie der Bestand */
+import { ValuationService } from './ValuationService.js';         /* v2541 */
+import { MarketAnalysisService } from './MarketAnalysisService.js';   /* v2541 */
+
+/* ══ v2541 · MARKTPREISINDIKATION JE STUFE UND JE WOHNUNG ═════════════════════
+   Marcel 20.10.2026: „dann kann man den Ertragswert sehen, aber auch die
+   Marktpreisindikationen" — Entscheidung: beide Wege nebeneinander.
+   (1) Angebote: derselbe Kern wie der Bericht (ValuationService.compute, Median
+       der Angebotspreise × Fläche × Objektfaktoren, Abschlag auf Angebotspreise).
+       Bestand = die Indikation des Berichts. Mieterhöhung = dieselbe Zahl (die
+       Angebotspreise hängen nicht an der Miete - so ausgewiesen). Zielbild =
+       derselbe Kern mit Zustand „modernisiert" und Modernisierung im Stichtagsjahr;
+       ein bOM-Kostenabzug entfällt dort (die Maßnahmen stehen als Kosten daneben).
+   (2) Rohertragsfaktor × Jahresmiete der Stufe: nur wo der Ausschuss für das
+       Segment einen Rohertragsfaktor veröffentlicht (Register), sonst kein Wert
+       und der Satz, warum (Wo die Quelle endet, endet die Rechnung).
+   Je Wohnung (nur mit Aufteilung): Angebote für WOHNUNGEN am Ort (eigener Abruf
+   je Flächenklasse, Segment „Wohnung") × Fläche der Wohnung, derselbe Kern. */
+const rundeMpi = (v) => (v == null ? null : Math.round(v / (v >= 500000 ? 5000 : v >= 100000 ? 1000 : 500)) * (v >= 500000 ? 5000 : v >= 100000 ? 1000 : 500));
+function mpiAngebote(wb, refAenderung) {
+  try {
+    if (!wb || !wb.sale || !(Number(wb.sale.median_per_sqm) > 0)) return null;
+    const ref = Object.assign({}, wb.ref || {}, refAenderung || {});
+    const v = ValuationService.compute(ref, wb.sale, wb.rent, wb.land_value_roh || null);
+    const mv = v && v.market_value;
+    if (!mv || mv.estimated == null) return null;
+    return { wert: mv.estimated, low: mv.low ?? null, high: mv.high ?? null,
+             abschlag_pct: mv.angebot_abschlag ? mv.angebot_abschlag.pct : null,
+             abschlag_herkunft: mv.angebot_abschlag ? mv.angebot_abschlag.herkunft : null,
+             median_qm: mv.basis_median_sqm ?? null, gegenprobe: v.amtliche_gegenprobe || null };
+  } catch (e) { return null; }
+}
+const ZIELBILD_REF = () => ({ condition: 'modernisiert', modernization: 'umfassend modernisiert',
+  modernization_year: new Date().getFullYear(), bom_eur: null, bom_grund: null });
 
 export const KENNZEICHNUNG = 'Potenzialwert nach Mieterhöhung bzw. Zielbild, keine Verkehrswertermittlung.';
 const STUFEN = ['mieterhoehung', 'zielbild'];
@@ -130,7 +163,7 @@ function bestandsBasis(basis, wl) {
       qm = markt; herkunft = 'leer_marktueblich';
     }
     if (!(qm > 0)) return null;
-    return { wfl, ist, ist_qm: istQm, qm, herkunft, roh: qm * wfl * 12,
+    return { wfl, ist, ist_qm: istQm, qm, herkunft, roh: herkunft === 'ist_im_band' ? ist : qm * wfl * 12,   /* v2541 · im Band die Vertragsmiete */
              kappe: band && band.oben_qm > 0 ? band.oben_qm * wfl * 12 : Infinity };
   });
   const summeRoh = zeilen.reduce((a, z) => a + (z ? z.roh : 0), 0);
@@ -333,6 +366,39 @@ export const PotenzialService = {
         out.haus[v.key] = z;
       }
     }
+    /* ── v2541 · Marktpreisindikation je Stufe (zwei Wege, s. o.) ─────────── */
+    {
+      const V = wb.valuation || null;
+      const mvB = (V && V.market_value && V.market_value.estimated != null)
+        ? { wert: V.market_value.estimated, low: V.market_value.low ?? null, high: V.market_value.high ?? null,
+            abschlag_pct: V.market_value.angebot_abschlag ? V.market_value.angebot_abschlag.pct : null,
+            abschlag_herkunft: V.market_value.angebot_abschlag ? V.market_value.angebot_abschlag.herkunft : null,
+            median_qm: V.market_value.basis_median_sqm ?? null }
+        : mpiAngebote(wb, null);
+      const mvZ = out.haus.zielbild ? mpiAngebote(wb, ZIELBILD_REF()) : null;
+      const gp = V && V.amtliche_gegenprobe;
+      const rf = gp && Number(gp.rohertragsfaktor) > 0 ? Number(gp.rohertragsfaktor) : null;
+      const mieteStufe = { bestand: (!ref.vacancy && zahl(ref.monthly_net_rent) > 0) ? zahl(ref.monthly_net_rent) * 12 : null };
+      for (const v of varianten) if (v && STUFEN.indexOf(v.key) >= 0) mieteStufe[v.key] = zahl(v.miete_wohnen_jahr);
+      out.mpi = {
+        angebote: mvB ? { verfuegbar: true, abschlag_pct: mvB.abschlag_pct, abschlag_herkunft: mvB.abschlag_herkunft, median_qm: mvB.median_qm,
+          hinweis: 'Angebotspreise am Ort × Wohnfläche × Objektfaktoren, abzüglich Abschlag auf Angebotspreise (§ 25 ImmoWertV verlangt Kaufpreise). '
+            + 'Mieterhöhung wie Bestand: die Angebotspreise hängen nicht an der Miete. Zielbild mit Zustand „modernisiert".' }
+          : { verfuegbar: false, grund: 'Für diesen Ort liegen keine Angebotspreise vor.' },
+        rohertragsfaktor: rf ? { verfuegbar: true, faktor: rf, ausschuss: gp.ausschuss || null, quelle_url: gp.quelle_url || null,
+          berichtsjahr: gp.berichtsjahr || null, seite: gp.seite || null,
+          hinweis: 'Rohertragsfaktor des Gutachterausschusses × Jahresnettokaltmiete der Stufe — Durchschnitt aus Kauffällen, eine Gegenprobe, kein Verkehrswert.' }
+          : { verfuegbar: false, grund: 'Der Gutachterausschuss veröffentlicht für dieses Segment keinen Rohertragsfaktor (oder er liegt nicht im Register).' },
+      };
+      for (const s of ['bestand'].concat(STUFEN)) {
+        const h = out.haus[s]; if (!h) continue;
+        const a = s === 'zielbild' ? mvZ : mvB;
+        h.mpi_angebote = a ? a.wert : null;
+        h.mpi_angebote_spanne = a && a.low != null ? [a.low, a.high] : null;
+        h.mpi_rohertrag = rf && mieteStufe[s] > 0 ? { faktor: rf, miete_jahr: Math.round(mieteStufe[s]), wert: rundeMpi(rf * mieteStufe[s]) } : null;
+      }
+    }
+
     if (bb) {
       const leer = bb.zeilen.filter((z) => z && z.herkunft === 'leer_marktueblich').length;
       out.basis.bestandsbasis = {
@@ -415,6 +481,39 @@ export const PotenzialService = {
                nicht als Zahl, sondern mit seiner Erklaerung */
             negativ: pot < 0, unter_haus: Math.round(summe) < Math.round(out.haus[s].wert) };
         }
+        /* v2541 · je Wohnung: Marktpreisindikation als Eigentumswohnung aus den
+           Angeboten für WOHNUNGEN am Ort (Segment „Wohnung", eigener Abruf je
+           Flächenklasse, gecacht), derselbe Kern wie der Bericht einer ETW. */
+        /* v2542 · nur im abgerechneten Abruf „Marktpreise" (auftrag.markt) - jeder Abruf
+           je Flaechenklasse ist ein Marktdaten-Aufruf (Marcel 20.10.2026: „kostet Guthaben") */
+        if (auftrag.markt === true) try {
+          const cache = {};
+          const mit = (p, ms) => Promise.race([p, new Promise((ok) => setTimeout(() => ok(null), ms))]);
+          let summeB = 0, summeZ = 0, vollB = true, vollZ = true, median = null, n = null;
+          for (let i = 0; i < out.wohnungen.length; i++) {
+            const r = out.wohnungen[i];
+            if (r.art === 'gewerbe') continue;
+            const fl = Math.round(Number(r.wfl));
+            const refW = { property_type: 'etw', living_area: fl, units: 1, plot_area: null, garden_area: null,
+              garages: 0, outdoor_parking: 0, purchase_price: null, monthly_net_rent: null, bom_eur: null, bom_grund: null, floor: null, vacancy: false };
+            const key = String(Math.round(fl / 10));
+            if (!(key in cache)) {
+              cache[key] = await mit(MarketAnalysisService.saleLevel(Object.assign({}, ref, refW)).catch(() => null), 20000);
+            }
+            const saleW = cache[key];
+            const wbW = { ref: Object.assign({}, ref, refW), sale: saleW, rent: wb.rent, land_value_roh: null };
+            const b = mpiAngebote(wbW, null);
+            const z = out.haus.zielbild ? mpiAngebote(wbW, ZIELBILD_REF()) : null;
+            r.mpi_etw = { bestand: b ? b.wert : null, zielbild: z ? z.wert : null,
+              median_qm: b ? b.median_qm : null, abschlag_pct: b ? b.abschlag_pct : null,
+              stichprobe: saleW ? (saleW.sample_size ?? null) : null };
+            if (b) { summeB += b.wert; median = median || b.median_qm; n = n || (saleW && saleW.sample_size); } else vollB = false;
+            if (out.haus.zielbild) { if (z) summeZ += z.wert; else vollZ = false; }
+          }
+          aOut.mpi_etw = { summe_bestand: vollB ? Math.round(summeB) : null, summe_zielbild: out.haus.zielbild && vollZ ? Math.round(summeZ) : null,
+            median_qm: median, stichprobe: n,
+            hinweis: 'Je Wohnung: Angebotspreise für Eigentumswohnungen am Ort × Wohnfläche, Objektfaktoren und Abschlag auf Angebotspreise wie im Bericht; Zielbild mit Zustand „modernisiert".' };
+        } catch (e) { aOut.mpi_etw = { fehler: 'Marktpreisindikation je Wohnung nicht verfügbar' }; }
         const neg = Object.keys(aOut.je_stufe).filter((s) => aOut.je_stufe[s].negativ);
         if (neg.length) aOut.negativ_hinweis = negativHinweis(aOut, out, neg);
         aOut.hinweis = 'Jede Wohnung als Eigentumswohnung mit dem Liegenschaftszins für Wohnungseigentum und ihrem Bodenwertanteil'

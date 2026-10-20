@@ -291,6 +291,15 @@ export const ErtragswertService = {
        Liegen sie vor, ersetzen sie die Stueckrechnung Anzahl x Miete - beides waere doppelt. */
     const zusatz = pos(ein.zusatz_jahr) || 0;
     const stellplatz = zusatz > 0 ? round0(zusatz) : round0(spAnz * spMiete * 12);
+    /* v2541 · STELLPLAETZE OHNE MIETE (Marcel 20.10.2026): ohne eingetragene
+       Stellplatzmiete und ohne Zusatzeinnahmen weder Ertrag noch Kosten fuer die
+       Stellplaetze - wo die Quelle endet, endet die Rechnung. Bis v2540 standen
+       Verwaltung und Instandhaltung im Abzug, der Ertrag fehlte (Westerfeld: 2
+       Stellplaetze, 312 EUR/Jahr Kosten ohne Ertrag, rund -6.900 EUR Ertragswert). */
+    const _spOhneErtrag = spAnz > 0 && !(stellplatz > 0);
+    const spKosten = _spOhneErtrag ? 0 : spAnz;
+    if (_spOhneErtrag) out.hinweise.push(spAnz + ' Stellpl' + (spAnz === 1 ? 'atz' : 'ätze') + ' ohne eingetragene Miete: '
+      + 'weder Ertrag noch Bewirtschaftungskosten angesetzt. Die Stellplatzmiete (€/Monat) im Reiter Objekt eintragen, dann rechnet der Ertragswert beides.');
     const sonstige = pos(ein.sonstige_jahr) || 0;
 
     if (!mieteMarkt && !gewerbe) {
@@ -398,8 +407,8 @@ export const ErtragswertService = {
       if (String(ein.modellversion || '') === 'agvga_nrw_2016') {
         _nrw = nrwBwk({
           rohertrag_eur: rohertrag, wohnflaeche_qm: wfl, ist_eigentumswohnung: _istWhg,
-          wohneinheiten: we, garagen: pos(ein.garagen_anz) || 0,
-          stellplaetze: pos(ein.aussen_anz) || 0,
+          wohneinheiten: we, garagen: _spOhneErtrag ? 0 : (pos(ein.garagen_anz) || 0),   /* v2541 */
+          stellplaetze: _spOhneErtrag ? 0 : (pos(ein.aussen_anz) || 0),
           stichtag_jahr: ein.stichtag_jahr,
         });
       }
@@ -459,7 +468,7 @@ export const ErtragswertService = {
         .filter((x) => x <= (Number(ein.stichtag_jahr) || new Date().getFullYear()) && BWK_JAHRE[x].gew_verw_pct != null).pop();
       const _gewVerwPct = _gewJahr != null ? BWK_JAHRE[_gewJahr].gew_verw_pct : 3;
       const verwGewerbe = gewerbe > 0 ? round0(gewerbe * _gewVerwPct / 100) : 0;
-      const verwaltung = round0(we * vJeWe + spAnz * vJeStp) + verwGewerbe;
+      const verwaltung = round0(we * vJeWe + spKosten * vJeStp) + verwGewerbe;   /* v2541: spKosten */
       /* v2210 · Instandhaltung der Gewerbeflaechen je m2 NUTZflaeche, nach
          Nutzungsart (Anlage 3: Buero/Praxen/Geschaefte 100 %, SB-Markt 50 %,
          Lager/Logistik 30 % der Wohn-Instandhaltung), zum Stichtag aus BWK_JAHRE.
@@ -475,7 +484,7 @@ export const ErtragswertService = {
         });
       }
       instGewerbe = round0(instGewerbe);
-      const instand = round0(wfl * iJeQm + spAnz * iJeStp) + instGewerbe;
+      const instand = round0(wfl * iJeQm + spKosten * iJeStp) + instGewerbe;   /* v2541: spKosten */
       /* getrennt exakt rechnen, nicht ueber den gerundeten Mischsatz (1.079 statt 1.080 EUR) */
       const mietausfall = _maGetrennt
         ? round0((rohertrag - gewerbe) * _maGetrennt.wohnen / 100 + gewerbe * _maGetrennt.gewerbe / 100)
@@ -493,12 +502,12 @@ export const ErtragswertService = {
 
       bwkDetail.push({
         pos: `Verwaltungskosten (${we} WE × ${vJeWe} €`
-             + (spAnz ? ` + ${spAnz} Stellpl. × ${vJeStp} €` : '')
+             + (spKosten ? ` + ${spKosten} Stellpl. × ${vJeStp} €` : '')
              + (verwGewerbe ? ` + Gewerbe ${_gewVerwPct} % vom Rohertrag` : '')
              + ')',
         wert: verwaltung });
       bwkDetail.push({ pos: `Instandhaltung (${wfl} m² × ${deZahl(iJeQm)} €`
-             + (spAnz ? ` + ${spAnz} Stellpl. × ${deZahl(iJeStp)} €` : '')   /* v2382 */
+             + (spKosten ? ` + ${spKosten} Stellpl. × ${deZahl(iJeStp)} €` : '')   /* v2382, v2541 */
              + (instGewerbe > 0 ? ` + Gewerbe ${_instGewTeile.join(' + ')}` : '') + ')',   /* v2210 */
         detail: iHerkunft === 'Anlage 3' ? null : 'aus deiner Rücklage',
         wert: instand });
