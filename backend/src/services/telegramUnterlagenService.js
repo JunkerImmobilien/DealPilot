@@ -470,5 +470,5 @@ async function weiter(ctx, text) {
 module.exports = {
   MODUS, erkenne, artenIm, start, weiter, aktiv,
   /* für die Prüfstrecke */
-  uebersicht, block, empfaengerVon, kopienVon, zuNachrichten, objektLesen
+  uebersicht, block, empfaengerVon, kopienVon, zuNachrichten, objektLesen, suchen
 };

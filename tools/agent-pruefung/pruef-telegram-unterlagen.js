@@ -154,6 +154,18 @@ U.amtHolen = async function () { amtHolenGerufen++; return { gefunden: false, gr
   const fehlend = U.ARTEN.filter((a) => !aemter[a.id]).length;
   pruefe('Suche nur für fehlende (' + fehlend + ')', amtHolenGerufen - vorher === fehlend);
 
+  /* v2472 · Die Suche an einer Gemeinde ohne hinterlegte Ämter — sonst
+     bliebe der Zweig ungeprüft, sobald das Prüfobjekt vollständig ist. */
+  gesagt.length = 0;
+  const v0 = amtHolenGerufen;
+  const fremdO = { id: null, adresse: 'Prüfweg 1, 99999 Prüfhausen',
+    objekt: { strasse: 'Prüfweg 1', plz: '99999', ort: 'Prüfhausen' } };
+  await T.suchen(Object.assign({}, ctx, { setze: async () => {}, merkeObjekt: async () => {} }), fremdO, U.ARTEN.map((a) => a.id));
+  const sg = gesagt.map((g) => g.t).join('\n');
+  pruefe('Suche ohne Ämter: ' + U.ARTEN.length + '× gestellte Recherche', amtHolenGerufen - v0 === U.ARTEN.length, String(amtHolenGerufen - v0));
+  pruefe('Suche: kündigt Dauer an und meldet „Nicht gefunden"', /dauert je Amt/.test(sg) && /Nicht gefunden/.test(sg));
+  pruefe('Suche: danach die Übersicht mit „suche alle"', /suche alle/.test(sg));
+
   pruefe('Fremde Frage verlässt den Zustand', (await T.weiter(ctx, 'wie ist der DSCR?')) === false && ctx.z.modus === null);
   ctx.z.modus = T.MODUS; ctx.z.entwurf = { schritt: 'wahl', zeit: new Date(Date.now() - 31 * 60000).toISOString() };
   pruefe('Nach 30 Minuten gilt eine Nummer nicht mehr', (await T.weiter(ctx, '1')) === false);
