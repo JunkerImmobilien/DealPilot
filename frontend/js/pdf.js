@@ -3224,10 +3224,24 @@ async function _exportPDFInner() {
     }
     if (_PD) {
       var _pc = function (t) { return String(t == null ? '' : t).replace(/[–—−‑]/g, '-').replace(/[  ]/g, ' ').replace(/[^\x00-\xFF€]/g, '').replace(/\s+/g, ' ').trim(); };
+      /* v2530 · Fließtext seitensicher (wie absatz() der Bankfassung): Umbruch,
+         vor JEDER Zeile Prüfung gegen den Fußbalken (y 285), sonst Fortsetzung
+         mit Kopf/Fuß über newPage() und derselben Schrift - pageTpl() stellt
+         die Schrift um. Gemessen 20.10.2026: die Fußnote lief bis an den Rand. */
+      var _TEXT_UNTEN = 280;
+      var _absatz = function (t, o) {
+        o = o || {};
+        var gr = o.groesse || 8, lh = o.zeile || 4, dy = o.dy || 0, farbe = o.farbe || C.MID;
+        var stil = function () { doc.setFont('helvetica', 'normal'); doc.setFontSize(gr); doc.setTextColor.apply(doc, farbe); };
+        stil();
+        doc.splitTextToSize(_pc(t), CW).forEach(function (z) {
+          if (cy + dy > _TEXT_UNTEN) { cy = newPage('Wertpotenzial · Fortsetzung'); stil(); }
+          doc.text(z, M, cy + dy); cy += lh;
+        });
+      };
       cy = newPage('Wertpotenzial');
       cy = secH(doc, cy, 'Wertpotenzial · Mieterhöhung und Zielbild', M, CW);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.6); doc.setTextColor.apply(doc, C.CH);
-      doc.splitTextToSize(_pc(_PD.satz_invest + ' ' + _PD.satz_bank), CW).forEach(function (t) { doc.text(t, M, cy + 3); cy += 4.4; });
+      _absatz(_PD.satz_invest + ' ' + _PD.satz_bank, { groesse: 8.6, farbe: C.CH, zeile: 4.4, dy: 3 });
       cy += 4;
       var _tab = function (kopf, breiten, zeilen, fettRe) {
         var fak = CW / breiten.reduce(function (a, b) { return a + b; }, 0), rh0 = 5.8;
@@ -3302,16 +3316,18 @@ async function _exportPDFInner() {
           doc.splitTextToSize(_pc(st.t), _gB - 1).slice(0, 2).forEach(function (z, j) { doc.text(z, x + _wB / 2, _by + _bh + 4.5 + j * 3, { align: 'center' }); });
         });
         cy = _by + _bh + 12;
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.MID);
-        doc.text(_pc('Achse beginnt bei ' + _tE(_AX.min) + '. Potenzial netto = Ertragswert ' + (_BR.zielbild != null ? 'Zielbild' : 'nach Mieterhöhung') + ' minus Bestand minus Maßnahmenkosten.'), M, cy);
-        cy += 6;
+        _absatz('Achse beginnt bei ' + _tE(_AX.min) + '. Potenzial netto = Ertragswert ' + (_BR.zielbild != null ? 'Zielbild' : 'nach Mieterhöhung') + ' minus Bestand minus Maßnahmenkosten.', { groesse: 7, zeile: 3.4 });
+        cy += 2.6;
       }
       if (cy > 230) cy = newPage('Wertpotenzial · Fortsetzung');
       _tab(['Kennzahl'].concat(_PD.spalten.map(function (k) { return _PD.titel[k]; })), [58].concat(_PD.spalten.map(function () { return 30; })),
         _PD.kennzahlen.concat(_PD.kaufpreis ? [['Kaufpreis', Math.round(_PD.kaufpreis).toLocaleString('de-DE') + ' \u20ac'].concat(_PD.spalten.slice(1).map(function () { return ''; }))] : []),
         /^Ertragswert|^nach Aufteilung/);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.MID);
-      doc.splitTextToSize(_pc(_PD.fuss), CW).forEach(function (t) { if (cy > 280) cy = newPage('Wertpotenzial · Fortsetzung'); doc.text(t, M, cy); cy += 3.6; });
+      /* v2530 · Fußnote in zwei Absätzen (Aufteilung, dann Kennzeichnung/Grundlagen) */
+      var _fu = String(_PD.fuss || ''), _au = _PD.aufteilung_hinweis ? 'Aufteilung: ' + _PD.aufteilung_hinweis + ' ' : '';
+      cy += 1;
+      if (_au && _fu.indexOf(_au) === 0) { _absatz(_au, { groesse: 7, zeile: 3.4 }); cy += 1.4; _fu = _fu.slice(_au.length); }
+      _absatz(_fu, { groesse: 7, zeile: 3.4 });
     }
   } catch (e) { try { console.warn('[pdf] Wertpotenzial', e); } catch (x) {} }
 
