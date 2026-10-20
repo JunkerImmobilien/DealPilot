@@ -594,7 +594,10 @@
       '.dp-pot th,.dp-pot td{padding:6px 8px;text-align:right;border-bottom:1px solid #E6DCC2;white-space:nowrap}',
       '.dp-pot th:first-child,.dp-pot td:first-child{text-align:left;white-space:normal}',
       '.dp-pot thead th{font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6c6450}',
-      '.dp-pot .c-soll{color:#3d6fa8}.dp-pot .c-ziel{color:#2f7d55}',
+      /* v2543 · Stufenfarben aus der Marke (Marcel 20.10.2026): Bestand Obsidian, Mieterhöhung helles Gold,
+         Zielbild dunkles Gold - als Kante, nie als Schriftfarbe (helles Gold auf Weiß ist nicht lesbar) */
+      '.dp-pot th.c-soll{box-shadow:inset 0 -3px 0 var(--wl-e8cc7a, #E8CC7A)}.dp-pot th.c-ziel{box-shadow:inset 0 -3px 0 var(--wl-b8932f, #b8932f)}',
+      '.dp-pot .c-soll,.dp-pot .c-ziel{color:#1d1a14}',
       '.dp-pot td.c-soll,.dp-pot td.c-ziel{font-weight:600}',
       '.dp-pot .dp-pot-scroll{overflow-x:auto}',
       '.dp-pot .dp-pot-hin{font-size:11.5px;color:#6c6450;margin:8px 0 0}',
@@ -616,7 +619,7 @@
     ].join('');
     document.head.appendChild(s);
   }
-  var LEG = '<div class="dp-pot-leg"><span><i style="background:#8a8272"></i>Ist / Bestand</span><span><i style="background:#3d6fa8"></i>Mieterhöhung · Mieter bleibt</span><span><i style="background:#2f7d55"></i>Zielbild · nach Umbau</span></div>';
+  var LEG = '<div class="dp-pot-leg"><span><i style="background:#2A2727"></i>Ist / Bestand</span><span><i style="background:var(--wl-e8cc7a, #E8CC7A)"></i>Mieterhöhung · Mieter bleibt</span><span><i style="background:#2f7d55"></i>Zielbild · nach Umbau</span></div>';
   function tafelHtml(o) {
     o = o || {};
     stilEinhaengen();
@@ -960,8 +963,26 @@
       '#card-wertpotenzial .dp-wp-k span{font:500 10.5px Inter,system-ui,sans-serif;color:#6B645A;text-transform:uppercase;letter-spacing:.04em}',
       '#card-wertpotenzial .dp-wp-k b{font:700 20px "Space Grotesk",Inter,sans-serif;font-variant-numeric:tabular-nums;color:#2A2727;overflow-wrap:anywhere}',
       '#card-wertpotenzial .dp-wp-k em{font:400 11.5px Inter,sans-serif;font-style:normal;color:#6B645A}',
-      '#card-wertpotenzial .dp-wp-k.soll{border-color:#3d6fa8}#card-wertpotenzial .dp-wp-k.soll b{color:#3d6fa8}',
-      '#card-wertpotenzial .dp-wp-k.ziel{border-color:#2f7d55}#card-wertpotenzial .dp-wp-k.ziel b{color:#2f7d55}',
+      /* v2543 · Kachelkante in der Stufenfarbe der Marke, Zahl in Textfarbe */
+      '#card-wertpotenzial .dp-wp-k.bestand{border-color:#2A2727}',
+      '#card-wertpotenzial .dp-wp-k.soll{border-color:var(--wl-e8cc7a, #E8CC7A)}',
+      '#card-wertpotenzial .dp-wp-k.ziel{border-color:var(--wl-b8932f, #b8932f)}',
+      '#card-wertpotenzial .dp-wp-k.netto b{color:#2f7d55}',
+      /* v2543 · Wertüberleitung (ersetzt die Wertbrücke): Stände als Zeilen mit Summenstrich,
+         Veränderungen als Balken auf einer Skala um null - keine gekürzte Achse */
+      '#card-wertpotenzial table.dp-wp-ueb{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:460px}',
+      '#card-wertpotenzial .dp-wp-ueb td{padding:8px 6px;border-bottom:1px solid #F0ECE4;vertical-align:middle;text-align:left;white-space:normal}',
+      '#card-wertpotenzial .dp-wp-ueb td.l{width:38%;font:500 12.5px Inter,system-ui,sans-serif;color:#2A2727}',
+      '#card-wertpotenzial .dp-wp-ueb td.l small{display:block;font:400 10.5px Inter,sans-serif;color:#8A8272}',
+      '#card-wertpotenzial .dp-wp-ueb td.bar{width:40%}',
+      '#card-wertpotenzial .dp-wp-ueb td.v{width:22%;text-align:right;font:600 13px Inter,sans-serif;white-space:nowrap;color:#2A2727}',
+      '#card-wertpotenzial .dp-wp-ueb tr.summe td{border-top:1.5px solid #2A2727;border-bottom:1px solid #E6DCC2;font-weight:700}',
+      '#card-wertpotenzial .dp-wp-ueb tr.summe td.v{font:700 14px "Space Grotesk",Inter,sans-serif}',
+      '#card-wertpotenzial .dp-wp-ueb tr.netto td{background:#FBF6E9;border-top:2px solid var(--wl-c9a84c, #C9A84C);border-bottom:0}',
+      '#card-wertpotenzial .dp-wp-ueb tr.netto td.v{font:700 16px "Space Grotesk",Inter,sans-serif}',
+      '#card-wertpotenzial .dp-wp-ueb .pos{color:#2f7d55}#card-wertpotenzial .dp-wp-ueb .neg{color:#B8625C}',
+      '#card-wertpotenzial .dp-wp-ueb i.dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:8px;vertical-align:0}',
+      '#card-wertpotenzial .dp-wp-ueb svg{display:block;width:100%;height:18px}',
       '#card-wertpotenzial .dp-wp-k.netto{border-color:var(--wl-c9a84c, #C9A84C)}',
       '#card-wertpotenzial .dp-wp-k.neg b{color:#B8625C}',
       '#card-wertpotenzial svg.dp-wp-br{display:block;width:100%;max-width:860px;height:auto;margin:6px 0 2px}',
@@ -1027,6 +1048,39 @@
       + (br.mieterhoehung != null ? ', nach Mieterhöhung ' + esc(eur(br.mieterhoehung)) : '') + (br.zielbild != null ? ', Zielbild ' + esc(eur(br.zielbild)) : '')
       + ', Maßnahmen ' + esc(eur(br.kosten)) + ', Potenzial netto ' + esc(eur(br.netto)) + '">' + s + '</svg>';
   }
+  /* v2543 · DIE WERTÜBERLEITUNG (Marcel 20.10.2026: Variante B, Farben der Marke).
+     Bis v2542 eine Wertbrücke mit gekürzter Achse (ab 680 T€): +15 T€ sahen aus wie
+     der halbe Bestand, „Potenzial netto" stand als Balken von der Achse bis zum
+     Bestand, ein Schritt von 0 € war ein Strich. Jetzt: Stände als Zeilen mit
+     Summenstrich, Veränderungen als Balken auf einer gemeinsamen Skala um null. */
+  var STUFE_FARBE = { bestand: '#2A2727', soll: 'var(--wl-e8cc7a, #E8CC7A)', ziel: 'var(--wl-b8932f, #b8932f)', kosten: '#C98A84' };
+  function ueberleitungZeilen(br) {
+    var B = br.bestand, Sw = br.mieterhoehung, Zw = br.zielbild, top = br.top, z = [];
+    z.push({ t: 'Ertragswert Bestand', klein: 'Ist-Miete je Wohnung im Band', w: B, art: 'bestand', summe: true });
+    if (Sw != null) z.push({ t: '+ Mieterhöhung', klein: 'Mieter bleibt, § 558 BGB', w: Sw - B, art: 'soll', schritt: true });
+    if (Zw != null) z.push({ t: Sw != null ? '+ Umbau, Wechsel' : '+ Zielbild', klein: 'Zielmiete nach Maßnahmen', w: Zw - (Sw != null ? Sw : B), art: 'ziel', schritt: true });
+    z.push({ t: Zw != null ? 'Ertragswert Zielbild' : 'Ertragswert nach Mieterhöhung', w: top, art: Zw != null ? 'ziel' : 'soll', summe: true });
+    if (br.kosten > 0) z.push({ t: '− Maßnahmenkosten', w: -br.kosten, art: 'kosten', schritt: true });
+    z.push({ t: 'Potenzial netto', klein: (Zw != null ? 'Zielbild' : 'Mieterhöhung') + ' − Bestand − Kosten', w: br.netto, art: 'netto', schritt: true, netto: true });
+    return z;
+  }
+  function ueberleitungHtml(br) {
+    var Z = ueberleitungZeilen(br);
+    var M = Math.max.apply(null, Z.filter(function (z) { return z.schritt; }).map(function (z) { return Math.abs(z.w); }).concat([1])) * 1.08;
+    var bar = function (v, farbe) {
+      if (Math.abs(v) < 500) return '<svg viewBox="0 0 300 18" aria-hidden="true"><line x1="150" x2="150" y1="1" y2="17" stroke="#D9D2C3"/><text x="158" y="13" style="font:500 9.5px \'JetBrains Mono\',monospace;fill:#8A8272">unverändert</text></svg>';
+      var w = Math.abs(v) / M * 146, x = v >= 0 ? 150 : 150 - w;
+      return '<svg viewBox="0 0 300 18" aria-hidden="true"><line x1="150" x2="150" y1="0" y2="18" stroke="#E6DCC2"/><rect x="' + x.toFixed(1) + '" y="3" width="' + w.toFixed(1) + '" height="12" rx="2" style="fill:' + farbe + '"/></svg>';
+    };
+    return '<div class="dp-pot-scroll"><table class="dp-wp-ueb" aria-label="Wertüberleitung: Ertragswert je Stufe und Potenzial netto"><tbody>'
+      + Z.map(function (z) {
+          var farbe = z.netto ? (z.w >= 0 ? '#2f7d55' : '#B8625C') : STUFE_FARBE[z.art];
+          var wert = z.netto ? '<span class="' + (z.w >= 0 ? 'pos' : 'neg') + '">' + (z.w > 0 ? '+ ' : '') + esc(eur(z.w)) + '</span>'
+            : (z.schritt && z.w > 0 ? '+ ' : '') + esc(eur(z.w));
+          return '<tr class="' + (z.summe ? 'summe' : '') + (z.netto ? ' netto' : '') + '"><td class="l">' + (z.netto ? '' : '<i class="dot" style="background:' + farbe + '"></i>') + esc(z.t)
+            + (z.klein ? '<small>' + esc(z.klein) + '</small>' : '') + '</td><td class="bar">' + (z.schritt ? bar(z.w, farbe) : '') + '</td><td class="v">' + wert + '</td></tr>';
+        }).join('') + '</tbody></table></div>';
+  }
   function bewertungHtml(breite) {
     var m = modell(); if (!m.aktiv) return '';
     var d = pdfDaten(); if (!d) return '';
@@ -1047,8 +1101,8 @@
             return '<div class="dp-wp-k ' + k.art + (k.art === 'netto' && k.w < 0 ? ' neg' : '') + '"><span>' + esc(k.t) + '</span><b>' + (k.art === 'netto' && k.w > 0 ? '+' : '') + esc(eur(k.w)) + '</b>'
               + (k.unter ? '<em>' + esc(k.unter) + '</em>' : '') + '</div>';
           }).join('') + '</div>'
-        + '<div class="dp-wp-h">Wertbrücke</div>' + brueckeSvg(d.bruecke, breite)
-        + '<p class="dp-wp-achse">Achse beginnt bei ' + esc(tEur(brueckeAchse(d.bruecke).min)) + ' · Beträge in Tausend Euro, gerundet.</p>';
+        + '<div class="dp-wp-h">Wertüberleitung</div>' + ueberleitungHtml(d.bruecke)
+        + '<p class="dp-wp-achse">Balken: Veränderung gegen die Zeile darüber, gemeinsame Skala um null.</p>';
     }
     html += '<div class="dp-wp-h">Kennzahlen je Stufe</div><div class="dp-pot-scroll"><table><thead><tr><th>Kennzahl</th>'
       + d.spalten.map(function (k) { return '<th class="' + cls[k] + '">' + esc(d.titel[k]) + '</th>'; }).join('') + '</tr></thead><tbody>'
@@ -1383,7 +1437,7 @@
     punkteGewinn: punkteGewinn, sollFuer: sollFuer, umlage559: umlage559,
     modell: modell, rechnen: rechnen, ergebnis: ergebnis, ergebnisVeraltet: ergebnisVeraltet,
     wohnungErgebnis: wohnungErgebnis, kennzahlen: kennzahlen, tafelHtml: tafelHtml, pdfDaten: pdfDaten, pilotPayload: pilotPayload,
-    brueckeDaten: brueckeDaten, brueckeAchse: brueckeAchse, bewertungKarte: bewertungKarte, bewertungHtml: bewertungHtml,
+    brueckeDaten: brueckeDaten, brueckeAchse: brueckeAchse, ueberleitungZeilen: ueberleitungZeilen, STUFE_FARBE: STUFE_FARBE, bewertungKarte: bewertungKarte, bewertungHtml: bewertungHtml,
     sollFuerMietentwicklung: sollFuerMietentwicklung, objektKarte: objektKarte,
     _hash: hash, _auftrag: auftrag
   };

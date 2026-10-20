@@ -1273,32 +1273,41 @@
             return [sauberE(w.we), fmt(w.wfl, 0), sauberE(w.ist), sauberE(w.soll), sauberE(w.ziel), sauberE(w.massnahmen)];
           }), { titel: 'Wertpotenzial' });
       }
-      /* v2462 · Wertbrücke (dieselben Zahlen wie im Tab Bewertung, DpPotenzial.brueckeDaten) */
-      if (PD.bruecke && PZ.brueckeAchse) {
-        platz(70, 'Wertpotenzial', (adr || 'Objekt') + ' · Mieterhöhung und Zielbild');
-        abschnitt('Wertbrücke · Ertragswert je Stufe');
-        var BR = PD.bruecke, AX = PZ.brueckeAchse(BR), bx0 = L + 16, bwB = CW - 16, bh0 = 46, by0 = y + 4;
-        var yB = function (v) { return by0 + bh0 * (1 - (v - AX.min) / ((AX.max - AX.min) || 1)); };
-        var tE = function (n, vz) { return (n < 0 ? '- ' : (vz ? '+ ' : '')) + fmt(Math.abs(n) / 1000, 0) + ' T€'; };
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4);
-        AX.ticks.forEach(function (t) {
-          doc.setDrawColor(236, 232, 223); doc.setLineWidth(0.15); doc.line(bx0, yB(t), bx0 + bwB, yB(t));
-          doc.setTextColor(140); doc.text(tE(t), bx0 - 2, yB(t) + 1.2, { align: 'right' });
+      /* v2543 · WERTÜBERLEITUNG statt Wertbrücke (Marcel 20.10.2026: Variante B, Farben der
+         Marke) - dieselben Zeilen wie im Tab Bewertung (DpPotenzial.ueberleitungZeilen). Stände als
+         Zeilen mit Summenstrich, Veränderungen als Balken um null; keine gekürzte Achse mehr. */
+      if (PD.bruecke && PZ.ueberleitungZeilen) {
+        var UZ = PZ.ueberleitungZeilen(PD.bruecke), uRh = 7.6;
+        platz(14 + UZ.length * uRh + 10, 'Wertpotenzial', (adr || 'Objekt') + ' · Mieterhöhung und Zielbild');
+        abschnitt('Wertüberleitung · Ertragswert je Stufe');
+        var uF = { bestand: [42, 39, 39], kosten: [201, 138, 132],
+          soll: [Math.round(G[0] + (255 - G[0]) * 0.45), Math.round(G[1] + (255 - G[1]) * 0.45), Math.round(G[2] + (255 - G[2]) * 0.45)],
+          ziel: [GD[0], GD[1], GD[2]] };
+        var uM = Math.max.apply(null, UZ.filter(function (z) { return z.schritt; }).map(function (z) { return Math.abs(z.w); }).concat([1])) * 1.08;
+        var uBx = L + CW * 0.42, uBw = CW * 0.34, uMx = uBx + uBw / 2;
+        var uE = function (n, vz) { return (n < 0 ? '- ' : (vz && n > 0 ? '+ ' : '')) + fmt(Math.abs(n), 0) + ' \u20ac'; };
+        UZ.forEach(function (z) {
+          var y0 = y, f = z.netto ? (z.w >= 0 ? [47, 125, 85] : [184, 98, 92]) : uF[z.art];
+          if (z.netto) { doc.setFillColor(251, 246, 233); doc.rect(L, y0 - 1.4, CW, uRh, 'F'); doc.setDrawColor(G[0], G[1], G[2]); doc.setLineWidth(0.5); doc.line(L, y0 - 1.4, W - R, y0 - 1.4); doc.setLineWidth(0.2); }
+          else if (z.summe) { doc.setDrawColor(42, 39, 39); doc.setLineWidth(0.35); doc.line(L, y0 - 1.4, W - R, y0 - 1.4); doc.setLineWidth(0.2); }
+          if (!z.netto) { doc.setFillColor(f[0], f[1], f[2]); doc.rect(L, y0 + 0.9, 2.2, 2.2, 'F'); }
+          var lx = z.netto ? L + 1 : L + 4;
+          doc.setFont('helvetica', (z.summe || z.netto) ? 'bold' : 'normal'); doc.setFontSize(8.6); doc.setTextColor(26, 26, 26);
+          doc.text(sauberE(z.t), lx, y0 + 2.9);
+          if (z.klein) { doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(120); doc.text(sauberE(z.klein), lx, y0 + 5.6); }
+          if (z.schritt) {
+            doc.setDrawColor(226, 221, 210); doc.setLineWidth(0.15); doc.line(uMx, y0, uMx, y0 + 4.6); doc.setLineWidth(0.2);
+            if (Math.abs(z.w) < 500) { doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(140); doc.text('unverändert', uMx + 1.5, y0 + 3.2); }
+            else { var bw0 = Math.abs(z.w) / uM * (uBw / 2 - 1), bx0 = z.w >= 0 ? uMx : uMx - bw0; doc.setFillColor(f[0], f[1], f[2]); doc.rect(bx0, y0 + 0.6, bw0, 3.4, 'F'); }
+          }
+          doc.setFont('helvetica', (z.summe || z.netto) ? 'bold' : 'normal'); doc.setFontSize(z.netto ? 9.6 : 8.8);
+          if (z.netto) doc.setTextColor(f[0], f[1], f[2]); else doc.setTextColor(26, 26, 26);
+          doc.text(uE(z.w, z.schritt), W - R, y0 + 2.9, { align: 'right' });
+          if (!z.summe && !z.netto) { doc.setDrawColor(236, 232, 223); doc.setLineWidth(0.15); doc.line(L, y0 + uRh - 1.4, W - R, y0 + uRh - 1.4); doc.setLineWidth(0.2); }
+          y += uRh;
         });
-        var FB = { bestand: [138, 130, 114], soll: [61, 111, 168], ziel: [47, 125, 85], kosten: [184, 98, 92], netto: G };
-        var nB = BR.stufen.length, gB = bwB / nB, wB = Math.min(20, gB * 0.6);
-        BR.stufen.forEach(function (st, i) {
-          var x = bx0 + i * gB + (gB - wB) / 2;
-          var lo = st.summe ? AX.min : Math.min(st.a, st.b), hi = st.summe ? st.b : Math.max(st.a, st.b);
-          var t0 = yB(hi), h0 = Math.max(0.6, yB(lo) - t0), f = FB[st.art] || FB.bestand;
-          doc.setFillColor(f[0], f[1], f[2]); doc.rect(x, t0, wB, h0, 'F');
-          doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(40);
-          doc.text(tE(st.wert, !st.summe), x + wB / 2, t0 - 1.5, { align: 'center' });
-          doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(110);
-          doc.splitTextToSize(sauberE(st.t), gB - 1).slice(0, 2).forEach(function (z, j) { doc.text(z, x + wB / 2, by0 + bh0 + 4.5 + j * 3, { align: 'center' }); });
-        });
-        y = by0 + bh0 + 12;
-        absatz(sauberE('Achse beginnt bei ' + tE(AX.min) + '. Potenzial netto = Ertragswert ' + (BR.zielbild != null ? 'Zielbild' : 'nach Mieterhöhung') + ' minus Bestand minus Maßnahmenkosten.'), { groesse: 7, farbe: 130, zeile: 3.6 });
+        y += 1.5;
+        absatz(sauberE('Balken: Veränderung gegen die Zeile darüber, gemeinsame Skala um null. Potenzial netto = Ertragswert ' + (PD.bruecke.zielbild != null ? 'Zielbild' : 'nach Mieterhöhung') + ' minus Bestand minus Maßnahmenkosten.'), { groesse: 7, farbe: 130, zeile: 3.6 });
         y += 2.4;
       }
       var spP = [['Kennzahl', 52, 'l']].concat(PD.spalten.map(function (k) { return [PD.titel[k], 30]; }));

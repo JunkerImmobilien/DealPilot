@@ -3290,33 +3290,43 @@ async function _exportPDFInner() {
         _tab(['WE', 'm²', 'Ist €/M', 'Mieterhöhung', 'Ziel €/M', 'Maßnahmen'], [30, 11, 18, 30, 18, 48],
           _PD.wohnungen.map(function (w) { return [w.we, String(Math.round(w.wfl || 0)), w.ist, w.soll, w.ziel, w.massnahmen]; }));
       }
-      /* v2464 · Wertbrücke - dieselben Zahlen wie im Tab Bewertung (DpPotenzial.brueckeDaten) */
-      if (_PD.bruecke && _PZ.brueckeAchse) {
-        if (cy > 200) cy = newPage('Wertpotenzial · Fortsetzung');
+      /* v2543 · WERTÜBERLEITUNG statt Wertbrücke (Marcel 20.10.2026: Variante B, Farben der
+         Marke) - dieselben Zeilen wie im Tab Bewertung (DpPotenzial.ueberleitungZeilen). Stände als
+         Zeilen mit Summenstrich, Veränderungen als Balken um null; keine gekürzte Achse mehr. */
+      if (_PD.bruecke && _PZ.ueberleitungZeilen) {
+        var _UZ = _PZ.ueberleitungZeilen(_PD.bruecke), _uRh = 7.4;
+        if (cy + 12 + _UZ.length * _uRh + 8 > 280) cy = newPage('Wertpotenzial · Fortsetzung');
         doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor.apply(doc, C.CH);
-        doc.text('WERTBRÜCKE · ERTRAGSWERT JE STUFE', M, cy + 2); cy += 6;
-        var _BR = _PD.bruecke, _AX = _PZ.brueckeAchse(_BR), _bx = M + 16, _bw = CW - 16, _bh = 44, _by = cy + 4;
-        var _yB = function (v) { return _by + _bh * (1 - (v - _AX.min) / ((_AX.max - _AX.min) || 1)); };
-        var _tE = function (n, vz) { return (n < 0 ? '- ' : (vz ? '+ ' : '')) + Math.round(Math.abs(n) / 1000).toLocaleString('de-DE') + ' T\u20ac'; };
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4);
-        _AX.ticks.forEach(function (t) {
-          doc.setDrawColor.apply(doc, C.BORDER); doc.setLineWidth(0.15); doc.line(_bx, _yB(t), _bx + _bw, _yB(t));
-          doc.setTextColor.apply(doc, C.MID); doc.text(_tE(t), _bx - 2, _yB(t) + 1.2, { align: 'right' });
+        doc.text('WERTÜBERLEITUNG · ERTRAGSWERT JE STUFE', M, cy + 2); cy += 7;
+        var _uG = C.GOLD, _uF = {
+          bestand: [42, 39, 39], kosten: [201, 138, 132],
+          soll: [Math.round(_uG[0] + (255 - _uG[0]) * 0.45), Math.round(_uG[1] + (255 - _uG[1]) * 0.45), Math.round(_uG[2] + (255 - _uG[2]) * 0.45)],
+          ziel: [Math.round(_uG[0] * 0.82), Math.round(_uG[1] * 0.82), Math.round(_uG[2] * 0.82)] };
+        var _uM = Math.max.apply(null, _UZ.filter(function (z) { return z.schritt; }).map(function (z) { return Math.abs(z.w); }).concat([1])) * 1.08;
+        var _uBx = M + CW * 0.42, _uBw = CW * 0.34, _uMx = _uBx + _uBw / 2;
+        var _uE = function (n, vz) { return (n < 0 ? '- ' : (vz && n > 0 ? '+ ' : '')) + Math.round(Math.abs(n)).toLocaleString('de-DE') + ' \u20ac'; };
+        _UZ.forEach(function (z) {
+          var y0 = cy, f = z.netto ? (z.w >= 0 ? [47, 125, 85] : [184, 98, 92]) : _uF[z.art];
+          if (z.netto) { doc.setFillColor(251, 246, 233); doc.rect(M, y0 - 1.2, CW, _uRh, 'F'); doc.setDrawColor.apply(doc, _uG); doc.setLineWidth(0.5); doc.line(M, y0 - 1.2, M + CW, y0 - 1.2); }
+          else if (z.summe) { doc.setDrawColor(42, 39, 39); doc.setLineWidth(0.35); doc.line(M, y0 - 1.2, M + CW, y0 - 1.2); }
+          if (!z.netto) { doc.setFillColor(f[0], f[1], f[2]); doc.rect(M, y0 + 0.9, 2.2, 2.2, 'F'); }
+          var lx = z.netto ? M + 1 : M + 4;
+          doc.setFont('helvetica', (z.summe || z.netto) ? 'bold' : 'normal'); doc.setFontSize(8); doc.setTextColor.apply(doc, C.CH);
+          doc.text(String(z.t).replace(/\u2212/g, '-'), lx, y0 + 2.9);
+          if (z.klein) { doc.setFont('helvetica', 'normal'); doc.setFontSize(6.2); doc.setTextColor.apply(doc, C.MID); doc.text(String(z.klein).replace(/\u2212/g, '-'), lx, y0 + 5.5); }
+          if (z.schritt) {
+            doc.setDrawColor.apply(doc, C.BORDER); doc.setLineWidth(0.15); doc.line(_uMx, y0, _uMx, y0 + 4.6);
+            if (Math.abs(z.w) < 500) { doc.setFont('helvetica', 'normal'); doc.setFontSize(6.2); doc.setTextColor.apply(doc, C.MID); doc.text('unverändert', _uMx + 1.5, y0 + 3.2); }
+            else { var bw0 = Math.abs(z.w) / _uM * (_uBw / 2 - 1), bx0 = z.w >= 0 ? _uMx : _uMx - bw0; doc.setFillColor(f[0], f[1], f[2]); doc.rect(bx0, y0 + 0.6, bw0, 3.4, 'F'); }
+          }
+          doc.setFont('helvetica', (z.summe || z.netto) ? 'bold' : 'normal'); doc.setFontSize(z.netto ? 9 : 8.2);
+          if (z.netto) doc.setTextColor(f[0], f[1], f[2]); else doc.setTextColor.apply(doc, C.CH);
+          doc.text(_uE(z.w, z.schritt), M + CW, y0 + 2.9, { align: 'right' });
+          if (!z.summe && !z.netto) { doc.setDrawColor(240, 236, 228); doc.setLineWidth(0.15); doc.line(M, y0 + _uRh - 1.2, M + CW, y0 + _uRh - 1.2); }
+          cy += _uRh;
         });
-        var _FB = { bestand: [138, 130, 114], soll: [61, 111, 168], ziel: [47, 125, 85], kosten: [184, 98, 92], netto: C.GOLD };
-        var _nB = _BR.stufen.length, _gB = _bw / _nB, _wB = Math.min(20, _gB * 0.6);
-        _BR.stufen.forEach(function (st, i) {
-          var x = _bx + i * _gB + (_gB - _wB) / 2;
-          var lo = st.summe ? _AX.min : Math.min(st.a, st.b), hi = st.summe ? st.b : Math.max(st.a, st.b);
-          var t0 = _yB(hi), h0 = Math.max(0.6, _yB(lo) - t0), f = _FB[st.art] || _FB.bestand;
-          doc.setFillColor(f[0], f[1], f[2]); doc.rect(x, t0, _wB, h0, 'F');
-          doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.CH);
-          doc.text(_tE(st.wert, !st.summe), x + _wB / 2, t0 - 1.5, { align: 'center' });
-          doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor.apply(doc, C.MID);
-          doc.splitTextToSize(_pc(st.t), _gB - 1).slice(0, 2).forEach(function (z, j) { doc.text(z, x + _wB / 2, _by + _bh + 4.5 + j * 3, { align: 'center' }); });
-        });
-        cy = _by + _bh + 12;
-        _absatz('Achse beginnt bei ' + _tE(_AX.min) + '. Potenzial netto = Ertragswert ' + (_BR.zielbild != null ? 'Zielbild' : 'nach Mieterhöhung') + ' minus Bestand minus Maßnahmenkosten.', { groesse: 7, zeile: 3.4 });
+        cy += 1.5;
+        _absatz('Balken: Veränderung gegen die Zeile darüber, gemeinsame Skala um null. Potenzial netto = Ertragswert ' + (_PD.bruecke.zielbild != null ? 'Zielbild' : 'nach Mieterhöhung') + ' minus Bestand minus Maßnahmenkosten.', { groesse: 7, zeile: 3.4 });
         cy += 2.6;
       }
       if (cy > 230) cy = newPage('Wertpotenzial · Fortsetzung');

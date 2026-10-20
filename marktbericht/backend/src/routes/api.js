@@ -1523,7 +1523,7 @@ function _verlaufEinordnung(zeilen) {
   const teile = kennzahlen.filter((k) => /^Kaufpreis|^Angebotsmiete/.test(k.kennzahl))
     .map((k) => k.kennzahl.replace(/ \(Median €\/m²\)/, '') + ' ' + (k.pct > 0 ? '+' : '') + String(k.pct).replace('.', ',') + ' % (' + k.richtung + ')');
   return { genug: true, tage, seit: alt.abgerufen_am, abrufe: zeilen.length, kennzahlen,
-    text: teile.length ? 'Seit dem ' + dt(alt.abgerufen_am) + ' (' + zeilen.length + ' Abrufe, ' + tage + ' Tage): ' + teile.join(', ') + '.'
+    text: teile.length ? 'Seit dem ' + dt(alt.abgerufen_am) + ' (' + zeilen.length + ' Abrufe, ' + (tage === 1 ? 'einem Tag' : tage + ' Tagen') + '): ' + teile.join(', ') + '.'
       + (tage < 90 ? ' Der Zeitraum ist kurz; Angebotsdaten schwanken - erst über mehrere Monate ist eine Richtung belastbar.' : '') : null };
 }
 router.post('/potenzial/markt', async (req, res) => {
