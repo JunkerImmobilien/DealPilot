@@ -166,6 +166,23 @@
       if (zahl(e.soll) > 0) s.hatSoll = true;
       s.kosten += zahl(e.kosten);
     });
+    /* ══ v2486 · DIE SOLL-MIETE AUS DERSELBEN QUELLE WIE DAS WOHNUNGSFENSTER ══
+       Hier zaehlte nur die VON HAND eingetragene Soll-Miete (e.soll), sonst die
+       Ist-Miete. Seit v2430 rechnet DealPilot die Soll-Miete selbst
+       (Vergleichsmiete, Kappungsgrenze) - gemessen (Drehbuch Modul 26): die
+       Summenzeile zeigte „Soll 2.265 €/Monat" gleich Ist, das Wohnungsfenster
+       die gerechnete Mieterhoehung. Jetzt dieselbe Summe wie DpPotenzial
+       (Soll ueber Ist, sonst Ist; Leerstand bleibt leer). Die eigene Angabe
+       bleibt als sollEigen/hatSollEigen fuer die Felder me_soll/me_pct. */
+    s.sollEigen = s.soll; s.hatSollEigen = s.hatSoll;
+    try {
+      var P = window.DpPotenzial && typeof window.DpPotenzial.modell === 'function' ? window.DpPotenzial.modell({ einheiten: list }) : null;
+      if (P && P.art === 'mfh' && Array.isArray(P.wohnungen) && P.wohnungen.length) {
+        s.soll = P.wohnungen.reduce(function (a, w) { return a + ((w.soll && w.soll.miete != null && w.soll.miete > w.ist) ? w.soll.miete : w.ist); }, 0);
+        s.hatSoll = s.hatSollEigen || !!P.hat_soll;
+        s.sollQuelle = 'DpPotenzial';
+      }
+    } catch (x) {}
     return s;
   }
 
@@ -1160,20 +1177,20 @@
          ertrag, nicht nur der veraenderte Teil. Leerstehende Einheiten
          zaehlen dort mit, bei `s.ist` nicht; genau das ist das
          Aufholpotenzial. */
-      if (s.hatSoll && s.flaeche > 0 && s.soll > 0) {
-        setzen('me_soll', s.soll / s.flaeche);
+      if (s.hatSollEigen && s.flaeche > 0 && s.sollEigen > 0) {   /* v2486: nur die eigene Angabe, wie bisher */
+        setzen('me_soll', s.sollEigen / s.flaeche);
         meldung += ' · Soll-Mietspiegel ' +
-          (Math.round(s.soll / s.flaeche * 100) / 100).toFixed(2).replace('.', ',') + ' €/m²';
+          (Math.round(s.sollEigen / s.flaeche * 100) / 100).toFixed(2).replace('.', ',') + ' €/m²';
         /* Die angestrebte Entwicklung ergibt sich aus denselben zwei
            Zahlen. Sie NICHT mitzusetzen hiesse, den Nutzer dieselbe
            Rechnung von Hand machen zu lassen. */
         /* v2410 - NICHT, wenn ein Soll-Jahr steht: dann bringt der Sprung
            (mietentwicklung.js, sollSprung) dieselben Prozent schon einmal
            ein, und Detail rechnete Soll / Ist doppelt. */
-        if (s.ist > 0 && s.soll > s.ist && !(sollAb > 0)) {
-          setzen('me_pct', (s.soll - s.ist) / s.ist * 100);
+        if (s.ist > 0 && s.sollEigen > s.ist && !(sollAb > 0)) {
+          setzen('me_pct', (s.sollEigen - s.ist) / s.ist * 100);
           meldung += ' · Entwicklung ' +
-            (Math.round((s.soll - s.ist) / s.ist * 1000) / 10).toFixed(1).replace('.', ',') + ' %';
+            (Math.round((s.sollEigen - s.ist) / s.ist * 1000) / 10).toFixed(1).replace('.', ',') + ' %';
         }
       }
       if (s.kosten > 0 && el('mfh-san') && el('mfh-san').checked) { setzen('san', s.kosten); if (typeof window.syncSanTaxOnSanInput === 'function') try { window.syncSanTaxOnSanInput(); } catch (x) {} }
