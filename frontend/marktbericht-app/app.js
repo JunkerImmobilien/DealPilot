@@ -4354,7 +4354,14 @@ async function exportPdf(out) {
         + [_mbd.amtlich_qm != null ? 'amtliche Vergleichsmiete ' + _qm(_mbd.amtlich_qm) : null,
            _mbd.angebot_qm != null ? 'Angebotsmiete ' + _qm(_mbd.angebot_qm) : null].filter(Boolean).join(', ')
         + '; untere Kante × 0,7, obere × 1,3)'
-        + (_mbd.ist_qm != null ? ': die Ist-Miete von ' + _qm(_mbd.ist_qm) + ({ im_band: ' liegt im Band und gilt als marktüblich (§ 31 Abs. 2 ImmoWertV).',
+        /* v2540 · je Wohnung geprueft (CrossCheckService miete_band.je_wohnung): die Wohnungen nennen,
+           die an eine Kante gehen - nicht den Hausdurchschnitt „liegt im Band" */
+        + (_mbd.je_wohnung ? ': geprüft je Wohnung (ImmoWertA 31.2). '
+            + (_mbd.je_wohnung.angepasst.length
+              ? _mbd.je_wohnung.angepasst.map((w) => w.nr + ' mit ' + _qm(w.ist_qm) + (w.herkunft === 'obere_kante' ? ' darüber, gerechnet die obere' : ' darunter, gerechnet die untere') + ' Kante ' + _qm(w.qm)).join('; ')
+                + '; die übrigen liegen im Band. Mehr- oder Minderertrag nur für die gesicherte Vertragslaufzeit als besonderes objektspezifisches Merkmal (§ 8 Abs. 3).'
+              : 'Alle vermieteten Wohnungen liegen im Band und gelten als marktüblich (§ 31 Abs. 2 ImmoWertV).')
+        : _mbd.ist_qm != null ? ': die Ist-Miete von ' + _qm(_mbd.ist_qm) + ({ im_band: ' liegt im Band und gilt als marktüblich (§ 31 Abs. 2 ImmoWertV).',
             ueber: ' liegt darüber — gerechnet wird die obere Kante; der Mehrertrag ist nur für die gesicherte Vertragslaufzeit als besonderes objektspezifisches Merkmal (§ 8 Abs. 3) zu würdigen.',
             unter: ' liegt darunter — gerechnet wird die untere Kante; der Minderertrag ist nur für die gesicherte Vertragslaufzeit als besonderes objektspezifisches Merkmal (§ 8 Abs. 3) zu würdigen.' }[_mbd.lage] || '.') : '.')) : '';
       doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setCharSpace(0);
@@ -4520,9 +4527,13 @@ async function exportPdf(out) {
       if (z.faktor != null) _re = String(z.faktor).replace('.', ',');
       else if (z.wert != null) _re = euro(z.wert);
       if (_re) { doc.setTextColor(...(_sm ? GOLD : TXT)); doc.text(_re, M + blockW - 2, y, { align: 'right' }); }
+      /* v2540 · die Unterzeile bricht um statt bei 120 Zeichen abzuschneiden (gemessen:
+         „… × (80 − 25,7) / 80 = 67,9 % — linear nach § 38 …" lief über), U+2212 als ASCII-Minus */
       if (z.detail) {
-        y += 3.6; doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6);
-        doc.setTextColor(...MUT); doc.text(String(z.detail).slice(0, 120), M + 4, y);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6);
+        const _dl = doc.splitTextToSize(String(z.detail).replace(/−/g, '-'), blockW - 8).slice(0, 4);
+        need(_dl.length * 3 + 6);
+        y += 3.6; doc.setTextColor(...MUT); doc.text(_dl, M + 4, y); y += (_dl.length - 1) * 3;
       }
       y += _sm ? 6 : 5;
       if (_sm) { doc.setDrawColor(225, 221, 212); doc.setLineWidth(0.2); doc.line(M, y - 3.4, M + blockW, y - 3.4); }
@@ -4654,9 +4665,13 @@ async function exportPdf(out) {
         doc.setTextColor(...(summe ? GOLD : TXT));
         doc.text(rechts, M + blockW - 2, y, { align: 'right' });
       }
+      /* v2540 · die Unterzeile bricht um (die Rohertrag-Zeile je Wohnung ist rund 170 Zeichen
+         lang und lief in einer Zeile über den Rand), U+2212 als ASCII-Minus */
       if (z.detail) {
-        y += 3.6; doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6);
-        doc.setTextColor(...MUT); doc.text(String(z.detail), M + 4, y);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6);
+        const _dl = doc.splitTextToSize(String(z.detail).replace(/−/g, '-'), blockW - 8).slice(0, 4);
+        need(_dl.length * 3 + 6);
+        y += 3.6; doc.setTextColor(...MUT); doc.text(_dl, M + 4, y); y += (_dl.length - 1) * 3;
       }
       y += summe ? 6 : 5;
       if (summe) {

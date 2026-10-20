@@ -1013,6 +1013,9 @@ export const CrossCheckService = {
       + (_ls ? ' auf der vermieteten Fläche; leere Fläche mit der Vergleichsmiete' : ''));
     if (_band) {
       _band.ist_qm = _istQm; _band.lage = _istLage;
+      /* v2540 · geprueft je Wohnung: welche Wohnung an welche Kante (Bericht/PDF nennen sie) */
+      if (_je) _band.je_wohnung = { n_vermietet: _je.n_vermietet,
+        angepasst: _je.angepasst.map((z) => ({ nr: z.nr, ist_qm: z.ist_qm, qm: z.qm, herkunft: z.herkunft })) };
       out.miete_band = _band;
     }
     const _dq = (x) => String(Math.round(x * 100) / 100).replace('.', ',');
