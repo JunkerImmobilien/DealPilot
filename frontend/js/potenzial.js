@@ -365,6 +365,17 @@
         return { art: e.art || 'wohnen', wfl: e.wfl, ist: e.ist, soll: e.soll, status: e.status || 'vermietet',
                  nutzung_gew: e.nutzung_gew || null, markt_qm: e.markt_qm || null };
       });
+      /* v2487 · GEMESSEN (Mitschnitt-Lauf Modul 26, neues MFH): im Wohnungsfenster VOR dem
+         ersten „Übernehmen" sind Wohnfläche und Kaltmiete im Reiter Objekt noch leer - der
+         Dienst rechnete keinen Ertragswert (verfuegbar false, „es fehlen Pflichtangaben"), das
+         Fenster zeigte nur „Die Angaben haben sich geändert". Leere Felder werden aus den
+         Einheiten gefüllt, genau wie uebernehmen() sie gleich schreiben wird (Fläche aller,
+         Ist der vermieteten). Ein gesetztes Feld bleibt unberührt. */
+      var flS = 0, istS = 0, nW = 0;
+      opts.einheiten.forEach(function (e) { flS += zahl(e.wfl); if (e.art !== 'gewerbe') nW++; if (e.status !== 'leer') istS += zahl(e.ist); });
+      if (!(zahl(obj.wfl) > 0) && flS > 0) obj.wfl = flS;
+      if (!(zahl(obj.nkm) > 0) && istS > 0) obj.nkm = String(Math.round(istS * 100) / 100);
+      if (!(zahl(obj.einheiten) > 0) && nW > 0) obj.einheiten = String(nW);
     }
     var istW = function (w) { return w.art === 'gewerbe' ? 0 : 1; };
     var wohnMiete = function (k) {
