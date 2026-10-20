@@ -3988,14 +3988,19 @@ async function exportPdf(out) {
     if (lcomp && lcomp.value_eur > 0) {
       need(8);
       doc.setFontSize(8); doc.setTextColor(120, 113, 100);
-      doc.text('Im Marktwert berücksichtigt: +' + euro(lcomp.value_eur) + ' Mehrflächen-Bodenwert (' +
+      const _mfT = 'Im Marktwert berücksichtigt: +' + euro(lcomp.value_eur) + ' Mehrflächen-Bodenwert (' +
         Math.round(lcomp.excess_sqm).toLocaleString('de-DE') + ' m² über typischem Grundstück von ' + lcomp.typical_plot_sqm +
         /* v2380 · mit amtlichem Koeffizienten ist market_factor null - hier stand „Marktfaktor null“ */
         (lcomp.market_factor != null
           ? ' m², Marktfaktor ' + String(lcomp.market_factor).replace('.', ',')
           : ' m², Umrechnungskoeffizient ' + String(lcomp.umrechnungskoeffizient).replace('.', ',')
-            + (lcomp.umrechnung_quelle ? ' · ' + lcomp.umrechnung_quelle : '')) + ').', M, y);
-      y += 7;
+            + (lcomp.umrechnung_quelle ? ' · ' + lcomp.umrechnung_quelle : '')) + ').';
+      /* v2540c · gemessen 20.10.2026 (Bericht 324): die Zeile war mit Quelle 265 mm breit und lief
+         ueber den Rand - jetzt umgebrochen */
+      const _mfZ = doc.splitTextToSize(_mfT, W - 2 * M);
+      need(_mfZ.length * 3.6 + 4);
+      doc.text(_mfZ, M, y);
+      y += 7 + (_mfZ.length - 1) * 3.6;
     }
   }
 
