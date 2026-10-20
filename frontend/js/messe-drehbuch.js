@@ -5356,12 +5356,12 @@
      Gezeigt wird ein PDF (Bankfassung, lokal erzeugt, Nutzungszähler gesperrt). */
   var R26 = {
     kuerzel: 'DEMO Zielbild MFH', str: 'Teutoburger Straße', hnr: '60', plz: '33604', ort: 'Bielefeld',
-    baujahr: '1962', gsfl: '640', kp: '430000', etagen: '3',
+    baujahr: '1962', gsfl: '640', kp: '505000', etagen: '3',
     /* nr, lage, wfl, zimmer, ist (leer = ''), status - Marcel 20.10.2026: eine DEUTLICHE Entwicklung,
-       Ist klar unter der Vergleichsmiete (4,80-5,50 EUR/m2), letzte Erhoehungen lange her */
-    we: [['1', 'EG links', '68', '3', '340', 'vermietet'], ['2', 'EG rechts', '58', '2', '310', 'vermietet'],
-         ['3', '1. OG links', '68', '3', '365', 'vermietet'], ['4', '1. OG rechts', '58', '2', '280', 'vermietet'],
-         ['5', '2. OG links', '68', '3', '', 'leer'], ['6', '2. OG rechts', '58', '2', '318', 'vermietet']],
+       Ist 5,90-6,40 EUR/m2 (an der unteren Kante des Marktueblichkeitsbands, klar unter der Vergleichsmiete; die Kappung fuehrt auf 6,8-7,4), letzte Erhoehungen lange her */
+    we: [['1', 'EG links', '68', '3', '408', 'vermietet'], ['2', 'EG rechts', '58', '2', '360', 'vermietet'],
+         ['3', '1. OG links', '68', '3', '435', 'vermietet'], ['4', '1. OG rechts', '58', '2', '342', 'vermietet'],
+         ['5', '2. OG links', '68', '3', '', 'leer'], ['6', '2. OG rechts', '58', '2', '365', 'vermietet']],
     /* Mietvertrag und Plan je Wohnung (Index in we) */
     plan: {
       0: { mv_art: 'unbefristet', mv_beginn: '2012-04-01', mv_letzte_erhoehung: '2019-04-01', vgl_qm: '7,80',
