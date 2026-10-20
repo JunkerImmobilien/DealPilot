@@ -3269,8 +3269,9 @@ async function _exportPDFInner() {
             var bw = breiten[i] * fak, t0 = z[0];
             if (istKopf) doc.setTextColor.apply(doc, C.GOLD);
             else if (t0 === 'kein Potenzial') doc.setTextColor.apply(doc, C.MID);
-            else if (kopf[i] === 'Mieterhöhung') doc.setTextColor(61, 111, 168);
-            else if (kopf[i] === 'Zielbild' || kopf[i] === 'Ziel €/M') doc.setTextColor(47, 125, 85);
+            /* v2543c · Stufen nicht mehr blau/grün eingefärbt (Marcel 20.10.2026: Farben der Marke) -
+               Werte in Textfarbe; die Stufenfarbe trägt die Wertüberleitung. Zuvor griff der Vergleich
+               auch nur noch zufällig (Spaltenkopf jetzt mit Jahr: „Mieterhöhung 2026"). */
             else doc.setTextColor.apply(doc, C.CH);
             z.forEach(function (t, j) {
               var ty = cy + rh0 - 1.8 + j * 3.4;
