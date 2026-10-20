@@ -556,6 +556,15 @@ eine selbst ausgerechnete Zahl.
 - Nur der **rentierliche** Bodenwert wird verzinst (§ 41).
 
 **Testobjekte für jede Prüfstrecke:**
+
+> **⚠ Seit v2541 (20.10.2026) verschieben sich Ertragswerte gewollt** — RND ohne
+> Punkte nach Anlage 2 mit 0 Punkten statt linear, obere Bandkante × 1,15 statt
+> × 1,3, Stellplätze ohne Miete ohne Kosten. Gemessen am Prüfsatz
+> (`faelle.json`, Journal v2541): Hüllhorst (chk-Eingabe, Ist 10 €/m²) 410.000 →
+> **383.000 €** (Ist jetzt über der Kante 9,27), Demo-MFH 610.000 → 635.000 €,
+> Westerfeld (body) 780.000 → 785.000 €. Wer gegen ältere Zahlen prüft, findet
+> eine Abweichung, die keine ist.
+
 - **Hüllhorst**, Hermannstr. 9, 32609, ETW 165 m², Bj 1968 — Sachwert
   305.937 / 348.687 €, Zinsanpassung 2,56 %, Miete 4,83 €/m²
 - **Löhner Str. 278**, 32120 Hiddenhausen, ZFH 233 m², Bj 1964 —
