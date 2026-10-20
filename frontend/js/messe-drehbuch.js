@@ -1461,7 +1461,7 @@
      aus der Antwort auf POST /objects und wird beim Aufräumen gelöscht, auch
      bei Esc. Zurückgesetzt: Eingabetiefe, Kachelwahl, Nummernzähler,
      Marktbericht-Aufträge, Spannenwahl. */
-  var RH_BUSTER = 'v2481j';   /* v2481j: zielbild26 nach v2520; v2481g: Modul 26 Mieterhoehung und Zielbild (zielbild26); v2395vr3: Portfolio-Analyse neu (Modul 21); v2395: BMF-Mitschnitt Ravensberger Weg mit Nebenkosten neu; v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
+  var RH_BUSTER = 'v2481n';   /* v2481n: zielbild26 nach v2540-v2543 mit Marktpreisen; v2481j: zielbild26 nach v2520; v2481g: Modul 26 Mieterhoehung und Zielbild (zielbild26); v2395vr3: Portfolio-Analyse neu (Modul 21); v2395: BMF-Mitschnitt Ravensberger Weg mit Nebenkosten neu; v2374: Modul 25 MFH Fürth (gefuehrt25, gefuehrt25geo); v2372: Modul-25-Auslese; v2353 Portfolio-Pilot neu; v2305: Telegram-Mitschnitt (Modul 22); v2303 Portfolio-Analyse; v2278 Modul-16-Sachwert */
   /* v2257 · dazu BMF (Modul 10b, abgespielt), die RND-Gutachten-Anfrage und
      alles, was eine Anfrage an Dritte oder eine Zahlung ausloest */
   var RH_SPERRE = /\/marktbericht\/reports|\/ai\/|\/avm\/|immometrica|\/voice|\/transcri|\/passes|\/bmf\/|\/rnd-request|\/deal-action\/submit|\/checkout|gutachten|\/network-cards\/(einreichen|partner-interest)|\/unterlagen|\/portfolio-spiegel|\/objects\/track-usage|\/marktbericht\/potenzial/i;
@@ -5453,7 +5453,7 @@
   DREHBUECHER['reihe-zielbild'] = {
     titel: 'Mieterhöhung und Zielbild', unterzeile: 'Ein Mehrfamilienhaus, Wohnung für Wohnung — Ist, Soll und Zielbild bis zum Wertpotenzial', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
-    aufraeumen: function () { if (_r26.wahl) { clearInterval(_r26.wahl); _r26.wahl = null; } [].forEach.call(document.querySelectorAll('.dpm-wahl'), function (b) { b.classList.remove('dpm-wahl'); }); var w = q('#mfh-we-ov'); if (w) w.remove(); var m = q('#mfh-modal'); if (m) m.remove(); r19Zu(); rhAufraeumen(); },
+    aufraeumen: function () { if (_r26.wahl) { clearInterval(_r26.wahl); _r26.wahl = null; } [].forEach.call(document.querySelectorAll('.dpm-wahl'), function (b) { b.classList.remove('dpm-wahl'); ['background', 'color', 'font-weight'].forEach(function (p) { b.style.removeProperty(p); }); }); var w = q('#mfh-we-ov'); if (w) w.remove(); var m = q('#mfh-modal'); if (m) m.remove(); r19Zu(); rhAufraeumen(); },
     szenen: [
       async function (s) {   /* 1 · das Haus */
         await rhStart(0);
@@ -5661,14 +5661,16 @@
         await b2oZeile(s, '„' + (knopf() ? r6Text(knopf()) : 'Aus Wohnungen') + '“', schon ? 'Das Übernehmen hat ihn schon vorgewählt — ein Klick, und die Tabelle rechnet je Wohnung.' : 'Ein Klick, und die Tabelle rechnet je Wohnung.', 1200);
         /* ein Klick auch dann, wenn der Modus schon steht: er zeichnet die Tabelle (setMietModus) */
         var k = knopf(); if (k && !k.disabled) k.click();
-        var wahl = function () { var b = knopf(); if (b && !b.classList.contains('dpm-wahl')) b.classList.add('dpm-wahl'); return b; };
+        /* v2481n · GEMESSEN (getComputedStyle im Mitschnitt-Lauf): Rahmen kam an, Füllung und Schrift nicht -
+           eine !important-Regel der App mit höherer Spezifität gewinnt. Füllung daher inline mit !important. */
+        var wahl = function () { var b = knopf(); if (b && !b.classList.contains('dpm-wahl')) { b.classList.add('dpm-wahl'); b.style.setProperty('background', GH, 'important'); b.style.setProperty('color', '#050505', 'important'); b.style.setProperty('font-weight', '700', 'important'); } return b; };
         wahl(); _r26.wahl = setInterval(wahl, 300);
         await warte(900);
         DPM_REIHE.r26wahl = { aktiv: !!(knopf() && knopf().classList.contains('active')), markiert: !!(knopf() && knopf().classList.contains('dpm-wahl')), modus: ME && ME.getMode ? ME.getMode() : null };
         await zeige(knopf, 10);
         await b2oZeile(s, 'Gewählt: „' + (knopf() ? r6Text(knopf()) : 'Aus Wohnungen') + '“', 'Der Knopf ist aktiv — die Mietentwicklung des Hauses kommt jetzt aus den einzelnen Wohnungen.', 2500);
         clearInterval(_r26.wahl); _r26.wahl = null;
-        [].forEach.call(document.querySelectorAll('.dpm-wahl'), function (b) { b.classList.remove('dpm-wahl'); });
+        [].forEach.call(document.querySelectorAll('.dpm-wahl'), function (b) { b.classList.remove('dpm-wahl'); ['background', 'color', 'font-weight'].forEach(function (p) { b.style.removeProperty(p); }); });
         var tw = function () { return q('#me_table_wrap'); };
         await warteAuf(function () { return q('#me_table_wrap table'); }, 4000);
         await zeige(tw, 8);
@@ -5710,7 +5712,8 @@
         await r11PaTab(/Zielbild/);
         var tab = function () { var p = r11Panel(); return p && p.querySelector('[data-dp-pot-wirt] table'); };
         await zeige(tab, 6);
-        var T = tab(), kopf = T ? [].map.call(T.querySelectorAll('thead th'), function (x) { return r6Text(x); }).filter(Boolean) : [];
+        /* v2481n · GEMESSEN: der Kopf trägt das Jahr als eigenes Kind („Mieterhöhung" + „2026") - r6Text klebte es an */
+        var T = tab(), kopf = T && T.querySelector('thead tr') ? [].map.call(T.querySelector('thead tr').querySelectorAll('th'), function (x) { return [].map.call(x.childNodes, function (n) { return String(n.textContent || '').replace(/\s+/g, ' ').trim(); }).filter(Boolean).join(' '); }).filter(Boolean) : [];
         var zeile = function (re) { var r = T && [].filter.call(T.querySelectorAll('tbody tr'), function (x) { return re.test(r6Text(x.cells[0])); })[0]; return r ? [].map.call(r.cells, function (c) { return r6Text(c); }) : null; };
         var ew = zeile(/^Ertragswert/), km = zeile(/^Kaltmiete p\. a\./), mpi = zeile(/^Marktpreisindikation/), rf = zeile(/^Rohertragsfaktor/);
         /* v2481m · seit v2541 tragen die Köpfe ein Jahr („Bestand 2026", „Zielbild Jahr offen") - Spalte per Muster */
