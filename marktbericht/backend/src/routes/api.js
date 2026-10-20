@@ -1536,7 +1536,14 @@ router.post('/potenzial/markt', async (req, res) => {
     if (!obj || typeof obj !== 'object') return res.status(400).json({ verfuegbar: false, grund: 'Kein Objekt im Aufruf.' });
     const wb = await runLimited(() => ReportOrchestrator.generate(
       { dealpilot: obj, wert_stufe: 3, user_id: uid }, { nurWertBasis: true }));
-    const out = await PotenzialService.rechne(wb, Object.assign({}, body, { markt: true }));
+    /* v2542a · je Wohnung beides nebeneinander (Marcel: „unter Ertragswert der Wohnung
+       auch die Marktpreisindikation"): der Ertragswert als ETW entsteht im Aufteilungs-
+       zweig - im Abruf rechnet er immer mit; ohne „aufgeteilt" fällt nur die
+       Aufteilungsbilanz (Kosten, Potenzial) wieder weg. */
+    const _aufIn = body.aufteilung || {};
+    const out = await PotenzialService.rechne(wb, Object.assign({}, body, { markt: true,
+      aufteilung: Object.assign({}, _aufIn, { aktiv: true, kosten_eur: _aufIn.kosten_eur != null ? _aufIn.kosten_eur : 0 }) }));
+    if (!_aufIn.aktiv) delete out.aufteilung;
     /* Ohne Freigabe Stufe 3 (Haupt-Backend, ertragswertFreigabe) keine Ertragswerte -
        weder in der Antwort noch im gespeicherten Abruf (v2431-Regel). */
     if (body.ohne_ertragswert) {

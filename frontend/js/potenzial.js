@@ -500,7 +500,7 @@
   function mpiFuss(M) {
     var t = [];
     if (M.angebote && M.angebote.verfuegbar) t.push('Marktpreisindikation: Angebotspreise am Ort × Wohnfläche × Objektfaktoren, abzüglich '
-      + (M.angebote.abschlag_pct != null ? pct(M.angebote.abschlag_pct).replace(/,00 %$/, ' %') + ' ' : '') + 'Abschlag auf Angebotspreise; Mieterhöhung wie Bestand (Angebotspreise hängen nicht an der Miete), Zielbild mit Zustand „modernisiert".');
+      + (M.angebote.abschlag_pct != null ? String(Math.round(Number(M.angebote.abschlag_pct) * 10) / 10).replace('.', ',') + ' % ' : '') + 'Abschlag auf Angebotspreise; Mieterhöhung wie Bestand (Angebotspreise hängen nicht an der Miete), Zielbild mit Zustand „modernisiert".');
     if (M.rohertragsfaktor && M.rohertragsfaktor.verfuegbar) t.push('Rohertragsfaktor ' + dez(M.rohertragsfaktor.faktor, 1).replace(',0', '') + ' des '
       + String(M.rohertragsfaktor.ausschuss || 'Gutachterausschusses').replace(/^Der\s+/, '') + (M.rohertragsfaktor.berichtsjahr ? ' (' + M.rohertragsfaktor.berichtsjahr + ')' : '')
       + ' × Jahresnettokaltmiete der Stufe — Durchschnitt aus Kauffällen, eine Gegenprobe.');
