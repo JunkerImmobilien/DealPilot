@@ -39057,6 +39057,55 @@ Marcel (20.10.2026): *„Das muss eindeutig sein, bitte so machen, dass es passt
 - `_dpRnd` (RND-Assistent, Westerfeld 14.10.: 2 Punkte, 23,6 J.) ist ein eigener, gespeicherter Stand und wurde nicht angefasst.
 - Konfigurator-Fußzeile sagt weiter „Gerechnet mit dem Punktraster … RND-Kern", auch wenn die Zahl vom Dienst kommt (Zeile darüber nennt die Quelle).
 
+### v2500–v2501 · Zensus raus aus dem Reiter Miete, Pilot-Mietpreis-Analyse mit belegten Vergleichswerten (20.10.2026, Staging)
+
+**Was.** Marcel hat drei Dinge gesagt. Erstens: „Im Tab Miete kannst du unten den Zensus rausnehmen. Der hat einfach nichts mit der Marktmiete zu tun.“ Zweitens soll die Pilot-Mietpreis-Analyse genauer werden, mit mehreren Vergleichswerten und beim Mietausfallrisiko mit dem Zensus daneben. Drittens fragte er: „Ist es überhaupt Zensus 2022?“
+
+- **Reiter Miete (v2500):** Beide Zensus-Kästen aus `zensus-info.js` sind abgeschaltet, die Bestandsmiete unter „Marktmiete“ und der Leerstand unter „Mietausfall-Risiko“. Der Schalter heißt `ANZEIGE`, Grund und Datum stehen im Kommentar. Der Abruf selbst bleibt.
+- **Gemessen vorher:** Die Pilot-Mietpreis-Analyse (`ki-miete.js` → `/ai/ds2-suggest`) war reine KI mit Websuche. Kein Wert aus den eigenen Daten kam an, obwohl amtliche Mietpreisübersicht, Angebotsmieten und Zensus für das Objekt in der Datenbank liegen.
+  - Die Quellenliste zeigte Portalnamen mit Link, z. B. „Mietpreisuebersicht (ImmobilienScout24)“. Seit v1242d wurde der Name sogar extra angehängt. Das verstößt gegen die Vorgabe vom 14.10.
+- **Neu: `backend/src/services/mietBelegeService.js`.** Sammelt serverseitig, mit Frist und `user_id` aus dem Token, aus drei Quellen:
+  - **Letzter Marktbericht des Objekts:**
+    - amtliche Vergleichsmiete (Mietpreisübersicht des Gutachterausschusses, Quelle nennbar)
+    - aktueller Marktdurchschnitt: Angebotsmieten mit Median, Q25/Q75, Zahl, Umkreis und Trend. Der Anbieter wird nicht genannt, ein Abschlag für Mieten ist nicht gemessen.
+    - Marktüblichkeitsband und die im Ertragswert angesetzte Miete
+  - **Zensus 2022 (`/zensus/objekt`):** marktaktiver Leerstand, Gesamt- und Dauerleerstand, Leerstand nach Baujahr und Größe. Die Gemeinde geht vor dem Kreis, Stichtag 15.05.2022. Der Anhalt nutzt die Stufen aus v2220.
+  - **Regionaldatenbank (`/lage/gemessen` ohne Adresse, also ohne Umfeld-Kosten):** Bevölkerungstrend des Kreises.
+  - **Was fehlt, kommt als `fehlt` mit Weg dorthin.** Das gilt auch für Haushaltsentwicklung und Angebotsdauer der Mietangebote, die es in unseren Daten nicht gibt.
+- **Prompt (`buildDs2Prompt`, exportiert):** Block „BELEGTE VERGLEICHSWERTE“ mit Schlüsseln in eckigen Klammern.
+  - Neue Antwortfelder `vergleich_text` und `stuetzt_sich_auf` gibt es nur, wenn Belege da sind.
+  - Portal- und Anbieternamen werden in Quellenliste und Text neutralisiert: „Aktueller Marktdurchschnitt (Angebotsmieten)“, ohne Link. Das Server-Protokoll behält das Original.
+  - Zusätzlich gilt eine Umkehrregel: Eine nicht amtliche Quelle mit Link auf einen nicht amtsfähigen Host, die von Miete, Angebot oder Preis spricht, wird ebenfalls neutralisiert.
+- **Anzeige (`ki-miete.js`):** Tabelle „Vergleichswerte“ mit Herkunft je Zeile (amtlich, Markt, Wertermittlung, KI, deine Angabe). Ein Häkchen markiert die Werte, auf die sich die KI stützt.
+  - Block „Belegte Daten zum Risiko“: „Leerstand laut Zensus 2022 (Stichtag 15.05.2022)“, der Anhalt mit Abgleich zur KI-Einstufung und der Knopf „Zensus-Anhalt übernehmen“.
+  - Abgerufen wird über `Auth.apiCall` statt nacktem `fetch`.
+- **v2501, `LageMessungService`:** `ds2_nachfrage` trug den Kreiswert unter dem Etikett „Gemeinde“. Bei Hüllhorst stand 2 % (Kreis), richtig sind 1,2 %. Außerdem stand der Wanderungssaldo zehnfach da (34.3 statt 3,4 je 1.000 EW).
+
+**Commit:** `4c9d641b` (v2500), `058b01af` (v2501), `11410499` (v2500a), `870b3e32` (v2500b), `0e91defe` (v2500c).
+
+**Nachweis:**
+- **Container Staging:** `sammeln()` für Hüllhorst (Bericht 313) ergab amtlich 4,83 (außerhalb der Tabelle), Markt 8,06 (6,69–8,88, 20 Angebote, 5 km), Band 3,38–10,48, Zensus Gemeinde marktaktiv 1,2 % / gesamt 3,4 % / Dauerleerstand 62,7 % und Bevölkerung +0,3 %/J (2025).
+- **Zwei echte KI-Läufe (gpt-4.1):**
+  - Lauf 1 schrieb aus dem Beispiel „innerhalb der amtlichen Spanne“ ab, und ohne-makler.net kam mit Link durch. Behoben in v2500b.
+  - Lauf 2: keine Portalnamen mehr. miete-aktuell und ImmobilienScout24 wurden neutralisiert (Protokoll). Die Ausgabe enthielt `vergleich_text`, Marktmiete 7,66 („5 % unter dem Marktdurchschnitt 8,06, 59 % über der amtlichen 4,83“) und `stuetzt_sich_auf` [amtliche_vergleichsmiete, marktdurchschnitt] bzw. [leerstand_zensus].
+  - Lauf 2 zeigte noch drei Mängel, behoben in v2500c ohne weiteren Lauf: „Dein Wert“ meinte den Wert der Recherche, ein Enum-Schlüssel stand im Text, und es gab eine Quellen-Dublette.
+- **Browser, eigener Tab, Schreibzugriffe auf /objects gesperrt, gestelltes Ergebnis, kein Speichern:** 11 Zeilen, 3 als genutzt markiert, kein Portalname im Text, kein Überlauf (1278/1278). Die Zensus-Kästen erscheinen nicht.
+- **Prüfläufe:**
+  - `prompt-lecks-pruefen` RC 0, neu mit 25 Stellen für `buildDs2Prompt`. Er fand eine Regel ohne Daten: „vergleich_text“ stand auch ohne Belege im Prompt.
+  - `buster-ebenen-pruefen` SAUBER, `frontend-konstanten` RC 0, `node --check` je Datei.
+
+**Rest:**
+- **Messe-Drehbuch `reihe-miete`** (`messe-drehbuch.js` ab Z. 2343, Szenen 3 und 5) wartet auf `#dp-zi-miete` / `#dp-zi-leer`. Beide gibt es nicht mehr, das muss der Video-Strang anpassen.
+- **Quick-Check (`quickcheck-app.html` ~Z. 5389):** Er nutzt die Zensus-**Bestandsmiete** weiter als Marktmiete-Ersatz („Luft nach oben“ / „Risiko bei Mieterwechsel“ gegen das Zensus-Mittel). Die Datei gehört dem Strang der Markteinschätzungskarte und ist nicht angefasst.
+- Die Pilot-Mietpreis-Analyse ist bei 390 px nicht in der Messkabine abgenommen. Das Raster nutzt `minmax(0,1fr)`.
+- **Zensus-Frage:**
+  - Ja, Zensus 2022, Stichtag 15.05.2022, erste Ergebnisse 25.06.2024, Leerstand am 04.07.2024 (Destatis PM 46).
+  - Es gibt keinen Zensus 2025/26. Der nächste ist der Zensus 2031, wieder mit Gebäude- und Wohnungszählung (Destatis Registerzensus; EU-VO 2025/2458).
+  - Jüngere amtliche Leerstandsdaten je Gemeinde gibt es nicht:
+    - Die Fortschreibung 31231 (Stand 31.12.2025) führt keinen Leerstand.
+    - Das Mikrozensus-Zusatzprogramm Wohnen (2022, Welle 2026 läuft) reicht nur bis zu den Ländern und ist nicht vergleichbar.
+  - Privat gibt es den CBRE-empirica-Leerstandsindex auf Kreisebene (Stand Ende 2024, keine offene Lizenz).
+
 ### v2490 · Angebotsabschlag aus einer Quelle, Marktmiete ragt nicht mehr in „Einordnung" (20.10.2026, Staging)
 
 **Was.** Marcel: „im Quick-Check 5,9 % Abschlag, im Tab Objekt 15,9 % — warum?" und „die Texte bei Marktmiete ragen ins Feld Einordnung, wenn wir Mieten über 10 € haben".
