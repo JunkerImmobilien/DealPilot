@@ -5529,7 +5529,7 @@
         await r6Ende(zb);
         var gesp = !r26We('.mfh-we-ew3');
         DPM_REIHE.r26ew = (DPM_REIHE.r26ew || []).concat([{ we: 1, gesperrt: gesp, text: r6Text(r26We('#mfh-we-ew')).slice(0, 200) }]);
-        if (gesp) { await b2oZeile(s, 'Ertragswert mit Stufe 3', 'Der Ertragswert gehört zur Wertermittlung (Stufe 3) — ohne sie bleibt es bei Mieten, Kosten und Rendite.'); return; }
+        if (gesp) { await b2oZeile(s, 'Ertragswert mit Stufe 3', 'Der Ertragswert gehört zur Wertermittlung (Stufe 3) — ohne sie bleibt es bei Mieten, Kosten und Rendite.'); await r26WohnungZu(); return; }
         var e3 = r26Kv('#mfh-we-ew .mfh-we-ew3'), zt = r6Text(r26We('#mfh-we-ew .mfh-we-hint')), zi = /Zins ([\d,]+ %)/.exec(zt);
         await zeige(function () { return r26We('#mfh-we-ew'); }, 6);
         await b2oZeile(s, 'Als Eigentumswohnung', 'Bestand <b>' + (e3['Bestand'] || '–') + '</b>, mit Mieterhöhung <b>' + (e3['Mieterhöhung'] || '–') + '</b>, im Zielbild <b>' + (e3['Zielbild'] || '–') + '</b>' + (zi ? ' — Zins ' + zi[1] + ' für Wohnungseigentum' : '') + '.');
@@ -5543,7 +5543,7 @@
         await r26WohnungAuf(1);
         var P = R26.plan[1];
         await zeige(r26BlockTitel(/^Mietvertrag/), 6);
-        var zb = r6Beginn(s, 'Wohnung 2', 'Zuletzt erhöht im <b>' + datum(P.mv_letzte_erhoehung).slice(3) + '</b>, Vergleichsmiete <b>' + P.vgl_qm + ' €/m²</b>.');
+        var zb = r6Beginn(s, 'Wohnung 2', 'Zuletzt erhöht im <b>' + ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'][+P.mv_letzte_erhoehung.slice(5, 7) - 1] + ' ' + P.mv_letzte_erhoehung.slice(0, 4) + '</b>, Vergleichsmiete <b>' + P.vgl_qm + ' €/m²</b>.');
         await r26Feld('mv_art', P.mv_art); await r26Feld('mv_beginn', P.mv_beginn); await r26Feld('mv_letzte_erhoehung', P.mv_letzte_erhoehung);
         await zeige(r26Block('soll'), 6);
         await r26Feld('vgl_qm', P.vgl_qm, 80);
@@ -5577,7 +5577,7 @@
         await r6Ende(zb);
         await zeige(function () { return b2oHuelle(r26Mfh('.mfh-tab'), r26Mfh('#mfh-summe')); }, 6);
         var n = [].filter.call(document.querySelectorAll('#mfh-modal .mfh-det.mit-plan'), function () { return true; }).length;
-        await b2oZeile(s, 'Sechs Wohnungen, sechs Pläne', '<b>' + n + ' Wohnungen</b> tragen jetzt einen Plan — „Details · Plan“. Gerechnet wird je Wohnung, nicht pauschal.');
+        await b2oZeile(s, 'Jede Wohnung für sich', '<b>' + n + ' Wohnungen</b> mit Zielbild („Details · Plan“), die übrigen mit Vergleichsmiete — gerechnet wird je Wohnung, nicht pauschal.');
       },
       async function (s) {   /* 10 · Ergebnis, Übernehmen */
         var wb = r26Mfh('#mfh-weiter'); if (wb) wb.click(); await warte(500);
@@ -5586,7 +5586,15 @@
         await warte(600);
         await zeige(function () { return r26Mfh('#mfh-body'); }, 6);
         var et = r6Text(r26Mfh('#mfh-body')), rg = /Restnutzungsdauer (\d+) Jahre/.exec(et), pg = /Gebäude gesamt:\s*([\d,]+) Punkte/.exec(et);
-        await b2oZeile(s, 'Schritt 4 · Ergebnis', 'Heute ' + (pg ? '<b>' + pg[1] + ' Punkte</b> nach Anlage 2' : 'die Punkte nach Anlage 2') + (rg ? ', Restnutzungsdauer <b>' + rg[1] + ' Jahre</b>' : '') + ' — Score und Verkehrswert rechnen weiter mit dem Bestand.');
+        await b2oZeile(s, 'Schritt 4 · Ergebnis', 'Heute ' + (pg ? '<b>' + pg[1].replace(/,0$/, '') + ' Punkte</b> nach Anlage 2' : 'die Punkte nach Anlage 2') + (rg ? ', Restnutzungsdauer <b>' + rg[1] + ' Jahre</b>' : '') + ' — Score und Verkehrswert rechnen weiter mit dem Bestand.');
+        /* Die Maßnahmenkosten NICHT als Sanierung ins Objekt: das Zielbild ist ein Plan, der Bestand
+           rechnet ohne ihn (Haken ist vorbelegt, wenn keine Sanierung eingetragen ist) */
+        var san = r26Mfh('#mfh-san'), sanZ = r26Mfh('#mfh-san-zeile');
+        if (san && sanZ && sanZ.offsetWidth) {
+          await zeige(function () { return r26Mfh('#mfh-san-zeile'); }, 8);
+          if (san.checked) san.click();
+          await b2oZeile(s, 'Kein Umbau im Bestand', 'Den Haken „' + r6Text(r26Mfh('#mfh-san-text')).replace(/ als Sanierung übernehmen.*$/, '') + ' als Sanierung“ lassen wir weg — das Zielbild ist ein Plan, die Investition bleibt der Kauf.');
+        }
         await zeige(function () { return r26Mfh('#mfh-weiter'); }, 8);
         s.zeile('Übernehmen', 'Ein Klick: Fläche, Einheiten, Ist-Miete und die Pläne gehen ins Objekt.');
         await warte(3200);
@@ -5618,11 +5626,18 @@
         var tw = function () { return q('#me_table_wrap'); };
         await warteAuf(function () { return q('#me_table_wrap table'); }, 4000);
         await zeige(tw, 8);
-        var zeilen = [].filter.call(document.querySelectorAll('#me_table_wrap tbody tr'), function () { return true; });
-        var z0 = zeilen[0] ? r6Text(zeilen[0].cells[1]) : null, hz = zeilen.filter(function (r) { return r.classList.contains('me-row-hike'); })[0];
-        var hj = hz ? r6Text(hz.cells[0]).replace(/\s*⬆/, '') : null, hv = hz ? r6Text(hz.cells[1]) : null, hp = hz && hz.previousElementSibling ? r6Text(hz.previousElementSibling.cells[1]) : z0;
-        DPM_REIHE.r26me = { modus: ME && ME.getMode ? ME.getMode() : null, z0: z0, sprung: hj, vor: hp, nach: hv };
-        await b2oZeile(s, 'Der Sprung zur Soll-Miete', (hz ? 'In <b>' + hj + '</b> greifen die Soll-Mieten: Kaltmiete von <b>' + hp + '</b> auf <b>' + hv + '</b> im Jahr' : 'Ab ihrem Termin rechnet jede Wohnung mit ihrer Soll-Miete') + '. Das Zielbild bleibt draußen — es ist ein Plan, kein Vertrag.');
+        var zeilen = [].filter.call(document.querySelectorAll('#me_table_wrap tbody tr'), function (r) { return r.cells.length >= 4; });
+        /* die erste Zeile, deren Faktor mehr springt als die Prognose-Steigerung: dort greifen die Soll-Mieten */
+        var fx = function (r) { return parseFloat(r6Text(r.cells[3]).replace(',', '.')) || 0; }, stg = (zahl('mietstg') || 0) / 100;
+        var hz = null, vorF = 1;
+        for (var j = 0; j < zeilen.length && !hz; j++) { var f = fx(zeilen[j]); if (f / vorF - 1 > stg + 0.005) hz = zeilen[j]; vorF = f; }
+        var hj = hz ? r6Text(hz.cells[0]).replace(/\s*⬆/, '') : null, hv = hz ? r6Text(hz.cells[1]) : null;
+        var hp = hz && hz.previousElementSibling ? r6Text(hz.previousElementSibling.cells[1]) : eur((zahl('nkm') || 0) * 12);
+        var kopf = r6Text(q('#me_table_wrap .me-herkunft'));
+        DPM_REIHE.r26me = { modus: ME && ME.getMode ? ME.getMode() : null, sprung: hj, vor: hp, nach: hv, kopf: kopf };
+        await b2oZeile(s, 'Der Sprung zur Soll-Miete', hz ? 'In <b>' + hj + '</b> greifen die Soll-Mieten: Kaltmiete <b>' + hv + '</b> statt ' + hp + ' im Jahr — danach weiter mit der Prognose.' : 'Ab ihrem Termin rechnet jede Wohnung mit ihrer Soll-Miete.');
+        await zeige(function () { return q('#me_table_wrap .me-herkunft'); }, 8);
+        await b2oZeile(s, 'Je Wohnung ihr Termin', '15 Monate nach der letzten Erhöhung — oder eine eigene Angabe. Das Zielbild bleibt draußen: es ist ein Plan, kein Vertrag.');
       },
       async function (s) {   /* 12 · Pilot-Analyse */
         reiter('s5'); await warte(1200);
@@ -5685,7 +5700,9 @@
         try { var tx = await bank.text(); DPM_REIHE.pdf26 = { bytes: bank.size, seite: _r26.seite, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8) }; } catch (e) {}
         zeige(null); kegelHoch(true);
         await r19Seite(bank, _r26.seite || 1);
-        await b2oZeile(s, 'Seite Wertpotenzial', 'Die Wohnungen mit Ist, Mieterhöhung und Zielmiete, die Ertragswerte je Stufe und die Wertbrücke — gekennzeichnet als Potenzialwert.', 1500);
+        await b2oZeile(s, 'Seite Wertpotenzial', 'Oben die Wohnungen: Ist, Mieterhöhung mit Termin, Zielmiete und Maßnahmen.');
+        await r19Seite(bank, _r26.seite || 1, 560);
+        await b2oZeile(s, 'Ertragswert und Wertbrücke', 'Darunter die Ertragswerte je Stufe und die Wertbrücke — gekennzeichnet als Potenzialwert, keine Verkehrswertermittlung.', 1500);
         var o = q('#dpm-pdf'); if (o && o.parentNode) o.parentNode.removeChild(o);
         kegelHoch(false);
       },

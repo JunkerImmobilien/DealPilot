@@ -141,7 +141,7 @@
     eingabe.baujahr = bj;
     eingabe.gnd = gnd();
     eingabe.modPoints = punkte;
-    eingabe.modPoints_herkunft = 'je Einheit gerechnet, Gebäudegewerke geerbt';
+    eingabe.modPoints_herkunft = 'Punkte des Hauses aus den Einheiten (flächengewichtet, Gebäudegewerke geerbt)';   /* v2483 */
     try {
       var r = window.DealPilotRND.calcAll(eingabe);
       var jahre = (r && r.methods && r.methods.punktraster)
@@ -734,22 +734,71 @@
     GEB_IDS.concat(WE_IDS).forEach(function (id) { gp += punkteVon(id, geb[id] || '0'); });
     /* v2095: die Rangfolge fuer Stichtag/kernsaniert EINMAL holen, nicht
        je Einheit - collectData() liest das ganze Formular. */
-    var basis = rndBasis();
+    /* ══ v2483 · EINE RESTNUTZUNGSDAUER FUER DAS HAUS ══════════════════
+       HIER STAND: je Einheit eine eigene RND (calcAll mit den Punkten der
+       Einheit) und als „Gebaeude gesamt" der flaechengewichtete MITTELWERT
+       dieser RNDs. Gemessen an Westerfeldstr. 140 (20.10.2026):
+
+         Mieterliste / Konfigurator   35 J.  (7 Punkte aus den Einheiten)
+         Wertpotenzial / Ertragswert  32 J.  (6 Punkte aus dem Feld mod_punkte)
+
+       Zwei Punktzahlen fuer dasselbe Gebaeude: der Konfigurator fuehrt
+       Fenster „teilweise erneuert" (1 P.), der Reiter Objekt „> 20 Jahre"
+       (0 P.) - und die Fenster gehen als Wohnungs-Gewerk NICHT ins Objekt
+       zurueck (inObjektZurueck nimmt nur die vier Gebaeude-Gewerke).
+
+       Anlage 2 ImmoWertV bewertet das GEBAEUDE: eine Punktzahl, eine RND.
+       Die Punkte des Hauses sind die flaechengewichteten Punkte der
+       Einheiten (`hausPunkte`, ganze Punkte wie die Tabelle der Anlage 2);
+       dieselbe Zahl geht ins Feld mod_punkte und damit in Marktbericht,
+       Ertragswert, Wertpotenzial und Zinssatz-Abfrage. Die RND des Hauses
+       kommt aus `hausRnd` - vom Marktbericht-Dienst (GND aus dem Modell des
+       Liegenschaftszinssatzes), sonst aus demselben Anlage-2-Kern hier. Eine
+       eigene RND je Einheit gibt es nicht mehr. */
     var zeilen = list.map(function (e) {
       var p = punkteEinheit(e, geb), fl = zahl(e.wfl);
-      var r = rndFuer(p.punkte, basis);
-      return { e: e, fl: fl, punkte: p.punkte, geerbt: p.geerbt,
-               /* `rnd` bleibt eine ZAHL - Z. 567 und 589 rechnen damit.
-                  Die Herkunft reist daneben mit, statt die Form zu
-                  aendern und zwei Verbraucher zu brechen. */
-               rnd: r ? r.jahre : null,
-               rndInfo: r || null };
+      return { e: e, fl: fl, punkte: p.punkte, geerbt: p.geerbt };
     });
     var flSum = zeilen.reduce(function (a, z) { return a + z.fl; }, 0);
     var pGew = flSum > 0 ? zeilen.reduce(function (a, z) { return a + z.punkte * z.fl; }, 0) / flSum
       : (zeilen.length ? zeilen.reduce(function (a, z) { return a + z.punkte; }, 0) / zeilen.length : 0);
-    var rGew = flSum > 0 ? zeilen.reduce(function (a, z) { return a + (z.rnd || 0) * z.fl; }, 0) / flSum : 0;
-    return { s: s, gebPunkte: Math.min(20, gp), zeilen: zeilen, punkteGew: pGew, rndGew: rGew };
+    var hp = Math.min(20, Math.round(pGew));
+    var hr = zeilen.length ? hausRnd(hp) : null;
+    return { s: s, gebPunkte: Math.min(20, gp), zeilen: zeilen, punkteGew: pGew, hausPunkte: hp,
+             rndGew: hr && hr.jahre > 0 ? hr.jahre : 0, rndInfo: hr };
+  }
+
+  /* v2483 · Die Punkte des Hauses aus dem GESPEICHERTEN Stand der Einheiten.
+     null, wenn die Objektart keine Einheiten fuehrt oder keine erfasst sind -
+     dann gilt das Feld mod_punkte (Reiter Objekt) wie bisher. */
+  function hausPunkte() {
+    var art = (el('objart') && el('objart').value) || '';
+    if (!ARTEN_MIT_EINHEITEN[art]) return null;
+    var d = daten(), list = d.einheiten || [];
+    if (!list.length) return null;
+    var geb = d.gebaeude || {}, fl = 0, sp = 0, sn = 0;
+    list.forEach(function (e) { var p = punkteEinheit(e, geb).punkte, f = zahl(e.wfl); fl += f; sp += p * f; sn += p; });
+    var g = fl > 0 ? sp / fl : sn / list.length;
+    return { punkte: Math.min(20, Math.round(g)), gewichtet: Math.round(g * 10) / 10, einheiten: list.length,
+             herkunft: 'Einheiten flächengewichtet (MFH-Konfigurator)' };
+  }
+
+  /* v2483 · Die RND des Hauses. Erst die Antwort des Marktbericht-Dienstes
+     (objekt-reiter.js legt sie als window._dpHausRnd ab - GND aus dem Modell
+     des Liegenschaftszinssatzes, derselbe Weg wie der Bericht), wenn sie zu
+     DIESEN Punkten und diesem Baujahr gehoert; sonst derselbe Anlage-2-Kern
+     im Browser (GND nach Anlage 1, Stichtag heute wie der Bericht). */
+  function hausRnd(punkte) {
+    var bj = zahl(el('baujahr') && el('baujahr').value);
+    var D = window._dpHausRnd;
+    if (D && D.rnd != null && Number(D.punkte) === Number(punkte) && Number(D.baujahr) === bj
+        && (D.key || null) === ((typeof window._currentObjKey === 'string' && window._currentObjKey) || null)) {
+      return { jahre: Number(D.rnd), gnd: D.gnd || null, quelle: 'marktbericht', gnd_quelle: D.gnd_quelle || null,
+               stichtag: new Date().toISOString().slice(0, 10), stichtag_herkunft: 'heute (Verkehrswert-Stichtag)' };
+    }
+    var r = rndFuer(punkte, rndBasis());
+    if (r) r.quelle = 'browser';
+    return r;
   }
   function ergebnisDaten() { return auswerten(_arbeit, _geb); }
   /* Fuer Bankunterlagen und PDF: aus dem GESPEICHERTEN Stand. */
@@ -1160,8 +1209,12 @@
        erhoben wurde (Ist, Staffel, Soll je Wohnung). Umgestellt wird
        nur, wenn der Modus etwas zu rechnen hat, und die Meldung sagt es. */
     var ME = window.MietEntwicklung;
+    /* v2481 · auch die von DealPilot GERECHNETE Soll-Miete (Vergleichsmiete, Kappung) zaehlt -
+       s.hatSoll kennt nur die eigene Angabe. Gemessen (Drehbuch Modul 26): sechs Wohnungen mit
+       Vergleichsmiete, der Modus blieb auf Prognose. */
+    var _hatSollP = false; try { _hatSollP = !!(window.DpPotenzial && window.DpPotenzial.modell({ einheiten: list, gebaeude: _geb }).hat_soll); } catch (x) {}
     if (list.length && ME && typeof ME.setMode === 'function' && typeof ME.einheitenNutzbar === 'function'
-        && ME.einheitenNutzbar() && (s.hatSoll || list.some(function (e) { return e.mv_in_mietentwicklung; }))) {
+        && ME.einheitenNutzbar() && (s.hatSoll || _hatSollP || list.some(function (e) { return e.mv_in_mietentwicklung; }))) {
       if (ME.getMode() !== 'einheiten') meldung += ' · Mietentwicklung: aus Wohnungen';
       ME.setMode('einheiten');   /* ruft calc() selbst */
     } else if (typeof window.calc === 'function') window.calc();

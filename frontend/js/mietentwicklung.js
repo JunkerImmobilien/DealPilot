@@ -295,9 +295,16 @@ window.MietEntwicklung = (function() {
     var alle = _einheiten().filter(function (e) { return _zahl(e.ist) > 0; });
     var mit = alle.filter(function (e) { return e.mv_in_mietentwicklung; });
     var index = mit.filter(function (e) { return e.mv_art === 'index'; });
-    var soll = _einheiten().filter(function (e) { return _zahl(e.soll) > 0; });   /* v2410 */
+    /* v2481 · GEMESSEN (Drehbuch Modul 26): seit v2430 rechnet DealPilot die Soll-Miete selbst
+       (Vergleichsmiete, Kappungsgrenze) und _mieteEinheit setzt sie ab ihrem Termin ein - gezaehlt
+       wurde hier aber nur die EIGENE Angabe (e.soll). Der Kopf sagte „die uebrigen 5 bleiben auf ihrer
+       Ist-Miete", waehrend die Tabelle in Jahr 1 um 7,7 % sprang. Gezaehlt wird jetzt, was rechnet. */
+    var _P = window.DpPotenzial, _bj = _basisJahr();
+    var _sp = function (e) { return (e.status !== 'leer' && _P && _P.sollFuerMietentwicklung) ? _P.sollFuerMietentwicklung(e, _bj) : null; };
+    var soll = _einheiten().filter(function (e) { return _zahl(e.soll) > 0 || !!_sp(e); });   /* v2410, v2481 */
+    var termin = _einheiten().filter(function (e) { var x = _sp(e); return x && x.jahrIndex != null; });
     return { gesamt: alle.length, mit: mit.length, index: index.length,
-             soll: soll.length, soll_ab: sollJahr(), soll_roh: Math.round(Number(window._dpMfh && window._dpMfh.sollAbJahr) || 0),
+             soll: soll.length, soll_termin: termin.length, soll_ab: sollJahr(), soll_roh: Math.round(Number(window._dpMfh && window._dpMfh.sollAbJahr) || 0),
              miete_heute: _summeEinheiten(0) };
   }
 
@@ -443,10 +450,11 @@ window.MietEntwicklung = (function() {
         + '</b> davon mit Staffel- oder Indexvertrag.'
         + (st.gesamt > st.mit
             ? ' Die \u00fcbrigen ' + (st.gesamt - st.mit) + ' bleiben auf ihrer Ist-Miete \u2014 f\u00fcr sie'
-              + ' wird <b>keine</b> Steigerung angenommen' + (st.soll && st.soll_ab ? ', bis ihre Soll-Miete greift' : '') + '.'
+              + ' wird <b>keine</b> Steigerung angenommen' + (st.soll && (st.soll_ab || st.soll_termin) ? ', bis ihre Soll-Miete greift' : '') + '.'
             : '')
         + (st.soll && st.soll_ab ? (st.soll_roh >= 1900 ? ' Ab ' + st.soll_roh : ' Ab Jahr ' + st.soll_ab) + ' gilt je Wohnung die <b>Soll-Miete</b> (' + st.soll + ' Wohnungen).' : '')
-        + (st.soll && !st.soll_ab ? ' Soll-Mieten sind erfasst, aber ohne Jahr \u2014 sie gehen noch nicht ein (Konfigurator, Schritt 4).' : '')
+        + (st.soll && !st.soll_ab && st.soll_termin ? ' Je Wohnung gilt ab ihrem Termin die <b>Soll-Miete</b> (' + st.soll_termin + ' Wohnungen: 15 Monate nach der letzten Erhöhung oder eigene Angabe).' : '')   /* v2481 */
+        + (st.soll && !st.soll_ab && !st.soll_termin ? ' Soll-Mieten sind erfasst, aber ohne Jahr \u2014 sie gehen noch nicht ein (Konfigurator, Schritt 4).' : '')
         + '</div>';
       if (st.index > 0) {
         kopf += '<div class="me-herkunft me-herkunft-annahme">\u26a0 <b>' + st.index
