@@ -305,8 +305,12 @@ async function gemAbruf(a, log) {
     if (code && code !== '0') throw new Error('GENESIS-Code ' + code);
     const csv = DestatisConnector._extractCsv(txt);
     const zeilen = a.art === 'bev' ? gemBevZeilen(csv) : gemWanZeilen(csv);
-    if (!zeilen.length) throw new Error('keine Zeilen gelesen');
-    const n = await schreiben(zeilen);
+    /* v2517a · Hamburg, Bremen und Berlin fuehren in den Gemeindetabellen nur
+       fuenfstellige Zeilen (gemessen 20.10.2026: 04, 04011, 04012) - dort ist
+       die Gemeinde der Kreis, und der Kreiswert gilt. Das ist kein Fehler;
+       als Fehler gezaehlt, liefe der Takt alle 12 Stunden erneut. */
+    if (!zeilen.length && !/^((19|20)\d{2};)?\d{2}(\d{3})?;/m.test(csv)) throw new Error('keine Zeilen gelesen');
+    const n = zeilen.length ? await schreiben(zeilen) : 0;
     const gebiete = new Set(zeilen.map((z) => z.ags)).size;
     await protokoll(a.tabelle, a.filter + ' ' + a.von + '-' + a.bis, n, gebiete, Date.now() - t0, 'ok', null);
     log(a.tabelle + ' ' + a.filter + ' ' + a.von + '-' + a.bis + ': ' + n + ' Werte · ' + gebiete + ' Gemeinden · ' + Math.round((Date.now() - t0) / 1000) + ' s');
@@ -348,7 +352,7 @@ export async function importiereGemeinden({ log = console.log, laender = LAENDER
   const fehler = ergebnis.filter((r) => !r.ok);
   /* rund 10.800 Gemeinden in Deutschland; 10.000 als Untergrenze */
   const voll = !fehler.length && deckung.length === 3
-    && deckung.every((d) => Number(d.gemeinden) >= 10000 && Number(d.laender) === 16);
+    && deckung.every((d) => Number(d.gemeinden) >= 10000 && Number(d.laender) >= 13);   /* v2517a: ohne die drei Stadtstaaten */
   await protokoll('GESAMT-GEMEINDE', null, ergebnis.reduce((s, r) => s + (r.werte || 0), 0),
     deckung.length ? Math.min(...deckung.map((d) => Number(d.gemeinden))) : 0, Date.now() - t0, voll ? 'ok' : 'fehler',
     voll ? null : (fehler.length + ' Abrufe gescheitert; Deckung ' + JSON.stringify(deckung)));

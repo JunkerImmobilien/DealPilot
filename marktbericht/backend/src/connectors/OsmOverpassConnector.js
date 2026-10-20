@@ -67,7 +67,14 @@ export const OsmOverpassConnector = {
     try {
       const res = await fetch(cfg.overpass.endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        /* v2514a · Gemessen am 20.10.2026 im Container: overpass-api.de
+           antwortet auf Anfragen ohne aussagekraeftigen User-Agent mit
+           406 Not Acceptable (ein Spiegel mit 429 und dem Hinweis
+           „include a meaningful User-Agent"). Node schickt keinen - der
+           Rueckfall lieferte damit seit jeher NICHTS, und die Fehlerform
+           (leeres Array) sah aus wie „keine Orte". */
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded',
+                   'User-Agent': 'DealPilot-Marktbericht/1.0 (Lageanalyse; Junker Solution)' },
         body: 'data=' + encodeURIComponent(ql),
         signal: ctrl.signal,
       });
