@@ -1667,7 +1667,8 @@ function _makroZeilen(d) {
     /* v2517 · Ebene JE WERT (Gemeinde vor Kreis); Name wie amtlich */
     const wo = (w) => {
       const eb = w.ebene || 'Kreis', g = w.gebiet || (eb === 'Kreis' ? mk.kreis_name : null);
-      return g ? (new RegExp(eb, 'i').test(g) ? g : eb + ' ' + g) : eb;
+      /* amtliche Form „Bielefeld, Stadt" / „Minden-Lübbecke, Kreis" bleibt, wie sie ist */
+      return g ? ((new RegExp(eb, 'i').test(g) || g.indexOf(',') >= 0) ? g : eb + ' ' + g) : eb;
     };
     return {
       ebene: mk.ebene || 'Kreis',
