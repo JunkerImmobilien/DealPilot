@@ -695,7 +695,8 @@ function _pfZahl(n) {
   var x = (typeof n === 'number') ? n : Number(String(n).replace(',', '.'));
   return isFinite(x) ? x : NaN;
 }
-function pP(n, d) { d = d || 2; var x = _pfZahl(n); return isNaN(x) ? '-' : x.toFixed(d).replace('.', ',') + ' %'; }
+/* v2463 · „d || 2" machte aus 0 Nachkommastellen zwei (Gebäudeanteil „31,71 %" statt „32 %"). */
+function pP(n, d) { d = (d == null) ? 2 : d; var x = _pfZahl(n); return isNaN(x) ? '-' : x.toFixed(d).replace('.', ',') + ' %'; }
 function pN(n, d) { d = d || 1; var x = _pfZahl(n); return isNaN(x) ? '-' : x.toFixed(d).replace('.', ','); }
 
 /* ── PAGE TEMPLATE ──────────────────────────────── */
@@ -780,7 +781,8 @@ function kBox(doc, x, y, w, h, label, val, vc) {
   doc.setFillColor.apply(doc, C.CH);
   doc.roundedRect(x, y, w, h, 2.5, 2.5, 'F');
   doc.setFillColor.apply(doc, C.GOLD); doc.rect(x, y, w, 1.5, 'F');
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(6); doc.setTextColor(90,85,80);
+  /* v2463 · Beschriftung war 90/85/80 auf Obsidian (Kontrast unter 2:1) - kaum lesbar. */
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(6); doc.setTextColor(196, 188, 170);
   doc.text(label.toUpperCase(), x + 3, y + 7);
   doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5);
   doc.setTextColor.apply(doc, vc);
@@ -1232,7 +1234,10 @@ async function _exportPDFInner() {
   [
     { l: 'Bruttomietrendite', v: pP(K.bmy),           c: K.bmy >= 5 ? C.GREEN : C.GOLD },
     { l: 'Nettomietrendite',  v: pP(K.nmy),           c: K.nmy >= 3 ? C.GREEN : C.GOLD },
-    { l: 'CF/Monat n.St.',    v: pE(K.cf_m, true),    c: K.cf_m >= 0 ? C.GREEN : C.RED }
+    /* v2463 · K.cf_m ist der Cashflow VOR Steuern / 12 - die Kachel heisst „n.St." */
+    { l: 'CF/Monat n.St.',    v: pE(K.cf_ns / 12, true),    c: K.cf_ns >= 0 ? C.GREEN : C.RED },
+    /* v2463 · vierte Kachel: die erste Reihe hatte drei Kacheln unter vier Spalten (Lücke rechts) */
+    { l: 'EK-Rendite (v. St.)', v: pP(K.ekr, 1),      c: K.ekr >= 0 ? C.GREEN : C.RED }
   ].forEach(function(k, i) { kBox(doc, M + i * (tw4 + 3), cy, tw4, 20, k.l, k.v, k.c); });
   cy += 23;
 
@@ -1288,7 +1293,10 @@ async function _exportPDFInner() {
     _cfRows.push(['- Tilgung / Jahr',                  '- ' + pE(K.tilg_j)]);
     _cfRows.push(['= CF vor Steuern (nach Tilgung)',          pE(cf_vst_now, true)]);
   }
-  _cfRows.push(['\u00b1 Steuern / Jahr',                    (K.steuer < 0 ? '+ ' : '- ') + pE(Math.abs(K.steuer))]);
+  /* v2463 · Steuer als Differenz der Volljahres-Cashflows (wie die App, calc.js V352) -
+     K.steuer ist das anteilige erste Jahr: „+ 771" zwischen zwei gleichen Cashflows. */
+  var _stP2 = (K.cf_ns || 0) - (K.cf_op || 0);
+  _cfRows.push(['\u00b1 Steuern / Jahr',                    (_stP2 > 0.5 ? '+ ' : (_stP2 < -0.5 ? '- ' : '')) + pE(Math.abs(_stP2))]);
   _cfRows.push(['= CF nach Steuern / Jahr (operativ)',      pE(K.cf_ns, true)]);
   _cfRows.push(['= CF nach Steuern / Monat',                pE(K.cf_ns_m || (K.cf_ns/12), true)]);
   kvT(doc, M, cy, hw, _cfRows, [2, 4, 6, 8, 10, 11]);
@@ -1305,7 +1313,7 @@ async function _exportPDFInner() {
     ['Wertpuffer / Equity',  pE(K.wp_kpi, true)],
     ['AfA / Jahr',           pE(K.afa)],
     ['Zu versteuernder CF',  pE(K.zve_immo, true)],
-    ['Zinsrisiko / Mon.',    pE(K.zaer_m) + '/Mon.']
+    ['Zinsrisiko / Mon.',    pE(K.zaer_m) + ' \u20ac']
   ], [4, 5]);
   setPdfProgress(35);
 
@@ -1366,7 +1374,7 @@ async function _exportPDFInner() {
     } else {
       finRows.push(['Anf\u00e4ngl. Tilgung', pP(d1t, 2)]);
     }
-    finRows.push(['Monatliche Rate', pE(d1_rate, 2)]);
+    finRows.push(['Monatliche Rate', pE(d1_rate)]);   /* v2463: das zweite Argument ist das Vorzeichen, nicht die Stellen („+1.968") */
   }
   finRows.push(['Eigenkapital', pE(K.ek)]);
   finRows.push(['LTV (Loan to Value)', pP(K.ltv, 1)]);
@@ -1387,9 +1395,10 @@ async function _exportPDFInner() {
     doc.setFillColor.apply(doc, C.GREEN); doc.rect(M, cy, 3, 12, 'F');
     doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5);
     doc.setTextColor.apply(doc, C.GREEN);
-    doc.text('Sofortiger Wertpuffer / Equity: ' + pE(K.wp_kpi, true), M + 7, cy + 8);
+    doc.text('Sofortiger Wertpuffer / Equity: ' + pE(K.wp_kpi, true) + ' \u20ac', M + 7, cy + 8);
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor.apply(doc, C.MID);
-    doc.text('Kaufpreis ' + pE(K.kp) + '  vs.  Verkehrswert ' + pE(v('svwert')), W - M, cy + 8, { align: 'right' });
+    /* v2463 · stand bündig auf dem Rahmen (x = W - M) */
+    doc.text('Kaufpreis ' + pE(K.kp) + ' \u20ac  vs.  Verkehrswert ' + pE(v('svwert')) + ' \u20ac', W - M - 4, cy + 8, { align: 'right' });
     cy += 15;
   }
 
@@ -1594,12 +1603,14 @@ async function _exportPDFInner() {
   // Für die "vor BSV"-Anzeige addieren wir sie wieder, damit der User sieht
   // wie sich der CF zusammensetzt.
   var _bsparY = (State.bsparRate_m || 0) * 12;
+  /* v2463 · Steuer je Phase = Cashflow vor minus nach Steuern (Volljahre, wie die App) -
+     gemessen: Ende Zinsbindung 11.216 - 2.467 ergab nicht die gezeigten 8.943. */
   var heuteData = { wm: K.nkm_j, bwk: K.bwk_cf, zins: K.zins_j, tilg: K.tilg_j,
-                    cf_op: K.cf_op, steuer: K.steuer, cf_ns: K.cf_ns, bspar: _bsparY };
+                    cf_op: K.cf_op, steuer: (K.cf_op || 0) - (K.cf_ns || 0), cf_ns: K.cf_ns, bspar: _bsparY };
   var ezbData   = { wm: K.nkm_ezb, bwk: K.bwk_cf_ezb, zins: K.zins_ezb, tilg: K.tilg_ezb,
-                    cf_op: K.cf_op_ezb, steuer: K.ster_ezb, cf_ns: K.cf_ns_ezb, bspar: _bsparY };
+                    cf_op: K.cf_op_ezb, steuer: (K.cf_op_ezb || 0) - (K.cf_ns_ezb || 0), cf_ns: K.cf_ns_ezb, bspar: _bsparY };
   var anData    = { wm: K.nkm_an, bwk: K.bwk_cf_an, zins: K.zins_an, tilg: K.tilg_an,
-                    cf_op: K.cf_op_an, steuer: K.ster_an, cf_ns: K.cf_ns_an, bspar: _bsparY };
+                    cf_op: K.cf_op_an, steuer: (K.cf_op_an || 0) - (K.cf_ns_an || 0), cf_ns: K.cf_ns_an, bspar: _bsparY };
 
   drawCFCard(M,                cy, 'HEUTE (' + new Date().getFullYear() + ')',     C.GREEN,         heuteData);
   drawCFCard(M + cfColW + 4,   cy, 'ENDE ZINSBINDUNG',                              C.GOLD,     ezbData);
@@ -1629,7 +1640,7 @@ async function _exportPDFInner() {
   // V63.66: Wert-Anker für Wertsteigerung (svw > bankval > kp) explizit ausweisen
   if (State.wert_basis && State.wert_basis !== v('kp')) {
     var _wbLabel = (v('svwert') > 0)
-      ? 'Verkehrswert (§194 BauGB)'
+      ? 'Verkehrswert (§ 194 BauGB)'
       : (v('bankval') > v('kp'))
         ? 'Bankbewertung'
         : 'Kaufpreis';
@@ -1703,7 +1714,7 @@ async function _exportPDFInner() {
       // Vorher: hardcoded "-" davor → bei Erstattung (negativ) wurde "--663" angezeigt.
       // Steuer-Wert: positiv = Belastung, negativ = Erstattung. Wir drehen Vorzeichen für die Anzeige
       // (Zahllast-Sicht: + = Geld weg, - = Geld zurück), damit es wie im Frontend "± Steuer" wirkt.
-      ['Steuern / Jahr', pE(-pt.now.ster, true), pE(-pt.ezb.ster, true), pE(-pt.an.ster, true)],
+      ['Steuern / Jahr', pE(pt.now.cfns - pt.now.cfvst, true), pE(pt.ezb.cfns - pt.ezb.cfvst, true), pE(pt.an.cfns - pt.an.cfvst, true)],   /* v2463: Differenz, wie die App (ph-st-now) */
       ['CF nach Steuern / Jahr', pE(pt.now.cfns, true), pE(pt.ezb.cfns, true), pE(pt.an.cfns, true)],
       ['CF nach Steuern / Monat', pE(pt.now.cfns / 12, true), pE(pt.ezb.cfns / 12, true), pE(pt.an.cfns / 12, true)],
       ['Bruttomietrendite', pP(pt.now.bmy, 2), pP(pt.ezb.bmy, 2), pP(pt.an.bmy, 2)],
@@ -1792,7 +1803,7 @@ async function _exportPDFInner() {
       var _zT = function(id) { var el = document.getElementById(id); return (el && el.textContent.trim()) || '-'; };
       var zaerRows = [
         ['Zinssatz',                 _zT('zaer-zins-now'),  _zT('zaer-zins-ezb'),  _zT('zaer-zins-an')],
-        ['Monatliche Rate',          _zT('zaer-rate-now'),  _zT('zaer-rate-ezb'),  _zT('zaer-rate-an')],
+        ['Monatliche Rate',          _zT('zaer-rate-now').replace(/^\+/, ''),  _zT('zaer-rate-ezb').replace(/^\+/, ''),  _zT('zaer-rate-an').replace(/^\+/, '')],
         ['CF/Mon (vor Steuer)',      _zT('zaer-cfvst-now'), _zT('zaer-cfvst-ezb'), _zT('zaer-cfvst-an')],
         ['CF/Mon (nach Steuer)',     _zT('zaer-cf-now'),    _zT('zaer-cf-ezb'),    _zT('zaer-cf-an')],
         ['DSCR',                     _zT('zaer-dscr-now'),  _zT('zaer-dscr-ezb'),  _zT('zaer-dscr-an')],
@@ -1895,7 +1906,7 @@ async function _exportPDFInner() {
     //  - overflow:visible für Body damit "251.546 €" und "+1.470 €" nicht in 2 Zeilen umbricht
     var _projHead = [
       'Jahr',
-      'NKM/Mon',
+      'NKM\n/Mon',
       'Zinsen',
       _hasBsparProj ? 'BSV-Rate' : 'Tilgung',
       'CF v.St./J',
@@ -2078,7 +2089,14 @@ async function _exportPDFInner() {
           }
         }
       },
-      margin: { left: _tblM, right: _tblM }
+      /* v2463 · die Fortsetzungsseite hatte weder Kopf noch Fuss und keine
+         Seitennummer (alle folgenden Nummern lagen um eins daneben). */
+      margin: { left: _tblM, right: _tblM, top: 30, bottom: 16 },
+      didDrawPage: function (dp) {
+        if (dp.pageNumber > 1 && doc.internal.getNumberOfPages() > pageNum) {
+          pageNum++; pageTpl(doc, pageNum, 'Cashflow-Projektion \u00b7 Fortsetzung', W, M);
+        }
+      }
     });
     cy = doc.lastAutoTable.finalY + 4;
 
@@ -2090,8 +2108,9 @@ async function _exportPDFInner() {
     doc.text('Alle Werte in EUR' +
              (_hasBsparProj ? '  \u00b7  BSV-Rate statt Tilgung (Tilgungsaussetzung)' : ''), _tblM, cy);
     cy += 3.5;
-    doc.text('CF v.St./J = NKM - Bewirt. n.uml. - Zinsen - Tilgung (was wirklich am Konto bleibt, vor Steuer)  \u00b7  CF n.St./J = NKM - Bewirt. n.uml. - Zinsen +/- Steuer (operativ, ohne Tilgung)', _tblM, cy);
-    cy += 3.5;
+    /* v2463 · lief 9 mm über den rechten Rand, und „ohne Tilgung" stimmte nicht:
+       gemessen CF n.St./J 2027 = 7.965 - 388 = 7.577, also nach Tilgung. */
+    doc.splitTextToSize('CF v.St./J = NKM - Bewirt. n.uml. - Zinsen - Tilgung (was wirklich am Konto bleibt, vor Steuer)  \u00b7  CF n.St./J = CF v.St./J +/- Steuer', _tblW).forEach(function (z) { doc.text(z, _tblM, cy); cy += 3.5; });
     doc.text('LTV-F\u00e4rbung: gr\u00fcn bis ' + _pdfSw().ltvGruenTxt + ' %  \u00b7  gold ' + _pdfSw().ltvGruenTxt + '-' + _pdfSw().ltvRotTxt + ' %  \u00b7  rot \u00fcber ' + _pdfSw().ltvRotTxt + ' %  \u00b7  Anschluss-Konditionen ab Jahr ' + g('d1_bindj') + ': ' + pP(v('anschl_z'), 1) + ' / ' + pP(v('anschl_t'), 1), _tblM, cy);
     cy += 6;
     console.log('[pdf] V63.99 CF-Projektion 13-Spalten (ohne BWK n.u., ohne Sum-Row), finalY=' + cy);
@@ -2179,17 +2198,20 @@ async function _exportPDFInner() {
     var card = host.querySelector('.bc-card');
     if (!card) return null;
 
-    var eyebrow = (card.querySelector('.bc-head-eyebrow') || {}).textContent || '';
-    var title = (card.querySelector('.bc-head-title') || {}).textContent || '';
-    var sub = (card.querySelector('.bc-head-sub') || {}).textContent || '';
+    /* v2463 · Texte aus der Oberfläche tragen U+2212 (Minus) - die Standardschrift
+       kennt es nicht, im PDF stand „' 46.092 €". */
+    var _pdfT = function (t) { return String(t || '').replace(/[\u2212\u2011\u2012\u2013]/g, '-').replace(/[\u00a0\u202f]/g, ' ').replace(/[^\x00-\xFF\u20AC\u2014]/g, ''); };
+    var eyebrow = _pdfT((card.querySelector('.bc-head-eyebrow') || {}).textContent || '');
+    var title = _pdfT((card.querySelector('.bc-head-title') || {}).textContent || '');
+    var sub = _pdfT((card.querySelector('.bc-head-sub') || {}).textContent || '');
     var headlineKpi = (card.querySelector('.bc-headline-kpi') || {}).textContent || '';
     var headlineKpiLabel = (card.querySelector('.bc-headline-kpi-label') || {}).textContent || '';
     var footerCells = Array.prototype.slice.call(card.querySelectorAll('.bc-footer-cell'));
     var footer = footerCells.map(function(cell) {
       return {
-        label: ((cell.querySelector('.bc-footer-label') || {}).textContent || '').trim(),
-        value: ((cell.querySelector('.bc-footer-value') || {}).textContent || '').trim(),
-        sub:   ((cell.querySelector('.bc-footer-sub')   || {}).textContent || '').trim()
+        label: _pdfT((cell.querySelector('.bc-footer-label') || {}).textContent || '').trim(),
+        value: _pdfT((cell.querySelector('.bc-footer-value') || {}).textContent || '').trim(),
+        sub:   _pdfT((cell.querySelector('.bc-footer-sub')   || {}).textContent || '').trim()
       };
     });
     return {
@@ -2389,7 +2411,7 @@ async function _exportPDFInner() {
     doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
     doc.setTextColor(120, 115, 110);
     zinsSzen.forEach(function(z, i) {
-      var label = (z > 0 ? '+' : '') + z.toFixed(1) + ' pp';
+      var label = (z > 0 ? '+' : (z < 0 ? '-' : '\u00b1')) + Math.abs(z).toFixed(1).replace('.', ',') + ' pp';   /* v2463: Komma */
       doc.text(label, matX - 2, matY + i * cellH + cellH / 2 + 1, { align: 'right' });
     });
 
@@ -2704,6 +2726,15 @@ async function _exportPDFInner() {
           if (t > max) max = t;
         });
       }
+      /* v2463 · die Schwellen kamen als thresholdLines und weiteten die Achse NICHT:
+         „>= 1,2 (gut)" stand im Seitenfuss, „1,0 (knapp)" ausserhalb der Seite und die
+         80-%-Linie des LTV im DSCR-Diagramm. */
+      if (opts.thresholdLines) {
+        opts.thresholdLines.forEach(function(t) {
+          if (t.value < min) min = t.value;
+          if (t.value > max) max = t.value;
+        });
+      }
       var range = max - min || 1;
       // Kleiner Puffer
       min -= range * 0.08;
@@ -2883,9 +2914,8 @@ async function _exportPDFInner() {
     if (equityData && equityData.sub) {
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
       doc.setTextColor(120, 115, 110);
-      var sLines = doc.splitTextToSize(equityData.sub, CW);
-      doc.text(sLines[0] || '', M, cy);
-      cy += 4;
+      var sLines = doc.splitTextToSize(equityData.sub, CW).slice(0, 2);   /* v2463: zweite Zeile fiel weg */
+      sLines.forEach(function (l) { doc.text(l, M, cy); cy += 3.8; });
     }
     cy += 1;
 
@@ -2962,9 +2992,8 @@ async function _exportPDFInner() {
     if (waterfallData && waterfallData.sub) {
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
       doc.setTextColor(120, 115, 110);
-      var wfSLines = doc.splitTextToSize(waterfallData.sub, CW);
-      doc.text(wfSLines[0] || '', M, cy);
-      cy += 4;
+      var wfSLines = doc.splitTextToSize(waterfallData.sub, CW).slice(0, 2);   /* v2463: Satz brach mitten ab */
+      wfSLines.forEach(function (l) { doc.text(l, M, cy); cy += 3.8; });
     }
     cy += 1;
 
@@ -2989,7 +3018,7 @@ async function _exportPDFInner() {
     if (waterfallData && waterfallData.footer && waterfallData.footer.length > 0) {
       var wfnF = Math.min(waterfallData.footer.length, 3);
       var wffW = (CW - (wfnF - 1) * 3) / wfnF;
-      var wffH = 13;
+      var wffH = 16;   /* v2463: Platz für zwei Zeilen Untertext */
       var wffY = cy;
       waterfallData.footer.slice(0, wfnF).forEach(function(cell, i) {
         var wffX = M + i * (wffW + 3);
@@ -3009,8 +3038,8 @@ async function _exportPDFInner() {
         if (cell.sub) {
           doc.setFont('helvetica', 'normal'); doc.setFontSize(6);
           doc.setTextColor(120, 115, 110);
-          var sub = doc.splitTextToSize(cell.sub, wffW - 4);
-          doc.text(sub[0] || '', wffX + 2.5, wffY + 11);
+          var sub = doc.splitTextToSize(cell.sub, wffW - 4).slice(0, 2);   /* v2463: „— alles aus dem" brach ab */
+          sub.forEach(function (l, j) { doc.text(l, wffX + 2.5, wffY + 11 + j * 2.6); });
         }
       });
       cy = wffY + wffH + 3;
@@ -3063,7 +3092,9 @@ async function _exportPDFInner() {
     var _vzCapture = null;
 
     if (!_vzCapture) {
-      var btjY = parseInt(g('btj') || '15');
+      /* v2463 · das Feld btj ist oft leer - dann stand hier „15 Jahre", während das
+         Objekt über 20 Jahre rechnet (Wertsteigerung 245.567 gegen 345.023 darüber). */
+      var btjY = State.btj || parseInt(g('btj'), 10) || (State.cfRows || []).length || 15;
       var _vz = State._vz || {};
       var cumT = _vz.tilg_durch_einnahmen || 0;
       var cumC = _vz.cf_ueberschuss_konto || 0;
@@ -3084,7 +3115,7 @@ async function _exportPDFInner() {
 
     if (!_vzCapture) {
       var lastRow = State.cfRows[State.cfRows.length - 1];
-      var btjY = parseInt(g('btj') || '15');
+      var btjY = State.btj || parseInt(g('btj'), 10) || (State.cfRows || []).length || 15;
       var cumNkm = 0, cumBwk = 0, cumZins = 0, cumTax = 0, cumTilg = 0, cumBspar = 0;
       State.cfRows.forEach(function(r){
         cumNkm += r.nkm_y || 0;
@@ -3102,7 +3133,7 @@ async function _exportPDFInner() {
       var mstgPct = parseDe(g('mietstg')) || 1.5;
       var kstgPct = parseDe(g('kostenstg')) || 1.0;
       cy = secH(doc, cy, 'Wie der Cashflow-\u00dcberschuss entsteht (' + btjY + ' Jahre)', M, CW);
-      var nkmHeute = ((K.nkm_m || 0) + (K.ze_m || 0)) * 12;
+      var nkmHeute = K.nkm_j || (((K.nkm_m || 0) + (K.ze_m || 0)) * 12);   /* v2463: nkm_m gibt es nicht - „davon statisch 0" */
       var statisch = nkmHeute * btjY;
       var _cumTaxDisplay = -cumTax;
       var _vzData = (window.State && window.State._vz) || {};
@@ -3179,42 +3210,88 @@ async function _exportPDFInner() {
       doc.splitTextToSize(_pc(_PD.satz_invest + ' ' + _PD.satz_bank), CW).forEach(function (t) { doc.text(t, M, cy + 3); cy += 4.4; });
       cy += 4;
       var _tab = function (kopf, breiten, zeilen, fettRe) {
-        var fak = CW / breiten.reduce(function (a, b) { return a + b; }, 0), rh = 5.8;
+        var fak = CW / breiten.reduce(function (a, b) { return a + b; }, 0), rh0 = 5.8;
+        /* v2464 · gemessen: die Maßnahmen wurden nach der ersten Zeile abgeschnitten
+           („Treppenhaus und"), und „kein Potenzial" stand blau/grün wie ein Wert.
+           Jetzt bricht die Maßnahmenspalte um (bis drei Zeilen), „kein Potenzial"
+           steht neutral grau, und der Text links hält 3 mm Abstand zur Zahl davor. */
         var zeichne = function (werte, istKopf, idx) {
+          doc.setFont('helvetica', istKopf ? 'bold' : 'normal'); doc.setFontSize(istKopf ? 7 : 8);
+          var zellen = werte.map(function (w, i) {
+            var bw = breiten[i] * fak, t = _pc(w);
+            if (!istKopf && /Maßnahmen/.test(kopf[i])) return doc.splitTextToSize(t, bw - 5).slice(0, 3);
+            if (i === 0) return [doc.splitTextToSize(t, bw - 3)[0] || ''];
+            return [t];
+          });
+          var n = zellen.reduce(function (a, z) { return Math.max(a, z.length); }, 1), rh = rh0 + (n - 1) * 3.4;
+          if (!istKopf && cy + rh > 275) { cy = newPage('Wertpotenzial · Fortsetzung'); zeichne(kopf, true, 0); doc.setFont('helvetica', 'normal'); doc.setFontSize(8); }
           var x = M;
           doc.setFillColor.apply(doc, istKopf ? C.CH : (idx % 2 === 0 ? C.SURF : C.WHITE));
           doc.setDrawColor.apply(doc, C.BORDER); doc.setLineWidth(0.2);
           doc.rect(M, cy, CW, rh, istKopf ? 'F' : 'FD');
           var fett = !istKopf && fettRe && fettRe.test(String(werte[0]));
           doc.setFont('helvetica', (istKopf || fett) ? 'bold' : 'normal'); doc.setFontSize(istKopf ? 7 : 8);
-          werte.forEach(function (w, i) {
-            var bw = breiten[i] * fak;
+          zellen.forEach(function (z, i) {
+            var bw = breiten[i] * fak, t0 = z[0];
             if (istKopf) doc.setTextColor.apply(doc, C.GOLD);
+            else if (t0 === 'kein Potenzial') doc.setTextColor.apply(doc, C.MID);
             else if (kopf[i] === 'Mieterhöhung') doc.setTextColor(61, 111, 168);
             else if (kopf[i] === 'Zielbild' || kopf[i] === 'Ziel €/M') doc.setTextColor(47, 125, 85);
             else doc.setTextColor.apply(doc, C.CH);
-            var t = _pc(w);
-            if (i === 0 || /Maßnahmen/.test(kopf[i])) doc.text(doc.splitTextToSize(t, bw - 3)[0] || '', x + 2, cy + rh - 1.8);
-            else doc.text(t, x + bw - 2, cy + rh - 1.8, { align: 'right' });
+            z.forEach(function (t, j) {
+              var ty = cy + rh0 - 1.8 + j * 3.4;
+              if (i === 0) doc.text(t, x + 2, ty);
+              else if (/Maßnahmen/.test(kopf[i])) doc.text(t, x + 3, ty);
+              else doc.text(t, x + bw - 2, ty, { align: 'right' });
+            });
             x += bw;
           });
           cy += rh;
         };
         zeichne(kopf, true, 0);
-        zeilen.forEach(function (z, n) {
-          if (cy > 270) { cy = newPage('Wertpotenzial · Fortsetzung'); zeichne(kopf, true, 0); }
-          zeichne(z, false, n);
-        });
+        zeilen.forEach(function (z, n) { zeichne(z, false, n); });
         cy += 5;
       };
       if (_PD.art === 'mfh' && _PD.wohnungen.length) {
         _tab(['WE', 'm²', 'Ist €/M', 'Mieterhöhung', 'Ziel €/M', 'Maßnahmen'], [30, 11, 18, 30, 18, 48],
           _PD.wohnungen.map(function (w) { return [w.we, String(Math.round(w.wfl || 0)), w.ist, w.soll, w.ziel, w.massnahmen]; }));
       }
+      /* v2464 · Wertbrücke - dieselben Zahlen wie im Tab Bewertung (DpPotenzial.brueckeDaten) */
+      if (_PD.bruecke && _PZ.brueckeAchse) {
+        if (cy > 200) cy = newPage('Wertpotenzial · Fortsetzung');
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor.apply(doc, C.CH);
+        doc.text('WERTBRÜCKE · ERTRAGSWERT JE STUFE', M, cy + 2); cy += 6;
+        var _BR = _PD.bruecke, _AX = _PZ.brueckeAchse(_BR), _bx = M + 16, _bw = CW - 16, _bh = 44, _by = cy + 4;
+        var _yB = function (v) { return _by + _bh * (1 - (v - _AX.min) / ((_AX.max - _AX.min) || 1)); };
+        var _tE = function (n, vz) { return (n < 0 ? '- ' : (vz ? '+ ' : '')) + Math.round(Math.abs(n) / 1000).toLocaleString('de-DE') + ' T\u20ac'; };
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4);
+        _AX.ticks.forEach(function (t) {
+          doc.setDrawColor.apply(doc, C.BORDER); doc.setLineWidth(0.15); doc.line(_bx, _yB(t), _bx + _bw, _yB(t));
+          doc.setTextColor.apply(doc, C.MID); doc.text(_tE(t), _bx - 2, _yB(t) + 1.2, { align: 'right' });
+        });
+        var _FB = { bestand: [138, 130, 114], soll: [61, 111, 168], ziel: [47, 125, 85], kosten: [184, 98, 92], netto: C.GOLD };
+        var _nB = _BR.stufen.length, _gB = _bw / _nB, _wB = Math.min(20, _gB * 0.6);
+        _BR.stufen.forEach(function (st, i) {
+          var x = _bx + i * _gB + (_gB - _wB) / 2;
+          var lo = st.summe ? _AX.min : Math.min(st.a, st.b), hi = st.summe ? st.b : Math.max(st.a, st.b);
+          var t0 = _yB(hi), h0 = Math.max(0.6, _yB(lo) - t0), f = _FB[st.art] || _FB.bestand;
+          doc.setFillColor(f[0], f[1], f[2]); doc.rect(x, t0, _wB, h0, 'F');
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.CH);
+          doc.text(_tE(st.wert, !st.summe), x + _wB / 2, t0 - 1.5, { align: 'center' });
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor.apply(doc, C.MID);
+          doc.splitTextToSize(_pc(st.t), _gB - 1).slice(0, 2).forEach(function (z, j) { doc.text(z, x + _wB / 2, _by + _bh + 4.5 + j * 3, { align: 'center' }); });
+        });
+        cy = _by + _bh + 12;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.MID);
+        doc.text(_pc('Achse beginnt bei ' + _tE(_AX.min) + '. Potenzial netto = Ertragswert ' + (_BR.zielbild != null ? 'Zielbild' : 'nach Mieterhöhung') + ' minus Bestand minus Maßnahmenkosten.'), M, cy);
+        cy += 6;
+      }
+      if (cy > 230) cy = newPage('Wertpotenzial · Fortsetzung');
       _tab(['Kennzahl'].concat(_PD.spalten.map(function (k) { return _PD.titel[k]; })), [58].concat(_PD.spalten.map(function () { return 30; })),
-        _PD.kennzahlen, /^Ertragswert|^nach Aufteilung/);
+        _PD.kennzahlen.concat(_PD.kaufpreis ? [['Kaufpreis', Math.round(_PD.kaufpreis).toLocaleString('de-DE') + ' \u20ac'].concat(_PD.spalten.slice(1).map(function () { return ''; }))] : []),
+        /^Ertragswert|^nach Aufteilung/);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.MID);
-      doc.splitTextToSize(_pc(_PD.fuss), CW).forEach(function (t) { doc.text(t, M, cy); cy += 3.6; });
+      doc.splitTextToSize(_pc(_PD.fuss), CW).forEach(function (t) { if (cy > 280) cy = newPage('Wertpotenzial · Fortsetzung'); doc.text(t, M, cy); cy += 3.6; });
     }
   } catch (e) { try { console.warn('[pdf] Wertpotenzial', e); } catch (x) {} }
 
@@ -3444,9 +3521,10 @@ async function _exportPDFInner() {
     ['Anschlusszinssatz',               pP(v('anschl_z'), 1), 'Annahme', 'Konservativer Puffer \u00fcber aktuellem Niveau'],
     ['Anschluss-Tilgung',               pP(v('anschl_t'), 1), 'Annahme', 'Markt\u00fcblicher Satz'],
     ['Exit-Rendite (Verkaufsszenario)', pP(v('exit_bmy'), 1), 'Annahme', 'Markt\u00fcblich f\u00fcr Standort'],
-    ['Betrachtungszeitraum',            g('btj') + ' Jahre',  'Festwert', '-'],
+    ['Betrachtungszeitraum',            ((State.btj || parseInt(g('btj'), 10) || (State.cfRows || []).length) || '-') + ' Jahre',  'Festwert', '-'],   /* v2463: Feld leer ergab „ Jahre" */
     ['Grunderwerbsteuer NRW',           '6,50 %',              'Gesetz',   'GrEStG \u00a7 11 NRW'],
-    ['AfA-Satz Geb\u00e4ude',          '2,00 % p.a.',         'Gesetz',   '\u00a7 7 EStG (ab Baujahr 1925)'],
+    /* v2463 · stand fest auf „2,00 %" - das Objekt rechnete mit 6,25 % (die Bankfassung zeigte den echten Satz) */
+    ['AfA-Satz Geb\u00e4ude',          v('afa_satz') > 0 ? pP(v('afa_satz'), 2) + ' p.a.' : '2,00 % p.a.', v('afa_satz') > 0 && Math.abs(v('afa_satz') - 2) > 0.001 ? 'Eingabe' : 'Gesetz', '\u00a7 7 EStG'],
     ['Geb\u00e4udeanteil am KP',       pP(v('geb_ant'), 0),   'Sch\u00e4tzwert', 'steuerliche Grundlage \u00a7 7 EStG'],
     /* v1383: Herkunft und Fundstelle sagen jetzt, was wirklich rechnet. */
     ['Pers\u00f6nl. Grenzsteuersatz',   pP(v('grenz'), 2),

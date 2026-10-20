@@ -106,8 +106,11 @@
     return String(t == null ? '' : t)
       .replace(/[\u2713\u2714]/g, '+')
       .replace(/[\u2717\u2718\u26A0\uFE0F]/g, '!')
-      .replace(/[\u2212\u2011\u2012]/g, '-')
-      .replace(/[^\x00-\xFF]/g, '')
+      .replace(/[\u2212\u2011\u2012\u2013\u2014]/g, '-')
+      /* v2461 · das Euro-Zeichen bleibt (die Standardschrift kennt es) - gemessen:
+         in „Kennzahlen je Phase" stand „+1.968" statt „1.968 €", weil der
+         Filter es mit allem ausserhalb Latin-1 entfernte. */
+      .replace(/[^\x00-\xFF\u20AC]/g, '')
       .replace(/\s+/g, ' ').trim();
   }
   function heute() {
@@ -637,19 +640,43 @@
     function tabelle(spalten, zeilen, o) {
       o = o || {};
       var fak = CW / spalten.reduce(function (a, s) { return a + s[1]; }, 0);
+      /* v2461 · gemessen: eine linksbündige Spalte rechts neben einer
+         rechtsbündigen klebte an ihr („950 vermietet", „1.121 € Bad, …"), und zu
+         lange Texte liefen in die Nachbarspalte oder wurden mitten im Wort
+         abgeschnitten. Jetzt: 3 mm Abstand, jede Zelle passt in ihre Spalte
+         (sonst „..."), Spalten mit Kennung 'u' brechen in bis zu drei Zeilen um. */
+      function passt(t, breite) {
+        t = String(t); if (doc.getTextWidth(t) <= breite) return t;
+        while (t.length > 1 && doc.getTextWidth(t + '...') > breite) t = t.slice(0, -1);
+        return t.replace(/[\s,;·-]+$/, '') + '...';
+      }
       function tz(werte, kopfzeile, fett) {
-        var x = L;
+        var x = L, zeilen = 1;
         doc.setFont('helvetica', (kopfzeile || fett) ? 'bold' : 'normal'); doc.setFontSize(kopfzeile ? 7.4 : 8.4);
         doc.setTextColor(kopfzeile ? 110 : (fett ? 26 : 45));
-        werte.forEach(function (w, i) {
-          var bw = spalten[i][1] * fak;
-          if (i === 0 || spalten[i][2] === 'l') doc.text(String(w), x, y);
-          else doc.text(String(w), x + bw - 1, y, { align: 'right' });
+        var inhalt = werte.map(function (w, i) {
+          var bw = spalten[i][1] * fak, links = i === 0 || spalten[i][2] === 'l' || spalten[i][2] === 'u';
+          var platzB = bw - (links && i > 0 ? 3 : 0) - 1.5;
+          if (spalten[i][2] === 'u' && !kopfzeile) {
+            var l = doc.splitTextToSize(String(w), platzB);
+            if (l.length > 3) { l = l.slice(0, 3); l[2] = passt(l[2] + ' ...', platzB); }
+            zeilen = Math.max(zeilen, l.length); return l;
+          }
+          return [passt(w, platzB)];
+        });
+        if (zeilen > 1 && y + (zeilen - 1) * 3.7 > H - 26) { doc.addPage(); kopf(o.titel || 'Investment Case', 'Fortsetzung'); }
+        inhalt.forEach(function (l, i) {
+          var bw = spalten[i][1] * fak, links = i === 0 || spalten[i][2] === 'l' || spalten[i][2] === 'u';
+          l.forEach(function (t, j) {
+            if (links) doc.text(t, x + (i > 0 ? 3 : 0), y + j * 3.7);
+            else doc.text(t, x + bw - 1, y + j * 3.7, { align: 'right' });
+          });
           x += bw;
         });
+        var unten = y + (zeilen - 1) * 3.7;
         doc.setDrawColor(kopfzeile ? G[0] : 236, kopfzeile ? G[1] : 232, kopfzeile ? G[2] : 223);
-        doc.setLineWidth(kopfzeile ? 0.5 : 0.15); doc.line(L, y + 2.2, W - R, y + 2.2); doc.setLineWidth(0.2);
-        y += kopfzeile ? 7 : 6.2;
+        doc.setLineWidth(kopfzeile ? 0.5 : 0.15); doc.line(L, unten + 2.2, W - R, unten + 2.2); doc.setLineWidth(0.2);
+        y = unten + (kopfzeile ? 7 : 6.2);
       }
       tz(spalten.map(function (s) { return s[0]; }), true);
       zeilen.forEach(function (z) {
@@ -677,7 +704,7 @@
         var wert = min + (sp * t) / 4, yy = py(wert);
         doc.line(bx, yy, bx + bw, yy);
         doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4); doc.setTextColor(140);
-        doc.text(fmt(Math.round(wert / 1000)) + 'k', bx - 2, yy + 1.6, { align: 'right' });
+        doc.text(fmt(Math.round(wert / 1000)) + ' T€', bx - 2, yy + 1.6, { align: 'right' });   /* v2461: deutsch statt „k" */
       }
       /* MARKER_V1469 · gemessen: liegen zwei Linien am Ende aufeinander (ohne
          Darlehen sind Objektwert und Eigenkapital gleich), druckten sich die
@@ -700,7 +727,7 @@
           while (belegt.some(function (v) { return Math.abs(v - ly) < 3.2; })) ly += 3.4;
           belegt.push(ly);
           doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(f[0], f[1], f[2]);
-          doc.text(fmt(Math.round(letzte / 1000)) + 'k', bx + bw + 1.5, ly);
+          doc.text(fmt(Math.round(letzte / 1000)) + ' T€', bx + bw + 1.5, ly);
         }
       });
       doc.setLineWidth(0.2);
@@ -949,7 +976,11 @@
     if (da(K.bspar_j) && K.bspar_j > 0) zeile('abzüglich Bausparrate', '- ' + eur(K.bspar_j), { einzug: true });
     zeile('abzüglich Tilgung', da(K.tilg_j) === null ? '-' : '- ' + eur(K.tilg_j), { einzug: true });
     zeile('Cashflow vor Steuern / Jahr', eur(K.cf_op), { summe: true });
-    zeile('Steuern (Belastung -, Erstattung +)', da(K.steuer) === null ? '-' : (K.steuer < 0 ? '+ ' : '- ') + eur(Math.abs(K.steuer)), { einzug: true });
+    /* v2461 · Steuer als Differenz der beiden Cashflows (wie die App, calc.js
+       V352): K.steuer ist das anteilige erste Jahr, die Cashflows sind Volljahre -
+       gemessen stand „+ 771 €" zwischen zwei gleichen Cashflows von 8.119 €. */
+    var _stH = (da(K.cf_op) === null || da(K.cf_ns) === null) ? null : K.cf_ns - K.cf_op;
+    zeile('Steuern (Belastung -, Erstattung +)', _stH === null ? '-' : (_stH > 0.5 ? '+ ' : (_stH < -0.5 ? '- ' : '')) + eur(Math.abs(_stH)), { einzug: true });
     zeile('Cashflow nach Steuern / Jahr', eur(K.cf_ns), { summe: true });
     zeile('Cashflow nach Steuern / Monat', da(K.cf_ns) === null ? '-' : eur(K.cf_ns / 12, 2), { fett: true });
     y += 2;
@@ -1016,15 +1047,18 @@
       abschnitt('Cashflow je Phase');
       einleitung('Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + fmt(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung mit dem angenommenen Zins.');
       function ph(label, a, b, c) { return { werte: [label, a, b, c] }; }
+      function stD(vor, nach) { if (da(vor) === null || da(nach) === null) return '-'; var d = nach - vor; return (d > 0.5 ? '+ ' : (d < -0.5 ? '- ' : '')) + eur(Math.abs(d)); }
       tabelle(
         [['', 46], ['Heute', 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
         [
-          ph('Warmmiete / Jahr', eur(K.wm_j), eur(K.wm_ezb), eur(K.wm_an)),
+          /* v2461 · Kaltmiete statt Warmmiete: nur so geht die Spalte bis zum
+             Cashflow auf (die Umlagen laufen durch). */
+          ph('Kaltmiete / Jahr', eur(K.nkm_j), eur(K.nkm_ezb), eur(K.nkm_an)),
           ph('Bewirtschaftung (nicht umlagef.)', eur(K.bwk_cf), eur(K.bwk_cf_ezb), eur(K.bwk_cf_an)),
           ph('Zinsen', eur(K.zins_j), eur(K.zins_ezb), eur(K.zins_an)),
           ph('Tilgung', eur(K.tilg_j), eur(K.tilg_ezb), eur(K.tilg_an)),
-          ph('Steuern', eur(K.steuer), eur(K.ster_ezb), eur(K.ster_an)),
           { werte: ['Cashflow vor Steuern', eur(K.cf_op), eur(K.cf_op_ezb), eur(K.cf_op_an)], fett: true },
+          ph('Steuern (Belastung -, Erstattung +)', stD(K.cf_op, K.cf_ns), stD(K.cf_op_ezb, K.cf_ns_ezb), stD(K.cf_op_an, K.cf_ns_an)),
           { werte: ['Cashflow nach Steuern', eur(K.cf_ns), eur(K.cf_ns_ezb), eur(K.cf_ns_an)], fett: true },
           { werte: ['Cashflow nach Steuern / Monat', eur((K.cf_ns || 0) / 12, 2), eur((K.cf_ns_ezb || 0) / 12, 2), eur((K.cf_ns_an || 0) / 12, 2)], fett: true }
         ],
@@ -1040,7 +1074,7 @@
           [['', 46], ['Heute', 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
           [
             { werte: ['Sollzins', zT('zaer-zins-now'), zT('zaer-zins-ezb'), zT('zaer-zins-an')] },
-            { werte: ['Rate / Monat', zT('zaer-rate-now'), zT('zaer-rate-ezb'), zT('zaer-rate-an')] },
+            { werte: ['Rate / Monat', zT('zaer-rate-now').replace(/^\+/, ''), zT('zaer-rate-ezb').replace(/^\+/, ''), zT('zaer-rate-an').replace(/^\+/, '')] },
             { werte: ['Cashflow / Monat vor Steuern', zT('zaer-cfvst-now'), zT('zaer-cfvst-ezb'), zT('zaer-cfvst-an')] },
             { werte: ['Cashflow / Monat nach Steuern', zT('zaer-cf-now'), zT('zaer-cf-ezb'), zT('zaer-cf-an')] },
             { werte: ['DSCR', zT('zaer-dscr-now'), zT('zaer-dscr-ezb'), zT('zaer-dscr-an')] },
@@ -1055,8 +1089,11 @@
       zeile('Restschuld am Ende der Zinsbindung', eur(S.rs));
       zeile('Angenommener Anschlusszins / Tilgung', [pct(num('anschl_z'), 2), pct(num('anschl_t'), 2)].join('  ·  '));
       zeile('Rate nach Anschluss / Monat', eur(K.rate_an_m, 2));
-      zeile('Mehrbelastung gegenüber heute / Monat', eur(K.zaer_m, 2), { summe: true });
-      if (da(K.zaer_pct) !== null) zeile('Das entspricht einer Veränderung von', pct(K.zaer_pct, 1), { klein: true });
+      /* v2461 · K.zaer_m ist der MEHRZINS auf die Restschuld (calc.js: rs x
+         Zinsdifferenz / 12), nicht die Veränderung der Rate - die steht oben in
+         „Kennzahlen je Phase". Gemessen: „Mehrbelastung 346,41 €" neben „+110 €". */
+      zeile('Mehrzins auf die Restschuld / Monat (Zinsänderungsrisiko)', eur(K.zaer_m, 2), { summe: true });
+      if (da(K.zaer_pct) !== null) zeile('Zinsanstieg gegenüber heute', fmt(K.zaer_pct, 2) + ' Prozentpunkte', { klein: true });
     }
 
     /* ── Cashflow-Jahre ──────────────────────────────────────── */
@@ -1186,10 +1223,39 @@
       abschnitt('Wertpotenzial');
       einleitung(sauberE(PD.satz_bank));
       if (PD.art === 'mfh' && PD.wohnungen.length) {
-        tabelle([['WE', 30, 'l'], ['m²', 12], ['Ist €/M', 18], ['Mieterhöhung', 30], ['Ziel €/M', 18], ['Maßnahmen', 46, 'l']],
+        tabelle([['WE', 26, 'l'], ['m²', 10], ['Ist €/M', 16], ['Mieterhöhung', 28], ['Ziel €/M', 17], ['Maßnahmen', 57, 'u']],
           PD.wohnungen.map(function (w) {
-            return [sauberE(w.we).slice(0, 20), fmt(w.wfl, 0), sauberE(w.ist), sauberE(w.soll), sauberE(w.ziel), sauberE(w.massnahmen).slice(0, 34)];
+            return [sauberE(w.we), fmt(w.wfl, 0), sauberE(w.ist), sauberE(w.soll), sauberE(w.ziel), sauberE(w.massnahmen)];
           }), { titel: 'Wertpotenzial' });
+      }
+      /* v2462 · Wertbrücke (dieselben Zahlen wie im Tab Bewertung, DpPotenzial.brueckeDaten) */
+      if (PD.bruecke && PZ.brueckeAchse) {
+        platz(70, 'Wertpotenzial', (adr || 'Objekt') + ' · Mieterhöhung und Zielbild');
+        abschnitt('Wertbrücke · Ertragswert je Stufe');
+        var BR = PD.bruecke, AX = PZ.brueckeAchse(BR), bx0 = L + 16, bwB = CW - 16, bh0 = 46, by0 = y + 4;
+        var yB = function (v) { return by0 + bh0 * (1 - (v - AX.min) / ((AX.max - AX.min) || 1)); };
+        var tE = function (n, vz) { return (n < 0 ? '- ' : (vz ? '+ ' : '')) + fmt(Math.abs(n) / 1000, 0) + ' T€'; };
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4);
+        AX.ticks.forEach(function (t) {
+          doc.setDrawColor(236, 232, 223); doc.setLineWidth(0.15); doc.line(bx0, yB(t), bx0 + bwB, yB(t));
+          doc.setTextColor(140); doc.text(tE(t), bx0 - 2, yB(t) + 1.2, { align: 'right' });
+        });
+        var FB = { bestand: [138, 130, 114], soll: [61, 111, 168], ziel: [47, 125, 85], kosten: [184, 98, 92], netto: G };
+        var nB = BR.stufen.length, gB = bwB / nB, wB = Math.min(20, gB * 0.6);
+        BR.stufen.forEach(function (st, i) {
+          var x = bx0 + i * gB + (gB - wB) / 2;
+          var lo = st.summe ? AX.min : Math.min(st.a, st.b), hi = st.summe ? st.b : Math.max(st.a, st.b);
+          var t0 = yB(hi), h0 = Math.max(0.6, yB(lo) - t0), f = FB[st.art] || FB.bestand;
+          doc.setFillColor(f[0], f[1], f[2]); doc.rect(x, t0, wB, h0, 'F');
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(40);
+          doc.text(tE(st.wert, !st.summe), x + wB / 2, t0 - 1.5, { align: 'center' });
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(110);
+          doc.splitTextToSize(sauberE(st.t), gB - 1).slice(0, 2).forEach(function (z, j) { doc.text(z, x + wB / 2, by0 + bh0 + 4.5 + j * 3, { align: 'center' }); });
+        });
+        y = by0 + bh0 + 12;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
+        doc.text(sauberE('Achse beginnt bei ' + tE(AX.min) + '. Potenzial netto = Ertragswert ' + (BR.zielbild != null ? 'Zielbild' : 'nach Mieterhöhung') + ' minus Bestand minus Maßnahmenkosten.'), L, y);
+        y += 6;
       }
       var spP = [['Kennzahl', 52, 'l']].concat(PD.spalten.map(function (k) { return [PD.titel[k], 30]; }));
       tabelle(spP, PD.kennzahlen.map(function (z, n) { return { werte: z.map(function (x) { return sauberE(String(x)); }), fett: /^Ertragswert|^nach Aufteilung/.test(z[0]) }; }), { titel: 'Wertpotenzial' });
@@ -1274,6 +1340,9 @@
       if (ai) {
         if (ai.empfehlung || ai.recommendation) zeile('Empfehlung', sauber(ai.empfehlung || ai.recommendation).slice(0, 60), { summe: true });
         var offerte = ai.kaufpreis_offerte || ai.offerte || ai.kaufpreisempfehlung;
+        /* v2461 · die KI liefert die Offerte als Objekt {empfohlen, begruendung,
+           argumente} - gemessen stand im PDF „[object Object]". */
+        if (offerte && typeof offerte === 'object') offerte = offerte.empfohlen || offerte.betrag || offerte.wert || null;
         if (offerte) zeile('Vorgeschlagene Kaufpreis-Offerte', typeof offerte === 'number' ? eur(offerte) : sauber(offerte).slice(0, 60));
         liste('Stärken', ai.staerken || ai.strengths);
         liste('Risiken', ai.risiken || ai.schwaechen || ai.risks);
