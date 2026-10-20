@@ -953,6 +953,7 @@ function renderTaxTimeline() {
   var _tlHdr = document.getElementById('tax-timeline-header');
   if (_tlCorp && _tlRate != null) {
     if (_tlHdr) _tlHdr.innerHTML = '<span class="ct-ico"><svg width="22" height="22"><use href="#i-calendar"/></svg></span>K&ouml;rperschaftsteuer-Verlauf der Gesellschaft';
+    try { var _stvK = document.getElementById('tax-verlauf-chart'); if (_stvK) _stvK.innerHTML = ''; } catch (_e2) {}   /* v2544: die ESt-Grafik gilt nicht für die Gesellschaft */
     var _activeY = State._taxDisplayYear || new Date().getFullYear();
     var chtml = '<div class="tax-tl-grid">';
     var sumKst = 0;
@@ -978,8 +979,21 @@ function renderTaxTimeline() {
     box.innerHTML = chtml;
     return;
   } else if (_tlHdr) {
-    _tlHdr.innerHTML = '<span class="ct-ico"><svg width="22" height="22"><use href="#i-calendar"/></svg></span>Steuerverlauf &middot; Erstattung (gr&uuml;n) vs. Nachzahlung (rot)';
+    _tlHdr.innerHTML = '<span class="ct-ico"><svg width="22" height="22"><use href="#i-calendar"/></svg></span>Steuerverlauf &middot; wann das Objekt steuerlich positiv wird';
   }
+  /* v2544 · DIE GRAFIK MIT WENDEPUNKT über der Kärtchen-Reihe (steuer-verlauf.js;
+     Marcel 20.10.2026: „wann ein Objekt ins Positive läuft und man Steuern zahlen
+     müsste – das ist der Punkt, wo ich investiere"). Dieselben Jahreswerte
+     (_computeYearTotal), über die ganze Haltedauer. */
+  try {
+    var _stvH = document.getElementById('tax-verlauf-chart');
+    if (!_stvH && box.parentNode) {
+      _stvH = document.createElement('div'); _stvH.id = 'tax-verlauf-chart';
+      var _vor = box.previousElementSibling && /hint/.test(box.previousElementSibling.className || '') ? box.previousElementSibling : box;
+      box.parentNode.insertBefore(_stvH, _vor);
+    }
+    if (_stvH && window.DpSteuerVerlauf) window.DpSteuerVerlauf.mount(_stvH);
+  } catch (_stvE) {}
   // Render as visual timeline
   var html = '<div class="tax-tl-grid">';
   /* V270-cardClick: Klickbare Cards → laden Berechnung in Steuermodul oben */

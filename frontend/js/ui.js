@@ -2142,6 +2142,11 @@ function _renderAIServerAnalysis(a) {
       + 'Lass sie von deinem Steuerberater bestätigen.</div></div>'
     : '<div class="dp-pa-card"><div class="dp-pa-fuss" style="margin-top:0">Diese Analyse wurde vor der steuerlichen '
       + 'Zusammenfassung erstellt. Beim nächsten Abruf steht sie hier.</div></div>';
+  /* v2544 · der Steuerverlauf mit Wendepunkt (steuer-verlauf.js) auch hier - dieselben Zahlen wie im Tab Steuer */
+  if (window.DpSteuerVerlauf) {
+    pSt += '<div class="dp-pa-card" style="margin-top:12px">' + sec('', I.bank, 'STEUERVERLAUF · WANN DAS OBJEKT STEUERLICH POSITIV WIRD') + '<div data-dp-steuerverlauf="1"></div></div>';
+    try { setTimeout(function () { window.DpSteuerVerlauf.mountAll(); }, 0); } catch (e) {}
+  }
 
   try { setTimeout(window._dpLoadVerlauf, 0); } catch (e) {} /* v972a */
   /* v2017 - DER KOPF: Stand und Gueltigkeit, bevor irgendein Text kommt. */
