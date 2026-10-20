@@ -41415,3 +41415,27 @@ Potenzial Demo: Bestand/MH/ZB 610.000/625.000/805.000 → 610.000/630.000/805.00
 - Bank-PDF: Tabelle + Fußnote springen geschlossen auf S. 7, S. 6 endet nach der Überleitung (gewollt, v2540).
 - Messe-Modul 26: Drehbuch v2481k/l fertig; Mitschnitt `zielbild26` (neuer KI-Abruf) und beide Aufnahmen stehen aus; der Übertrag des Mitschnitts aus dem Browser ins Repo braucht Marcels Freigabe.
 - Staging-Kontingent „wev" aufgebraucht (Bericht 324, ohne Objekt).
+
+### v2481k–v2481o · Messe-Modul 26 „Mieterhöhung und Zielbild" ausführlich, Mitschnitt neu, zwei Aufnahmen (20.10.2026, Staging)
+
+**Was.** Marcel (20.10.2026): „Im Video geht das sehr schnell mit dem ‚Aus Wohnungen', und man sieht auch nicht genau, welches ausgewählt wurde" — dazu ausführlicher, mit und ohne Sprecher, nach den Ansichten v2541–v2543. Drehbuch `reihe-zielbild` (`frontend/js/messe-drehbuch.js`):
+- Szene 2: „Zielbild fertig (Jahr)" 2028 im Konfigurator (`#mfh-zbjahr`), Karte „Ein Jahr je Stufe".
+- Szene 5/6: Erklärkarten „Was ‚Soll-Miete' heißt" und „Soll und Zielbild".
+- Szene 11: erst der ganze Modus-Schalter, dann der Knopf, Klick, die gewählte Option trägt `.dpm-wahl` (Goldrahmen + Füllung INLINE mit `!important` — gemessen: eine App-Regel mit höherer Spezifität schlug Hintergrund und Schrift der Klassenregel), Karte „Was sich geändert hat" mit der Tabelle im Kegel.
+- Szene 12: Spaltenköpfe per Muster (tragen seit v2541 ein Jahr als eigenes Kind), „Jede Stufe hat ihr Jahr", Ertragswert, Marktpreisindikation + Rohertragsfaktor × Miete, „Zwei Blickwinkel".
+- Szene 12b neu: Abschnitt „Marktpreise" — Knopf, Rückfrage, Markt am Ort, je Stufe, je Wohnung als ETW, Verlauf.
+- Szene 13: Wertüberleitung (`table.dp-wp-ueb`, Potenzial netto) statt Wertbrücke; Szene 14: Wertüberleitung im Bank-PDF, Kennzahlen je Stufe auf der Fortsetzungsseite (v2481o — bei 720 px stand im ersten Video nur der leere Seitenfuß).
+- Kein Abruf je Durchgang: `POST /marktbericht/potenzial/markt` (bucht 1 × erweiterte MPI) und der Verlauf danach werden im Mitschnitt-Lauf einmal echt aufgezeichnet (`zielbild26.markt`) und sonst gespielt; vor dem gespielten Abruf liefert der Verlauf leer.
+
+**Commits:** `3f8226db`, `0ced23e9` (v2481k), `0699852d` (v2481l), `1b5ea572` (v2481m), `b84139c0` (v2481n, Mitschnitt), `a82168e5` (v2481o).
+
+**Nachweis:**
+- Mitschnitt-Lauf `?messe=reihe-zielbild&mitschnitt=26` (v2481m): echt hinaus nur 2 × potenzial, 1 × `/ai/analyze`, 1 × `/potenzial/markt` + GET Verlauf. Haus **595.000 / 620.000 / 770.000 €** (Sperre ok), MPI 690.000 / 690.000 / 760.000 €, RF × Miete 435.000 / 500.000 / 765.000 €, Potenzial netto **+96.500 €**, ETW-Summe am Markt 969.000 € (Ertragswert 559.500 €), Markt am Ort MFH 2.178 €/m², ETW 2.713 €/m², Miete 9,49 €/m². Übertrag über ein Transfer-Objekt (gelöscht), Prüfsumme gleich (57.450 Zeichen).
+- Prüflauf Wiedergabe (v2481n, 947 s): potenzial, analyze, markt und Verlauf gespielt, nichts gesperrt, nichts Kostenpflichtiges hinaus; jede Zeile mit Kegel außer den drei PDF-Zeilen (gewollt); danach `fetch` echt, `.dpm-wahl` weg, Objekt gelöscht (DB: 0 „DEMO Zielbild%"), `zb_fertig_jahr` leer. Markierung im Stichbild gold gefüllt (`rgb(232,204,122)`).
+- Aufnahme (Studio `?modul=26`, eigenes Fenster, Start per Leertaste, Leerlauf vor/nach der Aufnahme 947 s): `Dateien/Messe/Videos/Videoreihe/Modul 26 - Mieterhoehung und Zielbild/DealPilot Modul 26 - Mieterhoehung und Zielbild.mp4` — 15:26, 33,6 MB. Mit Sprecher (onyx, Pirate-Vibe, 64 Abschnitte, alle passen ohne Stauchung über 1,08): `Videoreihe-Sprecher/Modul 26 - …/…mp4` — 15:26, 44,1 MB, `texte.json` daneben.
+
+**Rest:**
+- Der Mitschnitt-Lauf v2481m hat in `mb.potenzial_abrufe` eine Zeile (id 5, external_ref `13a967db-…`) für das gelöschte Demo-Objekt hinterlassen — Löschen ist ein DB-Eingriff, Marcel entscheidet.
+- Die Pilot-Tafel zeigt beim Demo-MFH „Bestand" ohne Jahr (kein Kaufdatum im Drehbuch) und keine Spalte „Ankauf".
+- Im Ordner liegen zwei Rohaufnahmen (`roh-modul-26.mp4` mit leerem PDF-Bild, `roh-modul-26b.mp4`).
+- Videothek/Landing nicht nachgezogen, Prod nicht angefasst.
