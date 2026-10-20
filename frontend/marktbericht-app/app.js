@@ -819,13 +819,16 @@ function _mvHtml(Mo) {
   var esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
   var tab = function (kopf, rows) {
     if (!rows.length) return '';
-    return '<table class="data-table" style="font-size:12px;margin-top:6px"><thead><tr>'
-      + kopf.map(function (k, i) { return '<th' + (i ? ' style="text-align:right"' : '') + '>' + esc(k) + '</th>'; }).join('')
+    /* v2543d · im Browser gesehen: die Tabelle war schmal, die Spalten klebten aneinander
+       („2.164 €/m² 1.848 – 2.396 €/m²") - volle Breite, Abstand je Zelle, Trennlinien */
+    var zelle = 'padding:6px 10px;border-bottom:1px solid rgba(128,128,128,.18);font-variant-numeric:tabular-nums;';
+    return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;min-width:520px"><thead><tr>'
+      + kopf.map(function (k, i) { return '<th style="' + zelle + 'font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;opacity:.7;font-weight:600;text-align:' + (i ? 'right' : 'left') + '">' + esc(k) + '</th>'; }).join('')
       + '</tr></thead><tbody>'
       + rows.map(function (r) {
-        return '<tr>' + r.map(function (c, i) { return '<td' + (i ? ' style="text-align:right;white-space:nowrap"' : '') + '>' + esc(c) + '</td>'; }).join('') + '</tr>';
+        return '<tr>' + r.map(function (c, i) { return '<td style="' + zelle + 'text-align:' + (i ? 'right;white-space:nowrap' : 'left') + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
       }).join('')
-      + '</tbody></table>';
+      + '</tbody></table></div>';
   };
   var unter = function (t) {
     return '<div style="font-size:12.5px;font-weight:600;margin:14px 0 2px">' + esc(t) + '</div>';
