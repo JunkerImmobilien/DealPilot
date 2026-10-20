@@ -165,7 +165,7 @@ var FIELDS = [
   'rate_kueche','rate_bad','rate_boden','rate_fenster',
   'qual_kueche','qual_bad','qual_boden','qual_fenster','zimmer','bad_anz','etage','etagen_ges','modernis',
   /* v1608 · Modernisierungsgrad nach Anlage 2 ImmoWertV */
-  'mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss','garagen','stellpl_aussen','balkon_flae','_avm_state','_mb_state','einheiten',
+  'mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss','garagen','stellpl_aussen','balkon_flae','_avm_state','_mb_state','_lage_herkunft','einheiten',   /* v2515: _lage_herkunft */
   /* V292.6.5-fields-checkboxes: Werbungskosten-Übernahme Checkboxen + Select-Felder */
   'san_tax_active','san_tax_years','moebl_tax_active','moebl_tax_years',
   'san_ust',   /* v1261: brutto/netto fuer die 15%-Grenze */
@@ -510,6 +510,9 @@ function loadData(d) {
        Staging trugen dieselbe Karte (199.000 € fuer 95 m²) - am MFH
        Gohliser Str. 42 (1,68 Mio.) stand „234 €/m² · -88,2 %". */
     '_mb_state', '_avm_state',
+    /* v2515: Herkunft der Lage-Felder (KI/Messung/eigen) - sonst erbt
+       Objekt B die Kennzeichnung von A, und ein eigener Wert hiesse KI. */
+    '_lage_herkunft',
     /* v1958: ohne diesen Eintrag traegt Objekt B die Lageklasse von
        Objekt A weiter - und an ihr haengt eine Rechnung. */
     'lageklasse',

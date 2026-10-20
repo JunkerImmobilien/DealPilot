@@ -520,7 +520,30 @@ export const DealPilotObjectMapper = {
       marktmiete_eur_qm: num(pick(d, ['ds2_marktmiete'])),
       marktfaktor: num(pick(d, ['ds2_marktfaktor'])),
     };
-    return Object.values(out).some((v) => v != null && v !== '') ? out : null;
+    if (!Object.values(out).some((v) => v != null && v !== '')) return null;
+    /* v2515 · HERKUNFT JE FELD. Die KI-Funktion „Lage analysieren" fuellt
+       diese Felder (gemessen, wo es eine Messung gibt, sonst KI-Wert) - im
+       Bericht stand dann alles als „Ihre Angabe". Die Haupt-App fuehrt seit
+       v2515 das versteckte Feld _lage_herkunft (JSON, Feld-ID -> gemessen |
+       ki | eigen). Fehlt es (Altbestand), wird nichts behauptet. */
+    let h = d._lage_herkunft;
+    if (typeof h === 'string') { try { h = h ? JSON.parse(h) : null; } catch { h = null; } }
+    if (h && typeof h === 'object') {
+      const ERLAUBT = { gemessen: 1, ki: 1, eigen: 1 };
+      const map = { mikrolage: 'mikrolage', makrolage: 'makrolage', bevoelkerung: 'ds2_bevoelkerung',
+        nachfrage: 'ds2_nachfrage', entwicklung: 'ds2_entwicklung', wertsteigerung: 'ds2_wertsteigerung',
+        mietausfallrisiko: 'ds2_mietausfall' };
+      const herkunft = {};
+      /* Eintrag {art, wert}: gilt nur, solange der Feldwert noch derselbe
+         ist - sonst wurde das Feld spaeter anders gesetzt (dann nichts). */
+      for (const [k, id] of Object.entries(map)) {
+        const e = h[id];
+        if (out[k] == null || out[k] === '' || !e || typeof e !== 'object') continue;
+        if (ERLAUBT[e.art] && String(e.wert) === String(out[k])) herkunft[k] = e.art;
+      }
+      if (Object.keys(herkunft).length) out.herkunft = herkunft;
+    }
+    return out;
   },
 
   // Lage- und Potenzialbewertungen (DealPilot-Eingaben). Strings bleiben lesbar (gut/mittel/…).

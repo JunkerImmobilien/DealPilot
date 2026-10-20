@@ -20,8 +20,48 @@ var _LAGE_FELDER = [
   { id: 'ds2_bevoelkerung',   t: 'Bevölkerung',           ki: 'bevoelkerung' },
   { id: 'ds2_nachfrage',      t: 'Nachfrage',             ki: 'nachfrage' },
   { id: 'ds2_wertsteigerung', t: 'Wertsteigerung',        ki: 'wertsteigerung' },
-  { id: 'ds2_entwicklung',    t: 'Entwicklung',           ki: 'entwicklung' }
+  { id: 'ds2_entwicklung',    t: 'Entwicklung',           ki: 'entwicklung' },
+  /* v2518 · der Zensus-Leerstand gehoert zum Mietausfallrisiko (Marcel 20.10.2026) */
+  { id: 'ds2_mietausfall',    t: 'Mietausfallrisiko',     ki: 'mietausfall' }
 ];
+/* ══ v2515 · HERKUNFT JE LAGE-FELD ═══════════════════════════════════
+   Gemessen am 20.10.2026 (Bestandsaufnahme): „Lage analysieren" fuellt die
+   Lage-Felder - gemessen, wo es eine Messung gibt, sonst mit dem KI-Wert -
+   und speicherte nicht, WOHER der Wert kam. Der Marktbericht zeigte dann
+   jeden davon als „Ihre Angabe". Eine KI-Einschaetzung als eigene Angabe
+   des Investors auszugeben, ist eine falsche Herkunft.
+
+   Jetzt haelt das versteckte Feld #_lage_herkunft je Feld {art, wert}:
+   art = gemessen | ki | eigen. Der WERT steht mit drin: aendert sich das
+   Feld spaeter auf einem anderen Weg, passt der Wert nicht mehr und die
+   Kennzeichnung verfaellt von selbst (der Bericht behauptet dann nichts).
+   Eine Hand-Aenderung (echtes Nutzerereignis) markiert „eigen".
+   Das Feld steht in storage.js FIELDS und resetFields (versteckte Felder
+   erben sonst ins naechste Objekt). */
+(function () {
+  var IDS = ['makrolage', 'mikrolage', 'ds2_bevoelkerung', 'ds2_nachfrage',
+             'ds2_wertsteigerung', 'ds2_entwicklung', 'ds2_mietausfall'];
+  function feld() { return document.getElementById('_lage_herkunft'); }
+  function lesen() {
+    try { var e = feld(); var h = e && e.value ? JSON.parse(e.value) : {}; return (h && typeof h === 'object') ? h : {}; }
+    catch (x) { return {}; }
+  }
+  function schreiben(h) { var e = feld(); if (e) e.value = Object.keys(h).length ? JSON.stringify(h) : ''; }
+  function setze(id, art) {
+    if (IDS.indexOf(id) < 0) return;
+    var f = document.getElementById(id); if (!f) return;
+    var h = lesen();
+    if (f.value) h[id] = { art: art, wert: String(f.value) }; else delete h[id];
+    schreiben(h);
+  }
+  document.addEventListener('change', function (ev) {
+    var t = ev.target;
+    if (!t || !ev.isTrusted || IDS.indexOf(t.id) < 0) return;
+    setze(t.id, 'eigen');
+  }, true);
+  window.DpLageHerkunft = { setze: setze, lesen: lesen, IDS: IDS };
+})();
+
 function _lageOptText(id, val) {
   var el = document.getElementById(id);
   var o = el && val ? el.querySelector('option[value="' + val + '"]') : null;
@@ -31,7 +71,8 @@ function _lageMessen(str, hnr, plz, ort) {
   if (typeof Auth === 'undefined' || !Auth.apiCall) return Promise.resolve(null);
   var adr = [(str + ' ' + hnr).trim(), (plz + ' ' + ort).trim()].filter(Boolean).join(', ');
   return Auth.apiCall('/marktbericht/lage/gemessen?adresse=' + encodeURIComponent(adr)
-    + '&plz=' + encodeURIComponent(plz) + '&ort=' + encodeURIComponent(ort), { method: 'GET' })
+    + '&plz=' + encodeURIComponent(plz) + '&ort=' + encodeURIComponent(ort)
+    + '&objektart=' + encodeURIComponent(((document.getElementById('objart') || {}).value) || ''), { method: 'GET' })   /* v2518 */
     .then(function (r) { return (r && r.felder) ? r : null; })
     .catch(function () { return null; });
 }
@@ -300,7 +341,7 @@ function _renderKiLage(data) {
   if (data.bevoelkerung || data.nachfrage || data.wertsteigerung || data.entwicklung) {
     aspectsHtml = '<div class="ki-lage-aspects-grid">' +
       renderAspect('Bevölkerungsentwicklung', 'bevoelkerung',  data.bevoelkerung, 'ds2_bevoelkerung') +
-      renderAspect('Nachfrage-Indikatoren',   'nachfrage',     data.nachfrage,    'ds2_nachfrage') +
+      renderAspect('Nachfrage (Vermarktungsdauer)', 'nachfrage',     data.nachfrage,    'ds2_nachfrage') +
       renderAspect('Wertsteigerungs-Potenzial','wertsteigerung',data.wertsteigerung,'ds2_wertsteigerung') +
       renderAspect('Entwicklungs-Möglichkeiten','entwicklung', data.entwicklung,  'ds2_entwicklung') +
     '</div>';
@@ -349,9 +390,11 @@ function applyKiLageToFields() {
     if (opt) {
       el.value = value;
       el.dispatchEvent(new Event('change'));
+      return true;
     } else {
       console.warn('[applyKiLage] Option "' + value + '" nicht im Select #' + id);
     }
+    return false;
   }
 
   /* v2175: je Feld die Messung, wo es eine gibt - sonst der KI-Wert */
@@ -359,8 +402,9 @@ function applyKiLageToFields() {
   _LAGE_FELDER.forEach(function (x) {
     var g = mg[x.id] && mg[x.id].stufe;
     var k = d[x.ki] && d[x.ki].value;
-    if (g) { _setSelect(x.id, g); _n.gemessen++; }
-    else if (k) { _setSelect(x.id, k); _n.ki++; }
+    /* v2515: Herkunft je Feld mitschreiben */
+    if (g) { if (_setSelect(x.id, g)) window.DpLageHerkunft.setze(x.id, 'gemessen'); _n.gemessen++; }
+    else if (k) { if (_setSelect(x.id, k)) window.DpLageHerkunft.setze(x.id, 'ki'); _n.ki++; }
   });
 
   if (typeof toast === 'function') toast('✓ Lage übernommen — ' + _n.gemessen + ' gemessen, ' + _n.ki + ' aus der KI');

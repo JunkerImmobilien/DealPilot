@@ -53,7 +53,7 @@
       }
     },
     'ds2_nachfrage': {
-      label: 'Nachfrage-Indikatoren',
+      label: 'Nachfrage (Vermarktungsdauer der Angebote: sehr stark bis 30 Tage, stark bis 60, mittel bis 120, schwach bis 200, darüber sehr schwach)',   /* v2518 */
       values: ['sehr_stark', 'stark', 'mittel', 'schwach', 'sehr_schwach'],
       valueLabels: {
         'sehr_stark': 'Sehr stark', 'stark': 'Stark',
@@ -397,6 +397,7 @@
     }
     var evt = new Event('change', { bubbles: true });
     input.dispatchEvent(evt);
+    try { if (window.DpLageHerkunft) window.DpLageHerkunft.setze(fieldId, 'ki'); } catch (e) {}   /* v2515 */
     if (typeof renderDealScore2 === 'function') {
       try { renderDealScore2(); } catch(e) {}
     }
@@ -723,6 +724,7 @@ async function ds2AiSuggestAllLage() {
       if (inp && s.value) {
         // Select-Field: value setzen
         inp.value = s.value;
+        try { if (window.DpLageHerkunft) window.DpLageHerkunft.setze(fid, 'ki'); } catch (e) {}   /* v2515 */
         // Source-Box anhängen falls Helper da
         if (typeof window._ds2RenderSourceBox === 'function') {
           window._ds2RenderSourceBox(fid, s);

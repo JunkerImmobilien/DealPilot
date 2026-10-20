@@ -540,7 +540,9 @@ if (!window._wlc) {
 
   /* \u2500\u2500 In Felder \u00fcbernehmen (wie applyAvm: svwert + ds2_marktmiete \u20ac/m\u00b2) \u2500\u2500 */
   function setInput(id, val) { var el = $(id); if (!el || val == null || val === '') return; el.value = val; try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {} }
-  function setSel(id, v) { var el = $(id); if (!el || !v) return; el.value = v; try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} }
+  /* v2515: Werte aus dem Marktbericht sind gemessen - die Herkunft je Lage-Feld wird mitgeschrieben (ki-lage.js) */
+  function _herkGemessen(id) { try { if (global.DpLageHerkunft) global.DpLageHerkunft.setze(id, 'gemessen'); } catch (e) {} }
+  function setSel(id, v) { var el = $(id); if (!el || !v) return; el.value = v; try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} if (String(el.value) === String(v)) _herkGemessen(id); }
   /* ═══════════════════════════════════════════════════════════════════
      v1316 · Die erweiterte Marktpreisindikation füllt jetzt aus, was sie
              weiss — und tut es von selbst
@@ -622,6 +624,7 @@ if (!window._wlc) {
     el.value = v;
     if (String(el.value || '') !== String(v)) return false;   /* Option gibt es nicht */
     try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+    _herkGemessen(id);   /* v2515 */
     return true;
   }
 

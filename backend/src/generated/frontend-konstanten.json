@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-20T08:59:06.521Z",
+ "erzeugt_am": "2026-10-20T09:17:03.923Z",
  "quellen": {
   "voice-import": "4d1160a61b89e852",
   "objektart-felder": "1e0549e54a17a054",
   "storage": "fa6252931a76b7af",
-  "index-html": "01e39e2a986afbc4",
+  "index-html": "070fa64b80096dc6",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -1683,23 +1683,23 @@
     "optionen": [
      {
       "wert": "sehr_niedrig",
-      "text": "Sehr niedrig"
+      "text": "Sehr niedrig (Leerstand unter 1,5 %)"
      },
      {
       "wert": "niedrig",
-      "text": "Niedrig"
+      "text": "Niedrig (unter 3 %)"
      },
      {
       "wert": "mittel",
-      "text": "Mittel"
+      "text": "Mittel (unter 6 %)"
      },
      {
       "wert": "erhoeht",
-      "text": "Erhöht"
+      "text": "Erhöht (unter 9 %)"
      },
      {
       "wert": "hoch",
-      "text": "Hoch"
+      "text": "Hoch (ab 9 %)"
      }
     ],
     "label": "Mietausfall-Risiko DS2"
@@ -1742,26 +1742,26 @@
     "optionen": [
      {
       "wert": "sehr_stark",
-      "text": "Sehr stark (Uni, ÖPNV, Top-Arbeitgeber)"
+      "text": "Sehr stark (bis 30 Tage)"
      },
      {
       "wert": "stark",
-      "text": "Stark"
+      "text": "Stark (bis 60 Tage)"
      },
      {
       "wert": "mittel",
-      "text": "Mittel"
+      "text": "Mittel (bis 120 Tage)"
      },
      {
       "wert": "schwach",
-      "text": "Schwach"
+      "text": "Schwach (bis 200 Tage)"
      },
      {
       "wert": "sehr_schwach",
-      "text": "Sehr schwach"
+      "text": "Sehr schwach (über 200 Tage)"
      }
     ],
-    "label": "Nachfrage-Indikatoren DS2"
+    "label": "Nachfrage Vermarktungsdauer DS2"
    },
    {
     "id": "ds2_wertsteigerung",

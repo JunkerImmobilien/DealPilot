@@ -781,15 +781,17 @@ router.get('/zensus/objekt', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// GET /lage/gemessen?adresse=&plz=&ort= — v2175 · die vier messbaren Lage-Felder
-// (Makro, Mikro, Bevoelkerung, Nachfrage) mit Wert, Stufe, Schwelle und Quelle.
+// GET /lage/gemessen?adresse=&plz=&ort=&objektart= — v2175 · die messbaren Lage-Felder
+// (Makro, Mikro, Bevoelkerung, Nachfrage = Vermarktungsdauer, Mietausfall = Zensus-Leerstand; v2518)
+// mit Wert, Stufe, Schwelle und Quelle.
 // Referenzdaten, keine GeoMap-Kosten; nur Geoapify fuer die Mikrolage (7 Tage im Speicher).
 router.get('/lage/gemessen', async (req, res) => {
   try {
     const plz = String(req.query.plz || '').trim();
     /* v2175b: hier stand /^d{5}$/ - der Backslash ging im Erzeugerskript verloren */
     if (!/^\d{5}$/.test(plz) && !req.query.adresse) return res.status(400).json({ error: 'plz_fehlt' });
-    res.json(await messeLage({ adresse: req.query.adresse || null, plz: plz || null, ort: req.query.ort || null }));
+    res.json(await messeLage({ adresse: req.query.adresse || null, plz: plz || null, ort: req.query.ort || null,
+      objektart: req.query.objektart || null }));   /* v2518: Objektart fuer die Vermarktungsdauer */
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

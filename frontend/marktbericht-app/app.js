@@ -1323,7 +1323,6 @@ function render(out) {
     if (_st1) $('reportMd').innerHTML = '<p><b>Stufe 1 · Marktpreisindikation.</b> Sie steht auf der Objektkarte in DealPilot. '
       + 'Einen Marktbericht mit Lage, Markt und Text gibt es ab <b>Stufe 2</b>, die Wertermittlung nach ImmoWertV in <b>Stufe 3</b>.</p>';
   } catch (e) {}
-  renderProvenance(out);
   window._lastOut = out;
   try { _installMbSaveObject(); } catch (e) {}
   try { if (out && out.object_key) _mbLoadReportsList({ key: out.object_key }); } catch (e) {}
@@ -1639,15 +1638,66 @@ function renderValuation(d) {
   $('mmCard').innerHTML = mmInner;
 }
 
+/* v2511 · Makro-Rohwerte als Anzeigezeilen, fuer Web und PDF dieselben.
+   Quelle: payload.makro_kennzahlen (seit v2510). Aeltere Berichte kennen
+   nur bevoelkerung_trend_pct - dann ohne Jahr, aber mit Ebene. */
+function _mkEsc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function _makroWert(w) {
+  const n = new Intl.NumberFormat('de-DE', { minimumFractionDigits: w.nachkomma, maximumFractionDigits: w.nachkomma }).format(w.wert);
+  return (w.vorzeichen && w.wert > 0 ? '+' : '') + n + ' ' + w.einheit;
+}
+/* v2518 · Ton einer Einstufung (lib/lage_stufen.js: Stufe 1-2 gut, 3 mittel, 4-5 schwach) */
+const _TON_KLASSE = { gut: 'good', mittel: 'mid', schwach: 'low' };
+function _stufeWert(s) {
+  const n = Number(s.wert);
+  const t = Number.isFinite(n) ? new Intl.NumberFormat('de-DE', { maximumFractionDigits: 2 }).format(n) : String(s.wert);
+  return (s.einheit === '% p. a.' && n > 0 ? '+' : '') + t + (s.einheit ? ' ' + s.einheit : '');
+}
+/* v2515 · Beschriftung der Herkunft eines Lage-Felds aus DealPilot */
+function _herkunftWort(art) {
+  return art === 'ki' ? 'KI-Einschätzung, keine Messung'
+    : art === 'gemessen' ? 'aus der Lagemessung übernommen'
+    : 'Ihre Angabe';
+}
+function _makroZeilen(d) {
+  const mk = d && d.makro_kennzahlen;
+  if (mk && Array.isArray(mk.werte) && mk.werte.length) {
+    /* v2517 · Ebene JE WERT (Gemeinde vor Kreis); Name wie amtlich */
+    const wo = (w) => {
+      const eb = w.ebene || 'Kreis', g = w.gebiet || (eb === 'Kreis' ? mk.kreis_name : null);
+      return g ? (new RegExp(eb, 'i').test(g) ? g : eb + ' ' + g) : eb;
+    };
+    return {
+      ebene: mk.ebene || 'Kreis',
+      zeilen: mk.werte.map((w) => ({
+        label: w.label,
+        wo: wo(w) + (w.von_jahr && w.jahr ? ', ' + w.von_jahr + '–' + w.jahr : (w.jahr ? ', Stand ' + w.jahr : '')),
+        wert: _makroWert(w), teilscore: w.teilscore, erlaeuterung: w.erlaeuterung || '', schluessel: w.schluessel,
+      })),
+    };
+  }
+  const bt = d && d.bevoelkerung_trend_pct;
+  if (typeof bt === 'number' && Number.isFinite(bt)) {
+    const tsc = d.macro && d.macro.breakdown ? d.macro.breakdown.bevoelkerung : null;
+    return { ebene: 'Kreis', zeilen: [{ label: 'Bevölkerungsentwicklung', wo: 'Kreis',
+      wert: _makroWert({ wert: bt, nachkomma: 2, vorzeichen: true, einheit: '% p. a.' }), teilscore: tsc != null ? tsc : null,
+      erlaeuterung: '', schluessel: 'bevoelkerung' }] };
+  }
+  return { ebene: 'Kreis', zeilen: [] };
+}
+
 // --- Lage-/Potenzialbewertung (aus DealPilot-Daten) ---
 function renderAssessment(d) {
   const a = d.assessment;
   const grid = $('assessGrid'), title = $('assessTitle');
+  const _st = d.assessment_stufen || {};   /* v2518 · eine Skala: Ton, Messwert, Schwelle je Einstufung */
   const rows = a ? [
-    ['Mikrolage', a.mikrolage], ['Makrolage', a.makrolage], ['Bevölkerung', a.bevoelkerung],
-    ['Nachfrage', a.nachfrage], ['Entwicklung', a.entwicklung], ['Wertsteigerung', a.wertsteigerung],
-    ['Mietentwicklung', a.mietentwicklung],
-    ['Mietausfallrisiko', a.mietausfallrisiko], ['Ausstattung', a.ausstattung], ['Vermietung', a.vermietungsstand],
+    ['Mikrolage', a.mikrolage, 'mikrolage'], ['Makrolage', a.makrolage, 'makrolage'], ['Bevölkerung', a.bevoelkerung, 'bevoelkerung'],
+    ['Nachfrage', a.nachfrage, 'nachfrage'], ['Entwicklung', a.entwicklung, 'entwicklung'], ['Wertsteigerung', a.wertsteigerung, 'wertsteigerung'],
+    ['Mietentwicklung', a.mietentwicklung, 'mietentwicklung'],
+    ['Mietausfallrisiko', a.mietausfallrisiko, 'mietausfallrisiko'], ['Ausstattung', a.ausstattung, 'ausstattung'], ['Vermietung', a.vermietungsstand, 'vermietungsstand'],
   ].filter(([, v]) => v != null && v !== '') : [];
 
   // Task 4: Bodenrichtwert gehoert (wie im DealPilot) in die Lage-/Potenzialbewertung.
@@ -1671,29 +1721,57 @@ function renderAssessment(d) {
     for (const [l, w] of _zensusZeilen(z)) extra += card(l, w);
   }
 
+  /* v2511 · Die Makro-ROHWERTE (Regionaldatenbank, Kreis) mit Stand-Jahr
+     und Teilscore - bisher stand nur der Score da, und die Zeile
+     „Bevölkerung" blieb leer, obwohl der Trend gemessen war. */
+  const _mk = _makroZeilen(d);
+  if (_mk.zeilen.length) {
+    extra += `<div class="assess rate-neutral" style="grid-column:1/-1;padding:4px 0 0;border:0;background:transparent"><div class="l">Makrolage · amtliche Regionalstatistik, Ebene ${_mkEsc(_mk.ebene)}</div></div>`;
+    for (const z of _mk.zeilen) {
+      extra += `<div class="assess rate-neutral"><div class="l">${_mkEsc(z.label)} · ${_mkEsc(z.wo)}</div>
+       <div class="v" style="text-transform:none;"><span class="dot" style="background:var(--gold);"></span>${_mkEsc(z.wert)}${z.teilscore != null ? ` <span style="opacity:.65;font-size:11px;font-weight:400">· Teilscore ${z.teilscore}/100</span>` : ''}</div></div>`;
+    }
+  }
+  const _qnm = d.quellen_nachweis_markt || [];
+  if (_qnm.length) {
+    extra += '<div class="mb-nachweis-markt" style="grid-column:1/-1;margin-top:4px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);font-size:11.5px;line-height:1.5;color:var(--muted)">'
+      + '<b style="display:block;margin-bottom:4px;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--txt)">Quellennachweis</b>'
+      + _qnm.map((q) => '<div>' + _mkEsc(q.vermerk)
+        + (q.kennzahlen && q.kennzahlen.length ? ' <span style="opacity:.75">(' + _mkEsc(q.kennzahlen.join(', ')) + ')</span>' : '')
+        + '<br>' + _mkEsc(q.lizenz || '')
+        + (q.urls || []).map((u) => '<br><a href="' + _mkEsc(u) + '" target="_blank" rel="noopener" style="color:inherit;word-break:break-all">' + _mkEsc(u) + '</a>').join('')
+        + '</div>').join('')
+      + '</div>';
+  }
+
   /* v1853 · N4-P1b: die Einschaetzung des NUTZERS (aus dem Reiter Objekt)
      steht NEBEN der Datenlage — getrennt beschriftet, nie vermischt. Der
      Orchestrator liefert sie als `nutzer_einschaetzung`; `assessment`
      bleibt, was gemessen wurde (GeoMap, Zensus, Makro). */
   const n = d.nutzer_einschaetzung;
   const ENTW_WORT = { mehrere: 'mehrere klare Möglichkeiten', eine_starke: 'eine starke Möglichkeit', begrenzt: 'begrenzt', kaum: 'kaum', keine: 'keine' };
+  const _nh = (n && n.herkunft) || {};   /* v2515 · Herkunft je Feld */
   const nrows = n ? [
-    ['Mikrolage', n.mikrolage], ['Makrolage', n.makrolage], ['Bevölkerung', n.bevoelkerung],
-    ['Nachfrage', n.nachfrage], ['Entwicklung', n.entwicklung], ['Wertsteigerung', n.wertsteigerung],
-    ['Mietausfallrisiko', n.mietausfallrisiko],
-  ].filter(([, v]) => v != null && v !== '').map(([l, v]) => [l, (l === 'Entwicklung' && ENTW_WORT[v]) || String(v).replace(/_/g, ' ')]) : [];
+    ['Mikrolage', n.mikrolage, 'mikrolage'], ['Makrolage', n.makrolage, 'makrolage'], ['Bevölkerung', n.bevoelkerung, 'bevoelkerung'],
+    ['Nachfrage', n.nachfrage, 'nachfrage'], ['Entwicklung', n.entwicklung, 'entwicklung'], ['Wertsteigerung', n.wertsteigerung, 'wertsteigerung'],
+    ['Mietausfallrisiko', n.mietausfallrisiko, 'mietausfallrisiko'],
+  ].filter(([, v]) => v != null && v !== '').map(([l, v, k]) => [l, (l === 'Entwicklung' && ENTW_WORT[v]) || String(v).replace(/_/g, ' '), _herkunftWort(_nh[k])]) : [];
   /* v2273 · ds2_entwicklung führt Schlüssel (index.html:1378) - im Bericht stand „Eine Starke" */
   const nutzerHtml = nrows.length
-    ? `<div class="assess rate-neutral" style="grid-column:1/-1;padding:4px 0 0;border:0;background:transparent"><div class="l">Ihre Einschätzung (aus DealPilot, Reiter Objekt) — keine Messung</div></div>`
-      + nrows.map(([l, v]) => `<div class="assess rate-${rateClass(l, v)} assess-nutzer"><div class="l">${l} · Ihre Angabe</div>
+    ? `<div class="assess rate-neutral" style="grid-column:1/-1;padding:4px 0 0;border:0;background:transparent"><div class="l">Angaben aus DealPilot (Reiter Objekt) — Herkunft je Feld</div></div>`
+      + nrows.map(([l, v, hw]) => `<div class="assess rate-${rateClass(l, v)} assess-nutzer"><div class="l">${l} · ${hw}</div>
        <div class="v"><span class="dot"></span>${v}</div></div>`).join('')
     : '';
 
   if (!rows.length && !extra && !nutzerHtml) { grid.classList.add('hide'); title.classList.add('hide'); return; }
   title.classList.remove('hide'); grid.classList.remove('hide');
-  grid.innerHTML = rows.map(([l, v]) =>
-    `<div class="assess rate-${rateClass(l, v)}"><div class="l">${l}</div>
-       <div class="v"><span class="dot"></span>${v}</div></div>`).join('') + extra + nutzerHtml;
+  grid.innerHTML = rows.map(([l, v, k]) => {
+    const s = _st[k];
+    const cls = s && _TON_KLASSE[s.ton] ? _TON_KLASSE[s.ton] : rateClass(l, v);
+    const tip = s ? ' title="' + _mkEsc(s.basis + (s.schwelle ? ' · Einstufung (Modellannahme DealPilot): ' + s.schwelle : '')) + '"' : '';
+    return `<div class="assess rate-${cls}"${tip}><div class="l">${l}${s && s.basis ? ' · <span style="text-transform:none;opacity:.75">' + _mkEsc(s.basis) + '</span>' : ''}</div>
+       <div class="v"><span class="dot"></span>${v}${s && s.wert != null ? ' <span style="opacity:.65;font-size:11px;font-weight:400;text-transform:none">· ' + _mkEsc(_stufeWert(s)) + '</span>' : ''}</div></div>`;
+  }).join('') + extra + nutzerHtml;
 }
 function rateClass(label, val) {
   const v = String(val || '').toLowerCase();
@@ -2695,17 +2773,11 @@ function mdToHtml(md) {
   return html;
 }
 
-// --- Datengrundlage / Echtheits-Kennzeichnung ---
-function renderProvenance(out) {
-  const prov = out && out.data && out.data.meta && out.data.meta.provenance;
-  const el = $('provList');
-  if (!el) return; /* v877-datengrundlage-out */
-  if (!prov || !prov.length) { el.innerHTML = ''; return; }
-  el.innerHTML = prov.map((p) =>
-    `<div class="prov-row"><span class="pl">${p.label}</span>
-       <span class="ps">${p.source}</span>
-       <span class="badge b-${p.trust}">${p.trust}</span></div>`).join('');
-}
+/* v2512 · renderProvenance() ist entfernt. Es suchte #provList, das seit
+   v877 („Datengrundlage raus", Marktbericht-Redesign) nicht mehr existiert -
+   die Funktion lief bei jedem Bericht ins Leere. `meta.provenance` bleibt im
+   Payload: die Haupt-App liest sie (dealpilot-mb.js, objekt-reiter.js). Die
+   Herkunft je Zahl steht im Bericht selbst, die KI-Kennzeichnung am Text. */
 
 // --- PDF-Export (DealPilot-Stil, an PriceHubble/Sprengnetter orientiert) ---
 $('pdfBtn').addEventListener('click', async () => {
@@ -4894,17 +4966,24 @@ async function exportPdf(out) {
   if ((_arProbe >= 2) || (_z && _z.available) || _nProbe >= 1) {
     lageSektion();
     blockTitle("Bewertung & Potenzial", 30);
+    const _ST = d.assessment_stufen || {};   /* v2518 */
     const A = d.assessment || {}; const ar = [
-      ['Mikrolage', A.mikrolage], ['Makrolage', A.makrolage], ['Bevölkerungsentwicklung', A.bevoelkerung],
-      ['Nachfrage', A.nachfrage], ['Entwicklungsmöglichkeiten', A.entwicklung], ['Wertsteigerungspotenzial', A.wertsteigerung],
-      ['Mietausfallrisiko', A.mietausfallrisiko], ['Ausstattung', A.ausstattung], ['Vermietungsstand', A.vermietungsstand],
-    ].filter((r) => r[1] != null && r[1] !== '');
+      ['Mikrolage', A.mikrolage, 'mikrolage'], ['Makrolage', A.makrolage, 'makrolage'], ['Bevölkerungsentwicklung', A.bevoelkerung, 'bevoelkerung'],
+      ['Nachfrage', A.nachfrage, 'nachfrage'], ['Entwicklungsmöglichkeiten', A.entwicklung, 'entwicklung'], ['Wertsteigerungspotenzial', A.wertsteigerung, 'wertsteigerung'],
+      ['Mietausfallrisiko', A.mietausfallrisiko, 'mietausfallrisiko'], ['Ausstattung', A.ausstattung, 'ausstattung'], ['Vermietungsstand', A.vermietungsstand, 'vermietungsstand'],
+    ].filter((r) => r[1] != null && r[1] !== '')
+     .map((r) => { const s = _ST[r[2]]; return s ? [r[0], r[1] + (s.wert != null ? '  (' + _stufeWert(s) + ')' : ''), r[2], s] : r; });
     // Zensus-2022-Kennzahlen (amtlich) anhaengen:
     if (_z && _z.available) {
       const de = (n, dec) => new Intl.NumberFormat('de-DE', { minimumFractionDigits: dec, maximumFractionDigits: dec }).format(n);
       void de;   /* v2162: die Zeilen kommen aus _zensusZeilen() */
       for (const r of _zensusZeilen(_z)) ar.push(r);
     }
+    /* v2511 · der gemessene Bevoelkerungstrend als ZAHL, mit Ebene und Jahr
+       (die Wortzeile „Bevölkerungsentwicklung" oben wurde nie gesetzt) */
+    const _bevZ = _makroZeilen(d).zeilen.find((z) => z.schluessel === 'bevoelkerung');
+    if (_bevZ && !A.bevoelkerung) ar.push(['Bevölkerungsentwicklung (' + _bevZ.wo + ')', _bevZ.wert]);
+    else if (_bevZ) ar.forEach((r) => { if (r[2] === 'bevoelkerung') r[0] = 'Bevölkerungsentwicklung (' + _bevZ.wo + ')'; });
     const rateCol = (label, v) => {
       const s = String(v || '').toLowerCase();
       let c = MUT;
@@ -4921,11 +5000,19 @@ async function exportPdf(out) {
       columnStyles: { 0: { textColor: MUT, cellWidth: 72 }, 1: { fontStyle: 'bold' } },
       didParseCell: (data) => {
         if (data.section === 'body' && data.column.index === 1) {
-          data.cell.styles.textColor = rateCol(ar[data.row.index][0], ar[data.row.index][1]);
+          const _s = ar[data.row.index][3];   /* v2518: Ton der Skala, sonst wie bisher */
+          data.cell.styles.textColor = (_s && _s.ton) ? (_s.ton === 'gut' ? [63, 165, 108] : _s.ton === 'mittel' ? GOLD : [184, 98, 80])
+            : rateCol(ar[data.row.index][0], ar[data.row.index][1]);
         }
       },
     });
     y = doc.lastAutoTable.finalY + 6;
+    /* v2518 · woraus jede Einstufung kommt und wo ihre Grenzen liegen -
+       Modellannahmen von DealPilot, keine amtlichen Werte */
+    const _stN = ar.filter((r) => r[3] && r[3].basis).map((r) => r[0].replace(/\s*\(.*$/, '') + ': ' + r[3].basis + ' — ' + r[3].schwelle);
+    if (_stN.length) { doc.setFontSize(6.5); doc.setTextColor(...MUT);
+      const _sl = doc.splitTextToSize('Einstufung (Modellannahme DealPilot, fünf Stufen): ' + _stN.join(' · '), W - 2 * M);
+      need(3 * _sl.length + 2); doc.text(_sl, M, y); y += 3 * _sl.length + 2; }
     if (_z && _z.available && _z.license) { doc.setFontSize(7); doc.setTextColor(...MUT);
       const _zl = doc.splitTextToSize('Zensus-Kennzahlen (Bestandsmieten aller Verträge, Stichtag 15.05.2022): ' + _z.license, W - 2 * M);
       need(4 * _zl.length + 2); doc.text(_zl, M, y); y += 4 * _zl.length + 1; }
@@ -4934,14 +5021,14 @@ async function exportPdf(out) {
     /* v1853 · N4-P1b: die Einschaetzung des Nutzers als EIGENE Tabelle unter
        der Datenlage — getrennt beschriftet, damit niemand eine Angabe aus
        dem Reiter Objekt fuer eine Messung haelt. */
-    const N = d.nutzer_einschaetzung || {}; const nr = [
-      ['Mikrolage', N.mikrolage], ['Makrolage', N.makrolage], ['Bevölkerungsentwicklung', N.bevoelkerung],
-      ['Nachfrage', N.nachfrage], ['Entwicklungsmöglichkeiten', N.entwicklung], ['Wertsteigerungspotenzial', N.wertsteigerung],
-      ['Mietausfallrisiko', N.mietausfallrisiko],
-    ].filter((r) => r[1] != null && r[1] !== '').map((r) => [r[0], String(r[1]).replace(/_/g, ' ')]);
+    const N = d.nutzer_einschaetzung || {}; const _NH = N.herkunft || {}; const nr = [
+      ['Mikrolage', N.mikrolage, 'mikrolage'], ['Makrolage', N.makrolage, 'makrolage'], ['Bevölkerungsentwicklung', N.bevoelkerung, 'bevoelkerung'],
+      ['Nachfrage', N.nachfrage, 'nachfrage'], ['Entwicklungsmöglichkeiten', N.entwicklung, 'entwicklung'], ['Wertsteigerungspotenzial', N.wertsteigerung, 'wertsteigerung'],
+      ['Mietausfallrisiko', N.mietausfallrisiko, 'mietausfallrisiko'],
+    ].filter((r) => r[1] != null && r[1] !== '').map((r) => [r[0] + ' (' + _herkunftWort(_NH[r[2]]) + ')', String(r[1]).replace(/_/g, ' ')]);   /* v2515 */
     if (nr.length) {
       need(14); doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(...MUT);
-      doc.text('Ihre Einschätzung (aus DealPilot, Reiter Objekt) — keine Messung', M, y); y += 4;
+      doc.text('Angaben aus DealPilot (Reiter Objekt) — Herkunft je Feld', M, y); y += 4;
       doc.autoTable({
         startY: y, margin: { left: M, right: M }, theme: 'plain',
         body: nr,
@@ -4964,7 +5051,8 @@ async function exportPdf(out) {
     const labelMap = { bevoelkerung: 'Bevölkerung', kaufkraft: 'Kaufkraft', arbeitslosigkeit: 'Arbeitsmarkt',
       wanderung: 'Wanderung', miet_trend: 'Miettrend', kaufpreis_trend: 'Kaufpreistrend' };
     const order = ['bevoelkerung', 'kaufkraft', 'arbeitslosigkeit', 'wanderung', 'miet_trend', 'kaufpreis_trend'];
-    const entries = order.filter((k) => mbd[k] != null).map((k) => [labelMap[k] || k, mbd[k]]);
+    const entries = order.filter((k) => mbd[k] != null).map((k) => [labelMap[k] || k, mbd[k], k]);
+    const _mkZ = _makroZeilen(d);   /* v2511 · Rohwert neben den Teilscore */
     need(8);
     doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(...TXT);
     doc.text('Makro-Gesamtscore', M, y);
@@ -4972,10 +5060,14 @@ async function exportPdf(out) {
     doc.setTextColor(...mcol); doc.text((mac.score ?? '–') + ' / 100', W - M, y, { align: 'right' });
     y += 7;
     const barX = M + 52, barW = (W - M) - barX - 14;
-    entries.forEach(([lab, val]) => {
-      need(9);
+    entries.forEach(([lab, val, key]) => {
+      const _rz = _mkZ.zeilen.find((z) => z.schluessel === key);
+      doc.setFontSize(6.8);
+      const _rl = _rz ? doc.splitTextToSize(_rz.wert + ' · ' + _rz.wo, 50) : [];
+      need(9 + _rl.length * 2.9);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(...MUT);
       doc.text(lab, M, y + 3.2);
+      if (_rl.length) { doc.setFont('helvetica', 'bold'); doc.setFontSize(6.8); doc.setTextColor(...TXT); doc.text(_rl, M, y + 6.6); }
       doc.setFillColor(233, 231, 225); doc.roundedRect(barX, y, barW, 4.4, 2.2, 2.2, 'F');
       const c = val >= 70 ? [67, 183, 124] : val >= 50 ? [217, 180, 90] : [217, 104, 95];
       if (doc.GState) { // dezenter Glow unter dem Füllbalken
@@ -4986,14 +5078,36 @@ async function exportPdf(out) {
       doc.setFillColor(...c); doc.roundedRect(barX, y, barW * Math.max(0.03, val / 100), 4.4, 2.2, 2.2, 'F');
       doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...c);
       doc.text(String(val), W - M, y + 3.4, { align: 'right' });
-      y += 9;
+      y += 9 + _rl.length * 2.9;
     });
-    const _mm = (mac && (mac.metrics || mac)) || {};
-    const _trend = _mm.bevoelkerung_trend;
-    if (_trend != null) {
-      need(6); doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(...MUT);
-      doc.text('Bevölkerungstrend ' + (_trend > 0 ? '+' : '') + _trend.toFixed(2) + ' %/Jahr', M, y); y += 8;
+    /* v2511 · Bis hier las die Zeile „Bevölkerungstrend" mac.metrics - das
+       traegt der Score nicht, die Zeile erschien nie. Jetzt stehen die
+       Rohwerte an den Balken; hier nur, was keinen Balken hat. */
+    const _ohneBalken = _mkZ.zeilen.filter((z) => !entries.some((e) => e[2] === z.schluessel));
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(...MUT);
+    _ohneBalken.forEach((z) => { need(5); doc.text(z.label + ' ' + z.wert + ' · ' + z.wo, M, y); y += 4; });
+    const _erl = _mkZ.zeilen.filter((z) => z.erlaeuterung).map((z) => z.label + ': ' + z.erlaeuterung);
+    if (_erl.length) {
+      const _el = doc.splitTextToSize(_erl.join('. ') + '. Teilscore 0–100 je Kennzahl, Gesamtscore als Mittel der gemessenen Kennzahlen.', W - 2 * M);
+      need(_el.length * 3 + 2); doc.setFontSize(6.5); doc.text(_el, M, y); y += _el.length * 3 + 2;
     }
+  }
+  /* v2511 · NAMENSNENNUNG der Regionaldatenbank (dl-de/by-2-0) - nur, wenn
+     ihre Zahlen in diesem Bericht stecken; die Liste baut das Backend. */
+  const _qnmP = d.quellen_nachweis_markt || [];
+  if (_qnmP.length) {
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(...TXT);
+    need(14); y += 1; doc.text('Quellennachweis', M, y); y += 3.6;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.3);
+    _qnmP.forEach((q) => {
+      doc.setTextColor(...MUT);
+      const _ql = doc.splitTextToSize(q.vermerk + (q.kennzahlen && q.kennzahlen.length ? '  (' + q.kennzahlen.join(', ') + ')' : '') + '  ' + (q.lizenz || ''), W - 2 * M);
+      need(_ql.length * 3 + 4); doc.text(_ql, M, y); y += _ql.length * 3 + 0.5;
+      doc.setTextColor(120, 110, 140);
+      (q.urls || []).forEach((u) => { const _ul = doc.splitTextToSize(String(u), W - 2 * M); need(_ul.length * 3); doc.text(_ul, M, y); y += _ul.length * 3; });
+      y += 1.5;
+    });
+    doc.setTextColor(...TXT); y += 2;
   }
 
   // ---------- Marktentwicklung (Chart aus Dashboard) ----------
@@ -5146,6 +5260,19 @@ async function exportPdf(out) {
     sectionTitle('Ausführlicher Marktbericht');
     /*v895d-mbfmt: KI-Bericht sauber rendern (Fett/Tabellen/num.Listen/Callouts) */
     const RMW = W - 2 * M, RLH = 4.9, RSZ = 9.5;
+    /* v2512 · Die Web-Ansicht kennzeichnet den Text als „KI-Auswertung",
+       das PDF - das Blatt, das zur Bank geht - tat es nicht. Neutral, ohne
+       Modell- oder Anbieternamen. */
+    if (out.ai_mode && out.ai_mode !== 'schnell') {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(...GOLD);
+      need(12); doc.text('KI-AUSWERTUNG', M, y);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...MUT);
+      const _kiL = doc.splitTextToSize('Dieser Abschnitt ist KI-gestützt erstellt: eine maschinell formulierte Einordnung '
+        + 'der in diesem Bericht ausgewiesenen Daten. Maßgeblich sind die Zahlen mit ihrer jeweiligen Herkunftsangabe; '
+        + 'der Text ersetzt keine Prüfung durch einen Sachverständigen.', RMW);
+      doc.text(_kiL, M, y + 4); y += 4 + _kiL.length * 3.3 + 3;
+      doc.setTextColor(...TXT);
+    }
     const _drawRich = (text, x, maxW, color) => {
       const lay = _mbLayoutRuns(doc, _mbParseRuns(text), maxW, RSZ);
       for (const line of lay.lines) {

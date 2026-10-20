@@ -2153,7 +2153,7 @@ async function analyzeLage(payload, opts) {
     '3. bevoelkerung (Bevölkerungsentwicklung der Region)',
     '   ENUM-Werte: "stark_wachsend" | "wachsend" | "stabil" | "leicht_fallend" | "stark_fallend"',
     '',
-    '4. nachfrage (Nachfrage-Indikatoren / Marktpuls)',
+    '4. nachfrage (Nachfrage = Vermarktungsdauer der Kaufangebote: sehr_stark bis 30 Tage, stark bis 60, mittel bis 120, schwach bis 200, darueber sehr_schwach)',   /* v2518 */
     '   ENUM-Werte: "sehr_stark" | "stark" | "mittel" | "schwach" | "sehr_schwach"',
     '',
     '5. wertsteigerung (mittelfristiges Wertsteigerungs-Potenzial)',
@@ -3110,7 +3110,7 @@ async function enrichMarketFields(text, fields, context, opts) {
     makrolage: 'Makrolage (Stadt/Region: Bevoelkerung, Wirtschaft, Arbeitsmarkt)',
     mikrolage: 'Mikrolage (Stadtteil: OEPNV, Infrastruktur, Wohnumfeld)',
     ds2_bevoelkerung: 'Bevoelkerungsentwicklung der Region',
-    ds2_nachfrage: 'Nachfrage-Indikatoren / Marktpuls',
+    ds2_nachfrage: 'Nachfrage = Vermarktungsdauer der Kaufangebote (bis 30 / 60 / 120 / 200 Tage)',   /* v2518 */
     ds2_wertsteigerung: 'Mittelfristiges Wertsteigerungs-Potenzial',
     ds2_entwicklung: 'Entwicklungs-Moeglichkeiten / Stadtentwicklungs-Plaene'
   };

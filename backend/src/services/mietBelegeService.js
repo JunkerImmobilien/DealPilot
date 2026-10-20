@@ -185,8 +185,8 @@ function ausLage(l) {
   const f = (l && l.felder) || {};
   const bv = f.ds2_bevoelkerung;
   const bevoelkerung = (bv && _n(bv.wert) != null)
-    ? { trend_pct_pa: _n(bv.wert), stufe: bv.stufe || null, stand: bv.stand || null, ebene: 'Kreis',
-        quelle: 'Regionaldatenbank der Statistischen Ämter, Tabelle 12411-01-01-4 (Bevölkerungsstand), Trend je Jahr' }
+    ? { trend_pct_pa: _n(bv.wert), stufe: bv.stufe || null, stand: bv.stand || null, ebene: bv.ebene || 'Kreis',   /* v2517: Gemeinde vor Kreis */
+        quelle: 'Regionaldatenbank der Statistischen Ämter, Tabelle ' + (bv.ebene === 'Gemeinde' ? '12411-01-01-5' : '12411-01-01-4') + ' (Bevölkerungsstand), Trend je Jahr' }
     : { fehlt: true, weg: 'Bevölkerungsstand des Kreises: regionalstatistik.de (Tabelle 12411-01-01-4).' };
   return { bevoelkerung };
 }

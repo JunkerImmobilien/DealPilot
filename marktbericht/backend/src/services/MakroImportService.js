@@ -47,6 +47,20 @@ export const KENNZAHLEN = {
   wanderungssaldo_je_10000:  { tabelle: 'AI002-1',       einheit: 'je 10.000 EW',     spalte: 9 },
 };
 
+/* v2517 · GEMEINDEEBENE. Gemessen am 20.10.2026 an der Regionaldatenbank:
+   je Gemeinde fuehrt sie die Bevoelkerung (12411-01-01-5) und die Zu- und
+   Fortzuege (12711-91-01-5). Wanderungssaldo und Arbeitslosenquote der
+   Atlas-Tabellen (AI002-1-5, AI008-1-5) sind je Gemeinde gesperrt ("."),
+   Einkommen je Einwohner gibt es nur je Kreis. Der Wanderungssaldo der
+   Gemeinde wird deshalb gerechnet: (Zuzuege - Fortzuege) / Bevoelkerung
+   31.12. x 10.000 - nachgeprueft am Kreis Minden-Luebbecke 2024:
+   (17.951 - 16.851) / 320.557 x 10.000 = 34,3, genau der Atlas-Wert. */
+export const GEMEINDE_KENNZAHLEN = {
+  bevoelkerung_gemeinde: { tabelle: '12411-01-01-5', einheit: 'Personen' },
+  zuzuege_gemeinde:      { tabelle: '12711-91-01-5', einheit: 'Personen je Jahr' },
+  fortzuege_gemeinde:    { tabelle: '12711-91-01-5', einheit: 'Personen je Jahr' },
+};
+
 function zahl(roh) {
   const s = String(roh == null ? '' : roh).replace(/"/g, '').trim();
   if (!/^-?\d{1,3}(\.\d{3})*(,\d+)?$|^-?\d+(,\d+)?$/.test(s)) return null;
@@ -135,7 +149,11 @@ function bevZeilen(csv) {
 }
 
 const SPALTEN = ['kennzahl', 'ags', 'gebiet_name', 'jahr', 'wert', 'wert_roh', 'einheit', 'tabelle', 'merkmal',
-  'stichtag', 'lizenz', 'quelle_url'];
+  'stichtag', 'lizenz', 'quelle_url', 'ebene'];   /* v2517: ebene */
+function ebeneVon(ags) {
+  const a = String(ags || '');
+  return a === 'DG' ? 'bund' : a.length === 2 ? 'land' : a.length === 5 ? 'kreis' : a.length === 8 ? 'gemeinde' : null;
+}
 
 async function schreiben(zeilen) {
   const m = new Map();
@@ -146,9 +164,9 @@ async function schreiben(zeilen) {
     const teil = alle.slice(a, a + BLOCK);
     const werte = [], platz = [];
     teil.forEach((z, k) => {
-      const def = KENNZAHLEN[z.kennzahl];
+      const def = KENNZAHLEN[z.kennzahl] || GEMEINDE_KENNZAHLEN[z.kennzahl];
       const reihe = SPALTEN.map((s) => (s === 'einheit' ? def.einheit : s === 'tabelle' ? def.tabelle
-        : s === 'lizenz' ? LIZENZ : s === 'quelle_url' ? QUELLE + def.tabelle : z[s]));
+        : s === 'lizenz' ? LIZENZ : s === 'quelle_url' ? QUELLE + def.tabelle : s === 'ebene' ? ebeneVon(z.ags) : z[s]));
       platz.push('(' + reihe.map((_, j) => '$' + (k * SPALTEN.length + j + 1)).join(',') + ', now())');
       werte.push(...reihe);
     });
@@ -157,7 +175,7 @@ async function schreiben(zeilen) {
       + ' ON CONFLICT (kennzahl, ags, jahr) DO UPDATE SET gebiet_name = EXCLUDED.gebiet_name,'
       + ' wert = EXCLUDED.wert, wert_roh = EXCLUDED.wert_roh, einheit = EXCLUDED.einheit, tabelle = EXCLUDED.tabelle,'
       + ' merkmal = EXCLUDED.merkmal, stichtag = EXCLUDED.stichtag, lizenz = EXCLUDED.lizenz,'
-      + ' quelle_url = EXCLUDED.quelle_url, abgerufen_am = now()',
+      + ' quelle_url = EXCLUDED.quelle_url, ebene = EXCLUDED.ebene, abgerufen_am = now()',
       werte);
   }
   return alle.length;
@@ -239,25 +257,134 @@ export async function importiere({ log = console.log, kennzahlen = Object.keys(K
   return { voll, fehler, deckung, dauer_s: Math.round((Date.now() - t0) / 1000) };
 }
 
+/* ── v2517 · Gemeinden ────────────────────────────────────────────────── */
+/* Bevoelkerung je Gemeinde (datencsv-Pivot, Datumszeile + Zeile
+   Insgesamt/maennlich/weiblich). Nur 8-stellige Schluessel. */
+function gemBevZeilen(csv) {
+  const rows = String(csv || '').split(/\r?\n/).map((l) => l.split(';').map((c) => c.replace(/"/g, '').trim()));
+  let di = -1, best = 0;
+  rows.forEach((r, i) => { const n = r.filter((c) => /^\d{2}\.\d{2}\.(19|20)\d{2}$/.test(c)).length; if (n > best) { best = n; di = i; } });
+  if (di < 0) return [];
+  const jahrSp = rows[di].map((c) => { const m = c.match(/^\d{2}\.\d{2}\.((19|20)\d{2})$/); return m ? parseInt(m[1], 10) : null; });
+  const lab = rows[di + 1] || [];
+  const spalten = jahrSp.map((j, i) => (j && (!lab[i] || /insgesamt/i.test(lab[i]))) ? i : -1).filter((i) => i >= 0);
+  const out = [];
+  for (const r of rows) {
+    const ags = (r[0] || '').trim();
+    if (!/^\d{8}$/.test(ags)) continue;
+    for (const i of spalten) {
+      const w = zahl(r[i]);
+      if (w == null) continue;
+      out.push({ kennzahl: 'bevoelkerung_gemeinde', ags, gebiet_name: (r[1] || '').trim() || null, jahr: jahrSp[i],
+        wert: w, wert_roh: r[i], merkmal: 'Bevölkerung insgesamt (Stichtag 31.12.)', stichtag: jahrSp[i] + '-12-31' });
+    }
+  }
+  return out;
+}
+/* Zu- und Fortzuege je Gemeinde (ffcsv: Jahr;Schluessel;Name;Zuzuege;Fortzuege) */
+function gemWanZeilen(csv) {
+  const out = [];
+  for (const l of String(csv || '').split(/\r?\n/)) {
+    const c = l.split(';').map((x) => x.replace(/"/g, '').trim());
+    if (!/^(19|20)\d{2}$/.test(c[0] || '') || !/^\d{8}$/.test(c[1] || '')) continue;
+    const jahr = parseInt(c[0], 10);
+    const zu = zahl(c[3]), fort = zahl(c[4]);
+    if (zu != null) out.push({ kennzahl: 'zuzuege_gemeinde', ags: c[1], gebiet_name: c[2] || null, jahr, wert: zu, wert_roh: c[3],
+      merkmal: 'Zuzüge über die Gemeindegrenzen', stichtag: null });
+    if (fort != null) out.push({ kennzahl: 'fortzuege_gemeinde', ags: c[1], gebiet_name: c[2] || null, jahr, wert: fort, wert_roh: c[4],
+      merkmal: 'Fortzüge über die Gemeindegrenzen', stichtag: null });
+  }
+  return out;
+}
+async function gemAbruf(a, log) {
+  const t0 = Date.now();
+  try {
+    const txt = await DestatisConnector._fetchTableFfcsv(a.tabelle, null, new Date().getFullYear(), a.filter,
+      { timeoutMs: ZEIT_MS, regionalvariable: 'GEMEIN', startyear: a.von, endyear: a.bis });
+    const code = (String(txt).slice(0, 300).match(/"Code"\s*:\s*(\d+)/) || [])[1];
+    if (code && code !== '0') throw new Error('GENESIS-Code ' + code);
+    const csv = DestatisConnector._extractCsv(txt);
+    const zeilen = a.art === 'bev' ? gemBevZeilen(csv) : gemWanZeilen(csv);
+    if (!zeilen.length) throw new Error('keine Zeilen gelesen');
+    const n = await schreiben(zeilen);
+    const gebiete = new Set(zeilen.map((z) => z.ags)).size;
+    await protokoll(a.tabelle, a.filter + ' ' + a.von + '-' + a.bis, n, gebiete, Date.now() - t0, 'ok', null);
+    log(a.tabelle + ' ' + a.filter + ' ' + a.von + '-' + a.bis + ': ' + n + ' Werte · ' + gebiete + ' Gemeinden · ' + Math.round((Date.now() - t0) / 1000) + ' s');
+    return { ok: true, werte: n, gebiete };
+  } catch (e) {
+    await protokoll(a.tabelle, a.filter + ' ' + a.von + '-' + a.bis, 0, 0, Date.now() - t0, 'fehler', e.message);
+    log(a.tabelle + ' ' + a.filter + ' FEHLER ' + e.message);
+    return { ok: false, fehler: e.message, auftrag: a };
+  }
+}
+/* Je Land drei Abrufe: Bevoelkerung im Anfangsjahr des Trends (wie beim
+   Kreis: heute - 12), Bevoelkerung und Zu-/Fortzuege der letzten Jahre. */
+export async function importiereGemeinden({ log = console.log, laender = LAENDER } = {}) {
+  if (!destatisEnabled()) throw new Error('kein DESTATIS_TOKEN');
+  const jetzt = new Date().getFullYear();
+  const auftraege = [];
+  for (const l of laender) {
+    auftraege.push({ art: 'bev', tabelle: '12411-01-01-5', filter: l + '*', von: jetzt - 12, bis: jetzt - 12 });
+    auftraege.push({ art: 'bev', tabelle: '12411-01-01-5', filter: l + '*', von: jetzt - 3, bis: jetzt });
+    auftraege.push({ art: 'wan', tabelle: '12711-91-01-5', filter: l + '*', von: jetzt - 3, bis: jetzt });
+  }
+  try { await DestatisConnector.logincheck(); } catch (e) { /* nur Aufraeumen */ }
+  const t0 = Date.now();
+  const ergebnis = [];
+  let i = 0;
+  async function arbeiter() {
+    while (i < auftraege.length) {
+      const a = auftraege[i++];
+      let r = await gemAbruf(a, log);
+      if (!r.ok) { await new Promise((ok) => setTimeout(ok, PAUSE_MS)); r = await gemAbruf(a, log); }
+      ergebnis.push(r);
+    }
+  }
+  await Promise.all(Array.from({ length: PARALLEL }, arbeiter));
+  const deckung = await q(
+    "SELECT kennzahl, count(DISTINCT ags) AS gemeinden, count(DISTINCT left(ags, 2)) AS laender, min(jahr) AS von, max(jahr) AS bis "
+    + "FROM mb.makro_werte WHERE ebene = 'gemeinde' AND kennzahl = ANY($1) AND wert IS NOT NULL GROUP BY kennzahl ORDER BY kennzahl",
+    [Object.keys(GEMEINDE_KENNZAHLEN)]);
+  const fehler = ergebnis.filter((r) => !r.ok);
+  /* rund 10.800 Gemeinden in Deutschland; 10.000 als Untergrenze */
+  const voll = !fehler.length && deckung.length === 3
+    && deckung.every((d) => Number(d.gemeinden) >= 10000 && Number(d.laender) === 16);
+  await protokoll('GESAMT-GEMEINDE', null, ergebnis.reduce((s, r) => s + (r.werte || 0), 0),
+    deckung.length ? Math.min(...deckung.map((d) => Number(d.gemeinden))) : 0, Date.now() - t0, voll ? 'ok' : 'fehler',
+    voll ? null : (fehler.length + ' Abrufe gescheitert; Deckung ' + JSON.stringify(deckung)));
+  return { voll, fehler, deckung, dauer_s: Math.round((Date.now() - t0) / 1000) };
+}
+
 /* ── Der Takt: alle 12 Stunden nachsehen, alle 30 Tage holen ───────────── */
 const TAKT_MS = 12 * 3600 * 1000;
 const ALTER_TAGE = 30;
 let _laeuft = false;
-async function faellig() {
+async function faellig(gesamt = 'GESAMT') {
   try {
-    const r = await q("SELECT max(abgerufen_am) AS t FROM mb.makro_abrufe WHERE tabelle = 'GESAMT' AND status = 'ok'");
+    const r = await q("SELECT max(abgerufen_am) AS t FROM mb.makro_abrufe WHERE tabelle = $1 AND status = 'ok'", [gesamt]);
     const t = r[0] && r[0].t ? new Date(r[0].t).getTime() : 0;
     return Date.now() - t > ALTER_TAGE * 86400000;
   } catch (e) { return false; }   /* Tabelle fehlt -> Migration noch nicht gelaufen */
 }
 async function durchgang() {
-  if (_laeuft || !destatisEnabled() || !(await faellig())) return;
+  if (_laeuft || !destatisEnabled()) return;
+  if (!(await faellig())) { await durchgangGemeinden(); return; }   /* v2517: Gemeinden haben ihren eigenen Stand */
   _laeuft = true;
   try {
     const b = await importiere({ log: (s) => console.log('[makro] ' + s) });
     console.log('[makro] Lauf ' + (b.voll ? 'vollstaendig' : 'UNVOLLSTAENDIG') + ' in ' + b.dauer_s + ' s · '
       + b.deckung.map((d) => d.kennzahl + ' ' + d.kreise + ' Kreise/' + d.laender + ' Laender bis ' + d.jahr).join(' · '));
   } catch (e) { console.log('[makro] Lauf fehlgeschlagen:', e.message); }
+  finally { _laeuft = false; }
+  await durchgangGemeinden();   /* v2517 */
+}
+async function durchgangGemeinden() {
+  if (_laeuft || !destatisEnabled() || !(await faellig('GESAMT-GEMEINDE'))) return;
+  _laeuft = true;
+  try {
+    const b = await importiereGemeinden({ log: (s) => console.log('[makro-gem] ' + s) });
+    console.log('[makro-gem] Lauf ' + (b.voll ? 'vollstaendig' : 'UNVOLLSTAENDIG') + ' in ' + b.dauer_s + ' s · ' + JSON.stringify(b.deckung));
+  } catch (e) { console.log('[makro-gem] Lauf fehlgeschlagen:', e.message); }
   finally { _laeuft = false; }
 }
 export function starteMakroTakt() {
@@ -268,7 +395,12 @@ export function starteMakroTakt() {
 }
 
 // Direktaufruf: node src/services/MakroImportService.js
-if (process.argv[1] && process.argv[1].endsWith('MakroImportService.js')) {
+if (process.argv[1] && process.argv[1].endsWith('MakroImportService.js') && process.argv[2] === 'gemeinden') {
+  importiereGemeinden()
+    .then((b) => { console.log(JSON.stringify(b.deckung)); console.log((b.voll ? 'FERTIG' : 'UNVOLLSTÄNDIG') + ' in ' + b.dauer_s + ' s, ' + b.fehler.length + ' Fehler'); if (!b.voll) process.exitCode = 1; })
+    .catch((e) => { console.error('FEHLER', e.message); process.exitCode = 1; })
+    .finally(() => pool.end());
+} else if (process.argv[1] && process.argv[1].endsWith('MakroImportService.js')) {
   importiere()
     .then((b) => {
       b.deckung.forEach((d) => console.log(`DECKUNG ${d.kennzahl.padEnd(26)} ${d.kreise} Kreise · ${d.laender} Länder · bis ${d.jahr}`));

@@ -82,7 +82,7 @@ export const DestatisConnector = {
   // {ags, city} -> { available, source, metrics:{...}, tables, reason? }
   // Ruft die regionalen GENESIS-Tabellen (Bevoelkerung, Einkommen, Arbeitslosenquote) im
   // flachen ffcsv-Format ab und leitet daraus die Metriken fuer den Makro-Score ab.
-  async macro({ ags, city, nurDb = false } = {}) {
+  async macro({ ags, city, nurDb = false, gemeindeAgs = null } = {}) {   /* v2517: gemeindeAgs */
     if (!destatisEnabled()) {
       return { available: false, source: 'destatis', reason: 'kein_token', metrics: null,
                note: 'Sozioökonomie nicht angebunden – kostenlosen Token bei regionalstatistik.de hinterlegen.' };
@@ -102,7 +102,7 @@ export const DestatisConnector = {
        Live-Abruf darunter bleibt nur als Rueckfall fuer einen Kreis, der
        (noch) nicht in der Tabelle steht. */
     try {
-      const db = await this._macroAusDb(krs, now);
+      const db = await this._macroAusDb(krs, now, gemeindeAgs);
       if (db) return db;
     } catch (e) { /* Tabelle fehlt oder DB haengt -> Live-Abruf */ }
     /* v2192 · nurDb: der Schnell-Abruf (Quick-Check) will die eigene Tabelle,
@@ -202,6 +202,8 @@ export const DestatisConnector = {
     }
     /* v2165 · aus den Atlas-Zeilen. Jahr je Kennzahl wird mitgegeben. */
     const jahre = {};
+    /* v2510 · auch fuer den Bevoelkerungstrend: Zeitraum von-bis */
+    if (metrics.bevoelkerung_trend != null) { jahre.bevoelkerung = bev[bev.length - 1].year; jahre.bevoelkerung_von = bev[0].year; }
     const neueste = (rows, schl, spalte) => {
       const r = (rows || []).filter((z) => z.schl === schl && z.werte[spalte] != null)
         .sort((a, b) => b.jahr - a.jahr)[0];
@@ -224,6 +226,9 @@ export const DestatisConnector = {
     return {
       available: hasAny, source: 'destatis', metrics: hasAny ? metrics : null,
       kreis_ags: krs, tables_used: tables, jahre,
+      /* v2517: der Live-Abruf kennt nur den Kreis */
+      ebenen: Object.fromEntries([['bevoelkerung', 'bevoelkerung_trend'], ['kaufkraft', 'kaufkraft_idx'], ['arbeitslosenquote', 'arbeitslosenquote'], ['wanderung', 'wanderungssaldo']]
+        .filter(([, m]) => metrics[m] != null).map(([k]) => [k, 'Kreis'])),
       reason: hasAny ? undefined : 'kein_wert_geparst',
       note: hasAny ? 'Sozioökonomie aus GENESIS-Regionalstatistik (Kreisebene).'
                    : 'GENESIS antwortete, aber es konnten keine Werte geparst werden (Format prüfen über /destatis/raw).',
@@ -233,37 +238,76 @@ export const DestatisConnector = {
   /* v2172 · Die Makro-Kennzahlen aus mb.makro_werte, gerechnet wie der
      Live-Abruf oben (Trend ueber die letzten 12 Jahre, Kaufkraft gegen DG
      desselben Jahres, Wanderung je 10.000 -> %). null = Kreis nicht da. */
-  async _macroAusDb(krs, now) {
+  /* v2172 · Die Makro-Kennzahlen aus mb.makro_werte, gerechnet wie der
+     Live-Abruf oben (Trend ueber die letzten 12 Jahre, Kaufkraft gegen DG
+     desselben Jahres, Wanderung je 10.000 -> %). null = Kreis nicht da.
+
+     v2517 · GEMEINDE VOR KREIS. Marcel am 20.10.2026: die Makrolage auf
+     Gemeindeebene, wo die Regionaldatenbank die Kennzahl je Gemeinde
+     fuehrt. Das sind Bevoelkerung (12411-01-01-5) und Wanderungssaldo
+     (gerechnet aus 12711-91-01-5 und dem Bevoelkerungsstand). Arbeitslosen-
+     quote und Kaufkraft bleiben Kreiswerte - je Gemeinde gesperrt bzw.
+     nicht erhoben. Jede Kennzahl traegt ihre Ebene (ebenen.*) und ihre
+     Tabelle (tables_used.*); die Anzeige schreibt beides dazu. */
+  async _macroAusDb(krs, now, gemeindeAgs = null) {
+    const gem = /^\d{8}$/.test(String(gemeindeAgs || '')) && String(gemeindeAgs).startsWith(krs) ? String(gemeindeAgs) : null;
     const rows = await q(
-      'SELECT kennzahl, ags, jahr, wert::float8 AS wert, tabelle, lizenz, abgerufen_am '
+      'SELECT kennzahl, ags, gebiet_name, jahr, wert::float8 AS wert, tabelle, lizenz, abgerufen_am '
       + 'FROM mb.makro_werte WHERE ags = ANY($1) AND wert IS NOT NULL ORDER BY jahr',
-      [[krs, 'DG']]);
+      [gem ? [krs, 'DG', gem] : [krs, 'DG']]);
     const eigen = rows.filter((r) => r.ags === krs);
     if (!eigen.length) return null;
-    const reihe = (k) => eigen.filter((r) => r.kennzahl === k);
-    const neueste = (k) => { const r = reihe(k); return r.length ? r[r.length - 1] : null; };
-    const metrics = {}, jahre = {};
-    const bev = reihe('bevoelkerung').filter((r) => r.jahr >= now - 12);
-    if (bev.length >= 2) {
+    const gr = gem ? rows.filter((r) => r.ags === gem) : [];
+    const reihe = (k, quelle = eigen) => quelle.filter((r) => r.kennzahl === k);
+    const neueste = (k, quelle = eigen) => { const r = reihe(k, quelle); return r.length ? r[r.length - 1] : null; };
+    const metrics = {}, jahre = {}, ebenen = {};
+    const tables = { bevoelkerung: '12411-01-01-4', einkommen: '82000-07-01-4', arbeitslosenquote: 'AI008-1', wanderung: 'AI002-1' };
+    const trend = (bev) => {
+      if (bev.length < 2) return null;
       const a = bev[0], b = bev[bev.length - 1], yrs = (b.jahr - a.jahr) || 1;
-      if (a.wert > 0 && b.wert > 0) { metrics.bevoelkerung_trend = ((b.wert / a.wert) ** (1 / yrs) - 1) * 100; jahre.bevoelkerung = b.jahr; }
+      return (a.wert > 0 && b.wert > 0) ? { v: ((b.wert / a.wert) ** (1 / yrs) - 1) * 100, von: a.jahr, bis: b.jahr } : null;
+    };
+    const tg = trend(reihe('bevoelkerung_gemeinde', gr).filter((r) => r.jahr >= now - 12));
+    const tk = tg ? null : trend(reihe('bevoelkerung').filter((r) => r.jahr >= now - 12));
+    const t = tg || tk;
+    if (t) {
+      metrics.bevoelkerung_trend = t.v; jahre.bevoelkerung = t.bis; jahre.bevoelkerung_von = t.von;   /* v2510: von-Jahr */
+      ebenen.bevoelkerung = tg ? 'Gemeinde' : 'Kreis';
+      if (tg) tables.bevoelkerung = '12411-01-01-5';
     }
     const ein = neueste('einkommen_je_ew');
     if (ein && ein.wert > 0) {
       const de = rows.find((r) => r.ags === 'DG' && r.kennzahl === 'einkommen_je_ew' && r.jahr === ein.jahr);
-      if (de && de.wert > 0) { metrics.kaufkraft_idx = (ein.wert / de.wert) * 100; jahre.kaufkraft = ein.jahr; }
+      if (de && de.wert > 0) { metrics.kaufkraft_idx = (ein.wert / de.wert) * 100; jahre.kaufkraft = ein.jahr; ebenen.kaufkraft = 'Kreis'; }
     }
     const alq = neueste('arbeitslosenquote');
-    if (alq && alq.wert >= 0) { metrics.arbeitslosenquote = alq.wert; jahre.arbeitslosenquote = alq.jahr; }
-    const wan = neueste('wanderungssaldo_je_10000');
-    if (wan && Number.isFinite(wan.wert)) { metrics.wanderungssaldo = wan.wert / 100; jahre.wanderung = wan.jahr; }
+    if (alq && alq.wert >= 0) { metrics.arbeitslosenquote = alq.wert; jahre.arbeitslosenquote = alq.jahr; ebenen.arbeitslosenquote = 'Kreis'; }
+    /* Wanderungssaldo der Gemeinde: (Zuzuege - Fortzuege) / Bevoelkerung
+       31.12. desselben Jahres x 10.000 - am Kreis gegen AI002-1 geprueft. */
+    let wanG = null;
+    const zu = neueste('zuzuege_gemeinde', gr);
+    if (zu) {
+      const fo = gr.find((r) => r.kennzahl === 'fortzuege_gemeinde' && r.jahr === zu.jahr);
+      const bv = gr.find((r) => r.kennzahl === 'bevoelkerung_gemeinde' && r.jahr === zu.jahr);
+      if (fo && bv && bv.wert > 0) wanG = { wert: (zu.wert - fo.wert) / bv.wert * 10000, jahr: zu.jahr };
+    }
+    const wan = wanG || neueste('wanderungssaldo_je_10000');
+    if (wan && Number.isFinite(wan.wert)) {
+      metrics.wanderungssaldo = wan.wert / 100; jahre.wanderung = wan.jahr; ebenen.wanderung = wanG ? 'Gemeinde' : 'Kreis';
+      if (wanG) tables.wanderung = '12711-91-01-5';
+    }
     if (!Object.keys(metrics).length) return null;
-    const quellen = [...new Map(eigen.map((r) => [r.tabelle, { tabelle: r.tabelle, lizenz: r.lizenz,
+    const benutzt = new Set(Object.values(tables));
+    const quellen = [...new Map(rows.filter((r) => benutzt.has(r.tabelle)).map((r) => [r.tabelle, { tabelle: r.tabelle, lizenz: r.lizenz,
       abgerufen_am: r.abgerufen_am }])).values()];
+    const kreisName = (eigen.find((r) => r.gebiet_name) || {}).gebiet_name || null;
+    const gemName = (gr.find((r) => r.gebiet_name) || {}).gebiet_name || null;
+    const hatGem = Object.values(ebenen).includes('Gemeinde');
     return {
-      available: true, source: 'destatis', herkunft: 'mb.makro_werte', metrics, kreis_ags: krs, jahre, quellen,
-      tables_used: { bevoelkerung: '12411-01-01-4', einkommen: '82000-07-01-4', arbeitslosenquote: 'AI008-1', wanderung: 'AI002-1' },
-      note: 'Sozioökonomie aus GENESIS-Regionalstatistik (Kreisebene), aus der DealPilot-Datenbank.',
+      available: true, source: 'destatis', herkunft: 'mb.makro_werte', metrics, kreis_ags: krs, jahre, quellen, ebenen,
+      gemeinde_ags: hatGem ? gem : null, gemeinde_name: hatGem ? gemName : null, kreis_name: kreisName,
+      tables_used: tables,
+      note: 'Sozioökonomie aus GENESIS-Regionalstatistik (' + (hatGem ? 'Gemeinde- und Kreisebene' : 'Kreisebene') + '), aus der DealPilot-Datenbank.',
     };
   },
 
@@ -375,12 +419,15 @@ export const DestatisConnector = {
     const body = {
       username: cfg.destatis.token, password: cfg.destatis.password || '',
       name, area: 'all', compress: 'false', language: 'de', format: 'ffcsv',
-      startyear: String(now - 12), endyear: String(now),
+      startyear: String(opts.startyear != null ? opts.startyear : now - 12), endyear: String(opts.endyear != null ? opts.endyear : now),
     };
+    /* v2517 · Gemeindetabellen: Regionalvariable GEMEIN statt KREISE, und
+       ein Jahresfenster - ein ganzes Land (Bayern) ist ueber 13 Jahre „zu
+       gross" (Code 98), in vier Jahren nicht (gemessen 20.10.2026). */
     /* v2165: mit Kreisfilter, wo gewuenscht. Der Kommentar oben („KREISE
        liefert 104") gilt fuer die Bevoelkerungstabelle; die Atlas-Tabellen
        antworten mit Filter Code 0 und ohne ihn Code 98 (gemessen). */
-    if (kreisFilter) { body.regionalvariable = 'KREISE'; body.regionalkey = kreisFilter; }
+    if (kreisFilter) { body.regionalvariable = opts.regionalvariable || 'KREISE'; body.regionalkey = kreisFilter; }
     const base = await resolveBase(); // genesisws/genesisWS-robust
     const r = await httpText(`${base}/data/table`, { method: 'POST', headers: authHeaders(), form: body, timeoutMs: opts.timeoutMs || 60000, retries: opts.timeoutMs ? 0 : 2 });   /* v2169: die Regionaldatenbank braucht teils ueber 30 s */
     return r.text || '';
