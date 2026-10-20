@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-20T09:17:03.923Z",
+ "erzeugt_am": "2026-10-20T12:01:18.012Z",
  "quellen": {
   "voice-import": "4d1160a61b89e852",
   "objektart-felder": "1e0549e54a17a054",
-  "storage": "fa6252931a76b7af",
-  "index-html": "070fa64b80096dc6",
+  "storage": "803379623cd7e5eb",
+  "index-html": "e1322023577f10aa",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -659,6 +659,7 @@
    "standardstufe",
    "grundriss",
    "mod_punkte",
+   "mod_quelle",
    "sachwertfaktor",
    "uk_flaeche",
    "wgfz_objekt",

@@ -141,7 +141,8 @@
     eingabe.baujahr = bj;
     eingabe.gnd = gnd();
     eingabe.modPoints = punkte;
-    eingabe.modPoints_herkunft = 'Punkte des Hauses aus den Einheiten (flächengewichtet, Gebäudegewerke geerbt)';   /* v2483 */
+    eingabe.modPoints_herkunft = modQuelle() === 'felder' ? 'Punkte des Hauses aus den acht Feldern im Reiter Objekt'   /* v2540 */
+      : 'Punkte des Hauses aus den Einheiten (flächengewichtet, Gebäudegewerke geerbt)';   /* v2483 */
     try {
       var r = window.DealPilotRND.calcAll(eingabe);
       var jahre = (r && r.methods && r.methods.punktraster)
@@ -780,6 +781,11 @@
     var pGew = flSum > 0 ? zeilen.reduce(function (a, z) { return a + z.punkte * z.fl; }, 0) / flSum
       : (zeilen.length ? zeilen.reduce(function (a, z) { return a + z.punkte; }, 0) / zeilen.length : 0);
     var hp = Math.min(20, Math.round(pGew));
+    /* v2540 · Quelle „acht Felder": die Punkte des Feldes mod_punkte (leer = geschaetzt) */
+    if (modQuelle() === 'felder') {
+      var _mpF = parseInt(el('mod_punkte') && el('mod_punkte').value, 10);
+      hp = isFinite(_mpF) ? _mpF : null;
+    }
     var hr = zeilen.length ? hausRnd(hp) : null;
     return { s: s, gebPunkte: Math.min(20, gp), zeilen: zeilen, punkteGew: pGew, hausPunkte: hp,
              rndGew: hr && hr.jahre > 0 ? hr.jahre : 0, rndInfo: hr };
@@ -788,9 +794,22 @@
   /* v2483 · Die Punkte des Hauses aus dem GESPEICHERTEN Stand der Einheiten.
      null, wenn die Objektart keine Einheiten fuehrt oder keine erfasst sind -
      dann gilt das Feld mod_punkte (Reiter Objekt) wie bisher. */
+  /* v2540 · Marcel 20.10.2026 (Rest aus v2483): „konfigurierbar machen". Je Objekt
+     waehlbar, woher die Modernisierungspunkte beim MFH kommen: aus den Einheiten
+     (Vorgabe, flaechengewichtet) oder aus den acht Feldern im Reiter Objekt.
+     Merker: verstecktes Feld mod_quelle ('' = einheiten, 'felder'). */
+  function modQuelle() {
+    var f = el('mod_quelle');
+    return (f && f.value === 'felder') ? 'felder' : 'einheiten';
+  }
+  function hatEinheiten() {
+    var art = (el('objart') && el('objart').value) || '';
+    return !!ARTEN_MIT_EINHEITEN[art] && !!((daten().einheiten || []).length);
+  }
   function hausPunkte() {
     var art = (el('objart') && el('objart').value) || '';
     if (!ARTEN_MIT_EINHEITEN[art]) return null;
+    if (modQuelle() === 'felder') return null;   /* v2540 · dann gilt das Feld mod_punkte */
     var d = daten(), list = d.einheiten || [];
     if (!list.length) return null;
     var geb = d.gebaeude || {}, fl = 0, sp = 0, sn = 0;
@@ -1204,7 +1223,7 @@
       /* v2483 · die GENAUE Punktzahl des Hauses, nicht die naechste der fuenf
          festen Stufen (optionFuer machte aus 7 Punkten 8). Fehlt die Option,
          bekommt sie eine eigene - wie objekt-reiter.js modPunkteSchreiben. */
-      if (el('mfh-uep') && el('mfh-uep').checked && el('mod_punkte')) {
+      if (el('mfh-uep') && el('mfh-uep').checked && el('mod_punkte') && modQuelle() !== 'felder' && d.hausPunkte != null) {   /* v2540 */
         var _mpSel = el('mod_punkte'), _mpV = String(d.hausPunkte);
         if (!Array.prototype.some.call(_mpSel.options || [], function (o) { return o.value === _mpV; })) {
           var _o = document.createElement('option'); _o.value = _mpV; _o.textContent = _mpV + ' Punkte (aus den Einheiten)'; _o.setAttribute('data-oe-auto', '1'); _mpSel.appendChild(_o);
@@ -1311,7 +1330,7 @@
   }
   window.DpMfhEinheiten = { /* v2430: Punkte-Helfer fuer potenzial.js - keine zweite Tabelle */
     punkteVon: punkteVon, maxPunkte: maxPunkte, labelVon: labelVon, punkteObjekt: punkteObjekt, WE_IDS: WE_IDS, GEB_IDS: GEB_IDS,
-    oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, hausPunkte: hausPunkte /* v2483 */, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
+    oeffnen: oeffnen, knopf: knopf, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, hausPunkte: hausPunkte /* v2483 */, modQuelle: modQuelle, hatEinheiten: hatEinheiten /* v2540 */, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
     /* v2087: die elf Vertragsformen mitexportiert. Der Reiter Miete
        braucht dieselbe Liste fuer die Objektebene (Backlog N60.8-alt) -
        eine zweite Liste dort waere der Anfang der Abweichung. */

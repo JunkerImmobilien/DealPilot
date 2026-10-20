@@ -40,7 +40,7 @@ if (!window._pdfGold) {
  * harmlos, weil die Felder gar nicht gespeichert wurden; ab jetzt wuerden
  * die 828 m2 Hinterland von Objekt A beim Speichern an Objekt B kleben. */
 var WM_FIELDS = [
-  'baustatus','bgf','standardstufe','grundriss','mod_punkte',
+  'baustatus','bgf','standardstufe','grundriss','mod_punkte','mod_quelle',   /* v2540: mod_quelle */
   'sachwertfaktor','uk_flaeche','wgfz_objekt','stellplatz_miete_monat','sonstige_jahr',   /* v2282: uk_flaeche, v2361: wgfz_objekt */
   'nhk_haus','nhk_geschosse','nhk_dach',
   'hinterland_qm','hinterland_eur_qm','hinterland_rentierlich',

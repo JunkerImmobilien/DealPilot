@@ -1302,11 +1302,24 @@
         y += 2.4;
       }
       var spP = [['Kennzahl', 52, 'l']].concat(PD.spalten.map(function (k) { return [PD.titel[k], 30]; }));
-      tabelle(spP, PD.kennzahlen.map(function (z, n) { return { werte: z.map(function (x) { return sauberE(String(x)); }), fett: /^Ertragswert|^nach Aufteilung/.test(z[0]) }; }), { titel: 'Wertpotenzial' });
-      zeile('Kaufpreis', eur(K.kp));
       /* v2530 · Fußnote: lief über den Seitenfuß bis an den Papierrand. Jetzt in
          zwei Absätzen (Aufteilung, dann Kennzeichnung und Grundlagen) über absatz(). */
       var _fu = String(PD.fuss || ''), _au = PD.aufteilung_hinweis ? 'Aufteilung: ' + PD.aufteilung_hinweis + ' ' : '';
+      /* v2540 · Tabelle, Kaufpreis und Fußnote bleiben ZUSAMMEN (Marcel 20.10.2026:
+         „ja bitte"). Seit v2530 stand die Fortsetzung der Fußnote allein oben auf
+         der Folgeseite, getrennt von der Tabelle, die sie erklärt. Passt der Block
+         nicht mehr, beginnt er geschlossen auf der nächsten Seite - wie das
+         Kennzahlenraster (v1462c). Höhen wie in tabelle()/zeile()/absatz(). */
+      (function () {
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7.2);
+        var _zl = function (t) { return t ? doc.splitTextToSize(sauberE(t), CW).length : 0; };
+        var _teile = (_au && _fu.indexOf(_au) === 0) ? [_au, _fu.slice(_au.length)] : [_fu];
+        var bedarf = 7 + PD.kennzahlen.length * 6.2 + 4 + 6.1 + 1
+          + _teile.reduce(function (a, t) { return a + _zl(t) * 3.5; }, 0) + (_teile.length > 1 ? 1.5 : 0);
+        if (y + bedarf > TEXT_UNTEN && bedarf < H - 60) { doc.addPage(); kopf(_titel, _unter); }
+      })();
+      tabelle(spP, PD.kennzahlen.map(function (z, n) { return { werte: z.map(function (x) { return sauberE(String(x)); }), fett: /^Ertragswert|^nach Aufteilung/.test(z[0]) }; }), { titel: 'Wertpotenzial' });
+      zeile('Kaufpreis', eur(K.kp));
       y += 1;
       if (_au && _fu.indexOf(_au) === 0) {
         absatz(sauberE(_au), { groesse: 7.2, farbe: 120, zeile: 3.5 }); y += 1.5;

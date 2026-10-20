@@ -308,8 +308,20 @@ export const ErtragswertService = {
        Zeile „Rohertrag Wohnen 0 €" waere eine Aussage ueber etwas, das es
        nicht gibt. Mit Wohnmiete bleibt die Zeile wie immer. */
     /* v2520 · bei Leerstand steht im Rechenweg, worauf die Miete steht */
-    const _auf = ein.miete_aufteilung && pos(ein.miete_aufteilung.wfl_leer) ? ein.miete_aufteilung : null;
-    const _aufDetail = _auf
+    /* v2540 · je Wohnung gegen das Band (CrossCheckService): die angepassten Wohnungen einzeln */
+    const _je = ein.miete_aufteilung && Array.isArray(ein.miete_aufteilung.einheiten) ? ein.miete_aufteilung : null;
+    const _jeAng = _je ? _je.einheiten.filter((z) => z.herkunft === 'untere_kante' || z.herkunft === 'obere_kante') : [];
+    const _jeDetail = _je && (_jeAng.length || pos(_je.wfl_leer))
+      ? `Ist-Miete je Wohnung im Band`
+        + (_jeAng.length ? '; ' + (_jeAng.length > 2 && _jeAng.every((z) => z.qm === _jeAng[0].qm && z.ist_qm === _jeAng[0].ist_qm)
+          ? `${_jeAng.length} Wohnungen ${deZahl(_jeAng[0].qm)} statt ${deZahl(_jeAng[0].ist_qm)} €/m² (${_jeAng[0].herkunft === 'obere_kante' ? 'obere' : 'untere'} Bandkante)`
+          : _jeAng.map((z) => `${z.nr} ${deZahl(z.qm)} statt ${deZahl(z.ist_qm)} €/m² (${z.herkunft === 'obere_kante' ? 'obere' : 'untere'} Bandkante)`).join(', ')) : '')
+        + ` · vermietet ${deZahl(_je.wfl_vermietet)} m² Ø ${deZahl(_je.qm_vermietet)} €/m²`
+        + (pos(_je.wfl_leer) ? ` + leere Fläche ${deZahl(_je.wfl_leer)} m² mit marktüblicher Miete ${deZahl(_je.qm_leer)} €/m²` : '')
+        + ' (je × 12)'
+      : null;
+    const _auf = !_je && ein.miete_aufteilung && pos(ein.miete_aufteilung.wfl_leer) ? ein.miete_aufteilung : null;
+    const _aufDetail = _je ? _jeDetail : _auf
       ? `${_auf.herkunft_vermietet === 'ist_im_band' ? 'Ist-Miete' : (_auf.herkunft_vermietet === 'obere_kante' ? 'obere Bandkante' : 'untere Bandkante')}`
         + ` auf vermieteter Fläche ${deZahl(_auf.wfl_vermietet)} m² × ${deZahl(_auf.qm_vermietet)} €/m²`
         + ` + leere Fläche ${deZahl(_auf.wfl_leer)} m² mit marktüblicher Miete ${deZahl(_auf.qm_leer)} €/m² (je × 12)`
@@ -573,12 +585,26 @@ export const ErtragswertService = {
     const gebReinertrag = round0(reinertrag - bwVerzinsung);
     if (hatBw) out.staffel.push({ pos: '= Gebäudereinertrag', wert: gebReinertrag, summe: true });
 
-    if (hatBw && gebReinertrag <= 0) {
+    /* v2540 · Marcel 20.10.2026 („so dass es richtig ist nach ImmoWertV"): der
+       Kurzweg „Ertragswert = Bodenwert" ist die Annahme eines Liquidationsobjekts
+       (§ 43 ImmoWertV: alsbaldige Freilegung). Eine EIGENTUMSWOHNUNG laesst sich
+       nicht freilegen - dort gilt die Formel des § 28 unveraendert
+       (vEW = (RE - BW x LZ) x KF + BW; ein negativer Gebaeudereinertrag mindert
+       den Wert). Gemessen v2488: die leere WE 5 des Demo-MFH als ETW ergab hier
+       69.558 € = ihr Bodenwertanteil, ungerundet. Beim Haus bleibt der Kurzweg,
+       jetzt gerundet wie jeder Ertragswert. */
+    const _etw = /etw|wohnung|whg|apartment|appartement/i.test(String(ein.objektart || ''));   /* wie _istWhg oben */
+    if (hatBw && gebReinertrag <= 0 && !_etw) {
       out.warnungen.push('Der Gebäudereinertrag ist null oder negativ: Die Bodenwertverzinsung übersteigt den Reinertrag. In diesem Fall ist regelmäßig der Bodenwert die maßgebliche Größe — das Gebäude trägt rechnerisch nichts bei.');
-      out.wert = bw;
+      out.wert = rundeSinnvoll(bw);
+      out.wert_ungerundet = round0(bw);
       out.staffel.push({ pos: '= Ertragswert (entspricht dem Bodenwert)', wert: bw, summe: true });
       out.vollstaendig = true;
       return out;
+    }
+    if (hatBw && gebReinertrag <= 0 && _etw) {
+      out.hinweise.push('Der Gebäudereinertrag ist null oder negativ: Die Bodenwertverzinsung auf den Bodenwertanteil übersteigt den Reinertrag. '
+        + 'Eine Eigentumswohnung kann nicht freigelegt werden (§ 43 ImmoWertV), deshalb rechnet die Formel des § 28 unverändert weiter.');
     }
 
     /* ── 5 · Restnutzungsdauer und Barwertfaktor ────────────────────────── */

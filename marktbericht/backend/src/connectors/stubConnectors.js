@@ -4,6 +4,7 @@ import { httpJson, httpText } from '../lib/http.js';
 import { cfg, destatisEnabled } from '../lib/config.js';
 import { cacheGet, cacheSet } from '../lib/cache.js';   /* v2169 */
 import { q } from '../lib/db.js';                       /* v2172: mb.makro_werte */
+import { bevoelkerungTrend } from '../lib/bevoelkerung_trend.js';   /* v2540 */
 
 // Destatis / Regionalstatistik (GENESIS-Online, regionalstatistik.de)
 // REST/JSON, POST. Auth: username (= persoenlicher Token 32 Z. ODER Kennung) + password
@@ -196,14 +197,14 @@ export const DestatisConnector = {
     // Metriken ableiten (defensiv – fehlende Werte bleiben undefined -> Score ignoriert sie)
     const metrics = {};
     const bev = series.bevoelkerung;
-    if (bev && bev.length >= 2) {
-      const first = bev[0].value, last = bev[bev.length - 1].value, yrs = bev[bev.length - 1].year - bev[0].year || 1;
-      if (first > 0 && last > 0) metrics.bevoelkerung_trend = ((last / first) ** (1 / yrs) - 1) * 100; // %/Jahr
-    }
+    /* v2540 · Jahresschritte, der Zensus-Sprung 2021/2022 ausgelassen (lib/bevoelkerung_trend.js) */
+    const _bt = bev && bev.length >= 2 ? bevoelkerungTrend(bev.map((p) => ({ jahr: p.year, wert: p.value }))) : null;
+    if (_bt) metrics.bevoelkerung_trend = _bt.v; // %/Jahr
     /* v2165 · aus den Atlas-Zeilen. Jahr je Kennzahl wird mitgegeben. */
     const jahre = {};
     /* v2510 · auch fuer den Bevoelkerungstrend: Zeitraum von-bis */
-    if (metrics.bevoelkerung_trend != null) { jahre.bevoelkerung = bev[bev.length - 1].year; jahre.bevoelkerung_von = bev[0].year; }
+    if (metrics.bevoelkerung_trend != null) { jahre.bevoelkerung = bev[bev.length - 1].year; jahre.bevoelkerung_von = bev[0].year;
+      if (_bt.bruch_ausgelassen) jahre.bevoelkerung_bruch = true; }   /* v2540 */
     const neueste = (rows, schl, spalte) => {
       const r = (rows || []).filter((z) => z.schl === schl && z.werte[spalte] != null)
         .sort((a, b) => b.jahr - a.jahr)[0];
@@ -262,16 +263,14 @@ export const DestatisConnector = {
     const neueste = (k, quelle = eigen) => { const r = reihe(k, quelle); return r.length ? r[r.length - 1] : null; };
     const metrics = {}, jahre = {}, ebenen = {};
     const tables = { bevoelkerung: '12411-01-01-4', einkommen: '82000-07-01-4', arbeitslosenquote: 'AI008-1', wanderung: 'AI002-1' };
-    const trend = (bev) => {
-      if (bev.length < 2) return null;
-      const a = bev[0], b = bev[bev.length - 1], yrs = (b.jahr - a.jahr) || 1;
-      return (a.wert > 0 && b.wert > 0) ? { v: ((b.wert / a.wert) ** (1 / yrs) - 1) * 100, von: a.jahr, bis: b.jahr } : null;
-    };
+    /* v2540 · Jahresschritte, der Zensus-Sprung 2021/2022 ausgelassen (lib/bevoelkerung_trend.js) */
+    const trend = (bev) => bevoelkerungTrend(bev);
     const tg = trend(reihe('bevoelkerung_gemeinde', gr).filter((r) => r.jahr >= now - 12));
     const tk = tg ? null : trend(reihe('bevoelkerung').filter((r) => r.jahr >= now - 12));
     const t = tg || tk;
     if (t) {
       metrics.bevoelkerung_trend = t.v; jahre.bevoelkerung = t.bis; jahre.bevoelkerung_von = t.von;   /* v2510: von-Jahr */
+      if (t.bruch_ausgelassen) jahre.bevoelkerung_bruch = true;   /* v2540 */
       ebenen.bevoelkerung = tg ? 'Gemeinde' : 'Kreis';
       if (tg) tables.bevoelkerung = '12411-01-01-5';
     }

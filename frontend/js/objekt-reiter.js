@@ -322,6 +322,16 @@
       + '<br>' + mpChips;
     if (mp && mp.mfh) mpQ = st('a', 'Anlage 2 greift') + 'Aus den ' + mp.mfh.einheiten + ' Einheiten des MFH-Konfigurators, flächengewichtet ('
       + deNum(mp.mfh.gewichtet, 1) + ' Punkte, angesetzt ' + mp.total + '). Dieselbe Zahl rechnen Marktbericht, Ertragswert und Wertpotenzial.';   /* v2483 */
+    /* v2540 · Marcel 20.10.2026: „konfigurierbar machen" - beim MFH mit Einheiten
+       waehlbar, woher die Punkte kommen (Merker mod_quelle, mfh-einheiten.js modQuelle) */
+    var _DM = window.DpMfhEinheiten;
+    if (_DM && _DM.hatEinheiten && _DM.hatEinheiten()) {
+      var _q = _DM.modQuelle();
+      if (_q === 'felder') mpQ += '<br>Beim MFH nach deiner Wahl aus diesen acht Feldern, nicht aus den Einheiten. Dieselbe Zahl rechnen Marktbericht, Ertragswert, Wertpotenzial und Mieterliste.';
+      mpQ += '<br><span class="oe-chips">Punkte aus: '
+        + '<span class="oe-chip' + (_q === 'einheiten' ? '' : ' fehlt') + '" data-oe-modquelle="">den Einheiten (Konfigurator)</span>'
+        + '<span class="oe-chip' + (_q === 'felder' ? '' : ' fehlt') + '" data-oe-modquelle="felder">den acht Feldern</span></span>';
+    }
     var mpZeile = zeile('Modernisierungspunkte', mp ? mp.total + ' von 20' : '—', mpQ, '');
     if (!o.plz) {
       box.innerHTML = brwZeile() + zeile('Liegenschaftszins', '—', 'PLZ eintragen — dann holt DealPilot den amtlichen Satz', '')
@@ -1143,6 +1153,24 @@
         bgfEl.dispatchEvent(new Event('input', { bubbles: true })); bgfEl.dispatchEvent(new Event('change', { bubbles: true }));
         try { var hk = $('_dp_herkunft'); if (hk) { var o = {}; try { o = JSON.parse(hk.value || '{}'); } catch (e2) {} o.bgf = 'geschätzt (Wohnfläche × 1,35, EFH-Faustwert)'; hk.value = JSON.stringify(o); hk.dispatchEvent(new Event('change', { bubbles: true })); } } catch (e3) {}
         if (bh) bh.textContent = 'Schätzung: ' + deNum(wfl, 0) + ' m² × 1,35 = ' + deNum(bgf, 0) + ' m² BGF — grobe Näherung (DIN 277 misst außen, alle Grundrissebenen). Die Bauzeichnung ist genauer.';
+        return;
+      }
+      /* v2540 · Quelle der Modernisierungspunkte beim MFH umschalten */
+      var mq = e.target.closest('[data-oe-modquelle]');
+      if (mq) {
+        var mqF = $('mod_quelle'), mqV = mq.getAttribute('data-oe-modquelle') || '';
+        if (mqF && mqF.value !== mqV) {
+          mqF.value = mqV;
+          try { mqF.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {}
+          /* die Zahl aus den Einheiten gilt nicht mehr: ohne Angabe in den acht
+             Feldern steht das Feld danach auf „keine Angabe", nicht auf ihr */
+          var mpS = $('mod_punkte'), mpO = mpS && mpS.selectedIndex >= 0 ? mpS.options[mpS.selectedIndex] : null;
+          if (mqV === 'felder' && mpO && mpO.hasAttribute('data-oe-auto')) {
+            mpS.value = '';
+            try { mpS.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {}
+          }
+          automatik();
+        }
         return;
       }
       var b = e.target.closest('[data-oe-feld]'); if (b) { abweichend(b.getAttribute('data-oe-feld')); return; }

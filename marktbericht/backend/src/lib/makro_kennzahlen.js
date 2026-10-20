@@ -48,7 +48,11 @@ export function makroKennzahlen(macroRaw, macro, agsInfo) {
     schluessel: 'bevoelkerung', label: 'Bevölkerungsentwicklung',
     wert: bev, einheit: '% p. a.', nachkomma: 2, vorzeichen: true,
     jahr: j.bevoelkerung ?? null, von_jahr: j.bevoelkerung_von ?? null,
-    erlaeuterung: 'Durchschnitt pro Jahr aus dem Bevölkerungsstand',
+    /* v2540 · der Sprung 2021/2022 (Umstellung auf den Zensus 2022) ist herausgerechnet */
+    erlaeuterung: j.bevoelkerung_bruch
+      ? 'Durchschnitt pro Jahr aus dem Bevölkerungsstand; der Sprung 2021/2022 durch die Umstellung auf den Zensus 2022 ist ausgelassen (Jahresschritte bis 2021 auf Basis Zensus 2011, ab 2022 auf Basis Zensus 2022, von DealPilot verkettet)'
+      : 'Durchschnitt pro Jahr aus dem Bevölkerungsstand',
+    zensus_bruch_ausgelassen: !!j.bevoelkerung_bruch,
     tabelle: t.bevoelkerung, teilscore: bd.bevoelkerung ?? null,
   });
   const alq = zahl(m.arbeitslosenquote);
@@ -96,7 +100,8 @@ export function makroKennzahlen(macroRaw, macro, agsInfo) {
   const tabellen = [...new Set(werte.flatMap((w) => w.tabellen || [w.tabelle]).filter(Boolean))];
   const vermerk = 'Datenquelle: © Statistische Ämter des Bundes und der Länder, ' + new Date().getFullYear()
     + ', Regionaldatenbank Deutschland, Tabelle' + (tabellen.length > 1 ? 'n ' : ' ') + tabellen.join(', ')
-    + '. Bevölkerungsentwicklung, Kaufkraftindex und Wanderungssaldo von DealPilot aus den Tabellenwerten umgerechnet.';
+    + '. Bevölkerungsentwicklung, Kaufkraftindex und Wanderungssaldo von DealPilot aus den Tabellenwerten umgerechnet'
+    + (j.bevoelkerung_bruch ? ' (Bevölkerungsentwicklung ohne den Sprung durch die Umstellung auf den Zensus 2022)' : '') + '.';
   return {
     ebene: werte.some((w) => w.ebene === 'Gemeinde') ? 'Gemeinde und Kreis' : 'Kreis',
     kreis_ags: macroRaw.kreis_ags || (agsInfo && agsInfo.kreis_ags) || null,

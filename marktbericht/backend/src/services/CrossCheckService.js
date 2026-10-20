@@ -966,12 +966,51 @@ export const CrossCheckService = {
     const _istAbw = (_istQm != null && _refQm > 0) ? (_istQm / _refQm - 1) : null;
     const _istFuehrt = _mnb.fuehrt;
     const _kante = _mnb.kante;
-    const mieteQm = _mnb.qm;
-    const mieteQuelle = (_istFuehrt ? 'Ist-Miete (marktüblich, § 31 Abs. 2 ImmoWertV)'
+    /* ══ v2540 · DIE BANDPRUEFUNG JE WOHNUNG (Marcel 20.10.2026: „ja") ══════
+       ImmoWertA 31.2 a/b: die tatsaechlichen Ertraege gelten, wenn sie in der
+       Bandbreite des Marktueblichen liegen - geprueft je Mietverhaeltnis, denn
+       Mieterhoehungsmoeglichkeiten gibt es nur je Vertrag; eine Saldierung ueber
+       das ganze Haus deckt der Text nicht. Bis v2539 pruefte der Kern die Ist-
+       Miete des HAUSES: Demo-MFH WE 1 mit 6,18 €/m² unter der Kante 6,64, das
+       Haus mit 7,31 im Band - die Wohnung blieb bei 6,18 (und PotenzialService
+       verteilte die Differenz auf die leere Wohnung). Jetzt je Wohnung
+       mieteNachBand auf ihre EIGENE Flaeche; Flaechen fuer den Rohertrag auf die
+       Wohnflaeche des Objekts umgelegt (wie v2520); leere Wohnungen mit der
+       Vergleichsmiete. Ohne Einheitenliste oder ohne Band: wie bisher. */
+    const _ehR = (Array.isArray(ref.einheiten_miete) && ref.einheiten_miete.length >= 2 && !(ref.gewerbe && _num(ref.gewerbe.wfl_gewerbe))
+      && _band && _refQm > 0 && _wflIst > 0) ? ref.einheiten_miete : null;
+    const _je = _ehR ? (function () {
+      const r2 = (x) => Math.round(x * 100) / 100;
+      const sum = _ehR.reduce((a, e) => a + (Number(e.wfl) || 0), 0);
+      if (!(sum > 0)) return null;
+      const f = _wflIst / sum;
+      const zeilen = _ehR.map((e) => {
+        const fl = r2(Number(e.wfl) * f);
+        if (e.leer || !(Number(e.ist_monat) > 0)) {
+          return { nr: e.nr, wfl: fl, ist_qm: null, qm: r2(_refQm), herkunft: 'leer_marktueblich', jahr: Math.round(_refQm * fl * 12) };
+        }
+        const iq = r2(Number(e.ist_monat) / Number(e.wfl));
+        const r = mieteNachBand(iq, _band, _refQm);
+        return { nr: e.nr, wfl: fl, ist_qm: iq, qm: r2(r.qm), jahr: Math.round(r.qm * fl * 12),
+                 herkunft: r.fuehrt ? 'ist_im_band' : (r.lage === 'ueber' ? 'obere_kante' : 'untere_kante') };
+      });
+      const v = zeilen.filter((z) => z.herkunft !== 'leer_marktueblich'), l = zeilen.filter((z) => z.herkunft === 'leer_marktueblich');
+      const wflV = r2(v.reduce((a, z) => a + z.wfl, 0)), jV = v.reduce((a, z) => a + z.jahr, 0);
+      return { zeilen, flaeche_umgelegt: Math.abs(f - 1) > 0.005, wfl_vermietet: wflV, jahr_vermietet: jV,
+               qm_vermietet: wflV > 0 ? r2(jV / 12 / wflV) : null,
+               wfl_leer: r2(l.reduce((a, z) => a + z.wfl, 0)), jahr_leer: l.reduce((a, z) => a + z.jahr, 0),
+               n_vermietet: v.length, n_leer: l.length,
+               angepasst: v.filter((z) => z.herkunft !== 'ist_im_band') };
+    })() : null;
+    const mieteQm = _je && _je.qm_vermietet ? _je.qm_vermietet : _mnb.qm;
+    const mieteQuelle = _je
+      ? ('Ist-Miete je Wohnung (marktüblich, § 31 Abs. 2 ImmoWertV), außerhalb des Bandes die Bandkante'
+        + (_je.n_leer ? '; leere Wohnungen mit der Vergleichsmiete' : ''))
+      : ((_istFuehrt ? 'Ist-Miete (marktüblich, § 31 Abs. 2 ImmoWertV)'
       : (_kante != null ? (_istLage === 'ueber' ? 'obere' : 'untere') + ' Kante des Marktüblichkeitsbandes'
         : (_amtFuehrt ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten')))
       /* v2520 · bei Leerstand gilt die Zahl nur fuer die vermietete Flaeche */
-      + (_ls ? ' auf der vermieteten Fläche; leere Fläche mit der Vergleichsmiete' : '');
+      + (_ls ? ' auf der vermieteten Fläche; leere Fläche mit der Vergleichsmiete' : ''));
     if (_band) {
       _band.ist_qm = _istQm; _band.lage = _istLage;
       out.miete_band = _band;
@@ -981,7 +1020,20 @@ export const CrossCheckService = {
       + [_band.amtlich_qm != null ? 'amtliche Vergleichsmiete ' + _dq(_band.amtlich_qm) + ' €/m²' : null,
         _band.angebot_qm != null ? 'Angebotsmiete ' + _dq(_band.angebot_qm) + ' €/m²' : null].filter(Boolean).join(', ')
       + '; untere Kante × 0,7, obere × 1,3)') : '';
-    if (_istQm != null && _band) {
+    const _dqJ = (x) => String(Math.round(x * 100) / 100).replace('.', ',');
+    if (_je) {
+      /* v2540 · je Wohnung: welche Wohnung an welche Kante, in einem Satz */
+      out.notes.push('Die Ist-Mieten sind je Wohnung gegen das Band der Marktüblichkeit ('
+        + _dqJ(_band.unten_qm) + ' bis ' + _dqJ(_band.oben_qm) + ' €/m²) geprüft (ImmoWertA 31.2: je Mietverhältnis). '
+        + (_je.angepasst.length
+          ? ((_je.angepasst.length > 2 && _je.angepasst.every((z) => z.qm === _je.angepasst[0].qm && z.ist_qm === _je.angepasst[0].ist_qm))
+              ? _je.angepasst.length + ' Wohnungen mit ' + _dqJ(_je.angepasst[0].ist_qm) + ' €/m² ' + (_je.angepasst[0].herkunft === 'obere_kante' ? 'über' : 'unter')
+                + ' dem Band, angesetzt ' + _dqJ(_je.angepasst[0].qm) + ' €/m²'
+              : _je.angepasst.map((z) => z.nr + ' ' + _dqJ(z.ist_qm) + ' €/m² ' + (z.herkunft === 'obere_kante' ? 'über' : 'unter')
+              + ' dem Band, angesetzt ' + _dqJ(z.qm) + ' €/m²').join('; '))
+            + '. Der Mehr- oder Minderertrag ist nach § 8 Abs. 3 ImmoWertV nur für die gesicherte Restlaufzeit des Mietvertrags zu würdigen; ohne bekannte Laufzeit ist er nicht angesetzt.'
+          : 'Alle vermieteten Wohnungen liegen im Band; der Ertragswert rechnet mit ihren Ist-Mieten.'));
+    } else if (_istQm != null && _band) {
       out.notes.push(_istFuehrt
         ? ('Die Ist-Miete (' + _dq(_istQm) + ' €/m²) liegt im ' + _bandText + ' und gilt als marktüblich '
           + '(§ 31 Abs. 2 ImmoWertV); der Ertragswert rechnet mit ihr.')
@@ -996,8 +1048,13 @@ export const CrossCheckService = {
         + _dq(_ls.wfl_vermietet) + ' m²' + (_ls.n_vermietet ? ' (' + _ls.n_vermietet + ' Wohnung' + (_ls.n_vermietet === 1 ? '' : 'en') + ')' : '')
         + ' und ist dort gegen das Band geprüft. Die leere Fläche von ' + _dq(_ls.wfl_leer) + ' m²'
         + (_ls.n_leer ? ' (' + _ls.n_leer + ' Wohnung' + (_ls.n_leer === 1 ? '' : 'en') + ')' : '')
-        + ' geht mit der marktüblichen Miete von ' + _dq(_ls.leer_qm) + ' €/m² in den Rohertrag ein (§ 31 Abs. 2 ImmoWertV: '
-        + 'marktüblich erzielbarer Ertrag für alle Einheiten).'
+        + ' geht mit der marktüblichen Miete von ' + _dq(_ls.leer_qm) + ' €/m² in den Rohertrag ein (§ 31 Abs. 2 ImmoWertV, '
+        + 'ImmoWertA 31.4: bei vorübergehendem Leerstand die marktüblich erzielbaren Erträge).'
+        /* v2540 · recherchiert 20.10.2026: Mietausfall bis zur Wiedervermietung und
+           Herrichtungskosten stehen nicht in ImmoWertV/ImmoWertA, sie sind
+           Fachpraxis unter § 8 Abs. 3 - ohne Angabe keine Zahl, aber benannt */
+        + ' Der Mietausfall bis zur Wiedervermietung und Kosten der Herrichtung sind als besonderes objektspezifisches '
+        + 'Grundstücksmerkmal (§ 8 Abs. 3 ImmoWertV) zu würdigen; ohne Angabe zur Dauer sind sie nicht angesetzt.'
         + (_ls.flaeche_umgelegt ? ' Die Flächen der Einheiten sind auf die Wohnfläche des Objekts umgelegt.' : ''));
     }
     /* v1207-WMIE-2 · DER WIDERSPRUCH GEHOERT BENANNT, NICHT VERSTECKT.
@@ -1102,7 +1159,13 @@ export const CrossCheckService = {
       /* v1059-WMIET-6 · v2210: nur der Wohnteil */
       /* v2520 · bei Leerstand: vermietete Flaeche x gewaehlte Miete (Band) +
          leere Flaeche x Vergleichsmiete. Ohne Leerstandsangabe wie bisher. */
-      const _aufteilung = _ls ? {
+      /* v2540 · je Wohnung: dieselbe Form, die Zeilen der Wohnungen dabei */
+      const _aufteilung = _je ? {
+        wfl_vermietet: _je.wfl_vermietet, qm_vermietet: _je.qm_vermietet, jahr_vermietet: _je.jahr_vermietet,
+        wfl_leer: _je.wfl_leer, qm_leer: Math.round(_refQm * 100) / 100, jahr_leer: _je.jahr_leer,
+        n_vermietet: _je.n_vermietet, n_leer: _je.n_leer, herkunft_vermietet: 'je_wohnung',
+        einheiten: _je.zeilen, flaeche_umgelegt: _je.flaeche_umgelegt,
+      } : _ls ? {
         wfl_vermietet: _ls.wfl_vermietet, qm_vermietet: mieteQm,
         jahr_vermietet: Math.round(mieteQm * _ls.wfl_vermietet * 12),
         wfl_leer: _ls.wfl_leer, qm_leer: _ls.leer_qm,

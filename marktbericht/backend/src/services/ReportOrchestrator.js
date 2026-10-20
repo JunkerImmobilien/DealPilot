@@ -170,6 +170,8 @@ export const ReportOrchestrator = {
       gewerbe: (input.gewerbe && typeof input.gewerbe === 'object') ? input.gewerbe : null,
       /* v2520 · Leerstand aus den MFH-Einheiten (DealPilotObjectMapper.leerstandAus) */
       leerstand: (input.leerstand && typeof input.leerstand === 'object') ? input.leerstand : null,
+      /* v2540 · die Einheiten einzeln (DealPilotObjectMapper.einheitenMieteAus) - Bandpruefung je Wohnung */
+      einheiten_miete: Array.isArray(input.einheiten_miete) ? input.einheiten_miete : null,
       /* v1438: der Mapper liefert eq_elevator als 'Ja' (Grossschreibung) — das fiel bisher durch. */
       elevator: input.elevator === true || /^(true|ja)$/i.test(String(input.elevator == null ? '' : input.elevator)) || false,
       garages: input.garages ? Number(input.garages) : null,

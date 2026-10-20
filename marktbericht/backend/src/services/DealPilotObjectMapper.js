@@ -305,6 +305,33 @@ function leerstandAus(d) {
   return out;
 }
 
+/* v2540 · DIE EINHEITEN EINZELN (Marcel 20.10.2026: die vermieteten Wohnungen
+   werden einzeln an die Bandkante gehoben). ImmoWertA 31.2 a/b prueft die
+   Marktueblichkeit je Mietverhaeltnis - Mieterhoehungsmoeglichkeiten gibt es
+   nur je Vertrag. Bis v2539 pruefte der Ertragswert die Ist-Miete des ganzen
+   Hauses: Demo-MFH WE 1 mit 6,18 €/m² unter der Kante 6,64, das Haus mit 7,31
+   im Band - die Wohnung blieb bei 6,18. Gleiche Bedingungen wie leerstandAus
+   (nur Wohnen, jede Einheit mit Flaeche, mindestens eine vermietet); schon ab
+   ZWEI Einheiten, auch ohne Leerstand. */
+function einheitenMieteAus(d) {
+  const liste = Array.isArray(d._mfh_einheiten) ? d._mfh_einheiten
+    : (d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : null);
+  if (!liste || liste.length < 2) return null;
+  if (/^\s*leer\s*$/i.test(String(pick(d, ['vermstand', 'vermietungsstand']) || ''))) return null;
+  if (liste.some((e) => e && String(e.art || '') === 'gewerbe')) return null;
+  const out = [];
+  for (let i = 0; i < liste.length; i++) {
+    const e = liste[i];
+    const fl = num(e && e.wfl);
+    if (!(fl > 0)) return null;
+    const ist = num(e.ist);
+    const leer = String(e.status || '') === 'leer' || !(ist > 0);
+    out.push({ nr: String(e.nr || e.bez || e.name || ('WE ' + (i + 1))), wfl: Math.round(fl * 100) / 100,
+               ist_monat: leer ? null : Math.round(ist * 100) / 100, leer });
+  }
+  return out.some((x) => !x.leer) ? out : null;
+}
+
 export const DealPilotObjectMapper = {
   reportInput(obj) {
     const d = dataOf(obj);
@@ -342,6 +369,7 @@ export const DealPilotObjectMapper = {
       units: num(pick(d, ['einheiten', 'units'])),
       gewerbe: gewerbeAus(d),   /* v2210 */
       leerstand: leerstandAus(d),   /* v2520 */
+      einheiten_miete: einheitenMieteAus(d),   /* v2540 */
       /* v2241 · Hier stand `|| 'gepflegt'`. Ein Objekt OHNE Zustandsangabe
          (der Quick-Check fuehrt gar kein Feld dafuer) wurde damit als
          gepflegt bewertet UND zaehlte in der Aussagekraft als „Zustand
