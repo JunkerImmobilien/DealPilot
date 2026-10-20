@@ -5656,7 +5656,8 @@
         var zeile = function (re) { var r = T && [].filter.call(T.querySelectorAll('tbody tr'), function (x) { return re.test(r6Text(x.cells[0])); })[0]; return r ? [].map.call(r.cells, function (c) { return r6Text(c); }) : null; };
         var ew = zeile(/^Ertragswert/), km = zeile(/^Kaltmiete p\. a\./);
         DPM_REIHE.r26pa = { kopf: kopf, ertragswert: ew, kaltmiete: km };
-        await b2oZeile(s, 'Vier Spalten', kopf.join(' · ') + (km ? ' — Kaltmiete im Jahr von <b>' + km[kopf.indexOf('Bestand') >= 0 ? kopf.indexOf('Bestand') : 1] + '</b> bis <b>' + km[km.length - 1] + '</b>' : '') + '.');
+        var sp = kopf.slice(1);   /* ohne die Spalte „Kennzahl" */
+        await b2oZeile(s, (sp.length === 3 ? 'Drei Stufen' : sp.length + ' Spalten') + ' nebeneinander', sp.join(' · ') + (km ? ' — Kaltmiete im Jahr von <b>' + km[kopf.indexOf('Bestand') >= 0 ? kopf.indexOf('Bestand') : 1] + '</b> bis <b>' + km[km.length - 1] + '</b>' : '') + '.');
         if (ew) await b2oZeile(s, 'Ertragswert je Stufe', 'Bestand <b>' + ew[kopf.indexOf('Bestand')] + '</b>, mit Mieterhöhung <b>' + ew[kopf.length - 2] + '</b>, im Zielbild <b>' + ew[kopf.length - 1] + '</b> — Potenzialwert, keine Verkehrswertermittlung.');
         var auf = function () { var p = r11Panel(); var x = p && [].filter.call(p.querySelectorAll('[data-dp-pot-wirt] table'), function (y) { return /Aufteilung|Eigentumswohnung/i.test(r6Text(y)); })[1]; return x || null; };
         var au = auf();
