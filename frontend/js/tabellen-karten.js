@@ -153,7 +153,10 @@
       '}',
       /* Ausserhalb beider Fenster: nichts. Der Schalter darf am
          Schreibtisch nicht einmal Platz brauchen. */
-      '@media(min-width:601px){.dptk-schalter{display:none}}'
+      /* v2466 · gemessen im Tab Bewertung: „.sec button:not(…)" in style.css setzt
+         display:inline-flex !important - der Schalter stand am Schreibtisch über
+         jeder Tabelle in einem .sec. */
+      '@media(min-width:601px){.dptk-schalter{display:none !important}}'
     ].join('\n');
     (document.head || document.documentElement).appendChild(s);
   }

@@ -497,7 +497,12 @@ function captureBankChartSvg(hostId, scale) {
         if (fos[fj].parentNode) fos[fj].parentNode.removeChild(fos[fj]);
       }
       // Externe Fonts ersetzen (Google Fonts werden in img-decode nicht geladen)
-      var allTexts = clone.querySelectorAll('text, tspan');
+      /* v2463 · gemessen: die Diagrammschrift im Investment-PDF war Times - die
+         Schrift steht im Wasserfall an der Gruppe (<g font-family="DM Sans">), nicht
+         am <text>, und Texte ohne Angabe erbten die Bildvorgabe (Serifen). Darum
+         jedes Element mit font-family umsetzen und an der Wurzel eine Sans setzen. */
+      if (!clone.getAttribute('font-family')) clone.setAttribute('font-family', 'Helvetica, Arial, sans-serif');
+      var allTexts = clone.querySelectorAll('[font-family]');
       for (var ti = 0; ti < allTexts.length; ti++) {
         var t = allTexts[ti];
         var ff = t.getAttribute('font-family') || '';
@@ -1255,7 +1260,8 @@ async function _exportPDFInner() {
   // Szenarien
   var sw3 = (CW - 8) / 3;
   sBox(doc, M,             cy, sw3, 'Heute (' + new Date().getFullYear() + ')', pE(K.cf_ns, true), 'CF p.a. nach Steuern', C.GREEN_BG, C.GREEN);
-  sBox(doc, M + sw3 + 4,  cy, sw3, 'Ende Zinsbindung',                         pE(K.cf_ezb, true),'CF p.a. prognose',      [250,245,232], C.GOLD);
+  /* v2463 · daneben stand „Heute" nach Steuern und hier der Wert VOR Steuern (K.cf_ezb) */
+  sBox(doc, M + sw3 + 4,  cy, sw3, 'Ende Zinsbindung',                         pE(K.cf_ns_ezb != null ? K.cf_ns_ezb : K.cf_ezb, true),'CF p.a. nach Steuern (Prognose)',      [250,245,232], C.GOLD);
   sBox(doc, M+(sw3+4)*2,  cy, sw3, 'Exit / Verkauf',                            pE(K.exit_vkp - Math.max(0, State.rs), true), 'M\u00f6gl. Gewinn', C.CH, C.GOLD);
   cy += 22;
 

@@ -766,7 +766,7 @@
       '#card-wertpotenzial .dp-wp-k.ziel{border-color:#2f7d55}#card-wertpotenzial .dp-wp-k.ziel b{color:#2f7d55}',
       '#card-wertpotenzial .dp-wp-k.netto{border-color:var(--wl-c9a84c, #C9A84C)}',
       '#card-wertpotenzial .dp-wp-k.neg b{color:#B8625C}',
-      '#card-wertpotenzial svg.dp-wp-br{display:block;width:100%;height:auto;margin:6px 0 2px}',
+      '#card-wertpotenzial svg.dp-wp-br{display:block;width:100%;max-width:860px;height:auto;margin:6px 0 2px}',
       '#card-wertpotenzial svg.dp-wp-br text{font-family:Inter,system-ui,sans-serif}',
       '#card-wertpotenzial svg.dp-wp-br .ax{font:500 10px "JetBrains Mono",monospace;fill:#8A8272}',
       '#card-wertpotenzial svg.dp-wp-br .gl{stroke:#EEE8DC;stroke-width:1}',
@@ -868,7 +868,9 @@
           : (ergebnisVeraltet() ? 'Die Angaben haben sich geändert — die Ertragswerte sind neu zu rechnen. ' : (grund ? esc(grund) + ' ' : ''))
             + ' <button type="button" class="dp-pot-knopf" data-dp-wp-rechnen="1">Ertragswerte rechnen</button>') + '</p>';
     }
-    html += '</div><p class="dp-wp-fuss">' + esc(d.fuss) + '</p>';
+    /* Die Aufteilungs-Erklärung steht oben schon hervorgehoben - im Fuss nicht noch einmal. */
+    var fuss = d.aufteilung_hinweis ? String(d.fuss).replace('Aufteilung: ' + d.aufteilung_hinweis + ' ', '') : d.fuss;
+    html += '</div><p class="dp-wp-fuss">' + esc(fuss) + '</p>';
     void r;
     return html;
   }
