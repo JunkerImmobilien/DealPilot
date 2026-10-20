@@ -210,6 +210,12 @@
       mal();
     });
     mal();
+    /* v2466a · die Regel im Blatt genügt nicht: „.sec button:not(...)" in style.css
+       hat neun :not() und damit die höhere Spezifität (gemessen: display
+       inline-flex !important im Tab Bewertung). Inline-!important schlägt jedes Blatt. */
+    var mq = window.matchMedia ? window.matchMedia('(max-width:600px)') : null;
+    var zeig = function () { if (mq && mq.matches) b.style.removeProperty('display'); else b.style.setProperty('display', 'none', 'important'); };
+    zeig(); if (mq) { if (mq.addEventListener) mq.addEventListener('change', zeig); else if (mq.addListener) mq.addListener(zeig); }
     huelle.parentNode.insertBefore(b, huelle);
   }
 
