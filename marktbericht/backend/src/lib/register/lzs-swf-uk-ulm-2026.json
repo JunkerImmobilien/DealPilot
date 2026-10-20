@@ -1,0 +1,1424 @@
+[
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2026,
+  "modellversion": "IMB Ulm 2026",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "quellenvermerk": "Immobilienmarktbericht 2026 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern.",
+   "jahrgang_2026": "Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026)."
+  },
+  "zweig": "ezfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 0.6,
+   "rundung_stellen": 1,
+   "bezeichnung": "Ein- und Zweifamilienhäuser, alle Baujahre, Vertragsjahre 2024+2025",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne = einfache Standardabweichung, 21 Vertraege, mittlere Restnutzungsdauer 34 Jahre, Ertragsfaktor 30,6 (Spanne 25,4-35,9). Einzeljahre laut Tabelle: nur 2024 (5 KV) 1,3 %, nur 2025 (16 KV) 0,4 %.",
+   "spanne_pct": [
+    -0.6,
+    1.8
+   ],
+   "fallzahl": 21,
+   "restnutzungsdauer_mittel": 34,
+   "ertragsfaktor": 30.6,
+   "ertragsfaktor_spanne": "25,4-35,9",
+   "vertragsjahre": "2024+2025",
+   "einzeljahre": {
+    "2024": {
+     "anzahl": 5,
+     "lzs_pct": 1.3
+    },
+    "2025": {
+     "anzahl": 16,
+     "lzs_pct": 0.4
+    }
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024 und zum Stichtag 01.01.2025 fuer die Kaufvertraege 2025 (Druck-S. 27). Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2025-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter der Sachwertfaktoren (Druck-S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“ OHNE Zahl. Die Indexreihe auf Druck-S. 49 („Indexreihe für Wohnbaugrundstücke: Jahr 2000 = 100“) fuehrt eine Zeile „Baupreisindex“ mit 191 (01.01.2023) und 213 (01.01.2025) auf Basis 2000, nicht 2010 — als Modellansatz NICHT eingetragen. Fuer den Liegenschaftszinssatz ist der Index keine Eingangsgroesse.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Wohnhaeuser, also 80 Jahre.",
+   "gnd_abweichend_von_anlage1": false,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT. Der Text auf Druck-S. 27 sagt woertlich „Der Ansatz für die KV bis einschließlich 2023 erfolgt teilweise abweichend …“ — fuer die hier ausgewerteten KV 2024/2025 nennt der Bericht keinen anderen Ansatz, und dieselbe Liste steht ohne Jahresbegrenzung in den Modellparametern der Sachwertfaktoren (Druck-S. 24). Sonderfall: Fertighaeuser bis Baujahr 1989 mit 70 Jahren.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70,
+   "bodenrichtwert_stichtag_hinweis": "KV 2024: 01.01.2023, KV 2025: 01.01.2025 (Druck-S. 27)."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Ein- und Zweifamilienhäuser, alle Baujahre",
+   "extrapolation": "gesperrt",
+   "hinweis": "Alle Baujahre. Sonderfall des Ausschusses: Fertighaeuser bis Baujahr 1989 werden mit einer Gesamtnutzungsdauer von 70 Jahren statt 80 gerechnet — bei einem Fertighaus ist dieser Satz nur mit der GND 70 modellkonform."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.1 „Daten für Wohngebäude“, Druck-S. 28 (PDF-S. 30)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Ein- und Zweifamilienhaeuser, Vertragsjahr 2024+2025, alle Baujahre, 21 Vertraege, Ø RND 34 Jahre, Ertragsfaktor 30,6 (Spanne 25,4 - 35,9), Liegenschaftszinssatz 0,6 % (Spanne -0,6 - 1,8). Darunter: nur 2024 5 Vertraege 1,3 %; nur 2025 16 Vertraege 0,4 %.",
+    "vorjahr": "Vorjahreszeile derselben Tabelle: 2023+2024, alle Baujahre, 11 Vertraege, Ø RND 37, Ertragsfaktor 30,4 (27,3 - 33,5), Liegenschaftszinssatz 1,1 % (0,2 - 2,0) — identisch mit dem Satz des Jahrgangs 2025.",
+    "pruefprotokoll": "Gegenproben am 20.10.2026: (1) ZWEI LESEWEGE — Tabelle am gerenderten Seitenbild (150 dpi) Zelle fuer Zelle gelesen, gegengelesen mit pdftotext -layout (dort stehen Ergebniszellen teils untereinander, deshalb ist das Seitenbild die Grundlage). (2) JAHRGANGSPROBE — der Bericht 2026 druckt die Vorjahreszeile mit ab; sie stimmt Zelle fuer Zelle mit dem Satz des Jahrgangs 2025 in lzs-bw.json (gleicher Zweig) ueberein, die Zeilen sitzen also richtig. (3) ANWENDUNGSBEISPIELE S. 61 nachgerechnet (betreffen Sachwertfaktor und Abbruchobjekt, keinen Zinssatz): 300.000 × 0,67 = 201.000 und 300.000 × 1,67 = 501.000 (Soll 201.000 / 501.000); 500.000 × 0,16 = 80.000 und 500.000 × 1,16 = 580.000 (Soll 80.000 / 580.000); 770 × 2,0 × 200 = 308.000 (Soll 308.000). UNSTIMMIGKEIT IM DOKUMENT: die Herleitung druckt „(308.000 + 44.000) / 200 = 1.540 €/m²“ — 1.540 ergibt sich aus (264.000 + 44.000) / 200 (Kaufpreis vor Abbruch 264.000 € plus Abbruchkosten 44.000 €); (308.000 + 44.000) / 200 waeren 1.760. Ein Druckfehler des Berichts, kein hier erfasster Wert."
+   }
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtlich abgedruckte Tabelle des oertlich zustaendigen Ausschusses, Jahrgang 2026, Gemeindeebene — 21 Kaufvertraege, aber die einfache Standardabweichung reicht von -0,6 bis 1,8 Prozentpunkten, und die Einzeljahre liegen bei 1,3 % (2024) und 0,4 % (2025). Diese Streuung traegt keine Stufe B.",
+  "fallzahl": 21,
+  "streuung": {
+   "min_pct": -0.6,
+   "max_pct": 1.8,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL, kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG; Werte ausserhalb der dreifachen Standardabweichung hat der Ausschuss nicht beruecksichtigt. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse“ (Druck-S. 27). INDIKATIV: 21 Kaufvertraege bei breiter Streuung; die Einzeljahre weichen deutlich voneinander ab.",
+  "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.1 „Daten für Wohngebäude“, Druck-S. 28 (PDF-S. 30)",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Jahrgangs 2026 (01.01.2026); Datenbasis sind die im Satz genannten Vertragsjahre, Bodenwerte nach Bodenrichtwert 01.01.2023 (KV 2024) bzw. 01.01.2025 (KV 2025), Druck-S. 27.",
+  "vorjahrgang": {
+   "berichtsjahr": 2025,
+   "datei": "lzs-bw.json",
+   "wert": 1.1,
+   "hinweis": "Der juengere Jahrgang gilt (gutachterausschuss.js, waehleAusGruppe: „DER JUENGSTE JAHRGANG GILT, die aelteren sind Dokumentation“). Der Satz 2025 bleibt als Dokumentation stehen."
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2026,
+  "modellversion": "IMB Ulm 2026",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "quellenvermerk": "Immobilienmarktbericht 2026 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern.",
+   "jahrgang_2026": "Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026)."
+  },
+  "zweig": "dreifh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.6,
+   "rundung_stellen": 1,
+   "bezeichnung": "Drei- und Vierfamilienhäuser, alle Baujahre, Vertragsjahre 2024+2025",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne = einfache Standardabweichung, 27 Vertraege, mittlere Restnutzungsdauer 32 Jahre, Ertragsfaktor 25,5 (Spanne 17,6-33,4). Einzeljahre laut Tabelle: 2024 (9 KV) 1,5 %, 2025 (18 KV) 1,7 %. Kategorie kann Gebaeude mit gewerblich genutzten Einheiten enthalten, sofern der gewerbliche Rohertrag unter 15 % liegt (Fussnote **).",
+   "spanne_pct": [
+    0.4,
+    2.9
+   ],
+   "fallzahl": 27,
+   "restnutzungsdauer_mittel": 32,
+   "ertragsfaktor": 25.5,
+   "ertragsfaktor_spanne": "17,6-33,4",
+   "vertragsjahre": "2024+2025",
+   "einzeljahre": {
+    "2024": {
+     "anzahl": 9,
+     "lzs_pct": 1.5
+    },
+    "2025": {
+     "anzahl": 18,
+     "lzs_pct": 1.7
+    }
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024 und zum Stichtag 01.01.2025 fuer die Kaufvertraege 2025 (Druck-S. 27). Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2025-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter der Sachwertfaktoren (Druck-S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“ OHNE Zahl. Die Indexreihe auf Druck-S. 49 („Indexreihe für Wohnbaugrundstücke: Jahr 2000 = 100“) fuehrt eine Zeile „Baupreisindex“ mit 191 (01.01.2023) und 213 (01.01.2025) auf Basis 2000, nicht 2010 — als Modellansatz NICHT eingetragen. Fuer den Liegenschaftszinssatz ist der Index keine Eingangsgroesse.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Wohnhaeuser, also 80 Jahre.",
+   "gnd_abweichend_von_anlage1": false,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT. Der Text auf Druck-S. 27 sagt woertlich „Der Ansatz für die KV bis einschließlich 2023 erfolgt teilweise abweichend …“ — fuer die hier ausgewerteten KV 2024/2025 nennt der Bericht keinen anderen Ansatz, und dieselbe Liste steht ohne Jahresbegrenzung in den Modellparametern der Sachwertfaktoren (Druck-S. 24). Sonderfall: Fertighaeuser bis Baujahr 1989 mit 70 Jahren.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70,
+   "bodenrichtwert_stichtag_hinweis": "KV 2024: 01.01.2023, KV 2025: 01.01.2025 (Druck-S. 27)."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Drei- und Vierfamilienhäuser, alle Baujahre",
+   "extrapolation": "gesperrt",
+   "hinweis": "Der Ausschuss fasst Drei- UND Vierfamilienhaeuser in einer Zeile zusammen. Fuer Haeuser ab fuenf Wohneinheiten fuehrt er eine eigene Zeile (siehe zweig „mfh\")."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.1 „Daten für Wohngebäude“, Druck-S. 28 (PDF-S. 30)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Drei- und Vierfamilienhaeuser **, Vertragsjahr 2024+2025, alle Baujahre, 27 Vertraege, Ø RND 32 Jahre, Ertragsfaktor 25,5 (17,6 - 33,4), Liegenschaftszinssatz 1,6 % (0,4 - 2,9). Darunter: 2024 9 Vertraege 1,5 %; 2025 18 Vertraege 1,7 %.",
+    "vorjahr": "Vorjahreszeile: 2023+2024, 20 Vertraege, Ø RND 29, Ertragsfaktor 26,2 (18,8 - 33,7), 1,5 % (0,1 - 2,9) — identisch mit dem Satz des Jahrgangs 2025.",
+    "pruefprotokoll": "Gegenproben am 20.10.2026: (1) ZWEI LESEWEGE — Tabelle am gerenderten Seitenbild (150 dpi) Zelle fuer Zelle gelesen, gegengelesen mit pdftotext -layout (dort stehen Ergebniszellen teils untereinander, deshalb ist das Seitenbild die Grundlage). (2) JAHRGANGSPROBE — der Bericht 2026 druckt die Vorjahreszeile mit ab; sie stimmt Zelle fuer Zelle mit dem Satz des Jahrgangs 2025 in lzs-bw.json (gleicher Zweig) ueberein, die Zeilen sitzen also richtig. (3) ANWENDUNGSBEISPIELE S. 61 nachgerechnet (betreffen Sachwertfaktor und Abbruchobjekt, keinen Zinssatz): 300.000 × 0,67 = 201.000 und 300.000 × 1,67 = 501.000 (Soll 201.000 / 501.000); 500.000 × 0,16 = 80.000 und 500.000 × 1,16 = 580.000 (Soll 80.000 / 580.000); 770 × 2,0 × 200 = 308.000 (Soll 308.000). UNSTIMMIGKEIT IM DOKUMENT: die Herleitung druckt „(308.000 + 44.000) / 200 = 1.540 €/m²“ — 1.540 ergibt sich aus (264.000 + 44.000) / 200 (Kaufpreis vor Abbruch 264.000 € plus Abbruchkosten 44.000 €); (308.000 + 44.000) / 200 waeren 1.760. Ein Druckfehler des Berichts, kein hier erfasster Wert."
+   }
+  ],
+  "stufe": "C",
+  "stufe_grund": "Amtlich abgedruckt, 27 Kaufvertraege, Standardabweichung 0,4 bis 2,9 Prozentpunkte. Fuer Stufe B zu breit.",
+  "fallzahl": 27,
+  "streuung": {
+   "min_pct": 0.4,
+   "max_pct": 2.9,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL, kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG; Werte ausserhalb der dreifachen Standardabweichung hat der Ausschuss nicht beruecksichtigt. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse“ (Druck-S. 27). Fussnote ** (Druck-S. 28): Gebaeude mit gewerblichem Rohertragsanteil unter 15 % werden dieser Kategorie zugeordnet.",
+  "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.1 „Daten für Wohngebäude“, Druck-S. 28 (PDF-S. 30)",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Jahrgangs 2026 (01.01.2026); Datenbasis sind die im Satz genannten Vertragsjahre, Bodenwerte nach Bodenrichtwert 01.01.2023 (KV 2024) bzw. 01.01.2025 (KV 2025), Druck-S. 27.",
+  "vorjahrgang": {
+   "berichtsjahr": 2025,
+   "datei": "lzs-bw.json",
+   "wert": 1.5,
+   "hinweis": "Der juengere Jahrgang gilt (gutachterausschuss.js, waehleAusGruppe: „DER JUENGSTE JAHRGANG GILT, die aelteren sind Dokumentation“). Der Satz 2025 bleibt als Dokumentation stehen."
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2026,
+  "modellversion": "IMB Ulm 2026",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "quellenvermerk": "Immobilienmarktbericht 2026 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern.",
+   "jahrgang_2026": "Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026)."
+  },
+  "zweig": "mfh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.3,
+   "rundung_stellen": 1,
+   "bezeichnung": "Mehrfamilienhäuser ab 5 Wohneinheiten, alle Baujahre, Vertragsjahre 2024+2025",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne = einfache Standardabweichung, 16 Vertraege, mittlere Restnutzungsdauer 32 Jahre, Ertragsfaktor 23,9 (Spanne 18,9-28,8). Einzeljahre laut Tabelle: 2024 (6 KV) 1,3 %, 2025 (10 KV) 1,3 %. Gewerblicher Rohertragsanteil unter 15 % (Fussnote **).",
+   "spanne_pct": [
+    0.1,
+    2.5
+   ],
+   "fallzahl": 16,
+   "restnutzungsdauer_mittel": 32,
+   "ertragsfaktor": 23.9,
+   "ertragsfaktor_spanne": "18,9-28,8",
+   "vertragsjahre": "2024+2025",
+   "einzeljahre": {
+    "2024": {
+     "anzahl": 6,
+     "lzs_pct": 1.3
+    },
+    "2025": {
+     "anzahl": 10,
+     "lzs_pct": 1.3
+    }
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024 und zum Stichtag 01.01.2025 fuer die Kaufvertraege 2025 (Druck-S. 27). Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2025-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter der Sachwertfaktoren (Druck-S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“ OHNE Zahl. Die Indexreihe auf Druck-S. 49 („Indexreihe für Wohnbaugrundstücke: Jahr 2000 = 100“) fuehrt eine Zeile „Baupreisindex“ mit 191 (01.01.2023) und 213 (01.01.2025) auf Basis 2000, nicht 2010 — als Modellansatz NICHT eingetragen. Fuer den Liegenschaftszinssatz ist der Index keine Eingangsgroesse.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Wohnhaeuser, also 80 Jahre.",
+   "gnd_abweichend_von_anlage1": false,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT. Der Text auf Druck-S. 27 sagt woertlich „Der Ansatz für die KV bis einschließlich 2023 erfolgt teilweise abweichend …“ — fuer die hier ausgewerteten KV 2024/2025 nennt der Bericht keinen anderen Ansatz, und dieselbe Liste steht ohne Jahresbegrenzung in den Modellparametern der Sachwertfaktoren (Druck-S. 24). Sonderfall: Fertighaeuser bis Baujahr 1989 mit 70 Jahren.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70,
+   "bodenrichtwert_stichtag_hinweis": "KV 2024: 01.01.2023, KV 2025: 01.01.2025 (Druck-S. 27)."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Mehrfamilienhäuser ab 5 Wohneinheiten, alle Baujahre",
+   "extrapolation": "gesperrt",
+   "hinweis": "Gilt erst ab fuenf Wohneinheiten. Drei- und Vierfamilienhaeuser fuehrt der Bericht getrennt (siehe zweig „dreifh\") — der eine Wert darf nicht fuer den anderen Teilmarkt eingesetzt werden."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.1 „Daten für Wohngebäude“, Druck-S. 28 (PDF-S. 30)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Mehrfamilienhaeuser (ab 5 Wohneinheiten)**, Vertragsjahr 2024+2025, alle Baujahre, 16 Vertraege, Ø RND 32 Jahre, Ertragsfaktor 23,9 (18,9 - 28,8), Liegenschaftszinssatz 1,3 % (0,1 - 2,5). Darunter: 2024 6 Vertraege 1,3 %; 2025 10 Vertraege 1,3 %.",
+    "vorjahr": "Vorjahreszeile: 2023+2024, 16 Vertraege, Ø RND 30, Ertragsfaktor 22,8 (17,1 - 28,4), 1,3 % (-0,7 - 3,3) — identisch mit dem Satz des Jahrgangs 2025.",
+    "pruefprotokoll": "Gegenproben am 20.10.2026: (1) ZWEI LESEWEGE — Tabelle am gerenderten Seitenbild (150 dpi) Zelle fuer Zelle gelesen, gegengelesen mit pdftotext -layout (dort stehen Ergebniszellen teils untereinander, deshalb ist das Seitenbild die Grundlage). (2) JAHRGANGSPROBE — der Bericht 2026 druckt die Vorjahreszeile mit ab; sie stimmt Zelle fuer Zelle mit dem Satz des Jahrgangs 2025 in lzs-bw.json (gleicher Zweig) ueberein, die Zeilen sitzen also richtig. (3) ANWENDUNGSBEISPIELE S. 61 nachgerechnet (betreffen Sachwertfaktor und Abbruchobjekt, keinen Zinssatz): 300.000 × 0,67 = 201.000 und 300.000 × 1,67 = 501.000 (Soll 201.000 / 501.000); 500.000 × 0,16 = 80.000 und 500.000 × 1,16 = 580.000 (Soll 80.000 / 580.000); 770 × 2,0 × 200 = 308.000 (Soll 308.000). UNSTIMMIGKEIT IM DOKUMENT: die Herleitung druckt „(308.000 + 44.000) / 200 = 1.540 €/m²“ — 1.540 ergibt sich aus (264.000 + 44.000) / 200 (Kaufpreis vor Abbruch 264.000 € plus Abbruchkosten 44.000 €); (308.000 + 44.000) / 200 waeren 1.760. Ein Druckfehler des Berichts, kein hier erfasster Wert."
+   }
+  ],
+  "stufe": "C",
+  "stufe_grund": "16 Kaufvertraege, Standardabweichung 0,1 bis 2,5 Prozentpunkte. Amtlich abgedruckt und ueber die Einzeljahre stabil (1,3 / 1,3 %), aber die Fallzahl traegt keine Stufe B.",
+  "fallzahl": 16,
+  "streuung": {
+   "min_pct": 0.1,
+   "max_pct": 2.5,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL, kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG; Werte ausserhalb der dreifachen Standardabweichung hat der Ausschuss nicht beruecksichtigt. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse“ (Druck-S. 27). Gilt erst ab fuenf Wohneinheiten; Drei- und Vierfamilienhaeuser fuehrt der Bericht getrennt (zweig „dreifh“).",
+  "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.1 „Daten für Wohngebäude“, Druck-S. 28 (PDF-S. 30)",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Jahrgangs 2026 (01.01.2026); Datenbasis sind die im Satz genannten Vertragsjahre, Bodenwerte nach Bodenrichtwert 01.01.2023 (KV 2024) bzw. 01.01.2025 (KV 2025), Druck-S. 27.",
+  "vorjahrgang": {
+   "berichtsjahr": 2025,
+   "datei": "lzs-bw.json",
+   "wert": 1.3,
+   "hinweis": "Der juengere Jahrgang gilt (gutachterausschuss.js, waehleAusGruppe: „DER JUENGSTE JAHRGANG GILT, die aelteren sind Dokumentation“). Der Satz 2025 bleibt als Dokumentation stehen."
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2026,
+  "modellversion": "IMB Ulm 2026",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "quellenvermerk": "Immobilienmarktbericht 2026 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern.",
+   "jahrgang_2026": "Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026)."
+  },
+  "zweig": "ggg_gew_unter50",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.5,
+   "rundung_stellen": 1,
+   "bezeichnung": "Gemischt genutzte Grundstücke, gewerblicher Rohertrag 15 - 50 %, Vertragsjahre 2024+2025",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne = einfache Standardabweichung, 15 Vertraege, mittlere Restnutzungsdauer 30 Jahre, Ertragsfaktor 22,5 (Spanne 15,0-30,0). Restnutzungsdauer ertragsgewichtet, gewerblicher Rohertragsanteil im Mittel 32 %. Der Bericht 2026 beschriftet die Zeile mit „15 - 50 %“ (unter 15 % gehoeren die Vertraege zu den Wohngebaeuden, Fussnote **).",
+   "spanne_pct": [
+    0.7,
+    4.3
+   ],
+   "fallzahl": 15,
+   "restnutzungsdauer_mittel": 30,
+   "ertragsfaktor": 22.5,
+   "ertragsfaktor_spanne": "15,0-30,0",
+   "vertragsjahre": "2024+2025",
+   "gewerblicher_rohertrag_mittel_pct": 32
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024 und zum Stichtag 01.01.2025 fuer die Kaufvertraege 2025 (Druck-S. 27). Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2025-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter der Sachwertfaktoren (Druck-S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“ OHNE Zahl. Die Indexreihe auf Druck-S. 49 („Indexreihe für Wohnbaugrundstücke: Jahr 2000 = 100“) fuehrt eine Zeile „Baupreisindex“ mit 191 (01.01.2023) und 213 (01.01.2025) auf Basis 2000, nicht 2010 — als Modellansatz NICHT eingetragen. Fuer den Liegenschaftszinssatz ist der Index keine Eingangsgroesse.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Wohnhaeuser mit Mischnutzung, also 70 Jahre.",
+   "gnd_abweichend_von_anlage1": true,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT. Der Text auf Druck-S. 27 sagt woertlich „Der Ansatz für die KV bis einschließlich 2023 erfolgt teilweise abweichend …“ — fuer die hier ausgewerteten KV 2024/2025 nennt der Bericht keinen anderen Ansatz, und dieselbe Liste steht ohne Jahresbegrenzung in den Modellparametern der Sachwertfaktoren (Druck-S. 24). Sonderfall: Fertighaeuser bis Baujahr 1989 mit 70 Jahren.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70,
+   "bodenrichtwert_stichtag_hinweis": "KV 2024: 01.01.2023, KV 2025: 01.01.2025 (Druck-S. 27)."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Gemischt genutzte Grundstücke mit einem gewerblichen Rohertragsanteil von 15 bis 50 % (im Mittel 32 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Gewerblicher Rohertragsanteil unter 50 %. Der Ausschuss ordnet Objekte mit gemischter gewerblicher Nutzung (z. B. Laden mit Buero) der Kategorie des HOEHEREN gewerblichen Rohertragsanteils zu. Die Restnutzungsdauer dieser Tabelle ist ertragsgewichtet, nicht arithmetisch."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung“, Druck-S. 30 (PDF-S. 32)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Gemischt genutzte Grundstuecke / gewerblicher Rohertrag 15 - 50 %**, 2024 + 2025, alle Baujahre, 15 Vertraege, Ø RND 30 (ertragsgewichtet), gewerblicher Rohertrag 32 %, Ertragsfaktor 22,5 (15,0 - 30,0), Liegenschaftszinssatz 2,5 % (0,7 - 4,3).",
+    "vorjahr": "Vorjahreszeile: 2023 + 2024, 11 Vertraege, Ø RND 34, 37 %, Ertragsfaktor 22,0 (13,9 - 30,0), 3,0 % (1,1 - 4,8) — identisch mit dem Satz des Jahrgangs 2025.",
+    "pruefprotokoll": "Gegenproben am 20.10.2026: (1) ZWEI LESEWEGE — Tabelle am gerenderten Seitenbild (150 dpi) Zelle fuer Zelle gelesen, gegengelesen mit pdftotext -layout (dort stehen Ergebniszellen teils untereinander, deshalb ist das Seitenbild die Grundlage). (2) JAHRGANGSPROBE — der Bericht 2026 druckt die Vorjahreszeile mit ab; sie stimmt Zelle fuer Zelle mit dem Satz des Jahrgangs 2025 in lzs-bw.json (gleicher Zweig) ueberein, die Zeilen sitzen also richtig. (3) ANWENDUNGSBEISPIELE S. 61 nachgerechnet (betreffen Sachwertfaktor und Abbruchobjekt, keinen Zinssatz): 300.000 × 0,67 = 201.000 und 300.000 × 1,67 = 501.000 (Soll 201.000 / 501.000); 500.000 × 0,16 = 80.000 und 500.000 × 1,16 = 580.000 (Soll 80.000 / 580.000); 770 × 2,0 × 200 = 308.000 (Soll 308.000). UNSTIMMIGKEIT IM DOKUMENT: die Herleitung druckt „(308.000 + 44.000) / 200 = 1.540 €/m²“ — 1.540 ergibt sich aus (264.000 + 44.000) / 200 (Kaufpreis vor Abbruch 264.000 € plus Abbruchkosten 44.000 €); (308.000 + 44.000) / 200 waeren 1.760. Ein Druckfehler des Berichts, kein hier erfasster Wert."
+   }
+  ],
+  "stufe": "D",
+  "stufe_grund": "15 Kaufvertraege, Standardabweichung 0,7 bis 4,3 Prozentpunkte — gut dreieinhalb Prozentpunkte Breite, und der Vorjahresmittelwert derselben Kategorie lag bei 3,0 %. Amtlich abgedruckt, als Einzelwert nur indikativ.",
+  "fallzahl": 15,
+  "streuung": {
+   "min_pct": 0.7,
+   "max_pct": 4.3,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL, kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG; Werte ausserhalb der dreifachen Standardabweichung hat der Ausschuss nicht beruecksichtigt. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse“ (Druck-S. 27). INDIKATIV. Der Ausschuss ordnet Objekte mit gemischter gewerblicher Nutzung der Kategorie des hoeheren gewerblichen Rohertragsanteils zu (Druck-S. 31).",
+  "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung“, Druck-S. 30 (PDF-S. 32)",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Jahrgangs 2026 (01.01.2026); Datenbasis sind die im Satz genannten Vertragsjahre, Bodenwerte nach Bodenrichtwert 01.01.2023 (KV 2024) bzw. 01.01.2025 (KV 2025), Druck-S. 27.",
+  "vorjahrgang": {
+   "berichtsjahr": 2025,
+   "datei": "lzs-bw.json",
+   "wert": 3,
+   "hinweis": "Der juengere Jahrgang gilt (gutachterausschuss.js, waehleAusGruppe: „DER JUENGSTE JAHRGANG GILT, die aelteren sind Dokumentation“). Der Satz 2025 bleibt als Dokumentation stehen."
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2026,
+  "modellversion": "IMB Ulm 2026",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "quellenvermerk": "Immobilienmarktbericht 2026 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern.",
+   "jahrgang_2026": "Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026)."
+  },
+  "zweig": "ggg_gew_50_99",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.2,
+   "rundung_stellen": 1,
+   "bezeichnung": "Gemischt genutzte Grundstücke, gewerblicher Rohertrag > 50 - 99 %, Vertragsjahre 2024+2025",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne = einfache Standardabweichung, 4 Vertraege, mittlere Restnutzungsdauer 26 Jahre, Ertragsfaktor 18,9 (Spanne 15,6-22,2). Restnutzungsdauer ertragsgewichtet, gewerblicher Rohertragsanteil im Mittel 67 %.",
+   "spanne_pct": [
+    1.7,
+    2.7
+   ],
+   "fallzahl": 4,
+   "restnutzungsdauer_mittel": 26,
+   "ertragsfaktor": 18.9,
+   "ertragsfaktor_spanne": "15,6-22,2",
+   "vertragsjahre": "2024+2025",
+   "gewerblicher_rohertrag_mittel_pct": 67
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024 und zum Stichtag 01.01.2025 fuer die Kaufvertraege 2025 (Druck-S. 27). Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2025-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter der Sachwertfaktoren (Druck-S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“ OHNE Zahl. Die Indexreihe auf Druck-S. 49 („Indexreihe für Wohnbaugrundstücke: Jahr 2000 = 100“) fuehrt eine Zeile „Baupreisindex“ mit 191 (01.01.2023) und 213 (01.01.2025) auf Basis 2000, nicht 2010 — als Modellansatz NICHT eingetragen. Fuer den Liegenschaftszinssatz ist der Index keine Eingangsgroesse.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Wohnhaeuser mit Mischnutzung, also 70 Jahre.",
+   "gnd_abweichend_von_anlage1": true,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT. Der Text auf Druck-S. 27 sagt woertlich „Der Ansatz für die KV bis einschließlich 2023 erfolgt teilweise abweichend …“ — fuer die hier ausgewerteten KV 2024/2025 nennt der Bericht keinen anderen Ansatz, und dieselbe Liste steht ohne Jahresbegrenzung in den Modellparametern der Sachwertfaktoren (Druck-S. 24). Sonderfall: Fertighaeuser bis Baujahr 1989 mit 70 Jahren.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70,
+   "bodenrichtwert_stichtag_hinweis": "KV 2024: 01.01.2023, KV 2025: 01.01.2025 (Druck-S. 27)."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Gemischt genutzte Grundstücke mit einem gewerblichen Rohertragsanteil über 50 bis 99 % (im Mittel 67 %)",
+   "extrapolation": "gesperrt",
+   "hinweis": "Gewerblicher Rohertragsanteil 50 bis 99 %. Bei 100 % fuehrt der Bericht eine eigene Zeile (siehe zweig „gegi\")."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung“, Druck-S. 30 (PDF-S. 32)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Gemischt genutzte Grundstuecke / gewerblicher Rohertrag > 50 - 99 %, 2024 + 2025, alle Baujahre, 4 Vertraege, Ø RND 26, gewerblicher Rohertrag 67 %, Ertragsfaktor 18,9 (15,6 - 22,2), Liegenschaftszinssatz 2,2 % (1,7 - 2,7).",
+    "vorjahr": "Vorjahreszeile: 2023 + 2024, 7 Vertraege, Ø RND 31, 68 %, Ertragsfaktor 23,4 (18,6 - 28,2), 1,9 % (0,9 - 2,9) — identisch mit dem Satz des Jahrgangs 2025.",
+    "pruefprotokoll": "Gegenproben am 20.10.2026: (1) ZWEI LESEWEGE — Tabelle am gerenderten Seitenbild (150 dpi) Zelle fuer Zelle gelesen, gegengelesen mit pdftotext -layout (dort stehen Ergebniszellen teils untereinander, deshalb ist das Seitenbild die Grundlage). (2) JAHRGANGSPROBE — der Bericht 2026 druckt die Vorjahreszeile mit ab; sie stimmt Zelle fuer Zelle mit dem Satz des Jahrgangs 2025 in lzs-bw.json (gleicher Zweig) ueberein, die Zeilen sitzen also richtig. (3) ANWENDUNGSBEISPIELE S. 61 nachgerechnet (betreffen Sachwertfaktor und Abbruchobjekt, keinen Zinssatz): 300.000 × 0,67 = 201.000 und 300.000 × 1,67 = 501.000 (Soll 201.000 / 501.000); 500.000 × 0,16 = 80.000 und 500.000 × 1,16 = 580.000 (Soll 80.000 / 580.000); 770 × 2,0 × 200 = 308.000 (Soll 308.000). UNSTIMMIGKEIT IM DOKUMENT: die Herleitung druckt „(308.000 + 44.000) / 200 = 1.540 €/m²“ — 1.540 ergibt sich aus (264.000 + 44.000) / 200 (Kaufpreis vor Abbruch 264.000 € plus Abbruchkosten 44.000 €); (308.000 + 44.000) / 200 waeren 1.760. Ein Druckfehler des Berichts, kein hier erfasster Wert."
+   }
+  ],
+  "stufe": "D",
+  "stufe_grund": "Nur vier Kaufvertraege. Amtlich abgedruckt, aber die Fallzahl traegt keine hoehere Stufe.",
+  "fallzahl": 4,
+  "streuung": {
+   "min_pct": 1.7,
+   "max_pct": 2.7,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL, kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG; Werte ausserhalb der dreifachen Standardabweichung hat der Ausschuss nicht beruecksichtigt. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse“ (Druck-S. 27). INDIKATIV: vier Kaufvertraege. Bei 100 % gewerblichem Rohertrag gilt der zweig „gegi“.",
+  "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung“, Druck-S. 30 (PDF-S. 32)",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Jahrgangs 2026 (01.01.2026); Datenbasis sind die im Satz genannten Vertragsjahre, Bodenwerte nach Bodenrichtwert 01.01.2023 (KV 2024) bzw. 01.01.2025 (KV 2025), Druck-S. 27.",
+  "vorjahrgang": {
+   "berichtsjahr": 2025,
+   "datei": "lzs-bw.json",
+   "wert": 1.9,
+   "hinweis": "Der juengere Jahrgang gilt (gutachterausschuss.js, waehleAusGruppe: „DER JUENGSTE JAHRGANG GILT, die aelteren sind Dokumentation“). Der Satz 2025 bleibt als Dokumentation stehen."
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2026,
+  "modellversion": "IMB Ulm 2026",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "quellenvermerk": "Immobilienmarktbericht 2026 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern.",
+   "jahrgang_2026": "Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026)."
+  },
+  "zweig": "ggg_gew_0_99_sammel",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2,
+   "rundung_stellen": 1,
+   "bezeichnung": "Gemischt genutzte Grundstücke, gewerblicher Rohertrag 15 - 99 % (Sammelzeile), Vertragsjahr 2025",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne = einfache Standardabweichung, 9 Vertraege, mittlere Restnutzungsdauer 30 Jahre, Ertragsfaktor 22,5 (Spanne 15,8-29,3). Sammelzeile ueber beide gemischten Kategorien, nur Vertragsjahr 2025, gewerblicher Rohertragsanteil im Mittel 33 %.",
+   "spanne_pct": [
+    0.5,
+    3.5
+   ],
+   "fallzahl": 9,
+   "restnutzungsdauer_mittel": 30,
+   "ertragsfaktor": 22.5,
+   "ertragsfaktor_spanne": "15,8-29,3",
+   "vertragsjahre": "2025",
+   "gewerblicher_rohertrag_mittel_pct": 33
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024 und zum Stichtag 01.01.2025 fuer die Kaufvertraege 2025 (Druck-S. 27). Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2025-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter der Sachwertfaktoren (Druck-S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“ OHNE Zahl. Die Indexreihe auf Druck-S. 49 („Indexreihe für Wohnbaugrundstücke: Jahr 2000 = 100“) fuehrt eine Zeile „Baupreisindex“ mit 191 (01.01.2023) und 213 (01.01.2025) auf Basis 2000, nicht 2010 — als Modellansatz NICHT eingetragen. Fuer den Liegenschaftszinssatz ist der Index keine Eingangsgroesse.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Wohnhaeuser mit Mischnutzung, also 70 Jahre.",
+   "gnd_abweichend_von_anlage1": true,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT. Der Text auf Druck-S. 27 sagt woertlich „Der Ansatz für die KV bis einschließlich 2023 erfolgt teilweise abweichend …“ — fuer die hier ausgewerteten KV 2024/2025 nennt der Bericht keinen anderen Ansatz, und dieselbe Liste steht ohne Jahresbegrenzung in den Modellparametern der Sachwertfaktoren (Druck-S. 24). Sonderfall: Fertighaeuser bis Baujahr 1989 mit 70 Jahren.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70,
+   "bodenrichtwert_stichtag_hinweis": "KV 2024: 01.01.2023, KV 2025: 01.01.2025 (Druck-S. 27)."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Gemischt genutzte Grundstücke mit einem gewerblichen Rohertragsanteil von 15 bis 99 % — die SAMMELZEILE über beide Kategorien (im Mittel 33 %), nur Vertragsjahr 2025",
+   "extrapolation": "gesperrt",
+   "hinweis": "DIES IST DER RUECKFALL, wenn der gewerbliche Rohertragsanteil nicht bestimmbar ist. Ist er bestimmbar, gilt die passende Kategorie (zweig „ggg_gew_unter50\" bzw. „ggg_gew_50_99\") und NICHT diese Sammelzeile. Sie ist kein eigener Teilmarkt und darf nicht neben einer der beiden anderen verwendet werden."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung“, Druck-S. 30 (PDF-S. 32)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Gemischt genutzte Grundstuecke / gewerblicher Rohertrag 15 - 99 %**, nur 2025, alle Baujahre, 9 Vertraege, Ø RND 30, gewerblicher Rohertrag 33 %, Ertragsfaktor 22,5 (15,8 - 29,3), Liegenschaftszinssatz 2,0 % (0,5 - 3,5).",
+    "vorjahr": "Zeile „nur 2024“ derselben Tabelle: 10 Vertraege, Ø RND 33, 46 %, Ertragsfaktor 21,0 (13,9 - 28,0), 2,8 % (1,2 - 4,5) — identisch mit dem Satz des Jahrgangs 2025.",
+    "pruefprotokoll": "Gegenproben am 20.10.2026: (1) ZWEI LESEWEGE — Tabelle am gerenderten Seitenbild (150 dpi) Zelle fuer Zelle gelesen, gegengelesen mit pdftotext -layout (dort stehen Ergebniszellen teils untereinander, deshalb ist das Seitenbild die Grundlage). (2) JAHRGANGSPROBE — der Bericht 2026 druckt die Vorjahreszeile mit ab; sie stimmt Zelle fuer Zelle mit dem Satz des Jahrgangs 2025 in lzs-bw.json (gleicher Zweig) ueberein, die Zeilen sitzen also richtig. (3) ANWENDUNGSBEISPIELE S. 61 nachgerechnet (betreffen Sachwertfaktor und Abbruchobjekt, keinen Zinssatz): 300.000 × 0,67 = 201.000 und 300.000 × 1,67 = 501.000 (Soll 201.000 / 501.000); 500.000 × 0,16 = 80.000 und 500.000 × 1,16 = 580.000 (Soll 80.000 / 580.000); 770 × 2,0 × 200 = 308.000 (Soll 308.000). UNSTIMMIGKEIT IM DOKUMENT: die Herleitung druckt „(308.000 + 44.000) / 200 = 1.540 €/m²“ — 1.540 ergibt sich aus (264.000 + 44.000) / 200 (Kaufpreis vor Abbruch 264.000 € plus Abbruchkosten 44.000 €); (308.000 + 44.000) / 200 waeren 1.760. Ein Druckfehler des Berichts, kein hier erfasster Wert."
+   }
+  ],
+  "stufe": "D",
+  "stufe_grund": "Neun Kaufvertraege, und es ist eine SAMMELZEILE ueber zwei Teilmaerkte. Als Rueckfall brauchbar, wenn der gewerbliche Anteil nicht bestimmbar ist.",
+  "fallzahl": 9,
+  "streuung": {
+   "min_pct": 0.5,
+   "max_pct": 3.5,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL, kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG; Werte ausserhalb der dreifachen Standardabweichung hat der Ausschuss nicht beruecksichtigt. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse“ (Druck-S. 27). Ist der gewerbliche Rohertragsanteil bestimmbar, gilt die passende Kategorie (ggg_gew_unter50 bzw. ggg_gew_50_99), nicht diese Sammelzeile.",
+  "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung“, Druck-S. 30 (PDF-S. 32)",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Jahrgangs 2026 (01.01.2026); Datenbasis sind die im Satz genannten Vertragsjahre, Bodenwerte nach Bodenrichtwert 01.01.2023 (KV 2024) bzw. 01.01.2025 (KV 2025), Druck-S. 27.",
+  "vorjahrgang": {
+   "berichtsjahr": 2025,
+   "datei": "lzs-bw.json",
+   "wert": 2.8,
+   "hinweis": "Der juengere Jahrgang gilt (gutachterausschuss.js, waehleAusGruppe: „DER JUENGSTE JAHRGANG GILT, die aelteren sind Dokumentation“). Der Satz 2025 bleibt als Dokumentation stehen."
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2026,
+  "modellversion": "IMB Ulm 2026",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "quellenvermerk": "Immobilienmarktbericht 2026 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern.",
+   "jahrgang_2026": "Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026)."
+  },
+  "zweig": "gegi",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.4,
+   "rundung_stellen": 1,
+   "bezeichnung": "Objekte mit 100 % gewerblichem Rohertrag, Vertragsjahre 2024+2025",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne = einfache Standardabweichung, 9 Vertraege, mittlere Restnutzungsdauer 20 Jahre, Ertragsfaktor 18,2 (Spanne 12,8-23,6). Restnutzungsdauer ertragsgewichtet.",
+   "spanne_pct": [
+    -0.4,
+    3.2
+   ],
+   "fallzahl": 9,
+   "restnutzungsdauer_mittel": 20,
+   "ertragsfaktor": 18.2,
+   "ertragsfaktor_spanne": "12,8-23,6",
+   "vertragsjahre": "2024+2025",
+   "gewerblicher_rohertrag_mittel_pct": 100,
+   "nach_hauptnutzung_kv_2024_2025": {
+    "hinweis": "Diagramm „Liegenschaftszinssätze in Abhängigkeit der Hauptnutzung im Gebäude / Vertragsjahre 2024 + 2025“ (Druck-S. 31) druckt Mittelwerte ohne Fallzahl: alle KV 2,1 · Läden 2,5 · Gaststätten/Lokale 2,2 · Werkstätten/Lager/Btrg 0,3 · Logistikzentrum 4,2 · Sonstiges 1,4 (Büros/Praxen ohne Wert). Nur dokumentiert, nicht als eigener Satz: keine Fallzahl, keine Modelltrennung nach Rohertragsanteil."
+   }
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 4.3 „Liegenschaftszinssaetze und Ertragsfaktoren\", Bericht S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024 und zum Stichtag 01.01.2025 fuer die Kaufvertraege 2025 (Druck-S. 27). Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2025-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter der Sachwertfaktoren (Druck-S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“ OHNE Zahl. Die Indexreihe auf Druck-S. 49 („Indexreihe für Wohnbaugrundstücke: Jahr 2000 = 100“) fuehrt eine Zeile „Baupreisindex“ mit 191 (01.01.2023) und 213 (01.01.2025) auf Basis 2000, nicht 2010 — als Modellansatz NICHT eingetragen. Fuer den Liegenschaftszinssatz ist der Index keine Eingangsgroesse.",
+   "gnd_jahre": 60,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Geschaeftshaeuser, also 60 Jahre. Fuer reine Gewerbeobjekte verweist der Bericht dagegen auf Anlage 1 ImmoWertV — welche der beiden Zeilen fuer ein konkretes Objekt gilt, ist eine sachverstaendige Zuordnung und hier nicht entschieden.",
+   "gnd_abweichend_von_anlage1": true,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT. Der Text auf Druck-S. 27 sagt woertlich „Der Ansatz für die KV bis einschließlich 2023 erfolgt teilweise abweichend …“ — fuer die hier ausgewerteten KV 2024/2025 nennt der Bericht keinen anderen Ansatz, und dieselbe Liste steht ohne Jahresbegrenzung in den Modellparametern der Sachwertfaktoren (Druck-S. 24). Sonderfall: Fertighaeuser bis Baujahr 1989 mit 70 Jahren.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70,
+   "bodenrichtwert_stichtag_hinweis": "KV 2024: 01.01.2023, KV 2025: 01.01.2025 (Druck-S. 27)."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Objekte mit 100 % gewerblichem Rohertrag",
+   "extrapolation": "gesperrt",
+   "hinweis": "Fuenf Kaufvertraege mit einer ertragsgewichteten Restnutzungsdauer von nur 16 Jahren. Die Standardabweichung reicht von -1,8 bis 5,3 Prozentpunkten — ueber sieben Prozentpunkte Breite. Der Mittelwert allein ist hier keine Auskunft."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung“, Druck-S. 30 (PDF-S. 32)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Objekte mit 100 % gewerblichem Rohertrag, 2024 + 2025, alle Baujahre, 9 Vertraege, Ø RND 20, gewerblicher Rohertrag 100 %, Ertragsfaktor 18,2 (12,8 - 23,6), Liegenschaftszinssatz 1,4 % (-0,4 - 3,2).",
+    "vorjahr": "Vorjahreszeile: 2023 + 2024, 5 Vertraege, Ø RND 16, 100 %, Ertragsfaktor 17,0 (10,5 - 23,6), 1,8 % (-1,8 - 5,3) — identisch mit dem Satz des Jahrgangs 2025.",
+    "pruefprotokoll": "Gegenproben am 20.10.2026: (1) ZWEI LESEWEGE — Tabelle am gerenderten Seitenbild (150 dpi) Zelle fuer Zelle gelesen, gegengelesen mit pdftotext -layout (dort stehen Ergebniszellen teils untereinander, deshalb ist das Seitenbild die Grundlage). (2) JAHRGANGSPROBE — der Bericht 2026 druckt die Vorjahreszeile mit ab; sie stimmt Zelle fuer Zelle mit dem Satz des Jahrgangs 2025 in lzs-bw.json (gleicher Zweig) ueberein, die Zeilen sitzen also richtig. (3) ANWENDUNGSBEISPIELE S. 61 nachgerechnet (betreffen Sachwertfaktor und Abbruchobjekt, keinen Zinssatz): 300.000 × 0,67 = 201.000 und 300.000 × 1,67 = 501.000 (Soll 201.000 / 501.000); 500.000 × 0,16 = 80.000 und 500.000 × 1,16 = 580.000 (Soll 80.000 / 580.000); 770 × 2,0 × 200 = 308.000 (Soll 308.000). UNSTIMMIGKEIT IM DOKUMENT: die Herleitung druckt „(308.000 + 44.000) / 200 = 1.540 €/m²“ — 1.540 ergibt sich aus (264.000 + 44.000) / 200 (Kaufpreis vor Abbruch 264.000 € plus Abbruchkosten 44.000 €); (308.000 + 44.000) / 200 waeren 1.760. Ein Druckfehler des Berichts, kein hier erfasster Wert."
+   }
+  ],
+  "stufe": "D",
+  "stufe_grund": "Neun Kaufvertraege und eine Standardabweichung von -0,4 bis 3,2 Prozentpunkten. Amtlich abgedruckt, als Einzelwert aber nicht belastbar.",
+  "fallzahl": 9,
+  "streuung": {
+   "min_pct": -0.4,
+   "max_pct": 3.2,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL, kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG; Werte ausserhalb der dreifachen Standardabweichung hat der Ausschuss nicht beruecksichtigt. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse“ (Druck-S. 27). INDIKATIV: neun Kaufvertraege, breite Streuung.",
+  "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 4.3.2 „Daten für Objekte mit gewerblicher Nutzung“, Druck-S. 30 (PDF-S. 32)",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Jahrgangs 2026 (01.01.2026); Datenbasis sind die im Satz genannten Vertragsjahre, Bodenwerte nach Bodenrichtwert 01.01.2023 (KV 2024) bzw. 01.01.2025 (KV 2025), Druck-S. 27.",
+  "vorjahrgang": {
+   "berichtsjahr": 2025,
+   "datei": "lzs-bw.json",
+   "wert": 1.8,
+   "hinweis": "Der juengere Jahrgang gilt (gutachterausschuss.js, waehleAusGruppe: „DER JUENGSTE JAHRGANG GILT, die aelteren sind Dokumentation“). Der Satz 2025 bleibt als Dokumentation stehen."
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2026,
+  "modellversion": "IMB Ulm 2026",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "quellenvermerk": "Immobilienmarktbericht 2026 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern.",
+   "jahrgang_2026": "Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026)."
+  },
+  "zweig": "we_v",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.7,
+   "rundung_stellen": 1,
+   "bezeichnung": "Eigentumswohnungen (ohne Senioren- und Studentenwohnungen), Vertragsjahr 2025",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne = einfache Standardabweichung, 71 Vertraege, mittlere Restnutzungsdauer 47 Jahre, Ertragsfaktor 30,5 (Spanne 23,8-37,20). Ø Wohnflaeche 66 m². Die Balkenreihe ueber der Tabelle (Druck-S. 39) zeigt fuer 2025 ebenfalls 1,7 % und Ertragsfaktor 30,5.",
+   "spanne_pct": [
+    0.9,
+    2.6
+   ],
+   "fallzahl": 71,
+   "restnutzungsdauer_mittel": 47,
+   "ertragsfaktor": 30.5,
+   "ertragsfaktor_spanne": "23,8-37,20",
+   "vertragsjahre": "2025",
+   "wohnflaeche_mittel_qm": 66
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 5.1.4, Bewertungsansaetze-Tabelle, Druck-S. 39, und Kapitel 4.3, Druck-S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024 und zum Stichtag 01.01.2025 fuer die Kaufvertraege 2025 (Druck-S. 27). Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2025-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter der Sachwertfaktoren (Druck-S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“ OHNE Zahl. Die Indexreihe auf Druck-S. 49 („Indexreihe für Wohnbaugrundstücke: Jahr 2000 = 100“) fuehrt eine Zeile „Baupreisindex“ mit 191 (01.01.2023) und 213 (01.01.2025) auf Basis 2000, nicht 2010 — als Modellansatz NICHT eingetragen. Fuer den Liegenschaftszinssatz ist der Index keine Eingangsgroesse.",
+   "gnd_jahre": 80,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Eigentumswohnungen, also 80 Jahre — hier nicht aus der Liste auf S. 24 abgeleitet, sondern ausdruecklich in der Tabelle 5.1.4 selbst abgedruckt („Gesamtnutzungsdauer 80 Jahre\" fuer Kaufvertraege ab 2015).",
+   "gnd_abweichend_von_anlage1": false,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT. Der Text auf Druck-S. 27 sagt woertlich „Der Ansatz für die KV bis einschließlich 2023 erfolgt teilweise abweichend …“ — fuer die hier ausgewerteten KV 2024/2025 nennt der Bericht keinen anderen Ansatz, und dieselbe Liste steht ohne Jahresbegrenzung in den Modellparametern der Sachwertfaktoren (Druck-S. 24). Sonderfall: Fertighaeuser bis Baujahr 1989 mit 70 Jahren.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70,
+   "bewirtschaftungskostenquote": 19,
+   "bewirtschaftungskostenquote_beleg": "Woertlich in der Kopftabelle von 5.1.4 (Druck-S. 39): „Bewirtschaftungskosten 19 %“ — fuer Kaufvertraege von 2003 bis 2014 UND fuer Kaufvertraege ab 2015. Als Zahl eingetragen.",
+   "gebaeudesachwert": "NHK 2010 fuer Kaufvertraege ab 2015 (NHK 2000 fuer 2003 bis 2014), Alterswertminderung linear ab 2015 (bis 2014: baujahrsabhaengiger NHK-2000-Wert + Abschreibung nach Ross)",
+   "mietansatz": "tatsaechlich bezahlte Miete",
+   "bodenrichtwert_stichtag_hinweis": "KV 2024: 01.01.2023, KV 2025: 01.01.2025 (Druck-S. 27)."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Eigentumswohnungen, alle Wohnflächen, ohne Senioren- und Studentenwohnungen",
+   "extrapolation": "gesperrt",
+   "hinweis": "Senioren- und Studentenwohnungen sind ausdruecklich AUSGENOMMEN; fuer sie weist der Bericht keinen Liegenschaftszinssatz aus. Eine Unterteilung nach Wohnflaechenklassen enthaelt die Tabelle nicht — die Abhaengigkeit von Wohnflaeche und Kaufpreis zeigt der Bericht nur als Streudiagramm mit linearer Trendlinie ohne Gleichung (Druck-S. 40); daraus ist keine Zahl ablesbar."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 5.1.4 „Liegenschaftszinssätze und Ertragsfaktoren für Eigentumswohnungen“, Druck-S. 39 (PDF-S. 41)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "alle Wohnungen (ohne Senioren- und Studentenwohnungen), Vertragsjahr 2025, 71 Vertraege, Ø WF 66 m², Ø RND 47, Ertragsfaktor 30,5 (23,8 - 37,20), Liegenschaftszinssatz 1,7 % (0,9 - 2,6). Bewertungsansaetze KV ab 2015: tatsaechlich bezahlte Miete, Bewirtschaftungskosten 19 %, NHK 2010, Gesamtnutzungsdauer 80 Jahre, Abschreibung linear.",
+    "vorjahr": "Zeile 2024 derselben Tabelle: 46 Vertraege, Ø WF 65, Ø RND 43, Ertragsfaktor 28,5 (21,0 - 35,9), 1,8 % (0,8 - 2,8) — identisch mit dem Satz des Jahrgangs 2025. Zeile 2023: 39 Vertraege, 1,6 % — das Balkendiagramm zeigt fuer 2023 weiter 1,7 % / 29,8 (Unstimmigkeit des Berichts, schon im Jahrgang 2025 vermerkt, betrifft den Wert 2025 nicht).",
+    "pruefprotokoll": "Gegenproben am 20.10.2026: (1) ZWEI LESEWEGE — Tabelle am gerenderten Seitenbild (150 dpi) Zelle fuer Zelle gelesen, gegengelesen mit pdftotext -layout (dort stehen Ergebniszellen teils untereinander, deshalb ist das Seitenbild die Grundlage). (2) JAHRGANGSPROBE — der Bericht 2026 druckt die Vorjahreszeile mit ab; sie stimmt Zelle fuer Zelle mit dem Satz des Jahrgangs 2025 in lzs-bw.json (gleicher Zweig) ueberein, die Zeilen sitzen also richtig. (3) ANWENDUNGSBEISPIELE S. 61 nachgerechnet (betreffen Sachwertfaktor und Abbruchobjekt, keinen Zinssatz): 300.000 × 0,67 = 201.000 und 300.000 × 1,67 = 501.000 (Soll 201.000 / 501.000); 500.000 × 0,16 = 80.000 und 500.000 × 1,16 = 580.000 (Soll 80.000 / 580.000); 770 × 2,0 × 200 = 308.000 (Soll 308.000). UNSTIMMIGKEIT IM DOKUMENT: die Herleitung druckt „(308.000 + 44.000) / 200 = 1.540 €/m²“ — 1.540 ergibt sich aus (264.000 + 44.000) / 200 (Kaufpreis vor Abbruch 264.000 € plus Abbruchkosten 44.000 €); (308.000 + 44.000) / 200 waeren 1.760. Ein Druckfehler des Berichts, kein hier erfasster Wert."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "71 Kaufvertraege des oertlich zustaendigen Ausschusses, Jahrgang 2026, Gemeindeebene, mit abgedruckter Spanne (0,9 - 2,6), bezifferter Bewirtschaftungskostenquote (19 %) und Gesamtnutzungsdauer (80 Jahre) in der Tabelle selbst.",
+  "fallzahl": 71,
+  "streuung": {
+   "min_pct": 0.9,
+   "max_pct": 2.6,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL, kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG; Werte ausserhalb der dreifachen Standardabweichung hat der Ausschuss nicht beruecksichtigt. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse“ (Druck-S. 27). Senioren- und Studentenwohnungen sind ausgenommen.",
+  "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 5.1.4 „Liegenschaftszinssätze und Ertragsfaktoren für Eigentumswohnungen“, Druck-S. 39 (PDF-S. 41)",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Jahrgangs 2026 (01.01.2026); Datenbasis sind die im Satz genannten Vertragsjahre, Bodenwerte nach Bodenrichtwert 01.01.2023 (KV 2024) bzw. 01.01.2025 (KV 2025), Druck-S. 27.",
+  "vorjahrgang": {
+   "berichtsjahr": 2025,
+   "datei": "lzs-bw.json",
+   "wert": 1.8,
+   "hinweis": "Der juengere Jahrgang gilt (gutachterausschuss.js, waehleAusGruppe: „DER JUENGSTE JAHRGANG GILT, die aelteren sind Dokumentation“). Der Satz 2025 bleibt als Dokumentation stehen."
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "liegenschaftszinssatz",
+  "berichtsjahr": 2026,
+  "modellversion": "IMB Ulm 2026",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "quellenvermerk": "Immobilienmarktbericht 2026 © Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "lizenz": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "nutzungsrecht": {
+   "stand": "schriftliche Genehmigung liegt vor, Umfang: ganzer Bericht",
+   "mitgeteilt_von": "Marcel Junker am 02.10.2026",
+   "datum": "2026-09-23",
+   "aktenzeichen": "liegt Marcel Junker vor — auf seinen ausdruecklichen Wunsch NICHT im Repo gefuehrt (02.10.2026). Bei einer Pruefung dort anfordern.",
+   "jahrgang_2026": "Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026)."
+  },
+  "zweig": "teileigentum",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 3.6,
+   "rundung_stellen": 1,
+   "bezeichnung": "Teileigentum (gemischt genutzte Gebäude und Gebäude mit 100 % gewerblicher Nutzung), Vertragsjahr 2025",
+   "hinweis": "Ergebnis in PROZENT. Keine Achse, keine Interpolation: der Bericht druckt fuer diesen Teilmarkt EINEN arithmetischen Mittelwert ab. Spanne = einfache Standardabweichung, 9 Vertraege, mittlere Restnutzungsdauer 32 Jahre, Ertragsfaktor 20,5 (Spanne 13,1-27,8). Durchschnittliche Miete 13,0 €/m² Nutzflaeche.",
+   "spanne_pct": [
+    1.5,
+    5.7
+   ],
+   "fallzahl": 9,
+   "restnutzungsdauer_mittel": 32,
+   "ertragsfaktor": 20.5,
+   "ertragsfaktor_spanne": "13,1-27,8",
+   "vertragsjahre": "2025",
+   "miete_mittel_eur_qm_nf": 13
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Quelle: Kapitel 5.2.5, Druck-S. 44 (Bewirtschaftungskosten 15 %, Gesamtnutzungsdauer pauschal 70 Jahre), und Kapitel 4.3, Druck-S. 27.",
+   "verfahren": "Iterative Umkehrung des Ertragswertverfahrens (§§ 27 bis 34 ImmoWertV 2021). Der Bericht druckt die Gleichung ab: p = [RE − pv / ((1 + pv)^RND − 1) × (KP − BW)] / KP, wobei pv das Ergebnis des vorangegangenen Iterationsschritts ist.",
+   "kaufpreis": "tatsaechlicher Kaufpreis (bei Gewerbeobjekten ohne Mehrwertsteuer), ohne besondere objektspezifische Grundstuecksmerkmale wie Inventar, besondere Rechte und Lasten oder selbststaendig nutzbare Grundstuecksflaechen",
+   "rohertrag": "tatsaechlich bezahlte Nettokaltmieten. Liegen sie nicht innerhalb der Spannen des aktuellen Mietspiegels der Stadt Ulm/Neu-Ulm, wird eine nachhaltig erzielbare Miete in Anlehnung an den Mietspiegel angesetzt. Bei gewerblichen Objekten wird davon ausgegangen, dass die tatsaechlich bezahlte Miete im marktueblichen Mietrahmen liegt.",
+   "bewirtschaftungskosten": "nicht umlagefaehige Betriebskosten, Verwaltungskosten, Mietausfallwagnis und Instandhaltungskosten nach Anlage 3 ImmoWertV 2021",
+   "bodenwert": "Bodenrichtwert zum Stichtag 01.01.2023 fuer die Kaufvertraege 2024 und zum Stichtag 01.01.2025 fuer die Kaufvertraege 2025 (Druck-S. 27). Weitere Zu- oder Abschlaege vom Bodenrichtwert von bis zu 30 % sind moeglich, z. B. wegen Immissionsbelastung, besserer/schlechterer Lage bzw. Ausnutzung. Ein Bebauungsabschlag wird NICHT vorgenommen.",
+   "bodenrichtwert_stichtag": "2025-01-01",
+   "restnutzungsdauer": "wirtschaftliche Restnutzungsdauer nach dem Modell der Anlage 2 ImmoWertV 2021; durchgefuehrte bzw. unterlassene Instandhaltung und Modernisierung verlaengern bzw. verkuerzen sie. Im Allgemeinen gilt RND = GND − Baualter.",
+   "ausreisser": "Werte ausserhalb der DREIFACHEN Standardabweichung wurden nicht beruecksichtigt. Die abgedruckte Spanne ist die EINFACHE Standardabweichung, nicht eine 2/3-Spanne und nicht ein Min-Max.",
+   "baupreisindex_stichtag": null,
+   "baupreisindex_hinweis": "Die Modellparameter der Sachwertfaktoren (Druck-S. 24) nennen „Baupreisindex: Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“ OHNE Zahl. Die Indexreihe auf Druck-S. 49 („Indexreihe für Wohnbaugrundstücke: Jahr 2000 = 100“) fuehrt eine Zeile „Baupreisindex“ mit 191 (01.01.2023) und 213 (01.01.2025) auf Basis 2000, nicht 2010 — als Modellansatz NICHT eingetragen. Fuer den Liegenschaftszinssatz ist der Index keine Eingangsgroesse.",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Woertlich S. 24 (Modellparameter Sachwertfaktoren) und S. 27 (Liegenschaftszinssaetze): „Gesamtnutzungsdauer: teilweise abweichend von den Orientierungswerten der Anlage 1 der ImmoWertV 2021: Wohnhaeuser: 80 Jahre; Fertighaeuser bis Baujahr 1989: 70 Jahre; Wohnhaeuser mit Mischnutzung: 70 Jahre; Geschaeftshaeuser: 60 Jahre; Gewerbeobjekte: Anlage 1 der ImmoWertV 2021.\" Fuer diesen Satz gilt: Teileigentum, also pauschal 70 Jahre — hier nicht aus der Liste auf S. 24 abgeleitet, sondern ausdruecklich im Text von 5.2.5 abgedruckt („eine Gesamtnutzungsdauer von pauschal 70 Jahren\").",
+   "gnd_abweichend_von_anlage1": true,
+   "gnd_hinweis": "DIE ZAHL STEHT ALS ZAHL IM BERICHT. Der Text auf Druck-S. 27 sagt woertlich „Der Ansatz für die KV bis einschließlich 2023 erfolgt teilweise abweichend …“ — fuer die hier ausgewerteten KV 2024/2025 nennt der Bericht keinen anderen Ansatz, und dieselbe Liste steht ohne Jahresbegrenzung in den Modellparametern der Sachwertfaktoren (Druck-S. 24). Sonderfall: Fertighaeuser bis Baujahr 1989 mit 70 Jahren.",
+   "gnd_sonderfall_fertighaus_bis_1989": 70,
+   "bewirtschaftungskostenquote": 15,
+   "bewirtschaftungskostenquote_beleg": "Woertlich Druck-S. 44: „Als feste Größen wurden bei der Auswertung der Kaufverträge Bewirtschaftungskosten mit 15 % und eine Gesamtnutzungsdauer von pauschal 70 Jahren in Ansatz gebracht.“ Beide Zahlen stehen als Zahl im Bericht.",
+   "datenbasis": "ausgewertete Vertraege aus den Jahren 2022 bis 2025; der hier erfasste Wert ist das Vertragsjahr 2025",
+   "bodenrichtwert_stichtag_hinweis": "KV 2024: 01.01.2023, KV 2025: 01.01.2025 (Druck-S. 27)."
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "sachlich": "Teileigentum — sowohl in gemischt genutzten Gebäuden als auch in Gebäuden mit 100 % gewerblicher Nutzung",
+   "extrapolation": "gesperrt",
+   "hinweis": "Neun Kaufvertraege mit einer durchschnittlichen Miete von 13,0 €/m² Nutzflaeche und einer Restnutzungsdauer von 32 Jahren. Die Jahrgaenge schwanken stark (2022: 3,0 %, 2023: 2,3 %, 2024: 5,0 %, 2025: 3,6 %); der Bericht zeigt dazu die Abhaengigkeit des Zinssatzes von der Miete als Diagramm (Druck-S. 44)."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 5.2.5 „Liegenschaftszinssätze und Ertragsfaktoren für Teileigentum“, Druck-S. 44 (PDF-S. 46)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Vertragsjahr 2025, 9 Vertraege, durchschnittliche Miete 13,0 €/m² NF, RND 32, Ertragsfaktor Spanne 13,1 - 27,8, Mittel 20,5, Liegenschaftszins Spanne 1,5 - 5,7, Mittel 3,6. Text: „Als feste Größen wurden bei der Auswertung der Kaufverträge Bewirtschaftungskosten mit 15 % und eine Gesamtnutzungsdauer von pauschal 70 Jahren in Ansatz gebracht.“",
+    "vorjahr": "Zeile 2024: 5 Vertraege, 19,0 €/m² NF, RND 58, Ertragsfaktor 16,2 (13,4 - 19,1), 5,0 % (4,0 - 5,9) — identisch mit dem Satz des Jahrgangs 2025.",
+    "pruefprotokoll": "Gegenproben am 20.10.2026: (1) ZWEI LESEWEGE — Tabelle am gerenderten Seitenbild (150 dpi) Zelle fuer Zelle gelesen, gegengelesen mit pdftotext -layout (dort stehen Ergebniszellen teils untereinander, deshalb ist das Seitenbild die Grundlage). (2) JAHRGANGSPROBE — der Bericht 2026 druckt die Vorjahreszeile mit ab; sie stimmt Zelle fuer Zelle mit dem Satz des Jahrgangs 2025 in lzs-bw.json (gleicher Zweig) ueberein, die Zeilen sitzen also richtig. (3) ANWENDUNGSBEISPIELE S. 61 nachgerechnet (betreffen Sachwertfaktor und Abbruchobjekt, keinen Zinssatz): 300.000 × 0,67 = 201.000 und 300.000 × 1,67 = 501.000 (Soll 201.000 / 501.000); 500.000 × 0,16 = 80.000 und 500.000 × 1,16 = 580.000 (Soll 80.000 / 580.000); 770 × 2,0 × 200 = 308.000 (Soll 308.000). UNSTIMMIGKEIT IM DOKUMENT: die Herleitung druckt „(308.000 + 44.000) / 200 = 1.540 €/m²“ — 1.540 ergibt sich aus (264.000 + 44.000) / 200 (Kaufpreis vor Abbruch 264.000 € plus Abbruchkosten 44.000 €); (308.000 + 44.000) / 200 waeren 1.760. Ein Druckfehler des Berichts, kein hier erfasster Wert."
+   }
+  ],
+  "stufe": "D",
+  "stufe_grund": "Neun Kaufvertraege, Spanne 1,5 bis 5,7 %, und die Jahreswerte schwanken stark (2022: 3,0 · 2023: 2,3 · 2024: 5,0 · 2025: 3,6 %). Amtlich abgedruckt, als Einzelwert nur indikativ.",
+  "fallzahl": 9,
+  "streuung": {
+   "min_pct": 1.5,
+   "max_pct": 5.7,
+   "art": "einfache Standardabweichung"
+  },
+  "auflagen": "Modellkonformitaet nach § 10 ImmoWertV: die Ansaetze in `modellansaetze` gehoeren zum Wert. DAS ERGEBNIS IST EINE PROZENTZAHL, kein Dezimalbruch. DIE SPANNE IST DIE EINFACHE STANDARDABWEICHUNG; Werte ausserhalb der dreifachen Standardabweichung hat der Ausschuss nicht beruecksichtigt. Zum Ertragsfaktor sagt der Bericht selbst, er liefere „nur relativ unsichere Bewertungsergebnisse“ (Druck-S. 27). INDIKATIV: neun Kaufvertraege, starke Jahresschwankung.",
+  "fundstelle": "Immobilienmarktbericht Ulm 2026, Kapitel 5.2.5 „Liegenschaftszinssätze und Ertragsfaktoren für Teileigentum“, Druck-S. 44 (PDF-S. 46)",
+  "stichtag_hinweis": "Der Bericht nennt für die Liegenschaftszinssätze keinen eigenen Stichtag. Eingetragen ist der Stand des Jahrgangs 2026 (01.01.2026); Datenbasis sind die im Satz genannten Vertragsjahre, Bodenwerte nach Bodenrichtwert 01.01.2023 (KV 2024) bzw. 01.01.2025 (KV 2025), Druck-S. 27.",
+  "vorjahrgang": {
+   "berichtsjahr": 2025,
+   "datei": "lzs-bw.json",
+   "wert": 5,
+   "hinweis": "Der juengere Jahrgang gilt (gutachterausschuss.js, waehleAusGruppe: „DER JUENGSTE JAHRGANG GILT, die aelteren sind Dokumentation“). Der Satz 2025 bleibt als Dokumentation stehen."
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "berichtsjahr": 2026,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "nicht freistehende Ein- und Zweifamilienhäuser (Reihenhäuser, Doppelhaushälften, Vierspänner-, Atrium-, Winkel- und Kettenhäuser)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor NUR als Diagramm: Durchschnittskurve (logarithmische Trendlinie) mit Erwartungsbereich über dem ermittelten Sachwert nach NHK 2010, Kaufverträge 2025 — OHNE abgedruckte Gleichung und ohne Tabelle (Seitenbild geprüft). Eine am Kurvenverlauf abgelesene Zahl wäre eine Schätzung, kein amtlicher Wert. Dazu: der Baupreisindex steht im Modell (Druck-S. 24) nur als „Statistisches Bundesamt“ ohne Zahl. Getrennte Kurven für Zone A (Sachwert 125.000-600.000 €) und Zone B (ca. 185.000-600.000 €); die Zone (Karten Druck-S. 3 und 16) ist eine eigene Eingangsgröße. WEG ZUR QUELLE: Gleichung der Trendlinie (bzw. Tabellenwerte) und den angesetzten Baupreisindex bei der Geschäftsstelle erfragen — Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de. Bericht kostenfrei: https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: Baden-Württemberg veröffentlicht keinen Landeswert.",
+  "sperre_grund": "nur_diagramm",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_dokument": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010 (Anlage 4 ImmoWertV 2021), Baunebenkosten in den NHK enthalten",
+   "regionalfaktor": 1,
+   "aussenanlagen": "prozentual (i. d. R. 3 %)",
+   "alterswertminderung": "linear (§ 38 ImmoWertV 2021)",
+   "restnutzungsdauer": "Modernisierungsmodell Anlage 2 ImmoWertV 2021",
+   "bodenwert": "zum Kaufvertragsdatum aktueller Bodenrichtwert ohne Bebauungsabschlag (KV 2023/2024: BRW 01.01.2023, KV 2025: BRW 01.01.2025); Zu-/Abschlaege bis 30 % moeglich",
+   "gnd_beleg": "Druck-S. 24: „Wohnhäuser: 80 Jahre; Fertighäuser bis Baujahr 1989: 70 Jahre; Wohnhäuser mit Mischnutzung: 70 Jahre; Geschäftshäuser: 60 Jahre“",
+   "baupreisindex_hinweis": "Druck-S. 24 nennt nur „Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“, keine Zahl.",
+   "modell_quelle": "Kap. 4.2, Druck-S. 24 (PDF-S. 26)"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "mfh",
+    "etw"
+   ],
+   "ausserhalb_wortlaut": "Kap. 4.2 führt Sachwertfaktoren nur für nicht freistehende 1-2 Familienhäuser (4.2.1), freistehende 1-2 Familienhäuser (4.2.2) und Drei- und Vierfamilienhäuser (4.2.3).",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de"
+  },
+  "belege": [
+   {
+    "art": "diagramm_ohne_gleichung",
+    "fundstelle": "Kap. 4.2.1, Druck-S. 25 (PDF-S. 27), Diagramme Zone A und Zone B",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Sachwertfaktor bei nicht freistehenden Ein- und Zweifamilienhäusern (z.B. RH, DHH etc.) in Zone A / in Zone B für die Bewertung nach NHK 2010 — „Durchschnitt Zone A - KV 2025 - logarithmische …“, „Erwartungsbereich - Standardabweichung“; keine Gleichung abgedruckt."
+   },
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Anwendungsbeispiele, Druck-S. 61 (PDF-S. 63)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Beispiel 1: Reihenhaus / NHK 2010 / Zone A, vorläufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,67 (+ 67 %) + 201.000 €, Verkehrswert 501.000 €. Beispiel 2: freistehendes EFH / NHK 2010 / Zone B, 500.000 €, Faktor Mittelwert ca. 1,16 (+ 16 %) + 80.000 €, Verkehrswert 580.000 €. Nachgerechnet: beide auf den Euro. Die Beispiele zeigen den Faktor an EINEM Punkt („ca.“), keine Funktion."
+   }
+  ],
+  "fundstelle": "Kap. 4.2.1, Druck-S. 25 (PDF-S. 27), Diagramme Zone A und Zone B",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "modellversion": "IMB Ulm 2026, Sachwertfaktoren Kap. 4.2 (NHK 2010, GND 80, Regionalfaktor 1,0)",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "belege_meta": {
+   "abgerufen_am": "2026-10-20",
+   "dokument": "Immobilienmarktbericht 2026"
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "berichtsjahr": 2026,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "efh",
+  "objektart": "efh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor NUR als Diagramm: Durchschnittskurve (logarithmische Trendlinie) mit Erwartungsbereich über dem ermittelten Sachwert nach NHK 2010, Kaufverträge 2025 — OHNE abgedruckte Gleichung und ohne Tabelle (Seitenbild geprüft). Eine am Kurvenverlauf abgelesene Zahl wäre eine Schätzung, kein amtlicher Wert. Dazu: der Baupreisindex steht im Modell (Druck-S. 24) nur als „Statistisches Bundesamt“ ohne Zahl. Getrennte Kurven für Zone A (Sachwert 150.000-1.000.000 €) und Zone B (ca. 210.000-1.000.000 €). WEG ZUR QUELLE: Gleichung der Trendlinie (bzw. Tabellenwerte) und den angesetzten Baupreisindex bei der Geschäftsstelle erfragen — Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de. Bericht kostenfrei: https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: Baden-Württemberg veröffentlicht keinen Landeswert.",
+  "sperre_grund": "nur_diagramm",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_dokument": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010 (Anlage 4 ImmoWertV 2021), Baunebenkosten in den NHK enthalten",
+   "regionalfaktor": 1,
+   "aussenanlagen": "prozentual (i. d. R. 3 %)",
+   "alterswertminderung": "linear (§ 38 ImmoWertV 2021)",
+   "restnutzungsdauer": "Modernisierungsmodell Anlage 2 ImmoWertV 2021",
+   "bodenwert": "zum Kaufvertragsdatum aktueller Bodenrichtwert ohne Bebauungsabschlag (KV 2023/2024: BRW 01.01.2023, KV 2025: BRW 01.01.2025); Zu-/Abschlaege bis 30 % moeglich",
+   "gnd_beleg": "Druck-S. 24: „Wohnhäuser: 80 Jahre; Fertighäuser bis Baujahr 1989: 70 Jahre; Wohnhäuser mit Mischnutzung: 70 Jahre; Geschäftshäuser: 60 Jahre“",
+   "baupreisindex_hinweis": "Druck-S. 24 nennt nur „Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“, keine Zahl.",
+   "modell_quelle": "Kap. 4.2, Druck-S. 24 (PDF-S. 26)"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "objektarten": [
+    "efh",
+    "zfh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "dhh",
+    "rh",
+    "mfh",
+    "etw"
+   ],
+   "ausserhalb_wortlaut": "Kap. 4.2 führt Sachwertfaktoren nur für nicht freistehende 1-2 Familienhäuser (4.2.1), freistehende 1-2 Familienhäuser (4.2.2) und Drei- und Vierfamilienhäuser (4.2.3).",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de"
+  },
+  "belege": [
+   {
+    "art": "diagramm_ohne_gleichung",
+    "fundstelle": "Kap. 4.2.2, Druck-S. 26 (PDF-S. 28), Diagramme Zone A und Zone B",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Sachwertfaktor bei freistehenden Ein- und Zweifamilienhäuser Zone A / Zone B für die Bewertung nach NHK 2010 — „Durchschnitt Zone A - KV 2025- logarithmische …“, „Erwartungsbereich“; keine Gleichung abgedruckt."
+   },
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Anwendungsbeispiele, Druck-S. 61 (PDF-S. 63)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Beispiel 1: Reihenhaus / NHK 2010 / Zone A, vorläufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,67 (+ 67 %) + 201.000 €, Verkehrswert 501.000 €. Beispiel 2: freistehendes EFH / NHK 2010 / Zone B, 500.000 €, Faktor Mittelwert ca. 1,16 (+ 16 %) + 80.000 €, Verkehrswert 580.000 €. Nachgerechnet: beide auf den Euro. Die Beispiele zeigen den Faktor an EINEM Punkt („ca.“), keine Funktion."
+   }
+  ],
+  "fundstelle": "Kap. 4.2.2, Druck-S. 26 (PDF-S. 28), Diagramme Zone A und Zone B",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "modellversion": "IMB Ulm 2026, Sachwertfaktoren Kap. 4.2 (NHK 2010, GND 80, Regionalfaktor 1,0)",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "belege_meta": {
+   "abgerufen_am": "2026-10-20",
+   "dokument": "Immobilienmarktbericht 2026"
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "berichtsjahr": 2026,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "dreifh",
+  "objektart": "dreifh",
+  "objektart_bez": "Drei- und Vierfamilienhäuser",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Bericht führt den Sachwertfaktor NUR als Diagramm: Durchschnittskurve (logarithmische Trendlinie) mit Erwartungsbereich über dem ermittelten Sachwert nach NHK 2010, Kaufverträge 2025 — OHNE abgedruckte Gleichung und ohne Tabelle (Seitenbild geprüft). Eine am Kurvenverlauf abgelesene Zahl wäre eine Schätzung, kein amtlicher Wert. Dazu: der Baupreisindex steht im Modell (Druck-S. 24) nur als „Statistisches Bundesamt“ ohne Zahl. Eine Kurve für Zone A + B (Sachwert 250.000-750.000 €); Lageansatz laut Druck-S. 25: Zone A „Wert zwischen dem unteren und oberen Erwartungsbereich“, Zone B „Wert zwischen dem unteren Erwartungsbereich und dem Mittelwert“. Gilt nur für drei bis vier Wohneinheiten. WEG ZUR QUELLE: Gleichung der Trendlinie (bzw. Tabellenwerte) und den angesetzten Baupreisindex bei der Geschäftsstelle erfragen — Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de. Bericht kostenfrei: https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: Baden-Württemberg veröffentlicht keinen Landeswert.",
+  "sperre_grund": "nur_diagramm",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_dokument": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010 (Anlage 4 ImmoWertV 2021), Baunebenkosten in den NHK enthalten",
+   "regionalfaktor": 1,
+   "aussenanlagen": "prozentual (i. d. R. 3 %)",
+   "alterswertminderung": "linear (§ 38 ImmoWertV 2021)",
+   "restnutzungsdauer": "Modernisierungsmodell Anlage 2 ImmoWertV 2021",
+   "bodenwert": "zum Kaufvertragsdatum aktueller Bodenrichtwert ohne Bebauungsabschlag (KV 2023/2024: BRW 01.01.2023, KV 2025: BRW 01.01.2025); Zu-/Abschlaege bis 30 % moeglich",
+   "gnd_beleg": "Druck-S. 24: „Wohnhäuser: 80 Jahre; Fertighäuser bis Baujahr 1989: 70 Jahre; Wohnhäuser mit Mischnutzung: 70 Jahre; Geschäftshäuser: 60 Jahre“",
+   "baupreisindex_hinweis": "Druck-S. 24 nennt nur „Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“, keine Zahl.",
+   "modell_quelle": "Kap. 4.2, Druck-S. 24 (PDF-S. 26)"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh",
+    "etw"
+   ],
+   "ausserhalb_wortlaut": "Kap. 4.2 führt Sachwertfaktoren nur für nicht freistehende 1-2 Familienhäuser (4.2.1), freistehende 1-2 Familienhäuser (4.2.2) und Drei- und Vierfamilienhäuser (4.2.3).",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de"
+  },
+  "belege": [
+   {
+    "art": "diagramm_ohne_gleichung",
+    "fundstelle": "Kap. 4.2.3, Druck-S. 26 (PDF-S. 28)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Sachwertfaktor bei Drei- und Vierfamilienhäusern für die Bewertung nach NHK 2010 — „Durchschnitt - logarithmische Trendlinie“, „Erwartungsbereich - Standardabweichung“; keine Gleichung abgedruckt."
+   },
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Anwendungsbeispiele, Druck-S. 61 (PDF-S. 63)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Beispiel 1: Reihenhaus / NHK 2010 / Zone A, vorläufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,67 (+ 67 %) + 201.000 €, Verkehrswert 501.000 €. Beispiel 2: freistehendes EFH / NHK 2010 / Zone B, 500.000 €, Faktor Mittelwert ca. 1,16 (+ 16 %) + 80.000 €, Verkehrswert 580.000 €. Nachgerechnet: beide auf den Euro. Die Beispiele zeigen den Faktor an EINEM Punkt („ca.“), keine Funktion."
+   }
+  ],
+  "fundstelle": "Kap. 4.2.3, Druck-S. 26 (PDF-S. 28)",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "modellversion": "IMB Ulm 2026, Sachwertfaktoren Kap. 4.2 (NHK 2010, GND 80, Regionalfaktor 1,0)",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "belege_meta": {
+   "abgerufen_am": "2026-10-20",
+   "dokument": "Immobilienmarktbericht 2026"
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "berichtsjahr": 2026,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser ab 5 Wohneinheiten",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Bericht leitet für Mehrfamilienhäuser ab 5 Wohneinheiten KEINEN Sachwertfaktor ab: Kap. 4.2 führt nur nicht freistehende und freistehende 1-2 Familienhäuser sowie Drei- und Vierfamilienhäuser. Der Satz der Drei- und Vierfamilienhäuser darf nicht übertragen werden. WEG ZUR QUELLE: Gleichung der Trendlinie (bzw. Tabellenwerte) und den angesetzten Baupreisindex bei der Geschäftsstelle erfragen — Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de. Bericht kostenfrei: https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: Baden-Württemberg veröffentlicht keinen Landeswert.",
+  "sperre_grund": "nicht_abgeleitet",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_dokument": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010 (Anlage 4 ImmoWertV 2021), Baunebenkosten in den NHK enthalten",
+   "regionalfaktor": 1,
+   "aussenanlagen": "prozentual (i. d. R. 3 %)",
+   "alterswertminderung": "linear (§ 38 ImmoWertV 2021)",
+   "restnutzungsdauer": "Modernisierungsmodell Anlage 2 ImmoWertV 2021",
+   "bodenwert": "zum Kaufvertragsdatum aktueller Bodenrichtwert ohne Bebauungsabschlag (KV 2023/2024: BRW 01.01.2023, KV 2025: BRW 01.01.2025); Zu-/Abschlaege bis 30 % moeglich",
+   "gnd_beleg": "Druck-S. 24: „Wohnhäuser: 80 Jahre; Fertighäuser bis Baujahr 1989: 70 Jahre; Wohnhäuser mit Mischnutzung: 70 Jahre; Geschäftshäuser: 60 Jahre“",
+   "baupreisindex_hinweis": "Druck-S. 24 nennt nur „Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“, keine Zahl.",
+   "modell_quelle": "Kap. 4.2, Druck-S. 24 (PDF-S. 26)"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh",
+    "etw"
+   ],
+   "ausserhalb_wortlaut": "Kap. 4.2 führt Sachwertfaktoren nur für nicht freistehende 1-2 Familienhäuser (4.2.1), freistehende 1-2 Familienhäuser (4.2.2) und Drei- und Vierfamilienhäuser (4.2.3).",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de"
+  },
+  "belege": [
+   {
+    "art": "fehlanzeige",
+    "fundstelle": "Kap. 4.2, Druck-S. 24-26 (PDF-S. 26-28), Gliederung Inhaltsverzeichnis Druck-S. 1",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Kapitel 4.2 (Druck-S. 24-26) gliedert sich in 4.2.1 nicht freistehende 1-2 Familienhäuser, 4.2.2 freistehende 1-2 Familienhäuser, 4.2.3 Drei- und Vierfamilienhäuser — keine weitere Objektart."
+   },
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Anwendungsbeispiele, Druck-S. 61 (PDF-S. 63)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Beispiel 1: Reihenhaus / NHK 2010 / Zone A, vorläufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,67 (+ 67 %) + 201.000 €, Verkehrswert 501.000 €. Beispiel 2: freistehendes EFH / NHK 2010 / Zone B, 500.000 €, Faktor Mittelwert ca. 1,16 (+ 16 %) + 80.000 €, Verkehrswert 580.000 €. Nachgerechnet: beide auf den Euro. Die Beispiele zeigen den Faktor an EINEM Punkt („ca.“), keine Funktion."
+   }
+  ],
+  "fundstelle": "Kap. 4.2, Druck-S. 24-26 (PDF-S. 26-28), Gliederung Inhaltsverzeichnis Druck-S. 1",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "modellversion": "IMB Ulm 2026, Sachwertfaktoren Kap. 4.2 (NHK 2010, GND 80, Regionalfaktor 1,0)",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "belege_meta": {
+   "abgerufen_am": "2026-10-20",
+   "dokument": "Immobilienmarktbericht 2026"
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "berichtsjahr": 2026,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "etw",
+  "objektart": "etw",
+  "objektart_bez": "Eigentumswohnungen",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Bericht leitet für Wohnungseigentum KEINEN Sachwertfaktor ab: Kap. 5 (Wohnungs- und Teileigentum) führt Vergleichsfaktoren, Indexreihen und Liegenschaftszinssätze, Kap. 4.2 nur Häuser. WEG ZUR QUELLE: Gleichung der Trendlinie (bzw. Tabellenwerte) und den angesetzten Baupreisindex bei der Geschäftsstelle erfragen — Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de. Bericht kostenfrei: https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: Baden-Württemberg veröffentlicht keinen Landeswert.",
+  "sperre_grund": "nicht_abgeleitet",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_dokument": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "baupreisindex": null,
+   "nhk": "NHK 2010 (Anlage 4 ImmoWertV 2021), Baunebenkosten in den NHK enthalten",
+   "regionalfaktor": 1,
+   "aussenanlagen": "prozentual (i. d. R. 3 %)",
+   "alterswertminderung": "linear (§ 38 ImmoWertV 2021)",
+   "restnutzungsdauer": "Modernisierungsmodell Anlage 2 ImmoWertV 2021",
+   "bodenwert": "zum Kaufvertragsdatum aktueller Bodenrichtwert ohne Bebauungsabschlag (KV 2023/2024: BRW 01.01.2023, KV 2025: BRW 01.01.2025); Zu-/Abschlaege bis 30 % moeglich",
+   "gnd_beleg": "Druck-S. 24: „Wohnhäuser: 80 Jahre; Fertighäuser bis Baujahr 1989: 70 Jahre; Wohnhäuser mit Mischnutzung: 70 Jahre; Geschäftshäuser: 60 Jahre“",
+   "baupreisindex_hinweis": "Druck-S. 24 nennt nur „Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“, keine Zahl.",
+   "modell_quelle": "Kap. 4.2, Druck-S. 24 (PDF-S. 26)"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "objektarten": [
+    "etw"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh",
+    "mfh"
+   ],
+   "ausserhalb_wortlaut": "Kap. 4.2 führt Sachwertfaktoren nur für nicht freistehende 1-2 Familienhäuser (4.2.1), freistehende 1-2 Familienhäuser (4.2.2) und Drei- und Vierfamilienhäuser (4.2.3).",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de"
+  },
+  "belege": [
+   {
+    "art": "fehlanzeige",
+    "fundstelle": "Kap. 4.2, Druck-S. 24-26, und Kap. 5, Druck-S. 32-44",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Kapitel 4.2 (Druck-S. 24-26) gliedert sich in 4.2.1 nicht freistehende 1-2 Familienhäuser, 4.2.2 freistehende 1-2 Familienhäuser, 4.2.3 Drei- und Vierfamilienhäuser — keine weitere Objektart."
+   },
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Anwendungsbeispiele, Druck-S. 61 (PDF-S. 63)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Beispiel 1: Reihenhaus / NHK 2010 / Zone A, vorläufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,67 (+ 67 %) + 201.000 €, Verkehrswert 501.000 €. Beispiel 2: freistehendes EFH / NHK 2010 / Zone B, 500.000 €, Faktor Mittelwert ca. 1,16 (+ 16 %) + 80.000 €, Verkehrswert 580.000 €. Nachgerechnet: beide auf den Euro. Die Beispiele zeigen den Faktor an EINEM Punkt („ca.“), keine Funktion."
+   }
+  ],
+  "fundstelle": "Kap. 4.2, Druck-S. 24-26, und Kap. 5, Druck-S. 32-44",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "modellversion": "IMB Ulm 2026, Sachwertfaktoren Kap. 4.2 (NHK 2010, GND 80, Regionalfaktor 1,0)",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "belege_meta": {
+   "abgerufen_am": "2026-10-20",
+   "dokument": "Immobilienmarktbericht 2026"
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "berichtsjahr": 2026,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ggg",
+  "objektart": "ggg",
+  "objektart_bez": "gemischt genutzte und gewerbliche Objekte",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Bericht leitet für gemischt genutzte und gewerbliche Objekte KEINEN Sachwertfaktor ab (Kap. 4.2 nur Wohnhäuser bis vier Einheiten); für diese Objekte führt er Liegenschaftszinssätze (Kap. 4.3.2). WEG ZUR QUELLE: Gleichung der Trendlinie (bzw. Tabellenwerte) und den angesetzten Baupreisindex bei der Geschäftsstelle erfragen — Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de. Bericht kostenfrei: https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL: Baden-Württemberg veröffentlicht keinen Landeswert.",
+  "sperre_grund": "nicht_abgeleitet",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_dokument": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "stichtag": "2026-01-01",
+  "modellansaetze": {
+   "gnd_jahre": 70,
+   "baupreisindex": null,
+   "nhk": "NHK 2010 (Anlage 4 ImmoWertV 2021), Baunebenkosten in den NHK enthalten",
+   "regionalfaktor": 1,
+   "aussenanlagen": "prozentual (i. d. R. 3 %)",
+   "alterswertminderung": "linear (§ 38 ImmoWertV 2021)",
+   "restnutzungsdauer": "Modernisierungsmodell Anlage 2 ImmoWertV 2021",
+   "bodenwert": "zum Kaufvertragsdatum aktueller Bodenrichtwert ohne Bebauungsabschlag (KV 2023/2024: BRW 01.01.2023, KV 2025: BRW 01.01.2025); Zu-/Abschlaege bis 30 % moeglich",
+   "gnd_beleg": "Druck-S. 24: „Wohnhäuser: 80 Jahre; Fertighäuser bis Baujahr 1989: 70 Jahre; Wohnhäuser mit Mischnutzung: 70 Jahre; Geschäftshäuser: 60 Jahre“",
+   "baupreisindex_hinweis": "Druck-S. 24 nennt nur „Statistisches Bundesamt (§ 36 (2) ImmoWertV 2021)“, keine Zahl.",
+   "modell_quelle": "Kap. 4.2, Druck-S. 24 (PDF-S. 26)"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm (Gebiet des Gutachterausschusses)",
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh",
+    "mfh",
+    "etw"
+   ],
+   "ausserhalb_wortlaut": "Kap. 4.2 führt Sachwertfaktoren nur für nicht freistehende 1-2 Familienhäuser (4.2.1), freistehende 1-2 Familienhäuser (4.2.2) und Drei- und Vierfamilienhäuser (4.2.3).",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de"
+  },
+  "belege": [
+   {
+    "art": "fehlanzeige",
+    "fundstelle": "Kap. 4.2, Druck-S. 24-26 (PDF-S. 26-28)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Kapitel 4.2 (Druck-S. 24-26) gliedert sich in 4.2.1 nicht freistehende 1-2 Familienhäuser, 4.2.2 freistehende 1-2 Familienhäuser, 4.2.3 Drei- und Vierfamilienhäuser — keine weitere Objektart."
+   },
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Anwendungsbeispiele, Druck-S. 61 (PDF-S. 63)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Beispiel 1: Reihenhaus / NHK 2010 / Zone A, vorläufiger Sachwert 300.000 €, Faktor Mittelwert ca. 1,67 (+ 67 %) + 201.000 €, Verkehrswert 501.000 €. Beispiel 2: freistehendes EFH / NHK 2010 / Zone B, 500.000 €, Faktor Mittelwert ca. 1,16 (+ 16 %) + 80.000 €, Verkehrswert 580.000 €. Nachgerechnet: beide auf den Euro. Die Beispiele zeigen den Faktor an EINEM Punkt („ca.“), keine Funktion."
+   }
+  ],
+  "fundstelle": "Kap. 4.2, Druck-S. 24-26 (PDF-S. 26-28)",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "modellversion": "IMB Ulm 2026, Sachwertfaktoren Kap. 4.2 (NHK 2010, GND 80, Regionalfaktor 1,0)",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "belege_meta": {
+   "abgerufen_am": "2026-10-20",
+   "dokument": "Immobilienmarktbericht 2026"
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Ulmer Immobilienmarktbericht 2026 führt für den individuellen Wohnungsbau keine Umrechnungskoeffizienten für die Grundstücksgröße: Kap. 6.1.1 weist nur Bauplatzpreise je Zone (A/B) mit Flächen- und Preisspanne aus (Zone A 5 KV, 310-1.170 m², Mittel 860 €/m²; Zone B 37 KV, 250-930 m², Mittel 310 €/m²) und ein Streudiagramm Preis über Grundstücksgröße. Weg: Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de; Immobilienmarktbericht 2026: https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "sperre_grund": "keine_uk",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de",
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026",
+    "fundstelle": "Kap. 6.1.1, Druck-S. 45 (PDF-S. 47)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Bei den dargestellten Werten handelt es sich um Durchschnittswerte, die keine Normierung hinsichtlich wertbeeinflussender Grundstücksmerkmale wie Lage, Nutzungsart, Indexreihen usw. aufweisen."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_dokument": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "fundstelle": "Kap. 6.1.1, Druck-S. 45 (PDF-S. 47)",
+  "weg": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de; https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "belege_meta": {
+   "abgerufen_am": "2026-10-20",
+   "dokument": "Immobilienmarktbericht 2026"
+  },
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm, Jahrgang 2026",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm",
+   "objektarten": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "mfh",
+    "etw"
+   ],
+   "ausserhalb_wortlaut": "Bei den dargestellten Werten handelt es sich um Durchschnittswerte, die keine Normierung hinsichtlich wertbeeinflussender Grundstücksmerkmale wie Lage, Nutzungsart, Indexreihen usw. aufweisen.",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de"
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08421000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ulm, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "mfh",
+  "vollstaendig": false,
+  "warum_kein_wert": "Für Mehrfamilienhausgrundstücke hat der Ausschuss ausdrücklich keine Umrechnungskoeffizienten ermittelt (Kap. 6.1.2): zu wenige Kaufverträge (2025: Zone A 4, Zone B 2). Weg: Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de; Immobilienmarktbericht 2026: https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "sperre_grund": "keine_uk",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de",
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026",
+    "fundstelle": "Kap. 6.1.2, Druck-S. 46 (PDF-S. 48)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Aufgrund der geringen Anzahl der Kaufverträge wurden keine Umrechnungskoeffizienten ermittelt."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_dokument": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "fundstelle": "Kap. 6.1.2, Druck-S. 46 (PDF-S. 48)",
+  "weg": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de; https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "belege_meta": {
+   "abgerufen_am": "2026-10-20",
+   "dokument": "Immobilienmarktbericht 2026"
+  },
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm, Jahrgang 2026",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, Tabellen Zelle fuer Zelle am Bild gelesen, 20.10.2026, Agent register-ernte; PDF 66 Seiten, 4.126.146 Byte, sha256 0caa882d86e0bce1061fb72c04f2c0f5e4456441f205762f7e998b3a8852213c)",
+  "modellansaetze": {},
+  "geltungsbereich": {
+   "raeumlich": "Stadtkreis Ulm",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "dhh",
+    "rh",
+    "etw"
+   ],
+   "ausserhalb_wortlaut": "Aufgrund der geringen Anzahl der Kaufverträge wurden keine Umrechnungskoeffizienten ermittelt.",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de"
+  }
+ }
+]

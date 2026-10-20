@@ -1163,36 +1163,50 @@
   "jahrgang": 2026,
   "berichtsjahr": 2026,
   "vollstaendig": false,
-  "warum_kein_wert": "Kein frei abrufbares Dokument des Ausschusses gemessen (siehe Weg). Ob er WGFZ-Koeffizienten führt, ist offen.",
+  "warum_kein_wert": "Gemessen am Immobilienmarktbericht 2026 (20.10.2026): der Ausschuss führt KEINE Umrechnungskoeffizienten für die WGFZ. Individueller Wohnungsbau: „konnte keine Abhängigkeit betreffend dem Maß der baulichen Nutzung (GFZ) ermittelt werden. Deshalb sind die dargestellten Kaufpreise nicht auf eine bestimmte GFZ bezogen.“ (Kap. 6.1.1, Druck-S. 45). Geschosswohnungsbau: „Bei diesen Grundstücken besteht eine Korrelation zwischen dem Maß der baulichen Nutzung (GFZ) und dem Grundstückspreis. Aufgrund der geringen Anzahl der Kaufverträge wurden keine Umrechnungskoeffizienten ermittelt.“ (Kap. 6.1.2, Druck-S. 46). Gewerbe: keine Angabe. Weg: Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de; Bericht kostenfrei: https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
   "geltungsbereich": {
    "objektarten": [],
    "objektarten_ausgeschlossen": [],
-   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses bei der Stadt Ulm; Immobilienmarktbericht: https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf"
+   "ausserhalb_wortlaut": "Aufgrund der geringen Anzahl der Kaufverträge wurden keine Umrechnungskoeffizienten ermittelt. (Druck-S. 46)",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de; https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf"
   },
   "belege": [
    {
     "art": "amtliche Veröffentlichung",
-    "dokument": "Örtliche Fachinformationen / Grundstücksmarktbericht – Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm",
-    "fundstelle": "ganzer Text (Textsuche); Bezugsseite abgerufen am 18.10.2026",
-    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf"
+    "dokument": "Immobilienmarktbericht 2026, Kap. 6.1.1",
+    "fundstelle": "Druck-S. 45 (PDF-S. 47)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Beim individuellen Wohnungsbau (Ein- und Zweifamilienhäuser) konnte keine Abhängigkeit betreffend dem Maß der baulichen Nutzung (GFZ) ermittelt werden."
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026, Kap. 6.1.2",
+    "fundstelle": "Druck-S. 46 (PDF-S. 48)",
+    "url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+    "wortlaut": "Aufgrund der geringen Anzahl der Kaufverträge wurden keine Umrechnungskoeffizienten ermittelt."
    }
   ],
-  "fundstelle": "ganzer Text (Textsuche); Bezugsseite abgerufen am 18.10.2026",
+  "fundstelle": "Kap. 6.1.1 und 6.1.2, Druck-S. 45-46 (PDF-S. 47-48)",
   "stufe": "A",
   "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
   "stichtag": null,
-  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
-  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf",
-  "seite": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag. Bericht Jahrgang 2026 (Stand 2026).",
+  "quelle_url": "https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2026-immobilienmarktbericht-2026.pdf",
+  "seite": 45,
   "lizenz": "kein Wert - Lizenz nicht einschlägig",
   "quellenvermerk": null,
   "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm, Jahrgang 2026",
-  "quelle_parser": "v-uk-wgfz-ernte-2 (pdftotext -layout, Seitenbild wo noetig, 18.10.2026)",
+  "quelle_parser": "ernte-ulm-2026 (pdftotext -layout + Seitenbild 150 dpi, 20.10.2026, Agent register-ernte)",
   "modellansaetze": {},
   "belege_meta": {
-   "abgerufen_am": "2026-10-18",
-   "dokument": "Örtliche Fachinformationen / Grundstücksmarktbericht – Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm"
-  }
+   "abgerufen_am": "2026-10-20",
+   "dokument": "Immobilienmarktbericht 2026"
+  },
+  "sperre_grund": "keine_uk",
+  "zugang": "kostenfrei",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für die Ermittlung von Grundstückswerten in Ulm, Münchner Straße 1 (Impressum: „Müncher Str.1“), 89073 Ulm, Telefon 0731 161-6270, gutachterausschuss@ulm.de",
+  "lizenz_dokument": "Wörtlich (Impressum, Druck-S. 2): „Irrtum vorbehalten. Die Produkte des Gutachterausschusses sind urheberrechtlich geschützt. Nachdruck und sonstige Vervielfältigung, auch auszugsweise, nur mit Genehmigung der Geschäftsstelle.“ — Genehmigung des Gutachterausschusses Ulm vom 23.09.2026, laut Marcel Junker auch für Jahrgang 2026 (Bestätigung 20.10.2026).",
+  "korrektur_20261020": "Bis 20.10.2026 stand hier „Kein frei abrufbares Dokument des Ausschusses gemessen … Ob er WGFZ-Koeffizienten führt, ist offen“ mit dem Link auf den Bericht 2025. Der Bericht 2026 ist frei abrufbar und beantwortet die Frage: keine Koeffizienten."
  },
  {
   "kennzahl": "umrechnungskoeffizient_wgfz",
