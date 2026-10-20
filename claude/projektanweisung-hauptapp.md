@@ -39017,6 +39017,44 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - Pilot-Antwort zu „Stufe 2“ und „Stufe C“.
 - Essen EFH Sachwertfaktor 1,33 im echten Bericht.
 
+### v2483–v2485 · Eine Restnutzungsdauer je Haus, eine Warmmiete, „deutlich unter" ab 90 % (20.10.2026, Staging)
+
+Marcel (20.10.2026): *„Das muss eindeutig sein, bitte so machen, dass es passt."* und „ja" zu einem deutlicheren Wort unter 90 % des Ziels. Die drei offenen Punkte aus Prod-Rollout (56) / v2460–v2466a.
+
+**Was:**
+- **v2483 · Restnutzungsdauer.** Gemessen an Westerfeldstr. 140 (Bj 1967, GND 80, Stichtag heute in beiden Wegen):
+  - Wertpotenzial / Ertragswert-Kern **32 J.** = Anlage 2 mit **6 Punkten** aus dem Feld `mod_punkte` (acht `mod_*`-Felder des Reiters Objekt, Alter 59 → 32,3).
+  - Mieterliste / Konfigurator **35 J.** = Mittel der RND je Einheit mit **7 Punkten** aus `_mfh.gebaeude` (Alter 59 → 34,6).
+  - **Ursache: zwei Punktzahlen für dasselbe Gebäude, nicht zwei Kerne.** Fenster im Konfigurator „teilweise erneuert" (1 P.), im Reiter Objekt „> 20 Jahre" (0 P.). Die vier Wohnungs-Gewerke gehen nie ins Objekt zurück (`inObjektZurueck` nimmt nur Dach/Außenwand/Leitungen/Heizung), und „Modernisierungsgrad übernehmen" schrieb die nächste der fünf festen Stufen (`optionFuer`: aus 7 wurde 8). GND (80/80) und Stichtag (heute/heute) waren gleich.
+  - **Gewählte Quelle und Begründung:** Anlage 2 ImmoWertV bewertet das GEBÄUDE — eine Punktzahl, eine RND. Beim MFH mit erfassten Einheiten ist der Konfigurator die genauere Angabe (Wohnungs-Gewerke je Einheit, flächengewichtet, wie ein Sachverständiger teilmodernisierte Wohnungen anteilig ansetzt). Daher: **Punkte des Hauses = flächengewichtete Punkte der Einheiten, auf ganze Punkte gerundet** (die Tabelle der Anlage 2 kennt nur ganze Punkte; `anlage2.js` rundet ebenso). Ohne Einheiten gilt `mod_punkte` wie bisher. **GND = Modell des verwendeten Liegenschaftszinssatzes, sonst Anlage 1** — das rechnet nur der Marktbericht-Dienst; deshalb liest die Mieterliste die RND von dort (Zinssatz-Endpunkt, derselbe Weg wie Bericht und Wertpotenzial) und rechnet nur ohne Antwort selbst mit demselben Anlage-2-Kern. **Keine RND je Einheit mehr** (sie ging in keinen Wert ein, nur in den Mittelwert).
+  - Umsetzung: `DpMfhEinheiten.hausPunkte()` (eine Stelle); `objekt-reiter.js` `modPunkte()` nimmt sie für das Feld `mod_punkte` und die Zinssatz-Abfrage und legt die Antwort als `window._dpHausRnd` ab; `DealPilotMB.inputs()` schickt sie als `mod_punkte` (Bericht + Wertpotenzial, auch bei altem Feldstand); `auswerten()` → `hausRnd()`; Konfigurator Schritt 4 und Bank-PDF ohne RND-Spalte, Zeile „Restnutzungsdauer des Gebäudes (Anlage 2, indikativ) 35 Jahre (GND 80)"; „Übernehmen" schreibt die genaue Punktzahl und zieht die Zinssatz-Zeile nach; Objekt-Leiste GND/RND in ganzen Jahren. Backend unverändert (rechnete schon richtig mit dem, was ankam).
+- **v2484/a/b · Warmmiete.** Bank-PDF 41.147 € = `wm_j` = (NKM + Zusatzeinnahmen + Umlagen der Mieter) × 12; Investment-PDF 39.756 € = Kaltmiete inkl. Zusatzeinnahmen + umlagefähige KOSTEN (336 €), App-Kasse ebenso. **Festgelegt: Warmmiete = Nettokaltmiete + Nebenkostenvorauszahlungen der Mieter** (Feld `umlagef`), Zusatzeinnahmen (`ze`) getrennt. Neue Kennzahlen in `State.kpis`: `warm_j`, `nk_vz_j`, `ze_j`, `nkm_netto_j`, `ze_ezb`. Eine Kette in beiden PDFs und der Cashflow-Kasse der App: Warmmiete / Jahr (NKM + NK-Vorauszahlungen) − NK-Vorauszahlungen der Mieter = Nettokaltmiete / Jahr + Zusatzeinnahmen (Stellplatz, Garage) = Kaltmiete inkl. Zusatzeinnahmen / Jahr — weiter wie bisher (NOI, Cashflow unverändert). Reiter Miete „= Warmmiete" und CF-Tabelle „Warmm./Mon." zeigen dieselbe Definition. `wm_j`/`wm_y` intern **unverändert** (Steuerverlauf `tax.js:2153` rechnet damit, dort zählen die Zusatzeinnahmen mit). App-Beschriftung per JS (`_crWarmKette`), index.html nur Buster.
+- **v2485 · Wort unter 90 %.** `QcHeuristik.zielUrteil`: gelb ab 90 % des Ziels „knapp unter deinem Ziel", 75–90 % „deutlich unter deinem Ziel", Ampel bleibt gelb. 0,9 liegt auf keiner Ampelgrenze (0,75 / 0,96875). `zielurteil-pruefen` fährt 0,9 von beiden Seiten an und prüft in Gelb das Wort zur Quote (412 Fälle). Einzige Wortquelle; QC, Haupt-App, Telegram lesen `zu.wort`. Kern gespiegelt, Backend neu gebaut.
+
+**Commit:** `aed82474` (v2483–v2485), `cf242156` (v2484a Beschriftung gleich), `90bc6edf` (v2484b Fußnote). Hinweis: Teile von `auswerten`/`hausPunkte`/`hausRnd` stecken schon in `43a2448c` (v2481) — der Video-Strang hat `mfh-einheiten.js` während der Arbeit mitcommittet. Buster: mfh-einheiten, objekt-reiter, dealpilot-mb v2483; calc, pdf v2484a; pdf-investment-bank v2484b; qc-heuristik v2485 (index + quickcheck-app); qc-bridge und IFRAME_SRC qc-v2485.
+
+**Nachweis (eigener Tab, Schreibzugriffe auf /objects und `dpTabSwitchSave`/`saveObj` gesperrt, Westerfeld `updated_at` vorher = nachher 19.10. 18:49:21, `mod_punkte` in der DB weiter 6):**
+
+| Westerfeld | vorher | nachher |
+|---|---|---|
+| Punkte Haus (Feld, Mapper, Konfigurator) | 6 / 6 / 7 | 7 / 7 / 7 |
+| RND Zinssatz-Zeile Objekt | 32,3 | 35 (34,6) |
+| RND Wertpotenzial Bestand / Mieterhöhung / Zielbild (Tab Bewertung, Investment-PDF S. 11, Bank-PDF S. 6) | 32 | 35 / 35 / 35 |
+| RND Mieterliste (Konfigurator, Bank-PDF S. 5) | 35 | 35 (GND 80, Quelle Marktbericht-Dienst) |
+| Warmmiete Bank-PDF / Investment-PDF / App-Kasse / Reiter Miete | 41.147 / 39.756 / 39.756 / 41.147 | 40.067 / 40.067 / 40.067 / 40.067 |
+
+- Ertragswert Bestand 800.000 € = `bericht_ertragswert` (Proxy, nurWertBasis).
+- MFH-Testfall (im Speicher, Westerfeld mit Einheit 1 voll modernisiert, Einheit 2 nichts, Einheit 3 auf 60 m²): 8,1 → 8 Punkte, Feld 8, Zinssatz-Zeile 36,9, Mieterliste 36,9 (Dienst) bzw. 36,86 ohne Dienst (Browser-Kern), Wertpotenzial Bestand/Mieterhöhung 36,9 → überall 37 J.
+- PDFs im Tab mit pdf.js gerendert und angesehen: Bank S. 2 (Kette), S. 5 (Mieterliste ohne RND-Spalte, Haus-RND), Investment S. 2 (Kette, eine Zeile mehr, passt). Konfigurator Schritt 4 angesehen.
+- Prüfläufe: `rechenkerne-spiegeln` RC 0, `score-ketten-pruefen` RC 0 (216), `rnd-kerne-pruefen` RC 0, `zielurteil-pruefen` RC 0 (412), `prompt-lecks-pruefen` RC 0, `objekt-mapper-pruefen` RC 0, `frontend-konstanten` RC 0 (mitcommittet), `buster-ebenen-pruefen` SAUBER, `node --check` je Datei, Gold-Audit Staging RC 0, `auth/me` 401. Staging per `git pull --ff-only` + `docker compose … up -d --build mb-backend backend`.
+
+**Rest:**
+- Westerfeld trägt in der DB weiter `mod_punkte` 6; beim nächsten Öffnen schreibt die Automatik 7 ins Feld (dann speichert die App wie bei jeder Feldänderung). Der gespeicherte Bericht Stufe 3 (ältere Punkte) zeigt bis zum nächsten Abruf seine alte RND.
+- Die acht `mod_*`-Felder bleiben beim MFH mit Einheiten sichtbar, zählen dort aber nicht mehr (die Leiste sagt „aus den Einheiten"). Ob sie beim MFH ausgeblendet oder aus dem Konfigurator gespiegelt werden sollen: Produktfrage Marcel.
+- „Restnutzungsdauer in die AfA übernehmen" nimmt weiter die Verkehrswert-RND (Stichtag heute); fürs Finanzamt zählt der Anschaffungsstichtag — unverändert, Hinweis „indikativ" steht.
+- `_dpRnd` (RND-Assistent, Westerfeld 14.10.: 2 Punkte, 23,6 J.) ist ein eigener, gespeicherter Stand und wurde nicht angefasst.
+- Konfigurator-Fußzeile sagt weiter „Gerechnet mit dem Punktraster … RND-Kern", auch wenn die Zahl vom Dienst kommt (Zeile darüber nennt die Quelle).
+
 ### Prod-Rollout (56) · qc-v2450, v2460–v2466a, v2470–v2472, Ulm 2026, SH-Freigaben (20.10.2026)
 
 **Was:**
