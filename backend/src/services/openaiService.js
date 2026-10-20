@@ -2330,14 +2330,14 @@ function buildDs2Prompt(payload) {
     '      "sources": [ { "label": "Qualifizierter Mietspiegel Herford 2024", "url": "https://www.herford.de/mietspiegel", "amtlich": true },',
     '                   { "label": "IHK Ostwestfalen, Immobilienmarktbericht 2025", "amtlich": true },',
     '                   { "label": "Aktueller Marktdurchschnitt (Angebotsmieten), Stand 2026" } ]'
-      + (_belege ? ',\n      "vergleich_text": "9,50 EUR/m2 liegt 6 % ueber dem aktuellen Marktdurchschnitt von 8,96 EUR/m2 und innerhalb der amtlichen Spanne.",'
+      + (_belege ? ',\n      "vergleich_text": "<dein Wert> liegt <x> % <ueber/unter> dem aktuellen Marktdurchschnitt von <Median von oben>; zur amtlichen Vergleichsmiete von <Wert von oben, oder: keine amtliche>: <x> % <ueber/unter>.",'
         + '\n      "stuetzt_sich_auf": ["amtliche_vergleichsmiete", "marktdurchschnitt"] },' : ' },'),
     '    "ds2_mietausfall": { "value": "niedrig",',
     '      "reasoning": "Kein amtlicher Mietspiegel fuer Huellhorst; Einschaetzung aus Kreisdaten",',
     '      "source": "Kreis Minden-Luebbecke, Wohnungsmarktbeobachtung",',
     '      "sources": [ { "label": "Kreis Minden-Luebbecke, Wohnungsmarktbeobachtung 2025", "amtlich": true },',
     '                   { "label": "IT.NRW Bevoelkerungsvorausberechnung", "amtlich": true } ]'
-      + (_belege ? ',\n      "vergleich_text": "Zensus 2022 (Stichtag 15.05.2022): marktaktiver Leerstand 1,2 % in der Gemeinde - passt zu niedrig; die Bevoelkerung des Kreises waechst um 0,3 % im Jahr.",'
+      + (_belege ? ',\n      "vergleich_text": "Deine Einstufung <Stufe> gegen den Anhalt aus dem Zensus 2022 (<Anhalt von oben>, marktaktiver Leerstand <Wert von oben>): <passt/weicht ab, weil ...>.",'
         + '\n      "stuetzt_sich_auf": ["leerstand_zensus", "bevoelkerung"] }' : ' }'),
     '  }',
     '}'
@@ -2461,7 +2461,7 @@ async function suggestDs2Fields(payload, opts) {
       if (_ortWorte.some(function (w) { return hostFlach.indexOf(w.replace(/-/g, '')) >= 0; })) return true;
       return _AMTSSTELLEN.test(host);
     };
-    const _PORTALE = /(immoportal|immowelt|immobilienscout|immoscout|immonet|wohnungsboerse|homeday|mietspiegel\.(com|net|org)|meinestadt|wohnen-im-alter|kalaydo|ebay|miete-aktuell|wohnpreis|mietpreise\.|immopreise|immo-?kompass|capital\.de|wohnungsmarkt24)/i;
+    const _PORTALE = /(ohne-makler|immobilien\.net|immoportal|immowelt|immobilienscout|immoscout|immonet|wohnungsboerse|homeday|mietspiegel\.(com|net|org)|meinestadt|wohnen-im-alter|kalaydo|ebay|miete-aktuell|wohnpreis|mietpreise\.|immopreise|immo-?kompass|capital\.de|wohnungsmarkt24)/i;
     /* v2500 · Bewertungs- und Datenanbieter nie namentlich (CLAUDE.md) */
     const _ANBIETER = /(sprengnetter|pricehubble|geomap|on-?geo|f\+b|empirica|bulwiengesa|value ag|vdp research|europace|homeday)/i;
     const _quellen = (function () {
@@ -2518,7 +2518,12 @@ async function suggestDs2Fields(payload, opts) {
            (Angebotsmieten)", ohne Link; Etikett und Link bleiben nur im
            Server-Protokoll. Mehrere Portale fallen zu EINEM Eintrag zusammen. */
         const _istAnbieter = !amtlich && (_ANBIETER.test(label) || _ANBIETER.test(url));
-        const _istPortal = !amtlich && (_istAnbieter || _PORTALE.test(url) || _PORTALE.test(label));
+        /* Die Liste verliert immer (v1242e): der erste echte Lauf von v2500
+           brachte ohne-makler.net. Also zusaetzlich die Umkehrung - eine nicht
+           amtliche Quelle mit Link auf einen nicht amtsfaehigen Host, die von
+           Miete, Angeboten oder Preisen spricht, ist eine Marktquelle. */
+        const _marktHost = !amtlich && url && !_amtsfaehig(url) && /miet|angebot|preis|markt/i.test(label + ' ' + url);
+        const _istPortal = !amtlich && (_istAnbieter || _marktHost || _PORTALE.test(url) || _PORTALE.test(label));
         let _url = url;
         if (_istPortal) {
           const _jahr = (label.match(/\b(20\d\d)\b/) || [])[1];
