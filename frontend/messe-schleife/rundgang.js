@@ -23,7 +23,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VER = 'messe-schleife-4c';
+  var VER = 'messe-schleife-5';
   var Q = new URLSearchParams(location.search);
   var RATE = Math.max(0.5, Math.min(8, parseFloat(Q.get('rate')) || 1));
   var DATEI = location.protocol === 'file:';
@@ -81,10 +81,15 @@
     bewerten:  { art: 'zwischen', dauer: 5, zeile: 'Erst rechnen, dann boarden.', weiter: 'bewerten' },
     aufruf1:   { art: 'aufruf', dauer: 8, weiter: 'finanzieren' },
     wachsen:   { art: 'zwischen', dauer: 5, zeile: 'Immobilien prüfen wie ein Pilot.', weiter: 'wachsen' },
-    aufruf2:   { art: 'aufruf', dauer: 9 }
+    aufruf2:   { art: 'aufruf', dauer: 9 },
+    /* messe-schleife-5: Register-Tafel und Gewinnspiel (tafeln.js); fehlt die
+       Grundlage oder ist das Gewinnspiel aus, entfällt die Tafel. */
+    register:  { art: 'register', dauer: 14 },
+    gewinn1:   { art: 'gewinnspiel', dauer: 15 },
+    gewinn2:   { art: 'gewinnspiel', dauer: 15 }
   };
-  var FOLGE = ['T:start', 'quickcheck', 'immometrica', 'mfh', 'T:bewerten', 'marktbericht', 'score', 'pilot',
-    'T:aufruf1', 'finanzierung', 'bank', 'steuer', 'T:wachsen', 'zielbild', 'portfolio', 'telegram', 'T:aufruf2'];
+  var FOLGE = ['T:start', 'quickcheck', 'immometrica', 'T:gewinn1', 'mfh', 'T:bewerten', 'marktbericht', 'T:register', 'score', 'pilot',
+    'T:aufruf1', 'finanzierung', 'bank', 'T:gewinn2', 'steuer', 'T:wachsen', 'zielbild', 'portfolio', 'telegram', 'T:aufruf2'];
 
   /* Schritte: Tafel oder ein Ausschnitt (Stück) eines Abschnitts. */
   var SCHRITTE = [];
@@ -191,6 +196,9 @@
 
   /* ── Tafeln ── */
   function tafelHtml(t) {
+    var T = window.DPSTafeln;
+    if (t.art === 'register') return T && T.register.da() ? T.register.html(null) : null;
+    if (t.art === 'gewinnspiel') return T && T.gewinnspiel.aktiv() ? T.gewinnspiel.html(null, T.gewinnspiel.sekunden() / RATE) : null;
     var weiter = t.weiter ? '<div class="rg-weiter">Als Nächstes · <b>' + BLOECKE[t.weiter] + '</b></div>' : '';
     if (t.art === 'marke') return '<div class="rg-t rg-t-marke"><div class="rg-bahn"><span class="rg-flieger">' + FLIEGER + '</span></div>'
       + logo('rg-logo-gross') + '<div class="rg-claim">Immobilien prüfen wie ein <em>Pilot</em>.</div>'
@@ -203,8 +211,8 @@
       + '<div class="rg-unter">Immobilien prüfen wie ein Pilot.</div></div>' + qr + weiter + '</div>';
   }
   var tafelOffen = false;
-  function zeigeTafel(t) {
-    tafelEl.innerHTML = tafelHtml(t);
+  function zeigeTafel(t, html) {
+    tafelEl.innerHTML = html;
     void tafelEl.offsetWidth;
     tafelEl.classList.add('an'); tafelOffen = true;
     kopf.classList.add('leer');
@@ -268,13 +276,18 @@
     while (!abbruch) {
       var s = SCHRITTE[i];
       if (s.typ === 'tafel') {
-        status(i, s);
-        log('tafel', s.id);
-        zeigeTafel(s.t);
-        if (!vorbereitet) { var j = naechstesStueck(i); if (j >= 0) vorbereiten(j); }
-        var ende = performance.now() + s.t.dauer * 1000 / RATE;
-        while (performance.now() < ende && !naechsterSprung) await warte(100);
-        naechsterSprung = false;
+        var html = tafelHtml(s.t);
+        if (html) {
+          status(i, s);
+          log('tafel', s.id);
+          zeigeTafel(s.t, html);
+          if (!vorbereitet) { var j = naechstesStueck(i); if (j >= 0) vorbereiten(j); }
+          var dauer = s.t.art === 'gewinnspiel' ? window.DPSTafeln.gewinnspiel.sekunden() : s.t.dauer;
+          var t0 = performance.now(), ende = t0 + dauer * 1000 / RATE;
+          while (performance.now() < ende && !naechsterSprung) await warte(100);
+          naechsterSprung = false;
+          log('tafel-ende', s.id + ' ' + Math.round(performance.now() - t0));
+        } else log('tafel-aus', s.id);
       } else {
         await spieleStueck(i, s);
       }

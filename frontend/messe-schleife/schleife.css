@@ -404,3 +404,54 @@ body.laeuft.maus{cursor:default}
 .wahl-rundgang h2{margin:0;font:700 44px/1.05 "Space Grotesk",sans-serif}
 .wahl-rundgang p{margin:8px 0 0;font:400 22px/1.4 Inter,sans-serif;color:var(--text)}
 .wahl-weitere{margin:0 0 12px;font:700 20px "JetBrains Mono",monospace;letter-spacing:.28em;text-transform:uppercase;color:var(--g)}
+/* ── messe-schleife-5 · Register-Tafel, Gewinnspiel-Tafel, Videothek-Kanal ── */
+.rt-t{flex-direction:row;align-items:center;justify-content:center;gap:90px;text-align:left;padding:0 110px}
+.rt-links{display:flex;flex-direction:column;align-items:flex-start;max-width:860px}
+.rt-kick{font:700 22px "JetBrains Mono",monospace;letter-spacing:.24em;text-transform:uppercase;color:var(--g)}
+.rt-gross{margin-top:22px;font:700 64px/1 "Space Grotesk",sans-serif;letter-spacing:-.02em;color:var(--creme)}
+.rt-gross b{font-size:150px;letter-spacing:-.04em;display:block;line-height:.95}
+.rt-unter{margin-top:14px;font:400 26px/1.35 Inter,sans-serif;color:var(--text)}
+.rt-kacheln{margin-top:34px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%}
+.rt-kacheln div{padding:16px 18px;border-radius:14px;background:rgba(255,255,255,.035);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--g) 35%,transparent)}
+.rt-kacheln b{display:block;font:700 46px/1 "Space Grotesk",sans-serif;color:var(--gh)}
+.rt-kacheln b small{font-size:.55em;color:var(--matt)}
+.rt-kacheln span{display:block;margin-top:8px;font:500 19px/1.25 Inter,sans-serif;color:var(--text)}
+.rt-satz{margin-top:30px;font:400 27px/1.35 Inter,sans-serif;color:var(--creme)}
+.rt-satz b{color:var(--gh);font-weight:600}
+.rt-stand{margin-top:16px;font:600 19px "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--matt)}
+.rt-karte{flex:none;display:grid;grid-template-columns:repeat(5,138px);grid-template-rows:repeat(5,138px) auto;gap:10px;position:relative}
+.rt-land{border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;
+  background:color-mix(in srgb,var(--g) var(--a),#0d0c09);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--g) 40%,transparent)}
+.rt-code{font:700 34px/1 "Space Grotesk",sans-serif;color:var(--creme)}
+.rt-werte{margin-top:4px;font:600 18px "JetBrains Mono",monospace;color:var(--creme);opacity:.85;min-height:22px}
+.rt-balken{margin-top:auto;display:flex;gap:6px;height:38px;align-items:flex-end}
+.rt-balken i{flex:1;height:100%;border-radius:3px;background:rgba(0,0,0,.35);position:relative;overflow:hidden}
+.rt-balken b{position:absolute;left:0;right:0;bottom:0;background:var(--gh)}
+.rt-legende{grid-column:1/-1;grid-row:6;margin-top:6px;font:500 17px/1.4 Inter,sans-serif;color:var(--matt)}
+.rt-bal-leg{display:flex;gap:18px;margin-bottom:4px;font:600 15px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--text)}
+.rt-bal-leg span::before{content:"";display:inline-block;width:10px;height:14px;margin-right:6px;border-radius:2px;background:var(--gh);vertical-align:-1px}
+.gw-t{flex-direction:row;align-items:center;justify-content:center;gap:110px;text-align:left}
+.gw-text{display:flex;flex-direction:column;align-items:flex-start;max-width:900px}
+.gw-logo{font-size:86px}
+.gw-kick{margin-top:34px;font:700 24px "JetBrains Mono",monospace;letter-spacing:.22em;text-transform:uppercase;color:var(--g)}
+.gw-titel{margin-top:18px;font:700 96px/1.02 "Space Grotesk",sans-serif;letter-spacing:-.03em;color:var(--creme)}
+.gw-los{margin-top:30px;font:600 44px/1.2 "Space Grotesk",sans-serif;color:var(--creme)}
+.gw-los b{color:var(--gh)}
+.gw-klein{margin-top:14px;font:400 26px/1.4 Inter,sans-serif;color:var(--text)}
+.gw-claim{margin-top:36px;font:italic 500 52px/1.15 "Cormorant Garamond",Georgia,serif;color:var(--creme)}
+.gw-claim em{color:var(--gh)}
+.gw-qr{flex:none;display:flex;flex-direction:column;align-items:center;gap:18px;font:600 22px "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--text)}
+.gw-qr img{display:block;width:600px;height:600px;padding:36px;border-radius:24px;background:#FFFFFF;box-shadow:0 0 0 4px color-mix(in srgb,var(--g) 70%,transparent),0 30px 80px rgba(0,0,0,.6);image-rendering:pixelated}
+.gw-zeit{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,.06)}
+.gw-zeit i{display:block;height:100%;width:0;background:var(--runway)}
+.rg-tafel.an .gw-zeit i{animation:gwZeit linear both}
+@keyframes gwZeit{from{width:0}to{width:100%}}
+.dps-hinweis{position:fixed;left:50%;top:40px;transform:translateX(-50%);z-index:200;padding:14px 26px;border-radius:12px;background:rgba(12,11,8,.94);color:var(--creme);
+  box-shadow:0 0 0 2px var(--g),0 12px 40px rgba(0,0,0,.6);font:700 22px "JetBrains Mono",monospace;letter-spacing:.08em;transition:opacity .7s}
+.dps-hinweis.weg{opacity:0}
+.vt-zaehler{font:600 19px "JetBrains Mono",monospace;letter-spacing:.18em;color:var(--matt)}
+.wahl-kanaele{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:4px 0 18px}
+.wahl-kanaele .wahl-rundgang{margin:0}
+.wahl-kanaele .wahl-rundgang img{width:220px;height:124px}
+.wahl-kanaele .wahl-rundgang h2{font-size:36px}
+.wahl-kanaele .wahl-rundgang p{font-size:19px}
