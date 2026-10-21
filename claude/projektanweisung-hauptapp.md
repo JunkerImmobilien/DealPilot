@@ -41703,3 +41703,15 @@ Potenzial Demo: Bestand/MH/ZB 610.000/625.000/805.000 → 610.000/630.000/805.00
 - Handbuch: klickbare Nummern und einklappbare Feldliste beauftragt (Agent).
 - Westerfeld: Pilot-Analyse vom 13.10. rechnet mit alten Steuerzahlen — neu abrufen.
 - Arbeit mit parallelen Agenten: der Git-Index ist geteilt — immer `git commit -F <datei> -- <pfade>`; `6daacf3c` trägt deshalb die Videothek-Dateien unter der Botschaft v2554b.
+
+### v2560i–v2560l · Flughandbuch: Nummern im Bild anklickbar, Feldliste einklappbar (21.10.2026, Staging)
+
+**Was.**
+- **v2560i** (`2e67166b`): `aufnahme.js` liefert je Bild die Mitte jeder Nummernmarke (Anteil am Ausschnitt), `handbuch-bilder.mjs` nimmt sie als `P|`-Zeilen in `aufnahme.json` (`bilder[].marken`).
+- **v2560j** (`d29b76c5`): 667 Klickflächen (`button.bildmarke`, mit Feldname im aria-label) über den eingebrannten Nummern, Desktop und Handy. Ein Klick klappt die Beschreibung auf, scrollt hin, hebt 1,5 s golden hervor und setzt den Fokus; „↑ zum Bild" führt zum sichtbaren Bild zurück (Handy oder Desktop) und fokussiert die Marke. Feldzeilen sind `button` mit `aria-expanded`/`aria-controls`, Körper `hidden`; je Schritt „Alle aufklappen / Alle zuklappen"; die Suche klappt Treffer auf und bei leerer Suche wieder zu. PDF unverändert (107 Seiten, alles ausgeschrieben). Finanzierung Bild 1 je Objektart neu aufgenommen: die Lage der Marken passte nach dem Kapitaldeckungs-Kasten nicht mehr.
+- **v2560k** (`5735744a`): Klasse `bildmarke` statt `marke` — `.marke` war schon das Kopfband „Flughandbuch · Pre-Flight" und wurde zur 34-px-Scheibe.
+- **v2560l** (`ab2ad116`): `.fkoerper[hidden]{display:none}` — `display:grid` hob das `hidden`-Attribut auf, alle Beschreibungen standen offen.
+
+**Nachweis.** Echter Klick auf Nummer 6 (EFH Finanzierung): aufgeklappt, hervorgehoben, Fokus auf der Zeile; „zum Bild" zurück mit Fokus auf der Marke; Alle auf 38/38, Alle zu 0; Suche „miteigentum" 2 Treffer offen, leer 0 offen; Enter auf einer Zeile klappt auf. 390-px-iframe: 41 Handy-Marken, kein Überlauf, Klick springt. Markenlage per roter Hilfsfläche über ETW/EFH/MFH-Bildern geprüft. `--pruefen` RC 0.
+
+**Rest.** Die Markenlage ist gemessen, nicht aus dem Bild gelesen: wer ein Bild neu aufnimmt, nimmt die Marken mit (`DPHB.zeige` liefert sie, `komp` → `P|`-Zeilen). Beim Aufnehmen erst einige Sekunden nach dem Laden `DPHB.demo` rufen — sonst leert die App das Formular hinterher (gemessen an EFH Finanzierung).
