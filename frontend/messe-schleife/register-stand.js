@@ -1,33 +1,33 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-10-21T20:54:31.454Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-10-21T21:12:14.328Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_REGISTER = {
  "stand": "2026-10-21",
- "erzeugt": "2026-10-21T20:54:31.454Z",
- "register_commit": "77cb54c2",
+ "erzeugt": "2026-10-21T21:12:14.328Z",
+ "register_commit": "7c90bce1",
  "register_lokal_geaendert": false,
  "quelle": "registerDeckung() · lib/register_deckung.js, ohne Datenbank (wie Admin „Register & Ernte\")",
- "dateien": 91,
- "saetze": 9069,
+ "dateien": 100,
+ "saetze": 10679,
  "kopf": {
-  "werte_gesamt": 4332,
-  "lzs": 2381,
+  "werte_gesamt": 4500,
+  "lzs": 2447,
   "swf": 624,
   "uk_flaeche": 159,
-  "uk_wgfz": 106,
-  "uk": 265,
-  "irw_tabellen": 21,
-  "irw_ausschuesse": 9,
-  "ausschuesse": 197,
+  "uk_wgfz": 115,
+  "uk": 274,
+  "irw_tabellen": 114,
+  "irw_ausschuesse": 48,
+  "ausschuesse": 199,
   "laender_erfasst": 16,
   "laender_mit_wert": 15,
   "laender_gesamt": 16
  },
  "herkunft": {
-  "werte": 4332,
-  "mit_ausschuss": 4332,
-  "mit_jahrgang": 4332,
-  "mit_quelle": 4332,
-  "mit_seite": 4331
+  "werte": 4500,
+  "mit_ausschuss": 4500,
+  "mit_jahrgang": 4500,
+  "mit_quelle": 4500,
+  "mit_seite": 4499
  },
  "jahrgaenge": [
   2018,
@@ -124,7 +124,7 @@ window.DPS_REGISTER = {
   },
   "NW": {
    "name": "Nordrhein-Westfalen",
-   "werte": 2756,
+   "werte": 2849,
    "lzs": {
     "w": 1475,
     "anteil": 1
@@ -190,24 +190,24 @@ window.DPS_REGISTER = {
   },
   "BW": {
    "name": "Baden-Württemberg",
-   "werte": 256,
+   "werte": 331,
    "lzs": {
-    "w": 170,
-    "anteil": 0.23
+    "w": 236,
+    "anteil": 0.14
    },
    "swf": {
     "w": 49,
-    "anteil": 0.22
+    "anteil": 0.06
    },
    "uk_flaeche": {
     "w": 1,
     "anteil": 0
    },
    "uk_wgfz": {
-    "w": 36,
-    "anteil": 0.04
+    "w": 45,
+    "anteil": 0.05
    },
-   "anteil4": 0.09,
+   "anteil4": 0.08,
    "erfasst": true
   },
   "BY": {
