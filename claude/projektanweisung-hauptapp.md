@@ -41661,3 +41661,20 @@ Potenzial Demo: Bestand/MH/ZB 610.000/625.000/805.000 → 610.000/630.000/805.00
 - Die Bilder zeigen App-Beschriftungen wie „BORIS-Portal" — das ist die App selbst, nicht der Handbuchtext.
 - Aufnahme ist Desktop (2133 × 987); 51 Felder je Kapitel erscheinen erst nach einer Auswahl (Darlehen II, Bausparvertrag, Erbbaurecht …) und stehen ohne Bild unter „weitere Felder".
 - Eigener Fehler: ein `var st` auf oberster Ebene im Messcode überschrieb `st()` aus calc.js (Gesamtinvestition 0) — erste Bilderserie verworfen, neu aufgenommen; Warnung steht im Kopf von `aufnahme.js`.
+
+### v2560g–v2560h · Flughandbuch: Felder nach Auswahl mit Bild, Handy-Bilder, Gründe (21.10.2026, Staging)
+
+**Was.**
+- **v2560g** (Commit von `aufnahme.js`/`handbuch-bilder.mjs`, ausgerollt mit `40ed1aa1`): `DPHB.auswahl()` setzt die Schalter, die Zusatzfelder einblenden (Erbbaurecht, Inventar erfassen, Anschlussfinanzierung D1, Tilgungsaussetzung, Darlehen II + Anschluss, BWK „% der NKM", § 7b). `rahmen(sec, 'extra')` nummeriert hinter den Grundfeldern weiter, `rahmen(sec, 'mobil')` nimmt dieselben Nummern in einem 390-px-iframe (Massstab 2). Das Bildwerkzeug rechnet eingebettete Ausschnitte ins Fenster um.
+- **v2560h** (`94ce9f90`): 18 Bilder nach Auswahl (6 je Kapitel) und 15 Handy-Bilder (Objekt ×2, Investition, Miete, Finanzierung je Kapitel). Die Seite zeigt bei ≤ 900 px die Handy-Bilder, die Desktop-Bilder stehen dann zugeklappt darunter. Felder nach Auswahl tragen die Marke „nach Auswahl" und einen Hinweis, wie sie erscheinen. Ohne Bild bleiben 9 Felder je Kapitel, jedes mit Grund, auch im PDF.
+
+**Nachweis.**
+- `node tools/handbuch-erzeugen.mjs --pruefen` RC 0 (ETW 212+9 · EFH 210+9 · MFH 204+9).
+- Staging: 90 Bilder, keines kaputt, keine Konsolenfehler; im 390-px-iframe 15 Handy-Bilder sichtbar, kein Querüberlauf.
+- PDF: komplett 107 Seiten / 6,3 MB, ETW 35, EFH 35, MFH 37; mit pdf.js gerendert, „Nach einer Auswahl" und „Ohne Bild" stehen drin.
+- Sperre: blockiert nur `PUT /api/v1/portfolio-spiegel` (oben und im Handy-iframe), kein Objekt geladen. Messcode nur in IIFEs bzw. `window.__hb*`.
+
+**Rest.**
+- Ohne Bild: 7 Überführungsfelder (nur über „Deal-Aktion → Überführung starten" an einem gespeicherten Objekt), `ausst` (Altfeld), `bwk_kp_pct` (Unterwahl „% vom Kaufpreis" schliesst die NKM-Quoten aus).
+- Handy-Bilder gibt es für die ersten Felder je Reiter, nicht für Bewirtschaftung und Steuer.
+- Wer eine Bildschirmaufnahme in einem frischen Tab macht: erst ein Bildschirmfoto, sonst deutet `zoom` die Koordinaten als CSS-Pixel (gemessen: 874 statt 1189 px breit).
