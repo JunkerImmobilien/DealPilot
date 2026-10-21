@@ -23,7 +23,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VER = 'messe-schleife-4';
+  var VER = 'messe-schleife-4a';
   var Q = new URLSearchParams(location.search);
   var RATE = Math.max(0.5, Math.min(8, parseFloat(Q.get('rate')) || 1));
   var DATEI = location.protocol === 'file:';
@@ -286,14 +286,14 @@
   }
 
   /* Prüfhilfe: längste Strecke ohne sichtbares Bild (keine Tafel, kein
-     spielbereites, eingeblendetes Video). */
+     spielbereites, eingeblendetes Video) — gezählt ab dem ersten Bild. */
   function schwarzMesser() {
-    window.DPS_SCHWARZ = 0; var ab = null;
+    window.DPS_SCHWARZ = 0; var ab = null, gesehen = false;
     (function m() {
       var ok = tafelOffen || (aktiv && aktiv.classList.contains('an') && aktiv.readyState >= 2);
       var t = performance.now();
-      if (ok) { if (ab !== null) { window.DPS_SCHWARZ = Math.max(window.DPS_SCHWARZ, Math.round(t - ab)); ab = null; } }
-      else if (ab === null) ab = t;
+      if (ok) { gesehen = true; if (ab !== null) { window.DPS_SCHWARZ = Math.max(window.DPS_SCHWARZ, Math.round(t - ab)); ab = null; } }
+      else if (gesehen && ab === null) ab = t;
       requestAnimationFrame(m);
     })();
   }
