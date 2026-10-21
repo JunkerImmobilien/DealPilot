@@ -32,7 +32,7 @@
      quickcheck-app.html am Browser-Cache vorbeikommt. Das qcpm-Overlay
      (ab Zeile ~348), auf das sich der Nicht-anfassen-Vermerk in
      CLAUDE.md bezieht, ist unberuehrt. */
-  var IFRAME_SRC = 'quickcheck-app.html?v=qc-v2502';
+  var IFRAME_SRC = 'quickcheck-app.html?v=qc-v2546a';
   // qb-buffer: Zwischenspeicher-Pass. Score erreichbar -> Snapshot -> EIN Pass (debounced),
   //   ohne echtes Objekt (object_id NULL). 'Als Objekt speichern' legt erst dann ein Portfolio-Objekt an.
   var _bufState = { code:null, timer:0, lastSig:'', busy:false };
@@ -99,7 +99,10 @@
     /* v1956: ohne diesen versteckten Traeger geht die Lageklasse zwischen
        iframe und Hauptfenster verloren - `_handleSave` schreibt jeden
        Eingabewert in `qc_<id>`, und was es dort nicht gibt, kommt nicht an. */
-    ['qc_lageklasse', '']
+    ['qc_lageklasse', ''],
+    /* v2546a: die wirksamen Kaufnebenkosten-Saetze aus dem Quick-Check
+       (GrESt;Notar;Grundbuch;Makler;Sonstige) - abgewaehlte stehen mit 0 */
+    ['qc_knk_teile', '']
   ];
   // Felder, die der Exposé-Import (_qcApplyImported) füllt → zurück an die iframe-Seite
   var IMPORT_KEYS = ['qc_str','qc_hnr','qc_plz','qc_ort','qc_adresse','qc_wfl','qc_bj','qc_zimmer','qc_kp','qc_nkm','qc_hg'];

@@ -419,6 +419,31 @@ window.QcHeuristik = (function () {
    * Woertlich aus quick-check.js (_renderQcRecommendation, Z. 909–953).
    * `betont` zeichnet den Kaufpreis aus — im Browser `<strong>`, im Chat
    * gar nicht. */
+  /* ── v2546a · GUENSTIG GEKAUFT, ABER DIE RECHNUNG TRAEGT NICHT ──────────
+   *
+   * Marcel 21.10.2026 (Sachsenstr. 18, Herford): „da kam ein Dealscore von
+   * 26 raus, und die Bewertung sagt nicht kaufen, aber 18 % unter Markt. Das
+   * ist widersprüchlich und müsste genauer erklärt werden, warum wir das so
+   * entscheiden."
+   *
+   * Gemessen: KP 180.000, Marktwert 213.000 (+18 %), Miete 750, Hausgeld 400,
+   * Zins 4,31 + 1,5 % Tilgung, 100 % finanziert -> Cashflow −362 €/Monat,
+   * DSCR 0,76. Beide Aussagen waren richtig gerechnet, der Text darunter
+   * sagte aber „Ein Preis klar unter Markt ist ein zusätzliches Argument für
+   * den Kauf" - direkt unter „Finger weg". Fuer die beiden Absage-Stufen
+   * steht jetzt, WARUM der Preisabstand nicht reicht, mit den Treibern in
+   * Zahlen. Der Score bleibt unberuehrt. */
+  function _warumTrotzdemNicht(d, cfMon, b) {
+    var t = [];
+    if (cfMon < 0) t.push('Cashflow ' + b(_eurMon(cfMon)));
+    if (+d.dscr > 0 && +d.dscr < 1) t.push('DSCR ' + b((+d.dscr).toFixed(2).replace('.', ',')) + ' (die Miete deckt die Rate nicht)');
+    if (+d.nmr > 0) t.push('Nettomietrendite ' + b((Math.round(+d.nmr * 10) / 10).toFixed(1).replace('.', ',') + ' %'));
+    return 'Warum trotzdem nicht: der Preisabstand ist ein Wert auf dem Papier, er zahlt keine Monatsrate. ' +
+      (t.length ? 'Als Kapitalanlage trägt die Rechnung nicht — ' + t.join(', ') + '. ' : '') +
+      'Der Puffer hilft erst beim Verkauf oder als Sicherheit gegenüber der Bank; bis dahin musst du die Lücke jeden Monat selbst zahlen. ' +
+      'Mit mehr Eigenkapital, besserer Miete oder niedrigerem Zins kann das Bild kippen — dann neu rechnen.';
+  }
+
   function empfehlung(d, betont, nichtAnwendbar) {
     var b = (typeof betont === 'function') ? betont : function (s) { return s; };
     var na = nichtAnwendbar || {};
@@ -628,7 +653,9 @@ window.QcHeuristik = (function () {
         ' — ' + b('+' + _fmtEur(puffer)) + ' (+' + pp + ' %) Wertpuffer ab dem ersten Tag. ' +
         ((lage && !lage.passt)
           ? 'Als Renditeobjekt passt er nicht zu deiner ' + lage.klasse + '-Lage, als Substanzkauf kann er sich trotzdem lohnen.'
-          : 'Ein Preis klar unter Markt ist ein zusätzliches Argument für den Kauf.');
+          : (verdict === 'PASS' || verdict === 'KRITISCH')
+            ? _warumTrotzdemNicht(d, cfMon, b)
+            : 'Ein Preis klar unter Markt ist ein zusätzliches Argument für den Kauf.');
     }
 
     return { verdict: verdict, farbklasse: farbklasse, text: advice, ziel_kp: ziel, lage: lage, wert: wert };

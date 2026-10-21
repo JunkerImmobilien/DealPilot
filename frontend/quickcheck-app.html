@@ -679,6 +679,18 @@ body::before {
 .bewirt-derived strong { color: var(--gold-3); }
 .bewirt-derived .nul-pill { color: var(--red); font-weight: 600; }
 .bewirt-derived .ul-pill { color: var(--green); font-weight: 600; }
+/* qc-v2546a · Herkunft unter Hausgeld/Bewirtschaftung und die Kaufnebenkosten-Tabelle */
+.bewirt-derived .qc-herkunft, .qc-knk-box .qc-herkunft { display:block; margin-top:4px; font-size:11.5px; color:var(--ch3); line-height:1.45; }
+.qc-knk-box { margin:0 0 12px; padding:8px 12px; background:var(--gold-bg); border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 20%, transparent); border-radius:6px; font-size:12.5px; color:var(--ch2); }
+.qc-knk-box:empty { display:none; }
+.qc-knk-kopf { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--gold-3); margin-bottom:4px; }
+.qc-knk-zeile { display:grid; grid-template-columns:20px minmax(0,1fr) 64px 84px; gap:6px; align-items:center; padding:2px 0; }
+.qc-knk-zeile input { margin:0; width:14px; height:14px; cursor:pointer; }
+.qc-knk-zeile label { cursor:pointer; min-width:0; }
+.qc-knk-zeile .p, .qc-knk-zeile .e { text-align:right; font-variant-numeric:tabular-nums; }
+.qc-knk-zeile.aus label, .qc-knk-zeile.aus .p, .qc-knk-zeile.aus .e { color:var(--ch3); text-decoration:line-through; }
+.qc-knk-zeile.summe { border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent); margin-top:3px; padding-top:4px; font-weight:700; }
+.qc-knk-zeile .klein { font-size:11px; color:var(--ch3); }
 
 /* Foto-Drop */
 .photo-drop {
@@ -3404,7 +3416,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
              genommen. Gerechnet werden sie weiter (score.kpi), nur nicht gezeigt. -->
         <div class="kpi" id="kpi-cf"><div class="l">Cashflow/Mo</div><div class="v">—</div><div class="h">Ziel ≥0€</div></div>
         <div class="kpi" id="kpi-nmr"><div class="l">Nettomietr.</div><div class="v">—</div><div class="h">Ziel ≥3%</div></div>
-        <div class="kpi" id="kpi-ltv"><div class="l">LTV</div><div class="v">—</div><div class="h">Ziel &lt;90%</div></div>
+        <div class="kpi" id="kpi-ltv" title="Beleihungsauslauf = Darlehen ÷ Kaufpreis"><div class="l">LTV (auf KP)</div><div class="v">—</div><div class="h">Ziel &lt;90%</div></div>
         <div class="kpi" id="kpi-dscr"><div class="l">DSCR</div><div class="v">—</div><div class="h">Ziel ≥1,2</div></div>
         <div class="kpi" id="kpi-wp"><div class="l">Wertpuffer</div><div class="v">—</div><div class="h">Marktwert − KP</div></div>
       </div>
@@ -3621,13 +3633,13 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
         <label class="req" for="qc_hg">Hausgeld / Monat (€)</label>
         <input type="text" id="qc_hg" placeholder="221" inputmode="decimal" autocomplete="off">
         <div class="qc-hg-hint" id="qc-hg-hint" style="font:500 11.5px/1.35 'DM Sans',system-ui,sans-serif;color:#6b6660;margin:5px 2px 0;min-height:14px"></div>
-        <span class="hint">Inkl. Heizung + Rücklagen — wie auf Exposé. Faustregel: ~26% der NKM</span>
+        <span class="hint">Inkl. Heizung + Rücklagen — wie im Exposé oder Wirtschaftsplan</span>
         <span class="source">PDF</span>
       </div>
       <div class="field">
         <label class="req" for="qc_hg_split">Nicht-umlagefähig (% vom HG)</label>
         <input type="text" id="qc_hg_split" value="22" placeholder="22" inputmode="decimal" autocomplete="off">
-        <span class="hint">Üblich 12-30%, Faustregel 22%. Rest geht auf Mieter.</span>
+        <span class="hint" id="qc-hg-split-hint">Rest geht über die Nebenkosten auf den Mieter.</span>
       </div>
     </div>
     <div class="bewirt-derived" id="bewirt-derived">Tragen Sie Hausgeld und NUL-Anteil ein …</div>
@@ -3641,13 +3653,17 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
     </div>
     <div class="ltv-row">
       <span class="ltv-l">Beleihung (LTV):</span>
-      <button class="ltv-btn active" data-ltv="100" onclick="QcApp.setLtv(100, this)">100%</button>
+      <button class="ltv-btn" data-ltv="voll" onclick="QcApp.setLtv('voll', this)" title="Vollfinanzierung: Kaufpreis UND Kaufnebenkosten über das Darlehen, 0 € Eigenkapital">100% + NK</button>
+      <button class="ltv-btn active" data-ltv="100" onclick="QcApp.setLtv(100, this)" title="Darlehen = Kaufpreis, die Kaufnebenkosten zahlst du aus Eigenkapital">100%</button>
       <button class="ltv-btn" data-ltv="95" onclick="QcApp.setLtv(95, this)">95%</button>
       <button class="ltv-btn" data-ltv="90" onclick="QcApp.setLtv(90, this)">90%</button>
       <button class="ltv-btn" data-ltv="85" onclick="QcApp.setLtv(85, this)">85%</button>
       <button class="ltv-btn" data-ltv="80" onclick="QcApp.setLtv(80, this)">80%</button>
     </div>
-    <div class="qc-ltv-satz" id="qc-ltv-satz" style="font:500 11.5px/1.35 'DM Sans',system-ui,sans-serif;color:#6b6660;margin:-4px 2px 10px">Darlehen = 100 % von Kaufpreis + Nebenkosten</div><!-- qc-v2420, qc-v2450 -->
+    <div class="qc-ltv-satz" id="qc-ltv-satz" style="font:500 11.5px/1.35 'DM Sans',system-ui,sans-serif;color:#6b6660;margin:-4px 2px 10px">Darlehen = 100 % vom Kaufpreis · Kaufnebenkosten aus Eigenkapital</div><!-- qc-v2420, qc-v2450, qc-v2546a -->
+    <!-- qc-v2546a · Kaufnebenkosten einzeln, in % und €, jede Position abwählbar -->
+    <div class="qc-knk-box" id="qc-knk-box"></div>
+    <input type="hidden" id="qc_knk_teile" value="">
     <div class="row row-4">
       <div class="field">
         <label class="req" for="qc_kp">Kaufpreis (€)</label>
@@ -3822,9 +3838,38 @@ window._qcKnkPct = function () {
      Beleihungsknoepfen sagen kann, WORAUS die Quote besteht. Gemessen ohne
      PLZ: 13,77 % = 6,5 GrESt + 1,7 Notar + 0,5 Grundbuch + 3,57 Makler
      + 1,5 Sonstige - der Makler kommt aus den Einstellungen (Profil). */
-  window._qcKnkTeile = { grest: grest, notar: notar, gb: gb, makler: makler, sonst: sonst,
+  /* qc-v2546a · Marcel 21.10.2026: „dass man auswählen kann, welche
+     Kaufnebenkosten reingehen. Wenn man mal keinen Makler hat, dass man den
+     auch einfach rausnehmen kann." Abgewaehlte Positionen (window._qcKnkAus,
+     gesetzt von den Haken unter der Beleihung) zaehlen mit 0. Die Saetze
+     VOR der Abwahl bleiben in `roh`, damit der Haken weiss, was er zurueckgibt.
+     Herkunft der Grunderwerbsteuer: 'plz' (Bundesland aus der PLZ),
+     'profil' (Bundesland aus den Einstellungen, Automatik aus) oder
+     'vorgabe' (ohne PLZ 6,5 % wie die Vorbelegung im Objekt). */
+  var grestQ = 'vorgabe', blName = '';
+  try {
+    var _plz2 = ((document.getElementById('qc_plz') || {}).value || '').trim();
+    var _G3 = (P && P.DealPilotGrest) || window.DealPilotGrest;
+    if (IP && IP.get && IP.get('grest_auto') === false) {
+      var _bl3 = IP.get('bundesland');
+      if (_G3 && _G3.rates && _bl3 && isFinite(_G3.rates[_bl3])) { grestQ = 'profil'; blName = (_G3.names && _G3.names[_bl3]) || _bl3; }
+    } else if (_plz2.length === 5 && _G3 && _G3.forPlz) {
+      var _r3 = _G3.forPlz(_plz2); if (_r3 && isFinite(_r3.rate)) { grestQ = 'plz'; blName = _r3.name || _r3.bundesland || ''; }
+    }
+  } catch (e) {}
+  var roh = { grest: grest, notar: notar, gb: gb, makler: makler, sonst: sonst };
+  var A = window._qcKnkAus || {};
+  var eff = {}; Object.keys(roh).forEach(function (k) { eff[k] = A[k] ? 0 : roh[k]; });
+  window._qcKnkTeile = { grest: eff.grest, notar: eff.notar, gb: eff.gb, makler: eff.makler, sonst: eff.sonst,
+    roh: roh, aus: A, grestQuelle: grestQ, bundesland: blName,
     plz: (((document.getElementById('qc_plz') || {}).value || '').trim().length === 5) };
-  return Math.round((grest + notar + gb + makler + sonst) * 100) / 100;
+  /* Traeger fuer die Uebernahme ins Objekt (qc-bridge CARRIERS -> quick-check.js):
+     die fuenf wirksamen Saetze in fester Reihenfolge. */
+  try {
+    var _tr = document.getElementById('qc_knk_teile');
+    if (_tr) _tr.value = [eff.grest, eff.notar, eff.gb, eff.makler, eff.sonst].join(';');
+  } catch (e) {}
+  return Math.round((eff.grest + eff.notar + eff.gb + eff.makler + eff.sonst) * 100) / 100;
 };
 </script>
 <script>
@@ -3883,7 +3928,10 @@ const QcEngine = (function() {
     /* v1956: ohne diesen Eintrag liest `getInputs()` das Feld NIE - das
        Praefix `qc_` ist die ganze Kopplung zwischen Liste und Markup.
        Nicht pflichtig: ohne Lageklasse rechnet alles wie bisher. */
-    { id: 'lageklasse', required: false }
+    { id: 'lageklasse', required: false },
+    /* qc-v2546a: die wirksamen Kaufnebenkosten-Saetze (GrESt;Notar;Grundbuch;
+       Makler;Sonstige) - versteckt, damit die Abwahl ins Objekt durchgeht. */
+    { id: 'knk_teile', required: false }
   ];
   function num(v) {
     if (v == null || v === '') return null;
@@ -3942,7 +3990,7 @@ const QcEngine = (function() {
     const gesamt = kp * (1 + knkPct / 100);
     const ekValue = ek != null ? ek : gesamt * 0.20;
     const darlehen = Math.max(0, gesamt - ekValue);
-    const ltvPct = darlehen / gesamt * 100;   /* qc-v2450: wie die Beleihungsknoepfe auf Kaufpreis + Nebenkosten */
+    const ltvPct = darlehen / kp * 100;   /* qc-v2546a: wie die Beleihungsknoepfe auf den Kaufpreis */
     const ekr = ekValue > 0 ? ((nkm * 12) - nulY - (darlehen * zins / 100)) / ekValue * 100 : 0;
     const annu = darlehen * (zins + tilg) / 100;
     const annuMon = annu / 12;
@@ -4227,13 +4275,69 @@ const QcApp = (function() {
      Nebenkosten), EK = Rest. 100 % = Vollfinanzierung inkl. Nebenkosten =
      0 € EK. Die Karte rechnet den LTV auf derselben Basis (ekInklNkLtv in
      _dpPilotScore), damit Knopf und Kachel dieselbe Zahl zeigen. */
+  /* qc-v2546a · DIE QUOTE GILT WIEDER AUF DEN KAUFPREIS - qc-v2450 ZURUECKGENOMMEN
+     Marcel 21.10.2026: „100 % sind nicht 0 [Eigenkapital], weil die
+     Kaufnebenkosten ja reingehen." Die Lesart von qc-v2450 (Quote auf die
+     Gesamtinvestition, 100 % = 0 € EK) war falsch verstanden. Bankueblich ist
+     der Beleihungsauslauf das Darlehen im Verhaeltnis zum KAUFPREIS: 100 % =
+     Darlehen in Hoehe des Kaufpreises, die Kaufnebenkosten kommen aus dem
+     Eigenkapital. Gemessen KP 180.000, PLZ 32052 (NRW), Nebenkosten 13,77 %:
+       vorher  „100 %"  EK 0 €,      Darlehen 204.786 €
+       jetzt   „100 %"  EK 24.786 €, Darlehen 180.000 €
+               „90 %"   EK 42.786 €, Darlehen 162.000 €
+     Wer wirklich alles finanziert, waehlt den eigenen Knopf „100 % + NK"
+     (EK 0 €) - dann steht der LTV ueber 100 % (204.786 / 180.000 = 114 %),
+     und genau das ist die richtige Zahl. Die Karte rechnet den LTV auf
+     derselben Basis (_dpPilotScore: ekInklNkLtv false, svw 0 -> Darlehen /
+     Kaufpreis). */
   function _ekAuto(kp) {
     const knkPct = window._qcKnkPct();   /* v2254: war fest 10,5 */
-    return Math.round(kp * (1 + knkPct / 100) * (1 - _ltv / 100));
+    if (_ltv === 'voll') return 0;
+    return Math.max(0, Math.round(kp * (1 + knkPct / 100) - kp * _ltv / 100));
   }
   function _ltvKnoepfe(aktiv) {
-    document.querySelectorAll('.ltv-btn').forEach(b => b.classList.toggle('active', aktiv && Number(b.getAttribute('data-ltv')) === _ltv));
+    document.querySelectorAll('.ltv-btn').forEach(b => b.classList.toggle('active', aktiv && b.getAttribute('data-ltv') === String(_ltv)));
   }
+  /* qc-v2546a · KAUFNEBENKOSTEN EINZELN (Marcel 21.10.2026, Punkt 4)
+     „wie die Kaufnebenkosten sich zusammensetzen, und dass der aktuelle
+     Wert für das Bundesland an Grunderwerbsteuer gezogen wird ... auswählen,
+     welche Kaufnebenkosten reingehen". Fuenf Positionen mit Satz und Euro,
+     jede per Haken abwaehlbar (window._qcKnkAus). Die Saetze kommen aus
+     window._qcKnkPct() - dieselben wie im Objekt (Einstellungen), die
+     Grunderwerbsteuer aus grest-plz-lookup.js (Landessaetze Stand 2026). */
+  var KNK_POS = [
+    ['grest', 'Grunderwerbsteuer'], ['notar', 'Notar'], ['gb', 'Grundbuchamt'],
+    ['makler', 'Makler'], ['sonst', 'Sonstige (Gutachter, Anfahrt)']
+  ];
+  function _knkBox(kp) {
+    const box = document.getElementById('qc-knk-box');
+    if (!box) return;
+    const knk = window._qcKnkPct(), T = window._qcKnkTeile || {}, roh = T.roh || {}, aus = T.aus || {};
+    const eur = x => fmt0(x) + ' €';
+    let h = '<div class="qc-knk-kopf">Kaufnebenkosten · Haken raus = Position entfällt</div>';
+    KNK_POS.forEach(([k, name]) => {
+      const satz = roh[k] || 0, an = !aus[k];
+      let zusatz = '';
+      if (k === 'grest') zusatz = T.grestQuelle === 'plz' ? ' <span class="klein">· ' + (T.bundesland || '') + ' (aus der PLZ)</span>'
+        : T.grestQuelle === 'profil' ? ' <span class="klein">· ' + (T.bundesland || '') + ' (Bundesland aus deinen Einstellungen)</span>'
+        : ' <span class="klein">· ohne PLZ 6,5 %</span>';
+      h += '<div class="qc-knk-zeile' + (an ? '' : ' aus') + '"><input type="checkbox" id="qc-knk-' + k + '" data-knk="' + k + '"' + (an ? ' checked' : '') + '>'
+        + '<label for="qc-knk-' + k + '">' + name + zusatz + '</label>'
+        + '<span class="p">' + _pctDe(satz) + ' %</span><span class="e">' + (kp ? (an ? eur(kp * satz / 100) : '0 €') : '—') + '</span></div>';
+    });
+    h += '<div class="qc-knk-zeile summe"><span></span><span>Summe</span><span class="p">' + _pctDe(knk) + ' %</span><span class="e">' + (kp ? eur(kp * knk / 100) : '—') + '</span></div>';
+    h += '<span class="qc-herkunft">Sätze aus deinen Einstellungen (Investmentprofil › Kaufnebenkosten), wie sie auch ein neues Objekt bekommt. '
+      + 'Grunderwerbsteuer nach dem Landessatz 2026. Was du hier abwählst, geht so auch ins Objekt.</span>';
+    box.innerHTML = h;
+  }
+  function _knkUmschalten(ev) {
+    const cb = ev.target && ev.target.closest && ev.target.closest('input[data-knk]');
+    if (!cb) return;
+    const A = window._qcKnkAus = window._qcKnkAus || {};
+    if (cb.checked) delete A[cb.getAttribute('data-knk')]; else A[cb.getAttribute('data-knk')] = true;
+    scheduleUpdate();
+  }
+  document.addEventListener('change', _knkUmschalten);
   function _ekNachziehen() {
     const ekInp = document.getElementById('qc_ek');
     if (!ekInp) return;
@@ -4247,25 +4351,33 @@ const QcApp = (function() {
     }
     _ltvKnoepfe(vonHier);
     _ltvSatz(vonHier, kp);
+    try { _knkBox(kp); } catch (_e) {}
   }
   function _pctDe(x) { return String(Math.round(x * 100) / 100).replace('.', ','); }
   function _ltvSatz(vonHier, kp) {
     const el = document.getElementById('qc-ltv-satz');
     if (!el) return;
-    if (!kp) { el.textContent = 'Darlehen = ' + _ltv + ' % von Kaufpreis + Nebenkosten'; el.title = ''; return; }
-    const knk = window._qcKnkPct(), T = window._qcKnkTeile || {};
+    const _q = _ltv === 'voll' ? '100 % + Nebenkosten' : _ltv + ' %';
+    if (!kp) { el.textContent = 'Beleihung (LTV) = Darlehen ÷ Kaufpreis · ' + _q; el.title = ''; return; }
+    /* qc-v2546a: Quote auf den KAUFPREIS (siehe _ekAuto) */
+    const knk = window._qcKnkPct();
+    const nkEur = kp * knk / 100;
     const ek = QcEngine.num(document.getElementById('qc_ek').value) || 0;
-    const darl = Math.max(0, kp * (1 + knk / 100) - ek);
-    const q = darl / (kp * (1 + knk / 100)) * 100;   /* qc-v2450: auf die Gesamtinvestition */
-    let t = vonHier
-      ? 'Darlehen = ' + _ltv + ' % von Kaufpreis + Nebenkosten (' + _pctDe(knk) + ' %)' + (_ltv >= 100 ? ' · kein Eigenkapital' : '')
-      : 'Eigenkapital frei eingetragen · Darlehen = ' + _pctDe(Math.round(q * 10) / 10) + ' % von Kaufpreis + Nebenkosten';
-    if (!T.plz) t += ' · ohne PLZ mit 6,5 % Grunderwerbsteuer';
+    const darl = Math.max(0, kp + nkEur - ek);
+    const q = darl / kp * 100;
+    let t;
+    if (vonHier && _ltv === 'voll') {
+      t = 'Darlehen ' + fmt0(darl) + ' € = Kaufpreis + Nebenkosten · 0 € Eigenkapital · LTV ' + _pctDe(Math.round(q * 10) / 10) + ' % vom Kaufpreis';
+    } else if (vonHier) {
+      t = 'Darlehen ' + fmt0(darl) + ' € = ' + _ltv + ' % vom Kaufpreis · Eigenkapital ' + fmt0(ek) + ' € = '
+        + (_ltv < 100 ? fmt0(kp - darl) + ' € Kaufpreisanteil + ' : '') + fmt0(nkEur) + ' € Nebenkosten';
+    } else {
+      t = 'Eigenkapital frei eingetragen · Darlehen ' + fmt0(darl) + ' € = ' + _pctDe(Math.round(q * 10) / 10) + ' % vom Kaufpreis';
+    }
     el.textContent = t;
-    el.title = 'Kaufnebenkosten ' + _pctDe(knk) + ' % = Grunderwerbsteuer ' + _pctDe(T.grest || 0) + ' % + Notar ' + _pctDe(T.notar || 0)
-      + ' % + Grundbuch ' + _pctDe(T.gb || 0) + ' % + Makler ' + _pctDe(T.makler || 0) + ' % + Sonstige ' + _pctDe(T.sonst || 0)
-      + ' % (Sätze aus deinen Einstellungen, wie im Objekt).'
-      + ' Der LTV auf der Karte steht auf derselben Basis: Darlehen geteilt durch Kaufpreis + Nebenkosten.';
+    el.title = 'Beleihungsauslauf (LTV) = Darlehen geteilt durch Kaufpreis, wie bei der Bank. '
+      + 'Die Kaufnebenkosten (' + _pctDe(knk) + ' % = ' + fmt0(nkEur) + ' €) zahlst du aus Eigenkapital, außer bei „100 % + NK“. '
+      + 'Die LTV-Kachel oben steht auf derselben Basis.';
   }
   function setLtv(pct, btnEl) {
     _ltv = pct;
@@ -4429,11 +4541,23 @@ const QcApp = (function() {
     const derived = document.getElementById('bewirt-derived');
     if (k.hgY > 0) {
       const pctNkm = inputs.nkm ? Math.round(k.hgY / (QcEngine.num(inputs.nkm) * 12) * 100) : '–';
+      /* qc-v2546a · Marcel 21.10.2026, Punkt 2: „Kann man die Quelle erstmal
+         angeben und auch die Aufteilung in Euro?" - je Monat UND Jahr, dazu
+         woher der Anteil kommt. Die Vorgabe 30 % ist Marcels Abnahme der
+         Demo v2183 (bwk-profil.js, Einstellungen › Bewirtschaftung je
+         Objektart); eine amtliche Quote fuer das Hausgeld gibt es nicht. */
+      const splitIst = QcEngine.num(inputs.hg_split);
+      const NQ = window._qcNulQuelle || {};
+      const quelle = (NQ.pct != null && splitIst != null && Math.abs(splitIst - NQ.pct) < 1e-9)
+        ? (NQ.eigen ? 'dein Standard aus den Einstellungen (Bewirtschaftung je Objektart, ETW)'
+                    : 'DealPilot-Standard für Eigentumswohnungen (änderbar in Einstellungen › Bewirtschaftung je Objektart)')
+        : 'deine Angabe hier';
       derived.innerHTML =
-        '<strong>' + fmt0(k.hgY) + ' €/Jahr</strong> gesamt ' +
-        '(' + pctNkm + '% der NKM) · ' +
-        '<span class="nul-pill">nicht-umlagef.: ' + fmt0(k.nulY) + ' €/Jahr</span> · ' +
-        '<span class="ul-pill">umlagef.: ' + fmt0(k.ulY) + ' €/Jahr</span>';
+        'Hausgeld <strong>' + fmt0(k.hgY / 12) + ' €/Monat</strong> (' + fmt0(k.hgY) + ' €/Jahr, ' + pctNkm + ' % der NKM) = ' +
+        '<span class="ul-pill">' + fmt0(k.ulY / 12) + ' € umlagefähig</span> (zahlt der Mieter über die Nebenkosten) + ' +
+        '<span class="nul-pill">' + fmt0(k.nulY / 12) + ' € nicht umlagefähig</span> (trägst du: v. a. Verwaltung und Instandhaltungsrücklage; ' + fmt0(k.nulY) + ' €/Jahr)' +
+        '<span class="qc-herkunft">Anteil nicht umlagefähig ' + (splitIst != null ? String(splitIst).replace('.', ',') : '–') + ' %: ' + quelle +
+        '. Eine amtliche Quote gibt es nicht — die genaue Aufteilung steht in der Hausgeldabrechnung bzw. im Wirtschaftsplan.</span>';
     } else {
       derived.textContent = 'Tragen Sie Hausgeld und NUL-Anteil ein …';
     }
@@ -4510,6 +4634,13 @@ const QcApp = (function() {
     var z = [
       ['Kaufpreis', eur(kp), ''],
       ['+ Kaufnebenkosten (' + pct(k.knkPct != null ? k.knkPct : QCB_KNK_PCT) + ')', eur(knk), ''],
+    ].concat((function () {
+      /* qc-v2546a: die Nebenkosten einzeln, wie im Kasten unter der Beleihung */
+      var T = window._qcKnkTeile || {}, L = { grest: 'Grunderwerbsteuer', notar: 'Notar', gb: 'Grundbuchamt', makler: 'Makler', sonst: 'Sonstige' };
+      return Object.keys(L).filter(function (x) { return T[x] > 0; }).map(function (x) {
+        return ['&nbsp;&nbsp;davon ' + L[x] + ' (' + pct(T[x]) + ')', eur(kp * T[x] / 100), ''];
+      });
+    })()).concat([
       ['= Gesamtinvestition', eur(k.gesamt), 'stark'],
       ['– Eigenkapital', eur(k.ekValue), ''],
       ['= Darlehen', eur(k.darlehen) + ' @ ' + pct(zins) + ' / ' + pct(tilg) + ' Tilg.', 'stark'],
@@ -4518,8 +4649,8 @@ const QcApp = (function() {
       ['Nettomietrendite', pct(k.nmr), ''],
       ['Cashflow / Monat', eur(k.cfMon), (k.cfMon < 0 ? 'rot' : 'gruen')],
       ['DSCR', k.dscr == null ? '—' : String(k.dscr).replace('.', ','), (k.dscr != null && k.dscr < 1 ? 'rot' : '')],
-      ['LTV', pct(k.ltvPct), '']
-    ];
+      ['LTV (Darlehen ÷ Kaufpreis)', pct(k.ltvPct), '']
+    ]);
     host.innerHTML = z.map(function (r) {
       return '<div class="qcb-row' + (r[2] === 'stark' ? ' qcb-row-stark' : '') + '">' +
              '<span class="qcb-l">' + r[0] + '</span>' +
@@ -5707,7 +5838,8 @@ const QcApp = (function() {
     var kopf = w.kopf;
     if (e.wert && e.wert.pct > 0) {
       var neg = (e.verdict === 'NICHT KAUFEN' || e.verdict === 'KRITISCH' || e.verdict === 'PASS');
-      kopf += (neg ? ' · aber ' : ' · ') + e.wert.pct + ' % unter Marktwert';
+      /* v2546a: „trotz“ statt „aber“ - die Überschrift nennt die Entscheidung UND den Grund, warum der Preisabstand sie nicht kippt (Begründung im Rat: qc-heuristik _warumTrotzdemNicht) */
+      kopf += (neg ? ' · trotz ' : ' · ') + e.wert.pct + ' % unter Marktwert';
     }
     return {
       ton: w.ton, zeichen: w.zeichen, verdict: e.verdict,
@@ -6890,8 +7022,41 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
         if (est && est.grundlageText) {
           var w = (est.plausibilitaet && est.plausibilitaet.hint) ? "  \u26a0 " + est.plausibilitaet.hint
                  : (est.ungenau ? "  \u26a0 grobe Sch\u00e4tzung" : "");
-          box.textContent = est.grundlageText + w;
+          box.textContent = (est.herkunft || est.grundlageText) + w;
         } else box.textContent = "";
+      }
+      /* qc-v2546a \u00b7 WOHER DAS HAUSGELD KOMMT (Marcel 21.10.2026, Punkt 1:
+         \u201eHaben wir nicht einen Standard, woher wir das holen, also Tabellen?")
+         Es gibt KEINE amtliche Hausgeld-Tabelle - jede Eigentuemergemeinschaft
+         legt es im Wirtschaftsplan fest (Kopf von hausgeld-engine.js). Es gibt
+         zwei Standards im Haus:
+           a) hausgeld-engine.js: Richtwerte je Baujahr (2,75 / 3,25 / 4,00 /
+              5,00 EUR/m2), marktuebliche Spannen, kein amtlicher Beleg;
+           b) Einstellungen \u203a Bewirtschaftung je Objektart (bwk-profil.js),
+              ETW-Hausgeld-Startwert, Vorgabe 4,00 EUR/m2 - der Wert, den das
+              Objekt mit \u201eStandardwerte einsetzen" bekommt.
+         Bisher nahm der Quick-Check nur (a) und sagte nicht, woher. Jetzt:
+         hat der Nutzer (b) selbst geaendert, gilt SEIN Wert (seine Vorgabe
+         schlaegt die Tabelle); sonst (a). Der Satz darunter nennt die Quelle. */
+      function eigenerHgQm(){
+        try {
+          var BP = window.parent && window.parent.DealPilotBwkProfil;
+          if (!BP || !BP.lesen || !BP.STANDARD) return null;
+          var p = BP.lesen(), s = BP.STANDARD;
+          if (p && p.etw && s.etw && isFinite(p.etw.hg_qm) && p.etw.hg_qm > 0 && Math.abs(p.etw.hg_qm - s.etw.hg_qm) > 1e-9) return p.etw.hg_qm;
+        } catch(e){}
+        return null;
+      }
+      function de2(x){ return (Math.round(x*100)/100).toFixed(2).replace(".", ","); }
+      function bandText(est){
+        try {
+          var H = window.parent && window.parent.Hausgeld, rw = est.baujahrBereich;
+          if (!H || !rw) return "ohne Baujahr " + de2(H ? H.CONFIG.stdOhneBaujahr : 3.5) + " \u20ac/m\u00b2";
+          var arr = H.CONFIG.richtwerte.slice().sort(function(a,b){ return b.abJahr - a.abJahr; });
+          var i = arr.indexOf(rw), bis = i > 0 ? arr[i-1].abJahr - 1 : null;
+          var jahre = rw.abJahr > 0 ? ("Baujahr " + rw.abJahr + (bis ? "\u2013" + bis : " und j\u00fcnger")) : ("Baujahr vor " + arr[i-1].abJahr);
+          return jahre + ": " + de2(rw.min) + "\u2013" + de2(rw.max) + " \u20ac/m\u00b2";
+        } catch(e){ return ""; }
       }
       function recalc(){
         if (hgEl.dataset.userSet === "1") { renderHint(null); return; }
@@ -6902,6 +7067,16 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
         var est = (typeof IP.getHausgeldEstimate === "function")
           ? IP.getHausgeldEstimate(kp, { wohnflaeche: wfl, baujahr: bj, energieklasse: ek })
           : (typeof IP.getHausgeldMonthly === "function" ? { monatlich: IP.getHausgeldMonthly(kp), grundlageText: "" } : null);
+        /* qc-v2546a: eigener Standard aus den Einstellungen schlaegt die Baujahr-Tabelle */
+        var eig = eigenerHgQm(), wflN = num(wfl);
+        if (eig != null && wflN > 0) {
+          est = { monatlich: Math.round(wflN * eig), grundlageText: "x",
+            herkunft: "Geschätzt aus deinem Standard: " + wflN + " m² × " + de2(eig) + " €/m² = " + Math.round(wflN * eig)
+              + " €/Monat (Einstellungen › Bewirtschaftung je Objektart, ETW). Die echte Zahl aus Exposé oder Wirtschaftsplan geht vor." };
+        } else if (est && est.methode === "wohnflaeche") {
+          est.herkunft = "Geschätzt mit dem DealPilot-Richtwert nach Baujahr: " + wflN + " m² × " + de2(est.faktor) + " €/m² = "
+            + Math.round(est.monatlich) + " €/Monat (" + bandText(est) + "). Eine amtliche Hausgeld-Tabelle gibt es nicht — jede Eigentümergemeinschaft legt es selbst fest; die echte Zahl aus Exposé oder Wirtschaftsplan geht vor.";
+        }
         if (!est || est.monatlich == null || !isFinite(est.monatlich)) { renderHint(null); return; }
         hgEl.dataset.autoHg = "1"; hgEl.value = String(Math.round(est.monatlich)).replace(".", ",");
         try { hgEl.dispatchEvent(new Event("input", {bubbles:true})); } catch(e){}
@@ -6927,6 +7102,11 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
       setEmpty("qc_tilg", tilg);
       var hs = document.getElementById("qc_hg_split");
       if (hs && bwk != null) { var cur = (hs.value||"").trim(); if (!cur || cur === "22") { hs.value = String(bwk).replace(".", ","); try { hs.dispatchEvent(new Event("input",{bubbles:true})); } catch(e){} } }
+      /* qc-v2546a · Herkunft des Anteils fuer die Euro-Aufteilung (bewirt-derived) */
+      try {
+        var _std = BP && BP.STANDARD && BP.STANDARD.etw ? BP.STANDARD.etw.nul_pct : null;
+        window._qcNulQuelle = { pct: bwk, eigen: (bwk != null && _std != null && Math.abs(bwk - _std) > 1e-9) };
+      } catch(e){}
       autoHg();
     } catch(e){}
   }
@@ -7023,7 +7203,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <!-- v1945: derselbe Bewertungskern, den der Quick-Check-Tab und der
        Telegram-Bot benutzen. Bis v1944 hatte dieses Dokument ein EIGENES
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
-  <script src="js/qc-heuristik.js?v=v2485"></script>
+  <script src="js/qc-heuristik.js?v=v2546a"></script>
   <script src="js/dealscore.js?v=v2191"></script>
   <script src="js/avm-section.js?v=v2149"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->
@@ -7475,12 +7655,13 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     var gesamt=kp*(1+knk), ek=n(i.ek), darlehen=Math.max(0,gesamt-ek);
     var k = window.DealKpis.compute({ kp:kp, nk:kp*knk, nkm:nkm, ze:0,
       bwk_ul:hgY*(1-split), bwk_nul:hgY*split, d1:darlehen, d1z:(n(i.zins)||3.8), d1t:(n(i.tilg)||1.5),
-      ek:ek, svw:(avm&&avm.marktwert)||0, afa:0, grenz:0,
-      /* qc-v2450: LTV gegen Kaufpreis + Nebenkosten (deal-kpis.js, wie der Haken
-         ek_inkl_nk im Objekt) - dieselbe Basis wie die Beleihungsknoepfe. Bis
-         qc-v2420a stand er gegen den Marktwert bzw. den Kaufpreis - mit der neuen
-         Knopfrechnung haette „100 %“ auf der Karte 114 % gezeigt (KP 180.000, NK 13,77 %). */
-      ekInklNkLtv:true });
+      ek:ek, svw:0, afa:0, grenz:0,
+      /* qc-v2546a: LTV wieder gegen den KAUFPREIS (deal-kpis.js: ekInklNkLtv false
+         und svw 0 -> ltv_basis = kp) - dieselbe Basis wie die Beleihungsknoepfe
+         (Marcel 21.10.2026: „100 % sind nicht 0, weil die Kaufnebenkosten ja
+         reingehen"). svw nur fuer den LTV gelesen (deal-kpis.js Z. 124-127);
+         der Marktwert geht ueber wp_kpi unten in den Score. */
+      ekInklNkLtv:false });
     var mw = (avm&&avm.marktwert)||0;
     var K = { kp:kp, cf_m:k.cf_m, nmy:k.nmy, ltv:k.ltv, dscr:k.dscr, wp_kpi:(mw>kp?mw-kp:0), mstg:1.5 };
     var r = window.DealScore.computeFromKpis(K);
@@ -7499,7 +7680,9 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
             darlehen:Math.round(darlehen), knkPct:Math.round(knk*1000)/10,
             /* qc-v2420: Wertpuffer wie im Score (mw - kp), nur mit Marktwert;
                ltvKpPct = Darlehen/Kaufpreis - die Basis der Beleihungsknoepfe */
-            wpDiff:(mw>0)?Math.round(mw-kp):null, ltvBasis:'gesamtinvestition',
+            wpDiff:(mw>0)?Math.round(mw-kp):null, ltvBasis:'kaufpreis',
+            /* qc-v2546a: ohne diese drei blieb die Euro-Aufteilung unter dem Hausgeld leer (bewirt-derived las k.hgY) */
+            hgY:Math.round(hgY), nulY:Math.round(hgY*split), ulY:Math.round(hgY*(1-split)),
             ltvKpPct:Math.round(darlehen/kp*1000)/10 } };
   };
 })();
