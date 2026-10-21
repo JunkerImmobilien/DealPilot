@@ -41191,3 +41191,48 @@ html body #nk-aus-einstellungen { white-space: normal !important; max-width: 100
   .phase-table th, .phase-table td, .zaer-table th, .zaer-table td { white-space: normal !important; word-break: break-word !important; }
   .phase-table th:first-child, .phase-table td:first-child, .zaer-table th:first-child, .zaer-table td:first-child { width: 40% !important; }
 }
+
+/* v2575 · Bank-Export am Handy als Karten. Die Tabelle hat 25 Spalten und
+   war 1.882 px breit (Gesamtpruefung 21.10.2026). Unter 640 px wird jede
+   Zeile eine Karte; die Spaltennamen setzt showBankexportView() als
+   data-label an jede Zelle (js/storage.js). Anker #bankexport-modal, damit
+   die anderen .bank-table (Reiter Finanzierung) unberuehrt bleiben. */
+@media (max-width: 640px) {
+  #bankexport-modal .bank-table-full thead { display: none; }
+  #bankexport-modal .bank-table-full,
+  #bankexport-modal .bank-table-full tbody,
+  #bankexport-modal .bank-table-full tr,
+  #bankexport-modal .bank-table-full td { display: block; width: auto; }
+  #bankexport-modal .bank-table-full tr {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #FAF9F4;
+    margin: 0 0 12px;
+    padding: 8px 12px;
+  }
+  #bankexport-modal .bank-table-full tbody td,
+  #bankexport-modal .bank-table-full tbody tr:nth-child(even) td,
+  #bankexport-modal .bank-table-full tbody tr:hover td {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+    padding: 4px 0;
+    font-size: 12px;
+    white-space: normal;
+    text-align: right;
+  }
+  #bankexport-modal .bank-table-full tbody td:last-child { border-bottom: 0; }
+  #bankexport-modal .bank-table-full tbody td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    max-width: 55%;
+    text-align: left;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  #bankexport-modal .bank-table-full tbody td:first-child::before { content: 'Im Export'; }
+}

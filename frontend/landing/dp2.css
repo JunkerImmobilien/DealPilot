@@ -331,3 +331,13 @@ img{max-width:100%;display:block}
 .hbeleg .gr{font-style:normal;color:var(--gdh);opacity:.72;margin-right:2px;font-weight:700}
 .tb .nz{white-space:nowrap}
 .tb .nz b{color:var(--gdh);font-weight:700}
+
+/* landing-kopf320 · Bei 320 px lief der Kopf 13 px ueber (Gesamtpruefung
+   21.10.2026): Logo + Anmelden + Burger + "Kostenlos starten" passen
+   nicht. Marcels Entscheidung: unter 380 px heisst der Knopf "Starten". */
+.b-cta-kurz{display:none}
+@media(max-width:380px){
+  .b-cta{padding:10px 14px}
+  .b-cta-voll{display:none}
+  .b-cta-kurz{display:inline}
+}

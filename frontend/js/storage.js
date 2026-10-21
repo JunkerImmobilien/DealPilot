@@ -3353,6 +3353,15 @@ async function showBankexportView() {
 
     '</div>';
   document.body.appendChild(modal);
+  // v2575: Spaltenname an jede Zelle - unter 640 px wird jede Zeile eine Karte
+  // (die Tabelle ist 1.882 px breit, seitlich wischen war am Handy kaum lesbar).
+  var _bxTab = modal.querySelector('.bank-table-full');
+  if (_bxTab) {
+    var _bxKopf = Array.prototype.map.call(_bxTab.querySelectorAll('thead th'), function(th) { return th.textContent; });
+    _bxTab.querySelectorAll('tbody tr').forEach(function(tr) {
+      Array.prototype.forEach.call(tr.children, function(td, i) { if (_bxKopf[i]) td.setAttribute('data-label', _bxKopf[i]); });
+    });
+  }
   // V105: Nur die nicht-excludeten Zeilen zur Export-Funktion durchreichen
   window._bankexportData = { objects: objects, rows: rows, totals: t };
 }
