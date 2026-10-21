@@ -775,9 +775,13 @@
     }
     var U = Array.isArray(V.ursachen) ? V.ursachen : [];
     if (D && U.length) {
-      h += '<div class="dp-vgl-kopf">Warum die Werte auseinanderliegen · Anteile nicht bezifferbar</div><ul class="dp-vgl-urs">'
+      /* eingeklappt, die Zählung im Kopf sichtbar - die Tafel v2577 bleibt kompakt */
+      var zahl = {}; U.forEach(function (x) { zahl[x.status] = (zahl[x.status] || 0) + 1; });
+      h += '<details class="dp-pot-mehr" data-dp-vgl-urs="1"><summary>Warum die Werte auseinanderliegen: '
+        + ['nachgewiesen', 'plausibel', 'nicht_pruefbar'].filter(function (k) { return zahl[k]; }).map(function (k) { return zahl[k] + ' ' + ST[k][0]; }).join(' · ')
+        + ' <span class="dp-pot-u" style="display:inline">(Anteile nicht bezifferbar)</span></summary><ul class="dp-vgl-urs">'
         + U.map(function (x) { var s = ST[x.status] || [x.status, '']; return '<li><span class="dp-vgl-st ' + s[1] + '">' + esc(s[0]) + '</span><span>' + esc(x.text) + '</span></li>'; }).join('')
-        + '</ul>';
+        + '</ul></details>';
     }
     return h + '</div>';
   }
