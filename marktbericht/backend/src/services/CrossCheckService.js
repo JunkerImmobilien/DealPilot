@@ -90,6 +90,20 @@ const LIEGENSCHAFTSZINS = 0.03;   // EFH-typisch 2,5–3,5 % -> 3,0 %
  * die Zahl fuer eine Aussage haelt, die sie nicht ist. */
 
 const _num = (v) => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
+const BAND_OBEN = 1.15;   /* v2541 · obere Kante des Marktueblichkeitsbandes (bis v2540: 1,3) */
+
+/* v2488 · DIE BANDREGEL ALS EINE FUNKTION (Marcel 20.10.2026: jede Stufe baut auf
+   derselben Basis wie der Bestand). Bis v2487 stand sie nur inline in compute();
+   PotenzialService braucht sie je WOHNUNG. Band nach v2382: untere Kante =
+   min(amtlich, Angebot) x 0,7, obere = max(...) x 1,3. Ist im Band -> Ist,
+   darueber/darunter -> die Kante, ohne Ist -> die Vergleichsmiete. */
+export function mieteNachBand(istQm, band, refQm) {
+  const lage = (istQm != null && band)
+    ? (istQm > band.oben_qm ? 'ueber' : (istQm < band.unten_qm ? 'unter' : 'im_band')) : null;
+  const fuehrt = istQm != null && (band == null || lage === 'im_band');
+  const kante = lage === 'ueber' ? band.oben_qm : (lage === 'unter' ? band.unten_qm : null);
+  return { qm: fuehrt ? istQm : (kante != null ? kante : refQm), lage, fuehrt, kante };
+}
 
 export const CrossCheckService = {
   // ref: Objektdaten; landValue: BORIS ({available, value_sqm}); rent: GeoMap-Mietstats;
@@ -898,8 +912,35 @@ export const CrossCheckService = {
        oder Untervermietung ist ein besonderes objektspezifisches Merkmal
        (§ 8 Abs. 3) und wird benannt, nicht stillschweigend kapitalisiert. */
     const _wflIst = _num(ref.living_area);
-    const _istQm = (!ref.vacancy && _num(ref.monthly_net_rent) > 0 && _wflIst > 0 && !(ref.gewerbe && _num(ref.gewerbe.wfl_gewerbe)))
-      ? Math.round(_num(ref.monthly_net_rent) / _wflIst * 100) / 100 : null;
+    /* ══ v2520 · LEERSTAND: IST-MIETE NUR AUF DIE VERMIETETE FLAECHE ═══════
+       Marcel 20.10.2026: der Rohertrag steht mit der marktueblich erzielbaren
+       Miete fuer ALLE Einheiten (§ 31 Abs. 2 ImmoWertV). Die Ist-Miete gehoert
+       deshalb nur auf die Flaeche, fuer die sie gezahlt wird, und wird dort gegen
+       das Band geprueft; leere Einheiten gehen mit der Vergleichsmiete ein.
+       Bis v2519 teilte der Kern die Ist-Miete durch die GESAMTE Wohnflaeche,
+       die leere Wohnung eingeschlossen - gemessen am Demo-MFH (378 m², WE 5 mit
+       68 m² leer): 5,99 statt 7,31 €/m², damit unter der unteren Bandkante und
+       der Rohertrag rund 5.000 €/Jahr zu niedrig.
+       Quelle: die MFH-Einheiten (DealPilotObjectMapper.leerstandAus, nur mit
+       mindestens einer leeren UND einer vermieteten Wohnung, ohne Gewerbe).
+       Ohne diese Angabe - oder ohne Vergleichsmiete fuer die leere Flaeche -
+       rechnet alles wie bisher. Die Einheitenflaechen werden auf die
+       Wohnflaeche des Objekts umgelegt, damit die Summe dieselbe bleibt. */
+    const _lsR = (ref.leerstand && typeof ref.leerstand === 'object' && !(ref.gewerbe && _num(ref.gewerbe.wfl_gewerbe))
+      && _num(ref.leerstand.wfl_leer) && _num(ref.leerstand.wfl_vermietet) && _num(ref.leerstand.ist_monat_vermietet)
+      && _wflIst > 0 && _refQm > 0) ? ref.leerstand : null;
+    const _ls = _lsR ? (function () {
+      const f = _wflIst / (_lsR.wfl_leer + _lsR.wfl_vermietet);
+      const wflV = Math.round(_lsR.wfl_vermietet * f * 100) / 100;
+      return { wfl_vermietet: wflV, wfl_leer: Math.round((_wflIst - wflV) * 100) / 100,
+               n_leer: _lsR.n_leer || null, n_vermietet: _lsR.n_vermietet || null,
+               ist_monat_vermietet: _lsR.ist_monat_vermietet, flaeche_umgelegt: Math.abs(f - 1) > 0.005,
+               leer_qm: Math.round(_refQm * 100) / 100 };
+    })() : null;
+    const _istQm = _ls
+      ? Math.round(_ls.ist_monat_vermietet / _ls.wfl_vermietet * 100) / 100
+      : ((!ref.vacancy && _num(ref.monthly_net_rent) > 0 && _wflIst > 0 && !(ref.gewerbe && _num(ref.gewerbe.wfl_gewerbe)))
+        ? Math.round(_num(ref.monthly_net_rent) / _wflIst * 100) / 100 : null);
     /* ══ v2382 · DAS BAND DER MARKTUEBLICHKEIT (Marcel 19.10.2026) ═════════
        Die Mietpreisuebersicht bildet weitgehend BESTANDSmieten ab; marktueblich
        im Sinne von § 27 Abs. 1 / § 31 Abs. 2 ImmoWertV ist die bei
@@ -917,29 +958,91 @@ export const CrossCheckService = {
     const _bandQ = [_amtQmBand, _angQmBand].filter((x) => x != null);
     const _band = _bandQ.length ? {
       unten_qm: Math.round(Math.min(..._bandQ) * 0.7 * 100) / 100,
-      oben_qm: Math.round(Math.max(..._bandQ) * 1.3 * 100) / 100,
+      /* v2541 · obere Kante × 1,15 statt × 1,3 (Marcel 20.10.2026; Pruefbericht: 12,35 €/m² lag in Bielefeld 2,7σ ueber dem Ø der MFH-Kauffaelle 7,70 ± 1,70) */
+      oben_qm: Math.round(Math.max(..._bandQ) * BAND_OBEN * 100) / 100, faktor_oben: BAND_OBEN,
       amtlich_qm: _amtQmBand, angebot_qm: _angQmBand != null ? Math.round(_angQmBand * 100) / 100 : null,
-      regel: 'untere Kante = min(amtliche Vergleichsmiete, Angebotsmiete) × 0,7; obere Kante = max(…) × 1,3',
+      regel: 'untere Kante = min(amtliche Vergleichsmiete, Angebotsmiete) × 0,7; obere Kante = max(…) × 1,15',
     } : null;
-    const _istLage = (_istQm != null && _band)
-      ? (_istQm > _band.oben_qm ? 'ueber' : (_istQm < _band.unten_qm ? 'unter' : 'im_band')) : null;
+    const _mnb = mieteNachBand(_istQm, _band, _refQm);   /* v2488 · eine Regel, auch je Wohnung */
+    const _istLage = _mnb.lage;
     const _istAbw = (_istQm != null && _refQm > 0) ? (_istQm / _refQm - 1) : null;
-    const _istFuehrt = _istQm != null && (_band == null || _istLage === 'im_band');
-    const _kante = _istLage === 'ueber' ? _band.oben_qm : (_istLage === 'unter' ? _band.unten_qm : null);
-    const mieteQm = _istFuehrt ? _istQm : (_kante != null ? _kante : _refQm);
-    const mieteQuelle = _istFuehrt ? 'Ist-Miete (marktüblich, § 31 Abs. 2 ImmoWertV)'
+    const _istFuehrt = _mnb.fuehrt;
+    const _kante = _mnb.kante;
+    /* ══ v2540 · DIE BANDPRUEFUNG JE WOHNUNG (Marcel 20.10.2026: „ja") ══════
+       ImmoWertA 31.2 a/b: die tatsaechlichen Ertraege gelten, wenn sie in der
+       Bandbreite des Marktueblichen liegen - geprueft je Mietverhaeltnis, denn
+       Mieterhoehungsmoeglichkeiten gibt es nur je Vertrag; eine Saldierung ueber
+       das ganze Haus deckt der Text nicht. Bis v2539 pruefte der Kern die Ist-
+       Miete des HAUSES: Demo-MFH WE 1 mit 6,18 €/m² unter der Kante 6,64, das
+       Haus mit 7,31 im Band - die Wohnung blieb bei 6,18 (und PotenzialService
+       verteilte die Differenz auf die leere Wohnung). Jetzt je Wohnung
+       mieteNachBand auf ihre EIGENE Flaeche; Flaechen fuer den Rohertrag auf die
+       Wohnflaeche des Objekts umgelegt (wie v2520); leere Wohnungen mit der
+       Vergleichsmiete. Ohne Einheitenliste oder ohne Band: wie bisher. */
+    const _ehR = (Array.isArray(ref.einheiten_miete) && ref.einheiten_miete.length >= 2 && !(ref.gewerbe && _num(ref.gewerbe.wfl_gewerbe))
+      && _band && _refQm > 0 && _wflIst > 0) ? ref.einheiten_miete : null;
+    const _je = _ehR ? (function () {
+      const r2 = (x) => Math.round(x * 100) / 100;
+      const sum = _ehR.reduce((a, e) => a + (Number(e.wfl) || 0), 0);
+      if (!(sum > 0)) return null;
+      const f = _wflIst / sum;
+      const zeilen = _ehR.map((e) => {
+        const fl = r2(Number(e.wfl) * f);
+        if (e.leer || !(Number(e.ist_monat) > 0)) {
+          return { nr: e.nr, wfl: fl, ist_qm: null, qm: r2(_refQm), herkunft: 'leer_marktueblich', jahr: Math.round(_refQm * fl * 12) };
+        }
+        const iq = r2(Number(e.ist_monat) / Number(e.wfl));
+        const r = mieteNachBand(iq, _band, _refQm);
+        /* v2541 · im Band die VERTRAGSMIETE selbst (× Flaechenfaktor), nicht die auf Cent
+           gerundeten €/m² hochgerechnet - Westerfeld: 799 € / 97,5 m² = 8,1949 -> 8,19 ergab
+           9.582 statt 9.588 €/Jahr je Wohnung (Pruefbericht 20.10.2026). Bandkante: qm × Flaeche. */
+        return { nr: e.nr, wfl: fl, ist_qm: iq, qm: r2(r.qm),
+                 jahr: r.fuehrt ? Math.round(Number(e.ist_monat) * 12 * f) : Math.round(r.qm * fl * 12),
+                 herkunft: r.fuehrt ? 'ist_im_band' : (r.lage === 'ueber' ? 'obere_kante' : 'untere_kante') };
+      });
+      const v = zeilen.filter((z) => z.herkunft !== 'leer_marktueblich'), l = zeilen.filter((z) => z.herkunft === 'leer_marktueblich');
+      const wflV = r2(v.reduce((a, z) => a + z.wfl, 0)), jV = v.reduce((a, z) => a + z.jahr, 0);
+      return { zeilen, flaeche_umgelegt: Math.abs(f - 1) > 0.005, wfl_vermietet: wflV, jahr_vermietet: jV,
+               qm_vermietet: wflV > 0 ? r2(jV / 12 / wflV) : null,
+               wfl_leer: r2(l.reduce((a, z) => a + z.wfl, 0)), jahr_leer: l.reduce((a, z) => a + z.jahr, 0),
+               n_vermietet: v.length, n_leer: l.length,
+               angepasst: v.filter((z) => z.herkunft !== 'ist_im_band') };
+    })() : null;
+    const mieteQm = _je && _je.qm_vermietet ? _je.qm_vermietet : _mnb.qm;
+    const mieteQuelle = _je
+      ? ('Ist-Miete je Wohnung (marktüblich, § 31 Abs. 2 ImmoWertV), außerhalb des Bandes die Bandkante'
+        + (_je.n_leer ? '; leere Wohnungen mit der Vergleichsmiete' : ''))
+      : ((_istFuehrt ? 'Ist-Miete (marktüblich, § 31 Abs. 2 ImmoWertV)'
       : (_kante != null ? (_istLage === 'ueber' ? 'obere' : 'untere') + ' Kante des Marktüblichkeitsbandes'
-        : (_amtFuehrt ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten'));
+        : (_amtFuehrt ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten')))
+      /* v2520 · bei Leerstand gilt die Zahl nur fuer die vermietete Flaeche */
+      + (_ls ? ' auf der vermieteten Fläche; leere Fläche mit der Vergleichsmiete' : ''));
     if (_band) {
       _band.ist_qm = _istQm; _band.lage = _istLage;
+      /* v2540 · geprueft je Wohnung: welche Wohnung an welche Kante (Bericht/PDF nennen sie) */
+      if (_je) _band.je_wohnung = { n_vermietet: _je.n_vermietet,
+        angepasst: _je.angepasst.map((z) => ({ nr: z.nr, ist_qm: z.ist_qm, qm: z.qm, herkunft: z.herkunft })) };
       out.miete_band = _band;
     }
     const _dq = (x) => String(Math.round(x * 100) / 100).replace('.', ',');
     const _bandText = _band ? ('Band der Marktüblichkeit ' + _dq(_band.unten_qm) + ' bis ' + _dq(_band.oben_qm) + ' €/m² ('
       + [_band.amtlich_qm != null ? 'amtliche Vergleichsmiete ' + _dq(_band.amtlich_qm) + ' €/m²' : null,
         _band.angebot_qm != null ? 'Angebotsmiete ' + _dq(_band.angebot_qm) + ' €/m²' : null].filter(Boolean).join(', ')
-      + '; untere Kante × 0,7, obere × 1,3)') : '';
-    if (_istQm != null && _band) {
+      + '; untere Kante × 0,7, obere × 1,15)') : '';
+    const _dqJ = (x) => String(Math.round(x * 100) / 100).replace('.', ',');
+    if (_je) {
+      /* v2540 · je Wohnung: welche Wohnung an welche Kante, in einem Satz */
+      out.notes.push('Die Ist-Mieten sind je Wohnung gegen das Band der Marktüblichkeit ('
+        + _dqJ(_band.unten_qm) + ' bis ' + _dqJ(_band.oben_qm) + ' €/m²) geprüft (ImmoWertA 31.2: je Mietverhältnis). '
+        + (_je.angepasst.length
+          ? ((_je.angepasst.length > 2 && _je.angepasst.every((z) => z.qm === _je.angepasst[0].qm && z.ist_qm === _je.angepasst[0].ist_qm))
+              ? _je.angepasst.length + ' Wohnungen mit ' + _dqJ(_je.angepasst[0].ist_qm) + ' €/m² ' + (_je.angepasst[0].herkunft === 'obere_kante' ? 'über' : 'unter')
+                + ' dem Band, angesetzt ' + _dqJ(_je.angepasst[0].qm) + ' €/m²'
+              : _je.angepasst.map((z) => z.nr + ' ' + _dqJ(z.ist_qm) + ' €/m² ' + (z.herkunft === 'obere_kante' ? 'über' : 'unter')
+              + ' dem Band, angesetzt ' + _dqJ(z.qm) + ' €/m²').join('; '))
+            + '. Der Mehr- oder Minderertrag ist nach § 8 Abs. 3 ImmoWertV nur für die gesicherte Restlaufzeit des Mietvertrags zu würdigen; ohne bekannte Laufzeit ist er nicht angesetzt.'
+          : 'Alle vermieteten Wohnungen liegen im Band; der Ertragswert rechnet mit ihren Ist-Mieten.'));
+    } else if (_istQm != null && _band) {
       out.notes.push(_istFuehrt
         ? ('Die Ist-Miete (' + _dq(_istQm) + ' €/m²) liegt im ' + _bandText + ' und gilt als marktüblich '
           + '(§ 31 Abs. 2 ImmoWertV); der Ertragswert rechnet mit ihr.')
@@ -948,6 +1051,20 @@ export const CrossCheckService = {
           + ' Kante (' + _dq(_kante) + ' €/m²). Der ' + (_istLage === 'ueber' ? 'Mehr' : 'Minder') + 'ertrag ist nach '
           + '§ 8 Abs. 3 ImmoWertV als besonderes objektspezifisches Grundstücksmerkmal zu würdigen — nur für die '
           + 'gesicherte Restlaufzeit des Mietvertrags; ohne bekannte Laufzeit ist er nicht angesetzt.'));
+    }
+    if (_ls) {
+      out.notes.push('Leerstand: Die Ist-Miete (' + _dq(_ls.ist_monat_vermietet) + ' €/Monat) bezieht sich auf die vermietete Fläche von '
+        + _dq(_ls.wfl_vermietet) + ' m²' + (_ls.n_vermietet ? ' (' + _ls.n_vermietet + ' Wohnung' + (_ls.n_vermietet === 1 ? '' : 'en') + ')' : '')
+        + ' und ist dort gegen das Band geprüft. Die leere Fläche von ' + _dq(_ls.wfl_leer) + ' m²'
+        + (_ls.n_leer ? ' (' + _ls.n_leer + ' Wohnung' + (_ls.n_leer === 1 ? '' : 'en') + ')' : '')
+        + ' geht mit der marktüblichen Miete von ' + _dq(_ls.leer_qm) + ' €/m² in den Rohertrag ein (§ 31 Abs. 2 ImmoWertV, '
+        + 'ImmoWertA 31.4: bei vorübergehendem Leerstand die marktüblich erzielbaren Erträge).'
+        /* v2540 · recherchiert 20.10.2026: Mietausfall bis zur Wiedervermietung und
+           Herrichtungskosten stehen nicht in ImmoWertV/ImmoWertA, sie sind
+           Fachpraxis unter § 8 Abs. 3 - ohne Angabe keine Zahl, aber benannt */
+        + ' Der Mietausfall bis zur Wiedervermietung und Kosten der Herrichtung sind als besonderes objektspezifisches '
+        + 'Grundstücksmerkmal (§ 8 Abs. 3 ImmoWertV) zu würdigen; ohne Angabe zur Dauer sind sie nicht angesetzt.'
+        + (_ls.flaeche_umgelegt ? ' Die Flächen der Einheiten sind auf die Wohnfläche des Objekts umgelegt.' : ''));
     }
     /* v1207-WMIE-2 · DER WIDERSPRUCH GEHOERT BENANNT, NICHT VERSTECKT.
      *
@@ -1047,9 +1164,37 @@ export const CrossCheckService = {
         + 'Im MFH-Konfigurator je Gewerbeeinheit die marktübliche Miete (€/m²) eintragen.');
     }
 
+    /* v2556 · Rechnet der Ertragswert nicht, sagt die Notiz WAS fehlt - bis hier
+       hiess es nur „eine Pflichtangabe fehlt" (Bismarckstr., 21.10.2026). */
+    if (!_gewObjekt && !_gewSperre) {
+      const _fehlt = [];
+      if (!wfl) _fehlt.push('Wohnfläche');
+      if (!(wflWohnen > 0)) _fehlt.push('Wohnfläche Wohnen');
+      if (!mieteQm) _fehlt.push('Miete je m² (weder Ist-Miete noch Vergleichs- oder Angebotsmiete)');
+      if (rnd == null) _fehlt.push('Restnutzungsdauer (Baujahr bzw. Modernisierung)');
+      if (_fehlt.length) out.notes.push('Ertragswert nicht gerechnet: es fehlt ' + _fehlt.join(', ') + '.');
+    }
+
     if (!_gewObjekt && wfl && mieteQm && rnd != null && !_gewSperre && wflWohnen > 0) {
       /* v1059-WMIET-6 · v2210: nur der Wohnteil */
-      const rohertrag = Math.round(mieteQm * wflWohnen * 12);
+      /* v2520 · bei Leerstand: vermietete Flaeche x gewaehlte Miete (Band) +
+         leere Flaeche x Vergleichsmiete. Ohne Leerstandsangabe wie bisher. */
+      /* v2540 · je Wohnung: dieselbe Form, die Zeilen der Wohnungen dabei */
+      const _aufteilung = _je ? {
+        wfl_vermietet: _je.wfl_vermietet, qm_vermietet: _je.qm_vermietet, jahr_vermietet: _je.jahr_vermietet,
+        wfl_leer: _je.wfl_leer, qm_leer: Math.round(_refQm * 100) / 100, jahr_leer: _je.jahr_leer,
+        n_vermietet: _je.n_vermietet, n_leer: _je.n_leer, herkunft_vermietet: 'je_wohnung',
+        einheiten: _je.zeilen, flaeche_umgelegt: _je.flaeche_umgelegt,
+      } : _ls ? {
+        wfl_vermietet: _ls.wfl_vermietet, qm_vermietet: mieteQm,
+        jahr_vermietet: Math.round(mieteQm * _ls.wfl_vermietet * 12),
+        wfl_leer: _ls.wfl_leer, qm_leer: _ls.leer_qm,
+        jahr_leer: Math.round(_ls.leer_qm * _ls.wfl_leer * 12),
+        n_vermietet: _ls.n_vermietet, n_leer: _ls.n_leer,
+        herkunft_vermietet: _istFuehrt ? 'ist_im_band' : (_istLage === 'ueber' ? 'obere_kante' : 'untere_kante'),
+      } : null;
+      const rohertrag = _aufteilung ? (_aufteilung.jahr_vermietet + _aufteilung.jahr_leer)
+        : Math.round(mieteQm * wflWohnen * 12);
       const lzsPct = _num(p.lzs_pct) != null ? Number(p.lzs_pct) : LIEGENSCHAFTSZINS * 100;
       /* ── v1198 · „unvollstaendig" ist eine ENTSCHEIDUNG, kein Fehlen ──────
          Hier stand:
@@ -1109,6 +1254,7 @@ export const CrossCheckService = {
         gewerbe_flaechen: _gew ? _gew.flaechen : null,
         gewerbe_ohne_nutzung_qm: _gew ? _num(_gew.ohne_nutzung_qm) : null,
         miete_markt_qm: mieteQm, miete_quelle: mieteQuelle,   /* v1059-WMIET-7 */
+        miete_aufteilung: _aufteilung,   /* v2520 · vermietet/leer im Rechenweg */
         /* v1048-WSPL-1 · Vorher nur ref.garages — die Aussenstellplaetze
          * fielen unter den Tisch. Das PDF meldete "1 Stellpl." bei einem
          * Objekt mit einer Garage UND zwei Aussenplaetzen. */
@@ -1124,7 +1270,9 @@ export const CrossCheckService = {
          * ist (`if (!R)`). Mit vorgegebener Dauer blieb es bei der
          * Schaetzung, obwohl die Punkte durchgereicht wurden — der Wert
          * kam an und wurde trotzdem nicht benutzt. */
-        rnd_jahre: (_num(ref.mod_punkte) != null ? null : rnd),
+        /* v2541 · ohne Punkte die RND nach Anlage 2 mit 0 Punkten (rndEinheitlich) statt der
+           linearen Schaetzung `rnd` - gemessen: Herkunft sagte 18 J. (Anlage 2), gerechnet wurde 16 */
+        rnd_jahre: (_num(ref.mod_punkte) != null ? null : (function () { try { const r = _rndEinheitlich(GND_JAHRE); return Number(r) > 0 ? Number(r) : rnd; } catch (e) { return rnd; } })()),
         /* v1057-WSON-7 */
         sonstige_jahr: _num(ref.sonstige_jahr),
         zusatz_jahr: _num(ref.zusatz_ertrag_jahr),   /* v2382 · Stellplatz/Garage aus `ze`, IM Rohertrag */
@@ -1269,7 +1417,11 @@ export const CrossCheckService = {
       try {
         Object.defineProperty(out, '_ertragswertEingabe', { enumerable: false, configurable: true, writable: true,
           value: { ein: Object.assign({}, ein), bodenwert: bwErgebnis, wohnflaeche_wohnen: wflWohnen,
-                   miete_qm: mieteQm, miete_quelle: mieteQuelle || null, gnd_quelle: _gndEwQuelle } });
+                   miete_qm: mieteQm, miete_quelle: mieteQuelle || null, gnd_quelle: _gndEwQuelle,
+                   /* v2488 · Band und Vergleichsmiete fuer die Bestandsbasis je Wohnung */
+                   miete_band: _band || null, markt_qm: _refQm > 0 ? _refQm : null,
+                   /* v2520 · der Bestand trennt vermietete und leere Flaeche */
+                   miete_aufteilung: _aufteilung } });
       } catch (e) { /* nur Zusatz */ }
 
       if (kern.vollstaendig && kern.wert != null && _ertragUnterdruecken) {
@@ -1340,6 +1492,7 @@ export const CrossCheckService = {
           miete_modellkonform: mieteQuelle === 'Mietpreisübersicht des Gutachterausschusses' || _istFuehrt,   /* v2367 */
           miete_ist_qm: _istQm, miete_vergleich_qm: _refQm != null ? Math.round(_refQm * 100) / 100 : null,
           miete_band: _band || null,   /* v2382 · beide Vergleichswerte und das Band */
+          miete_aufteilung: _aufteilung,   /* v2520 · vermietete/leere Flaeche */
           /* v1207-WMIE-2 · die angesetzte Miete war nirgends als Zahl sichtbar,
            * nur als Quellenname. Ohne sie kann das Dokument den Vergleich mit
            * dem amtlichen Wert nicht ausschreiben, ohne ihn neu herzuleiten —

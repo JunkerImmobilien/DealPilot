@@ -61,6 +61,11 @@
       icon: 'i-layers',
       desc: 'Was du in welchem Reiter eingibst und was daraus wird',
       sections: [
+        /* v2560 · Flughandbuch: die Seite handbuch.html, oben im Thema als Knopf (_handbuchBannerHtml) */
+        {
+          h: 'Handbuch: Objekt anlegen (ETW · EFH · MFH)',
+          body: 'Das <strong>Flughandbuch</strong> führt je Objektart — Eigentumswohnung, Einfamilienhaus, Mehrfamilienhaus — Reiter für Reiter durch alle Felder: was du einträgst, woher der Wert kommt und was er bewirkt. Mit Bildern aus der App und als PDF zum Ausdrucken. Öffnen über den Knopf <strong>Handbuch öffnen</strong> oben in diesem Thema.'
+        },
         {
           h: 'Objekt — Grunddaten, Lage und Eingabetiefe',
           body: 'Hier beginnt jedes Objekt: <strong>PLZ</strong>, <strong>Ort</strong>, <strong>Straße</strong>, <strong>Hausnummer</strong>, <strong>Objektart</strong>, <strong>Wohnfläche (m²)</strong> und <strong>Baujahr</strong>. Dazu kommen Zimmer, Zustand, Standardstufe (NHK 2010), Energieklasse, Vermietungsstand und die Wertanker (<strong>Bankbewertung</strong>, <strong>Verkehrswert</strong>).\n\n<strong>Eingabetiefe</strong> — sie bestimmt, welche Felder Pflicht sind:\n• <strong>Einfach · Stufe 1</strong> — Adresse, Objektart, Wohnfläche, Baujahr: Marktpreisindikation.\n• <strong>Mittel · Stufe 2</strong> — dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe: erweiterte Indikation.\n• <strong>Ausgiebig · Stufe 3</strong> — dazu Grundstück, Bodenrichtwert, bei Häusern BGF und NHK-Typ: Sach- und Ertragswert nach ImmoWertV.\n\nFehlende Pflichtfelder sind rot umrandet; „x fehlt“ zeigt sie dir. In der Box <strong>Marktbericht abrufen</strong> holst du den Bericht der gewählten Stufe — Stufe 2 gibt es ab Investor, Stufe 3 ab Pro.\n\nTipp: Liegt der Verkehrswert über dem Kaufpreis, zeigt DealPilot oben den <strong>Sofortigen Wertpuffer / Equity</strong>.'
@@ -187,7 +192,7 @@
         },
         {
           h: 'DealScore (0–100) — die Gesamtbewertung',
-          body: 'Der DealScore fasst dein Investment in einer Zahl von 0 bis 100 zusammen — der schnelle Blick. Er besteht aus fünf Faktoren:\n\n• <strong>Cashflow</strong> — was monatlich bleibt (30 %)\n• <strong>Rendite</strong> — netto, nach Bewirtschaftung (25 %)\n• <strong>Beleihungsauslauf</strong> — wie viel Fremdkapital (15 %)\n• <strong>Risiko</strong> — Deckung des Kapitaldienstes (15 %)\n• <strong>Potenzial</strong> — Wertpuffer und Mietsteigerung (15 %)\n\nBei einem Barkauf entfallen Beleihungsauslauf und Risiko — sie werden nicht schlecht bewertet, sondern aus der Rechnung genommen.\n\nDaneben gibt es den <strong>Investor Deal Score</strong> mit fünf Kategorien (Rendite 35 %, Finanzierung 25 %, Risiko 20 %, Lage 10 %, Upside 10 %), jede mit eigenen Unterkennzahlen. Fehlt eine Unterkennzahl, fällt sie aus der Gewichtung, statt mit einem Mittelwert gefüllt zu werden; fehlt eine ganze Kategorie, zählt sie neutral mit 60 Punkten. Dass beide Scores abweichen, ist gewollt.\n\n<strong>Die Stufen — überall dieselben:</strong>\n• <strong>ab 85 — Sehr gut</strong>\n• <strong>ab 70 — Gut</strong>\n• <strong>ab 50 — Solide</strong>\n• <strong>ab 35 — Schwach</strong>\n• <strong>unter 35 — Kritisch</strong>\n\nEinstellen lässt sich viel: sechs Vorlagen (Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus, Sicherheit), eigene Gewichte mit Summe 100, die Ziel-Bruttomietrendite je Lageklasse und persönliche Mindest-Schwellen — unter Einstellungen.'
+          body: 'Der DealScore fasst dein Investment in einer Zahl von 0 bis 100 zusammen — der schnelle Blick. Er besteht aus fünf Faktoren:\n\n• <strong>Cashflow</strong> — was monatlich bleibt (30 %)\n• <strong>Rendite</strong> — netto, nach Bewirtschaftung (25 %)\n• <strong>Beleihungsauslauf</strong> — wie viel Fremdkapital (15 %)\n• <strong>Risiko</strong> — Deckung des Kapitaldienstes (15 %)\n• <strong>Potenzial</strong> — Wertpuffer und Mietsteigerung (15 %)\n\nBei einem Barkauf entfallen Beleihungsauslauf und Risiko — sie werden nicht schlecht bewertet, sondern aus der Rechnung genommen.\n\nDaneben gibt es den <strong>Investor Deal Score</strong> mit fünf Kategorien (Rendite 35 %, Finanzierung 25 %, Risiko 20 %, Lage 10 %, Upside 10 %), jede mit eigenen Unterkennzahlen. Fehlt eine Unterkennzahl, fällt sie aus der Gewichtung, statt mit einem Mittelwert gefüllt zu werden; fehlt eine ganze Kategorie, zählt sie neutral mit 60 Punkten. Dass beide Scores abweichen, ist gewollt.\n\n<strong>Die Stufen — überall dieselben:</strong>\n• <strong>ab 85 — Sehr gut</strong>\n• <strong>ab 70 — Gut</strong>\n• <strong>ab 50 — Solide</strong>\n• <strong>ab 35 — Schwach</strong>\n• <strong>unter 35 — Kritisch</strong>\n\nEinstellen lässt sich viel: sechs Vorlagen (Ausgewogen, Vorsichtig, Renditeorientiert — dein Anlegerprofil, das auch die Standardwerte setzt — und zur Feinjustierung Lage-Fokus, Cashflow-Fokus, Sicherheit), eigene Gewichte mit Summe 100, die Ziel-Bruttomietrendite je Lageklasse und persönliche Mindest-Schwellen — unter Einstellungen.'
         }
       ]
     },
@@ -534,7 +539,7 @@
         },
         {
           h: 'Deal Score: Gewichtung und Bewertungsprofile',
-          body: '<strong>DealPilot Score (Quick-Check)</strong> — fünf Regler: Cashflow, Rendite (Nettomietrendite), Beleihung (LTV), Risiko (DSCR) und Potenzial (Wertpuffer und Mietsteigerung). Jeder geht von 0 bis 60 %, zusammen müssen es 100 % sein. „↺ Standard wiederherstellen“ setzt 30 / 25 / 15 / 15 / 15.\n\n<strong>Investor Deal Score</strong> (Investor/Pro, 24 KPIs) — oben wählst du ein <strong>Bewertungsprofil</strong>: Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus oder Sicherheit. Darunter passt du Hauptgewichtungen, Untergewichtungen und Grenzwerte an. Grenzwerte trägst du im Format Wert:Punkte ein, z. B. 4:20, 5:50, 7:80, 9:100. Sobald du von Hand änderst, springt das Profil auf <strong>Benutzerdefiniert</strong>.\n\nBeide Scores hängen zusammen: Speicherst du eigene Regler, gelten sie sofort — bis du wieder ein Bewertungsprofil wählst. Dann rechnet auch der DealPilot Score mit dessen Gewichtung.'
+          body: '<strong>DealPilot Score (Quick-Check)</strong> — fünf Regler: Cashflow, Rendite (Nettomietrendite), Beleihung (LTV), Risiko (DSCR) und Potenzial (Wertpuffer und Mietsteigerung). Jeder geht von 0 bis 60 %, zusammen müssen es 100 % sein. „↺ Standard wiederherstellen“ setzt 30 / 25 / 15 / 15 / 15.\n\n<strong>Investor Deal Score</strong> (Investor/Pro, 24 KPIs) — oben wählst du ein <strong>Bewertungsprofil</strong>: Ausgewogen, Vorsichtig oder Renditeorientiert (dein Anlegerprofil, setzt auch die Standardwerte) — zur Feinjustierung Lage-Fokus, Cashflow-Fokus oder Sicherheit. Darunter passt du Hauptgewichtungen, Untergewichtungen und Grenzwerte an. Grenzwerte trägst du im Format Wert:Punkte ein, z. B. 4:20, 5:50, 7:80, 9:100. Sobald du von Hand änderst, springt das Profil auf <strong>Benutzerdefiniert</strong>.\n\nBeide Scores hängen zusammen: Speicherst du eigene Regler, gelten sie sofort — bis du wieder ein Bewertungsprofil wählst. Dann rechnet auch der DealPilot Score mit dessen Gewichtung.'
         },
         {
           h: 'Standardwerte: deine Annahmen für neue Objekte',
@@ -598,7 +603,7 @@
         },
         {
           h: 'Wie ändere ich die Score-Gewichtung?',
-          body: '<strong>So geht\'s:</strong>\n1. Öffne <strong>Einstellungen → Deal Score</strong>.\n2. Im Abschnitt „DealPilot Score (Quick-Check)“ stellst du fünf Regler: Cashflow, Rendite (Nettomietrendite), Beleihung (LTV), Risiko (DSCR), Potenzial (Wertpuffer und Mietsteigerung).\n3. Die „Summe der Gewichtungen“ muss 100 % ergeben — sie wird grün. Sonst wird nicht gespeichert.\n4. „Speichern“ klicken.\n\n„↺ Standard wiederherstellen“ setzt 30 / 25 / 15 / 15 / 15 zurück.\n\n<strong>Ab Investor</strong> gibt es darunter den „Investor Deal Score“ mit einem „Bewertungsprofil“: Ausgewogen, Konservativ, Optimistisch, Lage-Fokus, Cashflow-Fokus oder Sicherheit. Passt du die Gewichte dort von Hand an, wechselt das Profil auf „Benutzerdefiniert“.'
+          body: '<strong>So geht\'s:</strong>\n1. Öffne <strong>Einstellungen → Deal Score</strong>.\n2. Im Abschnitt „DealPilot Score (Quick-Check)“ stellst du fünf Regler: Cashflow, Rendite (Nettomietrendite), Beleihung (LTV), Risiko (DSCR), Potenzial (Wertpuffer und Mietsteigerung).\n3. Die „Summe der Gewichtungen“ muss 100 % ergeben — sie wird grün. Sonst wird nicht gespeichert.\n4. „Speichern“ klicken.\n\n„↺ Standard wiederherstellen“ setzt 30 / 25 / 15 / 15 / 15 zurück.\n\n<strong>Ab Investor</strong> gibt es darunter den „Investor Deal Score“ mit einem „Bewertungsprofil“: Ausgewogen, Vorsichtig oder Renditeorientiert (dein Anlegerprofil, setzt auch die Standardwerte) — zur Feinjustierung Lage-Fokus, Cashflow-Fokus oder Sicherheit. Passt du die Gewichte dort von Hand an, wechselt das Profil auf „Benutzerdefiniert“.'
         },
         {
           h: 'Warum sehe ich keinen Investor Deal Score?',
@@ -1044,6 +1049,13 @@
       + '<div class="kn"><button type="button" onclick="window.DealPilotAtlas && DealPilotAtlas.oeffne()">✈ Atlas öffnen</button>'
       + '<button type="button" class="z" onclick="hideHelp(); window.DealPilotPilot && DealPilotPilot.rufen()">Pilot rufen · F1</button></div></div>';
   }
+  function _handbuchBannerHtml() {
+    return '<div class="hb-banner" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#050505;color:#f3ead0;border-radius:14px;padding:16px 18px;margin:0 0 16px">'
+      + '<div style="flex:1;min-width:200px"><div style="font:700 10.5px JetBrains Mono,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--wl-e8cc7a, #E8CC7A)">Flughandbuch</div>'
+      + '<div style="font:600 16px Space Grotesk,sans-serif;color:#fdfcfa;margin-top:4px">Handbuch: Objekt anlegen (ETW · EFH · MFH)</div>'
+      + '<div style="font-size:12.5px;color:#b9ad8f;margin-top:2px">Jedes Feld mit Bild, Beispiel, Herkunft und Wirkung — auch als PDF.</div></div>'
+      + '<button type="button" id="help-handbuch-btn" onclick="window.open(&quot;handbuch.html&quot;, &quot;_blank&quot;, &quot;noopener&quot;)" style="border:0;border-radius:10px;padding:10px 14px;font:600 13px Space Grotesk,sans-serif;cursor:pointer;color:#1a1407;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))">Handbuch öffnen</button></div>';
+  }
   function _renderTopic(topic) {
     var c = document.getElementById('help-content');
     if (!c) return;
@@ -1084,6 +1096,8 @@
     }
     /* v789-kpi-viz: Visuals oben im Kennzahlen-Topic */
     if (topic.id === 'kennzahlen') { html += _kpiVizHtml(); }
+    /* v2560 · Flughandbuch oben im Thema „Die Reiter im Objekt“ */
+    if (topic.id === 'reiter') { html += _handbuchBannerHtml(); }
     topic.sections.forEach(function(s) {
       html += '<div class="help-section">' +
         '<h3>' + _escHtml(s.h) + '</h3>' +

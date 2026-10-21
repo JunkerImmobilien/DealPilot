@@ -46,6 +46,27 @@
     return Math.abs(s - m.pct) < 1e-9 ? 'aktueller Marktdurchschnitt' : 'dein Wert aus den Einstellungen';
   }
 
+  /* v2490 · der EIGENE Satz aus den Einstellungen, sonst null - EINE Stelle fuer
+     beide Abrufe (Reiter Objekt: dealpilot-mb.js, Quick-Check-iframe:
+     dealpilot-mb-qc.js). Bis v2489 schickte nur der Reiter Objekt ihn mit;
+     der Quick-Check rechnete trotz eigenem Wert mit dem oertlichen Satz oder
+     dem Marktdurchschnitt. */
+  function eigen() {
+    var P = profil(), v = null;
+    try { v = P && P.get ? P.get('angebot_abschlag_pct') : null; } catch (e) {}
+    var n = (v == null || v === '') ? NaN : Number(String(v).replace(',', '.'));
+    return (isFinite(n) && n >= 0 && n < 50) ? n : null;
+  }
+  /* v2490 · Herkunft eines Kartensatzes in Kundensprache (card.abschlag.quelle
+     kommt aus mapCard: 'dein Wert' | 'oertliche Kauffaelle' | 'Marktdurchschnitt').
+     Nach aussen keine Datenquelle - nur, WOHER der Satz stammt. */
+  function herkunftText(a) {
+    var q = String((a && a.quelle) || '');
+    if (/dein/i.test(q)) return 'dein Wert aus den Einstellungen';
+    if (/rtlich/i.test(q)) return 'örtlich gemessen an den Kauffällen des Gutachterausschusses';
+    return 'aktueller Marktdurchschnitt';
+  }
+
   function anwenden(card) {
     if (!card || !card.mw || card.abschlag) return card;
     var s = satz(), f = 1 - s / 100;
@@ -63,8 +84,12 @@
     var st = null; try { var el = document.getElementById('_mb_state'); st = el && el.value ? JSON.parse(el.value) : null; } catch (e) {}
     var c = st && st.card, a = c && c.abschlag;
     var alt = karte.querySelector('.dp-abschlag');
-    if (!a) { if (alt) alt.remove(); return; }
-    var txt = ' · inkl. ' + String(a.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise';
+    if (!a || !(Number(a.pct) > 0)) { if (alt) alt.remove(); return; }
+    /* v2490 · mit Herkunft - Marcel sah 15,9 % im Reiter Objekt (Bielefeld, oertlich
+       gemessen) und 5,8 % im Quick-Check (Marktdurchschnitt) und konnte den
+       Unterschied nirgends ablesen. */
+    var txt = ' · inkl. ' + String(a.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise ('
+      + (/rtlich/i.test(String(a.quelle || '')) ? 'örtlich gemessen' : herkunftText(a)) + ')';
     if (alt && alt.textContent === txt) return;
     /* v2237d · Marcel: „Formatierung passt nicht". Der Hinweis hängt jetzt an
        der vorhandenen Fußzeile der Karte (.legal, „Marktpreisindikation — kein
@@ -81,5 +106,5 @@
       .observe(document.documentElement, { childList: true, subtree: true });
   }
 
-  global.DealPilotAbschlag = { satz: satz, markt: markt, quelle: quelle, anwenden: anwenden };
+  global.DealPilotAbschlag = { satz: satz, markt: markt, quelle: quelle, anwenden: anwenden, eigen: eigen, herkunftText: herkunftText };
 })(window);

@@ -1506,3 +1506,13 @@
   .rnd-wiz-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; }
   .rnd-wiz-grid > .rnd-wiz-col-2, .rnd-wiz-grid > .rnd-wiz-section { grid-column: 1 / -1; }
 }
+
+/* v2571 · RND-Wizard auf 320-420 px: zwei Knoepfe mit min-width 130 px,
+   Zaehler, 14 px Abstand und 28 px Rand ergaben 336 px im 270-px-Fuss.
+   Gemessen bei 320 px: „Weiter" stand bei 231-361 px, das Modal klippt bei
+   296 - der Assistent liess sich nicht weiterschalten. */
+@media (max-width: 420px) {
+  .rnd-wiz-footer { padding: 12px 14px !important; gap: 8px !important; }
+  .rnd-wiz-footer .rnd-wiz-btn { min-width: 0 !important; flex: 1 1 0 !important; padding: 10px 10px !important; }
+  .rnd-wiz-counter { flex: 0 0 auto !important; }
+}

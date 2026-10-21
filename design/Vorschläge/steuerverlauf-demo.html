@@ -1,0 +1,166 @@
+<title>Steuerverlauf Wendepunkt</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@600;700&display=swap">
+<style>
+/* Layout: Karte wie im Tab Steuer – Kopfzahlen, ein Diagramm über die Haltedauer mit Wendepunkt, darunter die Jahre als Tabelle zum Aufklappen */
+:root {
+  --bg: #F6F3EC; --card: #FFFFFF; --ink: #2A2727; --muted: #6B645A; --faint: #8A8272; --line: #E7E1D4; --grid: #EFEAE0; --soft: #FBF6E9;
+  --verlust: #3FA56C; --gewinn: #C9A84C; --gewinn-d: #9C7F2E; --cf: #2A2727; --marke: #C9A84C; --neg: #B8625C;
+  --f-display: "Space Grotesk", Inter, system-ui, sans-serif; --f-body: Inter, system-ui, sans-serif; --f-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0C0C0D; --card: #151515; --ink: #F3EAD0; --muted: #B5AC98; --faint: #8F8777; --line: #2C2A26; --grid: #22201D; --soft: #1C1A16;
+  --verlust: #4FB57C; --gewinn: #C9A84C; --gewinn-d: #E8CC7A; --cf: #F3EAD0; --marke: #E8CC7A; --neg: #E07A70; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0C0C0D; --card: #151515; --ink: #F3EAD0; --muted: #B5AC98; --faint: #8F8777; --line: #2C2A26; --grid: #22201D; --soft: #1C1A16;
+  --verlust: #4FB57C; --gewinn: #C9A84C; --gewinn-d: #E8CC7A; --cf: #F3EAD0; --marke: #E8CC7A; --neg: #E07A70; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font: 400 14px/1.55 var(--f-body); }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 28px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 18px; }
+.eyebrow { font: 700 10.5px var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--gewinn-d); margin-bottom: 8px; }
+h1 { font: 700 28px/1.15 var(--f-display); margin: 0 0 6px; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); max-width: 70ch; }
+.wahl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.wahl span { font-size: 12px; color: var(--muted); }
+.wahl button { font: 600 12.5px var(--f-body); color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.wahl button[aria-pressed="true"] { border-color: var(--marke); box-shadow: inset 0 0 0 1px var(--marke); }
+.wahl button:focus-visible { outline: 2px solid var(--marke); outline-offset: 2px; }
+.karte { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; display: grid; gap: 14px; min-width: 0; }
+.kopf { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.kopf h2 { margin: 0; font: 700 16px var(--f-display); }
+.kopf .obj { color: var(--muted); font-size: 12.5px; }
+.zahlen { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .zahlen { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.z { border-top: 3px solid var(--c, var(--line)); padding-top: 7px; display: grid; gap: 2px; min-width: 0; }
+.z span { font: 500 10px var(--f-body); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.z b { font: 700 20px var(--f-display); font-variant-numeric: tabular-nums; }
+.z em { font-style: normal; font-size: 11.5px; color: var(--faint); }
+.satz { margin: 0; padding: 10px 14px; background: var(--soft); border-left: 3px solid var(--marke); font-size: 13.5px; max-width: 80ch; }
+.leg { display: flex; flex-wrap: wrap; gap: 14px; font: 500 11px var(--f-mono); color: var(--muted); }
+.leg i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.leg i.lin { height: 2px; border-radius: 0; vertical-align: 3px; }
+.chart { position: relative; overflow-x: auto; }
+svg { display: block; width: 100%; height: auto; min-width: 560px; }
+svg text { font-family: var(--f-body); fill: var(--muted); }
+.ax { font: 500 10px var(--f-mono); fill: var(--faint); }
+.gl { stroke: var(--grid); }
+.null { stroke: var(--ink); stroke-width: 1.2; }
+.b-v { fill: var(--verlust); } .b-g { fill: var(--gewinn); }
+.cfl { fill: none; stroke: var(--cf); stroke-width: 2; }
+.cfp { fill: var(--card); stroke: var(--cf); stroke-width: 1.5; }
+.wp { stroke: var(--marke); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.wp-t { font: 700 11px var(--f-body); fill: var(--ink); }
+.ev { stroke: var(--faint); stroke-width: 1; stroke-dasharray: 2 3; }
+.ev-t { font: 500 10px var(--f-body); fill: var(--faint); }
+.hit { fill: transparent; cursor: default; }
+.tip { position: absolute; pointer-events: none; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 12px; box-shadow: 0 6px 18px rgba(0,0,0,.12); min-width: 210px; display: none; font-variant-numeric: tabular-nums; }
+.tip b { display: block; font: 700 13px var(--f-display); margin-bottom: 4px; }
+.tip div { display: flex; justify-content: space-between; gap: 14px; }
+.tip .pos { color: var(--verlust); } .tip .neg { color: var(--neg); }
+details summary { cursor: pointer; font-size: 12.5px; color: var(--muted); }
+table { width: 100%; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; margin-top: 8px; min-width: 560px; }
+th, td { padding: 5px 8px; border-bottom: 1px solid var(--grid); text-align: right; }
+th:first-child, td:first-child { text-align: left; }
+th { font: 600 10px var(--f-mono); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+tr.wende td { background: var(--soft); font-weight: 700; }
+.tabwrap { overflow-x: auto; }
+.fuss { font-size: 11.5px; color: var(--faint); margin: 0; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Vorschlag · Tab Steuer und Pilot-Analyse „Steuer"</div>
+    <h1>Steuerverlauf mit Wendepunkt</h1>
+    <p>Wann läuft das Objekt steuerlich ins Positive, und ab wann zahlst du Steuern statt Erstattungen zu bekommen? Echte Zahlen aus zwei Demo-Objekten auf Staging (Steuerrechnung des Objekts, Jahr für Jahr). Mit der Maus über ein Jahr fahren zeigt die Einzelwerte.</p>
+  </header>
+  <div class="wahl" role="group" aria-label="Objekt">
+    <span>Objekt:</span>
+    <button type="button" data-o="detmold" aria-pressed="true">Detmold · Bismarckstr. 27 (kippt 2027)</button>
+    <button type="button" data-o="westerfeld" aria-pressed="false">Bielefeld · Westerfeldstr. 140 (von Anfang an positiv)</button>
+  </div>
+  <section class="karte" aria-labelledby="t">
+    <div class="kopf"><h2 id="t">Steuerverlauf · Ergebnis aus Vermietung und Verpachtung</h2><span class="obj" id="obj"></span></div>
+    <div class="zahlen" id="zahlen"></div>
+    <p class="satz" id="satz"></p>
+    <div class="leg"><span><i style="background:var(--verlust)"></i>Verlust · Steuererstattung</span><span><i style="background:var(--gewinn)"></i>Gewinn · Steuer fällig</span><span><i class="lin" style="background:var(--cf)"></i>Cashflow nach Steuern</span><span><i class="lin" style="background:var(--marke)"></i>Wendepunkt</span></div>
+    <div class="chart" id="chart"><div class="tip" id="tip"></div></div>
+    <details><summary>Jahre als Tabelle</summary><div class="tabwrap" id="tab"></div></details>
+    <p class="fuss">Ergebnis aus V+V = Einnahmen minus Werbungskosten (Zinsen, AfA, Bewirtschaftung, Werbungskosten im Detail). Steuerwirkung mit dem Grenzsteuersatz des Objekts. Keine Steuerberatung.</p>
+  </section>
+</div>
+
+<script>
+/* [Jahr, Einnahmen, Werbungskosten, Ergebnis V+V, Erstattung(+)/Nachzahlung(-), CF vor Steuern, CF nach Steuern] — gemessen 20.10.2026, Staging */
+const OBJ = {
+  detmold: { name: 'DEMO-DT4 · Bismarckstr. 27, Detmold · MFH · Kaufpreis 1.150.000 € · Kauf 07/2023 · Grenzsteuersatz 42 %',
+    ereignisse: [[2027, 'Vollvermietung'], [2033, 'Zinsbindung endet']],
+    r: [[2023,23424,31611,-8187,3270,-7918,-4648],[2024,46864,65832,-18968,7220,-15977,-8757],[2025,46882,65862,-18980,7225,-16121,-8896],[2026,46899,65497,-18598,7092,-16265,-9173],[2027,73137,62568,10569,-4439,10451,6012],[2028,73155,62304,10851,-4557,10303,5746],[2029,73173,62025,11148,-4682,10154,5472],[2030,73192,61730,11461,-4813,10003,5190],[2031,73210,61418,11792,-4952,9851,4899],[2032,73229,61089,12140,-5099,9697,4598],[2033,73248,69034,4213,-1769,6927,5158],[2034,73267,68815,4451,-1869,6770,4901],[2035,73286,68579,4708,-1977,6612,4635],[2036,73306,68323,4983,-2092,6452,4360],[2037,73325,68047,5278,-2217,6290,4073],[2038,73345,67750,5595,-2349,6127,3778],[2039,73365,67431,5934,-2492,5962,3470],[2040,73385,67089,6297,-2644,5795,3151],[2041,73406,66722,6684,-2807,5627,2820],[2042,73426,66329,7097,-2981,5457,2476]] },
+  westerfeld: { name: 'DEMO-LE1 · Westerfeldstr. 140, Bielefeld · MFH · Kaufpreis 545.000 € · Kauf 2025',
+    ereignisse: [[2035, 'Zinsbindung endet']],
+    r: [[2025,41147,36484,4663,-1952,null,null],[2026,41739,36139,5600,-2346,null,null],[2027,42341,33717,8624,-3622,null,null],[2028,43967,33608,10359,-4350,null,null],[2029,44601,33493,11109,-4665,null,null],[2030,45245,33369,11876,-4987,null,null],[2031,45899,33238,12660,-5317,null,null],[2032,46562,33099,13463,-5654,null,null],[2033,47235,32951,14284,-5999,null,null],[2034,47918,32795,15123,-6352,null,null],[2035,48611,36785,11825,-4966,null,null],[2036,49314,36681,12633,-5305,null,null],[2037,50028,36568,13460,-5653,null,null],[2038,50753,36445,14308,-6009,null,null],[2039,51488,36311,15176,-6374,null,null],[2040,52234,36167,16067,-6748,null,null],[2041,52991,30402,22590,-9487,null,null],[2042,53760,30233,23527,-9881,null,null],[2043,54540,30052,24488,-10284,null,null],[2044,55332,29858,25474,-10699,null,null]] },
+};
+const eur = (v) => (v < 0 ? '− ' : '') + Math.round(Math.abs(v)).toLocaleString('de-DE') + ' €';
+const sgn = (v) => (v > 0 ? '+ ' : '') + eur(v);
+function nice(span) { const r = span / 5, p = Math.pow(10, Math.floor(Math.log10(r))), f = r / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; }
+function zeichne(k) {
+  const O = OBJ[k], R = O.r;
+  document.querySelectorAll('.wahl button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.o === k)));
+  document.getElementById('obj').textContent = O.name;
+  const wende = R.findIndex((x, i) => x[3] > 0 && (i === 0 || R[i - 1][3] <= 0));
+  const vorWende = wende > 0 ? R.slice(0, wende) : [];
+  const erst = vorWende.reduce((a, x) => a + Math.max(0, x[4]), 0);
+  const steuerDanach = R.slice(Math.max(0, wende)).reduce((a, x) => a + Math.min(0, x[4]), 0);
+  const jahrW = wende >= 0 ? R[wende][0] : null;
+  const zahlen = [
+    ['Steuerlich positiv ab', jahrW ? String(jahrW) : 'nie', wende === 0 ? 'vom ersten Jahr an' : (wende > 0 ? 'nach ' + wende + ' Verlustjahren' : 'im Betrachtungszeitraum'), 'var(--marke)'],
+    ['Erstattungen bis dahin', wende > 0 ? sgn(erst) : '0 €', wende > 0 ? R[0][0] + '–' + R[wende - 1][0] : 'keine Verlustjahre', 'var(--verlust)'],
+    ['Steuern ab dem Wendepunkt', eur(steuerDanach), (jahrW || R[0][0]) + '–' + R[R.length - 1][0] + ', ' + (R.length - Math.max(0, wende)) + ' Jahre', 'var(--gewinn)'],
+    ['Ergebnis V+V im letzten Jahr', sgn(R[R.length - 1][3]), String(R[R.length - 1][0]), 'var(--line)'],
+  ];
+  document.getElementById('zahlen').innerHTML = zahlen.map(([t, w, u, c]) => `<div class="z" style="--c:${c}"><span>${t}</span><b>${w}</b><em>${u}</em></div>`).join('');
+  document.getElementById('satz').innerHTML = wende > 0
+    ? `Bis ${R[wende - 1][0]} senkt das Objekt deine Steuer (Erstattungen ${sgn(erst)}). <b>Ab ${jahrW} wird das Ergebnis positiv</b> – ab hier zahlst du auf dieses Objekt Steuern. Das ist der Zeitpunkt, an dem ein weiteres Investment mit Anfangsverlusten (Zinsen, AfA, Sanierung) die Steuerlast wieder ausgleichen kann.`
+    : (wende === 0 ? `Dieses Objekt ist <b>vom ersten Jahr an steuerlich positiv</b> – es bringt keine Erstattung, die Steuer steigt mit der Miete (${R[0][0]}: ${eur(-R[0][4])}, ${R[R.length - 1][0]}: ${eur(-R[R.length - 1][4])} pro Jahr). Ein Objekt mit Anfangsverlusten daneben würde die Last senken.`
+      : 'Das Objekt bleibt im Betrachtungszeitraum steuerlich negativ.');
+  /* Diagramm */
+  const W = 900, H = 330, L = 64, Rr = 16, T = 44, U = 40;
+  const werte = R.flatMap((x) => [x[3], x[6] != null ? x[6] : 0]);
+  let lo = Math.min(0, ...werte), hi = Math.max(0, ...werte);
+  const st = nice(hi - lo); lo = Math.floor(lo / st) * st; hi = Math.ceil(hi / st) * st;
+  const y = (v) => T + (H - T - U) * (1 - (v - lo) / (hi - lo));
+  const n = R.length, gap = (W - L - Rr) / n, bw = Math.min(26, gap * 0.62);
+  const x = (i) => L + i * gap + gap / 2;
+  let s = '';
+  for (let v = lo; v <= hi + 1; v += st) s += `<line class="gl" x1="${L}" x2="${W - Rr}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${L - 8}" y="${y(v) + 3.5}" text-anchor="end">${(v / 1000).toLocaleString('de-DE')} T€</text>`;
+  s += `<line class="null" x1="${L}" x2="${W - Rr}" y1="${y(0)}" y2="${y(0)}"/>`;
+  O.ereignisse.forEach(([j, t]) => { const i = R.findIndex((r) => r[0] === j); if (i < 0) return; const xx = L + i * gap; s += `<line class="ev" x1="${xx}" x2="${xx}" y1="${T - 8}" y2="${H - U}"/><text class="ev-t" x="${xx + 4}" y="${T - 10}">${t}</text>`; });
+  if (wende > 0) { const xx = L + wende * gap; s += `<line class="wp" x1="${xx}" x2="${xx}" y1="${T - 26}" y2="${H - U}"/><text class="wp-t" x="${xx + 4}" y="${T - 28}">Wendepunkt ${jahrW}: ab hier Steuern</text>`; }
+  R.forEach((r, i) => {
+    const v = r[3], y0 = y(Math.max(0, v)), h = Math.max(1.5, Math.abs(y(v) - y(0)));
+    s += `<rect class="${v < 0 ? 'b-v' : 'b-g'}" x="${x(i) - bw / 2}" y="${v < 0 ? y(0) : y0}" width="${bw}" height="${h}" rx="3"/>`;
+    if (i % (n > 14 ? 2 : 1) === 0 || i === n - 1) s += `<text class="ax" x="${x(i)}" y="${H - U + 16}" text-anchor="middle">${r[0]}</text>`;
+  });
+  const cf = R.map((r, i) => (r[6] != null ? [x(i), y(r[6])] : null)).filter(Boolean);
+  if (cf.length > 1) { s += `<polyline class="cfl" points="${cf.map((p) => p.join(',')).join(' ')}"/>` + cf.map((p) => `<circle class="cfp" cx="${p[0]}" cy="${p[1]}" r="3"/>`).join(''); }
+  R.forEach((r, i) => { s += `<rect class="hit" data-i="${i}" x="${L + i * gap}" y="${T - 30}" width="${gap}" height="${H - U - T + 30}"/>`; });
+  const host = document.getElementById('chart');
+  host.querySelectorAll('svg').forEach((e) => e.remove());
+  host.insertAdjacentHTML('afterbegin', `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Steuerverlauf ${O.name}">${s}</svg>`);
+  const tip = document.getElementById('tip');
+  host.querySelectorAll('.hit').forEach((h) => {
+    h.addEventListener('mousemove', (ev) => {
+      const r = R[+h.dataset.i]; const box = host.getBoundingClientRect();
+      tip.innerHTML = `<b>${r[0]}</b><div><span>Einnahmen</span><span>${eur(r[1])}</span></div><div><span>Werbungskosten</span><span>${eur(-r[2])}</span></div>`
+        + `<div><span>Ergebnis V+V</span><span>${sgn(r[3])}</span></div><div><span>${r[4] >= 0 ? 'Erstattung' : 'Steuer'}</span><span class="${r[4] >= 0 ? 'pos' : 'neg'}">${sgn(r[4])}</span></div>`
+        + (r[6] != null ? `<div><span>Cashflow nach Steuern</span><span>${sgn(r[6])}</span></div>` : '');
+      tip.style.display = 'block';
+      const lx = ev.clientX - box.left + host.scrollLeft + 14; tip.style.left = Math.min(lx, host.scrollWidth - 230) + 'px'; tip.style.top = (ev.clientY - box.top + 10) + 'px';
+    });
+    h.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+  });
+  document.getElementById('tab').innerHTML = '<table><thead><tr><th>Jahr</th><th>Einnahmen</th><th>Werbungskosten</th><th>Ergebnis V+V</th><th>Erstattung / Steuer</th><th>Cashflow n. St.</th></tr></thead><tbody>'
+    + R.map((r, i) => `<tr class="${i === wende && wende > 0 ? 'wende' : ''}"><td>${r[0]}</td><td>${eur(r[1])}</td><td>${eur(-r[2])}</td><td>${sgn(r[3])}</td><td>${sgn(r[4])}</td><td>${r[6] != null ? sgn(r[6]) : '–'}</td></tr>`).join('') + '</tbody></table>';
+}
+document.querySelectorAll('.wahl button').forEach((b) => b.addEventListener('click', () => zeichne(b.dataset.o)));
+zeichne('detmold');
+</script>

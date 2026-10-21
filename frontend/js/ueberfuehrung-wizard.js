@@ -116,7 +116,11 @@
         /* dunkler Header-Balken (Mail-Look) */
         '<div style="background:#0a0a0a;padding:15px 22px;display:flex;align-items:center;justify-content:space-between">' +
           '<div style="font-family:\'Space Grotesk\',sans-serif;font-size:19px;font-weight:700;color:#fff">Deal<span style="color:#E8CC7A">Pilot</span></div>' +
+          '<div style="display:flex;align-items:center;gap:12px">' +
           '<div style="font:700 10px/1 \'JetBrains Mono\',monospace;letter-spacing:4px;color:#C9A84C;text-transform:uppercase">DealPilot</div>' +
+          /* v2572: das Fenster hatte nur Zurueck/Weiter - ohne ESC und mit 16 px Rand kam man auf dem Handy kaum heraus */
+          '<button type="button" class="dpuew-x" aria-label="Schließen" onclick="DealPilotUeberfuehrung.close()" style="width:36px;height:36px;border:1px solid #2a2724;border-radius:8px;background:transparent;color:#F2EDE3;font-size:20px;line-height:1;cursor:pointer">×</button>' +
+          '</div>' +
         '</div>' +
         /* Gold-Hero */
         '<div style="background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);padding:20px 22px">' +

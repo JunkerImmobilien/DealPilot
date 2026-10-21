@@ -94,3 +94,7 @@ backup_*.sql
 # landing-videothek-1 · Erklaervideos der Landing (~190 MB) liegen NUR auf dem
 # Server (scp), nie im Git. Titel/Texte: frontend/landing/assets/videothek/videos.json
 frontend/landing/medien/
+
+# messe-schleife-1 · Clips der Messe-Schleife (Ausschnitte der Videoreihe) liegen wie
+# die Videothek NUR auf dem Server (scp), nie im Git.
+frontend/messe-schleife/clips/

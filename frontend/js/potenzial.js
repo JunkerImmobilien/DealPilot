@@ -238,23 +238,40 @@
     r.ab = ab;
     r.ab_text = ab ? (ab <= heuteYm() ? 'sofort' : monatText(ab)) : (letzte ? '' : 'sofort (letzte Erhöhung nicht eingetragen)');
     r.ab_herkunft = /^\d{4}-\d{2}/.test(e.soll_ab || '') ? 'eigene Angabe' : (frist ? '15 Monate nach der letzten Erhöhung (§ 558 Abs. 1 BGB)' : null);
+    /* v2545 · DREI-JAHRES-ANRECHNUNG (§ 558 Abs. 3 BGB) — Marcel 20.10.2026.
+       Die Kappungsgrenze gilt auf die Miete DREI JAHRE VOR dem Wirksamwerden
+       der neuen Erhoehung, nicht auf die heutige. Lag die letzte Erhoehung in
+       diesem Fenster, wird ihre Hoehe (`mv_letzte_erhoehung_betrag`, €/Monat;
+       bei mehreren die Summe, ohne § 559 und Betriebskosten) von der Ist-Miete
+       abgezogen. Ohne Hoehe bleibt die Rechnung beim Ist - mit Hinweis, denn
+       dann ist der Spielraum zu gross gerechnet. */
+    var basisK = ist;
+    var betragL = zahl(e.mv_letzte_erhoehung_betrag);
+    var imFenster = /^\d{4}-\d{2}/.test(letzte) && letzte.slice(0, 7) > plusMonate(ab || heuteYm(), -36);
+    if (imFenster && betragL > 0 && betragL < ist) {
+      basisK = ist - betragL; r.kapp_basis = basisK; r.kapp_angerechnet = betragL;
+    } else if (imFenster && !(betragL > 0)) {
+      r.hinweise.push('die letzte Erhöhung liegt in den drei Jahren der Kappungsgrenze — ihre Höhe eintragen, sonst ist der Spielraum zu groß gerechnet');
+    }
     var eigen = zahl(e.soll);
     if (eigen > 0) {
       r.miete = eigen; r.herkunft = 'eigene Angabe';
-      var kc = ctx.kapp && ctx.kapp.pct ? ist * (1 + ctx.kapp.pct / 100) + u.monat : null;
+      var kc = ctx.kapp && ctx.kapp.pct ? basisK * (1 + ctx.kapp.pct / 100) + u.monat : null;
       if (kc && eigen > kc + 0.5) r.hinweise.push('liegt über der Kappungsgrenze (' + ctx.kapp.pct + ' % in 3 Jahren)');
       return r;
     }
     var vgl = zahl(e.vgl_qm) || zahl(ctx.vgl_qm);
     var m558 = ist;
     if (vgl > 0 && wfl > 0) {
-      var ziel = vgl * wfl, kappe = ist * (1 + ((ctx.kapp && ctx.kapp.pct) || 20) / 100);
+      var ziel = vgl * wfl, kappe = basisK * (1 + ((ctx.kapp && ctx.kapp.pct) || 20) / 100);
       m558 = Math.max(ist, Math.min(ziel, kappe));
-      r.grenze = (kappe < ziel) ? 'Kappungsgrenze ' + ((ctx.kapp && ctx.kapp.pct) || 20) + ' %' : 'Vergleichsmiete';
+      r.grenze = (kappe < ziel) ? 'Kappungsgrenze ' + ((ctx.kapp && ctx.kapp.pct) || 20) + ' %' + (r.kapp_angerechnet ? ' (letzte Erhöhung angerechnet)' : '') : 'Vergleichsmiete';
       r.vgl_qm = vgl; r.vgl_herkunft = zahl(e.vgl_qm) ? 'eigene Angabe' : (ctx.vgl_herkunft || 'am Objekt');
     }
     if (m558 <= ist + 0.01 && !(u.monat > 0)) {
-      r.grund = vgl > 0 ? 'Die Miete liegt schon an der Vergleichsmiete.' : 'Keine Vergleichsmiete eingetragen.';
+      r.grund = !(vgl > 0) ? 'Keine Vergleichsmiete eingetragen.'
+        : (kappe <= ist + 0.01 && vgl * wfl > ist + 0.01) ? 'Die Kappungsgrenze ist durch die letzte Erhöhung ausgeschöpft.'
+        : 'Die Miete liegt schon an der Vergleichsmiete.';
       return r;
     }
     r.miete = Math.round((m558 + u.monat) * 100) / 100;
@@ -323,7 +340,7 @@
       var wflO = zahl(wert('wfl')), istO = zahl(wert('nkm'));
       var eO = { ist: istO, wfl: wflO, status: istO > 0 ? 'vermietet' : 'leer',
         soll: zahl(wert('zb_soll_qm')) > 0 && wflO > 0 ? zahl(wert('zb_soll_qm')) * wflO : 0,
-        soll_ab: wert('zb_soll_ab'), vgl_qm: 0, mv_letzte_erhoehung: wert('mv_letzte_erhoehung'),
+        soll_ab: wert('zb_soll_ab'), vgl_qm: 0, mv_letzte_erhoehung: wert('mv_letzte_erhoehung'), mv_letzte_erhoehung_betrag: wert('mv_letzte_erhoehung_betrag'),
         massnahmen: objektMassnahmen() };
       var sO = sollFuer(eO, ctx);
       var zQ = zahl(wert('zb_ziel_qm'));
@@ -365,6 +382,17 @@
         return { art: e.art || 'wohnen', wfl: e.wfl, ist: e.ist, soll: e.soll, status: e.status || 'vermietet',
                  nutzung_gew: e.nutzung_gew || null, markt_qm: e.markt_qm || null };
       });
+      /* v2487 · GEMESSEN (Mitschnitt-Lauf Modul 26, neues MFH): im Wohnungsfenster VOR dem
+         ersten „Übernehmen" sind Wohnfläche und Kaltmiete im Reiter Objekt noch leer - der
+         Dienst rechnete keinen Ertragswert (verfuegbar false, „es fehlen Pflichtangaben"), das
+         Fenster zeigte nur „Die Angaben haben sich geändert". Leere Felder werden aus den
+         Einheiten gefüllt, genau wie uebernehmen() sie gleich schreiben wird (Fläche aller,
+         Ist der vermieteten). Ein gesetztes Feld bleibt unberührt. */
+      var flS = 0, istS = 0, nW = 0;
+      opts.einheiten.forEach(function (e) { flS += zahl(e.wfl); if (e.art !== 'gewerbe') nW++; if (e.status !== 'leer') istS += zahl(e.ist); });
+      if (!(zahl(obj.wfl) > 0) && flS > 0) obj.wfl = flS;
+      if (!(zahl(obj.nkm) > 0) && istS > 0) obj.nkm = String(Math.round(istS * 100) / 100);
+      if (!(zahl(obj.einheiten) > 0) && nW > 0) obj.einheiten = String(nW);
     }
     var istW = function (w) { return w.art === 'gewerbe' ? 0 : 1; };
     var wohnMiete = function (k) {
@@ -471,6 +499,36 @@
     });
     return out;
   }
+  /* ── v2541 · Jahre je Stufe (Marcel 20.10.2026: „ein Jahr für Ankauf, für Soll
+     und für das Zielbild") ─ Ankauf = Kaufdatum (Reiter Objekt), Mieterhöhung =
+     frühester Termin der Soll-Mieten (§ 558: 15 Monate nach der letzten Erhöhung
+     oder eigene Angabe), Zielbild = Feld „Zielbild fertig (Jahr)"; ohne Angabe null
+     („offen"), nie geraten. */
+  function jahre(m) {
+    var kd = String(wert('kaufdat') || '');
+    var ankauf = /^\d{4}/.test(kd) ? +kd.slice(0, 4) : null;
+    var abs = (m.wohnungen || []).map(function (w) { return w.soll && w.soll.miete > w.ist && w.soll.ab ? w.soll.ab : null; }).filter(Boolean).sort();
+    var mh = m.stufen.mieterhoehung ? (abs.length ? +String(abs[0] <= heuteYm() ? heuteYm() : abs[0]).slice(0, 4) : new Date().getFullYear()) : null;
+    var zf = parseInt(String(wert('zb_fertig_jahr') || '').trim(), 10);
+    return { ankauf: ankauf, mieterhoehung: mh, mieterhoehung_herkunft: abs.length ? 'frühester Termin der Soll-Mieten' : 'sofort',
+             zielbild: m.stufen.zielbild && zf >= 1990 && zf <= 2100 ? zf : null };
+  }
+  /* v2541 · Fußzeilen: woher die Marktpreisindikationen und die Jahre kommen */
+  function mpiFuss(M) {
+    var t = [];
+    if (M.angebote && M.angebote.verfuegbar) t.push('Marktpreisindikation: Angebotspreise am Ort × Wohnfläche × Objektfaktoren, abzüglich '
+      + (M.angebote.abschlag_pct != null ? String(Math.round(Number(M.angebote.abschlag_pct) * 10) / 10).replace('.', ',') + ' % ' : '') + 'Abschlag auf Angebotspreise; Mieterhöhung wie Bestand (Angebotspreise hängen nicht an der Miete), Zielbild mit Zustand „modernisiert".');
+    if (M.rohertragsfaktor && M.rohertragsfaktor.verfuegbar) t.push('Rohertragsfaktor ' + dez(M.rohertragsfaktor.faktor, 1).replace(',0', '') + ' des '
+      + String(M.rohertragsfaktor.ausschuss || 'Gutachterausschusses').replace(/^Der\s+/, '') + (M.rohertragsfaktor.berichtsjahr ? ' (' + M.rohertragsfaktor.berichtsjahr + ')' : '')
+      + ' × Jahresnettokaltmiete der Stufe — Durchschnitt aus Kauffällen, eine Gegenprobe.');
+    else if (M.rohertragsfaktor) t.push('Rohertragsfaktor: ' + (M.rohertragsfaktor.grund || 'nicht veröffentlicht') + '');
+    return t.join(' ');
+  }
+  function jahreFuss(J) {
+    return 'Jahre: Bestand ab Kaufdatum' + (J.ankauf ? ' (' + J.ankauf + ')' : ' (nicht eingetragen)')
+      + (J.mieterhoehung ? ', Mieterhöhung ' + J.mieterhoehung + ' (' + J.mieterhoehung_herkunft + ')' : '')
+      + ', Zielbild ' + (J.zielbild ? J.zielbild + ' (eigene Angabe)' : 'offen — Feld „Zielbild fertig (Jahr)"') + '.';
+  }
   function ankaufKurz() {
     var AK = window.DealPilotAnkauf, st = null;
     try { st = AK && AK.stand ? AK.stand() : null; } catch (e) {}
@@ -493,22 +551,37 @@
         kosten: Math.round(m.stufen[k].kosten || 0), punkte_plus: m.stufen[k].plus || 0,
         bmy: kz[k] && kz[k].bmy != null ? Math.round(kz[k].bmy * 100) / 100 : null,
         dscr: kz[k] && kz[k].dscr != null ? Math.round(kz[k].dscr * 100) / 100 : null,
-        ertragswert: h[k] ? h[k].wert : null, rnd: h[k] ? h[k].rnd : null };
+        ertragswert: h[k] ? h[k].wert : null, rnd: h[k] ? h[k].rnd : null,
+        /* v2488 · die Miete, mit der der Ertragswert der Stufe rechnet, und ihre Anhebung gegen den Bestand */
+        rohertrag_ertragswert: h[k] && h[k].miete_wohnen_jahr != null ? Math.round(h[k].miete_wohnen_jahr) : null,
+        anhebung_ertragswert: h[k] && h[k].anhebung_jahr != null ? Math.round(h[k].anhebung_jahr) : null,
+        /* v2541 · Jahr der Stufe und beide Marktpreisindikationen */
+        jahr: k === 'bestand' ? (jahre(m).ankauf || null) : (jahre(m)[k] || null),
+        marktpreisindikation_angebote: h[k] && h[k].mpi_angebote != null ? h[k].mpi_angebote : null,
+        rohertragsfaktor_x_miete: h[k] && h[k].mpi_rohertrag ? h[k].mpi_rohertrag.wert : null };
     });
+    /* v2541 */
+    z.jahre = jahre(m);
+    if (r && r.mpi) z.marktpreisindikation = { angebote: r.mpi.angebote || null, rohertragsfaktor: r.mpi.rohertragsfaktor || null };
+    if (r && r.basis && r.basis.bestandsbasis) z.ertragswert_basis = r.basis.bestandsbasis.hinweis;   /* v2488 */
     if (gesperrt(r)) { z.ertragswert_gesperrt = true; z.ertragswert_hinweis = GESPERRT_KURZ + '. ' + GESPERRT_LANG; }
     if (r && r.aufteilung && r.aufteilung.je_stufe) {
       var zb = r.aufteilung.zins && r.aufteilung.zins.bestand;
       z.aufteilung = { kosten: r.aufteilung.kosten_eur, je_stufe: r.aufteilung.je_stufe,
         zins_etw: zb ? zb.pct : null, zins_etw_ausschuss: zb ? zb.ausschuss || null : null,
         zins_haus: r.basis ? r.basis.lzs_pct : null,
-        negativ_hinweis: r.aufteilung.negativ_hinweis || null };   /* v2431 */
+        negativ_hinweis: r.aufteilung.negativ_hinweis || null,   /* v2431 */
+        marktpreisindikation_etw: r.aufteilung.mpi_etw || null };   /* v2541 */
     }
     z.wohnungen = m.wohnungen.slice(0, 30).map(function (w) {
       return { nr: w.nr, lage: w.lage, wfl: w.wfl, status: w.status, ist: Math.round(w.ist),
         soll: w.soll && w.soll.miete != null ? Math.round(w.soll.miete) : null, soll_ab: w.soll ? w.soll.ab_text || null : null,
         soll_herkunft: w.soll ? w.soll.herkunft : null, ziel: w.ziel != null ? Math.round(w.ziel) : null, ziel_wann: w.ziel_wann || null,
         massnahmen: w.massnahmen.map(function (x) { return x.t + (zahl(x.k) ? ' ' + Math.round(zahl(x.k)) + ' €' : '') + (x.bewohnt ? ' (bewohnt, § 559)' : ''); }).join(', ') || null,
-        kosten: Math.round(w.kosten) || 0 };
+        kosten: Math.round(w.kosten) || 0,
+        /* v2541 · je Wohnung als ETW: Ertragswert und Marktpreisindikation nebeneinander */
+        etw: (function () { var we = wohnungErgebnis(r, m, w.i); if (!we || (!we.als_etw && !we.mpi_etw)) return null;
+          return { ertragswert: we.als_etw || null, marktpreisindikation: we.mpi_etw ? { bestand: we.mpi_etw.bestand, zielbild: we.mpi_etw.zielbild } : null }; })() };
     });
     return z;
   }
@@ -538,7 +611,10 @@
       '.dp-pot th,.dp-pot td{padding:6px 8px;text-align:right;border-bottom:1px solid #E6DCC2;white-space:nowrap}',
       '.dp-pot th:first-child,.dp-pot td:first-child{text-align:left;white-space:normal}',
       '.dp-pot thead th{font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6c6450}',
-      '.dp-pot .c-soll{color:#3d6fa8}.dp-pot .c-ziel{color:#2f7d55}',
+      /* v2543 · Stufenfarben aus der Marke (Marcel 20.10.2026): Bestand Obsidian, Mieterhöhung helles Gold,
+         Zielbild dunkles Gold - als Kante, nie als Schriftfarbe (helles Gold auf Weiß ist nicht lesbar) */
+      '.dp-pot th.c-soll{box-shadow:inset 0 -3px 0 var(--wl-e8cc7a, #E8CC7A)}.dp-pot th.c-ziel{box-shadow:inset 0 -3px 0 var(--wl-b8932f, #b8932f)}',
+      '.dp-pot .c-soll,.dp-pot .c-ziel{color:#1d1a14}',
       '.dp-pot td.c-soll,.dp-pot td.c-ziel{font-weight:600}',
       '.dp-pot .dp-pot-scroll{overflow-x:auto}',
       '.dp-pot .dp-pot-hin{font-size:11.5px;color:#6c6450;margin:8px 0 0}',
@@ -550,11 +626,17 @@
       '.dp-pot .dp-pot-stufe3{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:10px 0 0;padding:10px 12px;border:1px solid #E6DCC2;border-radius:10px;background:#FBF6E9;font-size:12.5px;color:#4a4436}',
       '.dp-pot .dp-pot-stufe3 b{color:#1d1a14;flex:1 1 100%}',
       '.dp-pot .dp-pot-stufe3 span{flex:1 1 260px}',
-      '.dp-pot td.dp-pot-neg{color:#6c6450 !important;font-weight:500 !important;white-space:normal}'
+      '.dp-pot td.dp-pot-neg{color:#6c6450 !important;font-weight:500 !important;white-space:normal}',
+      /* v2542 · Abschnitt Marktpreise */
+      '.dp-pot .dp-markt{border-top:1px solid #E6DCC2;padding-top:12px;display:grid;gap:6px}',
+      '.dp-pot .dp-markt-kopf{display:grid;gap:2px}.dp-pot .dp-markt-kopf b{font:700 12px "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#6c6450}',
+      '.dp-pot .dp-markt-kopf span{font-size:12px;color:#6c6450;max-width:80ch}',
+      '.dp-pot .dp-markt .dp-pot-knopf{justify-self:start}',
+      '.dp-pot th .dp-pot-jahr{display:block;font:400 10px "JetBrains Mono",monospace;letter-spacing:.04em;color:#8A8272;text-transform:none}'   /* v2541 */
     ].join('');
     document.head.appendChild(s);
   }
-  var LEG = '<div class="dp-pot-leg"><span><i style="background:#8a8272"></i>Ist / Bestand</span><span><i style="background:#3d6fa8"></i>Mieterhöhung · Mieter bleibt</span><span><i style="background:#2f7d55"></i>Zielbild · nach Umbau</span></div>';
+  var LEG = '<div class="dp-pot-leg"><span><i style="background:#2A2727"></i>Ist / Bestand</span><span><i style="background:var(--wl-e8cc7a, #E8CC7A)"></i>Mieterhöhung · Mieter bleibt</span><span><i style="background:#2f7d55"></i>Zielbild · nach Umbau</span></div>';
   function tafelHtml(o) {
     o = o || {};
     stilEinhaengen();
@@ -577,14 +659,22 @@
       ['Maßnahmenkosten', function (x, k) { return k === 'ankauf' || !x ? '—' : (x.kosten ? eur(x.kosten) : '—'); }],
       ['Modernisierungspunkte (Anlage 2)', function (x, k) { var h = H[k]; return h && h.mod_punkte != null ? dez(h.mod_punkte, 1).replace(',0', '') + (x && x.plus ? ' (+' + dez(x.plus, 1).replace(',0', '') + ')' : '') : (x && x.plus ? '+' + dez(x.plus, 1).replace(',0', '') : '—'); }],
       ['Restnutzungsdauer', function (x, k) { var h = H[k]; return h && h.rnd != null ? dez(h.rnd, 0) + ' J.' : '—'; }],
-      ['Ertragswert', function (x, k) { var h = H[k]; return h && h.wert != null ? '<b>' + eur(h.wert) + '</b>' : '—'; }]
+      ['Ertragswert', function (x, k) { var h = H[k]; return h && h.wert != null ? '<b>' + eur(h.wert) + '</b>' : '—'; }],
+      /* v2541 · Marktpreisindikation je Stufe, beide Wege (Ankauf: keine) */
+      ['Marktpreisindikation (Angebote)', function (x, k) { var h = H[k]; return k !== 'ankauf' && h && h.mpi_angebote != null ? eur(h.mpi_angebote) : '—'; }],
+      ['Rohertragsfaktor × Miete', function (x, k) { var h = H[k]; return k !== 'ankauf' && h && h.mpi_rohertrag ? eur(h.mpi_rohertrag.wert) : '—'; }]
     ];
+    var MPI = r && r.verfuegbar && r.mpi ? r.mpi : null;
+    if (!MPI || !(MPI.angebote && MPI.angebote.verfuegbar)) rows = rows.filter(function (row) { return row[0] !== 'Marktpreisindikation (Angebote)'; });
+    if (!MPI || !(MPI.rohertragsfaktor && MPI.rohertragsfaktor.verfuegbar)) rows = rows.filter(function (row) { return row[0] !== 'Rohertragsfaktor × Miete'; });
     /* v2431 · ohne Stufe 3 keine Ertragswert-Zeilen (auch die Restnutzungsdauer
        kommt aus dem Kern) - statt „—" als scheinbarer Wert steht der Hinweis unten. */
     var zu = gesperrt(r);
-    if (zu) rows = rows.filter(function (row) { return row[0] !== 'Ertragswert' && row[0] !== 'Restnutzungsdauer'; });
+    if (zu) rows = rows.filter(function (row) { return row[0] !== 'Ertragswert' && row[0] !== 'Restnutzungsdauer' && !/^Marktpreis|^Rohertragsfaktor/.test(row[0]); });
+    var JA = jahre(m);   /* v2541 · Jahr je Stufe im Spaltenkopf */
+    var jahrVon = function (k) { var j = k === 'ankauf' || k === 'bestand' ? JA.ankauf : JA[k]; return j ? String(j) : (k === 'zielbild' ? 'Jahr offen' : ''); };
     var html = '<div class="dp-pot">' + LEG + '<div class="dp-pot-scroll"><table><thead><tr><th>Kennzahl</th>'
-      + cols.map(function (c) { return '<th class="' + c.c + '">' + c.t + '</th>'; }).join('') + '</tr></thead><tbody>'
+      + cols.map(function (c) { var j = c.k === 'bestand' && A ? 'heute' : jahrVon(c.k); return '<th class="' + c.c + '">' + c.t + (j ? '<span class="dp-pot-jahr">' + esc(j) + '</span>' : '') + '</th>'; }).join('') + '</tr></thead><tbody>'
       + rows.map(function (row) {
           return '<tr><td>' + row[0] + '</td>' + cols.map(function (c) { return '<td class="' + c.c + '">' + v(c.k, row[1]) + '</td>'; }).join('') + '</tr>';
         }).join('');
@@ -602,16 +692,146 @@
     html += '<p class="dp-pot-hin">' + KENNZEICHNUNG + ' Score und Verkehrswert rechnen mit dem Bestand. '
       + (r && r.verfuegbar && r.basis ? 'Liegenschaftszins ' + pct(r.basis.lzs_pct) + (r.basis.lzs_stufe ? ' (Stufe ' + esc(r.basis.lzs_stufe) + ')' : '')
           + ', Bewirtschaftung, Gesamtnutzungsdauer und Bodenwert wie im Marktbericht Stufe 3; je Stufe wechseln Miete und Restnutzungsdauer (Anlage 2 ImmoWertV). ' : '')
-      + 'Cashflow und DSCR bei gleicher Finanzierung und gleichen Kosten. ' + esc(m.kappung.text) + '</p>';
+      + 'Cashflow und DSCR bei gleicher Finanzierung und gleichen Kosten. ' + esc(m.kappung.text)
+      + (MPI && !zu ? ' ' + esc(mpiFuss(MPI)) : '') + ' ' + esc(jahreFuss(JA)) + '</p>';
     if (zu) {
       html += '<div class="dp-pot-stufe3"><b>' + esc(GESPERRT_KURZ) + '</b><span>' + esc(GESPERRT_LANG) + '</span>'
         + '<button type="button" class="dp-pot-knopf" data-dp-pot-stufe3="1">Stufe 3 im Tab Objekt</button></div>';
+    }
+    if (!o.ohneMarkt) html += '<div data-dp-pot-markt="1" style="margin-top:16px">' + marktHtml() + '</div>';   /* v2542 */
+    if (zu) {
+      /* oben */
     } else if (!r || !r.verfuegbar) {
       var grund = window._dpPotenzial && window._dpPotenzial.ergebnis && !window._dpPotenzial.ergebnis.verfuegbar ? window._dpPotenzial.ergebnis.grund : '';
       html += '<p class="dp-pot-hin">' + (ergebnisVeraltet() ? 'Die Angaben haben sich geändert — die Ertragswerte sind neu zu rechnen. ' : (grund ? esc(grund) + ' ' : ''))
         + '<button type="button" class="dp-pot-knopf" data-dp-pot-rechnen="1">Ertragswerte rechnen</button></p>';
     }
     return html + '</div>';
+  }
+  /* ══ v2542 · ABRUF „MARKTPREISE" UND VERLAUF (Tab Pilot-Analyse) ═════════════
+     Marcel 20.10.2026: Spannen, Mieten und €/m² vollumfänglich; abrufbar aus der
+     Pilot-Analyse, kostet 1 × erweiterte Marktpreisindikation, geht mit in den
+     Marktbericht, mehrere Abrufe werden als Verlauf bewertet. Gespeichert wird im
+     Marktbericht-Dienst (mb.potenzial_abrufe); hier wird nur angezeigt. */
+  var _markt = { key: null, laedt: false, daten: null, einordnung: null, abrufe: [], zustand: 'ruhe', fehler: null };
+  function marktKey() { return (typeof window._currentObjKey === 'string' && window._currentObjKey) || null; }
+  function marktVerlaufLaden(neuZeichnen) {
+    var key = marktKey();
+    if (!key || !window.Auth || typeof Auth.apiCall !== 'function') return;
+    if (_markt.laedt && _markt.key === key) return;
+    _markt.laedt = true; _markt.key = key;
+    Auth.apiCall('/marktbericht/potenzial/markt/verlauf?external_ref=' + encodeURIComponent(key)).then(function (r) {
+      _markt.laedt = false;
+      if (marktKey() !== key) return;
+      _markt.abrufe = (r && r.abrufe) || [];
+      _markt.daten = _markt.abrufe.length ? _markt.abrufe[0] : null;
+      _markt.einordnung = (r && r.einordnung) || null;
+      if (neuZeichnen !== false) marktNeuZeichnen();
+    }, function () { _markt.laedt = false; });
+  }
+  function marktNeuZeichnen() { var h = document.querySelectorAll('[data-dp-pot-markt]'); for (var i = 0; i < h.length; i++) h[i].innerHTML = marktHtml(); }
+  function spanne(a, b, f) { return a != null && b != null ? f(a) + ' – ' + f(b) : '—'; }
+  function marktHtml() {
+    var key = marktKey();
+    if (_markt.key !== key) { _markt.daten = null; _markt.abrufe = []; _markt.einordnung = null; _markt.zustand = 'ruhe'; marktVerlaufLaden(); }
+    var knopf = '<button type="button" class="dp-pot-knopf" data-dp-markt-abruf="1">' + (_markt.daten ? 'Marktpreise neu abrufen' : 'Marktpreise abrufen') + '</button>';
+    var kopf = '<div class="dp-markt-kopf"><b>Marktpreise</b><span>Kaufpreise und Angebotsmieten am Ort, Marktpreisindikation je Stufe und je Wohnung — mit Spannen. '
+      + 'Ein Abruf kostet 1 × erweiterte Marktpreisindikation aus deinem Kontingent und bleibt gespeichert; mehrere Abrufe ergeben den Verlauf.</span></div>';
+    if (_markt.zustand === 'frage') {
+      return '<div class="dp-markt">' + kopf + '<div class="dp-pot-stufe3"><b>Jetzt abrufen?</b><span>Kostet 1 × erweiterte Marktpreisindikation. Ergebnis und Datum werden gespeichert und erscheinen auch im Marktbericht.</span>'
+        + '<button type="button" class="dp-pot-knopf" data-dp-markt-ja="1">Ja, abrufen</button> <button type="button" class="dp-pot-knopf" data-dp-markt-nein="1">Abbrechen</button></div></div>';
+    }
+    if (_markt.zustand === 'laeuft') return '<div class="dp-markt">' + kopf + '<p class="dp-pot-hin">Marktpreise werden abgerufen …</p></div>';
+    if (!_markt.daten) return '<div class="dp-markt">' + kopf + (_markt.fehler ? '<p class="dp-pot-hin" style="color:#7a3f3a">' + esc(_markt.fehler) + '</p>' : '')
+      + '<p class="dp-pot-hin">Für dieses Objekt liegt noch kein Abruf vor.</p>' + knopf + '</div>';
+    var D = _markt.daten.daten || {}, M = D.markt || {}, S = D.stufen || {};
+    var dt = new Date(_markt.daten.abgerufen_am).toLocaleDateString('de-DE');
+    var qm0 = function (v) { return v == null ? '—' : Math.round(v).toLocaleString('de-DE') + ' €/m²'; };
+    var qm2 = function (v) { return v == null ? '—' : eur2(v) + '/m²'; };
+    var zm = function (t, x, f, zus) { return '<tr><td>' + t + '</td><td>' + (x ? f(x.median_qm) : '—') + '</td><td>' + (x ? spanne(x.q25_qm, x.q75_qm, f) : '—') + '</td><td>'
+      + (x && x.angebote != null ? x.angebote + (x.radius_km ? ' · ' + dez(x.radius_km, 1).replace(',0', '') + ' km' : '') : '—') + (zus || '') + '</td></tr>'; };
+    var html = '<div class="dp-markt">' + kopf + '<p class="dp-pot-hin" style="margin-top:0">Abruf vom <b>' + esc(dt) + '</b>'
+      + (M.abschlag_pct != null ? ' · Abschlag auf Angebotspreise ' + esc(String(M.abschlag_pct).replace('.', ',')) + ' %' : '') + '</p>'
+      + '<div class="dp-pot-scroll"><table><thead><tr><th>Markt am Ort</th><th>Median</th><th>Spanne (Q25–Q75)</th><th>Angebote · Umkreis</th></tr></thead><tbody>'
+      + zm('Kaufpreis ' + (M.kauf_haus && /mfh|mehrfam/i.test(M.kauf_haus.segment || '') ? 'Mehrfamilienhaus' : 'Haus/Objekt'), M.kauf_haus, qm0)
+      + zm('Kaufpreis Eigentumswohnung', M.kauf_etw, qm0)
+      + zm('Angebotsmiete', M.miete, qm2)
+      + '</tbody></table></div>';
+    var sp = ['bestand', 'mieterhoehung', 'zielbild'].filter(function (k) { return S[k]; });
+    var T = { bestand: 'Bestand', mieterhoehung: 'Mieterhöhung', zielbild: 'Zielbild' };
+    html += '<div class="dp-pot-scroll" style="margin-top:10px"><table><thead><tr><th>Je Stufe</th>' + sp.map(function (k) { return '<th>' + T[k] + '</th>'; }).join('') + '</tr></thead><tbody>'
+      + '<tr><td>Ertragswert</td>' + sp.map(function (k) { return '<td>' + (S[k].ertragswert != null ? eur(S[k].ertragswert) : '—') + '</td>'; }).join('') + '</tr>'
+      + '<tr><td>Marktpreisindikation (Angebote)</td>' + sp.map(function (k) { return '<td><b>' + (S[k].mpi_angebote != null ? eur(S[k].mpi_angebote) : '—') + '</b></td>'; }).join('') + '</tr>'
+      + '<tr><td>Spanne</td>' + sp.map(function (k) { var s = S[k].mpi_spanne; return '<td>' + (s ? spanne(s[0], s[1], eur) : '—') + '</td>'; }).join('') + '</tr>'
+      + '<tr><td>Rohertragsfaktor × Miete</td>' + sp.map(function (k) { return '<td>' + (S[k].rohertragsfaktor_x_miete != null ? eur(S[k].rohertragsfaktor_x_miete) : '—') + '</td>'; }).join('') + '</tr>'
+      + '</tbody></table></div>';
+    var W = (D.wohnungen || []).filter(function (w) { return w.art !== 'gewerbe' && w.mpi_etw; });
+    if (W.length) {
+      html += '<div class="dp-pot-scroll" style="margin-top:10px"><table><thead><tr><th>Je Wohnung als ETW</th><th>m²</th><th>Ertragswert</th><th>Marktpreisindikation</th><th>Spanne</th><th>€/m² (Median)</th></tr></thead><tbody>'
+        + W.map(function (w) { var e = w.mpi_etw;
+            return '<tr><td>' + esc(w.nr || '') + '</td><td>' + dez(w.wfl, 0) + '</td><td>' + (w.als_etw && w.als_etw.bestand != null ? eur(w.als_etw.bestand) : '—') + '</td><td><b>'
+              + (e.bestand != null ? eur(e.bestand) : '—') + '</b></td><td>' + spanne(e.low, e.high, eur) + '</td><td>' + qm0(e.median_qm) + '</td></tr>'; }).join('')
+        + (D.etw_markt && D.etw_markt.summe_bestand != null ? '<tr class="dp-pot-sum"><td>Summe</td><td></td><td>' + (D.wohnungen.some(function (w) { return w.als_etw; })
+            ? eur(D.wohnungen.reduce(function (a, w) { return a + ((w.als_etw && w.als_etw.bestand) || 0); }, 0)) : '—') + '</td><td>' + eur(D.etw_markt.summe_bestand) + '</td><td>'
+            + spanne(D.etw_markt.summe_low, D.etw_markt.summe_high, eur) + '</td><td></td></tr>' : '')
+        + '</tbody></table></div>';
+    }
+    var Z = _markt.abrufe || [], E = _markt.einordnung;
+    html += '<div class="dp-pot-scroll" style="margin-top:10px"><table><thead><tr><th>Verlauf</th><th>Kauf Haus</th><th>Kauf ETW</th><th>Angebotsmiete</th><th>Marktpreisindikation</th></tr></thead><tbody>'
+      + Z.slice(0, 12).map(function (z) { var d = z.daten || {}, m = d.markt || {}, b = d.stufen && d.stufen.bestand;
+          return '<tr><td>' + esc(new Date(z.abgerufen_am).toLocaleDateString('de-DE')) + '</td><td>' + qm0(m.kauf_haus && m.kauf_haus.median_qm) + '</td><td>'
+            + qm0(m.kauf_etw && m.kauf_etw.median_qm) + '</td><td>' + qm2(m.miete && m.miete.median_qm) + '</td><td>' + (b && b.mpi_angebote != null ? eur(b.mpi_angebote) : '—') + '</td></tr>'; }).join('')
+      + '</tbody></table></div>'
+      + (E && E.text ? '<p class="dp-pot-hin" style="color:#4a4436">' + esc(E.text) + '</p>' : '')
+      + '<p class="dp-pot-hin">Angebotspreise und -mieten, keine Kaufpreise; die Marktpreisindikation zieht den Abschlag auf Angebotspreise ab. Zielbild mit Zustand „modernisiert". '
+      + 'Je Wohnung: Angebote für Eigentumswohnungen gleichen Baujahrs in der Flächenklasse der Wohnung.</p>' + knopf + '</div>';
+    return html;
+  }
+  /* v2556c · Marcel 21.10.2026: „Es muss gezeigt werden, ob die Marktpreis-
+     indikation gerade läuft." Ein Abruf dauert 10-40 s; der Hinweis im Block
+     stand oft ausserhalb des Sichtbaren. Jetzt ein Fenster mit Sekundenzaehler,
+     das erst mit dem Ergebnis geht - und solange keinen zweiten Klick zulaesst. */
+  var _lauf2 = null;
+  function laufAnzeige(an, titel, text) {
+    var ov = document.getElementById('dp-pot-lauf');
+    if (!an) { if (_lauf2) clearInterval(_lauf2); _lauf2 = null; if (ov) ov.remove(); return; }
+    if (!document.getElementById('dp-pot-lauf-css')) {
+      var st = document.createElement('style'); st.id = 'dp-pot-lauf-css';
+      st.textContent = '#dp-pot-lauf{position:fixed;inset:0;z-index:2147483000;background:rgba(5,5,5,.55);display:flex;align-items:center;justify-content:center;padding:16px}'
+        + '#dp-pot-lauf .k{background:#FDFCFA;color:#2A2727;border-radius:14px;padding:22px 24px;max-width:420px;width:100%;box-shadow:0 18px 50px rgba(0,0,0,.35);border-top:3px solid var(--wl-c9a84c, #C9A84C);font:400 13.5px/1.5 Inter,sans-serif}'
+        + '#dp-pot-lauf b{display:block;font:600 16px "Space Grotesk",sans-serif;margin-bottom:6px}'
+        + '#dp-pot-lauf .r{width:34px;height:34px;border-radius:50%;border:3px solid #EFE6CC;border-top-color:var(--wl-c9a84c, #C9A84C);animation:dpPotDreh 1s linear infinite;margin-bottom:12px}'
+        + '#dp-pot-lauf .z{margin-top:10px;font:500 11px "JetBrains Mono",monospace;color:#6B645A}'
+        + '@keyframes dpPotDreh{to{transform:rotate(360deg)}}@media (prefers-reduced-motion:reduce){#dp-pot-lauf .r{animation:none}}';
+      document.head.appendChild(st);
+    }
+    if (!ov) { ov = document.createElement('div'); ov.id = 'dp-pot-lauf'; ov.setAttribute('role', 'status'); ov.setAttribute('aria-live', 'polite'); document.body.appendChild(ov); }
+    var t0 = Date.now();
+    ov.innerHTML = '<div class="k"><div class="r"></div><b>' + esc(titel) + '</b>' + esc(text) + '<div class="z">läuft seit 0 s</div></div>';
+    if (_lauf2) clearInterval(_lauf2);
+    _lauf2 = setInterval(function () { var z = ov.querySelector('.z'); if (z) z.textContent = 'läuft seit ' + Math.round((Date.now() - t0) / 1000) + ' s'; }, 1000);
+  }
+  function marktAbrufen() {
+    var m = modell(); if (!m.aktiv) return;
+    var body = auftrag(m, {}); if (!body) return;
+    if (_markt.zustand === 'laeuft') return;
+    _markt.zustand = 'laeuft'; _markt.fehler = null; marktNeuZeichnen();
+    laufAnzeige(true, 'Marktpreisindikation läuft', 'Kaufpreise und Mieten am Ort werden abgerufen und je Stufe und Wohnung gerechnet. Das dauert meist 10 bis 40 Sekunden.');
+    var key = marktKey();
+    Auth.apiCall('/marktbericht/potenzial/markt', { method: 'POST', body: body }).then(function (r) {
+      _markt.zustand = 'ruhe'; laufAnzeige(false);
+      if (marktKey() !== key) return;
+      if (!r || r.error) { _markt.fehler = (r && (r.message || r.error)) || 'Abruf nicht möglich.'; marktNeuZeichnen(); return; }
+      /* v2556c · leer = nicht gespeichert, nicht abgerechnet: kein Erfolg melden */
+      if (r.leer || !r.abruf) { _markt.fehler = r.grund || 'Für dieses Objekt kamen keine Marktdaten zurück.'; marktNeuZeichnen(); return; }
+      if (typeof window.toast === 'function') window.toast('✓ Marktpreise abgerufen' + (r._kontingent && r._kontingent.charged ? ' · 1 × erweiterte Marktpreisindikation' : ''));
+      _markt.key = null; marktVerlaufLaden();
+      try { if (typeof window._dpLoadVerlauf === "function") window._dpLoadVerlauf(); } catch (e) {}   /* v2556c: Ablage sofort sichtbar */
+    }, function (e) {
+      _markt.zustand = 'ruhe'; laufAnzeige(false);
+      _markt.fehler = /kontingent|402/i.test(String(e && e.message)) ? 'Für den Abruf ist dein Kontingent „erweiterte Marktpreisindikation" aufgebraucht.' : ('Abruf nicht möglich: ' + ((e && e.message) || 'Dienst nicht erreichbar'));
+      marktNeuZeichnen();
+    });
   }
   function aufteilungHtml(m, r, cols) {
     var a = r.aufteilung, H = r.haus;
@@ -626,6 +846,9 @@
       + z('Haus als Ganzes', function (k) { return H[k] ? eur(H[k].wert) : '—'; })
       + z(n + ' Eigentumswohnungen (Summe, Zins ' + zi + ')', function (k) { var s = a.je_stufe[k]; return s ? eur(s.summe) + (s.vollstaendig ? '' : '*') : '—'; })
       + z('− Kosten der Aufteilung', function () { return eur(-a.kosten_eur); })
+      /* v2541 · dieselben Wohnungen nach Angebotspreisen für Eigentumswohnungen */
+      + (a.mpi_etw && a.mpi_etw.summe_bestand != null ? z(n + ' Eigentumswohnungen nach Angeboten (Summe)', function (k) {
+          var v = k === 'zielbild' ? a.mpi_etw.summe_zielbild : a.mpi_etw.summe_bestand; return v != null ? eur(v) : '—'; }) : '')
       /* v2431 · Marcel 19.10.2026: ein negatives Potenzial nicht als Zahl mit Minus
          in Gruen, sondern als „kein Potenzial" mit der Erklaerung darunter */
       + '<tr class="dp-pot-sum"><td>Aufteilungspotenzial</td>' + sc.map(function (c) {
@@ -647,6 +870,13 @@
     var d = { kennzeichnung: KENNZEICHNUNG, art: m.art, kappung: m.kappung.text,
       spalten: ['bestand'].concat(S.mieterhoehung ? ['mieterhoehung'] : []).concat(S.zielbild ? ['zielbild'] : []),
       titel: { bestand: 'Bestand', mieterhoehung: 'Mieterhöhung', zielbild: 'Zielbild' } };
+    /* v2541 · Jahr je Stufe: im Spaltenkopf beider PDFs und der Karte im Tab Bewertung */
+    var JA = jahre(m);
+    d.jahre = JA;
+    /* v2543a · Bestand ist der Stand HEUTE (das Kaufjahr steht in der Fußzeile und in der Pilot-Tafel unter „Ankauf") */
+    d.titel_jahr = { bestand: 'Bestand ' + new Date().getFullYear(), mieterhoehung: 'Mieterhöhung' + (JA.mieterhoehung ? ' ' + JA.mieterhoehung : ''),
+      zielbild: 'Zielbild' + (JA.zielbild ? ' ' + JA.zielbild : '') };
+    d.titel = d.titel_jahr;   /* Spaltenköpfe in Karte und beiden PDFs; ohne Jahr nennt die Fußzeile „offen" */
     var mehr1 = S.mieterhoehung ? (S.mieterhoehung.miete_m - S.bestand.miete_m) * 12 : 0;
     var mehr2 = S.zielbild ? (S.zielbild.miete_m - (S.mieterhoehung ? S.mieterhoehung.miete_m : S.bestand.miete_m)) * 12 : 0;
     var abs = m.wohnungen.map(function (w) { return w.soll && w.soll.ab && w.soll.miete > w.ist ? w.soll.ab : null; }).filter(Boolean).sort();
@@ -669,14 +899,30 @@
       ['DSCR', function (k) { return kz[k].dscr != null ? dez(kz[k].dscr, 2) : '—'; }],
       ['Maßnahmenkosten', function (k) { return kz[k].kosten ? eur(kz[k].kosten) : '—'; }],
       ['Restnutzungsdauer', function (k) { return H[k] && H[k].rnd != null ? dez(H[k].rnd, 0) + ' J.' : '—'; }],
-      [m.art === 'mfh' ? 'Ertragswert (Haus als Ganzes)' : 'Ertragswert', function (k) { return H[k] && H[k].wert != null ? eur(H[k].wert) : '—'; }]
-    ].filter(function (z) { return !zu || (z[0] !== 'Restnutzungsdauer' && !/^Ertragswert/.test(z[0])); })   /* v2431 */
+      /* v2488 · die Miete im Ertragswert (Wohnen) und ihre Anhebung - erklärt, warum sie von der Kaltmiete abweicht */
+      ['Miete im Ertragswert p. a.', function (k) { return H[k] && H[k].miete_wohnen_jahr != null ? eur(H[k].miete_wohnen_jahr) : '—'; }],
+      ['davon Anhebung gegen Bestand', function (k) { return k === 'bestand' || !H[k] || H[k].anhebung_jahr == null ? '—' : '+' + eur(H[k].anhebung_jahr); }],
+      [m.art === 'mfh' ? 'Ertragswert (Haus als Ganzes)' : 'Ertragswert', function (k) { return H[k] && H[k].wert != null ? eur(H[k].wert) : '—'; }],
+      /* v2541 · Marktpreisindikation je Stufe, beide Wege */
+      ['Marktpreisindikation (Angebote)', function (k) { return H[k] && H[k].mpi_angebote != null ? eur(H[k].mpi_angebote) : '—'; }],
+      ['Rohertragsfaktor × Miete', function (k) { return H[k] && H[k].mpi_rohertrag ? eur(H[k].mpi_rohertrag.wert) : '—'; }]
+    ].filter(function (z) { return !zu || (z[0] !== 'Restnutzungsdauer' && !/^Ertragswert|^Miete im Ertragswert|^davon Anhebung|^Marktpreis|^Rohertragsfaktor/.test(z[0])); })   /* v2431, v2488, v2541 */
+      .filter(function (z) {   /* v2541 · eine Zeile ohne Quelle erscheint nicht */
+        var M = r && r.mpi;
+        if (z[0] === 'Marktpreisindikation (Angebote)') return !!(M && M.angebote && M.angebote.verfuegbar);
+        if (z[0] === 'Rohertragsfaktor × Miete') return !!(M && M.rohertragsfaktor && M.rohertragsfaktor.verfuegbar);
+        return true;
+      })
       .map(function (z) { return [z[0]].concat(d.spalten.map(z[1])); });
     if (r && r.verfuegbar && r.aufteilung && r.aufteilung.je_stufe && r.aufteilung.je_stufe.bestand) {
       var n = m.wohnungen.filter(function (w) { return w.art !== 'gewerbe'; }).length;
       d.kennzahlen.push(['nach Aufteilung (' + n + ' ETW, abzgl. ' + eur(r.aufteilung.kosten_eur) + ')'].concat(d.spalten.map(function (k) {
         var s = r.aufteilung.je_stufe[k]; return s ? eur(s.summe - r.aufteilung.kosten_eur) : '—'; })));
       /* v2431 · Aufteilungspotenzial: positiv als Zahl, negativ als Wort - die Erklaerung steht im Fuss */
+      /* v2541 · die Wohnungen nach Angebotspreisen für Eigentumswohnungen */
+      var ME = r.aufteilung.mpi_etw;
+      if (ME && ME.summe_bestand != null) d.kennzahlen.push(['ETW nach Angeboten (Summe)'].concat(d.spalten.map(function (k) {
+        var v = k === 'zielbild' ? ME.summe_zielbild : ME.summe_bestand; return v != null ? eur(v) : '—'; })));
       d.kennzahlen.push(['Aufteilungspotenzial'].concat(d.spalten.map(function (k) {
         var s = r.aufteilung.je_stufe[k]; return !s ? '—' : (s.potenzial < 0 ? 'kein Potenzial' : '+' + eur(s.potenzial)); })));
       d.aufteilung_hinweis = r.aufteilung.negativ_hinweis || null;
@@ -685,8 +931,10 @@
       + (r && r.verfuegbar && r.basis ? ' Liegenschaftszins ' + pct(r.basis.lzs_pct) + ' (Haus)'
         + (r.aufteilung && r.aufteilung.zins && r.aufteilung.zins.bestand && r.aufteilung.zins.bestand.pct != null ? ' bzw. ' + pct(r.aufteilung.zins.bestand.pct) + ' (Wohnungseigentum, vermietet)' : '')
         + ', Restnutzungsdauer nach Modernisierungspunkten (Anlage 2 ImmoWertV).'
+        + (r.basis.bestandsbasis && r.basis.bestandsbasis.hinweis ? ' ' + r.basis.bestandsbasis.hinweis : '')   /* v2488 */
         : (zu ? ' ' + GESPERRT_KURZ + ' (Wertermittlung nach ImmoWertV).' : ' Ertragswerte nicht gerechnet.'))
-      + ' ' + m.kappung.text;
+      + ' ' + m.kappung.text
+      + (r && r.verfuegbar && r.mpi && !zu ? ' ' + mpiFuss(r.mpi) : '') + ' ' + jahreFuss(JA);   /* v2541 */
     if (d.aufteilung_hinweis) d.fuss = 'Aufteilung: ' + d.aufteilung_hinweis + ' ' + d.fuss;
     d.gerechnet = !!(r && r.verfuegbar);
     /* v2460 · Wertbrücke und Ertragswert-Kacheln - dieselben Zahlen für den
@@ -762,8 +1010,26 @@
       '#card-wertpotenzial .dp-wp-k span{font:500 10.5px Inter,system-ui,sans-serif;color:#6B645A;text-transform:uppercase;letter-spacing:.04em}',
       '#card-wertpotenzial .dp-wp-k b{font:700 20px "Space Grotesk",Inter,sans-serif;font-variant-numeric:tabular-nums;color:#2A2727;overflow-wrap:anywhere}',
       '#card-wertpotenzial .dp-wp-k em{font:400 11.5px Inter,sans-serif;font-style:normal;color:#6B645A}',
-      '#card-wertpotenzial .dp-wp-k.soll{border-color:#3d6fa8}#card-wertpotenzial .dp-wp-k.soll b{color:#3d6fa8}',
-      '#card-wertpotenzial .dp-wp-k.ziel{border-color:#2f7d55}#card-wertpotenzial .dp-wp-k.ziel b{color:#2f7d55}',
+      /* v2543 · Kachelkante in der Stufenfarbe der Marke, Zahl in Textfarbe */
+      '#card-wertpotenzial .dp-wp-k.bestand{border-color:#2A2727}',
+      '#card-wertpotenzial .dp-wp-k.soll{border-color:var(--wl-e8cc7a, #E8CC7A)}',
+      '#card-wertpotenzial .dp-wp-k.ziel{border-color:var(--wl-b8932f, #b8932f)}',
+      '#card-wertpotenzial .dp-wp-k.netto b{color:#2f7d55}',
+      /* v2543 · Wertüberleitung (ersetzt die Wertbrücke): Stände als Zeilen mit Summenstrich,
+         Veränderungen als Balken auf einer Skala um null - keine gekürzte Achse */
+      '#card-wertpotenzial table.dp-wp-ueb{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:460px}',
+      '#card-wertpotenzial .dp-wp-ueb td{padding:8px 6px;border-bottom:1px solid #F0ECE4;vertical-align:middle;text-align:left;white-space:normal}',
+      '#card-wertpotenzial .dp-wp-ueb td.l{width:38%;font:500 12.5px Inter,system-ui,sans-serif;color:#2A2727}',
+      '#card-wertpotenzial .dp-wp-ueb td.l small{display:block;font:400 10.5px Inter,sans-serif;color:#8A8272}',
+      '#card-wertpotenzial .dp-wp-ueb td.bar{width:40%}',
+      '#card-wertpotenzial .dp-wp-ueb td.v{width:22%;text-align:right;font:600 13px Inter,sans-serif;white-space:nowrap;color:#2A2727}',
+      '#card-wertpotenzial .dp-wp-ueb tr.summe td{border-top:1.5px solid #2A2727;border-bottom:1px solid #E6DCC2;font-weight:700}',
+      '#card-wertpotenzial .dp-wp-ueb tr.summe td.v{font:700 14px "Space Grotesk",Inter,sans-serif}',
+      '#card-wertpotenzial .dp-wp-ueb tr.netto td{background:#FBF6E9;border-top:2px solid var(--wl-c9a84c, #C9A84C);border-bottom:0}',
+      '#card-wertpotenzial .dp-wp-ueb tr.netto td.v{font:700 16px "Space Grotesk",Inter,sans-serif}',
+      '#card-wertpotenzial .dp-wp-ueb .pos{color:#2f7d55}#card-wertpotenzial .dp-wp-ueb .neg{color:#B8625C}',
+      '#card-wertpotenzial .dp-wp-ueb i.dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:8px;vertical-align:0}',
+      '#card-wertpotenzial .dp-wp-ueb svg{display:block;width:100%;height:18px}',
       '#card-wertpotenzial .dp-wp-k.netto{border-color:var(--wl-c9a84c, #C9A84C)}',
       '#card-wertpotenzial .dp-wp-k.neg b{color:#B8625C}',
       '#card-wertpotenzial svg.dp-wp-br{display:block;width:100%;max-width:860px;height:auto;margin:6px 0 2px}',
@@ -829,6 +1095,41 @@
       + (br.mieterhoehung != null ? ', nach Mieterhöhung ' + esc(eur(br.mieterhoehung)) : '') + (br.zielbild != null ? ', Zielbild ' + esc(eur(br.zielbild)) : '')
       + ', Maßnahmen ' + esc(eur(br.kosten)) + ', Potenzial netto ' + esc(eur(br.netto)) + '">' + s + '</svg>';
   }
+  /* v2543 · DIE WERTÜBERLEITUNG (Marcel 20.10.2026: Variante B, Farben der Marke).
+     Bis v2542 eine Wertbrücke mit gekürzter Achse (ab 680 T€): +15 T€ sahen aus wie
+     der halbe Bestand, „Potenzial netto" stand als Balken von der Achse bis zum
+     Bestand, ein Schritt von 0 € war ein Strich. Jetzt: Stände als Zeilen mit
+     Summenstrich, Veränderungen als Balken auf einer gemeinsamen Skala um null. */
+  var STUFE_FARBE = { bestand: '#2A2727', soll: 'var(--wl-e8cc7a, #E8CC7A)', ziel: 'var(--wl-b8932f, #b8932f)', kosten: '#C98A84' };
+  function ueberleitungZeilen(br) {
+    var B = br.bestand, Sw = br.mieterhoehung, Zw = br.zielbild, top = br.top, z = [];
+    z.push({ t: 'Ertragswert Bestand', klein: 'Ist-Miete je Wohnung im Band', w: B, art: 'bestand', summe: true });
+    if (Sw != null) z.push({ t: '+ Mieterhöhung', klein: 'Mieter bleibt, § 558 BGB', w: Sw - B, art: 'soll', schritt: true });
+    if (Zw != null) z.push({ t: Sw != null ? '+ Umbau, Wechsel' : '+ Zielbild', klein: 'Zielmiete nach Maßnahmen', w: Zw - (Sw != null ? Sw : B), art: 'ziel', schritt: true });
+    z.push({ t: Zw != null ? 'Ertragswert Zielbild' : 'Ertragswert nach Mieterhöhung', w: top, art: Zw != null ? 'ziel' : 'soll', summe: true });
+    if (br.kosten > 0) z.push({ t: '− Maßnahmenkosten', w: -br.kosten, art: 'kosten', schritt: true });
+    z.push({ t: 'Potenzial netto', klein: (Zw != null ? 'Zielbild' : 'Mieterhöhung') + ' − Bestand − Kosten', w: br.netto, art: 'netto', schritt: true, netto: true });
+    return z;
+  }
+  function ueberleitungHtml(br) {
+    var Z = ueberleitungZeilen(br);
+    var M = Math.max.apply(null, Z.filter(function (z) { return z.schritt; }).map(function (z) { return Math.abs(z.w); }).concat([1])) * 1.08;
+    var bar = function (v, farbe) {
+      if (Math.abs(v) < 500) return '<svg viewBox="0 0 300 18" aria-hidden="true"><line x1="150" x2="150" y1="1" y2="17" stroke="#D9D2C3"/><text x="158" y="13" style="font:500 9.5px \'JetBrains Mono\',monospace;fill:#8A8272">unverändert</text></svg>';
+      var w = Math.abs(v) / M * 146, x = v >= 0 ? 150 : 150 - w;
+      return '<svg viewBox="0 0 300 18" aria-hidden="true"><line x1="150" x2="150" y1="0" y2="18" stroke="#E6DCC2"/><rect x="' + x.toFixed(1) + '" y="3" width="' + w.toFixed(1) + '" height="12" rx="2" style="fill:' + farbe + '"/></svg>';
+    };
+    return '<div class="dp-pot-scroll"><table class="dp-wp-ueb" aria-label="Wertüberleitung: Ertragswert je Stufe und Potenzial netto"><tbody>'
+      + Z.map(function (z) {
+          var farbe = z.netto ? (z.w >= 0 ? '#2f7d55' : '#B8625C') : STUFE_FARBE[z.art];
+          /* v2543a · ein Vorzeichen-Stil: „+ 15.000 €" / „− 48.000 €" */
+          var vz = function (n) { return (n < 0 ? '− ' : (n > 0 ? '+ ' : '')) + esc(eur(Math.abs(n))); };
+          var wert = z.netto ? '<span class="' + (z.w >= 0 ? 'pos' : 'neg') + '">' + vz(z.w) + '</span>'
+            : (z.schritt ? vz(z.w) : esc(eur(z.w)));
+          return '<tr class="' + (z.summe ? 'summe' : '') + (z.netto ? ' netto' : '') + '"><td class="l">' + (z.netto ? '' : '<i class="dot" style="background:' + farbe + '"></i>') + esc(z.t)
+            + (z.klein ? '<small>' + esc(z.klein) + '</small>' : '') + '</td><td class="bar">' + (z.schritt ? bar(z.w, farbe) : '') + '</td><td class="v">' + wert + '</td></tr>';
+        }).join('') + '</tbody></table></div>';
+  }
   function bewertungHtml(breite) {
     var m = modell(); if (!m.aktiv) return '';
     var d = pdfDaten(); if (!d) return '';
@@ -849,8 +1150,8 @@
             return '<div class="dp-wp-k ' + k.art + (k.art === 'netto' && k.w < 0 ? ' neg' : '') + '"><span>' + esc(k.t) + '</span><b>' + (k.art === 'netto' && k.w > 0 ? '+' : '') + esc(eur(k.w)) + '</b>'
               + (k.unter ? '<em>' + esc(k.unter) + '</em>' : '') + '</div>';
           }).join('') + '</div>'
-        + '<div class="dp-wp-h">Wertbrücke</div>' + brueckeSvg(d.bruecke, breite)
-        + '<p class="dp-wp-achse">Achse beginnt bei ' + esc(tEur(brueckeAchse(d.bruecke).min)) + ' · Beträge in Tausend Euro, gerundet.</p>';
+        + '<div class="dp-wp-h">Wertüberleitung</div>' + ueberleitungHtml(d.bruecke)
+        + '<p class="dp-wp-achse">Balken: Veränderung gegen die Zeile darüber, gemeinsame Skala um null.</p>';
     }
     html += '<div class="dp-wp-h">Kennzahlen je Stufe</div><div class="dp-pot-scroll"><table><thead><tr><th>Kennzahl</th>'
       + d.spalten.map(function (k) { return '<th class="' + cls[k] + '">' + esc(d.titel[k]) + '</th>'; }).join('') + '</tr></thead><tbody>'
@@ -1045,7 +1346,7 @@
     var s = w.soll || {};
     var vor = el('zb-soll-vorschlag');
     if (vor) vor.innerHTML = s.herkunft && s.herkunft !== 'eigene Angabe' && s.miete
-      ? 'DealPilot rechnet vor: <b>' + eur2(s.miete / (m.wfl || 1)) + '/m²</b> (' + esc(s.grenze || s.herkunft) + ')' + (s.ab_text ? ', erreichbar ' + esc(s.ab_text) : '') + '. Eigene Angabe überschreibt.'
+      ? 'DealPilot rechnet vor: <b>' + eur2(s.miete / (m.wfl || 1)) + '/m²</b> (' + esc(s.grenze || s.herkunft) + ')' + (s.ab_text ? ', erreichbar ' + esc(s.ab_text) : '') + '. Eigene Angabe überschreibt.' + (s.hinweise && s.hinweise.length ? ' Hinweis: ' + esc(s.hinweise.join(', ')) + '.' : '')
       : (s.grund && s.grund !== 'leer' ? esc(s.grund) : (s.hinweise && s.hinweise.length ? 'Hinweis: ' + esc(s.hinweise.join(', ')) : ''));
     host.innerHTML = !m.aktiv ? 'Ohne Angaben bleibt alles beim Bestand.'
       : 'Ist <b>' + eur(m.stufen.bestand.miete_m) + '</b>/Monat'
@@ -1054,7 +1355,7 @@
         + '<br>' + esc(m.kappung.text) + ' Die Ertragswerte stehen in der Pilot-Analyse (Reiter „Ankauf · Bestand · Zielbild") und in beiden PDFs.';
   }
   function bindeObjektFelder() {
-    ['zb_soll_qm', 'zb_ziel_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_wann', 'nkm', 'wfl', 'ds2_marktmiete', 'me_soll', 'mv_letzte_erhoehung'].forEach(function (id) {
+    ['zb_soll_qm', 'zb_ziel_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_wann', 'zb_fertig_jahr', 'kaufdat', 'nkm', 'wfl', 'ds2_marktmiete', 'me_soll', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag'].forEach(function (id) {
       var e = el(id); if (!e || e._dpZb) return; e._dpZb = true;
       e.addEventListener('input', function () { objektSumme(); });
       e.addEventListener('change', function () { objektSumme(); });
@@ -1086,16 +1387,25 @@
       try { if (typeof window.switchTab === 'function') window.switchTab(0); } catch (e) {}
       setTimeout(function () { var z = el('oe-ziel-status'); if (z && z.scrollIntoView) z.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 250);
     });
+    /* v2542 · Abruf „Marktpreise": erst fragen (kostet Kontingent), dann abrufen */
+    document.addEventListener('click', function (ev) {
+      var t = ev.target && ev.target.closest ? ev.target : null; if (!t) return;
+      if (t.closest('[data-dp-markt-abruf]')) { _markt.zustand = 'frage'; marktNeuZeichnen(); return; }
+      if (t.closest('[data-dp-markt-nein]')) { _markt.zustand = 'ruhe'; marktNeuZeichnen(); return; }
+      if (t.closest('[data-dp-markt-ja]')) { marktAbrufen(); return; }
+    });
     document.addEventListener('click', function (ev) {
       var b = ev.target && ev.target.closest ? ev.target.closest('[data-dp-pot-rechnen]') : null;
       if (!b) return;
       b.disabled = true; b.textContent = 'wird gerechnet …';
+      laufAnzeige(true, 'Ertragswerte werden gerechnet', 'Bestand, Mieterhöhung und Zielbild nach ImmoWertV — mit den Werten des Gutachterausschusses. Das dauert meist 5 bis 30 Sekunden.');
       rechnen({ erzwingen: true }).then(function (r) {
+        laufAnzeige(false);
         var host = b.closest('[data-dp-pot-wirt]');
         if (host) host.innerHTML = tafelHtml();
         else { b.disabled = false; b.textContent = (r && r.verfuegbar) ? 'gerechnet — Ansicht neu öffnen' : 'nicht verfügbar'; }
         if (r && !r.verfuegbar && !gesperrt(r) && typeof window.toast === 'function') window.toast('Ertragswert: ' + (r.grund || 'nicht verfügbar'));
-      });
+      }, function () { laufAnzeige(false); b.disabled = false; b.textContent = 'Ertragswerte rechnen'; });   /* v2556c */
     });
   }
   window.addEventListener('dp:object-ready', function () { setTimeout(objektKarte, 300); setTimeout(function () { try { bewertungKarte(); } catch (e) {} }, 400); });
@@ -1178,7 +1488,7 @@
     punkteGewinn: punkteGewinn, sollFuer: sollFuer, umlage559: umlage559,
     modell: modell, rechnen: rechnen, ergebnis: ergebnis, ergebnisVeraltet: ergebnisVeraltet,
     wohnungErgebnis: wohnungErgebnis, kennzahlen: kennzahlen, tafelHtml: tafelHtml, pdfDaten: pdfDaten, pilotPayload: pilotPayload,
-    brueckeDaten: brueckeDaten, brueckeAchse: brueckeAchse, bewertungKarte: bewertungKarte, bewertungHtml: bewertungHtml,
+    brueckeDaten: brueckeDaten, brueckeAchse: brueckeAchse, ueberleitungZeilen: ueberleitungZeilen, STUFE_FARBE: STUFE_FARBE, bewertungKarte: bewertungKarte, bewertungHtml: bewertungHtml,
     sollFuerMietentwicklung: sollFuerMietentwicklung, objektKarte: objektKarte,
     _hash: hash, _auftrag: auftrag
   };

@@ -149,8 +149,21 @@
     var mod = { dach: _v('mod_dach'), fenster: _v('mod_fenster'), leitungen: _v('mod_leitungen'), heizung: _v('mod_heizung'),
                 aussenwand: _v('mod_aussenwand'), baeder: _v('mod_baeder'), innenausbau: _v('mod_innenausbau'), grundriss: _v('mod_grundriss') };
     var n = 0; Object.keys(mod).forEach(function (k) { if (mod[k]) n++; });
-    if (!n) return null;
-    try { var p = W.modPunkte(mod); return { total: p.total, elements: p.elements, angaben: n }; } catch (e) { return null; }
+    /* ══ v2483 · BEIM MFH ZAEHLEN DIE EINHEITEN ═════════════════════════
+       Ein Haus, zwei Punktzahlen: der Konfigurator fuehrt Fenster, Baeder,
+       Innenausbau und Grundriss JE WOHNUNG, die acht Felder hier nur einmal.
+       Gemessen an Westerfeldstr. 140: hier 6 Punkte (Fenster „> 20 Jahre"),
+       im Konfigurator 7 (Fenster „teilweise erneuert") - Wertpotenzial 32 J.,
+       Mieterliste 35 J. Sind Einheiten erfasst, gelten ihre flaechengewich-
+       teten Punkte (DpMfhEinheiten.hausPunkte) - fuer das Feld mod_punkte und
+       damit fuer jeden, der es liest. */
+    var hp = null;
+    try { hp = (window.DpMfhEinheiten && typeof DpMfhEinheiten.hausPunkte === 'function') ? DpMfhEinheiten.hausPunkte() : null; } catch (e) { hp = null; }
+    if (!n && !hp) return null;
+    var p0 = null;
+    try { p0 = n ? W.modPunkte(mod) : null; } catch (e) { p0 = null; }
+    if (hp) return { total: hp.punkte, elements: p0 ? p0.elements : null, angaben: n, mfh: hp };
+    return p0 ? { total: p0.total, elements: p0.elements, angaben: n } : null;
   }
 
   /* Die Punkte wandern ins Feld mod_punkte (Select mit festen Stufen): die
@@ -307,6 +320,18 @@
     var mpQ = (mp && mp.total > 0 ? st('a', 'Anlage 2 greift') : st('x', 'Anlage 2 greift nicht'))
       + 'Die Punkte entstehen aus der Spalte „modernisiert" der Gewerke-Tabelle (Anlage 2 ImmoWertV) und tragen die Restnutzungsdauer. Klick springt zum Feld:'
       + '<br>' + mpChips;
+    if (mp && mp.mfh) mpQ = st('a', 'Anlage 2 greift') + 'Aus den ' + mp.mfh.einheiten + ' Einheiten des MFH-Konfigurators, flächengewichtet ('
+      + deNum(mp.mfh.gewichtet, 1) + ' Punkte, angesetzt ' + mp.total + '). Dieselbe Zahl rechnen Marktbericht, Ertragswert und Wertpotenzial.';   /* v2483 */
+    /* v2540 · Marcel 20.10.2026: „konfigurierbar machen" - beim MFH mit Einheiten
+       waehlbar, woher die Punkte kommen (Merker mod_quelle, mfh-einheiten.js modQuelle) */
+    var _DM = window.DpMfhEinheiten;
+    if (_DM && _DM.hatEinheiten && _DM.hatEinheiten()) {
+      var _q = _DM.modQuelle();
+      if (_q === 'felder') mpQ += '<br>Beim MFH nach deiner Wahl aus diesen acht Feldern, nicht aus den Einheiten. Dieselbe Zahl rechnen Marktbericht, Ertragswert, Wertpotenzial und Mieterliste.';
+      mpQ += '<br><span class="oe-chips">Punkte aus: '
+        + '<span class="oe-chip' + (_q === 'einheiten' ? ' gewaehlt' : '') + '" data-oe-modquelle="" role="button" aria-pressed="' + (_q === 'einheiten') + '">den Einheiten (Konfigurator)</span>'
+        + '<span class="oe-chip' + (_q === 'felder' ? ' gewaehlt' : '') + '" data-oe-modquelle="felder" role="button" aria-pressed="' + (_q === 'felder') + '">den acht Feldern</span></span>';
+    }
     var mpZeile = zeile('Modernisierungspunkte', mp ? mp.total + ' von 20' : '—', mpQ, '');
     if (!o.plz) {
       box.innerHTML = brwZeile() + zeile('Liegenschaftszins', '—', 'PLZ eintragen — dann holt DealPilot den amtlichen Satz', '')
@@ -316,6 +341,14 @@
     box.innerHTML = brwZeile() + zeile('Liegenschaftszins', '…', 'wird aus dem Register gelesen', '') + mpZeile;
     var r = await api('/marktbericht/wertparameter/zinssatz', { object: o });
     if (lauf !== _autoLauf) return;
+    /* v2483 · die RND des Hauses fuer Mieterliste und Bankfassung (mfh-einheiten.js
+       hausRnd): dieselbe Zahl wie diese Zeile, nicht ein zweiter Weg */
+    try {
+      window._dpHausRnd = (r && r.verfuegbar && r.rnd_jahre != null)
+        ? { key: (typeof window._currentObjKey === 'string' && window._currentObjKey) || null, baujahr: Number(o.baujahr) || null,
+            punkte: o.mod_punkte, gnd: r.gnd_jahre || null, gnd_quelle: r.gnd_quelle || null, rnd: Number(r.rnd_jahre), quelle: r.rnd_quelle || null }
+        : null;
+    } catch (e) {}
     /* v2273 · gemessen Bismarckstr. 27 (Bj 1908, 9 Punkte): die Zeile sagte „Anlage 2
        greift", die Zeile GND / RND darüber „Anlage 2 wurde nicht angewandt“. Rechnet
        der Endpunkt den Rückfall, sagt das jetzt auch die Punkte-Zeile. */
@@ -411,7 +444,7 @@
          Beim Rueckfall steht auch, WARUM, denn das ist die Antwort auf
          Marcels Frage „wo muss ich die Eingaben machen": die
          Modernisierungspunkte sind der einzige Hebel. */
-      var rndTxt = (r.rnd_jahre == null) ? '—' : deNum(r.rnd_jahre, (r.rnd_jahre % 1 ? 1 : 0));
+      var rndTxt = (r.rnd_jahre == null) ? '—' : deNum(Math.round(r.rnd_jahre), 0);   /* v2483 · ganze Jahre wie Mieterliste, Wertpotenzial und PDFs */
       var rndQ = r.rnd_quelle === 'anlage2' ? st('a', 'Anlage 2')
               : r.rnd_quelle === 'geschaetzt' ? st('b', 'geschätzt') : '';
       var rndSatz = r.rnd_hinweis ? esc(r.rnd_hinweis)
@@ -561,7 +594,8 @@
     }
     var l = ['plz', 'ort', 'str', 'objart', 'wfl', 'baujahr'];
     if (stufe >= 2) {
-      l = l.concat(['kp', 'nkm', 'ds2_zustand', 'ds2_energie', 'standardstufe', 'zimmer']);
+      l = l.concat(['kp', 'nkm', 'ds2_zustand', 'ds2_energie', 'standardstufe']);
+      if (art !== 'MFH') l.push('zimmer');   /* v2557: beim MFH blendet objektart-felder.js Zimmer aus - kein Pflichtfeld, das man nicht sieht */
       if (art === 'ETW') l.push('etage');
       if (art === 'MFH') l.push('einheiten');
     }
@@ -968,11 +1002,18 @@
          (DealPilotAbschlag, Satz aus den Einstellungen, sonst Marktdurchschnitt). */
       if (isFinite(m) && m > 0) {
         var ab = null, mw = m;
-        try {
+        /* v2490 · Seit v2367 zieht der BERICHT den Abschlag ab (örtlich gemessen,
+           eigener Wert oder Marktdurchschnitt) - market_value ist dann schon
+           bereinigt und der Satz steht in angebot_abschlag_pct. Bis hier wurde
+           er ein zweites Mal abgezogen (Westerfeldstr. 140: Karte 795.000 nach
+           15,9 %, Verlauf 749.000 „−5,8 %"). Nur Berichte vor v2367 sind roh. */
+        var abB = (h.angebot_abschlag_pct != null && h.angebot_abschlag_pct !== '') ? Number(h.angebot_abschlag_pct) : NaN;
+        if (isFinite(abB)) { ab = abB; mw = m; }
+        else try {
           var A = window.DealPilotAbschlag;
           if (A && typeof A.satz === 'function') { ab = A.satz(); mw = Math.round(m * (1 - ab / 100) / 1000) * 1000; }
         } catch (x) { ab = null; mw = m; }
-        liste.push(Object.assign({}, basis, { wert: mw, roh: m, abschlag: ab, art: 'Marktwert', fuehrend: false, trau: 'I' }));
+        liste.push(Object.assign({}, basis, { wert: mw, roh: (isFinite(abB) && Number(h.market_value_roh) > 0) ? Number(h.market_value_roh) : m, abschlag: ab, art: 'Marktwert', fuehrend: false, trau: 'I' }));
       }
     });
     if (!liste.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
@@ -992,7 +1033,7 @@
          mit dem Abschlag dahinter */
       var _art = h.art === 'Marktwert' ? 'Marktwertindikation'
         : (h.art === 'Vergleichswert' && !h.amtlich ? 'Vergleichswert (Angebotspreise)' : (h.art || 'Marktwertindikation'));
-      var _ab = (h.art === 'Marktwert' && h.abschlag != null) ? ' (−' + String(h.abschlag).replace('.', ',') + ' %)' : '';
+      var _ab = (h.art === 'Marktwert' && h.abschlag > 0) ? ' (−' + String(h.abschlag).replace('.', ',') + ' %)' : '';
       var _tr = _trauen(h.trau);
       return '<option value="' + i + '"' + _t + '>' + _art + ' · '
         + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €' + _ab + _f + (_tr ? ' · ' + (_tr.buchst ? _tr.buchst + ' ' : '') + _tr.kurz : '') + '</option>';
@@ -1113,6 +1154,24 @@
         bgfEl.dispatchEvent(new Event('input', { bubbles: true })); bgfEl.dispatchEvent(new Event('change', { bubbles: true }));
         try { var hk = $('_dp_herkunft'); if (hk) { var o = {}; try { o = JSON.parse(hk.value || '{}'); } catch (e2) {} o.bgf = 'geschätzt (Wohnfläche × 1,35, EFH-Faustwert)'; hk.value = JSON.stringify(o); hk.dispatchEvent(new Event('change', { bubbles: true })); } } catch (e3) {}
         if (bh) bh.textContent = 'Schätzung: ' + deNum(wfl, 0) + ' m² × 1,35 = ' + deNum(bgf, 0) + ' m² BGF — grobe Näherung (DIN 277 misst außen, alle Grundrissebenen). Die Bauzeichnung ist genauer.';
+        return;
+      }
+      /* v2540 · Quelle der Modernisierungspunkte beim MFH umschalten */
+      var mq = e.target.closest('[data-oe-modquelle]');
+      if (mq) {
+        var mqF = $('mod_quelle'), mqV = mq.getAttribute('data-oe-modquelle') || '';
+        if (mqF && mqF.value !== mqV) {
+          mqF.value = mqV;
+          try { mqF.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {}
+          /* die Zahl aus den Einheiten gilt nicht mehr: ohne Angabe in den acht
+             Feldern steht das Feld danach auf „keine Angabe", nicht auf ihr */
+          var mpS = $('mod_punkte'), mpO = mpS && mpS.selectedIndex >= 0 ? mpS.options[mpS.selectedIndex] : null;
+          if (mqV === 'felder' && mpO && mpO.hasAttribute('data-oe-auto')) {
+            mpS.value = '';
+            try { mpS.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {}
+          }
+          automatik();
+        }
         return;
       }
       var b = e.target.closest('[data-oe-feld]'); if (b) { abweichend(b.getAttribute('data-oe-feld')); return; }

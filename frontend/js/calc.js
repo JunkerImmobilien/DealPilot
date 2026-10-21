@@ -1213,7 +1213,18 @@ function _calcImmediate(){
   st('gs_ant',gs_a.toFixed(2)+' m²');st('bodenwert',fE(gs_a*v('brw')));
   var nkm=v('nkm'),ze=v('ze'),uf=v('umlagef');
   var wm_m=nkm+ze+uf,wm_j=wm_m*12,nkm_j=(nkm+ze)*12;
-  st('wm_m',fE(wm_m,2));st('wm_j',fE(wm_j,2));st('nkm_j_out',fE(nkm_j));
+  /* ══ v2484 · EINE WARMMIETE ══════════════════════════════════════════
+     Marcel 20.10.2026: „Das muss eindeutig sein." Gemessen Westerfeldstr. 140:
+     Bank-PDF 41.147 € (wm_j = NKM + Zusatzeinnahmen + Umlagen der Mieter),
+     Investment-PDF 39.756 € (NKM + Zusatzeinnahmen + umlagefaehige KOSTEN des
+     Vermieters, 336 €). Zwei Definitionen, zwei Zahlen.
+     Festgelegt: WARMMIETE = Nettokaltmiete + Nebenkostenvorauszahlungen der
+     Mieter (Feld umlagef). Zusatzeinnahmen (Stellplatz, Garage, Feld ze) sind
+     keine Miete der Wohnung und stehen GETRENNT. warm_j ist die Anzeigezahl
+     fuer App und beide PDFs; wm_j bleibt als interne Summe (Steuerverlauf
+     tax.js, Projektion) unveraendert - dort zaehlen die Zusatzeinnahmen mit. */
+  var warm_m=nkm+uf,warm_j=warm_m*12;
+  st('wm_m',fE(warm_m,2));st('wm_j',fE(warm_j,2));st('nkm_j_out',fE(nkm_j));
   // V227: AfA mit linear ODER degressiv ODER degressiv-mit-Wechsel, optional + § 7b
   var afaSelVal = (el('afa_satz') || {}).value || '2.0';
   var afaParsed = (window.Afa && Afa.parseSelectValue) ? Afa.parseSelectValue(afaSelVal) : { methode: 'linear', satzPct: parseDe(afaSelVal) || 2 };
@@ -2519,7 +2530,7 @@ function _calcImmediate(){
   st('sc-today',fE(cf_ns,0,true));st('sc-ezb',fE(cf_ezb,0,true));
   st('sc-exit',fE(exit_vkp-Math.max(0,rs),0,true));
   // V63.35: Initial-Setter für Cashflow-Box (renderCFCalc überschreibt mit Phase-Werten)
-  st('cr-wm',fE(wm_j));st('cr-bwk-ul','–'+fE(ul));st('cr-bwk-nul','–'+fE(nul));st('cr-zins','–'+fE(zins_j));
+  st('cr-wm',fE(warm_j));st('cr-bwk-ul','–'+fE(uf*12));   /* v2484 */st('cr-bwk-nul','–'+fE(nul));st('cr-zins','–'+fE(zins_j));
   st('cr-cfop',fE(cf_op,0,true));
   // V63.51: Bei Tilgungsaussetzung "Tilgung" durch Bauspar-Rate ersetzen
   if (_d1IsAussetzung) {
@@ -2837,7 +2848,8 @@ function _calcImmediate(){
      abholt (storage.js), prueft das und schreibt sonst nichts.
 
        > Wer eine Rechnung abholt, muss wissen, zu wem sie gehoert. */
-  State.kpis={_fuer:(window._currentObjKey||null),bmy:bmy,bmy_gi:(gi>0?nkm_j/gi*100:0),san_fin:_sanFin,ltc:_ltc,ltv_soll:_ltvSoll,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,ekr_ns:ekr_ns,
+  State.kpis={_fuer:(window._currentObjKey||null),warm_j:warm_j,nk_vz_j:uf*12,ze_j:ze*12,nkm_netto_j:nkm*12,ze_ezb:ze*12*(_meIncludesZE?_mFac(bindj):1),   /* v2484 */
+    bmy:bmy,bmy_gi:(gi>0?nkm_j/gi*100:0),san_fin:_sanFin,ltc:_ltc,ltv_soll:_ltvSoll,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,ekr_ns:ekr_ns,
     irr:irr,be_cf:be.cf,be_kum:be.kum,be_kum_ek:be.kumEk,dscr:dscr,dscr_netto:dscr_netto,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,bwk_nul_st:nul_st,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung};
   /* v1898 · `bwk_nul_st` wird hier MITGEFUEHRT, damit storage.js es am Objekt
      stempeln kann (`_kpis_bwk_nul_st_y`). Das Cockpit rechnet seine
@@ -3261,7 +3273,7 @@ function _calcImmediate(){
     }
     var _rs_push = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0);  // V354: kombinierte RS fuer Anzeige
     var eff_rs = Math.max(0, _rs_push - bspar_kum_proj);
-    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:wm_y2/12,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,bwk_st_y:bwk_st_y2,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y,afa_y:_afaJahr(y),zve_y:zve_op_y-_afaJahr(y)});  /* v2166: AfA und steuerliches Ergebnis je Jahr - fuer die Pilot-Analyse (Werbungskosten, Jahr der Wende) */
+    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:(wm_j>0?wm_y2*warm_j/wm_j:0)/12 /* v2484: Anzeige Warmmiete ohne Zusatzeinnahmen */,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,bwk_st_y:bwk_st_y2,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y,afa_y:_afaJahr(y),zve_y:zve_op_y-_afaJahr(y)});  /* v2166: AfA und steuerliches Ergebnis je Jahr - fuer die Pilot-Analyse (Werbungskosten, Jahr der Wende) */
   }
   /* v1898 · WOHER DAS zvE JE JAHR KAM — die Herkunft ist ausweisbar, statt
      dass eine Zahl ohne Vermerk dasteht. 'steuerzeitraum' = aus Marcels
@@ -3745,6 +3757,22 @@ function renderCFCalc(mode){
   mode = mode || 'heute';
   var K = State.kpis;
   if(!K || !K.kp) return;
+  /* v2484 · Beschriftung der Warmmieten-Kette einmal setzen (index.html bleibt unberuehrt) */
+  function _crWarmKette() {
+    var w = document.getElementById('cr-wm'), u = document.getElementById('cr-bwk-ul'), k = document.getElementById('cr-kaltmiete');
+    if (!w || !u || !k || w.getAttribute('data-v2484')) return;
+    w.setAttribute('data-v2484', '1');
+    var lab = function (id, html) { var e = document.getElementById(id); if (e && e.parentNode && e.parentNode.firstElementChild) e.parentNode.firstElementChild.innerHTML = html; };
+    lab('cr-wm', '<b>Warmmiete / Jahr</b> <span class="cf-hint">(NKM + NK-Vorauszahlungen)</span>');
+    lab('cr-bwk-ul', '– NK-Vorauszahlungen der Mieter <span class="cf-hint">(durchlaufend, mit den umlagefähigen Kosten verrechnet)</span>');
+    lab('cr-kaltmiete', '<b>= Kaltmiete inkl. Zusatzeinnahmen / Jahr</b>');
+    var ref = k.parentNode;
+    var z1 = document.createElement('div'); z1.className = 'kv kv-step';
+    z1.innerHTML = '<span><b>= Nettokaltmiete / Jahr</b></span><span class="kv-v" id="cr-nkm-netto">—</span>';
+    var z2 = document.createElement('div'); z2.className = 'kv';
+    z2.innerHTML = '<span>+ Zusatzeinnahmen <span class="cf-hint">(Stellplatz, Garage)</span></span><span class="kv-v" id="cr-ze">—</span>';
+    ref.parentNode.insertBefore(z1, ref); ref.parentNode.insertBefore(z2, ref);
+  }
   var data;
   if(mode === 'heute'){
     data = {
@@ -3788,8 +3816,19 @@ function renderCFCalc(mode){
   var cf_nach_zinsen = noi - data.zins;
   var cf_vst = cf_nach_zinsen - data.tilg;
 
-  st('cr-wm', fE(warmmiete_phase));                  // Warmmiete (inkl. umlagef. Erstattung)
-  st('cr-bwk-ul', '–' + fE(phase_bwk_ul));            // UL durchlaufend (an Verwaltung)
+  /* v2484 · Warmmiete = Nettokaltmiete + Nebenkostenvorauszahlungen der Mieter,
+     Zusatzeinnahmen getrennt (dieselbe Kette wie beide PDFs). Hier stand die
+     Warmmiete als NKM + ZE + umlagefaehige KOSTEN (Westerfeld 39.756 statt der
+     Vorauszahlungen 41.147 im Reiter Miete). Kaltmiete und NOI bleiben gleich. */
+  var _ufPh = Math.max(0, (data.wm || 0) - (data.nkm || 0));
+  var _zePh = mode === 'heute' ? (K.ze_j || 0) : (K.ze_ezb || 0);
+  var _nkmNetto = kaltmiete_phase - _zePh;
+  _crWarmKette();
+  st('cr-wm', fE(_nkmNetto + _ufPh));
+  st('cr-bwk-ul', '–' + fE(_ufPh));
+  st('cr-nkm-netto', fE(_nkmNetto, 0, true));
+  st('cr-ze', '+' + fE(_zePh));
+  var _zeZ = document.getElementById('cr-ze'); if (_zeZ && _zeZ.parentNode) _zeZ.parentNode.style.display = _zePh > 0.5 ? '' : 'none';
   st('cr-kaltmiete', fE(kaltmiete_phase, 0, true));   // = NKM + ZE
   st('cr-bwk-nul', '–' + fE(phase_bwk_nul));
   st('cr-noi', fE(noi, 0, true));

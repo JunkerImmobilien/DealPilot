@@ -29,6 +29,18 @@
     + 'Datenlizenz Deutschland – Namensnennung – 2.0';
   var _letzt = '', _timer = null, _daten = null;
 
+  /* ══ v2500 · BEIDE KAESTEN IM REITER MIETE ABGESCHALTET (20.10.2026) ═══
+     Marcel: „Im Tab Miete kannst du unten den Zensus rausnehmen. Der hat
+     einfach nichts mit der Marktmiete zu tun." Die Bestandsmiete aller
+     Vertraege vom Mai 2022 ist keine Marktmiete; neben dem Feld Marktmiete
+     las sie sich wie eine. Der Leerstand wandert in die
+     Pilot-Mietpreis-Analyse (ki-miete.js, Block Mietausfall-Risiko) - dort
+     als Gegenueberstellung „Leerstand laut Zensus 2022 (Stichtag
+     15.05.2022)", mit demselben Anhalt und demselben Uebernehmen-Knopf.
+     Der Abruf bleibt (DealPilotZensusInfo.daten() fuer andere Leser);
+     wer einen Kasten zurueckwill, setzt hier true. */
+  var ANZEIGE = { miete: false, leer: false };
+
   function $(id) { return document.getElementById(id); }
   function v(id) { var e = $(id); return e ? String(e.value || '').trim() : ''; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -128,10 +140,10 @@
     var mm = $('ds2_marktmiete'), ma = $('ds2_mietausfall');
     var fMiete = mm && mm.closest ? mm.closest('.f') : null;
     var fLeer = ma && ma.closest ? ma.closest('.f') : null;   /* v2220: am Mietausfall-Risiko */
-    if (!z || !z.available) { einsetzen(null, 'dp-zi-miete'); einsetzen(null, 'dp-zi-leer'); return; }
+    if (!z || !z.available || (!ANZEIGE.miete && !ANZEIGE.leer)) { einsetzen(null, 'dp-zi-miete'); einsetzen(null, 'dp-zi-leer'); return; }
     stil();
-    einsetzen(fMiete, 'dp-zi-miete', mieteHtml(z));
-    einsetzen(fLeer, 'dp-zi-leer', leerHtml(z));
+    einsetzen(ANZEIGE.miete ? fMiete : null, 'dp-zi-miete', mieteHtml(z));
+    einsetzen(ANZEIGE.leer ? fLeer : null, 'dp-zi-leer', leerHtml(z));
   }
 
   function laden() {

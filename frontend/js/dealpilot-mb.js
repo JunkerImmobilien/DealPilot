@@ -203,10 +203,19 @@ if (!window._wlc) {
         });
       }
     } catch (e) {}
+    /* v2483 · beim MFH mit erfassten Einheiten sind DEREN flaechengewichtete Punkte die
+       Punkte des Hauses (Anlage 2) - auch wenn das Feld mod_punkte noch den alten Stand
+       traegt (gespeichert vor v2483, oder nach einer Aenderung der acht mod_*-Felder).
+       Eine Punktzahl, eine Restnutzungsdauer: Bericht, Wertpotenzial, Mieterliste. */
+    try {
+      var _hp = (window.DpMfhEinheiten && typeof window.DpMfhEinheiten.hausPunkte === 'function') ? window.DpMfhEinheiten.hausPunkte() : null;
+      if (_hp && _hp.punkte != null) o.mod_punkte = String(_hp.punkte);
+    } catch (e) {}
     /* v2367 · eigener Abschlag auf Angebotspreise (Investmentprofil) - nur wenn gesetzt;
        sonst waehlt der Marktbericht selbst (oertliche Kauffaelle oder Marktdurchschnitt). */
-    try { var _IP = window.DealPilotInvestmentProfile, _ab = _IP && _IP.get ? _IP.get('angebot_abschlag_pct') : null;
-      if (_ab != null && _ab !== '') o.angebot_abschlag_pct = _ab; } catch (e) {}
+    /* v2490 · eine Stelle fuer beide Abrufe: DealPilotAbschlag.eigen() (auch im QC-iframe) */
+    try { var _A = window.DealPilotAbschlag, _ab = (_A && _A.eigen) ? _A.eigen() : null;
+      if (_ab != null) o.angebot_abschlag_pct = _ab; } catch (e) {}
     return o;
   }
 
@@ -531,7 +540,9 @@ if (!window._wlc) {
 
   /* \u2500\u2500 In Felder \u00fcbernehmen (wie applyAvm: svwert + ds2_marktmiete \u20ac/m\u00b2) \u2500\u2500 */
   function setInput(id, val) { var el = $(id); if (!el || val == null || val === '') return; el.value = val; try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {} }
-  function setSel(id, v) { var el = $(id); if (!el || !v) return; el.value = v; try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} }
+  /* v2515: Werte aus dem Marktbericht sind gemessen - die Herkunft je Lage-Feld wird mitgeschrieben (ki-lage.js) */
+  function _herkGemessen(id) { try { if (global.DpLageHerkunft) global.DpLageHerkunft.setze(id, 'gemessen'); } catch (e) {} }
+  function setSel(id, v) { var el = $(id); if (!el || !v) return; el.value = v; try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} if (String(el.value) === String(v)) _herkGemessen(id); }
   /* ═══════════════════════════════════════════════════════════════════
      v1316 · Die erweiterte Marktpreisindikation füllt jetzt aus, was sie
              weiss — und tut es von selbst
@@ -613,6 +624,7 @@ if (!window._wlc) {
     el.value = v;
     if (String(el.value || '') !== String(v)) return false;   /* Option gibt es nicht */
     try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
+    _herkGemessen(id);   /* v2515 */
     return true;
   }
 

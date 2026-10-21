@@ -829,7 +829,10 @@ function sBox(doc, x, y, w, label, val, sub, bg, acc) {
  */
 /* v603-pdf-sections: Titel -> Checkbox-Key (default an, unbekannt = an) */
 function _dpPdfSecKey(title){
-  var m={'Gesamtbewertung':'gesamt','Stärken':'staerken','Risiken':'risiken','Risikoanalyse':'risikoanalyse','Szenario-Analyse':'szenarien','Investor-Fit':'investorfit','Empfehlung':'empfehlung','Investmentbewertung':'investbew','Verhandlungsempfehlung':'verhandlung','Kaufpreis-Offerte':'offerte','Bankargumente':'bank','DealPilot-Insight':'insight'};
+  var m={'Gesamtbewertung':'gesamt','Stärken':'staerken','Risiken':'risiken','Risikoanalyse':'risikoanalyse','Szenario-Analyse':'szenarien','Investor-Fit':'investorfit','Empfehlung':'empfehlung','Investmentbewertung':'investbew','Verhandlungsempfehlung':'verhandlung','Kaufpreis-Offerte':'offerte','Bankargumente':'bank','DealPilot-Insight':'insight',
+    /* v2552 · die Abschnitte, die die Pilot-Analyse seit v2150-v2544 zeigt */
+    'Anschlussfinanzierung':'anschluss','Lage & Markt':'lage','Abgleich mit dem Marktbericht':'abgleich','Optischer Eindruck aus den Fotos':'fotos',
+    'Ankauf · Bestand · Zielbild':'zielbild','Ankauf gegen heute':'ankaufheute','Steuerliche Zusammenfassung':'steuer','Steuerverlauf':'steuerverlauf'};
   return m[title]||null;
 }
 function _dpPdfSectionOn(title){var k=_dpPdfSecKey(title);if(!k)return true;var cb=document.getElementById('ai-pdf-sec-'+k);return !cb||cb.checked;}
@@ -841,7 +844,36 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     return t.replace(/\*+/g, '').trim();
   }
   function maybePage(needed) {
-    if (cy + needed > 280) cy = newPage('KI-Investment-Analyse');
+    if (cy + needed > 280) cy = newPage('Pilot-Analyse');
+  }
+
+  /* v2555 · Ein Abschnitt bricht ueber die Seite um, statt als Ganzes auf die
+     naechste zu springen. Gemessen am Westerfeld-PDF (21.10.2026): die Analyse
+     belegte zehn Seiten, viele zu einem Viertel gefuellt. Passen Kopf und drei
+     Zeilen nicht mehr, beginnt der Abschnitt auf der neuen Seite; sonst laeuft
+     er weiter und traegt dort „(Fortsetzung)". */
+  function _zeichneBlock(title, lines, accentColor, isDarkBg) {
+    var LINE_H = 5.2, KOPF = 12, FUSS = 7, UNTEN = 280;
+    if (cy + KOPF + 3 * LINE_H + FUSS > UNTEN) cy = newPage('Pilot-Analyse');
+    var i = 0, erst = true;
+    while (i < lines.length) {
+      var platz = Math.max(1, Math.floor((UNTEN - cy - KOPF - FUSS) / LINE_H));
+      var teil = lines.slice(i, i + platz);
+      var h = KOPF + teil.length * LINE_H + FUSS;
+      doc.setFillColor(255, 255, 255); doc.roundedRect(M, cy, CW, h, 1.8, 1.8, 'F');
+      doc.setFillColor.apply(doc, accentColor); doc.rect(M, cy, 2, h, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.8);
+      doc.setTextColor.apply(doc, accentColor);
+      doc.text(title.toUpperCase() + (erst ? '' : ' (FORTSETZUNG)'), M + 6, cy + 6);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+      if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.35);
+      if (isDarkBg) doc.setTextColor(245, 245, 240); else doc.setTextColor(45, 42, 42);
+      var textY = cy + KOPF;
+      teil.forEach(function (line) { doc.text(line, M + 6, textY); textY += LINE_H; });
+      if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.15);
+      i += teil.length; erst = false;
+      if (i < lines.length) cy = newPage('Pilot-Analyse'); else cy += h + 4;
+    }
   }
 
   // V63.45: Sicherer Multi-Paragraph-Renderer mit klarem rechtem Padding (10mm).
@@ -873,33 +905,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     // V63.71: Sehr konservatives TEXT_W (CW - 24mm = 6 links + 18 rechts Sicherheit)
     var TEXT_W = CW - 24;
     var lines = _splitParagraphs(text, TEXT_W);
-    // V63.71: LINE_H 5.2mm - generous für lange dt. Wörter mit Descender
-    var LINE_H = 5.2;
-    // V63.71: Mehr Header-Luft (6mm) + Bottom-Padding (7mm) für Sicherheit
-    var blockH = 6 + 6 + lines.length * LINE_H + 7;
-    maybePage(blockH);
-
-    doc.setFillColor.apply(doc, bgColor); doc.roundedRect(M, cy, CW, blockH, 1.8, 1.8, 'F');
-    doc.setFillColor.apply(doc, accentColor); doc.rect(M, cy, 2, blockH, 'F');
-
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(8.8);
-    doc.setTextColor.apply(doc, accentColor);
-    doc.text(title.toUpperCase(), M + 6, cy + 6);
-
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
-    if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.35);
-    if (isDarkBg) {
-      doc.setTextColor(245, 245, 240);
-    } else {
-      doc.setTextColor(45, 42, 42);
-    }
-    var textY = cy + 12;
-    lines.forEach(function(line) {
-      doc.text(line, M + 6, textY);
-      textY += LINE_H;
-    });
-    if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.15);
-    cy += blockH + 4;
+    _zeichneBlock(title, lines, accentColor, isDarkBg);   /* v2555 */
   }
 
   function bulletBlock(title, items, bgColor, accentColor) {
@@ -919,27 +925,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
         rendered.push((idx === 0 ? '\u2022  ' : '   ') + w);
       });
     });
-    var LINE_H = 5.2;
-    var blockH = 6 + 6 + rendered.length * LINE_H + 7;
-    maybePage(blockH);
-
-    doc.setFillColor.apply(doc, bgColor); doc.roundedRect(M, cy, CW, blockH, 1.8, 1.8, 'F');
-    doc.setFillColor.apply(doc, accentColor); doc.rect(M, cy, 2, blockH, 'F');
-
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(8.8);
-    doc.setTextColor.apply(doc, accentColor);
-    doc.text(title.toUpperCase(), M + 6, cy + 6);
-
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
-    if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.35);
-    doc.setTextColor(45, 42, 42);
-    var textY = cy + 12;
-    rendered.forEach(function(line) {
-      doc.text(line, M + 6, textY);
-      textY += LINE_H;
-    });
-    if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.15);
-    cy += blockH + 4;
+    _zeichneBlock(title, rendered, accentColor, false);   /* v2555 */
   }
 
   // 1. Gesamtbewertung
@@ -1004,6 +990,52 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   if (Array.isArray(a.bankargumente) && a.bankargumente.length) {
     bulletBlock('Bankargumente', a.bankargumente, [232, 244, 234], [42, 154, 90]);
   }
+
+  /* v2552 · Marcel 21.10.2026: „in der Pilot-Analyse muss auch der Reiter Bausteine
+     im PDF angepasst werden." Gemessen: die Analyse zeigt acht Abschnitte, die das
+     PDF nie druckte (Felder kamen in pdf.js nicht vor). Jetzt als Textbausteine,
+     jeder mit eigenem Haken unter „Bausteine im PDF". */
+  var _eur = function (x) { return (x < 0 ? '-' : '') + Math.round(Math.abs(x)).toLocaleString('de-DE') + ' €'; };
+  if (a.anschlussfinanzierung) block('Anschlussfinanzierung', clean(a.anschlussfinanzierung));
+  (function () {
+    var t = [];
+    if (a.makrolage_recherche) t.push('Makrolage: ' + clean(a.makrolage_recherche));
+    if (a.mikrolage_recherche) t.push('Mikrolage: ' + clean(a.mikrolage_recherche));
+    if (a.mietspiegel_eur_qm != null && a.mietspiegel_eur_qm !== '') t.push('Mietspiegel: ' + clean(a.mietspiegel_eur_qm) + ' €/m²' + (a.mietspiegel_herkunft ? ' (' + clean(a.mietspiegel_herkunft) + ')' : ''));
+    if (a.kaufpreisniveau) t.push('Kaufpreisniveau: ' + clean(a.kaufpreisniveau));
+    if (t.length) block('Lage & Markt', t.join('\n\n'));
+  })();
+  if (a.berichts_abgleich) block('Abgleich mit dem Marktbericht', clean(a.berichts_abgleich) + '\n\nSach- und Ertragswert im Bericht sind ein Plausibilitäts-Quercheck nach ImmoWertV-Logik — indikativ, kein Gutachten nach § 194 BauGB.');
+  if (a.optischer_eindruck) block('Optischer Eindruck aus den Fotos', clean(a.optischer_eindruck) + '\n\nEin visueller Eindruck aus den mitgesendeten Bildern — keine Feststellung.');
+  if (a.potenzial_text) block('Ankauf · Bestand · Zielbild', clean(a.potenzial_text) + '\n\nDie Zahlen je Stand stehen auf der Seite Wertpotenzial.');
+  (function () {
+    var t = [];
+    try {
+      var AK = window.DealPilotAnkauf, st = AK && AK.stand ? AK.stand() : (window._dpAnkauf || null);
+      var roh = st && st.daten ? st.daten._ai : null, alt = roh ? (typeof roh === 'string' ? JSON.parse(roh) : roh) : null;
+      if (alt && typeof alt === 'object' && (alt.empfehlung || alt.gesamtbewertung)) {
+        var kp = function (x) { var o = x && x.kaufpreis_offerte; return o && o.empfohlen ? clean(String(o.empfohlen)) : '–'; };
+        t.push('Empfehlung beim Ankauf: ' + clean(alt.empfehlung || '–') + ' · heute: ' + clean(a.empfehlung || '–'));
+        t.push('Empfohlener Kaufpreis beim Ankauf: ' + kp(alt) + ' · heute: ' + kp(a));
+      }
+    } catch (e) {}
+    if (a.soll_ist_steuer) t.push('Steuerlich: ' + clean(a.soll_ist_steuer));
+    if (t.length) block('Ankauf gegen heute', t.join('\n\n'));
+  })();
+  if (a.steuer_zusammenfassung) block('Steuerliche Zusammenfassung', clean(a.steuer_zusammenfassung) + '\n\nEine Einordnung aus den Eingaben im Reiter Steuer — keine Steuerberatung.');
+  (function () {
+    var SV = window.DpSteuerVerlauf, r = null;
+    try { r = SV && SV.reihe ? SV.reihe() : null; } catch (e) { r = null; }
+    if (!r || !r.length) return;
+    var w = SV.auswerten(r), t = [];
+    if (w.jahr != null) t.push(w.wende === 0 ? 'Das Objekt ist vom ersten Jahr an steuerlich positiv (Überschuss ab ' + w.jahr + ').'
+      : 'Steuerlich positiv ab ' + w.jahr + '. Bis dahin ' + _eur(w.erstattung) + ' Steuererstattung, danach ' + _eur(-w.steuer) + ' Steuer im Betrachtungszeitraum.');
+    else t.push('Im Betrachtungszeitraum bleibt das Objekt steuerlich im Verlust.');
+    r.slice(0, 12).forEach(function (z) {
+      t.push(z.jahr + ': Ergebnis ' + _eur(z.erg) + ' · ' + (z.steuer >= 0 ? 'Erstattung ' + _eur(z.steuer) : 'Steuer ' + _eur(-z.steuer)) + (z.cf != null ? ' · Cashflow nach Steuern ' + _eur(z.cf) : ''));
+    });
+    block('Steuerverlauf', t.join('\n'));
+  })();
 
   // 7. DealPilot-Insight (V63.45: dunkler Hintergrund mit hellem Text)
   if (a.dealpilot_insight) {
@@ -1281,8 +1313,13 @@ async function _exportPDFInner() {
   var bwk_ul_now = K.bwk_ul || 0;
   var bwk_nul_now = K.bwk_nul || 0;
   var nkm_now = K.nkm_j;
-  var warmmiete_now = nkm_now + bwk_ul_now;
-  var kaltmiete_now = warmmiete_now - bwk_ul_now;  // = nkm_now
+  /* v2484 · EINE Warmmiete (wie Bankfassung und App): Nettokaltmiete +
+     Nebenkostenvorauszahlungen der Mieter, Zusatzeinnahmen getrennt. Hier
+     stand NKM + ZE + umlagefaehige KOSTEN (Westerfeld 39.756 statt 41.147 in
+     der Bankfassung). Kaltmiete, NOI und alles darunter bleiben gleich. */
+  var nkv_now = K.nk_vz_j || 0, ze_now = K.ze_j || 0;
+  var warmmiete_now = (K.warm_j != null) ? K.warm_j : (nkm_now - ze_now + nkv_now);
+  var kaltmiete_now = nkm_now;
   var noi_now = kaltmiete_now - bwk_nul_now;
   var cf_nz_now = noi_now - K.zins_j;
   var cf_vst_now = cf_nz_now - K.tilg_j;
@@ -1290,9 +1327,11 @@ async function _exportPDFInner() {
   var _bsparY_p2 = (State.bsparRate_m || 0) * 12;
   var _hasBspar_p2 = _bsparY_p2 > 0;
   var _cfRows = [
-    ['Warmmiete / Jahr (Kalt + UL-Erstattung)',  pE(warmmiete_now)],
-    ['- Umlagef. BWK (durchlaufend)',     '- ' + pE(bwk_ul_now)],
-    ['= Kaltmiete (NKM + ZE)',                   pE(kaltmiete_now, true)],
+    ['Warmmiete / Jahr (NKM + NK-Vorauszahlungen)', pE(warmmiete_now)],
+    ['- NK-Vorauszahlungen der Mieter',   '- ' + pE(nkv_now)],
+    ['= Nettokaltmiete / Jahr',                  pE(nkm_now - ze_now, true)],
+    ['+ Zusatzeinnahmen (Stellplatz, Garage)', '+ ' + pE(ze_now)],
+    ['= Kaltmiete inkl. Zusatzeinnahmen / Jahr', pE(kaltmiete_now, true)],
     ['- nicht umlagef\u00e4hige BWK',     '- ' + pE(bwk_nul_now)],
     ['= NOI (Net Operating Income)',             pE(noi_now, true)],
     ['- Zinsen / Jahr',                   '- ' + pE(K.zins_j)],
@@ -1312,7 +1351,7 @@ async function _exportPDFInner() {
   _cfRows.push(['\u00b1 Steuern / Jahr',                    (_stP2 > 0.5 ? '+ ' : (_stP2 < -0.5 ? '- ' : '')) + pE(Math.abs(_stP2))]);
   _cfRows.push(['= CF nach Steuern / Jahr (operativ)',      pE(K.cf_ns, true)]);
   _cfRows.push(['= CF nach Steuern / Monat',                pE(K.cf_ns_m || (K.cf_ns/12), true)]);
-  kvT(doc, M, cy, hw, _cfRows, [2, 4, 6, 8, 10, 11]);
+  kvT(doc, M, cy, hw, _cfRows, [2, 4, 6, 8, 10, 12, 13]);   /* v2484: zwei Zeilen mehr (Nettokaltmiete, Zusatzeinnahmen) */
 
   cy = secH(doc, cyA, 'Alle Kennzahlen', M + hw + 5, hw);
   kvT(doc, M + hw + 5, cy, hw, [
@@ -3217,10 +3256,24 @@ async function _exportPDFInner() {
     }
     if (_PD) {
       var _pc = function (t) { return String(t == null ? '' : t).replace(/[–—−‑]/g, '-').replace(/[  ]/g, ' ').replace(/[^\x00-\xFF€]/g, '').replace(/\s+/g, ' ').trim(); };
+      /* v2530 · Fließtext seitensicher (wie absatz() der Bankfassung): Umbruch,
+         vor JEDER Zeile Prüfung gegen den Fußbalken (y 285), sonst Fortsetzung
+         mit Kopf/Fuß über newPage() und derselben Schrift - pageTpl() stellt
+         die Schrift um. Gemessen 20.10.2026: die Fußnote lief bis an den Rand. */
+      var _TEXT_UNTEN = 280;
+      var _absatz = function (t, o) {
+        o = o || {};
+        var gr = o.groesse || 8, lh = o.zeile || 4, dy = o.dy || 0, farbe = o.farbe || C.MID;
+        var stil = function () { doc.setFont('helvetica', 'normal'); doc.setFontSize(gr); doc.setTextColor.apply(doc, farbe); };
+        stil();
+        doc.splitTextToSize(_pc(t), CW).forEach(function (z) {
+          if (cy + dy > _TEXT_UNTEN) { cy = newPage('Wertpotenzial · Fortsetzung'); stil(); }
+          doc.text(z, M, cy + dy); cy += lh;
+        });
+      };
       cy = newPage('Wertpotenzial');
       cy = secH(doc, cy, 'Wertpotenzial · Mieterhöhung und Zielbild', M, CW);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.6); doc.setTextColor.apply(doc, C.CH);
-      doc.splitTextToSize(_pc(_PD.satz_invest + ' ' + _PD.satz_bank), CW).forEach(function (t) { doc.text(t, M, cy + 3); cy += 4.4; });
+      _absatz(_PD.satz_invest + ' ' + _PD.satz_bank, { groesse: 8.6, farbe: C.CH, zeile: 4.4, dy: 3 });
       cy += 4;
       var _tab = function (kopf, breiten, zeilen, fettRe) {
         var fak = CW / breiten.reduce(function (a, b) { return a + b; }, 0), rh0 = 5.8;
@@ -3248,8 +3301,9 @@ async function _exportPDFInner() {
             var bw = breiten[i] * fak, t0 = z[0];
             if (istKopf) doc.setTextColor.apply(doc, C.GOLD);
             else if (t0 === 'kein Potenzial') doc.setTextColor.apply(doc, C.MID);
-            else if (kopf[i] === 'Mieterhöhung') doc.setTextColor(61, 111, 168);
-            else if (kopf[i] === 'Zielbild' || kopf[i] === 'Ziel €/M') doc.setTextColor(47, 125, 85);
+            /* v2543c · Stufen nicht mehr blau/grün eingefärbt (Marcel 20.10.2026: Farben der Marke) -
+               Werte in Textfarbe; die Stufenfarbe trägt die Wertüberleitung. Zuvor griff der Vergleich
+               auch nur noch zufällig (Spaltenkopf jetzt mit Jahr: „Mieterhöhung 2026"). */
             else doc.setTextColor.apply(doc, C.CH);
             z.forEach(function (t, j) {
               var ty = cy + rh0 - 1.8 + j * 3.4;
@@ -3269,42 +3323,54 @@ async function _exportPDFInner() {
         _tab(['WE', 'm²', 'Ist €/M', 'Mieterhöhung', 'Ziel €/M', 'Maßnahmen'], [30, 11, 18, 30, 18, 48],
           _PD.wohnungen.map(function (w) { return [w.we, String(Math.round(w.wfl || 0)), w.ist, w.soll, w.ziel, w.massnahmen]; }));
       }
-      /* v2464 · Wertbrücke - dieselben Zahlen wie im Tab Bewertung (DpPotenzial.brueckeDaten) */
-      if (_PD.bruecke && _PZ.brueckeAchse) {
-        if (cy > 200) cy = newPage('Wertpotenzial · Fortsetzung');
+      /* v2543 · WERTÜBERLEITUNG statt Wertbrücke (Marcel 20.10.2026: Variante B, Farben der
+         Marke) - dieselben Zeilen wie im Tab Bewertung (DpPotenzial.ueberleitungZeilen). Stände als
+         Zeilen mit Summenstrich, Veränderungen als Balken um null; keine gekürzte Achse mehr. */
+      if (_PD.bruecke && _PZ.ueberleitungZeilen) {
+        var _UZ = _PZ.ueberleitungZeilen(_PD.bruecke), _uRh = 7.4;
+        if (cy + 12 + _UZ.length * _uRh + 8 > 280) cy = newPage('Wertpotenzial · Fortsetzung');
         doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor.apply(doc, C.CH);
-        doc.text('WERTBRÜCKE · ERTRAGSWERT JE STUFE', M, cy + 2); cy += 6;
-        var _BR = _PD.bruecke, _AX = _PZ.brueckeAchse(_BR), _bx = M + 16, _bw = CW - 16, _bh = 44, _by = cy + 4;
-        var _yB = function (v) { return _by + _bh * (1 - (v - _AX.min) / ((_AX.max - _AX.min) || 1)); };
-        var _tE = function (n, vz) { return (n < 0 ? '- ' : (vz ? '+ ' : '')) + Math.round(Math.abs(n) / 1000).toLocaleString('de-DE') + ' T\u20ac'; };
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4);
-        _AX.ticks.forEach(function (t) {
-          doc.setDrawColor.apply(doc, C.BORDER); doc.setLineWidth(0.15); doc.line(_bx, _yB(t), _bx + _bw, _yB(t));
-          doc.setTextColor.apply(doc, C.MID); doc.text(_tE(t), _bx - 2, _yB(t) + 1.2, { align: 'right' });
+        doc.text('WERTÜBERLEITUNG · ERTRAGSWERT JE STUFE', M, cy + 2); cy += 7;
+        var _uG = C.GOLD, _uF = {
+          bestand: [42, 39, 39], kosten: [201, 138, 132],
+          soll: [Math.round(_uG[0] + (255 - _uG[0]) * 0.45), Math.round(_uG[1] + (255 - _uG[1]) * 0.45), Math.round(_uG[2] + (255 - _uG[2]) * 0.45)],
+          ziel: [Math.round(_uG[0] * 0.82), Math.round(_uG[1] * 0.82), Math.round(_uG[2] * 0.82)] };
+        var _uM = Math.max.apply(null, _UZ.filter(function (z) { return z.schritt; }).map(function (z) { return Math.abs(z.w); }).concat([1])) * 1.08;
+        var _uBx = M + CW * 0.42, _uBw = CW * 0.34, _uMx = _uBx + _uBw / 2;
+        var _uE = function (n, vz) { return (n < 0 ? '- ' : (vz && n > 0 ? '+ ' : '')) + Math.round(Math.abs(n)).toLocaleString('de-DE') + ' \u20ac'; };
+        _UZ.forEach(function (z) {
+          var y0 = cy, f = z.netto ? (z.w >= 0 ? [47, 125, 85] : [184, 98, 92]) : _uF[z.art];
+          if (z.netto) { doc.setFillColor(251, 246, 233); doc.rect(M, y0 - 1.2, CW, _uRh, 'F'); doc.setDrawColor.apply(doc, _uG); doc.setLineWidth(0.5); doc.line(M, y0 - 1.2, M + CW, y0 - 1.2); }
+          else if (z.summe) { doc.setDrawColor(42, 39, 39); doc.setLineWidth(0.35); doc.line(M, y0 - 1.2, M + CW, y0 - 1.2); }
+          if (!z.netto) { doc.setFillColor(f[0], f[1], f[2]); doc.rect(M, y0 + 0.9, 2.2, 2.2, 'F'); }
+          var lx = z.netto ? M + 1 : M + 4;
+          doc.setFont('helvetica', (z.summe || z.netto) ? 'bold' : 'normal'); doc.setFontSize(8); doc.setTextColor.apply(doc, C.CH);
+          doc.text(String(z.t).replace(/\u2212/g, '-'), lx, y0 + 2.9);
+          if (z.klein) { doc.setFont('helvetica', 'normal'); doc.setFontSize(6.2); doc.setTextColor.apply(doc, C.MID); doc.text(String(z.klein).replace(/\u2212/g, '-'), lx, y0 + 5.5); }
+          if (z.schritt) {
+            doc.setDrawColor.apply(doc, C.BORDER); doc.setLineWidth(0.15); doc.line(_uMx, y0, _uMx, y0 + 4.6);
+            if (Math.abs(z.w) < 500) { doc.setFont('helvetica', 'normal'); doc.setFontSize(6.2); doc.setTextColor.apply(doc, C.MID); doc.text('unverändert', _uMx + 1.5, y0 + 3.2); }
+            else { var bw0 = Math.abs(z.w) / _uM * (_uBw / 2 - 1), bx0 = z.w >= 0 ? _uMx : _uMx - bw0; doc.setFillColor(f[0], f[1], f[2]); doc.rect(bx0, y0 + 0.6, bw0, 3.4, 'F'); }
+          }
+          doc.setFont('helvetica', (z.summe || z.netto) ? 'bold' : 'normal'); doc.setFontSize(z.netto ? 9 : 8.2);
+          if (z.netto) doc.setTextColor(f[0], f[1], f[2]); else doc.setTextColor.apply(doc, C.CH);
+          doc.text(_uE(z.w, z.schritt), M + CW, y0 + 2.9, { align: 'right' });
+          if (!z.summe && !z.netto) { doc.setDrawColor(240, 236, 228); doc.setLineWidth(0.15); doc.line(M, y0 + _uRh - 1.2, M + CW, y0 + _uRh - 1.2); }
+          cy += _uRh;
         });
-        var _FB = { bestand: [138, 130, 114], soll: [61, 111, 168], ziel: [47, 125, 85], kosten: [184, 98, 92], netto: C.GOLD };
-        var _nB = _BR.stufen.length, _gB = _bw / _nB, _wB = Math.min(20, _gB * 0.6);
-        _BR.stufen.forEach(function (st, i) {
-          var x = _bx + i * _gB + (_gB - _wB) / 2;
-          var lo = st.summe ? _AX.min : Math.min(st.a, st.b), hi = st.summe ? st.b : Math.max(st.a, st.b);
-          var t0 = _yB(hi), h0 = Math.max(0.6, _yB(lo) - t0), f = _FB[st.art] || _FB.bestand;
-          doc.setFillColor(f[0], f[1], f[2]); doc.rect(x, t0, _wB, h0, 'F');
-          doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.CH);
-          doc.text(_tE(st.wert, !st.summe), x + _wB / 2, t0 - 1.5, { align: 'center' });
-          doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor.apply(doc, C.MID);
-          doc.splitTextToSize(_pc(st.t), _gB - 1).slice(0, 2).forEach(function (z, j) { doc.text(z, x + _wB / 2, _by + _bh + 4.5 + j * 3, { align: 'center' }); });
-        });
-        cy = _by + _bh + 12;
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.MID);
-        doc.text(_pc('Achse beginnt bei ' + _tE(_AX.min) + '. Potenzial netto = Ertragswert ' + (_BR.zielbild != null ? 'Zielbild' : 'nach Mieterhöhung') + ' minus Bestand minus Maßnahmenkosten.'), M, cy);
-        cy += 6;
+        cy += 1.5;
+        _absatz('Balken: Veränderung gegen die Zeile darüber, gemeinsame Skala um null. Potenzial netto = Ertragswert ' + (_PD.bruecke.zielbild != null ? 'Zielbild' : 'nach Mieterhöhung') + ' minus Bestand minus Maßnahmenkosten.', { groesse: 7, zeile: 3.4 });
+        cy += 2.6;
       }
       if (cy > 230) cy = newPage('Wertpotenzial · Fortsetzung');
       _tab(['Kennzahl'].concat(_PD.spalten.map(function (k) { return _PD.titel[k]; })), [58].concat(_PD.spalten.map(function () { return 30; })),
         _PD.kennzahlen.concat(_PD.kaufpreis ? [['Kaufpreis', Math.round(_PD.kaufpreis).toLocaleString('de-DE') + ' \u20ac'].concat(_PD.spalten.slice(1).map(function () { return ''; }))] : []),
         /^Ertragswert|^nach Aufteilung/);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.MID);
-      doc.splitTextToSize(_pc(_PD.fuss), CW).forEach(function (t) { if (cy > 280) cy = newPage('Wertpotenzial · Fortsetzung'); doc.text(t, M, cy); cy += 3.6; });
+      /* v2530 · Fußnote in zwei Absätzen (Aufteilung, dann Kennzeichnung/Grundlagen) */
+      var _fu = String(_PD.fuss || ''), _au = _PD.aufteilung_hinweis ? 'Aufteilung: ' + _PD.aufteilung_hinweis + ' ' : '';
+      cy += 1;
+      if (_au && _fu.indexOf(_au) === 0) { _absatz(_au, { groesse: 7, zeile: 3.4 }); cy += 1.4; _fu = _fu.slice(_au.length); }
+      _absatz(_fu, { groesse: 7, zeile: 3.4 });
     }
   } catch (e) { try { console.warn('[pdf] Wertpotenzial', e); } catch (x) {} }
 
@@ -3316,14 +3382,14 @@ async function _exportPDFInner() {
   // V27: includeAi gilt auch wenn nur das neue JSON-Format (_aiAnalysis) vorliegt
   var includeAi = (!aiInPdf || aiInPdf.checked) && (window._aiText || window._aiAnalysis);
   if (includeAi) {
-  cy = newPage('KI-Investment-Analyse');
+  cy = newPage('Pilot-Analyse');
 
   // Header-Banner
   doc.setFillColor.apply(doc, C.CH); doc.roundedRect(M, cy, CW, 13, 2, 2, 'F');
   doc.setFillColor.apply(doc, C.GOLD); doc.rect(M, cy, CW, 1.2, 'F');
   doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5);
   doc.setTextColor.apply(doc, C.GOLD);
-  doc.text('KI-INVESTMENT-ANALYSE', M + 5, cy + 9);
+  doc.text('PILOT-ANALYSE', M + 5, cy + 9);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
   doc.setTextColor(140, 130, 110);
   (function(){var b=_getBranding();doc.text('KI-Analyse via ' + _pn() + (b.company ? ' \u00b7 ' + b.company : ''), W - M, cy + 9, { align: 'right' });})();

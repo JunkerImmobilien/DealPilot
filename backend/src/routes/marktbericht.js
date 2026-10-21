@@ -527,6 +527,46 @@ router.post('/potenzial', authenticate, async function (req, res) {
     res.status(out.status).json(out.data);
   } catch (e) { res.status(502).json({ verfuegbar: false, error: 'mb_unreachable', message: e.message }); }
 });
+/* ══ v2542 · ABRUF „MARKTPREISE" AUS DER PILOT-ANALYSE ═════════════════════
+   Marcel 20.10.2026: kostet Guthaben - 1 × erweiterte Marktpreisindikation
+   (mpi_plus) je Abruf. Die Schranke steht VOR der Leistung (wie v1251), gebucht
+   wird erst nach dem gespeicherten Ergebnis. Ohne Freigabe Stufe 3 bleibt der
+   Abruf möglich, aber ohne Ertragswerte (der Dienst lässt sie weg). */
+router.post('/potenzial/markt', authenticate, requireVerified, async function (req, res) {
+  try {
+    const b0 = req.body || {};
+    const obj = b0.object || b0.dealpilot || null;
+    const ref = b0.external_ref || (obj && (obj.id || obj.objId)) || null;
+    const darf = await aiCreditsService.pruefeArt(req.user.id, 'mpi_plus');
+    if (!darf.ok) {
+      return res.status(402).json({ error: 'kein_kontingent', art: 'mpi_plus',
+        message: 'Für den Abruf „Marktpreise" (erweiterte Marktpreisindikation) ist dein Kontingent aufgebraucht.', upgrade_to: 'investor' });
+    }
+    const fg = await ertragswertFreigabe.fuerObjekt(req.user.id, ref, obj);
+    const body = Object.assign({}, b0, { user_id: req.user.id, external_ref: ref, ohne_ertragswert: !fg.ok });
+    const out = await forward('POST', '/potenzial/markt', { body: body });
+    let charged = 0;
+    if (out.status === 200 && out.data && out.data.abruf && out.data.abruf.id) {
+      try {
+        await aiCreditsService.consumeArt(req.user.id, 'mpi_plus', 'marktbericht:potenzial-markt', { external_ref: ref, abruf_id: out.data.abruf.id });
+        charged = 1;
+      } catch (e) { console.warn('[marktbericht] Kontingent-Buchung potenzial/markt fehlgeschlagen:', e.message); }
+    }
+    if (out.data && typeof out.data === 'object') {
+      out.data.freigabe = { ok: !!fg.ok, weg: fg.weg || null };
+      out.data._kontingent = { charged: charged, art: 'mpi_plus' };
+    }
+    res.status(out.status).json(out.data);
+  } catch (e) { res.status(502).json({ verfuegbar: false, error: 'mb_unreachable', message: e.message }); }
+});
+router.get('/potenzial/markt/verlauf', authenticate, async function (req, res) {
+  try {
+    const ref = req.query.external_ref ? String(req.query.external_ref) : '';
+    const out = await forward('GET', '/potenzial/markt/verlauf',
+      { query: 'user_id=' + encodeURIComponent(req.user.id) + (ref ? '&external_ref=' + encodeURIComponent(ref) : '') });
+    res.status(out.status).json(out.data);
+  } catch (e) { res.status(502).json({ abrufe: [], error: 'mb_unreachable', message: e.message }); }
+});
 router.post('/ausstattung/vorschlag', authenticate, async function (req, res) {
   try { const out = await forward('POST', '/ausstattung/vorschlag', { body: req.body || {} }); res.status(out.status).json(out.data); }
   catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }

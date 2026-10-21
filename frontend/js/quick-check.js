@@ -1913,6 +1913,21 @@
           var _r = _G.forPlz(_plz); if (_r && isFinite(_r.rate)) _gest = Number(_r.rate);
         }
       } catch (e) {}
+      /* v2546a · Marcel 21.10.2026: abgewaehlte Kaufnebenkosten (z. B. kein
+         Makler) muessen ins Objekt durchgehen. Der Quick-Check schickt seine
+         wirksamen Saetze (qc_knk_teile); liegen sie vor, bekommt das Objekt
+         GENAU diese - sonst stuenden dort wieder 3,57 % Makler aus den
+         Einstellungen, und das Darlehen deckte die Gesamtinvestition nicht. */
+      try {
+        var _tt = String((document.getElementById('qc_knk_teile') || {}).value || '').split(';');
+        if (_tt.length === 5 && _tt.every(function (x) { return x !== '' && isFinite(+x); })) {
+          var _fmtP = function (x) { return String(Math.round(+x * 100) / 100).replace('.', ','); };
+          set('gest_p', _fmtP(_tt[0])); set('notar_p', _fmtP(_tt[1])); set('gba_p', _fmtP(_tt[2]));
+          set('makler_p', _fmtP(_tt[3])); set('ji_p', _fmtP(_tt[4]));
+          _gest = +_tt[0];
+          try { ['gest', 'notar', 'gba', 'makler', 'ji'].forEach(function (k) { if (typeof window.syncCostPct === 'function') window.syncCostPct(k); }); } catch (e) {}
+        }
+      } catch (e) {}
       var _nkP = _pz('makler_p') + _pz('notar_p') + _pz('gba_p') + _pz('ji_p') + _gest;
       var darlehen = Math.max(0, snapshot.kp * (1 + _nkP / 100) - snapshot.ek);
       set('d1', String(Math.round(darlehen)));

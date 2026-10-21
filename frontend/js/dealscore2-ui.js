@@ -547,9 +547,9 @@ function renderDealScore2() {
           sb.avg.toFixed(1).replace('.', ',') + ' / 5 aus ' + sb.count + ' Gewerken (Anlage 4 ImmoWertV) → Risiko-Kategorie Qualität.</span>' +
         '</div>'
       : '<div class="ds2-stern-banner">' +
-          '<span class="ds2-stern-icon">★</span>' +
-          '<span><strong>Sterne-Bewertung Q&amp;Z aktiv:</strong> ' +
-          sb.avg.toFixed(1).replace('.', ',') + ' / 5,0 aus ' + sb.count + ' Bereichen → wird im Risiko-Score (Baujahr/Zustand) verwendet.</span>' +
+          '<span class="ds2-stern-icon">▦</span>' +   /* v2548c · keine Sterne im Kundentext (Marcel 21.10.) */
+          '<span><strong>Qualität &amp; Zustand aus dem Import:</strong> Stufe ' +
+          sb.avg.toFixed(1).replace('.', ',') + ' von 5 aus ' + sb.count + ' Bereichen → wird im Risiko-Score (Baujahr/Zustand) verwendet.</span>' +
         '</div>';
   }
 
@@ -762,16 +762,21 @@ function _ds2FillSettingsForm() {
   var presets = window.DealScore2.getPresets();
   var activePreset = window.DealScore2.getActivePreset();
   html += '<div class="ds2-set-section ds2-preset-section">';
-  html += '<h4>Bewertungsprofil</h4>';
-  html += '<p class="ds2-set-hint" style="margin-bottom:12px">Wähle ein vorgefertigtes Profil oder passe die Gewichtungen unten manuell an. Beim manuellen Anpassen wechselt das Profil automatisch auf <strong>Benutzerdefiniert</strong>.</p>';
-  html += '<div class="ds2-preset-grid">';
-  presets.forEach(function(p) {
+  /* v2548 · ANLEGERPROFIL — die drei Hauptprofile sind dieselbe Wahl wie unter
+     Standardwerte (standardwerte-karten.js SETS[].ds); ein Klick hier setzt dort die
+     Standardwerte mit. Lage-, Cashflow-Fokus und Sicherheit sind Feinjustierung: sie
+     ändern nur die Gewichte des Scores. */
+  var _HAUPT = { balanced: 1, conservative: 1, optimistic: 1 };
+  var _profilName = function (k) { return (window.DpStandardKarten && DpStandardKarten.profilVonScore && DpStandardKarten.profilVonScore(k)) || null; };
+  html += '<h4>Bewertungsprofil · aus deinem Anlegerprofil</h4>';
+  html += '<p class="ds2-set-hint" style="margin-bottom:12px">Ausgewogen, Vorsichtig und Renditeorientiert sind dein <strong>Anlegerprofil</strong> — sie setzen auch die Standardwerte (Tilgung, Eigenkapital, Mietausfall, Mindest-DSCR, Angebotsabschlag). Darunter kannst du den Score fein justieren; beim Anpassen der Gewichte unten steht das Profil auf <strong>Benutzerdefiniert</strong>.</p>';
+  var _karte = function(p) {
     var isActive = (activePreset === p.key);
     html += '<button type="button" class="ds2-preset-card' + (isActive ? ' ds2-preset-active' : '') + '" ' +
               'onclick="ds2SetPreset(\'' + p.key + '\')" data-preset="' + p.key + '">' +
               '<div class="ds2-preset-top">' +
                 '<span class="ds2-preset-icon">' + p.icon + '</span>' +
-                '<span class="ds2-preset-label">' + p.label + '</span>' +
+                '<span class="ds2-preset-label">' + (_profilName(p.key) || p.label) + '</span>' +
               '</div>' +
               _ds2GewichtBalken(p.weights) +
               '<div class="ds2-preset-zahlen">' + _ds2GewichtText(p.weights) +
@@ -780,7 +785,13 @@ function _ds2FillSettingsForm() {
                 (p.description || '') + '</div>' +
             '</button>';
 
-  });
+  };
+  html += '<div class="ds2-preset-grid">';
+  presets.filter(function (p) { return _HAUPT[p.key]; }).forEach(_karte);
+  html += '</div>';
+  html += '<h4 style="margin-top:14px">Feinjustierung <span style="font-weight:400;color:#7a736b">· optional, nur die Score-Gewichte</span></h4>';
+  html += '<div class="ds2-preset-grid">';
+  presets.filter(function (p) { return !_HAUPT[p.key]; }).forEach(_karte);
   // Custom-Karte (nur sichtbar wenn der User manuell editiert hat)
   if (activePreset === 'custom') {
     html += '<button type="button" class="ds2-preset-card ds2-preset-active" data-preset="custom">' +
@@ -888,10 +899,32 @@ function ds2SaveConfig() {
       _setNested(cfg, path, n);
     }
   });
+  /* v2548 · Unveränderte Werte lassen das Profil stehen. Bis hier machte JEDES
+     „Speichern" der Einstellungen (settings.js ruft diese Funktion mit) aus dem
+     gewählten Profil „Benutzerdefiniert" — auch ohne eine geänderte Zahl. Mit dem
+     Anlegerprofil wäre damit die Wahl bei jedem Speichern still verloren gegangen. */
+  var _akt = window.DealScore2.getActivePreset();
+  if (_akt !== 'custom' && window.DealScore2.getPresetConfig && _ds2Gleich(cfg, window.DealScore2.getPresetConfig(_akt))) {
+    if (typeof toast === 'function') toast('✓ DealScore-Profil unverändert');
+    closeDS2Settings();
+    if (typeof renderDealScore2 === 'function') renderDealScore2();
+    return;
+  }
   window.DealScore2.saveConfig(cfg);
   if (typeof toast === 'function') toast('✓ DealScore 2.0 Konfiguration gespeichert');
   closeDS2Settings();
   if (typeof renderDealScore2 === 'function') renderDealScore2();
+}
+
+/* v2548 · Vergleich mit Toleranz: die Felder runden beim Anzeigen. */
+function _ds2Gleich(a, b) {
+  if (typeof a === 'number' || typeof b === 'number') return typeof a === 'number' && typeof b === 'number' && Math.abs(a - b) < 1e-6;
+  if (Array.isArray(a) || Array.isArray(b)) return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every(function (x, i) { return _ds2Gleich(x, b[i]); });
+  if (a && b && typeof a === 'object' && typeof b === 'object') {
+    var k = {}; Object.keys(a).concat(Object.keys(b)).forEach(function (x) { k[x] = 1; });
+    return Object.keys(k).every(function (x) { return _ds2Gleich(a[x], b[x]); });
+  }
+  return a === b;
 }
 
 function ds2ResetConfig() {
@@ -921,10 +954,13 @@ window.ds2ResetConfig = ds2ResetConfig;
 // V107: Preset auswählen — speichert Preset-Wahl, lädt zugehörige Config in die Form,
 //       triggert Re-Render der Settings + Score (wenn Tab Kennzahlen offen)
 // V108: Score-Cache invalidieren + dpUpdateAll() für ALLE Renderer (DS1, DS2, Header, Sidebar)
-window.ds2SetPreset = function(presetKey) {
+window.ds2SetPreset = function(presetKey, vonAussen) {
   if (!window.DealScore2 || typeof window.DealScore2.setActivePreset !== 'function') return;
   var ok = window.DealScore2.setActivePreset(presetKey);
   if (!ok) return;
+  /* v2548 · Ein Hauptprofil hier gewählt = dasselbe Anlegerprofil unter Standardwerte.
+     standardwerte-karten.js ruft mit dem Set selbst hierher - dann nicht zurück. */
+  if (!vonAussen && window.DpStandardKarten && DpStandardKarten.perScore) { try { DpStandardKarten.perScore(presetKey); } catch (e) {} }
 
   // V108 BUG-FIX: DS2-Cache invalidieren — sonst zeigen Header und Sidebar weiter alte Werte
   window._dpLastDS2Result = null;

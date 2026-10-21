@@ -69,13 +69,15 @@ console.log('=== 1 · Jede Grenze von beiden Seiten ===');
 console.log('    Ziel = ' + ZIEL.toFixed(1).replace('.', ',') + ' %');
 console.log('');
 console.log('      q        BMR      Guete   Ampel   Wort');
-[0.4999, 0.5, 0.5001, 0.7499, 0.75, 0.7501, 0.9699, 0.97, 0.9701,
+[0.4999, 0.5, 0.5001, 0.7499, 0.75, 0.7501, 0.8999, 0.9, 0.9001, 0.9699, 0.97, 0.9701,
  0.9999, 1.0, 1.0001, 1.1499, 1.15, 1.1501, 1.2999, 1.3, 1.3001].forEach(function (q) {
   const bmr = Math.round(q * ZIEL * 1e8) / 1e8;
   const u = Q.zielUrteil(bmr, ZIEL, 'B');
   geprueft++;
   if (!u) { console.log('  ROT q=' + q + ' -> null, obwohl ein Ziel vorliegt'); rot++; return; }
-  const ok = (ERLAUBT[u.wort] || []).includes(u.ampel);
+  /* v2485 · in Gelb trennt 0,9 des Ziels „knapp" (ab 0,9) von „deutlich unter" */
+  const wortSoll = u.ampel !== 'gelb' ? null : (q >= 0.9 ? 'knapp unter deinem Ziel' : 'deutlich unter deinem Ziel');
+  const ok = (ERLAUBT[u.wort] || []).includes(u.ampel) && (wortSoll == null || u.wort === wortSoll);
   if (!ok) rot++;
   console.log('  ' + (ok ? 'ok ' : 'ROT')
     + ' ' + String(q).padEnd(8)

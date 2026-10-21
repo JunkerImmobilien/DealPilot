@@ -33,6 +33,8 @@ import { gartenland as gartenlandVorschlag, zustaendig as gaaZustaendig,
 import { ScoringService } from './ScoringService.js';
 import { ReportGenerationService } from './ReportGenerationService.js';
 import { DestatisConnector } from '../connectors/stubConnectors.js';
+import { makroKennzahlen } from '../lib/makro_kennzahlen.js';   /* v2510 */
+import { einstufen, schwelleText, zensusLeerstand, ZENSUS_LEERSTAND_TEXT } from '../lib/lage_stufen.js';   /* v2518 */
 import { BorisConnector } from '../connectors/BorisConnector.js';
 import { DealPilotObjectMapper } from './DealPilotObjectMapper.js';
 import { MarketInsightsService } from './MarketInsightsService.js';
@@ -166,6 +168,10 @@ export const ReportOrchestrator = {
       /* v2210 · Gewerbeteil aus den MFH-Einheiten (DealPilotObjectMapper.gewerbeAus) - ohne
          diese Zeile laege er im input und kaeme im CrossCheckService nie an (wie WREF-1). */
       gewerbe: (input.gewerbe && typeof input.gewerbe === 'object') ? input.gewerbe : null,
+      /* v2520 · Leerstand aus den MFH-Einheiten (DealPilotObjectMapper.leerstandAus) */
+      leerstand: (input.leerstand && typeof input.leerstand === 'object') ? input.leerstand : null,
+      /* v2540 · die Einheiten einzeln (DealPilotObjectMapper.einheitenMieteAus) - Bandpruefung je Wohnung */
+      einheiten_miete: Array.isArray(input.einheiten_miete) ? input.einheiten_miete : null,
       /* v1438: der Mapper liefert eq_elevator als 'Ja' (Grossschreibung) — das fiel bisher durch. */
       elevator: input.elevator === true || /^(true|ja)$/i.test(String(input.elevator == null ? '' : input.elevator)) || false,
       garages: input.garages ? Number(input.garages) : null,
@@ -386,7 +392,10 @@ export const ReportOrchestrator = {
        direkten Zugriff haben. */
     const macroP = (async () => {
       const agsInfo = await agsP;
-      const macroRaw = await DestatisConnector.macro({ ags: agsInfo?.kreis_ags, city: geo?.components?.city, nurDb: FAST || NUR_WERT });   /* v2430 */
+      /* v2517 · Gemeinde vor Kreis - nur eine EINDEUTIGE Gemeinde (wie beim Zensus, v2162) */
+      const gemM = await AgsResolver.gemeindeEindeutig(geo?.components?.postcode, geo?.components?.city).catch(() => null);
+      const macroRaw = await DestatisConnector.macro({ ags: agsInfo?.kreis_ags, city: geo?.components?.city, nurDb: FAST || NUR_WERT,
+        gemeindeAgs: gemM && gemM.gemeinde_ags });   /* v2430 */
       step(`Makrolage: ${macroRaw.available ? 'ausgewertet' : 'keine Daten'}`);
       return { agsInfo, macroRaw };
     })().catch((e) => { step('macro: fehler ' + e.message); return { agsInfo: null, macroRaw: { available: false, reason: e.message } }; });
@@ -467,9 +476,19 @@ export const ReportOrchestrator = {
 
     const macroRaw = macroBundle.macroRaw;
     const macro = ScoringService.macroScore(macroRaw.metrics || null);
+    const _makroKz = makroKennzahlen(macroRaw, macro, macroBundle.agsInfo);   /* v2510 */
 
     // Bewertungen aus ECHTEN Quellen zusammenfuehren (keine Nutzereingabe).
     let assessment = (insights && insights.assessment) ? { ...insights.assessment } : null;
+    /* v2518 · EINE Skala (lib/lage_stufen.js), je Einstufung Wert, Stufe, Ton und Schwelle */
+    const assessmentStufen = Object.assign({}, (insights && insights.stufen) || {});
+    const _lageStufe = (feld, skala, wert, einheit, basis) => {
+      const e = einstufen(skala, wert);
+      if (!e) return;
+      assessment = assessment || {};
+      assessment[feld] = e.wort;
+      assessmentStufen[feld] = { ...e, wert, einheit, basis, schwelle: schwelleText(skala) };
+    };
     /* v2158 · Die Makrolage-Wertung braucht mindestens ZWEI gemessene
        Kennzahlen. Bis v2157 entstand sie aus einem Score, der fehlende
        Kennzahlen mit Platzhaltern auffuellte (Bericht 176: 5 von 6) — und
@@ -477,15 +496,20 @@ export const ReportOrchestrator = {
        dem Bevoelkerungstrend allein wird keine Makrolage. */
     if (macroRaw.available && macro && macro.estimated === false && macro.score != null
         && (macro.gemessen ?? 0) >= 2) {
-      assessment = assessment || {};
-      assessment.makrolage = macro.score >= 60 ? 'gut' : macro.score >= 45 ? 'durchschnittlich' : 'schwach';
+      _lageStufe('makrolage', 'makrolage', macro.score, 'Score', 'Makro-Score aus ' + macro.gemessen + ' Kennzahlen der Regionaldatenbank');
     }
-    // Zensus-Leerstand qualitativ in die Bewertung (niedriger Leerstand = gut vermietbar):
-    if (zensus && zensus.available && zensus.leerstandsquote != null) {
-      assessment = assessment || {};
-      const ls = zensus.leerstandsquote;
-      assessment.leerstand_zensus = ls < 3 ? 'niedrig' : ls < 6 ? 'moderat' : 'erhöht';
+    /* v2518 · Bevoelkerung: der gemessene Trend (bis hier nie gesetzt) */
+    if (macroRaw.available && macroRaw.metrics && Number.isFinite(macroRaw.metrics.bevoelkerung_trend)) {
+      const _eb = (macroRaw.ebenen && macroRaw.ebenen.bevoelkerung) || 'Kreis';
+      _lageStufe('bevoelkerung', 'bevoelkerung', Math.round(macroRaw.metrics.bevoelkerung_trend * 100) / 100, '% p. a.',
+        'Bevölkerungsentwicklung je Jahr, Regionaldatenbank, Ebene ' + _eb);
     }
+    /* v2518 · Marcel 20.10.2026: der marktaktive Zensus-Leerstand gehoert
+       zum MIETAUSFALLRISIKO, nicht zur Nachfrage (Nachfrage = Vermarktungs-
+       dauer). Bis hier stand er als leerstand_zensus auf eigener Skala. */
+    const _ls = zensusLeerstand(zensus);
+    if (_ls) _lageStufe('mietausfallrisiko', 'mietausfall', _ls.wert, '% Leerstand',
+      ZENSUS_LEERSTAND_TEXT + ', ' + _ls.ebene + (_ls.name ? ' ' + _ls.name : ''));
 
     /* v1047-WAGS-1 · Ohne Schluessel laeuft die ganze Kaskade ins Leere.
      * ref.ags ist leer — das Formular kennt kein solches Feld. Der
@@ -1002,6 +1026,27 @@ export const ReportOrchestrator = {
         });
         step('uk-wgfz: ' + (_wgfz.verfuegbar ? 'Faktor ' + _wgfz.faktor + ' (' + _wgfz.uk_objekt + '/' + _wgfz.uk_zone + ')' : _wgfz.grund));
       } catch (e) { _wgfz = null; }
+      /* v2541 · MFH: WGFZ VOR FLAECHE (Marcel 20.10.2026). Bielefeld schreibt zur
+         Flaechentabelle selbst „nicht fuer Geschosswohnungsbau ... Ruecksprache
+         erforderlich"; beim Mehrfamilienhaus ist die WGFZ das wertrelevante Merkmal
+         (§ 16 Abs. 4). Greift die WGFZ-Umrechnung, entfaellt die (uebertragene)
+         Flaechentabelle - nie beide, sonst stuende der Groesseneffekt doppelt im Wert.
+         Fehlt die WGFZ des Objekts, bleibt die Uebertragung (Stufe C, v2362) mit dem
+         Hinweis, dass der Ausschuss dafuer die WGFZ verlangt. */
+      try {
+        const _istMfh = /mfh|mehrfam/i.test(String(ref.property_subtype || ref.property_type || ''));
+        if (_istMfh && _wgfz && _wgfz.verfuegbar && _ukReg && _ukReg.verfuegbar) {
+          step('uk-flaeche: entfaellt beim MFH, die WGFZ-Umrechnung greift');
+          _ukReg = { verfuegbar: false, grund: 'wgfz_vor_flaeche',
+            hinweis: 'Beim Mehrfamilienhaus rechnet der Bodenwert über die WGFZ (§ 16 Abs. 4 ImmoWertV); die Umrechnung über die Grundstücksgröße entfällt.' };
+        } else if (_istMfh && _ukReg && _ukReg.verfuegbar && _ukReg.uebertragen) {
+          _ukReg.hinweis = (_ukReg.hinweis ? _ukReg.hinweis + ' ' : '')
+            + 'Der Gutachterausschuss verlangt für den Geschosswohnungsbau Rücksprache bzw. die Umrechnung über die WGFZ: '
+            + (_wgfz && _wgfz.grund === 'wgfz_objekt_fehlt'
+              ? 'die WGFZ des Objekts im Reiter Objekt eintragen, dann rechnet der Bodenwert über die WGFZ.'
+              : 'für diese Zone liegt keine Geschossflächenzahl oder keine WGFZ-Tabelle vor, deshalb bleibt die übertragene Flächentabelle (vorläufig).');
+        }
+      } catch (e) { /* die Rangfolge darf den Bericht nie kippen */ }
       /* v2288 · DIE DEALPILOT-FORMEL als Stufe unter dem amtlichen Wert (seit v2401 Stufe N) -
        * nur wo kein Registersatz greift (und nicht Minden-Luebbecke, das seine
        * Tabelle fest im Code hat) oder wo eine Sperre KEINE andere Regel des
@@ -1517,6 +1562,10 @@ export const ReportOrchestrator = {
       return { nur_wert_basis: true, ref, wert_params: _wertParams, cross_check: crossCheck,
         ertragswert_eingabe: (crossCheck && crossCheck._ertragswertEingabe) || null,
         land_value: landValue ? { available: !!landValue.available, value_sqm: landValue.value_sqm ?? null } : null,
+        /* v2541 · Marktpreisindikation je Stufe/Wohnung (PotenzialService): die Indikation
+           des Bestands samt Gegenprobe und die Marktdaten, aus denen sie entsteht -
+           bis v2540 lief ValuationService hier mit und das Ergebnis wurde verworfen. */
+        valuation: valuation || null, sale: sale || null, rent: rent || null, land_value_roh: landValue || null,
         trace, took_ms: Date.now() - t0 };
     }
 
@@ -1650,6 +1699,11 @@ export const ReportOrchestrator = {
       object_image: (geoEnabled() && lat != null && lon != null)
         ? `/api/v1/marktbericht/static-map?lat=${lat}&lon=${lon}` : null,
       sale, rent, micro, macro,
+      /* v2510 · die Makro-ROHWERTE mit Ebene, Jahr und Tabelle - bisher
+         standen nur die Teilscores im Bericht. Und die Namensnennung der
+         Regionaldatenbank (dl-de/by-2-0), nur wenn ein Wert drinsteckt. */
+      makro_kennzahlen: _makroKz,
+      quellen_nachweis_markt: (_makroKz && _makroKz.quellennachweis) ? [_makroKz.quellennachweis] : [],
         /* WETIK-1 · Herkunft der Wertermittlungsparameter im Klartext.
        * A/B sind amtlich, C/D/E sind indikativ — das muss im Bericht und
        * im PDF stehen, nicht nur als Buchstabe im Datensatz. */
@@ -1713,6 +1767,7 @@ export const ReportOrchestrator = {
       deal_score: deal,
       dealscore_meta: dealscoreMeta,
       assessment,            // jetzt aus echten APIs abgeleitet (oder null)
+      assessment_stufen: Object.keys(assessmentStufen).length ? assessmentStufen : null,   /* v2518 */
       /* v1851 · die Lage-Einschätzung des NUTZERS — getrennt von `assessment`,
          getrennt beschriftet. Sie ersetzt keine Messung, sie steht daneben. */
       nutzer_einschaetzung: nutzerEinschaetzung,
@@ -1749,12 +1804,30 @@ export const ReportOrchestrator = {
         ? insights.dynamics.days_on_market : null,
       meta: {
         generated_at: new Date().toISOString(),
-        sources: ['geoapify', 'overpass', 'geomap', (landValue && landValue.available) ? 'boris-nrw' : null].filter(Boolean),
-        missing: ['destatis', 'mietindex', 'preisindex'].concat((landValue && landValue.available) ? [] : ['boris']),
+        /* v2513 · aus den ECHTEN Ergebnissen. Bisher stand hier fest
+           'geoapify'/'overpass' als Quelle und 'destatis' als fehlend -
+           auch wenn die Mikrolage leer und die Makrolage gemessen war. */
+        sources: [
+          (micro && (micro.source === 'geoapify' || micro.source === 'mixed')) ? 'geoapify' : null,
+          (micro && (micro.source === 'overpass' || micro.source === 'mixed')) ? 'overpass' : null,
+          (sale && sale.source === 'geomap') || (rent && rent.source === 'geomap') ? 'geomap' : null,
+          (macroRaw && macroRaw.available) ? 'regionaldatenbank' : null,
+          (zensus && zensus.available) ? 'zensus2022' : null,
+          (landValue && landValue.available && landValue.source !== 'dealpilot-eingabe') ? 'boris' : null,
+        ].filter(Boolean),
+        missing: [
+          (micro && micro.source && micro.source !== 'none') ? null : 'mikrolage',
+          (sale && sale.source === 'geomap') ? null : 'vergleichspreise',
+          (rent && rent.source === 'geomap') ? null : 'vergleichsmieten',
+          (macroRaw && macroRaw.available) ? null : 'regionaldatenbank',
+          (zensus && zensus.available) ? null : 'zensus2022',
+          (insights && insights.series && insights.series.usable) ? null : 'preis-/mietindex',
+          (landValue && landValue.available) ? null : 'boris',
+        ].filter(Boolean),
         // Datenherkunft je Bereich. trust: echt=externe API | berechnet | eingabe | simuliert | fehlt
         provenance: [
           { label: 'Standort / Geocoding', source: 'Standortdaten', trust: 'echt' },
-          { label: 'Mikrolage / Infrastruktur', source: micro.source ? 'Infrastrukturdaten' : 'keine Daten', trust: micro.source ? 'echt' : 'fehlt' },
+          { label: 'Mikrolage / Infrastruktur', source: (micro.source && micro.source !== 'none') ? 'Infrastrukturdaten' : 'keine Daten', trust: (micro.source && micro.source !== 'none') ? 'echt' : 'fehlt' },   /* v2513: 0 Treffer = fehlt */
           { label: 'Vergleichspreise Kauf (€/m²)', source: sale.source === 'geomap' ? 'Marktdaten' : (sale.source === 'keine_daten' ? 'keine Daten' : 'Demo'), trust: sale.source === 'geomap' ? 'echt' : (sale.source === 'keine_daten' ? 'fehlt' : 'simuliert') },
           { label: 'Vergleichsmieten (€/m²)', source: rent.source === 'geomap' ? 'Marktdaten' : (rent.source === 'keine_daten' ? 'keine Daten' : 'Demo'), trust: rent.source === 'geomap' ? 'echt' : (rent.source === 'keine_daten' ? 'fehlt' : 'simuliert') },
           { label: 'Vergleichsobjekte (Einzeln)', source: (sale.comparables && sale.comparables.length) ? 'Marktdaten' : 'nicht abgerufen', trust: (sale.comparables && sale.comparables.length) ? 'echt' : 'fehlt' },

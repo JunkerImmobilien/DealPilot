@@ -1717,6 +1717,12 @@
   var QUAL_SCALE = { 5: ['luxus', 'luxuri'], 4: ['gehoben', 'hochwertig'], 3: ['normal'], 2: ['standard'], 1: ['einfach', 'schlicht'] };
   var ZUST_SCALE = { 5: ['neu', 'kürzlich modernis', 'kuerzlich modernis', 'erstbezug', 'kernsaniert'], 4: ['gehobenes niveau', 'gehoben'], 3: ['gut in stand', 'gepflegt', 'gut'], 2: ['renovierungsbed'], 1: ['stark sanier', 'sanierungsbed'] };
   function starFromText(s, scale) { if (s == null) return 0; var t = String(s).trim().toLowerCase(); var ord = [5, 4, 3, 2, 1]; for (var i = 0; i < ord.length; i++) { var k = ord[i], a = scale[k]; if (a) { for (var j = 0; j < a.length; j++) { if (t.indexOf(a[j]) >= 0) return k; } } } return 0; }
+  /* v2546b · Marcel 21.10.2026: „Wir haben ja keine Sterne." Die Vorschau
+     zeigte „3 ★" - jetzt das Wort der Stufe, wie es der Zustand- bzw.
+     Qualitaetsregler im Objekt fuehrt (star-rating.js LABELS/QUAL_LABELS). */
+  var _STUFE_Q = { 1: 'Einfach', 2: 'Standard', 3: 'Normal', 4: 'Gehoben', 5: 'Luxus' };
+  var _STUFE_Z = { 1: 'Stark sanierungsbedürftig', 2: 'Renovierungsbedürftig', 3: 'Gepflegt', 4: 'Modernisiert', 5: 'Neuwertig' };
+  function _stufeWort(id, n) { var m = String(id).indexOf('qual_') === 0 ? _STUFE_Q : _STUFE_Z; return (m[n] || String(n)) + ' (Stufe ' + n + ' von 5)'; }
   function pretty(v) { return String(v == null ? '' : v).replace(/_/g, ' ').replace(/^./, function (c) { return c.toUpperCase(); }); }
   function lageAvg(d) { var sum = 0, c = 0; ['lage_einkaufen', 'lage_bildung', 'lage_gastronomie', 'lage_gesundheit', 'lage_freizeit'].forEach(function (k) { var n = numDe(d[k]); if (n != null) { sum += (n > 5 ? n / 2 : n); c++; } }); return c >= 3 ? (sum / c) : null; }
   function lageCat(avg) { return avg >= 4.5 ? 'sehr_gut' : avg >= 3.5 ? 'gut' : avg >= 2.5 ? 'durchschnittlich' : avg >= 1.5 ? 'schwach' : 'sehr_schwach'; }
@@ -1813,9 +1819,14 @@
     addRow('garagen', 'Garagenplätze', d.garagen, d.garagen, S, 'input'); addRow('stellpl_aussen', 'Außenstellplätze', d.stellplatz_aussen, d.stellplatz_aussen, S, 'input');
     addRow('balkon_flae', 'Balkon/Terrasse (m²)', d.balkon_flaeche, d.balkon_flaeche, S, 'input');
     // Qualität → Sterne
-    [['qual_kueche', 'Küche · Qualität', d.kueche_qualitaet], ['qual_bad', 'Bad · Qualität', d.bad_qualitaet], ['qual_boden', 'Boden · Qualität', d.boden_qualitaet], ['qual_fenster', 'Fenster · Qualität', d.fenster_qualitaet]].forEach(function (q) { var n = starFromText(q[2], QUAL_SCALE); if (n > 0) addRow(q[0], q[1], n + ' ★', n, S, 'star'); });
+    [['qual_kueche', 'Küche · Qualität', d.kueche_qualitaet], ['qual_bad', 'Bad · Qualität', d.bad_qualitaet], ['qual_boden', 'Boden · Qualität', d.boden_qualitaet], ['qual_fenster', 'Fenster · Qualität', d.fenster_qualitaet]].forEach(function (q) { var n = starFromText(q[2], QUAL_SCALE); if (n > 0) addRow(q[0], q[1], _stufeWort(q[0], n), n, S, 'star'); });
+    /* v2549 · Marcel 21.10.2026: die Qualitätsangaben gehen auch auf die
+       Gewerke-Standardstufen (Anlage 4 ImmoWertV) - dieselbe Skala 1-5.
+       Nur in LEERE Felder (emptyOnly), eine eigene Stufe bleibt stehen. Die
+       Küche hat kein Gewerk, der Zustand ist keine Standardstufe. */
+    [['ausst_sanitaer', 'Bad / Sanitär · Standardstufe', d.bad_qualitaet], ['ausst_fussboeden', 'Fußböden · Standardstufe', d.boden_qualitaet], ['ausst_fenster', 'Fenster / Außentüren · Standardstufe', d.fenster_qualitaet]].forEach(function (q) { var n = starFromText(q[2], QUAL_SCALE); if (n > 0) addRow(q[0], q[1], 'Stufe ' + n + ' von 5 (aus der Qualitätsangabe)', String(n), S, 'select', true); });
     // Zustand → Sterne
-    [['rate_kueche', 'Küche · Zustand', d.kueche_zustand], ['rate_bad', 'Bad · Zustand', d.bad_zustand], ['rate_boden', 'Boden · Zustand', d.boden_zustand], ['rate_fenster', 'Fenster · Zustand', d.fenster_zustand]].forEach(function (q) { var n = starFromText(q[2], ZUST_SCALE); if (n > 0) addRow(q[0], q[1], n + ' ★', n, S, 'star'); });
+    [['rate_kueche', 'Küche · Zustand', d.kueche_zustand], ['rate_bad', 'Bad · Zustand', d.bad_zustand], ['rate_boden', 'Boden · Zustand', d.boden_zustand], ['rate_fenster', 'Fenster · Zustand', d.fenster_zustand]].forEach(function (q) { var n = starFromText(q[2], ZUST_SCALE); if (n > 0) addRow(q[0], q[1], _stufeWort(q[0], n), n, S, 'star'); });
   }
   function mergeExpose(d) {
     var S = 'Exposé';

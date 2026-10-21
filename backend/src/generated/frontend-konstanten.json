@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-20T07:10:33.015Z",
+ "erzeugt_am": "2026-10-21T14:39:25.033Z",
  "quellen": {
   "voice-import": "4d1160a61b89e852",
   "objektart-felder": "1e0549e54a17a054",
-  "storage": "22c1a92b2860815c",
-  "index-html": "8db793ffceaa4fb7",
+  "storage": "d8a9087aaa9b7d3f",
+  "index-html": "1c94fd03702f9354",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -580,9 +580,11 @@
    "zb_ziel_qm",
    "zb_ziel_wann",
    "zb_massnahmen",
+   "zb_fertig_jahr",
    "mv_art",
    "mv_beginn",
    "mv_letzte_erhoehung",
+   "mv_letzte_erhoehung_betrag",
    "ds2_zustand",
    "ds2_energie",
    "ds2_mietausfall",
@@ -618,6 +620,7 @@
    "balkon_flae",
    "_avm_state",
    "_mb_state",
+   "_lage_herkunft",
    "einheiten",
    "san_tax_active",
    "san_tax_years",
@@ -658,6 +661,7 @@
    "standardstufe",
    "grundriss",
    "mod_punkte",
+   "mod_quelle",
    "sachwertfaktor",
    "uk_flaeche",
    "wgfz_objekt",
@@ -1592,6 +1596,11 @@
     "label": "Zielbild ab wann"
    },
    {
+    "id": "zb_fertig_jahr",
+    "kind": "text",
+    "label": "Zielbild fertig (Jahr)"
+   },
+   {
     "id": "mv_art",
     "kind": "select",
     "label": "Vertragsart"
@@ -1605,6 +1614,11 @@
     "id": "mv_letzte_erhoehung",
     "kind": "text",
     "label": "Letzte Erhöhung"
+   },
+   {
+    "id": "mv_letzte_erhoehung_betrag",
+    "kind": "text",
+    "label": "Letzte Erhöhung um"
    },
    {
     "id": "ds2_zustand",
@@ -1682,23 +1696,23 @@
     "optionen": [
      {
       "wert": "sehr_niedrig",
-      "text": "Sehr niedrig"
+      "text": "Sehr niedrig (Leerstand unter 1,5 %)"
      },
      {
       "wert": "niedrig",
-      "text": "Niedrig"
+      "text": "Niedrig (unter 3 %)"
      },
      {
       "wert": "mittel",
-      "text": "Mittel"
+      "text": "Mittel (unter 6 %)"
      },
      {
       "wert": "erhoeht",
-      "text": "Erhöht"
+      "text": "Erhöht (unter 9 %)"
      },
      {
       "wert": "hoch",
-      "text": "Hoch"
+      "text": "Hoch (ab 9 %)"
      }
     ],
     "label": "Mietausfall-Risiko DS2"
@@ -1741,26 +1755,26 @@
     "optionen": [
      {
       "wert": "sehr_stark",
-      "text": "Sehr stark (Uni, ÖPNV, Top-Arbeitgeber)"
+      "text": "Sehr stark (bis 30 Tage)"
      },
      {
       "wert": "stark",
-      "text": "Stark"
+      "text": "Stark (bis 60 Tage)"
      },
      {
       "wert": "mittel",
-      "text": "Mittel"
+      "text": "Mittel (bis 120 Tage)"
      },
      {
       "wert": "schwach",
-      "text": "Schwach"
+      "text": "Schwach (bis 200 Tage)"
      },
      {
       "wert": "sehr_schwach",
-      "text": "Sehr schwach"
+      "text": "Sehr schwach (über 200 Tage)"
      }
     ],
-    "label": "Nachfrage-Indikatoren DS2"
+    "label": "Nachfrage Vermarktungsdauer DS2"
    },
    {
     "id": "ds2_wertsteigerung",

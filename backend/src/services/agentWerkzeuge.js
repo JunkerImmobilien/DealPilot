@@ -335,8 +335,8 @@ function _potenzialKurz(d, frei) {
   const gesperrt = !!(z && (z.ertragswert_gesperrt || frei === false));
   if (z && gesperrt) {
     const st = {};
-    Object.keys(z.stufen || {}).forEach((k) => { st[k] = Object.assign({}, z.stufen[k], { ertragswert: null, rnd: null }); });
-    z = Object.assign({}, z, { stufen: st, aufteilung: null });
+    Object.keys(z.stufen || {}).forEach((k) => { st[k] = Object.assign({}, z.stufen[k], { ertragswert: null, rnd: null, rohertrag_ertragswert: null, anhebung_ertragswert: null }); });
+    z = Object.assign({}, z, { stufen: st, aufteilung: null, ertragswert_basis: null });
   }
   const roh = [];
   const e = d && d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : [];
@@ -361,6 +361,7 @@ function _potenzialKurz(d, frei) {
     stufen: z ? z.stufen : null,
     aufteilung: z ? (z.aufteilung || null) : null,
     kappung: z && z.kappung ? z.kappung.text : null,
+    ertragswert_basis: z && !gesperrt ? (z.ertragswert_basis || null) : null,   /* v2488 */
     wohnungen: z ? z.wohnungen : (roh.length ? roh : null),
     am_objekt: obj,
     ertragswert_gerechnet: !!(z && z.stufen && z.stufen.bestand && z.stufen.bestand.ertragswert != null),

@@ -570,9 +570,29 @@
       doc.setDrawColor(226, 221, 210); doc.line(L, y + 1.8, W - R, y + 1.8);
       y += 7.5;
     }
+    /* v2530 · Fließtext seitensicher. Gemessen (Video-Strang 20.10.2026): die
+       Fußnote der Seite Wertpotenzial lief ohne Prüfung über die Fußlinie
+       (H - 16) und den Seitenfuß bis an den Papierrand. Jeder Textblock geht
+       jetzt hier durch: Umbruch per splitTextToSize, vor JEDER Zeile die
+       Prüfung gegen TEXT_UNTEN, bei Platzmangel Fortsetzung auf neuer Seite
+       mit Kopf (der Fuß kommt am Ende über fuss()) und derselben Schrift -
+       kopf() stellt die Schrift um, deshalb wird sie danach neu gesetzt. */
+    var TEXT_UNTEN = H - 20;
+    function absatz(t, o) {
+      o = o || {};
+      var gr = o.groesse || 8, lh = o.zeile || 4.2, x = o.x == null ? L : o.x, br = o.breite || (W - R - x);
+      var stil = function () {
+        doc.setFont('helvetica', o.fett ? 'bold' : 'normal'); doc.setFontSize(gr);
+        doc.setTextColor(o.farbe == null ? 120 : o.farbe);
+      };
+      stil();
+      doc.splitTextToSize(String(t == null ? '' : t), br).forEach(function (z) {
+        if (y > TEXT_UNTEN) { doc.addPage(); kopf(_titel, _unter || 'Fortsetzung'); stil(); }
+        doc.text(z, x, y); y += lh;
+      });
+    }
     function einleitung(t) {
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(120);
-      doc.splitTextToSize(t, CW).forEach(function (z) { doc.text(z, L, y); y += 4.2; });
+      absatz(t, { groesse: 8, farbe: 120, zeile: 4.2 });
       y += 2.5;
     }
     function zeile(label, wert, o) {
@@ -908,8 +928,7 @@
     ], { titel: 'Kennzahlen' });
     if (SC && SC.interpretation) {
       platz(16);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(70);
-      doc.splitTextToSize('Einordnung: ' + String(SC.interpretation).replace(/\s+/g, ' '), CW).forEach(function (t) { doc.text(t, L, y); y += 4.4; });
+      absatz('Einordnung: ' + String(SC.interpretation).replace(/\s+/g, ' '), { groesse: 8.4, farbe: 70, zeile: 4.4 });
       y += 4;
     }
 
@@ -975,13 +994,21 @@
     /* ── Ertragsrechnung ─────────────────────────────────────── */
     platz(46, 'Ertrag und Cashflow', (adr || 'Objekt') + ' · laufendes Jahr');
     abschnitt('Von der Warmmiete zum Cashflow');
-    zeile('Warmmiete / Jahr (Kaltmiete und Umlagen)', eur(K.wm_j));
+    /* v2484 · EINE Warmmiete in beiden PDFs und der App: Nettokaltmiete +
+       Nebenkostenvorauszahlungen der Mieter (calc.js warm_j). Zusatzeinnahmen
+       (Stellplatz, Garage) stehen getrennt. Hier stand K.wm_j = NKM + ZE + Umlagen
+       (Westerfeld 41.147 €), im Investment-PDF NKM + ZE + umlagefaehige Kosten
+       (39.756 €). Die Kette endet unveraendert bei der Kaltmiete inkl. Zuschlaege. */
+    var _warm = da(K.warm_j) !== null ? K.warm_j : null;
+    zeile('Warmmiete / Jahr (NKM + NK-Vorauszahlungen)', eur(_warm));
     /* v2273 · hier stand „abzüglich umlagefähiger Bewirtschaftung“ (K.bwk_ul) - die Kette ging
        nicht auf: Westerfeldstr. 140 Warmmiete 41.147 − 336 ≠ Kaltmiete 39.420. Die Warmmiete
        enthält die Umlagen der Mieter (calc.js wm_m = nkm + ze + uf), abgezogen werden also
        diese; die umlagefähigen Kosten stehen weiter unten im Block Bewirtschaftung. */
-    zeile('abzüglich Umlagen der Mieter', (da(K.wm_j) === null || da(K.nkm_j) === null) ? '-' : '- ' + eur(K.wm_j - K.nkm_j), { einzug: true });
-    zeile('Kaltmiete / Jahr (netto, inkl. Zuschläge)', eur(K.nkm_j), { fett: true });
+    zeile('abzüglich NK-Vorauszahlungen der Mieter', da(K.nk_vz_j) === null ? '-' : '- ' + eur(K.nk_vz_j), { einzug: true });
+    zeile('Nettokaltmiete / Jahr', eur(K.nkm_netto_j));
+    if (da(K.ze_j) && K.ze_j > 0) zeile('zuzüglich Zusatzeinnahmen (Stellplatz, Garage)', '+ ' + eur(K.ze_j), { einzug: true });
+    zeile('Kaltmiete inkl. Zusatzeinnahmen / Jahr', eur(K.nkm_j), { fett: true });
     zeile('abzüglich nicht umlagefähiger Bewirtschaftung', da(K.bwk_cf) === null ? '-' : '- ' + eur(K.bwk_cf), { einzug: true });
     zeile('Betriebsergebnis (NOI)', da(K.nkm_j) === null ? '-' : eur(K.nkm_j - (K.bwk_cf || 0)), { fett: true });
     zeile('abzüglich Zinsen', da(K.zins_j) === null ? '-' : '- ' + eur(K.zins_j), { einzug: true });
@@ -1167,7 +1194,7 @@
     if (MFH && MFH.zeilen.length) {
       platz(56, 'Einheiten und Zustand', (adr || 'Objekt') + ' · ' + MFH.zeilen.length + ' Einheiten');
       abschnitt('Mieterliste');
-      var spM = [['Nr.', 14], ['Lage', 30], ['m²', 16], ['Ist €/M', 20], ['Soll €/M', 20], ['Status', 20], ['Anlage 2', 20], ['RND', 16]];
+      var spM = [['Nr.', 14], ['Lage', 30], ['m²', 16], ['Ist €/M', 20], ['Soll €/M', 20], ['Status', 20], ['Anlage 2', 22]];   /* v2483: keine RND je Einheit - eine fuer das Haus, unten */
       var fakM = CW / spM.reduce(function (a, s) { return a + s[1]; }, 0);
       function mZeile(werte, kopfzeile) {
         var x = L;
@@ -1192,11 +1219,11 @@
           (z.e.ist && Number(String(z.e.ist).replace(',', '.')) > 0) ? fmt(Number(String(z.e.ist).replace(',', '.')), 0) : '-',
           z.e.soll ? fmt(Number(String(z.e.soll).replace(',', '.')), 0) : '-',
           z.e.status === 'leer' ? 'leer' : 'vermietet',
-          z.punkte + ' P.' + (z.geerbt === 4 ? '*' : ''), z.rnd != null ? Math.round(z.rnd) + ' J.' : '-']);
+          z.punkte + ' P.' + (z.geerbt === 4 ? '*' : '')]);
       });
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
       doc.text('Anlage 2 ImmoWertV: Modernisierungspunkte je Einheit; * = Zustand vollständig vom Gebäude übernommen. '
-        + 'RND = Restnutzungsdauer (indikativ, kein Gutachten).', L, y + 1);
+        + 'RND: eine für das Gebäude (unten).', L, y + 1);
       y += 10;
 
       abschnitt('Ist gegen Soll');
@@ -1208,13 +1235,15 @@
       zeile('Rechtliche Einheit', MFH.aufgeteilt ? 'in Wohnungseigentum aufgeteilt (WEG)' : 'ungeteiltes Gebäude');
       if (MFH.s.leer) zeile('Leerstand', MFH.s.leer + ' Einheiten / ' + fmt(MFH.s.leerFl, 0) + ' m²');
       if (MFH.s.kosten) zeile('Geplante Maßnahmen', eur(MFH.s.kosten));
-      zeile('Modernisierungsgrad (flächengewichtet)', fmt(MFH.punkteGew, 1) + ' von 20 Punkten');
-      if (MFH.rndGew > 0) zeile('Restnutzungsdauer (flächengewichtet)', Math.round(MFH.rndGew) + ' Jahre', { summe: true });
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.6); doc.setTextColor(130);
+      /* v2483 · eine RND fuer das Haus: aus den ganzen Punkten des Hauses, dieselbe Zahl wie
+         Wertpotenzial, Ertragswert und Marktbericht (DpMfhEinheiten.berichtDaten -> hausRnd) */
+      zeile('Modernisierungsgrad (flächengewichtet)', fmt(MFH.punkteGew, 1) + ' von 20 Punkten, angesetzt ' + MFH.hausPunkte + ' Punkte');
+      if (MFH.rndGew > 0) zeile('Restnutzungsdauer des Gebäudes (Anlage 2, indikativ)', Math.round(MFH.rndGew) + ' Jahre'
+        + (MFH.rndInfo && MFH.rndInfo.gnd ? ' (GND ' + MFH.rndInfo.gnd + ')' : ''), { summe: true });
       var hin = MFH.sollAbJahr
         ? 'Die Cashflow-Rechnung setzt die Soll-Miete ab Jahr ' + MFH.sollAbJahr + ' an; davor und danach gilt die hinterlegte Mietentwicklung.'
         : 'Die Cashflow-Rechnung rechnet durchgehend mit der Ist-Miete - die Soll-Miete ist hier nur nachrichtlich.';
-      doc.splitTextToSize(hin, CW).forEach(function (t) { doc.text(t, L, y); y += 4.2; });
+      absatz(hin, { groesse: 7.6, farbe: 130, zeile: 4.2 });
       y += 6;
     }
 
@@ -1234,7 +1263,8 @@
       }
     } catch (e) { PD = null; }
     if (PD) {
-      doc.addPage(); kopf('Wertpotenzial', (adr || 'Objekt') + ' · Mieterhöhung und Zielbild');
+      _titel = 'Wertpotenzial'; _unter = (adr || 'Objekt') + ' · Mieterhöhung und Zielbild';   /* v2530: Fortsetzung trägt denselben Kopf */
+      doc.addPage(); kopf(_titel, _unter);
       abschnitt('Wertpotenzial');
       einleitung(sauberE(PD.satz_bank));
       if (PD.art === 'mfh' && PD.wohnungen.length) {
@@ -1243,40 +1273,68 @@
             return [sauberE(w.we), fmt(w.wfl, 0), sauberE(w.ist), sauberE(w.soll), sauberE(w.ziel), sauberE(w.massnahmen)];
           }), { titel: 'Wertpotenzial' });
       }
-      /* v2462 · Wertbrücke (dieselben Zahlen wie im Tab Bewertung, DpPotenzial.brueckeDaten) */
-      if (PD.bruecke && PZ.brueckeAchse) {
-        platz(70, 'Wertpotenzial', (adr || 'Objekt') + ' · Mieterhöhung und Zielbild');
-        abschnitt('Wertbrücke · Ertragswert je Stufe');
-        var BR = PD.bruecke, AX = PZ.brueckeAchse(BR), bx0 = L + 16, bwB = CW - 16, bh0 = 46, by0 = y + 4;
-        var yB = function (v) { return by0 + bh0 * (1 - (v - AX.min) / ((AX.max - AX.min) || 1)); };
-        var tE = function (n, vz) { return (n < 0 ? '- ' : (vz ? '+ ' : '')) + fmt(Math.abs(n) / 1000, 0) + ' T€'; };
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4);
-        AX.ticks.forEach(function (t) {
-          doc.setDrawColor(236, 232, 223); doc.setLineWidth(0.15); doc.line(bx0, yB(t), bx0 + bwB, yB(t));
-          doc.setTextColor(140); doc.text(tE(t), bx0 - 2, yB(t) + 1.2, { align: 'right' });
+      /* v2543 · WERTÜBERLEITUNG statt Wertbrücke (Marcel 20.10.2026: Variante B, Farben der
+         Marke) - dieselben Zeilen wie im Tab Bewertung (DpPotenzial.ueberleitungZeilen). Stände als
+         Zeilen mit Summenstrich, Veränderungen als Balken um null; keine gekürzte Achse mehr. */
+      if (PD.bruecke && PZ.ueberleitungZeilen) {
+        var UZ = PZ.ueberleitungZeilen(PD.bruecke), uRh = 7.6;
+        platz(14 + UZ.length * uRh + 10, 'Wertpotenzial', (adr || 'Objekt') + ' · Mieterhöhung und Zielbild');
+        abschnitt('Wertüberleitung · Ertragswert je Stufe');
+        var uF = { bestand: [42, 39, 39], kosten: [201, 138, 132],
+          soll: [Math.round(G[0] + (255 - G[0]) * 0.45), Math.round(G[1] + (255 - G[1]) * 0.45), Math.round(G[2] + (255 - G[2]) * 0.45)],
+          ziel: [GD[0], GD[1], GD[2]] };
+        var uM = Math.max.apply(null, UZ.filter(function (z) { return z.schritt; }).map(function (z) { return Math.abs(z.w); }).concat([1])) * 1.08;
+        var uBx = L + CW * 0.42, uBw = CW * 0.34, uMx = uBx + uBw / 2;
+        var uE = function (n, vz) { return (n < 0 ? '- ' : (vz && n > 0 ? '+ ' : '')) + fmt(Math.abs(n), 0) + ' \u20ac'; };
+        UZ.forEach(function (z) {
+          var y0 = y, f = z.netto ? (z.w >= 0 ? [47, 125, 85] : [184, 98, 92]) : uF[z.art];
+          if (z.netto) { doc.setFillColor(251, 246, 233); doc.rect(L, y0 - 1.4, CW, uRh, 'F'); doc.setDrawColor(G[0], G[1], G[2]); doc.setLineWidth(0.5); doc.line(L, y0 - 1.4, W - R, y0 - 1.4); doc.setLineWidth(0.2); }
+          else if (z.summe) { doc.setDrawColor(42, 39, 39); doc.setLineWidth(0.35); doc.line(L, y0 - 1.4, W - R, y0 - 1.4); doc.setLineWidth(0.2); }
+          if (!z.netto) { doc.setFillColor(f[0], f[1], f[2]); doc.rect(L, y0 + 0.9, 2.2, 2.2, 'F'); }
+          var lx = z.netto ? L + 1 : L + 4;
+          doc.setFont('helvetica', (z.summe || z.netto) ? 'bold' : 'normal'); doc.setFontSize(8.6); doc.setTextColor(26, 26, 26);
+          doc.text(sauberE(z.t), lx, y0 + 2.9);
+          if (z.klein) { doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(120); doc.text(sauberE(z.klein), lx, y0 + 5.6); }
+          if (z.schritt) {
+            doc.setDrawColor(226, 221, 210); doc.setLineWidth(0.15); doc.line(uMx, y0, uMx, y0 + 4.6); doc.setLineWidth(0.2);
+            if (Math.abs(z.w) < 500) { doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(140); doc.text('unverändert', uMx + 1.5, y0 + 3.2); }
+            else { var bw0 = Math.abs(z.w) / uM * (uBw / 2 - 1), bx0 = z.w >= 0 ? uMx : uMx - bw0; doc.setFillColor(f[0], f[1], f[2]); doc.rect(bx0, y0 + 0.6, bw0, 3.4, 'F'); }
+          }
+          doc.setFont('helvetica', (z.summe || z.netto) ? 'bold' : 'normal'); doc.setFontSize(z.netto ? 9.6 : 8.8);
+          if (z.netto) doc.setTextColor(f[0], f[1], f[2]); else doc.setTextColor(26, 26, 26);
+          doc.text(uE(z.w, z.schritt), W - R, y0 + 2.9, { align: 'right' });
+          if (!z.summe && !z.netto) { doc.setDrawColor(236, 232, 223); doc.setLineWidth(0.15); doc.line(L, y0 + uRh - 1.4, W - R, y0 + uRh - 1.4); doc.setLineWidth(0.2); }
+          y += uRh;
         });
-        var FB = { bestand: [138, 130, 114], soll: [61, 111, 168], ziel: [47, 125, 85], kosten: [184, 98, 92], netto: G };
-        var nB = BR.stufen.length, gB = bwB / nB, wB = Math.min(20, gB * 0.6);
-        BR.stufen.forEach(function (st, i) {
-          var x = bx0 + i * gB + (gB - wB) / 2;
-          var lo = st.summe ? AX.min : Math.min(st.a, st.b), hi = st.summe ? st.b : Math.max(st.a, st.b);
-          var t0 = yB(hi), h0 = Math.max(0.6, yB(lo) - t0), f = FB[st.art] || FB.bestand;
-          doc.setFillColor(f[0], f[1], f[2]); doc.rect(x, t0, wB, h0, 'F');
-          doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(40);
-          doc.text(tE(st.wert, !st.summe), x + wB / 2, t0 - 1.5, { align: 'center' });
-          doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(110);
-          doc.splitTextToSize(sauberE(st.t), gB - 1).slice(0, 2).forEach(function (z, j) { doc.text(z, x + wB / 2, by0 + bh0 + 4.5 + j * 3, { align: 'center' }); });
-        });
-        y = by0 + bh0 + 12;
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
-        doc.text(sauberE('Achse beginnt bei ' + tE(AX.min) + '. Potenzial netto = Ertragswert ' + (BR.zielbild != null ? 'Zielbild' : 'nach Mieterhöhung') + ' minus Bestand minus Maßnahmenkosten.'), L, y);
-        y += 6;
+        y += 1.5;
+        absatz(sauberE('Balken: Veränderung gegen die Zeile darüber, gemeinsame Skala um null. Potenzial netto = Ertragswert ' + (PD.bruecke.zielbild != null ? 'Zielbild' : 'nach Mieterhöhung') + ' minus Bestand minus Maßnahmenkosten.'), { groesse: 7, farbe: 130, zeile: 3.6 });
+        y += 2.4;
       }
       var spP = [['Kennzahl', 52, 'l']].concat(PD.spalten.map(function (k) { return [PD.titel[k], 30]; }));
+      /* v2530 · Fußnote: lief über den Seitenfuß bis an den Papierrand. Jetzt in
+         zwei Absätzen (Aufteilung, dann Kennzeichnung und Grundlagen) über absatz(). */
+      var _fu = String(PD.fuss || ''), _au = PD.aufteilung_hinweis ? 'Aufteilung: ' + PD.aufteilung_hinweis + ' ' : '';
+      /* v2540 · Tabelle, Kaufpreis und Fußnote bleiben ZUSAMMEN (Marcel 20.10.2026:
+         „ja bitte"). Seit v2530 stand die Fortsetzung der Fußnote allein oben auf
+         der Folgeseite, getrennt von der Tabelle, die sie erklärt. Passt der Block
+         nicht mehr, beginnt er geschlossen auf der nächsten Seite - wie das
+         Kennzahlenraster (v1462c). Höhen wie in tabelle()/zeile()/absatz(). */
+      (function () {
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7.2);
+        var _zl = function (t) { return t ? doc.splitTextToSize(sauberE(t), CW).length : 0; };
+        var _teile = (_au && _fu.indexOf(_au) === 0) ? [_au, _fu.slice(_au.length)] : [_fu];
+        var bedarf = 7 + PD.kennzahlen.length * 6.2 + 4 + 6.1 + 1
+          + _teile.reduce(function (a, t) { return a + _zl(t) * 3.5; }, 0) + (_teile.length > 1 ? 1.5 : 0);
+        if (y + bedarf > TEXT_UNTEN && bedarf < H - 60) { doc.addPage(); kopf(_titel, _unter); }
+      })();
       tabelle(spP, PD.kennzahlen.map(function (z, n) { return { werte: z.map(function (x) { return sauberE(String(x)); }), fett: /^Ertragswert|^nach Aufteilung/.test(z[0]) }; }), { titel: 'Wertpotenzial' });
       zeile('Kaufpreis', eur(K.kp));
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.4); doc.setTextColor(120);
-      doc.splitTextToSize(sauberE(PD.fuss), CW).forEach(function (t) { doc.text(t, L, y); y += 3.8; });
+      y += 1;
+      if (_au && _fu.indexOf(_au) === 0) {
+        absatz(sauberE(_au), { groesse: 7.2, farbe: 120, zeile: 3.5 }); y += 1.5;
+        _fu = _fu.slice(_au.length);
+      }
+      absatz(sauberE(_fu), { groesse: 7.2, farbe: 120, zeile: 3.5 });
       y += 6;
     }
 
@@ -1338,17 +1396,13 @@
     /* ── KI-Analyse, wenn vorhanden ──────────────────────────── */
     var ai = window._aiAnalysis || null, aiText = window._aiText || '';
     if (ai || aiText) {
-      platz(60, 'KI-Investment-Analyse', (adr || 'Objekt'));
-      abschnitt('KI-Investment-Analyse');
+      platz(60, 'Pilot-Analyse', (adr || 'Objekt'));
+      abschnitt('Pilot-Analyse');   /* v2555a: Produktname statt KI-Investment-Analyse */
       function liste(titel, arr) {
         if (!arr || !arr.length) return;
         zeile(titel, '', { fett: true });
         arr.slice(0, 6).forEach(function (t) {
-          doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(60);
-          doc.splitTextToSize('· ' + String(t).replace(/\s+/g, ' '), CW - 4).forEach(function (z) {
-            if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
-            doc.text(z, L + 3, y); y += 4.4;
-          });
+          absatz('· ' + String(t).replace(/\s+/g, ' '), { x: L + 3, breite: CW - 4, groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
         });
         y += 2;
       }
@@ -1362,22 +1416,13 @@
         liste('Stärken', ai.staerken || ai.strengths);
         liste('Risiken', ai.risiken || ai.schwaechen || ai.risks);
         if (ai.fazit || ai.summary) {
-          doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(60);
-          doc.splitTextToSize(String(ai.fazit || ai.summary).replace(/\s+/g, ' '), CW).forEach(function (z) {
-            if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
-            doc.text(z, L, y); y += 4.4;
-          });
+          absatz(String(ai.fazit || ai.summary).replace(/\s+/g, ' '), { groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
         }
       } else {
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(60);
-        doc.splitTextToSize(String(aiText).replace(/\s+/g, ' ').slice(0, 2400), CW).forEach(function (z) {
-          if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
-          doc.text(z, L, y); y += 4.4;
-        });
+        absatz(String(aiText).replace(/\s+/g, ' ').slice(0, 2400), { groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
       }
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
-      doc.text('Erzeugt von einem Sprachmodell aus den erfassten Angaben - eine Einschätzung, keine Beratung.', L, y + 1);
-      y += 7;
+      y += 1;
+      absatz('Erzeugt von einem Sprachmodell aus den erfassten Angaben - eine Einschätzung, keine Beratung.', { groesse: 7, farbe: 130, zeile: 6 });   /* v2530 */
     }
 
     /* ── Belastungsprobe (Stress-Matrix) ─────────────────────── */
@@ -1473,12 +1518,8 @@
       if (rows.length < 2 && txt('ueberf_ende')) gruende.push('Grund ist das gesetzte Privat-Ende zum ' + sauber(txt('ueberf_ende')) + ' - ab dann rechnet die Gesellschaft weiter.');
       if (rows.length >= 2 && !diagramme.length) gruende.push('Die Diagramme der Bankansicht ließen sich nicht erzeugen.');
       if (rows.length >= 2 && !SM) gruende.push('Die Belastungsprobe ließ sich nicht erzeugen.');
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(70);
       gruende.forEach(function (t) {
-        doc.splitTextToSize(t, CW).forEach(function (z) {
-          if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
-          doc.text(z, L, y); y += 4.4;
-        });
+        absatz(t, { groesse: 8.4, farbe: 70, zeile: 4.4 });   /* v2530 */
         y += 1.5;
       });
       y += 3;
@@ -1505,12 +1546,11 @@
     y += 2;
 
     abschnitt('Grundlagen und Hinweise');
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(60);
     var hinweis = 'Alle Werte beruhen auf den im Objekt erfassten Angaben und den dort hinterlegten Annahmen '
       + '(Mietentwicklung, Bewirtschaftungskosten, Zins und Tilgung). Sie sind eine Kalkulation, kein '
       + 'Wertgutachten nach § 194 BauGB und keine Anlage- oder Finanzierungsberatung. Der LTV bezieht sich auf '
       + (S.ltv_basis_label || 'die angegebene Bezugsgröße') + '.';
-    doc.splitTextToSize(hinweis, CW).forEach(function (z) { doc.text(z, L, y); y += 4.4; });
+    absatz(hinweis, { groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
 
     fuss();
     var slug = (adr || 'Objekt').replace(/[^A-Za-z0-9äöüÄÖÜß]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40);

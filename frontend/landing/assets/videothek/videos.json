@@ -1,6 +1,6 @@
 {
   "_hinweis": "landing-videothek-3b · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
-  "stand": "2026-10-19",
+  "stand": "2026-10-21",
   "basis_medien": "medien/videothek/",
   "basis_bilder": "assets/videothek/",
   "kategorien": [
@@ -365,6 +365,84 @@
        "Objekterfassung",
        "Deal Score",
        "Mehrfamilienhaus"
+      ],
+      "youtube_id": null
+     }
+    },
+    {
+     "id": "modul-26-mieterhoehung-und-zielbild",
+     "kategorie": "spezial",
+     "nr": "26",
+     "dauer": 945,
+     "titel": "Mieterhöhung und Zielbild",
+     "unterzeile": "Ein Mehrfamilienhaus, Wohnung für Wohnung — Ist, Soll und Zielbild bis zum Wertpotenzial.",
+     "story": "Ein erfundenes Mehrfamilienhaus mit sechs Wohnungen. Je Wohnung trägst du Ist-Miete, Mietvertrag und Vergleichsmiete ein — DealPilot rechnet daraus die Soll-Miete, begrenzt durch Kappungsgrenze und Frist, und kennt die Mieterschutzverordnung jeder Gemeinde. Dazu das Zielbild: was nach Umbau oder Mieterwechsel möglich ist, jede Maßnahme mit Kosten und Modernisierungspunkten. Die Miete des Hauses kommt danach aus den Wohnungen, die Pilot-Analyse stellt Ankauf, Bestand, Mieterhöhung und Zielbild nebeneinander, und die Wertüberleitung zeigt das Potenzial netto — bis ins Bank-PDF.",
+     "nutzen": "Du siehst, was im Haus steckt: was der laufende Vertrag hergibt und was nur Plan ist, je Wohnung gerechnet statt pauschal.",
+     "kapitel": [
+      "Das Haus",
+      "In Wohnungseigentum aufgeteilt",
+      "Die Wohnungen",
+      "Mietvertrag und Kappung",
+      "Die Soll-Miete",
+      "Das Zielbild",
+      "Ertragswert je Wohnung",
+      "Die übrigen Wohnungen",
+      "Übernehmen",
+      "Mietentwicklung aus Wohnungen",
+      "Ankauf, Bestand, Zielbild",
+      "Marktpreise am Ort",
+      "Die Wertüberleitung",
+      "Die Seite im Bank-PDF"
+     ],
+     "spruch": "Ist, Soll und Zielbild — das Potenzial steht daneben.",
+     "datei": "dealpilot-modul-26-mieterhoehung-und-zielbild.mp4", "datei_ton": "dealpilot-modul-26-mieterhoehung-und-zielbild-sprecher.mp4",
+     "poster": "dealpilot-modul-26-mieterhoehung-und-zielbild.webp",
+     "youtube": {
+      "titel": "DealPilot Modul 26 · Mieterhöhung und Zielbild",
+      "tags": [
+       "DealPilot",
+       "Immobilien",
+       "Mieterhöhung",
+       "Kappungsgrenze",
+       "Wertpotenzial",
+       "Mehrfamilienhaus"
+      ],
+      "youtube_id": null
+     }
+    },
+    {
+     "id": "modul-27-steuerverlauf-mit-wendepunkt",
+     "kategorie": "spezial",
+     "nr": "27",
+     "dauer": 523,
+     "titel": "Steuerverlauf mit Wendepunkt",
+     "unterzeile": "Wann ein Objekt steuerlich positiv wird — und warum das der Zeitpunkt fürs nächste Investment ist.",
+     "story": "Im Reiter Steuer zeigt DealPilot das Ergebnis aus Vermietung Jahr für Jahr: grün, solange das Finanzamt erstattet, gold, sobald Steuer fällig wird — und dazwischen den Wendepunkt. Jedes Jahr hat seinen Tooltip, darüber stehen Zinsbindung und Zehn-Jahres-Frist, darunter die Werbungskosten im Detail, gegliedert wie die Anlage V. Ein zweites Haus zeigt das Gegenbild: geplanter Erhaltungsaufwand dreht Jahre mit Steuerlast zurück zur Erstattung.",
+     "nutzen": "Du weißt, ab wann ein Objekt Steuern kostet — und wann ein weiteres Investment oder eine geplante Maßnahme die Last ausgleicht. Keine Steuerberatung.",
+     "kapitel": [
+      "Das Beispiel",
+      "Ergebnis aus Vermietung",
+      "Der Wendepunkt",
+      "Jedes Jahr im Tooltip",
+      "Der Zeitpunkt fürs nächste Investment",
+      "Zinsbindung und Zehn-Jahres-Frist",
+      "Die Jahres-Kärtchen",
+      "Werbungskosten im Detail",
+      "In der Pilot-Analyse",
+      "Das Gegenbild",
+      "Keine Steuerberatung"
+     ],
+     "spruch": "Erst Erstattung, dann Steuer — der Wendepunkt ist dein Zeitpunkt.",
+     "datei": "dealpilot-modul-27-steuerverlauf-mit-wendepunkt.mp4", "datei_ton": "dealpilot-modul-27-steuerverlauf-mit-wendepunkt-sprecher.mp4",
+     "poster": "dealpilot-modul-27-steuerverlauf-mit-wendepunkt.webp",
+     "youtube": {
+      "titel": "DealPilot Modul 27 · Steuerverlauf mit Wendepunkt",
+      "tags": [
+       "DealPilot",
+       "Immobilien",
+       "Steuer",
+       "Vermietung und Verpachtung",
+       "Werbungskosten"
       ],
       "youtube_id": null
      }

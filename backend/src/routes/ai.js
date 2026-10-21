@@ -24,6 +24,7 @@ const schwaerzen = require('../services/schwaerzen');   /* v2210 */
 const plzValidator = require('../services/plzValidator');  // V229: PLZ-Halluzinationsschutz
 const voiceExtractService = require('../services/voiceExtractService');  // v503-voice
 const marketRatesService = require('../services/marketRatesService');  /* v1951: Marktzins fuer die Quick-Check-Einordnung */
+const mietBelegeService = require('../services/mietBelegeService');    /* v2500: Vergleichswerte der Mietpreis-Analyse */
 
 /* v947-mbsource
  * ──────────────────────────────────────────────────────────────────────────
@@ -754,7 +755,26 @@ router.post('/ds2-suggest', authenticate,
          enthalten. Frueher stand hier ein 402 gegen den Litertank. */
     }
 
+    /* v2500 · Die Pilot-Mietpreis-Analyse bekommt belegte Vergleichswerte
+       (Marktbericht, Zensus 2022, Regionaldatenbank) - serverseitig
+       gesammelt, user_id aus dem Token. objId gehoert nicht in den Prompt.
+       Ein Fehlschlag darf die Analyse nicht verhindern. */
+    let _belege = null;
+    const _ctx = payload.context || {};
+    if (payload.fields.indexOf('ds2_marktmiete') >= 0 || payload.fields.indexOf('ds2_mietausfall') >= 0) {
+      try {
+        _belege = await mietBelegeService.sammeln({
+          userId: req.user.id, objId: typeof payload.objId === 'string' ? payload.objId.slice(0, 120) : null,
+          plz: _ctx.plz, ort: _ctx.ort, baujahr: _ctx.baujahr, wflJeWohnung: _ctx.wfl_je_wohnung,
+          istQm: (Number(_ctx.nettokaltmiete) > 0 && Number(_ctx.wohnflaeche) > 0) ? Number(_ctx.nettokaltmiete) / Number(_ctx.wohnflaeche) : null
+        });
+        if (_belege) payload.mietbelege = _belege;
+      } catch (e) { console.warn('[v2500 ds2-suggest] Belege nicht verfuegbar: ' + e.message); }
+    }
+    delete payload.objId;
+
     const result = await openaiService.suggestDs2Fields(payload, { userApiKey, aiOptions });
+    if (_belege && result && typeof result === 'object') result.belege = _belege;
 
     if (!userApiKey) {
       try { await aiCreditsService.logExtract(req.user.id, 'ds2-suggest'); } catch (e) {} /* v1183: im Plan enthalten */

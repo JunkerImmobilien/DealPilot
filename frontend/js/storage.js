@@ -40,7 +40,7 @@ if (!window._pdfGold) {
  * harmlos, weil die Felder gar nicht gespeichert wurden; ab jetzt wuerden
  * die 828 m2 Hinterland von Objekt A beim Speichern an Objekt B kleben. */
 var WM_FIELDS = [
-  'baustatus','bgf','standardstufe','grundriss','mod_punkte',
+  'baustatus','bgf','standardstufe','grundriss','mod_punkte','mod_quelle',   /* v2540: mod_quelle */
   'sachwertfaktor','uk_flaeche','wgfz_objekt','stellplatz_miete_monat','sonstige_jahr',   /* v2282: uk_flaeche, v2361: wgfz_objekt */
   'nhk_haus','nhk_geschosse','nhk_dach',
   'hinterland_qm','hinterland_eur_qm','hinterland_rentierlich',
@@ -149,14 +149,14 @@ var FIELDS = [
   // V23: Mietentwicklung Detail-Modus
   'mietspiegel','me_modus','me_soll','me_anz','me_int','me_pct',
   /* v2430 · Mieterhoehung und Zielbild am Objekt (ETW/EFH/ZFH; beim MFH je Wohnung in _mfh) */
-  'zb_soll_qm','zb_soll_ab','zb_vgl_qm','zb_ziel_qm','zb_ziel_wann','zb_massnahmen',
+  'zb_soll_qm','zb_soll_ab','zb_vgl_qm','zb_ziel_qm','zb_ziel_wann','zb_massnahmen','zb_fertig_jahr',   /* v2541 */
   /* v2087 · Mietvertrag auf OBJEKTEBENE (Backlog N60.8-alt).
      Dieselben Namen wie in `_mfh.einheiten[]` - derselbe Begriff soll
      nicht zweimal anders heissen. Ohne diesen Eintrag waeren die drei
      Felder im Formular sichtbar und wuerden NICHT gespeichert: diese
      Liste ist die Einsammelstelle, und was hier fehlt, verschwindet
      beim Speichern lautlos. */
-  'mv_art','mv_beginn','mv_letzte_erhoehung',
+  'mv_art','mv_beginn','mv_letzte_erhoehung','mv_letzte_erhoehung_betrag',   /* v2545 */
   // V36: DealScore 2.0 Zusatzangaben
   'ds2_zustand','ds2_energie','ds2_mietausfall','ds2_marktmiete',
   'ds2_bevoelkerung','ds2_nachfrage','ds2_marktfaktor',
@@ -165,7 +165,7 @@ var FIELDS = [
   'rate_kueche','rate_bad','rate_boden','rate_fenster',
   'qual_kueche','qual_bad','qual_boden','qual_fenster','zimmer','bad_anz','etage','etagen_ges','modernis',
   /* v1608 · Modernisierungsgrad nach Anlage 2 ImmoWertV */
-  'mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss','garagen','stellpl_aussen','balkon_flae','_avm_state','_mb_state','einheiten',
+  'mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss','garagen','stellpl_aussen','balkon_flae','_avm_state','_mb_state','_lage_herkunft','einheiten',   /* v2515: _lage_herkunft */
   /* V292.6.5-fields-checkboxes: Werbungskosten-Übernahme Checkboxen + Select-Felder */
   'san_tax_active','san_tax_years','moebl_tax_active','moebl_tax_years',
   'san_ust',   /* v1261: brutto/netto fuer die 15%-Grenze */
@@ -510,6 +510,9 @@ function loadData(d) {
        Staging trugen dieselbe Karte (199.000 € fuer 95 m²) - am MFH
        Gohliser Str. 42 (1,68 Mio.) stand „234 €/m² · -88,2 %". */
     '_mb_state', '_avm_state',
+    /* v2515: Herkunft der Lage-Felder (KI/Messung/eigen) - sonst erbt
+       Objekt B die Kennzeichnung von A, und ein eigener Wert hiesse KI. */
+    '_lage_herkunft',
     /* v1958: ohne diesen Eintrag traegt Objekt B die Lageklasse von
        Objekt A weiter - und an ihr haengt eine Rechnung. */
     'lageklasse',
@@ -539,7 +542,7 @@ function loadData(d) {
     'ueberf_restschuld', 'ueberf_rest_zins',
     'ueberf_ende', '_ueberf_link',
     /* v2430: sonst erbt Objekt B Soll-Miete, Zielbild und Massnahmen von A */
-    'zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen'
+    'zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen', 'zb_fertig_jahr'
   ].concat(WM_FIELDS);  /* v1136-WMTAB-1: dieselbe Falle, siehe Kommentar an WM_FIELDS */
   resetFields.forEach(function(id) {
     var e = document.getElementById(id);
@@ -3350,6 +3353,15 @@ async function showBankexportView() {
 
     '</div>';
   document.body.appendChild(modal);
+  // v2575: Spaltenname an jede Zelle - unter 640 px wird jede Zeile eine Karte
+  // (die Tabelle ist 1.882 px breit, seitlich wischen war am Handy kaum lesbar).
+  var _bxTab = modal.querySelector('.bank-table-full');
+  if (_bxTab) {
+    var _bxKopf = Array.prototype.map.call(_bxTab.querySelectorAll('thead th'), function(th) { return th.textContent; });
+    _bxTab.querySelectorAll('tbody tr').forEach(function(tr) {
+      Array.prototype.forEach.call(tr.children, function(td, i) { if (_bxKopf[i]) td.setAttribute('data-label', _bxKopf[i]); });
+    });
+  }
   // V105: Nur die nicht-excludeten Zeilen zur Export-Funktion durchreichen
   window._bankexportData = { objects: objects, rows: rows, totals: t };
 }

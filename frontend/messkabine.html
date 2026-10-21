@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2131</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2571</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -178,6 +178,23 @@
     ['iPad Pro 11"',     834, 1194],
     ['Desktop',         1180,  800],
     ['Desktop breit',   1280,  800]
+  ];
+  /* v2553 · TABLET IN SAFARI — Marcel 21.10.2026: „diese Sache muessen wir auch mit
+     in unsere Messkabine uebernehmen". Am iPad bleibt in Safari weniger Hoehe als
+     der Bildschirm hat: Adress- und Tableiste nehmen rund 132 px. Gemessen an
+     Marcels Bild: 892 px sichtbar am 12,9"-iPad quer (1024 - 132). Diese Profile
+     tragen die SICHTBARE Hoehe, und die Kabine laedt sie in ECHTER Hoehe (nicht auf
+     760 gekappt) - sonst prueft sie nie, ob oben die Reiter und unten der
+     Nutzerbereich ins Bild passen.
+     Grenze: im iframe ist 100vh = 100dvh = Rahmenhoehe. Den Safari-Fehler selbst
+     (vh groesser als sichtbar) kann die Kabine nicht erzeugen; sie prueft, ob die
+     App bei der sichtbaren Hoehe vollstaendig im Bild steht. */
+  var SAFARI = [
+    ['iPad Pro 12,9" quer · Safari', 1366,  892],
+    ['iPad Pro 12,9" hoch · Safari', 1024, 1234],
+    ['iPad Air quer · Safari',       1180,  688],
+    ['iPad Air hoch · Safari',        820, 1048],
+    ['iPad mini quer · Safari',      1024,  636]
   ];
   var ZIEL = new URLSearchParams(location.search).get('ziel') || '/';
   var f = document.getElementById('f'), rahmen = document.getElementById('rahmen');
@@ -1232,7 +1249,7 @@
   function lade(breite, layout, hoehe, extra){
     setzeMerker(layout, extra);
     rahmen.style.width  = (breite + 2) + 'px';          /* +2 für den Rahmen */
-    rahmen.style.height = Math.min(hoehe || 780, 760) + 'px';
+    rahmen.style.height = ((extra && extra.echteHoehe) ? (hoehe || 780) : Math.min(hoehe || 780, 760)) + 'px';
     var kurz = varianteKurz(layout, extra);
     lbl.textContent = breite + ' px · ' + kurz;
     aktuell = [ kurz + ' @ ' + breite, breite, hoehe || 780 ];
@@ -1241,11 +1258,354 @@
       function da(){ if (los) return; los = true; warte(3600).then(fertig); }
       f.addEventListener('load', da, { once: true });
       setTimeout(da, 22000);   /* Notbremse - darf gedrosselt sein */
-      f.src = ZIEL + (ZIEL.indexOf('?') >= 0 ? '&' : '?') + 'mk=' + Date.now();
+      f.src = (extra && extra.ziel ? extra.ziel : ZIEL) + (((extra && extra.ziel) || ZIEL).indexOf('?') >= 0 ? '&' : '?') + 'mk=' + Date.now();
+      sperreFrueh();
     });
   }
 
+  /* ══ v2570 · DIE SPERRE: MESSEN DARF NICHTS SCHREIBEN ════════════════
+     Marcel 21.10.2026: „keine produktiven Daten veraendern", keine
+     kostenpflichtigen Abrufe. Drei Ansichten (Cockpit, Portfolio-Strategie,
+     Marktbericht) rufen beim OEFFNEN saveObj, das Einstellungsfenster
+     speichert automatisch, und saveObj ist dreimal umhuellt (free-lock,
+     ankauf-ansicht ...) - eine Stummschaltung der Funktion waere nach dem
+     naechsten Wrapper wieder offen. Gesperrt wird deshalb am NETZ:
+     fetch, XMLHttpRequest und sendBeacon im Pruefling.
+
+       - jede Methode ausser GET/HEAD/OPTIONS        -> gesperrt (200, {})
+       - GET auf kostenpflichtige Pfade (KI, Bericht,
+         AVM, Marktpreise, ImmoMetrica)              -> gesperrt (503)
+       - confirm/alert/prompt                        -> gestubbt (confirm=false)
+
+     Gesetzt wird FRUEH (sobald das neue Dokument existiert, ueber eine
+     MessageChannel-Schleife, die im Hintergrund nicht gedrosselt wird) und
+     nach dem Laden noch einmal. Jeder gesperrte Aufruf landet in
+     `win.__DPM_GESPERRT` - die Deckung der Sperre ist damit nachweisbar,
+     und `DPM.sperreProbe()` beweist einmal, dass sie greift. */
+  var SPERRE_AN = true;
+  /* Reine Stand-Abfragen in diesen Familien kosten nichts und tragen die Oberflaeche (Kontingent-Pille, Anbieter-Status). */
+  var LESEN_FREI = /\/(credits|health|status|credentials|dokument-arten|arten|searches|history)(\/|$|\?)/i;
+  var KOSTEN_GET = /\/ai\/|\/marktbericht\/(reports|from-dealpilot|run|abruf)|\/avm|market-analysis|marktpreis|\/immometrica|\/checkout|\/credits\/(checkout|consume)/i;
+  function sperreSetzen(win){
+    if (!SPERRE_AN || !win) return false;
+    try {
+      if (win.__dpmSperre) return true;
+      if (!win.location || win.location.href === 'about:blank') return false;
+      win.__dpmSperre = true;
+      var log = win.__DPM_GESPERRT = win.__DPM_GESPERRT || [];
+      var urlVon = function(x){ try { return typeof x === 'string' ? x : (x && x.url) || String(x); } catch (e) { return '?'; } };
+      var gesperrt = function(meth, url){
+        meth = String(meth || 'GET').toUpperCase();
+        if (meth !== 'GET' && meth !== 'HEAD' && meth !== 'OPTIONS') return 'schreibt';
+        if (KOSTEN_GET.test(url) && !LESEN_FREI.test(url)) return 'kostet';
+        return null;
+      };
+      var echtFetch = win.fetch;
+      win.fetch = function(inp, init){
+        var url = urlVon(inp), meth = (init && init.method) || (inp && inp.method) || 'GET';
+        var g = gesperrt(meth, url);
+        if (g) {
+          log.push({ art: g, m: String(meth).toUpperCase(), u: String(url).replace(/[?#].*$/, '').slice(-60) });
+          return Promise.resolve(new win.Response(g === 'kostet' ? '{"error":"dpm-gesperrt"}' : '{}',
+            { status: g === 'kostet' ? 503 : 200, headers: { 'Content-Type': 'application/json' } }));
+        }
+        return echtFetch.apply(this, arguments);
+      };
+      var XO = win.XMLHttpRequest && win.XMLHttpRequest.prototype;
+      if (XO) {
+        var eo = XO.open, es = XO.send;
+        XO.open = function(m, u){ this.__dpmM = m; this.__dpmU = String(u); return eo.apply(this, arguments); };
+        XO.send = function(){
+          var g = gesperrt(this.__dpmM, this.__dpmU || '');
+          if (g) { log.push({ art: g, m: String(this.__dpmM).toUpperCase(), u: String(this.__dpmU).replace(/[?#].*$/, '').slice(-60), xhr: 1 }); try { this.abort(); } catch (e) {} return; }
+          return es.apply(this, arguments);
+        };
+      }
+      try { if (win.navigator.sendBeacon) win.navigator.sendBeacon = function(u){ log.push({ art: 'schreibt', m: 'BEACON', u: String(u).slice(-60) }); return true; }; } catch (e) {}
+      win.confirm = function(t){ log.push({ art: 'dialog', m: 'confirm', u: String(t).slice(0, 60) }); return false; };
+      win.alert   = function(t){ log.push({ art: 'dialog', m: 'alert',   u: String(t).slice(0, 60) }); };
+      win.prompt  = function(t){ log.push({ art: 'dialog', m: 'prompt',  u: String(t).slice(0, 60) }); return null; };
+      return true;
+    } catch (e) { return false; }
+  }
+  /* Ein Kind-iframe (Quick-Check, Marktbericht) ist ein EIGENES Fenster mit
+     eigenem fetch - die Sperre muss dort auch hinein. */
+  function sperreTief(win, tiefe){
+    if (!win || (tiefe || 0) > 3) return 0;
+    var n = sperreSetzen(win) ? 1 : 0;
+    try { for (var i = 0; i < win.frames.length; i++) n += sperreTief(win.frames[i], (tiefe || 0) + 1); } catch (e) {}
+    return n;
+  }
+  var sperreLaeuft = 0;
+  function sperreFrueh(){
+    if (!SPERRE_AN) return;
+    var meinLauf = ++sperreLaeuft, bis = Date.now() + 30000;
+    var k = new MessageChannel();
+    k.port1.onmessage = function(){
+      if (meinLauf !== sperreLaeuft) { k.port1.close(); return; }
+      try { sperreTief(f.contentWindow, 0); } catch (e) {}
+      /* 30 s weiter wachen: Kind-iframes entstehen spaeter */
+      if (Date.now() < bis) setTimeout(function(){ k.port2.postMessage(0); }, 0);
+      else k.port1.close();
+    };
+    k.port2.postMessage(0);
+  }
+  function gesperrtStand(){
+    var z = ziel(), out = { an: SPERRE_AN, fenster: 0, aufrufe: 0, nachArt: {} };
+    (function sammle(win, t){
+      if (!win || t > 3) return;
+      try {
+        if (win.__dpmSperre) out.fenster++;
+        (win.__DPM_GESPERRT || []).forEach(function(x){ out.aufrufe++; out.nachArt[x.art + ' ' + x.m] = (out.nachArt[x.art + ' ' + x.m] || 0) + 1; });
+        for (var i = 0; i < win.frames.length; i++) sammle(win.frames[i], t + 1);
+      } catch (e) {}
+    })(z.win, 0);
+    return out;
+  }
+  /* Gegenprobe: ein PUT muss gesperrt werden und darf das Netz nie erreichen. */
+  async function sperreProbe(){
+    var z = ziel(); if (!z.win) return 'kein Fenster';
+    var vor = (z.win.__DPM_GESPERRT || []).length;
+    var r = await z.win.fetch('/api/v1/objects/__dpm_probe__', { method: 'PUT', body: '{}' });
+    var nach = (z.win.__DPM_GESPERRT || []).length;
+    return (nach === vor + 1 && r.status === 200 ? 'ok   ' : 'FEHL ') + 'PUT gesperrt: Eintraege ' + vor + ' -> ' + nach + ', Status ' + r.status;
+  }
+
+  /* ══ v2570 · LOCALSTORAGE SICHERN UND ZURUECKSTELLEN ══════════════════
+     Kabine und App teilen sich die Herkunft, also den Speicher. Gesichert
+     wird nach sessionStorage (ueberlebt ein Neuladen der Kabine). Beim
+     Zurueckstellen bleiben Anmeldeschluessel unangetastet - ein frisch
+     erneuertes Token durch das alte zu ersetzen, wuerde abmelden. */
+  var LS_SCHUTZ = /token|auth|session|refresh|jwt/i;
+  function lsSichern(){
+    var o = {};
+    for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); o[k] = localStorage.getItem(k); }
+    sessionStorage.setItem('dpm_ls_backup', JSON.stringify(o));
+    return { gesichert: Object.keys(o).length };
+  }
+  function lsVergleich(){
+    var b = JSON.parse(sessionStorage.getItem('dpm_ls_backup') || 'null');
+    if (!b) return { fehler: 'keine Sicherung' };
+    var neu = [], weg = [], anders = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (!(k in b)) neu.push(k); else if (b[k] !== localStorage.getItem(k)) anders.push(k);
+    }
+    Object.keys(b).forEach(function(k){ if (localStorage.getItem(k) === null) weg.push(k); });
+    return { neu: neu, weg: weg, anders: anders };
+  }
+  function lsZurueck(){
+    var b = JSON.parse(sessionStorage.getItem('dpm_ls_backup') || 'null');
+    if (!b) return { fehler: 'keine Sicherung' };
+    var v = lsVergleich(), n = 0, geschuetzt = [];
+    v.neu.forEach(function(k){ if (LS_SCHUTZ.test(k)) { geschuetzt.push(k); return; } localStorage.removeItem(k); n++; });
+    v.weg.concat(v.anders).forEach(function(k){ if (LS_SCHUTZ.test(k)) { geschuetzt.push(k); return; } localStorage.setItem(k, b[k]); n++; });
+    var rest = lsVergleich();
+    return { zurueckgestellt: n, geschuetzt: geschuetzt,
+             rest: rest.neu.length + rest.weg.length + rest.anders.length - geschuetzt.length };
+  }
+
+  /* ══ v2570 · DER MODAL-PRUEFER ═══════════════════════════════════════
+     Es gab keinen. `apSchliesser` stand seit v2129 bereit, gelaufen ist er
+     nur in Handarbeit. `pruefeModal` beantwortet je Dialog und Breite:
+
+       M1  Wurzel gefunden (sonst: Oeffner tot oder anderer Name)
+       M2  Kasten passt in die Breite; in der Hoehe passt er ODER scrollt
+           in sich (ein Kasten hoeher als der Schirm ohne eigenen Scroller
+           schneidet die Fussleiste ab)
+       M3  Schliesser gefunden, im Bild, treffbar (elementsFromPoint)
+       M4  letzter Knopf (Fussleiste) erreichbar: im Bild oder im eigenen
+           Scroller des Dialogs
+       M5  kein Seiten-Querscroll durch den Dialog
+       M6  ESC schliesst (nur gemeldet, kein Fehler, wo nicht vorgesehen)
+       M7  nach dem Schliessen: Wurzel weg oder verborgen
+
+     DECKUNG: Zahl der Bedienelemente im Dialog. „Kasten" ist das groesste
+     sichtbare Kind der Wurzel, wenn die Wurzel selbst den Schirm fuellt
+     (Overlay mit Schleier) - sonst die Wurzel.
+
+     Der Oeffner gibt die Wurzel zurueck oder einen Selektor. */
+  function mdKasten(root, win){
+    var rr = root.getBoundingClientRect();
+    var fuellt = rr.width >= win.innerWidth - 2 && rr.height >= win.innerHeight - 2;
+    if (!fuellt) return root;
+    var best = null, fl = 0;
+    [].slice.call(root.querySelectorAll('*')).slice(0, 400).forEach(function(e){
+      var r = e.getBoundingClientRect();
+      if (r.width >= win.innerWidth - 2 && r.height >= win.innerHeight - 2) return;
+      var a = r.width * Math.min(r.height, win.innerHeight * 3);
+      if (a > fl && r.width > 120 && r.height > 80) { fl = a; best = e; }
+    });
+    return best || root;
+  }
+  function mdScrollt(el, win, bis){
+    for (var p = el; p && p !== bis.parentElement; p = p.parentElement) {
+      var cs = win.getComputedStyle(p);
+      if ((cs.overflowY === 'auto' || cs.overflowY === 'scroll') && p.scrollHeight > p.clientHeight + 1) return p;
+    }
+    return null;
+  }
+  function mdTreffbar(d, win, e){
+    var p = apPunkte(d, win, e);
+    return !!(p && p.gezaehlt > 0 && p.frei > 0);
+  }
+  async function pruefeModal(breite, hoehe, oeffner, name, layout, extra){
+    if (!extra || !extra.wiederverwenden) await lade(breite, layout === undefined ? '' : layout, hoehe, Object.assign({ echteHoehe: true }, extra || {}));
+    var z = ziel(), d = z.d, win = z.win, r = { modal: name, v: win.innerWidth + 'x' + win.innerHeight, fehler: [] };
+    var root = null;
+    try {
+      var x = oeffner(win, d);
+      if (x && typeof x.then === 'function') x = await x;
+      await warte((extra && extra.warte) || 900);
+      try { d.getAnimations().forEach(function(a){ try { a.finish(); } catch (e) {} }); } catch (e) {}
+      root = typeof x === 'string' ? d.querySelector(x) : x;
+    } catch (e) { r.fehler.push('Oeffner wirft: ' + String(e && e.message || e).slice(0, 80)); }
+    if (!root || !root.getBoundingClientRect || root.getBoundingClientRect().height === 0) {
+      r.m1 = false; r.fehler.push('M1 keine sichtbare Wurzel'); return r;
+    }
+    r.m1 = true;
+    var k = mdKasten(root, win), kr = k.getBoundingClientRect();
+    r.kasten = apNam(k).slice(0, 40) + ' ' + Math.round(kr.width) + 'x' + Math.round(kr.height) + ' @' + Math.round(kr.left) + ',' + Math.round(kr.top);
+    var bed = [].slice.call(root.querySelectorAll('button,a[href],input,select,textarea,[role=button]')).filter(function(e){
+      var b = e.getBoundingClientRect(); return b.width > 0 && b.height > 0 && win.getComputedStyle(e).visibility !== 'hidden';
+    });
+    r.deckung = bed.length + ' Bedienelemente';
+    /* M2 */
+    if (kr.left < -1 || kr.right > win.innerWidth + 1) r.fehler.push('M2 Kasten breiter als Schirm (' + Math.round(kr.left) + '..' + Math.round(kr.right) + ')');
+    var kScroll = mdScrollt(k, win, root) || (function(){
+      var s = null; [].slice.call(k.querySelectorAll('*')).some(function(e){
+        var cs = win.getComputedStyle(e);
+        if ((cs.overflowY === 'auto' || cs.overflowY === 'scroll') && e.scrollHeight > e.clientHeight + 1 && e.clientHeight > 60) { s = e; return true; }
+        return false; }); return s; })();
+    var rootScroll = (function(){ var cs = win.getComputedStyle(root); return (cs.overflowY === 'auto' || cs.overflowY === 'scroll') && root.scrollHeight > root.clientHeight + 1; })();
+    if ((kr.top < -1 || kr.bottom > win.innerHeight + 1) && !kScroll && !rootScroll) r.fehler.push('M2 Kasten hoeher als Schirm ohne Scroller (' + Math.round(kr.top) + '..' + Math.round(kr.bottom) + ' von ' + win.innerHeight + ')');
+    r.scroller = kScroll ? apNam(kScroll).slice(0, 30) : (rootScroll ? 'Wurzel' : '-');
+    /* M3 */
+    var s = apSchliesser(root);
+    if (!s) { r.m3 = 'kein Schliesser'; }
+    else {
+      var sb = s.getBoundingClientRect();
+      var imBild = sb.top >= 0 && sb.bottom <= win.innerHeight && sb.left >= 0 && sb.right <= win.innerWidth;
+      r.m3 = apNam(s).slice(0, 28) + ' ' + Math.round(sb.width) + 'x' + Math.round(sb.height);
+      if (!imBild) r.fehler.push('M3 Schliesser nicht im Bild (' + Math.round(sb.left) + ',' + Math.round(sb.top) + ')');
+      else if (!mdTreffbar(d, win, s)) r.fehler.push('M3 Schliesser verdeckt');
+      if (sb.width < 24 || sb.height < 24) r.klein = 'Schliesser ' + Math.round(sb.width) + 'x' + Math.round(sb.height);
+    }
+    /* M4: der unterste Knopf */
+    var letzter = null, lb = -1;
+    bed.forEach(function(e){ if (e.tagName === 'BUTTON' || e.getAttribute('role') === 'button') { var b = e.getBoundingClientRect(); if (b.bottom > lb) { lb = b.bottom; letzter = e; } } });
+    if (letzter) {
+      var lr = letzter.getBoundingClientRect();
+      r.m4 = apNam(letzter).slice(0, 28) + ' unten ' + Math.round(lr.bottom);
+      if (lr.bottom > win.innerHeight + 1 || lr.right > win.innerWidth + 1) {
+        var sc = mdScrollt(letzter, win, root);
+        if (!sc && !rootScroll) r.fehler.push('M4 unterster Knopf ausserhalb ohne Scrollweg (' + Math.round(lr.bottom) + ' von ' + win.innerHeight + ')');
+      }
+    }
+    /* M5 */
+    var ue = Math.max(d.documentElement.scrollWidth, d.body.scrollWidth) - win.innerWidth;
+    if (ue > 1) r.fehler.push('M5 Seite ' + ue + ' px zu breit');
+    var raus = 0; [].slice.call(root.querySelectorAll('*')).forEach(function(e){
+      var b = e.getBoundingClientRect(); if (b.width && b.right > win.innerWidth + 2 && !apGefangen(e, win) && !apNurFuerVorleser(e, win)) raus++; });
+    if (raus) r.fehler.push('M5 ' + raus + ' Elemente ragen rechts heraus');
+    /* M6 + M7 */
+    if (!extra || !extra.ohneEsc) {
+      try { d.dispatchEvent(new win.KeyboardEvent('keydown', { key: 'Escape', keyCode: 27, which: 27, bubbles: true }));
+            (d.activeElement || d.body).dispatchEvent(new win.KeyboardEvent('keydown', { key: 'Escape', keyCode: 27, which: 27, bubbles: true })); } catch (e) {}
+      await warte(400);
+      var zu = !root.isConnected || root.getBoundingClientRect().height === 0 || win.getComputedStyle(root).display === 'none';
+      r.m6 = zu ? 'ESC schliesst' : 'ESC wirkungslos';
+    }
+    var nochOffen = root.isConnected && root.getBoundingClientRect().height > 0 && win.getComputedStyle(root).display !== 'none';
+    if (nochOffen && s) { try { s.click(); } catch (e) {} await warte(500); }
+    nochOffen = root.isConnected && root.getBoundingClientRect().height > 0 && win.getComputedStyle(root).display !== 'none' && win.getComputedStyle(root).visibility !== 'hidden';
+    /* v2571: eine Schublade, die nach unten/seitlich aus dem Bild faehrt, ist zu (Darstellungs-Panel: translateY 657 px). */
+    if (nochOffen) { var rz = root.getBoundingClientRect(); if (rz.top >= win.innerHeight - 2 || rz.bottom <= 2 || rz.left >= win.innerWidth - 2 || rz.right <= 2) nochOffen = false; }
+    r.m7 = nochOffen ? 'bleibt offen' : 'zu';
+    if (nochOffen && s) r.fehler.push('M7 Schliesser schliesst nicht');
+    r.ok = r.fehler.length === 0;
+    return r;
+  }
+  /* Selbsttest des Modal-Pruefers: ein gebautes Modal mit Schliesser unten
+     ausserhalb und Kasten zu breit MUSS rot werden, ein sauberes gruen. */
+  async function modalSelbsttest(){
+    var z = ziel(), d = z.d, win = z.win;
+    function bau(gut){
+      var o = d.createElement('div'); o.id = '_dpm-md-test';
+      o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999999';
+      var k = d.createElement('div');
+      k.style.cssText = gut ? 'position:absolute;left:10px;right:10px;top:10px;max-height:calc(100% - 20px);overflow:auto;background:#fff'
+                            : 'position:absolute;left:0;top:0;width:' + (win.innerWidth + 200) + 'px;height:' + (win.innerHeight + 300) + 'px;background:#fff';
+      k.innerHTML = '<button class="x-close" style="position:absolute;right:4px;top:' + (gut ? 4 : win.innerHeight + 100) + 'px;width:30px;height:30px">×</button>'
+                  + '<div style="height:' + (gut ? 2000 : 10) + 'px"></div><button>Ok</button>';
+      o.appendChild(k);
+      k.querySelector('.x-close').onclick = function(){ o.remove(); };
+      d.body.appendChild(o); return o;
+    }
+    var schlecht = await pruefeModal(0, 0, function(){ return bau(false); }, 'Test schlecht', '', { wiederverwenden: true, warte: 100, ohneEsc: true });
+    var e1 = d.getElementById('_dpm-md-test'); if (e1) e1.remove();
+    var gut = await pruefeModal(0, 0, function(){ return bau(true); }, 'Test gut', '', { wiederverwenden: true, warte: 100, ohneEsc: true });
+    var e2 = d.getElementById('_dpm-md-test'); if (e2) e2.remove();
+    return { schlecht: schlecht.fehler, gut: gut.fehler,
+             urteil: (schlecht.fehler.length >= 2 && gut.fehler.length === 0) ? 'BESTANDEN' : 'DURCHGEFALLEN' };
+  }
+
   function schlaf(ms){ return warte(ms); }   /* v1901e: nicht gedrosselt */
+
+  /* v2553 · Steht die App bei der sichtbaren Safari-Hoehe ganz im Bild?
+     Je Profil und Ansicht: (1) die Wurzel scrollt nicht (Dokument nicht hoeher
+     als sichtbar), (2) die Reiterleiste nav.tabs liegt ganz im Bild, (3) das
+     unterste sichtbare Element von Sidebar bzw. Schiene endet im Bild (dort sitzt
+     der Nutzerbereich mit Name und Anmelden). Gemessen wird nach dem Laden UND
+     nach einem Scrollversuch der Wurzel - genau der rutschte am iPad. */
+  async function tabletSafari(opt){
+    opt = opt || {};
+    var profile = opt.profile || SAFARI, ansichten = opt.layouts || ['', 'v1b'], out = [];
+    for (var i = 0; i < profile.length; i++) {
+      for (var j = 0; j < ansichten.length; j++) {
+        var g = profile[i], lay = ansichten[j];
+        await lade(g[1], lay, g[2], { echteHoehe: true });
+        var z = ziel(), d = z.d, win = z.win, H = win.innerHeight, se = d.scrollingElement || d.documentElement;
+        try { win.scrollTo(0, 99999); } catch (e) {}
+        await schlaf(250);
+        var r = { geraet: g[0], ansicht: lay || 'Heute', breite: g[1], sichtbar: H,
+                  wurzelHoehe: se.scrollHeight, wurzelScroll: Math.round(win.scrollY || se.scrollTop || 0) };
+        var tabs = d.querySelector('nav.tabs');
+        if (tabs) { var tb = tabs.getBoundingClientRect(); r.reiterOben = Math.round(tb.top); r.reiterUnten = Math.round(tb.bottom); }
+        var unten = -1, wer = null;
+        ['#sidebar', '.dpl-schiene'].forEach(function (sel) {
+          var box = d.querySelector(sel); if (!box) return;
+          var bb = box.getBoundingClientRect(); if (bb.width < 2 || bb.height < 2 || bb.right <= 0 || bb.left >= win.innerWidth) return;   /* zugeklappt oder ausserhalb */
+          [].forEach.call(box.querySelectorAll('*'), function (e) {
+            var cs = win.getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden') return;
+            var b = e.getBoundingClientRect(); if (b.width < 2 || b.height < 2) return;
+            if (!(e.textContent || '').trim() && e.tagName !== 'BUTTON') return;
+            /* In einem eigenen Scrollbereich (z. B. die Objektliste) ist tiefer
+               liegender Inhalt erreichbar - dort zaehlt die Unterkante des Bereichs. */
+            var bot = b.bottom;
+            for (var an = e.parentElement; an && an !== box.parentElement; an = an.parentElement) {
+              var oy = win.getComputedStyle(an).overflowY;
+              if ((oy === 'auto' || oy === 'scroll') && an.scrollHeight > an.clientHeight + 1) bot = Math.min(bot, an.getBoundingClientRect().bottom);
+            }
+            if (bot < b.top) return;   /* im Scrollbereich weggescrollt - erreichbar */
+            b = { bottom: bot };
+            if (b.bottom > unten) { unten = b.bottom; wer = sel + ' ' + e.tagName.toLowerCase() + (e.className && typeof e.className === 'string' ? '.' + e.className.split(/\s+/)[0] : ''); }
+          });
+        });
+        r.untenEnde = Math.round(unten); r.untenWer = wer;
+        try { win.scrollTo(0, 0); } catch (e) {}
+        var fehler = [];
+        if (r.wurzelScroll > 0) fehler.push('Wurzel scrollt ' + r.wurzelScroll + ' px');
+        if (r.wurzelHoehe > H + 1) fehler.push('Dokument ' + (r.wurzelHoehe - H) + ' px hoeher als sichtbar');
+        if (tabs && (r.reiterOben < 0 || r.reiterUnten > H)) fehler.push('Reiterleiste angeschnitten (' + r.reiterOben + '..' + r.reiterUnten + ')');
+        if (unten > H + 1) fehler.push('unten abgeschnitten: ' + wer + ' endet bei ' + r.untenEnde + ' von ' + H);
+        r.ok = !fehler.length; r.fehler = fehler;
+        out.push(r);
+      }
+    }
+    window.DPM_TABLET = out;
+    return out;
+  }
 
   /* Über die Reiter schleifen mit einem ECHTEN Klickweg (el.click() löst das
      Ereignis aus — der Unterschied zu setAttribute, vor dem die Doktrin
@@ -1321,9 +1681,10 @@
     rahmen.style.height = Math.min(g[2], 760) + 'px';
     lbl.textContent = g[0] + ' — ' + g[1] + '×' + g[2];
     f.src = ZIEL + (ZIEL.indexOf('?') >= 0 ? '&' : '?') + 'mk=' + Date.now();
+    sperreFrueh();
   }
 
-  f.addEventListener('load', function(){ setTimeout(function(){
+  f.addEventListener('load', function(){ try { sperreTief(f.contentWindow, 0); } catch (e) {} setTimeout(function(){
     /* v1984: das Standbild gilt je DOKUMENT - nach jedem Laden neu
        setzen, sonst misst der erste Lauf nach einem Geraetewechsel
        wieder ein eingefrorenes Einzelbild. */
@@ -1611,6 +1972,10 @@
     for (var i = 0; i < kn.length; i++) {
       var s = (kn[i].textContent || '').trim();
       if (s.length <= 2 && /^[×✕✖✗✘xX╳]$/.test(s)) return kn[i];
+    }
+    /* v2571: ein Knopf mit dem WORT - Unterlagen-Fenster (dp-unterlagen-modal) traegt nur „Schliessen“. */
+    for (var j = 0; j < kn.length; j++) {
+      if (/^(Schlie(ss|ß)en|Abbrechen|Fertig)$/i.test((kn[j].textContent || '').trim())) return kn[j];
     }
     return null;
   }
@@ -2231,9 +2596,16 @@
                  rafErsatz: rafErsatz, rafProbe: rafProbe,
                  stopps: stopps,
                  standbildAn: function(){ return SB_AN; },
-                 selbsttest: selbsttest, geraete: GERAETE };
+                 selbsttest: selbsttest, geraete: GERAETE,
+                 tabletSafari: tabletSafari, safari: SAFARI,
+                 /* v2570 */
+                 pruefeModal: pruefeModal, modalSelbsttest: modalSelbsttest,
+                 sperreSetzen: sperreSetzen, sperreTief: sperreTief, gesperrtStand: gesperrtStand,
+                 sperreProbe: sperreProbe, sperreAn: function(v){ if (v !== undefined) SPERRE_AN = !!v; return SPERRE_AN; },
+                 lsSichern: lsSichern, lsVergleich: lsVergleich, lsZurueck: lsZurueck };
 
-  waehle(2);   /* iPhone 14 */
+  /* v2570: ?leer=1 laedt die App NICHT sofort - erst sichern (DPM.lsSichern), dann laden. */
+  if (!/[?&]leer=1/.test(location.search)) waehle(2);   /* iPhone 14 */
 })();
 </script>
 </body>

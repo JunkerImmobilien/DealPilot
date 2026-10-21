@@ -275,6 +275,63 @@ function gewerbeAus(d) {
   return out;
 }
 
+/* v2520 · LEERSTAND AUS DEN MFH-EINHEITEN (Marcel 20.10.2026).
+   Der Ertragswert bezieht die Ist-Miete nur auf die VERMIETETE Flaeche und
+   prueft sie dort gegen das Band; leere Einheiten gehen mit der marktueblichen
+   Miete in den Rohertrag ein (CrossCheckService). Bis hier kam vom Leerstand
+   nichts an - die Ist-Miete wurde durch die gesamte Wohnflaeche geteilt.
+   Nur wenn es mindestens eine leere UND eine vermietete Wohnung gibt, jede
+   Einheit eine Flaeche traegt und kein Gewerbe dabei ist (das rechnet v2210
+   getrennt). Leer = Status „leer" oder keine Ist-Miete (wie gewerbeAus und
+   PotenzialService). Vermietungsstand „Leer" (ganzes Objekt) gewinnt. */
+function leerstandAus(d) {
+  const liste = Array.isArray(d._mfh_einheiten) ? d._mfh_einheiten
+    : (d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : null);
+  if (!liste || !liste.length) return null;
+  if (/^\s*leer\s*$/i.test(String(pick(d, ['vermstand', 'vermietungsstand']) || ''))) return null;
+  if (liste.some((e) => e && String(e.art || '') === 'gewerbe')) return null;
+  const out = { n_leer: 0, n_vermietet: 0, wfl_leer: 0, wfl_vermietet: 0, ist_monat_vermietet: 0 };
+  for (const e of liste) {
+    const fl = num(e && e.wfl);
+    if (!(fl > 0)) return null;
+    const ist = num(e.ist);
+    if (String(e.status || '') === 'leer' || !(ist > 0)) { out.n_leer++; out.wfl_leer += fl; }
+    else { out.n_vermietet++; out.wfl_vermietet += fl; out.ist_monat_vermietet += ist; }
+  }
+  if (!out.n_leer || !out.n_vermietet) return null;
+  out.wfl_leer = Math.round(out.wfl_leer * 100) / 100;
+  out.wfl_vermietet = Math.round(out.wfl_vermietet * 100) / 100;
+  out.ist_monat_vermietet = Math.round(out.ist_monat_vermietet * 100) / 100;
+  return out;
+}
+
+/* v2540 · DIE EINHEITEN EINZELN (Marcel 20.10.2026: die vermieteten Wohnungen
+   werden einzeln an die Bandkante gehoben). ImmoWertA 31.2 a/b prueft die
+   Marktueblichkeit je Mietverhaeltnis - Mieterhoehungsmoeglichkeiten gibt es
+   nur je Vertrag. Bis v2539 pruefte der Ertragswert die Ist-Miete des ganzen
+   Hauses: Demo-MFH WE 1 mit 6,18 €/m² unter der Kante 6,64, das Haus mit 7,31
+   im Band - die Wohnung blieb bei 6,18. Gleiche Bedingungen wie leerstandAus
+   (nur Wohnen, jede Einheit mit Flaeche, mindestens eine vermietet); schon ab
+   ZWEI Einheiten, auch ohne Leerstand. */
+function einheitenMieteAus(d) {
+  const liste = Array.isArray(d._mfh_einheiten) ? d._mfh_einheiten
+    : (d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : null);
+  if (!liste || liste.length < 2) return null;
+  if (/^\s*leer\s*$/i.test(String(pick(d, ['vermstand', 'vermietungsstand']) || ''))) return null;
+  if (liste.some((e) => e && String(e.art || '') === 'gewerbe')) return null;
+  const out = [];
+  for (let i = 0; i < liste.length; i++) {
+    const e = liste[i];
+    const fl = num(e && e.wfl);
+    if (!(fl > 0)) return null;
+    const ist = num(e.ist);
+    const leer = String(e.status || '') === 'leer' || !(ist > 0);
+    out.push({ nr: String(e.nr || e.bez || e.name || ('WE ' + (i + 1))), wfl: Math.round(fl * 100) / 100,
+               ist_monat: leer ? null : Math.round(ist * 100) / 100, leer });
+  }
+  return out.some((x) => !x.leer) ? out : null;
+}
+
 export const DealPilotObjectMapper = {
   reportInput(obj) {
     const d = dataOf(obj);
@@ -311,6 +368,8 @@ export const DealPilotObjectMapper = {
          ohne sie am Durchschnitt. Der Sprechlauf fragt sie beim MFH jetzt ab. */
       units: num(pick(d, ['einheiten', 'units'])),
       gewerbe: gewerbeAus(d),   /* v2210 */
+      leerstand: leerstandAus(d),   /* v2520 */
+      einheiten_miete: einheitenMieteAus(d),   /* v2540 */
       /* v2241 · Hier stand `|| 'gepflegt'`. Ein Objekt OHNE Zustandsangabe
          (der Quick-Check fuehrt gar kein Feld dafuer) wurde damit als
          gepflegt bewertet UND zaehlte in der Aussagekraft als „Zustand
@@ -489,7 +548,30 @@ export const DealPilotObjectMapper = {
       marktmiete_eur_qm: num(pick(d, ['ds2_marktmiete'])),
       marktfaktor: num(pick(d, ['ds2_marktfaktor'])),
     };
-    return Object.values(out).some((v) => v != null && v !== '') ? out : null;
+    if (!Object.values(out).some((v) => v != null && v !== '')) return null;
+    /* v2515 · HERKUNFT JE FELD. Die KI-Funktion „Lage analysieren" fuellt
+       diese Felder (gemessen, wo es eine Messung gibt, sonst KI-Wert) - im
+       Bericht stand dann alles als „Ihre Angabe". Die Haupt-App fuehrt seit
+       v2515 das versteckte Feld _lage_herkunft (JSON, Feld-ID -> gemessen |
+       ki | eigen). Fehlt es (Altbestand), wird nichts behauptet. */
+    let h = d._lage_herkunft;
+    if (typeof h === 'string') { try { h = h ? JSON.parse(h) : null; } catch { h = null; } }
+    if (h && typeof h === 'object') {
+      const ERLAUBT = { gemessen: 1, ki: 1, eigen: 1 };
+      const map = { mikrolage: 'mikrolage', makrolage: 'makrolage', bevoelkerung: 'ds2_bevoelkerung',
+        nachfrage: 'ds2_nachfrage', entwicklung: 'ds2_entwicklung', wertsteigerung: 'ds2_wertsteigerung',
+        mietausfallrisiko: 'ds2_mietausfall' };
+      const herkunft = {};
+      /* Eintrag {art, wert}: gilt nur, solange der Feldwert noch derselbe
+         ist - sonst wurde das Feld spaeter anders gesetzt (dann nichts). */
+      for (const [k, id] of Object.entries(map)) {
+        const e = h[id];
+        if (out[k] == null || out[k] === '' || !e || typeof e !== 'object') continue;
+        if (ERLAUBT[e.art] && String(e.wert) === String(out[k])) herkunft[k] = e.art;
+      }
+      if (Object.keys(herkunft).length) out.herkunft = herkunft;
+    }
+    return out;
   },
 
   // Lage- und Potenzialbewertungen (DealPilot-Eingaben). Strings bleiben lesbar (gut/mittel/…).

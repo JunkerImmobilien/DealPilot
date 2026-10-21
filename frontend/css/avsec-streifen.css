@@ -146,3 +146,21 @@
   #avsec .av-cards.single .mc.dp .mbody .avs-spanne, #avsec .av-cards.single .mc.dp .mbody .row3 { border-left: 0 !important; }
   #avsec .av-cards.single .mc.dp .mbody .row3 .f3:first-child { border-left: 0 !important; padding-left: 10px !important; }
 }
+
+/* ===== v2490 · Marcel 20.10.2026: „Oft ragen auf der Markteinschätzungskarte die Texte bei Marktmiete ins Feld
+   Einordnung. Das passiert, wenn wir Mieten über 10 € haben." GEMESSEN (beide Dokumente, Kartenbreite per Stil
+   gesetzt, 1300 -> 300 px in 10er-Schritten): nur die EINE-ZEILE-Stufe ab 1180 px ist betroffen. Ihre fünf
+   Spalten sind max-content ×4 + minmax(0,1fr) für Einordnung/Genauigkeit; die beiden .f3 brauchen 231 px. Bei
+   1230 px Karte bleiben der Restspalte 210 px - und weil `.mbody > *` (Z. 33) ALLEN Kindern
+   justify-content:flex-end gibt, quillt der Überhang nach LINKS über die Marktmiete (1180 px: 57 px).
+   Über 10 € ist die Miete eine Ziffer breiter (+7 px), damit beginnt die Überlappung schon bei 1240 statt 1230.
+   Ursache ist also die Schwelle, nicht die Zahl: die eine Zeile braucht rund 1.250-1.300 px. Darunter gilt
+   jetzt die Zwei-Zeilen-Stufe, und falls es doch einmal eng wird, kürzt die Einordnung rechts (…),
+   statt nach links zu wachsen (`safe flex-end`: bleibt rechtsbündig, solange es passt). ===== */
+@container (min-width: 1180px) and (max-width: 1339px) {
+  #avsec .av-cards.single .mc.dp .mbody { grid-template-columns: max-content max-content minmax(0, 1fr) !important; grid-template-areas: "mw sp sub" "miete row3 row3" !important; row-gap: 6px !important; }
+  #avsec .av-cards.single .mc.dp .mbody .miete { border-left: 0 !important; }
+}
+#avsec .av-cards.single .mc.dp .mbody .row3 { justify-content: safe flex-end !important; min-width: 0 !important; overflow: hidden !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 .f3 { flex: 0 1 auto !important; min-width: 0 !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 .f3 .fv { overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }

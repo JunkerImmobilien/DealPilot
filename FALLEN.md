@@ -4544,3 +4544,67 @@ um die fertige Funktion — gewollt) oder Deklarationen in einer IIFE.
 **Regel:** Globale Hilfsfunktionen bekommen einen Namen, der nicht nach
 einem `window.`-Einstiegspunkt klingt — oder stehen in einer IIFE.
 Ein `onclick="name()"` im HTML ruft IMMER die zuletzt gebundene Fassung.
+
+## Das MFH wird gekauft, aber Wohnungen werden vermietet — auch beim Flächenfilter
+
+Gemessen am 21.10.2026, Bismarckstr. Detmold (MFH, 546 m², 6 WE): „Ertragswerte
+rechnen" und „Marktpreise abrufen" kamen leer zurück. `segment()` wählte für die
+MIETE eines MFH schon richtig die Klasse `Wohnung` — aber
+`MarketAnalysisService._geomapLevel` filterte die Fläche weiter mit der
+Wohnfläche des HAUSES: Mietwohnungen von 410 bis 683 m². Treffer 0, obwohl die
+Quelle im 3-km-Umkreis 14.351 Mietangebote führt. Mit Leerstand braucht der
+Ertragswert eine Vergleichsmiete — ohne sie keine Eingabe, kein Wert.
+
+**Regel:** Wer das Segment wechselt, wechselt auch die Bezugsgröße. Beim MFH zur
+Miete gilt die mittlere Wohnungsgröße (Einheitenliste, sonst Wfl / Einheiten).
+
+Dazu der Tarnfehler: der Grund lautete „Vereinfachtes Sachwert-/Ertragswert-
+verfahren … Indikativ" — die erste Notiz mit dem Wort „Ertragswert" war der
+allgemeine Hinweis. **Eine Fehlermeldung, die per Stichwort aus Notizen gesucht
+wird, findet den Hinweistext zuerst.**
+
+## `[hidden]` verliert gegen eine Klasse mit `display`
+
+Ersteinrichtung v2551: die alte Liste und die alten Kacheln trugen `hidden` —
+und standen im Browser trotzdem da, weil `.dpo-set` und `.dpo-kacheln`
+`display:grid` setzen. Die Klasse schlägt das UA-Stylesheet. Gefunden erst beim
+Durchklicken (v2554a), `node --check` und Code-Lesen sahen nichts.
+
+**Regel:** Ausblenden per inline `style="display:none"` (oder `[hidden]{display:none!important}`
+im eigenen Blatt), und nach jedem Umbau einmal per `offsetParent` zählen, was sichtbar ist.
+
+## Jedes Laden in der Kabine zählt die Objektnummer hoch
+
+Gemessen am 21.10.2026 (v2570): die App startet im iframe als „Neues Objekt"
+und zieht dabei den Zähler `ji_u_<user>_seq_<jahr>` im **localStorage** hoch
+– 2026-1119, 1120 … 1126 über einen Messlauf. Gespeichert wurde nichts (die
+Sperre fing `POST /objects` ab), aber der Zähler liegt im **geteilten**
+Speicher derselben Herkunft: nach dem Lauf vergibt Marcels nächstes Objekt
+sonst eine Nummer mit Lücke.
+
+**Regel:** vor jedem Kabinenlauf `DPM.lsSichern()`, danach iframe auf
+`about:blank` und `DPM.lsZurueck()` – und den Zähler gegen die höchste
+Nummer aus `GET /objects` halten (Zähler ≥ Maximum). Die Messkabine mit
+`?leer=1` öffnen, sonst lädt sie die App, bevor gesichert ist.
+
+## Ein Modal, dessen Wurzel null Pixel hoch ist
+
+`#bmf-modal-container` ist eine Hülle mit Höhe 0; sichtbar ist ihr Kind
+`#bmfOverlay` (`position:fixed`). `#v10-market-modal` steht statisch im
+Reiter Finanzierung (`#s3`) – ist der Reiter nicht aktiv, ist das Modal
+`display:flex` und trotzdem 0×0, weil ein Vorfahr `display:none` trägt.
+Beide meldete der Modal-Prüfer zuerst als „keine sichtbare Wurzel".
+
+**Regel:** ein Modal-Prüfer bekommt den Selektor des **gemalten** Kastens,
+nicht den der Hülle, und öffnet ein Modal aus dem Zustand, aus dem der
+Nutzer es öffnet (Reiter aktiv, Objekt geladen). Drei Deal-Aktion-Fenster
+öffnen ohne Objekt gar nicht (`alert` „Bitte zuerst Adresse …") – auch das
+ist ein Zustand, kein Fehler.
+
+## `scrollbar-width: thin` nimmt auf Windows Höhe
+
+Der Balken der Reiterleiste (v2571, ab 1025 px) ist im Prüf-Chrome unter
+Windows **13 px** hoch (`offsetHeight − clientHeight`), auf Mac/iPad mit
+Überlagerungsbalken 0. Er erscheint nur, wenn die Leiste überläuft. Wer an
+Höhenverträgen unter `nav.tabs` rechnet (`top:178px`-Muster), misst auf
+beiden Systemen.

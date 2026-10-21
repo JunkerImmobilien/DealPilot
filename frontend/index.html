@@ -35,8 +35,8 @@
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=v2421">
-<link rel="stylesheet" href="css/avsec-streifen.css?v=v1881c"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/style.css?v=v2576">
+<link rel="stylesheet" href="css/avsec-streifen.css?v=v2490"><!-- v1148-spalt-1025px -->
     <!-- ui-varianten-20260801: nach style.css, damit html[data-ui-*] greift -->
     <link rel="stylesheet" href="css/ui-varianten.css?v=v2104b">
     <!-- v1082-uv-boot: Attribute VOR dem ersten Paint setzen, sonst blitzt beim
@@ -53,7 +53,7 @@
 <link rel="stylesheet" href="css/pricing-modal.css?v=v2132">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
 <link rel="stylesheet" href="css/hell-varianten.css?v=v1652c">
-<link rel="stylesheet" href="css/rnd-styles.css?v=v2421">
+<link rel="stylesheet" href="css/rnd-styles.css?v=v2571">
 <link rel="stylesheet" href="css/select-fix.css?v=W34">
     <link rel="stylesheet" href="css/v187-additions.css?v=W34">
   <link rel="stylesheet" href="credits-modal.css?v=W34">
@@ -1050,6 +1050,7 @@ label.dp-required.qc-required::after {
   <h2 class="sec-title">Objekt &amp; Fotos</h2><p class="sec-desc">Grunddaten, Lage und Objektfotos für den Bankexport</p><div id="oe-kopf" class="oe-kopf"><!-- v1867: Eingabetiefe mit Pillen 1/2/3 (dieselbe Wahl wie in der Pre-Flight-Karte), Stand, Haken - und darunter die Abruf-Box --><div id="oe-ziel" class="oe-ziel"><span class="oe-ziel-lbl">Eingabetiefe</span><span class="dp-pf-stufen oe-pillen" data-oe-pillen title="Einfach · Mittel · Ausgiebig"></span><span id="oe-ziel-status" class="oe-ziel-status"></span></div><label class="oe-kopf-cb"><input type="checkbox" id="oe-details-cb"> weitere Objektdetails angeben</label><p class="hint oe-ziel-hint" id="oe-ziel-hint"></p><div id="oe-abruf-box" class="oe-abruf-box"><div class="card-title">Marktbericht abrufen <span class="oe-ct-hint">die gewählte Eingabetiefe ist vorgemerkt</span></div><div id="oe-stufen" class="oe-abruf"></div><div id="oe-fehlt" class="oe-fehlt" style="display:none"></div><div class="oe-abruf-foot"><span>Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.</span><button type="button" class="oe-btn" id="oe-mb-oeffnen">Im Marktbericht öffnen →</button></div></div></div>
   <input type="hidden" id="_avm_state" value="">
   <input type="hidden" id="_mb_state" value="">  <!-- v540: DealPilot-Marktbewertung Snapshot -->
+  <input type="hidden" id="_lage_herkunft" value="">  <!-- v2515: Herkunft je Lage-Feld (gemessen | ki | eigen), JSON -->
   <input type="hidden" id="_immometrica_id" value="">
   <input type="hidden" id="_immometrica_online_since" value="">
   <input type="hidden" id="_immometrica_portals" value="">  <!-- v671: ImmoMetrica-Meta (Inseratsalter) -->
@@ -1350,14 +1351,14 @@ label.dp-required.qc-required::after {
         </select>
       </div>
       <div class="f">
-        <label>Nachfrage-Indikatoren <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label>
+        <label>Nachfrage <span class="oe-q" title="Gemessen als Vermarktungsdauer der Angebote (Median, Kauf, letzte 12 Monate)">Vermarktungsdauer</span> <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label>
         <select id="ds2_nachfrage" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
           <option value="">– keine Angabe –</option>
-          <option value="sehr_stark">Sehr stark (Uni, ÖPNV, Top-Arbeitgeber)</option>
-          <option value="stark">Stark</option>
-          <option value="mittel">Mittel</option>
-          <option value="schwach">Schwach</option>
-          <option value="sehr_schwach">Sehr schwach</option>
+          <option value="sehr_stark">Sehr stark (bis 30 Tage)</option>
+          <option value="stark">Stark (bis 60 Tage)</option>
+          <option value="mittel">Mittel (bis 120 Tage)</option>
+          <option value="schwach">Schwach (bis 200 Tage)</option>
+          <option value="sehr_schwach">Sehr schwach (über 200 Tage)</option>
         </select>
       </div>
       <div class="f">
@@ -1441,6 +1442,8 @@ label.dp-required.qc-required::after {
       <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="14" height="14"><use href="#i-trend"/></svg></span>Mieterhöhung und Zielbild <span class="oe-ct-hint">optional · kann, nicht muss</span></div>
     </div>
     <div id="zb-mfh-summe" style="display:none"></div>
+    <!-- v2541: Jahr der Fertigstellung des Zielbilds (Pilot-Analyse, PDF, Karte im Tab Bewertung) - fuer Einzelobjekt und MFH -->
+    <div class="g3" id="zb-jahr-zeile" style="margin:0 0 10px"><div class="f"><label title="In welchem Jahr ist das Zielbild erreicht (Umbau fertig, neu vermietet)? Leer: in Pilot-Analyse und PDF steht das Jahr als offen.">Zielbild fertig (Jahr)</label><div class="iw"><input id="zb_fertig_jahr" type="text" inputmode="numeric" maxlength="4" placeholder="z. B. 2028"></div></div></div>
     <div id="zb-einzel">
       <p class="sec-desc" style="margin:0 0 12px"><b>Soll-Miete</b> ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt — er bleibt wohnen. <b>Zielbild</b> ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Beides ist freiwillig. Score und Verkehrswert rechnen weiter mit dem Bestand; der Ertragswert je Stufe steht in der Pilot-Analyse und in beiden PDFs.</p>
       <div class="g3">
@@ -1490,7 +1493,7 @@ label.dp-required.qc-required::after {
         <option value="dreispaenner">Dreispänner · 3 Wohnungen (× 0,97)</option>
         <option value="vierspaenner">Vierspänner · 4 Wohnungen (× 0,95)</option>
       </select></div></div>
-      <div class="f"><label title="Punktesystem der Anlage 2: durchgeführte Modernisierungen (Dach, Fenster, Heizung, Bäder, Leitungen ...) ergeben Punkte, aus denen sich die verlängerte Restnutzungsdauer ableitet. Es beschreibt den Zustand — die Standardstufe daneben die Ausstattungsqualität.">Modernisierungsgrad (Anlage 2)</label><div class="iw"><select id="mod_punkte">
+      <div class="f"><label title="Punktesystem der Anlage 2: durchgeführte Modernisierungen (Dach, Fenster, Heizung, Bäder, Leitungen ...) ergeben Punkte, aus denen sich die verlängerte Restnutzungsdauer ableitet. Es beschreibt den Zustand — die Standardstufe daneben die Ausstattungsqualität.">Modernisierungsgrad (Anlage 2)</label><div class="iw"><input type="hidden" id="mod_quelle"><!-- v2540: Quelle der Punkte beim MFH --><select id="mod_punkte">
         <option value="">— keine Angabe, wird geschätzt —</option>
         <option value="0">nicht modernisiert</option>
         <option value="4">kleine Modernisierungen im Rahmen der Instandhaltung</option>
@@ -1903,11 +1906,11 @@ label.dp-required.qc-required::after {
         <label>Mietausfall-Risiko <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab3.mietausfall_risiko" tabindex="-1" aria-label="Hilfe zu Mietausfall-Risiko"></button></label>
         <select id="ds2_mietausfall" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
           <option value="">– keine Angabe –</option>
-          <option value="sehr_niedrig">Sehr niedrig</option>
-          <option value="niedrig">Niedrig</option>
-          <option value="mittel">Mittel</option>
-          <option value="erhoeht">Erhöht</option>
-          <option value="hoch">Hoch</option>
+          <option value="sehr_niedrig">Sehr niedrig (Leerstand unter 1,5 %)</option>
+          <option value="niedrig">Niedrig (unter 3 %)</option>
+          <option value="mittel">Mittel (unter 6 %)</option>
+          <option value="erhoeht">Erhöht (unter 9 %)</option>
+          <option value="hoch">Hoch (ab 9 %)</option>
         </select>
       </div>
     </div>
@@ -1947,6 +1950,9 @@ label.dp-required.qc-required::after {
           <div class="iw"><input id="mv_beginn" type="date"></div></div>
         <div class="f"><label title="Wann die Miete zuletzt erhöht wurde. Daran hängen die Kappungsgrenze und bei Indexmieten die Frist bis zur nächsten Anpassung.">Letzte Erhöhung</label>
           <div class="iw"><input id="mv_letzte_erhoehung" type="date"></div></div>
+        <!-- v2545 · Hoehe der letzten Erhoehung: die Kappungsgrenze gilt auf die Miete drei Jahre vorher (§ 558 Abs. 3 BGB) -->
+        <div class="f"><label title="Um wie viel Euro im Monat die Miete bei der letzten Erhöhung gestiegen ist (bei mehreren in den letzten drei Jahren: die Summe, ohne Modernisierungsumlage und Betriebskosten). Die Kappungsgrenze gilt auf die Miete vor drei Jahren — ohne diese Angabe rechnet DealPilot den Spielraum zu groß.">Letzte Erhöhung um</label>
+          <div class="iw"><span class="pfx">€</span><input id="mv_letzte_erhoehung_betrag" type="text" inputmode="decimal" placeholder="€/Monat" class="trl"></div></div>
         <p class="hint" id="mv-objekt-mfh-hinweis" style="display:none"></p>
       </div>
       <div class="card"><div class="ct ct-pro me-header"><!-- V316-miete-header -->
@@ -2721,7 +2727,7 @@ label.dp-required.qc-required::after {
           </div>
         </div>
         <div class="g2">
-          <div class="f"><label class="dp-required" data-v236-required-set="1">Zinssatz nominal (% p.a.) <button type="button" class="dp-tip" data-tip-id="tab5.zinsbindung" tabindex="-1" aria-label="Hilfe zu tab5.zinsbindung"></button></label><div class="iw"><input id="d1z" type="text" inputmode="decimal" value="3.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+          <div class="f"><label class="dp-required" data-v236-required-set="1">Zinssatz nominal (% p.a.) <button type="button" class="dp-tip" data-tip-id="tab5.zinssatz" tabindex="-1" aria-label="Hilfe zu Zinssatz nominal"></button></label><div class="iw"><input id="d1z" type="text" inputmode="decimal" value="3.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
           <div class="f" id="d1t_field"><label class="dp-required" data-v236-required-set="1">Tilgung (% p.a.) <span class="cf-hint" id="d1t_hint" style="display:none">— bei Aussetzung deaktiviert</span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgung" tabindex="-1" aria-label="Hilfe zu Tilgung"></button></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
         </div>
         <div class="f"><label>Monatliche Rate (berechnet)</label><div class="cf" id="d1_rate">—</div></div>
@@ -3140,6 +3146,15 @@ label.dp-required.qc-required::after {
         <label><input type="checkbox" id="ai-pdf-sec-offerte" checked> Kaufpreis-Offerte</label>
         <label><input type="checkbox" id="ai-pdf-sec-bank" checked> Bankargumente</label>
         <label><input type="checkbox" id="ai-pdf-sec-insight" checked> DealPilot-Insight</label>
+        <!-- v2552: die Abschnitte der Pilot-Analyse, die das PDF bisher nicht druckte -->
+        <label><input type="checkbox" id="ai-pdf-sec-anschluss" checked> Anschlussfinanzierung</label>
+        <label><input type="checkbox" id="ai-pdf-sec-lage" checked> Lage &amp; Markt</label>
+        <label><input type="checkbox" id="ai-pdf-sec-abgleich" checked> Abgleich mit dem Marktbericht</label>
+        <label><input type="checkbox" id="ai-pdf-sec-fotos" checked> Optischer Eindruck</label>
+        <label><input type="checkbox" id="ai-pdf-sec-zielbild" checked> Ankauf &middot; Bestand &middot; Zielbild</label>
+        <label><input type="checkbox" id="ai-pdf-sec-ankaufheute" checked> Ankauf gegen heute</label>
+        <label><input type="checkbox" id="ai-pdf-sec-steuer" checked> Steuerliche Zusammenfassung</label>
+        <label><input type="checkbox" id="ai-pdf-sec-steuerverlauf" checked> Steuerverlauf</label>
       </div>
       </details>
     </div>
@@ -3592,7 +3607,7 @@ label.dp-required.qc-required::after {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="js/pdf-logo.js?v=v1634b"></script><!-- v1634 · muss VOR den PDF-Bausteinen stehen: waermt das Logo vor -->
 <script src="js/pdf-anlage-bmf.js?v=v1634c"></script>
-<script src="js/pdf-investment-bank.js?v=v2461c"></script>
+<script src="js/pdf-investment-bank.js?v=v2555a"></script>
 <script src="js/bmf-modal.js?v=v2269"></script>
 <script src="js/bmf-modal-v292.js?v=v2269"></script>
 <script src="js/bmf-bodenabschlag.js?v=v2269"></script>
@@ -3623,13 +3638,14 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v2301"></script>
+  <script src="js/calc.js?v=v2484a"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
-<script src="js/mietentwicklung.js?v=v2430"></script>
+<script src="js/mietentwicklung.js?v=v2481a"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v2261"></script>
+<script src="js/tax.js?v=v2544"></script>
+<script src="js/steuer-verlauf.js?v=v2571"></script>
 <script src="js/config.js?v=v2261"></script>
   <script src="js/legal-links.js?v=v1885" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
@@ -3640,21 +3656,21 @@ label.dp-required.qc-required::after {
 <script src="js/lage-profil.js?v=v2159"></script><!-- v1956 · A-/B-/C-Lage und die Zielrenditen -->
 <script src="js/score-tiers.js?v=v1950"></script>
 <script src="js/dealscore.js?v=v2191"></script>
-<script src="js/qc-heuristik.js?v=qc-v2450"></script>
+<script src="js/qc-heuristik.js?v=v2546a"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=W34">
 <script src="js/datenraum.js?v=1375"></script>
-<script src="js/tooltip-content.js?v=v1620"></script>
+<script src="js/tooltip-content.js?v=v2557"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
   <script src="js/immometrica-import.js?v=v2421"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
   <script src="js/modal-boarding-skin.js?v=v2218h"></script>
   <script src="js/provider-keys.js?v=v2180"></script>
   <script src="js/mandanten.js?v=v2212b"></script>
-  <script src="js/ueberfuehrung-wizard.js?v=v2180"></script>
+  <script src="js/ueberfuehrung-wizard.js?v=v2572"></script>
   <script src="js/apikeys.js?v=811"></script>
   <script src="js/telegram-panel.js?v=v2421"></script>
   <script src="js/unterlagen-modal.js?v=v2441a"></script>
-  <script src="js/standardwerte-karten.js?v=v2261"></script>
+  <script src="js/standardwerte-karten.js?v=v2548b"></script>
   <script src="js/settings.js?v=v2216c"></script>
 <script src="js/pricing-modal.js?v=v2132a"></script>
   <script src="js/flyer-code.js?v=v1421c"></script>
@@ -3673,15 +3689,15 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=v2254"></script>
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
-<script src="js/ui.js?v=v2430"></script>
+<script src="js/ui.js?v=v2576a"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v2430"></script>
+<script src="js/storage.js?v=v2575"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v2269"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v2263e"></script>
 <script src="js/track-record.js?v=W39"></script>
-<script src="js/pdf.js?v=v2463c"></script>
-<script src="js/auth.js?v=v2249"></script>
+<script src="js/pdf.js?v=v2555"></script>
+<script src="js/auth.js?v=v2571"></script>
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
   <!-- v1370 (B5): nach dem 401-Handler, damit beide dieselbe Auth.apiCall umschliessen -->
   <script src="js/rate-limit-handler.js?v=v1370" defer></script>
@@ -3690,29 +3706,29 @@ label.dp-required.qc-required::after {
   <script src="js/qc-ai-bridge.js?v=v2237" defer></script>
 <script src="js/subscription.js?v=v1421"></script>
 <!-- V311-A1-bmfui-removed: bmf-ui.js (V35-Modal) toter Code, durch V292-Modal abgeloest -->
-<script src="js/dealscore2.js?v=v2191"></script>
-<script src="js/dealscore2-ui.js?v=v2144"></script>
-<script src="js/ds2-ai.js?v=166"></script>
-<script src="js/ki-lage.js?v=v2188a"></script>
-<script src="js/ki-miete.js?v=v1242c"></script>
+<script src="js/dealscore2.js?v=v2548c"></script>
+<script src="js/dealscore2-ui.js?v=v2548c"></script>
+<script src="js/ds2-ai.js?v=v2518"></script>
+<script src="js/ki-lage.js?v=v2518"></script>
+<script src="js/ki-miete.js?v=v2500"></script>
 <script src="js/star-rating.js?v=v1851"></script>
-<script src="js/pdf-import.js?v=v1678"></script>
+<script src="js/pdf-import.js?v=v2549"></script>
 <script src="js/dokument-import.js?v=v2218h"></script>
 <script src="js/beleg-import.js?v=v2273"></script>
 <script src="js/financing.js?v=v2261"></script>
 <script src="js/financing-pdf.js?v=20260611105943"></script>
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
-<script src="js/quick-check.js?v=v2272"></script>
-<script src="js/qc-bridge.js?v=qc-v2450a"></script>
+<script src="js/quick-check.js?v=v2546a"></script>
+<script src="js/qc-bridge.js?v=qc-v2571"></script>
 <script src="js/bodenrichtwert.js?v=v2374"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v2245"></script>
-<script src="js/objekt-reiter.js?v=v2403"></script>
+<script src="js/objekt-reiter.js?v=v2557"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v2431"></script>
-<script src="js/potenzial.js?v=v2460c"></script>
+<script src="js/mfh-einheiten.js?v=v2545"></script>
+<script src="js/potenzial.js?v=v2556c"></script>
 <script src="js/mietvertrag-objekt.js?v=v2087"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>
@@ -3723,12 +3739,12 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v2465"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v2471"></script>
+<script src="js/help.js?v=v2560c"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v2410"></script>
 <script src="js/prozess-atlas-gesamt.js?v=v2218f"></script>
-<script src="js/messe-drehbuch.js?v=v2395vr3"></script>
+<script src="js/messe-drehbuch.js?v=v2481r"></script>
 <script src="js/hinweise.js?v=v2204"></script>
 <script src="js/pilot-tower.js?v=v2252"></script>
   <script src="js/dp-band-fix.js?v=1117"></script> <!-- v863-band-fix, v1117: 32/15 -->
@@ -3736,13 +3752,13 @@ label.dp-required.qc-required::after {
   <script src="js/tour-engine.js?v=v2251"></script>
   <script src="js/tour-content.js?v=v2205a"></script>
   <!-- v1740 � Grund-Setup VOR dem Rundgang (Aussehen, Stammdaten, Rechenwerte) -->
-  <script src="js/onboarding.js?v=v2254"></script>
+  <script src="js/onboarding.js?v=v2554b"></script>
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=777e"></script>
   <script src="js/email-change.js?v=774"></script><!-- v774-change-email -->
 <!-- V63.74: Deal-Aktion Tab (10. Tab) -->
 <script src="js/ankauf.js?v=v2239"></script>
-<script src="js/zensus-info.js?v=v2220"></script><!-- v2162 · Zensus an Miete und Leerstand -->
+<script src="js/zensus-info.js?v=v2500"></script><!-- v2162 · Zensus an Miete und Leerstand; v2500 Kaesten aus -->
 <script src="js/doppelkarte.js?v=v2173"></script>
 <script src="js/abweichung.js?v=v2216j"></script>
 <script src="js/ankauf-ansicht.js?v=v2219"></script>
@@ -3763,8 +3779,8 @@ label.dp-required.qc-required::after {
 <script src="js/avm-missing-reset.js?v=443"></script>
 <script src="js/avm-section.js?v=v2149"></script>
 <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte, klickbar = übernehmen -->
-<script src="js/marktwert-abschlag.js?v=v2237d"></script><!-- v2237 · Abschlag auf Angebotspreise -->
-<script src="js/dealpilot-mb.js?v=v2367"></script>
+<script src="js/marktwert-abschlag.js?v=v2490"></script><!-- v2237 · Abschlag auf Angebotspreise -->
+<script src="js/dealpilot-mb.js?v=v2515"></script>
 <script src="js/mb-auftrag.js?v=v2191"></script>
   <script src="js/marktbericht-view.js?v=v2403"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
@@ -3787,7 +3803,7 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v2354"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v2430"></script>
+  <script src="js/object-actions.js?v=v2549"></script>
   <script src="js/dpsh-score-hero.js?v=v2263"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
   <script src="js/voice-import.js?v=v2430"></script>
@@ -4219,7 +4235,7 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 
 <script src="js/copilot.js?v=v2180"></script>
-<script src="js/copilot-pillen.js?v=v2188a"></script>
+<script src="js/copilot-pillen.js?v=v2553"></script>
 <script src="js/dp-diktat.js?v=v1760"></script><!-- v1760 · Mikrofon fuer Textfelder -->
 <script src="js/copilot-aenderungen.js?v=v1875a"></script><!-- v1760 · der Co-Pilot versteht Aenderungen -->
 <script src="js/pilot-berichte.js?v=v2180"></script><!-- v1769 · beide Piloten holen die Marktberichte (V6) -->
@@ -4242,8 +4258,8 @@ document.addEventListener('DOMContentLoaded', function(){
     <!-- v1635 · Layout-Varianten. Stylesheet ZULETZT, damit es style.css
          bei gleicher Spezifitaet ueberstimmt; Skript NACH settings.js,
          weil es _dpDispSkin fuer den hellen Grund benutzt. -->
-    <link rel="stylesheet" href="css/datenaufnahme.css?v=v2135"><!-- v1639 · aus der Bordkarte wird eine Zeile -->
-    <link rel="stylesheet" href="css/layout-varianten.css?v=v2421">
+    <link rel="stylesheet" href="css/datenaufnahme.css?v=v2547a"><!-- v1639 · aus der Bordkarte wird eine Zeile -->
+    <link rel="stylesheet" href="css/layout-varianten.css?v=v2573">
     <script src="js/pdf-wahl.js?v=v1733"></script><!-- v1636 · Rueckfrage vor dem Export -->
     <script src="js/bmf-wahl.js?v=v1748"></script><!-- v1748 · Auswahl bei der Kaufpreisaufteilung -->
     <!-- v1765 · js/pilot-sprache.js ist RAUS. Der Knopf "Aenderungen
@@ -4258,6 +4274,7 @@ document.addEventListener('DOMContentLoaded', function(){
 <script src="js/objektkarten-stil.js?v=v2216c"></script>
     <script src="js/karten-stil.js?v=v2252"></script><!-- v1953 · Trichter (Bordkarte ist raus) -->
     <script src="js/erststart.js?v=v2251"></script>
+    <script src="js/esc-schliesst.js?v=v2572"></script>
     <!-- v1697 · DIE CHECKLISTE BEIM ANLEGEN IST AUSGEHAENGT.
          Marcel: „nimm bitte auch das Modal bei neues Objekt anlegen
          erstmal raus."

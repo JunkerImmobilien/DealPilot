@@ -419,6 +419,31 @@ window.QcHeuristik = (function () {
    * Woertlich aus quick-check.js (_renderQcRecommendation, Z. 909–953).
    * `betont` zeichnet den Kaufpreis aus — im Browser `<strong>`, im Chat
    * gar nicht. */
+  /* ── v2546a · GUENSTIG GEKAUFT, ABER DIE RECHNUNG TRAEGT NICHT ──────────
+   *
+   * Marcel 21.10.2026 (Sachsenstr. 18, Herford): „da kam ein Dealscore von
+   * 26 raus, und die Bewertung sagt nicht kaufen, aber 18 % unter Markt. Das
+   * ist widersprüchlich und müsste genauer erklärt werden, warum wir das so
+   * entscheiden."
+   *
+   * Gemessen: KP 180.000, Marktwert 213.000 (+18 %), Miete 750, Hausgeld 400,
+   * Zins 4,31 + 1,5 % Tilgung, 100 % finanziert -> Cashflow −362 €/Monat,
+   * DSCR 0,76. Beide Aussagen waren richtig gerechnet, der Text darunter
+   * sagte aber „Ein Preis klar unter Markt ist ein zusätzliches Argument für
+   * den Kauf" - direkt unter „Finger weg". Fuer die beiden Absage-Stufen
+   * steht jetzt, WARUM der Preisabstand nicht reicht, mit den Treibern in
+   * Zahlen. Der Score bleibt unberuehrt. */
+  function _warumTrotzdemNicht(d, cfMon, b) {
+    var t = [];
+    if (cfMon < 0) t.push('Cashflow ' + b(_eurMon(cfMon)));
+    if (+d.dscr > 0 && +d.dscr < 1) t.push('DSCR ' + b((+d.dscr).toFixed(2).replace('.', ',')) + ' (die Miete deckt die Rate nicht)');
+    if (+d.nmr > 0) t.push('Nettomietrendite ' + b((Math.round(+d.nmr * 10) / 10).toFixed(1).replace('.', ',') + ' %'));
+    return 'Warum trotzdem nicht: der Preisabstand ist ein Wert auf dem Papier, er zahlt keine Monatsrate. ' +
+      (t.length ? 'Als Kapitalanlage trägt die Rechnung nicht — ' + t.join(', ') + '. ' : '') +
+      'Der Puffer hilft erst beim Verkauf oder als Sicherheit gegenüber der Bank; bis dahin musst du die Lücke jeden Monat selbst zahlen. ' +
+      'Mit mehr Eigenkapital, besserer Miete oder niedrigerem Zins kann das Bild kippen — dann neu rechnen.';
+  }
+
   function empfehlung(d, betont, nichtAnwendbar) {
     var b = (typeof betont === 'function') ? betont : function (s) { return s; };
     var na = nichtAnwendbar || {};
@@ -628,7 +653,9 @@ window.QcHeuristik = (function () {
         ' — ' + b('+' + _fmtEur(puffer)) + ' (+' + pp + ' %) Wertpuffer ab dem ersten Tag. ' +
         ((lage && !lage.passt)
           ? 'Als Renditeobjekt passt er nicht zu deiner ' + lage.klasse + '-Lage, als Substanzkauf kann er sich trotzdem lohnen.'
-          : 'Ein Preis klar unter Markt ist ein zusätzliches Argument für den Kauf.');
+          : (verdict === 'PASS' || verdict === 'KRITISCH')
+            ? _warumTrotzdemNicht(d, cfMon, b)
+            : 'Ein Preis klar unter Markt ist ein zusätzliches Argument für den Kauf.');
     }
 
     return { verdict: verdict, farbklasse: farbklasse, text: advice, ziel_kp: ziel, lage: lage, wert: wert };
@@ -814,7 +841,14 @@ window.QcHeuristik = (function () {
     /* qc-v2450: „die Lücke ist klein" stand auch bei 77 % des Ziels (2,9 statt
        3,75 %) - dort muesste der Preis um 22 % fallen. Das Wort bleibt (es haengt
        an der Ampel), der Satz sagt die Groesse nur, wo sie stimmt. */
-    else if (amp === 'gelb') { wort = 'knapp unter deinem Ziel';    satz = (q >= 0.9) ? 'Erreichbar über den Preis oder die Miete — die Lücke ist klein.' : 'Erreichbar über den Preis oder die Miete — dafür muss sich spürbar etwas bewegen.'; }
+    /* v2485 · Marcel 20.10.2026 („ja" zu einem deutlicheren Wort): „knapp" nur
+       ab 90 % des Ziels. Darunter (75-90 %) heisst es „deutlich unter", die Ampel
+       bleibt GELB - 0,9 liegt auf keiner Ampelgrenze (0,75 / 0,96875), und die
+       Satzgrenze war schon dieselbe (qc-v2450). */
+    else if (amp === 'gelb') {
+      if (q >= 0.9) { wort = 'knapp unter deinem Ziel';    satz = 'Erreichbar über den Preis oder die Miete — die Lücke ist klein.'; }
+      else          { wort = 'deutlich unter deinem Ziel'; satz = 'Erreichbar über den Preis oder die Miete — dafür muss sich spürbar etwas bewegen.'; }
+    }
     else if (q >= 1.15)      { wort = 'deutlich über deinem Ziel';  satz = 'Das ist Spielraum — beim Preis oder bei der Qualität des Objekts.'; }
     else                     { wort = 'am Ziel';                    satz = 'Genau das, was du für diese Lage angesetzt hast.'; }
     return {

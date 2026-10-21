@@ -84,25 +84,28 @@ async function runKiMiete() {
     }
   };
 
+  /* v2500 · Baujahr und mittlere Wohnungsgroesse fuer den Zensus-Leerstand
+     nach Klasse; die Zensus-Groessenklassen gelten JE WOHNUNG (v2162c). */
+  var _bj = ((document.getElementById('baujahr') || {}).value || '').trim();
+  var _eh = parseInt(((document.getElementById('einheiten') || {}).value || ''), 10);
   var ctx = {
     adresse: [str + ' ' + hnr, plz + ' ' + ort].map(function(s){return s.trim()}).filter(Boolean).join(', '),
     str: str, hnr: hnr, plz: plz, ort: ort,
     kaufpreis: _vN('kp') || null,
     wohnflaeche: wfl,
-    nettokaltmiete: nkm
+    nettokaltmiete: nkm,
+    baujahr: /^\d{4}$/.test(_bj) ? _bj : null,
+    wfl_je_wohnung: Math.round((_eh > 1 ? wfl / _eh : wfl) * 10) / 10
   };
 
-  try {
-    var res = await fetch('/api/v1/ai/ds2-suggest', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify({
+  /* v2500 · ueber Auth.apiCall statt nacktem fetch: der zentrale
+     401-Handler greift, und die Frist fuer /ai/ betraegt 120 s. */
+  var _body = {
         fields: ['ds2_marktmiete', 'ds2_mietausfall'],
         fieldSpecs: fieldSpecs,
         context: ctx,
+        /* v2500 · damit der Server den letzten Marktbericht DIESES Objekts findet */
+        objId: (typeof window._currentObjKey === 'string' && window._currentObjKey) ? window._currentObjKey : null,
         userApiKey: userApiKey,
         aiOptions: {
           temperature: aiTemp,
@@ -115,12 +118,22 @@ async function runKiMiete() {
           focusAreas: aiFocusAreas,
           customInstructions: aiCustomInstructions
         }
-      })
-    });
-
+  };
+  try {
     var data;
-    try { data = await res.json(); } catch(e) { data = {}; }
-    if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+    if (window.Auth && typeof Auth.apiCall === 'function') {
+      data = await Auth.apiCall('/ai/ds2-suggest', { method: 'POST', body: _body });
+    } else {
+      var res = await fetch('/api/v1/ai/ds2-suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify(_body)
+      });
+      try { data = await res.json(); } catch(e) { data = {}; }
+      if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+    }
+    data = data || {};
+    var belege = data.belege || null;
 
     var sugMarkt = (data.suggestions || {}).ds2_marktmiete || null;
     var sugAusfall = (data.suggestions || {}).ds2_mietausfall || null;
@@ -177,6 +190,8 @@ async function runKiMiete() {
         html += '<div class="ki-miete-reasoning">' + _esc(sugMarkt.reasoning) + '</div>';
       }
       html += _renderQuellen(sugMarkt);
+      if (sugMarkt.vergleich_text) html += '<div class="ki-miete-reasoning km-vgl-text">' + _esc(sugMarkt.vergleich_text) + '</div>';
+      html += _kmVergleichHtml(belege, marktVal, istQm, sugMarkt);
 
       html += '<div class="ki-miete-actions">';
       html += '<button type="button" class="btn btn-gold btn-sm" onclick="kiMieteApplyMarktmiete(' + marktVal + ')">Marktmiete (€/m²) übernehmen</button>';
@@ -186,6 +201,10 @@ async function runKiMiete() {
       }
       html += '</div>';
       html += '</div>';
+    } else if (belege) {
+      /* v2500 · die Belege stehen auch ohne KI-Wert da */
+      html += '<div class="ki-miete-block"><div class="ki-miete-block-header"><span class="ki-miete-block-icon">💰</span><span class="ki-miete-block-title">Marktmiete</span></div>'
+        + _kmVergleichHtml(belege, null, istQm, null) + '</div>';
     }
 
     if (ausfallVal && ausfallMap[ausfallVal]) {
@@ -200,16 +219,22 @@ async function runKiMiete() {
         html += '<div class="ki-miete-reasoning">' + _esc(sugAusfall.reasoning) + '</div>';
       }
       html += _renderQuellen(sugAusfall);
+      if (sugAusfall.vergleich_text) html += '<div class="ki-miete-reasoning km-vgl-text">' + _esc(sugAusfall.vergleich_text) + '</div>';
+      html += _kmRisikoHtml(belege, ausfallVal, sugAusfall);
       html += '<div class="ki-miete-actions">';
       html += '<button type="button" class="btn btn-gold btn-sm" onclick="kiMieteApplyAusfall(\'' + _esc(ausfallVal) + '\')">Risiko-Einstufung übernehmen</button>';
       html += '</div>';
       html += '</div>';
+    } else if (belege) {
+      html += '<div class="ki-miete-block"><div class="ki-miete-block-header"><span class="ki-miete-block-icon">🛡</span><span class="ki-miete-block-title">Mietausfall-Risiko</span></div>'
+        + _kmRisikoHtml(belege, null, null) + '</div>';
     }
 
     if (!html) {
       html = '<div class="ki-miete-err">Keine Empfehlungen erhalten.</div>';
     } else {
-      html += '<div class="ki-miete-disclaimer">Werte gelten als KI-Schätzung — vor Verwendung gegen Mietspiegel/Vergleichsmieten prüfen.</div>';
+      html += '<div class="ki-miete-disclaimer">Die Werte der KI sind Schätzungen — vor Verwendung gegen Mietspiegel/Vergleichsmieten prüfen.'
+        + (belege ? ' Die Vergleichswerte darunter stammen aus DealPilots eigenen Daten (Marktbericht, Zensus 2022, Regionaldatenbank) und tragen ihren Stand.' : '') + '</div>';
     }
 
     body.innerHTML = html;
@@ -220,6 +245,120 @@ async function runKiMiete() {
     if (btn) { btn.disabled = false; btn.innerHTML = '<span data-ico="sparkles" data-ico-size="14"></span> Mietpreis recherchieren'; }
     if (typeof refreshDataIcos === 'function') setTimeout(refreshDataIcos, 10);
   }
+}
+
+/* ══ v2500 · MEHRERE VERGLEICHSWERTE NEBENEINANDER, MIT HERKUNFT ══════════
+   Marcel am 20.10.2026: „Vielleicht holen wir uns auch mehrere
+   Vergleichswerte, und fuer das Mietausfallrisiko auch. Da koennten wir den
+   Zensus gegenueberstellen, wenn es passt."
+   Die Werte kommen vom SERVER (mietBelegeService.js), nicht vom Modell:
+   amtliche Vergleichsmiete, aktueller Marktdurchschnitt, Marktueblichkeits-
+   band, Ist-Miete; beim Risiko der Zensus-Leerstand (Stichtag 15.05.2022)
+   und der Bevoelkerungstrend. Fehlt ein Wert, steht der Weg dorthin da.
+   Worauf die KI sich stuetzt (stuetzt_sich_auf), wird markiert. */
+function _kmStil() {
+  if (document.getElementById('km-vgl-stil')) return;
+  var s = document.createElement('style'); s.id = 'km-vgl-stil';
+  s.textContent = [
+    '.km-vgl{margin-top:10px;border-top:1px solid var(--border,rgba(0,0,0,.12));padding-top:8px}',
+    '.km-vgl-k{font:600 10px/1.2 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;opacity:.7;margin-bottom:6px}',
+    '.km-vgl-z{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:5px 0;border-bottom:1px dashed var(--border,rgba(0,0,0,.1));font:400 12.5px/1.45 Inter,system-ui,sans-serif}',
+    '.km-vgl-z:last-child{border-bottom:0}',
+    '.km-vgl-z b{white-space:nowrap;text-align:right}',
+    '.km-vgl-h{grid-column:1/-1;font-size:11px;opacity:.68}',
+    '.km-vgl-z.km-fehlt b{opacity:.55;font-weight:500}',
+    '.km-vgl-tag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;font:600 9.5px/1.4 "JetBrains Mono",monospace;letter-spacing:.06em;border:1px solid var(--border,rgba(0,0,0,.15));opacity:.85;vertical-align:1px}',
+    '.km-vgl-tag.km-genutzt{border-color:var(--wl-c9a84c,#C9A84C)}',
+    '.km-vgl-text{font-style:normal}'
+  ].join('');
+  document.head.appendChild(s);
+}
+function _kmQm(n) { return (n == null || !isFinite(n)) ? null : Number(n).toFixed(2).replace('.', ',') + ' €/m²'; }
+function _kmPct(n, d) { return (n == null || !isFinite(n)) ? null : Number(n).toFixed(d == null ? 1 : d).replace('.', ',') + ' %'; }
+function _kmDat(s) { return s ? String(s).slice(8, 10) + '.' + String(s).slice(5, 7) + '.' + String(s).slice(0, 4) : null; }
+function _kmZeile(titel, wert, hinweis, tag, genutzt, fehlt) {
+  return '<div class="km-vgl-z' + (fehlt ? ' km-fehlt' : '') + '"><span>' + _kmEsc(titel)
+    + (tag ? '<span class="km-vgl-tag' + (genutzt ? ' km-genutzt' : '') + '" title="' + (genutzt ? 'Die KI stützt sich darauf' : 'Herkunft') + '">' + _kmEsc(tag) + (genutzt ? ' ✓' : '') + '</span>' : '')
+    + '</span><b>' + _kmEsc(wert) + '</b>'
+    + (hinweis ? '<span class="km-vgl-h">' + _kmEsc(hinweis) + '</span>' : '') + '</div>';
+}
+function _kmAbw(w, ref) {
+  if (w == null || ref == null || !(ref > 0)) return '';
+  var p = (w / ref - 1) * 100;
+  return ' (' + (p >= 0 ? '+' : '') + p.toFixed(0) + ' % zur Ist-Miete)';
+}
+function _kmVergleichHtml(b, kiWert, istQm, sug) {
+  if (!b) return '';
+  _kmStil();
+  var g = (sug && Array.isArray(sug.stuetzt_sich_auf)) ? sug.stuetzt_sich_auf : [];
+  var ist = istQm > 0 ? istQm : null;
+  var o = '<div class="km-vgl"><div class="km-vgl-k">Vergleichswerte · €/m² kalt</div>';
+  var a = b.amtlich || {};
+  if (!a.fehlt && a.wert_qm != null) {
+    o += _kmZeile('Amtliche Vergleichsmiete', _kmQm(a.wert_qm) + _kmAbw(a.wert_qm, ist),
+      'Mietpreisübersicht des Gutachterausschusses' + (a.quelle ? ' · ' + a.quelle : '') + (a.stand ? ' · Marktbericht vom ' + _kmDat(a.stand) : '')
+        + ' · bildet weitgehend Bestandsmieten ab' + (a.ausserhalb && a.hinweis ? ' · ' + a.hinweis : ''),
+      'amtlich', g.indexOf('amtliche_vergleichsmiete') >= 0);
+  } else {
+    o += _kmZeile('Amtliche Vergleichsmiete', 'liegt nicht vor', (a.hinweis ? a.hinweis + ' ' : '') + (a.weg || ''), 'amtlich', false, true);
+  }
+  var m = b.markt || {};
+  if (!m.fehlt && m.wert_qm != null) {
+    o += _kmZeile('Aktueller Marktdurchschnitt', _kmQm(m.wert_qm) + _kmAbw(m.wert_qm, ist),
+      'Angebotsmieten, Median' + (m.q25_qm != null && m.q75_qm != null ? ', mittlere Hälfte ' + _kmQm(m.q25_qm) + ' bis ' + _kmQm(m.q75_qm) : '')
+        + (m.anzahl != null ? ' · ' + m.anzahl + ' Angebote' : '') + (m.umkreis_km != null ? ' im Umkreis von ' + String(m.umkreis_km).replace('.', ',') + ' km' : '')
+        + (m.stand ? ' · Marktbericht vom ' + _kmDat(m.stand) : '') + ' · Angebote, keine Abschlüsse; ein Abschlag für Mieten ist nicht gemessen',
+      'Markt', g.indexOf('marktdurchschnitt') >= 0);
+  } else {
+    o += _kmZeile('Aktueller Marktdurchschnitt', 'liegt nicht vor', m.weg || '', 'Markt', false, true);
+  }
+  if (b.band) {
+    o += _kmZeile('Marktüblichkeitsband', _kmQm(b.band.unten_qm) + ' – ' + _kmQm(b.band.oben_qm),
+      'Wertermittlung im Marktbericht: amtliche Vergleichsmiete und Angebotsmiete × 0,7 bis × 1,3', 'Wertermittlung', g.indexOf('marktueblichkeitsband') >= 0);
+  }
+  if (b.ertrag && b.ertrag.wert_qm != null) {
+    o += _kmZeile('Im Ertragswert angesetzt', _kmQm(b.ertrag.wert_qm), b.ertrag.quelle || '', 'Wertermittlung', g.indexOf('ertragswert_miete') >= 0);
+  }
+  if (kiWert != null) o += _kmZeile('Pilot-Recherche', _kmQm(kiWert) + _kmAbw(kiWert, ist), 'KI-Schätzung mit Websuche, Quellen oben', 'KI', false);
+  if (ist != null) o += _kmZeile('Deine Ist-Miete', _kmQm(ist), 'Nettokaltmiete durch Wohnfläche', 'deine Angabe', g.indexOf('ist_miete') >= 0);
+  return o + '</div>';
+}
+function _kmRisikoHtml(b, kiWert, sug) {
+  if (!b) return '';
+  _kmStil();
+  var g = (sug && Array.isArray(sug.stuetzt_sich_auf)) ? sug.stuetzt_sich_auf : [];
+  var WORT = { sehr_niedrig: 'Sehr niedrig', niedrig: 'Niedrig', mittel: 'Mittel', erhoeht: 'Erhöht', hoch: 'Hoch' };
+  var o = '<div class="km-vgl"><div class="km-vgl-k">Belegte Daten zum Risiko</div>';
+  var lz = b.leerstand || {};
+  if (!lz.fehlt) {
+    var h = (lz.gesamt_pct != null ? 'Gesamtleerstand ' + _kmPct(lz.gesamt_pct) : '')
+      + (lz.dauerleer_anteil_pct != null ? ', davon ' + _kmPct(lz.dauerleer_anteil_pct) + ' seit über einem Jahr leer (Dauerleerstand, kein Mietausfall)' : '')
+      + (lz.nach_baujahr ? ' · Baujahr ' + lz.nach_baujahr.klasse + ': ' + _kmPct(lz.nach_baujahr.pct) + ' (' + lz.nach_baujahr.ebene + ')' : '')
+      + (lz.nach_groesse ? ' · Größe ' + lz.nach_groesse.klasse + ': ' + _kmPct(lz.nach_groesse.pct) + ' (' + lz.nach_groesse.ebene + ')' : '')
+      + ' · Marktaktiv = leere Wohnungen, die kurzfristig vermietbar wären. Lage der ' + lz.ebene + ', nicht des Objekts. Einen jüngeren amtlichen Leerstand je Gemeinde gibt es nicht. '
+      + (lz.quelle || '');
+    o += _kmZeile('Leerstand laut Zensus 2022 (Stichtag 15.05.2022) · ' + lz.ebene + ' ' + (lz.name || ''),
+      lz.marktaktiv_pct != null ? 'marktaktiv ' + _kmPct(lz.marktaktiv_pct) : 'nicht ausgewiesen', h, 'amtlich · 2022', g.indexOf('leerstand_zensus') >= 0);
+    if (lz.anhalt) {
+      var abw = kiWert && kiWert !== lz.anhalt.wert;
+      o += _kmZeile('Anhalt aus dem Zensus-Leerstand', lz.anhalt.wort,
+        'Stufen: ' + (lz.schwellen || '') + (kiWert ? (abw ? ' · Die Pilot-Einstufung „' + (WORT[kiWert] || kiWert) + '“ weicht ab — begründbar z. B. durch Mieterstruktur, Objektzustand oder Entwicklung seit 2022.' : ' · Passt zur Pilot-Einstufung.') : ''),
+        'Vorschlag', false);
+      o += '<div class="ki-miete-actions"><button type="button" class="btn btn-outline btn-sm" onclick="kiMieteApplyAusfall(\'' + _kmEsc(lz.anhalt.wert) + '\')">Zensus-Anhalt „' + _kmEsc(lz.anhalt.wort) + '“ übernehmen</button></div>';
+    }
+  } else {
+    o += _kmZeile('Leerstand laut Zensus 2022', 'liegt nicht vor', lz.weg || '', 'amtlich · 2022', false, true);
+  }
+  var bv = b.bevoelkerung || {};
+  if (!bv.fehlt && bv.trend_pct_pa != null) {
+    o += _kmZeile('Bevölkerungsentwicklung (Kreis)', (bv.trend_pct_pa >= 0 ? '+' : '') + _kmPct(bv.trend_pct_pa, 2) + ' pro Jahr',
+      (bv.stand ? 'Stand ' + bv.stand + ' · ' : '') + (bv.quelle || ''), 'amtlich', g.indexOf('bevoelkerung') >= 0);
+  } else {
+    o += _kmZeile('Bevölkerungsentwicklung (Kreis)', 'liegt nicht vor', bv.weg || '', 'amtlich', false, true);
+  }
+  if (b.haushalte && b.haushalte.fehlt) o += _kmZeile('Haushaltsentwicklung', 'liegt nicht vor', b.haushalte.weg || '', '', false, true);
+  if (b.angebotsdauer_miete && b.angebotsdauer_miete.fehlt) o += _kmZeile('Angebotsdauer der Mietangebote', 'liegt nicht vor', b.angebotsdauer_miete.weg || '', '', false, true);
+  return o + '</div>';
 }
 
 /* ── v1242 · Mehrere Quellen statt einer ──────────────────────────────────

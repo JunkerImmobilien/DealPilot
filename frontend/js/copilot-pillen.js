@@ -43,19 +43,56 @@
     { id: 'tiefe',  text: 'Datentiefe',        titel: 'Wie vollständig ist dieses Objekt?' },
     { id: 'fehlt',  text: 'Was fehlt?',        titel: 'Welche Felder sind noch leer?' }
   ];
+  /* v2550 · Pillen + Auswahl nach Thema. Eingesetzt wird nur, gesendet per Hand -
+     der Nutzer sieht, was Kontingent kostet. */
+  /* v2551b · Marcel 21.10.2026: „was hat Richtung Bank, Richtung Steuern,
+     Gesamtbewertung, aber auch Ankauf Bestand Zielbild Auswertung sowie auch
+     was zum Preisverlauf. Der Kunde moechte ja schnell wissen: rechnet sich der
+     Deal vor und nach Steuern, und was sage ich der Bank?" Die beiden Fragen
+     stehen deshalb vorne als Pillen, der Rest nach Thema in der Auswahl. */
   var FRAGEN = [
-    { id: 'sollist', text: 'Soll/Ist',
-      frage: 'Vergleiche den Ankaufstand mit dem heutigen Stand: Wo liegen wir '
-           + 'besser, wo schlechter, und was heißt das für die Bank?' },
-    { id: 'tiefer', text: 'Mehr Tiefe?',
-      frage: 'Welche zusätzlichen Angaben würden die Analyse dieses Objekts '
-           + 'belastbarer machen — und was bringt jede davon konkret?' },
-    { id: 'risiko', text: 'Risiken',
-      frage: 'Was sind die drei größten Risiken bei diesem Objekt, '
-           + 'gemessen an den vorliegenden Zahlen?' },
-    { id: 'bank', text: 'Bankgespräch',
-      frage: 'Worauf wird die Bank bei diesem Objekt zuerst schauen, '
-           + 'und welche Zahl sollte ich vorher kennen?' }
+    { id: 'rechnet', text: 'Rechnet sich das?',
+      frage: 'Rechnet sich dieser Deal — vor Steuern und nach Steuern? Nenne je den Cashflow '
+           + 'im ersten Jahr und über zehn Jahre und sag in einem Satz, ob ich kaufen sollte.' },
+    { id: 'bank', text: 'Was sage ich der Bank?',
+      frage: 'Was sage ich der Bank zu diesem Objekt? Formuliere die drei stärksten Argumente '
+           + 'mit Zahlen (DSCR, Beleihung, Vermögen), nenne die Schwachstelle, nach der sie fragen '
+           + 'wird, und meine Antwort darauf.' },
+    { id: 'urteil', text: 'Gesamturteil',
+      frage: 'Gib mir dein Gesamturteil zu diesem Objekt: Score, Stärken, Schwächen und die '
+           + 'eine Zahl, die das Urteil kippen würde.' },
+    { id: 'abz', text: 'Ankauf · Bestand · Zielbild',
+      frage: 'Stelle Ankauf, heutigen Bestand und Zielbild nebeneinander: Miete, Cashflow, Wert '
+           + 'und Rendite je Stand. Was bringt der Weg zum Zielbild, und was kostet er?' },
+    { id: 'preis', text: 'Preisverlauf',
+      frage: 'Wie hat sich der Wert dieses Objekts seit dem Kauf entwickelt, wie steht der Kaufpreis '
+           + 'zum heutigen Marktwert, und welche Wertentwicklung ist für die nächsten zehn Jahre realistisch?' }
+  ];
+  var WEITERE = [
+    { gruppe: 'Bank & Finanzierung', fragen: [
+      'Welche Unterlagen wird die Bank für dieses Objekt verlangen, und welche fehlen mir noch?',
+      'Wie hoch würde die Bank das Objekt beleihen, und wie viel Eigenkapital muss ich dann einbringen?',
+      'Was passiert mit dem Cashflow, wenn der Zins nach der Zinsbindung um zwei Prozentpunkte steigt?',
+      'Ist die Tilgung sinnvoll gewählt, oder sollte ich sie für dieses Objekt anpassen?' ] },
+    { gruppe: 'Steuer', fragen: [
+      'Wie entwickelt sich die Steuer über die Jahre, und ab wann kippt die Erstattung in eine Nachzahlung?',
+      'Wie hoch ist der Cashflow nach Steuern im ersten, fünften und zehnten Jahr?',
+      'Lohnt sich ein Gutachten zur Restnutzungsdauer für eine höhere Abschreibung?',
+      'Welchen Anteil des Kaufpreises sollte ich auf das Gebäude legen, und wie belege ich ihn?' ] },
+    { gruppe: 'Gesamtbewertung & Risiko', fragen: [
+      'Was sind die drei größten Risiken bei diesem Objekt, und wie begrenze ich jedes davon?',
+      'Bis zu welchem Kaufpreis trägt sich das Objekt noch? Nenne die Grenze in Euro.',
+      'Mit welchen Argumenten aus den Zahlen kann ich beim Kaufpreis verhandeln?',
+      'Wie robust ist der Deal, wenn eine Wohnung sechs Monate leer steht?' ] },
+    { gruppe: 'Ankauf · Bestand · Zielbild', fragen: [
+      'Wo liegt das Objekt heute besser oder schlechter als beim Ankauf geplant?',
+      'Wie viel Mieterhöhung ist rechtlich und am Markt möglich (Soll-Miete), und ab wann?',
+      'Lohnt sich das Zielbild? Stelle Aufwand, Mehrmiete und Wertzuwachs gegenüber.',
+      'Welche Wohnung hat das größte Mietpotenzial, und was ist der erste Schritt dorthin?' ] },
+    { gruppe: 'Preisverlauf & Verkauf', fragen: [
+      'Liegt der Kaufpreis über oder unter dem Marktwert, und was erklärt den Unterschied?',
+      'Wie entwickeln sich Preise und Mieten am Standort, und was heißt das für mein Objekt?',
+      'Wann wäre ein Verkauf am sinnvollsten, und was bleibt nach Steuern übrig?' ] }
   ];
 
   function css() {
@@ -79,7 +116,12 @@
         'border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);border-radius:999px;background:transparent;' +
         'color:var(--wl-c9a84c, #C9A84C);font:11px/1.4 "Space Grotesk",sans-serif;cursor:pointer}' +
       '.dp-cpp-spr:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent)}' +
-      '@media(max-width:560px){.dp-cpp{padding:7px 10px 2px}.dp-cpp-lbl{display:none}}';
+      '.dp-cpp-sel{border:1px solid rgba(138,130,121,.45);background:transparent;color:#6b6660;' +
+        'border-radius:999px;padding:4px 10px;font:600 11.5px/1.3 "Space Grotesk",sans-serif;' +
+        'cursor:pointer;width:230px;max-width:100%}' +
+      '.dp-cpp-sel option,.dp-cpp-sel optgroup{color:#2A2727;background:#FDFCFA;font-weight:400}' +
+      '.dp-cpp-sel optgroup{font-weight:700}' +
+      '@media(max-width:560px){.dp-cpp{padding:7px 10px 2px}.dp-cpp-lbl{display:none}.dp-cpp-sel{flex:1 1 100%}}';
     document.head.appendChild(st);
   }
 
@@ -95,7 +137,7 @@
     if (!d) return 'Die Vollständigkeit kann ich gerade nicht messen — '
       + 'der Zähler aus dem Reiter Deal-Aktion ist nicht erreichbar.';
     var t = [];
-    t.push(d.filled + ' von ' + d.total + ' Feldern sind gefuellt (' + d.percent + ' %).');
+    t.push(d.filled + ' von ' + d.total + ' Feldern sind gefüllt (' + d.percent + ' %).');
     if (d.stufe) {
       t.push('Eingabetiefe ' + d.stufe + ' ist gewählt; davon kommen '
         + d.stufe_felder + ' Pflichtfelder der Wertermittlung dazu.');
@@ -118,7 +160,7 @@
     if (!d) return { text: 'Ich kann die fehlenden Felder gerade nicht lesen.', chips: [] };
     if (!d.missing.length) {
       return { text: 'Nichts fehlt. ' + d.filled + ' von ' + d.total
-        + ' Feldern sind gefuellt.', chips: [] };
+        + ' Feldern sind gefüllt.', chips: [] };
     }
     /* Nach Herkunft trennen - das sagt dem Nutzer, WOFUER es fehlt. */
     var stufe = d.missing.filter(function (m) { return m.stufe; });
@@ -203,6 +245,19 @@
       b.addEventListener('click', function () { fragenSetzen(p.frage); });
       w.appendChild(b);
     });
+
+    /* v2550 · Auswahlbox: setzt die Frage ein und springt zurueck auf den Platzhalter */
+    var sel = document.createElement('select');
+    sel.className = 'dp-cpp-sel'; sel.setAttribute('aria-label', 'Weitere Fragen an den Co-Pilot');
+    var o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Weitere Fragen …';
+    sel.appendChild(o0);
+    WEITERE.forEach(function (g) {
+      var og = document.createElement('optgroup'); og.label = g.gruppe;
+      g.fragen.forEach(function (f) { var o = document.createElement('option'); o.value = f; o.textContent = f; og.appendChild(o); });
+      sel.appendChild(og);
+    });
+    sel.addEventListener('change', function () { var f = sel.value; sel.selectedIndex = 0; if (f) fragenSetzen(f); });
+    w.appendChild(sel);
 
     bar.parentNode.insertBefore(w, bar);
     return true;

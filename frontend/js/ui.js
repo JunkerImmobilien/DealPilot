@@ -833,6 +833,7 @@ function _buildAIPayload() {
                 zimmer: zahl(e.zimmer) || null,
                 vertragsart: e.mv_art || null,
                 letzte_erhoehung: e.mv_letzte_erhoehung || null,
+                letzte_erhoehung_betrag: zahl(e.mv_letzte_erhoehung_betrag) || null,   /* v2545 */
                 naechste_anpassung: e.mv_naechste_anpassung || null,
                 befristet_bis: e.mv_befristet_bis || null,
                 /* v2023a - `rnd_eigen`/`rnd_jahre` sind hier entfallen.
@@ -2142,6 +2143,11 @@ function _renderAIServerAnalysis(a) {
       + 'Lass sie von deinem Steuerberater bestätigen.</div></div>'
     : '<div class="dp-pa-card"><div class="dp-pa-fuss" style="margin-top:0">Diese Analyse wurde vor der steuerlichen '
       + 'Zusammenfassung erstellt. Beim nächsten Abruf steht sie hier.</div></div>';
+  /* v2544 · der Steuerverlauf mit Wendepunkt (steuer-verlauf.js) auch hier - dieselben Zahlen wie im Tab Steuer */
+  if (window.DpSteuerVerlauf) {
+    pSt += '<div class="dp-pa-card" style="margin-top:12px">' + sec('', I.bank, 'STEUERVERLAUF · WANN DAS OBJEKT STEUERLICH POSITIV WIRD') + '<div data-dp-steuerverlauf="1"></div></div>';
+    try { setTimeout(function () { window.DpSteuerVerlauf.mountAll(); }, 0); } catch (e) {}
+  }
 
   try { setTimeout(window._dpLoadVerlauf, 0); } catch (e) {} /* v972a */
   /* v2017 - DER KOPF: Stand und Gueltigkeit, bevor irgendein Text kommt. */
@@ -2667,7 +2673,14 @@ function _sbActionsDock() {
       acc.style.removeProperty('bottom');
       if (btn) {
         var topPx = parseFloat(cs.top) || 0;
-        var avail = Math.max(160, Math.round(btn.getBoundingClientRect().top - topPx - 8));
+        var bRect = btn.getBoundingClientRect();
+        /* v2576: im Handy-Querformat steht das Menue NEBEN der Leiste
+           (style.css v2576) - dort deckelt die Fensterhoehe, nicht der
+           Ausloeser. Gegen den Ausloeser blieben 232 px fuer 687 px Inhalt. */
+        var neben = (parseFloat(cs.left) || 0) >= bRect.right;
+        var avail = neben
+          ? Math.max(160, Math.round(window.innerHeight - topPx - 8))
+          : Math.max(160, Math.round(bRect.top - topPx - 8));
         acc.style.setProperty('max-height', avail + 'px', 'important');
         if (inner) inner.style.setProperty('max-height', avail + 'px', 'important');
       }
@@ -3188,28 +3201,52 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
     _dpVerlaufCss();
     var objKey = (typeof window._currentObjKey === 'string' && window._currentObjKey) ? window._currentObjKey : null;
     if (!objKey || typeof Auth === 'undefined' || !Auth.apiCall) { if (tabBtn) tabBtn.style.display = 'none'; return; }
-    Auth.apiCall('/marktbericht/objects/history?key=' + encodeURIComponent('dp:' + objKey), { method: 'GET' })
-      .then(function (data) {
+    /* v2556c · Marcel 21.10.2026: „wenn wir mehr Abrufe machen, dann auch die
+       Marktberichte abgelegt werden." Die Abrufe „Marktpreise" (mb.potenzial_abrufe)
+       stehen hier mit Datum und Kennzahlen neben den Marktberichten. */
+    var abrufeP = Auth.apiCall('/marktbericht/potenzial/markt/verlauf?external_ref=' + encodeURIComponent(objKey))
+      .then(function (r) { return (r && r.abrufe) || []; }, function () { return []; });
+    Promise.all([Auth.apiCall('/marktbericht/objects/history?key=' + encodeURIComponent('dp:' + objKey), { method: 'GET' }).catch(function () { return null; }), abrufeP])
+      .then(function (res) {
+        var data = res[0], abrufe = res[1];
+        if ((typeof window._currentObjKey === 'string' ? window._currentObjKey : null) !== objKey) return;
         var hist = (data && data.history) || [];
         hist = hist.filter(function (h) { return h && h.market_value != null; });
+        var abHtml = _dpAbrufeHtml(abrufe);
         /* v2217 · Marcel 14.10.2026: „Marktbericht auch erst, wenn wir schon
            einen Report haben." Bis hier erschien der Reiter erst ab ZWEI
            Berichten - mit einem war er unsichtbar, obwohl es einen gab. */
-        if (hist.length < 1) { if (tabBtn) tabBtn.style.display = 'none'; return; }
-        if (tabBtn) { tabBtn.style.display = ''; tabBtn.textContent = hist.length === 1 ? 'Marktbericht' : 'Marktbericht-Verlauf'; }
+        if (hist.length < 1 && !abrufe.length) { if (tabBtn) tabBtn.style.display = 'none'; return; }
+        if (tabBtn) { tabBtn.style.display = ''; tabBtn.textContent = (hist.length + abrufe.length) === 1 ? 'Marktbericht' : 'Marktbericht-Verlauf'; }
+        if (hist.length < 1) { body.innerHTML = abHtml; return; }
         if (hist.length === 1) {
           var h1 = hist[0], mw = Number(h1.market_value);
           body.innerHTML = '<p class="dp-pa-p"><b>Ein Marktbericht vom ' + _dpVDate(h1.created_at) + '</b> — Marktwert '
             + (isFinite(mw) ? '<b>' + Math.round(mw).toLocaleString('de-DE') + ' €</b>' : '–') + '.</p>'
-            + '<p class="dp-pa-p" style="color:#8b8678">Ein Verlauf mit Wertentwicklung entsteht ab dem zweiten Bericht zu diesem Objekt.</p>';
+            + '<p class="dp-pa-p" style="color:#8b8678">Ein Verlauf mit Wertentwicklung entsteht ab dem zweiten Bericht zu diesem Objekt.</p>' + abHtml;
           return;
         }
-        body.innerHTML = window._dpVerlaufHtml(hist);
+        body.innerHTML = window._dpVerlaufHtml(hist) + abHtml;
         window._dpVerlaufWire(body, hist);
         _dpVerlaufLocLine(hist);
       })
       .catch(function () { if (tabBtn) tabBtn.style.display = 'none'; });
   };
+  /* v2556c · die abgelegten Marktpreis-Abrufe, neueste zuerst */
+  function _dpAbrufeHtml(abrufe) {
+    if (!abrufe || !abrufe.length) return '';
+    var qm = function (m, d) { return m && m.median_qm != null ? Number(m.median_qm).toLocaleString('de-DE', { maximumFractionDigits: d }) + ' €/m²' : '–'; };
+    var eur = function (x) { return x != null && isFinite(Number(x)) ? Math.round(Number(x)).toLocaleString('de-DE') + ' €' : '–'; };
+    var zeilen = abrufe.map(function (a) {
+      var d = a.daten || {}, M = d.markt || {}, B = (d.stufen && d.stufen.bestand) || {};
+      return '<tr><td>' + _dpVDate(a.abgerufen_am) + '</td><td>' + qm(M.kauf_haus, 0) + '</td><td>' + qm(M.kauf_etw, 0) + '</td><td>' + qm(M.miete, 2)
+        + '</td><td>' + eur(B.mpi_angebote) + '</td><td>' + eur(B.ertragswert) + '</td></tr>';
+    }).join('');
+    return '<div class="dp-pa-card" style="margin-top:14px"><h4 class="dpv-h">Abgelegte Marktpreis-Abrufe (' + abrufe.length + ')</h4>'
+      + '<p class="dp-pa-p" style="color:#8b8678;margin:2px 0 8px">Jeder Abruf „Marktpreise“ aus dem Reiter Pilot-Analyse wird mit Datum gespeichert und erscheint auch im Marktbericht.</p>'
+      + '<div style="overflow-x:auto"><table class="abw-tafel" style="min-width:560px"><thead><tr><th>Abruf</th><th>Kauf Haus</th><th>Kauf ETW</th><th>Angebotsmiete</th><th>Marktpreisindikation Bestand</th><th>Ertragswert Bestand</th></tr></thead><tbody>'
+      + zeilen + '</tbody></table></div></div>';
+  }
 
   // Entwicklungszeile in "Lage & Markt" (Panel dp-pa-loc), sobald History da ist
   function _dpVerlaufLocLine(hist) {

@@ -41,9 +41,11 @@ Adresse: ${a.formatted || p.ref.address || 'n/a'}. Koordinaten: ${p.ref.lat?.toF
 ## C) Makrolage
 Makro-Score: ${macro.score != null ? '**' + macro.score + '/100**' : 'kein Wert (keine Kennzahl gemessen)'}.
 ${macro.note || ''}
+${((p.makro_kennzahlen && p.makro_kennzahlen.werte) || []).map((w) => '- ' + w.label + ' (Ebene Kreis' + (w.von_jahr ? ', ' + w.von_jahr + '-' + w.jahr : (w.jahr ? ', Stand ' + w.jahr : '')) + '): '
+  + (w.vorzeichen && w.wert > 0 ? '+' : '') + Number(w.wert).toFixed(w.nachkomma).replace('.', ',') + ' ' + w.einheit).join('\n')}
 
 ## D) Mikrolage
-Mikro-Score: **${micro.score ?? 'n/a'}/100** (Quelle: ${micro.source || 'n/a'}).
+Mikro-Score: ${micro.score != null ? '**' + micro.score + '/100**' : 'kein Wert (keine Infrastrukturdaten abrufbar)'}${micro.poi_gesamt != null ? ' (' + micro.poi_gesamt + ' Orte im Umkreis erfasst)' : ''}.
 ${micro.categories ? Object.entries(micro.categories).map(([k, c]) =>
   `- ${k}: nächste ${c.nearest_m != null ? c.nearest_m + ' m' : 'keine'} (${c.count} im Umkreis)`).join('\n') : ''}
 ${p.assessment ? `
