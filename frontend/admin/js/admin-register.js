@@ -117,7 +117,7 @@
         (db.fremde_url ? ', ' + zahl(db.fremde_url) + ' mit anderer Quelle' : '') +
         (db.ohne_datei ? ', ' + zahl(db.ohne_datei) + ' ohne Datei' : '') +
         (db.datei_ohne_db ? '; ' + zahl(db.datei_ohne_db) + ' Dateiwerte fehlen in der Datenbank' : '') +
-        '. Der Bericht liest die Datei; wo beides steht, gewinnt sie.';
+        '. Eine Sperre der Datei schlägt immer die Datenbank.';
     h += '<div class="rg-stand">Gemessen ' + zeit(D.gemessen_am) + ' · ' + zahl(D.saetze) + ' Sätze aus ' +
       zahl(D.dateien.gelesen) + ' Registerdateien' +
       (D.dateien.vermisst ? ' · <b class="rg-rot">' + D.dateien.vermisst + ' nicht lesbar</b>' : '') +
@@ -378,6 +378,7 @@
       '#view-register .rg-art-genehmigungspflichtig{background:#ECE8E0;color:#5e584c}' +
       '#view-register .rg-filter{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:0 0 10px;font-size:12.5px}' +
       '#view-register .rg-filter select,#view-register .rg-filter input[type=search]{padding:4px 8px;border:1px solid var(--border,#e5dfd2);border-radius:5px;font-size:12.5px;background:#fff}' +
+      '#view-register .rg-eng{width:auto;min-width:320px}' +
       '#view-register .rg-det{margin-top:12px}' +
       '#view-register .rg-det summary{cursor:pointer;font-size:13px;font-weight:600;margin-bottom:6px}' +
       '#view-register a{color:var(--wl-b8932f, #b8932f)}' +

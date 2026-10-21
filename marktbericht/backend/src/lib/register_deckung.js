@@ -70,13 +70,32 @@ const istKaufFeld = (s) => ZUGANG_KAUF.has(String(s.zugang || '').toLowerCase())
 const KAUF_MUSTER = /kostenpflichtig|gegen\s+geb(ü|ue)hr|geb(ü|ue)hrenpflichtig|genehmigungspflichtig|genehmigung\s+(des|der)\s+(gutachterausschuss|gesch(ä|ae)ftsstelle)|nur\s+(im|in\s+der)\s+(kostenpflichtigen\s+)?voll(bericht|fassung|version)/i;
 const KAUF_VERNEINT = /nicht\s+kostenpflichtig|kostenfrei\s+und\s+vollst(ä|ae)ndig/i;
 function kaufImText(s) {
-  const txt = [s.warum_kein_wert, s.unvollstaendig_grund, s.weg]
-    .filter((x) => typeof x === 'string').join(' · ');
+  /* `weg` bleibt draussen, und die Formel „Bodenrichtwerte (Einsicht
+     gebuehrenfrei, Auskunft kostenpflichtig)" wird entfernt: sie betrifft
+     die Bodenrichtwert-Auskunft, nicht die Kennzahl. „(dort kostenpflichtig:
+     „Grundstuecksmarktbericht 2025", 60 €)" bleibt dagegen — das ist der
+     Bezugsweg mit Preis (gemessen am 21.10.2026 an uk-flaeche-by-2026). */
+  const txt = [s.warum_kein_wert, s.unvollstaendig_grund]
+    .filter((x) => typeof x === 'string').join(' · ')
+    .replace(/bodenrichtwerte\s*\([^)]*auskunft\s+kostenpflichtig\)/gi, ' ');
   if (!txt) return null;
   const m = KAUF_MUSTER.exec(txt);
   if (!m || KAUF_VERNEINT.test(txt)) return null;
   const a = Math.max(0, m.index - 90), e = Math.min(txt.length, m.index + m[0].length + 90);
   return (a > 0 ? '… ' : '') + txt.slice(a, e).trim() + (e < txt.length ? ' …' : '');
+}
+
+/* Ein Betrag nur, wo er im Wortlaut neben „kostenpflichtig" steht, z. B.
+   „(dort kostenpflichtig: „Grundstücksmarktbericht 2025", 60 €)". Kein
+   Betrag ohne Beleg — die Textstelle ist der Beleg. */
+const _PREIS = /kostenpflichtig[^()€]{0,80}?(?:[„"]([^“"]{3,80})[“"])?[^()€]{0,20}?(\d{1,4}(?:,\d{2})?)\s*(?:€|EUR|Euro)/i;
+function preisImText(...texte) {
+  for (const t of texte) {
+    if (typeof t !== 'string') continue;
+    const m = _PREIS.exec(t);
+    if (m) return (m[1] ? m[1].trim() + ': ' : '') + m[2] + ' € (laut Wortlaut)';
+  }
+  return null;
 }
 
 const FREMD = [
@@ -272,6 +291,7 @@ function kaufListe(alle, quellenDb) {
     if (!e.grund) e.grund = kurz(s.warum_kein_wert || s.unvollstaendig_grund || null);
     if (text && !e.erkannt_aus) e.erkannt_aus = kurz(text, 260);
     if (!e.preis && s.gebuehr) e.preis = kurz(s.gebuehr, 120);
+    if (!e.preis) e.preis = preisImText(s.warum_kein_wert, s.weg);
     if (!e.bestell_url && s.bestell_url) e.bestell_url = s.bestell_url;
     if (!e.quelle_url && s.quelle_url) e.quelle_url = s.quelle_url;
     if (!e.kontakt) e.kontakt = kontaktAus(s.weg, s.zustaendige_stelle);
@@ -333,7 +353,34 @@ function kaufListe(alle, quellenDb) {
     return /kostenpflichtig|geb(ü|ue)hr|€|auf_anfrage|voll(bericht|fassung|version)/i.test(t)
       ? 'kostenpflichtig' : 'genehmigungspflichtig';
   };
+  /* Zweiter Durchgang: dieselbe Stelle heisst in zwei Dateien verschieden
+     („Gutachterausschuss der Stadt Ansbach" / „... fuer Grundstueckswerte
+     Ansbach"). Zusammengefuehrt wird nur bei GLEICHEM AGS im selben Land —
+     nie ueber Namensaehnlichkeit, sonst fielen Stadt und Landkreis
+     gleichen Namens zusammen. */
+  const wurzel = new Map();
+  const finde = (e) => { while (wurzel.has(e)) e = wurzel.get(e); return e; };
+  const erster = new Map();
+  for (const e of eintr.values()) {
+    for (const a of e.ags) {
+      const k = e.land + '|' + a;
+      if (!erster.has(k)) { erster.set(k, e); continue; }
+      const z = finde(erster.get(k)), q = finde(e);
+      if (z === q) continue;
+      wurzel.set(q, z);
+      for (const x of q.ags) z.ags.add(x);
+      for (const f of ['kennzahlen', 'fundorte', 'zugang']) for (const x of q[f]) z[f].add(x);
+      z.saetze += q.saetze;
+      for (const f of ['grund', 'erkannt_aus', 'preis', 'bestell_url', 'quelle_url', 'kontakt', 'pruefstand']) {
+        if (!z[f] && q[f]) z[f] = q[f];
+      }
+      if (q.stelle !== z.stelle) (z.auch || (z.auch = new Set())).add(q.stelle);
+    }
+  }
+  for (const [k, e] of [...eintr]) if (wurzel.has(e)) eintr.delete(k);
+
   const liste = [...eintr.values()].map((e) => ({
+    auch_genannt: e.auch ? [...e.auch] : undefined,
     land: e.land, stelle: e.stelle, art: artVon(e),
     ags: [...e.ags].sort().slice(0, 12), ags_anzahl: e.ags.size,
     kennzahlen: [...e.kennzahlen], fundorte: [...e.fundorte], zugang: [...e.zugang],
