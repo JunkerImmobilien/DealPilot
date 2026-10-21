@@ -41586,3 +41586,23 @@ Potenzial Demo: Bestand/MH/ZB 610.000/625.000/805.000 → 610.000/630.000/805.00
 - **Abnahmepunkt Marcel, nur am echten iPad prüfbar:** Chrome rechnet `dvh` = `vh`; ob Reiterleiste und Nutzerfuß mit eingeblendeter Tableiste jetzt ganz sichtbar sind, zeigt nur Safari.
 - `quickcheck-app.html` lädt `datenaufnahme.css?v=v1954a` (Datei des Quick-Check-Strangs, nicht angefasst). Ein Gerät mit altem Cache sieht die Zeile im QuickBoarding erst nach dem Hochziehen dieses Busters.
 - Objekt-Reiter 1024 px: in der Zeile, aber die vier Quellen stehen untereinander (Segment 223 px).
+
+### v2549–v2553b · Gewerke aus dem Import, Anlegerprofil in der Ersteinrichtung, Co-Pilot-Fragen, Pilot-PDF-Bausteine, Messkabine Tablet-Safari (21.10.2026, Staging)
+
+**Was.**
+- **v2549** (`2351012a`): Qualitätsangaben aus Marktbericht/Exposé gehen auch auf die Gewerke-Standardstufen — Bad → `ausst_sanitaer`, Boden → `ausst_fussboeden`, Fenster → `ausst_fenster`, Skala 1:1, nur leere Felder (object-actions.js Übernahme-Tabelle, pdf-import.js). Küche ohne Gewerk, Zustand ist keine Standardstufe. Marcels Entscheidungen dazu: Hausgeld-Einstellungswert vor Baujahr-Tabelle bleibt; Kaufnebenkosten-Abwahl nur im Quick-Check, Grundlage immer die Einstellungen.
+- **v2550/v2551b/v2553b** (`fe8fbaf7`, `a9889fc9`, `ef773321`): Co-Pilot-Pillen — Rechnet sich das? (vor/nach Steuern), Was sage ich der Bank?, Gesamturteil, Ankauf · Bestand · Zielbild, Preisverlauf; Auswahl „Weitere Fragen …" (230 px) mit 19 Fragen in fünf Themen. Gesendet wird per Hand.
+- **v2551** (`a9889fc9`): Ersteinrichtung, Schritt 3 bietet die drei Anlegerprofile aus `standardwerte-karten.js` SETS (schreibt deren Werte, setzt `dp_std_set` über `perScore`), Schritt 5 heißt „Wie soll DealPilot bewerten?" und zeigt die Profilkachel plus Feinjustierung (Lage/Cashflow/Sicherheit).
+- **v2552** (`98e68733`): Pilot-PDF druckt acht Abschnitte, die nie ankamen (Felder fehlten in pdf.js ganz): Anschlussfinanzierung, Lage & Markt, Abgleich Marktbericht, Optischer Eindruck, Ankauf · Bestand · Zielbild, Ankauf gegen heute, Steuerliche Zusammenfassung, Steuerverlauf (aus `DpSteuerVerlauf.reihe/auswerten`, 12 Jahre). Je ein Haken unter „Bausteine im PDF" (jetzt 20).
+- **v2553/v2553a** (`c394d6a7`, `d3f67e5c`): Messkabine `DPM.tabletSafari()` mit fünf iPad-Profilen in sichtbarer Safari-Höhe (12,9" quer 1366×892 aus Marcels Bild), geladen in echter Höhe statt auf 760 gekappt; Inhalt in eigenem Scrollbereich zählt bis zu dessen Unterkante.
+
+**Nachweis.**
+- PDF: Funktionstest mit jsPDF-Attrappe, alle acht Bausteine mit Text und Wendepunkt-Satz.
+- Browser (Speichern gesperrt): 7 Pillen, 5 Gruppen, 20 Haken, Buster v2551b/v2552/v2551 geladen.
+- Messkabine: 10 von 10 OK (fünf Profile × Heute/v1b). Am 12,9" quer endet der Nutzerbereich `sb-user-box` bei 885 von 890 px, die Reiterleiste liegt bei 57–100; Wurzel scrollt nirgends.
+- Modul 27 aufgenommen, ohne Ton und mit Sprecher, je 8:43, 1920×1022; Objektzeilen md5-gleich vor/nach.
+
+**Rest.**
+- Ersteinrichtung nur per Code und Syntax geprüft, nicht im Browser durchgeklickt (schreibt Marcels Profil).
+- Im iframe gilt vh = dvh — den Safari-Fehler selbst erzeugt die Kabine nicht; Abnahme am echten iPad bleibt.
+- Videothek: Modul 26/27 nicht eingetragen.
