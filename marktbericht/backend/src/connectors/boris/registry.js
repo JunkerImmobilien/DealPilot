@@ -16,10 +16,18 @@ import { httpText } from '../../lib/http.js';
 const CURRENT_BRW_YEAR = 2026;
 
 // ---- Hilfen --------------------------------------------------------------
+/* v2590 · Punkt ist nicht immer Tausender. GML schreibt "75.0" (Dezimal-
+ * punkt); der alte Leser strich jeden Punkt und machte daraus 750 - in
+ * BB gemessen 21.10.2026: Perleberg 750 statt 75, Cottbus 3.800 statt 380.
+ * Deutsch ("1.200,50") nur, wenn ein Komma da ist oder die Punkte reine
+ * Dreiergruppen trennen ("1.200"); sonst ist der Punkt Dezimalpunkt. */
 function num(v) {
   if (v == null || v === '') return null;
-  const n = typeof v === 'number' ? v
-    : parseFloat(String(v).replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, ''));
+  if (typeof v === 'number') return isNaN(v) ? null : v;
+  let s = String(v).replace(/[^\d.,-]/g, '');
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+  const n = parseFloat(s);
   return isNaN(n) ? null : n;
 }
 function inBox(lat, lon, b) {
@@ -454,8 +462,12 @@ function buildUrl(a, lat, lon, year, layerName) {
     WIDTH: '101', HEIGHT: '101', X: '50', Y: '50',
     INFO_FORMAT: fmt, FEATURE_COUNT: a.featureCount || '1',
   } : {
+    /* v2590 · STYLES auch bei 1.3.0 (Pflicht laut WMS 1.3.0). BORIS-BB
+     * antwortet ohne ihn „The required parameter STYLES is missing" -
+     * der Leser hielt das fuer „kein Wert am Punkt", ganz BB ausser dem
+     * Berlin-Rechteck lieferte nichts (gemessen 21.10.2026). */
     SERVICE: 'WMS', VERSION: '1.3.0', REQUEST: 'GetFeatureInfo',
-    LAYERS: layer, QUERY_LAYERS: layer, CRS: a.crs, BBOX: bbox,
+    LAYERS: layer, QUERY_LAYERS: layer, STYLES: '', CRS: a.crs, BBOX: bbox,
     WIDTH: '101', HEIGHT: '101', I: '50', J: '50',
     INFO_FORMAT: fmt, FEATURE_COUNT: a.featureCount || '1',
   });
