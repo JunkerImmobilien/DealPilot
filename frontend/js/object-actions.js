@@ -1820,6 +1820,11 @@
     addRow('balkon_flae', 'Balkon/Terrasse (m²)', d.balkon_flaeche, d.balkon_flaeche, S, 'input');
     // Qualität → Sterne
     [['qual_kueche', 'Küche · Qualität', d.kueche_qualitaet], ['qual_bad', 'Bad · Qualität', d.bad_qualitaet], ['qual_boden', 'Boden · Qualität', d.boden_qualitaet], ['qual_fenster', 'Fenster · Qualität', d.fenster_qualitaet]].forEach(function (q) { var n = starFromText(q[2], QUAL_SCALE); if (n > 0) addRow(q[0], q[1], _stufeWort(q[0], n), n, S, 'star'); });
+    /* v2549 · Marcel 21.10.2026: die Qualitätsangaben gehen auch auf die
+       Gewerke-Standardstufen (Anlage 4 ImmoWertV) - dieselbe Skala 1-5.
+       Nur in LEERE Felder (emptyOnly), eine eigene Stufe bleibt stehen. Die
+       Küche hat kein Gewerk, der Zustand ist keine Standardstufe. */
+    [['ausst_sanitaer', 'Bad / Sanitär · Standardstufe', d.bad_qualitaet], ['ausst_fussboeden', 'Fußböden · Standardstufe', d.boden_qualitaet], ['ausst_fenster', 'Fenster / Außentüren · Standardstufe', d.fenster_qualitaet]].forEach(function (q) { var n = starFromText(q[2], QUAL_SCALE); if (n > 0) addRow(q[0], q[1], 'Stufe ' + n + ' von 5 (aus der Qualitätsangabe)', String(n), S, 'select', true); });
     // Zustand → Sterne
     [['rate_kueche', 'Küche · Zustand', d.kueche_zustand], ['rate_bad', 'Bad · Zustand', d.bad_zustand], ['rate_boden', 'Boden · Zustand', d.boden_zustand], ['rate_fenster', 'Fenster · Zustand', d.fenster_zustand]].forEach(function (q) { var n = starFromText(q[2], ZUST_SCALE); if (n > 0) addRow(q[0], q[1], _stufeWort(q[0], n), n, S, 'star'); });
   }

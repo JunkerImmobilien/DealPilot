@@ -1209,6 +1209,12 @@
       _v362SetStar('qual_bad',     picked.bad_qualitaet,     _V362_QUAL);
       _v362SetStar('qual_boden',   picked.boden_qualitaet,   _V362_QUAL);
       _v362SetStar('qual_fenster', picked.fenster_qualitaet, _V362_QUAL);
+      /* v2549 · Qualität auch auf die Gewerke-Standardstufen, nur leere Felder
+         (wie object-actions.js mergeMarktbericht). */
+      [['ausst_sanitaer', picked.bad_qualitaet], ['ausst_fussboeden', picked.boden_qualitaet], ['ausst_fenster', picked.fenster_qualitaet]].forEach(function (g) {
+        var n = _v362Stars(g[1], _V362_QUAL), el = document.getElementById(g[0]);
+        if (n > 0 && el && !el.value) { el.value = String(n); try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} _marked.push(g[0]); }
+      });
       _v362SetStar('rate_kueche',  picked.kueche_zustand,    _V362_ZUST);
       _v362SetStar('rate_bad',     picked.bad_zustand,       _V362_ZUST);
       _v362SetStar('rate_boden',   picked.boden_zustand,     _V362_ZUST);
