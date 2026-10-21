@@ -965,7 +965,24 @@ export function sachwert(ein, bodenwertErgebnis, param) {
   out.herstellungskosten_eur = herst;
 
   const bw = (bodenwertErgebnis && bodenwertErgebnis.vollstaendig) ? bodenwertErgebnis.wert : 0;
-  if (!bw) out.warnungen.push('Ohne Bodenwert ist der Sachwert unvollständig — er besteht aus Gebäude UND Boden.');
+  /* ══ v2595 · OHNE BODENWERT KEIN SACHWERT (§ 35 Abs. 2 ImmoWertV) ══════════
+     Bis v2594 stand hier nur eine Warnung, und der Gebaeudesachwert ging als
+     „Sachwert" hinaus (Pruefstrecke B10i: 159.485 € = nur Gebaeude). § 35 Abs. 2:
+     vorlaeufiger Sachwert = bauliche Anlagen + Aussenanlagen + BODENWERT. Kein
+     Verfahren rechnet halb: der Rechenweg bis zum Gebaeudesachwert bleibt stehen,
+     ein Wert wird nicht ausgewiesen. Das trifft auch die Eigentumswohnung ohne
+     Miteigentumsanteil (ErtragswertService.bodenwert: kein Bodenwert, v1026). */
+  if (!bw) {
+    const _etwOhneMea = !!(bodenwertErgebnis && bodenwertErgebnis.vollstaendig === false
+      && Array.isArray(bodenwertErgebnis.hinweise) && bodenwertErgebnis.hinweise.some((h) => /Miteigentumsanteil/.test(String(h))));
+    out.grund_code = 'bodenwert_fehlt';
+    out.grund = 'Sachwert nicht ausgewiesen: '
+      + (_etwOhneMea ? 'ohne Miteigentumsanteil ist der Bodenwertanteil der Wohnung nicht bestimmbar'
+                     : 'der Bodenwert fehlt (Grundstücksfläche oder Bodenrichtwert)')
+      + '. Der Sachwert besteht aus Gebäude UND Boden (§ 35 Abs. 2 ImmoWertV); der Gebäudesachwert allein ist keiner. '
+      + (_etwOhneMea ? 'Miteigentumsanteil ergänzen, dann rechnet er.' : 'Grundstücksfläche bzw. Bodenrichtwert ergänzen, dann rechnet er.');
+    return out;
+  }
   out.staffel.push({ pos: '+ Bodenwert', wert: bw });
   out.bodenwert_eur = bw || null;   /* v1056-WSW-2 */
   const vorlaeufig = geb + bw;

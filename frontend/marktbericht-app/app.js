@@ -1116,9 +1116,14 @@ function _renderWertverfahren(d) {
              /* v2382 · das Band der Marktueblichkeit mit beiden Vergleichswerten */
              + (e.miete_band ? ' · Band ' + String(e.miete_band.unten_qm).replace('.', ',') + '–' + String(e.miete_band.oben_qm).replace('.', ',') + ' €/m² ('
                 + [e.miete_band.amtlich_qm != null ? 'amtlich ' + String(e.miete_band.amtlich_qm).replace('.', ',') : null,
-                   e.miete_band.angebot_qm != null ? 'Angebot ' + String(e.miete_band.angebot_qm).replace('.', ',') : null].filter(Boolean).join(' · ') + ')' : ''))
+                   e.miete_band.angebot_qm != null ? 'Angebot ' + String(e.miete_band.angebot_qm).replace('.', ',') : null].filter(Boolean).join(' · ') + ')' : '')
+             /* v2595 · Modellpruefung des Zinses: weicht das Objekt von dessen Stichprobe ab, steht es an der Zahl */
+             + (e.modellpruefung && e.modellpruefung.geprueft && e.modellpruefung.abweichend && e.modellpruefung.abweichend.length
+                ? ' · <b>Zins passt nur eingeschränkt</b> (' + esc(e.modellpruefung.kurz.replace(/^Zins passt nur eingeschränkt: /, '')) + ')' : ''))
           : (e.grund || ''),
-        'ertrag', e.staffel)
+        'ertrag', e.staffel,
+        (e.modellpruefung && e.modellpruefung.geprueft && e.modellpruefung.abweichend && e.modellpruefung.abweichend.length)
+          ? 'Modellprüfung des Liegenschaftszinses: ' + e.modellpruefung.text : null)
     /* v1143-VORL \u00b7 Die Karte zeigte bei vorhandenem Sachwert eine LEERE
      * Unterzeile \u2014 die wichtigste Einschraenkung fehlte damit genau dort,
      * wo die Zahl steht. Das PDF sagt "INDIKATIV \u00b7 ohne Sachwertfaktor \u2014
@@ -5095,6 +5100,18 @@ async function exportPdf(out) {
           _ew.belastbarkeit.abzuege.join(' · ').replace(/−/g, '-'), blockW - 2);
         doc.text(_ab, M, y); y += _ab.length * 3 + 2;
       }
+    }
+    /* v2595 · Modellpruefung des Zinses im Rechenweg - Satz und Ansatz, ohne Fachjargon */
+    if (_ew.modellpruefung && _ew.modellpruefung.geprueft && _ew.modellpruefung.abweichend && _ew.modellpruefung.abweichend.length) {
+      need(12 + _HR);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.2); doc.setTextColor(...TXT);
+      doc.text('Modellprüfung des Liegenschaftszinses', M, y); y += 3.8;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.8); doc.setCharSpace(0);
+      const _mpT = doc.splitTextToSize(String(_ew.modellpruefung.text || '').replace(/−/g, '-'), blockW - 2);
+      doc.text(_mpT, M, y); y += _mpT.length * 3 + 2;
+      doc.setFontSize(6.2); doc.setTextColor(...MUT);
+      doc.text('Schwellen: ' + String((_ew.modellpruefung.schwellen && _ew.modellpruefung.schwellen.art) || 'DealPilot-Hinweisschwelle') + '. Der Ertragswert ist unverändert.', M, y);
+      y += 4;
     }
     if (_ew.sensitivitaet && _ew.sensitivitaet.lzs_plus_05) {
       need(10 + _HR);   /* v1207-umbruch · siehe _HR oben */

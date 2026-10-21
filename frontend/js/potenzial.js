@@ -669,6 +669,25 @@
       '.dp-pot details.dp-pot-mehr ul{margin:4px 0 2px;padding-left:18px}.dp-pot details.dp-pot-mehr li{margin:2px 0}',
       '.dp-pot details.dp-pot-mehr .dp-pot-scroll{margin-top:6px}',
       '.dp-pot .dp-markt-knopfzeile{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}.dp-pot .dp-markt-knopfzeile .dp-pot-u{display:inline;flex:1 1 220px}',
+      /* v2595 · Bestand im Vergleich: zwei gleichrangige Karten, Differenz, Einordnung, Ursachen */
+      '.dp-pot .dp-vgl{margin:12px 0 0;display:grid;gap:8px}',
+      '.dp-pot .dp-vgl-karten{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}',
+      '.dp-pot .dp-vgl-k{border:1px solid #E6DCC2;border-radius:10px;padding:8px 12px;background:#fff;min-width:0}',
+      '.dp-pot .dp-vgl-k b.t{display:block;font:500 10px/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6c6450}',
+      '.dp-pot .dp-vgl-k .w{display:block;font:700 18px/1.25 "Space Grotesk",Inter,sans-serif;color:#1d1a14;font-variant-numeric:tabular-nums}',
+      '.dp-pot .dp-vgl-k .q{display:block;font-size:11.5px;color:#4a4436;font-variant-numeric:tabular-nums}',
+      '.dp-pot .dp-vgl-diff{border-left:3px solid var(--wl-b8932f, #b8932f);padding:4px 10px;font-size:12.5px;color:#1d1a14;font-variant-numeric:tabular-nums}',
+      '.dp-pot .dp-vgl-diff b{font-weight:700}',
+      '.dp-pot .dp-vgl-ein{margin:0;padding:0;list-style:none;display:grid;gap:3px;font-size:11.5px;line-height:1.45;color:#4a4436}',
+      '.dp-pot .dp-vgl-ein li b{font-weight:600;color:#1d1a14}',
+      '.dp-pot .dp-vgl-mp{font-size:11.5px;line-height:1.45;color:#4a4436;padding:6px 10px;border-radius:8px;background:#FBF6E9;border:1px solid #E6DCC2}',
+      '.dp-pot .dp-vgl-mp.ab{background:#FBEFEC;border-color:#E9C9C3;color:#5b2f2b}',
+      '.dp-pot .dp-vgl-urs{margin:0;padding:0;list-style:none;display:grid;gap:3px;font-size:11.5px;line-height:1.45;color:#4a4436}',
+      '.dp-pot .dp-vgl-urs li{display:flex;gap:6px;align-items:baseline}',
+      '.dp-pot .dp-vgl-st{flex:0 0 auto;font:500 9.5px/1.4 "JetBrains Mono",monospace;letter-spacing:.04em;border-radius:999px;padding:0 6px;border:1px solid #8A8272;color:#4a4436;white-space:nowrap}',
+      '.dp-pot .dp-vgl-st.nw{border-color:#2f7d55;color:#2f7d55}.dp-pot .dp-vgl-st.np{border-style:dashed}',
+      '.dp-pot .dp-vgl-kopf{font:600 10px/1.2 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#8A8272;margin:4px 0 0}',
+      '@media(max-width:640px){.dp-pot .dp-vgl-karten{grid-template-columns:minmax(0,1fr)}.dp-pot .dp-vgl-k .w{font-size:17px}}',
       /* auf dem Handy macht tabellen-karten.js aus jeder Kennzahl eine Karte - die Gruppenköpfe wären dort leere Karten */
       '@media(max-width:600px){.dp-pot table.dptk tbody tr.dp-pot-gr{border:0;background:none;padding:8px 2px 0;margin:0}'
         + '.dp-pot table.dptk tbody tr.dp-pot-gr td{justify-content:flex-start;text-align:left;font:600 10px/1.2 "JetBrains Mono",monospace;letter-spacing:.1em;padding:0 !important;margin:0;border:0 !important}'
@@ -714,18 +733,53 @@
      der Miete dieses Hauses, die Marktpreisindikation aus Angebotspreisen
      vergleichbarer Häuser und kennt die Miete nicht. Gezeigt als Vielfaches der
      Jahresmiete, beide auf denselben Rohertrag bezogen. */
-  function abstandSatz(W) {
-    var b = W && W.S.bestand;
-    if (!b || !(b.ew > 0) || !(b.mpi > 0)) return '';
-    var d = (b.mpi / b.ew - 1) * 100, n = Math.round(Math.abs(d));
-    var t = n < 3 ? 'Im Bestand liegen Marktpreisindikation und Ertragswert gleichauf.'
-      : 'Im Bestand liegt die Marktpreisindikation ' + n + ' % ' + (d < 0 ? 'unter' : 'über') + ' dem Ertragswert.';
-    t += ' Der Ertragswert rechnet aus der Miete dieses Hauses'
-      + (b.roh > 0 ? ' (' + dez(b.ew / b.roh, 1) + '-fache Jahresmiete)' : '')
-      + ', die Marktpreisindikation aus den Angebotspreisen vergleichbarer Häuser am Ort'
-      + (b.roh > 0 ? ' (' + dez(b.mpi / b.roh, 1) + '-fach)' : '')
-      + ' — sie kennt die Miete nicht. Liegt die Miete über dem, was solche Häuser üblicherweise tragen, oder ist die Restnutzungsdauer länger, liegt der Ertragswert darüber.';
-    return t;
+  /* v2595 · Gutachterprüfung 21.10.2026: der pauschale Satz oben („sie kennt die Miete
+     nicht …") sagte für jedes Objekt dasselbe und stand eingeklappt. Er ist ersetzt durch
+     den Bestandsvergleich aus PotenzialService (vergleich): zwei gleichrangige Karten mit
+     €/m² auf dieselbe Bezugsfläche, die Differenz mit Vorzeichen in € und % vom Ertragswert,
+     Stufe des Zinses und Herkunft der Miete in je einem Satz, die Modellprüfung als
+     Hinweiszeile und die Ursachen mit Status (nachgewiesen / plausibel / nicht prüfbar). */
+  var ST = { nachgewiesen: ['nachgewiesen', 'nw'], plausibel: ['plausibel', 'pl'], nicht_pruefbar: ['nicht prüfbar', 'np'] };
+  function vergleichHtml(V) {
+    if (!V || !V.ertragswert || V.ertragswert.wert == null) return '';
+    var E = V.ertragswert, Mp = V.mpi || {}, D = V.differenz, B = V.bezugsflaeche;
+    var bez = B ? ' Wohnfläche' : '';
+    var qm = function (w) { return w != null ? Math.round(w).toLocaleString('de-DE') + ' €/m²' + bez : '—'; };
+    var karte = function (titel, wert, q, unter) {
+      return '<div class="dp-vgl-k"><b class="t">' + titel + '</b><span class="w">' + wert + '</span><span class="q">' + q + '</span>'
+        + (unter ? '<span class="dp-pot-u">' + unter + '</span>' : '') + '</div>';
+    };
+    var ab = Mp.abschlag_pct != null ? abschlagPct(Mp.abschlag_pct) : null;
+    var h = '<div class="dp-vgl" data-dp-vgl="1"><div class="dp-vgl-kopf">Bestand im Vergleich' + (B ? ' · Bezugsfläche ' + esc(B.art) + ' ' + Math.round(B.qm).toLocaleString('de-DE') + ' m²' : '') + '</div>'
+      + '<div class="dp-vgl-karten">'
+      + karte('Ertragswert', eur(E.wert), qm(E.eur_qm), V.lzs ? 'Liegenschaftszins ' + pct(E.lzs_pct) + ' · Stufe ' + esc(V.lzs.stufe) + (E.belastbarkeit ? ' · Belastbarkeit ' + E.belastbarkeit.pct + ' %' : '') : '')
+      + (Mp.wert != null
+        ? karte('Marktpreisindikation', eur(Mp.wert), qm(Mp.eur_qm), 'Angebotspreise am Ort' + (ab ? ', abzüglich ' + ab + ' % (' + abschlagKurz(Mp.abschlag_herkunft) + ')' : '') + (Mp.spanne ? ' · ' + spanneTsd(Mp.spanne[0], Mp.spanne[1]) : ''))
+        : karte('Marktpreisindikation', '—', 'keine Angebotspreise am Ort', ''))
+      + '</div>';
+    if (D) {
+      var vz = D.absolut_eur > 0 ? '+' : (D.absolut_eur < 0 ? '−' : '±');
+      h += '<div class="dp-vgl-diff">Differenz Marktpreisindikation − Ertragswert: <b>' + vz + eur(Math.abs(D.absolut_eur)) + '</b> · <b>' + vz
+        + pct(Math.abs(D.relativ_pct), 1) + '</b> vom Ertragswert</div>';
+    }
+    var ein = [];
+    if (V.lzs && V.lzs.satz) ein.push('<li><b>Zins:</b> ' + esc(V.lzs.satz) + '</li>');
+    if (V.miete && V.miete.satz) ein.push('<li><b>Miete:</b> ' + esc(V.miete.satz) + '</li>');
+    if (ein.length) h += '<ul class="dp-vgl-ein">' + ein.join('') + '</ul>';
+    var MP = V.modellpruefung || {};
+    if (MP.kurz || MP.text) {
+      var abw = MP.abweichend && MP.abweichend.length;
+      h += '<div class="dp-vgl-mp' + (abw ? ' ab' : '') + '"><b>Modellprüfung des Zinses:</b> '
+        + esc(abw ? MP.text : (MP.kurz || MP.text) + (MP.ausschuss ? ' (' + String(MP.ausschuss).replace(/^Ders+/, '') + (MP.berichtsjahr ? ' ' + MP.berichtsjahr : '') + ')' : '') + '.')
+        + (MP.schwellen_art ? ' <span class="dp-pot-u" style="display:inline">Schwellen: ' + esc(MP.schwellen_art) + '.</span>' : '') + '</div>';
+    }
+    var U = Array.isArray(V.ursachen) ? V.ursachen : [];
+    if (D && U.length) {
+      h += '<div class="dp-vgl-kopf">Warum die Werte auseinanderliegen · Anteile nicht bezifferbar</div><ul class="dp-vgl-urs">'
+        + U.map(function (x) { var s = ST[x.status] || [x.status, '']; return '<li><span class="dp-vgl-st ' + s[1] + '">' + esc(s[0]) + '</span><span>' + esc(x.text) + '</span></li>'; }).join('')
+        + '</ul>';
+    }
+    return h + '</div>';
   }
 
   function tafelHtml(o) {
@@ -796,12 +850,13 @@
       }).join('') + '</tr>';
     }
     html += '</tbody></table></div>';
+    /* v2595 · Bestand im Vergleich - aus dem Lauf, sonst aus dem gespeicherten Abruf */
+    if (W) html += vergleichHtml((r && r.verfuegbar && r.vergleich) || (W.mpi && W.mpi.vergleich) || null);
     var auf = r && r.verfuegbar && r.aufteilung && r.aufteilung.je_stufe && r.aufteilung.je_stufe.bestand;
     if (auf) html += aufteilungHtml(m, r, cols);
     /* Sichtbar bleibt die Kennzeichnung; alles Weitere eingeklappt */
     html += '<p class="dp-pot-kenn">' + KENNZEICHNUNG + '</p>';
     var li = [];
-    var ab2 = abstandSatz(W); if (ab2) li.push(esc(ab2));
     li.push('Score und Verkehrswert rechnen mit dem Bestand.');
     if (r && r.verfuegbar && r.basis) li.push('Liegenschaftszins ' + esc(pct(r.basis.lzs_pct)) + (r.basis.lzs_stufe ? ' (Stufe ' + esc(r.basis.lzs_stufe) + ')' : '')
       + ', Bewirtschaftung, Gesamtnutzungsdauer und Bodenwert wie im Marktbericht Stufe 3; je Stufe wechseln Miete und Restnutzungsdauer (Anlage 2 ImmoWertV).');

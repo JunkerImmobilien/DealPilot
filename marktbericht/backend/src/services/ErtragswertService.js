@@ -16,6 +16,7 @@ import {
   barwertfaktor, abzinsungsfaktor, gnd, rnd, lzsNach256,
   istNeubau, istErstbezugNachSanierung, round0, round2, gndNachAnlage1Belegt,
 } from '../lib/immowertv.js';
+import { ABZUG as MP_ABZUG } from '../lib/modellpruefung.js';   /* v2595 */
 
 /* FIX-NUM: Number(null) ist 0, nicht NaN. Ohne diese Wache lieferte
  * num(null) ?? Default die 0 und kippte die gesamten Bewirtschaftungs-
@@ -53,6 +54,11 @@ function deZahl(v) {
 }
 
 export const ErtragswertService = {
+
+  /* v2595 · Belastbarkeit um die Modellpruefung des Zinses ergaenzen (lib/modellpruefung.js).
+     Der Kern selbst kennt den Registersatz nicht; der CrossCheckService prueft nach der
+     Zinswahl und reicht das Ergebnis hierher. Der WERT bleibt unberuehrt. */
+  belastbarkeitMitModell(bel, mp) { return belastbarkeitMitModell(bel, mp); },
 
   /* v2390 · Herkunft des Bodenrichtwerts aus dem BORIS-Ergebnis, an EINER Stelle.
        'boris'          amtlich ueber BORIS abgerufen
@@ -792,7 +798,45 @@ function belastbarkeit({ lzsStufe, lzsGrund = null, lzsHerkunft = null, bwkGepru
   p = Math.max(10, Math.min(100, p));
   return {
     pct: p,
-    label: p >= 80 ? 'Hoch' : p >= 60 ? 'Mittel' : p >= 40 ? 'Niedrig' : 'Sehr niedrig',
+    label: belastbarkeitLabel(p),
     abzuege,
   };
+}
+function belastbarkeitLabel(p) { return p >= 80 ? 'Hoch' : p >= 60 ? 'Mittel' : p >= 40 ? 'Niedrig' : 'Sehr niedrig'; }
+
+/* ══ v2595 · MODELLPRUEFUNG DES LIEGENSCHAFTSZINSES IN DER BELASTBARKEIT ══════
+   Je Merkmal (Miete, Restnutzungsdauer, Objektgroesse), das ausserhalb der
+   Stichprobe des verwendeten Satzes liegt, ABZUG.abweichend Punkte; je Merkmal,
+   das der Satz nicht angibt, ABZUG.unbekannt. Moderat: der Zins bleibt amtlich,
+   nur seine Uebertragbarkeit auf dieses Objekt ist eingeschraenkt (zum Vergleich
+   Stufe B −12, C −20). Ohne Satz mit Modelldaten (Stufe D/N, eigene Angabe)
+   kein Abzug - dort steht der Abzug der Stufe schon da.
+   Die Schwellen sind DealPilot-Hinweisschwellen (lib/modellpruefung.js), keine
+   gesetzliche Grenze. */
+const _MP_ABZUG = MP_ABZUG;   /* eine Stelle: lib/modellpruefung.js */
+function belastbarkeitMitModell(bel, mp) {
+  if (!bel || !mp || !mp.geprueft || !mp.merkmale) return bel;
+  const neu = { pct: bel.pct, label: bel.label, abzuege: (bel.abzuege || []).slice() };
+  const name = { miete: 'Miete', rnd: 'Restnutzungsdauer', flaeche: 'Objektgröße' };
+  let p = bel.pct;
+  for (const k of ['miete', 'rnd', 'flaeche']) {
+    const m = mp.merkmale[k];
+    if (!m) continue;
+    if (m.status === 'abweichend') {
+      p -= _MP_ABZUG.abweichend;
+      neu.abzuege.push(name[k] + ' außerhalb des Modells des Liegenschaftszinses ('
+        + (k === 'miete' ? (m.abweichung_pct > 0 ? '+' : '−') + Math.round(Math.abs(m.abweichung_pct)) + ' % gegen Ø '
+            + Number(m.satz).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €/m²'
+          : k === 'rnd' ? Math.round(m.ansatz) + ' gegen Ø ' + Math.round(m.satz) + ' Jahre'
+          : Math.round(m.ansatz).toLocaleString('de-DE') + ' gegen Ø ' + Math.round(m.satz).toLocaleString('de-DE') + ' m²')
+        + ') (−' + _MP_ABZUG.abweichend + ')');
+    } else if (m.status === 'unbekannt') {
+      p -= _MP_ABZUG.unbekannt;
+      neu.abzuege.push(name[k] + ' im Modell des Liegenschaftszinses nicht angegeben, nicht prüfbar (−' + _MP_ABZUG.unbekannt + ')');
+    }
+  }
+  neu.pct = Math.max(10, Math.min(100, p));
+  neu.label = belastbarkeitLabel(neu.pct);
+  if (neu.pct !== bel.pct) neu.vor_modellpruefung = bel.pct;
+  return neu;
 }

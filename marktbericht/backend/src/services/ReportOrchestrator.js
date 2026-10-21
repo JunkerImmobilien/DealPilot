@@ -1332,6 +1332,11 @@ export const ReportOrchestrator = {
           lzs_gnd_jahre: (_lzs.aus_register && Number(_lzs.modell_gnd_jahre) > 0
             && !_lzs.ausserhalb_geltung) ? Number(_lzs.modell_gnd_jahre) : null,
           lzs_ausschuss: _lzs.ausschuss || null,
+          /* v2595 · die Modellansaetze DES Satzes, dessen Zins der Ertragswert nutzt (Ø Miete, Ø RND,
+             Ø Objektgroesse, Rohertrag) - fuer die Modellpruefung in CrossCheckService. Nur aus dem
+             Register und nur, wo der Satz fuer dieses Objekt gilt. */
+          lzs_modellansaetze: (_lzs.aus_register && !_lzs.ausserhalb_geltung && _lzs.modellansaetze
+            && typeof _lzs.modellansaetze === 'object') ? _lzs.modellansaetze : null,
           /* v2390 · Ebene in Klartext + der Weg zum genaueren Wert (WPS.zinsHerkunft) */
           lzs_zins_herkunft: _lzs.zins_herkunft || null,
           lzs_quelle_link: _lzs.quelle_link || null,

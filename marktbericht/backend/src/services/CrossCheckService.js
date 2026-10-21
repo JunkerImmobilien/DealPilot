@@ -11,6 +11,7 @@ import { quelleFuer, quellenSatz } from '../lib/quellen_links.js';
 import { ErtragswertService } from './ErtragswertService.js';
 /* WNHK-4 */
 import { sachwert as nhkSachwert, NHK_2010 } from '../lib/nhk2010.js';
+import { pruefeModell, mieteModellkonform } from '../lib/modellpruefung.js';   /* v2595 */
 /* ══ v1968 · HIER STAND EIN TOTER IMPORT ══════════════════════════════
 
      import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';
@@ -103,6 +104,17 @@ export function mieteNachBand(istQm, band, refQm) {
   const fuehrt = istQm != null && (band == null || lage === 'im_band');
   const kante = lage === 'ueber' ? band.oben_qm : (lage === 'unter' ? band.unten_qm : null);
   return { qm: fuehrt ? istQm : (kante != null ? kante : refQm), lage, fuehrt, kante };
+}
+
+/* v2595 · Differenz Marktpreisindikation − Ertragswert, bezogen auf den Ertragswert.
+   Auch PotenzialService nutzt sie (eine Rechnung, zwei Ausgaben). */
+export function differenzZumErtragswert(mpi, ew) {
+  const m = Number(mpi), e = Number(ew);
+  if (mpi == null || ew == null || !Number.isFinite(m) || !Number.isFinite(e) || e === 0 || m <= 0) return null;
+  const abs = Math.round(m - e);
+  return { mpi_eur: Math.round(m), ertragswert_eur: Math.round(e), absolut_eur: abs,
+           relativ_pct: Math.round(abs / e * 10000) / 100, bezug: 'ertragswert',
+           formel: 'Marktpreisindikation − Ertragswert; in % des Ertragswerts' };
 }
 
 export const CrossCheckService = {
@@ -390,6 +402,11 @@ export const CrossCheckService = {
       if (_q) _swfQuelle = { quelle_link: { ..._q, satz: quellenSatz(_q, 'sachwertfaktor') } };
     } catch { _swfQuelle = null; }
 
+    /* v2595 · derselbe Bodenwert wie im Ertragswert (v1198): liegt das gepruefte Ergebnis
+       vor, gilt es - auch wenn es „kein Bodenwert" sagt (ETW ohne MEA); nur ohne geprueftes
+       Ergebnis Grundstuecksflaeche × Bodenrichtwert. Bis v2594 bekam der Sachwert ohne
+       `p.bodenwert` gar keinen Bodenwert und wies das Gebaeude als Sachwert aus. */
+    const _bwSw = (p && p.bodenwert) || (bodenwert != null ? { vollstaendig: true, wert: bodenwert } : null);
     if (NHK_2010.geprueft && ref.property_type && (!istWohnung || _bgfWhg > 0)) {
       let _sw = nhkSachwert({   /* v1076-WLET-1 · weiter unten steht _sw = _sw2 */
         nhk_typ: (p && p.nhk_typ) || ref.nhk_typ
@@ -431,7 +448,7 @@ export const CrossCheckService = {
         aussenanlagen_pct: (p && p.aussenanlagen_pct) || ref.aussenanlagen_pct || null,
         garagen_bgf_qm: (p && p.garagen_bgf_qm) || ref.garagen_bgf_qm || null,
         garagen_stufe: (p && p.garagen_stufe) || ref.garagen_stufe || null,
-      }, (p && p.bodenwert) || null, (p && p.sachwertfaktor_param) || null);
+      }, _bwSw, (p && p.sachwertfaktor_param) || null);
 
       /* v1069-WSWF-2 · Der Sachwertfaktor haengt vom vorlaeufigen Sachwert
        * ab — er laesst sich nicht vorab aus einer Tabelle holen. Deshalb
@@ -554,7 +571,7 @@ export const CrossCheckService = {
             ausstattung: (p && p.ausstattung) || ref.ausstattung || null,
             bauteile_hk: (p && p.bauteile_hk) || ref.bauteile_hk || null,
             bauteile_detail: (p && p.bauteile_detail) || ref.bauteile_detail || null,
-          }, (p && p.bodenwert) || null, {
+          }, _bwSw, {
             sachwertfaktor: _swfTab.wert, stufe: _swfTab.stufe,
             quelle: _swfTab.quelle_text,
             /* v1338: die Streuung des Registersatzes - sie lag seit jeher
@@ -731,6 +748,13 @@ export const CrossCheckService = {
          * out.comparison und den Spread. Frueher aussteigen hiesse, den
          * Sachwert zu haben und die Gegenueberstellung zu verlieren. */
         _nhkFertig = true;
+      } else if (_sw.grund_code === 'bodenwert_fehlt') {
+        /* v2595 · ohne Bodenwert kein Sachwert - und auch kein Pauschalweg darunter,
+           der dieselbe Luecke mit einer anderen Zahl fuellte. Der Rechenweg bleibt. */
+        out.sachwert = { available: false, grund: _sw.grund, grund_code: 'bodenwert_fehlt',
+          gebaeude_sachwert_eur: _sw.gebaeude_sachwert_eur ?? null, staffel: _sw.staffel };
+        if (out.notes.indexOf(_sw.grund) < 0) out.notes.push(_sw.grund);
+        _nhkFertig = true;
       } else {
         _nhkGrundFehlt = _sw.grund || null;   /* v2390 */
       }
@@ -802,6 +826,20 @@ export const CrossCheckService = {
       const hkNeubau = bgf * NHK_EFH_BGF * BAUPREISINDEX;
       const alterswertfaktor = rnd != null ? rnd / GND_JAHRE : null;
       const gebaeudeSachwert = alterswertfaktor != null ? hkNeubau * alterswertfaktor : null;
+      /* ══ v2595 · OHNE BODENWERT KEIN SACHWERT (§ 35 Abs. 2 ImmoWertV) ══════
+         Bis v2594 wies dieser Weg ohne Grundstuecksflaeche oder Bodenrichtwert den
+         reinen Gebaeudewert als „Sachwert" aus (mit einer Notiz). § 35 Abs. 2: der
+         vorlaeufige Sachwert ist die Summe aus baulichen Anlagen, Aussenanlagen UND
+         Bodenwert - ohne ihn ist er nicht bestimmt. Gemessen am 21.10.2026 auf Staging:
+         5 von 130 Berichten mit Sachwert (mb.market_reports, zuletzt 14.09.2026). */
+      if (gebaeudeSachwert != null && bodenwert == null) {
+        out.sachwert = { available: false, grund_code: 'bodenwert_fehlt',
+          gebaeude_sachwert_eur: Math.round(gebaeudeSachwert),
+          grund: 'Sachwert nicht ausgewiesen: der Bodenwert fehlt (Grundstücksfläche oder Bodenrichtwert). '
+            + 'Der Sachwert besteht aus Gebäude UND Boden (§ 35 Abs. 2 ImmoWertV); ein reiner Gebäudewert ist keiner. '
+            + 'Grundstücksfläche bzw. Bodenrichtwert ergänzen, dann rechnet er.' };
+        out.notes.push(out.sachwert.grund);
+      } else
       if (gebaeudeSachwert != null) {
         const vorl = (bodenwert || 0) + gebaeudeSachwert;
         const sachwert = Math.round(vorl * SACHWERTFAKTOR / 1000) * 1000;
@@ -842,7 +880,6 @@ export const CrossCheckService = {
             + 'und Verfahrenswahl heraus.',
         });
         out.notes.push(out.sachwert.grund_vorlaeufig);
-        if (bodenwert == null) out.notes.push('Sachwert OHNE Bodenwert (Grundstücksfläche oder Bodenrichtwert fehlt) – nur Gebäudesachwert ausgewiesen.');
         /* v2241 · Derselbe Grundsatz wie im NHK-Kern (nhk2010.js): bOM wirken
            NACH der Marktanpassung, und dieser Weg hat keine. Ohne den Satz
            saehe es aus, als waeren die Sanierungskosten vergessen worden. */
@@ -1164,9 +1201,15 @@ export const CrossCheckService = {
         + 'Im MFH-Konfigurator je Gewerbeeinheit die marktübliche Miete (€/m²) eintragen.');
     }
 
+    /* v2595 · Leerstand ohne Vergleichsmiete (Begruendung unten am Ertragswert) */
+    const _leerAngabe = !_gew && ((ref.leerstand && typeof ref.leerstand === 'object'
+        && _num(ref.leerstand.wfl_leer) && _num(ref.leerstand.wfl_vermietet))
+      || (Array.isArray(ref.einheiten_miete) && ref.einheiten_miete.some((e) => e && (e.leer || !(Number(e.ist_monat) > 0)))
+        && ref.einheiten_miete.some((e) => e && !e.leer && Number(e.ist_monat) > 0)));
+    const _leerOhneMarkt = !_gewObjekt && !_gewSperre && !!_leerAngabe && !(_refQm > 0);
     /* v2556 · Rechnet der Ertragswert nicht, sagt die Notiz WAS fehlt - bis hier
        hiess es nur „eine Pflichtangabe fehlt" (Bismarckstr., 21.10.2026). */
-    if (!_gewObjekt && !_gewSperre) {
+    if (!_gewObjekt && !_gewSperre && !_leerOhneMarkt) {   /* v2595: dort steht der genauere Grund */
       const _fehlt = [];
       if (!wfl) _fehlt.push('Wohnfläche');
       if (!(wflWohnen > 0)) _fehlt.push('Wohnfläche Wohnen');
@@ -1175,7 +1218,28 @@ export const CrossCheckService = {
       if (_fehlt.length) out.notes.push('Ertragswert nicht gerechnet: es fehlt ' + _fehlt.join(', ') + '.');
     }
 
-    if (!_gewObjekt && wfl && mieteQm && rnd != null && !_gewSperre && wflWohnen > 0) {
+    /* ══ v2595 · LEERSTAND OHNE JEDE VERGLEICHSMIETE: KEIN ERTRAGSWERT ═════
+       Gutachterpruefung 21.10.2026 (Pruefstrecke B4b): ohne Angebots- und ohne
+       amtliche Miete griff die Leerstandsregel v2520 nicht (sie braucht die
+       Vergleichsmiete fuer die leere Flaeche), und der Kern teilte die Ist-Miete
+       der vermieteten Wohnungen durch die GANZE Wohnflaeche - Demo-MFH 4,72 statt
+       5,99 €/m², die leere Wohnung trug 0 €, und der Ertragswert erschien als
+       „Ist-Miete (marktueblich)". § 31 Abs. 2 verlangt fuer die leere Flaeche die
+       marktueblich erzielbare Miete; ohne sie ist der Rohertrag nicht bestimmbar.
+       Kein Verfahren rechnet halb: der Ertragswert entfaellt, der Grund steht da. */
+    if (_leerOhneMarkt) {
+      const _nL = ref.leerstand && ref.leerstand.n_leer ? Number(ref.leerstand.n_leer) : null;
+      out.notes.push('Ertragswert entfällt: ' + (_nL ? _nL + ' Wohnung' + (_nL === 1 ? ' steht' : 'en stehen') : 'Ein Teil der Wohnfläche steht')
+        + ' leer, und für diesen Ort liegt weder eine Angebotsmiete noch eine amtliche Vergleichsmiete vor. '
+        + 'Die leere Fläche geht nach § 31 Abs. 2 ImmoWertV mit der marktüblich erzielbaren Miete in den Rohertrag ein — '
+        + 'ohne sie ist der Rohertrag nicht bestimmbar. Die Ist-Miete der vermieteten Wohnungen auf die ganze Fläche zu verteilen, '
+        + 'würde den Wert zu niedrig ausweisen. Für die leeren Wohnungen die marktübliche Miete (€/m²) im MFH-Konfigurator eintragen, '
+        + 'dann rechnet der Ertragswert.');
+      out.ertragswert = { available: false, grund_code: 'leerstand_ohne_vergleichsmiete',
+        grund: 'Leerstand ohne Vergleichsmiete — die leere Fläche ist nicht bewertbar, der Ertragswert entfällt (§ 31 Abs. 2 ImmoWertV).' };
+    }
+
+    if (!_gewObjekt && wfl && mieteQm && rnd != null && !_gewSperre && wflWohnen > 0 && !_leerOhneMarkt) {
       /* v1059-WMIET-6 · v2210: nur der Wohnteil */
       /* v2520 · bei Leerstand: vermietete Flaeche x gewaehlte Miete (Band) +
          leere Flaeche x Vergleichsmiete. Ohne Leerstandsangabe wie bisher. */
@@ -1443,6 +1507,20 @@ export const CrossCheckService = {
         kern.warnungen.forEach((w) => { if (out.notes.indexOf(w) < 0) out.notes.push(w); });
       } else if (kern.vollstaendig && kern.wert != null) {
         const hol = (t) => { const r = kern.staffel.find((s) => s.pos.indexOf(t) >= 0); return r ? r.wert : null; };
+        /* ══ v2595 · MODELLPRUEFUNG DES VERWENDETEN ZINSSATZES (lib/modellpruefung.js) ══
+           Nach der Zinswahl und dem Kern: Ø Miete, Ø RND und Ø Objektgroesse des Satzes
+           gegen das, was dieser Ertragswert TATSAECHLICH ansetzt - die Miete als Wohn-
+           Rohertrag / 12 / Wohnflaeche Wohnen (bei Leerstand und je Wohnung also der
+           Mittelwert ueber alle Flaechen), die RND des Kerns, die Wohnflaeche des Objekts.
+           Der Wert bleibt; Belastbarkeit, miete_modellkonform und der Hinweis folgen. */
+        const _mp = pruefeModell(p.lzs_modellansaetze || null, {
+          miete_qm: wflWohnen > 0 ? Math.round(rohertrag / 12 / wflWohnen * 100) / 100 : null,
+          rnd_jahre: kern.nutzungsdauer ? kern.nutzungsdauer.rnd : rnd,
+          flaeche_qm: wfl,
+        }, { ausschuss: p.lzs_ausschuss || null, berichtsjahr: p.lzs_berichtsjahr || null, zweig: p.lzs_zweig || null,
+             amtliche_miete_fuehrt: !!_amtFuehrt });
+        const _mk = mieteModellkonform(_mp);
+        kern.belastbarkeit = ErtragswertService.belastbarkeitMitModell(kern.belastbarkeit, _mp);
         out.ertragswert = {
           available: true,
           rohertrag_pa_eur: hol('= Rohertrag'),
@@ -1489,7 +1567,27 @@ export const CrossCheckService = {
            * erkennen koennen, welche auf Angaben beruht. */
           miete_quelle: mieteQuelle,
           miete_erfasst: !!(p && p.ist_miete_erfasst),
-          miete_modellkonform: mieteQuelle === 'Mietpreisübersicht des Gutachterausschusses' || _istFuehrt,   /* v2367 */
+          /* v2595 · bis v2594 „modellkonform", sobald die Ist-Miete im Band lag (oder die
+             Mietpreisuebersicht fuehrte). Das Band prueft die Marktueblichkeit, nicht ob der
+             Zins zu dieser Miete passt. Jetzt: true nur, wenn die Modellpruefung „im_modell"
+             ergibt; false mit Grund; null, wenn der Satz keine Ø Miete fuehrt. */
+          /* v2595 · Herkunft der Miete als Code (Pilot-Tafel, Ursachen der Differenz):
+             je_wohnung | ist_im_band | obere_kante | untere_kante | amtlich | angebot */
+          miete_herkunft: (function () {
+            const z = _je ? _je.zeilen : null;
+            const n = (h) => (z ? z.filter((x) => x.herkunft === h).length : 0);
+            const code = _je ? 'je_wohnung' : _istFuehrt ? 'ist_im_band'
+              : (_kante != null ? (_istLage === 'ueber' ? 'obere_kante' : 'untere_kante') : (_amtFuehrt ? 'amtlich' : 'angebot'));
+            return { code, vergleich: _amtFuehrt ? 'amtlich' : (_refQm > 0 ? 'angebot' : null),
+                     vergleich_qm: _refQm > 0 ? Math.round(_refQm * 100) / 100 : null,
+                     n_band: n('ist_im_band'), n_oben: n('obere_kante'), n_unten: n('untere_kante'),
+                     n_leer: _je ? n('leer_marktueblich') : (_ls ? (_ls.n_leer || null) : 0),
+                     wfl_leer: _je ? _je.wfl_leer : (_ls ? _ls.wfl_leer : null),
+                     angesetzt_qm: wflWohnen > 0 ? Math.round(rohertrag / 12 / wflWohnen * 100) / 100 : null };
+          })(),
+          miete_modellkonform: _mk.wert,
+          miete_modellkonform_grund: _mk.grund,
+          modellpruefung: _mp,
           miete_ist_qm: _istQm, miete_vergleich_qm: _refQm != null ? Math.round(_refQm * 100) / 100 : null,
           miete_band: _band || null,   /* v2382 · beide Vergleichswerte und das Band */
           miete_aufteilung: _aufteilung,   /* v2520 · vermietete/leere Flaeche */
@@ -1530,6 +1628,8 @@ export const CrossCheckService = {
         };
         kern.warnungen.forEach((w) => { if (out.notes.indexOf(w) < 0) out.notes.push(w); });
         kern.hinweise.forEach((h) => { if (out.notes.indexOf(h) < 0) out.notes.push(h); });
+        /* v2595 · die Modellpruefung als Satz im Bericht - nur wenn etwas abweicht */
+        if (_mp.geprueft && _mp.abweichend.length) out.notes.push('Modellprüfung des Liegenschaftszinses: ' + _mp.text);
         /* v2390 · Zins unter A: Ertragswert insoweit indikativ, und der Weg */
         const _zh = p.lzs_zins_herkunft;
         if (_zh && _zh.unter_a && _zh.ertragswert_hinweis) {
@@ -1691,7 +1791,21 @@ export const CrossCheckService = {
             liegenschaftszins_quelle_url: p.lzs_quelle_url || null,
             liegenschaftszins_berichtsjahr: p.lzs_berichtsjahr || null,
             miete_quelle: einG.miete_quelle, miete_erfasst: true,
-            miete_modellkonform: _gHerk === 'marktueblich', miete_qm: null, miete_vergleich: null,
+            /* v2595 · auch hier nur mit Modellpruefung „im_modell“ (vorher: _gHerk === 'marktueblich') */
+            ...(function () {
+              const _flS = (_flG || 0) + (_flW || 0);
+              const _mpG = pruefeModell(p.lzs_modellansaetze || null, {
+                miete_qm: _flS > 0 ? Math.round(((_gJahr || 0) + (_wJahr || 0)) / 12 / _flS * 100) / 100 : null,
+                rnd_jahre: kernG.nutzungsdauer ? kernG.nutzungsdauer.rnd : _rndG, flaeche_qm: _flS || null,
+              }, { ausschuss: p.lzs_ausschuss || null, berichtsjahr: p.lzs_berichtsjahr || null, zweig: p.lzs_zweig || null });
+              const _mkG = mieteModellkonform(_mpG);
+              kernG.belastbarkeit = ErtragswertService.belastbarkeitMitModell(kernG.belastbarkeit, _mpG);
+              if (_mpG.geprueft && _mpG.abweichend.length) out.notes.push('Modellprüfung des Liegenschaftszinses: ' + _mpG.text);
+              return { miete_modellkonform: _gHerk === 'marktueblich' ? _mkG.wert : (_mkG.wert === true ? false : _mkG.wert),
+                       miete_modellkonform_grund: _gHerk === 'marktueblich' ? _mkG.grund : 'Gewerbemiete = Ist-Miete, nicht auf Marktüblichkeit geprüft; ' + _mkG.grund,
+                       modellpruefung: _mpG };
+            })(),
+            miete_qm: null, miete_vergleich: null,
             gewerbe_herkunft: _gHerk,
             restnutzungsdauer_jahre: kernG.nutzungsdauer ? kernG.nutzungsdauer.rnd : _rndG,
             gesamtnutzungsdauer_jahre: _gndG,
@@ -1985,6 +2099,11 @@ export const CrossCheckService = {
         max_eur: nums.length ? Math.max(...nums) : null,
         spread_pct: nums.length >= 2 && Math.min(...nums) > 0
           ? round((Math.max(...nums) / Math.min(...nums) - 1) * 100, 1) : null,
+        /* v2595 · DIE DIFFERENZ MIT VORZEICHEN, BEZOGEN AUF DEN ERTRAGSWERT
+           (Prompt „Vergleich der Werte"): absolut = Marktpreisindikation − Ertragswert,
+           relativ = absolut / Ertragswert × 100; null ohne Ertragswert (oder 0).
+           spread_pct (max/min − 1, ohne Vorzeichen) bleibt fuer bestehende Leser. */
+        differenz_zum_ertragswert: differenzZumErtragswert(vgl, out.ertragswert.available ? out.ertragswert.value_eur : null),
       };
     }
 

@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
-   DealPilot · tools/wertermittlung-pruefen.mjs · v2580
+   DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595
+   v2595: B6/B7 auf comparison.differenz_zum_ertragswert (Soll in der Falldatei,
+   mit dem Wert davor), B4b/B10i als Pruefung statt Befund, B10j/B10k Sachwert
+   ohne Bodenwert, B12 Modellpruefung des Liegenschaftszinses (lib/modellpruefung.js).
 
    Prueft die Wertermittlung des Marktberichts am ECHTEN Rechenkern:
      marktbericht/backend/src/services/ErtragswertService.js
@@ -246,14 +249,49 @@ fallB('B3', () => {
     offen('B', 'B3', 'Ist 20 % über Markt: angesetzt die obere Bandkante ' + band.oben_qm + ' €/m² (Markt × 1,15), dauerhaft über die ganze RND (Prompt: keine automatische dauerhafte Kapitalisierung)');
   }
 });
-/* Hinweis aus dem Auftrag (Befund CrossCheckService ~Z. 1492): modellkonform = Ist fuehrt */
-{
-  const D = ccFall('demo');
-  const zeig = [];
-  if (W && W.ertragswert && W.ertragswert.miete_modellkonform === true && /^Ist-Miete/.test(W.ertragswert.miete_quelle || '')) zeig.push('Westerfeld (Ist im Band)');
-  if (D && D.ertragswert && D.ertragswert.miete_modellkonform === true && !D.ertragswert.miete_band) zeig.push('Demo (Ist OHNE Band, keine Vergleichsmiete)');
-  if (zeig.length) hinweise.push('miete_modellkonform = true, sobald die Ist-Miete führt — ohne Prüfung gegen das Modell des Zinses (CrossCheckService, v2367): ' + zeig.join(', ') + '. Bewertungsentscheidung, nicht geändert.');
-}
+/* B12 · v2595 · MODELLPRUEFUNG DES ZINSSATZES. Bis v2594 war miete_modellkonform = true,
+   sobald die Ist-Miete im Band lag. Geprueft am Fall Westerfeld mit den Modellansaetzen des
+   Satzes, den der Bericht dort verwendet (Bielefeld, MFH, Berichtsjahr 2025) - gelesen aus der
+   ECHTEN Registerdatei, nicht abgeschrieben. Die eingefrorenen Argumente fuehren das Feld
+   lzs_modellansaetze noch nicht (Erfassung vor v2595): ohne Satz muss das Ergebnis null sein. */
+const satzBielefeld = (() => {
+  try {
+    const j = JSON.parse(fs.readFileSync(path.join(SRC, 'lib/register/lzs-swf-2026-nachernte.json'), 'utf8'));
+    const s = (Array.isArray(j) ? j : (j.saetze || [])).find((x) => x.kennzahl === 'liegenschaftszinssatz'
+      && String(x.ags).startsWith('05711') && x.zweig === 'mfh' && Number(x.berichtsjahr) === 2025);
+    return s ? s.modellansaetze : null;
+  } catch (e) { return null; }
+})();
+fallB('B12', () => {
+  if (!satzBielefeld) return pruefe('B', 'B12', 'Registersatz Bielefeld MFH 2025', false, 'nicht gefunden');
+  const ohne = W && W.ertragswert;
+  pruefe('B', 'B12a', 'ohne Satz: miete_modellkonform null, Modellpruefung nicht geprüft, kein Abzug',
+    !!ohne && ohne.miete_modellkonform === null && ohne.modellpruefung && ohne.modellpruefung.geprueft === false
+    && !(ohne.belastbarkeit.abzuege || []).some((a) => /Modell des Liegenschaftszinses/.test(a)));
+  const mit = ccFall('westerfeld_body', (a) => { a[4].lzs_modellansaetze = satzBielefeld; });
+  const e = mit && mit.ertragswert, mp = e && e.modellpruefung;
+  if (!mp || !mp.geprueft) return pruefe('B', 'B12b', 'Modellpruefung mit Satz', false, 'nicht geprüft');
+  wert('B', 'B12b', 'Ø Miete des Satzes (marktmiete_eur_qm)', mp.merkmale.miete.satz, 7.7, 0);
+  pruefe('B', 'B12c', 'Westerfeld im Modell (Miete, RND, Fläche) → modellkonform true',
+    e.miete_modellkonform === true && mp.abweichend.length === 0,
+    'Miete ' + mp.merkmale.miete.ansatz + ' (' + mp.merkmale.miete.abweichung_pct + ' %), RND ' + mp.merkmale.rnd.ansatz + ' gegen ' + mp.merkmale.rnd.satz + ', Fläche ' + mp.merkmale.flaeche.ansatz + ' gegen ' + mp.merkmale.flaeche.satz);
+  wert('B', 'B12d', 'Ertragswert unverändert durch die Prüfung', e.value_eur, W.ertragswert.value_eur, 0);
+  /* Miete +44 % gegen den Satz: Satz-Miete so gesetzt, dass die angesetzte Miete 44 % darueber liegt */
+  const mq = mp.merkmale.miete.ansatz;
+  const ma44 = Object.assign({}, satzBielefeld, { marktmiete_eur_qm: Math.round(mq / 1.44 * 100) / 100 });
+  const ab = ccFall('westerfeld_body', (a) => { a[4].lzs_modellansaetze = ma44; });
+  const e2 = ab && ab.ertragswert, mp2 = e2 && e2.modellpruefung;
+  pruefe('B', 'B12e', 'Miete +44 % → abweichend, modellkonform false mit Grund',
+    !!mp2 && mp2.merkmale.miete.status === 'abweichend' && e2.miete_modellkonform === false && /außerhalb ±20 %/.test(e2.miete_modellkonform_grund || ''),
+    mp2 ? mp2.merkmale.miete.abweichung_pct + ' %' : '–');
+  wert('B', 'B12f', 'Belastbarkeit −8 gegen die Prüfung im Modell', e2 ? e.belastbarkeit.pct - e2.belastbarkeit.pct : null, 8, 0);
+  pruefe('B', 'B12g', 'Kundentext ohne Fachjargon nennt beide Mieten', !!mp2 && /liegt 44 % über der Durchschnittsmiete, aus der der Gutachterausschuss den Liegenschaftszins abgeleitet hat/.test(mp2.text)
+    && /nur eingeschränkt/.test(mp2.text), mp2 ? mp2.text.slice(0, 90) : '');
+  wert('B', 'B12h', 'Ertragswert bleibt bei Abweichung', e2 ? e2.value_eur : null, W.ertragswert.value_eur, 0);
+  const ohneMiete = ccFall('westerfeld_body', (a) => { const m = Object.assign({}, satzBielefeld); delete m.marktmiete_eur_qm; a[4].lzs_modellansaetze = m; });
+  pruefe('B', 'B12i', 'Satz ohne Ø Miete → modellkonform null („nicht prüfbar"), −3', !!ohneMiete && ohneMiete.ertragswert.miete_modellkonform === null
+    && /nicht prüfbar/.test(ohneMiete.ertragswert.miete_modellkonform_grund || '') && e.belastbarkeit.pct - ohneMiete.ertragswert.belastbarkeit.pct === 3);
+});
 fallB('B4', () => {
   const L = ccFall('demo2leer');
   if (!L) return pruefe('B', 'B4', 'Fall demo2leer', false, 'fehlt in Ebene C');
@@ -276,12 +314,10 @@ fallB('B4b', () => {
   if (!L || !V) return pruefe('B', 'B4b', 'Faelle demo/demo2leer', false, 'fehlen');
   const eL = L.ertragswert || {}, eV = V.ertragswert || {};
   const roh = ((L.ertragswert_kern || {}).staffel || []).find((z) => /^Rohertrag Wohnen/.test(z.pos)) || {};
-  if (eL.available && !/leere Fläche/.test(roh.detail || '')) {
-    offen('B', 'B4b', 'BEFUND: Leerstand ohne Vergleichsmiete — leere Fläche trägt 0 €, Ist-Miete auf alle m² verteilt (' + String(eL.miete_qm).replace('.', ',')
-      + ' statt ' + String(eV.miete_qm).replace('.', ',') + ' €/m²), Ertragswert trotzdem ausgewiesen (' + eur(eL.value_eur) + ')');
-  } else {
-    pruefe('B', 'B4b', 'Leerstand ohne Vergleichsmiete', true, eL.available ? 'leere Fläche angesetzt' : 'kein Ertragswert');
-  }
+  /* v2595 · vorher (v2580) BEFUND: leere Flaeche 0 €, 4,72 statt 5,99 €/m², Ertragswert ausgewiesen */
+  pruefe('B', 'B4b', 'Leerstand ohne Vergleichsmiete → kein Ertragswert, Grund genannt', !eL.available && eL.grund_code === 'leerstand_ohne_vergleichsmiete'
+    && (L.notes || []).some((n) => /^Ertragswert entfällt: .*leer/.test(n)), eL.available ? 'ausgewiesen ' + eur(eL.value_eur) : 'kein Ertragswert');
+  void eV; void roh;
 });
 fallB('B5', () => {
   const kN = ertragswert(Object.assign(einOk(), { bwk_modus: 'normiert', modellversion: 'agvga_nrw_2016' }), bwOk());
@@ -291,20 +327,31 @@ fallB('B5', () => {
 });
 /* B6/B7/B9 · Gegenueberstellung am Fall Westerfeld, Marktpreisindikation gesetzt */
 const mitMpi = (faktor) => ccFall('westerfeld_body', (a) => { const ew = C.faelle.westerfeld_body.soll.ertragswert; a[3].market_value.estimated = Math.round(ew * faktor); });
-fallB('B6', () => {
-  const r = mitMpi(910 / 800);
-  if (!r || !r.comparison) return pruefe('B', 'B6', 'comparison', false, 'fehlt');
-  const sp = r.comparison.spread_pct;
-  if (pruefe('B', 'B6', 'IST: spread_pct bei 910/800', Math.abs(sp - 13.8) < 0.051, 'spread ' + sp + ' %')) {
-    offen('B', 'B6', 'Differenz zur Marktpreisindikation: der Code führt nur spread_pct = max/min − 1 (hier ' + String(sp).replace('.', ',') + ' %), keine vorzeichenbehaftete Differenz in € und % bezogen auf den Ertragswert (Prompt: +110.000 € / +13,75 %)');
-  }
-});
-fallB('B7', () => {
-  const r = mitMpi(750 / 800);
-  const sp = r && r.comparison ? r.comparison.spread_pct : null;
-  if (pruefe('B', 'B7', 'IST: spread_pct bei 750/800', sp != null && Math.abs(sp - 6.7) < 0.051, 'spread ' + sp + ' %')) {
-    offen('B', 'B7', 'Marktpreisindikation unter dem Ertragswert: Code zeigt ' + String(sp).replace('.', ',') + ' % ohne Vorzeichen (bezogen auf den kleineren Wert), Prompt verlangt −50.000 € / −6,25 % bezogen auf den Ertragswert');
-  }
+/* v2595 · B6/B7 auf die Differenz mit Vorzeichen bezogen auf den Ertragswert. Soll und der
+   Wert davor (spread_pct) stehen in der Falldatei (ebene_b.B6/B7). Die Gegenueberstellung
+   rechnet mit dem ECHTEN Ertragswert des Falls; die Marktpreisindikation steht im Verhaeltnis
+   910/800 bzw. 750/800 dazu - das Soll wird deshalb auf diesen Ertragswert skaliert. */
+for (const [id, faktor] of [['B6', 910 / 800], ['B7', 750 / 800]]) {
+  fallB(id, () => {
+    const fb = F.ebene_b[id] || {}, soll = fb.soll || {};
+    const r = mitMpi(faktor);
+    const d = r && r.comparison ? r.comparison.differenz_zum_ertragswert : null;
+    if (!d) return pruefe('B', id, 'comparison.differenz_zum_ertragswert', false, 'fehlt');
+    const ew = d.ertragswert_eur, skal = ew / 800000;
+    wert('B', id, 'Differenz € (MPI − Ertragswert)', d.absolut_eur, Math.round(soll.absolut_eur * skal), 1);
+    wert('B', id, 'Differenz % vom Ertragswert', d.relativ_pct, soll.relativ_pct, 0.01);
+    const sp = r.comparison.spread_pct;
+    pruefe('B', id, 'spread_pct bleibt (rückwärtskompatibel)', sp != null && Math.abs(sp - fb.vorher.wert) < 0.051, 'spread ' + sp + ' %');
+  });
+}
+fallB('B6b', () => {
+  wert('B', 'B6b', 'Differenz ohne Ertragswert = null', CCS.differenzZumErtragswert(910000, null), null);
+  wert('B', 'B6b', 'Differenz bei Ertragswert 0 = null', CCS.differenzZumErtragswert(910000, 0), null);
+  const d = CCS.differenzZumErtragswert(910000, 800000), d2 = CCS.differenzZumErtragswert(750000, 800000);
+  wert('B', 'B6b', 'Prompt-Beispiel +110.000', d.absolut_eur, 110000, 0);
+  wert('B', 'B6b', 'Prompt-Beispiel +13,75 %', d.relativ_pct, 13.75, 0);
+  wert('B', 'B6b', 'Prompt-Beispiel −50.000', d2.absolut_eur, -50000, 0);
+  wert('B', 'B6b', 'Prompt-Beispiel −6,25 %', d2.relativ_pct, -6.25, 0);
 });
 fallB('B8', () => {
   const k = ertragswert(Object.assign(einOk(), { miete_ist_jahr: 28800, bwk_modus: 'normiert' }), bwOk());
@@ -334,10 +381,20 @@ fallB('B10', () => {
   /* B10i · dieselbe Frage beim Sachwert (§ 35 Abs. 2: vorlaeufiger Sachwert = bauliche Anlagen + Aussenanlagen
      + BODENWERT). Gemessen: nhk2010.sachwert gibt ohne Bodenwert den Gebaeudewert als Sachwert aus (mit Warnung).
      Gemeldet, nicht geaendert - nicht Teil des Auftrags v2580. */
+  /* v2595 · vorher (v2580) BEFUND: 159.485 € = nur Gebaeude als Sachwert ausgewiesen */
   const swOhneBw = sachwert(Object.assign({}, swBasis, { standardstufe: 3 }), null, { wert: 1.0 });
-  if (swOhneBw.anwendbar && swOhneBw.wert != null) {
-    offen('B', 'B10i', 'BEFUND: Sachwert ohne Bodenwert wird ausgewiesen (' + eur(swOhneBw.wert) + ' = nur Gebäude, mit Warnung) — § 35 Abs. 2 verlangt den Bodenwert; ebenso der Pauschalweg im CrossCheck');
-  } else pruefe('B', 'B10i', 'Sachwert ohne Bodenwert entfällt', true);
+  pruefe('B', 'B10i', 'Sachwert ohne Bodenwert entfällt (§ 35 Abs. 2), Grund genannt', swOhneBw.wert == null && swOhneBw.anwendbar === false
+    && swOhneBw.grund_code === 'bodenwert_fehlt' && /§ 35 Abs. 2/.test(swOhneBw.grund || ''), swOhneBw.wert != null ? eur(swOhneBw.wert) : 'kein Wert');
+  const swEtw = sachwert(Object.assign({}, swBasis, { standardstufe: 3 }), bwEtw, null);
+  pruefe('B', 'B10j', 'ETW ohne MEA: kein Sachwert, Grund nennt den Miteigentumsanteil', swEtw.wert == null && /Miteigentumsanteil/.test(swEtw.grund || ''));
+  /* Pauschalweg im CrossCheck: Haus ohne Typ/Stufe und OHNE Grundstuecksflaeche */
+  const pausch = CCS.CrossCheckService.compute({ property_type: 'efh', living_area: 140, build_year: 1990, plot_area: null },
+    { available: true, value_sqm: 200 }, null, { market_value: { estimated: null } }, {});
+  pruefe('B', 'B10k', 'Pauschalweg ohne Bodenwert: kein Sachwert', !!pausch && pausch.sachwert && pausch.sachwert.available === false
+    && pausch.sachwert.grund_code === 'bodenwert_fehlt', pausch && pausch.sachwert && pausch.sachwert.available ? 'ausgewiesen ' + eur(pausch.sachwert.value_eur) : 'kein Wert');
+  const pauschMit = CCS.CrossCheckService.compute({ property_type: 'efh', living_area: 140, build_year: 1990, plot_area: 500 },
+    { available: true, value_sqm: 200 }, null, { market_value: { estimated: null } }, {});
+  pruefe('B', 'B10k', 'Pauschalweg mit Bodenwert rechnet weiter (vorläufig)', !!pauschMit && pauschMit.sachwert.available === true && pauschMit.sachwert.vorlaeufig === true);
   const ohneZins = ertragswert(Object.assign(einOk(), { lzs_pct: null, lzs_stufe: null }), bwOk());
   pruefe('B', 'B10h', 'ohne Zins: § 256 BewG als Stufe D (Ausnahme LZS, Marcel 19.10.)', ohneZins.wert != null && ohneZins.lzs.stufe === 'D');
 });
@@ -408,7 +465,7 @@ for (const [name, fall] of Object.entries(C.faelle || {})) {
 /* ══ AUSGABE ═════════════════════════════════════════════════════════ */
 if (ALLE) detail.forEach((z) => console.log(z));
 const titel = { A: 'amtliche Anwendungsbeispiele', B: 'Prompt-Testfälle 1–11', C: 'Demo-Objekte (eingefroren ' + (C.stand || '–') + ')' };
-console.log('wertermittlung-pruefen v2580 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
+console.log('wertermittlung-pruefen v2595 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
 for (const eb of ['A', 'B', 'C']) {
   const x = E[eb];
   console.log('  Ebene ' + eb + ' ' + titel[eb].padEnd(38) + x.faelle + ' Fälle, ' + x.werte + ' Werte, '

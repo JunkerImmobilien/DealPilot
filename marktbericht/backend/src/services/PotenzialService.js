@@ -25,7 +25,7 @@
 import { ErtragswertService } from './ErtragswertService.js';
 import { WertParameterService } from './WertParameterService.js';
 import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js';
-import { mieteNachBand } from './CrossCheckService.js';   /* v2488 · dieselbe Bandregel wie der Bestand */
+import { mieteNachBand, differenzZumErtragswert } from './CrossCheckService.js';   /* v2488 · dieselbe Bandregel wie der Bestand; v2595 · dieselbe Differenz */
 import { ValuationService } from './ValuationService.js';         /* v2541 */
 import { MarketAnalysisService } from './MarketAnalysisService.js';   /* v2541 */
 
@@ -299,6 +299,124 @@ function negativHinweis(a, out, neg) {
     + gruende.join(', dazu ') + '.';
 }
 
+/* ══ v2595 · ERTRAGSWERT UND MARKTPREISINDIKATION IM BESTAND, NEBENEINANDER ══════
+   Gutachterpruefung 21.10.2026 (Prompt „Vergleich der Werte", „Ursachenanalyse"):
+   zwei gleichrangige Werte, je €/m² auf DIESELBE Bezugsflaeche (Wohnflaeche des
+   Objekts), die Differenz mit Vorzeichen in € und in % des Ertragswerts (dieselbe
+   Rechnung wie comparison.differenz_zum_ertragswert), die Stufe des Zinses und die
+   Herkunft der Miete, das Ergebnis der Modellpruefung und die Ursachen - jede mit
+   ihrem Status:
+     nachgewiesen    gemessen, mit Zahl (Miete gegen Ø Miete des Satzes, Abschlag)
+     plausibel       eine Erklaerung, die passt, aber nicht belegt ist
+     nicht_pruefbar  was wir nicht sehen koennen (Angebotsauswahl des Datenanbieters)
+   Ein „nachgewiesen" belegt die TATSACHE, nicht ihren Anteil an der Differenz - der
+   ist ohne die Methodik der Marktpreisindikation nicht bezifferbar (Prompt: keine
+   scheinpraezise Ursachenzerlegung). Bis v2594 stand hier ein pauschaler Satz
+   („sie kennt die Miete nicht …"), der fuer jedes Objekt dasselbe sagte. */
+const qmDe = (v) => Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €/m²';
+function vergleichBestand(wb, out, bestand) {
+  const ref = (wb && wb.ref) || {}, cc = (wb && wb.cross_check) || {}, e = cc.ertragswert || {};
+  const ew = bestand && bestand.wert != null ? bestand.wert : null;
+  const mpi = out.haus && out.haus.bestand ? out.haus.bestand.mpi_angebote : null;
+  const fl = zahl(ref.living_area);
+  const proQm = (w) => (w != null && fl > 0 ? Math.round(w / fl) : null);
+  const A = out.mpi && out.mpi.angebote && out.mpi.angebote.verfuegbar ? out.mpi.angebote : null;
+  const mp = e.modellpruefung || null, mh = e.miete_herkunft || null, band = e.miete_band || null;
+  const lzsStufe = out.basis ? out.basis.lzs_stufe : null;
+  const lzsEt = out.basis ? out.basis.lzs_etikett : null;
+
+  /* Herkunft der Miete in einem Satz */
+  let mieteSatz = null, mieteKurz = null;
+  if (mh) {
+    const bandT = band ? ' (Band ' + qmDe(band.unten_qm).replace(' €/m²', '') + '–' + qmDe(band.oben_qm) + ')' : '';
+    const vgl = mh.vergleich === 'amtlich' ? 'amtlichen Vergleichsmiete' : 'Angebotsmiete am Ort';
+    if (mh.code === 'je_wohnung') {
+      const kante = (mh.n_oben || 0) + (mh.n_unten || 0);
+      mieteKurz = 'Ist-Miete je Wohnung' + (kante ? ', ' + kante + ' an der Bandkante' : ', im Band') + (mh.n_leer ? ', ' + mh.n_leer + ' leer' : '');
+      mieteSatz = 'Ist-Miete je Wohnung gegen das Band der Marktüblichkeit geprüft' + bandT + ': '
+        + (mh.n_band || 0) + ' im Band' + (mh.n_oben ? ', ' + mh.n_oben + ' über dem Band (angesetzt die obere Kante)' : '')
+        + (mh.n_unten ? ', ' + mh.n_unten + ' darunter (angesetzt die untere Kante)' : '')
+        + (mh.n_leer ? '; ' + mh.n_leer + ' leere Wohnung' + (mh.n_leer === 1 ? '' : 'en') + ' mit der ' + vgl + (mh.vergleich_qm ? ' ' + qmDe(mh.vergleich_qm) : '') : '') + '.';
+    } else if (mh.code === 'ist_im_band') {
+      mieteKurz = 'Ist-Miete im Band';
+      mieteSatz = 'Ist-Miete im Band der Marktüblichkeit' + bandT + ' — angesetzt, wie sie gezahlt wird.';
+    } else if (mh.code === 'obere_kante' || mh.code === 'untere_kante') {
+      const o = mh.code === 'obere_kante';
+      mieteKurz = 'Bandkante (' + (o ? 'oben' : 'unten') + ')';
+      mieteSatz = 'Die Ist-Miete liegt ' + (o ? 'über' : 'unter') + ' dem Band der Marktüblichkeit' + bandT + '; angesetzt ist die ' + (o ? 'obere' : 'untere') + ' Kante.';
+    } else if (mh.code === 'amtlich') {
+      mieteKurz = 'amtliche Vergleichsmiete';
+      mieteSatz = 'Angesetzt ist die Miete der Mietpreisübersicht des Gutachterausschusses.';
+    } else {
+      mieteKurz = 'Angebotsmiete';
+      mieteSatz = 'Keine Ist-Miete erfasst — angesetzt ist die Angebotsmiete am Ort (aktueller Marktdurchschnitt).';
+    }
+  }
+  /* Stufe des Zinses in einem Satz */
+  const lzsSatz = lzsStufe ? ('Liegenschaftszins ' + Number(out.basis.lzs_pct).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' % · Stufe ' + lzsStufe
+    + (lzsStufe === 'A' && (!lzsEt || lzsEt === 'amtlich') ? ' — amtlicher Satz des Gutachterausschusses'
+      : lzsStufe === 'N' ? ' — abgeleitet aus der DealPilot-Formel, nicht amtlich'
+      : lzsStufe === 'D' ? ' — gesetzlicher Auffangwert (§ 256 BewG); mit dem örtlichen Zins wird es genauer'
+      : ' — ' + (lzsEt || 'nicht der örtliche Satz') + '; mit dem örtlichen Zins wird es genauer') + '.') : null;
+
+  /* Ursachen der Differenz - nur, was hier gemessen ist, als „nachgewiesen" */
+  const d = differenzZumErtragswert(mpi, ew);
+  const ursachen = [];
+  if (d) {
+    const mm = mp && mp.geprueft && mp.merkmale ? mp.merkmale : null;
+    if (mm && mm.miete.status !== 'unbekannt' && mm.miete.abweichung_pct != null && Math.abs(mm.miete.abweichung_pct) >= 5) {
+      const ueber = mm.miete.abweichung_pct > 0;
+      ursachen.push({ status: 'nachgewiesen', richtung: ueber ? 'ertragswert_hoeher' : 'ertragswert_niedriger',
+        text: 'Die angesetzte Miete (' + qmDe(mm.miete.ansatz) + ') liegt ' + Math.round(Math.abs(mm.miete.abweichung_pct)) + ' % '
+          + (ueber ? 'über' : 'unter') + ' der Durchschnittsmiete, aus der der Zins abgeleitet ist (' + qmDe(mm.miete.satz) + ') — das '
+          + (ueber ? 'hebt' : 'senkt') + ' den Ertragswert.' });
+    }
+    if (mh && mh.angesetzt_qm && band && band.angebot_qm && Math.abs(mh.angesetzt_qm / band.angebot_qm - 1) >= 0.05) {
+      const p = Math.round((mh.angesetzt_qm / band.angebot_qm - 1) * 100);
+      ursachen.push({ status: 'nachgewiesen', richtung: p > 0 ? 'ertragswert_hoeher' : 'ertragswert_niedriger',
+        text: 'Die angesetzte Miete liegt ' + Math.abs(p) + ' % ' + (p > 0 ? 'über' : 'unter') + ' der Angebotsmiete am Ort ('
+          + qmDe(band.angebot_qm) + '); die Marktpreisindikation rechnet nicht mit der Miete dieses Hauses.' });
+    }
+    if (mm && mm.rnd.status !== 'unbekannt' && mm.rnd.abweichung_jahre != null && Math.abs(mm.rnd.abweichung_jahre) >= 5) {
+      const l = mm.rnd.abweichung_jahre > 0;
+      ursachen.push({ status: 'nachgewiesen', richtung: l ? 'ertragswert_hoeher' : 'ertragswert_niedriger',
+        text: 'Die Restnutzungsdauer (' + Math.round(mm.rnd.ansatz) + ' J.) liegt ' + Math.abs(mm.rnd.abweichung_jahre) + ' Jahre '
+          + (l ? 'über' : 'unter') + ' dem Durchschnitt der Kauffälle des Zinses (' + Math.round(mm.rnd.satz) + ' J.).' });
+    }
+    if (A && A.abschlag_pct != null && Number(A.abschlag_pct) !== 0) {
+      ursachen.push({ status: 'nachgewiesen', richtung: 'mpi_niedriger',
+        text: 'Die Marktpreisindikation enthält einen Abschlag von ' + String(Math.round(Number(A.abschlag_pct) * 10) / 10).replace('.', ',')
+          + ' % auf Angebotspreise (' + (/^örtlich/.test(String(A.abschlag_herkunft || '')) ? 'örtlich gemessen' : (/eigene/.test(String(A.abschlag_herkunft || '')) ? 'eigene Angabe' : 'Marktdurchschnitt')) + ').' });
+    }
+    if (mh && mh.n_leer) {
+      ursachen.push({ status: 'plausibel', richtung: 'ertragswert_hoeher',
+        text: mh.n_leer + ' leere Wohnung' + (mh.n_leer === 1 ? ' geht' : 'en gehen') + ' mit der Vergleichsmiete in den Ertragswert ein, ohne Abzug für die Zeit bis zur Wiedervermietung — '
+          + 'das kann den Ertragswert über das heben, was der Markt für das Haus im heutigen Zustand zahlt.' });
+    }
+    if (lzsStufe && lzsStufe !== 'A') {
+      ursachen.push({ status: 'plausibel', richtung: null,
+        text: 'Der Liegenschaftszins ist nicht der örtliche amtliche Satz (Stufe ' + lzsStufe + ')'
+          + (e.sensitivitaet && e.sensitivitaet.lzs_plus_05 ? '; ein halber Prozentpunkt mehr ändert den Ertragswert um ' + String(e.sensitivitaet.lzs_plus_05.abweichung_pct).replace('.', ',') + ' %' : '') + '.' });
+    }
+    ursachen.push({ status: 'nicht_pruefbar', richtung: null,
+      text: 'Welche Angebote der Datenanbieter für die Marktpreisindikation auswählt und wie er sie gewichtet, ist nicht offengelegt.' });
+  }
+  return {
+    bezugsflaeche: fl > 0 ? { qm: fl, art: 'Wohnfläche des Objekts' } : null,
+    ertragswert: { wert: ew, eur_qm: proQm(ew), lzs_pct: out.basis ? out.basis.lzs_pct : null, lzs_stufe: lzsStufe, lzs_etikett: lzsEt,
+                   belastbarkeit: e.belastbarkeit ? { pct: e.belastbarkeit.pct, label: e.belastbarkeit.label } : null },
+    mpi: { wert: mpi, eur_qm: proQm(mpi), abschlag_pct: A ? A.abschlag_pct : null, abschlag_herkunft: A ? A.abschlag_herkunft : null,
+           spanne: out.haus && out.haus.bestand ? (out.haus.bestand.mpi_angebote_spanne || null) : null },
+    differenz: d,
+    miete: mh ? { code: mh.code, kurz: mieteKurz, satz: mieteSatz, angesetzt_qm: mh.angesetzt_qm } : null,
+    lzs: lzsStufe ? { stufe: lzsStufe, etikett: lzsEt, satz: lzsSatz } : null,
+    modellpruefung: mp && mp.geprueft ? { kurz: mp.kurz, text: mp.text, abweichend: mp.abweichend, unbekannt: mp.unbekannt,
+      ausschuss: mp.ausschuss || null, berichtsjahr: mp.berichtsjahr || null, schwellen_art: mp.schwellen ? mp.schwellen.art : null }
+      : { kurz: null, text: mp ? mp.hinweis || null : null, nicht_geprueft: true },
+    ursachen,
+  };
+}
+
 export const PotenzialService = {
   KENNZEICHNUNG,
 
@@ -407,6 +525,10 @@ export const PotenzialService = {
         h.mpi_rohertrag = rf && mieteStufe[s] > 0 ? { faktor: rf, miete_jahr: Math.round(mieteStufe[s]), wert: rundeMpi(rf * mieteStufe[s]) } : null;
       }
     }
+
+    /* v2595 · der Bestandsvergleich - auch im Abruf „Marktpreise" gespeichert (out.mpi reist mit) */
+    try { out.vergleich = vergleichBestand(wb, out, bestand); if (out.mpi) out.mpi.vergleich = out.vergleich; }
+    catch (e) { out.vergleich = null; }
 
     if (bb) {
       const leer = bb.zeilen.filter((z) => z && z.herkunft === 'leer_marktueblich').length;
