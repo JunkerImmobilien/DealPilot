@@ -503,6 +503,14 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Hansestadt Rostock 2026, Landkreis Rostock 2026, Vorpommern-Greifswald 2024
                                genehmigungspflichtig - nur Sperren mit Fundstelle und Weg. */
                             'nachernte-2026-10-mv.json',
+                            /* v2700 · Nachernte 10b 21.10.2026 (HE/SH/RP/HH): Darmstadt IMB 2026 (neu im Register:
+                               LZS MFH nach Baujahr vor/ab 1950, vermietete ETW, WGH/gemischt dünn belegt Stufe B),
+                               Sachwertfaktor MFH/ETW je hessischem Ausschuss als Sperre mit Fundstelle (Korbach,
+                               Homberg, Frankfurt fuehren MFH-SWF, aber Baupreisindex ohne Zahl), Main-Kinzig/Wetterau-
+                               Luecken; SH Datenblaetter Luebeck/Lauenburg/Ostholstein (MFH/ETW-SWF, WGH/Gewerbe-LZS);
+                               Worms eigener GMB 2025 kostenpflichtig (50 EUR, Bestellweg); Hamburg WGH-LZS, ETW-SWF. */
+                            'nachernte-2026-10b-he.json', 'nachernte-2026-10b-sh.json',
+                            'nachernte-2026-10b-rp.json', 'nachernte-2026-10b-hh.json',
                             /* v2620: Umrechnungskoeffizienten zum Immobilienrichtwert NRW (Kennzahl umrechnung_irw,
                                lib/vergleichswert_irw.js, Pruefer tools/irw-pruefen.mjs): Herford, Bielefeld,
                                Koeln, Duesseldorf (Sperren), Bonn, Muenster, Dortmund (Sperren, additiv), Bochum,
