@@ -103,6 +103,10 @@
       var legal = karte.querySelector('.legal'); if (!legal) return;
       alt = document.createElement('span'); alt.className = 'dp-abschlag'; legal.appendChild(alt);
       alt.style.display = 'block';   /* v2672 · eigene Zeile, Schrift erbt von .legal */
+      /* v2672a · gemessen: eine Sammelregel in layout-varianten.css setzt Spans
+         mit !important auf die Body-Schrift (Inter) - die Zeile stand anders
+         als der Rechtshinweis darueber (JetBrains Mono). Inline !important erbt. */
+      alt.style.setProperty('font-family', 'inherit', 'important');
     }
     alt.textContent = txt;
   }
