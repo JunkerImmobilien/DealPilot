@@ -43,6 +43,15 @@
   var GESPERRT_KURZ = 'Ertragswert je Stufe mit DealPilot Stufe 3';
   var GESPERRT_LANG = 'Der Ertragswert gehört zur Wertermittlung nach ImmoWertV (Stufe 3). Er erscheint hier, sobald für dieses Objekt ein Marktbericht Stufe 3 vorliegt oder dein Tarif Stufe 3 enthält.';
   function gesperrt(r) { return !!(r && r.ertragswert_gesperrt); }
+  /* v2577 · Grund eines gespeicherten Laufs ohne Ertragswert. Vor v2556 trug der
+     Dienst dort den allgemeinen Hinweis „Vereinfachtes Sachwert-/Ertragswert-
+     verfahren … Indikativ" - das ist kein Grund (gemessen 21.10.2026 an
+     Bismarckstr. 27, gespeichert im Objekt). Solche Altstände zeigen keinen Grund. */
+  function grundGespeichert() {
+    var e = window._dpPotenzial && window._dpPotenzial.ergebnis;
+    var g = e && !e.verfuegbar ? String(e.grund || '') : '';
+    return /^Vereinfachtes Sachwert-\/Ertragswertverfahren/.test(g) ? '' : g;
+  }
   var KAPP_URL = 'js/data/kappungsgrenzen.json';
   var AUFTEILUNG_JE_WE = 1800;   /* Vorbelegung: Notar, Grundbuch, Teilungserklärung, Abgeschlossenheit */
   var PRAEFIX = { '01': 'SH', '02': 'HH', '03': 'NI', '04': 'HB', '05': 'NW', '06': 'HE', '07': 'RP', '08': 'BW',
@@ -807,7 +816,7 @@
       html += '<div class="dp-pot-stufe3"><b>' + esc(GESPERRT_KURZ) + '</b><span>' + esc(GESPERRT_LANG) + '</span>'
         + '<button type="button" class="dp-pot-knopf" data-dp-pot-stufe3="1">Stufe 3 im Tab Objekt</button></div>';
     } else if (!r || !r.verfuegbar) {
-      var grund = window._dpPotenzial && window._dpPotenzial.ergebnis && !window._dpPotenzial.ergebnis.verfuegbar ? window._dpPotenzial.ergebnis.grund : '';
+      var grund = grundGespeichert();
       html += '<p class="dp-pot-hin">' + (ergebnisVeraltet() ? 'Die Angaben haben sich geändert — die Ertragswerte sind neu zu rechnen. ' : (grund ? esc(grund) + ' ' : ''))
         + '<button type="button" class="dp-pot-knopf" data-dp-pot-rechnen="1">Ertragswerte rechnen</button></p>';
     }
@@ -852,7 +861,7 @@
   function spanneTsd(a, b) {
     if (a == null || b == null) return '';
     if (!(a >= 100000 && b >= 100000)) return 'Spanne ' + spanne(a, b, eur);
-    return 'Spanne ' + Math.round(a / 1000).toLocaleString('de-DE') + '–' + Math.round(b / 1000).toLocaleString('de-DE') + '&nbsp;Tsd.&nbsp;€';
+    return 'Spanne <span style="white-space:nowrap">' + Math.round(a / 1000).toLocaleString('de-DE') + '–' + Math.round(b / 1000).toLocaleString('de-DE') + '&nbsp;Tsd.&nbsp;€</span>';
   }
   function aufklapp(titel, inhalt) { return '<details class="dp-pot-mehr"><summary>' + titel + '</summary>' + inhalt + '</details>'; }
   function marktHtml() {
@@ -1309,7 +1318,7 @@
         + '<button type="button" class="dp-pot-knopf" data-dp-pot-stufe3="1">Stufe 3 im Tab Objekt</button></div>';
     } else if (!d.gerechnet) {
       var lauf = !!_bwLauf;
-      var grund = window._dpPotenzial && window._dpPotenzial.ergebnis && !window._dpPotenzial.ergebnis.verfuegbar ? window._dpPotenzial.ergebnis.grund : '';
+      var grund = grundGespeichert();
       html += '<p class="dp-pot-hin">' + (lauf ? 'Die Ertragswerte werden gerechnet (bis 40 Sekunden) …'
           : (ergebnisVeraltet() ? 'Die Angaben haben sich geändert — die Ertragswerte sind neu zu rechnen. ' : (grund ? esc(grund) + ' ' : ''))
             + ' <button type="button" class="dp-pot-knopf" data-dp-wp-rechnen="1">Ertragswerte rechnen</button>') + '</p>';
