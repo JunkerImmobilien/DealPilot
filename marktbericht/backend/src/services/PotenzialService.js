@@ -340,10 +340,11 @@ function vergleichBestand(wb, out, bestand) {
     const aus = (mh.n_oben || 0) + (mh.n_unten || 0);
     if (mh.code === 'je_wohnung') {
       mieteKurz = 'Ist-Miete je Wohnung' + (aus ? ', ' + aus + ' außerhalb des Bandes' : ', im Band') + (mh.n_leer ? ', ' + mh.n_leer + ' leer' : '');
-      mieteSatz = 'Ist-Miete je Wohnung gegen die ' + ank + ' ± ' + ((ms && ms.band_pct) || 20) + ' % geprüft' + bandT + ': '
-        + (mh.n_band || 0) + ' im Band' + (mh.n_oben ? ', ' + mh.n_oben + ' darüber' : '') + (mh.n_unten ? ', ' + mh.n_unten + ' darunter' : '')
-        + (aus ? ' (dort angesetzt ' + qmDe(ms ? ms.qm : mh.vergleich_qm) + ')' : '')
-        + (mh.n_leer ? '; ' + mh.n_leer + ' leere Wohnung' + (mh.n_leer === 1 ? '' : 'en') + ' ebenso' : '') + '.';
+      /* v2600 · knapp (Tafel nicht aufblaehen): Massstab, dann nur, was nicht im Band liegt */
+      const nT = [mh.n_band ? mh.n_band + ' im Band (Ist-Miete)' : null, mh.n_oben ? mh.n_oben + ' darüber' : null, mh.n_unten ? mh.n_unten + ' darunter' : null,
+        mh.n_leer ? mh.n_leer + ' leer' : null].filter(Boolean);
+      mieteSatz = 'gemessen an der ' + ank + ' ± ' + ((ms && ms.band_pct) || 20) + ' %' + bandT + ': ' + nT.join(', ')
+        + (aus || mh.n_leer ? ' — ' + (aus && mh.n_leer ? 'diese' : (aus ? 'darüber/darunter' : 'leere')) + ' mit ' + qmDe(ms ? ms.qm : mh.vergleich_qm) + ' angesetzt' : '') + '.';
     } else if (mh.code === 'ist_im_band') {
       mieteKurz = 'Ist-Miete im Band';
       mieteSatz = 'Ist-Miete im Band um die ' + ank + bandT + ' — angesetzt, wie sie gezahlt wird.';
@@ -364,9 +365,9 @@ function vergleichBestand(wb, out, bestand) {
   else if (b && (b.n_angesetzt || b.n_offen)) {
     const t = [];
     if (b.n_angesetzt && b.angesetzt_eur) t.push('angesetzt ' + eu(b.angesetzt_eur) + ' (Barwert über die Restlaufzeit)');
-    if (b.n_offen && b.szenarien) t.push(eu(b.offen_differenz_jahr) + '/Jahr ohne Restlaufzeit: ' + eu(b.szenarien[0].barwert_eur) + ' bis '
-      + eu(b.szenarien[b.szenarien.length - 1].barwert_eur) + ' (' + b.szenarien[0].jahre + '–' + b.szenarien[b.szenarien.length - 1].jahre + ' Jahre, Szenario)');
-    bogSatz = 'Mietabweichung: ' + t.join('; ') + '.';
+    if (b.n_offen && b.szenarien) t.push(eu(b.offen_differenz_jahr) + '/Jahr, Restlaufzeit unbekannt: ' + eu(b.szenarien[0].barwert_eur).replace(' €', '') + ' bis '
+      + eu(b.szenarien[b.szenarien.length - 1].barwert_eur) + ' (Szenario ' + b.szenarien[0].jahre + '–' + b.szenarien[b.szenarien.length - 1].jahre + ' J.), nicht im Wert');
+    bogSatz = 'Mietabweichung ' + t.join('; ') + '.';
   }
   if (e.leerstand_bog && e.leerstand_bog.summe_eur > 0 && !e.bog_doppelt_vermieden) bogSatz = (bogSatz ? bogSatz + ' ' : '') + 'Leerstand: ' + eu(-e.leerstand_bog.summe_eur) + ' (Mietausfall, Herrichtung).';
   /* Stufe des Zinses in einem Satz */

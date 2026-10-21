@@ -769,17 +769,17 @@
     if (V.lzs && V.lzs.satz) ein.push('<li><b>Zins:</b> ' + esc(V.lzs.satz) + '</li>');
     if (V.miete && V.miete.satz) ein.push('<li><b>Miete:</b> ' + esc(V.miete.satz) + '</li>');
     /* v2600 · E2/E3 · Mietabweichung und Leerstand als besonderes Merkmal; E4 · Spanne der Stufe N */
-    if (V.bog && V.bog.satz) ein.push('<li><b>Besondere Merkmale:</b> ' + esc(V.bog.satz)
-      + (V.vorlaeufig_vor_bog ? ' Ausgewiesen ist der vorläufige Ertragswert vor diesen Merkmalen.' : '') + '</li>');
-    else if (V.vorlaeufig_vor_bog) ein.push('<li><b>Besondere Merkmale:</b> leere Wohnungen voll vermietet angesetzt, ohne Mietausfall und Herrichtung (vorläufiger Ertragswert).</li>');
+    if (V.bog && V.bog.satz) ein.push('<li><b>Besondere Merkmale:</b> ' + esc(V.bog.satz) + '</li>');
+    else if (V.vorlaeufig_vor_bog) ein.push('<li><b>Besondere Merkmale:</b> leere Wohnungen voll vermietet, ohne Mietausfall und Herrichtung.</li>');
     if (V.lzs_spanne && V.lzs_spanne.text) ein.push('<li><b>Spanne:</b> ' + esc(V.lzs_spanne.text) + '</li>');
     if (ein.length) h += '<ul class="dp-vgl-ein">' + ein.join('') + '</ul>';
     var MP = V.modellpruefung || {};
     if (MP.kurz || MP.text) {
       var abw = MP.abweichend && MP.abweichend.length;
+      /* v2600 · im Modell: eine kurze Zeile (Ausschuss und Schwellenart nur bei Abweichung) */
       h += '<div class="dp-vgl-mp' + (abw ? ' ab' : '') + '"><b>Modellprüfung des Zinses:</b> '
-        + esc(abw ? MP.text : (MP.kurz || MP.text) + (MP.ausschuss ? ' (' + String(MP.ausschuss).replace(/^Ders+/, '') + (MP.berichtsjahr ? ' ' + MP.berichtsjahr : '') + ')' : '') + '.')
-        + (MP.schwellen_art ? ' <span class="dp-pot-u" style="display:inline">Schwellen: ' + esc(MP.schwellen_art) + '.</span>' : '') + '</div>';
+        + esc(abw ? MP.text : (MP.kurz || MP.text) + '.')
+        + (abw && MP.schwellen_art ? ' <span class="dp-pot-u" style="display:inline">Schwellen: ' + esc(MP.schwellen_art) + '.</span>' : '') + '</div>';
     }
     var U = Array.isArray(V.ursachen) ? V.ursachen : [];
     if (D && U.length) {
