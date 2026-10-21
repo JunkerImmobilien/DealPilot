@@ -41769,3 +41769,13 @@ Marcel 21.10.2026: „Das Flughandbuch könnte auch in Richtung Schritt-für-Sch
 - **Nachweis:** `node tools/handbuch-erzeugen.mjs --pruefen` RC 0 („Abläufe 11 (77 Schritte, 191 Belege)"). Auf Staging `app.staging.dealpilot.immo/handbuch.html` per curl: Titel, `data-pdf="ABL"`, `handbuch-daten.js?v=v2574` mit `ablaeufe`. PDF per CDP auf Staging erzeugt (nicht gespeichert): Teil A 8 Seiten, komplett **115 Seiten** (vorher 107).
 - **Rest:** (1) `help.js` „Exposé oder Marktbericht einlesen" nennt das Fenster „Exposé & Marktbericht importieren" — es heißt im Code „PDFs einlesen — Exposé, Marktbericht, Dokumente" (`object-actions.js`); nicht angefasst. (2) Der Hilfe-Banner zum Flughandbuch (`help.js`) erwähnt Teil A noch nicht. (3) „Aktenmappe" ist im Code eine Ansicht (Layout), kein Ziel der Übernahme — der Ablauf sagt „Als Objekt speichern". (4) Neue Bilder nur mit neuer Aufnahme (`aufnahme.js`); Teil A nutzt vier vorhandene.
 - **Falle:** `/\*\*/g` über ein node-Heredoc/Template geschrieben wurde zu `/**/` — ein Kommentar, `new Function` meldete trotzdem „Syntax ok". Regex mit Backslash nur per Edit schreiben (Memory „Backslash im Erzeuger").
+
+### Prod-Rollout (57) (21.10.2026, Produktion)
+
+Marcel 21.10.2026: „mach jetzt den Prod rollout".
+
+- **Was:** 146 Commits seit Rollout (56) `c1ba43e0`, Staging-Stand `df2de62d` (v2470–v2576a, v2574 Flughandbuch Teil A). **Nicht dabei:** v2577–v2577d (Pilot-Tafel „Ankauf · Bestand · Zielbild"), lief bei Rollout noch.
+- **Commit:** `e66dadd4` auf `main` (Merge im eigenen Worktree, damit die Arbeitskopie der parallelen Agenten unberührt blieb).
+- **Nachweis:** Sicherungen vorher `/root/backups/haupt-20261021-1442.sql.gz` (14 MB, 73 Tabellen) und `mb-20261021-1441.sql.gz` (25 MB, 32 Tabellen). `backend` + `mb-backend` neu gebaut; mb-Log `[migrate] OK 019_makro_ebene.sql`, `OK 020_potenzial_abrufe.sql`, `listening on :4000`; Haupt „No new migrations", `listening on 3001`. Medien Staging → Prod per tar über ssh: Videothek Module 26/27 (4 MP4), Messe-Clips (14) — Bytesummen beider Server gleich (763.638.714 / 2.292.555). curl: MP4 `video/mp4`, `videos.json` mit Modul 26/27, `messe-schleife.html` und `schleife.js` mit richtigem Typ, `handbuch.html` mit Teil A. Gold-Audit RC 0 (Basislinie kann sinken).
+- **Falle:** `pg_dump -U dealpilot dealpilot` ergab wieder eine **20-Byte-Sicherung** — die Haupt-DB heißt `dealpilot_db` (`printenv POSTGRES_DB` im Container). Gelöscht und richtig neu gezogen.
+- **Rest:** v2577ff in den nächsten Rollout.
