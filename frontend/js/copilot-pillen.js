@@ -43,19 +43,48 @@
     { id: 'tiefe',  text: 'Datentiefe',        titel: 'Wie vollständig ist dieses Objekt?' },
     { id: 'fehlt',  text: 'Was fehlt?',        titel: 'Welche Felder sind noch leer?' }
   ];
+  /* v2550 · Marcel 21.10.2026: „vlzt koennen wir das besser formulieren und
+     paar mehr. mit Auswahlbox." Fuenf Pillen fuer die haeufigen Fragen, der
+     Rest in einer Auswahl nach Thema. Auch dort wird nur EINGESETZT, gesendet
+     wird per Hand - der Nutzer sieht, was Kontingent kostet. */
   var FRAGEN = [
-    { id: 'sollist', text: 'Soll/Ist',
-      frage: 'Vergleiche den Ankaufstand mit dem heutigen Stand: Wo liegen wir '
-           + 'besser, wo schlechter, und was heißt das für die Bank?' },
-    { id: 'tiefer', text: 'Mehr Tiefe?',
-      frage: 'Welche zusätzlichen Angaben würden die Analyse dieses Objekts '
-           + 'belastbarer machen — und was bringt jede davon konkret?' },
-    { id: 'risiko', text: 'Risiken',
-      frage: 'Was sind die drei größten Risiken bei diesem Objekt, '
-           + 'gemessen an den vorliegenden Zahlen?' },
+    { id: 'kauf', text: 'Kaufen oder nicht?',
+      frage: 'Würdest du dieses Objekt zu diesem Preis kaufen? Begründe es mit '
+           + 'Cashflow, DSCR und Rendite und nenne die eine Zahl, die das Urteil kippen würde.' },
+    { id: 'risiko', text: 'Größte Risiken',
+      frage: 'Was sind die drei größten Risiken bei diesem Objekt, gemessen an den '
+           + 'vorliegenden Zahlen — und wie kann ich jedes davon begrenzen?' },
     { id: 'bank', text: 'Bankgespräch',
-      frage: 'Worauf wird die Bank bei diesem Objekt zuerst schauen, '
-           + 'und welche Zahl sollte ich vorher kennen?' }
+      frage: 'Worauf schaut die Bank bei diesem Objekt zuerst? Welche Zahlen sollte '
+           + 'ich vor dem Termin kennen, und welche Unterlagen wird sie verlangen?' },
+    { id: 'sollist', text: 'Ankauf ↔ heute',
+      frage: 'Vergleiche den Stand beim Ankauf mit dem heutigen Stand: Wo liegt das '
+           + 'Objekt besser, wo schlechter, und was heißt das für Bank und Verkauf?' },
+    { id: 'tiefer', text: 'Mehr Tiefe?',
+      frage: 'Welche zusätzlichen Angaben würden die Analyse dieses Objekts belastbarer '
+           + 'machen — und was ändert jede davon konkret am Ergebnis?' }
+  ];
+  var WEITERE = [
+    { gruppe: 'Kaufpreis & Verhandlung', fragen: [
+      'Bis zu welchem Kaufpreis trägt sich dieses Objekt noch? Nenne die Grenze in Euro und woran sie hängt.',
+      'Mit welchen Argumenten aus den Zahlen kann ich beim Kaufpreis verhandeln, und wie viel ist realistisch?',
+      'Wie weit liegt der Kaufpreis vom Marktwert entfernt, und was erklärt den Unterschied?' ] },
+    { gruppe: 'Miete & Potenzial', fragen: [
+      'Wie viel Mieterhöhung ist rechtlich und am Markt möglich (Soll-Miete), und ab wann?',
+      'Lohnt sich das Zielbild? Stelle Aufwand, Mehrmiete und Wertzuwachs gegenüber.',
+      'Ist die heutige Miete marktüblich, oder liegt sie deutlich darüber oder darunter?' ] },
+    { gruppe: 'Finanzierung', fragen: [
+      'Was passiert mit dem Cashflow, wenn der Zins nach der Zinsbindung um zwei Prozentpunkte steigt?',
+      'Wie viel Eigenkapital brauche ich, damit der Cashflow nicht negativ wird?',
+      'Ist die Tilgung sinnvoll gewählt, oder sollte ich sie für dieses Objekt anpassen?' ] },
+    { gruppe: 'Steuer', fragen: [
+      'Wie wirkt sich das Objekt steuerlich aus, und ab welchem Jahr kippt der Vorteil in eine Steuerlast?',
+      'Lohnt sich ein Gutachten zur Restnutzungsdauer für eine höhere Abschreibung?',
+      'Welchen Anteil des Kaufpreises sollte ich auf das Gebäude legen, und wie belege ich ihn?' ] },
+    { gruppe: 'Bewirtschaftung & Verkauf', fragen: [
+      'Welche Instandhaltung steht in den nächsten zehn Jahren an, und reicht die Rücklage dafür?',
+      'Wie robust ist der Deal, wenn eine Wohnung sechs Monate leer steht?',
+      'Wann wäre ein Verkauf am sinnvollsten, und was bleibt nach Steuern übrig?' ] }
   ];
 
   function css() {
@@ -79,7 +108,12 @@
         'border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);border-radius:999px;background:transparent;' +
         'color:var(--wl-c9a84c, #C9A84C);font:11px/1.4 "Space Grotesk",sans-serif;cursor:pointer}' +
       '.dp-cpp-spr:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent)}' +
-      '@media(max-width:560px){.dp-cpp{padding:7px 10px 2px}.dp-cpp-lbl{display:none}}';
+      '.dp-cpp-sel{border:1px solid rgba(138,130,121,.45);background:transparent;color:#6b6660;' +
+        'border-radius:999px;padding:4px 10px;font:600 11.5px/1.3 "Space Grotesk",sans-serif;' +
+        'cursor:pointer;max-width:100%}' +
+      '.dp-cpp-sel option,.dp-cpp-sel optgroup{color:#2A2727;background:#FDFCFA;font-weight:400}' +
+      '.dp-cpp-sel optgroup{font-weight:700}' +
+      '@media(max-width:560px){.dp-cpp{padding:7px 10px 2px}.dp-cpp-lbl{display:none}.dp-cpp-sel{flex:1 1 100%}}';
     document.head.appendChild(st);
   }
 
@@ -95,7 +129,7 @@
     if (!d) return 'Die Vollständigkeit kann ich gerade nicht messen — '
       + 'der Zähler aus dem Reiter Deal-Aktion ist nicht erreichbar.';
     var t = [];
-    t.push(d.filled + ' von ' + d.total + ' Feldern sind gefuellt (' + d.percent + ' %).');
+    t.push(d.filled + ' von ' + d.total + ' Feldern sind gefüllt (' + d.percent + ' %).');
     if (d.stufe) {
       t.push('Eingabetiefe ' + d.stufe + ' ist gewählt; davon kommen '
         + d.stufe_felder + ' Pflichtfelder der Wertermittlung dazu.');
@@ -118,7 +152,7 @@
     if (!d) return { text: 'Ich kann die fehlenden Felder gerade nicht lesen.', chips: [] };
     if (!d.missing.length) {
       return { text: 'Nichts fehlt. ' + d.filled + ' von ' + d.total
-        + ' Feldern sind gefuellt.', chips: [] };
+        + ' Feldern sind gefüllt.', chips: [] };
     }
     /* Nach Herkunft trennen - das sagt dem Nutzer, WOFUER es fehlt. */
     var stufe = d.missing.filter(function (m) { return m.stufe; });
@@ -203,6 +237,19 @@
       b.addEventListener('click', function () { fragenSetzen(p.frage); });
       w.appendChild(b);
     });
+
+    /* v2550 · Auswahlbox: setzt die Frage ein und springt zurueck auf den Platzhalter */
+    var sel = document.createElement('select');
+    sel.className = 'dp-cpp-sel'; sel.setAttribute('aria-label', 'Weitere Fragen an den Co-Pilot');
+    var o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Weitere Fragen …';
+    sel.appendChild(o0);
+    WEITERE.forEach(function (g) {
+      var og = document.createElement('optgroup'); og.label = g.gruppe;
+      g.fragen.forEach(function (f) { var o = document.createElement('option'); o.value = f; o.textContent = f; og.appendChild(o); });
+      sel.appendChild(og);
+    });
+    sel.addEventListener('change', function () { var f = sel.value; sel.selectedIndex = 0; if (f) fragenSetzen(f); });
+    w.appendChild(sel);
 
     bar.parentNode.insertBefore(w, bar);
     return true;
