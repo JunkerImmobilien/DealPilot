@@ -41888,3 +41888,13 @@ Gutachterprüfung vom 21.10.2026 — die Befunde, die **ohne Bewertungsentscheid
 - Andere Stellen, die N weiter „DealPilot-Formel" nennen und beim Landesmittel nicht passen: `ErtragswertService.js:785` (Abzugstext Belastbarkeit), `KiGegenrechnungService.js:153`, `frontend/marktbericht-app/app.js` `_stufeTxt` N. Die liegen beim anderen Strang. Herkunft, Etikett und Hinweis (`lzs_hinweis`) sind richtig.
 - Den vollen Bericht mit Landesmittel (Web und PDF, Darmstadt/Offenbach MFH) muss Marcel auf Staging abnehmen, sobald die Anzeige der Spanne steht.
 - Prod nicht angefasst.
+
+### v2650 · Nachernte Harvest-Takt (Teil RP/BE/BY/HB/NI-OGA, dazu SN-OGA und SH): Berlin LZS und SWF 2026 (21.10.2026, Staging)
+
+**Was:** 48 Dokumente der Harvest-Liste und die Zusatzquellen (Sachsen Grundstücksmarktbericht 2025, SH Lübeck, Herzogtum Lauenburg, Ostholstein) gegen das Register gehalten. Neu war nur Berlin: **Liegenschaftszinssätze 2026** (Dokument-id 2019, Stichtag 31.12.2025) mit einem Modellwechsel: der Zins hängt jetzt von Objektmiete UND ln(Wohn-/Nutzfläche) ab. Dazu die **Sachwertfaktoren 2026** (nicht in der Liste, derselbe Ausschuss, Stand 19.10.2026). Neue Datei `nachernte-2026-10-be.json` (18 Sätze: 6 LZS-Gebietsgruppen, SWF Teilmarkt 1 ezfh/dhh/reh/rmh und Teilmarkt 2 villa, 7 Sperren), in SAATDATEIEN eingetragen. Lizenz dl-de/zero-2-0 (Seite „Nutzungsbestimmungen“, seit 01.03.2025).
+
+**Commit:** `00d97cd9`.
+
+**Nachweis:** Alle 432 LZS-Zellen, 160 SWF-Zellen aus Teilmarkt 1 und 120 aus Teilmarkt 2 = abgedruckte Formel. Ein Rechenbeispiel ist nicht abgedruckt, deshalb dient die Formel als Prüfmaßstab. Echter Auswerter (`auswerten`) an 9 Fällen. Kette `ladeSaat` → `liegenschaftszinssatz` mfh_city 3,0 % (Jahrgang 2026 gewinnt), `sachwertfaktor` DHH Britz 1995 → 1,19 mit GND 80. saat-pruefen (Datei) RC 0, `--basislinie` RC 0, uk-flaeche RC 0, uk-wgfz RC 0. register-saat `--trocken --nur=BE` im Staging-Container: 27 Werte, 27 eindeutige Schlüssel, 0 verwaist. Nicht eingespielt.
+
+**Rest:** (1) `objektkaltmiete_eur_m2_monat` steht in keiner FELDBRÜCKE. Die Berliner LZS laufen deshalb (schon 2025) über die Rückfrage `fehlende_eingaben`. (2) Achse WNfl. wird aus `wohnflaeche` gespeist, die Nutzfläche gewerblicher Teile fehlt dort. (3) Die BRW-Grenze von Teilmarkt 1 (gute Wohnlage ab 400 m² BGF → Teilmarkt 2) prüft der Auswerter nicht, sie steht nur im Vorbehalt. `villa` wird von der Objektartwahl nicht angesteuert. (4) Baujahr nach 2002 (LZS) und ab 2021 (SWF TM2) steht im Dokument als k.A. Das steht im Geltungsbereich, der Auswerter setzt es aber nicht durch. (5) Prod nicht angefasst.
