@@ -11,7 +11,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VER = 'messe-schleife-1';
+  var VER = 'messe-schleife-1b';
   var Q = new URLSearchParams(location.search);
   var TEMPO = Math.max(0.3, Math.min(4, parseFloat(Q.get('tempo')) || 1));
   var GRUEN = '#3FA56C', ROT = '#B8625C', GOLD = 'var(--wl-c9a84c,#C9A84C)';

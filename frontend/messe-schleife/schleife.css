@@ -27,7 +27,7 @@ video{display:block;background:#0b0a08}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
 .ring circle{fill:none;stroke-width:9;stroke-linecap:round}
 .ring .bahn{stroke:#2a251a}
-.ring .wert{stroke:var(--farbe);stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset 2s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 0 10px var(--farbe))}
+.ring .wert{stroke:var(--farbe);stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset 2s cubic-bezier(.2,.8,.2,1)}
 .ring.an .wert{stroke-dashoffset:calc(100 - var(--ziel))}
 .ring-mitte{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .ring-zahl{font:700 calc(var(--px)*.36)/1 "Space Grotesk",sans-serif;letter-spacing:-.04em}
