@@ -122,6 +122,9 @@ export function eingabenAusBericht(cc, extra) {
     const wfl = r2(reWohnen / (n(ew.miete_qm) * 12));
     const istQm = n(ew.miete_ist_qm);
     einheiten.push({ nr: 'Wohnen', wfl, leer: false, vertrag_jahr: istQm != null ? r0(istQm * wfl * 12) : null, ansatz_bericht_jahr: reWohnen });
+  } else if (reWohnen != null) {
+    /* aeltere Berichte (vor v1059) fuehren keine Miete je m2: nur der Rohertrag */
+    einheiten.push({ nr: 'Wohnen', wfl: null, leer: false, vertrag_jahr: null, ansatz_bericht_jahr: reWohnen });
   }
   const sv = zeile(st, /^Stellpl/);
   const hk = zw(sw.staffel, /^= Herstellungskosten/);
@@ -135,6 +138,7 @@ export function eingabenAusBericht(cc, extra) {
     objektart: X.objektart || (cc.ref && cc.ref.property_type) || null,
     wohnen: { einheiten, markt_qm: marktQm, rohertrag_bericht_jahr: reWohnen },
     stellplaetze: sv ? { jahr: n(sv.wert), text: sv.pos } : null,
+    sonstige_ertraege: zeile(st, /sonstige Ertr/) ? zw(st, /sonstige Ertr/) : null,
     gewerbe: zw(st, /^Rohertrag Gewerbe/) != null
       ? { ansatz_jahr: zw(st, /^Rohertrag Gewerbe/), vertrag_jahr: n(X.gewerbe_vertrag_jahr), anteil_pct: n(cc.gewerbeanteil_pct) } : null,
     bwk: { verwaltung: zw(st, /^Verwaltung/), instandhaltung: zw(st, /^Instandhaltung/), mietausfall: zw(st, /^Mietausfall/),
@@ -195,8 +199,9 @@ function ohneErtragswert(E, out, grund) {
   if (vw != null && wert > vw) wert = vw;
   out.hinweise.push('Kein Ertragswert: bei Ein-/Zweifamilienhäusern und Eigentumswohnungen darf sich die Bank am '
     + (k.art === 'sachwert' ? 'Sachwert' : 'Vergleichswert') + ' orientieren - aber nur, wenn das Objekt zweifelsfrei zur Eigennutzung taugt und dauerhaft nachgefragt wird (§ 4 Abs. 2 BelWertV). Ist es vermietet, zieht die Bank dafür noch etwas ab.');
-  Object.assign(out, { verfuegbar: true, beleihungswert: Math.floor(wert / 1000) * 1000, basis: k.art + '_4_2',
-    verkehrswert: vw, sachwert: sw, vergleichswert: vg != null ? { wert: vg, ausgang: n(E.vergleichswert.wert) } : null, ertragswert: null });
+  const bwG = Math.floor(wert / 1000) * 1000;
+  Object.assign(out, { verfuegbar: true, beleihungswert: bwG, basis: k.art + '_4_2',
+    verkehrswert: vw, verkehrswert_verfahren: E.verkehrswert_verfahren || null, verhaeltnis_zum_verkehrswert_pct: vw ? r2(bwG / vw * 100) : null, sachwert: sw, vergleichswert: vg != null ? { wert: vg, ausgang: n(E.vergleichswert.wert) } : null, ertragswert: null });
   return out;
 }
 
@@ -215,7 +220,7 @@ export function beleihungswert(eingaben, parameter) {
   let reWohnen = 0, vertragFehlt = 0, leerN = 0, overN = 0, underN = 0;
   const einh = (W.einheiten || []).map((e) => {
     const wfl = n(e.wfl) || 0;
-    const nachhaltig = marktQm != null ? r0(marktQm * wfl * 12) : n(e.ansatz_bericht_jahr);
+    const nachhaltig = (marktQm != null && wfl > 0) ? r0(marktQm * wfl * 12) : n(e.ansatz_bericht_jahr);
     let ansatz, grund;
     if (e.leer) { ansatz = nachhaltig; grund = 'leer: nachhaltige Miete angesetzt'; leerN++; }
     else if (n(e.vertrag_jahr) == null) { ansatz = n(e.ansatz_bericht_jahr) ?? nachhaltig; grund = 'Vertragsmiete nicht erfasst: Ansatz des Berichts'; vertragFehlt++; }
@@ -253,7 +258,10 @@ export function beleihungswert(eingaben, parameter) {
   const instMin = sw && n(sw.hk_gebaeude) ? BELWERTV.instandhaltung_wohnen_hk * n(sw.hk_gebaeude) : 0;
   const inst = Math.max(instM || 0, instMin);
   const sonst = (teileBekannt && sumM != null) ? Math.max(0, sumM - verwM - instM - mawM) : 0;
-  let bwkEinzeln = teileBekannt ? verw + inst + maw + sonst : Math.max(sumM || 0, maw);
+  /* Nur Summe bekannt (Quote des Ausschusses, z. B. 27 %): die Quote auf den
+     Rohertrag der Bank, mindestens das Mietausfallwagnis der Anlage 1. */
+  const quoteM = (sumM != null && reBericht > 0) ? sumM / reBericht : null;
+  let bwkEinzeln = teileBekannt ? verw + inst + maw + sonst : Math.max(quoteM != null ? quoteM * reBel : (sumM || 0), mawMin);
   const bwkMin15 = BELWERTV.bwk_min_quote * reBel;
   /* Einzelansaetze bekannt: sie sind die kalkulierten Kosten (§ 11 Abs. 2 Satz 4) -
      das Mietausfallwagnis faellt mit dem Rohertrag, die Summe des Modells nicht.
@@ -261,8 +269,9 @@ export function beleihungswert(eingaben, parameter) {
   const bwk = r0(Math.max(bwkEinzeln, bwkMin15));
   const bwkWeg = bwkMin15 > bwkEinzeln ? 'mindestquote_15' : 'einzelansaetze';
   if (bwkWeg === 'mindestquote_15') hinweise.push('Bewirtschaftungskosten auf die Mindesthöhe von 15 % des Rohertrags angehoben (§ 11 Abs. 2 Satz 3): ' + de(bwk) + ' € statt ' + de(r0(bwkEinzeln)) + ' €.');
-  if (instMin > (instM || 0)) hinweise.push('Instandhaltung auf den Mindestsatz 0,5 % der Herstellungskosten angehoben (Anlage 1 BelWertV).');
-  if (!teileBekannt) hinweise.push('Einzelansätze der Bewirtschaftungskosten nicht lesbar - geprüft wurde die Summe.');
+  if (teileBekannt && instMin > (instM || 0)) hinweise.push('Instandhaltung auf den Mindestsatz 0,5 % der Herstellungskosten angehoben (Anlage 1 BelWertV).');
+  if (!teileBekannt) hinweise.push('Der Bericht führt die Bewirtschaftungskosten als Quote (' + (quoteM != null ? pct(quoteM * 100) : 'Summe') + '), nicht einzeln - geprüft wurden die Mindestquote von 15 % und das Mietausfallwagnis.');
+  if (n(E.sonstige_ertraege)) hinweise.push('Sonstige Erträge des Berichts sind nicht angesetzt - die Bank rechnet nur mit der nachhaltigen Miete.');
 
   /* ── § 12 Kapitalisierung, je Nutzung getrennt (Abs. 3 Satz 3) ── */
   const mzW = mindestzins(parameter, 'wohnen');

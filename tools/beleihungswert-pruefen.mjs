@@ -150,6 +150,17 @@ ok('V', 'Vervielfaeltiger 5 % / 20 J (Tabellenwert 12,4622)', Math.round(K.vervi
   ok('11', 'MFH ohne Ertragswert: kein Check', m.verfuegbar, false);
 }
 
+{ // 12 aelterer Bericht: BWK nur als Quote, keine Miete je m2 (gemessen an Bericht 74, Loehner Str.)
+  const cc = { ertragswert: { value_eur: 300000, rohertrag_pa_eur: 20000, bwk_pa_eur: 4800, bodenwert_eur: 100000, restnutzungsdauer_jahre: 18, liegenschaftszins_pct: 1.7,
+    staffel: [{ pos: 'Rohertrag Wohnen (marktüblich erzielbar)', wert: 20000 }, { pos: '= Rohertrag', wert: 20000 }, { pos: 'Bewirtschaftungskosten (24 % · Angabe des Gutachterausschusses)', wert: 4800 }] } };
+  const ein = K.eingabenAusBericht(cc, { objektart: 'zfh' });
+  const r = K.beleihungswert(ein, P);
+  ok('12', 'Quote-Bericht: Rohertrag aus dem Bericht', r.ertragswert.rohertrag, 20000);
+  ok('12', 'Quote-Bericht: BWK 24 %', r.ertragswert.bwk.summe, 4800);
+  ok('12', 'Quote-Bericht: Ertragswert (9.700 x V(5,5 %/18) + 100.000)', r.ertragswert.wert, 209087, 1);
+  ok('12', 'Quote-Bericht: basis ertragswert (nicht § 4 Abs. 2)', r.basis, 'ertragswert');
+}
+
 /* ── Teil 2 · Kette ueber den echten CrossCheckService ─────────────── */
 const kette = [];
 if (CCS) {
