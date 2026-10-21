@@ -455,3 +455,5 @@ body.laeuft.maus{cursor:default}
 .wahl-kanaele .wahl-rundgang img{width:220px;height:124px}
 .wahl-kanaele .wahl-rundgang h2{font-size:36px}
 .wahl-kanaele .wahl-rundgang p{font-size:19px}
+.vt .rg-titel{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gw-t .rg-weiter,.rt-t .rg-weiter{text-align:center}

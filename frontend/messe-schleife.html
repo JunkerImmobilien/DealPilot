@@ -19,7 +19,7 @@
 -->
 <script>/* Fehlerprotokoll fuer den Pruefer: window.DPS_FEHLER (Skript-, Versprechen- und Ladefehler) */
 window.DPS_FEHLER=[];addEventListener('error',function(e){DPS_FEHLER.push(e.message||('Ladefehler '+((e.target&&(e.target.currentSrc||e.target.src))||'?')))},true);addEventListener('unhandledrejection',function(e){DPS_FEHLER.push('Promise: '+(e.reason&&e.reason.message||e.reason))});</script>
-<link rel="stylesheet" href="messe-schleife/schleife.css?v=messe-schleife-5">
+<link rel="stylesheet" href="messe-schleife/schleife.css?v=messe-schleife-5b">
 </head>
 <body>
 <div id="buehne"></div>
