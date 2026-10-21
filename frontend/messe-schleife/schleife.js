@@ -14,7 +14,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VER = 'messe-schleife-4';
+  var VER = 'messe-schleife-4d';
   var Q = new URLSearchParams(location.search);
   var TEMPO = Math.max(0.3, Math.min(4, parseFloat(Q.get('tempo')) || 1));
   var GRUEN = '#3FA56C', ROT = '#B8625C', GOLD = 'var(--wl-c9a84c,#C9A84C)';
@@ -525,7 +525,7 @@
       r.appendChild(a);
     });
     w.appendChild(r);
-    w.appendChild(el('div', 'wahl-hinweis', '<b>Am Stand ohne Netz:</b> Ordner „Messe-Schleife“ auf den Rechner kopieren, <b>messe-schleife.html</b> doppelklicken, Idee anklicken (oder F11).'));
+    w.appendChild(el('div', 'wahl-hinweis', '<b>Am Stand ohne Netz:</b> Ordner „Messe-Schleife“ auf den Rechner kopieren, <b>messe-schleife.html</b> doppelklicken — der Rundgang startet sofort; <b>F</b> oder F11 für Vollbild, <b>Esc</b> hierher.'));
     buehne.appendChild(w);
     w.querySelector('.wahl-alle').href = '?idee=alle';
     document.body.classList.remove('laeuft');
