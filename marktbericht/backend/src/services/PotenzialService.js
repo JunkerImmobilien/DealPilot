@@ -313,7 +313,13 @@ export const PotenzialService = {
     const out = { verfuegbar: false, kennzeichnung: KENNZEICHNUNG, stand: new Date().toISOString().slice(0, 10) };
     if (!basis || !basis.ein) {
       const cc = (wb && wb.cross_check) || {};
-      out.grund = (cc.notes && cc.notes.find((n) => /Ertragswert/i.test(n)))
+      /* v2556 · Die erste Notiz mit „Ertragswert" war der allgemeine Hinweis
+         („Vereinfachtes Sachwert-/Ertragswertverfahren … Indikativ") - der stand
+         dann als GRUND da. Der Hinweis zaehlt nicht; der Lauf wird geloggt. */
+      const notiz = (cc.notes || []).find((n) => /Ertragswert/i.test(n) && !/^Vereinfachtes Sachwert-\/Ertragswertverfahren/.test(n));
+      const spur = Array.isArray(wb && wb.trace) ? wb.trace : [];
+      try { console.log('[potenzial] keine Ertragswert-Eingabe · ' + spur.slice(-14).map((s) => (typeof s === 'string' ? s : JSON.stringify(s)).slice(0, 160)).join(' | ')); } catch (e) { /* nur Log */ }
+      out.grund = notiz
         || 'Für dieses Objekt rechnet der Ertragswert nicht (es fehlen Pflichtangaben wie Wohnfläche, Miete oder Baujahr).';
       return out;
     }
