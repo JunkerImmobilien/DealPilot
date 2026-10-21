@@ -23,7 +23,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VER = 'messe-schleife-4b';
+  var VER = 'messe-schleife-4c';
   var Q = new URLSearchParams(location.search);
   var RATE = Math.max(0.5, Math.min(8, parseFloat(Q.get('rate')) || 1));
   var DATEI = location.protocol === 'file:';
@@ -200,7 +200,7 @@
     try { if (window.DpQr && window.DpQr.svg) qr = '<div class="rg-qr">' + window.DpQr.svg(URL_AUFRUF, { ecc: 'M', border: 2, dark: '#050505', light: '#FDFCFA' }) + '<span>Scannen und loslegen</span></div>'; } catch (e) { qr = ''; }
     return '<div class="rg-t rg-t-aufruf' + (qr ? '' : ' ohne-qr') + '"><div class="rg-aufruf-text">' + logo('rg-logo-mittel')
       + '<div class="rg-aufruf-titel">Jetzt kostenlos testen</div><div class="rg-aufruf-url gold">dealpilot.immo</div>'
-      + '<div class="rg-unter">Immobilien prüfen wie ein Pilot.</div>' + weiter + '</div>' + qr + '</div>';
+      + '<div class="rg-unter">Immobilien prüfen wie ein Pilot.</div></div>' + qr + weiter + '</div>';
   }
   var tafelOffen = false;
   function zeigeTafel(t) {
