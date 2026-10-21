@@ -302,7 +302,9 @@
     [].slice.call(host.querySelectorAll('.swk-set')).forEach(function (b) {
       var id = b.getAttribute('data-set'), st = setVon(id), an = id === g;
       b.classList.toggle('an', an);
-      b.classList.toggle('angepasst', an && !gleich(st));
+      /* v2548b · auch abweichende Score-Gewichte (Feinjustierung, Benutzerdefiniert) heißen „angepasst“ */
+      var dsAnders = !!(st.ds && window.DealScore2 && DealScore2.getActivePreset && DealScore2.getActivePreset() !== st.ds);
+      b.classList.toggle('angepasst', an && (!gleich(st) || dsAnders));
     });
   }
 
