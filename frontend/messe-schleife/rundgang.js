@@ -23,7 +23,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VER = 'messe-schleife-4a';
+  var VER = 'messe-schleife-4b';
   var Q = new URLSearchParams(location.search);
   var RATE = Math.max(0.5, Math.min(8, parseFloat(Q.get('rate')) || 1));
   var DATEI = location.protocol === 'file:';
@@ -208,7 +208,8 @@
     void tafelEl.offsetWidth;
     tafelEl.classList.add('an'); tafelOffen = true;
     kopf.classList.add('leer');
-    setTimeout(function () { if (tafelOffen) vids.forEach(function (v) { v.pause(); }); }, 900);
+    /* ist die Tafel deckend, das alte Video ausblenden — sonst scheint es beim Abblenden der Tafel durch */
+    setTimeout(function () { if (tafelOffen) vids.forEach(function (v) { v.pause(); v.classList.remove('an'); }); }, 900);
   }
   function schliesseTafel() { if (!tafelOffen) return; tafelOffen = false; tafelEl.classList.remove('an'); }
 
