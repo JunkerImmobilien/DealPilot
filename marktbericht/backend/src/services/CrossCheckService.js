@@ -1045,7 +1045,10 @@ export const CrossCheckService = {
     })();
     const _r2a = (x) => Math.round(x * 100) / 100;
     const _anker = _amtFuehrt
-      ? { qm: _r2a(_num(_amtM.miete_qm)), stufe: 'amtlich', etikett: 'amtliche Miete des Gutachterausschusses',
+      ? { qm: _r2a(_num(_amtM.miete_qm)), stufe: 'amtlich',
+          /* v2670 · Marcel 21.10.: jenseits der Groessentabelle gilt die Randklasse - im Etikett gekennzeichnet */
+          etikett: 'amtliche Miete des Gutachterausschusses' + (_amtM.ausserhalb_tabelle && _amtM.groessenklasse_kurz ? ' (' + _amtM.groessenklasse_kurz + ')' : ''),
+          groessenklasse_hinweis: _amtM.ausserhalb_tabelle ? (_amtM.ausserhalb_hinweis || null) : null,
           quelle: _amtM.quelle || 'Mietpreisübersicht des Gutachterausschusses' }
       : _satzMiete
         ? { qm: _r2a(_satzMiete.qm), stufe: 'satz_mittel', etikett: 'Ø Miete des Liegenschaftszinssatzes', feld: _satzMiete.feld,
@@ -1776,7 +1779,8 @@ export const CrossCheckService = {
           })(),
           /* v2600 · E1 · Stufe der Miete (amtlich / Ø Miete des Satzes / Angebotsmiete) */
           miete_stufe: _anker ? { code: _anker.stufe, etikett: _anker.etikett, quelle: _anker.quelle, qm: _anker.qm,
-            band_pct: MIETBAND.pct, band_art: MIETBAND.art, amtlich_nicht_fuehrend: _anker.amtlich_nicht_fuehrend || null } : null,
+            band_pct: MIETBAND.pct, band_art: MIETBAND.art, amtlich_nicht_fuehrend: _anker.amtlich_nicht_fuehrend || null,
+            groessenklasse_hinweis: _anker.groessenklasse_hinweis || null } : null,
           /* v2600 · E2/E3 · boG aus Mietabweichung und Leerstand; vorlaeufig, wo nicht beziffert */
           miete_bog: _mietBog,
           leerstand_bog: _leerBog,

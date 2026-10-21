@@ -707,6 +707,58 @@ fallB('B34', () => {
   pruefe('B', 'B34', 'ohne Anbauweise in der Umrechnung: kein Wert (grund teilmarkt)', b.verfuegbar === false && b.grund === 'teilmarkt', b.grund);
 });
 
+/* ══ v2670 · GARAGE IM NORMOBJEKT (B36) ═══════════════════════════════════════
+   Marcel 21.10.2026: enthaelt das Normobjekt eine Garage und das Objekt keine, wird
+   abgezogen - nur in der Hoehe des Ausschusses. Herford EFH/ZFH: Zeitwertspanne
+   5.000-15.000 € (Oertliche Fachinformationen 2026, S. 3) -> Untergrenze 5.000 €. */
+fallB('B36', () => {
+  if (!irwB30) return pruefe('B', 'B36', 'eingefrorener IRW', false, 'fehlt');
+  const mit = ccFall('loehner', (a) => { a[4].irw = klon(irwB30); });
+  const ohne = ccFall('loehner', (a) => { a[4].irw = klon(irwB30); a[0].garages = 0; a[0].outdoor_parking = 0; });
+  const unb = ccFall('loehner', (a) => { a[4].irw = klon(irwB30); a[0].garages = null; a[0].outdoor_parking = null; });
+  const vm = mit && mit.vergleichswert_irw, vo = ohne && ohne.vergleichswert_irw, vu = unb && unb.vergleichswert_irw;
+  wert('B', 'B36', 'Löhner mit Garage: Vergleichswert wie B30 (kein Abzug)', vm && vm.verfuegbar ? vm.vergleichswert_eur : null, 329932, 0);
+  wert('B', 'B36', 'Löhner ohne Garage: 329.932 − 5.000 (Untergrenze der Spanne des Ausschusses)', vo && vo.verfuegbar ? vo.vergleichswert_eur : null, 324932, 0);
+  pruefe('B', 'B36', 'ohne Garage: Rechenweg-Zeile „Garage des Normobjekts" −5.000 mit Spanne und Seite',
+    !!vo && vo.rechenweg.some((z) => /Garage des Normobjekts/.test(z.pos) && z.wert === -5000 && /5\.000 € bis 15\.000 €.*S\. 3/.test(z.detail)),
+    vo ? (vo.rechenweg.find((z) => /Garage/.test(z.pos)) || {}).detail : '');
+  wert('B', 'B36', 'Garage nicht angegeben: kein Abzug', vu && vu.verfuegbar ? vu.vergleichswert_eur : null, 329932, 0);
+  pruefe('B', 'B36', 'Garage nicht angegeben: Hinweis mit Betrag und Ort der Angabe',
+    !!vu && (vu.hinweise || []).some((h) => /nicht angegeben/.test(h) && /5\.000 €/.test(h)));
+});
+
+/* ══ v2670 · MIETPREISUEBERSICHT JENSEITS DER GROESSENTABELLE (B35) ══════════
+   Marcel 21.10.2026: ueber 140 m² die oberste Groessenklasse ansetzen (nicht
+   fortrechnen) und kennzeichnen; unten genauso (unter 50 m² die unterste).
+   Vorher (v2600): ausserhalb der Tabelle „nicht fuehrend", Anker = Ø Miete des Satzes. */
+let MM = null;
+try { MM = await lade('lib/mietmodell_nrw.js'); } catch (e) { MM = null; }
+fallB('B35', () => {
+  if (!MM) return pruefe('B', 'B35', 'mietmodell_nrw geladen', false, 'fehlt');
+  const mm = (wfl) => MM.marktmiete({ gemeinde: 'Hüllhorst', baujahr: 1968, wohnflaeche_qm: wfl, ags: '05770016',
+    modernisierung_klasse: 4, wohnlage: 'mittel', stichtag_jahr: 2026 });
+  const g165 = mm(165), g140 = mm(140), g40 = mm(40), g50 = mm(50), g100 = mm(100);
+  wert('B', 'B35', '165 m²: Miete = oberste Klasse (140 m²)', g165.miete_qm, g140.miete_qm, 0);
+  wert('B', 'B35', '165 m²: 6,54 × 0,9 × 0,82 = 4,83 €/m²', g165.miete_qm, 4.83, 0);
+  pruefe('B', 'B35', '165 m²: führend, gekennzeichnet „Wohnfläche über der Tabelle, oberste Größenklasse angesetzt"',
+    g165.fuehrend === true && g165.ausserhalb_tabelle === true && g165.groessenklasse === 'oberste'
+    && /^Wohnfläche über der Tabelle, oberste Größenklasse angesetzt/.test(g165.ausserhalb_hinweis || '')
+    && /oberste Größenklasse 140 m²/.test(g165.staffel[2].pos), g165.ausserhalb_hinweis || '');
+  wert('B', 'B35', '40 m²: Miete = unterste Klasse (50 m²)', g40.miete_qm, g50.miete_qm, 0);
+  pruefe('B', 'B35', '40 m²: führend, Faktor 1,20, „unterste Größenklasse angesetzt"',
+    g40.fuehrend === true && g40.groessenklasse === 'unterste' && g40.staffel[2].faktor === 1.2
+    && /^Wohnfläche unter der Tabelle, unterste Größenklasse angesetzt/.test(g40.ausserhalb_hinweis || ''), g40.ausserhalb_hinweis || '');
+  pruefe('B', 'B35', '100 m² (in der Tabelle): kein Vermerk, Faktor 0,94',
+    g100.fuehrend === true && g100.ausserhalb_tabelle === false && g100.ausserhalb_hinweis === null && g100.staffel[2].faktor === 0.94);
+  const r = ccFall('huellhorst');
+  const e = r && r.ertragswert;
+  pruefe('B', 'B35', 'Hüllhorst 165 m²: Anker amtlich 4,83, Etikett gekennzeichnet, Ist 10,00 über dem Band -> 4,83',
+    !!e && e.miete_stufe.code === 'amtlich' && e.miete_stufe.qm === 4.83
+    && /oberste Größenklasse angesetzt/.test(e.miete_stufe.etikett) && /oberste Größenklasse/.test(e.miete_stufe.groessenklasse_hinweis || ''),
+    e ? e.miete_stufe.etikett : '');
+  wert('B', 'B35', 'Hüllhorst Ertragswert (v2600: 239.000)', e ? e.value_eur : null, 218000, 0);
+});
+
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */
 const auszug = (cc) => {
   const e = (cc && cc.ertragswert) || {}, s = (cc && cc.sachwert) || {};
@@ -756,7 +808,7 @@ for (const [name, fall] of Object.entries(C.faelle || {})) {
 /* ══ AUSGABE ═════════════════════════════════════════════════════════ */
 if (ALLE) detail.forEach((z) => console.log(z));
 const titel = { A: 'amtliche Anwendungsbeispiele', B: 'Prompt-Testfälle 1–11', C: 'Demo-Objekte (eingefroren ' + (C.stand || '–') + ')' };
-console.log('wertermittlung-pruefen v2600 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
+console.log('wertermittlung-pruefen v2670 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
 for (const eb of ['A', 'B', 'C']) {
   const x = E[eb];
   console.log('  Ebene ' + eb + ' ' + titel[eb].padEnd(38) + x.faelle + ' Fälle, ' + x.werte + ' Werte, '
