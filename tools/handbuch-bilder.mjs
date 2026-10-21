@@ -52,7 +52,7 @@ for (const datei of kompDateien) {
   const A = erg.arten[art] = { beispiel: BSP[art], reiter: {} };
   const zeilen = fs.readFileSync(datei, 'utf8').split(/\r?\n/).filter(Boolean);
   const bilder = zeilen.filter((z) => z.startsWith('C|'));
-  for (const z of zeilen.filter((z) => !/^[CWEM]\|/.test(z))) {
+  for (const z of zeilen.filter((z) => !/^[CWEMP]\|/.test(z))) {
     const [sec, ids, teile] = z.split('|');
     const sichtbar = ids.split(','), nummer = {}; sichtbar.forEach((id, i) => { nummer[id] = i + 1; });
     let p = 0; const bl = teile.split(',').map(Number).map((anz, i) => { const f = sichtbar.slice(p, p + anz); p += anz; return { datei: 'hb-' + art.toLowerCase() + '-' + sec + '-' + (i + 1) + '.webp', felder: f }; });
@@ -83,6 +83,15 @@ for (const datei of kompDateien) {
     const cw = Math.min(bw - cx, Math.round((x1 - x0) * s2)), ch = Math.min(bh - cy, Math.round((y1 - y0) * s2));
     execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', finde(nr), '-vf', 'crop=' + cw + ':' + ch + ':' + cx + ':' + cy, '-c:v', 'libwebp', '-quality', '82', path.join(ZIEL, webp)]);
     n++;
+  }
+  /* P|datei|id:x:y;… - Mittelpunkte der Nummernmarken als Anteil am Bild (fuer klickbare Nummern) */
+  const marken = {};
+  for (const z of zeilen.filter((z) => z.startsWith('P|'))) {
+    const [, datei, liste] = z.split('|');
+    marken[datei] = (liste || '').split(';').filter(Boolean).map((m) => { const [id, x, y] = m.split(':'); return { id, x: +x, y: +y }; });
+  }
+  for (const R of Object.values(A.reiter)) {
+    [].concat(R.bilder || [], (R.extra && R.extra.bilder) || [], (R.mobil && R.mobil.bilder) || []).forEach((b) => { if (marken[b.datei]) b.marken = marken[b.datei]; });
   }
   for (const z of zeilen.filter((z) => z.startsWith('W|'))) {
     const [, webp, unterschrift, nr] = z.split('|');

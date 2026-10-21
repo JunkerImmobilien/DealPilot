@@ -201,7 +201,7 @@
     var ov = document.createElement('div'); ov.id = 'dphb-marken';
     ov.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2147483000';
     var lo = Infinity, hi = -Infinity, li = Infinity, re = -Infinity;
-    var schmal = innerWidth < 700;
+    var schmal = innerWidth < 700, punkte = [];
     b.ids.forEach(function (id) {
       var f = $(id) && $(id).closest('.f'); if (!f) return;
       var q = f.getBoundingClientRect();
@@ -213,6 +213,8 @@
       /* schmal: die Marke sitzt INNEN am rechten Rand - links waere sie abgeschnitten */
       n.style.cssText = 'position:fixed;left:' + (schmal ? q.right - 34 : q.left - 22) + 'px;top:' + (q.top - 12) + 'px;min-width:24px;height:24px;padding:0 5px;box-sizing:border-box;border-radius:12px;background:#050505;color:var(--wl-e8cc7a, #E8CC7A);border:2px solid var(--wl-c9a84c, #C9A84C);font:700 12px/20px "JetBrains Mono",monospace;text-align:center';
       ov.appendChild(k); ov.appendChild(n);
+      /* Mittelpunkt der Nummernmarke - die Seite legt dort eine klickbare Flaeche ueber das Bild */
+      punkte.push({ id: id, x: (schmal ? q.right - 34 : q.left - 22) + 12, y: q.top });
     });
     document.body.appendChild(ov); _ov = ov;
     var sr = s.getBoundingClientRect();
@@ -220,7 +222,9 @@
     /* Bildanfang = Rahmenanfang (bei Kartenbeginn mit Kartentitel) */
     var y0 = Math.max(frei + 2, Math.min(lo - 22, b.oben - sc.scrollTop + top0 - 8)), y1 = Math.min(innerHeight, hi + 22);
     var f = (fw || innerWidth) / innerWidth;
-    return { css: [x0, y0, x1, y1].map(Math.round), rahmen: [x0 * f, y0 * f, x1 * f, y1 * f].map(Math.round), datei: r.dateien[i], felder: b.ids.length };
+    var marken = punkte.map(function (m) { return m.id + ":" + ((m.x - x0) / (x1 - x0)).toFixed(4) + ":" + ((m.y - y0) / (y1 - y0)).toFixed(4); }).join(";");
+    (ERG.marken = ERG.marken || {})[r.dateien[i]] = marken;
+    return { marken: marken, css: [x0, y0, x1, y1].map(Math.round), rahmen: [x0 * f, y0 * f, x1 * f, y1 * f].map(Math.round), datei: r.dateien[i], felder: b.ids.length };
   }
 
   /* ── Auswahl: was die Zusatzfelder einblendet ──
