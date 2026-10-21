@@ -19,7 +19,7 @@ window.DP_HANDBUCH = {
   "pdf-anlage-bmf.js": "41997cf31f29fb07",
   "pdf-kaufpreisaufteilung.js": "fe5f492746a957c4",
   "frontend-konstanten.json": "494c505bc98da6d7",
-  "aufnahme.json": "b66220f42d1ab6b4"
+  "aufnahme.json": "433c9aa7f5c9ec56"
  },
  "reiter": [
   {
@@ -7371,6 +7371,98 @@ window.DP_HANDBUCH = {
         "gsfl",
         "mea",
         "kuerzel"
+       ],
+       "marken": [
+        {
+         "id": "plz",
+         "x": 0.024,
+         "y": 0.0935
+        },
+        {
+         "id": "ort",
+         "x": 0.252,
+         "y": 0.0935
+        },
+        {
+         "id": "str",
+         "x": 0.024,
+         "y": 0.1871
+        },
+        {
+         "id": "hnr",
+         "x": 0.252,
+         "y": 0.1871
+        },
+        {
+         "id": "objart",
+         "x": 0.024,
+         "y": 0.2806
+        },
+        {
+         "id": "nutzungsart",
+         "x": 0.252,
+         "y": 0.2806
+        },
+        {
+         "id": "wfl",
+         "x": 0.024,
+         "y": 0.3751
+        },
+        {
+         "id": "zimmer",
+         "x": 0.252,
+         "y": 0.3751
+        },
+        {
+         "id": "baujahr",
+         "x": 0.024,
+         "y": 0.4687
+        },
+        {
+         "id": "etage",
+         "x": 0.252,
+         "y": 0.4687
+        },
+        {
+         "id": "etagen_ges",
+         "x": 0.024,
+         "y": 0.5622
+        },
+        {
+         "id": "ds2_zustand",
+         "x": 0.252,
+         "y": 0.5622
+        },
+        {
+         "id": "standardstufe",
+         "x": 0.024,
+         "y": 0.6597
+        },
+        {
+         "id": "ds2_energie",
+         "x": 0.252,
+         "y": 0.6597
+        },
+        {
+         "id": "vermstand",
+         "x": 0.024,
+         "y": 0.7582
+        },
+        {
+         "id": "gsfl",
+         "x": 0.252,
+         "y": 0.7582
+        },
+        {
+         "id": "mea",
+         "x": 0.024,
+         "y": 0.8517
+        },
+        {
+         "id": "kuerzel",
+         "x": 0.252,
+         "y": 0.8517
+        }
        ]
       },
       {
@@ -7383,6 +7475,43 @@ window.DP_HANDBUCH = {
         "wirtschaftlicher_uebergang",
         "halter",
         "mand_ueberf_cb"
+       ],
+       "marken": [
+        {
+         "id": "thesis",
+         "x": 0.024,
+         "y": 0.038
+        },
+        {
+         "id": "risiken",
+         "x": 0.024,
+         "y": 0.225
+        },
+        {
+         "id": "exitstr",
+         "x": 0.024,
+         "y": 0.413
+        },
+        {
+         "id": "kaufdat",
+         "x": 0.024,
+         "y": 0.675
+        },
+        {
+         "id": "wirtschaftlicher_uebergang",
+         "x": 0.252,
+         "y": 0.675
+        },
+        {
+         "id": "halter",
+         "x": 0.024,
+         "y": 0.805
+        },
+        {
+         "id": "mand_ueberf_cb",
+         "x": 0.024,
+         "y": 0.934
+        }
        ]
       },
       {
@@ -7390,6 +7519,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "brw",
         "brw_stichtag"
+       ],
+       "marken": [
+        {
+         "id": "brw",
+         "x": 0.517,
+         "y": 0.293
+        },
+        {
+         "id": "brw_stichtag",
+         "x": 0.517,
+         "y": 0.738
+        }
        ]
       },
       {
@@ -7421,6 +7562,138 @@ window.DP_HANDBUCH = {
         "eq_elevator",
         "eq_guest_wc",
         "eq_store_room"
+       ],
+       "marken": [
+        {
+         "id": "eq_walls",
+         "x": 0.23,
+         "y": 0.129
+        },
+        {
+         "id": "mod_aussenwand",
+         "x": 0.537,
+         "y": 0.129
+        },
+        {
+         "id": "ausst_aussenwaende",
+         "x": 0.762,
+         "y": 0.129
+        },
+        {
+         "id": "eq_roof",
+         "x": 0.23,
+         "y": 0.189
+        },
+        {
+         "id": "mod_dach",
+         "x": 0.537,
+         "y": 0.189
+        },
+        {
+         "id": "ausst_dach",
+         "x": 0.762,
+         "y": 0.189
+        },
+        {
+         "id": "eq_windows",
+         "x": 0.23,
+         "y": 0.249
+        },
+        {
+         "id": "mod_fenster",
+         "x": 0.537,
+         "y": 0.249
+        },
+        {
+         "id": "ausst_fenster",
+         "x": 0.762,
+         "y": 0.249
+        },
+        {
+         "id": "eq_heating",
+         "x": 0.23,
+         "y": 0.308
+        },
+        {
+         "id": "mod_heizung",
+         "x": 0.537,
+         "y": 0.308
+        },
+        {
+         "id": "ausst_heizung",
+         "x": 0.762,
+         "y": 0.308
+        },
+        {
+         "id": "eq_bath",
+         "x": 0.23,
+         "y": 0.368
+        },
+        {
+         "id": "mod_baeder",
+         "x": 0.537,
+         "y": 0.368
+        },
+        {
+         "id": "ausst_sanitaer",
+         "x": 0.762,
+         "y": 0.368
+        },
+        {
+         "id": "eq_floor",
+         "x": 0.23,
+         "y": 0.427
+        },
+        {
+         "id": "ausst_fussboeden",
+         "x": 0.762,
+         "y": 0.427
+        },
+        {
+         "id": "mod_innenausbau",
+         "x": 0.537,
+         "y": 0.487
+        },
+        {
+         "id": "ausst_innenwaende",
+         "x": 0.762,
+         "y": 0.487
+        },
+        {
+         "id": "ausst_decken",
+         "x": 0.762,
+         "y": 0.547
+        },
+        {
+         "id": "mod_leitungen",
+         "x": 0.537,
+         "y": 0.606
+        },
+        {
+         "id": "ausst_technik",
+         "x": 0.762,
+         "y": 0.606
+        },
+        {
+         "id": "mod_grundriss",
+         "x": 0.537,
+         "y": 0.666
+        },
+        {
+         "id": "eq_elevator",
+         "x": 0.024,
+         "y": 0.901
+        },
+        {
+         "id": "eq_guest_wc",
+         "x": 0.339,
+         "y": 0.901
+        },
+        {
+         "id": "eq_store_room",
+         "x": 0.654,
+         "y": 0.901
+        }
        ]
       },
       {
@@ -7446,6 +7719,108 @@ window.DP_HANDBUCH = {
         "ds2_nachfrage",
         "ds2_wertsteigerung",
         "ds2_entwicklung"
+       ],
+       "marken": [
+        {
+         "id": "bad_anz",
+         "x": 0.024,
+         "y": 0.175
+        },
+        {
+         "id": "balkon_flae",
+         "x": 0.339,
+         "y": 0.175
+        },
+        {
+         "id": "garagen",
+         "x": 0.654,
+         "y": 0.175
+        },
+        {
+         "id": "stellpl_aussen",
+         "x": 0.024,
+         "y": 0.261
+        },
+        {
+         "id": "modernis",
+         "x": 0.339,
+         "y": 0.261
+        },
+        {
+         "id": "baustatus",
+         "x": 0.654,
+         "y": 0.261
+        },
+        {
+         "id": "gemarkung",
+         "x": 0.024,
+         "y": 0.348
+        },
+        {
+         "id": "flur",
+         "x": 0.339,
+         "y": 0.348
+        },
+        {
+         "id": "flurstueck",
+         "x": 0.654,
+         "y": 0.348
+        },
+        {
+         "id": "hinterland_qm",
+         "x": 0.024,
+         "y": 0.434
+        },
+        {
+         "id": "hinterland_eur_qm",
+         "x": 0.339,
+         "y": 0.434
+        },
+        {
+         "id": "hinterland_rentierlich",
+         "x": 0.654,
+         "y": 0.434
+        },
+        {
+         "id": "erbpacht",
+         "x": 0.024,
+         "y": 0.527
+        },
+        {
+         "id": "lageklasse",
+         "x": 0.024,
+         "y": 0.72
+        },
+        {
+         "id": "makrolage",
+         "x": 0.339,
+         "y": 0.72
+        },
+        {
+         "id": "mikrolage",
+         "x": 0.654,
+         "y": 0.72
+        },
+        {
+         "id": "ds2_bevoelkerung",
+         "x": 0.024,
+         "y": 0.81
+        },
+        {
+         "id": "ds2_nachfrage",
+         "x": 0.339,
+         "y": 0.81
+        },
+        {
+         "id": "ds2_wertsteigerung",
+         "x": 0.654,
+         "y": 0.81
+        },
+        {
+         "id": "ds2_entwicklung",
+         "x": 0.024,
+         "y": 0.9
+        }
        ]
       },
       {
@@ -7461,6 +7836,58 @@ window.DP_HANDBUCH = {
         "zb_soll_ab",
         "zb_ziel_qm",
         "zb_ziel_wann"
+       ],
+       "marken": [
+        {
+         "id": "bankval",
+         "x": 0.024,
+         "y": 0.026
+        },
+        {
+         "id": "svwert",
+         "x": 0.339,
+         "y": 0.026
+        },
+        {
+         "id": "wert_soll",
+         "x": 0.654,
+         "y": 0.026
+        },
+        {
+         "id": "notizen",
+         "x": 0.515,
+         "y": 0.223
+        },
+        {
+         "id": "zb_fertig_jahr",
+         "x": 0.024,
+         "y": 0.564
+        },
+        {
+         "id": "zb_vgl_qm",
+         "x": 0.024,
+         "y": 0.707
+        },
+        {
+         "id": "zb_soll_qm",
+         "x": 0.339,
+         "y": 0.707
+        },
+        {
+         "id": "zb_soll_ab",
+         "x": 0.654,
+         "y": 0.707
+        },
+        {
+         "id": "zb_ziel_qm",
+         "x": 0.024,
+         "y": 0.818
+        },
+        {
+         "id": "zb_ziel_wann",
+         "x": 0.024,
+         "y": 0.904
+        }
        ]
       },
       {
@@ -7480,6 +7907,78 @@ window.DP_HANDBUCH = {
         "garagen_bgf_qm",
         "garagen_stufe",
         "aussenanlagen_pct"
+       ],
+       "marken": [
+        {
+         "id": "bgf",
+         "x": 0.024,
+         "y": 0.252
+        },
+        {
+         "id": "grundriss",
+         "x": 0.339,
+         "y": 0.252
+        },
+        {
+         "id": "mod_punkte",
+         "x": 0.654,
+         "y": 0.252
+        },
+        {
+         "id": "sachwertfaktor",
+         "x": 0.024,
+         "y": 0.441
+        },
+        {
+         "id": "uk_flaeche",
+         "x": 0.339,
+         "y": 0.441
+        },
+        {
+         "id": "wgfz_objekt",
+         "x": 0.654,
+         "y": 0.441
+        },
+        {
+         "id": "stellplatz_miete_monat",
+         "x": 0.024,
+         "y": 0.531
+        },
+        {
+         "id": "sonstige_jahr",
+         "x": 0.339,
+         "y": 0.531
+        },
+        {
+         "id": "nhk_haus",
+         "x": 0.024,
+         "y": 0.737
+        },
+        {
+         "id": "nhk_geschosse",
+         "x": 0.339,
+         "y": 0.737
+        },
+        {
+         "id": "nhk_dach",
+         "x": 0.654,
+         "y": 0.737
+        },
+        {
+         "id": "garagen_bgf_qm",
+         "x": 0.024,
+         "y": 0.9
+        },
+        {
+         "id": "garagen_stufe",
+         "x": 0.339,
+         "y": 0.9
+        },
+        {
+         "id": "aussenanlagen_pct",
+         "x": 0.654,
+         "y": 0.9
+        }
        ]
       },
       {
@@ -7496,6 +7995,63 @@ window.DP_HANDBUCH = {
         "brw_manuell",
         "brw_anpassung_pct",
         "brw_anpassung_grund"
+       ],
+       "marken": [
+        {
+         "id": "aussenanlagen",
+         "x": 0.024,
+         "y": 0.1804
+        },
+        {
+         "id": "bes_bauteile",
+         "x": 0.024,
+         "y": 0.4166
+        },
+        {
+         "id": "btl_gauben",
+         "x": 0.339,
+         "y": 0.4166
+        },
+        {
+         "id": "btl_balkone",
+         "x": 0.654,
+         "y": 0.4166
+        },
+        {
+         "id": "btl_vordach",
+         "x": 0.024,
+         "y": 0.5284
+        },
+        {
+         "id": "btl_terrassen",
+         "x": 0.339,
+         "y": 0.5284
+        },
+        {
+         "id": "btl_sonstige",
+         "x": 0.654,
+         "y": 0.5284
+        },
+        {
+         "id": "lzs_pct",
+         "x": 0.024,
+         "y": 0.7646
+        },
+        {
+         "id": "brw_manuell",
+         "x": 0.339,
+         "y": 0.7646
+        },
+        {
+         "id": "brw_anpassung_pct",
+         "x": 0.654,
+         "y": 0.7646
+        },
+        {
+         "id": "brw_anpassung_grund",
+         "x": 0.024,
+         "y": 0.8763
+        }
        ]
       },
       {
@@ -7507,6 +8063,33 @@ window.DP_HANDBUCH = {
         "erb_zs_ang",
         "erb_entsch",
         "erb_wert_ist_erb"
+       ],
+       "marken": [
+        {
+         "id": "erbbauzins",
+         "x": 0.024,
+         "y": 0.103
+        },
+        {
+         "id": "erb_restlz",
+         "x": 0.497,
+         "y": 0.103
+        },
+        {
+         "id": "erb_zs_ang",
+         "x": 0.024,
+         "y": 0.458
+        },
+        {
+         "id": "erb_entsch",
+         "x": 0.497,
+         "y": 0.458
+        },
+        {
+         "id": "erb_wert_ist_erb",
+         "x": 0.024,
+         "y": 0.812
+        }
        ]
       }
      ],
@@ -7519,6 +8102,33 @@ window.DP_HANDBUCH = {
         "str",
         "hnr",
         "objart"
+       ],
+       "marken": [
+        {
+         "id": "plz",
+         "x": 0.425,
+         "y": 0.203
+        },
+        {
+         "id": "ort",
+         "x": 0.827,
+         "y": 0.203
+        },
+        {
+         "id": "str",
+         "x": 0.626,
+         "y": 0.46
+        },
+        {
+         "id": "hnr",
+         "x": 0.827,
+         "y": 0.46
+        },
+        {
+         "id": "objart",
+         "x": 0.827,
+         "y": 0.717
+        }
        ]
       },
       {
@@ -7527,6 +8137,23 @@ window.DP_HANDBUCH = {
         "nutzungsart",
         "wfl",
         "zimmer"
+       ],
+       "marken": [
+        {
+         "id": "nutzungsart",
+         "x": 0.827,
+         "y": 0.082
+        },
+        {
+         "id": "wfl",
+         "x": 0.827,
+         "y": 0.378
+        },
+        {
+         "id": "zimmer",
+         "x": 0.827,
+         "y": 0.674
+        }
        ]
       }
      ]
@@ -7715,6 +8342,78 @@ window.DP_HANDBUCH = {
         "san",
         "san_ust",
         "moebl"
+       ],
+       "marken": [
+        {
+         "id": "kp",
+         "x": 0.024,
+         "y": 0.115
+        },
+        {
+         "id": "makler_p",
+         "x": 0.024,
+         "y": 0.25
+        },
+        {
+         "id": "makler_e",
+         "x": 0.251,
+         "y": 0.25
+        },
+        {
+         "id": "notar_p",
+         "x": 0.024,
+         "y": 0.366
+        },
+        {
+         "id": "notar_e",
+         "x": 0.251,
+         "y": 0.366
+        },
+        {
+         "id": "gba_p",
+         "x": 0.024,
+         "y": 0.482
+        },
+        {
+         "id": "gba_e",
+         "x": 0.251,
+         "y": 0.482
+        },
+        {
+         "id": "gest_p",
+         "x": 0.024,
+         "y": 0.597
+        },
+        {
+         "id": "gest_e",
+         "x": 0.251,
+         "y": 0.597
+        },
+        {
+         "id": "ji_p",
+         "x": 0.024,
+         "y": 0.713
+        },
+        {
+         "id": "ji_e",
+         "x": 0.251,
+         "y": 0.713
+        },
+        {
+         "id": "san",
+         "x": 0.515,
+         "y": 0.13
+        },
+        {
+         "id": "san_ust",
+         "x": 0.515,
+         "y": 0.276
+        },
+        {
+         "id": "moebl",
+         "x": 0.515,
+         "y": 0.839
+        }
        ]
       },
       {
@@ -7727,6 +8426,38 @@ window.DP_HANDBUCH = {
         "inv_pv",
         "inv_stellplatz",
         "inv_sonst"
+       ],
+       "marken": [
+        {
+         "id": "inv_kueche",
+         "x": 0.515,
+         "y": 0.126
+        },
+        {
+         "id": "inv_moebel",
+         "x": 0.666,
+         "y": 0.126
+        },
+        {
+         "id": "inv_geraete",
+         "x": 0.818,
+         "y": 0.126
+        },
+        {
+         "id": "inv_pv",
+         "x": 0.515,
+         "y": 0.534
+        },
+        {
+         "id": "inv_stellplatz",
+         "x": 0.666,
+         "y": 0.534
+        },
+        {
+         "id": "inv_sonst",
+         "x": 0.818,
+         "y": 0.534
+        }
        ]
       }
      ],
@@ -7736,6 +8467,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "kp",
         "makler_p"
+       ],
+       "marken": [
+        {
+         "id": "kp",
+         "x": 0.827,
+         "y": 0.257
+        },
+        {
+         "id": "makler_p",
+         "x": 0.827,
+         "y": 0.643
+        }
        ]
       }
      ]
@@ -7857,6 +8600,23 @@ window.DP_HANDBUCH = {
         "nkm",
         "ze",
         "umlagef"
+       ],
+       "marken": [
+        {
+         "id": "nkm",
+         "x": 0.024,
+         "y": 0.245
+        },
+        {
+         "id": "ze",
+         "x": 0.024,
+         "y": 0.453
+        },
+        {
+         "id": "umlagef",
+         "x": 0.024,
+         "y": 0.734
+        }
        ]
       },
       {
@@ -7864,6 +8624,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "ds2_marktmiete",
         "ds2_mietausfall"
+       ],
+       "marken": [
+        {
+         "id": "ds2_marktmiete",
+         "x": 0.024,
+         "y": 0.112
+        },
+        {
+         "id": "ds2_mietausfall",
+         "x": 0.024,
+         "y": 0.568
+        }
        ]
       },
       {
@@ -7877,6 +8649,48 @@ window.DP_HANDBUCH = {
         "me_anz",
         "me_int",
         "me_pct"
+       ],
+       "marken": [
+        {
+         "id": "mv_art",
+         "x": 0.515,
+         "y": 0.095
+        },
+        {
+         "id": "mv_beginn",
+         "x": 0.515,
+         "y": 0.176
+        },
+        {
+         "id": "mv_letzte_erhoehung",
+         "x": 0.515,
+         "y": 0.257
+        },
+        {
+         "id": "mv_letzte_erhoehung_betrag",
+         "x": 0.515,
+         "y": 0.338
+        },
+        {
+         "id": "me_soll",
+         "x": 0.515,
+         "y": 0.731
+        },
+        {
+         "id": "me_anz",
+         "x": 0.743,
+         "y": 0.731
+        },
+        {
+         "id": "me_int",
+         "x": 0.515,
+         "y": 0.856
+        },
+        {
+         "id": "me_pct",
+         "x": 0.743,
+         "y": 0.856
+        }
        ]
       }
      ],
@@ -7886,6 +8700,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "nkm",
         "ze"
+       ],
+       "marken": [
+        {
+         "id": "nkm",
+         "x": 0.827,
+         "y": 0.245
+        },
+        {
+         "id": "ze",
+         "x": 0.827,
+         "y": 0.523
+        }
        ]
       }
      ]
@@ -8215,6 +9041,63 @@ window.DP_HANDBUCH = {
         "d1",
         "d1z",
         "d1t"
+       ],
+       "marken": [
+        {
+         "id": "bank_inst",
+         "x": 0.024,
+         "y": 0.118
+        },
+        {
+         "id": "d1_vertrag",
+         "x": 0.251,
+         "y": 0.118
+        },
+        {
+         "id": "d1_vertragsdatum",
+         "x": 0.024,
+         "y": 0.201
+        },
+        {
+         "id": "d1_type",
+         "x": 0.024,
+         "y": 0.286
+        },
+        {
+         "id": "d1_auszahl",
+         "x": 0.251,
+         "y": 0.286
+        },
+        {
+         "id": "ek",
+         "x": 0.024,
+         "y": 0.386
+        },
+        {
+         "id": "ek_ist_nk",
+         "x": 0.024,
+         "y": 0.466
+        },
+        {
+         "id": "ek_inkl_nk",
+         "x": 0.024,
+         "y": 0.511
+        },
+        {
+         "id": "d1",
+         "x": 0.024,
+         "y": 0.553
+        },
+        {
+         "id": "d1z",
+         "x": 0.024,
+         "y": 0.832
+        },
+        {
+         "id": "d1t",
+         "x": 0.251,
+         "y": 0.832
+        }
        ]
       },
       {
@@ -8222,6 +9105,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "d1_bindj",
         "d1_anschl_enable"
+       ],
+       "marken": [
+        {
+         "id": "d1_bindj",
+         "x": 0.024,
+         "y": 0.067
+        },
+        {
+         "id": "d1_anschl_enable",
+         "x": 0.024,
+         "y": 0.8726
+        }
        ]
       },
       {
@@ -8240,6 +9135,68 @@ window.DP_HANDBUCH = {
         "bspar_zins",
         "bspar_dar_z",
         "bspar_dar_t"
+       ],
+       "marken": [
+        {
+         "id": "anschl_z",
+         "x": 0.024,
+         "y": 0.026
+        },
+        {
+         "id": "anschl_t",
+         "x": 0.251,
+         "y": 0.026
+        },
+        {
+         "id": "anschl_bj",
+         "x": 0.251,
+         "y": 0.102
+        },
+        {
+         "id": "bspar_inst",
+         "x": 0.024,
+         "y": 0.452
+        },
+        {
+         "id": "bspar_vertrag",
+         "x": 0.251,
+         "y": 0.452
+        },
+        {
+         "id": "bspar_vertragsdatum",
+         "x": 0.024,
+         "y": 0.541
+        },
+        {
+         "id": "bspar_sum",
+         "x": 0.024,
+         "y": 0.617
+        },
+        {
+         "id": "bspar_rate",
+         "x": 0.251,
+         "y": 0.617
+        },
+        {
+         "id": "bspar_quote_min",
+         "x": 0.024,
+         "y": 0.692
+        },
+        {
+         "id": "bspar_zins",
+         "x": 0.251,
+         "y": 0.692
+        },
+        {
+         "id": "bspar_dar_z",
+         "x": 0.024,
+         "y": 0.874
+        },
+        {
+         "id": "bspar_dar_t",
+         "x": 0.251,
+         "y": 0.874
+        }
        ]
       },
       {
@@ -8259,6 +9216,73 @@ window.DP_HANDBUCH = {
         "d2_anschl_enable",
         "d2_az",
         "d2_at"
+       ],
+       "marken": [
+        {
+         "id": "d2_type",
+         "x": 0.024,
+         "y": 0.036
+        },
+        {
+         "id": "d2_inst",
+         "x": 0.251,
+         "y": 0.036
+        },
+        {
+         "id": "d2_vertrag",
+         "x": 0.024,
+         "y": 0.139
+        },
+        {
+         "id": "d2_bspar",
+         "x": 0.251,
+         "y": 0.139
+        },
+        {
+         "id": "d2_auszahl",
+         "x": 0.024,
+         "y": 0.243
+        },
+        {
+         "id": "d2_vertragsdatum",
+         "x": 0.251,
+         "y": 0.243
+        },
+        {
+         "id": "d2",
+         "x": 0.024,
+         "y": 0.346
+        },
+        {
+         "id": "d2z",
+         "x": 0.024,
+         "y": 0.45
+        },
+        {
+         "id": "d2t",
+         "x": 0.251,
+         "y": 0.45
+        },
+        {
+         "id": "d2_bindj",
+         "x": 0.024,
+         "y": 0.591
+        },
+        {
+         "id": "d2_anschl_enable",
+         "x": 0.024,
+         "y": 0.801
+        },
+        {
+         "id": "d2_az",
+         "x": 0.024,
+         "y": 0.867
+        },
+        {
+         "id": "d2_at",
+         "x": 0.251,
+         "y": 0.867
+        }
        ]
       }
      ],
@@ -8268,6 +9292,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "bank_inst",
         "d1_vertrag"
+       ],
+       "marken": [
+        {
+         "id": "bank_inst",
+         "x": 0.827,
+         "y": 0.394
+        },
+        {
+         "id": "d1_vertrag",
+         "x": 0.827,
+         "y": 0.682
+        }
        ]
       }
      ]
@@ -8439,12 +9475,56 @@ window.DP_HANDBUCH = {
         "weg_r",
         "eigen_r",
         "mietausfall"
+       ],
+       "marken": [
+        {
+         "id": "hg_ul",
+         "x": 0.024,
+         "y": 0.089
+        },
+        {
+         "id": "grundsteuer",
+         "x": 0.024,
+         "y": 0.163
+        },
+        {
+         "id": "ul_sonst",
+         "x": 0.024,
+         "y": 0.238
+        },
+        {
+         "id": "hg_nul",
+         "x": 0.024,
+         "y": 0.511
+        },
+        {
+         "id": "weg_r",
+         "x": 0.024,
+         "y": 0.59
+        },
+        {
+         "id": "eigen_r",
+         "x": 0.024,
+         "y": 0.825
+        },
+        {
+         "id": "mietausfall",
+         "x": 0.024,
+         "y": 0.904
+        }
        ]
       },
       {
        "datei": "hb-etw-s4-2.webp",
        "felder": [
         "nul_sonst"
+       ],
+       "marken": [
+        {
+         "id": "nul_sonst",
+         "x": 0.024,
+         "y": 0.213
+        }
        ]
       },
       {
@@ -8458,6 +9538,48 @@ window.DP_HANDBUCH = {
         "kp3l",
         "kp4",
         "kp4l"
+       ],
+       "marken": [
+        {
+         "id": "kp1",
+         "x": 0.515,
+         "y": 0.067
+        },
+        {
+         "id": "kp1l",
+         "x": 0.743,
+         "y": 0.067
+        },
+        {
+         "id": "kp2",
+         "x": 0.515,
+         "y": 0.295
+        },
+        {
+         "id": "kp2l",
+         "x": 0.743,
+         "y": 0.295
+        },
+        {
+         "id": "kp3",
+         "x": 0.515,
+         "y": 0.524
+        },
+        {
+         "id": "kp3l",
+         "x": 0.743,
+         "y": 0.524
+        },
+        {
+         "id": "kp4",
+         "x": 0.515,
+         "y": 0.753
+        },
+        {
+         "id": "kp4l",
+         "x": 0.743,
+         "y": 0.753
+        }
        ]
       },
       {
@@ -8466,6 +9588,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "bwk_ul_pct",
         "bwk_nul_pct"
+       ],
+       "marken": [
+        {
+         "id": "bwk_ul_pct",
+         "x": 0.024,
+         "y": 0.345
+        },
+        {
+         "id": "bwk_nul_pct",
+         "x": 0.024,
+         "y": 0.641
+        }
        ]
       }
      ],
@@ -8567,6 +9701,38 @@ window.DP_HANDBUCH = {
         "afa_satz",
         "geb_ant",
         "afa_sonder7b_aktiv"
+       ],
+       "marken": [
+        {
+         "id": "zve",
+         "x": 0.024,
+         "y": 0.205
+        },
+        {
+         "id": "grenz",
+         "x": 0.497,
+         "y": 0.205
+        },
+        {
+         "id": "grenz_auto",
+         "x": 0.024,
+         "y": 0.285
+        },
+        {
+         "id": "afa_satz",
+         "x": 0.024,
+         "y": 0.634
+        },
+        {
+         "id": "geb_ant",
+         "x": 0.497,
+         "y": 0.634
+        },
+        {
+         "id": "afa_sonder7b_aktiv",
+         "x": 0.035,
+         "y": 0.937
+        }
        ]
       },
       {
@@ -8577,6 +9743,28 @@ window.DP_HANDBUCH = {
         "afa_sonder7b_baukosten",
         "afa_sonder7b_vermietung",
         "afa_sonder7b_neubau"
+       ],
+       "marken": [
+        {
+         "id": "afa_sonder7b_eh40",
+         "x": 0.043,
+         "y": 0.115
+        },
+        {
+         "id": "afa_sonder7b_baukosten",
+         "x": 0.043,
+         "y": 0.315
+        },
+        {
+         "id": "afa_sonder7b_vermietung",
+         "x": 0.043,
+         "y": 0.516
+        },
+        {
+         "id": "afa_sonder7b_neubau",
+         "x": 0.043,
+         "y": 0.716
+        }
        ]
       }
      ],
@@ -9627,6 +10815,93 @@ window.DP_HANDBUCH = {
         "gsfl",
         "kuerzel",
         "thesis"
+       ],
+       "marken": [
+        {
+         "id": "plz",
+         "x": 0.024,
+         "y": 0.0928
+        },
+        {
+         "id": "ort",
+         "x": 0.252,
+         "y": 0.0928
+        },
+        {
+         "id": "str",
+         "x": 0.024,
+         "y": 0.1868
+        },
+        {
+         "id": "hnr",
+         "x": 0.252,
+         "y": 0.1868
+        },
+        {
+         "id": "objart",
+         "x": 0.024,
+         "y": 0.2808
+        },
+        {
+         "id": "nutzungsart",
+         "x": 0.252,
+         "y": 0.2808
+        },
+        {
+         "id": "wfl",
+         "x": 0.024,
+         "y": 0.3758
+        },
+        {
+         "id": "zimmer",
+         "x": 0.252,
+         "y": 0.3758
+        },
+        {
+         "id": "baujahr",
+         "x": 0.024,
+         "y": 0.4698
+        },
+        {
+         "id": "etagen_ges",
+         "x": 0.252,
+         "y": 0.4698
+        },
+        {
+         "id": "ds2_zustand",
+         "x": 0.024,
+         "y": 0.5638
+        },
+        {
+         "id": "standardstufe",
+         "x": 0.252,
+         "y": 0.5638
+        },
+        {
+         "id": "ds2_energie",
+         "x": 0.024,
+         "y": 0.6618
+        },
+        {
+         "id": "vermstand",
+         "x": 0.252,
+         "y": 0.6618
+        },
+        {
+         "id": "gsfl",
+         "x": 0.024,
+         "y": 0.7598
+        },
+        {
+         "id": "kuerzel",
+         "x": 0.252,
+         "y": 0.7598
+        },
+        {
+         "id": "thesis",
+         "x": 0.024,
+         "y": 0.8548
+        }
        ]
       },
       {
@@ -9638,6 +10913,38 @@ window.DP_HANDBUCH = {
         "wirtschaftlicher_uebergang",
         "halter",
         "mand_ueberf_cb"
+       ],
+       "marken": [
+        {
+         "id": "risiken",
+         "x": 0.024,
+         "y": 0.0481
+        },
+        {
+         "id": "exitstr",
+         "x": 0.024,
+         "y": 0.2791
+        },
+        {
+         "id": "kaufdat",
+         "x": 0.024,
+         "y": 0.6031
+        },
+        {
+         "id": "wirtschaftlicher_uebergang",
+         "x": 0.252,
+         "y": 0.6031
+        },
+        {
+         "id": "halter",
+         "x": 0.024,
+         "y": 0.7621
+        },
+        {
+         "id": "mand_ueberf_cb",
+         "x": 0.024,
+         "y": 0.9211
+        }
        ]
       },
       {
@@ -9645,6 +10952,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "brw",
         "brw_stichtag"
+       ],
+       "marken": [
+        {
+         "id": "brw",
+         "x": 0.517,
+         "y": 0.2898
+        },
+        {
+         "id": "brw_stichtag",
+         "x": 0.517,
+         "y": 0.7348
+        }
        ]
       },
       {
@@ -9676,6 +10995,138 @@ window.DP_HANDBUCH = {
         "eq_elevator",
         "eq_guest_wc",
         "eq_store_room"
+       ],
+       "marken": [
+        {
+         "id": "eq_walls",
+         "x": 0.23,
+         "y": 0.1279
+        },
+        {
+         "id": "mod_aussenwand",
+         "x": 0.537,
+         "y": 0.1279
+        },
+        {
+         "id": "ausst_aussenwaende",
+         "x": 0.762,
+         "y": 0.1279
+        },
+        {
+         "id": "eq_roof",
+         "x": 0.23,
+         "y": 0.188
+        },
+        {
+         "id": "mod_dach",
+         "x": 0.537,
+         "y": 0.188
+        },
+        {
+         "id": "ausst_dach",
+         "x": 0.762,
+         "y": 0.188
+        },
+        {
+         "id": "eq_windows",
+         "x": 0.23,
+         "y": 0.2481
+        },
+        {
+         "id": "mod_fenster",
+         "x": 0.537,
+         "y": 0.2481
+        },
+        {
+         "id": "ausst_fenster",
+         "x": 0.762,
+         "y": 0.2481
+        },
+        {
+         "id": "eq_heating",
+         "x": 0.23,
+         "y": 0.3072
+        },
+        {
+         "id": "mod_heizung",
+         "x": 0.537,
+         "y": 0.3072
+        },
+        {
+         "id": "ausst_heizung",
+         "x": 0.762,
+         "y": 0.3072
+        },
+        {
+         "id": "eq_bath",
+         "x": 0.23,
+         "y": 0.3672
+        },
+        {
+         "id": "mod_baeder",
+         "x": 0.537,
+         "y": 0.3672
+        },
+        {
+         "id": "ausst_sanitaer",
+         "x": 0.762,
+         "y": 0.3672
+        },
+        {
+         "id": "eq_floor",
+         "x": 0.23,
+         "y": 0.4263
+        },
+        {
+         "id": "ausst_fussboeden",
+         "x": 0.762,
+         "y": 0.4263
+        },
+        {
+         "id": "mod_innenausbau",
+         "x": 0.537,
+         "y": 0.4864
+        },
+        {
+         "id": "ausst_innenwaende",
+         "x": 0.762,
+         "y": 0.4864
+        },
+        {
+         "id": "ausst_decken",
+         "x": 0.762,
+         "y": 0.5464
+        },
+        {
+         "id": "mod_leitungen",
+         "x": 0.537,
+         "y": 0.6055
+        },
+        {
+         "id": "ausst_technik",
+         "x": 0.762,
+         "y": 0.6055
+        },
+        {
+         "id": "mod_grundriss",
+         "x": 0.537,
+         "y": 0.6656
+        },
+        {
+         "id": "eq_elevator",
+         "x": 0.024,
+         "y": 0.9009
+        },
+        {
+         "id": "eq_guest_wc",
+         "x": 0.339,
+         "y": 0.9009
+        },
+        {
+         "id": "eq_store_room",
+         "x": 0.654,
+         "y": 0.9009
+        }
        ]
       },
       {
@@ -9701,6 +11152,108 @@ window.DP_HANDBUCH = {
         "ds2_nachfrage",
         "ds2_wertsteigerung",
         "ds2_entwicklung"
+       ],
+       "marken": [
+        {
+         "id": "bad_anz",
+         "x": 0.024,
+         "y": 0.1762
+        },
+        {
+         "id": "balkon_flae",
+         "x": 0.339,
+         "y": 0.1762
+        },
+        {
+         "id": "garagen",
+         "x": 0.654,
+         "y": 0.1762
+        },
+        {
+         "id": "stellpl_aussen",
+         "x": 0.024,
+         "y": 0.2622
+        },
+        {
+         "id": "modernis",
+         "x": 0.339,
+         "y": 0.2622
+        },
+        {
+         "id": "baustatus",
+         "x": 0.654,
+         "y": 0.2622
+        },
+        {
+         "id": "gemarkung",
+         "x": 0.024,
+         "y": 0.3492
+        },
+        {
+         "id": "flur",
+         "x": 0.339,
+         "y": 0.3492
+        },
+        {
+         "id": "flurstueck",
+         "x": 0.654,
+         "y": 0.3492
+        },
+        {
+         "id": "hinterland_qm",
+         "x": 0.024,
+         "y": 0.4352
+        },
+        {
+         "id": "hinterland_eur_qm",
+         "x": 0.339,
+         "y": 0.4352
+        },
+        {
+         "id": "hinterland_rentierlich",
+         "x": 0.654,
+         "y": 0.4352
+        },
+        {
+         "id": "erbpacht",
+         "x": 0.024,
+         "y": 0.5282
+        },
+        {
+         "id": "lageklasse",
+         "x": 0.024,
+         "y": 0.7212
+        },
+        {
+         "id": "makrolage",
+         "x": 0.339,
+         "y": 0.7212
+        },
+        {
+         "id": "mikrolage",
+         "x": 0.654,
+         "y": 0.7212
+        },
+        {
+         "id": "ds2_bevoelkerung",
+         "x": 0.024,
+         "y": 0.8112
+        },
+        {
+         "id": "ds2_nachfrage",
+         "x": 0.339,
+         "y": 0.8112
+        },
+        {
+         "id": "ds2_wertsteigerung",
+         "x": 0.654,
+         "y": 0.8112
+        },
+        {
+         "id": "ds2_entwicklung",
+         "x": 0.024,
+         "y": 0.9012
+        }
        ]
       },
       {
@@ -9716,6 +11269,58 @@ window.DP_HANDBUCH = {
         "zb_soll_ab",
         "zb_ziel_qm",
         "zb_ziel_wann"
+       ],
+       "marken": [
+        {
+         "id": "bankval",
+         "x": 0.024,
+         "y": 0.026
+        },
+        {
+         "id": "svwert",
+         "x": 0.339,
+         "y": 0.026
+        },
+        {
+         "id": "wert_soll",
+         "x": 0.654,
+         "y": 0.026
+        },
+        {
+         "id": "notizen",
+         "x": 0.515,
+         "y": 0.223
+        },
+        {
+         "id": "zb_fertig_jahr",
+         "x": 0.024,
+         "y": 0.564
+        },
+        {
+         "id": "zb_vgl_qm",
+         "x": 0.024,
+         "y": 0.707
+        },
+        {
+         "id": "zb_soll_qm",
+         "x": 0.339,
+         "y": 0.707
+        },
+        {
+         "id": "zb_soll_ab",
+         "x": 0.654,
+         "y": 0.707
+        },
+        {
+         "id": "zb_ziel_qm",
+         "x": 0.024,
+         "y": 0.818
+        },
+        {
+         "id": "zb_ziel_wann",
+         "x": 0.024,
+         "y": 0.904
+        }
        ]
       },
       {
@@ -9735,6 +11340,78 @@ window.DP_HANDBUCH = {
         "garagen_bgf_qm",
         "garagen_stufe",
         "aussenanlagen_pct"
+       ],
+       "marken": [
+        {
+         "id": "bgf",
+         "x": 0.024,
+         "y": 0.252
+        },
+        {
+         "id": "grundriss",
+         "x": 0.339,
+         "y": 0.252
+        },
+        {
+         "id": "mod_punkte",
+         "x": 0.654,
+         "y": 0.252
+        },
+        {
+         "id": "sachwertfaktor",
+         "x": 0.024,
+         "y": 0.441
+        },
+        {
+         "id": "uk_flaeche",
+         "x": 0.339,
+         "y": 0.441
+        },
+        {
+         "id": "wgfz_objekt",
+         "x": 0.654,
+         "y": 0.441
+        },
+        {
+         "id": "stellplatz_miete_monat",
+         "x": 0.024,
+         "y": 0.532
+        },
+        {
+         "id": "sonstige_jahr",
+         "x": 0.339,
+         "y": 0.532
+        },
+        {
+         "id": "nhk_haus",
+         "x": 0.024,
+         "y": 0.738
+        },
+        {
+         "id": "nhk_geschosse",
+         "x": 0.339,
+         "y": 0.738
+        },
+        {
+         "id": "nhk_dach",
+         "x": 0.654,
+         "y": 0.738
+        },
+        {
+         "id": "garagen_bgf_qm",
+         "x": 0.024,
+         "y": 0.9
+        },
+        {
+         "id": "garagen_stufe",
+         "x": 0.339,
+         "y": 0.9
+        },
+        {
+         "id": "aussenanlagen_pct",
+         "x": 0.654,
+         "y": 0.9
+        }
        ]
       },
       {
@@ -9751,6 +11428,63 @@ window.DP_HANDBUCH = {
         "brw_manuell",
         "brw_anpassung_pct",
         "brw_anpassung_grund"
+       ],
+       "marken": [
+        {
+         "id": "aussenanlagen",
+         "x": 0.024,
+         "y": 0.0408
+        },
+        {
+         "id": "bes_bauteile",
+         "x": 0.024,
+         "y": 0.3178
+        },
+        {
+         "id": "btl_gauben",
+         "x": 0.339,
+         "y": 0.3178
+        },
+        {
+         "id": "btl_balkone",
+         "x": 0.654,
+         "y": 0.3178
+        },
+        {
+         "id": "btl_vordach",
+         "x": 0.024,
+         "y": 0.4488
+        },
+        {
+         "id": "btl_terrassen",
+         "x": 0.339,
+         "y": 0.4488
+        },
+        {
+         "id": "btl_sonstige",
+         "x": 0.654,
+         "y": 0.4488
+        },
+        {
+         "id": "lzs_pct",
+         "x": 0.024,
+         "y": 0.7258
+        },
+        {
+         "id": "brw_manuell",
+         "x": 0.339,
+         "y": 0.7258
+        },
+        {
+         "id": "brw_anpassung_pct",
+         "x": 0.654,
+         "y": 0.7258
+        },
+        {
+         "id": "brw_anpassung_grund",
+         "x": 0.024,
+         "y": 0.8568
+        }
        ]
       },
       {
@@ -9762,6 +11496,33 @@ window.DP_HANDBUCH = {
         "erb_zs_ang",
         "erb_entsch",
         "erb_wert_ist_erb"
+       ],
+       "marken": [
+        {
+         "id": "erbbauzins",
+         "x": 0.024,
+         "y": 0.103
+        },
+        {
+         "id": "erb_restlz",
+         "x": 0.497,
+         "y": 0.103
+        },
+        {
+         "id": "erb_zs_ang",
+         "x": 0.024,
+         "y": 0.458
+        },
+        {
+         "id": "erb_entsch",
+         "x": 0.497,
+         "y": 0.458
+        },
+        {
+         "id": "erb_wert_ist_erb",
+         "x": 0.024,
+         "y": 0.812
+        }
        ]
       }
      ],
@@ -9774,6 +11535,33 @@ window.DP_HANDBUCH = {
         "str",
         "hnr",
         "objart"
+       ],
+       "marken": [
+        {
+         "id": "plz",
+         "x": 0.425,
+         "y": 0.203
+        },
+        {
+         "id": "ort",
+         "x": 0.827,
+         "y": 0.203
+        },
+        {
+         "id": "str",
+         "x": 0.626,
+         "y": 0.46
+        },
+        {
+         "id": "hnr",
+         "x": 0.827,
+         "y": 0.46
+        },
+        {
+         "id": "objart",
+         "x": 0.827,
+         "y": 0.717
+        }
        ]
       },
       {
@@ -9782,6 +11570,23 @@ window.DP_HANDBUCH = {
         "nutzungsart",
         "wfl",
         "zimmer"
+       ],
+       "marken": [
+        {
+         "id": "nutzungsart",
+         "x": 0.827,
+         "y": 0.082
+        },
+        {
+         "id": "wfl",
+         "x": 0.827,
+         "y": 0.378
+        },
+        {
+         "id": "zimmer",
+         "x": 0.827,
+         "y": 0.674
+        }
        ]
       }
      ]
@@ -9970,6 +11775,78 @@ window.DP_HANDBUCH = {
         "san",
         "san_ust",
         "moebl"
+       ],
+       "marken": [
+        {
+         "id": "kp",
+         "x": 0.024,
+         "y": 0.115
+        },
+        {
+         "id": "makler_p",
+         "x": 0.024,
+         "y": 0.25
+        },
+        {
+         "id": "makler_e",
+         "x": 0.251,
+         "y": 0.25
+        },
+        {
+         "id": "notar_p",
+         "x": 0.024,
+         "y": 0.366
+        },
+        {
+         "id": "notar_e",
+         "x": 0.251,
+         "y": 0.366
+        },
+        {
+         "id": "gba_p",
+         "x": 0.024,
+         "y": 0.482
+        },
+        {
+         "id": "gba_e",
+         "x": 0.251,
+         "y": 0.482
+        },
+        {
+         "id": "gest_p",
+         "x": 0.024,
+         "y": 0.597
+        },
+        {
+         "id": "gest_e",
+         "x": 0.251,
+         "y": 0.597
+        },
+        {
+         "id": "ji_p",
+         "x": 0.024,
+         "y": 0.713
+        },
+        {
+         "id": "ji_e",
+         "x": 0.251,
+         "y": 0.713
+        },
+        {
+         "id": "san",
+         "x": 0.515,
+         "y": 0.13
+        },
+        {
+         "id": "san_ust",
+         "x": 0.515,
+         "y": 0.276
+        },
+        {
+         "id": "moebl",
+         "x": 0.515,
+         "y": 0.839
+        }
        ]
       },
       {
@@ -9982,6 +11859,38 @@ window.DP_HANDBUCH = {
         "inv_pv",
         "inv_stellplatz",
         "inv_sonst"
+       ],
+       "marken": [
+        {
+         "id": "inv_kueche",
+         "x": 0.515,
+         "y": 0.126
+        },
+        {
+         "id": "inv_moebel",
+         "x": 0.666,
+         "y": 0.126
+        },
+        {
+         "id": "inv_geraete",
+         "x": 0.818,
+         "y": 0.126
+        },
+        {
+         "id": "inv_pv",
+         "x": 0.515,
+         "y": 0.534
+        },
+        {
+         "id": "inv_stellplatz",
+         "x": 0.666,
+         "y": 0.534
+        },
+        {
+         "id": "inv_sonst",
+         "x": 0.818,
+         "y": 0.534
+        }
        ]
       }
      ],
@@ -9991,6 +11900,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "kp",
         "makler_p"
+       ],
+       "marken": [
+        {
+         "id": "kp",
+         "x": 0.827,
+         "y": 0.257
+        },
+        {
+         "id": "makler_p",
+         "x": 0.827,
+         "y": 0.643
+        }
        ]
       }
      ]
@@ -10112,6 +12033,23 @@ window.DP_HANDBUCH = {
         "nkm",
         "ze",
         "umlagef"
+       ],
+       "marken": [
+        {
+         "id": "nkm",
+         "x": 0.024,
+         "y": 0.245
+        },
+        {
+         "id": "ze",
+         "x": 0.024,
+         "y": 0.453
+        },
+        {
+         "id": "umlagef",
+         "x": 0.024,
+         "y": 0.734
+        }
        ]
       },
       {
@@ -10119,6 +12057,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "ds2_marktmiete",
         "ds2_mietausfall"
+       ],
+       "marken": [
+        {
+         "id": "ds2_marktmiete",
+         "x": 0.024,
+         "y": 0.112
+        },
+        {
+         "id": "ds2_mietausfall",
+         "x": 0.024,
+         "y": 0.568
+        }
        ]
       },
       {
@@ -10132,6 +12082,48 @@ window.DP_HANDBUCH = {
         "me_anz",
         "me_int",
         "me_pct"
+       ],
+       "marken": [
+        {
+         "id": "mv_art",
+         "x": 0.515,
+         "y": 0.095
+        },
+        {
+         "id": "mv_beginn",
+         "x": 0.515,
+         "y": 0.176
+        },
+        {
+         "id": "mv_letzte_erhoehung",
+         "x": 0.515,
+         "y": 0.257
+        },
+        {
+         "id": "mv_letzte_erhoehung_betrag",
+         "x": 0.515,
+         "y": 0.338
+        },
+        {
+         "id": "me_soll",
+         "x": 0.515,
+         "y": 0.731
+        },
+        {
+         "id": "me_anz",
+         "x": 0.743,
+         "y": 0.731
+        },
+        {
+         "id": "me_int",
+         "x": 0.515,
+         "y": 0.856
+        },
+        {
+         "id": "me_pct",
+         "x": 0.743,
+         "y": 0.856
+        }
        ]
       }
      ],
@@ -10141,6 +12133,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "nkm",
         "ze"
+       ],
+       "marken": [
+        {
+         "id": "nkm",
+         "x": 0.827,
+         "y": 0.245
+        },
+        {
+         "id": "ze",
+         "x": 0.827,
+         "y": 0.523
+        }
        ]
       }
      ]
@@ -10470,6 +12474,63 @@ window.DP_HANDBUCH = {
         "d1",
         "d1z",
         "d1t"
+       ],
+       "marken": [
+        {
+         "id": "bank_inst",
+         "x": 0.024,
+         "y": 0.118
+        },
+        {
+         "id": "d1_vertrag",
+         "x": 0.251,
+         "y": 0.118
+        },
+        {
+         "id": "d1_vertragsdatum",
+         "x": 0.024,
+         "y": 0.201
+        },
+        {
+         "id": "d1_type",
+         "x": 0.024,
+         "y": 0.286
+        },
+        {
+         "id": "d1_auszahl",
+         "x": 0.251,
+         "y": 0.286
+        },
+        {
+         "id": "ek",
+         "x": 0.024,
+         "y": 0.386
+        },
+        {
+         "id": "ek_ist_nk",
+         "x": 0.024,
+         "y": 0.466
+        },
+        {
+         "id": "ek_inkl_nk",
+         "x": 0.024,
+         "y": 0.511
+        },
+        {
+         "id": "d1",
+         "x": 0.024,
+         "y": 0.553
+        },
+        {
+         "id": "d1z",
+         "x": 0.024,
+         "y": 0.832
+        },
+        {
+         "id": "d1t",
+         "x": 0.251,
+         "y": 0.832
+        }
        ]
       },
       {
@@ -10477,6 +12538,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "d1_bindj",
         "d1_anschl_enable"
+       ],
+       "marken": [
+        {
+         "id": "d1_bindj",
+         "x": 0.024,
+         "y": 0.0702
+        },
+        {
+         "id": "d1_anschl_enable",
+         "x": 0.024,
+         "y": 0.8758
+        }
        ]
       },
       {
@@ -10495,6 +12568,68 @@ window.DP_HANDBUCH = {
         "bspar_zins",
         "bspar_dar_z",
         "bspar_dar_t"
+       ],
+       "marken": [
+        {
+         "id": "anschl_z",
+         "x": 0.024,
+         "y": 0.026
+        },
+        {
+         "id": "anschl_t",
+         "x": 0.251,
+         "y": 0.026
+        },
+        {
+         "id": "anschl_bj",
+         "x": 0.251,
+         "y": 0.1019
+        },
+        {
+         "id": "bspar_inst",
+         "x": 0.024,
+         "y": 0.4515
+        },
+        {
+         "id": "bspar_vertrag",
+         "x": 0.251,
+         "y": 0.4515
+        },
+        {
+         "id": "bspar_vertragsdatum",
+         "x": 0.024,
+         "y": 0.5404
+        },
+        {
+         "id": "bspar_sum",
+         "x": 0.024,
+         "y": 0.6163
+        },
+        {
+         "id": "bspar_rate",
+         "x": 0.251,
+         "y": 0.6163
+        },
+        {
+         "id": "bspar_quote_min",
+         "x": 0.024,
+         "y": 0.6912
+        },
+        {
+         "id": "bspar_zins",
+         "x": 0.251,
+         "y": 0.6912
+        },
+        {
+         "id": "bspar_dar_z",
+         "x": 0.024,
+         "y": 0.873
+        },
+        {
+         "id": "bspar_dar_t",
+         "x": 0.251,
+         "y": 0.873
+        }
        ]
       },
       {
@@ -10514,6 +12649,73 @@ window.DP_HANDBUCH = {
         "d2_anschl_enable",
         "d2_az",
         "d2_at"
+       ],
+       "marken": [
+        {
+         "id": "d2_type",
+         "x": 0.024,
+         "y": 0.0359
+        },
+        {
+         "id": "d2_inst",
+         "x": 0.251,
+         "y": 0.0359
+        },
+        {
+         "id": "d2_vertrag",
+         "x": 0.024,
+         "y": 0.1388
+        },
+        {
+         "id": "d2_bspar",
+         "x": 0.251,
+         "y": 0.1388
+        },
+        {
+         "id": "d2_auszahl",
+         "x": 0.024,
+         "y": 0.2426
+        },
+        {
+         "id": "d2_vertragsdatum",
+         "x": 0.251,
+         "y": 0.2426
+        },
+        {
+         "id": "d2",
+         "x": 0.024,
+         "y": 0.3454
+        },
+        {
+         "id": "d2z",
+         "x": 0.024,
+         "y": 0.4493
+        },
+        {
+         "id": "d2t",
+         "x": 0.251,
+         "y": 0.4493
+        },
+        {
+         "id": "d2_bindj",
+         "x": 0.024,
+         "y": 0.59
+        },
+        {
+         "id": "d2_anschl_enable",
+         "x": 0.024,
+         "y": 0.7997
+        },
+        {
+         "id": "d2_az",
+         "x": 0.024,
+         "y": 0.8656
+        },
+        {
+         "id": "d2_at",
+         "x": 0.251,
+         "y": 0.8656
+        }
        ]
       }
      ],
@@ -10523,6 +12725,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "bank_inst",
         "d1_vertrag"
+       ],
+       "marken": [
+        {
+         "id": "bank_inst",
+         "x": 0.827,
+         "y": 0.394
+        },
+        {
+         "id": "d1_vertrag",
+         "x": 0.827,
+         "y": 0.682
+        }
        ]
       }
      ]
@@ -10694,12 +12908,56 @@ window.DP_HANDBUCH = {
         "weg_r",
         "eigen_r",
         "mietausfall"
+       ],
+       "marken": [
+        {
+         "id": "hg_ul",
+         "x": 0.024,
+         "y": 0.089
+        },
+        {
+         "id": "grundsteuer",
+         "x": 0.024,
+         "y": 0.163
+        },
+        {
+         "id": "ul_sonst",
+         "x": 0.024,
+         "y": 0.238
+        },
+        {
+         "id": "hg_nul",
+         "x": 0.024,
+         "y": 0.511
+        },
+        {
+         "id": "weg_r",
+         "x": 0.024,
+         "y": 0.59
+        },
+        {
+         "id": "eigen_r",
+         "x": 0.024,
+         "y": 0.825
+        },
+        {
+         "id": "mietausfall",
+         "x": 0.024,
+         "y": 0.904
+        }
        ]
       },
       {
        "datei": "hb-efh-s4-2.webp",
        "felder": [
         "nul_sonst"
+       ],
+       "marken": [
+        {
+         "id": "nul_sonst",
+         "x": 0.024,
+         "y": 0.213
+        }
        ]
       },
       {
@@ -10713,6 +12971,48 @@ window.DP_HANDBUCH = {
         "kp3l",
         "kp4",
         "kp4l"
+       ],
+       "marken": [
+        {
+         "id": "kp1",
+         "x": 0.515,
+         "y": 0.067
+        },
+        {
+         "id": "kp1l",
+         "x": 0.743,
+         "y": 0.067
+        },
+        {
+         "id": "kp2",
+         "x": 0.515,
+         "y": 0.295
+        },
+        {
+         "id": "kp2l",
+         "x": 0.743,
+         "y": 0.295
+        },
+        {
+         "id": "kp3",
+         "x": 0.515,
+         "y": 0.524
+        },
+        {
+         "id": "kp3l",
+         "x": 0.743,
+         "y": 0.524
+        },
+        {
+         "id": "kp4",
+         "x": 0.515,
+         "y": 0.753
+        },
+        {
+         "id": "kp4l",
+         "x": 0.743,
+         "y": 0.753
+        }
        ]
       },
       {
@@ -10721,6 +13021,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "bwk_ul_pct",
         "bwk_nul_pct"
+       ],
+       "marken": [
+        {
+         "id": "bwk_ul_pct",
+         "x": 0.024,
+         "y": 0.4103
+        },
+        {
+         "id": "bwk_nul_pct",
+         "x": 0.024,
+         "y": 0.7063
+        }
        ]
       }
      ],
@@ -10822,6 +13134,38 @@ window.DP_HANDBUCH = {
         "afa_satz",
         "geb_ant",
         "afa_sonder7b_aktiv"
+       ],
+       "marken": [
+        {
+         "id": "zve",
+         "x": 0.024,
+         "y": 0.205
+        },
+        {
+         "id": "grenz",
+         "x": 0.497,
+         "y": 0.205
+        },
+        {
+         "id": "grenz_auto",
+         "x": 0.024,
+         "y": 0.285
+        },
+        {
+         "id": "afa_satz",
+         "x": 0.024,
+         "y": 0.634
+        },
+        {
+         "id": "geb_ant",
+         "x": 0.497,
+         "y": 0.634
+        },
+        {
+         "id": "afa_sonder7b_aktiv",
+         "x": 0.035,
+         "y": 0.937
+        }
        ]
       },
       {
@@ -10832,6 +13176,28 @@ window.DP_HANDBUCH = {
         "afa_sonder7b_baukosten",
         "afa_sonder7b_vermietung",
         "afa_sonder7b_neubau"
+       ],
+       "marken": [
+        {
+         "id": "afa_sonder7b_eh40",
+         "x": 0.043,
+         "y": 0.115
+        },
+        {
+         "id": "afa_sonder7b_baukosten",
+         "x": 0.043,
+         "y": 0.315
+        },
+        {
+         "id": "afa_sonder7b_vermietung",
+         "x": 0.043,
+         "y": 0.516
+        },
+        {
+         "id": "afa_sonder7b_neubau",
+         "x": 0.043,
+         "y": 0.716
+        }
        ]
       }
      ],
@@ -11829,6 +14195,88 @@ window.DP_HANDBUCH = {
         "vermstand",
         "gsfl",
         "kuerzel"
+       ],
+       "marken": [
+        {
+         "id": "plz",
+         "x": 0.024,
+         "y": 0.0909
+        },
+        {
+         "id": "ort",
+         "x": 0.252,
+         "y": 0.0909
+        },
+        {
+         "id": "str",
+         "x": 0.024,
+         "y": 0.184
+        },
+        {
+         "id": "hnr",
+         "x": 0.252,
+         "y": 0.184
+        },
+        {
+         "id": "objart",
+         "x": 0.024,
+         "y": 0.2771
+        },
+        {
+         "id": "nutzungsart",
+         "x": 0.252,
+         "y": 0.2771
+        },
+        {
+         "id": "wfl",
+         "x": 0.024,
+         "y": 0.3702
+        },
+        {
+         "id": "baujahr",
+         "x": 0.252,
+         "y": 0.3702
+        },
+        {
+         "id": "etagen_ges",
+         "x": 0.024,
+         "y": 0.5715
+        },
+        {
+         "id": "einheiten",
+         "x": 0.252,
+         "y": 0.5715
+        },
+        {
+         "id": "ds2_zustand",
+         "x": 0.024,
+         "y": 0.7056
+        },
+        {
+         "id": "standardstufe",
+         "x": 0.252,
+         "y": 0.7056
+        },
+        {
+         "id": "ds2_energie",
+         "x": 0.024,
+         "y": 0.8028
+        },
+        {
+         "id": "vermstand",
+         "x": 0.252,
+         "y": 0.8028
+        },
+        {
+         "id": "gsfl",
+         "x": 0.024,
+         "y": 0.8999
+        },
+        {
+         "id": "kuerzel",
+         "x": 0.252,
+         "y": 0.8999
+        }
        ]
       },
       {
@@ -11841,6 +14289,43 @@ window.DP_HANDBUCH = {
         "wirtschaftlicher_uebergang",
         "halter",
         "mand_ueberf_cb"
+       ],
+       "marken": [
+        {
+         "id": "thesis",
+         "x": 0.024,
+         "y": 0.0363
+        },
+        {
+         "id": "risiken",
+         "x": 0.024,
+         "y": 0.2233
+        },
+        {
+         "id": "exitstr",
+         "x": 0.024,
+         "y": 0.4113
+        },
+        {
+         "id": "kaufdat",
+         "x": 0.024,
+         "y": 0.6733
+        },
+        {
+         "id": "wirtschaftlicher_uebergang",
+         "x": 0.252,
+         "y": 0.6733
+        },
+        {
+         "id": "halter",
+         "x": 0.024,
+         "y": 0.8033
+        },
+        {
+         "id": "mand_ueberf_cb",
+         "x": 0.024,
+         "y": 0.9323
+        }
        ]
       },
       {
@@ -11848,6 +14333,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "brw",
         "brw_stichtag"
+       ],
+       "marken": [
+        {
+         "id": "brw",
+         "x": 0.517,
+         "y": 0.2898
+        },
+        {
+         "id": "brw_stichtag",
+         "x": 0.517,
+         "y": 0.7348
+        }
        ]
       },
       {
@@ -11879,6 +14376,138 @@ window.DP_HANDBUCH = {
         "eq_elevator",
         "eq_guest_wc",
         "eq_store_room"
+       ],
+       "marken": [
+        {
+         "id": "eq_walls",
+         "x": 0.23,
+         "y": 0.1279
+        },
+        {
+         "id": "mod_aussenwand",
+         "x": 0.537,
+         "y": 0.1279
+        },
+        {
+         "id": "ausst_aussenwaende",
+         "x": 0.762,
+         "y": 0.1279
+        },
+        {
+         "id": "eq_roof",
+         "x": 0.23,
+         "y": 0.188
+        },
+        {
+         "id": "mod_dach",
+         "x": 0.537,
+         "y": 0.188
+        },
+        {
+         "id": "ausst_dach",
+         "x": 0.762,
+         "y": 0.188
+        },
+        {
+         "id": "eq_windows",
+         "x": 0.23,
+         "y": 0.2481
+        },
+        {
+         "id": "mod_fenster",
+         "x": 0.537,
+         "y": 0.2481
+        },
+        {
+         "id": "ausst_fenster",
+         "x": 0.762,
+         "y": 0.2481
+        },
+        {
+         "id": "eq_heating",
+         "x": 0.23,
+         "y": 0.3072
+        },
+        {
+         "id": "mod_heizung",
+         "x": 0.537,
+         "y": 0.3072
+        },
+        {
+         "id": "ausst_heizung",
+         "x": 0.762,
+         "y": 0.3072
+        },
+        {
+         "id": "eq_bath",
+         "x": 0.23,
+         "y": 0.3672
+        },
+        {
+         "id": "mod_baeder",
+         "x": 0.537,
+         "y": 0.3672
+        },
+        {
+         "id": "ausst_sanitaer",
+         "x": 0.762,
+         "y": 0.3672
+        },
+        {
+         "id": "eq_floor",
+         "x": 0.23,
+         "y": 0.4263
+        },
+        {
+         "id": "ausst_fussboeden",
+         "x": 0.762,
+         "y": 0.4263
+        },
+        {
+         "id": "mod_innenausbau",
+         "x": 0.537,
+         "y": 0.4864
+        },
+        {
+         "id": "ausst_innenwaende",
+         "x": 0.762,
+         "y": 0.4864
+        },
+        {
+         "id": "ausst_decken",
+         "x": 0.762,
+         "y": 0.5464
+        },
+        {
+         "id": "mod_leitungen",
+         "x": 0.537,
+         "y": 0.6055
+        },
+        {
+         "id": "ausst_technik",
+         "x": 0.762,
+         "y": 0.6055
+        },
+        {
+         "id": "mod_grundriss",
+         "x": 0.537,
+         "y": 0.6656
+        },
+        {
+         "id": "eq_elevator",
+         "x": 0.024,
+         "y": 0.9009
+        },
+        {
+         "id": "eq_guest_wc",
+         "x": 0.339,
+         "y": 0.9009
+        },
+        {
+         "id": "eq_store_room",
+         "x": 0.654,
+         "y": 0.9009
+        }
        ]
       },
       {
@@ -11903,6 +14532,103 @@ window.DP_HANDBUCH = {
         "ds2_nachfrage",
         "ds2_wertsteigerung",
         "ds2_entwicklung"
+       ],
+       "marken": [
+        {
+         "id": "balkon_flae",
+         "x": 0.024,
+         "y": 0.1752
+        },
+        {
+         "id": "garagen",
+         "x": 0.339,
+         "y": 0.1752
+        },
+        {
+         "id": "stellpl_aussen",
+         "x": 0.654,
+         "y": 0.1752
+        },
+        {
+         "id": "modernis",
+         "x": 0.024,
+         "y": 0.2613
+        },
+        {
+         "id": "baustatus",
+         "x": 0.339,
+         "y": 0.2613
+        },
+        {
+         "id": "gemarkung",
+         "x": 0.654,
+         "y": 0.2613
+        },
+        {
+         "id": "flur",
+         "x": 0.024,
+         "y": 0.3484
+        },
+        {
+         "id": "flurstueck",
+         "x": 0.339,
+         "y": 0.3484
+        },
+        {
+         "id": "hinterland_qm",
+         "x": 0.654,
+         "y": 0.3484
+        },
+        {
+         "id": "hinterland_eur_qm",
+         "x": 0.024,
+         "y": 0.4345
+        },
+        {
+         "id": "hinterland_rentierlich",
+         "x": 0.339,
+         "y": 0.4345
+        },
+        {
+         "id": "erbpacht",
+         "x": 0.024,
+         "y": 0.5276
+        },
+        {
+         "id": "lageklasse",
+         "x": 0.024,
+         "y": 0.7208
+        },
+        {
+         "id": "makrolage",
+         "x": 0.339,
+         "y": 0.7208
+        },
+        {
+         "id": "mikrolage",
+         "x": 0.654,
+         "y": 0.7208
+        },
+        {
+         "id": "ds2_bevoelkerung",
+         "x": 0.024,
+         "y": 0.811
+        },
+        {
+         "id": "ds2_nachfrage",
+         "x": 0.339,
+         "y": 0.811
+        },
+        {
+         "id": "ds2_wertsteigerung",
+         "x": 0.654,
+         "y": 0.811
+        },
+        {
+         "id": "ds2_entwicklung",
+         "x": 0.024,
+         "y": 0.9011
+        }
        ]
       },
       {
@@ -11913,6 +14639,33 @@ window.DP_HANDBUCH = {
         "wert_soll",
         "notizen",
         "zb_fertig_jahr"
+       ],
+       "marken": [
+        {
+         "id": "bankval",
+         "x": 0.024,
+         "y": 0.0345
+        },
+        {
+         "id": "svwert",
+         "x": 0.339,
+         "y": 0.0345
+        },
+        {
+         "id": "wert_soll",
+         "x": 0.654,
+         "y": 0.0345
+        },
+        {
+         "id": "notizen",
+         "x": 0.515,
+         "y": 0.3119
+        },
+        {
+         "id": "zb_fertig_jahr",
+         "x": 0.024,
+         "y": 0.8686
+        }
        ]
       },
       {
@@ -11932,6 +14685,78 @@ window.DP_HANDBUCH = {
         "garagen_bgf_qm",
         "garagen_stufe",
         "aussenanlagen_pct"
+       ],
+       "marken": [
+        {
+         "id": "bgf",
+         "x": 0.024,
+         "y": 0.2508
+        },
+        {
+         "id": "grundriss",
+         "x": 0.339,
+         "y": 0.2508
+        },
+        {
+         "id": "mod_punkte",
+         "x": 0.654,
+         "y": 0.2508
+        },
+        {
+         "id": "sachwertfaktor",
+         "x": 0.024,
+         "y": 0.4398
+        },
+        {
+         "id": "uk_flaeche",
+         "x": 0.339,
+         "y": 0.4398
+        },
+        {
+         "id": "wgfz_objekt",
+         "x": 0.654,
+         "y": 0.4398
+        },
+        {
+         "id": "stellplatz_miete_monat",
+         "x": 0.024,
+         "y": 0.5298
+        },
+        {
+         "id": "sonstige_jahr",
+         "x": 0.339,
+         "y": 0.5298
+        },
+        {
+         "id": "nhk_haus",
+         "x": 0.024,
+         "y": 0.7358
+        },
+        {
+         "id": "nhk_geschosse",
+         "x": 0.339,
+         "y": 0.7358
+        },
+        {
+         "id": "nhk_dach",
+         "x": 0.654,
+         "y": 0.7358
+        },
+        {
+         "id": "garagen_bgf_qm",
+         "x": 0.024,
+         "y": 0.8988
+        },
+        {
+         "id": "garagen_stufe",
+         "x": 0.339,
+         "y": 0.8988
+        },
+        {
+         "id": "aussenanlagen_pct",
+         "x": 0.654,
+         "y": 0.8988
+        }
        ]
       },
       {
@@ -11948,6 +14773,63 @@ window.DP_HANDBUCH = {
         "brw_manuell",
         "brw_anpassung_pct",
         "brw_anpassung_grund"
+       ],
+       "marken": [
+        {
+         "id": "aussenanlagen",
+         "x": 0.024,
+         "y": 0.0408
+        },
+        {
+         "id": "bes_bauteile",
+         "x": 0.024,
+         "y": 0.3178
+        },
+        {
+         "id": "btl_gauben",
+         "x": 0.339,
+         "y": 0.3178
+        },
+        {
+         "id": "btl_balkone",
+         "x": 0.654,
+         "y": 0.3178
+        },
+        {
+         "id": "btl_vordach",
+         "x": 0.024,
+         "y": 0.4488
+        },
+        {
+         "id": "btl_terrassen",
+         "x": 0.339,
+         "y": 0.4488
+        },
+        {
+         "id": "btl_sonstige",
+         "x": 0.654,
+         "y": 0.4488
+        },
+        {
+         "id": "lzs_pct",
+         "x": 0.024,
+         "y": 0.7258
+        },
+        {
+         "id": "brw_manuell",
+         "x": 0.339,
+         "y": 0.7258
+        },
+        {
+         "id": "brw_anpassung_pct",
+         "x": 0.654,
+         "y": 0.7258
+        },
+        {
+         "id": "brw_anpassung_grund",
+         "x": 0.024,
+         "y": 0.8568
+        }
        ]
       },
       {
@@ -11959,6 +14841,33 @@ window.DP_HANDBUCH = {
         "erb_zs_ang",
         "erb_entsch",
         "erb_wert_ist_erb"
+       ],
+       "marken": [
+        {
+         "id": "erbbauzins",
+         "x": 0.024,
+         "y": 0.103
+        },
+        {
+         "id": "erb_restlz",
+         "x": 0.497,
+         "y": 0.103
+        },
+        {
+         "id": "erb_zs_ang",
+         "x": 0.024,
+         "y": 0.458
+        },
+        {
+         "id": "erb_entsch",
+         "x": 0.497,
+         "y": 0.458
+        },
+        {
+         "id": "erb_wert_ist_erb",
+         "x": 0.024,
+         "y": 0.812
+        }
        ]
       }
      ],
@@ -11971,6 +14880,33 @@ window.DP_HANDBUCH = {
         "str",
         "hnr",
         "objart"
+       ],
+       "marken": [
+        {
+         "id": "plz",
+         "x": 0.425,
+         "y": 0.203
+        },
+        {
+         "id": "ort",
+         "x": 0.827,
+         "y": 0.203
+        },
+        {
+         "id": "str",
+         "x": 0.626,
+         "y": 0.46
+        },
+        {
+         "id": "hnr",
+         "x": 0.827,
+         "y": 0.46
+        },
+        {
+         "id": "objart",
+         "x": 0.827,
+         "y": 0.717
+        }
        ]
       },
       {
@@ -11978,6 +14914,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "nutzungsart",
         "wfl"
+       ],
+       "marken": [
+        {
+         "id": "nutzungsart",
+         "x": 0.827,
+         "y": 0.079
+        },
+        {
+         "id": "wfl",
+         "x": 0.827,
+         "y": 0.366
+        }
        ]
       }
      ]
@@ -12166,6 +15114,78 @@ window.DP_HANDBUCH = {
         "san",
         "san_ust",
         "moebl"
+       ],
+       "marken": [
+        {
+         "id": "kp",
+         "x": 0.024,
+         "y": 0.115
+        },
+        {
+         "id": "makler_p",
+         "x": 0.024,
+         "y": 0.25
+        },
+        {
+         "id": "makler_e",
+         "x": 0.251,
+         "y": 0.25
+        },
+        {
+         "id": "notar_p",
+         "x": 0.024,
+         "y": 0.366
+        },
+        {
+         "id": "notar_e",
+         "x": 0.251,
+         "y": 0.366
+        },
+        {
+         "id": "gba_p",
+         "x": 0.024,
+         "y": 0.482
+        },
+        {
+         "id": "gba_e",
+         "x": 0.251,
+         "y": 0.482
+        },
+        {
+         "id": "gest_p",
+         "x": 0.024,
+         "y": 0.597
+        },
+        {
+         "id": "gest_e",
+         "x": 0.251,
+         "y": 0.597
+        },
+        {
+         "id": "ji_p",
+         "x": 0.024,
+         "y": 0.713
+        },
+        {
+         "id": "ji_e",
+         "x": 0.251,
+         "y": 0.713
+        },
+        {
+         "id": "san",
+         "x": 0.515,
+         "y": 0.13
+        },
+        {
+         "id": "san_ust",
+         "x": 0.515,
+         "y": 0.276
+        },
+        {
+         "id": "moebl",
+         "x": 0.515,
+         "y": 0.839
+        }
        ]
       },
       {
@@ -12178,6 +15198,38 @@ window.DP_HANDBUCH = {
         "inv_pv",
         "inv_stellplatz",
         "inv_sonst"
+       ],
+       "marken": [
+        {
+         "id": "inv_kueche",
+         "x": 0.515,
+         "y": 0.126
+        },
+        {
+         "id": "inv_moebel",
+         "x": 0.666,
+         "y": 0.126
+        },
+        {
+         "id": "inv_geraete",
+         "x": 0.818,
+         "y": 0.126
+        },
+        {
+         "id": "inv_pv",
+         "x": 0.515,
+         "y": 0.534
+        },
+        {
+         "id": "inv_stellplatz",
+         "x": 0.666,
+         "y": 0.534
+        },
+        {
+         "id": "inv_sonst",
+         "x": 0.818,
+         "y": 0.534
+        }
        ]
       }
      ],
@@ -12187,6 +15239,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "kp",
         "makler_p"
+       ],
+       "marken": [
+        {
+         "id": "kp",
+         "x": 0.827,
+         "y": 0.257
+        },
+        {
+         "id": "makler_p",
+         "x": 0.827,
+         "y": 0.643
+        }
        ]
       }
      ]
@@ -12308,6 +15372,23 @@ window.DP_HANDBUCH = {
         "nkm",
         "ze",
         "umlagef"
+       ],
+       "marken": [
+        {
+         "id": "nkm",
+         "x": 0.024,
+         "y": 0.245
+        },
+        {
+         "id": "ze",
+         "x": 0.024,
+         "y": 0.453
+        },
+        {
+         "id": "umlagef",
+         "x": 0.024,
+         "y": 0.734
+        }
        ]
       },
       {
@@ -12315,6 +15396,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "ds2_marktmiete",
         "ds2_mietausfall"
+       ],
+       "marken": [
+        {
+         "id": "ds2_marktmiete",
+         "x": 0.024,
+         "y": 0.112
+        },
+        {
+         "id": "ds2_mietausfall",
+         "x": 0.024,
+         "y": 0.568
+        }
        ]
       },
       {
@@ -12328,6 +15421,48 @@ window.DP_HANDBUCH = {
         "me_anz",
         "me_int",
         "me_pct"
+       ],
+       "marken": [
+        {
+         "id": "mv_art",
+         "x": 0.515,
+         "y": 0.092
+        },
+        {
+         "id": "mv_beginn",
+         "x": 0.515,
+         "y": 0.17
+        },
+        {
+         "id": "mv_letzte_erhoehung",
+         "x": 0.515,
+         "y": 0.247
+        },
+        {
+         "id": "mv_letzte_erhoehung_betrag",
+         "x": 0.515,
+         "y": 0.325
+        },
+        {
+         "id": "me_soll",
+         "x": 0.515,
+         "y": 0.741
+        },
+        {
+         "id": "me_anz",
+         "x": 0.743,
+         "y": 0.741
+        },
+        {
+         "id": "me_int",
+         "x": 0.515,
+         "y": 0.861
+        },
+        {
+         "id": "me_pct",
+         "x": 0.743,
+         "y": 0.861
+        }
        ]
       }
      ],
@@ -12337,6 +15472,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "nkm",
         "ze"
+       ],
+       "marken": [
+        {
+         "id": "nkm",
+         "x": 0.827,
+         "y": 0.245
+        },
+        {
+         "id": "ze",
+         "x": 0.827,
+         "y": 0.523
+        }
        ]
       }
      ]
@@ -12666,6 +15813,63 @@ window.DP_HANDBUCH = {
         "d1",
         "d1z",
         "d1t"
+       ],
+       "marken": [
+        {
+         "id": "bank_inst",
+         "x": 0.024,
+         "y": 0.121
+        },
+        {
+         "id": "d1_vertrag",
+         "x": 0.251,
+         "y": 0.121
+        },
+        {
+         "id": "d1_vertragsdatum",
+         "x": 0.024,
+         "y": 0.206
+        },
+        {
+         "id": "d1_type",
+         "x": 0.024,
+         "y": 0.294
+        },
+        {
+         "id": "d1_auszahl",
+         "x": 0.251,
+         "y": 0.294
+        },
+        {
+         "id": "ek",
+         "x": 0.024,
+         "y": 0.397
+        },
+        {
+         "id": "ek_ist_nk",
+         "x": 0.024,
+         "y": 0.48
+        },
+        {
+         "id": "ek_inkl_nk",
+         "x": 0.024,
+         "y": 0.526
+        },
+        {
+         "id": "d1",
+         "x": 0.024,
+         "y": 0.569
+        },
+        {
+         "id": "d1z",
+         "x": 0.024,
+         "y": 0.856
+        },
+        {
+         "id": "d1t",
+         "x": 0.251,
+         "y": 0.856
+        }
        ]
       },
       {
@@ -12673,6 +15877,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "d1_bindj",
         "d1_anschl_enable"
+       ],
+       "marken": [
+        {
+         "id": "d1_bindj",
+         "x": 0.024,
+         "y": 0.0702
+        },
+        {
+         "id": "d1_anschl_enable",
+         "x": 0.024,
+         "y": 0.8758
+        }
        ]
       },
       {
@@ -12691,6 +15907,68 @@ window.DP_HANDBUCH = {
         "bspar_zins",
         "bspar_dar_z",
         "bspar_dar_t"
+       ],
+       "marken": [
+        {
+         "id": "anschl_z",
+         "x": 0.024,
+         "y": 0.0248
+        },
+        {
+         "id": "anschl_t",
+         "x": 0.251,
+         "y": 0.0248
+        },
+        {
+         "id": "anschl_bj",
+         "x": 0.251,
+         "y": 0.1008
+        },
+        {
+         "id": "bspar_inst",
+         "x": 0.024,
+         "y": 0.4508
+        },
+        {
+         "id": "bspar_vertrag",
+         "x": 0.251,
+         "y": 0.4508
+        },
+        {
+         "id": "bspar_vertragsdatum",
+         "x": 0.024,
+         "y": 0.5398
+        },
+        {
+         "id": "bspar_sum",
+         "x": 0.024,
+         "y": 0.6158
+        },
+        {
+         "id": "bspar_rate",
+         "x": 0.251,
+         "y": 0.6158
+        },
+        {
+         "id": "bspar_quote_min",
+         "x": 0.024,
+         "y": 0.6908
+        },
+        {
+         "id": "bspar_zins",
+         "x": 0.251,
+         "y": 0.6908
+        },
+        {
+         "id": "bspar_dar_z",
+         "x": 0.024,
+         "y": 0.8728
+        },
+        {
+         "id": "bspar_dar_t",
+         "x": 0.251,
+         "y": 0.8728
+        }
        ]
       },
       {
@@ -12710,6 +15988,73 @@ window.DP_HANDBUCH = {
         "d2_anschl_enable",
         "d2_az",
         "d2_at"
+       ],
+       "marken": [
+        {
+         "id": "d2_type",
+         "x": 0.024,
+         "y": 0.0344
+        },
+        {
+         "id": "d2_inst",
+         "x": 0.251,
+         "y": 0.0344
+        },
+        {
+         "id": "d2_vertrag",
+         "x": 0.024,
+         "y": 0.1374
+        },
+        {
+         "id": "d2_bspar",
+         "x": 0.251,
+         "y": 0.1374
+        },
+        {
+         "id": "d2_auszahl",
+         "x": 0.024,
+         "y": 0.2414
+        },
+        {
+         "id": "d2_vertragsdatum",
+         "x": 0.251,
+         "y": 0.2414
+        },
+        {
+         "id": "d2",
+         "x": 0.024,
+         "y": 0.3444
+        },
+        {
+         "id": "d2z",
+         "x": 0.024,
+         "y": 0.4484
+        },
+        {
+         "id": "d2t",
+         "x": 0.251,
+         "y": 0.4484
+        },
+        {
+         "id": "d2_bindj",
+         "x": 0.024,
+         "y": 0.5894
+        },
+        {
+         "id": "d2_anschl_enable",
+         "x": 0.024,
+         "y": 0.7994
+        },
+        {
+         "id": "d2_az",
+         "x": 0.024,
+         "y": 0.8654
+        },
+        {
+         "id": "d2_at",
+         "x": 0.251,
+         "y": 0.8654
+        }
        ]
       }
      ],
@@ -12719,6 +16064,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "bank_inst",
         "d1_vertrag"
+       ],
+       "marken": [
+        {
+         "id": "bank_inst",
+         "x": 0.827,
+         "y": 0.394
+        },
+        {
+         "id": "d1_vertrag",
+         "x": 0.827,
+         "y": 0.682
+        }
        ]
       }
      ]
@@ -12890,12 +16247,56 @@ window.DP_HANDBUCH = {
         "weg_r",
         "eigen_r",
         "mietausfall"
+       ],
+       "marken": [
+        {
+         "id": "hg_ul",
+         "x": 0.024,
+         "y": 0.089
+        },
+        {
+         "id": "grundsteuer",
+         "x": 0.024,
+         "y": 0.163
+        },
+        {
+         "id": "ul_sonst",
+         "x": 0.024,
+         "y": 0.238
+        },
+        {
+         "id": "hg_nul",
+         "x": 0.024,
+         "y": 0.511
+        },
+        {
+         "id": "weg_r",
+         "x": 0.024,
+         "y": 0.59
+        },
+        {
+         "id": "eigen_r",
+         "x": 0.024,
+         "y": 0.825
+        },
+        {
+         "id": "mietausfall",
+         "x": 0.024,
+         "y": 0.904
+        }
        ]
       },
       {
        "datei": "hb-mfh-s4-2.webp",
        "felder": [
         "nul_sonst"
+       ],
+       "marken": [
+        {
+         "id": "nul_sonst",
+         "x": 0.024,
+         "y": 0.213
+        }
        ]
       },
       {
@@ -12909,6 +16310,48 @@ window.DP_HANDBUCH = {
         "kp3l",
         "kp4",
         "kp4l"
+       ],
+       "marken": [
+        {
+         "id": "kp1",
+         "x": 0.515,
+         "y": 0.067
+        },
+        {
+         "id": "kp1l",
+         "x": 0.743,
+         "y": 0.067
+        },
+        {
+         "id": "kp2",
+         "x": 0.515,
+         "y": 0.295
+        },
+        {
+         "id": "kp2l",
+         "x": 0.743,
+         "y": 0.295
+        },
+        {
+         "id": "kp3",
+         "x": 0.515,
+         "y": 0.524
+        },
+        {
+         "id": "kp3l",
+         "x": 0.743,
+         "y": 0.524
+        },
+        {
+         "id": "kp4",
+         "x": 0.515,
+         "y": 0.753
+        },
+        {
+         "id": "kp4l",
+         "x": 0.743,
+         "y": 0.753
+        }
        ]
       },
       {
@@ -12917,6 +16360,18 @@ window.DP_HANDBUCH = {
        "felder": [
         "bwk_ul_pct",
         "bwk_nul_pct"
+       ],
+       "marken": [
+        {
+         "id": "bwk_ul_pct",
+         "x": 0.024,
+         "y": 0.4103
+        },
+        {
+         "id": "bwk_nul_pct",
+         "x": 0.024,
+         "y": 0.7063
+        }
        ]
       }
      ],
@@ -13018,6 +16473,38 @@ window.DP_HANDBUCH = {
         "afa_satz",
         "geb_ant",
         "afa_sonder7b_aktiv"
+       ],
+       "marken": [
+        {
+         "id": "zve",
+         "x": 0.024,
+         "y": 0.205
+        },
+        {
+         "id": "grenz",
+         "x": 0.497,
+         "y": 0.205
+        },
+        {
+         "id": "grenz_auto",
+         "x": 0.024,
+         "y": 0.285
+        },
+        {
+         "id": "afa_satz",
+         "x": 0.024,
+         "y": 0.634
+        },
+        {
+         "id": "geb_ant",
+         "x": 0.497,
+         "y": 0.634
+        },
+        {
+         "id": "afa_sonder7b_aktiv",
+         "x": 0.035,
+         "y": 0.937
+        }
        ]
       },
       {
@@ -13028,6 +16515,28 @@ window.DP_HANDBUCH = {
         "afa_sonder7b_baukosten",
         "afa_sonder7b_vermietung",
         "afa_sonder7b_neubau"
+       ],
+       "marken": [
+        {
+         "id": "afa_sonder7b_eh40",
+         "x": 0.043,
+         "y": 0.115
+        },
+        {
+         "id": "afa_sonder7b_baukosten",
+         "x": 0.043,
+         "y": 0.315
+        },
+        {
+         "id": "afa_sonder7b_vermietung",
+         "x": 0.043,
+         "y": 0.516
+        },
+        {
+         "id": "afa_sonder7b_neubau",
+         "x": 0.043,
+         "y": 0.716
+        }
        ]
       }
      ],

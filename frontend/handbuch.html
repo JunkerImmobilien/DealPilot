@@ -76,11 +76,22 @@ figure{margin:14px 0 8px;background:#fff;border:1px solid var(--linie);border-ra
 figure img{display:block;width:100%;height:auto}
 figcaption{font:500 12px "JetBrains Mono",monospace;color:var(--leise);padding:8px 12px;border-top:1px solid var(--linie);background:var(--karte)}
 .felder{margin:12px 0 0;border:1px solid var(--linie);border-radius:14px;overflow:hidden;background:#fff}
-details.feld{border-top:1px solid var(--linie)}
-details.feld:first-child{border-top:0}
-details.feld summary{list-style:none;display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer}
-details.feld summary::-webkit-details-marker{display:none}
-details.feld summary:hover{background:var(--karte)}
+/* v2560j · Feldliste einklappbar: eine Zeile je Feld (button mit aria-expanded), Koerper erst auf Klick */
+.feld{border-top:1px solid var(--linie);scroll-margin-top:90px;transition:box-shadow .3s}
+.feld:first-child{border-top:0}
+.fkopf{appearance:none;border:0;background:none;width:100%;text-align:left;font:inherit;color:inherit;display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer}
+.fkopf:hover{background:var(--karte)}
+.fkopf:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.fkopf[aria-expanded="true"] .pfeil{transform:rotate(90deg)}
+.feld.blitz{box-shadow:inset 0 0 0 3px var(--gold);border-radius:10px}
+.fleiste{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 0}
+.fleiste button,.zumbild{appearance:none;border:1px solid var(--linie);background:#fff;border-radius:8px;padding:6px 10px;font:600 12.5px Inter,sans-serif;color:var(--text);cursor:pointer}
+.fleiste button:hover,.zumbild:hover{border-color:var(--gold)}
+.zumbild{margin-top:8px;grid-column:1/-1;justify-self:start}
+.bildrahmen{position:relative}
+.marke{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:2px solid transparent;background:transparent;cursor:pointer;padding:0}
+.marke:hover,.marke:focus-visible{border-color:var(--gold);background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 22%,transparent);outline:none}
+figure.blitz{box-shadow:0 0 0 3px var(--gold)}
 .fnr{flex:0 0 auto;min-width:28px;height:28px;padding:0 6px;border-radius:14px;background:var(--obs);color:var(--gold-hi);border:2px solid var(--gold);font:700 12px/24px "JetBrains Mono",monospace;text-align:center}
 .fnr.leer{background:transparent;color:var(--leise);border-color:var(--linie)}
 .flab{flex:1;min-width:0;font-weight:600}
@@ -123,7 +134,7 @@ details[open] .pfeil{transform:rotate(90deg)}
   .kopf .knopf{padding:8px 10px;font-size:12px}
   .chips{display:none}
 }
-@media print{.kopf,nav.inhalt{display:none}.rahmen{display:block}details.feld{break-inside:avoid}}
+@media print{.kopf,nav.inhalt{display:none}.rahmen{display:block}.feld{break-inside:avoid}.fkoerper[hidden]{display:grid!important}.fleiste,.zumbild,.marke{display:none}}
 </style>
 </head>
 <body>
@@ -202,11 +213,12 @@ details[open] .pfeil{transform:rotate(90deg)}
     var wirk = pflichtSaetze(kap, e).concat(f.wirkung || []);
     var opts = f.optionen ? f.optionen.filter(function (o) { return o.wert !== ''; }).map(function (o) { return esc(o.text); }).join(' · ') : '';
     var such = [f.label, f.karte, was, f.woher, wirk.join(' '), f.id].join(' ').toLowerCase();
-    return '<details class="feld" data-such="' + esc(such) + '" id="f-' + esc(kap.art + '-' + e.id) + '"><summary>'
-      + '<span class="fnr' + (nr ? '' : ' leer') + '">' + (nr || '·') + '</span>'
+    var schl = kap.art + '-' + e.id;
+    return klapp('f-' + schl, such,
+      '<span class="fnr' + (nr ? '' : ' leer') + '">' + (nr || '·') + '</span>'
       + '<span class="flab">' + esc(f.label) + (f.karte ? '<small>' + esc(f.karte) + '</small>' : '') + '</span>'
-      + '<span class="chips">' + chips + '</span><span class="pfeil">›</span></summary>'
-      + '<dl class="fkoerper">'
+      + '<span class="chips">' + chips + '</span>',
+      ''
       + '<dt>Was eintragen</dt><dd>' + (was ? esc(was) : '<span class="opt">' + esc(f.typ === 'auswahl' ? 'Auswahl aus der Liste.' : f.typ === 'haken' ? 'Haken setzen, wenn es zutrifft.' : f.typ === 'datum' ? 'Datum.' : 'Wert eintragen.') + '</span>')
       + (f.tip && f.tip.paragraf ? ' <span class="opt">(' + esc(f.tip.paragraf) + ')</span>' : '')
       + (opts ? '<div class="opt">Auswahl: ' + opts + '</div>' : '') + '</dd>'
@@ -214,7 +226,38 @@ details[open] .pfeil{transform:rotate(90deg)}
       + (f.woher ? '<dt>Woher</dt><dd>' + esc(f.woher) + '</dd>' : '')
       + (e.grund ? '<dt>Ohne Bild, weil</dt><dd>' + esc(e.grund) + '</dd>' : '')
       + (wirk.length ? '<dt>Was es bewirkt</dt><dd><ul>' + wirk.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul></dd>' : '')
-      + '</dl></details>';
+      + (nr && !e.grund ? '<button type="button" class="zumbild" data-zumbild="' + esc(schl) + '">↑ zum Bild</button>' : ''));
+  }
+  /* Eine einklappbare Zeile: Kopf als button (aria-expanded), Koerper erst auf Klick */
+  var _kz = 0;
+  function klapp(id, such, kopf, koerper) {
+    var kid = 'fk' + (++_kz);
+    return '<div class="feld"' + (id ? ' id="' + esc(id) + '"' : '') + ' data-such="' + esc(such) + '">'
+      + '<button type="button" class="fkopf" aria-expanded="false" aria-controls="' + kid + '">' + kopf + '<span class="pfeil" aria-hidden="true">›</span></button>'
+      + '<dl class="fkoerper" id="' + kid + '" hidden>' + koerper + '</dl></div>';
+  }
+  function setze(feld, auf) {
+    var b = feld.querySelector('.fkopf'), k = feld.querySelector('.fkoerper'); if (!b || !k) return;
+    b.setAttribute('aria-expanded', auf ? 'true' : 'false'); k.hidden = !auf;
+  }
+  function blitz(el) { el.classList.add('blitz'); setTimeout(function () { el.classList.remove('blitz'); }, 1500); }
+  /* Sprung von einer Nummer im Bild zur Beschreibung */
+  function springeZuFeld(schl) {
+    var feld = document.getElementById('f-' + schl); if (!feld) return;
+    var w = feld.closest('details.weitere'); if (w) w.open = true;
+    setze(feld, true);
+    feld.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    blitz(feld);
+    var b = feld.querySelector('.fkopf'); if (b) setTimeout(function () { try { b.focus({ preventScroll: true }); } catch (x) {} }, 300);
+  }
+  /* Rueckweg: das Bild, in dem das Feld steht - das sichtbare zuerst (Handy oder Desktop) */
+  function springeZuBild(schl) {
+    var fs = [].slice.call(document.querySelectorAll('figure[data-felder]')).filter(function (f) { return (' ' + f.getAttribute('data-felder') + ' ').indexOf(' ' + schl + ' ') >= 0; });
+    var ziel = fs.filter(function (f) { return f.offsetParent; })[0] || fs[0]; if (!ziel) return;
+    var d = ziel.closest('details'); if (d && !d.open) d.open = true;
+    ziel.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    blitz(ziel);
+    var m = ziel.querySelector('.marke[data-ziel="' + schl + '"]'); if (m) setTimeout(function () { try { m.focus({ preventScroll: true }); } catch (x) {} }, 300);
   }
 
   function wohnungslisteHtml(kap, n) {
@@ -228,15 +271,23 @@ details[open] .pfeil{transform:rotate(90deg)}
       + bilder
       + '<p class="einl">Spalten der Liste: ' + W.spalten.map(esc).join(' · ') + '. <b>Details</b> öffnet die Wohnung mit diesen Feldern:</p><div class="felder">';
     Object.keys(bl).forEach(function (b) {
-      h += '<details class="feld" data-such="' + esc((b + ' ' + bl[b].map(function (f) { return f.label; }).join(' ')).toLowerCase()) + '"><summary><span class="fnr leer">·</span><span class="flab">' + esc(b) + '<small>' + bl[b].length + ' Felder</small></span><span class="pfeil">›</span></summary>'
-        + '<dl class="fkoerper">' + bl[b].map(function (f) { return '<dt>' + esc(f.typ === 'datum' ? 'Datum' : f.typ === 'auswahl' ? 'Auswahl' : 'Eingabe') + '</dt><dd><b>' + esc(f.label) + '</b>' + (f.platzhalter && f.platzhalter !== 'optional' ? ' <span class="opt">— z. B. ' + esc(f.platzhalter) + '</span>' : (f.platzhalter === 'optional' ? ' <span class="opt">— optional</span>' : '')) + '</dd>'; }).join('') + '</dl></details>';
+      h += klapp('', (b + ' ' + bl[b].map(function (f) { return f.label; }).join(' ')).toLowerCase(),
+        '<span class="fnr leer">·</span><span class="flab">' + esc(b) + '<small>' + bl[b].length + ' Felder</small></span>',
+        bl[b].map(function (f) { return '<dt>' + esc(f.typ === 'datum' ? 'Datum' : f.typ === 'auswahl' ? 'Auswahl' : 'Eingabe') + '</dt><dd><b>' + esc(f.label) + '</b>' + (f.platzhalter && f.platzhalter !== 'optional' ? ' <span class="opt">— z. B. ' + esc(f.platzhalter) + '</span>' : (f.platzhalter === 'optional' ? ' <span class="opt">— optional</span>' : '')) + '</dd>'; }).join(''));
     });
     h += '</div>' + W.hinweise.map(function (t) { return '<div class="hinweis">' + esc(t) + '</div>'; }).join('');
     if (W.hilfe && W.hilfe.length) h += '<details class="weitere"><summary>Mehr zu Soll-Miete, Zielbild und Ertragswert je Wohnung</summary>' + W.hilfe.map(function (x) { return '<p class="einl"><strong>' + esc(x.titel) + '</strong><br>' + rich(x.text) + '</p>'; }).join('') + '</details>';
     return h + '</div>';
   }
-  function bildHtml(b, felder) {
-    return '<figure data-zoom' + (b.klasse ? ' class="' + b.klasse + '"' : '') + '><img loading="lazy" src="handbuch/bilder/' + esc(b.datei) + '?v=v2560h" alt="' + esc(b.alt || 'Bildschirmfoto') + '"><figcaption>' + esc(b.unterschrift || felder) + '</figcaption></figure>';
+  /* b.marken: Mittelpunkte der eingebrannten Nummern (gemessen bei der Aufnahme) - darueber liegt je ein button */
+  function bildHtml(b, felder, kap, liste) {
+    var marken = '', ids = [];
+    if (kap && b.marken) b.marken.forEach(function (m) {
+      var e = (liste || []).filter(function (x) { return x.id === m.id; })[0]; if (!e || !F[m.id]) return;
+      var schl = kap.art + '-' + m.id; ids.push(schl);
+      marken += '<button type="button" class="marke" data-ziel="' + esc(schl) + '" style="left:' + (m.x * 100).toFixed(2) + '%;top:' + (m.y * 100).toFixed(2) + '%" aria-label="Feld ' + e.nr + ': ' + esc(F[m.id].label) + ' — zur Beschreibung"></button>';
+    });
+    return '<figure data-zoom' + (b.klasse ? ' class="' + b.klasse + '"' : '') + (ids.length ? ' data-felder="' + esc(ids.join(' ')) + '"' : '') + '><div class="bildrahmen"><img loading="lazy" src="handbuch/bilder/' + esc(b.datei) + '?v=v2560j" alt="' + esc(b.alt || 'Bildschirmfoto') + '">' + marken + '</div><figcaption>' + esc(b.unterschrift || felder) + (ids.length ? ' · Nummer anklicken springt zur Beschreibung' : '') + '</figcaption></figure>';
   }
 
   function render() {
@@ -259,7 +310,8 @@ details[open] .pfeil{transform:rotate(90deg)}
         toc += '<a href="#' + sid + '">' + n + ' · ' + esc(r.name) + '</a>';
         var einl = r.hilfe ? r.hilfe.text : (r.tour ? r.tour.text : r.desc);
         inhalt += '<div class="schritt" id="' + sid + '" data-schritt><h3><span class="nr">' + n + '</span>Reiter ' + esc(r.name) + '</h3>'
-          + '<p class="einl">' + rich(einl) + '</p>';
+          + '<p class="einl">' + rich(einl) + '</p>'
+          + '<div class="fleiste" role="group" aria-label="Feldbeschreibungen in diesem Schritt"><button type="button" data-alle="auf">Alle aufklappen</button><button type="button" data-alle="zu">Alle zuklappen</button></div>';
         var bildUnter = function (b, liste) {
           var nrs = b.felder.map(function (id) { var e = liste.filter(function (x) { return x.id === id; })[0]; return e ? e.nr : null; }).filter(Boolean);
           return nrs.length ? ' · Felder ' + Math.min.apply(null, nrs) + '–' + Math.max.apply(null, nrs) : '';
@@ -268,15 +320,15 @@ details[open] .pfeil{transform:rotate(90deg)}
         var grundBilder = st.bilder.filter(function (b) { return !b.nachAuswahl; }), zusatzBilder = st.bilder.filter(function (b) { return b.nachAuswahl; });
         /* Handy-Bilder (390 px) erscheinen nur bei schmalem Fenster; die Desktop-Bilder stehen dann zugeklappt darunter */
         if (st.mobil && st.mobil.length) {
-          inhalt += st.mobil.map(function (b) { return bildHtml({ datei: b.datei, alt: r.name + ' — Handy', klasse: 'handy' }, r.name + ' · Handy' + bildUnter(b, st.felder)); }).join('');
+          inhalt += st.mobil.map(function (b) { return bildHtml({ datei: b.datei, marken: b.marken, alt: r.name + ' — Handy', klasse: 'handy' }, r.name + ' · Handy' + bildUnter(b, st.felder), kap, st.felder); }).join('');
           inhalt += '<details class="desk-mehr" open><summary>Desktop-Bilder mit allen Feldern</summary>';
         }
-        grundBilder.forEach(function (b) { inhalt += bildHtml({ datei: b.datei, alt: r.name + ' — ' + kap.name }, r.name + bildUnter(b, grund)); });
+        grundBilder.forEach(function (b) { inhalt += bildHtml({ datei: b.datei, marken: b.marken, alt: r.name + ' — ' + kap.name }, r.name + bildUnter(b, grund), kap, grund); });
         if (st.mobil && st.mobil.length) inhalt += '</details>';
         inhalt += '<div class="felder">' + grund.map(function (e) { return feldHtml(kap, e, e.nr); }).join('') + '</div>';
         if (zusatz.length) {
           inhalt += '<div class="hinweis"><b>Nach einer Auswahl:</b> ' + esc(st.auswahl || 'weitere Angaben') + '. Dann erscheinen diese Felder; die Nummern laufen weiter.</div>';
-          zusatzBilder.forEach(function (b) { inhalt += bildHtml({ datei: b.datei, alt: r.name + ' — nach Auswahl' }, r.name + ' · nach Auswahl' + bildUnter(b, zusatz)); });
+          zusatzBilder.forEach(function (b) { inhalt += bildHtml({ datei: b.datei, marken: b.marken, alt: r.name + ' — nach Auswahl' }, r.name + ' · nach Auswahl' + bildUnter(b, zusatz), kap, zusatz); });
           inhalt += '<div class="felder">' + zusatz.map(function (e) { return feldHtml(kap, e, e.nr); }).join('') + '</div>';
         }
         if (st.weitere.length) inhalt += '<details class="weitere"><summary>' + st.weitere.length + (st.weitere.length === 1 ? ' Feld' : ' Felder') + ' ohne Bild — mit Grund</summary><div class="felder">' + st.weitere.map(function (e) { return feldHtml(kap, e, 0); }).join('') + '</div></details>';
@@ -293,13 +345,15 @@ details[open] .pfeil{transform:rotate(90deg)}
   /* ── Suche ── */
   function suchen() {
     var q = $('suche').value.trim().toLowerCase(), n = 0;
-    document.querySelectorAll('details.feld').forEach(function (d) {
+    document.querySelectorAll('.feld').forEach(function (d) {
       var hit = !q || d.getAttribute('data-such').indexOf(q) >= 0;
       d.classList.toggle('versteckt', !hit); if (q && hit) n++;
-      if (q && hit) { d.open = true; var w = d.closest('details.weitere'); if (w) w.open = true; }
+      /* Treffer klappen auf; ist die Suche leer, wieder alles zu */
+      setze(d, !!(q && hit));
+      if (q && hit) { var w = d.closest('details.weitere'); if (w) w.open = true; }
     });
     document.querySelectorAll('[data-schritt]').forEach(function (s) {
-      var sichtbar = !q || s.querySelector('details.feld:not(.versteckt)');
+      var sichtbar = !q || s.querySelector('.feld:not(.versteckt)');
       s.classList.toggle('versteckt', !sichtbar);
     });
     $('treffer').textContent = q ? (n ? n + ' Treffer' : 'kein Treffer für „' + q + '“') : '';
@@ -438,6 +492,10 @@ details[open] .pfeil{transform:rotate(90deg)}
   $('held-knoepfe').innerHTML = H.kapitel.map(function (k) { return '<button type="button" class="knopf zart klein" data-pdf="' + k.art + '">PDF · ' + esc(k.name) + '</button>'; }).join('');
   document.addEventListener('click', function (e) {
     var p = e.target.closest('[data-pdf]'); if (p) { pdf([p.getAttribute('data-pdf')], p); return; }
+    var mk = e.target.closest('.marke'); if (mk) { e.preventDefault(); springeZuFeld(mk.getAttribute('data-ziel')); return; }
+    var zb = e.target.closest('[data-zumbild]'); if (zb) { springeZuBild(zb.getAttribute('data-zumbild')); return; }
+    var kopf = e.target.closest('.fkopf'); if (kopf) { setze(kopf.parentNode, kopf.getAttribute('aria-expanded') !== 'true'); return; }
+    var alle = e.target.closest('[data-alle]'); if (alle) { var sch = alle.closest('[data-schritt]'); if (sch) sch.querySelectorAll('.feld:not(.versteckt)').forEach(function (f) { if (!f.closest('details.weitere') || alle.getAttribute('data-alle') === 'zu') setze(f, alle.getAttribute('data-alle') === 'auf'); }); return; }
     var fz = e.target.closest('figure[data-zoom]'); if (fz) { var z = document.createElement('div'); z.className = 'zoom'; z.innerHTML = '<img src="' + fz.querySelector('img').src + '" alt="">'; z.onclick = function () { z.remove(); }; document.body.appendChild(z); return; }
     if (e.target.closest('nav.inhalt a')) document.body.classList.remove('menue-auf');
   });
