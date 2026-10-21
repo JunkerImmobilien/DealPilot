@@ -829,7 +829,10 @@ function sBox(doc, x, y, w, label, val, sub, bg, acc) {
  */
 /* v603-pdf-sections: Titel -> Checkbox-Key (default an, unbekannt = an) */
 function _dpPdfSecKey(title){
-  var m={'Gesamtbewertung':'gesamt','Stärken':'staerken','Risiken':'risiken','Risikoanalyse':'risikoanalyse','Szenario-Analyse':'szenarien','Investor-Fit':'investorfit','Empfehlung':'empfehlung','Investmentbewertung':'investbew','Verhandlungsempfehlung':'verhandlung','Kaufpreis-Offerte':'offerte','Bankargumente':'bank','DealPilot-Insight':'insight'};
+  var m={'Gesamtbewertung':'gesamt','Stärken':'staerken','Risiken':'risiken','Risikoanalyse':'risikoanalyse','Szenario-Analyse':'szenarien','Investor-Fit':'investorfit','Empfehlung':'empfehlung','Investmentbewertung':'investbew','Verhandlungsempfehlung':'verhandlung','Kaufpreis-Offerte':'offerte','Bankargumente':'bank','DealPilot-Insight':'insight',
+    /* v2552 · die Abschnitte, die die Pilot-Analyse seit v2150-v2544 zeigt */
+    'Anschlussfinanzierung':'anschluss','Lage & Markt':'lage','Abgleich mit dem Marktbericht':'abgleich','Optischer Eindruck aus den Fotos':'fotos',
+    'Ankauf · Bestand · Zielbild':'zielbild','Ankauf gegen heute':'ankaufheute','Steuerliche Zusammenfassung':'steuer','Steuerverlauf':'steuerverlauf'};
   return m[title]||null;
 }
 function _dpPdfSectionOn(title){var k=_dpPdfSecKey(title);if(!k)return true;var cb=document.getElementById('ai-pdf-sec-'+k);return !cb||cb.checked;}
@@ -1004,6 +1007,52 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   if (Array.isArray(a.bankargumente) && a.bankargumente.length) {
     bulletBlock('Bankargumente', a.bankargumente, [232, 244, 234], [42, 154, 90]);
   }
+
+  /* v2552 · Marcel 21.10.2026: „in der Pilot-Analyse muss auch der Reiter Bausteine
+     im PDF angepasst werden." Gemessen: die Analyse zeigt acht Abschnitte, die das
+     PDF nie druckte (Felder kamen in pdf.js nicht vor). Jetzt als Textbausteine,
+     jeder mit eigenem Haken unter „Bausteine im PDF". */
+  var _eur = function (x) { return (x < 0 ? '-' : '') + Math.round(Math.abs(x)).toLocaleString('de-DE') + ' €'; };
+  if (a.anschlussfinanzierung) block('Anschlussfinanzierung', clean(a.anschlussfinanzierung));
+  (function () {
+    var t = [];
+    if (a.makrolage_recherche) t.push('Makrolage: ' + clean(a.makrolage_recherche));
+    if (a.mikrolage_recherche) t.push('Mikrolage: ' + clean(a.mikrolage_recherche));
+    if (a.mietspiegel_eur_qm != null && a.mietspiegel_eur_qm !== '') t.push('Mietspiegel: ' + clean(a.mietspiegel_eur_qm) + ' €/m²' + (a.mietspiegel_herkunft ? ' (' + clean(a.mietspiegel_herkunft) + ')' : ''));
+    if (a.kaufpreisniveau) t.push('Kaufpreisniveau: ' + clean(a.kaufpreisniveau));
+    if (t.length) block('Lage & Markt', t.join('\n\n'));
+  })();
+  if (a.berichts_abgleich) block('Abgleich mit dem Marktbericht', clean(a.berichts_abgleich) + '\n\nSach- und Ertragswert im Bericht sind ein Plausibilitäts-Quercheck nach ImmoWertV-Logik — indikativ, kein Gutachten nach § 194 BauGB.');
+  if (a.optischer_eindruck) block('Optischer Eindruck aus den Fotos', clean(a.optischer_eindruck) + '\n\nEin visueller Eindruck aus den mitgesendeten Bildern — keine Feststellung.');
+  if (a.potenzial_text) block('Ankauf · Bestand · Zielbild', clean(a.potenzial_text) + '\n\nDie Zahlen je Stand stehen auf der Seite Wertpotenzial.');
+  (function () {
+    var t = [];
+    try {
+      var AK = window.DealPilotAnkauf, st = AK && AK.stand ? AK.stand() : (window._dpAnkauf || null);
+      var roh = st && st.daten ? st.daten._ai : null, alt = roh ? (typeof roh === 'string' ? JSON.parse(roh) : roh) : null;
+      if (alt && typeof alt === 'object' && (alt.empfehlung || alt.gesamtbewertung)) {
+        var kp = function (x) { var o = x && x.kaufpreis_offerte; return o && o.empfohlen ? clean(String(o.empfohlen)) : '–'; };
+        t.push('Empfehlung beim Ankauf: ' + clean(alt.empfehlung || '–') + ' · heute: ' + clean(a.empfehlung || '–'));
+        t.push('Empfohlener Kaufpreis beim Ankauf: ' + kp(alt) + ' · heute: ' + kp(a));
+      }
+    } catch (e) {}
+    if (a.soll_ist_steuer) t.push('Steuerlich: ' + clean(a.soll_ist_steuer));
+    if (t.length) block('Ankauf gegen heute', t.join('\n\n'));
+  })();
+  if (a.steuer_zusammenfassung) block('Steuerliche Zusammenfassung', clean(a.steuer_zusammenfassung) + '\n\nEine Einordnung aus den Eingaben im Reiter Steuer — keine Steuerberatung.');
+  (function () {
+    var SV = window.DpSteuerVerlauf, r = null;
+    try { r = SV && SV.reihe ? SV.reihe() : null; } catch (e) { r = null; }
+    if (!r || !r.length) return;
+    var w = SV.auswerten(r), t = [];
+    if (w.jahr != null) t.push(w.wende === 0 ? 'Das Objekt ist vom ersten Jahr an steuerlich positiv (Überschuss ab ' + w.jahr + ').'
+      : 'Steuerlich positiv ab ' + w.jahr + '. Bis dahin ' + _eur(w.erstattung) + ' Steuererstattung, danach ' + _eur(-w.steuer) + ' Steuer im Betrachtungszeitraum.');
+    else t.push('Im Betrachtungszeitraum bleibt das Objekt steuerlich im Verlust.');
+    r.slice(0, 12).forEach(function (z) {
+      t.push(z.jahr + ': Ergebnis ' + _eur(z.erg) + ' · ' + (z.steuer >= 0 ? 'Erstattung ' + _eur(z.steuer) : 'Steuer ' + _eur(-z.steuer)) + (z.cf != null ? ' · Cashflow nach Steuern ' + _eur(z.cf) : ''));
+    });
+    block('Steuerverlauf', t.join('\n'));
+  })();
 
   // 7. DealPilot-Insight (V63.45: dunkler Hintergrund mit hellem Text)
   if (a.dealpilot_insight) {
