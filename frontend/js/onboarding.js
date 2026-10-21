@@ -419,7 +419,7 @@ window.DealPilotOnboarding = (function () {
          Standardwerte (standardwerte-karten.js SETS) - sie setzen die Rechenwerte UND
          die Gewichte des Deal Scores. Schritt 5 justiert nur noch fein. */
       + (_sets() ? _setKarten() : '')
-      + '<div class="dpo-set" role="radiogroup" aria-label="Rechenwerte"' + (_sets() ? ' hidden' : '') + '>'
+      + '<div class="dpo-set" role="radiogroup" aria-label="Rechenwerte"' + (_sets() ? ' style="display:none"' : '') + '>'
       +   '<label class="dpo-set-k an"><input type="radio" name="dpo_set" value="standard"' + (_sets() ? '' : ' checked') + '>'
       +     '<span><b>DealPilot-Standard</b> <span class="dpo-k-std">empfohlen</span>'
       +     '<span class="dpo-set-t">Indikativer Marktzins · Zinsbindung ' + esc(String(profil('zinsbindung_default', 10))) + ' Jahre · '
@@ -625,7 +625,7 @@ window.DealPilotOnboarding = (function () {
             + '<p class="dpo-vor dpo-vor-klein" style="margin-top:12px"><b>Feinjustierung</b> · optional, nur die Gewichte des Deal Scores</p>'
             + '<div class="dpo-kacheln dpo-kacheln-3">' + fein.map(function (t) { return kachel(t); }).join('') + '</div>';
         })()
-      + '<div class="dpo-kacheln dpo-kacheln-3"' + (_sets() ? ' hidden' : '') + '>'
+      + '<div class="dpo-kacheln dpo-kacheln-3"' + (_sets() ? ' style="display:none"' : '') + '>'   /* v2554a: [hidden] verlor gegen .dpo-kacheln{display:grid} */
       + _profile().map(function (t) {
           return '<button type="button" class="dpo-kachel' + (_wahl.typ === t.id ? ' an' : '')
             + '" data-typ="' + t.id + '">'
