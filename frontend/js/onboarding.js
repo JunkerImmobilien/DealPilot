@@ -1574,7 +1574,7 @@ window.DealPilotOnboarding = (function () {
       var alt = document.getElementById('dp-onboarding');
       if (alt) alt.remove();
       _ov = null;
-      _wahl = { aussehen: _aussehenStandard(), typ: _typDefault() };   /* v1770, v2083 */
+      _wahl = { aussehen: _aussehenStandard(), typ: _typDefault(), pilot: null, set: 'dp', basis: 'balanced' };   /* v1770, v2083, v2551 */
       zeige(0);
       return 'Setup neu gestartet' + (auchTour ? ' (Rundgang-Marker ebenfalls gelöscht)' : '');
     },
