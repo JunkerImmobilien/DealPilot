@@ -41950,3 +41950,23 @@ Die Marktparameter stehen in `config.js` `beleihungswert`, der Kern liest keine 
 **Nachweis:** `saat-pruefen <datei>` RC 0. `--basislinie`: nichts über dem Deckel (RC 1 nur wegen der fremden, noch nicht eingetragenen `uk-irw-nw-owl-2026.json`). `uk-flaeche-pruefen` und `uk-wgfz-pruefen` sauber. Die Kette über den echten Lookup liefert für 13076: ezfh 4,0 · rhdhh 4,1 · efh_rmh 4,9 · we_v 4,0 · mfh_bis6 6,3 (2026), mfh_ueber6/wgh weiter 2025. `pruefeModell` liest Ø Miete 8,94 €/m² und Ø 132 m². `register-saat --trocken` im Container: 4.298 Werte, 0 Dubletten, 0 verwaist. Nicht eingespielt.
 
 **Rest:** (1) geocms.com und shop.geoport-nwm.de waren den ganzen Abend nicht erreichbar. NWM 2026/2025, Rostock 2025, LK Rostock 2024 und die 19 historischen VG-Berichte (1995–2007) sind deshalb nicht neu geladen. NWM-Sperren stützen sich auf die Messung vom 02.10. (2) Der LUP-SWF 2026 überdeckt den RH/DHH-Wert 2025: eine Entscheidung zum Baupreisindex „stichtagsbezogen“ würde beide Tabellen freigeben. (3) Das Belegexemplar an LUP ist weiterhin offen. (4) VG-Sachwertfaktoren: das Kapitel ist im Bericht noch unvollständig, eine Fortschreibung sollte beobachtet werden.
+
+### v2620 · Vergleichswert aus dem Immobilienrichtwert NRW (E7, Marcel 21.10.2026)
+
+**Was:** Echtes Vergleichswertverfahren (§§ 24–26, § 20 ImmoWertV) auf Basis der Immobilienrichtwerte (IRW) mit den Umrechnungskoeffizienten des jeweiligen Ausschusses. Neuer Kern `marktbericht/backend/src/lib/vergleichswert_irw.js` (Schnittstelle im Dateikopf: `vergleichswertIrw({ irw, objekt, bog })`), Register `uk-irw-nw-{owl,rheinland,ruhr-ost,ruhr-west}-2026.json` (Kennzahl `umrechnung_irw`, Schlüssel GASL × Teilmarkt × Jahrgang), Prüfer `tools/irw-pruefen.mjs`, `verfahrenMitIrw()` in `verfahrenswahl.js`, IrwConnector liefert jetzt `roh`, `gasl`, `teilmarkt_code`, optionale `ebene`. Angebotspreise bleiben Marktpreisindikation. **Noch nicht im CrossCheckService verdrahtet.**
+
+**Commit:** `7ce06a46`
+
+**Nachweis:**
+- Bestand gemessen: IRW-Shape 21.10.2026 (opengeodata.nrw.de) 19.388 Zonen, **71 Ausschüsse mit IRW**, 184 Umrechnungsdokumente (alle HTTP 200), Stichtag einheitlich 01.01.2026. WMS-Verfügbarkeitsebene über ein Raster (3.240 Punkte): 394 Gemeinden, 72 Ausschüsse, nur **Kreis Minden-Lübbecke (31700, 10 Gemeinden) „noch nicht beschlossen"**.
+- Ernte: 32 Sätze, **21 Werte, 11 Sperren** (Düsseldorf 5× und Dortmund 4×: Baujahr nur als Spanne bzw. additive Verknüpfung; Bochum MFH: Merkmale ohne Eingabe; Minden-Lübbecke). Werte: Herford ETW/EFH, Bielefeld ETW/EFH, Köln ETW/EFH, Bonn ETW/RH-DHH, Münster ETW/EFH, Bochum ETW/EFH/RH, Essen ETW/EFH/RH, Duisburg ETW/EFH, Wuppertal ETW/EFH/RH.
+- `irw-pruefen` RC 0: **11 amtliche Anwendungsbeispiele getroffen**, 10 Wert-Sätze ohne Beispiel im Dokument (nur Aufbau/Normbezug), 4 Druckfehler als `zweifel` (dort kein Wert), Verfahrenswahl 9 Fälle. `--shape`: alle Zonen abbildbar außer Bielefeld (ETW 8/10, EFH 5/10 — Tabellen nur Ausschnitte um das Richtwertobjekt).
+- Testobjekte live: **Löhner Str. 278**: IRW 1.700 € × 1,000 (Bj) × 1,265 (Standard 3) × 0,730 (233 m²) × 0,902 (1 Mod.-Punkt) × 1 × 1 × 1 = 1.416 €/m² → **329.932 €** (Gutachten 350.094 €). **Hüllhorst**: kein IRW (nicht beschlossen). **Westerfeldstr. 140**: Bielefeld führt keinen MFH-IRW.
+- `saat-pruefen --basislinie` RC 0, SAATDATEIEN 82, 0 fehlen. Register NICHT in die DB eingespielt.
+
+**Rest:**
+- Verdrahtung im CrossCheckService (Hauptagent); Herford RH/DHH: IRW über `ebene: 18` holen (EFH-Dokument führt die Anbauweise).
+- Neue Formen: additiv (Dortmund), Spannen (Düsseldorf), bedingte Kategorie (Wuppertal ETW vermietet je Wohnfläche), Eingaben `rohertrag_qm`, `balkon_art`, `keller_teil`.
+- Bonn, Münster, Wuppertal ETW schweigen zu Stellplätzen → `stellplaetze_im_irw: false` gesetzt, Rückfrage offen.
+- Übrige 60 Ausschüsse (rund 150 Dokumente) ungeerntet.
+- `wertermittlung-pruefen` war rot (B14a/B14c) durch fremde Arbeitsänderungen an `uk-naeherung.json`; diese Dateien hat v2620 nicht angefasst.
