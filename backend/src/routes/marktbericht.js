@@ -223,6 +223,14 @@ router.get('/reports/replay', authenticate, readGet('/reports/replay'));
 router.get('/reports/fixtures', authenticate, readGet('/reports/fixtures'));
 router.get('/objects', authenticate, readGetLabelled('/objects', function (d) { return d.objects; }));           /* v942 */
 router.get('/objects/history', authenticate, readGetLabelled('/objects/history', function (d) { return d.history; })); /* v942 */
+/* v2630 · indikativer Beleihungswert-Check aus den gespeicherten Berichten (kein Abruf, keine Kosten) */
+router.post('/beleihungswert', authenticate, async function (req, res) {
+  try {
+    const body = Object.assign({}, req.body || {}, { user_id: req.user && req.user.id });
+    const out = await forward('POST', '/beleihungswert', { body: body });
+    res.status(out.status).json(out.data);
+  } catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }
+});
 
 /* v972b: KI-Trend-Text. v1183: im Plan enthalten — er ist ein Begleittext
    zu einem Verlauf, keine Bewertung, und passt in keines der drei

@@ -1004,6 +1004,28 @@ window.DealPilotConfig = (function() {
       spanne: 'Leipzig 0 %, Düsseldorf 1,4 %, Hamburg 7,8 %, Köln 9,2 % (Dezember 2025); Mitte 2025 bundesweit 6,8 %'
     },
 
+    /* v2630 · Marktparameter des indikativen Beleihungswert-Checks (Bank-Export).
+       Der Kern (marktbericht/backend/src/lib/beleihungswert.js) liest sie nicht
+       selbst - storage.js schickt sie mit. Jaehrlich nach dem 30.11. pruefen.
+       GELTEND ist der Satz der BaFin (§ 12 Abs. 4 Satz 2 BelWertV hat eine
+       Anpassungsregel mit 0,5-Pp-Schwelle - die Rendite allein bestimmt ihn
+       nicht). Seit 01.01.2024 liegen beide Saetze an der Obergrenze des
+       Korridors. Die Rendite steht als Gegenprobe daneben. */
+    beleihungswert: {
+      mindestzins: {
+        wohnen_pct: 5.5, gewerbe_pct: 6.5, gueltig_ab: '01.01.2024',
+        quelle: 'BaFin, Bekanntgabe der Mindestkapitalisierungszinssätze nach § 12 Abs. 4 BelWertV',
+        url: 'https://www.bafin.de/DE/Aufsicht/BankenFinanzdienstleister/Pfandbriefbanken/Bekanntgabe_BelWertV/bekanntmachungen_node.html',
+        recherchiert: '2026-10-21',
+        gegenprobe: 'Fachveröffentlichung 08.12.2025: zum 01.01.2026 unverändert (Rendite 30.11.2025: 3,32 %, Obergrenze erreicht)'
+      },
+      rendite_30j: {
+        pct: 3.86, datum: '21.10.2026',
+        quelle: 'Deutsche Bundesbank, Zinsstrukturkurve börsennotierter Bundeswertpapiere, 30 Jahre Restlaufzeit, Tageswert',
+        reihe: 'BBSIS.D.I.ZST.ZI.EUR.S1311.B.A604.R30XX.R.A.A._Z._Z.A'
+      }
+    },
+
     investmentProfileDefaults: {
       // Finanzierung
       /* v1257: an setDefaults() in main.js angeglichen — das war der
