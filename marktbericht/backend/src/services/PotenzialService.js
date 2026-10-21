@@ -54,6 +54,7 @@ function mpiAngebote(wb, refAenderung) {
     return { wert: mv.estimated, low: mv.low ?? null, high: mv.high ?? null,
              abschlag_pct: mv.angebot_abschlag ? mv.angebot_abschlag.pct : null,
              abschlag_herkunft: mv.angebot_abschlag ? mv.angebot_abschlag.herkunft : null,
+             abschlag_kurz: mv.angebot_abschlag ? (mv.angebot_abschlag.kurz || null) : null,   /* v2578 */
              median_qm: mv.basis_median_sqm ?? null, gegenprobe: v.amtliche_gegenprobe || null };
   } catch (e) { return null; }
 }
@@ -380,6 +381,7 @@ export const PotenzialService = {
         ? { wert: V.market_value.estimated, low: V.market_value.low ?? null, high: V.market_value.high ?? null,
             abschlag_pct: V.market_value.angebot_abschlag ? V.market_value.angebot_abschlag.pct : null,
             abschlag_herkunft: V.market_value.angebot_abschlag ? V.market_value.angebot_abschlag.herkunft : null,
+            abschlag_kurz: V.market_value.angebot_abschlag ? (V.market_value.angebot_abschlag.kurz || null) : null,   /* v2578 */
             median_qm: V.market_value.basis_median_sqm ?? null }
         : mpiAngebote(wb, null);
       const mvZ = out.haus.zielbild ? mpiAngebote(wb, ZIELBILD_REF()) : null;
@@ -388,7 +390,7 @@ export const PotenzialService = {
       const mieteStufe = { bestand: (!ref.vacancy && zahl(ref.monthly_net_rent) > 0) ? zahl(ref.monthly_net_rent) * 12 : null };
       for (const v of varianten) if (v && STUFEN.indexOf(v.key) >= 0) mieteStufe[v.key] = zahl(v.miete_wohnen_jahr);
       out.mpi = {
-        angebote: mvB ? { verfuegbar: true, abschlag_pct: mvB.abschlag_pct, abschlag_herkunft: mvB.abschlag_herkunft, median_qm: mvB.median_qm,
+        angebote: mvB ? { verfuegbar: true, abschlag_pct: mvB.abschlag_pct, abschlag_herkunft: mvB.abschlag_herkunft, abschlag_kurz: mvB.abschlag_kurz || null, median_qm: mvB.median_qm,
           hinweis: 'Angebotspreise am Ort × Wohnfläche × Objektfaktoren, abzüglich Abschlag auf Angebotspreise (§ 25 ImmoWertV verlangt Kaufpreise). '
             + 'Mieterhöhung wie Bestand: die Angebotspreise hängen nicht an der Miete. Zielbild mit Zustand „modernisiert".' }
           : { verfuegbar: false, grund: 'Für diesen Ort liegen keine Angebotspreise vor.' },

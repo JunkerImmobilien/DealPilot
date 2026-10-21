@@ -8,6 +8,154 @@ import { finde as regFinde } from '../lib/ausschuss_register.js';   /* v2367 */
    Wert wie frontend/js/config.js angebotAbschlagMarkt.pct (Stand Dezember 2025). Bei
    jeder Nachrecherche BEIDE Stellen ziehen. */
 const ANGEBOT_ABSCHLAG_MARKT_PCT = 5.8;
+import { lagenFuer as regLagen } from '../lib/ausschuss_register.js';   /* v2578 */
+import { liegenschaftszinssatz as regZins } from '../lib/gutachterausschuss.js';   /* v2578 */
+import { zinssatzFuerObjekt, typVon, dekodiere } from '../lib/zweigwahl.js';   /* v2578 */
+import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js';   /* v2578 */
+import { etwKleinobjektAusgenommen } from './WertParameterService.js';   /* v2578 */
+
+/* ══ v2578 · ZWEITE QUELLE FUER DEN OERTLICHEN ANGEBOTSABSCHLAG ═══════════════
+   Marcel 21.10.2026: „Wenn wir verlaessliche Abschlaege haben fuer Angebotsdaten,
+   sollten wir das machen." Die Liegenschaftszins-Saetze der Ausschuesse (NRW:
+   Grundstuecksmarktdaten nach AGVGA-Modell, HE: Immobilienmarktberichte) fuehren
+   als Modellansatz den Ø Kaufpreis der ausgewerteten Kauffaelle
+   (modellansaetze.kaufpreis_eur_qm, €/m² Wohnflaeche). Gegen den Angebotsmedian
+   gehalten ergibt er den oertlichen Abschlag - aber NUR, wenn ALLE Kriterien
+   erfuellt sind; sonst gilt der Marktdurchschnitt, und WARUM steht intern im
+   Ergebnis (angebot_abschlag.pruefung_lzs), nie im Kundentext:
+
+     K1  Teilmarkt: der Zweig des Satzes ist DERSELBE Teilmarkt wie das Objekt
+         (MFH -> mfh/mfh_bis6/mfh_ueber6, Dreifamilienhaus -> dreifh/mfh,
+         ETW -> etw/we_v/we/wohnung, EFH -> efh/ezfh, ZFH -> zfh/ezfh,
+         DHH/RH -> efh_dhh_reh/efh_rmh/rhdhh, Villa -> efh_villa/altbauvilla).
+         Kein Ausweichen auf einen Nachbarteilmarkt (wgh fuer ein MFH, efh fuer
+         eine DHH), kein Gewerbe, kein Grundstueck. Der Zweig wird mit
+         DERSELBEN Zweigwahl bestimmt wie der Zins des Ertragswerts
+         (zinssatzFuerObjekt) - Lage/Baujahr/RND-Baender inklusive; eine
+         Rueckfrage der Zweigwahl heisst: kein Wert.
+     K2  Gebiet: Satz des Ausschusses fuer die AGS des Objekts (Gemeinde oder
+         Kreis); nie Bezirk, Land oder Bund (Kein Treffer heisst kein Wert).
+         ETW in Objekten mit hoechstens zwei WE dort, wo der Ausschuss sie aus
+         seiner ETW-Auswertung ausdruecklich ausnimmt (Kreis Minden-Luebbecke).
+     K3  Satz nicht gesperrt (vollstaendig !== false) und amtlich: Stufe A oder B
+         (B heisst bei NRW nur: die Streuung des ZINSES liegt ueber 1,5 Pp - fuer
+         den Ø Kaufpreis ohne Belang).
+     K4  Jahrgang: der juengste Satz (Rangfolge der Zweigwahl), Berichtsjahr
+         hoechstens zwei Jahre vor dem Bewertungsjahr - aeltere Kaufpreise gegen
+         heutige Angebote messen die Preisentwicklung mit, nicht den Abschlag.
+     K5  Stichprobe: mindestens 10 Kauffaelle, wo der Satz sie fuehrt
+         (dieselbe Untergrenze wie MIN_FALLZAHL_C im WertParameterService).
+     K6  Angebote: Median aus mindestens 8 Angeboten (MIN_SAMPLE des
+         MarketAnalysisService), keine Demodaten.
+     K7  Modellrahmen: die Saetze fuehren nur MITTELWERTE (Ø Objektgroesse,
+         Ø Restnutzungsdauer), keine Spannen. Das Objekt liegt im Rahmen, wenn
+         seine Wohnflaeche zwischen der Haelfte und dem Doppelten der
+         Ø Objektgroesse liegt und seine RND (Anlage 2, GND des Satzes) hoechstens
+         20 Jahre von der Ø RND abweicht (gemessene Streuung der RND in den
+         Stichproben rund 10-11 Jahre, Bielefeld MFH 24 +- 11: 20 Jahre sind
+         knapp zwei Standardabweichungen). Ohne RND entscheidet die Flaeche allein.
+     K8  Band: das Ergebnis liegt zwischen 0 und 25 % - dasselbe Band wie die
+         Messung am Rohertragsfaktor-Satz. Anders als dort wird NICHT gekappt:
+         ein Wert ausserhalb heisst, dass Satz und Angebote nicht dasselbe messen
+         -> Marktdurchschnitt mit internem Vermerk.
+
+   Rangfolge (im compute): eigene Angabe > Ø Kaufpreis des Rohertragsfaktor-
+   Satzes > Ø Kaufpreis des Liegenschaftszins-Satzes > Marktdurchschnitt. Der
+   Rohertragsfaktor-Satz geht vor, weil er den Kaufpreis als eigene Kennzahl des
+   Segments veroeffentlicht und dieselbe Quelle die amtliche Gegenprobe traegt;
+   der Kaufpreis im Zins-Satz ist ein beschreibender Modellansatz der
+   Zins-Stichprobe (nur rentierliche, vermietete Faelle eines Geschaeftsjahres). */
+const LZS_AB = Object.freeze({ MIN_ANGEBOTE: 8, MIN_FALLZAHL: 10, MAX_ALTER_JAHRE: 2,
+  FLAECHE_MIN: 0.5, FLAECHE_MAX: 2.0, RND_ABW_MAX: 20, BAND_MIN: 0, BAND_MAX: 25 });
+const LZS_AB_TEILMARKT = {
+  etw: ['etw', 'we_v', 'we', 'wohnung'], etw_selbst: ['etw', 'we_s', 'we_e', 'we', 'wohnung'],
+  efh: ['efh', 'ezfh'], zfh: ['zfh', 'ezfh'], villa: ['efh_villa', 'altbauvilla'],
+  dhh: ['efh_dhh_reh', 'rhdhh'], reh: ['efh_dhh_reh', 'efh_rmh', 'rhdhh'],
+  rmh: ['efh_dhh_reh', 'efh_rmh', 'rhdhh'], rh: ['efh_dhh_reh', 'efh_rmh', 'rhdhh'],
+  dreifh: ['dreifh', 'mfh'], mfh: ['mfh'], mfh_bis6: ['mfh_bis6', 'mfh'], mfh_ueber6: ['mfh_ueber6', 'mfh'],
+};
+/** „Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold"
+ *  -> „Gutachterausschuss Kreis Lippe und Stadt Detmold" (Ausschussnamen sind erlaubt). */
+export function ausschussKurz(n) {
+  let s = String(n || '').trim();
+  if (!s) return null;
+  s = s.replace(/^(der|die|das)\s+/i, '').replace(/\s+für\s+Grundstückswerte/i, '')
+    .replace(/^(Gutachterausschuss|Obere[rn]? Gutachterausschuss)\s+(im|in der|in den|in|für den|für die|für das|für)\s+/i, '$1 ')
+    .replace(/\s+und\s+(in der|im|in)\s+/gi, ' und ');
+  return s;
+}
+/** Prueft K1-K8 und liefert den Abschlag aus dem Ø Kaufpreis des LZS-Satzes oder den Grund, warum nicht. */
+export function abschlagAusLzs(ref, sale, area) {
+  const nein = (grund, extra) => Object.assign({ verwendet: false, grund }, extra || {});
+  try {
+    if (!ref || !ref.ags) return nein('keine AGS');
+    if (istGewerbe(ref) || istGrundstueck(ref)) return nein('Gewerbe/Grundstück - kein Wohnteilmarkt');
+    const med = Number(sale && sale.median_per_sqm);
+    const n = Number(sale && sale.sample_size);
+    if (!(med > 0)) return nein('kein Angebotsmedian');
+    if (!(n >= LZS_AB.MIN_ANGEBOTE)) return nein('K6: nur ' + (Number.isFinite(n) ? n : 0) + ' Angebote (mindestens ' + LZS_AB.MIN_ANGEBOTE + ')');
+    if (sale.enthaelt_demodaten === true || sale.datenherkunft === 'demo') return nein('K6: Demodaten');
+    const objart = ref.property_subtype || ref.property_type;
+    const obj = { objart, nutzung: ref.nutzung || ref.usage_type || 'vermietet', haustyp: ref.haustyp || null,
+      baujahr: ref.build_year || null, einheiten: ref.units || null, lage: ref.lage || null,
+      stadtteil: ref.stadtteil || ref.ortsteil || null, bauweise: ref.bauweise || null };
+    const typ = typVon(obj);
+    if (!typ || !LZS_AB_TEILMARKT[typ]) return nein('K1: kein Wohnteilmarkt für Objektart ' + (objart || '-'));
+    if (/^etw/.test(typ) && etwKleinobjektAusgenommen(ref.ags) && Number(ref.units) > 0 && Number(ref.units) <= 2) {
+      return nein('K2: der Ausschuss nimmt Wohnungseigentum in Objekten mit höchstens zwei WE aus seiner ETW-Auswertung aus');
+    }
+    const rnd80 = rndEinheitlich(ref, 80);
+    obj.restnutzungsdauer = rnd80 && rnd80.rnd != null ? rnd80.rnd : null;
+    const z = zinssatzFuerObjekt({ finde: regFinde, lagenFuer: regLagen, abruf: regZins }, String(ref.ags), obj);
+    if (!z || !z.verfuegbar) return nein('K1: Zweigwahl ohne Satz (' + ((z && (z.rueckfrage || z.grund)) || 'kein Satz') + ')');
+    const art = dekodiere(z.zweig).art;
+    if (LZS_AB_TEILMARKT[typ].indexOf(art) < 0) return nein('K1: Zweig ' + z.zweig + ' ist nicht der Teilmarkt ' + typ, { zweig: z.zweig });
+    const satz = (regFinde('liegenschaftszinssatz', ref.ags) || []).find((s) => s && s.zweig === z.zweig
+      && (z.lage == null || String(((s.geltungsbereich || {}).lage) || '') === String(z.lage))
+      && (z.berichtsjahr == null || s.berichtsjahr === z.berichtsjahr)) || null;
+    if (!satz) return nein('K1: Satz nicht auffindbar', { zweig: z.zweig });
+    const ebene = String(satz.ebene || z.register_ebene || '');
+    if (['bezirk', 'land', 'bund'].indexOf(ebene) >= 0) return nein('K2: Ebene ' + ebene, { zweig: z.zweig });
+    if (satz.vollstaendig === false) return nein('K3: Satz gesperrt', { zweig: z.zweig });
+    const stufe = String(satz.stufe || z.stufe || '');
+    if (['A', 'B'].indexOf(stufe) < 0) return nein('K3: Stufe ' + (stufe || '-') + ' (nur A/B)', { zweig: z.zweig });
+    const ma = satz.modellansaetze || {};
+    const kp = Number(ma.kaufpreis_eur_qm);
+    if (!(kp > 0)) return nein('Satz führt keinen Ø Kaufpreis', { zweig: z.zweig });
+    const jahr = Number(satz.berichtsjahr) || (String(satz.stichtag || '').slice(0, 4) * 1) || null;
+    const bewJahr = new Date().getFullYear();
+    if (!jahr || jahr < bewJahr - LZS_AB.MAX_ALTER_JAHRE) return nein('K4: Berichtsjahr ' + (jahr || '-') + ' älter als ' + LZS_AB.MAX_ALTER_JAHRE + ' Jahre', { zweig: z.zweig });
+    const fz = satz.fallzahl != null ? Number(satz.fallzahl) : null;
+    if (fz != null && Number.isFinite(fz) && fz < LZS_AB.MIN_FALLZAHL) return nein('K5: ' + fz + ' Kauffälle (mindestens ' + LZS_AB.MIN_FALLZAHL + ')', { zweig: z.zweig });
+    const og = Number(ma.objektgroesse_qm);
+    const fl = Number(area);
+    if (og > 0 && fl > 0 && (fl < og * LZS_AB.FLAECHE_MIN || fl > og * LZS_AB.FLAECHE_MAX)) {
+      return nein('K7: Wohnfläche ' + Math.round(fl) + ' m² außerhalb des Modellrahmens (Ø ' + Math.round(og) + ' m², '
+        + LZS_AB.FLAECHE_MIN + '- bis ' + LZS_AB.FLAECHE_MAX + '-fach)', { zweig: z.zweig });
+    }
+    const gnd = Number(ma.gnd_jahre || ma.gesamtnutzungsdauer_jahre || ma.gesamtnutzungsdauer || ma.gnd) || 80;
+    const rr = rndEinheitlich(ref, gnd);
+    const rnd = rr && rr.rnd != null ? Number(rr.rnd) : null;
+    const rm = Number(ma.restnutzungsdauer_mittel);
+    if (rnd != null && rm > 0 && Math.abs(rnd - rm) > LZS_AB.RND_ABW_MAX) {
+      return nein('K7: RND ' + rnd + ' J. weicht mehr als ' + LZS_AB.RND_ABW_MAX + ' J. von der Ø RND ' + rm + ' J. ab', { zweig: z.zweig });
+    }
+    const pct = round((1 - kp / med) * 100, 1);
+    if (!(pct >= LZS_AB.BAND_MIN && pct <= LZS_AB.BAND_MAX)) {
+      return nein('K8: ' + String(pct).replace('.', ',') + ' % außerhalb des Bands ' + LZS_AB.BAND_MIN + ' bis ' + LZS_AB.BAND_MAX + ' %',
+        { zweig: z.zweig, kaufpreis_eur_qm: kp, median_angebote: round(med, 0) });
+    }
+    const kurz = ausschussKurz(satz.gaa_name || z.ausschuss);
+    const herkunft = 'örtlich gemessen: Ø Kaufpreis der Kauffälle des '
+      + String(kurz || 'Gutachterausschusses').replace(/^Gutachterausschuss/, 'Gutachterausschusses') + ' ' + jahr
+      + ' (' + Math.round(kp).toLocaleString('de-DE') + ' €/m²' + (fz ? ', ' + fz + ' Kauffälle' : '') + ', Teilmarkt ' + z.zweig
+      + ') gegen den Median der Angebote (' + Math.round(med).toLocaleString('de-DE') + ' €/m², ' + n + ' Angebote)';
+    return { verwendet: true, pct, herkunft, quelle: 'liegenschaftszinssatz', ausschuss: kurz, berichtsjahr: jahr,
+      kurz: (kurz || 'Gutachterausschuss') + ' ' + jahr, zweig: z.zweig, kaufpreis_eur_qm: kp, fallzahl: fz,
+      median_angebote: round(med, 0), angebote: n, objektgroesse_qm: og || null, rnd_objekt: rnd, rnd_mittel: rm || null,
+      register_ags: satz.ags || null, quelle_url: satz.quelle_url || null };
+  } catch (e) { return nein('Fehler: ' + e.message); }
+}
 import { groessenanpassung as ukAusRegister, naeherung as ukNaeherung } from '../lib/umrechnung_flaeche.js';   /* v2282, v2288 */
 
 // Zustands-/Energie-/Etagen-Faktoren (dokumentiert, anpassbar)
@@ -455,7 +603,7 @@ export const ValuationService = {
               dieses Segment gegen den Angebotsmedian (0 bis 25 %)
            3. recherchierter Marktdurchschnitt (5,8 %)
          Die Rohwerte bleiben im Ergebnis (angebot_abschlag.roh). */
-      let _abPct = null, _abHerk = null, _rfSatz = null;
+      let _abPct = null, _abHerk = null, _rfSatz = null, _abMeta = null, _lzsPruef = null;   /* v2578: _abMeta, _lzsPruef */
       try {
         const _art = String(ref.property_type || '').toLowerCase();
         _rfSatz = (regFinde('rohertragsfaktor', ref.ags || null) || []).find((s) => s && s.vollstaendig !== false
@@ -468,12 +616,28 @@ export const ValuationService = {
           _abHerk = 'örtlich gemessen: Ø Kaufpreis der Kauffälle des Gutachterausschusses ('
             + Math.round(_kpQm).toLocaleString('de-DE') + ' €/m²) gegen den Median der Angebote ('
             + Math.round(Number(sale.median_per_sqm)).toLocaleString('de-DE') + ' €/m²)';
-        } else { _abPct = ANGEBOT_ABSCHLAG_MARKT_PCT; _abHerk = 'Marktdurchschnitt'; }
+          /* v2578 · kurze Herkunft fuer die Zeile an der Zahl */
+          const _rfK = ausschussKurz(_rfSatz.gaa_name || _rfSatz.ausschuss || null);
+          _abMeta = { quelle: 'rohertragsfaktor', ausschuss: _rfK,
+            berichtsjahr: _rfSatz.berichtsjahr || null,
+            kurz: _rfK ? _rfK + (_rfSatz.berichtsjahr ? ' ' + _rfSatz.berichtsjahr : '') : null };
+        } else {
+          /* v2578 · zweite Quelle: Ø Kaufpreis des Liegenschaftszins-Satzes, nur mit K1-K8 (s. o.) */
+          _lzsPruef = abschlagAusLzs(ref, sale, area);
+          if (_lzsPruef && _lzsPruef.verwendet) {
+            _abPct = _lzsPruef.pct; _abHerk = _lzsPruef.herkunft;
+            _abMeta = { quelle: 'liegenschaftszinssatz', ausschuss: _lzsPruef.ausschuss,
+              berichtsjahr: _lzsPruef.berichtsjahr, kurz: _lzsPruef.kurz };
+          } else { _abPct = ANGEBOT_ABSCHLAG_MARKT_PCT; _abHerk = 'Marktdurchschnitt'; }
+        }
       } catch (e) { _abPct = ANGEBOT_ABSCHLAG_MARKT_PCT; _abHerk = 'Marktdurchschnitt'; }
       if (_abPct > 0) {
         const _f = 1 - _abPct / 100;
         out.market_value.angebot_abschlag = { pct: _abPct, herkunft: _abHerk,
           roh: { estimated: out.market_value.estimated, low: out.market_value.low, high: out.market_value.high } };
+        /* v2578 · Quelle kurz (Ausschuss + Jahrgang) und die interne Pruefung K1-K8 */
+        if (_abMeta) Object.assign(out.market_value.angebot_abschlag, _abMeta);
+        if (_lzsPruef) out.market_value.angebot_abschlag.pruefung_lzs = _lzsPruef;
         /* v2383 · Der Abschlag trifft nur den Teil, der aus ANGEBOTSPREISEN kommt. Mehrflaechen-
            Bodenwert (Bodenrichtwert), Stellplatzwert und bOM-Betrag sind keine Angebotspreise -
            bis v2382 wurden sie mit abgeschlagen (W: 15,9 % auch auf 43.615 € Bodenwert). */
@@ -492,6 +656,8 @@ export const ValuationService = {
            NICHT gemacht hat. */
         out.market_value.angebot_abschlag = { pct: 0, herkunft: _abHerk, nicht_abgeschlagen_eur: 0,
           roh: { estimated: out.market_value.estimated, low: out.market_value.low, high: out.market_value.high } };
+        if (_abMeta) Object.assign(out.market_value.angebot_abschlag, _abMeta);   /* v2578 */
+        if (_lzsPruef) out.market_value.angebot_abschlag.pruefung_lzs = _lzsPruef;
       }
       /* v2367 · AMTLICHE GEGENPROBE - wo der Ausschuss fuer dieses Segment einen
          Rohertragsfaktor und den Ø Kaufpreis seiner Kauffaelle veroeffentlicht.

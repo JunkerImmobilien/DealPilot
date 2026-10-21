@@ -681,7 +681,8 @@
   function zz(haupt, unter) { return '<span class="dp-pot-z">' + haupt + u(unter) + '</span>'; }
   function pk(n) { return dez(n, 1).replace(',0', ''); }   /* Punkte ohne „,0" */
   /* v2577 · Herkunft des Angebotsabschlags in zwei Worten (die volle Herkunft steht unter „So ist gerechnet") */
-  function abschlagKurz(h) { h = String(h || ''); return /^örtlich/.test(h) ? 'örtlich gemessen' : (/eigene/.test(h) ? 'eigene Angabe' : (h ? 'Marktdurchschnitt' : '')); }
+  /* v2578 · dazu der Ausschuss mit Jahrgang (k), wo der Abschlag örtlich gemessen ist */
+  function abschlagKurz(h, k) { h = String(h || ''); return /^örtlich/.test(h) ? 'örtlich gemessen' + (k ? ', ' + esc(String(k)) : '') : (/eigene/.test(h) ? 'eigene Angabe' : (h ? 'Marktdurchschnitt' : '')); }
   function abschlagPct(p) { return p == null ? null : String(Math.round(Number(p) * 10) / 10).replace('.', ','); }
 
   /* v2577 · Wert je Stufe: aus dem aktuellen Ertragswert-Lauf, sonst aus dem
@@ -765,7 +766,7 @@
       rows.push({ gr: 'Wert' + (W.quelle === 'abruf' ? ' · laut Abruf Marktpreise vom ' + esc(W.datum) : '') });
       rows.push({ t: 'Ertragswert', u: [lzsT, W.leer ? W.leer + ' leere Wohnung' + (W.leer === 1 ? '' : 'en') + ' mit marktüblicher Miete' : ''].filter(Boolean).join(' · '),
         f: function (k) { var w = WS[k]; return w && w.ew != null ? zz('<b>' + eur(w.ew) + '</b>', w.rnd != null ? '<abbr title="Restnutzungsdauer" style="text-decoration:none">RND</abbr>&nbsp;' + dez(w.rnd, 0) + '&nbsp;J.' : '') : null; } });
-      if (mpiDa) rows.push({ t: 'Marktpreisindikation', u: 'Angebote am Ort' + (ab ? ', abzüglich ' + ab + ' % Abschlag (' + abschlagKurz(MPI.angebote.abschlag_herkunft) + ')' : ''),
+      if (mpiDa) rows.push({ t: 'Marktpreisindikation', u: 'Angebote am Ort' + (ab ? ', abzüglich ' + ab + ' % Abschlag (' + abschlagKurz(MPI.angebote.abschlag_herkunft, MPI.angebote.abschlag_kurz) + ')' : ''),
         f: function (k) { var w = WS[k]; if (!w || w.mpi == null) return null;
           return zz(eur(w.mpi), k === 'mieterhoehung' ? 'wie Bestand' : (w.spanne ? spanneTsd(w.spanne[0], w.spanne[1]) : '')); } });
       if (rfDa) rows.push({ t: 'Rohertragsfaktor × Miete', u: 'Faktor ' + pk(MPI.rohertragsfaktor.faktor) + ' · '
