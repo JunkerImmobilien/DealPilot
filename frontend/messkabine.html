@@ -1292,6 +1292,15 @@
             var cs = win.getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden') return;
             var b = e.getBoundingClientRect(); if (b.width < 2 || b.height < 2) return;
             if (!(e.textContent || '').trim() && e.tagName !== 'BUTTON') return;
+            /* In einem eigenen Scrollbereich (z. B. die Objektliste) ist tiefer
+               liegender Inhalt erreichbar - dort zaehlt die Unterkante des Bereichs. */
+            var bot = b.bottom;
+            for (var an = e.parentElement; an && an !== box.parentElement; an = an.parentElement) {
+              var oy = win.getComputedStyle(an).overflowY;
+              if ((oy === 'auto' || oy === 'scroll') && an.scrollHeight > an.clientHeight + 1) bot = Math.min(bot, an.getBoundingClientRect().bottom);
+            }
+            if (bot < b.top) return;   /* im Scrollbereich weggescrollt - erreichbar */
+            b = { bottom: bot };
             if (b.bottom > unten) { unten = b.bottom; wer = sel + ' ' + e.tagName.toLowerCase() + (e.className && typeof e.className === 'string' ? '.' + e.className.split(/\s+/)[0] : ''); }
           });
         });
