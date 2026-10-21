@@ -844,7 +844,36 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     return t.replace(/\*+/g, '').trim();
   }
   function maybePage(needed) {
-    if (cy + needed > 280) cy = newPage('KI-Investment-Analyse');
+    if (cy + needed > 280) cy = newPage('Pilot-Analyse');
+  }
+
+  /* v2555 · Ein Abschnitt bricht ueber die Seite um, statt als Ganzes auf die
+     naechste zu springen. Gemessen am Westerfeld-PDF (21.10.2026): die Analyse
+     belegte zehn Seiten, viele zu einem Viertel gefuellt. Passen Kopf und drei
+     Zeilen nicht mehr, beginnt der Abschnitt auf der neuen Seite; sonst laeuft
+     er weiter und traegt dort „(Fortsetzung)". */
+  function _zeichneBlock(title, lines, accentColor, isDarkBg) {
+    var LINE_H = 5.2, KOPF = 12, FUSS = 7, UNTEN = 280;
+    if (cy + KOPF + 3 * LINE_H + FUSS > UNTEN) cy = newPage('Pilot-Analyse');
+    var i = 0, erst = true;
+    while (i < lines.length) {
+      var platz = Math.max(1, Math.floor((UNTEN - cy - KOPF - FUSS) / LINE_H));
+      var teil = lines.slice(i, i + platz);
+      var h = KOPF + teil.length * LINE_H + FUSS;
+      doc.setFillColor(255, 255, 255); doc.roundedRect(M, cy, CW, h, 1.8, 1.8, 'F');
+      doc.setFillColor.apply(doc, accentColor); doc.rect(M, cy, 2, h, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.8);
+      doc.setTextColor.apply(doc, accentColor);
+      doc.text(title.toUpperCase() + (erst ? '' : ' (FORTSETZUNG)'), M + 6, cy + 6);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+      if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.35);
+      if (isDarkBg) doc.setTextColor(245, 245, 240); else doc.setTextColor(45, 42, 42);
+      var textY = cy + KOPF;
+      teil.forEach(function (line) { doc.text(line, M + 6, textY); textY += LINE_H; });
+      if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.15);
+      i += teil.length; erst = false;
+      if (i < lines.length) cy = newPage('Pilot-Analyse'); else cy += h + 4;
+    }
   }
 
   // V63.45: Sicherer Multi-Paragraph-Renderer mit klarem rechtem Padding (10mm).
@@ -876,33 +905,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     // V63.71: Sehr konservatives TEXT_W (CW - 24mm = 6 links + 18 rechts Sicherheit)
     var TEXT_W = CW - 24;
     var lines = _splitParagraphs(text, TEXT_W);
-    // V63.71: LINE_H 5.2mm - generous für lange dt. Wörter mit Descender
-    var LINE_H = 5.2;
-    // V63.71: Mehr Header-Luft (6mm) + Bottom-Padding (7mm) für Sicherheit
-    var blockH = 6 + 6 + lines.length * LINE_H + 7;
-    maybePage(blockH);
-
-    doc.setFillColor.apply(doc, bgColor); doc.roundedRect(M, cy, CW, blockH, 1.8, 1.8, 'F');
-    doc.setFillColor.apply(doc, accentColor); doc.rect(M, cy, 2, blockH, 'F');
-
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(8.8);
-    doc.setTextColor.apply(doc, accentColor);
-    doc.text(title.toUpperCase(), M + 6, cy + 6);
-
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
-    if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.35);
-    if (isDarkBg) {
-      doc.setTextColor(245, 245, 240);
-    } else {
-      doc.setTextColor(45, 42, 42);
-    }
-    var textY = cy + 12;
-    lines.forEach(function(line) {
-      doc.text(line, M + 6, textY);
-      textY += LINE_H;
-    });
-    if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.15);
-    cy += blockH + 4;
+    _zeichneBlock(title, lines, accentColor, isDarkBg);   /* v2555 */
   }
 
   function bulletBlock(title, items, bgColor, accentColor) {
@@ -922,27 +925,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
         rendered.push((idx === 0 ? '\u2022  ' : '   ') + w);
       });
     });
-    var LINE_H = 5.2;
-    var blockH = 6 + 6 + rendered.length * LINE_H + 7;
-    maybePage(blockH);
-
-    doc.setFillColor.apply(doc, bgColor); doc.roundedRect(M, cy, CW, blockH, 1.8, 1.8, 'F');
-    doc.setFillColor.apply(doc, accentColor); doc.rect(M, cy, 2, blockH, 'F');
-
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(8.8);
-    doc.setTextColor.apply(doc, accentColor);
-    doc.text(title.toUpperCase(), M + 6, cy + 6);
-
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
-    if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.35);
-    doc.setTextColor(45, 42, 42);
-    var textY = cy + 12;
-    rendered.forEach(function(line) {
-      doc.text(line, M + 6, textY);
-      textY += LINE_H;
-    });
-    if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.15);
-    cy += blockH + 4;
+    _zeichneBlock(title, rendered, accentColor, false);   /* v2555 */
   }
 
   // 1. Gesamtbewertung
@@ -3399,14 +3382,14 @@ async function _exportPDFInner() {
   // V27: includeAi gilt auch wenn nur das neue JSON-Format (_aiAnalysis) vorliegt
   var includeAi = (!aiInPdf || aiInPdf.checked) && (window._aiText || window._aiAnalysis);
   if (includeAi) {
-  cy = newPage('KI-Investment-Analyse');
+  cy = newPage('Pilot-Analyse');
 
   // Header-Banner
   doc.setFillColor.apply(doc, C.CH); doc.roundedRect(M, cy, CW, 13, 2, 2, 'F');
   doc.setFillColor.apply(doc, C.GOLD); doc.rect(M, cy, CW, 1.2, 'F');
   doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5);
   doc.setTextColor.apply(doc, C.GOLD);
-  doc.text('KI-INVESTMENT-ANALYSE', M + 5, cy + 9);
+  doc.text('PILOT-ANALYSE', M + 5, cy + 9);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
   doc.setTextColor(140, 130, 110);
   (function(){var b=_getBranding();doc.text('KI-Analyse via ' + _pn() + (b.company ? ' \u00b7 ' + b.company : ''), W - M, cy + 9, { align: 'right' });})();
