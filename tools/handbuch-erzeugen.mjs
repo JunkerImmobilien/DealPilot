@@ -259,7 +259,7 @@ function ernte() {
   const liest = (q, id) => new RegExp('\\(\\s*[\'"]' + id.replace(/[$]/g, '\\$') + '[\'"]\\s*\\)').test(q);
 
   /* ── Felder je Reiter aus index.html ── */
-  const OHNE = (k) => k.tag === 'button' || hatKlasse(k, 'ds2-tag') || hatKlasse(k, 'oe-opt') || hatKlasse(k, 'sfx') || k.tag === 'select' || k.tag === 'input' || k.tag === 'textarea';
+  const OHNE = (k) => k.tag === 'button' || hatKlasse(k, 'ds2-tag') || hatKlasse(k, 'oe-lk-tag') || hatKlasse(k, 'info-tag') || hatKlasse(k, 'oe-opt') || hatKlasse(k, 'sfx') || k.tag === 'select' || k.tag === 'input' || k.tag === 'textarea';
   const felder = {}; const reiter = []; const auffaellig = [];
   for (const sec of reihenfolge) {
     const s = erstes(root, (k) => k.attr && k.attr.id === sec);
@@ -301,6 +301,8 @@ function ernte() {
       const ds2 = !!erstes(f, (x) => hatKlasse(x, 'ds2-tag')) || DS2.includes(id);
       const titelAttr = (lab && lab.attr.title) || ein.attr.title || '';
       const wirkung = [];
+      /* Marken an der Beschriftung erklaeren ihre Wirkung im title (Lageklasse → Zielrendite, WEG-Ruecklage → nur Info) */
+      if (lab) alle(lab, (x) => (hatKlasse(x, 'oe-lk-tag') || hatKlasse(x, 'info-tag')) && x.attr.title).forEach((x) => wirkung.push(sauber(x.attr.title)));
       if (ds2) wirkung.push('geht in den Investor Deal Score');
       if (readycheck[id]) wirkung.push('zählt im Readycheck der Deal-Aktion (' + readycheck[id] + ')');
       if (/^mod_/.test(id)) wirkung.push('Modernisierungspunkte nach Anlage 2 ImmoWertV (Restnutzungsdauer)');

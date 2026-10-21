@@ -3095,7 +3095,7 @@ window.DP_HANDBUCH = {
    "id": "lageklasse",
    "reiter": "s0",
    "karte": "Lage & Einschätzung",
-   "label": "Lageklasse Ziel",
+   "label": "Lageklasse",
    "typ": "auswahl",
    "einheit": "",
    "platzhalter": "",
@@ -3124,6 +3124,7 @@ window.DP_HANDBUCH = {
    "pflichtMarke": false,
    "woher": "",
    "wirkung": [
+    "Bestimmt deine Zielrendite aus den Einstellungen. Daraus rechnet DealPilot, auf welchen Kaufpreis du verhandeln müsstest.",
     "geht in die Pilot-Analyse ein"
    ]
   },
@@ -5026,7 +5027,7 @@ window.DP_HANDBUCH = {
    "id": "ek_inkl_nk",
    "reiter": "s3",
    "karte": "Darlehen I – Hauptdarlehen",
-   "label": "LTV inkl. Erwerbsnebenkosten berechnen (strenger, GI-Bezug) ℹ",
+   "label": "LTV inkl. Erwerbsnebenkosten berechnen (strenger, GI-Bezug)",
    "typ": "haken",
    "einheit": "",
    "platzhalter": "",
@@ -5821,7 +5822,7 @@ window.DP_HANDBUCH = {
    "id": "weg_r",
    "reiter": "s4",
    "karte": "Nicht umlagefähige Kosten / Jahr",
-   "label": "WEG-Rücklage / Jahr ℹ Info",
+   "label": "WEG-Rücklage / Jahr",
    "typ": "zahl",
    "einheit": "",
    "platzhalter": "798",
@@ -5838,6 +5839,7 @@ window.DP_HANDBUCH = {
    "pflichtMarke": false,
    "woher": "",
    "wirkung": [
+    "Nur Info — wird NICHT zusätzlich summiert. Die Rücklage ist normalerweise bereits Teil des Hausgeldes (HG)",
     "geht in den Investor Deal Score",
     "geht in die Pilot-Analyse ein",
     "steht im Investment-PDF",

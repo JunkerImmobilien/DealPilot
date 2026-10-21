@@ -186,6 +186,7 @@ details[open] .pfeil{transform:rotate(90deg)}
     return s;
   }
 
+  function imKapitel(kap, id) { return kap.schritte.some(function (st) { return st.felder.some(function (x) { return x.id === id; }) || st.weitere.some(function (x) { return x.id === id; }); }); }
   function feldHtml(kap, e, nr) {
     var f = F[e.id]; if (!f) return '';
     var chips = '';
@@ -243,7 +244,7 @@ details[open] .pfeil{transform:rotate(90deg)}
       inhalt += '<section class="kapitel" id="k-' + kap.art + '" data-kapitel="' + kap.art + '"><div class="kapkopf"><h2><span class="art">Kapitel ' + (ki + 1) + ' · ' + kap.art + '</span>' + esc(kap.name) + ' anlegen</h2>'
         + '<button type="button" class="knopf klein" data-pdf="' + kap.art + '">PDF · dieses Kapitel</button></div>'
         + '<div class="steckbrief"><h3>Beispielobjekt: ' + esc(adr || kap.name) + '</h3>'
-        + [1, 2, 3].map(function (s) { return '<div class="stufe"><b>Pflicht für Marktbericht ' + STUFE[s] + '</b><div>' + kap.pflicht[s].filter(function (id) { return !(s > 1 && kap.pflicht[s - 1].indexOf(id) >= 0); }).map(function (id) { return esc(F[id] ? F[id].label.replace(/\s*\(.*\)$/, '') : id); }).join(' · ') + (s > 1 ? ' <i>(zusätzlich)</i>' : '') + '</div></div>'; }).join('')
+        + [1, 2, 3].map(function (s) { return '<div class="stufe"><b>Pflicht für Marktbericht ' + STUFE[s] + '</b><div>' + kap.pflicht[s].filter(function (id) { return !(s > 1 && kap.pflicht[s - 1].indexOf(id) >= 0); }).map(function (id) { return esc(F[id] ? F[id].label.replace(/\s*\(.*\)$/, '') : id) + (imKapitel(kap, id) ? '' : ' <i title="Die App verlangt das Feld für diese Stufe, blendet es bei dieser Objektart aber aus.">(bei ' + esc(kap.art) + ' ausgeblendet)</i>'); }).join(' · ') + (s > 1 ? ' <i>(zusätzlich)</i>' : '') + '</div></div>'; }).join('')
         + '<div class="stufe"><b>Die Nummern</b><div>Jeder Reiter zählt ab 1. Die eingekreiste Zahl im Bild ist die Zahl in der Liste darunter.</div></div></div>';
       var n = 0;
       kap.schritte.forEach(function (st) {
@@ -375,7 +376,7 @@ details[open] .pfeil{transform:rotate(90deg)}
         var bsp = kap.beispiel || {};
         absatz('Beispielobjekt: ' + [bsp.str, bsp.hnr].filter(Boolean).join(' ') + (bsp.plz ? ', ' + bsp.plz + ' ' + (bsp.ort || '') : ''), 9.5, 40);
         absatz('Die eingekreisten Nummern in den Bildern entsprechen den Nummern der Felder. Jeder Reiter zählt ab 1.', 8.6, 110);
-        [1, 2, 3].forEach(function (s) { absatz('Pflicht für den Marktbericht Stufe ' + s + (s > 1 ? ' (zusätzlich)' : '') + ': ' + kap.pflicht[s].filter(function (id) { return !(s > 1 && kap.pflicht[s - 1].indexOf(id) >= 0); }).map(function (id) { return F[id] ? F[id].label.replace(/\s*\(.*\)$/, '') : id; }).join(', '), 8.6, 70); });
+        [1, 2, 3].forEach(function (s) { absatz('Pflicht für den Marktbericht Stufe ' + s + (s > 1 ? ' (zusätzlich)' : '') + ': ' + kap.pflicht[s].filter(function (id) { return !(s > 1 && kap.pflicht[s - 1].indexOf(id) >= 0); }).map(function (id) { return (F[id] ? F[id].label.replace(/\s*\(.*\)$/, '') : id) + (imKapitel(kap, id) ? '' : ' (bei ' + kap.art + ' ausgeblendet)'); }).join(', '), 8.6, 70); });
         var n = 0;
         for (var si = 0; si < kap.schritte.length; si++) {
           var st = kap.schritte[si], r = REITER[st.sec]; n++;
