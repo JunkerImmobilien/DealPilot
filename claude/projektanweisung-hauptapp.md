@@ -41485,3 +41485,32 @@ Potenzial Demo: Bestand/MH/ZB 610.000/625.000/805.000 → 610.000/630.000/805.00
 - **Leerlauf-Regel bei der Aufnahme Modul 26 verletzt:** am Ende maß `GetLastInputInfo` 354 s statt ~1.030 s — rund elf Minuten nach Start gab es eine Eingabe, das Vordergrundfenster war am Ende ein anderes. Das Bild ist sauber (alle Sekunden 560–944 im 4-s-Raster geprüft, nur das Studio), die Aufnahme-Maschine misst es aber erst hinterher.
 - **Modul 27 nicht aufgenommen:** beim zweiten Versuch stand der Bildschirm auf 1.024 × 768 (ein Monitor, vermutlich Bildschirm aus/abgedockt); ffmpeg brach ab, das Skript verarbeitete die alte Rohdatei und legte sie fälschlich als Modul 27 ab — sofort gelöscht. Nachholen: `scratchpad/rec/aufnahme.ps1 -Modul 27 -Name "Modul 27 - Steuerverlauf mit Wendepunkt" -Sek 545`, Sprechertext liegt bereit. Das Skript löscht die Rohdatei jetzt vorher (siehe unten).
 - Videothek/Landing nicht nachgezogen, Prod nicht angefasst.
+
+### v2548/b · Anlegerprofil: Standardwert-Set und Deal-Score-Profil sind eine Wahl (21.10.2026, Staging)
+
+**Was.** Marcel (14.10. und 20./21.10.2026) wollte die Werte für DealPilot-Standard an das Bewertungsprofil koppeln, damit es nur eine Auswahl gibt. Entschieden per Abfrage: drei Profile, der Rest als Feinjustierung.
+- `standardwerte-karten.js`:
+  - Die Sets heißen jetzt Ausgewogen (DealPilot-Standard), Vorsichtig und Renditeorientiert und tragen `ds` (balanced/conservative/optimistic).
+  - Der Kopf heißt „Dein Anlegerprofil", jede Karte nennt den Deal Score.
+  - Ein Klick setzt Standardwerte UND `ds2SetPreset`.
+  - `perScore(dsKey)` gibt es für die Gegenrichtung.
+  - Weichen die Score-Gewichte vom Profil ab, steht „angepasst" (v2548b).
+- `dealscore2-ui.js`:
+  - Die drei Hauptprofile stehen oben („aus deinem Anlegerprofil"). Ein Klick dort setzt die Standardwerte mit.
+  - Lage-Fokus, Cashflow-Fokus und Sicherheit stehen unter „Feinjustierung · nur die Score-Gewichte".
+- `dealscore2.js`: Konservativ heißt jetzt **Vorsichtig**, Optimistisch heißt **Renditeorientiert**. `help.js` ist nachgezogen.
+- **Fehler im Bestand behoben:** `ds2SaveConfig` lief bei JEDEM „Speichern" der Einstellungen mit (`settings.js`) und setzte das Profil auf „Benutzerdefiniert", auch ohne geänderte Zahl. Unveränderte Werte (Vergleich mit Toleranz, `_ds2Gleich`) lassen das Profil jetzt stehen.
+
+**Commits.** `4b82260f`, `4df95226` (Konstanten), `a7a56db7` (v2548b).
+
+**Nachweis.** Staging, Browser:
+- Klick „Vorsichtig": Preset conservative, Tilgung 2, Angebotsabschlag 9.
+- Feinjustierung „Lage": Preset lage, Tilgung bleibt 2.
+- „Renditeorientiert" im Deal-Score-Reiter: Preset optimistic, Tilgung 1, EK 5, Set ren.
+- `ds2SaveConfig` unverändert: `saveConfig` wird nicht gerufen, das Profil bleibt.
+
+**Achtung beim Testen:** Das Einstellungsfenster speichert automatisch („Auto-Save aktiv"). Außerdem löscht `setActivePreset` die eigene Score-Konfiguration (`dp_dealscore2_config`). Marcels Stand (custom, Lage 40, Standardwerte 1,5/10/1/1,2/Ø) war vorher gesichert und ist wiederhergestellt; nach dem Neuladen nachgemessen.
+
+**Rest.**
+- Das Profil liegt weiter nur im Browser (localStorage), wie das Investmentprofil.
+- Wer ein Hauptprofil wählt, verliert seine eigenen Score-Gewichte. So war es auch vorher.
