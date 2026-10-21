@@ -3,15 +3,14 @@
    Whitelabel-Tokens (var(--wl-<hex>, #<hex>)), Statusfarben bleiben fest. */
 /* Schriften ohne Netz (messe-schleife-2): kein Google Fonts mehr. Ist die Schrift
    auf dem Rechner installiert, greift local(); sonst die nächste Windows-Schrift
-   (Segoe UI, Cascadia Mono/Consolas, Georgia) statt Arial. Die woff2-Dateien (OFL) kommen nach Freigabe nach
-   messe-schleife/schriften/ und werden hier je Schnitt als url() ergänzt. */
-@font-face{font-family:"Space Grotesk";font-weight:500;font-display:swap;src:local("Space Grotesk Medium"),local("SpaceGrotesk-Medium"),local("Segoe UI Semibold")}
-@font-face{font-family:"Space Grotesk";font-weight:700;font-display:swap;src:local("Space Grotesk Bold"),local("SpaceGrotesk-Bold"),local("Segoe UI Bold")}
-@font-face{font-family:"JetBrains Mono";font-weight:500 600;font-display:swap;src:local("JetBrains Mono Medium"),local("JetBrainsMono-Medium"),local("Cascadia Mono SemiBold"),local("Consolas")}
-@font-face{font-family:"JetBrains Mono";font-weight:700;font-display:swap;src:local("JetBrains Mono Bold"),local("JetBrainsMono-Bold"),local("Cascadia Mono Bold"),local("Consolas Bold")}
-@font-face{font-family:"Inter";font-weight:400;font-display:swap;src:local("Inter Regular"),local("Inter-Regular"),local("Segoe UI")}
-@font-face{font-family:"Inter";font-weight:500 600;font-display:swap;src:local("Inter Medium"),local("Inter-Medium"),local("Segoe UI Semibold")}
-@font-face{font-family:"Cormorant Garamond";font-weight:500 600;font-display:swap;src:local("Cormorant Garamond Medium"),local("CormorantGaramond-Medium"),local("Georgia")}
+   (Segoe UI, Cascadia Mono/Consolas, Georgia) statt Arial. Seit messe-schleife-3 liegen die
+   woff2-Dateien (OFL) unter messe-schleife/schriften/ - siehe unten. */
+/* Markenschriften lokal (SIL Open Font License 1.1, Lizenztexte in schriften/OFL-*.txt) - Marcel 21.10.2026: ohne Netz am Stand.
+   Variable Schriften, eine Datei je Familie (latin inkl. Umlaute). Fehlt eine Datei, greift der Systemersatz. */
+@font-face{font-family:"Space Grotesk";font-weight:300 700;font-display:swap;src:url("schriften/space-grotesk.woff2") format("woff2"),local("Segoe UI Semibold")}
+@font-face{font-family:"JetBrains Mono";font-weight:100 800;font-display:swap;src:url("schriften/jetbrains-mono.woff2") format("woff2"),local("Cascadia Mono"),local("Consolas")}
+@font-face{font-family:"Inter";font-weight:100 900;font-display:swap;src:url("schriften/inter.woff2") format("woff2"),local("Segoe UI")}
+@font-face{font-family:"Cormorant Garamond";font-weight:300 700;font-display:swap;src:url("schriften/cormorant-garamond.woff2") format("woff2"),local("Georgia")}
 :root{
   --g:var(--wl-c9a84c,#C9A84C);--gh:var(--wl-e8cc7a,#E8CC7A);--gl:var(--wl-b8932f,#b8932f);
   --obs:#050505;--creme:#FDFCFA;--text:#d9cfb8;--matt:#8c8578;--gruen:#3FA56C;--rot:#B8625C;
