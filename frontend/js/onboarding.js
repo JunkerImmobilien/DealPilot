@@ -601,11 +601,12 @@ window.DealPilotOnboarding = (function () {
          Empfehlung" — und genau das stimmte zur Haelfte: es setzte auch
          DSCR, LTV und Eigenkapital, die der Nutzer zwei Schritte vorher
          selbst eingegeben hatte. */
-      + '<p class="dpo-vor dpo-vor-klein">Deine Finanzierungsgrenzen aus '
+      /* v2554b: mit Anlegerprofil entfaellt der Absatz - die Kacheln tragen keine Zahlen mehr */
+      + (_sets() ? '' : '<p class="dpo-vor dpo-vor-klein">Deine Finanzierungsgrenzen aus '
       + 'Schritt <b>Finanzierung</b> bleiben, wie du sie eingestellt hast. '
       + 'Die Zahlen auf den Kacheln zeigen nur, was für das jeweilige Profil '
       + 'typisch ist. Ändern kannst du sie dort — oder später unter '
-      + '<b>Einstellungen › Investmentprofil</b>.</p>'
+      + '<b>Einstellungen › Investmentprofil</b>.</p>')
       /* v2551 · Ist ein Anlegerprofil gewählt, steht hier nur noch seine Kachel
          und darunter die Feinjustierung (wie im Reiter Deal Score). */
       + (function () {
@@ -1033,6 +1034,10 @@ window.DealPilotOnboarding = (function () {
       if (_st) {
         _wahl.basis = _st.ds; _wahl.typ = _st.ds;
         if (String(_w.ip_angebot_abschlag_pct || '').trim()) profilSchreiben({ angebot_abschlag_pct: parseFloat(_w.ip_angebot_abschlag_pct) });
+        else {   /* v2554b: leer = Marktdurchschnitt - ein frueher gewaehltes 9 % darf nicht stehen bleiben */
+          try { var _IP = window.DealPilotInvestmentProfile, _pp = _IP && _IP.load ? _IP.load() : null;
+                if (_pp && _pp.angebot_abschlag_pct != null) { delete _pp.angebot_abschlag_pct; _IP.save(_pp); } } catch (e) {}
+        }
         try { if (window.DpStandardKarten && DpStandardKarten.perScore) DpStandardKarten.perScore(_st.ds); } catch (e) {}
       } else if (_sets()) { _wahl.basis = null; }
       profilSchreiben({
