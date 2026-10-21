@@ -9,7 +9,7 @@
      · Gewinnspiel (tafeln.js, 15 s), solange es eingeschaltet ist und das Bild
        da ist — sonst die kurze Aufruftafel „Jetzt kostenlos testen“ mit
        dealpilot.immo-QR (6 s). Nie zwei QR-Tafeln hintereinander.
-     · nach jedem zehnten Video zusätzlich die Register-Tafel (14 s).
+     · nach dem 10. und 20. Video zusätzlich die Register-Tafel (14 s).
 
    Woher die Videos kommen: landing/medien/videothek/<datei> — online die
    Videothek der App, offline (file://) derselbe Pfad im Ordner zum Mitnehmen.
@@ -24,7 +24,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VER = 'messe-schleife-5';
+  var VER = 'messe-schleife-5c';
   var Q = new URLSearchParams(location.search);
   var RATE = Math.max(0.5, Math.min(16, parseFloat(Q.get('rate')) || 1));
   var TRATE = Math.max(0.2, Math.min(20, parseFloat(Q.get('tafelrate')) || 1));
@@ -33,7 +33,7 @@
   var DATEI = location.protocol === 'file:';
   var BASIS = 'landing/medien/videothek/';
   var URL_AUFRUF = 'https://dealpilot.immo';
-  var REGISTER_NACH = 10;     /* Register-Tafel nach jedem zehnten Video */
+  var REGISTER_NACH = 10;     /* Register-Tafel nach dem 10. und 20. Video (nicht nach dem letzten: dort folgt die Starttafel) */
 
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
   function warte(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
@@ -209,7 +209,7 @@
       var ok = await spiele(i);
       var n = (i + 1) % V.length;
       if (ok) {
-        if ((i + 1) % REGISTER_NACH === 0 && T && T.register.da()) await tafel('register', T.register.html(null), T.register.sekunden);
+        if ((i + 1) % REGISTER_NACH === 0 && i + 1 < V.length && T && T.register.da()) await tafel('register', T.register.html(null), T.register.sekunden);
         if (T && T.gewinnspiel.aktiv()) { var s = T.gewinnspiel.sekunden(); await tafel('gewinnspiel', T.gewinnspiel.html(n === 0 ? null : weiterZeile(n), s / TRATE), s); }
         else if (n !== 0) await tafel('aufruf', aufrufHtml(n), 6);
       }
