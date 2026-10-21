@@ -1,6 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════════════
    messe-schleife.js · messe-schleife-1 — Dauerschleife für den Messestand
-   Aufruf: messe-schleife.html?idee=1 … 6 · ohne Parameter: Auswahlseite
+   Aufruf: messe-schleife.html?idee=1 … 6 · ?idee=alle (jede eine Runde) · ohne Parameter: Auswahl
+           In jeder Idee: Leiste bei Mausbewegung, Tasten 1–6, A, Esc.
+           Läuft auch direkt von der Platte (file://): keine Abrufe, alles relativ.
            &tempo=1.4 streckt alle Wartezeiten (Vorgabe 1)
 
    Die Zahlen sind KEINE Erfindung: jede steht so im Kapitelband eines
@@ -11,7 +13,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VER = 'messe-schleife-1b';
+  var VER = 'messe-schleife-2';
   var Q = new URLSearchParams(location.search);
   var TEMPO = Math.max(0.3, Math.min(4, parseFloat(Q.get('tempo')) || 1));
   var GRUEN = '#3FA56C', ROT = '#B8625C', GOLD = 'var(--wl-c9a84c,#C9A84C)';
@@ -91,7 +93,7 @@
   function fmt(n, dez) { return new Intl.NumberFormat('de-DE', { minimumFractionDigits: dez || 0, maximumFractionDigits: dez || 0 }).format(n); }
   function zaehle(node, von, bis, ms, f) {
     var t0 = performance.now(); ms = ms * TEMPO;
-    (function s(t) { var p = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - p, 3); node.textContent = f(von + (bis - von) * e); if (p < 1 && node.isConnected) requestAnimationFrame(s); })(t0);
+    (function s(t) { var p = Math.max(0, Math.min(1, (t - t0) / ms)), e = 1 - Math.pow(1 - p, 3); node.textContent = f(von + (bis - von) * e); if (p < 1 && node.isConnected) requestAnimationFrame(s); })(t0);
   }
   function stufe(score) {
     var st = (window.ScoreTier && window.ScoreTier.stufe) ? window.ScoreTier.stufe(score) : { wort: '–', versal: '–', farbe: 'na' };
@@ -118,7 +120,22 @@
   }
   function spiel(v) { try { v.currentTime = 0; } catch (e) { /* noch nicht geladen */ } var p = v.play(); if (p && p.catch) p.catch(function () {}); }
   function fuss(txt) { var f = el('div', 'fuss', txt || 'Beispielzahlen aus den <b>DealPilot</b>-Demo-Objekten'); buehne.appendChild(f); return f; }
-  function status(idee, runde, szene) { window.DPS = { idee: idee, runde: runde, szene: szene, zeit: Date.now() }; }
+  /* „Alle im Wechsel“: nach einer vollen Runde die nächste Idee. Gewechselt
+     wird per Neuladen — jede Idee hat eigene Schleifen, Takte und Videos, ein
+     frisches Dokument räumt sie vollständig ab (auch unter file://). */
+  var ALLE = Q.get('idee') === 'alle', wechselt = false;
+  function status(idee, runde, szene) {
+    window.DPS = { idee: idee, runde: runde, szene: szene, zeit: Date.now(), alle: ALLE };
+    if (ALLE && runde > 1 && !wechselt) { wechselt = true; geh('?idee=alle&n=' + (idee % 6 + 1) + (Q.get('tempo') ? '&tempo=' + Q.get('tempo') : ''), true); }
+  }
+  function geh(q, ersetzen) {
+    document.body.classList.add('raus');
+    setTimeout(function () { if (ersetzen) location.replace(q); else location.href = q; }, 600);
+  }
+  function zurAuswahl() {
+    if (window.parent !== window) { try { window.parent.postMessage({ dps: 'auswahl' }, '*'); return; } catch (e) { /* weiter */ } }
+    geh(location.href.split('?')[0].split('#')[0]);
+  }
 
   /* Goldstaub im Hintergrund — Canvas kann kein var(), also Token auslesen. */
   function funken() {
@@ -207,7 +224,8 @@
     var kopf = el('div', 'c2-kopf', '<div class="marke">Deal<b>Pilot</b></div><div class="mitte">FLIGHT DECK · <b>●</b> IM FLUG</div><div class="c2-uhr"></div>');
     buehne.appendChild(kopf);
     var uhr = kopf.querySelector('.c2-uhr');
-    setInterval(function () { uhr.textContent = new Date().toLocaleTimeString('de-DE'); }, 500);
+    function uhrStellen() { uhr.textContent = new Date().toLocaleTimeString('de-DE'); }
+    uhrStellen(); setInterval(uhrStellen, 500);
     var DEF = [
       { k: 'score', lab: 'Deal Score', min: 0, max: 100, dez: 0, einh: '' },
       { k: 'dscr', lab: 'DSCR', min: 0, max: 2.5, dez: 2, einh: '', gruen: 1.2 },
@@ -337,7 +355,8 @@
       + '<div class="t4-spalten"><span>FLUG</span><span>ZIEL</span><span>ERGEBNIS</span><span>GATE</span><span>STATUS</span></div>');
     buehne.appendChild(tafel);
     var uhr = tafel.querySelector('.t4-uhr');
-    setInterval(function () { uhr.textContent = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }); }, 1000);
+    function uhrStellen() { uhr.textContent = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }); }
+    uhrStellen(); setInterval(uhrStellen, 1000);
     function feld(n, cls) { var f = el('div', 't4-feld' + (cls ? ' ' + cls : '')); for (var i = 0; i < n; i++) f.appendChild(el('span', 'fl', ' ')); return f; }
     function klappe(f, txt) {
       var z = f.children; txt = (txt + ' '.repeat(z.length)).slice(0, z.length).toUpperCase();
@@ -482,14 +501,77 @@
     { n: 5, name: 'Video-Collage', text: 'Neun Clips laufen im Raster, einer nach dem anderen zoomt groß, mit Kapitelband wie in der Videoreihe.', f: idee5 },
     { n: 6, name: '3D-Karussell', text: 'Neun Karten im Raum drehen sich nach vorn — vorne läuft der Clip, darunter Titel und Zahl.', f: idee6 }
   ];
+  /* Auswahl: sechs Vorschaukarten (Standbild, beim Überfahren läuft die Idee
+     klein im Rahmen) und „Alle im Wechsel“. Ein Klick holt den Vollbildmodus
+     (braucht die Geste) und spielt die Idee in einem Rahmen über der Seite —
+     so bleibt der Vollbildmodus auch beim Wechseln zwischen den Ideen stehen. */
   function wahl() {
     funkenAus = funken();
     var w = el('div', 'wahl ebene');
-    w.innerHTML = '<div class="kick">Messe-Schleife · Auswahl</div><h1>Deal<span class="gold">Pilot</span> am Stand</h1><p class="unter">Sechs Dauerschleifen für den großen Bildschirm — ohne Ton, ohne Bedienung. Eine wählen, dann F11.</p>';
+    w.innerHTML = '<div class="wahl-kopf"><div><div class="kick">Messe-Schleife · Auswahl</div><h1>Deal<span class="gold">Pilot</span> am Stand</h1></div>'
+      + '<a class="wahl-alle" data-idee="alle"><b>A</b>Alle im Wechsel<small>jede Idee eine Runde, endlos</small></a></div>'
+      + '<p class="unter">Sechs Dauerschleifen für den großen Bildschirm — stumm, ohne Bedienung. Klick startet im Vollbild; Tasten <b>1–6</b>, <b>A</b>, <b>Esc</b> zurück.</p>';
     var r = el('div', 'wahl-raster');
-    IDEEN.forEach(function (d) { r.appendChild(el('a', '', '<div class="nr">' + d.n + '</div><h2>' + d.name + '</h2><p>' + d.text + '</p><code>?idee=' + d.n + '</code>')); r.lastChild.href = '?idee=' + d.n; });
-    w.appendChild(r); buehne.appendChild(w);
+    IDEEN.forEach(function (d) {
+      var a = el('a', 'wahl-karte', '<div class="bild"><img alt="" src="messe-schleife/vorschau/idee-' + d.n + '.jpg?v=' + VER + '"><span class="nr">' + d.n + '</span></div><h2>' + d.name + '</h2><p>' + d.text + '</p>');
+      a.setAttribute('data-idee', d.n); a.href = '?idee=' + d.n;
+      var live = null, t = null;
+      a.addEventListener('mouseenter', function () { t = setTimeout(function () { live = el('iframe', 'live'); live.src = '?idee=' + d.n + '&vorschau=1'; live.setAttribute('tabindex', '-1'); a.querySelector('.bild').appendChild(live); }, 350); });
+      a.addEventListener('mouseleave', function () { clearTimeout(t); if (live) { live.remove(); live = null; } });
+      r.appendChild(a);
+    });
+    w.appendChild(r);
+    w.appendChild(el('div', 'wahl-hinweis', '<b>Am Stand ohne Netz:</b> Ordner „Messe-Schleife“ auf den Rechner kopieren, <b>messe-schleife.html</b> doppelklicken, Idee anklicken (oder F11).'));
+    buehne.appendChild(w);
+    w.querySelector('.wahl-alle').href = '?idee=alle';
     document.body.classList.remove('laeuft');
+
+    var spieler = null;
+    function spiele(id) {
+      var q = '?idee=' + id;
+      var el0 = document.documentElement;
+      if (el0.requestFullscreen && !document.fullscreenElement) { try { var p = el0.requestFullscreen(); if (p && p.catch) p.catch(function () {}); } catch (e) { /* ohne Vollbild weiter */ } }
+      if (!spieler) { spieler = el('iframe', 'spieler'); spieler.setAttribute('allow', 'fullscreen; autoplay'); document.body.appendChild(spieler); }
+      spieler.src = q; spieler.focus();
+      document.body.classList.add('spielt');
+    }
+    function schliesse() {
+      if (!spieler) return;
+      spieler.remove(); spieler = null; document.body.classList.remove('spielt');
+      if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+    }
+    w.addEventListener('click', function (e) {
+      var a = e.target.closest('[data-idee]'); if (!a) return;
+      e.preventDefault(); spiele(a.getAttribute('data-idee'));
+    });
+    addEventListener('message', function (e) { if (e.data && e.data.dps === 'auswahl') schliesse(); });
+    document.addEventListener('fullscreenchange', function () { if (!document.fullscreenElement) schliesse(); });
+    addEventListener('keydown', function (e) {
+      if (spieler) { if (e.key === 'Escape') schliesse(); return; }
+      if (/^[1-6]$/.test(e.key)) spiele(e.key);
+      else if (e.key === 'a' || e.key === 'A') spiele('alle');
+    });
+  }
+
+  /* Umschalter in jeder Idee: erscheint erst bei Mausbewegung, geht nach 3 s. */
+  function umschalter(aktiv) {
+    var l = el('nav', 'umschalter');
+    var html = '';
+    IDEEN.forEach(function (d) { html += '<a data-q="?idee=' + d.n + '"' + (aktiv === d.n ? ' class="an"' : '') + '><b>' + d.n + '</b>' + d.name + '</a>'; });
+    html += '<a data-q="?idee=alle"' + (ALLE ? ' class="an"' : '') + '><b>A</b>Alle im Wechsel</a><a data-q="auswahl"><b>Esc</b>Zur Auswahl</a>';
+    l.innerHTML = html; document.body.appendChild(l);
+    var t = null;
+    function zeig() { document.body.classList.add('maus'); clearTimeout(t); t = setTimeout(function () { document.body.classList.remove('maus'); }, 3000); }
+    addEventListener('mousemove', zeig);
+    l.addEventListener('click', function (e) {
+      var a = e.target.closest('a'); if (!a) return; e.preventDefault();
+      var q = a.getAttribute('data-q'); if (q === 'auswahl') zurAuswahl(); else geh(q);
+    });
+    addEventListener('keydown', function (e) {
+      if (/^[1-6]$/.test(e.key)) geh('?idee=' + e.key);
+      else if (e.key === 'a' || e.key === 'A') geh('?idee=alle');
+      else if (e.key === 'Escape') zurAuswahl();
+    });
   }
 
   /* ── Start ── */
@@ -497,11 +579,12 @@
   function start() {
     buehne = document.getElementById('buehne');
     skaliere(); addEventListener('resize', skaliere);
-    var n = parseInt(Q.get('idee'), 10);
+    var n = ALLE ? (parseInt(Q.get('n'), 10) || 1) : parseInt(Q.get('idee'), 10);
     var d = IDEEN.filter(function (x) { return x.n === n; })[0];
     if (!d) { wahl(); return; }
-    document.title = 'DealPilot · Messe-Schleife ' + d.n + ' · ' + d.name;
+    document.title = 'DealPilot · Messe-Schleife ' + (ALLE ? 'alle · ' : '') + d.n + ' · ' + d.name;
     document.body.classList.add('laeuft');
+    if (!Q.has('vorschau')) umschalter(ALLE ? 0 : d.n);
     d.f();
   }
   window.DealPilotMesseSchleife = { ideen: IDEEN, funktionen: F, instrumente: INSTR, version: VER };

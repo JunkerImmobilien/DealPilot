@@ -1,6 +1,17 @@
 /* messe-schleife.css · messe-schleife-1 — Dauerschleife für den Messebildschirm.
    Bühne 1920 x 1080, auf jedes Fenster skaliert. Gold nur über die
    Whitelabel-Tokens (var(--wl-<hex>, #<hex>)), Statusfarben bleiben fest. */
+/* Schriften ohne Netz (messe-schleife-2): kein Google Fonts mehr. Ist die Schrift
+   auf dem Rechner installiert, greift local(); sonst die nächste Windows-Schrift
+   (Segoe UI, Cascadia Mono/Consolas, Georgia) statt Arial. Die woff2-Dateien (OFL) kommen nach Freigabe nach
+   messe-schleife/schriften/ und werden hier je Schnitt als url() ergänzt. */
+@font-face{font-family:"Space Grotesk";font-weight:500;font-display:swap;src:local("Space Grotesk Medium"),local("SpaceGrotesk-Medium"),local("Segoe UI Semibold")}
+@font-face{font-family:"Space Grotesk";font-weight:700;font-display:swap;src:local("Space Grotesk Bold"),local("SpaceGrotesk-Bold"),local("Segoe UI Bold")}
+@font-face{font-family:"JetBrains Mono";font-weight:500 600;font-display:swap;src:local("JetBrains Mono Medium"),local("JetBrainsMono-Medium"),local("Cascadia Mono SemiBold"),local("Consolas")}
+@font-face{font-family:"JetBrains Mono";font-weight:700;font-display:swap;src:local("JetBrains Mono Bold"),local("JetBrainsMono-Bold"),local("Cascadia Mono Bold"),local("Consolas Bold")}
+@font-face{font-family:"Inter";font-weight:400;font-display:swap;src:local("Inter Regular"),local("Inter-Regular"),local("Segoe UI")}
+@font-face{font-family:"Inter";font-weight:500 600;font-display:swap;src:local("Inter Medium"),local("Inter-Medium"),local("Segoe UI Semibold")}
+@font-face{font-family:"Cormorant Garamond";font-weight:500 600;font-display:swap;src:local("Cormorant Garamond Medium"),local("CormorantGaramond-Medium"),local("Georgia")}
 :root{
   --g:var(--wl-c9a84c,#C9A84C);--gh:var(--wl-e8cc7a,#E8CC7A);--gl:var(--wl-b8932f,#b8932f);
   --obs:#050505;--creme:#FDFCFA;--text:#d9cfb8;--matt:#8c8578;--gruen:#3FA56C;--rot:#B8625C;
@@ -35,17 +46,42 @@ video{display:block;background:#0b0a08}
 .pille{display:inline-block;padding:.22em .8em;border-radius:99px;font:700 .9em "JetBrains Mono",monospace;letter-spacing:.14em;border:2px solid var(--farbe);color:var(--farbe)}
 
 /* ── Auswahlseite ── */
-.wahl{position:absolute;inset:0;padding:70px 90px;display:flex;flex-direction:column}
-.wahl h1{margin:18px 0 6px;font:700 84px/1 "Space Grotesk",sans-serif;letter-spacing:-.03em}
-.wahl p.unter{margin:0 0 44px;font:400 30px/1.4 Inter,sans-serif;color:var(--text)}
-.wahl-raster{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;flex:1}
-.wahl a{position:relative;display:flex;flex-direction:column;gap:14px;padding:34px 36px;border-radius:20px;text-decoration:none;color:var(--creme);overflow:hidden;
+.wahl{position:absolute;inset:0;padding:44px 80px 30px;display:flex;flex-direction:column}
+.wahl-kopf{display:flex;align-items:flex-end;justify-content:space-between;gap:40px}
+.wahl h1{margin:12px 0 0;font:700 72px/1 "Space Grotesk",sans-serif;letter-spacing:-.03em}
+.wahl p.unter{margin:14px 0 26px;font:400 26px/1.4 Inter,sans-serif;color:var(--text)}
+.wahl p.unter b{color:var(--gh);font-weight:600}
+.wahl-alle{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:18px 30px 18px 92px;position:relative;border-radius:18px;text-decoration:none;cursor:pointer;
+  color:#1a1407;background:var(--runway);font:700 34px/1.1 "Space Grotesk",sans-serif;box-shadow:0 14px 40px color-mix(in srgb,var(--g) 35%,transparent);transition:transform .25s}
+.wahl-alle:hover{transform:translateY(-4px)}
+.wahl-alle b{position:absolute;left:22px;top:50%;margin-top:-26px;width:52px;height:52px;border-radius:12px;display:grid;place-items:center;background:#1a1407;color:var(--gh);font:700 30px "JetBrains Mono",monospace}
+.wahl-alle small{font:600 18px "JetBrains Mono",monospace;letter-spacing:.06em;opacity:.75}
+.wahl-raster{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:24px;flex:1;min-height:0}
+.wahl-karte{position:relative;display:flex;flex-direction:column;gap:6px;padding:14px 14px 18px;border-radius:20px;text-decoration:none;color:var(--creme);overflow:hidden;cursor:pointer;min-height:0;
   background:linear-gradient(150deg,rgba(28,24,15,.95),rgba(10,9,7,.95));box-shadow:0 0 0 1px color-mix(in srgb,var(--g) 35%,transparent),0 20px 60px rgba(0,0,0,.5);transition:transform .3s,box-shadow .3s}
-.wahl a:hover{transform:translateY(-6px);box-shadow:0 0 0 2px var(--g),0 30px 80px rgba(0,0,0,.6)}
-.wahl a .nr{width:76px;height:76px;border-radius:14px;display:grid;place-items:center;font:700 42px "Space Grotesk",sans-serif;color:#1a1407;background:var(--runway)}
-.wahl a h2{margin:6px 0 0;font:700 44px/1.1 "Space Grotesk",sans-serif}
-.wahl a p{margin:0;font:400 24px/1.45 Inter,sans-serif;color:var(--text)}
-.wahl a code{margin-top:auto;font:500 20px "JetBrains Mono",monospace;color:var(--g)}
+.wahl-karte:hover{transform:translateY(-6px);box-shadow:0 0 0 3px var(--g),0 30px 80px rgba(0,0,0,.6)}
+.wahl-karte .bild{position:relative;flex:1 1 0;min-height:0;border-radius:12px;overflow:hidden;background:#0b0a08}
+.wahl-karte .bild img,.wahl-karte .bild iframe{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover}
+.wahl-karte .bild iframe{pointer-events:none;background:#000}
+.wahl-karte .nr{position:absolute;left:12px;top:12px;width:54px;height:54px;border-radius:12px;display:grid;place-items:center;font:700 30px "Space Grotesk",sans-serif;color:#1a1407;background:var(--runway);z-index:2}
+.wahl-karte h2{margin:8px 6px 0;font:700 36px/1.1 "Space Grotesk",sans-serif}
+.wahl-karte p{margin:0 6px;font:400 20px/1.4 Inter,sans-serif;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wahl-hinweis{margin-top:18px;font:400 20px/1.4 Inter,sans-serif;color:var(--matt)}
+.wahl-hinweis b{color:var(--text);font-weight:600}
+/* Spieler über der Auswahl (Vollbild bleibt beim Wechseln stehen) */
+iframe.spieler{position:fixed;inset:0;width:100vw;height:100vh;border:0;z-index:100;background:#000}
+/* Wechsel ausblenden */
+body::after{content:"";position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .55s;z-index:90}
+body.raus::after{opacity:1}
+/* Umschalter: nur nach Mausbewegung sichtbar */
+.umschalter{position:fixed;left:50%;bottom:18px;z-index:80;display:flex;gap:6px;padding:8px;border-radius:14px;transform:translate(-50%,140%);opacity:0;transition:transform .35s,opacity .35s;
+  background:rgba(12,11,8,.92);box-shadow:0 0 0 1px color-mix(in srgb,var(--g) 45%,transparent),0 12px 40px rgba(0,0,0,.6);font:600 14px Inter,system-ui,sans-serif;white-space:nowrap}
+body.maus .umschalter{transform:translate(-50%,0);opacity:1}
+body.laeuft.maus{cursor:default}
+.umschalter a{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:9px;color:var(--text);text-decoration:none;cursor:pointer}
+.umschalter a:hover{background:rgba(255,255,255,.06);color:var(--creme)}
+.umschalter a.an{background:color-mix(in srgb,var(--g) 22%,transparent);color:var(--gh)}
+.umschalter a b{min-width:22px;height:22px;padding:0 5px;border-radius:6px;display:grid;place-items:center;font:700 12px "JetBrains Mono",monospace;color:#1a1407;background:var(--runway)}
 
 /* ══ Idee 1 · Kinetik ══ */
 .k1-strahl{position:absolute;left:50%;top:50%;width:2600px;height:2600px;margin:-1300px 0 0 -1300px;z-index:1;opacity:.5;
