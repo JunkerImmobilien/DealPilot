@@ -4572,3 +4572,39 @@ Durchklicken (v2554a), `node --check` und Code-Lesen sahen nichts.
 
 **Regel:** Ausblenden per inline `style="display:none"` (oder `[hidden]{display:none!important}`
 im eigenen Blatt), und nach jedem Umbau einmal per `offsetParent` zählen, was sichtbar ist.
+
+## Jedes Laden in der Kabine zählt die Objektnummer hoch
+
+Gemessen am 21.10.2026 (v2570): die App startet im iframe als „Neues Objekt"
+und zieht dabei den Zähler `ji_u_<user>_seq_<jahr>` im **localStorage** hoch
+– 2026-1119, 1120 … 1126 über einen Messlauf. Gespeichert wurde nichts (die
+Sperre fing `POST /objects` ab), aber der Zähler liegt im **geteilten**
+Speicher derselben Herkunft: nach dem Lauf vergibt Marcels nächstes Objekt
+sonst eine Nummer mit Lücke.
+
+**Regel:** vor jedem Kabinenlauf `DPM.lsSichern()`, danach iframe auf
+`about:blank` und `DPM.lsZurueck()` – und den Zähler gegen die höchste
+Nummer aus `GET /objects` halten (Zähler ≥ Maximum). Die Messkabine mit
+`?leer=1` öffnen, sonst lädt sie die App, bevor gesichert ist.
+
+## Ein Modal, dessen Wurzel null Pixel hoch ist
+
+`#bmf-modal-container` ist eine Hülle mit Höhe 0; sichtbar ist ihr Kind
+`#bmfOverlay` (`position:fixed`). `#v10-market-modal` steht statisch im
+Reiter Finanzierung (`#s3`) – ist der Reiter nicht aktiv, ist das Modal
+`display:flex` und trotzdem 0×0, weil ein Vorfahr `display:none` trägt.
+Beide meldete der Modal-Prüfer zuerst als „keine sichtbare Wurzel".
+
+**Regel:** ein Modal-Prüfer bekommt den Selektor des **gemalten** Kastens,
+nicht den der Hülle, und öffnet ein Modal aus dem Zustand, aus dem der
+Nutzer es öffnet (Reiter aktiv, Objekt geladen). Drei Deal-Aktion-Fenster
+öffnen ohne Objekt gar nicht (`alert` „Bitte zuerst Adresse …") – auch das
+ist ein Zustand, kein Fehler.
+
+## `scrollbar-width: thin` nimmt auf Windows Höhe
+
+Der Balken der Reiterleiste (v2571, ab 1025 px) ist im Prüf-Chrome unter
+Windows **13 px** hoch (`offsetHeight − clientHeight`), auf Mac/iPad mit
+Überlagerungsbalken 0. Er erscheint nur, wenn die Leiste überläuft. Wer an
+Höhenverträgen unter `nav.tabs` rechnet (`top:178px`-Muster), misst auf
+beiden Systemen.
