@@ -491,6 +491,12 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                in lzs-bw.json ab - juengster Jahrgang gilt), Sachwertfaktor nur als Diagramm ohne Gleichung
                                (Sperren), keine Umrechnungskoeffizienten Flaeche (Sperren). */
                             'lzs-swf-uk-ulm-2026.json',
+                            /* v2650 · Nachernte 21.10.2026 (Harvest-Takt, Teil RP/BE/BY/HB/NI-OGA):
+                               Berlin Liegenschaftszinssaetze 2026 (6 Gebietsgruppen, NEU Objektmiete x
+                               Wohn-/Nutzflaeche, 432 Zellen = Formel) und Sachwertfaktoren 2026
+                               (Teilmarkt 1: 4 Altbezirksgruppen x EFH/DHH/REH/RMH; Teilmarkt 2: Villen),
+                               Stichtag 31.12.2025 - loesen 2025 ab; dazu 7 Sperren. dl-de/zero-2-0. */
+                            'nachernte-2026-10-be.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
