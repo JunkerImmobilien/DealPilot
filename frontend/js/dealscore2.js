@@ -189,7 +189,7 @@ window.DealScore2 = (function() {
      */
     conservative: {
       key: 'conservative',
-      label: 'Konservativ',
+      label: 'Vorsichtig',   /* v2548 · vorher „Konservativ" - ein Name mit dem Anlegerprofil */
       description: 'Substanz und Cashflow-Sicherheit vor Renditejagd.',
       icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
       overrides: {
@@ -236,7 +236,7 @@ window.DealScore2 = (function() {
      */
     optimistic: {
       key: 'optimistic',
-      label: 'Optimistisch',
+      label: 'Renditeorientiert',   /* v2548 · vorher „Optimistisch" */
       description: 'Wachstum: Rendite und Upside zählen, LTV wird toleriert.',
       icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
       overrides: {

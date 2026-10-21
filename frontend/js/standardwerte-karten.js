@@ -21,11 +21,16 @@
   if (window.DpStandardKarten) return;
 
   var SETS = [
-    { id: 'dp',  name: 'DealPilot-Standard', txt: 'Die heutigen Vorbelegungen.',
+    /* v2548 · ANLEGERPROFIL — Marcel 20./21.10.2026: „Sollten wir die Werte für
+       DealPilot-Standard mit an das Bewertungsprofil koppeln? Dann haben wir nur eine
+       Auswahl." Entschieden: drei Profile setzen Standardwerte UND die Gewichte des
+       Deal Scores (`ds` = Schlüssel in dealscore2.js PRESETS). Lage-, Cashflow-Fokus
+       und Sicherheit bleiben im Deal-Score-Reiter als Feinjustierung. */
+    { id: 'dp',  name: 'Ausgewogen', txt: 'DealPilot-Standard — die heutigen Vorbelegungen.', ds: 'balanced',
       werte: { ip_tilgung_default: '1.5', ip_ek_quote_default: '10', ip_mietausfall_pct: '1', ip_min_dscr: '1.2', ip_angebot_abschlag_pct: '' } },
-    { id: 'vor', name: 'Vorsichtig', txt: 'Mehr Puffer, strengere Grenzen.',
+    { id: 'vor', name: 'Vorsichtig', txt: 'Mehr Puffer, strengere Grenzen.', ds: 'conservative',
       werte: { ip_tilgung_default: '2', ip_ek_quote_default: '20', ip_mietausfall_pct: '3', ip_min_dscr: '1.3', ip_angebot_abschlag_pct: '9' } },
-    { id: 'ren', name: 'Renditeorientiert', txt: 'Mehr Hebel, weniger Puffer.',
+    { id: 'ren', name: 'Renditeorientiert', txt: 'Mehr Hebel, weniger Puffer.', ds: 'optimistic',
       werte: { ip_tilgung_default: '1', ip_ek_quote_default: '5', ip_mietausfall_pct: '1', ip_min_dscr: '1.1', ip_angebot_abschlag_pct: '' } }
   ];
   /* v2237 · Abschlag auf Angebotspreise im Set: '' = recherchierter Marktdurchschnitt
@@ -138,6 +143,7 @@
       '#settings-modal .ip-zins-modi small{color:#625c59;font-weight:400}',
       '#settings-modal .ip-zins-wahl,#settings-modal .ip-bwk-wahl{grid-column:1/-1}',
       '#settings-modal input[readonly]#ip_zins_override{background:#f6f3ec;color:#625c59}',
+      '#settings-modal .swk-kopf{font:600 11px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:#8a6d1f;margin:2px 0 8px}',
       '@media (max-width:640px){#settings-modal .swk-sets{grid-template-columns:1fr}}'
     ].join('\n');
     document.head.appendChild(st);
@@ -189,12 +195,15 @@
       var b = document.createElement('button'); b.type = 'button'; b.className = 'swk-set'; b.setAttribute('data-set', st.id);
       b.innerHTML = '<b>' + esc(st.name) + '</b><p>' + esc(st.txt) + '</p><ul>' + SET_ZEILEN.map(function (z) {
         var sw = st.werte[z[0]];
-        return '<li><span>' + esc(z[1]) + '</span> ' + esc(sw === '' ? 'Ø Markt' : zahl(sw) + z[2]) + '</li>'; }).join('') + '</ul>';
+        return '<li><span>' + esc(z[1]) + '</span> ' + esc(sw === '' ? 'Ø Markt' : zahl(sw) + z[2]) + '</li>'; }).join('')
+        + '<li><span>Deal Score</span> ' + esc(dsName(st.ds)) + '</li></ul>';
       b.addEventListener('click', function () { setAnwenden(host, st); });
       sets.appendChild(b);
     });
     var hin = document.createElement('p'); hin.className = 'swk-hinweis';
-    hin.textContent = 'Ein Set setzt Tilgung, Eigenkapital, Mietausfall, Mindest-DSCR und den Abschlag auf Angebotspreise. Übernommen wird mit „Speichern“ unten.';
+    hin.textContent = 'Dein Anlegerprofil setzt Tilgung, Eigenkapital, Mietausfall, Mindest-DSCR, den Abschlag auf Angebotspreise und die Gewichte des Deal Scores. Die Werte übernimmst du mit „Speichern“ unten, die Score-Gewichte gelten sofort. Feiner justieren: Reiter Deal Score.';
+    var kopf = document.createElement('div'); kopf.className = 'swk-kopf'; kopf.textContent = 'Dein Anlegerprofil';
+    oben.appendChild(kopf);
     var band = document.createElement('div'); band.className = 'swk-band';   /* v2211 */
     oben.appendChild(sets); oben.appendChild(hin); oben.appendChild(band); oben.appendChild(karten);
     host.insertBefore(oben, teile[0] ? teile[0].el : null);
@@ -265,8 +274,14 @@
     karteneZeichnen(host); setMarkieren(host);
     try { host.scrollIntoView({ block: 'start' }); } catch (e) {}
   }
-  function setAnwenden(host, st) {
+  function dsName(k) {
+    var p = window.DealScore2 && DealScore2.getPresets ? DealScore2.getPresets().filter(function (x) { return x.key === k; })[0] : null;
+    return p ? p.label : '—';
+  }
+  function setAnwenden(host, st, ohneScore) {
     setMerken(st.id);   /* v2211: das gewählte Set bleibt gemerkt */
+    /* v2548 · das Profil setzt auch die Deal-Score-Gewichte */
+    if (!ohneScore && st.ds && typeof window.ds2SetPreset === 'function') { try { window.ds2SetPreset(st.ds, true); } catch (x) {} }
     Object.keys(st.werte).forEach(function (id) {
       var e = document.getElementById(id); if (!e) return;
       e.value = st.werte[id];
@@ -291,5 +306,14 @@
     });
   }
 
-  window.DpStandardKarten = { aufbauen: aufbauen, SETS: SETS };
+  /* v2548 · Wahl aus dem Deal-Score-Reiter: dasselbe Profil auch für die Standardwerte.
+     Liefert false, wenn das Formular nicht offen ist (dann nur die Score-Gewichte). */
+  function perScore(dsKey) {
+    var st = SETS.filter(function (s) { return s.ds === dsKey; })[0]; if (!st) return false;
+    var host = document.querySelector('#settings-modal [data-swk]');
+    if (!host) { setMerken(st.id); return false; }
+    setAnwenden(host, st, true); return true;
+  }
+  function profilVonScore(dsKey) { var st = SETS.filter(function (s) { return s.ds === dsKey; })[0]; return st ? st.name : null; }
+  window.DpStandardKarten = { aufbauen: aufbauen, SETS: SETS, perScore: perScore, profilVonScore: profilVonScore };
 })();
