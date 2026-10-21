@@ -63,8 +63,8 @@
       sections: [
         /* v2560 · Flughandbuch: die Seite handbuch.html, oben im Thema als Knopf (_handbuchBannerHtml) */
         {
-          h: 'Handbuch: Objekt anlegen (ETW · EFH · MFH)',
-          body: 'Das <strong>Flughandbuch</strong> führt je Objektart — Eigentumswohnung, Einfamilienhaus, Mehrfamilienhaus — Reiter für Reiter durch alle Felder: was du einträgst, woher der Wert kommt und was er bewirkt. Mit Bildern aus der App und als PDF zum Ausdrucken. Öffnen über den Knopf <strong>Handbuch öffnen</strong> oben in diesem Thema.'
+          h: 'Handbuch: Schritt für Schritt und alle Felder',
+          body: 'Das <strong>Flughandbuch</strong> beginnt mit <strong>Teil A · Schritt für Schritt</strong>: 11 Abläufe von der Ersteinrichtung über Quick Boarding, Finanzierung, RND-Assistent und Pilot-Analyse bis zu Bank, Steuer und Portfolio. Danach führt es je Objektart — Eigentumswohnung, Einfamilienhaus, Mehrfamilienhaus — Reiter für Reiter durch alle Felder: was du einträgst, woher der Wert kommt und was er bewirkt. Mit Bildern aus der App und als PDF zum Ausdrucken. Öffnen über den Knopf <strong>Handbuch öffnen</strong> oben in diesem Thema.'
         },
         {
           h: 'Objekt — Grunddaten, Lage und Eingabetiefe',
@@ -1052,8 +1052,8 @@
   function _handbuchBannerHtml() {
     return '<div class="hb-banner" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#050505;color:#f3ead0;border-radius:14px;padding:16px 18px;margin:0 0 16px">'
       + '<div style="flex:1;min-width:200px"><div style="font:700 10.5px JetBrains Mono,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--wl-e8cc7a, #E8CC7A)">Flughandbuch</div>'
-      + '<div style="font:600 16px Space Grotesk,sans-serif;color:#fdfcfa;margin-top:4px">Handbuch: Objekt anlegen (ETW · EFH · MFH)</div>'
-      + '<div style="font-size:12.5px;color:#b9ad8f;margin-top:2px">Jedes Feld mit Bild, Beispiel, Herkunft und Wirkung — auch als PDF.</div></div>'
+      + '<div style="font:600 16px Space Grotesk,sans-serif;color:#fdfcfa;margin-top:4px">Handbuch: Schritt für Schritt und alle Felder</div>'
+      + '<div style="font-size:12.5px;color:#b9ad8f;margin-top:2px">11 Abläufe von der Einrichtung bis zur Steuer, dazu jedes Feld mit Bild, Beispiel, Herkunft und Wirkung — auch als PDF.</div></div>'
       + '<button type="button" id="help-handbuch-btn" onclick="window.open(&quot;handbuch.html&quot;, &quot;_blank&quot;, &quot;noopener&quot;)" style="border:0;border-radius:10px;padding:10px 14px;font:600 13px Space Grotesk,sans-serif;cursor:pointer;color:#1a1407;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))">Handbuch öffnen</button></div>';
   }
   function _renderTopic(topic) {
