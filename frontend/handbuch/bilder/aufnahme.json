@@ -417,7 +417,57 @@
         "brw_anpassung_grund"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "erbbauzins",
+       "erb_restlz",
+       "erb_zs_ang",
+       "erb_entsch",
+       "erb_wert_ist_erb"
+      ],
+      "nummer": {
+       "erbbauzins": 109,
+       "erb_restlz": 110,
+       "erb_zs_ang": 111,
+       "erb_entsch": 112,
+       "erb_wert_ist_erb": 113
+      },
+      "bilder": [
+       {
+        "datei": "hb-etw-s0-x1.webp",
+        "felder": [
+         "erbbauzins",
+         "erb_restlz",
+         "erb_zs_ang",
+         "erb_entsch",
+         "erb_wert_ist_erb"
+        ]
+       }
+      ]
+     },
+     "mobil": {
+      "bilder": [
+       {
+        "datei": "hb-etw-s0-m1.webp",
+        "felder": [
+         "plz",
+         "ort",
+         "str",
+         "hnr",
+         "objart"
+        ]
+       },
+       {
+        "datei": "hb-etw-s0-m2.webp",
+        "felder": [
+         "nutzungsart",
+         "wfl",
+         "zimmer"
+        ]
+       }
+      ]
+     }
     },
     "s1": {
      "sichtbar": [
@@ -472,7 +522,49 @@
         "moebl"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "inv_kueche",
+       "inv_moebel",
+       "inv_geraete",
+       "inv_pv",
+       "inv_stellplatz",
+       "inv_sonst"
+      ],
+      "nummer": {
+       "inv_kueche": 15,
+       "inv_moebel": 16,
+       "inv_geraete": 17,
+       "inv_pv": 18,
+       "inv_stellplatz": 19,
+       "inv_sonst": 20
+      },
+      "bilder": [
+       {
+        "datei": "hb-etw-s1-x1.webp",
+        "felder": [
+         "inv_kueche",
+         "inv_moebel",
+         "inv_geraete",
+         "inv_pv",
+         "inv_stellplatz",
+         "inv_sonst"
+        ]
+       }
+      ]
+     },
+     "mobil": {
+      "bilder": [
+       {
+        "datei": "hb-etw-s1-m1.webp",
+        "felder": [
+         "kp",
+         "makler_p"
+        ]
+       }
+      ]
+     }
     },
     "s2": {
      "sichtbar": [
@@ -534,7 +626,18 @@
         "me_pct"
        ]
       }
-     ]
+     ],
+     "mobil": {
+      "bilder": [
+       {
+        "datei": "hb-etw-s2-m1.webp",
+        "felder": [
+         "nkm",
+         "ze"
+        ]
+       }
+      ]
+     }
     },
     "s3": {
      "sichtbar": [
@@ -591,7 +694,111 @@
         "d1_anschl_enable"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "anschl_z",
+       "anschl_t",
+       "anschl_bj",
+       "bspar_inst",
+       "bspar_vertrag",
+       "bspar_vertragsdatum",
+       "bspar_sum",
+       "bspar_rate",
+       "bspar_quote_min",
+       "bspar_zins",
+       "bspar_dar_z",
+       "bspar_dar_t",
+       "d2_type",
+       "d2_inst",
+       "d2_vertrag",
+       "d2_bspar",
+       "d2_auszahl",
+       "d2_vertragsdatum",
+       "d2",
+       "d2z",
+       "d2t",
+       "d2_bindj",
+       "d2_anschl_enable",
+       "d2_az",
+       "d2_at"
+      ],
+      "nummer": {
+       "anschl_z": 14,
+       "anschl_t": 15,
+       "anschl_bj": 16,
+       "bspar_inst": 17,
+       "bspar_vertrag": 18,
+       "bspar_vertragsdatum": 19,
+       "bspar_sum": 20,
+       "bspar_rate": 21,
+       "bspar_quote_min": 22,
+       "bspar_zins": 23,
+       "bspar_dar_z": 24,
+       "bspar_dar_t": 25,
+       "d2_type": 26,
+       "d2_inst": 27,
+       "d2_vertrag": 28,
+       "d2_bspar": 29,
+       "d2_auszahl": 30,
+       "d2_vertragsdatum": 31,
+       "d2": 32,
+       "d2z": 33,
+       "d2t": 34,
+       "d2_bindj": 35,
+       "d2_anschl_enable": 36,
+       "d2_az": 37,
+       "d2_at": 38
+      },
+      "bilder": [
+       {
+        "datei": "hb-etw-s3-x1.webp",
+        "felder": [
+         "anschl_z",
+         "anschl_t",
+         "anschl_bj",
+         "bspar_inst",
+         "bspar_vertrag",
+         "bspar_vertragsdatum",
+         "bspar_sum",
+         "bspar_rate",
+         "bspar_quote_min",
+         "bspar_zins",
+         "bspar_dar_z",
+         "bspar_dar_t"
+        ]
+       },
+       {
+        "datei": "hb-etw-s3-x2.webp",
+        "felder": [
+         "d2_type",
+         "d2_inst",
+         "d2_vertrag",
+         "d2_bspar",
+         "d2_auszahl",
+         "d2_vertragsdatum",
+         "d2",
+         "d2z",
+         "d2t",
+         "d2_bindj",
+         "d2_anschl_enable",
+         "d2_az",
+         "d2_at"
+        ]
+       }
+      ]
+     },
+     "mobil": {
+      "bilder": [
+       {
+        "datei": "hb-etw-s3-m1.webp",
+        "felder": [
+         "bank_inst",
+         "d1_vertrag"
+        ]
+       }
+      ]
+     }
     },
     "s4": {
      "sichtbar": [
@@ -662,7 +869,26 @@
         "kp4l"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "bwk_ul_pct",
+       "bwk_nul_pct"
+      ],
+      "nummer": {
+       "bwk_ul_pct": 17,
+       "bwk_nul_pct": 18
+      },
+      "bilder": [
+       {
+        "datei": "hb-etw-s4-x1.webp",
+        "felder": [
+         "bwk_ul_pct",
+         "bwk_nul_pct"
+        ]
+       }
+      ]
+     }
     },
     "s3-tax": {
      "sichtbar": [
@@ -693,7 +919,32 @@
         "afa_sonder7b_aktiv"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "afa_sonder7b_eh40",
+       "afa_sonder7b_baukosten",
+       "afa_sonder7b_vermietung",
+       "afa_sonder7b_neubau"
+      ],
+      "nummer": {
+       "afa_sonder7b_eh40": 7,
+       "afa_sonder7b_baukosten": 8,
+       "afa_sonder7b_vermietung": 9,
+       "afa_sonder7b_neubau": 10
+      },
+      "bilder": [
+       {
+        "datei": "hb-etw-s3-tax-x1.webp",
+        "felder": [
+         "afa_sonder7b_eh40",
+         "afa_sonder7b_baukosten",
+         "afa_sonder7b_vermietung",
+         "afa_sonder7b_neubau"
+        ]
+       }
+      ]
+     }
     }
    }
   },
@@ -1099,7 +1350,57 @@
         "brw_anpassung_grund"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "erbbauzins",
+       "erb_restlz",
+       "erb_zs_ang",
+       "erb_entsch",
+       "erb_wert_ist_erb"
+      ],
+      "nummer": {
+       "erbbauzins": 107,
+       "erb_restlz": 108,
+       "erb_zs_ang": 109,
+       "erb_entsch": 110,
+       "erb_wert_ist_erb": 111
+      },
+      "bilder": [
+       {
+        "datei": "hb-efh-s0-x1.webp",
+        "felder": [
+         "erbbauzins",
+         "erb_restlz",
+         "erb_zs_ang",
+         "erb_entsch",
+         "erb_wert_ist_erb"
+        ]
+       }
+      ]
+     },
+     "mobil": {
+      "bilder": [
+       {
+        "datei": "hb-efh-s0-m1.webp",
+        "felder": [
+         "plz",
+         "ort",
+         "str",
+         "hnr",
+         "objart"
+        ]
+       },
+       {
+        "datei": "hb-efh-s0-m2.webp",
+        "felder": [
+         "nutzungsart",
+         "wfl",
+         "zimmer"
+        ]
+       }
+      ]
+     }
     },
     "s1": {
      "sichtbar": [
@@ -1154,7 +1455,49 @@
         "moebl"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "inv_kueche",
+       "inv_moebel",
+       "inv_geraete",
+       "inv_pv",
+       "inv_stellplatz",
+       "inv_sonst"
+      ],
+      "nummer": {
+       "inv_kueche": 15,
+       "inv_moebel": 16,
+       "inv_geraete": 17,
+       "inv_pv": 18,
+       "inv_stellplatz": 19,
+       "inv_sonst": 20
+      },
+      "bilder": [
+       {
+        "datei": "hb-efh-s1-x1.webp",
+        "felder": [
+         "inv_kueche",
+         "inv_moebel",
+         "inv_geraete",
+         "inv_pv",
+         "inv_stellplatz",
+         "inv_sonst"
+        ]
+       }
+      ]
+     },
+     "mobil": {
+      "bilder": [
+       {
+        "datei": "hb-efh-s1-m1.webp",
+        "felder": [
+         "kp",
+         "makler_p"
+        ]
+       }
+      ]
+     }
     },
     "s2": {
      "sichtbar": [
@@ -1216,7 +1559,18 @@
         "me_pct"
        ]
       }
-     ]
+     ],
+     "mobil": {
+      "bilder": [
+       {
+        "datei": "hb-efh-s2-m1.webp",
+        "felder": [
+         "nkm",
+         "ze"
+        ]
+       }
+      ]
+     }
     },
     "s3": {
      "sichtbar": [
@@ -1273,7 +1627,111 @@
         "d1_anschl_enable"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "anschl_z",
+       "anschl_t",
+       "anschl_bj",
+       "bspar_inst",
+       "bspar_vertrag",
+       "bspar_vertragsdatum",
+       "bspar_sum",
+       "bspar_rate",
+       "bspar_quote_min",
+       "bspar_zins",
+       "bspar_dar_z",
+       "bspar_dar_t",
+       "d2_type",
+       "d2_inst",
+       "d2_vertrag",
+       "d2_bspar",
+       "d2_auszahl",
+       "d2_vertragsdatum",
+       "d2",
+       "d2z",
+       "d2t",
+       "d2_bindj",
+       "d2_anschl_enable",
+       "d2_az",
+       "d2_at"
+      ],
+      "nummer": {
+       "anschl_z": 14,
+       "anschl_t": 15,
+       "anschl_bj": 16,
+       "bspar_inst": 17,
+       "bspar_vertrag": 18,
+       "bspar_vertragsdatum": 19,
+       "bspar_sum": 20,
+       "bspar_rate": 21,
+       "bspar_quote_min": 22,
+       "bspar_zins": 23,
+       "bspar_dar_z": 24,
+       "bspar_dar_t": 25,
+       "d2_type": 26,
+       "d2_inst": 27,
+       "d2_vertrag": 28,
+       "d2_bspar": 29,
+       "d2_auszahl": 30,
+       "d2_vertragsdatum": 31,
+       "d2": 32,
+       "d2z": 33,
+       "d2t": 34,
+       "d2_bindj": 35,
+       "d2_anschl_enable": 36,
+       "d2_az": 37,
+       "d2_at": 38
+      },
+      "bilder": [
+       {
+        "datei": "hb-efh-s3-x1.webp",
+        "felder": [
+         "anschl_z",
+         "anschl_t",
+         "anschl_bj",
+         "bspar_inst",
+         "bspar_vertrag",
+         "bspar_vertragsdatum",
+         "bspar_sum",
+         "bspar_rate",
+         "bspar_quote_min",
+         "bspar_zins",
+         "bspar_dar_z",
+         "bspar_dar_t"
+        ]
+       },
+       {
+        "datei": "hb-efh-s3-x2.webp",
+        "felder": [
+         "d2_type",
+         "d2_inst",
+         "d2_vertrag",
+         "d2_bspar",
+         "d2_auszahl",
+         "d2_vertragsdatum",
+         "d2",
+         "d2z",
+         "d2t",
+         "d2_bindj",
+         "d2_anschl_enable",
+         "d2_az",
+         "d2_at"
+        ]
+       }
+      ]
+     },
+     "mobil": {
+      "bilder": [
+       {
+        "datei": "hb-efh-s3-m1.webp",
+        "felder": [
+         "bank_inst",
+         "d1_vertrag"
+        ]
+       }
+      ]
+     }
     },
     "s4": {
      "sichtbar": [
@@ -1344,7 +1802,26 @@
         "kp4l"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "bwk_ul_pct",
+       "bwk_nul_pct"
+      ],
+      "nummer": {
+       "bwk_ul_pct": 17,
+       "bwk_nul_pct": 18
+      },
+      "bilder": [
+       {
+        "datei": "hb-efh-s4-x1.webp",
+        "felder": [
+         "bwk_ul_pct",
+         "bwk_nul_pct"
+        ]
+       }
+      ]
+     }
     },
     "s3-tax": {
      "sichtbar": [
@@ -1375,7 +1852,32 @@
         "afa_sonder7b_aktiv"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "afa_sonder7b_eh40",
+       "afa_sonder7b_baukosten",
+       "afa_sonder7b_vermietung",
+       "afa_sonder7b_neubau"
+      ],
+      "nummer": {
+       "afa_sonder7b_eh40": 7,
+       "afa_sonder7b_baukosten": 8,
+       "afa_sonder7b_vermietung": 9,
+       "afa_sonder7b_neubau": 10
+      },
+      "bilder": [
+       {
+        "datei": "hb-efh-s3-tax-x1.webp",
+        "felder": [
+         "afa_sonder7b_eh40",
+         "afa_sonder7b_baukosten",
+         "afa_sonder7b_vermietung",
+         "afa_sonder7b_neubau"
+        ]
+       }
+      ]
+     }
     }
    }
   },
@@ -1762,7 +2264,56 @@
         "brw_anpassung_grund"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "erbbauzins",
+       "erb_restlz",
+       "erb_zs_ang",
+       "erb_entsch",
+       "erb_wert_ist_erb"
+      ],
+      "nummer": {
+       "erbbauzins": 101,
+       "erb_restlz": 102,
+       "erb_zs_ang": 103,
+       "erb_entsch": 104,
+       "erb_wert_ist_erb": 105
+      },
+      "bilder": [
+       {
+        "datei": "hb-mfh-s0-x1.webp",
+        "felder": [
+         "erbbauzins",
+         "erb_restlz",
+         "erb_zs_ang",
+         "erb_entsch",
+         "erb_wert_ist_erb"
+        ]
+       }
+      ]
+     },
+     "mobil": {
+      "bilder": [
+       {
+        "datei": "hb-mfh-s0-m1.webp",
+        "felder": [
+         "plz",
+         "ort",
+         "str",
+         "hnr",
+         "objart"
+        ]
+       },
+       {
+        "datei": "hb-mfh-s0-m2.webp",
+        "felder": [
+         "nutzungsart",
+         "wfl"
+        ]
+       }
+      ]
+     }
     },
     "s1": {
      "sichtbar": [
@@ -1817,7 +2368,49 @@
         "moebl"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "inv_kueche",
+       "inv_moebel",
+       "inv_geraete",
+       "inv_pv",
+       "inv_stellplatz",
+       "inv_sonst"
+      ],
+      "nummer": {
+       "inv_kueche": 15,
+       "inv_moebel": 16,
+       "inv_geraete": 17,
+       "inv_pv": 18,
+       "inv_stellplatz": 19,
+       "inv_sonst": 20
+      },
+      "bilder": [
+       {
+        "datei": "hb-mfh-s1-x1.webp",
+        "felder": [
+         "inv_kueche",
+         "inv_moebel",
+         "inv_geraete",
+         "inv_pv",
+         "inv_stellplatz",
+         "inv_sonst"
+        ]
+       }
+      ]
+     },
+     "mobil": {
+      "bilder": [
+       {
+        "datei": "hb-mfh-s1-m1.webp",
+        "felder": [
+         "kp",
+         "makler_p"
+        ]
+       }
+      ]
+     }
     },
     "s2": {
      "sichtbar": [
@@ -1879,7 +2472,18 @@
         "me_pct"
        ]
       }
-     ]
+     ],
+     "mobil": {
+      "bilder": [
+       {
+        "datei": "hb-mfh-s2-m1.webp",
+        "felder": [
+         "nkm",
+         "ze"
+        ]
+       }
+      ]
+     }
     },
     "s3": {
      "sichtbar": [
@@ -1936,7 +2540,111 @@
         "d1_anschl_enable"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "anschl_z",
+       "anschl_t",
+       "anschl_bj",
+       "bspar_inst",
+       "bspar_vertrag",
+       "bspar_vertragsdatum",
+       "bspar_sum",
+       "bspar_rate",
+       "bspar_quote_min",
+       "bspar_zins",
+       "bspar_dar_z",
+       "bspar_dar_t",
+       "d2_type",
+       "d2_inst",
+       "d2_vertrag",
+       "d2_bspar",
+       "d2_auszahl",
+       "d2_vertragsdatum",
+       "d2",
+       "d2z",
+       "d2t",
+       "d2_bindj",
+       "d2_anschl_enable",
+       "d2_az",
+       "d2_at"
+      ],
+      "nummer": {
+       "anschl_z": 14,
+       "anschl_t": 15,
+       "anschl_bj": 16,
+       "bspar_inst": 17,
+       "bspar_vertrag": 18,
+       "bspar_vertragsdatum": 19,
+       "bspar_sum": 20,
+       "bspar_rate": 21,
+       "bspar_quote_min": 22,
+       "bspar_zins": 23,
+       "bspar_dar_z": 24,
+       "bspar_dar_t": 25,
+       "d2_type": 26,
+       "d2_inst": 27,
+       "d2_vertrag": 28,
+       "d2_bspar": 29,
+       "d2_auszahl": 30,
+       "d2_vertragsdatum": 31,
+       "d2": 32,
+       "d2z": 33,
+       "d2t": 34,
+       "d2_bindj": 35,
+       "d2_anschl_enable": 36,
+       "d2_az": 37,
+       "d2_at": 38
+      },
+      "bilder": [
+       {
+        "datei": "hb-mfh-s3-x1.webp",
+        "felder": [
+         "anschl_z",
+         "anschl_t",
+         "anschl_bj",
+         "bspar_inst",
+         "bspar_vertrag",
+         "bspar_vertragsdatum",
+         "bspar_sum",
+         "bspar_rate",
+         "bspar_quote_min",
+         "bspar_zins",
+         "bspar_dar_z",
+         "bspar_dar_t"
+        ]
+       },
+       {
+        "datei": "hb-mfh-s3-x2.webp",
+        "felder": [
+         "d2_type",
+         "d2_inst",
+         "d2_vertrag",
+         "d2_bspar",
+         "d2_auszahl",
+         "d2_vertragsdatum",
+         "d2",
+         "d2z",
+         "d2t",
+         "d2_bindj",
+         "d2_anschl_enable",
+         "d2_az",
+         "d2_at"
+        ]
+       }
+      ]
+     },
+     "mobil": {
+      "bilder": [
+       {
+        "datei": "hb-mfh-s3-m1.webp",
+        "felder": [
+         "bank_inst",
+         "d1_vertrag"
+        ]
+       }
+      ]
+     }
     },
     "s4": {
      "sichtbar": [
@@ -2007,7 +2715,26 @@
         "kp4l"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "bwk_ul_pct",
+       "bwk_nul_pct"
+      ],
+      "nummer": {
+       "bwk_ul_pct": 17,
+       "bwk_nul_pct": 18
+      },
+      "bilder": [
+       {
+        "datei": "hb-mfh-s4-x1.webp",
+        "felder": [
+         "bwk_ul_pct",
+         "bwk_nul_pct"
+        ]
+       }
+      ]
+     }
     },
     "s3-tax": {
      "sichtbar": [
@@ -2038,7 +2765,32 @@
         "afa_sonder7b_aktiv"
        ]
       }
-     ]
+     ],
+     "extra": {
+      "felder": [
+       "afa_sonder7b_eh40",
+       "afa_sonder7b_baukosten",
+       "afa_sonder7b_vermietung",
+       "afa_sonder7b_neubau"
+      ],
+      "nummer": {
+       "afa_sonder7b_eh40": 7,
+       "afa_sonder7b_baukosten": 8,
+       "afa_sonder7b_vermietung": 9,
+       "afa_sonder7b_neubau": 10
+      },
+      "bilder": [
+       {
+        "datei": "hb-mfh-s3-tax-x1.webp",
+        "felder": [
+         "afa_sonder7b_eh40",
+         "afa_sonder7b_baukosten",
+         "afa_sonder7b_vermietung",
+         "afa_sonder7b_neubau"
+        ]
+       }
+      ]
+     }
     }
    },
    "wohnungen": [

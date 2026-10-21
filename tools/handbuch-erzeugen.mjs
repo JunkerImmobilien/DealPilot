@@ -353,6 +353,22 @@ function ernte() {
   const auf = fs.existsSync(AUFNAHME) ? JSON.parse(lies(AUFNAHME)) : null;
   const ARTEN = konst.objektarten;
   const ALLE_ART_FELDER = new Set(Object.values(ARTEN).flatMap((a) => a.passt));
+  /* Zweite handgepflegte Stelle (neben WOHER_REGELN): wie die Aufnahme die Zusatzfelder
+     eingeblendet hat (frontend/handbuch/aufnahme.js AUSWAHL) - in den Worten der Oberflaeche. */
+  const AUSWAHL_TEXT = {
+    s0: 'Haken „Erbbaurecht / Erbpacht“ gesetzt',
+    s1: 'Haken „Inventar erfassen“ gesetzt',
+    s3: 'Haken „Eigene Anschlussfinanzierung für Darlehen 1“, Art des Darlehens „Tilgungsaussetzungsdarlehen (mit Bausparvertrag)“, Darlehen II „Hinzufügen“ und dessen Anschlussfinanzierung',
+    s4: 'Eingabe-Modus „% der NKM“',
+    's3-tax': 'Haken „§ 7b Sonder-AfA aktivieren“ gesetzt'
+  };
+  /* Warum ein Feld ohne Bild bleibt - gemessen bei der Aufnahme v2560 */
+  const UEBERF = 'Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild.';
+  const GRUENDE = {
+    verkehrswert_ueberf: UEBERF, ueberf_preis: UEBERF, halter_seit: UEBERF, gesellschafterdarlehen: UEBERF, ueberf_restschuld: UEBERF, ueberf_rest_zins: UEBERF, ueberf_ende: UEBERF,
+    ausst: 'Altfeld, ersetzt durch die Standardstufe (NHK 2010). Die App blendet es nicht mehr ein; gespeicherte Werte bleiben lesbar.',
+    bwk_kp_pct: 'Erscheint im Eingabe-Modus „% der NKM“ erst mit der Unterwahl „% vom Kaufpreis“ und ersetzt dann die beiden NKM-Quoten — es steht nie zusammen mit ihnen im Bild.'
+  };
   const KAPITEL = [['ETW', 'Eigentumswohnung'], ['EFH', 'Einfamilienhaus'], ['MFH', 'Mehrfamilienhaus']];
   const kapitel = KAPITEL.map(([art, name]) => {
     const passt = new Set(ARTEN[art].passt);
@@ -360,24 +376,29 @@ function ernte() {
     const gem = auf && auf.arten && auf.arten[art];
     const schritte = reiter.map((r) => {
       const ids = r.karten.flatMap((k) => k.felder).filter((id) => !ALLE_ART_FELDER.has(id) || passt.has(id));
-      let sichtbar = ids, weitere = [];
-      if (gem && gem.reiter && gem.reiter[r.sec]) {
-        const g = gem.reiter[r.sec];
-        const vis = new Set(g.sichtbar || []);
-        /* Gemessen sichtbar → Hauptliste in Bildreihenfolge; nur bei ANDEREN Arten
-           sichtbar → gehoert nicht hierher; nirgends sichtbar → „erscheint je nach Auswahl". */
-        const sonst = new Set(Object.entries(auf.arten).filter(([a]) => a !== art).flatMap(([, x]) => (x.reiter && x.reiter[r.sec] && x.reiter[r.sec].sichtbar) || []));
+      let sichtbar = ids, weitere = [], extra = [];
+      const g = (gem && gem.reiter && gem.reiter[r.sec]) || null;
+      if (g) {
+        const vis = new Set((g.sichtbar || []).concat((g.extra && g.extra.felder) || []));
+        /* Gemessen sichtbar (auch nach einer Auswahl) → Hauptliste in Bildreihenfolge; nur bei
+           ANDEREN Arten sichtbar → gehoert nicht hierher; nirgends sichtbar → „weitere“ mit Grund. */
+        const sonst = new Set(Object.entries(auf.arten).filter(([a]) => a !== art)
+          .flatMap(([, x]) => { const y = x.reiter && x.reiter[r.sec]; return y ? (y.sichtbar || []).concat((y.extra && y.extra.felder) || []) : []; }));
         sichtbar = (g.sichtbar || []).filter((id) => felder[id] && (!ALLE_ART_FELDER.has(id) || passt.has(id)));
+        extra = ((g.extra && g.extra.felder) || []).filter((id) => felder[id]);
         weitere = ids.filter((id) => !vis.has(id) && !sonst.has(id));
       }
       const stufe = (id) => (pf[1].includes(id) ? 1 : pf[2].includes(id) ? 2 : pf[3].includes(id) ? 3 : 0);
       const artPflicht = (ARTEN[art].pflicht || []);
-      const nr = {}; if (gem && gem.reiter && gem.reiter[r.sec]) Object.assign(nr, gem.reiter[r.sec].nummer || {});
+      const nr = Object.assign({}, (g && g.nummer) || {}, (g && g.extra && g.extra.nummer) || {});
+      const eintrag = (id, i, nachAuswahl) => ({ id, nr: nr[id] || i + 1, stufe: stufe(id), artPflicht: artPflicht.includes(id), artHinweis: (ARTEN[art].hinweis || {})[id] || '', nachAuswahl: !!nachAuswahl });
       return {
         sec: r.sec,
-        felder: sichtbar.map((id, i) => ({ id, nr: nr[id] || i + 1, stufe: stufe(id), artPflicht: artPflicht.includes(id), artHinweis: (ARTEN[art].hinweis || {})[id] || '' })),
-        weitere: weitere.map((id) => ({ id, stufe: stufe(id) })),
-        bilder: (gem && gem.reiter && gem.reiter[r.sec] && gem.reiter[r.sec].bilder) || []
+        auswahl: extra.length ? (AUSWAHL_TEXT[r.sec] || '') : '',
+        felder: sichtbar.map((id, i) => eintrag(id, i, false)).concat(extra.map((id, i) => eintrag(id, sichtbar.length + i, true))),
+        weitere: weitere.map((id) => ({ id, stufe: stufe(id), grund: GRUENDE[id] || '' })),
+        bilder: ((g && g.bilder) || []).concat(((g && g.extra && g.extra.bilder) || []).map((b) => Object.assign({ nachAuswahl: true }, b))),
+        mobil: (g && g.mobil && g.mobil.bilder) || []
       };
     });
     return { art, name, beispiel: (gem && gem.beispiel) || null, pflicht: pf, schritte, wohnungsliste: art === 'MFH', wohnungBilder: (art === 'MFH' && gem && gem.wohnungen) || [] };

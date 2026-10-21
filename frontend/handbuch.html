@@ -70,6 +70,8 @@ section.kapitel{margin:0 0 48px}
 .schritt h3 .nr{font:700 12px "JetBrains Mono",monospace;color:#1a1407;background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));border-radius:8px;padding:4px 8px}
 .einl{color:var(--leise);font-size:14.5px;margin:0 0 12px;max-width:860px}
 .einl strong{color:var(--text)}
+figure.handy{display:none;max-width:420px;margin-left:auto;margin-right:auto}
+.desk-mehr>summary{display:none}
 figure{margin:14px 0 8px;background:#fff;border:1px solid var(--linie);border-radius:14px;overflow:hidden;cursor:zoom-in}
 figure img{display:block;width:100%;height:auto}
 figcaption{font:500 12px "JetBrains Mono",monospace;color:var(--leise);padding:8px 12px;border-top:1px solid var(--linie);background:var(--karte)}
@@ -105,6 +107,8 @@ details[open] .pfeil{transform:rotate(90deg)}
 .zoom img{max-width:100%;max-height:100%;border-radius:10px}
 .fuss{margin-top:50px;font-size:12.5px;color:var(--leise);border-top:1px solid var(--linie);padding-top:14px}
 @media (max-width:900px){
+  figure.handy{display:block}
+  .desk-mehr>summary{display:block;cursor:pointer;font-weight:600;font-size:13.5px;color:var(--leise);margin:6px 0}
   .rahmen{grid-template-columns:minmax(0,1fr)}
   nav.inhalt{position:fixed;top:56px;left:0;width:min(86vw,320px);z-index:30;transform:translateX(-105%);transition:transform .2s}
   body.menue-auf nav.inhalt{transform:none;box-shadow:0 0 0 100vmax rgba(0,0,0,.45)}
@@ -148,7 +152,7 @@ details[open] .pfeil{transform:rotate(90deg)}
     <div class="fuss" id="fuss"></div>
   </main>
 </div>
-<script src="handbuch/handbuch-daten.js?v=v2560"></script>
+<script src="handbuch/handbuch-daten.js?v=v2560h"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="js/pdf-logo.js?v=v1634b"></script>
 <script src="js/whitelabel-override.js?v=v2149"></script>
@@ -193,6 +197,7 @@ details[open] .pfeil{transform:rotate(90deg)}
     if (e.stufe) chips += '<span class="chip p">Pflicht ' + STUFE[e.stufe] + '</span>';
     if (e.artPflicht) chips += '<span class="chip p">Pflicht ' + esc(kap.art) + '</span>';
     if (f.ds2) chips += '<span class="chip d">DS2</span>';
+    if (e.nachAuswahl) chips += '<span class="chip">nach Auswahl</span>';
     var was = wasText(f), bsp = beispielText(kap, e.id);
     var wirk = pflichtSaetze(kap, e).concat(f.wirkung || []);
     var opts = f.optionen ? f.optionen.filter(function (o) { return o.wert !== ''; }).map(function (o) { return esc(o.text); }).join(' · ') : '';
@@ -207,6 +212,7 @@ details[open] .pfeil{transform:rotate(90deg)}
       + (opts ? '<div class="opt">Auswahl: ' + opts + '</div>' : '') + '</dd>'
       + (bsp ? '<dt>Beispiel</dt><dd>' + esc(bsp) + '</dd>' : '')
       + (f.woher ? '<dt>Woher</dt><dd>' + esc(f.woher) + '</dd>' : '')
+      + (e.grund ? '<dt>Ohne Bild, weil</dt><dd>' + esc(e.grund) + '</dd>' : '')
       + (wirk.length ? '<dt>Was es bewirkt</dt><dd><ul>' + wirk.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul></dd>' : '')
       + '</dl></details>';
   }
@@ -230,7 +236,7 @@ details[open] .pfeil{transform:rotate(90deg)}
     return h + '</div>';
   }
   function bildHtml(b, felder) {
-    return '<figure data-zoom><img loading="lazy" src="handbuch/bilder/' + esc(b.datei) + '?v=v2560" alt="' + esc(b.alt || 'Bildschirmfoto') + '"><figcaption>' + esc(b.unterschrift || felder) + '</figcaption></figure>';
+    return '<figure data-zoom' + (b.klasse ? ' class="' + b.klasse + '"' : '') + '><img loading="lazy" src="handbuch/bilder/' + esc(b.datei) + '?v=v2560h" alt="' + esc(b.alt || 'Bildschirmfoto') + '"><figcaption>' + esc(b.unterschrift || felder) + '</figcaption></figure>';
   }
 
   function render() {
@@ -254,12 +260,26 @@ details[open] .pfeil{transform:rotate(90deg)}
         var einl = r.hilfe ? r.hilfe.text : (r.tour ? r.tour.text : r.desc);
         inhalt += '<div class="schritt" id="' + sid + '" data-schritt><h3><span class="nr">' + n + '</span>Reiter ' + esc(r.name) + '</h3>'
           + '<p class="einl">' + rich(einl) + '</p>';
-        st.bilder.forEach(function (b) {
-          var nrs = b.felder.map(function (id) { var e = st.felder.filter(function (x) { return x.id === id; })[0]; return e ? e.nr : null; }).filter(Boolean);
-          inhalt += bildHtml({ datei: b.datei, alt: r.name + ' — ' + kap.name }, r.name + (nrs.length ? ' · Felder ' + Math.min.apply(null, nrs) + '–' + Math.max.apply(null, nrs) : ''));
-        });
-        inhalt += '<div class="felder">' + st.felder.map(function (e) { return feldHtml(kap, e, e.nr); }).join('') + '</div>';
-        if (st.weitere.length) inhalt += '<details class="weitere"><summary>' + st.weitere.length + ' weitere Felder, die erst nach einer Auswahl erscheinen</summary><div class="felder">' + st.weitere.map(function (e) { return feldHtml(kap, e, 0); }).join('') + '</div></details>';
+        var bildUnter = function (b, liste) {
+          var nrs = b.felder.map(function (id) { var e = liste.filter(function (x) { return x.id === id; })[0]; return e ? e.nr : null; }).filter(Boolean);
+          return nrs.length ? ' · Felder ' + Math.min.apply(null, nrs) + '–' + Math.max.apply(null, nrs) : '';
+        };
+        var grund = st.felder.filter(function (e) { return !e.nachAuswahl; }), zusatz = st.felder.filter(function (e) { return e.nachAuswahl; });
+        var grundBilder = st.bilder.filter(function (b) { return !b.nachAuswahl; }), zusatzBilder = st.bilder.filter(function (b) { return b.nachAuswahl; });
+        /* Handy-Bilder (390 px) erscheinen nur bei schmalem Fenster; die Desktop-Bilder stehen dann zugeklappt darunter */
+        if (st.mobil && st.mobil.length) {
+          inhalt += st.mobil.map(function (b) { return bildHtml({ datei: b.datei, alt: r.name + ' — Handy', klasse: 'handy' }, r.name + ' · Handy' + bildUnter(b, st.felder)); }).join('');
+          inhalt += '<details class="desk-mehr" open><summary>Desktop-Bilder mit allen Feldern</summary>';
+        }
+        grundBilder.forEach(function (b) { inhalt += bildHtml({ datei: b.datei, alt: r.name + ' — ' + kap.name }, r.name + bildUnter(b, grund)); });
+        if (st.mobil && st.mobil.length) inhalt += '</details>';
+        inhalt += '<div class="felder">' + grund.map(function (e) { return feldHtml(kap, e, e.nr); }).join('') + '</div>';
+        if (zusatz.length) {
+          inhalt += '<div class="hinweis"><b>Nach einer Auswahl:</b> ' + esc(st.auswahl || 'weitere Angaben') + '. Dann erscheinen diese Felder; die Nummern laufen weiter.</div>';
+          zusatzBilder.forEach(function (b) { inhalt += bildHtml({ datei: b.datei, alt: r.name + ' — nach Auswahl' }, r.name + ' · nach Auswahl' + bildUnter(b, zusatz)); });
+          inhalt += '<div class="felder">' + zusatz.map(function (e) { return feldHtml(kap, e, e.nr); }).join('') + '</div>';
+        }
+        if (st.weitere.length) inhalt += '<details class="weitere"><summary>' + st.weitere.length + (st.weitere.length === 1 ? ' Feld' : ' Felder') + ' ohne Bild — mit Grund</summary><div class="felder">' + st.weitere.map(function (e) { return feldHtml(kap, e, 0); }).join('') + '</div></details>';
         inhalt += '</div>';
         if (kap.wohnungsliste && st.sec === 's0') { n++; toc += '<a href="#s-' + kap.art + '-wohnungen">' + n + ' · Wohnungsliste</a>'; inhalt += wohnungslisteHtml(kap, n); }
       });
@@ -350,6 +370,7 @@ details[open] .pfeil{transform:rotate(90deg)}
         var b = beispielText(kap, e.id); if (b) zeilen.push(['Beispiel', b]);
         if (f.woher) zeilen.push(['Woher', f.woher]);
         var w = pflichtSaetze(kap, e).concat(f.wirkung || []); if (w.length) zeilen.push(['Wirkung', w.join(' · ')]);
+        if (e.grund) zeilen.push(['Ohne Bild', e.grund]);
         doc.setFontSize(8.4);
         var hoehe = 6 + zeilen.reduce(function (s, z) { return s + doc.splitTextToSize(pdfText(z[1]), CW - 34).length * 3.6 + 0.8; }, 0);
         platz(Math.min(hoehe, 60));
@@ -382,15 +403,16 @@ details[open] .pfeil{transform:rotate(90deg)}
           var st = kap.schritte[si], r = REITER[st.sec]; n++;
           abschnitt(n + ' · Reiter ' + r.name);
           absatz(String((r.hilfe ? r.hilfe.text : r.desc) || '').replace(/<[^>]+>/g, '').replace(/\n+/g, ' '), 8.6, 90);
-          for (var bi = 0; bi < st.bilder.length; bi++) await bild('handbuch/bilder/' + st.bilder[bi].datei + '?v=v2560');
+          if (st.auswahl) absatz('Nach einer Auswahl (' + st.auswahl + ') erscheinen weitere Felder; ihre Nummern laufen weiter.', 8.4, 110);
+          for (var bi = 0; bi < st.bilder.length; bi++) await bild('handbuch/bilder/' + st.bilder[bi].datei + '?v=v2560h');
           st.felder.forEach(function (e) { feld(kap, e, e.nr); });
-          if (st.weitere.length) { absatz('Weitere Felder, die erst nach einer Auswahl erscheinen:', 8.6, 110); st.weitere.forEach(function (e) { feld(kap, e, 0); }); }
+          if (st.weitere.length) { absatz('Felder ohne Bild (mit Grund):', 8.6, 110); st.weitere.forEach(function (e) { feld(kap, e, 0); }); }
           if (kap.wohnungsliste && st.sec === 's0') {
             var WL = H.wohnungsliste; n++;
             abschnitt(n + ' · Wohnungsliste - Einheiten erfassen');
             absatz(WL.einstieg, 8.6, 90);
             WL.schritte.forEach(function (s, i) { absatz((i + 1) + ' · ' + s.titel + ': ' + s.text, 8.6, 60, 4); });
-            for (var wi = 0; wi < (kap.wohnungBilder || []).length; wi++) await bild('handbuch/bilder/' + kap.wohnungBilder[wi].datei + '?v=v2560');
+            for (var wi = 0; wi < (kap.wohnungBilder || []).length; wi++) await bild('handbuch/bilder/' + kap.wohnungBilder[wi].datei + '?v=v2560h');
             var bl = {}; WL.felder.forEach(function (f) { (bl[f.block] = bl[f.block] || []).push(f); });
             Object.keys(bl).forEach(function (b) { absatz(b + ': ' + bl[b].map(function (f) { return f.label + (f.platzhalter && f.platzhalter !== 'optional' ? ' (z. B. ' + f.platzhalter + ')' : ''); }).join(' · '), 8.6, 60, 4); });
             WL.hinweise.forEach(function (t) { absatz(t, 8.2, 110, 4); });
@@ -411,6 +433,8 @@ details[open] .pfeil{transform:rotate(90deg)}
   window.DealPilotHandbuch = { pdf: pdf, daten: H };
 
   render();
+  /* schmal: die Desktop-Bilder neben den Handy-Bildern zuklappen */
+  try { if (window.matchMedia('(max-width:900px)').matches) document.querySelectorAll('details.desk-mehr').forEach(function (d) { d.open = false; }); } catch (e) {}
   $('held-knoepfe').innerHTML = H.kapitel.map(function (k) { return '<button type="button" class="knopf zart klein" data-pdf="' + k.art + '">PDF · ' + esc(k.name) + '</button>'; }).join('');
   document.addEventListener('click', function (e) {
     var p = e.target.closest('[data-pdf]'); if (p) { pdf([p.getAttribute('data-pdf')], p); return; }

@@ -19,7 +19,7 @@ window.DP_HANDBUCH = {
   "pdf-anlage-bmf.js": "41997cf31f29fb07",
   "pdf-kaufpreisaufteilung.js": "fe5f492746a957c4",
   "frontend-konstanten.json": "494c505bc98da6d7",
-  "aufnahme.json": "9c3a9574aa6030d0"
+  "aufnahme.json": "b66220f42d1ab6b4"
  },
  "reiter": [
   {
@@ -6400,816 +6400,953 @@ window.DP_HANDBUCH = {
    "schritte": [
     {
      "sec": "s0",
+     "auswahl": "Haken „Erbbaurecht / Erbpacht“ gesetzt",
      "felder": [
       {
        "id": "plz",
        "nr": 1,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ort",
        "nr": 2,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "str",
        "nr": 3,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hnr",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "objart",
        "nr": 5,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nutzungsart",
        "nr": 6,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "wfl",
        "nr": 7,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zimmer",
        "nr": 8,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "baujahr",
        "nr": 9,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "etage",
        "nr": 10,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "etagen_ges",
        "nr": 11,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_zustand",
        "nr": 12,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "standardstufe",
        "nr": 13,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_energie",
        "nr": 14,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "vermstand",
        "nr": 15,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gsfl",
        "nr": 16,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mea",
        "nr": 17,
        "stufe": 3,
        "artPflicht": true,
-       "artHinweis": "Bei Wohnungseigentum trägt der Miteigentumsanteil den Bodenwert."
+       "artHinweis": "Bei Wohnungseigentum trägt der Miteigentumsanteil den Bodenwert.",
+       "nachAuswahl": false
       },
       {
        "id": "kuerzel",
        "nr": 18,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "thesis",
        "nr": 19,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "risiken",
        "nr": 20,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "exitstr",
        "nr": 21,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kaufdat",
        "nr": 22,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "wirtschaftlicher_uebergang",
        "nr": 23,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "halter",
        "nr": 24,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mand_ueberf_cb",
        "nr": 25,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw",
        "nr": 26,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw_stichtag",
        "nr": 27,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_walls",
        "nr": 28,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_aussenwand",
        "nr": 29,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_aussenwaende",
        "nr": 30,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_roof",
        "nr": 31,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_dach",
        "nr": 32,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_dach",
        "nr": 33,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_windows",
        "nr": 34,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_fenster",
        "nr": 35,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_fenster",
        "nr": 36,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_heating",
        "nr": 37,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_heizung",
        "nr": 38,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_heizung",
        "nr": 39,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_bath",
        "nr": 40,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_baeder",
        "nr": 41,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_sanitaer",
        "nr": 42,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_floor",
        "nr": 43,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_fussboeden",
        "nr": 44,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_innenausbau",
        "nr": 45,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_innenwaende",
        "nr": 46,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_decken",
        "nr": 47,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_leitungen",
        "nr": 48,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_technik",
        "nr": 49,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_grundriss",
        "nr": 50,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_elevator",
        "nr": 51,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_guest_wc",
        "nr": 52,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_store_room",
        "nr": 53,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "bad_anz",
        "nr": 54,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "balkon_flae",
        "nr": 55,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "garagen",
        "nr": 56,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "stellpl_aussen",
        "nr": 57,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "modernis",
        "nr": 58,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "baustatus",
        "nr": 59,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gemarkung",
        "nr": 60,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "flur",
        "nr": 61,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "flurstueck",
        "nr": 62,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hinterland_qm",
        "nr": 63,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hinterland_eur_qm",
        "nr": 64,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hinterland_rentierlich",
        "nr": 65,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "erbpacht",
        "nr": 66,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "lageklasse",
        "nr": 67,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "makrolage",
        "nr": 68,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mikrolage",
        "nr": 69,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_bevoelkerung",
        "nr": 70,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_nachfrage",
        "nr": 71,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_wertsteigerung",
        "nr": 72,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_entwicklung",
        "nr": 73,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "bankval",
        "nr": 74,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "svwert",
        "nr": 75,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "wert_soll",
        "nr": 76,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "notizen",
        "nr": 77,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zb_fertig_jahr",
        "nr": 78,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zb_vgl_qm",
        "nr": 79,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zb_soll_qm",
        "nr": 80,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zb_soll_ab",
        "nr": 81,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zb_ziel_qm",
        "nr": 82,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zb_ziel_wann",
        "nr": 83,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "bgf",
        "nr": 84,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "grundriss",
        "nr": 85,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_punkte",
        "nr": 86,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "sachwertfaktor",
        "nr": 87,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "uk_flaeche",
        "nr": 88,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "wgfz_objekt",
        "nr": 89,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "stellplatz_miete_monat",
        "nr": 90,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "sonstige_jahr",
        "nr": 91,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nhk_haus",
        "nr": 92,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nhk_geschosse",
        "nr": 93,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nhk_dach",
        "nr": 94,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "garagen_bgf_qm",
        "nr": 95,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "garagen_stufe",
        "nr": 96,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "aussenanlagen_pct",
        "nr": 97,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "aussenanlagen",
        "nr": 98,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "bes_bauteile",
        "nr": 99,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_gauben",
        "nr": 100,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_balkone",
        "nr": 101,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_vordach",
        "nr": 102,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_terrassen",
        "nr": 103,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_sonstige",
        "nr": 104,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "lzs_pct",
        "nr": 105,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw_manuell",
        "nr": 106,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw_anpassung_pct",
        "nr": 107,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw_anpassung_grund",
        "nr": 108,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
+      {
+       "id": "erbbauzins",
+       "nr": 109,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "erb_restlz",
+       "nr": 110,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "erb_zs_ang",
+       "nr": 111,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "erb_entsch",
+       "nr": 112,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "erb_wert_ist_erb",
+       "nr": 113,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
      "weitere": [
       {
        "id": "verkehrswert_ueberf",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ueberf_preis",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "halter_seit",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "gesellschafterdarlehen",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ueberf_restschuld",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ueberf_rest_zins",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ueberf_ende",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ausst",
-       "stufe": 0
-      },
-      {
-       "id": "erbbauzins",
-       "stufe": 0
-      },
-      {
-       "id": "erb_restlz",
-       "stufe": 0
-      },
-      {
-       "id": "erb_zs_ang",
-       "stufe": 0
-      },
-      {
-       "id": "erb_entsch",
-       "stufe": 0
-      },
-      {
-       "id": "erb_wert_ist_erb",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Altfeld, ersetzt durch die Standardstufe (NHK 2010). Die App blendet es nicht mehr ein; gespeicherte Werte bleiben lesbar."
       }
      ],
      "bilder": [
@@ -7360,137 +7497,206 @@ window.DP_HANDBUCH = {
         "brw_anpassung_pct",
         "brw_anpassung_grund"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-etw-s0-x1.webp",
+       "felder": [
+        "erbbauzins",
+        "erb_restlz",
+        "erb_zs_ang",
+        "erb_entsch",
+        "erb_wert_ist_erb"
+       ]
+      }
+     ],
+     "mobil": [
+      {
+       "datei": "hb-etw-s0-m1.webp",
+       "felder": [
+        "plz",
+        "ort",
+        "str",
+        "hnr",
+        "objart"
+       ]
+      },
+      {
+       "datei": "hb-etw-s0-m2.webp",
+       "felder": [
+        "nutzungsart",
+        "wfl",
+        "zimmer"
+       ]
       }
      ]
     },
     {
      "sec": "s1",
+     "auswahl": "Haken „Inventar erfassen“ gesetzt",
      "felder": [
       {
        "id": "kp",
        "nr": 1,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "makler_p",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "makler_e",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "notar_p",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "notar_e",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gba_p",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gba_e",
        "nr": 7,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gest_p",
        "nr": 8,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gest_e",
        "nr": 9,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ji_p",
        "nr": 10,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ji_e",
        "nr": 11,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "san",
        "nr": 12,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "san_ust",
        "nr": 13,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "moebl",
        "nr": 14,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
-      }
-     ],
-     "weitere": [
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
       {
        "id": "inv_kueche",
-       "stufe": 0
+       "nr": 15,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_moebel",
-       "stufe": 0
+       "nr": 16,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_geraete",
-       "stufe": 0
+       "nr": 17,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_pv",
-       "stufe": 0
+       "nr": 18,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_stellplatz",
-       "stufe": 0
+       "nr": 19,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_sonst",
-       "stufe": 0
+       "nr": 20,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
+     "weitere": [],
      "bilder": [
       {
        "datei": "hb-etw-s1-1.webp",
@@ -7510,102 +7716,137 @@ window.DP_HANDBUCH = {
         "san_ust",
         "moebl"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-etw-s1-x1.webp",
+       "felder": [
+        "inv_kueche",
+        "inv_moebel",
+        "inv_geraete",
+        "inv_pv",
+        "inv_stellplatz",
+        "inv_sonst"
+       ]
+      }
+     ],
+     "mobil": [
+      {
+       "datei": "hb-etw-s1-m1.webp",
+       "felder": [
+        "kp",
+        "makler_p"
+       ]
       }
      ]
     },
     {
      "sec": "s2",
+     "auswahl": "",
      "felder": [
       {
        "id": "nkm",
        "nr": 1,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ze",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "umlagef",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_marktmiete",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_mietausfall",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mv_art",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mv_beginn",
        "nr": 7,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mv_letzte_erhoehung",
        "nr": 8,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mv_letzte_erhoehung_betrag",
        "nr": 9,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "me_soll",
        "nr": 10,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "me_anz",
        "nr": 11,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "me_int",
        "nr": 12,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "me_pct",
        "nr": 13,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       }
      ],
      "weitere": [],
@@ -7638,205 +7879,327 @@ window.DP_HANDBUCH = {
         "me_pct"
        ]
       }
+     ],
+     "mobil": [
+      {
+       "datei": "hb-etw-s2-m1.webp",
+       "felder": [
+        "nkm",
+        "ze"
+       ]
+      }
      ]
     },
     {
      "sec": "s3",
+     "auswahl": "Haken „Eigene Anschlussfinanzierung für Darlehen 1“, Art des Darlehens „Tilgungsaussetzungsdarlehen (mit Bausparvertrag)“, Darlehen II „Hinzufügen“ und dessen Anschlussfinanzierung",
      "felder": [
       {
        "id": "bank_inst",
        "nr": 1,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_vertrag",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_vertragsdatum",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_type",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_auszahl",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ek",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ek_ist_nk",
        "nr": 7,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ek_inkl_nk",
        "nr": 8,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1",
        "nr": 9,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1z",
        "nr": 10,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1t",
        "nr": 11,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_bindj",
        "nr": 12,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_anschl_enable",
        "nr": 13,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
-      }
-     ],
-     "weitere": [
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
       {
        "id": "anschl_z",
-       "stufe": 0
+       "nr": 14,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "anschl_t",
-       "stufe": 0
+       "nr": 15,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "anschl_bj",
-       "stufe": 0
+       "nr": 16,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_inst",
-       "stufe": 0
+       "nr": 17,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_vertrag",
-       "stufe": 0
+       "nr": 18,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_vertragsdatum",
-       "stufe": 0
+       "nr": 19,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_sum",
-       "stufe": 0
+       "nr": 20,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_rate",
-       "stufe": 0
+       "nr": 21,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_quote_min",
-       "stufe": 0
+       "nr": 22,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_zins",
-       "stufe": 0
+       "nr": 23,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_dar_z",
-       "stufe": 0
+       "nr": 24,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_dar_t",
-       "stufe": 0
+       "nr": 25,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_type",
-       "stufe": 0
+       "nr": 26,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_inst",
-       "stufe": 0
+       "nr": 27,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_vertrag",
-       "stufe": 0
+       "nr": 28,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_bspar",
-       "stufe": 0
+       "nr": 29,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_auszahl",
-       "stufe": 0
+       "nr": 30,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_vertragsdatum",
-       "stufe": 0
+       "nr": 31,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2",
-       "stufe": 0
+       "nr": 32,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2z",
-       "stufe": 0
+       "nr": 33,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2t",
-       "stufe": 0
+       "nr": 34,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_bindj",
-       "stufe": 0
+       "nr": 35,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_anschl_enable",
-       "stufe": 0
+       "nr": 36,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_az",
-       "stufe": 0
+       "nr": 37,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_at",
-       "stufe": 0
+       "nr": 38,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
+     "weitere": [],
      "bilder": [
       {
        "datei": "hb-etw-s3-1.webp",
@@ -7860,137 +8223,209 @@ window.DP_HANDBUCH = {
         "d1_bindj",
         "d1_anschl_enable"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-etw-s3-x1.webp",
+       "felder": [
+        "anschl_z",
+        "anschl_t",
+        "anschl_bj",
+        "bspar_inst",
+        "bspar_vertrag",
+        "bspar_vertragsdatum",
+        "bspar_sum",
+        "bspar_rate",
+        "bspar_quote_min",
+        "bspar_zins",
+        "bspar_dar_z",
+        "bspar_dar_t"
+       ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-etw-s3-x2.webp",
+       "felder": [
+        "d2_type",
+        "d2_inst",
+        "d2_vertrag",
+        "d2_bspar",
+        "d2_auszahl",
+        "d2_vertragsdatum",
+        "d2",
+        "d2z",
+        "d2t",
+        "d2_bindj",
+        "d2_anschl_enable",
+        "d2_az",
+        "d2_at"
+       ]
+      }
+     ],
+     "mobil": [
+      {
+       "datei": "hb-etw-s3-m1.webp",
+       "felder": [
+        "bank_inst",
+        "d1_vertrag"
+       ]
       }
      ]
     },
     {
      "sec": "s4",
+     "auswahl": "Eingabe-Modus „% der NKM“",
      "felder": [
       {
        "id": "hg_ul",
        "nr": 1,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "grundsteuer",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ul_sonst",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hg_nul",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "weg_r",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eigen_r",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mietausfall",
        "nr": 7,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nul_sonst",
        "nr": 8,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp1",
        "nr": 9,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp1l",
        "nr": 10,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp2",
        "nr": 11,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp2l",
        "nr": 12,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp3",
        "nr": 13,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp3l",
        "nr": 14,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp4",
        "nr": 15,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp4l",
        "nr": 16,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
+      {
+       "id": "bwk_ul_pct",
+       "nr": 17,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "bwk_nul_pct",
+       "nr": 18,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
      "weitere": [
       {
-       "id": "bwk_ul_pct",
-       "stufe": 0
-      },
-      {
-       "id": "bwk_nul_pct",
-       "stufe": 0
-      },
-      {
        "id": "bwk_kp_pct",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint im Eingabe-Modus „% der NKM“ erst mit der Unterwahl „% vom Kaufpreis“ und ersetzt dann die beiden NKM-Quoten — es steht nie zusammen mit ihnen im Bild."
       }
      ],
      "bilder": [
@@ -8024,73 +8459,104 @@ window.DP_HANDBUCH = {
         "kp4",
         "kp4l"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-etw-s4-x1.webp",
+       "felder": [
+        "bwk_ul_pct",
+        "bwk_nul_pct"
+       ]
       }
-     ]
+     ],
+     "mobil": []
     },
     {
      "sec": "s3-tax",
+     "auswahl": "Haken „§ 7b Sonder-AfA aktivieren“ gesetzt",
      "felder": [
       {
        "id": "zve",
        "nr": 1,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "grenz",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "grenz_auto",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "afa_satz",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "geb_ant",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "afa_sonder7b_aktiv",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
-      }
-     ],
-     "weitere": [
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
       {
        "id": "afa_sonder7b_eh40",
-       "stufe": 0
+       "nr": 7,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "afa_sonder7b_baukosten",
-       "stufe": 0
+       "nr": 8,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "afa_sonder7b_vermietung",
-       "stufe": 0
+       "nr": 9,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "afa_sonder7b_neubau",
-       "stufe": 0
+       "nr": 10,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
+     "weitere": [],
      "bilder": [
       {
        "datei": "hb-etw-s3-tax-1.webp",
@@ -8102,8 +8568,19 @@ window.DP_HANDBUCH = {
         "geb_ant",
         "afa_sonder7b_aktiv"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-etw-s3-tax-x1.webp",
+       "felder": [
+        "afa_sonder7b_eh40",
+        "afa_sonder7b_baukosten",
+        "afa_sonder7b_vermietung",
+        "afa_sonder7b_neubau"
+       ]
       }
-     ]
+     ],
+     "mobil": []
     }
    ],
    "wohnungsliste": false,
@@ -8196,802 +8673,937 @@ window.DP_HANDBUCH = {
    "schritte": [
     {
      "sec": "s0",
+     "auswahl": "Haken „Erbbaurecht / Erbpacht“ gesetzt",
      "felder": [
       {
        "id": "plz",
        "nr": 1,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ort",
        "nr": 2,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "str",
        "nr": 3,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hnr",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "objart",
        "nr": 5,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nutzungsart",
        "nr": 6,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "wfl",
        "nr": 7,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zimmer",
        "nr": 8,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "baujahr",
        "nr": 9,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "etagen_ges",
        "nr": 10,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_zustand",
        "nr": 11,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "standardstufe",
        "nr": 12,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_energie",
        "nr": 13,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "vermstand",
        "nr": 14,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gsfl",
        "nr": 15,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kuerzel",
        "nr": 16,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "thesis",
        "nr": 17,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "risiken",
        "nr": 18,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "exitstr",
        "nr": 19,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kaufdat",
        "nr": 20,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "wirtschaftlicher_uebergang",
        "nr": 21,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "halter",
        "nr": 22,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mand_ueberf_cb",
        "nr": 23,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw",
        "nr": 24,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw_stichtag",
        "nr": 25,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_walls",
        "nr": 26,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_aussenwand",
        "nr": 27,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_aussenwaende",
        "nr": 28,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_roof",
        "nr": 29,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_dach",
        "nr": 30,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_dach",
        "nr": 31,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_windows",
        "nr": 32,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_fenster",
        "nr": 33,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_fenster",
        "nr": 34,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_heating",
        "nr": 35,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_heizung",
        "nr": 36,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_heizung",
        "nr": 37,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_bath",
        "nr": 38,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_baeder",
        "nr": 39,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_sanitaer",
        "nr": 40,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_floor",
        "nr": 41,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_fussboeden",
        "nr": 42,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_innenausbau",
        "nr": 43,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_innenwaende",
        "nr": 44,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_decken",
        "nr": 45,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_leitungen",
        "nr": 46,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_technik",
        "nr": 47,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_grundriss",
        "nr": 48,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_elevator",
        "nr": 49,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_guest_wc",
        "nr": 50,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_store_room",
        "nr": 51,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "bad_anz",
        "nr": 52,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "balkon_flae",
        "nr": 53,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "garagen",
        "nr": 54,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "stellpl_aussen",
        "nr": 55,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "modernis",
        "nr": 56,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "baustatus",
        "nr": 57,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gemarkung",
        "nr": 58,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "flur",
        "nr": 59,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "flurstueck",
        "nr": 60,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hinterland_qm",
        "nr": 61,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hinterland_eur_qm",
        "nr": 62,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hinterland_rentierlich",
        "nr": 63,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "erbpacht",
        "nr": 64,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "lageklasse",
        "nr": 65,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "makrolage",
        "nr": 66,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mikrolage",
        "nr": 67,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_bevoelkerung",
        "nr": 68,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_nachfrage",
        "nr": 69,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_wertsteigerung",
        "nr": 70,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_entwicklung",
        "nr": 71,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "bankval",
        "nr": 72,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "svwert",
        "nr": 73,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "wert_soll",
        "nr": 74,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "notizen",
        "nr": 75,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zb_fertig_jahr",
        "nr": 76,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zb_vgl_qm",
        "nr": 77,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zb_soll_qm",
        "nr": 78,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zb_soll_ab",
        "nr": 79,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zb_ziel_qm",
        "nr": 80,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zb_ziel_wann",
        "nr": 81,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "bgf",
        "nr": 82,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "grundriss",
        "nr": 83,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_punkte",
        "nr": 84,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "sachwertfaktor",
        "nr": 85,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "uk_flaeche",
        "nr": 86,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "wgfz_objekt",
        "nr": 87,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "stellplatz_miete_monat",
        "nr": 88,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "sonstige_jahr",
        "nr": 89,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nhk_haus",
        "nr": 90,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nhk_geschosse",
        "nr": 91,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nhk_dach",
        "nr": 92,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "garagen_bgf_qm",
        "nr": 93,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "garagen_stufe",
        "nr": 94,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "aussenanlagen_pct",
        "nr": 95,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "aussenanlagen",
        "nr": 96,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "bes_bauteile",
        "nr": 97,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_gauben",
        "nr": 98,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_balkone",
        "nr": 99,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_vordach",
        "nr": 100,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_terrassen",
        "nr": 101,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_sonstige",
        "nr": 102,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "lzs_pct",
        "nr": 103,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw_manuell",
        "nr": 104,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw_anpassung_pct",
        "nr": 105,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw_anpassung_grund",
        "nr": 106,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
+      {
+       "id": "erbbauzins",
+       "nr": 107,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "erb_restlz",
+       "nr": 108,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "erb_zs_ang",
+       "nr": 109,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "erb_entsch",
+       "nr": 110,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "erb_wert_ist_erb",
+       "nr": 111,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
      "weitere": [
       {
        "id": "verkehrswert_ueberf",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ueberf_preis",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "halter_seit",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "gesellschafterdarlehen",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ueberf_restschuld",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ueberf_rest_zins",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ueberf_ende",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ausst",
-       "stufe": 0
-      },
-      {
-       "id": "erbbauzins",
-       "stufe": 0
-      },
-      {
-       "id": "erb_restlz",
-       "stufe": 0
-      },
-      {
-       "id": "erb_zs_ang",
-       "stufe": 0
-      },
-      {
-       "id": "erb_entsch",
-       "stufe": 0
-      },
-      {
-       "id": "erb_wert_ist_erb",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Altfeld, ersetzt durch die Standardstufe (NHK 2010). Die App blendet es nicht mehr ein; gespeicherte Werte bleiben lesbar."
       }
      ],
      "bilder": [
@@ -9140,137 +9752,206 @@ window.DP_HANDBUCH = {
         "brw_anpassung_pct",
         "brw_anpassung_grund"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-efh-s0-x1.webp",
+       "felder": [
+        "erbbauzins",
+        "erb_restlz",
+        "erb_zs_ang",
+        "erb_entsch",
+        "erb_wert_ist_erb"
+       ]
+      }
+     ],
+     "mobil": [
+      {
+       "datei": "hb-efh-s0-m1.webp",
+       "felder": [
+        "plz",
+        "ort",
+        "str",
+        "hnr",
+        "objart"
+       ]
+      },
+      {
+       "datei": "hb-efh-s0-m2.webp",
+       "felder": [
+        "nutzungsart",
+        "wfl",
+        "zimmer"
+       ]
       }
      ]
     },
     {
      "sec": "s1",
+     "auswahl": "Haken „Inventar erfassen“ gesetzt",
      "felder": [
       {
        "id": "kp",
        "nr": 1,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "makler_p",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "makler_e",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "notar_p",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "notar_e",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gba_p",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gba_e",
        "nr": 7,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gest_p",
        "nr": 8,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gest_e",
        "nr": 9,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ji_p",
        "nr": 10,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ji_e",
        "nr": 11,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "san",
        "nr": 12,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "san_ust",
        "nr": 13,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "moebl",
        "nr": 14,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
-      }
-     ],
-     "weitere": [
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
       {
        "id": "inv_kueche",
-       "stufe": 0
+       "nr": 15,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_moebel",
-       "stufe": 0
+       "nr": 16,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_geraete",
-       "stufe": 0
+       "nr": 17,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_pv",
-       "stufe": 0
+       "nr": 18,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_stellplatz",
-       "stufe": 0
+       "nr": 19,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_sonst",
-       "stufe": 0
+       "nr": 20,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
+     "weitere": [],
      "bilder": [
       {
        "datei": "hb-efh-s1-1.webp",
@@ -9290,102 +9971,137 @@ window.DP_HANDBUCH = {
         "san_ust",
         "moebl"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-efh-s1-x1.webp",
+       "felder": [
+        "inv_kueche",
+        "inv_moebel",
+        "inv_geraete",
+        "inv_pv",
+        "inv_stellplatz",
+        "inv_sonst"
+       ]
+      }
+     ],
+     "mobil": [
+      {
+       "datei": "hb-efh-s1-m1.webp",
+       "felder": [
+        "kp",
+        "makler_p"
+       ]
       }
      ]
     },
     {
      "sec": "s2",
+     "auswahl": "",
      "felder": [
       {
        "id": "nkm",
        "nr": 1,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ze",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "umlagef",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_marktmiete",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_mietausfall",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mv_art",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mv_beginn",
        "nr": 7,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mv_letzte_erhoehung",
        "nr": 8,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mv_letzte_erhoehung_betrag",
        "nr": 9,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "me_soll",
        "nr": 10,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "me_anz",
        "nr": 11,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "me_int",
        "nr": 12,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "me_pct",
        "nr": 13,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       }
      ],
      "weitere": [],
@@ -9418,205 +10134,327 @@ window.DP_HANDBUCH = {
         "me_pct"
        ]
       }
+     ],
+     "mobil": [
+      {
+       "datei": "hb-efh-s2-m1.webp",
+       "felder": [
+        "nkm",
+        "ze"
+       ]
+      }
      ]
     },
     {
      "sec": "s3",
+     "auswahl": "Haken „Eigene Anschlussfinanzierung für Darlehen 1“, Art des Darlehens „Tilgungsaussetzungsdarlehen (mit Bausparvertrag)“, Darlehen II „Hinzufügen“ und dessen Anschlussfinanzierung",
      "felder": [
       {
        "id": "bank_inst",
        "nr": 1,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_vertrag",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_vertragsdatum",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_type",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_auszahl",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ek",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ek_ist_nk",
        "nr": 7,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ek_inkl_nk",
        "nr": 8,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1",
        "nr": 9,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1z",
        "nr": 10,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1t",
        "nr": 11,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_bindj",
        "nr": 12,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_anschl_enable",
        "nr": 13,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
-      }
-     ],
-     "weitere": [
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
       {
        "id": "anschl_z",
-       "stufe": 0
+       "nr": 14,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "anschl_t",
-       "stufe": 0
+       "nr": 15,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "anschl_bj",
-       "stufe": 0
+       "nr": 16,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_inst",
-       "stufe": 0
+       "nr": 17,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_vertrag",
-       "stufe": 0
+       "nr": 18,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_vertragsdatum",
-       "stufe": 0
+       "nr": 19,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_sum",
-       "stufe": 0
+       "nr": 20,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_rate",
-       "stufe": 0
+       "nr": 21,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_quote_min",
-       "stufe": 0
+       "nr": 22,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_zins",
-       "stufe": 0
+       "nr": 23,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_dar_z",
-       "stufe": 0
+       "nr": 24,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_dar_t",
-       "stufe": 0
+       "nr": 25,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_type",
-       "stufe": 0
+       "nr": 26,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_inst",
-       "stufe": 0
+       "nr": 27,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_vertrag",
-       "stufe": 0
+       "nr": 28,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_bspar",
-       "stufe": 0
+       "nr": 29,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_auszahl",
-       "stufe": 0
+       "nr": 30,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_vertragsdatum",
-       "stufe": 0
+       "nr": 31,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2",
-       "stufe": 0
+       "nr": 32,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2z",
-       "stufe": 0
+       "nr": 33,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2t",
-       "stufe": 0
+       "nr": 34,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_bindj",
-       "stufe": 0
+       "nr": 35,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_anschl_enable",
-       "stufe": 0
+       "nr": 36,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_az",
-       "stufe": 0
+       "nr": 37,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_at",
-       "stufe": 0
+       "nr": 38,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
+     "weitere": [],
      "bilder": [
       {
        "datei": "hb-efh-s3-1.webp",
@@ -9640,137 +10478,209 @@ window.DP_HANDBUCH = {
         "d1_bindj",
         "d1_anschl_enable"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-efh-s3-x1.webp",
+       "felder": [
+        "anschl_z",
+        "anschl_t",
+        "anschl_bj",
+        "bspar_inst",
+        "bspar_vertrag",
+        "bspar_vertragsdatum",
+        "bspar_sum",
+        "bspar_rate",
+        "bspar_quote_min",
+        "bspar_zins",
+        "bspar_dar_z",
+        "bspar_dar_t"
+       ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-efh-s3-x2.webp",
+       "felder": [
+        "d2_type",
+        "d2_inst",
+        "d2_vertrag",
+        "d2_bspar",
+        "d2_auszahl",
+        "d2_vertragsdatum",
+        "d2",
+        "d2z",
+        "d2t",
+        "d2_bindj",
+        "d2_anschl_enable",
+        "d2_az",
+        "d2_at"
+       ]
+      }
+     ],
+     "mobil": [
+      {
+       "datei": "hb-efh-s3-m1.webp",
+       "felder": [
+        "bank_inst",
+        "d1_vertrag"
+       ]
       }
      ]
     },
     {
      "sec": "s4",
+     "auswahl": "Eingabe-Modus „% der NKM“",
      "felder": [
       {
        "id": "hg_ul",
        "nr": 1,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "grundsteuer",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ul_sonst",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hg_nul",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "weg_r",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eigen_r",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mietausfall",
        "nr": 7,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nul_sonst",
        "nr": 8,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp1",
        "nr": 9,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp1l",
        "nr": 10,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp2",
        "nr": 11,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp2l",
        "nr": 12,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp3",
        "nr": 13,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp3l",
        "nr": 14,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp4",
        "nr": 15,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp4l",
        "nr": 16,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
+      {
+       "id": "bwk_ul_pct",
+       "nr": 17,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "bwk_nul_pct",
+       "nr": 18,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
      "weitere": [
       {
-       "id": "bwk_ul_pct",
-       "stufe": 0
-      },
-      {
-       "id": "bwk_nul_pct",
-       "stufe": 0
-      },
-      {
        "id": "bwk_kp_pct",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint im Eingabe-Modus „% der NKM“ erst mit der Unterwahl „% vom Kaufpreis“ und ersetzt dann die beiden NKM-Quoten — es steht nie zusammen mit ihnen im Bild."
       }
      ],
      "bilder": [
@@ -9804,73 +10714,104 @@ window.DP_HANDBUCH = {
         "kp4",
         "kp4l"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-efh-s4-x1.webp",
+       "felder": [
+        "bwk_ul_pct",
+        "bwk_nul_pct"
+       ]
       }
-     ]
+     ],
+     "mobil": []
     },
     {
      "sec": "s3-tax",
+     "auswahl": "Haken „§ 7b Sonder-AfA aktivieren“ gesetzt",
      "felder": [
       {
        "id": "zve",
        "nr": 1,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "grenz",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "grenz_auto",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "afa_satz",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "geb_ant",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "afa_sonder7b_aktiv",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
-      }
-     ],
-     "weitere": [
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
       {
        "id": "afa_sonder7b_eh40",
-       "stufe": 0
+       "nr": 7,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "afa_sonder7b_baukosten",
-       "stufe": 0
+       "nr": 8,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "afa_sonder7b_vermietung",
-       "stufe": 0
+       "nr": 9,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "afa_sonder7b_neubau",
-       "stufe": 0
+       "nr": 10,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
+     "weitere": [],
      "bilder": [
       {
        "datei": "hb-efh-s3-tax-1.webp",
@@ -9882,8 +10823,19 @@ window.DP_HANDBUCH = {
         "geb_ant",
         "afa_sonder7b_aktiv"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-efh-s3-tax-x1.webp",
+       "felder": [
+        "afa_sonder7b_eh40",
+        "afa_sonder7b_baukosten",
+        "afa_sonder7b_vermietung",
+        "afa_sonder7b_neubau"
+       ]
       }
-     ]
+     ],
+     "mobil": []
     }
    ],
    "wohnungsliste": false,
@@ -9972,760 +10924,889 @@ window.DP_HANDBUCH = {
    "schritte": [
     {
      "sec": "s0",
+     "auswahl": "Haken „Erbbaurecht / Erbpacht“ gesetzt",
      "felder": [
       {
        "id": "plz",
        "nr": 1,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ort",
        "nr": 2,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "str",
        "nr": 3,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hnr",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "objart",
        "nr": 5,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nutzungsart",
        "nr": 6,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "wfl",
        "nr": 7,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "baujahr",
        "nr": 8,
        "stufe": 1,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "etagen_ges",
        "nr": 9,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "einheiten",
        "nr": 10,
        "stufe": 2,
        "artPflicht": true,
-       "artHinweis": "Beim Mehrfamilienhaus zählt die Zahl der Wohneinheiten, nicht die Zimmer einer einzelnen."
+       "artHinweis": "Beim Mehrfamilienhaus zählt die Zahl der Wohneinheiten, nicht die Zimmer einer einzelnen.",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_zustand",
        "nr": 11,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "standardstufe",
        "nr": 12,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_energie",
        "nr": 13,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "vermstand",
        "nr": 14,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gsfl",
        "nr": 15,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kuerzel",
        "nr": 16,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "thesis",
        "nr": 17,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "risiken",
        "nr": 18,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "exitstr",
        "nr": 19,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kaufdat",
        "nr": 20,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "wirtschaftlicher_uebergang",
        "nr": 21,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "halter",
        "nr": 22,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mand_ueberf_cb",
        "nr": 23,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw",
        "nr": 24,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw_stichtag",
        "nr": 25,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_walls",
        "nr": 26,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_aussenwand",
        "nr": 27,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_aussenwaende",
        "nr": 28,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_roof",
        "nr": 29,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_dach",
        "nr": 30,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_dach",
        "nr": 31,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_windows",
        "nr": 32,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_fenster",
        "nr": 33,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_fenster",
        "nr": 34,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_heating",
        "nr": 35,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_heizung",
        "nr": 36,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_heizung",
        "nr": 37,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_bath",
        "nr": 38,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_baeder",
        "nr": 39,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_sanitaer",
        "nr": 40,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_floor",
        "nr": 41,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_fussboeden",
        "nr": 42,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_innenausbau",
        "nr": 43,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_innenwaende",
        "nr": 44,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_decken",
        "nr": 45,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_leitungen",
        "nr": 46,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ausst_technik",
        "nr": 47,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_grundriss",
        "nr": 48,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_elevator",
        "nr": 49,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_guest_wc",
        "nr": 50,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eq_store_room",
        "nr": 51,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "balkon_flae",
        "nr": 52,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "garagen",
        "nr": 53,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "stellpl_aussen",
        "nr": 54,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "modernis",
        "nr": 55,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "baustatus",
        "nr": 56,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gemarkung",
        "nr": 57,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "flur",
        "nr": 58,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "flurstueck",
        "nr": 59,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hinterland_qm",
        "nr": 60,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hinterland_eur_qm",
        "nr": 61,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hinterland_rentierlich",
        "nr": 62,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "erbpacht",
        "nr": 63,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "lageklasse",
        "nr": 64,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "makrolage",
        "nr": 65,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mikrolage",
        "nr": 66,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_bevoelkerung",
        "nr": 67,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_nachfrage",
        "nr": 68,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_wertsteigerung",
        "nr": 69,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_entwicklung",
        "nr": 70,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "bankval",
        "nr": 71,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "svwert",
        "nr": 72,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "wert_soll",
        "nr": 73,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "notizen",
        "nr": 74,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "zb_fertig_jahr",
        "nr": 75,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "bgf",
        "nr": 76,
        "stufe": 3,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "grundriss",
        "nr": 77,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mod_punkte",
        "nr": 78,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "sachwertfaktor",
        "nr": 79,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "uk_flaeche",
        "nr": 80,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "wgfz_objekt",
        "nr": 81,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "stellplatz_miete_monat",
        "nr": 82,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "sonstige_jahr",
        "nr": 83,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nhk_haus",
        "nr": 84,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nhk_geschosse",
        "nr": 85,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nhk_dach",
        "nr": 86,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "garagen_bgf_qm",
        "nr": 87,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "garagen_stufe",
        "nr": 88,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "aussenanlagen_pct",
        "nr": 89,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "aussenanlagen",
        "nr": 90,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "bes_bauteile",
        "nr": 91,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_gauben",
        "nr": 92,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_balkone",
        "nr": 93,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_vordach",
        "nr": 94,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_terrassen",
        "nr": 95,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "btl_sonstige",
        "nr": 96,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "lzs_pct",
        "nr": 97,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw_manuell",
        "nr": 98,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw_anpassung_pct",
        "nr": 99,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "brw_anpassung_grund",
        "nr": 100,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
+      {
+       "id": "erbbauzins",
+       "nr": 101,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "erb_restlz",
+       "nr": 102,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "erb_zs_ang",
+       "nr": 103,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "erb_entsch",
+       "nr": 104,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "erb_wert_ist_erb",
+       "nr": 105,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
      "weitere": [
       {
        "id": "verkehrswert_ueberf",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ueberf_preis",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "halter_seit",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "gesellschafterdarlehen",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ueberf_restschuld",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ueberf_rest_zins",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ueberf_ende",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint nur bei einem Objekt, das über „Deal-Aktion → Überführung starten“ aus dem Privatbestand überführt wurde. Das braucht ein gespeichertes Objekt; im Aufnahme-Tab ist Speichern gesperrt, deshalb kein Bild."
       },
       {
        "id": "ausst",
-       "stufe": 0
-      },
-      {
-       "id": "erbbauzins",
-       "stufe": 0
-      },
-      {
-       "id": "erb_restlz",
-       "stufe": 0
-      },
-      {
-       "id": "erb_zs_ang",
-       "stufe": 0
-      },
-      {
-       "id": "erb_entsch",
-       "stufe": 0
-      },
-      {
-       "id": "erb_wert_ist_erb",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Altfeld, ersetzt durch die Standardstufe (NHK 2010). Die App blendet es nicht mehr ein; gespeicherte Werte bleiben lesbar."
       }
      ],
      "bilder": [
@@ -10868,137 +11949,205 @@ window.DP_HANDBUCH = {
         "brw_anpassung_pct",
         "brw_anpassung_grund"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-mfh-s0-x1.webp",
+       "felder": [
+        "erbbauzins",
+        "erb_restlz",
+        "erb_zs_ang",
+        "erb_entsch",
+        "erb_wert_ist_erb"
+       ]
+      }
+     ],
+     "mobil": [
+      {
+       "datei": "hb-mfh-s0-m1.webp",
+       "felder": [
+        "plz",
+        "ort",
+        "str",
+        "hnr",
+        "objart"
+       ]
+      },
+      {
+       "datei": "hb-mfh-s0-m2.webp",
+       "felder": [
+        "nutzungsart",
+        "wfl"
+       ]
       }
      ]
     },
     {
      "sec": "s1",
+     "auswahl": "Haken „Inventar erfassen“ gesetzt",
      "felder": [
       {
        "id": "kp",
        "nr": 1,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "makler_p",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "makler_e",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "notar_p",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "notar_e",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gba_p",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gba_e",
        "nr": 7,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gest_p",
        "nr": 8,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "gest_e",
        "nr": 9,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ji_p",
        "nr": 10,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ji_e",
        "nr": 11,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "san",
        "nr": 12,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "san_ust",
        "nr": 13,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "moebl",
        "nr": 14,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
-      }
-     ],
-     "weitere": [
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
       {
        "id": "inv_kueche",
-       "stufe": 0
+       "nr": 15,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_moebel",
-       "stufe": 0
+       "nr": 16,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_geraete",
-       "stufe": 0
+       "nr": 17,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_pv",
-       "stufe": 0
+       "nr": 18,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_stellplatz",
-       "stufe": 0
+       "nr": 19,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "inv_sonst",
-       "stufe": 0
+       "nr": 20,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
+     "weitere": [],
      "bilder": [
       {
        "datei": "hb-mfh-s1-1.webp",
@@ -11018,102 +12167,137 @@ window.DP_HANDBUCH = {
         "san_ust",
         "moebl"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-mfh-s1-x1.webp",
+       "felder": [
+        "inv_kueche",
+        "inv_moebel",
+        "inv_geraete",
+        "inv_pv",
+        "inv_stellplatz",
+        "inv_sonst"
+       ]
+      }
+     ],
+     "mobil": [
+      {
+       "datei": "hb-mfh-s1-m1.webp",
+       "felder": [
+        "kp",
+        "makler_p"
+       ]
       }
      ]
     },
     {
      "sec": "s2",
+     "auswahl": "",
      "felder": [
       {
        "id": "nkm",
        "nr": 1,
        "stufe": 2,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ze",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "umlagef",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_marktmiete",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ds2_mietausfall",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mv_art",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mv_beginn",
        "nr": 7,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mv_letzte_erhoehung",
        "nr": 8,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mv_letzte_erhoehung_betrag",
        "nr": 9,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "me_soll",
        "nr": 10,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "me_anz",
        "nr": 11,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "me_int",
        "nr": 12,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "me_pct",
        "nr": 13,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       }
      ],
      "weitere": [],
@@ -11146,205 +12330,327 @@ window.DP_HANDBUCH = {
         "me_pct"
        ]
       }
+     ],
+     "mobil": [
+      {
+       "datei": "hb-mfh-s2-m1.webp",
+       "felder": [
+        "nkm",
+        "ze"
+       ]
+      }
      ]
     },
     {
      "sec": "s3",
+     "auswahl": "Haken „Eigene Anschlussfinanzierung für Darlehen 1“, Art des Darlehens „Tilgungsaussetzungsdarlehen (mit Bausparvertrag)“, Darlehen II „Hinzufügen“ und dessen Anschlussfinanzierung",
      "felder": [
       {
        "id": "bank_inst",
        "nr": 1,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_vertrag",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_vertragsdatum",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_type",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_auszahl",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ek",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ek_ist_nk",
        "nr": 7,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ek_inkl_nk",
        "nr": 8,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1",
        "nr": 9,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1z",
        "nr": 10,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1t",
        "nr": 11,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_bindj",
        "nr": 12,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "d1_anschl_enable",
        "nr": 13,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
-      }
-     ],
-     "weitere": [
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
       {
        "id": "anschl_z",
-       "stufe": 0
+       "nr": 14,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "anschl_t",
-       "stufe": 0
+       "nr": 15,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "anschl_bj",
-       "stufe": 0
+       "nr": 16,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_inst",
-       "stufe": 0
+       "nr": 17,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_vertrag",
-       "stufe": 0
+       "nr": 18,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_vertragsdatum",
-       "stufe": 0
+       "nr": 19,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_sum",
-       "stufe": 0
+       "nr": 20,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_rate",
-       "stufe": 0
+       "nr": 21,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_quote_min",
-       "stufe": 0
+       "nr": 22,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_zins",
-       "stufe": 0
+       "nr": 23,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_dar_z",
-       "stufe": 0
+       "nr": 24,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "bspar_dar_t",
-       "stufe": 0
+       "nr": 25,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_type",
-       "stufe": 0
+       "nr": 26,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_inst",
-       "stufe": 0
+       "nr": 27,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_vertrag",
-       "stufe": 0
+       "nr": 28,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_bspar",
-       "stufe": 0
+       "nr": 29,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_auszahl",
-       "stufe": 0
+       "nr": 30,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_vertragsdatum",
-       "stufe": 0
+       "nr": 31,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2",
-       "stufe": 0
+       "nr": 32,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2z",
-       "stufe": 0
+       "nr": 33,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2t",
-       "stufe": 0
+       "nr": 34,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_bindj",
-       "stufe": 0
+       "nr": 35,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_anschl_enable",
-       "stufe": 0
+       "nr": 36,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_az",
-       "stufe": 0
+       "nr": 37,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "d2_at",
-       "stufe": 0
+       "nr": 38,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
+     "weitere": [],
      "bilder": [
       {
        "datei": "hb-mfh-s3-1.webp",
@@ -11368,137 +12674,209 @@ window.DP_HANDBUCH = {
         "d1_bindj",
         "d1_anschl_enable"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-mfh-s3-x1.webp",
+       "felder": [
+        "anschl_z",
+        "anschl_t",
+        "anschl_bj",
+        "bspar_inst",
+        "bspar_vertrag",
+        "bspar_vertragsdatum",
+        "bspar_sum",
+        "bspar_rate",
+        "bspar_quote_min",
+        "bspar_zins",
+        "bspar_dar_z",
+        "bspar_dar_t"
+       ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-mfh-s3-x2.webp",
+       "felder": [
+        "d2_type",
+        "d2_inst",
+        "d2_vertrag",
+        "d2_bspar",
+        "d2_auszahl",
+        "d2_vertragsdatum",
+        "d2",
+        "d2z",
+        "d2t",
+        "d2_bindj",
+        "d2_anschl_enable",
+        "d2_az",
+        "d2_at"
+       ]
+      }
+     ],
+     "mobil": [
+      {
+       "datei": "hb-mfh-s3-m1.webp",
+       "felder": [
+        "bank_inst",
+        "d1_vertrag"
+       ]
       }
      ]
     },
     {
      "sec": "s4",
+     "auswahl": "Eingabe-Modus „% der NKM“",
      "felder": [
       {
        "id": "hg_ul",
        "nr": 1,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "grundsteuer",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "ul_sonst",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "hg_nul",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "weg_r",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "eigen_r",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "mietausfall",
        "nr": 7,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "nul_sonst",
        "nr": 8,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp1",
        "nr": 9,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp1l",
        "nr": 10,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp2",
        "nr": 11,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp2l",
        "nr": 12,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp3",
        "nr": 13,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp3l",
        "nr": 14,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp4",
        "nr": 15,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "kp4l",
        "nr": 16,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
+      {
+       "id": "bwk_ul_pct",
+       "nr": 17,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
+      },
+      {
+       "id": "bwk_nul_pct",
+       "nr": 18,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
      "weitere": [
       {
-       "id": "bwk_ul_pct",
-       "stufe": 0
-      },
-      {
-       "id": "bwk_nul_pct",
-       "stufe": 0
-      },
-      {
        "id": "bwk_kp_pct",
-       "stufe": 0
+       "stufe": 0,
+       "grund": "Erscheint im Eingabe-Modus „% der NKM“ erst mit der Unterwahl „% vom Kaufpreis“ und ersetzt dann die beiden NKM-Quoten — es steht nie zusammen mit ihnen im Bild."
       }
      ],
      "bilder": [
@@ -11532,73 +12910,104 @@ window.DP_HANDBUCH = {
         "kp4",
         "kp4l"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-mfh-s4-x1.webp",
+       "felder": [
+        "bwk_ul_pct",
+        "bwk_nul_pct"
+       ]
       }
-     ]
+     ],
+     "mobil": []
     },
     {
      "sec": "s3-tax",
+     "auswahl": "Haken „§ 7b Sonder-AfA aktivieren“ gesetzt",
      "felder": [
       {
        "id": "zve",
        "nr": 1,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "grenz",
        "nr": 2,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "grenz_auto",
        "nr": 3,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "afa_satz",
        "nr": 4,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "geb_ant",
        "nr": 5,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
+       "artHinweis": "",
+       "nachAuswahl": false
       },
       {
        "id": "afa_sonder7b_aktiv",
        "nr": 6,
        "stufe": 0,
        "artPflicht": false,
-       "artHinweis": ""
-      }
-     ],
-     "weitere": [
+       "artHinweis": "",
+       "nachAuswahl": false
+      },
       {
        "id": "afa_sonder7b_eh40",
-       "stufe": 0
+       "nr": 7,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "afa_sonder7b_baukosten",
-       "stufe": 0
+       "nr": 8,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "afa_sonder7b_vermietung",
-       "stufe": 0
+       "nr": 9,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       },
       {
        "id": "afa_sonder7b_neubau",
-       "stufe": 0
+       "nr": 10,
+       "stufe": 0,
+       "artPflicht": false,
+       "artHinweis": "",
+       "nachAuswahl": true
       }
      ],
+     "weitere": [],
      "bilder": [
       {
        "datei": "hb-mfh-s3-tax-1.webp",
@@ -11610,8 +13019,19 @@ window.DP_HANDBUCH = {
         "geb_ant",
         "afa_sonder7b_aktiv"
        ]
+      },
+      {
+       "nachAuswahl": true,
+       "datei": "hb-mfh-s3-tax-x1.webp",
+       "felder": [
+        "afa_sonder7b_eh40",
+        "afa_sonder7b_baukosten",
+        "afa_sonder7b_vermietung",
+        "afa_sonder7b_neubau"
+       ]
       }
-     ]
+     ],
+     "mobil": []
     }
    ],
    "wohnungsliste": true,
