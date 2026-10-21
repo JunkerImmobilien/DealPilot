@@ -118,7 +118,7 @@
       '.dp-cpp-spr:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 15%, transparent)}' +
       '.dp-cpp-sel{border:1px solid rgba(138,130,121,.45);background:transparent;color:#6b6660;' +
         'border-radius:999px;padding:4px 10px;font:600 11.5px/1.3 "Space Grotesk",sans-serif;' +
-        'cursor:pointer;max-width:100%}' +
+        'cursor:pointer;width:230px;max-width:100%}' +
       '.dp-cpp-sel option,.dp-cpp-sel optgroup{color:#2A2727;background:#FDFCFA;font-weight:400}' +
       '.dp-cpp-sel optgroup{font-weight:700}' +
       '@media(max-width:560px){.dp-cpp{padding:7px 10px 2px}.dp-cpp-lbl{display:none}.dp-cpp-sel{flex:1 1 100%}}';
