@@ -41738,3 +41738,13 @@ Potenzial Demo: Bestand/MH/ZB 610.000/625.000/805.000 → 610.000/630.000/805.00
 - **Nur Code geprüft:** `.v754-ov` (startet kostenpflichtig), `#oab-miss-ov`, `#dp-mba`, `#finpdf-modal`, `#dp-pdf-luecken`, `#rnd-result-modal` (markDirty), `#qcpm-ov` (Nicht anfassen), Steuer-Bestand (Öffner nur mit Bestandsobjekten im DOM), `#dp-nq` (newObj legte direkt an – gesperrt), Login-/Registrier-Dialoge (Marcel angemeldet).
 - **Nicht testbar hier:** echtes Safari (`dvh`), echte Touch-Gesten, Tastatur-Fokusreihenfolge über Screenreader.
 - Messe-Schleife ist für 1920 gebaut, kleinere Breiten nicht bewertet.
+
+### v2575–v2576a · Die drei Vorschläge der Gesamtprüfung umgesetzt (21.10.2026, Staging)
+
+Marcel 21.10.2026: „ja alles umsetzen so und dann rollout".
+
+- **Was:** (1) Bank-Export am Handy als Karten: `showBankexportView()` (`js/storage.js`) setzt den Spaltennamen als `data-label` an jede Zelle, unter 640 px wird jede Zeile eine Karte (Anker `#bankexport-modal`, die übrigen `.bank-table` bleiben). (2) Landing-Kopf: unter 380 px heißt der Knopf „Starten", unter 340 px schmaler (`landing/dp2.css`, Buster `landing-kopf320-2`). (3) Aktionen-Menü im Handy-Querformat (640–900 px breit, ≤ 500 px hoch) steht neben der 380-px-Leiste in voller Höhe; `_sbActionsDock()` (`js/ui.js`) deckelte per Inline-`max-height !important` gegen die Auslöser-Oberkante und hielt es auf 232 px — steht das Menü neben der Leiste, gilt jetzt die Fensterhöhe.
+- **Commits:** `9c5a55c2` (v2575), `8eac7a1b` (v2576), `bc222d63` (v2576a), `f8aeebfc` (landing-kopf320-2).
+- **Nachweis (Messkabine, Speichersperre an, localStorage 376/376 zurück):** Bank-Export 390 px: Tabelle 294 px breit, Seite 390 = kein Überlauf, 11 Karten. Menü quer 844×390: 182 → 369 px Höhe, Auslöser frei (`elementFromPoint`); 667×375: 355 px; Hochformat 390×844 und 390×556 unverändert. Landing 320 px: Inhalt 312 px (Messkabine zeigt 303 px Innenbreite nur wegen des Desktop-Scrollbalkens), 414 px weiter „Kostenlos starten".
+- **Rest:** Karten sind lang (25 Felder je Darlehen, ~700 px) — wenn Marcel will, lassen sich Nebenspalten am Handy einklappen.
+- **Falle:** Wer die Höhe eines fixierten Menüs per CSS ändert, verliert gegen ein Skript, das inline mit `!important` deckelt — erst `getAttribute('style')` lesen (vgl. Memory „Inline-!important schlägt alles").
