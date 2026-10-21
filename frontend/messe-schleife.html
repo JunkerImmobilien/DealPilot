@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Messe-Schleife</title>
+<meta name="robots" content="noindex">
+<!--
+  messe-schleife-1 · Dauerschleife für den Messebildschirm (21.10.2026).
+  Aufruf: messe-schleife.html?idee=1 … 6 — ohne Parameter die Auswahl.
+  Stumm, ohne Bedienung, 1920 x 1080 auf jedes Fenster skaliert.
+  Clips: messe-schleife/clips/*.mp4 — Ausschnitte der Videoreihe, NICHT im Git
+  (wie die Videothek), per scp auf den Server.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;600;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="messe-schleife/schleife.css?v=messe-schleife-1">
+</head>
+<body>
+<div id="buehne"></div>
+<script src="js/score-tiers.js?v=v1950"></script>
+<script src="js/pilot-figur.js?v=v2189"></script>
+<script src="messe-schleife/schleife.js?v=messe-schleife-1"></script>
+</body>
+</html>
