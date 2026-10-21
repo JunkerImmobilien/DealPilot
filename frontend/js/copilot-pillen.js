@@ -43,47 +43,55 @@
     { id: 'tiefe',  text: 'Datentiefe',        titel: 'Wie vollständig ist dieses Objekt?' },
     { id: 'fehlt',  text: 'Was fehlt?',        titel: 'Welche Felder sind noch leer?' }
   ];
-  /* v2550 · Marcel 21.10.2026: „vlzt koennen wir das besser formulieren und
-     paar mehr. mit Auswahlbox." Fuenf Pillen fuer die haeufigen Fragen, der
-     Rest in einer Auswahl nach Thema. Auch dort wird nur EINGESETZT, gesendet
-     wird per Hand - der Nutzer sieht, was Kontingent kostet. */
+  /* v2550 · Pillen + Auswahl nach Thema. Eingesetzt wird nur, gesendet per Hand -
+     der Nutzer sieht, was Kontingent kostet. */
+  /* v2551b · Marcel 21.10.2026: „was hat Richtung Bank, Richtung Steuern,
+     Gesamtbewertung, aber auch Ankauf Bestand Zielbild Auswertung sowie auch
+     was zum Preisverlauf. Der Kunde moechte ja schnell wissen: rechnet sich der
+     Deal vor und nach Steuern, und was sage ich der Bank?" Die beiden Fragen
+     stehen deshalb vorne als Pillen, der Rest nach Thema in der Auswahl. */
   var FRAGEN = [
-    { id: 'kauf', text: 'Kaufen oder nicht?',
-      frage: 'Würdest du dieses Objekt zu diesem Preis kaufen? Begründe es mit '
-           + 'Cashflow, DSCR und Rendite und nenne die eine Zahl, die das Urteil kippen würde.' },
-    { id: 'risiko', text: 'Größte Risiken',
-      frage: 'Was sind die drei größten Risiken bei diesem Objekt, gemessen an den '
-           + 'vorliegenden Zahlen — und wie kann ich jedes davon begrenzen?' },
-    { id: 'bank', text: 'Bankgespräch',
-      frage: 'Worauf schaut die Bank bei diesem Objekt zuerst? Welche Zahlen sollte '
-           + 'ich vor dem Termin kennen, und welche Unterlagen wird sie verlangen?' },
-    { id: 'sollist', text: 'Ankauf ↔ heute',
-      frage: 'Vergleiche den Stand beim Ankauf mit dem heutigen Stand: Wo liegt das '
-           + 'Objekt besser, wo schlechter, und was heißt das für Bank und Verkauf?' },
-    { id: 'tiefer', text: 'Mehr Tiefe?',
-      frage: 'Welche zusätzlichen Angaben würden die Analyse dieses Objekts belastbarer '
-           + 'machen — und was ändert jede davon konkret am Ergebnis?' }
+    { id: 'rechnet', text: 'Rechnet sich das?',
+      frage: 'Rechnet sich dieser Deal — vor Steuern und nach Steuern? Nenne je den Cashflow '
+           + 'im ersten Jahr und über zehn Jahre und sag in einem Satz, ob ich kaufen sollte.' },
+    { id: 'bank', text: 'Was sage ich der Bank?',
+      frage: 'Was sage ich der Bank zu diesem Objekt? Formuliere die drei stärksten Argumente '
+           + 'mit Zahlen (DSCR, Beleihung, Vermögen), nenne die Schwachstelle, nach der sie fragen '
+           + 'wird, und meine Antwort darauf.' },
+    { id: 'urteil', text: 'Gesamturteil',
+      frage: 'Gib mir dein Gesamturteil zu diesem Objekt: Score, Stärken, Schwächen und die '
+           + 'eine Zahl, die das Urteil kippen würde.' },
+    { id: 'abz', text: 'Ankauf · Bestand · Zielbild',
+      frage: 'Stelle Ankauf, heutigen Bestand und Zielbild nebeneinander: Miete, Cashflow, Wert '
+           + 'und Rendite je Stand. Was bringt der Weg zum Zielbild, und was kostet er?' },
+    { id: 'preis', text: 'Preisverlauf',
+      frage: 'Wie hat sich der Wert dieses Objekts seit dem Kauf entwickelt, wie steht der Kaufpreis '
+           + 'zum heutigen Marktwert, und welche Wertentwicklung ist für die nächsten zehn Jahre realistisch?' }
   ];
   var WEITERE = [
-    { gruppe: 'Kaufpreis & Verhandlung', fragen: [
-      'Bis zu welchem Kaufpreis trägt sich dieses Objekt noch? Nenne die Grenze in Euro und woran sie hängt.',
-      'Mit welchen Argumenten aus den Zahlen kann ich beim Kaufpreis verhandeln, und wie viel ist realistisch?',
-      'Wie weit liegt der Kaufpreis vom Marktwert entfernt, und was erklärt den Unterschied?' ] },
-    { gruppe: 'Miete & Potenzial', fragen: [
-      'Wie viel Mieterhöhung ist rechtlich und am Markt möglich (Soll-Miete), und ab wann?',
-      'Lohnt sich das Zielbild? Stelle Aufwand, Mehrmiete und Wertzuwachs gegenüber.',
-      'Ist die heutige Miete marktüblich, oder liegt sie deutlich darüber oder darunter?' ] },
-    { gruppe: 'Finanzierung', fragen: [
+    { gruppe: 'Bank & Finanzierung', fragen: [
+      'Welche Unterlagen wird die Bank für dieses Objekt verlangen, und welche fehlen mir noch?',
+      'Wie hoch würde die Bank das Objekt beleihen, und wie viel Eigenkapital muss ich dann einbringen?',
       'Was passiert mit dem Cashflow, wenn der Zins nach der Zinsbindung um zwei Prozentpunkte steigt?',
-      'Wie viel Eigenkapital brauche ich, damit der Cashflow nicht negativ wird?',
       'Ist die Tilgung sinnvoll gewählt, oder sollte ich sie für dieses Objekt anpassen?' ] },
     { gruppe: 'Steuer', fragen: [
-      'Wie wirkt sich das Objekt steuerlich aus, und ab welchem Jahr kippt der Vorteil in eine Steuerlast?',
+      'Wie entwickelt sich die Steuer über die Jahre, und ab wann kippt die Erstattung in eine Nachzahlung?',
+      'Wie hoch ist der Cashflow nach Steuern im ersten, fünften und zehnten Jahr?',
       'Lohnt sich ein Gutachten zur Restnutzungsdauer für eine höhere Abschreibung?',
       'Welchen Anteil des Kaufpreises sollte ich auf das Gebäude legen, und wie belege ich ihn?' ] },
-    { gruppe: 'Bewirtschaftung & Verkauf', fragen: [
-      'Welche Instandhaltung steht in den nächsten zehn Jahren an, und reicht die Rücklage dafür?',
-      'Wie robust ist der Deal, wenn eine Wohnung sechs Monate leer steht?',
+    { gruppe: 'Gesamtbewertung & Risiko', fragen: [
+      'Was sind die drei größten Risiken bei diesem Objekt, und wie begrenze ich jedes davon?',
+      'Bis zu welchem Kaufpreis trägt sich das Objekt noch? Nenne die Grenze in Euro.',
+      'Mit welchen Argumenten aus den Zahlen kann ich beim Kaufpreis verhandeln?',
+      'Wie robust ist der Deal, wenn eine Wohnung sechs Monate leer steht?' ] },
+    { gruppe: 'Ankauf · Bestand · Zielbild', fragen: [
+      'Wo liegt das Objekt heute besser oder schlechter als beim Ankauf geplant?',
+      'Wie viel Mieterhöhung ist rechtlich und am Markt möglich (Soll-Miete), und ab wann?',
+      'Lohnt sich das Zielbild? Stelle Aufwand, Mehrmiete und Wertzuwachs gegenüber.',
+      'Welche Wohnung hat das größte Mietpotenzial, und was ist der erste Schritt dorthin?' ] },
+    { gruppe: 'Preisverlauf & Verkauf', fragen: [
+      'Liegt der Kaufpreis über oder unter dem Marktwert, und was erklärt den Unterschied?',
+      'Wie entwickeln sich Preise und Mieten am Standort, und was heißt das für mein Objekt?',
       'Wann wäre ein Verkauf am sinnvollsten, und was bleibt nach Steuern übrig?' ] }
   ];
 

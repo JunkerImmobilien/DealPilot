@@ -201,7 +201,7 @@ window.DealPilotOnboarding = (function () {
   var _schritt = 0, _ov = null;
   /* v2083: die Vorauswahl ist der Standard (Aktenmappe), nicht null -
      vorher musste der Nutzer erst klicken, bevor es weiterging. */
-  var _wahl = { aussehen: _aussehenStandard(), typ: _typDefault(), pilot: null };
+  var _wahl = { aussehen: _aussehenStandard(), typ: _typDefault(), pilot: null, set: 'dp', basis: 'balanced' };
 
   function _ls(k)      { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function _lsSet(k,v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -412,18 +412,25 @@ window.DealPilotOnboarding = (function () {
          (bwk-profil.js). Jetzt: eine Karte mit dem DealPilot-Standard, die
          Felder erst auf Wunsch. Die Felder bleiben im Dokument - wer
          „Standard" waehlt, speichert genau ihre Vorbelegung. */
-      + '<div class="dpo-set" role="radiogroup" aria-label="Rechenwerte">'
-      +   '<label class="dpo-set-k an"><input type="radio" name="dpo_set" value="standard" checked>'
+      /* v2551 · ANLEGERPROFIL auch in der Ersteinrichtung. Marcel 21.10.2026: „ist das
+         auch bei der erstanmeldung in dem modal geloest mit dem Bewertungsprofil?" Es war
+         es nicht: hier stand EIN Standard, und Schritt 5 bot alle sechs Score-Profile
+         getrennt davon an. Jetzt dieselben drei Profile wie unter Einstellungen ›
+         Standardwerte (standardwerte-karten.js SETS) - sie setzen die Rechenwerte UND
+         die Gewichte des Deal Scores. Schritt 5 justiert nur noch fein. */
+      + (_sets() ? _setKarten() : '')
+      + '<div class="dpo-set" role="radiogroup" aria-label="Rechenwerte"' + (_sets() ? ' hidden' : '') + '>'
+      +   '<label class="dpo-set-k an"><input type="radio" name="dpo_set" value="standard"' + (_sets() ? '' : ' checked') + '>'
       +     '<span><b>DealPilot-Standard</b> <span class="dpo-k-std">empfohlen</span>'
       +     '<span class="dpo-set-t">Indikativer Marktzins · Zinsbindung ' + esc(String(profil('zinsbindung_default', 10))) + ' Jahre · '
       +     'Tilgung ' + esc(String(profil('tilgung_default', 1.5)).replace('.', ',')) + ' % · Eigenkapital ' + esc(String(profil('ek_quote_default', 10))) + ' % · '
       +     'Mietausfall ' + esc(String(profil('mietausfall_pct', 1)).replace('.', ',')) + ' % · Mindest-DSCR ' + esc(String(profil('min_dscr', 1.20)).replace('.', ',')) + ' · '
       +     'Bewirtschaftung je Objektart nach ImmoWertV</span></span></label>'
-      +   '<label class="dpo-set-k"><input type="radio" name="dpo_set" value="eigen">'
+      +   '<label class="dpo-set-k"><input type="radio" name="dpo_set" value="eigen"' + (_sets() ? ' data-alt="1"' : '') + '>'
       +     '<span><b>Selbst festlegen</b><span class="dpo-set-t">Zins, Tilgung, Eigenkapital und Grenzen einzeln einstellen. '
       +     'Alles bleibt später in den Einstellungen änderbar.</span></span></label>'
       + '</div>'
-      + '<div id="dpo-s3-eigen" hidden>'
+      + '<div id="dpo-s3-eigen"' + (_wahl.set === 'eigen' ? '' : ' hidden') + '>'
       /* v1750 · DER ZINS IST EINE WAHL, KEINE ANSAGE.
          Marcel: „Man sollte eine Checkbox haben, ob er sich den automatisch
          ziehen soll, und wenn nicht, dass man einen angeben kann … den
@@ -465,6 +472,31 @@ window.DealPilotOnboarding = (function () {
           'Debt Service Coverage Ratio: Jahresreinertrag geteilt durch Kapitaldienst. 1,0 heißt, die Miete deckt Zins und Tilgung genau. 1,20 lässt 20 % Luft — darunter wird es bei jeder Mietminderung eng. Banken verlangen meist 1,1 bis 1,3.')
       + '</div>'
       + '</div>';   /* v2184: Ende #dpo-s3-eigen */
+  }
+
+  /* v2551 · die Anlegerprofile aus standardwerte-karten.js (eine Liste, nicht zwei) */
+  function _sets() { var K = window.DpStandardKarten; return (K && K.SETS && K.SETS.length) ? K.SETS : null; }
+  function _setGewaehlt() {
+    var S = _sets(); if (!S || _wahl.set === 'eigen') return null;
+    return S.filter(function (s) { return s.id === _wahl.set; })[0] || S[0];
+  }
+  function _setKarten() {
+    var S = _sets(), akt = _wahl.set || S[0].id;
+    var z = function (v) { return String(v).replace('.', ','); };
+    return '<div class="dpo-set" role="radiogroup" aria-label="Anlegerprofil">'
+      + S.map(function (st) {
+          var w = st.werte || {}, an = akt === st.id;
+          var ab = String(w.ip_angebot_abschlag_pct || '').trim();
+          return '<label class="dpo-set-k' + (an ? ' an' : '') + '"><input type="radio" name="dpo_set" value="' + esc(st.id) + '"' + (an ? ' checked' : '') + '>'
+            + '<span><b>' + esc(st.name) + '</b>' + (st.id === 'dp' ? ' <span class="dpo-k-std">empfohlen</span>' : '')
+            + '<span class="dpo-set-t">' + esc(st.txt) + ' Tilgung ' + z(w.ip_tilgung_default) + ' % · Eigenkapital ' + z(w.ip_ek_quote_default)
+            + ' % · Mietausfall ' + z(w.ip_mietausfall_pct) + ' % · Mindest-DSCR ' + z(w.ip_min_dscr)
+            + ' · Angebotsabschlag ' + (ab ? z(ab) + ' %' : 'Ø Markt') + ' · gewichtet auch den Deal Score</span></span></label>';
+        }).join('')
+      + '<label class="dpo-set-k' + (akt === 'eigen' ? ' an' : '') + '"><input type="radio" name="dpo_set" value="eigen"' + (akt === 'eigen' ? ' checked' : '') + '>'
+      +   '<span><b>Selbst festlegen</b><span class="dpo-set-t">Zins, Tilgung, Eigenkapital und Grenzen einzeln einstellen. '
+      +   'Alles bleibt später in den Einstellungen änderbar.</span></span></label>'
+      + '</div>';
   }
 
   /* Haken an → das Zinsfeld ist gesperrt und zeigt, was DealPilot gerade
@@ -574,7 +606,26 @@ window.DealPilotOnboarding = (function () {
       + 'Die Zahlen auf den Kacheln zeigen nur, was für das jeweilige Profil '
       + 'typisch ist. Ändern kannst du sie dort — oder später unter '
       + '<b>Einstellungen › Investmentprofil</b>.</p>'
-      + '<div class="dpo-kacheln dpo-kacheln-3">'
+      /* v2551 · Ist ein Anlegerprofil gewählt, steht hier nur noch seine Kachel
+         und darunter die Feinjustierung (wie im Reiter Deal Score). */
+      + (function () {
+          var ps = _profile(), H = { balanced: 1, conservative: 1, optimistic: 1 };
+          if (!_sets()) return '';
+          var haupt = ps.filter(function (t) { return H[t.id] && (!_wahl.basis || t.id === _wahl.basis); });
+          var fein = ps.filter(function (t) { return !H[t.id]; });
+          var kachel = function (t, vor) {
+            return '<button type="button" class="dpo-kachel' + (_wahl.typ === t.id ? ' an' : '') + '" data-typ="' + t.id + '">'
+              + '<span class="dpo-k-name">' + esc((vor || '') + t.name) + '</span>'
+              + '<span class="dpo-k-unter">' + esc(t.unter) + '</span></button>';
+          };
+          return '<p class="dpo-vor dpo-vor-klein">' + (_wahl.basis
+              ? 'Dein Anlegerprofil aus Schritt <b>Finanzierung</b> gewichtet den Deal Score. Willst du einen Schwerpunkt setzen, wähle ihn darunter — die Rechenwerte bleiben.'
+              : 'Du hast die Rechenwerte selbst festgelegt. Wähle, wie der Deal Score gewichten soll.') + '</p>'
+            + '<div class="dpo-kacheln dpo-kacheln-3">' + haupt.map(function (t) { return kachel(t, _wahl.basis ? 'Anlegerprofil · ' : ''); }).join('') + '</div>'
+            + '<p class="dpo-vor dpo-vor-klein" style="margin-top:12px"><b>Feinjustierung</b> · optional, nur die Gewichte des Deal Scores</p>'
+            + '<div class="dpo-kacheln dpo-kacheln-3">' + fein.map(function (t) { return kachel(t); }).join('') + '</div>';
+        })()
+      + '<div class="dpo-kacheln dpo-kacheln-3"' + (_sets() ? ' hidden' : '') + '>'
       + _profile().map(function (t) {
           return '<button type="button" class="dpo-kachel' + (_wahl.typ === t.id ? ' an' : '')
             + '" data-typ="' + t.id + '">'
@@ -697,9 +748,9 @@ window.DealPilotOnboarding = (function () {
   var SCHRITTE = [
     { titel: 'Wie soll DealPilot aussehen?', kurz: 'Aussehen',    bau: s1 },
     { titel: 'Deine Daten',                  kurz: 'Daten',       bau: s2 },
-    { titel: 'Womit sollen wir rechnen?',    kurz: 'Finanzierung',bau: s3 },
+    { titel: 'Dein Anlegerprofil — womit sollen wir rechnen?', kurz: 'Finanzierung',bau: s3 },
     { titel: 'Steuer',                       kurz: 'Steuer',      bau: s4 },
-    { titel: 'Was für ein Investor bist du?',kurz: 'Profil',      bau: s5 },
+    { titel: 'Wie soll DealPilot bewerten?', kurz: 'Bewertung',   bau: s5 },
     { titel: 'Möchtest du Hilfe beim Start?', kurz: 'Hilfe',      bau: s6 }
   ];
 
@@ -877,6 +928,7 @@ window.DealPilotOnboarding = (function () {
       if (ev.target.id === 'dpo_zins_auto') { _zinsFeld(); return; }
       /* v2184: Standard-Set oder selbst festlegen */
       if (ev.target.name === 'dpo_set') {
+        if (_sets() && ev.target.value !== 'standard') _wahl.set = ev.target.value;
         var eigen = ev.target.value === 'eigen', box = el('dpo-s3-eigen');
         if (box) box.hidden = !eigen;
         [].forEach.call(document.querySelectorAll('.dpo-set-k'), function (k) {
@@ -974,13 +1026,22 @@ window.DealPilotOnboarding = (function () {
       } catch (e) {}
     }
     if (_schritt === 2) {
+      /* v2551 · Ein gewähltes Anlegerprofil schreibt SEINE Werte - die Felder stehen
+         dann zugeklappt und tragen nur die Vorbelegung. */
+      var _st = _setGewaehlt(), _w = _st ? (_st.werte || {}) : null;
+      var _p = function (k, id) { var x = _w ? parseFloat(_w[k]) : NaN; return isFinite(x) ? x : _zahl(id); };
+      if (_st) {
+        _wahl.basis = _st.ds; _wahl.typ = _st.ds;
+        if (String(_w.ip_angebot_abschlag_pct || '').trim()) profilSchreiben({ angebot_abschlag_pct: parseFloat(_w.ip_angebot_abschlag_pct) });
+        try { if (window.DpStandardKarten && DpStandardKarten.perScore) DpStandardKarten.perScore(_st.ds); } catch (e) {}
+      } else if (_sets()) { _wahl.basis = null; }
       profilSchreiben({
         zinsbindung_default: _zahl('dpo_zinsbindung'),
         zins_margin: (el('dpo_margin') || {}).value || 'standard',
-        tilgung_default: _zahl('dpo_tilgung'),
-        ek_quote_default: _zahl('dpo_ek'),
-        mietausfall_pct: _zahl('dpo_mietausfall'),
-        min_dscr: _zahl('dpo_dscr'),
+        tilgung_default: _p('ip_tilgung_default', 'dpo_tilgung'),
+        ek_quote_default: _p('ip_ek_quote_default', 'dpo_ek'),
+        mietausfall_pct: _p('ip_mietausfall_pct', 'dpo_mietausfall'),
+        min_dscr: _p('ip_min_dscr', 'dpo_dscr'),
         max_ltv: _zahl('dpo_ltv'),
         /* v1750 · Haken an = null, und genau das liest getZins() als
            „nimm den indikativen Satz". Der angezeigte Wert im gesperrten
