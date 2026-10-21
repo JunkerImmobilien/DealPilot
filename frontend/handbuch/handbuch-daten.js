@@ -7943,7 +7943,8 @@ window.DP_HANDBUCH = {
      "bilder": []
     }
    ],
-   "wohnungsliste": false
+   "wohnungsliste": false,
+   "wohnungBilder": []
   },
   {
    "art": "EFH",
@@ -9571,7 +9572,8 @@ window.DP_HANDBUCH = {
      "bilder": []
     }
    ],
-   "wohnungsliste": false
+   "wohnungsliste": false,
+   "wohnungBilder": []
   },
   {
    "art": "MFH",
@@ -11191,7 +11193,8 @@ window.DP_HANDBUCH = {
      "bilder": []
     }
    ],
-   "wohnungsliste": true
+   "wohnungsliste": true,
+   "wohnungBilder": []
   }
  ],
  "wohnungsliste": {

@@ -378,7 +378,7 @@ function ernte() {
         bilder: (gem && gem.reiter && gem.reiter[r.sec] && gem.reiter[r.sec].bilder) || []
       };
     });
-    return { art, name, beispiel: (gem && gem.beispiel) || null, pflicht: pf, schritte, wohnungsliste: art === 'MFH' };
+    return { art, name, beispiel: (gem && gem.beispiel) || null, pflicht: pf, schritte, wohnungsliste: art === 'MFH', wohnungBilder: (art === 'MFH' && gem && gem.wohnungen) || [] };
   });
 
   const quellen = {}; for (const [n, p] of Object.entries(QUELLEN)) quellen[n] = summe(p);

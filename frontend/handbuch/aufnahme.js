@@ -188,5 +188,6 @@
     R.bilder.push({ datei: datei, felder: felder || [] });
   }
 
-  window.DPHB = { sperre: sperre, demo: demo, rahmen: rahmen, zeige: zeige, weg: weg, wohnungsliste: wohnungsliste, ergebnis: ergebnis, bildEintrag: bildEintrag, log: LOG, _rahmen: _rahmen, ERG: ERG };
+  function wohnungBild(datei, unterschrift) { var A = ERG.arten.MFH = ERG.arten.MFH || { reiter: {} }; (A.wohnungen = A.wohnungen || []).push({ datei: datei, unterschrift: unterschrift || '' }); return datei; }
+  window.DPHB = { wohnungBild: wohnungBild, sperre: sperre, demo: demo, rahmen: rahmen, zeige: zeige, weg: weg, wohnungsliste: wohnungsliste, ergebnis: ergebnis, bildEintrag: bildEintrag, log: LOG, _rahmen: _rahmen, ERG: ERG };
 })();

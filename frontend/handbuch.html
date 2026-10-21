@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flughandbuch · DealPilot</title>
+<link rel="icon" href="assets/dealpilot-favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<!-- v2560 · Flughandbuch „Objekt anlegen" (ETW · EFH · MFH)
+     Inhalt: handbuch/handbuch-daten.js — ERZEUGT von tools/handbuch-erzeugen.mjs
+     aus index.html, den Hilfetexten, pflichtFuer() und den Rechen-/PDF-Modulen.
+     Bilder: handbuch/bilder/*.webp — aufgenommen mit handbuch/aufnahme.js auf
+     Staging (Speichern gesperrt). Hier steht KEIN Feldtext von Hand. -->
+<style>
+:root{
+  --obs:#050505; --obs2:#141210; --creme:#FDFCFA; --karte:#FBF6E9; --linie:#E6DFCF;
+  --text:#2A2727; --leise:#6B6356; --gruen:#3FA56C; --rot:#B8625C;
+  --gold:var(--wl-c9a84c, #C9A84C); --gold-hi:var(--wl-e8cc7a, #E8CC7A); --gold-lo:var(--wl-b8932f, #b8932f);
+  --sb:300px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--creme);color:var(--text);font:400 15px/1.6 Inter,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+a{color:inherit}
+.kopf{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:16px;padding:12px 20px;background:var(--obs);color:#f3ead0;border-bottom:1px solid #2a2520}
+.kopf img{height:30px;width:auto;display:block}
+.kopf .titel{font:600 15px/1.2 "Space Grotesk",sans-serif;letter-spacing:.02em}
+.kopf .titel small{display:block;font:500 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-hi);opacity:.85}
+.kopf .platz{flex:1}
+.knopf{appearance:none;border:0;border-radius:10px;padding:9px 14px;font:600 13px/1 "Space Grotesk",sans-serif;cursor:pointer;color:#1a1407;
+  background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));white-space:nowrap}
+.knopf.zart{background:transparent;color:var(--gold-hi);border:1px solid var(--gold)}
+.knopf.klein{padding:6px 10px;font-size:12px}
+.knopf:disabled{opacity:.5;cursor:wait}
+.menue{display:none}
+.rahmen{display:grid;grid-template-columns:var(--sb) minmax(0,1fr);min-height:calc(100vh - 56px)}
+nav.inhalt{position:sticky;top:56px;align-self:start;height:calc(100vh - 56px);overflow:auto;background:var(--obs2);color:#e9e1cc;padding:18px 14px 40px}
+.suche{width:100%;border:1px solid #3a342b;background:#0c0b0a;color:#f3ead0;border-radius:10px;padding:10px 12px;font:400 14px Inter,sans-serif;outline:none}
+.suche:focus{border-color:var(--gold)}
+.treffer{font:500 11px "JetBrains Mono",monospace;color:#a89c7f;margin:6px 2px 14px;min-height:14px}
+nav.inhalt h4{font:700 10.5px "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-hi);margin:18px 6px 6px}
+nav.inhalt a{display:block;text-decoration:none;padding:6px 10px;border-radius:8px;font-size:13.5px;color:#d9d0b8}
+nav.inhalt a:hover{background:#1f1b16;color:#fff}
+nav.inhalt a.kap{font:600 14px "Space Grotesk",sans-serif;color:#fdfcfa;margin-top:4px}
+nav.inhalt a.an{background:#241f17;color:var(--gold-hi)}
+nav.inhalt .sub{padding-left:12px;border-left:1px solid #2e2820;margin-left:12px}
+main{padding:28px 40px 80px;max-width:1180px;width:100%}
+.held{background:var(--obs);color:#f3ead0;border-radius:18px;padding:28px 30px;position:relative;overflow:hidden;margin-bottom:28px}
+.held:after{content:"";position:absolute;inset:auto -10% -60% 40%;height:160%;background:radial-gradient(closest-side,color-mix(in srgb,var(--gold) 22%,transparent),transparent);pointer-events:none}
+.held h1{font:700 32px/1.15 "Space Grotesk",sans-serif;margin:6px 0 10px;color:#fdfcfa}
+.held p{margin:0 0 14px;max-width:760px;color:#cfc5aa}
+.held .marke{font:700 11px "JetBrains Mono",monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-hi)}
+.kacheln{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px;position:relative;z-index:1}
+.kachel{background:#141210;border:1px solid #2e2820;border-radius:14px;padding:14px 16px;text-decoration:none;display:block}
+.kachel b{font:600 17px "Space Grotesk",sans-serif;color:#fdfcfa;display:block}
+.kachel span{font-size:12.5px;color:#b9ad8f}
+.kachel:hover{border-color:var(--gold)}
+.held .zeile{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
+section.kapitel{margin:0 0 48px}
+.kapkopf{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;border-bottom:2px solid var(--gold);padding-bottom:10px;margin:40px 0 18px}
+.kapkopf h2{font:700 28px/1.1 "Space Grotesk",sans-serif;margin:0;flex:1;min-width:220px}
+.kapkopf .art{font:700 11px "JetBrains Mono",monospace;letter-spacing:.16em;color:var(--gold-lo);display:block;margin-bottom:4px}
+.steckbrief{background:var(--karte);border:1px solid var(--linie);border-radius:14px;padding:16px 18px;margin:0 0 18px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 24px}
+.steckbrief h3{grid-column:1/-1;margin:0;font:600 15px "Space Grotesk",sans-serif}
+.steckbrief .stufe b{font:700 11px "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-lo)}
+.steckbrief .stufe div{font-size:13.5px;color:var(--leise)}
+.schritt{margin:30px 0 0}
+.schritt h3{font:600 21px/1.2 "Space Grotesk",sans-serif;margin:0 0 6px;display:flex;align-items:center;gap:10px}
+.schritt h3 .nr{font:700 12px "JetBrains Mono",monospace;color:#1a1407;background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));border-radius:8px;padding:4px 8px}
+.einl{color:var(--leise);font-size:14.5px;margin:0 0 12px;max-width:860px}
+.einl strong{color:var(--text)}
+figure{margin:14px 0 8px;background:#fff;border:1px solid var(--linie);border-radius:14px;overflow:hidden;cursor:zoom-in}
+figure img{display:block;width:100%;height:auto}
+figcaption{font:500 12px "JetBrains Mono",monospace;color:var(--leise);padding:8px 12px;border-top:1px solid var(--linie);background:var(--karte)}
+.felder{margin:12px 0 0;border:1px solid var(--linie);border-radius:14px;overflow:hidden;background:#fff}
+details.feld{border-top:1px solid var(--linie)}
+details.feld:first-child{border-top:0}
+details.feld summary{list-style:none;display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer}
+details.feld summary::-webkit-details-marker{display:none}
+details.feld summary:hover{background:var(--karte)}
+.fnr{flex:0 0 auto;min-width:28px;height:28px;padding:0 6px;border-radius:14px;background:var(--obs);color:var(--gold-hi);border:2px solid var(--gold);font:700 12px/24px "JetBrains Mono",monospace;text-align:center}
+.fnr.leer{background:transparent;color:var(--leise);border-color:var(--linie)}
+.flab{flex:1;min-width:0;font-weight:600}
+.flab small{font-weight:400;color:var(--leise);margin-left:6px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.chip{font:700 10px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;border:1px solid currentColor;border-radius:4px;padding:4px 6px;color:var(--gold-lo);white-space:nowrap}
+.chip.p{color:var(--rot)}
+.chip.d{color:#1a1407;background:var(--gold-hi);border-color:var(--gold)}
+.pfeil{flex:0 0 auto;transition:transform .15s;color:var(--leise)}
+details[open] .pfeil{transform:rotate(90deg)}
+.fkoerper{padding:2px 16px 16px 54px;display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 14px;font-size:14px}
+.fkoerper dt{font:700 10.5px/2 "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-lo)}
+.fkoerper dd{margin:0}
+.fkoerper ul{margin:0;padding-left:18px}
+.fkoerper .opt{color:var(--leise);font-size:13px}
+.weitere{margin:10px 0 0;font-size:13.5px;color:var(--leise)}
+.weitere summary{cursor:pointer;font-weight:600;color:var(--text)}
+.hinweis{background:var(--karte);border-left:3px solid var(--gold);border-radius:8px;padding:10px 14px;margin:12px 0;font-size:14px}
+.tabelle{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0}
+.tabelle th{text-align:left;font:700 10.5px "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--leise);border-bottom:1px solid var(--linie);padding:6px 8px}
+.tabelle td{border-bottom:1px solid var(--linie);padding:7px 8px;vertical-align:top}
+.versteckt{display:none!important}
+.zoom{position:fixed;inset:0;background:rgba(5,5,5,.88);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
+.zoom img{max-width:100%;max-height:100%;border-radius:10px}
+.fuss{margin-top:50px;font-size:12.5px;color:var(--leise);border-top:1px solid var(--linie);padding-top:14px}
+@media (max-width:900px){
+  .rahmen{grid-template-columns:minmax(0,1fr)}
+  nav.inhalt{position:fixed;top:56px;left:0;width:min(86vw,320px);z-index:30;transform:translateX(-105%);transition:transform .2s}
+  body.menue-auf nav.inhalt{transform:none;box-shadow:0 0 0 100vmax rgba(0,0,0,.45)}
+  .menue{display:inline-flex}
+  main{padding:18px 16px 60px}
+  .held{padding:20px 18px}.held h1{font-size:25px}
+  .kacheln{grid-template-columns:minmax(0,1fr)}
+  .steckbrief{grid-template-columns:minmax(0,1fr)}
+  .fkoerper{grid-template-columns:minmax(0,1fr);padding-left:16px}
+  .fkoerper dt{line-height:1.4;margin-top:6px}
+  .kopf{padding:10px 12px;gap:10px}.kopf .titel{display:none}
+  .kopf .knopf{padding:8px 10px;font-size:12px}
+  .chips{display:none}
+}
+@media print{.kopf,nav.inhalt{display:none}.rahmen{display:block}details.feld{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="kopf">
+  <button type="button" class="knopf zart menue" id="menue" aria-label="Inhaltsverzeichnis">☰ Inhalt</button>
+  <img src="assets/dealpilot-logo-rahmen.png" alt="DealPilot">
+  <div class="titel">Flughandbuch<small>Objekt anlegen · ETW · EFH · MFH</small></div>
+  <div class="platz"></div>
+  <button type="button" class="knopf" id="pdf-alles">PDF · komplett</button>
+</header>
+<div class="rahmen">
+  <nav class="inhalt" id="inhalt" aria-label="Inhaltsverzeichnis">
+    <input type="search" class="suche" id="suche" placeholder="Feld suchen, z. B. Miteigentumsanteil" aria-label="Felder durchsuchen">
+    <div class="treffer" id="treffer"></div>
+    <div id="toc"></div>
+  </nav>
+  <main id="haupt">
+    <div class="held" id="start">
+      <div class="marke">Flughandbuch · Pre-Flight</div>
+      <h1>Ein Objekt anlegen — Feld für Feld</h1>
+      <p>Für jede Objektart der Weg durch die Reiter: was in jedes Feld gehört, woher du den Wert bekommst und was er in DealPilot bewirkt. Die Nummern in den Bildern sind die Nummern in den Feldlisten darunter.</p>
+      <div class="zeile" id="held-knoepfe"></div>
+      <div class="kacheln" id="kacheln"></div>
+    </div>
+    <div id="kapitel"></div>
+    <div class="fuss" id="fuss"></div>
+  </main>
+</div>
+<script src="handbuch/handbuch-daten.js?v=v2560"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="js/pdf-logo.js?v=v1634b"></script>
+<script src="js/whitelabel-override.js?v=v2149"></script>
+<script src="js/qc-whitelabel.js?v=W33"></script>
+<script>
+(function () {
+  'use strict';
+  var H = window.DP_HANDBUCH; if (!H) { document.getElementById('kapitel').textContent = 'Handbuch-Daten fehlen.'; return; }
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  /* Hilfetexte: help.js erlaubt <strong>/<em>/<code> und \n; die Tour **fett** */
+  function rich(s) {
+    var t = esc(s).replace(/&lt;(\/?)(strong|em|code)&gt;/g, '<$1$2>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    return t.replace(/\n\n/g, '</p><p class="einl">').replace(/\n/g, '<br>');
+  }
+  var STUFE = { 1: 'Stufe 1', 2: 'Stufe 2', 3: 'Stufe 3' };
+  var REITER = {}; H.reiter.forEach(function (r) { REITER[r.sec] = r; });
+  var F = H.felder;
+
+  function beispielText(kap, id) {
+    var b = kap.beispiel && kap.beispiel[id]; var f = F[id];
+    if (b != null && b !== '') {
+      if (f.optionen) { var o = f.optionen.filter(function (x) { return x.wert === String(b); })[0]; if (o) return o.text; }
+      return String(b) + (f.einheit ? ' ' + f.einheit : '');
+    }
+    if (f.tip && f.tip.beispiel) return f.tip.beispiel.replace(/^Beispiel:\s*/, '');
+    if (f.platzhalter) return f.platzhalter.replace(/^z\.\s?B\.\s*/i, '') + (f.einheit && !/[a-z€%²]/i.test(f.platzhalter) ? ' ' + f.einheit : '');
+    return '';
+  }
+  function wasText(f) { return (f.tip && f.tip.text) || f.hinweis || f.titel || ''; }
+  function pflichtSaetze(kap, e) {
+    var s = [];
+    if (e.stufe) s.push('Pflicht für den Marktbericht ab ' + STUFE[e.stufe] + (e.stufe === 1 ? ' (jede Marktbewertung)' : e.stufe === 2 ? ' (erweiterte Indikation)' : ' (Sach- und Ertragswert)'));
+    if (e.artPflicht) s.push('Pflichtfeld beim ' + kap.name + (e.artHinweis ? ' — ' + e.artHinweis : ''));
+    return s;
+  }
+
+  function feldHtml(kap, e, nr) {
+    var f = F[e.id]; if (!f) return '';
+    var chips = '';
+    if (e.stufe) chips += '<span class="chip p">Pflicht ' + STUFE[e.stufe] + '</span>';
+    if (e.artPflicht) chips += '<span class="chip p">Pflicht ' + esc(kap.art) + '</span>';
+    if (f.ds2) chips += '<span class="chip d">DS2</span>';
+    var was = wasText(f), bsp = beispielText(kap, e.id);
+    var wirk = pflichtSaetze(kap, e).concat(f.wirkung || []);
+    var opts = f.optionen ? f.optionen.filter(function (o) { return o.wert !== ''; }).map(function (o) { return esc(o.text); }).join(' · ') : '';
+    var such = [f.label, f.karte, was, f.woher, wirk.join(' '), f.id].join(' ').toLowerCase();
+    return '<details class="feld" data-such="' + esc(such) + '" id="f-' + esc(kap.art + '-' + e.id) + '"><summary>'
+      + '<span class="fnr' + (nr ? '' : ' leer') + '">' + (nr || '·') + '</span>'
+      + '<span class="flab">' + esc(f.label) + (f.karte ? '<small>' + esc(f.karte) + '</small>' : '') + '</span>'
+      + '<span class="chips">' + chips + '</span><span class="pfeil">›</span></summary>'
+      + '<dl class="fkoerper">'
+      + '<dt>Was eintragen</dt><dd>' + (was ? esc(was) : '<span class="opt">' + esc(f.typ === 'auswahl' ? 'Auswahl aus der Liste.' : f.typ === 'haken' ? 'Haken setzen, wenn es zutrifft.' : f.typ === 'datum' ? 'Datum.' : 'Wert eintragen.') + '</span>')
+      + (f.tip && f.tip.paragraf ? ' <span class="opt">(' + esc(f.tip.paragraf) + ')</span>' : '')
+      + (opts ? '<div class="opt">Auswahl: ' + opts + '</div>' : '') + '</dd>'
+      + (bsp ? '<dt>Beispiel</dt><dd>' + esc(bsp) + '</dd>' : '')
+      + (f.woher ? '<dt>Woher</dt><dd>' + esc(f.woher) + '</dd>' : '')
+      + (wirk.length ? '<dt>Was es bewirkt</dt><dd><ul>' + wirk.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul></dd>' : '')
+      + '</dl></details>';
+  }
+
+  function wohnungslisteHtml(kap, n) {
+    var W = H.wohnungsliste, bl = {};
+    W.felder.forEach(function (f) { (bl[f.block] = bl[f.block] || []).push(f); });
+    var bilder = (kap.wohnungBilder || []).map(function (b) { return bildHtml(b, ''); }).join('');
+    var h = '<div class="schritt" id="s-' + kap.art + '-wohnungen" data-schritt><h3><span class="nr">' + n + '</span>Wohnungsliste — Einheiten erfassen</h3>'
+      + '<p class="einl">' + esc(W.einstieg) + '</p>'
+      + '<table class="tabelle"><thead><tr><th>Schritt</th><th>Was dort passiert</th></tr></thead><tbody>'
+      + W.schritte.map(function (s, i) { return '<tr><td><b>' + (i + 1) + ' · ' + esc(s.titel) + '</b></td><td>' + esc(s.text) + '</td></tr>'; }).join('') + '</tbody></table>'
+      + bilder
+      + '<p class="einl">Spalten der Liste: ' + W.spalten.map(esc).join(' · ') + '. <b>Details</b> öffnet die Wohnung mit diesen Feldern:</p><div class="felder">';
+    Object.keys(bl).forEach(function (b) {
+      h += '<details class="feld" data-such="' + esc((b + ' ' + bl[b].map(function (f) { return f.label; }).join(' ')).toLowerCase()) + '"><summary><span class="fnr leer">·</span><span class="flab">' + esc(b) + '<small>' + bl[b].length + ' Felder</small></span><span class="pfeil">›</span></summary>'
+        + '<dl class="fkoerper">' + bl[b].map(function (f) { return '<dt>' + esc(f.typ === 'datum' ? 'Datum' : f.typ === 'auswahl' ? 'Auswahl' : 'Eingabe') + '</dt><dd><b>' + esc(f.label) + '</b>' + (f.platzhalter && f.platzhalter !== 'optional' ? ' <span class="opt">— z. B. ' + esc(f.platzhalter) + '</span>' : (f.platzhalter === 'optional' ? ' <span class="opt">— optional</span>' : '')) + '</dd>'; }).join('') + '</dl></details>';
+    });
+    h += '</div>' + W.hinweise.map(function (t) { return '<div class="hinweis">' + esc(t) + '</div>'; }).join('');
+    if (W.hilfe && W.hilfe.length) h += '<details class="weitere"><summary>Mehr zu Soll-Miete, Zielbild und Ertragswert je Wohnung</summary>' + W.hilfe.map(function (x) { return '<p class="einl"><strong>' + esc(x.titel) + '</strong><br>' + rich(x.text) + '</p>'; }).join('') + '</details>';
+    return h + '</div>';
+  }
+  function bildHtml(b, felder) {
+    return '<figure data-zoom><img loading="lazy" src="handbuch/bilder/' + esc(b.datei) + '?v=v2560" alt="' + esc(b.alt || 'Bildschirmfoto') + '"><figcaption>' + esc(b.unterschrift || felder) + '</figcaption></figure>';
+  }
+
+  function render() {
+    var toc = '', inhalt = '', kacheln = '';
+    H.kapitel.forEach(function (kap, ki) {
+      var gesamt = kap.schritte.reduce(function (s, x) { return s + x.felder.length; }, 0);
+      kacheln += '<a class="kachel" href="#k-' + kap.art + '"><b>' + esc(kap.name) + '</b><span>' + kap.art + ' · ' + gesamt + ' Felder · ' + kap.schritte.length + (kap.wohnungsliste ? ' Reiter + Wohnungsliste' : ' Reiter') + '</span></a>';
+      toc += '<h4>Kapitel ' + (ki + 1) + '</h4><a class="kap" href="#k-' + kap.art + '">' + esc(kap.name) + '</a><div class="sub">';
+      var bsp = kap.beispiel || {};
+      var adr = [bsp.str, bsp.hnr].filter(Boolean).join(' ') + (bsp.plz ? ', ' + bsp.plz + ' ' + (bsp.ort || '') : '');
+      inhalt += '<section class="kapitel" id="k-' + kap.art + '" data-kapitel="' + kap.art + '"><div class="kapkopf"><h2><span class="art">Kapitel ' + (ki + 1) + ' · ' + kap.art + '</span>' + esc(kap.name) + ' anlegen</h2>'
+        + '<button type="button" class="knopf klein" data-pdf="' + kap.art + '">PDF · dieses Kapitel</button></div>'
+        + '<div class="steckbrief"><h3>Beispielobjekt: ' + esc(adr || kap.name) + '</h3>'
+        + [1, 2, 3].map(function (s) { return '<div class="stufe"><b>Pflicht für Marktbericht ' + STUFE[s] + '</b><div>' + kap.pflicht[s].filter(function (id) { return !(s > 1 && kap.pflicht[s - 1].indexOf(id) >= 0); }).map(function (id) { return esc(F[id] ? F[id].label.replace(/\s*\(.*\)$/, '') : id); }).join(' · ') + (s > 1 ? ' <i>(zusätzlich)</i>' : '') + '</div></div>'; }).join('')
+        + '<div class="stufe"><b>Die Nummern</b><div>Jeder Reiter zählt ab 1. Die eingekreiste Zahl im Bild ist die Zahl in der Liste darunter.</div></div></div>';
+      var n = 0;
+      kap.schritte.forEach(function (st) {
+        var r = REITER[st.sec]; n++;
+        var sid = 's-' + kap.art + '-' + st.sec;
+        toc += '<a href="#' + sid + '">' + n + ' · ' + esc(r.name) + '</a>';
+        var einl = r.hilfe ? r.hilfe.text : (r.tour ? r.tour.text : r.desc);
+        inhalt += '<div class="schritt" id="' + sid + '" data-schritt><h3><span class="nr">' + n + '</span>Reiter ' + esc(r.name) + '</h3>'
+          + '<p class="einl">' + rich(einl) + '</p>';
+        st.bilder.forEach(function (b) {
+          var nrs = b.felder.map(function (id) { var e = st.felder.filter(function (x) { return x.id === id; })[0]; return e ? e.nr : null; }).filter(Boolean);
+          inhalt += bildHtml({ datei: b.datei, alt: r.name + ' — ' + kap.name }, r.name + (nrs.length ? ' · Felder ' + Math.min.apply(null, nrs) + '–' + Math.max.apply(null, nrs) : ''));
+        });
+        inhalt += '<div class="felder">' + st.felder.map(function (e) { return feldHtml(kap, e, e.nr); }).join('') + '</div>';
+        if (st.weitere.length) inhalt += '<details class="weitere"><summary>' + st.weitere.length + ' weitere Felder, die erst nach einer Auswahl erscheinen</summary><div class="felder">' + st.weitere.map(function (e) { return feldHtml(kap, e, 0); }).join('') + '</div></details>';
+        inhalt += '</div>';
+        if (kap.wohnungsliste && st.sec === 's0') { n++; toc += '<a href="#s-' + kap.art + '-wohnungen">' + n + ' · Wohnungsliste</a>'; inhalt += wohnungslisteHtml(kap, n); }
+      });
+      toc += '</div>';
+      inhalt += '</section>';
+    });
+    $('toc').innerHTML = toc; $('kapitel').innerHTML = inhalt; $('kacheln').innerHTML = kacheln;
+    $('fuss').innerHTML = 'Stand ' + esc((H.aufnahme && H.aufnahme.am) || '') + ' · ' + Object.keys(F).length + ' Felder · Texte aus den Hilfetexten der App, Bilder aus der App mit Beispielwerten. Die Score-Stufen heißen Sehr gut · Gut · Solide · Schwach · Kritisch.';
+  }
+
+  /* ── Suche ── */
+  function suchen() {
+    var q = $('suche').value.trim().toLowerCase(), n = 0;
+    document.querySelectorAll('details.feld').forEach(function (d) {
+      var hit = !q || d.getAttribute('data-such').indexOf(q) >= 0;
+      d.classList.toggle('versteckt', !hit); if (q && hit) n++;
+      if (q && hit) { d.open = true; var w = d.closest('details.weitere'); if (w) w.open = true; }
+    });
+    document.querySelectorAll('[data-schritt]').forEach(function (s) {
+      var sichtbar = !q || s.querySelector('details.feld:not(.versteckt)');
+      s.classList.toggle('versteckt', !sichtbar);
+    });
+    $('treffer').textContent = q ? (n ? n + ' Treffer' : 'kein Treffer für „' + q + '“') : '';
+  }
+
+  /* ── PDF ── im Stil der DealPilot-PDFs (Kopf mit Logo, Goldlinie, Abschnitte in Versalien, Fuß mit Seitenzahl) */
+  function pdfText(t) {
+    return String(t == null ? '' : t).replace(/[✓✔]/g, '+').replace(/[−‑‒–—]/g, '-')
+      .replace(/[„“”]/g, '"').replace(/[‚‘’]/g, "'").replace(/→/g, '->').replace(/≤/g, '<=').replace(/≥/g, '>=')
+      .replace(/…/g, '...').replace(/[^\x00-\xFF€]/g, '').replace(/\s+/g, ' ').trim();
+  }
+  function goldRgb() {
+    var c = getComputedStyle(document.documentElement).getPropertyValue('--wl-c9a84c').trim() || '#C9A84C';
+    var m = /^#?([0-9a-f]{6})$/i.exec(c); if (!m) return [201, 168, 76];
+    var v = parseInt(m[1], 16); return [v >> 16 & 255, v >> 8 & 255, v & 255];
+  }
+  function bildAlsJpeg(src) {
+    return new Promise(function (ok) {
+      var img = new Image();
+      img.onload = function () { try { var c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight; var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0); ok({ d: c.toDataURL('image/jpeg', 0.86), w: c.width, h: c.height }); } catch (e) { ok(null); } };
+      img.onerror = function () { ok(null); };
+      img.src = src;
+    });
+  }
+  async function pdf(arten, knopf) {
+    if (!window.jspdf || !window.jspdf.jsPDF) { alert('Der PDF-Baustein ist nicht geladen.'); return; }
+    if (knopf) { knopf.disabled = true; var alt = knopf.textContent; knopf.textContent = 'PDF wird erstellt …'; }
+    try {
+      var doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4' });
+      var W = 210, Hh = 297, L = 16, R = 16, CW = W - L - R, y = 0, G = goldRgb(), GD = G.map(function (v) { return Math.round(v * 0.82); });
+      var logo = null; try { logo = window.DealPilotPdfLogo ? await window.DealPilotPdfLogo.dealpilot() : null; } catch (e) {}
+      var titel = arten.length > 1 ? 'Flughandbuch · Objekt anlegen' : 'Flughandbuch · ' + H.kapitel.filter(function (k) { return k.art === arten[0]; })[0].name + ' anlegen';
+      var unter = '';
+      function kopf() {
+        y = 22;
+        if (logo && logo.b64) { try { var K = window.DealPilotPdfLogo.kopf, m = window.DealPilotPdfLogo.masse(logo, K.b, K.h); doc.addImage(logo.b64, L, y + K.dy, m.w, m.h, undefined, 'FAST'); } catch (e) {} }
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6); doc.setTextColor(120);
+        doc.text('F L U G H A N D B U C H  ·  O B J E K T   A N L E G E N', L, y + 4.6);
+        y += 8.5; doc.setDrawColor(G[0], G[1], G[2]); doc.setLineWidth(0.8); doc.line(L, y, W - R, y); doc.setLineWidth(0.2);
+        y += 10;
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(26, 26, 26); doc.text(pdfText(titel), L, y); y += 5.5;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(110); doc.text(pdfText(unter), L, y); y += 9;
+      }
+      function neu() { doc.addPage(); kopf(); }
+      function platz(h) { if (y + h > Hh - 22) neu(); }
+      function abschnitt(t) {
+        platz(16);
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(8.6); doc.setTextColor(GD[0], GD[1], GD[2]); doc.text(pdfText(t).toUpperCase(), L, y);
+        doc.setDrawColor(226, 221, 210); doc.line(L, y + 1.8, W - R, y + 1.8); y += 7.5;
+      }
+      function absatz(t, gr, farbe, einzug) {
+        gr = gr || 9; einzug = einzug || 0;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(gr); doc.setTextColor(farbe == null ? 60 : farbe);
+        var z = doc.splitTextToSize(pdfText(t), CW - einzug), lh = gr * 0.42;
+        z.forEach(function (zeile) { platz(lh + 1); doc.text(zeile, L + einzug, y); y += lh; });
+        y += 1.5;
+      }
+      async function bild(src) {
+        var b = await bildAlsJpeg(src); if (!b) return;
+        var w = CW, h = b.h * w / b.w; if (h > 150) { h = 150; w = b.w * h / b.h; }
+        platz(h + 4); doc.setDrawColor(226, 221, 210); doc.addImage(b.d, 'JPEG', L, y, w, h, undefined, 'FAST'); doc.rect(L, y, w, h); y += h + 5;
+      }
+      function feld(kap, e, nr) {
+        var f = F[e.id]; if (!f) return;
+        var zeilen = [];
+        var was = wasText(f); if (was) zeilen.push(['Eintragen', was + (f.tip && f.tip.paragraf ? ' (' + f.tip.paragraf + ')' : '')]);
+        if (f.optionen) { var o = f.optionen.filter(function (x) { return x.wert !== ''; }).map(function (x) { return x.text; }).join(' · '); if (o) zeilen.push(['Auswahl', o]); }
+        var b = beispielText(kap, e.id); if (b) zeilen.push(['Beispiel', b]);
+        if (f.woher) zeilen.push(['Woher', f.woher]);
+        var w = pflichtSaetze(kap, e).concat(f.wirkung || []); if (w.length) zeilen.push(['Wirkung', w.join(' · ')]);
+        doc.setFontSize(8.4);
+        var hoehe = 6 + zeilen.reduce(function (s, z) { return s + doc.splitTextToSize(pdfText(z[1]), CW - 34).length * 3.6 + 0.8; }, 0);
+        platz(Math.min(hoehe, 60));
+        if (nr) { doc.setFillColor(5, 5, 5); doc.setDrawColor(G[0], G[1], G[2]); doc.setLineWidth(0.5); doc.circle(L + 3, y - 1.2, 3, 'FD'); doc.setLineWidth(0.2);
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(7.2); doc.setTextColor(232, 204, 122); doc.text(String(nr), L + 3, y - 0.1, { align: 'center' }); }
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(9.6); doc.setTextColor(26, 26, 26);
+        doc.text(pdfText(f.label + (f.ds2 ? '  [DS2]' : '')), L + 8, y); y += 4.8;
+        zeilen.forEach(function (z) {
+          var t = doc.splitTextToSize(pdfText(z[1]), CW - 34);
+          t.forEach(function (zeile, i) {
+            platz(4);
+            if (i === 0) { doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(GD[0], GD[1], GD[2]); doc.text(z[0].toUpperCase(), L + 8, y); }
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(60); doc.text(zeile, L + 34, y); y += 3.6;
+          });
+          y += 0.8;
+        });
+        doc.setDrawColor(236, 231, 220); doc.line(L + 8, y - 1, W - R, y - 1); y += 3;
+      }
+      var erste = true;
+      for (var ki = 0; ki < H.kapitel.length; ki++) {
+        var kap = H.kapitel[ki]; if (arten.indexOf(kap.art) < 0) continue;
+        unter = 'Kapitel ' + (ki + 1) + ' · ' + kap.name + ' (' + kap.art + ')';
+        if (erste) { kopf(); erste = false; } else neu();
+        var bsp = kap.beispiel || {};
+        absatz('Beispielobjekt: ' + [bsp.str, bsp.hnr].filter(Boolean).join(' ') + (bsp.plz ? ', ' + bsp.plz + ' ' + (bsp.ort || '') : ''), 9.5, 40);
+        absatz('Die eingekreisten Nummern in den Bildern entsprechen den Nummern der Felder. Jeder Reiter zählt ab 1.', 8.6, 110);
+        [1, 2, 3].forEach(function (s) { absatz('Pflicht für den Marktbericht Stufe ' + s + (s > 1 ? ' (zusätzlich)' : '') + ': ' + kap.pflicht[s].filter(function (id) { return !(s > 1 && kap.pflicht[s - 1].indexOf(id) >= 0); }).map(function (id) { return F[id] ? F[id].label.replace(/\s*\(.*\)$/, '') : id; }).join(', '), 8.6, 70); });
+        var n = 0;
+        for (var si = 0; si < kap.schritte.length; si++) {
+          var st = kap.schritte[si], r = REITER[st.sec]; n++;
+          abschnitt(n + ' · Reiter ' + r.name);
+          absatz(String((r.hilfe ? r.hilfe.text : r.desc) || '').replace(/<[^>]+>/g, '').replace(/\n+/g, ' '), 8.6, 90);
+          for (var bi = 0; bi < st.bilder.length; bi++) await bild('handbuch/bilder/' + st.bilder[bi].datei + '?v=v2560');
+          st.felder.forEach(function (e) { feld(kap, e, e.nr); });
+          if (st.weitere.length) { absatz('Weitere Felder, die erst nach einer Auswahl erscheinen:', 8.6, 110); st.weitere.forEach(function (e) { feld(kap, e, 0); }); }
+          if (kap.wohnungsliste && st.sec === 's0') {
+            var WL = H.wohnungsliste; n++;
+            abschnitt(n + ' · Wohnungsliste - Einheiten erfassen');
+            absatz(WL.einstieg, 8.6, 90);
+            WL.schritte.forEach(function (s, i) { absatz((i + 1) + ' · ' + s.titel + ': ' + s.text, 8.6, 60, 4); });
+            for (var wi = 0; wi < (kap.wohnungBilder || []).length; wi++) await bild('handbuch/bilder/' + kap.wohnungBilder[wi].datei + '?v=v2560');
+            var bl = {}; WL.felder.forEach(function (f) { (bl[f.block] = bl[f.block] || []).push(f); });
+            Object.keys(bl).forEach(function (b) { absatz(b + ': ' + bl[b].map(function (f) { return f.label + (f.platzhalter && f.platzhalter !== 'optional' ? ' (z. B. ' + f.platzhalter + ')' : ''); }).join(' · '), 8.6, 60, 4); });
+            WL.hinweise.forEach(function (t) { absatz(t, 8.2, 110, 4); });
+          }
+        }
+      }
+      var nS = doc.getNumberOfPages();
+      for (var p = 1; p <= nS; p++) {
+        doc.setPage(p); doc.setDrawColor(226, 221, 210); doc.line(L, Hh - 16, W - R, Hh - 16);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
+        doc.text(pdfText('DealPilot · Flughandbuch · Stand ' + ((H.aufnahme && H.aufnahme.am) || '')), L, Hh - 11.5);
+        doc.text('Seite ' + p + ' von ' + nS, W - R, Hh - 11.5, { align: 'right' });
+      }
+      window.__hbPdf = { seiten: nS, arten: arten };
+      doc.save('DealPilot-Flughandbuch' + (arten.length > 1 ? '' : '-' + arten[0]) + '.pdf');
+    } finally { if (knopf) { knopf.disabled = false; knopf.textContent = alt; } }
+  }
+  window.DealPilotHandbuch = { pdf: pdf, daten: H };
+
+  render();
+  $('held-knoepfe').innerHTML = H.kapitel.map(function (k) { return '<button type="button" class="knopf zart klein" data-pdf="' + k.art + '">PDF · ' + esc(k.name) + '</button>'; }).join('');
+  document.addEventListener('click', function (e) {
+    var p = e.target.closest('[data-pdf]'); if (p) { pdf([p.getAttribute('data-pdf')], p); return; }
+    var fz = e.target.closest('figure[data-zoom]'); if (fz) { var z = document.createElement('div'); z.className = 'zoom'; z.innerHTML = '<img src="' + fz.querySelector('img').src + '" alt="">'; z.onclick = function () { z.remove(); }; document.body.appendChild(z); return; }
+    if (e.target.closest('nav.inhalt a')) document.body.classList.remove('menue-auf');
+  });
+  $('pdf-alles').addEventListener('click', function () { pdf(H.kapitel.map(function (k) { return k.art; }), this); });
+  $('menue').addEventListener('click', function () { document.body.classList.toggle('menue-auf'); });
+  $('suche').addEventListener('input', suchen);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var z = document.querySelector('.zoom'); if (z) z.remove(); document.body.classList.remove('menue-auf'); } });
+  /* Inhaltsverzeichnis folgt dem Lesen */
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (!x.isIntersecting) return; document.querySelectorAll('nav.inhalt a.an').forEach(function (a) { a.classList.remove('an'); }); var a = document.querySelector('nav.inhalt a[href="#' + x.target.id + '"]'); if (a) a.classList.add('an'); }); }, { rootMargin: '-80px 0px -70% 0px' });
+    document.querySelectorAll('[data-schritt], section.kapitel').forEach(function (s) { io.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>
