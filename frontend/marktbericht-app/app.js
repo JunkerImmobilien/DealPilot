@@ -611,12 +611,18 @@ function _scoreWord(s) {
  * einen davon fuer falsch. */
 function _wvErklaerung(art) {
   var t = {
-    vergleich: 'Das Vergleichswertverfahren fragt: was zahlen Käufer gerade für ähnliche '
-      + 'Objekte? Grundlage sind tatsächliche Angebote im Umkreis, zugeschnitten auf '
-      + 'Wohnfläche, Baujahr, Zustand und Erstbezug. Bei Eigentumswohnungen ist es das '
-      + 'führende Verfahren, weil es dafür viele Vergleichsfälle gibt. Es bildet den '
-      + 'Markt ab — mit allem, was der Markt gerade einpreist, auch Erwartungen an die '
-      + 'künftige Wertentwicklung.',
+    /* v2660 · die Angebotszahl ist eine Marktpreisindikation, kein Vergleichswert nach § 24 */
+    vergleich: 'Die Marktpreisindikation fragt: was verlangen Anbieter gerade für ähnliche '
+      + 'Objekte? Grundlage sind Angebote im Umkreis, zugeschnitten auf '
+      + 'Wohnfläche, Baujahr, Zustand und Erstbezug. Sie bildet den Markt ab — mit allem, '
+      + 'was er gerade einpreist. Ein Vergleichswert nach § 24 ImmoWertV ist sie nicht: '
+      + 'dafür verlangt § 25 tatsächlich gezahlte Kaufpreise.',
+    irw: 'Der Vergleichswert nach § 24 ImmoWertV geht vom Immobilienrichtwert des '
+      + 'Gutachterausschusses aus — einem Durchschnittspreis je m² Wohnfläche, abgeleitet aus '
+      + 'tatsächlich gezahlten Kaufpreisen der Lage, bezogen auf ein typisches Normobjekt. '
+      + 'Weicht das Objekt davon ab (Baujahr, Größe, Ausstattung …), wird der Richtwert '
+      + 'ausschließlich mit den Umrechnungskoeffizienten desselben Ausschusses angepasst. '
+      + 'Fehlt eine Angabe, die der Ausschuss umrechnet, wird kein Wert ausgewiesen.',
     ertrag: 'Das Ertragswertverfahren fragt: was wirft die Immobilie ab? Von der '
       + 'marktüblich erzielbaren Miete werden die Bewirtschaftungskosten abgezogen, der '
       + 'Bodenwert wird verzinst abgesetzt, und was das Gebäude übrig lässt, wird über '
@@ -909,6 +915,19 @@ function _mvPdf(doc, v, c) {
   c.setY(c.getY() + 2);
   return true;
 }
+/* v2660 · E7 · Rechenweg des Vergleichswerts (Kern lib/vergleichswert_irw.js) fuer Bildschirm
+   und PDF: €/m²-Zeilen fertig formatiert, Faktoren dreistellig, Ergebnis fett. */
+function _irwStaffel(rw) {
+  if (!Array.isArray(rw) || !rw.length) return null;
+  return rw.map(function (z) {
+    var o = { pos: z.pos, detail: z.detail || null };
+    if (z.faktor != null) o.faktor = Number(z.faktor).toLocaleString('de-DE', { minimumFractionDigits: 3, maximumFractionDigits: 3 }).replace(',', '.');
+    else if (z.einheit === '€/m²') o.anzeige = Number(z.wert).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €/m²';
+    else if (z.wert != null) o.wert = z.wert;
+    if (/^= Vergleichswert/.test(z.pos || '')) o.summe = true;
+    return o;
+  });
+}
 function _renderWertverfahren(d) {
   var wrap = document.getElementById('resultBody');
   if (!wrap) return;
@@ -931,6 +950,7 @@ function _renderWertverfahren(d) {
   var lv = d.land_value || {};
   var hk = d.wertermittlung_herkunft || {};
   var e = cc.ertragswert || {}, sw = cc.sachwert || {};
+  var vi = cc.vergleichswert_irw || null;   /* v2660 · E7 */
   var v = d.valuation && d.valuation.market_value ? d.valuation.market_value.estimated : null;
 
   function eur(n) {
@@ -960,7 +980,8 @@ function _renderWertverfahren(d) {
     if (!staffel || !staffel.length) return '';
     return '<table class="wv-rw"><tbody>' + staffel.map(function (z) {
       var rechts = '';
-      if (z.faktor != null) rechts = String(z.faktor).replace('.', ',');
+      if (z.anzeige != null) rechts = esc(z.anzeige);   /* v2660 · fertig formatiert (€/m²) */
+      else if (z.faktor != null) rechts = String(z.faktor).replace('.', ',');
       else if (z.wert != null) rechts = eur(z.wert);
       return '<tr' + (z.summe ? ' class="wv-rw-s"' : '') + '>'
         + '<td>' + esc(z.pos)
@@ -1072,7 +1093,21 @@ function _renderWertverfahren(d) {
             ])
           : null))
     + '<h3 class="wv-h">Wertverfahren im Vergleich</h3>'
-    + '<div class="wv-g">'
+    + '<div class="wv-g' + (vi ? ' wv-g4' : '') + '">'
+    /* ══ v2660 · E7 · VERGLEICHSWERT AUS DEM IMMOBILIENRICHTWERT ═══════════
+       Eigene Karte (nur wo ein Richtwert vorliegt). Die Angebotskarte daneben
+       bleibt die Marktpreisindikation - zwei Zahlen, zwei Namen. */
+    + (vi ? karte('irw', 'Vergleichswert (§ 24 ImmoWertV, Immobilienrichtwert)',
+        vi.verfuegbar ? eur(vi.vergleichswert_eur) : '–',
+        vi.verfuegbar
+          ? ('Immobilienrichtwert ' + eur(cc.irw && cc.irw.wert_qm) + '/m²' + (cc.irw && cc.irw.zonennummer ? ' (Zone ' + esc(cc.irw.zonennummer) + ')' : '')
+             + ' · angepasst ' + eur(vi.wert_qm) + '/m² · Stufe A, amtlich'
+             + (cc.verfahrenswahl && cc.verfahrenswahl.verfahren === 'vergleichswert' ? ' · <b>führendes Verfahren</b>'
+                : ((cc.verfahrenswahl && (cc.verfahrenswahl.weitere || []).indexOf('vergleichswert') >= 0) ? ' · zweites Verfahren' : ''))
+             + ((vi.hinweise || []).length ? ' · ' + vi.hinweise.map(esc).join(' · ') : ''))
+          : (esc(vi.hinweis_kunde || vi.hinweis || 'kein Vergleichswert')
+             + (vi.weg && vi.weg.url ? ' <a href="' + esc(vi.weg.url) + '" target="_blank" rel="noopener">Umrechnungsvorschrift</a>' : '')),
+        'irw', vi.verfuegbar ? _irwStaffel(vi.rechenweg) : null) : '')
     /* ══ v1971 · DIE KARTE HEISST, WAS SIE IST ══════════════════════════
 
        Hier stand Titel „Vergleichswert" und Unterzeile „fuehrend bei
@@ -1084,9 +1119,10 @@ function _renderWertverfahren(d) {
 
        Marcel am 08.10.2026: „Vergleichswert muessen wir auf jeden Fall
        umbenennen." */
-    + karte('vgl', (cc.comparison && cc.comparison.bezeichnung) || 'Marktpreisindikation',
+    + karte('vgl', (vi && vi.verfuegbar) ? 'Marktpreisindikation aus Angebotspreisen'   /* v2660 · die Zahl ist v (Angebote) */
+        : ((cc.comparison && cc.comparison.bezeichnung) || 'Marktpreisindikation'),
         eur(v),
-        ((cc.comparison && cc.comparison.basis) === 'kaufpreise'
+        ((cc.comparison && cc.comparison.basis) === 'kaufpreise' && !(vi && vi.verfuegbar)
           ? 'amtlicher Vergleichsfaktor · § 20, § 25 ImmoWertV'
           /* v2380 · Angebotspreise heissen so, auch wenn irgendwo eine amtliche Grundlage existiert */
           : 'Angebotspreise (Marktdurchschnitt), keine Kaufpreise (§ 25 ImmoWertV)')
@@ -1297,6 +1333,8 @@ function _renderWertverfahren(d) {
       /* v1198b · Der Grund, warum kein Bodenwert dasteht. */
       + '#wv-box .wv-bwgrund{margin-top:9px;padding:9px 11px;border-radius:8px;font-size:11.5px;line-height:1.55;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 32%, transparent);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent)}'
       + '#wv-box .wv-g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}'
+      /* v2660 · vier Karten (mit Vergleichswert aus dem Immobilienrichtwert): 2 × 2 */
+      + '#wv-box .wv-g.wv-g4{grid-template-columns:repeat(2,minmax(0,1fr))}'
       + '#wv-box .wv-k{padding:13px 15px;border:1px solid rgba(128,128,128,.22);border-radius:8px}'
       + '#wv-box .wv-t{font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.6}'
       + '#wv-box .wv-v{font-size:20px;font-weight:600;margin:4px 0 2px}'
@@ -4320,9 +4358,17 @@ async function exportPdf(out) {
        als Titel. */
     const _vglBasis = (cc.comparison && cc.comparison.basis) || 'angebote';
     const _vglAmtlich = _vglBasis === 'kaufpreise';
-    const _vglTitel = _vglAmtlich ? 'VERGLEICHSWERT · AMTLICH' : 'MARKTPREIS AUS ANGEBOTEN';
     const _amtV = (cc.comparison && cc.comparison.amtlicher_vergleich) || null;   /* v2380 */
-    card3(M, _vglTitel, cc.comparison.vergleichswert_eur, _vglAmtlich ? [
+    /* v2660 · E7 · Vergleichswert aus dem Immobilienrichtwert: eigener Titel, eigene Zeilen;
+       die Marktpreisindikation steht als Zahl daneben, unter ihrem Namen. */
+    const _vi = cc.vergleichswert_irw || null;
+    const _irwV = !!(_amtV && _amtV.art === 'immobilienrichtwert' && _vi && _vi.verfuegbar);
+    const _vglTitel = _irwV ? 'VERGLEICHSWERT · § 24 · IRW' : (_vglAmtlich ? 'VERGLEICHSWERT · AMTLICH' : 'MARKTPREIS AUS ANGEBOTEN');
+    card3(M, _vglTitel, cc.comparison.vergleichswert_eur, _irwV ? [
+      _amtV.rechnung || null,
+      'Stufe A · Koeffizienten des Gutachterausschusses (§§ 24–26 ImmoWertV)',
+      (cc.comparison.angebotswert_eur ? 'Marktpreisindikation aus Angebotspreisen: ' + Math.round(cc.comparison.angebotswert_eur).toLocaleString('de-DE') + ' €' : null),
+    ] : _vglAmtlich ? [
       _amtV && _amtV.rechnung ? _amtV.rechnung : null,
       'Amtlicher Vergleichsfaktor aus der Kaufpreissammlung (§ 20, § 25 ImmoWertV)',
       (cc.comparison.angebotswert_eur ? 'zum Vergleich Angebotspreise: ' + Math.round(cc.comparison.angebotswert_eur).toLocaleString('de-DE') + ' €' : null),
@@ -4341,6 +4387,9 @@ async function exportPdf(out) {
          Paragraf-25-Hinweis haengt daran, woraus die ZAHL gebildet ist. */
       _irwOk
         ? 'Immobilienrichtwert ' + cc.irw.wert_qm + ' €/m² · Stichtag ' + (cc.irw.stichtag || '?')
+          /* v2660 · warum er hier nicht zum Vergleichswert wird */
+          + (_vi && !_vi.verfuegbar ? ' · kein Vergleichswert' + ((_vi.fehlt_text || []).length
+            ? ', fehlt: ' + _vi.fehlt_text.map((t) => String(t).split(' — ')[0]).join(', ') : '') : '')
         : null,
       _vglAmtlich
         ? 'Amtliche Grundlage aus der Kaufpreissammlung (§ 20, § 25 ImmoWertV)'
@@ -4815,6 +4864,49 @@ async function exportPdf(out) {
    * Bisher zeigte das PDF nur das Ergebnis. Fuer ein Dossier, das vor einer Bank
    * besteht, muss der Weg dastehen — Zeile fuer Zeile, mit der Herkunft des
    * Liegenschaftszinses. Eine Zahl ohne Herleitung ist im Dossier wertlos. */
+  /* (WPDF-1 oben gilt dem Ertragswert-Block weiter unten.)
+     v2660 · E7 · Rechenweg Vergleichswertverfahren (§§ 24–26 ImmoWertV, Immobilienrichtwert) -
+     Zeile fuer Zeile wie der Ertragswert, mit Quelle und Hinweisen; ohne Wert der Grund und der Weg. */
+  const _viP = d.cross_check && d.cross_check.vergleichswert_irw;
+  if (_viP && !(d.cross_check && d.cross_check.nicht_im_umfang)) {
+    sectionTitle('Vergleichswertverfahren — Immobilienrichtwert', 90);
+    need(20);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...MUT);
+    doc.text('Vergleichswert (§ 24 ImmoWertV, Immobilienrichtwert)  ·  §§ 24–26, § 20 ImmoWertV', M, y); y += 6;
+    if (_viP.verfuegbar) {
+      (_irwStaffel(_viP.rechenweg) || []).forEach((z) => {
+        need(9);
+        const summe = !!z.summe;
+        doc.setFont('helvetica', summe ? 'bold' : 'normal');
+        doc.setFontSize(summe ? 8.4 : 7.8);
+        doc.setTextColor(...(summe ? TXT : [110, 110, 118]));
+        const label = doc.splitTextToSize(String(z.pos).replace(/−/g, '-'), blockW - 42);
+        doc.text(label[0], M + 2, y);
+        let rechts = '';
+        if (z.anzeige != null) rechts = String(z.anzeige);
+        else if (z.faktor != null) rechts = String(z.faktor).replace('.', ',');
+        else if (z.wert != null) rechts = euro(z.wert);
+        if (rechts) { doc.setTextColor(...(summe ? GOLD : TXT)); doc.text(rechts, M + blockW - 2, y, { align: 'right' }); }
+        if (z.detail) {
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6);
+          const _dl = doc.splitTextToSize(String(z.detail).replace(/−/g, '-'), blockW - 8).slice(0, 3);
+          need(_dl.length * 3 + 6);
+          y += 3.6; doc.setTextColor(...MUT); doc.text(_dl, M + 4, y); y += (_dl.length - 1) * 3;
+        }
+        y += summe ? 6 : 5;
+        if (summe) { doc.setDrawColor(225, 221, 212); doc.setLineWidth(0.2); doc.line(M, y - 3.4, M + blockW, y - 3.4); }
+      });
+      const _vh = [].concat(_viP.hinweise || [], _viP.quellennachweis ? ['Quelle: ' + _viP.quellennachweis] : []);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.8); doc.setTextColor(...MUT);
+      _vh.forEach((t) => { const l = doc.splitTextToSize(String(t), blockW); need(l.length * 3.2 + 2); doc.text(l, M, y); y += l.length * 3.2 + 1.5; });
+    } else {
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.4); doc.setTextColor(...TXT);
+      const l = doc.splitTextToSize(String(_viP.hinweis_kunde || _viP.hinweis || 'Kein Vergleichswert ausgewiesen.')
+        + (_viP.weg && _viP.weg.url ? ' Umrechnungsvorschrift: ' + _viP.weg.url : ''), blockW);
+      need(l.length * 3.4 + 4); doc.text(l, M, y); y += l.length * 3.4 + 2;
+    }
+    y += 4;
+  }
   const _ew = d.cross_check && d.cross_check.ertragswert;
   if (_ew && _ew.available && _ew.staffel && _ew.staffel.length) {
     /* WPDF26-2 · Erklaertext. Ein Kunde, der Vergleichswert und Ertragswert

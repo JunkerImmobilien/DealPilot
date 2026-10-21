@@ -373,6 +373,14 @@ export const DealPilotObjectMapper = {
       rooms: num(pick(d, ['zimmer'])),
       build_year: num(pick(d, ['baujahr'])),
       floor: num(pick(d, ['etage'])),
+      /* v2660 · E7 · „Anzahl Etagen" (Reiter Objekt) - die Umrechnung des Immobilienrichtwerts
+         fuehrt bei Wohnungseigentum teils die Geschosszahl des Gebaeudes (Koeln, Feld ANZG). */
+      geschosse_gesamt: num(pick(d, ['etagen_ges'])),
+      /* v2660 · E2 · Einzelobjekt ohne Wohnungsliste (ETW, EFH): Restlaufzeit der Mietabweichung.
+         Mit Wohnungsliste reisen dieselben Felder je Wohnung (einheitenMieteAus). */
+      mv_befristet_bis: (function () { const v = pick(d, ['mv_befristet_bis']); return v && /^\d{4}-\d{2}(-\d{2})?$/.test(String(v)) ? String(v) : null; })(),
+      mv_kuendigungsverzicht_bis: (function () { const v = pick(d, ['mv_kuendigungsverzicht_bis']); return v && /^\d{4}-\d{2}(-\d{2})?$/.test(String(v)) ? String(v) : null; })(),
+      mv_abw_jahre: num(pick(d, ['mv_abw_jahre'])) > 0 ? num(pick(d, ['mv_abw_jahre'])) : null,
       /* v1437: Wohneinheiten fehlten - der Ertragswert setzt die Verwaltungskosten
          je BEWERTETER Einheit an (Anlage 3 ImmoWertV) und rechnete auf dem Objektweg
          ohne sie am Durchschnitt. Der Sprechlauf fragt sie beim MFH jetzt ab. */

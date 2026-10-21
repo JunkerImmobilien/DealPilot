@@ -180,11 +180,12 @@ export const IrwConnector = {
         ags: verf && text(verf.properties && verf.properties.GESL),
         gasl: verf && text(verf.properties && verf.properties.GASL),   /* v2620 */
         hinweis: st && /verf(ue|ü)gbar/i.test(st)
-          ? `Für ${(verf && text(verf.properties.GENA)) || 'diese Gemeinde'} liegen Immobilienrichtwerte vor, an dieser Stelle aber keiner für diese Objektart. Der Vergleichswert stützt sich daher auf Angebotspreise.`
+          ? `Für ${(verf && text(verf.properties.GENA)) || 'diese Gemeinde'} liegen Immobilienrichtwerte vor, an dieser Stelle aber keiner für diese Objektart. Ein Vergleichswert nach § 24 ImmoWertV ist daher nicht möglich; die Marktpreisindikation stützt sich auf Angebotspreise.`
           : st
           ? `Für ${(verf && text(verf.properties.GENA)) || 'diese Gemeinde'} hat der Gutachterausschuss `
-            + `noch keine Immobilienrichtwerte beschlossen (${st}). Der Vergleichswert stützt sich `
-            + 'daher weiterhin auf Angebotspreise.'
+            /* v2660 · „Vergleichswert" heisst nur noch das Verfahren nach § 24 (Immobilienrichtwert) */
+            + `noch keine Immobilienrichtwerte beschlossen (${st}). Ein Vergleichswert nach § 24 ImmoWertV `
+            + 'ist daher nicht möglich; die Marktpreisindikation stützt sich auf Angebotspreise.'
           : 'An dieser Stelle liegt kein Immobilienrichtwert vor.',
       };
     }

@@ -176,7 +176,9 @@ if (!window._wlc) {
        besonderes objektspezifisches Grundstuecksmerkmal (§ 8 Abs. 3
        ImmoWertV) nach der Marktanpassung abgezogen. `san_ust` sagt, ob
        der Betrag brutto oder netto eingetragen ist. */
-    'san', 'san_ust'];
+    'san', 'san_ust',
+    /* v2660 · E7: Etagen im Gebaeude (Umrechnung des Immobilienrichtwerts); E2: Restlaufzeit der Mietabweichung am Einzelobjekt */
+    'etagen_ges', 'mv_befristet_bis', 'mv_kuendigungsverzicht_bis', 'mv_abw_jahre'];
   function inputs() {
     var o = { plz: vIn('plz'), ort: vIn('ort'), str: vIn('str'), hnr: vIn('hnr'), objektart: vIn('objart'), objart: vIn('objart'), wfl: numDe(vIn('wfl')), baujahr: numDe(vIn('baujahr')), kp: numDe(vIn('kp')) };
     var art = String(o.objart || '').toUpperCase(), OA = window.DealPilotObjektart;

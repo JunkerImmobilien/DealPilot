@@ -446,6 +446,17 @@ function vergleichBestand(wb, out, bestand) {
       ausschuss: mp.ausschuss || null, berichtsjahr: mp.berichtsjahr || null, schwellen_art: mp.schwellen ? mp.schwellen.art : null }
       : { kurz: null, text: mp ? mp.hinweis || null : null, nicht_geprueft: true },
     ursachen,
+    /* v2660 · E7 · der Vergleichswert aus dem Immobilienrichtwert, knapp (nur wo ein IRW vorliegt) */
+    vergleichswert: (function () {
+      const v = cc.vergleichswert_irw;
+      if (!v) return null;
+      if (v.verfuegbar) {
+        return { verfuegbar: true, wert: v.vergleichswert_eur, eur_qm: v.wert_qm, stufe: v.stufe || 'A',
+          ausschuss: v.quelle ? v.quelle.ausschuss : null, fuehrend: !!(cc.verfahrenswahl && cc.verfahrenswahl.verfahren === 'vergleichswert') };
+      }
+      return { verfuegbar: false, grund: v.grund || null, fehlt: (v.fehlt_text || []).map((t) => String(t).split(' — ')[0]),
+        weg: v.weg || null, irw_qm: cc.irw && cc.irw.verfuegbar ? cc.irw.wert_qm : null };
+    })(),
   };
 }
 

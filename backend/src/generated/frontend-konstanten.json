@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-21T18:52:25.834Z",
+ "erzeugt_am": "2026-10-21T19:14:41.375Z",
  "quellen": {
   "voice-import": "4d1160a61b89e852",
   "objektart-felder": "1e0549e54a17a054",
-  "storage": "191b717b8700338c",
-  "index-html": "c305a373bf002cc4",
+  "storage": "2f90eb34c2eacdda",
+  "index-html": "f985b03751a93ad7",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -585,6 +585,9 @@
    "mv_beginn",
    "mv_letzte_erhoehung",
    "mv_letzte_erhoehung_betrag",
+   "mv_befristet_bis",
+   "mv_kuendigungsverzicht_bis",
+   "mv_abw_jahre",
    "ds2_zustand",
    "ds2_energie",
    "ds2_mietausfall",
@@ -1619,6 +1622,21 @@
     "id": "mv_letzte_erhoehung_betrag",
     "kind": "text",
     "label": "Letzte Erhöhung um"
+   },
+   {
+    "id": "mv_befristet_bis",
+    "kind": "text",
+    "label": "Befristet bis"
+   },
+   {
+    "id": "mv_kuendigungsverzicht_bis",
+    "kind": "text",
+    "label": "Kündigungsverzicht bis"
+   },
+   {
+    "id": "mv_abw_jahre",
+    "kind": "text",
+    "label": "Abweichung erwartet noch (Jahre)"
    },
    {
     "id": "ds2_zustand",

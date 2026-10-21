@@ -28,7 +28,8 @@ import { barwertAbweichung } from '../lib/immowertv.js';   /* v2600 · E2 */
    Die Zieldatei lib/anlage2.js bleibt: lib/rnd-einheitlich.js und
    lib/immowertv.js importieren sie und rufen sie auch. */
 import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js'; /* v1816 */
-import { fuehrendesVerfahren, angepassterZins } from '../lib/verfahrenswahl.js';   /* v1061-WVER-1 */
+import { fuehrendesVerfahren, angepassterZins, verfahrenMitIrw } from '../lib/verfahrenswahl.js';   /* v1061-WVER-1, v2660: verfahrenMitIrw */
+import { vergleichswertIrw, objektAusRef, EINGABE_ORT } from '../lib/vergleichswert_irw.js';   /* v2660 · E7 */
 /* v1069-WSWF-1 · Sachwertfaktoren nach § 21 Abs. 3 ImmoWertV. */
 /* v1073-WGAA-1 · Nicht mehr ein Modul, sondern der Aufloeser. Er
  * entscheidet nach dem Gemeindeschluessel, welcher Ausschuss zustaendig
@@ -2104,11 +2105,59 @@ export const CrossCheckService = {
     /* v1053-WIRW-4 · Der Immobilienrichtwert gehoert in den Bericht — auch
      * und gerade dann, wenn es keinen gibt. "Fuer diese Gemeinde noch
      * nicht beschlossen" ist eine Auskunft, kein Fehler. */
+    /* ══ v2660 · E7 · DER VERGLEICHSWERT AUS DEM IMMOBILIENRICHTWERT ══════════
+       Der Kern (lib/vergleichswert_irw.js, v2620) rechnet IRW × Umrechnungskoeffizienten
+       DES Ausschusses × Wohnflaeche, Stufe A. Die Merkmale kommen nur aus dem Objekt
+       (objektAusRef - nichts erfunden); fehlt eines, steht der Grund mit dem Weg da.
+       Die Marktpreisindikation aus Angeboten bleibt getrennt und heisst weiter so. */
+    let _vwIrw = null;
     if (p.irw) {
       out.irw = p.irw;
-      if (p.irw.verfuegbar && p.irw.abweichung && p.irw.abweichung.hinweis
+      /* nur mit den Zonenmerkmalen (roh, seit v2620) - aeltere Abrufe fuehren sie nicht */
+      if (p.irw.verfuegbar && p.irw.roh && typeof p.irw.roh === 'object') {
+        try {
+          const _bogV = [];
+          const _bv = Number(p.bog_eur);
+          if (Number.isFinite(_bv) && _bv !== 0) {
+            _bogV.push({ pos: 'besondere objektspezifische Grundstücksmerkmale (eigene Angabe)', eur: _bv,
+              detail: (p.bog_grund ? String(p.bog_grund) + ' · ' : '') + '§ 8 Abs. 3 ImmoWertV' });
+          }
+          _vwIrw = vergleichswertIrw({ irw: p.irw, objekt: objektAusRef(ref, { bodenrichtwert: brw }),
+            bog: _bogV, ersatz_teilmarkt: !!p.irw.ebene_ersatz });
+        } catch (e) {
+          _vwIrw = { verfuegbar: false, grund: 'fehler', hinweis: 'Die Umrechnung des Immobilienrichtwerts ist fehlgeschlagen: ' + e.message };
+        }
+        _vwIrw.bezeichnung = 'Vergleichswert (§ 24 ImmoWertV, Immobilienrichtwert)';
+        if (!_vwIrw.verfuegbar) {
+          /* „fehlt: …" mit dem Ort der Angabe - nur fuer Merkmale, die der Ausschuss umrechnet */
+          const _fg = (_vwIrw.gruende || []).filter((g) => g.grund === 'merkmal_fehlt');
+          _vwIrw.fehlt_text = _fg.map((g) => {
+            const k = [].concat(g.eingabe || []).slice(-1)[0];
+            return (g.name || g.id) + (EINGABE_ORT[k] ? ' — ' + EINGABE_ORT[k] : '');
+          });
+        }
+        out.vergleichswert_irw = _vwIrw;
+      }
+      if (_vwIrw && _vwIrw.verfuegbar) {
+        const _vt = 'Vergleichswert nach § 24 ImmoWertV aus dem Immobilienrichtwert (' + (_vwIrw.quelle && _vwIrw.quelle.ausschuss || 'Gutachterausschuss')
+          + '): ' + Number(_vwIrw.vergleichswert_eur).toLocaleString('de-DE') + ' € (' + Number(_vwIrw.wert_qm).toLocaleString('de-DE')
+          + ' €/m²), umgerechnet mit den Koeffizienten des Ausschusses, Stufe A.';
+        out.notes.push(_vt);
+      } else if (_vwIrw && !_vwIrw.verfuegbar) {
+        /* Der Richtwert liegt vor, rechnet aber nicht: Grund und Weg (alte Abweichungsnotiz
+           sagte „nicht angewendet" - jetzt steht da, WARUM). */
+        const _ft = _vwIrw.fehlt_text || [];
+        const _rest = (_vwIrw.gruende || []).filter((g) => g.grund !== 'merkmal_fehlt').map((g) => g.text);
+        _vwIrw.hinweis_kunde = _ft.length
+          ? 'Für den Vergleichswert aus dem Immobilienrichtwert (' + Number(p.irw.wert_qm).toLocaleString('de-DE') + ' €/m²'
+            + (p.irw.zonennummer ? ', Zone ' + p.irw.zonennummer : '') + ') fehlt ' + (_ft.length === 1 ? 'die Angabe' : 'je eine Angabe') + ': '
+            + _ft.join('; ') + '.' + (_rest.length ? ' Außerdem: ' + _rest.join(' · ') + '.' : '')
+            + ' Ohne sie wird nicht umgerechnet — kein Verfahren rechnet halb; der Richtwert bleibt Orientierung.'
+          : String(_vwIrw.hinweis || '').trim();
+        out.notes.push(_vwIrw.hinweis_kunde);
+      } else if (p.irw.verfuegbar && p.irw.abweichung && p.irw.abweichung.hinweis
           && out.notes.indexOf(p.irw.abweichung.hinweis) < 0) {
-        out.notes.push(p.irw.abweichung.hinweis);
+        out.notes.push(p.irw.abweichung.hinweis);   /* aeltere Abrufe ohne Zonenmerkmale */
       } else if (!p.irw.verfuegbar && p.irw.hinweis
                  && out.notes.indexOf(p.irw.hinweis) < 0) {
         out.notes.push(p.irw.hinweis);
@@ -2163,7 +2212,17 @@ export const CrossCheckService = {
        Umrechnungskoeffizienten der Anlage) - er bleibt Auskunft. */
     let _amtVgl = null;
     const _avf = p.amtlicher_vergleichsfaktor, _rvf = p.register_vergleichsfaktor;
-    if (_avf && _avf.verfuegbar && _avf.fuehrend !== false && !_avf.ausserhalb_grenzen
+    /* v2660 · E7: der Vergleichswert aus dem Immobilienrichtwert geht vor - er ist auf die
+       Zone UND mit den Koeffizienten des Ausschusses auf das Objekt bezogen. */
+    if (_vwIrw && _vwIrw.verfuegbar && Number(_vwIrw.vergleichswert_eur) > 0) {
+      _amtVgl = { wert_eur: Math.round(Number(_vwIrw.vergleichswert_eur)), faktor_qm: _vwIrw.wert_qm || null,
+        rechnung: 'Immobilienrichtwert ' + Number(p.irw.wert_qm).toLocaleString('de-DE') + ' €/m² × Koeffizienten '
+          + String(Math.round(_vwIrw.produkt * 10000) / 10000).replace('.', ',') + ' = '
+          + Number(_vwIrw.wert_qm).toLocaleString('de-DE') + ' €/m² × ' + String(ref.living_area).replace('.', ',') + ' m²',
+        quelle: (_vwIrw.quelle && _vwIrw.quelle.umrechnung_url) || null,
+        ausschuss: (_vwIrw.quelle && _vwIrw.quelle.ausschuss) || null,
+        art: 'immobilienrichtwert', stufe: 'A' };
+    } else if (_avf && _avf.verfuegbar && _avf.fuehrend !== false && !_avf.ausserhalb_grenzen
         && Number(_avf.wert_eur) > 0) {
       _amtVgl = { wert_eur: Math.round(Number(_avf.wert_eur)), faktor_qm: _avf.faktor_qm || null,
         rechnung: _avf.rechnung || null, quelle: _avf.quelle || null, ausschuss: _avf.ausschuss || null,
@@ -2178,6 +2237,21 @@ export const CrossCheckService = {
       objektart: ref.property_type, wohneinheiten: ref.units, nutzung: ref.usage_type,
       vergleichsbasis: _vglKaufpreise ? 'kaufpreise' : null,
     });
+    /* v2660 · E7 · Mit dem Vergleichswert aus dem Immobilienrichtwert waehlt verfahrenMitIrw
+       (verfahrenswahl.js, v2620): ETW -> Vergleichswert fuehrt; EFH/ZFH mit amtlichem
+       Sachwertfaktor -> Sachwert fuehrt, Vergleichswert zweites Verfahren; EFH ohne
+       Sachwertfaktor -> Vergleichswert fuehrt; MFH -> Ertragswert fuehrt, Vergleichswert
+       zweites. Ohne diesen Wert bleibt die Wahl wie bisher. */
+    if (_amtVgl && _amtVgl.art === 'immobilienrichtwert') {
+      const _swfAmtlich = !!(out.sachwert && out.sachwert.available && !out.sachwert.vorlaeufig
+        && !out.sachwert.pauschal && out.sachwert.marktangepasst);
+      const _vm = verfahrenMitIrw({ objektart: ref.property_type, wohneinheiten: ref.units, nutzung: ref.usage_type,
+        irw_vergleichswert: true, sachwertfaktor: _swfAmtlich });
+      if (_vm && _vm.fuehrend) {
+        out.verfahrenswahl = { verfahren: _vm.fuehrend, grund: _vm.grund, quelle: _vm.quelle || null,
+          weitere: _vm.weitere || [], basis: _vm.basis || null };
+      }
+    }
     /* v2380 · KEIN FUEHRENDES VERFAHREN, DAS NICHT GERECHNET WURDE.
        Hueellhorst (ETW ohne BGF, Bericht 223): „Fuehrend: Sachwertverfahren"
        stand neben einem Sachwert, der gar nicht ausgewiesen war. Dann wird
@@ -2197,7 +2271,10 @@ export const CrossCheckService = {
             ? ((out.sachwert.fehlt && out.sachwert.fehlt.length)
               ? 'die Angabe ' + out.sachwert.fehlt.join(' und ')
               : 'ein Kostenkennwert der NHK 2010')
-          : _vk === 'vergleichswert' ? 'ein amtlicher Vergleichsfaktor im Anwendungsbereich'
+          : _vk === 'vergleichswert'
+            ? ((_vwIrw && _vwIrw.fehlt_text && _vwIrw.fehlt_text.length)   /* v2660 */
+              ? 'für die Umrechnung des Immobilienrichtwerts die Angabe ' + _vwIrw.fehlt_text.map((t) => t.split(' — ')[0]).join(' und ')
+              : 'ein amtlicher Vergleichsfaktor im Anwendungsbereich')
             : ('eine Pflichtangabe' + (_gGrund ? ' (' + _gGrund.replace(/\.$/, '') + ')' : ''));
         const _vName = { sachwert: 'Sachwertverfahren', ertragswert: 'Ertragswertverfahren',
           vergleichswert: 'Vergleichswertverfahren' }[_vk];
@@ -2347,9 +2424,15 @@ export const CrossCheckService = {
       out.comparison = {
         vergleichswert_eur: _amtVgl ? _amtVgl.wert_eur : vgl,
         basis: _vglKaufpreise ? 'kaufpreise' : 'angebote',
-        bezeichnung: _vglKaufpreise ? 'Vergleichswert (amtlicher Vergleichsfaktor)'
+        /* v2660 · E7: der Vergleichswert aus dem Immobilienrichtwert heisst so, wie er gerechnet ist */
+        bezeichnung: (_amtVgl && _amtVgl.art === 'immobilienrichtwert') ? 'Vergleichswert (§ 24 ImmoWertV, Immobilienrichtwert)'
+          : _vglKaufpreise ? 'Vergleichswert (amtlicher Vergleichsfaktor)'
           : 'Marktpreisindikation aus Angebotspreisen',
-        basis_hinweis: _vglKaufpreise
+        basis_art: _amtVgl ? _amtVgl.art : 'angebote',
+        basis_hinweis: (_amtVgl && _amtVgl.art === 'immobilienrichtwert')
+          ? 'Immobilienrichtwert des Gutachterausschusses (§ 20 ImmoWertV, aus der Kaufpreissammlung), mit seinen '
+            + 'Umrechnungskoeffizienten auf das Objekt angepasst (§§ 24–26 ImmoWertV): ' + _amtVgl.rechnung + '.'
+          : _vglKaufpreise
           ? 'Amtlicher Vergleichsfaktor des Gutachterausschusses, abgeleitet aus der '
             + 'Kaufpreissammlung (§ 20, § 25 Abs. 1 ImmoWertV)'
             + (_amtVgl.rechnung ? ': ' + _amtVgl.rechnung : '') + '.'
@@ -2425,6 +2508,13 @@ export const CrossCheckService = {
     if (_bwAuf && _bwAuf.koeffizient_angewandt && _bwAuf.quellenvermerk) {
       _merke(_bwAuf.quellenvermerk, 'Umrechnungskoeffizient Grundstücksgröße',
              _bwAuf.quelle_url, _bwAuf.lizenz, _bwAuf.berichtsjahr || null);
+    }
+    /* v2660 · E7 · Immobilienrichtwert und Umrechnungskoeffizienten, wenn der Vergleichswert gerechnet ist */
+    const _vwQ = out.vergleichswert_irw;
+    if (_vwQ && _vwQ.verfuegbar && _vwQ.quellennachweis) {
+      _merke(_vwQ.quellennachweis, 'Immobilienrichtwert und Umrechnungskoeffizienten',
+             (_vwQ.quelle && _vwQ.quelle.umrechnung_url) || null, (_vwQ.quelle && _vwQ.quelle.lizenz) || null,
+             (_vwQ.quelle && _vwQ.quelle.jahrgang) || null);
     }
     out.quellen_nachweis = Array.from(_nachweis.values());
 

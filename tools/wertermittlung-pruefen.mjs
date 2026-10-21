@@ -626,6 +626,87 @@ fallB('B8b', () => {
     && (r.notes || []).some((n) => /nur einmal berücksichtigt/.test(n)));
 });
 
+/* ══ v2660 · E7 · VERGLEICHSWERT AUS DEM IMMOBILIENRICHTWERT (B30–B34) ══════
+   Eingefrorene IRW-Abrufe in der Falldatei (ebene_b.B30/B31.irw_eingefroren), gerechnet
+   ueber den ECHTEN CrossCheckService; die Sollzahl kommt aus dem ECHTEN Kern
+   (vergleichswertIrw) mit denselben Merkmalen bzw. aus irw-pruefen --live (329.932 €). */
+let VIRW = null;
+try { VIRW = await lade('lib/vergleichswert_irw.js'); } catch (e) { VIRW = null; }
+const irwB30 = F.ebene_b.B30 && F.ebene_b.B30.irw_eingefroren;
+const irwB31 = F.ebene_b.B31 && F.ebene_b.B31.irw_eingefroren;
+fallB('B30', () => {
+  if (!irwB30 || !VIRW) return pruefe('B', 'B30', 'eingefrorener IRW / Kern', false, 'fehlt');
+  const alt = ccFall('loehner');
+  const r = ccFall('loehner', (a) => { a[4].irw = klon(irwB30); });
+  const v = r && r.vergleichswert_irw, c = r && r.comparison;
+  wert('B', 'B30', 'Vergleichswert Löhner Str. 278 (IRW 1.700 × 0,833 × 233 m²)', v && v.verfuegbar ? v.vergleichswert_eur : null, 329932, 0);
+  wert('B', 'B30', 'angepasster Richtwert €/m²', v && v.verfuegbar ? v.wert_qm : null, 1416, 0);
+  pruefe('B', 'B30', 'Stufe A, Rechenweg Zeile für Zeile (IRW, 7 Koeffizienten, = angepasst, × Fläche, = Vergleichswert)',
+    !!v && v.stufe === 'A' && v.rechenweg.length === 11 && /Immobilienrichtwert/.test(v.rechenweg[0].pos) && v.rechenweg[10].pos === '= Vergleichswert',
+    v ? v.rechenweg.map((z) => z.pos).join(' | ') : '');
+  pruefe('B', 'B30', 'comparison: Bezeichnung „Vergleichswert (§ 24 ImmoWertV, Immobilienrichtwert)", Basis Kaufpreise',
+    !!c && c.vergleichswert_eur === 329932 && c.bezeichnung === 'Vergleichswert (§ 24 ImmoWertV, Immobilienrichtwert)'
+    && c.basis === 'kaufpreise' && c.basis_art === 'immobilienrichtwert', c ? c.bezeichnung + ' ' + c.vergleichswert_eur : '');
+  pruefe('B', 'B30', 'Marktpreisindikation bleibt getrennt (angebotswert_eur unverändert)',
+    !!c && !!alt && c.angebotswert_eur === alt.comparison.angebotswert_eur && alt.comparison.bezeichnung === 'Marktpreisindikation aus Angebotspreisen');
+  pruefe('B', 'B30', 'EFH/ZFH mit amtlichem Sachwertfaktor: Sachwert führt, Vergleichswert zweites Verfahren',
+    !!r && r.verfahrenswahl.verfahren === 'sachwert' && (r.verfahrenswahl.weitere || []).includes('vergleichswert'), JSON.stringify(r && r.verfahrenswahl.weitere));
+  pruefe('B', 'B30', 'Quellennachweis nennt Immobilienrichtwert und Umrechnungskoeffizienten mit Link',
+    !!r && (r.quellen_nachweis || []).some((q) => q.kennzahlen.includes('Immobilienrichtwert und Umrechnungskoeffizienten') && /LGDIR_2_0531000_2026/.test(q.url || '')));
+  wert('B', 'B30', 'Ertragswert unverändert', r ? r.ertragswert.value_eur : null, alt ? alt.ertragswert.value_eur : NaN, 0);
+  wert('B', 'B30', 'Sachwert unverändert', r ? r.sachwert.value_eur : null, alt ? alt.sachwert.value_eur : NaN, 0);
+});
+fallB('B31', () => {
+  if (!irwB31 || !VIRW) return pruefe('B', 'B31', 'eingefrorener IRW / Kern', false, 'fehlt');
+  const essen = { address: 'Rüttenscheider Str. 120, 45131 Essen', units: 9, living_area: 75, build_year: 1975, standardstufe: 3,
+    balcony_area: 6, garages: 0, outdoor_parking: 0, usage_type: 'vermietet', floor: 2 };
+  const r = ccFall('huellhorst', (a) => { a[4].irw = klon(irwB31); Object.assign(a[0], essen); });
+  const v = r && r.vergleichswert_irw;
+  const soll = VIRW.vergleichswertIrw({ irw: klon(irwB31), objekt: VIRW.objektAusRef(Object.assign({ property_type: 'wohnung' }, essen)) });
+  pruefe('B', 'B31', 'Kern rechnet (Essen ETW: Baujahr, Standard, Vermietung, Stellplatz, Balkon, Einheiten, Fläche)', !!soll.verfuegbar, soll.hinweis || '');
+  wert('B', 'B31', 'Vergleichswert ETW Essen = Kern mit denselben Merkmalen', v && v.verfuegbar ? v.vergleichswert_eur : null, soll.vergleichswert_eur, 0);
+  pruefe('B', 'B31', 'ETW mit IRW: Vergleichswert führt, Ertragswert zweites',
+    !!r && r.verfahrenswahl.verfahren === 'vergleichswert' && (r.verfahrenswahl.weitere || []).includes('ertragswert') && r.ertragswert.available,
+    r ? r.verfahrenswahl.verfahren : '');
+  pruefe('B', 'B31', 'Stellplätze nicht im IRW: Hinweis steht', !!v && (v.hinweise || []).some((h) => /Stellplätze/.test(h)));
+});
+fallB('B32', () => {
+  const r = ccFall('huellhorst');
+  pruefe('B', 'B32', 'Hüllhorst (nicht beschlossen): kein Vergleichswert, Marktpreisindikation, Wahl wie bisher',
+    !!r && !r.vergleichswert_irw && r.comparison.basis === 'angebote' && r.comparison.bezeichnung === 'Marktpreisindikation aus Angebotspreisen'
+    && r.verfahrenswahl.waere === 'sachwert' && !(r.quellen_nachweis || []).some((q) => /Immobilienrichtwert/.test(q.kennzahlen.join())));
+});
+fallB('B33', () => {
+  if (!irwB30) return;
+  const ohneMod = ccFall('loehner', (a) => { a[4].irw = klon(irwB30); a[0].mod_punkte = null; });
+  const v = ohneMod && ohneMod.vergleichswert_irw;
+  pruefe('B', 'B33', 'ohne Modernisierungspunkte: kein Wert, merkmal_fehlt, Ort der Angabe, Weg zur Umrechnungsvorschrift',
+    !!v && v.verfuegbar === false && v.grund === 'merkmal_fehlt' && v.fehlt.includes('modernisierung')
+    && /Anlage 2, Reiter Objekt/.test(v.fehlt_text.join()) && /LGDIR_2_0531000_2026/.test((v.weg || {}).url || ''), v ? v.hinweis_kunde : '');
+  pruefe('B', 'B33', 'dann zurück zur Marktpreisindikation, Verfahrenswahl wie ohne IRW',
+    ohneMod.comparison.basis === 'angebote' && !(ohneMod.verfahrenswahl.weitere || []).length && (ohneMod.notes || []).some((n) => /fehlt die Angabe: Modernisierung/.test(n)));
+  const ohneKeller = ccFall('loehner', (a) => { a[4].irw = klon(irwB30); a[0].nhk_typ = null; a[0].keller_dg = null; });
+  pruefe('B', 'B33', 'ohne NHK-Typ/Unterkellerung: Keller fehlt (nicht vorbelegt)',
+    !!ohneKeller && ohneKeller.vergleichswert_irw.grund === 'merkmal_fehlt' && ohneKeller.vergleichswert_irw.fehlt.join() === 'keller');
+  const o = VIRW.objektAusRef({ property_type: 'haus', build_year: 1964, living_area: 233 });
+  pruefe('B', 'B33', 'objektAusRef erfindet nichts (nur Baujahr und Fläche)', JSON.stringify(o) === '{"baujahr":1964,"wohnflaeche":233}', JSON.stringify(o));
+  const o2 = VIRW.objektAusRef({ property_type: 'haus', property_subtype: 'dhh', nhk_typ: '2.21', usage_type: 'eigennutzung', floor: 0 });
+  pruefe('B', 'B33', 'NHK 2.21 + DHH: ohne Keller, Doppelhaushälfte; Eigennutzung = unvermietet; Etage nur bei ETW',
+    o2.keller === false && o2.anbauweise === 'doppelhaushaelfte' && o2.vermietet === false && o2.geschoss === undefined, JSON.stringify(o2));
+});
+fallB('B34', () => {
+  if (!irwB30 || !VIRW) return;
+  const dhh = { property_type: 'haus', property_subtype: 'dhh', nhk_typ: '2.12', build_year: 1964, living_area: 140, plot_area: 400,
+    standardstufe: 3, mod_punkte: 1 };
+  const a = VIRW.vergleichswertIrw({ irw: klon(irwB30), objekt: VIRW.objektAusRef(dhh), ersatz_teilmarkt: true });
+  pruefe('B', 'B34', 'Herford: DHH über die EFH-Umrechnung (Anbauweise geführt) rechnet', a.verfuegbar === true
+    && a.faktoren.some((f) => f.id === 'anbauweise' && Math.abs(f.uk - 0.931) < 1e-9), a.verfuegbar ? 'Anbauweise ' + a.faktoren.find((f) => f.id === 'anbauweise').uk : a.hinweis);
+  const saetze = VIRW.ladeSaetze().filter((s) => s.gasl === '31000' && s.zweig === 'efh_zfh')
+    .map((s) => Object.assign(klon(s), { formel: Object.assign(klon(s.formel), { merkmale: s.formel.merkmale.filter((m) => m.id !== 'anbauweise') }) }));
+  const b = VIRW.vergleichswertIrw({ irw: klon(irwB30), objekt: VIRW.objektAusRef(dhh), ersatz_teilmarkt: true, saetze });
+  pruefe('B', 'B34', 'ohne Anbauweise in der Umrechnung: kein Wert (grund teilmarkt)', b.verfuegbar === false && b.grund === 'teilmarkt', b.grund);
+});
+
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */
 const auszug = (cc) => {
   const e = (cc && cc.ertragswert) || {}, s = (cc && cc.sachwert) || {};

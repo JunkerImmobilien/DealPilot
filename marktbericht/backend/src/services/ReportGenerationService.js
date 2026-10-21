@@ -543,10 +543,29 @@ const ZINSSTUFE_KLARTEXT = {
    Jeder Satz hier ist aus Feldern des Kerns gebaut (cross_check.ertragswert), nie geschaetzt. */
 const _wEu = (x) => (x > 0 ? '+' : (x < 0 ? '−' : '')) + Math.abs(Math.round(Number(x))).toLocaleString('de-DE') + ' €';
 const _wQm = (x) => Number(x).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €/m²';
+/* v2660 · E7 · Vergleichswert aus dem Immobilienrichtwert als feste Aussage - nur aus Kernfeldern.
+   Die Marktpreisindikation aus Angeboten bleibt ein eigener Begriff. */
+function vergleichswertFakten(cc) {
+  const v = cc && cc.vergleichswert_irw;
+  if (!v) return [];
+  const wahl = cc.verfahrenswahl || {};
+  if (v.verfuegbar) {
+    const rolle = wahl.verfahren === 'vergleichswert' ? 'Er ist das führende Verfahren.'
+      : ((wahl.weitere || []).includes('vergleichswert') ? 'Er steht als zweites Verfahren neben dem führenden.' : '');
+    return ['Vergleichswert nach § 24 ImmoWertV aus dem Immobilienrichtwert des Gutachterausschusses ('
+      + ((v.quelle && v.quelle.ausschuss) || 'Gutachterausschuss') + '): ' + Math.round(v.vergleichswert_eur).toLocaleString('de-DE')
+      + ' € (' + Math.round(v.wert_qm).toLocaleString('de-DE') + ' €/m²), mit den Umrechnungskoeffizienten des Ausschusses auf das Objekt angepasst, amtlich (Stufe A). '
+      + rolle + ' Nenne ihn „Vergleichswert" und die Zahl aus Angebotspreisen weiter „Marktpreisindikation"; verwechsle die beiden nicht.'];
+  }
+  const ft = (v.fehlt_text || []).map((t) => String(t).split(' — ')[0]);
+  return ['Ein Vergleichswert aus dem Immobilienrichtwert wird NICHT ausgewiesen'
+    + (ft.length ? ': für die Umrechnung fehlt ' + ft.join(', ') + '.' : '. ' + String(v.hinweis || '').slice(0, 220))
+    + ' Nenne keinen Vergleichswert; die Zahl aus Angebotspreisen heißt Marktpreisindikation.'];
+}
 export function wertermittlungFakten(cc) {
   const e = cc && cc.ertragswert && cc.ertragswert.available ? cc.ertragswert : null;
-  if (!e) return [];
-  const f = [];
+  if (!e) return vergleichswertFakten(cc);
+  const f = vergleichswertFakten(cc);
   const ms = e.miete_stufe, mh = e.miete_herkunft || {};
   if (ms && ms.qm) {
     const nAus = (mh.n_oben || 0) + (mh.n_unten || 0);

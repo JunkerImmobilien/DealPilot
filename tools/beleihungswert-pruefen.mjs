@@ -165,6 +165,20 @@ ok('V', 'Vervielfaeltiger 5 % / 20 J (Tabellenwert 12,4622)', Math.round(K.vervi
   ok('13', 'Angebots-Vergleichswert nicht als Verkehrswert', e2.verkehrswert, 300000);
   ok('13', 'Verfahren dann Ertragswert', e2.verkehrswert_verfahren, 'ertragswert');
   ok('13', 'kein Vergleichswert im Check', e2.vergleichswert, null);
+  /* 14 · v2660 · E7: der Vergleichswert aus dem Immobilienrichtwert ist amtlich und kommt durch */
+  const cc3 = Object.assign({}, cc, { comparison: { vergleichswert_eur: 329932, basis: 'kaufpreise', basis_art: 'immobilienrichtwert',
+    amtlicher_vergleich: { wert_eur: 329932, art: 'immobilienrichtwert' }, angebotswert_eur: 389000 },
+    verfahrenswahl: { verfahren: 'vergleichswert' }, amtlicher_vergleichsfaktor: null });
+  const e3 = K.eingabenAusBericht(cc3, { objektart: 'zfh' });
+  ok('14', 'IRW-Vergleichswert als Verkehrswert', e3.verkehrswert, 329932);
+  ok('14', 'Verfahren Vergleichswert', e3.verkehrswert_verfahren, 'vergleichswert');
+  ok('14', 'im Check als amtlich (Immobilienrichtwert)', e3.vergleichswert && e3.vergleichswert.art, 'immobilienrichtwert');
+  /* 15 · Vergleichsfaktor vorhanden, Objekt AUSSERHALB seines Bereichs: Zahl ist der Angebotswert -> nicht amtlich */
+  const cc4 = Object.assign({}, cc, { comparison: { vergleichswert_eur: 281000, basis: 'angebote', amtlicher_vergleich: null },
+    verfahrenswahl: { verfahren: 'vergleichswert' }, amtlicher_vergleichsfaktor: { verfuegbar: true, fuehrend: false } });
+  const e4 = K.eingabenAusBericht(cc4, { objektart: 'etw' });
+  ok('15', 'Angebotswert neben Vergleichsfaktor außerhalb des Bereichs: nicht als Verkehrswert', e4.verkehrswert, 300000);
+  ok('15', 'kein Vergleichswert im Check', e4.vergleichswert, null);
 }
 
 /* ── Teil 2 · Kette ueber den echten CrossCheckService ─────────────── */

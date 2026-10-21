@@ -772,6 +772,12 @@
     if (V.bog && V.bog.satz) ein.push('<li><b>Besondere Merkmale:</b> ' + esc(V.bog.satz) + '</li>');
     else if (V.vorlaeufig_vor_bog) ein.push('<li><b>Besondere Merkmale:</b> leere Wohnungen voll vermietet, ohne Mietausfall und Herrichtung.</li>');
     if (V.lzs_spanne && V.lzs_spanne.text) ein.push('<li><b>Spanne:</b> ' + esc(V.lzs_spanne.text) + '</li>');
+    /* v2660 · E7 · Vergleichswert aus dem Immobilienrichtwert - eine Zeile, nur wo ein Richtwert vorliegt */
+    var VW = V.vergleichswert;
+    if (VW && VW.verfuegbar) ein.push('<li data-dp-vgl-irw="1"><b>Vergleichswert:</b> ' + eur(VW.wert) + ' (' + Math.round(VW.eur_qm).toLocaleString('de-DE')
+      + ' €/m², Immobilienrichtwert, Stufe A' + (VW.fuehrend ? ', führend' : '') + ')</li>');
+    else if (VW && VW.irw_qm != null) ein.push('<li data-dp-vgl-irw="1"><b>Vergleichswert:</b> nicht gerechnet'
+      + (VW.fehlt && VW.fehlt.length ? ' — fehlt: ' + esc(VW.fehlt.join(', ')) : '') + '.</li>');
     if (ein.length) h += '<ul class="dp-vgl-ein">' + ein.join('') + '</ul>';
     var MP = V.modellpruefung || {};
     if (MP.kurz || MP.text) {

@@ -157,6 +157,7 @@ var FIELDS = [
      Liste ist die Einsammelstelle, und was hier fehlt, verschwindet
      beim Speichern lautlos. */
   'mv_art','mv_beginn','mv_letzte_erhoehung','mv_letzte_erhoehung_betrag',   /* v2545 */
+  'mv_befristet_bis','mv_kuendigungsverzicht_bis','mv_abw_jahre',   /* v2660 · E2 · Restlaufzeit der Mietabweichung am Einzelobjekt */
   // V36: DealScore 2.0 Zusatzangaben
   'ds2_zustand','ds2_energie','ds2_mietausfall','ds2_marktmiete',
   'ds2_bevoelkerung','ds2_nachfrage','ds2_marktfaktor',
@@ -542,7 +543,11 @@ function loadData(d) {
     'ueberf_restschuld', 'ueberf_rest_zins',
     'ueberf_ende', '_ueberf_link',
     /* v2430: sonst erbt Objekt B Soll-Miete, Zielbild und Massnahmen von A */
-    'zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen', 'zb_fertig_jahr'
+    'zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen', 'zb_fertig_jahr',
+    /* v2660: der Mietvertrag am Objekt - fehlte er im geladenen Objekt, erbte B Vertragsart,
+       Daten, Befristung und Kuendigungsverzicht von A und schrieb sie beim Speichern mit */
+    'mv_art', 'mv_beginn', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag',
+    'mv_befristet_bis', 'mv_kuendigungsverzicht_bis', 'mv_abw_jahre'
   ].concat(WM_FIELDS);  /* v1136-WMTAB-1: dieselbe Falle, siehe Kommentar an WM_FIELDS */
   resetFields.forEach(function(id) {
     var e = document.getElementById(id);

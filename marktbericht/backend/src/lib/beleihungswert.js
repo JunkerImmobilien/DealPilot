@@ -135,7 +135,14 @@ export function eingabenAusBericht(cc, extra) {
   const verf = cc.verfahrenswahl && cc.verfahrenswahl.verfahren;
   /* Vergleichswert nur, wenn amtlich (Vergleichsfaktor des Ausschusses) - ein Wert aus
      Angebotspreisen ist kein Verkehrswert und taugt nicht als Deckel (Baeckerstr. 7, v2630b). */
-  const wertVon = { ertragswert: n(ew.value_eur), sachwert: n(sw.value_eur), vergleichswert: avf.verfuegbar ? n(vgl.vergleichswert_eur) : null };
+  /* v2660 · amtlich ist die Zahl, wenn der Bericht sie AUS der amtlichen Grundlage gebildet hat
+     (comparison.amtlicher_vergleich, seit v2380: Vergleichsfaktor ODER Immobilienrichtwert, E7).
+     Bis hier genuegte avf.verfuegbar - auch ausserhalb des Anwendungsbereichs (dann ist
+     vergleichswert_eur der Angebotswert), und der Immobilienrichtwert kam nie durch. */
+  const _amtV = vgl.amtlicher_vergleich;
+  const vglAmtlich = (vgl.basis === 'kaufpreise' && _amtV && n(_amtV.wert_eur) != null && n(_amtV.wert_eur) === n(vgl.vergleichswert_eur))
+    || (!_amtV && vgl.basis !== 'angebote' && !!avf.verfuegbar && avf.fuehrend !== false && !avf.ausserhalb_grenzen);   /* Berichte vor v2380 */
+  const wertVon = { ertragswert: n(ew.value_eur), sachwert: n(sw.value_eur), vergleichswert: vglAmtlich ? n(vgl.vergleichswert_eur) : null };
   return {
     objektart: X.objektart || (cc.ref && cc.ref.property_type) || null,
     wohnen: { einheiten, markt_qm: marktQm, rohertrag_bericht_jahr: reWohnen },
@@ -154,7 +161,8 @@ export function eingabenAusBericht(cc, extra) {
     sachwert: (sw.available && hk != null && awm != null)
       ? { hk_gebaeude: hk, alterswertminderung: awm, aussenanlagen: aussen || 0,
           gebaeude_sachwert: n(sw.gebaeude_sachwert_eur), bodenwert: n(sw.bodenwert_eur), wert_bericht: n(sw.value_eur) } : null,
-    vergleichswert: (avf.verfuegbar && n(vgl.vergleichswert_eur)) ? { wert: n(vgl.vergleichswert_eur), amtlich: true } : null,
+    vergleichswert: (vglAmtlich && n(vgl.vergleichswert_eur)) ? { wert: n(vgl.vergleichswert_eur), amtlich: true,
+      art: (_amtV && _amtV.art) || 'vergleichsfaktor' } : null,
     verkehrswert: (verf && wertVon[verf]) || wertVon.ertragswert || wertVon.sachwert || null,
     verkehrswert_verfahren: (verf && wertVon[verf]) ? verf : (wertVon.ertragswert ? 'ertragswert' : (wertVon.sachwert ? 'sachwert' : null)),
     darlehen: n(X.darlehen),

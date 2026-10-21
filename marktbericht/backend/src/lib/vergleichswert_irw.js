@@ -319,7 +319,8 @@ export function umrechnen(satz, irwWert, objekt, roh = null) {
   const faktoren = [], fehler = [];
   for (const m of f.merkmale || []) {
     const r = merkmalFaktor(m, objekt, roh, f.normobjekt);
-    if (!r.ok) { fehler.push({ id: m.id, grund: r.grund, text: r.text }); continue; }
+    /* v2660 · `eingabe` und `name` reisen mit: der Bericht nennt, WELCHE Angabe fehlt und wo sie einzutragen ist */
+    if (!r.ok) { fehler.push({ id: m.id, name: m.name || m.id, eingabe: m.eingabe, grund: r.grund, text: r.text }); continue; }
     faktoren.push({ id: m.id, name: m.name || m.id, art: m.art, objekt: r.objekt, norm: r.norm, uk: r.uk, uk_objekt: r.uk_objekt, uk_norm: r.uk_norm, text: r.text });
   }
   if (fehler.length) return { ok: false, fehler };
@@ -349,7 +350,7 @@ const GRUND_TEXT = {
  * @param {Array}  [p.bog]   [{ pos, eur }] — besondere objektspezifische Grundstücksmerkmale
  * @param {Array}  [p.saetze] Registersätze (sonst Ordner)
  */
-export function vergleichswertIrw({ irw, objekt = {}, bog = [], saetze = null }) {
+export function vergleichswertIrw({ irw, objekt = {}, bog = [], saetze = null, ersatz_teilmarkt = false }) {
   if (!irw || !irw.verfuegbar || !(Number(irw.wert_qm) > 0)) {
     return { verfuegbar: false, grund: 'kein_irw',
       hinweis: (irw && irw.hinweis) || 'An dieser Stelle liegt kein Immobilienrichtwert vor.' };
@@ -372,12 +373,20 @@ export function vergleichswertIrw({ irw, objekt = {}, bog = [], saetze = null })
     return { verfuegbar: false, grund: 'sperre', weg: weg || (satz.quelle_url ? { url: satz.quelle_url, text: 'Quelle' } : null),
       hinweis: satz.warum_kein_wert || 'Die Umrechnung dieses Ausschusses ist gesperrt.' };
   }
+  /* v2660 · Ersatz-Teilmarkt: ein Doppel- oder Reihenhaus mit dem Richtwert der Ein- und
+     Zweifamilienhaeuser (Kreis Herford fuehrt keinen eigenen Teilmarkt 3) nur, wenn DESSEN
+     Umrechnung die Anbauweise fuehrt - sonst wuerde das Haus still wie ein freistehendes gerechnet. */
+  if (ersatz_teilmarkt && !((satz.formel.merkmale || []).some((m) => [].concat(m.eingabe || []).includes('anbauweise')))) {
+    return { verfuegbar: false, grund: 'teilmarkt', weg,
+      hinweis: 'An dieser Stelle führt der Gutachterausschuss keinen Immobilienrichtwert für Doppel- und Reihenhäuser, '
+        + 'und seine Umrechnung für Ein- und Zweifamilienhäuser kennt die Anbauweise nicht. Ein Vergleichswert wird deshalb nicht ausgewiesen.' };
+  }
 
   const u = umrechnen(satz, Number(irw.wert_qm), objekt, roh);
   if (!u.ok) {
     const g = u.fehler[0].grund;
     return { verfuegbar: false, grund: g, fehlt: u.fehler.filter((x) => x.grund === 'merkmal_fehlt').map((x) => x.id),
-      gruende: u.fehler, weg,
+      gruende: u.fehler, weg, ausschuss: satz.gaa_name || null,
       hinweis: `${GRUND_TEXT[g] || 'Keine Umrechnung möglich'}: ${u.fehler.map((x) => x.text).join(' · ')}. `
         + 'Ein Vergleichswert wird deshalb nicht ausgewiesen; der Immobilienrichtwert bleibt Orientierung.' };
   }
@@ -435,6 +444,109 @@ export function vergleichswertIrw({ irw, objekt = {}, bog = [], saetze = null })
   };
 }
 
+/* ══ v2660 · DIE KANONISCHEN MERKMALE AUS DEM BERICHTSOBJEKT (ref) ══════════
+   Nur, was das Objekt FUEHRT - nichts wird erfunden oder vorbelegt. Was fehlt,
+   bleibt leer, und der Kern meldet „merkmal_fehlt" mit dem Merkmal.
+     keller        aus der Unterkellerung (keller_dg) oder dem NHK-Typ: zweite
+                   Ziffer 0/1 = mit Keller, 2/3 = ohne (NHK 2010, Anlage 4)
+     anbauweise    NHK-Hausform 1 freistehend · 2 Doppel-/Reihenendhaus (dann
+                   die Objektart: DHH oder Reihenendhaus) · 3 Reihenmittelhaus;
+                   ohne Hausform die Objektart des Reiters (EFH/ZFH = freistehend,
+                   dort getrennt von DHH und RH gefuehrt)
+     geschoss      Etage: 0 = Erdgeschoss (Code 88), n = n. OG; Dachgeschoss und
+                   Souterrain sind aus der Etage nicht abzulesen -> leer
+   Nicht abbildbar, weil der Reiter sie nicht fuehrt: Wohnlage (des Ausschusses),
+   Modernisierungstyp (baujahrtypisch/teilmodernisiert/neuzeitlich), Baudenkmal. */
+export const EINGABE_ORT = {
+  baujahr: 'Baujahr (Reiter Objekt)',
+  wohnflaeche: 'Wohnfläche (Reiter Objekt)',
+  grundstuecksflaeche: 'Grundstücksfläche (Reiter Objekt)',
+  bodenrichtwert: 'Bodenrichtwert (BORIS oder eigene Angabe)',
+  standardstufe: 'Standardstufe (Wertermittlung, Reiter Objekt)',
+  gstand: 'Standardstufe (Wertermittlung, Reiter Objekt)',
+  modernisierungspunkte: 'Modernisierungsgrad (Anlage 2, Reiter Objekt)',
+  mgrad: 'Modernisierungsgrad (Anlage 2, Reiter Objekt)',
+  mtyp: 'Modernisierungstyp des Ausschusses (baujahrtypisch, teilmodernisiert, neuzeitlich) — im Reiter Objekt nicht erfasst',
+  keller: 'Hausform und Geschosse nach NHK 2010 (Wertermittlung, Reiter Objekt)',
+  anbauweise: 'Objektart (EFH, DHH, Reihenhaus) bzw. Hausform nach NHK 2010',
+  gebaeudeart: 'Objektart (Reiter Objekt)',
+  vermietet: 'Nutzungsart (Reiter Objekt)',
+  wohnlage: 'Wohnlage nach der Einstufung des Gutachterausschusses — im Reiter Objekt nicht erfasst',
+  einheiten: 'Einheiten im Gebäude (Reiter Objekt)',
+  geschoss: 'Etage (Reiter Objekt)',
+  geschosse: 'Etagen gesamt (Reiter Objekt)',
+  erstverkauf: 'Baustatus (Wertermittlung, Reiter Objekt)',
+  balkon: 'Balkonfläche (Reiter Objekt)',
+  aufzug: 'Aufzug (Ausstattung, Reiter Objekt)',
+  garage: 'Garagen bzw. Stellplätze (Reiter Objekt)',
+  denkmalschutz: 'Baudenkmal — im Reiter Objekt nicht erfasst',
+};
+export function objektAusRef(ref = {}, { bodenrichtwert = null } = {}) {
+  const r = ref || {};
+  const z = (v) => { if (v == null || v === '') return null; const x = Number(v); return Number.isFinite(x) ? x : null; };
+  const o = {};
+  const setze = (k, v) => { if (v != null && v !== '') o[k] = v; };
+  const art = String(r.property_type || '').toLowerCase();
+  const unter = String(r.property_subtype || '').toLowerCase();
+  const istWohnung = /etw|eigentumswohnung|wohnung|whg|apartment/.test(art);
+  setze('baujahr', z(r.build_year) > 0 ? z(r.build_year) : null);
+  setze('wohnflaeche', z(r.living_area) > 0 ? z(r.living_area) : null);
+  if (!istWohnung) setze('grundstuecksflaeche', z(r.plot_area) > 0 ? z(r.plot_area) : null);
+  setze('bodenrichtwert', z(bodenrichtwert) > 0 ? z(bodenrichtwert) : null);
+  const ss = z(r.standardstufe);
+  setze('standardstufe', ss != null && ss >= 1 && ss <= 5 ? ss : null);
+  const mp = z(r.mod_punkte);
+  setze('modernisierungspunkte', mp != null && mp >= 0 && mp <= 20 ? mp : null);
+  /* Keller */
+  const kdg = String(r.keller_dg || '');
+  const nhk = String(r.nhk_typ || '').match(/^([123])\.([0-3])\d$/);
+  if (/^kg_/.test(kdg)) o.keller = true;
+  else if (/^ohne_kg/.test(kdg)) o.keller = false;
+  else if (nhk) o.keller = Number(nhk[2]) <= 1;
+  /* Anbauweise */
+  const ht = String(r.haustyp || '').toLowerCase();
+  let anb = null;
+  if (nhk) {
+    if (nhk[1] === '1') anb = 'freistehend';
+    else if (nhk[1] === '3') anb = 'reihenmittelhaus';
+    else if (nhk[1] === '2') anb = unter === 'dhh' ? 'doppelhaushaelfte' : (ht === 'reh' ? 'reihenendhaus' : null);
+  } else if (unter === 'dhh') anb = 'doppelhaushaelfte';
+  else if (ht === 'rmh') anb = 'reihenmittelhaus';
+  else if (ht === 'reh') anb = 'reihenendhaus';
+  else if (unter === 'efh' || unter === 'zfh') anb = 'freistehend';
+  if (!istWohnung) setze('anbauweise', anb);
+  /* Gebaeudeart */
+  if (!istWohnung) {
+    if (unter === 'zfh' || r.zweifamilienhaus === true) o.gebaeudeart = 'zfh';
+    else if (/mfh|mehrfamilien/.test(art)) o.gebaeudeart = 'mfh';
+    else if (unter === 'efh' || unter === 'dhh' || unter === 'rh') o.gebaeudeart = 'efh';
+  }
+  /* Vermietung */
+  const nu = String(r.usage_type || '').toLowerCase();
+  if (/eigen/.test(nu)) o.vermietet = false;
+  else if (/vermiet|kapital/.test(nu)) o.vermietet = true;
+  setze('einheiten', z(r.units) > 0 ? z(r.units) : null);
+  if (istWohnung) {
+    const fl = z(r.floor);
+    if (fl === 0) o.geschoss = 88;
+    else if (fl != null && fl > 0) o.geschoss = fl;
+    setze('geschosse', z(r.geschosse_gesamt) > 0 ? z(r.geschosse_gesamt) : null);
+  }
+  const bk = z(r.balcony_area);
+  if (bk != null) o.balkon = bk > 0;
+  /* Aufzug nur, wenn JA: der Bericht fuehrt `elevator` immer als Wahrheitswert (false auch
+     ohne Angabe, ReportOrchestrator) - ein „nein" waere hier geraten. */
+  const el = r.elevator;
+  if (el === true || /^(ja|true|1)$/i.test(String(el == null ? '' : el))) o.aufzug = true;
+  const ga = z(r.garages), sp = z(r.outdoor_parking);
+  if ((ga || 0) + (sp || 0) > 0) o.garage = true;
+  else if (ga === 0 || sp === 0) o.garage = false;
+  const bs = String(r.baustatus || '').toLowerCase();
+  if (/erstbezug|neubau|erstverkauf/.test(bs)) o.erstverkauf = true;
+  else if (/bestand/.test(bs)) o.erstverkauf = false;
+  return o;
+}
+
 /** Anwendungsbeispiel eines Satzes nachrechnen (Pruefmassstab). */
 export function pruefeBeispiel(satz) {
   const b = satz.anwendungsbeispiel;
@@ -454,4 +566,4 @@ export function pruefeBeispiel(satz) {
   return { ok: !abw.length, abw, wert_qm: u.wert_qm, faktoren: u.faktoren.length };
 }
 
-export default { KENNZAHL, TEILMAERKTE, EINGABEN, ladeSaetze, satzFuer, merkmalFaktor, umrechnen, vergleichswertIrw, pruefeBeispiel, gstandAusStandardstufe };
+export default { KENNZAHL, TEILMAERKTE, EINGABEN, EINGABE_ORT, objektAusRef, ladeSaetze, satzFuer, merkmalFaktor, umrechnen, vergleichswertIrw, pruefeBeispiel, gstandAusStandardstufe };

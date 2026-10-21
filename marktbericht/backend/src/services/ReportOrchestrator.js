@@ -39,7 +39,7 @@ import { BorisConnector } from '../connectors/BorisConnector.js';
 import { DealPilotObjectMapper } from './DealPilotObjectMapper.js';
 import { MarketInsightsService } from './MarketInsightsService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
-import { IrwConnector } from '../connectors/IrwConnector.js';
+import { IrwConnector, ebeneFuer, IRW_EBENEN } from '../connectors/IrwConnector.js';   /* v2660: ebeneFuer, IRW_EBENEN */
 import { marktmiete as amtlicheMiete } from '../lib/mietmodell_nrw.js';   /* v1059-WMIET-1 */
 import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.js';   /* v1060-WVF-1 */   /* v1053-WIRW-1 */
 import { AgsResolver } from '../connectors/AgsResolver.js';
@@ -112,6 +112,9 @@ export const ReportOrchestrator = {
        Ausschluss (der fragt `=== 'gewerbe'`); 'gewerbe' umgekehrt.
        Wohnarten bleiben unveraendert stehen. */
     const _oa = objektartNormal(input.property_type || null);
+    /* v2660 · Zahl mit 0 als Angabe (leer/ungueltig -> null) und Datum JJJJ-MM(-TT) */
+    const _null0 = (v) => (v == null || v === '' || !Number.isFinite(Number(v)) ? null : Number(v));
+    const _ymd = (v) => (v && /^\d{4}-\d{2}(-\d{2})?$/.test(String(v)) ? String(v) : null);
     const ref = {
       address: input.address,
       lat, lon,
@@ -129,6 +132,13 @@ export const ReportOrchestrator = {
       rooms: input.rooms ? Number(input.rooms) : null,
       build_year: input.build_year ? Number(input.build_year) : null,
       floor: input.floor != null ? Number(input.floor) : null,
+      /* v2660 · E7 · Etagen im Gebaeude (Reiter Objekt „Anzahl Etagen") - Umrechnung des Immobilienrichtwerts */
+      geschosse_gesamt: Number(input.geschosse_gesamt) > 0 ? Number(input.geschosse_gesamt) : null,
+      /* v2660 · E2 · Restlaufzeit der Mietabweichung am Einzelobjekt (ETW/EFH ohne Wohnungsliste).
+         CrossCheckService liest ref.mv_* seit v2600 - hier kamen sie nie an. */
+      mv_befristet_bis: _ymd(input.mv_befristet_bis),
+      mv_kuendigungsverzicht_bis: _ymd(input.mv_kuendigungsverzicht_bis),
+      mv_abw_jahre: Number(input.mv_abw_jahre) > 0 ? Number(input.mv_abw_jahre) : null,
       condition: input.condition || null,
       quality: input.quality || null,
       modernization: input.modernization || null,
@@ -161,7 +171,8 @@ export const ReportOrchestrator = {
       eq_dachform: input.eq_dachform || null,
       eq_roof: input.eq_roof || input.roof || null,
       bathrooms: input.bathrooms ? Number(input.bathrooms) : null,
-      balcony_area: input.balcony_area ? Number(input.balcony_area) : null,
+      /* v2660 · 0 ist eine Angabe (kein Balkon, keine Garage) - fuer die IRW-Umrechnung (E7) bleibt sie stehen */
+      balcony_area: _null0(input.balcony_area),
       garden_area: input.garden_area ? Number(input.garden_area) : null,
       plot_area: input.plot_area ? Number(input.plot_area) : null,
       units: input.units ? Number(input.units) : null,
@@ -174,8 +185,8 @@ export const ReportOrchestrator = {
       einheiten_miete: Array.isArray(input.einheiten_miete) ? input.einheiten_miete : null,
       /* v1438: der Mapper liefert eq_elevator als 'Ja' (Grossschreibung) — das fiel bisher durch. */
       elevator: input.elevator === true || /^(true|ja)$/i.test(String(input.elevator == null ? '' : input.elevator)) || false,
-      garages: input.garages ? Number(input.garages) : null,
-      outdoor_parking: input.outdoor_parking ? Number(input.outdoor_parking) : null,
+      garages: _null0(input.garages),   /* v2660 */
+      outdoor_parking: _null0(input.outdoor_parking),
       purchase_price: input.purchase_price ? Number(input.purchase_price) : null,
       monthly_net_rent: input.monthly_net_rent ? Number(input.monthly_net_rent) : null,
       vacancy: !!input.vacancy,
@@ -663,9 +674,26 @@ export const ReportOrchestrator = {
     try {
       /* lat/lon stehen ab Z. 62 bereit; BorisConnector nutzt sie genauso. */
       const _la = Number(lat), _lo = Number(lon);
-      if (Number.isFinite(_la) && Number.isFinite(_lo)) {
+      /* v2660 · Immobilienrichtwerte gibt es offen nur in NRW (BORIS-NRW). Ausserhalb
+         (AGS nicht 05…) wird der fremde Dienst nicht gefragt; ohne AGS wie bisher. */
+      const _agsIrw = String(ref.ags || '');
+      const _inNw = !_agsIrw || /^05/.test(_agsIrw);
+      if (_inNw && Number.isFinite(_la) && Number.isFinite(_lo)) {
+        /* v2660 · die genaue Hausart waehlt die Ebene: „haus" + DHH ging bisher auf die
+           EFH-Ebene 18, nicht auf 15 (Doppel-/Reihenhaeuser). */
+        const _oaIrw = ref.property_subtype || ref.property_type;
         _irw = await IrwConnector.hole({ lat: _la, lon: _lo,
-          objektart: ref.property_type, anzahlWe: ref.units });
+          objektart: _oaIrw, anzahlWe: ref.units });
+        /* v2620/v2660 · Kreis Herford fuehrt Doppel- und Reihenhaeuser im EFH-Teilmarkt
+           (Anbauweise-Tabelle im EFH-Dokument). Kein Treffer auf Ebene 15 -> noch einmal
+           auf Ebene 18; der Kern rechnet dann nur, wenn DIESE Umrechnung die Anbauweise
+           fuehrt (ersatz_teilmarkt). */
+        if (_irw && !_irw.verfuegbar && _irw.grund === 'kein_treffer'
+            && ebeneFuer(_oaIrw, ref.units) === IRW_EBENEN.reihen_doppelhaeuser) {
+          const _irw18 = await IrwConnector.hole({ lat: _la, lon: _lo, objektart: _oaIrw,
+            anzahlWe: ref.units, ebene: IRW_EBENEN.ein_zweifamilienhaeuser });
+          if (_irw18 && _irw18.verfuegbar) { _irw = _irw18; _irw.ebene_ersatz = true; }
+        }
         if (_irw && _irw.verfuegbar) {
           _irw.abweichung = IrwConnector.abweichung(_irw, ref);
           step('irw: ' + _irw.wert_qm + ' EUR/m2, Stichtag ' + (_irw.stichtag || '?'));
