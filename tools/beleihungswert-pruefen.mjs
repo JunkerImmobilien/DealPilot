@@ -159,6 +159,12 @@ ok('V', 'Vervielfaeltiger 5 % / 20 J (Tabellenwert 12,4622)', Math.round(K.vervi
   ok('12', 'Quote-Bericht: BWK 24 %', r.ertragswert.bwk.summe, 4800);
   ok('12', 'Quote-Bericht: Ertragswert (9.700 x V(5,5 %/18) + 100.000)', r.ertragswert.wert, 209087, 1);
   ok('12', 'Quote-Bericht: basis ertragswert (nicht § 4 Abs. 2)', r.basis, 'ertragswert');
+  // 13 Vergleichswert aus Angebotspreisen ist kein Verkehrswert (Baeckerstr. 7)
+  const cc2 = Object.assign({}, cc, { comparison: { vergleichswert_eur: 150000 }, verfahrenswahl: { verfahren: 'vergleichswert' }, amtlicher_vergleichsfaktor: { verfuegbar: false } });
+  const e2 = K.eingabenAusBericht(cc2, { objektart: 'efh' });
+  ok('13', 'Angebots-Vergleichswert nicht als Verkehrswert', e2.verkehrswert, 300000);
+  ok('13', 'Verfahren dann Ertragswert', e2.verkehrswert_verfahren, 'ertragswert');
+  ok('13', 'kein Vergleichswert im Check', e2.vergleichswert, null);
 }
 
 /* ── Teil 2 · Kette ueber den echten CrossCheckService ─────────────── */

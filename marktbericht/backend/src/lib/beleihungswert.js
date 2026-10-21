@@ -20,7 +20,7 @@
 // Bekanntgabe BelWertV: seit 01.01.2024 Wohnen 5,5 %, Gewerbe 6,5 %) und
 // eine Fachveroeffentlichung vom 08.12.2025 (unveraendert auch 2026).
 
-export const VERSION = 'v2630';
+export const VERSION = 'v2630b';
 
 /* ── Zahlen der Verordnung ─────────────────────────────────────────── */
 export const BELWERTV = Object.freeze({
@@ -133,7 +133,9 @@ export function eingabenAusBericht(cc, extra) {
   const avf = cc.amtlicher_vergleichsfaktor || {};
   const vgl = cc.comparison || {};
   const verf = cc.verfahrenswahl && cc.verfahrenswahl.verfahren;
-  const wertVon = { ertragswert: n(ew.value_eur), sachwert: n(sw.value_eur), vergleichswert: n(vgl.vergleichswert_eur) };
+  /* Vergleichswert nur, wenn amtlich (Vergleichsfaktor des Ausschusses) - ein Wert aus
+     Angebotspreisen ist kein Verkehrswert und taugt nicht als Deckel (Baeckerstr. 7, v2630b). */
+  const wertVon = { ertragswert: n(ew.value_eur), sachwert: n(sw.value_eur), vergleichswert: avf.verfuegbar ? n(vgl.vergleichswert_eur) : null };
   return {
     objektart: X.objektart || (cc.ref && cc.ref.property_type) || null,
     wohnen: { einheiten, markt_qm: marktQm, rohertrag_bericht_jahr: reWohnen },
