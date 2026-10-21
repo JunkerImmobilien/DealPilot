@@ -94,7 +94,18 @@ export const MarketAnalysisService = {
       ? { objectClasses: _gew.objectClasses, objectTypes: undefined }
       : segment(ref.property_type, offerType);
     const objectCategories = _gew ? _gew.objectCategories : undefined;
-    const wfl = ref.living_area && ref.living_area > 0 ? ref.living_area : null;
+    let wfl = ref.living_area && ref.living_area > 0 ? ref.living_area : null;
+    /* v2556b · MFH zur MIETE: vermietet werden Wohnungen (siehe segment()), also
+       gehoert in den Flaechenfilter die Wohnungsgroesse, nicht die des Hauses.
+       Bismarckstr. Detmold (546 m², 6 WE) suchte Mietwohnungen mit 410-683 m² und
+       fand 0 - ohne Vergleichsmiete rechnete bei Leerstand kein Ertragswert, und
+       der Abruf „Marktpreise" kam leer zurueck. Mittel aus der Einheitenliste,
+       sonst Wohnflaeche / Einheiten; ohne beides kein Flaechenfilter. */
+    if (listingType === 'miete' && wfl && !_gew && /^mfh$|mehrfamilien/i.test(String(ref.property_type || ''))) {
+      const _eh = Array.isArray(ref.einheiten_miete) ? ref.einheiten_miete.map((e) => Number(e && e.wfl)).filter((x) => x > 0) : [];
+      wfl = _eh.length ? _eh.reduce((a, x) => a + x, 0) / _eh.length
+        : (Number(ref.units) > 1 ? wfl / Number(ref.units) : null);
+    }
     const by = ref.build_year && ref.build_year > 1500 ? ref.build_year : null;
     // Hoehere Schwelle = stabilerer Median der engen Gruppe und seltenere Umschaltung
     // breit<->eng (GeoMaps Trefferzahl schwankt leicht). Dampft die grossen Wertspruenge.
