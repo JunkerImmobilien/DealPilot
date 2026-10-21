@@ -542,6 +542,13 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Essen, Duisburg, Wuppertal; Minden-Luebbecke Sperre (keine IRW beschlossen). */
                             'uk-irw-nw-owl-2026.json', 'uk-irw-nw-rheinland-2026.json',
                             'uk-irw-nw-ruhr-ost-2026.json', 'uk-irw-nw-ruhr-west-2026.json',
+                            /* v2680: zweite IRW-Ernte NRW, die uebrigen 58 Ausschuesse nach Region
+                               (156 Saetze: 93 Werte, 63 Sperren; additive Verknuepfung, interpolierte
+                               Rechteck-Matrizen, Spannen und bedingte Kategorien als Sperre vorgemerkt). */
+                            'uk-irw-nw-rheinland-sued-2026.json', 'uk-irw-nw-niederrhein-2026.json',
+                            'uk-irw-nw-bergisch-mettmann-2026.json', 'uk-irw-nw-ruhr-nord-2026.json',
+                            'uk-irw-nw-muensterland-2026.json', 'uk-irw-nw-ostwestfalen-2026.json',
+                            'uk-irw-nw-sauerland-siegerland-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

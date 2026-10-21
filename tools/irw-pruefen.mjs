@@ -31,11 +31,15 @@ const VW = await imp('verfahrenswahl.js');
 const argv = process.argv.slice(2);
 const SHAPE = argv.includes('--shape') ? argv[argv.indexOf('--shape') + 1] : null;
 const LIVE = argv.includes('--live');
+/* v2680 · --datei <name>: nur diese Registerdatei (parallele Ernte); --entwurf: unbekannte
+   Eingabenamen nur melden (NEUE EINGABE), nicht als Fehler — fuer den Erntelauf, nie fuer die Abnahme. */
+const NUR_DATEI = argv.includes('--datei') ? argv[argv.indexOf('--datei') + 1] : null;
+const ENTWURF = argv.includes('--entwurf');
 
 let saetze = 0, werte = 0, sperren = 0, beispiele = 0, ohneBeispiel = 0, rot = 0;
 const fehler = (t) => { rot++; console.log('  FEHLER ' + t); };
 const ARTEN = new Set(['klassen', 'kategorien', 'kurve', 'matrix', 'stichtag']);
-const dateien = fs.readdirSync(ORDNER).filter((x) => x.startsWith('uk-irw-') && x.endsWith('.json')).sort();
+const dateien = fs.readdirSync(ORDNER).filter((x) => x.startsWith('uk-irw-') && x.endsWith('.json') && (!NUR_DATEI || x === NUR_DATEI)).sort();
 const alle = [];
 const schl = new Map();
 
@@ -72,7 +76,7 @@ for (const d of dateien) {
       if (ids.has(m.id)) fehler(mw + ': id doppelt');
       ids.add(m.id);
       if (!ARTEN.has(m.art)) { fehler(mw + ': art ' + m.art); continue; }
-      for (const e of [].concat(m.eingabe)) if (!V.EINGABEN[e]) fehler(mw + ': eingabe ' + e + ' nicht im kanonischen Katalog (EINGABEN)');
+      for (const e of [].concat(m.eingabe)) if (!V.EINGABEN[e]) { if (ENTWURF) console.log('  NEUE EINGABE ' + mw + ': ' + e); else fehler(mw + ': eingabe ' + e + ' nicht im kanonischen Katalog (EINGABEN)'); }
       const ukOk = (u) => u == null || (typeof u === 'number' && u >= 0.3 && u <= 3);
       if (m.art === 'klassen') {
         for (const kl of m.klassen || []) if (!ukOk(kl.uk)) fehler(mw + ': uk ' + kl.uk + ' in Klasse ' + kl.name);
@@ -186,6 +190,31 @@ let garFaelle = 0;
   }
 }
 
+/* ── v2680 · Geltungsgrenze eines Merkmals (gilt_nur): ausserhalb kein Wert, innerhalb normal ── */
+let gnFaelle = 0;
+for (const s of alle) {
+  for (const m of (s.formel && s.formel.merkmale) || []) {
+    const g = m.gilt_nur;
+    if (!g) continue;
+    const wo = `${s._datei} ${s.gebiet_name || s.gasl} ${s.zweig} · ${m.id}`;
+    if (g.baujahr_bis == null && g.baujahr_von == null) { fehler(wo + ': gilt_nur ohne baujahr_von/baujahr_bis'); continue; }
+    if (!g.wortlaut) fehler(wo + ': gilt_nur ohne wortlaut');
+    /* Norm und Objektwert aus dem Anwendungsbeispiel des Satzes (Zonennorm), sonst die Norm des Satzes */
+    const ab = s.anwendungsbeispiel || {};
+    const roh = ab.norm_zone || null;
+    const e0 = [].concat(m.eingabe); const k = e0[e0.length - 1];
+    const ov = (ab.objekt || {})[k] != null ? ab.objekt[k] : (m.norm != null ? m.norm : (s.formel.normobjekt || {})[m.id]);
+    const drin = g.baujahr_bis != null ? g.baujahr_bis : g.baujahr_von;
+    const draussen = g.baujahr_bis != null ? g.baujahr_bis + 1 : g.baujahr_von - 1;
+    const r1 = V.merkmalFaktor(m, { [k]: ov, baujahr: drin }, roh, s.formel.normobjekt);
+    const r2 = V.merkmalFaktor(m, { [k]: ov, baujahr: draussen }, roh, s.formel.normobjekt);
+    gnFaelle += 2;
+    if (!r1.ok) fehler(wo + ': innerhalb der Geltung (Bj ' + drin + ') nicht rechenbar — ' + r1.text);
+    else if (r2.ok || r2.grund !== 'ausserhalb') fehler(wo + ': ausserhalb der Geltung (Bj ' + draussen + ') muss kein Wert sein');
+    else console.log(`  ok ${wo}: Bj ${drin} rechnet (${r1.text}), Bj ${draussen} kein Wert (gilt_nur)`);
+  }
+}
+
 /* ── optional: Deckung gegen das Shape ── */
 /* Minimaler DBF-Leser für die Attribute des IRW-Shapes (UTF-8, siehe .cpg). */
 function liesDbf(pfad) {
@@ -252,7 +281,7 @@ if (LIVE) {
 }
 
 console.log(`DECKUNG: ${dateien.length} Datei(en), ${saetze} Sätze (${werte} Werte, ${sperren} Sperren), `
-  + `${beispiele} Anwendungsbeispiel(e) getroffen, ${ohneBeispiel} ohne Beispiel · Verfahrenswahl ${vwFaelle} Fälle · Garage ${garFaelle} Kernläufe`);
+  + `${beispiele} Anwendungsbeispiel(e) getroffen, ${ohneBeispiel} ohne Beispiel · Verfahrenswahl ${vwFaelle} Fälle · Garage ${garFaelle} Kernläufe · gilt_nur ${gnFaelle} Kernläufe`);
 if (!saetze) { rot++; console.log('  -> NULL Sätze gelesen — kein grünes Ergebnis'); }
 console.log('ERGEBNIS: ' + (rot ? rot + ' Fehler' : 'sauber'));
 process.exit(rot ? 1 : 0);
