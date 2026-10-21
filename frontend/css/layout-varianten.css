@@ -8841,7 +8841,7 @@ html:not([data-dp-layout])[data-dp-objkarte="bordkarte"] :is(#sb-list) .sb-card 
   border:0 !important;
   border-right:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent) !important;
   background:transparent !important;
-  font-size:7.5px !important;
+  font-size:8.5px !important; /* v2573: Hausgrenze 8,5 px (Heute + Bordkarte), war 7,5 */
   letter-spacing:.14em !important;
   padding:0 !important;
 }
