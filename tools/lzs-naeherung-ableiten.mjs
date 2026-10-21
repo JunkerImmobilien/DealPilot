@@ -197,6 +197,58 @@ console.log('Koeffizienten: c ' + r3(b[0]) + ' · ETW ' + r3(b[1]) + ' · MFH ' 
 console.log('Einsatz (' + laenderBesser.join(' ') + ', ' + einsatz.length + ' Saetze) LOAO: Median ' + loaoEinsatz.median_pp + ' · P80 ' + loaoEinsatz.p80_pp + ' · P95 ' + loaoEinsatz.p95_pp);
 console.log('Spanne P80 je Objektart: ' + FAM.map((F) => F + ' ±' + spanne[F] + ' (Deckung ' + deckungJe[F].deckung_pct + ' %)').join(' · ') + ' — gesamt ' + Math.round(1000 * deckDrin / einsatz.length) / 10 + ' %');
 
+/* ═══ v2611 · E6 · DAS DEALPILOT-LANDESMITTEL (Marcel 21.10.2026 freigegeben) ══
+ *
+ * Nur fuer den Liegenschaftszins (Regel 19.10.: dort gibt es immer einen Wert,
+ * Kaskade bis Landes-/Bundeswert). Fuer SWF und UK bleibt „nie ein Landesmittel".
+ *
+ *   Wert   = Median der amtlichen Zinssaetze desselben Lernstoffs wie die Formel
+ *            (Wohnen, juengster Jahrgang je AGS x Zweig, unter der Landesebene)
+ *            je Land x Objektart (EZFH, ETW, MFH, WGH)
+ *   Bedingung: mindestens MIN_LM_AUSSCHUESSE Ausschuesse UND MIN_LM_SAETZE Saetze
+ *   Pruefmass: Leave-one-AUSSCHUSS-out - der Median ohne den eigenen Ausschuss
+ *            gegen dessen amtlichen Satz (genau der Einsatzfall: fuer die
+ *            Gemeinde gibt es keinen Satz). Daneben Formel (LOAO) und § 256.
+ *   verdrahtet nur, wo das Landesmittel im Median genauer ist als § 256 UND
+ *            - in Laendern, in denen die Formel rechnet - genauer als die Formel.
+ *   Spanne  = P80 der LOAO-Fehler dieser Zelle; Deckung mit der Halbbreite
+ *            ohne den eigenen Ausschuss. */
+/* --lm-ausschuesse=N nur zum MESSEN (mit --trocken): wie saehe es mit weniger Ausschuessen aus */
+const MIN_LM_AUSSCHUESSE = Number((process.argv.find((a) => a.startsWith('--lm-ausschuesse=')) || '=8').split('=')[1]) || 8, MIN_LM_SAETZE = 8;
+const landesmittel = {};
+for (const L of laender) for (const F of FAM) {
+  const S = rows.filter((r) => r.land === L && r.F === F);
+  const gremien = [...new Set(S.map((r) => r.gaa))];
+  const jahre = S.map((r) => r.jahr).filter((j) => j > 0);
+  const zelle = { saetze: S.length, ausschuesse: gremien.length,
+    median_pct: S.length ? r3(median(S.map((r) => r.w))) : null,
+    jahrgang_von: jahre.length ? Math.min(...jahre) : null, jahrgang_bis: jahre.length ? Math.max(...jahre) : null };
+  if (gremien.length < MIN_LM_AUSSCHUESSE || S.length < MIN_LM_SAETZE) {
+    landesmittel[L + '|' + F] = { ...zelle, verdrahtet: false, grund: 'zu_wenig_saetze' }; continue;
+  }
+  const lmVor = new Map(); for (const g of gremien) lmVor.set(g, median(S.filter((r) => r.gaa !== g).map((r) => r.w)));
+  const eLm = S.map((r) => Math.abs(lmVor.get(r.gaa) - r.w));
+  const eF = S.map(fehlerLoao), e256 = S.map((r) => Math.abs(nach256(r) - r.w));
+  const formelAktiv = laenderBesser.includes(L);
+  const mLm = median(eLm), mF = median(eF), m256 = median(e256);
+  const besser256 = mLm < m256, besserFormel = mLm < mF;
+  const verdrahtet = besser256 && (!formelAktiv || besserFormel);
+  const hb = quantil(eLm, 0.8);
+  let d = 0; for (const r of S) { const hbo = quantil(S.filter((x) => x.gaa !== r.gaa).map((x) => Math.abs(lmVor.get(x.gaa) - x.w)), 0.8); if (Math.abs(lmVor.get(r.gaa) - r.w) <= hbo + 1e-9) d++; }
+  landesmittel[L + '|' + F] = { ...zelle, verdrahtet,
+    grund: verdrahtet ? (formelAktiv ? 'besser_als_formel_und_256' : 'besser_als_256') : (!besser256 ? 'nicht_besser_als_256' : 'formel_besser'),
+    formel_rechnet_im_land: formelAktiv,
+    fehler_loao: { landesmittel_median_pp: r3(mLm), landesmittel_p80_pp: r3(hb), formel_median_pp: r3(mF), formel_p80_pp: r3(quantil(eF, 0.8)),
+                   bewg256_median_pp: r3(m256) },
+    spanne_p80_pp: r3(hb), spanne_deckung_pct: Math.round(1000 * d / S.length) / 10 };
+}
+const lmAn = Object.entries(landesmittel).filter(([, z]) => z.verdrahtet);
+console.log('LANDESMITTEL (>= ' + MIN_LM_AUSSCHUESSE + ' Ausschuesse, LOAO, Median PP LM/Formel/§256): '
+  + Object.entries(landesmittel).filter(([, z]) => z.fehler_loao).map(([k, z]) => k + ' ' + z.median_pct + '% n' + z.saetze + '/' + z.ausschuesse
+    + ' ' + z.fehler_loao.landesmittel_median_pp + '/' + z.fehler_loao.formel_median_pp + '/' + z.fehler_loao.bewg256_median_pp + (z.verdrahtet ? ' AN' : '')).join(' · '));
+console.log('verdrahtet: ' + (lmAn.map(([k]) => k).join(' ') || 'keine') + ' · zu wenig Saetze: '
+  + Object.entries(landesmittel).filter(([, z]) => z.grund === 'zu_wenig_saetze' && z.saetze > 0).map(([k, z]) => k + ' ' + z.saetze + '/' + z.ausschuesse).join(' '));
+
 let lernkurve = null;
 if (LERNKURVE) {
   let seed = 7; const zufall = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
@@ -249,6 +301,14 @@ const aus = {
     stadt_merkmal: 'lzsStadt(ags) wie zur Laufzeit (v2593)',
   },
   bewg256_gegen_amtlich: bias256,
+  /* v2611 · E6 */
+  landesmittel: {
+    methode: 'Median der amtlichen Zinssaetze (Lernstoff wie die Formel) je Land x Objektart; nur mit >= ' + MIN_LM_AUSSCHUESSE + ' Ausschuessen und >= ' + MIN_LM_SAETZE
+      + ' Saetzen; Pruefung Leave-one-Ausschuss-out gegen Formel (LOAO) und § 256; verdrahtet, wo genauer als § 256 und - wo die Formel rechnet - als die Formel',
+    kennzeichnung: 'DealPilot-Landesmittel aus n amtlichen Zinssaetzen (nie amtlich), Stufe N',
+    mindest_ausschuesse: MIN_LM_AUSSCHUESSE, mindest_saetze: MIN_LM_SAETZE,
+    zellen: landesmittel,
+  },
   lernkurve,
 };
 if (lohnt && !TROCKEN) { fs.writeFileSync(ZIEL, JSON.stringify(aus, null, 2) + '\n'); console.log('geschrieben: ' + path.relative(WURZEL, ZIEL)); }

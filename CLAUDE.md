@@ -549,6 +549,12 @@ eine selbst ausgerechnete Zahl.
   Gemessen 19.10.2026: wirksam fast nur in BW (1.040 Gemeinden ohne
   Registersatz) und zwei Orten in HE; NW, NI, SN, RP, BB haben überall einen
   Satz oder eine Sperre.
+  **Zweiter Weg in N, nur LZS (v2611, E6): das DealPilot-Landesmittel**
+  (`lzsLandesmittel()`, `lzs-naeherung.json` `landesmittel.zellen`) — Median
+  der amtlichen Sätze je Land × Objektart, nur mit ≥ 8 Ausschüssen und nur,
+  wo es per Leave-one-Ausschuss-out genauer ist als § 256 und die Formel;
+  dieselben Sperren wie die Formel, im Bericht „DealPilot-Landesmittel aus n
+  amtlichen Zinssätzen (Land, Objektart, Jahrgänge)". Für SWF/UK nie.
 - Jede Zahl trägt Herkunft: Stufe A–E und N, Modellvermerk, `indikativ`, Ausschuss.
 - Eine Restnutzungsdauer für alle Verfahren.
 - BWK-Quoten stehen auf dem **gesamten** Rohertrag inklusive Stellplätzen.

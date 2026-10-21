@@ -416,6 +416,79 @@ fallB('B11', () => {
   wert('B', 'B11g', 'Sensitivität +0,5 % = Kern mit 6,5 % (rentierlicher Bodenwert)', kS.sensitivitaet ? kS.sensitivitaet.lzs_plus_05.wert : null, kP.wert, 0);
 });
 
+/* B13 · v2611 · E6 · DAS DEALPILOT-LANDESMITTEL (nur Liegenschaftszins, Stufe N).
+   Am echten Modul lib/lzs_naeherung.js und der echten lzs-naeherung.json; die
+   Sollwerte kommen aus der JSON selbst (Zelle), geprueft wird, dass Kern und
+   Tabelle zusammenpassen und die Regeln (>= 8 Ausschuesse, besser als § 256
+   und Formel) in jeder verdrahteten Zelle gelten. */
+let LZN = null, WPS = null;
+try { LZN = await lade('lib/lzs_naeherung.js'); } catch (e) { LZN = null; }
+try { WPS = await lade('services/WertParameterService.js'); } catch (e) { WPS = null; }
+fallB('B13', () => {
+  if (!LZN || !LZN.lzsLandesmittel) return pruefe('B', 'B13', 'lzsLandesmittel geladen', false, 'fehlt');
+  const d = LZN.lzsNaeherungsDaten(), Z = (d && d.landesmittel && d.landesmittel.zellen) || {};
+  const an = Object.entries(Z).filter(([, z]) => z.verdrahtet);
+  pruefe('B', 'B13a', 'jede verdrahtete Zelle: >= 8 Ausschüsse, genauer als § 256 und (wo die Formel rechnet) als die Formel',
+    an.length > 0 && an.every(([, z]) => z.ausschuesse >= 8 && z.saetze >= 8 && z.fehler_loao.landesmittel_median_pp < z.fehler_loao.bewg256_median_pp
+      && (!z.formel_rechnet_im_land || z.fehler_loao.landesmittel_median_pp < z.fehler_loao.formel_median_pp)),
+    an.map(([k]) => k).join(' '));
+  const zHe = Z['HE|MFH'];
+  const lm = LZN.lzsLandesmittel({ ags: '06411000', objektart: 'mfh', rnd: 30 });
+  if (!zHe || !zHe.verdrahtet) return pruefe('B', 'B13b', 'Zelle HE|MFH verdrahtet', false, zHe ? zHe.grund : 'fehlt');
+  wert('B', 'B13b', 'Darmstadt MFH: Landesmittel = Median der Zelle HE|MFH', lm.verfuegbar ? lm.pct : null, zHe.median_pct, 0);
+  pruefe('B', 'B13c', 'Spanne um den Wert (± P80 der Kreuzvalidierung), Deckung gemessen',
+    lm.pct_von < lm.pct && lm.pct < lm.pct_bis && Math.abs((lm.pct_bis - lm.pct) - zHe.spanne_p80_pp) < 0.011 && lm.spanne_deckung === zHe.spanne_deckung_pct,
+    lm.pct_von + '–' + lm.pct_bis + ' %, Deckung ' + lm.spanne_deckung + ' %');
+  pruefe('B', 'B13d', 'Kennzeichnung „DealPilot-Landesmittel aus n amtlichen Zinssätzen" mit Land und Objektart',
+    new RegExp('DealPilot-Landesmittel aus ' + zHe.saetze + ' amtlichen Zinssätzen').test(lm.hinweis) && /Hessen, Mehrfamilienhäuser/.test(lm.hinweis) && /nicht amtlich/.test(lm.hinweis),
+    lm.hinweis.slice(0, 90));
+  const efh = LZN.lzsLandesmittel({ ags: '06411000', objektart: 'efh', rnd: 40 });
+  const efhF = LZN.lzsNaeherung({ ags: '06411000', objektart: 'efh', rnd: 40 });
+  pruefe('B', 'B13e', 'HE EZFH: Formel genauer → kein Landesmittel, die Formel rechnet (mit Spanne)',
+    !efh.verfuegbar && efh.grund === 'formel_besser' && efhF.verfuegbar && efhF.pct_von < efhF.pct && efhF.spanne_deckung > 0, efh.grund);
+  const bw = LZN.lzsLandesmittel({ ags: '08115001', objektart: 'efh', rnd: 40 });
+  pruefe('B', 'B13f', 'BW EZFH: unter 8 Ausschüssen → kein Landesmittel', !bw.verfuegbar && bw.grund === 'zu_wenig_saetze',
+    Z['BW|EZFH'] ? Z['BW|EZFH'].saetze + ' Sätze / ' + Z['BW|EZFH'].ausschuesse + ' Ausschüsse' : '–');
+  pruefe('B', 'B13g', 'Gewerbe und RND außerhalb 5–80: kein Landesmittel',
+    !LZN.lzsLandesmittel({ ags: '06411000', objektart: 'buero' }).verfuegbar && !LZN.lzsLandesmittel({ ags: '06411000', objektart: 'mfh', rnd: 90 }).verfuegbar);
+  if (WPS && WPS.zinsHerkunft) {
+    const h = WPS.zinsHerkunft({ wert: lm.pct, stufe: 'N', dealpilot_landesmittel: true, pct_von: lm.pct_von, pct_bis: lm.pct_bis,
+      spanne_deckung: lm.spanne_deckung, formel: { weg: 'landesmittel', ...lm.landesmittel } });
+    pruefe('B', 'B13h', 'Herkunft: Ebene dealpilot_landesmittel, unter A, Etikett mit Land/Objektart/Jahrgang, Spanne',
+      h.ebene === 'dealpilot_landesmittel' && h.unter_a === true && /^DealPilot-Landesmittel aus [0-9]+ amtlichen Zinssätzen [(]Hessen, Mehrfamilienhäuser, Jahrgänge? [0-9]{4}/.test(h.etikett)
+      && h.spanne && h.spanne.pct_von === lm.pct_von && !!h.weg, h.etikett);
+    const hF = WPS.zinsHerkunft({ wert: efhF.pct, stufe: 'N', dealpilot_formel: true, pct_von: efhF.pct_von, pct_bis: efhF.pct_bis, spanne_deckung: efhF.spanne_deckung, formel: efhF.formel });
+    pruefe('B', 'B13i', 'E4: Formel-Herkunft trägt die Spanne', hF.ebene === 'dealpilot_formel' && hF.spanne && hF.spanne.pct_bis === efhF.pct_bis);
+  } else hinweise.push('B13h/i übersprungen: WertParameterService nicht geladen');
+  /* Ertragswertwirkung (Kern): MFH 6 WE, Rohertrag 36.000, RND 30 - Formel gegen Landesmittel */
+  const fMfh = LZN.lzsNaeherung({ ags: '06411000', objektart: 'mfh', rnd: 30 });
+  const kF = ertragswert(Object.assign(einOk(), { lzs_pct: fMfh.pct, lzs_stufe: 'N', rnd_jahre: 30 }), bwOk());
+  const kL = ertragswert(Object.assign(einOk(), { lzs_pct: lm.pct, lzs_stufe: 'N', rnd_jahre: 30 }), bwOk());
+  pruefe('B', 'B13j', 'Ertragswert rechnet mit dem Landesmittel (Stufe N)', kL.wert > 0 && kL.lzs.stufe === 'N' && kL.wert !== kF.wert,
+    'Formel ' + fMfh.pct + ' % → ' + eur(kF.wert) + ' · Landesmittel ' + lm.pct + ' % → ' + eur(kL.wert));
+});
+
+/* B14 · v2610 · E5 · UK-FORMEL NUR BIS ZUM 2,0-FACHEN DER BEZUGSGROESSE.
+   Darueber keine Naeherung (Variante A im Aufrufer: volle Flaeche, markiert).
+   Die amtlichen Tabellen sind nicht beruehrt (uk-flaeche-pruefen). */
+let UKF = null;
+try { UKF = await lade('lib/umrechnung_flaeche.js'); } catch (e) { UKF = null; }
+fallB('B14', () => {
+  if (!UKF || !UKF.naeherung) return pruefe('B', 'B14', 'umrechnung_flaeche geladen', false, 'fehlt');
+  const j = JSON.parse(fs.readFileSync(path.join(SRC, 'lib/uk-naeherung.json'), 'utf8'));
+  pruefe('B', 'B14a', 'uk-naeherung.json: verhaeltnis_bis 2, kein zweiter Ast', j.gilt_fuer.verhaeltnis_bis === 2 && !j.oberhalb,
+    'bis ' + j.gilt_fuer.verhaeltnis_bis);
+  const n = (fl) => UKF.naeherung({ objektart: 'efh', flaeche_qm: fl, bezugsgroesse_qm: 600, brw_eur_qm: 200, geschosszahl: 'II' });
+  const k2 = n(1200);
+  wert('B', 'B14b', '2,0-fach: Formel (2)^b', k2.verfuegbar ? k2.koeffizient_bauland : null, Math.round(Math.pow(2, j.alle.b) * 10000) / 10000, 0.0001);
+  const ueber = [1206, 1500, 1800].map(n);
+  pruefe('B', 'B14c', '2,01-, 2,5-, 3,0-fach: keine Näherung, Grund ausserhalb_bereich, Text „nicht an die Grundstücksgröße angepasst"',
+    ueber.every((x) => !x.verfuegbar && x.grund === 'ausserhalb_bereich' && /nicht an die Grundstücksgröße angepasst/.test(x.hinweis)),
+    ueber.map((x) => x.grund).join(' '));
+  const unter = n(300);
+  pruefe('B', 'B14d', '0,5-fach: Formel rechnet weiter', unter.verfuegbar && unter.koeffizient_bauland > 1);
+});
+
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */
 const auszug = (cc) => {
   const e = (cc && cc.ertragswert) || {}, s = (cc && cc.sachwert) || {};

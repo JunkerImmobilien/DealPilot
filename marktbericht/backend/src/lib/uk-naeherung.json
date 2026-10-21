@@ -16,10 +16,25 @@
     ],
     "max_vollgeschosse": 2,
     "verhaeltnis_von": 0.5,
-    "verhaeltnis_bis": 3
+    "verhaeltnis_bis": 2
   },
   "mindest_tabellen": 8,
-  "oberhalb": {
+  "grenze": {
+    "verhaeltnis_bis": 2,
+    "begruendung": "Marcels Entscheidung 21.10.2026 (E5): oberhalb des 2,0-Fachen der Bezugsgroesse keine Naeherung, dort Variante A (volle Flaeche, markiert). Grundlage war die Messung \"beim 2,5-Fachen schlechter als keine Anpassung\" (Median 14,2 gegen 11,7 %). Die Vollmessung hier (alle Tabellen, exakte Stuetzstelle 2,5) zeigt das Gegenteil - siehe gemessen_2_5; die Ausgangsmessung erfasste nur Tabellen, deren Normgroesse x 2,5 ganzzahlig ist. Zur Neuentscheidung vorgelegt.",
+    "gemessen_2_5": {
+      "tabellen": 86,
+      "formel_median_pct": 12.514,
+      "ohne_anpassung_median_pct": 20.157,
+      "formel_p80_pct": 17.763,
+      "ohne_anpassung_p80_pct": 42.857,
+      "formel_lolo_median_pct": 13.911,
+      "formel_lolo_p80_pct": 17.763,
+      "methode": "Leave-one-Tabelle-out (formel_*) und Leave-one-Land-out (formel_lolo_*); Tabellen ohne Flaechenabhaengigkeit mit UK = 1"
+    }
+  },
+  "oberhalb_gemessen": {
+    "verdrahtet": false,
     "ab": 2.5,
     "bis": 3,
     "rest_faktor": 0.531,
@@ -37,11 +52,11 @@
   },
   "alle": {
     "b": -0.213,
-    "b_q1": -0.258,
-    "b_q3": -0.133,
-    "b_p10": -0.37,
-    "b_p90": -0.071,
-    "tabellen": 169,
+    "b_q1": -0.243,
+    "b_q3": -0.131,
+    "b_p10": -0.34,
+    "b_p90": -0.072,
+    "tabellen": 168,
     "laender": [
       "BB",
       "BW",
@@ -57,31 +72,31 @@
       "SN",
       "ST"
     ],
-    "abweichung_median_pct": 1.454,
-    "abweichung_p90_pct": 10.423,
+    "abweichung_median_pct": 1.262,
+    "abweichung_p90_pct": 8.297,
     "pruefung": {
       "loto": {
-        "median_pct": 1.943,
-        "p80_pct": 7.561,
-        "p95_pct": 17.337,
-        "punkte": 1465
+        "median_pct": 1.659,
+        "p80_pct": 6.332,
+        "p95_pct": 13.752,
+        "punkte": 1376
       },
       "lolo": {
-        "median_pct": 2.002,
-        "p80_pct": 8.235,
-        "p95_pct": 16.088,
-        "punkte": 1465
+        "median_pct": 1.705,
+        "p80_pct": 6.83,
+        "p95_pct": 13.752,
+        "punkte": 1376
       },
-      "spanne_b_deckung_pct": 74.1,
+      "spanne_b_deckung_pct": 75.9,
       "methode": "Leave-one-Tabelle-out (b = Median der uebrigen Tabellen) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Tabellen"
     }
   },
   "stadt": {
-    "b": -0.241,
+    "b": -0.237,
     "b_q1": -0.271,
     "b_q3": -0.205,
-    "b_p10": -0.314,
-    "b_p90": -0.116,
+    "b_p10": -0.283,
+    "b_p90": -0.113,
     "tabellen": 53,
     "laender": [
       "BW",
@@ -93,32 +108,32 @@
       "RP",
       "SN"
     ],
-    "abweichung_median_pct": 1.677,
-    "abweichung_p90_pct": 6.22,
+    "abweichung_median_pct": 1.58,
+    "abweichung_p90_pct": 5.38,
     "pruefung": {
       "loto": {
-        "median_pct": 1.877,
-        "p80_pct": 4.69,
-        "p95_pct": 16.529,
-        "punkte": 441
+        "median_pct": 1.72,
+        "p80_pct": 4.108,
+        "p95_pct": 15.098,
+        "punkte": 408
       },
       "lolo": {
-        "median_pct": 1.968,
-        "p80_pct": 4.596,
-        "p95_pct": 16.529,
-        "punkte": 441
+        "median_pct": 1.836,
+        "p80_pct": 4.371,
+        "p95_pct": 15.091,
+        "punkte": 408
       },
-      "spanne_b_deckung_pct": 79.1,
+      "spanne_b_deckung_pct": 58.8,
       "methode": "Leave-one-Tabelle-out (b = Median der uebrigen Tabellen) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Tabellen"
     }
   },
   "land": {
     "b": -0.213,
-    "b_q1": -0.226,
-    "b_q3": -0.107,
-    "b_p10": -0.38,
-    "b_p90": -0.071,
-    "tabellen": 116,
+    "b_q1": -0.224,
+    "b_q3": -0.1,
+    "b_p10": -0.353,
+    "b_p90": -0.072,
+    "tabellen": 115,
     "laender": [
       "BB",
       "BW",
@@ -130,22 +145,22 @@
       "SN",
       "ST"
     ],
-    "abweichung_median_pct": 1.223,
-    "abweichung_p90_pct": 10.447,
+    "abweichung_median_pct": 1.017,
+    "abweichung_p90_pct": 9.212,
     "pruefung": {
       "loto": {
-        "median_pct": 1.705,
-        "p80_pct": 8.29,
-        "p95_pct": 17.337,
-        "punkte": 1024
+        "median_pct": 1.372,
+        "p80_pct": 7.551,
+        "p95_pct": 13.752,
+        "punkte": 968
       },
       "lolo": {
-        "median_pct": 1.705,
-        "p80_pct": 8.29,
-        "p95_pct": 17.019,
-        "punkte": 1024
+        "median_pct": 1.372,
+        "p80_pct": 7.388,
+        "p95_pct": 13.752,
+        "punkte": 968
       },
-      "spanne_b_deckung_pct": 70.6,
+      "spanne_b_deckung_pct": 72.5,
       "methode": "Leave-one-Tabelle-out (b = Median der uebrigen Tabellen) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Tabellen"
     }
   }

@@ -21,6 +21,18 @@
 //     prueft der Aufrufer (WertParameterService), weil nur er das Register
 //     fuer diese AGS gefragt hat.
 //
+// ZWEITER WEG IN STUFE N (v2611, E6, Marcel 21.10.2026): das DealPilot-LANDESMITTEL
+//   - lzsLandesmittel(): Median der amtlichen Zinssaetze je Land x Objektart, nur
+//     mit >= 8 Ausschuessen dahinter und nur, wo es per Leave-one-Ausschuss-out
+//     genauer ist als § 256 und (wo die Formel rechnet) als die Formel
+//     (lzs-naeherung.json landesmittel.zellen). Nur Liegenschaftszins - fuer SWF
+//     und UK gilt „nie ein Landesmittel" unveraendert. Sonst wie die Formel: nie
+//     bei Registersatz/Sperre/Rueckfrage, Wohnen, RND 5-80. Der Aufrufer versucht
+//     es VOR der Formel; ist es nicht verdrahtet, rechnet die Formel.
+//
+// SPANNE (E4): jede Rueckgabe traegt pct_von, pct_bis (Wert ± P80 der
+// Kreuzvalidierung) und spanne_deckung (gemessene Deckung in %).
+//
 // Kein Kern im Sinne von CLAUDE.md (liest keine Einstellungen, rechnet nur
 // aus Parametern und der JSON).
 import { readFileSync } from 'node:fs';
@@ -137,14 +149,19 @@ export function lzsNaeherung({ ags, objektart, objart = null, anzahlWe = null, r
   const hb = Number(((d.pruefung && d.pruefung.spanne_p80_pp) || {})[F]);
   const pctVon = Number.isFinite(hb) ? Math.max(0, Math.round((pct - hb) * 100) / 100) : null;
   const pctBis = Number.isFinite(hb) ? Math.round((pct + hb) * 100) / 100 : null;
+  /* v2610 · E4: gemessene Deckung der Spanne je Objektart mit dazu */
+  const _dj = (((d.pruefung || {}).spanne_deckung || {}).je_objektart || {})[F] || {};
+  const spanneDeckung = Number.isFinite(Number(_dj.deckung_pct)) ? Number(_dj.deckung_pct) : null;
   return {
-    verfuegbar: true, pct, pct_von: pctVon, pct_bis: pctBis, familie: F, rnd: r, rnd_quelle: rndQuelle, stadt, land,
+    verfuegbar: true, weg: 'formel', pct, pct_von: pctVon, pct_bis: pctBis, spanne_deckung: spanneDeckung,
+    familie: F, rnd: r, rnd_quelle: rndQuelle, stadt, land,
     formel: {
       stand: d.stand || null, saetze, ausschuesse: (d.daten || {}).ausschuesse || null,
       laender: (d.daten || {}).laender || [], koeffizienten: k,
       abweichung_median_pp: abwMed, abweichung_p80_pp: abwP80,
       abweichung_p90_pp: Number.isFinite(Number(ein.p90_pp)) ? Number(ein.p90_pp) : Number(lolo.p90_pp),
       spanne_p80_pp: Number.isFinite(hb) ? hb : null,
+      pct_von: pctVon, pct_bis: pctBis, spanne_deckung: spanneDeckung,
       land_median_pp: jl.formel_median_pp ?? null, land_bewg256_median_pp: jl.bewg256_median_pp ?? null,
     },
     hinweis: 'Liegenschaftszinssatz abgeleitet aus der DealPilot-Formel (Stufe N) — aus ' + (saetze || '?')
@@ -160,6 +177,65 @@ export function lzsNaeherung({ ags, objektart, objart = null, anzahlWe = null, r
       + (rndQuelle === 'ersatz' ? ', mittlere RND der Objektart' : '') + ')'
       + (stadt ? ' ' + (Number(k.stadt) < 0 ? '− ' + de(-k.stadt, 3) : '+ ' + de(k.stadt, 3)) + ' (Stadt)' : '')
       + ' = ' + de(pct) + ' %. '
+      + 'Genauer: den Liegenschaftszinssatz des zuständigen Gutachterausschusses eintragen.',
+  };
+}
+
+const LANDNAME = { SH: 'Schleswig-Holstein', HH: 'Hamburg', NI: 'Niedersachsen', HB: 'Bremen', NW: 'Nordrhein-Westfalen',
+  HE: 'Hessen', RP: 'Rheinland-Pfalz', BW: 'Baden-Württemberg', BY: 'Bayern', SL: 'Saarland', BE: 'Berlin',
+  BB: 'Brandenburg', MV: 'Mecklenburg-Vorpommern', SN: 'Sachsen', ST: 'Sachsen-Anhalt', TH: 'Thüringen' };
+const FAMNAME = { EZFH: 'Ein- und Zweifamilienhäuser', ETW: 'Wohnungseigentum', MFH: 'Mehrfamilienhäuser', WGH: 'Wohn- und Geschäftshäuser' };
+
+/**
+ * v2611 · E6 · Das DealPilot-Landesmittel (zweiter Weg in Stufe N).
+ * Median der amtlichen Zinssaetze desselben Landes und derselben Objektart,
+ * nur wo es gemessen genauer ist (lzs-naeherung.json landesmittel.zellen[L|F].verdrahtet).
+ * Registersatz/Sperre/Rueckfrage prueft der Aufrufer - wie bei der Formel.
+ * @returns {{verfuegbar:true, weg:'landesmittel', pct, pct_von, pct_bis, spanne_deckung, familie, land, landesmittel, hinweis}
+ *          |{verfuegbar:false, grund}}
+ */
+export function lzsLandesmittel({ ags, objektart, objart = null, anzahlWe = null, rnd = null }) {
+  const nein = (grund) => ({ verfuegbar: false, grund });
+  const d = lzsNaeherungsDaten();
+  const zellen = d && d.landesmittel && d.landesmittel.zellen;
+  if (!zellen) return nein('kein_landesmittel');
+  const land = landAusAgs(ags);
+  if (!land) return nein('kein_land');
+  const F = lzsFamilie(objektart, objart, anzahlWe);
+  if (!F) return nein('keine_wohnnutzung');
+  /* wie die Formel: nur im Bereich RND 5-80 (ohne RND gilt es - der Median haengt nicht an ihr) */
+  const g = d.gilt_fuer || {};
+  const r = (rnd == null || rnd === '') ? null : Number(rnd);
+  if (r != null && Number.isFinite(r) && (r < Number(g.rnd_von || 5) || r > Number(g.rnd_bis || 80))) return nein('rnd_ausserhalb');
+  const z = zellen[land + '|' + F];
+  if (!z) return nein('keine_zelle');
+  if (!z.verdrahtet) return nein(z.grund || 'nicht_verdrahtet');
+  const pct = Number(z.median_pct);
+  if (!(pct > 0)) return nein('nicht_positiv');
+  const hb = Number(z.spanne_p80_pp);
+  const pctVon = Number.isFinite(hb) ? Math.max(0, Math.round((pct - hb) * 100) / 100) : null;
+  const pctBis = Number.isFinite(hb) ? Math.round((pct + hb) * 100) / 100 : null;
+  const k = (x) => (Math.round(Number(x) * 10) / 10).toFixed(1).replace('.', ',');
+  const fl = z.fehler_loao || {};
+  const jg = z.jahrgang_von && z.jahrgang_bis ? (z.jahrgang_von === z.jahrgang_bis ? String(z.jahrgang_von) : z.jahrgang_von + '–' + z.jahrgang_bis) : null;
+  const landName = LANDNAME[land] || land;
+  return {
+    verfuegbar: true, weg: 'landesmittel', pct, pct_von: pctVon, pct_bis: pctBis,
+    spanne_deckung: Number.isFinite(Number(z.spanne_deckung_pct)) ? Number(z.spanne_deckung_pct) : null,
+    familie: F, land, rnd: r, rnd_quelle: r == null ? null : 'objekt', stadt: lzsStadt(ags),
+    landesmittel: { land, land_name: landName, familie: F, familie_name: FAMNAME[F], saetze: z.saetze, ausschuesse: z.ausschuesse,
+      jahrgang_von: z.jahrgang_von, jahrgang_bis: z.jahrgang_bis, median_pct: pct,
+      abweichung_median_pp: fl.landesmittel_median_pp ?? null, abweichung_p80_pp: fl.landesmittel_p80_pp ?? null,
+      formel_median_pp: fl.formel_median_pp ?? null, bewg256_median_pp: fl.bewg256_median_pp ?? null,
+      spanne_p80_pp: Number.isFinite(hb) ? hb : null, stand: d.stand || null },
+    hinweis: 'Liegenschaftszinssatz als DealPilot-Landesmittel aus ' + z.saetze + ' amtlichen Zinssätzen (Stufe N) — '
+      + landName + ', ' + FAMNAME[F] + ', ' + z.ausschuesse + ' Gutachterausschüsse' + (jg ? ', Jahrgänge ' + jg : '')
+      + ': der mittlere Wert (Median) dieser Sätze, ' + String(pct).replace('.', ',') + ' %. '
+      + (Number.isFinite(Number(fl.landesmittel_median_pp))
+        ? 'Nachgeprüft an amtlichen Werten, jeweils ohne den eigenen Ausschuss, liegt er in der Hälfte der Fälle höchstens '
+          + k(fl.landesmittel_median_pp) + ' Prozentpunkte daneben'
+          + (Number.isFinite(hb) ? ', in 8 von 10 Fällen höchstens ' + k(hb) : '') + '; nicht amtlich und nicht für diesen Ort ermittelt. '
+        : 'Nicht amtlich und nicht für diesen Ort ermittelt. ')
       + 'Genauer: den Liegenschaftszinssatz des zuständigen Gutachterausschusses eintragen.',
   };
 }
