@@ -306,11 +306,20 @@ export function barwertfaktor(zinsPct, rndJahre) {
 /**
  * Abzinsungsfaktor fuer einen Einmalbetrag (vereinfachtes Ertragswertverfahren):
  * A = 1 / q^n
+ *
+ * v2580 · VIER Nachkommastellen, nicht zwei. Die amtlichen Beispiele fuehren
+ * den Abzinsungsfaktor vierstellig (EW-RL Anl. 3: 0,0805 / 0,1512 / 0,5327;
+ * VW-RL Anl. 5: 0,6768; ImmoWertA G.II.2.b: 0,5976). Mit round2 wurde aus
+ * 0,0805 eine 0,08 - am Beispiel 1 der EW-RL 20.000 statt 20.125 EUR
+ * abgezinster Bodenwert, bei langer RND bis 8 % daneben (0,0543 -> 0,05).
+ * Gemessen mit tools/wertermittlung-pruefen.mjs (Ebene A, 11 Faktoren).
+ * Die Funktion wurde bis hier nirgends gerufen; der Barwertfaktor bleibt
+ * zweistellig wie in allen Beispielen (14,15 / 13,06 / 6,46).
  */
 export function abzinsungsfaktor(zinsPct, rndJahre) {
   const p = Number(zinsPct), n = Number(rndJahre);
   if (!Number.isFinite(p) || !Number.isFinite(n) || n <= 0) return null;
-  return round2(1 / Math.pow(1 + p / 100, n));
+  return Math.round(1e4 / Math.pow(1 + p / 100, n)) / 1e4;
 }
 
 /**

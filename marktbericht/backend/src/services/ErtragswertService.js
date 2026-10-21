@@ -271,15 +271,29 @@ export const ErtragswertService = {
       wert: null, vollstaendig: false,
     };
 
-    /* FIX-OHNEBW: Fehlt der Bodenwert (typisch bei Eigentumswohnungen ohne
-     * Grundstuecksangabe), wird NICHT abgebrochen, sondern ohne Bodenwert-
-     * trennung gerechnet - so wie der Quercheck es bisher tat. Ein Abbruch
-     * haette den haeufigsten Objekttyp verloren. */
+    /* ═══ v2580 · OHNE BODENWERT KEIN ERTRAGSWERT ═══════════════════════
+       Hier stand FIX-OHNEBW: fehlte der Bodenwert, rechnete der Kern
+       „vereinfacht ohne Bodenwerttrennung" weiter - Reinertrag x Barwertfaktor,
+       sonst nichts. Das ist KEIN Verfahren der ImmoWertV:
+         § 28  vorlaeufiger Ertragswert = (RE - BW x LZ) x KF + BW
+         § 29  vorlaeufiger Ertragswert = RE x KF + BW x Abzinsungsfaktor
+       Beide setzen den Bodenwert an; ohne ihn fehlt der Summand des § 29 Nr. 2
+       (gesetze-im-internet.de/immowertv_2022/__29.html). Gemessen am Pruefer
+       tools/wertermittlung-pruefen.mjs: ETW 70 m2 ohne Grundstuecksangabe
+       53.000 EUR, ein MFH ohne Bodenwert 630.000 EUR - beide halb gerechnet.
+       Jetzt wie jede andere fehlende Pflichtangabe: kein Wert, mit Grund
+       (CLAUDE.md „Kein Verfahren rechnet halb"). Der Grund aus bodenwert()
+       (etwa der fehlende Miteigentumsanteil) wird mitgenannt. */
     const hatBw = !!(bodenwertErgebnis && bodenwertErgebnis.vollstaendig && bodenwertErgebnis.wert != null);
     const bw = hatBw ? bodenwertErgebnis.wert : 0;
     if (!hatBw) {
-      out.verfahren = 'vereinfachtes Ertragswertverfahren (ohne Bodenwerttrennung)';
-      out.warnungen.push('Ohne Bodenwert wurde ohne Bodenwerttrennung gerechnet. Grundstücksfläche und Bodenrichtwert ergänzen, dann rechnet das allgemeine Ertragswertverfahren.');
+      const _bwGrund = bodenwertErgebnis && Array.isArray(bodenwertErgebnis.hinweise) && bodenwertErgebnis.hinweise.length
+        ? ' ' + bodenwertErgebnis.hinweise[0] : '';
+      out.grund = 'kein_bodenwert';
+      out.warnungen.push('Ertragswert nicht ausgewiesen: es fehlt der Bodenwert. Das allgemeine (§ 28) wie das vereinfachte '
+        + 'Ertragswertverfahren (§ 29 ImmoWertV) setzen ihn an — ohne ihn wäre die Rechnung nur halb.' + _bwGrund
+        + (_bwGrund ? '' : ' Grundstücksfläche und Bodenrichtwert ergänzen (bei Wohnungseigentum auch den Miteigentumsanteil).'));
+      return out;
     }
 
     /* ── 1 · Rohertrag ──────────────────────────────────────────────────── */
@@ -703,9 +717,14 @@ export const ErtragswertService = {
 
     // Sensitivitaet: was macht ein halber Punkt? Das ist die ehrlichste Angabe
     // im ganzen Verfahren — sie zeigt, wie sehr alles an dieser einen Zahl haengt.
+    /* v2580 · DIESELBE Rechnung wie oben, nur mit Zins + 0,5: verzinst wird der
+       RENTIERLICHE Bodenwert (§ 41), und die sonstigen Ertraege laufen mit. Hier
+       stand `bw * (lzs + 0.5)` - mit Hinterland/Teilflaeche verzinste die
+       Sensitivitaet den vollen Bodenwert (EW-RL Anl. 3 Bsp. 3: 227.000 statt 265.000). */
     const V2 = barwertfaktor(lzs + 0.5, R);
     if (V2) {
-      const alt = round0(bw + (reinertrag - bw * (lzs + 0.5) / 100) * V2 + (bog || 0));
+      const _sonst2 = sonstige > 0 ? round0(sonstige * barwertfaktor(lzs + 0.5, Math.min(pos(ein.sonstige_dauer_jahre) || 15, R))) : 0;
+      const alt = round0(bw + (reinertrag - round0(_bwRent * (lzs + 0.5) / 100)) * V2 + _sonst2 + (bog || 0));
       out.sensitivitaet = {
         lzs_plus_05: { lzs_pct: round2(lzs + 0.5), wert: rundeSinnvoll(alt), abweichung_pct: round2(((alt - ertragswert) / ertragswert) * 100) },
       };
