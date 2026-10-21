@@ -1396,8 +1396,8 @@
     /* ── KI-Analyse, wenn vorhanden ──────────────────────────── */
     var ai = window._aiAnalysis || null, aiText = window._aiText || '';
     if (ai || aiText) {
-      platz(60, 'KI-Investment-Analyse', (adr || 'Objekt'));
-      abschnitt('KI-Investment-Analyse');
+      platz(60, 'Pilot-Analyse', (adr || 'Objekt'));
+      abschnitt('Pilot-Analyse');   /* v2555a: Produktname statt KI-Investment-Analyse */
       function liste(titel, arr) {
         if (!arr || !arr.length) return;
         zeile(titel, '', { fett: true });
