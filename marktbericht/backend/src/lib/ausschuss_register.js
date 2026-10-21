@@ -497,6 +497,12 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                (Teilmarkt 1: 4 Altbezirksgruppen x EFH/DHH/REH/RMH; Teilmarkt 2: Villen),
                                Stichtag 31.12.2025 - loesen 2025 ab; dazu 7 Sperren. dl-de/zero-2-0. */
                             'nachernte-2026-10-be.json',
+                            /* v2640 · Nachernte 21.10.2026 (Harvest-Takt, Teil MV): Ludwigslust-Parchim 2026
+                               5 Zinssaetze + 7 Rohertragsfaktoren (loesen 2025 ab; WGH/MFH>6 unveraendert
+                               aus 2025), SWF 2026 als Sperre (Baupreisindex ohne Zahl, Tabelle vorgemerkt);
+                               Hansestadt Rostock 2026, Landkreis Rostock 2026, Vorpommern-Greifswald 2024
+                               genehmigungspflichtig - nur Sperren mit Fundstelle und Weg. */
+                            'nachernte-2026-10-mv.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
