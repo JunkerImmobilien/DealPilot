@@ -41624,3 +41624,24 @@ Potenzial Demo: Bestand/MH/ZB 610.000/625.000/805.000 → 610.000/630.000/805.00
 - Ersteinrichtung nur per Code und Syntax geprüft, nicht im Browser durchgeklickt (schreibt Marcels Profil).
 - Im iframe gilt vh = dvh — den Safari-Fehler selbst erzeugt die Kabine nicht; Abnahme am echten iPad bleibt.
 - Videothek: Modul 26/27 nicht eingetragen.
+
+### v2560–v2560f · Flughandbuch „Objekt anlegen (ETW · EFH · MFH)" mit Bildern, Suche, PDF und Hilfe-Eintrag (21.10.2026, Staging)
+
+**Was.**
+- **v2560** (`f5a55d8f`): `tools/handbuch-erzeugen.mjs` liest Felder, Beschriftung, Einheit, Auswahlwerte, Platzhalter und Hinweise aus `index.html` (eigener kleiner HTML-Baum, kein Parser im Repo), Erklärtexte aus `tooltip-content.js` (über `data-tip-id`), die Reiter-Einleitung aus `help.js` („Die Reiter im Objekt"), `pflichtFuer()` aus `objekt-reiter.js` (die echte Funktion per vm), Readycheck-Ziele, DS2-Liste und die Wohnungsliste aus `mfh-einheiten.js`. „Wirkung" nur, wo belegt: Modul liest die Feld-Id (calc.js, `_buildAIPayload`, pdf.js, Bank-, Finanzierungs-, Werbungskosten-PDF, BMF-Anlage, Kaufpreisaufteilung). Einzige Handtabelle: `WOHER_REGELN` (gewinnt nie gegen einen Hilfetext, der die Herkunft nennt). Schreibt `frontend/handbuch/handbuch-daten.js`; `--pruefen` meldet RC 1 bei geänderten Quellen.
+- **v2560a/d** (`b1a43485`, `5dc42fe2`): `frontend/handbuch/aufnahme.js` (nur von Hand in einen eigenen Tab geladen) mit Speichersperre: jeder Nicht-GET verworfen (Ausnahme lesende Zinsauskunft `/marktbericht/wertparameter/`), `saveObj`/`dpTabSwitchSave` Attrappen, localStorage in Schattenkopie. 57 Bilder (18 ETW, 18 EFH, 18 MFH + 3 Wohnungsliste) mit eingekreisten, nummerierten Feldern; `tools/handbuch-bilder.mjs` schneidet zu, schreibt WebP und `bilder/aufnahme.json` (gemessene Sichtbarkeit je Objektart).
+- **v2560b/e/f** (`37232b58`, `ff436e0d`, `0ac986e3`): `frontend/handbuch.html` — Obsidian/Creme, Gold nur über `--wl-*`, Inhaltsverzeichnis links (Handy: Schublade), Suche über alle Felder, aufklappbare Felder (Was eintragen · Beispiel · Woher · Was es bewirkt), Bild-Zoom, PDF je Kapitel und komplett im Stil des Bank-PDF (Logo über `DealPilotPdfLogo`, Goldlinie, Versalien-Abschnitte, „Seite x von n").
+- **v2560c** (`83495afd`): Hilfe, Thema „Die Reiter im Objekt": Kopfband „Handbuch: Objekt anlegen (ETW · EFH · MFH)" mit Knopf, dazu ein Abschnitt für die Suche. `help.js`-Buster v2548 → v2560c, Konstanten neu.
+
+**Nachweis.**
+- Staging `handbuch.html`: 3 Kapitel, 659 Feldeinträge, 57 Bilder geladen, keine Konsolenfehler; 390-px-iframe: kein Querüberlauf (scrollWidth 371 bei 387).
+- PDF (jsPDF-`save` abgefangen, kein Download): komplett 98 Seiten / 5,5 MB, ETW 32, MFH 34 Seiten; mit pdf.js gerendert, Seiten 1/4/12 lesbar, Text „Miteigentumsanteil", „WOHNUNGSLISTE", Umlaute vorhanden.
+- Hilfe-Knopf per echtem Klick: öffnet `handbuch.html` im neuen Tab.
+- Speichersperre: blockiert wurden nur `PUT /api/v1/portfolio-spiegel` und Attrappen-Aufrufe; kein Objekt geladen (`_currentObjKey` leer).
+
+**Rest.**
+- Befund App: `d1z` (Zinssatz) trägt den Hilfetext `tab5.zinsbindung` — der Erzeuger lässt ihn weg (`auffaellig`).
+- Befund App: `pflichtFuer(2)` verlangt `zimmer` auch beim MFH, `objektart-felder.js` blendet es dort aus — im Steckbrief als „(bei MFH ausgeblendet)" markiert, nicht behoben.
+- Die Bilder zeigen App-Beschriftungen wie „BORIS-Portal" — das ist die App selbst, nicht der Handbuchtext.
+- Aufnahme ist Desktop (2133 × 987); 51 Felder je Kapitel erscheinen erst nach einer Auswahl (Darlehen II, Bausparvertrag, Erbbaurecht …) und stehen ohne Bild unter „weitere Felder".
+- Eigener Fehler: ein `var st` auf oberster Ebene im Messcode überschrieb `st()` aus calc.js (Gesamtinvestition 0) — erste Bilderserie verworfen, neu aufgenommen; Warnung steht im Kopf von `aufnahme.js`.
