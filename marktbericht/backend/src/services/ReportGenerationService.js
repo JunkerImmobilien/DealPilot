@@ -6,6 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { cfg, aiEnabled } from '../lib/config.js';
 import { httpJson } from '../lib/http.js';
+import { textFakten, faktenAnweisung, pruefeUndRepariere } from '../lib/ki_text_pruefung.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SYSTEM_PROMPT = fs.readFileSync(path.join(__dirname, 'report_prompt.txt'), 'utf8');
@@ -153,8 +154,8 @@ export const ReportGenerationService = {
   async generate(payload, opts = {}) {
     if (aiEnabled()) {
       try {
-        const text = await callOpenAI(payload, opts);
-        return { mode: 'openai', report_md: text };
+        const r = await callOpenAI(payload, opts);
+        return { mode: 'openai', report_md: r.text, ki_text_pruefung: r.ki_text_pruefung };
       } catch (e) {
         // Fallback auf Stub bei API-Fehler, Bericht crasht nicht
         return { mode: 'stub_fallback', report_md: stubReport(payload),
@@ -202,8 +203,10 @@ export function kapitelD(p) {
                    berichte_im_verlauf: Array.isArray(p.market_history) ? p.market_history.length : null },
     ableitung: { marktwert: Number.isFinite(est) ? est : null, spanne: [mv.low ?? null, mv.high ?? null],
                  median_qm: mv.basis_median_sqm ?? null, abweichung_kaufpreis_pct: mv.discount_to_market_pct ?? null,
-                 ertragswert: ew ? (ew.wert ?? ew.ertragswert_eur ?? null) : null, liegenschaftszins_pct: ew ? ew.liegenschaftszins_pct ?? null : null,
-                 sachwert: sw ? (sw.wert ?? sw.sachwert_eur ?? null) : null },
+                 /* v2670: das Feld heisst value_eur - mit .wert kam null an, und der Text schrieb
+                    „Ertragswert in dieser Berichtsstufe nicht enthalten" (Bericht 330). */
+                 ertragswert: ew ? (ew.value_eur ?? ew.wert ?? ew.ertragswert_eur ?? null) : null, liegenschaftszins_pct: ew ? ew.liegenschaftszins_pct ?? null : null,
+                 sachwert: sw ? (sw.value_eur ?? sw.wert ?? sw.sachwert_eur ?? null) : null },
     prognose: prog,
   };
 }
@@ -254,6 +257,10 @@ async function callOpenAI(payload, opts = {}) {
   console.log(`[openai] split-call model=${cfg.ai.model} groups=${CHAPTER_GROUPS.length}`);
   onStep(`report: ${CHAPTER_GROUPS.length} Kapitelgruppen werden parallel geschrieben…`);
   const tStart = Date.now();
+  /* v2670 · Pruefzahlen einmal je Bericht: jedes Verhaeltnis in beiden Richtungen, jede Zaehlung. */
+  const _F = textFakten(payload);
+  const _pruefAnw = faktenAnweisung(_F);
+  const _pruefProt = [];
 
   /* ═══ v1329 · Prompt-Caching: ein kurzer Versatz statt Gleichstart ═══
      Der grosse, GEMEINSAME Teil (userJson) steht schon vorn und der
@@ -376,6 +383,7 @@ async function callOpenAI(payload, opts = {}) {
          als fertige Saetze - der Text nennt sie, ohne eine Zahl zu erfinden. */
       if (payload.cross_check && !payload.cross_check.nicht_im_umfang) wertermittlungFakten(payload.cross_check).forEach((x) => _fest.push(x));
       if (_fest.length) extra += '\n\nFESTE AUSSAGEN (verbindlich, Zahlen und Richtung exakt so): ' + _fest.join(' ');
+      extra += _pruefAnw;
     }
     if (g.id === 'g4') {
       const D = kapitelD(payload);
@@ -416,11 +424,23 @@ async function callOpenAI(payload, opts = {}) {
     const raw = await callOneGroup(userMsg);
     /* v960-chapterguard: die Gruppe liefert, was sie liefert — der Code
      * entscheidet, was davon uebernommen wird. Fremde Kapitel fliegen raus. */
-    const md = keepOnlyChapters(raw, g.kapitel);
-    if (md !== raw) {
+    const md0 = keepOnlyChapters(raw, g.kapitel);
+    if (md0 !== raw) {
       console.warn(`[openai] Gruppe ${g.id} lieferte fremde Kapitel mit `
-        + `(${raw.length} -> ${md.length} Zeichen) — verworfen.`);
+        + `(${raw.length} -> ${md0.length} Zeichen) — verworfen.`);
     }
+    /* v2670 · deterministische Nachpruefung: Prozent mit Richtung, Zaehlungen, Umfang.
+       Bei Befund EINMAL neu schreiben lassen; was danach falsch bleibt, wird entfernt. */
+    const { md, prot } = await pruefeUndRepariere(md0, _F,
+      async (hinweis) => keepOnlyChapters(await callOneGroup(userMsg + hinweis), g.kapitel));
+    if (prot.befunde_erst.length) {
+      console.warn(`[ki-pruefung] Gruppe ${g.id}: ${prot.befunde_erst.length} Befund(e) `
+        + prot.befunde_erst.map((x) => x.art + ' "' + x.ist + '" soll ' + x.soll).join('; ')
+        + ` | neu erzeugt: ${prot.neu_erzeugt} | danach: ${prot.befunde_danach.length} | entfernt: ${prot.entfernt.length}`);
+      onStep('report: "' + g.titel + '" Zahlenpruefung - ' + prot.befunde_erst.length + ' Befund(e) korrigiert');
+    }
+    _pruefProt.push({ gruppe: g.id, befunde: prot.befunde_erst.map((x) => ({ art: x.art, ist: x.ist, soll: x.soll, satz: x.satz })),
+      neu_erzeugt: prot.neu_erzeugt, befunde_danach: prot.befunde_danach.length, entfernt: prot.entfernt });
     onStep(`report: "${g.titel}" fertig`);
     return { id: g.id, md };
   }));
@@ -440,7 +460,7 @@ async function callOpenAI(payload, opts = {}) {
 
   console.log(`[openai] ${Object.keys(okById).length}/${CHAPTER_GROUPS.length} Gruppen ok nach ${Date.now() - tStart}ms`);
   if (!merged) throw new Error('Leere OpenAI-Antwort (alle Gruppen)');
-  return merged;
+  return { text: merged, ki_text_pruefung: { version: 'v2670', basis: _F.werte, zaehl: _F.zaehl, gruppen: _pruefProt } };
 }
 
 async function callOneGroup(userMsg) {

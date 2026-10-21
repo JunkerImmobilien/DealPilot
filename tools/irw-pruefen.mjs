@@ -133,6 +133,59 @@ vw({ objektart: 'mfh', irw_vergleichswert: true }, { fuehrend: 'ertragswert', zw
 vw({ objektart: 'mfh', irw_vergleichswert: false }, { fuehrend: 'ertragswert', zweites: '' });
 vw({ objektart: 'wohnung', wohneinheiten: 2, irw_vergleichswert: true, sachwertfaktor: true }, { fuehrend: 'sachwert', zweites: 'vergleichswert' });
 
+/* ── v2670 · Garage im Normobjekt (Marcel 21.10.2026): Abzug nur in der Hoehe des Ausschusses ── */
+let garFaelle = 0;
+{
+  const mitGarage = alle.filter((s) => s.formel && s.formel.stellplaetze_im_irw === true);
+  for (const s of alle) {
+    const g = s.formel && s.formel.garage_normobjekt;
+    const wo = `${s._datei} ${s.gebiet_name || s.ags} ${s.zweig}`;
+    if (!g) continue;
+    if (s.formel.stellplaetze_im_irw !== true) fehler(wo + ': garage_normobjekt ohne stellplaetze_im_irw=true');
+    if (!g.seite) fehler(wo + ': garage_normobjekt.seite fehlt');
+    if (!g.wortlaut) fehler(wo + ': garage_normobjekt.wortlaut fehlt');
+    const e = g.zeitwert_eur, v = g.zeitwert_eur_von, b = g.zeitwert_eur_bis;
+    for (const x of [e, v, b]) if (x != null && !(typeof x === 'number' && x > 0)) fehler(wo + ': garage_normobjekt Betrag keine positive Zahl');
+    if (e != null && (v != null || b != null)) fehler(wo + ': garage_normobjekt Einzelbetrag UND Spanne');
+    if ((v == null) !== (b == null) || (v != null && v > b)) fehler(wo + ': garage_normobjekt Spanne unvollständig oder verkehrt');
+    if (e == null && v == null && !g.warum_kein_betrag) fehler(wo + ': garage_normobjekt ohne Betrag braucht warum_kein_betrag');
+  }
+  console.log(`  Garage im Normobjekt: ${mitGarage.length} von ${alle.length} Wert-Sätzen — `
+    + mitGarage.map((s) => { const g = s.formel.garage_normobjekt; return `${s.gebiet_name || s.gasl} ${s.zweig}: `
+      + (!g ? 'NICHT GEERNTET' : (g.zeitwert_eur != null ? g.zeitwert_eur + ' €' : (g.zeitwert_eur_von != null ? g.zeitwert_eur_von + '–' + g.zeitwert_eur_bis + ' €' : 'kein Betrag')) + ' (' + (g && g.seite) + ')'); }).join(' · '));
+  mitGarage.filter((s) => !s.formel.garage_normobjekt).forEach((s) => fehler(`${s._datei} ${s.gebiet_name} ${s.zweig}: Normobjekt mit Garage, garage_normobjekt fehlt (Betrag oder warum_kein_betrag)`));
+  /* Kernlauf am Anwendungsbeispiel Herford (S. 4) mit und ohne Garage */
+  const h = alle.find((s) => s.gasl === '31000' && s.zweig === 'efh_zfh');
+  if (h && h.anwendungsbeispiel) {
+    const irw = { verfuegbar: true, wert_qm: h.anwendungsbeispiel.irw, gasl: '31000', teilmarkt_code: 2, stichtag: '01.01.2026', roh: {} };
+    const ob = { ...h.anwendungsbeispiel.objekt, wohnflaeche: h.anwendungsbeispiel.wohnflaeche };
+    const mit = V.vergleichswertIrw({ irw, objekt: { ...ob, garage: true } });
+    const ohne = V.vergleichswertIrw({ irw, objekt: { ...ob, garage: false } });
+    const unb = V.vergleichswertIrw({ irw, objekt: { ...ob } });
+    garFaelle += 3;
+    if (!mit.verfuegbar || !ohne.verfuegbar) fehler('Herford-Beispiel rechnet nicht: ' + (mit.hinweis || ohne.hinweis));
+    else {
+      if (mit.vergleichswert_eur !== mit.vorlaeufig_eur || mit.garage_normobjekt.fall !== 'wie_norm') fehler('Herford mit Garage: kein Abzug erwartet');
+      // v2671: Mitte der Zeitwertspanne (vorher Untergrenze 5.000)
+      if (ohne.vergleichswert_eur !== ohne.vorlaeufig_eur - 10000 || ohne.garage_normobjekt.fall !== 'abzug') fehler(`Herford ohne Garage: ${ohne.vergleichswert_eur} statt ${ohne.vorlaeufig_eur - 10000}`);
+      if (!ohne.rechenweg.some((z) => /Garage des Normobjekts/.test(z.pos) && z.wert === -10000 && /Mitte.*5\.000 €.*15\.000 €.*S\. 3/.test(z.detail))) fehler('Herford ohne Garage: Rechenweg-Zeile mit Spanne und Seite fehlt');
+      if (unb.vergleichswert_eur !== unb.vorlaeufig_eur || unb.garage_normobjekt.fall !== 'angabe_fehlt') fehler('Herford Garage unbekannt: kein Abzug, Hinweis erwartet');
+      console.log(`  ok Herford EFH (S. 4): mit Garage ${mit.vergleichswert_eur} € · ohne ${ohne.vergleichswert_eur} € (−10.000, Mitte von 5.000–15.000 €, S. 3) · unbekannt ${unb.vergleichswert_eur} € mit Hinweis`);
+    }
+  }
+  const d = alle.find((s) => s.gasl === '10800' && s.zweig === 'efh_zfh');
+  if (d && d.anwendungsbeispiel) {
+    const ab = d.anwendungsbeispiel;
+    const irw = { verfuegbar: true, wert_qm: ab.irw, gasl: '10800', teilmarkt_code: 2, stichtag: '01.01.2026', roh: {} };
+    const r = V.vergleichswertIrw({ irw, objekt: { ...ab.objekt, wohnflaeche: ab.wohnflaeche, garage: false } });
+    garFaelle++;
+    if (!r.verfuegbar) console.log('  HINWEIS Duisburg-Beispiel rechnet nicht ohne Zonenmerkmale: ' + String(r.hinweis).slice(0, 120));
+    else if (r.vergleichswert_eur !== r.vorlaeufig_eur || r.garage_normobjekt.fall !== 'kein_betrag'
+      || !r.hinweise.some((x) => /keinen Betrag/.test(x))) fehler('Duisburg ohne Garage: kein Abzug, Hinweis „keinen Betrag" erwartet');
+    else console.log(`  ok Duisburg EFH ohne Garage: ${r.vergleichswert_eur} € unverändert, Hinweis (kein Betrag des Ausschusses)`);
+  }
+}
+
 /* ── optional: Deckung gegen das Shape ── */
 /* Minimaler DBF-Leser für die Attribute des IRW-Shapes (UTF-8, siehe .cpg). */
 function liesDbf(pfad) {
@@ -199,7 +252,7 @@ if (LIVE) {
 }
 
 console.log(`DECKUNG: ${dateien.length} Datei(en), ${saetze} Sätze (${werte} Werte, ${sperren} Sperren), `
-  + `${beispiele} Anwendungsbeispiel(e) getroffen, ${ohneBeispiel} ohne Beispiel · Verfahrenswahl ${vwFaelle} Fälle`);
+  + `${beispiele} Anwendungsbeispiel(e) getroffen, ${ohneBeispiel} ohne Beispiel · Verfahrenswahl ${vwFaelle} Fälle · Garage ${garFaelle} Kernläufe`);
 if (!saetze) { rot++; console.log('  -> NULL Sätze gelesen — kein grünes Ergebnis'); }
 console.log('ERGEBNIS: ' + (rot ? rot + ' Fehler' : 'sauber'));
 process.exit(rot ? 1 : 0);

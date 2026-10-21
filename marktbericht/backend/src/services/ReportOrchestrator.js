@@ -1886,6 +1886,9 @@ export const ReportOrchestrator = {
       step(`report: start (mode=${cfg.ai.mode})`);
       report = await ReportGenerationService.generate(payload, { onStep: (opts && opts.onStep) });
       step(`report: fertig mode=${report.mode}${report.error ? ' ERR=' + report.error : ''}`);
+      /* v2670 · Protokoll der Zahlenpruefung des KI-Texts mit dem Bericht ablegen:
+         welche Saetze falsch waren, ob neu erzeugt, was entfernt wurde. */
+      if (report.ki_text_pruefung) payload.ki_text_pruefung = report.ki_text_pruefung;
     }
 
     // 10) Persistieren

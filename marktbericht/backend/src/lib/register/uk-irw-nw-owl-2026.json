@@ -34,6 +34,7 @@
       "irw_lageangepasst": true,
       "stellplaetze_im_irw": true,
       "stellplaetze_hinweis": "Das Normobjekt beinhaltet ein Nebengebäude (Garage oder Carport) mit einem Zeitwert von 5.000 bis 15.000 €; ein gesonderter Ansatz entfällt, eine Abweichung ist ein besonderes Merkmal.",
+      "garage_normobjekt": {"enthalten":true,"art":"Garage oder Carport","zeitwert_eur":null,"zeitwert_eur_von":5000,"zeitwert_eur_bis":15000,"abhaengig":"je nach Größe, Alter und Ausstattung","seite":"S. 3","wortlaut":"Das Normobjekt beinhaltet ein Nebengebäude (Garage oder Carport) mit einer Zeitwertspanne zwischen 5.000 € und 15.000 €, je nach Größe, Alter und Ausstattung.","geerntet":"2026-10-21 (v2670), aus LGDIR_2_0531000_2026.pdf Seite 3 nachgelesen"},
       "normobjekt": {
         "kommune": "Herford",
         "bodenrichtwert": "101-120 €/m²",

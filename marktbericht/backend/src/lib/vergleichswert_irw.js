@@ -403,6 +403,35 @@ export function vergleichswertIrw({ irw, objekt = {}, bog = [], saetze = null, e
   rechenweg.push({ pos: '× Wohnfläche', detail: `${de(wfl, 2)} m²`, wert: Math.round(vorl), einheit: '€' });
 
   const bogListe = (Array.isArray(bog) ? bog : []).filter((b) => b && Number.isFinite(Number(b.eur)) && Number(b.eur) !== 0);
+  /* ══ v2670 · GARAGE IM NORMOBJEKT, OBJEKT OHNE (Marcel 21.10.2026) ══════════
+     Enthaelt das Normobjekt eine Garage/einen Stellplatz und das Objekt hat keine,
+     wird abgezogen - NUR in der Hoehe, die der Ausschuss selbst angibt
+     (formel.garage_normobjekt: zeitwert_eur, sonst die MITTE der Spanne
+     zeitwert_eur_von/_bis, mit Seite). v2671 · Marcel 21.10.2026 „was ein
+     Gutachter machen wuerde": das Normobjekt ist ein durchschnittliches Objekt,
+     seine Garage also eine durchschnittliche - ohne Angaben zu Alter/Zustand die
+     Mitte der Zeitwertspanne, nicht die Untergrenze (die den Wert systematisch
+     zu hoch ausweist). Ein Koeffizient des Ausschusses steht als Merkmal
+     in formel.merkmale und rechnet oben mit. Ohne Betrag bleibt es beim Hinweis. */
+  const gn = f.stellplaetze_im_irw === true ? (f.garage_normobjekt || null) : null;
+  let garage = null;
+  if (gn) {
+    const einzel = num(gn.zeitwert_eur), von = num(gn.zeitwert_eur_von), bis = num(gn.zeitwert_eur_bis);
+    const betrag = einzel != null ? einzel : (von != null && bis != null ? Math.round((von + bis) / 2) : von);
+    const spanne = einzel == null && von != null && bis != null;
+    const fund = `${satz.gaa_name || 'Gutachterausschuss'}, Örtliche Fachinformationen ${satz.jahrgang}, ${gn.seite || satz.seite || ''}`.trim();
+    if (objekt.garage === false && betrag > 0) {
+      const detail = spanne
+        ? `Mitte der Zeitwertspanne des Ausschusses (${eur(von)} bis ${eur(bis)}${gn.abhaengig ? ', ' + gn.abhaengig : ''}; ${fund})`
+        : `Zeitwert nach Angabe des Ausschusses (${fund})`;
+      bogListe.unshift({ pos: 'Garage des Normobjekts (Objekt ohne Garage)', eur: -betrag, detail, quelle: 'ausschuss' });
+      garage = { fall: 'abzug', eur: -betrag, spanne: spanne ? [von, bis] : null, fundstelle: fund };
+    } else if (objekt.garage === false) {
+      garage = { fall: 'kein_betrag', fundstelle: fund };
+    } else if (objekt.garage == null) {
+      garage = { fall: 'angabe_fehlt', eur: betrag > 0 ? -betrag : null, fundstelle: fund };
+    } else garage = { fall: 'wie_norm' };
+  }
   let summeBog = 0;
   for (const b of bogListe) { summeBog += Number(b.eur); rechenweg.push({ pos: (Number(b.eur) > 0 ? '+ ' : '− ') + (b.pos || 'besonderes Merkmal'), detail: b.detail || '§ 8 Abs. 3 ImmoWertV', wert: Math.round(Number(b.eur)), einheit: '€' }); }
   const vw = vorl + summeBog;
@@ -410,7 +439,19 @@ export function vergleichswertIrw({ irw, objekt = {}, bog = [], saetze = null, e
 
   const hinweise = [];
   if (f.stellplaetze_im_irw === false) hinweise.push('Stellplätze und Garagen sind im Immobilienrichtwert nicht enthalten; sie sind getrennt als besonderes objektspezifisches Merkmal anzusetzen.');
-  if (f.stellplaetze_im_irw === true) hinweise.push(f.stellplaetze_hinweis || 'Das Normobjekt enthält Garage oder Stellplatz; ein gesonderter Ansatz entfällt.');
+  if (f.stellplaetze_im_irw === true) {
+    if (garage && garage.fall === 'abzug') {
+      hinweise.push('Das Normobjekt enthält eine Garage, das Objekt hat keine: abgezogen sind ' + eur(-garage.eur)
+        + (garage.spanne ? ' — die Mitte der vom Ausschuss angegebenen Zeitwertspanne (' + eur(garage.spanne[0]) + ' bis ' + eur(garage.spanne[1]) + '); je nach Größe, Alter und Ausstattung der Garage liegt der Abzug zwischen ' + eur(garage.spanne[0]) + ' und ' + eur(garage.spanne[1]) : '')
+        + ' (' + garage.fundstelle + ').');
+    } else if (garage && garage.fall === 'kein_betrag') {
+      hinweise.push('Das Normobjekt enthält eine Garage oder einen Stellplatz, das Objekt hat keine. Der Ausschuss nennt dafür keinen Betrag; '
+        + 'der Unterschied ist mit dem Zeitwert sachverständig zu berücksichtigen und hier nicht angesetzt (' + garage.fundstelle + ').');
+    } else if (garage && garage.fall === 'angabe_fehlt') {
+      hinweise.push('Das Normobjekt enthält eine Garage oder einen Stellplatz; ob das Objekt eine hat, ist nicht angegeben (Garagen bzw. Stellplätze, Reiter Objekt). '
+        + (garage.eur ? 'Ohne Garage wären nach Angabe des Ausschusses ' + eur(-garage.eur) + ' abzuziehen.' : 'Ein gesonderter Ansatz ist nicht vorgenommen.'));
+    } else hinweise.push(f.stellplaetze_hinweis || 'Das Normobjekt enthält Garage oder Stellplatz; ein gesonderter Ansatz entfällt.');
+  }
   if (irw.aus_vorjahr) hinweise.push(irw.vorjahr_hinweis);
   if (f.hinweis_ausschuss) hinweise.push(f.hinweis_ausschuss);
 
@@ -433,6 +474,7 @@ export function vergleichswertIrw({ irw, objekt = {}, bog = [], saetze = null, e
     produkt: u.produkt,
     rechenweg,
     stellplaetze_im_irw: f.stellplaetze_im_irw ?? null,
+    garage_normobjekt: garage,   /* v2670: abzug | kein_betrag | angabe_fehlt | wie_norm | null */
     quelle,
     /* dl-de/zero-2-0 verlangt keine Namensnennung; genannt wird die Quelle
        trotzdem (ImmoWertA 9: Herkunft der Daten). */

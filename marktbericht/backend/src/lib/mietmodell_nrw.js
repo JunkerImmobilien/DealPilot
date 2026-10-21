@@ -124,7 +124,17 @@ export function baujahrAnpassung(gebaeudealter, klasse) {
  *
  * Ausserhalb der Spanne wird die amtliche Miete deshalb als NICHT FUEHREND
  * gekennzeichnet. Sie bleibt als Vergleich sichtbar; rechnen soll sie dort
- * nicht. */
+ * nicht.
+ *
+ * ══ v2670 · MARCEL 21.10.2026: DIE TABELLE GILT AUCH JENSEITS IHRER RAENDER ══
+ * „Nicht ueber die Tabelle hinaus fortrechnen, sondern die oberste
+ * Groessenklasse ansetzen und das im Bericht kennzeichnen." Die Rechnung war
+ * schon immer so (groesseFaktor klemmt an 0,82 bzw. 1,20) - geaendert ist die
+ * ROLLE: die amtliche Miete FUEHRT jetzt auch ueber 140 m² und unter 50 m²,
+ * statt dem Ø des Zinssatzes zu weichen. Fortgeschrieben wird weiterhin nicht.
+ * Das untere Ende fehlte genauso (unter 50 m² ebenfalls „nicht fuehrend") und
+ * folgt deshalb derselben Regel: unterste Klasse (50 m², Faktor 1,20).
+ * Der Bericht traegt den Satz in ausserhalb_hinweis und im Etikett des Ankers. */
 export const GROESSE_VON = 50;
 export const GROESSE_BIS = 140;
 
@@ -208,19 +218,26 @@ export function marktmiete({
   const miete = basis * fLage * fGr * fGe;
   const r2 = (x) => Math.round(x * 100) / 100;
 
-  /* Ausserhalb der veroeffentlichten Groessenspanne fuehrt die amtliche Miete
-   * nicht — sie wird nur ausgewiesen. */
-  const ausserhalb = wfl < GROESSE_VON || wfl > GROESSE_BIS;
+  /* v2670 · Ausserhalb der veroeffentlichten Groessenspanne gilt die Randklasse
+   * der Tabelle (oberste ueber 140 m², unterste unter 50 m²) - die amtliche
+   * Miete fuehrt weiter, der Bericht kennzeichnet es. */
+  const ueber = wfl > GROESSE_BIS, unter = wfl < GROESSE_VON;
+  const ausserhalb = ueber || unter;
+  const fRand = ueber ? GROESSE[GROESSE.length - 1][1] : GROESSE[0][1];
+  const kurz = ueber ? 'Wohnfläche über der Tabelle, oberste Größenklasse angesetzt'
+    : (unter ? 'Wohnfläche unter der Tabelle, unterste Größenklasse angesetzt' : null);
 
   return {
     verfuegbar: true,
-    fuehrend: !ausserhalb,
+    fuehrend: true,
     ausserhalb_tabelle: ausserhalb,
+    groessenklasse: ueber ? 'oberste' : (unter ? 'unterste' : null),
+    groessenklasse_kurz: kurz,
     ausserhalb_hinweis: ausserhalb
-      ? `Die Größentabelle des Gutachterausschusses reicht von ${GROESSE_VON} bis `
-        + `${GROESSE_BIS} m². Mit ${wfl} m² liegt das Objekt außerhalb; der Anpassungsfaktor `
-        + 'wurde nicht über den veröffentlichten Bereich hinaus fortgeschrieben. Die amtliche '
-        + 'Miete dient hier als Vergleich, nicht als Rechengrundlage.'
+      ? `${kurz}: Die Größentabelle des Gutachterausschusses reicht von ${GROESSE_VON} bis `
+        + `${GROESSE_BIS} m². Mit ${wfl} m² liegt die Wohnung ${ueber ? 'darüber' : 'darunter'}; angesetzt ist die `
+        + `${ueber ? 'oberste' : 'unterste'} Größenklasse (${ueber ? GROESSE_BIS : GROESSE_VON} m², Faktor `
+        + `${fRand.toFixed(2).replace('.', ',')}). Über den veröffentlichten Bereich hinaus wird nicht fortgerechnet.`
       : null,
     miete_qm: r2(miete),
     miete_monat: Math.round(miete * wfl * 100) / 100,
@@ -228,7 +245,7 @@ export function marktmiete({
     staffel: [
       { pos: `Tabellenwert ${gemeinde} (${wegBj})`, wert: r2(basis), einheit: 'EUR/m²' },
       { pos: `× Wohnlage (${wohnlage})`, faktor: fLage },
-      { pos: `× Wohnungsgröße (${wfl} m²)`, faktor: r2(fGr) },
+      { pos: `× Wohnungsgröße (${wfl} m²${ausserhalb ? ', ' + (ueber ? 'oberste' : 'unterste') + ' Größenklasse ' + (ueber ? GROESSE_BIS : GROESSE_VON) + ' m²' : ''})`, faktor: r2(fGr) },
       { pos: `× Geschosslage (${dachgeschoss ? 'Dachgeschoss' : 'Vollgeschoss'})`, faktor: fGe },
       { pos: '= marktüblich erzielbare Miete', wert: r2(miete), einheit: 'EUR/m²' },
     ],

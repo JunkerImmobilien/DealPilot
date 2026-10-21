@@ -5458,6 +5458,7 @@
       "irw_lageangepasst": false,
       "stellplaetze_im_irw": true,
       "stellplaetze_hinweis": "Der Immobilienrichtwert enthält eine Garage oder einen Stellplatz (S. 1); eine Abweichung ist mit ihrem Zeitwert zu berücksichtigen (S. 2).",
+      "garage_normobjekt": {"enthalten":true,"art":"Garage oder Stellplatz","zeitwert_eur":null,"zeitwert_eur_von":null,"zeitwert_eur_bis":null,"seite":"S. 1–2","wortlaut":"Die ermittelten Immobilienrichtwerte … enthalten eine Garage oder einen Stellplatz (S. 1). Garagen, Stellplätze sowie Teilflächen sind mit ihrem Zeitwert zu berücksichtigen (S. 2).","warum_kein_betrag":"Der Ausschuss nennt keinen Betrag; im Anwendungsbeispiel (S. 8) steht „Eine Garage vorhanden (+/-) 0 €\".","geerntet":"2026-10-21 (v2670), aus LGDIR_2_0510800_2026.pdf Seiten 1, 2 und 8 nachgelesen"},
       "normobjekt": {
         "gebaeudeart": "Einfamilienhaus",
         "ergaenzende_gebaeudeart": "Doppelhaushälfte",
