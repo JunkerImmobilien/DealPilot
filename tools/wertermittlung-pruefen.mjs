@@ -468,25 +468,30 @@ fallB('B13', () => {
     'Formel ' + fMfh.pct + ' % → ' + eur(kF.wert) + ' · Landesmittel ' + lm.pct + ' % → ' + eur(kL.wert));
 });
 
-/* B14 · v2610 · E5 · UK-FORMEL NUR BIS ZUM 2,0-FACHEN DER BEZUGSGROESSE.
-   Darueber keine Naeherung (Variante A im Aufrufer: volle Flaeche, markiert).
-   Die amtlichen Tabellen sind nicht beruehrt (uk-flaeche-pruefen). */
+/* B14 · v2612 · UK-FORMEL 0,5- BIS 3,0-FACH, ZWEITER AST OBERHALB 2,5.
+   E5 (v2610: Kappung bei 2,0) zurueckgenommen - die Begruendung kam aus einer
+   Teilmenge. Geprueft wird die Geltung, beide Aeste und die Messung an der
+   GENAUEN Stuetzstelle (uk-naeherung.json pruefung_genau): die Naeherung muss
+   dort im Median besser sein als ohne Anpassung, sonst gehoert der Ast gekappt. */
 let UKF = null;
 try { UKF = await lade('lib/umrechnung_flaeche.js'); } catch (e) { UKF = null; }
 fallB('B14', () => {
   if (!UKF || !UKF.naeherung) return pruefe('B', 'B14', 'umrechnung_flaeche geladen', false, 'fehlt');
   const j = JSON.parse(fs.readFileSync(path.join(SRC, 'lib/uk-naeherung.json'), 'utf8'));
-  pruefe('B', 'B14a', 'uk-naeherung.json: verhaeltnis_bis 2, kein zweiter Ast', j.gilt_fuer.verhaeltnis_bis === 2 && !j.oberhalb,
-    'bis ' + j.gilt_fuer.verhaeltnis_bis);
+  const o = j.oberhalb || {};
+  pruefe('B', 'B14a', 'uk-naeherung.json: Geltung bis 3,0, zweiter Ast ab 2,5', j.gilt_fuer.verhaeltnis_bis === 3 && o.ab === 2.5 && o.rest_faktor > 0,
+    'bis ' + j.gilt_fuer.verhaeltnis_bis + ', Restfaktor ' + o.rest_faktor);
   const n = (fl) => UKF.naeherung({ objektart: 'efh', flaeche_qm: fl, bezugsgroesse_qm: 600, brw_eur_qm: 200, geschosszahl: 'II' });
-  const k2 = n(1200);
-  wert('B', 'B14b', '2,0-fach: Formel (2)^b', k2.verfuegbar ? k2.koeffizient_bauland : null, Math.round(Math.pow(2, j.alle.b) * 10000) / 10000, 0.0001);
-  const ueber = [1206, 1500, 1800].map(n);
-  pruefe('B', 'B14c', '2,01-, 2,5-, 3,0-fach: keine Näherung, Grund ausserhalb_bereich, Text „nicht an die Grundstücksgröße angepasst"',
-    ueber.every((x) => !x.verfuegbar && x.grund === 'ausserhalb_bereich' && /nicht an die Grundstücksgröße angepasst/.test(x.hinweis)),
-    ueber.map((x) => x.grund).join(' '));
-  const unter = n(300);
-  pruefe('B', 'B14d', '0,5-fach: Formel rechnet weiter', unter.verfuegbar && unter.koeffizient_bauland > 1);
+  const b = j.alle.b, r4 = (x) => Math.round(x * 10000) / 10000;
+  const k25 = n(1500), k30 = n(1800);
+  wert('B', 'B14b', '2,5-fach: Potenz (2,5)^b', k25.verfuegbar ? k25.koeffizient_bauland : null, r4(Math.pow(2.5, b)), 0.0001);
+  wert('B', 'B14c', '3,0-fach: zweiter Ast (2,5^b·2,5 + 0,5·c)/3', k30.verfuegbar ? k30.koeffizient_bauland : null, r4((Math.pow(2.5, b) * 2.5 + 0.5 * o.rest_faktor) / 3), 0.0001);
+  const ueber = n(1806);
+  pruefe('B', 'B14d', '3,01-fach: keine Näherung (ausserhalb_bereich)', !ueber.verfuegbar && ueber.grund === 'ausserhalb_bereich', ueber.grund);
+  const g = j.pruefung_genau || {}, g25 = g.bei_2_5 || {}, g30 = g.bei_3_0_zweiter_ast || {};
+  pruefe('B', 'B14e', 'genaue Stützstelle, alle Tabellen: Näherung bei 2,5 und 3,0 besser als ohne Anpassung (Median)',
+    g25.naeherung_median_pct < g25.ohne_anpassung_median_pct && g30.naeherung_median_pct < g30.ohne_anpassung_median_pct,
+    '2,5: ' + g25.naeherung_median_pct + ' gegen ' + g25.ohne_anpassung_median_pct + ' % · 3,0: ' + g30.naeherung_median_pct + ' gegen ' + g30.ohne_anpassung_median_pct + ' %');
 });
 
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */

@@ -150,7 +150,11 @@ export const KiGegenrechnungService = {
         liegenschaftszins_herkunft: params ? (((params.lzs_zins_herkunft && params.lzs_zins_herkunft.etikett)
           ? 'Stufe ' + (params.lzs_stufe || '?') + ': ' + params.lzs_zins_herkunft.etikett
           : ({ A: 'Stufe A: amtlich', B: 'Stufe B: amtlich, grosse Streuung oder regional',
-               C: 'Stufe C: indikativ', N: 'Stufe N: abgeleitet aus der DealPilot-Formel, nicht amtlich',
+               C: 'Stufe C: indikativ',
+               /* v2612 · beim Landesmittel (formel.weg) nicht „Formel" */
+               N: (params.lzs_formel && params.lzs_formel.weg === 'landesmittel')
+                 ? 'Stufe N: DealPilot-Landesmittel, nicht amtlich'
+                 : 'Stufe N: abgeleitet aus der DealPilot-Formel, nicht amtlich',
                D: 'Stufe D: gesetzlicher Auffangwert Paragraf 256 BewG', E: 'Stufe E: eigene Angabe' }[params.lzs_stufe]))
           || params.lzs_stufe || params.lzs_quelle || null) : null,
       },

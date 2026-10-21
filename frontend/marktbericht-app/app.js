@@ -4850,6 +4850,10 @@ async function exportPdf(out) {
       N: 'abgeleitet aus der DealPilot-Formel, nicht amtlich',
       D: 'gesetzlicher Auffangwert n. § 256 BewG',
       E: 'eigene Angabe' };
+    /* v2612 · Stufe N kann auch das DealPilot-Landesmittel sein (formel.weg) */
+    if (_ew && _ew.liegenschaftszins_formel && _ew.liegenschaftszins_formel.weg === 'landesmittel') {
+      _stufeTxt.N = 'DealPilot-Landesmittel, nicht amtlich';
+    }
 
     doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...MUT);
     doc.text((_ew.verfahren || 'allgemeines Ertragswertverfahren')

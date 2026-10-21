@@ -355,8 +355,7 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
    NIE amtlich: Herkunft „abgeleitet aus der DealPilot-Formel", Stufe N (v2401, vorher D),
    mit Tabellenzahl und typischer Abweichung. Nur Ein-/Zweifamilien-,
    Doppel-, Reihenhaus, nur Zonen mit BEKANNTER Geschosszahl bis II, nur
-   0,5- bis 2,0-fache Bezugsgroesse (v2610, E5 - vorher 2,5 und ein zweiter
-   Ast bis 3,0; darueber jetzt Variante A: volle Flaeche, markiert). Wo der Ausschuss etwas anderes sagt
+   0,5- bis 2,5-fache Bezugsgroesse. Wo der Ausschuss etwas anderes sagt
    (Tiefe, WGFZ, kein Einfluss, Gebiet/Haustyp/Objektart ausgeschlossen),
    entscheidet der Aufrufer, sie NICHT zu rufen. */
 let _NAEH = null;
@@ -415,23 +414,17 @@ export function naeherung({ objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm,
   const fl = Number(flaeche_qm), bez = Number(bezugsgroesse_qm), brw = Number(brw_eur_qm);
   if (!(fl > 0) || !(bez > 0) || !(brw > 0)) return nein('angaben_fehlen');
   const r = fl / bez;
-  /* v2610 · E5 (Marcel 21.10.2026): die Formel gilt nur bis zum 2,0-Fachen der
-     Bezugsgroesse. Darueber keine Naeherung - der Aufrufer rechnet Variante A
-     (volle Flaeche, markiert, Weg zum Ausschuss). Rueckfall 2 auch ohne JSON-Feld. */
-  const vVon = Number(g.verhaeltnis_von) > 0 ? Number(g.verhaeltnis_von) : 0.5;
-  const vBis = Number(g.verhaeltnis_bis) > 0 ? Number(g.verhaeltnis_bis) : 2;
-  const _dz = (x) => String(x).replace('.', ',');
-  if (r < vVon || r > vBis) return nein('ausserhalb_bereich',
-    'Die Grundstücksgröße liegt außerhalb des Bereichs, in dem DealPilot den Umrechnungskoeffizienten näherungsweise ableitet ('
-      + _dz(vVon) + '- bis ' + _dz(vBis) + '-fache Größe des Bodenrichtwertgrundstücks)'
-      + (r > vBis ? '; bei so großen Grundstücken bewerten die Gutachterausschüsse die Mehrfläche sehr unterschiedlich' : '')
-      + '. Der Bodenwert ist deshalb nicht an die Grundstücksgröße angepasst.');
+  if (r < (g.verhaeltnis_von || 0.5) || r > (g.verhaeltnis_bis || 2.5)) return nein('ausserhalb_bereich',
+    'Die Grundstücksgröße liegt außerhalb des Bereichs, für den die DealPilot-Formel abgeleitet ist ('
+      + (g.verhaeltnis_von || 0.5) + '- bis ' + (g.verhaeltnis_bis || 2.5) + '-fache Bezugsgröße).');
   if (fl === bez) return nein('gleich_bezugsgroesse');
   const b = Number(d.alle.b);
-  /* v2610 · Der zweite Ast (v2360, Restfaktor jenseits des 2,5-Fachen) ist fuer
-     die Naeherung entfallen; die JSON fuehrt seine Messung nur noch unter
-     oberhalb_gemessen (verdrahtet false). */
-  const k = r4(Math.pow(r, b));
+  /* v2360 · Zweiter Ast jenseits des 2,5-Fachen: dort fallen die amtlichen Tabellen
+     steiler, die Mehrflaeche wird wie Hinterland bewertet - bis 2,5 x die Potenz,
+     darueber je m2 der Restfaktor c (Median aus den Tabellen, uk-naeherung.json). */
+  const o = d.oberhalb && Number(d.oberhalb.rest_faktor) > 0 && r > Number(d.oberhalb.ab) ? d.oberhalb : null;
+  const k = o ? r4((Math.pow(Number(o.ab), b) * Number(o.ab) + (r - Number(o.ab)) * Number(o.rest_faktor)) / r)
+              : r4(Math.pow(r, b));
   const bwQm = Math.round(brw * k * 100) / 100;
   const de = (x) => String(x).replace('.', ',');
   return {
@@ -443,10 +436,10 @@ export function naeherung({ objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm,
     wert_bauland_eur: Math.round(fl * bwQm), wert_gruen_eur: 0, wert_eur: Math.round(fl * bwQm),
     koeffizient_angewandt: true,
     formel: { b, tabellen: d.alle.tabellen, laender: d.alle.laender, stand: d.stand,
-              abweichung_median_pct: d.alle.abweichung_median_pct, abweichung_p90_pct: d.alle.abweichung_p90_pct,
+              abweichung_median_pct: (o || d.alle).abweichung_median_pct, abweichung_p90_pct: (o || d.alle).abweichung_p90_pct,
               /* v2593 · Kreuzvalidierung und Streuung des Exponenten (noch nicht im Bericht) */
-              pruefung: (d.alle.pruefung || {}).loto || null, b_p10: d.alle.b_p10 ?? null, b_p90: d.alle.b_p90 ?? null,
-              zweiter_ast: null, verhaeltnis_bis: vBis },
+              pruefung: ((o || d.alle).pruefung || {}).loto || null, b_p10: d.alle.b_p10 ?? null, b_p90: d.alle.b_p90 ?? null,
+              zweiter_ast: o ? { ab: Number(o.ab), rest_faktor: Number(o.rest_faktor), tabellen: o.tabellen } : null },
     uebertragen: (g.uebertragen_auf || []).indexOf(art) >= 0,
     hinweis: ((g.uebertragen_auf || []).indexOf(art) >= 0
       ? 'Für Mehrfamilienhäuser veröffentlicht der Ausschuss hier keinen Umrechnungskoeffizienten. Die DealPilot-Formel '
@@ -456,13 +449,15 @@ export function naeherung({ objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm,
       + ((g.uebertragen_auf || []).indexOf(art) >= 0 ? '' : 'Für diesen Ort liegt kein amtlicher Umrechnungskoeffizient vor. ')
       + 'Der Bodenrichtwert ist deshalb mit einem '
       + 'Koeffizienten angepasst, der aus der DealPilot-Formel abgeleitet ist: '
-      + '(' + fl + ' / ' + bez + ')^' + de(b) + ' = ' + de(k)
+      + (o ? 'bis zum ' + de(o.ab) + '-Fachen der Bezugsgröße (' + de(o.ab) + ')^' + de(b) + ', die Fläche darüber mit dem Restfaktor '
+             + de(o.rest_faktor) + ' (aus ' + o.tabellen + ' Tabellen, die so weit reichen), zusammen ' + de(k)
+           : '(' + fl + ' / ' + bez + ')^' + de(b) + ' = ' + de(k))
       + '. Die Formel beruht auf ' + d.alle.tabellen + ' amtlichen Umrechnungstabellen der '
       + 'Gutachterausschüsse (' + (d.alle.laender || []).join(', ') + ', Stand ' + d.stand + '); '
       /* v2593 · gemessen mit ausgelassener Tabelle (uk-naeherung.json pruefung.loto),
          nicht mehr an den Tabellen, aus denen die Formel gelernt ist. */
-      + _abwText(d.alle.pruefung && d.alle.pruefung.loto, d.alle)
-      + '. Keine amtliche Zahl — liegt dir der Koeffizient des '
+      + _abwText((o || d.alle).pruefung && (o || d.alle).pruefung.loto, (o || d.alle))
+      + (o ? ' (oberhalb des 2,5-Fachen deutlich unsicherer)' : '') + '. Keine amtliche Zahl — liegt dir der Koeffizient des '
       + 'zuständigen Ausschusses vor, trag ihn unter „Umrechnungskoeffizient Grundstücksgröße" ein.',
   };
 }

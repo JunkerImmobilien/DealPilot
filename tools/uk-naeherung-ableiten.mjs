@@ -34,22 +34,7 @@ const ZIEL = path.join(WURZEL, 'marktbericht/backend/src/lib/uk-naeherung.json')
 const UK = await import('file://' + path.join(WURZEL, 'marktbericht/backend/src/lib/umrechnung_flaeche.js').replace(/\\/g, '/'));
 const TROCKEN = process.argv.includes('--trocken');
 
-/* ═══ v2610 · GRENZE 2,0 (E5, Marcel 21.10.2026 freigegeben) ═════════════
- * Begruendet mit: beim 2,0-Fachen Median 5,7 % gegen 16,3 % ohne Anpassung,
- * beim 2,5-Fachen 14,2 % gegen 11,7 % (cv-uk.mjs). ACHTUNG, nachgemessen in
- * v2610: die 2,5-Zahl stammt aus einer Teilmenge (Filter x.r === 2.5 trifft nur
- * Tabellen mit ganzzahliger Normgroesse x 2,5). Ueber alle Tabellen ist die
- * Formel beim 2,5-Fachen BESSER (grenze.gemessen_2_5). Umgesetzt wie entschieden,
- * zur Neuentscheidung vorgelegt; Ruecknahme = GRENZE hier setzen und neu laufen. Deshalb gilt
- * die Naeherung nur bis zum 2,0-Fachen; darueber Variante A (volle Flaeche,
- * markiert). Der zweite Ast (Restfaktor bis 3,0) entfaellt fuer die Naeherung.
- * Die amtlichen Tabellen sind davon nicht beruehrt.
- * Abgetastet und gelernt wird nur im Anwendungsbereich (bis 2,0), damit
- * Exponent und Kreuzvalidierung den Bereich beschreiben, in dem gerechnet wird.
- * Die Stuetzstelle 2,5 wird nur noch GEMESSEN (grenze.gemessen_2_5). */
-const GRENZE = 2;
-const FAKTOREN_ALLE = [0.5, 0.6, 0.75, 0.9, 1.1, 1.25, 1.5, 1.75, 2, 2.5];
-const FAKTOREN = FAKTOREN_ALLE.filter((f) => f <= GRENZE);
+const FAKTOREN = [0.5, 0.6, 0.75, 0.9, 1.1, 1.25, 1.5, 1.75, 2, 2.5];
 /* Kreisfreie Staedte erkennen: Stadtstaaten (02, 04, 11) und Saetze, deren
    Gebiets-/Ausschussname eine Stadt nennt und keinen Kreis/Landkreis. */
 const istStadt = (s) => /^(02|04|11)/.test(String(s.ags))
@@ -96,11 +81,8 @@ for (const datei of fs.readdirSync(ORDNER).filter((x) => x.startsWith('uk-') && 
         sxy += x * y; sxx += x * x; n++; pkt.push([fl / norm, kF.k / kN.k]);
       }
       if (n < 3 || !(sxx > 0)) continue;
-      /* v2610 · nur gemessen, nicht gelernt: der amtliche Wert beim 2,5-Fachen */
-      const k25 = UK.koeffizientFuer(satz, Math.round(norm * 2.5), norm), k25n = UK.koeffizientFuer(satz, norm, norm);
       tabellen.push({ wo: datei + ' ' + (s.gebiet_name || s.ags) + ' Norm ' + norm, land: s.land_code, stadt: istStadt(s),
-                      b: sxy / sxx, n, pkt, quelle: sperre ? 'stuetzstelle' : 'wert',
-                      p25: k25.k != null && k25n.k > 0 ? k25.k / k25n.k : null });
+                      b: sxy / sxx, n, pkt, quelle: sperre ? 'stuetzstelle' : 'wert' });
     }
   }
 }
@@ -190,25 +172,64 @@ const restAbw = restPkt.map((k3) => Math.abs(((Math.pow(2.5, alle.b) * 2.5 + 0.5
 console.log('oberhalb 2,5-fach: Restfaktor ' + r3(restFaktor) + ' aus ' + restC.length + ' Tabellen, typ. Abweichung beim 3-Fachen '
   + r3(median(restAbw)) + ' % (90 %: ' + r3(quartil(restAbw, 0.9)) + ' %)');
 const MIN_TABELLEN = 8;
-/* v2610 · Grenze belegen: beim 2,5-Fachen Formel (b ohne die eigene Tabelle) gegen UK = 1 */
-const g25 = [], g25_0 = [], g25_l = [];
-tabellen.forEach((t, i) => {
-  if (t.p25 == null && t.b !== 0) return;
-  const a = t.p25 == null ? 1 : t.p25;
-  const bo = median(tabellen.filter((_, j) => j !== i).map((x) => x.b));
-  const bl = median(tabellen.filter((x) => x.land !== t.land).map((x) => x.b));
-  g25.push(Math.abs(Math.pow(2.5, bo) / a - 1) * 100); g25_0.push(Math.abs(1 / a - 1) * 100);
-  g25_l.push(Math.abs(Math.pow(2.5, bl) / a - 1) * 100);
-});
-const grenze = { verhaeltnis_bis: GRENZE,
-  begruendung: 'Marcels Entscheidung 21.10.2026 (E5): oberhalb des 2,0-Fachen der Bezugsgroesse keine Naeherung, dort Variante A (volle Flaeche, markiert). Grundlage war die Messung "beim 2,5-Fachen schlechter als keine Anpassung" (Median 14,2 gegen 11,7 %). Die Vollmessung hier (alle Tabellen, exakte Stuetzstelle 2,5) zeigt das Gegenteil - siehe gemessen_2_5; die Ausgangsmessung erfasste nur Tabellen, deren Normgroesse x 2,5 ganzzahlig ist. Zur Neuentscheidung vorgelegt.',
-  gemessen_2_5: { tabellen: g25.length, formel_median_pct: r3(median(g25)), ohne_anpassung_median_pct: r3(median(g25_0)),
-    formel_p80_pct: r3(quartil(g25, 0.8)), ohne_anpassung_p80_pct: r3(quartil(g25_0, 0.8)),
-    formel_lolo_median_pct: r3(median(g25_l)), formel_lolo_p80_pct: r3(quartil(g25_l, 0.8)),
-    methode: 'Leave-one-Tabelle-out (formel_*) und Leave-one-Land-out (formel_lolo_*); Tabellen ohne Flaechenabhaengigkeit mit UK = 1' } };
-console.log('Grenze ' + GRENZE + '-fach: beim 2,5-Fachen (' + g25.length + ' Tabellen) Formel ' + grenze.gemessen_2_5.formel_median_pct
-  + ' % (LOLO ' + grenze.gemessen_2_5.formel_lolo_median_pct + ') gegen ohne Anpassung ' + grenze.gemessen_2_5.ohne_anpassung_median_pct + ' % (Median); P80 '
-  + grenze.gemessen_2_5.formel_p80_pct + ' gegen ' + grenze.gemessen_2_5.ohne_anpassung_p80_pct);
+
+/* ═══ v2612 · NACHGEMESSEN AN DER GENAUEN STUETZSTELLE, UEBER ALLE TABELLEN ══
+ * E5 (v2610) hatte die Naeherung auf 2,0 gekappt - begruendet mit einer Messung,
+ * die je Band nur Punkte mit r === 2.5 zaehlte (round(norm x 2,5)/norm ist nur
+ * bei geraden Normgroessen genau 2,5). Zurueckgenommen in v2612. Hier wird
+ * jede Tabelle (flaeche_tabelle, flaeche_funktion, flaeche_eins mit UK = 1) an
+ * GENAU 2,5 und 3,0 gefragt (koeffizientFuer mit Flaeche norm x r, ungerundet):
+ *   2,5: Potenz r^b, b ohne die eigene Tabelle (LOTO)
+ *   3,0: zweiter Ast (2,5^b x 2,5 + 0,5 x c) / 3, b und c ohne die eigene Tabelle
+ * gegen „ohne Anpassung" (UK = 1). Ist der zweite Ast bei 3,0 im Median
+ * schlechter als UK = 1, wird er gekappt (Geltung dann bis 2,5). */
+const genauTab = [];
+{
+  const gesehen3 = new Set();
+  for (const datei of fs.readdirSync(ORDNER).filter((x) => x.startsWith('uk-') && x.endsWith('.json')).sort()) {
+    for (const s of JSON.parse(fs.readFileSync(path.join(ORDNER, datei), 'utf8'))) {
+      const sperre = s.vollstaendig === false || !!s.warum_kein_wert;
+      const fm = !sperre ? s.formel : (s.nutzung_intern === 'stuetzstelle' ? s.formel_vorgemerkt : null);
+      if (!fm) continue;
+      const schl = JSON.stringify(fm); if (gesehen3.has(schl)) continue; gesehen3.add(schl);
+      if (fm.form === 'flaeche_eins') { genauTab.push({ id: schl, kk: () => 1, b: 0 }); continue; }
+      for (const norm of normen(fm)) {
+        const satz = { ...s, formel: fm };
+        const kn = UK.koeffizientFuer(satz, norm, norm).k;
+        if (!(kn > 0)) continue;
+        const t = tabellen.find((x) => x.wo === datei + ' ' + (s.gebiet_name || s.ags) + ' Norm ' + norm);
+        genauTab.push({ id: schl + norm, b: t ? t.b : null,
+          kk: (r) => { const a = UK.koeffizientFuer(satz, norm * r, norm).k; return a == null || !(a > 0) ? null : a / kn; } });
+      }
+    }
+  }
+}
+const alleB = tabellen.map((t) => t.b);
+function genauMessen(r, zweiterAst) {
+  const e = [], e0 = [];
+  for (const t of genauTab) {
+    const a = t.kk(r); if (a == null) continue;
+    /* LOTO: die eigene Tabelle aus b (und c) nehmen, soweit sie dort mitzaehlt */
+    const bs = t.b == null ? alleB : alleB.filter((x, i) => !(x === t.b && i === alleB.indexOf(t.b)));
+    const bo = median(bs);
+    let nae;
+    if (zweiterAst) {
+      const k25 = t.kk(2.5);
+      const cs = (k25 != null && t.b != null) ? restC.filter((c, i) => Math.abs(restPkt[i] - a) > 1e-12 || Math.abs(c - (3 * a - 2.5 * k25) / 0.5) > 1e-9) : restC;
+      nae = (Math.pow(2.5, bo) * 2.5 + 0.5 * median(cs)) / 3;
+    } else nae = Math.pow(r, bo);
+    e.push(Math.abs(nae / a - 1) * 100); e0.push(Math.abs(1 / a - 1) * 100);
+  }
+  return { stuetzstelle: r, tabellen: e.length, naeherung_median_pct: r3(median(e)), naeherung_p80_pct: r3(quartil(e, 0.8)),
+    ohne_anpassung_median_pct: r3(median(e0)), ohne_anpassung_p80_pct: r3(quartil(e0, 0.8)),
+    naeherung_besser_pct: e.length ? Math.round(1000 * e.filter((x, i) => x < e0[i]).length / e.length) / 10 : null };
+}
+const genau25 = genauMessen(2.5, false), genau30 = genauMessen(3, true);
+const astKappen = !(genau30.naeherung_median_pct < genau30.ohne_anpassung_median_pct);
+console.log('genau 2,5 (Potenz, LOTO): ' + genau25.naeherung_median_pct + ' % gegen UK=1 ' + genau25.ohne_anpassung_median_pct + ' % (' + genau25.tabellen + ' Tabellen, P80 '
+  + genau25.naeherung_p80_pct + '/' + genau25.ohne_anpassung_p80_pct + ')');
+console.log('genau 3,0 (zweiter Ast, LOTO): ' + genau30.naeherung_median_pct + ' % gegen UK=1 ' + genau30.ohne_anpassung_median_pct + ' % (' + genau30.tabellen + ' Tabellen, P80 '
+  + genau30.naeherung_p80_pct + '/' + genau30.ohne_anpassung_p80_pct + ') -> ' + (astKappen ? 'zweiter Ast GEKAPPT, Geltung bis 2,5' : 'zweiter Ast bleibt'));
 const aus = {
   stand: new Date().toISOString().slice(0, 10),
   form: 'UK(Objekt)/UK(Bezugsgroesse) = (Flaeche/Bezugsgroesse)^b',
@@ -218,11 +239,13 @@ const aus = {
      Koeffizienten auf jeden Fall mit hinzunehmen". mfh gilt als UEBERTRAGUNG aus dem
      individuellen Wohnungsbau (die Tabellen sind IfW) - nur in Zonen bis II Vollgeschosse,
      im Bericht ausdruecklich so gekennzeichnet. */
-  gilt_fuer: { objektarten: ['efh', 'zfh', 'dhh', 'rh', 'mfh'], uebertragen_auf: ['mfh'], max_vollgeschosse: 2, verhaeltnis_von: 0.5, verhaeltnis_bis: GRENZE },
+  gilt_fuer: { objektarten: ['efh', 'zfh', 'dhh', 'rh', 'mfh'], uebertragen_auf: ['mfh'], max_vollgeschosse: 2, verhaeltnis_von: 0.5, verhaeltnis_bis: (restC.length >= MIN_TABELLEN && !astKappen) ? 3 : 2.5 },
   mindest_tabellen: MIN_TABELLEN,
-  grenze,
-  /* v2610 · der zweite Ast ist fuer die Naeherung abgeschaltet; die Messung bleibt im Protokoll */
-  oberhalb_gemessen: restC.length >= MIN_TABELLEN ? { verdrahtet: false, ab: 2.5, bis: 3, rest_faktor: r3(restFaktor), tabellen: restC.length,
+  /* v2612 · Messung an der genauen Stuetzstelle (s. o.), Entscheidungsgrund dabei */
+  pruefung_genau: { methode: 'jede Tabelle an genau r x Normgroesse (ungerundet), flaeche_eins mit UK = 1; LOTO fuer b und Restfaktor; gegen UK = 1 (Variante A)',
+    bei_2_5: genau25, bei_3_0_zweiter_ast: genau30,
+    entscheidung: astKappen ? 'zweiter Ast gekappt: bei 3,0 im Median nicht besser als ohne Anpassung' : 'zweiter Ast bleibt: bei 3,0 im Median besser als ohne Anpassung' },
+  oberhalb: (restC.length >= MIN_TABELLEN && !astKappen) ? { ab: 2.5, bis: 3, rest_faktor: r3(restFaktor), tabellen: restC.length,
     abweichung_median_pct: r3(median(restAbw)), abweichung_p90_pct: r3(quartil(restAbw, 0.9)),
     /* v2593 · Leave-one-Tabelle-out wie oben */
     pruefung: (() => { const e = restPkt.map((k3, i) => { const c = median(restC.filter((_, j) => j !== i));
