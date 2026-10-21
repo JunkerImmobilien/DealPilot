@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2570</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2570a</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -1283,6 +1283,8 @@
      `win.__DPM_GESPERRT` - die Deckung der Sperre ist damit nachweisbar,
      und `DPM.sperreProbe()` beweist einmal, dass sie greift. */
   var SPERRE_AN = true;
+  /* Reine Stand-Abfragen in diesen Familien kosten nichts und tragen die Oberflaeche (Kontingent-Pille, Anbieter-Status). */
+  var LESEN_FREI = /\/(credits|health|status|credentials|dokument-arten|arten|searches|history)(\/|$|\?)/i;
   var KOSTEN_GET = /\/ai\/|\/marktbericht\/(reports|from-dealpilot|run|abruf)|\/avm|market-analysis|marktpreis|\/immometrica|\/checkout|\/credits\/(checkout|consume)/i;
   function sperreSetzen(win){
     if (!SPERRE_AN || !win) return false;
@@ -1295,7 +1297,7 @@
       var gesperrt = function(meth, url){
         meth = String(meth || 'GET').toUpperCase();
         if (meth !== 'GET' && meth !== 'HEAD' && meth !== 'OPTIONS') return 'schreibt';
-        if (KOSTEN_GET.test(url)) return 'kostet';
+        if (KOSTEN_GET.test(url) && !LESEN_FREI.test(url)) return 'kostet';
         return null;
       };
       var echtFetch = win.fetch;
