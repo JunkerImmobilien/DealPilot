@@ -2673,7 +2673,14 @@ function _sbActionsDock() {
       acc.style.removeProperty('bottom');
       if (btn) {
         var topPx = parseFloat(cs.top) || 0;
-        var avail = Math.max(160, Math.round(btn.getBoundingClientRect().top - topPx - 8));
+        var bRect = btn.getBoundingClientRect();
+        /* v2576: im Handy-Querformat steht das Menue NEBEN der Leiste
+           (style.css v2576) - dort deckelt die Fensterhoehe, nicht der
+           Ausloeser. Gegen den Ausloeser blieben 232 px fuer 687 px Inhalt. */
+        var neben = (parseFloat(cs.left) || 0) >= bRect.right;
+        var avail = neben
+          ? Math.max(160, Math.round(window.innerHeight - topPx - 8))
+          : Math.max(160, Math.round(bRect.top - topPx - 8));
         acc.style.setProperty('max-height', avail + 'px', 'important');
         if (inner) inner.style.setProperty('max-height', avail + 'px', 'important');
       }
