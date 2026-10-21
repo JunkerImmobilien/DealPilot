@@ -26,7 +26,7 @@ import { zinssatzFuerObjekt } from '../lib/zweigwahl.js';
 import { lzsNach256, MODELL } from '../lib/immowertv.js';
 import { stufeNachStreuung } from '../lib/nrw_modell.js';   /* v1048-WSTR-1 */
 /* v2401 · Stufe N - die DealPilot-Formel fuer den Liegenschaftszins */
-import { lzsNaeherung, lzsNaeherungsDaten } from '../lib/lzs_naeherung.js';
+import { lzsNaeherung, lzsNaeherungsDaten, lzsLandesmittel } from '../lib/lzs_naeherung.js';
 /* v1063-WOD-1 · Die Open-Data-Tabelle wurde in v1054 angelegt, gefuellt hat
  * sie nie jemand und gelesen hat sie niemand. Ab hier liest sie die Kaskade
  * — ueber das Repository, nicht mit eigenem SQL. */
@@ -491,20 +491,48 @@ export const WertParameterService = {
         try { nb = await nachbarwert(a8(ags), art, tag); } catch (e) { nb = null; }
         if (nb) { _formelNicht = { grund: 'nachbarwert' }; return null; }
       }
+      const _nArg = { ags, objektart, objart: (objekt && objekt.objart) || null,
+        anzahlWe: (objekt && objekt.einheiten != null) ? objekt.einheiten : anzahlWe,
+        rnd: objekt ? objekt.restnutzungsdauer : null };
+      /* v2611 · E6 · ZUERST DAS DEALPILOT-LANDESMITTEL (zweiter Weg in Stufe N).
+         Verdrahtet ist es nur, wo es gemessen genauer ist als § 256 und als die
+         Formel (lzs-naeherung.json landesmittel.zellen) - dann ist es hier der
+         bessere Wert. Dieselben Sperren wie die Formel (oben: Register, Open
+         Data, Nachbarwert). Nur Liegenschaftszins (typ lzs, s. o.). */
+      let lm = null;
+      try { lm = lzsLandesmittel(_nArg); } catch (e) { lm = null; }
+      if (lm && lm.verfuegbar) {
+        return {
+          wert: lm.pct, min: null, max: null, stufe: 'N', stufe_roh: 'N',
+          /* E4 · Spanne (Wert ± P80 der Kreuzvalidierung) und ihre gemessene Deckung */
+          pct_von: lm.pct_von, pct_bis: lm.pct_bis, spanne_deckung: lm.spanne_deckung,
+          quelle: 'DealPilot-Landesmittel', quelle_url: null, parameter_id: null,
+          modellversion: MODELL.IMMOWERTV_2021, fallzahl: lm.landesmittel.saetze, ebene: 'dealpilot_landesmittel',
+          dealpilot_formel: false, dealpilot_landesmittel: true, n_weg: 'landesmittel',
+          formel: { weg: 'landesmittel', ...lm.landesmittel, familie: lm.familie, land: lm.land, rnd: lm.rnd,
+                    rnd_quelle: lm.rnd_quelle, stadt: lm.stadt,
+                    pct_von: lm.pct_von, pct_bis: lm.pct_bis, spanne_deckung: lm.spanne_deckung },
+          hinweis: lm.hinweis,
+          wert_parameter_uebergangen: _veraltet,
+          einordnung: _odEinordnung,
+          rueckfrage: null,
+        };
+      }
       let fn = null;
       try {
-        fn = lzsNaeherung({ ags, objektart, objart: (objekt && objekt.objart) || null,
-          anzahlWe: (objekt && objekt.einheiten != null) ? objekt.einheiten : anzahlWe,
-          rnd: objekt ? objekt.restnutzungsdauer : null });
+        fn = lzsNaeherung(_nArg);
       } catch (e) { fn = { verfuegbar: false, grund: 'formel_fehler', hinweis: e && e.message }; }
       if (fn && fn.verfuegbar) {
         return {
           wert: fn.pct, min: null, max: null, stufe: 'N', stufe_roh: 'N',
+          /* v2610 · E4 · Spanne und Deckung bis in die Rueckgabe (vorher nur in lzsNaeherung) */
+          pct_von: fn.pct_von, pct_bis: fn.pct_bis, spanne_deckung: fn.spanne_deckung,
           quelle: 'DealPilot-Formel', quelle_url: null, parameter_id: null,
           modellversion: MODELL.IMMOWERTV_2021, fallzahl: null, ebene: 'dealpilot_formel',
-          dealpilot_formel: true,
-          formel: { ...fn.formel, familie: fn.familie, rnd: fn.rnd, rnd_quelle: fn.rnd_quelle,
-                    stadt: fn.stadt, land: fn.land },
+          dealpilot_formel: true, n_weg: 'formel',
+          formel: { ...fn.formel, weg: 'formel', familie: fn.familie, rnd: fn.rnd, rnd_quelle: fn.rnd_quelle,
+                    stadt: fn.stadt, land: fn.land,
+                    pct_von: fn.pct_von, pct_bis: fn.pct_bis, spanne_deckung: fn.spanne_deckung },
           hinweis: fn.hinweis,
           wert_parameter_uebergangen: _veraltet,
           einordnung: _odEinordnung,
@@ -857,6 +885,7 @@ const _EBENE_TEXT = {
   marktableitung: ['aus eigener Marktableitung, nicht amtlich', 'aus dem regionalen Marktgeschehen zurückgerechnet, kein amtlicher Wert'],
   nachbarwert: ['Nachbarwert desselben Ausschusses', 'amtlicher Satz desselben Gutachterausschusses, aber für einen anderen Ort ermittelt'],
   uebertragen: ['übertragen, nicht örtlich', 'aus einer offenen Veröffentlichung übertragen, nicht für diesen Ort ermittelt'],
+  dealpilot_landesmittel: ['DealPilot-Landesmittel', 'DealPilot-Landesmittel — Median der amtlichen Liegenschaftszinssätze dieses Landes und dieser Objektart, nicht amtlich und nicht für diesen Ort ermittelt'],   /* v2611 */
   dealpilot_formel: ['abgeleitet aus der DealPilot-Formel', 'DealPilot-Formel — aus den amtlichen Liegenschaftszinssätzen der Gutachterausschüsse abgeleitet, nicht amtlich und nicht für diesen Ort ermittelt'],
   auffangwert: ['gesetzlicher Auffangwert § 256 BewG', 'gesetzlicher Auffangwert nach § 256 BewG — nicht marktabgeleitet; er kann deutlich vom örtlichen Satz abweichen'],
   eigene_angabe: ['eigene Angabe', 'vom Nutzer gesetzt'],
@@ -870,6 +899,7 @@ export function zinsHerkunft(a) {
   let ebene;
   if (st === 'E') ebene = 'eigene_angabe';
   else if (st === 'D') ebene = 'auffangwert';
+  else if (st === 'N' && a.dealpilot_landesmittel) ebene = 'dealpilot_landesmittel';   /* v2611 · E6 */
   else if (st === 'N' || a.dealpilot_formel) ebene = 'dealpilot_formel';   /* v2401 */
   else if (a.nachbarwert) ebene = 'nachbarwert';
   else if (a.aus_register) {
@@ -896,7 +926,7 @@ export function zinsHerkunft(a) {
   if ((ebene === 'amtlich' || ebene === 'amtlich_streuung') && a.rueckfrage && !a.aus_register) ebene = 'rueckfall';
 
   const unterA = ['landeswert', 'bundesdurchschnitt', 'regional', 'rueckfall', 'amtlich_duenn',
-    'marktableitung', 'nachbarwert', 'uebertragen', 'dealpilot_formel', 'auffangwert'].indexOf(ebene) >= 0;
+    'marktableitung', 'nachbarwert', 'uebertragen', 'dealpilot_formel', 'dealpilot_landesmittel', 'auffangwert'].indexOf(ebene) >= 0;
   const t = _EBENE_TEXT[ebene];
   const n = a.fallzahl != null ? a.fallzahl : a.register_fallzahl;
   let etikett = t[0];
@@ -907,12 +937,31 @@ export function zinsHerkunft(a) {
     const f = a.formel || {};
     const d = lzsNaeherungsDaten() || {};
     const sz = f.saetze || (d.daten && d.daten.saetze) || null;
+    /* v2593 · gemessene Abweichung im Einsatzfall (lzs-naeherung.json
+       pruefung.loao_einsatz): Median und 8 von 10 - ohne Fachwort. */
+    const _ein = (d.pruefung || {}).loao_einsatz || {};
     const ab = Number.isFinite(Number(f.abweichung_median_pp)) ? Number(f.abweichung_median_pp)
-      : Number(((d.pruefung || {}).lolo || {}).median_pp);
+      : Number.isFinite(Number(_ein.median_pp)) ? Number(_ein.median_pp) : Number(((d.pruefung || {}).lolo || {}).median_pp);
+    const ab80 = Number.isFinite(Number(f.abweichung_p80_pp)) ? Number(f.abweichung_p80_pp) : Number(_ein.p80_pp);
+    const _k = (x) => (Math.round(x * 10) / 10).toFixed(1).replace('.', ',');
     etikett = 'abgeleitet aus der DealPilot-Formel (N)';
     klartext = 'DealPilot-Formel (N), aus ' + (sz || 'allen') + ' amtlichen Liegenschaftszinssätzen '
       + 'der Gutachterausschüsse abgeleitet' + (Number.isFinite(ab)
-        ? ', typische Abweichung ' + (Math.round(ab * 10) / 10).toFixed(1).replace('.', ',') + ' Prozentpunkte' : '')
+        ? '; an amtlichen Werten nachgeprüft in der Hälfte der Fälle höchstens ' + _k(ab) + ' Prozentpunkte daneben'
+          + (Number.isFinite(ab80) ? ', in 8 von 10 Fällen höchstens ' + _k(ab80) : '') : '')
+      + ' — nicht amtlich, nicht für diesen Ort ermittelt';
+  }
+  /* v2611 · E6 · Landesmittel: „DealPilot-Landesmittel aus n amtlichen Zinssätzen (Land, Objektart, Jahrgänge)" */
+  if (ebene === 'dealpilot_landesmittel') {
+    const f = a.formel || {};
+    const _k = (x) => (Math.round(Number(x) * 10) / 10).toFixed(1).replace('.', ',');
+    const jg = f.jahrgang_von && f.jahrgang_bis ? (f.jahrgang_von === f.jahrgang_bis ? String(f.jahrgang_von) : f.jahrgang_von + '–' + f.jahrgang_bis) : null;
+    etikett = 'DealPilot-Landesmittel aus ' + (f.saetze || '?') + ' amtlichen Zinssätzen ('
+      + [f.land_name || f.land, f.familie_name || f.familie, jg ? 'Jahrgänge ' + jg : null].filter(Boolean).join(', ') + ') (N)';
+    klartext = 'DealPilot-Landesmittel (N): Median aus ' + (f.saetze || '?') + ' amtlichen Liegenschaftszinssätzen von '
+      + (f.ausschuesse || '?') + ' Gutachterausschüssen' + (Number.isFinite(Number(f.abweichung_median_pp))
+        ? '; an amtlichen Werten nachgeprüft in der Hälfte der Fälle höchstens ' + _k(f.abweichung_median_pp) + ' Prozentpunkte daneben'
+          + (Number.isFinite(Number(f.spanne_p80_pp)) ? ', in 8 von 10 Fällen höchstens ' + _k(f.spanne_p80_pp) : '') : '')
       + ' — nicht amtlich, nicht für diesen Ort ermittelt';
   }
   if (ebene === 'nachbarwert' && a.herkunft_ort) {
@@ -931,13 +980,20 @@ export function zinsHerkunft(a) {
       + 'Gutachterausschusses' + (stelle ? ' (' + stelle + ')' : '') + ': im Feld '
       + '„Liegenschaftszinssatz" eintragen, dann rechnet der Ertragswert damit.',
   } : null;
+  /* v2610 · E4 · Spanne der Stufe N in der Herkunft (Bericht zeigt sie, anderer Strang) */
+  const spanne = (st === 'N' && Number.isFinite(Number(a.pct_von)) && Number.isFinite(Number(a.pct_bis)))
+    ? { pct_von: Number(a.pct_von), pct_bis: Number(a.pct_bis),
+        spanne_deckung: Number.isFinite(Number(a.spanne_deckung)) ? Number(a.spanne_deckung) : null } : null;
   return {
-    ebene, etikett, klartext, unter_a: unterA,
+    ebene, etikett, klartext, unter_a: unterA, spanne,
     indikativ: unterA || ebene === 'eigene_angabe',
     ertragswert_hinweis: unterA
       ? (ebene === 'dealpilot_formel'
         ? 'Ertragswert insoweit indikativ: der Liegenschaftszinssatz ist aus der DealPilot-Formel '
           + 'abgeleitet (Stufe N), nicht der örtliche Satz des zuständigen Gutachterausschusses.'
+        : ebene === 'dealpilot_landesmittel'
+        ? 'Ertragswert insoweit indikativ: der Liegenschaftszinssatz ist ein DealPilot-Landesmittel '
+          + '(Stufe N), nicht der örtliche Satz des zuständigen Gutachterausschusses.'
         : 'Ertragswert insoweit indikativ: der Liegenschaftszinssatz ist ein ' + etikett
           + ', nicht der örtliche Satz des zuständigen Gutachterausschusses.')
       : null,

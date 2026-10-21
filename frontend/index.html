@@ -1953,6 +1953,13 @@ label.dp-required.qc-required::after {
         <!-- v2545 · Hoehe der letzten Erhoehung: die Kappungsgrenze gilt auf die Miete drei Jahre vorher (§ 558 Abs. 3 BGB) -->
         <div class="f"><label title="Um wie viel Euro im Monat die Miete bei der letzten Erhöhung gestiegen ist (bei mehreren in den letzten drei Jahren: die Summe, ohne Modernisierungsumlage und Betriebskosten). Die Kappungsgrenze gilt auf die Miete vor drei Jahren — ohne diese Angabe rechnet DealPilot den Spielraum zu groß.">Letzte Erhöhung um</label>
           <div class="iw"><span class="pfx">€</span><input id="mv_letzte_erhoehung_betrag" type="text" inputmode="decimal" placeholder="€/Monat" class="trl"></div></div>
+        <!-- v2660 · E2 · Restlaufzeit einer Mietabweichung am Einzelobjekt (ETW, EFH ohne Wohnungsliste) - dieselben Namen wie je Wohnung im MFH -->
+        <div class="f"><label title="Ist der Mietvertrag befristet, endet eine Abweichung der Miete vom Markt spätestens dann. Liegt die Ist-Miete mehr als 20 % über der marktüblichen Miete, rechnet der Ertragswert den Mehrertrag nur bis zu diesem Datum als besonderes Merkmal — ohne Datum nur als Szenario.">Befristet bis</label>
+          <div class="iw"><input id="mv_befristet_bis" type="date"></div></div>
+        <div class="f"><label title="Bis wann der Mieter auf seine Kündigung verzichtet hat. Wie bei der Befristung: so lange ist eine Miete über dem Markt gesichert und wird als besonderes Merkmal über diese Restlaufzeit angesetzt.">Kündigungsverzicht bis</label>
+          <div class="iw"><input id="mv_kuendigungsverzicht_bis" type="date"></div></div>
+        <div class="f"><label title="Nur bei einer Miete mehr als 20 % UNTER dem Markt: wie viele Jahre die Abweichung voraussichtlich noch besteht, bis die Miete rechtlich angepasst werden kann (Kappungsgrenze, Mieterhöhungsverlangen). Ohne Angabe zeigt der Bericht Szenarien über 3, 5 und 10 Jahre und setzt nichts an.">Abweichung erwartet noch (Jahre)</label>
+          <div class="iw"><input id="mv_abw_jahre" type="text" inputmode="decimal" placeholder="nur bei Miete unter Markt" class="tr"></div></div>
         <p class="hint" id="mv-objekt-mfh-hinweis" style="display:none"></p>
       </div>
       <div class="card"><div class="ct ct-pro me-header"><!-- V316-miete-header -->
@@ -3646,7 +3653,7 @@ label.dp-required.qc-required::after {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=v2544"></script>
 <script src="js/steuer-verlauf.js?v=v2571"></script>
-<script src="js/config.js?v=v2261"></script>
+<script src="js/config.js?v=v2630"></script>
   <script src="js/legal-links.js?v=v1885" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
   <script src="js/autocomplete-debug.js?v=174" defer></script>
@@ -3691,7 +3698,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v2576a"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v2575"></script>
+<script src="js/storage.js?v=v2660"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v2269"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v2263e"></script>
@@ -3721,14 +3728,14 @@ label.dp-required.qc-required::after {
 <script src="js/import-export-modal.js?v=v1678"></script>
 <script src="js/quick-check.js?v=v2546a"></script>
 <script src="js/qc-bridge.js?v=qc-v2571"></script>
-<script src="js/bodenrichtwert.js?v=v2374"></script>
+<script src="js/bodenrichtwert.js?v=v2592"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v2245"></script>
 <script src="js/objekt-reiter.js?v=v2557"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v2545"></script>
-<script src="js/potenzial.js?v=v2578"></script>
+<script src="js/mfh-einheiten.js?v=v2600"></script>
+<script src="js/potenzial.js?v=v2660"></script>
 <script src="js/mietvertrag-objekt.js?v=v2087"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>
@@ -3780,9 +3787,9 @@ label.dp-required.qc-required::after {
 <script src="js/avm-section.js?v=v2149"></script>
 <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte, klickbar = übernehmen -->
 <script src="js/marktwert-abschlag.js?v=v2490"></script><!-- v2237 · Abschlag auf Angebotspreise -->
-<script src="js/dealpilot-mb.js?v=v2515"></script>
+<script src="js/dealpilot-mb.js?v=v2660"></script>
 <script src="js/mb-auftrag.js?v=v2191"></script>
-  <script src="js/marktbericht-view.js?v=v2403"></script>
+  <script src="js/marktbericht-view.js?v=v2660"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=W40"></script>
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->

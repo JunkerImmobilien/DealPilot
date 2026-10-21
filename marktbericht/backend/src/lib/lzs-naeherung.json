@@ -1,5 +1,5 @@
 {
-  "stand": "2026-10-19",
+  "stand": "2026-10-21",
   "form": "LZS [%] = c + a_ETW + a_MFH + a_WGH + r * min(80, max(5, RND))/10 + s * Stadt",
   "herkunft": "DealPilot-Naeherung aus allen amtlichen Liegenschaftszinssaetzen des Registers (Wohnnutzung, juengster Jahrgang je Zweig), kleinste Quadrate",
   "kennzeichnung": "abgeleitet aus der DealPilot-Formel (nie amtlich)",
@@ -18,12 +18,12 @@
     "nicht": "Gewerbe, Buero, Handel, Sonderimmobilien; nie wo der Ausschuss einen Wert fuehrt (auch keinen gesperrten: dann Weg zum Ausschuss)"
   },
   "koeffizienten": {
-    "c": 1.682,
-    "ETW": 0.245,
-    "MFH": 1.487,
-    "WGH": 2.478,
-    "je_10_jahre_rnd": 0.093,
-    "stadt": -0.429
+    "c": 1.173,
+    "ETW": 0.167,
+    "MFH": 1.572,
+    "WGH": 2.556,
+    "je_10_jahre_rnd": 0.205,
+    "stadt": -0.669
   },
   "rnd_ersatz": {
     "EZFH": 37,
@@ -51,79 +51,132 @@
   "pruefung": {
     "methode": "Leave-one-Land-out (massgeblich) und Leave-one-Ausschuss-out; |Naeherung - amtlich| in Prozentpunkten",
     "lolo": {
-      "median_pp": 0.625,
-      "p90_pp": 1.571
+      "median_pp": 0.712,
+      "p80_pp": 1.369,
+      "p90_pp": 1.73,
+      "p95_pp": 1.998
     },
     "loao": {
-      "median_pp": 0.543,
-      "p90_pp": 1.554
+      "median_pp": 0.575,
+      "p80_pp": 1.131,
+      "p90_pp": 1.517,
+      "p95_pp": 1.86
     },
     "in_stichprobe": {
-      "median_pp": 0.533,
-      "p90_pp": 1.433
+      "median_pp": 0.566,
+      "p80_pp": 1.09,
+      "p90_pp": 1.5,
+      "p95_pp": 1.796
     },
     "bewg256_lolo": {
       "median_pp": 0.84,
-      "p90_pp": 1.75
+      "p80_pp": 1.47,
+      "p90_pp": 1.75,
+      "p95_pp": 2.1
     },
     "besser_als_256_in_laendern": "7 von 11",
     "je_land": {
       "NW": {
         "saetze": 480,
-        "formel_median_pp": 0.609,
+        "formel_median_pp": 0.808,
         "bewg256_median_pp": 1
       },
       "HE": {
         "saetze": 66,
-        "formel_median_pp": 0.538,
+        "formel_median_pp": 0.531,
         "bewg256_median_pp": 0.7
       },
       "NI": {
         "saetze": 125,
-        "formel_median_pp": 0.426,
+        "formel_median_pp": 0.496,
         "bewg256_median_pp": 0.5
       },
       "TH": {
         "saetze": 47,
-        "formel_median_pp": 1.226,
+        "formel_median_pp": 1.285,
         "bewg256_median_pp": 0.7
       },
       "ST": {
         "saetze": 48,
-        "formel_median_pp": 1.727,
+        "formel_median_pp": 1.777,
         "bewg256_median_pp": 0.9
       },
       "SH": {
         "saetze": 16,
-        "formel_median_pp": 0.894,
+        "formel_median_pp": 1.095,
         "bewg256_median_pp": 0.62
       },
       "BB": {
         "saetze": 83,
-        "formel_median_pp": 0.541,
+        "formel_median_pp": 0.602,
         "bewg256_median_pp": 0.7
       },
       "SN": {
         "saetze": 42,
-        "formel_median_pp": 1.338,
+        "formel_median_pp": 0.883,
         "bewg256_median_pp": 1.76
       },
       "BW": {
         "saetze": 85,
-        "formel_median_pp": 0.249,
+        "formel_median_pp": 0.303,
         "bewg256_median_pp": 0.77
       },
       "RP": {
         "saetze": 11,
-        "formel_median_pp": 0.575,
+        "formel_median_pp": 0.361,
         "bewg256_median_pp": 1.22
       },
       "MV": {
         "saetze": 8,
-        "formel_median_pp": 2.08,
+        "formel_median_pp": 2.155,
         "bewg256_median_pp": 1.55
       }
-    }
+    },
+    "laender_einsatz": [
+      "BB",
+      "BW",
+      "HE",
+      "NI",
+      "NW",
+      "RP",
+      "SN"
+    ],
+    "loao_einsatz": {
+      "median_pp": 0.506,
+      "p80_pp": 0.972,
+      "p90_pp": 1.258,
+      "p95_pp": 1.522
+    },
+    "spanne_p80_pp": {
+      "EZFH": 0.925,
+      "ETW": 0.805,
+      "MFH": 1.165,
+      "WGH": 1.376
+    },
+    "spanne_methode": "P80 der |Fehler| je Objektart, Leave-one-Ausschuss-out, nur Laender aus laender_einsatz; Deckung mit Halbbreite ohne den eigenen Ausschuss",
+    "spanne_deckung": {
+      "gesamt_pct": 79.6,
+      "je_objektart": {
+        "EZFH": {
+          "saetze": 339,
+          "deckung_pct": 79.6
+        },
+        "ETW": {
+          "saetze": 237,
+          "deckung_pct": 79.7
+        },
+        "MFH": {
+          "saetze": 210,
+          "deckung_pct": 79.5
+        },
+        "WGH": {
+          "saetze": 106,
+          "deckung_pct": 79.2
+        }
+      }
+    },
+    "rnd_steigung_aus": "574 Saetzen mit eigener RND (zweistufig, v2593)",
+    "stadt_merkmal": "lzsStadt(ags) wie zur Laufzeit (v2593)"
   },
   "bewg256_gegen_amtlich": {
     "EZFH": {
@@ -145,6 +198,530 @@
       "saetze": 119,
       "amtlich_median_pct": 4.2,
       "bewg256_minus_amtlich_pp": -0.2
+    }
+  },
+  "landesmittel": {
+    "methode": "Median der amtlichen Zinssaetze (Lernstoff wie die Formel) je Land x Objektart; nur mit >= 8 Ausschuessen und >= 8 Saetzen; Pruefung Leave-one-Ausschuss-out gegen Formel (LOAO) und § 256; verdrahtet, wo genauer als § 256 und - wo die Formel rechnet - als die Formel",
+    "kennzeichnung": "DealPilot-Landesmittel aus n amtlichen Zinssaetzen (nie amtlich), Stufe N",
+    "mindest_ausschuesse": 8,
+    "mindest_saetze": 8,
+    "zellen": {
+      "BB|EZFH": {
+        "saetze": 29,
+        "ausschuesse": 11,
+        "median_pct": 2.21,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": true,
+        "grund": "besser_als_formel_und_256",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 0.41,
+          "landesmittel_p80_pp": 0.98,
+          "formel_median_pp": 0.539,
+          "formel_p80_pp": 1.38,
+          "bewg256_median_pp": 0.51
+        },
+        "spanne_p80_pp": 0.98,
+        "spanne_deckung_pct": 79.3
+      },
+      "BB|ETW": {
+        "saetze": 20,
+        "ausschuesse": 13,
+        "median_pct": 2.75,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": true,
+        "grund": "besser_als_formel_und_256",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 0.508,
+          "landesmittel_p80_pp": 1.092,
+          "formel_median_pp": 0.61,
+          "formel_p80_pp": 0.956,
+          "bewg256_median_pp": 0.52
+        },
+        "spanne_p80_pp": 1.092,
+        "spanne_deckung_pct": 75
+      },
+      "BB|MFH": {
+        "saetze": 20,
+        "ausschuesse": 14,
+        "median_pct": 3.28,
+        "jahrgang_von": 2024,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "formel_besser",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 0.32,
+          "landesmittel_p80_pp": 0.77,
+          "formel_median_pp": 0.285,
+          "formel_p80_pp": 0.601,
+          "bewg256_median_pp": 0.72
+        },
+        "spanne_p80_pp": 0.77,
+        "spanne_deckung_pct": 75
+      },
+      "BB|WGH": {
+        "saetze": 14,
+        "ausschuesse": 12,
+        "median_pct": 3.8,
+        "jahrgang_von": 2024,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "nicht_besser_als_256",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 1.3,
+          "landesmittel_p80_pp": 1.78,
+          "formel_median_pp": 0.972,
+          "formel_p80_pp": 1.63,
+          "bewg256_median_pp": 1.265
+        },
+        "spanne_p80_pp": 1.78,
+        "spanne_deckung_pct": 78.6
+      },
+      "BW|EZFH": {
+        "saetze": 51,
+        "ausschuesse": 5,
+        "median_pct": 1.73,
+        "jahrgang_von": 2023,
+        "jahrgang_bis": 2026,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "BW|ETW": {
+        "saetze": 15,
+        "ausschuesse": 3,
+        "median_pct": 2.79,
+        "jahrgang_von": 2023,
+        "jahrgang_bis": 2026,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "BW|MFH": {
+        "saetze": 17,
+        "ausschuesse": 4,
+        "median_pct": 2.25,
+        "jahrgang_von": 2023,
+        "jahrgang_bis": 2026,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "BW|WGH": {
+        "saetze": 2,
+        "ausschuesse": 1,
+        "median_pct": 2.5,
+        "jahrgang_von": 2023,
+        "jahrgang_bis": 2023,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "HE|EZFH": {
+        "saetze": 23,
+        "ausschuesse": 11,
+        "median_pct": 1.8,
+        "jahrgang_von": 2024,
+        "jahrgang_bis": 2026,
+        "verdrahtet": false,
+        "grund": "formel_besser",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 0.55,
+          "landesmittel_p80_pp": 0.7,
+          "formel_median_pp": 0.529,
+          "formel_p80_pp": 0.837,
+          "bewg256_median_pp": 0.7
+        },
+        "spanne_p80_pp": 0.7,
+        "spanne_deckung_pct": 73.9
+      },
+      "HE|ETW": {
+        "saetze": 16,
+        "ausschuesse": 7,
+        "median_pct": 2.6,
+        "jahrgang_von": 2026,
+        "jahrgang_bis": 2026,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "HE|MFH": {
+        "saetze": 17,
+        "ausschuesse": 8,
+        "median_pct": 3.1,
+        "jahrgang_von": 2026,
+        "jahrgang_bis": 2026,
+        "verdrahtet": true,
+        "grund": "besser_als_formel_und_256",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 0.3,
+          "landesmittel_p80_pp": 1.04,
+          "formel_median_pp": 0.409,
+          "formel_p80_pp": 0.593,
+          "bewg256_median_pp": 0.9
+        },
+        "spanne_p80_pp": 1.04,
+        "spanne_deckung_pct": 76.5
+      },
+      "HE|WGH": {
+        "saetze": 10,
+        "ausschuesse": 6,
+        "median_pct": 3.4,
+        "jahrgang_von": 2024,
+        "jahrgang_bis": 2026,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "MV|EZFH": {
+        "saetze": 4,
+        "ausschuesse": 2,
+        "median_pct": 3.95,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "MV|ETW": {
+        "saetze": 1,
+        "ausschuesse": 1,
+        "median_pct": 3.9,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "MV|MFH": {
+        "saetze": 2,
+        "ausschuesse": 1,
+        "median_pct": 5.8,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "MV|WGH": {
+        "saetze": 1,
+        "ausschuesse": 1,
+        "median_pct": 6.7,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "NI|EZFH": {
+        "saetze": 60,
+        "ausschuesse": 8,
+        "median_pct": 2.35,
+        "jahrgang_von": 2024,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "nicht_besser_als_256",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 0.6,
+          "landesmittel_p80_pp": 0.9,
+          "formel_median_pp": 0.682,
+          "formel_p80_pp": 0.993,
+          "bewg256_median_pp": 0.4
+        },
+        "spanne_p80_pp": 0.9,
+        "spanne_deckung_pct": 75
+      },
+      "NI|ETW": {
+        "saetze": 38,
+        "ausschuesse": 8,
+        "median_pct": 2.3,
+        "jahrgang_von": 2024,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "formel_besser",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 0.4,
+          "landesmittel_p80_pp": 0.5,
+          "formel_median_pp": 0.326,
+          "formel_p80_pp": 0.497,
+          "bewg256_median_pp": 0.7
+        },
+        "spanne_p80_pp": 0.5,
+        "spanne_deckung_pct": 63.2
+      },
+      "NI|MFH": {
+        "saetze": 6,
+        "ausschuesse": 3,
+        "median_pct": 4,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "NI|WGH": {
+        "saetze": 21,
+        "ausschuesse": 4,
+        "median_pct": 4.2,
+        "jahrgang_von": 2024,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "NW|EZFH": {
+        "saetze": 156,
+        "ausschuesse": 57,
+        "median_pct": 1.6,
+        "jahrgang_von": 2023,
+        "jahrgang_bis": 2025,
+        "verdrahtet": true,
+        "grund": "besser_als_formel_und_256",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 0.4,
+          "landesmittel_p80_pp": 0.7,
+          "formel_median_pp": 0.495,
+          "formel_p80_pp": 0.973,
+          "bewg256_median_pp": 0.9
+        },
+        "spanne_p80_pp": 0.7,
+        "spanne_deckung_pct": 84.6
+      },
+      "NW|ETW": {
+        "saetze": 130,
+        "ausschuesse": 70,
+        "median_pct": 2,
+        "jahrgang_von": 2023,
+        "jahrgang_bis": 2025,
+        "verdrahtet": true,
+        "grund": "besser_als_formel_und_256",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 0.4,
+          "landesmittel_p80_pp": 0.76,
+          "formel_median_pp": 0.469,
+          "formel_p80_pp": 0.816,
+          "bewg256_median_pp": 1
+        },
+        "spanne_p80_pp": 0.76,
+        "spanne_deckung_pct": 80
+      },
+      "NW|MFH": {
+        "saetze": 137,
+        "ausschuesse": 71,
+        "median_pct": 2.9,
+        "jahrgang_von": 2024,
+        "jahrgang_bis": 2025,
+        "verdrahtet": true,
+        "grund": "besser_als_formel_und_256",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 0.4,
+          "landesmittel_p80_pp": 0.9,
+          "formel_median_pp": 0.604,
+          "formel_p80_pp": 1.079,
+          "bewg256_median_pp": 1.1
+        },
+        "spanne_p80_pp": 0.9,
+        "spanne_deckung_pct": 81
+      },
+      "NW|WGH": {
+        "saetze": 57,
+        "ausschuesse": 55,
+        "median_pct": 4.2,
+        "jahrgang_von": 2023,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "nicht_besser_als_256",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 0.5,
+          "landesmittel_p80_pp": 1.08,
+          "formel_median_pp": 0.422,
+          "formel_p80_pp": 0.967,
+          "bewg256_median_pp": 0.5
+        },
+        "spanne_p80_pp": 1.08,
+        "spanne_deckung_pct": 78.9
+      },
+      "RP|EZFH": {
+        "saetze": 1,
+        "ausschuesse": 1,
+        "median_pct": 2.02,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "RP|ETW": {
+        "saetze": 8,
+        "ausschuesse": 1,
+        "median_pct": 1.635,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "RP|MFH": {
+        "saetze": 1,
+        "ausschuesse": 1,
+        "median_pct": 2.67,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "RP|WGH": {
+        "saetze": 1,
+        "ausschuesse": 1,
+        "median_pct": 2.91,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "SH|EZFH": {
+        "saetze": 7,
+        "ausschuesse": 4,
+        "median_pct": 2.93,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "SH|ETW": {
+        "saetze": 4,
+        "ausschuesse": 4,
+        "median_pct": 2.73,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "SH|MFH": {
+        "saetze": 4,
+        "ausschuesse": 4,
+        "median_pct": 4.82,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "SH|WGH": {
+        "saetze": 1,
+        "ausschuesse": 1,
+        "median_pct": 5.3,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "SN|EZFH": {
+        "saetze": 19,
+        "ausschuesse": 1,
+        "median_pct": 0.75,
+        "jahrgang_von": 2026,
+        "jahrgang_bis": 2026,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "SN|ETW": {
+        "saetze": 10,
+        "ausschuesse": 2,
+        "median_pct": 2.08,
+        "jahrgang_von": 2026,
+        "jahrgang_bis": 2026,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "SN|MFH": {
+        "saetze": 12,
+        "ausschuesse": 2,
+        "median_pct": 1.51,
+        "jahrgang_von": 2026,
+        "jahrgang_bis": 2026,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "SN|WGH": {
+        "saetze": 1,
+        "ausschuesse": 1,
+        "median_pct": 3.5,
+        "jahrgang_von": 2026,
+        "jahrgang_bis": 2026,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "ST|EZFH": {
+        "saetze": 0,
+        "ausschuesse": 0,
+        "median_pct": null,
+        "jahrgang_von": null,
+        "jahrgang_bis": null,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "ST|ETW": {
+        "saetze": 0,
+        "ausschuesse": 0,
+        "median_pct": null,
+        "jahrgang_von": null,
+        "jahrgang_bis": null,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "ST|MFH": {
+        "saetze": 46,
+        "ausschuesse": 1,
+        "median_pct": 4.9,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "ST|WGH": {
+        "saetze": 2,
+        "ausschuesse": 1,
+        "median_pct": 3.4,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "TH|EZFH": {
+        "saetze": 13,
+        "ausschuesse": 3,
+        "median_pct": 3.11,
+        "jahrgang_von": 2023,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "TH|ETW": {
+        "saetze": 7,
+        "ausschuesse": 3,
+        "median_pct": 3.56,
+        "jahrgang_von": 2024,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "TH|MFH": {
+        "saetze": 18,
+        "ausschuesse": 7,
+        "median_pct": 4.4,
+        "jahrgang_von": 2023,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "TH|WGH": {
+        "saetze": 9,
+        "ausschuesse": 5,
+        "median_pct": 6.3,
+        "jahrgang_von": 2024,
+        "jahrgang_bis": 2025,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      }
     }
   },
   "lernkurve": null

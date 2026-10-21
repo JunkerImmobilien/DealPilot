@@ -157,6 +157,7 @@ var FIELDS = [
      Liste ist die Einsammelstelle, und was hier fehlt, verschwindet
      beim Speichern lautlos. */
   'mv_art','mv_beginn','mv_letzte_erhoehung','mv_letzte_erhoehung_betrag',   /* v2545 */
+  'mv_befristet_bis','mv_kuendigungsverzicht_bis','mv_abw_jahre',   /* v2660 · E2 · Restlaufzeit der Mietabweichung am Einzelobjekt */
   // V36: DealScore 2.0 Zusatzangaben
   'ds2_zustand','ds2_energie','ds2_mietausfall','ds2_marktmiete',
   'ds2_bevoelkerung','ds2_nachfrage','ds2_marktfaktor',
@@ -542,7 +543,11 @@ function loadData(d) {
     'ueberf_restschuld', 'ueberf_rest_zins',
     'ueberf_ende', '_ueberf_link',
     /* v2430: sonst erbt Objekt B Soll-Miete, Zielbild und Massnahmen von A */
-    'zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen', 'zb_fertig_jahr'
+    'zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen', 'zb_fertig_jahr',
+    /* v2660: der Mietvertrag am Objekt - fehlte er im geladenen Objekt, erbte B Vertragsart,
+       Daten, Befristung und Kuendigungsverzicht von A und schrieb sie beim Speichern mit */
+    'mv_art', 'mv_beginn', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag',
+    'mv_befristet_bis', 'mv_kuendigungsverzicht_bis', 'mv_abw_jahre'
   ].concat(WM_FIELDS);  /* v1136-WMTAB-1: dieselbe Falle, siehe Kommentar an WM_FIELDS */
   resetFields.forEach(function(id) {
     var e = document.getElementById(id);
@@ -3349,6 +3354,7 @@ async function showBankexportView() {
           '</tbody>' +
         '</table>' +
       '</div>' +
+      '<div id="bx-belw" style="margin-top:22px"></div>' +   /* v2630 · Beleihungswert-Check */
       '</div>' +
 
     '</div>';
@@ -3364,6 +3370,142 @@ async function showBankexportView() {
   }
   // V105: Nur die nicht-excludeten Zeilen zur Export-Funktion durchreichen
   window._bankexportData = { objects: objects, rows: rows, totals: t };
+  try { _bxBelwLaden(modal, objects, rows); } catch (e) { console.warn('[v2630] Beleihungswert-Check:', e && e.message); }
+}
+
+/* ══ v2630 · INDIKATIVER BELEIHUNGSWERT-CHECK (BelWertV) ════════════════
+   Marcel 21.10.2026 (E8): im Bank-Export, klar getrennt vom Verkehrswert,
+   nie als Gutachten nach § 5 BelWertV. Gerechnet im Marktbericht-Dienst
+   (lib/beleihungswert.js) aus dem GESPEICHERTEN Bericht je Objekt - kein
+   neuer Abruf, keine Kosten. Die Marktparameter (Mindestzins der BaFin,
+   Rendite der Bundesanleihe) stehen in config.js und gehen mit; der Kern
+   liest keine Einstellungen. Darlehen je Objekt = Summe der aktuellen
+   Restschuld der ausgewaehlten Zeilen (sonst Darlehenssumme). */
+var _bxBelwLauf = 0;
+function _bxEsc(x) { return String(x == null ? '' : x).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function _bxEur(x) { return (x == null || !isFinite(x)) ? '–' : Math.round(x).toLocaleString('de-DE') + ' €'; }
+function _bxPct(x, d) { var k = d == null ? 1 : d; return (x == null || !isFinite(x)) ? '–' : Number(x).toLocaleString('de-DE', { minimumFractionDigits: k, maximumFractionDigits: k }) + ' %'; }
+async function _bxBelwLaden(modal, objects, rows) {
+  var box = modal && modal.querySelector('#bx-belw'); if (!box) return;
+  var lauf = ++_bxBelwLauf;
+  var refs = objects.map(function (o) { return o && o.id; }).filter(function (x) { return x && /^[A-Za-z0-9_.:-]{1,80}$/.test(String(x)); });
+  if (!refs.length || !window.Auth || typeof Auth.apiCall !== 'function' || !(Auth.isApiMode && Auth.isApiMode())) { box.innerHTML = ''; return; }
+  var darl = {};
+  rows.forEach(function (r) {
+    var v = (r.akt_restschuld > 0 ? r.akt_restschuld : (r.darl_summe || 0));
+    if (r.objectId && v > 0) darl[r.objectId] = (darl[r.objectId] || 0) + v;
+  });
+  var cfg = (window.DealPilotConfig && DealPilotConfig.beleihungswert) || {};
+  box.innerHTML = '<div style="font-size:12px;color:var(--muted)">Beleihungswert-Check wird aus den gespeicherten Marktberichten gerechnet …</div>';
+  var j = null;
+  try { j = await Auth.apiCall('/marktbericht/beleihungswert', { method: 'POST', body: { refs: refs, darlehen: darl, parameter: { mindestzins: cfg.mindestzins || null, rendite_30j: cfg.rendite_30j || null } } }); }
+  catch (e) { j = null; }
+  if (lauf !== _bxBelwLauf || !document.body.contains(box)) return;
+  var je = (j && j.objekte) || null;
+  if (!je) { box.innerHTML = '<div style="font-size:12px;color:var(--muted)">Beleihungswert-Check gerade nicht erreichbar.</div>'; return; }
+  if (window._bankexportData) window._bankexportData.belw = { objekte: je, parameter: cfg };
+  box.innerHTML = _bxBelwHtml(objects, je, cfg);
+}
+function _bxName(o) { return (o && o.name) || (o && o.data && ((o.data.str || '') + ' ' + (o.data.hnr || '')).trim()) || 'Objekt'; }
+function _bxBelwHtml(objects, je, cfg) {
+  var mit = [], ohne = [], erkl = null;
+  objects.forEach(function (o) {
+    var r = je[o.id]; if (!r) return;
+    if (r.verfuegbar) { mit.push({ o: o, r: r, name: _bxName(o) }); erkl = erkl || r.erklaerungen; } else ohne.push(_bxName(o));
+  });
+  var mz = cfg.mindestzins || {}, rd = cfg.rendite_30j || {};
+  var zeile = function (l, v, t) {
+    return '<div style="display:flex;justify-content:space-between;gap:12px;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px">'
+      + '<span style="color:var(--muted)"' + (t ? ' title="' + _bxEsc(t) + '"' : '') + '>' + l + '</span>'
+      + '<span style="text-align:right;font-variant-numeric:tabular-nums">' + v + '</span></div>';
+  };
+  var karten = mit.map(function (m) {
+    var r = m.r, e = r.ertragswert || null, sw = r.sachwert, k = r.kontrolle, a = r.auslauf, x = r.erklaerungen || {};
+    var vwArt = r.verkehrswert_verfahren === 'sachwert' ? 'Sachwert' : (r.verkehrswert_verfahren === 'vergleichswert' ? 'Vergleichswert' : 'Ertragswert');
+    var h = '<div class="bx-belw-karte" style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--surface2,#FAF9F4);min-width:0">';
+    h += '<div style="font-weight:700;font-size:13px;margin-bottom:2px;overflow-wrap:anywhere">' + _bxEsc(m.name) + '</div>';
+    h += '<div style="font-size:11px;color:var(--muted);margin-bottom:8px">aus dem Marktbericht vom ' + (r.bericht && r.bericht.created_at ? new Date(r.bericht.created_at).toLocaleDateString('de-DE') : '–') + '</div>';
+    h += '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600">Beleihungswert · indikativ</div>';
+    h += '<div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">' + _bxEur(r.beleihungswert) + '</div>';
+    if (r.verkehrswert) h += '<div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">' + _bxPct(r.verhaeltnis_zum_verkehrswert_pct, 0) + ' des Verkehrswerts (' + vwArt + ' ' + _bxEur(r.verkehrswert) + ')</div>';
+    if (e) {
+      h += zeile('Nachhaltiger Rohertrag', _bxEur(e.rohertrag) + (e.rohertrag_bericht && e.rohertrag_bericht !== e.rohertrag ? ' <span style="color:var(--muted)">(Bericht ' + _bxEur(e.rohertrag_bericht) + ')</span>' : ''), x.nachhaltige_miete);
+      h += zeile('Bewirtschaftungskosten', _bxEur(e.bwk.summe) + ' · ' + _bxPct(e.bwk.quote_pct), x.bewirtschaftungskosten);
+      h += zeile('Kapitalisierungszins', _bxPct(e.zins_wohnen_pct) + (e.zins_gewerbe_pct ? ' / Gewerbe ' + _bxPct(e.zins_gewerbe_pct) : '')
+        + (e.lzs_bericht_pct != null ? ' <span style="color:var(--muted)">(Bericht ' + _bxPct(e.lzs_bericht_pct) + ')</span>' : ''), x.kapitalisierungszins);
+      h += zeile('Restnutzungsdauer', String(e.rnd_jahre).replace('.', ',') + ' Jahre');
+      h += zeile('Ertragswert (Bank)', _bxEur(e.wert));
+    }
+    if (sw) h += zeile('Sachwert (Bank, −10 %)', _bxEur(sw.wert) + (k && k.art === 'sachwert' ? ' · ' + (k.abweichung_pct > 0 ? '+' : '') + _bxPct(k.abweichung_pct) : ''), x.sicherheitsabschlag);
+    if (a) h += zeile('Beleihungsauslauf', '<b style="color:' + (a.ueber_60 ? '#B8625C' : '#3FA56C') + '">' + _bxPct(a.auslauf_pct) + '</b> <span style="color:var(--muted)">(60 % = ' + _bxEur(a.grenze_60_eur) + ')</span>', x.beleihungsauslauf);
+    var hw = (r.hinweise || []).slice();
+    if (a) hw.push(a.text);
+    if (r.kleindarlehen) hw.push(r.kleindarlehen.text);
+    if (hw.length) h += '<ul style="margin:8px 0 0;padding-left:16px;font-size:11.5px;line-height:1.45;color:var(--muted)">' + hw.map(function (t) { return '<li>' + _bxEsc(t) + '</li>'; }).join('') + '</ul>';
+    return h + '</div>';
+  }).join('');
+  var out = '<h3 style="margin:0 0 4px;font-size:15px">Beleihungswert-Check <span style="font-weight:500;color:var(--muted)">· indikativ</span></h3>'
+    + '<p style="margin:0 0 10px;font-size:12px;line-height:1.5;color:var(--muted);max-width:900px">Was eine Bank nach der Beleihungswertermittlungsverordnung (BelWertV) ungefähr ansetzen würde, gerechnet aus deinem letzten Marktbericht. '
+    + '<b>Kein Beleihungswertgutachten nach § 5 BelWertV</b>, keine Festsetzung durch die Bank und kein Verkehrswert. Die Bank rechnet vorsichtiger: nur die dauerhaft erzielbare Miete, mindestens 15 % Bewirtschaftungskosten, ein gesetzlicher Mindestzins und 10 % Sicherheitsabschlag auf die Baukosten.</p>';
+  if (karten) out += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px">' + karten + '</div>';
+  if (ohne.length) out += '<p style="margin:10px 0 0;font-size:12px;color:var(--muted)">Ohne Check (' + ohne.length + '): ' + ohne.map(_bxEsc).join(', ') + ' – dafür braucht es einen Marktbericht mit Ertrags- oder Sachwert (Stufe 3) im Reiter Objekt.</p>';
+  out += '<p style="margin:10px 0 0;font-size:11px;color:var(--muted)">Mindestkapitalisierungszins '
+    + (mz.wohnen_pct != null ? _bxPct(mz.wohnen_pct) + ' Wohnen / ' + _bxPct(mz.gewerbe_pct) + ' Gewerbe, von der BaFin bekanntgegeben' + (mz.gueltig_ab ? ', gültig seit ' + _bxEsc(mz.gueltig_ab) : '') : 'nicht hinterlegt – gerechnet mit der Untergrenze 3,5 %')
+    + (rd.pct != null ? ' · Rendite 30-jähriger Bundesanleihen ' + _bxPct(rd.pct, 2) + ' (' + _bxEsc(rd.datum || '') + ', Deutsche Bundesbank)' : '') + '.</p>';
+  if (erkl) out += '<details style="margin-top:8px;font-size:12px"><summary style="cursor:pointer;font-weight:600">Begriffe erklärt</summary><dl style="margin:8px 0 0;line-height:1.5">'
+    + [['Beleihungswert', erkl.beleihungswert], ['Nachhaltige Miete', erkl.nachhaltige_miete], ['Bewirtschaftungskosten', erkl.bewirtschaftungskosten], ['Kapitalisierungszins', erkl.kapitalisierungszins], ['Sicherheitsabschlag', erkl.sicherheitsabschlag], ['Beleihungsauslauf', erkl.beleihungsauslauf], ['Kleindarlehen', erkl.kleindarlehen]]
+      .map(function (p) { return '<dt style="font-weight:600">' + p[0] + '</dt><dd style="margin:0 0 6px;color:var(--muted)">' + _bxEsc(p[1]) + '</dd>'; }).join('') + '</dl></details>';
+  return out;
+}
+/* v2630 · dieselbe Rechnung als eigene Seite im Bank-PDF (jsPDF: nur Latin-1-Zeichen) */
+function _bxBelwPdf(doc, data) {
+  var je = data && data.belw && data.belw.objekte; if (!je) return;
+  var mit = data.objects.filter(function (o) { return je[o.id] && je[o.id].verfuegbar; });
+  if (!mit.length) return;
+  var L = function (t) { return String(t == null ? '' : t).replace(/[−–]/g, '-').replace(/[^\x00-\xFF€]/g, ''); };
+  var eur = function (x) { return (x == null || !isFinite(x)) ? '-' : Math.round(x).toLocaleString('de-DE') + ' €'; };
+  var pc = function (x, d) { return (x == null || !isFinite(x)) ? '-' : Number(x).toLocaleString('de-DE', { minimumFractionDigits: d == null ? 1 : d, maximumFractionDigits: d == null ? 1 : d }) + ' %'; };
+  doc.addPage();
+  var W = doc.internal.pageSize.getWidth(), TW = W - 24;
+  doc.setFillColor(42, 39, 39); doc.rect(0, 0, W, 22, 'F');
+  doc.setTextColor.apply(doc, window._pdfGold()); doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+  doc.text('Beleihungswert-Check - indikativ (BelWertV)', 12, 14);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(60, 60, 60);
+  var intro = doc.splitTextToSize(L('Was eine Bank nach der Beleihungswertermittlungsverordnung ungefähr ansetzen würde, gerechnet aus dem letzten Marktbericht je Objekt. Kein Beleihungswertgutachten nach § 5 BelWertV, keine Festsetzung durch die Bank und kein Verkehrswert. Nachhaltige Miete mit der Vertragsmiete als Obergrenze (§ 10), Bewirtschaftungskosten mindestens 15 % (§ 11), Mindestkapitalisierungszins (§ 12 Abs. 4), 10 % Sicherheitsabschlag auf die Herstellungskosten (§ 16), Ertragswert als Obergrenze (§ 4).'), TW);
+  doc.text(intro, 12, 29);
+  var body = mit.map(function (o) {
+    var r = je[o.id], e = r.ertragswert || {}, a = r.auslauf;
+    return [L(_bxName(o)), eur(r.verkehrswert), eur(e.rohertrag), e.bwk ? eur(e.bwk.summe) + ' (' + pc(e.bwk.quote_pct) + ')' : '-',
+      (e.zins_wohnen_pct != null ? pc(e.zins_wohnen_pct) : '-') + (e.lzs_bericht_pct != null ? ' (LZS ' + pc(e.lzs_bericht_pct) + ')' : ''),
+      e.rnd_jahre != null ? String(e.rnd_jahre).replace('.', ',') + ' J' : '-', eur(e.wert), r.sachwert ? eur(r.sachwert.wert) : '-',
+      eur(r.beleihungswert), pc(r.verhaeltnis_zum_verkehrswert_pct, 0), a ? pc(a.auslauf_pct) : '-'];
+  });
+  doc.autoTable({
+    startY: 29 + intro.length * 3.4 + 2,
+    head: [['Objekt', 'Verkehrswert', 'Rohertrag nachh.', 'BWK', 'Kap.-Zins', 'RND', 'Ertragswert Bank', 'Sachwert Bank', 'Beleihungswert', 'zum VW', 'Auslauf']],
+    body: body, theme: 'striped',
+    headStyles: { fillColor: [42, 39, 39], textColor: window._pdfGold(), fontSize: 8, fontStyle: 'bold' },
+    bodyStyles: { fontSize: 7.8, cellPadding: 1.6 }, alternateRowStyles: { fillColor: [248, 246, 240] },
+    columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' }, 6: { halign: 'right' }, 7: { halign: 'right' }, 8: { halign: 'right', fontStyle: 'bold' }, 9: { halign: 'right' }, 10: { halign: 'right' } },
+    margin: { left: 12, right: 12 }
+  });
+  var y = (doc.lastAutoTable && doc.lastAutoTable.finalY || 60) + 6;
+  var ph = doc.internal.pageSize.getHeight();
+  doc.setFontSize(7.5); doc.setTextColor(70, 70, 70);
+  mit.forEach(function (o) {
+    var r = je[o.id], hw = (r.hinweise || []).slice();
+    if (r.auslauf) hw.push(r.auslauf.text);
+    if (r.kleindarlehen) hw.push(r.kleindarlehen.text);
+    if (!hw.length) return;
+    var t = doc.splitTextToSize(L(_bxName(o) + ': ' + hw.join(' ')), TW);
+    if (y + t.length * 3.2 > ph - 14) { doc.addPage(); y = 16; }
+    doc.text(t, 12, y); y += t.length * 3.2 + 2;
+  });
+  var mz = (data.belw.parameter || {}).mindestzins || {}, rd = (data.belw.parameter || {}).rendite_30j || {};
+  var q = doc.splitTextToSize(L('Mindestkapitalisierungszins ' + (mz.wohnen_pct != null ? pc(mz.wohnen_pct) + ' Wohnen / ' + pc(mz.gewerbe_pct) + ' Gewerbe (BaFin, gültig seit ' + (mz.gueltig_ab || '-') + ')' : 'nicht hinterlegt: Untergrenze 3,5 %')
+    + (rd.pct != null ? '; Rendite 30-jähriger Bundesanleihen ' + pc(rd.pct, 2) + ' am ' + (rd.datum || '-') + ' (Deutsche Bundesbank)' : '') + '. Beleihungsauslauf = aktuelle Restschuld / Beleihungswert; 60-%-Grenze nach § 14 PfandBG.'), TW);
+  if (y + q.length * 3.2 > ph - 10) { doc.addPage(); y = 16; }
+  doc.setTextColor(120, 120, 120); doc.text(q, 12, y);
 }
 
 // V105: Toggle-Helpers für Bankexport-Filter
@@ -4095,6 +4237,8 @@ async function exportGlobalBankPDF() {
   doc.setTextColor(150, 150, 150);
   doc.text((typeof _getUserContact === 'function' ? _formatContact(_getUserContact()) : 'Junker Immobilien · Hermannstr. 9 · 32609 Hüllhorst · www.junker-immobilien.io'), 12, pageH - 6);
 
+  /* v2630b: die AKTIVE Bank-PDF ist diese zweite Definition (A3) - die erste weiter oben wird von ihr ueberschrieben */
+  try { _bxBelwPdf(doc, data); } catch (e) { console.warn('[v2630] Beleihungswert-PDF:', e && e.message); }
   if (typeof _applyWatermarkIfFree === 'function') { try { var _npA=doc.internal.getNumberOfPages(); for(var _pA=1;_pA<=_npA;_pA++){ doc.setPage(_pA); _applyWatermarkIfFree(doc, doc.internal.pageSize.getWidth()); } } catch(e){} } /*v899-bankexport*/
   doc.save(((((typeof _getBranding==='function')?(_getBranding().company||'DealPilot'):'DealPilot').replace(/[^a-zA-Z0-9]/g,'_'))+'_AuswertungBank_') + new Date().toISOString().slice(0, 10) + '.pdf');
   toast('✓ PDF erstellt (A3 Querformat)');

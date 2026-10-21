@@ -19,7 +19,9 @@ import { BorisConnector } from '../connectors/BorisConnector.js';
 import { HarvestService } from '../services/HarvestService.js';
 /* WIMP-3 */
 import { MarktberichtImportService } from '../services/MarktberichtImportService.js';
-import { sperreRest, merkeLauf } from '../lib/harvestScheduler.js';
+import { sperreRest, merkeLauf, laufStand } from '../lib/harvestScheduler.js';
+/* v2591 · Deckung des Registers fuer die Admin-Ansicht „Register & Ernte" */
+import { registerDeckung, zellenListe, KZ_NAME as DECKUNG_KZ } from '../lib/register_deckung.js';
 import { q as qMb } from '../lib/db.js';
 import { DestatisConnector } from '../connectors/stubConnectors.js';
 import { AgsResolver } from '../connectors/AgsResolver.js';
@@ -44,6 +46,7 @@ import { LocationFinderService } from '../services/LocationFinderService.js';
 /* v1096-WPRB · Der Aufloeser und der Registerstand fuer die Abnahme. */
 import * as GAA from '../lib/gutachterausschuss.js';
 import { registerStand } from '../lib/ausschuss_register.js';
+import { beleihungswert as belwCheck, eingabenAusBericht as belwEingaben } from '../lib/beleihungswert.js';   /* v2630 */
 
 export const router = express.Router();
 
@@ -72,6 +75,32 @@ router.get('/register/stand', (req, res) => {
       datei: String(g.datei).split('/').pop(), saetze: g.saetze })),
     vermisst: (st.vermisst || []).map((v) => String(v.datei).split('/').pop()),
   });
+});
+
+/* ── v2591 · DECKUNG DES REGISTERS, fuer die Admin-Ansicht ─────────────
+ *
+ * Abgesichert wie /harvest/status: lesend offen nur im Docker-Netz, von
+ * aussen ausschliesslich ueber den Admin-Proxy des Haupt-Backends
+ * (/admin/register/deckung, requireAdmin). In routes/marktbericht.js des
+ * Haupt-Backends steht dieser Weg bewusst NICHT.
+ *
+ * Schreibt genau eine Zeile je Tag in mb.register_deckung_lauf (eigene
+ * Tabelle, Migration 021) — den Schnappschuss fuer den Verlauf. */
+router.get('/register/deckung', async (req, res) => {
+  try {
+    res.json(await registerDeckung({ q: qMb, laufStand }));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.get('/register/deckung/zelle', (req, res) => {
+  const land = String(req.query.land || '').toUpperCase();
+  const kz = String(req.query.kz || '');
+  if (!/^[A-Z]{2}$/.test(land) || !DECKUNG_KZ[kz]) {
+    return res.status(400).json({ error: 'land (zwei Buchstaben) und kz ('
+      + Object.keys(DECKUNG_KZ).join(', ') + ') erforderlich' });
+  }
+  try { res.json({ land, kz, ausschuesse: zellenListe(land, kz) }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 /**
@@ -527,6 +556,43 @@ router.get('/objects', async (req, res) => {
       [uid]
     );
     res.json({ objects: r });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+/* ══ v2630 · INDIKATIVER BELEIHUNGSWERT-CHECK (BelWertV) ═══════════════════
+   Marcel 21.10.2026 (E8): im Bank-Export, getrennt vom Verkehrswert, nie als
+   Gutachten. Gerechnet wird aus dem GESPEICHERTEN Bericht - kein neuer Abruf,
+   keine Kosten: neuester Stand des Objekts (external_ref) mit Ertrags- oder
+   Sachwert, daraus lib/beleihungswert.js. Die Marktparameter (Mindestzins der
+   BaFin, Rendite der Bundesanleihe) kommen aus dem Aufrufer (frontend
+   config.js), der Kern liest keine Einstellungen.
+   POST { user_id, refs: [external_ref, ...], darlehen: { ref: eur }, parameter } */
+router.post('/beleihungswert', async (req, res) => {
+  const uid = _uidAus(req);
+  if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
+  const b = req.body || {};
+  const refs = (Array.isArray(b.refs) ? b.refs : [b.ref]).filter((r) => r && /^[A-Za-z0-9_.:-]{1,80}$/.test(String(r))).slice(0, 60);
+  if (!refs.length) return res.status(400).json({ error: 'refs erforderlich' });
+  const darl = (b.darlehen && typeof b.darlehen === 'object') ? b.darlehen : {};
+  try {
+    /* Die Bedingung steht hier, nicht im SQL-Text: neuester Stand je Objekt,
+       der einen Ertragswert ODER Sachwert traegt. */
+    const rows = await q(
+      'SELECT DISTINCT ON (external_ref) external_ref, report_id, created_at, address, property_type,'
+      + " data->'cross_check' AS cc"
+      + ' FROM mb.object_snapshots'
+      + ' WHERE user_id = $1 AND external_ref = ANY($2)'
+      + " AND ((data->'cross_check'->'ertragswert'->>'value_eur') IS NOT NULL OR (data->'cross_check'->'sachwert'->>'value_eur') IS NOT NULL)"
+      + ' ORDER BY external_ref, created_at DESC', [uid, refs]);
+    const je = {};
+    for (const r of rows) {
+      const ein = belwEingaben(r.cc, { objektart: r.property_type, darlehen: darl[r.external_ref] });
+      const erg = belwCheck(ein, b.parameter || {});
+      erg.bericht = { report_id: r.report_id, created_at: r.created_at, address: r.address };
+      je[r.external_ref] = erg;
+    }
+    refs.forEach((r) => { if (!je[r]) je[r] = { verfuegbar: false, grund: 'kein Marktbericht mit Ertrags- oder Sachwert (Stufe 3) für dieses Objekt' }; });
+    res.json({ objekte: je, stand: new Date().toISOString().slice(0, 10) });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

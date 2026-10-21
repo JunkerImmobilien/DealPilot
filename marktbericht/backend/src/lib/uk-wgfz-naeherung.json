@@ -1,5 +1,5 @@
 {
-  "stand": "2026-10-19",
+  "stand": "2026-10-21",
   "form": "UK(WGFZ Objekt)/UK(WGFZ Richtwert) = (WGFZ Objekt / WGFZ Richtwert)^b",
   "herkunft": "DealPilot-Naeherung aus allen amtlichen WGFZ-Umrechnungstabellen und -formeln des Registers (Werte und interne Stuetzstellen), Median der Exponenten je Kurve; gleiche Zahlenreihen einmal gezaehlt",
   "kennzeichnung": "abgeleitet aus der DealPilot-Formel (nie amtlich)",
@@ -25,6 +25,24 @@
     "b_q3": 0.561,
     "b_min": 0,
     "b_max": 1.185,
+    "b_p10": 0.234,
+    "b_p90": 0.754,
+    "pruefung": {
+      "loto": {
+        "median_pct": 3.584,
+        "p80_pct": 9.456,
+        "p95_pct": 19.623,
+        "punkte": 14740
+      },
+      "lolo": {
+        "median_pct": 3.527,
+        "p80_pct": 9.498,
+        "p95_pct": 19.685,
+        "punkte": 14740
+      },
+      "spanne_b_deckung_pct": 78.3,
+      "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
+    },
     "tabellen": 86,
     "uebernahmen": 252,
     "punkte": 14740,
@@ -56,6 +74,24 @@
     "b_q3": 0.413,
     "b_min": 0.163,
     "b_max": 0.519,
+    "b_p10": 0.189,
+    "b_p90": 0.466,
+    "pruefung": {
+      "loto": {
+        "median_pct": 5.397,
+        "p80_pct": 10.164,
+        "p95_pct": 15.514,
+        "punkte": 521
+      },
+      "lolo": {
+        "median_pct": 5.845,
+        "p80_pct": 12.023,
+        "p95_pct": 17.975,
+        "punkte": 521
+      },
+      "spanne_b_deckung_pct": 44.9,
+      "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
+    },
     "tabellen": 6,
     "uebernahmen": 6,
     "punkte": 521,
@@ -75,6 +111,24 @@
     "b_q3": 0.576,
     "b_min": 0,
     "b_max": 1.185,
+    "b_p10": 0.253,
+    "b_p90": 0.775,
+    "pruefung": {
+      "loto": {
+        "median_pct": 3.589,
+        "p80_pct": 9.445,
+        "p95_pct": 19.487,
+        "punkte": 14219
+      },
+      "lolo": {
+        "median_pct": 3.51,
+        "p80_pct": 9.415,
+        "p95_pct": 19.605,
+        "punkte": 14219
+      },
+      "spanne_b_deckung_pct": 78.1,
+      "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
+    },
     "tabellen": 80,
     "uebernahmen": 246,
     "punkte": 14219,
@@ -106,6 +160,24 @@
     "b_q3": 0.956,
     "b_min": 0.398,
     "b_max": 1,
+    "b_p10": 0.565,
+    "b_p90": 1,
+    "pruefung": {
+      "loto": {
+        "median_pct": 4.511,
+        "p80_pct": 12.217,
+        "p95_pct": 23.077,
+        "punkte": 819
+      },
+      "lolo": {
+        "median_pct": 4.634,
+        "p80_pct": 12.663,
+        "p95_pct": 23.077,
+        "punkte": 819
+      },
+      "spanne_b_deckung_pct": 35.7,
+      "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
+    },
     "tabellen": 6,
     "uebernahmen": 6,
     "punkte": 819,
@@ -127,6 +199,24 @@
     "b_q3": 0.551,
     "b_min": 0,
     "b_max": 1.185,
+    "b_p10": 0.258,
+    "b_p90": 0.713,
+    "pruefung": {
+      "loto": {
+        "median_pct": 3.369,
+        "p80_pct": 8.657,
+        "p95_pct": 19.352,
+        "punkte": 11760
+      },
+      "lolo": {
+        "median_pct": 3.362,
+        "p80_pct": 8.809,
+        "p95_pct": 19.723,
+        "punkte": 11760
+      },
+      "spanne_b_deckung_pct": 76.9,
+      "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
+    },
     "tabellen": 67,
     "uebernahmen": 193,
     "punkte": 11760,
@@ -153,6 +243,24 @@
     "b_q3": 0.607,
     "b_min": 0.125,
     "b_max": 1.185,
+    "b_p10": 0.266,
+    "b_p90": 0.789,
+    "pruefung": {
+      "loto": {
+        "median_pct": 3.338,
+        "p80_pct": 9.162,
+        "p95_pct": 18.867,
+        "punkte": 13430
+      },
+      "lolo": {
+        "median_pct": 3.294,
+        "p80_pct": 9.19,
+        "p95_pct": 19.049,
+        "punkte": 13430
+      },
+      "spanne_b_deckung_pct": 78.5,
+      "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
+    },
     "tabellen": 76,
     "uebernahmen": 228,
     "punkte": 13430,
@@ -183,6 +291,24 @@
     "b_q3": 0.423,
     "b_min": 0,
     "b_max": 0.495,
+    "b_p10": 0.123,
+    "b_p90": 0.492,
+    "pruefung": {
+      "loto": {
+        "median_pct": 4.754,
+        "p80_pct": 9.591,
+        "p95_pct": 15.628,
+        "punkte": 1310
+      },
+      "lolo": {
+        "median_pct": 4.093,
+        "p80_pct": 8.139,
+        "p95_pct": 14.427,
+        "punkte": 1310
+      },
+      "spanne_b_deckung_pct": 72.8,
+      "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
+    },
     "tabellen": 10,
     "uebernahmen": 24,
     "punkte": 1310,
@@ -205,6 +331,24 @@
       "b_q3": 0.661,
       "b_min": 0.137,
       "b_max": 1.185,
+      "b_p10": 0.137,
+      "b_p90": 0.975,
+      "pruefung": {
+        "loto": {
+          "median_pct": 23.537,
+          "p80_pct": 41.26,
+          "p95_pct": 64.559,
+          "punkte": 447
+        },
+        "lolo": {
+          "median_pct": 23.537,
+          "p80_pct": 41.26,
+          "p95_pct": 64.559,
+          "punkte": 447
+        },
+        "spanne_b_deckung_pct": 0,
+        "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
+      },
       "tabellen": 3,
       "uebernahmen": 14,
       "punkte": 447,
@@ -226,6 +370,24 @@
       "b_q3": 0.404,
       "b_min": 0.26,
       "b_max": 0.97,
+      "b_p10": 0.26,
+      "b_p90": 0.693,
+      "pruefung": {
+        "loto": {
+          "median_pct": 2.374,
+          "p80_pct": 8.531,
+          "p95_pct": 30.901,
+          "punkte": 945
+        },
+        "lolo": {
+          "median_pct": 2.582,
+          "p80_pct": 9.041,
+          "p95_pct": 30.901,
+          "punkte": 945
+        },
+        "spanne_b_deckung_pct": 50.3,
+        "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
+      },
       "tabellen": 6,
       "uebernahmen": 35,
       "punkte": 945,
@@ -247,6 +409,24 @@
       "b_q3": 0.475,
       "b_min": 0.44,
       "b_max": 0.509,
+      "b_p10": 0.44,
+      "b_p90": 0.495,
+      "pruefung": {
+        "loto": {
+          "median_pct": 1.334,
+          "p80_pct": 2.48,
+          "p95_pct": 4.136,
+          "punkte": 413
+        },
+        "lolo": {
+          "median_pct": 0.772,
+          "p80_pct": 2.229,
+          "p95_pct": 4.142,
+          "punkte": 413
+        },
+        "spanne_b_deckung_pct": 22,
+        "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
+      },
       "tabellen": 3,
       "uebernahmen": 23,
       "punkte": 413,
@@ -267,6 +447,24 @@
       "b_q3": 0.654,
       "b_min": 0.446,
       "b_max": 0.836,
+      "b_p10": 0.475,
+      "b_p90": 0.747,
+      "pruefung": {
+        "loto": {
+          "median_pct": 2.98,
+          "p80_pct": 8.205,
+          "p95_pct": 15.207,
+          "punkte": 2038
+        },
+        "lolo": {
+          "median_pct": 2.575,
+          "p80_pct": 7.55,
+          "p95_pct": 14.093,
+          "punkte": 2038
+        },
+        "spanne_b_deckung_pct": 60.9,
+        "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
+      },
       "tabellen": 10,
       "uebernahmen": 28,
       "punkte": 2038,
@@ -287,6 +485,9 @@
       "b_q3": 0.413,
       "b_min": 0.163,
       "b_max": 0.519,
+      "b_p10": 0.189,
+      "b_p90": 0.466,
+      "pruefung": null,
       "tabellen": 6,
       "uebernahmen": 6,
       "punkte": 521,
@@ -305,6 +506,9 @@
       "b_q3": 0.576,
       "b_min": 0,
       "b_max": 1.185,
+      "b_p10": 0.253,
+      "b_p90": 0.775,
+      "pruefung": null,
       "tabellen": 80,
       "uebernahmen": 246,
       "punkte": 14219,

@@ -503,9 +503,23 @@
             f('mv_kaution', 'Kaution (€)', '', 'decimal') +
             d('mv_befristet_bis', 'Befristet bis') +
             d('mv_kuendigungsverzicht_bis', 'Kündigungsverzicht bis') +
+            /* v2600 · E2 · Restlaufzeit einer Mietabweichung (Underrent: bis zur rechtlich moeglichen Anpassung) */
+            f('mv_abw_jahre', 'Abweichung erwartet noch (Jahre)', 'nur bei Miete unter Markt', 'decimal') +
             f('mv_mieter', 'Mieter (Name, optional)', '') +
             f('mv_notiz', 'Notiz zum Vertrag', '', 'text', true) +
           '</div>' +
+          /* v2600 · E2/E3 · Hinweis zur Restlaufzeit und der waehlbare Leerstandsabzug (nur bei „leer") */
+          '<p class="mfh-we-hint">Liegt die Ist-Miete außerhalb von ± 20 % um die marktübliche Miete, rechnet der Ertragswert mit der marktüblichen Miete; '
+            + 'die Abweichung wird über die <b>Restlaufzeit</b> beziffert: bei Miete <i>über</i> dem Markt nur mit <b>Befristet bis</b> oder <b>Kündigungsverzicht bis</b>, '
+            + 'bei Miete darunter auch mit „Abweichung erwartet noch". Ohne Angabe zeigt der Bericht Szenarien (3/5/10 Jahre).</p>' +
+          '<div id="mfh-we-leer-box" style="display:none"><h4>Leerstand</h4>' +
+            '<p class="mfh-we-hint">Standard: voll vermietet zur marktüblichen Miete. Wahlweise ziehen Mietausfall bis zur Vermietung und Herrichtung vom Ertragswert ab.</p>' +
+            '<label class="mfh-we-haken"><input type="checkbox" data-wkb="leer_abzug"' + (e.leer_abzug ? ' checked' : '') + '>' +
+              '<span>Mietausfall und Herrichtung <b>abziehen</b></span></label>' +
+            '<div class="mfh-we-raster">' +
+              f('leer_monate', 'Monate bis zur Vermietung', 'z. B. 4', 'decimal') +
+              f('herrichtung_eur', 'Herrichtung (€)', 'z. B. 6.000', 'decimal') +
+            '</div></div>' +
           '<p class="mfh-we-hint">Staffel- und Indexmiete tragen ihre nächste Erhöhung schon im Vertrag — sie sind ein <b>Termin</b>, kein Potenzial. ' +
             '<b>Kündigungsverzicht</b> heißt: <i>beide</i> Seiten verzichten bis zu diesem Datum auf die ordentliche Kündigung (bei Staffelmiete höchstens vier Jahre, § 557a Abs. 3 BGB).</p>' +
           /* v2023 - die Erhoehung wird konkret, nur bei Staffel und Index */
@@ -662,6 +676,11 @@
     }
     if (vArt) vArt.addEventListener("change", erhoehungZeigen);
     erhoehungZeigen();
+    /* v2600 · E3 · Leerstandsblock nur bei Status „leer" */
+    var sSt = ov.querySelector('[data-wk="status"]');
+    function leerZeigen() { var b = el('mfh-we-leer-box'); if (b) b.style.display = (sSt && sSt.value === 'leer') ? '' : 'none'; }
+    if (sSt) sSt.addEventListener('change', leerZeigen);
+    leerZeigen();
     var gArt = ov.querySelector('[data-wk="art"]');
     function gewerbeZeigen() { var b = el('mfh-we-gew-box'); if (b) b.style.display = (gArt && gArt.value === 'gewerbe') ? '' : 'none'; }
     if (gArt) gArt.addEventListener("change", gewerbeZeigen);

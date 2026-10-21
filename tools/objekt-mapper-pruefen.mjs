@@ -106,7 +106,9 @@ const BASIS = {
   mikrolage: 'gut', makrolage: 'durchschnittlich', ds2_bevoelkerung: 'stabil',
   ds2_nachfrage: 'mittel', ds2_wertsteigerung: 'mittel',
   ds2_entwicklung: 'begrenzt', ds2_mietausfall: 'niedrig',
-  ds2_marktmiete: '8.50', ds2_marktfaktor: '1.0'
+  ds2_marktmiete: '8.50', ds2_marktfaktor: '1.0',
+  /* v2660 · E2 · Einzelobjekt: Restlaufzeit der Mietabweichung */
+  mv_befristet_bis: '2028-06', mv_kuendigungsverzicht_bis: '', mv_abw_jahre: '3'
 };
 
 /* Je Formularfeld ein ANDERER Wert — plausibel, aber verschieden. */
@@ -140,7 +142,8 @@ const ANDERS = {
   ds2_nachfrage: 'sehr_schwach', ds2_wertsteigerung: 'hoch',
   ds2_entwicklung: 'keine', ds2_mietausfall: 'hoch',
   ds2_marktmiete: '14.20', ds2_marktfaktor: '1.4',
-  plz: '10115', ort: 'Berlin', str: 'Dorotheenstr.', hnr: '42'
+  plz: '10115', ort: 'Berlin', str: 'Dorotheenstr.', hnr: '42',
+  mv_befristet_bis: '2030-12', mv_kuendigungsverzicht_bis: '2029-01', mv_abw_jahre: '7'   /* v2660 */
 };
 
 /* ── WELCHE METHODEN ZAEHLEN ─────────────────────────────────────────

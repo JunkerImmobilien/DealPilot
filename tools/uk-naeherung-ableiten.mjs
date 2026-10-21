@@ -98,9 +98,41 @@ function klasse(liste) {
      Wert jeder Tabelle - Median der absoluten Prozentabweichung ueber alle Punkte */
   const abw = [];
   for (const t of liste) for (const [r, rel] of (t.pkt || [])) abw.push(Math.abs(Math.pow(r, b) / rel - 1) * 100);
-  return { b: r3(b), b_q1: r3(quartil(bs, 0.25)), b_q3: r3(quartil(bs, 0.75)), tabellen: liste.length,
+  /* ═══ v2593 · NACHGEPRUEFT STATT IN DER STICHPROBE ════════════════════
+   * abweichung_* oben misst die Formel an den Tabellen, aus denen sie
+   * gelernt ist. Die Kundentexte nennen seit v2593 die Kreuzvalidierung:
+   * je Tabelle b = Median der UEBRIGEN Tabellen (Leave-one-Tabelle-out),
+   * dazu Leave-one-Land-out. Tabellen ohne Abhaengigkeit (flaeche_eins)
+   * zaehlen mit UK = 1 an allen Stuetzpunkten - auch sie sind amtlich.
+   * Spanne: b_p10..b_p90 der Tabellen, Deckung je ausgelassener Tabelle
+   * mit P10/P90 der uebrigen. Ausgegeben wird die Spanne noch nicht. */
+  const pktVon = (t) => (t.pkt && t.pkt.length ? t.pkt : FAKTOREN.map((r) => [r, 1]));
+  const cv = (gruppe) => {
+    const e = [];
+    for (const t of liste) {
+      const bo = median(liste.filter((x) => gruppe(x) !== gruppe(t)).map((x) => x.b));
+      if (bo == null) continue;
+      for (const [r, rel] of pktVon(t)) e.push(Math.abs(Math.pow(r, bo) / rel - 1) * 100);
+    }
+    return { median_pct: r3(median(e)), p80_pct: r3(quartil(e, 0.8)), p95_pct: r3(quartil(e, 0.95)), punkte: e.length };
+  };
+  let drin = 0, n = 0;
+  liste.forEach((t, i) => {
+    const bo = liste.filter((_, j) => j !== i).map((x) => x.b);
+    const lo = quartil(bo, 0.1), hi = quartil(bo, 0.9);
+    for (const [r, rel] of pktVon(t)) {
+      if (Math.abs(r - 1) < 1e-9) continue;
+      const k1 = Math.pow(r, lo), k2 = Math.pow(r, hi); n++;
+      if (rel >= Math.min(k1, k2) - 1e-9 && rel <= Math.max(k1, k2) + 1e-9) drin++;
+    }
+  });
+  return { b: r3(b), b_q1: r3(quartil(bs, 0.25)), b_q3: r3(quartil(bs, 0.75)),
+           b_p10: r3(quartil(bs, 0.1)), b_p90: r3(quartil(bs, 0.9)), tabellen: liste.length,
            laender: [...new Set(liste.map((t) => t.land))].sort(),
-           abweichung_median_pct: r3(median(abw)), abweichung_p90_pct: r3(quartil(abw, 0.9)) };
+           abweichung_median_pct: r3(median(abw)), abweichung_p90_pct: r3(quartil(abw, 0.9)),
+           pruefung: { loto: cv((t) => t), lolo: cv((t) => t.land),
+             spanne_b_deckung_pct: n ? Math.round(1000 * drin / n) / 10 : null,
+             methode: 'Leave-one-Tabelle-out (b = Median der uebrigen Tabellen) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Tabellen' } };
 }
 const alle = klasse(tabellen), stadt = klasse(tabellen.filter((t) => t.stadt)), land = klasse(tabellen.filter((t) => !t.stadt));
 
@@ -140,6 +172,64 @@ const restAbw = restPkt.map((k3) => Math.abs(((Math.pow(2.5, alle.b) * 2.5 + 0.5
 console.log('oberhalb 2,5-fach: Restfaktor ' + r3(restFaktor) + ' aus ' + restC.length + ' Tabellen, typ. Abweichung beim 3-Fachen '
   + r3(median(restAbw)) + ' % (90 %: ' + r3(quartil(restAbw, 0.9)) + ' %)');
 const MIN_TABELLEN = 8;
+
+/* ═══ v2612 · NACHGEMESSEN AN DER GENAUEN STUETZSTELLE, UEBER ALLE TABELLEN ══
+ * E5 (v2610) hatte die Naeherung auf 2,0 gekappt - begruendet mit einer Messung,
+ * die je Band nur Punkte mit r === 2.5 zaehlte (round(norm x 2,5)/norm ist nur
+ * bei geraden Normgroessen genau 2,5). Zurueckgenommen in v2612. Hier wird
+ * jede Tabelle (flaeche_tabelle, flaeche_funktion, flaeche_eins mit UK = 1) an
+ * GENAU 2,5 und 3,0 gefragt (koeffizientFuer mit Flaeche norm x r, ungerundet):
+ *   2,5: Potenz r^b, b ohne die eigene Tabelle (LOTO)
+ *   3,0: zweiter Ast (2,5^b x 2,5 + 0,5 x c) / 3, b und c ohne die eigene Tabelle
+ * gegen „ohne Anpassung" (UK = 1). Ist der zweite Ast bei 3,0 im Median
+ * schlechter als UK = 1, wird er gekappt (Geltung dann bis 2,5). */
+const genauTab = [];
+{
+  const gesehen3 = new Set();
+  for (const datei of fs.readdirSync(ORDNER).filter((x) => x.startsWith('uk-') && x.endsWith('.json')).sort()) {
+    for (const s of JSON.parse(fs.readFileSync(path.join(ORDNER, datei), 'utf8'))) {
+      const sperre = s.vollstaendig === false || !!s.warum_kein_wert;
+      const fm = !sperre ? s.formel : (s.nutzung_intern === 'stuetzstelle' ? s.formel_vorgemerkt : null);
+      if (!fm) continue;
+      const schl = JSON.stringify(fm); if (gesehen3.has(schl)) continue; gesehen3.add(schl);
+      if (fm.form === 'flaeche_eins') { genauTab.push({ id: schl, kk: () => 1, b: 0 }); continue; }
+      for (const norm of normen(fm)) {
+        const satz = { ...s, formel: fm };
+        const kn = UK.koeffizientFuer(satz, norm, norm).k;
+        if (!(kn > 0)) continue;
+        const t = tabellen.find((x) => x.wo === datei + ' ' + (s.gebiet_name || s.ags) + ' Norm ' + norm);
+        genauTab.push({ id: schl + norm, b: t ? t.b : null,
+          kk: (r) => { const a = UK.koeffizientFuer(satz, norm * r, norm).k; return a == null || !(a > 0) ? null : a / kn; } });
+      }
+    }
+  }
+}
+const alleB = tabellen.map((t) => t.b);
+function genauMessen(r, zweiterAst) {
+  const e = [], e0 = [];
+  for (const t of genauTab) {
+    const a = t.kk(r); if (a == null) continue;
+    /* LOTO: die eigene Tabelle aus b (und c) nehmen, soweit sie dort mitzaehlt */
+    const bs = t.b == null ? alleB : alleB.filter((x, i) => !(x === t.b && i === alleB.indexOf(t.b)));
+    const bo = median(bs);
+    let nae;
+    if (zweiterAst) {
+      const k25 = t.kk(2.5);
+      const cs = (k25 != null && t.b != null) ? restC.filter((c, i) => Math.abs(restPkt[i] - a) > 1e-12 || Math.abs(c - (3 * a - 2.5 * k25) / 0.5) > 1e-9) : restC;
+      nae = (Math.pow(2.5, bo) * 2.5 + 0.5 * median(cs)) / 3;
+    } else nae = Math.pow(r, bo);
+    e.push(Math.abs(nae / a - 1) * 100); e0.push(Math.abs(1 / a - 1) * 100);
+  }
+  return { stuetzstelle: r, tabellen: e.length, naeherung_median_pct: r3(median(e)), naeherung_p80_pct: r3(quartil(e, 0.8)),
+    ohne_anpassung_median_pct: r3(median(e0)), ohne_anpassung_p80_pct: r3(quartil(e0, 0.8)),
+    naeherung_besser_pct: e.length ? Math.round(1000 * e.filter((x, i) => x < e0[i]).length / e.length) / 10 : null };
+}
+const genau25 = genauMessen(2.5, false), genau30 = genauMessen(3, true);
+const astKappen = !(genau30.naeherung_median_pct < genau30.ohne_anpassung_median_pct);
+console.log('genau 2,5 (Potenz, LOTO): ' + genau25.naeherung_median_pct + ' % gegen UK=1 ' + genau25.ohne_anpassung_median_pct + ' % (' + genau25.tabellen + ' Tabellen, P80 '
+  + genau25.naeherung_p80_pct + '/' + genau25.ohne_anpassung_p80_pct + ')');
+console.log('genau 3,0 (zweiter Ast, LOTO): ' + genau30.naeherung_median_pct + ' % gegen UK=1 ' + genau30.ohne_anpassung_median_pct + ' % (' + genau30.tabellen + ' Tabellen, P80 '
+  + genau30.naeherung_p80_pct + '/' + genau30.ohne_anpassung_p80_pct + ') -> ' + (astKappen ? 'zweiter Ast GEKAPPT, Geltung bis 2,5' : 'zweiter Ast bleibt'));
 const aus = {
   stand: new Date().toISOString().slice(0, 10),
   form: 'UK(Objekt)/UK(Bezugsgroesse) = (Flaeche/Bezugsgroesse)^b',
@@ -149,10 +239,18 @@ const aus = {
      Koeffizienten auf jeden Fall mit hinzunehmen". mfh gilt als UEBERTRAGUNG aus dem
      individuellen Wohnungsbau (die Tabellen sind IfW) - nur in Zonen bis II Vollgeschosse,
      im Bericht ausdruecklich so gekennzeichnet. */
-  gilt_fuer: { objektarten: ['efh', 'zfh', 'dhh', 'rh', 'mfh'], uebertragen_auf: ['mfh'], max_vollgeschosse: 2, verhaeltnis_von: 0.5, verhaeltnis_bis: restC.length >= MIN_TABELLEN ? 3 : 2.5 },
+  gilt_fuer: { objektarten: ['efh', 'zfh', 'dhh', 'rh', 'mfh'], uebertragen_auf: ['mfh'], max_vollgeschosse: 2, verhaeltnis_von: 0.5, verhaeltnis_bis: (restC.length >= MIN_TABELLEN && !astKappen) ? 3 : 2.5 },
   mindest_tabellen: MIN_TABELLEN,
-  oberhalb: restC.length >= MIN_TABELLEN ? { ab: 2.5, bis: 3, rest_faktor: r3(restFaktor), tabellen: restC.length,
-    abweichung_median_pct: r3(median(restAbw)), abweichung_p90_pct: r3(quartil(restAbw, 0.9)) } : null,
+  /* v2612 · Messung an der genauen Stuetzstelle (s. o.), Entscheidungsgrund dabei */
+  pruefung_genau: { methode: 'jede Tabelle an genau r x Normgroesse (ungerundet), flaeche_eins mit UK = 1; LOTO fuer b und Restfaktor; gegen UK = 1 (Variante A)',
+    bei_2_5: genau25, bei_3_0_zweiter_ast: genau30,
+    entscheidung: astKappen ? 'zweiter Ast gekappt: bei 3,0 im Median nicht besser als ohne Anpassung' : 'zweiter Ast bleibt: bei 3,0 im Median besser als ohne Anpassung' },
+  oberhalb: (restC.length >= MIN_TABELLEN && !astKappen) ? { ab: 2.5, bis: 3, rest_faktor: r3(restFaktor), tabellen: restC.length,
+    abweichung_median_pct: r3(median(restAbw)), abweichung_p90_pct: r3(quartil(restAbw, 0.9)),
+    /* v2593 · Leave-one-Tabelle-out wie oben */
+    pruefung: (() => { const e = restPkt.map((k3, i) => { const c = median(restC.filter((_, j) => j !== i));
+      return Math.abs(((Math.pow(2.5, alle.b) * 2.5 + 0.5 * c) / 3) / k3 - 1) * 100; });
+      return { loto: { median_pct: r3(median(e)), p80_pct: r3(quartil(e, 0.8)), p95_pct: r3(quartil(e, 0.95)), punkte: e.length } }; })() } : null,
   alle, stadt: stadt.tabellen >= MIN_TABELLEN ? stadt : null, land: land.tabellen >= MIN_TABELLEN ? land : null,
 };
 if (!TROCKEN) { fs.writeFileSync(ZIEL, JSON.stringify(aus, null, 2) + '\n'); console.log('geschrieben: ' + path.relative(WURZEL, ZIEL)); }

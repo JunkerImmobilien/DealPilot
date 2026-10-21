@@ -491,6 +491,24 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                in lzs-bw.json ab - juengster Jahrgang gilt), Sachwertfaktor nur als Diagramm ohne Gleichung
                                (Sperren), keine Umrechnungskoeffizienten Flaeche (Sperren). */
                             'lzs-swf-uk-ulm-2026.json',
+                            /* v2650 · Nachernte 21.10.2026 (Harvest-Takt, Teil RP/BE/BY/HB/NI-OGA):
+                               Berlin Liegenschaftszinssaetze 2026 (6 Gebietsgruppen, NEU Objektmiete x
+                               Wohn-/Nutzflaeche, 432 Zellen = Formel) und Sachwertfaktoren 2026
+                               (Teilmarkt 1: 4 Altbezirksgruppen x EFH/DHH/REH/RMH; Teilmarkt 2: Villen),
+                               Stichtag 31.12.2025 - loesen 2025 ab; dazu 7 Sperren. dl-de/zero-2-0. */
+                            'nachernte-2026-10-be.json',
+                            /* v2640 · Nachernte 21.10.2026 (Harvest-Takt, Teil MV): Ludwigslust-Parchim 2026
+                               5 Zinssaetze + 7 Rohertragsfaktoren (loesen 2025 ab; WGH/MFH>6 unveraendert
+                               aus 2025), SWF 2026 als Sperre (Baupreisindex ohne Zahl, Tabelle vorgemerkt);
+                               Hansestadt Rostock 2026, Landkreis Rostock 2026, Vorpommern-Greifswald 2024
+                               genehmigungspflichtig - nur Sperren mit Fundstelle und Weg. */
+                            'nachernte-2026-10-mv.json',
+                            /* v2620: Umrechnungskoeffizienten zum Immobilienrichtwert NRW (Kennzahl umrechnung_irw,
+                               lib/vergleichswert_irw.js, Pruefer tools/irw-pruefen.mjs): Herford, Bielefeld,
+                               Koeln, Duesseldorf (Sperren), Bonn, Muenster, Dortmund (Sperren, additiv), Bochum,
+                               Essen, Duisburg, Wuppertal; Minden-Luebbecke Sperre (keine IRW beschlossen). */
+                            'uk-irw-nw-owl-2026.json', 'uk-irw-nw-rheinland-2026.json',
+                            'uk-irw-nw-ruhr-ost-2026.json', 'uk-irw-nw-ruhr-west-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
@@ -526,7 +544,14 @@ export function fehlendeSaatdateien() {
   } catch (e) { return []; }
 }
 
-export function ladeSaat(dateien = SAATDATEIEN) {
+/* v2591 · DER LESEWEG DER SAAT, OHNE DEN ZUSTAND ANZUFASSEN.
+   Die Deckungsauskunft (register_deckung.js) muss dieselben Dateien auf
+   demselben Weg lesen wie der Bericht — aber ladeSaat() SETZT das Register
+   neu und wuerfe den DB-Stand des laufenden Servers weg. Deshalb ist das
+   Lesen hier herausgezogen; ladeSaat() ruft genau diese Funktion.
+   `_datei` traegt den Dateinamen am Satz mit — nur fuer die Auskunft, der
+   Rechenweg liest das Feld nicht. */
+export function leseSaatdateien(dateien = SAATDATEIEN, { mitDatei = false } = {}) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])
     .map((d) => (String(d).includes('/') ? String(d) : join(HIER, 'register', d)));
   const alle = [];
@@ -536,13 +561,21 @@ export function ladeSaat(dateien = SAATDATEIEN) {
     try {
       const saetze = JSON.parse(readFileSync(datei, 'utf8'));
       if (!Array.isArray(saetze)) throw new Error('kein Array');
-      alle.push(...saetze);
+      if (mitDatei) {
+        const kurz = String(datei).split(/[\\/]/).pop();
+        for (const s of saetze) alle.push({ ...s, _datei: kurz });
+      } else alle.push(...saetze);
       gelesen.push({ datei, saetze: saetze.length });   /* v1084a-WMRG */
     } catch (e) {
       vermisst.push({ datei, fehler: e.message });
       console.error('[register] Saatdatei nicht lesbar:', datei, e.message);
     }
   }
+  return { alle, gelesen, vermisst };
+}
+
+export function ladeSaat(dateien = SAATDATEIEN) {
+  const { alle, gelesen, vermisst } = leseSaatdateien(dateien);
   if (alle.length) {
     _saat = alle;                                 /* v1084a-WMRG */
     _index = indizieren(alle);

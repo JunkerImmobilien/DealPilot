@@ -7,6 +7,9 @@
 //   - Brandenburg liefert nur GML 3.2.1 / HTML, EPSG:4326 in WMS 1.3.0 => Achsen lat,lon,
 //     und der Bodenrichtwert-Layer ist JAHRESABHAENGIG (bbv_pg_zobau_JJJJ).
 //
+// v2592: Der Satz darunter ist Stand v1071. Heute laufen alle Laender ausser Bayern
+// (Dienst seit 21.10.2026 mit HTTP 403 abgeschaltet) automatisch; BW/SL/SH/BY ueber
+// Freigaben, Berlin ueber den Landesdienst (dl-de/zero-2-0), der Rest ueber BORIS-D.
 // Lizenz ist pro Land geprueft: nur kommerziell freie Open-Data-Laender werden
 // automatisch abgefragt. Alles andere (BW: Vermarktung untersagt, Bayern: gebuehren-
 // pflichtig, restliche Laender noch nicht verifiziert) faellt auf den manuell in
@@ -16,20 +19,51 @@ import { httpText } from '../../lib/http.js';
 const CURRENT_BRW_YEAR = 2026;
 
 // ---- Hilfen --------------------------------------------------------------
+/* v2590 · Punkt ist nicht immer Tausender. GML schreibt "75.0" (Dezimal-
+ * punkt); der alte Leser strich jeden Punkt und machte daraus 750 - in
+ * BB gemessen 21.10.2026: Perleberg 750 statt 75, Cottbus 3.800 statt 380.
+ * Deutsch ("1.200,50") nur, wenn ein Komma da ist oder die Punkte reine
+ * Dreiergruppen trennen ("1.200"); sonst ist der Punkt Dezimalpunkt. */
 function num(v) {
   if (v == null || v === '') return null;
-  const n = typeof v === 'number' ? v
-    : parseFloat(String(v).replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, ''));
+  if (typeof v === 'number') return isNaN(v) ? null : v;
+  let s = String(v).replace(/[^\d.,-]/g, '');
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+  const n = parseFloat(s);
   return isNaN(n) ? null : n;
+}
+/* v2592 · Jahr aus "2026-01-01", "01.01.2026" oder "2026"; sonst null. */
+function stichtagJahr(st) {
+  const m = String(st == null ? '' : st).match(/(?:^|\D)((?:19|20)\d{2})(?:\D|$)/);
+  return m ? Number(m[1]) : null;
+}
+/* v2592 · Punkt-in-Polygon fuer GeoJSON (Multi)Polygon mit Achsen [lat, lon]
+ * (GeoServer, EPSG:4326, WMS 1.3.0). Loecher werden beachtet. */
+function punktInGeometrie(lat, lon, g) {
+  if (!g || !Array.isArray(g.coordinates)) return false;
+  const polys = g.type === 'Polygon' ? [g.coordinates] : g.type === 'MultiPolygon' ? g.coordinates : [];
+  const inRing = (r) => {
+    let c = false;
+    for (let i = 0, k = r.length - 1; i < r.length; k = i++) {
+      const [yi, xi] = r[i], [yk, xk] = r[k];
+      if ((yi > lat) !== (yk > lat) && lon < (xk - xi) * (lat - yi) / (yk - yi) + xi) c = !c;
+    }
+    return c;
+  };
+  return polys.some((q) => Array.isArray(q) && q.length && inRing(q[0]) && !q.slice(1).some(inRing));
 }
 function inBox(lat, lon, b) {
   return lat >= b.minLat && lat <= b.maxLat && lon >= b.minLon && lon <= b.maxLon;
 }
 // geo+json: erstes Feature, tolerantes Feld-Mapping
-function parseGeoJson(text) {
+/* v2592 · waehle: optionaler Vorrang unter mehreren Features am Punkt
+ * (Berlin fuehrt deckungsgleiche Zonen verschiedener Nutzung, s. Adapter). */
+function parseGeoJson(text, waehle, lat, lon) {
   let data; try { data = JSON.parse(text); } catch { return null; }
-  const f = data && data.features && data.features[0];
-  if (!f || !f.properties) return null;
+  const fs = (data && Array.isArray(data.features) ? data.features : []).filter((x) => x && x.properties);
+  if (!fs.length) return null;
+  const f = (typeof waehle === 'function' && fs.length > 1) ? (waehle(fs, lat, lon) || fs[0]) : fs[0];
   return f.properties;
 }
 // GML/XML: Werte aus <ns:feld>wert</ns:feld> ziehen (tolerant, namespace-agnostisch)
@@ -82,7 +116,11 @@ const F = {
   geschosse: ['gez', 'vollgeschosszahl', 'anzahl vollgeschosse'],
   flaeche: ['flae', 'flaeche', 'grundstuecksflaeche'],
   gemeinde: ['gena', 'gemeindename', 'gemeinde'],
-  value: ['brw', 'bodenrichtwert', 'wert', 'brw_eur', 'brwert', 'bodenwert', 'richtwert', 'bri'],
+  value: ['brw', 'bodenrichtwert', 'wert', 'brw_eur', 'brwert', 'bodenwert', 'richtwert', 'bri',
+    /* v2592 · Berlin (gdi.berlin.de/services/wms/brwJJJJ) schreibt die
+     * Einheit in den Feldnamen - gemessen 21.10.2026, Pariser Platz:
+     * „Bodenrichtwert (in EURO/m²)": "60000.0". */
+    'bodenrichtwert (in euro/m²)'],
   stichtag: ['stag', 'stichtag', 'jahr', 'stichtag des bodenrichtwertes', 'jahr des bodenrichtwerts'],
   nutzung: ['nuta', 'nutzung', 'entw', 'nutzungsart', 'art der nutzung', 'entwicklungszustand'], // v1080-WFLD-1
   zone: ['brwznr', 'wnum', 'zone', 'bodenrichtwertzonen id', 'bodenrichtwertnummer',
@@ -138,10 +176,64 @@ const ADAPTERS = [
   },
   {
     // Berlin liegt IN der BB-Box -> MUSS vor Brandenburg stehen.
-    code: 'be', name: 'BORIS-Berlin', license: 'open data (Berlin)', enabled: true, verified: false,
-    base: 'https://gdi.berlin.de/services/wms/bodenrichtwerte', // beim 1. Call verifizieren
+    /* ═══ v2592 · BERLIN: EIN DIENST JE JAHRGANG ════════════════════════
+     *
+     * Hier stand gdi.berlin.de/services/wms/bodenrichtwerte - gemessen am
+     * 21.10.2026: HTTP 404. Der Adapter war nie verifiziert und fiel
+     * deshalb still auf BORIS-D zurueck; jeder Berliner Wert kam seit
+     * jeher von dort.
+     *
+     * Der Landesdienst fuehrt je Stichtag einen eigenen WMS
+     * (brw2026, brw2025, brw2024, brw2023 - alle vier mit HTTP 200 und
+     * genau einem abfragbaren Layer gleichen Namens). GeoServer, WMS 1.3.0,
+     * EPSG:4326 mit Achsen lat,lon, INFO_FORMAT application/json.
+     * Lizenz laut Capabilities (<Fees>): „Datenlizenz Deutschland - Zero -
+     * Version 2.0" - keine Namensnennung verlangt.
+     *
+     * Gegenprobe 21.10.2026 mit BORIS-D am selben Punkt: Pariser Platz
+     * 60000 = 60000 EUR/m2, Spandau 800 = 800, beide Stichtag 01.01.2026.
+     * Der Landesdienst liefert ZUSAETZLICH die wertrelevante
+     * Geschossflaechenzahl der Zone (BORIS-D fuehrt sie fuer Berlin leer)
+     * - die braucht die WGFZ-Umrechnung. Was BORIS-D mehr hatte
+     * (Gemeindeschluessel, Ausschuss), ist fuer Berlin eine einzige
+     * Gemeinde und ein einziger Ausschuss und steht unten als
+     * `rawZusatz` - Kopien der Feldnamen, die der Orchestrator liest. */
+    code: 'be', name: 'BORIS-Berlin', license: 'dl-de/zero-2-0', enabled: true, verified: true,
+    base: 'https://gdi.berlin.de/services/wms/brw' + CURRENT_BRW_YEAR,
+    baseFn: (y) => 'https://gdi.berlin.de/services/wms/brw' + (y || CURRENT_BRW_YEAR),
     bbox: { minLon: 13.05, maxLon: 13.79, minLat: 52.32, maxLat: 52.69 },
-    layer: () => 'brw', crs: 'EPSG:4326', axis: 'latlon', format: 'gml', time: null,
+    layer: (y) => 'brw' + (y || CURRENT_BRW_YEAR),
+    crs: 'EPSG:4326', axis: 'latlon', format: 'geojson', infoFormat: 'application/json',
+    /* DECKUNGSGLEICHE ZONEN. Gemessen Spandau (52.5350/13.2000): ZWEI Zonen
+     * mit identischer Geometrie (258 Eckpunkte, beide enthalten den Punkt) -
+     * 40261 „SF-SN Sonstige Flaechen - Sondernutzungsflaeche" 20 EUR/m2 und
+     * 40262 „G-GD Gewerbliche Bauflaeche" 800 EUR/m2. Der Dienst nennt die
+     * Sonderflaeche zuerst; BORIS-D nimmt die Bauflaeche (seine Layergruppe
+     * Bauland steht vor „sonstige Flaechen"). Hier dieselbe Rangfolge:
+     * Wohnen, gemischt, Gewerbe, Sonderbau, dann alles uebrige. */
+    featureCount: '5', time: null,
+    waehleFeature: (fs, lat, lon) => {
+      /* Erst die Zonen, die den Punkt WIRKLICH enthalten (Geometrie kommt
+       * mit, Achsen lat,lon) - sonst koennte die Rangfolge eine Nachbarzone
+       * im Pixelpuffer vorziehen. */
+      const drin = fs.filter((f) => punktInGeometrie(lat, lon, f.geometry));
+      const kand = drin.length ? drin : [fs[0]];
+      const rang = (f) => {
+        const n = String((f.properties || {})['Art der Nutzung'] || '').trim().toUpperCase();
+        if (/^W/.test(n)) return 0;
+        if (/^M/.test(n)) return 1;
+        if (/^G/.test(n)) return 2;
+        if (/^SO\b|^S\s*-/.test(n)) return 3;
+        return 4;
+      };
+      return kand.slice().sort((x, y) => rang(x) - rang(y))[0];
+    },
+    rawZusatz: (p) => ({
+      Gemeindename: 'Berlin', 'Gemeindeschlüssel': '11000000', LAND_KENNUNG: 'BE',
+      Gutachterausschussname: 'Gutachterausschuss für Grundstückswerte in Berlin',
+      Gutachterausschussnummer: '11000',
+      'Geschossflächenzahl': p['Wertrelevante Geschossfläche'] || '',
+    }),
   },
   {
     code: 'bb', name: 'BORIS-Brandenburg', license: 'dl-de/by-2-0', enabled: true, verified: true,
@@ -254,9 +346,28 @@ const ADAPTERS = [
      * eigentliche Grund ist ein anderer und steht seit jeher im Kopf
      * dieser Datei: Bayern gibt den WERT nicht kostenfrei heraus. Alles
      * uebrige - Zone, Gemarkung, Stichtag, Ausschuss - schon. */
-    note: 'Bayern gibt den Bodenrichtwert nur gegen Gebühr heraus. Zone, '
-      + 'Gemarkung und zuständiger Gutachterausschuss werden trotzdem '
-      + 'ermittelt — damit findest du den Wert im BORIS-Bayern-Viewer sofort.',
+    /* ═══ v2592 · „NUR GEGEN GEBUEHR" WAR NICHT DER GRUND ══════════════
+     *
+     * Der Satz stand hier fuer JEDEN bayerischen Fehlschlag - auch fuer
+     * den heutigen. Gemessen 21.10.2026 (curl mit Referer atlas.bayern.de,
+     * Jahrgang 2026 und 2024, GetCapabilities und GetFeatureInfo): HTTP 403
+     * mit der Seite „Aus sicherheitstechnischen Gründen ist dieses
+     * Webangebot aktuell leider nicht verfügbar." Das ist eine Abschaltung,
+     * keine Gebuehr - und wer „nur gegen Gebuehr" liest, sucht den Fehler
+     * beim Geld.
+     *
+     * Seitdem zwei Texte: `note` sagt den dauerhaften Rechtsstand (er
+     * erscheint, wenn der Dienst antwortet und trotzdem nichts liefert),
+     * `ausfallNote` den Ausfall (er erscheint, wenn KEIN Jahrgang sauber
+     * geantwortet hat). Die Gebuehrenauskunft am einzelnen Punkt bleibt
+     * eine dritte Sache und kommt aus der Antwort selbst (v1393). */
+    note: 'In Bayern sind die Bodenrichtwerte seit 2024 großteils kostenfrei '
+      + 'einsehbar; für die Einbindung in Anwendungen verlangt das Landesamt '
+      + 'eine Lizenz. Bitte den Bodenrichtwert im Bodenrichtwert-Portal Bayern '
+      + 'nachsehen und hier eintragen.',
+    ausfallNote: 'Der bayerische Bodenrichtwert-Dienst ist derzeit nicht erreichbar. '
+      + 'Bitte den Bodenrichtwert im '
+      + 'Bodenrichtwert-Portal Bayern nachsehen und hier eintragen.',
     quellenvermerk: 'Gutachterausschüsse in Bayern, BayernAtlas / GDI Bayern '
       + '(www.bodenrichtwerte.bayern.de)',
     base: 'https://gdi.bayern.de/services/bodenrichtwerte',
@@ -348,10 +459,63 @@ const ADAPTERS = [
     featureCount: '5', time: null,
   },
   {
-    // BUNDESWEITER Catch-all: BORIS-D deckt alle Laender AUSSER BY/BW/SL/SH/MV ab
-    // (Berlin, Brandenburg, Bremen, Hamburg, Hessen, Niedersachsen, NRW, RLP, Sachsen,
-    // Sachsen-Anhalt, Thueringen). Steht ZULETZT + catchAll -> spezifische verifizierte
-    // Landesadapter (NRW...) und die restriktiven Marker gewinnen immer zuerst.
+    /* v1077-WWMS-1 · ZWEITER Catch-all: der offizielle BORIS-D-WMS
+     * (News auf bodenrichtwerte-boris.de vom 22.07.2026), vermessen am
+     * 03.08.2026. Er greift NUR als Rueckfall hinter dem ArcGIS-Dienst
+     * (borisd steht davor im Array) bzw. hinter unverifizierten
+     * Landesadaptern — siehe v1077-WFBK-1 in landValue().
+     * Gemessen: EPSG:4326 liefert LEER -> nativ EPSG:25832 abfragen.
+     * INFO_FORMAT application/geo+json. Eine Adresse kann in JEDEM
+     * brw_*-Layer liegen (Hannover lag in der gemischten Bauweise, nicht
+     * in der Wohnbauflaeche) -> Layer-Gruppen kommagetrennt in EINEM
+     * Request, FEATURE_COUNT 5 (v1077-WWMS-2 in buildUrl). Feldnamen nach
+     * BRM 3.0.1: "Bodenrichtwert", "Gemeindeschlüssel" (mit Umlaut — der
+     * AGS-Leser im Orchestrator, v1047-WAGS-1, trifft genau diese
+     * Schreibweise), "bodenrichtwertzoneName", "BodenrichtwertNummer".
+     * BY/BW/SL/SH sind NICHT im Dienst enthalten — die restriktiven
+     * Marker davor gewinnen ohnehin. */
+    /* ═══ v2592 · DER OFFIZIELLE DIENST ZUERST ══════════════════════════
+     *
+     * Bis v2591 stand dieser Eintrag HINTER dem ArcGIS-Dienst. Der ist das
+     * Backend des BORIS-D-Viewers, keine veroeffentlichte Schnittstelle
+     * (ohne Browser-Kopfzeilen HTTP 403); dieser WMS dagegen ist der in den
+     * Capabilities unter dl-de/by-2-0 freigegebene Dienst.
+     *
+     * GEMESSEN am 21.10.2026, beide Dienste direkt an 35 Punkten (je Land
+     * mindestens einer): an allen 27 Punkten in HH NI HB NW HE RP BE BB MV
+     * SN ST TH liefern beide DENSELBEN Wert, denselben Stichtag, dieselbe
+     * Nutzungsart und denselben Gemeindeschluessel. Unterschied nur in BW
+     * und SL (ArcGIS hat sie, der WMS nicht) - beide Laender haben einen
+     * eigenen Landesadapter davor. SH und BY fehlen in beiden.
+     * Deshalb jetzt: WMS erster Rueckfall, ArcGIS zweiter.
+     *
+     * DABEI GEFUNDEN: dieser Adapter war auf Staging NIE in Betrieb. Die
+     * .env setzte BORISD_WMS_BASE auf https://www.bodenrichtwerte-boris.de/
+     * boris-d - die PORTALSEITE. Jede Anfrage kam per Weiterleitung als
+     * HTML zurueck, der Leser fand kein Feature und meldete „kein Wert am
+     * Punkt". Eine Portaladresse ist kein Dienst; sie wird ignoriert. */
+    code: 'borisd_wms', name: 'BORIS-D WMS (bundesweit)',
+    license: 'dl-de/by-2-0 (laenderspezifisch)',
+    quellenvermerk: '© Daten der Gutachterausschüsse für Grundstückswerte '
+      + CURRENT_BRW_YEAR + ', dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0) '
+      + 'https://www.bodenrichtwerte-boris.de',
+    enabled: true, verified: true, catchAll: true,
+    base: (process.env.BORISD_WMS_BASE && !/bodenrichtwerte-boris\.de/i.test(process.env.BORISD_WMS_BASE)
+      ? process.env.BORISD_WMS_BASE : 'https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte'),
+    bbox: { minLon: 5.80, maxLon: 15.10, minLat: 47.20, maxLat: 55.10 },
+    layers: () => [
+      'brw_wohnbauflaeche,brw_gemischte_bauweise,brw_gewerbliche_bauweise,'
+        + 'brw_sonderbauflaeche,brw_sonstige_flaechen',
+      'brw_landwirtschaftliche_flaeche,brw_forstwirtschaftliche_flaeche',
+    ],
+    crs: 'EPSG:25832', proj: 'utm32', format: 'geojson',
+    featureCount: '5', headers: borisdHeaders, yearIndependent: true, time: null,
+  },
+  {
+    // BUNDESWEITER Catch-all: BORIS-D deckt alle Laender AUSSER BY/SH ab
+    // (v2592 gemessen: auch MV, und hier zusaetzlich BW/SL mit Stichtag 2024/2025).
+    // Steht ZULETZT + catchAll -> spezifische verifizierte Landesadapter und der
+    // offizielle WMS davor gewinnen immer zuerst (v2592: zweiter Rueckfall).
     code: 'borisd', name: 'BORIS-D (bundesweit)', license: 'dl-de/by-2-0 (laenderspezifisch)',
     /* v1456 · gemessen am 20.09.2026 (Josef-Mueller-Str. 92, Wolfenbuettel):
        dieser Eintrag lieferte quellenvermerk=null, obwohl die Lizenz eine
@@ -371,38 +535,6 @@ const ADAPTERS = [
     arcgisLayers: process.env.BORISD_LAYERS || 'all',
     bbox: { minLon: 5.80, maxLon: 15.10, minLat: 47.20, maxLat: 55.10 },
     layer: () => 'all', crs: 'EPSG:25832', axis: 'latlon', proj: 'utm32', format: 'json', time: null,
-  },
-  {
-    /* v1077-WWMS-1 · ZWEITER Catch-all: der offizielle BORIS-D-WMS
-     * (News auf bodenrichtwerte-boris.de vom 22.07.2026), vermessen am
-     * 03.08.2026. Er greift NUR als Rueckfall hinter dem ArcGIS-Dienst
-     * (borisd steht davor im Array) bzw. hinter unverifizierten
-     * Landesadaptern — siehe v1077-WFBK-1 in landValue().
-     * Gemessen: EPSG:4326 liefert LEER -> nativ EPSG:25832 abfragen.
-     * INFO_FORMAT application/geo+json. Eine Adresse kann in JEDEM
-     * brw_*-Layer liegen (Hannover lag in der gemischten Bauweise, nicht
-     * in der Wohnbauflaeche) -> Layer-Gruppen kommagetrennt in EINEM
-     * Request, FEATURE_COUNT 5 (v1077-WWMS-2 in buildUrl). Feldnamen nach
-     * BRM 3.0.1: "Bodenrichtwert", "Gemeindeschlüssel" (mit Umlaut — der
-     * AGS-Leser im Orchestrator, v1047-WAGS-1, trifft genau diese
-     * Schreibweise), "bodenrichtwertzoneName", "BodenrichtwertNummer".
-     * BY/BW/SL/SH sind NICHT im Dienst enthalten — die restriktiven
-     * Marker davor gewinnen ohnehin. */
-    code: 'borisd_wms', name: 'BORIS-D WMS (bundesweit)',
-    license: 'dl-de/by-2-0 (laenderspezifisch)',
-    quellenvermerk: '© Daten der Gutachterausschüsse für Grundstückswerte '
-      + CURRENT_BRW_YEAR + ', dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0) '
-      + 'https://www.bodenrichtwerte-boris.de',
-    enabled: true, verified: true, catchAll: true,
-    base: process.env.BORISD_WMS_BASE || 'https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte',
-    bbox: { minLon: 5.80, maxLon: 15.10, minLat: 47.20, maxLat: 55.10 },
-    layers: () => [
-      'brw_wohnbauflaeche,brw_gemischte_bauweise,brw_gewerbliche_bauweise,'
-        + 'brw_sonderbauflaeche,brw_sonstige_flaechen',
-      'brw_landwirtschaftliche_flaeche,brw_forstwirtschaftliche_flaeche',
-    ],
-    crs: 'EPSG:25832', proj: 'utm32', format: 'geojson',
-    featureCount: '5', headers: borisdHeaders, yearIndependent: true, time: null,
   },
 ];
 
@@ -454,8 +586,12 @@ function buildUrl(a, lat, lon, year, layerName) {
     WIDTH: '101', HEIGHT: '101', X: '50', Y: '50',
     INFO_FORMAT: fmt, FEATURE_COUNT: a.featureCount || '1',
   } : {
+    /* v2590 · STYLES auch bei 1.3.0 (Pflicht laut WMS 1.3.0). BORIS-BB
+     * antwortet ohne ihn „The required parameter STYLES is missing" -
+     * der Leser hielt das fuer „kein Wert am Punkt", ganz BB ausser dem
+     * Berlin-Rechteck lieferte nichts (gemessen 21.10.2026). */
     SERVICE: 'WMS', VERSION: '1.3.0', REQUEST: 'GetFeatureInfo',
-    LAYERS: layer, QUERY_LAYERS: layer, CRS: a.crs, BBOX: bbox,
+    LAYERS: layer, QUERY_LAYERS: layer, STYLES: '', CRS: a.crs, BBOX: bbox,
     WIDTH: '101', HEIGHT: '101', I: '50', J: '50',
     INFO_FORMAT: fmt, FEATURE_COUNT: a.featureCount || '1',
   });
@@ -760,7 +896,25 @@ export const BorisRegistry = {
      *
      * Dasselbe gilt fuer die Gebuehrenauskunft aus v1393: sie ist die
      * aussagekraeftigste Antwort ueberhaupt und schlaegt beide. */
-    let hit = null, first = null, sauber = null, gebuehr = null, ausfall = false;
+    /* ═══ v2592 · AUCH EIN LEERES „VERIFIZIERT" FAELLT ZURUECK ═══════════
+     *
+     * Bis v2591 durften die Catch-alls nur nach einem AUSFALL ran. Eine
+     * leere Antwort eines verifizierten Landesdienstes beendete die Suche -
+     * auch dann, wenn der Punkt gar nicht in seinem Land lag und der
+     * Aufrufer das Land nicht mitschickte (das Rechteck-Problem aus v1388).
+     *
+     * Die Unterscheidung, die jetzt gilt:
+     *   - LEER (keine Zone am Punkt) oder AUSFALL -> die Catch-alls fragen.
+     *     BORIS-D fuehrt fuer NRW, BB, BE dieselben Zahlen wie der
+     *     Landesdienst (gemessen 21.10.2026), ein Rueckfall erfindet also
+     *     nichts - er findet nur, was das Rechteck verdeckt hat.
+     *   - ZONE OHNE WERT vom zustaendigen Landesdienst -> das ist eine
+     *     AUSKUNFT („hier gibt es keinen Bodenrichtwert"), und dann wird
+     *     NICHT bei einem anderen Dienst nachgefragt. Gehoert der Dienst
+     *     nachweislich zu einem anderen Land als `land`, zaehlt seine
+     *     Auskunft nicht. */
+    let hit = null, first = null, sauber = null, gebuehr = null, ausfall = false, explizit = null;
+    const _landUp = land ? String(land).toUpperCase() : null;
     for (const a of chain) {
       const r = await this._queryAdapter(a, lat, lon, year);
       if (first == null) first = r;
@@ -768,8 +922,12 @@ export const BorisRegistry = {
       if (!r.lastErr && sauber == null) sauber = r;
       if (r.value != null) { hit = { a, r }; break; }
       if (r.lastErr) ausfall = true;
+      if (!a.catchAll && r.zoneGesehen && explizit == null
+          && (!_landUp || !LAND_VON_CODE[a.code] || LAND_VON_CODE[a.code] === _landUp)) explizit = a;
     }
-    if (!hit && ausfall) {
+    /* Der zustaendige Dienst hat KEINE einzige saubere Antwort gegeben. */
+    const dienstAusfall = !!(first && first.lastErr && !first.antworten);
+    if (!hit && (ausfall || !explizit)) {
       for (const c of ADAPTERS) {
         if (chain.indexOf(c) >= 0 || !c.catchAll || !c.enabled) continue;
         if (!inBox(lat, lon, c.bbox)) continue;
@@ -792,7 +950,15 @@ export const BorisRegistry = {
          NUR bei gesperrten Laendern (Z. 565) - ausgerechnet im Ausfall,
          wo der Nutzer am ehesten wissen will, woran es liegt, kam die
          Standardfloskel "kein automatischer Bodenrichtwert vorhanden". */
-      if (claimed.note) fb.note = claimed.note;
+      /* v2592 · Ausfall und Rechtsstand sind zwei Texte (s. Bayern-Adapter).
+         `dienst_ausfall` sagt dem Aufrufer, dass der Dienst NICHTS gesagt
+         hat - dann heisst es „derzeit nicht erreichbar", nicht „kein Wert". */
+      if (dienstAusfall) {
+        fb.dienst_ausfall = true;
+        fb.note = claimed.ausfallNote
+          || ('Der Bodenrichtwert-Dienst (' + claimed.name + ') ist derzeit nicht erreichbar. '
+              + 'Bitte den Bodenrichtwert selbst eintragen.');
+      } else if (claimed.note) fb.note = claimed.note;
       fb.claimed_land = claimed.name;
       /* ═══ v1393 · DER WEG ZUM WERT, WENN ER GELD KOSTET ════════════════
        * Bayern antwortet vollstaendig und setzt an die Stelle des Wertes
@@ -805,8 +971,12 @@ export const BorisRegistry = {
         fb.reason = 'wert_gebuehrenpflichtig';
         fb.gebuehr = r0.gebuehr;
         const g = r0.gebuehr;
-        fb.note = 'Der Bodenrichtwert liegt vor, wird von diesem Bundesland aber '
-          + 'nur gegen Gebühr herausgegeben.'
+        /* v2592 · Der Satz behauptete eine Landesregel („von diesem Bundesland
+           nur gegen Gebuehr"). Belegt ist nur, was die Antwort sagt: an DIESER
+           Stelle steht statt des Wertes „Information gebuehrenpflichtig". */
+        fb.dienst_ausfall = false;
+        fb.note = 'Der Bodenrichtwert liegt vor; der Dienst des Landes weist ihn an '
+          + 'dieser Stelle als gebührenpflichtig aus.'
           + (g.zone ? ' Bodenrichtwertzone: „' + g.zone + '".' : '')
           + (g.gemarkung ? ' Gemarkung ' + g.gemarkung + '.' : '')
           + (g.stichtag ? ' Stichtag ' + g.stichtag + '.' : '')
@@ -821,12 +991,29 @@ export const BorisRegistry = {
       value_sqm: hit.r.value, stichtag: hit.r.stichtag, nutzung: hit.r.nutzung, zone: hit.r.zone,
       used_layer: hit.r.usedLayer, used_year: hit.r.usedYear, properties_raw: hit.r.raw,
     };
+    /* ═══ v2592 · EIN ALTER STICHTAG GEHOERT GESAGT ══════════════════════
+     *
+     * BORIS-D liefert fuer Bremen den Stichtag 01.01.2023, fuer Sachsen
+     * 01.01.2024 (gemessen 21.10.2026, Bremen, Bremerhaven, Dresden,
+     * Oschatz). Der Bericht schrieb ihn hin, aber ohne Einordnung - ein
+     * drei Jahre alter Wert sah aus wie ein aktueller. Veraltet heisst hier:
+     * Stichtagsjahr VOR dem Vorjahr des Bewertungsjahres. Ob es einen
+     * neueren gibt, wissen wir nicht - deshalb ein Hinweis, keine Sperre. */
+    const _stJ = stichtagJahr(hit.r.stichtag);
+    const _bewJ = Number(year) || new Date().getFullYear();
+    out.stichtag_veraltet = _stJ != null ? _stJ < _bewJ - 1 : null;
+    if (out.stichtag_veraltet) {
+      out.stichtag_hinweis = 'Stichtag ' + _stJ + ' – älter als ein Jahr; ein neuerer '
+        + 'Bodenrichtwert kann vorliegen (beim zuständigen Gutachterausschuss prüfen).';
+    }
     if (hit.a !== chain[0]) {
       /* v1077-WFBK-4 · Der Wert kam aus dem Rueckfall, nicht vom eigentlich
        * zustaendigen (unverifizierten) Landesdienst — das gehoert in den
        * Bericht, jede Zahl traegt ihre Herkunft. */
       out.fallback_von = chain[0].name;
-      out.note = 'Landesdienst ' + chain[0].name + ' lieferte keinen Wert — Rueckfall auf ' + hit.a.name + '.';
+      out.note = dienstAusfall
+        ? 'Landesdienst ' + chain[0].name + ' derzeit nicht erreichbar — Wert über ' + hit.a.name + '.'
+        : 'Landesdienst ' + chain[0].name + ' lieferte keinen Wert — Rueckfall auf ' + hit.a.name + '.';
     }
     return out;
   },
@@ -864,6 +1051,11 @@ export const BorisRegistry = {
       : (a.yearIndependent ? [nowY] : [nowY, nowY - 1, nowY - 2, nowY - 3]));
     let value = null, stichtag = null, nutzung = null, zone = null, raw = null, usedLayer = null, usedYear = null, lastErr = null;
     let gebuehr = null;   /* v1393: gesperrter Wert samt Zone und Ausschuss */
+    /* v2592 · antworten = saubere Antworten (kein Fehler, keine Fehlerseite);
+     * zoneGesehen = mindestens ein Feature/eine Zone am Punkt. Eine Zone
+     * OHNE Wert ist eine ausdrueckliche Auskunft des Dienstes, eine leere
+     * Antwort nicht - danach unterscheidet landValue() den Rueckfall. */
+    let antworten = 0, zoneGesehen = false;
     outer:
     for (const yr of yearCandidates) {
       /* v1080-WJR-1 · Layer je KANDIDATENJAHR aufloesen — erst damit greift
@@ -896,10 +1088,34 @@ export const BorisRegistry = {
           }
         } catch (e) { lastErr = e.message; continue; }
 
+        /* ═══ v2592 · HTTP 200 IST NOCH KEINE ANTWORT ═════════════════════
+         *
+         * Zwei Faelle, beide am 21.10.2026 gemessen, in denen ein Dienst
+         * „200" sagt und trotzdem nichts gesagt hat:
+         *   - der BORIS-D-WMS kam als PORTALSEITE zurueck (falsche Basis in
+         *     der .env, Weiterleitung auf bodenrichtwerte-boris.de),
+         *   - BORIS-BB meldete in einer ServiceException „STYLES is missing"
+         *     (v2590).
+         * Der Leser fand in beiden kein Feature und machte daraus „kein Wert
+         * am Punkt" - eine AUSKUNFT, wo ein AUSFALL war. Ab hier zaehlen
+         * beide als Fehler: dann darf die Kette weiterfragen, und die
+         * Meldung nennt den Ausfall statt einer Fehlanzeige. */
+        const _kopf = String(text || '').slice(0, 600);
+        if (a.format !== 'html' && /^\s*(<!DOCTYPE html|<html)/i.test(_kopf)) {
+          lastErr = 'HTML-Seite statt Dienstantwort'; continue;
+        }
+        if (/<(?:[A-Za-z0-9_]+:)?ServiceException\b/.test(_kopf)
+            || (a.protocol === 'arcgis' && /^\s*\{\s*"error"\s*:/.test(_kopf))) {
+          lastErr = 'Dienstfehler: ' + _kopf.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
+          continue;
+        }
+        antworten++;
+
         let v = null, st = null, nu = null, zo = null, rw = null;
         if (a.protocol === 'arcgis') {   /* WBORISD-4 */
           const props = parseArcgis(text);
           if (props) {
+            zoneGesehen = true;
             rw = props;
             v = num(propCI(props, F.value));
             st = propCI(props, F.stichtag);
@@ -910,11 +1126,15 @@ export const BorisRegistry = {
           /* v1080-WHTM-3 · MapServer-Template: Sachdaten stehen NUR im
            * text/html (GML liefert dort blosse Geometrie, gemessen SL). */
           const props = parseHtmlProps(text);
-          if (props) { rw = props; v = num(propCI(props, F.value)); st = propCI(props, F.stichtag); nu = propCI(props, F.nutzung); zo = propCI(props, F.zone); }
+          if (props) { zoneGesehen = true; rw = props; v = num(propCI(props, F.value)); st = propCI(props, F.stichtag); nu = propCI(props, F.nutzung); zo = propCI(props, F.zone); }
           else rw = (text || '').slice(0, 1200);
         } else if (a.format === 'geojson') {
-          const props = parseGeoJson(text);
-          if (props) { rw = props; v = num(propCI(props, F.value)); st = propCI(props, F.stichtag); nu = propCI(props, F.nutzung); zo = propCI(props, F.zone); }
+          let props = parseGeoJson(text, a.waehleFeature, lat, lon);
+          /* v2592 · rawZusatz: Felder, die ein Landesdienst nicht fuehrt, der
+           * Orchestrator aber liest (Berlin: Gemeindeschluessel, Ausschuss,
+           * GFZ unter BORIS-D-Namen). Die Antwort des Dienstes gewinnt. */
+          if (props && typeof a.rawZusatz === 'function') props = Object.assign(a.rawZusatz(props), props);
+          if (props) { zoneGesehen = true; rw = props; v = num(propCI(props, F.value)); st = propCI(props, F.stichtag); nu = propCI(props, F.nutzung); zo = propCI(props, F.zone); }
           else rw = (text || '').slice(0, 1200); // kein Feature -> Rohtext fuer Diagnose behalten
         } else {
           rw = text.slice(0, 1200);
@@ -923,6 +1143,7 @@ export const BorisRegistry = {
            * auch als &#252;-Entitaet mit Ziffern) sind KEIN Wert. */
           const gesperrt = !!(vRoh && /geb(ührenpflichtig|uehrenpflichtig|&#252;hrenpflichtig)/i.test(String(vRoh)));
           v = gesperrt ? null : num(vRoh);
+          if (vRoh != null || /<(?:[A-Za-z0-9_]+:)?(featureMember|member)\b/.test(text)) zoneGesehen = true;
           st = parseGmlField(text, F.stichtag);
           nu = parseGmlField(text, F.nutzung); zo = parseGmlField(text, F.zone);
           /* ═══ v1393 · EIN GESPERRTER WERT IST KEIN LEERES ERGEBNIS ══════
@@ -952,6 +1173,7 @@ export const BorisRegistry = {
       }
     }
     return { value, stichtag, nutzung, zone, raw, usedLayer, usedYear, lastErr, gebuehr,
+             antworten, zoneGesehen,
              layers: layersInfo, years: yearCandidates };
   },
 

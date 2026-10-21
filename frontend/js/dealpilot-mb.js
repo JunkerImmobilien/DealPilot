@@ -176,7 +176,9 @@ if (!window._wlc) {
        besonderes objektspezifisches Grundstuecksmerkmal (§ 8 Abs. 3
        ImmoWertV) nach der Marktanpassung abgezogen. `san_ust` sagt, ob
        der Betrag brutto oder netto eingetragen ist. */
-    'san', 'san_ust'];
+    'san', 'san_ust',
+    /* v2660 · E7: Etagen im Gebaeude (Umrechnung des Immobilienrichtwerts); E2: Restlaufzeit der Mietabweichung am Einzelobjekt */
+    'etagen_ges', 'mv_befristet_bis', 'mv_kuendigungsverzicht_bis', 'mv_abw_jahre'];
   function inputs() {
     var o = { plz: vIn('plz'), ort: vIn('ort'), str: vIn('str'), hnr: vIn('hnr'), objektart: vIn('objart'), objart: vIn('objart'), wfl: numDe(vIn('wfl')), baujahr: numDe(vIn('baujahr')), kp: numDe(vIn('kp')) };
     var art = String(o.objart || '').toUpperCase(), OA = window.DealPilotObjektart;
@@ -199,7 +201,10 @@ if (!window._wlc) {
       if (m && Array.isArray(m.einheiten) && m.einheiten.length) {
         o._mfh_einheiten = m.einheiten.map(function (e) {
           return { art: e.art || 'wohnen', wfl: e.wfl, ist: e.ist, soll: e.soll, status: e.status || 'vermietet',
-                   nutzung_gew: e.nutzung_gew || null, markt_qm: e.markt_qm || null };
+                   nutzung_gew: e.nutzung_gew || null, markt_qm: e.markt_qm || null,
+                   /* v2600 · E2/E3 · Restlaufzeit der Mietabweichung, waehlbarer Leerstandsabzug */
+                   mv_art: e.mv_art || null, mv_befristet_bis: e.mv_befristet_bis || null, mv_kuendigungsverzicht_bis: e.mv_kuendigungsverzicht_bis || null,
+                   mv_abw_jahre: e.mv_abw_jahre || null, leer_abzug: e.leer_abzug === true, leer_monate: e.leer_monate || null, herrichtung_eur: e.herrichtung_eur || null };
         });
       }
     } catch (e) {}

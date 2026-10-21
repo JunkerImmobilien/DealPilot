@@ -199,6 +199,24 @@ if (Test-Path "tools\saat-pruefen.mjs") {
     Write-Host "   [ok] Register-Pflichtfelder (Basislinie)"
 }
 
+# v2580 - Wertermittlung am echten Rechenkern (Ertragswert, Sachwert, BWK,
+# Barwert-/Abzinsungsfaktoren) gegen die amtlichen Anwendungsbeispiele
+# (EW-RL, VW-RL, ImmoWertA), die Prompt-Testfaelle und die eingefrorenen
+# Demo-Objekte. Marcel 21.10.2026: "wichtig ist, dass wir richtig mit den
+# Werten rechnen". Ohne DB und ohne Netz; Rot = Abbruch.
+if (Test-Path "tools\wertermittlung-pruefen.mjs") {
+    $wert = node tools/wertermittlung-pruefen.mjs 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        $wert | Select-Object -First 30
+        Write-Host ""
+        Write-Host "ABBRUCH: die Wertermittlung weicht von einem Anwendungsbeispiel oder Sollwert ab." -ForegroundColor Red
+        Write-Host "         node tools/wertermittlung-pruefen.mjs --alle   (jeder Wert)" -ForegroundColor Yellow
+        Write-Host ""
+        exit 1
+    }
+    Write-Host "   [ok] Wertermittlung (amtliche Beispiele, Prompt-Faelle, Demo-Objekte)"
+}
+
 # v2545 - Kappungsgrenzen (Paragraf 558 Abs. 3 BGB) der Laender. Marcel am
 # 20.10.2026: "vor dem 25.11. pruefen, ob Hessen verlaengert". Statt einer
 # Erinnerung, die an einer Sitzung haengt, zeigt jedes Ausrollen die

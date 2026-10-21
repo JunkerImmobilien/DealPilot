@@ -326,8 +326,18 @@ function einheitenMieteAus(d) {
     if (!(fl > 0)) return null;
     const ist = num(e.ist);
     const leer = String(e.status || '') === 'leer' || !(ist > 0);
-    out.push({ nr: String(e.nr || e.bez || e.name || ('WE ' + (i + 1))), wfl: Math.round(fl * 100) / 100,
-               ist_monat: leer ? null : Math.round(ist * 100) / 100, leer });
+    /* v2600 · E2/E3 · Vertragslaufzeit (Restlaufzeit der Mietabweichung) und der waehlbare
+       Leerstandsabzug je Wohnung - nur, was eingetragen ist */
+    const _d = (v) => (v && /^\d{4}-\d{2}(-\d{2})?$/.test(String(v)) ? String(v) : null);
+    out.push(Object.assign({ nr: String(e.nr || e.bez || e.name || ('WE ' + (i + 1))), wfl: Math.round(fl * 100) / 100,
+               ist_monat: leer ? null : Math.round(ist * 100) / 100, leer },
+      e.mv_art ? { mv_art: String(e.mv_art) } : {},
+      _d(e.mv_befristet_bis) ? { mv_befristet_bis: _d(e.mv_befristet_bis) } : {},
+      _d(e.mv_kuendigungsverzicht_bis) ? { mv_kuendigungsverzicht_bis: _d(e.mv_kuendigungsverzicht_bis) } : {},
+      num(e.mv_abw_jahre) > 0 ? { mv_abw_jahre: num(e.mv_abw_jahre) } : {},
+      (leer && (e.leer_abzug === true || e.leer_abzug === 'true')) ? { leer_abzug: true,
+        leer_monate: num(e.leer_monate) > 0 ? num(e.leer_monate) : null,
+        herrichtung_eur: num(e.herrichtung_eur) > 0 ? num(e.herrichtung_eur) : null } : {}));
   }
   return out.some((x) => !x.leer) ? out : null;
 }
@@ -363,6 +373,14 @@ export const DealPilotObjectMapper = {
       rooms: num(pick(d, ['zimmer'])),
       build_year: num(pick(d, ['baujahr'])),
       floor: num(pick(d, ['etage'])),
+      /* v2660 · E7 · „Anzahl Etagen" (Reiter Objekt) - die Umrechnung des Immobilienrichtwerts
+         fuehrt bei Wohnungseigentum teils die Geschosszahl des Gebaeudes (Koeln, Feld ANZG). */
+      geschosse_gesamt: num(pick(d, ['etagen_ges'])),
+      /* v2660 · E2 · Einzelobjekt ohne Wohnungsliste (ETW, EFH): Restlaufzeit der Mietabweichung.
+         Mit Wohnungsliste reisen dieselben Felder je Wohnung (einheitenMieteAus). */
+      mv_befristet_bis: (function () { const v = pick(d, ['mv_befristet_bis']); return v && /^\d{4}-\d{2}(-\d{2})?$/.test(String(v)) ? String(v) : null; })(),
+      mv_kuendigungsverzicht_bis: (function () { const v = pick(d, ['mv_kuendigungsverzicht_bis']); return v && /^\d{4}-\d{2}(-\d{2})?$/.test(String(v)) ? String(v) : null; })(),
+      mv_abw_jahre: num(pick(d, ['mv_abw_jahre'])) > 0 ? num(pick(d, ['mv_abw_jahre'])) : null,
       /* v1437: Wohneinheiten fehlten - der Ertragswert setzt die Verwaltungskosten
          je BEWERTETER Einheit an (Anlage 3 ImmoWertV) und rechnete auf dem Objektweg
          ohne sie am Durchschnitt. Der Sprechlauf fragt sie beim MFH jetzt ab. */

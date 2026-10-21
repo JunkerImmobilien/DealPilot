@@ -261,6 +261,7 @@ seine Datei (gegen git, nicht gegen die Dateizeit). RC=0 ist sauber.
 | `uk-flaeche-pruefen.mjs` | jeden Umrechnungskoeffizienten (Grundstücksgröße) gegen das amtliche Anwendungsbeispiel mit der echten Funktion; Tabellen 1,00 an der Normgröße, fallend; **Sperre ohne rechenbare Formel** |
 | `uk-naeherung-ableiten.mjs` | leitet die DealPilot-Formel (Näherung) aus allen amtlichen Flächentabellen ab, nach jeder Ernte neu laufen lassen |
 | `uk-wgfz-pruefen.mjs` | jeden Umrechnungskoeffizienten WGFZ (`uk-wgfz-*.json`) gegen sein amtliches Beispiel, 1,00 an der Norm, steigend; Sperre ohne Formel |
+| `wertermittlung-pruefen.mjs` | Ertrags-/Sachwert am echten Kern (ErtragswertService, CrossCheckService, immowertv, nhk2010, nrw_modell) ohne DB/Netz: **A** amtliche Anwendungsbeispiele (EW-RL Anl. 3, VW-RL Anl. 5, ImmoWertA), **B** Prompt-Testfälle 1–11 (bewusste Abweichungen als „Entscheidung offen"), **C** eingefrorene Demo-Objekte (`wertermittlung-faelle.json`, Uhr fest auf 21.10.2026); läuft in `deploy-staging.ps1` mit. Nach jeder Änderung am Wertkern laufen lassen; Ebene C nur bewusst neu einfrieren (`--einfrieren=`) |
 
 **Agents für die Datenpflege** (`.claude/agents/`, seit v2176): `register-ernte`
 (Zins/Sachwertfaktor ins Register, nur Dateien), `nachernte-pdf` (die vom
@@ -548,6 +549,12 @@ eine selbst ausgerechnete Zahl.
   Gemessen 19.10.2026: wirksam fast nur in BW (1.040 Gemeinden ohne
   Registersatz) und zwei Orten in HE; NW, NI, SN, RP, BB haben überall einen
   Satz oder eine Sperre.
+  **Zweiter Weg in N, nur LZS (v2611, E6): das DealPilot-Landesmittel**
+  (`lzsLandesmittel()`, `lzs-naeherung.json` `landesmittel.zellen`) — Median
+  der amtlichen Sätze je Land × Objektart, nur mit ≥ 8 Ausschüssen und nur,
+  wo es per Leave-one-Ausschuss-out genauer ist als § 256 und die Formel;
+  dieselben Sperren wie die Formel, im Bericht „DealPilot-Landesmittel aus n
+  amtlichen Zinssätzen (Land, Objektart, Jahrgänge)". Für SWF/UK nie.
 - Jede Zahl trägt Herkunft: Stufe A–E und N, Modellvermerk, `indikativ`, Ausschuss.
 - Eine Restnutzungsdauer für alle Verfahren.
 - BWK-Quoten stehen auf dem **gesamten** Rohertrag inklusive Stellplätzen.
