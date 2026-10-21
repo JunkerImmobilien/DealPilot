@@ -138,6 +138,14 @@ function groessenIn(text) {
   return treffer.sort((a, b) => a.i - b.i);
 }
 
+/* „vier von sechs Wohnungen": gezaehlt sind die vier, nicht die sechs (gemessen an Bericht 331). */
+const zahl = (x) => (/^\d+$/.test(x) ? Number(x) : ZAHLWORT[String(x).toLowerCase()]);
+const VON_RE = new RegExp('\\b' + ZAHL_RE + '\\s+von\\s+$', 'i');
+function zahlAn(t, n) {
+  const m = t.slice(0, n.index).match(VON_RE);
+  return m ? zahl(m[1]) : zahl(n[1]);
+}
+
 const HECKE = /(knapp|rund|etwa|gut|fast|ca\.|circa|nahezu|annähernd|ungefähr|mehr als|beinahe)\s*$/i;
 
 export function pruefeText(md, F) {
@@ -173,7 +181,7 @@ export function pruefeText(md, F) {
       for (const re of [LEER, LEER2]) {
         let n;
         while ((n = re.exec(t))) {
-          const w = /^\d+$/.test(n[1]) ? Number(n[1]) : ZAHLWORT[n[1].toLowerCase()];
+          const w = zahlAn(t, n);
           if (w !== z.anzahl_leer) befunde.push({ art: 'zaehlung_leer', satz: t.trim(), zeile: s.zeile, ist: n[0], soll: String(z.anzahl_leer) + ' leer stehend' });
         }
       }
@@ -183,7 +191,7 @@ export function pruefeText(md, F) {
       const UEB = new RegExp('\\b' + ZAHL_RE + '\\s+(?:Mietverhältniss?e?|Wohnungen|Einheiten)\\b[^.]{0,60}?(?:höheren Ist-Mieten|über dem (?:marktüblichen )?Band|oberhalb des Bandes)', 'gi');
       let n;
       while ((n = UEB.exec(t))) {
-        const w = /^\d+$/.test(n[1]) ? Number(n[1]) : ZAHLWORT[n[1].toLowerCase()];
+        const w = zahlAn(t, n);
         if (w !== z.anzahl_ueber_band) befunde.push({ art: 'zaehlung_band', satz: t.trim(), zeile: s.zeile, ist: n[0], soll: String(z.anzahl_ueber_band) + ' über dem Band' });
       }
     }

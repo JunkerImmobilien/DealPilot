@@ -83,5 +83,17 @@ ok(r2.md === gut && r2.prot.entfernt.length === 0, 'Neuschreiben mit Besserung -
 const r3 = await K.pruefeUndRepariere(gut, F, async () => { throw new Error('nie gerufen'); });
 ok(r3.md === gut && !r3.prot.neu_erzeugt, 'sauberer Text -> kein Neuschreiben');
 
+console.log('6) Abnahme Bericht 331 (echter Lauf v2670)');
+const ab = fx.abnahme_331;
+if (ab) {
+  const [sw, band] = ab.entwurf_saetze;
+  ok(K.pruefeText(sw, F).some((x) => x.art === 'prozent'), 'Entwurf: „Sachwert ... 11,3 Prozent unter dem Kaufpreis" (soll 10,2 %) -> Befund');
+  ok(!K.pruefeText(band, F).some((x) => x.art === 'zaehlung_band'), 'Entwurf: „vier von sechs Wohnungen ... über dem Band" ist richtig -> kein Fehlalarm');
+  ok(K.pruefeText('Fünf von sechs Wohnungen liegen über dem marktüblichen Band.', F).length === 1, '„Fünf von sechs ... über dem Band" (soll 4) -> Befund');
+  const e = K.pruefeText(ab.report_md, F);
+  e.forEach((x) => console.log('       ' + x.art + ': ' + x.satz.slice(0, 80)));
+  ok(e.length === 0, 'veröffentlichter Text 331 ohne Befund');
+} else ok(false, 'abnahme_331 fehlt in der Fixture');
+
 console.log((fehler ? 'ROT' : 'GRUEN') + ': ' + (n - fehler) + '/' + n);
 process.exit(fehler ? 1 : 0);
