@@ -41559,3 +41559,30 @@ Potenzial Demo: Bestand/MH/ZB 610.000/625.000/805.000 → 610.000/630.000/805.00
   Eine Abbildung Exposé-Qualität → Standardstufe ist eine Bewertungsentscheidung (Marcel).
 - Weiterhin ★ im Kundentext: Banner in `dealscore2-ui.js:550` und die Einheit in `dealscore2.js:550`. Beide Dateien gehören dem Hauptchat und sind nicht angefasst.
 - Der Kasten merkt sich die Abwahl nur für die Sitzung, nicht dauerhaft.
+
+### v2547a · Tablet: sichtbare Höhe (dvh) und Abruf-Knopf in der Datenaufnahme-Zeile (21.10.2026, Staging)
+
+**Was.** Marcel, iPad quer mit Safari-Tableiste (Bild `Dateien/app1.png`): Reiterleiste oben angeschnitten, Nutzerfuß der Sidebar unten abgeschnitten, in der Datenaufnahme steht „Neuer Vorgang" unter dem Pass statt in der Zeile.
+- **Höhe:** `html, body`, `.app-wrap`, `.sidebar`/`#sidebar`, `.main-col` (style.css, 9 Stellen) und `.dpl-schiene` (layout-varianten.css) tragen hinter `100vh` jetzt `100dvh`. Auf iPad-Safari ist `100vh` die Höhe OHNE eingeblendete Leisten; das Dokument war damit höher als der sichtbare Bereich, ließ sich trotz `overflow:hidden` verschieben und schob Kopf/Reiter nach oben und den Nutzerfuß nach unten raus. Aus Marcels Bild gerechnet: sichtbar ~892 CSS-px, Reiter-Unterkante bei 27 statt 100 px.
+- **Zeile:** datenaufnahme.css (Block v2547a am Ende). Ursache: das zweite Segment „Daten übernehmen aus" stand auf `flex:0 0 auto` (QC inline, ab 769 px) und zählte mit seiner ganzen Kachelreihe; die Leiste bricht um, und der Knopf wanderte. Jetzt gibt GENAU dieses Segment nach (`flex:1 1 0%`, `min-width:min-content`), seine Kacheln brechen in sich um. QuickBoarding ab 901 px Rahmen, Objekt-Reiter ab 1024 px; im Objekt-Reiter 1024–1139 fällt der QR „DealPilot öffnen" (mit ihm 790 > 732 px, passt nicht).
+- Der Umschaltpunkt auf das Handy-Menü bleibt 900 px (Schiene → Drawer), die Leiste wird darunter wie bisher zur Spalte.
+
+**Commit.** `530b7dc9` (mit Bustern style/datenaufnahme/layout-varianten in index.html → v2547a).
+
+**Nachweis.** Staging, eigenes gleich-Origin-iframe, Speichern gesperrt. Leistenhöhe, Knopf in der Zeile, elementsFromPoint auf dem Knopf:
+
+| Breite | vorher | nachher |
+|---|---|---|
+| QC-Rahmen 1073 (iPad 1366) | 175 px, Knopf Zeile 2 | 135 px, in der Zeile („Neuer Vorgang") |
+| QC-Rahmen 902 (1194) / 987 (1280) | – | 185 / 135 px, in der Zeile |
+| Objekt 1024×768 | 243, Zeile 2 | 235, in der Zeile |
+| Objekt 1180 / 1366 / 1920 | 185 / 115 / 78 | unverändert |
+| Objekt 1440 | 131, Zeile 2 | 115, in der Zeile |
+| 390 / 768 / 834 | Spalte/Schublade | unverändert |
+
+Überall: kein Dokument-Überlauf (0/0), Schienenhöhe = Fensterhöhe, Nutzerfuß und erster Reiter per elementsFromPoint erreichbar, auch 1024×700 und 1366×900. Gold-Audit auf Staging RC 0. Kartei-Stil: Stub steht dort gewollt in eigener Zeile (gegen abgeschaltete Regel gemessen, 216 px in beiden Fällen).
+
+**Rest.**
+- **Abnahmepunkt Marcel, nur am echten iPad prüfbar:** Chrome rechnet `dvh` = `vh`; ob Reiterleiste und Nutzerfuß mit eingeblendeter Tableiste jetzt ganz sichtbar sind, zeigt nur Safari.
+- `quickcheck-app.html` lädt `datenaufnahme.css?v=v1954a` (Datei des Quick-Check-Strangs, nicht angefasst). Ein Gerät mit altem Cache sieht die Zeile im QuickBoarding erst nach dem Hochziehen dieses Busters.
+- Objekt-Reiter 1024 px: in der Zeile, aber die vier Quellen stehen untereinander (Segment 223 px).
