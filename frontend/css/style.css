@@ -41236,3 +41236,23 @@ html body #nk-aus-einstellungen { white-space: normal !important; max-width: 100
   }
   #bankexport-modal .bank-table-full tbody td:first-child::before { content: 'Im Export'; }
 }
+
+/* v2576 · Aktionen-Menue im Handy-Querformat. Gemessen 844 x 390 (Messkabine,
+   21.10.2026): das offene Menue (v642, fixed ab top 58) war nur 182 px hoch
+   fuer 687 px Inhalt - ein Scrollbereich im Scrollbereich der Seitenleiste.
+   Quer ist neben der 380 px breiten Leiste genug Platz: das Menue steht dort
+   in voller Hoehe, der Ausloeser bleibt sichtbar. html-Praefix hebt die
+   Spezifitaet ueber v642, ohne auf die Ladereihenfolge zu bauen. */
+@media (max-width: 900px) and (min-width: 640px) and (max-height: 500px) and (orientation: landscape) {
+  html body .app-wrap.sb-mobile-open #sidebar.sidebar .sb-actions-accordion.sb-actions-open,
+  html body #sidebar.sidebar.sb-mobile-open .sb-actions-accordion.sb-actions-open {
+    top: calc(8px + env(safe-area-inset-top, 0px)) !important;
+    left: 392px !important;
+    width: min(420px, calc(100vw - 404px - env(safe-area-inset-right, 0px))) !important;
+    max-height: calc(100dvh - 16px) !important;
+  }
+  html body .app-wrap.sb-mobile-open #sidebar.sidebar .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner,
+  html body #sidebar.sidebar.sb-mobile-open .sb-actions-accordion.sb-actions-open .sb-actions-accordion-inner {
+    max-height: calc(100dvh - 16px) !important;
+  }
+}
