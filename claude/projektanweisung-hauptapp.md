@@ -42073,3 +42073,18 @@ Marcel 21.10.2026: „ja rollout 60 und zu 2. bitte nimm das, was ein Gutachter 
 
 - **v2671 (`2e6fc0d0`):** Garage im Normobjekt des Immobilienrichtwerts, Objekt ohne Garage: Abzug = **Mitte** der Zeitwertspanne des Ausschusses statt Untergrenze (Normobjekt = durchschnittliches Objekt; Untergrenze wies den Wert systematisch zu hoch aus). Herford EFH (S. 3, 5.000–15.000 €): 5.000 → 10.000 €; Löhner Str. 278 ohne Garage 324.932 → 319.932 € (B36). Prüfstrecke A 80/80, B 118/118, C 99/99; irw, beleihungswert, saat --basislinie grün.
 - **Prod-Rollout (60):** `e45d2986` auf `main` = Staging `2e6fc0d0` (v2670/v2670a KI-Zahlenprüfung, Mietpreisübersicht außerhalb der Größentabelle, Garage; v2671). Sicherungen vorher `/root/backups/haupt-20261021-2022.sql.gz` (14 MB, 73 Tabellen), `mb-20261021-2022.sql.gz` (27 MB, 34 Tabellen). mb-backend gebaut („skip 021", :4000), `register-saat` SOLL = IST 4.319, 0 verwaist. Im Container: `ki_text_pruefung.js` vorhanden, „Mitte der Zeitwertspanne" im Kern. mb-health 200, Gold-Audit RC 0.
+
+### v2700 · Nachernte 10b HE/SH/RP/HH (21.10.2026 abends, Staging)
+
+Auftrag: Lücken in NI, HE, SH, HH, RP schließen (MFH-LZS NI, MFH/ETW-SWF, Jahrgang 2026, RP-Städte, SH-Kreise, HH).
+
+- **Was:** Vier neue Saatdateien `nachernte-2026-10b-{he,sh,rp,hh}.json` (101 Sätze) in `SAATDATEIEN`; Dithmarschen-SWF-Sperren in `swf-ni-sh-rp-sl-2026.json` mit gelesenem Sachwertkapitel nachgeführt.
+  - **Darmstadt** (IMB 2026, Okt. 2026, bisher gar nicht im Register): LZS MFH verzweigt nach Baujahr (vor 1950 2,8 % / ab 1950 3,2 %), vermietete ETW 2,17 % (n 120), WGH 3,6 % und gemischt bis 75 % 4,8 % (Stufe B, < 5 Fälle); Stichtag 01.07.2025, Wortlaut dl-de/zero-2-0. SWF nur Diagramm → Sperre.
+  - **HE MFH/ETW-SWF:** je 2026er Ausschuss Sperre mit Fundstelle (58). Korbach, Homberg (GND 70, altes Modell) und Frankfurt führen MFH-SWF, aber ohne Baupreisindex als Zahl; Gießen weist MFH-Tabellenwerte ausdrücklich nicht aus.
+  - **Main-Kinzig/Wetterau:** SWF-Tabelle ist die hessenweite ZGGH-Auswertung ohne Index → Sperre; LZS ETW/WGH/Gewerbe/RH Sperren mit Zitat.
+  - **Worms:** eigener GMB 2025 mit LZS (S. 52) und SWF (S. 59), 50 € PDF, `zugang: kostenpflichtig`, direkter Bestelllink — die ältere Sperre („nur LGMB") stimmt für Worms nicht.
+  - **SH:** Lübeck/Lauenburg/Ostholstein MFH/ETW-SWF, WGH/Gewerbe-LZS als Sperren; Dithmarschen SWF: NHK 2000/2010 ohne GND/Index, MFH nur in GEW-Sammeltabelle (NHK 2000).
+  - **HH:** WGH-LZS-Sperre (MFH-Satz gilt nur „ohne gewerblichen Anteil", S. 139) — verhindert stillen Rückfall WGH → MFH; ETW-SWF-Sperre.
+- **Commit:** `b024a248`.
+- **Nachweis:** `saat-pruefen` je Datei RC=0; `--basislinie` im sauberen Worktree von HEAD RC=0 (im geteilten Arbeitsverzeichnis rot nur durch fremde, nicht eingetragene `uk-irw-nw-*`); `uk-flaeche-pruefen`/`uk-wgfz-pruefen` RC=0; `wertermittlung-pruefen` RC=0; Kette im Container: Darmstadt MFH Bj 1960 → 3,2 % Stufe A, we_v → 2,17 %. `register-saat --trocken --nur=HE` 330 Schlüssel, keine Dublette, 0 verwaist. mb-backend auf Staging neu gebaut.
+- **Rest:** NI nicht geerntet — `gag.niedersachsen.de` den ganzen Abend im Wartungsmodus (MFH-LZS Braunschweig-Wolfsburg, Lüneburg, Oldenburg-Cloppenburg, Osnabrück-Meppen, Otterndorf offen). Mainz (mainz.de 503) und Kaiserslautern/Ludwigshafen/Trier ohne neuen Befund. Kassel-Anlage zum IMB 2026 (WGH) prüfen. HE-SWF für EFH bleiben ohne Baupreisindex-Zahl (Bestand unter Basislinie).
