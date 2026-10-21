@@ -1,32 +1,33 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-10-21T20:35:39.680Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-10-21T20:54:31.454Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_REGISTER = {
  "stand": "2026-10-21",
- "erzeugt": "2026-10-21T20:35:39.680Z",
- "register_commit": "5a115f7c",
+ "erzeugt": "2026-10-21T20:54:31.454Z",
+ "register_commit": "77cb54c2",
  "register_lokal_geaendert": false,
  "quelle": "registerDeckung() · lib/register_deckung.js, ohne Datenbank (wie Admin „Register & Ernte\")",
- "dateien": 82,
- "saetze": 8851,
+ "dateien": 91,
+ "saetze": 9069,
  "kopf": {
-  "werte_gesamt": 4319,
-  "lzs": 2368,
+  "werte_gesamt": 4332,
+  "lzs": 2381,
   "swf": 624,
   "uk_flaeche": 159,
   "uk_wgfz": 106,
   "uk": 265,
   "irw_tabellen": 21,
   "irw_ausschuesse": 9,
-  "ausschuesse": 196,
+  "ausschuesse": 197,
   "laender_erfasst": 16,
+  "laender_mit_wert": 15,
   "laender_gesamt": 16
  },
  "herkunft": {
-  "werte": 4319,
-  "mit_ausschuss": 4319,
-  "mit_jahrgang": 4319,
-  "mit_quelle": 4319,
-  "mit_seite": 4318
+  "werte": 4332,
+  "mit_ausschuss": 4332,
+  "mit_jahrgang": 4332,
+  "mit_quelle": 4332,
+  "mit_seite": 4331
  },
  "jahrgaenge": [
   2018,
@@ -38,11 +39,11 @@ window.DPS_REGISTER = {
    "werte": 34,
    "lzs": {
     "w": 18,
-    "anteil": 0.64
+    "anteil": 0.53
    },
    "swf": {
     "w": 6,
-    "anteil": 0.11
+    "anteil": 0.1
    },
    "uk_flaeche": {
     "w": 5,
@@ -52,7 +53,7 @@ window.DPS_REGISTER = {
     "w": 5,
     "anteil": 0.31
    },
-   "anteil4": 0.3,
+   "anteil4": 0.27,
    "erfasst": true
   },
   "HH": {
@@ -60,11 +61,11 @@ window.DPS_REGISTER = {
    "werte": 8,
    "lzs": {
     "w": 5,
-    "anteil": 1
+    "anteil": 0.83
    },
    "swf": {
     "w": 2,
-    "anteil": 0.67
+    "anteil": 0.5
    },
    "uk_flaeche": {
     "w": 1,
@@ -74,7 +75,7 @@ window.DPS_REGISTER = {
     "w": 0,
     "anteil": 0
    },
-   "anteil4": 0.62,
+   "anteil4": 0.53,
    "erfasst": true
   },
   "NI": {
@@ -145,14 +146,14 @@ window.DPS_REGISTER = {
   },
   "HE": {
    "name": "Hessen",
-   "werte": 326,
+   "werte": 330,
    "lzs": {
-    "w": 136,
-    "anteil": 0.94
+    "w": 140,
+    "anteil": 0.88
    },
    "swf": {
     "w": 164,
-    "anteil": 1
+    "anteil": 0.72
    },
    "uk_flaeche": {
     "w": 16,
@@ -162,7 +163,7 @@ window.DPS_REGISTER = {
     "w": 10,
     "anteil": 0.56
    },
-   "anteil4": 0.91,
+   "anteil4": 0.75,
    "erfasst": true
   },
   "RP": {
@@ -170,7 +171,7 @@ window.DPS_REGISTER = {
    "werte": 30,
    "lzs": {
     "w": 26,
-    "anteil": 0.16
+    "anteil": 0.15
    },
    "swf": {
     "w": 1,
@@ -284,7 +285,7 @@ window.DPS_REGISTER = {
    },
    "swf": {
     "w": 36,
-    "anteil": 0.95
+    "anteil": 0.67
    },
    "uk_flaeche": {
     "w": 27,
@@ -294,7 +295,7 @@ window.DPS_REGISTER = {
     "w": 12,
     "anteil": 0.32
    },
-   "anteil4": 0.78,
+   "anteil4": 0.73,
    "erfasst": true
   },
   "MV": {
@@ -302,11 +303,11 @@ window.DPS_REGISTER = {
    "werte": 34,
    "lzs": {
     "w": 16,
-    "anteil": 0.39
+    "anteil": 0.32
    },
    "swf": {
     "w": 11,
-    "anteil": 0.41
+    "anteil": 0.38
    },
    "uk_flaeche": {
     "w": 0,
@@ -316,7 +317,7 @@ window.DPS_REGISTER = {
     "w": 0,
     "anteil": 0
    },
-   "anteil4": 0.32,
+   "anteil4": 0.28,
    "erfasst": true
   },
   "SN": {
@@ -328,7 +329,7 @@ window.DPS_REGISTER = {
    },
    "swf": {
     "w": 16,
-    "anteil": 0.59
+    "anteil": 0.55
    },
    "uk_flaeche": {
     "w": 0,
@@ -338,7 +339,7 @@ window.DPS_REGISTER = {
     "w": 0,
     "anteil": 0
    },
-   "anteil4": 0.47,
+   "anteil4": 0.46,
    "erfasst": true
   },
   "ST": {
@@ -350,7 +351,7 @@ window.DPS_REGISTER = {
    },
    "swf": {
     "w": 28,
-    "anteil": 1
+    "anteil": 0.67
    },
    "uk_flaeche": {
     "w": 1,
@@ -360,19 +361,19 @@ window.DPS_REGISTER = {
     "w": 2,
     "anteil": 0.67
    },
-   "anteil4": 0.77,
+   "anteil4": 0.68,
    "erfasst": true
   },
   "TH": {
    "name": "Thüringen",
-   "werte": 127,
+   "werte": 136,
    "lzs": {
-    "w": 52,
-    "anteil": 0.9
+    "w": 61,
+    "anteil": 0.52
    },
    "swf": {
     "w": 75,
-    "anteil": 1
+    "anteil": 0.83
    },
    "uk_flaeche": {
     "w": 0,
@@ -382,7 +383,7 @@ window.DPS_REGISTER = {
     "w": 0,
     "anteil": 0
    },
-   "anteil4": 0.94,
+   "anteil4": 0.65,
    "erfasst": true
   }
  }

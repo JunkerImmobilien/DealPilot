@@ -93,7 +93,7 @@
       [zahl(k.uk), 'Umrechnungskoeffizienten'],
       [zahl(k.irw_tabellen), 'Tabellen zum Immobilienrichtwert'],
       [zahl(k.ausschuesse), 'Gutachterausschüsse'],
-      [k.laender_erfasst + '<small> / ' + k.laender_gesamt + '</small>', 'Bundesländer']
+      [zahl(k.laender_mit_wert), 'Bundesländer mit amtlichen Werten']
     ];
     var h = '<div class="rg-t rt-t"><div class="rt-links">'
       + '<div class="rt-kick">Register &amp; Ernte · amtliche Daten an Bord</div>'
@@ -107,7 +107,7 @@
     Object.keys(LAGE).forEach(function (L) {
       var r = R.laender[L]; if (!r) return;
       var a = Math.max(0, Math.min(1, r.anteil4 || 0));
-      h += '<div class="rt-land" style="grid-column:' + (LAGE[L][0] + 1) + ';grid-row:' + (LAGE[L][1] + 1)
+      h += '<div class="rt-land' + (r.werte ? '' : ' leer') + '" style="grid-column:' + (LAGE[L][0] + 1) + ';grid-row:' + (LAGE[L][1] + 1)
         + ';--a:' + Math.round(10 + 55 * a) + '%"><div class="rt-code">' + L + '</div>'
         + '<div class="rt-werte">' + (r.werte ? zahl(r.werte) : '') + '</div><div class="rt-balken">';
       KZ.forEach(function (z) { var c = r[z[0]] || { anteil: 0 }; h += '<i title="' + z[1] + '"><b style="height:' + Math.round(100 * (c.anteil || 0)) + '%"></b></i>'; });

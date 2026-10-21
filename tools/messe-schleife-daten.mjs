@@ -129,6 +129,8 @@ const R = {
     irw_ausschuesse: irwAus.size,
     ausschuesse: aus.size,
     laender_erfasst: Object.values(laender).filter((l) => l.erfasst).length,
+    /* messe-schleife-5d: auf der Tafel nur Länder mit mindestens einem WERT — Sätze allein (Saarland) zählen nicht */
+    laender_mit_wert: Object.values(laender).filter((l) => l.werte > 0).length,
     laender_gesamt: LAENDER.length,
   },
   herkunft: { werte, mit_ausschuss: mitAusschuss, mit_jahrgang: mitJahr, mit_quelle: mitQuelle, mit_seite: werte - ohneSeite },
@@ -152,7 +154,7 @@ const k = R.kopf;
 console.log('Register ' + stand + ' (' + R.register_commit + (R.register_lokal_geaendert ? ', LOKAL GEÄNDERT' : '') + '): '
   + R.dateien + ' Dateien, ' + R.saetze + ' Sätze, ' + k.werte_gesamt + ' Werte · LZS ' + k.lzs + ' · SWF ' + k.swf
   + ' · UK ' + k.uk + ' · IRW-Tabellen ' + k.irw_tabellen + ' (' + k.irw_ausschuesse + ' Ausschüsse) · Ausschüsse ' + k.ausschuesse
-  + ' · Länder ' + k.laender_erfasst + '/' + k.laender_gesamt);
+  + ' · Länder mit Wert ' + k.laender_mit_wert + ' (mit Sätzen ' + k.laender_erfasst + '/' + k.laender_gesamt + ')');
 console.log('Herkunft: Ausschuss ' + R.herkunft.mit_ausschuss + ', Jahrgang ' + R.herkunft.mit_jahrgang + ', Quelle ' + R.herkunft.mit_quelle
   + ', Seite ' + R.herkunft.mit_seite + ' von ' + werte + ' · Jahrgänge ' + jmin + '–' + jmax);
 console.log('Videothek ' + V.stand + ': ' + liste.length + ' Videos, ' + liste.reduce((s, v) => s + v.dauer, 0) + ' s');
