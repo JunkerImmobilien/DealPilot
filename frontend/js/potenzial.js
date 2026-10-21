@@ -742,6 +742,8 @@
        aus dem Kern) - statt „—" als scheinbarer Wert steht der Hinweis unten. */
     var zu = gesperrt(r);
     var W = zu ? null : wertQuelle(r), WS = (W && W.S) || {};
+    /* ein Abruf führt die Zahl der leeren Wohnungen nicht mit - dann aus der Wohnungsliste */
+    if (W && W.quelle === 'abruf') W.leer = (m.wohnungen || []).filter(function (w) { return w.status === 'leer' && w.art !== 'gewerbe' && w.wfl > 0; }).length;
     var MPI = W && W.mpi ? W.mpi : null;
     var mpiDa = !!(MPI && MPI.angebote && MPI.angebote.verfuegbar);
     var rfDa = !!(MPI && MPI.rohertragsfaktor && MPI.rohertragsfaktor.verfuegbar);
