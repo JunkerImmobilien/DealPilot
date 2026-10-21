@@ -787,19 +787,48 @@
       + 'Je Wohnung: Angebote für Eigentumswohnungen gleichen Baujahrs in der Flächenklasse der Wohnung.</p>' + knopf + '</div>';
     return html;
   }
+  /* v2556c · Marcel 21.10.2026: „Es muss gezeigt werden, ob die Marktpreis-
+     indikation gerade läuft." Ein Abruf dauert 10-40 s; der Hinweis im Block
+     stand oft ausserhalb des Sichtbaren. Jetzt ein Fenster mit Sekundenzaehler,
+     das erst mit dem Ergebnis geht - und solange keinen zweiten Klick zulaesst. */
+  var _lauf2 = null;
+  function laufAnzeige(an, titel, text) {
+    var ov = document.getElementById('dp-pot-lauf');
+    if (!an) { if (_lauf2) clearInterval(_lauf2); _lauf2 = null; if (ov) ov.remove(); return; }
+    if (!document.getElementById('dp-pot-lauf-css')) {
+      var st = document.createElement('style'); st.id = 'dp-pot-lauf-css';
+      st.textContent = '#dp-pot-lauf{position:fixed;inset:0;z-index:2147483000;background:rgba(5,5,5,.55);display:flex;align-items:center;justify-content:center;padding:16px}'
+        + '#dp-pot-lauf .k{background:#FDFCFA;color:#2A2727;border-radius:14px;padding:22px 24px;max-width:420px;width:100%;box-shadow:0 18px 50px rgba(0,0,0,.35);border-top:3px solid var(--wl-c9a84c, #C9A84C);font:400 13.5px/1.5 Inter,sans-serif}'
+        + '#dp-pot-lauf b{display:block;font:600 16px "Space Grotesk",sans-serif;margin-bottom:6px}'
+        + '#dp-pot-lauf .r{width:34px;height:34px;border-radius:50%;border:3px solid #EFE6CC;border-top-color:var(--wl-c9a84c, #C9A84C);animation:dpPotDreh 1s linear infinite;margin-bottom:12px}'
+        + '#dp-pot-lauf .z{margin-top:10px;font:500 11px "JetBrains Mono",monospace;color:#6B645A}'
+        + '@keyframes dpPotDreh{to{transform:rotate(360deg)}}@media (prefers-reduced-motion:reduce){#dp-pot-lauf .r{animation:none}}';
+      document.head.appendChild(st);
+    }
+    if (!ov) { ov = document.createElement('div'); ov.id = 'dp-pot-lauf'; ov.setAttribute('role', 'status'); ov.setAttribute('aria-live', 'polite'); document.body.appendChild(ov); }
+    var t0 = Date.now();
+    ov.innerHTML = '<div class="k"><div class="r"></div><b>' + esc(titel) + '</b>' + esc(text) + '<div class="z">läuft seit 0 s</div></div>';
+    if (_lauf2) clearInterval(_lauf2);
+    _lauf2 = setInterval(function () { var z = ov.querySelector('.z'); if (z) z.textContent = 'läuft seit ' + Math.round((Date.now() - t0) / 1000) + ' s'; }, 1000);
+  }
   function marktAbrufen() {
     var m = modell(); if (!m.aktiv) return;
     var body = auftrag(m, {}); if (!body) return;
+    if (_markt.zustand === 'laeuft') return;
     _markt.zustand = 'laeuft'; _markt.fehler = null; marktNeuZeichnen();
+    laufAnzeige(true, 'Marktpreisindikation läuft', 'Kaufpreise und Mieten am Ort werden abgerufen und je Stufe und Wohnung gerechnet. Das dauert meist 10 bis 40 Sekunden.');
     var key = marktKey();
     Auth.apiCall('/marktbericht/potenzial/markt', { method: 'POST', body: body }).then(function (r) {
-      _markt.zustand = 'ruhe';
+      _markt.zustand = 'ruhe'; laufAnzeige(false);
       if (marktKey() !== key) return;
       if (!r || r.error) { _markt.fehler = (r && (r.message || r.error)) || 'Abruf nicht möglich.'; marktNeuZeichnen(); return; }
+      /* v2556c · leer = nicht gespeichert, nicht abgerechnet: kein Erfolg melden */
+      if (r.leer || !r.abruf) { _markt.fehler = r.grund || 'Für dieses Objekt kamen keine Marktdaten zurück.'; marktNeuZeichnen(); return; }
       if (typeof window.toast === 'function') window.toast('✓ Marktpreise abgerufen' + (r._kontingent && r._kontingent.charged ? ' · 1 × erweiterte Marktpreisindikation' : ''));
       _markt.key = null; marktVerlaufLaden();
+      try { if (typeof window._dpLoadVerlauf === "function") window._dpLoadVerlauf(); } catch (e) {}   /* v2556c: Ablage sofort sichtbar */
     }, function (e) {
-      _markt.zustand = 'ruhe';
+      _markt.zustand = 'ruhe'; laufAnzeige(false);
       _markt.fehler = /kontingent|402/i.test(String(e && e.message)) ? 'Für den Abruf ist dein Kontingent „erweiterte Marktpreisindikation" aufgebraucht.' : ('Abruf nicht möglich: ' + ((e && e.message) || 'Dienst nicht erreichbar'));
       marktNeuZeichnen();
     });
@@ -1369,12 +1398,14 @@
       var b = ev.target && ev.target.closest ? ev.target.closest('[data-dp-pot-rechnen]') : null;
       if (!b) return;
       b.disabled = true; b.textContent = 'wird gerechnet …';
+      laufAnzeige(true, 'Ertragswerte werden gerechnet', 'Bestand, Mieterhöhung und Zielbild nach ImmoWertV — mit den Werten des Gutachterausschusses. Das dauert meist 5 bis 30 Sekunden.');
       rechnen({ erzwingen: true }).then(function (r) {
+        laufAnzeige(false);
         var host = b.closest('[data-dp-pot-wirt]');
         if (host) host.innerHTML = tafelHtml();
         else { b.disabled = false; b.textContent = (r && r.verfuegbar) ? 'gerechnet — Ansicht neu öffnen' : 'nicht verfügbar'; }
         if (r && !r.verfuegbar && !gesperrt(r) && typeof window.toast === 'function') window.toast('Ertragswert: ' + (r.grund || 'nicht verfügbar'));
-      });
+      }, function () { laufAnzeige(false); b.disabled = false; b.textContent = 'Ertragswerte rechnen'; });   /* v2556c */
     });
   }
   window.addEventListener('dp:object-ready', function () { setTimeout(objektKarte, 300); setTimeout(function () { try { bewertungKarte(); } catch (e) {} }, 400); });

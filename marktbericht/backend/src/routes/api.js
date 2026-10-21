@@ -1553,6 +1553,18 @@ router.post('/potenzial/markt', async (req, res) => {
       out.ertragswert_gesperrt = true;
     }
     const kurz = _abrufKurz(out);
+    /* v2556c · Ein leerer Abruf wird weder gespeichert noch abgerechnet (ohne
+       abruf.id bucht das Haupt-Backend nichts). Bismarckstr. 21.10.2026: Abruf 8
+       und 9 kamen ohne eine einzige Zahl zurueck, standen im Verlauf und kosteten
+       je 1 × erweiterte Marktpreisindikation. */
+    const _mk = kurz.markt || {}, _sb = (kurz.stufen && kurz.stufen.bestand) || {};
+    const _hatZahl = [_mk.kauf_haus, _mk.kauf_etw, _mk.miete].some((m) => m && m.median_qm != null)
+      || _sb.ertragswert != null || _sb.mpi_angebote != null;
+    if (!_hatZahl) {
+      console.log('[req] POST /potenzial/markt leer - nicht gespeichert, nicht berechnet');
+      return res.json({ verfuegbar: false, leer: true, kennzeichnung: out.kennzeichnung || null,
+        grund: (out.grund ? out.grund + ' ' : '') + 'Für dieses Objekt kamen keine Marktdaten zurück. Der Abruf wurde nicht gespeichert und nicht vom Kontingent abgezogen.' });
+    }
     const ref = body.external_ref ? String(body.external_ref).slice(0, 80) : null;
     const adr = (wb.ref && wb.ref.address) ? String(wb.ref.address).slice(0, 200) : null;
     const ins = await q('INSERT INTO mb.potenzial_abrufe (user_id, external_ref, adresse, ags, objektart, daten) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, abgerufen_am',
