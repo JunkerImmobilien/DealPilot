@@ -389,7 +389,10 @@
     if (opts && opts.einheiten) {
       obj._mfh_einheiten = opts.einheiten.map(function (e) {
         return { art: e.art || 'wohnen', wfl: e.wfl, ist: e.ist, soll: e.soll, status: e.status || 'vermietet',
-                 nutzung_gew: e.nutzung_gew || null, markt_qm: e.markt_qm || null };
+                 nutzung_gew: e.nutzung_gew || null, markt_qm: e.markt_qm || null,
+                   /* v2600 · E2/E3 · Restlaufzeit der Mietabweichung, waehlbarer Leerstandsabzug */
+                   mv_art: e.mv_art || null, mv_befristet_bis: e.mv_befristet_bis || null, mv_kuendigungsverzicht_bis: e.mv_kuendigungsverzicht_bis || null,
+                   mv_abw_jahre: e.mv_abw_jahre || null, leer_abzug: e.leer_abzug === true, leer_monate: e.leer_monate || null, herrichtung_eur: e.herrichtung_eur || null };
       });
       /* v2487 · GEMESSEN (Mitschnitt-Lauf Modul 26, neues MFH): im Wohnungsfenster VOR dem
          ersten „Übernehmen" sind Wohnfläche und Kaltmiete im Reiter Objekt noch leer - der
@@ -752,7 +755,7 @@
     var ab = Mp.abschlag_pct != null ? abschlagPct(Mp.abschlag_pct) : null;
     var h = '<div class="dp-vgl" data-dp-vgl="1"><div class="dp-vgl-kopf">Bestand im Vergleich' + (B ? ' · Bezugsfläche ' + esc(B.art) + ' ' + Math.round(B.qm).toLocaleString('de-DE') + ' m²' : '') + '</div>'
       + '<div class="dp-vgl-karten">'
-      + karte('Ertragswert', eur(E.wert), qm(E.eur_qm), V.lzs ? 'Liegenschaftszins ' + pct(E.lzs_pct) + ' · Stufe ' + esc(V.lzs.stufe) + (E.belastbarkeit ? ' · Belastbarkeit ' + E.belastbarkeit.pct + ' %' : '') : '')
+      + karte(V.vorlaeufig_vor_bog ? 'Ertragswert · vorläufig' : 'Ertragswert', eur(E.wert), qm(E.eur_qm), V.lzs ? 'Liegenschaftszins ' + pct(E.lzs_pct) + ' · Stufe ' + esc(V.lzs.stufe) + (E.belastbarkeit ? ' · Belastbarkeit ' + E.belastbarkeit.pct + ' %' : '') : '')
       + (Mp.wert != null
         ? karte('Marktpreisindikation', eur(Mp.wert), qm(Mp.eur_qm), 'Angebotspreise am Ort' + (ab ? ', abzüglich ' + ab + ' % (' + abschlagKurz(Mp.abschlag_herkunft) + ')' : '') + (Mp.spanne ? ' · ' + spanneTsd(Mp.spanne[0], Mp.spanne[1]) : ''))
         : karte('Marktpreisindikation', '—', 'keine Angebotspreise am Ort', ''))
@@ -765,6 +768,11 @@
     var ein = [];
     if (V.lzs && V.lzs.satz) ein.push('<li><b>Zins:</b> ' + esc(V.lzs.satz) + '</li>');
     if (V.miete && V.miete.satz) ein.push('<li><b>Miete:</b> ' + esc(V.miete.satz) + '</li>');
+    /* v2600 · E2/E3 · Mietabweichung und Leerstand als besonderes Merkmal; E4 · Spanne der Stufe N */
+    if (V.bog && V.bog.satz) ein.push('<li><b>Besondere Merkmale:</b> ' + esc(V.bog.satz)
+      + (V.vorlaeufig_vor_bog ? ' Ausgewiesen ist der vorläufige Ertragswert vor diesen Merkmalen.' : '') + '</li>');
+    else if (V.vorlaeufig_vor_bog) ein.push('<li><b>Besondere Merkmale:</b> leere Wohnungen voll vermietet angesetzt, ohne Mietausfall und Herrichtung (vorläufiger Ertragswert).</li>');
+    if (V.lzs_spanne && V.lzs_spanne.text) ein.push('<li><b>Spanne:</b> ' + esc(V.lzs_spanne.text) + '</li>');
     if (ein.length) h += '<ul class="dp-vgl-ein">' + ein.join('') + '</ul>';
     var MP = V.modellpruefung || {};
     if (MP.kurz || MP.text) {

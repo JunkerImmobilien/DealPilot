@@ -322,6 +322,40 @@ export function abzinsungsfaktor(zinsPct, rndJahre) {
   return Math.round(1e4 / Math.pow(1 + p / 100, n)) / 1e4;
 }
 
+/* ══ v2600 · MIETABWEICHUNG ALS BESONDERES OBJEKTSPEZIFISCHES MERKMAL ══════
+   ImmoWertA zu § 31 c): liegt der tatsaechliche Ertrag ausserhalb der
+   Bandbreite des Marktueblichen, rechnet der vorlaeufige Ertragswert mit dem
+   marktueblichen Ertrag, und „die Abweichung ist als besonderes objekt-
+   spezifisches Grundstuecksmerkmal zu beruecksichtigen (§ 8 Absatz 3)".
+   Ertragswertrichtlinie 2015 Nr. 11.1 + Anlage 3 Beispiel 1: der Mehrertrag
+   jedes Jahres wird mit dem Liegenschaftszins abgezinst und aufsummiert
+   (dort 254.977,54 €, gerundet 255.000 €). Keine Kapitalisierung ueber die
+   ganze Restnutzungsdauer (Prompt-Regel 4) - nur ueber die Restlaufzeit der
+   Abweichung, die der Aufrufer kennen muss.
+
+   barwertAbweichungen([d1, d2, …], zins): Jahr t mit Abzinsungsfaktor 1/q^t
+     (vierstellig wie das Dokument), Summe auf den Cent.
+   barwertAbweichung(dJahr, zins, n): gleichbleibende Differenz ueber n Jahre
+     = dJahr × Barwertfaktor (zweistellig wie das Dokument).
+   Vorzeichen bleibt: Overrent positiv (Zuschlag), Underrent negativ (Abschlag). */
+export function barwertAbweichungen(differenzen, zinsPct) {
+  if (!Array.isArray(differenzen) || !differenzen.length) return null;
+  const p = Number(zinsPct);
+  if (!Number.isFinite(p)) return null;
+  let s = 0;
+  differenzen.forEach((d, i) => {
+    const x = Number(d);
+    if (Number.isFinite(x) && x !== 0) s += x * abzinsungsfaktor(p, i + 1);
+  });
+  return round2(s);
+}
+export function barwertAbweichung(differenzJahr, zinsPct, jahre) {
+  const d = Number(differenzJahr), n = Number(jahre);
+  if (!Number.isFinite(d) || !Number.isFinite(n) || n <= 0) return null;
+  const v = barwertfaktor(zinsPct, n);
+  return v == null ? null : round0(d * v);
+}
+
 /**
  * Restnutzungsdauer. Paket A: schlicht GND − Alter, mit Untergrenze.
  * Das Anlage-2-Modell ist vorbereitet (MOD_ELEMENTE), aber noch nicht scharf.

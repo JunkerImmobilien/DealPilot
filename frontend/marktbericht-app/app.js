@@ -1115,8 +1115,13 @@ function _renderWertverfahren(d) {
                 + (/Ist-Miete/.test(e.miete_quelle || '') ? ' (Ist-Miete, marktüblich)' : (e.miete_quelle ? ' (' + esc(e.miete_quelle) + ')' : '')) : '')
              /* v2382 · das Band der Marktueblichkeit mit beiden Vergleichswerten */
              + (e.miete_band ? ' · Band ' + String(e.miete_band.unten_qm).replace('.', ',') + '–' + String(e.miete_band.oben_qm).replace('.', ',') + ' €/m² ('
-                + [e.miete_band.amtlich_qm != null ? 'amtlich ' + String(e.miete_band.amtlich_qm).replace('.', ',') : null,
-                   e.miete_band.angebot_qm != null ? 'Angebot ' + String(e.miete_band.angebot_qm).replace('.', ',') : null].filter(Boolean).join(' · ') + ')' : '')
+                /* v2600 · E1 · Massstab ist der Anker (amtlich / Ø Miete des Satzes / Angebotsmiete) ± 20 % */
+                + (e.miete_band.anker_qm != null
+                  ? esc(e.miete_band.anker_etikett || 'Vergleichsmiete') + ' ' + String(e.miete_band.anker_qm).replace('.', ',') + ' ± ' + (e.miete_band.band_pct || 20) + ' %'
+                  : [e.miete_band.amtlich_qm != null ? 'amtlich ' + String(e.miete_band.amtlich_qm).replace('.', ',') : null,
+                     e.miete_band.angebot_qm != null ? 'Angebot ' + String(e.miete_band.angebot_qm).replace('.', ',') : null].filter(Boolean).join(' · ')) + ')' : '')
+             /* v2600 · E2/E3/E4/E10 · besondere Merkmale, vorlaeufig, Spanne, Liquidationshinweis */
+             + ewZusatz(e).map((t) => ' · ' + esc(t)).join('')
              /* v2595 · Modellpruefung des Zinses: weicht das Objekt von dessen Stichprobe ab, steht es an der Zahl */
              + (e.modellpruefung && e.modellpruefung.geprueft && e.modellpruefung.abweichend && e.modellpruefung.abweichend.length
                 ? ' · <b>Zins passt nur eingeschränkt</b> (' + esc(e.modellpruefung.kurz.replace(/^Zins passt nur eingeschränkt: /, '')) + ')' : ''))
@@ -4568,7 +4573,18 @@ async function exportPdf(out) {
           + '§ 10 ImmoWertV wäre er nur, wenn auch der Liegenschaftszinssatz aus '
           + 'derselben Quelle stammt. Die Zahl oben ist ein Vergleichswert, kein '
           + 'Rechenschritt.';
-      const _bandT = _mbd ? (' Band der Marktüblichkeit ' + _z2(_mbd.unten_qm) + '–' + _z2(_mbd.oben_qm) + ' €/m² ('
+      /* v2600 · E1 · neues Band (Anker ± 20 %, ausserhalb der Anker); alte Berichte unten wie bisher */
+      const _bandT = (_mbd && _mbd.anker_qm != null) ? (' Band der Marktüblichkeit ' + _z2(_mbd.unten_qm) + '–' + _z2(_mbd.oben_qm) + ' €/m² ('
+        + (_mbd.anker_etikett || 'Vergleichsmiete') + ' ' + _qm(_mbd.anker_qm) + ' ± ' + (_mbd.band_pct || 20) + ' %, Analyseparameter von DealPilot, keine gesetzliche Grenze)'
+        + (_mbd.je_wohnung ? ': geprüft je Wohnung (ImmoWertA 31.2). '
+            + (_mbd.je_wohnung.angepasst.length
+              ? _mbd.je_wohnung.angepasst.map((w) => w.nr + ' mit ' + _qm(w.ist_qm) + (w.herkunft === 'ueber_band' ? ' darüber' : ' darunter')).join('; ')
+                + ' — dort angesetzt die marktüblich erzielbare Miete ' + _qm(_mbd.anker_qm) + ' (ImmoWertA zu § 31); die übrigen liegen im Band.'
+              : 'Alle vermieteten Wohnungen liegen im Band und gelten als marktüblich (§ 31 Abs. 2 ImmoWertV).')
+          : _mbd.ist_qm != null ? ': die Ist-Miete von ' + _qm(_mbd.ist_qm) + (_mbd.lage === 'im_band' ? ' liegt im Band und gilt als marktüblich (§ 31 Abs. 2 ImmoWertV).'
+            : ' liegt ' + (_mbd.lage === 'ueber' ? 'darüber' : 'darunter') + ' — angesetzt die marktüblich erzielbare Miete ' + _qm(_mbd.anker_qm) + '.') : '.')
+        + (ewZusatz(cc.ertragswert).length ? ' ' + ewZusatz(cc.ertragswert).join(' ') : ''))
+      : _mbd ? (' Band der Marktüblichkeit ' + _z2(_mbd.unten_qm) + '–' + _z2(_mbd.oben_qm) + ' €/m² ('
         + [_mbd.amtlich_qm != null ? 'amtliche Vergleichsmiete ' + _qm(_mbd.amtlich_qm) : null,
            _mbd.angebot_qm != null ? 'Angebotsmiete ' + _qm(_mbd.angebot_qm) : null].filter(Boolean).join(', ')
         + '; untere Kante × 0,7, obere × ' + (_mbd.faktor_oben ? String(_mbd.faktor_oben).replace('.', ',') : '1,3') + ')'   /* v2541: Faktor aus dem Bericht, alte Berichte 1,3 */
@@ -6107,3 +6123,28 @@ try { (function () {
     try { _mbLoadReportsList({ ref: (e && e.detail && e.detail.ref) || null, key: null }); } catch (x) {}
   });
 })(); } catch (e) {}
+
+/* ══ v2600 · E2/E3/E4/E10 · ZUSATZZEILEN ZUM ERTRAGSWERT (Bericht und PDF, eine Stelle) ══
+   Mietabweichung als besonderes objektspezifisches Merkmal (angesetzt oder als Szenario),
+   vorlaeufiger Ertragswert vor diesen Merkmalen, Spanne der Stufe N, Liquidationshinweis.
+   Nur aus Feldern des Kerns (cross_check.ertragswert), nichts geschaetzt. */
+function ewZusatz(e) {
+  if (!e || !e.available) return [];
+  var eu = function (x) { x = Math.round(Number(x)); return (x > 0 ? '+' : (x < 0 ? '−' : '')) + Math.abs(x).toLocaleString('de-DE') + ' €'; };
+  var t = [], b = e.miete_bog;
+  if (e.bog_doppelt_vermieden) t.push('Mietabweichung steckt in den eingegebenen besonderen Merkmalen und ist nicht doppelt angesetzt.');
+  else if (b) {
+    if (b.n_angesetzt && b.angesetzt_eur) t.push('Mietabweichung als besonderes objektspezifisches Merkmal: ' + eu(b.angesetzt_eur) + ' (Barwert über die Restlaufzeit).');
+    if (b.n_offen && b.szenarien && b.szenarien.length) {
+      var s0 = b.szenarien[0], s2 = b.szenarien[b.szenarien.length - 1];
+      t.push('Mietabweichung ' + eu(b.offen_differenz_jahr) + ' im Jahr ohne bekannte Restlaufzeit: je nach Dauer ' + eu(s0.barwert_eur) + ' (' + s0.jahre
+        + ' Jahre) bis ' + eu(s2.barwert_eur) + ' (' + s2.jahre + ' Jahre) — Szenario, keine gesetzliche Annahme.');
+    }
+  }
+  if (e.leerstand_bog && e.leerstand_bog.summe_eur > 0 && !e.bog_doppelt_vermieden) t.push('Leerstand (gewählt): Mietausfall und Herrichtung ' + eu(-e.leerstand_bog.summe_eur) + '.');
+  if (e.vorlaeufig_vor_bog) t.push('Ausgewiesen: ' + (e.bezeichnung || 'vorläufiger Ertragswert') + '.');
+  if (e.lzs_spanne && e.lzs_spanne.text) t.push(e.lzs_spanne.text);
+  var lq = e.liquidationshinweis || null;
+  if (lq && lq.hinweis) t.push(lq.hinweis);
+  return t;
+}

@@ -1718,7 +1718,7 @@ export const ReportOrchestrator = {
                   B: ['amtlich, regional', 'amtlicher Wert auf Landesebene', false],
                   C: ['indikativ, marktabgeleitet', 'aus dem regionalen Marktgeschehen zurueckgerechnet', true],
                   /* v2401 · Stufe N zwischen C und D */
-                  N: ['abgeleitet aus der DealPilot-Formel (N)', 'aus den amtlichen Liegenschaftszinssaetzen der Gutachterausschuesse abgeleitet, nicht amtlich', true],
+                  N: [(_wertParams && _wertParams.lzs_formel && _wertParams.lzs_formel.weg === 'landesmittel') ? 'DealPilot-Landesmittel (N)' : 'abgeleitet aus der DealPilot-Formel (N)', 'aus den amtlichen Liegenschaftszinssaetzen der Gutachterausschuesse abgeleitet, nicht amtlich', true],
                   D: ['indikativ, gesetzlicher Auffangwert', 'nach § 256 BewG, nicht marktabgeleitet', true],
                   E: ['eigene Angabe', 'vom Nutzer gesetzt', true] }[st]
                 || ['indikativ', 'Herkunft nicht bestimmbar', true];

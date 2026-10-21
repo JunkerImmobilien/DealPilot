@@ -372,6 +372,9 @@ async function callOpenAI(payload, opts = {}) {
           + '„in dieser Berichtsstufe nicht enthalten (Stufe 3)" — NIE „liegen nicht vor", „wurden nicht '
           + 'ermittelt" oder „keine belastbaren Angaben".');
       }
+      /* v2600 · Mietanker (E1), Modellpruefung des Zinses und Mietabweichung/Leerstand als boG (E2/E3)
+         als fertige Saetze - der Text nennt sie, ohne eine Zahl zu erfinden. */
+      if (payload.cross_check && !payload.cross_check.nicht_im_umfang) wertermittlungFakten(payload.cross_check).forEach((x) => _fest.push(x));
       if (_fest.length) extra += '\n\nFESTE AUSSAGEN (verbindlich, Zahlen und Richtung exakt so): ' + _fest.join(' ');
     }
     if (g.id === 'g4') {
@@ -531,10 +534,44 @@ const ZINSSTUFE_KLARTEXT = {
   A: 'A (amtlich, Satz des zustaendigen Gutachterausschusses)',
   B: 'B (amtlich, grosse Streuung oder regional)',
   C: 'C (indikativ: amtlich mit geringer Datenbasis oder Nachbarwert desselben Ausschusses)',
-  N: 'N (abgeleitet aus der DealPilot-Formel, nicht amtlich)',
+  N: 'N (abgeleitet aus der DealPilot-Formel oder DealPilot-Landesmittel, nicht amtlich)',
   D: 'D (gesetzlicher Auffangwert nach Paragraf 256 BewG)',
   E: 'E (eigene Angabe des Nutzers)',
 };
+/* ══ v2600 · DIE WERTERMITTLUNG IN FESTEN SAETZEN FUER DEN KI-TEXT ══════════════
+   Bis v2595 stand die Modellpruefung nur im JSON, und der Text erwaehnte sie nie.
+   Jeder Satz hier ist aus Feldern des Kerns gebaut (cross_check.ertragswert), nie geschaetzt. */
+const _wEu = (x) => (x > 0 ? '+' : (x < 0 ? '−' : '')) + Math.abs(Math.round(Number(x))).toLocaleString('de-DE') + ' €';
+const _wQm = (x) => Number(x).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €/m²';
+export function wertermittlungFakten(cc) {
+  const e = cc && cc.ertragswert && cc.ertragswert.available ? cc.ertragswert : null;
+  if (!e) return [];
+  const f = [];
+  const ms = e.miete_stufe, mh = e.miete_herkunft || {};
+  if (ms && ms.qm) {
+    const nAus = (mh.n_oben || 0) + (mh.n_unten || 0);
+    f.push('Maßstab der Miete im Ertragswert: ' + ms.etikett + ' (' + _wQm(ms.qm) + '). Ist-Mieten innerhalb von ± ' + (ms.band_pct || 20)
+      + ' % gelten als marktüblich und werden angesetzt, außerhalb wird die marktüblich erzielbare Miete von ' + _wQm(ms.qm) + ' angesetzt'
+      + (nAus ? ' (' + nAus + ' Mietverhältnis' + (nAus === 1 ? '' : 'se') + ' außerhalb)' : '')
+      + '. Die ± ' + (ms.band_pct || 20) + ' % sind ein Analyseparameter von DealPilot, keine gesetzliche Grenze.');
+  }
+  const mp = e.modellpruefung;
+  if (mp && mp.geprueft && mp.kurz) f.push('Modellprüfung des Liegenschaftszinses: ' + (mp.abweichend && mp.abweichend.length ? mp.text : mp.kurz + '.'));
+  const b = e.miete_bog;
+  if (e.bog_doppelt_vermieden) f.push('Die Mietabweichung ist bereits in den eingegebenen besonderen objektspezifischen Merkmalen enthalten und wird nicht zusätzlich angesetzt.');
+  else if (b) {
+    if (b.n_angesetzt && b.angesetzt_eur) f.push('Die Mietabweichung ist als besonderes objektspezifisches Grundstücksmerkmal mit ' + _wEu(b.angesetzt_eur) + ' im Ertragswert angesetzt (Barwert über die Restlaufzeit).');
+    if (b.n_offen && Array.isArray(b.szenarien) && b.szenarien.length) {
+      const s0 = b.szenarien[0], s2 = b.szenarien[b.szenarien.length - 1];
+      f.push('Für ' + b.n_offen + ' Mietverhältnis' + (b.n_offen === 1 ? '' : 'se') + ' ist keine Restlaufzeit bekannt: die Abweichung ist nicht angesetzt und macht je nach Dauer '
+        + _wEu(s0.barwert_eur) + ' (' + s0.jahre + ' Jahre) bis ' + _wEu(s2.barwert_eur) + ' (' + s2.jahre + ' Jahre) aus. Das sind Szenarien, keine gesetzliche Annahme.');
+    }
+  }
+  if (e.leerstand_bog && e.leerstand_bog.summe_eur > 0 && !e.bog_doppelt_vermieden) f.push('Für den Leerstand sind Mietausfall und Herrichtung mit ' + _wEu(-e.leerstand_bog.summe_eur) + ' abgezogen.');
+  if (e.vorlaeufig_vor_bog) f.push('Der ausgewiesene Wert ist der ' + e.bezeichnung + '; nenne ihn so.');
+  if (e.lzs_spanne && e.lzs_spanne.text) f.push(e.lzs_spanne.text);
+  return f;
+}
 export function zinsstufeKlartext(st) {
   const s = String(st == null ? '' : st).trim().toUpperCase();
   return ZINSSTUFE_KLARTEXT[s] || (s || null);

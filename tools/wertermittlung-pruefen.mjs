@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
-   DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595
+   DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595 · v2600
+   v2600: E1 Band am Satz des Ausschusses (Anker ± 20 %), E2 Mietabweichung als boG
+   (A-E6 Anlage 3 Beispiel 1, B13-B15), E3 Leerstand mit/ohne Abzug (B4, B16), E4
+   Spanne der DealPilot-Formel (B17), E10 negativer Gebaeudereinertrag (A-E5 jetzt
+   echte Pruefung), Prompt-Test 8 Doppelzaehlung (B8b). Ebene C rechnet mit den
+   Modellansaetzen des verwendeten Registersatzes (wie ReportOrchestrator seit v2595).
    v2595: B6/B7 auf comparison.differenz_zum_ertragswert (Soll in der Falldatei,
    mit dem Wert davor), B4b/B10i als Pruefung statt Befund, B10j/B10k Sachwert
    ohne Bodenwert, B12 Modellpruefung des Liegenschaftszinses (lib/modellpruefung.js).
@@ -95,6 +100,8 @@ const compute = zaehle('CrossCheckService.compute', CCS.CrossCheckService.comput
 const mieteNachBand = zaehle('mieteNachBand', CCS.mieteNachBand);
 const barwertfaktor = zaehle('barwertfaktor', IW.barwertfaktor);
 const abzinsungsfaktor = zaehle('abzinsungsfaktor', IW.abzinsungsfaktor);
+const barwertAbweichungen = zaehle('barwertAbweichungen', IW.barwertAbweichungen);
+const barwertAbweichung = zaehle('barwertAbweichung', IW.barwertAbweichung);
 const bwkAnsaetze = zaehle('bwkAnsaetze', IW.bwkAnsaetze);
 const sachwert = zaehle('nhk2010.sachwert', NHK.sachwert);
 const gewogenerKennwert = zaehle('gewogenerKennwert', NHK.gewogenerKennwert);
@@ -163,6 +170,15 @@ for (const f of F.ebene_a) {
       if (s.vorlaeufiger_ertragswert != null) wert('A', id, 'vorläufiger Ertragswert', zeile(k, /^= vorläufiger Ertragswert/) - (e.teilflaeche_eur || 0), s.vorlaeufiger_ertragswert, t.euro);
       if (s.summe != null) wert('A', id, 'Summe vor Rundung', k.wert_ungerundet, s.summe, t.euro);
       if (s.ertragswert != null) wert('A', id, 'Ertragswert gerundet', k.wert, s.ertragswert, t.rundung_dokument || 0);
+      if (s.liquidationshinweis_bodenwert != null) wert('A', id, 'Bodenwert als Liquidationshinweis daneben',
+        k.liquidationshinweis ? k.liquidationshinweis.bodenwert_eur : null, s.liquidationshinweis_bodenwert, 0);
+    } else if (f.art === 'bog_barwert') {
+      /* v2600 · E2 · der Mehrertrag je Jahr abgezinst mit dem Liegenschaftszins (EW-RL Nr. 11.1) */
+      const b = barwertAbweichungen(e.differenzen, e.lzs_pct);
+      wert('A', id, 'Barwert der Abweichung (Summe der abgezinsten Jahre)', b, s.summe, t.euro);
+      wert('A', id, 'boG gerundet (Dokument)', b == null ? null : Math.round(b / t.rundung_dokument) * t.rundung_dokument, s.bog, 0);
+      const kB = ertragswert(Object.assign(einManuell(fr.ertragswert), { bog_posten: [{ pos: 'besonderes objektspezifisches Merkmal: Mietabweichung', wert: s.bog }] }), bwEinfach(fr.ertragswert.bodenwert));
+      wert('A', id, 'Ertragswert mit boG-Zeile (Summe vor Rundung)', kB.wert_ungerundet, s.ertragswert_summe, t.euro);
     } else if (f.art === 'faktoren') {
       for (const [p, n, soll] of f.barwertfaktor || []) wert('A', id, 'Barwertfaktor ' + p + ' %/' + n + ' J', barwertfaktor(p, n), soll, 0.5 * 10 ** -dezimalen(soll));
       for (const [p, n, soll] of f.abzinsungsfaktor || []) wert('A', id, 'Abzinsungsfaktor ' + p + ' %/' + n + ' J', abzinsungsfaktor(p, n), soll, 0.5 * 10 ** -Math.max(dezimalen(soll), 3));
@@ -214,10 +230,33 @@ for (const f of F.ebene_a) {
 
 /* ══ EBENE B ═════════════════════════════════════════════════════════ */
 const C = F.ebene_c || { faelle: {} };
-const ccFall = (name, aendern) => {
+/* v2600 · Die eingefrorenen Argumente (Erfassung vor v2595) fuehren lzs_modellansaetze noch
+   nicht. Der ReportOrchestrator reicht seit v2595 die Modellansaetze DES Satzes durch, dessen
+   Zins der Ertragswert nutzt (nur aus dem Register, nicht ausserhalb der Geltung). Der Pruefer
+   holt sie aus der ECHTEN Registerdatei - gleiche AGS, gleicher Zweig, gleiches Berichtsjahr,
+   genau ein Treffer -, sonst bleibt das Feld leer. Nichts abgeschrieben. */
+const REG = (() => {
+  const d = path.join(SRC, 'lib/register'), alle = [];
+  for (const f of fs.readdirSync(d)) {
+    if (!f.endsWith('.json')) continue;
+    let j; try { j = JSON.parse(fs.readFileSync(path.join(d, f), 'utf8')); } catch (e) { continue; }
+    for (const s of (Array.isArray(j) ? j : (j.saetze || []))) if (s && s.kennzahl === 'liegenschaftszinssatz') alle.push(s);
+  }
+  return alle;
+})();
+const satzFuer = (p) => {
+  if (!p || !p.lzs_aus_register || (p.lzs_rueckfrage && p.lzs_rueckfrage.grund === 'ausserhalb_geltung')) return null;
+  const ags = String(p.ags || '');
+  const h = REG.filter((s) => s.ags && (ags === String(s.ags) || ags.startsWith(String(s.ags))) && s.zweig === p.lzs_zweig
+    && Number(s.berichtsjahr) === Number(p.lzs_berichtsjahr));
+  return h.length === 1 && h[0].modellansaetze && typeof h[0].modellansaetze === 'object' ? h[0].modellansaetze : null;
+};
+const mitSatz = (a) => { if (a[4] && a[4].lzs_modellansaetze === undefined) a[4].lzs_modellansaetze = satzFuer(a[4]); return a; };
+const ccFall = (name, aendern, opt = {}) => {
   const fall = C.faelle[name];
   if (!fall) return null;
   const a = klon(fall.argumente);
+  if (!opt.ohneSatz) mitSatz(a);
   if (aendern) aendern(a);
   return compute(...a);
 };
@@ -226,28 +265,34 @@ const einOk = () => ({ objektart: 'mfh', baujahr: 1990, baustatus: 'bestand', wo
 const bwOk = () => bwEinfach(200000);
 function fallB(id, fn) { E.B.faelle++; try { fn(); } catch (err) { pruefe('B', id, 'Lauf', false, 'Ausnahme: ' + err.message); } }
 
-/* B1-B3 · am ECHTEN Band des Falls Westerfeld (Kern v2541: unten x 0,7, oben x 1,15) */
+/* B1-B3 · am ECHTEN Band des Falls Westerfeld. v2600 (E1, Marcel 21.10.2026): Anker = Ø Miete
+   des verwendeten Satzes (Bielefeld MFH 2025: 7,70 €/m²), Band ± 20 %; ausserhalb gilt der
+   ANKER (ImmoWertA zu § 31 c), nicht mehr die Kante. Vorher (v2595): Band 9,50 × 0,7 bis
+   × 1,15 um die Angebotsmiete; B2/B3 standen als „Entscheidung offen". */
 const W = ccFall('westerfeld_body');
 const band = W && W.ertragswert && W.ertragswert.miete_band;
-const markt = band ? band.angebot_qm : null;
+const markt = band ? band.anker_qm : null;
 fallB('B1', () => {
   if (!band) return pruefe('B', 'B1', 'Band aus Ebene C', false, 'westerfeld_body fehlt');
+  pruefe('B', 'B1', 'Anker = Ø Miete des Satzes (Stufe satz_mittel), Band ± 20 %', band.anker_stufe === 'satz_mittel' && band.anker_qm === 7.7
+    && band.unten_qm === 6.16 && band.oben_qm === 9.24, band.anker_stufe + ' ' + band.anker_qm + ', ' + band.unten_qm + '–' + band.oben_qm);
   const r = mieteNachBand(markt, band, markt);
   pruefe('B', 'B1', 'Ist ≈ Markt wird angesetzt', r.fuehrt === true && r.qm === markt, 'Ist ' + markt + ' €/m², Band ' + band.unten_qm + '–' + band.oben_qm);
+  pruefe('B', 'B1', 'Stufe der Miete im Ergebnis benannt', !!(W.ertragswert.miete_stufe && W.ertragswert.miete_stufe.code === 'satz_mittel' && /Ø Miete/.test(W.ertragswert.miete_stufe.etikett)));
 });
 fallB('B2', () => {
   if (!band) return;
   const ist = Math.round(markt * 0.8 * 100) / 100, r = mieteNachBand(ist, band, markt);
-  if (pruefe('B', 'B2', 'IST: Ist −20 % im Band, Ist angesetzt', r.lage === 'im_band' && r.qm === ist, 'Ist ' + ist + ' €/m²')) {
-    offen('B', 'B2', 'Ist 20 % unter Markt (' + ist + ' statt ' + markt + ' €/m²) wird angesetzt, nicht die marktübliche Miete (v2367, Prompt: Markt maßgeblich)');
-  }
+  pruefe('B', 'B2', 'Ist −20 % (Bandgrenze) im Band → Ist angesetzt (ImmoWertA zu § 31 a)', r.lage === 'im_band' && r.qm === ist, 'Ist ' + ist + ' €/m²');
+  const ist2 = Math.round(markt * 0.75 * 100) / 100, r2 = mieteNachBand(ist2, band, markt);
+  pruefe('B', 'B2', 'Ist −25 % unter dem Band → marktüblicher Ansatz = Anker, nicht die Kante', r2.lage === 'unter' && r2.qm === markt && r2.kante === band.unten_qm, 'Ist ' + ist2 + ' → ' + r2.qm);
 });
 fallB('B3', () => {
   if (!band) return;
   const ist = Math.round(markt * 1.2 * 100) / 100, r = mieteNachBand(ist, band, markt);
-  if (pruefe('B', 'B3', 'IST: Ist +20 % über Band, Kante angesetzt', r.lage === 'ueber' && r.qm === band.oben_qm, 'Ist ' + ist + ', Kante ' + band.oben_qm)) {
-    offen('B', 'B3', 'Ist 20 % über Markt: angesetzt die obere Bandkante ' + band.oben_qm + ' €/m² (Markt × 1,15), dauerhaft über die ganze RND (Prompt: keine automatische dauerhafte Kapitalisierung)');
-  }
+  pruefe('B', 'B3', 'Ist +20 % (Bandgrenze) im Band → Ist angesetzt', r.lage === 'im_band' && r.qm === ist, 'Ist ' + ist);
+  const ist2 = Math.round(markt * 1.25 * 100) / 100, r2 = mieteNachBand(ist2, band, markt);
+  pruefe('B', 'B3', 'Ist +25 % über dem Band → Anker, keine dauerhafte Kapitalisierung des Mehrertrags', r2.lage === 'ueber' && r2.qm === markt, 'Ist ' + ist2 + ' → ' + r2.qm);
 });
 /* B12 · v2595 · MODELLPRUEFUNG DES ZINSSATZES. Bis v2594 war miete_modellkonform = true,
    sobald die Ist-Miete im Band lag. Geprueft am Fall Westerfeld mit den Modellansaetzen des
@@ -264,7 +309,8 @@ const satzBielefeld = (() => {
 })();
 fallB('B12', () => {
   if (!satzBielefeld) return pruefe('B', 'B12', 'Registersatz Bielefeld MFH 2025', false, 'nicht gefunden');
-  const ohne = W && W.ertragswert;
+  const W0 = ccFall('westerfeld_body', null, { ohneSatz: true });
+  const ohne = W0 && W0.ertragswert;
   pruefe('B', 'B12a', 'ohne Satz: miete_modellkonform null, Modellpruefung nicht geprüft, kein Abzug',
     !!ohne && ohne.miete_modellkonform === null && ohne.modellpruefung && ohne.modellpruefung.geprueft === false
     && !(ohne.belastbarkeit.abzuege || []).some((a) => /Modell des Liegenschaftszinses/.test(a)));
@@ -275,22 +321,37 @@ fallB('B12', () => {
   pruefe('B', 'B12c', 'Westerfeld im Modell (Miete, RND, Fläche) → modellkonform true',
     e.miete_modellkonform === true && mp.abweichend.length === 0,
     'Miete ' + mp.merkmale.miete.ansatz + ' (' + mp.merkmale.miete.abweichung_pct + ' %), RND ' + mp.merkmale.rnd.ansatz + ' gegen ' + mp.merkmale.rnd.satz + ', Fläche ' + mp.merkmale.flaeche.ansatz + ' gegen ' + mp.merkmale.flaeche.satz);
-  wert('B', 'B12d', 'Ertragswert unverändert durch die Prüfung', e.value_eur, W.ertragswert.value_eur, 0);
-  /* Miete +44 % gegen den Satz: Satz-Miete so gesetzt, dass die angesetzte Miete 44 % darueber liegt */
+  wert('B', 'B12d', 'Ertragswert gleich mit und ohne Satz (Ist im Band beider Anker)', e.value_eur, W0.ertragswert.value_eur, 0);
+  /* v2600 · Satz-Miete 44 % unter der Ist-Miete. Seit E1 ist der Satz der Anker: die Wohnungen
+     liegen ausserhalb seines Bandes, angesetzt wird seine Ø Miete - die Abweichung ist damit
+     AUSGERAEUMT, und der Belastbarkeitsabzug der Modellpruefung greift nicht zusaetzlich (kein
+     Doppelansatz). Vorher (v2595): Miete abweichend, −8, Ertragswert unveraendert 785.000. */
   const mq = mp.merkmale.miete.ansatz;
   const ma44 = Object.assign({}, satzBielefeld, { marktmiete_eur_qm: Math.round(mq / 1.44 * 100) / 100 });
   const ab = ccFall('westerfeld_body', (a) => { a[4].lzs_modellansaetze = ma44; });
   const e2 = ab && ab.ertragswert, mp2 = e2 && e2.modellpruefung;
-  pruefe('B', 'B12e', 'Miete +44 % → abweichend, modellkonform false mit Grund',
-    !!mp2 && mp2.merkmale.miete.status === 'abweichend' && e2.miete_modellkonform === false && /außerhalb ±20 %/.test(e2.miete_modellkonform_grund || ''),
-    mp2 ? mp2.merkmale.miete.abweichung_pct + ' %' : '–');
-  wert('B', 'B12f', 'Belastbarkeit −8 gegen die Prüfung im Modell', e2 ? e.belastbarkeit.pct - e2.belastbarkeit.pct : null, 8, 0);
-  pruefe('B', 'B12g', 'Kundentext ohne Fachjargon nennt beide Mieten', !!mp2 && /liegt 44 % über der Durchschnittsmiete, aus der der Gutachterausschuss den Liegenschaftszins abgeleitet hat/.test(mp2.text)
-    && /nur eingeschränkt/.test(mp2.text), mp2 ? mp2.text.slice(0, 90) : '');
-  wert('B', 'B12h', 'Ertragswert bleibt bei Abweichung', e2 ? e2.value_eur : null, W.ertragswert.value_eur, 0);
+  pruefe('B', 'B12e', 'Satz-Miete −44 %: angesetzt die Ø Miete des Satzes, Modellprüfung „im Modell", kein −8',
+    !!mp2 && mp2.merkmale.miete.status === 'im_modell' && e2.miete_modellkonform === true
+    && !(e2.belastbarkeit.abzuege || []).some((a) => /Miete außerhalb des Modells/.test(a))
+    && e2.miete_stufe.code === 'satz_mittel' && Math.abs(e2.miete_herkunft.angesetzt_qm - ma44.marktmiete_eur_qm) < 0.011,
+    mp2 ? mp2.merkmale.miete.abweichung_pct + ' %, angesetzt ' + e2.miete_herkunft.angesetzt_qm : '–');
+  pruefe('B', 'B12f', 'Mehrertrag ohne Laufzeit: nur Szenarien, Ertragswert ohne boG, „vorläufig" benannt',
+    !!e2 && e2.miete_bog && e2.miete_bog.n_offen === 4 && e2.miete_bog.n_angesetzt === 0 && e2.vorlaeufig_vor_bog === true
+    && ab.ertragswert_kern.wert_ungerundet === e2.vorlaeufiger_ertragswert_eur + ((ab.ertragswert_kern.staffel.find((x) => x.pos === 'besondere objektspezifische Merkmale') || {}).wert || 0)
+    && /Szenarien, keine gesetzliche Annahme/.test((ab.notes || []).join(' ')), e2 ? 'EW ' + e2.value_eur + ' (vorher 785.000)' : '–');
+  /* die Modellpruefung meldet weiter, wo der Anker NICHT der Satz ist: amtliche Miete fuehrt
+     (AGVGA-Modell), der Satz fuehrt eine 44 % niedrigere Ø Miete -> abweichend, −8 */
+  const amt = ccFall('westerfeld_body', (a) => { a[4].lzs_modellansaetze = ma44; a[4].modellversion = 'agvga_nrw_2016';
+    a[4].amtliche_miete = { verfuegbar: true, fuehrend: true, miete_qm: mq, quelle: 'Prüfer' }; });
+  const e3 = amt && amt.ertragswert, mp3 = e3 && e3.modellpruefung;
+  pruefe('B', 'B12g', 'Anker amtlich, Satz −44 %: Modellprüfung abweichend, Kundentext nennt beide Mieten',
+    !!mp3 && e3.miete_stufe.code === 'amtlich' && mp3.merkmale.miete.status === 'abweichend' && e3.miete_modellkonform === false
+    && /liegt 44 % über der Durchschnittsmiete, aus der der Gutachterausschuss den Liegenschaftszins abgeleitet hat/.test(mp3.text), mp3 ? mp3.text.slice(0, 80) : '');
+  wert('B', 'B12h', 'dort −8 Belastbarkeit (Miete außerhalb des Modells)', e3 ? (e3.belastbarkeit.vor_modellpruefung || e3.belastbarkeit.pct) - e3.belastbarkeit.pct - (mp3.merkmale.rnd.status === 'abweichend' ? 8 : 0) - (mp3.merkmale.flaeche.status === 'abweichend' ? 8 : 0) : null, 8, 0);
   const ohneMiete = ccFall('westerfeld_body', (a) => { const m = Object.assign({}, satzBielefeld); delete m.marktmiete_eur_qm; a[4].lzs_modellansaetze = m; });
-  pruefe('B', 'B12i', 'Satz ohne Ø Miete → modellkonform null („nicht prüfbar"), −3', !!ohneMiete && ohneMiete.ertragswert.miete_modellkonform === null
-    && /nicht prüfbar/.test(ohneMiete.ertragswert.miete_modellkonform_grund || '') && e.belastbarkeit.pct - ohneMiete.ertragswert.belastbarkeit.pct === 3);
+  pruefe('B', 'B12i', 'Satz ohne Ø Miete → modellkonform null („nicht prüfbar"), −3, Anker fällt auf die Angebotsmiete', !!ohneMiete && ohneMiete.ertragswert.miete_modellkonform === null
+    && /nicht prüfbar/.test(ohneMiete.ertragswert.miete_modellkonform_grund || '') && e.belastbarkeit.pct - ohneMiete.ertragswert.belastbarkeit.pct === 3
+    && ohneMiete.ertragswert.miete_stufe.code === 'angebot');
 });
 fallB('B4', () => {
   const L = ccFall('demo2leer');
@@ -299,9 +360,11 @@ fallB('B4', () => {
   const roh = (k.staffel || []).find((z) => /^Rohertrag Wohnen/.test(z.pos));
   const ok = roh && /leere Fläche .* marktüblicher Miete/.test(roh.detail || '')
     && !(k.staffel || []).some((z) => /Leerstand|Herrichtung|Vermarktung|Mietausfall.*Leer/i.test(z.pos));
-  if (pruefe('B', 'B4', 'IST: Leerstand mit Marktmiete, kein Abzug', !!ok, roh ? String(roh.detail).slice(0, 60) : 'keine Rohertragszeile')) {
-    offen('B', 'B4', 'Leerstand: leere Fläche mit marktüblicher Miete, kein Abzug für Vermarktung/Herrichtung (Marcel 21.10.2026; Prompt: zeitweilige Kosten berücksichtigen)');
-  }
+  /* v2600 · E3: Standard bleibt „voll vermietet" (Marcel 21.10.2026), benannt als vorlaeufiger
+     Ertragswert vor boG; der Abzug ist je leerer Wohnung waehlbar (B16). Vorher: Entscheidung offen. */
+  pruefe('B', 'B4', 'Leerstand mit Marktmiete, kein Abzug voreingestellt, „vorläufig vor boG" benannt', !!ok
+    && L.ertragswert.vorlaeufig_vor_bog === true && /vor besonderen objektspezifischen/.test(L.ertragswert.bezeichnung || ''),
+    roh ? String(roh.detail).slice(0, 60) : 'keine Rohertragszeile');
 });
 /* B4b · Leerstand OHNE jede Vergleichsmiete (kein Angebot, keine amtliche Miete):
    gemessen 21.10.2026 - die Ist-Miete der vermieteten Wohnungen wird auf die GANZE
@@ -310,7 +373,7 @@ fallB('B4', () => {
    unterdruecken oder anderer Mietansatz). */
 fallB('B4b', () => {
   const ohneMarkt = (a) => { a[2] = { listing_type: 'miete', source: 'keine_daten', sample_size: 0, median_per_sqm: null, comparables: [] }; };
-  const L = ccFall('demo2leer', ohneMarkt), V = ccFall('demo', ohneMarkt);
+  const L = ccFall('demo2leer', ohneMarkt, { ohneSatz: true }), V = ccFall('demo', ohneMarkt, { ohneSatz: true });   /* v2600: der Satz waere sonst der Anker */
   if (!L || !V) return pruefe('B', 'B4b', 'Faelle demo/demo2leer', false, 'fehlen');
   const eL = L.ertragswert || {}, eV = V.ertragswert || {};
   const roh = ((L.ertragswert_kern || {}).staffel || []).find((z) => /^Rohertrag Wohnen/.test(z.pos)) || {};
@@ -494,6 +557,75 @@ fallB('B14', () => {
     '2,5: ' + g25.naeherung_median_pct + ' gegen ' + g25.ohne_anpassung_median_pct + ' % · 3,0: ' + g30.naeherung_median_pct + ' gegen ' + g30.ohne_anpassung_median_pct + ' %');
 });
 
+/* ══ v2600 · E2 · MIETABWEICHUNG ALS boG (B20-B22), E3 (B23), E4 (B24), Prompt-Test 8 (B8b) ══ */
+const westerfeldMit = (fn) => ccFall('westerfeld_body', (a) => { fn(a[0].einheiten_miete[0], a); });
+const anteil = (e) => e && e.ertragswert;
+/* der eigene boG des Objekts (Westerfeld: Sanierungskosten −26.000 €) steht unveraendert daneben */
+const eigenerBog = (r) => { const z = ((r && r.ertragswert_kern && r.ertragswert_kern.staffel) || []).find((s) => s.pos === 'besondere objektspezifische Merkmale'); return z ? z.wert : 0; };
+fallB('B20', () => {
+  /* WE 1 mit 500 €/Monat (5,13 €/m²) unter dem Band 6,16-9,24; Restlaufzeit 5 Jahre (Eingabe) */
+  const r = westerfeldMit((w) => { w.ist_monat = 500; w.mv_abw_jahre = 5; }), e = anteil(r);
+  const z = e && e.miete_bog && e.miete_bog.zeilen[0];
+  const f = 390 / 390, diff = Math.round(500 * 12 * f) - Math.round(7.7 * 97.5 * 12);
+  pruefe('B', 'B20', 'Underrent mit Laufzeit → boG angesetzt', !!z && z.angesetzt && z.art === 'underrent' && z.jahre === 5 && z.jahre_quelle === 'eingabe', z ? JSON.stringify(z).slice(0, 90) : '–');
+  wert('B', 'B20', 'boG = Differenz × Barwertfaktor (2,5 % / 5 J.)', z ? z.barwert_eur : null, barwertAbweichung(diff, e.liegenschaftszins_pct, 5), 0);
+  const kz = (r.ertragswert_kern.staffel || []).find((s) => /Merkmal: Mietabweichung/.test(s.pos));
+  pruefe('B', 'B20', 'eigene boG-Zeile nach dem vorläufigen Ertragswert, Ertragswert = vorläufig + boG', !!kz && kz.wert === z.barwert_eur
+    && r.ertragswert_kern.wert_ungerundet === e.vorlaeufiger_ertragswert_eur + z.barwert_eur + eigenerBog(r) && e.vorlaeufig_vor_bog === false && e.bezeichnung === 'Ertragswert');
+});
+fallB('B21', () => {
+  const r = westerfeldMit((w) => { w.ist_monat = 500; }), e = anteil(r);
+  const b = e && e.miete_bog;
+  pruefe('B', 'B21', 'ohne Laufzeit: Szenarien 3/5/10 Jahre, nichts angesetzt', !!b && b.n_angesetzt === 0 && b.n_offen === 1
+    && b.szenarien.map((s) => s.jahre).join() === '3,5,10' && b.szenarien[0].barwert_eur < 0 && b.szenarien[2].barwert_eur < b.szenarien[0].barwert_eur);
+  pruefe('B', 'B21', 'Ertragswert ohne boG, als vorläufig benannt, Satz nennt die Spanne in €', !!e && e.vorlaeufig_vor_bog
+    && r.ertragswert_kern.wert_ungerundet === e.vorlaeufiger_ertragswert_eur + eigenerBog(r)
+    && (r.notes || []).some((n) => /Je nach Dauer macht sie −[\d.]+ € \(3 Jahre\) bis −[\d.]+ € \(10 Jahre\) aus — Szenarien, keine gesetzliche Annahme/.test(n)));
+});
+fallB('B22', () => {
+  /* WE 1 mit 1.100 €/Monat (11,28 €/m²) ueber dem Band: Mehrertrag */
+  const r1 = westerfeldMit((w) => { w.ist_monat = 1100; w.mv_abw_jahre = 5; }), b1 = r1 && r1.ertragswert.miete_bog;
+  pruefe('B', 'B22', 'Overrent mit „erwartet noch 5 Jahre" (unbelegt) → nur Szenario', !!b1 && b1.n_angesetzt === 0 && b1.zeilen[0].art === 'overrent'
+    && /belegter Vertragslaufzeit/.test(b1.zeilen[0].grund || ''));
+  const r2 = westerfeldMit((w) => { w.ist_monat = 1100; w.mv_befristet_bis = '2029-10-21'; }), b2 = r2 && r2.ertragswert.miete_bog;
+  const z = b2 && b2.zeilen[0];
+  pruefe('B', 'B22', 'Overrent mit Befristung bis 21.10.2029 → 3 Jahre angesetzt', !!z && z.angesetzt && z.jahre === 3 && z.jahre_quelle === 'befristung' && z.barwert_eur > 0);
+  wert('B', 'B22', 'boG = Mehrertrag × Barwertfaktor (2,5 % / 3 J.)', z ? z.barwert_eur : null, barwertAbweichung(z ? z.differenz_jahr : 0, r2.ertragswert.liegenschaftszins_pct, 3), 0);
+});
+fallB('B23', () => {
+  const L0 = ccFall('demo2leer');
+  const L1 = ccFall('demo2leer', (a) => { const w = a[0].einheiten_miete.find((x) => x.leer); w.leer_abzug = true; w.leer_monate = 6; w.herrichtung_eur = 5000; });
+  const e0 = L0 && L0.ertragswert, e1 = L1 && L1.ertragswert;
+  pruefe('B', 'B23', 'ohne Option: kein Leerstandsabzug', !!e0 && !e0.leerstand_bog && !(L0.ertragswert_kern.staffel || []).some((s) => /Merkmal: Leerstand/.test(s.pos)));
+  const z = e1 && e1.leerstand_bog && e1.leerstand_bog.zeilen[0];
+  const anker = e1 ? e1.miete_stufe.qm : null, wfl = L1 ? L1.ertragswert.miete_aufteilung.einheiten.find((x) => x.herkunft === 'leer_marktueblich').wfl : null;
+  wert('B', 'B23', 'mit Option: Mietausfall 6 Monate = Marktmiete × Fläche × 6', z ? z.mietausfall_eur : null, Math.round(Math.round(anker * wfl * 12) / 12 * 6), 0);
+  wert('B', 'B23', 'Ertragswert (ungerundet) = vorläufig − Mietausfall − 5.000 Herrichtung', L1 ? L1.ertragswert_kern.wert_ungerundet : null,
+    e1 ? e1.vorlaeufiger_ertragswert_eur - z.mietausfall_eur - 5000 + eigenerBog(L1) : null, 0);
+  pruefe('B', 'B23', 'zweite leere Wohnung ohne Abzug → weiter „vorläufig"', !!e1 && e1.vorlaeufig_vor_bog === true);
+});
+fallB('B24', () => {
+  /* E4 · Stufe N mit Spanne (Halbbreite MFH 1,16 Pp, lzs-naeherung.json) */
+  const r = ccFall('westerfeld_body', (a) => { a[4].lzs_stufe = 'N'; a[4].lzs_pct = 3.45; a[4].lzs_formel = { spanne_p80_pp: 1.16 }; });
+  const s = r && r.ertragswert.lzs_spanne;
+  pruefe('B', 'B24', 'Stufe N: Spanne 2,29–4,61 % und Ertragswert an beiden Rändern', !!s && s.von_pct === 2.29 && s.bis_pct === 4.61
+    && s.ertragswert_von_eur < r.ertragswert.value_eur && s.ertragswert_bis_eur > r.ertragswert.value_eur
+    && /8 von 10 amtlichen Zinssätzen vergleichbarer Objekte/.test(s.text), s ? s.text : 'keine Spanne');
+  const k = ertragswert(Object.assign({}, r._ertragswertEingabe.ein, { lzs_pct: 4.61 }), r._ertragswertEingabe.bodenwert);
+  wert('B', 'B24', 'unterer Rand = derselbe Kern mit 4,61 %', s ? s.ertragswert_von_eur : null, k.wert, 0);
+  const r2 = ccFall('westerfeld_body', (a) => { a[4].lzs_stufe = 'N'; a[4].lzs_pct = 3.45; a[4].lzs_formel = {}; });
+  pruefe('B', 'B24', 'ohne Spannenfelder entfällt die Spanne still', !!r2 && r2.ertragswert.available && r2.ertragswert.lzs_spanne === undefined);
+});
+fallB('B8b', () => {
+  /* Prompt-Test 8: die Abweichung steht schon als eigener boG im Objekt -> keine Doppelzaehlung */
+  const r = westerfeldMit((w, a) => { w.ist_monat = 500; w.mv_abw_jahre = 5; a[4].bog_eur = -20000; a[4].bog_grund = 'Mietabweichung WE 1 (Underrent), eigene Berechnung'; });
+  const e = r && r.ertragswert;
+  pruefe('B', 'B8b', 'eigener boG mit Mietbezug → berechnete Mietabweichung nicht zusätzlich', !!e && e.bog_doppelt_vermieden === true
+    && !(r.ertragswert_kern.staffel || []).some((s) => /Merkmal: Mietabweichung/.test(s.pos))
+    && r.ertragswert_kern.wert_ungerundet === e.vorlaeufiger_ertragswert_eur - 20000
+    && (r.notes || []).some((n) => /nur einmal berücksichtigt/.test(n)));
+});
+
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */
 const auszug = (cc) => {
   const e = (cc && cc.ertragswert) || {}, s = (cc && cc.sachwert) || {};
@@ -517,7 +649,7 @@ if (EINFRIEREN) {
     if (!v.argumente) continue;
     neu[name] = { markt: v.markt, erfasst: v.ergebnis, frueher: (alt[name] && alt[name].frueher) || null,
                   anmerkung: (alt[name] && alt[name].anmerkung) || null,
-                  soll: auszug(compute(...klon(v.argumente))), argumente: '__ARG_' + name + '__' };
+                  soll: auszug(compute(...mitSatz(klon(v.argumente)))), argumente: '__ARG_' + name + '__' };
   }
   F.ebene_c = Object.assign({}, F.ebene_c || {}, { stand: '2026-10-21', faelle: neu });
   /* die Argumente je Fall in EINER Zeile - sonst wird die Datei 20.000 Zeilen lang */
@@ -532,7 +664,7 @@ if (EINFRIEREN) {
 for (const [name, fall] of Object.entries(C.faelle || {})) {
   E.C.faelle++;
   try {
-    const ist = auszug(compute(...klon(fall.argumente)));
+    const ist = auszug(compute(...mitSatz(klon(fall.argumente))));
     for (const [k, soll] of Object.entries(fall.soll)) {
       const tol = (k === 'lzs_pct' || k === 'rnd_jahre' || k === 'vervielfaeltiger') ? 0.0001 : 0;
       wert('C', name, k, ist[k] ?? null, soll, tol);
@@ -543,7 +675,7 @@ for (const [name, fall] of Object.entries(C.faelle || {})) {
 /* ══ AUSGABE ═════════════════════════════════════════════════════════ */
 if (ALLE) detail.forEach((z) => console.log(z));
 const titel = { A: 'amtliche Anwendungsbeispiele', B: 'Prompt-Testfälle 1–11', C: 'Demo-Objekte (eingefroren ' + (C.stand || '–') + ')' };
-console.log('wertermittlung-pruefen v2595 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
+console.log('wertermittlung-pruefen v2600 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
 for (const eb of ['A', 'B', 'C']) {
   const x = E[eb];
   console.log('  Ebene ' + eb + ' ' + titel[eb].padEnd(38) + x.faelle + ' Fälle, ' + x.werte + ' Werte, '

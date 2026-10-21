@@ -11,7 +11,8 @@ import { quelleFuer, quellenSatz } from '../lib/quellen_links.js';
 import { ErtragswertService } from './ErtragswertService.js';
 /* WNHK-4 */
 import { sachwert as nhkSachwert, NHK_2010 } from '../lib/nhk2010.js';
-import { pruefeModell, mieteModellkonform } from '../lib/modellpruefung.js';   /* v2595 */
+import { pruefeModell, mieteModellkonform, modellDurchschnitte } from '../lib/modellpruefung.js';   /* v2595, v2600 */
+import { barwertAbweichung } from '../lib/immowertv.js';   /* v2600 · E2 */
 /* ══ v1968 · HIER STAND EIN TOTER IMPORT ══════════════════════════════
 
      import { restnutzungsdauer as anlage2Rnd } from '../lib/anlage2.js';
@@ -91,19 +92,105 @@ const LIEGENSCHAFTSZINS = 0.03;   // EFH-typisch 2,5–3,5 % -> 3,0 %
  * die Zahl fuer eine Aussage haelt, die sie nicht ist. */
 
 const _num = (v) => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
-const BAND_OBEN = 1.15;   /* v2541 · obere Kante des Marktueblichkeitsbandes (bis v2540: 1,3) */
+/* v2600 · E1/E11 · BANDBREITE DER MARKTUEBLICHKEIT um den Anker (amtliche Miete, Ø Miete
+   des Zinssatzes, sonst Angebotsmiete): ±20 %. DealPilot-Analyseparameter nach dem
+   hessischen Leitfaden II (ZGGH 01/2024: tatsaechliche Miete hoechstens ±20 % von der
+   ortsueblichen Vergleichsmiete) - KEINE gesetzliche Grenze; ImmoWertA 31 nennt keine Zahl.
+   Marcel 21.10.2026 (E11): bei ±20 % bleiben. Bis v2595: min(amtlich, Angebot) x 0,7 bis
+   max(...) x 1,15 (v2541; bis v2540 x 1,3). */
+export const MIETBAND = Object.freeze({ pct: 20, art: 'DealPilot-Analyseparameter (hessischer Leitfaden II), keine gesetzliche Grenze' });
+const BAND_OBEN = 1 + MIETBAND.pct / 100;
+/* v2600 · E2 · Szenarien der Restlaufzeit, wenn keine Laufzeit bekannt ist - ausdruecklich
+   keine gesetzliche Annahme (Prompt: „Nicht erfinden … gekennzeichnete Szenarien 3/5/10 Jahre"). */
+export const BOG_SZENARIEN_JAHRE = Object.freeze([3, 5, 10]);
 
 /* v2488 · DIE BANDREGEL ALS EINE FUNKTION (Marcel 20.10.2026: jede Stufe baut auf
    derselben Basis wie der Bestand). Bis v2487 stand sie nur inline in compute();
    PotenzialService braucht sie je WOHNUNG. Band nach v2382: untere Kante =
    min(amtlich, Angebot) x 0,7, obere = max(...) x 1,3. Ist im Band -> Ist,
    darueber/darunter -> die Kante, ohne Ist -> die Vergleichsmiete. */
+/* v2600 · E1 · ausserhalb des Bandes gilt der ANKER (die marktueblich erzielbare Miete),
+   nicht mehr die Bandkante: ImmoWertA zu § 31 c) „vorlaeufiger Ertragswert auf Grundlage
+   der marktueblich erzielbaren Ertraege"; die Abweichung geht als boG in die Rechnung
+   (E2). `kante` bleibt als Auskunft. Herkunftscodes je Wohnung seit v2600:
+   ist_im_band | ueber_band | unter_band | leer_marktueblich (bis v2595 obere_/untere_kante). */
 export function mieteNachBand(istQm, band, refQm) {
   const lage = (istQm != null && band)
     ? (istQm > band.oben_qm ? 'ueber' : (istQm < band.unten_qm ? 'unter' : 'im_band')) : null;
   const fuehrt = istQm != null && (band == null || lage === 'im_band');
   const kante = lage === 'ueber' ? band.oben_qm : (lage === 'unter' ? band.unten_qm : null);
-  return { qm: fuehrt ? istQm : (kante != null ? kante : refQm), lage, fuehrt, kante };
+  const anker = (band && band.anker_qm > 0) ? band.anker_qm : refQm;
+  return { qm: fuehrt ? istQm : anker, lage, fuehrt, kante, anker };
+}
+/** v2600 · Stufe N beim Namen: weg 'landesmittel' (v2611, E6) oder die Formel. */
+export function nEtikett(p, formel = 'DealPilot-Formel', lm = null) {
+  const f = (p && p.lzs_formel) || {};
+  if (f.weg === 'landesmittel') {
+    const n = Number(f.saetze);
+    return (lm || 'DealPilot-Landesmittel') + (n > 0 ? ' aus ' + n + ' amtlichen Zinssätzen' : '');
+  }
+  return formel;
+}
+/** v2600 · Herkunftscode einer vermieteten Wohnung nach der Bandregel. */
+export function herkunftNachBand(r) {
+  return r.fuehrt ? 'ist_im_band' : (r.lage === 'ueber' ? 'ueber_band' : 'unter_band');
+}
+
+/* ══ v2600 · E2 · DIE MIETABWEICHUNG ALS boG BEZIFFERN ═══════════════════════
+   Je Mietverhaeltnis ausserhalb des Bandes: Differenz Ist − Ansatz (€/Jahr) als Barwert
+   ueber die Restlaufzeit der Abweichung, Zins = verwendeter Liegenschaftszins
+   (Ertragswertrichtlinie Nr. 11.1, Anlage 3 Beispiel 1). Restlaufzeit, in dieser Rangfolge:
+     Befristung / Kuendigungsverzicht bis (Vertragsdatum)   belegt
+     „Abweichung erwartet noch n Jahre" (Eingabe)             nur fuer Underrent
+   Overrent (Ist ueber dem Band) NUR mit belegter Laufzeit (BelWertV § 10, Fachpraxis: ein
+   Mehrertrag ist nicht nachhaltig) - sonst nur Szenario. Ohne Laufzeit KEINE erfundene Dauer:
+   Szenarien 3/5/10 Jahre, ausdruecklich keine gesetzliche Annahme, und der Ertragswert bleibt
+   insoweit vorlaeufig. Die Dauer ist auf die Restnutzungsdauer begrenzt.
+   posten: [{ nr, art, differenz_jahr, befristet_bis, kuendigungsverzicht_bis, abw_jahre }] */
+export function mietabweichungBog(posten, lzsPct, rndJahre, stichtag) {
+  const st = stichtag instanceof Date ? stichtag : new Date();
+  const jahreBis = (d) => {
+    if (!d) return null;
+    const t = Date.parse(String(d).length === 7 ? d + '-01' : String(d));
+    if (!Number.isFinite(t)) return null;
+    const j = (t - st.getTime()) / (365.25 * 864e5);
+    return j > 0 ? Math.round(j * 10) / 10 : 0;
+  };
+  const R = Number(rndJahre) > 0 ? Number(rndJahre) : null;
+  const deckel = (n) => (R != null ? Math.min(n, R) : n);
+  const zeilen = [], offen = [];
+  for (const z of (posten || [])) {
+    const d = Math.round(Number(z.differenz_jahr) || 0);
+    if (!d) continue;
+    const art = d > 0 ? 'overrent' : 'underrent';
+    const jB = jahreBis(z.befristet_bis), jK = jahreBis(z.kuendigungsverzicht_bis);
+    const belegt = [jB, jK].filter((x) => x != null);
+    let jahre = null, quelle = null;
+    if (belegt.length) { jahre = Math.max(...belegt); quelle = jB != null && jahre === jB ? 'befristung' : 'kuendigungsverzicht'; }
+    else if (art === 'underrent' && Number(z.abw_jahre) > 0) { jahre = Number(z.abw_jahre); quelle = 'eingabe'; }
+    const zeile = { nr: z.nr || null, art, differenz_jahr: d, jahre: jahre != null ? deckel(jahre) : null, jahre_quelle: quelle,
+                    gedeckelt_auf_rnd: jahre != null && R != null && jahre > R };
+    if (jahre != null && jahre > 0) {
+      zeile.barwert_eur = barwertAbweichung(d, lzsPct, zeile.jahre);
+      zeile.angesetzt = true;
+    } else if (jahre === 0) {
+      zeile.barwert_eur = 0; zeile.angesetzt = true; zeile.abgelaufen = true;
+    } else {
+      zeile.angesetzt = false;
+      zeile.grund = art === 'overrent'
+        ? (Number(z.abw_jahre) > 0 ? 'Mehrertrag nur mit belegter Vertragslaufzeit (Befristung oder Kündigungsverzicht)' : 'keine Vertragslaufzeit angegeben')
+        : 'keine Restlaufzeit angegeben';
+      offen.push(zeile);
+    }
+    zeilen.push(zeile);
+  }
+  const angesetzt = zeilen.filter((z) => z.angesetzt).reduce((a, z) => a + (z.barwert_eur || 0), 0);
+  const dOffen = offen.reduce((a, z) => a + z.differenz_jahr, 0);
+  const szenarien = offen.length ? BOG_SZENARIEN_JAHRE.map((n) => ({ jahre: n,
+    barwert_eur: offen.reduce((a, z) => a + (barwertAbweichung(z.differenz_jahr, lzsPct, deckel(n)) || 0), 0) })) : null;
+  return { zeilen, angesetzt_eur: Math.round(angesetzt), n_angesetzt: zeilen.filter((z) => z.angesetzt).length,
+           offen_differenz_jahr: dOffen, n_offen: offen.length, szenarien, lzs_pct: lzsPct,
+           szenario_hinweis: 'Szenario, keine gesetzliche Annahme' };
 }
 
 /* v2595 · Differenz Marktpreisindikation − Ertragswert, bezogen auf den Ertragswert.
@@ -181,7 +268,7 @@ export const CrossCheckService = {
           ? 'dem gesetzlichen Auffangwert nach § 256 BewG (Stufe D, kein Wert des Gutachterausschusses)'
           /* v2401 · N tritt mit offener Rueckfrage nie auf (WertParameterService) - falls doch, beim Namen */
           : (params && params.lzs_stufe === 'N')
-          ? 'einem aus der DealPilot-Formel abgeleiteten Wert (Stufe N, nicht amtlich)'
+          ? 'einem Wert ' + nEtikett(params, 'aus der DealPilot-Formel abgeleitet', 'als DealPilot-Landesmittel') + ' (Stufe N, nicht amtlich)'
           : 'einem Rückfallwert' + ((params && params.lzs_quelle) ? ' (' + String(params.lzs_quelle).split(',')[0] + ')' : '')
             + ' — nicht dem objektgenau zugeordneten amtlichen Satz';
         out.notes.push(_rf.grund === 'ausserhalb_geltung'
@@ -931,10 +1018,44 @@ export const CrossCheckService = {
      * Mietpreisuebersicht vor, fuehrt die amtliche Miete — Paragraf 10:
      * derselbe Modellansatz, aus dem der Zinssatz abgeleitet wurde.
      * Sonst bleibt es beim Portalangebot, unveraendert. */
-    const _amtFuehrt = !!(p.amtliche_miete && p.amtliche_miete.verfuegbar
-      && p.amtliche_miete.fuehrend !== false
-      && ['agvga_nrw_2016'].indexOf(String(p.modellversion || '')) >= 0);
-    const _refQm = _amtFuehrt ? p.amtliche_miete.miete_qm : rentSqm;
+    /* ══ v2600 · E1 · DER ANKER DER MARKTUEBLICHKEIT IST DER SATZ DES AUSSCHUSSES ══
+       Marcel 21.10.2026: „am Satz des Ausschusses messen". § 10 ImmoWertV: der
+       Liegenschaftszins gilt nur mit der Miete, aus der er abgeleitet wurde. Bis v2595
+       war das Band min(amtlich, Angebot) x 0,7 bis max(…) x 1,15 - gemessen an
+       Angebotsmieten, nicht am Modell (Gutachterpruefung: Bismarckstr. 27 rechnete
+       9,66 €/m² gegen Ø 6,70 des Satzes Lippe 2025). Jetzt, in dieser Rangfolge:
+         1  amtliche Miete/Modellmiete des Ausschusses (Mietpreisuebersicht), wo das
+            Modell des verwendeten Zinses sie verlangt (AGVGA-NRW-Vermerk oder derselbe
+            Ausschuss) und sie fuer das Objekt gilt (fuehrend) - Rueckkehr zu v1059
+         2  Ø Miete des VERWENDETEN Liegenschaftszins-Satzes (modellansaetze)
+         3  nur wenn beides fehlt: die Angebotsmiete (aktueller Marktdurchschnitt).
+            Einen belegten Abschlag Angebot -> Vertrag gibt es nicht (empirica 273/2024:
+            -7 % bis +29 % je Stadt); er wird deshalb nicht erfunden.
+       _refQm ist ab hier der Anker: Mitte des Bandes, Ansatz ausserhalb des Bandes und
+       Miete der leeren Wohnungen (Marcel 21.10.: voll vermietet). */
+    const _amtM = (p.amtliche_miete && p.amtliche_miete.verfuegbar && _num(p.amtliche_miete.miete_qm)) ? p.amtliche_miete : null;
+    const _gleicherAusschuss = !!(_amtM && _amtM.ausschuss && p.lzs_ausschuss && p.lzs_aus_register
+      && String(_amtM.ausschuss).trim() === String(p.lzs_ausschuss).trim());
+    const _amtVerlangt = !!(_amtM && (['agvga_nrw_2016'].indexOf(String(p.modellversion || '')) >= 0 || _gleicherAusschuss));
+    const _amtFuehrt = _amtVerlangt && _amtM.fuehrend !== false;
+    const _satzMiete = (function () {
+      try { const D = modellDurchschnitte(p.lzs_modellansaetze || null); return D.miete != null ? { qm: D.miete, feld: D.miete_feld } : null; }
+      catch (e) { return null; }
+    })();
+    const _r2a = (x) => Math.round(x * 100) / 100;
+    const _anker = _amtFuehrt
+      ? { qm: _r2a(_num(_amtM.miete_qm)), stufe: 'amtlich', etikett: 'amtliche Miete des Gutachterausschusses',
+          quelle: _amtM.quelle || 'Mietpreisübersicht des Gutachterausschusses' }
+      : _satzMiete
+        ? { qm: _r2a(_satzMiete.qm), stufe: 'satz_mittel', etikett: 'Ø Miete des Liegenschaftszinssatzes', feld: _satzMiete.feld,
+            quelle: 'Ø Miete der Kauffälle, aus denen ' + (p.lzs_ausschuss || 'der Gutachterausschuss') + ' den Liegenschaftszins'
+              + (p.lzs_berichtsjahr ? ' ' + p.lzs_berichtsjahr : '') + ' abgeleitet hat' }
+        : (rentSqm > 0
+          ? { qm: _r2a(rentSqm), stufe: 'angebot', etikett: 'Angebotsmiete (aktueller Marktdurchschnitt)',
+              quelle: 'aktueller Marktdurchschnitt der Angebotsmieten' }
+          : null);
+    if (_anker && _amtVerlangt && !_amtFuehrt && _amtM.ausserhalb_hinweis) _anker.amtlich_nicht_fuehrend = _amtM.ausserhalb_hinweis;
+    const _refQm = _anker ? _anker.qm : null;
     /* ══ v2367 · DIE IST-MIETE, WENN SIE MARKTUEBLICH IST (§ 31 Abs. 2 ImmoWertV) ══
        Marcel 18.10.2026: „Ertragswert wird ja eigentlich immer mit der Ist-Miete
        berechnet" - § 31 Abs. 2 verlangt die MARKTUEBLICH erzielbaren Ertraege;
@@ -993,12 +1114,17 @@ export const CrossCheckService = {
       ? _num(p.amtliche_miete.miete_qm) : null;
     const _angQmBand = rentSqm > 0 ? rentSqm : null;
     const _bandQ = [_amtQmBand, _angQmBand].filter((x) => x != null);
-    const _band = _bandQ.length ? {
-      unten_qm: Math.round(Math.min(..._bandQ) * 0.7 * 100) / 100,
-      /* v2541 · obere Kante × 1,15 statt × 1,3 (Marcel 20.10.2026; Pruefbericht: 12,35 €/m² lag in Bielefeld 2,7σ ueber dem Ø der MFH-Kauffaelle 7,70 ± 1,70) */
-      oben_qm: Math.round(Math.max(..._bandQ) * BAND_OBEN * 100) / 100, faktor_oben: BAND_OBEN,
+    void _bandQ;
+    /* v2600 · E1 · Band = Anker ± 20 % (MIETBAND). Die drei Vergleichswerte stehen daneben,
+       damit Bericht und Pilot-Tafel sagen koennen, woran gemessen ist. */
+    const _band = _anker ? {
+      anker_qm: _anker.qm, anker_stufe: _anker.stufe, anker_etikett: _anker.etikett, anker_quelle: _anker.quelle,
+      unten_qm: Math.round(_anker.qm * (1 - MIETBAND.pct / 100) * 100) / 100,
+      oben_qm: Math.round(_anker.qm * BAND_OBEN * 100) / 100, faktor_oben: BAND_OBEN, band_pct: MIETBAND.pct,
       amtlich_qm: _amtQmBand, angebot_qm: _angQmBand != null ? Math.round(_angQmBand * 100) / 100 : null,
-      regel: 'untere Kante = min(amtliche Vergleichsmiete, Angebotsmiete) × 0,7; obere Kante = max(…) × 1,15',
+      satz_qm: _satzMiete ? _r2a(_satzMiete.qm) : null,
+      amtlich_nicht_fuehrend: _anker.amtlich_nicht_fuehrend || null,
+      regel: _anker.etikett + ' ± ' + MIETBAND.pct + ' % (' + MIETBAND.art + ')',
     } : null;
     const _mnb = mieteNachBand(_istQm, _band, _refQm);   /* v2488 · eine Regel, auch je Wohnung */
     const _istLage = _mnb.lage;
@@ -1025,17 +1151,25 @@ export const CrossCheckService = {
       const f = _wflIst / sum;
       const zeilen = _ehR.map((e) => {
         const fl = r2(Number(e.wfl) * f);
+        /* v2600 · E2/E3 · Vertragsangaben der Wohnung reisen mit (Restlaufzeit, Leerstandsabzug) */
+        const vt = { mv_art: e.mv_art || null, befristet_bis: e.mv_befristet_bis || null,
+                     kuendigungsverzicht_bis: e.mv_kuendigungsverzicht_bis || null,
+                     abw_jahre: Number(e.mv_abw_jahre) > 0 ? Number(e.mv_abw_jahre) : null };
         if (e.leer || !(Number(e.ist_monat) > 0)) {
-          return { nr: e.nr, wfl: fl, ist_qm: null, qm: r2(_refQm), herkunft: 'leer_marktueblich', jahr: Math.round(_refQm * fl * 12) };
+          return { nr: e.nr, wfl: fl, ist_qm: null, qm: r2(_refQm), herkunft: 'leer_marktueblich', jahr: Math.round(_refQm * fl * 12),
+                   leer_abzug: e.leer_abzug === true || e.leer_abzug === 'true' || e.leer_abzug === 1,
+                   leer_monate: Number(e.leer_monate) > 0 ? Number(e.leer_monate) : null,
+                   herrichtung_eur: Number(e.herrichtung_eur) > 0 ? Number(e.herrichtung_eur) : null };
         }
         const iq = r2(Number(e.ist_monat) / Number(e.wfl));
         const r = mieteNachBand(iq, _band, _refQm);
         /* v2541 · im Band die VERTRAGSMIETE selbst (× Flaechenfaktor), nicht die auf Cent
            gerundeten €/m² hochgerechnet - Westerfeld: 799 € / 97,5 m² = 8,1949 -> 8,19 ergab
-           9.582 statt 9.588 €/Jahr je Wohnung (Pruefbericht 20.10.2026). Bandkante: qm × Flaeche. */
-        return { nr: e.nr, wfl: fl, ist_qm: iq, qm: r2(r.qm),
-                 jahr: r.fuehrt ? Math.round(Number(e.ist_monat) * 12 * f) : Math.round(r.qm * fl * 12),
-                 herkunft: r.fuehrt ? 'ist_im_band' : (r.lage === 'ueber' ? 'obere_kante' : 'untere_kante') };
+           9.582 statt 9.588 €/Jahr je Wohnung (Pruefbericht 20.10.2026). Ausserhalb: Anker × Flaeche. */
+        const istJ = Math.round(Number(e.ist_monat) * 12 * f);
+        const jahr = r.fuehrt ? istJ : Math.round(r.qm * fl * 12);
+        return Object.assign({ nr: e.nr, wfl: fl, ist_qm: iq, qm: r2(r.qm), jahr, ist_jahr: istJ,
+                 differenz_jahr: istJ - jahr, herkunft: herkunftNachBand(r) }, vt);
       });
       const v = zeilen.filter((z) => z.herkunft !== 'leer_marktueblich'), l = zeilen.filter((z) => z.herkunft === 'leer_marktueblich');
       const wflV = r2(v.reduce((a, z) => a + z.wfl, 0)), jV = v.reduce((a, z) => a + z.jahr, 0);
@@ -1046,14 +1180,28 @@ export const CrossCheckService = {
                angepasst: v.filter((z) => z.herkunft !== 'ist_im_band') };
     })() : null;
     const mieteQm = _je && _je.qm_vermietet ? _je.qm_vermietet : _mnb.qm;
+    const _ankEt = _anker ? _anker.etikett : 'Vergleichsmiete';
     const mieteQuelle = _je
-      ? ('Ist-Miete je Wohnung (marktüblich, § 31 Abs. 2 ImmoWertV), außerhalb des Bandes die Bandkante'
-        + (_je.n_leer ? '; leere Wohnungen mit der Vergleichsmiete' : ''))
+      ? ('Ist-Miete je Wohnung, soweit im Band der Marktüblichkeit (§ 31 Abs. 2 ImmoWertV); außerhalb des Bandes die ' + _ankEt
+        + (_je.n_leer ? ', leere Wohnungen ebenso' : ''))
       : ((_istFuehrt ? 'Ist-Miete (marktüblich, § 31 Abs. 2 ImmoWertV)'
-      : (_kante != null ? (_istLage === 'ueber' ? 'obere' : 'untere') + ' Kante des Marktüblichkeitsbandes'
-        : (_amtFuehrt ? 'Mietpreisübersicht des Gutachterausschusses' : 'Angebotsmieten')))
+      : (_kante != null ? _ankEt + ' (Ist-Miete außerhalb des Bandes)' : _ankEt))
       /* v2520 · bei Leerstand gilt die Zahl nur fuer die vermietete Flaeche */
-      + (_ls ? ' auf der vermieteten Fläche; leere Fläche mit der Vergleichsmiete' : ''));
+      + (_ls ? ' auf der vermieteten Fläche; leere Fläche mit der ' + _ankEt : ''));
+    /* v2600 · E2 · die Abweichungen ausserhalb des Bandes, je Mietverhaeltnis (fuer den boG nach dem Kern) */
+    const _bogPosten = _je
+      ? _je.zeilen.filter((z) => z.herkunft === 'ueber_band' || z.herkunft === 'unter_band')
+      : ((_istQm != null && _band && !_istFuehrt && _kante != null)
+        ? [{ nr: null, differenz_jahr: _ls
+              ? Math.round(_ls.ist_monat_vermietet * 12 - _refQm * _ls.wfl_vermietet * 12)
+              : Math.round(_num(ref.monthly_net_rent) * 12 - _refQm * _wflIst * 12),
+             befristet_bis: ref.mv_befristet_bis || null, kuendigungsverzicht_bis: ref.mv_kuendigungsverzicht_bis || null,
+             abw_jahre: Number(ref.mv_abw_jahre) > 0 ? Number(ref.mv_abw_jahre) : null }]
+        : []);
+    /* v2600 · E3 · Leerstand: Mietausfall bis zur Vermietung + Herrichtung, je leerer Wohnung,
+       nur wenn ausdruecklich gewaehlt (voreingestellt aus; Marcel 21.10.: voll vermietet). */
+    const _leerPosten = _je ? _je.zeilen.filter((z) => z.herkunft === 'leer_marktueblich' && z.leer_abzug
+      && (z.leer_monate > 0 || z.herrichtung_eur > 0)) : [];
     if (_band) {
       _band.ist_qm = _istQm; _band.lage = _istLage;
       /* v2540 · geprueft je Wohnung: welche Wohnung an welche Kante (Bericht/PDF nennen sie) */
@@ -1063,31 +1211,29 @@ export const CrossCheckService = {
     }
     const _dq = (x) => String(Math.round(x * 100) / 100).replace('.', ',');
     const _bandText = _band ? ('Band der Marktüblichkeit ' + _dq(_band.unten_qm) + ' bis ' + _dq(_band.oben_qm) + ' €/m² ('
-      + [_band.amtlich_qm != null ? 'amtliche Vergleichsmiete ' + _dq(_band.amtlich_qm) + ' €/m²' : null,
-        _band.angebot_qm != null ? 'Angebotsmiete ' + _dq(_band.angebot_qm) + ' €/m²' : null].filter(Boolean).join(', ')
-      + '; untere Kante × 0,7, obere × 1,15)') : '';
+      + _band.anker_etikett + ' ' + _dq(_band.anker_qm) + ' €/m² ± ' + _band.band_pct + ' %)') : '';
     const _dqJ = (x) => String(Math.round(x * 100) / 100).replace('.', ',');
     if (_je) {
       /* v2540 · je Wohnung: welche Wohnung an welche Kante, in einem Satz */
       out.notes.push('Die Ist-Mieten sind je Wohnung gegen das Band der Marktüblichkeit ('
-        + _dqJ(_band.unten_qm) + ' bis ' + _dqJ(_band.oben_qm) + ' €/m²) geprüft (ImmoWertA 31.2: je Mietverhältnis). '
+        + _dqJ(_band.unten_qm) + ' bis ' + _dqJ(_band.oben_qm) + ' €/m², ' + _band.anker_etikett + ' ' + _dqJ(_band.anker_qm) + ' €/m² ± ' + _band.band_pct
+        + ' %) geprüft (ImmoWertA 31.2: je Mietverhältnis). '
         + (_je.angepasst.length
-          ? ((_je.angepasst.length > 2 && _je.angepasst.every((z) => z.qm === _je.angepasst[0].qm && z.ist_qm === _je.angepasst[0].ist_qm))
-              ? _je.angepasst.length + ' Wohnungen mit ' + _dqJ(_je.angepasst[0].ist_qm) + ' €/m² ' + (_je.angepasst[0].herkunft === 'obere_kante' ? 'über' : 'unter')
-                + ' dem Band, angesetzt ' + _dqJ(_je.angepasst[0].qm) + ' €/m²'
-              : _je.angepasst.map((z) => z.nr + ' ' + _dqJ(z.ist_qm) + ' €/m² ' + (z.herkunft === 'obere_kante' ? 'über' : 'unter')
+          ? ((_je.angepasst.length > 2 && _je.angepasst.every((z) => z.herkunft === _je.angepasst[0].herkunft))
+              ? _je.angepasst.length + ' Wohnungen ' + (_je.angepasst[0].herkunft === 'ueber_band' ? 'über' : 'unter') + ' dem Band ('
+                + _je.angepasst.map((z) => _dqJ(z.ist_qm)).join(', ') + ' €/m²), angesetzt ' + _dqJ(_je.angepasst[0].qm) + ' €/m²'
+              : _je.angepasst.map((z) => z.nr + ' ' + _dqJ(z.ist_qm) + ' €/m² ' + (z.herkunft === 'ueber_band' ? 'über' : 'unter')
               + ' dem Band, angesetzt ' + _dqJ(z.qm) + ' €/m²').join('; '))
-            + '. Der Mehr- oder Minderertrag ist nach § 8 Abs. 3 ImmoWertV nur für die gesicherte Restlaufzeit des Mietvertrags zu würdigen; ohne bekannte Laufzeit ist er nicht angesetzt.'
+            + '. Angesetzt ist dort die marktüblich erzielbare Miete (ImmoWertA zu § 31); die Abweichung ist ein besonderes objektspezifisches Grundstücksmerkmal (§ 8 Abs. 3 ImmoWertV) und steht unten beziffert.'
           : 'Alle vermieteten Wohnungen liegen im Band; der Ertragswert rechnet mit ihren Ist-Mieten.'));
     } else if (_istQm != null && _band) {
       out.notes.push(_istFuehrt
         ? ('Die Ist-Miete (' + _dq(_istQm) + ' €/m²) liegt im ' + _bandText + ' und gilt als marktüblich '
           + '(§ 31 Abs. 2 ImmoWertV); der Ertragswert rechnet mit ihr.')
         : ('Die Ist-Miete (' + _dq(_istQm) + ' €/m²) liegt ' + (_istLage === 'ueber' ? 'über' : 'unter') + ' dem '
-          + _bandText + '. Der Ertragswert rechnet mit der ' + (_istLage === 'ueber' ? 'oberen' : 'unteren')
-          + ' Kante (' + _dq(_kante) + ' €/m²). Der ' + (_istLage === 'ueber' ? 'Mehr' : 'Minder') + 'ertrag ist nach '
-          + '§ 8 Abs. 3 ImmoWertV als besonderes objektspezifisches Grundstücksmerkmal zu würdigen — nur für die '
-          + 'gesicherte Restlaufzeit des Mietvertrags; ohne bekannte Laufzeit ist er nicht angesetzt.'));
+          + _bandText + '. Der Ertragswert rechnet mit der marktüblich erzielbaren Miete (' + _dq(_refQm) + ' €/m², ImmoWertA zu § 31). Der '
+          + (_istLage === 'ueber' ? 'Mehr' : 'Minder') + 'ertrag ist ein besonderes objektspezifisches Grundstücksmerkmal '
+          + '(§ 8 Abs. 3 ImmoWertV) und steht unten beziffert.'));
     }
     if (_ls) {
       out.notes.push('Leerstand: Die Ist-Miete (' + _dq(_ls.ist_monat_vermietet) + ' €/Monat) bezieht sich auf die vermietete Fläche von '
@@ -1100,7 +1246,7 @@ export const CrossCheckService = {
            Herrichtungskosten stehen nicht in ImmoWertV/ImmoWertA, sie sind
            Fachpraxis unter § 8 Abs. 3 - ohne Angabe keine Zahl, aber benannt */
         + ' Der Mietausfall bis zur Wiedervermietung und Kosten der Herrichtung sind als besonderes objektspezifisches '
-        + 'Grundstücksmerkmal (§ 8 Abs. 3 ImmoWertV) zu würdigen; ohne Angabe zur Dauer sind sie nicht angesetzt.'
+        + 'Grundstücksmerkmal (§ 8 Abs. 3 ImmoWertV) zu würdigen; ohne Angabe sind sie nicht angesetzt (je leerer Wohnung wählbar).'
         + (_ls.flaeche_umgelegt ? ' Die Flächen der Einheiten sind auf die Wohnfläche des Objekts umgelegt.' : ''));
     }
     /* v1207-WMIE-2 · DER WIDERSPRUCH GEHOERT BENANNT, NICHT VERSTECKT.
@@ -1255,7 +1401,7 @@ export const CrossCheckService = {
         wfl_leer: _ls.wfl_leer, qm_leer: _ls.leer_qm,
         jahr_leer: Math.round(_ls.leer_qm * _ls.wfl_leer * 12),
         n_vermietet: _ls.n_vermietet, n_leer: _ls.n_leer,
-        herkunft_vermietet: _istFuehrt ? 'ist_im_band' : (_istLage === 'ueber' ? 'obere_kante' : 'untere_kante'),
+        herkunft_vermietet: _istFuehrt ? 'ist_im_band' : (_istLage === 'ueber' ? 'ueber_band' : 'unter_band'),
       } : null;
       const rohertrag = _aufteilung ? (_aufteilung.jahr_vermietet + _aufteilung.jahr_leer)
         : Math.round(mieteQm * wflWohnen * 12);
@@ -1362,6 +1508,8 @@ export const CrossCheckService = {
          * nie WARUM, und der Abzugstext blieb zwangslaeufig der pauschale.
          * Nach der Variable suchen, die angeblich gefuellt ist. */
         lzs_herabgestuft: !!p.lzs_herabgestuft,
+        /* v2600 · Stufe N hat zwei Wege (v2611): Formel oder DealPilot-Landesmittel - der Abzugstext nennt den richtigen */
+        lzs_n_etikett: p.lzs_stufe === 'N' ? nEtikett(p) : null,
         lzs_streuung_pp: p.lzs_streuung_pp != null ? p.lzs_streuung_pp : null,
         lzs_massstab: p.lzs_massstab || null,
         /* === v1338d - `_num` VERWIRFT JEDE NEGATIVE ZAHL ===============
@@ -1472,7 +1620,46 @@ export const CrossCheckService = {
         }
       }
 
-      const kern = ErtragswertService.ertragswert(ein, bwErgebnis);
+      let kern = ErtragswertService.ertragswert(ein, bwErgebnis);
+      /* ══ v2600 · E2/E3 · DIE ABWEICHUNG ALS boG, NACH DEM ERSTEN KERNLAUF ══════
+         Zins und Restnutzungsdauer des Barwerts sind die des Kerns (der verwendete
+         Liegenschaftszins). Angesetzt wird nur, was eine Restlaufzeit hat (E2) bzw. was
+         je leerer Wohnung ausdruecklich gewaehlt ist (E3); dann rechnet der Kern ein
+         zweites Mal mit den boG-Zeilen nach dem vorlaeufigen Ertragswert.
+         Prompt-Regel 5 (nie doppelt): traegt das Objekt schon einen eigenen boG mit
+         Mietbezug (bog_grund), wird die Mietabweichung NICHT zusaetzlich angesetzt. */
+      let _mietBog = null, _leerBog = null, _bogDoppelt = false, _vorBog = false;
+      if (kern.vollstaendig && kern.wert != null && !_gew) {
+        const _lzsK = kern.lzs ? kern.lzs.pct : lzsPct;
+        const _rndK = kern.nutzungsdauer ? kern.nutzungsdauer.rnd : null;
+        _bogDoppelt = !!(ein.bog_eur && /miet|leerst|herricht|overrent|underrent|mehrertrag|minderertrag/i.test(String(ein.bog_grund || '')));
+        if (_bogPosten.length) _mietBog = mietabweichungBog(_bogPosten, _lzsK, _rndK, new Date());
+        if (_leerPosten.length) {
+          const z = _leerPosten.map((x) => ({ nr: x.nr, monate: x.leer_monate || 0,
+            mietausfall_eur: Math.round((x.jahr / 12) * (x.leer_monate || 0)), herrichtung_eur: Math.round(x.herrichtung_eur || 0) }));
+          _leerBog = { zeilen: z, summe_eur: z.reduce((a, x) => a + x.mietausfall_eur + x.herrichtung_eur, 0),
+                       hinweis: 'Mietausfall bis zur Vermietung (Miete × Monate, nicht abgezinst) und Herrichtungskosten, je gewählter leerer Wohnung' };
+        }
+        const _nLeer = _je ? _je.n_leer : (_ls ? (_ls.n_leer || 1) : 0);
+        const _bp = [];
+        if (!_bogDoppelt && _mietBog && _mietBog.n_angesetzt && _mietBog.angesetzt_eur) {
+          _bp.push({ pos: 'besonderes objektspezifisches Merkmal: Mietabweichung', wert: _mietBog.angesetzt_eur,
+            detail: _mietBog.zeilen.filter((x) => x.angesetzt && x.barwert_eur).map((x) => (x.nr ? x.nr + ': ' : '')
+              + (x.differenz_jahr > 0 ? '+' : '−') + Math.abs(x.differenz_jahr).toLocaleString('de-DE') + ' €/Jahr × Barwertfaktor '
+              + String(x.jahre).replace('.', ',') + ' J. (' + (x.jahre_quelle === 'eingabe' ? 'eigene Angabe' : x.jahre_quelle === 'befristung' ? 'Befristung' : 'Kündigungsverzicht') + ')').join('; ') });
+        }
+        if (!_bogDoppelt && _leerBog && _leerBog.summe_eur > 0) {
+          _bp.push({ pos: 'besonderes objektspezifisches Merkmal: Leerstand (Mietausfall, Herrichtung)', wert: -_leerBog.summe_eur,
+            detail: _leerBog.zeilen.map((x) => (x.nr ? x.nr + ': ' : '') + (x.monate ? x.monate + ' Monate Mietausfall ' + x.mietausfall_eur.toLocaleString('de-DE') + ' €' : '')
+              + (x.herrichtung_eur ? (x.monate ? ' + ' : '') + 'Herrichtung ' + x.herrichtung_eur.toLocaleString('de-DE') + ' €' : '')).join('; ') });
+        }
+        _vorBog = !_bogDoppelt && (!!(_mietBog && _mietBog.n_offen) || (_nLeer > (_leerBog ? _leerBog.zeilen.length : 0)));
+        if (_bp.length || _vorBog) {
+          ein.bog_posten = _bp.length ? _bp : null;
+          ein.vorlaeufig_vor_bog = _vorBog;
+          kern = ErtragswertService.ertragswert(ein, bwErgebnis);
+        }
+      }
       out.ertragswert_kern = kern;
       /* v2430 · Die Eingabe des Kerns reist NICHT AUFZAEHLBAR mit: sie geht in
          keinen Bericht und kein JSON, steht aber dem Nur-Wert-Lauf (POST /potenzial)
@@ -1572,19 +1759,30 @@ export const CrossCheckService = {
              Zins zu dieser Miete passt. Jetzt: true nur, wenn die Modellpruefung „im_modell"
              ergibt; false mit Grund; null, wenn der Satz keine Ø Miete fuehrt. */
           /* v2595 · Herkunft der Miete als Code (Pilot-Tafel, Ursachen der Differenz):
-             je_wohnung | ist_im_band | obere_kante | untere_kante | amtlich | angebot */
+             je_wohnung | ist_im_band | ueber_band | unter_band | amtlich | satz_mittel | angebot
+             v2600 · `vergleich` ist die Stufe des Ankers (amtlich | satz_mittel | angebot) */
           miete_herkunft: (function () {
             const z = _je ? _je.zeilen : null;
             const n = (h) => (z ? z.filter((x) => x.herkunft === h).length : 0);
             const code = _je ? 'je_wohnung' : _istFuehrt ? 'ist_im_band'
-              : (_kante != null ? (_istLage === 'ueber' ? 'obere_kante' : 'untere_kante') : (_amtFuehrt ? 'amtlich' : 'angebot'));
-            return { code, vergleich: _amtFuehrt ? 'amtlich' : (_refQm > 0 ? 'angebot' : null),
+              : (_kante != null ? (_istLage === 'ueber' ? 'ueber_band' : 'unter_band') : (_anker ? _anker.stufe : 'angebot'));
+            return { code, vergleich: _anker ? _anker.stufe : null, vergleich_etikett: _anker ? _anker.etikett : null,
                      vergleich_qm: _refQm > 0 ? Math.round(_refQm * 100) / 100 : null,
-                     n_band: n('ist_im_band'), n_oben: n('obere_kante'), n_unten: n('untere_kante'),
+                     n_band: n('ist_im_band'), n_oben: n('ueber_band'), n_unten: n('unter_band'),
                      n_leer: _je ? n('leer_marktueblich') : (_ls ? (_ls.n_leer || null) : 0),
                      wfl_leer: _je ? _je.wfl_leer : (_ls ? _ls.wfl_leer : null),
                      angesetzt_qm: wflWohnen > 0 ? Math.round(rohertrag / 12 / wflWohnen * 100) / 100 : null };
           })(),
+          /* v2600 · E1 · Stufe der Miete (amtlich / Ø Miete des Satzes / Angebotsmiete) */
+          miete_stufe: _anker ? { code: _anker.stufe, etikett: _anker.etikett, quelle: _anker.quelle, qm: _anker.qm,
+            band_pct: MIETBAND.pct, band_art: MIETBAND.art, amtlich_nicht_fuehrend: _anker.amtlich_nicht_fuehrend || null } : null,
+          /* v2600 · E2/E3 · boG aus Mietabweichung und Leerstand; vorlaeufig, wo nicht beziffert */
+          miete_bog: _mietBog,
+          leerstand_bog: _leerBog,
+          bog_doppelt_vermieden: _bogDoppelt,
+          vorlaeufig_vor_bog: _vorBog,
+          bezeichnung: _vorBog ? 'vorläufiger Ertragswert vor besonderen objektspezifischen Grundstücksmerkmalen' : 'Ertragswert',
+          vorlaeufiger_ertragswert_eur: (function () { const z = kern.staffel.find((s) => /^= vorläufiger Ertragswert/.test(s.pos)); return z ? z.wert : null; })(),
           miete_modellkonform: _mk.wert,
           miete_modellkonform_grund: _mk.grund,
           modellpruefung: _mp,
@@ -1613,6 +1811,8 @@ export const CrossCheckService = {
           /* v2401 · Stufe N: die Formel mit Datenbasis und Rechenweg; bei D der Grund ohne Formel */
           liegenschaftszins_formel: p.lzs_formel || null,
           liegenschaftszins_formel_hinweis: p.lzs_stufe === 'N' ? (p.lzs_hinweis || null) : null,
+          liegenschaftszins_n_etikett: p.lzs_stufe === 'N' ? nEtikett(p) : null,   /* v2600 */
+          liquidationshinweis: kern.liquidationshinweis || null,   /* v2600 · E10 */
           liegenschaftszins_formel_nicht: p.lzs_formel_nicht || null,
           indikativ_wegen_zins: !!(p.lzs_zins_herkunft && p.lzs_zins_herkunft.unter_a),
           bwk_aus_zinssatz: !!p.bwk_quote_aus_lzs_satz,
@@ -1630,6 +1830,70 @@ export const CrossCheckService = {
         kern.hinweise.forEach((h) => { if (out.notes.indexOf(h) < 0) out.notes.push(h); });
         /* v2595 · die Modellpruefung als Satz im Bericht - nur wenn etwas abweicht */
         if (_mp.geprueft && _mp.abweichend.length) out.notes.push('Modellprüfung des Liegenschaftszinses: ' + _mp.text);
+        /* v2600 · E2 · die Abweichung in Euro - angesetzt oder als Szenario */
+        const _eu = (x) => (x > 0 ? '+' : (x < 0 ? '−' : '')) + Math.abs(Math.round(x)).toLocaleString('de-DE') + ' €';
+        if (_bogDoppelt && (_mietBog || _leerBog)) {
+          out.notes.push('Die Mietabweichung ist nicht zusätzlich angesetzt: das Objekt führt bereits besondere objektspezifische Merkmale mit Mietbezug („'
+            + ein.bog_grund + '"). Eine Abweichung wird nur einmal berücksichtigt.');
+        } else if (_mietBog) {
+          if (_mietBog.n_angesetzt && _mietBog.angesetzt_eur) {
+            out.notes.push('Mietabweichung als besonderes objektspezifisches Grundstücksmerkmal (§ 8 Abs. 3 ImmoWertV): Barwert der Differenz zwischen Ist-Miete und '
+              + 'marktüblichem Ansatz über die Restlaufzeit, mit dem Liegenschaftszins ' + String(_mietBog.lzs_pct).replace('.', ',') + ' % (Ertragswertrichtlinie Nr. 11.1): '
+              + _eu(_mietBog.angesetzt_eur) + '.');
+          }
+          if (_mietBog.n_offen && _mietBog.szenarien) {
+            const s0 = _mietBog.szenarien[0], s2 = _mietBog.szenarien[_mietBog.szenarien.length - 1];
+            const _ov = _mietBog.zeilen.some((x) => !x.angesetzt && x.art === 'overrent');
+            out.notes.push('Die Abweichung der Ist-Miete vom marktüblichen Ansatz (' + _eu(_mietBog.offen_differenz_jahr) + ' im Jahr'
+              + (_mietBog.n_offen > 1 ? ', ' + _mietBog.n_offen + ' Mietverhältnisse' : '') + ') ist ohne bekannte Restlaufzeit nicht angesetzt. '
+              + 'Je nach Dauer macht sie ' + _eu(s0.barwert_eur) + ' (' + s0.jahre + ' Jahre) bis ' + _eu(s2.barwert_eur) + ' (' + s2.jahre + ' Jahre) aus — '
+              + 'Szenarien, keine gesetzliche Annahme. '
+              + (_ov ? 'Ein Mehrertrag wird nur mit belegter Vertragslaufzeit (Befristung oder Kündigungsverzicht) angesetzt. ' : '')
+              + 'Mit der Restlaufzeit je Wohnung (Mietvertrag) wird sie beziffert.');
+          }
+        }
+        if (!_bogDoppelt && _leerBog && _leerBog.summe_eur > 0) {
+          out.notes.push('Leerstand als besonderes objektspezifisches Grundstücksmerkmal (gewählt): Mietausfall bis zur Vermietung und Herrichtung '
+            + _eu(-_leerBog.summe_eur) + '.');
+        }
+        if (_vorBog) {
+          out.notes.push('Ausgewiesen ist deshalb der vorläufige Ertragswert vor besonderen objektspezifischen Grundstücksmerkmalen'
+            + ((_je ? _je.n_leer : 0) > (_leerBog ? _leerBog.zeilen.length : 0)
+              ? ' (leere Wohnungen voll vermietet zur marktüblichen Miete, ohne Mietausfall und Herrichtung)' : '') + '.');
+        }
+        /* ══ v2600 · E4 · VERTRAUENSSPANNE DER DEALPILOT-FORMEL (Stufe N) ══════════
+           lzs_naeherung.js fuehrt die P80-Spanne je Objektart (Kreuzvalidierung: 79 % der
+           amtlichen Saetze, jeder Ausschuss ohne seine eigenen Werte gelernt). Gelesen
+           werden pct_von/pct_bis; fehlen sie, die Halbbreite spanne_p80_pp (dieselbe Rechnung
+           wie dort). Fehlt beides, entfaellt die Spanne still. Der Ertragswert an beiden
+           Raendern ist derselbe Kern mit getauschtem Zins - der Ausgangswert bleibt. */
+        if (p.lzs_stufe === 'N' && kern.lzs) {
+          const _f = p.lzs_formel || {};
+          const _z = (v) => (v == null || v === '' ? null : (Number.isFinite(Number(v)) ? Number(v) : null));
+          const _pct = kern.lzs.pct;
+          let _von = _z(_f.pct_von != null ? _f.pct_von : p.lzs_pct_von), _bis = _z(_f.pct_bis != null ? _f.pct_bis : p.lzs_pct_bis);
+          const _hb = _z(_f.spanne_p80_pp);
+          if ((_von == null || _bis == null) && _hb > 0) { _von = Math.max(0, Math.round((_pct - _hb) * 100) / 100); _bis = Math.round((_pct + _hb) * 100) / 100; }
+          if (_von > 0 && _bis > _von) {
+            const kV = ErtragswertService.ertragswert(Object.assign({}, ein, { lzs_pct: _von }), bwErgebnis);
+            const kB = ErtragswertService.ertragswert(Object.assign({}, ein, { lzs_pct: _bis }), bwErgebnis);
+            if (kV.wert != null && kB.wert != null) {
+              const _d1 = (x) => Number(x).toLocaleString('de-DE', { maximumFractionDigits: 1 });
+              const _d2 = (x) => Number(x).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+              /* gemessene Deckung (lzs_naeherung spanne_deckung, %), sonst die P80-Bauart: 8 von 10 */
+              const _dk = _z(_f.spanne_deckung != null ? _f.spanne_deckung : p.lzs_spanne_deckung);
+              const _vz = _dk != null && _dk > 0 && _dk <= 100 ? Math.round(_dk / 10) : 8;
+              out.ertragswert.lzs_spanne = {
+                pct: _pct, von_pct: _von, bis_pct: _bis, halbbreite_pp: _hb, deckung_pct: _dk, deckung: _vz + ' von 10',
+                ertragswert_von_eur: Math.min(kV.wert, kB.wert), ertragswert_bis_eur: Math.max(kV.wert, kB.wert),
+                text: 'Liegenschaftszins ' + _d2(_pct) + ' % (' + nEtikett(p) + '), Spanne ' + _d1(_von) + '–' + _d1(_bis)
+                  + ' %: bei der Rückrechnung lagen ' + _vz + ' von 10 amtlichen Zinssätzen vergleichbarer Objekte in dieser Spanne. Ertragswert entsprechend '
+                  + Math.min(kV.wert, kB.wert).toLocaleString('de-DE') + '–' + Math.max(kV.wert, kB.wert).toLocaleString('de-DE') + ' €.',
+              };
+              out.notes.push(out.ertragswert.lzs_spanne.text);
+            }
+          }
+        }
         /* v2390 · Zins unter A: Ertragswert insoweit indikativ, und der Weg */
         const _zh = p.lzs_zins_herkunft;
         if (_zh && _zh.unter_a && _zh.ertragswert_hinweis) {

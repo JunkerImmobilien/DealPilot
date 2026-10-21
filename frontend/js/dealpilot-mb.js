@@ -199,7 +199,10 @@ if (!window._wlc) {
       if (m && Array.isArray(m.einheiten) && m.einheiten.length) {
         o._mfh_einheiten = m.einheiten.map(function (e) {
           return { art: e.art || 'wohnen', wfl: e.wfl, ist: e.ist, soll: e.soll, status: e.status || 'vermietet',
-                   nutzung_gew: e.nutzung_gew || null, markt_qm: e.markt_qm || null };
+                   nutzung_gew: e.nutzung_gew || null, markt_qm: e.markt_qm || null,
+                   /* v2600 · E2/E3 · Restlaufzeit der Mietabweichung, waehlbarer Leerstandsabzug */
+                   mv_art: e.mv_art || null, mv_befristet_bis: e.mv_befristet_bis || null, mv_kuendigungsverzicht_bis: e.mv_kuendigungsverzicht_bis || null,
+                   mv_abw_jahre: e.mv_abw_jahre || null, leer_abzug: e.leer_abzug === true, leer_monate: e.leer_monate || null, herrichtung_eur: e.herrichtung_eur || null };
         });
       }
     } catch (e) {}

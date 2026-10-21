@@ -339,19 +339,20 @@ export const ErtragswertService = {
     /* v2520 · bei Leerstand steht im Rechenweg, worauf die Miete steht */
     /* v2540 · je Wohnung gegen das Band (CrossCheckService): die angepassten Wohnungen einzeln */
     const _je = ein.miete_aufteilung && Array.isArray(ein.miete_aufteilung.einheiten) ? ein.miete_aufteilung : null;
-    const _jeAng = _je ? _je.einheiten.filter((z) => z.herkunft === 'untere_kante' || z.herkunft === 'obere_kante') : [];
+    /* v2600 · ausserhalb des Bandes steht die marktuebliche Miete (Anker), nicht mehr die Kante */
+    const _jeAng = _je ? _je.einheiten.filter((z) => z.herkunft === 'unter_band' || z.herkunft === 'ueber_band') : [];
     const _jeDetail = _je && (_jeAng.length || pos(_je.wfl_leer))
       ? `Ist-Miete je Wohnung im Band`
-        + (_jeAng.length ? '; ' + (_jeAng.length > 2 && _jeAng.every((z) => z.qm === _jeAng[0].qm && z.ist_qm === _jeAng[0].ist_qm)
-          ? `${_jeAng.length} Wohnungen ${deZahl(_jeAng[0].qm)} statt ${deZahl(_jeAng[0].ist_qm)} €/m² (${_jeAng[0].herkunft === 'obere_kante' ? 'obere' : 'untere'} Bandkante)`
-          : _jeAng.map((z) => `${z.nr} ${deZahl(z.qm)} statt ${deZahl(z.ist_qm)} €/m² (${z.herkunft === 'obere_kante' ? 'obere' : 'untere'} Bandkante)`).join(', ')) : '')
+        + (_jeAng.length ? '; ' + (_jeAng.length > 2 && _jeAng.every((z) => z.qm === _jeAng[0].qm && z.herkunft === _jeAng[0].herkunft)
+          ? `${_jeAng.length} Wohnungen ${deZahl(_jeAng[0].qm)} €/m² marktüblich (Ist ${_jeAng.map((z) => deZahl(z.ist_qm)).join(', ')} €/m² ${_jeAng[0].herkunft === 'ueber_band' ? 'über' : 'unter'} dem Band)`
+          : _jeAng.map((z) => `${z.nr} ${deZahl(z.qm)} statt ${deZahl(z.ist_qm)} €/m² (${z.herkunft === 'ueber_band' ? 'über' : 'unter'} dem Band)`).join(', ')) : '')
         + ` · vermietet ${deZahl(_je.wfl_vermietet)} m² Ø ${deZahl(_je.qm_vermietet)} €/m²`
         + (pos(_je.wfl_leer) ? ` + leere Fläche ${deZahl(_je.wfl_leer)} m² mit marktüblicher Miete ${deZahl(_je.qm_leer)} €/m²` : '')
         + ' (je × 12)'
       : null;
     const _auf = !_je && ein.miete_aufteilung && pos(ein.miete_aufteilung.wfl_leer) ? ein.miete_aufteilung : null;
     const _aufDetail = _je ? _jeDetail : _auf
-      ? `${_auf.herkunft_vermietet === 'ist_im_band' ? 'Ist-Miete' : (_auf.herkunft_vermietet === 'obere_kante' ? 'obere Bandkante' : 'untere Bandkante')}`
+      ? `${_auf.herkunft_vermietet === 'ist_im_band' ? 'Ist-Miete' : 'marktübliche Miete (Ist ' + (_auf.herkunft_vermietet === 'ueber_band' ? 'über' : 'unter') + ' dem Band)'}`
         + ` auf vermieteter Fläche ${deZahl(_auf.wfl_vermietet)} m² × ${deZahl(_auf.qm_vermietet)} €/m²`
         + ` + leere Fläche ${deZahl(_auf.wfl_leer)} m² mit marktüblicher Miete ${deZahl(_auf.qm_leer)} €/m² (je × 12)`
       : null;
@@ -622,14 +623,23 @@ export const ErtragswertService = {
        den Wert). Gemessen v2488: die leere WE 5 des Demo-MFH als ETW ergab hier
        69.558 € = ihr Bodenwertanteil, ungerundet. Beim Haus bleibt der Kurzweg,
        jetzt gerundet wie jeder Ertragswert. */
+    /* ══ v2600 · E10 · NEGATIVER GEBAEUDEREINERTRAG: WEITERRECHNEN WIE DIE RICHTLINIE ══
+       Marcel 21.10.2026 (E10): Ertragswertrichtlinie Anlage 3 Beispiel 4 („Hinweis auf
+       ein Liquidationsobjekt"): RE 20.000, BW 480.000, 7 %, RND 5 -> Gebaeudereinertrag
+       −13.600, Gebaeudeertragswert −55.760, vorlaeufiger Ertragswert 424.240 € (gerundet
+       425.000). Die Richtlinie rechnet „aus methodischen Gruenden" weiter und nennt den
+       hoeheren Bodenwert nur als HINWEIS. Bis v2595 setzte der Kern beim Haus
+       Ertragswert = Bodenwert (480.000) - das ist die Annahme einer alsbaldigen
+       Freilegung (§ 43), ohne deren Kosten. Jetzt: § 28 unveraendert, daneben der
+       Bodenwert als Liquidationshinweis (§ 8 Abs. 3: Freilegungskosten). */
     const _etw = /etw|wohnung|whg|apartment|appartement/i.test(String(ein.objektart || ''));   /* wie _istWhg oben */
     if (hatBw && gebReinertrag <= 0 && !_etw) {
-      out.warnungen.push('Der Gebäudereinertrag ist null oder negativ: Die Bodenwertverzinsung übersteigt den Reinertrag. In diesem Fall ist regelmäßig der Bodenwert die maßgebliche Größe — das Gebäude trägt rechnerisch nichts bei.');
-      out.wert = rundeSinnvoll(bw);
-      out.wert_ungerundet = round0(bw);
-      out.staffel.push({ pos: '= Ertragswert (entspricht dem Bodenwert)', wert: bw, summe: true });
-      out.vollstaendig = true;
-      return out;
+      out.liquidationshinweis = { bodenwert_eur: round0(bw),
+        hinweis: 'Liquidationsobjekt prüfen: Die Bodenwertverzinsung übersteigt den Reinertrag, der Gebäudereinertrag ist negativ. '
+          + 'Der Bodenwert (' + round0(bw).toLocaleString('de-DE') + ' €) liegt über dem vorläufigen Ertragswert, das Gebäude trägt rechnerisch nichts bei. Ob das Objekt alsbald freigelegt wird '
+          + 'und welche Freilegungskosten anfallen, ist als besonderes objektspezifisches Grundstücksmerkmal zu prüfen (§ 8 Abs. 3, § 43 ImmoWertV). '
+          + 'Gerechnet ist wie in der Ertragswertrichtlinie (Anlage 3, Beispiel 4) mit der Formel des § 28.' };
+      out.hinweise.push(out.liquidationshinweis.hinweis);
     }
     if (hatBw && gebReinertrag <= 0 && _etw) {
       out.hinweise.push('Der Gebäudereinertrag ist null oder negativ: Die Bodenwertverzinsung auf den Bodenwertanteil übersteigt den Reinertrag. '
@@ -694,6 +704,15 @@ export const ErtragswertService = {
     }
 
     const bog = num(ein.bog_eur);
+    /* v2600 · E2/E3 · boG aus Mietabweichung/Leerstand (CrossCheckService), je eine Zeile */
+    const _bogP = Array.isArray(ein.bog_posten) ? ein.bog_posten.filter((x) => x && num(x.wert)) : [];
+    const _bogPSum = _bogP.reduce((a, x) => a + round0(num(x.wert)), 0);
+    if (hatBw && ein.vorlaeufig_vor_bog && !_bogP.length && !bog) {
+      const _z = out.staffel[out.staffel.length - 1];
+      if (_z && _z.pos === '= vorläufiger Ertragswert') _z.pos = '= vorläufiger Ertragswert (vor besonderen objektspezifischen Grundstücksmerkmalen)';
+    }
+    _bogP.forEach((x) => out.staffel.push({ pos: x.pos, detail: x.detail || null, wert: round0(num(x.wert)) }));
+    ertragswert += _bogPSum;
     if (bog && bog !== 0) {
       ertragswert += bog;
       out.staffel.push({
@@ -702,7 +721,9 @@ export const ErtragswertService = {
         wert: round0(bog),
       });
       if (!ein.bog_grund) out.hinweise.push('Besondere objektspezifische Merkmale sind ohne Begründung angesetzt. Ohne Begründung sind sie im Dossier nicht verwertbar.');
-      out.staffel.push({ pos: '= Ertragswert', wert: round0(ertragswert), summe: true });
+    }
+    if ((bog && bog !== 0) || _bogP.length) {
+      out.staffel.push({ pos: ein.vorlaeufig_vor_bog ? '= Ertragswert (insoweit vorläufig)' : '= Ertragswert', wert: round0(ertragswert), summe: true });
     }
 
     out.wert = rundeSinnvoll(ertragswert);
@@ -715,6 +736,7 @@ export const ErtragswertService = {
       /* v2390 · die Ebene des Zinses (WPS.zinsHerkunft) - nur wenn er auch
          angekommen ist; sonst rechnet dieser Kern mit § 256 selbst. */
       lzsHerkunft: pos(ein.lzs_pct) ? (ein.lzs_herkunft || null) : null,
+      lzsNEtikett: ein.lzs_n_etikett || null,
       bodenwertQuelle: bodenwertErgebnis?.quelle?.herkunft,
       hatWohnflaeche: !!pos(ein.wohnflaeche_qm),
       hatRnd: !!R,
@@ -730,7 +752,7 @@ export const ErtragswertService = {
     const V2 = barwertfaktor(lzs + 0.5, R);
     if (V2) {
       const _sonst2 = sonstige > 0 ? round0(sonstige * barwertfaktor(lzs + 0.5, Math.min(pos(ein.sonstige_dauer_jahre) || 15, R))) : 0;
-      const alt = round0(bw + (reinertrag - round0(_bwRent * (lzs + 0.5) / 100)) * V2 + _sonst2 + (bog || 0));
+      const alt = round0(bw + (reinertrag - round0(_bwRent * (lzs + 0.5) / 100)) * V2 + _sonst2 + (bog || 0) + _bogPSum);
       out.sensitivitaet = {
         lzs_plus_05: { lzs_pct: round2(lzs + 0.5), wert: rundeSinnvoll(alt), abweichung_pct: round2(((alt - ertragswert) / ertragswert) * 100) },
       };
@@ -746,7 +768,7 @@ function rundeSinnvoll(v) {
   return Math.round(v / step) * step;
 }
 
-function belastbarkeit({ lzsStufe, lzsGrund = null, lzsHerkunft = null, bwkGeprueft, bodenwertQuelle,
+function belastbarkeit({ lzsStufe, lzsGrund = null, lzsHerkunft = null, lzsNEtikett = null, bwkGeprueft, bodenwertQuelle,
                         hatWohnflaeche, hatRnd, warnungen }) {
   let p = 100;
   const abzuege = [];
@@ -782,7 +804,8 @@ function belastbarkeit({ lzsStufe, lzsGrund = null, lzsHerkunft = null, bwkGepru
   /* v2401 · Stufe N (DealPilot-Formel): gemessen genauer als § 256 BewG
    * (typ. Abweichung 0,6 gegen 0,8 Prozentpunkte), aber nie amtlich und nicht
    * fuer diesen Ort ermittelt - deshalb zwischen C (−20) und D (−40). */
-  if (stufe === 'N') { p -= 25; abzuege.push('Liegenschaftszinssatz abgeleitet aus der DealPilot-Formel, nicht amtlich (−25)'); }
+  /* v2600 · Stufe N als DealPilot-Landesmittel (v2611) traegt ihren eigenen Namen */
+  if (stufe === 'N') { p -= 25; abzuege.push('Liegenschaftszinssatz ' + (lzsNEtikett && /Landesmittel/.test(lzsNEtikett) ? 'als ' + lzsNEtikett : 'abgeleitet aus der DealPilot-Formel') + ', nicht amtlich (−25)'); }
   if (stufe === 'D') { p -= 40; abzuege.push('Liegenschaftszinssatz nur gesetzlicher Auffangwert (−40)'); }
   if (stufe === 'E') { p -= 10; abzuege.push('Liegenschaftszinssatz vom Nutzer gesetzt (−10)'); }
   if (!bwkGeprueft) { p -= 8; abzuege.push('Bewirtschaftungskosten-Tabelle ungeprüft (−8)'); }
