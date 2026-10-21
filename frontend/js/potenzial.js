@@ -662,7 +662,9 @@
       '.dp-pot .dp-markt-knopfzeile{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}.dp-pot .dp-markt-knopfzeile .dp-pot-u{display:inline;flex:1 1 220px}',
       /* auf dem Handy macht tabellen-karten.js aus jeder Kennzahl eine Karte - die Gruppenköpfe wären dort leere Karten */
       '@media(max-width:600px){.dp-pot table.dptk tbody tr.dp-pot-gr{border:0;background:none;padding:8px 2px 0;margin:0}'
-        + '.dp-pot table.dptk tbody tr.dp-pot-gr td{justify-content:flex-start;text-align:left;font:600 10px/1.2 "JetBrains Mono",monospace;letter-spacing:.1em;padding:0 !important;margin:0;border:0 !important}}'
+        + '.dp-pot table.dptk tbody tr.dp-pot-gr td{justify-content:flex-start;text-align:left;font:600 10px/1.2 "JetBrains Mono",monospace;letter-spacing:.1em;padding:0 !important;margin:0;border:0 !important}'
+        + '.dp-pot table.dptk tbody td:first-child{display:block;text-align:left}.dp-pot table.dptk tbody td:first-child::before{content:none}'
+        + '.dp-pot table.dptk tbody td:first-child .dp-pot-z{display:block}}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -751,7 +753,7 @@
       var lzsT = lzsKurz(W.lzs);
       rows.push({ gr: 'Wert' + (W.quelle === 'abruf' ? ' · laut Abruf Marktpreise vom ' + esc(W.datum) : '') });
       rows.push({ t: 'Ertragswert', u: [lzsT, W.leer ? W.leer + ' leere Wohnung' + (W.leer === 1 ? '' : 'en') + ' mit marktüblicher Miete' : ''].filter(Boolean).join(' · '),
-        f: function (k) { var w = WS[k]; return w && w.ew != null ? zz('<b>' + eur(w.ew) + '</b>', w.rnd != null ? 'Restnutzungsdauer&nbsp;' + dez(w.rnd, 0) + '&nbsp;J.' : '') : null; } });
+        f: function (k) { var w = WS[k]; return w && w.ew != null ? zz('<b>' + eur(w.ew) + '</b>', w.rnd != null ? '<abbr title="Restnutzungsdauer" style="text-decoration:none">RND</abbr>&nbsp;' + dez(w.rnd, 0) + '&nbsp;J.' : '') : null; } });
       if (mpiDa) rows.push({ t: 'Marktpreisindikation', u: 'Angebote am Ort' + (ab ? ', abzüglich ' + ab + ' % Abschlag (' + abschlagKurz(MPI.angebote.abschlag_herkunft) + ')' : ''),
         f: function (k) { var w = WS[k]; if (!w || w.mpi == null) return null;
           return zz(eur(w.mpi), k === 'mieterhoehung' ? 'wie Bestand' : (w.spanne ? spanneTsd(w.spanne[0], w.spanne[1]) : '')); } });
@@ -765,17 +767,17 @@
     /* dptk-alle: tabellen-karten.js klappt auf dem Handy ab der 5. Spalte ein - hier wäre das das Zielbild */
     var html = '<div class="dp-pot"><div class="dp-pot-scroll"><table class="dptk-alle"><thead><tr><th>Kennzahl</th>'
       + cols.map(function (c) { var j = c.k === 'bestand' && A ? 'heute' : jahrVon(c.k);
-          return '<th class="' + c.c + '">' + c.t + ((j || c.z) ? '<span class="dp-pot-jahr">' + esc([j, c.z].filter(Boolean).join(' · ')) + '</span>' : '') + '</th>'; }).join('')
+          return '<th class="' + c.c + '">' + c.t + ((j || c.z) ? ' <span class="dp-pot-jahr">' + esc([j, c.z].filter(Boolean).join(' · ')) + '</span>' : '') + '</th>'; }).join('')
       + '</tr></thead><tbody>'
       + rows.map(function (row) {
           if (row.gr) return '<tr class="dp-pot-gr"><td colspan="' + n + '">' + row.gr + '</td></tr>';
           var zellen = cols.map(function (c) { var v = null; try { v = row.f(c.k); } catch (e) { v = null; } return v; });
           if (!zellen.some(function (v) { return v != null && v !== ''; })) return '';   /* v2577 · keine Zeile aus lauter „—" */
-          return '<tr><td>' + row.t + u(row.u) + '</td>' + cols.map(function (c, i) { return '<td class="' + c.c + '">' + (zellen[i] != null && zellen[i] !== '' ? zellen[i] : '—') + '</td>'; }).join('') + '</tr>';
+          return '<tr><td>' + zz(row.t, row.u) + '</td>' + cols.map(function (c, i) { return '<td class="' + c.c + '">' + (zellen[i] != null && zellen[i] !== '' ? zellen[i] : '—') + '</td>'; }).join('') + '</tr>';
         }).join('');
     var HB = WS.bestand;
     if (HB && HB.ew != null && (WS.zielbild || WS.mieterhoehung)) {
-      html += '<tr class="dp-pot-sum"><td>Wertzuwachs nach Kosten' + u('Ertragswert der Stufe − Bestand − Maßnahmen') + '</td>' + cols.map(function (c) {
+      html += '<tr class="dp-pot-sum"><td>' + zz('Wertzuwachs nach Kosten', 'Ertragswert der Stufe − Bestand − Maßnahmen') + '</td>' + cols.map(function (c) {
         if (c.k === 'ankauf' || c.k === 'bestand') return '<td></td>';
         var h = WS[c.k], kk = (m.stufen[c.k] && m.stufen[c.k].kosten) || 0;
         return '<td class="' + c.c + '">' + (h && h.ew != null ? (h.ew - HB.ew - kk >= 0 ? '+' : '') + eur(h.ew - HB.ew - kk) : '—') + '</td>';
