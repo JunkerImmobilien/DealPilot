@@ -547,7 +547,7 @@ window.DealScore2 = (function() {
       qzPts = Math.min(100, Math.max(0, (qz - 1) / 4 * 100));
     }
     bd.push({
-      key: 'qualitaet', name: 'Ausstattungsqualität', value: qz, unit: '★',
+      key: 'qualitaet', name: 'Ausstattungsqualität', value: qz, unit: ' von 5',   /* v2548c · vorher ★ */
       points: qzPts,
       weight: w.qualitaet
     });

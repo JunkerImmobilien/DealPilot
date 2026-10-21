@@ -547,9 +547,9 @@ function renderDealScore2() {
           sb.avg.toFixed(1).replace('.', ',') + ' / 5 aus ' + sb.count + ' Gewerken (Anlage 4 ImmoWertV) → Risiko-Kategorie Qualität.</span>' +
         '</div>'
       : '<div class="ds2-stern-banner">' +
-          '<span class="ds2-stern-icon">★</span>' +
-          '<span><strong>Sterne-Bewertung Q&amp;Z aktiv:</strong> ' +
-          sb.avg.toFixed(1).replace('.', ',') + ' / 5,0 aus ' + sb.count + ' Bereichen → wird im Risiko-Score (Baujahr/Zustand) verwendet.</span>' +
+          '<span class="ds2-stern-icon">▦</span>' +   /* v2548c · keine Sterne im Kundentext (Marcel 21.10.) */
+          '<span><strong>Qualität &amp; Zustand aus dem Import:</strong> Stufe ' +
+          sb.avg.toFixed(1).replace('.', ',') + ' von 5 aus ' + sb.count + ' Bereichen → wird im Risiko-Score (Baujahr/Zustand) verwendet.</span>' +
         '</div>';
   }
 
