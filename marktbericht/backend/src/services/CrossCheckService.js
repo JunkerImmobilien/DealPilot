@@ -1164,6 +1164,17 @@ export const CrossCheckService = {
         + 'Im MFH-Konfigurator je Gewerbeeinheit die marktübliche Miete (€/m²) eintragen.');
     }
 
+    /* v2556 · Rechnet der Ertragswert nicht, sagt die Notiz WAS fehlt - bis hier
+       hiess es nur „eine Pflichtangabe fehlt" (Bismarckstr., 21.10.2026). */
+    if (!_gewObjekt && !_gewSperre) {
+      const _fehlt = [];
+      if (!wfl) _fehlt.push('Wohnfläche');
+      if (!(wflWohnen > 0)) _fehlt.push('Wohnfläche Wohnen');
+      if (!mieteQm) _fehlt.push('Miete je m² (weder Ist-Miete noch Vergleichs- oder Angebotsmiete)');
+      if (rnd == null) _fehlt.push('Restnutzungsdauer (Baujahr bzw. Modernisierung)');
+      if (_fehlt.length) out.notes.push('Ertragswert nicht gerechnet: es fehlt ' + _fehlt.join(', ') + '.');
+    }
+
     if (!_gewObjekt && wfl && mieteQm && rnd != null && !_gewSperre && wflWohnen > 0) {
       /* v1059-WMIET-6 · v2210: nur der Wohnteil */
       /* v2520 · bei Leerstand: vermietete Flaeche x gewaehlte Miete (Band) +
