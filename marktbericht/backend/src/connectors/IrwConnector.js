@@ -134,11 +134,15 @@ export const IrwConnector = {
    * @param {string} o.objektart
    * @param {number} [o.anzahlWe]
    */
-  async hole({ lat, lon, objektart, anzahlWe = null }) {
+  /* v2620 · `ebene` erzwingt eine IRW-Ebene (IRW_EBENEN). Gebraucht, wo ein
+     Ausschuss Doppel- und Reihenhaeuser im EFH-Teilmarkt mitfuehrt (Kreis Herford:
+     Anbauweise-Tabelle im EFH-Dokument, kein eigener Teilmarkt 3) — dann fragt der
+     Aufrufer nach leerem Ergebnis auf Ebene 15 erneut mit ebene: 18. */
+  async hole({ lat, lon, objektart, anzahlWe = null, ebene: ebeneVorgabe = null }) {
     const LA = Number(lat), LO = Number(lon);
     if (!Number.isFinite(LA) || !Number.isFinite(LO)) return null;
 
-    const ebene = ebeneFuer(objektart, anzahlWe);
+    const ebene = ebeneVorgabe || ebeneFuer(objektart, anzahlWe);
     const ebenen = ebene ? [IRW_EBENEN.verfuegbarkeit, ebene] : [IRW_EBENEN.verfuegbarkeit];
 
     const a = await frage(LA, LO, ebenen);
@@ -174,6 +178,7 @@ export const IrwConnector = {
         status: st,
         gemeinde: verf && text(verf.properties && verf.properties.GENA),
         ags: verf && text(verf.properties && verf.properties.GESL),
+        gasl: verf && text(verf.properties && verf.properties.GASL),   /* v2620 */
         hinweis: st && /verf(ue|ü)gbar/i.test(st)
           ? `Für ${(verf && text(verf.properties.GENA)) || 'diese Gemeinde'} liegen Immobilienrichtwerte vor, an dieser Stelle aber keiner für diese Objektart. Der Vergleichswert stützt sich daher auf Angebotspreise.`
           : st
@@ -188,9 +193,23 @@ export const IrwConnector = {
     const irw = zahl(p.IMRW);
     if (!(irw > 0)) return { verfuegbar: false, grund: 'kein_wert' };
 
+    /* v2620 · Fuer die Umrechnung (lib/vergleichswert_irw.js) braucht es die
+       Zonenmerkmale ROH: das Normobjekt steht dort als Code des IRW-Datenmodells
+       (GSTAND 4, MGRAD 2, WHNFL "126-150" …), nicht als Zahl. `normobjekt`
+       unten bleibt fuer die bisherigen Leser; `roh` ist die Wahrheit. */
+    const roh = {};
+    for (const [k, v] of Object.entries(p)) {
+      if (k === 'Shape' || k === 'SHAPE_Length' || k === 'SHAPE_Area' || k === 'OBJECTID') continue;
+      const t = text(v);
+      if (t != null) roh[k] = t;
+    }
+    const tm = Number(p.TEILMA || p.UDOK);
     return {
       verfuegbar: true,
       wert_qm: irw,
+      gasl: text(p.GASL),
+      teilmarkt_code: Number.isFinite(tm) && tm > 0 ? tm : null,
+      roh,
       stichtag: text(p.STAG),
       gutachterausschuss: text(p.GABE),
       gemeinde: text(p.GENA) || text(p.GEMA),
@@ -205,7 +224,10 @@ export const IrwConnector = {
        * Objekt der Lage, nicht fuer jedes. */
       normobjekt: {
         baujahr: zahl(p.BJ),
+        /* v2620 · WHNFL ist oft eine SPANNE ("126-150"): zahl() gab null - die
+           Spanne steht jetzt daneben, statt still zu verschwinden. */
         wohnflaeche_qm: zahl(p.WHNFL),
+        wohnflaeche_spanne: /^\s*\d+\s*-\s*\d+\s*$/.test(String(p.WHNFL || '')) ? text(p.WHNFL) : null,
         wohnlage: text(p.WHNLA),
         ausstattung: text(p.AKL),
         wohnungsanzahl: text(p.WHNA),

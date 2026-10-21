@@ -24,7 +24,10 @@ const KENNZAHLEN = new Set(['liegenschaftszinssatz', 'sachwertfaktor', 'vergleic
   'erbbaurechtskoeffizient', 'erbbauzinssatz', 'bodenpreisindex', 'bodenpreisniveau',
   'durchschnittspreis', 'preisentwicklung', 'rohertragsfaktor',
   /* v2279: Umrechnungskoeffizient Grundstuecksgroesse (§ 19 ImmoWertV) */
-  'umrechnungskoeffizient_flaeche', 'umrechnungskoeffizient_wgfz']);   /* v2361 */
+  'umrechnungskoeffizient_flaeche', 'umrechnungskoeffizient_wgfz',   /* v2361 */
+  /* v2620: Umrechnungskoeffizienten zum Immobilienrichtwert (§ 20, §§ 24–26 ImmoWertV),
+     uk-irw-*.json, gelesen von lib/vergleichswert_irw.js, geprueft von tools/irw-pruefen.mjs */
+  'umrechnung_irw']);
 
 /* ══ v1975 · DIE EINHEIT IST DIE VERWECHSLUNGSPROBE ════════════════════
 
@@ -230,6 +233,21 @@ for (const f of _dateien) {
         const bpi = ma.baupreisindex ?? ma.baupreisindex_stichtag ?? ma.baupreisindex_wert;
         if (!(typeof bpi === 'number' && isFinite(bpi))) fehler.push(`${wo}: modellansaetze.baupreisindex fehlt als Zahl`);
       }
+    }
+    /* v2620 · Vertrag der Kennzahl umrechnung_irw (Marcel 21.10.2026, E7): ein Wert
+       wird ueber Ausschuss (gasl) × Teilmarkt × Jahrgang gefunden; ohne diese drei
+       findet ihn die Rechnung nicht. Stellplaetze: das Modell muss sagen, ob sie im
+       Richtwert stecken (sonst doppelt oder gar nicht gezaehlt). Seite und Normobjekt
+       sind Herkunft. Die Rechenpruefung selbst macht tools/irw-pruefen.mjs. */
+    if (!sperre && s.kennzahl === 'umrechnung_irw') {
+      const f = s.formel || {};
+      if (!/^\d{5}$/.test(String(s.gasl || ''))) fehler.push(`${wo}: gasl fehlt (Gutachterausschusskennziffer, 5-stellig)`);
+      if (!s.jahrgang) fehler.push(`${wo}: jahrgang fehlt`);
+      if (!s.seite) fehler.push(`${wo}: seite fehlt`);
+      if (!(s.geltungsbereich && s.geltungsbereich.teilmarkt)) fehler.push(`${wo}: geltungsbereich.teilmarkt fehlt`);
+      if (typeof f.stellplaetze_im_irw !== 'boolean') fehler.push(`${wo}: formel.stellplaetze_im_irw nicht true/false`);
+      if (!f.normobjekt) fehler.push(`${wo}: formel.normobjekt fehlt`);
+      if (!Array.isArray(f.merkmale) || !f.merkmale.length) fehler.push(`${wo}: formel.merkmale leer`);
     }
     const _FUNDSTELLE_DATEI = /\.(csv|xlsx?|json|txt|zip|gpkg|shp)\b/i;
     (s.belege || []).forEach((b, j) => {

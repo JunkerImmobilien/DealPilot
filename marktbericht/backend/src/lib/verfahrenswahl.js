@@ -311,3 +311,65 @@ export function angepassterZins({
       + 'ersetzt aber keine sachverständige Würdigung des Einzelfalls.',
   };
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+ * 3 · VERFAHRENSWAHL MIT DEM IMMOBILIENRICHTWERT (v2620, Marcel 21.10.2026: E7)
+ *
+ * Seit es einen echten Vergleichswert aus dem Immobilienrichtwert gibt
+ * (lib/vergleichswert_irw.js — IRW × Umrechnungskoeffizienten des Ausschusses,
+ * Stufe A), stellt sich die Wahl neu. Die Regel:
+ *
+ *   Wohnungseigentum (typisch, mehr als zwei WE) mit IRW-Vergleichswert
+ *     → das Vergleichswertverfahren FÜHRT (ImmoWertA 6.(1): bei Wohnungseigentum
+ *       ist es das Regelverfahren, wenn Vergleichspreise/-faktoren vorliegen).
+ *       Ertragswert daneben als Plausibilität.
+ *   Ein-/Zweifamilienhaus mit IRW UND Sachwertfaktor
+ *     → Sachwert bleibt führend (Abschnitt 5.1.4 des Marktberichts, § 6 Abs. 1),
+ *       der Vergleichswert steht als zweites Verfahren daneben.
+ *   Ein-/Zweifamilienhaus mit IRW, OHNE Sachwertfaktor
+ *     → Vergleichswert führt: ein Sachwert ohne Marktanpassung (§ 21 Abs. 3,
+ *       § 39) ist kein Marktwert; der IRW ist es.
+ *   Mehrfamilienhaus / Renditeobjekt
+ *     → Ertragswert führt; ein IRW-Vergleichswert (Teilmarkt MFH) daneben.
+ *
+ * Diese Funktion WÄHLT nur; sie rechnet nichts und ist nicht in den
+ * CrossCheckService eingebunden (das macht die Verdrahtung danach).
+ *
+ * @param {object} o
+ * @param {string} o.objektart
+ * @param {number} [o.wohneinheiten]
+ * @param {string} [o.nutzung]
+ * @param {boolean} o.irw_vergleichswert  vergleichswertIrw(...).verfuegbar
+ * @param {boolean} [o.sachwertfaktor]    ein amtlicher Sachwertfaktor liegt vor
+ * @returns {{fuehrend:string|null, weitere:string[], grund:string, quelle:string, basis:string|null}}
+ * ════════════════════════════════════════════════════════════════════════ */
+export function verfahrenMitIrw({ objektart, wohneinheiten = null, nutzung = null,
+                                  irw_vergleichswert = false, sachwertfaktor = false }) {
+  const irw = irw_vergleichswert === true;
+  const basis = fuehrendesVerfahren({ objektart, wohneinheiten, nutzung,
+    vergleichsbasis: irw ? 'kaufpreise' : null });
+  const v = basis.verfahren;
+
+  if (v === 'vergleichswert') {
+    return { fuehrend: 'vergleichswert', weitere: ['ertragswert'], basis: 'immobilienrichtwert',
+      grund: 'Wohnungseigentum: der Immobilienrichtwert des Gutachterausschusses ist ein Vergleichsfaktor aus Kaufpreisen (§ 20 ImmoWertV); mit seinen Umrechnungskoeffizienten ist das Vergleichswertverfahren das Regelverfahren. Der Ertragswert steht zur Plausibilisierung daneben.',
+      quelle: '§ 6 Abs. 1, §§ 24–26 ImmoWertV · ImmoWertA 6.(1)' };
+  }
+  if (v === 'sachwert') {
+    if (sachwertfaktor === true || !irw) {
+      return { fuehrend: 'sachwert', weitere: irw ? ['vergleichswert'] : [], basis: irw ? 'immobilienrichtwert' : null,
+        grund: basis.grund + (irw ? ' Der Vergleichswert aus dem Immobilienrichtwert steht als zweites Verfahren daneben.' : ''),
+        quelle: basis.quelle };
+    }
+    return { fuehrend: 'vergleichswert', weitere: [], basis: 'immobilienrichtwert',
+      grund: 'Für dieses Objekt liegt kein amtlicher Sachwertfaktor vor; ein Sachwert ohne Marktanpassung ist kein Marktwert (§ 21 Abs. 3, § 39 ImmoWertV). Der Immobilienrichtwert ist aus Kaufpreisen abgeleitet und mit den Umrechnungskoeffizienten des Ausschusses anwendbar — deshalb führt hier das Vergleichswertverfahren.',
+      quelle: '§ 6 Abs. 1, § 21 Abs. 3, §§ 24–26 ImmoWertV' };
+  }
+  if (v === 'ertragswert') {
+    return { fuehrend: 'ertragswert', weitere: irw ? ['vergleichswert'] : [], basis: irw ? 'immobilienrichtwert' : null,
+      grund: basis.grund + (irw ? ' Der Vergleichswert aus dem Immobilienrichtwert (Teilmarkt Mehrfamilienhäuser) steht als zweites Verfahren daneben.' : ''),
+      quelle: basis.quelle };
+  }
+  return { fuehrend: null, weitere: [], basis: null, grund: basis.grund, quelle: basis.quelle || null,
+    fehlt: basis.fehlt || null, weg: basis.weg || null };
+}

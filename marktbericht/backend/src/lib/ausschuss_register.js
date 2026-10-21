@@ -503,6 +503,12 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Hansestadt Rostock 2026, Landkreis Rostock 2026, Vorpommern-Greifswald 2024
                                genehmigungspflichtig - nur Sperren mit Fundstelle und Weg. */
                             'nachernte-2026-10-mv.json',
+                            /* v2620: Umrechnungskoeffizienten zum Immobilienrichtwert NRW (Kennzahl umrechnung_irw,
+                               lib/vergleichswert_irw.js, Pruefer tools/irw-pruefen.mjs): Herford, Bielefeld,
+                               Koeln, Duesseldorf (Sperren), Bonn, Muenster, Dortmund (Sperren, additiv), Bochum,
+                               Essen, Duisburg, Wuppertal; Minden-Luebbecke Sperre (keine IRW beschlossen). */
+                            'uk-irw-nw-owl-2026.json', 'uk-irw-nw-rheinland-2026.json',
+                            'uk-irw-nw-ruhr-ost-2026.json', 'uk-irw-nw-ruhr-west-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
