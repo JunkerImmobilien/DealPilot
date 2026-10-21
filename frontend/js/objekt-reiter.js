@@ -594,7 +594,8 @@
     }
     var l = ['plz', 'ort', 'str', 'objart', 'wfl', 'baujahr'];
     if (stufe >= 2) {
-      l = l.concat(['kp', 'nkm', 'ds2_zustand', 'ds2_energie', 'standardstufe', 'zimmer']);
+      l = l.concat(['kp', 'nkm', 'ds2_zustand', 'ds2_energie', 'standardstufe']);
+      if (art !== 'MFH') l.push('zimmer');   /* v2557: beim MFH blendet objektart-felder.js Zimmer aus - kein Pflichtfeld, das man nicht sieht */
       if (art === 'ETW') l.push('etage');
       if (art === 'MFH') l.push('einheiten');
     }

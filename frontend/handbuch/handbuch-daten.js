@@ -2,11 +2,11 @@
 window.DP_HANDBUCH = {
  "version": "v2555",
  "quellen": {
-  "index.html": "2e288a51b4d35501",
-  "tooltip-content.js": "4ac19b29bc691f75",
+  "index.html": "3539746ea12db2bc",
+  "tooltip-content.js": "ede920d2f6583fdc",
   "help.js": "f7e7ccb0d347a0e2",
   "tour-content.js": "337253bde80bf1e1",
-  "objekt-reiter.js": "64beaea4aed16e97",
+  "objekt-reiter.js": "146e176f961a3b25",
   "deal-action-readycheck.js": "4d9c815073f8d2ab",
   "feld-hilfe.js": "db5913c4ec4dc08e",
   "mfh-einheiten.js": "9fdc26a09d7d7669",
@@ -18,7 +18,7 @@ window.DP_HANDBUCH = {
   "werbungskosten-pdf.js": "4048d673682f3acb",
   "pdf-anlage-bmf.js": "41997cf31f29fb07",
   "pdf-kaufpreisaufteilung.js": "fe5f492746a957c4",
-  "frontend-konstanten.json": "23112c7e110e0b6d",
+  "frontend-konstanten.json": "494c505bc98da6d7",
   "aufnahme.json": "9c3a9574aa6030d0"
  },
  "reiter": [
@@ -5073,7 +5073,12 @@ window.DP_HANDBUCH = {
    "optionen": null,
    "hinweis": "",
    "titel": "",
-   "tip": null,
+   "tip": {
+    "titel": "Zinssatz nominal",
+    "text": "Der Sollzins deines Darlehens laut Bankangebot, in Prozent pro Jahr. Er bestimmt die Zinsen und damit Rate, Cashflow und DSCR — und über die Schuldzinsen auch die Werbungskosten in der Steuer. Vorbelegt wird er aus deinen Einstellungen (eigener Zins oder indikativer Marktzins); mit einem echten Angebot trägst du hier dessen Satz ein.",
+    "beispiel": "",
+    "paragraf": ""
+   },
    "ds2": false,
    "pflichtMarke": true,
    "woher": "Finanzierungsangebot der Bank",
@@ -9943,7 +9948,6 @@ window.DP_HANDBUCH = {
      "ds2_zustand",
      "ds2_energie",
      "standardstufe",
-     "zimmer",
      "einheiten"
     ],
     "3": [
@@ -9958,7 +9962,6 @@ window.DP_HANDBUCH = {
      "ds2_zustand",
      "ds2_energie",
      "standardstufe",
-     "zimmer",
      "einheiten",
      "nutzungsart",
      "gsfl",
@@ -11942,9 +11945,7 @@ window.DP_HANDBUCH = {
    }
   ]
  },
- "auffaellig": [
-  "d1z trägt den Hilfetext tab5.zinsbindung („Zinsbindung“)"
- ],
+ "auffaellig": [],
  "aufnahme": {
   "am": "2026-10-21",
   "ansicht": {

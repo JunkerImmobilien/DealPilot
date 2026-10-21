@@ -321,6 +321,12 @@
       body: 'Wie lange ist dein Zinssatz fixiert? Kurze Bindung (5-10 Jahre) = flexibler + günstiger, aber höheres Anschlussrisiko. Lange Bindung (15-25 Jahre) = Planungssicherheit + Preisaufschlag. Bei aktueller flacher Zinsstruktur: 10-15 Jahre meist optimal.',
       severity: 'beginner'
     },
+    /* v2557 · am Feld Zinssatz (d1z) hing bis hier der Text zur Zinsbindung - gefunden beim Handbuch */
+    'tab5.zinssatz': {
+      title: 'Zinssatz nominal',
+      body: 'Der Sollzins deines Darlehens laut Bankangebot, in Prozent pro Jahr. Er bestimmt die Zinsen und damit Rate, Cashflow und DSCR — und über die Schuldzinsen auch die Werbungskosten in der Steuer. Vorbelegt wird er aus deinen Einstellungen (eigener Zins oder indikativer Marktzins); mit einem echten Angebot trägst du hier dessen Satz ein.',
+      severity: 'beginner'
+    },
     'tab5.tilgung': {
       title: 'Tilgung p.a.',
       body: 'Wieviel deiner Schulden tilgst du pro Jahr (in % der Darlehenssumme). Banken verlangen heute meist mindestens 2%. Höhere Tilgung = schnellere Entschuldung + geringere Restschuld bei Anschlussfinanzierung. Faustregel: mindestens 2,5% bei 10 Jahre Zinsbindung.',
