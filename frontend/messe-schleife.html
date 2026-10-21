@@ -7,7 +7,10 @@
 <meta name="robots" content="noindex">
 <!--
   messe-schleife-1 · Dauerschleife für den Messebildschirm (21.10.2026).
-  Aufruf: messe-schleife.html?idee=1 … 6, ?idee=alle — ohne Parameter die Auswahl.
+  Aufruf: ohne Parameter der Rundgang (messe-schleife-4: echte Videothek-Aufnahmen, rundgang.js),
+  ?idee=auswahl die Auswahl, ?idee=1 … 6, ?idee=alle.
+  Rundgang-Videos: online landing/medien/videothek/ (volle Videos, Zeitmarken), offline
+  messe-schleife/clips/rundgang/rg-*.mp4 (geschnittene Ausschnitte, nicht im Git).
   messe-schleife-2: ohne Netz lauffähig, auch direkt von der Platte (file://):
   keine externen Abrufe, alle Pfade relativ, KEIN Service Worker.
   Stumm, ohne Bedienung, 1920 x 1080 auf jedes Fenster skaliert.
@@ -16,12 +19,14 @@
 -->
 <script>/* Fehlerprotokoll fuer den Pruefer: window.DPS_FEHLER (Skript-, Versprechen- und Ladefehler) */
 window.DPS_FEHLER=[];addEventListener('error',function(e){DPS_FEHLER.push(e.message||('Ladefehler '+((e.target&&(e.target.currentSrc||e.target.src))||'?')))},true);addEventListener('unhandledrejection',function(e){DPS_FEHLER.push('Promise: '+(e.reason&&e.reason.message||e.reason))});</script>
-<link rel="stylesheet" href="messe-schleife/schleife.css?v=messe-schleife-3">
+<link rel="stylesheet" href="messe-schleife/schleife.css?v=messe-schleife-4">
 </head>
 <body>
 <div id="buehne"></div>
 <script src="js/score-tiers.js?v=v1950"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
-<script src="messe-schleife/schleife.js?v=messe-schleife-2"></script>
+<script src="js/dp-qr.js?v=v2180"></script>
+<script src="messe-schleife/rundgang.js?v=messe-schleife-4"></script>
+<script src="messe-schleife/schleife.js?v=messe-schleife-4"></script>
 </body>
 </html>
