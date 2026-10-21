@@ -3461,11 +3461,12 @@ function _bxBelwPdf(doc, data) {
   var eur = function (x) { return (x == null || !isFinite(x)) ? '-' : Math.round(x).toLocaleString('de-DE') + ' €'; };
   var pc = function (x, d) { return (x == null || !isFinite(x)) ? '-' : Number(x).toLocaleString('de-DE', { minimumFractionDigits: d == null ? 1 : d, maximumFractionDigits: d == null ? 1 : d }) + ' %'; };
   doc.addPage();
-  doc.setFillColor(42, 39, 39); doc.rect(0, 0, 297, 22, 'F');
+  var W = doc.internal.pageSize.getWidth(), TW = W - 24;
+  doc.setFillColor(42, 39, 39); doc.rect(0, 0, W, 22, 'F');
   doc.setTextColor.apply(doc, window._pdfGold()); doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
   doc.text('Beleihungswert-Check - indikativ (BelWertV)', 12, 14);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(60, 60, 60);
-  var intro = doc.splitTextToSize(L('Was eine Bank nach der Beleihungswertermittlungsverordnung ungefähr ansetzen würde, gerechnet aus dem letzten Marktbericht je Objekt. Kein Beleihungswertgutachten nach § 5 BelWertV, keine Festsetzung durch die Bank und kein Verkehrswert. Nachhaltige Miete mit der Vertragsmiete als Obergrenze (§ 10), Bewirtschaftungskosten mindestens 15 % (§ 11), Mindestkapitalisierungszins (§ 12 Abs. 4), 10 % Sicherheitsabschlag auf die Herstellungskosten (§ 16), Ertragswert als Obergrenze (§ 4).'), 273);
+  var intro = doc.splitTextToSize(L('Was eine Bank nach der Beleihungswertermittlungsverordnung ungefähr ansetzen würde, gerechnet aus dem letzten Marktbericht je Objekt. Kein Beleihungswertgutachten nach § 5 BelWertV, keine Festsetzung durch die Bank und kein Verkehrswert. Nachhaltige Miete mit der Vertragsmiete als Obergrenze (§ 10), Bewirtschaftungskosten mindestens 15 % (§ 11), Mindestkapitalisierungszins (§ 12 Abs. 4), 10 % Sicherheitsabschlag auf die Herstellungskosten (§ 16), Ertragswert als Obergrenze (§ 4).'), TW);
   doc.text(intro, 12, 29);
   var body = mit.map(function (o) {
     var r = je[o.id], e = r.ertragswert || {}, a = r.auslauf;
@@ -3491,13 +3492,13 @@ function _bxBelwPdf(doc, data) {
     if (r.auslauf) hw.push(r.auslauf.text);
     if (r.kleindarlehen) hw.push(r.kleindarlehen.text);
     if (!hw.length) return;
-    var t = doc.splitTextToSize(L(_bxName(o) + ': ' + hw.join(' ')), 273);
+    var t = doc.splitTextToSize(L(_bxName(o) + ': ' + hw.join(' ')), TW);
     if (y + t.length * 3.2 > ph - 14) { doc.addPage(); y = 16; }
     doc.text(t, 12, y); y += t.length * 3.2 + 2;
   });
   var mz = (data.belw.parameter || {}).mindestzins || {}, rd = (data.belw.parameter || {}).rendite_30j || {};
   var q = doc.splitTextToSize(L('Mindestkapitalisierungszins ' + (mz.wohnen_pct != null ? pc(mz.wohnen_pct) + ' Wohnen / ' + pc(mz.gewerbe_pct) + ' Gewerbe (BaFin, gültig seit ' + (mz.gueltig_ab || '-') + ')' : 'nicht hinterlegt: Untergrenze 3,5 %')
-    + (rd.pct != null ? '; Rendite 30-jähriger Bundesanleihen ' + pc(rd.pct, 2) + ' am ' + (rd.datum || '-') + ' (Deutsche Bundesbank)' : '') + '. Beleihungsauslauf = aktuelle Restschuld / Beleihungswert; 60-%-Grenze nach § 14 PfandBG.'), 273);
+    + (rd.pct != null ? '; Rendite 30-jähriger Bundesanleihen ' + pc(rd.pct, 2) + ' am ' + (rd.datum || '-') + ' (Deutsche Bundesbank)' : '') + '. Beleihungsauslauf = aktuelle Restschuld / Beleihungswert; 60-%-Grenze nach § 14 PfandBG.'), TW);
   if (y + q.length * 3.2 > ph - 10) { doc.addPage(); y = 16; }
   doc.setTextColor(120, 120, 120); doc.text(q, 12, y);
 }
@@ -3645,7 +3646,6 @@ async function exportGlobalBankPDF() {
   doc.setTextColor(150, 150, 150);
   doc.text((typeof _getUserContact === 'function' ? _formatContact(_getUserContact()) : 'Junker Immobilien · Hermannstr. 9 · 32609 Hüllhorst · www.junker-immobilien.io'), 12, pageHeight - 6);
 
-  try { _bxBelwPdf(doc, data); } catch (e) { console.warn('[v2630] Beleihungswert-PDF:', e && e.message); }   /* v2630 */
   if (typeof _applyWatermarkIfFree === 'function') { try { var _np=doc.internal.getNumberOfPages(); for(var _p=1;_p<=_np;_p++){ doc.setPage(_p); _applyWatermarkIfFree(doc, 297); } } catch(e){} } /*v898-p4*/
   var _bxCo = ((typeof _getBranding === 'function') ? (_getBranding().company || 'DealPilot') : 'DealPilot').replace(/[^a-zA-Z0-9]/g, '_');
   doc.save(_bxCo + '_Bankexport_Portfolio_' + new Date().toISOString().slice(0, 10) + '.pdf');
@@ -4232,6 +4232,8 @@ async function exportGlobalBankPDF() {
   doc.setTextColor(150, 150, 150);
   doc.text((typeof _getUserContact === 'function' ? _formatContact(_getUserContact()) : 'Junker Immobilien · Hermannstr. 9 · 32609 Hüllhorst · www.junker-immobilien.io'), 12, pageH - 6);
 
+  /* v2630b: die AKTIVE Bank-PDF ist diese zweite Definition (A3) - die erste weiter oben wird von ihr ueberschrieben */
+  try { _bxBelwPdf(doc, data); } catch (e) { console.warn('[v2630] Beleihungswert-PDF:', e && e.message); }
   if (typeof _applyWatermarkIfFree === 'function') { try { var _npA=doc.internal.getNumberOfPages(); for(var _pA=1;_pA<=_npA;_pA++){ doc.setPage(_pA); _applyWatermarkIfFree(doc, doc.internal.pageSize.getWidth()); } } catch(e){} } /*v899-bankexport*/
   doc.save(((((typeof _getBranding==='function')?(_getBranding().company||'DealPilot'):'DealPilot').replace(/[^a-zA-Z0-9]/g,'_'))+'_AuswertungBank_') + new Date().toISOString().slice(0, 10) + '.pdf');
   toast('✓ PDF erstellt (A3 Querformat)');
