@@ -341,3 +341,4 @@ img{max-width:100%;display:block}
   .b-cta-voll{display:none}
   .b-cta-kurz{display:inline}
 }
+@media(max-width:340px){ .b-cta{padding:9px 10px} }
