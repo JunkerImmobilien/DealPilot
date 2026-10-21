@@ -42066,3 +42066,10 @@ Marcel 21.10.2026: Bericht 330 (Bismarckstr. 27 Detmold) „MPI knapp 60 % unter
   1. **Entscheidung für Marcel:** Herford nennt eine Spanne, keinen Einzelbetrag — abgezogen wird die Untergrenze 5.000 €, gekennzeichnet „bis 15.000 € möglich". Wenn er Mitte oder nur Hinweis will: eine Zeile im Kern.
   2. Die Nachprüfung erkennt Verhältnisse nur in der Form „X liegt N Prozent über/unter Y"; „um N Prozent höher angesetzt" wird nicht beurteilt (in 331 war es richtig).
   3. Prod nicht angefasst (Stand Rollout 59).
+
+### v2671 und Prod-Rollout (60) (21.10.2026, Staging + Produktion)
+
+Marcel 21.10.2026: „ja rollout 60 und zu 2. bitte nimm das, was ein Gutachter machen würde und laut deiner Recherche am besten ist".
+
+- **v2671 (`2e6fc0d0`):** Garage im Normobjekt des Immobilienrichtwerts, Objekt ohne Garage: Abzug = **Mitte** der Zeitwertspanne des Ausschusses statt Untergrenze (Normobjekt = durchschnittliches Objekt; Untergrenze wies den Wert systematisch zu hoch aus). Herford EFH (S. 3, 5.000–15.000 €): 5.000 → 10.000 €; Löhner Str. 278 ohne Garage 324.932 → 319.932 € (B36). Prüfstrecke A 80/80, B 118/118, C 99/99; irw, beleihungswert, saat --basislinie grün.
+- **Prod-Rollout (60):** `e45d2986` auf `main` = Staging `2e6fc0d0` (v2670/v2670a KI-Zahlenprüfung, Mietpreisübersicht außerhalb der Größentabelle, Garage; v2671). Sicherungen vorher `/root/backups/haupt-20261021-2022.sql.gz` (14 MB, 73 Tabellen), `mb-20261021-2022.sql.gz` (27 MB, 34 Tabellen). mb-backend gebaut („skip 021", :4000), `register-saat` SOLL = IST 4.319, 0 verwaist. Im Container: `ki_text_pruefung.js` vorhanden, „Mitte der Zeitwertspanne" im Kern. mb-health 200, Gold-Audit RC 0.
