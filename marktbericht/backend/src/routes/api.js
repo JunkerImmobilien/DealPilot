@@ -19,7 +19,9 @@ import { BorisConnector } from '../connectors/BorisConnector.js';
 import { HarvestService } from '../services/HarvestService.js';
 /* WIMP-3 */
 import { MarktberichtImportService } from '../services/MarktberichtImportService.js';
-import { sperreRest, merkeLauf } from '../lib/harvestScheduler.js';
+import { sperreRest, merkeLauf, laufStand } from '../lib/harvestScheduler.js';
+/* v2591 · Deckung des Registers fuer die Admin-Ansicht „Register & Ernte" */
+import { registerDeckung, zellenListe, KZ_NAME as DECKUNG_KZ } from '../lib/register_deckung.js';
 import { q as qMb } from '../lib/db.js';
 import { DestatisConnector } from '../connectors/stubConnectors.js';
 import { AgsResolver } from '../connectors/AgsResolver.js';
@@ -72,6 +74,32 @@ router.get('/register/stand', (req, res) => {
       datei: String(g.datei).split('/').pop(), saetze: g.saetze })),
     vermisst: (st.vermisst || []).map((v) => String(v.datei).split('/').pop()),
   });
+});
+
+/* ── v2591 · DECKUNG DES REGISTERS, fuer die Admin-Ansicht ─────────────
+ *
+ * Abgesichert wie /harvest/status: lesend offen nur im Docker-Netz, von
+ * aussen ausschliesslich ueber den Admin-Proxy des Haupt-Backends
+ * (/admin/register/deckung, requireAdmin). In routes/marktbericht.js des
+ * Haupt-Backends steht dieser Weg bewusst NICHT.
+ *
+ * Schreibt genau eine Zeile je Tag in mb.register_deckung_lauf (eigene
+ * Tabelle, Migration 021) — den Schnappschuss fuer den Verlauf. */
+router.get('/register/deckung', async (req, res) => {
+  try {
+    res.json(await registerDeckung({ q: qMb, laufStand }));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.get('/register/deckung/zelle', (req, res) => {
+  const land = String(req.query.land || '').toUpperCase();
+  const kz = String(req.query.kz || '');
+  if (!/^[A-Z]{2}$/.test(land) || !DECKUNG_KZ[kz]) {
+    return res.status(400).json({ error: 'land (zwei Buchstaben) und kz ('
+      + Object.keys(DECKUNG_KZ).join(', ') + ') erforderlich' });
+  }
+  try { res.json({ land, kz, ausschuesse: zellenListe(land, kz) }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 /**

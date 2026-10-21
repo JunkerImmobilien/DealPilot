@@ -1986,6 +1986,22 @@ router.post('/marktzinsen/import', requireAdmin, express.json({ limit: '60mb' })
   catch (e) { res.status(502).json({ ok: false, grund: 'mb-Backend nicht erreichbar: ' + e.message }); }
 });
 
+/* v2591 · Register & Ernte — Deckung des Registers, Kaufliste, Ernte-Eingang.
+ * Nur lesend; der mb-Weg ist von aussen sonst nicht erreichbar. */
+router.get('/register/deckung', requireAdmin, async (req, res) => {
+  try { const o = await _mbCall('GET', '/register/deckung'); res.status(o.status).json(o.data); }
+  catch (e) { res.status(502).json({ error: 'mb-Backend nicht erreichbar: ' + e.message }); }
+});
+router.get('/register/deckung/zelle', requireAdmin, async (req, res) => {
+  const land = String(req.query.land || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
+  const kz = String(req.query.kz || '').replace(/[^a-z_]/g, '').slice(0, 20);
+  try {
+    const o = await _mbCall('GET', '/register/deckung/zelle?land=' + encodeURIComponent(land)
+      + '&kz=' + encodeURIComponent(kz));
+    res.status(o.status).json(o.data);
+  } catch (e) { res.status(502).json({ error: 'mb-Backend nicht erreichbar: ' + e.message }); }
+});
+
 router.post('/marktzinsen/uebernehmen', requireAdmin, async (req, res) => {
   try { const o = await _mbCall('POST', '/harvest/uebernehmen', req.body || {}); res.status(o.status).json(o.data); }
   catch (e) { res.status(502).json({ error: 'mb-Backend nicht erreichbar: ' + e.message }); }

@@ -526,7 +526,14 @@ export function fehlendeSaatdateien() {
   } catch (e) { return []; }
 }
 
-export function ladeSaat(dateien = SAATDATEIEN) {
+/* v2591 · DER LESEWEG DER SAAT, OHNE DEN ZUSTAND ANZUFASSEN.
+   Die Deckungsauskunft (register_deckung.js) muss dieselben Dateien auf
+   demselben Weg lesen wie der Bericht — aber ladeSaat() SETZT das Register
+   neu und wuerfe den DB-Stand des laufenden Servers weg. Deshalb ist das
+   Lesen hier herausgezogen; ladeSaat() ruft genau diese Funktion.
+   `_datei` traegt den Dateinamen am Satz mit — nur fuer die Auskunft, der
+   Rechenweg liest das Feld nicht. */
+export function leseSaatdateien(dateien = SAATDATEIEN, { mitDatei = false } = {}) {
   const liste = (Array.isArray(dateien) ? dateien : [dateien])
     .map((d) => (String(d).includes('/') ? String(d) : join(HIER, 'register', d)));
   const alle = [];
@@ -536,13 +543,21 @@ export function ladeSaat(dateien = SAATDATEIEN) {
     try {
       const saetze = JSON.parse(readFileSync(datei, 'utf8'));
       if (!Array.isArray(saetze)) throw new Error('kein Array');
-      alle.push(...saetze);
+      if (mitDatei) {
+        const kurz = String(datei).split(/[\\/]/).pop();
+        for (const s of saetze) alle.push({ ...s, _datei: kurz });
+      } else alle.push(...saetze);
       gelesen.push({ datei, saetze: saetze.length });   /* v1084a-WMRG */
     } catch (e) {
       vermisst.push({ datei, fehler: e.message });
       console.error('[register] Saatdatei nicht lesbar:', datei, e.message);
     }
   }
+  return { alle, gelesen, vermisst };
+}
+
+export function ladeSaat(dateien = SAATDATEIEN) {
+  const { alle, gelesen, vermisst } = leseSaatdateien(dateien);
   if (alle.length) {
     _saat = alle;                                 /* v1084a-WMRG */
     _index = indizieren(alle);

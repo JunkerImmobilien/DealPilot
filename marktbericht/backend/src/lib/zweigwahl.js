@@ -642,4 +642,46 @@ export function zinssatzFuerObjekt(deps, ags, obj = {}) {
     register_ebene: r.register_ebene || null, register_ags: r.register_ags || null, roh: r };
 }
 
-export default { dekodiere, typVon, waehle, zinssatzFuerObjekt };
+/* ── v2591 · Zweig des Registers → Objektgruppe (nur für die Auskunft) ──
+ *
+ * Die Admin-Ansicht „Register & Ernte" zählt je Objektart. Erfunden wird
+ * dafür nichts: der Zweig wird mit dekodiere() zerlegt, und die Art wird
+ * über ART_RANG zurückgelesen — also über GENAU die Tabelle, mit der der
+ * Bericht entscheidet, welcher Zweig zu welchem Objekt passt. Eine Art,
+ * die in keiner Zeile von ART_RANG steht (z. B. `alle`, `ifw`), bleibt
+ * „ohne Objektart-Trennung" — und trägt ihren Namen mit, damit sichtbar
+ * ist, was dahinter steckt. Der Rechenweg ruft diese Funktion nicht. */
+const _GRUPPE_VON_TYP = {
+  efh: 'ezfh', dhh: 'ezfh', reh: 'ezfh', rmh: 'ezfh', rh: 'ezfh', villa: 'ezfh', zfh: 'ezfh',
+  dreifh: 'mfh', mfh: 'mfh', mfh_bis6: 'mfh', mfh_ueber6: 'mfh', wgh: 'mfh',
+  etw: 'etw', etw_selbst: 'etw', teileigentum: 'etw',
+  buero: 'gewerbe', handel: 'gewerbe', gewerbe: 'gewerbe', hotel: 'gewerbe', logistik: 'gewerbe',
+};
+export const OBJEKTGRUPPEN = Object.freeze({
+  ezfh: 'Ein-/Zweifamilienhaus', mfh: 'Mehrfamilien-/Wohn- und Geschäftshaus',
+  etw: 'Eigentumswohnung', gewerbe: 'Gewerbe', uebergreifend: 'ohne Objektart-Trennung',
+});
+export function objektgruppe(zweig) {
+  const d = dekodiere(zweig);
+  const art = d.art || '';
+  const gruppen = new Set();
+  for (const [typ, liste] of Object.entries(ART_RANG)) {
+    if (liste.includes(art) || typ === art) gruppen.add(_GRUPPE_VON_TYP[typ]);
+  }
+  gruppen.delete(undefined);
+  /* Steht eine Art in zwei Gruppen (z. B. `mfh` auch unter `wgh`), gilt
+     die Gruppe des gleichnamigen Typs; sonst die erste. */
+  if (_GRUPPE_VON_TYP[art]) return { gruppe: _GRUPPE_VON_TYP[art], art };
+  if (gruppen.size) return { gruppe: [...gruppen][0], art };
+  /* Zusammengesetzte Arten, die dekodiere() nicht zerlegt (`efh_bis1990`,
+     `mfh_nord`, `indwb_bu`, `ggg_gew_unter50`): das erste Glied gegen
+     dieselbe Tabelle. `ifw`, `iwb`, `alle` bleiben übergreifend. */
+  const kopf = art.split('_')[0];
+  if (kopf && kopf !== art) {
+    const r = objektgruppe(kopf);
+    if (r.gruppe !== 'uebergreifend') return { gruppe: r.gruppe, art };
+  }
+  return { gruppe: 'uebergreifend', art };
+}
+
+export default { dekodiere, typVon, waehle, zinssatzFuerObjekt, objektgruppe };

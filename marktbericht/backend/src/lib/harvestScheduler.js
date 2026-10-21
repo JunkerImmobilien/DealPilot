@@ -22,6 +22,15 @@ const SPERRE_MS = 60 * 60 * 1000;            // eine Stunde je Quelle
 
 const zuletzt = new Map();                    // source_id -> Zeitstempel
 
+/* v2591 · Der letzte Durchgang des Takts, fuer die Admin-Ansicht
+ * „Register & Ernte". Nur im Speicher: nach einem Neustart steht hier
+ * null, und die Ansicht faellt auf max(letzter_check) der Quellen zurueck
+ * — das sagt sie dann auch. */
+let _letzterLauf = null;
+export function laufStand() {
+  return { an: AN(), takt_stunden: TAKT_MS / 3600000, letzter_lauf: _letzterLauf };
+}
+
 /** Wurde diese Quelle gerade erst geprueft? Gibt die Restzeit zurueck. */
 export function sperreRest(sourceId) {
   const t = zuletzt.get(String(sourceId));
@@ -43,8 +52,11 @@ function faelligeAnzahl() {
 
 async function durchgang() {
   if (!AN()) return;
+  const beginn = new Date().toISOString();
   try {
     const b = await HarvestService.discover({ limit: faelligeAnzahl() });
+    _letzterLauf = { beginn, ende: new Date().toISOString(), geprueft: b ? b.geprueft : null,
+                     neu: b ? b.neu : null, fehler: b && b.fehler ? b.fehler.length : null };
     if (b && (b.neu || b.fehler.length)) {
       /* v1047-WOUT-2 · Bisher stand nur die Anzahl da. Der Taktgeber laeuft
        * alle sechs Stunden gegen fremde Behoerdenserver — wogegen er
@@ -55,6 +67,7 @@ async function durchgang() {
       if (b.fehler.length > 5) console.log(`[harvest]   ... und ${b.fehler.length - 5} weitere`);
     }
   } catch (e) {
+    _letzterLauf = { beginn, ende: new Date().toISOString(), abbruch: e.message };
     console.log('[harvest] Durchgang fehlgeschlagen:', e.message);
   }
 }
