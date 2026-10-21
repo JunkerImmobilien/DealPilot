@@ -406,19 +406,23 @@ export function vergleichswertIrw({ irw, objekt = {}, bog = [], saetze = null, e
   /* ══ v2670 · GARAGE IM NORMOBJEKT, OBJEKT OHNE (Marcel 21.10.2026) ══════════
      Enthaelt das Normobjekt eine Garage/einen Stellplatz und das Objekt hat keine,
      wird abgezogen - NUR in der Hoehe, die der Ausschuss selbst angibt
-     (formel.garage_normobjekt: zeitwert_eur, sonst die Untergrenze der Spanne
-     zeitwert_eur_von, mit Seite). Ein Koeffizient des Ausschusses steht als Merkmal
+     (formel.garage_normobjekt: zeitwert_eur, sonst die MITTE der Spanne
+     zeitwert_eur_von/_bis, mit Seite). v2671 · Marcel 21.10.2026 „was ein
+     Gutachter machen wuerde": das Normobjekt ist ein durchschnittliches Objekt,
+     seine Garage also eine durchschnittliche - ohne Angaben zu Alter/Zustand die
+     Mitte der Zeitwertspanne, nicht die Untergrenze (die den Wert systematisch
+     zu hoch ausweist). Ein Koeffizient des Ausschusses steht als Merkmal
      in formel.merkmale und rechnet oben mit. Ohne Betrag bleibt es beim Hinweis. */
   const gn = f.stellplaetze_im_irw === true ? (f.garage_normobjekt || null) : null;
   let garage = null;
   if (gn) {
     const einzel = num(gn.zeitwert_eur), von = num(gn.zeitwert_eur_von), bis = num(gn.zeitwert_eur_bis);
-    const betrag = einzel != null ? einzel : von;
+    const betrag = einzel != null ? einzel : (von != null && bis != null ? Math.round((von + bis) / 2) : von);
     const spanne = einzel == null && von != null && bis != null;
     const fund = `${satz.gaa_name || 'Gutachterausschuss'}, Örtliche Fachinformationen ${satz.jahrgang}, ${gn.seite || satz.seite || ''}`.trim();
     if (objekt.garage === false && betrag > 0) {
       const detail = spanne
-        ? `Untergrenze der Zeitwertspanne des Ausschusses (${eur(von)} bis ${eur(bis)}${gn.abhaengig ? ', ' + gn.abhaengig : ''}; ${fund})`
+        ? `Mitte der Zeitwertspanne des Ausschusses (${eur(von)} bis ${eur(bis)}${gn.abhaengig ? ', ' + gn.abhaengig : ''}; ${fund})`
         : `Zeitwert nach Angabe des Ausschusses (${fund})`;
       bogListe.unshift({ pos: 'Garage des Normobjekts (Objekt ohne Garage)', eur: -betrag, detail, quelle: 'ausschuss' });
       garage = { fall: 'abzug', eur: -betrag, spanne: spanne ? [von, bis] : null, fundstelle: fund };
@@ -438,7 +442,7 @@ export function vergleichswertIrw({ irw, objekt = {}, bog = [], saetze = null, e
   if (f.stellplaetze_im_irw === true) {
     if (garage && garage.fall === 'abzug') {
       hinweise.push('Das Normobjekt enthält eine Garage, das Objekt hat keine: abgezogen sind ' + eur(-garage.eur)
-        + (garage.spanne ? ' — die Untergrenze der vom Ausschuss angegebenen Zeitwertspanne (' + eur(garage.spanne[0]) + ' bis ' + eur(garage.spanne[1]) + '); der Abzug kann je nach Größe, Alter und Ausstattung der Garage bis ' + eur(garage.spanne[1]) + ' betragen' : '')
+        + (garage.spanne ? ' — die Mitte der vom Ausschuss angegebenen Zeitwertspanne (' + eur(garage.spanne[0]) + ' bis ' + eur(garage.spanne[1]) + '); je nach Größe, Alter und Ausstattung der Garage liegt der Abzug zwischen ' + eur(garage.spanne[0]) + ' und ' + eur(garage.spanne[1]) : '')
         + ' (' + garage.fundstelle + ').');
     } else if (garage && garage.fall === 'kein_betrag') {
       hinweise.push('Das Normobjekt enthält eine Garage oder einen Stellplatz, das Objekt hat keine. Der Ausschuss nennt dafür keinen Betrag; '

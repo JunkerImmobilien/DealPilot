@@ -718,13 +718,14 @@ fallB('B36', () => {
   const unb = ccFall('loehner', (a) => { a[4].irw = klon(irwB30); a[0].garages = null; a[0].outdoor_parking = null; });
   const vm = mit && mit.vergleichswert_irw, vo = ohne && ohne.vergleichswert_irw, vu = unb && unb.vergleichswert_irw;
   wert('B', 'B36', 'Löhner mit Garage: Vergleichswert wie B30 (kein Abzug)', vm && vm.verfuegbar ? vm.vergleichswert_eur : null, 329932, 0);
-  wert('B', 'B36', 'Löhner ohne Garage: 329.932 − 5.000 (Untergrenze der Spanne des Ausschusses)', vo && vo.verfuegbar ? vo.vergleichswert_eur : null, 324932, 0);
-  pruefe('B', 'B36', 'ohne Garage: Rechenweg-Zeile „Garage des Normobjekts" −5.000 mit Spanne und Seite',
-    !!vo && vo.rechenweg.some((z) => /Garage des Normobjekts/.test(z.pos) && z.wert === -5000 && /5\.000 € bis 15\.000 €.*S\. 3/.test(z.detail)),
+  // v2671: Mitte der Spanne statt Untergrenze (vorher v2670: 324.932)
+  wert('B', 'B36', 'Löhner ohne Garage: 329.932 − 10.000 (Mitte der Spanne 5.000–15.000 des Ausschusses)', vo && vo.verfuegbar ? vo.vergleichswert_eur : null, 319932, 0);
+  pruefe('B', 'B36', 'ohne Garage: Rechenweg-Zeile „Garage des Normobjekts" −10.000 mit Spanne und Seite',
+    !!vo && vo.rechenweg.some((z) => /Garage des Normobjekts/.test(z.pos) && z.wert === -10000 && /Mitte.*5\.000 € bis 15\.000 €.*S\. 3/.test(z.detail)),
     vo ? (vo.rechenweg.find((z) => /Garage/.test(z.pos)) || {}).detail : '');
   wert('B', 'B36', 'Garage nicht angegeben: kein Abzug', vu && vu.verfuegbar ? vu.vergleichswert_eur : null, 329932, 0);
   pruefe('B', 'B36', 'Garage nicht angegeben: Hinweis mit Betrag und Ort der Angabe',
-    !!vu && (vu.hinweise || []).some((h) => /nicht angegeben/.test(h) && /5\.000 €/.test(h)));
+    !!vu && (vu.hinweise || []).some((h) => /nicht angegeben/.test(h) && /10\.000 €/.test(h)));
 });
 
 /* ══ v2670 · MIETPREISUEBERSICHT JENSEITS DER GROESSENTABELLE (B35) ══════════

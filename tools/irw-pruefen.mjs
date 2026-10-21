@@ -166,10 +166,11 @@ let garFaelle = 0;
     if (!mit.verfuegbar || !ohne.verfuegbar) fehler('Herford-Beispiel rechnet nicht: ' + (mit.hinweis || ohne.hinweis));
     else {
       if (mit.vergleichswert_eur !== mit.vorlaeufig_eur || mit.garage_normobjekt.fall !== 'wie_norm') fehler('Herford mit Garage: kein Abzug erwartet');
-      if (ohne.vergleichswert_eur !== ohne.vorlaeufig_eur - 5000 || ohne.garage_normobjekt.fall !== 'abzug') fehler(`Herford ohne Garage: ${ohne.vergleichswert_eur} statt ${ohne.vorlaeufig_eur - 5000}`);
-      if (!ohne.rechenweg.some((z) => /Garage des Normobjekts/.test(z.pos) && z.wert === -5000 && /Untergrenze.*5\.000 €.*15\.000 €.*S\. 3/.test(z.detail))) fehler('Herford ohne Garage: Rechenweg-Zeile mit Spanne und Seite fehlt');
+      // v2671: Mitte der Zeitwertspanne (vorher Untergrenze 5.000)
+      if (ohne.vergleichswert_eur !== ohne.vorlaeufig_eur - 10000 || ohne.garage_normobjekt.fall !== 'abzug') fehler(`Herford ohne Garage: ${ohne.vergleichswert_eur} statt ${ohne.vorlaeufig_eur - 10000}`);
+      if (!ohne.rechenweg.some((z) => /Garage des Normobjekts/.test(z.pos) && z.wert === -10000 && /Mitte.*5\.000 €.*15\.000 €.*S\. 3/.test(z.detail))) fehler('Herford ohne Garage: Rechenweg-Zeile mit Spanne und Seite fehlt');
       if (unb.vergleichswert_eur !== unb.vorlaeufig_eur || unb.garage_normobjekt.fall !== 'angabe_fehlt') fehler('Herford Garage unbekannt: kein Abzug, Hinweis erwartet');
-      console.log(`  ok Herford EFH (S. 4): mit Garage ${mit.vergleichswert_eur} € · ohne ${ohne.vergleichswert_eur} € (−5.000, Untergrenze 5.000–15.000 €, S. 3) · unbekannt ${unb.vergleichswert_eur} € mit Hinweis`);
+      console.log(`  ok Herford EFH (S. 4): mit Garage ${mit.vergleichswert_eur} € · ohne ${ohne.vergleichswert_eur} € (−10.000, Mitte von 5.000–15.000 €, S. 3) · unbekannt ${unb.vergleichswert_eur} € mit Hinweis`);
     }
   }
   const d = alle.find((s) => s.gasl === '10800' && s.zweig === 'efh_zfh');
