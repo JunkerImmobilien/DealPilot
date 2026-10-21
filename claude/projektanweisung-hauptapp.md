@@ -41908,3 +41908,35 @@ Gutachterprüfung vom 21.10.2026 — die Befunde, die **ohne Bewertungsentscheid
 **Nachweis:** Genau gemessen beim 2,5-Fachen (Potenz, 87 Tabellen): 12,5 % gegen 20,5 % ohne Anpassung, P80 17,8 gegen 42,9. Beim 3,0-Fachen (zweiter Ast, 50 Tabellen): 22,6 gegen 31,2 %, P80 41,1 gegen 81,8. **Der zweite Ast bleibt.** Nebenbefund: Die reine Potenz läge beim 3,0-Fachen mit 20,9 % noch etwas besser als der zweite Ast (Gegenrechnung `grenze-uk.mjs`); nicht geändert. Prüfer im sauberen Worktree (HEAD plus diese Dateien): `wertermittlung-pruefen` (B14a–e grün), `rnd-kerne`, `uk-flaeche`, `uk-wgfz`, `score-ketten`, `saat --basislinie` alle RC 0; `buster-ebenen` SAUBER. Container nach dem Neubau: 2,0-fach 0,8627 · 2,5-fach 0,8227 · 3,0-fach 0,7741 · 3,01-fach `ausserhalb_bereich`.
 
 **Rest:** `ValuationService` fällt oberhalb der Geltung auf `EXCESS_MARKET_FACTOR` zurück, nicht auf die volle Fläche. Das ist gemeldet, nicht geändert, weil die Datei einem anderen Bereich gehört. `ErtragswertService.js:785` (Abzugstext N) liegt beim anderen Strang. Beim Neubau lief ein paralleler Compose eines anderen Agenten, und das mb-Backend war kurz ohne laufenden Container; es ist neu gestartet und nachgemessen. Prod nicht angefasst.
+
+### v2630–v2630b · Indikativer Beleihungswert-Check (BelWertV) im Bank-Export, E8 (21.10.2026, Staging)
+
+**Was:** Marcel hat E8 heute freigegeben. Neuer reiner Kern `marktbericht/backend/src/lib/beleihungswert.js`. Er rechnet aus dem **gespeicherten** Bericht (`mb.object_snapshots`, `cross_check`), also ohne Abruf und ohne Kosten. Die Regeln:
+- **§ 10 Rohertrag:** je Einheit min(Vertragsmiete, nachhaltige Miete = Vergleichsmiete des Berichts). Overrent wird nie angesetzt, bei Underrent zählt die Vertragsmiete. Leerstand geht mit der Marktmiete ein und bekommt einen Hinweis.
+- **§ 11 Bewirtschaftungskosten:** Einzelansätze nach Anlage 1 (Mietausfall 2 % Wohnen / 4 % Gewerbe, Verwaltung Gewerbe 1 %, Instandhaltung 0,5 % der Herstellungskosten), insgesamt ≥ 15 %. Steht die BWK im Bericht nur als Quote, wird die Quote auf den Rohertrag der Bank angewendet.
+- **§ 12 Zins:** max(Mindestzins, LZS), Wohnen und Gewerbe getrennt kapitalisiert. Die Bodenwertverzinsung läuft zum selben Zins (§ 9 Abs. 2).
+- **§ 16 Sachwert:** 10 % Sicherheitsabschlag, Außenanlagen höchstens 5 %. **§ 19 Vergleichswert:** nur amtlich, mit 10 % Abschlag.
+- **§ 4 Abs. 1:** Der Ertragswert ist maßgeblich. Liegt der Kontrollwert mehr als 20 % darunter, gibt es einen Hinweis. Bei EZFH/ETW ohne Ertragswert greift § 4 Abs. 2, gekennzeichnet.
+- **PfandBG:** Deckel auf den Verkehrswert (§ 16 Abs. 2), Beleihungsauslauf mit der 60-%-Grenze (§ 14). Dazu der Hinweis auf Kleindarlehen nach § 24.
+
+Die Marktparameter stehen in `config.js` `beleihungswert`, der Kern liest keine Einstellungen. Die Route ist `POST /beleihungswert` (mb) mit Proxy `POST /marktbericht/beleihungswert`. Im Bank-Export erscheint ein Abschnitt mit Karten (auto-fill-Raster), den Begriffen erklärt und einer eigenen Seite in der Bank-PDF.
+
+**Fachlicher Befund, der die Vorgabe korrigiert:** Der geltende Mindestkapitalisierungszins ist **nicht** „Rendite + 3 Pp, ohne Wert Untergrenze 3,5 %". § 12 Abs. 4 Satz 2 enthält eine Anpassungsregel mit 0,5-Pp-Schwelle zum 30.11. Die BaFin gibt den Satz bekannt: **seit 01.01.2024 5,5 % Wohnen / 6,5 % Gewerbe**, also die Obergrenze, und zum 01.01.2026 unverändert. Quellen: BaFin-Seite „Bekanntgabe BelWertV"; Fachveröffentlichung vom 08.12.2025 (Rendite am 30.11.2025 3,32 %); HypZert zur Anpassung 2024. Die Rendite liegt heute bei 3,86 % (Bundesbank, Reihe BBSIS…R30XX, 21.10.2026), gerundet + 3 Pp = 6,9 %, gekappt also ebenfalls 5,5 %. Mit der Untergrenze 3,5 % läge der Beleihungswert spürbar zu hoch. Die Untergrenze bleibt deshalb nur der letzte Rückfall und wird gekennzeichnet. Den Wortlaut von §§ 4, 9, 10, 11, 12, 16, 19, 24 und den Anlagen 1–3 sowie PfandBG §§ 14 und 16 habe ich auf gesetze-im-internet.de gelesen. Die Mindestsätze sind zweifach belegt (BaFin und Fachveröffentlichung). Eine zweite Volltextquelle für den Wortlaut (dejure, buzer) war nicht abrufbar.
+
+**Commit:** `d4f42e25` (v2630) · `3e813638` (v2630a, ältere Berichte) · `2662f5df` (v2630b, Angebots-Vergleichswert kein Verkehrswert) · `479383a6` (v2630b, Seite in der aktiven Bank-PDF).
+
+**Nachweis:**
+- `tools/beleihungswert-pruefen.mjs` mit 87 Werten, RC 0. Es enthält 13 handgerechnete Regelfälle: Overrent 127.952, Underrent 90.212, BWK 15 % 136.810, Zins 6,0 bleibt 119.333, Sachwert −24,19 % mit Prüfung, Gewerbe 196.418, Leerstand, Mindestzins-Herkunft, Auslauf/Kleindarlehen, Marktwertdeckel, § 4 Abs. 2, Quote-Bericht 209.087, Angebots-Vergleichswert. Dazu die Kette über den echten `CrossCheckService` mit `--src=` aus `git archive HEAD`, weil im Arbeitsverzeichnis Fremdänderungen liegen: Demo-MFH EW 635.000 → **446.000 €** (70 %), Overrent-Demo 835.000 → **536.000 €** (Rohertrag 49.578 → 43.092), Westerfeld (body) 785.000 → **511.000 €** (65 %).
+- Staging, Bank-Export im Browser mit gesperrtem Speichern (0 Schreibversuche): 6 Karten. Westerfeld (Bericht 327): Verkehrswert 740.000 → **494.000 €** (66,8 %), Zins 5,5 statt 2,5 %, BWK 23,2 %, Sachwert (Bank) 536.779 € (+8,6 %). Bismarck 1.195.000 → 778.000. Parkstr. 332.000 → 278.000. Hermannstr. 138.463 → 97.000. Bäckerstr. 116.000 → 87.000.
+- 390 px (gleich-Origin-iframe): Karten 291 px, kein Überlauf, Tabelle weiter im Kartenmodus von v2575.
+- PDF: 2 Seiten, Seite 2 trägt den Check (`save` abgefangen, kein Download).
+- `wertermittlung-pruefen`: vorher RC 0. Heute ist es im Arbeitsverzeichnis wegen fremder Kernänderungen rot. Der Check ändert keinen Kern-Service. `buster-ebenen` SAUBER.
+
+**Rest:**
+- (1) Die Gewerbe-Vertragsmiete steht nicht getrennt im Bericht. Angesetzt ist die Gewerbemiete des Berichts, mit Hinweis. Die Schnittstelle wäre `gewerbe_ist_jahr` in `ertragswert_kern` (CrossCheckService, nicht angefasst).
+- (2) Die Vertragsmiete der Stellplätze ist unbekannt: Ansatz des Berichts.
+- (3) Bericht 74 (Löhner Str.) ist in sich unstimmig: Ertragswert-Staffel und Verkehrswert passen nicht zusammen. Der Check deckelt auf den Verkehrswert. Ein neuer Bericht Stufe 3 wäre sauberer.
+- (4) Modernisierungsrisiko (Anlage 1) ist nicht angesetzt (objektartabhängig) und Baunebenkosten nicht gesondert (die NHK 2010 enthalten sie).
+- (5) Der Mindestzins in `config.js` muss jährlich nach dem 30.11. geprüft werden.
+- (6) In `storage.js` gibt es `exportGlobalBankPDF` doppelt. Die erste Definition ist tot, aufgeräumt ist sie nicht.
+- (7) Prod nicht angefasst.
