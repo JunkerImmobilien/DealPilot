@@ -145,7 +145,36 @@ function auswertung(liste, bFest) {
   const bs = liste.map((t) => t.b); const b = bFest ?? median(bs);
   const abw = []; for (const t of liste) for (const [w0, w, f] of t.pkt) abw.push(Math.abs(Math.pow(w / w0, b) / f - 1) * 100);
   const wmin = median(liste.map((t) => Math.min(...t.pkt.map((p) => Math.min(p[0], p[1]))))), wmax = median(liste.map((t) => Math.max(...t.pkt.map((p) => Math.max(p[0], p[1])))));
+  /* v2593 · Kreuzvalidierung wie in uk-naeherung-ableiten.mjs: je Kurve b =
+     Median der UEBRIGEN Kurven (Leave-one-Kurve-out), dazu Leave-one-Land-out,
+     an allen Stuetzpunkten. Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen
+     Kurven, Deckung gemessen. Nur ohne festes b (sonst ist es kein Lernen). */
+  let pruefung = null;
+  if (bFest == null && liste.length > 2) {
+    const cv = (gruppe) => {
+      const e = [];
+      for (const t of liste) {
+        const bo = median(liste.filter((x) => gruppe(x) !== gruppe(t)).map((x) => x.b));
+        if (bo == null) continue;
+        for (const [w0, w, f] of t.pkt) e.push(Math.abs(Math.pow(w / w0, bo) / f - 1) * 100);
+      }
+      return { median_pct: r3(median(e)), p80_pct: r3(quantil(e, 0.8)), p95_pct: r3(quantil(e, 0.95)), punkte: e.length };
+    };
+    let drin = 0, n = 0;
+    liste.forEach((t, i) => {
+      const bo = liste.filter((_, j) => j !== i).map((x) => x.b);
+      const lo = quantil(bo, 0.1), hi = quantil(bo, 0.9);
+      for (const [w0, w, f] of t.pkt) {
+        const r = w / w0; if (Math.abs(r - 1) < 1e-9) continue;
+        const k1 = Math.pow(r, lo), k2 = Math.pow(r, hi); n++;
+        if (f >= Math.min(k1, k2) - 1e-9 && f <= Math.max(k1, k2) + 1e-9) drin++;
+      }
+    });
+    pruefung = { loto: cv((t) => t), lolo: cv((t) => t.land), spanne_b_deckung_pct: n ? Math.round(1000 * drin / n) / 10 : null,
+      methode: 'Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven' };
+  }
   return { b: r3(b), b_q1: r3(quantil(bs, 0.25)), b_q3: r3(quantil(bs, 0.75)), b_min: r3(Math.min(...bs)), b_max: r3(Math.max(...bs)),
+    b_p10: r3(quantil(bs, 0.1)), b_p90: r3(quantil(bs, 0.9)), pruefung,
     tabellen: liste.length, uebernahmen: liste.reduce((n, t) => n + t.uebernahmen.length, 0), punkte: abw.length,
     laender: [...new Set(liste.flatMap((t) => [t.land]))].sort(),
     wgfz_median_von: r3(wmin), wgfz_median_bis: r3(wmax),

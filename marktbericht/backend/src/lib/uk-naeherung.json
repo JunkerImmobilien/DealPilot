@@ -1,5 +1,5 @@
 {
-  "stand": "2026-10-17",
+  "stand": "2026-10-21",
   "form": "UK(Objekt)/UK(Bezugsgroesse) = (Flaeche/Bezugsgroesse)^b",
   "herkunft": "DealPilot-Naeherung aus amtlichen Umrechnungstabellen der Gutachterausschuesse (Register), Median der Exponenten je Tabelle",
   "stufe": "N",
@@ -25,12 +25,22 @@
     "rest_faktor": 0.531,
     "tabellen": 35,
     "abweichung_median_pct": 13.025,
-    "abweichung_p90_pct": 43.348
+    "abweichung_p90_pct": 43.348,
+    "pruefung": {
+      "loto": {
+        "median_pct": 14.251,
+        "p80_pct": 43.379,
+        "p95_pct": 58.434,
+        "punkte": 35
+      }
+    }
   },
   "alle": {
     "b": -0.213,
     "b_q1": -0.258,
     "b_q3": -0.133,
+    "b_p10": -0.37,
+    "b_p90": -0.071,
     "tabellen": 169,
     "laender": [
       "BB",
@@ -48,12 +58,30 @@
       "ST"
     ],
     "abweichung_median_pct": 1.454,
-    "abweichung_p90_pct": 10.423
+    "abweichung_p90_pct": 10.423,
+    "pruefung": {
+      "loto": {
+        "median_pct": 1.943,
+        "p80_pct": 7.561,
+        "p95_pct": 17.337,
+        "punkte": 1465
+      },
+      "lolo": {
+        "median_pct": 2.002,
+        "p80_pct": 8.235,
+        "p95_pct": 16.088,
+        "punkte": 1465
+      },
+      "spanne_b_deckung_pct": 74.1,
+      "methode": "Leave-one-Tabelle-out (b = Median der uebrigen Tabellen) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Tabellen"
+    }
   },
   "stadt": {
     "b": -0.241,
     "b_q1": -0.271,
     "b_q3": -0.205,
+    "b_p10": -0.314,
+    "b_p90": -0.116,
     "tabellen": 53,
     "laender": [
       "BW",
@@ -66,12 +94,30 @@
       "SN"
     ],
     "abweichung_median_pct": 1.677,
-    "abweichung_p90_pct": 6.22
+    "abweichung_p90_pct": 6.22,
+    "pruefung": {
+      "loto": {
+        "median_pct": 1.877,
+        "p80_pct": 4.69,
+        "p95_pct": 16.529,
+        "punkte": 441
+      },
+      "lolo": {
+        "median_pct": 1.968,
+        "p80_pct": 4.596,
+        "p95_pct": 16.529,
+        "punkte": 441
+      },
+      "spanne_b_deckung_pct": 79.1,
+      "methode": "Leave-one-Tabelle-out (b = Median der uebrigen Tabellen) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Tabellen"
+    }
   },
   "land": {
     "b": -0.213,
     "b_q1": -0.226,
     "b_q3": -0.107,
+    "b_p10": -0.38,
+    "b_p90": -0.071,
     "tabellen": 116,
     "laender": [
       "BB",
@@ -85,6 +131,22 @@
       "ST"
     ],
     "abweichung_median_pct": 1.223,
-    "abweichung_p90_pct": 10.447
+    "abweichung_p90_pct": 10.447,
+    "pruefung": {
+      "loto": {
+        "median_pct": 1.705,
+        "p80_pct": 8.29,
+        "p95_pct": 17.337,
+        "punkte": 1024
+      },
+      "lolo": {
+        "median_pct": 1.705,
+        "p80_pct": 8.29,
+        "p95_pct": 17.019,
+        "punkte": 1024
+      },
+      "spanne_b_deckung_pct": 70.6,
+      "methode": "Leave-one-Tabelle-out (b = Median der uebrigen Tabellen) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Tabellen"
+    }
   }
 }

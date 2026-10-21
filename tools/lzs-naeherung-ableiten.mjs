@@ -40,12 +40,28 @@ const imp = (d) => import(pathToFileURL(path.join(LIB, d)).href);
 const { SAATDATEIEN } = await imp('ausschuss_register.js');
 const { dekodiere } = await imp('zweigwahl.js');
 const { lzsNach256 } = await imp('immowertv.js');
+const { lzsStadt } = await imp('lzs_naeherung.js');
 const TROCKEN = process.argv.includes('--trocken');
 const LERNKURVE = process.argv.includes('--lernkurve');
 
-const istStadt = (s) => /^(02|04|11)/.test(String(s.ags))
-  || (/\bstadt\b|stadtkreis|kreisfreie/i.test(String(s.gebiet_name || '') + ' ' + String(s.gaa_name || ''))
-      && !/landkreis|\bkreis\b(?!freie)|kreises|region\b|städteregion/i.test(String(s.gebiet_name || '')));
+/* ═══ v2593 · LERNEN MIT DER DEFINITION, MIT DER GERECHNET WIRD ═══════════
+ *
+ * Bis v2592 hiess „Stadt" hier: der NAME des Gebiets oder Ausschusses
+ * enthaelt „Stadt". Zur Laufzeit heisst es lzsStadt(): Stadtstaat oder
+ * AGS auf 000 (kreisfreie Stadt). Gemessen 21.10.2026: bei 350 von 1.011
+ * Saetzen verschieden (307 kreisangehoerige „Stadt X" lernten als Stadt
+ * und rechnen zur Laufzeit als Land). Gelernt wurde also ein anderes
+ * Merkmal als das, das die Formel spaeter bekommt. Jetzt beide gleich.
+ *
+ * Und die RND: 437 Saetze haben keine eigene RND (ganze Laender - BB, NI,
+ * BW, RP, MV, SH, ST, TH) und bekommen den Ersatzwert der Objektfamilie.
+ * Sie verduennten die Steigung (0,093 je 10 Jahre gegen 0,193 aus den
+ * Saetzen mit eigener RND). Sie ganz aus dem Lernstoff zu nehmen, waere
+ * schlimmer: dann lernt die Formel nur aus NW, HE und SN, und BB und NI
+ * fielen gemessen unter § 256 (LOLO-Median BB 0,77 gegen 0,70). Deshalb
+ * ZWEISTUFIG: die RND-Steigung nur aus Saetzen mit eigener RND, alle
+ * uebrigen Koeffizienten aus allen Saetzen (mit dieser Steigung fest). */
+const istStadt = (s) => lzsStadt(s.ags) === 1;
 function familie(art) {
   const a = String(art || '');
   if (/^(efh|zfh|ezfh|rhdhh|rh|dhh|reh|rmh|altbauvilla|villa)/.test(a)) return 'EZFH';
@@ -76,7 +92,7 @@ for (const d of SAATDATEIEN) {
       rnd = dz.rnd_bis == null ? dz.rnd_von + 10 : dz.rnd_von == null ? dz.rnd_bis - 5 : (dz.rnd_von + dz.rnd_bis) / 2;
     }
     roh.push({ ags: s.ags, land: s.land_code, gaa: s.gaa_name || String(s.ags).slice(0, 5), zweig: s.zweig,
-      jahr: s.berichtsjahr || 0, F, w, rnd, stadt: istStadt(s) ? 1 : 0,
+      jahr: s.berichtsjahr || 0, F, w, rnd, eigen: rnd != null, stadt: istStadt(s) ? 1 : 0,
       ueber6: /ueber6/.test(s.zweig), brw: zahl(ma.brw_mittel_eur_qm) });
   }
 }
@@ -106,23 +122,65 @@ const merkmale = (r) => [1, r.F === 'ETW' ? 1 : 0, r.F === 'MFH' ? 1 : 0, r.F ==
   Math.min(RND_BIS, Math.max(RND_VON, r.rnd ?? RND_MED[r.F])) / 10, r.stadt];
 const nach256 = (r) => lzsNach256(B256[r.F], r.brw, r.F === 'MFH' ? (r.ueber6 ? 8 : 5) : null).pct;
 
+/* v2593 · zweistufig (s. Kopf): RND-Steigung aus Saetzen mit eigener RND,
+   die uebrigen Koeffizienten aus allen mit fester Steigung. */
+function lerne(train) {
+  const eigen = train.filter((r) => r.eigen);
+  if (eigen.length < 30) return kq(train.map(merkmale), train.map((r) => r.w));
+  const s = kq(eigen.map(merkmale), eigen.map((r) => r.w))[4];
+  const rest = (r) => { const m = merkmale(r); return [m[0], m[1], m[2], m[3], m[5]]; };
+  const b2 = kq(train.map(rest), train.map((r) => r.w - s * merkmale(r)[4]));
+  return [b2[0], b2[1], b2[2], b2[3], s, b2[4]];
+}
+
 function auslassen(schl, menge = rows) {
-  const formel = [], bewg = [], jeGruppe = {};
+  const formel = [], bewg = [], jeGruppe = {}, vorhersage = new Map();
   for (const g of [...new Set(menge.map(schl))]) {
     const test = menge.filter((r) => schl(r) === g), train = rows.filter((r) => schl(r) !== g);
-    const b = kq(train.map(merkmale), train.map((r) => r.w));
+    const b = lerne(train);
     const e = test.map((r) => Math.abs(skalar(b, merkmale(r)) - r.w)), e2 = test.map((r) => Math.abs(nach256(r) - r.w));
+    for (const r of test) vorhersage.set(r, skalar(b, merkmale(r)));
     formel.push(...e); bewg.push(...e2);
     jeGruppe[g] = { saetze: test.length, formel_median_pp: r3(median(e)), bewg256_median_pp: r3(median(e2)) };
   }
-  return { formel, bewg, jeGruppe };
+  return { formel, bewg, jeGruppe, vorhersage };
 }
 const lolo = auslassen((r) => r.land), loao = auslassen((r) => r.gaa);
-const b = kq(rows.map(merkmale), rows.map((r) => r.w));
+const b = lerne(rows);
 const inSample = rows.map((r) => Math.abs(skalar(b, merkmale(r)) - r.w));
 const besserIn = Object.values(lolo.jeGruppe).filter((g) => g.formel_median_pp < g.bewg256_median_pp).length;
 const laender = Object.keys(lolo.jeGruppe).sort();
-const kennz = (e) => ({ median_pp: r3(median(e)), p90_pp: r3(quantil(e, 0.9)) });
+const kennz = (e) => ({ median_pp: r3(median(e)), p80_pp: r3(quantil(e, 0.8)), p90_pp: r3(quantil(e, 0.9)), p95_pp: r3(quantil(e, 0.95)) });
+
+/* ═══ v2593 · DIE SPANNE, GEMESSEN STATT GESCHAETZT ═════════════════════
+ *
+ * Wo die Formel rechnet (Laender aus je_land, in denen sie genauer ist als
+ * § 256), ist der Fall „dieser Ausschuss fehlt im Lernstoff" der echte:
+ * fuer die Gemeinde gibt es keinen Satz. Deshalb Leave-one-AUSSCHUSS-out.
+ *   spanne_p80_pp[F] = P80 der |Fehler| je Objektfamilie dort
+ *   deckung          = Anteil der Saetze, deren amtlicher Wert in
+ *                      Formel ± Halbbreite liegt - die Halbbreite dabei
+ *                      OHNE den eigenen Ausschuss bestimmt (sonst misst
+ *                      die Spanne sich selbst).
+ * Ausgegeben wird sie noch nicht (Marcels Entscheidung); lzsNaeherung()
+ * liefert pct_von/pct_bis mit. */
+const laenderBesser = Object.keys(lolo.jeGruppe).filter((l) => lolo.jeGruppe[l].formel_median_pp < lolo.jeGruppe[l].bewg256_median_pp).sort();
+const einsatz = rows.filter((r) => laenderBesser.includes(r.land));
+const fehlerLoao = (r) => Math.abs(loao.vorhersage.get(r) - r.w);
+const spanne = {}, deckungJe = {};
+let deckDrin = 0;
+for (const F of FAM) {
+  const m = einsatz.filter((r) => r.F === F);
+  spanne[F] = r3(quantil(m.map(fehlerLoao), 0.8));
+  let d = 0;
+  for (const r of m) {
+    const hb = quantil(m.filter((x) => x.gaa !== r.gaa).map(fehlerLoao), 0.8);
+    if (fehlerLoao(r) <= hb + 1e-9) d++;
+  }
+  deckungJe[F] = { saetze: m.length, deckung_pct: m.length ? Math.round(1000 * d / m.length) / 10 : null };
+  deckDrin += d;
+}
+const loaoEinsatz = kennz(einsatz.map(fehlerLoao));
 const bias256 = {}; for (const F of FAM) { const s = rows.filter((r) => r.F === F); bias256[F] = { saetze: s.length, amtlich_median_pct: r3(median(s.map((r) => r.w))), bewg256_minus_amtlich_pp: r3(median(s.map((r) => nach256(r) - r.w))) }; }
 
 console.log('DECKUNG: ' + dateien + ' Dateien, ' + gelesen + ' Saetze gelesen, ' + rows.length + ' Zinssaetze (Wohnen, Wert, juengster Jahrgang) aus '
@@ -134,7 +192,10 @@ console.log('Leave-one-Land-out      Naeherung ' + kennz(lolo.formel).median_pp 
 console.log('Leave-one-Ausschuss-out Naeherung ' + kennz(loao.formel).median_pp + ' / P90 ' + kennz(loao.formel).p90_pp + '   (in der Stichprobe: '
   + kennz(inSample).median_pp + ' / ' + kennz(inSample).p90_pp + ')');
 console.log('je Land (Naeherung / § 256, Median PP): ' + laender.map((l) => l + ' ' + lolo.jeGruppe[l].formel_median_pp + '/' + lolo.jeGruppe[l].bewg256_median_pp).join('  '));
-console.log('Koeffizienten: c ' + r3(b[0]) + ' · ETW ' + r3(b[1]) + ' · MFH ' + r3(b[2]) + ' · WGH ' + r3(b[3]) + ' · je 10 J. RND ' + r3(b[4]) + ' · Stadt ' + r3(b[5]));
+console.log('Koeffizienten: c ' + r3(b[0]) + ' · ETW ' + r3(b[1]) + ' · MFH ' + r3(b[2]) + ' · WGH ' + r3(b[3]) + ' · je 10 J. RND ' + r3(b[4]) + ' · Stadt ' + r3(b[5])
+  + '  (RND-Steigung aus ' + rows.filter((r) => r.eigen).length + ' Saetzen mit eigener RND)');
+console.log('Einsatz (' + laenderBesser.join(' ') + ', ' + einsatz.length + ' Saetze) LOAO: Median ' + loaoEinsatz.median_pp + ' · P80 ' + loaoEinsatz.p80_pp + ' · P95 ' + loaoEinsatz.p95_pp);
+console.log('Spanne P80 je Objektart: ' + FAM.map((F) => F + ' ±' + spanne[F] + ' (Deckung ' + deckungJe[F].deckung_pct + ' %)').join(' · ') + ' — gesamt ' + Math.round(1000 * deckDrin / einsatz.length) / 10 + ' %');
 
 let lernkurve = null;
 if (LERNKURVE) {
@@ -147,7 +208,7 @@ if (LERNKURVE) {
       const kand = gremien.filter((g) => rows.find((r) => r.gaa === g).land !== L);
       const mix = [...kand]; for (let i = mix.length - 1; i > 0; i--) { const j = Math.floor(zufall() * (i + 1)); [mix[i], mix[j]] = [mix[j], mix[i]]; }
       const wahl = new Set(mix.slice(0, Math.max(1, Math.round(mix.length * f))));
-      const tr = rows.filter((r) => wahl.has(r.gaa)); const bb = kq(tr.map(merkmale), tr.map((r) => r.w));
+      const tr = rows.filter((r) => wahl.has(r.gaa)); const bb = lerne(tr);
       for (const r of rows.filter((x) => x.land === L)) E.push(Math.abs(skalar(bb, merkmale(r)) - r.w));
     }
     lernkurve[Math.round(f * 100) + '%'] = kennz(E);
@@ -178,6 +239,14 @@ const aus = {
     lolo: kennz(lolo.formel), loao: kennz(loao.formel), in_stichprobe: kennz(inSample),
     bewg256_lolo: kennz(lolo.bewg), besser_als_256_in_laendern: besserIn + ' von ' + laender.length,
     je_land: lolo.jeGruppe,
+    /* v2593 */
+    laender_einsatz: laenderBesser,
+    loao_einsatz: loaoEinsatz,
+    spanne_p80_pp: spanne,
+    spanne_methode: 'P80 der |Fehler| je Objektart, Leave-one-Ausschuss-out, nur Laender aus laender_einsatz; Deckung mit Halbbreite ohne den eigenen Ausschuss',
+    spanne_deckung: { gesamt_pct: Math.round(1000 * deckDrin / einsatz.length) / 10, je_objektart: deckungJe },
+    rnd_steigung_aus: rows.filter((r) => r.eigen).length + ' Saetzen mit eigener RND (zweistufig, v2593)',
+    stadt_merkmal: 'lzsStadt(ags) wie zur Laufzeit (v2593)',
   },
   bewg256_gegen_amtlich: bias256,
   lernkurve,

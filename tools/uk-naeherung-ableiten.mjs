@@ -98,9 +98,41 @@ function klasse(liste) {
      Wert jeder Tabelle - Median der absoluten Prozentabweichung ueber alle Punkte */
   const abw = [];
   for (const t of liste) for (const [r, rel] of (t.pkt || [])) abw.push(Math.abs(Math.pow(r, b) / rel - 1) * 100);
-  return { b: r3(b), b_q1: r3(quartil(bs, 0.25)), b_q3: r3(quartil(bs, 0.75)), tabellen: liste.length,
+  /* ═══ v2593 · NACHGEPRUEFT STATT IN DER STICHPROBE ════════════════════
+   * abweichung_* oben misst die Formel an den Tabellen, aus denen sie
+   * gelernt ist. Die Kundentexte nennen seit v2593 die Kreuzvalidierung:
+   * je Tabelle b = Median der UEBRIGEN Tabellen (Leave-one-Tabelle-out),
+   * dazu Leave-one-Land-out. Tabellen ohne Abhaengigkeit (flaeche_eins)
+   * zaehlen mit UK = 1 an allen Stuetzpunkten - auch sie sind amtlich.
+   * Spanne: b_p10..b_p90 der Tabellen, Deckung je ausgelassener Tabelle
+   * mit P10/P90 der uebrigen. Ausgegeben wird die Spanne noch nicht. */
+  const pktVon = (t) => (t.pkt && t.pkt.length ? t.pkt : FAKTOREN.map((r) => [r, 1]));
+  const cv = (gruppe) => {
+    const e = [];
+    for (const t of liste) {
+      const bo = median(liste.filter((x) => gruppe(x) !== gruppe(t)).map((x) => x.b));
+      if (bo == null) continue;
+      for (const [r, rel] of pktVon(t)) e.push(Math.abs(Math.pow(r, bo) / rel - 1) * 100);
+    }
+    return { median_pct: r3(median(e)), p80_pct: r3(quartil(e, 0.8)), p95_pct: r3(quartil(e, 0.95)), punkte: e.length };
+  };
+  let drin = 0, n = 0;
+  liste.forEach((t, i) => {
+    const bo = liste.filter((_, j) => j !== i).map((x) => x.b);
+    const lo = quartil(bo, 0.1), hi = quartil(bo, 0.9);
+    for (const [r, rel] of pktVon(t)) {
+      if (Math.abs(r - 1) < 1e-9) continue;
+      const k1 = Math.pow(r, lo), k2 = Math.pow(r, hi); n++;
+      if (rel >= Math.min(k1, k2) - 1e-9 && rel <= Math.max(k1, k2) + 1e-9) drin++;
+    }
+  });
+  return { b: r3(b), b_q1: r3(quartil(bs, 0.25)), b_q3: r3(quartil(bs, 0.75)),
+           b_p10: r3(quartil(bs, 0.1)), b_p90: r3(quartil(bs, 0.9)), tabellen: liste.length,
            laender: [...new Set(liste.map((t) => t.land))].sort(),
-           abweichung_median_pct: r3(median(abw)), abweichung_p90_pct: r3(quartil(abw, 0.9)) };
+           abweichung_median_pct: r3(median(abw)), abweichung_p90_pct: r3(quartil(abw, 0.9)),
+           pruefung: { loto: cv((t) => t), lolo: cv((t) => t.land),
+             spanne_b_deckung_pct: n ? Math.round(1000 * drin / n) / 10 : null,
+             methode: 'Leave-one-Tabelle-out (b = Median der uebrigen Tabellen) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Tabellen' } };
 }
 const alle = klasse(tabellen), stadt = klasse(tabellen.filter((t) => t.stadt)), land = klasse(tabellen.filter((t) => !t.stadt));
 
@@ -152,7 +184,11 @@ const aus = {
   gilt_fuer: { objektarten: ['efh', 'zfh', 'dhh', 'rh', 'mfh'], uebertragen_auf: ['mfh'], max_vollgeschosse: 2, verhaeltnis_von: 0.5, verhaeltnis_bis: restC.length >= MIN_TABELLEN ? 3 : 2.5 },
   mindest_tabellen: MIN_TABELLEN,
   oberhalb: restC.length >= MIN_TABELLEN ? { ab: 2.5, bis: 3, rest_faktor: r3(restFaktor), tabellen: restC.length,
-    abweichung_median_pct: r3(median(restAbw)), abweichung_p90_pct: r3(quartil(restAbw, 0.9)) } : null,
+    abweichung_median_pct: r3(median(restAbw)), abweichung_p90_pct: r3(quartil(restAbw, 0.9)),
+    /* v2593 · Leave-one-Tabelle-out wie oben */
+    pruefung: (() => { const e = restPkt.map((k3, i) => { const c = median(restC.filter((_, j) => j !== i));
+      return Math.abs(((Math.pow(2.5, alle.b) * 2.5 + 0.5 * c) / 3) / k3 - 1) * 100; });
+      return { loto: { median_pct: r3(median(e)), p80_pct: r3(quartil(e, 0.8)), p95_pct: r3(quartil(e, 0.95)), punkte: e.length } }; })() } : null,
   alle, stadt: stadt.tabellen >= MIN_TABELLEN ? stadt : null, land: land.tabellen >= MIN_TABELLEN ? land : null,
 };
 if (!TROCKEN) { fs.writeFileSync(ZIEL, JSON.stringify(aus, null, 2) + '\n'); console.log('geschrieben: ' + path.relative(WURZEL, ZIEL)); }

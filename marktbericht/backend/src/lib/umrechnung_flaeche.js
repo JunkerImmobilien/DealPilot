@@ -387,6 +387,19 @@ export function sperreSchliesstNaeherungAus(text, code) {
     .test(String(text || ''));
 }
 
+/* v2593 · Abweichung der DealPilot-Formel im Kundentext, ohne Fachwort:
+   „in der Haelfte der Faelle hoechstens X %, in 8 von 10 Faellen hoechstens Y %".
+   cv = pruefung.loto aus der JSON (Kreuzvalidierung); ohne sie die alten Werte. */
+function _abwText(cv, alt) {
+  const k = (x) => String(Math.round(Number(x) * 10) / 10).replace('.', ',');
+  if (cv && Number.isFinite(Number(cv.median_pct)) && Number.isFinite(Number(cv.p80_pct))) {
+    return 'nachgeprüft an amtlichen Tabellen weicht sie in der Hälfte der Fälle höchstens ' + k(cv.median_pct)
+      + ' % vom amtlichen Wert ab, in 8 von 10 Fällen höchstens ' + k(Math.round(Number(cv.p80_pct))) + ' %';
+  }
+  return 'typische Abweichung vom amtlichen Wert ' + k(alt.abweichung_median_pct) + ' %, in 90 % der Fälle unter '
+    + k(Math.round(Number(alt.abweichung_p90_pct))) + ' %';
+}
+
 export function naeherung({ objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm, geschosszahl }) {
   const d = naeherungsDaten();
   const nein = (grund, hinweis) => ({ verfuegbar: false, grund, hinweis: hinweis || null });
@@ -424,6 +437,8 @@ export function naeherung({ objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm,
     koeffizient_angewandt: true,
     formel: { b, tabellen: d.alle.tabellen, laender: d.alle.laender, stand: d.stand,
               abweichung_median_pct: (o || d.alle).abweichung_median_pct, abweichung_p90_pct: (o || d.alle).abweichung_p90_pct,
+              /* v2593 · Kreuzvalidierung und Streuung des Exponenten (noch nicht im Bericht) */
+              pruefung: ((o || d.alle).pruefung || {}).loto || null, b_p10: d.alle.b_p10 ?? null, b_p90: d.alle.b_p90 ?? null,
               zweiter_ast: o ? { ab: Number(o.ab), rest_faktor: Number(o.rest_faktor), tabellen: o.tabellen } : null },
     uebertragen: (g.uebertragen_auf || []).indexOf(art) >= 0,
     hinweis: ((g.uebertragen_auf || []).indexOf(art) >= 0
@@ -438,9 +453,11 @@ export function naeherung({ objektart, flaeche_qm, bezugsgroesse_qm, brw_eur_qm,
              + de(o.rest_faktor) + ' (aus ' + o.tabellen + ' Tabellen, die so weit reichen), zusammen ' + de(k)
            : '(' + fl + ' / ' + bez + ')^' + de(b) + ' = ' + de(k))
       + '. Die Formel beruht auf ' + d.alle.tabellen + ' amtlichen Umrechnungstabellen der '
-      + 'Gutachterausschüsse (' + (d.alle.laender || []).join(', ') + ', Stand ' + d.stand + '); typische Abweichung '
-      + 'vom amtlichen Wert ' + de(Math.round((o || d.alle).abweichung_median_pct * 10) / 10) + ' %, in 90 % der Fälle unter '
-      + de(Math.round((o || d.alle).abweichung_p90_pct)) + ' %' + (o ? ' (oberhalb des 2,5-Fachen deutlich unsicherer)' : '') + '. Keine amtliche Zahl — liegt dir der Koeffizient des '
+      + 'Gutachterausschüsse (' + (d.alle.laender || []).join(', ') + ', Stand ' + d.stand + '); '
+      /* v2593 · gemessen mit ausgelassener Tabelle (uk-naeherung.json pruefung.loto),
+         nicht mehr an den Tabellen, aus denen die Formel gelernt ist. */
+      + _abwText((o || d.alle).pruefung && (o || d.alle).pruefung.loto, (o || d.alle))
+      + (o ? ' (oberhalb des 2,5-Fachen deutlich unsicherer)' : '') + '. Keine amtliche Zahl — liegt dir der Koeffizient des '
       + 'zuständigen Ausschusses vor, trag ihn unter „Umrechnungskoeffizient Grundstücksgröße" ein.',
   };
 }

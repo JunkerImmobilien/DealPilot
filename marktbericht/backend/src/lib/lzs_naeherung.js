@@ -125,18 +125,33 @@ export function lzsNaeherung({ ags, objektart, objart = null, anzahlWe = null, r
   const saetze = Number((d.daten || {}).saetze) || null;
   const lolo = (d.pruefung && d.pruefung.lolo) || {};
   const jl = (d.pruefung.je_land || {})[land] || {};
-  const abw = Math.round(Number(lolo.median_pp) * 10) / 10;
+  /* v2593 · Die genannte Abweichung ist die des EINSATZFALLS: Laender, in denen
+     die Formel rechnet, der Ausschuss nicht im Lernstoff (Leave-one-Ausschuss-out).
+     Vorher stand hier der Leave-one-Land-out-Median mit dem Stadt-Merkmal des
+     Lernens - also eine Zahl fuer einen Fall, den es zur Laufzeit nicht gibt. */
+  const ein = (d.pruefung && d.pruefung.loao_einsatz) || {};
+  const abwMed = Number.isFinite(Number(ein.median_pp)) ? Number(ein.median_pp) : Number(lolo.median_pp);
+  const abwP80 = Number.isFinite(Number(ein.p80_pp)) ? Number(ein.p80_pp) : null;
+  /* v2593 · Spanne (P80 je Objektart) - gespeichert, im Bericht noch NICHT
+     ausgegeben (Marcels Entscheidung). Rueckwaertskompatibel: neue Felder. */
+  const hb = Number(((d.pruefung && d.pruefung.spanne_p80_pp) || {})[F]);
+  const pctVon = Number.isFinite(hb) ? Math.max(0, Math.round((pct - hb) * 100) / 100) : null;
+  const pctBis = Number.isFinite(hb) ? Math.round((pct + hb) * 100) / 100 : null;
   return {
-    verfuegbar: true, pct, familie: F, rnd: r, rnd_quelle: rndQuelle, stadt, land,
+    verfuegbar: true, pct, pct_von: pctVon, pct_bis: pctBis, familie: F, rnd: r, rnd_quelle: rndQuelle, stadt, land,
     formel: {
       stand: d.stand || null, saetze, ausschuesse: (d.daten || {}).ausschuesse || null,
       laender: (d.daten || {}).laender || [], koeffizienten: k,
-      abweichung_median_pp: Number(lolo.median_pp), abweichung_p90_pp: Number(lolo.p90_pp),
+      abweichung_median_pp: abwMed, abweichung_p80_pp: abwP80,
+      abweichung_p90_pp: Number.isFinite(Number(ein.p90_pp)) ? Number(ein.p90_pp) : Number(lolo.p90_pp),
+      spanne_p80_pp: Number.isFinite(hb) ? hb : null,
       land_median_pp: jl.formel_median_pp ?? null, land_bewg256_median_pp: jl.bewg256_median_pp ?? null,
     },
     hinweis: 'Liegenschaftszinssatz abgeleitet aus der DealPilot-Formel (Stufe N) — aus ' + (saetze || '?')
-      + ' amtlichen Liegenschaftszinssätzen der Gutachterausschüsse abgeleitet, typische Abweichung '
-      + de(abw, 1) + ' Prozentpunkte; nicht amtlich. '
+      + ' amtlichen Liegenschaftszinssätzen der Gutachterausschüsse abgeleitet; nachgeprüft an amtlichen Werten liegt sie '
+      + 'in der Hälfte der Fälle höchstens ' + de(Math.round(abwMed * 10) / 10, 1) + ' Prozentpunkte daneben'
+      + (abwP80 != null ? ', in 8 von 10 Fällen höchstens ' + de(Math.round(abwP80 * 10) / 10, 1) + ' Prozentpunkte' : '')
+      + '; nicht amtlich. '
       + 'Rechenweg: ' + de(k.c, 3)
       + (F === 'ETW' ? ' + ' + de(k.ETW, 3) + ' (Wohnungseigentum)' : '')
       + (F === 'MFH' ? ' + ' + de(k.MFH, 3) + ' (Mehrfamilienhaus)' : '')

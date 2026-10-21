@@ -193,9 +193,13 @@ export function wgfzAnpassung({ ags, objektart, brw_eur_qm, wgfz_zone, wgfz_obje
 /* ══ v2375 · DIE DEALPILOT-FORMEL FUER DIE WGFZ (Stufe N) ════════════════════
    Abgeleitet aus allen amtlichen WGFZ-Tabellen des Registers
    (tools/uk-wgfz-naeherung-ableiten.mjs -> uk-wgfz-naeherung.json):
-     UK(Objekt)/UK(Richtwert) = (WGFZ Objekt / WGFZ Richtwert)^b, b = 0,501
-   (Geschosswohnungsbau, 75 Kurven aus 14 Laendern, Abweichung Median 3,7 %,
-   P90 14,9 %). Nur fuer die Objektarten der Datei (MFH, ETW, gemischt), nur im
+     UK(Objekt)/UK(Richtwert) = (WGFZ Objekt / WGFZ Richtwert)^b
+   v2593 · Stand der JSON (gwb, 21.10.2026): b = 0,498 aus 80 Kurven aus 15 Laendern;
+   Streuung der Exponenten b_p10 0,253 / b_p90 0,775. Nachgeprueft mit ausgelassener
+   Kurve (pruefung.loto): Abweichung Median 3,6 %, 8 von 10 Punkten unter 9,4 %,
+   P95 19,5 %; die Spanne r^b_p10..r^b_p90 deckt 78 % der amtlichen Punkte. Hier
+   stand „b = 0,501, 75 Kurven aus 14 Laendern, Median 3,7 %, P90 14,9 %" - der
+   Stand vom 17.10.; die Zahl im Text kommt seit jeher aus der JSON, nicht von hier. Nur fuer die Objektarten der Datei (MFH, ETW, gemischt), nur im
    Gueltigkeitsbereich, keine Extrapolation. Im Bericht IMMER „abgeleitet aus der
    DealPilot-Formel", nie amtlich. Die Rangfolge (amtlich > oertliche Tabelle,
    auch uebertragen > diese Formel) setzt der Aufrufer. */
@@ -236,8 +240,14 @@ export function wgfzNaeherung({ objektart, brw_eur_qm, wgfz_zone, wgfz_objekt })
       + 'DealPilot-Formel — der Gutachterausschuss veröffentlicht hier keine eigenen Umrechnungskoeffizienten: '
       + '(' + de(wo) + ' / ' + de(wz) + ')^' + de(b) + ' = ' + de(faktor)
       + (bwQm != null ? ' → ' + de(brw) + ' €/m² × ' + de(faktor) + ' = ' + de(bwQm) + ' €/m²' : '')
-      + '. Die Formel ist aus ' + (kl.tabellen || '?') + ' amtlichen Tabellen abgeleitet (typische Abweichung '
-      + de(Math.round(Number(kl.abweichung_median_pct) * 10) / 10) + ' %); sie ist nicht amtlich, der Bodenwert insoweit vorläufig.',
+      + '. Die Formel ist aus ' + (kl.tabellen || '?') + ' amtlichen Tabellen abgeleitet ('
+      /* v2593 · Kreuzvalidierung (pruefung.loto) statt Abweichung in der Stichprobe */
+      + (kl.pruefung && kl.pruefung.loto && Number.isFinite(Number(kl.pruefung.loto.p80_pct))
+        ? 'nachgeprüft an amtlichen Tabellen in der Hälfte der Fälle höchstens '
+          + de(Math.round(Number(kl.pruefung.loto.median_pct) * 10) / 10) + ' % daneben, in 8 von 10 Fällen höchstens '
+          + de(Math.round(Number(kl.pruefung.loto.p80_pct))) + ' %'
+        : 'typische Abweichung ' + de(Math.round(Number(kl.abweichung_median_pct) * 10) / 10) + ' %')
+      + '); sie ist nicht amtlich, der Bodenwert insoweit vorläufig.',
   };
 }
 

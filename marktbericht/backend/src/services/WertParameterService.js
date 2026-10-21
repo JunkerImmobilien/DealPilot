@@ -907,12 +907,18 @@ export function zinsHerkunft(a) {
     const f = a.formel || {};
     const d = lzsNaeherungsDaten() || {};
     const sz = f.saetze || (d.daten && d.daten.saetze) || null;
+    /* v2593 · gemessene Abweichung im Einsatzfall (lzs-naeherung.json
+       pruefung.loao_einsatz): Median und 8 von 10 - ohne Fachwort. */
+    const _ein = (d.pruefung || {}).loao_einsatz || {};
     const ab = Number.isFinite(Number(f.abweichung_median_pp)) ? Number(f.abweichung_median_pp)
-      : Number(((d.pruefung || {}).lolo || {}).median_pp);
+      : Number.isFinite(Number(_ein.median_pp)) ? Number(_ein.median_pp) : Number(((d.pruefung || {}).lolo || {}).median_pp);
+    const ab80 = Number.isFinite(Number(f.abweichung_p80_pp)) ? Number(f.abweichung_p80_pp) : Number(_ein.p80_pp);
+    const _k = (x) => (Math.round(x * 10) / 10).toFixed(1).replace('.', ',');
     etikett = 'abgeleitet aus der DealPilot-Formel (N)';
     klartext = 'DealPilot-Formel (N), aus ' + (sz || 'allen') + ' amtlichen Liegenschaftszinssätzen '
       + 'der Gutachterausschüsse abgeleitet' + (Number.isFinite(ab)
-        ? ', typische Abweichung ' + (Math.round(ab * 10) / 10).toFixed(1).replace('.', ',') + ' Prozentpunkte' : '')
+        ? '; an amtlichen Werten nachgeprüft in der Hälfte der Fälle höchstens ' + _k(ab) + ' Prozentpunkte daneben'
+          + (Number.isFinite(ab80) ? ', in 8 von 10 Fällen höchstens ' + _k(ab80) : '') : '')
       + ' — nicht amtlich, nicht für diesen Ort ermittelt';
   }
   if (ebene === 'nachbarwert' && a.herkunft_ort) {
