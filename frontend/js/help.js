@@ -61,6 +61,11 @@
       icon: 'i-layers',
       desc: 'Was du in welchem Reiter eingibst und was daraus wird',
       sections: [
+        /* v2560 · Flughandbuch: die Seite handbuch.html, oben im Thema als Knopf (_handbuchBannerHtml) */
+        {
+          h: 'Handbuch: Objekt anlegen (ETW · EFH · MFH)',
+          body: 'Das <strong>Flughandbuch</strong> führt je Objektart — Eigentumswohnung, Einfamilienhaus, Mehrfamilienhaus — Reiter für Reiter durch alle Felder: was du einträgst, woher der Wert kommt und was er bewirkt. Mit Bildern aus der App und als PDF zum Ausdrucken. Öffnen über den Knopf <strong>Handbuch öffnen</strong> oben in diesem Thema.'
+        },
         {
           h: 'Objekt — Grunddaten, Lage und Eingabetiefe',
           body: 'Hier beginnt jedes Objekt: <strong>PLZ</strong>, <strong>Ort</strong>, <strong>Straße</strong>, <strong>Hausnummer</strong>, <strong>Objektart</strong>, <strong>Wohnfläche (m²)</strong> und <strong>Baujahr</strong>. Dazu kommen Zimmer, Zustand, Standardstufe (NHK 2010), Energieklasse, Vermietungsstand und die Wertanker (<strong>Bankbewertung</strong>, <strong>Verkehrswert</strong>).\n\n<strong>Eingabetiefe</strong> — sie bestimmt, welche Felder Pflicht sind:\n• <strong>Einfach · Stufe 1</strong> — Adresse, Objektart, Wohnfläche, Baujahr: Marktpreisindikation.\n• <strong>Mittel · Stufe 2</strong> — dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe: erweiterte Indikation.\n• <strong>Ausgiebig · Stufe 3</strong> — dazu Grundstück, Bodenrichtwert, bei Häusern BGF und NHK-Typ: Sach- und Ertragswert nach ImmoWertV.\n\nFehlende Pflichtfelder sind rot umrandet; „x fehlt“ zeigt sie dir. In der Box <strong>Marktbericht abrufen</strong> holst du den Bericht der gewählten Stufe — Stufe 2 gibt es ab Investor, Stufe 3 ab Pro.\n\nTipp: Liegt der Verkehrswert über dem Kaufpreis, zeigt DealPilot oben den <strong>Sofortigen Wertpuffer / Equity</strong>.'
@@ -1044,6 +1049,13 @@
       + '<div class="kn"><button type="button" onclick="window.DealPilotAtlas && DealPilotAtlas.oeffne()">✈ Atlas öffnen</button>'
       + '<button type="button" class="z" onclick="hideHelp(); window.DealPilotPilot && DealPilotPilot.rufen()">Pilot rufen · F1</button></div></div>';
   }
+  function _handbuchBannerHtml() {
+    return '<div class="hb-banner" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#050505;color:#f3ead0;border-radius:14px;padding:16px 18px;margin:0 0 16px">'
+      + '<div style="flex:1;min-width:200px"><div style="font:700 10.5px JetBrains Mono,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--wl-e8cc7a, #E8CC7A)">Flughandbuch</div>'
+      + '<div style="font:600 16px Space Grotesk,sans-serif;color:#fdfcfa;margin-top:4px">Handbuch: Objekt anlegen (ETW · EFH · MFH)</div>'
+      + '<div style="font-size:12.5px;color:#b9ad8f;margin-top:2px">Jedes Feld mit Bild, Beispiel, Herkunft und Wirkung — auch als PDF.</div></div>'
+      + '<button type="button" id="help-handbuch-btn" onclick="window.open(&quot;handbuch.html&quot;, &quot;_blank&quot;, &quot;noopener&quot;)" style="border:0;border-radius:10px;padding:10px 14px;font:600 13px Space Grotesk,sans-serif;cursor:pointer;color:#1a1407;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f))">Handbuch öffnen</button></div>';
+  }
   function _renderTopic(topic) {
     var c = document.getElementById('help-content');
     if (!c) return;
@@ -1084,6 +1096,8 @@
     }
     /* v789-kpi-viz: Visuals oben im Kennzahlen-Topic */
     if (topic.id === 'kennzahlen') { html += _kpiVizHtml(); }
+    /* v2560 · Flughandbuch oben im Thema „Die Reiter im Objekt“ */
+    if (topic.id === 'reiter') { html += _handbuchBannerHtml(); }
     topic.sections.forEach(function(s) {
       html += '<div class="help-section">' +
         '<h3>' + _escHtml(s.h) + '</h3>' +
