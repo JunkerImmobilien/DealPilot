@@ -12,6 +12,8 @@
   Clips: messe-schleife/clips/*.mp4 — Ausschnitte der Videoreihe, NICHT im Git
   (wie die Videothek), per scp auf den Server.
 -->
+<script>/* Fehlerprotokoll fuer den Pruefer: window.DPS_FEHLER (Skript-, Versprechen- und Ladefehler) */
+window.DPS_FEHLER=[];addEventListener('error',function(e){DPS_FEHLER.push(e.message||('Ladefehler '+((e.target&&(e.target.currentSrc||e.target.src))||'?')))},true);addEventListener('unhandledrejection',function(e){DPS_FEHLER.push('Promise: '+(e.reason&&e.reason.message||e.reason))});</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;600;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
