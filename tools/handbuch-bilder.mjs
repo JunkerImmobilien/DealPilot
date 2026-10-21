@@ -52,17 +52,35 @@ for (const datei of kompDateien) {
   const A = erg.arten[art] = { beispiel: BSP[art], reiter: {} };
   const zeilen = fs.readFileSync(datei, 'utf8').split(/\r?\n/).filter(Boolean);
   const bilder = zeilen.filter((z) => z.startsWith('C|'));
-  for (const z of zeilen.filter((z) => !/^[CW]\|/.test(z))) {
+  for (const z of zeilen.filter((z) => !/^[CWEM]\|/.test(z))) {
     const [sec, ids, teile] = z.split('|');
     const sichtbar = ids.split(','), nummer = {}; sichtbar.forEach((id, i) => { nummer[id] = i + 1; });
     let p = 0; const bl = teile.split(',').map(Number).map((anz, i) => { const f = sichtbar.slice(p, p + anz); p += anz; return { datei: 'hb-' + art.toLowerCase() + '-' + sec + '-' + (i + 1) + '.webp', felder: f }; });
     A.reiter[sec] = { sichtbar, nummer, bilder: bl };
   }
+  /* E|sec|ids|anzahl je Bild: Felder, die erst nach einer Auswahl erscheinen (Nummern laufen weiter) */
+  for (const z of zeilen.filter((z) => z.startsWith('E|'))) {
+    const [, sec, ids, teile] = z.split('|'); const R = A.reiter[sec]; const felder = ids.split(','), nummer = {};
+    felder.forEach((id, i) => { nummer[id] = R.sichtbar.length + i + 1; });
+    let p = 0;
+    R.extra = { felder, nummer, bilder: teile.split(',').map(Number).map((anz, i) => { const f = felder.slice(p, p + anz); p += anz; return { datei: 'hb-' + art.toLowerCase() + '-' + sec + '-x' + (i + 1) + '.webp', felder: f }; }) };
+  }
+  /* M|sec|datei|ids: Handy-Bild (390 px) */
+  for (const z of zeilen.filter((z) => z.startsWith('M|'))) {
+    const [, sec, datei, ids] = z.split('|'); const R = A.reiter[sec];
+    (R.mobil = R.mobil || { bilder: [] }).bilder.push({ datei, felder: ids.split(',') });
+  }
   for (const z of bilder) {
-    const [, webp, css, nr] = z.split('|');
-    const [x0, y0, x1, y1] = css.split(',').map(Number);
-    const cx = Math.max(0, Math.round((x0 - X0) * S)), cy = Math.max(0, Math.round((y0 - Y0) * S));
-    const cw = Math.min(1189 - cx, Math.round((x1 - x0) * S)), ch = Math.min(800 - cy, Math.round((y1 - y0) * S));
+    /* C|datei|css|png[|ox,oy,massstab|rx0,ry0,rx1,ry1]: ohne Einbettung der feste Desktop-Ausschnitt;
+       mit Einbettung (Handy-iframe) liegen die CSS-Werte im iframe und werden ins Fenster umgerechnet */
+    const [, webp, css, nr, einb, reg] = z.split('|');
+    let [x0, y0, x1, y1] = css.split(',').map(Number);
+    let R0 = [X0, Y0, X0 + 1189 / S, Y0 + 800 / S];
+    if (einb) { const [ox, oy, m] = einb.split(',').map(Number); [x0, y0, x1, y1] = [ox + x0 * m, oy + y0 * m, ox + x1 * m, oy + y1 * m]; R0 = reg.split(',').map(Number); }
+    const [bw, bh] = execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', finde(nr)]).toString().trim().split(',').map(Number);
+    const s2 = bw / (R0[2] - R0[0]);
+    const cx = Math.max(0, Math.round((x0 - R0[0]) * s2)), cy = Math.max(0, Math.round((y0 - R0[1]) * s2));
+    const cw = Math.min(bw - cx, Math.round((x1 - x0) * s2)), ch = Math.min(bh - cy, Math.round((y1 - y0) * s2));
     execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', finde(nr), '-vf', 'crop=' + cw + ':' + ch + ':' + cx + ':' + cy, '-c:v', 'libwebp', '-quality', '82', path.join(ZIEL, webp)]);
     n++;
   }

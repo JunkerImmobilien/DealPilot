@@ -134,14 +134,33 @@
     var k = f, b = f; while (k && k !== sec) { if (k.classList && (k.classList.contains('col2') || k.classList.contains('card'))) b = k; k = k.parentElement; }
     return b;
   }
-  function rahmen(sec) {
+  /* rahmen(sec, modus)
+     modus leer    alle sichtbaren Felder, Nummern ab 1             → hb-<art>-<sec>-N.webp
+     modus 'extra' nur Felder, die erst nach DPHB.auswahl() da sind,
+                   Nummern laufen hinter den Grundfeldern weiter     → hb-<art>-<sec>-xN.webp
+     modus 'mobil' Grund- und Zusatzfelder bei schmalem Fenster,
+                   dieselben Nummern wie auf dem Desktop             → hb-<art>-<sec>-mN.webp */
+  function rahmen(sec, modus) {
     var tab = document.querySelector('[data-target-sec="' + sec + '"]'); if (tab) tab.click();
-    var s = $(sec);
+    var s = $(sec), A = ERG.arten[_art], R0 = A.reiter[sec];
     var fs = [].slice.call(s.querySelectorAll('.f')).filter(function (f) { var e = feldVon(f); return e && sichtbar(f); });
     var ids = [], kaesten = [], gesehen = {};
     fs.forEach(function (f) { var e = feldVon(f); if (gesehen[e.id]) return; gesehen[e.id] = 1; ids.push(e.id); kaesten.push(f); });
-    var nummer = {}; ids.forEach(function (id, i) { nummer[id] = i + 1; });
-    var sc = scroller(s), top0 = sc.getBoundingClientRect ? (sc === document.scrollingElement ? 0 : sc.getBoundingClientRect().top) : 0;
+    var nummer = {}, behalte = function () { return true; }, bek = {};
+    if (modus === 'extra') {
+      var basis = {}; R0.sichtbar.forEach(function (id) { basis[id] = 1; });
+      behalte = function (id) { return !basis[id]; };
+    } else if (modus === 'mobil') {
+      bek = Object.assign({}, R0.nummer, (R0.extra && R0.extra.nummer) || {});
+      behalte = function (id) { return !!bek[id]; };
+    }
+    var k2 = [], i2 = [];
+    ids.forEach(function (id, i) { if (behalte(id)) { i2.push(id); k2.push(kaesten[i]); } });
+    ids = i2; kaesten = k2;
+    if (modus === 'extra') ids.forEach(function (id, i) { nummer[id] = R0.sichtbar.length + i + 1; });
+    else if (modus === 'mobil') ids.forEach(function (id) { nummer[id] = bek[id]; });
+    else ids.forEach(function (id, i) { nummer[id] = i + 1; });
+    var sc = scroller(s), top0 = sc === document.scrollingElement ? 0 : sc.getBoundingClientRect().top;
     var y = function (el) { return el.getBoundingClientRect().top - top0 + sc.scrollTop; };
     var maxH = innerHeight - Math.max(obenFrei(), 60) - 40;
     var bilder = [], akt = null;
@@ -154,18 +173,23 @@
       akt = { ids: [ids[i]], oben: (fy - by < 260) ? by : fy - 12, unten: fb };
       bilder.push(akt);
     });
-    _rahmen[sec] = { ids: ids, nummer: nummer, bilder: bilder.map(function (x) { return { ids: x.ids, oben: x.oben, unten: x.unten }; }) };
-    var R = ERG.arten[_art].reiter[sec] = { sichtbar: ids, nummer: nummer, bilder: [] };
-    _rahmen[sec].bilder.forEach(function (x, i) { R.bilder.push({ datei: 'hb-' + _art.toLowerCase() + '-' + sec + '-' + (i + 1) + '.webp', felder: x.ids }); });
-    return sec + ': ' + ids.length + ' Felder in ' + bilder.length + ' Bildern';
+    var kz = modus === 'extra' ? 'x' : (modus === 'mobil' ? 'm' : '');
+    var dateien = bilder.map(function (x, i) { return 'hb-' + _art.toLowerCase() + '-' + sec + '-' + kz + (i + 1) + '.webp'; });
+    var schl = sec + (modus ? '#' + modus : '');
+    _rahmen[schl] = { sec: sec, ids: ids, nummer: nummer, dateien: dateien, bilder: bilder.map(function (x) { return { ids: x.ids, oben: x.oben, unten: x.unten }; }) };
+    var liste = bilder.map(function (x, i) { return { datei: dateien[i], felder: x.ids }; });
+    if (modus === 'extra') R0.extra = { felder: ids, nummer: nummer, bilder: liste };
+    else if (modus === 'mobil') R0.mobil = { bilder: liste };
+    else A.reiter[sec] = { sichtbar: ids, nummer: nummer, bilder: liste };
+    return schl + ': ' + ids.length + ' Felder in ' + bilder.length + ' Bildern';
   }
 
   var _ov = null;
   function weg() { if (_ov && _ov.parentNode) _ov.parentNode.removeChild(_ov); _ov = null; }
-  function zeige(sec, i, fw) {
+  function zeige(schl, i, fw) {
     weg();
-    var r = _rahmen[sec], b = r.bilder[i]; if (!b) return null;
-    var s = $(sec), sc = scroller(s), frei = Math.max(obenFrei(), 0);
+    var r = _rahmen[schl], b = r && r.bilder[i]; if (!b) return null;
+    var s = $(r.sec), sc = scroller(s), frei = Math.max(obenFrei(), 0);
     var top0 = sc === document.scrollingElement ? 0 : sc.getBoundingClientRect().top;
     /* Lage NEU messen: zwischen rahmen() und zeige() verschiebt nachgeladener Inhalt die Karten */
     var yy = function (el) { return el.getBoundingClientRect().top - top0 + sc.scrollTop; };
@@ -177,6 +201,7 @@
     var ov = document.createElement('div'); ov.id = 'dphb-marken';
     ov.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2147483000';
     var lo = Infinity, hi = -Infinity, li = Infinity, re = -Infinity;
+    var schmal = innerWidth < 700;
     b.ids.forEach(function (id) {
       var f = $(id) && $(id).closest('.f'); if (!f) return;
       var q = f.getBoundingClientRect();
@@ -185,7 +210,8 @@
       k.style.cssText = 'position:fixed;left:' + (q.left - 4) + 'px;top:' + (q.top - 4) + 'px;width:' + (q.width + 8) + 'px;height:' + (q.height + 8) + 'px;border:2.5px solid var(--wl-c9a84c, #C9A84C);border-radius:10px;box-shadow:0 0 0 3px rgba(5,5,5,.18)';
       var n = document.createElement('div');
       n.textContent = r.nummer[id];
-      n.style.cssText = 'position:fixed;left:' + (q.left - 22) + 'px;top:' + (q.top - 12) + 'px;min-width:24px;height:24px;padding:0 5px;box-sizing:border-box;border-radius:12px;background:#050505;color:var(--wl-e8cc7a, #E8CC7A);border:2px solid var(--wl-c9a84c, #C9A84C);font:700 12px/20px "JetBrains Mono",monospace;text-align:center';
+      /* schmal: die Marke sitzt INNEN am rechten Rand - links waere sie abgeschnitten */
+      n.style.cssText = 'position:fixed;left:' + (schmal ? q.right - 34 : q.left - 22) + 'px;top:' + (q.top - 12) + 'px;min-width:24px;height:24px;padding:0 5px;box-sizing:border-box;border-radius:12px;background:#050505;color:var(--wl-e8cc7a, #E8CC7A);border:2px solid var(--wl-c9a84c, #C9A84C);font:700 12px/20px "JetBrains Mono",monospace;text-align:center';
       ov.appendChild(k); ov.appendChild(n);
     });
     document.body.appendChild(ov); _ov = ov;
@@ -194,7 +220,46 @@
     /* Bildanfang = Rahmenanfang (bei Kartenbeginn mit Kartentitel) */
     var y0 = Math.max(frei + 2, Math.min(lo - 22, b.oben - sc.scrollTop + top0 - 8)), y1 = Math.min(innerHeight, hi + 22);
     var f = (fw || innerWidth) / innerWidth;
-    return { css: [x0, y0, x1, y1].map(Math.round), rahmen: [x0 * f, y0 * f, x1 * f, y1 * f].map(Math.round), datei: ERG.arten[_art].reiter[sec].bilder[i].datei, felder: b.ids.length };
+    return { css: [x0, y0, x1, y1].map(Math.round), rahmen: [x0 * f, y0 * f, x1 * f, y1 * f].map(Math.round), datei: r.dateien[i], felder: b.ids.length };
+  }
+
+  /* ── Auswahl: was die Zusatzfelder einblendet ──
+     Gesetzt wird nur, was im Formular selbst liegt - nie etwas, das Marcels
+     Daten zeigt (Halter/Mandant kommt aus seinen Mandanten: bleibt leer). */
+  var AUSWAHL = [
+    ['haken', 'mand_ueberf_cb'], ['haken', 'erbpacht'], ['haken', 'inv_detail_toggle'],
+    ['haken', 'd1_anschl_enable'], ['wert', 'd1_type', 'tilgungsaussetzung'], ['haken', 'd2_enable'], ['haken', 'd2_anschl_enable'],
+    ['haken', 'afa_sonder7b_aktiv'], ['ruf', 'switchBwkMode', 'percent']
+  ];
+  function auswahl() {
+    var n = [];
+    AUSWAHL.forEach(function (a) {
+      try {
+        if (a[0] === 'ruf') { if (typeof window[a[1]] === 'function') { window[a[1]](a[2]); n.push(a[1]); } return; }
+        var e = $(a[1]); if (!e) return;
+        if (a[0] === 'haken') { if (!e.checked) { e.checked = true; e.dispatchEvent(new Event('change', { bubbles: true })); e.dispatchEvent(new Event('input', { bubbles: true })); } }
+        else { e.value = a[2]; e.dispatchEvent(new Event('change', { bubbles: true })); }
+        n.push(a[1]);
+      } catch (x) {}
+    });
+    try { window.calc && window.calc(); } catch (x) {}
+    return n.join(',');
+  }
+  /* Kurzliste fuer tools/handbuch-bilder.mjs; die PNG-Nummer (?) setzt der Aufrufer ein.
+     einbettung = "x,y,massstab|rx0,ry0,rx1,ry1": Lage des schmalen iframes im Fenster
+     und der Bildschirmfoto-Ausschnitt in Fenster-CSS-Pixeln (nur fuer -mN-Bilder). */
+  function komp(art, einbettung) {
+    var A = ERG.arten[art], out = [];
+    Object.keys(A.reiter).forEach(function (sec) {
+      var R = A.reiter[sec];
+      out.push(sec + '|' + R.sichtbar.join(',') + '|' + R.bilder.map(function (b) { return b.felder.length; }).join(','));
+      if (R.extra && R.extra.felder.length) out.push('E|' + sec + '|' + R.extra.felder.join(',') + '|' + R.extra.bilder.map(function (b) { return b.felder.length; }).join(','));
+      if (R.mobil) R.mobil.bilder.forEach(function (b) { out.push('M|' + sec + '|' + b.datei + '|' + b.felder.join(',')); });
+    });
+    Object.keys(ERG.css || {}).filter(function (d) { return d.indexOf('hb-' + art.toLowerCase() + '-') === 0; }).forEach(function (d) {
+      out.push('C|' + d + '|' + ERG.css[d].join(',') + '|?' + (einbettung && /-m\d+\.webp$/.test(d) ? '|' + einbettung : ''));
+    });
+    return out.join('\n');
   }
 
   /* ── Wohnungsliste (MFH): Konfigurator und eine Wohnung ── */
@@ -211,12 +276,12 @@
 
   function wohnungBild(datei, unterschrift) { var A = ERG.arten.MFH = ERG.arten.MFH || { reiter: {} }; (A.wohnungen = A.wohnungen || []).push({ datei: datei, unterschrift: unterschrift || '' }); return datei; }
   /* Ein Bild: Reiter oeffnen (die App scrollt danach verzoegert nach oben - abwarten), dann zeigen */
-  function bild(sec, i, fw) {
-    var S = $(sec);
+  function bild(schl, i, fw) {
+    var sec = (_rahmen[schl] && _rahmen[schl].sec) || schl, S = $(sec);
     var warte = S.classList.contains('active') ? 0 : 2500;
     if (warte) document.querySelector('[data-target-sec="' + sec + '"]').click();
-    return new Promise(function (ok) { setTimeout(function () { var r = zeige(sec, i, fw); setTimeout(function () { (ERG.css = ERG.css || {})[r.datei] = r.css; ok(r); }, 200); }, warte); });
+    return new Promise(function (ok) { setTimeout(function () { var r = zeige(schl, i, fw); setTimeout(function () { (ERG.css = ERG.css || {})[r.datei] = r.css; ok(r); }, 200); }, warte); });
   }
   var beispiel = {}; Object.keys(BEISPIEL).forEach(function (a) { beispiel[a] = Object.assign({}, GEMEINSAM, BEISPIEL[a]); });
-  window.DPHB = { beispiel: beispiel, bild: bild, wohnungBild: wohnungBild, sperre: sperre, demo: demo, rahmen: rahmen, zeige: zeige, weg: weg, wohnungsliste: wohnungsliste, ergebnis: ergebnis, bildEintrag: bildEintrag, log: LOG, _rahmen: _rahmen, ERG: ERG };
+  window.DPHB = { auswahl: auswahl, komp: komp, beispiel: beispiel, bild: bild, wohnungBild: wohnungBild, sperre: sperre, demo: demo, rahmen: rahmen, zeige: zeige, weg: weg, wohnungsliste: wohnungsliste, ergebnis: ergebnis, bildEintrag: bildEintrag, log: LOG, _rahmen: _rahmen, ERG: ERG };
 })();
