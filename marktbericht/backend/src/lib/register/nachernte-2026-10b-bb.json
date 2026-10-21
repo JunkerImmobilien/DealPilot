@@ -1,0 +1,722 @@
+[
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12051000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Brandenburg an der Havel, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Brandenburg an der Havel",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte in der Stadt Brandenburg an der Havel leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 „Sachwertfaktoren typischer Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für typische Doppelhaushälften und Reihenhäuser“). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Brandenburg an der Havel, kreisfreie Stadt gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in der Stadt Brandenburg an der Havel, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Brandenburg an der Havel, kreisfreie Stadt",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren typischer Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für typische Doppelhaushälften und Reihenhäuser“; Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_BRB.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren typischer Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für typische Doppelhaushälften und Reihenhäuser“; Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Brandenburg an der Havel, kreisfreie Stadt",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_BRB.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12052000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Cottbus/Chóśebuz, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Cottbus/Chóśebuz",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte in der Stadt Cottbus/Chóśebuz leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften)). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Cottbus/Chóśebuz, kreisfreie Stadt gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in der Stadt Cottbus/Chóśebuz, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Cottbus/Chóśebuz, kreisfreie Stadt",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_CB.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Cottbus/Chóśebuz, kreisfreie Stadt",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_CB.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12053000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Frankfurt (Oder), kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder)",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder) leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften)). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Frankfurt (Oder), kreisfreie Stadt gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder), Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Frankfurt (Oder), kreisfreie Stadt",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_LOS.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Frankfurt (Oder), kreisfreie Stadt",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_LOS.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12054000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Potsdam, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Potsdam",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Potsdam leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften)). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Potsdam, kreisfreie Stadt gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Potsdam, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Potsdam, kreisfreie Stadt",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_P.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Potsdam, kreisfreie Stadt",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_P.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12060",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Barnim",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Barnim",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte im Landkreis Barnim leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 „Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für Doppelhaushälften und Reihenhäuser“). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Landkreis Barnim gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Barnim, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Barnim",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für Doppelhaushälften und Reihenhäuser“; Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_BAR.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für Doppelhaushälften und Reihenhäuser“; Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Landkreis Barnim",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_BAR.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12061",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Dahme-Spreewald",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Dahme-Spreewald",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte im Landkreis Dahme-Spreewald leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.3 und 8.3.3 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Doppelhaushälften/Reihenend- und Reihenmittelhäuser)). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Landkreis Dahme-Spreewald gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Dahme-Spreewald, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Dahme-Spreewald",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.3 und 8.3.3 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Doppelhaushälften/Reihenend- und Reihenmittelhäuser); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_LDS.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.3 und 8.3.3 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Doppelhaushälften/Reihenend- und Reihenmittelhäuser); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Landkreis Dahme-Spreewald",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_LDS.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12062",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Elbe-Elster",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Elbe-Elster",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte im Landkreis Elbe-Elster leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 „Sachwertfaktoren für Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für Reihenhäuser und Doppelhaushälften“). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Landkreis Elbe-Elster gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Elbe-Elster, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Elbe-Elster",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren für Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für Reihenhäuser und Doppelhaushälften“; Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_EE.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren für Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für Reihenhäuser und Doppelhaushälften“; Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Landkreis Elbe-Elster",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_EE.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12063",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Havelland",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Havelland",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte im Landkreis Havelland leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (S. 60 bzw. 75)). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Landkreis Havelland gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Havelland, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Havelland",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (S. 60 bzw. 75); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_HVL.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (S. 60 bzw. 75); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Landkreis Havelland",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_HVL.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12064",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Märkisch-Oderland",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Märkisch-Oderland",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte im Landkreis Märkisch-Oderland leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften)). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Landkreis Märkisch-Oderland gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Märkisch-Oderland, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Märkisch-Oderland",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_MOL.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Landkreis Märkisch-Oderland",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_MOL.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12065",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Oberhavel",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Oberhavel",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte im Landkreis Oberhavel leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 „Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser“ (S. 73), 8.3.2 „Sachwertfaktoren für Reihenhäuser und Doppelhaushälften“ (S. 82)). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Landkreis Oberhavel gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Oberhavel, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Oberhavel",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser“ (S. 73), 8.3.2 „Sachwertfaktoren für Reihenhäuser und Doppelhaushälften“ (S. 82); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_OHV.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser“ (S. 73), 8.3.2 „Sachwertfaktoren für Reihenhäuser und Doppelhaushälften“ (S. 82); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Landkreis Oberhavel",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_OHV.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12067",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Oder-Spree",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder)",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder) leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften)). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Landkreis Oder-Spree gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Oder-Spree und in der Stadt Frankfurt (Oder), Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Oder-Spree",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_LOS.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Landkreis Oder-Spree",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_LOS.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12068",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Ostprignitz-Ruppin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ostprignitz-Ruppin",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte im Landkreis Ostprignitz-Ruppin leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.3 „Sachwertfaktoren für Ein-/ Zweifamilienhäuser“, 8.3.3 „Sachwertfaktoren Reihenhäuser/ Doppelhaushälften“). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Landkreis Ostprignitz-Ruppin gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Ostprignitz-Ruppin, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Ostprignitz-Ruppin",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.3 „Sachwertfaktoren für Ein-/ Zweifamilienhäuser“, 8.3.3 „Sachwertfaktoren Reihenhäuser/ Doppelhaushälften“; Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_OPR.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.3 „Sachwertfaktoren für Ein-/ Zweifamilienhäuser“, 8.3.3 „Sachwertfaktoren Reihenhäuser/ Doppelhaushälften“; Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Landkreis Ostprignitz-Ruppin",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_OPR.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12069",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Potsdam-Mittelmark",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Potsdam-Mittelmark",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte im Landkreis Potsdam-Mittelmark leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 „Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für Reihenhäuser und Doppelhaushälften“). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Landkreis Potsdam-Mittelmark gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Potsdam-Mittelmark, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Potsdam-Mittelmark",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für Reihenhäuser und Doppelhaushälften“; Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_PM.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für Reihenhäuser und Doppelhaushälften“; Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Landkreis Potsdam-Mittelmark",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_PM.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12070",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Prignitz",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Prignitz",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte im Landkreis Prignitz leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften)). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Landkreis Prignitz gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Prignitz, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Prignitz",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_PR.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 und 8.3.2 „Sachwertfaktoren“ (Ein- und Zweifamilienhäuser bzw. Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Landkreis Prignitz",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_PR.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12072",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Teltow-Fläming",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Teltow-Fläming",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte im Landkreis Teltow-Fläming leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 „Sachwertfaktoren für Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren“ (Reihenhäuser/Doppelhaushälften)). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Landkreis Teltow-Fläming gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Teltow-Fläming, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Teltow-Fläming",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren für Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren“ (Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_TF.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren für Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren“ (Reihenhäuser/Doppelhaushälften); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Landkreis Teltow-Fläming",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_TF.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "BB",
+  "ags": "12073",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Uckermark",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Uckermark",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 des Gutachterausschuss für Grundstückswerte im Landkreis Uckermark leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (Kap. 8.2.2 „Sachwertfaktoren für Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für Reihenhäuser und Doppelhaushälften“ (S. 64)). Kapitel 8.4 „Mehrfamilienhäuser“ führt Preisniveau, Liegenschaftszinssätze und Wohnflächenpreise, aber keinen Sachwertfaktor; im ganzen Bericht steht „Sachwertfaktor“ an keiner Stelle zusammen mit Mehrfamilienhäusern (Volltextprüfung). Für Landkreis Uckermark gibt es deshalb keinen Sachwertfaktor für Mehrfamilienhäuser — sie werden im Ertragswertverfahren mit dem Liegenschaftszinssatz desselben Berichts bewertet. WEG: Geschäftsstelle des Ausschusses; alle Brandenburger Berichte unter https://gutachterausschuss.brandenburg.de (Rubrik Grundstücksmarktberichte, kostenfrei). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV; der Landesbericht des Oberen Gutachterausschusses führt ebenfalls keinen MFH-Sachwertfaktor).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Landkreis Uckermark, Geschäftsstelle — Kontakt im Impressum des Berichts",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Wie swf-bb.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de",
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Uckermark",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren für Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für Reihenhäuser und Doppelhaushälften“ (S. 64); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_UM.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2025, Inhaltsverzeichnis: Sachwertfaktoren nur in Kap. 8.2.2 „Sachwertfaktoren für Ein- und Zweifamilienhäuser“, 8.3.2 „Sachwertfaktoren für Reihenhäuser und Doppelhaushälften“ (S. 64); Kap. 8.4 „Mehrfamilienhäuser“ ohne Sachwertfaktor",
+  "modellversion": "GMB 2025 Landkreis Uckermark",
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_UM.pdf",
+  "quelle_parser": "v2713-hand (pdftotext -layout der am 13.09.2026 bezogenen GMB 2025, 21.10.2026 gelesen; gutachterausschuss.brandenburg.de antwortete am 21.10.2026 mit 503)"
+ }
+]

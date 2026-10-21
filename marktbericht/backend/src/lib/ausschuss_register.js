@@ -511,6 +511,14 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Worms eigener GMB 2025 kostenpflichtig (50 EUR, Bestellweg); Hamburg WGH-LZS, ETW-SWF. */
                             'nachernte-2026-10b-he.json', 'nachernte-2026-10b-sh.json',
                             'nachernte-2026-10b-rp.json', 'nachernte-2026-10b-hh.json',
+                            /* v2710-v2713 · Nachernte 10b 21.10.2026 (TH/MV/SN/ST/BB): Altenburger Land/Greiz/Gera
+                               Liegenschaftszinssaetze 2026 (Stichtag 01.01.2025, 9 Werte MFH/WGH/ETW, loesen 2024 ab;
+                               Greiz-ETW neu), dazu Sperren je Thueringer Ausschuss fuer nicht abgeleitete Objektarten
+                               (EFH/DHH/ETW-Zins, MFH-Sachwertfaktor), Kyffhaeuser/Nordhausen Band 2022 (Stichtag 2020,
+                               veraltet); MV Seenplatte und Vorpommern-Ruegen genehmigungspflichtig (Sperren mit
+                               Fundstelle und Weg); MFH-Sachwertfaktor-Sperren SN (Dresden, Leipzig), ST (14), BB (16). */
+                            'nachernte-2026-10b-th.json', 'nachernte-2026-10b-mv.json', 'nachernte-2026-10b-sn.json',
+                            'nachernte-2026-10b-st.json', 'nachernte-2026-10b-bb.json',
                             /* v2620: Umrechnungskoeffizienten zum Immobilienrichtwert NRW (Kennzahl umrechnung_irw,
                                lib/vergleichswert_irw.js, Pruefer tools/irw-pruefen.mjs): Herford, Bielefeld,
                                Koeln, Duesseldorf (Sperren), Bonn, Muenster, Dortmund (Sperren, additiv), Bochum,

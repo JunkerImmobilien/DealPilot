@@ -1,0 +1,632 @@
+[
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15001000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Dessau-Roßlau, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Dessau-Roßlau, kreisfreie Stadt keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Dessau-Roßlau, kreisfreie Stadt",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15002000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Halle (Saale), kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Halle (Saale), kreisfreie Stadt keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Halle (Saale), kreisfreie Stadt",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15003000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Magdeburg, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Magdeburg, Landeshauptstadt keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Magdeburg, Landeshauptstadt",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15081",
+  "ebene": "kreis",
+  "gebiet_name": "Altmarkkreis Salzwedel",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Altmarkkreis Salzwedel keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Altmarkkreis Salzwedel",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15082",
+  "ebene": "kreis",
+  "gebiet_name": "Anhalt-Bitterfeld, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Anhalt-Bitterfeld, Landkreis keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Anhalt-Bitterfeld, Landkreis",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15083",
+  "ebene": "kreis",
+  "gebiet_name": "Börde, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Börde, Landkreis keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Börde, Landkreis",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15084",
+  "ebene": "kreis",
+  "gebiet_name": "Burgenlandkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Burgenlandkreis keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Burgenlandkreis",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15085",
+  "ebene": "kreis",
+  "gebiet_name": "Harz, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Harz, Landkreis keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Harz, Landkreis",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15086",
+  "ebene": "kreis",
+  "gebiet_name": "Jerichower Land, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Jerichower Land, Landkreis keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Jerichower Land, Landkreis",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15087",
+  "ebene": "kreis",
+  "gebiet_name": "Mansfeld-Südharz, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Mansfeld-Südharz, Landkreis keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Mansfeld-Südharz, Landkreis",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15088",
+  "ebene": "kreis",
+  "gebiet_name": "Saalekreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Saalekreis keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Saalekreis",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15089",
+  "ebene": "kreis",
+  "gebiet_name": "Salzlandkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Salzlandkreis keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Salzlandkreis",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15090",
+  "ebene": "kreis",
+  "gebiet_name": "Stendal, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Stendal, Landkreis keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Stendal, Landkreis",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "ST",
+  "ags": "15091",
+  "ebene": "kreis",
+  "gebiet_name": "Wittenberg, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "Der Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt leitet Sachwertfaktoren landeseinheitlich in EINEM Modell ab; dessen Zeile „Objektart“ lautet wörtlich: „Freistehende Ein- und Zweifamilienwohnhäuser (EFH/ZFH) · Reihenhäuser und Doppelhaushälften (RH/DHH), darunter Reihenendhäuser (REH) und Reihenmittelhäuser (RMH)“, Objektmerkmal „Eigennutzung (nicht vermietet)“ (Modellparameter S. 1). Die veröffentlichten Blätter (ezh_* und drh_* je Region) folgen dem. Für Mehrfamilienhäuser gibt es in Wittenberg, Landkreis keinen Sachwertfaktor; sie werden über die Liegenschaftszinssätze und Rohertragsfaktoren desselben Ausschusses erfasst. WEG: Geschäftsstelle des Gutachterausschusses beim Landesamt für Vermessung und Geoinformation Sachsen-Anhalt (LVermGeo), service.lvermgeo@sachsen-anhalt.de; Veröffentlichungen unter https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html (am 21.10.2026 nicht erreichbar, Zeitüberschreitung). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Geschäftsstelle beim LVermGeo, service.lvermgeo@sachsen-anhalt.de",
+  "lizenz": "dl-de/by-2-0 (Nutzungsbedingungen LVermGeo V 5.0, Nr. 2 — wie swf-st.json)",
+  "lizenz_hinweis": "Die Sperre gibt nur den Inhalt des Modells wieder, keine Zahl.",
+  "quellenvermerk": "© GeoBasis-DE / LVermGeo ST — Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt",
+  "geltungsbereich": {
+   "raeumlich": "Wittenberg, Landkreis",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+    "url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html"
+   }
+  ],
+  "fundstelle": "Modellparameter für die Ableitung von Sachwertfaktoren (Gutachterausschuss für Grundstückswerte in Sachsen-Anhalt, Datei sachwertfaktoren_modellbeschreibung.pdf, erstellt 19.03.2025), S. 1, Zeile „Objektart“",
+  "modellversion": "Sachwertfaktoren Sachsen-Anhalt (veröffentlicht 13.02.2025)",
+  "quelle_url": "https://www.lvermgeo.sachsen-anhalt.de/de/gdp-sachwertfaktoren.html",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ }
+]
