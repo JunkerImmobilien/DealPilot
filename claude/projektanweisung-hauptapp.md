@@ -41514,3 +41514,48 @@ Potenzial Demo: Bestand/MH/ZB 610.000/625.000/805.000 → 610.000/630.000/805.00
 **Rest.**
 - Das Profil liegt weiter nur im Browser (localStorage), wie das Investmentprofil.
 - Wer ein Hauptprofil wählt, verliert seine eigenen Score-Gewichte. So war es auch vorher.
+
+---
+
+### v2546a/b · Quick-Check: Beleihung, Kaufnebenkosten, Hausgeld-Herkunft, Absage-Begründung, Sterne (21.10.2026)
+
+**Was.** Marcels sechs Punkte zum Quick-Check (`frontend/quickcheck-app.html`, eigenes Dokument im iframe):
+- **(3) LTV wieder auf den Kaufpreis.** qc-v2450 hatte „100 %" auf die Gesamtinvestition gelegt (0 € EK). Das ist zurückgenommen: Darlehen = Quote × Kaufpreis, die Kaufnebenkosten kommen aus dem EK. Neuer Knopf **„100 % + NK"** für die Vollfinanzierung (EK 0, LTV > 100 %). Die Karte nutzt dieselbe Basis (`_dpPilotScore`: `ekInklNkLtv:false`, `svw:0`). Kachel „LTV (auf KP)", im Rechenweg „Darlehen ÷ Kaufpreis".
+- **(4) Kaufnebenkosten-Kasten** unter der Beleihung:
+  - Grunderwerbsteuer nach Bundesland aus der PLZ (`grest-plz-lookup.js`, Landessätze Stand 2026, HB 5,5 und TH 5,0 seit v2207). Mit `grest_auto` aus gilt das Bundesland der Einstellungen.
+  - Dazu Notar, Grundbuch, Makler und Sonstige, jeweils in % und €. Jede Position ist per Haken abwählbar (`window._qcKnkAus`).
+  - Die wirksamen Sätze gehen als `qc_knk_teile` (FIELDS + Träger in `qc-bridge.js`) ins Objekt. `quick-check.js` setzt `gest_p`/`notar_p`/`gba_p`/`makler_p`/`ji_p` und rechnet das Darlehen damit.
+- **(1) Hausgeld-Herkunft:**
+  - Eine amtliche Tabelle gibt es nicht. Hat der Nutzer in den Einstellungen (Bewirtschaftung je Objektart, ETW) einen eigenen Startwert, gilt dieser.
+  - Sonst gilt der DealPilot-Richtwert nach Baujahr (`hausgeld-engine.js`, 2,75/3,25/4,00/5,00 €/m²). Der Hinweis nennt die Spanne.
+- **(2) Euro-Aufteilung:**
+  - Die Box unter dem Hausgeld war im Pilot-Score-Weg immer leer: `kpi.hgY` fehlte. Jetzt zeigt sie umlagefähig/nicht umlagefähig je Monat und Jahr.
+  - Sie nennt die Herkunft des Anteils (DealPilot-Standard 30 % aus `bwk-profil.js` oder den eigenen Wert). Die veralteten Faustregeln (26 % der NKM, 22 %) sind gestrichen.
+- **(5) Sachsenstr. 18:**
+  - Der Fall war richtig gerechnet; der Text war widersprüchlich. Unter „Finger weg" stand „Ein Preis klar unter Markt ist ein zusätzliches Argument für den Kauf".
+  - `qc-heuristik.js` hat jetzt `_warumTrotzdemNicht`. Bei PASS/KRITISCH mit Preis unter Markt nennt sie Cashflow, DSCR und NMR und sagt, warum der Puffer keine Rate zahlt.
+  - Die Überschrift sagt „trotz" statt „aber". Kern gespiegelt, Backend auf Staging neu gebaut.
+- **(6) v2546b:** Die Übernahme-Vorschau aus Marktbericht/Exposé (`object-actions.js`) zeigt statt „3 ★" das Stufenwort, z. B. „Gepflegt (Stufe 3 von 5)".
+
+**Commits.** `8de1bf26` (v2546a), `bcff8f2e` (Konstanten), `56e41e99` (v2546b).
+
+**Nachweis.** Staging, Quick-Check aus der App geöffnet, Sachsenstr. 18, 32052 Herford: ETW 100 m², Bj 1998, KP 180.000, NKM 750.
+- Die Nebenkosten sind 13,77 % = 24.786 € (GrESt NRW 6,5 % = 11.700 €, Makler 3,57 % = 6.426 €).
+- Bei „100 %" ist das EK 24.786 € und das Darlehen 180.000 €. Vorher war das EK 0 und das Darlehen 204.786 €.
+- Mit Makler abgewählt sinkt die Summe auf 10,2 % = 18.360 €:
+  - „90 %": EK 36.360 € (18.000 € Kaufpreisanteil + 18.360 €), LTV 90 %.
+  - „100 % + NK": EK 0, LTV 110 %.
+- Übernahme ins Objekt (Speichern gesperrt, 0 Schreibaufrufe): `makler_p` 0, `gest_p` 6,5, `ek` 18.360, `d1` 180.000.
+- Score ohne Marktwert 26 (CF −242 €/Monat, DSCR 0,86). Mit Marktwert 213.000 ist der Score 42.
+- `QcHeuristik.empfehlung` mit Score 26 und Marktwert 213.000 ergibt PASS, Puffer +18 %, Begründung mit −362 €/Monat, DSCR 0,76 und NMR 3,7 %.
+- Prüfer: `score-ketten` grün (216 Punkte), `buster-ebenen` SAUBER, `node --check` auf alle 16 Inline-Skripte.
+
+**Rest.**
+- Zwei Hausgeld-Standards nebeneinander (Engine nach Baujahr ↔ Einstellung 4,00 €/m² flach). Ob einer wegfällt, entscheidet Marcel.
+- Die Sterne (rate_*/qual_*) werden NICHT auf die Gewerke-Tabelle `ausst_*` (NHK-Standardstufe) umgelegt. Sie wirken nur als Rückfall:
+  - auf den Zustand im Deal Score (Mittel ≥4,5/3,5/2,5/1,5),
+  - auf die Ausstattungsqualität (`dealscore2.js`),
+  - auf die RND-Gewerkegrade (`rnd-calc.js`).
+  Eine Abbildung Exposé-Qualität → Standardstufe ist eine Bewertungsentscheidung (Marcel).
+- Weiterhin ★ im Kundentext: Banner in `dealscore2-ui.js:550` und die Einheit in `dealscore2.js:550`. Beide Dateien gehören dem Hauptchat und sind nicht angefasst.
+- Der Kasten merkt sich die Abwahl nur für die Sitzung, nicht dauerhaft.
