@@ -41678,3 +41678,28 @@ Potenzial Demo: Bestand/MH/ZB 610.000/625.000/805.000 → 610.000/630.000/805.00
 - Ohne Bild: 7 Überführungsfelder (nur über „Deal-Aktion → Überführung starten" an einem gespeicherten Objekt), `ausst` (Altfeld), `bwk_kp_pct` (Unterwahl „% vom Kaufpreis" schliesst die NKM-Quoten aus).
 - Handy-Bilder gibt es für die ersten Felder je Reiter, nicht für Bewirtschaftung und Steuer.
 - Wer eine Bildschirmaufnahme in einem frischen Tab macht: erst ein Bildschirmfoto, sonst deutet `zoom` die Koordinaten als CSS-Pixel (gemessen: 874 statt 1189 px breit).
+
+### v2554–v2557 · Ersteinrichtung geprüft, PDFs umgebrochen, Ertragswert/Marktpreise beim MFH, leere Abrufe, Laufanzeige, Ablage, Handbuch-Fehler; messe-schleife-3 (21.10.2026, Staging)
+
+**Was.**
+- **v2554/a/b** (`107e5284`, `ea53b34a`, `6daacf3c`): Ersteinrichtung im Browser zweimal komplett durchgeklickt (Speichern gesperrt, localStorage gesichert und wiederhergestellt, 376/376, Abweichung 0). Gefunden und behoben: die alte Liste (Schritt 3) und die alten Kacheln (Schritt 5) standen trotz `hidden` doppelt da — `[hidden]` verlor gegen `.dpo-set`/`.dpo-kacheln{display:grid}`, jetzt inline `display:none`. Überholter Absatz in Schritt 5 entfällt; „Ø Markt" löscht einen früher gewählten Angebotsabschlag; `nochmal()` setzt `set`/`basis` mit zurück.
+  Gemessen: Vorsichtig → Tilgung 2 · EK 20 · Mietausfall 3 · DSCR 1,3 · Abschlag 9 · Preset conservative · `dp_std_set` vor. Renditeorientiert → 1 · 5 · 1 · 1,1 · Ø Markt · optimistic · ren.
+- **v2555/a** (`f99bcfda`, `82c5fda6`): Pilot-PDF — `_zeichneBlock()` bricht Abschnitte über die Seite um („(Fortsetzung)"), neue Seite nur wenn Kopf + 3 Zeilen nicht passen. Westerfeld: Analyse 10 → 8 Seiten, PDF 22 → 20. Titel „KI-Investment-Analyse" → „Pilot-Analyse" in pdf.js und pdf-investment-bank.js. Bank-PDF (10 Seiten) gerendert und gesichtet: sauber.
+  Prüfweg ohne Download: `exportPDF({ohneRueckfrage:true})` mit `_exportPdfReturnMode`, Bank-PDF über `jsPDF.API.save` abfangen (die Instanz trägt `save` als eigene Eigenschaft, `prototype.save` greift NICHT), Seiten mit pdf.js 3.11.174 in Canvas rendern.
+- **v2556/a/b/c** (`b82342f1`, `9c3114ca`, `bbc9d250`, `be979e08`) — Bismarckstr. Detmold (MFH 546 m², 6 WE, Leerstand):
+  - **Ursache:** `MarketAnalysisService._geomapLevel` filterte die MIETE eines MFH nach der Hausfläche (410–683 m²) → 0 Vergleichsmieten (die Quelle hat 14.351 Mietangebote im 3-km-Umkreis, Median 7,34). Bei Leerstand braucht der Ertragswert `_refQm` → `mieteQm` null → kein Ertragswert, Abruf „Marktpreise" leer. **Jetzt:** Miete beim MFH mit der mittleren Wohnungsgröße (Einheitenliste, sonst Wfl/Einheiten). Ergebnis Bestand 1.195.000 €, Mieterhöhung/Zielbild 1.270.000 €.
+  - Grund-Text: PotenzialService nahm die erste Notiz mit „Ertragswert" — den allgemeinen Hinweis. Jetzt `Ertragswert nicht gerechnet: es fehlt …` aus CrossCheckService; ohne Eingabe wird die Spur geloggt (`[potenzial] keine Ertragswert-Eingabe · …`).
+  - Leerer Abruf `/potenzial/markt` (keine einzige Zahl) wird nicht gespeichert, ohne `abruf.id` bucht das Haupt-Backend nicht.
+  - Fenster „Marktpreisindikation läuft" / „Ertragswerte werden gerechnet" mit Sekundenzähler (`#dp-pot-lauf`, `laufAnzeige()` in potenzial.js).
+  - Ablage: Reiter „Marktbericht-Verlauf" zeigt die abgelegten Abrufe (Datum, Kauf Haus/ETW, Miete, MPI und Ertragswert Bestand), auch ohne Bericht.
+- **Gutschrift (DB, Freigabe Marcel „ja mach das alles fertig"):** Abrufe 8/9 (leer, Bismarckstr.) aus `mb.potenzial_abrufe` gelöscht, Log 1833/1834 gelöscht, `mpi_plus_bank` +2 → 11. Sicherungen `/root/backups/credits-vor-erstattung-20261021-1028.sql.gz`, `mb-potenzial-abrufe-20261021-1028.sql.gz` (Staging).
+- **v2557** (`4f92e077`): am Feld Zinssatz (`d1z`) eigene Hilfe `tab5.zinssatz` statt Zinsbindung; `pflichtFuer(2)` verlangt Zimmer nicht beim MFH (dort ausgeblendet). Handbuch neu erzeugt, `--pruefen` RC 0.
+- **messe-schleife-3** (`8cc1563e`): Markenschriften lokal als woff2 (Space Grotesk, JetBrains Mono, Inter, Cormorant Garamond; variable Fonts, je eine Datei, latin) unter `frontend/messe-schleife/schriften/` mit OFL-Texten; auch im Ordner `Dateien/Messe/Messe-Schleife/`. Ausgeliefert 200 `font/woff2`.
+
+**Nachweis.** Browser auf Staging je Paket (Speichern gesperrt); Gold-Audit Staging RC 0; Buster-Prüfer sauber.
+
+**Rest.**
+- **Prod-Rollout (57) offen:** 127 Commits seit (56), Migrationen mb 019/020, 8 Haupt- und 22 mb-Backend-Dateien. Beide Prod-DBs gesichert: `/root/backups/haupt-20261021-1119.sql.gz` (14 MB, 73 Tabellen), `mb-20261021-1119.sql.gz` (25 MB, 32 Tabellen). Der Merge nach `main` wurde vom Sicherheitsfilter abgewiesen („ja alles ausrollen" reichte nicht). Danach fehlen auf Prod zusätzlich per scp: Videothek-MP4 26/27 (4 Dateien, `/opt/dealpilot/frontend/landing/medien/videothek/`) und die 14 Messe-Clips (`frontend/messe-schleife/clips/`).
+- Handbuch: klickbare Nummern und einklappbare Feldliste beauftragt (Agent).
+- Westerfeld: Pilot-Analyse vom 13.10. rechnet mit alten Steuerzahlen — neu abrufen.
+- Arbeit mit parallelen Agenten: der Git-Index ist geteilt — immer `git commit -F <datei> -- <pfade>`; `6daacf3c` trägt deshalb die Videothek-Dateien unter der Botschaft v2554b.

@@ -4544,3 +4544,31 @@ um die fertige Funktion — gewollt) oder Deklarationen in einer IIFE.
 **Regel:** Globale Hilfsfunktionen bekommen einen Namen, der nicht nach
 einem `window.`-Einstiegspunkt klingt — oder stehen in einer IIFE.
 Ein `onclick="name()"` im HTML ruft IMMER die zuletzt gebundene Fassung.
+
+## Das MFH wird gekauft, aber Wohnungen werden vermietet — auch beim Flächenfilter
+
+Gemessen am 21.10.2026, Bismarckstr. Detmold (MFH, 546 m², 6 WE): „Ertragswerte
+rechnen" und „Marktpreise abrufen" kamen leer zurück. `segment()` wählte für die
+MIETE eines MFH schon richtig die Klasse `Wohnung` — aber
+`MarketAnalysisService._geomapLevel` filterte die Fläche weiter mit der
+Wohnfläche des HAUSES: Mietwohnungen von 410 bis 683 m². Treffer 0, obwohl die
+Quelle im 3-km-Umkreis 14.351 Mietangebote führt. Mit Leerstand braucht der
+Ertragswert eine Vergleichsmiete — ohne sie keine Eingabe, kein Wert.
+
+**Regel:** Wer das Segment wechselt, wechselt auch die Bezugsgröße. Beim MFH zur
+Miete gilt die mittlere Wohnungsgröße (Einheitenliste, sonst Wfl / Einheiten).
+
+Dazu der Tarnfehler: der Grund lautete „Vereinfachtes Sachwert-/Ertragswert-
+verfahren … Indikativ" — die erste Notiz mit dem Wort „Ertragswert" war der
+allgemeine Hinweis. **Eine Fehlermeldung, die per Stichwort aus Notizen gesucht
+wird, findet den Hinweistext zuerst.**
+
+## `[hidden]` verliert gegen eine Klasse mit `display`
+
+Ersteinrichtung v2551: die alte Liste und die alten Kacheln trugen `hidden` —
+und standen im Browser trotzdem da, weil `.dpo-set` und `.dpo-kacheln`
+`display:grid` setzen. Die Klasse schlägt das UA-Stylesheet. Gefunden erst beim
+Durchklicken (v2554a), `node --check` und Code-Lesen sahen nichts.
+
+**Regel:** Ausblenden per inline `style="display:none"` (oder `[hidden]{display:none!important}`
+im eigenen Blatt), und nach jedem Umbau einmal per `offsetParent` zählen, was sichtbar ist.
