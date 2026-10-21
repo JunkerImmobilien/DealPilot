@@ -51,7 +51,7 @@ main{padding:28px 40px 80px;max-width:1180px;width:100%}
 .held h1{font:700 32px/1.15 "Space Grotesk",sans-serif;margin:6px 0 10px;color:#fdfcfa}
 .held p{margin:0 0 14px;max-width:760px;color:#cfc5aa}
 .held .marke{font:700 11px "JetBrains Mono",monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-hi)}
-.kacheln{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px;position:relative;z-index:1}
+.kacheln{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:18px;position:relative;z-index:1}
 .kachel{background:#141210;border:1px solid #2e2820;border-radius:14px;padding:14px 16px;text-decoration:none;display:block}
 .kachel b{font:600 17px "Space Grotesk",sans-serif;color:#fdfcfa;display:block}
 .kachel span{font-size:12.5px;color:#b9ad8f}
@@ -117,6 +117,20 @@ details[open] .pfeil{transform:rotate(90deg)}
 .versteckt{display:none!important}
 .zoom{position:fixed;inset:0;background:rgba(5,5,5,.88);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
 .zoom img{max-width:100%;max-height:100%;border-radius:10px}
+/* v2574 · Teil „Schritt für Schritt": nummerierte Abläufe vor den Feldkapiteln */
+.ablauf{margin:30px 0 0;scroll-margin-top:80px}
+.ablauf h3{font:600 21px/1.2 "Space Grotesk",sans-serif;margin:0 0 6px;display:flex;align-items:center;gap:10px}
+.ablauf h3 .nr{font:700 12px "JetBrains Mono",monospace;color:#1a1407;background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));border-radius:8px;padding:4px 8px;flex:0 0 auto}
+.ablauf .wann{font-size:13.5px;color:var(--leise);margin:-6px 0 10px}
+ol.gang{list-style:none;counter-reset:gang;margin:10px 0 0;padding:0;border:1px solid var(--linie);border-radius:14px;background:#fff;overflow:hidden}
+ol.gang>li{counter-increment:gang;position:relative;padding:12px 16px 12px 58px;border-top:1px solid var(--linie);font-size:14.5px}
+ol.gang>li:first-child{border-top:0}
+ol.gang>li:before{content:counter(gang);position:absolute;left:16px;top:11px;width:28px;height:28px;border-radius:14px;background:var(--obs);color:var(--gold-hi);border:2px solid var(--gold);font:700 12px/24px "JetBrains Mono",monospace;text-align:center}
+.gang .kosten{display:block;margin-top:6px;font-size:13px;color:var(--text);background:var(--karte);border-left:3px solid var(--rot);border-radius:6px;padding:5px 9px}
+.gang .kosten b{font:700 10px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--rot);margin-right:6px}
+.gang .plan{display:inline-block;margin-left:6px;vertical-align:1px}
+.siehe{margin:10px 0 0;font-size:13.5px;color:var(--leise)}
+.siehe a{color:var(--gold-lo);font-weight:600;margin-right:12px}
 .fuss{margin-top:50px;font-size:12.5px;color:var(--leise);border-top:1px solid var(--linie);padding-top:14px}
 @media (max-width:900px){
   figure.handy{display:block}
@@ -142,21 +156,21 @@ details[open] .pfeil{transform:rotate(90deg)}
 <header class="kopf">
   <button type="button" class="knopf zart menue" id="menue" aria-label="Inhaltsverzeichnis">☰ Inhalt</button>
   <img src="assets/dealpilot-logo-rahmen.png" alt="DealPilot">
-  <div class="titel">Flughandbuch<small>Objekt anlegen · ETW · EFH · MFH</small></div>
+  <div class="titel">Flughandbuch<small>Schritt für Schritt · ETW · EFH · MFH</small></div>
   <div class="platz"></div>
   <button type="button" class="knopf" id="pdf-alles">PDF · komplett</button>
 </header>
 <div class="rahmen">
   <nav class="inhalt" id="inhalt" aria-label="Inhaltsverzeichnis">
-    <input type="search" class="suche" id="suche" placeholder="Feld suchen, z. B. Miteigentumsanteil" aria-label="Felder durchsuchen">
+    <input type="search" class="suche" id="suche" placeholder="Suchen, z. B. Anschlussfinanzierung" aria-label="Abläufe und Felder durchsuchen">
     <div class="treffer" id="treffer"></div>
     <div id="toc"></div>
   </nav>
   <main id="haupt">
     <div class="held" id="start">
       <div class="marke">Flughandbuch · Pre-Flight</div>
-      <h1>Ein Objekt anlegen — Feld für Feld</h1>
-      <p>Für jede Objektart der Weg durch die Reiter: was in jedes Feld gehört, woher du den Wert bekommst und was er in DealPilot bewirkt. Die Nummern in den Bildern sind die Nummern in den Feldlisten darunter.</p>
+      <h1>Schritt für Schritt — und Feld für Feld</h1>
+      <p>Vorn die typischen Aufgaben als nummerierte Abläufe: vom ersten Objekt über Finanzierung, Marktbericht und Steuer bis zum Portfolio. Danach für jede Objektart der Weg durch die Reiter: was in jedes Feld gehört, woher du den Wert bekommst und was er in DealPilot bewirkt. Die Nummern in den Bildern sind die Nummern in den Feldlisten darunter.</p>
       <div class="zeile" id="held-knoepfe"></div>
       <div class="kacheln" id="kacheln"></div>
     </div>
@@ -164,7 +178,7 @@ details[open] .pfeil{transform:rotate(90deg)}
     <div class="fuss" id="fuss"></div>
   </main>
 </div>
-<script src="handbuch/handbuch-daten.js?v=v2560h"></script>
+<script src="handbuch/handbuch-daten.js?v=v2574"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="js/pdf-logo.js?v=v1634b"></script>
 <script src="js/whitelabel-override.js?v=v2149"></script>
@@ -291,8 +305,42 @@ details[open] .pfeil{transform:rotate(90deg)}
     return '<figure data-zoom' + (b.klasse ? ' class="' + b.klasse + '"' : '') + (ids.length ? ' data-felder="' + esc(ids.join(' ')) + '"' : '') + '><div class="bildrahmen"><img loading="lazy" src="handbuch/bilder/' + esc(b.datei) + '?v=v2560j" alt="' + esc(b.alt || 'Bildschirmfoto') + '">' + marken + '</div><figcaption>' + esc(b.unterschrift || felder) + (ids.length ? ' · Nummer anklicken springt zur Beschreibung' : '') + '</figcaption></figure>';
   }
 
+  /* v2574 · Teil A „Schritt für Schritt" — Daten aus tools/handbuch-ablaeufe.mjs,
+     jeder Schritt dort am Code belegt (die Belege bleiben in den Daten, nicht im Text) */
+  var ABL = H.ablaeufe || [];
+  function ablaufHtml(a, i) {
+    var such = [a.titel, a.kurz, a.wann, a.hinweis].concat(a.schritte.map(function (s) { return s.t + ' ' + s.kosten; })).join(' ').replace(/\*\*/g, '').toLowerCase();
+    return '<div class="ablauf" id="a-' + esc(a.id) + '" data-such="' + esc(such) + '">'
+      + '<h3><span class="nr">A' + (i + 1) + '</span>' + esc(a.titel) + '</h3>'
+      + '<p class="einl">' + rich(a.kurz) + '</p>'
+      + (a.wann ? '<p class="wann"><b>Wann:</b> ' + esc(a.wann) + '</p>' : '')
+      + '<ol class="gang">' + a.schritte.map(function (s) {
+          return '<li>' + rich(s.t)
+            + (s.plan ? '<span class="chip plan">' + esc(s.plan) + '</span>' : '')
+            + (s.kosten ? '<span class="kosten"><b>Kontingent / Kosten</b>' + esc(s.kosten) + '</span>' : '') + '</li>';
+        }).join('') + '</ol>'
+      + (a.bilder || []).map(function (b) { return bildHtml({ datei: b.datei, alt: b.unter }, b.unter); }).join('')
+      + (a.hinweis ? '<div class="hinweis">' + esc(a.hinweis) + '</div>' : '')
+      + (a.siehe && a.siehe.length ? '<p class="siehe">Feld für Feld: ' + a.siehe.map(function (x) { return '<a href="' + esc(x[0]) + '">' + esc(x[1]) + ' →</a>'; }).join('') + '</p>' : '')
+      + '</div>';
+  }
+
   function render() {
     var toc = '', inhalt = '', kacheln = '';
+    if (ABL.length) {
+      var nS = ABL.reduce(function (s, a) { return s + a.schritte.length; }, 0);
+      kacheln += '<a class="kachel" href="#k-ablaeufe"><b>Schritt für Schritt</b><span>' + ABL.length + ' Abläufe · ' + nS + ' Schritte</span></a>';
+      toc += '<h4>Teil A</h4><a class="kap" href="#k-ablaeufe">Schritt für Schritt</a><div class="sub">'
+        + ABL.map(function (a, i) { return '<a href="#a-' + esc(a.id) + '">A' + (i + 1) + ' · ' + esc(a.titel) + '</a>'; }).join('') + '</div>';
+      inhalt += '<section class="kapitel" id="k-ablaeufe"><div class="kapkopf"><h2><span class="art">Teil A · Abläufe</span>Schritt für Schritt</h2>'
+        + '<button type="button" class="knopf klein" data-pdf="ABL">PDF · Schritt für Schritt</button></div>'
+        + '<div class="steckbrief"><h3>So liest du die Abläufe</h3>'
+        + '<div class="stufe"><b>Die Nummern</b><div>Jeder Ablauf zählt ab 1 — so oft klicken, wie es Schritte gibt. Knöpfe und Reiter heißen hier genau so wie in der App.</div></div>'
+        + '<div class="stufe"><b>Kontingent</b><div>Wo ein Schritt Bewertungen aus deinem Kontingent verbraucht oder anderswo Kosten entstehen, steht das rot markiert darunter.</div></div>'
+        + '<div class="stufe"><b>Feld für Feld</b><div>Was in jedes einzelne Feld gehört, steht in den Kapiteln danach — die Links unter den Abläufen führen hin.</div></div>'
+        + '<div class="stufe"><b>Als Netzplan</b><div>Dieselben Abläufe zeigt die Hilfe im Prozess-Atlas als animierten Netzplan.</div></div></div>'
+        + ABL.map(ablaufHtml).join('') + '</section>';
+    }
     H.kapitel.forEach(function (kap, ki) {
       var gesamt = kap.schritte.reduce(function (s, x) { return s + x.felder.length; }, 0);
       kacheln += '<a class="kachel" href="#k-' + kap.art + '"><b>' + esc(kap.name) + '</b><span>' + kap.art + ' · ' + gesamt + ' Felder · ' + kap.schritte.length + (kap.wohnungsliste ? ' Reiter + Wohnungsliste' : ' Reiter') + '</span></a>';
@@ -353,6 +401,12 @@ details[open] .pfeil{transform:rotate(90deg)}
       setze(d, !!(q && hit));
       if (q && hit) { var w = d.closest('details.weitere'); if (w) w.open = true; }
     });
+    /* v2574 · die Abläufe werden mit durchsucht (ganzer Ablauf als Treffer) */
+    document.querySelectorAll('.ablauf').forEach(function (a) {
+      var hit = !q || a.getAttribute('data-such').indexOf(q) >= 0;
+      a.classList.toggle('versteckt', !hit); if (q && hit) n++;
+    });
+    var kA = $('k-ablaeufe'); if (kA) kA.classList.toggle('versteckt', !!q && !kA.querySelector('.ablauf:not(.versteckt)'));
     document.querySelectorAll('[data-schritt]').forEach(function (s) {
       var sichtbar = !q || s.querySelector('.feld:not(.versteckt)');
       s.classList.toggle('versteckt', !sichtbar);
@@ -386,7 +440,7 @@ details[open] .pfeil{transform:rotate(90deg)}
       var doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4' });
       var W = 210, Hh = 297, L = 16, R = 16, CW = W - L - R, y = 0, G = goldRgb(), GD = G.map(function (v) { return Math.round(v * 0.82); });
       var logo = null; try { logo = window.DealPilotPdfLogo ? await window.DealPilotPdfLogo.dealpilot() : null; } catch (e) {}
-      var titel = arten.length > 1 ? 'Flughandbuch · Objekt anlegen' : 'Flughandbuch · ' + H.kapitel.filter(function (k) { return k.art === arten[0]; })[0].name + ' anlegen';
+      var titel = arten.length > 1 ? 'Flughandbuch · Schritt für Schritt und Feld für Feld' : arten[0] === 'ABL' ? 'Flughandbuch · Schritt für Schritt' : 'Flughandbuch · ' + H.kapitel.filter(function (k) { return k.art === arten[0]; })[0].name + ' anlegen';
       var unter = '';
       function kopf() {
         y = 22;
@@ -409,7 +463,8 @@ details[open] .pfeil{transform:rotate(90deg)}
         gr = gr || 9; einzug = einzug || 0;
         doc.setFont('helvetica', 'normal'); doc.setFontSize(gr); doc.setTextColor(farbe == null ? 60 : farbe);
         var z = doc.splitTextToSize(pdfText(t), CW - einzug), lh = gr * 0.42;
-        z.forEach(function (zeile) { platz(lh + 1); doc.text(zeile, L + einzug, y); y += lh; });
+        /* v2574 · nach einem Seitenumbruch hat kopf() Schrift und Farbe umgestellt - je Zeile neu setzen */
+        z.forEach(function (zeile) { platz(lh + 1); doc.setFont('helvetica', 'normal'); doc.setFontSize(gr); doc.setTextColor(farbe == null ? 60 : farbe); doc.text(zeile, L + einzug, y); y += lh; });
         y += 1.5;
       }
       async function bild(src) {
@@ -445,6 +500,24 @@ details[open] .pfeil{transform:rotate(90deg)}
         doc.setDrawColor(236, 231, 220); doc.line(L + 8, y - 1, W - R, y - 1); y += 3;
       }
       var erste = true;
+      /* v2574 · Teil A „Schritt für Schritt" vor den Kapiteln */
+      if (arten.indexOf('ABL') >= 0 && ABL.length) {
+        unter = 'Teil A · Schritt für Schritt (' + ABL.length + ' Abläufe)';
+        kopf(); erste = false;
+        absatz('Typische Aufgaben als nummerierte Abläufe. Knöpfe und Reiter heißen hier genau so wie in der App. Was dein Kontingent belastet oder anderswo Kosten auslöst, ist mit KONTINGENT / KOSTEN markiert. Was in jedes Feld gehört, steht in den Kapiteln danach.', 8.6, 110);
+        for (var ai = 0; ai < ABL.length; ai++) {
+          var a = ABL[ai];
+          abschnitt('A' + (ai + 1) + ' · ' + a.titel);
+          absatz(a.kurz, 9, 60);
+          if (a.wann) absatz('Wann: ' + a.wann, 8.4, 110);
+          a.schritte.forEach(function (st, i) {
+            absatz((i + 1) + '.  ' + st.t.replace(/\*\*/g, '') + (st.plan ? '  [' + st.plan + ']' : ''), 8.8, 40, 4);
+            if (st.kosten) absatz('KONTINGENT / KOSTEN: ' + st.kosten, 8.2, 110, 9);
+          });
+          for (var abi = 0; abi < (a.bilder || []).length; abi++) await bild('handbuch/bilder/' + a.bilder[abi].datei + '?v=v2560h');
+          if (a.hinweis) absatz('Hinweis: ' + a.hinweis, 8.2, 110, 4);
+        }
+      }
       for (var ki = 0; ki < H.kapitel.length; ki++) {
         var kap = H.kapitel[ki]; if (arten.indexOf(kap.art) < 0) continue;
         unter = 'Kapitel ' + (ki + 1) + ' · ' + kap.name + ' (' + kap.art + ')';
@@ -482,7 +555,7 @@ details[open] .pfeil{transform:rotate(90deg)}
         doc.text('Seite ' + p + ' von ' + nS, W - R, Hh - 11.5, { align: 'right' });
       }
       window.__hbPdf = { seiten: nS, arten: arten };
-      doc.save('DealPilot-Flughandbuch' + (arten.length > 1 ? '' : '-' + arten[0]) + '.pdf');
+      doc.save('DealPilot-Flughandbuch' + (arten.length > 1 ? '' : arten[0] === 'ABL' ? '-Schritt-fuer-Schritt' : '-' + arten[0]) + '.pdf');
     } finally { if (knopf) { knopf.disabled = false; knopf.textContent = alt; } }
   }
   window.DealPilotHandbuch = { pdf: pdf, daten: H };
@@ -490,7 +563,7 @@ details[open] .pfeil{transform:rotate(90deg)}
   render();
   /* schmal: die Desktop-Bilder neben den Handy-Bildern zuklappen */
   try { if (window.matchMedia('(max-width:900px)').matches) document.querySelectorAll('details.desk-mehr').forEach(function (d) { d.open = false; }); } catch (e) {}
-  $('held-knoepfe').innerHTML = H.kapitel.map(function (k) { return '<button type="button" class="knopf zart klein" data-pdf="' + k.art + '">PDF · ' + esc(k.name) + '</button>'; }).join('');
+  $('held-knoepfe').innerHTML = (ABL.length ? '<button type="button" class="knopf zart klein" data-pdf="ABL">PDF · Schritt für Schritt</button>' : '') + H.kapitel.map(function (k) { return '<button type="button" class="knopf zart klein" data-pdf="' + k.art + '">PDF · ' + esc(k.name) + '</button>'; }).join('');
   document.addEventListener('click', function (e) {
     var p = e.target.closest('[data-pdf]'); if (p) { pdf([p.getAttribute('data-pdf')], p); return; }
     var mk = e.target.closest('.bildmarke'); if (mk) { e.preventDefault(); springeZuFeld(mk.getAttribute('data-ziel')); return; }
@@ -500,14 +573,14 @@ details[open] .pfeil{transform:rotate(90deg)}
     var fz = e.target.closest('figure[data-zoom]'); if (fz) { var z = document.createElement('div'); z.className = 'zoom'; z.innerHTML = '<img src="' + fz.querySelector('img').src + '" alt="">'; z.onclick = function () { z.remove(); }; document.body.appendChild(z); return; }
     if (e.target.closest('nav.inhalt a')) document.body.classList.remove('menue-auf');
   });
-  $('pdf-alles').addEventListener('click', function () { pdf(H.kapitel.map(function (k) { return k.art; }), this); });
+  $('pdf-alles').addEventListener('click', function () { pdf(['ABL'].concat(H.kapitel.map(function (k) { return k.art; })), this); });
   $('menue').addEventListener('click', function () { document.body.classList.toggle('menue-auf'); });
   $('suche').addEventListener('input', suchen);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var z = document.querySelector('.zoom'); if (z) z.remove(); document.body.classList.remove('menue-auf'); } });
   /* Inhaltsverzeichnis folgt dem Lesen */
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (!x.isIntersecting) return; document.querySelectorAll('nav.inhalt a.an').forEach(function (a) { a.classList.remove('an'); }); var a = document.querySelector('nav.inhalt a[href="#' + x.target.id + '"]'); if (a) a.classList.add('an'); }); }, { rootMargin: '-80px 0px -70% 0px' });
-    document.querySelectorAll('[data-schritt], section.kapitel').forEach(function (s) { io.observe(s); });
+    document.querySelectorAll('[data-schritt], section.kapitel, .ablauf').forEach(function (s) { io.observe(s); });
   }
 })();
 </script>

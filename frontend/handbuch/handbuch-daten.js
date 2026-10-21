@@ -2,7 +2,7 @@
 window.DP_HANDBUCH = {
  "version": "v2555",
  "quellen": {
-  "index.html": "3539746ea12db2bc",
+  "index.html": "1c94fd03702f9354",
   "tooltip-content.js": "ede920d2f6583fdc",
   "help.js": "f7e7ccb0d347a0e2",
   "tour-content.js": "337253bde80bf1e1",
@@ -11,15 +11,16 @@ window.DP_HANDBUCH = {
   "feld-hilfe.js": "db5913c4ec4dc08e",
   "mfh-einheiten.js": "9fdc26a09d7d7669",
   "calc.js": "c43592c29e191de1",
-  "ui.js": "6a063c2f271bc401",
+  "ui.js": "c2c22102bef4ef5e",
   "pdf.js": "315c92dfeefac6e7",
   "pdf-investment-bank.js": "cd661801c609d54c",
   "financing-pdf.js": "499286d3cab32382",
   "werbungskosten-pdf.js": "4048d673682f3acb",
   "pdf-anlage-bmf.js": "41997cf31f29fb07",
   "pdf-kaufpreisaufteilung.js": "fe5f492746a957c4",
-  "frontend-konstanten.json": "494c505bc98da6d7",
-  "aufnahme.json": "433c9aa7f5c9ec56"
+  "frontend-konstanten.json": "0a7cb96f8371632c",
+  "aufnahme.json": "433c9aa7f5c9ec56",
+  "handbuch-ablaeufe.mjs": "4a50fccab170f185"
  },
  "reiter": [
   {
@@ -16882,5 +16883,924 @@ window.DP_HANDBUCH = {
    "hoehe": 987,
    "hinweis": "Desktop, Eingabetiefe 3, weitere Objektdetails an"
   }
- }
+ },
+ "ablaeufe": [
+  {
+   "id": "einrichten",
+   "titel": "Vor dem ersten Flug: Anlegerprofil und Einstellungen",
+   "kurz": "Einmal einrichten, womit DealPilot rechnet — danach ist jedes neue Objekt mit deinen Annahmen vorbelegt.",
+   "wann": "Beim ersten Anmelden und immer dann, wenn sich deine Annahmen ändern.",
+   "hinweis": "Unten im Einstellungsfenster steht „Auto-Save aktiv · Änderungen werden direkt übernommen“ — die meisten Felder speichern sich sofort.",
+   "bilder": [],
+   "siehe": [],
+   "schritte": [
+    {
+     "t": "Beim ersten Anmelden öffnet sich ein Einrichtungsfenster mit sechs Schritten: **Aussehen**, **Daten**, **Finanzierung** (dein Anlegerprofil), **Steuer**, **Bewertung** und **Hilfe**. Jeden Schritt kannst du überspringen — dann gilt die Vorbelegung.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/onboarding.js: Wie soll DealPilot aussehen?",
+      "js/onboarding.js: Dein Anlegerprofil — womit sollen wir rechnen?",
+      "js/onboarding.js: Möchtest du Hilfe beim Start?"
+     ]
+    },
+    {
+     "t": "Später erreichst du alles über die Seitenleiste: **Aktionen** → unter „System“ **Einstellungen**.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: <span class=\"sb-actions-l\">Aktionen</span>",
+      "index.html: <div class=\"sb-act-section-title\">System</div>",
+      "index.html: sbActionsAction('settings')"
+     ]
+    },
+    {
+     "t": "Reiter **Standardwerte**, ganz oben **Dein Anlegerprofil**: wähle **Ausgewogen**, **Vorsichtig** oder **Renditeorientiert**. Das Profil setzt Tilgung, Eigenkapital, Mietausfall, Mindest-DSCR, den Abschlag auf Angebotspreise und die Gewichte des Deal Scores.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/settings.js: standardwerte:['Standardwerte'",
+      "js/standardwerte-karten.js: Dein Anlegerprofil",
+      "js/standardwerte-karten.js: Dein Anlegerprofil setzt Tilgung, Eigenkapital, Mietausfall, Mindest-DSCR, den Abschlag auf Angebotspreise und die Gewichte des Deal Scores.",
+      "js/standardwerte-karten.js: 'Renditeorientiert'"
+     ]
+    },
+    {
+     "t": "Darunter unter **Lageklassen A · B · C** je Klasse die Zielrendite (% brutto) eintragen und bei **Standard für neue Quick-Checks** die Klasse wählen, die im Quick-Check vorausgewählt sein soll.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/investment-profile.js: Lageklassen A · B · C",
+      "js/investment-profile.js: Standard für neue Quick-Checks"
+     ]
+    },
+    {
+     "t": "Mit **Profil speichern** sichern. Die Gewichte des Scores gelten sofort; **Auf Defaults zurücksetzen** stellt die Vorgaben wieder her.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/investment-profile.js: >Profil speichern<",
+      "js/investment-profile.js: >Auf Defaults zurücksetzen<",
+      "js/standardwerte-karten.js: die Score-Gewichte gelten sofort"
+     ]
+    },
+    {
+     "t": "Reiter **Kontakt & Logo**: Kontaktdaten eintragen und über **Logo hochladen** dein Logo setzen — es steht dann im Kopf deiner PDFs.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/settings.js: contact:['Kontakt & Logo'",
+      "js/settings.js: Logo hochladen"
+     ]
+    },
+    {
+     "t": "Reiter **Mandanten**: festlegen, wer Objekte hält (Privat oder eine Gesellschaft), und dort die Steuerzeiträume pflegen (siehe Ablauf „Steuer“).",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/settings.js: mandanten:['Mandanten','Gesellschaften, Halter und Steuerregime verwalten.']"
+     ]
+    },
+    {
+     "t": "Reiter **Plan**: hier siehst du dein Abo und dein Kontingent — wie viele Marktberichte je Stufe in diesem Monat noch frei sind.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/settings.js: plan:['Plan','Dein aktueller Tarif und dein Bewertungs-Kontingent.']"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "quickcheck",
+   "titel": "Erstes Objekt: Quick-Check und „Als Objekt speichern“",
+   "kurz": "Ein Inserat in einer Minute einordnen — und wenn es sich lohnt, mit einem Klick als Objekt anlegen.",
+   "wann": "",
+   "hinweis": "Nach der Marktbewertung trägt DealPilot die Marktmiete als Grundmiete ein. Willst du mit der Ist-Miete rechnen, trag sie danach wieder ein.",
+   "bilder": [],
+   "siehe": [],
+   "schritte": [
+    {
+     "t": "Seitenleiste: **Aktionen** → unter „Anlegen“ **Quick Boarding**. Der Quick-Check öffnet sich im Inhaltsbereich.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: <div class=\"sb-act-section-title\">Anlegen</div>",
+      "index.html: sbActionsAction('quickcheck')",
+      "index.html: <span class=\"sb-act-l\">Quick Boarding</span>"
+     ]
+    },
+    {
+     "t": "Die Pflichtfelder ausfüllen: Straße, PLZ, Ort, Wohnfläche, Kaufpreis, Nettokaltmiete, Hausgeld, den nicht umlagefähigen Anteil, Eigenkapital, Zins und Tilgung. Die Hausnummer ist freiwillig. Solange etwas fehlt, bleibt das Speichern gesperrt.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "quickcheck-app.html: Pflichtfelder aus, um das Objekt speichern zu können"
+     ]
+    },
+    {
+     "t": "Optional Daten holen: in der Leiste **QUICKBOARDING PASS** Kacheln anklicken — **DealPilot** (Marktbewertung: Marktwert, Marktmiete, Lage), **Exposé / Marktbericht** (PDF auslesen), **Sprachaufzeichnung** (Objekt frei einsprechen) — und **Abrufen** drücken.",
+     "kosten": "Die DealPilot-Marktbewertung verbraucht 1 Bewertung aus deinem Kontingent. Vorher fragt DealPilot im Fenster „Abruf bestätigen“ nach.",
+     "plan": "",
+     "belege": [
+      "quickcheck-app.html: QUICKBOARDING PASS",
+      "quickcheck-app.html: Exposé / Marktbericht",
+      "quickcheck-app.html: Sprachaufzeichnung",
+      "quickcheck-app.html: onclick=\"QcApp.openCreditModal()\"",
+      "quickcheck-app.html: Abruf bestätigen",
+      "js/object-actions.js: dealpilot:    '1 Bewertung'"
+     ]
+    },
+    {
+     "t": "Ergebnis lesen: **QUICK CHECK SCORE** mit Kennzahlen, die Bewertung und die **Verhandlungs-Empfehlung** mit Zielkaufpreis.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "quickcheck-app.html: QUICK CHECK SCORE",
+      "quickcheck-app.html: Verhandlungs-Empfehlung"
+     ]
+    },
+    {
+     "t": "Passt das Objekt: **Als Objekt speichern** klicken.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "quickcheck-app.html: Als Objekt speichern"
+     ]
+    },
+    {
+     "t": "Im Fenster **Diese Daten werden übernommen** zeigt der Reiter **Übernahme** die Werte der Marktbewertung — unter **Spanne** wählst du Unten, Ø oder Oben. Der Reiter **Ausgelesene Daten** zeigt alles aus dem Quick-Check. Haken entfernen, was nicht mit soll, oder **Alle übernehmen**.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/qc-bridge.js: Diese Daten werden übernommen",
+      "js/qc-bridge.js: Ausgelesene Daten",
+      "js/qc-bridge.js: <span class=\"qcpm-cl\">Spanne</span>",
+      "js/qc-bridge.js: Alle übernehmen"
+     ]
+    },
+    {
+     "t": "**Speichern & übernehmen** — DealPilot legt ein neues Objekt an; ein geöffnetes Objekt wird nicht überschrieben.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/qc-bridge.js: Speichern & übernehmen"
+     ]
+    },
+    {
+     "t": "Ohne Quick-Check geht es auch: **Aktionen** → **Neues Objekt** (oder **Neues Objekt hinzufügen** oben in der Objektliste) legt ein leeres Objekt an.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: sbActionsAction('new')",
+      "index.html: <span class=\"sb-act-l\">Neues Objekt</span>",
+      "js/storage.js: Neues Objekt hinzufügen"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "import",
+   "titel": "Exposé oder PDF einlesen",
+   "kurz": "Statt abzutippen: Exposé, Marktbericht oder andere PDFs lesen lassen und die Werte gezielt übernehmen.",
+   "wann": "",
+   "hinweis": "Aus fremden Gutachten übernimmt DealPilot nur die Eingaben, nie deren Ergebnis — gerechnet wird in DealPilot.",
+   "bilder": [],
+   "siehe": [],
+   "schritte": [
+    {
+     "t": "Das Objekt öffnen. In der Leiste oben im Objekt („Daten einlesen“ bzw. „Daten übernehmen aus“) die Kachel **Exposé / Marktbericht** wählen und **Abrufen** drücken.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/object-actions.js: <span class=\"k-heute\">Daten einlesen</span>",
+      "js/object-actions.js: pfTileTool('import', _doc, 'Exposé / Marktbericht'"
+     ]
+    },
+    {
+     "t": "Im Fenster **PDFs einlesen — Exposé, Marktbericht, Dokumente** die Dateien auswählen oder hineinziehen. Mehrere PDFs auf einmal gehen, bis 100 MB je Datei.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/object-actions.js: PDFs einlesen — Exposé, Marktbericht, Dokumente",
+      "js/object-actions.js: mehrere Dateien möglich · max 100 MB je Datei"
+     ]
+    },
+    {
+     "t": "DealPilot erkennt den Typ jeder Datei (auch gescannte PDFs); du kannst ihn je Datei umstellen. Alle Werte werden zusammengeführt — widersprechen sich zwei Dateien, führt der Marktbericht.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/object-actions.js: Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar",
+      "js/object-actions.js: Marktbericht führt bei Konflikt"
+     ]
+    },
+    {
+     "t": "Liste prüfen: Weicht ein gelesener Wert von dem ab, was schon im Objekt steht, ist die Zeile markiert und nicht vorgehakt. Gefundene Bilder lassen sich in die Objektfotos übernehmen.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/object-actions.js: ' class=\"oabi-abw\"'",
+      "js/object-actions.js: in Objektfotos übernehmen"
+     ]
+    },
+    {
+     "t": "**Ausgewählte übernehmen** — die angehakten Werte stehen in den Feldern.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/object-actions.js: Ausgewählte übernehmen"
+     ]
+    },
+    {
+     "t": "Für andere Dokumente: **Aktionen** → **Import**. Dort liest **Dokument einlesen** z. B. Grundbuch, Gutachten oder Kaufvertrag; **Excel-Kalkulation importieren** übernimmt eine Excel-Kalkulation ins geöffnete Objekt (bestehende Eingaben werden überschrieben); **JSON-Backup importieren** stellt eine Sicherung wieder her.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: sbActionsAction('hub-import')",
+      "js/import-export-modal.js: <h3>Dokument einlesen",
+      "js/import-export-modal.js: <h3>Excel-Kalkulation importieren",
+      "js/import-export-modal.js: Bestehende Eingaben im aktuellen Objekt werden überschrieben",
+      "js/import-export-modal.js: <h3>JSON-Backup importieren"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "erfassen",
+   "titel": "Ein Objekt vollständig erfassen — die Reiter der Reihe nach",
+   "kurz": "Der Weg durch die Datenaufnahme, vom Groben zum Feinen. Was in jedes einzelne Feld gehört, steht in den Kapiteln Eigentumswohnung, Einfamilienhaus und Mehrfamilienhaus.",
+   "wann": "",
+   "hinweis": "",
+   "bilder": [
+    {
+     "datei": "hb-etw-s0-1.webp",
+     "unter": "Reiter Objekt, Objektdaten — die Nummern gehören zur Feldliste im Kapitel Eigentumswohnung"
+    }
+   ],
+   "siehe": [
+    [
+     "#k-ETW",
+     "Kapitel Eigentumswohnung"
+    ],
+    [
+     "#k-EFH",
+     "Kapitel Einfamilienhaus"
+    ],
+    [
+     "#k-MFH",
+     "Kapitel Mehrfamilienhaus"
+    ],
+    [
+     "#s-MFH-wohnungen",
+     "Wohnungsliste"
+    ]
+   ],
+   "schritte": [
+    {
+     "t": "Das Objekt in der Objektliste anklicken. Änderungen speichert DealPilot automatisch.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/tour-content.js: werden automatisch gespeichert"
+     ]
+    },
+    {
+     "t": "Reiter **Objekt**: oben die **Eingabetiefe** wählen (Pillen 1 · 2 · 3 — Einfach, Mittel, Ausgiebig). Sie bestimmt, welche Felder für den Marktbericht Pflicht sind. Den Haken **weitere Objektdetails angeben** setzen, wenn du alle Felder sehen willst. Dann Adresse, Objektart, Wohnfläche und Baujahr eintragen.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: <span class=\"tab-lbl\">Objekt</span>",
+      "index.html: <span class=\"oe-ziel-lbl\">Eingabetiefe</span>",
+      "index.html: weitere Objektdetails angeben",
+      "js/objekt-reiter.js: name: 'Einfach · Stufe 1'"
+     ]
+    },
+    {
+     "t": "Beim Mehrfamilienhaus die Wohnungen erfassen — die **Wohnungsliste** mit ihren Schritten steht im Kapitel Mehrfamilienhaus.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/mfh-einheiten.js: var SCHRITTE = ["
+     ]
+    },
+    {
+     "t": "Reiter **Investition**: Kaufpreis und Kaufnebenkosten (Makler, Notar, Grundbuchamt, Grunderwerbsteuer), dazu Sanierung und Inventar, wenn es sie gibt.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: <span class=\"tab-lbl\">Investition</span>"
+     ]
+    },
+    {
+     "t": "Reiter **Miete**: Nettokaltmiete pro Monat, zusätzliche Einnahmen und die Angaben zum Mietvertrag.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: <span class=\"tab-lbl\">Miete</span>"
+     ]
+    },
+    {
+     "t": "Reiter **Finanzierung**: Darlehen, Zinsbindung und Anschlussfinanzierung (eigener Ablauf weiter unten).",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: <span class=\"tab-lbl\">Finanzierung</span>"
+     ]
+    },
+    {
+     "t": "Reiter **Bewirtschaftung**: entweder schnell als Prozent der Nettokaltmiete oder als einzelne Kosten pro Jahr. Leere Felder füllt DealPilot aus deinen Standardwerten je Objektart.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: <span class=\"tab-lbl\">Bewirtschaftung</span>"
+     ]
+    },
+    {
+     "t": "Reiter **Steuer**: Einkommen und AfA (eigener Ablauf weiter unten).",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: <span class=\"tab-lbl\">Steuer</span>"
+     ]
+    },
+    {
+     "t": "Kontrolle: rechts in der Reiterleiste zeigt die Anzeige „… / 6 · … %“, wie weit die Datenaufnahme ist. Danach die Ergebnisse ansehen: Reiter **Bewertung** (Kennzahlen), **Pilot-Analyse** und **Deal-Aktion**.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: title=\"Workflow-Fortschritt\"",
+      "index.html: <span class=\"tab-lbl\">Bewertung</span>",
+      "index.html: <span class=\"tab-lbl\">Pilot-Analyse</span>",
+      "index.html: <span class=\"tab-lbl\">Deal-Aktion</span>"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "finanzierung",
+   "titel": "Finanzierung und Anschlussfinanzierung eintragen",
+   "kurz": "Das Darlehen so erfassen, wie es im Vertrag oder Angebot steht — und festlegen, womit nach der Zinsbindung gerechnet wird.",
+   "wann": "",
+   "hinweis": "",
+   "bilder": [
+    {
+     "datei": "hb-etw-s3-2.webp",
+     "unter": "Zinsbindung, Bank-PDF-Import und der Haken für die Anschlussfinanzierung"
+    },
+    {
+     "datei": "hb-etw-s3-x1.webp",
+     "unter": "Nach dem Haken: die Felder der Anschlussfinanzierung"
+    }
+   ],
+   "siehe": [
+    [
+     "#s-ETW-s3",
+     "Reiter Finanzierung, Feld für Feld"
+    ]
+   ],
+   "schritte": [
+    {
+     "t": "Reiter **Finanzierung**, Karte **Darlehen I – Hauptdarlehen**.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Darlehen I – Hauptdarlehen"
+     ]
+    },
+    {
+     "t": "**Art des Darlehens** wählen: **Annuitätendarlehen** oder **Tilgungsaussetzungsdarlehen (mit Bausparvertrag)**. Bei der Tilgungsaussetzung erscheint zusätzlich die Karte für den Bausparvertrag.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: <label>Art des Darlehens",
+      "index.html: Tilgungsaussetzungsdarlehen (mit Bausparvertrag)",
+      "index.html: Bausparvertrag"
+     ]
+    },
+    {
+     "t": "Eigenkapital, Darlehenssumme, **Zinssatz nominal (% p.a.)**, **Tilgung (% p.a.)** und **Zinsbindung (Jahre)** eintragen. Rate, Restschuld am Ende der Zinsbindung und das Ende der Bindung rechnet DealPilot selbst.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Zinssatz nominal (% p.a.)",
+      "index.html: Tilgung (% p.a.)",
+      "index.html: Zinsbindung (Jahre)",
+      "index.html: Restschuld Ende Zinsbindung"
+     ]
+    },
+    {
+     "t": "Liegt der Darlehensvertrag als PDF vor: **Daten aus Bank-PDF importieren** — die Werte werden aus dem Vertrag übernommen.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Daten aus Bank-PDF importieren",
+      "index.html: Bankvertrag scannen — Werte werden automatisch übernommen"
+     ]
+    },
+    {
+     "t": "Anschlussfinanzierung: den Haken **Eigene Anschlussfinanzierung für Darlehen 1** setzen und **Zinssatz Anschluss (%)** sowie **Tilgung Anschluss (%)** eintragen. Ohne Haken läuft das Darlehen nach der Bindung zu den heutigen Konditionen weiter.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Eigene Anschlussfinanzierung für Darlehen 1",
+      "index.html: Zinssatz Anschluss (%)",
+      "index.html: Tilgung Anschluss (%)",
+      "js/help.js: Ohne Haken läuft das Darlehen zu den heutigen Konditionen weiter"
+     ]
+    },
+    {
+     "t": "Ein zweites Darlehen (z. B. Förderdarlehen): in der Karte **Darlehen II – Zusatzdarlehen** auf **Hinzufügen** — es hat seine eigene Anschlussfinanzierung.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Darlehen II – Zusatzdarlehen",
+      "index.html: <span>Hinzufügen</span>",
+      "index.html: Eigene Anschlussfinanzierung für Darlehen 2"
+     ]
+    },
+    {
+     "t": "Wirkung prüfen: Die Mehrbelastung nach der Zinsbindung (Zinsänderungsrisiko) steht im Reiter **Bewertung**.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/help.js: Es steht im Reiter <strong>Bewertung</strong> und im Bankgespräch"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "rnd",
+   "titel": "Restnutzungsdauer mit dem Assistenten ermitteln",
+   "kurz": "Ist das Gebäude kürzer nutzbar als die Regel-AfA annimmt, ist ein höherer AfA-Satz möglich. Der Assistent ermittelt die Restnutzungsdauer und setzt den Satz.",
+   "wann": "",
+   "hinweis": "Der Assistent dient der Steuer. Für den Marktbericht rechnet DealPilot die Restnutzungsdauer aus den Modernisierungen im Reiter Objekt (Modernisierungsgrad nach Anlage 2 ImmoWertV).",
+   "bilder": [
+    {
+     "datei": "hb-etw-s3-tax-1.webp",
+     "unter": "Reiter Steuer — Feld AfA-Satz in der Karte AfA-Konfiguration"
+    }
+   ],
+   "siehe": [
+    [
+     "#s-ETW-s3-tax",
+     "Reiter Steuer, Feld für Feld"
+    ]
+   ],
+   "schritte": [
+    {
+     "t": "Reiter **Steuer**, Karte **AfA-Konfiguration**, Feld **AfA-Satz**: den Eintrag **Eigenen Satz / Restnutzungsdauer eingeben …** wählen.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: AfA-Konfiguration",
+      "js/afa-eigen.js: Eigenen Satz / Restnutzungsdauer eingeben …"
+     ]
+    },
+    {
+     "t": "Auf **Restnutzungsdauer ermitteln** klicken. Der Assistent hat neun Schritte: Objekt-Basis · Auftraggeber & Stichtag · Bauliche Anlagen · Gebäudetechnik · Modernisierungen · Zustand der Gewerke · Schäden & Mängel · Sachverständiger · Ergebnis & Empfehlung. Was im Objekt schon steht, ist vorausgefüllt.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/afa-eigen.js: >Restnutzungsdauer ermitteln<",
+      "js/rnd-wizard.js: title: 'Objekt-Basis'",
+      "js/rnd-wizard.js: title: 'Schäden & Mängel'",
+      "js/rnd-wizard.js: title: 'Ergebnis & Empfehlung'",
+      "js/deal-action.js: var prefill = _getRndPrefill();"
+     ]
+    },
+    {
+     "t": "Mit **Weiter →** durch die Schritte; in Schritt 8 heißt der Knopf **Berechnen →**.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/rnd-wizard.js: 'Weiter →'",
+      "js/rnd-wizard.js: 'Berechnen →'"
+     ]
+    },
+    {
+     "t": "Im Ergebnis **Restnutzungsdauer … Jahre übernehmen** klicken: DealPilot setzt den eigenen AfA-Satz (100 ÷ Restnutzungsdauer) und zeigt die Steuerwirkung vorher und nachher. Ist die Übernahme gesperrt, braucht der Fall erst eine sachverständige Beurteilung.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/rnd-wizard.js:  Jahre übernehmen",
+      "js/rnd-wizard.js: Übernahme gesperrt — erst nach sachverständiger Beurteilung",
+      "js/afa-eigen.js: Eine eingetragene Restnutzungsdauer ergibt den Satz: 100 ÷ RND."
+     ]
+    },
+    {
+     "t": "Für den Nachweis beim Finanzamt: **✉ Anfrage senden →** schickt die Angaben als Anfrage für ein Gutachten an einen Sachverständigen.",
+     "kosten": "Das Gutachten selbst ist eine eigene, kostenpflichtige Leistung des Sachverständigen — DealPilot zeigt die Gutachterkosten im Reiter Deal-Aktion neben der Steuerersparnis.",
+     "plan": "",
+     "belege": [
+      "js/rnd-wizard.js: '✉ Anfrage senden →'",
+      "js/deal-action.js: GUTACHTER-KOSTEN"
+     ]
+    },
+    {
+     "t": "Später genügt **Letzte Ermittlung übernehmen**: Restnutzungsdauer und Satz werden eingesetzt, unter **Grundlage** steht „RND-Ermittlung DealPilot (indikativ)“. Das Finanzamt verlangt für einen eigenen Satz einen Nachweis (Gutachten).",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/afa-eigen.js: Letzte Ermittlung übernehmen",
+      "js/afa-eigen.js: RND-Ermittlung DealPilot (indikativ)",
+      "js/afa-eigen.js: Das Finanzamt verlangt dafür einen Nachweis (Gutachten)."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "marktbericht",
+   "titel": "Marktbericht und Potenzial abrufen und lesen",
+   "kurz": "Den Wert des Objekts einordnen lassen — von der schnellen Marktpreisindikation bis zur Wertermittlung nach ImmoWertV — und sehen, was nach Mieterhöhung oder Umbau drin ist.",
+   "wann": "",
+   "hinweis": "Der Marktbericht ist eine Marktpreisindikation, ausdrücklich kein Gutachten nach § 194 BauGB. Fehlt ein amtlicher Wert, nennt der Bericht den zuständigen Gutachterausschuss und den Weg zur Quelle.",
+   "bilder": [],
+   "siehe": [
+    [
+     "#k-ETW",
+     "Pflichtfelder je Stufe (Steckbrief jedes Kapitels)"
+    ]
+   ],
+   "schritte": [
+    {
+     "t": "Reiter **Objekt**, oben die **Eingabetiefe** wählen: **Einfach · Stufe 1** (Marktpreisindikation), **Mittel · Stufe 2** (erweiterte Indikation, ab Plan Investor) oder **Ausgiebig · Stufe 3** (Wertermittlung nach ImmoWertV mit Boden-, Ertrags- und Sachwert, ab Plan Pro).",
+     "kosten": "",
+     "plan": "Stufe 2 ab Investor, Stufe 3 ab Pro",
+     "belege": [
+      "js/objekt-reiter.js: name: 'Einfach · Stufe 1'",
+      "js/objekt-reiter.js: name: 'Mittel · Stufe 2'",
+      "js/objekt-reiter.js: name: 'Ausgiebig · Stufe 3'",
+      "js/objekt-reiter.js: var ab = { 2: 'ab Investor', 3: 'ab Pro' };"
+     ]
+    },
+    {
+     "t": "In der Box **Marktbericht abrufen** steht je Stufe, wie viele Berichte noch frei sind. Heißt der Knopf **was fehlt**, zeigt ein Klick die fehlenden Felder — ausfüllen, bis dort **abrufen** steht. Der Bericht rechnet nie halb.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Marktbericht abrufen",
+      "js/objekt-reiter.js: (fehlt ? 'was fehlt' : 'abrufen')",
+      "js/objekt-reiter.js: r + ' frei'"
+     ]
+    },
+    {
+     "t": "**abrufen** klicken und bestätigen.",
+     "kosten": "Jeder Abruf verbraucht 1 Bewertung aus dem Kontingent seiner Stufe. Eine schon bezahlte Tiefe kostet beim erneuten Abruf nichts.",
+     "plan": "",
+     "belege": [
+      "js/object-actions.js: Für diesen Abruf wird dein Kontingent belastet:",
+      "js/help.js: eine schon bezahlte Tiefe kostet beim erneuten Abruf nichts"
+     ]
+    },
+    {
+     "t": "Ein Fenster zeigt die Etappen. Mit **Im Hintergrund weiter** arbeitest du normal weiter; ist der Bericht fertig, wird die Pille unten zu „✓ Marktbericht fertig · … — öffnen“.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/mb-auftrag.js: Im Hintergrund weiter",
+      "js/mb-auftrag.js: Marktbericht fertig · "
+     ]
+    },
+    {
+     "t": "Lesen: **Im Marktbericht öffnen →** (oder **Aktionen** → **Marktbericht**). In Stufe 3 trägt jede amtliche Zahl ihre Herkunftsstufe (A bis E und N), und der Quellennachweis nennt die Gutachterausschüsse, deren Zahlen im Bericht stecken.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Im Marktbericht öffnen →",
+      "index.html: sbActionsAction('marktbericht')"
+     ]
+    },
+    {
+     "t": "Verkehrswert übernehmen: Reiter **Objekt**, Karte **Wertanker**, unter dem Feld Verkehrswert einen Eintrag aus dem Verlauf wählen und **als Verkehrswert übernehmen** klicken. Welche Zahl gilt, entscheidest du.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Wertanker",
+      "js/objekt-reiter.js: als Verkehrswert übernehmen"
+     ]
+    },
+    {
+     "t": "Alte Berichte: Reiter **Deal-Aktion**, Abschnitt **Marktberichte** („Erzeugte Berichte als PDF“) — neueste zuerst, als PDF ladbar.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/deal-action-boarding.js: band('doc', 'Marktberichte', 'Erzeugte Berichte als PDF')"
+     ]
+    },
+    {
+     "t": "Potenzial: im Reiter **Objekt** die Karte **Mieterhöhung und Zielbild (optional)** ausfüllen (beim Mehrfamilienhaus je Wohnung in der Wohnungsliste). DealPilot rechnet Soll-Miete und Zielbild mit demselben Kern wie Stufe 3 — ohne Kontingent. Das Ergebnis steht in der Pilot-Analyse unter **Ankauf · Bestand · Zielbild** und in den PDFs.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Mieterhöhung und Zielbild",
+      "index.html: Ankauf &middot; Bestand &middot; Zielbild",
+      "js/help.js: je Stufe wechseln nur Miete und Restnutzungsdauer. Kein Kontingent."
+     ]
+    },
+    {
+     "t": "Marktpreise zum Potenzial: Reiter **Pilot-Analyse**, Bereich „Ankauf · Bestand · Zielbild“ → **Marktpreise abrufen** → **Ja, abrufen**.",
+     "kosten": "Kostet 1 × erweiterte Marktpreisindikation aus deinem Kontingent; DealPilot fragt vorher nach.",
+     "plan": "",
+     "belege": [
+      "js/potenzial.js: Marktpreise abrufen",
+      "js/potenzial.js: Kostet 1 × erweiterte Marktpreisindikation",
+      "js/potenzial.js: Ja, abrufen"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "pilot",
+   "titel": "Pilot-Analyse abrufen und als PDF ausgeben",
+   "kurz": "Die KI-Einschätzung zum Objekt holen und mit genau den Bausteinen ins PDF bringen, die du zeigen willst.",
+   "wann": "",
+   "hinweis": "Im Free-Plan trägt jedes PDF ein Wasserzeichen.",
+   "bilder": [],
+   "siehe": [],
+   "schritte": [
+    {
+     "t": "Reiter **Pilot-Analyse** → **Pilot-Analyse starten**. Sie ist in deinem Plan enthalten und verbraucht kein Kontingent.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: <span>Pilot-Analyse starten</span>",
+      "js/help.js: Die Pilot-Analyse ist in deinem Plan enthalten und verbraucht kein Kontingent."
+     ]
+    },
+    {
+     "t": "Die Analyse wird beim Objekt gespeichert. Für eine frische Einschätzung (etwa nach geänderten Zahlen) einfach erneut starten.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/help.js: Die Pilot-Analyse wird beim Objekt gespeichert."
+     ]
+    },
+    {
+     "t": "Fürs PDF: den Schalter **Pilot-Analyse im PDF-Export einschließen** setzen, dann **Bausteine im PDF** aufklappen und die Haken setzen oder entfernen — z. B. Gesamtbewertung, Stärken, Risiken, Verhandlungsempfehlung, Bankargumente, Ankauf · Bestand · Zielbild, Steuerliche Zusammenfassung.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Pilot-Analyse im PDF-Export einschließen",
+      "index.html: Bausteine im PDF",
+      "index.html: id=\"ai-pdf-sec-gesamt\"",
+      "index.html: id=\"ai-pdf-sec-steuer\""
+     ]
+    },
+    {
+     "t": "Tipp: einmal kurz den Reiter **Bewertung** öffnen — dann sind alle Grafiken gezeichnet.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/help.js: Öffne vorher einmal kurz den Reiter <strong>Bewertung</strong>"
+     ]
+    },
+    {
+     "t": "Reiter **Deal-Aktion** → **PDFs herunterladen** → beim **Investment-PDF** auf **PDF**.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/deal-action-boarding.js: PDFs herunterladen",
+      "js/deal-action-boarding.js: DealActionBoarding.exportDoc(\\''"
+     ]
+    },
+    {
+     "t": "Fassung wählen: **Bankfassung**, **Investment-PDF · hell** oder **Investment-PDF · Obsidian**. Mit **Diese Wahl merken** fragt DealPilot nicht mehr — zurück zur Auswahl kommst du über den Knopf **Fassung** neben „PDF“.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/pdf-wahl.js: titel: 'Bankfassung'",
+      "js/pdf-wahl.js: titel: 'Investment-PDF · hell'",
+      "js/pdf-wahl.js: titel: 'Investment-PDF · Obsidian'",
+      "js/pdf-wahl.js: Diese Wahl merken",
+      "js/deal-action-boarding.js: >Fassung</button>"
+     ]
+    },
+    {
+     "t": "Derselbe Bericht geht auch über **Aktionen** → **Export** → **PDF-Report für Objekt**.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: sbActionsAction('hub-export')",
+      "js/import-export-modal.js: PDF-Report für Objekt"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bank",
+   "titel": "Unterlagen für die Bank: Bank-PDF und Bankexport",
+   "kurz": "Das Objekt bankfertig machen, die Bankfassung des PDFs erzeugen und die Darlehen aller Objekte als Liste ausgeben.",
+   "wann": "",
+   "hinweis": "",
+   "bilder": [],
+   "siehe": [
+    [
+     "#k-ETW",
+     "Felder, die in den Bank-PDFs stehen (Feldlisten, „Was es bewirkt“)"
+    ]
+   ],
+   "schritte": [
+    {
+     "t": "Reiter **Deal-Aktion**, Abschnitt **Bereit für die Bank?**: dort steht „… Grundfelder befüllt“; jedes fehlende Feld ist aufgeführt und führt per Klick zum Eingabefeld.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/deal-action-boarding.js: Bereit für die Bank?",
+      "js/deal-action-boarding.js: Grundfelder befüllt"
+     ]
+    },
+    {
+     "t": "Unter **PDFs herunterladen** beim **Investment-PDF** auf **PDF** und die Fassung **Bankfassung** wählen — weißes Papier, Kennzahlen als Tabelle, für Bank, Finanzierung und Steuerberater.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/pdf-wahl.js: unter: 'Weisses Papier, Kennzahlen als Tabelle'",
+      "js/pdf-wahl.js: fuer: 'Bank · Finanzierung · Steuerberater'"
+     ]
+    },
+    {
+     "t": "Abschnitt **Bordkarte & Unterlagen**: die Listen „Persönliche Unterlagen“ und „Objekt-Unterlagen“ zeigen, was die Bank üblicherweise sehen will. **Unterlagen beim Amt anfordern** ermittelt die zuständige Stelle und schreibt den Antrag.",
+     "kosten": "Die Ämter erheben für Auszüge und Akten ihre eigenen Gebühren.",
+     "plan": "",
+     "belege": [
+      "js/deal-action-boarding.js: band('doc2', 'Bordkarte &amp; Unterlagen'",
+      "js/deal-action-boarding.js: Persönliche Unterlagen",
+      "js/deal-action-boarding.js: Unterlagen beim Amt anfordern",
+      "js/deal-action-boarding.js: die zuständige Stelle und schreibt den Antrag"
+     ]
+    },
+    {
+     "t": "Alle Darlehen aller Objekte als Liste: Seitenleiste **Aktionen** → unter „Ausgeben“ **Bankexport**. Einzelne Darlehen per Häkchen abwählen, dann **CSV exportieren**, **Excel exportieren** oder **PDF erstellen**.",
+     "kosten": "",
+     "plan": "je nach Plan freigeschaltet",
+     "belege": [
+      "index.html: sbActionsAction('bankexport')",
+      "index.html: data-feature=\"bank_pdf_a3\"",
+      "js/storage.js: CSV exportieren",
+      "js/storage.js: Excel exportieren",
+      "js/storage.js: 'PDF erstellen"
+     ]
+    },
+    {
+     "t": "Als Nachweis deiner Erfahrung: **Aktionen** → **Track Record** — gewonnene Deals als Einzel- oder Sammel-PDF.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: sbActionsAction('trackrec')",
+      "index.html: <span class=\"sb-act-l\">Track Record</span>"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "steuer",
+   "titel": "Steuer: Einkommen, Steuerzeiträume und BMF-Kaufpreisaufteilung",
+   "kurz": "Die Steuerwirkung des Objekts richtig rechnen lassen: dein Einkommen über die Jahre, der Gebäudeanteil und die Werbungskosten bis zum Finanzamt-PDF.",
+   "wann": "",
+   "hinweis": "DealPilot ist keine Steuerberatung (§ 6 StBerG). Die Rechnungen sind Hilfsmittel — die finale Beurteilung gehört zu deinem Steuerberater.",
+   "bilder": [
+    {
+     "datei": "hb-etw-s3-tax-1.webp",
+     "unter": "Reiter Steuer: Persönliche Steuer mit „Steuerzeiträume verwalten“, AfA-Konfiguration mit dem Knopf BMF-Rechner"
+    }
+   ],
+   "siehe": [
+    [
+     "#s-ETW-s3-tax",
+     "Reiter Steuer, Feld für Feld"
+    ]
+   ],
+   "schritte": [
+    {
+     "t": "Reiter **Steuer**, Karte **Persönliche Steuer**: dein zu versteuerndes Einkommen (zvE) vor der Immobilie eintragen. Mit dem Haken **Grenzsteuersatz automatisch aus zvE berechnen** rechnet DealPilot den Satz selbst.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Persönliche Steuer",
+      "index.html: Zu versteuerndes Einkommen (zvE) vor Immobilie / Jahr",
+      "index.html: Grenzsteuersatz automatisch aus zvE berechnen"
+     ]
+    },
+    {
+     "t": "Ändert sich dein Einkommen über die Jahre: **📅 Steuerzeiträume verwalten →**. Unter **Neuen Zeitraum hinzufügen** **Gültig von**, **Gültig bis (leer = laufend)**, **zvE / Jahr (€)** und einen **Grund** eintragen, dann **Hinzufügen**. Überschneidet sich ein Zeitraum, zeigt DealPilot den Konflikt — du kannst abbrechen oder **Trotzdem als neuen Zeitraum anlegen**.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: 📅 Steuerzeiträume verwalten →",
+      "js/tax-periods.js: Neuen Zeitraum hinzufügen",
+      "js/tax-periods.js: Gültig bis (leer = laufend)",
+      "js/tax-periods.js: zvE / Jahr (€)",
+      "js/tax-periods.js: Trotzdem als neuen Zeitraum anlegen"
+     ]
+    },
+    {
+     "t": "Karte **AfA-Konfiguration**: **AfA-Satz** und **Gebäudeanteil am KP (%)** prüfen. Für einen genaueren Gebäudeanteil rechts in der Karte den Knopf **BMF-Rechner** öffnen (nicht den Link unter „Hilfreiche Links“).",
+     "kosten": "",
+     "plan": "BMF-Rechner ab Pro",
+     "belege": [
+      "index.html: Gebäudeanteil am KP (%)",
+      "index.html: id=\"btnBmfAdvanced\"",
+      "index.html: onclick=\"openBMFModal()\"",
+      "index.html: plan-badge plan-badge-gold"
+     ]
+    },
+    {
+     "t": "Im Fenster **Anschaffungskosten & BMF-Kaufpreisaufteilung** die vier Reiter der Reihe nach: **1 Anschaffungskosten** · **2 BMF-Aufteilung** · **3 AfA-Vorschau** · **4 AfA-Hebel**, jeweils mit **Weiter →**. Die Reiter 2 bis 4 öffnen erst, wenn die Pflichtangaben vollständig sind.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/bmf-modal-html.html: Anschaffungskosten &amp; BMF-Kaufpreisaufteilung",
+      "js/bmf-modal-html.html: switchPane('p-hebel')",
+      "js/bmf-modal.js: 'p-hebel': '<b>Schritt 4 / 4:</b>",
+      "js/bmf-modal-html.html: Weiter →"
+     ]
+    },
+    {
+     "t": "Im Reiter 4 eine Variante per Klick wählen und **✓ Übernehmen** — Gebäudeanteil und AfA-Satz stehen danach im Reiter Steuer. Ausgabe: **Kaufpreisaufteilung als PDF** oder **BMF-Arbeitshilfe als PDF**.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/bmf-modal-html.html: ✓ Übernehmen",
+      "js/bmf-modal.js: Kaufpreisaufteilung als PDF",
+      "js/bmf-modal.js: BMF-Arbeitshilfe als PDF"
+     ]
+    },
+    {
+     "t": "Werbungskosten je Jahr: Karte **Steuerformular pro Jahr · individuelle Werte**. DealPilot schlägt Werte vor; du überschreibst sie, etwa mit den Zahlen aus dem Bescheid. Belege liest **Belege & Abrechnungen einlesen (KI)**.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Steuerformular pro Jahr · individuelle Werte",
+      "index.html: Belege &amp; Abrechnungen einlesen (KI)"
+     ]
+    },
+    {
+     "t": "Finanzamt-PDF: unter **Steuerjahr** ein Jahr wählen, optional **Anlage V** anhaken und **Finanzamt-PDF** klicken. Dasselbe PDF gibt es im Reiter Deal-Aktion unter „PDFs herunterladen“.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: >Steuerjahr<",
+      "index.html: id=\"fa-pdf-anlagev\"",
+      "index.html: title=\"Finanzamt-PDF für das gewählte Steuerjahr erzeugen",
+      "js/deal-action-boarding.js: Finanzamt-PDF (Steuerformular)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "portfolio",
+   "titel": "Vom Deal zum Portfolio",
+   "kurz": "Ein gekauftes Objekt in den Bestand nehmen und alle Objekte zusammen im Portfolio-Cockpit steuern.",
+   "wann": "",
+   "hinweis": "Das Portfolio zählt nur Objekte mit Status Gewonnen. Verlorene Objekte bleiben mit allen Zahlen erhalten.",
+   "bilder": [],
+   "siehe": [],
+   "schritte": [
+    {
+     "t": "Im Reiter **Objekt** das Datum **Wirtsch. Übergang** (Nutzen-/Lastenwechsel) eintragen. Ohne dieses Datum friert DealPilot den Ankauf-Stand nicht ein.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: Wirtsch. Übergang"
+     ]
+    },
+    {
+     "t": "Reiter **Deal-Aktion**, Deal-Status **Gewonnen** wählen („Deal gewonnen — Objekt im Bestand“). DealPilot schreibt den Ankauf-Stand zu diesem Tag fest.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/deal-action-boarding.js: ['won', 'Gewonnen', 'Abgeflogen', 'Deal gewonnen \\u2014 Objekt im Bestand']"
+     ]
+    },
+    {
+     "t": "Seitenleiste **Aktionen** → **Portfolio-Cockpit**.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "index.html: sbActionsAction('cockpit')",
+      "index.html: <span class=\"sb-act-l\">Portfolio-Cockpit</span>"
+     ]
+    },
+    {
+     "t": "Oben **Portfolio Score** und die Kennzahlen über alle gewonnenen Objekte. Weiter unten die Steuer über alle Objekte und die Projektion.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/dashboard.js: Portfolio Score"
+     ]
+    },
+    {
+     "t": "Steuer-Mappe fürs Finanzamt: **Veranlagungsjahr** wählen, optional **Anlage-V-Zuordnung anhängen**, dann **Steuer-Mappe erstellen** — ein PDF über alle Objekte mit Steuerdaten.",
+     "kosten": "",
+     "plan": "",
+     "belege": [
+      "js/dashboard.js: Veranlagungsjahr",
+      "js/dashboard.js: Anlage-V-Zuordnung anhängen",
+      "js/dashboard.js: Steuer-Mappe erstellen"
+     ]
+    }
+   ]
+  }
+ ]
 };

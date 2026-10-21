@@ -50,6 +50,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
+import { ABLAEUFE } from './handbuch-ablaeufe.mjs';
 
 const HIER = path.dirname(fileURLToPath(import.meta.url));
 const WURZEL = path.resolve(HIER, '..');
@@ -77,7 +78,9 @@ const QUELLEN = {
   'pdf-anlage-bmf.js': JS('pdf-anlage-bmf.js'),
   'pdf-kaufpreisaufteilung.js': JS('pdf-kaufpreisaufteilung.js'),
   'frontend-konstanten.json': KONST,
-  'aufnahme.json': AUFNAHME
+  'aufnahme.json': AUFNAHME,
+  /* v2574 · Teil „Schritt für Schritt": handgepflegte Abläufe mit Belegen */
+  'handbuch-ablaeufe.mjs': path.join(HIER, 'handbuch-ablaeufe.mjs')
 };
 
 const nurPruefen = process.argv.includes('--pruefen');
@@ -408,9 +411,51 @@ function ernte() {
   return { version: 'v2555', quellen, reiter, felder, kapitel, wohnungsliste, auffaellig, aufnahme: auf ? { am: auf.am, ansicht: auf.ansicht } : null };
 }
 
+/* ═══ v2574 · Teil „Schritt für Schritt" ══════════════════════════════════
+ * Die Abläufe sind Prosa (tools/handbuch-ablaeufe.mjs). Jeder Schritt trägt
+ * Belege [Datei, Text]; hier wird geprüft, dass der Text in der Datei steht —
+ * roh, nach \uXXXX-Auflösung oder nach HTML-Entitäten. Fehlt einer, ist das
+ * Handbuch ROT (beim Schreiben wie beim Prüfen): ein Knopf ist weg oder
+ * umbenannt, und der Ablauf muss nachgezogen werden. */
+function ablaeufePruefen() {
+  const cache = {};
+  const fassungen = (datei) => {
+    if (cache[datei]) return cache[datei];
+    const p = path.join(WURZEL, datei);
+    if (!fs.existsSync(p)) return (cache[datei] = null);
+    const roh = lies(p);
+    const u = roh.replace(/\\u([0-9a-fA-F]{4})/g, (_, h) => String.fromCharCode(parseInt(h, 16)));
+    return (cache[datei] = [roh, u, ent(u)]);
+  };
+  const fehlen = []; let n = 0;
+  const ablaeufe = ABLAEUFE.map((a) => {
+    a.schritte.forEach((s, i) => {
+      if (!s.belege || !s.belege.length) fehlen.push(a.id + ' Schritt ' + (i + 1) + ': ohne Beleg');
+      (s.belege || []).forEach(([datei, txt]) => {
+        n++; const f = fassungen(datei);
+        if (!f) fehlen.push(a.id + ' Schritt ' + (i + 1) + ': Datei fehlt ' + datei);
+        else if (!f.some((x) => x.includes(txt))) fehlen.push(a.id + ' Schritt ' + (i + 1) + ': „' + txt + '“ nicht in ' + datei);
+      });
+    });
+    (a.bilder || []).forEach((b) => { if (!fs.existsSync(path.join(FE, 'handbuch', 'bilder', b.datei))) fehlen.push(a.id + ': Bild fehlt ' + b.datei); });
+    /* Ausgeliefert wird der Text; die Belege bleiben als Datei:Text-Liste lesbar dabei */
+    return { id: a.id, titel: a.titel, kurz: a.kurz, wann: a.wann || '', hinweis: a.hinweis || '', bilder: a.bilder || [], siehe: a.siehe || [],
+      schritte: a.schritte.map((s) => ({ t: s.t, kosten: s.kosten || '', plan: s.plan || '', belege: (s.belege || []).map(([d, t]) => d.replace(/^frontend\//, '') + ': ' + t) })) };
+  });
+  return { ablaeufe, fehlen, belege: n };
+}
+const ABL = ablaeufePruefen();
+if (ABL.fehlen.length) {
+  console.log('ROT · Schritt für Schritt: ' + ABL.fehlen.length + ' Beleg(e) nicht gefunden — Ablauf in tools/handbuch-ablaeufe.mjs nachziehen:');
+  ABL.fehlen.forEach((x) => console.log('  - ' + x));
+  process.exit(1);
+}
+
 const daten = ernte();
+daten.ablaeufe = ABL.ablaeufe;
 const ausgabe = '/* Erzeugt von tools/handbuch-erzeugen.mjs — NICHT von Hand aendern. */\nwindow.DP_HANDBUCH = ' + JSON.stringify(daten, null, 1) + ';\n';
-const zaehl = daten.kapitel.map((k) => k.art + ' ' + k.schritte.reduce((s, x) => s + x.felder.length, 0) + '+' + k.schritte.reduce((s, x) => s + x.weitere.length, 0)).join(' · ');
+const zaehl = daten.kapitel.map((k) => k.art + ' ' + k.schritte.reduce((s, x) => s + x.felder.length, 0) + '+' + k.schritte.reduce((s, x) => s + x.weitere.length, 0)).join(' · ')
+  + ' · Abläufe ' + ABL.ablaeufe.length + ' (' + ABL.ablaeufe.reduce((s, a) => s + a.schritte.length, 0) + ' Schritte, ' + ABL.belege + ' Belege)';
 if (nurPruefen) {
   const alt = fs.existsSync(ZIEL) ? lies(ZIEL) : '';
   const m = /"quellen": (\{[\s\S]*?\})/.exec(alt);
