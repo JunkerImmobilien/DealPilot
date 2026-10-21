@@ -4405,6 +4405,7 @@ html[data-dp-layout] .dpl-schiene .dpl-teil-aktionen::-webkit-scrollbar-track{
 html[data-dp-layout] .dpl-schiene{
   display:flex !important; flex-direction:column !important;
   height:100vh !important; max-height:100vh !important;
+  height:100dvh !important; max-height:100dvh !important; /* v2547a iPad: Safari-Leiste */
 }
 html[data-dp-layout] .dpl-schiene .dpl-marke,
 html[data-dp-layout] .dpl-schiene .dpl-portfolio,

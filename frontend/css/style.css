@@ -265,7 +265,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 .app-wrap {
   display: grid;
   grid-template-columns: 380px 1fr;     /* V26: deutlich breiter (vorher 260px) für Mockup-Cards */
-  min-height: 100vh;
+  min-height: 100vh; min-height: 100dvh; /* v2547a iPad: sichtbare Hoehe */
   transition: grid-template-columns 0.25s ease;
 }
 .app-wrap.sb-collapsed {
@@ -277,7 +277,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   border-right: 1.5px solid color-mix(in srgb, var(--gold) 20%, transparent);
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100vh; height: 100dvh; /* v2547a */
   position: sticky;
   top: 0;
   overflow: hidden;
@@ -4232,7 +4232,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 .sidebar {
   display: flex !important;
   flex-direction: column !important;
-  height: 100vh !important;
+  height: 100vh !important; height: 100dvh !important; /* v2547a */
   overflow: hidden;
 }
 
@@ -12010,19 +12010,19 @@ body.dp-auth-active .dp-floating-save { display: none; }
    - Sidebar scrollt intern selbst falls die Liste lang ist
 ═══════════════════════════════════════════════════════════════ */
 html, body {
-  height: 100vh;
+  height: 100vh; height: 100dvh; /* v2547a */
   overflow: hidden;
   margin: 0;
 }
 
 /* app-wrap füllt full viewport, eigenes scroll an die Spalten weiterreichen */
 .app-wrap {
-  height: 100vh;
+  height: 100vh; height: 100dvh; /* v2547a */
 }
 
 /* Sidebar: scrollt intern — Liste, Portfolio, Aktionen können größer als 100vh sein */
 aside.sidebar, #sidebar {
-  height: 100vh;
+  height: 100vh; height: 100dvh; /* v2547a */
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -12030,7 +12030,7 @@ aside.sidebar, #sidebar {
 /* Main-Section rechts der Sidebar: eigener Scroll-Container.
    Tab-Inhalt kann beliebig lang sein, scrollt darin. Sidebar bleibt fix sichtbar. */
 .main-col {
-  height: 100vh;
+  height: 100vh; height: 100dvh; /* v2547a */
   overflow-y: auto;
 }
 
@@ -14557,7 +14557,7 @@ body.hdr-no-score .tabs-workflow-bar { top: var(--wf-top, 102px) !important; }
 /* main-col bekommt durchgehenden Background damit nichts mehr durchblitzt */
 .main-col {
   background: var(--surface, #F8F6F1);
-  min-height: 100vh;
+  min-height: 100vh; min-height: 100dvh; /* v2547a iPad: sichtbare Hoehe */
 }
 
 /* Sidebar bekommt eigenen Background damit nichts durchscheint */
@@ -17657,7 +17657,7 @@ html body .body {
     position: fixed !important;
     top: 0; left: 0;
     width: 280px !important;
-    height: 100vh !important;
+    height: 100vh !important; height: 100dvh !important; /* v2547a */
     z-index: 1050;
     transform: translateX(-100%);
     transition: transform 0.25s ease;

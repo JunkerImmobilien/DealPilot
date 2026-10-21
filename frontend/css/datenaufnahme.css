@@ -3239,3 +3239,43 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
     flex-wrap: wrap !important;
   }
 }
+
+/* =====================================================================
+   v2547a - DER ABRUF-KNOPF BLEIBT IN DER ZEILE (Tablet)
+
+   Marcel am 21.10.2026 (iPad quer, Bild app1.png): "bei Datenaufnahme
+   wird der Button 'Neuer Vorgang' darunter angezeigt. Koennen wir das
+   nicht so machen, dass es in einer Zeile dargestellt wird?"
+
+   GEMESSEN, direkte Kinder der Leiste:
+     QuickBoarding, Rahmen 1073 px (= iPad 1366 quer):
+       lead 168 · seg 197 · seg 466 (flex 0 0 auto) · qr 64 · rz 112
+       -> Summe ueber 1073, rz bricht in Zeile 2 (Leiste 175 hoch)
+     Objekt-Reiter 1440 px: rz in Zeile 2 (131 hoch)
+     Objekt-Reiter 1024 px: rz in Zeile 2 (243 hoch)
+
+   Das zweite Segment ("Daten uebernehmen aus") gab nie nach: es zaehlte
+   mit seiner vollen Kachelreihe, also wanderte der Knopf. Jetzt gibt
+   GENAU dieses Segment nach (Basis 0, waechst in den Rest, nie unter
+   eine Kachel) - seine Kacheln brechen in sich um, der Knopf bleibt
+   rechts in der Zeile. Unter 901 px bleibt die Spalten-/Handy-Form.
+
+   Im Objekt-Reiter reicht das erst ab 1024 px; zwischen 1024 und 1139
+   faellt dafuer der QR ("DealPilot oeffnen", die App, in der man schon
+   ist) - mit ihm passt die Zeile dort nachweislich nicht (790 > 732).
+   ===================================================================== */
+@media (min-width: 901px){
+  html body #qc7-sources.dp-pfbar > .dp-pf-seg ~ .dp-pf-seg{
+    flex: 1 1 0% !important;
+    min-width: min-content !important;
+  }
+}
+@media (min-width: 1024px){
+  html body #oab-bar.dp-pfbar > .dp-pf-seg ~ .dp-pf-seg{
+    flex: 1 1 0% !important;
+    min-width: min-content !important;
+  }
+}
+@media (min-width: 1024px) and (max-width: 1139px){
+  html body #oab-bar.dp-pfbar > .dp-pf-qr{ display: none !important; }
+}
