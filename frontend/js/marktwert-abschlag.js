@@ -88,8 +88,13 @@
     /* v2490 · mit Herkunft - Marcel sah 15,9 % im Reiter Objekt (Bielefeld, oertlich
        gemessen) und 5,8 % im Quick-Check (Marktdurchschnitt) und konnte den
        Unterschied nirgends ablesen. */
-    var txt = ' · inkl. ' + String(a.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise ('
-      + (/rtlich/i.test(String(a.quelle || '')) ? 'örtlich gemessen' : herkunftText(a)) + ')';
+    /* v2672 · Marcel 21.10.2026: Herkunft lesbarer - beim oertlichen Satz der
+       Ausschuss mit Jahrgang (card.abschlag.kurz aus angebot_abschlag.kurz), und
+       der Abschlag in einer eigenen Zeile der Fusszeile (gleiche Schrift), statt
+       hinter dem Rechtshinweis. Alte Abrufe ohne kurz: nur „örtlich gemessen". */
+    var oertl = /rtlich/i.test(String(a.quelle || ''));
+    var txt = 'inkl. ' + String(a.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise · '
+      + (oertl ? 'örtlich gemessen' + (a.kurz ? ' (' + a.kurz + ')' : '') : herkunftText(a));
     if (alt && alt.textContent === txt) return;
     /* v2237d · Marcel: „Formatierung passt nicht". Der Hinweis hängt jetzt an
        der vorhandenen Fußzeile der Karte (.legal, „Marktpreisindikation — kein
@@ -97,6 +102,7 @@
     if (!alt) {
       var legal = karte.querySelector('.legal'); if (!legal) return;
       alt = document.createElement('span'); alt.className = 'dp-abschlag'; legal.appendChild(alt);
+      alt.style.display = 'block';   /* v2672 · eigene Zeile, Schrift erbt von .legal */
     }
     alt.textContent = txt;
   }
