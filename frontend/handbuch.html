@@ -89,8 +89,8 @@ figcaption{font:500 12px "JetBrains Mono",monospace;color:var(--leise);padding:8
 .fleiste button:hover,.zumbild:hover{border-color:var(--gold)}
 .zumbild{margin-top:8px;grid-column:1/-1;justify-self:start}
 .bildrahmen{position:relative}
-.marke{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:2px solid transparent;background:transparent;cursor:pointer;padding:0}
-.marke:hover,.marke:focus-visible{border-color:var(--gold);background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 22%,transparent);outline:none}
+.bildmarke{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:2px solid transparent;background:transparent;cursor:pointer;padding:0}
+.bildmarke:hover,.bildmarke:focus-visible{border-color:var(--gold);background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 22%,transparent);outline:none}
 figure.blitz{box-shadow:0 0 0 3px var(--gold)}
 .fnr{flex:0 0 auto;min-width:28px;height:28px;padding:0 6px;border-radius:14px;background:var(--obs);color:var(--gold-hi);border:2px solid var(--gold);font:700 12px/24px "JetBrains Mono",monospace;text-align:center}
 .fnr.leer{background:transparent;color:var(--leise);border-color:var(--linie)}
@@ -134,7 +134,7 @@ details[open] .pfeil{transform:rotate(90deg)}
   .kopf .knopf{padding:8px 10px;font-size:12px}
   .chips{display:none}
 }
-@media print{.kopf,nav.inhalt{display:none}.rahmen{display:block}.feld{break-inside:avoid}.fkoerper[hidden]{display:grid!important}.fleiste,.zumbild,.marke{display:none}}
+@media print{.kopf,nav.inhalt{display:none}.rahmen{display:block}.feld{break-inside:avoid}.fkoerper[hidden]{display:grid!important}.fleiste,.zumbild,.bildmarke{display:none}}
 </style>
 </head>
 <body>
@@ -257,7 +257,7 @@ details[open] .pfeil{transform:rotate(90deg)}
     var d = ziel.closest('details'); if (d && !d.open) d.open = true;
     ziel.scrollIntoView({ block: 'center', behavior: 'smooth' });
     blitz(ziel);
-    var m = ziel.querySelector('.marke[data-ziel="' + schl + '"]'); if (m) setTimeout(function () { try { m.focus({ preventScroll: true }); } catch (x) {} }, 300);
+    var m = ziel.querySelector('.bildmarke[data-ziel="' + schl + '"]'); if (m) setTimeout(function () { try { m.focus({ preventScroll: true }); } catch (x) {} }, 300);
   }
 
   function wohnungslisteHtml(kap, n) {
@@ -285,7 +285,7 @@ details[open] .pfeil{transform:rotate(90deg)}
     if (kap && b.marken) b.marken.forEach(function (m) {
       var e = (liste || []).filter(function (x) { return x.id === m.id; })[0]; if (!e || !F[m.id]) return;
       var schl = kap.art + '-' + m.id; ids.push(schl);
-      marken += '<button type="button" class="marke" data-ziel="' + esc(schl) + '" style="left:' + (m.x * 100).toFixed(2) + '%;top:' + (m.y * 100).toFixed(2) + '%" aria-label="Feld ' + e.nr + ': ' + esc(F[m.id].label) + ' — zur Beschreibung"></button>';
+      marken += '<button type="button" class="bildmarke" data-ziel="' + esc(schl) + '" style="left:' + (m.x * 100).toFixed(2) + '%;top:' + (m.y * 100).toFixed(2) + '%" aria-label="Feld ' + e.nr + ': ' + esc(F[m.id].label) + ' — zur Beschreibung"></button>';
     });
     return '<figure data-zoom' + (b.klasse ? ' class="' + b.klasse + '"' : '') + (ids.length ? ' data-felder="' + esc(ids.join(' ')) + '"' : '') + '><div class="bildrahmen"><img loading="lazy" src="handbuch/bilder/' + esc(b.datei) + '?v=v2560j" alt="' + esc(b.alt || 'Bildschirmfoto') + '">' + marken + '</div><figcaption>' + esc(b.unterschrift || felder) + (ids.length ? ' · Nummer anklicken springt zur Beschreibung' : '') + '</figcaption></figure>';
   }
@@ -492,7 +492,7 @@ details[open] .pfeil{transform:rotate(90deg)}
   $('held-knoepfe').innerHTML = H.kapitel.map(function (k) { return '<button type="button" class="knopf zart klein" data-pdf="' + k.art + '">PDF · ' + esc(k.name) + '</button>'; }).join('');
   document.addEventListener('click', function (e) {
     var p = e.target.closest('[data-pdf]'); if (p) { pdf([p.getAttribute('data-pdf')], p); return; }
-    var mk = e.target.closest('.marke'); if (mk) { e.preventDefault(); springeZuFeld(mk.getAttribute('data-ziel')); return; }
+    var mk = e.target.closest('.bildmarke'); if (mk) { e.preventDefault(); springeZuFeld(mk.getAttribute('data-ziel')); return; }
     var zb = e.target.closest('[data-zumbild]'); if (zb) { springeZuBild(zb.getAttribute('data-zumbild')); return; }
     var kopf = e.target.closest('.fkopf'); if (kopf) { setze(kopf.parentNode, kopf.getAttribute('aria-expanded') !== 'true'); return; }
     var alle = e.target.closest('[data-alle]'); if (alle) { var sch = alle.closest('[data-schritt]'); if (sch) sch.querySelectorAll('.feld:not(.versteckt)').forEach(function (f) { if (!f.closest('details.weitere') || alle.getAttribute('data-alle') === 'zu') setze(f, alle.getAttribute('data-alle') === 'auf'); }); return; }
