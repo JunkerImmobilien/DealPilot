@@ -513,7 +513,7 @@ html[data-dp-layout="v5"] .sb-header .app-logo-simple-wrap{ max-height:40px !imp
    CSS-Datei entstünde. */
 .dpw-ov{ position:fixed; inset:0; z-index:2147482000; display:grid; place-items:center;
   background:rgba(18,16,14,.46); padding:20px; }
-.dpw-kasten{ width:min(560px,100%); background:#FDFCFA; border:1px solid #CEC6B6;
+.dpw-kasten{ width:min(560px,100%); background:#FDFCFA; border:1px solid #CEC6B6; /* v2571: quer 667x375 ragte der Kasten 32 px unter den Schirm */ max-height:calc(100vh - 40px); max-height:calc(100dvh - 40px); overflow-y:auto; overscroll-behavior:contain;
   border-radius:3px; box-shadow:0 26px 70px -30px rgba(0,0,0,.7); padding:18px 20px 16px;
   font-family:'Inter', system-ui, sans-serif; color:#1A1A18; }
 .dpw-kopf{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
@@ -581,7 +581,7 @@ html[data-dp-layout] .dpl-logo{
    sich einmal ganz, bevor der Nutzer sie hell schaltet. */
 .dpes-ov{ position:fixed; inset:0; z-index:2147482500; display:grid; place-items:center;
   background:rgba(8,7,6,.62); padding:20px; }
-.dpes-k{ width:min(620px,100%); background:#0A0A09; color:#F2EDE3;
+.dpes-k{ width:min(620px,100%); background:#0A0A09; color:#F2EDE3; /* v2571: bei 375x667 und quer lagen Rundgang/Spaeter 51 px unter dem Schirm, ohne Scrollweg */ max-height:calc(100vh - 40px); max-height:calc(100dvh - 40px); overflow-y:auto; overscroll-behavior:contain;
   border:1px solid #2A2622; border-radius:4px; padding:20px 24px 20px;
   box-shadow:0 30px 80px -34px rgba(0,0,0,.9);
   font-family:'Inter', system-ui, sans-serif; }
@@ -7208,7 +7208,7 @@ html[data-dp-layout] .dpl-schiene .sb-card .sbc-seq{
   /* ── die sieben Objektkarten-Stile (Aktenreiter, Bordkarte, Score-Kante, Datenzeile, Ampel,
      Kennzahlen, Minimal) ─────────────────────────────────────────────────────────────────── */
   html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card { padding:0 !important; }
-  html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq { position:absolute !important; top:0 !important; bottom:0 !important; left:0 !important; right:auto !important; width:16px !important; max-width:16px !important; display:flex !important; align-items:center !important; justify-content:center !important; writing-mode:vertical-rl !important; border-radius:5px 0 0 5px !important; border:0 !important; border-right:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent) !important; background:transparent !important; font-size:7.5px !important; letter-spacing:.14em !important; padding:0 !important; }
+  html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card .sbc-seq { position:absolute !important; top:0 !important; bottom:0 !important; left:0 !important; right:auto !important; width:16px !important; max-width:16px !important; display:flex !important; align-items:center !important; justify-content:center !important; writing-mode:vertical-rl !important; border-radius:5px 0 0 5px !important; border:0 !important; border-right:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent) !important; background:transparent !important; font-size:8.5px !important; /* v2571: Hausgrenze 8,5 px, war 7,5 */ letter-spacing:.12em !important; padding:0 !important; }
   html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card .sbc-top { border-radius:0 5px 5px 0 !important; margin-left:16px !important; }
   html[data-dp-objkarte="bordkarte"] aside#sidebar :is(#sb-list) .sb-card .sbc-investor-ribbon { top:auto !important; bottom:4px !important; right:4px !important; border-radius:3px !important; font-size:7.5px !important; border-bottom:1px solid !important; }
   html[data-dp-objkarte="kante"] aside#sidebar :is(#sb-list) .sb-card .sbc-top { border:0 !important; border-left:3px solid var(--wl-c9a84c, #C9A84C) !important; border-radius:0 4px 4px 0 !important; background-color:#17160F !important; }

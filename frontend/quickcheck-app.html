@@ -3119,7 +3119,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 /* Stub: schwarzer Boarding-Block links */
 .dp-pf-lead{background:#070707;padding:12px 18px !important;justify-content:center;gap:3px;align-self:stretch}
 .dp-pf-lead::after{display:none !important}
-.dp-pf-lead .bp{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;font-weight:600;color:#9a8f6a;display:block}
+.dp-pf-lead .bp{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:2px;font-weight:600;color:#9a8f6a;display:block}
 .dp-pf-lead .k{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:3px;font-weight:700;color:var(--gold-hi, #E8CC7A) !important;line-height:1.1}
 .dp-pf-lead .s{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.5px;color:var(--gold, #C9A84C) !important}
 /* Perforation mit Halbkreis-Cutouts */
@@ -3137,7 +3137,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 .dp-pf-qr{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;align-self:center;margin:0 6px}
 .dp-pf-qr svg{width:54px;height:54px;display:block;border-radius:7px;border:1px solid rgba(5,5,5,.2);background:#fff;padding:2px;box-shadow:0 4px 12px -6px rgba(0,0,0,.4);transition:.16s}
 .dp-pf-qr:hover svg{box-shadow:0 0 0 3px rgba(5,5,5,.25)}
-.dp-pf-scan{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:1.5px;color:#5a4a14;text-transform:uppercase;font-weight:600}
+.dp-pf-scan{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:1.5px;color:#5a4a14;text-transform:uppercase;font-weight:600}
 /* Weiße Reißzone mit Barcode hinter dem Abrufen-Button */
 .dp-pf-rz{position:relative;display:flex;align-items:center;justify-content:center;background:#fff;padding:0 20px;min-width:172px;align-self:stretch}
 .dp-pf-bc{position:absolute;inset:12px 16px;background:repeating-linear-gradient(90deg,#111 0 2px,transparent 2px 4px,#111 4px 5px,transparent 5px 8px,#111 8px 11px,transparent 11px 13px,#111 13px 14px,transparent 14px 17px,#111 17px 19px,transparent 19px 22px);opacity:.92;pointer-events:none}
@@ -7260,7 +7260,8 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 #qb-bp .ghead .t{ position:relative;z-index:2;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#5a4a14;font-weight:700; }
 #qb-bp .ghead .r{ position:relative;z-index:2;margin-left:auto;display:flex;align-items:center;gap:7px; }
 #qb-bp .htier{ font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:700;padding:3px 8px;border-radius:7px;background:#0a0a0a; }
-#qb-bp .hstat{ font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:.06em;color:#0a0a0a;background:rgba(10,10,10,.14);border:1px dashed rgba(10,10,10,.4);border-radius:6px;padding:2px 7px; }
+/* v2571: Mikrobeschriftungen des Boarding-Pass auf die Hausgrenze 8,5 px (v1890) - gemessen 7 bis 8 px an 9 Stellen */
+#qb-bp .hstat{ font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:700;letter-spacing:.06em;color:#0a0a0a;background:rgba(10,10,10,.14);border:1px dashed rgba(10,10,10,.4);border-radius:6px;padding:2px 7px; }
 #qb-bp .contrail{ position:absolute;top:50%;left:12%;right:38%;height:2px;transform:translateY(-50%);z-index:1;background:repeating-linear-gradient(90deg,rgba(255,255,255,.65) 0 5px,transparent 5px 11px); }
 #qb-bp .flyico{ position:absolute;top:50%;color:#070707;transform:translate(-50%,-50%);z-index:1;animation:qbfly 5s ease-in-out infinite; }
 #qb-bp .flyico svg{ height:17px;width:auto;display:block; }
@@ -7293,24 +7294,24 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 #qb-bp .kt .k::before,#qb-bp .kt .k::after{ content:"";position:absolute;left:-6px;width:11px;height:11px;border-radius:50%;background:#050505; }
 #qb-bp .kt .k:first-child::before,#qb-bp .kt .k:first-child::after{ display:none; }
 #qb-bp .kt .k::before{ top:-6px; } #qb-bp .kt .k::after{ bottom:-6px; }
-#qb-bp .kt .l{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.05em;text-transform:uppercase;color:var(--cmut); }
+#qb-bp .kt .l{ font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--cmut); }
 #qb-bp .kt .v{ font-weight:700;font-size:13px;margin:2px 0 1px;color:#fff; }
-#qb-bp .kt .h{ font-size:7.5px;color:var(--cmut); }
+#qb-bp .kt .h{ font-size:8.5px;color:var(--cmut); }
 /* QR-Stub rechts — groesser */
 #qb-bp .qb-tear{ position:relative;width:0;border-left:3px dashed color-mix(in srgb, var(--gold, #C9A84C) 50%, transparent);flex:none; }
 #qb-bp .qb-tear::before,#qb-bp .qb-tear::after{ content:"";position:absolute;left:-13px;width:25px;height:25px;border-radius:50%;background:#050505; }
 #qb-bp .qb-tear::before{ top:-13px; } #qb-bp .qb-tear::after{ bottom:-13px; }
 #qb-bp .qb-stub{ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:18px 20px;width:208px;background:#fff;flex:none; }
-#qb-bp .qb-stub .bp{ font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.18em;color:#8d846d; }
+#qb-bp .qb-stub .bp{ font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.18em;color:#8d846d; }
 #qb-bp .qb-stub .qrlink{ display:block;line-height:0;border-radius:10px;cursor:pointer;transition:transform .14s,box-shadow .14s; }
 #qb-bp .qb-stub .qrlink:hover{ transform:translateY(-1px);box-shadow:0 8px 20px -8px color-mix(in srgb, var(--gold, #C9A84C) 60%, transparent); }
 #qb-bp .qb-stub .qrtile{ width:128px;height:128px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid #efe7cf; }
 #qb-bp .qb-stub .qrtile img,#qb-bp .qb-stub .qrtile canvas{ display:block;border-radius:4px; }
-#qb-bp .qb-stub .qrtile .ph{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.1em;color:#b9ad88;text-align:center;line-height:1.6;padding:6px; }
+#qb-bp .qb-stub .qrtile .ph{ font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.1em;color:#b9ad88;text-align:center;line-height:1.6;padding:6px; }
 #qb-bp .qb-stub .no{ font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.1em;color:#1a1407; }
-#qb-bp .qb-stub .lnk{ font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-3, #9a7f33);text-decoration:none;border-bottom:1px dashed #cdbb80; }
+#qb-bp .qb-stub .lnk{ font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-3, #9a7f33);text-decoration:none;border-bottom:1px dashed #cdbb80; }
 #qb-bp .qb-stub .lnk:hover{ color:#5a4a14; }
-#qb-bp .qb-stub .cap{ font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.1em;text-transform:uppercase;color:#9a8f6a; }
+#qb-bp .qb-stub .cap{ font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:#9a8f6a; }
 @media(max-width:560px){ #qb-bp{flex-direction:column} #qb-bp .qb-tear{display:none} #qb-bp .qb-stub{flex-direction:row;flex-wrap:wrap;gap:14px;border-top:2px dashed color-mix(in srgb, var(--gold, #C9A84C) 40%, transparent)} }
 </style>
 

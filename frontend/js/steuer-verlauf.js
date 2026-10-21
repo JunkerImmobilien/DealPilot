@@ -69,7 +69,7 @@
       '.dp-stv-leg{display:flex;flex-wrap:wrap;gap:12px;font:500 10.5px "JetBrains Mono",monospace;color:var(--muted,#6B645A)}',
       '.dp-stv-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}',
       '.dp-stv-leg i.l{height:2px;border-radius:0;vertical-align:3px}',
-      '.dp-stv-ch{position:relative;overflow-x:auto}',
+      '.dp-stv-ch{position:relative;overflow-x:auto;--dpm-schiene:1}',  /* v2571: gewollter Querscroller (Diagramm min. 540 px), fuer die Messkabine markiert */
       '.dp-stv-ch svg{display:block;width:100%;height:auto;min-width:540px}',
       '.dp-stv-ch .ax{font:500 10px "JetBrains Mono",monospace;fill:#8A8272}',
       '.dp-stv-ch .gl{stroke:#EFEAE0}.dp-stv-ch .nl{stroke:#2A2727;stroke-width:1.2}',

@@ -33371,7 +33371,7 @@ body.hdr-banner-only .hdr-v61-row2 {
 /* Stub: schwarzer Boarding-Block links */
 .dp-pf-lead{background:#070707;padding:12px 18px !important;justify-content:center;gap:3px;align-self:stretch}
 .dp-pf-lead::after{display:none !important}
-.dp-pf-lead .bp{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;font-weight:600;color:#9a8f6a;display:block}
+.dp-pf-lead .bp{font-family:'JetBrains Mono',monospace;font-size:8.5px;/* v2571: war 8 */letter-spacing:2px;font-weight:600;color:#9a8f6a;display:block}
 .dp-pf-lead .k{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:3px;font-weight:700;color:var(--gold-hi) !important;line-height:1.1}
 .dp-pf-lead .s{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.5px;color:var(--gold) !important}
 /* Perforation mit Halbkreis-Cutouts */
@@ -39027,7 +39027,7 @@ body .sec .cf-phase-sub { color: #8a837c !important; }
 /* ===== v1865a · gemessen: zwischen v1855 und v1865 lag noch eine Regel mit -webkit-line-clamp:2 auf
    .oe-q - mit overflow:visible lief der Text ueber die naechste Zeile. Jetzt: der Hinweis bekommt eine
    eigene, volle Zeile unter Kennzahl/Wert/Knopf (Grid-Areas), kein Clamp, kein Ueberlauf. ===== */
-.oe-auto .oe-row { grid-template-columns: 150px 92px minmax(0, 1fr) 118px; grid-template-areas: "k w . a" "q q q q"; row-gap: 4px; align-items: center; }
+.oe-auto .oe-row { grid-template-columns: minmax(84px, 150px) minmax(56px, 92px) minmax(0, 1fr) auto; /* v2571: fest 150+92+118 px liefen in der schmalen Spalte (Aktenmappe 1180 px, Karte 384 px) 18 px aus der Karte - eintragen-Knopf abgeschnitten */ grid-template-areas: "k w . a" "q q q q"; row-gap: 4px; align-items: center; }
 .oe-auto .oe-row > .oe-k { grid-area: k; }
 .oe-auto .oe-row > .oe-w { grid-area: w; }
 .oe-auto .oe-row > .oe-q { grid-area: q; display: block; -webkit-line-clamp: unset; -webkit-box-orient: unset; white-space: normal; overflow: visible; line-height: 1.35; }
@@ -39203,8 +39203,8 @@ body .dp-oa-warum { font: 500 10.5px/1.35 "JetBrains Mono", monospace !important
   .bc-matrix-axis-y { width: 84px !important; }
   .bc-matrix-axis-y-row { font-size: 10.5px !important; white-space: nowrap !important; flex-direction: column !important; align-items: flex-end !important; justify-content: center !important; gap: 1px !important; }
   .bc-matrix-axis-y-row .bc-delta { display: block !important; white-space: nowrap !important; font-size: 9.5px !important; }
-  .bc-matrix-axis-y-label { font-size: 7.5px !important; letter-spacing: .2px !important; white-space: nowrap !important; }
-  .bc-matrix-axis-x-cell .bc-delta { font-size: 8px !important; white-space: nowrap !important; letter-spacing: 0 !important; }
+  .bc-matrix-axis-y-label { font-size: 8.5px !important; /* v2571: Hausgrenze 8,5 px (v1890), war 7,5 */ letter-spacing: .2px !important; white-space: nowrap !important; }
+  .bc-matrix-axis-x-cell .bc-delta { font-size: 8.5px !important; /* v2571: war 8 */ white-space: nowrap !important; letter-spacing: 0 !important; }
 }
 
 /* v1883a · Der Vollbild-Knopf #dp-sb-toggle (v625: FAB unten links, klappt die Seitenleiste zur 66-px-Schiene) lag im Layout
@@ -41167,3 +41167,27 @@ html body .sb-user-icons .sb-user-icon-btn svg {
 #dp-abweichung .abw-zahl:not(.abw-diff) { color: var(--ink2, #5C554E) !important; }
 #dp-abweichung .abw-tafel th { color: var(--ink3, #6f685e) !important; }
 #dp-abweichung .abw-kopf h4, #dp-abweichung .abw-stand, #dp-abweichung .abw-deckung { color: var(--ink2, #5C554E) !important; }
+
+/* ═══ v2571 · RESPONSIVE-DURCHGANG 21.10.2026 (Messkabine v2570, 46 Läufe) ═══
+   (1) Reiterleiste auf dem Desktop: bei 1280 px (Heute, Seitenleiste 380 px)
+       ist nav.tabs 896 px breit, der Inhalt 1276 px - „Deal-Aktion" und der
+       Fortschritt lagen rechts außerhalb, ohne Balken (style.css:21
+       scrollbar-width:none). Mit der Maus war der Reiter nur über
+       Umschalt+Rad erreichbar. Gemessen außerdem bei 1180 (Aktenmappe),
+       1366 und 900-932 px. Unter 1025 px gibt es den 3-px-Balken schon,
+       unter 769 px den Auslauf - hier dasselbe für Zeiger mit Maus: ein
+       dünner Balken, der NUR gemalt wird, wenn die Leiste überläuft. */
+@media (min-width: 1025px) {
+  html body nav.tabs { scrollbar-width: thin !important; scrollbar-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent) transparent !important; }
+}
+/* (2) „Nebenkosten aus den Einstellungen übernehmen" (Reiter Investition)
+       ist ein nowrap-Knopf mit 326 px - in der Karte bei 360-430 px fehlten
+       rechts 7 px Text (Karte overflow:hidden). Er bricht jetzt um. */
+html body #nk-aus-einstellungen { white-space: normal !important; max-width: 100% !important; height: auto !important; text-align: left !important; }
+/* (3) Bewertung, Vergleichstabellen: die Umbruch-Regel aus Block (5) galt
+       nur bis 480 px; bei 600 px lief die zweite Tabelle 10 px über. */
+@media (min-width: 481px) and (max-width: 700px) {
+  .phase-table, .zaer-table { display: table !important; table-layout: fixed !important; width: 100% !important; white-space: normal !important; overflow: visible !important; }
+  .phase-table th, .phase-table td, .zaer-table th, .zaer-table td { white-space: normal !important; word-break: break-word !important; }
+  .phase-table th:first-child, .phase-table td:first-child, .zaer-table th:first-child, .zaer-table td:first-child { width: 40% !important; }
+}

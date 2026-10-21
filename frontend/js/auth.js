@@ -558,7 +558,8 @@ function updateUserDisplay(session) {
     userBox.innerHTML =
       '<div class="sb-user-main" style="display:flex;align-items:center;gap:10px;padding:10px 12px">' +
         '<div class="sb-user-avatar">' + (session.name ? session.name.charAt(0).toUpperCase() : '?') + '</div>' +
-        '<div class="sb-user-text" style="flex:1;min-width:0">' +
+        /* v2571: Name und Mail kuerzen bei 320 px auf 66 px - der volle Wortlaut steht im title */
+        '<div class="sb-user-text" style="flex:1;min-width:0" title="' + String((session.name || '') + ' · ' + (session.email || '')).replace(/["<>&]/g, '') + '">' +
           '<div class="sb-user-name">' + session.name + ' ' + modeBadge + '</div>' +
           '<div class="sb-user-email">' + session.email + '</div>' +
         '</div>' +

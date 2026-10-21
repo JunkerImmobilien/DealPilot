@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2570a</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2571</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -1519,6 +1519,8 @@
     var nochOffen = root.isConnected && root.getBoundingClientRect().height > 0 && win.getComputedStyle(root).display !== 'none';
     if (nochOffen && s) { try { s.click(); } catch (e) {} await warte(500); }
     nochOffen = root.isConnected && root.getBoundingClientRect().height > 0 && win.getComputedStyle(root).display !== 'none' && win.getComputedStyle(root).visibility !== 'hidden';
+    /* v2571: eine Schublade, die nach unten/seitlich aus dem Bild faehrt, ist zu (Darstellungs-Panel: translateY 657 px). */
+    if (nochOffen) { var rz = root.getBoundingClientRect(); if (rz.top >= win.innerHeight - 2 || rz.bottom <= 2 || rz.left >= win.innerWidth - 2 || rz.right <= 2) nochOffen = false; }
     r.m7 = nochOffen ? 'bleibt offen' : 'zu';
     if (nochOffen && s) r.fehler.push('M7 Schliesser schliesst nicht');
     r.ok = r.fehler.length === 0;
@@ -1970,6 +1972,10 @@
     for (var i = 0; i < kn.length; i++) {
       var s = (kn[i].textContent || '').trim();
       if (s.length <= 2 && /^[×✕✖✗✘xX╳]$/.test(s)) return kn[i];
+    }
+    /* v2571: ein Knopf mit dem WORT - Unterlagen-Fenster (dp-unterlagen-modal) traegt nur „Schliessen“. */
+    for (var j = 0; j < kn.length; j++) {
+      if (/^(Schlie(ss|ß)en|Abbrechen|Fertig)$/i.test((kn[j].textContent || '').trim())) return kn[j];
     }
     return null;
   }
