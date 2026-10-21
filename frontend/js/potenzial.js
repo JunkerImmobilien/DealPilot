@@ -651,7 +651,7 @@
       /* v2577 · die kleine Zeile an der Zahl, Gruppenköpfe, „So ist gerechnet" */
       '.dp-pot .dp-pot-z{display:inline-block;text-align:inherit}',
       '.dp-pot .dp-pot-u{display:block;font:400 10.5px/1.35 Inter,system-ui,sans-serif;color:#6c6450;white-space:normal;letter-spacing:0;text-transform:none}',
-      '.dp-pot td:not(:first-child) .dp-pot-u{white-space:nowrap}',
+      '.dp-pot thead th{white-space:normal}.dp-pot th,.dp-pot td{padding-left:6px;padding-right:6px}',
       '.dp-pot tr.dp-pot-gr td{font:600 10px/1.2 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:#8A8272;padding:12px 8px 4px;text-align:left}',
       '.dp-pot .dp-pot-kenn{font-size:11.5px;color:#4a4436;margin:8px 0 0}',
       '.dp-pot details.dp-pot-mehr{margin:6px 0 0;font-size:11.5px;line-height:1.5;color:#6c6450}',
@@ -751,7 +751,7 @@
       var lzsT = lzsKurz(W.lzs);
       rows.push({ gr: 'Wert' + (W.quelle === 'abruf' ? ' · laut Abruf Marktpreise vom ' + esc(W.datum) : '') });
       rows.push({ t: 'Ertragswert', u: [lzsT, W.leer ? W.leer + ' leere Wohnung' + (W.leer === 1 ? '' : 'en') + ' mit marktüblicher Miete' : ''].filter(Boolean).join(' · '),
-        f: function (k) { var w = WS[k]; return w && w.ew != null ? zz('<b>' + eur(w.ew) + '</b>', w.rnd != null ? 'Restnutzungsdauer ' + dez(w.rnd, 0) + ' J.' : '') : null; } });
+        f: function (k) { var w = WS[k]; return w && w.ew != null ? zz('<b>' + eur(w.ew) + '</b>', w.rnd != null ? 'Restnutzungsdauer&nbsp;' + dez(w.rnd, 0) + '&nbsp;J.' : '') : null; } });
       if (mpiDa) rows.push({ t: 'Marktpreisindikation', u: 'Angebote am Ort' + (ab ? ', abzüglich ' + ab + ' % Abschlag (' + abschlagKurz(MPI.angebote.abschlag_herkunft) + ')' : ''),
         f: function (k) { var w = WS[k]; if (!w || w.mpi == null) return null;
           return zz(eur(w.mpi), k === 'mieterhoehung' ? 'wie Bestand' : (w.spanne ? spanneTsd(w.spanne[0], w.spanne[1]) : '')); } });
@@ -850,7 +850,7 @@
   function spanneTsd(a, b) {
     if (a == null || b == null) return '';
     if (!(a >= 100000 && b >= 100000)) return 'Spanne ' + spanne(a, b, eur);
-    return 'Spanne ' + Math.round(a / 1000).toLocaleString('de-DE') + '–' + Math.round(b / 1000).toLocaleString('de-DE') + ' Tsd. €';
+    return 'Spanne ' + Math.round(a / 1000).toLocaleString('de-DE') + '–' + Math.round(b / 1000).toLocaleString('de-DE') + '&nbsp;Tsd.&nbsp;€';
   }
   function aufklapp(titel, inhalt) { return '<details class="dp-pot-mehr"><summary>' + titel + '</summary>' + inhalt + '</details>'; }
   function marktHtml() {
