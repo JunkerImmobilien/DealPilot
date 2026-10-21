@@ -37,7 +37,8 @@
     var B = LOG.blockiert, of = window.fetch;
     window.fetch = function (u, o) {
       var m = ((o && o.method) || (u && u.method) || 'GET').toUpperCase();
-      if (m !== 'GET' && m !== 'HEAD') { B.push(m + ' ' + String((u && u.url) || u)); return Promise.resolve(new Response('{"ok":false,"handbuch":"gesperrt"}', { status: 403, headers: { 'Content-Type': 'application/json' } })); }
+      /* Ausnahme: die LESENDE Zinsauskunft (backend/src/routes/marktbericht.js:503 „kein Bericht, kein Kontingent, keine KI“) */
+      if (m !== 'GET' && m !== 'HEAD' && String((u && u.url) || u).indexOf('/marktbericht/wertparameter/') < 0) { B.push(m + ' ' + String((u && u.url) || u)); return Promise.resolve(new Response('{"ok":false,"handbuch":"gesperrt"}', { status: 403, headers: { 'Content-Type': 'application/json' } })); }
       return of.apply(this, arguments);
     };
     var xo = XMLHttpRequest.prototype.open, xs = XMLHttpRequest.prototype.send;
@@ -55,16 +56,17 @@
 
   /* ── Beispielwerte ── selbst gesetzt; Adressen aus den Demo-Objekten der Videoreihe */
   var GEMEINSAM = { nutzungsart: 'kapitalanlage', makler_p: '3,57', notar_p: '1,7', gba_p: '0,5', gest_p: '6,5',
-    d1z: '4,31', d1t: '1,5', d1_bindj: '10', zve: '60000', ds2_mietausfall: '', exitstr: '' };
+    d1z: '4,31', d1t: '1,5', d1_bindj: '10' };
+  /* zvE NICHT setzen: weicht er vom Profil ab, oeffnet die App den Dialog #zve-sync-overlay */
   var BEISPIEL = {
     ETW: { plz: '32052', ort: 'Herford', str: 'Sachsenstraße', hnr: '18', objart: 'ETW', wfl: '100', zimmer: '3', baujahr: '1998', etage: '2', etagen_ges: '3',
-      ds2_zustand: 'gut', standardstufe: '3', ds2_energie: 'C', gsfl: '1200', mea: '12', kp: '239000', nkm: '750', ze: '40', umlagef: '220',
+      ds2_zustand: 'gut', standardstufe: '3', ds2_energie: 'C', gsfl: '1200', mea: '12', brw: '190', kp: '239000', nkm: '750', ze: '40', umlagef: '220',
       ek: '40000', d1: '199000', hg_ul: '2400', grundsteuer: '260', hg_nul: '900', weg_r: '600', bgf: '135', thesis: 'Solide vermietete 3-Zimmer-Wohnung, Miete unter Vergleichsniveau.' },
     EFH: { plz: '32052', ort: 'Herford', str: 'Musterweg', hnr: '5', objart: 'EFH', wfl: '140', zimmer: '5', baujahr: '1985', etagen_ges: '2',
-      ds2_zustand: 'normal', standardstufe: '3', ds2_energie: 'E', gsfl: '650', kp: '365000', nkm: '1250', ze: '60', umlagef: '280',
+      ds2_zustand: 'normal', standardstufe: '3', ds2_energie: 'E', gsfl: '650', brw: '210', kp: '365000', nkm: '1250', ze: '60', umlagef: '280',
       ek: '70000', d1: '295000', grundsteuer: '480', eigen_r: '1800', bgf: '260', nhk_haus: '', thesis: 'Freistehendes Haus mit Garten, langfristig vermietet.' },
     MFH: { plz: '33613', ort: 'Bielefeld', str: 'Westerfeldstr.', hnr: '140', objart: 'MFH', wfl: '390', baujahr: '1967', etagen_ges: '3', einheiten: '4',
-      ds2_zustand: 'normal', standardstufe: '3', ds2_energie: 'E', gsfl: '1570', kp: '545000', nkm: '2650', ze: '120', umlagef: '780',
+      ds2_zustand: 'normal', standardstufe: '3', ds2_energie: 'E', gsfl: '1570', brw: '450', kp: '545000', nkm: '2650', ze: '120', umlagef: '780',
       ek: '110000', d1: '435000', grundsteuer: '1200', eigen_r: '5200', bgf: '507', thesis: 'Vier Wohnungen, Mieten deutlich unter Vergleichsmiete.' }
   };
   var MFH_EINHEITEN = [
@@ -149,7 +151,8 @@
     var r = _rahmen[sec], b = r.bilder[i]; if (!b) return null;
     var s = $(sec), sc = scroller(s), frei = Math.max(obenFrei(), 0);
     var top0 = sc === document.scrollingElement ? 0 : sc.getBoundingClientRect().top;
-    sc.scrollTop = Math.max(0, b.oben - (frei - top0) - 14);
+    /* sofort, nicht weich: sonst misst getBoundingClientRect mitten im Scrollen */
+    sc.scrollTo({ top: Math.max(0, b.oben - (frei - top0) - 14), behavior: 'instant' });
     var ov = document.createElement('div'); ov.id = 'dphb-marken';
     ov.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:2147483000';
     var lo = Infinity, hi = -Infinity, li = Infinity, re = -Infinity;
@@ -161,7 +164,7 @@
       k.style.cssText = 'position:fixed;left:' + (q.left - 4) + 'px;top:' + (q.top - 4) + 'px;width:' + (q.width + 8) + 'px;height:' + (q.height + 8) + 'px;border:2.5px solid var(--wl-c9a84c, #C9A84C);border-radius:10px;box-shadow:0 0 0 3px rgba(5,5,5,.18)';
       var n = document.createElement('div');
       n.textContent = r.nummer[id];
-      n.style.cssText = 'position:fixed;left:' + (q.left - 13) + 'px;top:' + (q.top - 13) + 'px;min-width:24px;height:24px;padding:0 5px;box-sizing:border-box;border-radius:12px;background:#050505;color:#E8CC7A;border:2px solid var(--wl-c9a84c, #C9A84C);font:700 12px/20px "JetBrains Mono",monospace;text-align:center';
+      n.style.cssText = 'position:fixed;left:' + (q.left - 22) + 'px;top:' + (q.top - 12) + 'px;min-width:24px;height:24px;padding:0 5px;box-sizing:border-box;border-radius:12px;background:#050505;color:#E8CC7A;border:2px solid var(--wl-c9a84c, #C9A84C);font:700 12px/20px "JetBrains Mono",monospace;text-align:center';
       ov.appendChild(k); ov.appendChild(n);
     });
     document.body.appendChild(ov); _ov = ov;
