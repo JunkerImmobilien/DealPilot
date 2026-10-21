@@ -503,6 +503,23 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Hansestadt Rostock 2026, Landkreis Rostock 2026, Vorpommern-Greifswald 2024
                                genehmigungspflichtig - nur Sperren mit Fundstelle und Weg. */
                             'nachernte-2026-10-mv.json',
+                            /* v2690 · Nachernte 21.10.2026 (Agent register-ernte BW): Gemeinsamer GAA Boeblingen
+                               und Schoenbuchgemeinden, GMB 2025 (Stichtag 01.01.2025, frei, ohne Lizenzvermerk):
+                               Liegenschaftszinssaetze als log-Funktion der Mietflaeche bzw. der RND (EFH City,
+                               RH/DHH Land, MFH City/Land, ETW City/Land); EFH Land und RH/DHH City gesperrt, weil
+                               Diagrammfunktion und Tabelle des Dokuments sich widersprechen; Sachwertfaktoren
+                               gesperrt (Baukostenindex ohne Zahl). Gemeinsamer GAA Lahr, GMB 2023/2024: LZS EFH/ZFH,
+                               MFH, ETW (Quellenangabe Pflicht), SWF gesperrt (Baupreisindex ohne Zahl). */
+                            'nachernte-2026-10b-bw.json',
+                            /* v2690 · Sperren mit Bezugsweg (kostenpflichtig / genehmigungspflichtig / auf Anfrage),
+                               je Gemeinde und Objektart: Mannheim, Freiburg, Oestl. Bodenseekreis (Friedrichshafen),
+                               Oestl. LK Biberach, Sinsheim, Rottenburg, Goeppingen, Esslingen a. N., Kehl,
+                               Offenburg-Kinzigtal, Linzgau-Gehrenberg, Neckar-Odenwald, nordoestl. Schwarzwald-Baar,
+                               Aalen-Essingen, Tuebingen (10 Gem.), Loerrach/Inzlingen, Leonberg, Heidelberg.
+                               ACHTUNG Stufe N (v2401: nie N bei Sperre): Gemeinden ohne Registersatz verlieren
+                               damit die DealPilot-Formel und rechnen § 256 BewG mit Weg — eigene Datei, damit die
+                               Entscheidung eine Zeile ist. */
+                            'nachernte-2026-10b-bw-wege.json',
                             /* v2700 · Nachernte 10b 21.10.2026 (HE/SH/RP/HH): Darmstadt IMB 2026 (neu im Register:
                                LZS MFH nach Baujahr vor/ab 1950, vermietete ETW, WGH/gemischt dünn belegt Stufe B),
                                Sachwertfaktor MFH/ETW je hessischem Ausschuss als Sperre mit Fundstelle (Korbach,
