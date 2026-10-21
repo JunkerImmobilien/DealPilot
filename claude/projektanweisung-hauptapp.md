@@ -42037,3 +42037,12 @@ Marcel 21.10.2026: „Ernte auch nebenbei weiter die 79 Dokumente".
 - **Nachweis:** Sicherungen vorher `/root/backups/mb-vor-saat-20261021-1856.sql.gz` und `mb-vor-saat2-20261021-1927.sql.gz` (je 37 MB, 34 Tabellen). Gegenprobe: SOLL = IST 4.319, 0 verwaist, keine Dublette.
 - **Prod-Rollout (59) vorbereitet, nicht ausgeführt:** Prod-Sicherungen `/root/backups/haupt-20261021-1927.sql.gz` (14 MB, 73 Tabellen) und `mb-20261021-1927.sql.gz` (27 MB, 33 Tabellen). Der Merge nach `main` wurde vom Sicherheitsfilter abgelehnt („weiter machen und am schluss ausrollen" reichte nicht). Prod steht auf (58) `8474fc7c`, Prod-Register 4.275. Beim Rollout: backend + mb-backend bauen (Migration 021), danach `register-saat.mjs --trocken`, dann echt.
 - **Rest:** 12 Dokumente nicht erreichbar (geocms.com, RP 503, NI Wartung) — nächster Harvest-Takt.
+
+### Prod-Rollout (59) (21.10.2026, Produktion)
+
+Marcel 21.10.2026: „1. ja rollout". Der erste Merge-Versuch auf „weiter machen und am schluss ausrollen" war vom Sicherheitsfilter abgewiesen worden.
+
+- **Was:** Staging-Stand `53c47f06` — Gutachterprüfung: v2580 Prüfstrecke Wertermittlung, v2590/v2592 Bodenrichtwerte, v2591 Admin „Register & Ernte" (Migration 021), v2593/v2612 Formeln, v2595 Modellprüfung + Pilot-Tafel, v2600 E1/E2/E3/E4/E10/E11, v2610 Landesmittel (E6), v2620/v2660 Vergleichswert Immobilienrichtwert NRW (E7), v2630 Beleihungswert-Check (E8), v2640/v2641/v2650 Nachernte, Journale.
+- **Commit:** `871dfdb3` auf `main` (Merge im eigenen Worktree).
+- **Nachweis:** Sicherungen vorher `/root/backups/haupt-20261021-1927.sql.gz` (14 MB, 73 Tabellen), `mb-20261021-1927.sql.gz` (27 MB, 33 Tabellen). backend + mb-backend gebaut: Haupt „No new migrations", 3001; mb `OK 021_register_deckung_lauf.sql`, :4000. `register-saat.mjs` auf Prod: 4.275 → **4.319**, SOLL = IST, 0 verwaist. curl: `potenzial.js?v=v2660` (Text „vorläufig"), `admin-register.js?v=2591a`, mb-health 200, `/admin/register/deckung` ohne Token 401. Gold-Audit RC 0.
+- **Rest:** `mb.gaa_documents`-Status nur auf Staging nachgezogen (Prod hat eigenen Harvest-Bestand).
