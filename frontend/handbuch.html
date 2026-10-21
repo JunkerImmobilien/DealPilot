@@ -182,7 +182,7 @@ details[open] .pfeil{transform:rotate(90deg)}
   function pflichtSaetze(kap, e) {
     var s = [];
     if (e.stufe) s.push('Pflicht für den Marktbericht ab ' + STUFE[e.stufe] + (e.stufe === 1 ? ' (jede Marktbewertung)' : e.stufe === 2 ? ' (erweiterte Indikation)' : ' (Sach- und Ertragswert)'));
-    if (e.artPflicht) s.push('Pflichtfeld beim ' + kap.name + (e.artHinweis ? ' — ' + e.artHinweis : ''));
+    if (e.artPflicht) s.push('Pflichtfeld ' + (kap.art === 'ETW' ? 'bei der ' : 'beim ') + kap.name + (e.artHinweis ? ' — ' + e.artHinweis : ''));
     return s;
   }
 
