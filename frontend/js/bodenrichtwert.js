@@ -603,6 +603,15 @@
                fehler: bd.note || 'Der Bodenrichtwert liegt vor, wird aber nur gegen Gebühr herausgegeben.',
                link: (_blG && BORIS_URLS[_blG] ? BORIS_URLS[_blG] : BORIS_FALLBACK).url };
     }
+    /* v2592 · Ein Dienst, der NICHTS gesagt hat, ist kein „kein Wert".
+       Bayern antwortete am 21.10.2026 mit HTTP 403 („aus sicherheits-
+       technischen Gründen nicht verfügbar") - hier stand dann „Kein
+       amtlicher Bodenrichtwert für diese Lage". Die Registry meldet den
+       Ausfall seit v2592 ausdrücklich (dienst_ausfall). */
+    if (!(bd.available && bd.value_sqm != null && bd.value_sqm > 0) && bd.dienst_ausfall) {
+      return { ok: false, grund: 'ausfall',
+               fehler: bd.note || 'Der Bodenrichtwert-Dienst ist derzeit nicht erreichbar — bitte den Wert selbst eintragen.' };
+    }
     if (!(bd.available && bd.value_sqm != null && bd.value_sqm > 0)) {
       return { ok: false, grund: 'kein_wert', fehler: 'Kein amtlicher Bodenrichtwert für diese Lage' };
     }
@@ -727,7 +736,8 @@
       var brwEl = _el('brw');
       if (brwEl) { brwEl.value = String(r.wert).replace('.', ','); brwEl.dispatchEvent(new Event('input', { bubbles: true })); }
       var extra = [];
-      if (r.stichtag) extra.push('Stichtag ' + String(r.stichtag).replace(/^(\d{4})-(\d{2})-(\d{2})$/, '$3.$2.$1'));   /* v2302: deutsches Datum statt ISO (Prüflauf Modul 24) */
+      if (r.stichtag) extra.push('Stichtag ' + String(r.stichtag).replace(/^(\d{4})-(\d{2})-(\d{2})$/, '$3.$2.$1')   /* v2302: deutsches Datum statt ISO (Prüflauf Modul 24) */
+        + (r.roh && r.roh.stichtag_veraltet ? ' (älter als ein Jahr – neueren Wert beim Gutachterausschuss prüfen)' : ''));   /* v2592 */
       if (r.zone) extra.push('Zone ' + r.zone);
       /* v1838 · Die Nutzungsart gehört neben den Wert, nicht in die
          Antwort des Servers und von dort in den Papierkorb. */

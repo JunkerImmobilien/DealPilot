@@ -112,12 +112,12 @@ ${p.land_value && p.land_value.available
       ? `Bodenrichtwert (Angabe aus DealPilot): **${fmt(p.land_value.value_sqm, ' €/m²')}**. `
         + `Für diesen Standort liegt aktuell kein automatischer Amtsabruf vor; der Wert stammt aus der manuellen Eingabe. `
       : `Amtlicher Bodenrichtwert (${p.land_value.source}): **${fmt(p.land_value.value_sqm, ' €/m²')}**`
-        + `${p.land_value.stichtag ? ` (Stichtag ${p.land_value.stichtag})` : ''}`
+        + `${p.land_value.stichtag ? ` (Stichtag ${p.land_value.stichtag}${p.land_value.stichtag_veraltet ? ' – älter als ein Jahr, ein neuerer Bodenrichtwert kann vorliegen' : ''})` : ''}`
         + `${p.land_value.nutzung ? `, Nutzung: ${p.land_value.nutzung}` : ''}`
         + `${p.land_value.zone ? `, Zone ${p.land_value.zone}` : ''}.`
         + ` Quelle: Gutachterausschüsse${p.land_value.license ? ', ' + p.land_value.license : ''}. `)
     + `Der Bodenrichtwert bezieht sich auf unbebaute Grundstücke und ist kein Verkehrswert.`
-  : `Kein Bodenrichtwert verfügbar${p.land_value && p.land_value.claimed_land ? ' (Land ' + p.land_value.claimed_land + ' noch nicht automatisch angebunden – manuelle Eingabe möglich)' : p.land_value && p.land_value.reason === 'land_nicht_unterstuetzt' ? ' (Bundesland noch nicht angebunden – manuelle Eingabe möglich)' : ''}.`}
+  : `Kein Bodenrichtwert verfügbar${p.land_value && p.land_value.dienst_ausfall ? ' (' + String(p.land_value.note || 'der Bodenrichtwert-Dienst des Landes ist derzeit nicht erreichbar').replace(/\.\s*$/, '') + ')' : p.land_value && p.land_value.claimed_land ? ' (Land ' + p.land_value.claimed_land + ' noch nicht automatisch angebunden – manuelle Eingabe möglich)' : p.land_value && p.land_value.reason === 'land_nicht_unterstuetzt' ? ' (Bundesland noch nicht angebunden – manuelle Eingabe möglich)' : ''}.`}
 
 
 ## J) Vergleichsobjekte

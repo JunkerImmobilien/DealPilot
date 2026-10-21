@@ -994,7 +994,9 @@ function _renderWertverfahren(d) {
       /* v2390 \u00b7 der Rueckfall auf die eigene Eingabe ist nicht amtlich */
       + (lv.source === 'dealpilot-eingabe' ? 'eigene Angabe, nicht \u00fcber BORIS abgerufen' : 'amtlich')
       + ' \u00b7 Stichtag ' + (lv.stichtag || '\u2013')
-    : 'kein amtlicher Bodenrichtwert verf\u00fcgbar';
+      /* v2592 \u00b7 ein Stichtag vor dem Vorjahr wird gesagt (registry.js) */
+      + (lv.stichtag_veraltet ? ' (\u00e4lter als ein Jahr \u2013 neueren Wert beim Gutachterausschuss pr\u00fcfen)' : '')
+    : (lv.dienst_ausfall && lv.note ? lv.note : 'kein amtlicher Bodenrichtwert verf\u00fcgbar');
 
   box.innerHTML =
     '<h3 class="wv-h">Bodenwert</h3>'
@@ -1909,7 +1911,8 @@ function renderAssessment(d) {
   const lv = d.land_value;
   let extra = '';
   if (lv && lv.available && lv.value_sqm != null) {
-    const stich = lv.stichtag ? ' · Stichtag ' + String(lv.stichtag).slice(0, 10) : '';
+    const stich = (lv.stichtag ? ' · Stichtag ' + String(lv.stichtag).slice(0, 10) : '')
+      + (lv.stichtag_veraltet ? ' (älter als ein Jahr – neueren Wert beim Gutachterausschuss prüfen)' : '');   /* v2592 */
     /* v2390 · Der Rueckfall auf die eigene Eingabe stand hier als „(amtlich) · dealpilot-eingabe". */
     const _lvEigen = lv.source === 'dealpilot-eingabe';
     extra = `<div class="assess rate-neutral"><div class="l">${_lvEigen ? 'Bodenrichtwert (eigene Angabe, nicht über BORIS abgerufen)' : 'Bodenrichtwert (amtlich)' + (lv.source ? ' · ' + lv.source : '')}${stich}</div>
@@ -4159,7 +4162,7 @@ async function exportPdf(out) {
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(180, 180, 188);
     const info = [];
     if (lv.nutzung) info.push('Nutzung ' + lv.nutzung);
-    if (lv.stichtag) info.push('Stichtag ' + lv.stichtag);
+    if (lv.stichtag) info.push('Stichtag ' + lv.stichtag + (lv.stichtag_veraltet ? ' (älter als ein Jahr)' : ''));   /* v2592 */
     if (lv.used_year) info.push('Jahrgang ' + lv.used_year);
     if (_lvEigenPdf) info.unshift('eigene Angabe, nicht über BORIS abgerufen');   /* v2390 */
     doc.text(info.join('  ·  '), M + 60, y + 9);
