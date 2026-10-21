@@ -179,6 +179,23 @@
     ['Desktop',         1180,  800],
     ['Desktop breit',   1280,  800]
   ];
+  /* v2553 · TABLET IN SAFARI — Marcel 21.10.2026: „diese Sache muessen wir auch mit
+     in unsere Messkabine uebernehmen". Am iPad bleibt in Safari weniger Hoehe als
+     der Bildschirm hat: Adress- und Tableiste nehmen rund 132 px. Gemessen an
+     Marcels Bild: 892 px sichtbar am 12,9"-iPad quer (1024 - 132). Diese Profile
+     tragen die SICHTBARE Hoehe, und die Kabine laedt sie in ECHTER Hoehe (nicht auf
+     760 gekappt) - sonst prueft sie nie, ob oben die Reiter und unten der
+     Nutzerbereich ins Bild passen.
+     Grenze: im iframe ist 100vh = 100dvh = Rahmenhoehe. Den Safari-Fehler selbst
+     (vh groesser als sichtbar) kann die Kabine nicht erzeugen; sie prueft, ob die
+     App bei der sichtbaren Hoehe vollstaendig im Bild steht. */
+  var SAFARI = [
+    ['iPad Pro 12,9" quer · Safari', 1366,  892],
+    ['iPad Pro 12,9" hoch · Safari', 1024, 1234],
+    ['iPad Air quer · Safari',       1180,  688],
+    ['iPad Air hoch · Safari',        820, 1048],
+    ['iPad mini quer · Safari',      1024,  636]
+  ];
   var ZIEL = new URLSearchParams(location.search).get('ziel') || '/';
   var f = document.getElementById('f'), rahmen = document.getElementById('rahmen');
   var lbl = document.getElementById('lbl'), w = document.getElementById('w');
@@ -1232,7 +1249,7 @@
   function lade(breite, layout, hoehe, extra){
     setzeMerker(layout, extra);
     rahmen.style.width  = (breite + 2) + 'px';          /* +2 für den Rahmen */
-    rahmen.style.height = Math.min(hoehe || 780, 760) + 'px';
+    rahmen.style.height = ((extra && extra.echteHoehe) ? (hoehe || 780) : Math.min(hoehe || 780, 760)) + 'px';
     var kurz = varianteKurz(layout, extra);
     lbl.textContent = breite + ' px · ' + kurz;
     aktuell = [ kurz + ' @ ' + breite, breite, hoehe || 780 ];
@@ -1246,6 +1263,52 @@
   }
 
   function schlaf(ms){ return warte(ms); }   /* v1901e: nicht gedrosselt */
+
+  /* v2553 · Steht die App bei der sichtbaren Safari-Hoehe ganz im Bild?
+     Je Profil und Ansicht: (1) die Wurzel scrollt nicht (Dokument nicht hoeher
+     als sichtbar), (2) die Reiterleiste nav.tabs liegt ganz im Bild, (3) das
+     unterste sichtbare Element von Sidebar bzw. Schiene endet im Bild (dort sitzt
+     der Nutzerbereich mit Name und Anmelden). Gemessen wird nach dem Laden UND
+     nach einem Scrollversuch der Wurzel - genau der rutschte am iPad. */
+  async function tabletSafari(opt){
+    opt = opt || {};
+    var profile = opt.profile || SAFARI, ansichten = opt.layouts || ['', 'v1b'], out = [];
+    for (var i = 0; i < profile.length; i++) {
+      for (var j = 0; j < ansichten.length; j++) {
+        var g = profile[i], lay = ansichten[j];
+        await lade(g[1], lay, g[2], { echteHoehe: true });
+        var z = ziel(), d = z.d, win = z.win, H = win.innerHeight, se = d.scrollingElement || d.documentElement;
+        try { win.scrollTo(0, 99999); } catch (e) {}
+        await schlaf(250);
+        var r = { geraet: g[0], ansicht: lay || 'Heute', breite: g[1], sichtbar: H,
+                  wurzelHoehe: se.scrollHeight, wurzelScroll: Math.round(win.scrollY || se.scrollTop || 0) };
+        var tabs = d.querySelector('nav.tabs');
+        if (tabs) { var tb = tabs.getBoundingClientRect(); r.reiterOben = Math.round(tb.top); r.reiterUnten = Math.round(tb.bottom); }
+        var unten = -1, wer = null;
+        ['#sidebar', '.dpl-schiene'].forEach(function (sel) {
+          var box = d.querySelector(sel); if (!box) return;
+          var bb = box.getBoundingClientRect(); if (bb.width < 2 || bb.height < 2 || bb.right <= 0 || bb.left >= win.innerWidth) return;   /* zugeklappt oder ausserhalb */
+          [].forEach.call(box.querySelectorAll('*'), function (e) {
+            var cs = win.getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden') return;
+            var b = e.getBoundingClientRect(); if (b.width < 2 || b.height < 2) return;
+            if (!(e.textContent || '').trim() && e.tagName !== 'BUTTON') return;
+            if (b.bottom > unten) { unten = b.bottom; wer = sel + ' ' + e.tagName.toLowerCase() + (e.className && typeof e.className === 'string' ? '.' + e.className.split(/\s+/)[0] : ''); }
+          });
+        });
+        r.untenEnde = Math.round(unten); r.untenWer = wer;
+        try { win.scrollTo(0, 0); } catch (e) {}
+        var fehler = [];
+        if (r.wurzelScroll > 0) fehler.push('Wurzel scrollt ' + r.wurzelScroll + ' px');
+        if (r.wurzelHoehe > H + 1) fehler.push('Dokument ' + (r.wurzelHoehe - H) + ' px hoeher als sichtbar');
+        if (tabs && (r.reiterOben < 0 || r.reiterUnten > H)) fehler.push('Reiterleiste angeschnitten (' + r.reiterOben + '..' + r.reiterUnten + ')');
+        if (unten > H + 1) fehler.push('unten abgeschnitten: ' + wer + ' endet bei ' + r.untenEnde + ' von ' + H);
+        r.ok = !fehler.length; r.fehler = fehler;
+        out.push(r);
+      }
+    }
+    window.DPM_TABLET = out;
+    return out;
+  }
 
   /* Über die Reiter schleifen mit einem ECHTEN Klickweg (el.click() löst das
      Ereignis aus — der Unterschied zu setAttribute, vor dem die Doktrin
@@ -2231,7 +2294,8 @@
                  rafErsatz: rafErsatz, rafProbe: rafProbe,
                  stopps: stopps,
                  standbildAn: function(){ return SB_AN; },
-                 selbsttest: selbsttest, geraete: GERAETE };
+                 selbsttest: selbsttest, geraete: GERAETE,
+                 tabletSafari: tabletSafari, safari: SAFARI };
 
   waehle(2);   /* iPhone 14 */
 })();
