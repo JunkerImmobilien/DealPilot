@@ -148,7 +148,7 @@ export function abschlagAusLzs(ref, sale, area) {
     const kurz = ausschussKurz(satz.gaa_name || z.ausschuss);
     const herkunft = 'örtlich gemessen: Ø Kaufpreis der Kauffälle des '
       + String(kurz || 'Gutachterausschusses').replace(/^Gutachterausschuss/, 'Gutachterausschusses') + ' ' + jahr
-      + ' (' + Math.round(kp).toLocaleString('de-DE') + ' €/m²' + (fz ? ', ' + fz + ' Kauffälle' : '') + ', Teilmarkt ' + z.zweig
+      + ' (' + Math.round(kp).toLocaleString('de-DE') + ' €/m²' + (fz ? ', ' + fz + ' Kauffälle' : '')   /* v2578a: kein Zweig-Kuerzel im Kundentext, es steht in pruefung_lzs */
       + ') gegen den Median der Angebote (' + Math.round(med).toLocaleString('de-DE') + ' €/m², ' + n + ' Angebote)';
     return { verwendet: true, pct, herkunft, quelle: 'liegenschaftszinssatz', ausschuss: kurz, berichtsjahr: jahr,
       kurz: (kurz || 'Gutachterausschuss') + ' ' + jahr, zweig: z.zweig, kaufpreis_eur_qm: kp, fallzahl: fz,
