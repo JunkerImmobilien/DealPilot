@@ -38840,6 +38840,22 @@ Analyselauf an einem MFH mit Marktbericht zeigt das.
 - **Kosten:** keine (alle KI-, Sprach-, ImmoMetrica-, Marktbericht- und BMF-Abrufe gespielt).
 - **Rest:** Aufnahmen 02–09, 10a, 10b, 12–14, Ü2 bei 1920 × 1080 (Ablauf: Tab per `Start-Process chrome`, 25-s-Probe, `rec-start -Los`, Bildraster, Adressprüfung per Bildvergleich unten links). Die Darlehen-Lücke (fachlich). Zähler pdf_export 12 → 11 nur auf Freigabe.
 
+### messe-schleife-2 · Auswahl mit Vorschau, Alle im Wechsel, Umschalter, ohne Netz (21.10.2026, Staging + Ordner zum Mitnehmen, Video-Agent)
+
+- **Was:** Marcels Nachtrag „zum Auswählen alle Versionen“ und „mach das alles fertig“.
+  - **Auswahl** (ohne Parameter): sechs Vorschaukarten mit Standbild (`messe-schleife/vorschau/idee-1…6.jpg`, auf Staging angehalten mit `DPS_HALT` aufgenommen, im Git), beim Überfahren läuft die Idee klein (`&vorschau=1`), Knopf „Alle im Wechsel“. Ein Klick holt den Vollbildmodus (Geste) und spielt die Idee in einem Rahmen über der Seite, damit der Vollbildmodus beim Wechseln stehen bleibt. Esc oder das Ende des Vollbilds schließen den Rahmen.
+  - **`?idee=alle`**: jede Idee eine volle Runde, dann die nächste (`?idee=alle&n=…`, Neuladen per `location.replace`, räumt Schleifen und Videos sicher ab), endlos.
+  - **Umschalter** in jeder Idee: Leiste erscheint erst bei Mausbewegung, verschwindet nach 3 s; Tasten 1–6, A, Esc.
+  - **Ohne Netz:** Google Fonts entfernt, keine externen Abrufe mehr, alle Pfade relativ, läuft per `file://`. **Kein Service Worker.** `@font-face` mit `local()` und Windows-Ersatz (Segoe UI, Cascadia Mono/Consolas, Georgia).
+  - Uhr der Abflugtafel (und des Cockpits) sofort gestellt. Zähler klemmt den Fortschritt auf 0…1 (der rAF-Zeitstempel liegt manchmal vor `t0` und gab einen Frame mit negativem Wert).
+- **Ordner zum Mitnehmen:** `Dateien/Messe/Messe-Schleife/` (untracked, 2,7 MB): `messe-schleife.html`, `messe-schleife/` (CSS, JS, 14 Clips, 6 Vorschaubilder), `js/score-tiers.js`, `js/pilot-figur.js`, `LIESMICH.txt` mit Start am Stand.
+- **Commit:** `40ed1aa1`.
+- **Nachweis:**
+  - Staging: Ressourcen nur vom eigenen Host (`performance.getEntriesByType` ohne fremden Host), Uhr beim Start „12:54“, sechs Vorschaubilder geladen, `DPS_FEHLER` leer. Alle im Wechsel mit `&tempo=0.3`: n=6 → n=1.
+  - Lokal (`file://`, Ordner unter `Dateien`), Chrome headless per CDP mit eigenem Profil: Auswahl und alle sechs Ideen ohne Fehler, **kein einziger Netzabruf**, Videos `readyState 4`, Bilder geladen; Alle im Wechsel 6 → 1; Klick auf Karte 4 lädt den Rahmen (Uhr gesetzt, Leiste mit 8 Einträgen), Esc schließt ihn.
+- **Fehler im Prüflauf (meiner):** Der erste CDP-Lauf nahm den festen Port 9333. Dort lief bereits ein fremder Chrome, und mein Skript schickte dessen Seite („Bau-Cockpit Villa Francello“, `127.0.0.1:3399`) dreimal per `Page.navigate` auf die Messe-Schleife. Nur Navigation, kein Klick, keine Eingabe; die Seite lud sich selbst neu und rief dabei ihre eigenen GET-Abrufe auf. Seitdem: Port 0, Port aus `DevToolsActivePort` des eigenen Profils, und das Ziel muss die eigene `about:blank` sein.
+- **Rest:** Die Markenschriften als woff2 (OFL) sind **nicht** dabei. Das Herunterladen braucht Marcels ausdrückliche Freigabe; bis dahin trägt der Windows-Ersatz. Dann nach `messe-schleife/schriften/` mit `OFL.txt`, je Schnitt ein `url()` vor die `local()`-Einträge setzen und den Ordner neu kopieren. Prod: Code mit dem nächsten Merge, Clips per scp.
+
 ### messe-schleife-1 / 1a / 1b · Dauerschleife für den Messebildschirm, sechs Ideen (21.10.2026, Staging, Video-Agent)
 
 - **Was:** neue Unterseite `frontend/messe-schleife.html` (Stil `messe-schleife/schleife.css`, Logik `messe-schleife/schleife.js`), Aufruf `?idee=1` … `?idee=6`, ohne Parameter eine Auswahlseite. Stumm, endlos, ohne Bedienung, Bühne 1920 × 1080 auf jedes Fenster skaliert, Schrift ab 30 px (Titel 58–300 px). Ideen: **1 Kinetik** (14 Takte große Zahlen/Worte, Score-Ring, Balken 2027, Chat-Blasen), **2 Flight Deck** (sechs Rundinstrumente, Clip im Schirm, Pre-Flight-Checkliste mit Runway-Flieger, Pilot-Figur aus `pilot-figur.js`), **3 Vorher/Nachher** (grau links, Goldlinie wischt DealPilot mit Clip und Zahl ein), **4 Abflugtafel** (Split-Flap mit neun Flügen, je Flug Gate mit Clip und Bordkarte), **5 Video-Collage** (3 × 3 Clips, einer zoomt groß mit Kapitelband wie die Videoreihe), **6 3D-Karussell** (neun Karten im Raum, vorne läuft der Clip).
