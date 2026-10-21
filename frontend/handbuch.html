@@ -291,7 +291,7 @@ details[open] .pfeil{transform:rotate(90deg)}
       .replace(/…/g, '...').replace(/[^\x00-\xFF€]/g, '').replace(/\s+/g, ' ').trim();
   }
   function goldRgb() {
-    var c = getComputedStyle(document.documentElement).getPropertyValue('--wl-c9a84c').trim() || '#C9A84C';
+    var c = getComputedStyle(document.documentElement).getPropertyValue('--wl-c9a84c').trim();
     var m = /^#?([0-9a-f]{6})$/i.exec(c); if (!m) return [201, 168, 76];
     var v = parseInt(m[1], 16); return [v >> 16 & 255, v >> 8 & 255, v & 255];
   }

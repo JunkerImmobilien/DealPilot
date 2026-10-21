@@ -16,6 +16,16 @@
  *   DPHB.weg()               Markierungen entfernen
  *   DPHB.ergebnis()          JSON fuer frontend/handbuch/bilder/aufnahme.json
  *
+ * So lief die Aufnahme v2560 (21.10.2026, Fenster 2133 × 987 CSS-Pixel):
+ *   je Bild  await DPHB.bild(sec, i)  →  Zoom-Bildschirmfoto des festen Ausschnitts
+ *   [388,72]–[1359,725] (Rahmenkoordinaten) mit save_to_disk  →  die Felder- und
+ *   Rahmenliste als Kurzliste komp-<ART>.txt  →  node tools/handbuch-bilder.mjs
+ *   schneidet zu, schreibt WebP und aufnahme.json  →  node tools/handbuch-erzeugen.mjs.
+ *
+ * VORSICHT beim eigenen Messcode im selben Tab: nie `var x = …` auf oberster
+ * Ebene. Am 21.10.2026 hat ein `var st` die globale Funktion st() aus calc.js
+ * ueberschrieben - calc() brach still ab, Gesamtinvestition stand auf 0.
+ *
  * DIE SPERRE ist nicht verhandelbar: Marcel arbeitet im selben Konto. Jeder
  * Nicht-GET-Aufruf (fetch, XHR, Beacon) wird verworfen, saveObj und
  * dpTabSwitchSave sind Attrappen, und localStorage schreibt in eine
@@ -34,6 +44,8 @@
   function sperre() {
     if (window.__hbSperre) return 'schon gesperrt';
     window.__hbSperre = LOG;
+    /* weiches Scrollen abschalten: sonst misst getBoundingClientRect mitten im Scrollen */
+    var st0 = document.createElement('style'); st0.textContent = '*{scroll-behavior:auto!important}'; document.head.appendChild(st0);
     var B = LOG.blockiert, of = window.fetch;
     window.fetch = function (u, o) {
       var m = ((o && o.method) || (u && u.method) || 'GET').toUpperCase();
@@ -56,18 +68,20 @@
 
   /* ── Beispielwerte ── selbst gesetzt; Adressen aus den Demo-Objekten der Videoreihe */
   var GEMEINSAM = { nutzungsart: 'kapitalanlage', makler_p: '3,57', notar_p: '1,7', gba_p: '0,5', gest_p: '6,5',
-    d1z: '4,31', d1t: '1,5', d1_bindj: '10' };
-  /* zvE NICHT setzen: weicht er vom Profil ab, oeffnet die App den Dialog #zve-sync-overlay */
+    d1z: '4,31', d1t: '1,5', d1_bindj: '10', zve: '60000' };
+  /* zvE nur per input-Ereignis: ein change oeffnet bei Abweichung vom Profil den Dialog #zve-sync-overlay.
+     Eigenkapital so, dass EK + Darlehen die Gesamtinvestition genau decken (sonst schiebt die App
+     einen Warnkasten ein und die Bildmarken verrutschen) - Werte aus „Eigenkapital passend setzen“. */
   var BEISPIEL = {
     ETW: { plz: '32052', ort: 'Herford', str: 'Sachsenstraße', hnr: '18', objart: 'ETW', wfl: '100', zimmer: '3', baujahr: '1998', etage: '2', etagen_ges: '3',
       ds2_zustand: 'gut', standardstufe: '3', ds2_energie: 'C', gsfl: '1200', mea: '12', brw: '190', kp: '239000', nkm: '750', ze: '40', umlagef: '220',
-      ek: '40000', d1: '199000', hg_ul: '2400', grundsteuer: '260', hg_nul: '900', weg_r: '600', bgf: '135', thesis: 'Solide vermietete 3-Zimmer-Wohnung, Miete unter Vergleichsniveau.' },
+      ek: '72910', d1: '199000', hg_ul: '2400', grundsteuer: '260', hg_nul: '900', weg_r: '600', bgf: '135', thesis: 'Solide vermietete 3-Zimmer-Wohnung, Miete unter Vergleichsniveau.' },
     EFH: { plz: '32052', ort: 'Herford', str: 'Musterweg', hnr: '5', objart: 'EFH', wfl: '140', zimmer: '5', baujahr: '1985', etagen_ges: '2',
       ds2_zustand: 'normal', standardstufe: '3', ds2_energie: 'E', gsfl: '650', brw: '210', kp: '365000', nkm: '1250', ze: '60', umlagef: '280',
-      ek: '70000', d1: '295000', grundsteuer: '480', eigen_r: '1800', bgf: '260', nhk_haus: '', thesis: 'Freistehendes Haus mit Garten, langfristig vermietet.' },
+      ek: '120261', d1: '295000', grundsteuer: '480', eigen_r: '1800', bgf: '260', nhk_haus: '', thesis: 'Freistehendes Haus mit Garten, langfristig vermietet.' },
     MFH: { plz: '33613', ort: 'Bielefeld', str: 'Westerfeldstr.', hnr: '140', objart: 'MFH', wfl: '390', baujahr: '1967', etagen_ges: '3', einheiten: '4',
       ds2_zustand: 'normal', standardstufe: '3', ds2_energie: 'E', gsfl: '1570', brw: '450', kp: '545000', nkm: '2650', ze: '120', umlagef: '780',
-      ek: '110000', d1: '435000', grundsteuer: '1200', eigen_r: '5200', bgf: '507', thesis: 'Vier Wohnungen, Mieten deutlich unter Vergleichsmiete.' }
+      ek: '185047', d1: '435000', grundsteuer: '1200', eigen_r: '5200', bgf: '507', thesis: 'Vier Wohnungen, Mieten deutlich unter Vergleichsmiete.' }
   };
   var MFH_EINHEITEN = [
     { nr: '1', lage: 'EG links', art: 'wohnen', wfl: '95', zimmer: '3', ist: '620', status: 'vermietet', zustand: '3' },
@@ -79,7 +93,7 @@
   function setze(id, v) {
     var e = $(id); if (!e) return false;
     if (e.type === 'checkbox') e.checked = !!v; else e.value = v;
-    ['input', 'change'].forEach(function (t) { try { e.dispatchEvent(new Event(t, { bubbles: true })); } catch (x) {} });
+    (id === 'zve' ? ['input'] : ['input', 'change']).forEach(function (t) { try { e.dispatchEvent(new Event(t, { bubbles: true })); } catch (x) {} });
     return true;
   }
   function demo(art) {
@@ -92,6 +106,8 @@
     var w = Object.assign({}, GEMEINSAM, BEISPIEL[art] || {});
     setze('objart', w.objart);
     var n = 0; Object.keys(w).forEach(function (k) { if (k !== 'objart' && w[k] !== '' && setze(k, w[k])) n++; });
+    /* aufklappbare Bereiche mit Feldern oeffnen (z. B. „Vertragsdaten der Bank“) - sonst stehen sie nicht im Bild */
+    ['s0', 's1', 's2', 's3', 's4', 's3-tax'].forEach(function (sec) { var S = $(sec); if (S) S.querySelectorAll('details').forEach(function (d) { if (!d.open && d.querySelector('.f input[id], .f select[id]')) d.open = true; }); });
     if (art === 'MFH') window._dpMfh = { einheiten: JSON.parse(JSON.stringify(MFH_EINHEITEN)), gebaeude: {} };
     try { window.calc && window.calc(); } catch (e) {}
     ERG.arten[art] = ERG.arten[art] || { beispiel: w, reiter: {} };
@@ -112,7 +128,7 @@
     });
     return b || 0;
   }
-  function sichtbar(f) { if (!f.offsetParent) return false; var r = f.getBoundingClientRect(); return r.width > 4 && r.height > 4 && getComputedStyle(f).visibility !== 'hidden'; }
+  function sichtbar(f) { if (!f.offsetParent) return false; var d = f.closest('details'); if (d && !d.open) return false; var r = f.getBoundingClientRect(); return r.width > 4 && r.height > 4 && getComputedStyle(f).visibility !== 'hidden'; }
   function feldVon(f) { return f.querySelector('input:not([type=hidden])[id], select[id], textarea[id]'); }
   function block(f, sec) {
     var k = f, b = f; while (k && k !== sec) { if (k.classList && (k.classList.contains('col2') || k.classList.contains('card'))) b = k; k = k.parentElement; }
@@ -151,6 +167,11 @@
     var r = _rahmen[sec], b = r.bilder[i]; if (!b) return null;
     var s = $(sec), sc = scroller(s), frei = Math.max(obenFrei(), 0);
     var top0 = sc === document.scrollingElement ? 0 : sc.getBoundingClientRect().top;
+    /* Lage NEU messen: zwischen rahmen() und zeige() verschiebt nachgeladener Inhalt die Karten */
+    var yy = function (el) { return el.getBoundingClientRect().top - top0 + sc.scrollTop; };
+    var fs0 = b.ids.map(function (id) { return $(id).closest('.f'); }), blk = block(fs0[0], s);
+    b.oben = (yy(fs0[0]) - yy(blk) < 260) ? yy(blk) : yy(fs0[0]) - 12;
+    b.unten = Math.max.apply(null, fs0.map(function (f) { return yy(f) + f.getBoundingClientRect().height; }));
     /* sofort, nicht weich: sonst misst getBoundingClientRect mitten im Scrollen */
     sc.scrollTo({ top: Math.max(0, b.oben - (frei - top0) - 14), behavior: 'instant' });
     var ov = document.createElement('div'); ov.id = 'dphb-marken';
@@ -164,7 +185,7 @@
       k.style.cssText = 'position:fixed;left:' + (q.left - 4) + 'px;top:' + (q.top - 4) + 'px;width:' + (q.width + 8) + 'px;height:' + (q.height + 8) + 'px;border:2.5px solid var(--wl-c9a84c, #C9A84C);border-radius:10px;box-shadow:0 0 0 3px rgba(5,5,5,.18)';
       var n = document.createElement('div');
       n.textContent = r.nummer[id];
-      n.style.cssText = 'position:fixed;left:' + (q.left - 22) + 'px;top:' + (q.top - 12) + 'px;min-width:24px;height:24px;padding:0 5px;box-sizing:border-box;border-radius:12px;background:#050505;color:#E8CC7A;border:2px solid var(--wl-c9a84c, #C9A84C);font:700 12px/20px "JetBrains Mono",monospace;text-align:center';
+      n.style.cssText = 'position:fixed;left:' + (q.left - 22) + 'px;top:' + (q.top - 12) + 'px;min-width:24px;height:24px;padding:0 5px;box-sizing:border-box;border-radius:12px;background:#050505;color:var(--wl-e8cc7a, #E8CC7A);border:2px solid var(--wl-c9a84c, #C9A84C);font:700 12px/20px "JetBrains Mono",monospace;text-align:center';
       ov.appendChild(k); ov.appendChild(n);
     });
     document.body.appendChild(ov); _ov = ov;
@@ -189,5 +210,13 @@
   }
 
   function wohnungBild(datei, unterschrift) { var A = ERG.arten.MFH = ERG.arten.MFH || { reiter: {} }; (A.wohnungen = A.wohnungen || []).push({ datei: datei, unterschrift: unterschrift || '' }); return datei; }
-  window.DPHB = { wohnungBild: wohnungBild, sperre: sperre, demo: demo, rahmen: rahmen, zeige: zeige, weg: weg, wohnungsliste: wohnungsliste, ergebnis: ergebnis, bildEintrag: bildEintrag, log: LOG, _rahmen: _rahmen, ERG: ERG };
+  /* Ein Bild: Reiter oeffnen (die App scrollt danach verzoegert nach oben - abwarten), dann zeigen */
+  function bild(sec, i, fw) {
+    var S = $(sec);
+    var warte = S.classList.contains('active') ? 0 : 2500;
+    if (warte) document.querySelector('[data-target-sec="' + sec + '"]').click();
+    return new Promise(function (ok) { setTimeout(function () { var r = zeige(sec, i, fw); setTimeout(function () { (ERG.css = ERG.css || {})[r.datei] = r.css; ok(r); }, 200); }, warte); });
+  }
+  var beispiel = {}; Object.keys(BEISPIEL).forEach(function (a) { beispiel[a] = Object.assign({}, GEMEINSAM, BEISPIEL[a]); });
+  window.DPHB = { beispiel: beispiel, bild: bild, wohnungBild: wohnungBild, sperre: sperre, demo: demo, rahmen: rahmen, zeige: zeige, weg: weg, wohnungsliste: wohnungsliste, ergebnis: ergebnis, bildEintrag: bildEintrag, log: LOG, _rahmen: _rahmen, ERG: ERG };
 })();
