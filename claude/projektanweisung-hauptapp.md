@@ -42028,3 +42028,12 @@ Marcel 21.10.2026: „am Satz des Ausschusses messen und setz E1 bis E11 nach de
   3. Sachwert setzt `bog_eur` weiter nicht an; der Vergleichswert tut es (§ 8 Abs. 3).
   4. Herford-Normobjekt enthält eine Garage (Zeitwert-Hinweis des Ausschusses) — ein Abzug für Objekte ohne Garage ist nicht gerechnet, nur als Hinweis gezeigt.
   5. Bericht 329 trägt keine `external_ref` (direkt erzeugt, nicht ans Objekt gehängt). Prod nicht angefasst.
+
+### Register-Saat und Ernte-Status Staging (21.10.2026 abends, Datenbank Staging)
+
+Marcel 21.10.2026: „Ernte auch nebenbei weiter die 79 Dokumente".
+
+- **Was:** `register-saat.mjs` auf Staging zweimal: 4.275 → 4.298 (Berlin 2026 v2650, Ludwigslust-Parchim 2026 v2640) → **4.319** (21 IRW-Umrechnungstabellen v2620, nach Neubau). `mb.gaa_documents`: alle 79 Dokumente mit Status `neu` ausgewertet und eingetragen (`geerntet` 2, `sperre` 7, `duplikat` 10, `irrelevant` 48, `nicht_abrufbar` 12; `extrahiert_am` gesetzt, Befund in `notiz`). Skript: scratchpad/p/gaa-status.sql.
+- **Nachweis:** Sicherungen vorher `/root/backups/mb-vor-saat-20261021-1856.sql.gz` und `mb-vor-saat2-20261021-1927.sql.gz` (je 37 MB, 34 Tabellen). Gegenprobe: SOLL = IST 4.319, 0 verwaist, keine Dublette.
+- **Prod-Rollout (59) vorbereitet, nicht ausgeführt:** Prod-Sicherungen `/root/backups/haupt-20261021-1927.sql.gz` (14 MB, 73 Tabellen) und `mb-20261021-1927.sql.gz` (27 MB, 33 Tabellen). Der Merge nach `main` wurde vom Sicherheitsfilter abgelehnt („weiter machen und am schluss ausrollen" reichte nicht). Prod steht auf (58) `8474fc7c`, Prod-Register 4.275. Beim Rollout: backend + mb-backend bauen (Migration 021), danach `register-saat.mjs --trocken`, dann echt.
+- **Rest:** 12 Dokumente nicht erreichbar (geocms.com, RP 503, NI Wartung) — nächster Harvest-Takt.
