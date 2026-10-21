@@ -41940,3 +41940,13 @@ Die Marktparameter stehen in `config.js` `beleihungswert`, der Kern liest keine 
 - (5) Der Mindestzins in `config.js` muss jährlich nach dem 30.11. geprüft werden.
 - (6) In `storage.js` gibt es `exportGlobalBankPDF` doppelt. Die erste Definition ist tot, aufgeräumt ist sie nicht.
 - (7) Prod nicht angefasst.
+
+### v2640 · Nachernte Harvest-Takt (Teil MV): Ludwigslust-Parchim 2026, Sperren Rostock/LK Rostock/VG/NWM (21.10.2026, Staging)
+
+**Was:** Die 31 MV-Dokumente aus `mb.gaa_documents` (Status `neu`) ausgewertet. Neue Datei `nachernte-2026-10-mv.json` (57 Sätze) in `SAATDATEIEN`. **12 Werte**, alle Ludwigslust-Parchim GMB 2026 (Lizenz S. 2: auszugsweise Wiedergabe mit Quellenangabe + Belegexemplar ohne Genehmigung): 5 Liegenschaftszinssätze (Tab. 32, S. 67; lösen 2025 ab; Modellansätze mit `marktmiete_eur_qm`, `objektgroesse_qm`, `mietdefinition`, `gnd_jahre` 80) und 7 Rohertragsfaktoren (Tab. 33, S. 68). **45 Sperren** mit `zugang`: Hansestadt Rostock 2026, LK Rostock 2026, Vorpommern-Greifswald 2024 und Nordwestmecklenburg 2026 sind genehmigungspflichtig; LUP-Sachwertfaktoren 2026 stehen vollständig unter `formel_vorgemerkt`, gesperrt nur wegen des Baupreisindex ohne Zahl.
+
+**Commit:** `2940cbc9`
+
+**Nachweis:** `saat-pruefen <datei>` RC 0. `--basislinie`: nichts über dem Deckel (RC 1 nur wegen der fremden, noch nicht eingetragenen `uk-irw-nw-owl-2026.json`). `uk-flaeche-pruefen` und `uk-wgfz-pruefen` sauber. Die Kette über den echten Lookup liefert für 13076: ezfh 4,0 · rhdhh 4,1 · efh_rmh 4,9 · we_v 4,0 · mfh_bis6 6,3 (2026), mfh_ueber6/wgh weiter 2025. `pruefeModell` liest Ø Miete 8,94 €/m² und Ø 132 m². `register-saat --trocken` im Container: 4.298 Werte, 0 Dubletten, 0 verwaist. Nicht eingespielt.
+
+**Rest:** (1) geocms.com und shop.geoport-nwm.de waren den ganzen Abend nicht erreichbar. NWM 2026/2025, Rostock 2025, LK Rostock 2024 und die 19 historischen VG-Berichte (1995–2007) sind deshalb nicht neu geladen. NWM-Sperren stützen sich auf die Messung vom 02.10. (2) Der LUP-SWF 2026 überdeckt den RH/DHH-Wert 2025: eine Entscheidung zum Baupreisindex „stichtagsbezogen“ würde beide Tabellen freigeben. (3) Das Belegexemplar an LUP ist weiterhin offen. (4) VG-Sachwertfaktoren: das Kapitel ist im Bericht noch unvollständig, eine Fortschreibung sollte beobachtet werden.
