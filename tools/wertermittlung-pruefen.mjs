@@ -531,6 +531,79 @@ fallB('B13', () => {
     'Formel ' + fMfh.pct + ' % → ' + eur(kF.wert) + ' · Landesmittel ' + lm.pct + ' % → ' + eur(kL.wert));
 });
 
+/* B37 · v2730 · ZUGANGSSPERRE ODER FACHLICHE SPERRE (Marcel 22.10.2026).
+   Ist der Registersatz NUR gesperrt, weil der Wert kostenpflichtig/genehmigungs-
+   pflichtig/nichtkommerziell/auf Anfrage ist (Feld `zugang`), rechnet Stufe N mit
+   dem Weg zum Bericht; fachliche Sperre und Rueckfrage bleiben § 256 mit Weg.
+   Am ECHTEN WertParameterService, echten Register, ohne Datenbank (die Tabelle
+   mb.wert_parameter fuehrt BW nicht). Orte aus nachernte-2026-10b-bw-wege.json
+   und lzs-swf-bw-2026-wege.json. */
+const _b37 = {};
+if (WPS && WPS.WertParameterService) {
+  const _efh = { objart: 'efh', haustyp: 'freistehend', nutzung: 'vermietet', baujahr: 1985, restnutzungsdauer: 40, einheiten: 1 };
+  const _mfh = { objart: 'mfh', nutzung: 'vermietet', baujahr: 1970, restnutzungsdauer: 30, einheiten: 6 };
+  const _lz = (ags, art, o) => WPS.WertParameterService.liegenschaftszins({ ags, objektart: art, anzahlWe: o.einheiten,
+    brwSqm: 200, stichtag: '2026-10-01', objekt: o }).catch((e) => ({ fehler: e.message }));
+  _b37.mannheim = await _lz('08222000', 'efh', _efh);      /* kostenpflichtig, 40 € */
+  _b37.sindelfingen = await _lz('08115045', 'mfh', _mfh);  /* genehmigungspflichtig */
+  _b37.altdorf = await _lz('08115002', 'efh', _efh);       /* fachlich: Widerspruch im Dokument */
+  _b37.boeblingen = await _lz('08115003', 'efh', _efh);    /* Rueckfrage: Achse fehlt */
+}
+fallB('B37', () => {
+  if (!WPS || !WPS.WertParameterService || !LZN || !LZN.registerSperreKlasse) return pruefe('B', 'B37', 'WertParameterService/registerSperreKlasse geladen', false, 'fehlt');
+  const m = _b37.mannheim || {}, s = _b37.sindelfingen || {}, a = _b37.altdorf || {}, b = _b37.boeblingen || {};
+  const wm = (m.zins_herkunft && m.zins_herkunft.weg) || {};
+  pruefe('B', 'B37a', 'Mannheim EFH (kostenpflichtige Sperre) → Stufe N, gekennzeichnet, Weg mit Preis und Bestell-Link',
+    m.stufe === 'N' && m.zugang_sperre && m.zugang_sperre.zugang === 'kostenpflichtig'
+    && /^abgeleitet aus der DealPilot-Formel|^DealPilot-Landesmittel/.test(m.zins_herkunft.etikett)
+    && /gegen Gebühr — genauer geht es mit seinem Wert/.test(wm.text || '') && /40 Euro/.test(wm.text || '')
+    && wm.bestell_url === 'https://www.service-bw.de/zufi/leistungen/6015515' && !wm.url
+    && /Bestellweg: https:\/\/www\.service-bw\.de/.test(wm.text || ''),
+    m.stufe + ' ' + m.wert + ' % · ' + String(wm.text || m.fehler || '').slice(0, 70));
+  const ws = (s.zins_herkunft && s.zins_herkunft.weg) || {};
+  pruefe('B', 'B37b', 'Sindelfingen MFH (genehmigungspflichtig) → Stufe N, Weg nennt die Genehmigung',
+    s.stufe === 'N' && s.zugang_sperre && s.zugang_sperre.zugang === 'genehmigungspflichtig' && /Genehmigung/.test(ws.text || ''),
+    s.stufe + ' ' + s.wert + ' %');
+  pruefe('B', 'B37c', 'Altdorf EFH (fachliche Sperre) → § 256 mit Weg, Grund fachliche_sperre',
+    a.stufe === 'D' && !a.zugang_sperre && a.dealpilot_formel_nicht && a.dealpilot_formel_nicht.sperre === 'fachliche_sperre'
+    && a.zins_herkunft && a.zins_herkunft.weg && /örtlichen Liegenschaftszinssatz/.test(a.zins_herkunft.weg.text),
+    a.stufe + ' ' + (a.dealpilot_formel_nicht && a.dealpilot_formel_nicht.sperre));
+  pruefe('B', 'B37d', 'Böblingen EFH (Rückfrage) → § 256, keine Formel',
+    b.stufe === 'D' && !b.zugang_sperre && b.dealpilot_formel_nicht && b.dealpilot_formel_nicht.sperre === 'rueckfrage',
+    b.stufe + ' ' + (b.rueckfrage && b.rueckfrage.grund));
+  /* reine Klassierung: Feld statt Freitext; aelterer Jahrgang entscheidet nicht */
+  const K = LZN.registerSperreKlasse;
+  const sp = (zugang, zweig = 'ezfh', j = 2025) => ({ vollstaendig: false, warum_kein_wert: 'x', zugang, zweig, berichtsjahr: j, gaa_name: 'GAA X', bestell_url: 'https://x' });
+  const wert = { zweig: 'etw', berichtsjahr: 2025, formel: { wert: 2.1 } };
+  const rfZ = { grund: 'datensatz_unvollstaendig', zweig: 'ezfh' };
+  const k1 = K([sp('kostenpflichtig'), sp('nichtkommerziell', 'mfh')], null);
+  const k2 = K([sp('auf_anfrage_kostenfrei')], rfZ);
+  const k3 = K([sp('kostenfrei')], rfZ);
+  const k4 = K([sp('kostenpflichtig'), wert], { grund: 'lage', zweig: 'ezfh' });
+  const k5 = K([sp('kostenpflichtig'), wert], rfZ);
+  const alt = sp(undefined, 'ezfh', 2024), neu = sp('kostenpflichtig', 'ezfh', 2025);
+  const k6 = K([alt, neu], rfZ, (z) => (z === 'ezfh' ? neu : null));
+  const k7 = K([alt, neu], rfZ);
+  const k8 = K([sp('kostenpflichtig')], { grund: 'register_fehler' });
+  pruefe('B', 'B37e', 'Klassierung: nur Zugangssperren → zugang; auf_anfrage_kostenfrei/kostenfrei → fachlich; Rückfrage bei Wertsatz → fachlich; Objektzweig gesperrt neben Wertsatz → zugang; jüngster Jahrgang entscheidet; Registerfehler → fachlich',
+    k1.klasse === 'zugang' && k2.klasse === 'fachlich' && k3.klasse === 'fachlich' && k4.klasse === 'fachlich'
+    && k5.klasse === 'zugang' && k6.klasse === 'zugang' && k7.klasse === 'fachlich' && k8.klasse === 'fachlich',
+    [k1, k2, k3, k4, k5, k6, k7, k8].map((k) => k.klasse[0]).join(''));
+  /* Ertragswert vorher (§ 256) / nachher (N) an zwei BW-Objekten, echter Kern */
+  const n256 = (art, we) => IW.lzsNach256(art, 200, we).pct;
+  const efhEin = () => ({ objektart: 'efh', baujahr: 1985, baustatus: 'bestand', wohnflaeche_qm: 150, anzahl_we: 1,
+    stichtag_jahr: 2026, miete_markt_jahr: 15000, rnd_jahre: 40 });
+  const eV = ertragswert(Object.assign(efhEin(), { lzs_pct: n256('efh', 1), lzs_stufe: 'D' }), bwEinfach(150000));
+  const eN = ertragswert(Object.assign(efhEin(), { lzs_pct: m.wert, lzs_stufe: 'N' }), bwEinfach(150000));
+  const mV = ertragswert(Object.assign(einOk(), { lzs_pct: n256('mfh', 6), lzs_stufe: 'D', rnd_jahre: 30 }), bwOk());
+  const mN = ertragswert(Object.assign(einOk(), { lzs_pct: s.wert, lzs_stufe: 'N', rnd_jahre: 30 }), bwOk());
+  _b37.ew = { efh: [n256('efh', 1), eV.wert, m.wert, eN.wert], mfh: [n256('mfh', 6), mV.wert, s.wert, mN.wert] };
+  pruefe('B', 'B37f', 'Ertragswert rechnet nachher mit Stufe N (EFH Mannheim, MFH Sindelfingen), vorher mit § 256',
+    eV.wert > 0 && eN.wert > 0 && mV.wert > 0 && mN.wert > 0 && eN.lzs.stufe === 'N' && mN.lzs.stufe === 'N' && eN.wert !== eV.wert && mN.wert !== mV.wert,
+    'EFH ' + n256('efh', 1) + ' % → ' + eur(eV.wert) + ' / ' + m.wert + ' % → ' + eur(eN.wert)
+    + ' · MFH ' + n256('mfh', 6) + ' % → ' + eur(mV.wert) + ' / ' + s.wert + ' % → ' + eur(mN.wert));
+});
+
 /* B14 · v2612 · UK-FORMEL 0,5- BIS 3,0-FACH, ZWEITER AST OBERHALB 2,5.
    E5 (v2610: Kappung bei 2,0) zurueckgenommen - die Begruendung kam aus einer
    Teilmenge. Geprueft wird die Geltung, beide Aeste und die Messung an der

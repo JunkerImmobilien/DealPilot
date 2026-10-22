@@ -224,7 +224,8 @@ if (!window._wlc) {
       var _ab = mv && mv.angebot_abschlag;
       if (_ab && _ab.pct != null) {
         out.abschlag = { pct: _ab.pct, roh: { low: _ab.roh && _ab.roh.low, med: _ab.roh && _ab.roh.estimated, high: _ab.roh && _ab.roh.high },
-                         quelle: /eigene/.test(_ab.herkunft || '') ? 'dein Wert' : (/rtlich/.test(_ab.herkunft || '') ? 'örtliche Kauffälle' : 'Marktdurchschnitt') };
+                         quelle: /eigene/.test(_ab.herkunft || '') ? 'dein Wert' : (/rtlich/.test(_ab.herkunft || '') ? 'örtliche Kauffälle' : 'Marktdurchschnitt'),
+                         kurz: _ab.kurz || null };   /* v2672 · Ausschuss + Jahrgang fuer die Fusszeile */
       }
     } catch (e) {}
     try { if (global.DealPilotAbschlag) global.DealPilotAbschlag.anwenden(out); } catch (e) {}

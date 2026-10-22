@@ -231,7 +231,19 @@ for (const f of _dateien) {
         const gnd = ma.gnd_jahre ?? ma.gesamtnutzungsdauer_jahre ?? ma.gnd;
         if (!(typeof gnd === 'number' && isFinite(gnd))) fehler.push(`${wo}: modellansaetze.gnd_jahre fehlt als Zahl`);
         const bpi = ma.baupreisindex ?? ma.baupreisindex_stichtag ?? ma.baupreisindex_wert;
-        if (!(typeof bpi === 'number' && isFinite(bpi))) fehler.push(`${wo}: modellansaetze.baupreisindex fehlt als Zahl`);
+        /* v2720 · Entscheidung Marcel 22.10.2026: ein Modell, das den Index nicht als
+           Zahl, aber mit eindeutigem BEZUG nennt („Baupreisindex zum Beurkundungs-/
+           Kaufzeitpunkt"), ist vollstaendig bestimmt - abgeleitet mit dem Index zum
+           Kaufzeitpunkt, angewandt mit dem Index zum Wertermittlungsstichtag (§ 36
+           Abs. 2 ImmoWertV, ImmoWertA 36). Pflicht: bezug 'kaufzeitpunkt' UND der
+           woertliche Satz des Dokuments UND seine Seite. Ein Index ohne Bezug
+           („Baupreisindex des Statistischen Bundesamtes") bleibt eine Luecke. */
+        const bpiBezug = ma.baupreisindex_bezug === 'kaufzeitpunkt'
+          && typeof ma.baupreisindex_wortlaut === 'string' && ma.baupreisindex_wortlaut.trim().length >= 10
+          && /\d/.test(String(ma.baupreisindex_seite ?? ''));
+        if (!(typeof bpi === 'number' && isFinite(bpi)) && !bpiBezug) {
+          fehler.push(`${wo}: modellansaetze.baupreisindex fehlt als Zahl`);
+        }
       }
     }
     /* v2620 · Vertrag der Kennzahl umrechnung_irw (Marcel 21.10.2026, E7): ein Wert

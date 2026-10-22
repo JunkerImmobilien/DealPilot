@@ -543,7 +543,11 @@ eine selbst ausgerechnete Zahl.
   in denen sie gemessen genauer ist als § 256 (BB BW HE NI NW RP SN, aus
   `lzs-naeherung.json` `pruefung.je_land`), und **nie, wenn das Register für
   die AGS einen Satz führt** — auch keinen gesperrten und keinen mit
-  Rückfrage (dann § 256 mit Weg zum Ausschuss). Sie wird vor jeder
+  Rückfrage (dann § 256 mit Weg zum Ausschuss). **Ausnahme (Marcel
+  22.10.2026, v2730):** ist der geltende Satz NUR gesperrt, weil der Wert
+  kostenpflichtig, genehmigungspflichtig, nichtkommerziell oder auf Anfrage
+  ist (Feld `zugang`, nie Freitext), rechnet N weiter — mit dem Weg zum
+  Bericht (Preis, Bestell-Link); `registerSperreKlasse()`, Prüfer B37. Sie wird vor jeder
   § 256-Zeile von `mb.wert_parameter` versucht (die Tabelle führt § 256
   selbst als Qualität D, Ebene bund). Belastbarkeit −25 (C −20, D −40).
   Gemessen 19.10.2026: wirksam fast nur in BW (1.040 Gemeinden ohne
@@ -652,6 +656,18 @@ Staging nachgemessen, alle drei offen, im Backlog unter B1):
   > (`modellansaetze.baupreisindex_stichtag`). Beim Anlegen eines Rezepts
   > gehört der Index als ZAHL ins Feld, sonst rechnet das System weiter mit
   > der Konstanten — und nichts widerspricht.
+
+  **Entscheidung Marcel 22.10.2026 (v2720):** Nennt das Modell den Index
+  nicht als Zahl, aber mit eindeutigem **Bezug zum Kaufzeitpunkt**
+  („zum Beurkundungsdatum", „zum Vertragszeitpunkt"), ist der Faktor ein
+  **Wert** — abgeleitet mit dem Index zum Kaufzeitpunkt, angewandt mit dem
+  Index zum Wertermittlungsstichtag (§ 36 Abs. 2 ImmoWertV, ImmoWertA 36),
+  also genau der heutige Weg. Im Satz: `baupreisindex_bezug: 'kaufzeitpunkt'`
+  plus `baupreisindex_wortlaut` und `baupreisindex_seite`; der Rechenweg sagt
+  dann „Baupreisindex zum Wertermittlungsstichtag (Modell des Ausschusses:
+  Index zum Kaufzeitpunkt)". **Ohne Bezugszeitpunkt** („Baupreisindex des
+  Statistischen Bundesamtes", Ludwigslust-Parchim, Böblingen, Lahr) bleibt
+  es eine Sperre.
 - **Die NRW-Bewirtschaftungskosten sind stichtagsabhängig** — das AGVGA-Modell
   schreibt die Ausgangswerte von 2002 über den VPI fort. Das hinterlegte Paar
   gilt nur für den 01.01.2015.

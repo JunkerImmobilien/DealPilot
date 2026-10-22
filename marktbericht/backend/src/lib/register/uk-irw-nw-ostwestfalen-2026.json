@@ -1,0 +1,5054 @@
+[
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": false,
+    "ags": "05754",
+    "gasl": "33300",
+    "gebiet_name": "Kreis Gütersloh und Stadt Gütersloh",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
+    "seite": "S. 1–6",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_2_0533300_2026.pdf",
+    "zweig": "efh_zfh",
+    "geltungsbereich": {
+      "teilmarkt": 2,
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "gemeinden": "Borgholzhausen, Gütersloh, Halle (Westf.), Harsewinkel, Herzebrock-Clarholz, Langenberg, Rheda-Wiedenbrück, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Verl, Versmold, Werther (Westf.)",
+      "hinweis": "Ein Immobilienrichtwert je Gemeinde (13 Zonen); drei Gemeindegruppen mit eigenem Normobjekt-Bodenrichtwert und eigener Bodenrichtwerttabelle."
+    },
+    "warum_kein_wert": "Der Ausschuss rechnet den Bodenrichtwert mit DREI verschiedenen Tabellen, je nach Gemeindegruppe (Halle, Harsewinkel, Herzebrock-Clarholz, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Werther: Norm 171–210 €/m²; Borgholzhausen, Langenberg, Versmold: Norm 131–170 €/m²; Gütersloh, Rheda-Wiedenbrück, Verl: Norm 291–400 €/m²; S. 1–2 und 4). Eine Tabelle, die von einem anderen Merkmal (der Gemeinde der Zone) abhängt, kennt der Rechenkern nicht (Formen klassen/kategorien/kurve/matrix rechnen mit EINER Tabelle je Merkmal). Eine Zusammenlegung zu einer Tabelle wäre eine Glättung (die Quotienten der drei Tabellen stimmen nur bis auf rund 0,001 überein). Ohne das Bodenrichtwert-Merkmal würde nur halb umgerechnet. Alle übrigen Tabellen und das Anwendungsbeispiel liegen unter formel_vorgemerkt bereit; es fehlt nur die Rechenform „klassen_je_gemeindegruppe\".",
+    "formel_vorgemerkt": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "interpolation": "keine (Klassen)",
+      "extrapolation": false,
+      "irw_lageangepasst": false,
+      "stellplaetze_im_irw": false,
+      "nebengebaeude": {
+        "im_irw": false,
+        "wortlaut": "Nebengebäude wie Garagen und Carports sind im Immobilienrichtwert nicht berücksichtigt. Es sind folgende Zuschläge anzubringen: Bestandsimmobilien: je Garagenstellplatz: 8.000 EUR, Carport: 5.000 EUR · Neubauten: je Garagenstellplatz: 17.000 EUR, Carport: 8.000 EUR",
+        "zuschlaege_eur": {
+          "bestand": {
+            "garagenstellplatz": 8000,
+            "carport": 5000
+          },
+          "neubau": {
+            "garagenstellplatz": 17000,
+            "carport": 8000
+          }
+        }
+      },
+      "normobjekt": {
+        "baujahr": "1982-1991",
+        "grundstuecksgroesse": "501-800 m²",
+        "keller": "unterkellert",
+        "wohnflaeche": "141-160 m²",
+        "gebaeudestandard": "mittel",
+        "bodenrichtwert_je_gruppe": {
+          "gruppe1": "171-210 €/m²",
+          "gruppe2": "131-170 €/m²",
+          "gruppe3": "291-400 €/m²"
+        }
+      },
+      "merkmale": [
+        {
+          "id": "baujahr",
+          "name": "Baujahr",
+          "eingabe": "baujahr",
+          "art": "klassen",
+          "norm_feld": "BJ",
+          "norm": "1982-1991",
+          "klassen": [
+            {
+              "name": "bis 1952",
+              "von": null,
+              "bis": 1952,
+              "uk": 0.833
+            },
+            {
+              "name": "1953-1962",
+              "von": 1953,
+              "bis": 1962,
+              "uk": 0.854
+            },
+            {
+              "name": "1963-1972",
+              "von": 1963,
+              "bis": 1972,
+              "uk": 0.893
+            },
+            {
+              "name": "1973-1981",
+              "von": 1973,
+              "bis": 1981,
+              "uk": 0.935
+            },
+            {
+              "name": "1982-1991",
+              "von": 1982,
+              "bis": 1991,
+              "uk": 1
+            },
+            {
+              "name": "1992-2001",
+              "von": 1992,
+              "bis": 2001,
+              "uk": 1.091
+            },
+            {
+              "name": "2002-2010",
+              "von": 2002,
+              "bis": 2010,
+              "uk": 1.143
+            },
+            {
+              "name": "2011-2020",
+              "von": 2011,
+              "bis": 2020,
+              "uk": 1.203
+            },
+            {
+              "name": "2021-2027",
+              "von": 2021,
+              "bis": 2027,
+              "uk": 1.264
+            }
+          ]
+        },
+        {
+          "id": "grundstuecksflaeche",
+          "name": "Grundstücksgröße",
+          "eingabe": "grundstuecksflaeche",
+          "art": "klassen",
+          "norm_feld": "FLAE",
+          "norm": "501-800",
+          "runden": 0,
+          "klassen": [
+            {
+              "name": "bis 250",
+              "von": null,
+              "bis": 250,
+              "uk": 0.856
+            },
+            {
+              "name": "251-350",
+              "von": 251,
+              "bis": 350,
+              "uk": 0.879
+            },
+            {
+              "name": "351-500",
+              "von": 351,
+              "bis": 500,
+              "uk": 0.933
+            },
+            {
+              "name": "501-800",
+              "von": 501,
+              "bis": 800,
+              "uk": 1
+            },
+            {
+              "name": "801-1000",
+              "von": 801,
+              "bis": 1000,
+              "uk": 1.06
+            }
+          ]
+        },
+        {
+          "id": "keller",
+          "name": "Keller",
+          "eingabe": "keller",
+          "art": "kategorien",
+          "norm_feld": "KELLER",
+          "norm": "unterkellert",
+          "zuordnung": {
+            "ja": "unterkellert",
+            "nein": "kein Keller bzw. geringfügig unterkellert (<30%)"
+          },
+          "norm_zuordnung": {
+            "0": "kein Keller bzw. geringfügig unterkellert (<30%)",
+            "1": "unterkellert"
+          },
+          "werte": {
+            "kein Keller bzw. geringfügig unterkellert (<30%)": 0.959,
+            "unterkellert": 1
+          }
+        },
+        {
+          "id": "wohnflaeche",
+          "name": "Wohnfläche",
+          "eingabe": "wohnflaeche",
+          "art": "klassen",
+          "norm_feld": "WHNFL",
+          "norm": "141-160",
+          "runden": 0,
+          "klassen": [
+            {
+              "name": "bis 90",
+              "von": null,
+              "bis": 90,
+              "uk": 1.336
+            },
+            {
+              "name": "91-110",
+              "von": 91,
+              "bis": 110,
+              "uk": 1.213
+            },
+            {
+              "name": "111-125",
+              "von": 111,
+              "bis": 125,
+              "uk": 1.129
+            },
+            {
+              "name": "126-140",
+              "von": 126,
+              "bis": 140,
+              "uk": 1.06
+            },
+            {
+              "name": "141-160",
+              "von": 141,
+              "bis": 160,
+              "uk": 1
+            },
+            {
+              "name": "161-190",
+              "von": 161,
+              "bis": 190,
+              "uk": 0.912
+            },
+            {
+              "name": "191-270",
+              "von": 191,
+              "bis": 270,
+              "uk": 0.795
+            }
+          ]
+        },
+        {
+          "id": "gebaeudestandard",
+          "name": "Gebäudestandard",
+          "eingabe": "standardstufe",
+          "art": "klassen",
+          "norm_feld": "GSTAND",
+          "norm": "mittel",
+          "runden": 1,
+          "norm_zuordnung": {
+            "1": "einfach",
+            "2": "einfach",
+            "3": "einfach",
+            "5": "mittel",
+            "7": "gehoben",
+            "8": "gehoben",
+            "9": "gehoben",
+            "10": "gehoben"
+          },
+          "zuordnung_herkunft": "Hinweis zur Standardstufe (letzte Seite): einfach = Standardstufe 1 und 2, mittel = 3, gehoben = 4 und 5; Bänder nach IRW-Datenmodell Feld 60 (Stufe 1 [1,0–1,2] … 2 [1,8–2,2], 3 [2,8–3,2], 4 [3,8–4,2], 5 [5,0]); Zwischenwerte 2,3–2,7 und 3,3–3,7 ordnet das Dokument nicht zu",
+          "klassen": [
+            {
+              "name": "einfach",
+              "von": 1,
+              "bis": 2.2,
+              "uk": 0.877
+            },
+            {
+              "name": "mittel",
+              "von": 2.8,
+              "bis": 3.2,
+              "uk": 1
+            },
+            {
+              "name": "gehoben",
+              "von": 3.8,
+              "bis": 5,
+              "uk": 1.106
+            }
+          ]
+        },
+        {
+          "id": "bodenrichtwert",
+          "name": "Boden-/Lagewert (Bodenrichtwert)",
+          "eingabe": "bodenrichtwert",
+          "art": "klassen_je_gemeindegruppe",
+          "norm_feld": "BOWL",
+          "runden": 0,
+          "gruppe_aus": "GENA der Zone (Gemeinde); gleichwertig: Normklasse des Zonenfelds BOWL, die je Gruppe eindeutig ist",
+          "gruppen": [
+            {
+              "gemeinden": [
+                "Halle (Westf.)",
+                "Harsewinkel",
+                "Herzebrock-Clarholz",
+                "Rietberg",
+                "Schloß Holte-Stukenbrock",
+                "Steinhagen",
+                "Werther (Westf.)"
+              ],
+              "norm": "171-210",
+              "klassen": [
+                {
+                  "name": "bis 130",
+                  "von": null,
+                  "bis": 130,
+                  "uk": 0.924
+                },
+                {
+                  "name": "131-170",
+                  "von": 131,
+                  "bis": 170,
+                  "uk": 0.96
+                },
+                {
+                  "name": "171-210",
+                  "von": 171,
+                  "bis": 210,
+                  "uk": 1
+                },
+                {
+                  "name": "211-250",
+                  "von": 211,
+                  "bis": 250,
+                  "uk": 1.05
+                },
+                {
+                  "name": "251-290",
+                  "von": 251,
+                  "bis": 290,
+                  "uk": 1.081
+                },
+                {
+                  "name": "291-400",
+                  "von": 291,
+                  "bis": 400,
+                  "uk": 1.147
+                },
+                {
+                  "name": "401-750",
+                  "von": 401,
+                  "bis": 750,
+                  "uk": 1.259
+                }
+              ]
+            },
+            {
+              "gemeinden": [
+                "Borgholzhausen",
+                "Langenberg",
+                "Versmold"
+              ],
+              "norm": "131-170",
+              "klassen": [
+                {
+                  "name": "bis 130",
+                  "von": null,
+                  "bis": 130,
+                  "uk": 0.963
+                },
+                {
+                  "name": "131-170",
+                  "von": 131,
+                  "bis": 170,
+                  "uk": 1
+                },
+                {
+                  "name": "171-210",
+                  "von": 171,
+                  "bis": 210,
+                  "uk": 1.042
+                },
+                {
+                  "name": "211-250",
+                  "von": 211,
+                  "bis": 250,
+                  "uk": 1.094
+                },
+                {
+                  "name": "251-290",
+                  "von": 251,
+                  "bis": 290,
+                  "uk": 1.126
+                },
+                {
+                  "name": "291-400",
+                  "von": 291,
+                  "bis": 400,
+                  "uk": 1.196
+                },
+                {
+                  "name": "401-750",
+                  "von": 401,
+                  "bis": 750,
+                  "uk": 1.312
+                }
+              ]
+            },
+            {
+              "gemeinden": [
+                "Gütersloh",
+                "Rheda-Wiedenbrück",
+                "Verl"
+              ],
+              "norm": "291-400",
+              "klassen": [
+                {
+                  "name": "bis 130",
+                  "von": null,
+                  "bis": 130,
+                  "uk": 0.806
+                },
+                {
+                  "name": "131-170",
+                  "von": 131,
+                  "bis": 170,
+                  "uk": 0.836
+                },
+                {
+                  "name": "171-210",
+                  "von": 171,
+                  "bis": 210,
+                  "uk": 0.872
+                },
+                {
+                  "name": "211-250",
+                  "von": 211,
+                  "bis": 250,
+                  "uk": 0.915
+                },
+                {
+                  "name": "251-290",
+                  "von": 251,
+                  "bis": 290,
+                  "uk": 0.942
+                },
+                {
+                  "name": "291-400",
+                  "von": 291,
+                  "bis": 400,
+                  "uk": 1
+                },
+                {
+                  "name": "401-750",
+                  "von": 401,
+                  "bis": 750,
+                  "uk": 1.097
+                }
+              ]
+            }
+          ],
+          "rechenvorschlag": "Tabelle der Gemeindegruppe der Zone wählen; dort ist die Norm 1,000, also UK = Tabellenwert(Objekt). Ein einziger Tabellensatz für alle Gruppen wäre nur bis auf die dritte Nachkommastelle gleich (Quotienten weichen bis 0,0013 ab) — deshalb nicht zusammengelegt."
+        }
+      ],
+      "anwendungsbeispiel": {
+        "seite": "S. 5",
+        "irw": 2590,
+        "gemeinde": "Halle (Westf.)",
+        "norm_zone": {
+          "BOWL": "190",
+          "BJ": "1986",
+          "FLAE": "501-800",
+          "WHNFL": "141-160",
+          "KELLER": "1",
+          "GSTAND": "5"
+        },
+        "objekt": {
+          "baujahr": 1992,
+          "grundstuecksflaeche": 850,
+          "keller": true,
+          "wohnflaeche": 165,
+          "standardstufe": "mittel",
+          "bodenrichtwert": 240
+        },
+        "faktoren": {
+          "baujahr": 1.091,
+          "grundstuecksflaeche": 1.06,
+          "keller": 1,
+          "wohnflaeche": 0.912,
+          "gebaeudestandard": 1,
+          "bodenrichtwert": 1.05
+        },
+        "ergebnis_eur_qm": 2868,
+        "toleranz_eur_qm": 1,
+        "wohnflaeche": 165,
+        "nebengebaeude_eur": 16000,
+        "ergebnis_eur": 489220,
+        "wortlaut": "2.590 EUR/m² x 1,091 x 1,060 x 1,000 x 0,912 x 1,000 x 1,050 = rd. 2.868 EUR/m² · 2.868 EUR/m² x 165 m² + 16.000 EUR = rd. 489.220 EUR (Nebengebäude: Doppelgarage, pauschaler Zuschlag 16.000 EUR)"
+      }
+    },
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Ein- und Zweifamilienhäuser - freistehend (6 Seiten): S. 1–2 Normobjekte je Gemeindegruppe und Immobilienrichtwerte der 13 Gemeinden, S. 3 Tabellen Baujahr, Grundstücksgröße, Keller, Wohnfläche, Gebäudestandard, S. 4 drei Bodenrichtwerttabellen je Gemeindegruppe und Nebengebäude, S. 5 Anwendungsbeispiel Halle (Westf.), S. 6 Hinweis zur Standardstufe.",
+      "S. 4: „Nebengebäude wie Garagen und Carports sind im Immobilienrichtwert nicht berücksichtigt. Es sind folgende Zuschläge anzubringen\" — Bestand: Garagenstellplatz 8.000 EUR, Carport 5.000 EUR; Neubau: 17.000 EUR / 8.000 EUR.",
+      "Anwendungsbeispiel S. 5 mit der Tabelle der Gruppe 1 (Halle) nachgerechnet: 2.590 × 1,091 × 1,060 × 0,912 × 1,050 = 2.868,0 €/m² — getroffen (Prüfskript scratchpad/irw/ostwestfalen/pruef-vorgemerkt.mjs).",
+      "Zonen (Shape IRW_2026): je Gemeinde eine Zone, BOWL 190 (Gruppe 1), 150 (Gruppe 2), 345 (Gruppe 3), BJ 1986, WHNFL 141-160, FLAE 501-800, KELLER 1, GSTAND 5."
+    ],
+    "modellansaetze": {
+      "teilmarkt_code": 2,
+      "rundung_uk": 3,
+      "brechv": 2,
+      "fehlende_rechenform": "klassen_je_gemeindegruppe (Tabelle je Gemeindegruppe der Zone)"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": false,
+    "ags": "05754",
+    "gasl": "33300",
+    "gebiet_name": "Kreis Gütersloh und Stadt Gütersloh",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
+    "seite": "S. 1–5",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0533300_2026.pdf",
+    "zweig": "etw",
+    "geltungsbereich": {
+      "teilmarkt": 1,
+      "objektarten": [
+        "etw"
+      ],
+      "gemeinden": "Borgholzhausen, Gütersloh, Halle (Westf.), Harsewinkel, Herzebrock-Clarholz, Langenberg, Rheda-Wiedenbrück, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Verl, Versmold, Werther (Westf.)",
+      "hinweis": "Ein Immobilienrichtwert je Gemeinde (13 Zonen); drei Gemeindegruppen mit eigenem Normobjekt-Bodenrichtwert und eigener Bodenrichtwerttabelle."
+    },
+    "warum_kein_wert": "Der Ausschuss rechnet den Bodenrichtwert mit DREI verschiedenen Tabellen, je nach Gemeindegruppe (Halle, Harsewinkel, Herzebrock-Clarholz, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Werther: Norm 151–210 €/m²; Borgholzhausen, Langenberg, Versmold: Norm bis 150 €/m²; Gütersloh, Rheda-Wiedenbrück, Verl: Norm 291–500 €/m²; S. 1–2 und 4). Eine Tabelle, die von einem anderen Merkmal (der Gemeinde der Zone) abhängt, kennt der Rechenkern nicht (Formen klassen/kategorien/kurve/matrix rechnen mit EINER Tabelle je Merkmal). Eine Zusammenlegung zu einer Tabelle wäre eine Glättung (die Quotienten der drei Tabellen stimmen nur bis auf rund 0,001 überein). Ohne das Bodenrichtwert-Merkmal würde nur halb umgerechnet. Alle übrigen Tabellen und das Anwendungsbeispiel liegen unter formel_vorgemerkt bereit; es fehlt nur die Rechenform „klassen_je_gemeindegruppe\".",
+    "formel_vorgemerkt": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "interpolation": "keine (Klassen)",
+      "extrapolation": false,
+      "irw_lageangepasst": false,
+      "stellplaetze_im_irw": false,
+      "nebengebaeude": {
+        "im_irw": false,
+        "wortlaut": "Nebengebäude wie Garagen und Carports sind im Immobilienrichtwert nicht berücksichtigt. Es sind folgende Zuschläge anzubringen: Bestandsimmobilien: je Garagenstellplatz: 8.000 EUR, Carport: 5.000 EUR, Stellplatz (Sondernutzungsrecht): 2.000 EUR, Tiefgaragenstellplatz: 8.000 EUR · Neubauten: je Garagenstellplatz: 17.000 EUR, Carport: 8.000 EUR, Stellplatz (Sondernutzungsrecht): 4.000 EUR, Tiefgaragenstellplatz: 17.000 EUR",
+        "zuschlaege_eur": {
+          "bestand": {
+            "garagenstellplatz": 8000,
+            "carport": 5000,
+            "stellplatz_sondernutzungsrecht": 2000,
+            "tiefgaragenstellplatz": 8000
+          },
+          "neubau": {
+            "garagenstellplatz": 17000,
+            "carport": 8000,
+            "stellplatz_sondernutzungsrecht": 4000,
+            "tiefgaragenstellplatz": 17000
+          }
+        }
+      },
+      "normobjekt": {
+        "baujahr": "1990-1997",
+        "wohnflaeche": "71-100 m²",
+        "gebaeudestandard": "mittel",
+        "einheiten_wohnanlage": "1-6",
+        "mietsituation": "unvermietet",
+        "objektgruppe": "Weiterverkauf",
+        "bodenrichtwert_je_gruppe": {
+          "gruppe1": "151-210 €/m²",
+          "gruppe2": "bis 150 €/m²",
+          "gruppe3": "291-500 €/m²"
+        }
+      },
+      "merkmale": [
+        {
+          "id": "baujahr",
+          "name": "Baujahr",
+          "eingabe": "baujahr",
+          "art": "klassen",
+          "norm_feld": "BJ",
+          "norm": "1990-1997",
+          "klassen": [
+            {
+              "name": "bis 1956",
+              "von": null,
+              "bis": 1956,
+              "uk": 0.825
+            },
+            {
+              "name": "1957-1964",
+              "von": 1957,
+              "bis": 1964,
+              "uk": 0.799
+            },
+            {
+              "name": "1965-1972",
+              "von": 1965,
+              "bis": 1972,
+              "uk": 0.862
+            },
+            {
+              "name": "1973-1980",
+              "von": 1973,
+              "bis": 1980,
+              "uk": 0.872
+            },
+            {
+              "name": "1981-1989",
+              "von": 1981,
+              "bis": 1989,
+              "uk": 0.917
+            },
+            {
+              "name": "1990-1997",
+              "von": 1990,
+              "bis": 1997,
+              "uk": 1
+            },
+            {
+              "name": "1998-2005",
+              "von": 1998,
+              "bis": 2005,
+              "uk": 1.033
+            },
+            {
+              "name": "2006-2013",
+              "von": 2006,
+              "bis": 2013,
+              "uk": 1.136
+            },
+            {
+              "name": "2014-2020",
+              "von": 2014,
+              "bis": 2020,
+              "uk": 1.228
+            },
+            {
+              "name": "2021-2027",
+              "von": 2021,
+              "bis": 2027,
+              "uk": 1.286
+            }
+          ]
+        },
+        {
+          "id": "wohnflaeche",
+          "name": "Wohnfläche",
+          "eingabe": "wohnflaeche",
+          "art": "klassen",
+          "norm_feld": "WHNFL",
+          "norm": "71-100",
+          "runden": 0,
+          "klassen": [
+            {
+              "name": "26-45",
+              "von": 26,
+              "bis": 45,
+              "uk": 0.981
+            },
+            {
+              "name": "46-70",
+              "von": 46,
+              "bis": 70,
+              "uk": 0.991
+            },
+            {
+              "name": "71-100",
+              "von": 71,
+              "bis": 100,
+              "uk": 1
+            },
+            {
+              "name": "101-150",
+              "von": 101,
+              "bis": 150,
+              "uk": 0.994
+            }
+          ]
+        },
+        {
+          "id": "gebaeudestandard",
+          "name": "Gebäudestandard",
+          "eingabe": "standardstufe",
+          "art": "klassen",
+          "norm_feld": "GSTAND",
+          "norm": "mittel",
+          "runden": 1,
+          "norm_zuordnung": {
+            "1": "einfach",
+            "2": "einfach",
+            "3": "einfach",
+            "5": "mittel",
+            "7": "gehoben",
+            "8": "gehoben",
+            "9": "gehoben",
+            "10": "gehoben"
+          },
+          "zuordnung_herkunft": "Hinweis zur Standardstufe (letzte Seite): einfach = Standardstufe 1 und 2, mittel = 3, gehoben = 4 und 5; Bänder nach IRW-Datenmodell Feld 60 (Stufe 1 [1,0–1,2] … 2 [1,8–2,2], 3 [2,8–3,2], 4 [3,8–4,2], 5 [5,0]); Zwischenwerte 2,3–2,7 und 3,3–3,7 ordnet das Dokument nicht zu",
+          "klassen": [
+            {
+              "name": "einfach",
+              "von": 1,
+              "bis": 2.2,
+              "uk": 0.924
+            },
+            {
+              "name": "mittel",
+              "von": 2.8,
+              "bis": 3.2,
+              "uk": 1
+            },
+            {
+              "name": "gehoben",
+              "von": 3.8,
+              "bis": 5,
+              "uk": 1.092
+            }
+          ]
+        },
+        {
+          "id": "einheiten",
+          "name": "Anzahl der Einheiten in der Wohnanlage",
+          "eingabe": "einheiten",
+          "art": "klassen",
+          "norm_feld": "WHNA",
+          "norm": "bis 6",
+          "norm_zuordnung": {
+            "1-6": "bis 6"
+          },
+          "klassen": [
+            {
+              "name": "bis 6",
+              "von": null,
+              "bis": 6,
+              "uk": 1
+            },
+            {
+              "name": "7-12",
+              "von": 7,
+              "bis": 12,
+              "uk": 0.988
+            },
+            {
+              "name": "13-100",
+              "von": 13,
+              "bis": 100,
+              "uk": 0.979
+            }
+          ]
+        },
+        {
+          "id": "mietsituation",
+          "name": "Mietsituation",
+          "eingabe": "vermietet",
+          "art": "kategorien",
+          "norm_feld": "MIETS",
+          "norm": "nicht vermietet",
+          "zuordnung": {
+            "ja": "vermietet",
+            "nein": "nicht vermietet"
+          },
+          "norm_zuordnung": {
+            "1": "nicht vermietet",
+            "2": "vermietet"
+          },
+          "werte": {
+            "vermietet": 0.962,
+            "nicht vermietet": 1
+          }
+        },
+        {
+          "id": "objektgruppe",
+          "name": "Objektgruppe",
+          "eingabe": "erstverkauf",
+          "art": "kategorien",
+          "norm_feld": "OBJGR",
+          "norm": "Weiterverkauf",
+          "zuordnung": {
+            "ja": "Erstverkauf",
+            "nein": "Weiterverkauf"
+          },
+          "norm_zuordnung": {
+            "1": "Erstverkauf",
+            "3": "Weiterverkauf"
+          },
+          "werte": {
+            "Erstverkauf": 1.142,
+            "Weiterverkauf": 1
+          }
+        },
+        {
+          "id": "bodenrichtwert",
+          "name": "Boden-/Lagewert (Bodenrichtwert)",
+          "eingabe": "bodenrichtwert",
+          "art": "klassen_je_gemeindegruppe",
+          "norm_feld": "BOWL",
+          "runden": 0,
+          "gruppe_aus": "GENA der Zone (Gemeinde); gleichwertig: Normklasse des Zonenfelds BOWL, die je Gruppe eindeutig ist",
+          "gruppen": [
+            {
+              "gemeinden": [
+                "Halle (Westf.)",
+                "Harsewinkel",
+                "Herzebrock-Clarholz",
+                "Rietberg",
+                "Schloß Holte-Stukenbrock",
+                "Steinhagen",
+                "Werther (Westf.)"
+              ],
+              "norm": "151-210",
+              "klassen": [
+                {
+                  "name": "bis 150",
+                  "von": null,
+                  "bis": 150,
+                  "uk": 0.971
+                },
+                {
+                  "name": "151-210",
+                  "von": 151,
+                  "bis": 210,
+                  "uk": 1
+                },
+                {
+                  "name": "211-250",
+                  "von": 211,
+                  "bis": 250,
+                  "uk": 1.043
+                },
+                {
+                  "name": "251-290",
+                  "von": 251,
+                  "bis": 290,
+                  "uk": 1.057
+                },
+                {
+                  "name": "291-500",
+                  "von": 291,
+                  "bis": 500,
+                  "uk": 1.134
+                },
+                {
+                  "name": "501-1700",
+                  "von": 501,
+                  "bis": 1700,
+                  "uk": 1.214
+                }
+              ]
+            },
+            {
+              "gemeinden": [
+                "Borgholzhausen",
+                "Langenberg",
+                "Versmold"
+              ],
+              "norm": "bis 150",
+              "klassen": [
+                {
+                  "name": "bis 150",
+                  "von": null,
+                  "bis": 150,
+                  "uk": 1
+                },
+                {
+                  "name": "151-210",
+                  "von": 151,
+                  "bis": 210,
+                  "uk": 1.03
+                },
+                {
+                  "name": "211-250",
+                  "von": 211,
+                  "bis": 250,
+                  "uk": 1.074
+                },
+                {
+                  "name": "251-290",
+                  "von": 251,
+                  "bis": 290,
+                  "uk": 1.088
+                },
+                {
+                  "name": "291-500",
+                  "von": 291,
+                  "bis": 500,
+                  "uk": 1.168
+                },
+                {
+                  "name": "501-1700",
+                  "von": 501,
+                  "bis": 1700,
+                  "uk": 1.25
+                }
+              ]
+            },
+            {
+              "gemeinden": [
+                "Gütersloh",
+                "Rheda-Wiedenbrück",
+                "Verl"
+              ],
+              "norm": "291-500",
+              "klassen": [
+                {
+                  "name": "bis 150",
+                  "von": null,
+                  "bis": 150,
+                  "uk": 0.856
+                },
+                {
+                  "name": "151-210",
+                  "von": 151,
+                  "bis": 210,
+                  "uk": 0.882
+                },
+                {
+                  "name": "211-250",
+                  "von": 211,
+                  "bis": 250,
+                  "uk": 0.92
+                },
+                {
+                  "name": "251-290",
+                  "von": 251,
+                  "bis": 290,
+                  "uk": 0.932
+                },
+                {
+                  "name": "291-500",
+                  "von": 291,
+                  "bis": 500,
+                  "uk": 1
+                },
+                {
+                  "name": "501-1700",
+                  "von": 501,
+                  "bis": 1700,
+                  "uk": 1.07
+                }
+              ]
+            }
+          ],
+          "rechenvorschlag": "Tabelle der Gemeindegruppe der Zone wählen; dort ist die Norm 1,000, also UK = Tabellenwert(Objekt). Ein einziger Tabellensatz für alle Gruppen wäre nur bis auf die dritte Nachkommastelle gleich (Quotienten weichen bis 0,0013 ab) — deshalb nicht zusammengelegt."
+        }
+      ],
+      "anwendungsbeispiel": {
+        "seite": "S. 5",
+        "irw": 2370,
+        "gemeinde": "Rietberg",
+        "norm_zone": {
+          "BOWL": "180",
+          "BJ": "1993",
+          "WHNFL": "71-100",
+          "WHNA": "1-6",
+          "MIETS": "1",
+          "GSTAND": "5",
+          "OBJGR": "3"
+        },
+        "objekt": {
+          "baujahr": 1992,
+          "wohnflaeche": 77,
+          "standardstufe": "mittel",
+          "einheiten": 4,
+          "vermietet": false,
+          "erstverkauf": false,
+          "bodenrichtwert": 280
+        },
+        "faktoren": {
+          "baujahr": 1,
+          "wohnflaeche": 1,
+          "gebaeudestandard": 1,
+          "einheiten": 1,
+          "mietsituation": 1,
+          "objektgruppe": 1,
+          "bodenrichtwert": 1.057
+        },
+        "ergebnis_eur_qm": 2505,
+        "toleranz_eur_qm": 1,
+        "wohnflaeche": 77,
+        "nebengebaeude_eur": 5000,
+        "ergebnis_eur": 198000,
+        "wortlaut": "2.370 EUR/m² x 1,000 x 1,000 x 1,000 x 1,000 x 1,000 x 1,000 x 1,057 = rd. 2.505 EUR/m² · 2.505 EUR/m² x 77 m² + 5.000 EUR = rd. 198.000 EUR (Nebengebäude: Carport)"
+      }
+    },
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Eigentumswohnungen (5 Seiten): S. 1–2 Normobjekte je Gemeindegruppe und Immobilienrichtwerte der 13 Gemeinden, S. 3 Tabellen Baujahr, Wohnfläche, Gebäudestandard, Anzahl der Einheiten, Mietsituation, S. 4 Objektgruppe, drei Bodenrichtwerttabellen je Gemeindegruppe, Nebengebäude/Stellplätze, S. 5 Anwendungsbeispiel Rietberg.",
+      "Anwendungsbeispiel S. 5 mit der Tabelle der Gruppe 1 (Rietberg) nachgerechnet: 2.370 × 1,057 = 2.505,1 €/m² — getroffen.",
+      "Die Wohnflächentabelle beginnt bei 26 m² und endet bei 150 m², die Einheiten-Tabelle bei 100 — außerhalb kein Koeffizient.",
+      "Gebäudestandard: Das ETW-Dokument trägt „Gebäudestandard*\", druckt den Hinweis zur Standardstufe aber nicht ab; die Zuordnung ist aus dem Dokument für Ein- und Zweifamilienhäuser (S. 6) übernommen — vor Freigabe beim Ausschuss bestätigen."
+    ],
+    "modellansaetze": {
+      "teilmarkt_code": 1,
+      "rundung_uk": 3,
+      "brechv": 2,
+      "fehlende_rechenform": "klassen_je_gemeindegruppe (Tabelle je Gemeindegruppe der Zone)"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": false,
+    "ags": "05754",
+    "gasl": "33300",
+    "gebiet_name": "Kreis Gütersloh und Stadt Gütersloh",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
+    "seite": "S. 1–5",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_3_0533300_2026.pdf",
+    "zweig": "rh_dhh",
+    "geltungsbereich": {
+      "teilmarkt": 3,
+      "objektarten": [
+        "dhh",
+        "rh"
+      ],
+      "gemeinden": "Borgholzhausen, Gütersloh, Halle (Westf.), Harsewinkel, Herzebrock-Clarholz, Langenberg, Rheda-Wiedenbrück, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Verl, Versmold, Werther (Westf.)",
+      "hinweis": "Ein Immobilienrichtwert je Gemeinde (13 Zonen); drei Gemeindegruppen mit eigenem Normobjekt-Bodenrichtwert und eigener Bodenrichtwerttabelle."
+    },
+    "warum_kein_wert": "Der Ausschuss rechnet den Bodenrichtwert mit DREI verschiedenen Tabellen, je nach Gemeindegruppe (Halle, Harsewinkel, Herzebrock-Clarholz, Rietberg, Schloß Holte-Stukenbrock, Steinhagen, Werther: Norm 171–210 €/m²; Borgholzhausen, Langenberg, Versmold: Norm 131–170 €/m²; Gütersloh, Rheda-Wiedenbrück, Verl: Norm 291–400 €/m²; S. 1–2 und 4). Eine Tabelle, die von einem anderen Merkmal (der Gemeinde der Zone) abhängt, kennt der Rechenkern nicht (Formen klassen/kategorien/kurve/matrix rechnen mit EINER Tabelle je Merkmal). Eine Zusammenlegung zu einer Tabelle wäre eine Glättung (die Quotienten der drei Tabellen stimmen nur bis auf rund 0,001 überein). Ohne das Bodenrichtwert-Merkmal würde nur halb umgerechnet. Alle übrigen Tabellen und das Anwendungsbeispiel liegen unter formel_vorgemerkt bereit; es fehlt nur die Rechenform „klassen_je_gemeindegruppe\".",
+    "formel_vorgemerkt": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "interpolation": "keine (Klassen)",
+      "extrapolation": false,
+      "irw_lageangepasst": false,
+      "stellplaetze_im_irw": false,
+      "nebengebaeude": {
+        "im_irw": false,
+        "wortlaut": "Nebengebäude wie Garagen und Carports sind im Immobilienrichtwert nicht berücksichtigt. Es sind folgende Zuschläge anzubringen: Bestandsimmobilien: je Garagenstellplatz: 8.000 EUR, Carport: 5.000 EUR · Neubauten: je Garagenstellplatz: 17.000 EUR, Carport: 8.000 EUR",
+        "zuschlaege_eur": {
+          "bestand": {
+            "garagenstellplatz": 8000,
+            "carport": 5000
+          },
+          "neubau": {
+            "garagenstellplatz": 17000,
+            "carport": 8000
+          }
+        }
+      },
+      "normobjekt": {
+        "ergaenzende_gebaeudeart": "Doppelhaushälfte",
+        "baujahr": "1982-1991",
+        "grundstuecksgroesse": "351-500 m²",
+        "keller": "unterkellert",
+        "wohnflaeche": "126-140 m²",
+        "gebaeudestandard": "mittel",
+        "bodenrichtwert_je_gruppe": {
+          "gruppe1": "171-210 €/m²",
+          "gruppe2": "131-170 €/m²",
+          "gruppe3": "291-400 €/m²"
+        }
+      },
+      "merkmale": [
+        {
+          "id": "gebaeudeart",
+          "name": "Ergänzende Gebäudeart",
+          "eingabe": "anbauweise",
+          "art": "kategorien",
+          "norm_feld": "EGART",
+          "norm": "Doppelhaushälfte",
+          "zuordnung": {
+            "doppelhaushaelfte": "Doppelhaushälfte",
+            "reihenmittelhaus": "Reihenmittelhaus",
+            "reihenendhaus": "Reihenendhaus"
+          },
+          "norm_zuordnung": {
+            "2": "Doppelhaushälfte",
+            "4": "Reihenmittelhaus",
+            "5": "Reihenendhaus"
+          },
+          "werte": {
+            "Doppelhaushälfte": 1,
+            "Reihenmittelhaus": 0.981,
+            "Reihenendhaus": 0.986
+          }
+        },
+        {
+          "id": "baujahr",
+          "name": "Baujahr",
+          "eingabe": "baujahr",
+          "art": "klassen",
+          "norm_feld": "BJ",
+          "norm": "1982-1991",
+          "klassen": [
+            {
+              "name": "bis 1952",
+              "von": null,
+              "bis": 1952,
+              "uk": 0.833
+            },
+            {
+              "name": "1953-1962",
+              "von": 1953,
+              "bis": 1962,
+              "uk": 0.854
+            },
+            {
+              "name": "1963-1972",
+              "von": 1963,
+              "bis": 1972,
+              "uk": 0.893
+            },
+            {
+              "name": "1973-1981",
+              "von": 1973,
+              "bis": 1981,
+              "uk": 0.935
+            },
+            {
+              "name": "1982-1991",
+              "von": 1982,
+              "bis": 1991,
+              "uk": 1
+            },
+            {
+              "name": "1992-2001",
+              "von": 1992,
+              "bis": 2001,
+              "uk": 1.091
+            },
+            {
+              "name": "2002-2010",
+              "von": 2002,
+              "bis": 2010,
+              "uk": 1.143
+            },
+            {
+              "name": "2011-2020",
+              "von": 2011,
+              "bis": 2020,
+              "uk": 1.203
+            },
+            {
+              "name": "2021-2025",
+              "von": 2021,
+              "bis": 2025,
+              "uk": 1.264
+            }
+          ]
+        },
+        {
+          "id": "grundstuecksflaeche",
+          "name": "Grundstücksgröße",
+          "eingabe": "grundstuecksflaeche",
+          "art": "klassen",
+          "norm_feld": "FLAE",
+          "norm": "351-500",
+          "runden": 0,
+          "klassen": [
+            {
+              "name": "bis 250",
+              "von": null,
+              "bis": 250,
+              "uk": 0.918
+            },
+            {
+              "name": "251-350",
+              "von": 251,
+              "bis": 350,
+              "uk": 0.942
+            },
+            {
+              "name": "351-500",
+              "von": 351,
+              "bis": 500,
+              "uk": 1
+            }
+          ]
+        },
+        {
+          "id": "keller",
+          "name": "Keller",
+          "eingabe": "keller",
+          "art": "kategorien",
+          "norm_feld": "KELLER",
+          "norm": "unterkellert",
+          "zuordnung": {
+            "ja": "unterkellert",
+            "nein": "kein Keller bzw. geringfügig unterkellert (<30%)"
+          },
+          "norm_zuordnung": {
+            "0": "kein Keller bzw. geringfügig unterkellert (<30%)",
+            "1": "unterkellert"
+          },
+          "werte": {
+            "kein Keller bzw. geringfügig unterkellert (<30%)": 0.959,
+            "unterkellert": 1
+          }
+        },
+        {
+          "id": "wohnflaeche",
+          "name": "Wohnfläche",
+          "eingabe": "wohnflaeche",
+          "art": "klassen",
+          "norm_feld": "WHNFL",
+          "norm": "126-140",
+          "runden": 0,
+          "klassen": [
+            {
+              "name": "bis 90",
+              "von": null,
+              "bis": 90,
+              "uk": 1.261
+            },
+            {
+              "name": "91-110",
+              "von": 91,
+              "bis": 110,
+              "uk": 1.145
+            },
+            {
+              "name": "111-125",
+              "von": 111,
+              "bis": 125,
+              "uk": 1.065
+            },
+            {
+              "name": "126-140",
+              "von": 126,
+              "bis": 140,
+              "uk": 1
+            },
+            {
+              "name": "141-160",
+              "von": 141,
+              "bis": 160,
+              "uk": 0.944
+            },
+            {
+              "name": "161-190",
+              "von": 161,
+              "bis": 190,
+              "uk": 0.861
+            }
+          ]
+        },
+        {
+          "id": "gebaeudestandard",
+          "name": "Gebäudestandard",
+          "eingabe": "standardstufe",
+          "art": "klassen",
+          "norm_feld": "GSTAND",
+          "norm": "mittel",
+          "runden": 1,
+          "norm_zuordnung": {
+            "1": "einfach",
+            "2": "einfach",
+            "3": "einfach",
+            "5": "mittel",
+            "7": "gehoben",
+            "8": "gehoben",
+            "9": "gehoben",
+            "10": "gehoben"
+          },
+          "zuordnung_herkunft": "Hinweis zur Standardstufe (letzte Seite): einfach = Standardstufe 1 und 2, mittel = 3, gehoben = 4 und 5; Bänder nach IRW-Datenmodell Feld 60 (Stufe 1 [1,0–1,2] … 2 [1,8–2,2], 3 [2,8–3,2], 4 [3,8–4,2], 5 [5,0]); Zwischenwerte 2,3–2,7 und 3,3–3,7 ordnet das Dokument nicht zu",
+          "klassen": [
+            {
+              "name": "einfach",
+              "von": 1,
+              "bis": 2.2,
+              "uk": 0.877
+            },
+            {
+              "name": "mittel",
+              "von": 2.8,
+              "bis": 3.2,
+              "uk": 1
+            },
+            {
+              "name": "gehoben",
+              "von": 3.8,
+              "bis": 5,
+              "uk": 1.106
+            }
+          ]
+        },
+        {
+          "id": "bodenrichtwert",
+          "name": "Boden-/Lagewert (Bodenrichtwert)",
+          "eingabe": "bodenrichtwert",
+          "art": "klassen_je_gemeindegruppe",
+          "norm_feld": "BOWL",
+          "runden": 0,
+          "gruppe_aus": "GENA der Zone (Gemeinde); gleichwertig: Normklasse des Zonenfelds BOWL, die je Gruppe eindeutig ist",
+          "gruppen": [
+            {
+              "gemeinden": [
+                "Halle (Westf.)",
+                "Harsewinkel",
+                "Herzebrock-Clarholz",
+                "Rietberg",
+                "Schloß Holte-Stukenbrock",
+                "Steinhagen",
+                "Werther (Westf.)"
+              ],
+              "norm": "171-210",
+              "klassen": [
+                {
+                  "name": "bis 130",
+                  "von": null,
+                  "bis": 130,
+                  "uk": 0.924
+                },
+                {
+                  "name": "131-170",
+                  "von": 131,
+                  "bis": 170,
+                  "uk": 0.96
+                },
+                {
+                  "name": "171-210",
+                  "von": 171,
+                  "bis": 210,
+                  "uk": 1
+                },
+                {
+                  "name": "211-250",
+                  "von": 211,
+                  "bis": 250,
+                  "uk": 1.05
+                },
+                {
+                  "name": "251-290",
+                  "von": 251,
+                  "bis": 290,
+                  "uk": 1.081
+                },
+                {
+                  "name": "291-400",
+                  "von": 291,
+                  "bis": 400,
+                  "uk": 1.147
+                },
+                {
+                  "name": "401-750",
+                  "von": 401,
+                  "bis": 750,
+                  "uk": 1.259
+                }
+              ]
+            },
+            {
+              "gemeinden": [
+                "Borgholzhausen",
+                "Langenberg",
+                "Versmold"
+              ],
+              "norm": "131-170",
+              "klassen": [
+                {
+                  "name": "bis 130",
+                  "von": null,
+                  "bis": 130,
+                  "uk": 0.963
+                },
+                {
+                  "name": "131-170",
+                  "von": 131,
+                  "bis": 170,
+                  "uk": 1
+                },
+                {
+                  "name": "171-210",
+                  "von": 171,
+                  "bis": 210,
+                  "uk": 1.042
+                },
+                {
+                  "name": "211-250",
+                  "von": 211,
+                  "bis": 250,
+                  "uk": 1.094
+                },
+                {
+                  "name": "251-290",
+                  "von": 251,
+                  "bis": 290,
+                  "uk": 1.126
+                },
+                {
+                  "name": "291-400",
+                  "von": 291,
+                  "bis": 400,
+                  "uk": 1.196
+                },
+                {
+                  "name": "401-750",
+                  "von": 401,
+                  "bis": 750,
+                  "uk": 1.312
+                }
+              ]
+            },
+            {
+              "gemeinden": [
+                "Gütersloh",
+                "Rheda-Wiedenbrück",
+                "Verl"
+              ],
+              "norm": "291-400",
+              "klassen": [
+                {
+                  "name": "bis 130",
+                  "von": null,
+                  "bis": 130,
+                  "uk": 0.806
+                },
+                {
+                  "name": "131-170",
+                  "von": 131,
+                  "bis": 170,
+                  "uk": 0.836
+                },
+                {
+                  "name": "171-210",
+                  "von": 171,
+                  "bis": 210,
+                  "uk": 0.872
+                },
+                {
+                  "name": "211-250",
+                  "von": 211,
+                  "bis": 250,
+                  "uk": 0.915
+                },
+                {
+                  "name": "251-290",
+                  "von": 251,
+                  "bis": 290,
+                  "uk": 0.942
+                },
+                {
+                  "name": "291-400",
+                  "von": 291,
+                  "bis": 400,
+                  "uk": 1
+                },
+                {
+                  "name": "401-750",
+                  "von": 401,
+                  "bis": 750,
+                  "uk": 1.097
+                }
+              ]
+            }
+          ],
+          "rechenvorschlag": "Tabelle der Gemeindegruppe der Zone wählen; dort ist die Norm 1,000, also UK = Tabellenwert(Objekt). Ein einziger Tabellensatz für alle Gruppen wäre nur bis auf die dritte Nachkommastelle gleich (Quotienten weichen bis 0,0013 ab) — deshalb nicht zusammengelegt."
+        }
+      ],
+      "anwendungsbeispiel": {
+        "seite": "S. 5",
+        "irw": 2770,
+        "gemeinde": "Verl",
+        "norm_zone": {
+          "EGART": "2",
+          "BOWL": "345",
+          "BJ": "1986",
+          "FLAE": "351-500",
+          "WHNFL": "126-140",
+          "KELLER": "1",
+          "GSTAND": "5"
+        },
+        "objekt": {
+          "anbauweise": "doppelhaushaelfte",
+          "baujahr": 1992,
+          "grundstuecksflaeche": 350,
+          "keller": true,
+          "wohnflaeche": 100,
+          "standardstufe": "mittel",
+          "bodenrichtwert": 370
+        },
+        "faktoren": {
+          "gebaeudeart": 1,
+          "baujahr": 1.091,
+          "grundstuecksflaeche": 0.942,
+          "keller": 1,
+          "wohnflaeche": 1.145,
+          "gebaeudestandard": 1,
+          "bodenrichtwert": 1
+        },
+        "ergebnis_eur_qm": 3260,
+        "toleranz_eur_qm": 5,
+        "wohnflaeche": 100,
+        "nebengebaeude_eur": 8000,
+        "ergebnis_eur": 334000,
+        "wortlaut": "2.770 EUR/m² x 1,000 x 1,091 x 0,942 x 1,000 x 1,145 x 1,000 x 1,000 = rd. 3.260 EUR/m² · 3.260 EUR/m² x 100 m² + 8.000 EUR = rd. 334.000 EUR (Nebengebäude: Einzelgarage)"
+      }
+    },
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Reihen- und Doppelhäuser (5 Seiten): S. 1–2 Normobjekte je Gemeindegruppe und Immobilienrichtwerte, S. 3 Tabellen Ergänzende Gebäudeart, Baujahr, Grundstücksgröße, Keller, Wohnfläche, Gebäudestandard, S. 4 drei Bodenrichtwerttabellen und Nebengebäude, S. 5 Anwendungsbeispiel Verl.",
+      "Anwendungsbeispiel S. 5 mit der Tabelle der Gruppe 3 (Verl) nachgerechnet: 2.770 × 1,091 × 0,942 × 1,145 = 3.259,6 €/m² → rd. 3.260 — getroffen.",
+      "Grundstücksgrößen-Tabelle endet bei 500 m², Wohnfläche bei 190 m² — darüber kein Koeffizient. Hinweis zur Standardstufe nicht im RH-Dokument abgedruckt; übernommen aus dem EFH-Dokument S. 6."
+    ],
+    "modellansaetze": {
+      "teilmarkt_code": 3,
+      "rundung_uk": 3,
+      "brechv": 2,
+      "fehlende_rechenform": "klassen_je_gemeindegruppe (Tabelle je Gemeindegruppe der Zone)"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": true,
+    "ags": "05766",
+    "gasl": "31400",
+    "gebiet_name": "Kreis Lippe und Stadt Detmold",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold",
+    "zweig": "efh_zfh",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold, Grundstücksmarktbericht 2026, Kapitel 5.1.2 (BORIS-NRW), dl-de/zero-2-0",
+    "geltungsbereich": {
+      "teilmarkt": 2,
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "gemeinden": "alle 16 Städte und Gemeinden des Kreises Lippe (Augustdorf bis Schlangen) einschließlich Stadt Detmold",
+      "hinweis": "Untersucht wurden freistehende Häuser, Doppelhaushälften, Reihenend- und Reihenmittelhäuser (Bauweise, GMB S. 51); eine Umrechnung nach Bauweise veröffentlicht der Ausschuss nicht. Er führt keinen Teilmarkt 3."
+    },
+    "formel": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "interpolation": "linear zwischen den gedruckten Stützstellen (Tabellen sind Schreibweise einer Regressionsfunktion)",
+      "extrapolation": false,
+      "irw_lageangepasst": false,
+      "stellplaetze_im_irw": false,
+      "normobjekt": {
+        "lagewert": "150 (Örtliche Fachinformationen; die Zonen führen eigene Lagewerte BOWL 60–340)",
+        "baugrundstuecksflaeche": "600 m²",
+        "wohnflaeche": "140 m²",
+        "optik": "normal ansprechend (5)",
+        "vollgeschosse": 1
+      },
+      "merkmale": [
+        {
+          "id": "lagewert",
+          "name": "Lagewert",
+          "eingabe": "lagewert",
+          "art": "kurve",
+          "norm_feld": "BOWL",
+          "norm": 150,
+          "x": [
+            25,
+            50,
+            75,
+            100,
+            125,
+            150,
+            175,
+            200,
+            225,
+            250,
+            275,
+            300,
+            325,
+            350,
+            375,
+            400,
+            425,
+            450,
+            475,
+            500,
+            525,
+            545
+          ],
+          "uk": [
+            0.689,
+            0.8,
+            0.865,
+            0.911,
+            0.946,
+            0.975,
+            1,
+            1.021,
+            1.04,
+            1.057,
+            1.072,
+            1.086,
+            1.099,
+            1.111,
+            1.122,
+            1.132,
+            1.142,
+            1.151,
+            1.16,
+            1.168,
+            1.176,
+            1.181
+          ],
+          "uk_druck": "in Prozent gedruckt (100,0 = 1,000); hier durch 100 geteilt",
+          "seite": "GMB S. 52",
+          "interpolation_herkunft": "Die Tabelle ist die gedruckte Schreibweise der Regressionsfunktion des Ausschusses (UK = a + b·ln Lagewert) — zwischen den Stützstellen linear interpoliert, nie darüber hinaus."
+        },
+        {
+          "id": "grundstuecksflaeche",
+          "name": "Baugrundstücksfläche",
+          "eingabe": "grundstuecksflaeche",
+          "art": "kurve",
+          "norm_feld": "FLAE",
+          "norm": 600,
+          "seite": "GMB S. 53",
+          "x": [
+            110,
+            150,
+            200,
+            250,
+            300,
+            350,
+            400,
+            450,
+            500,
+            550,
+            600,
+            650,
+            700,
+            750,
+            800,
+            850,
+            900,
+            950,
+            1000,
+            1050,
+            1100,
+            1150,
+            1200,
+            1250,
+            1300,
+            1350,
+            1400,
+            1450,
+            1500
+          ],
+          "uk": [
+            0.742,
+            0.789,
+            0.833,
+            0.867,
+            0.895,
+            0.918,
+            0.938,
+            0.956,
+            0.972,
+            0.987,
+            1,
+            1.012,
+            1.023,
+            1.034,
+            1.044,
+            1.053,
+            1.062,
+            1.07,
+            1.078,
+            1.085,
+            1.092,
+            1.099,
+            1.105,
+            1.112,
+            1.118,
+            1.123,
+            1.129,
+            1.134,
+            1.139
+          ],
+          "hinweis": "Baugrundstücksfläche nach GMB Nr. 8.4: ohne selbständig nutzbare Teilflächen und Flächen anderer Qualität (z. B. Ackerland)."
+        },
+        {
+          "id": "wohnflaeche",
+          "name": "Wohnfläche",
+          "eingabe": "wohnflaeche",
+          "art": "kurve",
+          "norm_feld": "WHNFL",
+          "norm": 140,
+          "seite": "GMB S. 54",
+          "x": [
+            70,
+            80,
+            90,
+            100,
+            110,
+            120,
+            130,
+            140,
+            150,
+            160,
+            170,
+            180,
+            190,
+            200,
+            210,
+            220,
+            230,
+            240,
+            250,
+            260,
+            270,
+            280,
+            290,
+            300
+          ],
+          "uk": [
+            1.291,
+            1.235,
+            1.186,
+            1.141,
+            1.101,
+            1.065,
+            1.031,
+            1,
+            0.971,
+            0.944,
+            0.918,
+            0.894,
+            0.872,
+            0.85,
+            0.83,
+            0.81,
+            0.791,
+            0.773,
+            0.756,
+            0.74,
+            0.724,
+            0.709,
+            0.694,
+            0.68
+          ]
+        },
+        {
+          "id": "optik",
+          "name": "Optik",
+          "eingabe": "optik",
+          "art": "kategorien",
+          "norm_feld": "OPTIK",
+          "norm": "normal ansprechend",
+          "seite": "GMB S. 54, Definition Nr. 8.5 S. 97–99",
+          "zuordnung": {
+            "3": "vernachlässigt",
+            "4": "schlechter als normal",
+            "5": "normal ansprechend",
+            "6": "besser als normal",
+            "7": "gut",
+            "8": "gut bis anspruchsvoll"
+          },
+          "werte": {
+            "vernachlässigt": 0.768,
+            "schlechter als normal": 0.887,
+            "normal ansprechend": 1,
+            "besser als normal": 1.182,
+            "gut": 1.448,
+            "gut bis anspruchsvoll": 1.729
+          },
+          "hinweis": "Kennziffern 1 (verkommen), 2 (stark vernachlässigt) und 9 (anspruchsvoll) haben keinen Koeffizienten."
+        },
+        {
+          "id": "vollgeschosse",
+          "name": "Anzahl der Vollgeschosse",
+          "eingabe": "geschosse",
+          "art": "kategorien",
+          "norm_feld": "ANZG",
+          "norm": "1",
+          "seite": "GMB S. 55",
+          "werte": {
+            "1": 1,
+            "2": 0.973
+          }
+        }
+      ],
+      "hinweis_ausschuss": "Außer den durch Umrechnungskoeffizienten belegten Einflüssen können weitere Merkmale den Verkehrswert beeinflussen, die statistisch nicht nachweisbar waren (Örtliche Fachinformationen, S. 1)."
+    },
+    "anwendungsbeispiel": {
+      "seite": "GMB S. 55",
+      "irw": 1800,
+      "norm_zone": {
+        "BOWL": "200",
+        "FLAE": "600",
+        "WHNFL": "140",
+        "OPTIK": "5",
+        "ANZG": "1"
+      },
+      "objekt": {
+        "lagewert": 225,
+        "grundstuecksflaeche": 800,
+        "wohnflaeche": 150,
+        "optik": 4,
+        "geschosse": 2
+      },
+      "faktoren": {
+        "lagewert": 1.0186,
+        "grundstuecksflaeche": 1.044,
+        "wohnflaeche": 0.971,
+        "optik": 0.887,
+        "vollgeschosse": 0.973
+      },
+      "faktoren_hinweis": "Quotienten der gedruckten UK (Objekt/Richtwertobjekt): 104,0/102,1; 104,4/100; 97,1/100; 88,7/100; 97,3/100",
+      "ergebnis_eur_qm": 1604.16,
+      "toleranz_eur_qm": 1,
+      "wortlaut": "Gesamtumrechnungskoeffizient 104,0 / 102,1 * 104,4 / 100 * 97,1 / 100 * 88,7 / 100 * 97,3 / 100 = 0,8912 · Objektspezifisch angepasster Immobilienrichtwert 1.800 * 0,8912 = 1.604,16 €/m²"
+    },
+    "belege": [
+      "Örtliche Fachinformationen (LGDIR_2_0531400_2026.pdf, 1 Seite): Normobjekt Lagewert 150, Baugrundstücksfläche 600 m², Wohnfläche 140 m², Optik normal ansprechend, 1 Vollgeschoss; „Umrechnungskoeffizienten … Siehe Grundstücksmarktbericht 2026 und Dashboard im Geoportal des Kreises Lippe\"; „Nebengebäude und Stellplätze sind im Richtwert nicht enthalten.\"",
+      "Grundstücksmarktbericht 2026, Kap. 5.1.2 S. 50–55: Beschreibung der Daten (1.822 Kauffälle 1/2020–4/2024), Tabellen Lage (S. 52), Baugrundstücksfläche (S. 53), Wohnfläche und Optik (S. 54), Vollgeschosse und Rechenvorschrift „durch Multiplikation zusammengesetzt\" mit Beispiel (S. 55).",
+      "Die UK sind in Prozent gedruckt (100,0); ein Koeffizient ist immer der Quotient Objekt/Richtwertobjekt (Beispiel S. 55). Die Tabellen sind Schreibweise der je abgedruckten Regressionsfunktion (z. B. Lage: 17,4859 + 15,9763·ln Lagewert) — geerntet sind die gedruckten Tabellenwerte.",
+      "GMB 2026 Nr. 8.3 S. 96: „Beim Lagewert des Bewertungsgrundstücks handelt es sich um einen dimensionslosen und auf die konkrete Lage des Bewertungsobjektes bezogenen individuellen Wert. Demgegenüber kennzeichnet der Lagewert des Bodenrichtwertes einen allgemeinen auf ein fiktives Bodenrichtwertgrundstück bezogenen Wert. Dieser ist in der Beschreibung des Bodenrichtwertes im Geodatenportal des Kreises Lippe und in BORIS.NRW (als Lagebeurteilung) veröffentlicht.\" — Lagewert des Bewertungsgrundstücks = Lagewert des Bodenrichtwertes × Lageanpassungsfaktor (z. B. 100 × 0,9 = 90). Der Lagewert ist NICHT der Bodenrichtwert in €/m² — deshalb eigene Eingabe `lagewert`.",
+      "Das Beispiel S. 55 nimmt als Richtwertobjekt Lagewert 200 (nicht 150 wie das Normobjekt der Örtlichen Fachinformationen) — die Zonen führen eigene Lagewerte (BOWL), deshalb norm_feld BOWL.",
+      "GMB 2026 Nr. 8.6 S. 99 (Wertansatz für Nebengebäude, Neuwert, Erfahrungswerte des Ausschusses): Garage 5.000–25.000 €, Tiefgarage 10.000–30.000 €, Fahrrad in TG 6.000–9.000 €, Carport 7.000–16.000 €, Stellplatz 3.500–10.000 €, Gartenhaus bis 30 m³ 2.500–4.000 €. Ein Abzug für das Normobjekt entfällt: Nebengebäude und Stellplätze sind nicht im Richtwert.",
+      "GMB 2026 S. 2 (Lizenz): „Für den Grundstücksmarktbericht gilt die ,,Datenlizenz Deutschland -Zero - Version 2.0\" (dl-de/zero-2-0) … Jede Nutzung ist ohne Einschränkungen oder Bedingungen zulässig.\""
+    ],
+    "seite": "GMB S. 50–55, 96–99",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31400_2026.pdf",
+    "udok_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_2_0531400_2026.pdf",
+    "modellansaetze": {
+      "teilmarkt_code": 2,
+      "brechv": 2,
+      "rundung_uk": 1,
+      "uk_einheit": "Prozent",
+      "normobjekt_quelle": "Örtliche Fachinformationen S. 1 und Zonenfelder BOWL/FLAE/WHNFL/OPTIK/ANZG",
+      "quelle_dokument": "Grundstücksmarktbericht 2026 (Verweis der Örtlichen Fachinformationen)"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": true,
+    "ags": "05766",
+    "gasl": "31400",
+    "gebiet_name": "Kreis Lippe und Stadt Detmold",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold",
+    "zweig": "etw",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold, Grundstücksmarktbericht 2026, Kapitel 6.1.2 (BORIS-NRW), dl-de/zero-2-0",
+    "geltungsbereich": {
+      "teilmarkt": 1,
+      "objektarten": [
+        "etw"
+      ],
+      "gemeinden": "alle 16 Städte und Gemeinden des Kreises Lippe (Augustdorf bis Schlangen) einschließlich Stadt Detmold",
+      "hinweis": "Abgeleitet aus dem Teilmarkt Weiterverkauf (GMB S. 70)."
+    },
+    "formel": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "interpolation": "linear zwischen den gedruckten Stützstellen (Tabellen sind Schreibweise einer Regressionsfunktion)",
+      "extrapolation": false,
+      "irw_lageangepasst": false,
+      "stellplaetze_im_irw": false,
+      "stellplaetze_hinweis": "Örtliche Fachinformationen S. 1: „Stellplätze und andere Nebenanlagen sind im Richtwert nicht enthalten.\" Das Normobjekt hat aber „Stellplatz: Vorhanden\", und der GMB rechnet „nicht vorhanden\" mit 0,958 um — Rückfrage beim Ausschuss, ob neben dem Koeffizienten ein Wertansatz (Nr. 8.6) hinzukommt.",
+      "normobjekt": {
+        "lagewert": "150 (Örtliche Fachinformationen; Zonen BOWL 94–390)",
+        "vollgeschosse": "1–2",
+        "baujahr": "1950–1977 (Tabelle 100,0 bei 1975, Zonen BJ 1975)",
+        "wohnflaeche": "75 m²",
+        "stellplatz": "vorhanden",
+        "vermietung": "unvermietet"
+      },
+      "merkmale": [
+        {
+          "id": "lagewert",
+          "name": "Lagewert",
+          "eingabe": "lagewert",
+          "art": "kurve",
+          "norm_feld": "BOWL",
+          "norm": 150,
+          "x": [
+            35,
+            50,
+            75,
+            100,
+            125,
+            150,
+            175,
+            200,
+            225,
+            250,
+            275,
+            300,
+            325,
+            350,
+            375,
+            400,
+            425,
+            450,
+            475,
+            500,
+            525,
+            550,
+            570
+          ],
+          "uk": [
+            0.3,
+            0.427,
+            0.571,
+            0.674,
+            0.753,
+            0.818,
+            0.873,
+            0.921,
+            0.962,
+            1,
+            1.034,
+            1.065,
+            1.093,
+            1.12,
+            1.144,
+            1.167,
+            1.189,
+            1.209,
+            1.229,
+            1.247,
+            1.264,
+            1.281,
+            1.294
+          ],
+          "uk_druck": "in Prozent gedruckt (100,0 = 1,000); hier durch 100 geteilt",
+          "seite": "GMB S. 72",
+          "interpolation_herkunft": "Die Tabelle ist die gedruckte Schreibweise der Regressionsfunktion des Ausschusses (UK = a + b·ln Lagewert) — zwischen den Stützstellen linear interpoliert, nie darüber hinaus."
+        },
+        {
+          "id": "wohnflaeche",
+          "name": "Wohnfläche",
+          "eingabe": "wohnflaeche",
+          "art": "kurve",
+          "norm_feld": "WHNFL",
+          "norm": 75,
+          "seite": "GMB S. 73",
+          "x": [
+            40,
+            45,
+            50,
+            55,
+            60,
+            65,
+            70,
+            75,
+            80,
+            85,
+            90,
+            95,
+            100,
+            105,
+            110,
+            115,
+            120,
+            125,
+            130,
+            135,
+            140,
+            145,
+            150,
+            155,
+            160,
+            165,
+            170
+          ],
+          "uk": [
+            0.937,
+            0.948,
+            0.958,
+            0.967,
+            0.976,
+            0.985,
+            0.993,
+            1,
+            1.007,
+            1.014,
+            1.02,
+            1.025,
+            1.03,
+            1.035,
+            1.039,
+            1.042,
+            1.046,
+            1.048,
+            1.05,
+            1.052,
+            1.053,
+            1.054,
+            1.054,
+            1.054,
+            1.053,
+            1.052,
+            1.05
+          ]
+        },
+        {
+          "id": "baujahr",
+          "name": "Baujahr",
+          "eingabe": "baujahr",
+          "art": "kurve",
+          "norm_feld": "BJ",
+          "norm": 1975,
+          "seite": "GMB S. 74",
+          "x": [
+            1870,
+            1880,
+            1890,
+            1900,
+            1910,
+            1920,
+            1930,
+            1940,
+            1950,
+            1960,
+            1970,
+            1975,
+            1980,
+            1990,
+            2000,
+            2010,
+            2020,
+            2021
+          ],
+          "uk": [
+            0.513,
+            0.56,
+            0.607,
+            0.655,
+            0.701,
+            0.748,
+            0.794,
+            0.84,
+            0.886,
+            0.932,
+            0.977,
+            1,
+            1.023,
+            1.068,
+            1.112,
+            1.157,
+            1.201,
+            1.205
+          ]
+        },
+        {
+          "id": "vollgeschosse",
+          "name": "Anzahl der Vollgeschosse",
+          "eingabe": "geschosse",
+          "art": "klassen",
+          "norm_feld": "ANZG",
+          "norm": "1 und 2",
+          "seite": "GMB S. 70 (Klassen) und S. 75",
+          "norm_zuordnung": {
+            "1-2": "1 und 2"
+          },
+          "klassen": [
+            {
+              "name": "1 und 2",
+              "von": 1,
+              "bis": 2,
+              "uk": 1
+            },
+            {
+              "name": "3",
+              "von": 3,
+              "bis": 3,
+              "uk": 0.946
+            },
+            {
+              "name": "4 bis 7",
+              "von": 4,
+              "bis": 7,
+              "uk": 0.871
+            },
+            {
+              "name": "größer 7",
+              "von": 8,
+              "bis": null,
+              "uk": 0.749
+            }
+          ]
+        },
+        {
+          "id": "stellplatz",
+          "name": "Stellplatzsituation",
+          "eingabe": [
+            "stellplatz_art",
+            "garage"
+          ],
+          "art": "kategorien",
+          "norm_feld": "GARSTP",
+          "norm": "vorhanden",
+          "seite": "GMB S. 75",
+          "zuordnung": {
+            "ja": "vorhanden",
+            "nein": "nicht vorhanden",
+            "garage": "vorhanden",
+            "tiefgarage": "vorhanden",
+            "carport": "vorhanden",
+            "stellplatz": "vorhanden",
+            "keiner": "nicht vorhanden"
+          },
+          "norm_zuordnung": {
+            "0": "nicht vorhanden",
+            "1": "vorhanden",
+            "2": "vorhanden",
+            "3": "vorhanden",
+            "4": "vorhanden"
+          },
+          "werte": {
+            "vorhanden": 1,
+            "nicht vorhanden": 0.958
+          }
+        },
+        {
+          "id": "vermietung",
+          "name": "Vermietungssituation",
+          "eingabe": "vermietet",
+          "art": "kategorien",
+          "norm_feld": "MIETS",
+          "norm": "nicht vermietet",
+          "seite": "GMB S. 75",
+          "zuordnung": {
+            "ja": "vermietet",
+            "nein": "nicht vermietet"
+          },
+          "norm_zuordnung": {
+            "1": "nicht vermietet",
+            "2": "vermietet"
+          },
+          "werte": {
+            "nicht vermietet": 1,
+            "vermietet": 0.934
+          }
+        }
+      ],
+      "hinweis_ausschuss": "Eine Wohnung im Dachgeschoss erhält den Wert für die Ebene über dem letzten Vollgeschoss (GMB S. 71); für die Geschosslage selbst veröffentlicht der Ausschuss keinen Koeffizienten."
+    },
+    "anwendungsbeispiel": {
+      "seite": "GMB S. 75–76",
+      "irw": 1000,
+      "norm_zone": {
+        "BOWL": "100",
+        "WHNFL": "75",
+        "BJ": "1975",
+        "ANZG": "1-2",
+        "GARSTP": "1",
+        "MIETS": "1"
+      },
+      "objekt": {
+        "lagewert": 125,
+        "wohnflaeche": 70,
+        "baujahr": 1960,
+        "geschosse": 3,
+        "garage": false,
+        "vermietet": true
+      },
+      "faktoren": {
+        "lagewert": 1.1172,
+        "wohnflaeche": 0.993,
+        "baujahr": 0.932,
+        "vollgeschosse": 0.946,
+        "stellplatz": 0.958,
+        "vermietung": 0.934
+      },
+      "faktoren_hinweis": "Quotienten der gedruckten UK: 75,3/67,4; 99,3/100; 93,2/100; 94,6/100; 95,8/100; 93,4/100",
+      "ergebnis_eur_qm": 875.19,
+      "toleranz_eur_qm": 1,
+      "wortlaut": "Gesamtumrechnungskoeffizient 75,3 / 67,4 * 99,3 / 100 * 93,2 / 100 * 94,6 / 100 * 95,8 / 100 * 93,4 / 100 = 0,87519 · Objektspezifisch angepasster Immobilienrichtwert (1.000 * 0,87519) = 875,19 €/m²"
+    },
+    "belege": [
+      "Örtliche Fachinformationen (LGDIR_1_0531400_2026.pdf, 1 Seite): Normobjekt Lagewert 150, Vollgeschosse 1–2, Baujahr 1950–1977, Wohnfläche 75 m², Stellplatz vorhanden, unvermietet; Umrechnungskoeffizienten „Siehe Grundstücksmarktbericht 2026\"; „Stellplätze und andere Nebenanlagen sind im Richtwert nicht enthalten.\"",
+      "Grundstücksmarktbericht 2026, Kap. 6.1.2 S. 70–76: Datenbeschreibung (2.063 Kauffälle, Weiterverkauf), Klassen Eigentume/Geschosse/Ebene (S. 70–71), Tabellen Lage (S. 72), Wohnfläche (S. 73), Baujahr (S. 74), Vollgeschosse, Stellplatz, Vermietung, Rechenvorschrift (S. 75), Beispiel (S. 75–76).",
+      "UK in Prozent gedruckt; Tabellen Lage/Wohnfläche/Baujahr sind Schreibweise der je abgedruckten Regressionsfunktion. Für Anzahl der Eigentume und Geschosslage (Ebene) sind Klassen beschrieben, aber keine Koeffizienten veröffentlicht — nicht umgerechnet. (Fundstelle: GMB_31400_2026.pdf, GMB S. 70–76, 96)",
+      "GMB 2026 Nr. 8.3 S. 96: „Beim Lagewert des Bewertungsgrundstücks handelt es sich um einen dimensionslosen und auf die konkrete Lage des Bewertungsobjektes bezogenen individuellen Wert. Demgegenüber kennzeichnet der Lagewert des Bodenrichtwertes einen allgemeinen auf ein fiktives Bodenrichtwertgrundstück bezogenen Wert. Dieser ist in der Beschreibung des Bodenrichtwertes im Geodatenportal des Kreises Lippe und in BORIS.NRW (als Lagebeurteilung) veröffentlicht.\" — Lagewert des Bewertungsgrundstücks = Lagewert des Bodenrichtwertes × Lageanpassungsfaktor (z. B. 100 × 0,9 = 90). Der Lagewert ist NICHT der Bodenrichtwert in €/m² — deshalb eigene Eingabe `lagewert`.",
+      "Widerspruch zur Rückfrage: Örtliche Fachinformationen „Stellplätze … im Richtwert nicht enthalten\", Normobjekt aber „Stellplatz vorhanden\" mit Koeffizient 0,958 für „nicht vorhanden\" (GMB S. 75). Geerntet wie gedruckt: Stellplatz als Merkmal, stellplaetze_im_irw = false.",
+      "GMB 2026 Nr. 8.6 S. 99 (Wertansatz für Nebengebäude, Neuwert, Erfahrungswerte des Ausschusses): Garage 5.000–25.000 €, Tiefgarage 10.000–30.000 €, Fahrrad in TG 6.000–9.000 €, Carport 7.000–16.000 €, Stellplatz 3.500–10.000 €, Gartenhaus bis 30 m³ 2.500–4.000 €.",
+      "GMB 2026 S. 2 (Lizenz): „Für den Grundstücksmarktbericht gilt die ,,Datenlizenz Deutschland -Zero - Version 2.0\" (dl-de/zero-2-0) … Jede Nutzung ist ohne Einschränkungen oder Bedingungen zulässig.\""
+    ],
+    "seite": "GMB S. 70–76, 96",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31400_2026.pdf",
+    "udok_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0531400_2026.pdf",
+    "modellansaetze": {
+      "teilmarkt_code": 1,
+      "brechv": 2,
+      "rundung_uk": 1,
+      "uk_einheit": "Prozent",
+      "normobjekt_quelle": "Örtliche Fachinformationen S. 1 und Zonenfelder BOWL/WHNFL/BJ/ANZG/GARSTP/MIETS",
+      "quelle_dokument": "Grundstücksmarktbericht 2026 (Verweis der Örtlichen Fachinformationen)"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": true,
+    "ags": "05766",
+    "gasl": "31400",
+    "gebiet_name": "Kreis Lippe und Stadt Detmold",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold",
+    "zweig": "mfh",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold, Grundstücksmarktbericht 2026, Kapitel 5.2.2 (BORIS-NRW), dl-de/zero-2-0",
+    "geltungsbereich": {
+      "teilmarkt": 4,
+      "objektarten": [
+        "mfh"
+      ],
+      "gemeinden": "alle 16 Städte und Gemeinden des Kreises Lippe (Augustdorf bis Schlangen) einschließlich Stadt Detmold",
+      "hinweis": "Drei- und Mehrfamilienhäuser (3 bis über 6 Einheiten). Für gemischt genutzte Gebäude wurden „keine Immobilienrichtwerte und keine Umrechnungskoeffizienten abgeleitet\" (GMB S. 65)."
+    },
+    "formel": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "interpolation": "linear zwischen den gedruckten Stützstellen (Tabellen sind Schreibweise einer Regressionsfunktion); Einheiten und Baujahr in Klassen",
+      "extrapolation": false,
+      "irw_lageangepasst": false,
+      "stellplaetze_im_irw": true,
+      "stellplaetze_hinweis": "Örtliche Fachinformationen S. 1: „Im Richtwert sind der Bodenwertanteil und Stellplätze sowie andere Nebenanlagen im üblichen Umfang enthalten.\"",
+      "garage_normobjekt": {
+        "enthalten": true,
+        "art": "Stellplätze sowie andere Nebenanlagen im üblichen Umfang",
+        "zeitwert_eur": null,
+        "warum_kein_betrag": "Der Ausschuss nennt für die im Richtwert enthaltenen Stellplätze keinen Betrag. GMB Nr. 8.6 (S. 99) nennt nur NEUWERTE (Stellplatz 3.500–10.000 €, Garage 5.000–25.000 €, Carport 7.000–16.000 €), keinen Zeitwert des Normobjekts.",
+        "abhaengig": null,
+        "seite": "Örtliche Fachinformationen S. 1",
+        "wortlaut": "Im Richtwert sind der Bodenwertanteil und Stellplätze sowie andere Nebenanlagen im üblichen Umfang enthalten.",
+        "geerntet": "2026-10-21 (v2680), aus LGDIR_4_0531400_2026.pdf Seite 1 und GMB 2026 S. 99 nachgelesen"
+      },
+      "normobjekt": {
+        "lagewert": "150 (Örtliche Fachinformationen; Zonen BOWL 80–360)",
+        "baugrundstuecksflaeche": "800 m²",
+        "durchschnittliche_wohnflaeche": "75 m² (Gesamtwohnfläche / Anzahl)",
+        "baujahr": "1950–1977",
+        "einheiten": "4–6"
+      },
+      "merkmale": [
+        {
+          "id": "lagewert",
+          "name": "Lagewert",
+          "eingabe": "lagewert",
+          "art": "kurve",
+          "norm_feld": "BOWL",
+          "norm": 150,
+          "x": [
+            40,
+            50,
+            75,
+            100,
+            125,
+            150,
+            175,
+            200,
+            225,
+            250,
+            275,
+            300,
+            325,
+            350,
+            375,
+            400,
+            425,
+            450,
+            475,
+            500,
+            525,
+            545
+          ],
+          "uk": [
+            0.427,
+            0.513,
+            0.671,
+            0.783,
+            0.869,
+            0.94,
+            1,
+            1.052,
+            1.098,
+            1.139,
+            1.176,
+            1.209,
+            1.241,
+            1.269,
+            1.296,
+            1.321,
+            1.345,
+            1.367,
+            1.388,
+            1.408,
+            1.427,
+            1.441
+          ],
+          "uk_druck": "in Prozent gedruckt (100,0 = 1,000); hier durch 100 geteilt",
+          "seite": "GMB S. 62",
+          "interpolation_herkunft": "Die Tabelle ist die gedruckte Schreibweise der Regressionsfunktion des Ausschusses (UK = a + b·ln Lagewert) — zwischen den Stützstellen linear interpoliert, nie darüber hinaus."
+        },
+        {
+          "id": "grundstuecksflaeche",
+          "name": "Baugrundstücksfläche",
+          "eingabe": "grundstuecksflaeche",
+          "art": "kurve",
+          "norm_feld": "FLAE",
+          "norm": 800,
+          "seite": "GMB S. 63",
+          "x": [
+            85,
+            100,
+            200,
+            300,
+            400,
+            500,
+            600,
+            700,
+            800,
+            900,
+            1000,
+            1100,
+            1200,
+            1300,
+            1400,
+            1500,
+            1600,
+            1700,
+            1800,
+            1900,
+            2000,
+            2100,
+            2200,
+            2300,
+            2400,
+            2500,
+            2600,
+            2700,
+            2800,
+            2900,
+            3000
+          ],
+          "uk": [
+            0.672,
+            0.695,
+            0.797,
+            0.856,
+            0.898,
+            0.931,
+            0.958,
+            0.98,
+            1,
+            1.017,
+            1.033,
+            1.047,
+            1.059,
+            1.071,
+            1.082,
+            1.092,
+            1.102,
+            1.11,
+            1.119,
+            1.127,
+            1.134,
+            1.141,
+            1.148,
+            1.155,
+            1.161,
+            1.167,
+            1.173,
+            1.178,
+            1.184,
+            1.189,
+            1.194
+          ]
+        },
+        {
+          "id": "einheiten",
+          "name": "Anzahl der Wohneinheiten",
+          "eingabe": "einheiten",
+          "art": "klassen",
+          "norm_feld": "WHNA",
+          "norm": "4 bis 6",
+          "seite": "GMB S. 63",
+          "norm_zuordnung": {
+            "4-6": "4 bis 6"
+          },
+          "klassen": [
+            {
+              "name": "3",
+              "von": 3,
+              "bis": 3,
+              "uk": 1.153
+            },
+            {
+              "name": "4 bis 6",
+              "von": 4,
+              "bis": 6,
+              "uk": 1
+            },
+            {
+              "name": "größer 6",
+              "von": 7,
+              "bis": null,
+              "uk": 0.818
+            }
+          ]
+        },
+        {
+          "id": "wohnflaeche_je_einheit",
+          "name": "Durchschnittliche Wohnfläche",
+          "eingabe": "wohnflaeche_je_einheit",
+          "art": "kurve",
+          "norm_feld": "WHNFL",
+          "norm": 75,
+          "seite": "GMB S. 64",
+          "x": [
+            30,
+            35,
+            40,
+            45,
+            50,
+            55,
+            60,
+            65,
+            70,
+            75,
+            80,
+            85,
+            90,
+            95,
+            100,
+            105,
+            110,
+            115,
+            120,
+            125,
+            130
+          ],
+          "uk": [
+            1.29,
+            1.241,
+            1.199,
+            1.162,
+            1.128,
+            1.098,
+            1.071,
+            1.045,
+            1.022,
+            1,
+            0.98,
+            0.96,
+            0.942,
+            0.925,
+            0.909,
+            0.893,
+            0.879,
+            0.865,
+            0.851,
+            0.838,
+            0.826
+          ],
+          "hinweis": "„Die durchschnittliche Wohnfläche ergibt sich aus der Gesamtwohnfläche / Anzahl der Einheiten.\" (GMB S. 62). Die Tabelle S. 64 ist in der Kopfzeile mit „Lagewert\" beschriftet — offensichtlich ein Druckfehler der Spaltenüberschrift (Überschrift, Regressionsfunktion „LN durchschnittliche Wohnfläche\" und Wertebereich 30–130 m² passen zur Wohnfläche); die Zahlen sind unberührt."
+        },
+        {
+          "id": "baujahr",
+          "name": "Baujahr",
+          "eingabe": "baujahr",
+          "art": "klassen",
+          "norm_feld": "BJ",
+          "norm": "1950 bis 1977",
+          "seite": "GMB S. 64",
+          "norm_zuordnung": {
+            "1950-1977": "1950 bis 1977"
+          },
+          "klassen": [
+            {
+              "name": "bis 1918",
+              "von": null,
+              "bis": 1918,
+              "uk": 0.889
+            },
+            {
+              "name": "1919 bis 1949",
+              "von": 1919,
+              "bis": 1949,
+              "uk": 0.944
+            },
+            {
+              "name": "1950 bis 1977",
+              "von": 1950,
+              "bis": 1977,
+              "uk": 1
+            },
+            {
+              "name": "1978 bis …",
+              "von": 1978,
+              "bis": null,
+              "uk": 1.096
+            }
+          ]
+        }
+      ]
+    },
+    "anwendungsbeispiel": {
+      "seite": "GMB S. 65",
+      "irw": 1000,
+      "norm_zone": {
+        "BOWL": "125",
+        "FLAE": "800",
+        "WHNA": "4-6",
+        "WHNFL": "75",
+        "BJ": "1950-1977"
+      },
+      "objekt": {
+        "lagewert": 150,
+        "grundstuecksflaeche": 700,
+        "einheiten": 3,
+        "baujahr": 1980,
+        "wohnflaeche_je_einheit": 70
+      },
+      "faktoren": {
+        "lagewert": 1.0817,
+        "grundstuecksflaeche": 0.98,
+        "einheiten": 1.153,
+        "baujahr": 1.096,
+        "wohnflaeche_je_einheit": 1.022
+      },
+      "faktoren_hinweis": "Quotienten der gedruckten UK: 94,0/86,9; 98,0/100; 115,3/100; 109,6/100; 102,2/100",
+      "ergebnis_eur_qm": 1369.07,
+      "toleranz_eur_qm": 1,
+      "wortlaut": "Gesamtumrechnungskoeffizient 94,0/86,9 *98,0/100 *115,3/100 *109,6/100 *102,2/100 = 1,36907 · Objektspezifisch angepasster Immobilienrichtwert (1.000 * 1,36907) = 1.369,07 €/m²"
+    },
+    "belege": [
+      "Örtliche Fachinformationen (LGDIR_4_0531400_2026.pdf, 1 Seite): Normobjekt Lagewert 150, Baugrundstücksfläche 800 m², durchschnittliche Wohnfläche 75 m², Baujahr 1950–1977, 4–6 Einheiten; „Im Richtwert sind der Bodenwertanteil und Stellplätze sowie andere Nebenanlagen im üblichen Umfang enthalten.\"; Umrechnungskoeffizienten „Siehe Grundstücksmarktbericht 2026\".",
+      "Grundstücksmarktbericht 2026, Kap. 5.2.2 S. 61–65: Datenbeschreibung (702 Kauffälle 1/2020–4/2024, Gemeinde, Lagewert 40–545, Fläche 85–3.000 m², Ø Wohnfläche 30–130 m²), Tabellen Lage (S. 62), Baugrundstücksfläche und Wohneinheiten (S. 63), Ø Wohnfläche und Baujahr (S. 64), Rechenvorschrift und Beispiel (S. 65).",
+      "UK in Prozent gedruckt; Lage-, Flächen- und Wohnflächentabelle sind Schreibweise der je abgedruckten Regressionsfunktion. Weniger als 3 Einheiten sind in der Tabelle nicht geführt.",
+      "GMB 2026 Nr. 8.3 S. 96: „Beim Lagewert des Bewertungsgrundstücks handelt es sich um einen dimensionslosen und auf die konkrete Lage des Bewertungsobjektes bezogenen individuellen Wert. Demgegenüber kennzeichnet der Lagewert des Bodenrichtwertes einen allgemeinen auf ein fiktives Bodenrichtwertgrundstück bezogenen Wert. Dieser ist in der Beschreibung des Bodenrichtwertes im Geodatenportal des Kreises Lippe und in BORIS.NRW (als Lagebeurteilung) veröffentlicht.\" — Lagewert des Bewertungsgrundstücks = Lagewert des Bodenrichtwertes × Lageanpassungsfaktor (z. B. 100 × 0,9 = 90). Der Lagewert ist NICHT der Bodenrichtwert in €/m² — deshalb eigene Eingabe `lagewert`.",
+      "Druckfehler S. 64: Spaltenkopf „Lagewert\" über der Tabelle der durchschnittlichen Wohnfläche — Zahlen unverändert übernommen.",
+      "GMB 2026 S. 2 (Lizenz): „Für den Grundstücksmarktbericht gilt die ,,Datenlizenz Deutschland -Zero - Version 2.0\" (dl-de/zero-2-0) … Jede Nutzung ist ohne Einschränkungen oder Bedingungen zulässig.\""
+    ],
+    "seite": "GMB S. 61–65, 96, 99",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31400_2026.pdf",
+    "udok_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_4_0531400_2026.pdf",
+    "modellansaetze": {
+      "teilmarkt_code": 4,
+      "brechv": 2,
+      "rundung_uk": 1,
+      "uk_einheit": "Prozent",
+      "normobjekt_quelle": "Örtliche Fachinformationen S. 1 und Zonenfelder BOWL/FLAE/WHNA/WHNFL/BJ",
+      "quelle_dokument": "Grundstücksmarktbericht 2026 (Verweis der Örtlichen Fachinformationen)"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": true,
+    "ags": "05774",
+    "gasl": "32100",
+    "gebiet_name": "Kreis Paderborn (ohne Stadt Paderborn)",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn",
+    "zweig": "efh_zfh",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
+    "geltungsbereich": {
+      "teilmarkt": 2,
+      "objektarten": [
+        "efh",
+        "zfh",
+        "dhh",
+        "rh"
+      ],
+      "gemeinden": "Altenbeken, Bad Lippspringe, Bad Wünnenberg, Borchen, Büren, Delbrück, Hövelhof, Lichtenau, Salzkotten (ohne Stadt Paderborn)",
+      "hinweis": "Ein Normobjekt für alle neun Städte/Gemeinden. Die Gebäudeart-Tabelle führt auch angebaute Häuser (DHH, RH); einen eigenen Teilmarkt 3 veröffentlicht der Ausschuss nicht."
+    },
+    "formel": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "interpolation": "keine (Klassen)",
+      "extrapolation": false,
+      "irw_lageangepasst": false,
+      "stellplaetze_im_irw": false,
+      "normobjekt": {
+        "baujahr": 1995,
+        "bodenrichtwert": "175 €/m²",
+        "wohnflaeche": "140–149 m²",
+        "grundstuecksgroesse": "650–799 m²",
+        "gebaeudeart": "freistehend",
+        "gebaeudestandard": "mittel"
+      },
+      "merkmale": [
+        {
+          "id": "baujahr",
+          "name": "Baujahr",
+          "eingabe": "baujahr",
+          "art": "klassen",
+          "norm_feld": "BJ",
+          "norm": "1990 – 1999",
+          "klassen": [
+            {
+              "name": "< 1960",
+              "von": null,
+              "bis": 1959,
+              "uk": 0.9
+            },
+            {
+              "name": "1960 – 1969",
+              "von": 1960,
+              "bis": 1969,
+              "uk": 0.9
+            },
+            {
+              "name": "1970 – 1979",
+              "von": 1970,
+              "bis": 1979,
+              "uk": 0.93
+            },
+            {
+              "name": "1980 – 1989",
+              "von": 1980,
+              "bis": 1989,
+              "uk": 0.93
+            },
+            {
+              "name": "1990 – 1999",
+              "von": 1990,
+              "bis": 1999,
+              "uk": 1
+            },
+            {
+              "name": "2000 – 2009",
+              "von": 2000,
+              "bis": 2009,
+              "uk": 1.08
+            },
+            {
+              "name": "2010 – 2019",
+              "von": 2010,
+              "bis": 2019,
+              "uk": 1.25
+            },
+            {
+              "name": "> 2019",
+              "von": 2020,
+              "bis": null,
+              "uk": 1.32
+            }
+          ]
+        },
+        {
+          "id": "bodenrichtwert",
+          "name": "Boden-/Lagewert",
+          "eingabe": "bodenrichtwert",
+          "art": "klassen",
+          "norm_feld": "BOWL",
+          "norm": "151 – 200 €/m²",
+          "runden": 0,
+          "klassen": [
+            {
+              "name": "< 51 €/m²",
+              "von": null,
+              "bis": 50,
+              "uk": 0.69
+            },
+            {
+              "name": "51 – 100 €/m²",
+              "von": 51,
+              "bis": 100,
+              "uk": 0.82
+            },
+            {
+              "name": "101 – 150 €/m²",
+              "von": 101,
+              "bis": 150,
+              "uk": 0.91
+            },
+            {
+              "name": "151 – 200 €/m²",
+              "von": 151,
+              "bis": 200,
+              "uk": 1
+            },
+            {
+              "name": "201 – 250 €/m²",
+              "von": 201,
+              "bis": 250,
+              "uk": 1.11
+            },
+            {
+              "name": "251 – 300 €/m²",
+              "von": 251,
+              "bis": 300,
+              "uk": 1.21
+            },
+            {
+              "name": "301 – 350 €/m²",
+              "von": 301,
+              "bis": 350,
+              "uk": 1.21
+            },
+            {
+              "name": "> 350 €/m²",
+              "von": 351,
+              "bis": null,
+              "uk": 1.26
+            }
+          ]
+        },
+        {
+          "id": "wohnflaeche",
+          "name": "Wohnfläche",
+          "eingabe": "wohnflaeche",
+          "art": "klassen",
+          "norm_feld": "WHNFL",
+          "norm": "140 – 149 m²",
+          "runden": 0,
+          "norm_zuordnung": {
+            "140-149": "140 – 149 m²"
+          },
+          "klassen": [
+            {
+              "name": "< 100 m²",
+              "von": null,
+              "bis": 99,
+              "uk": 1.23
+            },
+            {
+              "name": "100 – 109 m²",
+              "von": 100,
+              "bis": 109,
+              "uk": 1.2
+            },
+            {
+              "name": "110 – 119 m²",
+              "von": 110,
+              "bis": 119,
+              "uk": 1.13
+            },
+            {
+              "name": "120 – 129 m²",
+              "von": 120,
+              "bis": 129,
+              "uk": 1.08
+            },
+            {
+              "name": "130 – 139 m²",
+              "von": 130,
+              "bis": 139,
+              "uk": 1
+            },
+            {
+              "name": "140 – 149 m²",
+              "von": 140,
+              "bis": 149,
+              "uk": 1
+            },
+            {
+              "name": "150 – 160 m²",
+              "von": 150,
+              "bis": 160,
+              "uk": 0.95
+            },
+            {
+              "name": "161 – 170 m²",
+              "von": 161,
+              "bis": 170,
+              "uk": 0.91
+            },
+            {
+              "name": "171 – 180 m²",
+              "von": 171,
+              "bis": 180,
+              "uk": 0.89
+            },
+            {
+              "name": "181 – 190 m²",
+              "von": 181,
+              "bis": 190,
+              "uk": 0.86
+            },
+            {
+              "name": "191 – 200 m²",
+              "von": 191,
+              "bis": 200,
+              "uk": 0.83
+            },
+            {
+              "name": "201 – 250 m²",
+              "von": 201,
+              "bis": 250,
+              "uk": 0.78
+            },
+            {
+              "name": "> 250 m²",
+              "von": 251,
+              "bis": null,
+              "uk": 0.67
+            }
+          ]
+        },
+        {
+          "id": "grundstuecksflaeche",
+          "name": "Grundstücksgröße",
+          "eingabe": "grundstuecksflaeche",
+          "art": "klassen",
+          "norm_feld": "FLAE",
+          "norm": "650 – 799 m²",
+          "runden": 0,
+          "norm_zuordnung": {
+            "650-799": "650 – 799 m²"
+          },
+          "klassen": [
+            {
+              "name": "< 350 m²",
+              "von": null,
+              "bis": 349,
+              "uk": 0.79
+            },
+            {
+              "name": "350 – 499 m²",
+              "von": 350,
+              "bis": 499,
+              "uk": 0.86
+            },
+            {
+              "name": "500 – 649 m²",
+              "von": 500,
+              "bis": 649,
+              "uk": 0.95
+            },
+            {
+              "name": "650 – 799 m²",
+              "von": 650,
+              "bis": 799,
+              "uk": 1
+            },
+            {
+              "name": "> 799 m²",
+              "von": 800,
+              "bis": null,
+              "uk": 1.04
+            }
+          ]
+        },
+        {
+          "id": "gebaeudeart",
+          "name": "Gebäudeart",
+          "eingabe": "anbauweise",
+          "art": "kategorien",
+          "norm_feld": "EGART",
+          "norm": "freistehend",
+          "zuordnung": {
+            "freistehend": "freistehend",
+            "doppelhaushaelfte": "angebaut (DHH)",
+            "reihenendhaus": "angebaut (RH)",
+            "reihenmittelhaus": "angebaut (RH)"
+          },
+          "zuordnung_herkunft": "Das Dokument unterscheidet nur „angebaut (RH)\" — Reihenend- und Reihenmittelhaus sind beide Reihenhäuser.",
+          "norm_zuordnung": {
+            "1": "freistehend",
+            "2": "angebaut (DHH)",
+            "4": "angebaut (RH)",
+            "5": "angebaut (RH)"
+          },
+          "werte": {
+            "freistehend": 1,
+            "angebaut (DHH)": 0.97,
+            "angebaut (RH)": 0.94
+          }
+        },
+        {
+          "id": "gebaeudestandard",
+          "name": "Gebäudestandard",
+          "eingabe": "standardstufe",
+          "art": "klassen",
+          "norm_feld": "GSTAND",
+          "norm": "mittel",
+          "runden": 1,
+          "norm_zuordnung": {
+            "1": "sehr einfach",
+            "3": "einfach",
+            "5": "mittel",
+            "7": "gehoben",
+            "8": "gehoben",
+            "9": "gehoben",
+            "10": "gehoben"
+          },
+          "zuordnung_herkunft": "Dokument S. 3: gehoben = Standardstufe 4 und 5, mittel = 3, einfach = 2, sehr einfach = 1. Bänder der Standardstufe nach IRW-Datenmodell NRW Feld 60 (Stufe 1 [1,0–1,2] = sehr einfach, 2 [1,8–2,2] = einfach, 3 [2,8–3,2] = mittel, 4 [3,8–4,2] = gehoben); Zwischenwerte (z. B. 2,3–2,7) ordnet das Dokument keiner Klasse zu → kein Wert; „4 und 5\" umfasst 3,8–5,0.",
+          "klassen": [
+            {
+              "name": "sehr einfach",
+              "von": 1,
+              "bis": 1.2,
+              "uk": 0.64
+            },
+            {
+              "name": "einfach",
+              "von": 1.8,
+              "bis": 2.2,
+              "uk": 0.83
+            },
+            {
+              "name": "mittel",
+              "von": 2.8,
+              "bis": 3.2,
+              "uk": 1
+            },
+            {
+              "name": "gehoben",
+              "von": 3.8,
+              "bis": 5,
+              "uk": 1.04
+            }
+          ]
+        }
+      ]
+    },
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt „Ein- und Zweifamilienhäuser\" (3 Seiten): S. 1 Normobjekt für alle neun Städte/Gemeinden (Baujahr 1995, Boden-/Lagewert 175 €/m², Wohnfläche 140–149 m², Grundstücksgröße 650–799 m², freistehend, mittel); S. 2 Umrechnungskoeffizienten (gerundet auf zwei Nachkommastellen) Baujahr, Boden-/Lagewert, Wohnfläche, Grundstücksgröße, Gebäudeart; S. 3 Gebäudestandard und Zuordnung zur Standardstufe.",
+      "Kein Anwendungsbeispiel im Dokument (alle 3 Seitenbilder durchgesehen) — geprüft sind Aufbau und Normbezug (1,00 am Normobjekt).",
+      "Stellplätze/Garagen: Dokument schweigt zu Stellplätzen. (Fundstelle: LGDIR_2_0532100_2026.pdf, S. 1–3)",
+      "Bei der Grundstücksfläche „sind selbstständig verwertbare Grundstücksteile nicht zu berücksichtigen, sondern nur die Baugrundstücksfläche anzubringen\" (S. 1)."
+    ],
+    "seite": "S. 1–3",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_2_0532100_2026.pdf",
+    "modellansaetze": {
+      "teilmarkt_code": 2,
+      "brechv": 2,
+      "rundung_uk": 2,
+      "normobjekt_quelle": "PDF S. 1 und Zonenfelder BJ/BOWL/WHNFL/FLAE/EGART/GSTAND"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": true,
+    "ags": "05774",
+    "gasl": "32100",
+    "gebiet_name": "Kreis Paderborn (ohne Stadt Paderborn)",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn",
+    "zweig": "etw",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
+    "geltungsbereich": {
+      "teilmarkt": 1,
+      "objektarten": [
+        "etw"
+      ],
+      "gemeinden": "Altenbeken, Bad Lippspringe, Bad Wünnenberg, Borchen, Büren, Delbrück, Hövelhof, Lichtenau, Salzkotten (ohne Stadt Paderborn)",
+      "hinweis": "In Altenbeken, Büren, Bad Wünnenberg und Lichtenau gleicher Immobilienrichtwert (Ortsteile zusammengefasst, S. 1)."
+    },
+    "zweifel": [
+      {
+        "bei": "Wohnfläche 60 m²",
+        "grund": "Die Klassen lauten „< 60 m²\" und „61 – 100 m²\" — 60 m² ist in keiner Klasse; dort rechnet der Kern nicht (ausserhalb).",
+        "seite": "S. 2"
+      }
+    ],
+    "formel": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "interpolation": "keine (Klassen)",
+      "extrapolation": false,
+      "irw_lageangepasst": false,
+      "stellplaetze_im_irw": false,
+      "normobjekt": {
+        "baujahr": 1995,
+        "bodenrichtwert": "225 €/m²",
+        "wohnflaeche": "61–100 m²",
+        "wohneinheiten": "6–10"
+      },
+      "merkmale": [
+        {
+          "id": "baujahr",
+          "name": "Baujahr",
+          "eingabe": "baujahr",
+          "art": "klassen",
+          "norm_feld": "BJ",
+          "norm": "1990 – 1999",
+          "klassen": [
+            {
+              "name": "< 1970",
+              "von": null,
+              "bis": 1969,
+              "uk": 0.81
+            },
+            {
+              "name": "1970 – 1979",
+              "von": 1970,
+              "bis": 1979,
+              "uk": 0.88
+            },
+            {
+              "name": "1980 – 1989",
+              "von": 1980,
+              "bis": 1989,
+              "uk": 0.88
+            },
+            {
+              "name": "1990 – 1999",
+              "von": 1990,
+              "bis": 1999,
+              "uk": 1
+            },
+            {
+              "name": "2000 – 2009",
+              "von": 2000,
+              "bis": 2009,
+              "uk": 1.17
+            },
+            {
+              "name": "2010 – 2019",
+              "von": 2010,
+              "bis": 2019,
+              "uk": 1.34
+            },
+            {
+              "name": "> 2019",
+              "von": 2020,
+              "bis": null,
+              "uk": 1.7
+            }
+          ]
+        },
+        {
+          "id": "bodenrichtwert",
+          "name": "Boden-/Lagewert",
+          "eingabe": "bodenrichtwert",
+          "art": "klassen",
+          "norm_feld": "BOWL",
+          "norm": "201 – 250 €/m²",
+          "runden": 0,
+          "klassen": [
+            {
+              "name": "< 51 €/m²",
+              "von": null,
+              "bis": 50,
+              "uk": 0.81
+            },
+            {
+              "name": "51 – 100 €/m²",
+              "von": 51,
+              "bis": 100,
+              "uk": 0.82
+            },
+            {
+              "name": "101 – 150 €/m²",
+              "von": 101,
+              "bis": 150,
+              "uk": 0.82
+            },
+            {
+              "name": "151 – 200 €/m²",
+              "von": 151,
+              "bis": 200,
+              "uk": 0.82
+            },
+            {
+              "name": "201 – 250 €/m²",
+              "von": 201,
+              "bis": 250,
+              "uk": 1
+            },
+            {
+              "name": "251 – 300 €/m²",
+              "von": 251,
+              "bis": 300,
+              "uk": 1.04
+            },
+            {
+              "name": "301 – 350 €/m²",
+              "von": 301,
+              "bis": 350,
+              "uk": 1.06
+            },
+            {
+              "name": "> 350 €/m²",
+              "von": 351,
+              "bis": null,
+              "uk": 1.06
+            }
+          ]
+        },
+        {
+          "id": "wohnflaeche",
+          "name": "Wohnfläche",
+          "eingabe": "wohnflaeche",
+          "art": "klassen",
+          "norm_feld": "WHNFL",
+          "norm": "61 – 100 m²",
+          "runden": 0,
+          "norm_zuordnung": {
+            "61-100": "61 – 100 m²"
+          },
+          "klassen": [
+            {
+              "name": "< 60 m²",
+              "von": null,
+              "bis": 59,
+              "uk": 1.02
+            },
+            {
+              "name": "61 – 100 m²",
+              "von": 61,
+              "bis": 100,
+              "uk": 1
+            },
+            {
+              "name": "> 100 m²",
+              "von": 101,
+              "bis": null,
+              "uk": 1
+            }
+          ]
+        }
+      ],
+      "nicht_umgerechnet": "Anzahl der Wohneinheiten (> 10 / 6 – 10 / < 6): alle Koeffizienten 1,00 (S. 2) — als Merkmal nicht geführt, damit eine fehlende Angabe die Umrechnung nicht sperrt; das Ergebnis ist in jedem Fall 1,00."
+    },
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt „Eigentumswohnungen\" (2 Seiten): S. 1 Normobjekt (Baujahr 1995, Boden-/Lagewert 225 €/m², Wohnfläche 61–100 m², 6–10 Wohneinheiten); S. 2 Umrechnungskoeffizienten (gerundet auf zwei Nachkommastellen) Baujahr, Boden-/Lagewert, Wohnfläche, Anzahl der Wohneinheiten.",
+      "Kein Anwendungsbeispiel im Dokument (beide Seitenbilder durchgesehen). Kein Gebäudestandard-Merkmal für Eigentumswohnungen. (Fundstelle: LGDIR_1_0532100_2026.pdf, S. 1–2)",
+      "Lücke S. 2: Wohnfläche „< 60 m²\" / „61 – 100 m²\" — 60 m² nicht zugeordnet (zweifel); nicht korrigiert.",
+      "Stellplätze/Garagen: Dokument schweigt zu Stellplätzen. (Fundstelle: LGDIR_1_0532100_2026.pdf, S. 1–2)"
+    ],
+    "seite": "S. 1–2",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0532100_2026.pdf",
+    "modellansaetze": {
+      "teilmarkt_code": 1,
+      "brechv": 2,
+      "rundung_uk": 2,
+      "normobjekt_quelle": "PDF S. 1 und Zonenfelder BJ/BOWL/WHNFL"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": false,
+    "ags": "05774032",
+    "gasl": "27000",
+    "gebiet_name": "Stadt Paderborn",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+    "zweig": "etw",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
+    "seite": "S. 1–6",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0527000_2026.pdf",
+    "geltungsbereich": {
+      "teilmarkt": 1,
+      "objektarten": [
+        "etw"
+      ],
+      "gemeinden": "Stadt Paderborn",
+      "hinweis": "Jede Immobilienrichtwertzone hat ein eigenes Normobjekt (Lagewert und Baujahr)."
+    },
+    "warum_kein_wert": "Das Dokument druckt nur AUSSCHNITTE der Umrechnungstabellen („Im Folgenden sind Ausschnitte der Tabellen der Umrechnungskoeffizienten für verhältnisskalierte Variablen aufgeführt\"): Baujahr nur als Matrix 1992–2000 × 1992–2000 (S. 3), Lagewert nur 510–550 €/m² × 510–550 €/m² (S. 4), Wohnfläche 25–125 m² gegen Richtwertobjekt 71 m² (S. 4–5), Anzahl der Wohneinheiten 4–14 (S. 2–3). Die Normobjekte der Zonen liegen überwiegend außerhalb dieser Ausschnitte (Zonen-Lagewerte BOWL 204–710, keiner zwischen 510 und 550; Zonen-Baujahre 1980–2025, nur 6 von 17 zwischen 1992 und 2000), und das Anwendungsbeispiel des Dokuments rechnet mit Werten, die in keinem Ausschnitt stehen (Zone 2040, Lagewert 577 gegen 580 mit 1,025/1,027, Baujahr 1992 gegen 1994 mit 0,930/0,965 — Grundwerte einer Kurve, die nicht abgedruckt ist). Die vollständigen Tabellen veröffentlicht der Ausschuss nur im Immobilien-Preis-Kalkulator von BORIS-NRW — Weg: https://www.boris.nrw.de (Immobilienrichtwerte → Immobilien-Preis-Kalkulator, Stadt Paderborn) oder Geschäftsstelle des Gutachterausschusses der Stadt Paderborn.",
+    "formel_vorgemerkt": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "extrapolation": false,
+      "stellplaetze_im_irw": true,
+      "stellplaetze_wortlaut": "Die Immobilienrichtwerte … beinhalten einen Garagenstellplatz (Einstellplatz in Garage oder Tiefgarage), beinhalten keine weiteren Stellplätze (Außenstellplatz oder Stellplatz im Carport) (S. 1)",
+      "hinweis": "Abweichungen der wertbestimmenden Merkmale zwischen dem Richtwertobjekt und dem Wertermittlungsobjekt werden durch Umrechnungskoeffizienten berücksichtigt, wobei Extrapolationen nicht zulässig sind.",
+      "vollstaendige_tabellen": [
+        {
+          "id": "geschosslage",
+          "eingabe": "geschoss",
+          "art": "kategorien",
+          "norm_feld": "GESLA",
+          "norm": "Obergeschoss",
+          "seite": "S. 2",
+          "werte": {
+            "Erdgeschoss": 1.006,
+            "Obergeschoss": 1,
+            "Dachgeschoss": 0.922,
+            "Penthouse": 1.022
+          }
+        },
+        {
+          "id": "garage",
+          "eingabe": [
+            "stellplatz_art",
+            "garage"
+          ],
+          "art": "kategorien",
+          "norm_feld": "GARSTP",
+          "norm": "vorhanden",
+          "seite": "S. 2",
+          "werte": {
+            "vorhanden": 1,
+            "nicht vorhanden": 0.958
+          }
+        },
+        {
+          "id": "bezugsjahr",
+          "art": "stichtag",
+          "seite": "S. 2",
+          "norm": 2025,
+          "werte": {
+            "2023": 0.942,
+            "2024": 0.959,
+            "2025": 1
+          }
+        }
+      ],
+      "ausschnitte": [
+        {
+          "id": "einheiten",
+          "eingabe": "einheiten",
+          "art": "kurve",
+          "norm_feld": "WHNA",
+          "seite": "S. 2–3",
+          "kopf": "Richtwertobjekt 26 (Druckfehler? Wert 1 steht bei 8; Zonen WHNA 8, Beispiel 8 → 1)",
+          "x": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "uk": [
+            1.003,
+            1.002,
+            1.002,
+            1.001,
+            1,
+            0.999,
+            0.998,
+            0.998,
+            0.997,
+            0.996,
+            0.995
+          ]
+        },
+        {
+          "id": "baujahr",
+          "art": "matrix",
+          "norm_feld": "BJ",
+          "seite": "S. 3",
+          "kategorien": [
+            "1992",
+            "1993",
+            "1994",
+            "1995",
+            "1996",
+            "1997",
+            "1998",
+            "1999",
+            "2000"
+          ],
+          "hinweis": "Matrix Bewertungsobjekt × Richtwertobjekt, je Spalte 1 auf der Diagonale; Zeile 1992: 1, 0,982, 0,965, 0,948, 0,932, 0,916, 0,901, 0,886, 0,872"
+        },
+        {
+          "id": "lagewert",
+          "art": "matrix",
+          "norm_feld": "BOWL",
+          "seite": "S. 4",
+          "kategorien": [
+            "510",
+            "515",
+            "520",
+            "525",
+            "530",
+            "535",
+            "540",
+            "545",
+            "550"
+          ],
+          "hinweis": "Zeile 510: 1, 0,997, 0,995, 0,992, 0,989, 0,986, 0,984, 0,981, 0,978; „Als Lagewert ist der zum 01.01. des Bezugsjahres (hier: 2025) abgeleitete Bodenrichtwert heranzuziehen, wobei für die Innenstadt (innerer Ring) 870 €/m² gelten.\""
+        },
+        {
+          "id": "wohnflaeche",
+          "eingabe": "wohnflaeche",
+          "art": "kurve",
+          "norm_feld": "WHNFL",
+          "seite": "S. 4–5",
+          "kopf": "Richtwertobjekt 71",
+          "x": [
+            25,
+            30,
+            35,
+            40,
+            45,
+            50,
+            55,
+            60,
+            65,
+            70,
+            75,
+            80,
+            85,
+            90,
+            95,
+            100,
+            105,
+            110,
+            115,
+            120,
+            125
+          ],
+          "uk": [
+            1.016,
+            1.014,
+            1.013,
+            1.011,
+            1.009,
+            1.007,
+            1.006,
+            1.004,
+            1.002,
+            1,
+            0.999,
+            0.997,
+            0.995,
+            0.993,
+            0.992,
+            0.99,
+            0.988,
+            0.986,
+            0.985,
+            0.983,
+            0.981
+          ]
+        }
+      ],
+      "anwendungsbeispiel": {
+        "seite": "S. 6",
+        "irw": 3200,
+        "zone": 2040,
+        "bereich": "Kernstadt, Ost",
+        "zeilen": "Einheiten 8/10: 1/0,998 → 0,998 · Bezugsjahr 2025/2025 → 1 · Baujahr 1992/1994: 0,930/0,965 → 1,037 · Lagewert 577/580: 1,025/1,027 → 1,002 · Wohnfläche 71/105: 1/0,988 → 0,988 · Geschosslage Obergeschoss/Dachgeschoss → 0,922 · Garage vorhanden/nicht vorhanden → 0,958",
+        "ergebnis_eur_qm": 2900,
+        "ergebnis_eur": 300000,
+        "rundung": "gerundet"
+      }
+    },
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Eigentumswohnungen (6 Seiten): S. 1 Hinweise (je Zone ein Normobjekt, Garagenstellplatz enthalten, keine Extrapolation), S. 2 Geschosslage, Garage, Bezugsjahr, Wohneinheiten (Ausschnitt), S. 3 Baujahr-Matrix (Ausschnitt), S. 4–5 Lagewert-Matrix und Wohnfläche (Ausschnitte), S. 6 Beispielrechnung.",
+      "S. 2: „Im Folgenden sind Ausschnitte der Tabellen der Umrechnungskoeffizienten für verhältnisskalierte Variablen aufgeführt.\"",
+      "Zonen (Shape IRW_2026, 17 Zonen): BOWL 204, 330, 342, 354, 398, 404, 413, 419, 469, 477, 503, 577, 599, 655, 666, 710; BJ 1980–2025; WHNFL 71; WHNA 8; GESLA 1; GARSTP 4.",
+      "Auffällig: Kopf der Wohneinheiten-Tabelle „Richtwertobjekt 26\", der Wert 1 steht aber bei 8 (Zonen und Beispiel: 8)."
+    ],
+    "modellansaetze": {
+      "teilmarkt_code": 1,
+      "rundung_uk": 3,
+      "brechv": 2,
+      "fehlend": "vollständige Tabellen (nur Ausschnitte gedruckt)"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": false,
+    "ags": "05774032",
+    "gasl": "27000",
+    "gebiet_name": "Stadt Paderborn",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+    "zweig": "efh_zfh",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
+    "seite": "S. 1–6",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_2_0527000_2026.pdf",
+    "geltungsbereich": {
+      "teilmarkt": 2,
+      "objektarten": [
+        "efh",
+        "zfh"
+      ],
+      "gemeinden": "Stadt Paderborn",
+      "hinweis": "Jede Immobilienrichtwertzone hat ein eigenes Normobjekt (Lagewert und Baujahr)."
+    },
+    "warum_kein_wert": "Das Dokument druckt nur AUSSCHNITTE der Umrechnungstabellen („Im Folgenden sind Ausschnitte der Tabellen der Umrechnungskoeffizienten für verhältnisskalierte Variablen aufgeführt\"): Baujahr nur als Matrix 1975–1983 × 1975–1983 (S. 2), Lagewert nur 420–460 €/m² × 420–460 €/m² (S. 3), Wohnfläche 112–212 m² gegen Richtwertobjekt 162 m² (S. 4), Baulandfläche 635–735 m² gegen 679 m² (S. 5). Die Normobjekte der Zonen liegen überwiegend außerhalb dieser Ausschnitte (Zonen-Lagewerte BOWL 246–660, nur 433 und 437 im Bereich 420–460 und beide keine Stützstelle der Matrix; Zonen-Baujahre 1971–1987), und das Anwendungsbeispiel des Dokuments rechnet mit Werten, die in keinem Ausschnitt stehen (Zone 4100 Schloß Neuhaus, Lagewert 437 gegen 400 mit 0,994/0,941, Baulandfläche 750 mit 1,037, Wohnfläche 130 mit 1,121/1,002). Die vollständigen Tabellen veröffentlicht der Ausschuss nur im Immobilien-Preis-Kalkulator von BORIS-NRW — Weg: https://www.boris.nrw.de (Immobilienrichtwerte → Immobilien-Preis-Kalkulator, Stadt Paderborn) oder Geschäftsstelle des Gutachterausschusses der Stadt Paderborn.",
+    "formel_vorgemerkt": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "extrapolation": false,
+      "stellplaetze_im_irw": true,
+      "stellplaetze_wortlaut": "Die Immobilienrichtwerte … enthalten Stellplätze (Außenstellplatz, Garagen- oder Carportstellplatz) im üblichen Rahmen (S. 1)",
+      "hinweis": "Abweichungen der wertbestimmenden Merkmale zwischen dem Richtwertobjekt und dem Wertermittlungsobjekt werden durch Umrechnungskoeffizienten berücksichtigt, wobei Extrapolationen nicht zulässig sind.",
+      "vollstaendige_tabellen": [
+        {
+          "id": "gebaeudeart",
+          "eingabe": "gebaeudeart",
+          "art": "kategorien",
+          "norm_feld": "GART",
+          "norm": "Einfamilienhaus",
+          "seite": "S. 2",
+          "werte": {
+            "Einfamilienhaus": 1,
+            "Einfamilienhaus mit Einliegerwohnung": 0.908,
+            "Zweifamilienhaus": 0.909
+          }
+        },
+        {
+          "id": "bezugsjahr",
+          "art": "stichtag",
+          "seite": "S. 2",
+          "norm": 2025,
+          "werte": {
+            "2021": 1.172,
+            "2022": 1.163,
+            "2023": 1.001,
+            "2024": 1.011,
+            "2025": 1
+          }
+        }
+      ],
+      "ausschnitte": [
+        {
+          "id": "baujahr",
+          "art": "matrix",
+          "norm_feld": "BJ",
+          "seite": "S. 2",
+          "kategorien": [
+            "1975",
+            "1976",
+            "1977",
+            "1978",
+            "1979",
+            "1980",
+            "1981",
+            "1982",
+            "1983"
+          ],
+          "hinweis": "Zeile 1975: 1, 0,991, 0,982, 0,973, 0,965, 0,956, 0,948, 0,940, 0,932"
+        },
+        {
+          "id": "lagewert",
+          "art": "matrix",
+          "norm_feld": "BOWL",
+          "seite": "S. 3",
+          "kategorien": [
+            "420",
+            "425",
+            "430",
+            "435",
+            "440",
+            "445",
+            "450",
+            "455",
+            "460"
+          ],
+          "hinweis": "Zeile 420: 1, 0,993, 0,985, 0,978, 0,971, 0,964, 0,957, 0,951, 0,944; Lagewert = Bodenrichtwert zum 01.01. des Bezugsjahres (2025)"
+        },
+        {
+          "id": "wohnflaeche",
+          "eingabe": "wohnflaeche",
+          "art": "kurve",
+          "norm_feld": "WHNFL",
+          "seite": "S. 4",
+          "kopf": "Richtwertobjekt 162",
+          "x": [
+            112,
+            117,
+            122,
+            127,
+            132,
+            137,
+            142,
+            147,
+            152,
+            157,
+            162,
+            167,
+            172,
+            177,
+            182,
+            187,
+            192,
+            197,
+            202,
+            207,
+            212
+          ],
+          "uk": [
+            1.187,
+            1.169,
+            1.15,
+            1.131,
+            1.112,
+            1.094,
+            1.075,
+            1.056,
+            1.037,
+            1.019,
+            1,
+            0.981,
+            0.963,
+            0.944,
+            0.925,
+            0.906,
+            0.888,
+            0.869,
+            0.85,
+            0.831,
+            0.813
+          ]
+        },
+        {
+          "id": "grundstuecksflaeche",
+          "eingabe": "grundstuecksflaeche",
+          "art": "kurve",
+          "norm_feld": "FLAE",
+          "seite": "S. 5",
+          "kopf": "Richtwertobjekt 679",
+          "x": [
+            635,
+            640,
+            645,
+            650,
+            655,
+            660,
+            665,
+            670,
+            675,
+            680,
+            685,
+            690,
+            695,
+            700,
+            705,
+            710,
+            715,
+            720,
+            725,
+            730,
+            735
+          ],
+          "uk": [
+            0.977,
+            0.98,
+            0.982,
+            0.985,
+            0.988,
+            0.99,
+            0.993,
+            0.995,
+            0.998,
+            1.001,
+            1.003,
+            1.006,
+            1.008,
+            1.011,
+            1.013,
+            1.016,
+            1.019,
+            1.021,
+            1.024,
+            1.026,
+            1.029
+          ]
+        }
+      ],
+      "anwendungsbeispiel": {
+        "seite": "S. 6",
+        "irw": 3200,
+        "zone": 4100,
+        "bereich": "Schloß Neuhaus",
+        "zeilen": "Gebäudeart EFH/ZFH → 0,909 · Bezugsjahr 2025/2022 → 1,163 · Baujahr 1981/1982: 1,014/1,022 → 1,009 · Lagewert 437/400: 0,994/0,941 → 0,946 · Wohnfläche 162/130: 1,002/1,121 → 1,120 · Baulandfläche 679/750: 1,000/1,037 → 1,037",
+        "ergebnis_eur_qm": 3750,
+        "ergebnis_eur": 490000,
+        "rundung": "gerundet"
+      }
+    },
+    "belege": [
+      "Örtliche Fachinformationen für den Teilmarkt Ein- und Zweifamilienhäuser, freistehend (6 Seiten): S. 1 Hinweise (Stellplätze im üblichen Rahmen enthalten, keine Extrapolation), S. 2 ergänzende Gebäudeart, Bezugsjahr, Baujahr-Matrix (Ausschnitt), S. 3 Lagewert-Matrix (Ausschnitt), S. 4 Wohnfläche (Ausschnitt), S. 5 Baulandfläche (Ausschnitt), S. 6 Beispielrechnung.",
+      "Zonen (Shape IRW_2026, 17 Zonen): BOWL 246–660, BJ 1971–1987, WHNFL 162, FLAE 679, GART 13."
+    ],
+    "modellansaetze": {
+      "teilmarkt_code": 2,
+      "rundung_uk": 3,
+      "brechv": 2,
+      "fehlend": "vollständige Tabellen (nur Ausschnitte gedruckt)"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": false,
+    "ags": "05774032",
+    "gasl": "27000",
+    "gebiet_name": "Stadt Paderborn",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+    "zweig": "rh_dhh",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
+    "seite": "S. 1–5",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_3_0527000_2026.pdf",
+    "geltungsbereich": {
+      "teilmarkt": 3,
+      "objektarten": [
+        "dhh",
+        "rh"
+      ],
+      "gemeinden": "Stadt Paderborn",
+      "hinweis": "Jede Immobilienrichtwertzone hat ein eigenes Normobjekt (Lagewert und Baujahr)."
+    },
+    "warum_kein_wert": "Das Dokument druckt nur AUSSCHNITTE der Umrechnungstabellen („Im Folgenden sind Ausschnitte der Tabellen der Umrechnungskoeffizienten für verhältnisskalierte Variablen aufgeführt\"): Baujahr nur als Matrix 1989–1997 × 1989–1997 (S. 2), Lagewert nur 430–470 €/m² × 430–470 €/m² (S. 3), Wohnfläche 80–180 m² gegen Richtwertobjekt 128 m² (S. 3–4), Baulandfläche 270–370 m² gegen 313 m² (S. 4). Die Normobjekte der Zonen liegen überwiegend außerhalb dieser Ausschnitte (Zonen-Lagewerte BOWL 229–665, nur 448, 460 und 463 im Bereich 430–470, davon nur 460 eine Stützstelle; Zonen-Baujahre 1975–2022), und das Anwendungsbeispiel des Dokuments rechnet mit Werten, die in keinem Ausschnitt stehen (Zone 6030 Kernstadt Stadtheide, Baujahr 1995 gegen 1983 mit 1,013/0,933, Lagewert 472 gegen 450 mit 1,014/1,001). Die vollständigen Tabellen veröffentlicht der Ausschuss nur im Immobilien-Preis-Kalkulator von BORIS-NRW — Weg: https://www.boris.nrw.de (Immobilienrichtwerte → Immobilien-Preis-Kalkulator, Stadt Paderborn) oder Geschäftsstelle des Gutachterausschusses der Stadt Paderborn.",
+    "formel_vorgemerkt": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "extrapolation": false,
+      "stellplaetze_im_irw": true,
+      "stellplaetze_wortlaut": "Die Immobilienrichtwerte … enthalten Stellplätze (Außenstellplatz, Garagen- oder Carportstellplatz) im üblichen Rahmen (S. 1)",
+      "hinweis": "Abweichungen der wertbestimmenden Merkmale zwischen dem Richtwertobjekt und dem Wertermittlungsobjekt werden durch Umrechnungskoeffizienten berücksichtigt, wobei Extrapolationen nicht zulässig sind.",
+      "vollstaendige_tabellen": [
+        {
+          "id": "anbauweise",
+          "eingabe": "anbauweise",
+          "art": "kategorien",
+          "norm_feld": "EGART",
+          "norm": "Doppelhaushälfte",
+          "seite": "S. 2",
+          "werte": {
+            "Doppelhaushälfte": 1,
+            "Reihenendhaus": 1,
+            "Reihenmittelhaus": 0.945
+          }
+        },
+        {
+          "id": "bezugsjahr",
+          "art": "stichtag",
+          "seite": "S. 2",
+          "norm": 2025,
+          "werte": {
+            "2021": 0.964,
+            "2022": 1.039,
+            "2023": 0.918,
+            "2024": 0.926,
+            "2025": 1
+          }
+        }
+      ],
+      "ausschnitte": [
+        {
+          "id": "baujahr",
+          "art": "matrix",
+          "norm_feld": "BJ",
+          "seite": "S. 2",
+          "kategorien": [
+            "1989",
+            "1990",
+            "1991",
+            "1992",
+            "1993",
+            "1994",
+            "1995",
+            "1996",
+            "1997"
+          ],
+          "hinweis": "Zeile 1989: 1, 0,993, 0,986, 0,980, 0,973, 0,967, 0,960, 0,954, 0,948"
+        },
+        {
+          "id": "lagewert",
+          "art": "matrix",
+          "norm_feld": "BOWL",
+          "seite": "S. 3",
+          "kategorien": [
+            "430",
+            "435",
+            "440",
+            "445",
+            "450",
+            "455",
+            "460",
+            "465",
+            "470"
+          ],
+          "hinweis": "Zeile 430: 1, 0,997, 0,994, 0,991, 0,988, 0,985, 0,983, 0,98, 0,977"
+        },
+        {
+          "id": "wohnflaeche",
+          "eingabe": "wohnflaeche",
+          "art": "kurve",
+          "norm_feld": "WHNFL",
+          "seite": "S. 3–4",
+          "kopf": "Richtwertobjekt 128",
+          "x": [
+            80,
+            85,
+            90,
+            95,
+            100,
+            105,
+            110,
+            115,
+            120,
+            125,
+            130,
+            135,
+            140,
+            145,
+            150,
+            155,
+            160,
+            165,
+            170,
+            175,
+            180
+          ],
+          "uk": [
+            1.25,
+            1.224,
+            1.198,
+            1.172,
+            1.146,
+            1.12,
+            1.094,
+            1.068,
+            1.042,
+            1.016,
+            0.99,
+            0.964,
+            0.938,
+            0.912,
+            0.886,
+            0.859,
+            0.833,
+            0.807,
+            0.781,
+            0.755,
+            0.729
+          ],
+          "druckfehler": "Stützstelle gedruckt als „130t\" (S. 3)"
+        },
+        {
+          "id": "grundstuecksflaeche",
+          "eingabe": "grundstuecksflaeche",
+          "art": "kurve",
+          "norm_feld": "FLAE",
+          "seite": "S. 4",
+          "kopf": "Richtwertobjekt 313",
+          "x": [
+            270,
+            275,
+            280,
+            285,
+            290,
+            295,
+            300,
+            305,
+            310,
+            315,
+            320,
+            325,
+            330,
+            335,
+            340,
+            345,
+            350,
+            355,
+            360,
+            365,
+            370
+          ],
+          "uk": [
+            0.973,
+            0.976,
+            0.979,
+            0.983,
+            0.986,
+            0.989,
+            0.992,
+            0.995,
+            0.998,
+            1.001,
+            1.004,
+            1.007,
+            1.011,
+            1.014,
+            1.017,
+            1.02,
+            1.023,
+            1.026,
+            1.029,
+            1.032,
+            1.036
+          ]
+        }
+      ],
+      "anwendungsbeispiel": {
+        "seite": "S. 5",
+        "irw": 3440,
+        "zone": 6030,
+        "bereich": "Kernstadt, Stadtheide",
+        "zeilen": "Anbauweise DHH/RMH → 0,945 · Bezugsjahr 2025/2025 → 1 · Baujahr 1995/1983: 1,013/0,933 → 0,921 · Lagewert 472/450: 1,014/1,001 → 0,987 · Wohnfläche 128/140: 1,001/0,939 → 0,938 · Baulandfläche 313/320: 1,000/1,004 → 1,004",
+        "ergebnis_eur_qm": 2780,
+        "ergebnis_eur": 390000,
+        "rundung": "gerundet"
+      }
+    },
+    "belege": [
+      "Örtliche Fachinformationen für den Teilmarkt Reihen- und Doppelhäuser (5 Seiten): S. 1 Hinweise, S. 2 Anbauweise, Bezugsjahr, Baujahr-Matrix (Ausschnitt), S. 3 Lagewert-Matrix und Wohnfläche (Ausschnitte), S. 4 Baulandfläche (Ausschnitt), S. 5 Beispielrechnung.",
+      "Druckfehler S. 3: Wohnflächen-Stützstelle „130t\".",
+      "Zonen (Shape IRW_2026, 20 Zonen): BOWL 229–665, BJ 1975–2022, WHNFL 128, FLAE 313, EGART 2."
+    ],
+    "modellansaetze": {
+      "teilmarkt_code": 3,
+      "rundung_uk": 3,
+      "brechv": 2,
+      "fehlend": "vollständige Tabellen (nur Ausschnitte gedruckt)"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": true,
+    "ags": "05762",
+    "gasl": "31200",
+    "gebiet_name": "Kreis Höxter",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter",
+    "zweig": "efh_zfh",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
+    "geltungsbereich": {
+      "teilmarkt": 2,
+      "objektarten": [
+        "efh",
+        "zfh",
+        "dhh"
+      ],
+      "gemeinden": "alle Städte des Kreises Höxter (Ortsteile in fünf Vergleichsräumen VGR 1–5, S. 1)",
+      "hinweis": "Objektart-Tabelle: freistehend und Doppel-/Reihenendhaus; Reihenmittelhäuser sind nicht geführt."
+    },
+    "formel": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "interpolation": "keine (Klassen)",
+      "extrapolation": false,
+      "irw_lageangepasst": true,
+      "stellplaetze_im_irw": false,
+      "klassengrenzen": "Klassengrenzen wörtlich wie gedruckt („bis X\" / „ab X bis Y\" / „ab Y\"): ein Wert genau auf einer Grenze gehört zu zwei Klassen und wird nicht umgerechnet (sachverständig). Die Spannen der Zonenfelder (z. B. FLAE 470-749) zeigen, dass der Ausschuss „ab X bis unter Y\" meint — Rückfrage empfohlen, dann können die Grenzen geschlossen werden.",
+      "normobjekt": {
+        "richtwertobjekt": "UK = 1,000 in jeder Tabelle",
+        "keller": "mehr als 30 % Unterkellerung",
+        "objektart": "freistehend",
+        "grundstuecksflaeche": "ab 470 bis 750 m²",
+        "wohnflaeche": "bis 120 m²",
+        "baujahr": "ab 1980 bis 1989",
+        "ausstattungsstandard": "ab 2,1 bis 2,8 (einfach - mittel)",
+        "irw_vgr": {
+          "VGR1": 1860,
+          "VGR2": 1570,
+          "VGR3": 1530,
+          "VGR4": 1500,
+          "VGR5": 1360
+        }
+      },
+      "nicht_umgerechnet": "Bodenrichtwert (bis 30 €/m² 1,017 · ab 30 bis 50 1,000 · ab 50 bis 85 1,096 · ab 85 bis 115 1,301 · größer 115 1,272): „* Die Lageanpassung über den Bodenrichtwert ist in den veröffentlichten Immobilienrichtwerten bereits enthalten.\" (S. 2) — deshalb nicht noch einmal umgerechnet.",
+      "merkmale": [
+        {
+          "id": "keller",
+          "name": "Keller",
+          "eingabe": "keller",
+          "art": "kategorien",
+          "norm_feld": "KELLER",
+          "norm": "mehr als 30 % Unterkellerung",
+          "zuordnung": {
+            "ja": "mehr als 30 % Unterkellerung",
+            "nein": "bis 30% Unterkellerung"
+          },
+          "zuordnung_herkunft": "Eingabe Keller „ja\" = mehr als 30 % unterkellert; eine Teilunterkellerung bis 30 % ist als „nein\" einzugeben.",
+          "norm_zuordnung": {
+            "0": "bis 30% Unterkellerung",
+            "1": "mehr als 30 % Unterkellerung"
+          },
+          "werte": {
+            "bis 30% Unterkellerung": 0.947,
+            "mehr als 30 % Unterkellerung": 1
+          }
+        },
+        {
+          "id": "objektart",
+          "name": "Objektart",
+          "eingabe": "anbauweise",
+          "art": "kategorien",
+          "norm_feld": "EGART",
+          "norm": "freistehend",
+          "zuordnung": {
+            "freistehend": "freistehend",
+            "doppelhaushaelfte": "Doppel-/ Reihenendhaus",
+            "reihenendhaus": "Doppel-/ Reihenendhaus"
+          },
+          "norm_zuordnung": {
+            "1": "freistehend",
+            "2": "Doppel-/ Reihenendhaus",
+            "5": "Doppel-/ Reihenendhaus"
+          },
+          "werte": {
+            "freistehend": 1,
+            "Doppel-/ Reihenendhaus": 0.89
+          }
+        },
+        {
+          "id": "grundstuecksflaeche",
+          "name": "Grundstücksfläche",
+          "eingabe": "grundstuecksflaeche",
+          "art": "klassen",
+          "norm_feld": "FLAE",
+          "norm": "ab 470 m² bis 750 m²",
+          "norm_zuordnung": {
+            "470-749": "ab 470 m² bis 750 m²"
+          },
+          "klassen": [
+            {
+              "name": "bis 190 m²",
+              "von": null,
+              "bis": 190,
+              "uk": 0.752
+            },
+            {
+              "name": "ab 190 m² bis 330 m²",
+              "von": 190,
+              "bis": 330,
+              "uk": 0.816
+            },
+            {
+              "name": "ab 330 m² bis 470 m²",
+              "von": 330,
+              "bis": 470,
+              "uk": 0.917
+            },
+            {
+              "name": "ab 470 m² bis 750 m²",
+              "von": 470,
+              "bis": 750,
+              "uk": 1
+            },
+            {
+              "name": "ab 750 m² bis 1.000 m²",
+              "von": 750,
+              "bis": 1000,
+              "uk": 1.036
+            },
+            {
+              "name": "ab 1.000 m²",
+              "von": 1000,
+              "bis": null,
+              "uk": 1.135
+            }
+          ]
+        },
+        {
+          "id": "wohnflaeche",
+          "name": "Wohnfläche",
+          "eingabe": "wohnflaeche",
+          "art": "klassen",
+          "norm_feld": "WHNFL",
+          "norm": "bis 120 m²",
+          "norm_zuordnung": {
+            "1-119": "bis 120 m²"
+          },
+          "klassen": [
+            {
+              "name": "bis 120 m²",
+              "von": null,
+              "bis": 120,
+              "uk": 1
+            },
+            {
+              "name": "ab 120 m² bis 140 m²",
+              "von": 120,
+              "bis": 140,
+              "uk": 0.966
+            },
+            {
+              "name": "ab 140 m² bis 160 m²",
+              "von": 140,
+              "bis": 160,
+              "uk": 0.865
+            },
+            {
+              "name": "ab 160 m² bis 180 m²",
+              "von": 160,
+              "bis": 180,
+              "uk": 0.809
+            },
+            {
+              "name": "ab 180 m² bis 200 m²",
+              "von": 180,
+              "bis": 200,
+              "uk": 0.781
+            },
+            {
+              "name": "ab 200 m² bis 230 m²",
+              "von": 200,
+              "bis": 230,
+              "uk": 0.724
+            },
+            {
+              "name": "ab 230 m²",
+              "von": 230,
+              "bis": null,
+              "uk": 0.612
+            }
+          ]
+        },
+        {
+          "id": "baujahr",
+          "name": "Baujahreskategorie",
+          "eingabe": "baujahr",
+          "art": "klassen",
+          "norm_feld": "BJ",
+          "norm": "ab 1980 bis 1989",
+          "klassen": [
+            {
+              "name": "bis 1950",
+              "von": null,
+              "bis": 1950,
+              "uk": 0.716
+            },
+            {
+              "name": "ab 1950 bis 1959",
+              "von": 1950,
+              "bis": 1959,
+              "uk": 0.749
+            },
+            {
+              "name": "ab 1960 bis 1969",
+              "von": 1960,
+              "bis": 1969,
+              "uk": 0.79
+            },
+            {
+              "name": "ab 1970 bis 1979",
+              "von": 1970,
+              "bis": 1979,
+              "uk": 0.845
+            },
+            {
+              "name": "ab 1980 bis 1989",
+              "von": 1980,
+              "bis": 1989,
+              "uk": 1
+            },
+            {
+              "name": "ab 1990 bis 1999",
+              "von": 1990,
+              "bis": 1999,
+              "uk": 1.196
+            },
+            {
+              "name": "ab 2000 bis 2009",
+              "von": 2000,
+              "bis": 2009,
+              "uk": 1.31
+            },
+            {
+              "name": "ab 2010 bis 2025",
+              "von": 2010,
+              "bis": 2025,
+              "uk": 1.396
+            }
+          ]
+        },
+        {
+          "id": "ausstattungsstandard",
+          "name": "Ausstattungsstandard",
+          "eingabe": "standardstufe",
+          "art": "klassen",
+          "norm_feld": "GSTAND",
+          "norm": "ab 2,1 bis 2,8 (einfach - mittel)",
+          "norm_zuordnung": {
+            "4": "ab 2,1 bis 2,8 (einfach - mittel)"
+          },
+          "klassen": [
+            {
+              "name": "bis 1,5 (sehr einfach - einfach)",
+              "von": null,
+              "bis": 1.5,
+              "uk": 0.628
+            },
+            {
+              "name": "ab 1,5 bis 2,1 (einfach)",
+              "von": 1.5,
+              "bis": 2.1,
+              "uk": 0.803
+            },
+            {
+              "name": "ab 2,1 bis 2,8 (einfach - mittel)",
+              "von": 2.1,
+              "bis": 2.8,
+              "uk": 1
+            },
+            {
+              "name": "ab 2,8 bis 3,4 (mittel)",
+              "von": 2.8,
+              "bis": 3.4,
+              "uk": 1.085
+            },
+            {
+              "name": "ab 3,4 (gehoben)",
+              "von": 3.4,
+              "bis": 5,
+              "uk": 1.231
+            }
+          ]
+        }
+      ]
+    },
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Ein- und Zweifamilienhäuser (4 Seiten): S. 1 Ortsteile in fünf Vergleichsräumen, S. 2 Preisindex, IRW je VGR für das Richtwertobjekt (UK = 1,000), Tabellen Keller, Objektart, Grundstücksfläche, Bodenrichtwert*, Wohnfläche, Baujahreskategorie, S. 3 Ausstattungsstandard und Einstufungstabelle, S. 4 Hinweis.",
+      "Kein Anwendungsbeispiel im Dokument (alle 4 Seitenbilder durchgesehen) — geprüft sind Aufbau und Normbezug.",
+      "S. 2: „* Die Lageanpassung über den Bodenrichtwert ist in den veröffentlichten Immobilienrichtwerten bereits enthalten.\" — Bodenrichtwert-Tabelle deshalb nicht angewandt (formel.nicht_umgerechnet).",
+      "Klassengrenzen doppelt belegt gedruckt („bis 190 m²\" / „ab 190 m² bis 330 m²\", „bis 1950\" / „ab 1950 bis 1959\" usw.) — wörtlich übernommen; genau auf der Grenze rechnet der Kern nicht.",
+      "Stellplätze/Garagen: Dokument schweigt zu Stellplätzen. (Fundstelle: LGDIR_2_0531200_2026.pdf, S. 1–4)"
+    ],
+    "seite": "S. 1–4",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_2_0531200_2026.pdf",
+    "modellansaetze": {
+      "teilmarkt_code": 2,
+      "brechv": 2,
+      "rundung_uk": 3,
+      "normobjekt_quelle": "PDF S. 2 (UK = 1,000) und Zonenfelder KELLER/EGART/FLAE/WHNFL/BJ/GSTAND"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": true,
+    "ags": "05762",
+    "gasl": "31200",
+    "gebiet_name": "Kreis Höxter",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter",
+    "zweig": "etw",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
+    "geltungsbereich": {
+      "teilmarkt": 1,
+      "objektarten": [
+        "etw"
+      ],
+      "gemeinden": "Vergleichsräume VGR 1 (Bad Driburg, Höxter, Warburg) und VGR 2 (Beverungen, Brakel, Steinheim)"
+    },
+    "formel": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "interpolation": "keine (Klassen)",
+      "extrapolation": false,
+      "irw_lageangepasst": true,
+      "stellplaetze_im_irw": false,
+      "klassengrenzen": "Klassengrenzen wörtlich wie gedruckt („bis X\" / „ab X bis Y\" / „ab Y\"): ein Wert genau auf einer Grenze gehört zu zwei Klassen und wird nicht umgerechnet (sachverständig). Die Spannen der Zonenfelder (z. B. FLAE 470-749) zeigen, dass der Ausschuss „ab X bis unter Y\" meint — Rückfrage empfohlen, dann können die Grenzen geschlossen werden.",
+      "normobjekt": {
+        "richtwertobjekt": "UK = 1,000 in jeder Tabelle",
+        "wohnflaeche": "ab 40 bis 80 m²",
+        "geschossigkeit": "ab 2 bis 4 Geschosse",
+        "teilmarkt": "Weiterverkauf",
+        "ausstattungsstandard": "ab 2,1 bis 2,8 (einfach – mittel)",
+        "baujahr": "ab 1970 bis 1989",
+        "irw_vgr": {
+          "VGR1": 1305,
+          "VGR2": 1095
+        }
+      },
+      "nicht_umgerechnet": "Bodenrichtwert (bis 65 €/m² 1,097 · ab 65 bis 115 1,196 · größer 115 1,000): „* Die Lageanpassung über den Bodenrichtwert ist in den veröffentlichten Immobilienrichtwerten bereits enthalten.\" (S. 2) — nicht noch einmal umgerechnet.",
+      "merkmale": [
+        {
+          "id": "wohnflaeche",
+          "name": "Wohnfläche",
+          "eingabe": "wohnflaeche",
+          "art": "klassen",
+          "norm_feld": "WHNFL",
+          "norm": "ab 40 m² bis 80 m²",
+          "norm_zuordnung": {
+            "40-79": "ab 40 m² bis 80 m²"
+          },
+          "klassen": [
+            {
+              "name": "bis 40 m²",
+              "von": null,
+              "bis": 40,
+              "uk": 0.898
+            },
+            {
+              "name": "ab 40 m² bis 80 m²",
+              "von": 40,
+              "bis": 80,
+              "uk": 1
+            },
+            {
+              "name": "ab 80 m² bis 100 m²",
+              "von": 80,
+              "bis": 100,
+              "uk": 0.99
+            },
+            {
+              "name": "ab 100 m²",
+              "von": 100,
+              "bis": null,
+              "uk": 0.966
+            }
+          ]
+        },
+        {
+          "id": "geschossigkeit",
+          "name": "Geschossigkeit",
+          "eingabe": "geschosse",
+          "art": "klassen",
+          "norm": "ab 2 Geschosse bis 4 Geschosse",
+          "klassen": [
+            {
+              "name": "bis zwei Geschosse",
+              "von": null,
+              "bis": 2,
+              "uk": 0.973
+            },
+            {
+              "name": "ab 2 Geschosse bis 4 Geschosse",
+              "von": 2,
+              "bis": 4,
+              "uk": 1
+            },
+            {
+              "name": "ab 4 Geschosse",
+              "von": 4,
+              "bis": null,
+              "uk": 0.919
+            }
+          ],
+          "hinweis": "Bei genau 2 und genau 4 Geschossen sind zwei Klassen gedruckt („bis zwei\" und „ab 2\", „bis 4\" und „ab 4\") — dort keine Umrechnung."
+        },
+        {
+          "id": "teilmarkt",
+          "name": "Teilmarkt",
+          "eingabe": "erstverkauf",
+          "art": "kategorien",
+          "norm_feld": "OBJGR",
+          "norm": "Weiterverkauf",
+          "zuordnung": {
+            "ja": "Erstverkauf",
+            "nein": "Weiterverkauf"
+          },
+          "norm_zuordnung": {
+            "1": "Erstverkauf",
+            "3": "Weiterverkauf"
+          },
+          "werte": {
+            "Weiterverkauf": 1,
+            "Erstverkauf": 1.279
+          }
+        },
+        {
+          "id": "ausstattungsstandard",
+          "name": "Ausstattungsstandard",
+          "eingabe": "standardstufe",
+          "art": "klassen",
+          "norm_feld": "GSTAND",
+          "norm": "ab 2,1 bis 2,8 (einfach – mittel)",
+          "norm_zuordnung": {
+            "4": "ab 2,1 bis 2,8 (einfach – mittel)"
+          },
+          "klassen": [
+            {
+              "name": "ab 1,5 bis 2,1 (sehr einfach – einfach)",
+              "von": 1.5,
+              "bis": 2.1,
+              "uk": 0.958
+            },
+            {
+              "name": "ab 2,1 bis 2,8 (einfach – mittel)",
+              "von": 2.1,
+              "bis": 2.8,
+              "uk": 1
+            },
+            {
+              "name": "ab 2,8 (mittel)",
+              "von": 2.8,
+              "bis": 5,
+              "uk": 1.109
+            }
+          ]
+        },
+        {
+          "id": "baujahr",
+          "name": "Baujahreskategorie",
+          "eingabe": "baujahr",
+          "art": "klassen",
+          "norm_feld": "BJ",
+          "norm": "ab 1970 bis 1989",
+          "klassen": [
+            {
+              "name": "bis 1970",
+              "von": null,
+              "bis": 1970,
+              "uk": 0.933
+            },
+            {
+              "name": "ab 1970 bis 1989",
+              "von": 1970,
+              "bis": 1989,
+              "uk": 1
+            },
+            {
+              "name": "ab 1990 bis 2009",
+              "von": 1990,
+              "bis": 2009,
+              "uk": 1.199
+            },
+            {
+              "name": "ab 2010 bis 2025",
+              "von": 2010,
+              "bis": 2025,
+              "uk": 1.971
+            }
+          ]
+        }
+      ]
+    },
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Eigentumswohnungen (2 Seiten): S. 1 nur VGR 1 und 2, Preisindex, IRW je VGR (UK = 1,000); S. 2 Tabellen Wohnfläche, Teilmarkt, Geschossigkeit, Bodenrichtwert*, Ausstattungsstandard, Baujahreskategorie.",
+      "Kein Anwendungsbeispiel im Dokument (beide Seitenbilder durchgesehen). (Fundstelle: LGDIR_1_0531200_2026.pdf, S. 1–2)",
+      "S. 2: „* Die Lageanpassung über den Bodenrichtwert ist in den veröffentlichten Immobilienrichtwerten bereits enthalten.\" — Bodenrichtwert nicht angewandt.",
+      "Ausstattungsstandard unter 1,5 ist nicht geführt. Geschossigkeit hat keinen Zonenwert; Norm aus der Tabelle (UK 1,000). Klassengrenzen doppelt belegt gedruckt — wörtlich übernommen.",
+      "Stellplätze/Garagen: Dokument schweigt zu Stellplätzen. (Fundstelle: LGDIR_1_0531200_2026.pdf, S. 1–2)"
+    ],
+    "seite": "S. 1–2",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0531200_2026.pdf",
+    "modellansaetze": {
+      "teilmarkt_code": 1,
+      "brechv": 2,
+      "rundung_uk": 3,
+      "normobjekt_quelle": "PDF S. 2 (UK = 1,000) und Zonenfelder WHNFL/BJ/GSTAND/OBJGR"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": true,
+    "ags": "05770024",
+    "gasl": "26100",
+    "gebiet_name": "Stadt Minden",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden",
+    "zweig": "efh_zfh",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
+    "geltungsbereich": {
+      "teilmarkt": 2,
+      "objektarten": [
+        "efh",
+        "zfh",
+        "dhh",
+        "rh"
+      ],
+      "gemeinden": "Stadt Minden",
+      "hinweis": "Teilmarkt Ein- und Zweifamilienhäuser - freistehend; die Anbauweise-Tabelle führt auch Doppelhaushälfte und Reihenhäuser (kein eigener Teilmarkt 3)."
+    },
+    "formel": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "interpolation": "keine (Klassen)",
+      "extrapolation": false,
+      "irw_lageangepasst": false,
+      "stellplaetze_im_irw": false,
+      "stellplaetze_hinweis": "Die Immobilienrichtwerte … beinhalten keine Garagen oder Pkw-Stellplätze … Werte für Garagen, Stellplätze und Nebengebäude sind sachverständig (z.B. nach ihrem Zeitwert) zu veranschlagen. (S. 1)",
+      "normobjekt": {
+        "wohnflaeche": "126–150 m²",
+        "anbauweise": "freistehend",
+        "gebaeudestandard": "einfach",
+        "gebaeudeart": "EFH",
+        "grundstuecksflaeche": "601–1000 m² (Tabelle: 600 bis 1000 m²)",
+        "bodenrichtwert": "ab 121 €/m²",
+        "baujahr": "2011–2020"
+      },
+      "merkmale": [
+        {
+          "id": "wohnflaeche",
+          "name": "Wohnfläche",
+          "eingabe": "wohnflaeche",
+          "art": "klassen",
+          "norm_feld": "WHNFL",
+          "norm": "126 bis 150 m²",
+          "runden": 0,
+          "norm_zuordnung": {
+            "126-150": "126 bis 150 m²"
+          },
+          "klassen": [
+            {
+              "name": "1 bis 100 m²",
+              "von": 1,
+              "bis": 100,
+              "uk": 1.154
+            },
+            {
+              "name": "101 bis 125 m²",
+              "von": 101,
+              "bis": 125,
+              "uk": 1.075
+            },
+            {
+              "name": "126 bis 150 m²",
+              "von": 126,
+              "bis": 150,
+              "uk": 1
+            },
+            {
+              "name": "151 bis 175 m²",
+              "von": 151,
+              "bis": 175,
+              "uk": 0.896
+            },
+            {
+              "name": "176 bis 200 m²",
+              "von": 176,
+              "bis": 200,
+              "uk": 0.866
+            },
+            {
+              "name": "201 bis 1000 m²",
+              "von": 201,
+              "bis": 1000,
+              "uk": 0.741
+            }
+          ]
+        },
+        {
+          "id": "bodenrichtwert",
+          "name": "Bodenrichtwert",
+          "eingabe": "bodenrichtwert",
+          "art": "klassen",
+          "norm_feld": "BOWL",
+          "norm": "121 bis 1000 €/m²",
+          "runden": 0,
+          "klassen": [
+            {
+              "name": "1 bis 80 €/m²",
+              "von": 1,
+              "bis": 80,
+              "uk": 0.862
+            },
+            {
+              "name": "81 bis 90 €/m²",
+              "von": 81,
+              "bis": 90,
+              "uk": 0.802
+            },
+            {
+              "name": "91 bis 100 €/m²",
+              "von": 91,
+              "bis": 100,
+              "uk": 0.927
+            },
+            {
+              "name": "101 bis 110 €/m²",
+              "von": 101,
+              "bis": 110,
+              "uk": 0.973
+            },
+            {
+              "name": "111 bis 120 €/m²",
+              "von": 111,
+              "bis": 120,
+              "uk": 0.975
+            },
+            {
+              "name": "121 bis 1000 €/m²",
+              "von": 121,
+              "bis": 1000,
+              "uk": 1
+            }
+          ]
+        },
+        {
+          "id": "gebaeudestandard",
+          "name": "Gebäudestandard",
+          "eingabe": "standardstufe",
+          "art": "klassen",
+          "norm_feld": "GSTAND",
+          "runden": 1,
+          "norm_zuordnung": {
+            "1": "sehr einfach",
+            "3": "einfach",
+            "5": "mittel",
+            "7": "gehoben"
+          },
+          "zuordnung_herkunft": "Das Dokument ordnet die Standardstufen nicht selbst zu. Bänder der Standardstufe nach IRW-Datenmodell NRW Feld 60 (Stufe 1 [1,0–1,2] = sehr einfach, 2 [1,8–2,2] = einfach, 3 [2,8–3,2] = mittel, 4 [3,8–4,2] = gehoben); Zwischenwerte (z. B. 2,3–2,7) ordnet das Dokument keiner Klasse zu → kein Wert — gestützt darauf, dass der Ausschuss das EFH-Normobjekt „einfach\" mit GSTAND 3 und das ETW-Normobjekt „mittel\" mit GSTAND 5 kodiert.",
+          "klassen": [
+            {
+              "name": "sehr einfach",
+              "von": 1,
+              "bis": 1.2,
+              "uk": 0.776
+            },
+            {
+              "name": "einfach",
+              "von": 1.8,
+              "bis": 2.2,
+              "uk": 1
+            },
+            {
+              "name": "mittel",
+              "von": 2.8,
+              "bis": 3.2,
+              "uk": 1.159
+            },
+            {
+              "name": "gehoben",
+              "von": 3.8,
+              "bis": 4.2,
+              "uk": 1.37
+            }
+          ]
+        },
+        {
+          "id": "baujahr",
+          "name": "Baujahr",
+          "eingabe": "baujahr",
+          "art": "klassen",
+          "norm_feld": "BJ",
+          "norm": "2011 bis 2020",
+          "klassen": [
+            {
+              "name": "1700 bis 1950",
+              "von": 1700,
+              "bis": 1950,
+              "uk": 0.649
+            },
+            {
+              "name": "1951 bis 1960",
+              "von": 1951,
+              "bis": 1960,
+              "uk": 0.74
+            },
+            {
+              "name": "1961 bis 1970",
+              "von": 1961,
+              "bis": 1970,
+              "uk": 0.737
+            },
+            {
+              "name": "1971 bis 1980",
+              "von": 1971,
+              "bis": 1980,
+              "uk": 0.826
+            },
+            {
+              "name": "1981 bis 1990",
+              "von": 1981,
+              "bis": 1990,
+              "uk": 0.907
+            },
+            {
+              "name": "1991 bis 2000",
+              "von": 1991,
+              "bis": 2000,
+              "uk": 0.912
+            },
+            {
+              "name": "2001 bis 2010",
+              "von": 2001,
+              "bis": 2010,
+              "uk": 0.982
+            },
+            {
+              "name": "2011 bis 2020",
+              "von": 2011,
+              "bis": 2020,
+              "uk": 1
+            },
+            {
+              "name": "2021 bis 2026",
+              "von": 2021,
+              "bis": 2026,
+              "uk": 1.04
+            }
+          ]
+        },
+        {
+          "id": "anbauweise",
+          "name": "Anbauweise",
+          "eingabe": "anbauweise",
+          "art": "kategorien",
+          "norm_feld": "EGART",
+          "norm": "freistehend",
+          "norm_zuordnung": {
+            "1": "freistehend",
+            "2": "doppelhaushaelfte",
+            "4": "reihenmittelhaus",
+            "5": "reihenendhaus"
+          },
+          "werte": {
+            "doppelhaushaelfte": 0.953,
+            "reihenendhaus": 1.006,
+            "reihenmittelhaus": 1.019,
+            "freistehend": 1
+          }
+        },
+        {
+          "id": "gebaeudeart",
+          "name": "Gebäudeart",
+          "eingabe": "gebaeudeart",
+          "art": "kategorien",
+          "norm_feld": "GART",
+          "norm": "Einfamilienhaus",
+          "zuordnung": {
+            "efh": "Einfamilienhaus",
+            "efh_einlieger": "Einfamilienhaus mit Einliegerwohnung",
+            "zfh": "Zweifamilienhaus"
+          },
+          "norm_zuordnung": {
+            "13": "Einfamilienhaus",
+            "15": "Einfamilienhaus mit Einliegerwohnung",
+            "17": "Zweifamilienhaus"
+          },
+          "werte": {
+            "Einfamilienhaus mit Einliegerwohnung": 0.953,
+            "Zweifamilienhaus": 0.952,
+            "Einfamilienhaus": 1
+          }
+        },
+        {
+          "id": "grundstuecksflaeche",
+          "name": "Grundstücksfläche",
+          "eingabe": "grundstuecksflaeche",
+          "art": "klassen",
+          "norm_feld": "FLAE",
+          "norm": "600 bis 1000 m²",
+          "runden": 0,
+          "norm_zuordnung": {
+            "601-1000": "600 bis 1000 m²"
+          },
+          "zuordnung_herkunft": "Normobjekt (S. 2) „601 m² bis 1000 m²\", Tabelle „600 bis 1000 m²\" — die Zonenangabe 601-1000 ist die Normklasse mit UK 1,000.",
+          "klassen": [
+            {
+              "name": "1 bis 400 m²",
+              "von": 1,
+              "bis": 400,
+              "uk": 0.824
+            },
+            {
+              "name": "401 bis 599 m²",
+              "von": 401,
+              "bis": 599,
+              "uk": 0.963
+            },
+            {
+              "name": "600 bis 1000 m²",
+              "von": 600,
+              "bis": 1000,
+              "uk": 1
+            },
+            {
+              "name": "1001 bis 5000 m²",
+              "von": 1001,
+              "bis": 5000,
+              "uk": 1.059
+            }
+          ]
+        }
+      ]
+    },
+    "anwendungsbeispiel": {
+      "seite": "S. 3",
+      "irw": 2700,
+      "norm_zone": {
+        "GART": "13",
+        "EGART": "1",
+        "BJ": "2011",
+        "WHNFL": "126-150",
+        "FLAE": "601-1000",
+        "BOWL": "125",
+        "GSTAND": "3"
+      },
+      "objekt": {
+        "gebaeudeart": "efh",
+        "anbauweise": "doppelhaushaelfte",
+        "baujahr": 2005,
+        "wohnflaeche": 135,
+        "standardstufe": "mittel",
+        "grundstuecksflaeche": 500,
+        "bodenrichtwert": 125
+      },
+      "faktoren": {
+        "gebaeudeart": 1,
+        "anbauweise": 0.953,
+        "baujahr": 0.982,
+        "wohnflaeche": 1,
+        "gebaeudestandard": 1.159,
+        "grundstuecksflaeche": 0.963,
+        "bodenrichtwert": 1
+      },
+      "ergebnis_eur_qm": 2820,
+      "toleranz_eur_qm": 1,
+      "wohnflaeche": 135,
+      "ergebnis_eur": 380700,
+      "wortlaut": "2.700 x 1,000 x 0,953 x 0,982 x 1,000 x 1,159 x 0,963 x 1,000 = 2.820 EUR/m² · 2.820 EUR/m² x 135 m² = rd. 380.700 € (IRW-Zone 3)"
+    },
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Ein- und Zweifamilienhäuser - freistehend (3 Seiten): S. 1 Hinweise (Kaufpreise 2021–2025, auf 01.01.2026 indiziert, nur Weiterverkäufe, keine Garagen/Stellplätze), S. 2 Normobjekt und Tabellen Wohnfläche, BRW, Gebäudestandard, Baujahr, S. 3 Anbauweise, Gebäudeart, Grundstücksfläche und Anwendungsbeispiel (IRW-Zone 3).",
+      "Unstimmigkeit S. 2: Normobjekt Grundstücksfläche „601 m² bis 1000 m²\", Tabelle „600 bis 1000 m²\" — über norm_zuordnung der Normklasse zugeordnet, Tabelle unverändert.",
+      "Gebäudestandard ohne Zuordnung zur Standardstufe im Dokument — Zuordnung nach IRW-Datenmodell Feld 60 (siehe Merkmal); vor Freigabe beim Ausschuss bestätigen.",
+      "Stellplätze: Die Immobilienrichtwerte … beinhalten keine Garagen oder Pkw-Stellplätze … Werte für Garagen, Stellplätze und Nebengebäude sind sachverständig (z.B. nach ihrem Zeitwert) zu veranschlagen. (S. 1)"
+    ],
+    "seite": "S. 1–3",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_2_0526100_2026.pdf",
+    "modellansaetze": {
+      "teilmarkt_code": 2,
+      "brechv": 2,
+      "rundung_uk": 3,
+      "normobjekt_quelle": "PDF S. 2 und Zonenfelder WHNFL/BOWL/GSTAND/BJ/EGART/GART/FLAE"
+    }
+  },
+  {
+    "land_code": "NW",
+    "ebene": "kreis",
+    "kennzahl": "umrechnung_irw",
+    "stufe": "A",
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "jahrgang": 2026,
+    "lizenz": "dl-de/zero-2-0",
+    "modellversion": "IRW NRW 2026 (Örtliche Fachinformationen)",
+    "quelle_parser": "manuell (Seitenbild des PDF, 21.10.2026, v2680)",
+    "vollstaendig": true,
+    "ags": "05770024",
+    "gasl": "26100",
+    "gebiet_name": "Stadt Minden",
+    "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden",
+    "zweig": "etw",
+    "quellenvermerk": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden, Örtliche Fachinformationen zu den Immobilienrichtwerten 2026 (BORIS-NRW), dl-de/zero-2-0",
+    "geltungsbereich": {
+      "teilmarkt": 1,
+      "objektarten": [
+        "etw"
+      ],
+      "gemeinden": "Stadt Minden"
+    },
+    "formel": {
+      "form": "irw_umrechnung",
+      "verknuepfung": "multiplikativ",
+      "interpolation": "keine (Klassen)",
+      "extrapolation": false,
+      "irw_lageangepasst": false,
+      "stellplaetze_im_irw": false,
+      "stellplaetze_hinweis": "Die Immobilienrichtwerte … beinhalten keine Garagen oder Pkw-Stellplätze … Werte für Garagen, Stellplätze und Nebengebäude sind sachverständig (z.B. nach ihrem Zeitwert) zu veranschlagen. (S. 1)",
+      "normobjekt": {
+        "wohnflaeche": "61–80 m²",
+        "standard": "mittel",
+        "verkaufsumstand": "Weiterverkauf",
+        "bodenrichtwert": "1–100 €/m²",
+        "baujahr": "2011–2020"
+      },
+      "merkmale": [
+        {
+          "id": "wohnflaeche",
+          "name": "Wohnfläche",
+          "eingabe": "wohnflaeche",
+          "art": "klassen",
+          "norm_feld": "WHNFL",
+          "norm": "61 bis 80 m²",
+          "runden": 0,
+          "norm_zuordnung": {
+            "61-80": "61 bis 80 m²"
+          },
+          "klassen": [
+            {
+              "name": "1 bis 60 m²",
+              "von": 1,
+              "bis": 60,
+              "uk": 1.007
+            },
+            {
+              "name": "61 bis 80 m²",
+              "von": 61,
+              "bis": 80,
+              "uk": 1
+            },
+            {
+              "name": "81 bis 100 m²",
+              "von": 81,
+              "bis": 100,
+              "uk": 1.037
+            },
+            {
+              "name": "101 bis 1000 m²",
+              "von": 101,
+              "bis": 1000,
+              "uk": 0.939
+            }
+          ]
+        },
+        {
+          "id": "bodenrichtwert",
+          "name": "Bodenrichtwert",
+          "eingabe": "bodenrichtwert",
+          "art": "klassen",
+          "norm_feld": "BOWL",
+          "norm": "1 bis 100 €/m²",
+          "runden": 0,
+          "klassen": [
+            {
+              "name": "1 bis 100 €/m²",
+              "von": 1,
+              "bis": 100,
+              "uk": 1
+            },
+            {
+              "name": "101 bis 150 €/m²",
+              "von": 101,
+              "bis": 150,
+              "uk": 1.107
+            },
+            {
+              "name": "151 bis 1000 €/m²",
+              "von": 151,
+              "bis": 1000,
+              "uk": 1.283
+            }
+          ]
+        },
+        {
+          "id": "gebaeudestandard",
+          "name": "Gebäudestandard",
+          "eingabe": "standardstufe",
+          "art": "klassen",
+          "norm_feld": "GSTAND",
+          "runden": 1,
+          "norm_zuordnung": {
+            "1": "sehr einfach",
+            "3": "einfach",
+            "5": "mittel",
+            "7": "gehoben"
+          },
+          "zuordnung_herkunft": "Das Dokument ordnet die Standardstufen nicht selbst zu. Bänder der Standardstufe nach IRW-Datenmodell NRW Feld 60 (Stufe 1 [1,0–1,2] = sehr einfach, 2 [1,8–2,2] = einfach, 3 [2,8–3,2] = mittel, 4 [3,8–4,2] = gehoben); Zwischenwerte (z. B. 2,3–2,7) ordnet das Dokument keiner Klasse zu → kein Wert — gestützt darauf, dass der Ausschuss das EFH-Normobjekt „einfach\" mit GSTAND 3 und das ETW-Normobjekt „mittel\" mit GSTAND 5 kodiert.",
+          "klassen": [
+            {
+              "name": "sehr einfach",
+              "von": 1,
+              "bis": 1.2,
+              "uk": 0.738
+            },
+            {
+              "name": "einfach",
+              "von": 1.8,
+              "bis": 2.2,
+              "uk": 0.86
+            },
+            {
+              "name": "mittel",
+              "von": 2.8,
+              "bis": 3.2,
+              "uk": 1
+            },
+            {
+              "name": "gehoben",
+              "von": 3.8,
+              "bis": 4.2,
+              "uk": 1.163
+            }
+          ]
+        },
+        {
+          "id": "baujahr",
+          "name": "Baujahr",
+          "eingabe": "baujahr",
+          "art": "klassen",
+          "norm_feld": "BJ",
+          "norm": "2011 bis 2020",
+          "klassen": [
+            {
+              "name": "1700 bis 1930",
+              "von": 1700,
+              "bis": 1930,
+              "uk": 0.658
+            },
+            {
+              "name": "1931 bis 1960",
+              "von": 1931,
+              "bis": 1960,
+              "uk": 0.52
+            },
+            {
+              "name": "1961 bis 1970",
+              "von": 1961,
+              "bis": 1970,
+              "uk": 0.577
+            },
+            {
+              "name": "1971 bis 1980",
+              "von": 1971,
+              "bis": 1980,
+              "uk": 0.593
+            },
+            {
+              "name": "1981 bis 1990",
+              "von": 1981,
+              "bis": 1990,
+              "uk": 0.741
+            },
+            {
+              "name": "1991 bis 2000",
+              "von": 1991,
+              "bis": 2000,
+              "uk": 0.814
+            },
+            {
+              "name": "2001 bis 2010",
+              "von": 2001,
+              "bis": 2010,
+              "uk": 0.889
+            },
+            {
+              "name": "2011 bis 2020",
+              "von": 2011,
+              "bis": 2020,
+              "uk": 1
+            },
+            {
+              "name": "2021 bis 2026",
+              "von": 2021,
+              "bis": 2026,
+              "uk": 1.232
+            }
+          ]
+        },
+        {
+          "id": "verkaufsumstand",
+          "name": "Verkaufsumstand",
+          "eingabe": "erstverkauf",
+          "art": "kategorien",
+          "norm_feld": "OBJGR",
+          "norm": "Weiterverkauf",
+          "zuordnung": {
+            "ja": "Erstverkauf",
+            "nein": "Weiterverkauf"
+          },
+          "norm_zuordnung": {
+            "1": "Erstverkauf",
+            "3": "Weiterverkauf"
+          },
+          "werte": {
+            "Erstverkauf": 1.109,
+            "Weiterverkauf": 1
+          }
+        }
+      ]
+    },
+    "anwendungsbeispiel": {
+      "seite": "S. 3",
+      "irw": 1960,
+      "norm_zone": {
+        "BJ": "2011",
+        "WHNFL": "61-80",
+        "BOWL": "90",
+        "GSTAND": "5",
+        "OBJGR": "3"
+      },
+      "objekt": {
+        "baujahr": 1992,
+        "wohnflaeche": 77,
+        "standardstufe": "einfach",
+        "erstverkauf": false,
+        "bodenrichtwert": 125
+      },
+      "faktoren": {
+        "baujahr": 0.814,
+        "wohnflaeche": 1,
+        "gebaeudestandard": 0.86,
+        "verkaufsumstand": 1,
+        "bodenrichtwert": 1.107
+      },
+      "ergebnis_eur_qm": 1519,
+      "toleranz_eur_qm": 1,
+      "wohnflaeche": 77,
+      "ergebnis_eur": 116960,
+      "wortlaut": "1.960 x 0,814 x 1,000 x 0,860 x 1,000 x 1,107 = 1.519 EUR/m² · 1.519 EUR/m² x 77 m² = rd. 116.960 € (IRW-Zone 3)"
+    },
+    "belege": [
+      "Örtliche Fachinformationen zur Verwendung der Immobilienrichtwerte für den Teilmarkt Eigentumswohnungen (3 Seiten): S. 1 Hinweise (nur Weiterverkäufe, keine Garagen/Stellplätze), S. 2 Normobjekt und Tabellen Wohnfläche, BRW, Gebäudestandard*, Baujahr, Verkaufsumstand, S. 3 Anwendungsbeispiel (IRW-Zone 3).",
+      "S. 2 Baujahr: „1700 bis 1930\" 0,658 liegt über „1931 bis 1960\" 0,520 — so gedruckt, nicht geglättet. „Gebäudestandard*\": die Fußnote ist im Dokument nicht abgedruckt.",
+      "Gebäudestandard ohne Zuordnung zur Standardstufe im Dokument — Zuordnung nach IRW-Datenmodell Feld 60; vor Freigabe beim Ausschuss bestätigen.",
+      "Stellplätze: Die Immobilienrichtwerte … beinhalten keine Garagen oder Pkw-Stellplätze … Werte für Garagen, Stellplätze und Nebengebäude sind sachverständig (z.B. nach ihrem Zeitwert) zu veranschlagen. (S. 1)"
+    ],
+    "seite": "S. 1–3",
+    "quelle_url": "https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0526100_2026.pdf",
+    "modellansaetze": {
+      "teilmarkt_code": 1,
+      "brechv": 2,
+      "rundung_uk": 3,
+      "normobjekt_quelle": "PDF S. 2 und Zonenfelder WHNFL/BOWL/GSTAND/BJ/OBJGR"
+    }
+  }
+]

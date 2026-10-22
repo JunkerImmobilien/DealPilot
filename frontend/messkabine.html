@@ -143,7 +143,7 @@
 </head>
 <body>
 <header>
-  <h1>Messkabine <span class="hin leise" id="mk-stand">v2571</span></h1>
+  <h1>Messkabine <span class="hin leise" id="mk-stand">v2750</span></h1>
   <!-- v2063 · DIE KABINE SAGT, WELCHE FASSUNG LAEUFT.
        Diese Datei traegt keinen Cache-Buster. Am 09.10.2026 lief nach
        drei Aenderungen noch die alte Fassung im Tab: `DPM.apBedienbar`
@@ -459,6 +459,14 @@
          als keine. */
       var ins = parseFloat(ps.insetBlockStart || ps.top);
       if (!isFinite(ins)) return;
+      /* v2750: ein schmaler Randstreifen (3 px, top:0) erfuellt die
+         inset-Bedingung auch - er deckt aber nicht den Text. Gemessen am
+         22.10.2026: `.kpi::after` (2,99 px Gruen) und
+         `.cf-phase-card::after` (3 px Gold) wurden zum Grund jeder Kennzahl,
+         Kontrast 1,2-1,6 statt 3-8. Die eigene Breite/Hoehe des
+         Pseudoelements zaehlt, wo sie als Zahl vorliegt. */
+      var pw = parseFloat(ps.width), ph = parseFloat(ps.height);
+      if ((isFinite(pw) && pw < rEl.width - 0.5) || (isFinite(ph) && ph < rEl.height - 0.5)) return;
       var k = { links: rP.left + ins, oben: rP.top + ins,
                 rechts: rP.right - ins, unten: rP.bottom - ins };
       /* Liegt der Text GANZ darin? Sonst steht er teils daneben. */
@@ -503,8 +511,12 @@
       var eig = win.getComputedStyle(el);
       if ((!eig.backgroundImage || eig.backgroundImage === 'none')
           && ist_deckend(eig.backgroundColor)) {
-        var ec = eig.backgroundColor.match(/[\d.]+/g) || [255, 255, 255];
-        return { r: +ec[0], g: +ec[1], b: +ec[2], a: 1, quelle: 'eigener Grund' };
+        /* v2750: ueber `male`, nicht per Regex - `color-mix()` liefert
+           `color(srgb 0.97 0.96 0.92)`, und die Ziffern 0..1 lasen sich
+           als fast Schwarz (gemessen: `span.oe-chip.gewaehlt` Kontrast
+           1,41 statt rund 13). */
+        var ec = male(eig.backgroundColor, { r: 255, g: 255, b: 255 }) || { r: 255, g: 255, b: 255 };
+        return { r: ec.r, g: ec.g, b: ec.b, a: 1, quelle: 'eigener Grund' };
       }
     } catch (e) {}
 
@@ -587,6 +599,11 @@
         if (k) out = k;
       }
     }
+    /* v2750: `male` merkt sich seine Ergebnisse - `out` kann das gemerkte
+       Objekt SELBST sein. Ohne Kopie schrieb die Zeile darunter `quelle`
+       in den Merker, und ein spaeterer Treffer derselben Farbe trug die
+       Herkunft eines anderen Elements. */
+    out = { r: out.r, g: out.g, b: out.b, a: 1 };
     out.quelle = unmessbar ? 'unmessbar' : (hatVerlauf ? 'verlauf' : 'farbe');
     if (unmessbar) out.warum = unmessbar.grund;
     return out;

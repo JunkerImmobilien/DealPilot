@@ -1,0 +1,92 @@
+[
+ {
+  "vollstaendig": false,
+  "land_code": "SN",
+  "ags": "14612000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Dresden, Landeshauptstadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2026,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 leitet den Sachwertfaktor (Kap. 7.3, S. 76–79) aus einer Stichprobe von „Grundstücke[n] mit Gebäuden des individuellen Wohnungsbaus“ ab (307 Kauffälle vor Bereinigung, gegliedert nach freistehenden Ein-/Zweifamilienhäusern, Doppelhaushälften und Reihenhäusern). Mehrfamilienhäuser kommen im Kapitel nicht vor (Volltext Kap. 7.3: 0 Treffer „Mehrfamilien“); sie werden in Kap. 7.4/7.5 über Ertragsfaktoren und Liegenschaftszinssätze erfasst. WEG: Geschäftsstelle des Gutachterausschusses Dresden, Städtisches Vermessungsamt; Bericht unter https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf. KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in der Landeshauptstadt Dresden (Städtisches Vermessungsamt)",
+  "lizenz": "Urheberrechtlich geschützt — Nutzung mit Erlaubnis des Herausgebers",
+  "lizenz_hinweis": "Wie dresden.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, Grundstücksmarktbericht 2026",
+  "geltungsbereich": {
+   "raeumlich": "Dresden, Landeshauptstadt",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2026, Kap. 7.3 „Sachwertfaktor“, S. 76–79 (Stichprobe: „Grundstücke mit Gebäuden des individuellen Wohnungsbaus“)",
+    "url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2026, Kap. 7.3 „Sachwertfaktor“, S. 76–79 (Stichprobe: „Grundstücke mit Gebäuden des individuellen Wohnungsbaus“)",
+  "modellversion": "GMB Dresden 2026",
+  "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "SN",
+  "ags": "14713000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Leipzig, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Dokument gemessen.",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 leitet Sachwertfaktoren nur für Ein- und Zweifamilienhausgrundstücke ab (Kap. 7.4.2, S. 83; Tabellen 124–126, S. 85, Stichtag 01.01.2026); der Jahrgang 2025 nennt den Zweck wörtlich: „für Bewertungsobjekte im individuellen (eigengenutzten) Wohnungsbau“. Mehrfamilienhäuser kommen in Kap. 7.4 nicht vor (0 Treffer „Mehrfamilien“). WEG: Geschäftsstelle des Gutachterausschusses Leipzig, Amt für Geoinformation und Bodenordnung; Bericht unter static.leipzig.de (Link in quelle_url). KEIN NACHBARWERT UND KEIN LANDESMITTEL (§ 10, § 21 ImmoWertV).",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet (nur individueller Wohnungsbau).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte in der Stadt Leipzig (Amt für Geoinformation und Bodenordnung)",
+  "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
+  "lizenz_hinweis": "Wie leipzig.json; die Sperre gibt nur den Inhalt des Dokuments wieder, keine Zahl.",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+  "geltungsbereich": {
+   "raeumlich": "Leipzig, Stadt",
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2026, Kap. 7.4.2 „Sachwertfaktor“, S. 83; Tabellen 124–126 „Sachwertfaktor für Ein- und Zweifamilienhausgrundstücke“, S. 85",
+    "url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2026, Kap. 7.4.2 „Sachwertfaktor“, S. 83; Tabellen 124–126 „Sachwertfaktor für Ein- und Zweifamilienhausgrundstücke“, S. 85",
+  "modellversion": "GMB Leipzig 2026",
+  "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
+  "quelle_parser": "v2712-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte SN/ST)"
+ }
+]

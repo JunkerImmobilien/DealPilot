@@ -8,7 +8,7 @@
 <!--
   messe-schleife-1 · Dauerschleife für den Messebildschirm (21.10.2026).
   Aufruf: ohne Parameter der Rundgang (messe-schleife-4: echte Videothek-Aufnahmen, rundgang.js),
-  ?idee=auswahl die Auswahl, ?idee=1 … 6, ?idee=alle.
+  ?idee=videothek alle Videos der Videothek (messe-schleife-5), ?idee=auswahl die Auswahl, ?idee=1 … 6, ?idee=alle.
   Rundgang-Videos: online landing/medien/videothek/ (volle Videos, Zeitmarken), offline
   messe-schleife/clips/rundgang/rg-*.mp4 (geschnittene Ausschnitte, nicht im Git).
   messe-schleife-2: ohne Netz lauffähig, auch direkt von der Platte (file://):
@@ -19,14 +19,21 @@
 -->
 <script>/* Fehlerprotokoll fuer den Pruefer: window.DPS_FEHLER (Skript-, Versprechen- und Ladefehler) */
 window.DPS_FEHLER=[];addEventListener('error',function(e){DPS_FEHLER.push(e.message||('Ladefehler '+((e.target&&(e.target.currentSrc||e.target.src))||'?')))},true);addEventListener('unhandledrejection',function(e){DPS_FEHLER.push('Promise: '+(e.reason&&e.reason.message||e.reason))});</script>
-<link rel="stylesheet" href="messe-schleife/schleife.css?v=messe-schleife-4">
+<link rel="stylesheet" href="messe-schleife/schleife.css?v=messe-schleife-5d">
 </head>
 <body>
 <div id="buehne"></div>
 <script src="js/score-tiers.js?v=v1950"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/dp-qr.js?v=v2180"></script>
-<script src="messe-schleife/rundgang.js?v=messe-schleife-4c"></script>
-<script src="messe-schleife/schleife.js?v=messe-schleife-4d"></script>
+<!-- messe-schleife-5: Gewinnspiel-Schalter (gewinnspiel.js: an true/false), Daten fuer Register-Tafel und Videothek-Kanal
+     (erzeugt von tools/messe-schleife-daten.mjs), gemeinsame Tafeln, Kanal Videothek (?idee=videothek, Taste V) -->
+<script src="messe-schleife/gewinnspiel.js?v=messe-schleife-5"></script>
+<script src="messe-schleife/register-stand.js?v=messe-schleife-5d"></script>
+<script src="messe-schleife/videothek-liste.js?v=messe-schleife-5"></script>
+<script src="messe-schleife/tafeln.js?v=messe-schleife-5d"></script>
+<script src="messe-schleife/rundgang.js?v=messe-schleife-5"></script>
+<script src="messe-schleife/videothek-kanal.js?v=messe-schleife-5c"></script>
+<script src="messe-schleife/schleife.js?v=messe-schleife-5"></script>
 </body>
 </html>

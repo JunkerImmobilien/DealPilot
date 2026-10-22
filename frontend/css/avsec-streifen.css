@@ -164,3 +164,19 @@
 #avsec .av-cards.single .mc.dp .mbody .row3 { justify-content: safe flex-end !important; min-width: 0 !important; overflow: hidden !important; }
 #avsec .av-cards.single .mc.dp .mbody .row3 .f3 { flex: 0 1 auto !important; min-width: 0 !important; }
 #avsec .av-cards.single .mc.dp .mbody .row3 .f3 .fv { overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+
+/* ===== v2740 · Marcel 22.10.2026: „Einordnung und Genauigkeit steht irgendwie verschoben." GEMESSEN (Westerfeldstr.
+   140, Haupt-App und Quick-Check-Dokument, Kartenbreite 1400 -> 345 px): zwei Ursachen, beide hier in dieser Datei.
+   (1) v2490 gab .row3 `justify-content: safe flex-end` - gedacht gegen den Ueberhang nach links, wirkte aber in
+   JEDER Stufe: Einordnung/Genauigkeit standen am rechten Rand statt unter der Spaltenteilung (Karte 1264 px:
+   Einordnung bei x=839 statt 240 unter der Spanne; Handy 345 px: x=88 statt 4, der einzige Block rechtsbuendig).
+   (2) v1876a setzte das Raster auf `align-items: end` und jede Spalte auf `justify-content: flex-end` - jede
+   Beschriftung sitzt so hoch, wie ihr Wert gross ist: Marktwert / Spanne / je m² standen bei 8 / 11 / 16 px,
+   Marktmiete / Einordnung bei 53 / 54 px. Jetzt: Zellen gestreckt, Beschriftung oben (eine Oberkante je Zeile),
+   Einordnung/Genauigkeit links in ihrer Zelle. Gegen Ueberlauf bleibt v2490: .f3 schrumpft, .fv kuerzt mit "…",
+   .row3 overflow:hidden - nach links kann bei flex-start nichts mehr quellen. Die Abschlag-Zeile (v2672, .legal)
+   liegt in eigener Rasterflaeche und war nicht beteiligt. ===== */
+#avsec .av-cards.single .mc.dp .mbody { align-items: stretch !important; }
+#avsec .av-cards.single .mc.dp .mbody > *, #avsec .av-cards.single .mc.dp .mbody .avs-spanne { justify-content: flex-start !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 { justify-content: flex-start !important; align-items: stretch !important; }
+#avsec .av-cards.single .mc.dp .mbody .row3 .f3 { justify-content: flex-start !important; }

@@ -802,8 +802,8 @@
   "geltungsbereich": null,
   "belege": [
    {
-    "art": "amtliche Veröffentlichung",
-    "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kapitel Liegenschaftszinssätze S. 40; Quervergleich Immobilienmarktbericht Schleswig-Holstein 2024, Kapitel 9, Tabelle 44, S. 92"
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kap. 6.4 Sachwertfaktoren, S. 42–43 (Tabellen NHK 2000 und NHK 2010)"
    }
   ],
   "stufe": "A",
@@ -815,18 +815,19 @@
   "berichtsjahr": 2025,
   "modellversion": null,
   "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
-  "quelle_parser": "v1885-hand (pdftotext, Seite/Stelle siehe belege, am 05.10.2026 gelesen)",
+  "quelle_parser": "v2700-hand (pdftotext -layout, Kap. 6.4/6.5 gelesen am 21.10.2026, Nachernte 10b SH)",
   "quellenvermerk": null,
   "lizenz": "kein Wert - Lizenz nicht einschlägig",
   "lizenz_hinweis": null,
-  "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kapitel Liegenschaftszinssätze S. 40",
-  "seite": null,
+  "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kap. 6.4 Sachwertfaktoren, S. 42–43 (Tabellen NHK 2000 und NHK 2010)",
+  "seite": 42,
   "auflagen": [
    "KEIN Nachbarkreis und kein Landesmittel: der Immobilienmarktbericht Schleswig-Holstein 2024 verzichtet auf eine landesweite Zusammenstellung ausdrücklich, weil „die Daten teilweise sehr unterschiedlich vorliegen und auch die zugrundeliegenden Modelle und deren Parameter differieren\" (S. 92)."
   ],
-  "warum_kein_wert": "Tabelle 44 des Landesberichts 2024 führt für Dithmarschen einen Sachwertfaktor als vorhanden; der Kreisbericht ist die nächste Stelle zum Nachsehen. Diese Sperre ist der Weg dorthin — der Kreisbericht ist beim Zins gelesen, das Sachwertkapitel war in Linie 8 nicht Gegenstand und ist der konkrete Rest für die Nachernte (Geschäftsstelle: Kreis Dithmarschen, Heide). Der Grundstücksmarktbericht 2025 ist frei abrufbar und liefert die Liegenschaftszinssätze für fünf Teilmärkte (bereits im Register, S. 40), aber keinen in diesem Register verwendbaren Sachwertfaktor. Weg zum Wert: das Sachwertkapitel desselben Berichts (Link oben, kostenfreier Download) lesen oder bei der Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen anfragen; Tabelle 44 des Immobilienmarktberichts Schleswig-Holstein 2024 (S. 92) führt für Dithmarschen einen Sachwertfaktor als vorhanden. Am 05.10.2026 gemessen: die Datenblätter des Landesportals (gaSW<Jahr><Ausschuss>.pdf und gaLiegZ...) gibt es NUR für Lübeck, Herzogtum Lauenburg und Ostholstein. Für alle zwölf übrigen Ausschüsse wurden beide Namensmuster (gaSW2025<Name> und gaSW<Name>2025) unter https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_<Name>/ abgerufen: 48 von 48 Abrufen HTTP 404. Zusätzlich wurden die sieben erreichbaren Ausschussseiten (Flensburg, Neumünster, Pinneberg, Plön, Herzogtum Lauenburg, Ostholstein, Lübeck) im HTML nach Links auf gaSW/gaLiegZ durchsucht — Treffer nur bei den drei genannten. ACHTUNG beim Nachprüfen: der Server antwortet auf die 404 mit dem Content-Type application/pdf bei 0 Byte Länge — wer nur den Content-Type prüft, hält die Fehlerseite für ein PDF.",
-  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2025 ist frei abrufbar und liefert die Liegenschaftszinssätze für fünf Teilmärkte (bereits im Register, S. 40), aber keinen in diesem Register verwendbaren Sachwertfaktor. Weg zum Wert: das Sachwertkapitel desselben Berichts (Link oben, kostenfreier Download) lesen oder bei der Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen anfragen; Tabelle 44 des Immobilienmarktberichts Schleswig-Holstein 2024 (S. 92) führt für Dithmarschen einen Sachwertfaktor als vorhanden.",
-  "vollstaendig": false
+  "warum_kein_wert": "Am 21.10.2026 das Sachwertkapitel des Grundstücksmarktberichts 2025 (veröffentlicht 16.03.2026, kostenloser Download) gelesen: Kap. 6.4 „Sachwertfaktoren [Marktanpassungsfaktoren]“ (S. 42–43) und Kap. 6.5 „Sachwertfaktoren für Gewerbegrundstücke“ (S. 43). Für Einfamilienhausgrundstücke stehen ZWEI Tabellen nebeneinander (Bodenwertniveau 30–180 €/m² × vorläufiger Sachwert 100.000–650.000 €, 604 Kaufverträge 2024, nicht regionalisiert): eine nach NHK 2000 (Außenanlagen 8 %) und eine nach NHK 2010 (Außenanlagen 5 %). Das Modell nennt für die Sachwertfaktoren weder eine Gesamtnutzungsdauer noch einen Baupreisindex (nur „Altersentwertung LINEAR“, „Bodenwert erschließungsbeitragsfrei, ungedämpft“) — mit welchem Index und welcher GND der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne beides als Zahl rechnete der Kern mit 80 Jahren und seiner Konstanten 1,91, und nichts widerspräche (§ 10 ImmoWertV). Deshalb kein Wert. Weg: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen, Stettiner Straße 30, 25746 Heide, Tel. 0481/97-1456 — nach Index und GND des NHK-2010-Modells fragen.",
+  "unvollstaendig_grund": "Am 21.10.2026 das Sachwertkapitel des Grundstücksmarktberichts 2025 (veröffentlicht 16.03.2026, kostenloser Download) gelesen: Kap. 6.4 „Sachwertfaktoren [Marktanpassungsfaktoren]“ (S. 42–43) und Kap. 6.5 „Sachwertfaktoren für Gewerbegrundstücke“ (S. 43). Für Einfamilienhausgrundstücke stehen ZWEI Tabellen nebeneinander (Bodenwertniveau 30–180 €/m² × vorläufiger Sachwert 100.000–650.000 €, 604 Kaufverträge 2024, nicht regionalisiert): eine nach NHK 2000 (Außenanlagen 8 %) und eine nach NHK 2010 (Außenanlagen 5 %). Das Modell nennt für die Sachwertfaktoren weder eine Gesamtnutzungsdauer noch einen Baupreisindex (nur „Altersentwertung LINEAR“, „Bodenwert erschließungsbeitragsfrei, ungedämpft“) — mit welchem Index und welcher GND der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne beides als Zahl rechnete der Kern mit 80 Jahren und seiner Konstanten 1,91, und nichts widerspräche (§ 10 ImmoWertV). Deshalb kein Wert. Weg: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen, Stettiner Straße 30, 25746 Heide, Tel. 0481/97-1456 — nach Index und GND des NHK-2010-Modells fragen.",
+  "vollstaendig": false,
+  "zugang": "kostenfrei"
  },
  {
   "land_code": "SH",
@@ -843,8 +844,8 @@
   "geltungsbereich": null,
   "belege": [
    {
-    "art": "amtliche Veröffentlichung",
-    "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kapitel Liegenschaftszinssätze S. 40; Quervergleich Immobilienmarktbericht Schleswig-Holstein 2024, Kapitel 9, Tabelle 44, S. 92"
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kap. 6.4 Sachwertfaktoren, S. 42–43 (Tabellen NHK 2000 und NHK 2010)"
    }
   ],
   "stufe": "A",
@@ -856,18 +857,19 @@
   "berichtsjahr": 2025,
   "modellversion": null,
   "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
-  "quelle_parser": "v1885-hand (pdftotext, Seite/Stelle siehe belege, am 05.10.2026 gelesen)",
+  "quelle_parser": "v2700-hand (pdftotext -layout, Kap. 6.4/6.5 gelesen am 21.10.2026, Nachernte 10b SH)",
   "quellenvermerk": null,
   "lizenz": "kein Wert - Lizenz nicht einschlägig",
   "lizenz_hinweis": null,
-  "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kapitel Liegenschaftszinssätze S. 40",
-  "seite": null,
+  "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kap. 6.4 Sachwertfaktoren, S. 42–43 (Tabellen NHK 2000 und NHK 2010)",
+  "seite": 42,
   "auflagen": [
    "KEIN Nachbarkreis und kein Landesmittel: der Immobilienmarktbericht Schleswig-Holstein 2024 verzichtet auf eine landesweite Zusammenstellung ausdrücklich, weil „die Daten teilweise sehr unterschiedlich vorliegen und auch die zugrundeliegenden Modelle und deren Parameter differieren\" (S. 92)."
   ],
-  "warum_kein_wert": "Tabelle 44 des Landesberichts 2024 führt für Dithmarschen einen Sachwertfaktor als vorhanden; der Kreisbericht ist die nächste Stelle zum Nachsehen. Diese Sperre ist der Weg dorthin — der Kreisbericht ist beim Zins gelesen, das Sachwertkapitel war in Linie 8 nicht Gegenstand und ist der konkrete Rest für die Nachernte (Geschäftsstelle: Kreis Dithmarschen, Heide). Der Grundstücksmarktbericht 2025 ist frei abrufbar und liefert die Liegenschaftszinssätze für fünf Teilmärkte (bereits im Register, S. 40), aber keinen in diesem Register verwendbaren Sachwertfaktor. Weg zum Wert: das Sachwertkapitel desselben Berichts (Link oben, kostenfreier Download) lesen oder bei der Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen anfragen; Tabelle 44 des Immobilienmarktberichts Schleswig-Holstein 2024 (S. 92) führt für Dithmarschen einen Sachwertfaktor als vorhanden. Am 05.10.2026 gemessen: die Datenblätter des Landesportals (gaSW<Jahr><Ausschuss>.pdf und gaLiegZ...) gibt es NUR für Lübeck, Herzogtum Lauenburg und Ostholstein. Für alle zwölf übrigen Ausschüsse wurden beide Namensmuster (gaSW2025<Name> und gaSW<Name>2025) unter https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_<Name>/ abgerufen: 48 von 48 Abrufen HTTP 404. Zusätzlich wurden die sieben erreichbaren Ausschussseiten (Flensburg, Neumünster, Pinneberg, Plön, Herzogtum Lauenburg, Ostholstein, Lübeck) im HTML nach Links auf gaSW/gaLiegZ durchsucht — Treffer nur bei den drei genannten. ACHTUNG beim Nachprüfen: der Server antwortet auf die 404 mit dem Content-Type application/pdf bei 0 Byte Länge — wer nur den Content-Type prüft, hält die Fehlerseite für ein PDF.",
-  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2025 ist frei abrufbar und liefert die Liegenschaftszinssätze für fünf Teilmärkte (bereits im Register, S. 40), aber keinen in diesem Register verwendbaren Sachwertfaktor. Weg zum Wert: das Sachwertkapitel desselben Berichts (Link oben, kostenfreier Download) lesen oder bei der Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen anfragen; Tabelle 44 des Immobilienmarktberichts Schleswig-Holstein 2024 (S. 92) führt für Dithmarschen einen Sachwertfaktor als vorhanden.",
-  "vollstaendig": false
+  "warum_kein_wert": "Am 21.10.2026 das Sachwertkapitel des Grundstücksmarktberichts 2025 (veröffentlicht 16.03.2026, kostenloser Download) gelesen: Kap. 6.4 „Sachwertfaktoren [Marktanpassungsfaktoren]“ (S. 42–43) und Kap. 6.5 „Sachwertfaktoren für Gewerbegrundstücke“ (S. 43). Für Einfamilienhausgrundstücke stehen ZWEI Tabellen nebeneinander (Bodenwertniveau 30–180 €/m² × vorläufiger Sachwert 100.000–650.000 €, 604 Kaufverträge 2024, nicht regionalisiert): eine nach NHK 2000 (Außenanlagen 8 %) und eine nach NHK 2010 (Außenanlagen 5 %). Das Modell nennt für die Sachwertfaktoren weder eine Gesamtnutzungsdauer noch einen Baupreisindex (nur „Altersentwertung LINEAR“, „Bodenwert erschließungsbeitragsfrei, ungedämpft“) — mit welchem Index und welcher GND der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne beides als Zahl rechnete der Kern mit 80 Jahren und seiner Konstanten 1,91, und nichts widerspräche (§ 10 ImmoWertV). Deshalb kein Wert. Die Tabelle heißt „Einfamilienhausgrundstücke“ und unterscheidet nicht nach freistehend, Doppel- oder Reihenhaus. Weg: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen, Stettiner Straße 30, 25746 Heide, Tel. 0481/97-1456 — nach Index und GND des NHK-2010-Modells fragen.",
+  "unvollstaendig_grund": "Am 21.10.2026 das Sachwertkapitel des Grundstücksmarktberichts 2025 (veröffentlicht 16.03.2026, kostenloser Download) gelesen: Kap. 6.4 „Sachwertfaktoren [Marktanpassungsfaktoren]“ (S. 42–43) und Kap. 6.5 „Sachwertfaktoren für Gewerbegrundstücke“ (S. 43). Für Einfamilienhausgrundstücke stehen ZWEI Tabellen nebeneinander (Bodenwertniveau 30–180 €/m² × vorläufiger Sachwert 100.000–650.000 €, 604 Kaufverträge 2024, nicht regionalisiert): eine nach NHK 2000 (Außenanlagen 8 %) und eine nach NHK 2010 (Außenanlagen 5 %). Das Modell nennt für die Sachwertfaktoren weder eine Gesamtnutzungsdauer noch einen Baupreisindex (nur „Altersentwertung LINEAR“, „Bodenwert erschließungsbeitragsfrei, ungedämpft“) — mit welchem Index und welcher GND der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne beides als Zahl rechnete der Kern mit 80 Jahren und seiner Konstanten 1,91, und nichts widerspräche (§ 10 ImmoWertV). Deshalb kein Wert. Die Tabelle heißt „Einfamilienhausgrundstücke“ und unterscheidet nicht nach freistehend, Doppel- oder Reihenhaus. Weg: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen, Stettiner Straße 30, 25746 Heide, Tel. 0481/97-1456 — nach Index und GND des NHK-2010-Modells fragen.",
+  "vollstaendig": false,
+  "zugang": "kostenfrei"
  },
  {
   "land_code": "SH",
@@ -884,8 +886,8 @@
   "geltungsbereich": null,
   "belege": [
    {
-    "art": "amtliche Veröffentlichung",
-    "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kapitel Liegenschaftszinssätze S. 40; Quervergleich Immobilienmarktbericht Schleswig-Holstein 2024, Kapitel 9, Tabelle 44, S. 92"
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kap. 5.4 (S. 35), 6.2 (S. 40), 6.4–6.5 (S. 42–43)"
    }
   ],
   "stufe": "A",
@@ -897,18 +899,19 @@
   "berichtsjahr": 2025,
   "modellversion": null,
   "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
-  "quelle_parser": "v1885-hand (pdftotext, Seite/Stelle siehe belege, am 05.10.2026 gelesen)",
+  "quelle_parser": "v2700-hand (pdftotext -layout, Kap. 6.4/6.5 gelesen am 21.10.2026, Nachernte 10b SH)",
   "quellenvermerk": null,
   "lizenz": "kein Wert - Lizenz nicht einschlägig",
   "lizenz_hinweis": null,
-  "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kapitel Liegenschaftszinssätze S. 40",
-  "seite": null,
+  "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kap. 5.4 (S. 35), 6.2 (S. 40), 6.4–6.5 (S. 42–43)",
+  "seite": 35,
   "auflagen": [
    "KEIN Nachbarkreis und kein Landesmittel: der Immobilienmarktbericht Schleswig-Holstein 2024 verzichtet auf eine landesweite Zusammenstellung ausdrücklich, weil „die Daten teilweise sehr unterschiedlich vorliegen und auch die zugrundeliegenden Modelle und deren Parameter differieren\" (S. 92)."
   ],
-  "warum_kein_wert": "Tabelle 44 des Landesberichts 2024 führt für Dithmarschen einen Sachwertfaktor als vorhanden; der Kreisbericht ist die nächste Stelle zum Nachsehen. Diese Sperre ist der Weg dorthin — der Kreisbericht ist beim Zins gelesen, das Sachwertkapitel war in Linie 8 nicht Gegenstand und ist der konkrete Rest für die Nachernte (Geschäftsstelle: Kreis Dithmarschen, Heide). Der Grundstücksmarktbericht 2025 ist frei abrufbar und liefert die Liegenschaftszinssätze für fünf Teilmärkte (bereits im Register, S. 40), aber keinen in diesem Register verwendbaren Sachwertfaktor. Weg zum Wert: das Sachwertkapitel desselben Berichts (Link oben, kostenfreier Download) lesen oder bei der Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen anfragen; Tabelle 44 des Immobilienmarktberichts Schleswig-Holstein 2024 (S. 92) führt für Dithmarschen einen Sachwertfaktor als vorhanden. Am 05.10.2026 gemessen: die Datenblätter des Landesportals (gaSW<Jahr><Ausschuss>.pdf und gaLiegZ...) gibt es NUR für Lübeck, Herzogtum Lauenburg und Ostholstein. Für alle zwölf übrigen Ausschüsse wurden beide Namensmuster (gaSW2025<Name> und gaSW<Name>2025) unter https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_<Name>/ abgerufen: 48 von 48 Abrufen HTTP 404. Zusätzlich wurden die sieben erreichbaren Ausschussseiten (Flensburg, Neumünster, Pinneberg, Plön, Herzogtum Lauenburg, Ostholstein, Lübeck) im HTML nach Links auf gaSW/gaLiegZ durchsucht — Treffer nur bei den drei genannten. ACHTUNG beim Nachprüfen: der Server antwortet auf die 404 mit dem Content-Type application/pdf bei 0 Byte Länge — wer nur den Content-Type prüft, hält die Fehlerseite für ein PDF.",
-  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2025 ist frei abrufbar und liefert die Liegenschaftszinssätze für fünf Teilmärkte (bereits im Register, S. 40), aber keinen in diesem Register verwendbaren Sachwertfaktor. Weg zum Wert: das Sachwertkapitel desselben Berichts (Link oben, kostenfreier Download) lesen oder bei der Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen anfragen; Tabelle 44 des Immobilienmarktberichts Schleswig-Holstein 2024 (S. 92) führt für Dithmarschen einen Sachwertfaktor als vorhanden.",
-  "vollstaendig": false
+  "warum_kein_wert": "Am 21.10.2026 das Sachwertkapitel des Grundstücksmarktberichts 2025 (veröffentlicht 16.03.2026, kostenloser Download) gelesen: Kap. 6.4 „Sachwertfaktoren [Marktanpassungsfaktoren]“ (S. 42–43) und Kap. 6.5 „Sachwertfaktoren für Gewerbegrundstücke“ (S. 43). Für Eigentumswohnungen führt der Bericht keinen Sachwertfaktor; Wohnungseigentum steht dort nur als Richtwerttabelle (Vergleichsfaktoren, Kap. 5.4, S. 35) und als Liegenschaftszinssatz (S. 40).",
+  "unvollstaendig_grund": "Am 21.10.2026 das Sachwertkapitel des Grundstücksmarktberichts 2025 (veröffentlicht 16.03.2026, kostenloser Download) gelesen: Kap. 6.4 „Sachwertfaktoren [Marktanpassungsfaktoren]“ (S. 42–43) und Kap. 6.5 „Sachwertfaktoren für Gewerbegrundstücke“ (S. 43). Für Eigentumswohnungen führt der Bericht keinen Sachwertfaktor; Wohnungseigentum steht dort nur als Richtwerttabelle (Vergleichsfaktoren, Kap. 5.4, S. 35) und als Liegenschaftszinssatz (S. 40).",
+  "vollstaendig": false,
+  "zugang": "kostenfrei"
  },
  {
   "land_code": "SH",
@@ -925,8 +928,8 @@
   "geltungsbereich": null,
   "belege": [
    {
-    "art": "amtliche Veröffentlichung",
-    "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kapitel Liegenschaftszinssätze S. 40; Quervergleich Immobilienmarktbericht Schleswig-Holstein 2024, Kapitel 9, Tabelle 44, S. 92"
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kap. 6.5 Sachwertfaktoren für Gewerbegrundstücke, S. 43"
    }
   ],
   "stufe": "A",
@@ -938,18 +941,19 @@
   "berichtsjahr": 2025,
   "modellversion": null,
   "quelle_url": "https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf",
-  "quelle_parser": "v1885-hand (pdftotext, Seite/Stelle siehe belege, am 05.10.2026 gelesen)",
+  "quelle_parser": "v2700-hand (pdftotext -layout, Kap. 6.4/6.5 gelesen am 21.10.2026, Nachernte 10b SH)",
   "quellenvermerk": null,
   "lizenz": "kein Wert - Lizenz nicht einschlägig",
   "lizenz_hinweis": null,
-  "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kapitel Liegenschaftszinssätze S. 40",
-  "seite": null,
+  "fundstelle": "Grundstücksmarktbericht Dithmarschen 2025, Kap. 6.5 Sachwertfaktoren für Gewerbegrundstücke, S. 43",
+  "seite": 43,
   "auflagen": [
    "KEIN Nachbarkreis und kein Landesmittel: der Immobilienmarktbericht Schleswig-Holstein 2024 verzichtet auf eine landesweite Zusammenstellung ausdrücklich, weil „die Daten teilweise sehr unterschiedlich vorliegen und auch die zugrundeliegenden Modelle und deren Parameter differieren\" (S. 92)."
   ],
-  "warum_kein_wert": "Tabelle 44 des Landesberichts 2024 führt für Dithmarschen einen Sachwertfaktor als vorhanden; der Kreisbericht ist die nächste Stelle zum Nachsehen. Diese Sperre ist der Weg dorthin — der Kreisbericht ist beim Zins gelesen, das Sachwertkapitel war in Linie 8 nicht Gegenstand und ist der konkrete Rest für die Nachernte (Geschäftsstelle: Kreis Dithmarschen, Heide). Der Grundstücksmarktbericht 2025 ist frei abrufbar und liefert die Liegenschaftszinssätze für fünf Teilmärkte (bereits im Register, S. 40), aber keinen in diesem Register verwendbaren Sachwertfaktor. Weg zum Wert: das Sachwertkapitel desselben Berichts (Link oben, kostenfreier Download) lesen oder bei der Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen anfragen; Tabelle 44 des Immobilienmarktberichts Schleswig-Holstein 2024 (S. 92) führt für Dithmarschen einen Sachwertfaktor als vorhanden. Am 05.10.2026 gemessen: die Datenblätter des Landesportals (gaSW<Jahr><Ausschuss>.pdf und gaLiegZ...) gibt es NUR für Lübeck, Herzogtum Lauenburg und Ostholstein. Für alle zwölf übrigen Ausschüsse wurden beide Namensmuster (gaSW2025<Name> und gaSW<Name>2025) unter https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_<Name>/ abgerufen: 48 von 48 Abrufen HTTP 404. Zusätzlich wurden die sieben erreichbaren Ausschussseiten (Flensburg, Neumünster, Pinneberg, Plön, Herzogtum Lauenburg, Ostholstein, Lübeck) im HTML nach Links auf gaSW/gaLiegZ durchsucht — Treffer nur bei den drei genannten. ACHTUNG beim Nachprüfen: der Server antwortet auf die 404 mit dem Content-Type application/pdf bei 0 Byte Länge — wer nur den Content-Type prüft, hält die Fehlerseite für ein PDF.",
-  "unvollstaendig_grund": "Der Grundstücksmarktbericht 2025 ist frei abrufbar und liefert die Liegenschaftszinssätze für fünf Teilmärkte (bereits im Register, S. 40), aber keinen in diesem Register verwendbaren Sachwertfaktor. Weg zum Wert: das Sachwertkapitel desselben Berichts (Link oben, kostenfreier Download) lesen oder bei der Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen anfragen; Tabelle 44 des Immobilienmarktberichts Schleswig-Holstein 2024 (S. 92) führt für Dithmarschen einen Sachwertfaktor als vorhanden.",
-  "vollstaendig": false
+  "warum_kein_wert": "Am 21.10.2026 das Sachwertkapitel des Grundstücksmarktberichts 2025 (veröffentlicht 16.03.2026, kostenloser Download) gelesen: Kap. 6.4 „Sachwertfaktoren [Marktanpassungsfaktoren]“ (S. 42–43) und Kap. 6.5 „Sachwertfaktoren für Gewerbegrundstücke“ (S. 43). Mehrfamilienhäuser stehen nur in der Sammeltabelle „Gebäudetypen GEW [Mehrfamilienhäuser, gemischt genutzte Grundstücke, Gewerbegrundstücke]“ (Kap. 6.5, S. 43, 500 Datensätze) — und die ist ausschließlich nach „Normalherstellungskosten 2000 (NHK 2000, gem. WertR vom 01.12.2001)“ abgeleitet. Ein Faktor aus dem NHK-2000-Modell auf einen vorläufigen Sachwert nach NHK 2010 angewandt widerspricht § 10 ImmoWertV; außerdem trennt die Tabelle Mehrfamilienhäuser nicht von Gewerbe. Kein Wert. Weg: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen, Stettiner Straße 30, 25746 Heide, Tel. 0481/97-1456 — nach Index und GND des NHK-2010-Modells fragen.",
+  "unvollstaendig_grund": "Am 21.10.2026 das Sachwertkapitel des Grundstücksmarktberichts 2025 (veröffentlicht 16.03.2026, kostenloser Download) gelesen: Kap. 6.4 „Sachwertfaktoren [Marktanpassungsfaktoren]“ (S. 42–43) und Kap. 6.5 „Sachwertfaktoren für Gewerbegrundstücke“ (S. 43). Mehrfamilienhäuser stehen nur in der Sammeltabelle „Gebäudetypen GEW [Mehrfamilienhäuser, gemischt genutzte Grundstücke, Gewerbegrundstücke]“ (Kap. 6.5, S. 43, 500 Datensätze) — und die ist ausschließlich nach „Normalherstellungskosten 2000 (NHK 2000, gem. WertR vom 01.12.2001)“ abgeleitet. Ein Faktor aus dem NHK-2000-Modell auf einen vorläufigen Sachwert nach NHK 2010 angewandt widerspricht § 10 ImmoWertV; außerdem trennt die Tabelle Mehrfamilienhäuser nicht von Gewerbe. Kein Wert. Weg: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Dithmarschen, Stettiner Straße 30, 25746 Heide, Tel. 0481/97-1456 — nach Index und GND des NHK-2010-Modells fragen.",
+  "vollstaendig": false,
+  "zugang": "kostenfrei"
  },
  {
   "land_code": "SH",

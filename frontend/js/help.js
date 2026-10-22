@@ -878,8 +878,12 @@
         '<div class="help-sidebar-item-row">' +
           iconHtml +
           '<span class="help-sidebar-item-title">' + _escHtml(t.title) + '</span>' +
-        '</div>' +
-        '<span class="help-sidebar-item-desc">' + _escHtml(t.desc) + '</span>'; /* v838b-help-desc: Untertexte wieder an, gekuerzt */
+        '</div>';
+      /* v2741 · Marcel 22.10.2026: „die kleinen grauen Texte unter den Unterpunkten weg -
+         die Texte sind unnötig." Die Untertexte (t.desc) werden nicht mehr gerendert, weder
+         hier in der Seitenleiste noch unter der Themen-Ueberschrift (_renderTopic). Die Suche
+         liest nur sections (h/body), nie desc - sie bleibt unveraendert. Das Feld desc bleibt
+         in HELP_TOPICS stehen (DealPilotHilfe.themen() gibt es an den Piloten weiter). */
       item.onclick = function() { _selectTopic(t.id); };
       sidebar.appendChild(item);
     });
@@ -1068,8 +1072,7 @@
         iconHtml +
         '<h2>' + _escHtml(topic.title) + '</h2>' +
       '</div>' +
-      '<p class="help-topic-desc">' + _escHtml(topic.desc) + '</p>' +
-    '</div>';
+    '</div>';   /* v2741 · ohne Untertext (topic.desc), siehe Seitenleiste */
     /* v2188: Prozess-Atlas und Pilot oben im Thema „Abläufe & Pilot“ (v2200: vor der Tour) */
     if (topic.id === 'ablaeufe') { html += _atlasBannerHtml(); }
     // BlockA3: Tour-Banner OBEN im Einstieg-Topic — direkter innerHTML, kein Filter

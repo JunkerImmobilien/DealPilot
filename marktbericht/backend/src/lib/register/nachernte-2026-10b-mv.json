@@ -1,0 +1,508 @@
+[
+ {
+  "vollstaendig": false,
+  "land_code": "MV",
+  "ags": "13071",
+  "ebene": "kreis",
+  "gebiet_name": "Mecklenburgische Seenplatte, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Impressum und Inhalt des Dokuments gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — der Wert steht im Dokument, darf aber ohne Genehmigung nicht in einen Kundenbericht. Der Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023) führt Liegenschaftszinssätze für Ein- und Zweifamilienhäuser (Abschnitt B (Stadt Neubrandenburg) Kap. 5.3.1 „Ein- und Zweifamilienhäuser 2023“, S. 68; Abschnitt C (Landkreis ohne Neubrandenburg) Kap. 5.3.1–5.3.3 je Region Demmin, Mecklenburg-Strelitz, Waren (Müritz), S. 128–137), getrennt für die Stadt Neubrandenburg und die drei Regionen des Landkreises. Lizenz S. 2, „Vervielfältigung und Verbreitung“: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“ Ein DealPilot-Bericht ist eine Vervielfältigung und Verbreitung und damit ohne Genehmigung nicht gedeckt; kostenfreier Abruf ist keine Lizenz (gleiche Lage wie Rostock, nachernte-2026-10-mv.json). Übernommen wird weder die Zahl noch das Modell. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, (0395) 570 87 3200; Bezug: https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html (am 21.10.2026 nicht erreichbar). Ein Jahrgang 2025 war am 14.09.2026 im Geoshop nicht gelistet. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 und § 21 ImmoWertV verlangen den Wert des örtlich zuständigen Ausschusses in dessen Modell; der Landesgrundstücksmarktbericht M-V veröffentlicht keine Zins- und Faktorwerte.",
+  "unvollstaendig_grund": "Genehmigungspflichtig (Lizenz), keine Verfügbarkeitslücke.",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Bericht über den Geoshop des Landkreises abrufbar; die Hürde ist die Genehmigung, nicht der Preis",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, (0395) 570 87 3200",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig (Genehmigungsvorbehalt des Herausgebers)",
+  "lizenz_hinweis": "S. 2, „Vervielfältigung und Verbreitung“: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“",
+  "geltungsbereich": {
+   "objektarten": [
+    "ezfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "raeumlich": "Mecklenburgische Seenplatte, Landkreis",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023), Abschnitt B (Stadt Neubrandenburg) Kap. 5.3.1 „Ein- und Zweifamilienhäuser 2023“, S. 68; Abschnitt C (Landkreis ohne Neubrandenburg) Kap. 5.3.1–5.3.3 je Region Demmin, Mecklenburg-Strelitz, Waren (Müritz), S. 128–137",
+    "url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023), Abschnitt B (Stadt Neubrandenburg) Kap. 5.3.1 „Ein- und Zweifamilienhäuser 2023“, S. 68; Abschnitt C (Landkreis ohne Neubrandenburg) Kap. 5.3.1–5.3.3 je Region Demmin, Mecklenburg-Strelitz, Waren (Müritz), S. 128–137",
+  "modellversion": "GMB Mecklenburgische Seenplatte 2024 (Berichtsjahr 2023)",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "quelle_parser": "v2711-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte MV; Geoshop geocms.com am 21.10.2026 nicht erreichbar — Connection refused —, gelesen wurde die am 14.09.2026 dort bezogene Fassung)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "MV",
+  "ags": "13071",
+  "ebene": "kreis",
+  "gebiet_name": "Mecklenburgische Seenplatte, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppelhaushälften und Reihenhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Impressum und Inhalt des Dokuments gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — der Wert steht im Dokument, darf aber ohne Genehmigung nicht in einen Kundenbericht. Der Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023) führt Liegenschaftszinssätze für Doppelhaushälften und Reihenhäuser (Abschnitt C Kap. 5.3.1–5.3.3, Tabellen „Doppelhaushälften und Reihenhäuser“ je Region, S. 129–137; Abschnitt B Kap. 5.3.1, S. 68), getrennt für die Stadt Neubrandenburg und die drei Regionen des Landkreises. Lizenz S. 2, „Vervielfältigung und Verbreitung“: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“ Ein DealPilot-Bericht ist eine Vervielfältigung und Verbreitung und damit ohne Genehmigung nicht gedeckt; kostenfreier Abruf ist keine Lizenz (gleiche Lage wie Rostock, nachernte-2026-10-mv.json). Übernommen wird weder die Zahl noch das Modell. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, (0395) 570 87 3200; Bezug: https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html (am 21.10.2026 nicht erreichbar). Ein Jahrgang 2025 war am 14.09.2026 im Geoshop nicht gelistet. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 und § 21 ImmoWertV verlangen den Wert des örtlich zuständigen Ausschusses in dessen Modell; der Landesgrundstücksmarktbericht M-V veröffentlicht keine Zins- und Faktorwerte.",
+  "unvollstaendig_grund": "Genehmigungspflichtig (Lizenz), keine Verfügbarkeitslücke.",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Bericht über den Geoshop des Landkreises abrufbar; die Hürde ist die Genehmigung, nicht der Preis",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, (0395) 570 87 3200",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig (Genehmigungsvorbehalt des Herausgebers)",
+  "lizenz_hinweis": "S. 2, „Vervielfältigung und Verbreitung“: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“",
+  "geltungsbereich": {
+   "objektarten": [
+    "rhdhh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "raeumlich": "Mecklenburgische Seenplatte, Landkreis",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023), Abschnitt C Kap. 5.3.1–5.3.3, Tabellen „Doppelhaushälften und Reihenhäuser“ je Region, S. 129–137; Abschnitt B Kap. 5.3.1, S. 68",
+    "url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023), Abschnitt C Kap. 5.3.1–5.3.3, Tabellen „Doppelhaushälften und Reihenhäuser“ je Region, S. 129–137; Abschnitt B Kap. 5.3.1, S. 68",
+  "modellversion": "GMB Mecklenburgische Seenplatte 2024 (Berichtsjahr 2023)",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "quelle_parser": "v2711-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte MV; Geoshop geocms.com am 21.10.2026 nicht erreichbar — Connection refused —, gelesen wurde die am 14.09.2026 dort bezogene Fassung)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "MV",
+  "ags": "13071",
+  "ebene": "kreis",
+  "gebiet_name": "Mecklenburgische Seenplatte, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser und Geschosswohnungsbau",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Impressum und Inhalt des Dokuments gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — der Wert steht im Dokument, darf aber ohne Genehmigung nicht in einen Kundenbericht. Der Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023) führt Liegenschaftszinssätze für Mehrfamilienhäuser und Geschosswohnungsbau (Abschnitt B Kap. 5.3.2 „Mehrfamilienhäuser und Geschosswohnungsbau 2023“, S. 69; Abschnitt C Kap. 5.3.1–5.3.3 je Region, S. 129–138), getrennt für die Stadt Neubrandenburg und die drei Regionen des Landkreises. Lizenz S. 2, „Vervielfältigung und Verbreitung“: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“ Ein DealPilot-Bericht ist eine Vervielfältigung und Verbreitung und damit ohne Genehmigung nicht gedeckt; kostenfreier Abruf ist keine Lizenz (gleiche Lage wie Rostock, nachernte-2026-10-mv.json). Übernommen wird weder die Zahl noch das Modell. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, (0395) 570 87 3200; Bezug: https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html (am 21.10.2026 nicht erreichbar). Ein Jahrgang 2025 war am 14.09.2026 im Geoshop nicht gelistet. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 und § 21 ImmoWertV verlangen den Wert des örtlich zuständigen Ausschusses in dessen Modell; der Landesgrundstücksmarktbericht M-V veröffentlicht keine Zins- und Faktorwerte.",
+  "unvollstaendig_grund": "Genehmigungspflichtig (Lizenz), keine Verfügbarkeitslücke.",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Bericht über den Geoshop des Landkreises abrufbar; die Hürde ist die Genehmigung, nicht der Preis",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, (0395) 570 87 3200",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig (Genehmigungsvorbehalt des Herausgebers)",
+  "lizenz_hinweis": "S. 2, „Vervielfältigung und Verbreitung“: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "raeumlich": "Mecklenburgische Seenplatte, Landkreis",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023), Abschnitt B Kap. 5.3.2 „Mehrfamilienhäuser und Geschosswohnungsbau 2023“, S. 69; Abschnitt C Kap. 5.3.1–5.3.3 je Region, S. 129–138",
+    "url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023), Abschnitt B Kap. 5.3.2 „Mehrfamilienhäuser und Geschosswohnungsbau 2023“, S. 69; Abschnitt C Kap. 5.3.1–5.3.3 je Region, S. 129–138",
+  "modellversion": "GMB Mecklenburgische Seenplatte 2024 (Berichtsjahr 2023)",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "quelle_parser": "v2711-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte MV; Geoshop geocms.com am 21.10.2026 nicht erreichbar — Connection refused —, gelesen wurde die am 14.09.2026 dort bezogene Fassung)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "MV",
+  "ags": "13071",
+  "ebene": "kreis",
+  "gebiet_name": "Mecklenburgische Seenplatte, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "objektart": "etw",
+  "objektart_bez": "Wohnungseigentum",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Impressum und Inhalt des Dokuments gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — der Wert steht im Dokument, darf aber ohne Genehmigung nicht in einen Kundenbericht. Der Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023) führt Liegenschaftszinssätze für Wohnungseigentum (Abschnitt B Kap. 5.3.3 „Wohnungseigentum 2023“, S. 69 f.; Abschnitt C Kap. 5.3.1–5.3.3 je Region, S. 132–138), getrennt für die Stadt Neubrandenburg und die drei Regionen des Landkreises. Lizenz S. 2, „Vervielfältigung und Verbreitung“: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“ Ein DealPilot-Bericht ist eine Vervielfältigung und Verbreitung und damit ohne Genehmigung nicht gedeckt; kostenfreier Abruf ist keine Lizenz (gleiche Lage wie Rostock, nachernte-2026-10-mv.json). Übernommen wird weder die Zahl noch das Modell. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, (0395) 570 87 3200; Bezug: https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html (am 21.10.2026 nicht erreichbar). Ein Jahrgang 2025 war am 14.09.2026 im Geoshop nicht gelistet. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 und § 21 ImmoWertV verlangen den Wert des örtlich zuständigen Ausschusses in dessen Modell; der Landesgrundstücksmarktbericht M-V veröffentlicht keine Zins- und Faktorwerte.",
+  "unvollstaendig_grund": "Genehmigungspflichtig (Lizenz), keine Verfügbarkeitslücke.",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Bericht über den Geoshop des Landkreises abrufbar; die Hürde ist die Genehmigung, nicht der Preis",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, (0395) 570 87 3200",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig (Genehmigungsvorbehalt des Herausgebers)",
+  "lizenz_hinweis": "S. 2, „Vervielfältigung und Verbreitung“: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“",
+  "geltungsbereich": {
+   "objektarten": [
+    "etw"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "raeumlich": "Mecklenburgische Seenplatte, Landkreis",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023), Abschnitt B Kap. 5.3.3 „Wohnungseigentum 2023“, S. 69 f.; Abschnitt C Kap. 5.3.1–5.3.3 je Region, S. 132–138",
+    "url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023), Abschnitt B Kap. 5.3.3 „Wohnungseigentum 2023“, S. 69 f.; Abschnitt C Kap. 5.3.1–5.3.3 je Region, S. 132–138",
+  "modellversion": "GMB Mecklenburgische Seenplatte 2024 (Berichtsjahr 2023)",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "quelle_parser": "v2711-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte MV; Geoshop geocms.com am 21.10.2026 nicht erreichbar — Connection refused —, gelesen wurde die am 14.09.2026 dort bezogene Fassung)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "MV",
+  "ags": "13071",
+  "ebene": "kreis",
+  "gebiet_name": "Mecklenburgische Seenplatte, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ggg",
+  "objektart": "gewerbe",
+  "objektart_bez": "gewerblich genutzte Objekte, Büro- und Verwaltungsobjekte",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Impressum und Inhalt des Dokuments gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — der Wert steht im Dokument, darf aber ohne Genehmigung nicht in einen Kundenbericht. Der Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023) führt Liegenschaftszinssätze für gewerblich genutzte Objekte, Büro- und Verwaltungsobjekte (Abschnitt B Kap. 5.3.4 „Büro- und Verwaltungsobjekte 2023“ und 5.3.5 „Gewerblich genutzte Objekte 2023“, S. 71; Abschnitt C Region Waren (Müritz), S. 138), getrennt für die Stadt Neubrandenburg und die drei Regionen des Landkreises. Lizenz S. 2, „Vervielfältigung und Verbreitung“: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“ Ein DealPilot-Bericht ist eine Vervielfältigung und Verbreitung und damit ohne Genehmigung nicht gedeckt; kostenfreier Abruf ist keine Lizenz (gleiche Lage wie Rostock, nachernte-2026-10-mv.json). Übernommen wird weder die Zahl noch das Modell. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, (0395) 570 87 3200; Bezug: https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html (am 21.10.2026 nicht erreichbar). Ein Jahrgang 2025 war am 14.09.2026 im Geoshop nicht gelistet. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 und § 21 ImmoWertV verlangen den Wert des örtlich zuständigen Ausschusses in dessen Modell; der Landesgrundstücksmarktbericht M-V veröffentlicht keine Zins- und Faktorwerte.",
+  "unvollstaendig_grund": "Genehmigungspflichtig (Lizenz), keine Verfügbarkeitslücke.",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Bericht über den Geoshop des Landkreises abrufbar; die Hürde ist die Genehmigung, nicht der Preis",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, (0395) 570 87 3200",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig (Genehmigungsvorbehalt des Herausgebers)",
+  "lizenz_hinweis": "S. 2, „Vervielfältigung und Verbreitung“: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“",
+  "geltungsbereich": {
+   "objektarten": [
+    "gewerbe"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "raeumlich": "Mecklenburgische Seenplatte, Landkreis",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023), Abschnitt B Kap. 5.3.4 „Büro- und Verwaltungsobjekte 2023“ und 5.3.5 „Gewerblich genutzte Objekte 2023“, S. 71; Abschnitt C Region Waren (Müritz), S. 138",
+    "url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023), Abschnitt B Kap. 5.3.4 „Büro- und Verwaltungsobjekte 2023“ und 5.3.5 „Gewerblich genutzte Objekte 2023“, S. 71; Abschnitt C Region Waren (Müritz), S. 138",
+  "modellversion": "GMB Mecklenburgische Seenplatte 2024 (Berichtsjahr 2023)",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "quelle_parser": "v2711-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte MV; Geoshop geocms.com am 21.10.2026 nicht erreichbar — Connection refused —, gelesen wurde die am 14.09.2026 dort bezogene Fassung)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "MV",
+  "ags": "13071",
+  "ebene": "kreis",
+  "gebiet_name": "Mecklenburgische Seenplatte, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser und Geschosswohnungsbau",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Impressum und Inhalt des Dokuments gemessen.",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG — der Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023) führt für die Stadt Neubrandenburg Sachwertfaktoren für Mehrfamilienhäuser und Geschosswohnungsbau (Abschnitt B Kap. 5.2.2, S. 60). Lizenz S. 2, „Vervielfältigung und Verbreitung“: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“ Ohne Genehmigung kein Wert und kein Modell. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, (0395) 570 87 3200; Bezug: https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 und § 21 ImmoWertV verlangen den Wert des örtlich zuständigen Ausschusses in dessen Modell; der Landesgrundstücksmarktbericht M-V veröffentlicht keine Zins- und Faktorwerte.",
+  "unvollstaendig_grund": "Genehmigungspflichtig (Lizenz), keine Verfügbarkeitslücke.",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Bericht über den Geoshop des Landkreises abrufbar; die Hürde ist die Genehmigung, nicht der Preis",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Mecklenburgische Seenplatte, Platanenstraße 43, 17033 Neubrandenburg, gaa@lk-seenplatte.de, (0395) 570 87 3200",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig (Genehmigungsvorbehalt des Herausgebers)",
+  "lizenz_hinweis": "S. 2, „Vervielfältigung und Verbreitung“: „Der Bericht über den Grundstücksmarkt ist urheberrechtlich geschützt. Nachdruck und Vervielfältigung sind nur mit Genehmigung des Herausgebers und unter Angabe der Quellen gestattet.“",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "raeumlich": "Mecklenburgische Seenplatte, Landkreis",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023), Abschnitt B (Stadt Neubrandenburg) Kap. 5.2.2 „Mehrfamilienhäuser und Geschosswohnungsbau 2023“, S. 60",
+    "url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2024 Mecklenburgische Seenplatte (Berichtsjahr 2023, Berichtszeitraum 01.01.–31.12.2023), Abschnitt B (Stadt Neubrandenburg) Kap. 5.2.2 „Mehrfamilienhäuser und Geschosswohnungsbau 2023“, S. 60",
+  "modellversion": "GMB Mecklenburgische Seenplatte 2024 (Berichtsjahr 2023)",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html",
+  "quelle_parser": "v2711-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte MV; Geoshop geocms.com am 21.10.2026 nicht erreichbar — Connection refused —, gelesen wurde die am 14.09.2026 dort bezogene Fassung)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "MV",
+  "ags": "13073",
+  "ebene": "kreis",
+  "gebiet_name": "Vorpommern-Rügen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Impressum und Inhalt des Dokuments gemessen.",
+  "berichtsjahr": 2019,
+  "stichtag": null,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG UND VERALTET. Der jüngste im Geoshop gelistete Bericht ist der Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018) (Liste am 14.09.2026 gelesen; am 21.10.2026 war der Geoshop nicht erreichbar). Er führt Liegenschaftszinssätze für Ein- und Zweifamilienhäuser (Kap. 4.1.1 „EFH/ZFH“, Tabelle 48, S. 55) mit dem ausdrücklichen Vorbehalt (S. 54): „Die angegebenen Liegenschaftszinssätze sind statistisch nicht gesichert und dienen nur zur Orientierung.“ Lizenz S. 2, „Vervielfältigung und Verbreitung“: „Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.“ Ohne Genehmigung, aus Kauffällen 2017/2018 und vom Ausschuss selbst als nicht gesichert bezeichnet: kein Wert. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Vorpommern-Rügen (Landratsamt Stralsund); Bestellweg über den Geoshop des Landkreises; https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 und § 21 ImmoWertV verlangen den Wert des örtlich zuständigen Ausschusses in dessen Modell; der Landesgrundstücksmarktbericht M-V veröffentlicht keine Zins- und Faktorwerte.",
+  "unvollstaendig_grund": "Genehmigungspflichtig, Kauffälle 2017/2018, laut Ausschuss statistisch nicht gesichert.",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Schutzgebühr 50,00 € pro Exemplar (S. 2, Tarifstelle 3.1.1 GAKostVO M-V)",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Vorpommern-Rügen (Landratsamt Stralsund); Bestellweg über den Geoshop des Landkreises",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig (Genehmigungsvorbehalt des Herausgebers)",
+  "lizenz_hinweis": "S. 2, „Vervielfältigung und Verbreitung“: „Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.“",
+  "geltungsbereich": {
+   "objektarten": [
+    "ezfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "raeumlich": "Vorpommern-Rügen, Landkreis",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018), Kap. 4.1.1 „EFH/ZFH“, Tabelle 48, S. 55",
+    "url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018), Kap. 4.1.1 „EFH/ZFH“, Tabelle 48, S. 55",
+  "modellversion": "GMB Vorpommern-Rügen 2019",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "quelle_parser": "v2711-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte MV; Geoshop geocms.com am 21.10.2026 nicht erreichbar — Connection refused —, gelesen wurde die am 14.09.2026 dort bezogene Fassung)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "MV",
+  "ags": "13073",
+  "ebene": "kreis",
+  "gebiet_name": "Vorpommern-Rügen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "objektart_bez": "Doppelhaushälften und Reihenhäuser",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Impressum und Inhalt des Dokuments gemessen.",
+  "berichtsjahr": 2019,
+  "stichtag": null,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG UND VERALTET. Der jüngste im Geoshop gelistete Bericht ist der Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018) (Liste am 14.09.2026 gelesen; am 21.10.2026 war der Geoshop nicht erreichbar). Er führt Liegenschaftszinssätze für Doppelhaushälften und Reihenhäuser (Kap. 4.1.2 „DHH/RH“, Tabelle 49, S. 55 f.) mit dem ausdrücklichen Vorbehalt (S. 54): „Die angegebenen Liegenschaftszinssätze sind statistisch nicht gesichert und dienen nur zur Orientierung.“ Lizenz S. 2, „Vervielfältigung und Verbreitung“: „Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.“ Ohne Genehmigung, aus Kauffällen 2017/2018 und vom Ausschuss selbst als nicht gesichert bezeichnet: kein Wert. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Vorpommern-Rügen (Landratsamt Stralsund); Bestellweg über den Geoshop des Landkreises; https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 und § 21 ImmoWertV verlangen den Wert des örtlich zuständigen Ausschusses in dessen Modell; der Landesgrundstücksmarktbericht M-V veröffentlicht keine Zins- und Faktorwerte.",
+  "unvollstaendig_grund": "Genehmigungspflichtig, Kauffälle 2017/2018, laut Ausschuss statistisch nicht gesichert.",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Schutzgebühr 50,00 € pro Exemplar (S. 2, Tarifstelle 3.1.1 GAKostVO M-V)",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Vorpommern-Rügen (Landratsamt Stralsund); Bestellweg über den Geoshop des Landkreises",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig (Genehmigungsvorbehalt des Herausgebers)",
+  "lizenz_hinweis": "S. 2, „Vervielfältigung und Verbreitung“: „Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.“",
+  "geltungsbereich": {
+   "objektarten": [
+    "rhdhh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "raeumlich": "Vorpommern-Rügen, Landkreis",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018), Kap. 4.1.2 „DHH/RH“, Tabelle 49, S. 55 f.",
+    "url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018), Kap. 4.1.2 „DHH/RH“, Tabelle 49, S. 55 f.",
+  "modellversion": "GMB Vorpommern-Rügen 2019",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "quelle_parser": "v2711-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte MV; Geoshop geocms.com am 21.10.2026 nicht erreichbar — Connection refused —, gelesen wurde die am 14.09.2026 dort bezogene Fassung)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "MV",
+  "ags": "13073",
+  "ebene": "kreis",
+  "gebiet_name": "Vorpommern-Rügen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser und Geschosswohnungsbau",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Impressum und Inhalt des Dokuments gemessen.",
+  "berichtsjahr": 2019,
+  "stichtag": null,
+  "warum_kein_wert": "GENEHMIGUNGSPFLICHTIG UND VERALTET. Der jüngste im Geoshop gelistete Bericht ist der Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018) (Liste am 14.09.2026 gelesen; am 21.10.2026 war der Geoshop nicht erreichbar). Er führt Liegenschaftszinssätze für Mehrfamilienhäuser und Geschosswohnungsbau (Kap. 4.1.3 „MFH“, Tabelle 50, S. 56) mit dem ausdrücklichen Vorbehalt (S. 54): „Die angegebenen Liegenschaftszinssätze sind statistisch nicht gesichert und dienen nur zur Orientierung.“ Lizenz S. 2, „Vervielfältigung und Verbreitung“: „Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.“ Ohne Genehmigung, aus Kauffällen 2017/2018 und vom Ausschuss selbst als nicht gesichert bezeichnet: kein Wert. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Vorpommern-Rügen (Landratsamt Stralsund); Bestellweg über den Geoshop des Landkreises; https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 und § 21 ImmoWertV verlangen den Wert des örtlich zuständigen Ausschusses in dessen Modell; der Landesgrundstücksmarktbericht M-V veröffentlicht keine Zins- und Faktorwerte.",
+  "unvollstaendig_grund": "Genehmigungspflichtig, Kauffälle 2017/2018, laut Ausschuss statistisch nicht gesichert.",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Schutzgebühr 50,00 € pro Exemplar (S. 2, Tarifstelle 3.1.1 GAKostVO M-V)",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Vorpommern-Rügen (Landratsamt Stralsund); Bestellweg über den Geoshop des Landkreises",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig (Genehmigungsvorbehalt des Herausgebers)",
+  "lizenz_hinweis": "S. 2, „Vervielfältigung und Verbreitung“: „Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.“",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "raeumlich": "Vorpommern-Rügen, Landkreis",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018), Kap. 4.1.3 „MFH“, Tabelle 50, S. 56",
+    "url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018), Kap. 4.1.3 „MFH“, Tabelle 50, S. 56",
+  "modellversion": "GMB Vorpommern-Rügen 2019",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "quelle_parser": "v2711-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte MV; Geoshop geocms.com am 21.10.2026 nicht erreichbar — Connection refused —, gelesen wurde die am 14.09.2026 dort bezogene Fassung)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "MV",
+  "ags": "13073",
+  "ebene": "kreis",
+  "gebiet_name": "Vorpommern-Rügen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "objektart": "etw",
+  "objektart_bez": "Wohnungseigentum",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Impressum und Inhalt des Dokuments gemessen.",
+  "berichtsjahr": 2019,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018) führt Liegenschaftszinssätze nur für EFH/ZFH, DHH/RH und MFH (Inhalt, Kap. 4.1.1–4.1.3, S. 3); für Wohnungseigentum keinen. Lizenz S. 2, „Vervielfältigung und Verbreitung“: „Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.“ WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Vorpommern-Rügen (Landratsamt Stralsund); Bestellweg über den Geoshop des Landkreises; https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 und § 21 ImmoWertV verlangen den Wert des örtlich zuständigen Ausschusses in dessen Modell; der Landesgrundstücksmarktbericht M-V veröffentlicht keine Zins- und Faktorwerte.",
+  "unvollstaendig_grund": "Eigentumswohnungen: im Bericht 2019 nicht abgeleitet.",
+  "zugang": "nicht abgeleitet",
+  "gebuehr": "Schutzgebühr 50,00 € pro Exemplar (S. 2)",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Vorpommern-Rügen (Landratsamt Stralsund); Bestellweg über den Geoshop des Landkreises",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig (Genehmigungsvorbehalt des Herausgebers)",
+  "lizenz_hinweis": "S. 2, „Vervielfältigung und Verbreitung“: „Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.“",
+  "geltungsbereich": {
+   "objektarten": [
+    "etw"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "raeumlich": "Vorpommern-Rügen, Landkreis",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018), Inhalt, Kap. 4.1 (nur 4.1.1 EFH/ZFH, 4.1.2 DHH/RH, 4.1.3 MFH), S. 3",
+    "url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018), Inhalt, Kap. 4.1 (nur 4.1.1 EFH/ZFH, 4.1.2 DHH/RH, 4.1.3 MFH), S. 3",
+  "modellversion": "GMB Vorpommern-Rügen 2019",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "quelle_parser": "v2711-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte MV; Geoshop geocms.com am 21.10.2026 nicht erreichbar — Connection refused —, gelesen wurde die am 14.09.2026 dort bezogene Fassung)"
+ },
+ {
+  "vollstaendig": false,
+  "land_code": "MV",
+  "ags": "13073",
+  "ebene": "kreis",
+  "gebiet_name": "Vorpommern-Rügen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser und Geschosswohnungsbau",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle. Am Impressum und Inhalt des Dokuments gemessen.",
+  "berichtsjahr": 2019,
+  "stichtag": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018) leitet Sachwertfaktoren (Marktanpassungsfaktoren) nur für EFH und DHH/RH ab (Inhalt, Kap. 4.2.1–4.2.2, S. 3); für Mehrfamilienhäuser keine. WEG ZUR QUELLE: Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Vorpommern-Rügen (Landratsamt Stralsund); Bestellweg über den Geoshop des Landkreises; https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 und § 21 ImmoWertV verlangen den Wert des örtlich zuständigen Ausschusses in dessen Modell; der Landesgrundstücksmarktbericht M-V veröffentlicht keine Zins- und Faktorwerte.",
+  "unvollstaendig_grund": "Sachwertfaktor Mehrfamilienhaus: nicht abgeleitet.",
+  "zugang": "nicht abgeleitet",
+  "gebuehr": "Schutzgebühr 50,00 € pro Exemplar (S. 2)",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Landkreis Vorpommern-Rügen (Landratsamt Stralsund); Bestellweg über den Geoshop des Landkreises",
+  "bestell_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig (Genehmigungsvorbehalt des Herausgebers)",
+  "lizenz_hinweis": "S. 2, „Vervielfältigung und Verbreitung“: „Vervielfältigung und Verbreitung des Grundstücksmarktberichtes 2019 des Landkreises Vorpommern Rügen, auch auszugsweise, sind nur mit Genehmigung des Herausgebers gestattet.“",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "raeumlich": "Vorpommern-Rügen, Landkreis",
+   "extrapolation": "gesperrt"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018), Inhalt, Kap. 4.2 „Sachwertfaktoren (Marktanpassungsfaktoren - MAF)“ nur 4.2.1 EFH und 4.2.2 DHH/RH, S. 3",
+    "url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht 2019 (Kauffälle der Berichtsjahre 2017/2018), Inhalt, Kap. 4.2 „Sachwertfaktoren (Marktanpassungsfaktoren - MAF)“ nur 4.2.1 EFH und 4.2.2 DHH/RH, S. 3",
+  "modellversion": "GMB Vorpommern-Rügen 2019",
+  "quelle_url": "https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html",
+  "quelle_parser": "v2711-hand (pdftotext -layout, Seiten einzeln geprüft, 21.10.2026, Nachernte MV; Geoshop geocms.com am 21.10.2026 nicht erreichbar — Connection refused —, gelesen wurde die am 14.09.2026 dort bezogene Fassung)"
+ }
+]

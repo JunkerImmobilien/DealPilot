@@ -503,12 +503,52 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Hansestadt Rostock 2026, Landkreis Rostock 2026, Vorpommern-Greifswald 2024
                                genehmigungspflichtig - nur Sperren mit Fundstelle und Weg. */
                             'nachernte-2026-10-mv.json',
+                            /* v2690 · Nachernte 21.10.2026 (Agent register-ernte BW): Gemeinsamer GAA Boeblingen
+                               und Schoenbuchgemeinden, GMB 2025 (Stichtag 01.01.2025, frei, ohne Lizenzvermerk):
+                               Liegenschaftszinssaetze als log-Funktion der Mietflaeche bzw. der RND (EFH City,
+                               RH/DHH Land, MFH City/Land, ETW City/Land); EFH Land und RH/DHH City gesperrt, weil
+                               Diagrammfunktion und Tabelle des Dokuments sich widersprechen; Sachwertfaktoren
+                               gesperrt (Baukostenindex ohne Zahl). Gemeinsamer GAA Lahr, GMB 2023/2024: LZS EFH/ZFH,
+                               MFH, ETW (Quellenangabe Pflicht), SWF gesperrt (Baupreisindex ohne Zahl). */
+                            'nachernte-2026-10b-bw.json',
+                            /* v2690 · Sperren mit Bezugsweg (kostenpflichtig / genehmigungspflichtig / auf Anfrage),
+                               je Gemeinde und Objektart: Mannheim, Freiburg, Oestl. Bodenseekreis (Friedrichshafen),
+                               Oestl. LK Biberach, Sinsheim, Rottenburg, Goeppingen, Esslingen a. N., Kehl,
+                               Offenburg-Kinzigtal, Linzgau-Gehrenberg, Neckar-Odenwald, nordoestl. Schwarzwald-Baar,
+                               Aalen-Essingen, Tuebingen (10 Gem.), Loerrach/Inzlingen, Leonberg, Heidelberg.
+                               ACHTUNG Stufe N (v2401: nie N bei Sperre): Gemeinden ohne Registersatz verlieren
+                               damit die DealPilot-Formel und rechnen § 256 BewG mit Weg — eigene Datei, damit die
+                               Entscheidung eine Zeile ist. */
+                            'nachernte-2026-10b-bw-wege.json',
+                            /* v2700 · Nachernte 10b 21.10.2026 (HE/SH/RP/HH): Darmstadt IMB 2026 (neu im Register:
+                               LZS MFH nach Baujahr vor/ab 1950, vermietete ETW, WGH/gemischt dünn belegt Stufe B),
+                               Sachwertfaktor MFH/ETW je hessischem Ausschuss als Sperre mit Fundstelle (Korbach,
+                               Homberg, Frankfurt fuehren MFH-SWF, aber Baupreisindex ohne Zahl), Main-Kinzig/Wetterau-
+                               Luecken; SH Datenblaetter Luebeck/Lauenburg/Ostholstein (MFH/ETW-SWF, WGH/Gewerbe-LZS);
+                               Worms eigener GMB 2025 kostenpflichtig (50 EUR, Bestellweg); Hamburg WGH-LZS, ETW-SWF. */
+                            'nachernte-2026-10b-he.json', 'nachernte-2026-10b-sh.json',
+                            'nachernte-2026-10b-rp.json', 'nachernte-2026-10b-hh.json',
+                            /* v2710-v2713 · Nachernte 10b 21.10.2026 (TH/MV/SN/ST/BB): Altenburger Land/Greiz/Gera
+                               Liegenschaftszinssaetze 2026 (Stichtag 01.01.2025, 9 Werte MFH/WGH/ETW, loesen 2024 ab;
+                               Greiz-ETW neu), dazu Sperren je Thueringer Ausschuss fuer nicht abgeleitete Objektarten
+                               (EFH/DHH/ETW-Zins, MFH-Sachwertfaktor), Kyffhaeuser/Nordhausen Band 2022 (Stichtag 2020,
+                               veraltet); MV Seenplatte und Vorpommern-Ruegen genehmigungspflichtig (Sperren mit
+                               Fundstelle und Weg); MFH-Sachwertfaktor-Sperren SN (Dresden, Leipzig), ST (14), BB (16). */
+                            'nachernte-2026-10b-th.json', 'nachernte-2026-10b-mv.json', 'nachernte-2026-10b-sn.json',
+                            'nachernte-2026-10b-st.json', 'nachernte-2026-10b-bb.json',
                             /* v2620: Umrechnungskoeffizienten zum Immobilienrichtwert NRW (Kennzahl umrechnung_irw,
                                lib/vergleichswert_irw.js, Pruefer tools/irw-pruefen.mjs): Herford, Bielefeld,
                                Koeln, Duesseldorf (Sperren), Bonn, Muenster, Dortmund (Sperren, additiv), Bochum,
                                Essen, Duisburg, Wuppertal; Minden-Luebbecke Sperre (keine IRW beschlossen). */
                             'uk-irw-nw-owl-2026.json', 'uk-irw-nw-rheinland-2026.json',
                             'uk-irw-nw-ruhr-ost-2026.json', 'uk-irw-nw-ruhr-west-2026.json',
+                            /* v2680: zweite IRW-Ernte NRW, die uebrigen 58 Ausschuesse nach Region
+                               (156 Saetze: 93 Werte, 63 Sperren; additive Verknuepfung, interpolierte
+                               Rechteck-Matrizen, Spannen und bedingte Kategorien als Sperre vorgemerkt). */
+                            'uk-irw-nw-rheinland-sued-2026.json', 'uk-irw-nw-niederrhein-2026.json',
+                            'uk-irw-nw-bergisch-mettmann-2026.json', 'uk-irw-nw-ruhr-nord-2026.json',
+                            'uk-irw-nw-muensterland-2026.json', 'uk-irw-nw-ostwestfalen-2026.json',
+                            'uk-irw-nw-sauerland-siegerland-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

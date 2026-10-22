@@ -19,7 +19,10 @@
 //     Messung ist kein Land, in dem sie besser ist.
 //   - NIE, wo der Ausschuss einen Satz fuehrt — auch keinen gesperrten. Das
 //     prueft der Aufrufer (WertParameterService), weil nur er das Register
-//     fuer diese AGS gefragt hat.
+//     fuer diese AGS gefragt hat. AUSNAHME seit v2730 (Marcel 22.10.2026):
+//     eine reine ZUGANGSSPERRE (Feld `zugang` kostenpflichtig, genehmigungs-
+//     pflichtig, nichtkommerziell, auf_anfrage) - dann rechnet N mit dem Weg
+//     zum Bericht. registerSperreKlasse() am Ende dieser Datei.
 //
 // ZWEITER WEG IN STUFE N (v2611, E6, Marcel 21.10.2026): das DealPilot-LANDESMITTEL
 //   - lzsLandesmittel(): Median der amtlichen Zinssaetze je Land x Objektart, nur
@@ -238,4 +241,99 @@ export function lzsLandesmittel({ ags, objektart, objart = null, anzahlWe = null
         : 'Nicht amtlich und nicht für diesen Ort ermittelt. ')
       + 'Genauer: den Liegenschaftszinssatz des zuständigen Gutachterausschusses eintragen.',
   };
+}
+
+/* ══ v2730 · ZUGANGSSPERRE ODER FACHLICHE SPERRE (Marcel 22.10.2026) ══════
+   Bis v2729 galt: fuehrt das Register fuer die AGS IRGENDEINEN Satz (Wert,
+   Sperre, Rueckfrage), rechnet nie die Stufe N, sondern § 256 mit Weg.
+   Marcels Entscheidung vom 22.10.2026 aendert das fuer EINE Art Sperre: ist
+   der Satz NUR gesperrt, weil der Wert kostenpflichtig, genehmigungspflichtig,
+   nur nichtkommerziell nutzbar oder nur auf Anfrage zu haben ist, hat der
+   Ausschuss einen Wert - wir duerfen ihn nur nicht zeigen. Dann rechnet
+   weiter N (Landesmittel, sonst Formel), gekennzeichnet wie bisher, UND mit
+   dem Weg zum Bericht (Ausschuss, Preis, Bestell-Link aus der Sperre).
+   Gemessen BW: Formel Median 0,25 Pp daneben, § 256 0,77 Pp.
+
+   Fachliche Sperren (kein Wert abgeleitet, statistisch nicht gesichert,
+   Geltungsbereich, veraltet), Rueckfragen und Saetze mit Wert bleiben bei
+   § 256 mit Weg - unveraendert.
+
+   Entschieden wird NUR am Feld `zugang`, nie am Freitext: `warum_kein_wert`
+   nennt Gebuehren auch dort, wo der Bericht frei ist und schlicht keinen
+   Satz fuehrt. `auf_anfrage_kostenfrei` (nur Leonberg, v2690) zaehlt NICHT:
+   dort steht derselbe Zugang an Zweigen, fuer die der Ausschuss ausdruecklich
+   keinen Satz hat („keine belastbaren Ausgangsdaten") - das Feld traegt dort
+   den Zugang zum Bericht, nicht den Grund der Sperre. */
+export const ZUGANG_SPERRE = Object.freeze(['kostenpflichtig', 'genehmigungspflichtig', 'nichtkommerziell', 'auf_anfrage']);
+
+const _istSperre = (s) => !!s && (s.vollstaendig === false || !!s.warum_kein_wert);
+export function istZugangsSperre(s) {
+  return _istSperre(s) && ZUGANG_SPERRE.indexOf(String(s.zugang || '').trim().toLowerCase()) >= 0;
+}
+
+const ZUGANG_SATZ = {
+  kostenpflichtig: 'veröffentlicht einen eigenen Liegenschaftszinssatz gegen Gebühr',
+  genehmigungspflichtig: 'veröffentlicht einen eigenen Liegenschaftszinssatz, dessen Nutzung eine Genehmigung verlangt',
+  nichtkommerziell: 'veröffentlicht einen eigenen Liegenschaftszinssatz, der nur nichtkommerziell genutzt werden darf',
+  auf_anfrage: 'gibt einen eigenen Liegenschaftszinssatz nur auf Anfrage heraus',
+};
+
+/**
+ * Welche Art Sperre steht dem Weg N entgegen?
+ * @param {Array} saetze  alle Registersaetze der Kennzahl fuer diese AGS (finde())
+ * @param {object|null} rueckfrage  die Rueckfrage aus zinssatzFuerObjekt ({grund, zweig})
+ * @param {function} [aktuell]  (zweig) -> der Satz, den das Register fuer diesen Zweig
+ *   heute waehlt (findeZweig: juengster Jahrgang). Ein aelterer Satz desselben Zweigs
+ *   entscheidet nicht - Worms 07319000: alte Sperre ohne zugang (2024), neue
+ *   kostenpflichtig (2025), die die alte ausdruecklich korrigiert.
+ * @returns {{klasse:'frei'|'zugang'|'fachlich', grund:string, weg?:object}}
+ *   frei     - das Register fuehrt nichts (N wie bisher)
+ *   zugang   - nur Zugangssperren: N rechnet, mit Weg zum Bericht
+ *   fachlich - § 256 mit Weg (wie bis v2729)
+ */
+export function registerSperreKlasse(saetze, rueckfrage = null, aktuell = null) {
+  const alle = Array.isArray(saetze) ? saetze.filter(Boolean) : [];
+  const rf = rueckfrage || null;
+  if (rf && rf.grund === 'register_fehler') return { klasse: 'fachlich', grund: 'register_fehler' };
+  if (!alle.length) return rf ? { klasse: 'fachlich', grund: 'rueckfrage' } : { klasse: 'frei', grund: 'kein_satz' };
+  /* je Zweig die Saetze, die heute gelten: der vom Register gewaehlte, sonst alle des Zweigs */
+  const _zw = (s) => String(s.zweig || '').toLowerCase();
+  const geltend = (z) => {
+    const zw = alle.filter((s) => _zw(s) === z);
+    let a = null;
+    try { a = typeof aktuell === 'function' ? aktuell(z) : null; } catch (e) { a = null; }
+    return a ? [a] : zw;
+  };
+  const zweige = [...new Set(alle.map(_zw))];
+  let relevant = null;
+  /* 1 · Jeder Zweig des Ausschusses ist heute eine Zugangssperre: jede Rueckfrage
+     (Haustyp, Lage) fuehrte nur zu einem weiteren gesperrten Satz. */
+  const jeZweig = zweige.map(geltend);
+  if (jeZweig.every((t) => t.length && t.every(istZugangsSperre))) relevant = [].concat(...jeZweig);
+  /* 2 · Der Zweig des Objekts ist gefunden, und sein geltender Satz ist eine Zugangssperre. */
+  else if (rf && rf.grund === 'datensatz_unvollstaendig' && rf.zweig) {
+    const zw = geltend(String(rf.zweig).toLowerCase());
+    if (zw.length && zw.every(istZugangsSperre)) relevant = zw;
+    else return { klasse: 'fachlich', grund: zw.some(_istSperre) ? 'fachliche_sperre' : 'satz_mit_wert' };
+  } else {
+    return { klasse: 'fachlich', grund: rf ? 'rueckfrage' : (alle.some((s) => !_istSperre(s)) ? 'satz_mit_wert' : 'fachliche_sperre') };
+  }
+  /* Bei mehreren: der Satz des Objektzweigs, sonst der juengste */
+  const z = rf && rf.zweig ? String(rf.zweig).toLowerCase() : null;
+  const s = (z && relevant.find((x) => String(x.zweig || '').toLowerCase() === z))
+    || relevant.slice().sort((a, b) => Number(b.berichtsjahr || 0) - Number(a.berichtsjahr || 0))[0];
+  const zugang = String(s.zugang).trim().toLowerCase();
+  const ausschuss = s.gaa_name || null;
+  const url = s.bestell_url || s.quelle_url || null;
+  /* Name nur in Klammern, wenn keine Bezugsstelle folgt (sie nennt ihn schon) */
+  const text = 'Der zuständige Gutachterausschuss' + (ausschuss && !s.zustaendige_stelle ? ' (' + ausschuss + ')' : '') + ' '
+    + ZUGANG_SATZ[zugang] + ' — genauer geht es mit seinem Wert'
+    + (s.gebuehr ? ' (' + String(s.gebuehr).replace(/\s+/g, ' ').trim() + ')' : '')
+    + ': Bericht beziehen und den Satz im Feld „Liegenschaftszinssatz" eintragen, dann rechnet der Ertragswert damit.'
+    + (s.zustaendige_stelle ? ' Bezug: ' + String(s.zustaendige_stelle).replace(/\s+/g, ' ').trim() + '.' : '')
+    + (url ? ' Bestellweg: ' + url : '');
+  return { klasse: 'zugang', grund: zugang, weg: {
+    ausschuss, zugang, gebuehr: s.gebuehr || null, bestell_url: s.bestell_url || null,
+    quelle_url: s.quelle_url || null, zustaendige_stelle: s.zustaendige_stelle || null,
+    berichtsjahr: s.berichtsjahr ?? null, zweig: s.zweig || null, ags: s.ags || null, text } };
 }

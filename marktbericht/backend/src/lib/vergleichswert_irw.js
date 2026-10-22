@@ -95,6 +95,37 @@ export const EINGABEN = {
   restnutzungsdauer: 'Restnutzungsdauer in Jahren, Zahl',
   geschosse: 'Anzahl der Geschosse im Gebäude, Zahl (36)',
   denkmalschutz: 'Baudenkmal, ja/nein (54)',
+  /* v2680 · Merkmale, die Umrechnungsdokumente weiterer Ausschüsse führen, DealPilot aber
+     (noch) nicht als Eingabe hat. Ohne Angabe meldet der Kern merkmal_fehlt — es wird nichts geraten. */
+  energieklasse: 'Energieeffizienzklasse nach GEG (A+, A, B … H)',
+  energiekennwert: 'Endenergiebedarf bzw. -verbrauch in kWh/(m²·a), Zahl',
+  rohertrag_qm: 'Nettokaltmiete in €/m² Wohnfläche und Monat, Zahl',
+  balkon_art: "Art des Freisitzes: 'balkon' | 'loggia' | 'terrasse' | 'dachterrasse' | 'keiner'",
+  keller_art: "Unterkellerung: 'voll' | 'teil' | 'kein'",
+  stellplatz_art: "Stellplatz im Kaufpreis: 'garage' | 'tiefgarage' | 'carport' | 'stellplatz' | 'keiner'",
+  fertighaus: 'Fertighaus (Fertigbauweise), ja/nein',
+  erbbaurecht: 'Erbbaurecht, ja/nein',
+  /* v2680 · aus der zweiten IRW-Ernte (58 Ausschüsse), von den Erntelinien gemeldet */
+  baujahr_fiktiv: 'Fiktives Baujahr nach Anlage 2 ImmoWertV (Stichtag + Restnutzungsdauer − Gesamtnutzungsdauer des Ausschussmodells), Zahl',
+  bodenrichtwert_2022: 'Bodenrichtwert am Objekt zum 01.01.2022 in €/m² (Lagewert-Stichtag des Ausschusses), Zahl',
+  lagewert: 'Lagewert nach dem Modell des Ausschusses (z. B. Lagebeurteilung × Lageanpassungsfaktor, dimensionslos)',
+  optik: 'Äußeres Erscheinungsbild, IRW-Datenmodell Feld 67, Code 1–9',
+  wohnflaeche_je_einheit: 'Durchschnittliche Wohnfläche je Wohnung im Gebäude in m² (Gesamtwohnfläche / Einheiten), Zahl',
+  verkaufsumstand: "Verkaufsumstand: 'weiterverkauf' | 'erstverkauf_umwandlung' | 'erstverkauf_neubau'",
+  zimmer: 'Anzahl der Zimmer (Räume), Zahl',
+  barrierefrei: 'Alten- bzw. behindertengerecht (barrierefrei), ja/nein',
+  barrierearm: 'Barrierearmer Ausbau (IRW-Feld BEHING), ja/nein',
+  umwandlung: 'Nachträglich in Wohnungseigentum umgewandelt, ja/nein',
+  garagen_anzahl: 'Anzahl der Garagen, Zahl',
+  carport_anzahl: 'Anzahl der Carports, Zahl',
+  garage_ort: "Lage der Garage: 'hausgrundstueck' | 'separat' | 'keine'",
+  grundstuecksart: "Grundstücksart nach Lage: 'binnen' | 'einfront' | 'zweifront' | 'kopf' | 'eck'",
+  balkon_nutzwert: "Nutzwert des Balkons: 'kein' | 'gering' | 'normal' | 'hoch' | 'terrasse'",
+  terrasse: 'Terrasse vorhanden, ja/nein',
+  gewerbeanteil_klasse: "Gewerbeanteil am Rohertrag: 'kein' | 'bis 20' | '21-50' | 'über 50'",
+  jahresrohertrag_qm: 'Jahresrohertrag in €/m² Wohn-/Nutzfläche und JAHR, Zahl',
+  wohn_nutzflaeche: 'Summe aus Wohn- und Nutzfläche in m², Zahl',
+  einheiten_anlage: 'Anzahl der Wohnungen in der gesamten Wohnanlage, Zahl',
   /* Kein Objektmerkmal: Zeitpunkt. Stichtag des Richtwerts = Wertermittlungsstichtag. */
   stichtag: '(intern) Registrierungsjahr/Kaufzeitpunkt — gleich dem Richtwertstichtag',
 };
@@ -255,6 +286,17 @@ export function merkmalFaktor(m, objekt, roh, satzNorm) {
     return { ok: true, uk: 1, objekt: 'Stichtag des Richtwerts', norm: m.norm != null ? String(m.norm) : 'Richtwertstichtag',
       text: `${name}: Wertermittlungsstichtag gleich Richtwertstichtag — keine Zeitanpassung` };
   }
+  /* v2680 · Geltungsgrenze eines Merkmals (Hochsauerlandkreis: Modernisierungstyp „nur für die
+     Baujahre bis 1985 geeignet", darueber sachverstaendig): ausserhalb kein Wert, nie still 1,000. */
+  if (m.gilt_nur && (m.gilt_nur.baujahr_bis != null || m.gilt_nur.baujahr_von != null)) {
+    const bj = num(objekt && objekt.baujahr);
+    if (bj == null) return { ok: false, grund: 'merkmal_fehlt', text: name + ': gilt nur für bestimmte Baujahre — Baujahr fehlt' };
+    const gv = m.gilt_nur.baujahr_von, gb = m.gilt_nur.baujahr_bis;
+    if ((gb != null && bj > gb) || (gv != null && bj < gv)) {
+      return { ok: false, grund: 'ausserhalb', text: name + ': der Ausschuss wendet diese Umrechnung nur für Baujahre '
+        + (gv != null ? 'ab ' + gv + ' ' : '') + (gb != null ? 'bis ' + gb : '') + ' an; darüber hinaus ist sachverständig anzupassen' };
+    }
+  }
   const nw = normWert(m, roh, satzNorm);
   if (!nw) return { ok: false, grund: 'norm_unbekannt', text: `${name}: das Normobjekt der Zone führt dieses Merkmal nicht` };
   const ov0 = objektWert(m, objekt);
@@ -269,7 +311,22 @@ export function merkmalFaktor(m, objekt, roh, satzNorm) {
 
   if (m.art === 'matrix') {
     const ks = m.kategorien.map((k) => String(k).toLowerCase());
-    const i = ks.indexOf(String(ov).toLowerCase()), j = ks.indexOf(String(nw.wert).toLowerCase());
+    /* v2680 · Matrix mit Zahlenklassen (Kreis Steinfurt: Baujahr, Wohnflaeche, Grundstueck,
+       Lagewert als Klassen „Bewertungsobjekt × Richtwertobjekt"): eine Zahl wird ueber
+       m.klassen auf den Kategorienamen gebracht. Liegt sie in zwei Klassen → Grenze, in
+       keiner → ausserhalb. Ein Kategoriename gilt unmittelbar. */
+    const aufKat = (v) => {
+      if (ks.includes(String(v).toLowerCase()) || !Array.isArray(m.klassen)) return { kat: v };
+      const x = num(v);
+      if (x == null) return { kat: v };
+      const t = m.klassen.filter((k) => (k.von == null || x >= k.von) && (k.bis == null || x <= k.bis));
+      if (t.length > 1) return { grenze: t.map((k) => k.name) };
+      return t.length ? { kat: t[0].name } : { kat: null };
+    };
+    const ko = aufKat(ov), kn = aufKat(nw.wert);
+    if (ko.grenze) return { ok: false, grund: 'grenze', text: `${name}: ${ov0} liegt auf der Grenze zweier Klassen (${ko.grenze.join(' / ')}) — sachverständig zuzuordnen` };
+    if (kn.grenze) return { ok: false, grund: 'norm_unbekannt', text: `${name}: Normmerkmal „${nw.roh}" liegt auf einer Klassengrenze` };
+    const i = ko.kat == null ? -1 : ks.indexOf(String(ko.kat).toLowerCase()), j = kn.kat == null ? -1 : ks.indexOf(String(kn.kat).toLowerCase());
     if (i < 0) return { ok: false, grund: 'ausserhalb', text: `${name}: „${ov0}" ist in der Tabelle des Ausschusses nicht geführt` };
     if (j < 0) return { ok: false, grund: 'norm_unbekannt', text: `${name}: Normmerkmal „${nw.roh}" ist der Tabelle nicht zuzuordnen` };
     const uk = (m.werte[i] || [])[j];
@@ -522,6 +579,34 @@ export const EINGABE_ORT = {
   aufzug: 'Aufzug (Ausstattung, Reiter Objekt)',
   garage: 'Garagen bzw. Stellplätze (Reiter Objekt)',
   denkmalschutz: 'Baudenkmal — im Reiter Objekt nicht erfasst',
+  energieklasse: 'Energieeffizienzklasse — im Reiter Objekt nicht erfasst',
+  energiekennwert: 'Energiekennwert (kWh/m²a) — im Reiter Objekt nicht erfasst',
+  rohertrag_qm: 'Nettokaltmiete je m² (Reiter Miete)',
+  balkon_art: 'Art des Balkons/Freisitzes — im Reiter Objekt nicht erfasst',
+  keller_art: 'Voll- oder Teilunterkellerung — im Reiter Objekt nicht erfasst',
+  stellplatz_art: 'Art des Stellplatzes — im Reiter Objekt nicht erfasst',
+  fertighaus: 'Fertighaus — im Reiter Objekt nicht erfasst',
+  erbbaurecht: 'Erbbaurecht — im Reiter Objekt nicht erfasst',
+  baujahr_fiktiv: 'Fiktives Baujahr nach dem Modell des Ausschusses — im Reiter Objekt nicht erfasst',
+  bodenrichtwert_2022: 'Bodenrichtwert zum 01.01.2022 — im Reiter Objekt nicht erfasst',
+  lagewert: 'Lagewert nach dem Modell des Ausschusses — im Reiter Objekt nicht erfasst',
+  optik: 'Äußeres Erscheinungsbild — im Reiter Objekt nicht erfasst',
+  wohnflaeche_je_einheit: 'Wohnfläche je Wohnung (Wohnfläche und Einheiten, Reiter Objekt)',
+  verkaufsumstand: 'Verkaufsumstand (Weiterverkauf, Umwandlung, Neubau) — im Reiter Objekt nicht erfasst',
+  zimmer: 'Zimmerzahl — im Reiter Objekt nicht erfasst',
+  barrierefrei: 'Barrierefreiheit — im Reiter Objekt nicht erfasst',
+  barrierearm: 'Barrierearmer Ausbau — im Reiter Objekt nicht erfasst',
+  umwandlung: 'Umwandlung in Wohnungseigentum — im Reiter Objekt nicht erfasst',
+  garagen_anzahl: 'Garagen (Reiter Objekt)',
+  carport_anzahl: 'Carports — im Reiter Objekt nicht getrennt erfasst',
+  garage_ort: 'Lage der Garage — im Reiter Objekt nicht erfasst',
+  grundstuecksart: 'Grundstücksart (Eck-, Binnengrundstück …) — im Reiter Objekt nicht erfasst',
+  balkon_nutzwert: 'Nutzwert des Balkons — im Reiter Objekt nicht erfasst',
+  terrasse: 'Terrasse — im Reiter Objekt nicht erfasst',
+  gewerbeanteil_klasse: 'Gewerbeanteil — im Reiter Objekt nicht erfasst',
+  jahresrohertrag_qm: 'Jahresrohertrag je m² (Reiter Miete)',
+  wohn_nutzflaeche: 'Wohn- und Nutzfläche (Reiter Objekt)',
+  einheiten_anlage: 'Wohnungen in der Wohnanlage — im Reiter Objekt nicht erfasst',
 };
 export function objektAusRef(ref = {}, { bodenrichtwert = null } = {}) {
   const r = ref || {};

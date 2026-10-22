@@ -1,0 +1,70 @@
+[
+ {
+  "land_code": "HH",
+  "ags": "02000000",
+  "ebene": "land",
+  "gebiet_name": "Hamburg, Freie und Hansestadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": null,
+  "quelle_url": "https://daten-hamburg.de/opendata/immobilienmarktberichte/IMB2026.pdf",
+  "quelle_parser": "v2700-hand (pdftotext -layout, Druckseiten 116, 139, 154 gelesen, 21.10.2026, Nachernte 10b HH)",
+  "lizenz": "dl-de/by-2-0",
+  "zugang": "kostenfrei",
+  "vollstaendig": false,
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "wgh",
+  "objektart_bez": "Wohn- und Geschäftshäuser",
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Immobilienmarktbericht Hamburg 2026, Kap. 7.3.3 S. 139 (Geltungsbereich MFH „ohne gewerblichen Anteil“) und Kap. 7.4.3 S. 154"
+   }
+  ],
+  "unvollstaendig_grund": "Der Immobilienmarktbericht Hamburg 2026 leitet den Liegenschaftszinssatz für Mehrfamilienhäuser ausdrücklich nur für „Mehrfamilienhäuser ohne gewerblichen Anteil“ ab (Kap. 7.3.3, S. 139, sachlicher Geltungsbereich) und für „Büro- und Geschäftshäuser“ (Kap. 7.4.3, S. 154, mit Gebäudeartfaktor für eingeschossige Läden). Für Wohn- und Geschäftshäuser (Wohnen mit gewerblichem Anteil) gibt es keinen eigenen Satz; der MFH-Satz gilt für sie nach seinem eigenen Geltungsbereich NICHT. Diese Sperre verhindert, dass ein Wohn- und Geschäftshaus still den MFH-Satz erhält. Weg: Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Hamburg (Landesbetrieb Geoinformation und Vermessung), Einzelauskunft.",
+  "warum_kein_wert": "Der Immobilienmarktbericht Hamburg 2026 leitet den Liegenschaftszinssatz für Mehrfamilienhäuser ausdrücklich nur für „Mehrfamilienhäuser ohne gewerblichen Anteil“ ab (Kap. 7.3.3, S. 139, sachlicher Geltungsbereich) und für „Büro- und Geschäftshäuser“ (Kap. 7.4.3, S. 154, mit Gebäudeartfaktor für eingeschossige Läden). Für Wohn- und Geschäftshäuser (Wohnen mit gewerblichem Anteil) gibt es keinen eigenen Satz; der MFH-Satz gilt für sie nach seinem eigenen Geltungsbereich NICHT. Diese Sperre verhindert, dass ein Wohn- und Geschäftshaus still den MFH-Satz erhält. Weg: Geschäftsstelle des Gutachterausschusses für Grundstückswerte in Hamburg (Landesbetrieb Geoinformation und Vermessung), Einzelauskunft."
+ },
+ {
+  "land_code": "HH",
+  "ags": "02000000",
+  "ebene": "land",
+  "gebiet_name": "Hamburg, Freie und Hansestadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in Hamburg",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": null,
+  "quelle_url": "https://daten-hamburg.de/opendata/immobilienmarktberichte/IMB2026.pdf",
+  "quelle_parser": "v2700-hand (pdftotext -layout, Druckseiten 116, 139, 154 gelesen, 21.10.2026, Nachernte 10b HH)",
+  "lizenz": "dl-de/by-2-0",
+  "zugang": "kostenfrei",
+  "vollstaendig": false,
+  "kennzahl": "sachwertfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen",
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Immobilienmarktbericht Hamburg 2026, Inhaltsverzeichnis S. 4–5, Kap. 7.2.3 (S. 117) und Kap. 7.6 (S. 170–179)"
+   }
+  ],
+  "unvollstaendig_grund": "Der Immobilienmarktbericht Hamburg 2026 leitet einen Sachwertfaktor nur für Einfamilienhäuser ab (Kap. 7.2.3, S. 117 ff.); Eigentumswohnungen (Kap. 7.6, S. 170 ff.) führt er mit Gebäudefaktor, Liegenschaftszinssatz und Umrechnungsfaktor für vermietete Eigentumswohnungen — keinen Sachwertfaktor.",
+  "warum_kein_wert": "Der Immobilienmarktbericht Hamburg 2026 leitet einen Sachwertfaktor nur für Einfamilienhäuser ab (Kap. 7.2.3, S. 117 ff.); Eigentumswohnungen (Kap. 7.6, S. 170 ff.) führt er mit Gebäudefaktor, Liegenschaftszinssatz und Umrechnungsfaktor für vermietete Eigentumswohnungen — keinen Sachwertfaktor."
+ }
+]

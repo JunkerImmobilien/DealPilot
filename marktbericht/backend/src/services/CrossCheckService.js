@@ -630,6 +630,8 @@ export const CrossCheckService = {
             bgf_direkt: (p && p.bgf_direkt) || ref.bgf, wohnflaeche_qm: wfl,
             objektart: ref.property_type, baupreisindex: BAUPREISINDEX,
             zweifamilienhaus: ref.zweifamilienhaus === true,   /* v1427b-ZFH · zweiter Lauf */
+            /* v2720 · Bezug des Index im Modell des Ausschusses (nur fuer den Rechenweg). */
+            baupreisindex_bezug: ((_swfTab.modellansaetze || {}).baupreisindex_bezug) || null,
             ..._mfhKorr,   /* v2383 · zweiter Lauf */
             regionalfaktor: (p && p.regionalfaktor) || null,
             gnd_jahre: _gndSw, rnd_jahre: _rndEinheitlich(_gndSw),
