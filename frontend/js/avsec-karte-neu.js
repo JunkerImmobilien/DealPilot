@@ -4,8 +4,8 @@
    Markteinschätzungskarte schöner rendern ..." (v2760, Demo hinter ?mwkarte=neu) und
    „eine Schwelle finden, wann wir umschalten" (v2780).
 
-   SEIT v2780 ist die Kartenfassung (css/avsec-karte-neu.css) STANDARD unter 1.100 px
-   Kartenbreite - das regelt allein die @container-Abfrage, kein Skript. Diese Datei setzt
+   SEIT v2780 ist die Kartenfassung (css/avsec-karte-neu.css) STANDARD unter 940 px
+   Kartenbreite (v2780a) - das regelt allein die @container-Abfrage, kein Skript. Diese Datei setzt
    nur noch den Vergleichsschalter: ?mwkarte=alt setzt html[data-dp-mwkarte="alt"] und
    zeigt die Fassung vor v2760 (avsec-streifen.css). ?mwkarte=neu ist ohne Wirkung (war der
    Demo-Schalter). Kein Merker, kein localStorage.
