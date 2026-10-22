@@ -1638,10 +1638,25 @@ function _calcImmediate(){
   var rs_total = rs + rs2;
   State.rs=rs_total; State.rs1=rs; State.rs2=rs2;
   st('restschuld',fE(rs_total,0));
-  var be=new Date();be.setFullYear(be.getFullYear()+bindj);
+  /* v2850 · Zinsbindungsende ab dem FINANZIERUNGSBEGINN, nicht ab heute.
+     Bis hier stand `new Date() + bindj`: jedes Bestandsobjekt zeigte im Reiter
+     Finanzierung, im Investment-PDF und in der Bankfassung „Zinsbindung bis
+     10/2036", gleich ob 2023, 2024 oder 2025 gekauft (gemessen 22.10.2026 an
+     allen elf Bestandsobjekten) - die Projektion schaltet aber im Jahr
+     Basisjahr + bindj auf den Anschlusszins (2026-1054: Kauf 07/2023, Anschluss
+     ab 2033). Beginn: d1_auszahl > wirtschaftlicher Uebergang > Kaufdatum
+     (DealPilotAnteilig, dieselbe Kaskade wie das anteilige Jahr 1); ohne Datum
+     wie bisher heute. */
+  var _finStart = null;
+  try {
+    var _fsIso = (window.DealPilotAnteilig && typeof DealPilotAnteilig.getFinanzierungStartDate === 'function')
+      ? DealPilotAnteilig.getFinanzierungStartDate() : null;
+    if (_fsIso && /^\d{4}-\d{2}/.test(_fsIso)) _finStart = new Date(parseInt(_fsIso.slice(0,4),10), parseInt(_fsIso.slice(5,7),10)-1, 1);
+  } catch (_eFs) {}
+  var be=_finStart?new Date(_finStart.getTime()):new Date();be.setFullYear(be.getFullYear()+bindj);
   st('bindend',be.toLocaleDateString('de-DE',{month:'2-digit',year:'numeric'}));
   var vtJ=d1_tm>0?Math.ceil(Math.log(d1_rate_m/d1_tm)/Math.log(1+d1z/12)/12):99;
-  st('volltilg',(new Date().getFullYear()+vtJ).toString());
+  st('volltilg',((_finStart?_finStart.getFullYear():new Date().getFullYear())+vtJ).toString());
   var az=v('anschl_z')/100,at=v('anschl_t')/100;State.az=az;State.at=at;
   // V357-d1anschl: D1 eigene Anschlussfinanzierung als Schieber.
   //   Ohne Haken = durchfinanziert (D1 laeuft mit eigener Annuitaet weiter).
@@ -2850,7 +2865,14 @@ function _calcImmediate(){
        > Wer eine Rechnung abholt, muss wissen, zu wem sie gehoert. */
   State.kpis={_fuer:(window._currentObjKey||null),warm_j:warm_j,nk_vz_j:uf*12,ze_j:ze*12,nkm_netto_j:nkm*12,ze_ezb:ze*12*(_meIncludesZE?_mFac(bindj):1),   /* v2484 */
     bmy:bmy,bmy_gi:(gi>0?nkm_j/gi*100:0),san_fin:_sanFin,ltc:_ltc,ltv_soll:_ltvSoll,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,ekr_ns:ekr_ns,
-    irr:irr,be_cf:be.cf,be_kum:be.kum,be_kum_ek:be.kumEk,dscr:dscr,dscr_netto:dscr_netto,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,bwk_nul_st:nul_st,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung};
+    irr:irr,be_cf:be.cf,be_kum:be.kum,be_kum_ek:be.kumEk,dscr:dscr,dscr_netto:dscr_netto,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,bwk_nul_st:nul_st,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung,
+    /* v2850 · mstg (Prozent) und d_total, damit DealScore.computeFromKpis(State.kpis)
+       dasselbe rechnet wie DealScore.compute(): ohne mstg nahm der Kern 1,5 %, und die
+       Bankfassung (pdf-investment-bank.js) zeigte bei 3 % Mietsteigerung 3 Punkte weniger
+       als Reiter und Karte (gemessen 22.10.2026: 2026-1008 87 -> 84, 2026-004 26 -> 23).
+       d_total: compute() reicht K.d_total als `darlehen` weiter (Barkauf, v2141) - das
+       Feld gab es in State.kpis nie. */
+    mstg:mstg*100,d_total:d_total};
   /* v1898 · `bwk_nul_st` wird hier MITGEFUEHRT, damit storage.js es am Objekt
      stempeln kann (`_kpis_bwk_nul_st_y`). Das Cockpit rechnet seine
      Projektion aus den gespeicherten Kennzahlen und kann `_calcImmediate()`
@@ -2976,7 +2998,13 @@ function _calcImmediate(){
     // soll mit den AKTUELLEN Mieten arbeiten, nicht schon mit 1 Jahr Steigerung.
     // _mFac(0) = 1.0 → keine Steigerung im ersten Jahr; Jahr 2 hat dann _mFac(1) etc.
     // Vorher: y=1 → _mFac(1) → schon +1 Jahr Steigerung → CF v.St. höher als 'Heute'-Karte
-    var nkm_y2=nkm_j*_mFac(y-1),wm_y2=wm_j*_mFac(y-1),bwk_y2=bwk*Math.pow(1+kstg,y-1);
+    /* v2850 · Kaltmiete der Projektion ueber _nkmJYear - dieselbe Funktion wie
+       „Ende Zinsbindung", Anschluss, Exit und Vermoegenszuwachs. Hier stand
+       nkm_j * _mFac: die Zusatzeinnahmen (Stellplatz, Garage) wuchsen mit dem
+       Mietfaktor, auch ohne den Haken „Erhoehung gilt auch fuer Zusatzeinnahmen".
+       Gemessen 22.10.2026 an 2026-1054: Projektion 71.983 €/Jahr, Kennzahl Ende
+       Zinsbindung 71.340 € fuer dasselbe Jahr (1.080 € ZE x Sollsprung 1,595). */
+    var nkm_y2=_nkmJYear(y-1),wm_y2=wm_j*_mFac(y-1),bwk_y2=bwk*Math.pow(1+kstg,y-1);
     var bwk_cf_y2=bwk_cf*Math.pow(1+kstg,y-1);
     /* v1898: derselbe Jahresbetrag OHNE Mietausfallwagnis — das ist der
        Abzug, den der Steuerweg sehen darf. Er wird unten in cfRows
@@ -3511,6 +3539,20 @@ function _calcImmediate(){
           State._vz.steuervorteil +     // V116 signed
           Math.max(0, State._vz.wertsteig_kum || 0);
         State._vz.verm_zuwachs = _newVz;
+        /* v2850 · Equity Multiple aus DERSELBEN Summe wie die Box daneben.
+           `em` kam aus der ersten Schleife: dort ist `cfkum` der Cashflow VOR
+           Tilgung, und `verm_zuwachs` zaehlte Tilgung-vom-Mieter UND den
+           Cashflow vor Tilgung - die Tilgung doppelt. Gemessen 22.10.2026:
+           2026-001 Box „+77.068 € / 20.000 € EK", daneben „Equity Multiple 6,3 x"
+           (richtig 3,9); 2026-1054 3,7 x gegen 2,9 x im Vermoegensaufbau-Chart.
+           Kennzahlen-Tabelle, Kachel, Box, PDF und KI lesen State.kpis.em. */
+        if (State.kpis && ekv > 100) {
+          State.kpis.em = _newVz / ekv;
+          st('kpi-em', fX(State.kpis.em));
+          st('r-em', fX(State.kpis.em));
+          st('vz-em', fX(State.kpis.em));
+          try { setKpiColor('kpi-em', State.kpis.em, 2, 1); } catch (_eEm) {}
+        }
         // V118: vz-gesamt mit Farbe und Label-Wechsel
         var _vzGesEl = document.getElementById('vz-gesamt');
         if (_vzGesEl) {
