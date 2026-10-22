@@ -2594,6 +2594,7 @@ function _calcImmediate(){
     });
   }
   var _stv_pre_signed = -_tax_pre;
+  _cf_konto_pre += _tax_pre;   /* v2832: Hauptzeile vor Steuern, die Steuer steht in der Zeile darunter */
   // V118: vz-cf-Hauptzeile signed Anzeige
   var _vzCfEl = document.getElementById('vz-cf');
   if (_vzCfEl) {
@@ -2610,7 +2611,7 @@ function _calcImmediate(){
     var _vzCfLabel = _vzCfEl.parentElement && _vzCfEl.parentElement.querySelector('span');
     if (_vzCfLabel) {
       if (_cf_konto_pre >= 0) {
-        _vzCfLabel.innerHTML = '+ Cashflow-Überschuss <span class="cf-hint">(was nach Tilgung &amp; Steuer auf Konto bleibt)</span>';
+        _vzCfLabel.innerHTML = '+ Cashflow-Überschuss <span class="cf-hint">(nach Tilgung, vor Steuern)</span>';
       } else {
         _vzCfLabel.innerHTML = '− Cashflow-Verlust <span class="cf-hint">(Eigenmittel müssen über die Laufzeit zugeschossen werden)</span>';
       }
@@ -2675,7 +2676,16 @@ function _calcImmediate(){
   // V118: Vermögenszuwachs kann jetzt KLEINER werden wenn CF dauerhaft negativ.
   //   Das ist ehrlicher — wenn der User kumuliert Geld zuschießen muss, ist das
   //   keine Vermögensbildung mehr.
-  var verm_zuwachs_v88 = tilg_durch_einnahmen + bspar_durch_einnahmen + _cf_konto_kum + _steuervorteil_signed + Math.max(0, wertsteig_kum);
+/* v2832 · STEUER NICHT DOPPELT ZAEHLEN (Rechenwege-Pruefer 22.10.2026, Fund 5).
+   Der Vermoegenszuwachs summierte den Cashflow NACH Steuern (Σ cfns_y) UND
+   daneben die Steuer als eigenen Baustein - jede Belastung zog zweimal ab,
+   jede Erstattung zaehlte zweimal. Gemessen 2026-1054: 819.407 statt
+   838.812 € (Σ tax_y 19.405). Jetzt ist Baustein 2 der Cashflow-Ueberschuss
+   VOR Steuern (Σ cfns_y + Σ tax_y = Σ cfop_y), Baustein 3 die Steuer; die
+   Summe ist damit Tilgung-vom-Mieter + Cashflow nach Steuern + Wertsteigerung.
+   Bank-Wasserfall (bank-charts.js) und beide PDFs lesen dieselben Bausteine. */
+  var _cf_vor_st_kum = _cf_konto_kum + _tax_kum_signed;
+  var verm_zuwachs_v88 = tilg_durch_einnahmen + bspar_durch_einnahmen + _cf_vor_st_kum + _steuervorteil_signed + Math.max(0, wertsteig_kum);
 
   State._vz = {
     // Komponente 1
@@ -2685,7 +2695,8 @@ function _calcImmediate(){
     tilg_eigenanteil:   tilg_eigenanteil,
     bspar_kum:          bspar_kum,
     // Komponente 2
-    cf_ueberschuss_konto: _cf_konto_kum,
+    cf_ueberschuss_konto: _cf_vor_st_kum,           // v2832: VOR Steuern (Steuer = Baustein 3)
+    cf_nach_steuer:     _cf_konto_kum,              // v2832: Σ cfns_y
     cf_ueberschuss:     cf_ueberschuss,           // legacy: Math.max(0, cfkum) - vor Tilgung
     cfkum:              cfkum,                     // raw, kann negativ sein
     // Komponente 3
@@ -2811,8 +2822,8 @@ function _calcImmediate(){
     (bwk_kum || 0) -
     (zins_kum || 0) -
     Math.max(0, tilgung_kum || 0) -
-    (bspar_kum || 0) -
-    (tax_kum || 0);
+    (bspar_kum || 0);   /* v2832: vor Steuern - die Steuer steht in der Hauptaufstellung */
+  try { var _vzTaxRow = document.getElementById('vz-info-tax'); if (_vzTaxRow && _vzTaxRow.parentElement) _vzTaxRow.parentElement.style.display = 'none'; } catch (_eTr) {}
   var _vzSummeEl = document.getElementById('vz-info-summe');
   if (_vzSummeEl) {
     if (_vzSummeEcht >= 0) {
@@ -2828,7 +2839,7 @@ function _calcImmediate(){
     var _vzSummeLabelEl = _vzSummeEl.parentElement && _vzSummeEl.parentElement.querySelector('span');
     if (_vzSummeLabelEl) {
       if (_vzSummeEcht >= 0) {
-        _vzSummeLabelEl.innerHTML = '<b>= Kumulierter CF-Überschuss <span class="cf-hint">(Konto-Reserve nach Tilgung &amp; Steuer)</span></b>';
+        _vzSummeLabelEl.innerHTML = '<b>= Kumulierter CF-Überschuss <span class="cf-hint">(nach Tilgung, vor Steuern)</span></b>';
       } else {
         _vzSummeLabelEl.innerHTML = '<b>= Kumulierter CF-Verlust <span class="cf-hint">(Eigenmittel müssen über die Laufzeit zugeschossen werden)</span></b>';
       }
@@ -3472,8 +3483,7 @@ function _calcImmediate(){
           _bwkKumNew -
           _zinsKumNew -
           Math.max(0, _tilgKumNew) -
-          _bsparKumNew -
-          _taxKumNew;
+          _bsparKumNew;   /* v2832: vor Steuern */
         if (_vzSummeEchtNew >= 0) {
           _vzSummeEl2.textContent = fE(_vzSummeEchtNew, 0, true);
           _vzSummeEl2.classList.remove('c-red');
@@ -3486,7 +3496,7 @@ function _calcImmediate(){
         var _vzSummeLabelEl2 = _vzSummeEl2.parentElement && _vzSummeEl2.parentElement.querySelector('span');
         if (_vzSummeLabelEl2) {
           if (_vzSummeEchtNew >= 0) {
-            _vzSummeLabelEl2.innerHTML = '<b>= Kumulierter CF-Überschuss <span class="cf-hint">(Konto-Reserve nach Tilgung &amp; Steuer)</span></b>';
+            _vzSummeLabelEl2.innerHTML = '<b>= Kumulierter CF-Überschuss <span class="cf-hint">(nach Tilgung, vor Steuern)</span></b>';
           } else {
             _vzSummeLabelEl2.innerHTML = '<b>= Kumulierter CF-Verlust <span class="cf-hint">(Eigenmittel müssen über die Laufzeit zugeschossen werden)</span></b>';
           }
@@ -3506,7 +3516,9 @@ function _calcImmediate(){
           _cfKontoSigned += (r.cfns_y || 0);
           _tilgKumFromCfRows += (r.ty || 0);
         });
-        State._vz.cf_ueberschuss_konto = _cfKontoSigned;
+        var _cfVorStSigned = _cfKontoSigned + _taxKumNew;   /* v2832: Baustein 2 vor Steuern */
+        State._vz.cf_ueberschuss_konto = _cfVorStSigned;
+        State._vz.cf_nach_steuer = _cfKontoSigned;
         State._vz.tilgung_kum   = _tilgKumFromCfRows;  // V121: Single Source of Truth
         State._vz.tax_kum       = _taxKumNew;
         State._vz.steuervorteil = -_taxKumNew;  // V116 signed
@@ -3535,7 +3547,7 @@ function _calcImmediate(){
         var _newVz =
           _tilgVomMieterNew +
           _bsparVomMieterNew +
-          _cfKontoSigned +              // V118 signed
+          _cfVorStSigned +              // v2832: vor Steuern (vorher Σ cfns - Steuer doppelt)
           State._vz.steuervorteil +     // V116 signed
           Math.max(0, State._vz.wertsteig_kum || 0);
         State._vz.verm_zuwachs = _newVz;
@@ -3577,19 +3589,19 @@ function _calcImmediate(){
         // V118: vz-cf-Hauptzeile auch im Pass nachziehen — _cfKontoSigned ist jetzt der echte Wert
         var _vzCfElPass = document.getElementById('vz-cf');
         if (_vzCfElPass) {
-          if (_cfKontoSigned >= 0) {
-            _vzCfElPass.textContent = fE(_cfKontoSigned, 0, true);
+          if (_cfVorStSigned >= 0) {
+            _vzCfElPass.textContent = fE(_cfVorStSigned, 0, true);
             _vzCfElPass.classList.remove('c-red');
             _vzCfElPass.classList.add('c-green');
           } else {
-            _vzCfElPass.textContent = '– ' + fE(Math.abs(_cfKontoSigned), 0);
+            _vzCfElPass.textContent = '– ' + fE(Math.abs(_cfVorStSigned), 0);
             _vzCfElPass.classList.remove('c-green');
             _vzCfElPass.classList.add('c-red');
           }
           var _vzCfLabelPass = _vzCfElPass.parentElement && _vzCfElPass.parentElement.querySelector('span');
           if (_vzCfLabelPass) {
-            if (_cfKontoSigned >= 0) {
-              _vzCfLabelPass.innerHTML = '+ Cashflow-Überschuss <span class="cf-hint">(was nach Tilgung &amp; Steuer auf Konto bleibt)</span>';
+            if (_cfVorStSigned >= 0) {
+              _vzCfLabelPass.innerHTML = '+ Cashflow-Überschuss <span class="cf-hint">(nach Tilgung, vor Steuern)</span>';
             } else {
               _vzCfLabelPass.innerHTML = '− Cashflow-Verlust <span class="cf-hint">(Eigenmittel müssen über die Laufzeit zugeschossen werden)</span>';
             }

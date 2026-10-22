@@ -1030,7 +1030,12 @@ function buildPrompt(payload, opts) {
     'Kaufpreis: ' + fmtEur(k.kp),
     'Gesamtinvestition: ' + fmtEur(k.gi),
     'Eigenkapital: ' + fmtEur(k.ek),
-    'Eigenkapitalrendite (EK-Rendite): ' + (k.em == null ? '–' : (!isFinite(k.em) ? 'unendlich — no-money-down (Kaufpreis & Kaufnebenkosten voll fremdfinanziert)' : fmtPct(k.em, 1))),
+    /* v2832 · hier stand „Eigenkapitalrendite (EK-Rendite): 3,7 %" - gemeint war
+       k.em, das Equity Multiple (Vermoegenszuwachs / Eigenkapital, ein Vielfaches).
+       Gemessen (Rechenwege-Pruefer 22.10.2026, Fund 12) an 2026-1054. Die
+       EK-Rendite (k.ekr, p. a. vor Steuern) reist seit v2832 eigens mit. */
+    k.ekr != null && isFinite(Number(k.ekr)) ? 'Eigenkapitalrendite (EK-Rendite, p. a. vor Steuern): ' + fmtPct(Number(k.ekr), 1) : '',
+    'Equity Multiple (Vermögenszuwachs über die Haltedauer / Eigenkapital): ' + (k.em == null ? '–' : (!isFinite(k.em) ? 'unendlich — no-money-down (Kaufpreis & Kaufnebenkosten voll fremdfinanziert)' : Number(k.em).toFixed(1).replace('.', ',') + '-fach')),
     f.d1z_pct != null ? 'Sollzins D1: ' + Number(f.d1z_pct).toFixed(2) + ' %' : '',
     f.d1t_pct != null ? 'Tilgung D1: ' + Number(f.d1t_pct).toFixed(2) + ' %' : '',
     f.restschuld_ezb != null ? 'Restschuld am Ende der Zinsbindung: ' + fmtEur(f.restschuld_ezb) : '',

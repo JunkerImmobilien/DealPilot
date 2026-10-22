@@ -1185,13 +1185,15 @@
     var bindj = num('d1_bindj');
     var hatPhasen = da(K.cf_ns_ezb) !== null || da(K.cf_ns_an) !== null;
     if (hatPhasen) {
-      platz(62, 'Drei Phasen', 'Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + fmt(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung');
+      /* v2832 · die erste Spalte ist das erste VOLLE Jahr (beim Bestand das Kaufjahr) */
+      var _j1 = typeof window._dpPdfJahr1 === 'function' ? window._dpPdfJahr1(false) : 'Heute';
+      platz(62, 'Drei Phasen', _j1 + ' · Ende der Zinsbindung' + (bindj ? ' (nach ' + fmt(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung');
       abschnitt('Cashflow je Phase');
-      einleitung('Heute · Ende der Zinsbindung' + (bindj ? ' (nach ' + fmt(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung mit dem angenommenen Zins.');
+      einleitung(_j1 + ' · Ende der Zinsbindung' + (bindj ? ' (nach ' + fmt(bindj) + ' Jahren)' : '') + ' · Anschlussfinanzierung mit dem angenommenen Zins.');
       function ph(label, a, b, c) { return { werte: [label, a, b, c] }; }
       function stD(vor, nach) { if (da(vor) === null || da(nach) === null) return '-'; var d = nach - vor; return (d > 0.5 ? '+ ' : (d < -0.5 ? '- ' : '')) + eur(Math.abs(d)); }
       tabelle(
-        [['', 46], ['Heute', 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
+        [['', 46], [_j1, 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
         [
           /* v2461 · Kaltmiete statt Warmmiete: nur so geht die Spalte bis zum
              Cashflow auf (die Umlagen laufen durch). */
@@ -1213,7 +1215,7 @@
         platz(56);
         abschnitt('Kennzahlen je Phase');
         tabelle(
-          [['', 46], ['Heute', 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
+          [['', 46], [_j1, 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
           [
             { werte: ['Sollzins', zT('zaer-zins-now'), zT('zaer-zins-ezb'), zT('zaer-zins-an')] },
             { werte: ['Rate / Monat', zT('zaer-rate-now').replace(/^\+/, ''), zT('zaer-rate-ezb').replace(/^\+/, ''), zT('zaer-rate-an').replace(/^\+/, '')] },
@@ -1233,7 +1235,7 @@
         abschnitt('Rendite und Vermögen je Phase');
         var ptz = function (f, g) { return [PT.now, PT.ezb, PT.an].map(function (p) { return g(p[f]); }); };
         tabelle(
-          [['', 46], ['Heute', 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
+          [['', 46], [_j1, 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
           [
             { werte: ['Bruttomietrendite'].concat(ptz('bmy', function (v) { return pct(v, 2); })) },
             { werte: ['Nettomietrendite'].concat(ptz('nmy', function (v) { return pct(v, 2); })) },
@@ -1739,7 +1741,7 @@
         platz(46, 'Vermögenszuwachs im Detail', (adr || 'Objekt'));
         abschnitt('Woraus der Vermögenszuwachs besteht (' + nJ + ' Jahre)');
         zeile('Tilgung aus den Mieteinnahmen (Schuldenabbau)', eur(VZ.tilg_durch_einnahmen));
-        zeile('Cashflow-Überschuss nach Tilgung und Steuern', eur(VZ.cf_ueberschuss_konto));
+        zeile('Cashflow-Überschuss nach Tilgung, vor Steuern', eur(VZ.cf_ueberschuss_konto));   /* v2832 */
         zeile((VZ.steuervorteil || 0) < 0 ? 'Steuerlast (kumuliert)' : 'Steuervorteil (kumuliert)', eur(VZ.steuervorteil));
         zeile('Wertsteigerung (Annahme ' + (num('wertstg') !== null ? pct(num('wertstg'), 1) : '-') + ' p. a.)', eur(VZ.wertsteig_kum));
         zeile('Vermögenszuwachs gesamt', eur(VZ.verm_zuwachs), { summe: true });
@@ -1751,9 +1753,8 @@
         zeile('abzüglich Zinsen', '- ' + eur(sm('zy')), { einzug: true });
         zeile('abzüglich Tilgung', '- ' + eur(sm('ty')), { einzug: true });
         if (sm('bspar_y') > 0) zeile('abzüglich Bausparraten', '- ' + eur(sm('bspar_y')), { einzug: true });
-        var stK = -sm('tax_y');
-        zeile('Steuern kumuliert (Erstattung +, Belastung -)', (stK > 0.5 ? '+ ' : (stK < -0.5 ? '- ' : '')) + eur(Math.abs(stK)), { einzug: true });
-        zeile('Cashflow-Überschuss nach Tilgung und Steuern', eur(VZ.cf_ueberschuss_konto), { summe: true });
+        /* v2832 · vor Steuern - die Steuer ist der eigene Baustein darueber */
+        zeile('Cashflow-Überschuss nach Tilgung, vor Steuern', eur(VZ.cf_ueberschuss_konto), { summe: true });
         if (da(S.wert_basis) !== null && rows.length) {
           platz(34);
           abschnitt('Wie die Wertsteigerung angesetzt ist');
@@ -1793,7 +1794,7 @@
        beginnt er geschlossen auf der naechsten Seite. */
     platz(70, 'Annahmen und Hinweise', (adr || 'Objekt'));
     abschnitt('Annahmen');
-    zeile('Mietsteigerung p. a.', num('mietstg') !== null ? pct(num('mietstg'), 1) : '-');
+    zeile('Mietentwicklung', typeof window._dpPdfMiete === 'function' ? window._dpPdfMiete().text : (num('mietstg') !== null ? pct(num('mietstg'), 1) : '-'));   /* v2832: der Modus, der rechnet */
     zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '-');
     zeile('Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '-');
     zeile('Betrachtungszeitraum', S.btj ? fmt(S.btj) + ' Jahre' : '-');

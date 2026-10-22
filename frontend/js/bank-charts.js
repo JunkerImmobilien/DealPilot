@@ -59,18 +59,28 @@ if (!window._wlc) {
 
   // ───────────── DSCR pro Jahr ─────────────
   // DSCR = Nettomieteinnahmen / Kapitaldienst (Zinsen + Tilgung)
+  /* v2832 · ÜBER DEN KERN (Dscr.compute), und ein Jahr OHNE Kapitaldienst hat
+     keinen DSCR - nicht 0. Gemessen 22.10.2026 an Parkstr. 9 (2026-1056):
+     Jahr 1 = 12/2024, ein Monat Miete, Darlehen ab 01/2025 - Zins und Tilgung 0,
+     die eigene Formel gab 0 zurueck, und das Cockpit beider PDFs zeigte
+     „DSCR heute 0,00 · KRITISCH" (Tab und Kern: 1,23). Ein solches Jahr bekommt
+     jetzt den Wert des naechsten Jahres mit Kapitaldienst; der DSCR „heute"
+     kommt aus State.kpis.dscr (siehe _renderBankCockpit). */
   function _dscrPerYear(cfRows, ze) {
     ze = ze || 0;
-    return cfRows.map(function(r) {
-      var noi = (r.nkm_m + ze) * 12;
-      // V63.68: Bei Tilgungsaussetzung mit Bausparvertrag muss die Sparrate
-      // (bspar_y) als wirtschaftlicher Tilgungsersatz im Kapitaldienst berücksichtigt
-      // werden — sonst ist DSCR künstlich überhöht (Zinsen-only-Vergleich).
-      // Konsistent zur Phasentabelle (calc.js V63.57: nowVals.dscr inkl. K.bspar_j).
+    var roh = cfRows.map(function(r) {
+      // V63.68: BSV-Sparrate als wirtschaftlicher Tilgungsersatz im Kapitaldienst
       var bspar = r.bspar_y || 0;
-      var kd = r.zy + r.ty + bspar;
-      return kd > 0 ? noi / kd : 0;
+      var kd = (r.zy || 0) + (r.ty || 0) + bspar;
+      if (!(kd > 0)) return null;
+      if (window.Dscr && typeof window.Dscr.compute === 'function') {
+        return window.Dscr.compute({ nkm_j: (r.nkm_m || 0) * 12, ze_j: ze * 12, zins_j: r.zy || 0, tilg_j: r.ty || 0, bsv_j: bspar, bwk_cf: r.bwk_cf_y || 0 }).brutto;
+      }
+      return ((r.nkm_m || 0) + ze) * 12 / kd;
     });
+    for (var i = roh.length - 2; i >= 0; i--) if (roh[i] == null) roh[i] = roh[i + 1];
+    var letzt = null;
+    return roh.map(function (v) { if (v != null) letzt = v; return v != null ? v : (letzt != null ? letzt : 0); });
   }
 
   // ───────────── DSCR-Klassifizierung ─────────────
@@ -399,7 +409,7 @@ if (!window._wlc) {
             var cfLabel, cfClass, cfSub, cfVal;
             if (fCfKonto >= 0) {
               cfLabel = 'CF-Überschuss';
-              cfSub   = 'Konto-Reserve';
+              cfSub   = 'vor Steuern';   /* v2832 */
               cfClass = fCfKonto > 0 ? 'green' : '';
               cfVal   = _fmtEUR(fCfKonto, true);
             } else {
@@ -470,7 +480,8 @@ if (!window._wlc) {
       return r.wert_y > 0 ? (schuld / r.wert_y * 100) : 0;
     });
 
-    var dscrToday = dscrArr[0];
+    /* v2832 · „heute" ist der DSCR des Kerns (calc.js, erstes volles Jahr), nicht Zeile 1 */
+    var dscrToday = (state.kpis && typeof state.kpis.dscr === 'number' && isFinite(state.kpis.dscr) && state.kpis.dscr > 0) ? state.kpis.dscr : dscrArr[0];
     var dscrEzb = dscrArr[Math.min(bindj - 1, dscrArr.length - 1)] || dscrArr[dscrArr.length - 1];
     // V63.83 BUG-FIX: dscrEnd MUSS Anschluss-Phase sein (nicht letztes Jahr in Zinsbindung).
     // Vorher: dscrArr[dscrArr.length-1] = Jahr 10 = noch in Zinsbindung → identisch zu dscrEzb.
@@ -718,7 +729,7 @@ if (!window._wlc) {
     // 4 Bars + Total-Bar. Bars summieren EXAKT zur Total. Marcels Bug:
     // 23+14+2+38 = 77 ≠ 101 weil Bars verschiedene Definitionen mischten.
     var tilgEffektiv = _vz.tilg_durch_einnahmen + _vz.bspar_durch_einnahmen;  // Bar 1
-    var cfVstSum     = _vz.cf_ueberschuss_konto;                              // Bar 2 (Konto-Reserve, NACH Tilgung & Steuer)
+    var cfVstSum     = _vz.cf_ueberschuss_konto;                              // Bar 2 (v2832: nach Tilgung, VOR Steuern - die Steuer ist Bar 3)
     var taxBar       = _vz.steuervorteil;                                     // Bar 3 (separater Steuer-Vorteil)
     var ws           = _vz.wertsteig_kum;                                     // Bar 4
     var total        = _vz.verm_zuwachs;                                      // Total = Σ aller 4
@@ -909,7 +920,7 @@ if (!window._wlc) {
                    Ersatzschrift ist breiter. Kürzer, kleiner, ohne Sperrung. */
                 '<text x="' + (bar1X + barW/2) + '" y="340" font-size="8.5" fill="#9C9590" font-weight="500">SCHULDENABBAU</text>' +
                 '<text x="' + (bar2X + barW/2) + '" y="325">CF-Überschuss</text>' +
-                '<text x="' + (bar2X + barW/2) + '" y="340" font-size="8.5" fill="#9C9590" font-weight="500">RESERVE · ' + n + ' J.</text>' +
+                '<text x="' + (bar2X + barW/2) + '" y="340" font-size="8.5" fill="#9C9590" font-weight="500">VOR STEUERN · ' + n + ' J.</text>' +
                 '<text x="' + (bar3X + barW/2) + '" y="325">' + (taxBar >= 0 ? 'Steuervorteil' : 'Steuerlast') + '</text>' +
                 '<text x="' + (bar3X + barW/2) + '" y="340" font-size="8.5" fill="#9C9590" font-weight="500">' + (taxBar >= 0 ? 'ERSTATTUNG · ' : 'ZAHLUNG · ') + n + ' J.</text>' +
                 '<text x="' + (bar4X + barW/2) + '" y="325">Wertsteigerung</text>' +

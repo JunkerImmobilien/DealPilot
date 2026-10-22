@@ -737,6 +737,36 @@ function _pfZahl(n) {
 function pP(n, d) { d = (d == null) ? 2 : d; var x = _pfZahl(n); return isNaN(x) ? '-' : x.toFixed(d).replace('.', ',') + ' %'; }
 function pN(n, d) { d = d || 1; var x = _pfZahl(n); return isNaN(x) ? '-' : x.toFixed(d).replace('.', ','); }
 
+/* ── v2832 · zwei Etiketten, die BEIDE PDFs aus derselben Quelle lesen ──
+   (1) „Heute": State.kpis rechnet das erste VOLLE Jahr ab Kauf. Bei einem
+       Bestandsobjekt ist das das Kaufjahr - unter „Heute (2026)" stand die
+       Rechnung von 2023 (Rechenwege-Pruefer 22.10.2026, Fund 8: 2026-1054
+       zeigte dort -15.835 €, die Projektionszeile 2026 -16.265 €).
+   (2) Mietentwicklung: das PDF nannte immer „Mietstg. 1,5 %", auch wenn der
+       Detail- oder Einheiten-Modus rechnete (Fund 9). Jetzt der Modus, der
+       wirklich rechnet (MietEntwicklung.getMode). */
+window._dpPdfJahr1 = function (lang) {
+  var c = null;
+  try { c = window.State && State.cfRows && State.cfRows[0] ? Number(State.cfRows[0].cal) : null; } catch (e) {}
+  var j = new Date().getFullYear();
+  if (!c || !isFinite(c) || c >= j) return lang ? 'Heute (' + j + ')' : 'Heute';
+  return lang ? 'Jahr 1 (' + c + ', voll)' : 'Jahr 1 (' + c + ')';
+};
+window._dpPdfMiete = function () {
+  var ME = window.MietEntwicklung, m = 'prog';
+  try { if (ME && ME.getMode) m = ME.getMode(); } catch (e) {}
+  var zahl = function (id) { var e = document.getElementById(id); if (!e || e.value === '') return null; var n = (typeof parseDe === 'function') ? parseDe(e.value) : Number(String(e.value).replace(',', '.')); return isFinite(n) ? n : null; };
+  var p = function (x, d) { return Number(x).toFixed(d).replace('.', ','); };
+  var t;
+  if (m === 'einheiten') t = 'je Einheit (Mietverträge, Index)';
+  else if (m === 'detail') {
+    var anz = Math.round(zahl('me_anz') || 0), iv = Math.max(1, Math.round(zahl('me_int') || 1)), pc = zahl('me_pct') || 0;
+    t = (anz > 0 && pc) ? 'Erhöhungsplan: ' + p(pc, 1) + ' % in ' + anz + (anz === 1 ? ' Schritt' : ' Schritten') + ', alle ' + iv + ' J.' : 'Erhöhungsplan ohne Erhöhung';
+  } else t = (zahl('mietstg') != null ? p(zahl('mietstg'), 1) : '0,0') + ' % p. a.';
+  try { var s = ME && ME.sollSprung ? ME.sollSprung() : null; if (s && s.jahr != null && s.faktor && Math.abs(s.faktor - 1) > 0.001) t += ', Soll-Miete ab Jahr ' + s.jahr; } catch (e) {}
+  return { modus: m, text: t };
+};
+
 /* ── PAGE TEMPLATE ──────────────────────────────── */
 function pageTpl(doc, num, subtitle, W, M) {
   W = W || 210; M = M || 15;
@@ -1359,7 +1389,7 @@ async function _exportPDFInner() {
 
   // Szenarien
   var sw3 = (CW - 8) / 3;
-  sBox(doc, M,             cy, sw3, 'Heute (' + new Date().getFullYear() + ')', pE(K.cf_ns, true), 'CF p.a. nach Steuern', C.GREEN_BG, C.GREEN);
+  sBox(doc, M,             cy, sw3, window._dpPdfJahr1(true), pE(K.cf_ns, true), 'CF p.a. nach Steuern', C.GREEN_BG, C.GREEN);
   /* v2463 · daneben stand „Heute" nach Steuern und hier der Wert VOR Steuern (K.cf_ezb) */
   sBox(doc, M + sw3 + 4,  cy, sw3, 'Ende Zinsbindung',                         pE(K.cf_ns_ezb != null ? K.cf_ns_ezb : K.cf_ezb, true),'CF p.a. nach Steuern (Prognose)',      [250,245,232], C.GOLD);
   sBox(doc, M+(sw3+4)*2,  cy, sw3, 'Exit / Verkauf',                            pE(K.exit_vkp - Math.max(0, State.rs), true), 'M\u00f6gl. Gewinn', C.CH, C.GOLD);
@@ -1731,7 +1761,7 @@ async function _exportPDFInner() {
   var anData    = { wm: K.nkm_an, bwk: K.bwk_cf_an, zins: K.zins_an, tilg: K.tilg_an,
                     cf_op: K.cf_op_an, steuer: (K.cf_op_an || 0) - (K.cf_ns_an || 0), cf_ns: K.cf_ns_an, bspar: _bsparY };
 
-  drawCFCard(M,                cy, 'HEUTE (' + new Date().getFullYear() + ')',     C.GREEN,         heuteData);
+  drawCFCard(M,                cy, window._dpPdfJahr1(true).toUpperCase(),     C.GREEN,         heuteData);
   drawCFCard(M + cfColW + 4,   cy, 'ENDE ZINSBINDUNG',                              C.GOLD,     ezbData);
   drawCFCard(M + (cfColW+4)*2, cy, 'ANSCHLUSS (' + pP(v('anschl_z'), 1) + ')',     [231,111,81],     anData);
 
@@ -1739,7 +1769,7 @@ async function _exportPDFInner() {
 
   // V63.52: Annahmen kommen jetzt ganz am Schluss - wir merken sie nur in einer Variable
   var _annahmenRows = [
-    ['Mietsteigerung p.a.',           pP(v('mietstg'), 1)],
+    ['Mietentwicklung',               window._dpPdfMiete().text],
     ['Kostensteigerung p.a.',         pP(v('kostenstg'), 1)],
     ['Zinsbindung Hauptdarlehen',     g('d1_bindj') + ' Jahre'],
     ['Anschlusszinssatz (Annahme)',   pP(v('anschl_z'), 1)],
@@ -1846,7 +1876,7 @@ async function _exportPDFInner() {
     ];
     doc.autoTable({
       startY: cy,
-      head: [['Kennzahl', 'Heute', 'Ende Zinsbindung', 'Anschluss']],
+      head: [['Kennzahl', window._dpPdfJahr1(false), 'Ende Zinsbindung', 'Anschluss']],
       body: rows,
       theme: 'striped',
       headStyles: { fillColor: [42, 39, 39], textColor: C.GOLD, fontSize: 9, fontStyle: 'bold' },
@@ -1930,7 +1960,7 @@ async function _exportPDFInner() {
       ];
       doc.autoTable({
         startY: cy,
-        head: [['Kennzahl', 'Heute', 'Ende Zinsbindung', 'Anschluss']],
+        head: [['Kennzahl', window._dpPdfJahr1(false), 'Ende Zinsbindung', 'Anschluss']],
         body: zaerRows,
         theme: 'striped',
         headStyles: { fillColor: [42, 39, 39], textColor: C.GOLD, fontSize: 9, fontStyle: 'bold' },
@@ -2005,7 +2035,7 @@ async function _exportPDFInner() {
   doc.setFillColor.apply(doc, C.SURF2); doc.roundedRect(M, cy, CW, 6, 1.5, 1.5, 'F');
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.MID);
   doc.text(
-    'Mietstg. ' + pP(v('mietstg'), 1) + '  \u00b7  Wertstg. ' + pP(v('wertstg'), 1) +
+    'Miete ' + window._dpPdfMiete().text + '  \u00b7  Wertstg. ' + pP(v('wertstg'), 1) +
     '  \u00b7  Kostenstg. ' + pP(v('kostenstg'), 1) + '  \u00b7  Anschluss ' + pP(v('anschl_z'), 1) +
     ' ab Jahr ' + g('d1_bindj') + '  \u00b7  Exit-BMY ' + pP(v('exit_bmy'), 1),
     W / 2, cy + 4.2, { align: 'center' }
@@ -3224,7 +3254,7 @@ async function _exportPDFInner() {
       cy = secH(doc, cy, 'Verm\u00f6genszuwachs (' + btjY + ' Jahre)', M, CW);
       kvT(doc, M, cy, CW, [
         ['1. Tilgung-vom-Mieter (Schulden abgebaut durch Miete)',           pE(cumT)],
-        ['2. Cashflow-\u00dcberschuss (Konto-Reserve, n. Tilgung+Steuer)', pE(cumC)],
+        ['2. Cashflow-\u00dcberschuss (nach Tilgung, vor Steuern)', pE(cumC)],   /* v2832: vorher nach Steuern - Steuer doppelt */
         [stv < 0 ? '3. Steuerlast (kumulierte Mehrsteuer)' : '3. Steuervorteil (kumulierte Erstattung aus V+V-Verlusten)', pE(stv, true)],   /* v2463: negativ hiess es trotzdem „Steuervorteil" */
         ['4. Wertsteigerung ' + pP(v('wertstg'), 1) + ' p.a.',              pE(wzg)],
         ['= GESAMT Verm\u00f6genszuwachs (1+2+3+4)',                       pE(ges, true)]
@@ -3256,9 +3286,9 @@ async function _exportPDFInner() {
       var statisch = nkmHeute * btjY;
       var _cumTaxDisplay = -cumTax;
       var _vzData = (window.State && window.State._vz) || {};
-      var _cfKontoSoll = _vzData.cf_ueberschuss_konto != null ? _vzData.cf_ueberschuss_konto : (cumNkm - cumBwk - cumZins - cumTilg - cumBspar + _cumTaxDisplay);
+      var _cfKontoSoll = _vzData.cf_ueberschuss_konto != null ? _vzData.cf_ueberschuss_konto : (cumNkm - cumBwk - cumZins - cumTilg - cumBspar);   /* v2832: vor Steuern */
       var _rows = [
-        ['Kumulierte Mieteinnahmen (mit ' + mstgPct.toFixed(1).replace('.', ',') + ' % p.a. Mietsteigerung)', pE(cumNkm)],
+        ['Kumulierte Mieteinnahmen (Miete ' + window._dpPdfMiete().text + ')', pE(cumNkm)],
         ['  davon statisch (NKM heute \u00d7 Jahre)', pE(statisch)],
         ['  Effekt der Mietsteigerung', '+' + pE(cumNkm - statisch)],
         ['- Bewirtschaftung n.uml. (mit ' + kstgPct.toFixed(1).replace('.', ',') + ' % p.a.)', '-' + pE(cumBwk)],
@@ -3266,8 +3296,8 @@ async function _exportPDFInner() {
         ['- Tilgung (\u00fcber die Laufzeit)', '-' + pE(cumTilg)]
       ];
       if (cumBspar > 0) _rows.push(['- Bausparrate (kumuliert, gebunden)', '-' + pE(cumBspar)]);
-      _rows.push(['\u00b1 Steuern (kumuliert)', pE(_cumTaxDisplay, true)]);
-      _rows.push(['= Kumulierter CF-\u00dcberschuss (Konto-Reserve, n. Tilgung+Steuer)', pE(_cfKontoSoll, true)]);
+      /* v2832 · die Steuer steht als eigener Baustein (3.) in der Tabelle darueber */
+      _rows.push(['= Kumulierter CF-\u00dcberschuss (nach Tilgung, vor Steuern)', pE(_cfKontoSoll, true)]);
       var _resultIdx = _rows.length - 1;
       kvT(doc, M, cy, CW, _rows, [_resultIdx]);
       cy += _rows.length * 5.8 + 3;  // V63.98: kompakter, +4 → +3
@@ -3736,7 +3766,7 @@ async function _exportPDFInner() {
   cy = secH(doc, cy, 'Verwendete Prognose-Annahmen', M, CW);
   // V63.52: Annahmen-Tabelle erweitern bei Tilgungsaussetzung
   var _baseAnnahmen = [
-    ['Mietsteigerung p.a.',            pP(v('mietstg'), 1), 'Annahme', 'Erfahrungswert'],
+    ['Mietentwicklung',                window._dpPdfMiete().text, 'Annahme', window._dpPdfMiete().modus === 'prog' ? 'Erfahrungswert' : (window._dpPdfMiete().modus === 'detail' ? 'Erhöhungsplan im Objekt' : 'aus den Einheiten')],
     ['Wertsteigerung p.a.',             pP(v('wertstg'), 1), 'Annahme', 'Konservativ B-/C-Stadt'],
     ['Kostensteigerung p.a.',           pP(v('kostenstg'), 1),'Annahme', 'Orientiert an Inflationsrate'],
     ['Leerstand p.a.',                  pP(v('leerstand'), 1),'Annahme', 'Vollvermietung angenommen'],

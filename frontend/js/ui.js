@@ -928,7 +928,7 @@ function _buildAIPayload() {
     },
     kennzahlen: {
       kp: k.kp, gi: k.gi, ek: k.ek, bmy: k.bmy, nmy: k.nmy,
-      dscr: k.dscr, ltv: k.ltv, cf_m: k.cf_m, em: k.em,
+      dscr: k.dscr, ltv: k.ltv, cf_m: k.cf_m, em: k.em, ekr: k.ekr != null ? k.ekr : null,   /* v2832: EK-Rendite eigens, em ist das Equity Multiple */
       nkm_j: k.nkm_j != null ? k.nkm_j : null, /* v947-mbsource: Nettokaltmiete/Jahr */
       bwk: k.bwk != null ? k.bwk : null
     },
