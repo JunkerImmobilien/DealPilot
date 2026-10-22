@@ -20,13 +20,13 @@
 import { q } from '../lib/db.js';
 /* v1816 · der Weg zum Register. Kein Ringschluss: gutachterausschuss.js
    und ausschuss_register.js kennen diesen Dienst nicht (gegengeprueft). */
-import { finde as regFinde, lagenFuer as regLagen } from '../lib/ausschuss_register.js';
+import { finde as regFinde, lagenFuer as regLagen, findeZweig as regFindeZweig } from '../lib/ausschuss_register.js';
 import { liegenschaftszinssatz as regZins } from '../lib/gutachterausschuss.js';
 import { zinssatzFuerObjekt } from '../lib/zweigwahl.js';
 import { lzsNach256, MODELL } from '../lib/immowertv.js';
 import { stufeNachStreuung } from '../lib/nrw_modell.js';   /* v1048-WSTR-1 */
 /* v2401 · Stufe N - die DealPilot-Formel fuer den Liegenschaftszins */
-import { lzsNaeherung, lzsNaeherungsDaten, lzsLandesmittel } from '../lib/lzs_naeherung.js';
+import { lzsNaeherung, lzsNaeherungsDaten, lzsLandesmittel, registerSperreKlasse } from '../lib/lzs_naeherung.js';
 /* v1063-WOD-1 · Die Open-Data-Tabelle wurde in v1054 angelegt, gefuellt hat
  * sie nie jemand und gelesen hat sie niemand. Ab hier liest sie die Kaskade
  * — ueber das Repository, nicht mit eigenem SQL. */
@@ -436,10 +436,12 @@ export const WertParameterService = {
        der Ausschuss hat sich zu diesem Ort geaeussert, und der Weg fuehrt
        zu ihm. null = Register nicht lesbar (dann auch keine Formel). */
     let _regSaetze = 0;
+    let _regListe = [];   /* v2730 · die Saetze selbst: Zugangs- oder fachliche Sperre? */
     if (typ === 'lzs' && ags) {
       try {
         const _rs = regFinde('liegenschaftszinssatz', String(ags)) || [];
         _regSaetze = _rs.length;
+        _regListe = _rs;
         for (const s of _rs) {
           const j = Number(s.berichtsjahr);
           if (Number.isFinite(j) && j > 0 && (_regJahr == null || j > _regJahr)) _regJahr = j;
@@ -463,6 +465,8 @@ export const WertParameterService = {
        gesperrten und keinen, der eine Rueckfrage ausloest: dann hat der
        Ausschuss sich zu diesem Ort geaeussert, und die Auskunft ist der Weg
        zu ihm (§ 256 mit Link), nicht eine Formel, die ihn ueberdeckt.
+       v2730 · AUSNAHME (Marcel 22.10.2026): reine Zugangssperre (kostenpflichtig,
+       genehmigungspflichtig, nichtkommerziell, auf Anfrage) - dann N mit Weg zum Bericht.
        Und nie, wo eine offene amtliche Veroeffentlichung oder der Nachbarwert
        desselben Ausschusses einen Wert hat (beides amtlich, beides ueber N).
 
@@ -472,13 +476,21 @@ export const WertParameterService = {
        erreichte. Deshalb wird N VOR jeder D-Zeile der Tabelle versucht, und
        noch einmal vor dem gerechneten Auffangwert. Alles andere bleibt in
        seiner bisherigen Reihenfolge. */
-    let _formelNicht = null, _nVersucht = false;
+    let _formelNicht = null, _nVersucht = false, _zugangWeg = null;
     const _versucheN = async () => {
       _nVersucht = true;
       if (typ !== 'lzs') return null;
       if (_regSaetze == null) { _formelNicht = { grund: 'register_fehler' }; return null; }
-      if (_regSaetze > 0 || _rueckfrage) {
-        _formelNicht = { grund: 'register_fuehrt_satz',
+      /* v2730 · Marcel 22.10.2026: ist der Satz NUR gesperrt, weil der Wert
+         kostenpflichtig/genehmigungspflichtig/nichtkommerziell/auf Anfrage ist
+         (Feld `zugang`), rechnet weiter N - mit dem Weg zum Bericht. Fachliche
+         Sperren, Rueckfragen und Saetze mit Wert: § 256 wie bisher
+         (lib/lzs_naeherung.js registerSperreKlasse). */
+      const _klasse = (_regSaetze > 0 || _rueckfrage) ? registerSperreKlasse(_regListe, _rueckfrage,
+        (z) => regFindeZweig('liegenschaftszinssatz', String(ags), z)) : null;
+      if (_klasse && _klasse.klasse === 'zugang') _zugangWeg = _klasse.weg;
+      else if (_regSaetze > 0 || _rueckfrage) {
+        _formelNicht = { grund: 'register_fuehrt_satz', sperre: _klasse ? _klasse.grund : null,
           hinweis: 'Der zuständige Gutachterausschuss führt für diesen Ort einen eigenen '
             + 'Liegenschaftszinssatz (oder hat ihn gesperrt); er ließ sich diesem Objekt hier '
             + 'nicht zuordnen. Die DealPilot-Formel ersetzt ihn nicht — es bleibt beim '
@@ -513,6 +525,7 @@ export const WertParameterService = {
                     rnd_quelle: lm.rnd_quelle, stadt: lm.stadt,
                     pct_von: lm.pct_von, pct_bis: lm.pct_bis, spanne_deckung: lm.spanne_deckung },
           hinweis: lm.hinweis,
+          zugang_sperre: _zugangWeg,   /* v2730 · Weg zum kostenpflichtigen Bericht */
           wert_parameter_uebergangen: _veraltet,
           einordnung: _odEinordnung,
           rueckfrage: null,
@@ -534,6 +547,7 @@ export const WertParameterService = {
                     stadt: fn.stadt, land: fn.land,
                     pct_von: fn.pct_von, pct_bis: fn.pct_bis, spanne_deckung: fn.spanne_deckung },
           hinweis: fn.hinweis,
+          zugang_sperre: _zugangWeg,   /* v2730 · Weg zum kostenpflichtigen Bericht */
           wert_parameter_uebergangen: _veraltet,
           einordnung: _odEinordnung,
           rueckfrage: null,
@@ -971,7 +985,19 @@ export function zinsHerkunft(a) {
   const ql = a.quelle_link || null;
   const stelle = (ql && ql.stelle) || a.ausschuss || null;
   const url = (ql && ql.url) || a.quelle_url || null;
-  const weg = unterA ? {
+  /* v2730 · Stufe N trotz Registersperre (nur Zugangssperre, Marcel 22.10.2026):
+     der Weg nennt den kostenpflichtigen Bericht mit Preis und Bestell-Link. */
+  const zs = (st === 'N' && a.zugang_sperre && a.zugang_sperre.text) ? a.zugang_sperre : null;
+  const weg = unterA ? (zs ? {
+    feld: 'lzs_pct',
+    ausschuss: zs.ausschuss || stelle,
+    /* Bestell-Link und Preis stehen im TEXT (Web und PDF zeigen ihn, die Notiz im
+       CrossCheckService auch); url bleibt leer, sonst stuende der Link dort doppelt. */
+    url: null, bestell_url: zs.bestell_url || null, quelle_url: zs.quelle_url || null,
+    kosten: null,
+    zugang: zs.zugang,
+    text: zs.text,
+  } : {
     feld: 'lzs_pct',
     ausschuss: stelle,
     url,
@@ -979,7 +1005,7 @@ export function zinsHerkunft(a) {
     text: 'Genauer geht es mit dem örtlichen Liegenschaftszinssatz des zuständigen '
       + 'Gutachterausschusses' + (stelle ? ' (' + stelle + ')' : '') + ': im Feld '
       + '„Liegenschaftszinssatz" eintragen, dann rechnet der Ertragswert damit.',
-  } : null;
+  }) : null;
   /* v2610 · E4 · Spanne der Stufe N in der Herkunft (Bericht zeigt sie, anderer Strang) */
   const spanne = (st === 'N' && Number.isFinite(Number(a.pct_von)) && Number.isFinite(Number(a.pct_bis)))
     ? { pct_von: Number(a.pct_von), pct_bis: Number(a.pct_bis),

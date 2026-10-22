@@ -543,7 +543,11 @@ eine selbst ausgerechnete Zahl.
   in denen sie gemessen genauer ist als § 256 (BB BW HE NI NW RP SN, aus
   `lzs-naeherung.json` `pruefung.je_land`), und **nie, wenn das Register für
   die AGS einen Satz führt** — auch keinen gesperrten und keinen mit
-  Rückfrage (dann § 256 mit Weg zum Ausschuss). Sie wird vor jeder
+  Rückfrage (dann § 256 mit Weg zum Ausschuss). **Ausnahme (Marcel
+  22.10.2026, v2730):** ist der geltende Satz NUR gesperrt, weil der Wert
+  kostenpflichtig, genehmigungspflichtig, nichtkommerziell oder auf Anfrage
+  ist (Feld `zugang`, nie Freitext), rechnet N weiter — mit dem Weg zum
+  Bericht (Preis, Bestell-Link); `registerSperreKlasse()`, Prüfer B37. Sie wird vor jeder
   § 256-Zeile von `mb.wert_parameter` versucht (die Tabelle führt § 256
   selbst als Qualität D, Ebene bund). Belastbarkeit −25 (C −20, D −40).
   Gemessen 19.10.2026: wirksam fast nur in BW (1.040 Gemeinden ohne
