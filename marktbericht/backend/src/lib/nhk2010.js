@@ -821,6 +821,15 @@ export function sachwert(ein, bodenwertErgebnis, param) {
              ein.grundriss ? `Grundriss ${ein.grundriss}` : null].filter(Boolean).join(', ') + ' (NHK 2010, Anlage 4)' });
   if (korr !== 1) out.korrektur_wohnung = { faktor: korr, wohnflaeche_je_we: ein.wohnflaeche_je_we || null, grundriss: ein.grundriss || null };
   out.staffel.push({ pos: `× Baupreisindex`, faktor: _index3, wert: null });   /* v2280: die Zahl zeigt die Spalte faktor - vorher doppelt (1.91 1,91) */
+  /* v2720 · Entscheidung Marcel 22.10.2026: nennt das Modell des Ausschusses den Index
+     zum Kaufzeitpunkt (abgeleitet mit dem Index des Kaufdatums), gilt in der Anwendung
+     der Index zum Wertermittlungsstichtag (§ 36 Abs. 2 ImmoWertV, ImmoWertA 36) - das
+     ist genau der Wert oben. Der Rechenweg sagt es, damit niemand eine Abweichung sucht. */
+  if (ein.baupreisindex_bezug === 'kaufzeitpunkt') {
+    const _z = out.staffel[out.staffel.length - 1];
+    _z.pos = '× Baupreisindex zum Wertermittlungsstichtag (Modell des Ausschusses: Index zum Kaufzeitpunkt)';
+    out.baupreisindex_bezug = 'kaufzeitpunkt';
+  }
   if (regional !== 1) out.staffel.push({ pos: `× Regionalfaktor`, faktor: regional, wert: null });
   /* v1074-WBTL-1 · Sonstige Bauteile (Gauben, Balkone, Vordaecher,
    * Terrassen) als HERSTELLUNGSKOSTEN zum Stichtag — sie unterliegen

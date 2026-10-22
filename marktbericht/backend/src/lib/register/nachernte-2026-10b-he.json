@@ -662,7 +662,7 @@
    "hinweis": "Tabelle „Sachwertfaktor k für freistehende Ein- und Zweifamilienhäuser“ S. 79 (9 Bodenrichtwertbereiche × vorläufiger Sachwert 100.000–1.000.000 €). Nicht übernommen: hessenweite Auswertung, Baupreisindex ohne Zahl."
   },
   "vollstaendig": false,
-  "unvollstaendig_grund": "Kap. 8.3 (S. 76–80) druckt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (8.3.1, S. 79) und für Reihenhäuser und Doppelhaushälften (8.3.2, S. 80) — aber als „überregionale Auswertung (hessenweit)“ der ZGGH aus 1.526 Kauffällen 10/2024–12/2025 (Rahmendaten S. 77), nicht als Ableitung des Ausschusses für seinen Bereich. Zusätzlich nennt das Modell (S. 78) den Baupreisindex nur als „Baupreisindex (Basisjahr 2010) für die Bauwirtschaft des Statistischen Bundesamtes für den Neubau von Wohngebäuden“ — ohne Zahl; mit welchem Index der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne Index als Zahl würde der Rechenkern mit seiner Konstanten rechnen und nichts widerspräche — deshalb Sperre.",
+  "unvollstaendig_grund": "Kap. 8.3 (S. 76–80) druckt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (8.3.1, S. 79) und für Reihenhäuser und Doppelhaushälften (8.3.2, S. 80) — aber als „überregionale Auswertung (hessenweit)“ der ZGGH aus 1.526 Kauffällen 10/2024–12/2025 (Rahmendaten S. 77), nicht als Ableitung des Ausschusses für seinen Bereich. Zusätzlich nennt das Modell (S. 78) den Baupreisindex nur als „Baupreisindex (Basisjahr 2010) für die Bauwirtschaft des Statistischen Bundesamtes für den Neubau von Wohngebäuden“ — ohne Zahl; mit welchem Index der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne Index als Zahl würde der Rechenkern mit seiner Konstanten rechnen und nichts widerspräche — deshalb Sperre. Geprüft am 22.10.2026 (v2720): das Modell (S. 78) nennt keinen Bezugszeitpunkt des Index — die Freigabe für „Index zum Kaufzeitpunkt“ greift hier nicht.",
   "warum_kein_wert": "Kap. 8.3 (S. 76–80) druckt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (8.3.1, S. 79) und für Reihenhäuser und Doppelhaushälften (8.3.2, S. 80) — aber als „überregionale Auswertung (hessenweit)“ der ZGGH aus 1.526 Kauffällen 10/2024–12/2025 (Rahmendaten S. 77), nicht als Ableitung des Ausschusses für seinen Bereich. Zusätzlich nennt das Modell (S. 78) den Baupreisindex nur als „Baupreisindex (Basisjahr 2010) für die Bauwirtschaft des Statistischen Bundesamtes für den Neubau von Wohngebäuden“ — ohne Zahl; mit welchem Index der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne Index als Zahl würde der Rechenkern mit seiner Konstanten rechnen und nichts widerspräche — deshalb Sperre."
  },
  {
@@ -699,7 +699,7 @@
   "modellversion": null,
   "zugang": "kostenfrei",
   "vollstaendig": false,
-  "unvollstaendig_grund": "Kap. 8.3 (S. 76–80) druckt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (8.3.1, S. 79) und für Reihenhäuser und Doppelhaushälften (8.3.2, S. 80) — aber als „überregionale Auswertung (hessenweit)“ der ZGGH aus 1.526 Kauffällen 10/2024–12/2025 (Rahmendaten S. 77), nicht als Ableitung des Ausschusses für seinen Bereich. Zusätzlich nennt das Modell (S. 78) den Baupreisindex nur als „Baupreisindex (Basisjahr 2010) für die Bauwirtschaft des Statistischen Bundesamtes für den Neubau von Wohngebäuden“ — ohne Zahl; mit welchem Index der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne Index als Zahl würde der Rechenkern mit seiner Konstanten rechnen und nichts widerspräche — deshalb Sperre.",
+  "unvollstaendig_grund": "Kap. 8.3 (S. 76–80) druckt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (8.3.1, S. 79) und für Reihenhäuser und Doppelhaushälften (8.3.2, S. 80) — aber als „überregionale Auswertung (hessenweit)“ der ZGGH aus 1.526 Kauffällen 10/2024–12/2025 (Rahmendaten S. 77), nicht als Ableitung des Ausschusses für seinen Bereich. Zusätzlich nennt das Modell (S. 78) den Baupreisindex nur als „Baupreisindex (Basisjahr 2010) für die Bauwirtschaft des Statistischen Bundesamtes für den Neubau von Wohngebäuden“ — ohne Zahl; mit welchem Index der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne Index als Zahl würde der Rechenkern mit seiner Konstanten rechnen und nichts widerspräche — deshalb Sperre. Geprüft am 22.10.2026 (v2720): das Modell (S. 78) nennt keinen Bezugszeitpunkt des Index — die Freigabe für „Index zum Kaufzeitpunkt“ greift hier nicht.",
   "warum_kein_wert": "Kap. 8.3 (S. 76–80) druckt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (8.3.1, S. 79) und für Reihenhäuser und Doppelhaushälften (8.3.2, S. 80) — aber als „überregionale Auswertung (hessenweit)“ der ZGGH aus 1.526 Kauffällen 10/2024–12/2025 (Rahmendaten S. 77), nicht als Ableitung des Ausschusses für seinen Bereich. Zusätzlich nennt das Modell (S. 78) den Baupreisindex nur als „Baupreisindex (Basisjahr 2010) für die Bauwirtschaft des Statistischen Bundesamtes für den Neubau von Wohngebäuden“ — ohne Zahl; mit welchem Index der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne Index als Zahl würde der Rechenkern mit seiner Konstanten rechnen und nichts widerspräche — deshalb Sperre."
  },
  {
@@ -962,7 +962,7 @@
    "hinweis": "Tabelle „Sachwertfaktor k für freistehende Ein- und Zweifamilienhäuser“ S. 79 (9 Bodenrichtwertbereiche × vorläufiger Sachwert 100.000–1.000.000 €). Nicht übernommen: hessenweite Auswertung, Baupreisindex ohne Zahl."
   },
   "vollstaendig": false,
-  "unvollstaendig_grund": "Kap. 8.3 (S. 76–80) druckt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (8.3.1, S. 79) und für Reihenhäuser und Doppelhaushälften (8.3.2, S. 80) — aber als „überregionale Auswertung (hessenweit)“ der ZGGH aus 1.526 Kauffällen 10/2024–12/2025 (Rahmendaten S. 77), nicht als Ableitung des Ausschusses für seinen Bereich. Zusätzlich nennt das Modell (S. 78) den Baupreisindex nur als „Baupreisindex (Basisjahr 2010) für die Bauwirtschaft des Statistischen Bundesamtes für den Neubau von Wohngebäuden“ — ohne Zahl; mit welchem Index der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne Index als Zahl würde der Rechenkern mit seiner Konstanten rechnen und nichts widerspräche — deshalb Sperre.",
+  "unvollstaendig_grund": "Kap. 8.3 (S. 76–80) druckt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (8.3.1, S. 79) und für Reihenhäuser und Doppelhaushälften (8.3.2, S. 80) — aber als „überregionale Auswertung (hessenweit)“ der ZGGH aus 1.526 Kauffällen 10/2024–12/2025 (Rahmendaten S. 77), nicht als Ableitung des Ausschusses für seinen Bereich. Zusätzlich nennt das Modell (S. 78) den Baupreisindex nur als „Baupreisindex (Basisjahr 2010) für die Bauwirtschaft des Statistischen Bundesamtes für den Neubau von Wohngebäuden“ — ohne Zahl; mit welchem Index der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne Index als Zahl würde der Rechenkern mit seiner Konstanten rechnen und nichts widerspräche — deshalb Sperre. Geprüft am 22.10.2026 (v2720): das Modell (S. 78) nennt keinen Bezugszeitpunkt des Index — die Freigabe für „Index zum Kaufzeitpunkt“ greift hier nicht.",
   "warum_kein_wert": "Kap. 8.3 (S. 76–80) druckt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (8.3.1, S. 79) und für Reihenhäuser und Doppelhaushälften (8.3.2, S. 80) — aber als „überregionale Auswertung (hessenweit)“ der ZGGH aus 1.526 Kauffällen 10/2024–12/2025 (Rahmendaten S. 77), nicht als Ableitung des Ausschusses für seinen Bereich. Zusätzlich nennt das Modell (S. 78) den Baupreisindex nur als „Baupreisindex (Basisjahr 2010) für die Bauwirtschaft des Statistischen Bundesamtes für den Neubau von Wohngebäuden“ — ohne Zahl; mit welchem Index der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne Index als Zahl würde der Rechenkern mit seiner Konstanten rechnen und nichts widerspräche — deshalb Sperre."
  },
  {
@@ -999,7 +999,7 @@
   "modellversion": null,
   "zugang": "kostenfrei",
   "vollstaendig": false,
-  "unvollstaendig_grund": "Kap. 8.3 (S. 76–80) druckt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (8.3.1, S. 79) und für Reihenhäuser und Doppelhaushälften (8.3.2, S. 80) — aber als „überregionale Auswertung (hessenweit)“ der ZGGH aus 1.526 Kauffällen 10/2024–12/2025 (Rahmendaten S. 77), nicht als Ableitung des Ausschusses für seinen Bereich. Zusätzlich nennt das Modell (S. 78) den Baupreisindex nur als „Baupreisindex (Basisjahr 2010) für die Bauwirtschaft des Statistischen Bundesamtes für den Neubau von Wohngebäuden“ — ohne Zahl; mit welchem Index der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne Index als Zahl würde der Rechenkern mit seiner Konstanten rechnen und nichts widerspräche — deshalb Sperre.",
+  "unvollstaendig_grund": "Kap. 8.3 (S. 76–80) druckt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (8.3.1, S. 79) und für Reihenhäuser und Doppelhaushälften (8.3.2, S. 80) — aber als „überregionale Auswertung (hessenweit)“ der ZGGH aus 1.526 Kauffällen 10/2024–12/2025 (Rahmendaten S. 77), nicht als Ableitung des Ausschusses für seinen Bereich. Zusätzlich nennt das Modell (S. 78) den Baupreisindex nur als „Baupreisindex (Basisjahr 2010) für die Bauwirtschaft des Statistischen Bundesamtes für den Neubau von Wohngebäuden“ — ohne Zahl; mit welchem Index der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne Index als Zahl würde der Rechenkern mit seiner Konstanten rechnen und nichts widerspräche — deshalb Sperre. Geprüft am 22.10.2026 (v2720): das Modell (S. 78) nennt keinen Bezugszeitpunkt des Index — die Freigabe für „Index zum Kaufzeitpunkt“ greift hier nicht.",
   "warum_kein_wert": "Kap. 8.3 (S. 76–80) druckt Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser (8.3.1, S. 79) und für Reihenhäuser und Doppelhaushälften (8.3.2, S. 80) — aber als „überregionale Auswertung (hessenweit)“ der ZGGH aus 1.526 Kauffällen 10/2024–12/2025 (Rahmendaten S. 77), nicht als Ableitung des Ausschusses für seinen Bereich. Zusätzlich nennt das Modell (S. 78) den Baupreisindex nur als „Baupreisindex (Basisjahr 2010) für die Bauwirtschaft des Statistischen Bundesamtes für den Neubau von Wohngebäuden“ — ohne Zahl; mit welchem Index der vorläufige Sachwert gebildet wurde, ist aus dem Dokument nicht bestimmbar. Ohne Index als Zahl würde der Rechenkern mit seiner Konstanten rechnen und nichts widerspräche — deshalb Sperre."
  },
  {
@@ -1257,8 +1257,8 @@
   "modellversion": null,
   "zugang": "kostenfrei",
   "vollstaendig": false,
-  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 Frankfurt am Main führt Sachwertfaktoren für Mehrfamilienhäuser (Kap. 3.8.6.5, S. 75–77: 189 Fälle 2025, Stichtag 01.01.2026, gegliedert nach Baujahresklasse, Wohn-/Nutzfläche und Lage; Mittelwerte z. B. Baujahre bis 1918 bis 400 m² 1,28, 400–1.000 m² 1,11). Übernommen wird er nicht: das Modell (Kap. 4.6) nennt den Baupreisindex nur als „zum Vertragszeitpunkt zuletzt veröffentlichten Baupreisindex“, ohne Zahl — der Rechenkern würde mit seiner Konstanten rechnen und nichts widerspräche. Zudem sind es Mittelwerte mit großen Spannen (Minimum 0,49, Maximum 4,19), ohne Abhängigkeit vom vorläufigen Sachwert. Wer den Faktor braucht, liest ihn mit dem Modell im Bericht nach.",
-  "warum_kein_wert": "Der Immobilienmarktbericht 2026 Frankfurt am Main führt Sachwertfaktoren für Mehrfamilienhäuser (Kap. 3.8.6.5, S. 75–77: 189 Fälle 2025, Stichtag 01.01.2026, gegliedert nach Baujahresklasse, Wohn-/Nutzfläche und Lage; Mittelwerte z. B. Baujahre bis 1918 bis 400 m² 1,28, 400–1.000 m² 1,11). Übernommen wird er nicht: das Modell (Kap. 4.6) nennt den Baupreisindex nur als „zum Vertragszeitpunkt zuletzt veröffentlichten Baupreisindex“, ohne Zahl — der Rechenkern würde mit seiner Konstanten rechnen und nichts widerspräche. Zudem sind es Mittelwerte mit großen Spannen (Minimum 0,49, Maximum 4,19), ohne Abhängigkeit vom vorläufigen Sachwert. Wer den Faktor braucht, liest ihn mit dem Modell im Bericht nach."
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 Frankfurt am Main führt Sachwertfaktoren für Mehrfamilienhäuser (Kap. 3.8.6.5, S. 75–77: 189 Fälle 2025, Stichtag 01.01.2026, Mittelwerte nach Baujahresklasse, Wohn-/Nutzfläche und Lage, z. B. Baujahre bis 1918 bis 400 m² 1,28, 400–1.000 m² 1,11). Übernommen wird er nicht, weil das Modell mit NHK 2010 allein nicht nachzurechnen ist: „Sofern bei Mehrfamilienhäusern Standardmerkmale unterhalb von 3 auftreten, werden die in der Kaufpreissammlung … hinterlegten Normalherstellungskosten verwendet“ (Modellbeschreibung, S. 112) — Herstellungskosten aus einer privaten Kaufpreissammlung, bei einer Ø Standardstufe von 2,0 bis 2,6. Zudem sind es lagebezogene Mittelwerte mit großen Spannen (Minimum 0,49, Maximum 4,19) und teils ein bis zwei Fällen je Zelle, ohne Abhängigkeit vom vorläufigen Sachwert. Der Baupreisindex („Es wird der zum Vertragszeitpunkt zuletzt veröffentlichte Baupreisindex verwendet“, S. 112) ist seit der Entscheidung vom 22.10.2026 (v2720) KEIN Sperrgrund mehr. Wer den Faktor braucht, liest ihn mit dem Modell im Bericht nach.",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2026 Frankfurt am Main führt Sachwertfaktoren für Mehrfamilienhäuser (Kap. 3.8.6.5, S. 75–77: 189 Fälle 2025, Stichtag 01.01.2026, Mittelwerte nach Baujahresklasse, Wohn-/Nutzfläche und Lage, z. B. Baujahre bis 1918 bis 400 m² 1,28, 400–1.000 m² 1,11). Übernommen wird er nicht, weil das Modell mit NHK 2010 allein nicht nachzurechnen ist: „Sofern bei Mehrfamilienhäusern Standardmerkmale unterhalb von 3 auftreten, werden die in der Kaufpreissammlung … hinterlegten Normalherstellungskosten verwendet“ (Modellbeschreibung, S. 112) — Herstellungskosten aus einer privaten Kaufpreissammlung, bei einer Ø Standardstufe von 2,0 bis 2,6. Zudem sind es lagebezogene Mittelwerte mit großen Spannen (Minimum 0,49, Maximum 4,19) und teils ein bis zwei Fällen je Zelle, ohne Abhängigkeit vom vorläufigen Sachwert. Der Baupreisindex („Es wird der zum Vertragszeitpunkt zuletzt veröffentlichte Baupreisindex verwendet“, S. 112) ist seit der Entscheidung vom 22.10.2026 (v2720) KEIN Sperrgrund mehr. Wer den Faktor braucht, liest ihn mit dem Modell im Bericht nach."
  },
  {
   "land_code": "HE",
@@ -1885,31 +1885,125 @@
   "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
   "quelle_datei": "`2026_IMB_AfB_Homberg.pdf",
   "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026. Die Dateiliste liefert der REST-Endpunkt /INTERSHOP/rest/WFS/HLBG-Geodaten-Site/-/downloadcenter?path=…; der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt.",
-  "quelle_parser": "v2700-hand (pdftotext -layout, Bildtabellen per Seitenbild 200 dpi gelesen, 21.10.2026, Nachernte 10b HE)",
+  "quelle_parser": "v2720-hand (Seitenbild 130 dpi S. 106–108, 22.10.2026; vorher Sperre v2700)",
   "lizenz": "dl-de/zero-2-0",
   "kennzahl": "sachwertfaktor",
   "zweig": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": null,
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    200000,
+    300000,
+    400000,
+    500000,
+    600000,
+    700000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "200000": [
+     0.87,
+     1.04,
+     1.14,
+     null
+    ],
+    "300000": [
+     0.88,
+     1,
+     1.06,
+     1.1
+    ],
+    "400000": [
+     0.87,
+     0.97,
+     1.02,
+     1.05
+    ],
+    "500000": [
+     0.87,
+     0.94,
+     0.98,
+     1.01
+    ],
+    "600000": [
+     null,
+     0.92,
+     0.95,
+     null
+    ],
+    "700000": [
+     null,
+     null,
+     0.93,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Tabelle „Sachwertfaktor k für Mehrfamilienhäuser“ 2022–2024, S. 106 (Seitenbild gelesen 22.10.2026; Kurven S. 107 decken sich). Zeile 100.000 € ist im Bericht leer und entfällt; leere Zellen bleiben leer, keine Extrapolation. Multiple Regression über vorläufigen Sachwert und Bodenrichtwert, 63 Kauffälle, multipler Korrelationskoeffizient 0,80.",
+   "normobjekt": "Ø vorläufiger Sachwert 345.234 €, Ø Grundstücksgröße 925 m², Ø BRW 60 €/m², Ø RND 24 Jahre, Ø Standardstufe 2,2, Ø BGF 622 m², Ø Wohnfläche 300 m² (S. 107)."
+  },
   "korrekturen": [],
-  "modellansaetze": null,
-  "geltungsbereich": null,
+  "modellansaetze": {
+   "nhk": "NHK 2010 (Anlage 4 ImmoWertV 2021)",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Modell S. 108: „Gesamtnutzungsdauer gem. Leitfaden I (70 Jahre)“; Hinweis S. 107: „somit ist die in der nachfolgenden Modellbeschreibung aufgeführte Gesamtnutzungsdauer von 70 Jahren zu berücksichtigen.“",
+   "gnd_warnung": "Ausgewertet nach der alten Rechtsgrundlage (Übergangsregel § 53 Abs. 2 ImmoWertV): GND 70 statt 80 nach Anlage 1. Modellkonform nur mit GND 70.",
+   "baupreisindex": null,
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Baupreisindex: aktueller Index zum Beurkundungsdatum (quartalsweise)",
+   "baupreisindex_seite": "S. 108 (Sachwertmodell für Mehrfamilienhäuser)",
+   "regionalfaktor": 1,
+   "korrekturfaktor": "kein Korrekturfaktor",
+   "bezugsmassstab": "BGF",
+   "gebaeudestandard": "Standardstufe gem. Leitfaden I",
+   "baujahr": "ursprüngliches Baujahr und modifiziertes Baujahr",
+   "rnd_mindest_jahre": 20,
+   "alterswertminderung": "linear",
+   "bodenwert": "lage- und objektangepasster Bodenrichtwert, marktübliche objektbezogene Grundstücksgröße",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert auf Grundlage von Nachbewertungen"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Hersfeld-Rotenburg, Schwalm-Eder-Kreis und Werra-Meißner-Kreis",
+   "sachlich": "Mehrfamilienhäuser (inkl. Dreifamilienhäuser)",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "rnd_mindest_jahre": 20,
+   "kauffaelle_je_brw_stuetzstelle": {
+    "25": 14,
+    "50": 18,
+    "75": 23,
+    "100": 8
+   }
+  },
   "belege": [
    {
-    "art": "fehlstelle",
-    "fundstelle": "IMB 2026 AfB Homberg (Efze), Kap. 13.3 „Regionale Auswertung von Mehrfamilienhäusern“, S. 106–108 (Hinweis S. 107, Modell S. 108)"
+    "art": "tabellenwert",
+    "fundstelle": "IMB 2026 AfB Homberg (Efze), Kap. 13.2.3 „Regionale Auswertung von Mehrfamilienhäusern“, Tabelle S. 106, Merkmale und Hinweis S. 107, Modell S. 108",
+    "wortlaut": "Sachwertfaktor k für Mehrfamilienhäuser 2022–2024, BRW 25/50/75/100 €/m²: 200.000 € 0,87/1,04/1,14/– · 300.000 € 0,88/1,00/1,06/1,10 · 400.000 € 0,87/0,97/1,02/1,05 · 500.000 € 0,87/0,94/0,98/1,01 · 600.000 € –/0,92/0,95/– · 700.000 € –/–/0,93/–"
    }
   ],
-  "stufe": "A",
-  "stufe_grund": null,
-  "fallzahl": null,
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte zweiachsige Tabelle mit Kauffallzahlen je Zelle, multipler Korrelationskoeffizient 0,80. KEINE Stufe A: nur 63 Kauffälle, viele Randzellen beruhen auf ein bis zwei Fällen, und die Auswertung steht noch im alten Modell (GND 70).",
+  "fallzahl": 63,
   "streuung": null,
-  "stichtag": null,
-  "modellversion": null,
+  "stichtag": "2025-01-01",
+  "modellversion": "IMB 2026 AfB Homberg (Efze), Sachwertmodell Mehrfamilienhäuser (Leitfaden I/II Stand Januar 2024)",
   "zugang": "kostenfrei",
-  "vollstaendig": false,
-  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Homberg (Efze) führt einen Sachwertfaktor für Mehrfamilienhäuser (inkl. Dreifamilienhäuser), aber im ALTEN Modell: Hinweis S. 107 wörtlich „Die Auswertung der in diesem Immobilienmarktbericht dargestellten Sachwertfaktoren für Mehrfamilienhäuser erfolgte noch anhand der alten Rechtsgrundlage - Gesamtnutzungsdauer 70 Jahre“ und „Der Gutachterausschuss hat auf der neuen Rechtsgrundlage noch keine Sachwertfaktoren für Mehrfamilienhäuser ermittelt“; Untersuchungszeitraum 2022–2024, Stichtag 01.01.2025. Das Modell (S. 108) nennt den Baupreisindex als „aktueller Index zum Beurkundungsdatum (quartalsweise)“ — ohne Zahl, also nicht bestimmbar. Übernommen wird nichts; wer ihn nutzt, muss mit GND 70 rechnen (§ 10 ImmoWertV).",
-  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Homberg (Efze) führt einen Sachwertfaktor für Mehrfamilienhäuser (inkl. Dreifamilienhäuser), aber im ALTEN Modell: Hinweis S. 107 wörtlich „Die Auswertung der in diesem Immobilienmarktbericht dargestellten Sachwertfaktoren für Mehrfamilienhäuser erfolgte noch anhand der alten Rechtsgrundlage - Gesamtnutzungsdauer 70 Jahre“ und „Der Gutachterausschuss hat auf der neuen Rechtsgrundlage noch keine Sachwertfaktoren für Mehrfamilienhäuser ermittelt“; Untersuchungszeitraum 2022–2024, Stichtag 01.01.2025. Das Modell (S. 108) nennt den Baupreisindex als „aktueller Index zum Beurkundungsdatum (quartalsweise)“ — ohne Zahl, also nicht bestimmbar. Übernommen wird nichts; wer ihn nutzt, muss mit GND 70 rechnen (§ 10 ImmoWertV)."
+  "vollstaendig": true,
+  "quellenvermerk": "Amt für Bodenmanagement Homberg (Efze), Geschäftsstelle Gutachterausschuss für Immobilienwerte, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, Standardstufe nach Leitfaden I, kein Korrekturfaktor, BGF, Baupreisindex zum Beurkundungsdatum (Anwendung: Index zum Wertermittlungsstichtag), GESAMTNUTZUNGSDAUER 70 JAHRE, wirtschaftliche RND mindestens 20 Jahre, linear."
  },
  {
   "land_code": "HE",
@@ -1957,31 +2051,125 @@
   "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
   "quelle_datei": "`2026_IMB_AfB_Homberg.pdf",
   "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026. Die Dateiliste liefert der REST-Endpunkt /INTERSHOP/rest/WFS/HLBG-Geodaten-Site/-/downloadcenter?path=…; der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt.",
-  "quelle_parser": "v2700-hand (pdftotext -layout, Bildtabellen per Seitenbild 200 dpi gelesen, 21.10.2026, Nachernte 10b HE)",
+  "quelle_parser": "v2720-hand (Seitenbild 130 dpi S. 106–108, 22.10.2026; vorher Sperre v2700)",
   "lizenz": "dl-de/zero-2-0",
   "kennzahl": "sachwertfaktor",
   "zweig": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": null,
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    200000,
+    300000,
+    400000,
+    500000,
+    600000,
+    700000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "200000": [
+     0.87,
+     1.04,
+     1.14,
+     null
+    ],
+    "300000": [
+     0.88,
+     1,
+     1.06,
+     1.1
+    ],
+    "400000": [
+     0.87,
+     0.97,
+     1.02,
+     1.05
+    ],
+    "500000": [
+     0.87,
+     0.94,
+     0.98,
+     1.01
+    ],
+    "600000": [
+     null,
+     0.92,
+     0.95,
+     null
+    ],
+    "700000": [
+     null,
+     null,
+     0.93,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Tabelle „Sachwertfaktor k für Mehrfamilienhäuser“ 2022–2024, S. 106 (Seitenbild gelesen 22.10.2026; Kurven S. 107 decken sich). Zeile 100.000 € ist im Bericht leer und entfällt; leere Zellen bleiben leer, keine Extrapolation. Multiple Regression über vorläufigen Sachwert und Bodenrichtwert, 63 Kauffälle, multipler Korrelationskoeffizient 0,80.",
+   "normobjekt": "Ø vorläufiger Sachwert 345.234 €, Ø Grundstücksgröße 925 m², Ø BRW 60 €/m², Ø RND 24 Jahre, Ø Standardstufe 2,2, Ø BGF 622 m², Ø Wohnfläche 300 m² (S. 107)."
+  },
   "korrekturen": [],
-  "modellansaetze": null,
-  "geltungsbereich": null,
+  "modellansaetze": {
+   "nhk": "NHK 2010 (Anlage 4 ImmoWertV 2021)",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Modell S. 108: „Gesamtnutzungsdauer gem. Leitfaden I (70 Jahre)“; Hinweis S. 107: „somit ist die in der nachfolgenden Modellbeschreibung aufgeführte Gesamtnutzungsdauer von 70 Jahren zu berücksichtigen.“",
+   "gnd_warnung": "Ausgewertet nach der alten Rechtsgrundlage (Übergangsregel § 53 Abs. 2 ImmoWertV): GND 70 statt 80 nach Anlage 1. Modellkonform nur mit GND 70.",
+   "baupreisindex": null,
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Baupreisindex: aktueller Index zum Beurkundungsdatum (quartalsweise)",
+   "baupreisindex_seite": "S. 108 (Sachwertmodell für Mehrfamilienhäuser)",
+   "regionalfaktor": 1,
+   "korrekturfaktor": "kein Korrekturfaktor",
+   "bezugsmassstab": "BGF",
+   "gebaeudestandard": "Standardstufe gem. Leitfaden I",
+   "baujahr": "ursprüngliches Baujahr und modifiziertes Baujahr",
+   "rnd_mindest_jahre": 20,
+   "alterswertminderung": "linear",
+   "bodenwert": "lage- und objektangepasster Bodenrichtwert, marktübliche objektbezogene Grundstücksgröße",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert auf Grundlage von Nachbewertungen"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Hersfeld-Rotenburg, Schwalm-Eder-Kreis und Werra-Meißner-Kreis",
+   "sachlich": "Mehrfamilienhäuser (inkl. Dreifamilienhäuser)",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "rnd_mindest_jahre": 20,
+   "kauffaelle_je_brw_stuetzstelle": {
+    "25": 14,
+    "50": 18,
+    "75": 23,
+    "100": 8
+   }
+  },
   "belege": [
    {
-    "art": "fehlstelle",
-    "fundstelle": "IMB 2026 AfB Homberg (Efze), Kap. 13.3 „Regionale Auswertung von Mehrfamilienhäusern“, S. 106–108 (Hinweis S. 107, Modell S. 108)"
+    "art": "tabellenwert",
+    "fundstelle": "IMB 2026 AfB Homberg (Efze), Kap. 13.2.3 „Regionale Auswertung von Mehrfamilienhäusern“, Tabelle S. 106, Merkmale und Hinweis S. 107, Modell S. 108",
+    "wortlaut": "Sachwertfaktor k für Mehrfamilienhäuser 2022–2024, BRW 25/50/75/100 €/m²: 200.000 € 0,87/1,04/1,14/– · 300.000 € 0,88/1,00/1,06/1,10 · 400.000 € 0,87/0,97/1,02/1,05 · 500.000 € 0,87/0,94/0,98/1,01 · 600.000 € –/0,92/0,95/– · 700.000 € –/–/0,93/–"
    }
   ],
-  "stufe": "A",
-  "stufe_grund": null,
-  "fallzahl": null,
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte zweiachsige Tabelle mit Kauffallzahlen je Zelle, multipler Korrelationskoeffizient 0,80. KEINE Stufe A: nur 63 Kauffälle, viele Randzellen beruhen auf ein bis zwei Fällen, und die Auswertung steht noch im alten Modell (GND 70).",
+  "fallzahl": 63,
   "streuung": null,
-  "stichtag": null,
-  "modellversion": null,
+  "stichtag": "2025-01-01",
+  "modellversion": "IMB 2026 AfB Homberg (Efze), Sachwertmodell Mehrfamilienhäuser (Leitfaden I/II Stand Januar 2024)",
   "zugang": "kostenfrei",
-  "vollstaendig": false,
-  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Homberg (Efze) führt einen Sachwertfaktor für Mehrfamilienhäuser (inkl. Dreifamilienhäuser), aber im ALTEN Modell: Hinweis S. 107 wörtlich „Die Auswertung der in diesem Immobilienmarktbericht dargestellten Sachwertfaktoren für Mehrfamilienhäuser erfolgte noch anhand der alten Rechtsgrundlage - Gesamtnutzungsdauer 70 Jahre“ und „Der Gutachterausschuss hat auf der neuen Rechtsgrundlage noch keine Sachwertfaktoren für Mehrfamilienhäuser ermittelt“; Untersuchungszeitraum 2022–2024, Stichtag 01.01.2025. Das Modell (S. 108) nennt den Baupreisindex als „aktueller Index zum Beurkundungsdatum (quartalsweise)“ — ohne Zahl, also nicht bestimmbar. Übernommen wird nichts; wer ihn nutzt, muss mit GND 70 rechnen (§ 10 ImmoWertV).",
-  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Homberg (Efze) führt einen Sachwertfaktor für Mehrfamilienhäuser (inkl. Dreifamilienhäuser), aber im ALTEN Modell: Hinweis S. 107 wörtlich „Die Auswertung der in diesem Immobilienmarktbericht dargestellten Sachwertfaktoren für Mehrfamilienhäuser erfolgte noch anhand der alten Rechtsgrundlage - Gesamtnutzungsdauer 70 Jahre“ und „Der Gutachterausschuss hat auf der neuen Rechtsgrundlage noch keine Sachwertfaktoren für Mehrfamilienhäuser ermittelt“; Untersuchungszeitraum 2022–2024, Stichtag 01.01.2025. Das Modell (S. 108) nennt den Baupreisindex als „aktueller Index zum Beurkundungsdatum (quartalsweise)“ — ohne Zahl, also nicht bestimmbar. Übernommen wird nichts; wer ihn nutzt, muss mit GND 70 rechnen (§ 10 ImmoWertV)."
+  "vollstaendig": true,
+  "quellenvermerk": "Amt für Bodenmanagement Homberg (Efze), Geschäftsstelle Gutachterausschuss für Immobilienwerte, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, Standardstufe nach Leitfaden I, kein Korrekturfaktor, BGF, Baupreisindex zum Beurkundungsdatum (Anwendung: Index zum Wertermittlungsstichtag), GESAMTNUTZUNGSDAUER 70 JAHRE, wirtschaftliche RND mindestens 20 Jahre, linear."
  },
  {
   "land_code": "HE",
@@ -2029,31 +2217,125 @@
   "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
   "quelle_datei": "`2026_IMB_AfB_Homberg.pdf",
   "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026. Die Dateiliste liefert der REST-Endpunkt /INTERSHOP/rest/WFS/HLBG-Geodaten-Site/-/downloadcenter?path=…; der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt.",
-  "quelle_parser": "v2700-hand (pdftotext -layout, Bildtabellen per Seitenbild 200 dpi gelesen, 21.10.2026, Nachernte 10b HE)",
+  "quelle_parser": "v2720-hand (Seitenbild 130 dpi S. 106–108, 22.10.2026; vorher Sperre v2700)",
   "lizenz": "dl-de/zero-2-0",
   "kennzahl": "sachwertfaktor",
   "zweig": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
-  "formel": null,
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x": [
+    25,
+    50,
+    75,
+    100
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwert in Euro/m²",
+   "achse_y": [
+    200000,
+    300000,
+    400000,
+    500000,
+    600000,
+    700000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "200000": [
+     0.87,
+     1.04,
+     1.14,
+     null
+    ],
+    "300000": [
+     0.88,
+     1,
+     1.06,
+     1.1
+    ],
+    "400000": [
+     0.87,
+     0.97,
+     1.02,
+     1.05
+    ],
+    "500000": [
+     0.87,
+     0.94,
+     0.98,
+     1.01
+    ],
+    "600000": [
+     null,
+     0.92,
+     0.95,
+     null
+    ],
+    "700000": [
+     null,
+     null,
+     0.93,
+     null
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "Tabelle „Sachwertfaktor k für Mehrfamilienhäuser“ 2022–2024, S. 106 (Seitenbild gelesen 22.10.2026; Kurven S. 107 decken sich). Zeile 100.000 € ist im Bericht leer und entfällt; leere Zellen bleiben leer, keine Extrapolation. Multiple Regression über vorläufigen Sachwert und Bodenrichtwert, 63 Kauffälle, multipler Korrelationskoeffizient 0,80.",
+   "normobjekt": "Ø vorläufiger Sachwert 345.234 €, Ø Grundstücksgröße 925 m², Ø BRW 60 €/m², Ø RND 24 Jahre, Ø Standardstufe 2,2, Ø BGF 622 m², Ø Wohnfläche 300 m² (S. 107)."
+  },
   "korrekturen": [],
-  "modellansaetze": null,
-  "geltungsbereich": null,
+  "modellansaetze": {
+   "nhk": "NHK 2010 (Anlage 4 ImmoWertV 2021)",
+   "gnd_jahre": 70,
+   "gnd_beleg": "Modell S. 108: „Gesamtnutzungsdauer gem. Leitfaden I (70 Jahre)“; Hinweis S. 107: „somit ist die in der nachfolgenden Modellbeschreibung aufgeführte Gesamtnutzungsdauer von 70 Jahren zu berücksichtigen.“",
+   "gnd_warnung": "Ausgewertet nach der alten Rechtsgrundlage (Übergangsregel § 53 Abs. 2 ImmoWertV): GND 70 statt 80 nach Anlage 1. Modellkonform nur mit GND 70.",
+   "baupreisindex": null,
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Baupreisindex: aktueller Index zum Beurkundungsdatum (quartalsweise)",
+   "baupreisindex_seite": "S. 108 (Sachwertmodell für Mehrfamilienhäuser)",
+   "regionalfaktor": 1,
+   "korrekturfaktor": "kein Korrekturfaktor",
+   "bezugsmassstab": "BGF",
+   "gebaeudestandard": "Standardstufe gem. Leitfaden I",
+   "baujahr": "ursprüngliches Baujahr und modifiziertes Baujahr",
+   "rnd_mindest_jahre": 20,
+   "alterswertminderung": "linear",
+   "bodenwert": "lage- und objektangepasster Bodenrichtwert, marktübliche objektbezogene Grundstücksgröße",
+   "ermittlungsmethodik": "multiple Regression mit den Eingangsgrößen vorläufiger Sachwert und Bodenrichtwert auf Grundlage von Nachbewertungen"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Hersfeld-Rotenburg, Schwalm-Eder-Kreis und Werra-Meißner-Kreis",
+   "sachlich": "Mehrfamilienhäuser (inkl. Dreifamilienhäuser)",
+   "extrapolation": "ausgeschlossen, leere Zellen bleiben leer",
+   "rnd_mindest_jahre": 20,
+   "kauffaelle_je_brw_stuetzstelle": {
+    "25": 14,
+    "50": 18,
+    "75": 23,
+    "100": 8
+   }
+  },
   "belege": [
    {
-    "art": "fehlstelle",
-    "fundstelle": "IMB 2026 AfB Homberg (Efze), Kap. 13.3 „Regionale Auswertung von Mehrfamilienhäusern“, S. 106–108 (Hinweis S. 107, Modell S. 108)"
+    "art": "tabellenwert",
+    "fundstelle": "IMB 2026 AfB Homberg (Efze), Kap. 13.2.3 „Regionale Auswertung von Mehrfamilienhäusern“, Tabelle S. 106, Merkmale und Hinweis S. 107, Modell S. 108",
+    "wortlaut": "Sachwertfaktor k für Mehrfamilienhäuser 2022–2024, BRW 25/50/75/100 €/m²: 200.000 € 0,87/1,04/1,14/– · 300.000 € 0,88/1,00/1,06/1,10 · 400.000 € 0,87/0,97/1,02/1,05 · 500.000 € 0,87/0,94/0,98/1,01 · 600.000 € –/0,92/0,95/– · 700.000 € –/–/0,93/–"
    }
   ],
-  "stufe": "A",
-  "stufe_grund": null,
-  "fallzahl": null,
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte zweiachsige Tabelle mit Kauffallzahlen je Zelle, multipler Korrelationskoeffizient 0,80. KEINE Stufe A: nur 63 Kauffälle, viele Randzellen beruhen auf ein bis zwei Fällen, und die Auswertung steht noch im alten Modell (GND 70).",
+  "fallzahl": 63,
   "streuung": null,
-  "stichtag": null,
-  "modellversion": null,
+  "stichtag": "2025-01-01",
+  "modellversion": "IMB 2026 AfB Homberg (Efze), Sachwertmodell Mehrfamilienhäuser (Leitfaden I/II Stand Januar 2024)",
   "zugang": "kostenfrei",
-  "vollstaendig": false,
-  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Homberg (Efze) führt einen Sachwertfaktor für Mehrfamilienhäuser (inkl. Dreifamilienhäuser), aber im ALTEN Modell: Hinweis S. 107 wörtlich „Die Auswertung der in diesem Immobilienmarktbericht dargestellten Sachwertfaktoren für Mehrfamilienhäuser erfolgte noch anhand der alten Rechtsgrundlage - Gesamtnutzungsdauer 70 Jahre“ und „Der Gutachterausschuss hat auf der neuen Rechtsgrundlage noch keine Sachwertfaktoren für Mehrfamilienhäuser ermittelt“; Untersuchungszeitraum 2022–2024, Stichtag 01.01.2025. Das Modell (S. 108) nennt den Baupreisindex als „aktueller Index zum Beurkundungsdatum (quartalsweise)“ — ohne Zahl, also nicht bestimmbar. Übernommen wird nichts; wer ihn nutzt, muss mit GND 70 rechnen (§ 10 ImmoWertV).",
-  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Homberg (Efze) führt einen Sachwertfaktor für Mehrfamilienhäuser (inkl. Dreifamilienhäuser), aber im ALTEN Modell: Hinweis S. 107 wörtlich „Die Auswertung der in diesem Immobilienmarktbericht dargestellten Sachwertfaktoren für Mehrfamilienhäuser erfolgte noch anhand der alten Rechtsgrundlage - Gesamtnutzungsdauer 70 Jahre“ und „Der Gutachterausschuss hat auf der neuen Rechtsgrundlage noch keine Sachwertfaktoren für Mehrfamilienhäuser ermittelt“; Untersuchungszeitraum 2022–2024, Stichtag 01.01.2025. Das Modell (S. 108) nennt den Baupreisindex als „aktueller Index zum Beurkundungsdatum (quartalsweise)“ — ohne Zahl, also nicht bestimmbar. Übernommen wird nichts; wer ihn nutzt, muss mit GND 70 rechnen (§ 10 ImmoWertV)."
+  "vollstaendig": true,
+  "quellenvermerk": "Amt für Bodenmanagement Homberg (Efze), Geschäftsstelle Gutachterausschuss für Immobilienwerte, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "auflagen": "Modellkonformität nach § 10 ImmoWertV: NHK 2010, Standardstufe nach Leitfaden I, kein Korrekturfaktor, BGF, Baupreisindex zum Beurkundungsdatum (Anwendung: Index zum Wertermittlungsstichtag), GESAMTNUTZUNGSDAUER 70 JAHRE, wirtschaftliche RND mindestens 20 Jahre, linear."
  },
  {
   "land_code": "HE",
@@ -2147,11 +2429,11 @@
     "bgf_qm": 550,
     "wohnflaeche_qm": 308
    },
-   "hinweis": "Tab. 49, S. 168. Vorgemerkt, nicht gerechnet: Baupreisindex ohne Zahl, R² 0,07."
+   "hinweis": "gesperrt wegen R² = 0,0732 (statistisch nicht tragfähig); Baupreisindex zum Beurkundungstermin wäre zulässig (v2720)"
   },
   "vollstaendig": false,
-  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Korbach führt einen Sachwertfaktor für Mehrfamilienwohnhäuser in den Landkreisen Kassel und Waldeck-Frankenberg (Tab. 49, S. 168: 32 Kauffälle 2023–2025, Stichtag 31.12.2025, GND 80, Bodenrichtwertbereich bis 149 €/m²). Übernommen wird er nicht: das Modell (Tab. 48, S. 167) nennt den Baupreisindex nur als „zum Beurkundungstermin (quartalsweise) aktueller Baupreisindex, Basisjahr 2010“ — ohne Zahl, also nicht bestimmbar; der Rechenkern würde mit seiner Konstanten rechnen. Außerdem ist das Bestimmtheitsmaß R² = 0,0732; der Ausschuss schreibt selbst (Fußnote 32, S. 168): „Das Bestimmtheitsmaß ist sehr niedrig (< 10%!) … Das ist ggfs. bei einer Anwendung sachverständig zu würdigen.“ Tabellenkopf (bis 149 €/m²) und Grafik (bis 199 €/m²) nennen verschiedene BRW-Grenzen.",
-  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Korbach führt einen Sachwertfaktor für Mehrfamilienwohnhäuser in den Landkreisen Kassel und Waldeck-Frankenberg (Tab. 49, S. 168: 32 Kauffälle 2023–2025, Stichtag 31.12.2025, GND 80, Bodenrichtwertbereich bis 149 €/m²). Übernommen wird er nicht: das Modell (Tab. 48, S. 167) nennt den Baupreisindex nur als „zum Beurkundungstermin (quartalsweise) aktueller Baupreisindex, Basisjahr 2010“ — ohne Zahl, also nicht bestimmbar; der Rechenkern würde mit seiner Konstanten rechnen. Außerdem ist das Bestimmtheitsmaß R² = 0,0732; der Ausschuss schreibt selbst (Fußnote 32, S. 168): „Das Bestimmtheitsmaß ist sehr niedrig (< 10%!) … Das ist ggfs. bei einer Anwendung sachverständig zu würdigen.“ Tabellenkopf (bis 149 €/m²) und Grafik (bis 199 €/m²) nennen verschiedene BRW-Grenzen."
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Korbach führt einen Sachwertfaktor für Mehrfamilienwohnhäuser in den Landkreisen Kassel und Waldeck-Frankenberg (Tab. 49, S. 168: 32 Kauffälle 2023–2025, Stichtag 31.12.2025, GND 80, Bodenrichtwertbereich bis 149 €/m²). Übernommen wird er nicht, weil er statistisch nicht trägt: das Bestimmtheitsmaß ist R² = 0,0732; der Ausschuss schreibt selbst (Fußnote 32, S. 168): „Das Bestimmtheitsmaß ist sehr niedrig (< 10%!) … Das ist ggfs. bei einer Anwendung sachverständig zu würdigen.“ Tabellenkopf (bis 149 €/m²) und Grafik (bis 199 €/m²) nennen zudem verschiedene BRW-Grenzen. Der Baupreisindex („zum Beurkundungstermin (quartalsweise) aktueller Baupreisindex, Basisjahr 2010“, Tab. 48, S. 167) ist seit der Entscheidung vom 22.10.2026 (v2720) KEIN Sperrgrund mehr. Die Tabelle steht unter formel_vorgemerkt.",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Korbach führt einen Sachwertfaktor für Mehrfamilienwohnhäuser in den Landkreisen Kassel und Waldeck-Frankenberg (Tab. 49, S. 168: 32 Kauffälle 2023–2025, Stichtag 31.12.2025, GND 80, Bodenrichtwertbereich bis 149 €/m²). Übernommen wird er nicht, weil er statistisch nicht trägt: das Bestimmtheitsmaß ist R² = 0,0732; der Ausschuss schreibt selbst (Fußnote 32, S. 168): „Das Bestimmtheitsmaß ist sehr niedrig (< 10%!) … Das ist ggfs. bei einer Anwendung sachverständig zu würdigen.“ Tabellenkopf (bis 149 €/m²) und Grafik (bis 199 €/m²) nennen zudem verschiedene BRW-Grenzen. Der Baupreisindex („zum Beurkundungstermin (quartalsweise) aktueller Baupreisindex, Basisjahr 2010“, Tab. 48, S. 167) ist seit der Entscheidung vom 22.10.2026 (v2720) KEIN Sperrgrund mehr. Die Tabelle steht unter formel_vorgemerkt."
  },
  {
   "land_code": "HE",
@@ -2245,11 +2527,11 @@
     "bgf_qm": 550,
     "wohnflaeche_qm": 308
    },
-   "hinweis": "Tab. 49, S. 168. Vorgemerkt, nicht gerechnet: Baupreisindex ohne Zahl, R² 0,07."
+   "hinweis": "gesperrt wegen R² = 0,0732 (statistisch nicht tragfähig); Baupreisindex zum Beurkundungstermin wäre zulässig (v2720)"
   },
   "vollstaendig": false,
-  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Korbach führt einen Sachwertfaktor für Mehrfamilienwohnhäuser in den Landkreisen Kassel und Waldeck-Frankenberg (Tab. 49, S. 168: 32 Kauffälle 2023–2025, Stichtag 31.12.2025, GND 80, Bodenrichtwertbereich bis 149 €/m²). Übernommen wird er nicht: das Modell (Tab. 48, S. 167) nennt den Baupreisindex nur als „zum Beurkundungstermin (quartalsweise) aktueller Baupreisindex, Basisjahr 2010“ — ohne Zahl, also nicht bestimmbar; der Rechenkern würde mit seiner Konstanten rechnen. Außerdem ist das Bestimmtheitsmaß R² = 0,0732; der Ausschuss schreibt selbst (Fußnote 32, S. 168): „Das Bestimmtheitsmaß ist sehr niedrig (< 10%!) … Das ist ggfs. bei einer Anwendung sachverständig zu würdigen.“ Tabellenkopf (bis 149 €/m²) und Grafik (bis 199 €/m²) nennen verschiedene BRW-Grenzen.",
-  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Korbach führt einen Sachwertfaktor für Mehrfamilienwohnhäuser in den Landkreisen Kassel und Waldeck-Frankenberg (Tab. 49, S. 168: 32 Kauffälle 2023–2025, Stichtag 31.12.2025, GND 80, Bodenrichtwertbereich bis 149 €/m²). Übernommen wird er nicht: das Modell (Tab. 48, S. 167) nennt den Baupreisindex nur als „zum Beurkundungstermin (quartalsweise) aktueller Baupreisindex, Basisjahr 2010“ — ohne Zahl, also nicht bestimmbar; der Rechenkern würde mit seiner Konstanten rechnen. Außerdem ist das Bestimmtheitsmaß R² = 0,0732; der Ausschuss schreibt selbst (Fußnote 32, S. 168): „Das Bestimmtheitsmaß ist sehr niedrig (< 10%!) … Das ist ggfs. bei einer Anwendung sachverständig zu würdigen.“ Tabellenkopf (bis 149 €/m²) und Grafik (bis 199 €/m²) nennen verschiedene BRW-Grenzen."
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Korbach führt einen Sachwertfaktor für Mehrfamilienwohnhäuser in den Landkreisen Kassel und Waldeck-Frankenberg (Tab. 49, S. 168: 32 Kauffälle 2023–2025, Stichtag 31.12.2025, GND 80, Bodenrichtwertbereich bis 149 €/m²). Übernommen wird er nicht, weil er statistisch nicht trägt: das Bestimmtheitsmaß ist R² = 0,0732; der Ausschuss schreibt selbst (Fußnote 32, S. 168): „Das Bestimmtheitsmaß ist sehr niedrig (< 10%!) … Das ist ggfs. bei einer Anwendung sachverständig zu würdigen.“ Tabellenkopf (bis 149 €/m²) und Grafik (bis 199 €/m²) nennen zudem verschiedene BRW-Grenzen. Der Baupreisindex („zum Beurkundungstermin (quartalsweise) aktueller Baupreisindex, Basisjahr 2010“, Tab. 48, S. 167) ist seit der Entscheidung vom 22.10.2026 (v2720) KEIN Sperrgrund mehr. Die Tabelle steht unter formel_vorgemerkt.",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Geschäftsstelle Korbach führt einen Sachwertfaktor für Mehrfamilienwohnhäuser in den Landkreisen Kassel und Waldeck-Frankenberg (Tab. 49, S. 168: 32 Kauffälle 2023–2025, Stichtag 31.12.2025, GND 80, Bodenrichtwertbereich bis 149 €/m²). Übernommen wird er nicht, weil er statistisch nicht trägt: das Bestimmtheitsmaß ist R² = 0,0732; der Ausschuss schreibt selbst (Fußnote 32, S. 168): „Das Bestimmtheitsmaß ist sehr niedrig (< 10%!) … Das ist ggfs. bei einer Anwendung sachverständig zu würdigen.“ Tabellenkopf (bis 149 €/m²) und Grafik (bis 199 €/m²) nennen zudem verschiedene BRW-Grenzen. Der Baupreisindex („zum Beurkundungstermin (quartalsweise) aktueller Baupreisindex, Basisjahr 2010“, Tab. 48, S. 167) ist seit der Entscheidung vom 22.10.2026 (v2720) KEIN Sperrgrund mehr. Die Tabelle steht unter formel_vorgemerkt."
  },
  {
   "land_code": "HE",
