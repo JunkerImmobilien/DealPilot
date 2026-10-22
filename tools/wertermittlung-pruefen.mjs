@@ -190,6 +190,12 @@ for (const f of F.ebene_a) {
       wert('A', id, 'Barwert des Reinertrags (§ 29 Nr. 1)', br, s.barwert_reinertrag, t.euro);
       wert('A', id, 'abgezinster Bodenwert (§ 29 Nr. 2)', bwa, s.bodenwert_abgezinst, t.euro);
       wert('A', id, 'vorläufiger Ertragswert § 29', br + bwa, s.vorlaeufiger_ertragswert, t.euro);
+      /* v2770 · und der Kern selbst (out.vereinfacht, Gegenrechnung neben § 28) */
+      const kV = ertragswert(einManuell({ rohertrag: e.reinertrag + 1, bwk: 1, lzs_pct: e.lzs_pct, rnd_jahre: e.rnd_jahre }), bwEinfach(e.bodenwert));
+      const v29 = kV.vereinfacht || {};
+      wert('A', id, 'Kern § 29: Barwert des Reinertrags', v29.barwert_reinertrag_eur ?? null, s.barwert_reinertrag, t.euro);
+      wert('A', id, 'Kern § 29: abgezinster Bodenwert', v29.bodenwert_abgezinst_eur ?? null, s.bodenwert_abgezinst, t.euro);
+      wert('A', id, 'Kern § 29: vorläufiger Ertragswert', v29.vorlaeufiger_ertragswert_eur ?? null, s.vorlaeufiger_ertragswert, t.euro);
     } else if (f.art === 'bwk_anlage3') {
       const k = ertragswert({ objektart: e.objektart, baujahr: 2000, wohnflaeche_qm: e.wohnflaeche_qm, anzahl_we: 1,
         stichtag_jahr: e.stichtag_jahr, miete_markt_jahr: e.rohertrag, bwk_modus: 'normiert',
@@ -831,6 +837,49 @@ fallB('B35', () => {
     && /oberste Größenklasse angesetzt/.test(e.miete_stufe.etikett) && /oberste Größenklasse/.test(e.miete_stufe.groessenklasse_hinweis || ''),
     e ? e.miete_stufe.etikett : '');
   wert('B', 'B35', 'Hüllhorst Ertragswert (v2600: 239.000)', e ? e.value_eur : null, 218000, 0);
+});
+
+/* ══ v2770 · AUS DEM VERKEHRSWERT-MODUL V4.2.6 UEBERNOMMEN (B40-B42) ═════════
+   B40 Mapper: je Gewerbeeinheit Ist, Markt, Vertragslaufzeit.
+   B41 Wohn- und Geschaeftshaus (Demo-MFH, WE 6 als Laden): Mietabweichung Gewerbe
+       mit Befristung als boG (E2-Regeln je Mietverhaeltnis), ohne Laufzeit Szenarien.
+   B42 § 29 als Gegenrechnung am Demo-MFH: Wert bleibt § 28, Differenz nur Rundung. */
+const DPM = (await lade('services/DealPilotObjectMapper.js')).DealPilotObjectMapper;
+fallB('B40', () => {
+  const ri = DPM.reportInput({ data: { objart: 'MFH', wfl: 378, _mfh_einheiten: [
+    { nr: 'WE 1', art: 'wohnen', wfl: 310, ist: 2265 },
+    { nr: 'Laden', art: 'gewerbe', nutzung_gew: 'buero_praxis_laden', wfl: 68, ist: 700, markt_qm: 8, mv_befristet_bis: '2031-10-21' },
+    { nr: 'Büro leer', art: 'gewerbe', nutzung_gew: 'buero_praxis_laden', wfl: 50, status: 'leer', markt_qm: 7 }] } });
+  const g = ri && ri.gewerbe, z = g && g.einheiten;
+  pruefe('B', 'B40', 'nur die vermietete Gewerbeeinheit mit beiden Mieten', !!z && z.length === 1 && z[0].nr === 'Laden'
+    && z[0].ist_jahr === 8400 && z[0].markt_jahr === 6528 && z[0].mv_befristet_bis === '2031-10-21', JSON.stringify(z));
+});
+const gewDemo = (ge) => (a) => {
+  a[0].gewerbe = { n_gewerbe: 1, n_wohnen: 5, wfl_wohnen: 310, wfl_gewerbe: 68, flaechen: { buero_praxis_laden: 68 },
+    ist_jahr: ge.ist_jahr, markt_jahr: 6528, markt_vollstaendig: true, leer_ohne_markt: 0, ohne_nutzung_qm: 0,
+    wohnen_ist_jahr: 27180, wohnen_leer: 0, einheiten: [Object.assign({ nr: 'Laden', markt_jahr: 6528 }, ge)] };
+};
+fallB('B41', () => {
+  const r = ccFall('demo', gewDemo({ ist_jahr: 8400, mv_befristet_bis: '2031-10-21' })), e = r && r.ertragswert;
+  const b = e && e.miete_bog, z = b && b.zeilen[0];
+  pruefe('B', 'B41', 'Overrent Laden mit Befristung bis 21.10.2031 → 5 Jahre angesetzt', !!z && z.angesetzt && z.art === 'overrent'
+    && z.jahre === 5 && z.jahre_quelle === 'befristung' && b.gewerbe === true, z ? JSON.stringify(z).slice(0, 120) : JSON.stringify(e).slice(0, 120));
+  wert('B', 'B41', 'boG = (8.400 − 6.528) × Barwertfaktor (Zins des Kerns / 5 J.)', z ? z.barwert_eur : null, barwertAbweichung(1872, e.liegenschaftszins_pct, 5), 0);
+  const kz = r && (r.ertragswert_kern.staffel || []).find((s) => /Merkmal: Mietabweichung Gewerbe/.test(s.pos));
+  pruefe('B', 'B41', 'eigene boG-Zeile „Mietabweichung Gewerbe", Ertragswert = vorläufig + boG', !!kz && kz.wert === z.barwert_eur
+    && r.ertragswert_kern.wert_ungerundet === e.vorlaeufiger_ertragswert_eur + z.barwert_eur + eigenerBog(r));
+  const r2 = ccFall('demo', gewDemo({ ist_jahr: 6000 })), e2 = r2 && r2.ertragswert, b2 = e2 && e2.miete_bog;
+  pruefe('B', 'B41', 'Underrent ohne Laufzeit → nur Szenarien 3/5/10, vorläufig, Satz „je Gewerbeeinheit"', !!b2 && b2.n_angesetzt === 0
+    && b2.szenarien.map((s) => s.jahre).join() === '3,5,10' && e2.vorlaeufig_vor_bog === true
+    && (r2.notes || []).some((n) => /Restlaufzeit je Gewerbeeinheit/.test(n)));
+  const r3 = ccFall('demo', gewDemo({ ist_jahr: 6528 })), e3 = r3 && r3.ertragswert;
+  pruefe('B', 'B41', 'Ist = Markt → kein boG, nicht vorläufig', !!e3 && !e3.miete_bog && e3.vorlaeufig_vor_bog === false);
+});
+fallB('B42', () => {
+  const r = ccFall('demo'), k = r && r.ertragswert_kern, v = k && k.vereinfacht;
+  pruefe('B', 'B42', '§ 29 Gegenrechnung vorhanden, Wert bleibt § 28', !!v && k.wert === r.ertragswert.value_eur);
+  pruefe('B', 'B42', 'Differenz § 29 − § 28 nur aus Rundung der Faktoren (< 0,1 %)', !!v && Math.abs(v.differenz_zu_28_eur) < 0.001 * k.wert_ungerundet,
+    v ? 'Differenz ' + v.differenz_zu_28_eur + ' €' : '');
 });
 
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */

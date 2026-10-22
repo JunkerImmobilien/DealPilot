@@ -5,6 +5,13 @@
     "Eingaben, die das Dokument nicht nennt, stehen unter eingabe_frei mit Begruendung (z. B. Rohertrag/BWK-Aufteilung, wenn nur der Reinertrag gegeben ist).",
     "status 'entscheidung_offen' = der Code weicht bewusst ab (Bewertungsentscheidung Marcel); geprueft wird das IST, gemeldet wird die Abweichung, kein Rot."
   ],
+  "_gewerbe_ebene_a": {
+    "stand": "v2770 · 22.10.2026",
+    "befund": "KEIN amtliches, vollstaendig durchgerechnetes Ertragswert-Beispiel fuer Gewerbe oder gemischte Nutzung gefunden (Flaechen/Mieten je Nutzung, BWK nach Anlage 3 II). Deshalb keine Gewerbe-Faelle in Ebene A - die Gewerbe-Ansaetze sind nur gegen den Wortlaut der Anlage 3 II geprueft (Ebene B, B41) und nie durch selbst gerechnete Zahlen als amtlich ersetzt.",
+    "gesucht": "EW-RL 2015 Anl. 3 Bsp. 1-4 (ohne Objektart, BWK nur als Betraege: Bsp. 1 Verwaltung 12.000, Instandhaltung 10.800, Mietausfall 12.000), ImmoWertA-Hessen 2024 (kein Ertragswert-Rechenbeispiel), ZGGH-Leitfaden II, AGVGA-NRW-Modell 2016, AK OGA, Grundstuecksmarktberichte Koeln 2025, OGA NRW 2024, Kreis Unna 2024, Hamburg 2025, Brandenburg 2025, Stuttgart, RLP 2017",
+    "nicht_erreichbar": "Niedersachsen gag.niedersachsen.de (Wartung; Kandidat Braunschweig-Wolfsburg Grundstuecksmarktdaten 2023, /download/189397, laut Suchtreffer Anwendungsbeispiel Wohn-/Geschaeftshaus, ungeprueft), Berlin (503), Sachsen-Anhalt",
+    "naechster_schritt": "Niedersachsen/Berlin erneut abrufen; sonst Fachliteratur MIT Kennzeichnung oder ein Pruefobjekt, das Marcel als Sachverstaendiger abnimmt"
+  },
   "quellen": {
     "ewrl": {
       "dokument": "Ertragswertrichtlinie (EW-RL) vom 12.11.2015, BAnz AT 04.12.2015 B4, Anlage 3 Beispielrechnungen",
@@ -624,7 +631,10 @@
     "B31": {"text":"v2660 · E7 · ETW mit IRW (Essen, Zone 117183, 2.950 €/m²): Fall huellhorst mit Essener Objektangaben (75 m², Bj 1975, Standardstufe 3, 9 Einheiten, Balkon, ohne Stellplatz, vermietet). Vergleichswert fuehrt, Ertragswert zweites. Soll = Kern vergleichswertIrw mit denselben Merkmalen.","abruf":"21.10.2026, IrwConnector.hole({lat:51.4316, lon:7.0016, objektart:\"etw\"})","irw_eingefroren":{"verfuegbar":true,"wert_qm":2950,"gasl":"10900","teilmarkt_code":1,"roh":{"GESL":"05113000","GENA":"Essen","GASL":"10900","GABE":"Der Gutachterausschuss für Grundstückswerte in der Stadt Essen","ORTST":"Rüttenscheid","PLZ":"45131","WNUM":"117183","IMRW":"2950","STAG":"01.01.2026","YWERT":"360994","XWERT":"5699975","BEZUG":"ETRS89_UTM32","IRKE":"1","UDOK":"1","NUMZ":"117183","TEILMA":"1","OBJGR":"3","BJ":"1962","WHNFL":"69","BK":"1","MIETS":"1","IRWTYP":"1","BRECHV":"2","GSTAND":"5","GARSTP":"0","ANZEGEB":"7-12","FARBE":"1","UDOK_URL":"https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0510900_2026.pdf"},"stichtag":"01.01.2026","gutachterausschuss":"Der Gutachterausschuss für Grundstückswerte in der Stadt Essen","gemeinde":"Essen","ags":"05113000","ortsteil":"Rüttenscheid","gebiet":null,"plz":"45131","zonennummer":"117183","teilmarkt":"1","normobjekt":{"baujahr":1962,"wohnflaeche_qm":69,"wohnflaeche_spanne":null,"wohnlage":null,"ausstattung":null,"wohnungsanzahl":null,"beitragszustand":null,"grundstuecksflaeche_qm":null,"restnutzungsdauer":null},"umrechnungsvorschrift_url":"https://www.boris.nrw.de/borisfachdaten/lgd/irw/2026/LGDIR_1_0510900_2026.pdf","jahrgang":null,"aus_vorjahr":false,"vorjahr_hinweis":null,"quelle":"BORIS-NRW, Immobilienrichtwerte (dl-de/zero-2-0)","lizenz":"dl-de/zero-2-0","ebene":"irw_eigentumswohnungen"}},
     "B32": "v2660 · Fall ohne IRW (Hüllhorst, nicht beschlossen): kein Vergleichswert, Marktpreisindikation bleibt, Verfahrenswahl unveraendert.",
     "B33": "v2660 · Fehlende Pflichtangabe -> kein Wert: Loehner ohne Modernisierungspunkte bzw. ohne NHK-Typ (Keller) -> merkmal_fehlt mit Ort der Angabe und Weg (Umrechnungsvorschrift); nichts wird erfunden (objektAusRef).",
-    "B34": "v2660 · Ersatz-Teilmarkt (RH/DHH auf Ebene 18): nur, wenn die EFH-Umrechnung die Anbauweise fuehrt."
+    "B34": "v2660 · Ersatz-Teilmarkt (RH/DHH auf Ebene 18): nur, wenn die EFH-Umrechnung die Anbauweise fuehrt.",
+    "B40": {"text": "v2770 · aus dem VW-Modul V4.2.6: der Mapper fuehrt je vermieteter Gewerbeeinheit Ist-, Marktmiete und Vertragslaufzeit (gewerbe.einheiten)", "vorher": "v2760: nur Summen ist_jahr/markt_jahr, keine Einheit"},
+    "B41": {"text": "v2770 · E2 je Gewerbeeinheit (VW-Modul: Mehr-/Minderertrag je Mieteinheit, § 8 Abs. 3 Nr. 1): Demo-MFH + Laden 68 m², Markt 8 €/m² (6.528 €/Jahr), Ist 8.400 befristet bis 21.10.2031 -> boG 5 Jahre (8.705 €); Ist 6.000 ohne Laufzeit -> Szenarien 3/5/10, vorlaeufig; Ist = Markt -> nichts", "vorher": "v2760: gewerbe_ist_jahr kam im Kern an und wurde nie gelesen - keine Zeile, kein Hinweis"},
+    "B42": {"text": "v2770 · § 29 als Gegenrechnung neben § 28 (VW-Modul: Variante vereinfacht): Demo-MFH, Wert bleibt § 28, Differenz nur Rundung der Faktoren (gemessen −13 €)"}
   },
   "ebene_c": {
     "stand": "2026-10-21",

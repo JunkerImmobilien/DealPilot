@@ -194,6 +194,25 @@ export function mietabweichungBog(posten, lzsPct, rndJahre, stichtag) {
            szenario_hinweis: 'Szenario, keine gesetzliche Annahme' };
 }
 
+/* ══ v2770 · E2 AUCH FUER GEWERBE, JE MIETVERHAELTNIS ════════════════════════
+   Uebernommen aus dem Verkehrswert-Modul V4.2.6 (Ertragswert je Mieteinheit): dort
+   wird die Abweichung der Vertragsmiete jeder Gewerbeeinheit von der marktueblichen
+   Miete als boG ueber die Restlaufzeit kapitalisiert (§ 8 Abs. 3 Nr. 1 ImmoWertV,
+   EW-RL Nr. 11.1). Hier stand fuer Gewerbe NICHTS: der Rohertrag nahm die
+   marktuebliche Gewerbemiete, die Ist-Miete (gewerbe_ist_jahr) kam im Kern an und
+   wurde nie gelesen - eine Ladenmiete 30 % ueber Markt mit 8 Jahren Festlaufzeit
+   blieb unsichtbar. Dieselben Regeln wie bei den Wohnungen (mietabweichungBog):
+   Overrent nur mit belegter Laufzeit, ohne Laufzeit nur Szenarien. Ein Band
+   (±20 %) wie bei Wohnen gibt es fuer Gewerbe NICHT - offene Fachfrage an Marcel. */
+export function gewerbeMietPosten(gew) {
+  if (!gew || !Array.isArray(gew.einheiten)) return [];
+  return gew.einheiten
+    .filter((x) => x && Number(x.markt_jahr) > 0 && Number(x.ist_jahr) > 0 && Number(x.ist_jahr) !== Number(x.markt_jahr))
+    .map((x) => ({ nr: x.nr || null, differenz_jahr: Math.round(Number(x.ist_jahr) - Number(x.markt_jahr)),
+      befristet_bis: x.mv_befristet_bis || null, kuendigungsverzicht_bis: x.mv_kuendigungsverzicht_bis || null,
+      abw_jahre: Number(x.mv_abw_jahre) > 0 ? Number(x.mv_abw_jahre) : null }));
+}
+
 /* v2595 · Differenz Marktpreisindikation − Ertragswert, bezogen auf den Ertragswert.
    Auch PotenzialService nutzt sie (eine Rechnung, zwei Ausgaben). */
 export function differenzZumErtragswert(mpi, ew) {
@@ -1635,11 +1654,15 @@ export const CrossCheckService = {
          Prompt-Regel 5 (nie doppelt): traegt das Objekt schon einen eigenen boG mit
          Mietbezug (bog_grund), wird die Mietabweichung NICHT zusaetzlich angesetzt. */
       let _mietBog = null, _leerBog = null, _bogDoppelt = false, _vorBog = false;
-      if (kern.vollstaendig && kern.wert != null && !_gew) {
+      /* v2770 · Gewerbe je Mietverhaeltnis (gewerbeMietPosten), nur bei marktueblicher Gewerbemiete */
+      const _gewPosten = (_gew && _gewHerkunft === 'marktueblich') ? gewerbeMietPosten(_gew) : [];
+      if (kern.vollstaendig && kern.wert != null && (!_gew || _gewPosten.length)) {
         const _lzsK = kern.lzs ? kern.lzs.pct : lzsPct;
         const _rndK = kern.nutzungsdauer ? kern.nutzungsdauer.rnd : null;
         _bogDoppelt = !!(ein.bog_eur && /miet|leerst|herricht|overrent|underrent|mehrertrag|minderertrag/i.test(String(ein.bog_grund || '')));
-        if (_bogPosten.length) _mietBog = mietabweichungBog(_bogPosten, _lzsK, _rndK, new Date());
+        const _postenM = _gew ? _gewPosten : _bogPosten;   /* v2770 */
+        if (_postenM.length) _mietBog = mietabweichungBog(_postenM, _lzsK, _rndK, new Date());
+        if (_mietBog && _gew) _mietBog.gewerbe = true;
         if (_leerPosten.length) {
           const z = _leerPosten.map((x) => ({ nr: x.nr, monate: x.leer_monate || 0,
             mietausfall_eur: Math.round((x.jahr / 12) * (x.leer_monate || 0)), herrichtung_eur: Math.round(x.herrichtung_eur || 0) }));
@@ -1649,7 +1672,7 @@ export const CrossCheckService = {
         const _nLeer = _je ? _je.n_leer : (_ls ? (_ls.n_leer || 1) : 0);
         const _bp = [];
         if (!_bogDoppelt && _mietBog && _mietBog.n_angesetzt && _mietBog.angesetzt_eur) {
-          _bp.push({ pos: 'besonderes objektspezifisches Merkmal: Mietabweichung', wert: _mietBog.angesetzt_eur,
+          _bp.push({ pos: 'besonderes objektspezifisches Merkmal: Mietabweichung' + (_gew ? ' Gewerbe' : ''), wert: _mietBog.angesetzt_eur,
             detail: _mietBog.zeilen.filter((x) => x.angesetzt && x.barwert_eur).map((x) => (x.nr ? x.nr + ': ' : '')
               + (x.differenz_jahr > 0 ? '+' : '−') + Math.abs(x.differenz_jahr).toLocaleString('de-DE') + ' €/Jahr × Barwertfaktor '
               + String(x.jahre).replace('.', ',') + ' J. (' + (x.jahre_quelle === 'eingabe' ? 'eigene Angabe' : x.jahre_quelle === 'befristung' ? 'Befristung' : 'Kündigungsverzicht') + ')').join('; ') });
@@ -1856,7 +1879,7 @@ export const CrossCheckService = {
               + 'Je nach Dauer macht sie ' + _eu(s0.barwert_eur) + ' (' + s0.jahre + ' Jahre) bis ' + _eu(s2.barwert_eur) + ' (' + s2.jahre + ' Jahre) aus — '
               + 'Szenarien, keine gesetzliche Annahme. '
               + (_ov ? 'Ein Mehrertrag wird nur mit belegter Vertragslaufzeit (Befristung oder Kündigungsverzicht) angesetzt. ' : '')
-              + 'Mit der Restlaufzeit je Wohnung (Mietvertrag) wird sie beziffert.');
+              + 'Mit der Restlaufzeit je ' + (_mietBog.gewerbe ? 'Gewerbeeinheit' : 'Wohnung') + ' (Mietvertrag) wird sie beziffert.');
           }
         }
         if (!_bogDoppelt && _leerBog && _leerBog.summe_eur > 0) {
@@ -2040,7 +2063,27 @@ export const CrossCheckService = {
           bog_eur: (function () { const n = Number(p.bog_eur); return Number.isFinite(n) && n !== 0 ? n : null; })(),
           bog_grund: p.bog_grund || null,
         };
-        const kernG = ErtragswertService.ertragswert(einG, bwErgebnisG);
+        let kernG = ErtragswertService.ertragswert(einG, bwErgebnisG);
+        /* v2770 · E2 je Gewerbeeinheit (gewerbeMietPosten): boG nach dem ersten Kernlauf, Zins/RND des Kerns */
+        let _mietBogG = null;
+        const _gewPostenG = (_gew && _gHerk === 'marktueblich') ? gewerbeMietPosten(_gew) : [];
+        if (kernG.vollstaendig && kernG.wert != null && _gewPostenG.length) {
+          _mietBogG = mietabweichungBog(_gewPostenG, kernG.lzs ? kernG.lzs.pct : _lzsG, kernG.nutzungsdauer ? kernG.nutzungsdauer.rnd : _rndG, new Date());
+          const _dopG = !!(einG.bog_eur && /miet|overrent|underrent|mehrertrag|minderertrag/i.test(String(einG.bog_grund || '')));
+          if (!_dopG && (_mietBogG.n_angesetzt || _mietBogG.n_offen)) {
+            einG.bog_posten = _mietBogG.n_angesetzt && _mietBogG.angesetzt_eur ? [{ pos: 'besonderes objektspezifisches Merkmal: Mietabweichung Gewerbe', wert: _mietBogG.angesetzt_eur,
+              detail: _mietBogG.zeilen.filter((x) => x.angesetzt && x.barwert_eur).map((x) => (x.nr ? x.nr + ': ' : '') + (x.differenz_jahr > 0 ? '+' : '−')
+                + Math.abs(x.differenz_jahr).toLocaleString('de-DE') + ' €/Jahr über ' + String(x.jahre).replace('.', ',') + ' J.').join('; ') }] : null;
+            einG.vorlaeufig_vor_bog = !!_mietBogG.n_offen;
+            kernG = ErtragswertService.ertragswert(einG, bwErgebnisG);
+            if (_mietBogG.n_offen && _mietBogG.szenarien) {
+              const s0 = _mietBogG.szenarien[0], s2 = _mietBogG.szenarien[_mietBogG.szenarien.length - 1];
+              const _e = (x) => (x > 0 ? '+' : (x < 0 ? '−' : '')) + Math.abs(Math.round(x)).toLocaleString('de-DE') + ' €';
+              out.notes.push('Die Abweichung der Ist-Miete Gewerbe vom marktüblichen Ansatz (' + _e(_mietBogG.offen_differenz_jahr) + ' im Jahr) ist ohne bekannte Restlaufzeit nicht angesetzt. Je nach Dauer macht sie '
+                + _e(s0.barwert_eur) + ' (' + s0.jahre + ' Jahre) bis ' + _e(s2.barwert_eur) + ' (' + s2.jahre + ' Jahre) aus — Szenarien, keine gesetzliche Annahme. Mit der Restlaufzeit je Gewerbeeinheit (Mietvertrag) wird sie beziffert.');
+            }
+          }
+        }
         out.ertragswert_kern = kernG;
         if (kernG.vollstaendig && kernG.wert != null) {
           const holG = (t) => { const r = kernG.staffel.find((s) => s.pos.indexOf(t) >= 0); return r ? r.wert : null; };
@@ -2078,6 +2121,7 @@ export const CrossCheckService = {
             })(),
             miete_qm: null, miete_vergleich: null,
             gewerbe_herkunft: _gHerk,
+            miete_bog: _mietBogG, vorlaeufig_vor_bog: !!(_mietBogG && _mietBogG.n_offen),   /* v2770 */
             restnutzungsdauer_jahre: kernG.nutzungsdauer ? kernG.nutzungsdauer.rnd : _rndG,
             gesamtnutzungsdauer_jahre: _gndG,
             vervielfaeltiger: kernG.barwertfaktor,

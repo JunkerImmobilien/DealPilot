@@ -696,6 +696,24 @@ export const ErtragswertService = {
                                 barwertfaktor: _vS, barwert_eur: sonstigeBarwert };
     }
     let ertragswert = gebErtragswert + bw + sonstigeBarwert;
+    /* ══ v2770 · § 29 ALS GEGENRECHNUNG ══════════════════════════════════════
+       Uebernommen aus dem Verkehrswert-Modul V4.2.6 (Variante „vereinfacht"): das
+       vereinfachte Verfahren steht neben dem allgemeinen, mit demselben Zins, derselben
+       RND und denselben gerundeten Faktoren wie in den amtlichen Beispielen
+       (Barwertfaktor zweistellig, Abzinsungsfaktor vierstellig). Verzinst bzw.
+       abgezinst wird nur der rentierliche Bodenwert; ein nicht rentierlicher Anteil
+       (§ 41, selbststaendig nutzbare Teilflaeche/Hinterland) kommt ungekuerzt dazu -
+       wie EW-RL Anl. 3 Bsp. 3. Der ausgewiesene Wert bleibt der des § 28; die
+       Differenz entsteht nur aus der Rundung der Faktoren (EW-RL Bsp. 1: 63 €). */
+    const _af29 = abzinsungsfaktor(lzs, R);
+    if (hatBw && _af29 != null) {
+      const _br29 = round0(reinertrag * V), _bwa29 = round0(_bwRent * _af29), _nr29 = round0(bw - _bwRent);
+      const _v29 = _br29 + _bwa29 + _nr29 + sonstigeBarwert;
+      out.vereinfacht = { rechtsgrundlage: '§ 29 ImmoWertV', barwertfaktor: V, abzinsungsfaktor: _af29,
+        barwert_reinertrag_eur: _br29, bodenwert_abgezinst_eur: _bwa29, bodenwert_nicht_rentierlich_eur: _nr29,
+        sonstige_ertraege_eur: sonstigeBarwert, vorlaeufiger_ertragswert_eur: _v29,
+        differenz_zu_28_eur: _v29 - round0(ertragswert) };
+    }
     if (hatBw) out.staffel.push({ pos: '+ Bodenwert', wert: bw });
     /* WPDF12-4 · Ohne Bodenwert und ohne boG ist "vorlaeufiger Ertragswert"
      * dieselbe Zahl wie der Gebaeudeertragswert eine Zeile darueber. */

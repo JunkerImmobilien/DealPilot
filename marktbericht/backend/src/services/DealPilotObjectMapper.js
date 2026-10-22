@@ -268,6 +268,18 @@ function gewerbeAus(d) {
     const mq = num(e.markt_qm);
     if (mq > 0 && fl > 0) out.markt_jahr += mq * fl * 12;
     else { out.markt_vollstaendig = false; if (leer) out.leer_ohne_markt++; }
+    /* v2770 · je Gewerbeeinheit Ist, Markt und Vertragslaufzeit - fuer die
+       Mietabweichung als boG je Mietverhaeltnis (E2, wie bei den Wohnungen).
+       Nur vermietete Einheiten mit beiden Mieten; Laufzeit nur, was eingetragen ist. */
+    if (!leer && mq > 0 && fl > 0 && num(e.ist) > 0) {
+      const _d = (v) => (v && /^\d{4}-\d{2}(-\d{2})?$/.test(String(v)) ? String(v) : null);
+      if (!out.einheiten) out.einheiten = [];
+      out.einheiten.push(Object.assign({ nr: String(e.nr || e.bez || e.name || ('GE ' + (out.einheiten.length + 1))),
+        ist_jahr: Math.round(num(e.ist) * 12), markt_jahr: Math.round(mq * fl * 12) },
+        _d(e.mv_befristet_bis) ? { mv_befristet_bis: _d(e.mv_befristet_bis) } : {},
+        _d(e.mv_kuendigungsverzicht_bis) ? { mv_kuendigungsverzicht_bis: _d(e.mv_kuendigungsverzicht_bis) } : {},
+        num(e.mv_abw_jahre) > 0 ? { mv_abw_jahre: num(e.mv_abw_jahre) } : {}));
+    }
   });
   out.ist_jahr = Math.round(out.ist_jahr);
   out.wohnen_ist_jahr = Math.round(out.wohnen_ist_jahr);
