@@ -122,8 +122,12 @@
       var VOR = { bestand: 'Ist · ', mieterhoehung: 'Soll · ', zielbild: '' };
       X.stufen = (Z.spalten || []).map(function (k) {
         var s = Z.stufen[k] || {};
-        return { titel: (VOR[k] || '') + ((Z.titel && Z.titel[k]) || k), wert: s.ertragswert, kosten: k === 'bestand' ? null : s.kosten };
+        /* v2836 · Marktpreisindikation je Stufe mit Abschlag und ohne (v2842) */
+        return { titel: (VOR[k] || '') + ((Z.titel && Z.titel[k]) || k), wert: s.ertragswert, kosten: k === 'bestand' ? null : s.kosten,
+          mpi: s.marktpreisindikation != null ? s.marktpreisindikation : null, mpiAb: s.mpi_abschlag_pct != null ? s.mpi_abschlag_pct : null,
+          mpiOhne: s.mpi_ohne_abschlag != null ? s.mpi_ohne_abschlag : null };
       });
+      if (Z.kurz_ausblick) X.ausblick = Z.kurz_ausblick;
       /* v2834 · Sanierungsstau je Stufe (v2854, potenzial.js): der fertige Satz der Stufe */
       var gesehen = {};
       X.stau = (Z.spalten || []).map(function (k) {
@@ -160,7 +164,7 @@
       return {
         verfahren: verf.filter(function (v) { return zahl(v.mitte) != null; }),
         stufen: stufen, kaufpreis: kp, stand: sauber(stand),
-        texte: h ? texteAusBericht(h) : [], kern: X.kern || [], stau: X.stau || [],
+        texte: h ? texteAusBericht(h) : [], kern: X.kern || [], stau: X.stau || [], ausblick: sauber(X.ausblick || ''),
         /* v2833 · der Hinweis zu Mieterhoehung/Zielbild ist Marcels Wortlaut aus
            potenzial.js (KENNZEICHNUNG, v2870) - nie ein eigener Text */
         hinweis: sauber(X.hinweis || ('Marktpreisindikation, Ertrags- und Sachwert sind indikativ nach ImmoWertV-Logik, kein Gutachten nach § 194 BauGB.'
@@ -308,9 +312,12 @@
     /* ── 3. Ist / Soll / Zielbild ─────────────────────────────── */
     if (d.stufen.length) {
       ueber('Ist · Soll · Zielbild');
-      var sp3 = [['Stufe', 70, 'l'], ['Ertragswert', 32], ['zum Kaufpreis', 30], ['Maßnahmen', 32]];
+      var mitMpi = d.stufen.some(function (s) { return zahl(s.mpi) != null; });
+      var sp3 = mitMpi ? [['Stufe', 58, 'l'], ['Ertragswert', 28], ['zum Kaufpreis', 24], ['Marktpreisindikation', 38], ['Maßnahmen', 26]]
+        : [['Stufe', 70, 'l'], ['Ertragswert', 32], ['zum Kaufpreis', 30], ['Maßnahmen', 32]];
       var fk3 = B / sp3.reduce(function (a, s) { return a + s[1]; }, 0);
-      platz(8 + d.stufen.length * 6.4);
+      var rh3 = mitMpi ? 8.6 : 6.4;
+      platz(8 + d.stufen.length * rh3);
       var cx3 = x;
       if (o.stil === 'invest') { doc.setFillColor(f.kopfGrund[0], f.kopfGrund[1], f.kopfGrund[2]); doc.rect(x, y, B, 6.4, 'F'); }
       doc.setFont('helvetica', 'bold'); doc.setFontSize(7.2); setT(o.stil === 'invest' ? f.kopfText : [110, 110, 110]);
@@ -318,9 +325,19 @@
       if (o.stil !== 'invest') { doc.setDrawColor(f.gold[0], f.gold[1], f.gold[2]); doc.setLineWidth(0.5); doc.line(x, y + 6.4, x + B, y + 6.4); doc.setLineWidth(0.2); }
       y += 6.4;
       d.stufen.forEach(function (s, n) {
-        if (o.stil === 'invest' && n % 2 === 0) { doc.setFillColor(f.streifen[0], f.streifen[1], f.streifen[2]); doc.rect(x, y, B, 6.4, 'F'); }
+        if (o.stil === 'invest' && n % 2 === 0) { doc.setFillColor(f.streifen[0], f.streifen[1], f.streifen[2]); doc.rect(x, y, B, rh3, 'F'); }
         var dk = d.kaufpreis ? (s.wert - d.kaufpreis) / d.kaufpreis * 100 : null;
-        var w = [sauber(s.titel), eur(s.wert), dk != null ? pz(dk) : '', zahl(s.kosten) ? eur(s.kosten) : ''];
+        var w = [sauber(s.titel), eur(s.wert), dk != null ? pz(dk) : ''].concat(mitMpi ? [zahl(s.mpi) != null ? eur(s.mpi) : ''] : []).concat([zahl(s.kosten) ? eur(s.kosten) : '']);
+        if (mitMpi && zahl(s.mpi) != null) {
+          /* „nach x % Abschlag · ohne y €" klein unter der Zahl */
+          var unterM = (zahl(s.mpiAb) != null ? 'nach ' + Number(s.mpiAb).toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' % Abschlag' : '')
+            + (zahl(s.mpiOhne) != null ? (zahl(s.mpiAb) != null ? ' · ' : '') + 'ohne ' + eur(s.mpiOhne) : '');
+          if (unterM) {
+            var bxM = 0; for (var q = 0; q < 4; q++) bxM += sp3[q][1] * fk3;
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(6.2); setT(f.grau);
+            doc.text(sauber(unterM), x + bxM - 2, y + 7.5, { align: 'right' });
+          }
+        }
         var cx = x;
         w.forEach(function (t, i) {
           var bw = sp3[i][1] * fk3;
@@ -328,9 +345,15 @@
           if (i === 0) doc.text(t, cx + 2, y + 4.3); else if (t) doc.text(t, cx + bw - 2, y + 4.3, { align: 'right' });
           cx += bw;
         });
-        doc.setDrawColor(f.linie[0], f.linie[1], f.linie[2]); doc.setLineWidth(0.15); doc.line(x, y + 6.4, x + B, y + 6.4); doc.setLineWidth(0.2);
-        y += 6.4;
+        doc.setDrawColor(f.linie[0], f.linie[1], f.linie[2]); doc.setLineWidth(0.15); doc.line(x, y + rh3, x + B, y + rh3); doc.setLineWidth(0.2);
+        y += rh3;
       });
+      /* v2836 · kurzer Ausblick-Hinweis (DpWertZielbild.zielbild.kurz_ausblick) */
+      if (d.ausblick) {
+        y += 1.6;
+        y = BS.absatz(doc, d.ausblick, { x: x, y: y + 2.4, breite: B, zeile: 3.7, unten: unten,
+          neueSeite: function () { return o.neueSeite(); }, stil: function () { doc.setFont('helvetica', 'italic'); doc.setFontSize(7.6); setT(f.grau); } }) - 2.4;
+      }
       /* v2834 · Satz zum Sanierungsstau unter der Tafel */
       (d.stau || []).forEach(function (s) {
         y += 1.6;
@@ -349,10 +372,10 @@
         platz(10);
         doc.setFont('helvetica', 'bold'); doc.setFontSize(8.4); setT(f.tinte);
         /* „Heute · Miete im Jahr: 38.340 € Miete im Jahr" - die Einheit steht schon im Titel */
-        var tt = sauber(k.titel), wt = sauber(k.wert_text || ''), tail = tt.split(' · ').pop();
+        var tt = sauber(k.titel), wt = sauber(k.wert_text || ''), tail = tt.split(' · ').pop(), vg = sauber(k.vergleich_text || '');
         if (tail && wt.length > tail.length && wt.slice(-tail.length) === tail) wt = wt.slice(0, -tail.length).trim();
-        var kopf2 = tt + (wt ? ':  ' + wt : '');
-        doc.text(kopf2, x, y); y += 4.3;
+        var kopf2 = tt + (wt ? ':  ' + wt : '') + (vg ? '  (' + vg + ')' : '');   /* v2836: Vergleich gegen heute */
+        doc.splitTextToSize(kopf2, B).forEach(function (zz) { doc.text(zz, x, y); y += 4.3; });
         if (k.text) {
           y = BS.absatz(doc, sauber(k.text), { x: x, y: y, breite: B, zeile: 4.1, unten: unten, neueSeite: function () { return o.neueSeite(); }, stil: stil });
         }
