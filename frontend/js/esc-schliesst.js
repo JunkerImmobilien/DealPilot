@@ -33,7 +33,12 @@
     ['#dp-legal-info-modal', '.dp-legal-close'],
     ['#da-modal-ov',         '.da-modal-close'],
     ['#dpuew-overlay',       '.dpuew-x'],
-    ['#mfh-modal',           '#mfh-zu']
+    ['#mfh-modal',           '#mfh-zu'],
+    /* v2820 · die drei Import-Fenster hatten keinen ESC-Weg (pdf-import.js,
+       dokument-import.js, beleg-import.js: nur Klick auf ×/Schleier) */
+    ['#pdfimport-modal',     '.pdfi-header .bmf-close'],
+    ['#dpdi-modal',          '.dpdi-close'],
+    ['#beleg-import-ov',     '.bi-x']
   ];
 
   function sichtbar(el) {
