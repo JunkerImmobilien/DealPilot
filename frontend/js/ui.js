@@ -2196,6 +2196,9 @@ function _renderAIServerAnalysis(a) {
       tab('sr', 'St\u00e4rken &amp; Risiken', false) +
       tab('risk', 'Risiko &amp; Szenarien', false) +
       tab('loc', 'Lage &amp; Markt', false) +
+      /* v2810 · Marktpreisindikation, Ertrags- und Sachwert gegenuebergestellt (wertvergleich.js);
+         erscheint wie der Verlauf erst, wenn ein Marktbericht vorliegt */
+      '<button type="button" class="dp-pa-tab" id="dp-pa-tab-wert" style="display:none" onclick="_dpPaTab(\'wert\',this)">Wert &amp; Marktpreis</button>' +
       tab('verh', 'Verhandlung &amp; Offerte', false) +
       tab('bank', 'Bank', false) +
       tab('steuer', 'Steuer', false) +   /* v2160 */
@@ -2213,6 +2216,7 @@ function _renderAIServerAnalysis(a) {
       panel('sr', pS, false) +
       panel('risk', pR, false) +
       panel('loc', pL, false) +
+      panel('wert', '<div id="dp-pa-wert-body"></div>', false) +   /* v2810 */
       panel('verh', pV, false) +
       panel('bank', pK, false) +
       panel('steuer', pSt, false) +
@@ -3212,6 +3216,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
         if ((typeof window._currentObjKey === 'string' ? window._currentObjKey : null) !== objKey) return;
         var hist = (data && data.history) || [];
         hist = hist.filter(function (h) { return h && h.market_value != null; });
+        try { if (window.DpWertvergleich) window.DpWertvergleich.fuellen(hist); } catch (e) {}   /* v2810 */
         var abHtml = _dpAbrufeHtml(abrufe);
         /* v2217 · Marcel 14.10.2026: „Marktbericht auch erst, wenn wir schon
            einen Report haben." Bis hier erschien der Reiter erst ab ZWEI
