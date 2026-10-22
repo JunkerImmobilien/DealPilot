@@ -42288,3 +42288,21 @@ Marcel 22.10.2026: „ja rollout 62".
 - **Commit:** `f82a3d8e`. Buster wert-zielbild.js und object-actions.js v2841, frontend-konstanten neu (nur index-html-Hash), buster-ebenen SAUBER.
 - **Nachweis (Westerfeldstr. 140, Speichern gesperrt):** Oberkante des Segments 1.440×900: y 768, beginnt im ersten Blick. 1.280×720 mit Seitenleiste: y 776, 56 px unter dem Rand. 390×844: y 1.059. Reihenfolge: DealPilot Score, Wert & Zielbild, Investor Deal Score, Kennzahlen-Bewertung. Nach Objektwechsel (Bismarckstr. 27, Hauptstr. 51) und zurück steht genau eine Karte am Platz, die Detail-Karte nur einmal. Historie bei 0 Einträgen ausgeblendet (0 px). Screen `scratchpad/wz/nachher-v2841-1440-bewertung-oben.jpg`.
 - **Rest:** Auf 1.280×720 und 390 px beginnt das Segment erst nach dem Scrollen, weil schon die Score-Karte 521 px (Handy: 766 px) hoch ist. Ohne Scrollen ginge es nur ÜBER der Score-Karte oder mit einer kompakteren Score-Karte. Das ist eine Entscheidung für Marcel. Der Knopf „+ Eintrag" der Historie erscheint erst mit einem Eintrag; vorher war er gar nicht erreichbar.
+
+### v2852 / v2853 · Restschuld EZB aus einer Rechnung, Mietmodus je Objekt, Objektwechsel sichert wirklich (22.10.2026)
+- **Was:** Drei Hauptstrang-Funde aus der Bestandsprüfung (v2850).
+  - (1) **Restschuld am Ende der Zinsbindung:** Die Bindung zählt jetzt in Monaten ab Finanzierungsbeginn. `_d1Bindung()` in `calc.js` rechnet je Projektionsjahr den Teil in der Bindung (volle Jahre wie bisher, angebrochene monatlich). `State.rs1` und die Projektion rufen dieselbe Funktion. Ein Jahr mit dem Bindungsende rechnet nach dem Ende mit der Anschlussrate weiter; die Phasen „Ende Zinsbindung"/„Anschluss" lesen das letzte bzw. erste ganze Jahr.
+  - (2) **Objektwechsel:** `loadSaved` wartet den Save beim Wechsel ab. Vorher brach `saveObj` am Kontext-Wächter ab, und das verlassene Objekt wurde nie gesichert – daher die alten Listenwerte. Die aktive Karte liest ihre Kennzahlen aus `State.kpis` (`_fuer`) statt aus nicht mehr vorhandenen Kopfzeilen.
+  - (3) **Mietmodus:** `mietentwicklung.js` fällt nicht mehr auf den geräteweiten `dp_miet_modus` zurück (ein neues Objekt erbte sonst den Modus des zuletzt geöffneten). Leeres Feld = gleichmäßige Steigerung, wie bei Altobjekten ohne Angabe (storage.js).
+- **Commit:** `8300c1ca` (v2852: calc.js, mietentwicklung.js; Buster calc/mietentwicklung v2852), `3d8b2937` (v2853: storage.js, Buster storage v2852).
+- **Nachweis (Staging, Speichern gesperrt, alle 11 Bestandsobjekte):**
+  - Tab = PDF hell = PDF dunkel = Bank = Kern, 0 Abweichungen; Projektion zeilengleich.
+  - Restschuld EZB = Wert der Projektion beim Übergang, bei allen Objekten mit Übergang im Horizont: 2026-1054 822.743 / 829.341 → einheitlich 822.496 (07/2033).
+  - 2026-1056: Zeile 2024 ohne Rate behält 640.000 € (vorher fiel sie auf 633.600), Anschluss ab 2035 statt 2034.
+  - Wechsel 2026-001 → 004 schickt jetzt den PUT für 001 mit Score 77, DS2 74, CF 4.556 (abgefangen). Die aktive Karte zeigt CF/J +4.556 statt der gespeicherten +4.167.
+  - score-ketten gleich, buster-ebenen SAUBER.
+- **Rest:**
+  - (a) Objekte, die niemand öffnet, behalten ihre gespeicherten Listenwerte (bewusst kein Sammel-Speichern). Sie übernehmen die Live-Werte beim nächsten Öffnen und Verlassen.
+  - (b) Die Steuer eines Objekts hängt am Bestandssaldo der anderen Objekte. Die Live-Zahl schwankt deshalb je nach Ladezustand: 2026-001 CF n. St. 4.547 / 4.556 in zwei Läufen.
+  - (c) 2026-1052 wurde während des Laufs um 15:42:29/31 von Marcels IP gespeichert (v164 → v166). Meine Sperre hat beide PUTs dieses Laufs für 1052 abgefangen; die Schreibung kam nach Lage der Dinge aus einem parallelen Tab (?pdfp=2832). Die gespeicherten Werte (Score 79, CF 10.826) entsprechen der Live-Rechnung.
+  - (d) `bank-charts.js` nutzt für den DSCR je Jahr eigene Indizes (bindj-1/bindj) und noch nicht `State._zbEzbIdx`/`_zbAnIdx` → PDF-Strang.
