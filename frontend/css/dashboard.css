@@ -120,7 +120,7 @@
   #dashboard-main .hgate .tot{display:flex;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
 
   #dashboard-main .hgate .tot div{text-align:center}
-#dashboard-main .hgate .tot .k{font-family:'JetBrains Mono';font-size:7.5px;color:var(--c-pmut)}
+#dashboard-main .hgate .tot .k{font-family:'JetBrains Mono';font-size:8.5px;color:var(--c-pmut)}
 #dashboard-main .hgate .tot .v{font-family:'JetBrains Mono';font-weight:700;font-size:12px;color:var(--c-ptext);margin-top:2px}
 
   #dashboard-main .hbars{flex:1;display:flex;flex-direction:column;gap:11px;justify-content:center}
@@ -134,7 +134,7 @@
 
   #dashboard-main .bar .bt .v{font-weight:700;color:var(--c-ptext)}
   /* v1735 · das „/100" hinter dem Wert, wie im Tab Bewertung */
-  #dashboard-main .bar .bt .v i{font-style:normal;font-weight:400;font-size:.72em;color:var(--c-pmut);margin-left:3px}
+  #dashboard-main .bar .bt .v i{font-style:normal;font-weight:400;font-size:max(8.5px,.72em);color:var(--c-pmut);margin-left:3px}
 
   #dashboard-main .track{height:7px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
 
@@ -186,7 +186,7 @@
 
   #dashboard-main .kc-flat .sc{font-family:'Space Grotesk';font-weight:700;font-size:23px;line-height:1}
 
-  #dashboard-main .kc-flat .scl{font-family:'JetBrains Mono';font-size:7.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;text-align:center;margin-top:1px}
+  #dashboard-main .kc-flat .scl{font-family:'JetBrains Mono';font-size:8.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;text-align:center;margin-top:1px}
 
   #dashboard-main .kc.tg .sc, #dashboard-main .kc.tg .scl{color:var(--dp-green-txt,#2e784f)}
 #dashboard-main .kc.ty .sc, #dashboard-main .kc.ty .scl{color:var(--c-accd-txt)}
@@ -204,7 +204,7 @@
 
   #dashboard-main .kc-kp{display:flex;gap:15px;margin:10px 0}
 
-  #dashboard-main .kc-kp .kk{font-family:'JetBrains Mono';font-size:8px;color:var(--c-front-mut);text-transform:uppercase}
+  #dashboard-main .kc-kp .kk{font-family:'JetBrains Mono';font-size:8.5px;color:var(--c-front-mut);text-transform:uppercase}
 
   #dashboard-main .kc-kp .kv{font-family:'JetBrains Mono';font-weight:700;font-size:13px;margin-top:2px;color:var(--c-front-tx)}
 
@@ -477,7 +477,7 @@
 
   #dashboard-main .stage.fc .kc-flat .sc span{font-size:13px}
 
-  #dashboard-main .stage.fc .kc-flat .scl{font-size:7px;margin-top:2px}
+  #dashboard-main .stage.fc .kc-flat .scl{font-size:8.5px;margin-top:2px}
 
   #dashboard-main .stage.fc .kc.open .kc-body{max-height:300px}
 
@@ -519,7 +519,7 @@
 
   #dashboard-main .hpass{flex:0 0 158px;background:#fff;color:#1b1815;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px 14px}
 
-  #dashboard-main .hpass .hp-lab{font-family:'JetBrains Mono';font-size:8px;letter-spacing:1.4px;color:var(--wl-b8932f, #b8932f)}
+  #dashboard-main .hpass .hp-lab{font-family:'JetBrains Mono';font-size:8.5px;letter-spacing:1.4px;color:var(--wl-b8932f, #b8932f)}
 
   #dashboard-main .hpass .qb{background:#fff;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);border-radius:9px;padding:6px}
 
@@ -692,7 +692,7 @@
 #dashboard-main .hgate{flex-basis:174px}
 #dashboard-main .hgate .tot{gap:8px}
 #dashboard-main .hgate .tot div{flex:1 1 0;min-width:0}
-#dashboard-main .hgate .tot .k{font-size:7px;letter-spacing:.2px;white-space:nowrap}
+#dashboard-main .hgate .tot .k{font-size:8.5px;letter-spacing:.2px;white-space:nowrap}
 #dashboard-main .hgate .tot .v{font-size:12.5px;white-space:nowrap;margin-top:4px}
 #dashboard-main .kc-share a.qb{display:block;text-decoration:none;cursor:pointer}
 #dashboard-main .kc-share a.qb:hover{box-shadow:0 0 0 2px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent)}
@@ -804,7 +804,7 @@
 #dashboard-main .shr-stub .shr-qr{background:#fff;border-radius:7px;padding:4px;display:block}
 #dashboard-main .shr-stub .shr-qr svg{display:block;width:52px;height:52px}
 #dashboard-main .shr-stub .shr-qr-ph{display:block;width:52px;height:52px;border-radius:4px;background:repeating-linear-gradient(45deg,#0c0b09 0 2px,#fff 2px 4px)}
-#dashboard-main .shr-stub-lab{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--wl-e8cc7a, #E8CC7A);opacity:.85}
+#dashboard-main .shr-stub-lab{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--wl-e8cc7a, #E8CC7A);opacity:.85}
 #dashboard-main .shr-stub:hover{box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 50%, transparent)}
 @media(max-width:760px){#dashboard-main .sh-grid{grid-template-columns:1fr}}
 

@@ -907,13 +907,13 @@ if (!window._wlc) {
                 /* v2465 · gemessen im Bank-PDF: die Unterzeilen liefen ineinander
                    („SCHULD ABGEBAUTKONTO-RESERVE") - im Bild fehlt die Webschrift, die
                    Ersatzschrift ist breiter. Kürzer, kleiner, ohne Sperrung. */
-                '<text x="' + (bar1X + barW/2) + '" y="340" font-size="8" fill="#9C9590" font-weight="500">SCHULDENABBAU</text>' +
+                '<text x="' + (bar1X + barW/2) + '" y="340" font-size="8.5" fill="#9C9590" font-weight="500">SCHULDENABBAU</text>' +
                 '<text x="' + (bar2X + barW/2) + '" y="325">CF-Überschuss</text>' +
-                '<text x="' + (bar2X + barW/2) + '" y="340" font-size="8" fill="#9C9590" font-weight="500">RESERVE · ' + n + ' J.</text>' +
+                '<text x="' + (bar2X + barW/2) + '" y="340" font-size="8.5" fill="#9C9590" font-weight="500">RESERVE · ' + n + ' J.</text>' +
                 '<text x="' + (bar3X + barW/2) + '" y="325">' + (taxBar >= 0 ? 'Steuervorteil' : 'Steuerlast') + '</text>' +
-                '<text x="' + (bar3X + barW/2) + '" y="340" font-size="8" fill="#9C9590" font-weight="500">' + (taxBar >= 0 ? 'ERSTATTUNG · ' : 'ZAHLUNG · ') + n + ' J.</text>' +
+                '<text x="' + (bar3X + barW/2) + '" y="340" font-size="8.5" fill="#9C9590" font-weight="500">' + (taxBar >= 0 ? 'ERSTATTUNG · ' : 'ZAHLUNG · ') + n + ' J.</text>' +
                 '<text x="' + (bar4X + barW/2) + '" y="325">Wertsteigerung</text>' +
-                '<text x="' + (bar4X + barW/2) + '" y="340" font-size="8" fill="#9C9590" font-weight="500">MARKTWERT − ANKER</text>' +
+                '<text x="' + (bar4X + barW/2) + '" y="340" font-size="8.5" fill="#9C9590" font-weight="500">MARKTWERT − ANKER</text>' +
                 '<text x="' + (bar5X + barW5/2) + '" y="325" font-weight="700" fill="' + window._wlc('#A68A36') + '">Gesamt</text>' +
                 '<text x="' + (bar5X + barW5/2) + '" y="340" font-size="9" fill="' + window._wlc('#A68A36') + '" font-weight="600" letter-spacing="0.05em">VERMÖGENSZUWACHS</text>' +
               '</g>' +

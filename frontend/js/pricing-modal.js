@@ -227,7 +227,7 @@
       P+' .tkperf::before{content:"";position:absolute;left:14px;right:14px;top:50%;transform:translateY(-50%);border-top:2px dotted rgba(10,8,3,.5)}'+
       P+' .tk-rip{position:relative;background:#fff;border-top:2px dashed #d8d2c2;padding:9px 4px 2px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px}'+
       P+' .tk-rip .bar{flex:1;max-width:56%;height:20px;background:repeating-linear-gradient(90deg,#1a1305 0 2px,transparent 2px 4px,#1a1305 4px 5px,transparent 5px 9px);border-radius:2px;opacity:.8}'+
-      P+" .tk-rip .bp-txt{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#8a7c60;white-space:nowrap}"+
+      P+" .tk-rip .bp-txt{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:#8a7c60;white-space:nowrap}"+
       '@media(max-width:820px){'+P+'{grid-template-columns:1fr 1fr}}'+
       '@media(max-width:520px){'+P+'{grid-template-columns:1fr}}'+
       /* ═══ v1296 · DIESE REGELN HINGEN AM FALSCHEN ANKER ══════════════════
