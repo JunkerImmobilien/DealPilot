@@ -80,6 +80,9 @@
   /* Einordnung als Pille in ihrer Statusfarbe (Farbe kommt inline aus avm-section.js - nicht tokenisiert) */
   html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody .row3 .f3:first-child .fv { display: inline-block !important; max-width: 100% !important; margin: 0 !important; padding: 3px 9px !important; border: 1px solid color-mix(in srgb, currentColor 45%, transparent) !important; border-radius: 9px !important; background: color-mix(in srgb, currentColor 10%, transparent) !important; font: 700 11.5px/1.25 "JetBrains Mono", monospace !important; white-space: normal !important; overflow: visible !important; text-overflow: clip !important; }
 
+  /* v2760c · ohne Kaufpreis steht dort "–" in Grau (#7A7370, priceClass) - dann keine Pille, nur der Strich */
+  html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody .row3 .f3:first-child .fv[style*="7A7370" i] { border: 0 !important; background: none !important; padding: 0 !important; }
+
   /* Genauigkeit: Wort + dreistufige Skala. Die Stufe steht nur als Farbe im Inline-Stil
      (avm-section.js accUnified: hoch #3FA56C, mittel #9a7f33, niedrig #B8625C) - daran haengt die Fuellung.
      Ohne Treffer bleibt die Skala leer, das Wort steht trotzdem. */
