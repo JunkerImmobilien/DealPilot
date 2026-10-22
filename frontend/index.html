@@ -485,7 +485,7 @@ label.dp-required.qc-required::after {
 <!-- V292.6.5-cache-applied -->
 <!-- V292.6.6-cache-applied -->
 <!-- V292.6.8-cache-applied -->
-  <link rel="stylesheet" href="css/dashboard.css?v=v2101d">
+  <link rel="stylesheet" href="css/dashboard.css?v=v2822">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"><!--v922-fonts-->
 </head>
 <body>
@@ -3371,7 +3371,7 @@ label.dp-required.qc-required::after {
     <div class="kv"><span>… durch Tilgung <span class="cf-hint">(Schulden abgebaut, brutto)</span></span><span class="kv-v" id="vz-tilgung">—</span></div>
     <div class="kv" style="padding-left:14px;border-left:2px solid var(--green);margin-left:6px"><span class="cf-hint">… davon vom Mieter <i>(durch Mieteinnahmen finanziert)</i></span><span class="kv-v c-green" id="vz-mieter">—</span></div>
     <div class="kv" style="padding-left:14px;border-left:2px solid var(--gold);margin-left:6px"><span class="cf-hint">… davon Eigenanteil <i>(aus eigener Tasche zugeschossen, da CF negativ war)</i></span><span class="kv-v" id="vz-eigen">—</span></div>
-    <div class="kv"><span>+ Cashflow-Überschuss <span class="cf-hint">(was nach Tilgung &amp; Steuer auf Konto bleibt)</span></span><span class="kv-v c-green" id="vz-cf">—</span></div>
+    <div class="kv"><span>+ Cashflow-Überschuss <span class="cf-hint">(nach Tilgung, vor Steuern)</span></span><span class="kv-v c-green" id="vz-cf">—</span></div>
     <div class="kv"><span>+ Steuervorteil <span class="cf-hint">(kumulierte Erstattung aus V+V-Verlusten)</span></span><span class="kv-v c-green" id="vz-steuer">—</span></div>
     <!-- V63.58: Wenn Tilgungsaussetzung mit BSV — Sparguthaben separat ausweisen,
          damit User es nicht mit"freiem Cashflow" verwechselt -->
@@ -3393,7 +3393,7 @@ label.dp-required.qc-required::after {
         <div class="kv" style="font-size:.86em"><span>– Tilgung <span class="cf-hint">(über die Laufzeit, Schulden abgebaut)</span></span><span class="kv-v c-red" id="vz-info-tilg">—</span></div>
         <div class="kv" style="font-size:.86em;display:none" id="vz-info-bspar-row"><span>– Bausparrate <span class="cf-hint">(kumuliert, gebunden im Bausparvertrag)</span></span><span class="kv-v c-red" id="vz-info-bspar">—</span></div>
         <div class="kv" style="font-size:.86em"><span>± Steuern <span class="cf-hint">(Belastung/Erstattung kumuliert)</span></span><span class="kv-v" id="vz-info-tax">—</span></div>
-        <div class="kv kv-result" style="font-size:.9em"><span><b>= Kumulierter CF-Überschuss <span class="cf-hint">(Konto-Reserve nach Tilgung &amp; Steuer)</span></b></span><span class="kv-v c-gold" id="vz-info-summe">—</span></div>
+        <div class="kv kv-result" style="font-size:.9em"><span><b>= Kumulierter CF-Überschuss <span class="cf-hint">(nach Tilgung, vor Steuern)</span></b></span><span class="kv-v c-gold" id="vz-info-summe">—</span></div>
         <div class="hint" style="font-size:.78em;margin-top:8px">
           <b>Plausi-Check Mieten:</b> Aktuelle NKM <span id="vz-plausi-nkm">—</span>/J × <span id="vz-plausi-jahre">15</span> Jahre = <span id="vz-plausi-statisch">—</span> (ohne Steigerung). Mit <span id="vz-plausi-mstg">1,5</span> % p.a. wächst die Miete jedes Jahr → Summe = <span id="vz-plausi-mit">—</span>. <!-- v1137b-anteilsjahr · Ohne diesen Zusatz rechnet der Leser 10.800 × 15 nach, kommt auf einen hoeheren Wert und haelt die Summe fuer falsch. Genau so ist es mir im Pruefdurchgang gegangen: Jahr 1 stand bei 4.500 statt 10.800, weil ab Kaufmonat gerechnet wird. -->Das <b>erste Jahr zählt nur anteilig</b> ab dem Kaufmonat — deshalb liegt die Summe unter der reinen Zinseszins-Rechnung.<br>
           <b>Hinweis:</b> Die Tilgung wird hier abgezogen, weil sie kein Geld auf dem Konto ist — sie ist gebundenes Eigenkapital im Objekt. Sie taucht oben separat als <i>„Tilgung-vom-Mieter"</i> auf. <b>Konto-Reserve + Tilgung-vom-Mieter</b> = liquider und gebundener Vermögenszuwachs.
@@ -3616,7 +3616,9 @@ label.dp-required.qc-required::after {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="js/pdf-logo.js?v=v1634b"></script><!-- v1634 · muss VOR den PDF-Bausteinen stehen: waermt das Logo vor -->
 <script src="js/pdf-anlage-bmf.js?v=v1634c"></script>
-<script src="js/pdf-investment-bank.js?v=v2555a"></script>
+<script src="js/pdf-blocksatz.js?v=v2830a"></script><!-- v2830 · Blocksatz fuer alle PDFs -->
+<script src="js/pdf-wert-zielbild.js?v=v2836"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
+<script src="js/pdf-investment-bank.js?v=v2832"></script>
 <script src="js/bmf-modal.js?v=v2269"></script>
 <script src="js/bmf-modal-v292.js?v=v2269"></script>
 <script src="js/bmf-bodenabschlag.js?v=v2269"></script>
@@ -3647,11 +3649,11 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v2484a"></script>
+  <script src="js/calc.js?v=v2852"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
-<script src="js/mietentwicklung.js?v=v2481a"></script>
+<script src="js/mietentwicklung.js?v=v2852"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=v2544"></script>
 <script src="js/steuer-verlauf.js?v=v2571"></script>
@@ -3681,7 +3683,7 @@ label.dp-required.qc-required::after {
   <script src="js/unterlagen-modal.js?v=v2441a"></script>
   <script src="js/standardwerte-karten.js?v=v2548b"></script>
   <script src="js/settings.js?v=v2216c"></script>
-<script src="js/pricing-modal.js?v=v2132a"></script>
+<script src="js/pricing-modal.js?v=v2822"></script>
   <script src="js/flyer-code.js?v=v1421c"></script>
   <script src="js/promo-erstflug.js?v=v1421c"></script>
 <script src="js/stripe-success.js?v=183"></script>
@@ -3698,14 +3700,14 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=v2254"></script>
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
-<script src="js/ui.js?v=v2810"></script>
+<script src="js/ui.js?v=v2842"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v2660"></script>
+<script src="js/storage.js?v=v2852"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v2269"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v2263e"></script>
 <script src="js/track-record.js?v=W39"></script>
-<script src="js/pdf.js?v=v2555"></script>
+<script src="js/pdf.js?v=v2835"></script>
 <script src="js/auth.js?v=v2571"></script>
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
   <!-- v1370 (B5): nach dem 401-Handler, damit beide dieselbe Auth.apiCall umschliessen -->
@@ -3732,12 +3734,12 @@ label.dp-required.qc-required::after {
 <script src="js/qc-bridge.js?v=qc-v2780b"></script>
 <script src="js/bodenrichtwert.js?v=v2592"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
-<script src="js/objektart-felder.js?v=v2245"></script>
+<script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/objekt-reiter.js?v=v2557"></script>
 <script src="js/feld-hilfe.js?v=v1872"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v2600"></script>
-<script src="js/potenzial.js?v=v2660"></script>
+<script src="js/mfh-einheiten.js?v=v2824"></script>
+<script src="js/potenzial.js?v=v2842b"></script>
 <script src="js/mietvertrag-objekt.js?v=v2087"></script>
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v1863"></script>
@@ -3746,9 +3748,9 @@ label.dp-required.qc-required::after {
 <script src="js/ai-credits.js?v=v2421"></script>
 <script src="js/workflow.js?v=v2181b"></script>
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
-<script src="js/bank-charts.js?v=v2465"></script>
+<script src="js/bank-charts.js?v=v2833"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v2741"></script>
+<script src="js/help.js?v=v2870"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v2410"></script>
@@ -3778,7 +3780,7 @@ label.dp-required.qc-required::after {
 <script src="js/gutachten-org.js?v=v1448b"></script>
 <script src="js/afa-eigen.js?v=v1871"></script>
 <script src="js/deal-action-readycheck.js?v=v2080"></script>
-<script src="js/deal-action-boarding.js?v=v2198"></script>
+<script src="js/deal-action-boarding.js?v=v2842"></script>
 <script src="js/deal-action-pilot.js?v=876"></script>
 <script src="js/netzwerk-einreichung.js?v=v2200"></script> <!-- v856-einreichung -->
   <script src="js/deal-action-bootstrap.js?v=166" defer></script>
@@ -3789,10 +3791,11 @@ label.dp-required.qc-required::after {
 <script src="js/avm-section.js?v=v2149"></script>
 <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte, klickbar = übernehmen -->
 <script src="js/marktwert-abschlag.js?v=v2672a"></script><!-- v2237 · Abschlag auf Angebotspreise -->
-<script src="js/wertvergleich.js?v=v2810"></script><!-- v2810 · Pilot-Analyse: Marktpreisindikation, Ertrags- und Sachwert gegenuebergestellt -->
-<script src="js/dealpilot-mb.js?v=v2672"></script>
+<script src="js/wertvergleich.js?v=v2842"></script><!-- v2810 · Pilot-Analyse: Marktpreisindikation, Ertrags- und Sachwert gegenuebergestellt -->
+<script src="js/wert-zielbild.js?v=v2843a"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
+<script src="js/dealpilot-mb.js?v=v2820"></script>
 <script src="js/mb-auftrag.js?v=v2191"></script>
-  <script src="js/marktbericht-view.js?v=v2660"></script>
+  <script src="js/marktbericht-view.js?v=v2823a"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->
 <script src="js/selbstauskunft.js?v=W40"></script>
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
@@ -3813,8 +3816,8 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v2354"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v2549"></script>
-  <script src="js/dpsh-score-hero.js?v=v2263"></script><!-- dpsh-score-hero -->
+  <script src="js/object-actions.js?v=v2841"></script>
+  <script src="js/dpsh-score-hero.js?v=v2822a"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
   <script src="js/voice-import.js?v=v2430"></script>
   <!-- v1895: der sichtbare Vermerk an jedem pauschal angesetzten
@@ -4284,7 +4287,7 @@ document.addEventListener('DOMContentLoaded', function(){
 <script src="js/objektkarten-stil.js?v=v2216c"></script>
     <script src="js/karten-stil.js?v=v2252"></script><!-- v1953 · Trichter (Bordkarte ist raus) -->
     <script src="js/erststart.js?v=v2251"></script>
-    <script src="js/esc-schliesst.js?v=v2572"></script>
+    <script src="js/esc-schliesst.js?v=v2821"></script>
     <!-- v1697 · DIE CHECKLISTE BEIM ANLEGEN IST AUSGEHAENGT.
          Marcel: „nimm bitte auch das Modal bei neues Objekt anlegen
          erstmal raus."

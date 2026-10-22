@@ -151,7 +151,7 @@ const auftrag = {
       }]
     }
   },
-  kennzahlen: { bmy: 6.7, nmy: 5.3, cf_m: 234, dscr: 1.23, ltv: 67.8 },
+  kennzahlen: { bmy: 6.7, nmy: 5.3, cf_m: 234, dscr: 1.23, ltv: 67.8, em: 3.7, ekr: 8.4 },   /* v2832: em/ekr */
   finanzierung: { ek: 56789, d1: 234567, d1z: 3.9, d1t: 2.1 },
 
   /* ── STEUER: vier Angaben hatten bis v2139 keinen Leser ──────────── */

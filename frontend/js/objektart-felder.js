@@ -61,7 +61,7 @@
     BUERO: { passt: ['etagen_ges', 'einheiten'], pflicht: [] },
     GESCH: { passt: ['etagen_ges', 'einheiten'], pflicht: [] },
     HOTEL: { passt: ['etagen_ges', 'einheiten'], pflicht: [] },
-    GEW:   { passt: ['etagen_ges'], pflicht: [] },
+    GEW:   { passt: ['etagen_ges', 'einheiten'], pflicht: [] },   /* v2824 · Einheiten erfassen auch hier */
     GAR:   { passt: [], pflicht: [] },
     /* v2241 · Unbebautes Grundstueck: kein Gebaeude, keine Einheit. Der
        Marktbericht rechnet Bodenrichtwert x Grundstuecksflaeche (gsfl). */

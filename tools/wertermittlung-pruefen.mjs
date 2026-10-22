@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
    DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595 · v2600 · v2790 · v2800
+   v2854: Sanierungsstau in den Potenzial-Stufen nicht doppelt (B54, PotenzialService geladen).
+   v2825: GEW - Einheit ohne Nutzungsart wird nachgefragt (B53 angepasst).
+   v2824: Gewerbe-/Industriegebaeude (GEW) mit Einheiten, Kette Mapper -> Kern (B53).
+   v2820: Abnahme v2800 an der ganzen Kette Formular-Liste -> Mapper -> Kern (B52).
    v2800: Wohnungen im Wohn-/Geschaeftshaus je Mietverhaeltnis (B49-B51), Ort der Nutzungsart-Nachfrage (B48).
    v2790: Marcels sieben Entscheidungen vom 22.10.2026 (B43-B48, A-E6 Reinertragsdifferenz aus der Tabelle des Musters).
    v2600: E1 Band am Satz des Ausschusses (Anker ± 20 %), E2 Mietabweichung als boG
@@ -1069,6 +1073,93 @@ fallB('B51', () => {
   pruefe('B', 'B51', 'reines MFH unverändert: einheiten_miete je Wohnung, kein gewerbe', !!m && Array.isArray(m.einheiten_miete) && m.einheiten_miete.length === 5 && m.gewerbe === null);
 });
 
+/* ══ v2820 · ABNAHME v2800 AN DER GANZEN KETTE (B52) ═════════════════════
+   B48 setzt ohne_nutzung_qm/-nr von Hand. Hier kommt die Einheitenliste so,
+   wie das Formular sie schickt (dealpilot-mb.js), durch den ECHTEN Mapper in
+   den ECHTEN Kern. Vorher (v2800): das Formular schickte weder nr noch lage,
+   der Mapper nannte die Einheit „GE 1" - ein Name, den es im Formular nicht gibt. */
+fallB('B52', () => {
+  const liste = (laden) => ({ data: { objart: 'MFH', wfl: 378, _mfh_einheiten: wghWo().map((x) => ({ nr: x.nr, art: 'wohnen', wfl: x.wfl, ist: x.ist_monat }))
+    .concat([Object.assign({ art: 'gewerbe', wfl: 68, ist: 544, markt_qm: 8 }, laden)]) } });
+  const ri = DPM.reportInput(liste({ nr: 'Laden' })), g = ri && ri.gewerbe;
+  pruefe('B', 'B52', 'Mapper: Laden ohne Nutzungsart -> ohne_nutzung_qm 68, Name wie im Formular', !!g && g.ohne_nutzung_qm === 68
+    && g.ohne_nutzung_nr.join() === 'Laden', JSON.stringify(g && g.ohne_nutzung_nr));
+  const r = ccFall('demo', (a) => { a[0].gewerbe = g; }), e = r && r.ertragswert;
+  pruefe('B', 'B52', 'Kette Mapper -> Kern: kein Ertragswert, Nachfrage Feld nutzung_gew, Einheit Laden, Ort im Formular',
+    !!e && e.available === false && e.grund === 'gewerbe_ohne_nutzungsart' && e.nachfrage && e.nachfrage.feld === 'nutzung_gew'
+    && e.nachfrage.einheiten.join() === 'Laden' && /Einheiten erfassen/.test(e.hinweis), e ? e.grund + ' ' + JSON.stringify(e.nachfrage) : 'kein Ergebnis');
+  const ohne = DPM.reportInput(liste({})), go = ohne && ohne.gewerbe;
+  pruefe('B', 'B52', 'ohne Nummer: Rückfall = Zeilennummer der Liste (Nr. 6), nicht „GE 1"', !!go && go.ohne_nutzung_nr.join() === 'Nr. 6', JSON.stringify(go && go.ohne_nutzung_nr));
+  const mit = DPM.reportInput(liste({ nr: 'Laden', nutzung_gew: 'buero_praxis_laden' }));
+  const rm = ccFall('demo', (a) => { a[0].gewerbe = mit.gewerbe; });
+  pruefe('B', 'B52', 'mit Nutzungsart rechnet dieselbe Kette', !!rm && rm.ertragswert.available === true, rm && rm.ertragswert.grund);
+});
+
+/* ══ v2824 · GEWERBE-/INDUSTRIEGEBAEUDE (GEW) MIT EINHEITEN (B53) ══════════
+   Marcel 22.10.2026: GEW bekommt „Einheiten erfassen" wie das Geschaeftshaus.
+   Kette Formular-Liste -> echter Mapper -> echter Kern, Objektart GEW (Gewerbeart
+   des Objekts: gew). v2825 (Marcel 22.10.2026): eine Einheit ohne eigene
+   Nutzungsart wird im GEW NACHGEFRAGT wie im WGH - vorher (v2824) trug sie die
+   Art des Objekts (Halle/Lager, 30 %) und der Ertragswert rechnete mit Hinweis. */
+fallB('B53', () => {
+  const ein = (zwei) => [{ nr: 'Halle', art: 'gewerbe', nutzung_gew: 'lager_logistik', wfl: 300, ist: 1500, markt_qm: 5 },
+    Object.assign({ nr: 'Büro', art: 'gewerbe', wfl: 78, ist: 700, markt_qm: 9 }, zwei || {})];
+  const ri = DPM.reportInput({ data: { objart: 'GEW', wfl: 378, _mfh_einheiten: ein() } }), g = ri && ri.gewerbe;
+  pruefe('B', 'B53', 'Mapper: GEW -> gewerbe, Gewerbeart gew, Einheiten getrennt, Büro ohne Nutzungsart', !!g && ri.property_type === 'gewerbe'
+    && ri.gewerbe_art === 'gew' && g.n_gewerbe === 2 && g.wfl_gewerbe === 378 && g.flaechen.lager_logistik === 300 && g.ohne_nutzung_nr.join() === 'Büro',
+    JSON.stringify({ pt: ri && ri.property_type, art: ri && ri.gewerbe_art, fl: g && g.flaechen, ohne: g && g.ohne_nutzung_nr }));
+  const lauf = (r0) => ccFall('demo', (a) => { a[0].property_type = r0.property_type; a[0].gewerbe_art = r0.gewerbe_art; a[0].gewerbe = r0.gewerbe;
+    a[0].garages = 0; a[0].outdoor_parking = 0;
+    Object.assign(a[4], { lzs_pct: 5, lzs_zweig: 'gewerbe', lzs_aus_register: true, lzs_stufe: 'A', lzs_modellansaetze: null }); });
+  const r = lauf(ri), e = r && r.ertragswert;
+  pruefe('B', 'B53', 'GEW, eine Einheit ohne Nutzungsart → kein Ertragswert, Nachfrage nutzung_gew für „Büro", Ort im Formular (vorher v2824: rechnete mit Halle/Lager 30 %)',
+    !!e && e.available === false && e.grund === 'gewerbe_ohne_nutzungsart' && e.gewerbe === true && e.nachfrage && e.nachfrage.feld === 'nutzung_gew'
+    && e.nachfrage.einheiten.join() === 'Büro' && /Einheiten erfassen/.test(e.hinweis) && /„Nutzungsart“/.test(e.hinweis), e ? (e.grund || '') + ' ' + JSON.stringify(e.nachfrage) : 'kein Ergebnis');
+  pruefe('B', 'B53', 'kein Übernahme-Hinweis „mit der Gewerbeart des Objekts angesetzt"', !!r && !(r.notes || []).some((n) => /mit der Gewerbeart des Objekts angesetzt/.test(n)));
+  const riN = DPM.reportInput({ data: { objart: 'GEW', wfl: 378, _mfh_einheiten: ein({ nutzung_gew: 'buero_praxis_laden' }) } });
+  const rN = lauf(riN), eN = rN && rN.ertragswert;
+  pruefe('B', 'B53', 'GEW mit Nutzungsart je Einheit: Gewerbe-Ertragswert rechnet', !!eN && eN.available === true && eN.gewerbe === true, eN && (eN.grund || ''));
+  pruefe('B', 'B53', 'Rohertrag: beide Ist-Mieten im Band ±20 % um die Marktmiete (Halle 1.500 = 300 × 5, Büro 700 zu 702) → Ist (1.500 + 700) × 12', !!eN && eN.rohertrag_pa_eur === (1500 + 700) * 12, eN && eN.rohertrag_pa_eur);
+  const gB = ccFall('demo', gewObjekt({ flaechen: { buero_praxis_laden: 200 }, ohne_nutzung_qm: 178, ohne_nutzung_nr: ['Lager'] }, 'buero'));
+  pruefe('B', 'B53', 'Büroobjekt (Gewerbeart buero) unverändert: Einheit ohne Angabe trägt die Art des Objekts (v2790)', !!gB && gB.ertragswert.available === true);
+  const riO = DPM.reportInput({ data: { objart: 'Gewerbe', wfl: 378, _mfh_einheiten: ein() } }), rO = lauf(riO), eO = rO && rO.ertragswert;
+  pruefe('B', 'B53', 'ohne erkennbare Gewerbeart: kein Ertragswert, Nachfrage nutzung_gew für „Büro"', !!eO && eO.available === false
+    && eO.grund === 'gewerbe_ohne_nutzungsart' && eO.nachfrage && eO.nachfrage.feld === 'nutzung_gew' && eO.nachfrage.einheiten.join() === 'Büro',
+    eO ? eO.grund + ' art=' + (riO && riO.gewerbe_art) : '');
+});
+
+/* ══ v2854 · SANIERUNGSSTAU IN DEN STUFEN NICHT DOPPELT (B54) ═════════════
+   Parkstr. 9: Sanierungskosten 137.000 € stehen im Bestand als boG (Mapper bomAus),
+   die Zielbild-Massnahmen (136.000 €) sind dieselben Arbeiten und werden im Wertzuwachs
+   als Kosten abgezogen. Entscheidung 22.10.2026: in jeder Stufe gilt der Stau in Hoehe
+   ihrer Kosten als behoben, boG = min(0, Stau + Kosten) - nur fuer einen boG aus den
+   Sanierungskosten. Gegentest: kosten 0 = alter Weg (voller Stau in der Stufe). */
+let PSM = null, psGrund = '';
+try { PSM = await lade('services/PotenzialService.js'); } catch (e) { psGrund = e.message.slice(0, 80); }
+fallB('B54', () => {
+  if (!PSM || typeof PSM._eineStufe !== 'function') return pruefe('B', 'B54', 'PotenzialService geladen', false, psGrund || '_eineStufe fehlt');
+  const GRUND = 'Sanierungs-/Instandsetzungskosten laut Objekt (brutto) — Kostenansatz, kein sachverständig ermittelter Wertabschlag';
+  const lauf = (quelle, grund) => ccFall('demo', (a) => { a[0].bom_eur = -137000; a[0].bom_quelle = quelle; a[4].bog_eur = -137000; a[4].bog_grund = grund; });
+  const r = lauf('sanierungskosten', GRUND), basis = r && r._ertragswertEingabe;
+  pruefe('B', 'B54', 'Kette: boG aus den Sanierungskosten trägt bog_quelle', !!basis && basis.ein.bog_quelle === 'sanierungskosten' && basis.ein.bog_eur === -137000,
+    basis ? basis.ein.bog_quelle + ' ' + basis.ein.bog_eur : 'keine Ertragswert-Eingabe');
+  if (!basis) return;
+  const kB = ertragswert(Object.assign({}, basis.ein), basis.bodenwert), B = kB.wert_ungerundet, miete = basis.ein.miete_markt_jahr;
+  const zZ = PSM._eineStufe(basis, {}, kB, miete, 0, 136000), zM = PSM._eineStufe(basis, {}, kB, miete, 0, 0);
+  wert('B', 'B54', 'Zielbild, Kosten 136.000 → Rest-boG −1.000', zZ && zZ.sanierungsstau ? zZ.sanierungsstau.rest_eur : null, -1000, 0);
+  wert('B', 'B54', 'Zielbild bei gleicher Miete: Ertragswert = Bestand + 136.000 (vorher = Bestand, Stau doppelt)', zZ ? zZ.wert_ungerundet - B : null, 136000, 1);
+  pruefe('B', 'B54', 'Rechenweg-Zeile „Sanierungsstau durch die Maßnahmen dieser Stufe behoben: 136.000 €, Rest 1.000 €"',
+    !!zZ && /behoben: 136\.000 €, Rest 1\.000 €/.test(zZ.sanierungsstau.text), zZ && zZ.sanierungsstau && zZ.sanierungsstau.text);
+  wert('B', 'B54', 'Stufe ohne Kosten → voller Stau −137.000', zM && zM.sanierungsstau ? zM.sanierungsstau.rest_eur : null, -137000, 0);
+  wert('B', 'B54', 'Stufe ohne Kosten: Ertragswert = Bestand', zM ? zM.wert_ungerundet - B : null, 0, 1);
+  const zG = PSM._eineStufe(basis, {}, kB, miete, 0, 200000);
+  wert('B', 'B54', 'Kosten über dem Stau: boG nie positiv (Rest 0, Ertragswert = Bestand + 137.000)', zG ? zG.wert_ungerundet - B : null, 137000, 1);
+  const rE = lauf('eigene_angabe', 'Wegerecht zugunsten des Nachbarn'), bE = rE && rE._ertragswertEingabe;
+  const kE = bE ? ertragswert(Object.assign({}, bE.ein), bE.bodenwert) : null, zE = bE ? PSM._eineStufe(bE, {}, kE, bE.ein.miete_markt_jahr, 0, 136000) : null;
+  pruefe('B', 'B54', 'eigene bOM-Angabe (Wegerecht) bleibt in jeder Stufe voll', !!zE && !zE.sanierungsstau && zE.wert_ungerundet === kE.wert_ungerundet && bE.ein.bog_quelle === null,
+    zE ? 'quelle ' + bE.ein.bog_quelle + ', Δ ' + (zE.wert_ungerundet - kE.wert_ungerundet) : 'kein Lauf');
+});
+
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */
 const auszug = (cc) => {
   const e = (cc && cc.ertragswert) || {}, s = (cc && cc.sachwert) || {};
@@ -1118,7 +1209,7 @@ for (const [name, fall] of Object.entries(C.faelle || {})) {
 /* ══ AUSGABE ═════════════════════════════════════════════════════════ */
 if (ALLE) detail.forEach((z) => console.log(z));
 const titel = { A: 'amtliche Anwendungsbeispiele', B: 'Prompt-Testfälle 1–11', C: 'Demo-Objekte (eingefroren ' + (C.stand || '–') + ')' };
-console.log('wertermittlung-pruefen v2790 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
+console.log('wertermittlung-pruefen v2854 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
 for (const eb of ['A', 'B', 'C']) {
   const x = E[eb];
   console.log('  Ebene ' + eb + ' ' + titel[eb].padEnd(38) + x.faelle + ' Fälle, ' + x.werte + ' Werte, '

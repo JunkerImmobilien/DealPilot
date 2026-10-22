@@ -629,9 +629,22 @@ export const ReportOrchestrator = {
              : Number(_bp3.Lagebeurteilung) === 3 ? 'gut'
              : Number(_bp3.Lagebeurteilung) === 2 ? 'mittel' : 'einfach')
           : 'mittel';
+        /* v2851 · MFH: die Mietpreisuebersicht staffelt nach WOHNUNGSgroesse.
+           Hier stand die Wohnflaeche des ganzen Hauses - Parkstr. 9 (427 m², 5 WE)
+           fiel „ueber die Tabelle" in die oberste Groessenklasse, die amtliche Miete
+           wurde zum Anker des Bandes (3,87 €/m², Ist 7,48) und der Ertragswert
+           kapitalisierte 19.829 statt 32.384 €/Jahr (gemessen 22.10.2026, POST
+           /potenzial). Dasselbe Muster wie v2556b im Mietvergleich: Mittel aus der
+           Einheitenliste, sonst Wohnflaeche / Einheiten. */
+        let _wflAmt = ref.living_area;
+        if (/^mfh$|mehrfamilien/i.test(String(ref.property_type || '')) && !(ref.gewerbe && Number(ref.gewerbe.wfl_gewerbe) > 0)) {
+          const _eh = Array.isArray(ref.einheiten_miete) ? ref.einheiten_miete.map((e) => Number(e && e.wfl)).filter((x) => x > 0) : [];
+          if (_eh.length) _wflAmt = _eh.reduce((a, x) => a + x, 0) / _eh.length;
+          else if (Number(ref.units) > 1) _wflAmt = Number(ref.living_area) / Number(ref.units);
+        }
         _amtMiete = amtlicheMiete({
           ags: ref.ags || null,   /* v1071-WZUS-5 */
-          gemeinde: _gem, baujahr: ref.build_year, wohnflaeche_qm: ref.living_area,
+          gemeinde: _gem, baujahr: ref.build_year, wohnflaeche_qm: _wflAmt,
           modernisierung_klasse: _kl,
           kernsaniert: /kernsaniert/i.test(String(ref.modernization || ''))
             && Number(ref.mod_punkte || 0) >= 18,

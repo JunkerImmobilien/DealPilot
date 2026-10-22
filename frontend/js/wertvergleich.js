@@ -198,7 +198,8 @@
     var letzt = null;
     (hist || []).forEach(function (h) { if (h && h.market_value != null && (!letzt || new Date(h.created_at) >= new Date(letzt.created_at))) letzt = h; });
     var t = letzt ? html(letzt) : '';
-    if (!t) { if (knopf) knopf.style.display = 'none'; return; }
+    /* v2842 · der Knopf gehört jetzt auch dem Verlauf (ein Unterreiter) - ui.js _dpLoadVerlauf blendet ihn ein und aus */
+    if (!t) { body.innerHTML = ''; return; }
     css();
     body.innerHTML = t;
     if (knopf) knopf.style.display = '';

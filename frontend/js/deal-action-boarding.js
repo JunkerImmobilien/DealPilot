@@ -1245,11 +1245,13 @@
     var versuche = 0;
     var uhr = setInterval(function () {
       versuche++;
-      var b = document.getElementById('dp-pa-tab-verlauf');
+      /* v2842 · der Verlauf steht im Unterreiter „Wert & Marktpreis" */
+      var b = document.getElementById('dp-pa-tab-wert');
       if (b && b.style.display !== 'none') {
         clearInterval(uhr);
         b.click();
-        try { b.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+        var vz = document.getElementById('dp-pa-verlauf-wrap') || b;
+        try { vz.scrollIntoView({ block: 'start', behavior: 'auto' }); } catch (e) {}
         return;
       }
       if (versuche > 20) {              /* 2 s */

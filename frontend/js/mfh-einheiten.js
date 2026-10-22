@@ -29,7 +29,11 @@
    ════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var ARTEN_MIT_EINHEITEN = { MFH: 1, ZFH: 1, GESCH: 1, BUERO: 1, HOTEL: 1 };
+  /* v2824 · GEW dazu (Marcel 22.10.2026: „das soll man auch machen können“) - Gewerbe-/
+     Industriegebaeude mit Gewerbeeinheiten je Nutzungsart, wie das Geschaeftshaus. */
+  var ARTEN_MIT_EINHEITEN = { MFH: 1, ZFH: 1, GESCH: 1, BUERO: 1, HOTEL: 1, GEW: 1 };
+  /* v2824 · Art einer NEUEN Einheit: im Gewerbe-/Industriegebaeude Gewerbe, sonst Wohnen. */
+  function standardArt() { return ((el('objart') && el('objart').value) || '') === 'GEW' ? 'gewerbe' : 'wohnen'; }
   var ZUSTAND = [['', '–'], ['5', 'neuwertig'], ['4', 'modernisiert'], ['3', 'gepflegt'], ['2', 'renovierungsbed.'], ['1', 'sanierungsbed.']];
   /* Anlage 2 ImmoWertV, aufgeteilt nach dem, was am Gebaeude haengt, und dem,
      was in der einzelnen Wohnung steckt. Punkte je Gewerk aus DealPilotRND. */
@@ -66,7 +70,8 @@
     if (d.gnd) return zahl(d.gnd);
     var T = window.DealPilotRND_GND;
     var art = (el('objart') && el('objart').value) || 'MFH';
-    var k = (art === 'GESCH' || art === 'BUERO') ? 'geschaeft' : 'mfh';
+    /* v2824 · GEW -> Lager/Logistik (Anlage 1), derselbe Schluessel wie gewerbeGndSchluessel('gew') im Kern */
+    var k = (art === 'GESCH' || art === 'BUERO') ? 'geschaeft' : (art === 'GEW' ? 'lager' : 'mfh');
     try { return (T && typeof T.getDefault === 'function' ? T.getDefault(k) : 80) || 80; } catch (x) { return 80; }
   }
   /* ══ v2095 · DIE EINHEITEN-RND LIEF IN DIE DEFAULTS ═══════════════════
@@ -463,8 +468,9 @@
     var titel = (e.lage || e.nr || (i + 1));
     var ov = document.createElement("div"); ov.id = "mfh-we-ov";
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(42,39,39,.60);z-index:99999;display:flex;align-items:center;justify-content:center;padding:14px';
-    ov.innerHTML = '<div class="mfh-we-karte" role="dialog" aria-modal="true" aria-label="Wohnung ' + esc(String(titel)) + '">' +
-      '<div class="mfh-we-kopf"><div><b>Wohnung ' + esc(String(e.nr || (i + 1))) + (e.lage ? ' · ' + esc(e.lage) : '') + '</b>'
+    var _wort = e.art === 'gewerbe' ? 'Einheit' : 'Wohnung';   /* v2824 · eine Gewerbeeinheit ist keine Wohnung */
+    ov.innerHTML = '<div class="mfh-we-karte" role="dialog" aria-modal="true" aria-label="' + _wort + ' ' + esc(String(titel)) + '">' +
+      '<div class="mfh-we-kopf"><div><b>' + _wort + ' ' + esc(String(e.nr || (i + 1))) + (e.lage ? ' · ' + esc(e.lage) : '') + '</b>'
         + '<span class="mfh-we-unter" id="mfh-we-unter"></span></div>'
         + '<button type="button" id="mfh-we-zu" aria-label="Schließen">✕</button></div>' +
       '<div class="mfh-we-leib">' +
@@ -932,7 +938,7 @@
     el('mfh-zurueck').style.visibility = _schritt === 0 ? 'hidden' : 'visible';
     el('mfh-weiter').textContent = _schritt === SCHRITTE.length - 1 ? 'Übernehmen' : 'Weiter ›';
     zeichnenSumme(); punkteZeigen();
-    var neu = el('mfh-neu'); if (neu) neu.onclick = function () { _arbeit.push({ nr: String(_arbeit.length + 1), art: 'wohnen', status: 'vermietet' }); zeichnen(); };
+    var neu = el('mfh-neu'); if (neu) neu.onclick = function () { _arbeit.push({ nr: String(_arbeit.length + 1), art: standardArt(), status: 'vermietet' }); zeichnen(); };
   }
   function punkteZeigen() {
     var g = el('mfh-geb-p');
@@ -1095,7 +1101,7 @@
     _weg = !!d.aufgeteilt;
     _auftK = (d.aufteilungskosten != null && String(d.aufteilungskosten).trim() !== '') ? d.aufteilungskosten : null;   /* v2430 */
     _schritt = schritt || 0;
-    if (!_arbeit.length) _arbeit.push({ nr: '1', art: 'wohnen', status: 'vermietet' });
+    if (!_arbeit.length) _arbeit.push({ nr: '1', art: standardArt(), status: 'vermietet' });
     var m = document.createElement('div'); m.id = 'mfh-modal';
     m.style.cssText = 'position:fixed;inset:0;background:rgba(42,39,39,.55);z-index:99998;display:flex;align-items:center;justify-content:center;padding:12px';
     m.innerHTML = '<div class="mfh-karte">' +

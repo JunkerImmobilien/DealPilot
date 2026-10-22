@@ -928,7 +928,7 @@ function _buildAIPayload() {
     },
     kennzahlen: {
       kp: k.kp, gi: k.gi, ek: k.ek, bmy: k.bmy, nmy: k.nmy,
-      dscr: k.dscr, ltv: k.ltv, cf_m: k.cf_m, em: k.em,
+      dscr: k.dscr, ltv: k.ltv, cf_m: k.cf_m, em: k.em, ekr: k.ekr != null ? k.ekr : null,   /* v2832: EK-Rendite eigens, em ist das Equity Multiple */
       nkm_j: k.nkm_j != null ? k.nkm_j : null, /* v947-mbsource: Nettokaltmiete/Jahr */
       bwk: k.bwk != null ? k.bwk : null
     },
@@ -2097,7 +2097,12 @@ function _renderAIServerAnalysis(a) {
     try { t = PZ && PZ.tafelHtml ? PZ.tafelHtml() : ''; } catch (e) { t = ''; }
     if (!t) return '';
     return '<div class="dp-pa-card">' + sec('', I.bank, 'ANKAUF \u00b7 BESTAND \u00b7 ZIELBILD') + '<div data-dp-pot-wirt="1">' + t + '</div>'
-      + (has(a.potenzial_text) ? '<div style="margin-top:12px">' + sec('', I.bank, 'PILOT: WAS IM HAUS STECKT') + p(a.potenzial_text) + '</div>' : '') + '</div>';
+      + (has(a.potenzial_text) ? '<div style="margin-top:12px">' + sec('', I.bank, 'PILOT: WAS IM HAUS STECKT') + (function () {
+          /* v2842 · Marcel: „die Texte zwischen den Tabellen sind zu lang" - zwei Sätze, der Rest aufklappbar */
+          var t = String(a.potenzial_text), m = t.match(/^([\s\S]*?[.!?])\s+([\s\S]*?[.!?])\s+([\s\S]+)$/);
+          if (!m) return p(t);
+          return p(m[1] + ' ' + m[2]) + '<details class="dp-pot-mehr"><summary>weiterlesen</summary>' + p(m[3]) + '</details>';
+        })() + '</div>' : '') + '</div>';
   })();
   /* v2217 · Marcel 14.10.2026: „haben wir die Pilot-Analyse des Objektes für
      den Soll-Stand? … wenn wir das Objekt in Bestand überführen, möchte ich
@@ -2110,7 +2115,7 @@ function _renderAIServerAnalysis(a) {
     try { alt = roh ? (typeof roh === 'string' ? JSON.parse(roh) : roh) : null; } catch (e) { alt = null; }
     var kopf = sec('', I.bank, 'PILOT-ANALYSE: ANKAUF GEGEN HEUTE');
     if (!alt || typeof alt !== 'object' || !(alt.empfehlung || alt.gesamtbewertung)) {
-      return '<div class="dp-pa-card" style="margin-top:12px">' + kopf + '<p class="dp-pa-p">Beim Festschreiben des Ankauf-Stands lag keine Pilot-Analyse vor. '
+      return '<div class="dp-pa-card" style="margin-top:12px" data-dp-si-pilot="1">' + kopf + '<p class="dp-pa-p">Beim Festschreiben des Ankauf-Stands lag keine Pilot-Analyse vor. '
         + 'Was der Pilot damals gesagt hätte, lässt sich nicht nachträglich erzeugen — eine neue Analyse beschreibt immer den heutigen Stand.</p></div>';
     }
     function dat(x) { var d = x && x._fuer && x._fuer.stand ? new Date(x._fuer.stand) : null; return d && !isNaN(d) ? d.toLocaleDateString('de-DE') : 'ohne Datum'; }
@@ -2118,7 +2123,7 @@ function _renderAIServerAnalysis(a) {
     function kurz(t, n) { t = String(t || ''); return t.length > n ? t.slice(0, n).replace(/\s+\S*$/, '') + ' …' : t; }
     var gleich = alt._fuer && a._fuer && alt._fuer.stand === a._fuer.stand;
     var zeile = function (wort, x, y) { return '<tr><td class="abw-wort">' + wort + '</td><td>' + x + '</td><td>' + y + '</td></tr>'; };
-    return '<div class="dp-pa-card" style="margin-top:12px">' + kopf
+    return '<div class="dp-pa-card" style="margin-top:12px" data-dp-si-pilot="1">' + kopf
       + (gleich ? '<p class="dp-pa-p">Seit dem Festschreiben wurde keine neue Analyse abgerufen — beide Spalten zeigen dieselbe. Ruf sie neu ab, dann steht hier, wie der Pilot das Objekt <b>heute</b> sieht.</p>' : '')
       + '<table class="abw-tafel"><thead><tr><th></th><th>Beim Ankauf</th><th>Heute</th></tr></thead><tbody>'
       + zeile('Stand', dat(alt), dat(a))
@@ -2209,19 +2214,27 @@ function _renderAIServerAnalysis(a) {
          13.10.2026: „nur unter der Pilot Analyse faellt der Reiter Quellen
          weg. ueberall soll das sonst bleiben woher die daten kommen."
          Die Quellen IN den Reitern (Lage & Markt, je Lagemerkmal) bleiben. */
-      '<button type="button" class="dp-pa-tab" id="dp-pa-tab-verlauf" style="display:none" onclick="_dpPaTab(\'verlauf\',this)">Marktbericht-Verlauf</button>' +
+      /* v2842 · Marcel 22.10.2026: „Marktbericht-Verlauf" und „Wert & Marktpreis" sind EIN Unterreiter -
+         der Verlauf steht unter dem Wertvergleich (Panel 'wert'). */
     '</nav>' +
     '<div class="dp-pa-content">' +
       panel('briefing', pB, true) +
       panel('sr', pS, false) +
       panel('risk', pR, false) +
       panel('loc', pL, false) +
-      panel('wert', '<div id="dp-pa-wert-body"></div>', false) +   /* v2810 */
+      panel('wert', '<div id="dp-pa-wert-body"></div>'   /* v2810 */
+        + '<div id="dp-pa-verlauf-wrap" style="display:none;margin-top:16px"><h4 class="dp-wv-h" style="margin:0 0 8px">Verlauf · Marktberichte und Abrufe</h4>'
+        + '<div class="dp-pa-card" id="dp-pa-verlauf-body"></div></div>', false) +   /* v2842 */
       panel('verh', pV, false) +
       panel('bank', pK, false) +
       panel('steuer', pSt, false) +
-      (_siHtml || _potHtml ? panel('si', _potHtml + (_potHtml && _siHtml ? '<div style="margin-top:12px"></div>' : '') + _siHtml, false) : '') +   /* v2430 */
-      panel('verlauf', '<div class="dp-pa-card" id="dp-pa-verlauf-body"><p class="dp-pa-p" style="color:#8b8678">Lade Marktbericht-Verlauf \u2026</p></div>', false) +
+      /* v2840 · Marcel 22.10.2026: „für viele Kunden sehr unübersichtlich … oben einen Reiter:
+         einfach und genau". Einfach = Kernaussagen + Klartext (wert-zielbild.js), Genau = alles
+         Bisherige mit Sprungleiste. Ohne wert-zielbild.js bleibt es beim Bisherigen. */
+      (_siHtml || _potHtml ? panel('si', (function () {
+        var g = _potHtml + (_potHtml && _siHtml ? '<div style="margin-top:12px"></div>' : '') + _siHtml;
+        try { return window.DpWertZielbild ? window.DpWertZielbild.reiterHtml(g, { mitAnkauf: !!_siHtml, mitPot: !!_potHtml }) : g; } catch (e) { return g; }
+      })(), false) : '') +   /* v2430 */
     '</div>' +
   '</div>';
 }
@@ -2997,7 +3010,10 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
 (function () {
   'use strict';
   var METRICS = [
-    { key: 'market_value', label: 'Marktwert',   color: '#C9A84C', fmt: function (v) { return _dpVEur(v) + ' \u20ac'; } },
+    { key: 'market_value', label: 'Marktpreisindikation (nach Abschlag)',   color: '#C9A84C', fmt: function (v) { return _dpVEur(v) + ' \u20ac'; } },
+    /* v2842 · ohne Abschlag und der Abschlag selbst - sonst sieht der Wechsel auf den Abschlag (v2367) aus wie ein Preissturz */
+    { key: 'mpi_ohne_abschlag', label: 'Marktpreisindikation ohne Abschlag', color: '#b8932f', fmt: function (v) { return _dpVEur(v) + ' \u20ac'; } },
+    { key: 'abschlag_pct', label: 'Abschlag auf Angebotspreise', color: '#8b8678', fmt: function (v) { return v > 0 ? _dpVNum(v, 1) + ' %' : 'kein'; } },
     { key: 'deal_score',   label: 'DealPilot-Score', color: '#3FA56C', fmt: function (v) { return Math.round(v) + ' / 100'; } },
     { key: 'micro_score',  label: 'Lage (Mikro)', color: '#9b6fd4', fmt: function (v) { return Math.round(v) + ' / 100'; } },
     { key: 'macro_score',  label: 'Lage (Makro)', color: '#5a7fd4', fmt: function (v) { return Math.round(v) + ' / 100'; } },
@@ -3200,7 +3216,8 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
 
   window._dpLoadVerlauf = function () {
     var body = document.getElementById('dp-pa-verlauf-body');
-    var tabBtn = document.getElementById('dp-pa-tab-verlauf');
+    var tabBtn = document.getElementById('dp-pa-tab-wert');   /* v2842 · ein Unterreiter „Wert & Marktpreis" */
+    var wrap = document.getElementById('dp-pa-verlauf-wrap');
     if (!body) return;
     _dpVerlaufCss();
     var objKey = (typeof window._currentObjKey === 'string' && window._currentObjKey) ? window._currentObjKey : null;
@@ -3216,13 +3233,21 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
         if ((typeof window._currentObjKey === 'string' ? window._currentObjKey : null) !== objKey) return;
         var hist = (data && data.history) || [];
         hist = hist.filter(function (h) { return h && h.market_value != null; });
+        /* v2842 · Marcel: „Sind da Abschläge drin?" - je Bericht der Abschlag und der Wert OHNE
+           Abschlag. Berichte ohne Abschlag (vor v2367) führen das Angebotsniveau selbst. */
+        hist.forEach(function (h) {
+          var ab = h.angebot_abschlag_pct != null && h.angebot_abschlag_pct !== '' ? Number(h.angebot_abschlag_pct) : null;
+          h.abschlag_pct = ab != null && isFinite(ab) ? ab : 0;
+          h.mpi_ohne_abschlag = h.market_value_roh != null ? Number(h.market_value_roh) : (!(ab > 0) ? Number(h.market_value) : null);
+        });
         try { if (window.DpWertvergleich) window.DpWertvergleich.fuellen(hist); } catch (e) {}   /* v2810 */
         var abHtml = _dpAbrufeHtml(abrufe);
         /* v2217 · Marcel 14.10.2026: „Marktbericht auch erst, wenn wir schon
            einen Report haben." Bis hier erschien der Reiter erst ab ZWEI
            Berichten - mit einem war er unsichtbar, obwohl es einen gab. */
-        if (hist.length < 1 && !abrufe.length) { if (tabBtn) tabBtn.style.display = 'none'; return; }
-        if (tabBtn) { tabBtn.style.display = ''; tabBtn.textContent = (hist.length + abrufe.length) === 1 ? 'Marktbericht' : 'Marktbericht-Verlauf'; }
+        if (hist.length < 1 && !abrufe.length) { if (tabBtn) tabBtn.style.display = 'none'; if (wrap) wrap.style.display = 'none'; return; }
+        if (tabBtn) tabBtn.style.display = '';   /* v2842 · erscheint, sobald Bericht ODER Abruf vorliegt */
+        if (wrap) wrap.style.display = '';
         if (hist.length < 1) { body.innerHTML = abHtml; return; }
         if (hist.length === 1) {
           var h1 = hist[0], mw = Number(h1.market_value);
@@ -3235,7 +3260,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
         window._dpVerlaufWire(body, hist);
         _dpVerlaufLocLine(hist);
       })
-      .catch(function () { if (tabBtn) tabBtn.style.display = 'none'; });
+      .catch(function () { if (wrap) wrap.style.display = 'none'; });
   };
   /* v2556c · die abgelegten Marktpreis-Abrufe, neueste zuerst */
   function _dpAbrufeHtml(abrufe) {
@@ -3244,12 +3269,19 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
     var eur = function (x) { return x != null && isFinite(Number(x)) ? Math.round(Number(x)).toLocaleString('de-DE') + ' €' : '–'; };
     var zeilen = abrufe.map(function (a) {
       var d = a.daten || {}, M = d.markt || {}, B = (d.stufen && d.stufen.bestand) || {};
+      /* v2842 · Marcel: „Sind da Abschläge drin?" - ja: die Marktpreisindikation des Abrufs steht NACH
+         Abschlag auf Angebotspreise. Abschlag je Abruf aus markt bzw. mpi.angebote, ohne Abschlag ab v2842. */
+      var ab = B.mpi_abschlag_pct != null ? B.mpi_abschlag_pct : (M.abschlag_pct != null ? M.abschlag_pct : (d.mpi && d.mpi.angebote ? d.mpi.angebote.abschlag_pct : null));
+      ab = ab != null && isFinite(Number(ab)) ? Number(ab) : null;
+      var mpi = eur(B.mpi_angebote)
+        + (B.mpi_angebote != null ? '<span class="dp-wv-sub">' + (ab > 0 ? 'nach ' + _dpVNum(ab, 1) + ' % Abschlag' : (ab === 0 ? 'ohne Abschlag' : 'Abschlag nicht gespeichert'))
+          + (B.mpi_angebote_roh != null && ab > 0 ? ' · ohne: ' + eur(B.mpi_angebote_roh) : '') + '</span>' : '');
       return '<tr><td>' + _dpVDate(a.abgerufen_am) + '</td><td>' + qm(M.kauf_haus, 0) + '</td><td>' + qm(M.kauf_etw, 0) + '</td><td>' + qm(M.miete, 2)
-        + '</td><td>' + eur(B.mpi_angebote) + '</td><td>' + eur(B.ertragswert) + '</td></tr>';
+        + '</td><td>' + mpi + '</td><td>' + eur(B.ertragswert) + '</td></tr>';
     }).join('');
     return '<div class="dp-pa-card" style="margin-top:14px"><h4 class="dpv-h">Abgelegte Marktpreis-Abrufe (' + abrufe.length + ')</h4>'
-      + '<p class="dp-pa-p" style="color:#8b8678;margin:2px 0 8px">Jeder Abruf „Marktpreise“ aus dem Reiter Pilot-Analyse wird mit Datum gespeichert und erscheint auch im Marktbericht.</p>'
-      + '<div style="overflow-x:auto"><table class="abw-tafel" style="min-width:560px"><thead><tr><th>Abruf</th><th>Kauf Haus</th><th>Kauf ETW</th><th>Angebotsmiete</th><th>Marktpreisindikation Bestand</th><th>Ertragswert Bestand</th></tr></thead><tbody>'
+      + '<p class="dp-pa-p" style="color:#8b8678;margin:2px 0 8px">Jeder Abruf „Marktpreise“ wird mit Datum gespeichert. Kauf- und Mietpreise sind Angebotspreise; die Marktpreisindikation steht nach Abschlag.</p>'
+      + '<div style="overflow-x:auto"><table class="abw-tafel" style="min-width:560px"><thead><tr><th>Abruf</th><th>Kauf Haus</th><th>Kauf ETW</th><th>Angebotsmiete</th><th>Marktpreisindikation Bestand<br><span style="font-weight:400;text-transform:none">nach Abschlag</span></th><th>Ertragswert Bestand</th></tr></thead><tbody>'
       + zeilen + '</tbody></table></div></div>';
   }
 
@@ -3264,7 +3296,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
       var note = document.createElement('div'); note.className = 'dpv-locdev';
       note.style.cssText = 'margin-top:12px;padding:11px 14px;border-radius:11px;background:rgba(201,168,76,.09);border:1px solid rgba(201,168,76,.32);font-size:12.5px;line-height:1.5';
       note.innerHTML = '<b>Entwicklung \u00fcber ' + hist.length + ' Marktberichte:</b> Marktwert ' + _dpVEur(mw0) + ' \u2192 ' + _dpVEur(mw1) + ' \u20ac (' + trend + '). ' +
-        'Vollst\u00e4ndiger Verlauf im Tab \u201eMarktbericht-Verlauf\u201c.';
+        'Vollst\u00e4ndiger Verlauf im Unterreiter \u201eWert & Marktpreis\u201c.';
       loc.appendChild(note);
     } catch (e) {}
   }

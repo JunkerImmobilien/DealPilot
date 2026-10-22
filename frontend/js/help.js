@@ -403,7 +403,7 @@
         },
         {
           h: 'Ertragswert je Stufe und Aufteilung',
-          body: 'DealPilot rechnet den Ertragswert für Bestand, Mieterhöhung und Zielbild mit demselben Rechenkern und denselben Ansätzen wie der Marktbericht Stufe 3 (Liegenschaftszins, Bewirtschaftung, Bodenwert); je Stufe wechseln nur Miete und Restnutzungsdauer. Kein Kontingent. Beim MFH zusätzlich je Wohnung — als Anteil am Haus oder, mit dem Haken „aufgeteilt“, als Eigentumswohnung mit dem Zins für Wohnungseigentum. Die Summe nach Aufteilung steht dem Haus als Ganzes gegenüber, abzüglich der Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung, eigene Angabe möglich). Alles ist ein <strong>Potenzialwert nach Mieterhöhung bzw. Zielbild, keine Verkehrswertermittlung</strong>.'
+          body: 'DealPilot rechnet den Ertragswert für Bestand, Mieterhöhung und Zielbild mit demselben Rechenkern und denselben Ansätzen wie der Marktbericht Stufe 3 (Liegenschaftszins, Bewirtschaftung, Bodenwert); je Stufe wechseln nur Miete und Restnutzungsdauer. Kein Kontingent. Beim MFH zusätzlich je Wohnung — als Anteil am Haus oder, mit dem Haken „aufgeteilt“, als Eigentumswohnung mit dem Zins für Wohnungseigentum. Die Summe nach Aufteilung steht dem Haus als Ganzes gegenüber, abzüglich der Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung, eigene Angabe möglich). Alles ist <strong>ein Ausblick</strong>: Die Werte unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind, und sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand.'
         },
         {
           h: 'Wo es erscheint — und wo nicht',

@@ -55,13 +55,16 @@ function mpiAngebote(wb, refAenderung) {
              abschlag_pct: mv.angebot_abschlag ? mv.angebot_abschlag.pct : null,
              abschlag_herkunft: mv.angebot_abschlag ? mv.angebot_abschlag.herkunft : null,
              abschlag_kurz: mv.angebot_abschlag ? (mv.angebot_abschlag.kurz || null) : null,   /* v2578 */
+             /* v2842 · der Wert OHNE Abschlag (Angebotsniveau), wie ValuationService ihn fuehrt */
+             roh: mv.angebot_abschlag && mv.angebot_abschlag.roh ? { wert: mv.angebot_abschlag.roh.estimated ?? null, low: mv.angebot_abschlag.roh.low ?? null, high: mv.angebot_abschlag.roh.high ?? null } : null,
              median_qm: mv.basis_median_sqm ?? null, gegenprobe: v.amtliche_gegenprobe || null };
   } catch (e) { return null; }
 }
 const ZIELBILD_REF = () => ({ condition: 'modernisiert', modernization: 'umfassend modernisiert',
   modernization_year: new Date().getFullYear(), bom_eur: null, bom_grund: null });
 
-export const KENNZEICHNUNG = 'Potenzialwert nach Mieterhöhung bzw. Zielbild, keine Verkehrswertermittlung.';
+/* v2870 · Marcel 22.10.2026, neuer Wortlaut (vorher „Potenzialwert …, keine Verkehrswertermittlung“) */
+export const KENNZEICHNUNG = 'Die Ertragswerte nach Mieterhöhung und im Zielbild sind ein Ausblick: Sie unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand.';
 const STUFEN = ['mieterhoehung', 'zielbild'];
 
 const zahl = (v) => {
@@ -202,8 +205,31 @@ function stufenMiete(z, w, s) {
   return z.basis + Math.max(0, Math.min(m, z.kappe) - bezug);
 }
 
-function eineStufe(basis, ref, basisKern, miete, plus) {
+function eineStufe(basis, ref, basisKern, miete, plus, kosten) {
   const ein = Object.assign({}, basis.ein);
+  /* v2854 · SANIERUNGSSTAU UND MASSNAHMEN NICHT DOPPELT. Der Bestand traegt die
+     Sanierungskosten des Objekts als boG (§ 8 Abs. 3, Mapper bomAus). Die Stufe
+     fuehrt ihre Massnahmenkosten selbst und zieht sie im Wertzuwachs ab - blieb
+     der boG in der Stufe stehen, zaehlte dieselbe Arbeit zweimal (Parkstr. 9:
+     Stau 137.000 €, Zielbild-Massnahmen 136.000 €). Entscheidung 22.10.2026:
+     in jeder Stufe gilt der Stau in Hoehe ihrer Kosten als behoben,
+     boG = min(0, Stau + Kosten) - nur fuer einen boG aus den Sanierungskosten. */
+  let stau = null;
+  const _kst = Number(kosten) > 0 ? Number(kosten) : 0;
+  if (ein.bog_quelle === 'sanierungskosten' && Number(ein.bog_eur) < 0) {
+    const vor = Number(ein.bog_eur);
+    const rest = Math.min(0, vor + _kst);
+    const behoben = Math.round(rest - vor);
+    const de0 = (x) => Math.round(Math.abs(x)).toLocaleString('de-DE');
+    const text = _kst > 0
+      ? 'Sanierungsstau durch die Maßnahmen dieser Stufe behoben: ' + de0(behoben) + ' €, Rest ' + de0(rest) + ' €'
+      : 'Sanierungsstau unverändert (die Stufe hat keine Maßnahmenkosten): ' + de0(vor) + ' €';
+    if (_kst > 0) {
+      ein.bog_eur = rest === 0 ? null : Math.round(rest);
+      ein.bog_grund = text + ' (Sanierungsstau laut Objekt ' + de0(vor) + ' €)';
+    }
+    stau = { stau_eur: Math.round(vor), kosten_eur: Math.round(_kst), behoben_eur: behoben, rest_eur: Math.round(rest), text };
+  }
   const rndInfo = rndEinstellen(ein, ref, basisKern, plus);
   if (miete != null && miete >= 0) {
     bwkNachziehen(ein, miete);
@@ -222,7 +248,7 @@ function eineStufe(basis, ref, basisKern, miete, plus) {
     k = ErtragswertService.ertragswert(ein, basis.bodenwert);
   }
   const z = kernZusammenfassung(k);
-  if (z) { z.mod_punkte = rndInfo.mod_punkte; z.mod_punkte_plus = rndInfo.plus; z.miete_wohnen_jahr = ein.miete_markt_jahr; }
+  if (z) { z.mod_punkte = rndInfo.mod_punkte; z.mod_punkte_plus = rndInfo.plus; z.miete_wohnen_jahr = ein.miete_markt_jahr; z.sanierungsstau = stau; }
   return z;
 }
 
@@ -527,7 +553,7 @@ export const PotenzialService = {
       if (m == null) continue;
       if (bb) m = bb.zeilen.reduce((a, z, i) => a + (z ? stufenMiete(z, wlB[i], v.key) : 0), 0);
       else m = Math.max(m, Number(basis.ein.miete_markt_jahr) || 0);   /* ohne Basis: nie unter dem Bestand */
-      const z = eineStufe(basis, ref, kB, m, zahl(v.mod_punkte_plus) || 0);
+      const z = eineStufe(basis, ref, kB, m, zahl(v.mod_punkte_plus) || 0, zahl(v.kosten) || 0);
       if (z) {
         z.kosten = zahl(v.kosten) || 0;
         z.anhebung_jahr = Math.round(z.miete_wohnen_jahr - bestand.miete_wohnen_jahr);   /* v2488 */
@@ -543,6 +569,8 @@ export const PotenzialService = {
             abschlag_pct: V.market_value.angebot_abschlag ? V.market_value.angebot_abschlag.pct : null,
             abschlag_herkunft: V.market_value.angebot_abschlag ? V.market_value.angebot_abschlag.herkunft : null,
             abschlag_kurz: V.market_value.angebot_abschlag ? (V.market_value.angebot_abschlag.kurz || null) : null,   /* v2578 */
+            roh: V.market_value.angebot_abschlag && V.market_value.angebot_abschlag.roh   /* v2842 */
+              ? { wert: V.market_value.angebot_abschlag.roh.estimated ?? null, low: V.market_value.angebot_abschlag.roh.low ?? null, high: V.market_value.angebot_abschlag.roh.high ?? null } : null,
             median_qm: V.market_value.basis_median_sqm ?? null }
         : mpiAngebote(wb, null);
       const mvZ = out.haus.zielbild ? mpiAngebote(wb, ZIELBILD_REF()) : null;
@@ -565,6 +593,9 @@ export const PotenzialService = {
         const a = s === 'zielbild' ? mvZ : mvB;
         h.mpi_angebote = a ? a.wert : null;
         h.mpi_angebote_spanne = a && a.low != null ? [a.low, a.high] : null;
+        /* v2842 · Marcel 22.10.2026: „Sind da Abschläge drin?" - Abschlag und Wert ohne Abschlag je Stufe mitfuehren */
+        h.mpi_abschlag_pct = a && a.abschlag_pct != null ? Number(a.abschlag_pct) : null;
+        h.mpi_angebote_roh = a && a.roh && a.roh.wert != null ? a.roh.wert : null;
         h.mpi_rohertrag = rf && mieteStufe[s] > 0 ? { faktor: rf, miete_jahr: Math.round(mieteStufe[s]), wert: rundeMpi(rf * mieteStufe[s]) } : null;
       }
     }
@@ -730,3 +761,6 @@ export const PotenzialService = {
 };
 
 export default PotenzialService;
+
+/* v2854 · fuer den Pruefer (tools/wertermittlung-pruefen.mjs B54): dieselbe Stufenrechnung */
+export { eineStufe as _eineStufe };

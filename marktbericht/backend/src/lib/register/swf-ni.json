@@ -182,7 +182,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -365,7 +371,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -548,7 +560,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -721,7 +739,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -913,7 +937,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -1094,7 +1124,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -1267,7 +1303,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -1455,7 +1497,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -1632,7 +1680,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -1808,7 +1862,13 @@
       "aussenanlagen_eur": "5.000 bis 20.000 (Wochenendhäuser 4.000 bis 15.000)",
       "garagen_nebengebaeude_eur": "3.000 bis 12.000, im Mittel 5.000",
       "genauigkeitsmass": "Standardabweichung aus den Residuen, je Funktion konstant: ±0,21",
-      "selektion": "keine Widersprüche bei Musselementen · Anlass Kauf · kein wertbeeinflussender Umstand · keine ungewöhnlichen Verhältnisse · selbständiges Objekt · Sachwert nach NHK 2010 vorhanden · Objekte mit überdurchschnittlichen Baumängeln ausgeschlossen"
+      "selektion": "keine Widersprüche bei Musselementen · Anlass Kauf · kein wertbeeinflussender Umstand · keine ungewöhnlichen Verhältnisse · selbständiges Objekt · Sachwert nach NHK 2010 vorhanden · Objekte mit überdurchschnittlichen Baumängeln ausgeschlossen",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {
       "raeumlich": "Landkreis Wolfenbüttel",
@@ -2039,7 +2099,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -2123,7 +2189,11 @@
       "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
       "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
       "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
-      "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de"
+      "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
     },
     "geltungsbereich": {},
     "belege": [
@@ -2265,7 +2335,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -2426,7 +2502,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -2599,7 +2681,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -2784,7 +2872,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -2942,7 +3036,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -3122,7 +3222,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -3264,7 +3370,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -3406,7 +3518,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -3548,7 +3666,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -3697,7 +3821,11 @@
       "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
       "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
       "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
-      "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de"
+      "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
     },
     "geltungsbereich": {},
     "belege": [
@@ -3918,7 +4046,11 @@
       "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
       "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
       "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
-      "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de"
+      "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
     },
     "geltungsbereich": {},
     "belege": [
@@ -4060,7 +4192,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -4202,7 +4340,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -4408,7 +4552,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -4560,7 +4710,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -4716,7 +4872,11 @@
       "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
       "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
       "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
-      "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de"
+      "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
     },
     "geltungsbereich": {},
     "belege": [
@@ -4836,7 +4996,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -4966,7 +5132,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [
@@ -5078,7 +5250,13 @@
       "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
       "nhk": "NHK 2010",
       "bezugsmassstab": "Brutto-Grundflaeche",
-      "alterswertminderung": "linear"
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
     "geltungsbereich": {},
     "belege": [

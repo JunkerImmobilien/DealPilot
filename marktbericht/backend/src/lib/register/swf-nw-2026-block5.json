@@ -278,7 +278,10 @@
   "modellansaetze": {
    "aussenanlagen_prozent": "5 % des vorläufigen Sachwerts der baulichen Anlagen (inkl. Hausanschlüsse)",
    "baupreisindex": "Destatis Fachserie 17 Reihe 4, Neubau Wohngebäude inkl. USt., jeweils letzter vor dem Stichtag verfügbarer Index (keine Zahl abgedruckt)",
-   "wortlaut": "Kap. 8.2 Sachwertfaktor (Druck-S. 78–79): bereinigte Kaufpreise (Inventar, boG, Normverhältnisse); NHK 2010 inkl. Baunebenkosten; Garagen Anlage 4 Abschnitt II Pos. 12, Carports wie Garagen Standardstufe 3; Sonderbauteile nach AGVGA-Handlungsempfehlung, indexiert; BGF; DG-Zu-/Abschläge auf den Kostenkennwert; Baupreisindex Destatis; GND nach Anlage 1 (keine Zahl; Garagen/Carports 60 J.); RND nach Anlage 2, Garagen an Hauptgebäude angepasst; kernsaniert bis 90 % GND; Alterswertminderung § 38; Außenanlagen 5 %; Bodenwert §§ 40–45. Ein Regionalfaktor ist im gelesenen Modellblock nicht beziffert."
+   "wortlaut": "Kap. 8.2 Sachwertfaktor (Druck-S. 78–79): bereinigte Kaufpreise (Inventar, boG, Normverhältnisse); NHK 2010 inkl. Baunebenkosten; Garagen Anlage 4 Abschnitt II Pos. 12, Carports wie Garagen Standardstufe 3; Sonderbauteile nach AGVGA-Handlungsempfehlung, indexiert; BGF; DG-Zu-/Abschläge auf den Kostenkennwert; Baupreisindex Destatis; GND nach Anlage 1 (keine Zahl; Garagen/Carports 60 J.); RND nach Anlage 2, Garagen an Hauptgebäude angepasst; kernsaniert bis 90 % GND; Alterswertminderung § 38; Außenanlagen 5 %; Bodenwert §§ 40–45. Ein Regionalfaktor ist im gelesenen Modellblock nicht beziffert.",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Baupreisindex: Preisindizes für den Neubau von Wohngebäuden einschl. Umsatzsteuer, veröffentlicht vom Statistischen Bundesamt (DESTATIS), Schrift „Preisindizes für die Bauwirtschaft“ Fachserie 17 Reihe 4. Dabei wird der jeweils letzte, vor dem Vertragsdatum / Wertermittlungsstichtag verfügbare Index verwendet.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026 Stadt Arnsberg, Kap. 8.2 Sachwertfaktor (Modellbeschreibung), S. 81"
   },
   "korrekturen": [],
   "ags": "05958004",
@@ -350,7 +353,10 @@
   "modellansaetze": {
    "aussenanlagen_prozent": "5 % des vorläufigen Sachwerts der baulichen Anlagen (inkl. Hausanschlüsse)",
    "baupreisindex": "Destatis Fachserie 17 Reihe 4, Neubau Wohngebäude inkl. USt., jeweils letzter vor dem Stichtag verfügbarer Index (keine Zahl abgedruckt)",
-   "wortlaut": "Kap. 8.2 Sachwertfaktor (Druck-S. 78–79): bereinigte Kaufpreise (Inventar, boG, Normverhältnisse); NHK 2010 inkl. Baunebenkosten; Garagen Anlage 4 Abschnitt II Pos. 12, Carports wie Garagen Standardstufe 3; Sonderbauteile nach AGVGA-Handlungsempfehlung, indexiert; BGF; DG-Zu-/Abschläge auf den Kostenkennwert; Baupreisindex Destatis; GND nach Anlage 1 (keine Zahl; Garagen/Carports 60 J.); RND nach Anlage 2, Garagen an Hauptgebäude angepasst; kernsaniert bis 90 % GND; Alterswertminderung § 38; Außenanlagen 5 %; Bodenwert §§ 40–45. Ein Regionalfaktor ist im gelesenen Modellblock nicht beziffert."
+   "wortlaut": "Kap. 8.2 Sachwertfaktor (Druck-S. 78–79): bereinigte Kaufpreise (Inventar, boG, Normverhältnisse); NHK 2010 inkl. Baunebenkosten; Garagen Anlage 4 Abschnitt II Pos. 12, Carports wie Garagen Standardstufe 3; Sonderbauteile nach AGVGA-Handlungsempfehlung, indexiert; BGF; DG-Zu-/Abschläge auf den Kostenkennwert; Baupreisindex Destatis; GND nach Anlage 1 (keine Zahl; Garagen/Carports 60 J.); RND nach Anlage 2, Garagen an Hauptgebäude angepasst; kernsaniert bis 90 % GND; Alterswertminderung § 38; Außenanlagen 5 %; Bodenwert §§ 40–45. Ein Regionalfaktor ist im gelesenen Modellblock nicht beziffert.",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Baupreisindex: Preisindizes für den Neubau von Wohngebäuden einschl. Umsatzsteuer, veröffentlicht vom Statistischen Bundesamt (DESTATIS), Schrift „Preisindizes für die Bauwirtschaft“ Fachserie 17 Reihe 4. Dabei wird der jeweils letzte, vor dem Vertragsdatum / Wertermittlungsstichtag verfügbare Index verwendet.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026 Stadt Arnsberg, Kap. 8.2 Sachwertfaktor (Modellbeschreibung), S. 81"
   },
   "korrekturen": [],
   "ags": "05958004",
@@ -422,7 +428,10 @@
   "modellansaetze": {
    "aussenanlagen_prozent": "5 % des vorläufigen Sachwerts der baulichen Anlagen (inkl. Hausanschlüsse)",
    "baupreisindex": "Destatis Fachserie 17 Reihe 4, Neubau Wohngebäude inkl. USt., jeweils letzter vor dem Stichtag verfügbarer Index (keine Zahl abgedruckt)",
-   "wortlaut": "Kap. 8.2 Sachwertfaktor (Druck-S. 78–79): bereinigte Kaufpreise (Inventar, boG, Normverhältnisse); NHK 2010 inkl. Baunebenkosten; Garagen Anlage 4 Abschnitt II Pos. 12, Carports wie Garagen Standardstufe 3; Sonderbauteile nach AGVGA-Handlungsempfehlung, indexiert; BGF; DG-Zu-/Abschläge auf den Kostenkennwert; Baupreisindex Destatis; GND nach Anlage 1 (keine Zahl; Garagen/Carports 60 J.); RND nach Anlage 2, Garagen an Hauptgebäude angepasst; kernsaniert bis 90 % GND; Alterswertminderung § 38; Außenanlagen 5 %; Bodenwert §§ 40–45. Ein Regionalfaktor ist im gelesenen Modellblock nicht beziffert."
+   "wortlaut": "Kap. 8.2 Sachwertfaktor (Druck-S. 78–79): bereinigte Kaufpreise (Inventar, boG, Normverhältnisse); NHK 2010 inkl. Baunebenkosten; Garagen Anlage 4 Abschnitt II Pos. 12, Carports wie Garagen Standardstufe 3; Sonderbauteile nach AGVGA-Handlungsempfehlung, indexiert; BGF; DG-Zu-/Abschläge auf den Kostenkennwert; Baupreisindex Destatis; GND nach Anlage 1 (keine Zahl; Garagen/Carports 60 J.); RND nach Anlage 2, Garagen an Hauptgebäude angepasst; kernsaniert bis 90 % GND; Alterswertminderung § 38; Außenanlagen 5 %; Bodenwert §§ 40–45. Ein Regionalfaktor ist im gelesenen Modellblock nicht beziffert.",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Baupreisindex: Preisindizes für den Neubau von Wohngebäuden einschl. Umsatzsteuer, veröffentlicht vom Statistischen Bundesamt (DESTATIS), Schrift „Preisindizes für die Bauwirtschaft“ Fachserie 17 Reihe 4. Dabei wird der jeweils letzte, vor dem Vertragsdatum / Wertermittlungsstichtag verfügbare Index verwendet.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026 Stadt Arnsberg, Kap. 8.2 Sachwertfaktor (Modellbeschreibung), S. 81"
   },
   "korrekturen": [],
   "ags": "05958004",
@@ -1563,7 +1572,10 @@
    "regionalfaktor": 1,
    "aussenanlagen_prozent": "5–7 % des Gebäudesachwerts (i. d. R.)",
    "baupreisindex": "Baupreisindex Destatis zum Zeitpunkt des Kaufvertrags (keine Stichtagszahl abgedruckt)",
-   "wortlaut": "Kap. 5.1.2 (Druck-S. 42): Kaufpreissammlung 2025; Erbbaurechte, Außenbereich, nicht gewöhnlicher Geschäftsverkehr ausgeschlossen; BGF nach DIN 277-1:2005-02; NHK 2010; Baupreisindex Destatis zum Kaufvertrag; Regionalisierungsfaktor 1,0; Alterswertminderung linear, GND 80 Jahre (freistehende EZFH, Doppel-, Reihenhäuser); Garagen und Hausanschlüsse pauschal Zeitwert; RND sachverständig nach Anlage 2 (Modernisierung); normaler Unterhaltungszustand; Außenanlagen 5–7 % des Gebäudesachwerts; Bodenwert aus BRW (Lage, Art/Maß, Größe, Tiefe, Gestalt)."
+   "wortlaut": "Kap. 5.1.2 (Druck-S. 42): Kaufpreissammlung 2025; Erbbaurechte, Außenbereich, nicht gewöhnlicher Geschäftsverkehr ausgeschlossen; BGF nach DIN 277-1:2005-02; NHK 2010; Baupreisindex Destatis zum Kaufvertrag; Regionalisierungsfaktor 1,0; Alterswertminderung linear, GND 80 Jahre (freistehende EZFH, Doppel-, Reihenhäuser); Garagen und Hausanschlüsse pauschal Zeitwert; RND sachverständig nach Anlage 2 (Modernisierung); normaler Unterhaltungszustand; Außenanlagen 5–7 % des Gebäudesachwerts; Bodenwert aus BRW (Lage, Art/Maß, Größe, Tiefe, Gestalt).",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Baupreisindex vom Statistischen Bundesamt zum Zeitpunkt des Kaufvertrages",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026 Stadt Velbert, Kap. 5.1.2 Sachwertfaktoren, S. 42 (Modellparameter)"
   },
   "korrekturen": [],
   "ags": "05158032",
@@ -1655,7 +1667,10 @@
    "regionalfaktor": 1,
    "aussenanlagen_prozent": "5–7 % des Gebäudesachwerts (i. d. R.)",
    "baupreisindex": "Baupreisindex Destatis zum Zeitpunkt des Kaufvertrags (keine Stichtagszahl abgedruckt)",
-   "wortlaut": "Kap. 5.1.2 (Druck-S. 42): Kaufpreissammlung 2025; Erbbaurechte, Außenbereich, nicht gewöhnlicher Geschäftsverkehr ausgeschlossen; BGF nach DIN 277-1:2005-02; NHK 2010; Baupreisindex Destatis zum Kaufvertrag; Regionalisierungsfaktor 1,0; Alterswertminderung linear, GND 80 Jahre (freistehende EZFH, Doppel-, Reihenhäuser); Garagen und Hausanschlüsse pauschal Zeitwert; RND sachverständig nach Anlage 2 (Modernisierung); normaler Unterhaltungszustand; Außenanlagen 5–7 % des Gebäudesachwerts; Bodenwert aus BRW (Lage, Art/Maß, Größe, Tiefe, Gestalt)."
+   "wortlaut": "Kap. 5.1.2 (Druck-S. 42): Kaufpreissammlung 2025; Erbbaurechte, Außenbereich, nicht gewöhnlicher Geschäftsverkehr ausgeschlossen; BGF nach DIN 277-1:2005-02; NHK 2010; Baupreisindex Destatis zum Kaufvertrag; Regionalisierungsfaktor 1,0; Alterswertminderung linear, GND 80 Jahre (freistehende EZFH, Doppel-, Reihenhäuser); Garagen und Hausanschlüsse pauschal Zeitwert; RND sachverständig nach Anlage 2 (Modernisierung); normaler Unterhaltungszustand; Außenanlagen 5–7 % des Gebäudesachwerts; Bodenwert aus BRW (Lage, Art/Maß, Größe, Tiefe, Gestalt).",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Baupreisindex vom Statistischen Bundesamt zum Zeitpunkt des Kaufvertrages",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026 Stadt Velbert, Kap. 5.1.2 Sachwertfaktoren, S. 42 (Modellparameter)"
   },
   "korrekturen": [],
   "ags": "05158032",
@@ -1740,7 +1755,10 @@
    "regionalfaktor": 1,
    "aussenanlagen_prozent": "5–7 % des Gebäudesachwerts (i. d. R.)",
    "baupreisindex": "Baupreisindex Destatis zum Zeitpunkt des Kaufvertrags (keine Stichtagszahl abgedruckt)",
-   "wortlaut": "Kap. 5.1.2 (Druck-S. 42): Kaufpreissammlung 2025; Erbbaurechte, Außenbereich, nicht gewöhnlicher Geschäftsverkehr ausgeschlossen; BGF nach DIN 277-1:2005-02; NHK 2010; Baupreisindex Destatis zum Kaufvertrag; Regionalisierungsfaktor 1,0; Alterswertminderung linear, GND 80 Jahre (freistehende EZFH, Doppel-, Reihenhäuser); Garagen und Hausanschlüsse pauschal Zeitwert; RND sachverständig nach Anlage 2 (Modernisierung); normaler Unterhaltungszustand; Außenanlagen 5–7 % des Gebäudesachwerts; Bodenwert aus BRW (Lage, Art/Maß, Größe, Tiefe, Gestalt)."
+   "wortlaut": "Kap. 5.1.2 (Druck-S. 42): Kaufpreissammlung 2025; Erbbaurechte, Außenbereich, nicht gewöhnlicher Geschäftsverkehr ausgeschlossen; BGF nach DIN 277-1:2005-02; NHK 2010; Baupreisindex Destatis zum Kaufvertrag; Regionalisierungsfaktor 1,0; Alterswertminderung linear, GND 80 Jahre (freistehende EZFH, Doppel-, Reihenhäuser); Garagen und Hausanschlüsse pauschal Zeitwert; RND sachverständig nach Anlage 2 (Modernisierung); normaler Unterhaltungszustand; Außenanlagen 5–7 % des Gebäudesachwerts; Bodenwert aus BRW (Lage, Art/Maß, Größe, Tiefe, Gestalt).",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Baupreisindex vom Statistischen Bundesamt zum Zeitpunkt des Kaufvertrages",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026 Stadt Velbert, Kap. 5.1.2 Sachwertfaktoren, S. 42 (Modellparameter)"
   },
   "korrekturen": [],
   "ags": "05158032",

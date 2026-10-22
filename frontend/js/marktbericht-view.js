@@ -107,6 +107,7 @@
   function attachAutoHeight(fr) {
     function sizeFrame() {
       try {
+        if (!fr.isConnected) { abbau(); return; }
         var d = fr.contentDocument || (fr.contentWindow && fr.contentWindow.document);
         if (!d || !d.documentElement) return;
         var h = d.documentElement.scrollHeight;
@@ -114,17 +115,43 @@
         if (h > 0 && Math.abs(cur - h) > 2) fr.style.height = (h + 6) + 'px';
       } catch (e) {}
     }
+    /* v2823 · URSACHE der Meldung "ResizeObserver loop completed with undelivered
+       notifications" (gemessen 22.10.2026 mit einer Huelle um ResizeObserver, die
+       vor dem ersten Skript sass): der Observer blieb an <html> des Bericht-iframes
+       haengen, nachdem das iframe entfernt war (Ansicht verlassen: innerHTML = ''
+       in marktbericht-view.js und ui.js). Chrome meldete dann JEDES Bild einen
+       Fehler - 5 je 5 s, nach disconnect() 0 -, und jedes weitere Oeffnen legte
+       einen Observer dazu. Dasselbe beim Neuladen des iframes: !fr._mbRO liess den
+       Observer am alten Dokument.
+       Abbau, sobald das Dokument im iframe geht (pagehide - feuert auch beim
+       Entfernen des iframes) oder sizeFrame das iframe nicht mehr im DOM findet. */
+    function abbau() {
+      try { if (fr._mbRO) fr._mbRO.disconnect(); } catch (e) {}
+      fr._mbRO = null;
+      if (fr._mbRaf) { try { cancelAnimationFrame(fr._mbRaf); } catch (e) {} fr._mbRaf = 0; }
+      if (fr._mbIv) { clearInterval(fr._mbIv); fr._mbIv = 0; }
+      if (!fr.isConnected) window.removeEventListener('resize', sizeFrame);
+    }
     fr.addEventListener('load', function () {
       sizeFrame();
       try {
         var d = fr.contentDocument || (fr.contentWindow && fr.contentWindow.document);
         if (d && window.ResizeObserver && d.documentElement && !fr._mbRO) {
-          fr._mbRO = new ResizeObserver(function () { sizeFrame(); });
+          /* v2823 · im naechsten Bild statt im Callback: sizeFrame aendert die
+             iframe-Hoehe und damit die Breite des beobachteten <html>
+             (Scrollbalken, gemessen 1263,3 -> 1280 px). Im verborgenen Tab
+             (kein rAF) traegt das Intervall unten. */
+          fr._mbRO = new ResizeObserver(function () {
+            if (fr._mbRaf) return;
+            fr._mbRaf = requestAnimationFrame(function () { fr._mbRaf = 0; sizeFrame(); });
+          });
           fr._mbRO.observe(d.documentElement);
         }
+        if (fr.contentWindow) fr.contentWindow.addEventListener('pagehide', abbau);
       } catch (e) {}
       // Fallback fuer asynchron nachwachsenden Bericht (gebremst, endlich)
-      var n = 0; var iv = setInterval(function () { sizeFrame(); if (++n > 40) clearInterval(iv); }, 1000);
+      if (fr._mbIv) clearInterval(fr._mbIv);
+      var n = 0; var iv = setInterval(function () { sizeFrame(); if (++n > 40) { clearInterval(iv); if (fr._mbIv === iv) fr._mbIv = 0; } }, 1000);
       fr._mbIv = iv;
     });
     window.addEventListener('resize', sizeFrame);

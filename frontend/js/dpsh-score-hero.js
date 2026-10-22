@@ -596,7 +596,7 @@
 '.dpsh-rov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}',
 '.dpsh-n{font-family:"Space Grotesk",sans-serif;font-weight:700;color:#fff;line-height:1;letter-spacing:-1px}',
 '.dpsh-d{font-size:10px;color:#8a8378;margin-top:2px}',
-'.dpsh-sub{font-family:"JetBrains Mono",monospace;font-size:8px;color:var(--gold, #C9A84C);letter-spacing:.4px;margin-top:4px;text-transform:uppercase}',
+'.dpsh-sub{font-family:"JetBrains Mono",monospace;font-size:8.5px;color:var(--gold, #C9A84C);letter-spacing:.4px;margin-top:4px;text-transform:uppercase}',
 '.dpsh-statstrip{display:flex;gap:0;margin-top:4px}',
 '.dpsh-st{padding:0 13px;border-left:1px solid rgba(255,255,255,.08);text-align:center}',
 '.dpsh-st:first-child{border-left:none;padding-left:0}',

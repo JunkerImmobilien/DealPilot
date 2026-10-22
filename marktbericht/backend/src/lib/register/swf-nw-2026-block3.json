@@ -1175,7 +1175,10 @@
    "aussenanlagen_prozent": 5,
    "korrekturfaktor_zfh": 1.05,
    "baupreisindex": "Preisindex Destatis für den Neubau von Wohngebäuden in konventioneller Bauart einschl. USt (ehemals Fachserie 17 Reihe 4; keine Stichtagszahl abgedruckt)",
-   "wortlaut": "Kap. 8.1 (Druck-S. 53): BGF nach DIN 277 (1987, Teilflächen a und b); NHK 2010 Anlage 4, Baunebenkosten enthalten; Regionalfaktor 1,0; Alterswertminderung linear (§ 38); Preisindex Destatis; GND 80 Jahre (Anlage 1); Bodenwert wie unbebaut, selbstständige Teile herausgerechnet; nicht erfasste Bauteile nach Anlage 7 AGVGA-Modell (7/2017); Zeitwert Nebengebäude; Außenanlagen Ø 5 % des Sachwerts der baulichen Anlagen; Modernisierung nach Anlage 2; Dachgeschoss nach Anlage 5 AGVGA; Faktor freistehende ZFH 1,05; durchschnittlicher altersgemäßer Zustand."
+   "wortlaut": "Kap. 8.1 (Druck-S. 53): BGF nach DIN 277 (1987, Teilflächen a und b); NHK 2010 Anlage 4, Baunebenkosten enthalten; Regionalfaktor 1,0; Alterswertminderung linear (§ 38); Preisindex Destatis; GND 80 Jahre (Anlage 1); Bodenwert wie unbebaut, selbstständige Teile herausgerechnet; nicht erfasste Bauteile nach Anlage 7 AGVGA-Modell (7/2017); Zeitwert Nebengebäude; Außenanlagen Ø 5 % des Sachwerts der baulichen Anlagen; Modernisierung nach Anlage 2; Dachgeschoss nach Anlage 5 AGVGA; Faktor freistehende ZFH 1,05; durchschnittlicher altersgemäßer Zustand.",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Umrechnung auf das Kaufdatum mit dem Preisindex des statistischen Bundesamtes für den Neubau von Wohngebäuden in konventioneller Bauart einschl. Umsatzsteuer (ehemals Fachserie 17, Reihe 4)",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026 Stadt Leverkusen, Kap. 8.1 Sachwertfaktoren (Modellbeschreibung), S. 53"
   },
   "korrekturen": [],
   "ags": "05316000",

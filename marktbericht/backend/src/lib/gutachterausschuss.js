@@ -145,7 +145,7 @@ function hinterlegteNamen() {
 const FELDBRUECKE = {
   sachwert: ['sachwert_eur', 'vorlaeufiger_sachwert_eur', 'sachwert'],
   brw: ['brw_eur_qm', 'brw_sqm', 'brw'],
-  rnd: ['rnd_jahre', 'restnutzungsdauer_jahre', 'rnd'],
+  rnd: ['rnd_jahre', 'restnutzungsdauer_jahre', 'rnd', 'restnutzungsdauer'],   /* v2860 · alle Aufrufer uebergeben 'restnutzungsdauer' (WertParameterService, PotenzialService, ReportOrchestrator) - ohne den Namen meldete jeder nach RND gestaffelte Zinssatz 'achse_fehlt' (gemessen Horb 08237040) */
   bgf: ['bgf_qm', 'bgf_direkt', 'bgf'],
   /* v1103-WWFL - Havelland staffelt seine Sachwertfaktoren im Berliner
      Umland nach Grundstuecks- UND WOHNflaeche. Die Wohnflaeche stand in

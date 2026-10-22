@@ -53,7 +53,7 @@ const OPENAI_URL = 'https://api.openai.com/v1/responses';
 function _potenzialBlock(pz) {
   var z = [], e = function (n) { return n == null ? '-' : Math.round(n).toLocaleString('de-DE') + ' EUR'; };
   z.push('');
-  z.push('## MIETERHOEHUNG UND ZIELBILD (Potenzial, keine Verkehrswertermittlung)');
+  z.push('## MIETERHOEHUNG UND ZIELBILD (Ausblick, kein Verkehrswert zum heutigen Stichtag)');
   z.push('Stufen: Bestand = heutige Ist-Miete; Mieterhoehung = Soll-Miete, der jetzige Mieter bleibt'
     + ' (Paragraf 558 BGB bis zur Vergleichsmiete, Kappungsgrenze, 15 Monate nach der letzten Erhoehung;'
     + ' Paragraf 559 bei Modernisierung im bewohnten Zustand); Zielbild = nach Umbau oder Neuvermietung.');
@@ -1030,7 +1030,12 @@ function buildPrompt(payload, opts) {
     'Kaufpreis: ' + fmtEur(k.kp),
     'Gesamtinvestition: ' + fmtEur(k.gi),
     'Eigenkapital: ' + fmtEur(k.ek),
-    'Eigenkapitalrendite (EK-Rendite): ' + (k.em == null ? '–' : (!isFinite(k.em) ? 'unendlich — no-money-down (Kaufpreis & Kaufnebenkosten voll fremdfinanziert)' : fmtPct(k.em, 1))),
+    /* v2832 · hier stand „Eigenkapitalrendite (EK-Rendite): 3,7 %" - gemeint war
+       k.em, das Equity Multiple (Vermoegenszuwachs / Eigenkapital, ein Vielfaches).
+       Gemessen (Rechenwege-Pruefer 22.10.2026, Fund 12) an 2026-1054. Die
+       EK-Rendite (k.ekr, p. a. vor Steuern) reist seit v2832 eigens mit. */
+    k.ekr != null && isFinite(Number(k.ekr)) ? 'Eigenkapitalrendite (EK-Rendite, p. a. vor Steuern): ' + fmtPct(Number(k.ekr), 1) : '',
+    'Equity Multiple (Vermögenszuwachs über die Haltedauer / Eigenkapital): ' + (k.em == null ? '–' : (!isFinite(k.em) ? 'unendlich — no-money-down (Kaufpreis & Kaufnebenkosten voll fremdfinanziert)' : Number(k.em).toFixed(1).replace('.', ',') + '-fach')),
     f.d1z_pct != null ? 'Sollzins D1: ' + Number(f.d1z_pct).toFixed(2) + ' %' : '',
     f.d1t_pct != null ? 'Tilgung D1: ' + Number(f.d1t_pct).toFixed(2) + ' %' : '',
     f.restschuld_ezb != null ? 'Restschuld am Ende der Zinsbindung: ' + fmtEur(f.restschuld_ezb) : '',
@@ -1585,7 +1590,7 @@ function buildPrompt(payload, opts) {
       + '   4-7 Saetze: was ohne Mieterwechsel erreichbar ist und ab wann, was das Zielbild mit welchen\n'
       + '   Massnahmen und Kosten bringt, die Ertragswerte je Stufe und der Wertzuwachs nach Kosten,\n'
       + '   bei Aufteilung deren Wirkung (auch wenn sie negativ ist). Die schnellsten Hebel zuerst.\n'
-      + '   Nenne es ausdruecklich einen Potenzialwert, keine Verkehrswertermittlung; Score und\n'
+      + '   Nenne es ausdruecklich einen Ausblick (unterstellt, dass die hoehere Miete erzielt bzw. die Massnahmen umgesetzt sind), keinen Verkehrswert zum heutigen Stichtag; Score und\n'
       + '   Verkehrswert bleiben beim Bestand. Zahlen NUR aus dem Block. Gehoert nach "potenzial_text".' : ''),
     '## STIL',
     '- Klar, professionell, wie ein ausführlicher Investment-Report',

@@ -252,8 +252,11 @@ function gewerbeAus(d) {
        erfasst sind (Geschaeftshaus mit Wohnungen). Dort gibt es keine
        Wohn-Angebotsmiete im Abruf; ein MFH rechnet weiter wie bisher. */
     wohnen_ist_jahr: 0, wohnen_leer: 0 };
-  liste.forEach((e) => {
+  /* v2820 · Rueckfall-Name = die Nummer, die die Liste im Formular zeigt (Platzhalter i+1,
+     mfh-einheiten.js zeileHtml) - nicht ein eigener Zaehler „GE n", den es dort nicht gibt. */
+  liste.forEach((e, i) => {
     const fl = num(e.wfl) || 0;
+    const _name = String(e.nr || e.bez || e.name || e.lage || ('Nr. ' + (i + 1)));
     if (String(e.art || '') !== 'gewerbe') {
       out.wfl_wohnen += fl;
       if (String(e.status || '') === 'leer' || !(num(e.ist) > 0)) out.wohnen_leer++;
@@ -267,7 +270,7 @@ function gewerbeAus(d) {
       out.ohne_nutzung_qm += fl;
       /* v2790 · Punkt 6: WELCHE Einheit die Nutzungsart braucht - fuer die Nachfrage im Bericht */
       out.ohne_nutzung_nr = out.ohne_nutzung_nr || [];
-      out.ohne_nutzung_nr.push(String(e.nr || e.bez || e.name || ('GE ' + (out.ohne_nutzung_nr.length + 1))));
+      out.ohne_nutzung_nr.push(_name);
     }
     const leer = String(e.status || '') === 'leer';
     if (!leer) out.ist_jahr += (num(e.ist) || 0) * 12;
@@ -280,7 +283,7 @@ function gewerbeAus(d) {
     if (!leer && mq > 0 && fl > 0 && num(e.ist) > 0) {
       const _d = (v) => (v && /^\d{4}-\d{2}(-\d{2})?$/.test(String(v)) ? String(v) : null);
       if (!out.einheiten) out.einheiten = [];
-      out.einheiten.push(Object.assign({ nr: String(e.nr || e.bez || e.name || ('GE ' + (out.einheiten.length + 1))),
+      out.einheiten.push(Object.assign({ nr: _name,
         ist_jahr: Math.round(num(e.ist) * 12), markt_jahr: Math.round(mq * fl * 12) },
         _d(e.mv_befristet_bis) ? { mv_befristet_bis: _d(e.mv_befristet_bis) } : {},
         _d(e.mv_kuendigungsverzicht_bis) ? { mv_kuendigungsverzicht_bis: _d(e.mv_kuendigungsverzicht_bis) } : {},
