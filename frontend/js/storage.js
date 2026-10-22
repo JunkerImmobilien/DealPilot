@@ -1860,6 +1860,19 @@ async function renderSaved(opts) {
             if (cfMonEl) liveCf  = parseDe((cfMonEl.textContent || '').replace(/[^\d.,-]/g, ''));
             if (dscrEl)  liveDscr = parseDe((dscrEl.textContent || '').replace(/[^\d.,-]/g, ''));
             if (bmyEl)   liveBmy  = parseDe((bmyEl.textContent || '').replace(/[^\d.,-]/g, ''));
+            /* v2852 · die Kopfzeilen hdr-cf-mon/hdr-dscr/hdr-bmy gibt es nicht
+               mehr - die aktive Karte zeigte deshalb die gespeicherten Werte
+               (2026-001: CF/J +4.167 €, Reiter +4.547 €). Die Kennzahlen kommen
+               jetzt aus State.kpis, wenn sie zu DIESEM Objekt gehoeren (_fuer).
+               cf_ns ist JAHRES-Cashflow, wie die Spalte der Liste. */
+            var _Kc = (window.State && State.kpis && State.kpis._fuer === o.id) ? State.kpis : null;
+            if (_Kc) {
+              if (isFinite(_Kc.cf_ns)) liveCf = _Kc.cf_ns;
+              if (isFinite(_Kc.dscr)) liveDscr = _Kc.dscr;
+              if (isFinite(_Kc.bmy)) liveBmy = _Kc.bmy;
+              if (isFinite(_Kc.kp) && _Kc.kp > 0) liveKp = _Kc.kp;
+              if (isFinite(_Kc.ltv)) o = Object.assign({}, o, { ltv: _Kc.ltv });
+            }
           } catch(e) {}
         }
 
@@ -2048,7 +2061,21 @@ function _addNewBtn() {
 // ══════════════════════════════════════════════════
 async function loadSaved(k) {
   /* v736-save-before-switch: aktuelles Objekt sichern bevor gewechselt/neu */
-  try { if (window.dpTabSwitchSave) { window.dpTabSwitchSave(); } } catch (e) {} /* v782-always-save */
+  /* v2852 · den Save ABWARTEN, bevor gewechselt wird. Ohne await lief saveObj()
+     in sein erstes await (_checkObjIdConflict), loadSaved setzte derweil
+     _currentObjKey auf das neue Objekt - und saveObj brach am Kontext-Waechter
+     (v1268, `_currentObjKey !== _ctxKey`) ab. Das verlassene Objekt wurde also
+     nie gesichert: gemessen 22.10.2026, beim Wechsel 2026-001 -> 2026-004 ging
+     kein PUT fuer 2026-001 raus. Folge: Liste und Karten behielten Werte vom
+     19.10. (Score 85 gespeichert, live 77). Hoechstens 8 s warten, dann laden. */
+  try {
+    if (window.dpTabSwitchSave) {
+      var _swSave = window.dpTabSwitchSave();
+      if (_swSave && typeof _swSave.then === 'function') {
+        await Promise.race([_swSave, new Promise(function (r) { setTimeout(r, 8000); })]);
+      }
+    }
+  } catch (e) {} /* v782-always-save */
   if (Auth.isApiMode()) {
     try {
       var obj = await Auth.apiCall('/objects/' + k);
@@ -2089,6 +2116,12 @@ async function loadSaved(k) {
         setTimeout(DealPilotWorkflow.renderProgressBar, 100);
       }
       renderSaved();
+      /* v2852 · die aktive Karte zeigt die LIVE-Kennzahlen (State.kpis, siehe
+         _renderRichCard-Aufruf). Der erste renderSaved laeuft vor der Rechnung;
+         nach dem Rechnen einmal nachzeichnen, damit Karte und Reiter gleich sind. */
+      setTimeout(function () {
+        try { if (_currentObjKey === k && window.State && State.kpis && State.kpis._fuer === k) renderSaved({ _immediate: true }); } catch (e) {}
+      }, 1500);
       toast('✓ Geladen: ' + (obj.name || 'Objekt'));
     } catch (err) {
       toast('⚠ Fehler beim Laden: ' + err.message);
