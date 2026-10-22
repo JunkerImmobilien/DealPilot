@@ -167,7 +167,10 @@
       /* Das BEREITS geladene Element nehmen - ein frisch erzeugtes Image
          ist beim Zeichnen womoeglich noch nicht dekodiert und bliebe leer. */
       var i = b.el; if (!i || !i.naturalWidth) return b;
-      ctx.drawImage(i, (zw - iw) / 2, (zh - ih) / 2, iw, ih);
+      /* v2830 · senkrecht nicht mittig, sondern bei 40 %: auf Objektfotos steht das
+         Haus oben, unten liegen Hof und Garagen (gemessen Westerfeldstr.: der
+         mittige Schnitt zeigte nur die Garagen). */
+      ctx.drawImage(i, (zw - iw) / 2, (zh - ih) * 0.4, iw, ih);
       return { src: c.toDataURL('image/jpeg', 0.82), w: zw, h: zh };
     } catch (e) { return b; }
   }
@@ -578,18 +581,39 @@
        mit Kopf (der Fuß kommt am Ende über fuss()) und derselben Schrift -
        kopf() stellt die Schrift um, deshalb wird sie danach neu gesetzt. */
     var TEXT_UNTEN = H - 20;
+    /* v2830 · Blocksatz (Marcel 22.10.2026: „Die Texte sind nicht im Blocksatz").
+       Jede Zeile ausser der letzten eines Absatzes auf volle Breite, Absatz-
+       wechsel an \n (DpPdfBlocksatz). Zeilenabstand einheitlich aus der
+       Schriftgroesse (0,52 mm je pt), wenn der Aufrufer keinen nennt.
+       o.links = true setzt linksbuendig (Fussnoten unter Tabellen). */
     function absatz(t, o) {
       o = o || {};
-      var gr = o.groesse || 8, lh = o.zeile || 4.2, x = o.x == null ? L : o.x, br = o.breite || (W - R - x);
+      var gr = o.groesse || 8, lh = o.zeile || Math.round(gr * 0.52 * 10) / 10, x = o.x == null ? L : o.x, br = o.breite || (W - R - x);
       var stil = function () {
         doc.setFont('helvetica', o.fett ? 'bold' : 'normal'); doc.setFontSize(gr);
         doc.setTextColor(o.farbe == null ? 120 : o.farbe);
       };
+      if (window.DpPdfBlocksatz) {
+        y = window.DpPdfBlocksatz.absatz(doc, String(t == null ? '' : t), { x: x, y: y, breite: br, zeile: lh, unten: TEXT_UNTEN,
+          blocksatz: !o.links, stil: stil, neueSeite: function () { doc.addPage(); kopf(_titel, _unter || 'Fortsetzung'); return y; } });
+        return;
+      }
       stil();
       doc.splitTextToSize(String(t == null ? '' : t), br).forEach(function (z) {
         if (y > TEXT_UNTEN) { doc.addPage(); kopf(_titel, _unter || 'Fortsetzung'); stil(); }
         doc.text(z, x, y); y += lh;
       });
+    }
+    /* v2830 · Aufzaehlung mit haengendem Einzug: der Punkt steht links, jede
+       Folgezeile beginnt unter dem Text, nicht unter dem Punkt. */
+    function punkt(t, o) {
+      o = o || {};
+      var gr = o.groesse || 8.4, x0 = o.x == null ? L : o.x;
+      if (y > TEXT_UNTEN) { doc.addPage(); kopf(_titel, _unter || 'Fortsetzung'); }
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(gr); doc.setTextColor(o.farbe == null ? 60 : o.farbe);
+      doc.text('·', x0 + 0.6, y);
+      absatz(t, { x: x0 + 3.6, breite: (o.breite || (W - R - x0)) - 3.6, groesse: gr, farbe: o.farbe == null ? 60 : o.farbe, zeile: o.zeile || 4.4 });
+      y += 1.2;
     }
     function einleitung(t) {
       absatz(t, { groesse: 8, farbe: 120, zeile: 4.2 });
@@ -716,6 +740,52 @@
       y += 4;
     }
 
+    /* v2830 · Kachelreihe [label, wert, unter] - die Fusskennzahlen der
+       Bank-Karten, im Stil des Kennzahlenrasters (Haarlinie, keine Flaeche). */
+    function kachelReihe(items) {
+      items = items.filter(function (it) { return it && it[1]; }).slice(0, 5);
+      if (!items.length) return;
+      var n = items.length, sp = 2.5, bw = (CW - (n - 1) * sp) / n, bh = 15;
+      if (y + bh > H - 24) { doc.addPage(); kopf(_titel, _unter); }
+      items.forEach(function (it, i) {
+        var x = L + i * (bw + sp);
+        doc.setDrawColor(226, 221, 210); doc.setLineWidth(0.25); doc.rect(x, y, bw, bh);
+        doc.setFillColor(G[0], G[1], G[2]); doc.rect(x, y, bw, 0.7, 'F');
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(n >= 5 ? 6 : 6.6); doc.setTextColor(120);
+        var lb = sauber(it[0]); while (lb.length > 3 && doc.getTextWidth(lb) > bw - 4) lb = lb.slice(0, -1);
+        doc.text(lb, x + 2.2, y + 4.6);
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(n >= 5 ? 9 : 10.5); doc.setTextColor(26, 26, 26);
+        doc.text(sauber(it[1]), x + 2.2, y + 9.8);
+        if (it[2]) {
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(6); doc.setTextColor(140);
+          var u = sauber(it[2]); while (u.length > 3 && doc.getTextWidth(u) > bw - 4) u = u.slice(0, -1);
+          doc.text(u, x + 2.2, y + 13.2);
+        }
+      });
+      doc.setLineWidth(0.2);
+      y += bh + 3;
+    }
+    /* v2830 · Kopfsatz und Fusskacheln einer Bank-Karte (bc-equity, bc-waterfall)
+       lesen - dieselbe Quelle wie pdf.js _readCardDataFromDom. Gezeichnet wird
+       bei Bedarf unsichtbar in eine eigene Flaeche; gerechnet wird nichts. */
+    function karte(id) {
+      var host = document.getElementById(id), tmp = null;
+      if (!host || !host.querySelector('.bc-card')) {
+        var fn = BC_FN[id];
+        if (!fn || !window.BankCharts || typeof window.BankCharts[fn] !== 'function') return null;
+        tmp = document.createElement('div'); tmp.style.cssText = 'position:fixed;left:-3000px;top:0;width:640px;height:340px';
+        document.body.appendChild(tmp);
+        try { window.BankCharts[fn](tmp, window.State); } catch (e) { tmp.remove(); return null; }
+        host = tmp;
+      }
+      var c = host.querySelector('.bc-card');
+      var t = function (sel, w) { var e = (w || c).querySelector(sel); return e ? sauber(e.textContent) : ''; };
+      var r = c ? { titel: t('.bc-head-title'), fuss: [].slice.call(c.querySelectorAll('.bc-footer-cell')).map(function (z) {
+        return [t('.bc-footer-label', z), t('.bc-footer-value', z), t('.bc-footer-sub', z)]; }) } : null;
+      if (tmp) tmp.remove();
+      return r;
+    }
+
     /* Kurve: Vermoegensaufbau. Bewusst ohne Farbflaechen - zwei Linien,
        Gold fuer den Wert, Tinte fuer die Restschuld, Raster in Grau. */
     function kurve(reihen, jahre, o) {
@@ -724,6 +794,8 @@
       var alle = reihen.reduce(function (a, r) { return a.concat(r.werte); }, []).filter(function (n) { return isFinite(n); });
       if (!alle.length || jahre.length < 2) return;
       var max = Math.max.apply(null, alle), min = Math.min(0, Math.min.apply(null, alle));
+      if (o.min != null) min = Math.min(o.min, Math.min.apply(null, alle));
+      if (o.schwellen) o.schwellen.forEach(function (s) { if (s.wert > max) max = s.wert; if (s.wert < min) min = s.wert; });
       var sp = max - min || 1;
       function px(i) { return bx + (bw * i) / (jahre.length - 1); }
       function py(v) { return by + bh - ((v - min) / sp) * bh; }
@@ -733,11 +805,22 @@
         var wert = min + (sp * t) / 4, yy = py(wert);
         doc.line(bx, yy, bx + bw, yy);
         doc.setFont('helvetica', 'normal'); doc.setFontSize(6.4); doc.setTextColor(140);
-        doc.text(fmt(Math.round(wert / 1000)) + ' T€', bx - 2, yy + 1.6, { align: 'right' });   /* v2461: deutsch statt „k" */
+        doc.text(o.fmt ? o.fmt(wert) : fmt(Math.round(wert / 1000)) + ' T€', bx - 2, yy + 1.6, { align: 'right' });   /* v2461: deutsch statt „k" · v2830: o.fmt */
       }
       /* MARKER_V1469 · gemessen: liegen zwei Linien am Ende aufeinander (ohne
          Darlehen sind Objektwert und Eigenkapital gleich), druckten sich die
          beiden Endwerte uebereinander. Belegte Hoehen merken und ausweichen. */
+      /* v2830 · Schwellen (DSCR 1,2 / 1,0, LTV-Grenzen) als feine Strichlinien */
+      (o.schwellen || []).forEach(function (s) {
+        var c = s.farbe || [150, 145, 135], sy = py(s.wert);
+        doc.setDrawColor(c[0], c[1], c[2]); doc.setLineWidth(0.25);
+        try { doc.setLineDashPattern([0.8, 0.8], 0); } catch (e) {}
+        doc.line(bx, sy, bx + bw, sy);
+        try { doc.setLineDashPattern([], 0); } catch (e) {}
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6); doc.setTextColor(c[0], c[1], c[2]);
+        doc.text(s.text, bx + 1, sy - 0.8);
+      });
+      doc.setLineWidth(0.2);
       var belegt = [];
       reihen.forEach(function (r) {
         var f = r.gold ? GD : (r.grau ? [150, 145, 135] : [40, 40, 40]);
@@ -756,7 +839,7 @@
           while (belegt.some(function (v) { return Math.abs(v - ly) < 3.2; })) ly += 3.4;
           belegt.push(ly);
           doc.setFont('helvetica', 'bold'); doc.setFontSize(6.6); doc.setTextColor(f[0], f[1], f[2]);
-          doc.text(fmt(Math.round(letzte / 1000)) + ' T€', bx + bw + 1.5, ly);
+          doc.text(o.fmt ? o.fmt(letzte) : fmt(Math.round(letzte / 1000)) + ' T€', bx + bw + 1.5, ly);
         }
       });
       doc.setLineWidth(0.2);
@@ -811,7 +894,14 @@
     /* ── Seite 1 ─────────────────────────────────────────────── */
     kopf('Investment Case', (adr || 'Objekt ohne Anschrift') + ' · Finanzierungsunterlage · Stand ' + heute());
 
-    if (fotos.length) { bild(fotos[0], L, y, CW, CW / 2.5, true); y += CW / 2.5 + 6; }
+    /* v2830 · Titelbild: Zuschnitt nur so weit, wie das Foto es traegt -
+       ein Hochformat wurde auf 2,5 : 1 geschnitten und zeigte einen Streifen.
+       Abgeschnitten wird hoechstens ein Drittel der Hoehe (Ziel 2,5 : 1),
+       Hoehe hoechstens 74 mm, mittig - wie das Deckblatt des Investment-PDFs. */
+    if (fotos.length) {
+      var _r0 = fotos[0].w / fotos[0].h, _fr = _r0 < 2.5 ? Math.min(2.5, _r0 / 0.65) : 2.5, _fh = Math.min(74, CW / _fr), _fw = _fh * _fr;
+      bild(fotos[0], L + (CW - _fw) / 2, y, _fw, _fh, true); y += _fh + 6;
+    }
 
     abschnitt('Objekt');
     zeile('Anschrift', adr || '-');
@@ -867,6 +957,16 @@
     var bindEl = el('r-bindend');
     if (bindEl && bindEl.textContent.trim() && bindEl.textContent.trim() !== '-') zeile('Zinsbindung bis', bindEl.textContent.trim());
     zeile('Restschuld am Ende der Zinsbindung', eur(S.rs));
+    /* v2830 · aus dem Investment-PDF: Finanzierungsstruktur in einem Satz und der
+       Wertpuffer gegen einen angegebenen Verkehrswert (dieselben Felder wie pdf.js). */
+    var _strukt = aussetzung ? (d2an ? 'Tilgungsaussetzung + Bausparvertrag + Zusatzdarlehen' : 'Tilgungsaussetzung mit Bausparvertrag')
+      : (d2an ? 'Annuitätendarlehen + Zusatzdarlehen' : 'Annuitätendarlehen (Zins und Tilgung)');
+    zeile('Finanzierungsstruktur', _strukt, { klein: true });
+    var _svw = num('svwert');
+    if (_svw) {
+      zeile('Verkehrswert (Angabe, § 194 BauGB)', eur(_svw));
+      zeile('Sofortiger Wertpuffer gegenüber dem Kaufpreis', (da(K.wp_kpi) !== null && K.wp_kpi > 0 ? '+ ' : '') + eur(K.wp_kpi), { fett: true });
+    }
     y += 1;
 
     /* Bausparvertrag - nur beim Tilgungsaussetzungsdarlehen. */
@@ -1122,6 +1222,26 @@
           { titel: 'Kennzahlen je Phase' });
       }
 
+      /* v2830 · Rendite und Vermögen je Phase - im Investment-PDF Teil des
+         Kennzahlen-Vergleichs (State.phaseTable, calc.js), hier fehlten sie. */
+      var PT = S.phaseTable;
+      if (PT && PT.now && PT.ezb && PT.an) {
+        platz(50);
+        abschnitt('Rendite und Vermögen je Phase');
+        var ptz = function (f, g) { return [PT.now, PT.ezb, PT.an].map(function (p) { return g(p[f]); }); };
+        tabelle(
+          [['', 46], ['Heute', 26], ['Ende Zinsbindung', 30], ['Anschluss', 26]],
+          [
+            { werte: ['Bruttomietrendite'].concat(ptz('bmy', function (v) { return pct(v, 2); })) },
+            { werte: ['Nettomietrendite'].concat(ptz('nmy', function (v) { return pct(v, 2); })) },
+            { werte: ['Beleihungsauslauf (LTV)'].concat(ptz('ltv', function (v) { return pct(v, 1); })) },
+            { werte: ['Restschuld'].concat(ptz('rs', function (v) { return eur(v); })) },
+            { werte: ['Immobilienwert (angenommen)'].concat(ptz('wert', function (v) { return eur(v); })) },
+            { werte: ['Eigenkapital im Objekt'].concat(ptz('eq', function (v) { return eur(v); })), fett: true }
+          ],
+          { titel: 'Rendite und Vermögen je Phase', hinweis: 'Immobilienwert: fortgeschrieben mit der angenommenen Wertsteigerung, keine Bewertung.' });
+      }
+
       platz(44, 'Zinsänderungsrisiko', 'Was passiert, wenn die Zinsbindung endet');
       abschnitt('Zinsänderungsrisiko');
       zeile('Zinsbindung', bindj !== null ? fmt(bindj) + ' Jahre' : '-');
@@ -1136,13 +1256,17 @@
     }
 
     /* ── Cashflow-Jahre ──────────────────────────────────────── */
-    platz(52, 'Cashflow-Entwicklung', (adr || 'Objekt') + ' · die ersten ' + Math.min(10, rows.length || 0) + ' Jahre');
+    /* v2830 · ALLE Jahre (das Investment-PDF zeigt den ganzen Betrachtungs-
+       zeitraum, hier standen nur zehn) und dazu Steuer und Cashflow nach
+       Steuern je Jahr - dieselben Felder wie die Projektion in pdf.js. */
+    var _bsvJ = rows.some(function (r) { return (r.bspar_y || 0) > 0; });
+    platz(52, 'Cashflow-Entwicklung', (adr || 'Objekt') + ' · ' + (rows.length || 0) + ' Jahre');
     abschnitt('Cashflow je Jahr');
-    var sp = [['Jahr', 16], ['Kaltmiete', 24], ['Bewirtsch.', 22], ['Zins', 22], ['Tilgung', 22], ['CF v. St.', 24], ['Restschuld', 26], ['LTV', 16]];
+    var sp = [['Jahr', 13], ['Kaltmiete', 20], ['Bewirtsch.', 19], ['Zins', 19], [_bsvJ ? 'Bausparr.' : 'Tilgung', 19], ['CF v. St.', 19], ['Steuer', 17], ['CF n. St.', 19], ['Restschuld', 22], ['LTV', 13]];
     var fak = CW / sp.reduce(function (a, s) { return a + s[1]; }, 0);
     function tabZeile(werte, fett, kopfzeile) {
       var x = L;
-      doc.setFont('helvetica', (fett || kopfzeile) ? 'bold' : 'normal'); doc.setFontSize(kopfzeile ? 7.4 : 8.4);
+      doc.setFont('helvetica', (fett || kopfzeile) ? 'bold' : 'normal'); doc.setFontSize(kopfzeile ? 7.2 : 7.8);
       doc.setTextColor(kopfzeile ? 110 : 40);
       werte.forEach(function (w, i) {
         var bw = sp[i][1] * fak;
@@ -1158,12 +1282,16 @@
       doc.text('Keine Jahreswerte vorhanden - bitte Objekt vollständig erfassen.', L, y); y += 8;
     } else {
       tabZeile(sp.map(function (s) { return s[0]; }), false, true);
-      rows.slice(0, 10).forEach(function (r) {
-        tabZeile([r.cal || r.y, fmt(r.nkm_y), fmt(r.bwk_y), fmt(r.zy), fmt(r.ty), fmt(r.cfop_y), fmt(r.rs), pct(r.ltv_y, 1)]);
+      rows.forEach(function (r) {
+        if (y > H - 30) { doc.addPage(); kopf('Cashflow-Entwicklung', 'Fortsetzung'); tabZeile(sp.map(function (s) { return s[0]; }), false, true); }
+        /* Steuer: tax_y > 0 ist eine Belastung - gezeigt mit Vorzeichen der Kasse (wie pdf.js) */
+        var st = da(r.tax_y) === null ? null : -r.tax_y;
+        tabZeile([r.cal || r.y, fmt(r.nkm_y), fmt(r.bwk_cf_y != null ? r.bwk_cf_y : r.bwk_y), fmt(r.zy), fmt(_bsvJ ? r.bspar_y : r.ty), fmt(r.cfop_y),
+          st === null ? '-' : (st > 0.5 ? '+' : '') + fmt(st), fmt(r.cfns_y), fmt(r.rs), pct(r.ltv_y, 0)]);
       });
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(130);
-      doc.text('Beträge in Euro je Jahr. CF v. St. = Cashflow vor Steuern (Kaltmiete - Bewirtschaftung - Zins - Tilgung).', L, y + 1);
-      y += 10;
+      y += 1;
+      absatz('Beträge in Euro je Jahr. CF v. St. = Kaltmiete - Bewirtschaftung - Zins - ' + (_bsvJ ? 'Bausparrate' : 'Tilgung') + '. Steuer: + Erstattung, - Belastung. CF n. St. = CF v. St. + Steuer.', { groesse: 7, farbe: 130, zeile: 3.5, links: true });
+      y += 5;
     }
 
     /* ── Vermögensaufbau ─────────────────────────────────────── */
@@ -1338,6 +1466,27 @@
       y += 6;
     }
 
+    /* ── v2830 · Wert & Zielbild ─────────────────────────────────
+       Werte je Verfahren aus dem letzten Marktbericht (wie die Pilot-Analyse,
+       wertvergleich.js) und Ist / Soll / Zielbild. Ohne Daten entfaellt der
+       Abschnitt still (DpPdfWertZielbild). */
+    var WZ = null;
+    try { if (window.DpPdfWertZielbild) WZ = await window.DpPdfWertZielbild.daten({ potenzial: PD }); } catch (e) { WZ = null; }
+    if (WZ) {
+      _titel = 'Wert & Zielbild'; _unter = (adr || 'Objekt') + ' · Werte je Verfahren';
+      doc.addPage(); kopf(_titel, _unter);
+      abschnitt('Wert & Zielbild');
+      einleitung('Was das Objekt nach den Verfahren der Immobilienwertermittlung wert ist, im Vergleich zum Kaufpreis - und wohin sich der Ertragswert mit Mieterhöhung und Zielbild entwickelt.');
+      y = window.DpPdfWertZielbild.zeichne(doc, WZ, {
+        x: L, y: y, breite: CW, unten: TEXT_UNTEN, stil: 'bank',
+        neueSeite: function () { doc.addPage(); kopf(_titel, 'Fortsetzung'); return y; },
+        ueberschrift: function (t, yy) { y = yy; abschnitt(t); return y; },
+        f: { gold: G, goldD: GD, goldL: [Math.round(G[0] + (255 - G[0]) * 0.62), Math.round(G[1] + (255 - G[1]) * 0.62), Math.round(G[2] + (255 - G[2]) * 0.62)],
+          tinte: [26, 26, 26], text: [60, 60, 60], grau: [130, 130, 130], linie: [236, 232, 223] }
+      });
+      y += 4;
+    }
+
     /* ── Exit und Vermögenszuwachs ───────────────────────────── */
     var letzteZeile = rows.length ? rows[rows.length - 1] : null;
     if (da(K.exit_vkp) !== null || da(S.wert_basis) !== null) {
@@ -1384,39 +1533,113 @@
            setzt proportional ein, also wird die BREITE mitgezogen - sonst
            bliebe im Rahmen wieder Luft. */
         if (dh > 74) { dbw = dw * 74 / dh; dh = 74; }
-        platz(dh + 15);
+        /* v2830 · Aussage und Kennzahlen der Karte (wie im Investment-PDF):
+           die Ueberschrift der Karte als Satz, darunter ihre Fusskacheln. */
+        var K2 = karte(d.bild.id);
+        platz(dh + 15 + (K2 && K2.fuss.length ? 22 : 0) + (K2 && K2.titel ? 5 : 0));
         doc.setFont('helvetica', 'bold'); doc.setFontSize(8.6); doc.setTextColor(110);
         doc.text(d.titel, L, y + 3.8);
-        bild(d.bild, L + (dw - dbw) / 2, y + 5.8, dbw, dh);
-        y += dh + 15;
+        var _dy = 0;
+        if (K2 && K2.titel) { doc.setFont('helvetica', 'normal'); doc.setFontSize(8.4); doc.setTextColor(40); doc.text(doc.splitTextToSize(K2.titel, CW)[0], L, y + 8.2); _dy = 4.6; }
+        bild(d.bild, L + (dw - dbw) / 2, y + 5.8 + _dy, dbw, dh);
+        y += dh + 9 + _dy;
+        if (K2 && K2.fuss.length) kachelReihe(K2.fuss);
+        y += 4;
       });
       y += 2;
     }
+
+    /* v2830 · Bank-Cockpit: DSCR und LTV im Verlauf. Das Investment-PDF zeichnet
+       es nativ aus BankCharts._lastCockpitData (die SVG-Fassung ist nur ein
+       Balken ohne Beschriftung, v1733) - hier dieselben Reihen als Kurven. */
+    (function () {
+      var CD = window.BankCharts && window.BankCharts._lastCockpitData;
+      if ((!CD || !CD.dscrArr) && window.BankCharts && typeof window.BankCharts.renderBankCockpit === 'function') {
+        var tmp = document.createElement('div'); tmp.style.cssText = 'position:fixed;left:-3000px;top:0;width:640px;height:340px';
+        document.body.appendChild(tmp);
+        try { window.BankCharts.renderBankCockpit(tmp, window.State); } catch (e) {}
+        tmp.remove();
+        CD = window.BankCharts._lastCockpitData;
+      }
+      if (!CD || !CD.dscrArr || !CD.ltvArr || CD.dscrArr.length < 2) return;
+      var jj = CD.years || rows.map(function (r) { return r.cal || r.y; });
+      var sw = window.DealPilotSchwellen ? DealPilotSchwellen.get() : { dscrGruen: 1.2, dscrGelb: 1.0 };
+      var dez = function (v, n) { return Number(v).toLocaleString('de-DE', { minimumFractionDigits: n, maximumFractionDigits: n }); };
+      platz(150, 'Bank-Cockpit', (adr || 'Objekt') + ' · DSCR und LTV im Verlauf');
+      abschnitt('Schuldendienstdeckung (DSCR) im Verlauf');
+      kachelReihe([['DSCR heute', dez(CD.dscrToday, 2), ''], ['DSCR Ende Zinsbindung', dez(CD.dscrEzb, 2), CD.bindj ? 'Jahr ' + CD.bindj : ''], ['DSCR Ende', dez(CD.dscrEnd, 2), 'Betrachtungsende']]);
+      y += 3;
+      kurve([{ name: 'DSCR', werte: CD.dscrArr.map(Number), gold: true }], jj,
+        { hoehe: 34, min: 0, fmt: function (v) { return dez(v, 2); }, schwellen: [
+          { wert: sw.dscrGruen, text: 'solide ab ' + dez(sw.dscrGruen, 2), farbe: [63, 165, 108] },
+          { wert: sw.dscrGelb, text: 'Deckung ' + dez(sw.dscrGelb, 2), farbe: [184, 98, 92] }] });
+      platz(70);
+      abschnitt('Beleihungsauslauf (LTV) im Verlauf');
+      kachelReihe([['LTV heute', pct(CD.ltvToday, 1), ''], ['LTV Ende Zinsbindung', pct(CD.ltvEzb, 1), CD.bindj ? 'Jahr ' + CD.bindj : ''], ['LTV Ende', pct(CD.ltvEnd, 1), 'Betrachtungsende']]);
+      y += 3;
+      kurve([{ name: 'LTV in %', werte: CD.ltvArr.map(Number) }], jj,
+        { hoehe: 34, min: 0, fmt: function (v) { return dez(v, 0) + ' %'; } });
+    })();
 
     /* ── KI-Analyse, wenn vorhanden ──────────────────────────── */
     var ai = window._aiAnalysis || null, aiText = window._aiText || '';
     if (ai || aiText) {
       platz(60, 'Pilot-Analyse', (adr || 'Objekt'));
       abschnitt('Pilot-Analyse');   /* v2555a: Produktname statt KI-Investment-Analyse */
+      /* v2830 · die Abschnitte der Pilot-Analyse wie im Investment-PDF
+         (pdf.js _renderAiJsonInPdf), mit denselben Haken „Bausteine im PDF"
+         (_dpPdfSectionOn). Bisher standen hier nur Empfehlung, Offerte,
+         Stärken und Risiken - Gesamtbewertung und Bankargumente fehlten in
+         der Fassung, die an die Bank geht. */
+      var an = function (t) { try { return typeof window._dpPdfSectionOn !== 'function' || window._dpPdfSectionOn(t); } catch (e) { return true; } };
+      var klar = function (t) { return sauber(String(t == null ? '' : t).replace(/\*+/g, '')); };
+      function kopfzeile(t) {
+        if (y > TEXT_UNTEN - 14) { doc.addPage(); kopf(_titel, _unter || 'Fortsetzung'); }
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(8.8); doc.setTextColor(26, 26, 26);
+        doc.text(t, L, y); y += 5;
+      }
+      function block(titel, text) {
+        if (!text || !an(titel)) return;
+        kopfzeile(titel);
+        String(text).split(/\n+/).forEach(function (p) { p = klar(p); if (p) { absatz(p, { groesse: 8.4, farbe: 60, zeile: 4.4 }); y += 1.6; } });
+        y += 2;
+      }
       function liste(titel, arr) {
-        if (!arr || !arr.length) return;
-        zeile(titel, '', { fett: true });
-        arr.slice(0, 6).forEach(function (t) {
-          absatz('· ' + String(t).replace(/\s+/g, ' '), { x: L + 3, breite: CW - 4, groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
-        });
+        if (!arr || !arr.length || !an(titel)) return;
+        kopfzeile(titel);
+        arr.slice(0, 8).forEach(function (t) { punkt(klar(t), { groesse: 8.4, farbe: 60, zeile: 4.4 }); });
         y += 2;
       }
       if (ai) {
-        if (ai.empfehlung || ai.recommendation) zeile('Empfehlung', sauber(ai.empfehlung || ai.recommendation).slice(0, 60), { summe: true });
-        var offerte = ai.kaufpreis_offerte || ai.offerte || ai.kaufpreisempfehlung;
+        if ((ai.empfehlung || ai.recommendation) && an('Empfehlung')) zeile('Empfehlung', sauber(ai.empfehlung || ai.recommendation).slice(0, 60), { summe: true });
+        var offerte = ai.kaufpreis_offerte || ai.offerte || ai.kaufpreisempfehlung, offBeg = null;
         /* v2461 · die KI liefert die Offerte als Objekt {empfohlen, begruendung,
            argumente} - gemessen stand im PDF „[object Object]". */
-        if (offerte && typeof offerte === 'object') offerte = offerte.empfohlen || offerte.betrag || offerte.wert || null;
-        if (offerte) zeile('Vorgeschlagene Kaufpreis-Offerte', typeof offerte === 'number' ? eur(offerte) : sauber(offerte).slice(0, 60));
+        if (offerte && typeof offerte === 'object') { offBeg = offerte.begruendung || null; offerte = offerte.empfohlen || offerte.betrag || offerte.wert || null; }
+        if (offerte && an('Kaufpreis-Offerte')) zeile('Vorgeschlagene Kaufpreis-Offerte', typeof offerte === 'number' ? eur(offerte) : sauber(offerte).slice(0, 60));
+        y += 2;
+        block('Gesamtbewertung', ai.gesamtbewertung || ai.fazit_kurz);
         liste('Stärken', ai.staerken || ai.strengths);
         liste('Risiken', ai.risiken || ai.schwaechen || ai.risks);
+        if (ai.risikoanalyse && typeof ai.risikoanalyse === 'object') {
+          var ra = ai.risikoanalyse;
+          liste('Risikoanalyse', [ra.finanzierungsrisiko ? 'Finanzierungsrisiko: ' + ra.finanzierungsrisiko : null,
+            ra.cashflow_stabilitaet ? 'Cashflow-Stabilität: ' + ra.cashflow_stabilitaet : null,
+            ra.annahmen_abhaengigkeit ? 'Abhängigkeit von Annahmen: ' + ra.annahmen_abhaengigkeit : null].filter(Boolean));
+        }
+        liste('Bankargumente', ai.bankargumente);
+        block('Anschlussfinanzierung', ai.anschlussfinanzierung);
+        (function () {
+          var t = [];
+          if (ai.makrolage_recherche) t.push('Makrolage: ' + ai.makrolage_recherche);
+          if (ai.mikrolage_recherche) t.push('Mikrolage: ' + ai.mikrolage_recherche);
+          if (ai.kaufpreisniveau) t.push('Kaufpreisniveau: ' + ai.kaufpreisniveau);
+          block('Lage & Markt', t.join('\n'));
+        })();
+        if (offBeg) block('Kaufpreis-Offerte', offBeg);
+        if (ai.empfehlung_begruendung) block('Empfehlung', ai.empfehlung_begruendung);
         if (ai.fazit || ai.summary) {
-          absatz(String(ai.fazit || ai.summary).replace(/\s+/g, ' '), { groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
+          absatz(klar(ai.fazit || ai.summary), { groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
         }
       } else {
         absatz(String(aiText).replace(/\s+/g, ' ').slice(0, 2400), { groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
@@ -1503,6 +1726,40 @@
           return { werte: [r.cal || r.y, eur(r.wert_y), eur(r.rs), eur(r.eq_y), eur((r.eq_y || 0) - ekStart)] };
         }),
         { titel: 'Vermögenszuwachs im Detail', hinweis: 'Eigenkapital im Objekt = angenommener Wert minus Restschuld. Der Wert ist eine Annahme, keine Bewertung.' });
+
+      /* v2830 · woraus der Zuwachs besteht - dieselben vier Bausteine wie im
+         Investment-PDF (State._vz, calc.js) und die kumulierten Jahreswerte
+         (Summen der Zeilen oben, nichts neu gerechnet). */
+      var VZ = S._vz || {};
+      if (da(VZ.verm_zuwachs) !== null) {
+        var nJ = rows.length;
+        platz(46, 'Vermögenszuwachs im Detail', (adr || 'Objekt'));
+        abschnitt('Woraus der Vermögenszuwachs besteht (' + nJ + ' Jahre)');
+        zeile('Tilgung aus den Mieteinnahmen (Schuldenabbau)', eur(VZ.tilg_durch_einnahmen));
+        zeile('Cashflow-Überschuss nach Tilgung und Steuern', eur(VZ.cf_ueberschuss_konto));
+        zeile((VZ.steuervorteil || 0) < 0 ? 'Steuerlast (kumuliert)' : 'Steuervorteil (kumuliert)', eur(VZ.steuervorteil));
+        zeile('Wertsteigerung (Annahme ' + (num('wertstg') !== null ? pct(num('wertstg'), 1) : '-') + ' p. a.)', eur(VZ.wertsteig_kum));
+        zeile('Vermögenszuwachs gesamt', eur(VZ.verm_zuwachs), { summe: true });
+        var sm = function (f) { return rows.reduce(function (a, r) { return a + (Number(r[f]) || 0); }, 0); };
+        platz(52);
+        abschnitt('Wie der Cashflow-Überschuss entsteht');
+        zeile('Kumulierte Mieteinnahmen (Kaltmiete)', eur(sm('nkm_y')));
+        zeile('abzüglich Bewirtschaftung (nicht umlagefähig)', '- ' + eur(sm('bwk_cf_y')), { einzug: true });
+        zeile('abzüglich Zinsen', '- ' + eur(sm('zy')), { einzug: true });
+        zeile('abzüglich Tilgung', '- ' + eur(sm('ty')), { einzug: true });
+        if (sm('bspar_y') > 0) zeile('abzüglich Bausparraten', '- ' + eur(sm('bspar_y')), { einzug: true });
+        var stK = -sm('tax_y');
+        zeile('Steuern kumuliert (Erstattung +, Belastung -)', (stK > 0.5 ? '+ ' : (stK < -0.5 ? '- ' : '')) + eur(Math.abs(stK)), { einzug: true });
+        zeile('Cashflow-Überschuss nach Tilgung und Steuern', eur(VZ.cf_ueberschuss_konto), { summe: true });
+        if (da(S.wert_basis) !== null && rows.length) {
+          platz(34);
+          abschnitt('Wie die Wertsteigerung angesetzt ist');
+          zeile('Wert-Anker heute', eur(S.wert_basis));
+          zeile('Angenommene Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '-');
+          zeile('Angenommener Wert nach ' + nJ + ' Jahren', eur(rows[rows.length - 1].wert_y));
+          zeile('Wertsteigerung', eur(VZ.wertsteig_kum), { summe: true });
+        }
+      }
     }
 
     /* MARKER_V1468 · Fehlen Diagramme, Vermoegensaufbau und Belastungsprobe,
@@ -1541,6 +1798,7 @@
     zeile('AfA-Satz Gebäude', num('afa_satz') !== null ? pct(num('afa_satz'), 2) : (txt('afa_satz') || '-'));
     zeile('Grunderwerbsteuer (Land)', num('gest_p') !== null ? pct(num('gest_p'), 2) : '-');
     if (num('exit_bmy') !== null) zeile('Exit-Rendite (Verkaufsszenario)', pct(num('exit_bmy'), 1));
+    if (da(S.wert_basis) !== null && S.wert_basis !== kp) zeile('Wert-Anker der Wertsteigerung', (num('svwert') ? 'Verkehrswert' : 'Bankbewertung') + '  ·  ' + eur(S.wert_basis));   /* v2830 */
     if (K.d1IsAussetzung) zeile('Darlehenstyp', 'Tilgungsaussetzung mit Bausparvertrag');
     if (num('bspar_rate')) zeile('Bausparrate / Monat', eur(num('bspar_rate')));
     y += 2;

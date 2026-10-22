@@ -418,6 +418,39 @@ function drawPhotoFit(doc, photoMeta, containerX, containerY, containerW, contai
 }
 
 
+/* v2830 · ZUSCHNITT STATT RAHMEN
+   Marcel 22.10.2026: „Im PDF im hellen Modus ist bei dem eingefügten Bild
+   links und rechts ein schwarzer Rahmen." Gemessen (Westerfeldstr. 140,
+   Hochformat 0,75): drawPhotoFit setzte das Foto proportional in den
+   Rahmen 180 x 58 mm (3,1 : 1) und füllte den Rest mit [30, 27, 27] -
+   auf dem dunklen Deckblatt unsichtbar, auf dem hellen zwei schwarze
+   Balken von je 54 mm.
+   Jetzt: das Foto wird auf ein Verhältnis ZWISCHEN seinem eigenen und dem
+   des Rahmens zugeschnitten (nie verzerrt, senkrecht bei 40 % - oben steht
+   das Haus), und der Rest bleibt Papier. Eine Füllung gibt es nur noch auf
+   dunklem Grund. */
+/* verlust: hoechstens dieser Anteil der Hoehe bzw. Breite wird abgeschnitten */
+function _fotoZuschnitt(meta, ziel, verlust) {
+  return new Promise(function (fertig) {
+    if (!meta || !meta.src || !meta.ratio) return fertig(meta);
+    var zr = (meta.ratio < ziel) ? Math.min(ziel, meta.ratio / (1 - verlust)) : Math.max(ziel, meta.ratio * (1 - verlust));
+    if (Math.abs(zr - meta.ratio) < 0.01) return fertig(meta);
+    var im = new Image();
+    im.onload = function () {
+      try {
+        var w = im.naturalWidth, h = im.naturalHeight, sw = w, sh = h;
+        if (w / h > zr) sw = Math.round(h * zr); else sh = Math.round(w / zr);
+        var c = document.createElement('canvas'); c.width = sw; c.height = sh;
+        var ctx = c.getContext('2d'); ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(im, (w - sw) / 2, (h - sh) * 0.4, sw, sh, 0, 0, sw, sh);
+        fertig({ src: c.toDataURL('image/jpeg', 0.86), w: sw, h: sh, ratio: sw / sh, resampled: true });
+      } catch (e) { fertig(meta); }
+    };
+    im.onerror = function () { fertig(meta); };
+    im.src = meta.src;
+  });
+}
+
 // Capture a canvas chart as PNG dataURL for embedding in PDF
 function captureChart(canvasId) {
   var canvas = document.getElementById(canvasId);
@@ -869,7 +902,17 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
       if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.35);
       if (isDarkBg) doc.setTextColor(245, 245, 240); else doc.setTextColor(45, 42, 42);
       var textY = cy + KOPF;
-      teil.forEach(function (line) { doc.text(line, M + 6, textY); textY += LINE_H; });
+      /* v2830 · Blocksatz: Zeilen sind {t, ende, punkt, einzug}; die letzte
+         Zeile eines Absatzes bleibt linksbuendig (DpPdfBlocksatz). */
+      teil.forEach(function (line) {
+        if (typeof line === 'string') { if (line) doc.text(line, M + 6, textY); }
+        else if (line.t) {
+          if (line.punkt) doc.text('\u2022', M + 6, textY);
+          var lx = M + 6 + (line.einzug || 0), lb = (line.breite || (CW - 24)) - (line.einzug || 0);
+          if (window.DpPdfBlocksatz) window.DpPdfBlocksatz.zeile(doc, line, lx, textY, lb, true); else doc.text(line.t, lx, textY);
+        }
+        textY += LINE_H;
+      });
       if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.15);
       i += teil.length; erst = false;
       if (i < lines.length) cy = newPage('Pilot-Analyse'); else cy += h + 4;
@@ -888,8 +931,11 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
       var hardLines = p.split(/\n/);
       hardLines.forEach(function(hl) {
         if (!hl.trim()) { allLines.push(''); return; }
-        var wrapped = doc.splitTextToSize(hl, maxW);
-        wrapped.forEach(function(w) { allLines.push(w); });
+        /* v2830 · eine Zeile, die mit einem Aufzaehlungszeichen beginnt, bekommt
+           einen haengenden Einzug; jede Zeile traegt, ob sie den Absatz beendet */
+        var m = /^\s*[\u2022\u00b7-]\s+/.exec(hl), ein = m ? 4 : 0;
+        var wrapped = doc.splitTextToSize(m ? hl.slice(m[0].length) : hl.trim(), maxW - ein);
+        wrapped.forEach(function(w, j) { allLines.push({ t: String(w).trim(), ende: j === wrapped.length - 1, punkt: !!m && j === 0, einzug: ein, breite: maxW }); });
       });
     });
     return allLines;
@@ -920,9 +966,10 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     items.forEach(function(it) {
       var line = clean(it);
       if (!line) return;
-      var wrapped = doc.splitTextToSize(line, TEXT_W);
+      /* v2830 · haengender Einzug und Blocksatz statt eingerueckter Leerzeichen */
+      var wrapped = doc.splitTextToSize(line, TEXT_W - 4);
       wrapped.forEach(function(w, idx) {
-        rendered.push((idx === 0 ? '\u2022  ' : '   ') + w);
+        rendered.push({ t: String(w).trim(), ende: idx === wrapped.length - 1, punkt: idx === 0, einzug: 4, breite: TEXT_W });
       });
     });
     _zeichneBlock(title, rendered, accentColor, false);   /* v2555 */
@@ -1172,7 +1219,12 @@ async function _exportPDFInner() {
   cy = 127;
   if (_PHOTO_META.length > 0) {
     var containerH = 58;
-    drawPhotoFit(doc, _PHOTO_META[0], M, cy, CW, containerH, [30, 27, 27]);
+    /* v2830 · zuschneiden statt Rahmen (siehe _fotoZuschnitt): hoechstens bis
+       ein Drittel der Hoehe, die Seiten bleiben Papier bzw. Deckblattgrund. */
+    var _tf = await _fotoZuschnitt(_PHOTO_META[0], CW / containerH, 0.35);
+    var _tw = Math.min(CW, containerH * _tf.ratio), _th = _tw / _tf.ratio;
+    drawPhotoFit(doc, _tf, M + (CW - _tw) / 2, cy + (containerH - _th) / 2, _tw, _th, null);
+    if (window._dpPdfLight) { doc.setDrawColor.apply(doc, C.BORDER); doc.setLineWidth(0.25); doc.rect(M + (CW - _tw) / 2, cy + (containerH - _th) / 2, _tw, _th); }
     cy += containerH + 3;
   } else { cy += 2; }
 
@@ -1235,19 +1287,26 @@ async function _exportPDFInner() {
     var gap = 4;
     var cellW = (CW - gap * (cols - 1)) / cols;
     var cellH = 75; // jedes Feld 75mm hoch
-    photos.forEach(function(pm, i) {
+    /* v2830 · Galerie: Zuschnitt auf die Zelle (hoechstens ein Viertel),
+       im hellen Modus ohne dunkle Fuellung und mit heller Bildzeile. */
+    var _gal = [];
+    for (var _gi = 0; _gi < photos.length; _gi++) _gal.push(await _fotoZuschnitt(photos[_gi], cellW / cellH, 0.25));
+    _gal.forEach(function(pm, i) {
       var col = i % cols, row = Math.floor(i / cols);
       var x = M + col * (cellW + gap);
       var y = cy + row * (cellH + gap);
       // Check if we need a new page
       if (y + cellH > 275) return; // skip if would overflow
-      drawPhotoFit(doc, pm, x, y, cellW, cellH, [30, 27, 27]);
-      // Bildunterschrift
-      doc.setFillColor(30, 27, 27);
-      doc.rect(x, y + cellH - 6, cellW, 6, 'F');
+      var hell = !!window._dpPdfLight;
+      var pw = Math.min(cellW, cellH * pm.ratio), ph = pw / pm.ratio, px = x + (cellW - pw) / 2, py = y + (cellH - ph) / 2;
+      drawPhotoFit(doc, pm, x, y, cellW, cellH, hell ? null : [30, 27, 27]);
+      // Bildunterschrift - auf der Bildbreite, nicht auf der Zelle
+      doc.setFillColor.apply(doc, hell ? C.SURF2 : [30, 27, 27]);
+      doc.rect(px, py + ph - 6, pw, 6, 'F');
       doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
-      doc.setTextColor.apply(doc, C.GOLD);
-      doc.text('Foto ' + (i + 1), x + 3, y + cellH - 1.8);
+      doc.setTextColor.apply(doc, hell ? C.CH : C.GOLD);
+      doc.text('Foto ' + (i + 1), px + 3, py + ph - 1.8);
+      if (hell) { doc.setDrawColor.apply(doc, C.BORDER); doc.setLineWidth(0.25); doc.rect(px, py, pw, ph); }
     });
   }
 
@@ -1365,8 +1424,12 @@ async function _exportPDFInner() {
     ['Wertpuffer / Equity',  pE(K.wp_kpi, true)],
     ['AfA / Jahr',           pE(K.afa)],
     ['Zu versteuernder CF',  pE(K.zve_immo, true)],
-    ['Zinsrisiko / Mon.',    pE(K.zaer_m) + ' \u20ac']
-  ], [4, 5]);
+    ['Zinsrisiko / Mon.',    pE(K.zaer_m) + ' \u20ac'],
+    /* v2830 · aus der Bankfassung: interner Zinsfuss und Deal Score (Rechenkern
+       DealScore.computeFromKpis, wie dort) */
+    ['Interner Zinsfu\u00df (IRR)', (K.irr != null && isFinite(K.irr)) ? pP(K.irr, 2) : 'nicht bestimmbar'],
+    ['Deal Score', (function () { try { var sc = window.DealScore && DealScore.computeFromKpis(K); return sc && sc.score ? Math.round(sc.score) + ' / 100' + (sc.label ? ' \u00b7 ' + sc.label : '') : '-'; } catch (e) { return '-'; } })()]
+  ], [4, 5, 12]);
   setPdfProgress(35);
 
   /* ══════════════════════════════════════════════════
@@ -1512,8 +1575,9 @@ async function _exportPDFInner() {
     doc.setFillColor.apply(doc, C.SURF2);
     doc.roundedRect(M, cy, CW, 11, 1.5, 1.5, 'F');
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor.apply(doc, C.MID);
-    doc.text('Bei Tilgungsaussetzung wird das Hauptdarlehen \u00fcber den Bausparvertrag abgel\u00f6st. Die Bausparrate ist als Liquidit\u00e4tsabfluss im CF enthalten, aber kein Werbungskostenabzug.',
-             M + 5, cy + 7, { maxWidth: CW - 10 });
+    var _bsH = 'Bei Tilgungsaussetzung wird das Hauptdarlehen \u00fcber den Bausparvertrag abgel\u00f6st. Die Bausparrate ist als Liquidit\u00e4tsabfluss im CF enthalten, aber kein Werbungskostenabzug.';
+    if (window.DpPdfBlocksatz) window.DpPdfBlocksatz.absatz(doc, _bsH, { x: M + 5, y: cy + 4.6, breite: CW - 10, zeile: 3.6 });   /* v2830 */
+    else doc.text(_bsH, M + 5, cy + 7, { maxWidth: CW - 10 });
     cy += 14;
   }
 
@@ -1567,8 +1631,9 @@ async function _exportPDFInner() {
       doc.splitTextToSize('Die mit (gesch\u00e4tzt) bezeichneten Posten hat DealPilot angesetzt, '
         + 'weil dazu keine Angabe vorlag \u2014 als Anteil der Jahresmiete nach den hinterlegten '
         + 'Standardwerten. Das kalkulatorische Mietausfallwagnis steckt in keiner '
-        + 'Hausgeldabrechnung und wird deshalb immer angesetzt.', CW).forEach(function (z) {
-        cy += 3.4; doc.text(z, M, cy);
+        + 'Hausgeldabrechnung und wird deshalb immer angesetzt.', CW).forEach(function (z, i, a) {
+        cy += 3.4;
+        if (window.DpPdfBlocksatz) window.DpPdfBlocksatz.zeile(doc, { t: z, ende: i === a.length - 1 }, M, cy, CW, true); else doc.text(z, M, cy);   /* v2830 */
       });
       cy += 3;
       doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(26, 26, 26);
@@ -2289,7 +2354,7 @@ async function _exportPDFInner() {
       // Eyebrow (Gold, klein, gespert)
       if (data.eyebrow) {
         doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
-        doc.setTextColor(166, 138, 54);
+        doc.setTextColor.apply(doc, C.GOLD_D);
         doc.text(data.eyebrow.toUpperCase(), M, cy);
         cy += 5;
       }
@@ -2315,7 +2380,7 @@ async function _exportPDFInner() {
       }
       // Trennlinie
       cy += 2;
-      doc.setDrawColor(220, 200, 130);
+      doc.setDrawColor.apply(doc, C.GOLD_L);
       doc.setLineWidth(0.3);
       doc.line(M, cy, M + CW, cy);
       cy += 4;
@@ -2329,11 +2394,11 @@ async function _exportPDFInner() {
     if (!chart) {
       doc.setFillColor(255, 248, 230);
       doc.roundedRect(M, cy, CW, 26, 2, 2, 'F');
-      doc.setDrawColor(201, 168, 76);
+      doc.setDrawColor.apply(doc, C.GOLD);
       doc.setLineWidth(0.4);
       doc.roundedRect(M, cy, CW, 26, 2, 2, 'D');
       doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
-      doc.setTextColor(166, 138, 54);
+      doc.setTextColor.apply(doc, C.GOLD_D);
       doc.text('Chart konnte nicht gerendert werden', M + 5, cy + 8);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
       doc.setTextColor(80, 75, 70);
@@ -2376,15 +2441,15 @@ async function _exportPDFInner() {
       var fY = cy;
       data.footer.slice(0, nF).forEach(function(cell, i) {
         var fX = M + i * (fW + 2.5);
-        doc.setDrawColor(220, 200, 130);
+        doc.setDrawColor.apply(doc, C.GOLD_L);
         doc.setFillColor(248, 246, 241);
         doc.setLineWidth(0.3);
         doc.rect(fX, fY, fW, fH, 'FD');
-        doc.setFillColor(201, 168, 76);
+        doc.setFillColor.apply(doc, C.GOLD);
         doc.rect(fX, fY, fW, 0.8, 'F'); // Top-Streifen
         // Label — V63.90: kleinere Schrift bei 5 Boxen damit nichts überlappt
         doc.setFont('helvetica', 'bold'); doc.setFontSize(nF >= 5 ? 6.4 : 7);
-        doc.setTextColor(166, 138, 54);
+        doc.setTextColor.apply(doc, C.GOLD_D);
         var labelLines = doc.splitTextToSize(cell.label.toUpperCase(), fW - 4);
         doc.text(labelLines[0] || '', fX + 2.5, fY + 4);
         // Value
@@ -2417,11 +2482,11 @@ async function _exportPDFInner() {
     if (!data || !data.matrix) {
       doc.setFillColor(255, 248, 230);
       doc.roundedRect(M, cy, CW, 26, 2, 2, 'F');
-      doc.setDrawColor(201, 168, 76);
+      doc.setDrawColor.apply(doc, C.GOLD);
       doc.setLineWidth(0.4);
       doc.roundedRect(M, cy, CW, 26, 2, 2, 'D');
       doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
-      doc.setTextColor(166, 138, 54);
+      doc.setTextColor.apply(doc, C.GOLD_D);
       doc.text('Stress-Test-Daten nicht verfügbar', M + 5, cy + 8);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
       doc.setTextColor(80, 75, 70);
@@ -2558,12 +2623,12 @@ async function _exportPDFInner() {
     // Eyebrow
     if (dom && dom.eyebrow) {
       doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
-      doc.setTextColor(166, 138, 54);
+      doc.setTextColor.apply(doc, C.GOLD_D);
       doc.text(dom.eyebrow.toUpperCase(), M, cy);
       cy += 5;
     } else {
       doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
-      doc.setTextColor(166, 138, 54);
+      doc.setTextColor.apply(doc, C.GOLD_D);
       doc.text('BANK-COCKPIT \u00b7 RISIKO-KENNZAHLEN', M, cy);
       cy += 5;
     }
@@ -2581,7 +2646,7 @@ async function _exportPDFInner() {
       cy += 4.5;
     }
     cy += 2;
-    doc.setDrawColor(220, 200, 130);
+    doc.setDrawColor.apply(doc, C.GOLD_L);
     doc.setLineWidth(0.3);
     doc.line(M, cy, M + CW, cy);
     cy += 8;
@@ -2589,11 +2654,11 @@ async function _exportPDFInner() {
     if (!data || !data.dscrArr || !data.ltvArr) {
       doc.setFillColor(255, 248, 230);
       doc.roundedRect(M, cy, CW, 26, 2, 2, 'F');
-      doc.setDrawColor(201, 168, 76);
+      doc.setDrawColor.apply(doc, C.GOLD);
       doc.setLineWidth(0.4);
       doc.roundedRect(M, cy, CW, 26, 2, 2, 'D');
       doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
-      doc.setTextColor(166, 138, 54);
+      doc.setTextColor.apply(doc, C.GOLD_D);
       doc.text('Cockpit-Daten nicht verfügbar', M + 5, cy + 8);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
       doc.setTextColor(80, 75, 70);
@@ -2633,7 +2698,7 @@ async function _exportPDFInner() {
 
       // Eyebrow-Label oben
       doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
-      doc.setTextColor(166, 138, 54);
+      doc.setTextColor.apply(doc, C.GOLD_D);
       doc.text(label, x + 6, y + 6);
 
       // Großer Wert
@@ -2825,13 +2890,13 @@ async function _exportPDFInner() {
       // EZB-Marker (vertikale Linie)
       if (opts.ezbIdx != null && opts.ezbIdx > 0 && opts.ezbIdx < n) {
         var ex = x + (opts.ezbIdx / (n - 1)) * w;
-        doc.setDrawColor(201, 168, 76);
+        doc.setDrawColor.apply(doc, C.GOLD);
         doc.setLineWidth(0.3);
         doc.setLineDashPattern([1, 1.5], 0);
         doc.line(ex, y, ex, y + h);
         doc.setLineDashPattern([], 0);
         doc.setFont('helvetica', 'bold'); doc.setFontSize(6);
-        doc.setTextColor(166, 138, 54);
+        doc.setTextColor.apply(doc, C.GOLD_D);
         doc.text('EZB', ex - 1, y + 3, { align: 'right' });
       }
 
@@ -2952,7 +3017,7 @@ async function _exportPDFInner() {
     // ── EQUITY-BUILD oben ─────────────────────────────
     if (equityData && equityData.eyebrow) {
       doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
-      doc.setTextColor(166, 138, 54);
+      doc.setTextColor.apply(doc, C.GOLD_D);
       doc.text(equityData.eyebrow.toUpperCase(), M, cy);
       cy += 4;
     }
@@ -2997,15 +3062,15 @@ async function _exportPDFInner() {
       equityData.footer.slice(0, nF).forEach(function(cell, i) {
         var fX = M + i * (fW + 2.5);
         // V191: deutlich kräftigere gold-Hinterlegung (war 248/246/241 = fast unsichtbar)
-        doc.setDrawColor(201, 168, 76);
+        doc.setDrawColor.apply(doc, C.GOLD);
         doc.setFillColor(252, 248, 233);  // V191: leichtes gold-Tönung statt cream
         doc.setLineWidth(0.5);
         doc.rect(fX, fY, fW, fH, 'FD');
         // Gold-Akzentstrich oben
-        doc.setFillColor(201, 168, 76);
+        doc.setFillColor.apply(doc, C.GOLD);
         doc.rect(fX, fY, fW, 1.2, 'F');  // V191: 0.7 → 1.2 (deutlicher sichtbar)
         doc.setFont('helvetica', 'bold'); doc.setFontSize(6);
-        doc.setTextColor(166, 138, 54);
+        doc.setTextColor.apply(doc, C.GOLD_D);
         var labelLines = doc.splitTextToSize(cell.label.toUpperCase(), fW - 4);
         doc.text(labelLines[0] || '', fX + 2.2, fY + 4);
         doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
@@ -3023,14 +3088,14 @@ async function _exportPDFInner() {
 
     // ── WASSERFALL unten ──────────────────────────────
     // Trennlinie
-    doc.setDrawColor(220, 200, 130);
+    doc.setDrawColor.apply(doc, C.GOLD_L);
     doc.setLineWidth(0.25);
     doc.line(M, cy, M + CW, cy);
     cy += 9;  // V63.94: 4 → 9 (Marcels Wunsch: 2 Zeilen mehr Luft nach der Trennlinie)
 
     if (waterfallData && waterfallData.eyebrow) {
       doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
-      doc.setTextColor(166, 138, 54);
+      doc.setTextColor.apply(doc, C.GOLD_D);
       doc.text(waterfallData.eyebrow.toUpperCase(), M, cy);
       cy += 4;
     }
@@ -3074,14 +3139,14 @@ async function _exportPDFInner() {
       var wffY = cy;
       waterfallData.footer.slice(0, wfnF).forEach(function(cell, i) {
         var wffX = M + i * (wffW + 3);
-        doc.setDrawColor(220, 200, 130);
+        doc.setDrawColor.apply(doc, C.GOLD_L);
         doc.setFillColor(248, 246, 241);
         doc.setLineWidth(0.3);
         doc.rect(wffX, wffY, wffW, wffH, 'FD');
-        doc.setFillColor(201, 168, 76);
+        doc.setFillColor.apply(doc, C.GOLD);
         doc.rect(wffX, wffY, wffW, 0.7, 'F');
         doc.setFont('helvetica', 'bold'); doc.setFontSize(6);
-        doc.setTextColor(166, 138, 54);
+        doc.setTextColor.apply(doc, C.GOLD_D);
         var lbl = doc.splitTextToSize(cell.label.toUpperCase(), wffW - 4);
         doc.text(lbl[0] || '', wffX + 2.5, wffY + 3.3);
         doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
@@ -3112,12 +3177,12 @@ async function _exportPDFInner() {
     cy = newPage('Charts · Hinweis');
     doc.setFillColor(255, 248, 230);
     doc.roundedRect(M, cy, CW, 36, 2, 2, 'F');
-    doc.setDrawColor(201, 168, 76);
+    doc.setDrawColor.apply(doc, C.GOLD);
     doc.setLineWidth(0.5);
     doc.roundedRect(M, cy, CW, 36, 2, 2, 'D');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
-    doc.setTextColor(166, 138, 54);
+    doc.setTextColor.apply(doc, C.GOLD_D);
     doc.text('Charts konnten nicht erstellt werden', M + 5, cy + 8);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
@@ -3265,6 +3330,12 @@ async function _exportPDFInner() {
         o = o || {};
         var gr = o.groesse || 8, lh = o.zeile || 4, dy = o.dy || 0, farbe = o.farbe || C.MID;
         var stil = function () { doc.setFont('helvetica', 'normal'); doc.setFontSize(gr); doc.setTextColor.apply(doc, farbe); };
+        /* v2830 · Blocksatz, letzte Zeile linksbuendig */
+        if (window.DpPdfBlocksatz) {
+          cy = window.DpPdfBlocksatz.absatz(doc, _pc(t), { x: M, y: cy + dy, breite: CW, zeile: lh, unten: _TEXT_UNTEN, stil: stil,
+            neueSeite: function () { cy = newPage('Wertpotenzial · Fortsetzung'); return cy + dy; } }) - dy;
+          return;
+        }
         stil();
         doc.splitTextToSize(_pc(t), CW).forEach(function (z) {
           if (cy + dy > _TEXT_UNTEN) { cy = newPage('Wertpotenzial · Fortsetzung'); stil(); }
@@ -3375,6 +3446,76 @@ async function _exportPDFInner() {
   } catch (e) { try { console.warn('[pdf] Wertpotenzial', e); } catch (x) {} }
 
   /* ══════════════════════════════════════════════════
+     SEITE 4d · v2830: WERT & ZIELBILD
+     Werte je Verfahren aus dem letzten Marktbericht (wie die Pilot-Analyse,
+     wertvergleich.js) und Ist / Soll / Zielbild. Gezeichnet von
+     DpPdfWertZielbild (dieselbe Darstellung in der Bankfassung); ohne
+     Daten entfaellt die Seite still.
+  ══════════════════════════════════════════════════ */
+  try {
+    var _WZ = window.DpPdfWertZielbild ? await window.DpPdfWertZielbild.daten({ potenzial: (typeof _PD !== 'undefined' ? _PD : null) }) : null;
+    if (_WZ) {
+      cy = newPage('Wert & Zielbild');
+      cy = secH(doc, cy, 'Wert & Zielbild \u00b7 Werte je Verfahren', M, CW);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.6); doc.setTextColor.apply(doc, C.CH);
+      cy = window.DpPdfBlocksatz.absatz(doc, 'Was das Objekt nach den Verfahren der Immobilienwertermittlung wert ist, im Vergleich zum Kaufpreis - und wohin sich der Ertragswert mit Mieterh\u00f6hung und Zielbild entwickelt.', { x: M, y: cy + 3, breite: CW, zeile: 4.4 }) + 2;
+      cy = window.DpPdfWertZielbild.zeichne(doc, _WZ, {
+        x: M, y: cy, breite: CW, unten: 278, stil: 'invest',
+        neueSeite: function () { cy = newPage('Wert & Zielbild \u00b7 Fortsetzung'); return cy; },
+        ueberschrift: function (t, yy) { return secH(doc, yy, t, M, CW); },
+        f: { gold: C.GOLD, goldD: C.GOLD_D, goldL: C.GOLD_L, tinte: C.CH, text: [50, 45, 45], grau: C.MID, linie: C.BORDER,
+          kopfGrund: C.CH, kopfText: C.GOLD, streifen: C.SURF }
+      });
+    }
+  } catch (e) { try { console.warn('[pdf] Wert & Zielbild', e); } catch (x) {} }
+
+  /* ══════════════════════════════════════════════════
+     SEITE 4e · v2830: MIETERLISTE (aus der Bankfassung)
+     Nur beim Mehrfamilienhaus mit erfassten Einheiten. Gerechnet wird
+     nicht hier: DpMfhEinheiten.berichtDaten() (Anlage-2-Punkte, RND).
+  ══════════════════════════════════════════════════ */
+  try {
+    var _MFH = (window.DpMfhEinheiten && typeof window.DpMfhEinheiten.berichtDaten === 'function') ? window.DpMfhEinheiten.berichtDaten() : null;
+    if (_MFH && _MFH.zeilen && _MFH.zeilen.length && doc.autoTable) {
+      var _n = function (x) { var z = Number(String(x == null ? '' : x).replace(',', '.')); return isFinite(z) && z > 0 ? z : null; };
+      cy = newPage('Einheiten & Zustand');
+      cy = secH(doc, cy, 'Mieterliste \u00b7 ' + _MFH.zeilen.length + ' Einheiten', M, CW);
+      doc.autoTable({
+        startY: cy, theme: 'striped',
+        head: [['Nr.', 'Lage', 'm\u00b2', 'Ist \u20ac/Monat', 'Soll \u20ac/Monat', 'Status', 'Anlage 2']],
+        body: _MFH.zeilen.map(function (z) {
+          return [String(z.e.nr || ''), String(z.e.lage || '').replace(/[\u2013\u2014]/g, '-').replace(/[^\x00-\xFF\u20AC]/g, ''), z.fl ? pE(z.fl) : '-',
+            _n(z.e.ist) ? pE(_n(z.e.ist)) : '-', _n(z.e.soll) ? pE(_n(z.e.soll)) : '-', z.e.status === 'leer' ? 'leer' : 'vermietet', z.punkte + ' P.' + (z.geerbt === 4 ? '*' : '')];
+        }),
+        headStyles: { fillColor: C.CH, textColor: C.GOLD, fontSize: 8, fontStyle: 'bold' },
+        bodyStyles: { fontSize: 8.4, cellPadding: 2, textColor: C.CH },
+        alternateRowStyles: { fillColor: C.SURF },
+        columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' }, 6: { halign: 'right' } },
+        margin: { left: M, right: M, top: 30, bottom: 16 }
+      });
+      cy = doc.lastAutoTable.finalY + 4;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor.apply(doc, C.MID);
+      doc.text('Anlage 2 ImmoWertV: Modernisierungspunkte je Einheit; * = Zustand vollst\u00e4ndig vom Geb\u00e4ude \u00fcbernommen.', M, cy);
+      cy += 6;
+      var _sollJ = (_MFH.s && _MFH.s.soll ? _MFH.s.soll * 12 : null);
+      var _ist = [
+        ['Kaltmiete p. a. - Ist', pE(K.nkm_j) + ' \u20ac'],
+        ['Kaltmiete p. a. - Soll (nach Ma\u00dfnahmen)', _sollJ != null ? pE(_sollJ) + ' \u20ac' : '-'],
+        ['Bruttomietrendite Ist (auf Kaufpreis)', pP(K.bmy, 2)],
+        ['Bruttomietrendite Soll (auf Gesamtinvestition)', (_sollJ != null && K.gi > 0) ? pP(_sollJ / K.gi * 100, 2) : '-'],
+        ['Rechtliche Einheit', _MFH.aufgeteilt ? 'in Wohnungseigentum aufgeteilt (WEG)' : 'ungeteiltes Geb\u00e4ude'],
+        ['Modernisierungsgrad (fl\u00e4chengewichtet)', pN(_MFH.punkteGew, 1) + ' von 20 Punkten, angesetzt ' + _MFH.hausPunkte]
+      ];
+      if (_MFH.s && _MFH.s.leer) _ist.push(['Leerstand', _MFH.s.leer + ' Einheiten / ' + pE(_MFH.s.leerFl) + ' m\u00b2']);
+      if (_MFH.s && _MFH.s.kosten) _ist.push(['Geplante Ma\u00dfnahmen', pE(_MFH.s.kosten) + ' \u20ac']);
+      if (_MFH.rndGew > 0) _ist.push(['Restnutzungsdauer des Geb\u00e4udes (Anlage 2, indikativ)', Math.round(_MFH.rndGew) + ' Jahre' + (_MFH.rndInfo && _MFH.rndInfo.gnd ? ' (GND ' + _MFH.rndInfo.gnd + ')' : '')]);
+      if (cy + 11 + _ist.length * 5.8 > 278) cy = newPage('Einheiten & Zustand \u00b7 Fortsetzung');
+      cy = secH(doc, cy, 'Ist gegen Soll', M, CW);
+      cy = kvT(doc, M, cy, CW, _ist, [_ist.length - 1]);
+    }
+  } catch (e) { try { console.warn('[pdf] Mieterliste', e); } catch (x) {} }
+
+  /* ══════════════════════════════════════════════════
      SEITE 5: KI-INVESTMENT-ANALYSE (optional)
   ══════════════════════════════════════════════════ */
   // Check if user wants KI in PDF
@@ -3475,7 +3616,8 @@ async function _exportPDFInner() {
       var leftPad = 14;
       var rightPad = 14;
       var maxWidthForText = CW - leftPad - rightPad - 6;
-      var lines = doc.splitTextToSize(body, maxWidthForText);
+      /* v2830 · Zeilen mit Absatzende (Blocksatz) statt reiner Zeichenketten */
+      var lines = window.DpPdfBlocksatz ? window.DpPdfBlocksatz.zeilen(doc, body, maxWidthForText) : doc.splitTextToSize(body, maxWidthForText);
 
       // V63.67: Bei 8.8pt-Schrift braucht eine Zeile ca. 4.9mm - vorher 4.5 zu eng
       var lineHeight = 4.9;
@@ -3515,7 +3657,7 @@ async function _exportPDFInner() {
 
       var textY = cy + headerH + paddingTop + 2;  // +2 für Baseline-Offset
       lines.forEach(function(line) {
-        doc.text(line, M + leftPad, textY);
+        if (window.DpPdfBlocksatz) window.DpPdfBlocksatz.zeile(doc, line, M + leftPad, textY, maxWidthForText, true); else doc.text(line, M + leftPad, textY);
         textY += lineHeight;
       });
       if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.15);
@@ -3563,7 +3705,7 @@ async function _exportPDFInner() {
         doc.setTextColor.apply(doc, isDark ? [215, 205, 180] : [50, 45, 45]);
         var textY = cy + headerH + paddingTop + 2;
         chunkLines.forEach(function(line) {
-          doc.text(line, M + 14, textY);
+          if (window.DpPdfBlocksatz) window.DpPdfBlocksatz.zeile(doc, line, M + 14, textY, CW - 34, true); else doc.text(line, M + 14, textY);
           textY += lineHeight;
         });
         if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.15);
@@ -3657,7 +3799,9 @@ async function _exportPDFInner() {
   doc.text('WICHTIGER HINWEIS / DISCLAIMER', M + 5, cy + 7);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(165, 155, 135);
   var disc = 'Dieses Dokument dient ausschlie\u00dflich der internen Investitionsanalyse und stellt keine Steuer-, Rechts- oder Anlageberatung dar. Alle Angaben ohne Gew\u00e4hr. Prognosen basieren auf Annahmen und k\u00f6nnen von der tats\u00e4chlichen Entwicklung abweichen. Konsultieren Sie einen qualifizierten Steuerberater.';
-  doc.text(doc.splitTextToSize(disc, CW - 10), M + 5, cy + 13);
+  /* v2830 · Blocksatz */
+  if (window.DpPdfBlocksatz) window.DpPdfBlocksatz.absatz(doc, disc, { x: M + 5, y: cy + 13, breite: CW - 10, zeile: 3.6 });
+  else doc.text(doc.splitTextToSize(disc, CW - 10), M + 5, cy + 13);
   cy += 30;
 
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor.apply(doc, C.MID);
