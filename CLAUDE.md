@@ -54,6 +54,13 @@ Sachwertfaktor (§ 21 Abs. 3) — und für jeden Ausschuss soll **in der Datenba
 stehen, woher die Zahl kommt**: Link, Jahrgang, Lizenz, Stichtag, Seite. Ohne
 diese Liste fängt die jährliche Nachernte jedes Mal bei der Recherche an.
 
+**Stand 22.10.2026, gemessen mit `tools/messe-schleife-daten.mjs` (dieselbe
+Zählung wie der Admin-Reiter „Register & Ernte"): 100 Dateien, 10.679 Sätze,
+4.503 Werte** — LZS 2.447, SWF 627, UK 274, IRW-Umrechnungen 114 (alle 71
+NRW-Ausschüsse mit Immobilienrichtwert), 199 Ausschüsse, 15 Länder mit Wert
+(SL nur Sperren). `mb.param_modell` hält auf Staging und Prod je 4.503 Werte.
+Die Zahlen darunter sind der Stand vom 13.10. und nur noch Geschichte.
+
 **Stand 13.10.2026, am Register gemessen (62 Dateien, davon 56 Satzdateien,
 4.832 Sätze): alle 16 Länder sind vertreten.** 2.536 Zinssatz- und 1.259
 Sachwertfaktor-Sätze, davon **2.402 mit Wert** (1.783 LZS + 619 SWF) und
@@ -262,6 +269,10 @@ seine Datei (gegen git, nicht gegen die Dateizeit). RC=0 ist sauber.
 | `uk-naeherung-ableiten.mjs` | leitet die DealPilot-Formel (Näherung) aus allen amtlichen Flächentabellen ab, nach jeder Ernte neu laufen lassen |
 | `uk-wgfz-pruefen.mjs` | jeden Umrechnungskoeffizienten WGFZ (`uk-wgfz-*.json`) gegen sein amtliches Beispiel, 1,00 an der Norm, steigend; Sperre ohne Formel |
 | `wertermittlung-pruefen.mjs` | Ertrags-/Sachwert am echten Kern (ErtragswertService, CrossCheckService, immowertv, nhk2010, nrw_modell) ohne DB/Netz: **A** amtliche Anwendungsbeispiele (EW-RL Anl. 3, VW-RL Anl. 5, ImmoWertA), **B** Prompt-Testfälle 1–11 (bewusste Abweichungen als „Entscheidung offen"), **C** eingefrorene Demo-Objekte (`wertermittlung-faelle.json`, Uhr fest auf 21.10.2026); läuft in `deploy-staging.ps1` mit. Nach jeder Änderung am Wertkern laufen lassen; Ebene C nur bewusst neu einfrieren (`--einfrieren=`) |
+| `irw-pruefen.mjs` | Umrechnungstabellen der Immobilienrichtwerte NRW (`uk-irw-nw-*.json`) gegen ihre amtlichen Anwendungsbeispiele, Verfahrenswahl mit IRW (v2620/v2680) |
+| `beleihungswert-pruefen.mjs` | indikativer Beleihungswert-Check nach BelWertV (`lib/beleihungswert.js`), Mindestzins aus `config.js` jährlich nach dem 30.11. prüfen |
+| `ki-text-zahlen-pruefen.mjs` | KI-Fließtext des Marktberichts: Prozente/Zählungen gegen die vorab gerechneten Prüfzahlen (`lib/ki_text_pruefung.js`, v2670) |
+| `messe-schleife-daten.mjs` | erzeugt Register- und Videothek-Zahlen der Messe-Schleife; nach jeder Ernte laufen lassen |
 
 **Agents für die Datenpflege** (`.claude/agents/`, seit v2176): `register-ernte`
 (Zins/Sachwertfaktor ins Register, nur Dateien), `nachernte-pdf` (die vom
