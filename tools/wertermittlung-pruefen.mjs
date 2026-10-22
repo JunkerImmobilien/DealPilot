@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
    DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595 · v2600 · v2790 · v2800
+   v2820: Abnahme v2800 an der ganzen Kette Formular-Liste -> Mapper -> Kern (B52).
    v2800: Wohnungen im Wohn-/Geschaeftshaus je Mietverhaeltnis (B49-B51), Ort der Nutzungsart-Nachfrage (B48).
    v2790: Marcels sieben Entscheidungen vom 22.10.2026 (B43-B48, A-E6 Reinertragsdifferenz aus der Tabelle des Musters).
    v2600: E1 Band am Satz des Ausschusses (Anker ± 20 %), E2 Mietabweichung als boG
@@ -1069,6 +1070,28 @@ fallB('B51', () => {
   pruefe('B', 'B51', 'reines MFH unverändert: einheiten_miete je Wohnung, kein gewerbe', !!m && Array.isArray(m.einheiten_miete) && m.einheiten_miete.length === 5 && m.gewerbe === null);
 });
 
+/* ══ v2820 · ABNAHME v2800 AN DER GANZEN KETTE (B52) ═════════════════════
+   B48 setzt ohne_nutzung_qm/-nr von Hand. Hier kommt die Einheitenliste so,
+   wie das Formular sie schickt (dealpilot-mb.js), durch den ECHTEN Mapper in
+   den ECHTEN Kern. Vorher (v2800): das Formular schickte weder nr noch lage,
+   der Mapper nannte die Einheit „GE 1" - ein Name, den es im Formular nicht gibt. */
+fallB('B52', () => {
+  const liste = (laden) => ({ data: { objart: 'MFH', wfl: 378, _mfh_einheiten: wghWo().map((x) => ({ nr: x.nr, art: 'wohnen', wfl: x.wfl, ist: x.ist_monat }))
+    .concat([Object.assign({ art: 'gewerbe', wfl: 68, ist: 544, markt_qm: 8 }, laden)]) } });
+  const ri = DPM.reportInput(liste({ nr: 'Laden' })), g = ri && ri.gewerbe;
+  pruefe('B', 'B52', 'Mapper: Laden ohne Nutzungsart -> ohne_nutzung_qm 68, Name wie im Formular', !!g && g.ohne_nutzung_qm === 68
+    && g.ohne_nutzung_nr.join() === 'Laden', JSON.stringify(g && g.ohne_nutzung_nr));
+  const r = ccFall('demo', (a) => { a[0].gewerbe = g; }), e = r && r.ertragswert;
+  pruefe('B', 'B52', 'Kette Mapper -> Kern: kein Ertragswert, Nachfrage Feld nutzung_gew, Einheit Laden, Ort im Formular',
+    !!e && e.available === false && e.grund === 'gewerbe_ohne_nutzungsart' && e.nachfrage && e.nachfrage.feld === 'nutzung_gew'
+    && e.nachfrage.einheiten.join() === 'Laden' && /Einheiten erfassen/.test(e.hinweis), e ? e.grund + ' ' + JSON.stringify(e.nachfrage) : 'kein Ergebnis');
+  const ohne = DPM.reportInput(liste({})), go = ohne && ohne.gewerbe;
+  pruefe('B', 'B52', 'ohne Nummer: Rückfall = Zeilennummer der Liste (Nr. 6), nicht „GE 1"', !!go && go.ohne_nutzung_nr.join() === 'Nr. 6', JSON.stringify(go && go.ohne_nutzung_nr));
+  const mit = DPM.reportInput(liste({ nr: 'Laden', nutzung_gew: 'buero_praxis_laden' }));
+  const rm = ccFall('demo', (a) => { a[0].gewerbe = mit.gewerbe; });
+  pruefe('B', 'B52', 'mit Nutzungsart rechnet dieselbe Kette', !!rm && rm.ertragswert.available === true, rm && rm.ertragswert.grund);
+});
+
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */
 const auszug = (cc) => {
   const e = (cc && cc.ertragswert) || {}, s = (cc && cc.sachwert) || {};
@@ -1118,7 +1141,7 @@ for (const [name, fall] of Object.entries(C.faelle || {})) {
 /* ══ AUSGABE ═════════════════════════════════════════════════════════ */
 if (ALLE) detail.forEach((z) => console.log(z));
 const titel = { A: 'amtliche Anwendungsbeispiele', B: 'Prompt-Testfälle 1–11', C: 'Demo-Objekte (eingefroren ' + (C.stand || '–') + ')' };
-console.log('wertermittlung-pruefen v2790 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
+console.log('wertermittlung-pruefen v2820 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
 for (const eb of ['A', 'B', 'C']) {
   const x = E[eb];
   console.log('  Ebene ' + eb + ' ' + titel[eb].padEnd(38) + x.faelle + ' Fälle, ' + x.werte + ' Werte, '

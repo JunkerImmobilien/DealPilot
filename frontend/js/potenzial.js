@@ -388,7 +388,9 @@
     if (!obj) return null;
     if (opts && opts.einheiten) {
       obj._mfh_einheiten = opts.einheiten.map(function (e) {
-        return { art: e.art || 'wohnen', wfl: e.wfl, ist: e.ist, soll: e.soll, status: e.status || 'vermietet',
+        /* v2820 · Nummer und Lage reisen mit: ohne sie nannte die Nutzungsart-Nachfrage
+                   im Bericht „GE 1" statt der Einheit, wie sie im Formular heisst */
+          return { nr: e.nr || null, lage: e.lage || null, art: e.art || 'wohnen', wfl: e.wfl, ist: e.ist, soll: e.soll, status: e.status || 'vermietet',
                  nutzung_gew: e.nutzung_gew || null, markt_qm: e.markt_qm || null,
                    /* v2600 · E2/E3 · Restlaufzeit der Mietabweichung, waehlbarer Leerstandsabzug */
                    mv_art: e.mv_art || null, mv_befristet_bis: e.mv_befristet_bis || null, mv_kuendigungsverzicht_bis: e.mv_kuendigungsverzicht_bis || null,
