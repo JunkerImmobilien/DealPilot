@@ -283,6 +283,9 @@
   }
 
   /* ── Gestaltung ───────────────────────────────────────────────────────── */
+  /* Alle Knöpfe tragen .btn-clean: „.sec button:not(…)" in style.css (Z. 30576) setzt
+     sonst Grund, Rahmen und Schrift mit !important - der gedrückte Umschalter sah aus
+     wie der freie (gemessen v2840: Grund weiß statt Gold). .btn-clean ist dort ausgenommen. */
   function stil() {
     if (document.getElementById('dp-wz-stil')) return;
     var s = document.createElement('style'); s.id = 'dp-wz-stil';
@@ -402,7 +405,7 @@
     if (A) h += '<p class="dp-wz-klar">' + klartextAnkauf(A) + '</p>';
     if (!h) return '';
     if (Z) h += '<p class="dp-wz-kenn">' + esc(Z.kennzeichnung) + ' Alle Zahlen, Eingaben und der Abgleich mit dem Ankauf stehen unter „Genau".</p>';
-    h += '<button type="button" class="dp-wz-mehr" data-dp-si-knopf="genau">Alle Zahlen zeigen (Genau)</button>';
+    h += '<button type="button" class="dp-wz-mehr btn-clean" data-dp-si-knopf="genau">Alle Zahlen zeigen (Genau)</button>';
     return h;
   }
   function modus() { try { var v = localStorage.getItem(MERKER); return v === 'genau' ? 'genau' : 'einfach'; } catch (e) { return 'einfach'; } }
@@ -415,13 +418,13 @@
     if (!e) return genauHtml;   /* nichts Einfaches zu sagen: wie bisher */
     var m = modus();
     var nav = '<div class="dp-si-nav" role="navigation" aria-label="Inhalt">'
-      + (opts.mitPot ? '<button type="button" data-dp-si-sprung="[data-dp-pot-wirt]">Ist · Mieterhöhung · Zielbild</button><button type="button" data-dp-si-sprung="[data-dp-pot-markt]">Marktpreise</button>' : '')
-      + (opts.mitAnkauf ? '<button type="button" data-dp-si-sprung=".abw-tafel-host">Ankauf gegen Bestand</button><button type="button" data-dp-si-sprung="[data-dp-si-pilot]">Pilot damals und heute</button>' : '')
+      + (opts.mitPot ? '<button type="button" class="btn-clean" data-dp-si-sprung="[data-dp-pot-wirt]">Ist · Mieterhöhung · Zielbild</button><button type="button" class="btn-clean" data-dp-si-sprung="[data-dp-pot-markt]">Marktpreise</button>' : '')
+      + (opts.mitAnkauf ? '<button type="button" class="btn-clean" data-dp-si-sprung=".abw-tafel-host">Ankauf gegen Bestand</button><button type="button" class="btn-clean" data-dp-si-sprung="[data-dp-si-pilot]">Pilot damals und heute</button>' : '')
       + '</div>';
     return '<div class="dp-si" data-dp-si-modus="' + m + '">'
       + '<div class="dp-si-kopf"><div class="dp-si-um" role="group" aria-label="Darstellung">'
-      + '<button type="button" data-dp-si-knopf="einfach" aria-pressed="' + (m === 'einfach') + '">Einfach</button>'
-      + '<button type="button" data-dp-si-knopf="genau" aria-pressed="' + (m === 'genau') + '">Genau</button></div>'
+      + '<button type="button" class="btn-clean" data-dp-si-knopf="einfach" aria-pressed="' + (m === 'einfach') + '">Einfach</button>'
+      + '<button type="button" class="btn-clean" data-dp-si-knopf="genau" aria-pressed="' + (m === 'genau') + '">Genau</button></div>'
       + '<span class="dp-si-hin" data-dp-si-teil="einfach">Das Wichtigste in fünf Zahlen</span><span class="dp-si-hin" data-dp-si-teil="genau">Alle Zahlen, Eingaben und Abgleiche</span></div>'
       + '<div data-dp-si-teil="einfach"><div class="dp-pa-card" data-dp-si-einfach="' + (opts.mitAnkauf ? 'a' : '') + '">' + e + '</div></div>'
       + '<div data-dp-si-teil="genau">' + nav + genauHtml + '</div></div>';
@@ -477,7 +480,7 @@
         + '<p class="dp-wz-quelle">Aus dem Marktbericht vom ' + esc(datum(W.bericht_datum))
         + (W.abschlag_pct != null && W.abschlag_herkunft ? ' · Abschlag ' + esc(dez(W.abschlag_pct, 1)) + ' % (' + esc(W.abschlag_herkunft) + ')' : '')
         + ' · indikativ nach ImmoWertV-Logik, kein Gutachten nach § 194 BauGB. '
-        + '<button type="button" data-dp-wz-erkl="1">Warum die Werte auseinanderliegen</button></p>';
+        + '<button type="button" class="btn-clean" data-dp-wz-erkl="1">Warum die Werte auseinanderliegen</button></p>';
     }
     if (Z) {
       h += '<div class="dp-wz-h">Ist · Mieterhöhung · Zielbild</div>' + kachelnHtml(D.kernaussagen) + zielTafel(Z)
