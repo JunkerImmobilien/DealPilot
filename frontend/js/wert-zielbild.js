@@ -490,32 +490,64 @@
     return h;
   }
   function potenzialHost() {
-    var c = document.getElementById('card-wert-zielbild'); if (!c) return null;
+    var c = document.getElementById('card-wert-zielbild') || _karte; if (!c) return null;
     var d = c.querySelector('details.dp-wz-det'); if (!d) return null;
-    var h = document.getElementById('card-wertpotenzial');
-    if (h && d.contains(h)) return h;
+    var h = d.querySelector('#card-wertpotenzial');
+    if (h) return h;
+    h = document.getElementById('card-wertpotenzial');
     if (h && h.parentNode) h.parentNode.removeChild(h);   /* alte Einzelkarte */
     h = document.createElement('div'); h.id = 'card-wertpotenzial'; d.appendChild(h);
     return h;
   }
+  /* v2841 · Platz (Marcel 22.10.2026): direkt unter der obersten Score-Karte, vor der
+     Kennzahlen-Bewertung. Gemessen im Auslieferungszustand: #dpsh-mount trägt zwei Karten
+     (DealPilot Score 521 px, Investor Deal Score 540 px); hinter der ersten beginnt das
+     Segment bei 1.440 × 900 auf y 768. dpsh-score-hero.js zeichnet den Mount per innerHTML
+     neu - der Beobachter setzt die Karte danach wieder an ihren Platz (dieselbe Karte,
+     kein Neubau). Ohne Score-Karte: vor der Kennzahlen-Bewertung. */
+  var _karte = null, _mo = null, _moZiel = null;
+  function platz(c) {
+    var sec = document.getElementById('s6'); if (!sec || !c) return;
+    var m = document.getElementById('dpsh-mount');
+    var p1 = m ? m.querySelector(':scope > .dpsh-pass') : null;
+    if (p1) {
+      if (p1.nextElementSibling !== c) m.insertBefore(c, p1.nextSibling);
+      c.style.margin = '0';
+    } else {
+      c.style.margin = '';
+      var kpi = document.getElementById('kpi-eval-card');
+      var ziel = (m && m.parentNode === sec) ? m.nextSibling : (kpi && kpi.parentNode === sec ? kpi : null);
+      if (ziel) { if (ziel !== c && c.nextSibling !== ziel) sec.insertBefore(c, ziel); } else if (c.parentNode !== sec) sec.appendChild(c);
+    }
+    if (m && _moZiel !== m && typeof MutationObserver === 'function') {
+      if (_mo) _mo.disconnect();
+      _moZiel = m;
+      _mo = new MutationObserver(function () {
+        if (!_karte) return;
+        var q = _moZiel.querySelector(':scope > .dpsh-pass');
+        if (!_karte.isConnected || (q && q.nextElementSibling !== _karte)) platz(_karte);
+      });
+      _mo.observe(m, { childList: true });
+    }
+  }
   function karte() {
     var sec = document.getElementById('s6'); if (!sec) return;
-    var c = document.getElementById('card-wert-zielbild');
+    var c = document.getElementById('card-wert-zielbild') || _karte;
     var D = daten();
-    if (!D) { if (c) c.remove(); return; }
+    if (!D) { if (c) c.remove(); _karte = null; return; }
     stil();
     if (!c) {
       c = document.createElement('div'); c.className = 'card'; c.id = 'card-wert-zielbild';
       c.innerHTML = '<div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trending-up"/></svg></span>Wert &amp; Zielbild'
         + '<span class="dp-wz-kz" hidden>Potenzialwert</span></div><div data-dp-wz-oben="1"></div>'
         + '<details class="dp-wz-det" hidden><summary>Im Detail: Wohnungen, Wertüberleitung, Kennzahlen je Stufe</summary></details>';
-      /* Platz: hinter der Bewertungshistorie, dort stand die Karte „Mieterhöhung und Zielbild" */
-      var nach = document.getElementById('avm-history-host'), alt = document.getElementById('card-wertpotenzial');
-      if (nach && nach.parentNode === sec) sec.insertBefore(c, nach.nextSibling); else sec.appendChild(c);
+      var alt = document.getElementById('card-wertpotenzial');
       if (alt && alt.parentNode === sec) alt.remove();
       var det = c.querySelector('details.dp-wz-det');
       det.addEventListener('toggle', function () { if (det.open && global.DpPotenzial) { try { global.DpPotenzial.bewertungKarte(); } catch (e) {} } });
     }
+    _karte = c;
+    platz(c);
     c.querySelector('[data-dp-wz-oben]').innerHTML = segmentOben(D);
     c.querySelector('.dp-wz-kz').hidden = !D.zielbild;
     var det2 = c.querySelector('details.dp-wz-det');

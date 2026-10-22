@@ -1173,7 +1173,7 @@
     var box = document.getElementById('avm-history-host');
     if (!box) return;
     var objId = window._currentObjKey;
-    if (!objId) { box.innerHTML = '<div class="oab-h-head ct ct-pro"><span class="ct-ico">' + _v747HistIcon() + '</span><span class="oab-h-title">Bewertungshistorie</span></div><div class="oab-h-empty">Objekt speichern, um Bewertungen zu erfassen.</div>'; return; }
+    if (!objId) { box.style.display = ''; box.innerHTML = '<div class="oab-h-head ct ct-pro"><span class="ct-ico">' + _v747HistIcon() + '</span><span class="oab-h-title">Bewertungshistorie</span></div><div class="oab-h-empty">Objekt speichern, um Bewertungen zu erfassen.</div>'; return; }
     if (!window.Auth || typeof window.Auth.apiCall !== 'function') return;
     /* v744-import-state: vorhandene Live-Bewertungen einmalig uebernehmen */
     if (!window._v744Imported) { window._v744Imported = {}; }
@@ -1198,6 +1198,11 @@
     }
     window.Auth.apiCall('/avm/' + objId + '/history', { method: 'GET' }).then(function (resp) {
       var items = (resp && resp.items) || [];
+      /* v2841 · ohne Historie keine Karte: vorher stand hier eine leere Karte (42 px,
+         gemessen an Westerfeldstr. 140). Der Knopf „+ Eintrag" erscheint mit dem ersten Eintrag. */
+      if ((window._currentObjKey || null) !== objId) return;
+      if (!items.length) { box.innerHTML = ''; box.style.display = 'none'; return; }
+      box.style.display = '';
       var rows = items.map(function (it) {
         var sqm = it.eur_per_sqm ? ('<span class="oab-h-sub">' + Number(it.eur_per_sqm).toLocaleString('de-DE') + ' \u20ac/m\u00b2</span>') : '';
         var spanne = (it.low != null && it.high != null) ? (_v745k(it.low) + ' \u2013 ' + _v745k(it.high)) : '\u2013';
@@ -1284,7 +1289,16 @@
       var t = e.target && e.target.closest ? e.target.closest('.tab[data-target-sec="s6"]') : null;
       if (t) { setTimeout(function () { try { _v742RenderHistory(); } catch (e2) {} }, 60); }
     }, true);
+    /* v2841 · beim Objektwechsel neu zeichnen (sonst stand die Historie des vorigen Objekts) */
+    window.addEventListener('dp:object-ready', function () {
+      var b = document.getElementById('avm-history-host'); if (b) { b.innerHTML = ''; b.style.display = 'none'; }
+      setTimeout(function () { try { _v742RenderHistory(); } catch (e3) {} }, 200);
+    });
   }
+  /* v2841 · der Haken war seit v745 definiert, aber nirgends gebunden - die Karte
+     „Bewertungshistorie" blieb dadurch immer leer (gemessen 22.10.2026). */
+  try { _v745BindTabHook(); } catch (e) {}
+  try { var _b0 = document.getElementById('avm-history-host'); if (_b0 && !_b0.innerHTML.trim()) _b0.style.display = 'none'; } catch (e) {}
   function _v742DelEntry(id) {
     var objId = window._currentObjKey; if (!objId || !id) return;
     window.Auth.apiCall('/avm/' + objId + '/history/' + id, { method: 'DELETE' })

@@ -3371,7 +3371,7 @@ label.dp-required.qc-required::after {
     <div class="kv"><span>… durch Tilgung <span class="cf-hint">(Schulden abgebaut, brutto)</span></span><span class="kv-v" id="vz-tilgung">—</span></div>
     <div class="kv" style="padding-left:14px;border-left:2px solid var(--green);margin-left:6px"><span class="cf-hint">… davon vom Mieter <i>(durch Mieteinnahmen finanziert)</i></span><span class="kv-v c-green" id="vz-mieter">—</span></div>
     <div class="kv" style="padding-left:14px;border-left:2px solid var(--gold);margin-left:6px"><span class="cf-hint">… davon Eigenanteil <i>(aus eigener Tasche zugeschossen, da CF negativ war)</i></span><span class="kv-v" id="vz-eigen">—</span></div>
-    <div class="kv"><span>+ Cashflow-Überschuss <span class="cf-hint">(was nach Tilgung &amp; Steuer auf Konto bleibt)</span></span><span class="kv-v c-green" id="vz-cf">—</span></div>
+    <div class="kv"><span>+ Cashflow-Überschuss <span class="cf-hint">(nach Tilgung, vor Steuern)</span></span><span class="kv-v c-green" id="vz-cf">—</span></div>
     <div class="kv"><span>+ Steuervorteil <span class="cf-hint">(kumulierte Erstattung aus V+V-Verlusten)</span></span><span class="kv-v c-green" id="vz-steuer">—</span></div>
     <!-- V63.58: Wenn Tilgungsaussetzung mit BSV — Sparguthaben separat ausweisen,
          damit User es nicht mit"freiem Cashflow" verwechselt -->
@@ -3393,7 +3393,7 @@ label.dp-required.qc-required::after {
         <div class="kv" style="font-size:.86em"><span>– Tilgung <span class="cf-hint">(über die Laufzeit, Schulden abgebaut)</span></span><span class="kv-v c-red" id="vz-info-tilg">—</span></div>
         <div class="kv" style="font-size:.86em;display:none" id="vz-info-bspar-row"><span>– Bausparrate <span class="cf-hint">(kumuliert, gebunden im Bausparvertrag)</span></span><span class="kv-v c-red" id="vz-info-bspar">—</span></div>
         <div class="kv" style="font-size:.86em"><span>± Steuern <span class="cf-hint">(Belastung/Erstattung kumuliert)</span></span><span class="kv-v" id="vz-info-tax">—</span></div>
-        <div class="kv kv-result" style="font-size:.9em"><span><b>= Kumulierter CF-Überschuss <span class="cf-hint">(Konto-Reserve nach Tilgung &amp; Steuer)</span></b></span><span class="kv-v c-gold" id="vz-info-summe">—</span></div>
+        <div class="kv kv-result" style="font-size:.9em"><span><b>= Kumulierter CF-Überschuss <span class="cf-hint">(nach Tilgung, vor Steuern)</span></b></span><span class="kv-v c-gold" id="vz-info-summe">—</span></div>
         <div class="hint" style="font-size:.78em;margin-top:8px">
           <b>Plausi-Check Mieten:</b> Aktuelle NKM <span id="vz-plausi-nkm">—</span>/J × <span id="vz-plausi-jahre">15</span> Jahre = <span id="vz-plausi-statisch">—</span> (ohne Steigerung). Mit <span id="vz-plausi-mstg">1,5</span> % p.a. wächst die Miete jedes Jahr → Summe = <span id="vz-plausi-mit">—</span>. <!-- v1137b-anteilsjahr · Ohne diesen Zusatz rechnet der Leser 10.800 × 15 nach, kommt auf einen hoeheren Wert und haelt die Summe fuer falsch. Genau so ist es mir im Pruefdurchgang gegangen: Jahr 1 stand bei 4.500 statt 10.800, weil ab Kaufmonat gerechnet wird. -->Das <b>erste Jahr zählt nur anteilig</b> ab dem Kaufmonat — deshalb liegt die Summe unter der reinen Zinseszins-Rechnung.<br>
           <b>Hinweis:</b> Die Tilgung wird hier abgezogen, weil sie kein Geld auf dem Konto ist — sie ist gebundenes Eigenkapital im Objekt. Sie taucht oben separat als <i>„Tilgung-vom-Mieter"</i> auf. <b>Konto-Reserve + Tilgung-vom-Mieter</b> = liquider und gebundener Vermögenszuwachs.
@@ -3792,7 +3792,7 @@ label.dp-required.qc-required::after {
 <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte, klickbar = übernehmen -->
 <script src="js/marktwert-abschlag.js?v=v2672a"></script><!-- v2237 · Abschlag auf Angebotspreise -->
 <script src="js/wertvergleich.js?v=v2810"></script><!-- v2810 · Pilot-Analyse: Marktpreisindikation, Ertrags- und Sachwert gegenuebergestellt -->
-<script src="js/wert-zielbild.js?v=v2840e"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
+<script src="js/wert-zielbild.js?v=v2841"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
 <script src="js/dealpilot-mb.js?v=v2820"></script>
 <script src="js/mb-auftrag.js?v=v2191"></script>
   <script src="js/marktbericht-view.js?v=v2823a"></script>
@@ -3816,7 +3816,7 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v2354"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v2549"></script>
+  <script src="js/object-actions.js?v=v2841"></script>
   <script src="js/dpsh-score-hero.js?v=v2822a"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
   <script src="js/voice-import.js?v=v2430"></script>
