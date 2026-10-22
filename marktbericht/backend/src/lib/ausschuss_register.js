@@ -299,6 +299,10 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Liste anfasst, aendert sie ZEILENWEISE - nie als Block. */
                             'lzs-ni-sh-rp-sl-2026.json',
                             'swf-ni-sh-rp-sl-2026.json',
+                            /* v2830: Niedersachsen MFH-Liegenschaftszins nach dem
+                               Landesmodell des OGA (Tableau-Dashboard 2026, GGR je
+                               Gemeinde x RND 15-80), 40 Kreise, 796 Gemeinden. */
+                            'lzs-ni-mfh-landesmodell-2026.json',
                             /* v1888 (Linie 9): BAYERN wird erreichbar. 748 Sperren -
                                94 Ausschuesse x 2 Kennzahlen x 4 Zweige.
                                verfuegbarkeit-by.json liegt seit v1613 im Register, ist
