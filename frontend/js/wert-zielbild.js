@@ -310,12 +310,21 @@
   var _autoVersucht = {}, _autoLaeuft = false;
   function autoRechnen() {
     var k = key(), PZ = global.DpPotenzial;
-    if (!k || _autoVersucht[k] || _autoLaeuft || !PZ || typeof PZ.rechnen !== 'function') return;
-    _autoVersucht[k] = 1; _autoLaeuft = true;
+    if (!k || (_autoVersucht[k] || 0) >= 2 || _autoLaeuft || !PZ || typeof PZ.rechnen !== 'function') return;
+    _autoVersucht[k] = (_autoVersucht[k] || 0) + 1; _autoLaeuft = true;
+    /* gemessen v2843: sofort beim Laden gerechnet passte der Auftrag nicht mehr zum fertig
+       geladenen Formular (Hash ungleich, Tafel blieb „veraltet"). Darum erst nach 1,5 s,
+       und ein zweiter Versuch, wenn das Ergebnis danach nicht zum Stand passt. */
     setTimeout(function () {
-      var fertig = function () { _autoLaeuft = false; try { einfachNeu(); } catch (e) {} karteBald(false); };
+      if (key() !== k) { _autoLaeuft = false; _autoVersucht[k] = 0; return; }
+      var fertig = function () {
+        _autoLaeuft = false;
+        var ok = false; try { ok = !!PZ.ergebnis(); } catch (e) {}
+        if (!ok && key() === k) { setTimeout(autoRechnen, 1500); return; }
+        try { einfachNeu(); } catch (e) {} karteBald(false);
+      };
       try { PZ.rechnen({ erzwingen: true }).then(fertig, fertig); } catch (e) { fertig(); }
-    }, 0);
+    }, 1500);
   }
   function daten() {
     var W = null, Z = null, A = null;
