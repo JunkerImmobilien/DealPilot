@@ -251,7 +251,7 @@
   /* ── Kernaussagen (Einfach) ───────────────────────────────────────────── */
   /* v2842 · Marcel 22.10.2026: „zu dünn" - je Kachel die Zahl, der Vergleich zu heute und ein
      Satz: Miete, Rendite, Ertragswert, Maßnahmen, Wertzuwachs nach Kosten, Marktpreisindikation. */
-  function pctTxt(v) { return dez(v, 1) + ' %'; }
+  function pctTxt(v) { return dez(v, 2) + ' %'; }
   function delta(neu, alt, einheit) {
     if (neu == null || alt == null) return '';
     var d = neu - alt;
@@ -334,7 +334,7 @@
       '.dp-si-nav button{font:500 11.5px Inter,sans-serif;border:1px solid #E6DCC2;border-radius:999px;background:#fff;color:#2A2727;padding:5px 11px;cursor:pointer}',
       '.dp-si-nav button:hover{border-color:var(--wl-c9a84c, #C9A84C)}',
       /* Kacheln (Einfach und Segment) */
-      '.dp-wz-kacheln{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:0 0 12px}',
+      '.dp-wz-kacheln{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 12px}',
       '.dp-wz-k{border:1px solid #EDE6D6;border-top:3px solid #D9D2C3;border-radius:10px;padding:10px 12px;background:#fff;min-width:0}',
       '.dp-wz-k.ist{border-top-color:#2A2727}.dp-wz-k.soll{border-top-color:var(--wl-e8cc7a, #E8CC7A)}.dp-wz-k.ziel{border-top-color:var(--wl-b8932f, #b8932f)}',
       '.dp-wz-k.kosten{border-top-color:#C98A84}.dp-wz-k.wert{border-top-color:var(--wl-c9a84c, #C9A84C);background:#FBF6E9}',
@@ -451,6 +451,8 @@
     stil();
     var e = '';
     try { e = einfachHtml(opts); } catch (x) { e = ''; }
+    /* v2842 · der Marktbericht (Marktpreisindikation mit und ohne Abschlag) lädt nach - dann die Kacheln neu */
+    if (_hist.key !== key()) { try { laden().then(function () { einfachNeu(); }); } catch (x) {} }
     if (!e) return genauHtml;   /* nichts Einfaches zu sagen: wie bisher */
     var m = modus();
     var nav = '<div class="dp-si-nav" role="navigation" aria-label="Inhalt">'
