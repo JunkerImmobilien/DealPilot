@@ -332,7 +332,7 @@
       '#card-wert-zielbild .dp-wz-kz{font:600 9.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#2f7d55;border:1px solid #2f7d55;border-radius:999px;padding:1px 8px;margin-left:auto;white-space:nowrap}',
       '#card-wert-zielbild .dp-wz-spm{display:none}',
       '@media (min-width:641px){#card-wert-zielbild table.dp-wz-verf{min-width:560px}#card-wert-zielbild table.dp-wz-stufen{min-width:440px}}',
-      '@media (max-width:640px){#card-wert-zielbild .dp-wz-spc{display:none}#card-wert-zielbild .dp-wz-spm{display:block}#card-wert-zielbild .dp-wz-t td{white-space:normal}}',
+      '@media (max-width:640px){#card-wert-zielbild .dp-wz-spc{display:none}#card-wert-zielbild .dp-wz-spm{display:block}#card-wert-zielbild .dp-wz-t td,#card-wert-zielbild .dp-wz-t th{white-space:normal}#card-wert-zielbild .dp-wz-t td:first-child{min-width:92px}}',
       '#card-wert-zielbild .dp-wz-quelle{font:400 11px/1.5 Inter,sans-serif;color:#6B645A;margin:6px 0 0}',
       '#card-wert-zielbild .dp-wz-quelle button{font:600 11px Inter,sans-serif;border:0;background:none;color:var(--wl-b8932f, #b8932f);padding:0;cursor:pointer;text-decoration:underline}',
       '#card-wert-zielbild details.dp-wz-det{margin-top:14px;border-top:1px solid #F0ECE4;padding-top:10px}',
@@ -342,7 +342,7 @@
       '#card-wertpotenzial .dp-pot-leg{display:flex;flex-wrap:wrap;gap:4px 14px;font:500 11px/1.4 Inter,sans-serif;color:#6B645A;margin:0 0 8px}',
       '#card-wertpotenzial .dp-pot-leg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:0}',
       '@media (max-width:640px){.dp-wz-kacheln{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-wz-k .w{font-size:15.5px}.dp-wz-k{padding:8px 10px}'
-        + '#card-wert-zielbild .dp-wz-t th,#card-wert-zielbild .dp-wz-t td{padding:6px 4px;font-size:11.5px}#card-wert-zielbild .dp-wz-t td:first-child{min-width:104px}'
+        + '#card-wert-zielbild .dp-wz-t th,#card-wert-zielbild .dp-wz-t td{padding:6px 4px;font-size:11.5px}#card-wert-zielbild .dp-wz-t td:first-child{min-width:92px}'
         + '#card-wert-zielbild .dp-wz-t th{font-size:9px;letter-spacing:.03em}}',
       '@media (max-width:420px){.dp-wz-k.wert{grid-column:1 / -1}}'
     ].join('');
