@@ -1398,7 +1398,7 @@ async function _exportPDFInner() {
   // CF Rechnung + Kennzahlen nebeneinander
   var hw = (CW - 5) / 2;
   var cyA = cy;
-  cy = secH(doc, cy, 'Cashflow-Rechnung heute', M, hw);
+  cy = secH(doc, cy, 'Cashflow-Rechnung ' + window._dpPdfJahr1(false).replace(/^Heute$/, 'heute'), M, hw);   /* v2835 */
   // V63.35.1: Anzeige Warmmiete oben -> UL durchlaufend -> Kaltmiete -> NUL -> NOI
   // (mathematisch identisch zur Excel-Logik NKM - NUL)
   var bwk_ul_now = K.bwk_ul || 0;
@@ -1682,7 +1682,7 @@ async function _exportPDFInner() {
   // Intro-Hinweis
   doc.setFillColor.apply(doc, C.SURF2); doc.roundedRect(M, cy, CW, 9, 1.5, 1.5, 'F');
   doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor.apply(doc, C.MID);
-  doc.text('Vergleich der Cashflows in 3 Phasen: Heute (aktuelles Jahr), Ende Zinsbindung (' + g('d1_bindj') + ' Jahre), Anschluss (mit kalk. ' + pP(v('anschl_z'), 1) + ')', W/2, cy + 6, { align: 'center' });
+  doc.text('Vergleich der Cashflows in 3 Phasen: ' + window._dpPdfJahr1(true) + ', Ende Zinsbindung (' + g('d1_bindj') + ' Jahre), Anschluss (mit kalk. ' + pP(v('anschl_z'), 1) + ')', W/2, cy + 6, { align: 'center' });
   cy += 12;
 
   var cfColW = (CW - 8) / 3;
@@ -1844,7 +1844,7 @@ async function _exportPDFInner() {
   // 3-Phasen-Kennzahlen-Tabelle (immer auf neue Seite, damit nichts abgeschnitten wird)
   if (State.phaseTable) {
     if (cy > 200) { doc.addPage(); pageNum++; cy = pageTpl(doc, pageNum, 'Kennzahlen-Vergleich \u00b7 3 Phasen', W, M); }
-    cy = secH(doc, cy, 'Kennzahlen-Vergleich \u00b7 Heute / Ende Zinsbindung / Anschluss', M, CW);
+    cy = secH(doc, cy, 'Kennzahlen-Vergleich \u00b7 ' + window._dpPdfJahr1(false) + ' / Ende Zinsbindung / Anschluss', M, CW);   /* v2835 */
     var pt = State.phaseTable;
     // V63.51: Tilgung vs. Bauspar-Rate dynamisch labeln
     var _isAussetzungPhPdf = (g('d1_type') === 'tilgungsaussetzung');
