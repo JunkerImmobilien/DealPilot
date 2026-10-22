@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
    DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595 · v2600 · v2790 · v2800
+   v2854: Sanierungsstau in den Potenzial-Stufen nicht doppelt (B54, PotenzialService geladen).
    v2825: GEW - Einheit ohne Nutzungsart wird nachgefragt (B53 angepasst).
    v2824: Gewerbe-/Industriegebaeude (GEW) mit Einheiten, Kette Mapper -> Kern (B53).
    v2820: Abnahme v2800 an der ganzen Kette Formular-Liste -> Mapper -> Kern (B52).
@@ -1127,6 +1128,38 @@ fallB('B53', () => {
     eO ? eO.grund + ' art=' + (riO && riO.gewerbe_art) : '');
 });
 
+/* ══ v2854 · SANIERUNGSSTAU IN DEN STUFEN NICHT DOPPELT (B54) ═════════════
+   Parkstr. 9: Sanierungskosten 137.000 € stehen im Bestand als boG (Mapper bomAus),
+   die Zielbild-Massnahmen (136.000 €) sind dieselben Arbeiten und werden im Wertzuwachs
+   als Kosten abgezogen. Entscheidung 22.10.2026: in jeder Stufe gilt der Stau in Hoehe
+   ihrer Kosten als behoben, boG = min(0, Stau + Kosten) - nur fuer einen boG aus den
+   Sanierungskosten. Gegentest: kosten 0 = alter Weg (voller Stau in der Stufe). */
+let PSM = null, psGrund = '';
+try { PSM = await lade('services/PotenzialService.js'); } catch (e) { psGrund = e.message.slice(0, 80); }
+fallB('B54', () => {
+  if (!PSM || typeof PSM._eineStufe !== 'function') return pruefe('B', 'B54', 'PotenzialService geladen', false, psGrund || '_eineStufe fehlt');
+  const GRUND = 'Sanierungs-/Instandsetzungskosten laut Objekt (brutto) — Kostenansatz, kein sachverständig ermittelter Wertabschlag';
+  const lauf = (quelle, grund) => ccFall('demo', (a) => { a[0].bom_eur = -137000; a[0].bom_quelle = quelle; a[4].bog_eur = -137000; a[4].bog_grund = grund; });
+  const r = lauf('sanierungskosten', GRUND), basis = r && r._ertragswertEingabe;
+  pruefe('B', 'B54', 'Kette: boG aus den Sanierungskosten trägt bog_quelle', !!basis && basis.ein.bog_quelle === 'sanierungskosten' && basis.ein.bog_eur === -137000,
+    basis ? basis.ein.bog_quelle + ' ' + basis.ein.bog_eur : 'keine Ertragswert-Eingabe');
+  if (!basis) return;
+  const kB = ertragswert(Object.assign({}, basis.ein), basis.bodenwert), B = kB.wert_ungerundet, miete = basis.ein.miete_markt_jahr;
+  const zZ = PSM._eineStufe(basis, {}, kB, miete, 0, 136000), zM = PSM._eineStufe(basis, {}, kB, miete, 0, 0);
+  wert('B', 'B54', 'Zielbild, Kosten 136.000 → Rest-boG −1.000', zZ && zZ.sanierungsstau ? zZ.sanierungsstau.rest_eur : null, -1000, 0);
+  wert('B', 'B54', 'Zielbild bei gleicher Miete: Ertragswert = Bestand + 136.000 (vorher = Bestand, Stau doppelt)', zZ ? zZ.wert_ungerundet - B : null, 136000, 1);
+  pruefe('B', 'B54', 'Rechenweg-Zeile „Sanierungsstau durch die Maßnahmen dieser Stufe behoben: 136.000 €, Rest 1.000 €"',
+    !!zZ && /behoben: 136\.000 €, Rest 1\.000 €/.test(zZ.sanierungsstau.text), zZ && zZ.sanierungsstau && zZ.sanierungsstau.text);
+  wert('B', 'B54', 'Stufe ohne Kosten → voller Stau −137.000', zM && zM.sanierungsstau ? zM.sanierungsstau.rest_eur : null, -137000, 0);
+  wert('B', 'B54', 'Stufe ohne Kosten: Ertragswert = Bestand', zM ? zM.wert_ungerundet - B : null, 0, 1);
+  const zG = PSM._eineStufe(basis, {}, kB, miete, 0, 200000);
+  wert('B', 'B54', 'Kosten über dem Stau: boG nie positiv (Rest 0, Ertragswert = Bestand + 137.000)', zG ? zG.wert_ungerundet - B : null, 137000, 1);
+  const rE = lauf('eigene_angabe', 'Wegerecht zugunsten des Nachbarn'), bE = rE && rE._ertragswertEingabe;
+  const kE = bE ? ertragswert(Object.assign({}, bE.ein), bE.bodenwert) : null, zE = bE ? PSM._eineStufe(bE, {}, kE, bE.ein.miete_markt_jahr, 0, 136000) : null;
+  pruefe('B', 'B54', 'eigene bOM-Angabe (Wegerecht) bleibt in jeder Stufe voll', !!zE && !zE.sanierungsstau && zE.wert_ungerundet === kE.wert_ungerundet && bE.ein.bog_quelle === null,
+    zE ? 'quelle ' + bE.ein.bog_quelle + ', Δ ' + (zE.wert_ungerundet - kE.wert_ungerundet) : 'kein Lauf');
+});
+
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */
 const auszug = (cc) => {
   const e = (cc && cc.ertragswert) || {}, s = (cc && cc.sachwert) || {};
@@ -1176,7 +1209,7 @@ for (const [name, fall] of Object.entries(C.faelle || {})) {
 /* ══ AUSGABE ═════════════════════════════════════════════════════════ */
 if (ALLE) detail.forEach((z) => console.log(z));
 const titel = { A: 'amtliche Anwendungsbeispiele', B: 'Prompt-Testfälle 1–11', C: 'Demo-Objekte (eingefroren ' + (C.stand || '–') + ')' };
-console.log('wertermittlung-pruefen v2825 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
+console.log('wertermittlung-pruefen v2854 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
 for (const eb of ['A', 'B', 'C']) {
   const x = E[eb];
   console.log('  Ebene ' + eb + ' ' + titel[eb].padEnd(38) + x.faelle + ' Fälle, ' + x.werte + ' Werte, '

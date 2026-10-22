@@ -1642,6 +1642,17 @@ export const CrossCheckService = {
           return Number.isFinite(n) && n !== 0 ? n : null;
         })(),
         bog_grund: p.bog_grund || null,
+        /* v2854 · Herkunft des boG fuer die Stufen im Potenzial-Lauf: nur ein Abzug,
+           der aus den Sanierungskosten des Objekts stammt (Mapper bomAus, bom_quelle
+           'sanierungskosten', oder sein Wortlaut), gilt dort als durch Massnahmen
+           behebbar - nie eine eigene bOM-Angabe (Wegerecht, Altlast …). */
+        bog_quelle: (function () {
+          const n = Number(p.bog_eur);
+          if (!(Number.isFinite(n) && n < 0)) return null;
+          const ausRef = !!(ref && ref.bom_quelle === 'sanierungskosten' && Number(ref.bom_eur) === n);
+          const ausGrund = /^Sanierungs-\/Instandsetzungskosten laut Objekt/.test(String(p.bog_grund || ''));
+          return (ausRef || ausGrund) ? 'sanierungskosten' : null;
+        })(),
       };
       /* v1048-WMOD-3 */
       const _hatModell = ['agvga_nrw_2016'].indexOf(String(p.modellversion || '')) >= 0;
