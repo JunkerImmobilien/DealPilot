@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-22T14:57:25.846Z",
+ "erzeugt_am": "2026-10-22T15:05:20.177Z",
  "quellen": {
   "voice-import": "4d1160a61b89e852",
-  "objektart-felder": "1e0549e54a17a054",
+  "objektart-felder": "a9b7856466ce82eb",
   "storage": "2f90eb34c2eacdda",
-  "index-html": "6ccbbbb86cf01657",
+  "index-html": "5385ca79d7d0d74a",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -120,6 +120,7 @@
    "GEW": {
     "passt": [
      "etagen_ges",
+     "einheiten",
      "gsfl",
      "wfl",
      "baujahr"
