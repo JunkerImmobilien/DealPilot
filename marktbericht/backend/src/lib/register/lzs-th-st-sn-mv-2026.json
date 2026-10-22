@@ -7203,6 +7203,9 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Vogtlandkreis",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh",
+  "zugang": "genehmigungspflichtig",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses im Landratsamt Vogtlandkreis",
+  "zugang_beleg": "aus dem Sperrtext dieses Satzes: Grundstücksmarktbericht 2025 kostenfrei und vollständig, Liegenschaftszinssätze Kap. 6.3 (Tabelle 76); Verwertung nur mit Erlaubnis",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
   "formel_vorgemerkt": {
@@ -7261,6 +7264,9 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Vogtlandkreis",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "we_v",
+  "zugang": "genehmigungspflichtig",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses im Landratsamt Vogtlandkreis",
+  "zugang_beleg": "aus dem Sperrtext dieses Satzes: Grundstücksmarktbericht 2025 kostenfrei und vollständig, Liegenschaftszinssätze Kap. 6.3 (Tabelle 76); Verwertung nur mit Erlaubnis",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
   "formel_vorgemerkt": {
@@ -7319,6 +7325,9 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Vogtlandkreis",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "ezfh",
+  "zugang": "genehmigungspflichtig",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses im Landratsamt Vogtlandkreis",
+  "zugang_beleg": "aus dem Sperrtext dieses Satzes: Grundstücksmarktbericht 2025 kostenfrei und vollständig, Liegenschaftszinssätze Kap. 6.3 (Tabelle 76); Verwertung nur mit Erlaubnis",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
   "formel_vorgemerkt": {
@@ -7377,6 +7386,10 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Zwickau",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh",
+  "zugang": "kostenpflichtig",
+  "gebuehr": "Vollversion 140,00 €; Verwertung zusätzlich erlaubnispflichtig",
+  "bestell_url": "mailto:gaa@landkreis-zwickau.de",
+  "zugang_beleg": "aus dem Sperrtext dieses Satzes: öffentliche Fassung 2026 ohne die Wertetabellen (Seitensprung 113 → 117)",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
   "formel_vorgemerkt": {
@@ -7435,6 +7448,10 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Zwickau",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "we_v",
+  "zugang": "kostenpflichtig",
+  "gebuehr": "Vollversion 140,00 €; Verwertung zusätzlich erlaubnispflichtig",
+  "bestell_url": "mailto:gaa@landkreis-zwickau.de",
+  "zugang_beleg": "aus dem Sperrtext dieses Satzes: öffentliche Fassung 2026 ohne die Wertetabellen (Seitensprung 113 → 117)",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
   "formel_vorgemerkt": {
@@ -7493,6 +7510,10 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Zwickau",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "ezfh",
+  "zugang": "kostenpflichtig",
+  "gebuehr": "Vollversion 140,00 €; Verwertung zusätzlich erlaubnispflichtig",
+  "bestell_url": "mailto:gaa@landkreis-zwickau.de",
+  "zugang_beleg": "aus dem Sperrtext dieses Satzes: öffentliche Fassung 2026 ohne die Wertetabellen (Seitensprung 113 → 117)",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
   "formel_vorgemerkt": {
@@ -7551,6 +7572,9 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Bautzen",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh",
+  "zugang": "genehmigungspflichtig",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses im Landratsamt Bautzen",
+  "zugang_beleg": "aus dem Sperrtext dieses Satzes: Bericht Stand 01.01.2024 kostenfrei und vollständig, Liegenschaftszinssätze Kap. 17.4 (Tab. 88 ff.); Verwertung nur mit Erlaubnis",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
   "formel_vorgemerkt": {
@@ -7609,6 +7633,9 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Bautzen",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "we_v",
+  "zugang": "genehmigungspflichtig",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses im Landratsamt Bautzen",
+  "zugang_beleg": "aus dem Sperrtext dieses Satzes: Bericht Stand 01.01.2024 kostenfrei und vollständig, Liegenschaftszinssätze Kap. 17.4 (Tab. 88 ff.); Verwertung nur mit Erlaubnis",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
   "formel_vorgemerkt": {
@@ -7667,6 +7694,9 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Bautzen",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "ezfh",
+  "zugang": "genehmigungspflichtig",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses im Landratsamt Bautzen",
+  "zugang_beleg": "aus dem Sperrtext dieses Satzes: Bericht Stand 01.01.2024 kostenfrei und vollständig, Liegenschaftszinssätze Kap. 17.4 (Tab. 88 ff.); Verwertung nur mit Erlaubnis",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
   "formel_vorgemerkt": {
@@ -8073,6 +8103,9 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh",
+  "zugang": "genehmigungspflichtig",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses im Landratsamt Pirna",
+  "zugang_beleg": "aus dem Sperrtext dieses Satzes: Grundstücksmarktbericht 2026 kostenfrei und vollständig, Liegenschaftszinssätze Kap. 6.5; „nur mit Quellenangaben und Genehmigung des Herausgebers“",
   "objektart": "mfh",
   "objektart_bez": "Mehrfamilienhäuser",
   "formel_vorgemerkt": {
@@ -8131,6 +8164,9 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "we_v",
+  "zugang": "genehmigungspflichtig",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses im Landratsamt Pirna",
+  "zugang_beleg": "aus dem Sperrtext dieses Satzes: Grundstücksmarktbericht 2026 kostenfrei und vollständig, Liegenschaftszinssätze Kap. 6.5; „nur mit Quellenangaben und Genehmigung des Herausgebers“",
   "objektart": "etw",
   "objektart_bez": "Eigentumswohnungen (vermietet, Weiterverkauf)",
   "formel_vorgemerkt": {
@@ -8189,6 +8225,9 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Sächsische Schweiz-Osterzgebirge",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "ezfh",
+  "zugang": "genehmigungspflichtig",
+  "zustaendige_stelle": "Geschäftsstelle des Gutachterausschusses im Landratsamt Pirna",
+  "zugang_beleg": "aus dem Sperrtext dieses Satzes: Grundstücksmarktbericht 2026 kostenfrei und vollständig, Liegenschaftszinssätze Kap. 6.5; „nur mit Quellenangaben und Genehmigung des Herausgebers“",
   "objektart": "ezfh",
   "objektart_bez": "Ein- und Zweifamilienhäuser",
   "formel_vorgemerkt": {
