@@ -228,9 +228,12 @@
     if (texte < 1 || formen < 4) return null;
     return best;
   }
+  /* v2830 · IMMER frisch zeichnen, nie das SVG aus der Bankansicht nehmen.
+     Gemessen 22.10.2026: nach einem Objektwechsel stand in der Bankansicht
+     noch die Zeichnung des VORIGEN Objekts - die Bankfassung von Hüllhorst
+     zeigte „Aus 120.000 € werden 581.205 €" (Westerfeldstr. 140). Das
+     Investment-PDF war nicht betroffen, weil es vorher renderAll(State) ruft. */
   function svgQuelle(id) {
-    var host = document.getElementById(id), svg = groesstesSvg(host);
-    if (svg && (svg.getBoundingClientRect().width > 120)) return { svg: svg, breite: Math.round(host.getBoundingClientRect().width) || 640, hoehe: Math.round(host.getBoundingClientRect().height) || 340 };
     var fn = BC_FN[id];
     if (!fn || !window.BankCharts || typeof window.BankCharts[fn] !== 'function') return null;
     var tmp = document.createElement('div');
@@ -769,8 +772,8 @@
        lesen - dieselbe Quelle wie pdf.js _readCardDataFromDom. Gezeichnet wird
        bei Bedarf unsichtbar in eine eigene Flaeche; gerechnet wird nichts. */
     function karte(id) {
-      var host = document.getElementById(id), tmp = null;
-      if (!host || !host.querySelector('.bc-card')) {
+      var host = null, tmp = null;   /* v2830: frisch, siehe svgQuelle */
+      {
         var fn = BC_FN[id];
         if (!fn || !window.BankCharts || typeof window.BankCharts[fn] !== 'function') return null;
         tmp = document.createElement('div'); tmp.style.cssText = 'position:fixed;left:-3000px;top:0;width:640px;height:340px';
@@ -1552,8 +1555,9 @@
        es nativ aus BankCharts._lastCockpitData (die SVG-Fassung ist nur ein
        Balken ohne Beschriftung, v1733) - hier dieselben Reihen als Kurven. */
     (function () {
-      var CD = window.BankCharts && window.BankCharts._lastCockpitData;
-      if ((!CD || !CD.dscrArr) && window.BankCharts && typeof window.BankCharts.renderBankCockpit === 'function') {
+      /* immer frisch rechnen lassen - _lastCockpitData kann vom vorigen Objekt stammen */
+      var CD = null;
+      if (window.BankCharts && typeof window.BankCharts.renderBankCockpit === 'function') {
         var tmp = document.createElement('div'); tmp.style.cssText = 'position:fixed;left:-3000px;top:0;width:640px;height:340px';
         document.body.appendChild(tmp);
         try { window.BankCharts.renderBankCockpit(tmp, window.State); } catch (e) {}
