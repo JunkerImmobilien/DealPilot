@@ -115,17 +115,33 @@ export const BWK_JAHRE = {
   2021: { verw_we: 298, verw_etw: 357, verw_garage: 39, inst_qm: 11.70, inst_garage: 88,
           quelle: 'ImmoWertV 2021, Anlage 3 (Verordnungstext, Stand 01.01.2021)' },
   2022: { verw_we: 312, verw_etw: 373, verw_garage: 41, inst_qm: 12.20, inst_garage: 92,
-          gew_verw_pct: 3, gew_inst_qm: { lager: 3.70, sb_markt: 6.10, buero: 12.20 }, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
+          gew_verw_pct: 3, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
   2023: { verw_we: 339, verw_etw: 405, verw_garage: 44, inst_qm: 13.20, inst_garage: 100,
-          gew_verw_pct: 3, gew_inst_qm: { lager: 4.00, sb_markt: 6.60, buero: 13.20 }, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
+          gew_verw_pct: 3, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
   2024: { verw_we: 351, verw_etw: 421, verw_garage: 46, inst_qm: 13.80, inst_garage: 104,
-          gew_verw_pct: 3, gew_inst_qm: { lager: 4.10, sb_markt: 6.90, buero: 13.80 }, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
+          gew_verw_pct: 3, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
   2025: { verw_we: 359, verw_etw: 429, verw_garage: 47, inst_qm: 14.00, inst_garage: 106,
-          gew_verw_pct: 3, gew_inst_qm: { lager: 4.20, sb_markt: 7.00, buero: 14.00 }, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
+          gew_verw_pct: 3, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
   2026: { verw_we: 367, verw_etw: 439, verw_garage: 48, inst_qm: 14.40, inst_garage: 108,
-          gew_verw_pct: 3, gew_inst_qm: { lager: 4.30, sb_markt: 7.20, buero: 14.40 }, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
+          gew_verw_pct: 3, quelle: 'Oberer Gutachterausschuss Brandenburg, Bewirtschaftungskosten nach Anlage 3 ImmoWertV (gutachterausschuss.brandenburg.de, Stand 2026)' },
 };
 export const BWK_MIETAUSFALL = { wohnen_pct: 2, gewerbe_pct: 4, quelle: 'Oberer Gutachterausschuss Brandenburg / Anlage 3 ImmoWertV' };
+/* ══ v2790 · INSTANDHALTUNG GEWERBE EXAKT NACH ANLAGE 3 II.2 (Marcel 22.10.2026, Punkt 4) ══
+   Anlage 3 II.2 ImmoWertV nennt fuer die gewerbliche Nutzung keinen Eurobetrag, sondern
+   einen ANTEIL der Instandhaltungskosten fuer Wohnnutzung (jeweils „wenn der Vermieter
+   Dach und Fach traegt"): Buero/Praxen/Geschaefte 100 %, SB-Verbrauchermaerkte 50 %,
+   Lager/Logistik/Produktion 30 %. Gerechnet wird deshalb Wohn-Instandhaltung je m2 ZUM
+   STICHTAG (inst_qm) x Anteil, UNGERUNDET (2026: 14,40 x 30 % = 4,32 EUR/m2).
+   Bis v2789 standen hier je Jahr die Betraege der Tabelle des Oberen Gutachterausschusses
+   Brandenburg (gew_inst_qm), die auf zehn Cent rundet: Lager 2022 3,70 (exakt 3,66),
+   2023 4,00 (3,96), 2024 4,10 (4,14), 2025 4,20 (4,20), 2026 4,30 (4,32); SB-Markt und
+   Buero waren exakt. Wirkung: 178 m2 Lager 2026 = 769 statt 765 EUR/Jahr. */
+export const GEW_INST_PCT = Object.freeze({ buero: 100, sb_markt: 50, lager: 30 });
+export function gewerbeInstandhaltungQm(nutzung, instQmWohnen) {
+  const p = GEW_INST_PCT[nutzung], w = Number(instQmWohnen);
+  if (p == null || !Number.isFinite(w) || w <= 0) return null;
+  return Math.round(w * p / 100 * 10000) / 10000;
+}
 
 /* Ansaetze zum Stichtagsjahr. Je Feld das Jahr selbst, sonst das letzte
    belegte Jahr davor. `abweichend` nennt jedes Feld, das NICHT aus dem
@@ -348,6 +364,26 @@ export function barwertAbweichungen(differenzen, zinsPct) {
     if (Number.isFinite(x) && x !== 0) s += x * abzinsungsfaktor(p, i + 1);
   });
   return round2(s);
+}
+/* ══ v2790 · DIE ABWEICHUNG IST EINE REINERTRAGSDIFFERENZ (Marcel 22.10.2026, Punkt 2) ══
+   EW-RL 2015 Anlage 3, Tabelle „Werteinfluss der boG fuer Beispielrechnung 1": je Jahr
+   jaehrlicher Rohertrag (vertraglich) − jaehrliche Bewirtschaftungskosten = jaehrlicher
+   Reinertrag; „Abweichung zum marktueblichen Reinertrag" = dieser Reinertrag − 205.200 €
+   (= 240.000 − 34.800). Die Bewirtschaftungskosten stehen dort in JEDEM Jahr mit
+   34.800 € - genau den Kosten des marktueblichen Ansatzes, auch das Mietausfallwagnis
+   (12.000 €) waechst mit der Staffelmiete NICHT mit. Damit ist die Reinertragsdifferenz
+   des Musters gleich der Rohertragsdifferenz (Jahr 2: 217.200 − 205.200 = 252.000 − 240.000
+   = 12.000). Eine Kuerzung um mietabhaengige Kostenanteile (Mietausfall, prozentuale
+   Verwaltung) sieht das Muster NICHT vor - sie wird hier deshalb auch nicht gerechnet.
+   Gesonderte erhebliche Abweichungen der Bewirtschaftungskosten sind ein eigenes boG
+   (EW-RL Nr. 6 Abs. 3), nicht Teil der Mietabweichung.
+   reinertragsDifferenzen([Rohertrag Jahr 1, 2, …], Rohertrag marktueblich, BWK marktueblich)
+   -> [Reinertrag_t − Reinertrag_marktueblich], BWK in beiden Spalten gleich. */
+export function reinertragsDifferenzen(rohertraegeIst, rohertragMarkt, bwkMarkt) {
+  const m = Number(rohertragMarkt), b = Number(bwkMarkt) || 0;
+  if (!Array.isArray(rohertraegeIst) || !Number.isFinite(m)) return null;
+  const reinMarkt = m - b;
+  return rohertraegeIst.map((r) => Math.round(((Number(r) - b) - reinMarkt) * 100) / 100);
 }
 export function barwertAbweichung(differenzJahr, zinsPct, jahre) {
   const d = Number(differenzJahr), n = Number(jahre);

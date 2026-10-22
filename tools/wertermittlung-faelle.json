@@ -226,7 +226,11 @@
           51721.5
         ],
         "lzs_pct": 6.5,
-        "hinweis": "Abweichung = Reinertrag des Jahres − marktüblicher Reinertrag 205.200 € (Spalte „Abweichung\" des Dokuments)"
+        "hinweis": "Abweichung = Reinertrag des Jahres − marktüblicher Reinertrag 205.200 € (Spalte „Abweichung\" des Dokuments)",
+        "rohertraege_vertrag": [240000, 252000, 264600, 277830, 291721.5, 291721.5, 291721.5, 291721.5, 291721.5, 291721.5],
+        "rohertrag_markt": 240000,
+        "bwk_jahr": 34800,
+        "hinweis_v2790": "Punkt 2 (Marcel 22.10.2026): Spalten „jährlicher Rohertrag“ und „jährliche Bewirtschaftungskosten“ der boG-Tabelle; die BWK stehen in JEDEM Jahr mit 34.800 € (= Kosten des marktüblichen Ansatzes, Mietausfall wächst nicht mit). Reinertragsdifferenz = Rohertragsdifferenz; Summe bleibt 254.977,54 €."
       },
       "eingabe_frei": {
         "ertragswert": {
@@ -634,7 +638,14 @@
     "B34": "v2660 · Ersatz-Teilmarkt (RH/DHH auf Ebene 18): nur, wenn die EFH-Umrechnung die Anbauweise fuehrt.",
     "B40": {"text": "v2770 · aus dem VW-Modul V4.2.6: der Mapper fuehrt je vermieteter Gewerbeeinheit Ist-, Marktmiete und Vertragslaufzeit (gewerbe.einheiten)", "vorher": "v2760: nur Summen ist_jahr/markt_jahr, keine Einheit"},
     "B41": {"text": "v2770 · E2 je Gewerbeeinheit (VW-Modul: Mehr-/Minderertrag je Mieteinheit, § 8 Abs. 3 Nr. 1): Demo-MFH + Laden 68 m², Markt 8 €/m² (6.528 €/Jahr), Ist 8.400 befristet bis 21.10.2031 -> boG 5 Jahre (8.705 €); Ist 6.000 ohne Laufzeit -> Szenarien 3/5/10, vorlaeufig; Ist = Markt -> nichts", "vorher": "v2760: gewerbe_ist_jahr kam im Kern an und wurde nie gelesen - keine Zeile, kein Hinweis"},
-    "B42": {"text": "v2770 · § 29 als Gegenrechnung neben § 28 (VW-Modul: Variante vereinfacht): Demo-MFH, Wert bleibt § 28, Differenz nur Rundung der Faktoren (gemessen −13 €)"}
+    "B42": {"text": "v2770 · § 29 als Gegenrechnung neben § 28 (VW-Modul: Variante vereinfacht): Demo-MFH, Wert bleibt § 28, Differenz nur Rundung der Faktoren (gemessen −13 €)"},
+    "B41_v2790": {"text": "B41 Underrent jetzt mit Ist 5.000 (−23,4 %, außerhalb des Bandes)", "vorher": "v2770: Ist 6.000 (−8,1 %) -> Szenarien; seit v2790 liegt 6.000 im Band ±20 % und ist der Ansatz (B43)"},
+    "B43": {"text": "v2790 · Punkt 1 · Band ±20 % auch für Gewerbe: Anker Marktmiete der Einheit; im reinen Gewerbeobjekt ohne Marktmiete die Ø Miete des Gewerbe-Zinssatzes (modellansaetze)", "vorher": "v2789: jede Abweichung als boG (Laden 6.000/7.000: Rohertrag 6.528, vorläufig); Gewerbeobjekt ohne Marktmiete: Ist ungeprüft, indikativ"},
+    "B44": {"text": "v2790 · Punkt 2 · boG auf der Reinertragsdifferenz wie EW-RL Anl. 3 Bsp. 1 (BWK in beiden Spalten gleich) - Betrag unverändert, Basis im Ergebnis und im Rechenweg", "vorher": "v2789: Rohertragsdifferenz (gleicher Betrag, Basis nicht genannt)"},
+    "B45": {"text": "v2790 · Punkt 3 · Stellplätze im reinen Gewerbeobjekt: Mietausfall 4 %, Verwaltung/Instandhaltung je Stellplatz Anlage 3 zum Stichtag", "vorher": "v2789: Stellplätze 2 % (Mietausfall 1.080 statt 1.128 €)"},
+    "B46": {"text": "v2790 · Punkt 4 · Instandhaltung Gewerbe = Wohn-Instandhaltung zum Stichtag × 100/50/30 %, ungerundet (Lager 2026 4,32 €/m²)", "vorher": "v2789: Tabelle Brandenburg gerundet (Lager 4,30; 3.861 statt 3.865 €)"},
+    "B47": {"text": "v2790 · Punkt 5 · kein gewogener Zins; bei Mischnutzung zuerst wgh/ggg, sonst Rangfolge des Wohnhauses mit Hinweis „Hilfsweg nicht gerechnet“", "vorher": "v2789: MFH-Zweig zuerst, WGH nur letzter Rückfall; gewogener Zins gab es nie"},
+    "B48": {"text": "v2790 · Punkt 6 · Gewerbe ohne Nutzungsart: kein Ertragswert, Grund + Nachfrage je Einheit; im Gewerbeobjekt trägt eine Einheit ohne Angabe die Gewerbeart des Objekts", "vorher": "v2789: gerechnet ohne Instandhaltung dieser Fläche (Demo-WGH 645.000 €)"}
   },
   "ebene_c": {
     "stand": "2026-10-21",

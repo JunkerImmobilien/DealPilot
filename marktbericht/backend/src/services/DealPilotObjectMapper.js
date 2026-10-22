@@ -262,7 +262,13 @@ function gewerbeAus(d) {
     }
     out.wfl_gewerbe += fl;
     const n = e.nutzung_gew || '';
-    if (n) out.flaechen[n] = (out.flaechen[n] || 0) + fl; else out.ohne_nutzung_qm += fl;
+    if (n) out.flaechen[n] = (out.flaechen[n] || 0) + fl;
+    else {
+      out.ohne_nutzung_qm += fl;
+      /* v2790 · Punkt 6: WELCHE Einheit die Nutzungsart braucht - fuer die Nachfrage im Bericht */
+      out.ohne_nutzung_nr = out.ohne_nutzung_nr || [];
+      out.ohne_nutzung_nr.push(String(e.nr || e.bez || e.name || ('GE ' + (out.ohne_nutzung_nr.length + 1))));
+    }
     const leer = String(e.status || '') === 'leer';
     if (!leer) out.ist_jahr += (num(e.ist) || 0) * 12;
     const mq = num(e.markt_qm);

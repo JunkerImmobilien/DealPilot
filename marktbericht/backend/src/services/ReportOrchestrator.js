@@ -940,6 +940,9 @@ export const ReportOrchestrator = {
           einheiten: ref.units || null,
           lage: ref.lage || null,
           stadtteil: ref.stadtteil || ref.ortsteil || null,
+          /* v2790 · Punkt 5: Wohnungen UND Gewerbeeinheiten -> zuerst der Satz fuer Wohn- und
+             Geschaeftshaeuser (lib/zweigwahl.js waehle), nie ein gewogener Zins */
+          mischnutzung: !!(ref.gewerbe && Number(ref.gewerbe.wfl_gewerbe) > 0 && Number(ref.gewerbe.n_wohnen) > 0),
         },
       });
       /* v1049-WBWK-1 · Die Bewirtschaftungskostenquote, die der

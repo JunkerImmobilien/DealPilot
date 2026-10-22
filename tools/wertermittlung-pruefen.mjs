@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
-   DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595 · v2600
+   DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595 · v2600 · v2790
+   v2790: Marcels sieben Entscheidungen vom 22.10.2026 (B43-B48, A-E6 Reinertragsdifferenz aus der Tabelle des Musters).
    v2600: E1 Band am Satz des Ausschusses (Anker ± 20 %), E2 Mietabweichung als boG
    (A-E6 Anlage 3 Beispiel 1, B13-B15), E3 Leerstand mit/ohne Abzug (B4, B16), E4
    Spanne der DealPilot-Formel (B17), E10 negativer Gebaeudereinertrag (A-E5 jetzt
@@ -176,6 +177,14 @@ for (const f of F.ebene_a) {
       /* v2600 · E2 · der Mehrertrag je Jahr abgezinst mit dem Liegenschaftszins (EW-RL Nr. 11.1) */
       const b = barwertAbweichungen(e.differenzen, e.lzs_pct);
       wert('A', id, 'Barwert der Abweichung (Summe der abgezinsten Jahre)', b, s.summe, t.euro);
+      /* v2790 · Punkt 2: die Abweichung als REINERTRAGSdifferenz aus den Spalten Rohertrag und
+         Bewirtschaftungskosten des Musters (BWK in jedem Jahr 34.800 €) - echte Funktion */
+      if (Array.isArray(e.rohertraege_vertrag)) {
+        const dR = IW.reinertragsDifferenzen(e.rohertraege_vertrag, e.rohertrag_markt, e.bwk_jahr);
+        pruefe('A', id, 'Reinertragsdifferenz je Jahr = Spalte „Abweichung zum marktüblichen Reinertrag" (BWK gleich)',
+          !!dR && dR.length === e.differenzen.length && dR.every((x, i) => Math.abs(x - e.differenzen[i]) < 0.005), JSON.stringify(dR));
+        wert('A', id, 'Barwert aus der Reinertragsdifferenz', barwertAbweichungen(dR, e.lzs_pct), s.summe, t.euro);
+      }
       wert('A', id, 'boG gerundet (Dokument)', b == null ? null : Math.round(b / t.rundung_dokument) * t.rundung_dokument, s.bog, 0);
       const kB = ertragswert(Object.assign(einManuell(fr.ertragswert), { bog_posten: [{ pos: 'besonderes objektspezifisches Merkmal: Mietabweichung', wert: s.bog }] }), bwEinfach(fr.ertragswert.bodenwert));
       wert('A', id, 'Ertragswert mit boG-Zeile (Summe vor Rundung)', kB.wert_ungerundet, s.ertragswert_summe, t.euro);
@@ -868,7 +877,8 @@ fallB('B41', () => {
   const kz = r && (r.ertragswert_kern.staffel || []).find((s) => /Merkmal: Mietabweichung Gewerbe/.test(s.pos));
   pruefe('B', 'B41', 'eigene boG-Zeile „Mietabweichung Gewerbe", Ertragswert = vorläufig + boG', !!kz && kz.wert === z.barwert_eur
     && r.ertragswert_kern.wert_ungerundet === e.vorlaeufiger_ertragswert_eur + z.barwert_eur + eigenerBog(r));
-  const r2 = ccFall('demo', gewDemo({ ist_jahr: 6000 })), e2 = r2 && r2.ertragswert, b2 = e2 && e2.miete_bog;
+  // v2790: 5.000 (−23,4 %, ausserhalb des Bandes); vorher v2770: 6.000 (−8,1 %, seit v2790 im Band -> B43)
+  const r2 = ccFall('demo', gewDemo({ ist_jahr: 5000 })), e2 = r2 && r2.ertragswert, b2 = e2 && e2.miete_bog;
   pruefe('B', 'B41', 'Underrent ohne Laufzeit → nur Szenarien 3/5/10, vorläufig, Satz „je Gewerbeeinheit"', !!b2 && b2.n_angesetzt === 0
     && b2.szenarien.map((s) => s.jahre).join() === '3,5,10' && e2.vorlaeufig_vor_bog === true
     && (r2.notes || []).some((n) => /Restlaufzeit je Gewerbeeinheit/.test(n)));
@@ -880,6 +890,114 @@ fallB('B42', () => {
   pruefe('B', 'B42', '§ 29 Gegenrechnung vorhanden, Wert bleibt § 28', !!v && k.wert === r.ertragswert.value_eur);
   pruefe('B', 'B42', 'Differenz § 29 − § 28 nur aus Rundung der Faktoren (< 0,1 %)', !!v && Math.abs(v.differenz_zu_28_eur) < 0.001 * k.wert_ungerundet,
     v ? 'Differenz ' + v.differenz_zu_28_eur + ' €' : '');
+});
+
+/* ══ v2790 · MARCELS SIEBEN ENTSCHEIDUNGEN VOM 22.10.2026 (B43-B48) ══════════════
+   B43 Punkt 1  Band ±20 % auch fuer Gewerbe (Anker Marktmiete der Einheit bzw. Ø Miete
+                des Gewerbe-Zinssatzes)
+   B44 Punkt 2  boG auf der Reinertragsdifferenz (Muster EW-RL Anl. 3 Bsp. 1, A-E6)
+   B45 Punkt 3  Stellplaetze im reinen Gewerbeobjekt: Mietausfall 4 %, Verwaltung je Stellplatz
+   B46 Punkt 4  Instandhaltung Gewerbe exakt (Anteil der Wohn-Instandhaltung zum Stichtag)
+   B47 Punkt 5  kein gewogener Zins: bei Mischnutzung zuerst der WGH-Satz (wgh/ggg)
+   B48 Punkt 6  Gewerbe ohne Nutzungsart: kein Ertragswert, Grund + Nachfrage */
+const zeileK = (k, re) => { const z = ((k && k.staffel) || []).find((s) => re.test(s.pos)); return z ? z.wert : null; };
+fallB('B43', () => {
+  const im = ccFall('demo', gewDemo({ ist_jahr: 6000 })), eI = im && im.ertragswert;
+  pruefe('B', 'B43', 'Laden Ist 6.000 (−8,1 %) im Band: kein boG, nicht vorläufig, Band-Zeile ist_im_band',
+    !!eI && !eI.miete_bog && eI.vorlaeufig_vor_bog === false && im.gewerbe_band && im.gewerbe_band.zeilen[0].herkunft === 'ist_im_band');
+  wert('B', 'B43', 'Rohertrag Gewerbe = Ist 6.000 (vorher v2770: Markt 6.528)', zeileK(im.ertragswert_kern, /^Rohertrag Gewerbe/), 6000, 0);
+  const p7 = ccFall('demo', gewDemo({ ist_jahr: 7000 }));
+  wert('B', 'B43', 'Laden Ist 7.000 (+7,2 %) im Band: Rohertrag Gewerbe 7.000', zeileK(p7.ertragswert_kern, /^Rohertrag Gewerbe/), 7000, 0);
+  const au = ccFall('demo', gewDemo({ ist_jahr: 8400, mv_befristet_bis: '2031-10-21' }));
+  wert('B', 'B43', 'Laden Ist 8.400 (+28,7 %) außerhalb: Rohertrag Gewerbe = Markt 6.528', zeileK(au.ertragswert_kern, /^Rohertrag Gewerbe/), 6528, 0);
+  pruefe('B', 'B43', 'Grenze: +20 % genau (7.834) im Band, +20,1 % (7.841) außerhalb',
+    CCS.gewerbeNachBand({ markt_jahr: 6528, einheiten: [{ ist_jahr: 7833.6, markt_jahr: 6528 }] }).zeilen[0].herkunft === 'ist_im_band'
+    && CCS.gewerbeNachBand({ markt_jahr: 6528, einheiten: [{ ist_jahr: 7841, markt_jahr: 6528 }] }).zeilen[0].herkunft === 'ueber_band');
+  /* reines Gewerbeobjekt ohne Marktmiete je Einheit: Anker = Ø Miete des Gewerbe-Zinssatzes */
+  const gewAnker = (monat) => (a) => { a[0].property_type = 'gewerbe'; a[0].gewerbe_art = 'buero'; a[0].gewerbe = null;
+    a[0].monthly_net_rent = monat; a[0].vacancy = false; a[0].garages = 0; a[0].outdoor_parking = 0;
+    Object.assign(a[4], { lzs_pct: 5, lzs_zweig: 'gewerbe', lzs_aus_register: true, lzs_stufe: 'A', lzs_modellansaetze: { marktmiete_eur_qm: 7.5 } }); };
+  const gi = ccFall('demo', gewAnker(2600)), gE = gi && gi.ertragswert;
+  pruefe('B', 'B43', 'Gewerbeobjekt Ist 6,88 €/m² im Band um Ø 7,50 des Satzes: Ist angesetzt, nicht indikativ',
+    !!gE && gE.available && gE.gewerbe_herkunft === 'anker_lzs' && gE.indikativ === false && gE.gewerbe_band.herkunft === 'ist_im_band', gE ? gE.gewerbe_herkunft + '/' + gE.indikativ : '');
+  wert('B', 'B43', 'Gewerbeobjekt im Band: Rohertrag = Ist 31.200 (vorher v2770: Ist ungeprüft, indikativ)', gE ? gE.rohertrag_pa_eur : null, 31200, 0);
+  const ga = ccFall('demo', gewAnker(2000)), gA = ga && ga.ertragswert;
+  wert('B', 'B43', 'Gewerbeobjekt Ist 5,29 €/m² außerhalb: Rohertrag = 7,50 × 378 × 12', gA ? gA.rohertrag_pa_eur : null, 34020, 0);
+  pruefe('B', 'B43', 'außerhalb ohne Vertragslaufzeit: Szenarien 3/5/10, vorläufig', !!gA && gA.vorlaeufig_vor_bog === true
+    && gA.miete_bog && gA.miete_bog.n_offen === 1 && gA.miete_bog.offen_differenz_jahr === 24000 - 34020);
+  const gu = ccFall('demo', (a) => { gewAnker(2600)(a); a[4].lzs_modellansaetze = null; }), gU = gu && gu.ertragswert;
+  pruefe('B', 'B43', 'ohne Ø Miete im Satz: wie bisher Ist-Miete, indikativ', !!gU && gU.gewerbe_herkunft === 'ist_ungeprueft' && gU.indikativ === true);
+});
+fallB('B44', () => {
+  const r = ccFall('demo', gewDemo({ ist_jahr: 8400, mv_befristet_bis: '2031-10-21' })), b = r && r.ertragswert && r.ertragswert.miete_bog;
+  pruefe('B', 'B44', 'boG-Basis = Reinertragsdifferenz (BWK in beiden Ansätzen gleich, EW-RL Anl. 3 Bsp. 1)', !!b && b.basis === 'reinertragsdifferenz'
+    && /Reinertr/.test(b.basis_text) && /Beispiel 1/.test(b.basis_text));
+  const kz = (r.ertragswert_kern.staffel || []).find((s) => /Merkmal: Mietabweichung Gewerbe/.test(s.pos));
+  pruefe('B', 'B44', 'Rechenweg nennt die Reinertragsdifferenz', !!kz && /^Reinertragsdifferenz je Jahr/.test(kz.detail || ''), kz ? kz.detail : '');
+  wert('B', 'B44', 'Betrag unverändert: 1.872 €/Jahr × Barwertfaktor 5 J. (Muster: BWK gleich -> Reinertrags- = Rohertragsdifferenz)',
+    b && b.zeilen[0] ? b.zeilen[0].barwert_eur : null, barwertAbweichung(1872, r.ertragswert.liegenschaftszins_pct, 5), 0);
+});
+const gewObjekt = (extra = {}, art = 'buero') => (a) => {
+  a[0].property_type = 'gewerbe'; a[0].gewerbe_art = art; a[0].garages = 2; a[0].outdoor_parking = 0;
+  a[0].gewerbe = Object.assign({ n_gewerbe: 2, n_wohnen: 0, wfl_wohnen: 0, wfl_gewerbe: 378, flaechen: { buero_praxis_laden: 200, lager_logistik: 178 },
+    markt_jahr: 26400, markt_vollstaendig: true, leer_ohne_markt: 0, ohne_nutzung_qm: 0, wohnen_ist_jahr: 0, wohnen_leer: 0, ist_jahr: 27000,
+    einheiten: [{ nr: 'Büro', ist_jahr: 21000, markt_jahr: 19200 }, { nr: 'Lager', ist_jahr: 6000, markt_jahr: 7200 }] }, extra);
+  Object.assign(a[4], { lzs_pct: 5, lzs_zweig: 'gewerbe', lzs_aus_register: true, lzs_stufe: 'A', stellplatz_miete_monat: 50, lzs_modellansaetze: null });
+};
+fallB('B45', () => {
+  const r = ccFall('demo', gewObjekt()), k = r && r.ertragswert_kern;
+  /* Büro +9,4 %, Lager −16,7 %: beide im Band -> Gewerbe 27.000; Stellplätze 2 × 50 × 12 = 1.200 */
+  wert('B', 'B45', 'Rohertrag 27.000 + 1.200 Stellplätze', r && r.ertragswert ? r.ertragswert.rohertrag_pa_eur : null, 28200, 0);
+  wert('B', 'B45', 'Mietausfallwagnis 4 % auf alles, auch Stellplätze (vorher v2789: 26.400 × 4 % + 1.200 × 2 % = 1.080)', zeileK(k, /^Mietausfallwagnis/), 1128, 0);
+  wert('B', 'B45', 'Verwaltung 3 % × 27.000 + 2 × 48 € (Anlage 3, Garage 2026)', zeileK(k, /^Verwaltungskosten/), 810 + 96, 0);
+  pruefe('B', 'B45', 'Zeile und Hinweis nennen die Stellplätze wie Gewerbe', /Stellplätze wie Gewerbe/.test(((k.staffel || []).find((s) => /^Mietausfallwagnis/.test(s.pos)) || {}).pos || '')
+    && (k.hinweise || []).some((h) => /4 % auch auf die Stellplätze/.test(h)));
+  const w = ccFall('demo', (a) => { gewDemo({ ist_jahr: 6528 })(a); a[0].garages = 2; a[4].stellplatz_miete_monat = 50; });
+  pruefe('B', 'B45', 'Wohn- und Geschäftshaus: Stellplätze bleiben beim Wohnen-Satz (getrennt 2 %/4 %)', /Wohnen 2 %, Gewerbe 4 %/.test(((w.ertragswert_kern.staffel || []).find((s) => /^Mietausfallwagnis/.test(s.pos)) || {}).pos || ''));
+});
+fallB('B46', () => {
+  const r = ccFall('demo', gewObjekt()), k = r && r.ertragswert_kern;
+  wert('B', 'B46', 'Instandhaltung 200 × 14,40 + 178 × 14,40 × 30 % (= 4,32) + 2 × 108 (vorher v2789 mit 4,30: 3.861)', zeileK(k, /^Instandhaltung/), Math.round(2880 + 178 * 4.32 + 216), 0);
+  pruefe('B', 'B46', 'Rechenweg „178 m² × 14,4 € × 30 %"', /178 m² × 14,4 € × 30 %/.test(((k.staffel || []).find((s) => /^Instandhaltung/.test(s.pos)) || {}).pos || ''));
+  wert('B', 'B46', 'Lager 2022: 12,20 × 30 % = 3,66 (Tabelle Brandenburg: 3,70)', IW.gewerbeInstandhaltungQm('lager', 12.2), 3.66, 0);
+  wert('B', 'B46', 'SB-Markt 2026: 14,40 × 50 %', IW.gewerbeInstandhaltungQm('sb_markt', 14.4), 7.2, 0);
+  const k22 = ertragswert({ objektart: 'gewerbe', baujahr: 1990, wohnflaeche_qm: 0, anzahl_we: 0, stichtag_jahr: 2022, miete_markt_jahr: 0,
+    gewerbe_jahr: 10000, gewerbe_flaechen: { lager_logistik: 100 }, lzs_pct: 5, lzs_stufe: 'A', rnd_jahre: 30, bwk_modus: 'normiert' }, bwEinfach(50000));
+  wert('B', 'B46', 'Kern, Stichtag 2022: Instandhaltung 100 m² Lager = 366 €', zeileK(k22, /^Instandhaltung/), 366, 0);
+});
+let ZW = null;
+try { ZW = await lade('lib/zweigwahl.js'); } catch (e) { ZW = null; }
+fallB('B47', () => {
+  if (!ZW) return pruefe('B', 'B47', 'zweigwahl geladen', false, 'fehlt');
+  const w = (zw, misch) => ZW.waehle(zw, { objart: 'mfh', einheiten: 6, mischnutzung: misch }).zweig || null;
+  pruefe('B', 'B47', 'Mischnutzung: WGH-Satz vor dem MFH-Satz', w(['mfh', 'wgh'], true) === 'wgh', w(['mfh', 'wgh'], true));
+  pruefe('B', 'B47', 'Mischnutzung: ggg („Wohn- und Geschäftshäuser") vor dem MFH-Satz', w(['mfh', 'ggg'], true) === 'ggg', w(['mfh', 'ggg'], true));
+  pruefe('B', 'B47', 'ohne Gewerbe: MFH-Satz wie bisher', w(['mfh', 'wgh'], false) === 'mfh', w(['mfh', 'wgh'], false));
+  pruefe('B', 'B47', 'Mischnutzung ohne WGH-Satz: Rangfolge des Wohnhauses (mfh_bis6), kein Mischsatz', w(['mfh_bis6', 'mfh'], true) === 'mfh_bis6');
+  const r = ccFall('demo', gewDemo({ ist_jahr: 6528 }));
+  pruefe('B', 'B47', 'Bericht ohne WGH-Satz: „gewogener Satz wäre nur ein Hilfsweg und ist nicht gerechnet"', (r.notes || []).some((n) => /gewogener Satz wäre nur ein Hilfsweg und ist nicht gerechnet/.test(n)));
+  const r2 = ccFall('demo', (a) => { gewDemo({ ist_jahr: 6528 })(a); a[4].lzs_zweig = 'wgh'; });
+  pruefe('B', 'B47', 'mit WGH-Satz: „Satz des Gutachterausschusses für Wohn- und Geschäftshäuser (kein gewogener Zins …)"', (r2.notes || []).some((n) => /Satz des Gutachterausschusses für Wohn- und Geschäftshäuser \(kein gewogener Zins/.test(n)));
+  const quellen = ['services/CrossCheckService.js', 'services/ErtragswertService.js', 'services/WertParameterService.js', 'lib/zweigwahl.js']
+    .map((f) => fs.readFileSync(path.join(SRC, f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')).join('\n');
+  pruefe('B', 'B47', 'kein Bezeichner für einen gewogenen Liegenschaftszins im Code (kommentarfreier Text)', !/\b\w*(gewogen|gewichtet)\w*(zins|lzs)\w*\s*[=(]/i.test(quellen) && !/\b\w*(zins|lzs)\w*(gewogen|gewichtet)\w*\s*[=(]/i.test(quellen));
+});
+fallB('B48', () => {
+  const r = ccFall('demo', gewDemo({ ist_jahr: 6528 })), rO = ccFall('demo', (a) => { gewDemo({ ist_jahr: 6528 })(a);
+    Object.assign(a[0].gewerbe, { flaechen: {}, ohne_nutzung_qm: 68, ohne_nutzung_nr: ['Laden'] }); });
+  const e = rO && rO.ertragswert;
+  pruefe('B', 'B48', 'Wohn- und Geschäftshaus, Laden ohne Nutzungsart: kein Ertragswert, Grund, Nachfrage je Einheit (vorher v2789: 645.000 ohne Instandhaltung Laden)',
+    !!e && e.available === false && e.grund === 'gewerbe_ohne_nutzungsart' && e.nachfrage && e.nachfrage.einheiten.join() === 'Laden'
+    && /fehlt die Nutzungsart/.test(e.hinweis) && /Büro\/Praxis\/Laden, SB-Markt oder Lager\/Logistik/.test(e.hinweis), e ? e.grund : '');
+  pruefe('B', 'B48', 'mit Nutzungsart rechnet derselbe Fall', !!r && r.ertragswert.available === true);
+  const g = ccFall('demo', (a) => { gewObjekt({ flaechen: { buero_praxis_laden: 200 }, ohne_nutzung_qm: 178, ohne_nutzung_nr: ['Lager'] }, null)(a); }), gE = g && g.ertragswert;
+  pruefe('B', 'B48', 'Gewerbeobjekt ohne Gewerbeart, Einheit ohne Nutzungsart: kein Ertragswert mit Nachfrage', !!gE && gE.available === false && gE.grund === 'gewerbe_ohne_nutzungsart' && !!gE.nachfrage, gE ? gE.grund : '');
+  const gB = ccFall('demo', gewObjekt({ flaechen: { buero_praxis_laden: 200 }, ohne_nutzung_qm: 178 }, 'buero'));
+  pruefe('B', 'B48', 'Gewerbeobjekt mit Gewerbeart Büro: Einheit ohne Angabe trägt die Art des Objekts (rechnet, Hinweis)', !!gB && gB.ertragswert.available === true
+    && (gB.notes || []).some((n) => /mit der Gewerbeart des Objekts angesetzt/.test(n)));
+  const k = ertragswert({ objektart: 'mfh', baujahr: 1990, wohnflaeche_qm: 300, anzahl_we: 4, stichtag_jahr: 2026, miete_markt_jahr: 24000,
+    gewerbe_jahr: 6000, lzs_pct: 3, lzs_stufe: 'A', rnd_jahre: 40, bwk_modus: 'normiert' }, bwEinfach(100000));
+  pruefe('B', 'B48', 'Kern: Gewerbe-Rohertrag ohne Nutzungsart -> kein Wert, grund gewerbe_ohne_nutzungsart', k.vollstaendig === false && k.wert == null && k.grund === 'gewerbe_ohne_nutzungsart');
 });
 
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */
@@ -931,7 +1049,7 @@ for (const [name, fall] of Object.entries(C.faelle || {})) {
 /* ══ AUSGABE ═════════════════════════════════════════════════════════ */
 if (ALLE) detail.forEach((z) => console.log(z));
 const titel = { A: 'amtliche Anwendungsbeispiele', B: 'Prompt-Testfälle 1–11', C: 'Demo-Objekte (eingefroren ' + (C.stand || '–') + ')' };
-console.log('wertermittlung-pruefen v2670 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
+console.log('wertermittlung-pruefen v2790 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
 for (const eb of ['A', 'B', 'C']) {
   const x = E[eb];
   console.log('  Ebene ' + eb + ' ' + titel[eb].padEnd(38) + x.faelle + ' Fälle, ' + x.werte + ' Werte, '
