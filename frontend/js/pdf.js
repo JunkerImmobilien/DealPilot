@@ -1218,7 +1218,9 @@ async function _exportPDFInner() {
   // Titelfoto - Aspect Ratio wird respektiert
   cy = 127;
   if (_PHOTO_META.length > 0) {
-    var containerH = 58;
+    /* v2830 · ohne Investitionsthese bleibt die halbe Seite leer (gemessen 185-250 mm) -
+       dann darf das Titelbild bis 100 mm hoch werden; die These beginnt bei 198 mm. */
+    var containerH = g('thesis') ? 58 : 100;
     /* v2830 · zuschneiden statt Rahmen (siehe _fotoZuschnitt): hoechstens bis
        ein Drittel der Hoehe, die Seiten bleiben Papier bzw. Deckblattgrund. */
     var _tf = await _fotoZuschnitt(_PHOTO_META[0], CW / containerH, 0.35);
