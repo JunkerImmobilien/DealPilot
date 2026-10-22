@@ -119,7 +119,15 @@
       try {
         var d = fr.contentDocument || (fr.contentWindow && fr.contentWindow.document);
         if (d && window.ResizeObserver && d.documentElement && !fr._mbRO) {
-          fr._mbRO = new ResizeObserver(function () { sizeFrame(); });
+          /* v2820 · entkoppelt: sizeFrame aendert die iframe-Hoehe, damit verschwindet im iframe
+             der Scrollbalken und das beobachtete <html> wird breiter (gemessen 1263,3 -> 1280 px) -
+             im SELBEN Rendering-Schritt meldete Chrome "ResizeObserver loop completed with
+             undelivered notifications". Die Hoehe wird jetzt im naechsten Bild gesetzt; im
+             verborgenen Tab (kein rAF) traegt das Intervall unten. */
+          fr._mbRO = new ResizeObserver(function () {
+            if (fr._mbRaf) return;
+            fr._mbRaf = requestAnimationFrame(function () { fr._mbRaf = 0; sizeFrame(); });
+          });
           fr._mbRO.observe(d.documentElement);
         }
       } catch (e) {}
