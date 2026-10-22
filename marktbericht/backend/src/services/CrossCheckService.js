@@ -2101,7 +2101,11 @@ export const CrossCheckService = {
       const _flaechenG = _flaechenEin ? Object.assign({}, _flaechenEin) : (_nutzung3 ? { [_nutzung3]: _flG } : {});
       let _ohneQmG = _gew ? (_num(_gew.ohne_nutzung_qm) || 0) : 0;
       let _ohneUebernommen = false;
-      if (_ohneQmG > 0 && _nutzung3) {
+      /* v2825 · Marcel 22.10.2026: im Gewerbe-/Industriegebaeude (Gewerbeart gew) wird bei einer
+         Einheit ohne eigene Nutzungsart NACHGEFRAGT wie im Wohn-/Geschaeftshaus - nicht die Art
+         des Objekts (Halle/Lager, 30 % Instandhaltung) angenommen. Ein Laden in der Halle bekaeme
+         sonst 30 % statt 100 % und einen zu hohen Ertragswert. Andere Gewerbearten wie bisher. */
+      if (_ohneQmG > 0 && _nutzung3 && _artG !== 'gew') {
         if (_flaechenEin) _flaechenG[_nutzung3] = (_flaechenG[_nutzung3] || 0) + _ohneQmG;
         _ohneQmG = 0; _ohneUebernommen = !!_flaechenEin;
       }

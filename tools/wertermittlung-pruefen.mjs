@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
    DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595 · v2600 · v2790 · v2800
+   v2825: GEW - Einheit ohne Nutzungsart wird nachgefragt (B53 angepasst).
    v2824: Gewerbe-/Industriegebaeude (GEW) mit Einheiten, Kette Mapper -> Kern (B53).
    v2820: Abnahme v2800 an der ganzen Kette Formular-Liste -> Mapper -> Kern (B52).
    v2800: Wohnungen im Wohn-/Geschaeftshaus je Mietverhaeltnis (B49-B51), Ort der Nutzungsart-Nachfrage (B48).
@@ -1096,10 +1097,9 @@ fallB('B52', () => {
 /* ══ v2824 · GEWERBE-/INDUSTRIEGEBAEUDE (GEW) MIT EINHEITEN (B53) ══════════
    Marcel 22.10.2026: GEW bekommt „Einheiten erfassen" wie das Geschaeftshaus.
    Kette Formular-Liste -> echter Mapper -> echter Kern, Objektart GEW (Gewerbeart
-   des Objekts: gew -> Halle/Lager/Produktion, Anlage 3: 30 %). Einheiten ohne
-   eigene Nutzungsart tragen die Art des Objekts (v2790 Punkt 6) - der Kern
-   rechnet mit Hinweis statt nachzufragen. Ohne erkennbare Gewerbeart (Objektart
-   nur „Gewerbe") fragt er nach. */
+   des Objekts: gew). v2825 (Marcel 22.10.2026): eine Einheit ohne eigene
+   Nutzungsart wird im GEW NACHGEFRAGT wie im WGH - vorher (v2824) trug sie die
+   Art des Objekts (Halle/Lager, 30 %) und der Ertragswert rechnete mit Hinweis. */
 fallB('B53', () => {
   const ein = (zwei) => [{ nr: 'Halle', art: 'gewerbe', nutzung_gew: 'lager_logistik', wfl: 300, ist: 1500, markt_qm: 5 },
     Object.assign({ nr: 'Büro', art: 'gewerbe', wfl: 78, ist: 700, markt_qm: 9 }, zwei || {})];
@@ -1111,13 +1111,16 @@ fallB('B53', () => {
     a[0].garages = 0; a[0].outdoor_parking = 0;
     Object.assign(a[4], { lzs_pct: 5, lzs_zweig: 'gewerbe', lzs_aus_register: true, lzs_stufe: 'A', lzs_modellansaetze: null }); });
   const r = lauf(ri), e = r && r.ertragswert;
-  pruefe('B', 'B53', 'Kern: Gewerbe-Ertragswert rechnet, Büro mit der Gewerbeart des Objekts angesetzt (Hinweis)', !!e && e.available === true && e.gewerbe === true
-    && (r.notes || []).some((n) => /mit der Gewerbeart des Objekts angesetzt/.test(n)), e ? (e.grund || '') + ' ' + (e.hinweis || '').slice(0, 80) : 'kein Ergebnis');
-  pruefe('B', 'B53', 'Rohertrag: beide Ist-Mieten im Band ±20 % um die Marktmiete (Halle 1.500 = 300 × 5, Büro 700 zu 702) → Ist (1.500 + 700) × 12', !!e && e.rohertrag_pa_eur === (1500 + 700) * 12, e && e.rohertrag_pa_eur);
+  pruefe('B', 'B53', 'GEW, eine Einheit ohne Nutzungsart → kein Ertragswert, Nachfrage nutzung_gew für „Büro", Ort im Formular (vorher v2824: rechnete mit Halle/Lager 30 %)',
+    !!e && e.available === false && e.grund === 'gewerbe_ohne_nutzungsart' && e.gewerbe === true && e.nachfrage && e.nachfrage.feld === 'nutzung_gew'
+    && e.nachfrage.einheiten.join() === 'Büro' && /Einheiten erfassen/.test(e.hinweis) && /„Nutzungsart“/.test(e.hinweis), e ? (e.grund || '') + ' ' + JSON.stringify(e.nachfrage) : 'kein Ergebnis');
+  pruefe('B', 'B53', 'kein Übernahme-Hinweis „mit der Gewerbeart des Objekts angesetzt"', !!r && !(r.notes || []).some((n) => /mit der Gewerbeart des Objekts angesetzt/.test(n)));
   const riN = DPM.reportInput({ data: { objart: 'GEW', wfl: 378, _mfh_einheiten: ein({ nutzung_gew: 'buero_praxis_laden' }) } });
-  const rN = lauf(riN);
-  pruefe('B', 'B53', 'mit Nutzungsart je Einheit: rechnet ohne Übernahme-Hinweis', !!rN && rN.ertragswert.available === true
-    && !(rN.notes || []).some((n) => /mit der Gewerbeart des Objekts angesetzt/.test(n)));
+  const rN = lauf(riN), eN = rN && rN.ertragswert;
+  pruefe('B', 'B53', 'GEW mit Nutzungsart je Einheit: Gewerbe-Ertragswert rechnet', !!eN && eN.available === true && eN.gewerbe === true, eN && (eN.grund || ''));
+  pruefe('B', 'B53', 'Rohertrag: beide Ist-Mieten im Band ±20 % um die Marktmiete (Halle 1.500 = 300 × 5, Büro 700 zu 702) → Ist (1.500 + 700) × 12', !!eN && eN.rohertrag_pa_eur === (1500 + 700) * 12, eN && eN.rohertrag_pa_eur);
+  const gB = ccFall('demo', gewObjekt({ flaechen: { buero_praxis_laden: 200 }, ohne_nutzung_qm: 178, ohne_nutzung_nr: ['Lager'] }, 'buero'));
+  pruefe('B', 'B53', 'Büroobjekt (Gewerbeart buero) unverändert: Einheit ohne Angabe trägt die Art des Objekts (v2790)', !!gB && gB.ertragswert.available === true);
   const riO = DPM.reportInput({ data: { objart: 'Gewerbe', wfl: 378, _mfh_einheiten: ein() } }), rO = lauf(riO), eO = rO && rO.ertragswert;
   pruefe('B', 'B53', 'ohne erkennbare Gewerbeart: kein Ertragswert, Nachfrage nutzung_gew für „Büro"', !!eO && eO.available === false
     && eO.grund === 'gewerbe_ohne_nutzungsart' && eO.nachfrage && eO.nachfrage.feld === 'nutzung_gew' && eO.nachfrage.einheiten.join() === 'Büro',
@@ -1173,7 +1176,7 @@ for (const [name, fall] of Object.entries(C.faelle || {})) {
 /* ══ AUSGABE ═════════════════════════════════════════════════════════ */
 if (ALLE) detail.forEach((z) => console.log(z));
 const titel = { A: 'amtliche Anwendungsbeispiele', B: 'Prompt-Testfälle 1–11', C: 'Demo-Objekte (eingefroren ' + (C.stand || '–') + ')' };
-console.log('wertermittlung-pruefen v2824 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
+console.log('wertermittlung-pruefen v2825 · Uhr ' + new _Date(FEST).toISOString().slice(0, 10));
 for (const eb of ['A', 'B', 'C']) {
   const x = E[eb];
   console.log('  Ebene ' + eb + ' ' + titel[eb].padEnd(38) + x.faelle + ' Fälle, ' + x.werte + ' Werte, '
