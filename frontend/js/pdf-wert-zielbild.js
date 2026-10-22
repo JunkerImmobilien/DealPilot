@@ -124,6 +124,14 @@
         var s = Z.stufen[k] || {};
         return { titel: (VOR[k] || '') + ((Z.titel && Z.titel[k]) || k), wert: s.ertragswert, kosten: k === 'bestand' ? null : s.kosten };
       });
+      /* v2834 · Sanierungsstau je Stufe (v2854, potenzial.js): der fertige Satz der Stufe */
+      var gesehen = {};
+      X.stau = (Z.spalten || []).map(function (k) {
+        var st = Z.stufen[k] && Z.stufen[k].sanierungsstau;
+        if (!st || !st.satz || gesehen[st.satz]) return null;
+        gesehen[st.satz] = 1;
+        return { titel: (Z.titel && Z.titel[k]) || k, satz: st.satz };
+      }).filter(Boolean);
       if (Z.kennzeichnung) X.hinweis = 'Marktpreisindikation, Ertrags- und Sachwert sind indikativ nach ImmoWertV-Logik, kein Gutachten nach § 194 BauGB. ' + Z.kennzeichnung
         + (Z.ertragswert_veraltet ? ' Die Angaben wurden seit der letzten Rechnung geändert.' : '');
     }
@@ -152,7 +160,7 @@
       return {
         verfahren: verf.filter(function (v) { return zahl(v.mitte) != null; }),
         stufen: stufen, kaufpreis: kp, stand: sauber(stand),
-        texte: h ? texteAusBericht(h) : [], kern: X.kern || [],
+        texte: h ? texteAusBericht(h) : [], kern: X.kern || [], stau: X.stau || [],
         /* v2833 · der Hinweis zu Mieterhoehung/Zielbild ist Marcels Wortlaut aus
            potenzial.js (KENNZEICHNUNG, v2870) - nie ein eigener Text */
         hinweis: sauber(X.hinweis || ('Marktpreisindikation, Ertrags- und Sachwert sind indikativ nach ImmoWertV-Logik, kein Gutachten nach § 194 BauGB.'
@@ -322,6 +330,12 @@
         });
         doc.setDrawColor(f.linie[0], f.linie[1], f.linie[2]); doc.setLineWidth(0.15); doc.line(x, y + 6.4, x + B, y + 6.4); doc.setLineWidth(0.2);
         y += 6.4;
+      });
+      /* v2834 · Satz zum Sanierungsstau unter der Tafel */
+      (d.stau || []).forEach(function (s) {
+        y += 1.6;
+        y = BS.absatz(doc, 'Sanierungsstau · ' + sauber(s.titel) + ': ' + sauber(s.satz), { x: x, y: y + 2.4, breite: B, zeile: 3.7, unten: unten,
+          neueSeite: function () { return o.neueSeite(); }, stil: function () { doc.setFont('helvetica', 'normal'); doc.setFontSize(7.6); setT(f.text || f.tinte); } }) - 2.4;
       });
       y += 5;
     }
