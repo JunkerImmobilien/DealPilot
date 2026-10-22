@@ -42276,3 +42276,9 @@ Marcel 22.10.2026: „ja rollout 62".
   - (g) KI-Prompt nennt `em` „EK-Rendite … %“ (`openaiService.js:1033`).
   - (h) `PotenzialService` übernimmt den `san`-boG in Mieterhöhung und Zielbild, obwohl das Zielbild die Maßnahmen schon als Kosten abzieht – Bewertungsfrage an Marcel.
   - (i) 222.000 € (PDF-Strang) nicht reproduziert.
+
+### v2825 · GEW: Einheit ohne Nutzungsart wird nachgefragt (22.10.2026)
+- **Was:** Marcel 22.10.2026 zum Rest aus v2824: im Gewerbe-/Industriegebäude wird bei einer Einheit ohne eigene Nutzungsart NACHGEFRAGT wie im WGH, statt die Objektart (Halle/Lager, 30 % Instandhaltung) anzunehmen. `CrossCheckService`: die Übernahme der Objekt-Gewerbeart (v2790 Punkt 6) gilt nicht für Gewerbeart `gew`; es greift die vorhandene Sperre `gewerbe_ohne_nutzungsart` mit `nachfrage` (Feld `nutzung_gew`, Einheiten, Ort „Objekt › Einheiten erfassen › Details › Gewerbe › Nutzungsart“). Büro-, Geschäfts- und übrige Gewerbeobjekte unverändert.
+- **Commit:** `d10e6375`. mb-backend auf Staging neu gebaut (v2825 im Container nachgesehen).
+- **Nachweis:** `wertermittlung-pruefen` vorher A 88/88, B 193/193, C 99/99; nachher A 88/88, B 195/195, C 99/99. B53: GEW mit „Büro“ ohne Nutzungsart → kein Ertragswert, Nachfrage für „Büro“ mit Ort (gegen den alten Kern rot); GEW mit Nutzungsart je Einheit rechnet (Rohertrag 26.400); Büroobjekt weiter mit Übernahme.
+- **Rest:** GEW OHNE erfasste Einheiten rechnet weiter mit der Objektart (Halle/Lager) — dort gibt es keine Einheit, nach der man fragen könnte.
