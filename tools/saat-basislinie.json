@@ -1,7 +1,7 @@
 {
- "stand": "2026-10-13",
- "saetze": 4832,
- "dateien": 56,
+ "stand": "2026-10-22",
+ "saetze": 10713,
+ "dateien": 101,
  "befunde": {
   "berlin.json": {},
   "bodenpreise-nrw.json": {},
@@ -10,9 +10,7 @@
   },
   "erbbau-bs-wob.json": {},
   "erfurt.json": {},
-  "hamburg.json": {
-   "modellansaetze.baupreisindex fehlt als Zahl": 1
-  },
+  "hamburg.json": {},
   "laender2.json": {
    "modellansaetze.gnd_jahre fehlt als Zahl": 3,
    "modellansaetze.baupreisindex fehlt als Zahl": 5,
@@ -38,6 +36,7 @@
   },
   "lzs-he-2026.json": {},
   "lzs-ni-aurich-inseln-2026.json": {},
+  "lzs-ni-mfh-landesmodell-2026.json": {},
   "lzs-ni-sh-rp-sl-2026.json": {
    "stichtag fehlt": 8
   },
@@ -52,10 +51,28 @@
    "stichtag fehlt": 42,
    "beleg[#] ohne Seite, Kapitel oder Datei": 18
   },
+  "lzs-swf-2026-nachernte.json": {},
+  "lzs-swf-bw-2026-nachernte.json": {},
+  "lzs-swf-bw-2026-wege.json": {},
   "lzs-swf-by-2026-sperren.json": {},
   "lzs-swf-mv-rostock-2026-sperren.json": {},
+  "lzs-swf-uk-ulm-2026.json": {},
   "lzs-th-st-sn-mv-2026.json": {},
   "marktdaten-nrw.json": {},
+  "mfh-kennzahlen-2026.json": {},
+  "nachernte-2026-10-be.json": {},
+  "nachernte-2026-10-mv.json": {},
+  "nachernte-2026-10b-bb.json": {},
+  "nachernte-2026-10b-bw-wege.json": {},
+  "nachernte-2026-10b-bw.json": {},
+  "nachernte-2026-10b-he.json": {},
+  "nachernte-2026-10b-hh.json": {},
+  "nachernte-2026-10b-mv.json": {},
+  "nachernte-2026-10b-rp.json": {},
+  "nachernte-2026-10b-sh.json": {},
+  "nachernte-2026-10b-sn.json": {},
+  "nachernte-2026-10b-st.json": {},
+  "nachernte-2026-10b-th.json": {},
   "nord2.json": {},
   "ost.json": {
    "stichtag fehlt": 1,
@@ -72,12 +89,11 @@
   },
   "swf-bb.json": {
    "modellansaetze.gnd_jahre fehlt als Zahl": 29,
-   "modellansaetze.baupreisindex fehlt als Zahl": 31
+   "modellansaetze.baupreisindex fehlt als Zahl": 27
   },
   "swf-be-bb-hh-hb-2026.json": {},
   "swf-be.json": {
-   "modellansaetze.gnd_jahre fehlt als Zahl": 4,
-   "modellansaetze.baupreisindex fehlt als Zahl": 4
+   "modellansaetze.gnd_jahre fehlt als Zahl": 4
   },
   "swf-bw.json": {
    "modellansaetze.gnd_jahre fehlt als Zahl": 13,
@@ -90,9 +106,8 @@
    "modellansaetze.baupreisindex fehlt als Zahl": 19,
    "modellansaetze.gnd_jahre fehlt als Zahl": 2
   },
-  "swf-hh.json": {
-   "modellansaetze.baupreisindex fehlt als Zahl": 1
-  },
+  "swf-hh-2026-sperren.json": {},
+  "swf-hh.json": {},
   "swf-mv.json": {
    "modellansaetze.gnd_jahre fehlt als Zahl": 7,
    "modellansaetze.baupreisindex fehlt als Zahl": 7
@@ -102,10 +117,7 @@
    "modellansaetze.gnd_jahre fehlt als Zahl": 4,
    "modellansaetze.baupreisindex fehlt als Zahl": 4
   },
-  "swf-ni.json": {
-   "modellansaetze.gnd_jahre fehlt als Zahl": 26,
-   "modellansaetze.baupreisindex fehlt als Zahl": 31
-  },
+  "swf-ni.json": {},
   "swf-nrw.json": {
    "stichtag fehlt": 19,
    "modellansaetze.gnd_jahre fehlt als Zahl": 30,
@@ -118,18 +130,17 @@
   },
   "swf-nw-2026-block3.json": {
    "modellansaetze.gnd_jahre fehlt als Zahl": 20,
-   "modellansaetze.baupreisindex fehlt als Zahl": 36
+   "modellansaetze.baupreisindex fehlt als Zahl": 35
   },
   "swf-nw-2026-block5.json": {
-   "modellansaetze.baupreisindex fehlt als Zahl": 26,
+   "modellansaetze.baupreisindex fehlt als Zahl": 20,
    "modellansaetze.gnd_jahre fehlt als Zahl": 3
   },
   "swf-nw-he-2026-block4.json": {
-   "modellansaetze.baupreisindex fehlt als Zahl": 27,
+   "modellansaetze.baupreisindex fehlt als Zahl": 25,
    "modellansaetze.gnd_jahre fehlt als Zahl": 5
   },
   "swf-rp.json": {
-   "modellansaetze.gnd_jahre fehlt als Zahl": 1,
    "modellansaetze.baupreisindex fehlt als Zahl": 1
   },
   "swf-sh.json": {
@@ -151,6 +162,31 @@
    "modellansaetze.gnd_jahre fehlt als Zahl": 10,
    "modellansaetze.baupreisindex fehlt als Zahl": 70
   },
+  "uk-flaeche-bw-2026.json": {},
+  "uk-flaeche-by-2026.json": {},
+  "uk-flaeche-funde-ernte-lzs.json": {},
+  "uk-flaeche-laender-2026.json": {},
+  "uk-flaeche-ni-2026.json": {},
+  "uk-flaeche-nw-2026.json": {},
+  "uk-flaeche-ost-2026.json": {},
+  "uk-flaeche-west-2026.json": {},
+  "uk-irw-nw-bergisch-mettmann-2026.json": {},
+  "uk-irw-nw-muensterland-2026.json": {},
+  "uk-irw-nw-niederrhein-2026.json": {},
+  "uk-irw-nw-ostwestfalen-2026.json": {},
+  "uk-irw-nw-owl-2026.json": {},
+  "uk-irw-nw-rheinland-2026.json": {},
+  "uk-irw-nw-rheinland-sued-2026.json": {},
+  "uk-irw-nw-ruhr-nord-2026.json": {},
+  "uk-irw-nw-ruhr-ost-2026.json": {},
+  "uk-irw-nw-ruhr-west-2026.json": {},
+  "uk-irw-nw-sauerland-siegerland-2026.json": {},
+  "uk-wgfz-bielefeld-2026.json": {},
+  "uk-wgfz-bw-2026.json": {},
+  "uk-wgfz-laender-2026.json": {},
+  "uk-wgfz-nw-2026.json": {},
+  "uk-wgfz-nw2-2026.json": {},
+  "uk-wgfz-ost-west-2026.json": {},
   "vgf-bb.json": {},
   "vgf-be.json": {},
   "vgf-sl.json": {}
