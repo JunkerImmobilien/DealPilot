@@ -1635,6 +1635,54 @@ function _calcImmediate(){
       rs2=Math.max(0,rs2-t2);
     }
   }
+  /* ═══ v2852 · EINE RECHNUNG FUER DIE RESTSCHULD AM ENDE DER ZINSBINDUNG ═══
+     Bis hier rechnete diese Schleife die D1-Restschuld in bindj VOLLEN
+     Jahresschritten ab heute, die Projektion (cfRows) daneben ab dem Kaufjahr
+     mit anteiligem Jahr 1 - zwei Zahlen fuer dieselbe Groesse (2026-1054:
+     822.743 € in Reiter und PDF, 829.341 € in der Projektion). Und die
+     Projektion schaltete nach bindj ZEILEN auf den Anschluss, egal wie viele
+     Monate Zeile 1 hatte (2026-1056: Darlehen ab 01/2025, Zeile 1 = 12/2024
+     ohne Rate, Anschluss trotzdem schon ab 2034 statt 2035).
+     Jetzt zaehlt die Bindung in MONATEN ab Finanzierungsbeginn (dieselbe
+     Kaskade wie das anteilige Jahr 1 und „Zinsbindung bis"): _d1Bindung()
+     rechnet je Projektionsjahr den Teil in der Bindung - volle Jahre mit der
+     bisherigen Jahresformel (bitgleich), angebrochene Jahre Monat fuer Monat
+     wie computeY1Annuitaet. State.rs1 hier und die Projektion unten rufen
+     DIESELBE Funktion. Gilt fuer die klassische D1-Annuitaet; Aussetzung, BSV
+     und Darlehen 2 rechnen wie bisher. */
+  var _zbBaseY = (function(){ try { if (window.DealPilotAnteilig && DealPilotAnteilig.getBaseYear) { var _by = DealPilotAnteilig.getBaseYear(); if (_by) return _by; } } catch(_e){} return new Date().getFullYear(); })();
+  var _zbM1 = 12;
+  try {
+    if (window.DealPilotAnteilig && typeof DealPilotAnteilig.getFinanzierungMonths === 'function') {
+      var _zbStartIso = DealPilotAnteilig.getFinanzierungStartDate ? DealPilotAnteilig.getFinanzierungStartDate() : null;
+      var _zbM = DealPilotAnteilig.getFinanzierungMonths(_zbStartIso, _zbBaseY);
+      if (typeof _zbM === 'number' && _zbM >= 0 && _zbM < 12) _zbM1 = _zbM;
+    }
+  } catch(_eZb) {}
+  var _zbMon = bindj * 12;
+  var _zbStd = !_d1IsAussetzung && d1t > 0 && d1 > 0;
+  function _zbVor(y) { return y === 1 ? 0 : _zbM1 + (y - 2) * 12; }
+  function _zbIn(y)  { return y === 1 ? _zbM1 : 12; }
+  function _d1Bindung(rsIn, y) {
+    var vor = _zbVor(y), mon = _zbIn(y);
+    var kB = Math.max(0, Math.min(mon, _zbMon - vor));
+    var zy = 0, ty = 0, r = rsIn;
+    if (kB === 12) {
+      zy = r * d1z; ty = Math.min(r, d1_rate_m * 12 - zy); r = Math.max(0, r - ty);
+    } else {
+      for (var _k = 0; _k < kB; _k++) {
+        var _zm = r * d1z / 12, _tm = Math.min(r, d1_rate_m - _zm);
+        zy += _zm; ty += _tm; r = Math.max(0, r - _tm);
+      }
+    }
+    return { zy: zy, ty: ty, rs: r, kB: kB, mon: mon, vor: vor };
+  }
+  if (_zbStd) {
+    var _zbR = d1;
+    for (var _zbY = 1; _zbVor(_zbY) < _zbMon && _zbY < 400; _zbY++) _zbR = _d1Bindung(_zbR, _zbY).rs;
+    rs = _zbR;
+  }
+  State._zbM1 = _zbM1;
   var rs_total = rs + rs2;
   State.rs=rs_total; State.rs1=rs; State.rs2=rs2;
   st('restschuld',fE(rs_total,0));
@@ -2967,6 +3015,7 @@ function _calcImmediate(){
   }
 
   State.cfRows=[];var rs3=d1;
+  State._zbEzbIdx = null; State._zbAnIdx = null; State._zbRsEzbProj = null;   /* v2852: je Lauf neu, nie vom Vorgaenger */
   var rs3_d2 = (typeof d2_enabled !== 'undefined' && d2_enabled && d2 > 0) ? d2 : 0;  // V354-rs3d2-init: D2-Restschuld-Strang
   // V268-06: Anzeige-Basisjahr aus Kaufjahr (WU/kaufdat), Fallback heute
   var _v268_baseYear = (function(){
@@ -3120,7 +3169,29 @@ function _calcImmediate(){
     } else {
       // V63.38: Klassische Annuität (auch ohne BSV) - V63.51: bspar_y2 bleibt 0
       bspar_y2 = 0;
-      if (y <= bindj) {
+      if (_zbStd) {
+        /* v2852 · dieselbe Bindungsrechnung wie State.rs1 (oben); der Rest des
+           Jahres nach dem Bindungsende laeuft mit der Anschlussrate, Monat fuer
+           Monat, wenn der Uebergang mitten im Jahr liegt. */
+        var _zbB = _d1Bindung(rs3, y);
+        zy2 = _zbB.zy; ty2 = _zbB.ty; rs3 = _zbB.rs;
+        if (_zbB.kB > 0 && _zbB.vor + _zbB.kB >= _zbMon) State._zbRsEzbProj = rs3;
+        var _zbKA = _zbB.mon - _zbB.kB;
+        if (_zbKA > 0 && rs3 > 0) {
+          var _zbRateA = (typeof State.rs1 === 'number' ? State.rs1 : State.rs) * anschl_rate_eff;   /* je Jahr, wie bisher */
+          if (_zbKA === 12) {
+            var _zbZa = rs3 * az_eff, _zbTa = Math.min(rs3, Math.max(0, _zbRateA - _zbZa));
+            zy2 += _zbZa; ty2 += _zbTa; rs3 = Math.max(0, rs3 - _zbTa);
+          } else {
+            for (var _zbK = 0; _zbK < _zbKA; _zbK++) {
+              var _zbZm = rs3 * az_eff / 12, _zbTm = Math.min(rs3, Math.max(0, _zbRateA / 12 - _zbZm));
+              zy2 += _zbZm; ty2 += _zbTm; rs3 = Math.max(0, rs3 - _zbTm);
+            }
+          }
+        }
+        if (_zbB.vor + _zbB.mon <= _zbMon) State._zbEzbIdx = y - 1;            /* letztes Jahr ganz in der Bindung */
+        if (_zbB.vor >= _zbMon && State._zbAnIdx == null) State._zbAnIdx = y - 1;  /* erstes Jahr ganz im Anschluss */
+      } else if (y <= bindj) {
         zy2 = rs3 * d1z;
         ty2 = d1_rate_m * 12 - zy2;
       } else if (rs3 > 0) {
@@ -3132,7 +3203,7 @@ function _calcImmediate(){
       } else {
         zy2 = 0; ty2 = 0;
       }
-      rs3 = Math.max(0, rs3 - ty2);
+      if (!_zbStd) rs3 = Math.max(0, rs3 - ty2);   /* v2852: im Bindungsweg ist rs3 schon fortgeschrieben */
     }
 
     var cfop_y_operativ = nkm_y2 - bwk_cf_y2 - zy2;       // intern: für den Cashflow
@@ -3378,7 +3449,8 @@ function _calcImmediate(){
 
       // (3) State.kpis.ster_ezb (Year bindj) für CF-Vergleich-Ende-Zinsbindung
       if (State.kpis && State.bindj) {
-        var ezbIdx = Math.min((State.bindj || 1) - 1, State.cfRows.length - 1);
+        /* v2852 · das letzte Jahr GANZ in der Bindung (Monate ab Finanzierungsbeginn) */
+        var ezbIdx = Math.min((typeof State._zbEzbIdx === 'number' ? State._zbEzbIdx : (State.bindj || 1) - 1), State.cfRows.length - 1);
         if (State.cfRows[ezbIdx]) {
           State.kpis.ster_ezb  = State.cfRows[ezbIdx].tax_y;
           State.kpis.cf_ns_ezb = State.cfRows[ezbIdx].cfns_y;
@@ -3387,7 +3459,8 @@ function _calcImmediate(){
 
       // (4) State.kpis.ster_an (Year bindj+1) für CF-Vergleich-Anschluss
       if (State.kpis && State.bindj) {
-        var anIdx = Math.min(State.bindj || 1, State.cfRows.length - 1);
+        /* v2852 · das erste Jahr GANZ im Anschluss */
+        var anIdx = Math.min((typeof State._zbAnIdx === 'number' ? State._zbAnIdx : (State.bindj || 1)), State.cfRows.length - 1);
         if (State.cfRows[anIdx]) {
           State.kpis.ster_an  = State.cfRows[anIdx].tax_y;
           State.kpis.cf_ns_an = State.cfRows[anIdx].cfns_y;

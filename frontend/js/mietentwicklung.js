@@ -185,7 +185,13 @@ window.MietEntwicklung = (function() {
        hat, darf nicht einfach 1,0 liefern und so aussehen, als gaebe es
        keine Steigerung. */
     var el = document.getElementById('me_modus');
-    var w = el && el.value ? el.value : localStorage.getItem('dp_miet_modus');
+    /* v2852 · der Modus gehoert zum OBJEKT (Feld me_modus, gespeichert und beim
+       Laden gesetzt, storage.js), nie zum Geraet. Hier stand der Rueckfall auf
+       localStorage dp_miet_modus: ein frisch angelegtes Objekt (Feld geleert)
+       erbte so den Modus des zuletzt geoeffneten. Leer heisst jetzt:
+       gleichmaessige Steigerung - derselbe Wert, den storage.js Altobjekten
+       ohne Angabe gibt. */
+    var w = el && el.value ? el.value : 'prog';
     /* v2027 - die ART zaehlt mit. Wer ein MFH auf ETW umstellt, haette
        sonst einen gespeicherten Modus behalten, dessen Knopf gar nicht
        mehr da ist: rechnend, aber unerreichbar. */
@@ -197,7 +203,8 @@ window.MietEntwicklung = (function() {
     if (m !== 'detail' && m !== 'prog' && m !== 'einheiten') m = 'prog';   /* v2024 */
     var el = document.getElementById('me_modus');
     if (el) el.value = m;
-    localStorage.setItem('dp_miet_modus', m);
+    /* v2852 · kein geraeteweiter Merker mehr (siehe getMode) */
+    try { localStorage.removeItem('dp_miet_modus'); } catch (e) {}
     _renderUI();
     if (typeof calc === 'function') calc();
   }
