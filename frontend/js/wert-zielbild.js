@@ -248,13 +248,13 @@
     if (!Z) return K;
     var B = Z.stufen.bestand, M = Z.stufen.mieterhoehung, T = Z.stufen.zielbild, J = Z.jahre || {};
     var ewDa = !Z.ertragswert_gesperrt && B.ertragswert != null;
-    K.push({ schluessel: 'ist', titel: 'Heute', wert: B.miete_jahr, wert_text: eur(B.miete_jahr) + ' Miete im Jahr',
+    K.push({ schluessel: 'ist', titel: 'Heute · Miete im Jahr', wert: B.miete_jahr, wert_text: eur(B.miete_jahr) + ' Miete im Jahr',
       text: (B.miete_qm != null ? dez(B.miete_qm, 2) + ' €/m² kalt' : 'Kaltmiete heute')
         + (ewDa ? ' · Ertragswert ' + eur(B.ertragswert) : (W && W.ertragswert ? ' · Ertragswert laut Marktbericht ' + eur(W.ertragswert.wert) : '')) });
-    if (M) K.push({ schluessel: 'soll', titel: 'Mieterhöhung möglich', wert: Z.mehrertrag_jahr.mieterhoehung,
+    if (M) K.push({ schluessel: 'soll', titel: 'Mieterhöhung · mehr im Jahr', wert: Z.mehrertrag_jahr.mieterhoehung,
       wert_text: eurVz(Z.mehrertrag_jahr.mieterhoehung) + ' im Jahr',
       text: 'Der Mieter bleibt, bis zur Vergleichsmiete' + (J.mieterhoehung ? ', ab ' + J.mieterhoehung : '') + ' · dann ' + eur(M.miete_jahr) + ' im Jahr' });
-    if (T) K.push({ schluessel: 'ziel', titel: 'Zielbild', wert: T.miete_jahr, wert_text: eur(T.miete_jahr) + ' Miete im Jahr',
+    if (T) K.push({ schluessel: 'ziel', titel: 'Zielbild · Miete im Jahr', wert: T.miete_jahr, wert_text: eur(T.miete_jahr) + ' Miete im Jahr',
       text: 'nach Umbau oder Neuvermietung' + (J.zielbild ? ', fertig ' + J.zielbild : '') + ' · ' + eurVz(Z.mehrertrag_jahr.zielbild) + ' gegen heute' });
     var kost = T ? T.kosten : (M ? M.kosten : 0);
     if (kost > 0 || T) K.push({ schluessel: 'kosten', titel: 'Was es kostet', wert: kost || 0, wert_text: eur(kost || 0),
@@ -307,7 +307,7 @@
       '.dp-wz-k .w{display:block;font:700 18px/1.2 "Space Grotesk",Inter,sans-serif;color:#2A2727;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}',
       '.dp-wz-k .x{display:block;font:400 11.5px/1.45 Inter,sans-serif;color:#6B645A;margin-top:4px}',
       '.dp-wz-klar{font:400 13px/1.6 Inter,system-ui,sans-serif;color:#2A2727;margin:0 0 10px;max-width:80ch}',
-      '.dp-wz-klar b.pos{color:#2f7d55}.dp-wz-klar b.neg{color:#B8625C}',
+      '.dp-wz-klar b.dp-wz-pos{color:#2f7d55}.dp-wz-klar b.dp-wz-neg{color:#B8625C}',
       '.dp-wz-mehr{font:600 12px Inter,sans-serif;border:1px solid #E6DCC2;border-radius:8px;background:#fff;color:#2A2727;padding:6px 12px;cursor:pointer}',
       '.dp-wz-kenn{font:400 11px/1.5 Inter,sans-serif;color:#6B645A;margin:8px 0 0}',
       /* Segment im Tab Bewertung */
@@ -325,7 +325,7 @@
       '#card-wert-zielbild .dp-wz-t tr.fu td{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 8%,transparent)}',
       '#card-wert-zielbild .dp-wz-t tr.kp td{border-top:1.5px solid #2A2727}',
       '#card-wert-zielbild .dp-wz-t tr.sum td{font-weight:700;border-top:1.5px solid #2A2727}',
-      '#card-wert-zielbild .dp-wz-t .pos{color:#2f7d55}#card-wert-zielbild .dp-wz-t .neg{color:#B8625C}',
+      '#card-wert-zielbild .dp-wz-t .dp-wz-pos{color:#2f7d55}#card-wert-zielbild .dp-wz-t .dp-wz-neg{color:#B8625C}',
       '#card-wert-zielbild .dp-wz-t th.c-soll{box-shadow:inset 0 -2px 0 var(--wl-e8cc7a, #E8CC7A)}#card-wert-zielbild .dp-wz-t th.c-ziel{box-shadow:inset 0 -2px 0 var(--wl-b8932f, #b8932f)}',
       '#card-wert-zielbild .dp-wz-tag{font:600 9px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;padding:2px 5px;border-radius:4px;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 60%,transparent);color:var(--wl-b8932f, #b8932f);vertical-align:1px;margin-left:4px;white-space:nowrap}',
       '#card-wert-zielbild .dp-wz-kz{font:600 9.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#2f7d55;border:1px solid #2f7d55;border-radius:999px;padding:1px 8px;margin-left:auto;white-space:nowrap}',
@@ -350,7 +350,7 @@
   function kachelnHtml(K) {
     return '<div class="dp-wz-kacheln">' + K.map(function (k) {
       return '<div class="dp-wz-k ' + ART[k.schluessel] + '" data-dp-wz-kern="' + k.schluessel + '"><span class="t">' + esc(k.titel) + '</span>'
-        + '<span class="w">' + esc(k.wert_text) + '</span><span class="x">' + esc(k.text) + '</span></div>';
+        + '<span class="w">' + esc(k.wert == null ? k.wert_text : (k.schluessel === 'soll' ? eurVz(k.wert) : eur(k.wert))) + '</span><span class="x">' + esc(k.text) + '</span></div>';
     }).join('') + '</div>';
   }
   function klartextZiel(Z) {
@@ -363,7 +363,7 @@
     if (top && !Z.ertragswert_gesperrt && top.ertragswert != null && B.ertragswert != null) {
       var zw = Z.wertzuwachs_nach_kosten[topK];
       s.push('Der Ertragswert steigt von ' + esc(eur(B.ertragswert)) + ' auf <b>' + esc(eur(top.ertragswert)) + '</b>'
-        + (zw != null ? '; nach Abzug der Kosten bleiben <b class="' + (zw >= 0 ? 'pos' : 'neg') + '">' + esc(eurVz(zw)) + '</b> Wertzuwachs' : '') + '.');
+        + (zw != null ? '; nach Abzug der Kosten bleiben <b class="' + (zw >= 0 ? 'dp-wz-pos' : 'dp-wz-neg') + '">' + esc(eurVz(zw)) + '</b> Wertzuwachs' : '') + '.');
       if (Z.ertragswert_quelle === 'abruf') s.push('<span class="dp-si-hin">(Werte aus dem Abruf „Marktpreise" vom ' + esc(Z.ertragswert_abruf_datum || '') + '.)</span>');
     }
     return s.join(' ');
@@ -373,7 +373,7 @@
     var t = 'Gegenüber dem Ankauf' + (A.stichtag ? ' (Stand ' + esc(A.stichtag.split('-').reverse().join('.')) + ')' : '') + ' stehen <b>' + A.besser + '</b> von '
       + A.vergleichbar + ' Kennzahlen besser und <b>' + A.schlechter + '</b> schlechter.';
     if (A.bewegt.length) t += ' Am stärksten bewegt: ' + A.bewegt.map(function (z) {
-      return esc(z.wort) + ' <b class="' + (z.richtung === 'besser' ? 'pos' : 'neg') + '">' + (z.pct > 0 ? '+' : '−') + esc(dez(Math.abs(z.pct), 0)) + ' %</b>';
+      return esc(z.wort) + ' <b class="' + (z.richtung === 'besser' ? 'dp-wz-pos' : 'dp-wz-neg') + '">' + (z.pct > 0 ? '+' : '−') + esc(dez(Math.abs(z.pct), 0)) + ' %</b>';
     }).join(', ') + '.';
     if (A.dealscore && A.dealscore.ankauf !== A.dealscore.bestand) t += ' Der DealScore ging von ' + esc(dez(A.dealscore.ankauf, 0)) + ' auf ' + esc(dez(A.dealscore.bestand, 0)) + '.';
     return t;
@@ -457,7 +457,7 @@
       if (sp.some(function (k) { return S[k].marktpreisindikation != null; })) t += zeile('Marktpreisindikation', 'Angebote am Ort, nach Abschlag', function (k) { return S[k].marktpreisindikation != null ? esc(eur(S[k].marktpreisindikation)) : null; });
       if (sp.length > 1) t += zeile('Wertzuwachs nach Kosten', 'Ertragswert der Stufe − Bestand − Maßnahmen', function (k) {
         if (k === 'bestand') return '';
-        var v = Z.wertzuwachs_nach_kosten[k]; return v == null ? null : '<span class="' + (v >= 0 ? 'pos' : 'neg') + '">' + esc(eurVz(v)) + '</span>'; }, 'sum');
+        var v = Z.wertzuwachs_nach_kosten[k]; return v == null ? null : '<span class="' + (v >= 0 ? 'dp-wz-pos' : 'dp-wz-neg') + '">' + esc(eurVz(v)) + '</span>'; }, 'sum');
     }
     return t + '</tbody></table></div>';
   }
