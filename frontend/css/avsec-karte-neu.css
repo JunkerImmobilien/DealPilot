@@ -103,3 +103,15 @@
   html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mhead.dphead { padding: 8px 12px !important; }
   html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .legal { padding: 8px 12px 10px !important; }
 }
+
+/* ── v2760a · Tablet (Karte 640-899 px): gemessen 716 px Karte = 302 px hoch, weil Marktwert und Spanne
+   je eine eigene Zeile hatten. Jetzt Marktwert + je m² links untereinander, die Spanne rechts daneben
+   (unten buendig), darunter die drei Kacheln. ── */
+@container (min-width: 640px) and (max-width: 899px) {
+  html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; grid-template-areas: "mw sp sp" "sub sp sp" "miete ein gen" !important; row-gap: 8px !important; }
+  html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody .avs-sub { justify-self: start !important; text-align: left !important; }
+  html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody .avs-spanne { align-self: end !important; }
+  html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody .mw { align-self: start !important; }
+  html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody .miete { margin-top: 4px !important; }
+  html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody .row3 .f3 { margin-top: 4px !important; }
+}
