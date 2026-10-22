@@ -15,6 +15,7 @@ import {
   BWK_TABELLE, bwkAnsaetze, BWK_JAHRE, GND_TABELLE, MODELL,
   barwertfaktor, abzinsungsfaktor, gnd, rnd, lzsNach256,
   istNeubau, istErstbezugNachSanierung, round0, round2, gndNachAnlage1Belegt,
+  GEW_INST_PCT, gewerbeInstandhaltungQm,   /* v2790 */
 } from '../lib/immowertv.js';
 import { ABZUG as MP_ABZUG } from '../lib/modellpruefung.js';   /* v2595 */
 
@@ -472,8 +473,14 @@ export const ErtragswertService = {
          Wohn- und Stellplatzanteil, 4 % auf den gewerblichen Rohertrag. Bis
          hier galt EIN Satz fuer alles, je nachdem welcher Teil groesser war. */
       let _maGetrennt = null;
+      /* v2790 · Punkt 3 (Marcel 22.10.2026): im REINEN Gewerbeobjekt (kein Wohn-Rohertrag)
+         tragen Garagen/Stellplaetze das Mietausfallwagnis des Gewerbes, 4 % - Anlage 3 regelt
+         Stellplaetze bei gewerblicher Nutzung nicht ausdruecklich; DealPilot-Ansatz wie im
+         Verkehrswert-Modul. Verwaltung und Instandhaltung je Stellplatz bleiben die Anlage-3-
+         Betraege je Garage zum Stichtag. Bis v2789 liefen die Stellplaetze dort mit 2 %. */
+      const _spGewerbe = gewerbe > 0 && !mieteMarkt && stellplatz > 0;
       if (maPct == null) {
-        if (gewerbe > 0 && rohertrag > gewerbe) {
+        if (gewerbe > 0 && rohertrag > gewerbe && !_spGewerbe) {
           _maGetrennt = { wohnen: BWK_TABELLE.mietausfall_wohnen_pct, gewerbe: BWK_TABELLE.mietausfall_gewerbe_pct };
           maPct = round2(((rohertrag - gewerbe) * _maGetrennt.wohnen + gewerbe * _maGetrennt.gewerbe) / rohertrag);
         } else {
@@ -496,15 +503,37 @@ export const ErtragswertService = {
          wfl ist hier seit v2210 nur der WOHNteil (CrossCheckService trennt). */
       const _GEW_SCHL = { buero_praxis_laden: 'buero', sb_markt: 'sb_markt', lager_logistik: 'lager' };
       const _gewFl = (ein.gewerbe_flaechen && typeof ein.gewerbe_flaechen === 'object') ? ein.gewerbe_flaechen : {};
-      const _gewInstSaetze = (_gewJahr != null && BWK_JAHRE[_gewJahr].gew_inst_qm) || null;
+      /* v2790 · Punkt 4: Anteil der Wohn-Instandhaltung ZUM STICHTAG, ungerundet (Anlage 3 II.2;
+         lib/immowertv.js gewerbeInstandhaltungQm). Bis v2789 die auf 10 Cent gerundete Tabelle
+         Brandenburg (Lager 2026: 4,30 statt 4,32 €/m²). */
+      const _instWohnStichtag = _aw.inst_qm ?? BWK_TABELLE.instandhaltung_je_qm_wfl_eur;
       let instGewerbe = 0; const _instGewTeile = [];
-      if (gewerbe > 0 && _gewInstSaetze) {
+      if (gewerbe > 0) {
         Object.keys(_gewFl).forEach((n) => {
-          const satz = _gewInstSaetze[_GEW_SCHL[n]]; const fl = pos(_gewFl[n]);
-          if (satz != null && fl) { instGewerbe += fl * satz; _instGewTeile.push(Math.round(fl) + ' m² × ' + String(satz).replace('.', ',') + ' €'); }
+          const k = _GEW_SCHL[n]; const satz = gewerbeInstandhaltungQm(k, _instWohnStichtag); const fl = pos(_gewFl[n]);
+          if (satz != null && fl) { instGewerbe += fl * satz; _instGewTeile.push(Math.round(fl) + ' m² × ' + deZahl(_instWohnStichtag) + ' € × ' + GEW_INST_PCT[k] + ' %'); }
         });
       }
       instGewerbe = round0(instGewerbe);
+      /* ══ v2790 · Punkt 6 (Marcel 22.10.2026): GEWERBE OHNE NUTZUNGSART -> KEIN ERTRAGSWERT ══
+         Ohne Nutzungsart (Buero/Praxis/Laden, SB-Markt, Lager/Logistik) gibt es keinen
+         Instandhaltungsansatz nach Anlage 3 II.2. Bis v2789 rechnete der Kern dann OHNE
+         Instandhaltung fuer diese Flaeche weiter (Hinweis „NICHT angesetzt") - das ueberschaetzt
+         den Ertragswert und ist ein halbes Verfahren („Kein Verfahren rechnet halb").
+         Jetzt: kein Wert, Grund und die Nachfrage nach der Nutzungsart. */
+      const _gewFlBekannt = Object.keys(_gewFl).some((n) => _GEW_SCHL[n] && pos(_gewFl[n]));
+      if (gewerbe > 0 && (pos(ein.gewerbe_ohne_nutzung_qm) || !_gewFlBekannt)) {
+        const _qm = pos(ein.gewerbe_ohne_nutzung_qm);
+        const _nr = Array.isArray(ein.gewerbe_ohne_nutzung_nr) && ein.gewerbe_ohne_nutzung_nr.length ? ein.gewerbe_ohne_nutzung_nr : null;
+        out.grund = 'gewerbe_ohne_nutzungsart';
+        out.nachfrage = { feld: 'nutzung_gew', auswahl: Object.keys(_GEW_SCHL), einheiten: _nr };
+        out.warnungen.push('Ertragswert nicht ausgewiesen: Für ' + (_qm ? Math.round(_qm) + ' m² Gewerbefläche' : 'die Gewerbefläche')
+          + (_nr ? ' (' + _nr.join(', ') + ')' : '')
+          + ' fehlt die Nutzungsart. Ohne sie gibt es keinen Instandhaltungsansatz nach Anlage 3 ImmoWertV (Büro/Praxen/Geschäfte 100 %, '
+          + 'SB-Verbrauchermärkte 50 %, Lager/Logistik/Produktion 30 % der Wohn-Instandhaltung je m²) – ohne Instandhaltung wäre der Wert zu hoch. '
+          + 'Bitte je Gewerbeeinheit die Nutzungsart angeben: Büro/Praxis/Laden, SB-Markt oder Lager/Logistik.');
+        return out;
+      }
       const instand = round0(wfl * iJeQm + spKosten * iJeStp) + instGewerbe;   /* v2541: spKosten */
       /* getrennt exakt rechnen, nicht ueber den gerundeten Mischsatz (1.079 statt 1.080 EUR) */
       const mietausfall = _maGetrennt
@@ -513,11 +542,9 @@ export const ErtragswertService = {
       if (gewerbe > 0) {
         out.hinweise.push('Gewerbe: Verwaltung mit ' + _gewVerwPct + ' % des gewerblichen Rohertrags angesetzt'
           + (_maGetrennt ? ', Mietausfallwagnis 4 % auf Gewerbe und 2 % auf Wohnen' : '')
-          + (instGewerbe > 0
-            ? '. Instandhaltung der Gewerbeflächen nach Nutzungsart (Anlage 3): ' + _instGewTeile.join(' + ') + ' = ' + instGewerbe.toLocaleString('de-DE') + ' €'
-            : '. Die Instandhaltung der Gewerbeflächen ist NICHT angesetzt - dafür fehlt die Nutzungsart je Gewerbeeinheit'
-              + ' (Anlage 3: Lager 30 %, SB-Markt 50 %, Büro/Praxen/Geschäfte 100 % der Wohn-Instandhaltung je m²).')
-          + (pos(ein.gewerbe_ohne_nutzung_qm) && instGewerbe > 0 ? ' ' + Math.round(ein.gewerbe_ohne_nutzung_qm) + ' m² Gewerbe ohne Nutzungsart sind ohne Instandhaltung gerechnet.' : ''));
+          + (_spGewerbe ? ', Mietausfallwagnis 4 % auch auf die Stellplätze (reines Gewerbeobjekt), Verwaltung und Instandhaltung je Stellplatz nach Anlage 3 zum Stichtag' : '')
+          + '. Instandhaltung der Gewerbeflächen nach Nutzungsart (Anlage 3 II.2, Anteil der Wohn-Instandhaltung zum Stichtag): '
+          + _instGewTeile.join(' + ') + ' = ' + instGewerbe.toLocaleString('de-DE') + ' €');
       }
       const betriebNul = round0(pos(ein.bwk_betrieb_nul_jahr) || 0);
 
@@ -532,7 +559,8 @@ export const ErtragswertService = {
              + (instGewerbe > 0 ? ` + Gewerbe ${_instGewTeile.join(' + ')}` : '') + ')',   /* v2210 */
         detail: iHerkunft === 'Anlage 3' ? null : 'aus deiner Rücklage',
         wert: instand });
-      bwkDetail.push({ pos: _maGetrennt ? `Mietausfallwagnis (Wohnen ${_maGetrennt.wohnen} %, Gewerbe ${_maGetrennt.gewerbe} % - zusammen ${deZahl(maPct)} %)` : `Mietausfallwagnis (${deZahl(maPct)} % vom Rohertrag)`,
+      bwkDetail.push({ pos: _maGetrennt ? `Mietausfallwagnis (Wohnen ${_maGetrennt.wohnen} %, Gewerbe ${_maGetrennt.gewerbe} % - zusammen ${deZahl(maPct)} %)`
+          : (_spGewerbe ? `Mietausfallwagnis (${deZahl(maPct)} % vom Rohertrag, Stellplätze wie Gewerbe)` : `Mietausfallwagnis (${deZahl(maPct)} % vom Rohertrag)`),
         detail: maHerkunft === 'Anlage 3' ? null : 'aus deiner Leerstandsannahme',
         wert: mietausfall });
       if (betriebNul) bwkDetail.push({ pos: 'Nicht umlagefähige Betriebskosten', wert: betriebNul });
@@ -696,6 +724,24 @@ export const ErtragswertService = {
                                 barwertfaktor: _vS, barwert_eur: sonstigeBarwert };
     }
     let ertragswert = gebErtragswert + bw + sonstigeBarwert;
+    /* ══ v2770 · § 29 ALS GEGENRECHNUNG ══════════════════════════════════════
+       Uebernommen aus dem Verkehrswert-Modul V4.2.6 (Variante „vereinfacht"): das
+       vereinfachte Verfahren steht neben dem allgemeinen, mit demselben Zins, derselben
+       RND und denselben gerundeten Faktoren wie in den amtlichen Beispielen
+       (Barwertfaktor zweistellig, Abzinsungsfaktor vierstellig). Verzinst bzw.
+       abgezinst wird nur der rentierliche Bodenwert; ein nicht rentierlicher Anteil
+       (§ 41, selbststaendig nutzbare Teilflaeche/Hinterland) kommt ungekuerzt dazu -
+       wie EW-RL Anl. 3 Bsp. 3. Der ausgewiesene Wert bleibt der des § 28; die
+       Differenz entsteht nur aus der Rundung der Faktoren (EW-RL Bsp. 1: 63 €). */
+    const _af29 = abzinsungsfaktor(lzs, R);
+    if (hatBw && _af29 != null) {
+      const _br29 = round0(reinertrag * V), _bwa29 = round0(_bwRent * _af29), _nr29 = round0(bw - _bwRent);
+      const _v29 = _br29 + _bwa29 + _nr29 + sonstigeBarwert;
+      out.vereinfacht = { rechtsgrundlage: '§ 29 ImmoWertV', barwertfaktor: V, abzinsungsfaktor: _af29,
+        barwert_reinertrag_eur: _br29, bodenwert_abgezinst_eur: _bwa29, bodenwert_nicht_rentierlich_eur: _nr29,
+        sonstige_ertraege_eur: sonstigeBarwert, vorlaeufiger_ertragswert_eur: _v29,
+        differenz_zu_28_eur: _v29 - round0(ertragswert) };
+    }
     if (hatBw) out.staffel.push({ pos: '+ Bodenwert', wert: bw });
     /* WPDF12-4 · Ohne Bodenwert und ohne boG ist "vorlaeufiger Ertragswert"
      * dieselbe Zahl wie der Gebaeudeertragswert eine Zeile darueber. */

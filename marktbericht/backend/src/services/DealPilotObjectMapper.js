@@ -262,16 +262,37 @@ function gewerbeAus(d) {
     }
     out.wfl_gewerbe += fl;
     const n = e.nutzung_gew || '';
-    if (n) out.flaechen[n] = (out.flaechen[n] || 0) + fl; else out.ohne_nutzung_qm += fl;
+    if (n) out.flaechen[n] = (out.flaechen[n] || 0) + fl;
+    else {
+      out.ohne_nutzung_qm += fl;
+      /* v2790 · Punkt 6: WELCHE Einheit die Nutzungsart braucht - fuer die Nachfrage im Bericht */
+      out.ohne_nutzung_nr = out.ohne_nutzung_nr || [];
+      out.ohne_nutzung_nr.push(String(e.nr || e.bez || e.name || ('GE ' + (out.ohne_nutzung_nr.length + 1))));
+    }
     const leer = String(e.status || '') === 'leer';
     if (!leer) out.ist_jahr += (num(e.ist) || 0) * 12;
     const mq = num(e.markt_qm);
     if (mq > 0 && fl > 0) out.markt_jahr += mq * fl * 12;
     else { out.markt_vollstaendig = false; if (leer) out.leer_ohne_markt++; }
+    /* v2770 · je Gewerbeeinheit Ist, Markt und Vertragslaufzeit - fuer die
+       Mietabweichung als boG je Mietverhaeltnis (E2, wie bei den Wohnungen).
+       Nur vermietete Einheiten mit beiden Mieten; Laufzeit nur, was eingetragen ist. */
+    if (!leer && mq > 0 && fl > 0 && num(e.ist) > 0) {
+      const _d = (v) => (v && /^\d{4}-\d{2}(-\d{2})?$/.test(String(v)) ? String(v) : null);
+      if (!out.einheiten) out.einheiten = [];
+      out.einheiten.push(Object.assign({ nr: String(e.nr || e.bez || e.name || ('GE ' + (out.einheiten.length + 1))),
+        ist_jahr: Math.round(num(e.ist) * 12), markt_jahr: Math.round(mq * fl * 12) },
+        _d(e.mv_befristet_bis) ? { mv_befristet_bis: _d(e.mv_befristet_bis) } : {},
+        _d(e.mv_kuendigungsverzicht_bis) ? { mv_kuendigungsverzicht_bis: _d(e.mv_kuendigungsverzicht_bis) } : {},
+        num(e.mv_abw_jahre) > 0 ? { mv_abw_jahre: num(e.mv_abw_jahre) } : {}));
+    }
   });
   out.ist_jahr = Math.round(out.ist_jahr);
   out.wohnen_ist_jahr = Math.round(out.wohnen_ist_jahr);
   out.markt_jahr = out.markt_vollstaendig ? Math.round(out.markt_jahr) : null;
+  /* v2800 · die Wohnungen je Mietverhaeltnis (Band, boG je Wohnung wie im MFH, E1/E2) */
+  const _wo = einheitenMieteAus(d, true);
+  if (_wo) out.wohnungen = _wo;
   return out;
 }
 
@@ -313,12 +334,21 @@ function leerstandAus(d) {
    im Band - die Wohnung blieb bei 6,18. Gleiche Bedingungen wie leerstandAus
    (nur Wohnen, jede Einheit mit Flaeche, mindestens eine vermietet); schon ab
    ZWEI Einheiten, auch ohne Leerstand. */
-function einheitenMieteAus(d) {
-  const liste = Array.isArray(d._mfh_einheiten) ? d._mfh_einheiten
+/* v2800 · `nurWohnenImMix`: im Wohn- und Geschaeftshaus die WOHNUNGEN einzeln (fuer
+   gewerbe.wohnungen, gewerbeAus). Bis v2799 lieferte diese Funktion bei jeder Gewerbe-
+   einheit null - die Wohnungen eines Wohn-/Geschaeftshauses wurden nie je Mietverhaeltnis
+   gegen das Band geprueft, ihr Ist ging gar nicht ein (Rohertrag Wohnen = Anker x Flaeche),
+   und eine Mietabweichung konnte kein boG werden (Bericht v2790, Rest). Gewerbeeinheiten
+   bleiben draussen: sie prueft gewerbeNachBand je Einheit gegen IHRE Marktmiete. */
+function einheitenMieteAus(d, nurWohnenImMix) {
+  const alle = Array.isArray(d._mfh_einheiten) ? d._mfh_einheiten
     : (d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : null);
-  if (!liste || liste.length < 2) return null;
+  if (!alle || !alle.length) return null;
   if (/^\s*leer\s*$/i.test(String(pick(d, ['vermstand', 'vermietungsstand']) || ''))) return null;
-  if (liste.some((e) => e && String(e.art || '') === 'gewerbe')) return null;
+  const mitGewerbe = alle.some((e) => e && String(e.art || '') === 'gewerbe');
+  if (mitGewerbe !== !!nurWohnenImMix) return null;
+  const liste = nurWohnenImMix ? alle.filter((e) => e && String(e.art || '') !== 'gewerbe') : alle;
+  if (liste.length < (nurWohnenImMix ? 1 : 2)) return null;
   const out = [];
   for (let i = 0; i < liste.length; i++) {
     const e = liste[i];

@@ -287,7 +287,18 @@ export function waehle(zweige, obj = {}) {
       hinweis: 'Für diese Objektart ist kein Zinssatzzweig vorgesehen.' };
   }
 
-  const rang = ART_RANG[typ] || [typ];
+  /* ══ v2790 · GEMISCHTE NUTZUNG: ZUERST DER SATZ FUER WOHN- UND GESCHAEFTSHAEUSER ══
+     Marcel 22.10.2026 (Punkt 5): bei Mischnutzung (Wohnungen UND Gewerbeeinheiten im Objekt,
+     obj.mischnutzung) gilt der Liegenschaftszins des Ausschusses fuer Wohn- und
+     Geschaeftshaeuser - im Register die Arten 'wgh' und 'ggg' („Wohn- und Geschaeftshaeuser",
+     gemischt genutzt). Erst wenn der Ausschuss keinen fuehrt, die Rangfolge des Wohnhauses
+     (der Hinweis dazu steht im Bericht, CrossCheckService lzsMischText). Ein aus Wohn- und
+     Gewerbezins GEWOGENER Satz wird nirgends gerechnet. Bis v2789: MFH-Zweig zuerst, WGH nur
+     als letzter Rueckfall - auch fuer ein Haus mit Laden im Erdgeschoss. */
+  const _basis = ART_RANG[typ] || [typ];
+  const rang = (obj.mischnutzung && /^(mfh|dreifh)/.test(typ))
+    ? ['wgh', 'ggg', ..._basis.filter((a) => a !== 'wgh' && a !== 'ggg')]
+    : _basis;
   const rnd = Number(obj.restnutzungsdauer);
   const bj = Number(obj.baujahr);
   const dek = liste.map(dekodiere);

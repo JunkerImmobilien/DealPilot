@@ -1,0 +1,125 @@
+/* avsec-karte-neu.css · v2760 / v2780a · Marktbewertungskarte als Kartenraster unter 940 px Kartenbreite
+   ──────────────────────────────────────────────────────────────────────────────────────────────
+   Marcel 22.10.2026: „bei kleineren Displays und Handy sowie Tablets könnten wir die
+   Markteinschätzungskarte schöner rendern. Es rutscht zwar alles in die nächste Zeile, sieht
+   optisch aber nicht ansprechend aus."
+
+   SEIT v2780 STANDARD unter 940 px KARTENbreite (v2780a; erst 1.100) (Marcel 22.10.2026: „eine Schwelle finden, wann
+   wir umschalten"). Gemessen braucht die Desktop-Reihe mit Einordnung/Genauigkeit in Zeile 1 bis
+   1.085 px (siebenstellige Betraege, „Deutlich unter Markt") - Begruendung in avsec-streifen.css,
+   Block v2780/v2780a (dazwischen eine Zwischenstufe mit je m² unter dem Marktwert). Bis v2780 Demo hinter ?mwkarte=neu und nur unter 900 px.
+   Praefix html:not([data-dp-mwkarte="alt"]) = immer, ausser ?mwkarte=alt (Vergleich mit der alten
+   Fassung, js/avsec-karte-neu.js). Es haelt die Spezifitaet der Demo ueber avsec-streifen.css -
+   nicht ersatzlos streichen, sonst entscheidet die Ladereihenfolge.
+   Geladen von index.html UND quickcheck-app.html (eigenes Dokument).
+
+   GEMESSEN vorher (Westerfeldstr. 140, Karte 716 px im 1024er-Fenster): Kopf als 168-px-Spalte
+   links, 128 px hoch fuer zwei Zeilen Text; Marktwert / je m² / Marktmiete als Fliesszeile,
+   Einordnung 161 px und Genauigkeit 85 px ungleich breit, Beschriftungen 7,5 px (unter der
+   Hausuntergrenze 8,5 px), Fusszeile zentriert.
+
+   NEU (Kartenbreite < 900 px, seit v2780a < 940 px, @container an .av-cards.single wie v1876a):
+   - Kopf als Leiste oben (Logo · Markteinschätzung · Genauigkeit rechts).
+   - Marktwert gross als Hauptzahl, je m² / vs. Kaufpreis darunter.
+   - Spanne als ein Balken aus drei Feldern Unten · Ø · Oben (bleiben Knoepfe: Klick uebernimmt),
+     Oberkante als Stufenverlauf hell -> dunkel Gold, das gewaehlte Feld gerahmt.
+   - Kacheln gleicher Hoehe mit einer Oberkante: Marktmiete · Einordnung (Pille in Statusfarbe) ·
+     Genauigkeit (Wort + dreistufige Skala). Unter 520 px: Einordnung volle Breite,
+     darunter Marktmiete | Genauigkeit.
+   - Fusszeile linksbuendig, Rechtshinweis und Abschlag-Zeile (v2672) gestapelt, 9 px.
+   avm-section.js bleibt unberuehrt; .row3 wird display:contents, damit die beiden .f3 selbst
+   Rasterzellen sind.
+
+   */
+
+@container (max-width: 939px) {
+  /* ── Karte: drei Flaechen untereinander ── */
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp { grid-template-columns: minmax(0, 1fr) !important; grid-template-areas: "head" "body" "legal" !important; row-gap: 0 !important; column-gap: 0 !important; }
+
+  /* ── Kopf als Leiste ── */
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mhead.dphead { flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; gap: 10px !important; min-width: 0 !important; min-height: 0 !important; padding: 9px 14px !important; border-radius: 11px 11px 0 0 !important; align-self: stretch !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mhead.dphead .dplogo { flex: 1 1 auto !important; min-width: 0 !important; font-size: 14px !important; line-height: 1.2 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mhead.dphead .dplogo small { display: inline !important; margin: 0 0 0 8px !important; font-size: 8.5px !important; vertical-align: 1px !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mhead.dphead .avs-cf { margin: 0 0 0 auto !important; flex: 0 0 auto !important; }
+
+  /* ── Koerper: Raster mit drei gleich breiten Spalten ── */
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody { display: grid !important; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.15fr) minmax(0, .7fr) !important; grid-template-areas: "mw mw mw" "sub sub sub" "sp sp sp" "miete ein gen" !important; gap: 12px 10px !important; padding: 14px 14px 12px !important; align-items: stretch !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody > * { border-left: 0 !important; padding: 0 !important; min-width: 0 !important; margin: 0 !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody > .cmp { grid-column: 1 / -1 !important; }
+
+  /* Beschriftungen: eine Schrift, eine Groesse (8,5 px = Hausuntergrenze), ein Abstand */
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .mw::before,
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-sub::before,
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .miete::before,
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne::before,
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 .f3 .fk { display: block !important; font: 700 8.5px/1 "Space Grotesk", system-ui, sans-serif !important; letter-spacing: .1em !important; text-transform: uppercase !important; color: #9a8f72 !important; -webkit-text-fill-color: #9a8f72 !important; margin: 0 0 6px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+
+  /* Hauptzahl */
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .mw { grid-area: mw !important; align-self: end !important; font: 700 28px/1.05 "Space Grotesk", system-ui, sans-serif !important; letter-spacing: -.5px !important; white-space: nowrap !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-sub { grid-area: sub !important; align-self: start !important; justify-self: start !important; text-align: left !important; margin-top: -4px !important; font: 12.5px/1.2 "JetBrains Mono", monospace !important; color: #5f5a52 !important; white-space: nowrap !important; padding-bottom: 2px !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-sub > span { font-weight: 700 !important; }
+
+  /* Spanne als Balken: drei Felder in einem Rahmen, Oberkante als Stufenverlauf */
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne { grid-area: sp !important; display: block !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp-reihe { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 0 !important; border: 1px solid #E6E0D3 !important; border-radius: 10px !important; overflow: hidden !important; background: #FFFDF8 !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp { display: flex !important; flex-direction: column !important; align-items: flex-start !important; justify-content: center !important; gap: 4px !important; min-width: 0 !important; min-height: 44px !important; margin: 0 !important; padding: 7px 10px 8px !important; border: 0 !important; border-top: 3px solid var(--wl-c9a84c, #C9A84C) !important; border-left: 1px solid #EFE8D6 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; text-align: left !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp:first-child { border-left: 0 !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp[data-spanne="low"] { border-top-color: var(--wl-e8cc7a, #E8CC7A) !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp[data-spanne="high"] { border-top-color: var(--wl-b8932f, #b8932f) !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp.on { background: #fff !important; box-shadow: inset 0 0 0 1.5px var(--wl-c9a84c, #C9A84C) !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp small { display: block !important; font: 600 8.5px/1 "JetBrains Mono", monospace !important; letter-spacing: .1em !important; text-transform: uppercase !important; color: #9a8f72 !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp.on small { color: var(--wl-b8932f, #b8932f) !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp b { display: block !important; max-width: 100% !important; font: 700 13px/1.1 "Space Grotesk", system-ui, sans-serif !important; color: #1A1A18 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+
+  /* Kacheln: gleicher Rahmen, gleicher Innenabstand, Beschriftung oben */
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 { display: contents !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .miete,
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 .f3 { display: block !important; min-width: 0 !important; min-height: 0 !important; margin: 0 !important; padding: 10px 11px !important; border: 1px solid var(--border-g, #ece2c8) !important; border-radius: 10px !important; background: #FFFDF8 !important; text-align: left !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .miete { grid-area: miete !important; font: 11px/1.45 "JetBrains Mono", monospace !important; color: #5f5a52 !important; white-space: normal !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .miete b { font: 700 14px/1.2 "JetBrains Mono", monospace !important; color: #1b1815 !important; white-space: nowrap !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .miete:empty::after { content: "–"; display: block; font: 700 14px/1.2 "JetBrains Mono", monospace; color: #b3ab98; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 .f3:first-child { grid-area: ein !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 .f3:nth-child(2) { grid-area: gen !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 .f3 > * { display: block !important; }
+
+  /* Einordnung als Pille in ihrer Statusfarbe (Farbe kommt inline aus avm-section.js - nicht tokenisiert) */
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 .f3:first-child .fv { display: inline-block !important; max-width: 100% !important; margin: 0 !important; padding: 3px 9px !important; border: 1px solid color-mix(in srgb, currentColor 45%, transparent) !important; border-radius: 9px !important; background: color-mix(in srgb, currentColor 10%, transparent) !important; font: 700 11.5px/1.25 "JetBrains Mono", monospace !important; white-space: normal !important; overflow: visible !important; text-overflow: clip !important; }
+
+  /* v2760c · ohne Kaufpreis steht dort "–" in Grau (#7A7370, priceClass) - dann keine Pille, nur der Strich */
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 .f3:first-child .fv[style*="7A7370" i] { border: 0 !important; background: none !important; padding: 0 !important; }
+
+  /* Genauigkeit: Wort + dreistufige Skala. Die Stufe steht nur als Farbe im Inline-Stil
+     (avm-section.js accUnified: hoch #3FA56C, mittel #9a7f33, niedrig #B8625C) - daran haengt die Fuellung.
+     Ohne Treffer bleibt die Skala leer, das Wort steht trotzdem. */
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 .f3:nth-child(2) .fv { margin: 0 !important; font: 700 13px/1.2 "JetBrains Mono", monospace !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; --dp-acc: 0%; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 .f3:nth-child(2) .fv::after { content: ""; display: block; width: 100%; max-width: 64px; height: 4px; margin-top: 6px; border-radius: 2px; background: linear-gradient(90deg, currentColor 0 var(--dp-acc), #E9E2CF var(--dp-acc) 100%); -webkit-mask: repeating-linear-gradient(90deg, #000 0 31%, transparent 31% 34.5%); mask: repeating-linear-gradient(90deg, #000 0 31%, transparent 31% 34.5%); }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 .f3:nth-child(2) .fv[style*="B8625C" i] { --dp-acc: 31%; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 .f3:nth-child(2) .fv[style*="9a7f33" i] { --dp-acc: 65.5%; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 .f3:nth-child(2) .fv[style*="3FA56C" i] { --dp-acc: 100%; }
+
+  /* Fusszeile: linksbuendig, gestapelt, 9 px */
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .legal { grid-area: legal !important; text-align: left !important; padding: 9px 14px 11px !important; margin: 0 !important; border-top: 1px dashed var(--border-g, #ece2c8) !important; font: 9px/1.4 "JetBrains Mono", monospace !important; color: #8f8672 !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .legal .dp-abschlag { display: block !important; margin-top: 2px !important; }
+}
+
+/* ── Handy: unter 520 px Kartenbreite zwei Spalten, Marktwert und je m² untereinander ── */
+@container (max-width: 519px) {
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; grid-template-areas: "mw mw" "sub sub" "sp sp" "ein ein" "miete gen" !important; row-gap: 10px !important; padding: 12px 12px 10px !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-sub { justify-self: start !important; text-align: left !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp { padding: 7px 8px 8px !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne .avs-sp b { font-size: 12.5px !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mhead.dphead { padding: 8px 12px !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .legal { padding: 8px 12px 10px !important; }
+}
+
+/* ── v2760a · Tablet (Karte 640-899 px, seit v2780a bis 939 px): gemessen 716 px Karte = 302 px hoch, weil Marktwert und Spanne
+   je eine eigene Zeile hatten. Jetzt Marktwert + je m² links untereinander, die Spanne rechts daneben
+   (unten buendig), darunter die drei Kacheln. ── */
+@container (min-width: 640px) and (max-width: 939px) {
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; grid-template-areas: "mw sp sp" "sub sp sp" "miete ein gen" !important; row-gap: 8px !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-sub { justify-self: start !important; text-align: left !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .avs-spanne { align-self: end !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .mw { align-self: start !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .miete { margin-top: 4px !important; }
+  html:not([data-dp-mwkarte="alt"]) #avsec .av-cards.single .mc.dp .mbody .row3 .f3 { margin-top: 4px !important; }
+}

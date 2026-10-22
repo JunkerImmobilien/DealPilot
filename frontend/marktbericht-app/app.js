@@ -1161,7 +1161,7 @@ function _renderWertverfahren(d) {
              /* v2595 · Modellpruefung des Zinses: weicht das Objekt von dessen Stichprobe ab, steht es an der Zahl */
              + (e.modellpruefung && e.modellpruefung.geprueft && e.modellpruefung.abweichend && e.modellpruefung.abweichend.length
                 ? ' · <b>Zins passt nur eingeschränkt</b> (' + esc(e.modellpruefung.kurz.replace(/^Zins passt nur eingeschränkt: /, '')) + ')' : ''))
-          : (e.grund || ''),
+          : esc(ewGrundText(e)),   /* v2800 · Code-Gruende (gewerbe_ohne_nutzungsart) als Satz mit Ort im Formular */
         'ertrag', e.staffel,
         (e.modellpruefung && e.modellpruefung.geprueft && e.modellpruefung.abweichend && e.modellpruefung.abweichend.length)
           ? 'Modellprüfung des Liegenschaftszinses: ' + e.modellpruefung.text : null)
@@ -4456,7 +4456,9 @@ async function exportPdf(out) {
          darueber laufen Rohertrag und Reinertrag schon durch euro(), also
          durch de-DE. Im selben Kaertchen zwei Zahlensysteme. */
       'LZ ' + _deZahl(ew.liegenschaftszins_pct) + ' % · V ' + _deZahl(ew.vervielfaeltiger),
-    ] : [(cc.sachwert && cc.sachwert.grund) || (cc.ertragswert && cc.ertragswert.grund) || 'nicht berechenbar'],
+    /* v2800 · die Ertragswert-Karte nannte ohne Wert den Grund des SACHWERTS zuerst, und ein
+       Code-Grund (gewerbe_ohne_nutzungsart) stand roh da. Jetzt der eigene Grund, kurz mit Ort. */
+    ] : [ewGrundText(cc.ertragswert, true) || 'nicht berechenbar'],
       _fuehrt('ertragswert'));   /* v1062-WFUE-4 */
     y += cardH + 5;
 
@@ -6220,6 +6222,21 @@ try { (function () {
    Mietabweichung als besonderes objektspezifisches Merkmal (angesetzt oder als Szenario),
    vorlaeufiger Ertragswert vor diesen Merkmalen, Spanne der Stufe N, Liquidationshinweis.
    Nur aus Feldern des Kerns (cross_check.ertragswert), nichts geschaetzt. */
+/* v2800 · Grund ohne Ertragswert, lesbar. Die Gewerbe-Sperren tragen in `grund` einen CODE
+   und den Satz in `hinweis` (CrossCheckService); die Web-Karte zeigte den Code. Fehlt die
+   Nutzungsart, steht der Ort im Formular dabei (kurz: fuer die PDF-Karte, ohne Pfeile -
+   jsPDF/Helvetica kennt nur WinAnsi). */
+function ewGrundText(e, kurz) {
+  if (!e) return '';
+  var g = String(e.grund || '');
+  if (g === 'gewerbe_ohne_nutzungsart') {
+    var nr = e.nachfrage && Array.isArray(e.nachfrage.einheiten) && e.nachfrage.einheiten.length ? ' (' + e.nachfrage.einheiten.join(', ') + ')' : '';
+    if (kurz) return 'Nutzungsart der Gewerbeeinheit fehlt' + nr + ' – nachtragen: Reiter Objekt › Einheiten erfassen › Details › Gewerbe › Nutzungsart.';
+    return e.hinweis || ('Für die Gewerbeeinheit' + nr + ' fehlt die Nutzungsart.');
+  }
+  if (/^[a-z0-9_]+$/.test(g)) return e.hinweis || g.replace(/_/g, ' ');
+  return g;
+}
 function ewZusatz(e) {
   if (!e || !e.available) return [];
   var eu = function (x) { x = Math.round(Number(x)); return (x > 0 ? '+' : (x < 0 ? '−' : '')) + Math.abs(x).toLocaleString('de-DE') + ' €'; };

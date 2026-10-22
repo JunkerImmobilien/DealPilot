@@ -180,3 +180,39 @@
 #avsec .av-cards.single .mc.dp .mbody > *, #avsec .av-cards.single .mc.dp .mbody .avs-spanne { justify-content: flex-start !important; }
 #avsec .av-cards.single .mc.dp .mbody .row3 { justify-content: flex-start !important; align-items: stretch !important; }
 #avsec .av-cards.single .mc.dp .mbody .row3 .f3 { justify-content: flex-start !important; }
+
+/* ===== v2780 · Marcel 22.10.2026 (Bild Dateien/marktkarte.png): „Die Markteinschätzungskarte sieht auf dem
+   Desktop jetzt nicht mehr richtig aus … eine Schwelle finden, wann wir umschalten. Einordnung und Genauigkeit
+   können ja neben die −18,7 %." GEMESSEN (Bismarckstr. 27 = sein Bild, Westerfeldstr. 140; Breite der
+   .av-cards.single per Stil gesetzt): die Reihe Kopf | Marktwert | Spanne | je m² | Einordnung | Genauigkeit
+   braucht 1.036 px (Westerfeld) / 1.040 px (Bismarck), mit siebenstelligen Beträgen in Marktwert UND allen
+   drei Spannen-Knöpfen 1.078 px, mit „Deutlich unter Markt" 1.085 px. SCHWELLE deshalb 1.100 px KARTENbreite
+   (@container, nicht Fenster - die Seitenleiste nimmt 380 px). Darunter gilt die Kartenfassung v2760
+   (css/avsec-karte-neu.css, seit v2780 Standard) - ab 940 px erst die Zwischenstufe v2780a.
+   Ab 1.100 px: Einordnung/Genauigkeit in Zeile 1 rechts neben „je m² · vs. Kaufpreis", Zeile 2 nur die
+   Marktmiete unter dem Marktwert - sie spannt über alle Spalten, sonst macht ihre Breite die Marktwert-Spalte
+   breit (gemessen 236 statt 124 px). Ohne Marktmiete (avm-section.js schreibt dann ein leeres .miete) fällt
+   die Zelle weg und mit ihr die Zeile: keine Überschrift ohne Wert, Karte eine Zeile flach. Ab 1.340 px bleibt
+   die Ein-Zeilen-Stufe von v1876a (Marktmiete in Zeile 1).
+   `html ` vorn hebt die Spezifität über die gleichlautenden Stufen v1876a/v2490 - nicht auf Reihenfolge bauen. */
+@container (min-width: 1100px) and (max-width: 1339px) {
+  html #avsec .av-cards.single .mc.dp .mbody { grid-template-columns: max-content max-content max-content minmax(0, 1fr) !important; grid-template-areas: "mw sp sub row3" "miete miete miete miete" !important; row-gap: 4px !important; }
+  html #avsec .av-cards.single .mc.dp .mbody:has(> .miete:empty) { grid-template-areas: "mw sp sub row3" !important; row-gap: 0 !important; }
+  html #avsec .av-cards.single .mc.dp .mbody .miete { border-left: 0 !important; }
+}
+/* v2780a · ZWISCHENSTUFE 940-1.099 px (1.440er Fenster mit Seitenleiste = Karte 999 px). Die volle Reihe passt dort
+   nicht, die Kartenfassung waere 250-265 px hoch statt 116. Gemessen passt die Reihe, wenn „je m² · vs. Kaufpreis"
+   unter den Marktwert rueckt (wie in der Kartenfassung): Bismarckstr. 27 ohne Kuerzung bis unter 900 px, mit
+   siebenstelligen Betraegen und „Deutlich unter Markt" erste Kuerzung bei 914 px. Schwelle 940 px.
+   v2780b: die Marktmiete steht hier unter Einordnung/Genauigkeit (unter dem Marktwert steht schon je m²) -
+   gemessen Westerfeldstr. 140 bei 999 px: Karte 143 -> 112 px hoch (eigene dritte Zeile entfaellt); sie darf
+   dort umbrechen, falls eine fuenfstellige Miete die Spalte uebersteigt. */
+@container (min-width: 940px) and (max-width: 1099px) {
+  html #avsec .av-cards.single .mc.dp .mbody { grid-template-columns: max-content max-content minmax(0, 1fr) !important; grid-template-areas: "mw sp row3" "sub sp miete" !important; row-gap: 2px !important; }
+  html #avsec .av-cards.single .mc.dp .mbody:has(> .miete:empty) { grid-template-areas: "mw sp row3" "sub sp row3" !important; }
+  html #avsec .av-cards.single .mc.dp .mbody .avs-sub, html #avsec .av-cards.single .mc.dp .mbody .miete { border-left: 0 !important; }
+  html #avsec .av-cards.single .mc.dp .mbody .miete { white-space: normal !important; }
+}
+@container (min-width: 940px) {
+  html #avsec .av-cards.single .mc.dp .mbody > .miete:empty { display: none !important; }
+}
