@@ -203,11 +203,15 @@
 /* v2780a · ZWISCHENSTUFE 940-1.099 px (1.440er Fenster mit Seitenleiste = Karte 999 px). Die volle Reihe passt dort
    nicht, die Kartenfassung waere 250-265 px hoch statt 116. Gemessen passt die Reihe, wenn „je m² · vs. Kaufpreis"
    unter den Marktwert rueckt (wie in der Kartenfassung): Bismarckstr. 27 ohne Kuerzung bis unter 900 px, mit
-   siebenstelligen Betraegen und „Deutlich unter Markt" erste Kuerzung bei 914 px. Schwelle 940 px. */
+   siebenstelligen Betraegen und „Deutlich unter Markt" erste Kuerzung bei 914 px. Schwelle 940 px.
+   v2780b: die Marktmiete steht hier unter Einordnung/Genauigkeit (unter dem Marktwert steht schon je m²) -
+   gemessen Westerfeldstr. 140 bei 999 px: Karte 143 -> 112 px hoch (eigene dritte Zeile entfaellt); sie darf
+   dort umbrechen, falls eine fuenfstellige Miete die Spalte uebersteigt. */
 @container (min-width: 940px) and (max-width: 1099px) {
-  html #avsec .av-cards.single .mc.dp .mbody { grid-template-columns: max-content max-content minmax(0, 1fr) !important; grid-template-areas: "mw sp row3" "sub sp row3" "miete miete miete" !important; row-gap: 2px !important; }
+  html #avsec .av-cards.single .mc.dp .mbody { grid-template-columns: max-content max-content minmax(0, 1fr) !important; grid-template-areas: "mw sp row3" "sub sp miete" !important; row-gap: 2px !important; }
   html #avsec .av-cards.single .mc.dp .mbody:has(> .miete:empty) { grid-template-areas: "mw sp row3" "sub sp row3" !important; }
   html #avsec .av-cards.single .mc.dp .mbody .avs-sub, html #avsec .av-cards.single .mc.dp .mbody .miete { border-left: 0 !important; }
+  html #avsec .av-cards.single .mc.dp .mbody .miete { white-space: normal !important; }
 }
 @container (min-width: 940px) {
   html #avsec .av-cards.single .mc.dp .mbody > .miete:empty { display: none !important; }
