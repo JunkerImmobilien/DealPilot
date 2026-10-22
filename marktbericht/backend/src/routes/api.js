@@ -1582,7 +1582,9 @@ function _abrufKurz(out) {
   const h = out.haus || {};
   const stufe = (s) => (h[s] ? { ertragswert: h[s].wert ?? null, mpi_angebote: h[s].mpi_angebote ?? null,
     mpi_spanne: h[s].mpi_angebote_spanne || null, rohertragsfaktor_x_miete: h[s].mpi_rohertrag ? h[s].mpi_rohertrag.wert : null,
-    miete_jahr: h[s].miete_wohnen_jahr ?? null, rnd: h[s].rnd ?? null } : null);
+    miete_jahr: h[s].miete_wohnen_jahr ?? null, rnd: h[s].rnd ?? null,
+    /* v2842 · Abschlag und Wert ohne Abschlag je Stufe (Marcel: „Sind da Abschläge drin?") */
+    mpi_abschlag_pct: h[s].mpi_abschlag_pct ?? null, mpi_angebote_roh: h[s].mpi_angebote_roh ?? null } : null);
   return { kennzeichnung: out.kennzeichnung || null, ags: out.ags || null,
     stufen: { bestand: stufe('bestand'), mieterhoehung: stufe('mieterhoehung'), zielbild: stufe('zielbild') },
     markt: out.markt || null, mpi: out.mpi || null, etw_markt: out.etw_markt || null,

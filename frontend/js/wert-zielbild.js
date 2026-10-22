@@ -53,14 +53,17 @@
        titel: { bestand: 'Bestand 2026', … },   // mit Jahr, wie in den PDFs
        jahre: { ankauf, mieterhoehung, zielbild },
        stufen: { <stufe>: { miete_monat, miete_jahr, miete_qm, kosten, bmy, dscr, cf_monat,
-                            ertragswert, rnd, marktpreisindikation } },
+                            ertragswert, rnd, marktpreisindikation,
+                            mpi_abschlag_pct, mpi_ohne_abschlag,          // v2842: Abschlag auf Angebotspreise, Wert ohne Abschlag
+                            sanierungsstau: null|{ stau, kosten, behoben, rest, satz } } },   // v2854
        mehrertrag_jahr:   { mieterhoehung, zielbild }   // gegen Bestand
        wertzuwachs_nach_kosten: { mieterhoehung, zielbild }   // EW Stufe − EW Bestand − Kosten
        ertragswert_quelle: 'lauf'|'abruf'|null, ertragswert_abruf_datum: 'TT.MM.JJJJ'|null,
        ertragswert_gesperrt: Bool,         // ohne Stufe 3
        ertragswert_veraltet: Bool,         // Angaben seit dem Lauf geändert
        lzs: null | { pct, stufe, etikett },
-       satz: String                        // Satz für die Bank (pdfDaten().satz_bank)
+       satz: String,                       // Satz für die Bank (pdfDaten().satz_bank)
+       kurz_ausblick: String               // v2842: Kurzfassung des Ausblick-Hinweises
      },
      ankauf: null | {                      // nur mit Ankauf-Stand
        stichtag: 'JJJJ-MM-TT'|null, vergleichbar, gesamt, besser, schlechter,
@@ -68,9 +71,9 @@
        bewegt: [ { wort, einheit, ankauf, bestand, pct, richtung } ],  // die drei größten
        kern:   [ { wort, einheit: 'eur'|'zahl'|'score'|…, ankauf, bestand, richtung } ]  // Jahresmiete, Cashflow v. Steuer, DSCR, DealScore
      },
-     kernaussagen: [                       // die 3–5 Kernaussagen der Einfach-Ansicht
-       { schluessel: 'ist'|'soll'|'ziel'|'kosten'|'wert', titel, wert: Zahl|null,
-         wert_text: String, text: String }
+     kernaussagen: [                       // v2842: bis zu sechs Kacheln der Einfach-Ansicht
+       { schluessel: 'miete'|'rendite'|'ertragswert'|'kosten'|'wert'|'mpi', titel, wert: Zahl|null,
+         wert_text: String, vergleich_text: String (Vergleich zu heute), ton: 'pos'|'neg'|null, text: String }
      ]
    }
    ═══════════════════════════════════════════════════════════════════════ */
@@ -193,7 +196,9 @@
         miete_qm: zahl(x.miete_qm) != null ? Math.round(x.miete_qm * 100) / 100 : null,
         kosten: zahl(s.kosten) || 0, bmy: zahl(x.bmy) != null ? Math.round(x.bmy * 100) / 100 : null,
         dscr: zahl(x.dscr) != null ? Math.round(x.dscr * 100) / 100 : null, cf_monat: zahl(x.cf_m) != null ? Math.round(x.cf_m) : null,
-        ertragswert: zahl(w.ertragswert), rnd: zahl(w.rnd), marktpreisindikation: zahl(w.marktpreisindikation) };
+        ertragswert: zahl(w.ertragswert), rnd: zahl(w.rnd), marktpreisindikation: zahl(w.marktpreisindikation),
+        /* v2842 · Abschlag und Wert ohne Abschlag; Sanierungsstau der Stufe (v2854) */
+        mpi_abschlag_pct: zahl(w.mpi_abschlag_pct), mpi_ohne_abschlag: zahl(w.mpi_ohne_abschlag), sanierungsstau: w.sanierungsstau || null };
     });
     var B = st.bestand;
     var mehr = {}, zuw = {};
@@ -212,7 +217,8 @@
       ertragswert_abruf_datum: sw && sw.quelle === 'abruf' ? (sw.datum || null) : null,
       ertragswert_gesperrt: !!(sw && sw.gesperrt), ertragswert_veraltet: !!(sw && sw.veraltet),
       lzs: sw && sw.lzs ? { pct: zahl(sw.lzs.pct), stufe: sw.lzs.stufe || null, etikett: sw.lzs.etikett || null } : null,
-      satz: pd && pd.satz_bank ? String(pd.satz_bank) : ''
+      satz: pd && pd.satz_bank ? String(pd.satz_bank) : '',
+      kurz_ausblick: PZ.KURZ_AUSBLICK || 'Ausblick: Mieterhöhung und Zielbild unterstellen die höhere Miete bzw. umgesetzte Maßnahmen – kein heutiger Verkehrswert.'
     };
   }
 
@@ -243,30 +249,55 @@
   }
 
   /* ── Kernaussagen (Einfach) ───────────────────────────────────────────── */
+  /* v2842 · Marcel 22.10.2026: „zu dünn" - je Kachel die Zahl, der Vergleich zu heute und ein
+     Satz: Miete, Rendite, Ertragswert, Maßnahmen, Wertzuwachs nach Kosten, Marktpreisindikation. */
+  function pctTxt(v) { return dez(v, 1) + ' %'; }
+  function delta(neu, alt, einheit) {
+    if (neu == null || alt == null) return '';
+    var d = neu - alt;
+    if (einheit === 'pct') return (d >= 0 ? '+' : '−') + dez(Math.abs(d), 2) + ' %-Pkt.';
+    return eurVz(d) + (alt ? ' (' + (d >= 0 ? '+' : '−') + dez(Math.abs(d / alt * 100), 1) + ' %)' : '');
+  }
   function kernaussagen(Z, W) {
     var K = [];
     if (!Z) return K;
     var B = Z.stufen.bestand, M = Z.stufen.mieterhoehung, T = Z.stufen.zielbild, J = Z.jahre || {};
-    var ewDa = !Z.ertragswert_gesperrt && B.ertragswert != null;
-    K.push({ schluessel: 'ist', titel: 'Heute · Miete im Jahr', wert: B.miete_jahr, wert_text: eur(B.miete_jahr) + ' Miete im Jahr',
-      text: (B.miete_qm != null ? dez(B.miete_qm, 2) + ' €/m² kalt' : 'Kaltmiete heute')
-        + (ewDa ? ' · Ertragswert ' + eur(B.ertragswert) : (W && W.ertragswert ? ' · Ertragswert laut Marktbericht ' + eur(W.ertragswert.wert) : '')) });
-    if (M) K.push({ schluessel: 'soll', titel: 'Mieterhöhung · mehr im Jahr', wert: Z.mehrertrag_jahr.mieterhoehung,
-      wert_text: eurVz(Z.mehrertrag_jahr.mieterhoehung) + ' im Jahr',
-      text: 'Der Mieter bleibt, bis zur Vergleichsmiete' + (J.mieterhoehung ? ', ab ' + J.mieterhoehung : '') + ' · dann ' + eur(M.miete_jahr) + ' im Jahr' });
-    if (T) K.push({ schluessel: 'ziel', titel: 'Zielbild · Miete im Jahr', wert: T.miete_jahr, wert_text: eur(T.miete_jahr) + ' Miete im Jahr',
-      text: 'nach Umbau oder Neuvermietung' + (J.zielbild ? ', fertig ' + J.zielbild : '') + ' · ' + eurVz(Z.mehrertrag_jahr.zielbild) + ' gegen heute' });
-    var kost = T ? T.kosten : (M ? M.kosten : 0);
-    if (kost > 0 || T) K.push({ schluessel: 'kosten', titel: 'Was es kostet', wert: kost || 0, wert_text: eur(kost || 0),
-      text: kost > 0 ? 'Maßnahmen ' + (T ? 'bis zum Zielbild' : 'für die Mieterhöhung') + ', ohne Finanzierung' : 'keine Maßnahmenkosten eingetragen' });
     var top = T || M, topK = T ? 'zielbild' : 'mieterhoehung';
-    if (top) {
-      if (Z.ertragswert_gesperrt) K.push({ schluessel: 'wert', titel: 'Was es wert wird', wert: null, wert_text: 'mit Stufe 3',
-        text: 'Den Ertragswert je Stufe rechnet DealPilot Stufe 3 (Wertermittlung nach ImmoWertV).' });
-      else if (top.ertragswert != null) K.push({ schluessel: 'wert', titel: 'Was es wert wird', wert: top.ertragswert, wert_text: eur(top.ertragswert),
-        text: 'Ertragswert ' + (T ? 'im Zielbild' : 'nach Mieterhöhung') + (Z.wertzuwachs_nach_kosten[topK] != null ? ' · nach Kosten ' + eurVz(Z.wertzuwachs_nach_kosten[topK]) + ' gegen heute' : '') });
-      else K.push({ schluessel: 'wert', titel: 'Was es wert wird', wert: null, wert_text: 'noch nicht gerechnet',
-        text: 'Unter „Genau" mit „Ertragswerte rechnen" (ohne Kontingent).' });
+    var stufeWort = T ? 'Zielbild' + (J.zielbild ? ' ' + J.zielbild : '') : 'nach Mieterhöhung' + (J.mieterhoehung ? ' ' + J.mieterhoehung : '');
+    if (!top) return K;
+    K.push({ schluessel: 'miete', titel: 'Kaltmiete im Jahr · ' + stufeWort, wert: top.miete_jahr, wert_text: eur(top.miete_jahr),
+      vergleich_text: 'heute ' + eur(B.miete_jahr) + ' · ' + delta(top.miete_jahr, B.miete_jahr), ton: 'pos',
+      text: M && T ? 'Davon ' + eurVz(Z.mehrertrag_jahr.mieterhoehung) + ' ohne Mieterwechsel' + (J.mieterhoehung ? ' ab ' + J.mieterhoehung : '') + ', der Rest nach Umbau oder Neuvermietung.'
+        : (M ? 'Ohne Mieterwechsel, bis zur Vergleichsmiete und innerhalb der Kappungsgrenze.' : 'Nach Umbau oder Neuvermietung.') });
+    if (top.bmy != null) K.push({ schluessel: 'rendite', titel: 'Bruttomietrendite · ' + stufeWort, wert: top.bmy, wert_text: pctTxt(top.bmy),
+      vergleich_text: B.bmy != null ? 'heute ' + pctTxt(B.bmy) + ' · ' + delta(top.bmy, B.bmy, 'pct') : '', ton: B.bmy != null ? (top.bmy >= B.bmy ? 'pos' : 'neg') : null,
+      text: 'Jahresmiete auf Kaufpreis plus Maßnahmen' + (top.cf_monat != null ? '; Cashflow ' + eur(top.cf_monat) + ' im Monat' : '') + '.' });
+    var stau = top.sanierungsstau;
+    if (Z.ertragswert_gesperrt) K.push({ schluessel: 'ertragswert', titel: 'Ertragswert · ' + stufeWort, wert: null, wert_text: 'mit Stufe 3', vergleich_text: '',
+      text: 'Den Ertragswert je Stufe rechnet DealPilot Stufe 3 (Wertermittlung nach ImmoWertV).' });
+    else if (top.ertragswert != null && B.ertragswert != null) K.push({ schluessel: 'ertragswert', titel: 'Ertragswert · ' + stufeWort, wert: top.ertragswert, wert_text: eur(top.ertragswert),
+      vergleich_text: 'heute ' + eur(B.ertragswert) + ' · ' + delta(top.ertragswert, B.ertragswert), ton: top.ertragswert >= B.ertragswert ? 'pos' : 'neg',
+      text: 'Ausblick' + (Z.lzs && Z.lzs.pct != null ? ' mit Liegenschaftszins ' + dez(Z.lzs.pct, 2) + ' %' : '')
+        + (stau && stau.behoben > 0 ? '; ' + eur(stau.behoben) + ' Sanierungsstau durch die Maßnahmen behoben, Rest ' + eur(stau.rest || 0) : '') + '.' });
+    else K.push({ schluessel: 'ertragswert', titel: 'Ertragswert · ' + stufeWort, wert: null, wert_text: 'noch nicht gerechnet', vergleich_text: '',
+      text: 'Unter „Genau" mit „Ertragswerte rechnen" (ohne Kontingent).' });
+    var kost = top.kosten || 0;
+    K.push({ schluessel: 'kosten', titel: 'Maßnahmen', wert: kost, wert_text: eur(kost),
+      vergleich_text: M && T && M.kosten ? 'davon ' + eur(M.kosten) + ' für die Mieterhöhung' : (kost ? 'bis ' + (T ? 'zum Zielbild' : 'zur Mieterhöhung') : 'keine eingetragen'),
+      text: kost ? 'Kosten der Maßnahmen, ohne Finanzierung.' : 'Ohne Maßnahmen steigt nur die Miete.' });
+    var zw = Z.wertzuwachs_nach_kosten[topK];
+    if (!Z.ertragswert_gesperrt && zw != null) K.push({ schluessel: 'wert', titel: 'Wertzuwachs nach Kosten', wert: zw, wert_text: eurVz(zw), ton: zw >= 0 ? 'pos' : 'neg',
+      vergleich_text: 'Ertragswert ' + (T ? 'Zielbild' : 'nach Erhöhung') + ' − heute − Maßnahmen',
+      text: zw >= 0 ? 'Die Maßnahmen bringen mehr Ertragswert, als sie kosten.' : 'Die Maßnahmen kosten mehr, als sie an Ertragswert bringen.' });
+    /* Marktpreisindikation heute - aus dem Marktbericht, sonst aus der Stufe Bestand; immer mit Abschlag */
+    var mw = W ? W.marktpreisindikation.mitte : B.marktpreisindikation;
+    var ab = W ? W.abschlag_pct : B.mpi_abschlag_pct;
+    var ohne = W ? (W.ohne_abschlag ? W.ohne_abschlag.mitte : null) : B.mpi_ohne_abschlag;
+    if (mw != null) {
+      var kp = W ? W.kaufpreis : null;
+      K.push({ schluessel: 'mpi', titel: 'Marktpreisindikation heute', wert: mw, wert_text: eur(mw),
+        vergleich_text: (ab > 0 ? 'nach ' + dez(ab, 1) + ' % Abschlag' : 'ohne Abschlag') + (ohne != null && ab > 0 ? ' · ohne ' + eur(ohne) : ''),
+        text: 'Aus Angebotspreisen am Ort; der Abschlag holt sie auf gezahlte Kaufpreise' + (kp != null ? '. Dein Kaufpreis ' + eur(kp) + ' liegt ' + dez(Math.abs((kp - mw) / mw * 100), 1) + ' % ' + (kp < mw ? 'darunter' : 'darüber') : '') + '.' });
     }
     return K;
   }
@@ -310,6 +341,9 @@
       '.dp-wz-k .t{display:block;font:600 10px/1.2 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B645A;margin-bottom:4px}',
       '.dp-wz-k .w{display:block;font:700 18px/1.2 "Space Grotesk",Inter,sans-serif;color:#2A2727;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}',
       '.dp-wz-k .x{display:block;font:400 11.5px/1.45 Inter,sans-serif;color:#6B645A;margin-top:4px}',
+      '.dp-wz-k .v{display:block;font:600 11.5px/1.4 Inter,sans-serif;color:#4a4436;margin-top:3px;font-variant-numeric:tabular-nums}',
+      '.dp-wz-k .v.dp-wz-pos,.dp-wz-k .w.dp-wz-pos{color:#2f7d55}.dp-wz-k .v.dp-wz-neg,.dp-wz-k .w.dp-wz-neg{color:#B8625C}',
+      '.dp-wz-ausblick{font:400 11.5px/1.5 Inter,sans-serif;color:#4a4436;background:#FBF6E9;border-left:3px solid var(--wl-c9a84c, #C9A84C);padding:6px 10px;margin:8px 0 10px}',
       '.dp-wz-klar{font:400 13px/1.6 Inter,system-ui,sans-serif;color:#2A2727;margin:0 0 10px;max-width:80ch}',
       '.dp-wz-klar b.dp-wz-pos{color:#2f7d55}.dp-wz-klar b.dp-wz-neg{color:#B8625C}',
       '.dp-wz-mehr{font:600 12px Inter,sans-serif;border:1px solid #E6DCC2;border-radius:8px;background:#fff;color:#2A2727;padding:6px 12px;cursor:pointer}',
@@ -353,11 +387,13 @@
   }
 
   /* ── Einfach-Ansicht (Pilot-Analyse) ──────────────────────────────────── */
-  var ART = { ist: 'ist', soll: 'soll', ziel: 'ziel', kosten: 'kosten', wert: 'wert' };
+  var ART = { ist: 'ist', soll: 'soll', ziel: 'ziel', kosten: 'kosten', wert: 'wert', miete: 'ziel', rendite: 'soll', ertragswert: 'ziel', mpi: 'ist' };
   function kachelnHtml(K) {
     return '<div class="dp-wz-kacheln">' + K.map(function (k) {
-      return '<div class="dp-wz-k ' + ART[k.schluessel] + '" data-dp-wz-kern="' + k.schluessel + '"><span class="t">' + esc(k.titel) + '</span>'
-        + '<span class="w">' + esc(k.wert == null ? k.wert_text : (k.schluessel === 'soll' ? eurVz(k.wert) : eur(k.wert))) + '</span><span class="x">' + esc(k.text) + '</span></div>';
+      return '<div class="dp-wz-k ' + (ART[k.schluessel] || '') + '" data-dp-wz-kern="' + k.schluessel + '"><span class="t">' + esc(k.titel) + '</span>'
+        + '<span class="w' + (k.ton && k.schluessel === 'wert' ? ' dp-wz-' + k.ton : '') + '">' + esc(k.wert_text) + '</span>'
+        + (k.vergleich_text ? '<span class="v' + (k.ton ? ' dp-wz-' + k.ton : '') + '">' + esc(k.vergleich_text) + '</span>' : '')
+        + '<span class="x">' + esc(k.text) + '</span></div>';
     }).join('') + '</div>';
   }
   function klartextZiel(Z) {
@@ -404,7 +440,7 @@
     }
     if (A) h += '<p class="dp-wz-klar">' + klartextAnkauf(A) + '</p>';
     if (!h) return '';
-    if (Z) h += '<p class="dp-wz-kenn">' + esc(Z.kennzeichnung) + ' Alle Zahlen, Eingaben und der Abgleich mit dem Ankauf stehen unter „Genau".</p>';
+    if (Z) h += '<p class="dp-wz-ausblick">' + esc(Z.kurz_ausblick) + '</p>';
     h += '<button type="button" class="dp-wz-mehr btn-clean" data-dp-si-knopf="genau">Alle Zahlen zeigen (Genau)</button>';
     return h;
   }
@@ -425,7 +461,7 @@
       + '<div class="dp-si-kopf"><div class="dp-si-um" role="group" aria-label="Darstellung">'
       + '<button type="button" class="btn-clean" data-dp-si-knopf="einfach" aria-pressed="' + (m === 'einfach') + '">Einfach</button>'
       + '<button type="button" class="btn-clean" data-dp-si-knopf="genau" aria-pressed="' + (m === 'genau') + '">Genau</button></div>'
-      + '<span class="dp-si-hin" data-dp-si-teil="einfach">Das Wichtigste in fünf Zahlen</span><span class="dp-si-hin" data-dp-si-teil="genau">Alle Zahlen, Eingaben und Abgleiche</span></div>'
+      + '<span class="dp-si-hin" data-dp-si-teil="einfach">Das Wichtigste auf einen Blick</span><span class="dp-si-hin" data-dp-si-teil="genau">Alle Zahlen, Eingaben und Abgleiche</span></div>'
       + '<div data-dp-si-teil="einfach"><div class="dp-pa-card" data-dp-si-einfach="' + (opts.mitAnkauf ? 'a' : '') + '">' + e + '</div></div>'
       + '<div data-dp-si-teil="genau">' + nav + genauHtml + '</div></div>';
   }
@@ -464,7 +500,15 @@
     if (ewDa) {
       t += zeile('Ertragswert', Z.lzs && Z.lzs.pct != null ? 'Liegenschaftszins ' + esc(dez(Z.lzs.pct, 2)) + ' %' + (Z.lzs.stufe ? ' · Stufe ' + esc(Z.lzs.stufe) : '') : '',
         function (k) { return S[k].ertragswert != null ? '<b>' + esc(eur(S[k].ertragswert)) + '</b>' + (S[k].rnd != null ? '<small>RND ' + esc(dez(S[k].rnd, 0)) + ' J.</small>' : '') : null; });
-      if (sp.some(function (k) { return S[k].marktpreisindikation != null; })) t += zeile('Marktpreisindikation', 'Angebote am Ort, nach Abschlag', function (k) { return S[k].marktpreisindikation != null ? esc(eur(S[k].marktpreisindikation)) : null; });
+      if (sp.some(function (k) { return S[k].marktpreisindikation != null; })) {
+        var abS = S.bestand.mpi_abschlag_pct;
+        t += zeile('Marktpreisindikation', 'Angebote am Ort' + (abS > 0 ? ', nach ' + esc(dez(abS, 1)) + ' % Abschlag' : ''), function (k) {
+          return S[k].marktpreisindikation != null ? esc(eur(S[k].marktpreisindikation)) + (S[k].mpi_ohne_abschlag != null ? '<small>ohne Abschlag ' + esc(eur(S[k].mpi_ohne_abschlag)) + '</small>' : '') : null; });
+      }
+      /* v2854 · Sanierungsstau je Stufe */
+      if (sp.some(function (k) { return S[k].sanierungsstau; })) t += zeile('Sanierungsstau', 'durch die Maßnahmen der Stufe behoben', function (k) {
+        var x = S[k].sanierungsstau; if (!x) return null;
+        return x.behoben > 0 ? esc(eur(x.behoben)) + ' behoben<small>Rest ' + esc(eur(x.rest || 0)) + '</small>' : esc(eur(x.stau)) + ' offen'; });
       if (sp.length > 1) t += zeile('Wertzuwachs nach Kosten', 'Ertragswert der Stufe − Bestand − Maßnahmen', function (k) {
         if (k === 'bestand') return '';
         var v = Z.wertzuwachs_nach_kosten[k]; return v == null ? null : '<span class="' + (v >= 0 ? 'dp-wz-pos' : 'dp-wz-neg') + '">' + esc(eurVz(v)) + '</span>'; }, 'sum');
@@ -485,7 +529,7 @@
     if (Z) {
       h += '<div class="dp-wz-h">Ist · Mieterhöhung · Zielbild</div>' + kachelnHtml(D.kernaussagen) + zielTafel(Z)
         + (Z.ertragswert_quelle === 'abruf' ? '<p class="dp-wz-quelle">Ertragswerte je Stufe aus dem Abruf „Marktpreise" vom ' + esc(Z.ertragswert_abruf_datum || '') + (Z.ertragswert_veraltet ? '; die Angaben haben sich seitdem geändert' : '') + '.</p>' : '')
-        + '<p class="dp-wz-quelle">' + esc(Z.kennzeichnung) + ' Der Score rechnet ebenfalls mit dem Bestand.</p>';
+        + '<p class="dp-wz-quelle">' + esc(Z.kurz_ausblick) + ' Der Score rechnet ebenfalls mit dem Bestand.</p>';
     }
     return h;
   }
