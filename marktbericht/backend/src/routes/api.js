@@ -682,6 +682,32 @@ router.get('/objects/history', async (req, res) => {
               (data->'valuation'->'market_value'->'angebot_abschlag'->>'pct')::numeric AS angebot_abschlag_pct,
               data->'valuation'->'market_value'->'angebot_abschlag'->>'herkunft' AS angebot_abschlag_herkunft,
               (data->'valuation'->'market_value'->'angebot_abschlag'->'roh'->>'estimated')::numeric AS market_value_roh,
+              /* v2810 . Marcel 22.10.2026: in der Pilot-Analyse Marktpreisindikation, Ertrags-
+                 und Sachwert gegenueberstellen - untere, mittlere, obere Spanne, mit und ohne
+                 Abschlag, und erklaeren, warum sie auseinanderliegen. Dafuer gehen die rohe
+                 Spanne, der nicht abgeschlagene Teil, die Ertragswert-Spanne (E4), die Miete
+                 des Ertragswerts, die Bausteine des Sachwerts und der IRW-Vergleichswert mit.
+                 Keine Backticks hier. */
+              (data->'valuation'->'market_value'->'angebot_abschlag'->'roh'->>'low')::numeric AS market_value_roh_low,
+              (data->'valuation'->'market_value'->'angebot_abschlag'->'roh'->>'high')::numeric AS market_value_roh_high,
+              (data->'valuation'->'market_value'->'angebot_abschlag'->>'nicht_abgeschlagen_eur')::numeric AS abschlag_nicht_eur,
+              data->'valuation'->'market_value'->'angebot_abschlag'->>'kurz' AS angebot_abschlag_kurz,
+              data->'cross_check'->'ertragswert'->>'bezeichnung' AS ertragswert_bezeichnung,
+              (data->'cross_check'->'ertragswert'->'lzs_spanne'->>'ertragswert_von_eur')::numeric AS ertragswert_von_eur,
+              (data->'cross_check'->'ertragswert'->'lzs_spanne'->>'ertragswert_bis_eur')::numeric AS ertragswert_bis_eur,
+              data->'cross_check'->'ertragswert'->'lzs_spanne'->>'deckung' AS ertragswert_spanne_deckung,
+              (data->'cross_check'->'ertragswert'->>'miete_ist_qm')::numeric AS ew_miete_ist_qm,
+              (data->'cross_check'->'ertragswert'->>'miete_vergleich_qm')::numeric AS ew_miete_vergleich_qm,
+              data->'cross_check'->'ertragswert'->'miete_stufe'->>'etikett' AS ew_miete_stufe,
+              (data->'cross_check'->'sachwert'->>'bodenwert_eur')::numeric AS sw_bodenwert_eur,
+              (data->'cross_check'->'sachwert'->>'gebaeude_sachwert_eur')::numeric AS sw_gebaeude_eur,
+              CASE WHEN jsonb_typeof(data->'cross_check'->'sachwert'->'sachwertfaktor') = 'number'
+                   THEN (data->'cross_check'->'sachwert'->>'sachwertfaktor')::numeric END AS sw_faktor,
+              (data->'cross_check'->'sachwert'->>'restnutzungsdauer_jahre')::numeric AS sw_rnd_jahre,
+              (data->'cross_check'->'sachwert'->>'marktangepasst')::boolean AS sw_marktangepasst,
+              data->'cross_check'->'sachwert'->>'sachwertfaktor_grund' AS sw_faktor_grund,
+              CASE WHEN (data->'cross_check'->'vergleichswert_irw'->>'verfuegbar') = 'true'
+                   THEN (data->'cross_check'->'vergleichswert_irw'->>'vergleichswert_eur')::numeric END AS irw_vergleichswert_eur,
               /* v1965: das FUEHRENDE Verfahren. Marcel am 08.10.2026:
                  „welcher ist jetzt der fuehrende? Vielleicht sollte man das
                  dann mit in dem Dropdown mit angeben."
