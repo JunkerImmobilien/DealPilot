@@ -284,6 +284,9 @@
    }
   ],
   "modellansaetze": {
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Preisindex für den Neubau von Wohngebäuden einschl. Umsatzsteuer zum Kaufzeitpunkt (2021 = 100) veröffentlicht in den Statistischen Berichten des Statistischen Bundesamts umbasiert mit dem Faktor 1,4124 auf das Jahr 2010.",
+   "baupreisindex_seite": "Sachwertfaktoren 2025 Berlin (Amtsblatt für Berlin Nr. 29 vom 11.07.2025, S. 1852 ff.), Modellbeschreibung, PDF-S. 3",
    "modellgrundlage": "ImmoWertV §§ 35 bis 39, § 193 Abs. 5 Nr. 2 BauGB in Verbindung mit § 13 DVO BauGB",
    "berechnungsmodell": "Sachwertfaktor = geeigneter Kaufpreis / Sachwert",
    "ermittlung": "Baumanalyse für die Altbezirke, danach Regressionsanalyse mit Sachwert, Zeit und Dummyvariablen (Baujahresgruppe, Bauzustand, Wohnlage, Stadtlage, Gebäudeart, Gebäudekonstruktion, Bauerrichtungsvertrag, Endknoten der Altbezirke)",
@@ -604,6 +607,9 @@
    }
   ],
   "modellansaetze": {
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Preisindex für den Neubau von Wohngebäuden einschl. Umsatzsteuer zum Kaufzeitpunkt (2021 = 100) veröffentlicht in den Statistischen Berichten des Statistischen Bundesamts umbasiert mit dem Faktor 1,4124 auf das Jahr 2010.",
+   "baupreisindex_seite": "Sachwertfaktoren 2025 Berlin (Amtsblatt für Berlin Nr. 29 vom 11.07.2025, S. 1852 ff.), Modellbeschreibung, PDF-S. 3",
    "modellgrundlage": "ImmoWertV §§ 35 bis 39, § 193 Abs. 5 Nr. 2 BauGB in Verbindung mit § 13 DVO BauGB",
    "berechnungsmodell": "Sachwertfaktor = geeigneter Kaufpreis / Sachwert",
    "ermittlung": "Baumanalyse für die Altbezirke, danach Regressionsanalyse mit Sachwert, Zeit und Dummyvariablen (Baujahresgruppe, Bauzustand, Wohnlage, Stadtlage, Gebäudeart, Gebäudekonstruktion, Bauerrichtungsvertrag, Endknoten der Altbezirke)",
@@ -924,6 +930,9 @@
    }
   ],
   "modellansaetze": {
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Preisindex für den Neubau von Wohngebäuden einschl. Umsatzsteuer zum Kaufzeitpunkt (2021 = 100) veröffentlicht in den Statistischen Berichten des Statistischen Bundesamts umbasiert mit dem Faktor 1,4124 auf das Jahr 2010.",
+   "baupreisindex_seite": "Sachwertfaktoren 2025 Berlin (Amtsblatt für Berlin Nr. 29 vom 11.07.2025, S. 1852 ff.), Modellbeschreibung, PDF-S. 3",
    "modellgrundlage": "ImmoWertV §§ 35 bis 39, § 193 Abs. 5 Nr. 2 BauGB in Verbindung mit § 13 DVO BauGB",
    "berechnungsmodell": "Sachwertfaktor = geeigneter Kaufpreis / Sachwert",
    "ermittlung": "Baumanalyse für die Altbezirke, danach Regressionsanalyse mit Sachwert, Zeit und Dummyvariablen (Baujahresgruppe, Bauzustand, Wohnlage, Stadtlage, Gebäudeart, Gebäudekonstruktion, Bauerrichtungsvertrag, Endknoten der Altbezirke)",
@@ -1244,6 +1253,9 @@
    }
   ],
   "modellansaetze": {
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Preisindex für den Neubau von Wohngebäuden einschl. Umsatzsteuer zum Kaufzeitpunkt (2021 = 100) veröffentlicht in den Statistischen Berichten des Statistischen Bundesamts umbasiert mit dem Faktor 1,4124 auf das Jahr 2010.",
+   "baupreisindex_seite": "Sachwertfaktoren 2025 Berlin (Amtsblatt für Berlin Nr. 29 vom 11.07.2025, S. 1852 ff.), Modellbeschreibung, PDF-S. 3",
    "modellgrundlage": "ImmoWertV §§ 35 bis 39, § 193 Abs. 5 Nr. 2 BauGB in Verbindung mit § 13 DVO BauGB",
    "berechnungsmodell": "Sachwertfaktor = geeigneter Kaufpreis / Sachwert",
    "ermittlung": "Baumanalyse für die Altbezirke, danach Regressionsanalyse mit Sachwert, Zeit und Dummyvariablen (Baujahresgruppe, Bauzustand, Wohnlage, Stadtlage, Gebäudeart, Gebäudekonstruktion, Bauerrichtungsvertrag, Endknoten der Altbezirke)",

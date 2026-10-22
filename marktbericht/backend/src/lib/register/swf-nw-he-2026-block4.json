@@ -1571,7 +1571,10 @@
    "wortlaut": "Kap. 8.3 (Druck-S. 112 ff.): ImmoWertV 2021 mit ImmoWertA (20.09.2023); Kaufpreis auf Normverhältnisse umgerechnet und von boG bereinigt, unbekannte Schäden pauschal 3.000 € (VPI-indexiert); Bodenwert ungedämpft, erschließungsbeitragsfrei; NHK nach Anlage 4; Garagen Anlage 4 II Pos. 12; Stichprobe 2 Jahre, indexiert auf den 01.01.2026.",
    "regionalfaktor": null,
    "gnd_jahre": null,
-   "baupreisindex": "nicht beziffert"
+   "baupreisindex": "nicht beziffert",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Baupreisindex: Preisindizes für den Neubau von Wohngebäuden einschl. Umsatzsteuer, veröffentlicht vom Statistischen Bundesamt (DESTATIS), Schrift „Preisindizes für die Bauwirtschaft“ Fachserie 17 Reihe 4. Dabei wird der jeweils letzte, vor dem Vertragsdatum / Wertermittlungsstichtag verfügbare Index verwendet.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026 Hochsauerlandkreis, Modellbeschreibung Sachwertfaktoren, S. 113"
   },
   "korrekturen": [
    {
@@ -1696,7 +1699,10 @@
    "wortlaut": "Kap. 8.3 (Druck-S. 112 ff.): ImmoWertV 2021 mit ImmoWertA (20.09.2023); Kaufpreis auf Normverhältnisse umgerechnet und von boG bereinigt, unbekannte Schäden pauschal 3.000 € (VPI-indexiert); Bodenwert ungedämpft, erschließungsbeitragsfrei; NHK nach Anlage 4; Garagen Anlage 4 II Pos. 12; Stichprobe 2 Jahre, indexiert auf den 01.01.2026.",
    "regionalfaktor": null,
    "gnd_jahre": null,
-   "baupreisindex": "nicht beziffert"
+   "baupreisindex": "nicht beziffert",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Baupreisindex: Preisindizes für den Neubau von Wohngebäuden einschl. Umsatzsteuer, veröffentlicht vom Statistischen Bundesamt (DESTATIS), Schrift „Preisindizes für die Bauwirtschaft“ Fachserie 17 Reihe 4. Dabei wird der jeweils letzte, vor dem Vertragsdatum / Wertermittlungsstichtag verfügbare Index verwendet.",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026 Hochsauerlandkreis, Modellbeschreibung Sachwertfaktoren, S. 113"
   },
   "korrekturen": [
    {
