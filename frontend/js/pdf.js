@@ -2847,7 +2847,8 @@ async function _exportPDFInner() {
       if (v <= _pdfSw().ltvRot) return C.GOLD;
       return [184, 98, 92];
     }
-    var bindIdx = data.bindj || 10;
+    /* v2833 · Zeile Ende Zinsbindung aus calc.js (ueber BankCharts), sonst bindj */
+    var bindIdx = (typeof data.ezbIdx === 'number') ? data.ezbIdx + 1 : (data.bindj || 10);
     var ezbYearLabel = 'Jahr ' + bindIdx;
     var endYearLabel = 'Jahr ' + (data.years.length || 10);
 
@@ -3343,7 +3344,7 @@ async function _exportPDFInner() {
      Nur wenn Soll-Miete oder Zielbild eingetragen sind. Gerechnet wird
      hier nichts: DpPotenzial stellt Mieten und Kosten zusammen, die
      Ertragswerte kommen aus dem Marktbericht-Dienst (derselbe Kern wie
-     Stufe 3). Kennzeichnung: Potenzialwert, keine Verkehrswertermittlung.
+     Stufe 3). Kennzeichnung: DpPotenzial.KENNZEICHNUNG (v2870, steht in pdfDaten().fuss).
   ══════════════════════════════════════════════════ */
   try {
     var _PZ = window.DpPotenzial || null, _PD = null;

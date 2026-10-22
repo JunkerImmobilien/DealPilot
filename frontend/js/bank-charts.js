@@ -57,6 +57,15 @@ if (!window._wlc) {
     return (v || 0).toFixed(d).replace('.', ',');
   }
 
+  /* v2833 · Zeile „Ende Zinsbindung" aus calc.js (v2852: State._zbEzbIdx, letzte
+     Zeile GANZ in der Bindung, Monate ab Finanzierungsbeginn). bindj - 1 traf bei
+     einem angebrochenen Kaufjahr das falsche Jahr (2026-1056: Darlehen ab 01/2025,
+     Zeile 1 = 12/2024). bindj - 1 bleibt nur der Rueckfall. */
+  function _ezbIdx(state, bindj, n) {
+    var i = (state && typeof state._zbEzbIdx === 'number') ? state._zbEzbIdx : bindj - 1;
+    return Math.max(0, Math.min(i, n - 1));
+  }
+
   // ───────────── DSCR pro Jahr ─────────────
   // DSCR = Nettomieteinnahmen / Kapitaldienst (Zinsen + Tilgung)
   /* v2832 · ÜBER DEN KERN (Dscr.compute), und ein Jahr OHNE Kapitaldienst hat
@@ -278,7 +287,7 @@ if (!window._wlc) {
     });
 
     // EZB-Marker-Position (bindj=10 Jahre → Ende Jahr bindj = Index bindj-1)
-    var ezbIdx = Math.min(bindj - 1, n - 1);
+    var ezbIdx = _ezbIdx(state, bindj, n);   /* v2833 */
     var ezbX = ezbIdx > 0 ? px(ezbIdx) : null;
 
     // V63.88: Werte konsistent zur Tab-Kennzahlen-Tabelle aus _vz lesen.
@@ -482,7 +491,8 @@ if (!window._wlc) {
 
     /* v2832 · „heute" ist der DSCR des Kerns (calc.js, erstes volles Jahr), nicht Zeile 1 */
     var dscrToday = (state.kpis && typeof state.kpis.dscr === 'number' && isFinite(state.kpis.dscr) && state.kpis.dscr > 0) ? state.kpis.dscr : dscrArr[0];
-    var dscrEzb = dscrArr[Math.min(bindj - 1, dscrArr.length - 1)] || dscrArr[dscrArr.length - 1];
+    var _ei = _ezbIdx(state, bindj, dscrArr.length);   /* v2833 */
+    var dscrEzb = dscrArr[_ei] || dscrArr[dscrArr.length - 1];
     // V63.83 BUG-FIX: dscrEnd MUSS Anschluss-Phase sein (nicht letztes Jahr in Zinsbindung).
     // Vorher: dscrArr[dscrArr.length-1] = Jahr 10 = noch in Zinsbindung → identisch zu dscrEzb.
     // Frontend Bild 7 zeigt Anschluss DSCR 1,22 (mit kalk. 5 % Anschlusszins), PDF zeigte 1,43.
@@ -498,7 +508,7 @@ if (!window._wlc) {
     // V63.83: ltvToday wie Frontend — = kpis.ltv (vor 1. Tilgung), nicht ltvArr[0] (nach 1. Tilgung)
     // Frontend Bild zeigt 84,4 %, PDF zeigte 83,5 % — durch Tilgung im 1. Jahr.
     var ltvToday = (state.kpis && typeof state.kpis.ltv === 'number') ? state.kpis.ltv : ltvArr[0];
-    var ltvEzb = ltvArr[Math.min(bindj - 1, ltvArr.length - 1)] || ltvArr[ltvArr.length - 1];
+    var ltvEzb = ltvArr[_ezbIdx(state, bindj, ltvArr.length)] || ltvArr[ltvArr.length - 1];   /* v2833 */
     var ltvEnd = ltvArr[ltvArr.length - 1];
 
     // V63.73: Cockpit-Daten global verfügbar für PDF-Direkt-Render
@@ -509,6 +519,7 @@ if (!window._wlc) {
         dscrToday: dscrToday, dscrEzb: dscrEzb, dscrEnd: dscrEnd,
         ltvToday: ltvToday, ltvEzb: ltvEzb, ltvEnd: ltvEnd,
         bindj: bindj,
+        ezbIdx: _ei,   /* v2833: Zeile Ende Zinsbindung, fuer pdf.js */
         years: cfRows.map(function(r) { return r.cal; })
       };
     } catch(e) {}
@@ -531,7 +542,8 @@ if (!window._wlc) {
       var areaPath = path + ' L ' + px(n-1).toFixed(1) + ' 100 L 0 100 Z';
 
       // EZB-Marker
-      var ezbX = bindj < n ? px(bindj - 1) : null;
+      var _eiT = _ezbIdx(state, bindj, n);   /* v2833 */
+      var ezbX = _eiT < n - 1 ? px(_eiT) : null;
 
       // Threshold-Berechnung
       var thY = null, thY2 = null;

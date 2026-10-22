@@ -153,8 +153,10 @@
         verfahren: verf.filter(function (v) { return zahl(v.mitte) != null; }),
         stufen: stufen, kaufpreis: kp, stand: sauber(stand),
         texte: h ? texteAusBericht(h) : [], kern: X.kern || [],
-        hinweis: sauber(X.hinweis || 'Marktpreisindikation, Ertrags- und Sachwert sind indikativ nach ImmoWertV-Logik, kein Gutachten nach § 194 BauGB. '
-          + 'Ertragswerte je Stufe: Potenzialwerte mit dem Liegenschaftszins des Bestands, keine Verkehrswertermittlung.')
+        /* v2833 · der Hinweis zu Mieterhoehung/Zielbild ist Marcels Wortlaut aus
+           potenzial.js (KENNZEICHNUNG, v2870) - nie ein eigener Text */
+        hinweis: sauber(X.hinweis || ('Marktpreisindikation, Ertrags- und Sachwert sind indikativ nach ImmoWertV-Logik, kein Gutachten nach § 194 BauGB.'
+          + (stufen.length && global.DpPotenzial && global.DpPotenzial.KENNZEICHNUNG ? ' ' + global.DpPotenzial.KENNZEICHNUNG : '')))
       };
     });
   }
