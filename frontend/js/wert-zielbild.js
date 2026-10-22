@@ -295,6 +295,7 @@
       '.dp-si-um button:focus-visible{outline:2px solid var(--wl-b8932f, #b8932f);outline-offset:2px}',
       '.dp-si-hin{font:400 11.5px/1.4 Inter,sans-serif;color:#6B645A}',
       '[data-dp-si-modus="einfach"] [data-dp-si-teil="genau"],[data-dp-si-modus="genau"] [data-dp-si-teil="einfach"]{display:none !important}',
+      '[data-dp-si-modus] .dp-pa-card,[data-dp-si-modus] .abw-tafel-host,[data-dp-si-modus]{scroll-margin-top:130px}',
       '.dp-si-nav{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}',
       '.dp-si-nav button{font:500 11.5px Inter,sans-serif;border:1px solid #E6DCC2;border-radius:999px;background:#fff;color:#2A2727;padding:5px 11px;cursor:pointer}',
       '.dp-si-nav button:hover{border-color:var(--wl-c9a84c, #C9A84C)}',
@@ -329,6 +330,9 @@
       '#card-wert-zielbild .dp-wz-t th.c-soll{box-shadow:inset 0 -2px 0 var(--wl-e8cc7a, #E8CC7A)}#card-wert-zielbild .dp-wz-t th.c-ziel{box-shadow:inset 0 -2px 0 var(--wl-b8932f, #b8932f)}',
       '#card-wert-zielbild .dp-wz-tag{font:600 9px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;padding:2px 5px;border-radius:4px;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 60%,transparent);color:var(--wl-b8932f, #b8932f);vertical-align:1px;margin-left:4px;white-space:nowrap}',
       '#card-wert-zielbild .dp-wz-kz{font:600 9.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#2f7d55;border:1px solid #2f7d55;border-radius:999px;padding:1px 8px;margin-left:auto;white-space:nowrap}',
+      '#card-wert-zielbild .dp-wz-spm{display:none}',
+      '@media (min-width:641px){#card-wert-zielbild table.dp-wz-verf{min-width:560px}#card-wert-zielbild table.dp-wz-stufen{min-width:440px}}',
+      '@media (max-width:640px){#card-wert-zielbild .dp-wz-spc{display:none}#card-wert-zielbild .dp-wz-spm{display:block}#card-wert-zielbild .dp-wz-t td{white-space:normal}}',
       '#card-wert-zielbild .dp-wz-quelle{font:400 11px/1.5 Inter,sans-serif;color:#6B645A;margin:6px 0 0}',
       '#card-wert-zielbild .dp-wz-quelle button{font:600 11px Inter,sans-serif;border:0;background:none;color:var(--wl-b8932f, #b8932f);padding:0;cursor:pointer;text-decoration:underline}',
       '#card-wert-zielbild details.dp-wz-det{margin-top:14px;border-top:1px solid #F0ECE4;padding-top:10px}',
@@ -430,12 +434,15 @@
   /* ── Segment „Wert & Zielbild" im Tab Bewertung ───────────────────────── */
   function wertTafel(W) {
     var mw = W.marktpreisindikation.mitte;
-    var t = '<div class="dp-wz-scroll"><table class="dp-wz-t" style="min-width:520px"><thead><tr><th>Verfahren</th><th>untere</th><th>Mitte / Wert</th><th>obere</th><th>zur Markt&shy;preis&shy;indikation</th></tr></thead><tbody>';
+    /* vier Spalten (nicht fünf): tabellen-karten.js baut ab fünf Spalten auf dem Handy Karten -
+       hier stünden dann leere „untere/obere" untereinander. Die Spanne steht in einer Spalte. */
+    var sp = function (v) { return v.unten != null && v.oben != null ? esc(eur(v.unten)) + ' – ' + esc(eur(v.oben)) : ''; };
+    var t = '<div class="dp-wz-scroll"><table class="dp-wz-t dp-wz-verf"><thead><tr><th>Verfahren</th><th>Mitte / Wert</th><th class="dp-wz-spc">untere – obere</th><th>zur Markt&shy;preis&shy;indikation</th></tr></thead><tbody>';
     W.verfahren.forEach(function (v) {
       var d = v.abw_zur_mpi_pct;
       t += '<tr class="' + (v.fuehrend ? 'fu' : '') + (v.schluessel === 'kaufpreis' ? ' kp' : '') + '" data-dp-wz-verf="' + v.schluessel + '"><td>' + esc(v.name)
         + (v.fuehrend ? '<span class="dp-wz-tag">führend</span>' : '') + (v.zusatz ? '<small>' + esc(v.zusatz) + '</small>' : '') + '</td>'
-        + '<td>' + (v.unten != null ? esc(eur(v.unten)) : '') + '</td><td><b>' + esc(eur(v.mitte)) + '</b></td><td>' + (v.oben != null ? esc(eur(v.oben)) : '') + '</td>'
+        + '<td><b>' + esc(eur(v.mitte)) + '</b>' + (sp(v) ? '<small class="dp-wz-spm">' + sp(v) + '</small>' : '') + '</td><td class="dp-wz-spc">' + sp(v) + '</td>'
         + '<td>' + (d == null || mw == null ? '' : (d > 0 ? '+' : (d < 0 ? '−' : '±')) + esc(dez(Math.abs(d), 1)) + ' %') + '</td></tr>';
     });
     return t + '</tbody></table></div>';
@@ -447,7 +454,7 @@
     var zeile = function (t, klein, f, kl) {
       return '<tr' + (kl ? ' class="' + kl + '"' : '') + '><td>' + t + (klein ? '<small>' + klein + '</small>' : '') + '</td>' + sp.map(function (k) { var v = f(k); return '<td>' + (v == null || v === '' ? '–' : v) + '</td>'; }).join('') + '</tr>';
     };
-    var t = '<div class="dp-wz-scroll"><table class="dp-wz-t" style="min-width:' + (sp.length > 2 ? 440 : 340) + 'px"><thead><tr><th>Kennzahl</th>'
+    var t = '<div class="dp-wz-scroll"><table class="dp-wz-t dp-wz-stufen"><thead><tr><th>Kennzahl</th>'
       + sp.map(function (k) { return '<th class="' + cls[k] + '">' + esc(Z.titel[k] || k) + '</th>'; }).join('') + '</tr></thead><tbody>';
     t += zeile('Kaltmiete p. a.', '', function (k) { return S[k].miete_jahr != null ? esc(eur(S[k].miete_jahr)) + (S[k].miete_qm != null ? '<small>' + esc(dez(S[k].miete_qm, 2)) + ' €/m²</small>' : '') : null; });
     t += zeile('Maßnahmenkosten', '', function (k) { return k === 'bestand' ? '' : (S[k].kosten ? esc(eur(S[k].kosten)) : '0 €'); });
@@ -531,13 +538,13 @@
       if (w) {
         w.setAttribute('data-dp-si-modus', m);
         w.querySelectorAll('.dp-si-um [data-dp-si-knopf]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-dp-si-knopf') === m)); });
-        if (t.classList.contains('dp-wz-mehr')) { try { w.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} }
+        if (t.classList.contains('dp-wz-mehr')) { try { w.scrollIntoView({ block: 'start', behavior: 'auto' }); } catch (e) {} }
       }
       return;
     }
     if (t.hasAttribute('data-dp-si-sprung')) {
       var wr = t.closest('[data-dp-si-modus]'), ziel = wr ? wr.querySelector(t.getAttribute('data-dp-si-sprung')) : null;
-      if (ziel) { var k = ziel.closest('.dp-pa-card, .abw-tafel-host') || ziel; try { k.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} }
+      if (ziel) { var k = ziel.closest('.dp-pa-card, .abw-tafel-host') || ziel; try { k.scrollIntoView({ block: 'start', behavior: 'auto' }); } catch (e) {} }
       return;
     }
     if (t.hasAttribute('data-dp-wz-erkl')) {
