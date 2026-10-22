@@ -1475,7 +1475,6 @@
     if (WZ) {
       _titel = 'Wert & Zielbild'; _unter = (adr || 'Objekt') + ' · Werte je Verfahren';
       doc.addPage(); kopf(_titel, _unter);
-      abschnitt('Wert & Zielbild');
       einleitung('Was das Objekt nach den Verfahren der Immobilienwertermittlung wert ist, im Vergleich zum Kaufpreis - und wohin sich der Ertragswert mit Mieterhöhung und Zielbild entwickelt.');
       y = window.DpPdfWertZielbild.zeichne(doc, WZ, {
         x: L, y: y, breite: CW, unten: TEXT_UNTEN, stil: 'bank',
@@ -1756,7 +1755,10 @@
           abschnitt('Wie die Wertsteigerung angesetzt ist');
           zeile('Wert-Anker heute', eur(S.wert_basis));
           zeile('Angenommene Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '-');
-          zeile('Angenommener Wert nach ' + nJ + ' Jahren', eur(rows[rows.length - 1].wert_y));
+          /* Wert-Anker + kumulierte Wertsteigerung (State._vz) - wie pdf.js; die letzte
+             Jahreszeile traegt den Wert am ANFANG des letzten Jahres (gemessen 826.012
+             gegen 842.532 €) und passte deshalb nicht zur Summe darunter. */
+          zeile('Angenommener Wert nach ' + nJ + ' Jahren', eur(da(VZ.wertsteig_kum) !== null ? S.wert_basis + VZ.wertsteig_kum : null));
           zeile('Wertsteigerung', eur(VZ.wertsteig_kum), { summe: true });
         }
       }

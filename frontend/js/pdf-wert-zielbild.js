@@ -178,7 +178,9 @@
     var x = o.x, B = o.breite, y = o.y, f = o.f, unten = o.unten;
     var BS = global.DpPdfBlocksatz;
     function platz(h) { if (y + h > unten) { y = o.neueSeite(); return true; } return false; }
-    function ueber(t) { platz(16); y = o.ueberschrift ? o.ueberschrift(t, y) : y; }
+    /* Abstand vor jeder Zwischenueberschrift, ausser oben auf der Seite */
+    var erste = true;
+    function ueber(t) { if (!erste) y += 4; erste = false; platz(16); y = o.ueberschrift ? o.ueberschrift(t, y) : y; }
     function setT(c) { doc.setTextColor(c[0], c[1], c[2]); }
 
     /* ── 1. Tabelle der Verfahren ─────────────────────────────── */
@@ -234,7 +236,12 @@
 
     /* ── 2. Grafik: alle Werte auf einer Achse ───────────────── */
     var G = V.map(function (v) { return { name: v.name, unten: v.unten, mitte: v.mitte, oben: v.oben, art: v.art }; });
-    d.stufen.forEach(function (s) { G.push({ name: 'Ertragswert ' + s.titel, mitte: zahl(s.wert), art: 'stufe' }); });
+    /* Ertragswert je Stufe; der Bestand entfaellt, wenn er dem Ertragswert der Zeile darueber gleicht */
+    var ewZ = d.verfahren.filter(function (v) { return v.art === 'ew'; })[0];
+    d.stufen.forEach(function (s, i) {
+      if (i === 0 && ewZ && Math.abs(zahl(s.wert) - ewZ.mitte) <= ewZ.mitte * 0.005) return;
+      G.push({ name: 'Ertragswert ' + s.titel, mitte: zahl(s.wert), art: 'stufe' });
+    });
     G = G.filter(function (g) { return g.art !== 'kp'; });
     if (G.length >= 2 || (G.length && d.kaufpreis)) {
       var alle = [];
@@ -325,7 +332,10 @@
       d.kern.forEach(function (k) {
         platz(10);
         doc.setFont('helvetica', 'bold'); doc.setFontSize(8.4); setT(f.tinte);
-        var kopf2 = sauber(k.titel) + (k.wert_text ? ':  ' + sauber(k.wert_text) : '');
+        /* „Heute · Miete im Jahr: 38.340 € Miete im Jahr" - die Einheit steht schon im Titel */
+        var tt = sauber(k.titel), wt = sauber(k.wert_text || ''), tail = tt.split(' · ').pop();
+        if (tail && wt.length > tail.length && wt.slice(-tail.length) === tail) wt = wt.slice(0, -tail.length).trim();
+        var kopf2 = tt + (wt ? ':  ' + wt : '');
         doc.text(kopf2, x, y); y += 4.3;
         if (k.text) {
           y = BS.absatz(doc, sauber(k.text), { x: x, y: y, breite: B, zeile: 4.1, unten: unten, neueSeite: function () { return o.neueSeite(); }, stil: stil });

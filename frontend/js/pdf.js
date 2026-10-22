@@ -3456,7 +3456,6 @@ async function _exportPDFInner() {
     var _WZ = window.DpPdfWertZielbild ? await window.DpPdfWertZielbild.daten({ potenzial: (typeof _PD !== 'undefined' ? _PD : null) }) : null;
     if (_WZ) {
       cy = newPage('Wert & Zielbild');
-      cy = secH(doc, cy, 'Wert & Zielbild \u00b7 Werte je Verfahren', M, CW);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8.6); doc.setTextColor.apply(doc, C.CH);
       cy = window.DpPdfBlocksatz.absatz(doc, 'Was das Objekt nach den Verfahren der Immobilienwertermittlung wert ist, im Vergleich zum Kaufpreis - und wohin sich der Ertragswert mit Mieterh\u00f6hung und Zielbild entwickelt.', { x: M, y: cy + 3, breite: CW, zeile: 4.4 }) + 2;
       cy = window.DpPdfWertZielbild.zeichne(doc, _WZ, {
