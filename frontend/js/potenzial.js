@@ -920,6 +920,7 @@
       _markt.daten = _markt.abrufe.length ? _markt.abrufe[0] : null;
       _markt.einordnung = (r && r.einordnung) || null;
       if (neuZeichnen !== false) marktNeuZeichnen();
+      try { window.dispatchEvent(new CustomEvent('dp:potenzial-markt')); } catch (e) {}   /* v2840 */
     }, function () { _markt.laedt = false; });
   }
   /* v2577 · die Tafel oben kann ihre Wertzeilen aus dem Abruf nehmen - nach dem
@@ -1081,6 +1082,27 @@
     var zA = a.zins && a.zins.bestand && a.zins.bestand.ausschuss ? String(a.zins.bestand.ausschuss).replace(/^Der\s+/, '') : '';
     return [esc(a.hinweis || '') + (zA ? ' Zins für vermietetes Wohnungseigentum: ' + esc(zA) + '.' : ''),
       'Kosten der Aufteilung: ' + esc(m.aufteilungskosten_herkunft || a.kosten_herkunft || '') + '.'].filter(function (t) { return t && t !== '.'; });
+  }
+
+  /* ── v2840 · Wert je Stufe als reines Datenobjekt (Segment „Wert & Zielbild",
+     Einfach-Ansicht der Pilot-Analyse). Dieselbe Quelle wie die Tafel: der aktuelle
+     Ertragswert-Lauf, sonst der letzte Abruf „Marktpreise" (mit Datum). Lädt den
+     Verlauf der Abrufe nach, wenn er für dieses Objekt fehlt (Leseroute, kein
+     Kontingent) - danach kommt das Ereignis dp:potenzial-markt. */
+  function stufenWerte() {
+    var r = null; try { r = ergebnis(); } catch (e) { r = null; }
+    var alt = window._dpPotenzial;
+    if (gesperrt(r) || (!r && alt && gesperrt(alt.ergebnis) && !ergebnisVeraltet())) return { gesperrt: true, quelle: null, S: {} };
+    var key = marktKey();
+    if (key && _markt.key !== key) { _markt.daten = null; _markt.abrufe = []; _markt.einordnung = null; _markt.zustand = 'ruhe'; marktVerlaufLaden(false); }
+    var W = null; try { W = wertQuelle(r); } catch (e) { W = null; }
+    var veraltet = false; try { veraltet = ergebnisVeraltet(); } catch (e) {}
+    if (!W) return { gesperrt: false, quelle: null, S: {}, veraltet: veraltet };
+    var S = {};
+    Object.keys(W.S).forEach(function (k) { var w = W.S[k]; S[k] = { ertragswert: w.ew != null ? w.ew : null, rnd: w.rnd != null ? w.rnd : null,
+      marktpreisindikation: w.mpi != null ? w.mpi : null, mpi_spanne: w.spanne || null, rohertragsfaktor_x_miete: w.rf != null ? w.rf : null }; });
+    return { gesperrt: false, quelle: W.quelle, datum: W.datum || null, veraltet: W.quelle === 'lauf' ? false : veraltet,
+      lzs: W.lzs || null, S: S };
   }
 
   /* ── Daten für beide PDFs (Bank und Investment) ─────────────────────── */
@@ -1352,6 +1374,10 @@
             + (z.klein ? '<small>' + esc(z.klein) + '</small>' : '') + '</td><td class="bar">' + (z.schritt ? bar(z.w, farbe) : '') + '</td><td class="v">' + wert + '</td></tr>';
         }).join('') + '</tbody></table></div>';
   }
+  /* v2840 · LEG stand bis v2577 oben bei der Tafel und fiel dort mit weg - seitdem warf
+     bewertungHtml() „LEG is not defined", und die Karte im Tab Bewertung blieb leer
+     (gemessen 22.10.2026 an Westerfeldstr. 140: 42 px hoch, ohne Inhalt). */
+  var LEG = '<div class="dp-pot-leg"><span><i style="background:#2A2727"></i>Ist / Bestand</span><span><i style="background:var(--wl-e8cc7a, #E8CC7A)"></i>Mieterhöhung · Mieter bleibt</span><span><i style="background:var(--wl-b8932f, #b8932f)"></i>Zielbild · nach Umbau</span></div>';
   function bewertungHtml(breite) {
     var m = modell(); if (!m.aktiv) return '';
     var d = pdfDaten(); if (!d) return '';
@@ -1414,6 +1440,10 @@
     var m = null; try { m = modell(); } catch (e) { m = null; }
     if (!m || !m.aktiv) { if (karte) karte.remove(); return; }
     bwStil(); stilEinhaengen();
+    /* v2840 · im Segment „Wert & Zielbild" (wert-zielbild.js) steht die Karte als Detail */
+    if (!karte && window.DpWertZielbild && typeof window.DpWertZielbild.potenzialHost === 'function') {
+      try { karte = window.DpWertZielbild.potenzialHost(); } catch (e) { karte = null; }
+    }
     if (!karte) {
       karte = document.createElement('div');
       karte.className = 'card'; karte.id = 'card-wertpotenzial';
@@ -1710,7 +1740,7 @@
     punkteGewinn: punkteGewinn, sollFuer: sollFuer, umlage559: umlage559,
     modell: modell, rechnen: rechnen, ergebnis: ergebnis, ergebnisVeraltet: ergebnisVeraltet,
     wohnungErgebnis: wohnungErgebnis, kennzahlen: kennzahlen, tafelHtml: tafelHtml, pdfDaten: pdfDaten, pilotPayload: pilotPayload,
-    brueckeDaten: brueckeDaten, brueckeAchse: brueckeAchse, ueberleitungZeilen: ueberleitungZeilen, STUFE_FARBE: STUFE_FARBE, bewertungKarte: bewertungKarte, bewertungHtml: bewertungHtml,
+    brueckeDaten: brueckeDaten, brueckeAchse: brueckeAchse, ueberleitungZeilen: ueberleitungZeilen, STUFE_FARBE: STUFE_FARBE, bewertungKarte: bewertungKarte, bewertungHtml: bewertungHtml, stufenWerte: stufenWerte,
     sollFuerMietentwicklung: sollFuerMietentwicklung, objektKarte: objektKarte,
     _hash: hash, _auftrag: auftrag
   };

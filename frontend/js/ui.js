@@ -2110,7 +2110,7 @@ function _renderAIServerAnalysis(a) {
     try { alt = roh ? (typeof roh === 'string' ? JSON.parse(roh) : roh) : null; } catch (e) { alt = null; }
     var kopf = sec('', I.bank, 'PILOT-ANALYSE: ANKAUF GEGEN HEUTE');
     if (!alt || typeof alt !== 'object' || !(alt.empfehlung || alt.gesamtbewertung)) {
-      return '<div class="dp-pa-card" style="margin-top:12px">' + kopf + '<p class="dp-pa-p">Beim Festschreiben des Ankauf-Stands lag keine Pilot-Analyse vor. '
+      return '<div class="dp-pa-card" style="margin-top:12px" data-dp-si-pilot="1">' + kopf + '<p class="dp-pa-p">Beim Festschreiben des Ankauf-Stands lag keine Pilot-Analyse vor. '
         + 'Was der Pilot damals gesagt hätte, lässt sich nicht nachträglich erzeugen — eine neue Analyse beschreibt immer den heutigen Stand.</p></div>';
     }
     function dat(x) { var d = x && x._fuer && x._fuer.stand ? new Date(x._fuer.stand) : null; return d && !isNaN(d) ? d.toLocaleDateString('de-DE') : 'ohne Datum'; }
@@ -2118,7 +2118,7 @@ function _renderAIServerAnalysis(a) {
     function kurz(t, n) { t = String(t || ''); return t.length > n ? t.slice(0, n).replace(/\s+\S*$/, '') + ' …' : t; }
     var gleich = alt._fuer && a._fuer && alt._fuer.stand === a._fuer.stand;
     var zeile = function (wort, x, y) { return '<tr><td class="abw-wort">' + wort + '</td><td>' + x + '</td><td>' + y + '</td></tr>'; };
-    return '<div class="dp-pa-card" style="margin-top:12px">' + kopf
+    return '<div class="dp-pa-card" style="margin-top:12px" data-dp-si-pilot="1">' + kopf
       + (gleich ? '<p class="dp-pa-p">Seit dem Festschreiben wurde keine neue Analyse abgerufen — beide Spalten zeigen dieselbe. Ruf sie neu ab, dann steht hier, wie der Pilot das Objekt <b>heute</b> sieht.</p>' : '')
       + '<table class="abw-tafel"><thead><tr><th></th><th>Beim Ankauf</th><th>Heute</th></tr></thead><tbody>'
       + zeile('Stand', dat(alt), dat(a))
@@ -2220,7 +2220,13 @@ function _renderAIServerAnalysis(a) {
       panel('verh', pV, false) +
       panel('bank', pK, false) +
       panel('steuer', pSt, false) +
-      (_siHtml || _potHtml ? panel('si', _potHtml + (_potHtml && _siHtml ? '<div style="margin-top:12px"></div>' : '') + _siHtml, false) : '') +   /* v2430 */
+      /* v2840 · Marcel 22.10.2026: „für viele Kunden sehr unübersichtlich … oben einen Reiter:
+         einfach und genau". Einfach = Kernaussagen + Klartext (wert-zielbild.js), Genau = alles
+         Bisherige mit Sprungleiste. Ohne wert-zielbild.js bleibt es beim Bisherigen. */
+      (_siHtml || _potHtml ? panel('si', (function () {
+        var g = _potHtml + (_potHtml && _siHtml ? '<div style="margin-top:12px"></div>' : '') + _siHtml;
+        try { return window.DpWertZielbild ? window.DpWertZielbild.reiterHtml(g, { mitAnkauf: !!_siHtml, mitPot: !!_potHtml }) : g; } catch (e) { return g; }
+      })(), false) : '') +   /* v2430 */
       panel('verlauf', '<div class="dp-pa-card" id="dp-pa-verlauf-body"><p class="dp-pa-p" style="color:#8b8678">Lade Marktbericht-Verlauf \u2026</p></div>', false) +
     '</div>' +
   '</div>';
