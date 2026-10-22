@@ -15,7 +15,7 @@
 
    NEU (Kartenbreite < 900 px, @container an .av-cards.single wie v1876a):
    - Kopf als Leiste oben (Logo · Markteinschätzung · Genauigkeit rechts).
-   - Marktwert gross als Hauptzahl, je m² / vs. Kaufpreis rechts daneben (unter 520 px darunter).
+   - Marktwert gross als Hauptzahl, je m² / vs. Kaufpreis darunter.
    - Spanne als ein Balken aus drei Feldern Unten · Ø · Oben (bleiben Knoepfe: Klick uebernimmt),
      Oberkante als Stufenverlauf hell -> dunkel Gold, das gewaehlte Feld gerahmt.
    - Kacheln gleicher Hoehe mit einer Oberkante: Marktmiete · Einordnung (Pille in Statusfarbe) ·
@@ -38,7 +38,7 @@
   html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mhead.dphead .avs-cf { margin: 0 0 0 auto !important; flex: 0 0 auto !important; }
 
   /* ── Koerper: Raster mit drei gleich breiten Spalten ── */
-  html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody { display: grid !important; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.15fr) minmax(0, .7fr) !important; grid-template-areas: "mw mw sub" "sp sp sp" "miete ein gen" !important; gap: 12px 10px !important; padding: 14px 14px 12px !important; align-items: stretch !important; }
+  html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody { display: grid !important; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.15fr) minmax(0, .7fr) !important; grid-template-areas: "mw mw mw" "sub sub sub" "sp sp sp" "miete ein gen" !important; gap: 12px 10px !important; padding: 14px 14px 12px !important; align-items: stretch !important; }
   html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody > * { border-left: 0 !important; padding: 0 !important; min-width: 0 !important; margin: 0 !important; }
   html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody > .cmp { grid-column: 1 / -1 !important; }
 
@@ -51,7 +51,7 @@
 
   /* Hauptzahl */
   html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody .mw { grid-area: mw !important; align-self: end !important; font: 700 28px/1.05 "Space Grotesk", system-ui, sans-serif !important; letter-spacing: -.5px !important; white-space: nowrap !important; }
-  html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody .avs-sub { grid-area: sub !important; align-self: end !important; justify-self: end !important; text-align: right !important; font: 12.5px/1.2 "JetBrains Mono", monospace !important; color: #5f5a52 !important; white-space: nowrap !important; padding-bottom: 2px !important; }
+  html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody .avs-sub { grid-area: sub !important; align-self: start !important; justify-self: start !important; text-align: left !important; margin-top: -4px !important; font: 12.5px/1.2 "JetBrains Mono", monospace !important; color: #5f5a52 !important; white-space: nowrap !important; padding-bottom: 2px !important; }
   html[data-dp-mwkarte="neu"] #avsec .av-cards.single .mc.dp .mbody .avs-sub > span { font-weight: 700 !important; }
 
   /* Spanne als Balken: drei Felder in einem Rahmen, Oberkante als Stufenverlauf */
