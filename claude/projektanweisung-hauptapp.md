@@ -42306,3 +42306,17 @@ Marcel 22.10.2026: „ja rollout 62".
   - (b) Die Steuer eines Objekts hängt am Bestandssaldo der anderen Objekte. Die Live-Zahl schwankt deshalb je nach Ladezustand: 2026-001 CF n. St. 4.547 / 4.556 in zwei Läufen.
   - (c) 2026-1052 wurde während des Laufs um 15:42:29/31 von Marcels IP gespeichert (v164 → v166). Meine Sperre hat beide PUTs dieses Laufs für 1052 abgefangen; die Schreibung kam nach Lage der Dinge aus einem parallelen Tab (?pdfp=2832). Die gespeicherten Werte (Score 79, CF 10.826) entsprechen der Live-Rechnung.
   - (d) `bank-charts.js` nutzt für den DSCR je Jahr eigene Indizes (bindj-1/bindj) und noch nicht `State._zbEzbIdx`/`_zbAnIdx` → PDF-Strang.
+
+### v2854 · Sanierungsstau in den Potenzial-Stufen nicht doppelt (22.10.2026)
+- **Was:** Parkstr. 9 (2026-1056): `san` 137.000 € steht im Bestand als boG. Die Zielbild-Maßnahmen von 136.000 € (Summe je Wohnung in `_mfh`) sind dieselben Arbeiten und werden im Wertzuwachs als Kosten abgezogen; trotzdem blieb der boG in jeder Stufe stehen.
+  - Entscheidung 22.10.: In jeder Stufe gilt der Stau in Höhe ihrer Maßnahmenkosten als behoben, boG = min(0, Stau + Kosten). Das gilt nur für einen boG aus den Sanierungskosten: neues Feld `bog_quelle` in `CrossCheckService` (Mapper `bom_quelle` 'sanierungskosten' oder dessen Wortlaut), nie für eine eigene bOM-Angabe.
+  - `PotenzialService.eineStufe` bekommt die Kosten der Stufe. Die Stufe trägt `sanierungsstau` {stau_eur, kosten_eur, behoben_eur, rest_eur, text}; ein Rest steht mit dem Text „Sanierungsstau durch die Maßnahmen dieser Stufe behoben: x €, Rest y €“ in der boG-Zeile.
+- **Commit:** `55b920d8`, mb-backend auf Staging neu gebaut.
+- **Nachweis:**
+  - `wertermittlung-pruefen` A 88/88, B 203/203 (B54 neu, 10 Werte: Rest-boG −1.000 im Zielbild, ohne Kosten voller Stau, Kosten über dem Stau nie positiv, Wegerecht bleibt voll; gegen den alten PotenzialService 3 rot), C 99/99.
+  - Live-Lauf `POST /marktbericht/potenzial`, Speichern gesperrt:
+    - Parkstr. 9: Bestand 159.000 → 159.000, Mieterhöhung (keine Kosten) 186.000 → 186.000, Zielbild 186.000 → **322.000** (+136.000; Wertzuwachs nach Kosten −109.000 → +27.000).
+    - Westerfeldstr. 140 (kein `san`): 740.000 / 800.000 / 895.000 unverändert.
+- **Rest:**
+  - (a) Die Anzeige von `sanierungsstau.text` in Pilot-Tafel und PDF gehört dem Pilot- bzw. PDF-Strang. Im Rechenweg erscheint er nur, solange ein Rest bleibt.
+  - (b) Demo-Daten Parkstr. 9: Wohnung 3 trägt „Saniert 2025: Bad, Böden, Elektro“ und zugleich 45.000 € künftige Maßnahmen – widersprüchlich, nicht geändert.
