@@ -1,17 +1,17 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-10-21T21:12:14.328Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-10-22T06:28:06.216Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_REGISTER = {
- "stand": "2026-10-21",
- "erzeugt": "2026-10-21T21:12:14.328Z",
- "register_commit": "7c90bce1",
+ "stand": "2026-10-22",
+ "erzeugt": "2026-10-22T06:28:06.216Z",
+ "register_commit": "60192dd0",
  "register_lokal_geaendert": false,
  "quelle": "registerDeckung() · lib/register_deckung.js, ohne Datenbank (wie Admin „Register & Ernte\")",
  "dateien": 100,
  "saetze": 10679,
  "kopf": {
-  "werte_gesamt": 4500,
+  "werte_gesamt": 4503,
   "lzs": 2447,
-  "swf": 624,
+  "swf": 627,
   "uk_flaeche": 159,
   "uk_wgfz": 115,
   "uk": 274,
@@ -23,11 +23,11 @@ window.DPS_REGISTER = {
   "laender_gesamt": 16
  },
  "herkunft": {
-  "werte": 4500,
-  "mit_ausschuss": 4500,
-  "mit_jahrgang": 4500,
-  "mit_quelle": 4500,
-  "mit_seite": 4499
+  "werte": 4503,
+  "mit_ausschuss": 4503,
+  "mit_jahrgang": 4503,
+  "mit_quelle": 4503,
+  "mit_seite": 4502
  },
  "jahrgaenge": [
   2018,
@@ -146,14 +146,14 @@ window.DPS_REGISTER = {
   },
   "HE": {
    "name": "Hessen",
-   "werte": 330,
+   "werte": 333,
    "lzs": {
     "w": 140,
     "anteil": 0.88
    },
    "swf": {
-    "w": 164,
-    "anteil": 0.72
+    "w": 167,
+    "anteil": 0.73
    },
    "uk_flaeche": {
     "w": 16,
@@ -163,7 +163,7 @@ window.DPS_REGISTER = {
     "w": 10,
     "anteil": 0.56
    },
-   "anteil4": 0.75,
+   "anteil4": 0.76,
    "erfasst": true
   },
   "RP": {
