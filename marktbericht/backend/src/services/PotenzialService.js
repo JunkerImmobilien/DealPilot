@@ -61,7 +61,8 @@ function mpiAngebote(wb, refAenderung) {
 const ZIELBILD_REF = () => ({ condition: 'modernisiert', modernization: 'umfassend modernisiert',
   modernization_year: new Date().getFullYear(), bom_eur: null, bom_grund: null });
 
-export const KENNZEICHNUNG = 'Potenzialwert nach Mieterhöhung bzw. Zielbild, keine Verkehrswertermittlung.';
+/* v2870 · Marcel 22.10.2026, neuer Wortlaut (vorher „Potenzialwert …, keine Verkehrswertermittlung“) */
+export const KENNZEICHNUNG = 'Die Ertragswerte nach Mieterhöhung und im Zielbild sind ein Ausblick: Sie unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand.';
 const STUFEN = ['mieterhoehung', 'zielbild'];
 
 const zahl = (v) => {

@@ -526,7 +526,7 @@ router.post('/potenzial', authenticate, async function (req, res) {
     if (!fg.ok) {
       return res.json({ verfuegbar: false, ertragswert_gesperrt: true, freigabe: { ok: false, grund: fg.grund || null },
         grund: ertragswertFreigabe.HINWEIS_KURZ, hinweis: ertragswertFreigabe.HINWEIS_LANG,
-        kennzeichnung: 'Potenzialwert nach Mieterhöhung bzw. Zielbild, keine Verkehrswertermittlung.',
+        kennzeichnung: 'Die Ertragswerte nach Mieterhöhung und im Zielbild sind ein Ausblick: Sie unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand.',   /* v2870 */
         stand: new Date().toISOString().slice(0, 10) });
     }
     const body = Object.assign({}, b0, { user_id: req.user && req.user.id });

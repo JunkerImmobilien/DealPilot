@@ -53,7 +53,7 @@ const OPENAI_URL = 'https://api.openai.com/v1/responses';
 function _potenzialBlock(pz) {
   var z = [], e = function (n) { return n == null ? '-' : Math.round(n).toLocaleString('de-DE') + ' EUR'; };
   z.push('');
-  z.push('## MIETERHOEHUNG UND ZIELBILD (Potenzial, keine Verkehrswertermittlung)');
+  z.push('## MIETERHOEHUNG UND ZIELBILD (Ausblick, kein Verkehrswert zum heutigen Stichtag)');
   z.push('Stufen: Bestand = heutige Ist-Miete; Mieterhoehung = Soll-Miete, der jetzige Mieter bleibt'
     + ' (Paragraf 558 BGB bis zur Vergleichsmiete, Kappungsgrenze, 15 Monate nach der letzten Erhoehung;'
     + ' Paragraf 559 bei Modernisierung im bewohnten Zustand); Zielbild = nach Umbau oder Neuvermietung.');
@@ -1590,7 +1590,7 @@ function buildPrompt(payload, opts) {
       + '   4-7 Saetze: was ohne Mieterwechsel erreichbar ist und ab wann, was das Zielbild mit welchen\n'
       + '   Massnahmen und Kosten bringt, die Ertragswerte je Stufe und der Wertzuwachs nach Kosten,\n'
       + '   bei Aufteilung deren Wirkung (auch wenn sie negativ ist). Die schnellsten Hebel zuerst.\n'
-      + '   Nenne es ausdruecklich einen Potenzialwert, keine Verkehrswertermittlung; Score und\n'
+      + '   Nenne es ausdruecklich einen Ausblick (unterstellt, dass die hoehere Miete erzielt bzw. die Massnahmen umgesetzt sind), keinen Verkehrswert zum heutigen Stichtag; Score und\n'
       + '   Verkehrswert bleiben beim Bestand. Zahlen NUR aus dem Block. Gehoert nach "potenzial_text".' : ''),
     '## STIL',
     '- Klar, professionell, wie ein ausführlicher Investment-Report',

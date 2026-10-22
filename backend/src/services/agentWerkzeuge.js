@@ -357,7 +357,7 @@ function _potenzialKurz(d, frei) {
   if (!z && !roh.length && !obj) return null;
   return {
     stand: z ? z.stand : null,
-    kennzeichnung: 'Potenzialwert nach Mieterhoehung bzw. Zielbild, keine Verkehrswertermittlung. Score und Verkehrswert rechnen mit dem Bestand.',
+    kennzeichnung: 'Ausblick: die Ertragswerte nach Mieterhoehung und im Zielbild unterstellen, dass die hoehere Miete erzielt bzw. die Massnahmen umgesetzt sind; kein Verkehrswert zum heutigen Stichtag. Massgeblich fuer den heutigen Wert und den Score ist der Bestand.',   /* v2870 */
     stufen: z ? z.stufen : null,
     aufteilung: z ? (z.aufteilung || null) : null,
     kappung: z && z.kappung ? z.kappung.text : null,
@@ -403,7 +403,7 @@ async function potenzial_lesen(ctx, args) {
   liste.sort((a, b) => (b.potenzial_netto || 0) - (a.potenzial_netto || 0));
   return { anzahl: liste.length, objekte: liste.slice(0, 40),
     hinweis: 'Sortiert nach Wertzuwachs nach Kosten (Ertragswert Zielbild bzw. Mieterhoehung minus Bestand minus Massnahmenkosten). '
-      + 'Ohne gerechneten Ertragswert (ertragswert_gerechnet: false) nur die Mieten nennen; bei ertragswert_gesperrt: der Ertragswert je Stufe gehoert zu DealPilot Stufe 3, sachlich so sagen. Immer als Potenzialwert kennzeichnen, keine Verkehrswertermittlung.' };
+      + 'Ohne gerechneten Ertragswert (ertragswert_gerechnet: false) nur die Mieten nennen; bei ertragswert_gesperrt: der Ertragswert je Stufe gehoert zu DealPilot Stufe 3, sachlich so sagen. Immer als Ausblick kennzeichnen, kein Verkehrswert zum heutigen Stichtag.' };
 }
 
 async function pilot_analyse_lesen(ctx, args) {
@@ -3814,7 +3814,7 @@ const WERKZEUGE = [
       + '(Bestand, Mieterhoehung, Zielbild) samt Aufteilung in Eigentumswohnungen. Mit alle=true eine Rangliste '
       + 'ueber das ganze Portfolio nach Wertzuwachs. Nutze es bei "wo steckt das meiste Potenzial?", '
       + '"was bringt die Sanierung?", "lohnt sich die Aufteilung?". Kostet nichts; rechnet nichts neu. '
-      + 'Immer als Potenzialwert kennzeichnen, keine Verkehrswertermittlung.',
+      + 'Immer als Ausblick kennzeichnen, kein Verkehrswert zum heutigen Stichtag.',
     parameter: { type: 'object', properties: Object.assign({}, OBJEKT_ARGS, {
       alle: { type: 'boolean', description: 'true = alle Objekte mit Soll-Miete oder Zielbild, nach Potenzial sortiert' } }),
       additionalProperties: false } },

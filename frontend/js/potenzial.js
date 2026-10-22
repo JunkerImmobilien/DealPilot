@@ -36,7 +36,8 @@
   'use strict';
   if (window.DpPotenzial) return;
 
-  var KENNZEICHNUNG = 'Potenzialwert nach Mieterhöhung bzw. Zielbild, keine Verkehrswertermittlung.';
+  /* v2870 · Marcel 22.10.2026: der alte Satz („Potenzialwert …, keine Verkehrswertermittlung“) sagte nicht, was gemeint war */
+  var KENNZEICHNUNG = 'Die Ertragswerte nach Mieterhöhung und im Zielbild sind ein Ausblick: Sie unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand.';
   /* v2431 · Marcel 19.10.2026 (Geld): Ertragswert nur mit Stufe 3 - geprueft im
      Haupt-Backend (services/ertragswertFreigabe.js). Ohne Freigabe kommt
      `ertragswert_gesperrt` zurueck; Mieten, Zielbild, Kosten und Rendite bleiben. */
@@ -1171,7 +1172,7 @@
         var s = r.aufteilung.je_stufe[k]; return !s ? '—' : (s.potenzial < 0 ? 'kein Potenzial' : '+' + eur(s.potenzial)); })));
       d.aufteilung_hinweis = r.aufteilung.negativ_hinweis || null;
     }
-    d.fuss = KENNZEICHNUNG + ' Verkehrswert nach ImmoWertV und Score rechnen mit dem Bestand.'
+    d.fuss = KENNZEICHNUNG + ' Der Score rechnet ebenfalls mit dem Bestand.'
       + (r && r.verfuegbar && r.basis ? ' Liegenschaftszins ' + pct(r.basis.lzs_pct) + ' (Haus)'
         + (r.aufteilung && r.aufteilung.zins && r.aufteilung.zins.bestand && r.aufteilung.zins.bestand.pct != null ? ' bzw. ' + pct(r.aufteilung.zins.bestand.pct) + ' (Wohnungseigentum, vermietet)' : '')
         + ', Restnutzungsdauer nach Modernisierungspunkten (Anlage 2 ImmoWertV).'
@@ -1384,7 +1385,7 @@
     var r = ergebnis();
     var cls = { mieterhoehung: 'c-soll', zielbild: 'c-ziel', bestand: '' };
     var html = '<div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trending-up"/></svg></span>Mieterhöhung und Zielbild · Wertpotenzial'
-      + '<span class="dp-wp-kz" title="' + esc(KENNZEICHNUNG) + '">Potenzialwert</span></div>'
+      + '<span class="dp-wp-kz" title="' + esc(KENNZEICHNUNG) + '">Ausblick</span></div>'
       + '<p class="dp-wp-satz">' + esc(d.satz_bank) + '</p><div class="dp-pot">' + LEG;
     if (d.art === 'mfh' && d.wohnungen.length) {
       html += '<div class="dp-wp-h">Wohnungen · Ist, Soll-Miete und Zielbild</div><div class="dp-pot-scroll"><table class="dp-wp-we"><thead><tr><th>WE</th><th>m²</th><th>Ist / Monat</th><th class="c-soll">Mieterhöhung</th><th class="c-ziel">Zielmiete</th><th>Maßnahmen</th></tr></thead><tbody>'

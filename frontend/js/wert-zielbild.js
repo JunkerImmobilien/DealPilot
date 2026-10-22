@@ -203,7 +203,7 @@
       zuw[k] = st[k].ertragswert != null && B.ertragswert != null ? st[k].ertragswert - B.ertragswert - (st[k].kosten || 0) : null;
     });
     return {
-      kennzeichnung: PZ.KENNZEICHNUNG || 'Potenzialwert nach Mieterhöhung bzw. Zielbild, keine Verkehrswertermittlung.',
+      kennzeichnung: PZ.KENNZEICHNUNG || 'Die Ertragswerte nach Mieterhöhung und im Zielbild sind ein Ausblick: Sie unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand.',
       art: m.art || null, spalten: spalten,
       titel: (pd && pd.titel) || { bestand: 'Bestand', mieterhoehung: 'Mieterhöhung', zielbild: 'Zielbild' },
       jahre: (pd && pd.jahre) || { ankauf: null, mieterhoehung: null, zielbild: null },
@@ -485,7 +485,7 @@
     if (Z) {
       h += '<div class="dp-wz-h">Ist · Mieterhöhung · Zielbild</div>' + kachelnHtml(D.kernaussagen) + zielTafel(Z)
         + (Z.ertragswert_quelle === 'abruf' ? '<p class="dp-wz-quelle">Ertragswerte je Stufe aus dem Abruf „Marktpreise" vom ' + esc(Z.ertragswert_abruf_datum || '') + (Z.ertragswert_veraltet ? '; die Angaben haben sich seitdem geändert' : '') + '.</p>' : '')
-        + '<p class="dp-wz-quelle">' + esc(Z.kennzeichnung) + ' Verkehrswert und Score rechnen mit dem Bestand.</p>';
+        + '<p class="dp-wz-quelle">' + esc(Z.kennzeichnung) + ' Der Score rechnet ebenfalls mit dem Bestand.</p>';
     }
     return h;
   }
