@@ -173,6 +173,7 @@ export function mietabweichungBog(posten, lzsPct, rndJahre, stichtag) {
     else if (art === 'underrent' && Number(z.abw_jahre) > 0) { jahre = Number(z.abw_jahre); quelle = 'eingabe'; }
     const zeile = { nr: z.nr || null, art, differenz_jahr: d, jahre: jahre != null ? deckel(jahre) : null, jahre_quelle: quelle,
                     gedeckelt_auf_rnd: jahre != null && R != null && jahre > R };
+    if (z.nutzung) zeile.nutzung = z.nutzung;   /* v2800 · Wohnung oder Gewerbeeinheit (WGH) */
     if (jahre != null && jahre > 0) {
       zeile.barwert_eur = barwertAbweichung(d, lzsPct, zeile.jahre);
       zeile.angesetzt = true;
@@ -258,7 +259,10 @@ export function gewerbeNutzungNachfrage(gew) {
   return 'Für ' + (qm ? qm + ' m² Gewerbefläche' : 'die Gewerbefläche') + (nr ? ' (' + nr.join(', ') + ')' : '')
     + ' fehlt die Nutzungsart. Ohne sie gibt es keinen Instandhaltungsansatz nach Anlage 3 ImmoWertV (Büro/Praxen/Geschäfte 100 %, '
     + 'SB-Verbrauchermärkte 50 %, Lager/Logistik/Produktion 30 % der Wohn-Instandhaltung je m²); ohne Instandhaltung wäre der Ertragswert zu hoch, '
-    + 'deshalb wird er nicht ausgewiesen. Bitte im MFH-Konfigurator je Gewerbeeinheit die Nutzungsart wählen: Büro/Praxis/Laden, SB-Markt oder Lager/Logistik.';
+    /* v2800 · der Ort im Formular, wie er dort heisst (mfh-einheiten.js: Knopf „Einheiten erfassen",
+       Schritt „Einheiten", Knopf „Details", Block „Gewerbe" - erscheint bei Art „Gewerbe" -, Feld „Nutzungsart") */
+    + 'deshalb wird er nicht ausgewiesen. So tragen Sie sie nach: Reiter Objekt › „Einheiten erfassen“ › Schritt „Einheiten“ › bei der Gewerbeeinheit „Details“ › '
+    + 'im Block „Gewerbe“ das Feld „Nutzungsart“: Büro/Praxis/Laden, SB-Markt oder Lager/Logistik.';
 }
 /* v2790 · Punkt 5 · Liegenschaftszins bei gemischter Nutzung: der Satz des Ausschusses fuer
    Wohn- und Geschaeftshaeuser (Zweig wgh/ggg, lib/zweigwahl.js waehlt ihn bei Mischnutzung
@@ -1227,13 +1231,27 @@ export const CrossCheckService = {
        mieteNachBand auf ihre EIGENE Flaeche; Flaechen fuer den Rohertrag auf die
        Wohnflaeche des Objekts umgelegt (wie v2520); leere Wohnungen mit der
        Vergleichsmiete. Ohne Einheitenliste oder ohne Band: wie bisher. */
-    const _ehR = (Array.isArray(ref.einheiten_miete) && ref.einheiten_miete.length >= 2 && !(ref.gewerbe && _num(ref.gewerbe.wfl_gewerbe))
-      && _band && _refQm > 0 && _wflIst > 0) ? ref.einheiten_miete : null;
+    /* v2800 · IM WOHN- UND GESCHAEFTSHAUS DIE WOHNUNGEN EBENSO (E1/E2 gelten fuer jede
+       Wohnung). Bis v2799 schloss die Bedingung jedes Objekt mit Gewerbe aus: die Wohnungen
+       eines WGH gingen nie einzeln gegen das Band, ihre Ist-Miete gar nicht ein (Rohertrag
+       Wohnen = Anker x Wohnflaeche), eine Abweichung wurde nie boG - nur die Gewerbe-
+       einheiten (v2770/v2790). Jetzt dieselbe Rechnung je Wohnung auf die WOHNflaeche
+       (gewerbe.wohnungen, DealPilotObjectMapper.gewerbeAus); die Gewerbeeinheiten pruefen
+       weiter gewerbeNachBand gegen ihre eigene Marktmiete - jede Einheit genau einmal.
+       Reines Gewerbeobjekt (Geschaeftshaus mit Wohnungen) bleibt beim eigenen Zweig. */
+    const _gewEh = (ref.gewerbe && _num(ref.gewerbe.wfl_gewerbe)) ? ref.gewerbe : null;
+    const _wghWo = (_gewEh && !(istGewerbe(ref.property_type) || !!ref.gewerbe_art)
+      && Array.isArray(_gewEh.wohnungen) && _gewEh.wohnungen.length) ? _gewEh.wohnungen : null;
+    const _wflJe = _wghWo ? (_num(_gewEh.wfl_wohnen) || Math.max(0, (_wflIst || 0) - _gewEh.wfl_gewerbe)) : _wflIst;
+    const _ehR = _wghWo
+      ? ((_band && _refQm > 0 && _wflJe > 0) ? _wghWo : null)
+      : ((Array.isArray(ref.einheiten_miete) && ref.einheiten_miete.length >= 2 && !_gewEh
+        && _band && _refQm > 0 && _wflIst > 0) ? ref.einheiten_miete : null);
     const _je = _ehR ? (function () {
       const r2 = (x) => Math.round(x * 100) / 100;
       const sum = _ehR.reduce((a, e) => a + (Number(e.wfl) || 0), 0);
       if (!(sum > 0)) return null;
-      const f = _wflIst / sum;
+      const f = _wflJe / sum;
       const zeilen = _ehR.map((e) => {
         const fl = r2(Number(e.wfl) * f);
         /* v2600 · E2/E3 · Vertragsangaben der Wohnung reisen mit (Restlaufzeit, Leerstandsabzug) */
@@ -1262,7 +1280,7 @@ export const CrossCheckService = {
                qm_vermietet: wflV > 0 ? r2(jV / 12 / wflV) : null,
                wfl_leer: r2(l.reduce((a, z) => a + z.wfl, 0)), jahr_leer: l.reduce((a, z) => a + z.jahr, 0),
                n_vermietet: v.length, n_leer: l.length,
-               angepasst: v.filter((z) => z.herkunft !== 'ist_im_band') };
+               angepasst: v.filter((z) => z.herkunft !== 'ist_im_band'), wgh: !!_wghWo };
     })() : null;
     const mieteQm = _je && _je.qm_vermietet ? _je.qm_vermietet : _mnb.qm;
     const _ankEt = _anker ? _anker.etikett : 'Vergleichsmiete';
@@ -1716,13 +1734,21 @@ export const CrossCheckService = {
       let _mietBog = null, _leerBog = null, _bogDoppelt = false, _vorBog = false;
       /* v2770 · Gewerbe je Mietverhaeltnis (gewerbeMietPosten), nur bei marktueblicher Gewerbemiete */
       const _gewPosten = (_gew && _gewHerkunft === 'marktueblich') ? gewerbeMietPosten(_gew) : [];   /* v2790: nur ausserhalb des Bandes */
-      if (kern.vollstaendig && kern.wert != null && (!_gew || _gewPosten.length)) {
+      /* v2800 · im WGH Wohnungs- UND Gewerbeposten (je Einheit genau einmal: Wohnungen aus _je,
+         Gewerbe aus gewerbeNachBand). Bis v2799: mit Gewerbe NUR die Gewerbeposten. */
+      const _wohnPosten = _gew ? (_je ? _bogPosten : []) : _bogPosten;
+      const _postenAlle = _wohnPosten.map((x) => Object.assign({}, x, { nutzung: 'wohnen' }))
+        .concat(_gewPosten.map((x) => Object.assign({}, x, { nutzung: 'gewerbe' })));
+      if (kern.vollstaendig && kern.wert != null && (!_gew || _postenAlle.length || _je)) {
         const _lzsK = kern.lzs ? kern.lzs.pct : lzsPct;
         const _rndK = kern.nutzungsdauer ? kern.nutzungsdauer.rnd : null;
         _bogDoppelt = !!(ein.bog_eur && /miet|leerst|herricht|overrent|underrent|mehrertrag|minderertrag/i.test(String(ein.bog_grund || '')));
-        const _postenM = _gew ? _gewPosten : _bogPosten;   /* v2770 */
-        if (_postenM.length) _mietBog = mietabweichungBog(_postenM, _lzsK, _rndK, new Date());
-        if (_mietBog && _gew) _mietBog.gewerbe = true;
+        if (_postenAlle.length) _mietBog = mietabweichungBog(_postenAlle, _lzsK, _rndK, new Date());
+        /* v2800 · Wortlaut je Art: nur Gewerbe -> „Gewerbeeinheit", gemischt -> beide */
+        if (_mietBog && _gew) {
+          _mietBog.gewerbe = !_wohnPosten.length;
+          _mietBog.gemischt = !!(_wohnPosten.length && _gewPosten.length);
+        }
         if (_leerPosten.length) {
           const z = _leerPosten.map((x) => ({ nr: x.nr, monate: x.leer_monate || 0,
             mietausfall_eur: Math.round((x.jahr / 12) * (x.leer_monate || 0)), herrichtung_eur: Math.round(x.herrichtung_eur || 0) }));
@@ -1732,7 +1758,7 @@ export const CrossCheckService = {
         const _nLeer = _je ? _je.n_leer : (_ls ? (_ls.n_leer || 1) : 0);
         const _bp = [];
         if (!_bogDoppelt && _mietBog && _mietBog.n_angesetzt && _mietBog.angesetzt_eur) {
-          _bp.push({ pos: 'besonderes objektspezifisches Merkmal: Mietabweichung' + (_gew ? ' Gewerbe' : ''), wert: _mietBog.angesetzt_eur,
+          _bp.push({ pos: 'besonderes objektspezifisches Merkmal: Mietabweichung' + (_mietBog.gemischt ? ' Wohnungen und Gewerbe' : (_mietBog.gewerbe ? ' Gewerbe' : (_gew ? ' Wohnungen' : ''))), wert: _mietBog.angesetzt_eur,
             detail: 'Reinertragsdifferenz je Jahr (Bewirtschaftungskosten gleich): ' + _mietBog.zeilen.filter((x) => x.angesetzt && x.barwert_eur).map((x) => (x.nr ? x.nr + ': ' : '')
               + (x.differenz_jahr > 0 ? '+' : '−') + Math.abs(x.differenz_jahr).toLocaleString('de-DE') + ' €/Jahr × Barwertfaktor '
               + String(x.jahre).replace('.', ',') + ' J. (' + (x.jahre_quelle === 'eingabe' ? 'eigene Angabe' : x.jahre_quelle === 'befristung' ? 'Befristung' : 'Kündigungsverzicht') + ')').join('; ') });
@@ -1939,7 +1965,7 @@ export const CrossCheckService = {
               + 'Je nach Dauer macht sie ' + _eu(s0.barwert_eur) + ' (' + s0.jahre + ' Jahre) bis ' + _eu(s2.barwert_eur) + ' (' + s2.jahre + ' Jahre) aus — '
               + 'Szenarien, keine gesetzliche Annahme. '
               + (_ov ? 'Ein Mehrertrag wird nur mit belegter Vertragslaufzeit (Befristung oder Kündigungsverzicht) angesetzt. ' : '')
-              + 'Mit der Restlaufzeit je ' + (_mietBog.gewerbe ? 'Gewerbeeinheit' : 'Wohnung') + ' (Mietvertrag) wird sie beziffert.');
+              + 'Mit der Restlaufzeit je ' + (_mietBog.gemischt ? 'Wohnung bzw. Gewerbeeinheit' : (_mietBog.gewerbe ? 'Gewerbeeinheit' : 'Wohnung')) + ' (Mietvertrag) wird sie beziffert.');
           }
         }
         if (!_bogDoppelt && _leerBog && _leerBog.summe_eur > 0) {

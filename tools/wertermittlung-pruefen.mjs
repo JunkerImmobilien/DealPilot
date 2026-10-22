@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
-   DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595 · v2600 · v2790
+   DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595 · v2600 · v2790 · v2800
+   v2800: Wohnungen im Wohn-/Geschaeftshaus je Mietverhaeltnis (B49-B51), Ort der Nutzungsart-Nachfrage (B48).
    v2790: Marcels sieben Entscheidungen vom 22.10.2026 (B43-B48, A-E6 Reinertragsdifferenz aus der Tabelle des Musters).
    v2600: E1 Band am Satz des Ausschusses (Anker ± 20 %), E2 Mietabweichung als boG
    (A-E6 Anlage 3 Beispiel 1, B13-B15), E3 Leerstand mit/ohne Abzug (B4, B16), E4
@@ -998,6 +999,74 @@ fallB('B48', () => {
   const k = ertragswert({ objektart: 'mfh', baujahr: 1990, wohnflaeche_qm: 300, anzahl_we: 4, stichtag_jahr: 2026, miete_markt_jahr: 24000,
     gewerbe_jahr: 6000, lzs_pct: 3, lzs_stufe: 'A', rnd_jahre: 40, bwk_modus: 'normiert' }, bwEinfach(100000));
   pruefe('B', 'B48', 'Kern: Gewerbe-Rohertrag ohne Nutzungsart -> kein Wert, grund gewerbe_ohne_nutzungsart', k.vollstaendig === false && k.wert == null && k.grund === 'gewerbe_ohne_nutzungsart');
+  pruefe('B', 'B48', 'Nachfrage nennt den Ort im Formular (Reiter Objekt → Einheiten erfassen → Details → Gewerbe → Nutzungsart)',
+    !!e && /Reiter Objekt/.test(e.hinweis) && /Einheiten erfassen/.test(e.hinweis) && /„Nutzungsart“/.test(e.hinweis), e ? e.hinweis : '');
+});
+
+/* ══ v2800 · WOHNUNGEN IM WOHN- UND GESCHAEFTSHAUS JE MIETVERHAELTNIS (B49-B51) ═════
+   Bis v2799 schloss der Kern jedes Objekt mit Gewerbe von der Pruefung je Wohnung aus:
+   im WGH ging die Ist-Miete der Wohnungen gar nicht ein (Rohertrag Wohnen = Anker 7,70 ×
+   310 m² × 12 = 28.644), eine Mietabweichung wurde nie boG - nur die Gewerbeeinheiten.
+   Demo-MFH als WGH: fünf Wohnungen (310 m²) + Laden (68 m², Markt 6.528 €/Jahr).
+   B49 Wohnung WE 1 über dem Band (11,03 €/m², befristet bis 21.10.2029) + Laden im Band.
+   B50 beide außerhalb: WE 1 ohne Laufzeit (Szenario), Laden befristet (angesetzt).
+   B51 Mapper: gewerbe.wohnungen je Wohnung, einheiten_miete bleibt null; Doppelansatz. */
+const wghWo = (we1) => [Object.assign({ nr: 'WE 1', wfl: 68, ist_monat: 750, leer: false }, we1 || {}),
+  { nr: 'WE 2', wfl: 58, ist_monat: 455, leer: false }, { nr: 'WE 3', wfl: 68, ist_monat: 480, leer: false },
+  { nr: 'WE 4', wfl: 58, ist_monat: 470, leer: false }, { nr: 'WE 6', wfl: 58, ist_monat: 440, leer: false }];
+const wghDemo = (ge, we1) => (a) => { gewDemo(ge)(a); a[0].einheiten_miete = null; a[0].leerstand = null; a[0].gewerbe.wohnungen = wghWo(we1); };
+const mbZeile = (k) => ((k && k.staffel) || []).find((s) => /Merkmal: Mietabweichung/.test(s.pos)) || null;
+fallB('B49', () => {
+  const vor = ccFall('demo', gewDemo({ ist_jahr: 6000 }));   /* der Stand bis v2799: ohne Wohnungsliste */
+  wert('B', 'B49', 'ohne Wohnungsliste wie bisher: Rohertrag Wohnen = Anker 7,70 × 310 × 12', zeileK(vor.ertragswert_kern, /^Rohertrag Wohnen/), 28644, 0);
+  const r = ccFall('demo', wghDemo({ ist_jahr: 6000 }, { mv_befristet_bis: '2029-10-21' })), e = r && r.ertragswert, b = e && e.miete_bog;
+  pruefe('B', 'B49', 'Anker 7,70 (Ø Miete des Satzes), Band 6,16–9,24, je Wohnung geprüft (5 vermietet, WE 1 über dem Band)',
+    !!r && r.miete_band && r.miete_band.anker_qm === 7.7 && r.miete_band.oben_qm === 9.24 && r.miete_band.je_wohnung
+    && r.miete_band.je_wohnung.n_vermietet === 5 && r.miete_band.je_wohnung.angepasst.length === 1
+    && r.miete_band.je_wohnung.angepasst[0].nr === 'WE 1' && r.miete_band.je_wohnung.angepasst[0].herkunft === 'ueber_band',
+    r && r.miete_band ? JSON.stringify(r.miete_band.je_wohnung) : '');
+  wert('B', 'B49', 'Rohertrag Wohnen = WE 1 mit Anker (7,70 × 68 × 12 = 6.283) + Ist der übrigen (1.845 × 12 = 22.140)', zeileK(r.ertragswert_kern, /^Rohertrag Wohnen/), 6283 + 22140, 0);
+  wert('B', 'B49', 'Laden im Band (−8,1 %): Rohertrag Gewerbe = Ist 6.000', zeileK(r.ertragswert_kern, /^Rohertrag Gewerbe/), 6000, 0);
+  const z = b && b.zeilen;
+  pruefe('B', 'B49', 'genau ein Posten: WE 1 Overrent +2.717 €/Jahr, Befristung 3 J., angesetzt; Laden kein Posten',
+    !!z && z.length === 1 && z[0].nr === 'WE 1' && z[0].nutzung === 'wohnen' && z[0].art === 'overrent' && z[0].differenz_jahr === 9000 - 6283
+    && z[0].jahre === 3 && z[0].jahre_quelle === 'befristung' && z[0].angesetzt === true, JSON.stringify(z));
+  wert('B', 'B49', 'boG = 2.717 × Barwertfaktor (Zins des Kerns, 3 J.)', z && z[0] ? z[0].barwert_eur : null, barwertAbweichung(2717, e.liegenschaftszins_pct, 3), 0);
+  const kz = mbZeile(r.ertragswert_kern);
+  pruefe('B', 'B49', 'eine boG-Zeile „Mietabweichung Wohnungen", nicht vorläufig', !!kz && /Mietabweichung Wohnungen$/.test(kz.pos) && kz.wert === z[0].barwert_eur
+    && /^Reinertragsdifferenz je Jahr/.test(kz.detail) && /WE 1: \+2\.717/.test(kz.detail) && e.vorlaeufig_vor_bog === false, kz ? kz.pos + ' · ' + kz.detail : '');
+});
+fallB('B50', () => {
+  const r = ccFall('demo', wghDemo({ ist_jahr: 8400, mv_befristet_bis: '2031-10-21' })), e = r && r.ertragswert, b = e && e.miete_bog;
+  const z = (b && b.zeilen) || [], zW = z.find((x) => x.nr === 'WE 1'), zG = z.find((x) => x.nr === 'Laden');
+  pruefe('B', 'B50', 'zwei Posten, je Einheit einmal: WE 1 (wohnen, Overrent ohne Laufzeit, offen) + Laden (gewerbe, befristet 5 J., angesetzt)',
+    z.length === 2 && !!zW && !!zG && zW.nutzung === 'wohnen' && zW.angesetzt === false && zW.differenz_jahr === 2717
+    && zG.nutzung === 'gewerbe' && zG.angesetzt === true && zG.jahre === 5 && zG.differenz_jahr === 8400 - 6528, JSON.stringify(z));
+  wert('B', 'B50', 'angesetzt nur der Laden: 1.872 × Barwertfaktor 5 J.', b ? b.angesetzt_eur : null, barwertAbweichung(1872, e.liegenschaftszins_pct, 5), 0);
+  pruefe('B', 'B50', 'WE 1 nur Szenarien 3/5/10 J., Ertragswert vorläufig, Wortlaut „je Wohnung bzw. Gewerbeeinheit"',
+    !!b && b.n_offen === 1 && b.offen_differenz_jahr === 2717 && b.szenarien && b.szenarien.length === 3 && e.vorlaeufig_vor_bog === true
+    && b.gemischt === true && (r.notes || []).some((n) => /je Wohnung bzw\. Gewerbeeinheit/.test(n)));
+  wert('B', 'B50', 'Szenario 10 J. = 2.717 × Barwertfaktor 10 J.', b && b.szenarien ? b.szenarien[2].barwert_eur : null, barwertAbweichung(2717, e.liegenschaftszins_pct, 10), 0);
+  wert('B', 'B50', 'Rohertrag Gewerbe = Markt 6.528 (Laden außerhalb), Wohnen 28.423', (zeileK(r.ertragswert_kern, /^Rohertrag Gewerbe/) || 0) * 100000
+    + (zeileK(r.ertragswert_kern, /^Rohertrag Wohnen/) || 0), 6528 * 100000 + 28423, 0);
+  const kz = mbZeile(r.ertragswert_kern);
+  pruefe('B', 'B50', 'boG-Zeile „Mietabweichung Wohnungen und Gewerbe" nennt nur den angesetzten Laden', !!kz && /Wohnungen und Gewerbe$/.test(kz.pos)
+    && /Laden: \+1\.872/.test(kz.detail) && !/WE 1/.test(kz.detail), kz ? kz.detail : '');
+  const d = ccFall('demo', (a) => { wghDemo({ ist_jahr: 8400, mv_befristet_bis: '2031-10-21' })(a); a[4].bog_eur = -10000; a[4].bog_grund = 'Mietabweichung laut Gutachten'; });
+  pruefe('B', 'B50', 'eigener boG mit Mietbezug: keine zusätzliche Mietabweichung (Prompt-Regel 5)', !!d && !mbZeile(d.ertragswert_kern)
+    && d.ertragswert.bog_doppelt_vermieden === true, d ? JSON.stringify((d.ertragswert_kern.staffel || []).filter((s) => /Merkmal/.test(s.pos)).map((s) => s.pos)) : '');
+});
+fallB('B51', () => {
+  const ri = DPM.reportInput({ data: { objart: 'MFH', wfl: 378, _mfh_einheiten: [
+    { nr: 'WE 1', art: 'wohnen', wfl: 160, ist: 1300, mv_befristet_bis: '2029-10-21' },
+    { nr: 'WE 2', art: 'wohnen', wfl: 150, status: 'leer' },
+    { nr: 'Laden', art: 'gewerbe', nutzung_gew: 'buero_praxis_laden', wfl: 68, ist: 700, markt_qm: 8 }] } });
+  const w = ri && ri.gewerbe && ri.gewerbe.wohnungen;
+  pruefe('B', 'B51', 'Mapper: gewerbe.wohnungen nur die Wohnungen, mit Vertragslaufzeit und Leerstand; einheiten_miete bleibt null',
+    !!w && w.length === 2 && w[0].nr === 'WE 1' && w[0].ist_monat === 1300 && w[0].mv_befristet_bis === '2029-10-21' && w[1].leer === true
+    && ri.einheiten_miete === null, JSON.stringify(w));
+  const m = DPM.reportInput({ data: { objart: 'MFH', wfl: 310, _mfh_einheiten: wghWo().map((x) => ({ nr: x.nr, art: 'wohnen', wfl: x.wfl, ist: x.ist_monat })) } });
+  pruefe('B', 'B51', 'reines MFH unverändert: einheiten_miete je Wohnung, kein gewerbe', !!m && Array.isArray(m.einheiten_miete) && m.einheiten_miete.length === 5 && m.gewerbe === null);
 });
 
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */

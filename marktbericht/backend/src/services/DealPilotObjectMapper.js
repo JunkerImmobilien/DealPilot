@@ -290,6 +290,9 @@ function gewerbeAus(d) {
   out.ist_jahr = Math.round(out.ist_jahr);
   out.wohnen_ist_jahr = Math.round(out.wohnen_ist_jahr);
   out.markt_jahr = out.markt_vollstaendig ? Math.round(out.markt_jahr) : null;
+  /* v2800 · die Wohnungen je Mietverhaeltnis (Band, boG je Wohnung wie im MFH, E1/E2) */
+  const _wo = einheitenMieteAus(d, true);
+  if (_wo) out.wohnungen = _wo;
   return out;
 }
 
@@ -331,12 +334,21 @@ function leerstandAus(d) {
    im Band - die Wohnung blieb bei 6,18. Gleiche Bedingungen wie leerstandAus
    (nur Wohnen, jede Einheit mit Flaeche, mindestens eine vermietet); schon ab
    ZWEI Einheiten, auch ohne Leerstand. */
-function einheitenMieteAus(d) {
-  const liste = Array.isArray(d._mfh_einheiten) ? d._mfh_einheiten
+/* v2800 · `nurWohnenImMix`: im Wohn- und Geschaeftshaus die WOHNUNGEN einzeln (fuer
+   gewerbe.wohnungen, gewerbeAus). Bis v2799 lieferte diese Funktion bei jeder Gewerbe-
+   einheit null - die Wohnungen eines Wohn-/Geschaeftshauses wurden nie je Mietverhaeltnis
+   gegen das Band geprueft, ihr Ist ging gar nicht ein (Rohertrag Wohnen = Anker x Flaeche),
+   und eine Mietabweichung konnte kein boG werden (Bericht v2790, Rest). Gewerbeeinheiten
+   bleiben draussen: sie prueft gewerbeNachBand je Einheit gegen IHRE Marktmiete. */
+function einheitenMieteAus(d, nurWohnenImMix) {
+  const alle = Array.isArray(d._mfh_einheiten) ? d._mfh_einheiten
     : (d._mfh && Array.isArray(d._mfh.einheiten) ? d._mfh.einheiten : null);
-  if (!liste || liste.length < 2) return null;
+  if (!alle || !alle.length) return null;
   if (/^\s*leer\s*$/i.test(String(pick(d, ['vermstand', 'vermietungsstand']) || ''))) return null;
-  if (liste.some((e) => e && String(e.art || '') === 'gewerbe')) return null;
+  const mitGewerbe = alle.some((e) => e && String(e.art || '') === 'gewerbe');
+  if (mitGewerbe !== !!nurWohnenImMix) return null;
+  const liste = nurWohnenImMix ? alle.filter((e) => e && String(e.art || '') !== 'gewerbe') : alle;
+  if (liste.length < (nurWohnenImMix ? 1 : 2)) return null;
   const out = [];
   for (let i = 0; i < liste.length; i++) {
     const e = liste[i];
