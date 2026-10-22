@@ -4509,7 +4509,11 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 }
 .ao-table th.num { text-align: right; }
 .ao-table th:hover { color: var(--gold-l, #E2C97E); }
-.ao-table th.ao-sorted { background: color-mix(in srgb, var(--gold) 14%, transparent); color: var(--gold-l, #E2C97E); }
+/* v2750: Gold auf den DUNKLEN Kopfgrund mischen, nicht auf transparent - sonst
+   ersetzt die Kurzschrift var(--ch) aus .ao-table th, die sortierte Spalte steht
+   hell auf der weissen Tabellenflaeche (gemessen: #E2C97E auf rgb(247,243,230),
+   Kontrast 1,47) und die sticky Kopfzelle wird beim Scrollen durchsichtig. */
+.ao-table th.ao-sorted { background: color-mix(in srgb, var(--gold) 14%, var(--ch)); color: var(--gold-l, #E2C97E); }
 .ao-th-act { width: 80px; text-align: center !important; }
 .ao-row td {
   padding: 9px 12px;
@@ -8821,7 +8825,10 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   padding: 22px;
   overflow-y: auto;
   flex: 1;
-  min-height: 280px;
+  /* v2750: 280 px fest liessen den Kasten (max-height 90vh, overflow hidden)
+     auf dem Handy quer (844x390) nicht schrumpfen - die Fussleiste mit
+     "Schliessen" lag bei 410-444 px, unter dem Rand, ohne Scrollweg. */
+  min-height: min(280px, 35vh);
 }
 
 .pdfi-drop {
