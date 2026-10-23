@@ -143,21 +143,40 @@ console.log('    ETW, Baujahr 1994, Stichtag 06.05.2024, GND 70\n');
         44.07 > r.methods.linear.restnutzungsdauer,
         '44,07 gegen linear ' + r.methods.linear.restnutzungsdauer);
 
-  /* Und die technische Alterswertminderung, die im Gutachten führt. */
-  pruef('technisch = 26,00 Jahre wie im Gutachten',
-        n2(r.methods.technisch.restnutzungsdauer) === 26,
-        r.methods.technisch.restnutzungsdauer);
-  pruef('technische Alterswertminderung = 62,86 %',
-        Math.abs(r.methods.technisch.alterswertminderung_pct - 62.86) < 0.02,
-        n2(r.methods.technisch.alterswertminderung_pct) + ' %');
+  /* ---- Technisch: 26 im Gutachten, 23 bei uns — eine ENTSCHEIDUNG ----
+     Hier standen bis zum 23.10.2026 drei FEHLER („technisch = 26“), rot
+     seit v2074 (d5cba139, 10.10.2026). Nachgerechnet ist die Ursache
+     keine Rechenabweichung, sondern die Regel: Das Gutachten gibt
+     zeitgemäßen Gewerken einen HALBEN Aufschlag, wir seit v2074 keinen
+     (Marcels Festlegung 1: Zeitgemäßheit wirkt über die Punkte nach
+     Anlage 2, nicht ein zweites Mal technisch).
+         Basis 70 − 30 = 40 Jahre, veraltet 85 %, zeitgemäß 15 % (Technik)
+         Gutachten:  40 − 40 × 85 % / 2 + 40 × 15 % / 2 = 26,00  (AWM 62,86 %)
+         v2074:      40 − 40 × 85 % / 2                 = 23,00  (AWM 67,14 %)
+     Beide Rechenwege werden geprüft: unserer muss 23 liefern, der des
+     Gutachtens mit denselben Anteilen genau die 26. Wird die Regel
+     geändert, wird diese Prüfung rot — und das soll sie dann. */
+  const T = r.methods.technisch, basis = 70 - 30;
+  pruef('Anteile: 85 % veraltet, 15 % zeitgemäß (Technik)',
+        n2(T.anteil_veraltet_pct) === 85 && n2(T.anteil_standard_pct) === 15,
+        n2(T.anteil_veraltet_pct) + ' / ' + n2(T.anteil_standard_pct) + ' %');
+  pruef('Rechenweg des Gutachtens ergibt exakt 26,00',
+        n2(basis - basis * 0.85 / 2 + basis * 0.15 / 2) === 26,
+        n2(basis - basis * 0.85 / 2 + basis * 0.15 / 2));
+  pruef('ENTSCHEIDUNG v2074: zeitgemäß neutral → technisch 23',
+        n2(T.restnutzungsdauer) === 23,
+        T.restnutzungsdauer + ' (Gutachten 26)');
+  pruef('technische Alterswertminderung 67,14 % (Gutachten 62,86 %)',
+        Math.abs(T.alterswertminderung_pct - 67.14) < 0.02,
+        n2(T.alterswertminderung_pct) + ' %');
 
   /* Der Leitwert: Das Gutachten sagt ausdrücklich, dass das technische
      Verfahren führt und die anderen beiden stützen. */
   const nach = S.leitwertAn(r, false);
   pruef('bei uns führt ebenfalls das technische Verfahren',
         nach.verfahren === 'technisch', nach.verfahren + ' → ' + nach.final_rnd);
-  pruef('und liefert die reelle Restnutzungsdauer des Gutachtens (26)',
-        n2(nach.final_rnd) === 26, nach.final_rnd);
+  pruef('und liefert die technische RND (23; Gutachten 26, s. o.)',
+        n2(nach.final_rnd) === 23, nach.final_rnd);
 }
 
 /* =====================================================================
@@ -242,5 +261,6 @@ console.log('\n4 · DIE GESAMTNUTZUNGSDAUER IN DER PRAXIS\n');
 
 console.log('\n' + (fehler
   ? 'FEHLER: ' + fehler
-  : 'Unser Rechenkern liefert dieselben Zahlen wie die Gutachten.'));
+  : 'Unser Rechenkern liefert dieselben Zahlen wie die Gutachten — bis auf die\n'
+    + 'technische RND Am Markt 18 (23 statt 26), eine bewusste Entscheidung (v2074).'));
 process.exit(fehler ? 1 : 0);
