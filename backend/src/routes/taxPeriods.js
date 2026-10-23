@@ -8,6 +8,21 @@ const { authenticate } = require('../middleware/auth');
 const { query } = require('../db/pool');
 
 // Helper: Periode normalisieren (von DB-Row zu JSON)
+/* v2892: Splitting und Kirchensteuer aus dem Body. undefined = nicht
+   mitgeschickt (beim Aendern bleibt der alte Wert), null = wie Profil. */
+function veranlagungAusBody(b) {
+  const o = {};
+  if (Object.prototype.hasOwnProperty.call(b, 'splitting')) {
+    o.splitting = (b.splitting === true || b.splitting === 'true' || b.splitting === 1 || b.splitting === '1') ? true
+      : (b.splitting === false || b.splitting === 'false' || b.splitting === 0 || b.splitting === '0') ? false : null;
+  }
+  if (Object.prototype.hasOwnProperty.call(b, 'kirchensteuer')) {
+    const k = (b.kirchensteuer === null || b.kirchensteuer === '' || b.kirchensteuer === undefined) ? null : parseInt(b.kirchensteuer, 10);
+    o.kirchensteuer = (k === 0 || k === 8 || k === 9) ? k : null;
+  }
+  return o;
+}
+
 function rowToPeriod(row) {
   return {
     id: row.id,
@@ -16,6 +31,9 @@ function rowToPeriod(row) {
     zve: Number(row.zve),
     reason: row.reason || '',
     note: row.note || '',
+    /* v2892: Veranlagung je Zeitraum - null heisst "wie im Investmentprofil" */
+    splitting: (row.splitting === true || row.splitting === false) ? row.splitting : null,
+    kirchensteuer: (row.kirchensteuer === null || row.kirchensteuer === undefined) ? null : Number(row.kirchensteuer),
     created_at: row.created_at,
     updated_at: row.updated_at
   };
@@ -25,7 +43,7 @@ function rowToPeriod(row) {
 router.get('/', authenticate, async (req, res) => {
   try {
     const r = await query(
-      `SELECT id, valid_from, valid_to, zve, reason, note, created_at, updated_at
+      `SELECT id, valid_from, valid_to, zve, reason, note, splitting, kirchensteuer, created_at, updated_at
        FROM tax_periods
        WHERE user_id = $1
        ORDER BY valid_from DESC`,
@@ -46,7 +64,7 @@ router.get('/by-date', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'invalid-date' });
     }
     const r = await query(
-      `SELECT id, valid_from, valid_to, zve, reason, note
+      `SELECT id, valid_from, valid_to, zve, reason, note, splitting, kirchensteuer
        FROM tax_periods
        WHERE user_id = $1
          AND valid_from <= $2
@@ -120,11 +138,13 @@ router.post('/', authenticate, async (req, res) => {
     if (!Number.isFinite(zveNum) || zveNum < 0) {
       return res.status(400).json({ error: 'invalid-zve' });
     }
+    const v = veranlagungAusBody(req.body || {});
     const r = await query(
-      `INSERT INTO tax_periods (user_id, valid_from, valid_to, zve, reason, note)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id, valid_from, valid_to, zve, reason, note, created_at, updated_at`,
-      [req.user.id, valid_from, valid_to || null, Math.round(zveNum), reason || null, note || null]
+      `INSERT INTO tax_periods (user_id, valid_from, valid_to, zve, reason, note, splitting, kirchensteuer)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id, valid_from, valid_to, zve, reason, note, splitting, kirchensteuer, created_at, updated_at`,
+      [req.user.id, valid_from, valid_to || null, Math.round(zveNum), reason || null, note || null,
+       v.splitting === undefined ? null : v.splitting, v.kirchensteuer === undefined ? null : v.kirchensteuer]
     );
     res.status(201).json({ period: rowToPeriod(r.rows[0]) });
   } catch(e) {
@@ -140,7 +160,7 @@ router.put('/:id', authenticate, async (req, res) => {
     const id = req.params.id;
     
     // Verify ownership
-    const own = await query(`SELECT id FROM tax_periods WHERE id = $1 AND user_id = $2`, [id, req.user.id]);
+    const own = await query(`SELECT id, splitting, kirchensteuer FROM tax_periods WHERE id = $1 AND user_id = $2`, [id, req.user.id]);
     if (own.rows.length === 0) {
       return res.status(404).json({ error: 'not-found' });
     }
@@ -156,12 +176,16 @@ router.put('/:id', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'invalid-zve' });
     }
     
+    const vU = veranlagungAusBody(req.body || {});
     const r = await query(
       `UPDATE tax_periods
-       SET valid_from = $1, valid_to = $2, zve = $3, reason = $4, note = $5
+       SET valid_from = $1, valid_to = $2, zve = $3, reason = $4, note = $5,
+           splitting = $8, kirchensteuer = $9
        WHERE id = $6 AND user_id = $7
-       RETURNING id, valid_from, valid_to, zve, reason, note, created_at, updated_at`,
-      [valid_from, valid_to || null, Math.round(zveNum), reason || null, note || null, id, req.user.id]
+       RETURNING id, valid_from, valid_to, zve, reason, note, splitting, kirchensteuer, created_at, updated_at`,
+      [valid_from, valid_to || null, Math.round(zveNum), reason || null, note || null, id, req.user.id,
+       vU.splitting === undefined ? own.rows[0].splitting : vU.splitting,
+       vU.kirchensteuer === undefined ? own.rows[0].kirchensteuer : vU.kirchensteuer]
     );
     res.json({ period: rowToPeriod(r.rows[0]) });
   } catch(e) {

@@ -268,7 +268,14 @@ var Tax = (function() {
      `opt` = { splitting: bool, kist: 0 | 0.08 | 0.09 }. Fehlt es, gilt die
      Angabe unter den Steuerangaben (`optionen()`); ein Aufrufer, der einen
      fremden Fall rechnet (Pruefskript), gibt es ausdruecklich mit. */
-  function optionen(opt) {
+  /* v2892: JE STEUERZEITRAUM. Fuehrt der Zeitraum des Jahres eine eigene
+     Veranlagung oder Kirchensteuer (Spalten `splitting`, `kirchensteuer`,
+     Migration 089), gilt sie vor dem Profil; null heisst "wie im Profil".
+     Welcher Zeitraum gilt, entscheidet derselbe Weg wie beim zvE
+     (`_getZveForDateWithFallback`: exakter Zeitraum, sonst der letzte
+     fruehere) - sonst koennte ein Jahr das zvE des einen und die
+     Veranlagung eines anderen Zeitraums bekommen. */
+  function optionen(opt, jahr) {
     if (opt && typeof opt === 'object') {
       return { splitting: !!opt.splitting, kist: _kistSatz(opt.kist) };
     }
@@ -279,8 +286,20 @@ var Tax = (function() {
         p = DealPilotInvestmentProfile.load() || {};
       }
     } catch (e) { p = {}; }
-    return { splitting: p.splitting === true || p.splitting === 'true',
-             kist: _kistSatz(p.kirchensteuer) };
+    var o = { splitting: p.splitting === true || p.splitting === 'true',
+              kist: _kistSatz(p.kirchensteuer), quelle: 'profil' };
+    var per = _zeitraumFuer(jahr);
+    if (per) {
+      if (per.splitting === true || per.splitting === false) { o.splitting = per.splitting; o.quelle = 'zeitraum'; }
+      if (per.kirchensteuer === 0 || per.kirchensteuer === 8 || per.kirchensteuer === 9) { o.kist = _kistSatz(per.kirchensteuer); o.quelle = 'zeitraum'; }
+    }
+    return o;
+  }
+  function _zeitraumFuer(jahr) {
+    var j = parseInt(jahr, 10);
+    if (!(j > 1900) || typeof _getZveForDateWithFallback !== 'function') return null;
+    try { var r = _getZveForDateWithFallback(String(j)); return r && r.period ? r.period : null; }
+    catch (e) { return null; }
   }
   /* 8 und 9 (Prozent) wie 0,08 und 0,09 - alles andere ist „keine". */
   function _kistSatz(k) {
@@ -316,7 +335,7 @@ var Tax = (function() {
      DealPilot nicht; Soli und Kirchensteuer stehen deshalb auf der
      tariflichen Einkommensteuer. */
   function steuerLast(zvE, jahr, opt) {
-    var o = optionen(opt);
+    var o = optionen(opt, jahr);
     var x = Math.max(0, Math.floor(Number(zvE) || 0));
     var K = 0, E;
     if (o.kist > 0) {
@@ -339,7 +358,7 @@ var Tax = (function() {
        Soli s' = 0 unter der Freigrenze, 11,9 % in der Milderungszone, sonst 5,5 %,
        Kirchensteuer mit Sonderausgabenabzug:  g · (1 + s' + k) / (1 + k · g). */
   function grenzsatzGesamt(zvE, jahr, opt) {
-    var o = optionen(opt);
+    var o = optionen(opt, jahr);
     var L = steuerLast(zvE, jahr, o);
     var basis = Math.max(0, Math.floor(Number(zvE) || 0) - Math.floor(L.kist));
     var g = o.splitting ? calcGrenzsteuersatz(basis / 2, jahr) : calcGrenzsteuersatz(basis, jahr);
@@ -350,7 +369,7 @@ var Tax = (function() {
   }
 
   function calcImmoTaxImpact(baseIncome, immoResult, jahr, opt) {
-    var o = optionen(opt);
+    var o = optionen(opt, jahr);
     var newZvE = baseIncome + immoResult;
     if (newZvE < 0) newZvE = 0;
     var vor = steuerLast(baseIncome, jahr, o);
@@ -2224,7 +2243,7 @@ function _grenzAutoNachziehen(mitToast) {
   if (auto.checked) {
     var zve = parseDe((document.getElementById('zve') || {}).value) || 0;
     if (zve > 0) {
-      var gss = Tax.grenzsatzGesamt(zve) * 100;   /* v2891: inkl. Soli, Kirchensteuer, Splitting */
+      var gss = Tax.grenzsatzGesamt(zve, new Date().getFullYear()) * 100;   /* v2891: inkl. Soli, Kirchensteuer, Splitting; v2892: Jahr, damit ein Steuerzeitraum mit eigener Veranlagung greift */
       var neu = gss.toFixed(2);
       var geaendert = (String(grenzInput.value).replace(',', '.') !== neu);
       grenzInput.value = neu;
@@ -2393,6 +2412,32 @@ window.DpSteuerAngaben = (function () {
     var b = document.getElementById('st_kist');
     if (a) a.value = (p.splitting === true || p.splitting === 'true') ? '1' : '0';
     if (b) b.value = String(parseInt(p.kirchensteuer, 10) === 8 ? 8 : (parseInt(p.kirchensteuer, 10) === 9 ? 9 : 0));
+    _zeitraeumeZeigen();
+  }
+  /* v2892: Ueberstimmt ein Steuerzeitraum die Angabe oben, steht das hier -
+     sonst wundert sich, wer oben "Einzelveranlagung" sieht und fuer 2027
+     mit Splitting gerechnet bekommt. */
+  function _fmtD(s) { var t = String(s || '').split('-'); return t.length === 3 ? t[2] + '.' + t[1] + '.' + t[0] : String(s || ''); }
+  function _zeitraeumeZeigen() {
+    var el = document.getElementById('st_veranl_zeitraeume');
+    if (!el) return;
+    var liste = [];
+    try {
+      if (window.DealPilotTaxPeriods && typeof DealPilotTaxPeriods.getAllSync === 'function') liste = DealPilotTaxPeriods.getAllSync();
+    } catch (e) { liste = []; }
+    var teile = liste.filter(function (z) {
+      return z && (z.splitting === true || z.splitting === false || z.kirchensteuer === 0 || z.kirchensteuer === 8 || z.kirchensteuer === 9);
+    }).sort(function (a, b) { return a.valid_from < b.valid_from ? -1 : 1; }).map(function (z) {
+      var w = [];
+      if (z.splitting === true) w.push('Zusammenveranlagung');
+      else if (z.splitting === false) w.push('Einzelveranlagung');
+      if (z.kirchensteuer === 0) w.push('keine Kirchensteuer');
+      else if (z.kirchensteuer === 8 || z.kirchensteuer === 9) w.push(z.kirchensteuer + ' % Kirchensteuer');
+      return _fmtD(z.valid_from) + '–' + (z.valid_to ? _fmtD(z.valid_to) : 'laufend') + ': ' + w.join(', ');
+    });
+    if (!teile.length) { el.hidden = true; el.textContent = ''; return; }
+    el.hidden = false;
+    el.textContent = 'Abweichend in deinen Steuerzeiträumen (gilt dort vor der Angabe oben): ' + teile.join(' · ') + '.';
   }
   function speichern(splitting, kist) {
     try {

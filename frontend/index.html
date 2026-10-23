@@ -2148,6 +2148,8 @@ label.dp-required.qc-required::after {
       <div class="f"><label for="st_splitting">Veranlagung</label><select id="st_splitting" onchange="if(window.DpSteuerAngaben)DpSteuerAngaben.aendern()"><option value="0">Einzelveranlagung (Grundtabelle)</option><option value="1">Zusammenveranlagung (Splitting)</option></select></div>
       <div class="f"><label for="st_kist">Kirchensteuer</label><select id="st_kist" onchange="if(window.DpSteuerAngaben)DpSteuerAngaben.aendern()"><option value="0">keine</option><option value="8">8 % (Bayern, Baden-Württemberg)</option><option value="9">9 % (übrige Länder)</option></select></div>
       <div class="hint" style="grid-column:1/-1;margin-top:-4px">Das zvE ist die Größe <b>vor</b> dem Tarif. Bei Zusammenveranlagung trägst du das gemeinsame zvE ein; DealPilot wendet darauf den Splittingtarif an (§ 32a Abs. 5 EStG). Solidaritätszuschlag und Kirchensteuer rechnet DealPilot auf die Einkommensteuer obendrauf.</div>
+      <!-- v2892: Zeitraeume mit eigener Veranlagung/Kirchensteuer, geschrieben von DpSteuerAngaben.zeigen() -->
+      <div class="hint" id="st_veranl_zeitraeume" style="grid-column:1/-1;margin-top:-4px" hidden></div>
     </div>
     <div class="f checkbox-row">
       <label class="cb-label" title="Wenn aktiv, wird der Grenzsteuersatz automatisch aus deinem zvE nach §32a EStG (Tarif 2026) berechnet.">
@@ -3642,7 +3644,7 @@ label.dp-required.qc-required::after {
 <script src="js/erbbau-ui.js?v=v1312"></script>
   <script src="js/afa-ui.js?v=v1439"></script>
   <script src="js/zve-manager.js?v=v2180"></script>
-  <script src="js/tax-periods.js?v=841"></script>
+  <script src="js/tax-periods.js?v=v2892"></script>
   <script src="js/tax-periods-sync.js?v=1"></script>
   <script src="js/zve-smart.js?v=1"></script>
   <script src="js/wk-aggregator.js?v=v2891"></script>
@@ -3659,7 +3661,7 @@ label.dp-required.qc-required::after {
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v2852"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v2891"></script>
+<script src="js/tax.js?v=v2892"></script>
 <script src="js/steuer-verlauf.js?v=v2891"></script>
 <script src="js/config.js?v=v2630"></script>
   <script src="js/legal-links.js?v=v1885" defer></script>
