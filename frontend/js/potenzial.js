@@ -205,25 +205,41 @@
      `kosten`. Sie werden beim Lesen zur Liste; beim Speichern schreibt das
      Wohnungsfenster beide alten Felder mit (Titel verbunden, Summe), damit
      jeder alte Leser (Summenzeile, Bank-PDF, Prompt) weiter stimmt. */
-  function massnahmenVon(e) {
-    if (!e) return [];
-    if (Array.isArray(e.massnahmen)) return e.massnahmen.filter(function (m) { return m && (m.id || m.t); });
-    var t = String(e.massnahme || '').trim(), k = zahl(e.kosten);
-    if (!t && !k) return [];
-    /* v2938 · ALTER FREITEXT -> KATALOG. Gemessen Parkstr. 9: „Bad, Böden, Elektro“ stand als
-       Text, wurde „Sonstiges“ und brachte 0 Modernisierungspunkte - die RND blieb im Zielbild
-       bei 11,8 J., obwohl Bäder und Innenausbau nach Anlage 2 modernisiert werden. Erkannte
-       Begriffe werden zu Katalog-Maßnahmen, die Kosten gleichmäßig verteilt (Summe bleibt). */
-    var WORT = [[/bad|sanit/i, 'bad'], [/b(ö|oe)den|boden|innenausbau|decke|treppe/i, 'boeden'], [/fenster|t(ü|ue)r/i, 'fenster'],
-      [/elektr|strom/i, 'elektrik'], [/leitung|wasser|abwasser|gasleitung/i, 'leitungen'], [/heiz/i, 'heizung'], [/dach/i, 'dach'],
-      [/fassade|d(ä|ae)mm|au(ß|ss)enwand|wdvs/i, 'fassade'], [/grundriss/i, 'grundriss'], [/k(ü|ue)che/i, 'kueche'], [/renov|maler|tapez/i, 'renovierung']];
+  /* v2938/v2938a · FREITEXT -> KATALOG. Gemessen Parkstr. 9: „Bad, Böden, Elektro“ stand als
+     EINE Maßnahme „Sonstiges“ (alter Text, beim Speichern in die Liste übernommen) und brachte
+     0 Modernisierungspunkte - die RND blieb im Zielbild bei 11,8 J., obwohl Bäder und Innenausbau
+     nach Anlage 2 modernisiert werden. Erkannte Begriffe werden zu Katalog-Maßnahmen, die Kosten
+     gleichmäßig verteilt (Summe bleibt). Gilt für das alte Textfeld UND für „Sonstiges“ in der Liste;
+     eine echte Katalog-Maßnahme bleibt, wie sie ist. */
+  var WORT = [[/bad|sanit/i, 'bad'], [/b(ö|oe)den|boden|innenausbau|decke|treppe/i, 'boeden'], [/fenster|t(ü|ue)r/i, 'fenster'],
+    [/elektr|strom/i, 'elektrik'], [/leitung|wasser|abwasser|gasleitung/i, 'leitungen'], [/heiz/i, 'heizung'], [/dach/i, 'dach'],
+    [/fassade|d(ä|ae)mm|au(ß|ss)enwand|wdvs/i, 'fassade'], [/grundriss/i, 'grundriss'], [/k(ü|ue)che/i, 'kueche'], [/renov|maler|tapez/i, 'renovierung']];
+  function textZuKatalog(t, k, bewohnt) {
     var ids = [];
-    t.split(/[,;\/+&]|\bund\b/i).forEach(function (teil) {
+    String(t || '').split(/[,;\/+&]|\bund\b/i).forEach(function (teil) {
       WORT.forEach(function (w) { if (w[0].test(teil) && ids.indexOf(w[1]) < 0) ids.push(w[1]); });
     });
-    if (!ids.length) return [{ id: 'sonst', t: t || 'Maßnahme', k: k, bewohnt: false, alt: true }];
+    if (!ids.length) return null;
     var je = k ? Math.floor(k / ids.length) : 0;
-    return ids.map(function (id, i) { var kk = katalog(id); return { id: id, t: kk ? kk.t : id, k: k ? (i === ids.length - 1 ? k - je * (ids.length - 1) : je) : 0, bewohnt: false, alt: true }; });
+    return ids.map(function (id, i) {
+      var kk = katalog(id);
+      return { id: id, t: kk ? kk.t : id, k: k ? (i === ids.length - 1 ? k - je * (ids.length - 1) : je) : 0, bewohnt: !!bewohnt, alt: true };
+    });
+  }
+  function massnahmenVon(e) {
+    if (!e) return [];
+    if (Array.isArray(e.massnahmen)) {
+      var aus = [];
+      e.massnahmen.forEach(function (m) {
+        if (!m || !(m.id || m.t)) return;
+        var z = (m.id === 'sonst' && m.t) ? textZuKatalog(m.t, zahl(m.k), m.bewohnt) : null;
+        if (z) aus = aus.concat(z); else aus.push(m);
+      });
+      return aus;
+    }
+    var t = String(e.massnahme || '').trim(), k = zahl(e.kosten);
+    if (!t && !k) return [];
+    return textZuKatalog(t, k, false) || [{ id: 'sonst', t: t || 'Maßnahme', k: k, bewohnt: false, alt: true }];
   }
   function massnahmenSpiegeln(e) {
     var l = massnahmenVon(e);
