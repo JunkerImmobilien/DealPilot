@@ -1859,6 +1859,16 @@ function _calcImmediate(){
   var _zveQuellen = {};
   function _zveJahr(jahr) {
     var _j = (typeof jahr === 'number' && jahr > 1900) ? jahr : new Date().getFullYear();
+    /* v2890: derselbe zvE-Weg wie Ergebnisbox und _computeYearTotal
+       (tax.js `_dpZveFuerJahr`: Zeitraum des Jahres, sonst letzter frueherer,
+       sonst Feld `zve`, sonst das zvE zum eingestellten Grenzsteuersatz).
+       Der Block darunter bleibt nur fuer den Fall, dass tax.js fehlt. */
+    try {
+      if (typeof window._dpZveFuerJahr === 'function') {
+        var _zi = window._dpZveFuerJahr(_j);
+        if (_zi && _zi.zve > 0) { _zveQuellen[_j] = _zi.quelle; return _zi.zve; }
+      }
+    } catch (_e0) {}
     try {
       if (window.DealPilotTaxPeriods
           && typeof DealPilotTaxPeriods.getForDateSync === 'function') {

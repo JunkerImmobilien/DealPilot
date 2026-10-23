@@ -43,7 +43,16 @@
     var halter = String(wert('halter') || 'privat');
     var corp = false;
     try { var M = window.DealPilotMandanten, m = M && M.get ? M.get(halter) : null; corp = !!(m && M.isCorp && M.isCorp(m.rechtsform)); } catch (e) {}
-    if (kj > 1900 && !corp) ev.push([kj + 10, 'Verkauf steuerfrei (§ 23 EStG)']);
+    /* v2890: die Frist laeuft vom Kaufvertrag an und endet nach zehn Jahren auf
+       den Tag (§ 23 Abs. 1 Nr. 1 EStG) - steuerfrei ist ein Verkauf ab dem Tag
+       danach. Die Marke nennt dieses Datum und steht in SEINEM Jahr (Kauf am
+       31.12. -> 01.01. des elften Jahres), nicht pauschal Kaufjahr + 10. */
+    var kd = String(wert('kaufdat') || '').slice(0, 10);
+    if (kj > 1900 && !corp && /^\d{4}-\d{2}-\d{2}$/.test(kd)) {
+      var fr = new Date(Date.UTC(kj + 10, +kd.slice(5, 7) - 1, +kd.slice(8, 10) + 1));
+      var frTxt = ('0' + fr.getUTCDate()).slice(-2) + '.' + ('0' + (fr.getUTCMonth() + 1)).slice(-2) + '.' + fr.getUTCFullYear();
+      ev.push([fr.getUTCFullYear(), 'Verkauf steuerfrei ab ' + frTxt + ' (§ 23 EStG)']);
+    }
     return ev.filter(function (e) { return R.some(function (r) { return r.jahr === e[0]; }); });
   }
   function auswerten(R) {
@@ -131,7 +140,7 @@
       + '<div class="dp-stv-leg"><span><i style="background:' + C.verlust + '"></i>Verlust · Steuererstattung</span><span><i style="background:' + C.gewinn + '"></i>Gewinn · Steuer fällig</span>'
       + (pkt.length > 1 ? '<span><i class="l" style="background:' + C.linie + '"></i>Cashflow nach Steuern</span>' : '') + (w > 0 ? '<span><i class="l" style="background:' + C.marke + '"></i>Wendepunkt</span>' : '') + '</div>'
       + '<div class="dp-stv-ch"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Steuerverlauf über ' + n + ' Jahre' + (A.jahr ? ', steuerlich positiv ab ' + A.jahr : '') + '">' + s + '</svg><div class="dp-stv-tip"></div></div>'
-      + '<p class="dp-stv-fuss">Ergebnis aus V+V = Einnahmen minus Werbungskosten (Zinsen, AfA, Bewirtschaftung, Werbungskosten im Detail) – dieselbe Rechnung wie das Steuerformular. Steuerwirkung mit deinem Grenzsteuersatz. Keine Steuerberatung.</p>'
+      + '<p class="dp-stv-fuss">Ergebnis aus V+V = Einnahmen minus Werbungskosten (Zinsen, AfA, Bewirtschaftung, Werbungskosten im Detail) – dieselbe Rechnung wie das Steuerformular. Steuerwirkung als Unterschied der Einkommensteuer mit und ohne dieses Objekt (Tarif § 32a EStG, saldiert mit deinen früher gekauften Objekten), ohne Solidaritätszuschlag und Kirchensteuer. Keine Steuerberatung.</p>'
       + '</div>';
     var ch = host.querySelector('.dp-stv-ch'), tip = host.querySelector('.dp-stv-tip');
     Array.prototype.forEach.call(host.querySelectorAll('.hit'), function (h) {
