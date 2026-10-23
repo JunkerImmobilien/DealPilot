@@ -4340,7 +4340,7 @@
         await r6Ende(zb);
         await zeige(r10cKarte, 8);
         var E = r10cErgebnis();
-        await b2oZeile(s, 'Am Scheitel gehalten', '<b>' + (E.spanne || '–') + ' Jahre</b>. Hinter der Gesamtnutzungsdauer rechnet die Anlage 2 nicht weiter — DealPilot hält den Wert am Tiefpunkt der Kurve, statt ihn wieder steigen zu lassen.');
+        await b2oZeile(s, 'Alter höchstens die GND', '<b>' + (E.spanne || '–') + ' Jahre</b>. Ist das Haus älter als seine Gesamtnutzungsdauer, setzt DealPilot wie die ImmoWertA als Alter die Gesamtnutzungsdauer an.');   /* v2939 · bis v2938 „Am Scheitel gehalten" */
         var p = function () { return q('#rnd-pruefpflicht'); };
         var x = p(); if (x) x.scrollIntoView({ block: 'center' });
         await warte(500);
