@@ -73,7 +73,7 @@
       {
         titel: '5. Software-as-a-Service-Lizenz (Vertragstyp)',
         text: 'Mit der Registrierung schließen Sie einen Software-as-a-Service-Nutzungsvertrag mit ' +
-              '<strong>Junker Immobilien</strong> (Marcel Junker, Hermannstr. 9, 32609 Hüllhorst). ' +
+              '<strong>Junker Solution</strong> (Marcel Junker, Hermannstr. 9, 32609 Hüllhorst). ' +
               'Sie erhalten ein zeitlich befristetes, nicht ausschließliches und nicht übertragbares ' +
               'Nutzungsrecht an der Plattform. Eigentum oder Lizenzen am Quellcode oder am Design ' +
               'werden nicht übertragen.'
@@ -98,7 +98,7 @@
       },
       {
         titel: '8. Datenverarbeitung (DSGVO)',
-        text: 'Junker Immobilien verarbeitet personenbezogene Daten ausschließlich gemäß der ' +
+        text: 'Junker Solution verarbeitet personenbezogene Daten ausschließlich gemäß der ' +
               '<a href="/datenschutz.html" target="_blank">Datenschutzerklärung</a>. ' +
               'Es werden <strong>technisch notwendige Cookies</strong> verwendet, keine Tracking-Cookies. ' +
               'Daten werden in Deutschland gehostet (Hetzner). Eingaben in KI-Funktionen werden an ' +
@@ -106,7 +106,7 @@
       },
       {
         titel: '9. Haftungsausschluss',
-        text: 'Junker Immobilien übernimmt <strong>keine Haftung</strong> für direkte oder indirekte ' +
+        text: 'Junker Solution übernimmt <strong>keine Haftung</strong> für direkte oder indirekte ' +
               'Schäden, die aus der Nutzung der Modell-Berechnungen oder daraus abgeleiteten ' +
               'Entscheidungen entstehen. Die Haftung ist bei leichter Fahrlässigkeit auf den ' +
               'vorhersehbaren, vertragstypischen Schaden bei Verletzung von Kardinalpflichten ' +
@@ -159,22 +159,59 @@
     };
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(record)); } catch(e) {}
 
-    // Backend-Log (best-effort, blockt nicht)
-    // Endpoint /api/v1/consent kommt später als V272 — heute nur try/catch
-    if (global.Auth && global.Auth.isLoggedIn && global.Auth.isLoggedIn()) {
+    /* v2933 · Backend-Protokoll (consent_log). Bis v2932 ging hier ein nacktes
+       fetch ohne Token an einen Endpunkt, den es nicht gab - die Zustimmung
+       lag nur im Browser, obwohl die Datenschutzerklaerung ein Protokoll
+       verspricht. Auth.apiCall traegt das Token und stringifiziert selbst. */
+    if (global.Auth && global.Auth.isLoggedIn && global.Auth.isLoggedIn() && typeof global.Auth.apiCall === 'function') {
       try {
-        fetch('/api/v1/consent', {
+        Promise.resolve(global.Auth.apiCall('/consent', {
           method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            disclaimer_version: DISCLAIMER_VERSION,
-            accepted_at: record.accepted_at
-          })
-        }).catch(function() { /* still OK if endpoint not yet exists */ });
+          body: { art: 'hinweise', version: String(DISCLAIMER_VERSION) }
+        })).catch(function (e) { try { console.warn('[v2933] consent:', e && e.message); } catch (x) {} });
       } catch(e) {}
     }
   }
+
+  /* ─── v2933 · Widerrufsverzicht vor jedem Kauf (§ 356 Abs. 5 BGB) ─────────
+     AGB Ziffer V und Hinweis 6 versprechen "eine gesonderte Checkbox im
+     Bestellvorgang" - es gab sie nicht. Jetzt fragt jeder Kaufweg (Abo,
+     Kontingente) hier, und das Backend nimmt den Checkout nur mit
+     widerruf_verzicht:true an und protokolliert ihn (consent_log).
+     Der Wortlaut steht gleich in backend/src/services/consentService.js. */
+  var WIDERRUF_VERSION = '2026-10-23';
+  var WIDERRUF_TEXT = 'Ich verlange ausdrücklich, dass DealPilot vor Ablauf der Widerrufsfrist mit der '
+    + 'Ausführung des Vertrags beginnt. Mir ist bekannt, dass mein Widerrufsrecht mit vollständiger '
+    + 'Vertragserfüllung bzw. bei digitalen Inhalten mit Beginn der Ausführung erlischt (§ 356 Abs. 4 und 5 BGB).';
+  function widerrufEinholen(was) {
+    return new Promise(function (fertig) {
+      var alt = document.getElementById('dp-widerruf'); if (alt) alt.remove();
+      var w = document.createElement('div');
+      w.id = 'dp-widerruf';
+      w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true');
+      w.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:rgba(5,5,5,.72);padding:16px';
+      w.innerHTML =
+        '<div style="max-width:520px;width:100%;background:#FDFCFA;color:#1a1a1a;border-radius:14px;border-top:4px solid var(--wl-c9a84c, #C9A84C);padding:22px 22px 18px;font:14px/1.5 Inter,system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.4)">'
+        + '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);margin-bottom:8px">Vor dem Kauf</div>'
+        + '<div style="font:700 18px/1.3 \'Space Grotesk\',Inter,sans-serif;margin-bottom:12px">' + (was || 'Kauf bestätigen') + '</div>'
+        + '<label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer">'
+        + '<input type="checkbox" id="dp-widerruf-cb" style="margin-top:3px;width:18px;height:18px;flex:0 0 auto;accent-color:var(--wl-c9a84c, #C9A84C)">'
+        + '<span>' + WIDERRUF_TEXT + '</span></label>'
+        + '<div style="font-size:12px;color:#666;margin-top:10px">Details in den <a href="/agb.html" target="_blank" rel="noopener">AGB Ziffer V</a>. Die Bestätigung wird mit Zeitpunkt in deinem Konto gespeichert.</div>'
+        + '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap">'
+        + '<button type="button" id="dp-widerruf-nein" style="padding:9px 16px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer">Abbrechen</button>'
+        + '<button type="button" id="dp-widerruf-ja" disabled style="padding:9px 16px;border-radius:8px;border:0;background:var(--wl-c9a84c, #C9A84C);color:#050505;font-weight:600;cursor:pointer;opacity:.5">Weiter zur Zahlung</button>'
+        + '</div></div>';
+      document.body.appendChild(w);
+      var cb = w.querySelector('#dp-widerruf-cb'), ja = w.querySelector('#dp-widerruf-ja');
+      cb.addEventListener('change', function () { ja.disabled = !cb.checked; ja.style.opacity = cb.checked ? '1' : '.5'; });
+      function zu(erg) { w.remove(); fertig(erg); }
+      w.querySelector('#dp-widerruf-nein').addEventListener('click', function () { zu(null); });
+      w.addEventListener('click', function (e) { if (e.target === w) zu(null); });
+      ja.addEventListener('click', function () { if (cb.checked) zu({ widerruf_verzicht: true, widerruf_version: WIDERRUF_VERSION }); });
+    });
+  }
+  global.DpWiderruf = { einholen: widerrufEinholen, version: WIDERRUF_VERSION, text: WIDERRUF_TEXT };
 
   function getAcceptedRecord() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch(e) { return null; }

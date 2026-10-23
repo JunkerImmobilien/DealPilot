@@ -87,17 +87,18 @@
   <main>
     <a href="/" class="back">← zurück zu DealPilot</a>
     <h1>Datenschutzerklärung</h1>
-    <p class="meta">Stand: 4. Oktober 2026 · Version 1.1</p>
+    <p class="meta">Stand: 23. Oktober 2026 · Version 1.2</p>
 
     <div class="version-banner">
-      Diese Datenschutzerklärung informiert Sie gemäß <strong>Art. 13 DSGVO</strong> über die Art, den Umfang und die Zwecke der Verarbeitung Ihrer personenbezogenen Daten durch Junker Immobilien im Rahmen der Nutzung der Software-as-a-Service-Plattform „DealPilot".
+      Diese Datenschutzerklärung informiert Sie gemäß <strong>Art. 13 DSGVO</strong> über die Art, den Umfang und die Zwecke der Verarbeitung Ihrer personenbezogenen Daten durch Junker Solution im Rahmen der Nutzung der Software-as-a-Service-Plattform „DealPilot".
     </div>
 
     <h2>1. Verantwortlicher</h2>
     <p>
       Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO) ist:<br><br>
-      <strong>Junker Immobilien</strong><br>
+      <strong>Junker Solution</strong> (Einzelunternehmen)<br>
       Inhaber: Marcel Junker<br>
+      Marken: DealPilot, Junker Immobilien, Junker Digital<br>
       Hermannstr. 9<br>
       32609 Hüllhorst<br>
       Deutschland<br><br>
@@ -106,7 +107,7 @@
     </p>
 
     <h2>2. Datenschutzbeauftragter</h2>
-    <p>Aufgrund der Größe und des Umfangs der Datenverarbeitung ist Junker Immobilien gemäß Art. 37 DSGVO und § 38 BDSG nicht zur Bestellung eines Datenschutzbeauftragten verpflichtet. Bei datenschutzrechtlichen Fragen wenden Sie sich bitte an die unter Ziffer 1 angegebene E-Mail-Adresse.</p>
+    <p>Aufgrund der Größe und des Umfangs der Datenverarbeitung ist Junker Solution gemäß Art. 37 DSGVO und § 38 BDSG nicht zur Bestellung eines Datenschutzbeauftragten verpflichtet. Bei datenschutzrechtlichen Fragen wenden Sie sich bitte an die unter Ziffer 1 angegebene E-Mail-Adresse.</p>
 
     <h2>3. Allgemeine Hinweise</h2>
     <p>Wir nehmen den Schutz Ihrer personenbezogenen Daten ernst. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften (insbesondere DSGVO und BDSG) sowie dieser Datenschutzerklärung.</p>
@@ -126,7 +127,7 @@
       <li>Name (Vor- und Nachname)</li>
       <li>E-Mail-Adresse</li>
       <li>Passwort (verschlüsselt mit bcrypt)</li>
-      <li>Zustimmungen (AGB, Datenschutzerklärung, Nutzungshinweise) mit Zeitstempel und Versionsnummer</li>
+      <li>Zustimmungen (Nutzungshinweise; beim Kauf die Zustimmung zur sofortigen Ausführung nach § 356 Abs. 5 BGB) mit Zeitstempel und Versionsnummer, gespeichert in Ihrem Konto</li>
       <li>Verbraucher-/Unternehmer-Status</li>
       <li>Bei Registrierung verwendete IP-Adresse (anonymisiert nach 30 Tagen)</li>
       <li>Datum und Uhrzeit der Registrierung</li>
@@ -180,11 +181,14 @@
     <h3>(2) Datenarten</h3>
     <p>Übermittelt werden:</p>
     <ul>
-      <li>Objektdaten (Adresse, Eckdaten, Investmentthese)</li>
-      <li>Berechnungsergebnisse (anonymisierte Modell-Daten)</li>
+      <li>Objektdaten (Adresse, Eckdaten, Investmentthese) und der Name des Halters, sofern eingetragen</li>
+      <li>Berechnungsergebnisse</li>
       <li>Vom Nutzer formulierte Fragen oder Prompts</li>
+      <li>Objektfotos (bis zu vier je Analyse), wenn die Pilot-Analyse sie einbeziehen soll</li>
+      <li>Hochgeladene Belege und Dokumente (z.&nbsp;B. Rechnungen, Mietverträge, Auszüge aus Grundbuch oder Kaufvertrag), wenn Sie deren automatische Auslesung starten</li>
+      <li>Sprachnachrichten und Sprachaufnahmen zur Umwandlung in Text</li>
     </ul>
-    <p>Es werden <strong>keine</strong> Login-Daten, Zahlungsdaten oder personenbezogenen Daten Dritter übermittelt.</p>
+    <p>Belege und Dokumente können personenbezogene Daten Dritter enthalten (etwa Namen und Anschriften auf Rechnungen). Text aus Dokumenten wird vor der Übermittlung automatisch nach Mustern geschwärzt (z.&nbsp;B. Namen, Anschriften, Kontodaten); diese Schwärzung erkennt nicht jede Schreibweise. <strong>Bilder werden nicht geschwärzt.</strong> Namen von Mietern aus der Mieterliste werden nicht übermittelt. Login- und Zahlungsdaten werden nicht übermittelt. OpenAI ist angewiesen, die Anfragen nicht zu speichern (<code>store:false</code>).</p>
 
     <h3>(3) Rechtsgrundlage</h3>
     <p>Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung — die KI-Funktion ist Teil der gebuchten Leistung).</p>
@@ -194,7 +198,7 @@
     <p>Weitere Informationen: <a href="https://openai.com/policies/eu-privacy-policy" target="_blank" rel="noopener">OpenAI EU Privacy Policy</a> und <a href="https://openai.com/policies/data-processing-addendum" target="_blank" rel="noopener">OpenAI DPA</a>.</p>
 
     <h3>(5) Speicherdauer bei OpenAI</h3>
-    <p>OpenAI speichert API-Anfragen für maximal 30 Tage zu Sicherheits- und Missbrauchsprüfungszwecken, danach erfolgt die Löschung.</p>
+    <p>OpenAI speichert API-Anfragen für maximal 30 Tage zu Sicherheits- und Missbrauchsprüfungszwecken, danach erfolgt die Löschung. Das Ergebnis einer Analyse speichern wir am jeweiligen Objekt, bis Sie es oder Ihr Konto löschen.</p>
 
     <h2>7. Zahlungsdienstleister Stripe</h2>
 
@@ -235,6 +239,20 @@
     <p>Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse am Betrieb einer sicheren und performanten Plattform).</p>
 
     <p>Datenschutzerklärung von Hetzner: <a href="https://www.hetzner.com/rechtliches/datenschutz" target="_blank" rel="noopener">https://www.hetzner.com/rechtliches/datenschutz</a>.</p>
+    <p>Schriften und Programmbibliotheken liefern wir von unseren eigenen Servern aus. Beim Aufruf von DealPilot werden keine Daten an Google Fonts oder an Content-Delivery-Netzwerke übertragen.</p>
+
+    <h2 id="empfaenger">8a. Weitere Empfänger je nach genutzter Funktion</h2>
+    <p>Die folgenden Dienste erhalten Daten nur, wenn Sie die jeweilige Funktion nutzen:</p>
+    <ul>
+      <li><strong>Geokodierung und Umgebungsanalyse</strong> (Geoapify): Objektanschrift bzw. Koordinaten, um die Lage und Einrichtungen in der Umgebung zu ermitteln.</li>
+      <li><strong>Amtliche Geodienste der Länder</strong> (z.&nbsp;B. Bodenrichtwert-Informationssysteme): Koordinaten des Objekts.</li>
+      <li><strong>Kartendarstellung im Marktbericht</strong> (OpenStreetMap Foundation, Vereinigtes Königreich): Ihr Browser lädt die Kartenkacheln direkt; dabei wird Ihre IP-Adresse übertragen. Für das Vereinigte Königreich besteht ein Angemessenheitsbeschluss der EU-Kommission.</li>
+      <li><strong>Straßenansicht</strong> (Google, USA), sofern in Ihrem Objekt angefordert: Koordinaten des Objekts, abgerufen über unseren Server.</li>
+      <li><strong>Marktdaten</strong> (ImmoMetrica) und <strong>unabhängige Bewertungspartner</strong>: Objektanschrift und Eckdaten, wenn Sie eine Marktauswertung oder Bewertung abrufen.</li>
+      <li><strong>Deal-Aktion</strong>: Wenn Sie Unterlagen an Bank, Finanzierungsberater oder Gutachter senden, gehen die von Ihnen ausgewählten Unterlagen per E-Mail an die von Ihnen genannten Empfänger; Unterlagen können dafür in einer Cloud-Ablage (Nextcloud) bereitgestellt werden.</li>
+      <li><strong>Partner und Vermittler</strong>: Geben Sie ein Objekt für Ihren Partner frei, sieht dieser das Objekt einschließlich der Mieterliste sowie Ihren Namen und Ihre E-Mail-Adresse.</li>
+    </ul>
+    <p>Rechtsgrundlage ist jeweils Art. 6 Abs. 1 lit. b DSGVO (Ausführung der von Ihnen gestarteten Funktion).</p>
 
     <h2 id="telegram">9. Telegram-Bot (optional)</h2>
 
@@ -307,7 +325,7 @@
       <li>Speicherung von Benutzer-Präferenzen (z.B. Light-/Dark-Mode)</li>
     </ul>
     <p>Wir setzen <strong>keine</strong> Tracking-, Marketing- oder Analyse-Cookies ein. Es ist kein Cookie-Banner erforderlich.</p>
-    <p><strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO i.V.m. § 25 Abs. 2 Nr. 2 TTDSG (technisch notwendige Speicherung).</p>
+    <p><strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO i.V.m. § 25 Abs. 2 Nr. 2 TDDDG (technisch notwendige Speicherung).</p>
 
     <h2>12. Speicherdauer und Löschung</h2>
 
@@ -318,7 +336,7 @@
       </tr>
       <tr>
         <td>Account-Daten (Name, E-Mail, Passwort-Hash)</td>
-        <td>Bis zur Kontolöschung durch den Nutzer + 30 Tage Grace Period</td>
+        <td>Bis zur Kontolöschung durch den Nutzer. Bei der Löschung werden Objekte, Marktberichte, Support-Anfragen samt Anhängen sofort mitgelöscht und ein laufendes Abo gekündigt.</td>
       </tr>
       <tr>
         <td>Eingegebene Objekt-/Berechnungsdaten</td>
@@ -330,15 +348,19 @@
       </tr>
       <tr>
         <td>Consent-Logs (Zustimmungen)</td>
-        <td>3 Jahre nach Vertragsende (Nachweis-Pflicht DSGVO)</td>
+        <td>3 Jahre ab Zustimmung, danach automatische Löschung</td>
       </tr>
       <tr>
         <td>Server-Logs (IP, technische Daten)</td>
-        <td>30 Tage</td>
+        <td>30 Tage; IP-Adressen in Protokollen werden danach automatisch entfernt</td>
       </tr>
       <tr>
         <td>OpenAI API-Anfragen (KI-Inhalte)</td>
-        <td>30 Tage bei OpenAI, 0 Tage bei uns</td>
+        <td>30 Tage bei OpenAI; das Analyseergebnis bei uns am Objekt bis zu dessen Löschung</td>
+      </tr>
+      <tr>
+        <td>Datenbank-Sicherungen</td>
+        <td>2 Tage (nächtliche Sicherung, danach überschrieben)</td>
       </tr>
     </table>
 
@@ -367,7 +389,7 @@
     <p>Sie können erteilte Einwilligungen jederzeit mit Wirkung für die Zukunft widerrufen.</p>
 
     <h3>(8) Beschwerderecht bei der Aufsichtsbehörde (Art. 77 DSGVO)</h3>
-    <p>Sie haben das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Zuständig für Junker Immobilien:</p>
+    <p>Sie haben das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Zuständig für Junker Solution:</p>
     <p>
       <strong>Landesbeauftragte für Datenschutz und Informationsfreiheit Nordrhein-Westfalen</strong><br>
       Kavalleriestr. 2-4<br>
@@ -384,7 +406,7 @@
       <li>Passwort-Hashes mit bcrypt (kostspielig zu brute-forcen)</li>
       <li>JWT-Token mit kurzer Lebensdauer (7 Tage)</li>
       <li>Zwei-Faktor-Authentifizierung (TOTP) optional verfügbar</li>
-      <li>Tägliche Backups, getrennt vom Produktiv-System</li>
+      <li>Nächtliche Sicherung beider Datenbanken, Aufbewahrung 2 Tage</li>
       <li>Server-Standort ausschließlich in Deutschland</li>
     </ul>
 
@@ -471,7 +493,7 @@
     Gründe überwiegen; das Ergebnis teilen wir Ihnen begründet mit.</p>
 
     <h2>15. Datenverarbeitung Dritter durch den Nutzer</h2>
-    <p>Soweit der Nutzer in DealPilot personenbezogene Daten Dritter (z.B. potenzielle Mieter, Verkäufer, Berater) eingibt, ist der Nutzer selbst <strong>Verantwortlicher</strong> im Sinne der DSGVO. Junker Immobilien fungiert insofern als <strong>Auftragsverarbeiter</strong>.</p>
+    <p>Soweit der Nutzer in DealPilot personenbezogene Daten Dritter (z.B. potenzielle Mieter, Verkäufer, Berater) eingibt, ist der Nutzer selbst <strong>Verantwortlicher</strong> im Sinne der DSGVO. Junker Solution fungiert insofern als <strong>Auftragsverarbeiter</strong>.</p>
     <p>Der Nutzer ist verpflichtet, sicherzustellen, dass er zur Eingabe und Verarbeitung dieser Drittdaten berechtigt ist (z.B. durch Einwilligung der Betroffenen oder gesetzliche Erlaubnis).</p>
 
     <h2>16. Änderung der Datenschutzerklärung</h2>
@@ -479,7 +501,7 @@
     <p>Wesentliche Änderungen werden Ihnen per E-Mail mitgeteilt.</p>
 
     <footer>
-      Stand: 24. Mai 2026 · Datenschutz-Version 1.0 · <a href="/impressum.html">Impressum</a> · <a href="/agb.html">AGB</a>
+      Stand: 23. Oktober 2026 · Datenschutz-Version 1.2 · <a href="/impressum.html">Impressum</a> · <a href="/agb.html">AGB</a>
     </footer>
   </main>
 </body>
