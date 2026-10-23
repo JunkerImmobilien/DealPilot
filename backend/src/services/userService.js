@@ -267,8 +267,11 @@ async function setRole({ userId, role }) {
   await query('UPDATE users SET role = $1 WHERE id = $2', [role, userId]);
 }
 
+/* v2933 · Alle drei Loeschwege (Nutzer selbst, Admin, Lifecycle) laufen
+   ueber kontoLoeschen: Abo kuendigen, Marktbericht-Daten, Tickets, Nutzer. */
 async function deleteUser(userId) {
-  await query('DELETE FROM users WHERE id = $1', [userId]);
+  const r = await query('SELECT email FROM users WHERE id = $1', [userId]);
+  return require('./kontoLoeschen').loeschen(userId, r.rows[0] && r.rows[0].email);
 }
 
 /**

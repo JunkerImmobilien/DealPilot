@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('/fonts/dp-fonts.css');
 :root{--gold:#C9A84C;--gold-l:#E2C97E;--gold-bg:#FAF5E8;--gold-dim:rgba(201,168,76,.12);--gold-dim2:rgba(201,168,76,.22);--ch:#2A2727;--ch2:#3D3A3A;--surface:#F8F6F1;--surface2:#F0ECE4;--white:#fff;--border:#E0DBD3;--border-g:rgba(201,168,76,.3);--text:#2A2727;--muted:#7A7370;--muted2:#9A9390;--green:#3FA56C;--green-bg:#EAF7F0;--green-dim:rgba(42,154,90,.12);--red:#B8625C;--red-bg:#FBF1F0;--blue:#185FA5;--blue-bg:#E8F0FA;--r:8px;--r2:12px;--shadow:0 2px 12px rgba(42,39,39,.08);--shadow-md:0 4px 24px rgba(42,39,39,.12)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}

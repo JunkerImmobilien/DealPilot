@@ -130,7 +130,22 @@ function _parseJson(s) {
   try { return JSON.parse(s); } catch (e) { return null; }
 }
 
-router.post('/', fbLimiter, (req, res) => {
+/* v2935 · Die Route lief ohne Anmeldung - req.user war immer leer, und
+   support_tickets.user_id blieb NULL, auch fuer angemeldete Kunden. Jetzt:
+   Token mitgeschickt und gueltig -> Nutzer am Ticket; sonst geht es wie
+   bisher ohne (Kontaktformular ohne Konto bleibt moeglich). */
+async function _nutzerWennAngemeldet(req) {
+  try {
+    const m = String(req.headers.authorization || '').match(/^Bearer (.+)$/);
+    if (!m) return;
+    const p = require('../utils/jwt').verify(m[1]);
+    const r = await require('../db/pool').query('SELECT id, email, name FROM users WHERE id = $1 AND is_active = true', [p.userId]);
+    if (r.rowCount) req.user = r.rows[0];
+  } catch (e) { /* ungueltig/abgelaufen: wie ohne Anmeldung */ }
+}
+
+router.post('/', fbLimiter, async (req, res) => {
+  await _nutzerWennAngemeldet(req);
   if (!upload) {
     return res.status(503).json({ error: 'multer nicht installiert' });
   }
@@ -229,7 +244,8 @@ router.post('/', fbLimiter, (req, res) => {
         if (payload.type === 'support') {
           var _ticket = await supportService.createTicketFromSubmission({
             userId: _uid, contactEmail: _mail, category: payload.category,
-            subject: subject, message: payload.message, objectSnapshot: objJson
+            subject: subject, message: payload.message, objectSnapshot: objJson,
+            diagnose: payload.diagnostics   /* v2935 */
           });
           try { // v777g-att-save
             var _imgs = (Array.isArray(req.files) ? req.files : []).filter(function (f) { return f && f.mimetype && /^image\//.test(f.mimetype); });
@@ -237,6 +253,10 @@ router.post('/', fbLimiter, (req, res) => {
               await supportService.saveAttachments({ ticketId: _ticket.ticketId, messageId: _ticket.messageId || null, sender: 'user', files: _imgs });
             }
           } catch (attErr) { console.error('[feedback-att] save failed:', attErr && attErr.message); }
+          /* v2935 · KI-Einstufung im Hintergrund: Fehler-Backlog oder Rueckfrage-Entwurf */
+          if (_ticket && _ticket.ticketId) {
+            try { require('../services/supportEinstufung').einstufenImHintergrund(_ticket.ticketId); } catch (e) {}
+          }
         } else {
           await supportService.recordFeedback({
             userId: _uid, contactEmail: _mail, overallRating: payload.overall_rating,

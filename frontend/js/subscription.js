@@ -194,6 +194,9 @@ var Sub = (function() {
     if (!isApiMode()) {
       throw new Error('Abo-Buchung erfordert eine Backend-Verbindung');
     }
+    /* v2933 · Widerrufsverzicht (§ 356 Abs. 5 BGB) vor dem Checkout - ohne ihn nimmt das Backend nicht an */
+    var _wv = (window.DpWiderruf && typeof DpWiderruf.einholen === 'function') ? await DpWiderruf.einholen('Abo buchen') : null;
+    if (!_wv) return;   /* abgebrochen: kein Kauf */
     var resp = await Auth.apiCall('/subscription/checkout', {
       method: 'POST',
       body: {
@@ -205,7 +208,9 @@ var Sub = (function() {
            das weist null ab; JSON.stringify laesst undefined einfach weg. */
         promo: (window.DealPilotFlyerCode && window.DealPilotFlyerCode.get()) || undefined,
         successUrl: location.origin + location.pathname + '?subscription=success&session_id={CHECKOUT_SESSION_ID}',
-        cancelUrl:  location.origin + location.pathname + '?subscription=cancel'
+        cancelUrl:  location.origin + location.pathname + '?subscription=cancel',
+        widerruf_verzicht: true,
+        widerruf_version: _wv.widerruf_version
       }
     });
     location.href = resp.url;

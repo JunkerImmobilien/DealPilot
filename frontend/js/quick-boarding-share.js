@@ -7,7 +7,7 @@
 
   var MOUNT_ID = 'obj-action-bar';
   var BTN_ID = 'qb-share-btn';
-  var QR_LIB = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  var QR_LIB = '/vendor/cdn/qrcodejs/1.0.0/qrcode.min.js';
 
   function toast(m) { try { if (typeof window.toast === 'function') return window.toast(m); } catch (e) {} try { console.log('[qb-share]', m); } catch (e) {} }
   function plane() { return '<svg viewBox="0 0 24 24" fill="currentColor"><g transform="rotate(90 12 12)"><path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></g></svg>'; }

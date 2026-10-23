@@ -2369,6 +2369,10 @@ async function _buyCreditPack(packKey, el) {
   // Button-State (event.target falls vorhanden, sonst kein Loading-State)
   var btn = (typeof event !== 'undefined' && event && event.target) ? event.target : null;
   var origText = btn ? btn.textContent : '';
+  /* v2933 · Widerrufsverzicht (§ 356 Abs. 5 BGB) vor dem Checkout. Der
+     Knopf ist oben schon gegriffen - nach dem await gilt event nicht mehr. */
+  var _wv = (window.DpWiderruf && typeof DpWiderruf.einholen === 'function') ? await DpWiderruf.einholen('Kontingent kaufen') : null;
+  if (!_wv) return;
   if (btn) {
     btn.disabled = true;
     btn.textContent = 'Wird gestartet…';
@@ -2383,7 +2387,7 @@ async function _buyCreditPack(packKey, el) {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + token
       },
-      body: JSON.stringify({ pack_id: packKey, menge: _menge })
+      body: JSON.stringify({ pack_id: packKey, menge: _menge, widerruf_verzicht: true, widerruf_version: _wv.widerruf_version })
     });
     var data = null;
     try { data = await r.json(); } catch (e) {}

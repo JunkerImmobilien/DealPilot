@@ -22,7 +22,7 @@
   'use strict';
   if (window.DealPilotMesseFX) return;
   var G = 'var(--wl-c9a84c,#C9A84C)', GH = 'var(--wl-e8cc7a,#E8CC7A)', GL = 'var(--wl-b8932f,#b8932f)';
-  var QR_LIB = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  var QR_LIB = '/vendor/cdn/qrcodejs/1.0.0/qrcode.min.js';
   var FLIEGER = '<svg viewBox="0 0 64 64"><path d="M32 2c2 0 3 3 3 6v16l22 12v6l-22-6v12l7 5v4l-10-3-10 3v-4l7-5V36L7 42v-6l22-12V8c0-3 1-6 3-6z"/></svg>';
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function marke(cls) { return '<div class="mfx-marke ' + (cls || '') + '">Deal<b>Pilot</b></div>'; }

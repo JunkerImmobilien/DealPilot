@@ -93,6 +93,11 @@ return {
       return call('POST', '/tickets/' + id + '/reply', { body: body });
     },
     setTicketStatus: (id, status) => call('POST', '/tickets/' + id + '/status', { status: status }),
+    /* v2935 · Einstufung, Fehler-Backlog, Rueckfrage */
+    einstufen: (id) => call('POST', '/tickets/' + id + '/einstufen', {}),
+    fehlerBacklogSetzen: (id, status, commit) => call('POST', '/tickets/' + id + '/fehler-backlog', { status: status, commit: commit || undefined }),
+    rueckfrageVerwerfen: (id) => call('POST', '/tickets/' + id + '/rueckfrage-verwerfen', {}),
+    fehlerBacklog: (status) => call('GET', '/fehler-backlog?status=' + encodeURIComponent(status || 'offen')),
     feedback: () => call('GET', '/feedback'),
     invoices: (params) => {
       params = params || {};

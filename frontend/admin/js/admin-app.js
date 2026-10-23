@@ -173,6 +173,54 @@
     var C = ({ 'new': '#3FA56C', open: '#3FA56C', waiting: '#C9A84C', closed: '#9a9184' })[s] || '#9a9184';
     return '<span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:50%;background:' + C + ';display:inline-block;flex:none;"></span>' + L + '</span>'; // v777e-status-dot
   }
+  /* v2935 · Marke in der Liste: Fehler-Backlog / Rueckfrage-Entwurf */
+  function _tkMarke(t) {
+    var m = '';
+    if (t.fehler_backlog) m += '<span style="font-size:11px;padding:1px 6px;border-radius:6px;background:#FAF6EC;border:1px solid #C9A84C;margin-right:6px;">Backlog · ' + escapeHtml(t.fehler_backlog) + '</span>';
+    if (t.rueckfrage_status === 'entwurf') m += '<span style="font-size:11px;padding:1px 6px;border-radius:6px;background:#fff4e5;border:1px solid #d9a441;margin-right:6px;">Rückfrage-Entwurf</span>';
+    return m;
+  }
+  function _tkEinstufungBlock(t) {
+    var e = t.einstufung || null;
+    var h = '<div style="border:1px solid #e7e1d4;background:#fbf8f1;border-radius:8px;padding:10px 12px;margin:10px 0;font-size:13px;">';
+    h += '<div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a7a50;margin-bottom:6px;">KI-Einstufung</div>';
+    if (!e) {
+      h += '<div style="color:#888;">Noch nicht eingestuft.</div>';
+    } else {
+      h += '<div><b>' + escapeHtml(e.art || '') + '</b> · Priorität ' + escapeHtml(e.prioritaet || '') + ' · ' + (e.genau_genug ? 'genau genug fürs Fehler-Backlog' : 'nicht genau genug') + '</div>';
+      if (t.fehler_titel) h += '<div style="margin-top:6px;"><b>' + escapeHtml(t.fehler_titel) + '</b></div>';
+      if (t.fehler_beschreibung) h += '<div style="white-space:pre-wrap;margin-top:4px;color:#3a3326;">' + escapeHtml(t.fehler_beschreibung) + '</div>';
+      if (e.fehlt && e.fehlt.length) h += '<div style="margin-top:6px;color:#8a5a2a;">Fehlt: ' + e.fehlt.map(escapeHtml).join(' · ') + '</div>';
+    }
+    h += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center;">'
+      + '<span style="font-size:12px;color:#6f675b;">Fehler-Backlog:</span>'
+      + ['offen', 'in_arbeit', 'erledigt', 'kein_fehler'].map(function (s) {
+          var akt = t.fehler_backlog === s;
+          return '<button class="btn" style="padding:3px 9px;font-size:12px;' + (akt ? 'background:#C9A84C;color:#050505;' : '') + '" onclick="window._tkBacklog(\'' + t.id + '\',\'' + s + '\')">' + s.replace('_', ' ') + '</button>';
+        }).join('')
+      + '<button class="btn" style="padding:3px 9px;font-size:12px;" onclick="window._tkEinstufen(\'' + t.id + '\')">Neu einstufen</button>'
+      + '</div>';
+    if (t.rueckfrage_entwurf && t.rueckfrage_status === 'entwurf') {
+      h += '<div style="margin-top:10px;border-top:1px dashed #d9cfb8;padding-top:8px;">'
+        + '<div style="font-size:12px;color:#6f675b;margin-bottom:4px;">Rückfrage-Entwurf (geht erst raus, wenn du ihn sendest):</div>'
+        + '<div style="white-space:pre-wrap;background:#fff;border:1px solid #eee;border-radius:6px;padding:8px;">' + escapeHtml(t.rueckfrage_entwurf) + '</div>'
+        + '<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">'
+        + '<button class="btn btn-primary" style="font-size:12px;" onclick="window._tkEntwurfUebernehmen()">In Antwortfeld übernehmen</button>'
+        + '<button class="btn" style="font-size:12px;" onclick="window._tkEntwurfVerwerfen(\'' + t.id + '\')">Verwerfen</button>'
+        + '</div></div>';
+    } else if (t.rueckfrage_status) {
+      h += '<div style="margin-top:8px;font-size:12px;color:#6f675b;">Rückfrage: ' + escapeHtml(t.rueckfrage_status) + '</div>';
+    }
+    return h + '</div>';
+  }
+  var _tkEntwurf = '';
+  window._tkEntwurfUebernehmen = function () { var ta = document.getElementById('tk-reply-body'); if (ta) { ta.value = _tkEntwurf; ta.focus(); ta.scrollIntoView({ block: 'center' }); } };
+  window._tkEntwurfVerwerfen = async function (id) { try { await API.rueckfrageVerwerfen(id); } catch (e) {} _tkOpen(id); };
+  window._tkBacklog = async function (id, s) { try { await API.fehlerBacklogSetzen(id, s); } catch (e) { alert(e.message || 'Fehler'); } _tkOpen(id); };
+  window._tkEinstufen = async function (id) {
+    var msg = document.getElementById('tk-msg'); if (msg) { msg.style.color = '#888'; msg.textContent = 'Wird eingestuft…'; }
+    try { await API.einstufen(id); _tkOpen(id); } catch (e) { if (msg) { msg.style.color = '#B86250'; msg.textContent = 'Fehler: ' + (e.message || ''); } }
+  };
   async function loadTickets() {
     var listEl = document.getElementById('tickets-list');
     var detEl = document.getElementById('ticket-detail');
@@ -191,7 +239,7 @@
         var mail = escapeHtml(t.user_email || t.contact_email || '\u2013');
         return '<tr style="cursor:pointer" onclick="window._tkOpen(\'' + t.id + '\')">' +
           '<td>' + _tkAge(t.last_activity_at, t.status) + '</td>' +
-          '<td>' + escapeHtml(t.subject || '(ohne Betreff)') + '</td>' +
+          '<td>' + _tkMarke(t) + escapeHtml(t.subject || '(ohne Betreff)') + '</td>' +
           '<td>' + escapeHtml(t.category || '\u2013') + '</td>' +
           '<td>' + mail + '</td>' +
           '<td>' + _tkStatusLabel(t.status) + ' \u00b7 ' + t.msg_count + '</td>' +
@@ -211,6 +259,7 @@
       var r = await API.getTicket(id);
       if (!r || !r.ticket) { if (detEl) detEl.innerHTML = '<div class="error-msg">Ticket nicht gefunden</div>'; return; }
       var t = r.ticket;
+      _tkEntwurf = t.rueckfrage_entwurf || '';   /* v2935 */
       var _atts = r.attachments || []; // v777g-att
       function _attBlock(mid) {
         var mine = _atts.filter(function (a) { return a.message_id === mid; });
@@ -233,6 +282,7 @@
         '<button class="btn" onclick="window._tkBack()">\u2190 Zur\u00fcck</button>' +
         '<h3 style="margin:12px 0 4px;">' + escapeHtml(t.subject || '(ohne Betreff)') + '</h3>' +
         '<div style="font-size:12px;color:#888;margin-bottom:6px;">' + escapeHtml(t.user_email || t.contact_email || '\u2013') + ' \u00b7 ' + _tkStatusLabel(t.status) + ' \u00b7 ' + escapeHtml(t.category || '') + '</div>' +
+        _tkEinstufungBlock(t) +   /* v2935 */
         '<div>' + thread + '</div>' +
         '<textarea id="tk-reply-body" rows="5" style="width:100%;margin-top:10px;padding:8px;box-sizing:border-box;" placeholder="Antwort an den Kunden\u2026"></textarea>' +
         '<div style="margin-top:8px;font-size:13px;color:#6f675b;">\ud83d\udcce Bilder anh\u00e4ngen: <input type="file" id="tk-reply-files" accept="image/*" multiple style="font-size:12px;"></div>' + // v777h-reply-files

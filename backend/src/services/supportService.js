@@ -8,11 +8,12 @@ const { query } = require('../db/pool');
 async function createTicketFromSubmission(opts) {
   opts = opts || {};
   const t = await query(
-    `INSERT INTO support_tickets (user_id, contact_email, category, subject, object_snapshot, status, last_activity_at)
-     VALUES ($1,$2,$3,$4,$5,'new',NOW()) RETURNING id`,
+    `INSERT INTO support_tickets (user_id, contact_email, category, subject, object_snapshot, status, last_activity_at, diagnose)
+     VALUES ($1,$2,$3,$4,$5,'new',NOW(),$6) RETURNING id`,
     [opts.userId || null, opts.contactEmail || null, opts.category || null,
      (opts.subject || '').slice(0, 255),
-     opts.objectSnapshot ? JSON.stringify(opts.objectSnapshot) : null]
+     opts.objectSnapshot ? JSON.stringify(opts.objectSnapshot) : null,
+     opts.diagnose ? JSON.stringify(opts.diagnose) : null]   /* v2935 */
   );
   const ticketId = t.rows[0].id;
   const _um = await query(
@@ -43,6 +44,7 @@ async function listTickets(opts) {
   const r = await query(
     `SELECT t.id, t.contact_email, t.category, t.subject, t.status,
             t.created_at, t.last_activity_at, u.email AS user_email,
+            t.fehler_backlog, t.rueckfrage_status, t.einstufung->>'art' AS ki_art,   /* v2935 */
             (SELECT COUNT(*) FROM ticket_messages m WHERE m.ticket_id = t.id)::int AS msg_count
        FROM support_tickets t LEFT JOIN users u ON u.id = t.user_id
        ${wsql}
@@ -86,6 +88,8 @@ async function addReply(opts) {
     [opts.ticketId, opts.body || '']
   );
   await query(`UPDATE support_tickets SET status = 'waiting', last_activity_at = NOW() WHERE id = $1`, [opts.ticketId]);
+  /* v2935 · lag ein Rueckfrage-Entwurf an, gilt er mit dieser Antwort als gesendet */
+  try { await query(`UPDATE support_tickets SET rueckfrage_status = 'gesendet' WHERE id = $1 AND rueckfrage_status = 'entwurf'`, [opts.ticketId]); } catch (e) {}
   const _r = t.rows[0]; _r.messageId = _am.rows[0].id; // v777h-reply-msgid
   return _r; // { id, contact_email, subject, messageId }
 }
