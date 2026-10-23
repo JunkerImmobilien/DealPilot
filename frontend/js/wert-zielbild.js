@@ -530,7 +530,7 @@
       var bloecke = [].filter.call(box.children, function (c) { return c.tagName !== 'STYLE' && c.tagName !== 'SCRIPT' && (c.textContent || '').trim(); });
       if (bloecke.length < 1) return html;
       [].forEach.call(box.querySelectorAll('p.dp-pa-p'), function (p) {
-        if ((p.textContent || '').length < 260) return;
+        if ((p.textContent || '').length < 260 || p.closest('details')) return;   /* in einem <details> ist er schon zugeklappt */
         p.classList.add('dp-si-lang');
         var b = document.createElement('button'); b.type = 'button'; b.className = 'dp-si-mehr btn-clean'; b.setAttribute('data-dp-si-mehr', '1'); b.textContent = 'weiterlesen';
         p.parentNode.insertBefore(b, p.nextSibling);
