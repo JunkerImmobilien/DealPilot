@@ -553,6 +553,17 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                             'uk-irw-nw-bergisch-mettmann-2026.json', 'uk-irw-nw-ruhr-nord-2026.json',
                             'uk-irw-nw-muensterland-2026.json', 'uk-irw-nw-ostwestfalen-2026.json',
                             'uk-irw-nw-sauerland-siegerland-2026.json',
+                            /* v2881-v2884: Niedersachsen-Sachwertfaktoren aus den Tableau-Kalkulatoren per Sitzung
+                               (Parameter setzen, Ergebnisfeld als Vektorbild lesen): GAG Northeim mit Lageklassen
+                               ueber die Gemarkung (Goslar, Northeim, Holzminden, LK und Stadt Goettingen),
+                               GAG Oldenburg-Cloppenburg je Gemeinde (Gemeindekoeffizient), Sperren mit Weg fuer
+                               die Kalkulatoren der GAG Aurich und Lueneburg. */
+                            'swf-ni-nom-2026.json', 'swf-ni-ol-2026.json', 'swf-ni-sperren-2026.json',
+                            /* v2887: GAG Sulingen-Verden aus den Dashboards ohne Blatt "Berechnung"
+                               (ernte-sv.mjs): Stuhr, Syke, Weyhe je Gemeinde (EFH, ZFH, RH), uebriger LK
+                               Diepholz EFH/ZFH, LK Nienburg und Heidekreis RH; Sperren mit Weg fuer Verden RH
+                               (Bremer Umland ohne Ortsliste) und Nienburg-Land EFH. */
+                            'swf-ni-sv-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

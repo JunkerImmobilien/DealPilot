@@ -52,6 +52,13 @@
         STATE.periods = data.periods || [];
         STATE.loaded = true;
         console.log('[V259-03] Tax-Periods geladen:', STATE.periods.length);
+        /* v2892: der Zeitraum-Zwischenspeicher in tax.js (_zveCache, 5 s)
+           hielt nach einer Aenderung die ALTEN Zeitraum-Objekte - gemessen:
+           2027 rechnete schon mit Splitting, 2028 (Rueckfall auf denselben
+           Zeitraum) noch nicht. Nach jedem Laden verwerfen. */
+        try { if (window._zveCache) window._zveCache.ts = 0; } catch (e) {}
+        /* v2892: Hinweis unter den Steuerangaben nachziehen */
+        try { if (window.DpSteuerAngaben && DpSteuerAngaben.zeigen) setTimeout(DpSteuerAngaben.zeigen, 0); } catch (e) {}
         return STATE.periods;
       } catch(e) {
         console.warn('[V259-03] loadAll:', e.message);
@@ -141,6 +148,67 @@
     return true;
   }
 
+  /* ═══ v2892 · VERANLAGUNG UND KIRCHENSTEUER JE ZEITRAUM ═════════════
+     Marcel 23.10.2026: die Angaben stehen seit v2891 im Investmentprofil
+     und gelten fuer alle Jahre. Wer heiratet oder austritt, hat je Jahr
+     eine andere Veranlagung - dafuer sind die Zeitraeume da. Jeder
+     Zeitraum kann beides ueberstimmen; "wie Profil" (null) ist die
+     Vorgabe, damit ein bestehender Zeitraum nichts aendert. */
+  const SEL_STIL = 'height:36px;padding:0 8px;border:1.5px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);border-radius:8px;font-size:13px;width:100%;background:#fff';
+  function _opt(wert, text, akt) {
+    return '<option value="' + wert + '"' + (String(akt) === String(wert) ? ' selected' : '') + '>' + text + '</option>';
+  }
+  function splittingOptionen(akt) {
+    const a = (akt === true) ? '1' : (akt === false) ? '0' : '';
+    return _opt('', 'wie Profil', a) + _opt('0', 'Einzelveranlagung', a) + _opt('1', 'Zusammenveranlagung (Splitting)', a);
+  }
+  function kistOptionen(akt) {
+    const a = (akt === 0 || akt === 8 || akt === 9) ? String(akt) : '';
+    return _opt('', 'wie Profil', a) + _opt('0', 'keine', a) + _opt('8', '8 % (BY, BW)', a) + _opt('9', '9 % (übrige Länder)', a);
+  }
+  function veranlagungFelder() {
+    return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">'
+      + '<div><label for="tp-splitting" style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">Veranlagung in diesem Zeitraum</label>'
+      + '<select id="tp-splitting" style="' + SEL_STIL + '">' + splittingOptionen(null) + '</select></div>'
+      + '<div><label for="tp-kist" style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">Kirchensteuer in diesem Zeitraum</label>'
+      + '<select id="tp-kist" style="' + SEL_STIL + '">' + kistOptionen(null) + '</select></div>'
+      + '</div>';
+  }
+  function _ausSelect(id, art) {
+    const el = document.getElementById(id);
+    if (!el || el.value === '') return null;
+    if (art === 'splitting') return el.value === '1';
+    const k = parseInt(el.value, 10);
+    return (k === 0 || k === 8 || k === 9) ? k : null;
+  }
+  function _formLeeren() {
+    ['tp-from', 'tp-to', 'tp-zve', 'tp-reason', 'tp-note', 'tp-splitting', 'tp-kist'].forEach(function (id) {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+  }
+  function _nachRechnen() {
+    try { if (window.DpSteuerAngaben && DpSteuerAngaben.zeigen) DpSteuerAngaben.zeigen(); } catch (e) {}
+    try { if (typeof calcNow === 'function') calcNow(); else if (typeof calc === 'function') calc(); } catch (e) {}
+  }
+  /* In der Liste direkt umstellbar - ohne prompt(), das in eingebetteten
+     Ansichten nicht erscheint. */
+  async function setVeranlagung(id, art, wert) {
+    const p = STATE.periods.find(x => x.id === id);
+    if (!p) return;
+    const body = { valid_from: p.valid_from, valid_to: p.valid_to, zve: p.zve, reason: p.reason, note: p.note };
+    if (art === 'splitting') body.splitting = (wert === '') ? null : (wert === '1');
+    else body.kirchensteuer = (wert === '') ? null : parseInt(wert, 10);
+    try {
+      await update(id, body);
+      refreshList();
+      _nachRechnen();
+      if (typeof toast === 'function') toast('Aktualisiert');
+    } catch (e) {
+      alert('Fehler: ' + e.message);
+    }
+  }
+  function getAllSync() { return STATE.loaded ? STATE.periods.slice() : []; }
+
   // ─── Modal-UI ──────────────────────────────────────────────────
   function openModal() {
     let modal = document.getElementById('tax-periods-modal');
@@ -177,6 +245,7 @@
               <input id="tp-zve" type="text" inputmode="decimal" placeholder="65000" style="height:36px;padding:0 10px;border:1.5px solid rgba(201,168,76,0.30);border-radius:8px;font-size:13px;width:100%" />
             </div>
           </div>
+          ${veranlagungFelder()}
           <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:10px;align-items:end">
             <div>
               <label style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">Grund</label>
@@ -231,6 +300,7 @@
               <input id="tp-zve" type="text" inputmode="decimal" placeholder="65000" style="height:36px;padding:0 10px;border:1.5px solid rgba(201,168,76,0.30);border-radius:8px;font-size:13px;width:100%" />
             </div>
           </div>
+          ${veranlagungFelder()}
           <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:10px;align-items:end">
             <div>
               <label style="font-size:11px;color:var(--muted,#7A7370);display:block;margin-bottom:3px">Grund</label>
@@ -265,16 +335,19 @@
       return;
     }
     
-    let html = '<div style="border:1px solid rgba(201,168,76,0.20);border-radius:10px;overflow:hidden">';
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1.5fr 100px;gap:10px;padding:10px 12px;background:rgba(201,168,76,0.06);font-size:11.5px;font-weight:600;color:var(--ch,#2A2727);text-transform:uppercase;letter-spacing:0.04em">';
-    html += '<div>Von</div><div>Bis</div><div>zvE</div><div>Grund</div><div></div></div>';
+    let html = '<div style="border:1px solid rgba(201,168,76,0.20);border-radius:10px;overflow-x:auto;--dpm-schiene:1"><div style="min-width:720px">';
+    html += '<div style="display:grid;grid-template-columns:0.9fr 0.9fr 0.9fr 1.4fr 1fr 1.2fr 90px;gap:10px;padding:10px 12px;background:rgba(201,168,76,0.06);font-size:11.5px;font-weight:600;color:var(--ch,#2A2727);text-transform:uppercase;letter-spacing:0.04em">';
+    html += '<div>Von</div><div>Bis</div><div>zvE</div><div>Veranlagung</div><div>Kirchenst.</div><div>Grund</div><div></div></div>';
     
     periods.forEach((p, i) => {
       const rowBg = i % 2 === 0 ? '#fff' : 'rgba(201,168,76,0.03)';
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1.5fr 100px;gap:10px;padding:10px 12px;background:' + rowBg + ';border-top:1px solid rgba(201,168,76,0.10);align-items:center;font-size:13px">';
+      html += '<div style="display:grid;grid-template-columns:0.9fr 0.9fr 0.9fr 1.4fr 1fr 1.2fr 90px;gap:10px;padding:10px 12px;background:' + rowBg + ';border-top:1px solid rgba(201,168,76,0.10);align-items:center;font-size:13px">';
       html += '<div>' + fmtDate(p.valid_from) + '</div>';
       html += '<div>' + (p.valid_to ? fmtDate(p.valid_to) : '<span style="color:var(--muted,#7A7370);font-style:italic">laufend</span>') + '</div>';
       html += '<div style="font-weight:600">' + fmtEUR(p.zve) + '</div>';
+      /* v2892: je Zeitraum umstellbar */
+      html += '<div><select aria-label="Veranlagung ' + fmtDate(p.valid_from) + '" onchange="DealPilotTaxPeriods.setVeranlagung(\'' + p.id + '\',\'splitting\',this.value)" style="' + SEL_STIL + ';height:30px;font-size:12px">' + splittingOptionen(p.splitting) + '</select></div>';
+      html += '<div><select aria-label="Kirchensteuer ' + fmtDate(p.valid_from) + '" onchange="DealPilotTaxPeriods.setVeranlagung(\'' + p.id + '\',\'kirchensteuer\',this.value)" style="' + SEL_STIL + ';height:30px;font-size:12px">' + kistOptionen(p.kirchensteuer) + '</select></div>';
       html += '<div style="font-size:12px;color:var(--muted,#7A7370)">' + (p.reason || '–') + (p.note ? ' <span title="' + p.note.replace(/"/g, '&quot;') + '" style="cursor:help">ℹ</span>' : '') + '</div>';
       html += '<div style="display:flex;gap:4px;justify-content:flex-end">';
       html += '<button onclick="DealPilotTaxPeriods.editPeriod(\'' + p.id + '\')" style="padding:5px 9px;background:#fff;color:var(--ch,#2A2727);border:1.5px solid rgba(201,168,76,0.30);border-radius:6px;font-size:11px;cursor:pointer">Bearb.</button>';
@@ -282,7 +355,7 @@
       html += '</div>';
       html += '</div>';
     });
-    html += '</div>';
+    html += '</div></div>';   /* v2892: innerer Rahmen min-width */
     host.innerHTML = html;
   }
 
@@ -300,6 +373,8 @@
     const zve = parseDe(document.getElementById('tp-zve').value);
     const reason = document.getElementById('tp-reason').value;
     const note = document.getElementById('tp-note').value;
+    const splitting = _ausSelect('tp-splitting', 'splitting');      /* v2892 */
+    const kirchensteuer = _ausSelect('tp-kist', 'kirchensteuer');
     
     if (!from) return alert('Bitte gültig-von eintragen');
     if (zve <= 0) return alert('Bitte gültigen zvE eintragen');
@@ -308,18 +383,15 @@
     // Konflikt-Check
     const overlap = await checkOverlap(from, to, null);
     if (overlap.overlapping && overlap.overlapping.length > 0) {
-      showConflictDialog(overlap.overlapping, { valid_from: from, valid_to: to || null, zve, reason, note }, null);
+      showConflictDialog(overlap.overlapping, { valid_from: from, valid_to: to || null, zve, reason, note, splitting, kirchensteuer }, null);
       return;
     }
     
     try {
-      await create({ valid_from: from, valid_to: to || null, zve, reason, note });
-      document.getElementById('tp-from').value = '';
-      document.getElementById('tp-to').value = '';
-      document.getElementById('tp-zve').value = '';
-      document.getElementById('tp-reason').value = '';
-      document.getElementById('tp-note').value = '';
+      await create({ valid_from: from, valid_to: to || null, zve, reason, note, splitting, kirchensteuer });
+      _formLeeren();
       refreshList();
+      _nachRechnen();
       if (typeof toast === 'function') toast('Zeitraum hinzugefügt');
     } catch(e) {
       alert('Fehler: ' + e.message);
@@ -349,12 +421,9 @@
       const data = JSON.parse(dataJson);
       await create(data);
       cancelConflict();
-      document.getElementById('tp-from').value = '';
-      document.getElementById('tp-to').value = '';
-      document.getElementById('tp-zve').value = '';
-      document.getElementById('tp-reason').value = '';
-      document.getElementById('tp-note').value = '';
+      _formLeeren();
       refreshList();
+      _nachRechnen();
       if (typeof toast === 'function') toast('Zeitraum hinzugefügt');
     } catch(e) {
       alert('Fehler: ' + e.message);
@@ -376,6 +445,7 @@
     try {
       await update(id, { valid_from: p.valid_from, valid_to: p.valid_to, zve, reason: p.reason, note: p.note });
       refreshList();
+      _nachRechnen();
       if (typeof toast === 'function') toast('Aktualisiert');
     } catch(e) {
       alert('Fehler: ' + e.message);
@@ -387,6 +457,7 @@
     try {
       await remove(id);
       refreshList();
+      _nachRechnen();
       if (typeof toast === 'function') toast('Gelöscht');
     } catch(e) {
       alert('Fehler: ' + e.message);
@@ -398,6 +469,7 @@
     create, update, remove,
     openModal, closeModal, renderInline, refreshList, submitNew, /* v841-render-inline */
     forceCreate, cancelConflict, editPeriod, removePeriod,
+    setVeranlagung, getAllSync,   /* v2892 */
     _meta: 'V259-03'
   };
 

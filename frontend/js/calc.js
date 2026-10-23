@@ -1333,16 +1333,32 @@ function _calcImmediate(){
           var _v268_y1 = parseInt(_v268_rd.split('-')[0], 10);
           var _v268_mf = DealPilotAnteilig.startFactorMonths(_v268_rd, _v268_y1);
           if (_v268_mf < 1 && _v268_mf > 0) {
-            if (State._afaSeriesNormal && State._afaSeriesNormal.length > 0) {
+            /* v2891 · DIE REIHE WIRD MIT DEM TEILJAHR GERECHNET, NICHT HINTERHER
+               GEKUERZT. Bis v2890 stand hier normal[0] × Monatsanteil auf der
+               fertigen Reihe: degressiv fiel Jahr 2 zu niedrig aus (vom vollen
+               Jahr-1-Restwert), linear fehlte der gekuerzte Teil am Ende. Jetzt
+               rechnet die Engine selbst mit `ersterAnteil` (51 Jahre, damit der
+               Nachholbetrag bei 2 % noch in der Reihe steht).
+               v1878 bleibt: die Sonder-AfA § 7b kennt keine Zeitanteiligkeit -
+               im Anschaffungsjahr voll (Kauf 01.10., Basis 400.000: 20.000). */
+            var _v268_teil = (window.Afa && Afa.computeSeries) ? Afa.computeSeries({
+              methode: afaParsed.methode,
+              satzPct: afaParsed.satzPct,
+              ahk: afa_geb_basis,
+              jahre: 51,
+              sonder7bAktiv: sonder7bGueltig,
+              sonder7bBasis: sonder7bBasis,
+              linearFallback: 3.0,
+              ersterAnteil: _v268_mf
+            }) : null;
+            if (_v268_teil) {
+              State._afaSeries = _v268_teil.series;
+              State._afaSeriesNormal = _v268_teil.normal;
+              State._afaSeriesSonder = _v268_teil.sonder;
+              State._afaWechselJahrTeil = _v268_teil.wechselJahr;
+            } else if (State._afaSeriesNormal && State._afaSeriesNormal.length > 0) {
               State._afaSeriesNormal[0] = Math.round(State._afaSeriesNormal[0] * _v268_mf);
-            }
-            /* v1878 · Steuerfehler (c): die Sonder-AfA § 7b wurde hier mit gezwoelftelt. § 7 Abs. 1 S. 4
-               gilt der AfA nach Satz 1; § 7b kennt keine Zeitanteiligkeit — im Anschaffungsjahr voll.
-               Kauf 01.10., Basis 400.000: 20.000 statt 5.000. Nur die Normal-AfA bleibt anteilig. */
-            if (State._afaSeries && State._afaSeries.length > 0) {
-              var _v268_n = (State._afaSeriesNormal && State._afaSeriesNormal[0]) || 0;
-              var _v268_s = (State._afaSeriesSonder && State._afaSeriesSonder[0]) || 0;
-              State._afaSeries[0] = _v268_n + _v268_s;
+              State._afaSeries[0] = (State._afaSeriesNormal[0] || 0) + ((State._afaSeriesSonder && State._afaSeriesSonder[0]) || 0);
             }
             State._afa_year1_factor = _v268_mf;
             State._afa_year1_relDate = _v268_rd;
@@ -1859,6 +1875,16 @@ function _calcImmediate(){
   var _zveQuellen = {};
   function _zveJahr(jahr) {
     var _j = (typeof jahr === 'number' && jahr > 1900) ? jahr : new Date().getFullYear();
+    /* v2890: derselbe zvE-Weg wie Ergebnisbox und _computeYearTotal
+       (tax.js `_dpZveFuerJahr`: Zeitraum des Jahres, sonst letzter frueherer,
+       sonst Feld `zve`, sonst das zvE zum eingestellten Grenzsteuersatz).
+       Der Block darunter bleibt nur fuer den Fall, dass tax.js fehlt. */
+    try {
+      if (typeof window._dpZveFuerJahr === 'function') {
+        var _zi = window._dpZveFuerJahr(_j);
+        if (_zi && _zi.zve > 0) { _zveQuellen[_j] = _zi.quelle; return _zi.zve; }
+      }
+    } catch (_e0) {}
     try {
       if (window.DealPilotTaxPeriods
           && typeof DealPilotTaxPeriods.getForDateSync === 'function') {
@@ -1971,8 +1997,13 @@ function _calcImmediate(){
          nicht negativ. Ein negatives zvE gibt es im Tarif nicht. */
       var _bas = _zveJ + _sal;
       if (!(_bas > 0)) _bas = 0;
-      var _vor  = Tax.calcEStG(_bas, jahr);
-      var _nach = Tax.calcEStG(_bas + base, jahr);
+      /* v2891: die ganze Last (ESt + Soli + Kirchensteuer, Splitting) aus
+         den Steuerangaben - derselbe Kern wie die Ergebnisbox. */
+      var _last = (typeof Tax.steuerLast === 'function')
+        ? function (z) { return Tax.steuerLast(z, jahr).gesamt; }
+        : function (z) { return Tax.calcEStG(z, jahr); };
+      var _vor  = _last(_bas);
+      var _nach = _last(Math.max(0, _bas + base));
       var _d = _nach - _vor;
       if (!isFinite(_d)) return _lin;
       _progAktiv = true;
@@ -2035,6 +2066,20 @@ function _calcImmediate(){
   /* v1898: die Steuerbemessung laeuft gegen bwk_st, nicht gegen bwk_cf.
      Ohne Mietausfall sind beide Zahlen identisch. */
   var zve_immo = (nkm_j - bwk_st - zins_j) - afa;
+  /* v2891 · DAS VOLLE JAHR KENNT AUCH SANIERUNG UND INVENTAR.
+     Bis v2890 fehlten hier Erhaltungsaufwand, anschaffungsnahe Kosten und die
+     Moebel-AfA, die der Tab Steuern im selben Jahr abzieht - der Cashflow
+     nach Steuern des vollen Jahres (Score, Kacheln) lag dadurch neben der
+     Jahreskarte. Genommen wird die Rechnung des Tabs fuer das erste Jahr
+     (_computeAutoForYear), ohne die Kueche: die steckt oben schon in afa. */
+  try {
+    if (typeof _computeAutoForYear === 'function') {
+      var _a0 = _computeAutoForYear(0, _calYearBase) || {};
+      var _zwk = (Number(_a0.erhaltungsaufwand) || 0) + (Number(_a0.anschaffungsnah) || 0)
+               + Math.max(0, (Number(_a0.sonst_bewegl_wg) || 0) - (afa_kueche || 0));
+      if (isFinite(_zwk) && _zwk > 0) zve_immo -= _zwk;
+    }
+  } catch (_eZ) {}
   var steuer   = _mtxYear(zve_immo, _calYearBase);
 
   /* v1379-PROG · DER EFFEKTIVE SATZ, den dieses Objekt tatsaechlich traegt.

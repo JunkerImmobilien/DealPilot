@@ -62,7 +62,9 @@ const { query } = require('../db/pool');
    (localStorage dp_mandanten). Gemessen 14.10.2026: in Marcels Konto
    kannte der Browser nur „Privat", zwei Gesellschaftsobjekte fielen auf
    „Privat" zurück. Halter gehoeren ans Konto. */
-const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen', 'bwk_profil', 'hinweise', 'mandanten'];   /* v2204: abgeschaltete Hinweise (js/hinweise.js) */
+/* v2900 - `pdf_vorgabe`: Vorauswahl der PDF-Fassung, „ohne Rückfrage" und ob die
+   Pilot-Analyse mitkommt (js/pdf-wahl.js). Marcel 23.10.2026: geräteübergreifend. */
+const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen', 'bwk_profil', 'hinweise', 'mandanten', 'pdf_vorgabe'];   /* v2204: abgeschaltete Hinweise (js/hinweise.js) */
 
 router.get('/:schluessel', authenticate, async (req, res, next) => {
   try {

@@ -1,0 +1,2267 @@
+[
+ {
+  "land_code": "NI",
+  "ags": "03251037",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Stuhr",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhaus, Doppelhaushälfte",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "150000": 1.48,
+    "175000": 1.39,
+    "200000": 1.31,
+    "225000": 1.24,
+    "250000": 1.17,
+    "275000": 1.12,
+    "300000": 1.06,
+    "325000": 1.01,
+    "350000": 0.96,
+    "375000": 0.92,
+    "400000": 0.87,
+    "425000": 0.83,
+    "450000": 0.8
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Lagesowst „Weyhe/Stuhr“ — die Vorgaben des Kalkulators; Stichprobe 165 Kauffälle: vorläufiger Sachwert 130.000–494.000 € (Median 243.000), Bodenrichtwert 125–380 €/m² (Median 295).",
+   "hinweis": "13 Stützstellen am amtlichen Kalkulator 2026_sw_rh_sulverdhstsywe abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen), Lagesowst „Weyhe/Stuhr“: vorläufiger Sachwert 150000–450000 € — DIESES MODELL KENNT KEINEN BODENRICHTWERT, nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 300000 €) weist der Kalkulator 1,06 ± 0,17 aus; PDF-Export Sach=250000: „Weyhe/Stuhr“, 1,17 (Zelle 1,17); PDF-Export Sach=175000: „Weyhe/Stuhr“, 1,39 (Zelle 1,39)."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "2.0": 0.84,
+     "2.5": 1,
+     "3.0": 1.12,
+     "3.5": 1.21
+    },
+    "rundung_stellen": 2,
+    "hinweis": "4 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten für abweichende Standardstufen“ des Kalkulators), zwischen ihnen linear interpoliert, über den Rand hinaus nicht verlängert. Zuordnung der Beschriftungen zu den Stützstellen gegen den Rechner geprüft: größte Abweichung vom Quotienten am Normobjekt 0,026."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stuhr",
+   "lage_dokument": "Weyhe/Stuhr",
+   "lage_parameter": "Lagesowst",
+   "zuordnung_hinweis": "Der Kalkulator nennt die Gemeinde selbst („Syke“ bzw. „Stuhr/Weyhe“); er gilt laut Titel nur für Stuhr, Syke und Weyhe.",
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_rh_sulverdhstsywe (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein Reihenhaus oder Doppelhaushälfte | Stuhr, Syke, Weyhe · Wertermittlungsstichtag 01.01.2026 · Stichprobe 165 Kauffälle · Lagesowst „Weyhe/Stuhr“"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_rh_sulverdhstsywe/dash.pdf?Sach=250000 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 1,17, Weyhe/Stuhr"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_rh_sulverdhstsywe/dash.pdf?Sach=175000 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 1,39, Weyhe/Stuhr"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 165,
+  "streuung": 0.17,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_sulverdhstsywe",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_rh_sulverdhstsywe, Lagesowst „Weyhe/Stuhr“"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03251037",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Stuhr",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehendes Einfamilienhaus",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "200000": 1.11,
+    "250000": 1.04,
+    "300000": 0.98,
+    "350000": 0.93,
+    "400000": 0.89,
+    "450000": 0.85,
+    "500000": 0.82,
+    "550000": 0.79,
+    "600000": 0.76,
+    "650000": 0.74,
+    "700000": 0.71,
+    "750000": 0.69,
+    "800000": 0.67,
+    "850000": 0.65
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Lagesowst „Stuhr/Weyhe“, Zawo „Einfamilienhaus“ — die Vorgaben des Kalkulators; Stichprobe 368 Kauffälle: vorläufiger Sachwert 169.000–867.000 € (Median 405.000), Bodenrichtwert 50–380 €/m² (Median 248).",
+   "hinweis": "14 Stützstellen am amtlichen Kalkulator 2026_sw_efh_sulverdhstsywe abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen), Lagesowst „Stuhr/Weyhe“, Zawo „Einfamilienhaus“: vorläufiger Sachwert 200000–850000 € — DIESES MODELL KENNT KEINEN BODENRICHTWERT, nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 400000 €) weist der Kalkulator 0,89 ± 0,13 aus; PDF-Export Lagesowst=2: „Stuhr/Weyhe“, 0,89 (Zelle 0,89)."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "2.0": 0.85,
+     "2.5": 1,
+     "3.0": 1.11,
+     "3.5": 1.21,
+     "4.0": 1.29
+    },
+    "rundung_stellen": 2,
+    "hinweis": "5 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten für abweichende Standardstufen“ des Kalkulators), zwischen ihnen linear interpoliert, über den Rand hinaus nicht verlängert. Zuordnung der Beschriftungen zu den Stützstellen gegen den Rechner geprüft: größte Abweichung vom Quotienten am Normobjekt 0,011."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stuhr",
+   "lage_dokument": "Stuhr/Weyhe",
+   "lage_parameter": "Lagesowst",
+   "zuordnung_hinweis": "Der Kalkulator nennt die Gemeinde selbst („Syke“ bzw. „Stuhr/Weyhe“); er gilt laut Titel nur für Stuhr, Syke und Weyhe.",
+   "objektarten": [
+    "efh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "zfh",
+    "dhh",
+    "rh",
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_efh_sulverdhstsywe (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein freistehendes Ein- und Zweifamilienhaus | Stuhr, Syke, Weyhe · Wertermittlungsstichtag 01.01.2026 · Stichprobe 368 Kauffälle · Lagesowst „Stuhr/Weyhe“, Zawo „Einfamilienhaus“"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_efh_sulverdhstsywe/dash.pdf?Lagesowst=2 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 0,89, Stuhr/Weyhe"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 368,
+  "streuung": 0.13,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_sulverdhstsywe",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_efh_sulverdhstsywe, Lagesowst „Stuhr/Weyhe“, Zawo „Einfamilienhaus“"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03251037",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Stuhr",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "zfh",
+  "objektart_bez": "Zweifamilienhaus oder Einfamilienhaus mit Einliegerwohnung",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "200000": 1.05,
+    "250000": 0.98,
+    "300000": 0.92,
+    "350000": 0.87,
+    "400000": 0.83,
+    "450000": 0.8,
+    "500000": 0.77,
+    "550000": 0.74,
+    "600000": 0.71,
+    "650000": 0.69,
+    "700000": 0.66,
+    "750000": 0.64,
+    "800000": 0.62,
+    "850000": 0.61
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Lagesowst „Stuhr/Weyhe“, Zawo „Zweifam.hs./mit Einliegerwohnung“ — die Vorgaben des Kalkulators; Stichprobe 368 Kauffälle: vorläufiger Sachwert 169.000–867.000 € (Median 405.000), Bodenrichtwert 50–380 €/m² (Median 248).",
+   "hinweis": "14 Stützstellen am amtlichen Kalkulator 2026_sw_efh_sulverdhstsywe abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen), Lagesowst „Stuhr/Weyhe“, Zawo „Zweifam.hs./mit Einliegerwohnung“: vorläufiger Sachwert 200000–850000 € — DIESES MODELL KENNT KEINEN BODENRICHTWERT, nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 400000 €) weist der Kalkulator 0,83 ± 0,13 aus."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "2.0": 0.85,
+     "2.5": 1,
+     "3.0": 1.11,
+     "3.5": 1.21,
+     "4.0": 1.29
+    },
+    "rundung_stellen": 2,
+    "hinweis": "5 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten für abweichende Standardstufen“ des Kalkulators), zwischen ihnen linear interpoliert, über den Rand hinaus nicht verlängert. Zuordnung der Beschriftungen zu den Stützstellen gegen den Rechner geprüft: größte Abweichung vom Quotienten am Normobjekt 0,011."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Stuhr",
+   "lage_dokument": "Stuhr/Weyhe",
+   "lage_parameter": "Lagesowst",
+   "zuordnung_hinweis": "Der Kalkulator nennt die Gemeinde selbst („Syke“ bzw. „Stuhr/Weyhe“); er gilt laut Titel nur für Stuhr, Syke und Weyhe.",
+   "objektarten": [
+    "zfh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "dhh",
+    "rh",
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_efh_sulverdhstsywe (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein freistehendes Ein- und Zweifamilienhaus | Stuhr, Syke, Weyhe · Wertermittlungsstichtag 01.01.2026 · Stichprobe 368 Kauffälle · Lagesowst „Stuhr/Weyhe“, Zawo „Zweifam.hs./mit Einliegerwohnung“"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 368,
+  "streuung": 0.13,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_sulverdhstsywe",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_efh_sulverdhstsywe, Lagesowst „Stuhr/Weyhe“, Zawo „Zweifam.hs./mit Einliegerwohnung“"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03251041",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Syke, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhaus, Doppelhaushälfte",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "150000": 1.39,
+    "175000": 1.3,
+    "200000": 1.22,
+    "225000": 1.15,
+    "250000": 1.08,
+    "275000": 1.02,
+    "300000": 0.97,
+    "325000": 0.92,
+    "350000": 0.87,
+    "375000": 0.82,
+    "400000": 0.78,
+    "425000": 0.74,
+    "450000": 0.7
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Lagesowst „Syke“ — die Vorgaben des Kalkulators; Stichprobe 165 Kauffälle: vorläufiger Sachwert 130.000–494.000 € (Median 243.000), Bodenrichtwert 125–380 €/m² (Median 295).",
+   "hinweis": "13 Stützstellen am amtlichen Kalkulator 2026_sw_rh_sulverdhstsywe abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen), Lagesowst „Syke“: vorläufiger Sachwert 150000–450000 € — DIESES MODELL KENNT KEINEN BODENRICHTWERT, nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 300000 €) weist der Kalkulator 0,97 ± 0,17 aus; PDF-Export Lagesowst=1: „Syke“, 0,97 (Zelle 0,97)."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "2.0": 0.84,
+     "2.5": 1,
+     "3.0": 1.12,
+     "3.5": 1.21
+    },
+    "rundung_stellen": 2,
+    "hinweis": "4 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten für abweichende Standardstufen“ des Kalkulators), zwischen ihnen linear interpoliert, über den Rand hinaus nicht verlängert. Zuordnung der Beschriftungen zu den Stützstellen gegen den Rechner geprüft: größte Abweichung vom Quotienten am Normobjekt 0,026."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Syke, Stadt",
+   "lage_dokument": "Syke",
+   "lage_parameter": "Lagesowst",
+   "zuordnung_hinweis": "Der Kalkulator nennt die Gemeinde selbst („Syke“ bzw. „Stuhr/Weyhe“); er gilt laut Titel nur für Stuhr, Syke und Weyhe.",
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_rh_sulverdhstsywe (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein Reihenhaus oder Doppelhaushälfte | Stuhr, Syke, Weyhe · Wertermittlungsstichtag 01.01.2026 · Stichprobe 165 Kauffälle · Lagesowst „Syke“"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_rh_sulverdhstsywe/dash.pdf?Lagesowst=1 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 0,97, Syke"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 165,
+  "streuung": 0.17,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_sulverdhstsywe",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_rh_sulverdhstsywe, Lagesowst „Syke“"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03251041",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Syke, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehendes Einfamilienhaus",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "200000": 1.05,
+    "250000": 0.98,
+    "300000": 0.92,
+    "350000": 0.87,
+    "400000": 0.83,
+    "450000": 0.8,
+    "500000": 0.76,
+    "550000": 0.74,
+    "600000": 0.71,
+    "650000": 0.68,
+    "700000": 0.66,
+    "750000": 0.64,
+    "800000": 0.62,
+    "850000": 0.61
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Lagesowst „Syke“, Zawo „Einfamilienhaus“ — die Vorgaben des Kalkulators; Stichprobe 368 Kauffälle: vorläufiger Sachwert 169.000–867.000 € (Median 405.000), Bodenrichtwert 50–380 €/m² (Median 248).",
+   "hinweis": "14 Stützstellen am amtlichen Kalkulator 2026_sw_efh_sulverdhstsywe abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen), Lagesowst „Syke“, Zawo „Einfamilienhaus“: vorläufiger Sachwert 200000–850000 € — DIESES MODELL KENNT KEINEN BODENRICHTWERT, nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 400000 €) weist der Kalkulator 0,83 ± 0,13 aus; PDF-Export Sach=300000: „Syke“, 0,92 (Zelle 0,92)."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "2.0": 0.85,
+     "2.5": 1,
+     "3.0": 1.11,
+     "3.5": 1.21,
+     "4.0": 1.29
+    },
+    "rundung_stellen": 2,
+    "hinweis": "5 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten für abweichende Standardstufen“ des Kalkulators), zwischen ihnen linear interpoliert, über den Rand hinaus nicht verlängert. Zuordnung der Beschriftungen zu den Stützstellen gegen den Rechner geprüft: größte Abweichung vom Quotienten am Normobjekt 0,011."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Syke, Stadt",
+   "lage_dokument": "Syke",
+   "lage_parameter": "Lagesowst",
+   "zuordnung_hinweis": "Der Kalkulator nennt die Gemeinde selbst („Syke“ bzw. „Stuhr/Weyhe“); er gilt laut Titel nur für Stuhr, Syke und Weyhe.",
+   "objektarten": [
+    "efh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "zfh",
+    "dhh",
+    "rh",
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_efh_sulverdhstsywe (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein freistehendes Ein- und Zweifamilienhaus | Stuhr, Syke, Weyhe · Wertermittlungsstichtag 01.01.2026 · Stichprobe 368 Kauffälle · Lagesowst „Syke“, Zawo „Einfamilienhaus“"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_efh_sulverdhstsywe/dash.pdf?Sach=300000 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 0,92, Syke"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 368,
+  "streuung": 0.13,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_sulverdhstsywe",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_efh_sulverdhstsywe, Lagesowst „Syke“, Zawo „Einfamilienhaus“"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03251041",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Syke, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "zfh",
+  "objektart_bez": "Zweifamilienhaus oder Einfamilienhaus mit Einliegerwohnung",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "200000": 0.99,
+    "250000": 0.92,
+    "300000": 0.86,
+    "350000": 0.82,
+    "400000": 0.78,
+    "450000": 0.74,
+    "500000": 0.71,
+    "550000": 0.68,
+    "600000": 0.66,
+    "650000": 0.64,
+    "700000": 0.61,
+    "750000": 0.59,
+    "800000": 0.58,
+    "850000": 0.56
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Lagesowst „Syke“, Zawo „Zweifam.hs./mit Einliegerwohnung“ — die Vorgaben des Kalkulators; Stichprobe 368 Kauffälle: vorläufiger Sachwert 169.000–867.000 € (Median 405.000), Bodenrichtwert 50–380 €/m² (Median 248).",
+   "hinweis": "14 Stützstellen am amtlichen Kalkulator 2026_sw_efh_sulverdhstsywe abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen), Lagesowst „Syke“, Zawo „Zweifam.hs./mit Einliegerwohnung“: vorläufiger Sachwert 200000–850000 € — DIESES MODELL KENNT KEINEN BODENRICHTWERT, nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 400000 €) weist der Kalkulator 0,78 ± 0,13 aus; PDF-Export Zawo=2: „Zweifam“, 0,78 (Zelle 0,78)."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "2.0": 0.85,
+     "2.5": 1,
+     "3.0": 1.11,
+     "3.5": 1.21,
+     "4.0": 1.29
+    },
+    "rundung_stellen": 2,
+    "hinweis": "5 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten für abweichende Standardstufen“ des Kalkulators), zwischen ihnen linear interpoliert, über den Rand hinaus nicht verlängert. Zuordnung der Beschriftungen zu den Stützstellen gegen den Rechner geprüft: größte Abweichung vom Quotienten am Normobjekt 0,011."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Syke, Stadt",
+   "lage_dokument": "Syke",
+   "lage_parameter": "Lagesowst",
+   "zuordnung_hinweis": "Der Kalkulator nennt die Gemeinde selbst („Syke“ bzw. „Stuhr/Weyhe“); er gilt laut Titel nur für Stuhr, Syke und Weyhe.",
+   "objektarten": [
+    "zfh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "dhh",
+    "rh",
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_efh_sulverdhstsywe (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein freistehendes Ein- und Zweifamilienhaus | Stuhr, Syke, Weyhe · Wertermittlungsstichtag 01.01.2026 · Stichprobe 368 Kauffälle · Lagesowst „Syke“, Zawo „Zweifam.hs./mit Einliegerwohnung“"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_efh_sulverdhstsywe/dash.pdf?Zawo=2 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 0,78, Zweifam"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 368,
+  "streuung": 0.13,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_sulverdhstsywe",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_efh_sulverdhstsywe, Lagesowst „Syke“, Zawo „Zweifam.hs./mit Einliegerwohnung“"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03251047",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Weyhe",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhaus, Doppelhaushälfte",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "150000": 1.48,
+    "175000": 1.39,
+    "200000": 1.31,
+    "225000": 1.24,
+    "250000": 1.17,
+    "275000": 1.12,
+    "300000": 1.06,
+    "325000": 1.01,
+    "350000": 0.96,
+    "375000": 0.92,
+    "400000": 0.87,
+    "425000": 0.83,
+    "450000": 0.8
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Lagesowst „Weyhe/Stuhr“ — die Vorgaben des Kalkulators; Stichprobe 165 Kauffälle: vorläufiger Sachwert 130.000–494.000 € (Median 243.000), Bodenrichtwert 125–380 €/m² (Median 295).",
+   "hinweis": "13 Stützstellen am amtlichen Kalkulator 2026_sw_rh_sulverdhstsywe abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen), Lagesowst „Weyhe/Stuhr“: vorläufiger Sachwert 150000–450000 € — DIESES MODELL KENNT KEINEN BODENRICHTWERT, nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 300000 €) weist der Kalkulator 1,06 ± 0,17 aus; PDF-Export Sach=250000: „Weyhe/Stuhr“, 1,17 (Zelle 1,17); PDF-Export Sach=175000: „Weyhe/Stuhr“, 1,39 (Zelle 1,39)."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "2.0": 0.84,
+     "2.5": 1,
+     "3.0": 1.12,
+     "3.5": 1.21
+    },
+    "rundung_stellen": 2,
+    "hinweis": "4 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten für abweichende Standardstufen“ des Kalkulators), zwischen ihnen linear interpoliert, über den Rand hinaus nicht verlängert. Zuordnung der Beschriftungen zu den Stützstellen gegen den Rechner geprüft: größte Abweichung vom Quotienten am Normobjekt 0,026."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Weyhe",
+   "lage_dokument": "Weyhe/Stuhr",
+   "lage_parameter": "Lagesowst",
+   "zuordnung_hinweis": "Der Kalkulator nennt die Gemeinde selbst („Syke“ bzw. „Stuhr/Weyhe“); er gilt laut Titel nur für Stuhr, Syke und Weyhe.",
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_rh_sulverdhstsywe (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein Reihenhaus oder Doppelhaushälfte | Stuhr, Syke, Weyhe · Wertermittlungsstichtag 01.01.2026 · Stichprobe 165 Kauffälle · Lagesowst „Weyhe/Stuhr“"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_rh_sulverdhstsywe/dash.pdf?Sach=250000 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 1,17, Weyhe/Stuhr"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_rh_sulverdhstsywe/dash.pdf?Sach=175000 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 1,39, Weyhe/Stuhr"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 165,
+  "streuung": 0.17,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_sulverdhstsywe",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_rh_sulverdhstsywe, Lagesowst „Weyhe/Stuhr“"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03251047",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Weyhe",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehendes Einfamilienhaus",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "200000": 1.11,
+    "250000": 1.04,
+    "300000": 0.98,
+    "350000": 0.93,
+    "400000": 0.89,
+    "450000": 0.85,
+    "500000": 0.82,
+    "550000": 0.79,
+    "600000": 0.76,
+    "650000": 0.74,
+    "700000": 0.71,
+    "750000": 0.69,
+    "800000": 0.67,
+    "850000": 0.65
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Lagesowst „Stuhr/Weyhe“, Zawo „Einfamilienhaus“ — die Vorgaben des Kalkulators; Stichprobe 368 Kauffälle: vorläufiger Sachwert 169.000–867.000 € (Median 405.000), Bodenrichtwert 50–380 €/m² (Median 248).",
+   "hinweis": "14 Stützstellen am amtlichen Kalkulator 2026_sw_efh_sulverdhstsywe abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen), Lagesowst „Stuhr/Weyhe“, Zawo „Einfamilienhaus“: vorläufiger Sachwert 200000–850000 € — DIESES MODELL KENNT KEINEN BODENRICHTWERT, nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 400000 €) weist der Kalkulator 0,89 ± 0,13 aus; PDF-Export Lagesowst=2: „Stuhr/Weyhe“, 0,89 (Zelle 0,89)."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "2.0": 0.85,
+     "2.5": 1,
+     "3.0": 1.11,
+     "3.5": 1.21,
+     "4.0": 1.29
+    },
+    "rundung_stellen": 2,
+    "hinweis": "5 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten für abweichende Standardstufen“ des Kalkulators), zwischen ihnen linear interpoliert, über den Rand hinaus nicht verlängert. Zuordnung der Beschriftungen zu den Stützstellen gegen den Rechner geprüft: größte Abweichung vom Quotienten am Normobjekt 0,011."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Weyhe",
+   "lage_dokument": "Stuhr/Weyhe",
+   "lage_parameter": "Lagesowst",
+   "zuordnung_hinweis": "Der Kalkulator nennt die Gemeinde selbst („Syke“ bzw. „Stuhr/Weyhe“); er gilt laut Titel nur für Stuhr, Syke und Weyhe.",
+   "objektarten": [
+    "efh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "zfh",
+    "dhh",
+    "rh",
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_efh_sulverdhstsywe (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein freistehendes Ein- und Zweifamilienhaus | Stuhr, Syke, Weyhe · Wertermittlungsstichtag 01.01.2026 · Stichprobe 368 Kauffälle · Lagesowst „Stuhr/Weyhe“, Zawo „Einfamilienhaus“"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_efh_sulverdhstsywe/dash.pdf?Lagesowst=2 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 0,89, Stuhr/Weyhe"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 368,
+  "streuung": 0.13,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_sulverdhstsywe",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_efh_sulverdhstsywe, Lagesowst „Stuhr/Weyhe“, Zawo „Einfamilienhaus“"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03251047",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Weyhe",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "zfh",
+  "objektart_bez": "Zweifamilienhaus oder Einfamilienhaus mit Einliegerwohnung",
+  "formel": {
+   "form": "stufen_1d",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "stufen": {
+    "200000": 1.05,
+    "250000": 0.98,
+    "300000": 0.92,
+    "350000": 0.87,
+    "400000": 0.83,
+    "450000": 0.8,
+    "500000": 0.77,
+    "550000": 0.74,
+    "600000": 0.71,
+    "650000": 0.69,
+    "700000": 0.66,
+    "750000": 0.64,
+    "800000": 0.62,
+    "850000": 0.61
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Lagesowst „Stuhr/Weyhe“, Zawo „Zweifam.hs./mit Einliegerwohnung“ — die Vorgaben des Kalkulators; Stichprobe 368 Kauffälle: vorläufiger Sachwert 169.000–867.000 € (Median 405.000), Bodenrichtwert 50–380 €/m² (Median 248).",
+   "hinweis": "14 Stützstellen am amtlichen Kalkulator 2026_sw_efh_sulverdhstsywe abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen), Lagesowst „Stuhr/Weyhe“, Zawo „Zweifam.hs./mit Einliegerwohnung“: vorläufiger Sachwert 200000–850000 € — DIESES MODELL KENNT KEINEN BODENRICHTWERT, nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 400000 €) weist der Kalkulator 0,83 ± 0,13 aus."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "2.0": 0.85,
+     "2.5": 1,
+     "3.0": 1.11,
+     "3.5": 1.21,
+     "4.0": 1.29
+    },
+    "rundung_stellen": 2,
+    "hinweis": "5 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten für abweichende Standardstufen“ des Kalkulators), zwischen ihnen linear interpoliert, über den Rand hinaus nicht verlängert. Zuordnung der Beschriftungen zu den Stützstellen gegen den Rechner geprüft: größte Abweichung vom Quotienten am Normobjekt 0,011."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Weyhe",
+   "lage_dokument": "Stuhr/Weyhe",
+   "lage_parameter": "Lagesowst",
+   "zuordnung_hinweis": "Der Kalkulator nennt die Gemeinde selbst („Syke“ bzw. „Stuhr/Weyhe“); er gilt laut Titel nur für Stuhr, Syke und Weyhe.",
+   "objektarten": [
+    "zfh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "dhh",
+    "rh",
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_efh_sulverdhstsywe (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein freistehendes Ein- und Zweifamilienhaus | Stuhr, Syke, Weyhe · Wertermittlungsstichtag 01.01.2026 · Stichprobe 368 Kauffälle · Lagesowst „Stuhr/Weyhe“, Zawo „Zweifam.hs./mit Einliegerwohnung“"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 368,
+  "streuung": 0.13,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_sulverdhstsywe",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_efh_sulverdhstsywe, Lagesowst „Stuhr/Weyhe“, Zawo „Zweifam.hs./mit Einliegerwohnung“"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03251",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich übriger Landkreis Diepholz",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehendes Einfamilienhaus",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    100000,
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000
+   ],
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenrichtwert in €/m²",
+   "achse_y": [
+    20,
+    45,
+    75,
+    90,
+    105,
+    135,
+    165
+   ],
+   "zellen": {
+    "20": [
+     1.15,
+     1.04,
+     0.96,
+     0.9,
+     0.85,
+     0.81,
+     0.77,
+     0.74,
+     0.71,
+     0.69,
+     0.66,
+     0.64,
+     0.62
+    ],
+    "45": [
+     1.16,
+     1.05,
+     0.98,
+     0.91,
+     0.86,
+     0.82,
+     0.79,
+     0.75,
+     0.72,
+     0.7,
+     0.67,
+     0.65,
+     0.63
+    ],
+    "75": [
+     1.17,
+     1.07,
+     0.99,
+     0.92,
+     0.87,
+     0.83,
+     0.8,
+     0.76,
+     0.73,
+     0.71,
+     0.68,
+     0.66,
+     0.64
+    ],
+    "90": [
+     1.18,
+     1.07,
+     0.99,
+     0.93,
+     0.88,
+     0.84,
+     0.8,
+     0.77,
+     0.74,
+     0.71,
+     0.69,
+     0.67,
+     0.65
+    ],
+    "105": [
+     1.18,
+     1.07,
+     1,
+     0.93,
+     0.88,
+     0.84,
+     0.8,
+     0.77,
+     0.74,
+     0.72,
+     0.69,
+     0.67,
+     0.65
+    ],
+    "135": [
+     1.19,
+     1.08,
+     1,
+     0.94,
+     0.89,
+     0.85,
+     0.81,
+     0.78,
+     0.75,
+     0.72,
+     0.7,
+     0.68,
+     0.66
+    ],
+    "165": [
+     1.2,
+     1.09,
+     1.01,
+     0.95,
+     0.9,
+     0.85,
+     0.82,
+     0.78,
+     0.75,
+     0.73,
+     0.7,
+     0.68,
+     0.66
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Bruttogrundfläche/Wohnfläche 2,0 · Zawo „Einfamilienhaus“ — die Vorgaben des Kalkulators; Stichprobe 663 Kauffälle: vorläufiger Sachwert 78.000–717.000 € (Median 292.000), Bodenrichtwert 16–165 €/m² (Median 64).",
+   "hinweis": "91 Stützstellen am amtlichen Kalkulator 2026_sw_efh_sulverdhostsywe abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen), Zawo „Einfamilienhaus“: vorläufiger Sachwert 100000–700000 €, Bodenrichtwert 20–165 €/m², nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 400000 €, BRW 90) weist der Kalkulator 0,8 ± 0,13 aus; PDF-Export Sach=300000: „Einfamilienhaus“, 0,88 (Zelle 0,88); PDF-Export Brw=135: „Einfamilienhaus“, 0,81 (Zelle 0,81)."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.5": 0.81,
+     "2.0": 0.92,
+     "2.5": 1,
+     "3.0": 1.06,
+     "3.5": 1.11,
+     "4.0": 1.15
+    },
+    "rundung_stellen": 2,
+    "hinweis": "6 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten für abweichende Standardstufen“ des Kalkulators), zwischen ihnen linear interpoliert, über den Rand hinaus nicht verlängert. Zuordnung der Beschriftungen zu den Stützstellen gegen den Rechner geprüft: größte Abweichung vom Quotienten am Normobjekt 0,013."
+   },
+   {
+    "bez": "Abweichendes Verhältnis Bruttogrundfläche zu Wohnfläche",
+    "feld": "bgf_wfl",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.2": 1.08,
+     "1.4": 1.06,
+     "1.6": 1.03,
+     "1.8": 1.01,
+     "2.0": 1,
+     "2.2": 0.99,
+     "2.4": 0.98,
+     "2.6": 0.95,
+     "2.8": 0.94,
+     "3.0": 0.93,
+     "3.2": 0.93,
+     "3.4": 0.92,
+     "3.6": 0.91,
+     "3.8": 0.9
+    },
+    "rundung_stellen": 2,
+    "hinweis": "14 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten bei abweichendem Verhältnis von Bruttogrundfläche zu Wohnfläche“), Normstelle 2,0, gegen den Rechner geprüft (größte Abweichung 0,013). Das Feld `bgf_wfl` ist ein VERHÄLTNIS und wird nicht erhoben; ohne die Angabe rechnet das Modell am Normobjekt — so, wie es der Kalkulator selbst vorgibt."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Diepholz ohne Stuhr, Syke und Weyhe",
+   "hinweis": "Stuhr, Syke und Weyhe tragen eigene Gemeindesätze aus dem Kalkulator 2026_sw_efh_sulverdhstsywe.",
+   "objektarten": [
+    "efh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "zfh",
+    "dhh",
+    "rh",
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_efh_sulverdhostsywe (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein freistehendes Ein- und Zweifamilienhaus | Übriger Landkreis Diepholz · Wertermittlungsstichtag 01.01.2026 · Stichprobe 663 Kauffälle · Zawo „Einfamilienhaus“"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_efh_sulverdhostsywe/dash.pdf?Sach=300000 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 0,88, Einfamilienhaus"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_efh_sulverdhostsywe/dash.pdf?Brw=135 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 0,81, Einfamilienhaus"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 663,
+  "streuung": 0.13,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_sulverdhostsywe",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_efh_sulverdhostsywe, Zawo „Einfamilienhaus“"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03251",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich übriger Landkreis Diepholz",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "zfh",
+  "objektart_bez": "Zweifamilienhaus oder Einfamilienhaus mit Einliegerwohnung",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    100000,
+    150000,
+    200000,
+    250000,
+    300000,
+    350000,
+    400000,
+    450000,
+    500000,
+    550000,
+    600000,
+    650000,
+    700000
+   ],
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenrichtwert in €/m²",
+   "achse_y": [
+    20,
+    45,
+    75,
+    90,
+    105,
+    135,
+    165
+   ],
+   "zellen": {
+    "20": [
+     1.1,
+     1,
+     0.92,
+     0.86,
+     0.81,
+     0.77,
+     0.74,
+     0.71,
+     0.68,
+     0.65,
+     0.63,
+     0.61,
+     0.59
+    ],
+    "45": [
+     1.12,
+     1.01,
+     0.93,
+     0.87,
+     0.82,
+     0.78,
+     0.75,
+     0.72,
+     0.69,
+     0.66,
+     0.64,
+     0.62,
+     0.6
+    ],
+    "75": [
+     1.13,
+     1.02,
+     0.94,
+     0.88,
+     0.83,
+     0.79,
+     0.76,
+     0.73,
+     0.7,
+     0.67,
+     0.65,
+     0.63,
+     0.61
+    ],
+    "90": [
+     1.13,
+     1.03,
+     0.95,
+     0.89,
+     0.84,
+     0.8,
+     0.76,
+     0.73,
+     0.7,
+     0.68,
+     0.65,
+     0.63,
+     0.61
+    ],
+    "105": [
+     1.14,
+     1.03,
+     0.95,
+     0.89,
+     0.84,
+     0.8,
+     0.76,
+     0.73,
+     0.7,
+     0.68,
+     0.66,
+     0.63,
+     0.61
+    ],
+    "135": [
+     1.15,
+     1.04,
+     0.96,
+     0.9,
+     0.85,
+     0.81,
+     0.77,
+     0.74,
+     0.71,
+     0.69,
+     0.66,
+     0.64,
+     0.62
+    ],
+    "165": [
+     1.15,
+     1.04,
+     0.97,
+     0.91,
+     0.86,
+     0.81,
+     0.78,
+     0.75,
+     0.72,
+     0.69,
+     0.67,
+     0.65,
+     0.63
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 · Bruttogrundfläche/Wohnfläche 2,0 · Zawo „Zweifam.hs./mit Einliegerwohnung“ — die Vorgaben des Kalkulators; Stichprobe 663 Kauffälle: vorläufiger Sachwert 78.000–717.000 € (Median 292.000), Bodenrichtwert 16–165 €/m² (Median 64).",
+   "hinweis": "91 Stützstellen am amtlichen Kalkulator 2026_sw_efh_sulverdhostsywe abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen), Zawo „Zweifam.hs./mit Einliegerwohnung“: vorläufiger Sachwert 100000–700000 €, Bodenrichtwert 20–165 €/m², nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 400000 €, BRW 90) weist der Kalkulator 0,76 ± 0,13 aus; PDF-Export Zawo=2: „Zweifam“, 0,76 (Zelle 0,76)."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.5": 0.81,
+     "2.0": 0.92,
+     "2.5": 1,
+     "3.0": 1.06,
+     "3.5": 1.11,
+     "4.0": 1.15
+    },
+    "rundung_stellen": 2,
+    "hinweis": "6 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten für abweichende Standardstufen“ des Kalkulators), zwischen ihnen linear interpoliert, über den Rand hinaus nicht verlängert. Zuordnung der Beschriftungen zu den Stützstellen gegen den Rechner geprüft: größte Abweichung vom Quotienten am Normobjekt 0,013."
+   },
+   {
+    "bez": "Abweichendes Verhältnis Bruttogrundfläche zu Wohnfläche",
+    "feld": "bgf_wfl",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.2": 1.08,
+     "1.4": 1.06,
+     "1.6": 1.03,
+     "1.8": 1.01,
+     "2.0": 1,
+     "2.2": 0.99,
+     "2.4": 0.98,
+     "2.6": 0.95,
+     "2.8": 0.94,
+     "3.0": 0.93,
+     "3.2": 0.93,
+     "3.4": 0.92,
+     "3.6": 0.91,
+     "3.8": 0.9
+    },
+    "rundung_stellen": 2,
+    "hinweis": "14 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten bei abweichendem Verhältnis von Bruttogrundfläche zu Wohnfläche“), Normstelle 2,0, gegen den Rechner geprüft (größte Abweichung 0,013). Das Feld `bgf_wfl` ist ein VERHÄLTNIS und wird nicht erhoben; ohne die Angabe rechnet das Modell am Normobjekt — so, wie es der Kalkulator selbst vorgibt."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Diepholz ohne Stuhr, Syke und Weyhe",
+   "hinweis": "Stuhr, Syke und Weyhe tragen eigene Gemeindesätze aus dem Kalkulator 2026_sw_efh_sulverdhstsywe.",
+   "objektarten": [
+    "zfh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "dhh",
+    "rh",
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_efh_sulverdhostsywe (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein freistehendes Ein- und Zweifamilienhaus | Übriger Landkreis Diepholz · Wertermittlungsstichtag 01.01.2026 · Stichprobe 663 Kauffälle · Zawo „Zweifam.hs./mit Einliegerwohnung“"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_efh_sulverdhostsywe/dash.pdf?Zawo=2 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 0,76, Zweifam"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 663,
+  "streuung": 0.13,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_sulverdhostsywe",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_efh_sulverdhostsywe, Zawo „Zweifam.hs./mit Einliegerwohnung“"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03256",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich Landkreis Nienburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhaus, Doppelhaushälfte",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    75000,
+    100000,
+    125000,
+    150000,
+    175000,
+    200000,
+    225000,
+    250000,
+    275000,
+    300000,
+    325000,
+    350000,
+    375000,
+    400000
+   ],
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenrichtwert in €/m²",
+   "achse_y": [
+    30,
+    70,
+    120,
+    150,
+    170,
+    220,
+    270
+   ],
+   "zellen": {
+    "30": [
+     1.29,
+     1.17,
+     1.08,
+     1,
+     0.94,
+     0.89,
+     0.84,
+     0.8,
+     0.76,
+     0.73,
+     0.69,
+     0.67,
+     0.64,
+     0.62
+    ],
+    "70": [
+     1.39,
+     1.26,
+     1.17,
+     1.09,
+     1.02,
+     0.97,
+     0.92,
+     0.87,
+     0.83,
+     0.8,
+     0.76,
+     0.73,
+     0.71,
+     0.68
+    ],
+    "120": [
+     1.46,
+     1.33,
+     1.23,
+     1.15,
+     1.08,
+     1.02,
+     0.97,
+     0.93,
+     0.89,
+     0.85,
+     0.82,
+     0.78,
+     0.76,
+     0.73
+    ],
+    "150": [
+     1.49,
+     1.36,
+     1.26,
+     1.18,
+     1.11,
+     1.05,
+     1,
+     0.95,
+     0.91,
+     0.87,
+     0.84,
+     0.81,
+     0.78,
+     0.75
+    ],
+    "170": [
+     1.51,
+     1.38,
+     1.27,
+     1.19,
+     1.12,
+     1.06,
+     1.01,
+     0.97,
+     0.92,
+     0.89,
+     0.85,
+     0.82,
+     0.79,
+     0.76
+    ],
+    "220": [
+     1.54,
+     1.41,
+     1.31,
+     1.23,
+     1.16,
+     1.1,
+     1.04,
+     1,
+     0.95,
+     0.92,
+     0.88,
+     0.85,
+     0.82,
+     0.79
+    ],
+    "270": [
+     1.58,
+     1.44,
+     1.34,
+     1.25,
+     1.18,
+     1.12,
+     1.07,
+     1.02,
+     0.98,
+     0.94,
+     0.91,
+     0.87,
+     0.84,
+     0.81
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 — die Vorgaben des Kalkulators; Stichprobe 149 Kauffälle: vorläufiger Sachwert 68.000–403.000 € (Median 184.000), Bodenrichtwert 26–270 €/m² (Median 86).",
+   "hinweis": "98 Stützstellen am amtlichen Kalkulator 2026_sw_rh_sulverni abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen): vorläufiger Sachwert 75000–400000 €, Bodenrichtwert 30–270 €/m², nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 250000 €, BRW 150) weist der Kalkulator 0,95 ± 0,17 aus; PDF-Export Sach=150000: 1,18 (Zelle 1,18); PDF-Export Brw=70: 0,87 (Zelle 0,87)."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.5": 0.67,
+     "2.0": 0.86,
+     "2.5": 1,
+     "3.0": 1.12,
+     "3.5": 1.2,
+     "4.0": 1.28
+    },
+    "rundung_stellen": 2,
+    "hinweis": "6 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten für abweichende Standardstufen“ des Kalkulators), zwischen ihnen linear interpoliert, über den Rand hinaus nicht verlängert. Zuordnung der Beschriftungen zu den Stützstellen gegen den Rechner geprüft: größte Abweichung vom Quotienten am Normobjekt 0,017."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Nienburg (Weser) einschließlich der Stadt Nienburg",
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_rh_sulverni (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein Reihenhaus oder Doppelhaushälfte | Landkreis Nienburg · Wertermittlungsstichtag 01.01.2026 · Stichprobe 149 Kauffälle"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_rh_sulverni/dash.pdf?Sach=150000 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 1,18"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_rh_sulverni/dash.pdf?Brw=70 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 0,87"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 149,
+  "streuung": 0.17,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_sulverni",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_rh_sulverni"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03256022",
+  "ebene": "gemeinde",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Nienburg (Weser), Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhaus, Doppelhaushälfte",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    75000,
+    100000,
+    125000,
+    150000,
+    175000,
+    200000,
+    225000,
+    250000,
+    275000,
+    300000,
+    325000,
+    350000,
+    375000,
+    400000
+   ],
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenrichtwert in €/m²",
+   "achse_y": [
+    30,
+    70,
+    120,
+    150,
+    170,
+    220,
+    270
+   ],
+   "zellen": {
+    "30": [
+     1.29,
+     1.17,
+     1.08,
+     1,
+     0.94,
+     0.89,
+     0.84,
+     0.8,
+     0.76,
+     0.73,
+     0.69,
+     0.67,
+     0.64,
+     0.62
+    ],
+    "70": [
+     1.39,
+     1.26,
+     1.17,
+     1.09,
+     1.02,
+     0.97,
+     0.92,
+     0.87,
+     0.83,
+     0.8,
+     0.76,
+     0.73,
+     0.71,
+     0.68
+    ],
+    "120": [
+     1.46,
+     1.33,
+     1.23,
+     1.15,
+     1.08,
+     1.02,
+     0.97,
+     0.93,
+     0.89,
+     0.85,
+     0.82,
+     0.78,
+     0.76,
+     0.73
+    ],
+    "150": [
+     1.49,
+     1.36,
+     1.26,
+     1.18,
+     1.11,
+     1.05,
+     1,
+     0.95,
+     0.91,
+     0.87,
+     0.84,
+     0.81,
+     0.78,
+     0.75
+    ],
+    "170": [
+     1.51,
+     1.38,
+     1.27,
+     1.19,
+     1.12,
+     1.06,
+     1.01,
+     0.97,
+     0.92,
+     0.89,
+     0.85,
+     0.82,
+     0.79,
+     0.76
+    ],
+    "220": [
+     1.54,
+     1.41,
+     1.31,
+     1.23,
+     1.16,
+     1.1,
+     1.04,
+     1,
+     0.95,
+     0.92,
+     0.88,
+     0.85,
+     0.82,
+     0.79
+    ],
+    "270": [
+     1.58,
+     1.44,
+     1.34,
+     1.25,
+     1.18,
+     1.12,
+     1.07,
+     1.02,
+     0.98,
+     0.94,
+     0.91,
+     0.87,
+     0.84,
+     0.81
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": "Standardstufe 2,5 — die Vorgaben des Kalkulators; Stichprobe 149 Kauffälle: vorläufiger Sachwert 68.000–403.000 € (Median 184.000), Bodenrichtwert 26–270 €/m² (Median 86).",
+   "hinweis": "98 Stützstellen am amtlichen Kalkulator 2026_sw_rh_sulverni abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen): vorläufiger Sachwert 75000–400000 €, Bodenrichtwert 30–270 €/m², nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 250000 €, BRW 150) weist der Kalkulator 0,95 ± 0,17 aus; PDF-Export Sach=150000: 1,18 (Zelle 1,18); PDF-Export Brw=70: 0,87 (Zelle 0,87)."
+  },
+  "korrekturen": [
+   {
+    "bez": "Abweichende Standardstufe",
+    "feld": "standardstufe",
+    "art": "stufen",
+    "wirkung": "multiplikativ",
+    "stufen": {
+     "1.5": 0.67,
+     "2.0": 0.86,
+     "2.5": 1,
+     "3.0": 1.12,
+     "3.5": 1.2,
+     "4.0": 1.28
+    },
+    "rundung_stellen": 2,
+    "hinweis": "6 abgedruckte Stützstellen (Diagramm „Umrechnungskoeffizienten für abweichende Standardstufen“ des Kalkulators), zwischen ihnen linear interpoliert, über den Rand hinaus nicht verlängert. Zuordnung der Beschriftungen zu den Stützstellen gegen den Rechner geprüft: größte Abweichung vom Quotienten am Normobjekt 0,017."
+   }
+  ],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Nienburg (Weser) einschließlich der Stadt Nienburg",
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "mfh",
+    "etw"
+   ],
+   "hinweis_kopie": "Kopie des Kreissatzes auf Gemeindeebene: die Stadt trägt einen eigenen EFH-Satz (Kalkulator 2026_sw_efh_sulvernistni), und ohne die Kopie fände die Gemeindeebene keinen Reihenhaus-Faktor. Der Reihenhaus-Kalkulator gilt laut Titel für den ganzen Landkreis."
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_rh_sulverni (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein Reihenhaus oder Doppelhaushälfte | Landkreis Nienburg · Wertermittlungsstichtag 01.01.2026 · Stichprobe 149 Kauffälle"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_rh_sulverni/dash.pdf?Sach=150000 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 1,18"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_rh_sulverni/dash.pdf?Brw=70 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 0,87"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 149,
+  "streuung": 0.17,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_sulverni",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_rh_sulverni"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03358",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich Landkreis Heidekreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhaus, Doppelhaushälfte",
+  "formel": {
+   "form": "matrix_interp",
+   "achse_x_feld": "sachwert",
+   "achse_x_bez": "vorläufiger Sachwert in Euro",
+   "achse_x": [
+    100000,
+    125000,
+    150000,
+    175000,
+    200000,
+    225000,
+    250000,
+    275000,
+    300000,
+    325000,
+    350000
+   ],
+   "achse_y_feld": "brw",
+   "achse_y_bez": "Bodenrichtwert in €/m²",
+   "achse_y": [
+    45,
+    70,
+    90,
+    95,
+    120,
+    145,
+    170
+   ],
+   "zellen": {
+    "45": [
+     1.07,
+     1.05,
+     1.03,
+     1.02,
+     1,
+     0.99,
+     0.98,
+     0.96,
+     0.95,
+     0.94,
+     0.93
+    ],
+    "70": [
+     1.1,
+     1.08,
+     1.07,
+     1.05,
+     1.03,
+     1.02,
+     1.01,
+     0.99,
+     0.98,
+     0.97,
+     0.96
+    ],
+    "90": [
+     1.12,
+     1.1,
+     1.08,
+     1.07,
+     1.05,
+     1.04,
+     1.03,
+     1.01,
+     1,
+     0.99,
+     0.98
+    ],
+    "95": [
+     1.13,
+     1.11,
+     1.09,
+     1.07,
+     1.06,
+     1.04,
+     1.03,
+     1.02,
+     1.01,
+     0.99,
+     0.98
+    ],
+    "120": [
+     1.15,
+     1.13,
+     1.11,
+     1.09,
+     1.08,
+     1.06,
+     1.05,
+     1.04,
+     1.02,
+     1.01,
+     1
+    ],
+    "145": [
+     1.16,
+     1.14,
+     1.12,
+     1.11,
+     1.09,
+     1.08,
+     1.07,
+     1.05,
+     1.04,
+     1.03,
+     1.02
+    ],
+    "170": [
+     1.18,
+     1.16,
+     1.14,
+     1.12,
+     1.11,
+     1.09,
+     1.08,
+     1.07,
+     1.06,
+     1.04,
+     1.03
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "normobjekt": " — die Vorgaben des Kalkulators; Stichprobe 170 Kauffälle: vorläufiger Sachwert 84.000–374.000 € (Median 187.000), Bodenrichtwert 44–170 €/m² (Median 84).",
+   "hinweis": "77 Stützstellen am amtlichen Kalkulator 2026_sw_rh_sulverhk abgefragt (Sitzung, Parameter gesetzt, Ergebnisfeld „Sachwertfaktor“ aus dem Vektorbild des Dashboards gelesen): vorläufiger Sachwert 100000–350000 €, Bodenrichtwert 45–170 €/m², nur innerhalb der Stichprobe und des Eingabebereichs. Zwischen den Stützstellen linear, darüber hinaus nicht verlängert. GEGENPROBE: am Normpunkt (Sachwert 300000 €, BRW 90) weist der Kalkulator 1 ± 0,18 aus; PDF-Export Sach=150000: 1,08 (Zelle 1,08); PDF-Export Brw=145: 1,04 (Zelle 1,04)."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "wortlaut": "Aus der Modellbeschreibung Sachwertfaktoren des Ausschusses: „Die vorliegenden Sachwertfaktoren wurden in einem Sachwertmodell mit linearer Alterswertminderung ermittelt (§ 38 ImmoWertV). Dabei wird das lineare Verhaeltnis der wirtschaftlichen Restnutzungsdauer zur Gesamtnutzungsdauer des Gebaeudes beruecksichtigt. Die Gesamtnutzungsdauer betraegt 80 Jahre.“",
+   "nhk": "NHK 2010 aus Anlage 4 ImmoWertV; Umsatzsteuer und uebliche Baunebenkosten in den Kostenkennwerten enthalten",
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "rnd": "Modellgroesse nach § 4 Abs. 3 ImmoWertV, bei Modernisierungen verlaengert nach Anlage 2 ImmoWertV",
+   "bezugsmassstab": "Brutto-Grundflaeche nach DIN 277-1:2005-02, nur ueberdeckte Grundflaechen der Bereiche a und b",
+   "bodenwert": "Bodenrichtwert, gegebenenfalls angepasst mit Umrechnungskoeffizienten; Vergleichswertverfahren nach §§ 40 bis 43 ImmoWertV",
+   "aussenanlagen": "pauschale Wertansaetze im Sachwertmodell",
+   "quelle_modellbeschreibung": "Modellbeschreibung Sachwertfaktoren 2026 des zustaendigen Gutachterausschusses, abrufbar ueber gag.niedersachsen.de",
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+   "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+   "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867"
+  },
+  "geltungsbereich": {
+   "raeumlich": "Landkreis Heidekreis",
+   "objektarten": [
+    "dhh",
+    "rh"
+   ],
+   "objektarten_ausgeschlossen": [
+    "efh",
+    "zfh",
+    "mfh",
+    "etw"
+   ]
+  },
+  "belege": [
+   {
+    "fundstelle": "Kalkulator 2026_sw_rh_sulverhk (Tableau Public, Profil ogagmd2026), Dashboard „dash“, Feld „Sachwertfaktor“; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen / Datenbasis: 01.01.2026 / Tag der Veröffentlichung: 02.03.2026",
+    "wortlaut": "Sachwertfaktoren für ein Reihenhaus oder Doppelhaushälfte | Landkreis Heidekreis · Wertermittlungsstichtag 01.01.2026 · Stichprobe 170 Kauffälle"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_rh_sulverhk/dash.pdf?Sach=150000 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 1,08"
+   },
+   {
+    "fundstelle": "PDF-Export des Kalkulators, https://public.tableau.com/views/2026_sw_rh_sulverhk/dash.pdf?Brw=145 (abgerufen 2026-10-23)",
+    "wortlaut": "Sachwertfaktor 1,04"
+   },
+   {
+    "fundstelle": "Nutzungsbedingungen der Grundstücksmarktberichte und Landesgrundstücksmarktdaten, https://www.gag.niedersachsen.de/startseite/grundstucksmarktberichte/nutzungsbedingungen/nutzungsbedingungen-197313.html (gelesen 23.10.2026)",
+    "wortlaut": "Für die Grundstücksmarktberichte und Landesgrundstücksmarktdaten gilt die Lizenz \"Datenlizenz Deutschland – Namensnennung – Version 2.0\" (dl-de/by-2-0). … unter Angabe der Quelle © Gutachterausschuss für Grundstückswerte [Name des Ausschusses] [Jahr] … Zusätzlich ist die Internetadresse https://immobilienmarkt.niedersachsen.de anzugeben."
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Stufe B statt A: die Werte sind am amtlichen Kalkulator abgefragt, nicht aus einer abgedruckten Tabelle übernommen; die Stützstellen sind von uns gewählt (innerhalb der Stichprobe). Die Korrekturkurven sind die vom Ausschuss abgedruckten Diagrammwerte.",
+  "fallzahl": 170,
+  "streuung": 0.18,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMI 2026 (Kalkulator)",
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_sulverhk",
+  "quelle_parser": "v2887-WSV",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Sulingen-Verden 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "verwendung": "produkt",
+  "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche nach DIN 277-1:2005-02, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre, Baupreisindex zum Kaufzeitpunkt) und nur im genannten Gebiet. Die Umrechnungskoeffizienten sind die abgedruckten Diagrammwerte; der Kalkulator rechnet bei abweichenden Merkmalen mit seiner Regressionsfunktion und kann davon um bis zu drei Hundertstel abweichen.",
+  "fundstelle": "Grundstücksmarktinformationen Niedersachsen 2026, Sachwertfaktor, Kalkulator 2026_sw_rh_sulverhk"
+ },
+ {
+  "land_code": "NI",
+  "ags": "03361",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich Landkreis Verden",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": null,
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Kalkulator 2026_sw_rh_sulverver (Tableau Public, Profil ogagmd2026), Parameter „Lagebrem“ [1 = Bremer Umland, 2 = Übriger Landkreis], Dashboard-Tabelle „Umrechnungskoeffizienten für weitere wertbeeinflussende Merkmale“ (gelesen 23.10.2026)"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": null,
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_sulverver",
+  "quelle_parser": "v2887-hand (Kalkulator-Sitzung, gelesen am 23.10.2026)",
+  "quellenvermerk": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "fundstelle": "Kalkulator 2026_sw_rh_sulverver (Tableau Public, Profil ogagmd2026), Parameter „Lagebrem“ [1 = Bremer Umland, 2 = Übriger Landkreis], Dashboard-Tabelle „Umrechnungskoeffizienten für weitere wertbeeinflussende Merkmale“ (gelesen 23.10.2026)",
+  "auflagen": [
+   "KEIN Nachbarkreis und kein Landesmittel."
+  ],
+  "zugang": "kostenfrei",
+  "warum_kein_wert": "Der Kalkulator 2026_sw_rh_sulverver (Reihenhäuser und Doppelhaushälften, Landkreis Verden, Wertermittlungsstichtag 01.01.2026, 226 Kauffälle, frei abrufbar) staffelt den Sachwertfaktor nach zwei Lagen: „Lage im Bremer Umland“ und „Lage im übrigen Landkreis“ (die Tabelle „Umrechnungskoeffizienten für weitere wertbeeinflussende Merkmale“ druckt dazu 1,00 und 1,08). Welche Gemeinden oder Ortsteile zum Bremer Umland gehören, nennt der Kalkulator nicht; eine geratene Lage wäre teurer als gar kein Wert (acht Prozent). WEG ZUR QUELLE: Kalkulator unter dem Link, Lage dort selbst wählen; den Faktor als eigene Angabe eintragen.",
+  "unvollstaendig_grund": "Der Kalkulator 2026_sw_rh_sulverver (Reihenhäuser und Doppelhaushälften, Landkreis Verden, Wertermittlungsstichtag 01.01.2026, 226 Kauffälle, frei abrufbar) staffelt den Sachwertfaktor nach zwei Lagen: „Lage im Bremer Umland“ und „Lage im übrigen Landkreis“ (die Tabelle „Umrechnungskoeffizienten für weitere wertbeeinflussende Merkmale“ druckt dazu 1,00 und 1,08). Welche Gemeinden oder Ortsteile zum Bremer Umland gehören, nennt der Kalkulator nicht; eine geratene Lage wäre teurer als gar kein Wert (acht Prozent). WEG ZUR QUELLE: Kalkulator unter dem Link, Lage dort selbst wählen; den Faktor als eigene Angabe eintragen.",
+  "vollstaendig": false
+ },
+ {
+  "land_code": "NI",
+  "ags": "03256",
+  "ebene": "kreis",
+  "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich Landkreis Nienburg ohne Stadt Nienburg",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": null,
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Kalkulator 2026_sw_efh_sulverniostni (Tableau Public, Profil ogagmd2026), Parameter „Lagenisnst“ [Nordkreis, Südkreis, Stadtrand Nienburg], Blatt „ni2_efh_tab“ (gelesen 23.10.2026)"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "berichtsjahr": 2026,
+  "modellversion": null,
+  "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_sulverniostni",
+  "quelle_parser": "v2887-hand (Kalkulator-Sitzung, gelesen am 23.10.2026)",
+  "quellenvermerk": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "fundstelle": "Kalkulator 2026_sw_efh_sulverniostni (Tableau Public, Profil ogagmd2026), Parameter „Lagenisnst“ [Nordkreis, Südkreis, Stadtrand Nienburg], Blatt „ni2_efh_tab“ (gelesen 23.10.2026)",
+  "auflagen": [
+   "KEIN Nachbarkreis und kein Landesmittel."
+  ],
+  "zugang": "kostenfrei",
+  "warum_kein_wert": "Für den Landkreis Nienburg OHNE die Stadt Nienburg führt der Ausschuss einen eigenen Kalkulator (2026_sw_efh_sulverniostni, freistehende Ein- und Zweifamilienhäuser, Wertermittlungsstichtag 01.01.2026, 574 Kauffälle, frei abrufbar) mit drei Lagen: „Lage im nördlichen Landkreis“, „Lage im südlichen Landkreis“ und „Lage in den Randgemeinden zur Stadt Nienburg“ (die Tabelle „Umrechnungskoeffizienten für weitere wertbeeinflussende Merkmale“ druckt dazu 1,05, 1,00 und 1,00). Welche Gemeinden zu welcher Lage gehören, nennt der Kalkulator nicht, und der Kalkulator hat kein Bodenrichtwert-Feld; eine geratene Lage wäre teurer als gar kein Wert. Bis v2882 galt hier der Satz der STADT Nienburg für den ganzen Kreis. Reihenhäuser und Doppelhaushälften haben einen eigenen, kreisweiten Satz. WEG ZUR QUELLE: Kalkulator unter dem Link, Lage dort selbst wählen; den Faktor als eigene Angabe eintragen.",
+  "unvollstaendig_grund": "Für den Landkreis Nienburg OHNE die Stadt Nienburg führt der Ausschuss einen eigenen Kalkulator (2026_sw_efh_sulverniostni, freistehende Ein- und Zweifamilienhäuser, Wertermittlungsstichtag 01.01.2026, 574 Kauffälle, frei abrufbar) mit drei Lagen: „Lage im nördlichen Landkreis“, „Lage im südlichen Landkreis“ und „Lage in den Randgemeinden zur Stadt Nienburg“ (die Tabelle „Umrechnungskoeffizienten für weitere wertbeeinflussende Merkmale“ druckt dazu 1,05, 1,00 und 1,00). Welche Gemeinden zu welcher Lage gehören, nennt der Kalkulator nicht, und der Kalkulator hat kein Bodenrichtwert-Feld; eine geratene Lage wäre teurer als gar kein Wert. Bis v2882 galt hier der Satz der STADT Nienburg für den ganzen Kreis. Reihenhäuser und Doppelhaushälften haben einen eigenen, kreisweiten Satz. WEG ZUR QUELLE: Kalkulator unter dem Link, Lage dort selbst wählen; den Faktor als eigene Angabe eintragen.",
+  "vollstaendig": false
+ }
+]

@@ -11214,7 +11214,7 @@
       var _zv = _rfNum(_rf.data.fields.zve);
       if (_zv != null && _zv > 0 && window.Tax && Tax.calcGrenzsteuersatz &&
           !_rf.zveGerechnet) {
-        var _gs = Tax.calcGrenzsteuersatz(_zv, new Date().getFullYear());
+        var _gs = (Tax.grenzsatzGesamt ? Tax.grenzsatzGesamt(_zv, new Date().getFullYear()) : Tax.calcGrenzsteuersatz(_zv, new Date().getFullYear()));   /* v2891: inkl. Soli/KiSt */
         if (_gs != null && isFinite(_gs) && _gs > 0) {
           _rf.zveGerechnet = 1;
           var _gsTxt = String(Math.round(_gs * 1000) / 10).replace('.', ',');

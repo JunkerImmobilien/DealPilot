@@ -436,10 +436,13 @@ function _renderSteuerwirkung(doc, cy, M, CW, totals) {
   var zveNach = zve + totals.ergebnis;
   if (zveNach < 0) zveNach = 0;
   var zeilen = [
-    ['zu versteuerndes Einkommen vor Investition', eur(zve), 'Einkommensteuer ' + eur(imp.taxBefore)],
+    /* v2891: das zvE ist das nach den frueher gekauften Objekten (dieselbe
+       Basis wie die Steuer daneben), und die Steuer ist die ganze Last:
+       Einkommensteuer, Soli und Kirchensteuer. */
+    [(totals.bestandSaldo ? 'zvE nach früher gekauften Objekten, vor Investition' : 'zu versteuerndes Einkommen vor Investition'), eur(zve), 'Steuer ' + eur(imp.taxBefore)],
     [(totals.ergebnis >= 0 ? 'Überschuss' : 'Verlust') + ' aus Vermietung und Verpachtung',
      (totals.ergebnis >= 0 ? '+' : '') + eur(totals.ergebnis), ''],
-    ['zu versteuerndes Einkommen nach Investition', eur(zveNach), 'Einkommensteuer ' + eur(imp.taxAfter)],
+    ['zu versteuerndes Einkommen nach Investition', eur(zveNach), 'Steuer ' + eur(imp.taxAfter)],
     ['Grenzsteuersatz', pct(imp.grenzsteuersatzBefore * 100), 'danach ' + pct(imp.grenzsteuersatzAfter * 100)]
   ];
   zeilen.forEach(function (z, i) {

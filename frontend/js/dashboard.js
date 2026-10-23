@@ -836,6 +836,14 @@
    * verschwindet, wenn kein Profil geladen ist. */
   var ZVE_FALLBACK=78000;
   function zveFuer(jahr){
+    /* v2891: derselbe zvE-Weg wie Tab Steuern (Steuerzeitraum, letzter
+       frueherer, Feld, Ersatz) - bis v2890 las das Cockpit nur das Profil. */
+    try{
+      if(typeof window._dpZveFuerJahr==='function'){
+        var _z=window._dpZveFuerJahr(jahr);
+        if(_z && _z.zve>0) return _z.zve;
+      }
+    }catch(_e0){}
     try{
       if(window.DealPilotZvE){
         if(typeof jahr==='number' && jahr>1900 && typeof DealPilotZvE.getForYear==='function'){
@@ -871,7 +879,12 @@
      kommt jetzt aus `Tax.calcEStG()`; tax.js laedt 110 Zeilen vor dieser
      Datei, ist also immer da. Faellt es doch einmal aus, sagt die Konsole
      es - statt still eine andere Zahl zu rechnen als der Rest der App. */
-  function estg2026(zve){
+  /* v2891: die ganze Steuerlast (ESt + Soli + Kirchensteuer, Splitting) aus
+     den Steuerangaben - derselbe Kern wie Tab Steuern und calc.js. */
+  function estg2026(zve, jahr){
+    if (typeof Tax !== 'undefined' && Tax && typeof Tax.steuerLast === 'function') {
+      return Tax.steuerLast(zve, jahr).gesamt;
+    }
     if (typeof Tax !== 'undefined' && Tax && typeof Tax.calcEStG === 'function') {
       return Tax.calcEStG(zve);
     }
@@ -885,7 +898,22 @@
        im Frontend gesetzt wird. Die Summe war damit immer 0, und verwendet
        wurde sie ohnehin nie. Ersatzlos entfernt: toter Code, der aussieht,
        als werde hier das steuerliche Ergebnis aggregiert. */
+    /* v2891 · U7: DIE STEUERSEITE AUS DEN ECHTEN JAHRESERGEBNISSEN.
+       Jedes Objekt hinterlegt beim Rechnen sein steuerliches Ergebnis je Jahr
+       (wk_per_year, Tab Steuern). Wo es vorliegt, ersetzt es die Pauschale
+       (AfA 2 % auf 80 % des Kaufpreises, Zins 3,5 %); nur wo es fehlt, bleibt
+       das Modell. Und die Sphaeren werden getrennt wie in der Steuerkette:
+       Privat und GbR (mit Anteil) in die Einkommensteuer, eine GmbH/UG mit
+       ihrem Satz auf den Gewinn, Verlust als Vortrag. Bis v2890 floss alles
+       in die private Progression. */
+    var _snap={};
+    try{
+      var _alleWk=(window.DealPilotWKAggregator&&DealPilotWKAggregator.getAllObjectsWithWK)?DealPilotWKAggregator.getAllObjectsWithWK():null;
+      if(Array.isArray(_alleWk)) _alleWk.forEach(function(w){ if(w&&w.id) _snap[w.id]=w; });
+    }catch(_eS){}
+    var _kVortrag={};
     for(var i=0;i<years;i++){
+      var vuvEst=0, vuvKoerp={};
       /* v1898: `bwkSt` ist die Bewirtschaftung der STEUERZEILE (ohne
          Mietausfallwagnis). `bwk` bleibt die des Cashflows. Ohne getrennt
          erfassten Mietausfall sind beide gleich und die Tabelle rechnet
@@ -977,6 +1005,12 @@
         bwk+=bwkJ*Math.pow(1+ASSUMP.bwkWg,i);
         bwkSt+=bwkStJ*Math.pow(1+ASSUMP.bwkWg,i);   /* v1898 */
         zins+=zinsI; tilg+=tilgI; afa+=kp*ASSUMP.gebAnteil*ASSUMP.afaRate;
+        /* v2891: steuerliches Ergebnis des Objekts in diesem Jahr */
+        var _w=_snap[o._key], _wv=(_w&&_w.wk_per_year)?Number(_w.wk_per_year[String(yr)]):NaN;
+        var _vuvO=isFinite(_wv)?_wv:(mieteJ*Math.pow(1+ASSUMP.mietWg,i)-bwkStJ*Math.pow(1+ASSUMP.bwkWg,i)-zinsI-kp*ASSUMP.gebAnteil*ASSUMP.afaRate);
+        var _sp=_sphaereVon(o.halter);
+        if(_sp==='est'||!_istKoerperschaft(_sp)) vuvEst+=_vuvO*_anteilVon(o.halter);
+        else vuvKoerp[_sp]=(vuvKoerp[_sp]||0)+_vuvO;
         rest+=Math.max(0,restStart-tilgI); wert+=kp*Math.pow(1+ASSUMP.wertWg,i);
       });
       var cfVor=miete-bwk-zins-tilg;
@@ -987,12 +1021,19 @@
       var vuv=miete-bwkSt-zins-afa;
       /* v1397: zvE des JEWEILIGEN Jahres, nicht ein fester Wert fuers Cockpit. */
       var _zveJ=zveFuer(yr);
-      var estgOhne=estg2026(_zveJ);
-      var estgMit=estg2026(_zveJ+vuv);
+      var estgOhne=estg2026(_zveJ, yr);
+      var estgMit=estg2026(Math.max(0,_zveJ+vuvEst), yr);
       var steuereffekt=estgOhne-estgMit;
+      Object.keys(vuvKoerp).forEach(function(h){
+        var e=vuvKoerp[h], vt=_kVortrag[h]||0;
+        if(e<0){ _kVortrag[h]=vt-e; return; }
+        var gen=Math.min(vt,e); _kVortrag[h]=vt-gen;
+        var satz=_halterSatz(h); if(satz>0) steuereffekt-=(e-gen)*satz;
+      });
+      vuv=vuvEst+Object.keys(vuvKoerp).reduce(function(a,h){return a+vuvKoerp[h];},0);
       var cfNach=cfVor+steuereffekt; cumCf+=cfNach;
       rows.push({yr:yr,miete:miete,bwk:bwk,zins:zins,tilg:tilg,afa:afa,cfVor:cfVor,vuv:vuv,
-        zve:_zveJ+vuv,estg:estgMit,steuereffekt:steuereffekt,cfNach:cfNach,cumCf:cumCf,rest:rest,wert:wert,eq:wert-rest});
+        zve:_zveJ+vuvEst,estg:estgMit,steuereffekt:steuereffekt,cfNach:cfNach,cumCf:cumCf,rest:rest,wert:wert,eq:wert-rest});
     }
     return rows;
   }
@@ -1176,7 +1217,7 @@
     var TAX_OHNE=isDark()?'#A89F8E':'#7A7370', TAX_MIT=_wlc('#C9A84C');
     mk('dpc-steuer',{type:'line',data:{labels:labels,datasets:[
       {label:'Steuereffekt',data:PR.map(function(r){return Math.round(r.steuereffekt);}),borderColor:TAX_MIT,backgroundColor:TAX_MIT+'2e',tension:.3,fill:true,pointRadius:0,borderWidth:2},
-      {label:'EStG mit Immo',data:PR.map(function(r){return Math.round(r.estg);}),borderColor:TAX_OHNE,tension:.3,fill:false,pointRadius:0,borderWidth:1.6,borderDash:[4,4]}
+      {label:'Steuer mit Immo',data:PR.map(function(r){return Math.round(r.estg);}),borderColor:TAX_OHNE,tension:.3,fill:false,pointRadius:0,borderWidth:1.6,borderDash:[4,4]}
     ]},options:{plugins:{legend:{display:true}}}});
   }
 
@@ -1337,7 +1378,9 @@
       var satz = istKoerp ? _halterSatz(h) : null;
       var estPflichtig = !istKoerp;
       var liste = gruppen[h].slice().sort(function (a, b) {
-        return String(a.purchase_date || '9999').localeCompare(String(b.purchase_date || '9999'));
+        var _d = String(a.purchase_date || '9999').localeCompare(String(b.purchase_date || '9999'));
+        /* v2891: bei gleichem Kaufdatum die Anlage-Reihenfolge, wie im Tab Steuern */
+        return _d || ((a.rang == null ? 1e9 : a.rang) - (b.rang == null ? 1e9 : b.rang));
       });
 
       var topf = { halter: h, name: estPflichtig ? _estTopfName(liste) : _halterName(h), estPflichtig: estPflichtig,
@@ -1353,7 +1396,7 @@
           if (!v) return;                       /* kein Ergebnis in diesem Jahr */
           var vor = Math.max(0, basis);
           var nach = Math.max(0, basis + v);
-          var wirkung = estg2026(vor) - estg2026(nach);
+          var wirkung = estg2026(vor, y) - estg2026(nach, y);
           topf.schritte.push({
             id: o.id, name: o.address || 'Objekt',
             datum: (o.purchase_date || '').substring(0, 10),
@@ -1409,8 +1452,8 @@
   /* Der Grenzsteuersatz aus tax.js — EIN Tarif, nicht zwei (v1361). */
   function _grenzsatz(zve) {
     try {
-      if (typeof Tax !== 'undefined' && Tax && typeof Tax.calcGrenzsteuersatz === 'function') {
-        var r = Tax.calcGrenzsteuersatz(Math.max(0, zve));
+      if (typeof Tax !== 'undefined' && Tax && typeof Tax.grenzsatzGesamt === 'function') {
+        var r = Tax.grenzsatzGesamt(Math.max(0, zve));   /* v2891: inkl. Soli/Kirchensteuer */
         return (isFinite(r) ? r : 0) * 100;
       }
     } catch (e) {}

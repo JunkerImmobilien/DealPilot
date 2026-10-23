@@ -151,9 +151,16 @@
       if (WZ && typeof WZ.laden === 'function') extern = WZ.laden();
       else if (WZ && typeof WZ.daten === 'function') extern = WZ.daten();
     } catch (e) { extern = null; }
-    extern = Promise.race([Promise.resolve(extern), new Promise(function (f) { setTimeout(function () { f(null); }, 8000); })])
-      .then(ausWertZielbild, function () { return null; });
-    return Promise.all([extern, letzterBericht()]).then(function (r) {
+    var roh = Promise.race([Promise.resolve(extern), new Promise(function (f) { setTimeout(function () { f(null); }, 8000); })]);
+    extern = roh.then(ausWertZielbild, function () { return null; });
+    /* v2900 · die Erklaertexte aus DEMSELBEN Bericht wie die Seite: hat
+       DpWertZielbild ihn schon geladen (bericht()), wird nicht ein zweites Mal
+       abgerufen. Sonst konnten Tabelle und Text aus zwei Abrufen stammen. */
+    var bericht = roh.then(function () {
+      try { var WZ = global.DpWertZielbild, h = WZ && typeof WZ.bericht === 'function' ? WZ.bericht() : null; if (h) return h; } catch (e) {}
+      return letzterBericht();
+    }, function () { return letzterBericht(); });
+    return Promise.all([extern, bericht]).then(function (r) {
       var X = r[0] || {}, h = r[1];
       var verf = (X.verfahren && X.verfahren.length) ? X.verfahren : (h ? ausBericht(h) : []);
       var stufen = (X.stufen && X.stufen.length) ? X.stufen : stufenAusPotenzial(o.potenzial);
@@ -188,9 +195,17 @@
    *   f: { gold, goldD, goldL, tinte, grau, linie, kopfGrund, kopfText, streifen }, ueberschrift(t) -> y }
    * Rueckgabe: y.
    */
+  /* v2900 · o.teile: nur diese Teile zeichnen (Vorgabe: alle) -
+       verfahren, landschaft, stufen (Tafel), stufenText (Ausblick, Sanierungsstau),
+       mpiZeile (Marktpreisindikation je Stufe ohne Abschlag als Satz - fuer den Fall,
+       dass die Tafel wegfaellt, weil die Seite Wertpotenzial dieselben Stufen zeigt),
+       kern, texte, hinweis. So zeichnen beide PDFs Wertpotenzial und Wert & Zielbild
+       als EINEN Abschnitt, ohne die Stufen zweimal. */
+  var ALLE_TEILE = ['verfahren', 'landschaft', 'stufen', 'stufenText', 'kern', 'texte', 'hinweis'];
   function zeichne(doc, d, o) {
     var x = o.x, B = o.breite, y = o.y, f = o.f, unten = o.unten;
     var BS = global.DpPdfBlocksatz;
+    var teile = o.teile || ALLE_TEILE, T = function (k) { return teile.indexOf(k) >= 0; };
     function platz(h) { if (y + h > unten) { y = o.neueSeite(); return true; } return false; }
     /* Abstand vor jeder Zwischenueberschrift, ausser oben auf der Seite */
     var erste = true;
@@ -201,7 +216,7 @@
     var V = d.verfahren.slice();
     if (d.kaufpreis) V.push({ art: 'kp', name: 'Kaufpreis', sub: 'Angabe im Objekt', mitte: d.kaufpreis });
     var mpi = d.verfahren.filter(function (v) { return v.art === 'mpi'; })[0];
-    if (V.length) {
+    if (V.length && T('verfahren')) {
       ueber('Werte je Verfahren' + (d.stand ? ' · ' + d.stand : ''));
       var sp = [['Wert', 50, 'l'], ['untere', 22], ['Mitte / Wert', 25], ['obere', 22], ['zum Markt', 18], ['zum Kaufpreis', 21]];
       var fak = B / sp.reduce(function (a, s) { return a + s[1]; }, 0);
@@ -257,7 +272,7 @@
       G.push({ name: 'Ertragswert ' + s.titel, mitte: zahl(s.wert), art: 'stufe' });
     });
     G = G.filter(function (g) { return g.art !== 'kp'; });
-    if (G.length >= 2 || (G.length && d.kaufpreis)) {
+    if (T('landschaft') && (G.length >= 2 || (G.length && d.kaufpreis))) {
       var alle = [];
       G.forEach(function (g) { [g.unten, g.mitte, g.oben].forEach(function (w) { if (zahl(w) != null) alle.push(w); }); });
       if (d.kaufpreis) alle.push(d.kaufpreis);
@@ -310,7 +325,15 @@
     }
 
     /* ── 3. Ist / Soll / Zielbild ─────────────────────────────── */
-    if (d.stufen.length) {
+    if (d.stufen.length && T('mpiZeile')) {
+      var ohne = d.stufen.filter(function (s) { return zahl(s.mpiOhne) != null; });
+      if (ohne.length) {
+        y = BS.absatz(doc, 'Marktpreisindikation je Stufe ohne Abschlag (Angebotsniveau): ' + ohne.map(function (s) { return sauber(s.titel) + ' ' + eur(s.mpiOhne); }).join(' · ') + '.',
+          { x: x, y: y + 2.4, breite: B, zeile: 3.7, unten: unten, neueSeite: function () { return o.neueSeite(); },
+            stil: function () { doc.setFont('helvetica', 'normal'); doc.setFontSize(7.6); setT(f.text || f.tinte); } }) - 2.4 + 3;
+      }
+    }
+    if (d.stufen.length && T('stufen')) {
       ueber('Ist · Soll · Zielbild');
       var mitMpi = d.stufen.some(function (s) { return zahl(s.mpi) != null; });
       var sp3 = mitMpi ? [['Stufe', 58, 'l'], ['Ertragswert', 28], ['zum Kaufpreis', 24], ['Marktpreisindikation', 38], ['Maßnahmen', 26]]
@@ -348,6 +371,9 @@
         doc.setDrawColor(f.linie[0], f.linie[1], f.linie[2]); doc.setLineWidth(0.15); doc.line(x, y + rh3, x + B, y + rh3); doc.setLineWidth(0.2);
         y += rh3;
       });
+      y += 5;
+    }
+    if (d.stufen.length && T('stufenText')) {
       /* v2836 · kurzer Ausblick-Hinweis (DpWertZielbild.zielbild.kurz_ausblick) */
       if (d.ausblick) {
         y += 1.6;
@@ -360,13 +386,13 @@
         y = BS.absatz(doc, 'Sanierungsstau · ' + sauber(s.titel) + ': ' + sauber(s.satz), { x: x, y: y + 2.4, breite: B, zeile: 3.7, unten: unten,
           neueSeite: function () { return o.neueSeite(); }, stil: function () { doc.setFont('helvetica', 'normal'); doc.setFontSize(7.6); setT(f.text || f.tinte); } }) - 2.4;
       });
-      y += 5;
+      if (d.ausblick || (d.stau || []).length) y += 5;
     }
 
     /* ── 4. Erklaerung (aus wertvergleich.js) und Hinweis ───── */
     var stil = function () { doc.setFont('helvetica', 'normal'); doc.setFontSize(8.2); setT(f.text || f.tinte); };
     /* Kernaussagen der Einfach-Ansicht (DpWertZielbild.kernaussagen) */
-    if (d.kern && d.kern.length) {
+    if (d.kern && d.kern.length && T('kern')) {
       ueber('Kernaussagen');
       d.kern.forEach(function (k) {
         platz(10);
@@ -383,7 +409,7 @@
       });
       y += 2;
     }
-    d.texte.forEach(function (t) {
+    (T('texte') ? d.texte : []).forEach(function (t) {
       platz(18);
       doc.setFont('helvetica', 'bold'); doc.setFontSize(8.6); setT(f.tinte);
       doc.text(t.h, x, y); y += 4.8;
@@ -394,7 +420,7 @@
       });
       y += 1.5;
     });
-    if (d.hinweis) {
+    if (d.hinweis && T('hinweis')) {
       var stil2 = function () { doc.setFont('helvetica', 'normal'); doc.setFontSize(7); setT(f.grau); };
       y = BS ? BS.absatz(doc, d.hinweis, { x: x, y: y + 1, breite: B, zeile: 3.5, unten: unten, neueSeite: function () { return o.neueSeite(); }, stil: stil2 }) : y;
     }

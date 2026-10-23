@@ -47,6 +47,52 @@ router.get('/arten', (req, res) => {
  * Dienst einen hinterlegten Satz, solange keiner `erzwingen` sagt — und
  * sagt dazu, woher er kommt.
  */
+/* ══ v2920 · DIE RECHERCHE LÄUFT ALS AUFTRAG, NICHT IM AUFRUF ══════════
+ *
+ * Marcel am 23.10.2026 (Westerfeldstr. 140, Grundbuchauszug):
+ * „Anfrage-Timeout (Server antwortet nicht rechtzeitig) … das darf nicht
+ * passieren." Gemessen: `Auth.apiCall` bricht nach 15 s ab, die Recherche
+ * braucht aber eine bis drei KI-Anfragen mit Websuche plus das Lesen der
+ * amtlichen Seiten — und justiz.nrw.de nimmt vom Server aus gar keine
+ * Verbindung an (12 s + 8 s bis zum Abbruch). Der Server rechnete weiter
+ * und legte den Satz um 08:18 sogar ab; der Nutzer sah nur den Fehler.
+ *
+ * Jetzt: bis WARTEN_MS wird auf das Ergebnis gewartet (ein Satz aus dem
+ * Register kommt so wie bisher sofort). Dauert es länger, antwortet die
+ * Route mit `{ laeuft: true, auftrag }`, und das Modal fragt unter
+ * GET /amt/auftrag/:id nach. Der Auftrag liegt nur im Speicher dieses
+ * Prozesses — nach einem Neustart meldet die Abfrage 404, und das Modal
+ * sagt, dass neu gesucht werden muss. Für einen einzigen Backend-Prozess
+ * genügt das; eine Tabelle dafür wäre Bau ohne Bedarf. */
+const crypto = require('crypto');
+const WARTEN_MS = 10000;
+const AUFBEWAHREN_MS = 15 * 60 * 1000;
+const _auftraege = new Map();
+setInterval(function () {
+  const grenze = Date.now() - AUFBEWAHREN_MS;
+  for (const [id, a] of _auftraege) if (a.start < grenze) _auftraege.delete(id);
+}, 60 * 1000).unref();
+
+function _auftragAntwort(a) {
+  if (!a.fertig) {
+    return { laeuft: true, auftrag: a.id, sekunden: Math.round((Date.now() - a.start) / 1000) };
+  }
+  if (a.fehler) {
+    return { gefunden: false, grund: 'Die Recherche ist fehlgeschlagen: ' + a.fehler };
+  }
+  return a.ergebnis;
+}
+
+router.get('/amt/auftrag/:id', (req, res) => {
+  const a = _auftraege.get(String(req.params.id || ''));
+  if (!a || a.user !== req.user.id) {
+    return res.status(404).json({
+      error: 'Diese Recherche liegt nicht mehr vor. Bitte die Zuständigkeit neu ermitteln.'
+    });
+  }
+  res.json(_auftragAntwort(a));
+});
+
 router.post('/amt', async (req, res, next) => {
   try {
     const b = req.body || {};
@@ -64,10 +110,35 @@ router.post('/amt', async (req, res, next) => {
         error: 'Ohne Postleitzahl und Ort lässt sich keine Zuständigkeit bestimmen.'
       });
     }
-    const r = await unterlagen.amtHolen(req.user.id, art,
-      { plz: plz, ort: ort, strasse: String(b.strasse || '').trim() },
-      { erzwingen: Boolean(b.erzwingen) });
-    res.json(r);
+    const erzwingen = Boolean(b.erzwingen);
+    /* Läuft dieselbe Recherche für diesen Nutzer schon (Doppelklick,
+       „Alle abrufen" nach einem Einzelklick), wird sie nicht ein zweites
+       Mal bezahlt — der Aufrufer bekommt denselben Auftrag. */
+    const schluessel = [req.user.id, art, plz, ort.toLowerCase(), erzwingen].join('|');
+    let a = null;
+    for (const x of _auftraege.values()) {
+      if (x.schluessel === schluessel && !x.fertig) { a = x; break; }
+    }
+    if (!a) {
+      a = { id: crypto.randomUUID(), user: req.user.id, schluessel: schluessel,
+            start: Date.now(), fertig: false, ergebnis: null, fehler: null };
+      a.promise = unterlagen.amtHolen(req.user.id, art,
+        { plz: plz, ort: ort, strasse: String(b.strasse || '').trim() },
+        { erzwingen: erzwingen })
+        .then(function (r) { a.ergebnis = r; },
+              function (e) {
+                console.warn('[unterlagen] Recherche fehlgeschlagen:', e && e.message);
+                a.fehler = (e && e.message) || String(e);
+              })
+        .then(function () {
+          a.fertig = true;
+          console.log('[unterlagen] Recherche ' + art + ' ' + plz + ' fertig nach '
+            + Math.round((Date.now() - a.start) / 1000) + ' s');
+        });
+      _auftraege.set(a.id, a);
+    }
+    await Promise.race([a.promise, new Promise(function (ok) { setTimeout(ok, WARTEN_MS); })]);
+    res.json(_auftragAntwort(a));
   } catch (e) { next(e); }
 });
 

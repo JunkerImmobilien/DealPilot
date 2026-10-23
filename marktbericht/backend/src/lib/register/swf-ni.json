@@ -244,6 +244,208 @@
       ],
       "zellen": {
         "20": [
+          1.92,
+          1.23,
+          0.93,
+          0.72,
+          0.61,
+          0.52,
+          0.45,
+          0.4,
+          0.36
+        ],
+        "80": [
+          2.07,
+          1.36,
+          1.03,
+          0.82,
+          0.7,
+          0.6,
+          0.53,
+          0.47,
+          0.43
+        ],
+        "130": [
+          2.14,
+          1.41,
+          1.08,
+          0.86,
+          0.73,
+          0.64,
+          0.56,
+          0.51,
+          0.46
+        ],
+        "190": [
+          2.19,
+          1.45,
+          1.12,
+          0.9,
+          0.77,
+          0.67,
+          0.59,
+          0.53,
+          0.48
+        ],
+        "240": [
+          2.23,
+          1.48,
+          1.15,
+          0.92,
+          0.79,
+          0.69,
+          0.61,
+          0.55,
+          0.5
+        ],
+        "300": [
+          2.27,
+          1.51,
+          1.17,
+          0.94,
+          0.81,
+          0.71,
+          0.63,
+          0.57,
+          0.52
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 31 Jahre · Standardstufe 2,5 · Wohnfläche 150 m² · Lage „Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt“",
+      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter SZ EFH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.7,
+          "25": 0.93,
+          "35": 1.05,
+          "45": 1.13,
+          "55": 1.18,
+          "65": 1.22,
+          "75": 1.25
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.89,
+          "3": 1.08,
+          "4": 1.2,
+          "1.5": 0.74,
+          "2.5": 1,
+          "3.5": 1.14
+        },
+        "rundung_stellen": 2,
+        "hinweis": "6 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Wohnfläche",
+        "feld": "wohnflaeche",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "80": 0.88,
+          "100": 0.92,
+          "120": 0.95,
+          "140": 0.98,
+          "160": 1.02,
+          "180": 1.05,
+          "200": 1.07
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt",
+      "lage_dokument": "Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt [0,97]",
+      "lage_parameter": "Lageklname Parameter SZ EFH",
+      "lage_parameterwert": "Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt",
+      "zuordnung": {
+        "art": "ortsteil",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_efh_bssz (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 287 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 1 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_efh_bssz, Lage „Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt [0,97]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter SZ EFH“, Wert Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
+    "fallzahl": 287,
+    "streuung": 0.19,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bssz/dash#lage=Barum%2C%20Beddingen%2C%20Beinum%2C%20Bleckenstedt%2C%20Calbecht%2C%20Dr%C3%BCtt",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Stadt Salzgitter, Lage Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03102",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Stadt Salzgitter",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Stadt Salzgitter",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        70000,
+        140000,
+        210000,
+        290000,
+        360000,
+        430000,
+        500000,
+        570000,
+        640000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        20,
+        80,
+        130,
+        190,
+        240,
+        300
+      ],
+      "zellen": {
+        "20": [
           1.96,
           1.27,
           0.96,
@@ -312,8 +514,8 @@
       },
       "rundung_stellen": 2,
       "liefert": "faktor",
-      "normobjekt": "Restnutzungsdauer 31 Jahre · Standardstufe 2,5 · Wohnfläche 150 m²",
-      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen."
+      "normobjekt": "Restnutzungsdauer 31 Jahre · Standardstufe 2,5 · Wohnfläche 150 m² · Lage „Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder“",
+      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter SZ EFH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
     },
     "korrekturen": [
       {
@@ -379,9 +581,22 @@
       "gnd_jahre": 80,
       "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
-    "geltungsbereich": {},
+    "geltungsbereich": {
+      "lage": "Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder",
+      "lage_dokument": "Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder [1,00]",
+      "lage_parameter": "Lageklname Parameter SZ EFH",
+      "lage_parameterwert": "Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder",
+      "zuordnung": {
+        "art": "ortsteil",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
     "belege": [
-      "Kalkulator 2026_sw_efh_bssz (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 287 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 1 aus."
+      "Kalkulator 2026_sw_efh_bssz (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 287 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 1 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_efh_bssz, Lage „Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder [1,00]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter SZ EFH“, Wert Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
     ],
     "stufe": "B",
     "stufe_grund": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
@@ -391,12 +606,416 @@
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
     "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bssz/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
     "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
-    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Stadt Salzgitter"
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Stadt Salzgitter, Lage Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03102",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Stadt Salzgitter",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Stadt Salzgitter",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        70000,
+        140000,
+        210000,
+        290000,
+        360000,
+        430000,
+        500000,
+        570000,
+        640000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        20,
+        80,
+        130,
+        190,
+        240,
+        300
+      ],
+      "zellen": {
+        "20": [
+          2.01,
+          1.31,
+          0.99,
+          0.78,
+          0.66,
+          0.57,
+          0.5,
+          0.44,
+          0.4
+        ],
+        "80": [
+          2.17,
+          1.44,
+          1.1,
+          0.88,
+          0.75,
+          0.66,
+          0.58,
+          0.52,
+          0.47
+        ],
+        "130": [
+          2.24,
+          1.49,
+          1.15,
+          0.92,
+          0.79,
+          0.69,
+          0.62,
+          0.55,
+          0.5
+        ],
+        "190": [
+          2.29,
+          1.54,
+          1.19,
+          0.96,
+          0.82,
+          0.72,
+          0.65,
+          0.58,
+          0.53
+        ],
+        "240": [
+          2.33,
+          1.57,
+          1.22,
+          0.98,
+          0.85,
+          0.74,
+          0.67,
+          0.6,
+          0.55
+        ],
+        "300": [
+          2.37,
+          1.6,
+          1.24,
+          1.01,
+          0.87,
+          0.77,
+          0.68,
+          0.62,
+          0.57
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 31 Jahre · Standardstufe 2,5 · Wohnfläche 150 m² · Lage „Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede“",
+      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter SZ EFH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.7,
+          "25": 0.93,
+          "35": 1.05,
+          "45": 1.13,
+          "55": 1.18,
+          "65": 1.22,
+          "75": 1.25
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.89,
+          "3": 1.08,
+          "4": 1.2,
+          "1.5": 0.74,
+          "2.5": 1,
+          "3.5": 1.14
+        },
+        "rundung_stellen": 2,
+        "hinweis": "6 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Wohnfläche",
+        "feld": "wohnflaeche",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "80": 0.88,
+          "100": 0.92,
+          "120": 0.95,
+          "140": 0.98,
+          "160": 1.02,
+          "180": 1.05,
+          "200": 1.07
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede",
+      "lage_dokument": "Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede [1,03]",
+      "lage_parameter": "Lageklname Parameter SZ EFH",
+      "lage_parameterwert": "Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede",
+      "zuordnung": {
+        "art": "ortsteil",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_efh_bssz (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 287 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 1 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_efh_bssz, Lage „Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede [1,03]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter SZ EFH“, Wert Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
+    "fallzahl": 287,
+    "streuung": 0.19,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bssz/dash#lage=Gebhardshagen%2C%20Lebenstedt%2C%20Salzgitter-Bad%20und%20Thiede",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Stadt Salzgitter, Lage Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03102",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Stadt Salzgitter",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Stadt Salzgitter",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "rhdhh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        50000,
+        80000,
+        120000,
+        160000,
+        200000,
+        240000,
+        270000,
+        310000,
+        350000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        50,
+        70,
+        100,
+        130,
+        160,
+        190
+      ],
+      "zellen": {
+        "50": [
+          1.86,
+          1.47,
+          1.19,
+          1.01,
+          0.89,
+          0.8,
+          0.75,
+          0.69,
+          0.64
+        ],
+        "70": [
+          1.86,
+          1.47,
+          1.19,
+          1.01,
+          0.89,
+          0.8,
+          0.75,
+          0.69,
+          0.64
+        ],
+        "100": [
+          1.86,
+          1.47,
+          1.19,
+          1.01,
+          0.89,
+          0.8,
+          0.75,
+          0.69,
+          0.64
+        ],
+        "130": [
+          1.86,
+          1.47,
+          1.19,
+          1.01,
+          0.89,
+          0.8,
+          0.75,
+          0.69,
+          0.64
+        ],
+        "160": [
+          1.86,
+          1.47,
+          1.19,
+          1.01,
+          0.89,
+          0.8,
+          0.75,
+          0.69,
+          0.64
+        ],
+        "190": [
+          1.86,
+          1.47,
+          1.19,
+          1.01,
+          0.89,
+          0.8,
+          0.75,
+          0.69,
+          0.64
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 30 Jahre · Standardstufe 2,5 · Wohnfläche 100 m² · Lage „Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt“",
+      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter SZ RH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.79,
+          "25": 0.94,
+          "35": 1.05,
+          "45": 1.12,
+          "55": 1.18,
+          "65": 1.23,
+          "75": 1.27
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.92,
+          "3": 1.07,
+          "4": 1.17,
+          "1.5": 0.81,
+          "2.5": 1,
+          "3.5": 1.12
+        },
+        "rundung_stellen": 2,
+        "hinweis": "6 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Wohnfläche",
+        "feld": "wohnflaeche",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "80": 0.99,
+          "100": 1,
+          "120": 1,
+          "140": 1,
+          "160": 1.01,
+          "180": 1.01,
+          "200": 1.01
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt",
+      "lage_dokument": "Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt [0,93]",
+      "lage_parameter": "Lageklname Parameter SZ RH",
+      "lage_parameterwert": "Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt",
+      "zuordnung": {
+        "art": "ortsteil",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_rh_bssz (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 417 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 0,97 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_rh_bssz, Lage „Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt [0,93]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter SZ RH“, Wert Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
+    "fallzahl": 417,
+    "streuung": 0.27,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bssz#lage=Barum%2C%20Beddingen%2C%20Beinum%2C%20Bleckenstedt%2C%20Calbecht%2C%20Dr%C3%BCtt",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Stadt Salzgitter, Lage Barum, Beddingen, Beinum, Bleckenstedt, Calbecht, Drütte, Engerode, Groß Mahner, Hallendorf, Heerte, Hohenrode, Immendorf, Lesse, Lobmachtersen, Ohlendorf, Osterlinde, Sauingen, Üfingen und Watenstedt"
   },
   {
     "land_code": "NI",
@@ -501,8 +1120,8 @@
       },
       "rundung_stellen": 2,
       "liefert": "faktor",
-      "normobjekt": "Restnutzungsdauer 30 Jahre · Standardstufe 2,5 · Wohnfläche 100 m²",
-      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen."
+      "normobjekt": "Restnutzungsdauer 30 Jahre · Standardstufe 2,5 · Wohnfläche 100 m² · Lage „Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder“",
+      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter SZ RH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
     },
     "korrekturen": [
       {
@@ -568,9 +1187,22 @@
       "gnd_jahre": 80,
       "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
-    "geltungsbereich": {},
+    "geltungsbereich": {
+      "lage": "Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder",
+      "lage_dokument": "Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder [1,00]",
+      "lage_parameter": "Lageklname Parameter SZ RH",
+      "lage_parameterwert": "Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder",
+      "zuordnung": {
+        "art": "ortsteil",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
     "belege": [
-      "Kalkulator 2026_sw_rh_bssz (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 417 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 0,97 aus."
+      "Kalkulator 2026_sw_rh_bssz (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 417 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 0,97 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_rh_bssz, Lage „Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder [1,00]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter SZ RH“, Wert Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
     ],
     "stufe": "B",
     "stufe_grund": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
@@ -579,13 +1211,215 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bssz/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bssz",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
     "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
-    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Stadt Salzgitter"
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Stadt Salzgitter, Lage Bruchmachtersen, Engelnstedt, Flachstöckheim, Lichtenberg, Reppner, Ringelheim und Salder"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03102",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Stadt Salzgitter",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Stadt Salzgitter",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "rhdhh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        50000,
+        80000,
+        120000,
+        160000,
+        200000,
+        240000,
+        270000,
+        310000,
+        350000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        50,
+        70,
+        100,
+        130,
+        160,
+        190
+      ],
+      "zellen": {
+        "50": [
+          2.09,
+          1.67,
+          1.37,
+          1.18,
+          1.05,
+          0.95,
+          0.89,
+          0.83,
+          0.77
+        ],
+        "70": [
+          2.09,
+          1.67,
+          1.37,
+          1.18,
+          1.05,
+          0.95,
+          0.89,
+          0.83,
+          0.77
+        ],
+        "100": [
+          2.09,
+          1.67,
+          1.37,
+          1.18,
+          1.05,
+          0.95,
+          0.89,
+          0.83,
+          0.77
+        ],
+        "130": [
+          2.09,
+          1.67,
+          1.37,
+          1.18,
+          1.05,
+          0.95,
+          0.89,
+          0.83,
+          0.77
+        ],
+        "160": [
+          2.09,
+          1.67,
+          1.37,
+          1.18,
+          1.05,
+          0.95,
+          0.89,
+          0.83,
+          0.77
+        ],
+        "190": [
+          2.09,
+          1.67,
+          1.37,
+          1.18,
+          1.05,
+          0.95,
+          0.89,
+          0.83,
+          0.77
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 30 Jahre · Standardstufe 2,5 · Wohnfläche 100 m² · Lage „Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede“",
+      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter SZ RH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.79,
+          "25": 0.94,
+          "35": 1.05,
+          "45": 1.12,
+          "55": 1.18,
+          "65": 1.23,
+          "75": 1.27
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.92,
+          "3": 1.07,
+          "4": 1.17,
+          "1.5": 0.81,
+          "2.5": 1,
+          "3.5": 1.12
+        },
+        "rundung_stellen": 2,
+        "hinweis": "6 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Wohnfläche",
+        "feld": "wohnflaeche",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "80": 0.99,
+          "100": 1,
+          "120": 1,
+          "140": 1,
+          "160": 1.01,
+          "180": 1.01,
+          "200": 1.01
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede",
+      "lage_dokument": "Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede [1,08]",
+      "lage_parameter": "Lageklname Parameter SZ RH",
+      "lage_parameterwert": "Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede",
+      "zuordnung": {
+        "art": "ortsteil",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_rh_bssz (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 417 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 0,97 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_rh_bssz, Lage „Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede [1,08]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter SZ RH“, Wert Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
+    "fallzahl": 417,
+    "streuung": 0.27,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bssz#lage=Gebhardshagen%2C%20Lebenstedt%2C%20Salzgitter-Bad%20und%20Thiede",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Stadt Salzgitter, Lage Gebhardshagen, Lebenstedt, Salzgitter-Bad und Thiede"
   },
   {
     "land_code": "NI",
@@ -1067,8 +1901,8 @@
       },
       "rundung_stellen": 2,
       "liefert": "faktor",
-      "normobjekt": "Restnutzungsdauer 35 Jahre · Standardstufe 2,5 · Wohnfläche 140 m²",
-      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen."
+      "normobjekt": "Restnutzungsdauer 35 Jahre · Standardstufe 2,5 · Wohnfläche 140 m² · Lage „Helmstedt, Königslutter“",
+      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter HE EFH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
     },
     "korrekturen": [
       {
@@ -1132,9 +1966,22 @@
       "gnd_jahre": 80,
       "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
-    "geltungsbereich": {},
+    "geltungsbereich": {
+      "lage": "Helmstedt, Königslutter",
+      "lage_dokument": "Helmstedt, Königslutter [1,00]",
+      "lage_parameter": "Lageklname Parameter HE EFH",
+      "lage_parameterwert": "Helmstedt, Königslutter",
+      "zuordnung": {
+        "art": "gemeinde_oder_ortsteil",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
     "belege": [
-      "Kalkulator 2026_sw_efh_bshe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 262 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 0,96 aus."
+      "Kalkulator 2026_sw_efh_bshe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 262 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 0,96 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_efh_bshe, Lage „Helmstedt, Königslutter [1,00]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter HE EFH“, Wert Helmstedt, Königslutter; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
     ],
     "stufe": "B",
     "stufe_grund": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
@@ -1144,12 +1991,604 @@
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
     "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bshe/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
     "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
-    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Helmstedt"
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Helmstedt, Lage Helmstedt, Königslutter"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03154",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Helmstedt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Helmstedt",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        100000,
+        150000,
+        220000,
+        280000,
+        350000,
+        410000,
+        470000,
+        540000,
+        600000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        30,
+        70,
+        110,
+        150,
+        190,
+        230
+      ],
+      "zellen": {
+        "30": [
+          1.18,
+          1.04,
+          0.89,
+          0.79,
+          0.69,
+          0.62,
+          0.55,
+          0.49,
+          0.44
+        ],
+        "70": [
+          1.34,
+          1.19,
+          1.03,
+          0.92,
+          0.81,
+          0.73,
+          0.66,
+          0.59,
+          0.53
+        ],
+        "110": [
+          1.41,
+          1.26,
+          1.09,
+          0.98,
+          0.87,
+          0.78,
+          0.71,
+          0.64,
+          0.58
+        ],
+        "150": [
+          1.46,
+          1.3,
+          1.13,
+          1.02,
+          0.9,
+          0.82,
+          0.75,
+          0.67,
+          0.61
+        ],
+        "190": [
+          1.49,
+          1.34,
+          1.17,
+          1.05,
+          0.93,
+          0.85,
+          0.77,
+          0.69,
+          0.63
+        ],
+        "230": [
+          1.52,
+          1.36,
+          1.19,
+          1.07,
+          0.95,
+          0.87,
+          0.79,
+          0.71,
+          0.65
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 35 Jahre · Standardstufe 2,5 · Wohnfläche 140 m² · Lage „Lehre, Velpke“",
+      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter HE EFH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.88,
+          "25": 0.95,
+          "35": 1,
+          "45": 1.03,
+          "55": 1.06,
+          "65": 1.08,
+          "75": 1.09
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.77,
+          "3": 1.13,
+          "2.5": 1,
+          "3.5": 1.22
+        },
+        "rundung_stellen": 2,
+        "hinweis": "4 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Wohnfläche",
+        "feld": "wohnflaeche",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "80": 0.9,
+          "100": 0.94,
+          "120": 0.98,
+          "140": 1,
+          "160": 1.02,
+          "180": 1.04,
+          "200": 1.05
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Lehre, Velpke",
+      "lage_dokument": "Lehre, Velpke [1,08]",
+      "lage_parameter": "Lageklname Parameter HE EFH",
+      "lage_parameterwert": "Lehre, Velpke",
+      "zuordnung": {
+        "art": "gemeinde_oder_ortsteil",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_efh_bshe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 262 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 0,96 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_efh_bshe, Lage „Lehre, Velpke [1,08]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter HE EFH“, Wert Lehre, Velpke; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
+    "fallzahl": 262,
+    "streuung": 0.19,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bshe/dash#lage=Lehre%2C%20Velpke",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Helmstedt, Lage Lehre, Velpke"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03154",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Helmstedt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Helmstedt",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        100000,
+        150000,
+        220000,
+        280000,
+        350000,
+        410000,
+        470000,
+        540000,
+        600000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        30,
+        70,
+        110,
+        150,
+        190,
+        230
+      ],
+      "zellen": {
+        "30": [
+          1.06,
+          0.93,
+          0.79,
+          0.69,
+          0.6,
+          0.53,
+          0.47,
+          0.41,
+          0.36
+        ],
+        "70": [
+          1.2,
+          1.06,
+          0.91,
+          0.81,
+          0.71,
+          0.63,
+          0.57,
+          0.5,
+          0.45
+        ],
+        "110": [
+          1.28,
+          1.13,
+          0.97,
+          0.87,
+          0.76,
+          0.69,
+          0.62,
+          0.55,
+          0.49
+        ],
+        "150": [
+          1.32,
+          1.17,
+          1.01,
+          0.91,
+          0.8,
+          0.72,
+          0.65,
+          0.58,
+          0.52
+        ],
+        "190": [
+          1.36,
+          1.21,
+          1.04,
+          0.93,
+          0.82,
+          0.74,
+          0.67,
+          0.6,
+          0.54
+        ],
+        "230": [
+          1.38,
+          1.23,
+          1.07,
+          0.95,
+          0.84,
+          0.76,
+          0.69,
+          0.62,
+          0.56
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 35 Jahre · Standardstufe 2,5 · Wohnfläche 140 m² · Lage „Südkreis, Schöningen, Büddenstedt“",
+      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter HE EFH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.88,
+          "25": 0.95,
+          "35": 1,
+          "45": 1.03,
+          "55": 1.06,
+          "65": 1.08,
+          "75": 1.09
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.77,
+          "3": 1.13,
+          "2.5": 1,
+          "3.5": 1.22
+        },
+        "rundung_stellen": 2,
+        "hinweis": "4 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Wohnfläche",
+        "feld": "wohnflaeche",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "80": 0.9,
+          "100": 0.94,
+          "120": 0.98,
+          "140": 1,
+          "160": 1.02,
+          "180": 1.04,
+          "200": 1.05
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Südkreis, Schöningen, Büddenstedt",
+      "lage_dokument": "Südkreis, Schöningen, Büddenstedt [0,93]",
+      "lage_parameter": "Lageklname Parameter HE EFH",
+      "lage_parameterwert": "Südkreis, Schöningen, Büddenstedt",
+      "zuordnung": {
+        "art": "gemeinde_oder_ortsteil",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_efh_bshe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 262 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 0,96 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_efh_bshe, Lage „Südkreis, Schöningen, Büddenstedt [0,93]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter HE EFH“, Wert Südkreis, Schöningen, Büddenstedt; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
+    "fallzahl": 262,
+    "streuung": 0.19,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bshe/dash#lage=S%C3%BCdkreis%2C%20Sch%C3%B6ningen%2C%20B%C3%BCddenstedt",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Helmstedt, Lage Südkreis, Schöningen, Büddenstedt"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03154",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Helmstedt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Helmstedt",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "rhdhh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        60000,
+        110000,
+        160000,
+        220000,
+        280000,
+        340000,
+        390000,
+        450000,
+        500000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        30,
+        60,
+        100,
+        130,
+        160,
+        200
+      ],
+      "zellen": {
+        "30": [
+          1.82,
+          1.1,
+          0.82,
+          0.65,
+          0.55,
+          0.49,
+          0.45,
+          0.41,
+          0.39
+        ],
+        "60": [
+          1.95,
+          1.2,
+          0.91,
+          0.73,
+          0.62,
+          0.56,
+          0.51,
+          0.47,
+          0.45
+        ],
+        "100": [
+          2.04,
+          1.26,
+          0.97,
+          0.78,
+          0.67,
+          0.6,
+          0.56,
+          0.52,
+          0.49
+        ],
+        "130": [
+          2.08,
+          1.3,
+          1,
+          0.81,
+          0.7,
+          0.63,
+          0.58,
+          0.54,
+          0.51
+        ],
+        "160": [
+          2.11,
+          1.32,
+          1.02,
+          0.83,
+          0.72,
+          0.64,
+          0.6,
+          0.56,
+          0.53
+        ],
+        "200": [
+          2.15,
+          1.35,
+          1.04,
+          0.85,
+          0.74,
+          0.66,
+          0.62,
+          0.57,
+          0.55
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 35 · Standardstufen 2,5 · Lage „Südkreis, Schöningen, Büddenstedt“",
+      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Lesbar war die Umrechnung für: Restnutzungsdauer, Standardstufe. Die übrigen bleiben als offene Korrektur im Ergebnis stehen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter HE RH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.69,
+          "25": 0.9,
+          "35": 1,
+          "45": 1.06,
+          "55": 1.1,
+          "65": 1.12,
+          "75": 1.14
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.91,
+          "3": 1.06,
+          "2.5": 1,
+          "3.5": 1.1
+        },
+        "rundung_stellen": 2,
+        "hinweis": "4 abgedruckte Stützstellen."
+      },
+      {
+        "bez": "Umrechnung für abweichende Merkmale (im Dokument nur als Bild)",
+        "feld": "_nicht_lesbar",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {},
+        "rundung_stellen": 2,
+        "hinweis": "Der Ausschuss druckt Umrechnungskurven ab, aber ohne Zahlen an den Datenpunkten — sie sind aus dem PDF nicht lesbar. Der Tabellenwert gilt deshalb nur für die Stellung, an der er abgetastet wurde. Diese Korrektur bleibt absichtlich unbeziffert, damit sie als offen gemeldet wird statt still zu fehlen."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Südkreis, Schöningen, Büddenstedt",
+      "lage_dokument": "Südkreis, Schöningen, Büddenstedt [0,87]",
+      "lage_parameter": "Lageklname Parameter HE RH",
+      "lage_parameterwert": "Südkreis, Schöningen, Büddenstedt",
+      "zuordnung": {
+        "art": "gemeinde_oder_ortsteil",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_rh_bshe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 133 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 0,94 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_rh_bshe, Lage „Südkreis, Schöningen, Büddenstedt [0,87]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter HE RH“, Wert Südkreis, Schöningen, Büddenstedt; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
+    "fallzahl": 133,
+    "streuung": 0.3,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bshe#lage=S%C3%BCdkreis%2C%20Sch%C3%B6ningen%2C%20B%C3%BCddenstedt",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Helmstedt, Lage Südkreis, Schöningen, Büddenstedt"
   },
   {
     "land_code": "NI",
@@ -1254,8 +2693,8 @@
       },
       "rundung_stellen": 2,
       "liefert": "faktor",
-      "normobjekt": "Restnutzungsdauer 35 · Standardstufen 2,5",
-      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Lesbar war die Umrechnung für: Restnutzungsdauer, Standardstufe. Die übrigen bleiben als offene Korrektur im Ergebnis stehen."
+      "normobjekt": "Restnutzungsdauer 35 · Standardstufen 2,5 · Lage „Helmstedt, Königslutter“",
+      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Lesbar war die Umrechnung für: Restnutzungsdauer, Standardstufe. Die übrigen bleiben als offene Korrektur im Ergebnis stehen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter HE RH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
     },
     "korrekturen": [
       {
@@ -1311,9 +2750,22 @@
       "gnd_jahre": 80,
       "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
-    "geltungsbereich": {},
+    "geltungsbereich": {
+      "lage": "Helmstedt, Königslutter",
+      "lage_dokument": "Helmstedt, Königslutter [1,00]",
+      "lage_parameter": "Lageklname Parameter HE RH",
+      "lage_parameterwert": "Helmstedt, Königslutter",
+      "zuordnung": {
+        "art": "gemeinde_oder_ortsteil",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
     "belege": [
-      "Kalkulator 2026_sw_rh_bshe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 133 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 0,94 aus."
+      "Kalkulator 2026_sw_rh_bshe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 133 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 0,94 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_rh_bshe, Lage „Helmstedt, Königslutter [1,00]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter HE RH“, Wert Helmstedt, Königslutter; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
     ],
     "stufe": "B",
     "stufe_grund": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
@@ -1322,13 +2774,412 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bshe/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bshe",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
     "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
-    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Helmstedt"
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Helmstedt, Lage Helmstedt, Königslutter"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03154",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Helmstedt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Helmstedt",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "rhdhh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        60000,
+        110000,
+        160000,
+        220000,
+        280000,
+        340000,
+        390000,
+        450000,
+        500000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        30,
+        60,
+        100,
+        130,
+        160,
+        200
+      ],
+      "zellen": {
+        "30": [
+          2.23,
+          1.42,
+          1.1,
+          0.9,
+          0.79,
+          0.71,
+          0.66,
+          0.62,
+          0.59
+        ],
+        "60": [
+          2.37,
+          1.53,
+          1.2,
+          0.99,
+          0.87,
+          0.79,
+          0.74,
+          0.69,
+          0.66
+        ],
+        "100": [
+          2.47,
+          1.61,
+          1.27,
+          1.06,
+          0.93,
+          0.85,
+          0.79,
+          0.74,
+          0.71
+        ],
+        "130": [
+          2.51,
+          1.65,
+          1.3,
+          1.09,
+          0.96,
+          0.87,
+          0.82,
+          0.77,
+          0.74
+        ],
+        "160": [
+          2.55,
+          1.68,
+          1.33,
+          1.11,
+          0.98,
+          0.89,
+          0.84,
+          0.79,
+          0.76
+        ],
+        "200": [
+          2.59,
+          1.71,
+          1.36,
+          1.14,
+          1.01,
+          0.92,
+          0.86,
+          0.81,
+          0.78
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 35 · Standardstufen 2,5 · Lage „Lehre, Velpke“",
+      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Lesbar war die Umrechnung für: Restnutzungsdauer, Standardstufe. Die übrigen bleiben als offene Korrektur im Ergebnis stehen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter HE RH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.69,
+          "25": 0.9,
+          "35": 1,
+          "45": 1.06,
+          "55": 1.1,
+          "65": 1.12,
+          "75": 1.14
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.91,
+          "3": 1.06,
+          "2.5": 1,
+          "3.5": 1.1
+        },
+        "rundung_stellen": 2,
+        "hinweis": "4 abgedruckte Stützstellen."
+      },
+      {
+        "bez": "Umrechnung für abweichende Merkmale (im Dokument nur als Bild)",
+        "feld": "_nicht_lesbar",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {},
+        "rundung_stellen": 2,
+        "hinweis": "Der Ausschuss druckt Umrechnungskurven ab, aber ohne Zahlen an den Datenpunkten — sie sind aus dem PDF nicht lesbar. Der Tabellenwert gilt deshalb nur für die Stellung, an der er abgetastet wurde. Diese Korrektur bleibt absichtlich unbeziffert, damit sie als offen gemeldet wird statt still zu fehlen."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Lehre, Velpke",
+      "lage_dokument": "Lehre, Velpke [1,14]",
+      "lage_parameter": "Lageklname Parameter HE RH",
+      "lage_parameterwert": "Lehre, Velpke",
+      "zuordnung": {
+        "art": "gemeinde_oder_ortsteil",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_rh_bshe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 133 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 0,94 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_rh_bshe, Lage „Lehre, Velpke [1,14]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter HE RH“, Wert Lehre, Velpke; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
+    "fallzahl": 133,
+    "streuung": 0.3,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bshe#lage=Lehre%2C%20Velpke",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Helmstedt, Lage Lehre, Velpke"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03157",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Peine",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Peine",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        130000,
+        200000,
+        280000,
+        360000,
+        440000,
+        520000,
+        600000,
+        680000,
+        750000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        50,
+        70,
+        100,
+        130,
+        160,
+        190
+      ],
+      "zellen": {
+        "50": [
+          1.7,
+          1.18,
+          0.92,
+          0.78,
+          0.68,
+          0.62,
+          0.57,
+          0.53,
+          0.51
+        ],
+        "70": [
+          1.74,
+          1.21,
+          0.94,
+          0.79,
+          0.7,
+          0.63,
+          0.58,
+          0.54,
+          0.52
+        ],
+        "100": [
+          1.79,
+          1.24,
+          0.96,
+          0.81,
+          0.72,
+          0.65,
+          0.6,
+          0.56,
+          0.53
+        ],
+        "130": [
+          1.82,
+          1.26,
+          0.98,
+          0.83,
+          0.73,
+          0.66,
+          0.61,
+          0.57,
+          0.54
+        ],
+        "160": [
+          1.86,
+          1.29,
+          1,
+          0.84,
+          0.74,
+          0.67,
+          0.62,
+          0.57,
+          0.55
+        ],
+        "190": [
+          1.88,
+          1.3,
+          1.01,
+          0.85,
+          0.75,
+          0.68,
+          0.62,
+          0.58,
+          0.55
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 41 Jahre · Standardstufe 2,5 · Wohnfläche 140 m² · Lage „Hohenhameln, Ilsede, Lahstedt, Lengede“",
+      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter PE EFH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.69,
+          "25": 0.86,
+          "35": 0.96,
+          "45": 1.03,
+          "55": 1.08,
+          "65": 1.11,
+          "75": 1.14,
+          "80": 1.15
+        },
+        "rundung_stellen": 2,
+        "hinweis": "8 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.93,
+          "3": 1.05,
+          "4": 1.12,
+          "1.5": 0.83,
+          "2.5": 1,
+          "3.5": 1.09,
+          "4.5": 1.15
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Wohnfläche",
+        "feld": "wohnflaeche",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "60": 0.81,
+          "80": 0.88,
+          "100": 0.92,
+          "120": 0.97,
+          "140": 1,
+          "160": 1.03,
+          "180": 1.06,
+          "200": 1.08,
+          "220": 1.1,
+          "240": 1.12
+        },
+        "rundung_stellen": 2,
+        "hinweis": "10 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Hohenhameln, Ilsede, Lahstedt, Lengede",
+      "lage_dokument": "Gem. Hohenhameln, Ilsede, Lahstedt, Lengede [0,96]",
+      "lage_parameter": "Lageklname Parameter PE EFH",
+      "lage_parameterwert": "Gem. Hohenhameln, Ilsede, Lahstedt, Lengede",
+      "zuordnung": {
+        "art": "gemeinde",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_efh_bspe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 557 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 1,14 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_efh_bspe, Lage „Gem. Hohenhameln, Ilsede, Lahstedt, Lengede [0,96]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter PE EFH“, Wert Gem. Hohenhameln, Ilsede, Lahstedt, Lengede; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
+    "fallzahl": 557,
+    "streuung": 0.19,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bspe/dash#lage=Hohenhameln%2C%20Ilsede%2C%20Lahstedt%2C%20Lengede",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Peine, Lage Hohenhameln, Ilsede, Lahstedt, Lengede"
   },
   {
     "land_code": "NI",
@@ -1433,8 +3284,8 @@
       },
       "rundung_stellen": 2,
       "liefert": "faktor",
-      "normobjekt": "Restnutzungsdauer 41 Jahre · Standardstufe 2,5 · Wohnfläche 140 m²",
-      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen."
+      "normobjekt": "Restnutzungsdauer 41 Jahre · Standardstufe 2,5 · Wohnfläche 140 m² · Lage „Edemissen“",
+      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter PE EFH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
     },
     "korrekturen": [
       {
@@ -1505,9 +3356,22 @@
       "gnd_jahre": 80,
       "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
-    "geltungsbereich": {},
+    "geltungsbereich": {
+      "lage": "Edemissen",
+      "lage_dokument": "Gemeinde Edemissen [1,00]",
+      "lage_parameter": "Lageklname Parameter PE EFH",
+      "lage_parameterwert": "Gemeinde Edemissen",
+      "zuordnung": {
+        "art": "gemeinde",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
     "belege": [
-      "Kalkulator 2026_sw_efh_bspe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 557 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 1,14 aus."
+      "Kalkulator 2026_sw_efh_bspe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 557 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 1,14 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_efh_bspe, Lage „Gemeinde Edemissen [1,00]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter PE EFH“, Wert Gemeinde Edemissen; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
     ],
     "stufe": "B",
     "stufe_grund": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
@@ -1517,12 +3381,818 @@
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
     "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bspe/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
     "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
-    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Peine"
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Peine, Lage Edemissen"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03157",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Peine",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Peine",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        130000,
+        200000,
+        280000,
+        360000,
+        440000,
+        520000,
+        600000,
+        680000,
+        750000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        50,
+        70,
+        100,
+        130,
+        160,
+        190
+      ],
+      "zellen": {
+        "50": [
+          1.85,
+          1.28,
+          1,
+          0.84,
+          0.74,
+          0.67,
+          0.61,
+          0.57,
+          0.54
+        ],
+        "70": [
+          1.9,
+          1.31,
+          1.02,
+          0.86,
+          0.75,
+          0.68,
+          0.63,
+          0.58,
+          0.55
+        ],
+        "100": [
+          1.95,
+          1.35,
+          1.04,
+          0.88,
+          0.77,
+          0.7,
+          0.64,
+          0.6,
+          0.57
+        ],
+        "130": [
+          1.99,
+          1.37,
+          1.06,
+          0.89,
+          0.79,
+          0.71,
+          0.65,
+          0.61,
+          0.58
+        ],
+        "160": [
+          2.03,
+          1.4,
+          1.08,
+          0.91,
+          0.8,
+          0.72,
+          0.66,
+          0.62,
+          0.59
+        ],
+        "190": [
+          2.06,
+          1.42,
+          1.1,
+          0.92,
+          0.81,
+          0.73,
+          0.67,
+          0.63,
+          0.59
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 41 Jahre · Standardstufe 2,5 · Wohnfläche 140 m² · Lage „Vechelde, Wendeburg“",
+      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter PE EFH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.69,
+          "25": 0.86,
+          "35": 0.96,
+          "45": 1.03,
+          "55": 1.08,
+          "65": 1.11,
+          "75": 1.14,
+          "80": 1.15
+        },
+        "rundung_stellen": 2,
+        "hinweis": "8 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.93,
+          "3": 1.05,
+          "4": 1.12,
+          "1.5": 0.83,
+          "2.5": 1,
+          "3.5": 1.09,
+          "4.5": 1.15
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Wohnfläche",
+        "feld": "wohnflaeche",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "60": 0.81,
+          "80": 0.88,
+          "100": 0.92,
+          "120": 0.97,
+          "140": 1,
+          "160": 1.03,
+          "180": 1.06,
+          "200": 1.08,
+          "220": 1.1,
+          "240": 1.12
+        },
+        "rundung_stellen": 2,
+        "hinweis": "10 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Vechelde, Wendeburg",
+      "lage_dokument": "Gem. Vechelde, Wendeburg [1,04]",
+      "lage_parameter": "Lageklname Parameter PE EFH",
+      "lage_parameterwert": "Gem. Vechelde, Wendeburg",
+      "zuordnung": {
+        "art": "gemeinde",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_efh_bspe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 557 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 1,14 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_efh_bspe, Lage „Gem. Vechelde, Wendeburg [1,04]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter PE EFH“, Wert Gem. Vechelde, Wendeburg; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
+    "fallzahl": 557,
+    "streuung": 0.19,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bspe/dash#lage=Vechelde%2C%20Wendeburg",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Peine, Lage Vechelde, Wendeburg"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03157",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Peine",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Peine",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        130000,
+        200000,
+        280000,
+        360000,
+        440000,
+        520000,
+        600000,
+        680000,
+        750000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        50,
+        70,
+        100,
+        130,
+        160,
+        190
+      ],
+      "zellen": {
+        "50": [
+          1.93,
+          1.33,
+          1.04,
+          0.87,
+          0.77,
+          0.69,
+          0.64,
+          0.59,
+          0.56
+        ],
+        "70": [
+          1.98,
+          1.37,
+          1.06,
+          0.89,
+          0.78,
+          0.71,
+          0.65,
+          0.61,
+          0.58
+        ],
+        "100": [
+          2.03,
+          1.4,
+          1.09,
+          0.91,
+          0.8,
+          0.72,
+          0.67,
+          0.62,
+          0.59
+        ],
+        "130": [
+          2.08,
+          1.43,
+          1.11,
+          0.93,
+          0.82,
+          0.74,
+          0.68,
+          0.63,
+          0.6
+        ],
+        "160": [
+          2.12,
+          1.46,
+          1.13,
+          0.94,
+          0.83,
+          0.75,
+          0.69,
+          0.64,
+          0.61
+        ],
+        "190": [
+          2.15,
+          1.48,
+          1.14,
+          0.96,
+          0.84,
+          0.76,
+          0.7,
+          0.65,
+          0.62
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 41 Jahre · Standardstufe 2,5 · Wohnfläche 140 m² · Lage „Peine“",
+      "hinweis": "Alle 54 belegten Zellen sind am NORMOBJEKT abgetastet — dort stehen alle drei Umrechnungskurven auf 1,00. Abweichende Merkmale wirken über die Korrekturen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter PE EFH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.69,
+          "25": 0.86,
+          "35": 0.96,
+          "45": 1.03,
+          "55": 1.08,
+          "65": 1.11,
+          "75": 1.14,
+          "80": 1.15
+        },
+        "rundung_stellen": 2,
+        "hinweis": "8 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.93,
+          "3": 1.05,
+          "4": 1.12,
+          "1.5": 0.83,
+          "2.5": 1,
+          "3.5": 1.09,
+          "4.5": 1.15
+        },
+        "rundung_stellen": 2,
+        "hinweis": "7 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      },
+      {
+        "bez": "Abweichende Wohnfläche",
+        "feld": "wohnflaeche",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "60": 0.81,
+          "80": 0.88,
+          "100": 0.92,
+          "120": 0.97,
+          "140": 1,
+          "160": 1.03,
+          "180": 1.06,
+          "200": 1.08,
+          "220": 1.1,
+          "240": 1.12
+        },
+        "rundung_stellen": 2,
+        "hinweis": "10 abgedruckte Stützstellen. Zwischen ihnen wird linear interpoliert; über den Rand hinaus wird nicht verlängert."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Peine",
+      "lage_dokument": "Gemeinde Stadt Peine [1,08]",
+      "lage_parameter": "Lageklname Parameter PE EFH",
+      "lage_parameterwert": "Gemeinde Stadt Peine",
+      "zuordnung": {
+        "art": "gemeinde",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_efh_bspe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 557 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist am Normobjekt den Faktor 1,14 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_efh_bspe, Lage „Gemeinde Stadt Peine [1,08]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter PE EFH“, Wert Gemeinde Stadt Peine; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Stufe B statt A: die Gitterwerte sind nicht aus einer abgedruckten Tabelle übernommen, sondern am amtlichen Kalkulator abgetastet; die Stützstellen sind von uns gewählt. Die drei Korrekturkurven dagegen sind vom Ausschuss selbst abgedruckt.",
+    "fallzahl": 557,
+    "streuung": 0.19,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bspe/dash#lage=Peine",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert, der nach dem Modell der niedersächsischen Gutachterausschüsse ermittelt wurde (NHK 2010, Bezugsmaßstab Brutto-Grundfläche, lineare Alterswertminderung, Gesamtnutzungsdauer 80 Jahre). Für einen nach anderem Modell ermittelten Sachwert gelten sie nicht.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Peine, Lage Peine"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03157",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Peine",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Peine",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "rhdhh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        60000,
+        120000,
+        180000,
+        250000,
+        310000,
+        380000,
+        440000,
+        510000,
+        570000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        60,
+        90,
+        110,
+        140,
+        160,
+        190
+      ],
+      "zellen": {
+        "60": [
+          2.02,
+          1.28,
+          0.95,
+          0.73,
+          0.6,
+          0.5,
+          0.43,
+          0.37,
+          0.33
+        ],
+        "90": [
+          2.21,
+          1.43,
+          1.08,
+          0.84,
+          0.71,
+          0.6,
+          0.52,
+          0.46,
+          0.41
+        ],
+        "110": [
+          2.29,
+          1.5,
+          1.14,
+          0.9,
+          0.76,
+          0.64,
+          0.57,
+          0.5,
+          0.45
+        ],
+        "140": [
+          2.39,
+          1.57,
+          1.2,
+          0.95,
+          0.81,
+          0.69,
+          0.61,
+          0.54,
+          0.49
+        ],
+        "160": [
+          2.44,
+          1.61,
+          1.24,
+          0.98,
+          0.84,
+          0.72,
+          0.64,
+          0.56,
+          0.51
+        ],
+        "190": [
+          2.5,
+          1.66,
+          1.28,
+          1.02,
+          0.87,
+          0.75,
+          0.67,
+          0.59,
+          0.54
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 35 · Standardstufen 2,5 · Lage „Hohenhameln, Ilsede, Lahstedt, Lengede“",
+      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Lesbar war die Umrechnung für: Restnutzungsdauer, Standardstufe. Die übrigen bleiben als offene Korrektur im Ergebnis stehen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter PE RH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.98,
+          "25": 0.99,
+          "35": 1,
+          "45": 1,
+          "55": 1.01,
+          "65": 1.01,
+          "70": 1.01,
+          "75": 1.01,
+          "80": 1.01
+        },
+        "rundung_stellen": 2,
+        "hinweis": "9 abgedruckte Stützstellen."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.84,
+          "3": 1.11,
+          "4": 1.26,
+          "1.5": 0.61,
+          "2.5": 1,
+          "3.5": 1.19
+        },
+        "rundung_stellen": 2,
+        "hinweis": "6 abgedruckte Stützstellen."
+      },
+      {
+        "bez": "Umrechnung für abweichende Merkmale (im Dokument nur als Bild)",
+        "feld": "_nicht_lesbar",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {},
+        "rundung_stellen": 2,
+        "hinweis": "Der Ausschuss druckt Umrechnungskurven ab, aber ohne Zahlen an den Datenpunkten — sie sind aus dem PDF nicht lesbar. Der Tabellenwert gilt deshalb nur für die Stellung, an der er abgetastet wurde. Diese Korrektur bleibt absichtlich unbeziffert, damit sie als offen gemeldet wird statt still zu fehlen."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Hohenhameln, Ilsede, Lahstedt, Lengede",
+      "lage_dokument": "Gem. Hohenhameln, Ilsede, Lahstedt, Lengede [0,93]",
+      "lage_parameter": "Lageklname Parameter PE RH",
+      "lage_parameterwert": "Gem. Hohenhameln, Ilsede, Lahstedt, Lengede",
+      "zuordnung": {
+        "art": "gemeinde",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_rh_bspe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 233 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,1 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_rh_bspe, Lage „Gem. Hohenhameln, Ilsede, Lahstedt, Lengede [0,93]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter PE RH“, Wert Gem. Hohenhameln, Ilsede, Lahstedt, Lengede; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
+    "fallzahl": 233,
+    "streuung": 0.29,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bspe#lage=Hohenhameln%2C%20Ilsede%2C%20Lahstedt%2C%20Lengede",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Peine, Lage Hohenhameln, Ilsede, Lahstedt, Lengede"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03157",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Peine",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Peine",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "rhdhh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        60000,
+        120000,
+        180000,
+        250000,
+        310000,
+        380000,
+        440000,
+        510000,
+        570000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        60,
+        90,
+        110,
+        140,
+        160,
+        190
+      ],
+      "zellen": {
+        "60": [
+          2.07,
+          1.32,
+          0.98,
+          0.76,
+          0.63,
+          0.53,
+          0.46,
+          0.39,
+          0.35
+        ],
+        "90": [
+          2.26,
+          1.47,
+          1.11,
+          0.88,
+          0.74,
+          0.62,
+          0.55,
+          0.48,
+          0.43
+        ],
+        "110": [
+          2.35,
+          1.54,
+          1.18,
+          0.93,
+          0.79,
+          0.67,
+          0.59,
+          0.52,
+          0.47
+        ],
+        "140": [
+          2.44,
+          1.62,
+          1.24,
+          0.99,
+          0.84,
+          0.72,
+          0.64,
+          0.57,
+          0.51
+        ],
+        "160": [
+          2.49,
+          1.66,
+          1.28,
+          1.02,
+          0.87,
+          0.75,
+          0.67,
+          0.59,
+          0.54
+        ],
+        "190": [
+          2.55,
+          1.71,
+          1.32,
+          1.06,
+          0.91,
+          0.78,
+          0.7,
+          0.62,
+          0.56
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 35 · Standardstufen 2,5 · Lage „Edemissen“",
+      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Lesbar war die Umrechnung für: Restnutzungsdauer, Standardstufe. Die übrigen bleiben als offene Korrektur im Ergebnis stehen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter PE RH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.98,
+          "25": 0.99,
+          "35": 1,
+          "45": 1,
+          "55": 1.01,
+          "65": 1.01,
+          "70": 1.01,
+          "75": 1.01,
+          "80": 1.01
+        },
+        "rundung_stellen": 2,
+        "hinweis": "9 abgedruckte Stützstellen."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.84,
+          "3": 1.11,
+          "4": 1.26,
+          "1.5": 0.61,
+          "2.5": 1,
+          "3.5": 1.19
+        },
+        "rundung_stellen": 2,
+        "hinweis": "6 abgedruckte Stützstellen."
+      },
+      {
+        "bez": "Umrechnung für abweichende Merkmale (im Dokument nur als Bild)",
+        "feld": "_nicht_lesbar",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {},
+        "rundung_stellen": 2,
+        "hinweis": "Der Ausschuss druckt Umrechnungskurven ab, aber ohne Zahlen an den Datenpunkten — sie sind aus dem PDF nicht lesbar. Der Tabellenwert gilt deshalb nur für die Stellung, an der er abgetastet wurde. Diese Korrektur bleibt absichtlich unbeziffert, damit sie als offen gemeldet wird statt still zu fehlen."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Edemissen",
+      "lage_dokument": "Gemeinde Edemissen [0,97]",
+      "lage_parameter": "Lageklname Parameter PE RH",
+      "lage_parameterwert": "Gemeinde Edemissen",
+      "zuordnung": {
+        "art": "gemeinde",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_rh_bspe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 233 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,1 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_rh_bspe, Lage „Gemeinde Edemissen [0,97]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter PE RH“, Wert Gemeinde Edemissen; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
+    "fallzahl": 233,
+    "streuung": 0.29,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bspe#lage=Edemissen",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Peine, Lage Edemissen"
   },
   {
     "land_code": "NI",
@@ -1627,8 +4297,8 @@
       },
       "rundung_stellen": 2,
       "liefert": "faktor",
-      "normobjekt": "Restnutzungsdauer 35 · Standardstufen 2,5",
-      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Lesbar war die Umrechnung für: Restnutzungsdauer, Standardstufe. Die übrigen bleiben als offene Korrektur im Ergebnis stehen."
+      "normobjekt": "Restnutzungsdauer 35 · Standardstufen 2,5 · Lage „Vechelde, Wendeburg“",
+      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Lesbar war die Umrechnung für: Restnutzungsdauer, Standardstufe. Die übrigen bleiben als offene Korrektur im Ergebnis stehen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter PE RH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
     },
     "korrekturen": [
       {
@@ -1688,9 +4358,22 @@
       "gnd_jahre": 80,
       "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
-    "geltungsbereich": {},
+    "geltungsbereich": {
+      "lage": "Vechelde, Wendeburg",
+      "lage_dokument": "Gem. Vechelde, Wendeburg [1,00]",
+      "lage_parameter": "Lageklname Parameter PE RH",
+      "lage_parameterwert": "Gem. Vechelde, Wendeburg",
+      "zuordnung": {
+        "art": "gemeinde",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
     "belege": [
-      "Kalkulator 2026_sw_rh_bspe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 233 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,1 aus."
+      "Kalkulator 2026_sw_rh_bspe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 233 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,1 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_rh_bspe, Lage „Gem. Vechelde, Wendeburg [1,00]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter PE RH“, Wert Gem. Vechelde, Wendeburg; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
     ],
     "stufe": "B",
     "stufe_grund": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
@@ -1699,13 +4382,209 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bspe/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bspe",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
     "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
-    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Peine"
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Peine, Lage Vechelde, Wendeburg"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03157",
+    "ebene": "kreis",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Peine",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg, Bereich Landkreis Peine",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "rhdhh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        60000,
+        120000,
+        180000,
+        250000,
+        310000,
+        380000,
+        440000,
+        510000,
+        570000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        60,
+        90,
+        110,
+        140,
+        160,
+        190
+      ],
+      "zellen": {
+        "60": [
+          2.17,
+          1.4,
+          1.05,
+          0.82,
+          0.69,
+          0.58,
+          0.51,
+          0.44,
+          0.39
+        ],
+        "90": [
+          2.37,
+          1.56,
+          1.19,
+          0.94,
+          0.8,
+          0.68,
+          0.6,
+          0.53,
+          0.48
+        ],
+        "110": [
+          2.46,
+          1.63,
+          1.25,
+          1,
+          0.85,
+          0.73,
+          0.65,
+          0.57,
+          0.52
+        ],
+        "140": [
+          2.55,
+          1.71,
+          1.32,
+          1.06,
+          0.91,
+          0.78,
+          0.7,
+          0.62,
+          0.57
+        ],
+        "160": [
+          2.6,
+          1.75,
+          1.36,
+          1.09,
+          0.94,
+          0.81,
+          0.72,
+          0.65,
+          0.59
+        ],
+        "190": [
+          2.67,
+          1.8,
+          1.4,
+          1.13,
+          0.98,
+          0.84,
+          0.76,
+          0.68,
+          0.62
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauer 35 · Standardstufen 2,5 · Lage „Peine“",
+      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Lesbar war die Umrechnung für: Restnutzungsdauer, Standardstufe. Die übrigen bleiben als offene Korrektur im Ergebnis stehen. v2883: dasselbe Gitter je LAGE am Kalkulator abgefragt (Lage-Parameter „Lageklname Parameter PE RH“ per Index gesetzt). Die Vorgabe-Lage reproduziert alle 54 Zellen des bisherigen Satzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "15": 0.98,
+          "25": 0.99,
+          "35": 1,
+          "45": 1,
+          "55": 1.01,
+          "65": 1.01,
+          "70": 1.01,
+          "75": 1.01,
+          "80": 1.01
+        },
+        "rundung_stellen": 2,
+        "hinweis": "9 abgedruckte Stützstellen."
+      },
+      {
+        "bez": "Abweichende Standardstufe",
+        "feld": "standardstufe",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "2": 0.84,
+          "3": 1.11,
+          "4": 1.26,
+          "1.5": 0.61,
+          "2.5": 1,
+          "3.5": 1.19
+        },
+        "rundung_stellen": 2,
+        "hinweis": "6 abgedruckte Stützstellen."
+      },
+      {
+        "bez": "Umrechnung für abweichende Merkmale (im Dokument nur als Bild)",
+        "feld": "_nicht_lesbar",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {},
+        "rundung_stellen": 2,
+        "hinweis": "Der Ausschuss druckt Umrechnungskurven ab, aber ohne Zahlen an den Datenpunkten — sie sind aus dem PDF nicht lesbar. Der Tabellenwert gilt deshalb nur für die Stellung, an der er abgetastet wurde. Diese Korrektur bleibt absichtlich unbeziffert, damit sie als offen gemeldet wird statt still zu fehlen."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "lage": "Peine",
+      "lage_dokument": "Gemeinde Stadt Peine [1,03]",
+      "lage_parameter": "Lageklname Parameter PE RH",
+      "lage_parameterwert": "Gemeinde Stadt Peine",
+      "zuordnung": {
+        "art": "gemeinde",
+        "hinweis": "Die Lagenamen des Kalkulators nennen die Gemeinden bzw. Ortsteile selbst; zugeordnet wird nur ein vollständiger Name (Ortsteil vor Gemeinde). Ein Ort, der in keinem Lagenamen steht (z. B. Mitgliedsgemeinden einer Samtgemeinde oder „Südkreis“), bekommt keinen Faktor."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_rh_bspe (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, Stichprobe 233 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,1 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_rh_bspe, Lage „Gemeinde Stadt Peine [1,03]“ (v2883, 2026-10-22)",
+        "wortlaut": "Lage-Parameter „Lageklname Parameter PE RH“, Wert Gemeinde Stadt Peine; Quelle: Gutachterausschüsse für Grundstückswerte in Niedersachsen 2026, Datenbasis: 01.01.2026, Tag der Veröffentlichung: 02.03.2026"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
+    "fallzahl": 233,
+    "streuung": 0.29,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bspe#lage=Peine",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Peine, Lage Peine"
   },
   {
     "land_code": "NI",
@@ -2222,6 +5101,44 @@
     "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont",
     "kennzahl": "sachwertfaktor",
     "zweig": "ezfh",
+    "objektart_bez": null,
+    "formel": null,
+    "korrekturen": [],
+    "modellansaetze": null,
+    "geltungsbereich": null,
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "https://public.tableau.com/views/2026_sw_efh_hmhhm/dash (am 22.10.2026 in der Sitzung gelesen)"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": null,
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "berichtsjahr": 2026,
+    "modellversion": null,
+    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhm/dash",
+    "quelle_parser": "v2883-hand",
+    "quellenvermerk": null,
+    "lizenz": "kein Wert - Lizenz nicht einschlägig",
+    "fundstelle": "https://public.tableau.com/views/2026_sw_efh_hmhhm/dash",
+    "auflagen": [
+      "KEIN Nachbarkreis und kein Landesmittel."
+    ],
+    "warum_kein_wert": "Der Kalkulator 2026_sw_efh_hmhhm (Gutachterausschuss Hameln-Hannover, Landkreis Hameln-Pyrmont) staffelt den Sachwertfaktor für freistehende Ein- und Zweifamilienhäuser nach vier Lagen: „Hameln“ 1,00, „Bad Pyrmont“ 0,88, „Kleinstädte“ 0,88 und „Dörfer“ 0,84 (Blatt „Umrechnungskoeffizienten für abweichende Lagen“). Welche Gemeinden „Kleinstädte“ und welche „Dörfer“ sind, nennt der Kalkulator nicht. Für die Städte Hameln und Bad Pyrmont stehen eigene Sätze auf Gemeindeebene; für alle übrigen Gemeinden bleibt der Faktor offen. Bis v2882 stand hier EIN Satz an der Vorgabe-Lage „Hameln“ für den ganzen Kreis — in einem Dorf lag er rund 16 Prozent zu hoch. WEG ZUR QUELLE: Kalkulator mit Lageauswahl unter dem Link.",
+    "unvollstaendig_grund": "Der Kalkulator 2026_sw_efh_hmhhm (Gutachterausschuss Hameln-Hannover, Landkreis Hameln-Pyrmont) staffelt den Sachwertfaktor für freistehende Ein- und Zweifamilienhäuser nach vier Lagen: „Hameln“ 1,00, „Bad Pyrmont“ 0,88, „Kleinstädte“ 0,88 und „Dörfer“ 0,84 (Blatt „Umrechnungskoeffizienten für abweichende Lagen“). Welche Gemeinden „Kleinstädte“ und welche „Dörfer“ sind, nennt der Kalkulator nicht. Für die Städte Hameln und Bad Pyrmont stehen eigene Sätze auf Gemeindeebene; für alle übrigen Gemeinden bleibt der Faktor offen. Bis v2882 stand hier EIN Satz an der Vorgabe-Lage „Hameln“ für den ganzen Kreis — in einem Dorf lag er rund 16 Prozent zu hoch. WEG ZUR QUELLE: Kalkulator mit Lageauswahl unter dem Link.",
+    "vollstaendig": false
+  },
+  {
+    "land_code": "NI",
+    "ags": "03252006",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont, Hameln, Stadt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
     "formel": {
       "form": "matrix_interp",
       "achse_x_feld": "sachwert",
@@ -2317,8 +5234,8 @@
       },
       "rundung_stellen": 2,
       "liefert": "faktor",
-      "normobjekt": null,
-      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Keine der Umrechnungskurven war lesbar. Die übrigen bleiben als offene Korrektur im Ergebnis stehen."
+      "normobjekt": " · Lage „Hameln“",
+      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Keine der Umrechnungskurven war lesbar. Die übrigen bleiben als offene Korrektur im Ergebnis stehen. v2883: Gitter mit gesetzter Lage „Hameln“ (Lage-Parameter Wert 1) abgefragt; die Vorgabe-Lage „Hameln“ reproduziert alle Zellen des bisherigen Kreissatzes."
     },
     "korrekturen": [
       {
@@ -2343,9 +5260,96 @@
       "gnd_jahre": 80,
       "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
-    "geltungsbereich": {},
+    "geltungsbereich": {
+      "raeumlich": "Hameln, Stadt",
+      "lage_dokument": "Hameln",
+      "lage_parameterwert": "1",
+      "hinweis": "Der Kalkulator führt die Lagen „Hameln“, „Bad Pyrmont“, „Kleinstädte“ und „Dörfer“ (Tabelle „Umrechnungskoeffizienten für abweichende Lagen“: 1,00 / 0,88 / 0,88 / 0,84). Zugeordnet sind nur die beiden Lagen, die eine Gemeinde beim Namen nennen. Ob Ortschaften dieser Städte als „Dörfer“ gelten, sagt der Kalkulator nicht. v2888: gilt nur noch in der Gemarkung Hameln.",
+      "lage": "Hameln",
+      "zuordnung": {
+        "art": "gemarkung",
+        "quelle": "BORIS-D, WMS https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte (GetFeatureInfo, Felder „Gemarkungsnummer“ und „Gemarkungsname“), Rasterabfrage über das Stadtgebiet im Abstand von rund 650 m am 23.10.2026",
+        "tabelle": [
+          {
+            "gemarkung": "Hameln",
+            "gemarkungsnr": "034960",
+            "lageklasse": "Hameln"
+          },
+          {
+            "gemarkung": "Haverbeck",
+            "gemarkungsnr": "034738",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Wehrbergen",
+            "gemarkungsnr": "034739",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Halvestorf",
+            "gemarkungsnr": "034740",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Welliehausen",
+            "gemarkungsnr": "034956",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Holtensen",
+            "gemarkungsnr": "034957",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Unsen",
+            "gemarkungsnr": "034958",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Groß Hilligsfeld",
+            "gemarkungsnr": "034959",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Rohrsen Hn",
+            "gemarkungsnr": "034961",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Klein Hilligsfeld",
+            "gemarkungsnr": "034962",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Afferde",
+            "gemarkungsnr": "034963",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Klein Berkel",
+            "gemarkungsnr": "034964",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Hastenbeck",
+            "gemarkungsnr": "034965",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Tündern",
+            "gemarkungsnr": "034966",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          }
+        ],
+        "hinweis": "Der Kalkulator nennt die Lage „Hameln“, ohne zu sagen, ob die Ortschaften der Stadt dazugehören oder als „Dörfer“ gelten. Zugeordnet ist deshalb nur die Gemarkung, die den Namen trägt (Hameln, 034960); 13 weitere Gemarkungen der Stadt sind als „Ortschaften der Stadt Hameln“ gesperrt. Eine Gemarkung, die hier nicht steht, bekommt keinen Faktor."
+      }
+    },
     "belege": [
-      "Kalkulator 2026_sw_efh_hmhhm (Tableau Public, Profil ogagmd2026), Datenbasis 01.10.2025, Stichprobe 387 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,21 aus."
+      "Kalkulator 2026_sw_efh_hmhhm (Tableau Public, Profil ogagmd2026), Datenbasis 01.10.2025, Stichprobe 387 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,21 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_efh_hmhhm, Lage „Hameln“, Blatt „tabweiterelage“ (v2883)",
+        "wortlaut": "Hameln 1,00 · Bad Pyrmont 0,88 · Kleinstädte 0,88 · Dörfer 0,84"
+      }
     ],
     "stufe": "B",
     "stufe_grund": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
@@ -2355,7 +5359,788 @@
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
     "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhm/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-gemarkung",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert. Gilt nur in der Gemarkung Hameln (034960); für die übrigen Gemarkungen der Stadt ist der Faktor gesperrt.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Hameln-Pyrmont, Lage Hameln"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03252006",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont, Hameln, Stadt, Ortschaften der Stadt Hameln",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart_bez": null,
+    "formel": null,
+    "korrekturen": [],
+    "modellansaetze": null,
+    "geltungsbereich": {
+      "lage": "Ortschaften der Stadt Hameln",
+      "zuordnung": {
+        "art": "gemarkung",
+        "quelle": "BORIS-D, WMS https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte (GetFeatureInfo, Felder „Gemarkungsnummer“ und „Gemarkungsname“), Rasterabfrage über das Stadtgebiet im Abstand von rund 650 m am 23.10.2026",
+        "tabelle": [
+          {
+            "gemarkung": "Hameln",
+            "gemarkungsnr": "034960",
+            "lageklasse": "Hameln"
+          },
+          {
+            "gemarkung": "Haverbeck",
+            "gemarkungsnr": "034738",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Wehrbergen",
+            "gemarkungsnr": "034739",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Halvestorf",
+            "gemarkungsnr": "034740",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Welliehausen",
+            "gemarkungsnr": "034956",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Holtensen",
+            "gemarkungsnr": "034957",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Unsen",
+            "gemarkungsnr": "034958",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Groß Hilligsfeld",
+            "gemarkungsnr": "034959",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Rohrsen Hn",
+            "gemarkungsnr": "034961",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Klein Hilligsfeld",
+            "gemarkungsnr": "034962",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Afferde",
+            "gemarkungsnr": "034963",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Klein Berkel",
+            "gemarkungsnr": "034964",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Hastenbeck",
+            "gemarkungsnr": "034965",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Tündern",
+            "gemarkungsnr": "034966",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          }
+        ],
+        "hinweis": "Der Kalkulator nennt die Lage „Hameln“, ohne zu sagen, ob die Ortschaften der Stadt dazugehören oder als „Dörfer“ gelten. Zugeordnet ist deshalb nur die Gemarkung, die den Namen trägt (Hameln, 034960); 13 weitere Gemarkungen der Stadt sind als „Ortschaften der Stadt Hameln“ gesperrt. Eine Gemarkung, die hier nicht steht, bekommt keinen Faktor."
+      },
+      "raeumlich": "Hameln, Stadt"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Kalkulator 2026_sw_efh_hmhhm (Tableau Public, Profil ogagmd2026), Parameter „Lage“ [Hameln, Bad Pyrmont, Kleinstädte, Dörfer], Blatt „tabweiterelage“; Modellbeschreibung https://www.gag.niedersachsen.de/download/225531/hmh_2026_sw_modellbeschreibung.pdf (ohne Ortsliste); gelesen 23.10.2026"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": null,
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "berichtsjahr": 2026,
+    "modellversion": null,
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_hmhhm#lage=Ortschaften%20der%20Stadt%20Hameln",
+    "quelle_parser": "v2888-hand",
+    "quellenvermerk": null,
+    "lizenz": "kein Wert - Lizenz nicht einschlägig",
+    "fundstelle": "Kalkulator 2026_sw_efh_hmhhm, Blatt „tabweiterelage“",
+    "auflagen": [
+      "KEIN Nachbarkreis und kein Landesmittel."
+    ],
+    "zugang": "kostenfrei",
+    "warum_kein_wert": "Der Kalkulator 2026_sw_efh_hmhhm (Gutachterausschuss Hameln-Hannover, freistehende Ein- und Zweifamilienhäuser, Landkreis Hameln-Pyrmont, frei abrufbar) staffelt den Sachwertfaktor nach den Lagen „Hameln“ 1,00, „Bad Pyrmont“ 0,88, „Kleinstädte“ 0,88 und „Dörfer“ 0,84 (Blatt „Umrechnungskoeffizienten für abweichende Lagen“). Ob die Ortschaften der Stadt Hameln (Gemarkungen Haverbeck, Wehrbergen, Halvestorf, Welliehausen, Holtensen, Unsen, Groß Hilligsfeld, Rohrsen Hn, Klein Hilligsfeld, Afferde, Klein Berkel, Hastenbeck, Tündern) zur Lage „Hameln“ oder zu „Dörfer“ gehören, sagen weder der Kalkulator noch seine Modellbeschreibung; der Unterschied beträgt Hameln 1,00 gegen Dörfer 0,84 — bis zu 16 Prozent. Für die Gemarkung Hameln steht ein Wert. WEG ZUR QUELLE: Kalkulator unter dem Link, Lage dort selbst wählen; den Faktor als eigene Angabe eintragen.",
+    "unvollstaendig_grund": "Der Kalkulator 2026_sw_efh_hmhhm (Gutachterausschuss Hameln-Hannover, freistehende Ein- und Zweifamilienhäuser, Landkreis Hameln-Pyrmont, frei abrufbar) staffelt den Sachwertfaktor nach den Lagen „Hameln“ 1,00, „Bad Pyrmont“ 0,88, „Kleinstädte“ 0,88 und „Dörfer“ 0,84 (Blatt „Umrechnungskoeffizienten für abweichende Lagen“). Ob die Ortschaften der Stadt Hameln (Gemarkungen Haverbeck, Wehrbergen, Halvestorf, Welliehausen, Holtensen, Unsen, Groß Hilligsfeld, Rohrsen Hn, Klein Hilligsfeld, Afferde, Klein Berkel, Hastenbeck, Tündern) zur Lage „Hameln“ oder zu „Dörfer“ gehören, sagen weder der Kalkulator noch seine Modellbeschreibung; der Unterschied beträgt Hameln 1,00 gegen Dörfer 0,84 — bis zu 16 Prozent. Für die Gemarkung Hameln steht ein Wert. WEG ZUR QUELLE: Kalkulator unter dem Link, Lage dort selbst wählen; den Faktor als eigene Angabe eintragen.",
+    "vollstaendig": false
+  },
+  {
+    "land_code": "NI",
+    "ags": "03252006",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont, Hameln, Stadt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "rhdhh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        60000,
+        90000,
+        140000,
+        180000,
+        220000,
+        260000,
+        300000,
+        350000,
+        380000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        30,
+        60,
+        90,
+        120,
+        160,
+        190
+      ],
+      "zellen": {
+        "30": [
+          1.4,
+          1.13,
+          0.88,
+          0.76,
+          0.67,
+          0.61,
+          0.55,
+          0.5,
+          0.47
+        ],
+        "60": [
+          1.55,
+          1.26,
+          1,
+          0.87,
+          0.78,
+          0.71,
+          0.65,
+          0.59,
+          0.56
+        ],
+        "90": [
+          1.67,
+          1.38,
+          1.1,
+          0.97,
+          0.87,
+          0.79,
+          0.73,
+          0.67,
+          0.64
+        ],
+        "120": [
+          1.78,
+          1.47,
+          1.19,
+          1.05,
+          0.94,
+          0.86,
+          0.8,
+          0.74,
+          0.7
+        ],
+        "160": [
+          1.91,
+          1.59,
+          1.29,
+          1.15,
+          1.04,
+          0.95,
+          0.89,
+          0.82,
+          0.78
+        ],
+        "190": [
+          2,
+          1.67,
+          1.36,
+          1.21,
+          1.1,
+          1.02,
+          0.95,
+          0.88,
+          0.84
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauern 30",
+      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Lesbar war die Umrechnung für: Restnutzungsdauer. Die übrigen bleiben als offene Korrektur im Ergebnis stehen."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "10": 0.81,
+          "15": 0.89,
+          "20": 0.94,
+          "25": 0.98,
+          "30": 1,
+          "35": 1.02,
+          "40": 1.03,
+          "45": 1.05,
+          "50": 1.06
+        },
+        "rundung_stellen": 2,
+        "hinweis": "9 abgedruckte Stützstellen."
+      },
+      {
+        "bez": "Umrechnung für abweichende Merkmale (im Dokument nur als Bild)",
+        "feld": "_nicht_lesbar",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {},
+        "rundung_stellen": 2,
+        "hinweis": "Der Ausschuss druckt Umrechnungskurven ab, aber ohne Zahlen an den Datenpunkten — sie sind aus dem PDF nicht lesbar. Der Tabellenwert gilt deshalb nur für die Stellung, an der er abgetastet wurde. Diese Korrektur bleibt absichtlich unbeziffert, damit sie als offen gemeldet wird statt still zu fehlen."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "hinweis": "Unveränderte Kopie des Kreissatzes (Reihenhaus-Kalkulator ohne Lage-Parameter), damit die Gemeindeebene den Reihenhaus-Faktor weiter findet."
+    },
+    "belege": [
+      "Kalkulator 2026_sw_rh_hmhhm (Tableau Public, Profil ogagmd2026), Datenbasis ?, Stichprobe 277 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,12 aus."
+    ],
+    "stufe": "B",
+    "stufe_grund": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
+    "fallzahl": 277,
+    "streuung": 0.24,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_hmhhm",
+    "quelle_parser": "v1612-WREZ+v2883-kopie+v2888-url",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Hameln-Pyrmont"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03252003",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont, Bad Pyrmont, Stadt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        90000,
+        150000,
+        230000,
+        300000,
+        370000,
+        440000,
+        520000,
+        590000,
+        660000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        20,
+        50,
+        90,
+        130,
+        160,
+        200
+      ],
+      "zellen": {
+        "20": [
+          1.19,
+          0.99,
+          0.83,
+          0.74,
+          0.67,
+          0.61,
+          0.56,
+          0.52,
+          0.48
+        ],
+        "50": [
+          1.27,
+          1.06,
+          0.91,
+          0.82,
+          0.74,
+          0.69,
+          0.64,
+          0.6,
+          0.56
+        ],
+        "90": [
+          1.32,
+          1.12,
+          0.96,
+          0.87,
+          0.8,
+          0.74,
+          0.69,
+          0.65,
+          0.62
+        ],
+        "130": [
+          1.36,
+          1.16,
+          1,
+          0.91,
+          0.84,
+          0.78,
+          0.73,
+          0.69,
+          0.65
+        ],
+        "160": [
+          1.38,
+          1.18,
+          1.02,
+          0.93,
+          0.86,
+          0.8,
+          0.75,
+          0.71,
+          0.68
+        ],
+        "200": [
+          1.4,
+          1.2,
+          1.05,
+          0.95,
+          0.88,
+          0.83,
+          0.77,
+          0.73,
+          0.7
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": " · Lage „Bad Pyrmont“",
+      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Keine der Umrechnungskurven war lesbar. Die übrigen bleiben als offene Korrektur im Ergebnis stehen. v2883: Gitter mit gesetzter Lage „Bad Pyrmont“ (Lage-Parameter Wert 0.88) abgefragt; die Vorgabe-Lage „Hameln“ reproduziert alle Zellen des bisherigen Kreissatzes."
+    },
+    "korrekturen": [
+      {
+        "bez": "Umrechnung für abweichende Merkmale (im Dokument nur als Bild)",
+        "feld": "_nicht_lesbar",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {},
+        "rundung_stellen": 2,
+        "hinweis": "Der Ausschuss druckt Umrechnungskurven ab, aber ohne Zahlen an den Datenpunkten — sie sind aus dem PDF nicht lesbar. Der Tabellenwert gilt deshalb nur für die Stellung, an der er abgetastet wurde. Diese Korrektur bleibt absichtlich unbeziffert, damit sie als offen gemeldet wird statt still zu fehlen."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.1 Sachwertfaktoren – Ein- und Zweifamilienhäuser, S. 4",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "raeumlich": "Bad Pyrmont, Stadt",
+      "lage_dokument": "Bad Pyrmont",
+      "lage_parameterwert": "0.88",
+      "hinweis": "Der Kalkulator führt die Lagen „Hameln“, „Bad Pyrmont“, „Kleinstädte“ und „Dörfer“ (Tabelle „Umrechnungskoeffizienten für abweichende Lagen“: 1,00 / 0,88 / 0,88 / 0,84). Zugeordnet sind nur die beiden Lagen, die eine Gemeinde beim Namen nennen. Ob Ortschaften dieser Städte als „Dörfer“ gelten, sagt der Kalkulator nicht. v2888: gilt nur noch in der Gemarkung Pyrmont; v2893: dazu Holzhausen und Oesdorf.",
+      "lage": "Bad Pyrmont",
+      "zuordnung": {
+        "art": "gemarkung",
+        "quelle": "BORIS-D, WMS https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte (GetFeatureInfo, Felder „Gemarkungsnummer“ und „Gemarkungsname“), Rasterabfrage über das Stadtgebiet im Abstand von rund 650 m am 23.10.2026",
+        "tabelle": [
+          {
+            "gemarkung": "Pyrmont",
+            "gemarkungsnr": "035803",
+            "lageklasse": "Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Hagen",
+            "gemarkungsnr": "035801",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Holzhausen",
+            "gemarkungsnr": "035802",
+            "lageklasse": "Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Oesdorf",
+            "gemarkungsnr": "035804",
+            "lageklasse": "Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Löwensen",
+            "gemarkungsnr": "035805",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Thal",
+            "gemarkungsnr": "035806",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Kleinenberg",
+            "gemarkungsnr": "035807",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Großenberg",
+            "gemarkungsnr": "035808",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Eichenborn",
+            "gemarkungsnr": "035809",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Baarsen",
+            "gemarkungsnr": "035810",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Neersen",
+            "gemarkungsnr": "035901",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          }
+        ],
+        "hinweis": "Der Kalkulator nennt die Lage „Bad Pyrmont“, ohne zu sagen, ob die Ortschaften der Stadt dazugehören oder als „Dörfer“ gelten. Zugeordnet ist deshalb nur die Gemarkung, die den Namen trägt (Pyrmont, 035803); 10 weitere Gemarkungen der Stadt sind als „Ortsteile der Stadt Bad Pyrmont“ gesperrt. Eine Gemarkung, die hier nicht steht, bekommt keinen Faktor. Holzhausen (035802) und Oesdorf (035804) sind städtisch bebaut und gelten als Lage „Bad Pyrmont“ (Entscheidung Marcel Junker, DESAG-Sachverständiger, 23.10.2026, v2893)."
+      }
+    },
+    "belege": [
+      "Kalkulator 2026_sw_efh_hmhhm (Tableau Public, Profil ogagmd2026), Datenbasis 01.10.2025, Stichprobe 387 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,21 aus.",
+      {
+        "fundstelle": "Kalkulator 2026_sw_efh_hmhhm, Lage „Bad Pyrmont“, Blatt „tabweiterelage“ (v2883)",
+        "wortlaut": "Hameln 1,00 · Bad Pyrmont 0,88 · Kleinstädte 0,88 · Dörfer 0,84"
+      }
+    ],
+    "stufe": "B",
+    "stufe_grund": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
+    "fallzahl": 387,
+    "streuung": 0.18,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhm/dash",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-gemarkung+v2893-stadtlage",
+    "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+    "lizenz": "dl-de/by-2-0",
+    "verwendung": "produkt",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert. Gilt in den Gemarkungen Pyrmont (035803), Holzhausen (035802) und Oesdorf (035804); für die übrigen Gemarkungen der Stadt ist der Faktor gesperrt.",
+    "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Hameln-Pyrmont, Lage Bad Pyrmont"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03252003",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont, Bad Pyrmont, Stadt, Ortsteile der Stadt Bad Pyrmont",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart_bez": null,
+    "formel": null,
+    "korrekturen": [],
+    "modellansaetze": null,
+    "geltungsbereich": {
+      "lage": "Ortsteile der Stadt Bad Pyrmont",
+      "zuordnung": {
+        "art": "gemarkung",
+        "quelle": "BORIS-D, WMS https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte (GetFeatureInfo, Felder „Gemarkungsnummer“ und „Gemarkungsname“), Rasterabfrage über das Stadtgebiet im Abstand von rund 650 m am 23.10.2026",
+        "tabelle": [
+          {
+            "gemarkung": "Pyrmont",
+            "gemarkungsnr": "035803",
+            "lageklasse": "Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Hagen",
+            "gemarkungsnr": "035801",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Holzhausen",
+            "gemarkungsnr": "035802",
+            "lageklasse": "Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Oesdorf",
+            "gemarkungsnr": "035804",
+            "lageklasse": "Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Löwensen",
+            "gemarkungsnr": "035805",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Thal",
+            "gemarkungsnr": "035806",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Kleinenberg",
+            "gemarkungsnr": "035807",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Großenberg",
+            "gemarkungsnr": "035808",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Eichenborn",
+            "gemarkungsnr": "035809",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Baarsen",
+            "gemarkungsnr": "035810",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Neersen",
+            "gemarkungsnr": "035901",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          }
+        ],
+        "hinweis": "Der Kalkulator nennt die Lage „Bad Pyrmont“, ohne zu sagen, ob die Ortschaften der Stadt dazugehören oder als „Dörfer“ gelten. Zugeordnet ist deshalb nur die Gemarkung, die den Namen trägt (Pyrmont, 035803); 10 weitere Gemarkungen der Stadt sind als „Ortsteile der Stadt Bad Pyrmont“ gesperrt. Eine Gemarkung, die hier nicht steht, bekommt keinen Faktor. Holzhausen (035802) und Oesdorf (035804) sind städtisch bebaut und gelten als Lage „Bad Pyrmont“ (Entscheidung Marcel Junker, DESAG-Sachverständiger, 23.10.2026, v2893)."
+      },
+      "raeumlich": "Bad Pyrmont, Stadt"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Kalkulator 2026_sw_efh_hmhhm (Tableau Public, Profil ogagmd2026), Parameter „Lage“ [Hameln, Bad Pyrmont, Kleinstädte, Dörfer], Blatt „tabweiterelage“; Modellbeschreibung https://www.gag.niedersachsen.de/download/225531/hmh_2026_sw_modellbeschreibung.pdf (ohne Ortsliste); gelesen 23.10.2026"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": null,
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "berichtsjahr": 2026,
+    "modellversion": null,
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_hmhhm#lage=Ortsteile%20der%20Stadt%20Bad%20Pyrmont",
+    "quelle_parser": "v2888-hand",
+    "quellenvermerk": null,
+    "lizenz": "kein Wert - Lizenz nicht einschlägig",
+    "fundstelle": "Kalkulator 2026_sw_efh_hmhhm, Blatt „tabweiterelage“",
+    "auflagen": [
+      "KEIN Nachbarkreis und kein Landesmittel."
+    ],
+    "zugang": "kostenfrei",
+    "warum_kein_wert": "Der Kalkulator 2026_sw_efh_hmhhm (Gutachterausschuss Hameln-Hannover, freistehende Ein- und Zweifamilienhäuser, Landkreis Hameln-Pyrmont, frei abrufbar) staffelt den Sachwertfaktor nach den Lagen „Hameln“ 1,00, „Bad Pyrmont“ 0,88, „Kleinstädte“ 0,88 und „Dörfer“ 0,84 (Blatt „Umrechnungskoeffizienten für abweichende Lagen“). Ob die Ortsteile der Stadt Bad Pyrmont (Gemarkungen Hagen, Holzhausen, Oesdorf, Löwensen, Thal, Kleinenberg, Großenberg, Eichenborn, Baarsen, Neersen) zur Lage „Bad Pyrmont“ oder zu „Dörfer“ gehören, sagen weder der Kalkulator noch seine Modellbeschreibung; der Unterschied beträgt Bad Pyrmont 0,88 gegen Dörfer 0,84 — rund 5 Prozent. Für die Gemarkung Pyrmont steht ein Wert. WEG ZUR QUELLE: Kalkulator unter dem Link, Lage dort selbst wählen; den Faktor als eigene Angabe eintragen.",
+    "unvollstaendig_grund": "Der Kalkulator 2026_sw_efh_hmhhm (Gutachterausschuss Hameln-Hannover, freistehende Ein- und Zweifamilienhäuser, Landkreis Hameln-Pyrmont, frei abrufbar) staffelt den Sachwertfaktor nach den Lagen „Hameln“ 1,00, „Bad Pyrmont“ 0,88, „Kleinstädte“ 0,88 und „Dörfer“ 0,84 (Blatt „Umrechnungskoeffizienten für abweichende Lagen“). Ob die Ortsteile der Stadt Bad Pyrmont (Gemarkungen Hagen, Holzhausen, Oesdorf, Löwensen, Thal, Kleinenberg, Großenberg, Eichenborn, Baarsen, Neersen) zur Lage „Bad Pyrmont“ oder zu „Dörfer“ gehören, sagen weder der Kalkulator noch seine Modellbeschreibung; der Unterschied beträgt Bad Pyrmont 0,88 gegen Dörfer 0,84 — rund 5 Prozent. Für die Gemarkung Pyrmont steht ein Wert. WEG ZUR QUELLE: Kalkulator unter dem Link, Lage dort selbst wählen; den Faktor als eigene Angabe eintragen.",
+    "vollstaendig": false
+  },
+  {
+    "land_code": "NI",
+    "ags": "03252003",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont, Bad Pyrmont, Stadt",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "rhdhh",
+    "formel": {
+      "form": "matrix_interp",
+      "achse_x_feld": "sachwert",
+      "achse_x_bez": "vorläufiger Sachwert in Euro",
+      "achse_x": [
+        60000,
+        90000,
+        140000,
+        180000,
+        220000,
+        260000,
+        300000,
+        350000,
+        380000
+      ],
+      "achse_y_feld": "brw",
+      "achse_y_bez": "Bodenrichtwert in €/m²",
+      "achse_y": [
+        30,
+        60,
+        90,
+        120,
+        160,
+        190
+      ],
+      "zellen": {
+        "30": [
+          1.4,
+          1.13,
+          0.88,
+          0.76,
+          0.67,
+          0.61,
+          0.55,
+          0.5,
+          0.47
+        ],
+        "60": [
+          1.55,
+          1.26,
+          1,
+          0.87,
+          0.78,
+          0.71,
+          0.65,
+          0.59,
+          0.56
+        ],
+        "90": [
+          1.67,
+          1.38,
+          1.1,
+          0.97,
+          0.87,
+          0.79,
+          0.73,
+          0.67,
+          0.64
+        ],
+        "120": [
+          1.78,
+          1.47,
+          1.19,
+          1.05,
+          0.94,
+          0.86,
+          0.8,
+          0.74,
+          0.7
+        ],
+        "160": [
+          1.91,
+          1.59,
+          1.29,
+          1.15,
+          1.04,
+          0.95,
+          0.89,
+          0.82,
+          0.78
+        ],
+        "190": [
+          2,
+          1.67,
+          1.36,
+          1.21,
+          1.1,
+          1.02,
+          0.95,
+          0.88,
+          0.84
+        ]
+      },
+      "rundung_stellen": 2,
+      "liefert": "faktor",
+      "normobjekt": "Restnutzungsdauern 30",
+      "hinweis": "Die 54 Zellen sind an der STANDARDSTELLUNG des Kalkulators abgetastet — ni-ernte.sh setzt nur Bodenrichtwert und Sachwert. Bei den Gebieten mit lesbaren Kurven ist bewiesen, dass die Standardstellung das Normobjekt ist; hier ist es eine naheliegende, aber unbewiesene Annahme. Lesbar war die Umrechnung für: Restnutzungsdauer. Die übrigen bleiben als offene Korrektur im Ergebnis stehen."
+    },
+    "korrekturen": [
+      {
+        "bez": "Abweichende Restnutzungsdauer",
+        "feld": "rnd_jahre",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {
+          "10": 0.81,
+          "15": 0.89,
+          "20": 0.94,
+          "25": 0.98,
+          "30": 1,
+          "35": 1.02,
+          "40": 1.03,
+          "45": 1.05,
+          "50": 1.06
+        },
+        "rundung_stellen": 2,
+        "hinweis": "9 abgedruckte Stützstellen."
+      },
+      {
+        "bez": "Umrechnung für abweichende Merkmale (im Dokument nur als Bild)",
+        "feld": "_nicht_lesbar",
+        "art": "stufen",
+        "wirkung": "multiplikativ",
+        "stufen": {},
+        "rundung_stellen": 2,
+        "hinweis": "Der Ausschuss druckt Umrechnungskurven ab, aber ohne Zahlen an den Datenpunkten — sie sind aus dem PDF nicht lesbar. Der Tabellenwert gilt deshalb nur für die Stellung, an der er abgetastet wurde. Diese Korrektur bleibt absichtlich unbeziffert, damit sie als offen gemeldet wird statt still zu fehlen."
+      }
+    ],
+    "modellansaetze": {
+      "wortlaut": "Sachwertmodell der niedersaechsischen Gutachterausschuesse: NHK 2010, Bezugsmassstab Brutto-Grundflaeche, lineare Alterswertminderung. Der Kalkulator gibt den Sachwertfaktor zu einem vorlaeufigen Sachwert aus; abweichende Merkmale wirken ueber Umrechnungskoeffizienten.",
+      "nhk": "NHK 2010",
+      "bezugsmassstab": "Brutto-Grundflaeche",
+      "alterswertminderung": "linear",
+      "baupreisindex_bezug": "kaufzeitpunkt",
+      "baupreisindex_wortlaut": "Die NHK 2010 beziehen sich auf den Kostenstand des Jahres 2010, so dass sie mit dem Baupreisindex für den Neubau von Wohngebäuden konventioneller Bauart des Statistischen Bundesamtes an die Preisverhältnisse des Kaufzeitpunktes bzw. Wertermittlungsstichtages anzupassen sind (§ 36 Abs. 2 ImmoWertV).",
+      "baupreisindex_seite": "Beschreibung der Dashboards 2026 (GAG Niedersachsen, download/223867), Kap. 9.2 Sachwertfaktoren – Reihenhäuser und Doppelhaushälften, S. 9",
+      "baupreisindex_quelle_url": "https://www.gag.niedersachsen.de/download/223867",
+      "gnd_jahre": 80,
+      "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.2, S. 7 und S. 9 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
+    },
+    "geltungsbereich": {
+      "hinweis": "Unveränderte Kopie des Kreissatzes (Reihenhaus-Kalkulator ohne Lage-Parameter), damit die Gemeindeebene den Reihenhaus-Faktor weiter findet."
+    },
+    "belege": [
+      "Kalkulator 2026_sw_rh_hmhhm (Tableau Public, Profil ogagmd2026), Datenbasis ?, Stichprobe 277 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,12 aus."
+    ],
+    "stufe": "B",
+    "stufe_grund": "Amtliche Quelle, Gitterwerte am Kalkulator des Ausschusses abgetastet. Stufe B statt A: die Stützstellen sind von uns gewählt, und die Umrechnungskurven dieses Gebiets sind im Dokument nur als Bild abgedruckt — sie konnten nicht übernommen werden und werden deshalb als offene Korrektur ausgewiesen.",
+    "fallzahl": 277,
+    "streuung": 0.24,
+    "stichtag": "2026-01-01",
+    "berichtsjahr": 2026,
+    "modellversion": "GMB 2026",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_hmhhm",
+    "quelle_parser": "v1612-WREZ+v2883-kopie+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -2521,8 +6306,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhm/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_hmhhm",
+    "quelle_parser": "v1612-WREZ+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -2710,8 +6495,8 @@
   },
   {
     "land_code": "NI",
-    "ags": "03256",
-    "ebene": "kreis",
+    "ags": "03256022",
+    "ebene": "gemeinde",
     "gebiet_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich Stadt Nienburg",
     "gaa_name": "Gutachterausschuss für Grundstückswerte Sulingen-Verden, Bereich Stadt Nienburg",
     "kennzahl": "sachwertfaktor",
@@ -2880,7 +6665,10 @@
       "gnd_jahre": 80,
       "gnd_beleg": "Beschreibung der Dashboards 2026, Kap. 9.1, S. 2 und S. 4 („Die Gesamtnutzungsdauer beträgt 80 Jahre.“)"
     },
-    "geltungsbereich": {},
+    "geltungsbereich": {
+      "raeumlich": "Nienburg (Weser), Stadt",
+      "hinweis": "v2883: der Kalkulator 2026_sw_efh_sulvernistni gilt für die STADT Nienburg; bis v2882 stand der Satz auf Kreisebene und galt damit für den ganzen Landkreis."
+    },
     "belege": [
       "Kalkulator 2026_sw_efh_sulvernistni (Tableau Public, Profil ogagmd2026), Datenbasis 01.01.2026, veroeffentlicht 02.03.2026, Stichprobe 249 Kauffaelle. 60 Stuetzpunkte des Gitters am Normobjekt abgefragt (Bodenrichtwert 30 bis 280 EUR/qm x vorlaeufiger Sachwert 100.000 bis 700.000 EUR), dazu 18 abgedruckte Stuetzstellen der beiden Umrechnungskurven, ueber ihre x-Position im PDF zugeordnet. GEGENPROBE am Anwendungsbeispiel des Dashboards: Bodenrichtwert 150 EUR/qm, vorlaeufiger Sachwert 350.000 EUR, Standardstufe 2,5, BGF/Wohnflaeche 2,0 ergibt 0,87 - die Zelle traegt genau diese Zahl. Beide Korrekturkurven stehen an ihrer Normstelle auf 1,00."
     ],
@@ -2892,7 +6680,7 @@
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
     "quelle_url": "https://public.tableau.com/views/2026_sw_efh_sulvernistni/dash",
-    "quelle_parser": "v1084-WREZ",
+    "quelle_parser": "v1084-WREZ+v2883-geltung",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -3685,8 +7473,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_ott_ohz/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_ott_ohz",
+    "quelle_parser": "v1612-WREZ+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -4359,8 +8147,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_ott_std/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_ott_std",
+    "quelle_parser": "v1612-WREZ+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -5015,8 +8803,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_osmep_osmepnoh/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_osmep_osmepnoh",
+    "quelle_parser": "v1612-WREZ+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -5269,8 +9057,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_osmep_osmeposla/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_osmep_osmeposla",
+    "quelle_parser": "v1612-WREZ+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",

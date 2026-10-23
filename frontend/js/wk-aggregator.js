@@ -42,8 +42,13 @@
       _cache = await res.json();
       // V278: Mapping snapshots[] -> objects[] fuer Backwards-Compat
       if (_cache && Array.isArray(_cache.snapshots)) {
-        _cache.objects = _cache.snapshots.map(function(s){
-          return { id: s.object_id, address: s.address, purchase_date: s.purchase_date, status: 'won', wk_per_year: s.wk_per_year || {}, halter: s.halter || 'privat' /* v813-3c */ };
+        /* v2891: `rang` = Reihenfolge der Anlage (das Backend sortiert nach
+           objects.created_at). Er entscheidet bei GLEICHEM Kaufdatum, wer
+           zuerst kommt - Tab Steuern und Steuerkette im Cockpit nutzen ihn
+           beide, sonst schlossen sich zwei Objekte desselben Tages
+           gegenseitig aus. */
+        _cache.objects = _cache.snapshots.map(function(s, i){
+          return { id: s.object_id, address: s.address, purchase_date: s.purchase_date, status: 'won', wk_per_year: s.wk_per_year || {}, halter: s.halter || 'privat' /* v813-3c */, rang: i };
         });
         _cache.totals_per_year = {};
         _cache.snapshots.forEach(function(s){

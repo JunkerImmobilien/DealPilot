@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-10-22T17:26:48.877Z",
+ "erzeugt_am": "2026-10-23T09:08:17.707Z",
  "quellen": {
-  "voice-import": "4d1160a61b89e852",
+  "voice-import": "1e15dfc71ac3505a",
   "objektart-felder": "a9b7856466ce82eb",
-  "storage": "25691a8d15a0c341",
-  "index-html": "14ba51e47cd5b905",
+  "storage": "6f144987de5ca895",
+  "index-html": "9d034955321db933",
   "grest": "773e3e758b5f951c"
  },
  "daten": {
@@ -1482,7 +1482,7 @@
    {
     "id": "grenz_auto",
     "kind": "bool",
-    "label": "Persönl. Grenzsteuersatz (%)"
+    "label": "Kirchensteuer"
    },
    {
     "id": "d1_vertragsdatum",
@@ -1945,7 +1945,7 @@
     "optionen": [
      {
       "wert": "auto",
-      "text": "Automatisch (15%-Regel)"
+      "text": "Automatisch (15-%-Regel: sofort oder über die Nutzungsdauer)"
      },
      {
       "wert": "1",
@@ -1965,7 +1965,7 @@
      },
      {
       "wert": "5",
-      "text": "5 Jahre (Standard §82b)"
+      "text": "5 Jahre (§ 82b EStDV)"
      },
      {
       "wert": "50",

@@ -951,6 +951,9 @@ function showSettings(initialTab) {
           '<button type="button" class="dp-tt-mode-btn' + (_mbThemePref()==='dark'?' active':'') + '" data-mbth="dark" onclick="_setMbThemeDark()">Dunkel<span class="dp-tt-mode-btn-label">Obsidian/Gold</span></button>' +
         '</div>' +
         /* === v648-mb-theme END === */
+        /* v2900: PDF-Export - Vorauswahl der Fassung und Pilot-Analyse; den
+           Abschnitt baut pdf-wahl.js selbst (eine Liste der Fassungen). */
+        ((window.DealPilotPdfWahl && typeof window.DealPilotPdfWahl.einstellungenHtml === 'function') ? window.DealPilotPdfWahl.einstellungenHtml() : '') +
         /* v1719: der zweite Knopf DARSTELLUNG OEFFNEN stand hier. Er ist
            nach oben zur Layout-Wahl gewandert (siehe dort). Zwei Wege zum
            selben Panel in einer Ansicht sind keine Bequemlichkeit, sondern
