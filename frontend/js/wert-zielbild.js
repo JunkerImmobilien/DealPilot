@@ -685,6 +685,9 @@
   }, 0); });
   global.addEventListener('dp:potenzial-markt', function () { karteBald(false); einfachNeu(); });
 
-  global.DpWertZielbild = { VERSION: VERSION, daten: daten, laden: laden, karte: karte, potenzialHost: potenzialHost,
+  /* v2900 · der geladene Bericht selbst - das PDF nimmt seine Erklaertexte daraus
+     statt aus einem zweiten Abruf (pdf-wert-zielbild.js daten()) */
+  function bericht() { return (_hist.key && _hist.key === key()) ? _hist.eintrag : null; }
+  global.DpWertZielbild = { VERSION: VERSION, daten: daten, laden: laden, bericht: bericht, karte: karte, potenzialHost: potenzialHost,
     einfachHtml: einfachHtml, reiterHtml: reiterHtml, _wertDaten: wertDaten };
 })(window);

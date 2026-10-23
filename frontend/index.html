@@ -3145,7 +3145,7 @@ label.dp-required.qc-required::after {
         <span class="ji-slider"></span>
         <span class="ji-switch-label">Pilot-Analyse im PDF-Export einschließen</span>
       </label>
-      <div class="ai-pdf-hint">Deaktiviere diese Option, wenn du das PDF ohne die Pilot-Seite exportieren möchtest.</div>
+      <div class="ai-pdf-hint">Gilt für alle PDF-Fassungen (Bank, Kurz, Investment). Die Vorgabe steht unter Einstellungen › Darstellung › PDF-Export.</div>
       <details class="ai-pdf-details">
         <summary class="ai-pdf-sections-h">Bausteine im PDF</summary>
         <div class="ai-pdf-sections" id="ai-pdf-sections">
@@ -3623,8 +3623,8 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-logo.js?v=v1634b"></script><!-- v1634 · muss VOR den PDF-Bausteinen stehen: waermt das Logo vor -->
 <script src="js/pdf-anlage-bmf.js?v=v1634c"></script>
 <script src="js/pdf-blocksatz.js?v=v2830a"></script><!-- v2830 · Blocksatz fuer alle PDFs -->
-<script src="js/pdf-wert-zielbild.js?v=v2836"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
-<script src="js/pdf-investment-bank.js?v=v2832"></script>
+<script src="js/pdf-wert-zielbild.js?v=v2900"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
+<script src="js/pdf-investment-bank.js?v=v2900"></script>
 <script src="js/bmf-modal.js?v=v2269"></script>
 <script src="js/bmf-modal-v292.js?v=v2269"></script>
 <script src="js/bmf-bodenabschlag.js?v=v2269"></script>
@@ -3688,7 +3688,7 @@ label.dp-required.qc-required::after {
   <script src="js/telegram-panel.js?v=v2421"></script>
   <script src="js/unterlagen-modal.js?v=v2920"></script>
   <script src="js/standardwerte-karten.js?v=v2548b"></script>
-  <script src="js/settings.js?v=v2216c"></script>
+  <script src="js/settings.js?v=v2900"></script>
 <script src="js/pricing-modal.js?v=v2822"></script>
   <script src="js/flyer-code.js?v=v1421c"></script>
   <script src="js/promo-erstflug.js?v=v1421c"></script>
@@ -3713,7 +3713,7 @@ label.dp-required.qc-required::after {
 <script src="js/inventar-sync.js?v=v2269"></script><!-- V291-inv-sync-applied -->
 <script src="js/all-objects.js?v=v2263e"></script>
 <script src="js/track-record.js?v=W39"></script>
-<script src="js/pdf.js?v=v2835"></script>
+<script src="js/pdf.js?v=v2900"></script>
 <script src="js/auth.js?v=v2571"></script>
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
   <!-- v1370 (B5): nach dem 401-Handler, damit beide dieselbe Auth.apiCall umschliessen -->
@@ -3798,7 +3798,7 @@ label.dp-required.qc-required::after {
 <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte, klickbar = übernehmen -->
 <script src="js/marktwert-abschlag.js?v=v2672a"></script><!-- v2237 · Abschlag auf Angebotspreise -->
 <script src="js/wertvergleich.js?v=v2842"></script><!-- v2810 · Pilot-Analyse: Marktpreisindikation, Ertrags- und Sachwert gegenuebergestellt -->
-<script src="js/wert-zielbild.js?v=v2843a"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
+<script src="js/wert-zielbild.js?v=v2900"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
 <script src="js/dealpilot-mb.js?v=v2820"></script>
 <script src="js/mb-auftrag.js?v=v2191"></script>
   <script src="js/marktbericht-view.js?v=v2823a"></script>
@@ -4279,7 +4279,7 @@ document.addEventListener('DOMContentLoaded', function(){
          weil es _dpDispSkin fuer den hellen Grund benutzt. -->
     <link rel="stylesheet" href="css/datenaufnahme.css?v=v2547a"><!-- v1639 · aus der Bordkarte wird eine Zeile -->
     <link rel="stylesheet" href="css/layout-varianten.css?v=v2573">
-    <script src="js/pdf-wahl.js?v=v1733"></script><!-- v1636 · Rueckfrage vor dem Export -->
+    <script src="js/pdf-wahl.js?v=v2900"></script><!-- v1636 · Rueckfrage vor dem Export -->
     <script src="js/bmf-wahl.js?v=v1748"></script><!-- v1748 · Auswahl bei der Kaufpreisaufteilung -->
     <!-- v1765 · js/pilot-sprache.js ist RAUS. Der Knopf "Aenderungen
          diktieren" oeffnete den grossen Sprechlauf - genau das, was Marcel

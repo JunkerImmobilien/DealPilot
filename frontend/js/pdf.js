@@ -1027,7 +1027,8 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     var sz = '';
     if (a.szenarien.worst_case) sz += 'Worst Case (Miete -10%, Zins +1%): ' + clean(a.szenarien.worst_case) + '\n\n';
     if (a.szenarien.best_case)  sz += 'Best Case (Miete +5%, höhere Wertsteigerung): ' + clean(a.szenarien.best_case);
-    if (sz) block('Szenario-Analyse', sz, [248, 244, 232], C.GOLD);
+    /* v2900 · die gerechneten Werte stehen im Stress-Test - hier nur der Verweis, keine zweite Zahlenreihe */
+    if (sz) block('Szenario-Analyse', sz + '\n\nDie gerechnete Schuldendeckung je Szenario (Zins und Miete) steht im Stress-Test.', [248, 244, 232], C.GOLD);
   }
 
   // 5. Investor-Fit
@@ -1108,9 +1109,11 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     if (w.jahr != null) t.push(w.wende === 0 ? 'Das Objekt ist vom ersten Jahr an steuerlich positiv (Überschuss ab ' + w.jahr + ').'
       : 'Steuerlich positiv ab ' + w.jahr + '. Bis dahin ' + _eur(w.erstattung) + ' Steuererstattung, danach ' + _eur(-w.steuer) + ' Steuer im Betrachtungszeitraum.');
     else t.push('Im Betrachtungszeitraum bleibt das Objekt steuerlich im Verlust.');
-    r.slice(0, 12).forEach(function (z) {
-      t.push(z.jahr + ': Ergebnis ' + _eur(z.erg) + ' · ' + (z.steuer >= 0 ? 'Erstattung ' + _eur(z.steuer) : 'Steuer ' + _eur(-z.steuer)) + (z.cf != null ? ' · Cashflow nach Steuern ' + _eur(z.cf) : ''));
-    });
+    /* v2900 · Steuer und Cashflow nach Steuern je Jahr stehen in der Cashflow-Projektion
+       (Spalten ± Steuer, CF n.St.) - hier nur noch das steuerliche Ergebnis, das dort fehlt,
+       in einer Zeile statt zwoelf. */
+    t.push('Steuerliches Ergebnis je Jahr: ' + r.slice(0, 12).map(function (z) { return z.jahr + ' ' + _eur(z.erg); }).join(' · ') + '.');
+    t.push('Steuer und Cashflow nach Steuern je Jahr: siehe Cashflow-Projektion.');
     block('Steuerverlauf', t.join('\n'));
   })();
 
@@ -2852,7 +2855,8 @@ async function _exportPDFInner() {
     var ezbYearLabel = 'Jahr ' + bindIdx;
     var endYearLabel = 'Jahr ' + (data.years.length || 10);
 
-    _kpiCell(M, kpiY,                'DSCR · Heute', data.dscrToday.toFixed(2).replace('.', ','), 'Schuldendeckung', _dscrColor(data.dscrToday));
+    /* v2900 · dscrToday ist State.kpis.dscr - das erste VOLLE Jahr (calc.js V352), nicht der Stand heute */
+    _kpiCell(M, kpiY,                'DSCR · Jahr 1 (voll)', data.dscrToday.toFixed(2).replace('.', ','), 'erstes volles Jahr', _dscrColor(data.dscrToday));
     _kpiCell(M + kpiCellW + 3, kpiY, 'DSCR · ' + ezbYearLabel, data.dscrEzb.toFixed(2).replace('.', ','), 'Ende Zinsbindung', _dscrColor(data.dscrEzb));
     _kpiCell(M + 2 * (kpiCellW + 3), kpiY, 'DSCR · ' + endYearLabel, data.dscrEnd.toFixed(2).replace('.', ','), 'Anschluss', _dscrColor(data.dscrEnd));
 
@@ -3375,7 +3379,13 @@ async function _exportPDFInner() {
           doc.text(z, M, cy + dy); cy += lh;
         });
       };
-      cy = newPage('Wertpotenzial');
+      /* v2900 · gezeichnet wird im Abschnitt Wert & Zielbild (unten), zwischen den
+         Werten je Verfahren und den Erklaerungen - die Stufen standen bis dahin auf
+         zwei Seiten (Wertpotenzial und Wert & Zielbild). anschluss=true: im Fluss
+         weiter statt neuer Seite. */
+      var _pdZeichnen = function (anschluss) {
+      if (anschluss) { if (cy > 200) cy = newPage('Wert & Zielbild · Fortsetzung'); else cy += 4; }
+      else cy = newPage('Wertpotenzial');
       cy = secH(doc, cy, 'Wertpotenzial · Mieterhöhung und Zielbild', M, CW);
       _absatz(_PD.satz_invest + ' ' + _PD.satz_bank, { groesse: 8.6, farbe: C.CH, zeile: 4.4, dy: 3 });
       cy += 4;
@@ -3475,6 +3485,7 @@ async function _exportPDFInner() {
       cy += 1;
       if (_au && _fu.indexOf(_au) === 0) { _absatz(_au, { groesse: 7, zeile: 3.4 }); cy += 1.4; _fu = _fu.slice(_au.length); }
       _absatz(_fu, { groesse: 7, zeile: 3.4 });
+      };
     }
   } catch (e) { try { console.warn('[pdf] Wertpotenzial', e); } catch (x) {} }
 
@@ -3487,17 +3498,34 @@ async function _exportPDFInner() {
   ══════════════════════════════════════════════════ */
   try {
     var _WZ = window.DpPdfWertZielbild ? await window.DpPdfWertZielbild.daten({ potenzial: (typeof _PD !== 'undefined' ? _PD : null) }) : null;
+    var _pdOk = typeof _pdZeichnen === 'function';
     if (_WZ) {
       cy = newPage('Wert & Zielbild');
       doc.setFont('helvetica', 'normal'); doc.setFontSize(8.6); doc.setTextColor.apply(doc, C.CH);
       cy = window.DpPdfBlocksatz.absatz(doc, 'Was das Objekt nach den Verfahren der Immobilienwertermittlung wert ist, im Vergleich zum Kaufpreis - und wohin sich der Ertragswert mit Mieterh\u00f6hung und Zielbild entwickelt.', { x: M, y: cy + 3, breite: CW, zeile: 4.4 }) + 2;
-      cy = window.DpPdfWertZielbild.zeichne(doc, _WZ, {
-        x: M, y: cy, breite: CW, unten: 278, stil: 'invest',
+      /* v2900 · EIN Abschnitt: Werte je Verfahren und Wertlandschaft, dann das
+         Wertpotenzial (Wohnungen, Wertueberleitung, Kennzahlen je Stufe), dann
+         Ausblick, Kernaussagen und Erklaerung. Die Tafel Ist/Soll/Zielbild entfaellt
+         dort, weil die Kennzahlen je Stufe dieselben Ertragswerte, Kosten und
+         Marktpreisindikationen fuehren; nur die Indikation OHNE Abschlag steht dort
+         nicht - sie kommt als Satz (mpiZeile). Der Hinweis nennt die Kennzeichnung
+         nicht noch einmal, sie steht in der Fussnote des Wertpotenzials. */
+      var _wzO = function (teile) { return {
+        x: M, y: cy, breite: CW, unten: 278, stil: 'invest', teile: teile,
         neueSeite: function () { cy = newPage('Wert & Zielbild \u00b7 Fortsetzung'); return cy; },
         ueberschrift: function (t, yy) { return secH(doc, yy, t, M, CW); },
         f: { gold: C.GOLD, goldD: C.GOLD_D, goldL: C.GOLD_L, tinte: C.CH, text: [50, 45, 45], grau: C.MID, linie: C.BORDER,
           kopfGrund: C.CH, kopfText: C.GOLD, streifen: C.SURF }
-      });
+      }; };
+      if (_pdOk) {
+        cy = window.DpPdfWertZielbild.zeichne(doc, _WZ, _wzO(['verfahren', 'landschaft']));
+        try { _pdZeichnen(true); } catch (e) { try { console.warn('[pdf] Wertpotenzial', e); } catch (x) {} }
+        cy += 4;
+        _WZ.hinweis = 'Marktpreisindikation, Ertrags- und Sachwert sind indikativ nach ImmoWertV-Logik, kein Gutachten nach § 194 BauGB.';
+        cy = window.DpPdfWertZielbild.zeichne(doc, _WZ, _wzO(['mpiZeile', 'stufenText', 'kern', 'texte', 'hinweis']));
+      } else cy = window.DpPdfWertZielbild.zeichne(doc, _WZ, _wzO(null));
+    } else if (_pdOk) {
+      try { _pdZeichnen(false); } catch (e) { try { console.warn('[pdf] Wertpotenzial', e); } catch (x) {} }
     }
   } catch (e) { try { console.warn('[pdf] Wert & Zielbild', e); } catch (x) {} }
 
