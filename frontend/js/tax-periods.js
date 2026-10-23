@@ -52,6 +52,11 @@
         STATE.periods = data.periods || [];
         STATE.loaded = true;
         console.log('[V259-03] Tax-Periods geladen:', STATE.periods.length);
+        /* v2892: der Zeitraum-Zwischenspeicher in tax.js (_zveCache, 5 s)
+           hielt nach einer Aenderung die ALTEN Zeitraum-Objekte - gemessen:
+           2027 rechnete schon mit Splitting, 2028 (Rueckfall auf denselben
+           Zeitraum) noch nicht. Nach jedem Laden verwerfen. */
+        try { if (window._zveCache) window._zveCache.ts = 0; } catch (e) {}
         /* v2892: Hinweis unter den Steuerangaben nachziehen */
         try { if (window.DpSteuerAngaben && DpSteuerAngaben.zeigen) setTimeout(DpSteuerAngaben.zeigen, 0); } catch (e) {}
         return STATE.periods;
