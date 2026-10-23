@@ -91,10 +91,12 @@ console.log('\n1 · AM MARKT 18, KABELSKETAL — WE 2   (25DG02661/HH)');
 console.log('    ETW, Baujahr 1994, Stichtag 06.05.2024, GND 70\n');
 {
   /* Das Gutachten listet: alle Gewerke über 20 Jahre, nur die
-     technische Ausstattung 5 bis 10 Jahre. */
+     technische Ausstattung 5 bis 10 Jahre („Sanierung: überwiegend").
+     Im Gutachten heißt diese Stufe „aktueller Standard" - in der App
+     seit v2943 `erneuert` (`standard` ist dort zeitgemäß-ursprünglich). */
   const r = K.calcAll({
     baujahr: 1994, stichtag: '2024-05-06', gnd: 70, modPoints: 0,
-    gewerkeBewertung: gew('veraltet', { technik: 'standard' })
+    gewerkeBewertung: gew('veraltet', { technik: 'erneuert' })
   });
 
   pruef('Alter am Stichtag = 30 Jahre', r.input.alter === 30, r.input.alter);
@@ -143,40 +145,77 @@ console.log('    ETW, Baujahr 1994, Stichtag 06.05.2024, GND 70\n');
         44.07 > r.methods.linear.restnutzungsdauer,
         '44,07 gegen linear ' + r.methods.linear.restnutzungsdauer);
 
-  /* ---- Technisch: 26 im Gutachten, 23 bei uns — eine ENTSCHEIDUNG ----
-     Hier standen bis zum 23.10.2026 drei FEHLER („technisch = 26“), rot
-     seit v2074 (d5cba139, 10.10.2026). Nachgerechnet ist die Ursache
-     keine Rechenabweichung, sondern die Regel: Das Gutachten gibt
-     zeitgemäßen Gewerken einen HALBEN Aufschlag, wir seit v2074 keinen
-     (Marcels Festlegung 1: Zeitgemäßheit wirkt über die Punkte nach
-     Anlage 2, nicht ein zweites Mal technisch).
-         Basis 70 − 30 = 40 Jahre, veraltet 85 %, zeitgemäß 15 % (Technik)
-         Gutachten:  40 − 40 × 85 % / 2 + 40 × 15 % / 2 = 26,00  (AWM 62,86 %)
-         v2074:      40 − 40 × 85 % / 2                 = 23,00  (AWM 67,14 %)
-     Beide Rechenwege werden geprüft: unserer muss 23 liefern, der des
-     Gutachtens mit denselben Anteilen genau die 26. Wird die Regel
-     geändert, wird diese Prüfung rot — und das soll sie dann. */
-  const T = r.methods.technisch, basis = 70 - 30;
-  pruef('Anteile: 85 % veraltet, 15 % zeitgemäß (Technik)',
-        n2(T.anteil_veraltet_pct) === 85 && n2(T.anteil_standard_pct) === 15,
-        n2(T.anteil_veraltet_pct) + ' / ' + n2(T.anteil_standard_pct) + ' %');
-  pruef('Rechenweg des Gutachtens ergibt exakt 26,00',
-        n2(basis - basis * 0.85 / 2 + basis * 0.15 / 2) === 26,
-        n2(basis - basis * 0.85 / 2 + basis * 0.15 / 2));
-  pruef('ENTSCHEIDUNG v2074: zeitgemäß neutral → technisch 23',
-        n2(T.restnutzungsdauer) === 23,
-        T.restnutzungsdauer + ' (Gutachten 26)');
-  pruef('technische Alterswertminderung 67,14 % (Gutachten 62,86 %)',
-        Math.abs(T.alterswertminderung_pct - 67.14) < 0.02,
+  /* ---- Technisch: 26,00 wie im Gutachten (v2943) ---------------------
+     Von v2074 bis v2942 kam hier 23 heraus: „aktueller Standard" gab
+     keinen Aufschlag mehr. Die Stufe heißt im Gutachten aber ERNEUERT
+     (5-10 Jahre), und dafür gibt es den halben Aufschlag:
+         40 − 40 × 85 % / 2 + 40 × 15 % / 2 = 26,00  (AWM 62,86 %)
+     Zeitgemäß-ursprünglich (`standard`) bleibt neutral - geprüft unten. */
+  const T = r.methods.technisch;
+  pruef('technisch = 26,00 Jahre wie im Gutachten',
+        n2(T.restnutzungsdauer) === 26, T.restnutzungsdauer);
+  pruef('technische Alterswertminderung = 62,86 %',
+        Math.abs(T.alterswertminderung_pct - 62.86) < 0.02,
         n2(T.alterswertminderung_pct) + ' %');
+  pruef('Abzug 17,00, Aufschlag erneuert 3,00 wie im Gutachten',
+        n2(T.abzug_veraltet) === 17 && n2(T.aufschlag_erneuert) === 3,
+        n2(T.abzug_veraltet) + ' / ' + n2(T.aufschlag_erneuert));
 
   /* Der Leitwert: Das Gutachten sagt ausdrücklich, dass das technische
      Verfahren führt und die anderen beiden stützen. */
   const nach = S.leitwertAn(r, false);
   pruef('bei uns führt ebenfalls das technische Verfahren',
         nach.verfahren === 'technisch', nach.verfahren + ' → ' + nach.final_rnd);
-  pruef('und liefert die technische RND (23; Gutachten 26, s. o.)',
-        n2(nach.final_rnd) === 23, nach.final_rnd);
+  pruef('und liefert die reelle Restnutzungsdauer des Gutachtens (26)',
+        n2(nach.final_rnd) === 26, nach.final_rnd);
+
+  /* Die Gegenprobe zu v2074: dasselbe Haus, die Technik nur ZEITGEMÄSS
+     (nie erneuert) - dann kein Aufschlag, 40 − 17 = 23. Ein nie
+     modernisiertes Bauteil darf das Ergebnis nicht anheben. */
+  const r2 = K.calcAll({
+    baujahr: 1994, stichtag: '2024-05-06', gnd: 70, modPoints: 0,
+    gewerkeBewertung: gew('veraltet', { technik: 'standard' })
+  });
+  pruef('Technik nur zeitgemäß (nie erneuert) → neutral, 23',
+        n2(r2.methods.technisch.restnutzungsdauer) === 23,
+        r2.methods.technisch.restnutzungsdauer);
+}
+
+/* =====================================================================
+   1a. Am Markt 9 (25DG06644) — nie modernisiert, alles veraltet
+   ===================================================================== */
+console.log('\n1a · AM MARKT 9, KABELSKETAL — WE 03   (25DG06644)');
+console.log('    ETW, Baujahr 1998, Stichtag 31.07.2024, GND 70, nie modernisiert\n');
+{
+  const r = K.calcAll({
+    baujahr: 1998, stichtag: '2024-07-31', gnd: 70, modPoints: 0,
+    gewerkeBewertung: gew('veraltet')
+  });
+  pruef('linear = 44 Jahre wie im Gutachten',
+        n2(r.methods.linear.restnutzungsdauer) === 44, r.methods.linear.restnutzungsdauer);
+  pruef('technisch = 22,00 Jahre wie im Gutachten (44 − 22)',
+        n2(r.methods.technisch.restnutzungsdauer) === 22, r.methods.technisch.restnutzungsdauer);
+  pruef('technische Alterswertminderung = 68,57 %',
+        Math.abs(r.methods.technisch.alterswertminderung_pct - 68.57) < 0.02,
+        n2(r.methods.technisch.alterswertminderung_pct) + ' %');
+  /* Die reelle RND des Gutachtens (26) ist eine sachverständige Korrektur
+     „aufgrund der Substanz vor Ort" - kein Rechenweg, deshalb nicht geprüft. */
+}
+
+/* =====================================================================
+   1b. Gehoben wirkt voll (Gutachten Kap. 5.3.3: „RND x Summe Gewichtung")
+   ===================================================================== */
+console.log('\n1b · STUFE GEHOBEN — volle Gewichtung, Deckel 0,90 × GND\n');
+{
+  const r = K.calcAll({ baujahr: 1994, stichtag: '2024-05-06', gnd: 70, modPoints: 0,
+    gewerkeBewertung: gew('veraltet', { technik: 'gehoben' }) });
+  pruef('40 − 17 + 40 × 15 % = 29,00',
+        n2(r.methods.technisch.restnutzungsdauer) === 29, r.methods.technisch.restnutzungsdauer);
+  const r3 = K.calcAll({ baujahr: 2014, stichtag: '2024-05-06', gnd: 80, modPoints: 0,
+    gewerkeBewertung: gew('gehoben') });
+  pruef('alles gehoben, Alter 10: gedeckelt auf 0,90 × 80 = 72',
+        n2(r3.methods.technisch.restnutzungsdauer) === 72 && r3.methods.technisch.gedeckelt_auf_90_prozent,
+        r3.methods.technisch.restnutzungsdauer);
 }
 
 /* =====================================================================
@@ -261,6 +300,5 @@ console.log('\n4 · DIE GESAMTNUTZUNGSDAUER IN DER PRAXIS\n');
 
 console.log('\n' + (fehler
   ? 'FEHLER: ' + fehler
-  : 'Unser Rechenkern liefert dieselben Zahlen wie die Gutachten — bis auf die\n'
-    + 'technische RND Am Markt 18 (23 statt 26), eine bewusste Entscheidung (v2074).'));
+  : 'Unser Rechenkern liefert dieselben Zahlen wie die Gutachten.'));
 process.exit(fehler ? 1 : 0);

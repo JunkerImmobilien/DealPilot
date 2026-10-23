@@ -541,7 +541,8 @@
       var v = String(e.value || '').toLowerCase();
       gezaehlt++;
       werte[GEWERKE[id]] = v;
-      if (v === 'ja' || v === 'voll' || v === 'v') bewertung[GEWERKE[id]] = 'gehoben';
+      /* v2943: modernisiert = erneuert (Gutachten: „aktueller Standard"), nicht gehoben */
+      if (v === 'ja' || v === 'voll' || v === 'v') bewertung[GEWERKE[id]] = 'erneuert';
       else if (v === 'teil' || v === 'teilweise' || v === 'h') bewertung[GEWERKE[id]] = 'standard';
       else bewertung[GEWERKE[id]] = 'veraltet';
     });

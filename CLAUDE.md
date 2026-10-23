@@ -258,6 +258,8 @@ seine Datei (gegen git, nicht gegen die Dateizeit). RC=0 ist sauber.
 | `rechenkerne-spiegeln.mjs` | die fünf Kerne ins Backend-Image |
 | `score-ketten-pruefen.mjs` | 115 Punkte, alle fünf Score-Stellen gleich |
 | `rnd-kerne-pruefen.mjs` | beide RND-Kerne über 1.764 Fälle |
+| `rnd-pruefung/rnd-gutachten-test.mjs` | RND-Kern gegen vier echte Gutachten (Am Markt 18 und 9: technische Gewerke-Formel 26,00 / 22,00; Alexanderstr.; Westerfeldstr.). **Vier Gewerke-Stufen seit v2943:** `veraltet` −½ · `standard` (zeitgemäß, ursprünglich) neutral · `erneuert` (= „aktueller Standard“ im Gutachten) +½ · `gehoben` +1; Deckel 0,90 × GND |
+| `rnd-eingabe-pruefen.mjs` | Abbildung Objekt → RND-Eingabe (GND, Punkte, Zustand), Alter ≥ GND rechnet wie Alter = GND (v2939) |
 | `zielurteil-pruefen.mjs` | Wort und Ampel der Lageklasse, 409 Fälle |
 | `beleg-leser-pruefen.mjs` | Ämter-Belegprüfung, 79 Fälle, läuft auch im Container |
 | `buster-ebenen-pruefen.mjs` | Cache-Buster über alle fünf Dokumente |
