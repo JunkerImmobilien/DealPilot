@@ -1026,6 +1026,8 @@
     /* Score aus dem Rechenkern - nicht aus der Oberflaeche gelesen. */
     var SC = null;
     try { if (window.DealScore && typeof window.DealScore.computeFromKpis === 'function') SC = window.DealScore.computeFromKpis(K); } catch (e) {}
+    /* v2900b · Kurzfassung: acht Kacheln (zwei Reihen) - mit zwoelf rutschte das Raster auf S. 2 */
+    var KURZ_RASTER = ['Bruttomietrendite', 'Nettomietrendite', 'Cashflow vor Steuern', 'DSCR', 'LTV', 'EK-Rendite', 'Interner Zinsfuß (IRR)', 'Deal Score'];
     raster([
       ['Bruttomietrendite', pct(K.bmy, 2), 'auf Kaufpreis'],
       ['Nettomietrendite', pct(K.nmy, 2), 'auf Gesamtinvest.'],
@@ -1039,7 +1041,7 @@
       ['Equity Multiple', da(K.em) === null ? '-' : fmt(K.em, 1) + 'x', 'über die Haltedauer'],
       ['Wertpuffer / Equity', eur(K.wp_kpi), 'heute'],
       ['Deal Score', (SC && SC.score) ? fmt(SC.score, 0) + ' / 100' : '-', (SC && SC.label) ? SC.label : '']
-    ], { titel: 'Kennzahlen' });
+    ].filter(function (k) { return !KURZ || KURZ_RASTER.indexOf(k[0]) >= 0; }), { titel: 'Kennzahlen' });
     if (SC && SC.interpretation && !KURZ) {
       platz(16);
       absatz('Einordnung: ' + String(SC.interpretation).replace(/\s+/g, ' '), { groesse: 8.4, farbe: 70, zeile: 4.4 });
@@ -1526,6 +1528,8 @@
       } else y = window.DpPdfWertZielbild.zeichne(doc, WZ, wzO(null));
       y += 4;
     } else if (pdZeichnen && !KURZ) pdZeichnen(false);
+    /* v2900b · Kurzfassung: Annahmen und Hinweise unter Wert & Zielbild (dort ist Platz), die Pilot-Analyse folgt auf eigener Seite */
+    if (KURZ) annahmenHinweise();
 
     /* ── Exit und Vermögenszuwachs ───────────────────────────── */
     var letzteZeile = rows.length ? rows[rows.length - 1] : null;
@@ -1856,15 +1860,17 @@
     /* v1470: gemessen - mit 48 mm blieb EINE Annahmen-Zeile allein auf der
        letzten Seite stehen. Der Block braucht rund 70 mm; passt er nicht,
        beginnt er geschlossen auf der naechsten Seite. */
-    platz(KURZ ? 46 : 70, 'Annahmen und Hinweise', (adr || 'Objekt'));
+    if (!KURZ) annahmenHinweise();
+    function annahmenHinweise() {
+    platz(KURZ ? 70 : 70, 'Annahmen und Hinweise', (adr || 'Objekt'));
     abschnitt('Annahmen');
     zeile('Mietentwicklung', typeof window._dpPdfMiete === 'function' ? window._dpPdfMiete().text : (num('mietstg') !== null ? pct(num('mietstg'), 1) : '-'));   /* v2832: der Modus, der rechnet */
-    zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '-');
+    if (!KURZ) zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '-');
     zeile('Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '-');
     zeile('Betrachtungszeitraum', S.btj ? fmt(S.btj) + ' Jahre' : '-');
-    if (num('leerstand') !== null) zeile('Kalkulierter Leerstand p. a.', pct(num('leerstand'), 1));
+    if (num('leerstand') !== null && !KURZ) zeile('Kalkulierter Leerstand p. a.', pct(num('leerstand'), 1));
     zeile('Anschlusszins / Anschlusstilgung (Annahme)', [pct(num('anschl_z'), 2), pct(num('anschl_t'), 2)].join('  ·  '));
-    zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '-');
+    if (!KURZ) zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '-');
     if (!KURZ) zeile('Gebäudeanteil am Kaufpreis', num('geb_ant') !== null ? pct(num('geb_ant'), 0) : '-');
     if (!KURZ) zeile('AfA-Satz Gebäude', num('afa_satz') !== null ? pct(num('afa_satz'), 2) : (txt('afa_satz') || '-'));
     if (!KURZ) zeile('Grunderwerbsteuer (Land)', num('gest_p') !== null ? pct(num('gest_p'), 2) : '-');
@@ -1874,13 +1880,14 @@
     if (num('bspar_rate')) zeile('Bausparrate / Monat', eur(num('bspar_rate')));
     y += 2;
 
-    abschnitt('Grundlagen und Hinweise');
+    if (!KURZ) abschnitt('Grundlagen und Hinweise');
     var hinweis = 'Alle Werte beruhen auf den im Objekt erfassten Angaben und den dort hinterlegten Annahmen '
       + '(Mietentwicklung, Bewirtschaftungskosten, Zins und Tilgung). Sie sind eine Kalkulation, kein '
       + 'Wertgutachten nach § 194 BauGB und keine Anlage- oder Finanzierungsberatung. Der LTV bezieht sich auf '
       + (S.ltv_basis_label || 'die angegebene Bezugsgröße') + '.';
-    absatz(hinweis, { groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
-    if (KURZ) { y += 2; absatz('Kurzfassung. Die Bankfassung enthält zusätzlich die Bewirtschaftung im Einzelnen, die drei Finanzierungsphasen, den Cashflow je Jahr, die Mieterliste, das Wertpotenzial je Wohnung, die Diagramme, die Belastungsprobe und den Vermögenszuwachs im Detail.', { groesse: 8, farbe: 90, zeile: 4.2 }); }
+    if (KURZ) hinweis += ' Kurzfassung: die Bankfassung enthält zusätzlich die Bewirtschaftung im Einzelnen, die drei Finanzierungsphasen, den Cashflow je Jahr, die Mieterliste, das Wertpotenzial je Wohnung, die Diagramme, die Belastungsprobe und den Vermögenszuwachs im Detail.';
+    absatz(hinweis, KURZ ? { groesse: 7.4, farbe: 90, zeile: 3.7 } : { groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
+    }
 
     fuss();
     var slug = (adr || 'Objekt').replace(/[^A-Za-z0-9äöüÄÖÜß]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40);
