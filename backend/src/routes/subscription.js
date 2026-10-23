@@ -73,7 +73,10 @@ const checkoutSchema = z.object({
      gemerkt und hier mitgeschickt. Bewusst NICHT streng validiert ausser
      in Form und Laenge — die Wahrheit ist Stripe, nicht dieses Schema.
      Ein unbekannter Code darf den Checkout NIE scheitern lassen. */
-  promo: z.string().regex(/^[A-Za-z0-9_-]{2,50}$/).optional()
+  promo: z.string().regex(/^[A-Za-z0-9_-]{2,50}$/).optional(),
+  /* v2933 · Widerrufsverzicht § 356 Abs. 5 BGB - Pflicht, wird protokolliert */
+  widerruf_verzicht: z.boolean().optional(),
+  widerruf_version: z.string().max(40).optional()
 });
 
 const portalSchema = z.object({
@@ -144,6 +147,14 @@ router.post('/checkout', validate({ body: checkoutSchema }), async (req, res, ne
       : plan.stripe_price_monthly_id;
     if (!priceId) {
       throw new HttpError(503, `${plan.name} (${req.body.billingInterval}) is not yet available for purchase`);
+    }
+
+    /* v2933 · ohne ausdruecklichen Widerrufsverzicht kein Checkout */
+    try {
+      await require('../services/consentService').widerrufVerzichtPruefen(req, { kauf: 'abo', plan: plan.id, intervall: req.body.billingInterval });
+    } catch (e) {
+      if (e.code === 'widerruf_verzicht_fehlt') throw new HttpError(400, e.message);
+      throw e;
     }
 
     const successUrl = req.body.successUrl || `${getFrontendBase(req)}/subscription/success?session_id={CHECKOUT_SESSION_ID}`;

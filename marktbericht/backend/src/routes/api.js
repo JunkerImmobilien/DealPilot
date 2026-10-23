@@ -1119,6 +1119,63 @@ router.get('/reports/one', async (req, res) => {
  * valuation_results, deal_scores und micro_locations tragen keinen Besitzer —
  * ohne diesen Nachweis waere die Route ein Loeschknopf fuer fremde Berichte.
  */
+/* v2933 · KONTO GELOESCHT -> ALLE MARKTBERICHT-DATEN DIESES NUTZERS.
+   Datenschutz-Bestandsaufnahme 23.10.2026: "Konto loeschen" in der Haupt-App
+   loeschte nur die Haupt-Datenbank; Berichte, Snapshots, Wertermittlungs-
+   eingaben und Potenzial-Abrufe (mit Objektanschrift) blieben hier stehen.
+   Gerufen NUR vom Haupt-Backend (backend/src/routes/auth.js, DELETE /me) im
+   Docker-Netz - mb-backend hat keinen Port nach aussen, und die Haupt-App
+   reicht diese Route nicht durch. Der Kopf x-dp-konto-loeschen muss die
+   Kennung wiederholen: ein versehentlicher Aufruf loescht nichts. */
+router.delete('/nutzer/:uid', async (req, res) => {
+  const uid = String(req.params.uid || '');
+  if (!/^[0-9a-f-]{8,64}$/i.test(uid)) return res.status(400).json({ error: 'kennung ungueltig' });
+  if (req.get('x-dp-konto-loeschen') !== uid) return res.status(400).json({ error: 'bestaetigung fehlt' });
+  const client = await pool.connect();
+  const del = {};
+  try {
+    await client.query('BEGIN');
+    const pids = (await client.query(
+      `SELECT property_id FROM mb.object_snapshots WHERE user_id = $1 AND property_id IS NOT NULL
+       UNION SELECT property_id FROM mb.market_reports WHERE user_id = $1 AND property_id IS NOT NULL
+       UNION SELECT property_id FROM mb.valuation_inputs WHERE user_id = $1 AND property_id IS NOT NULL`, [uid]
+    )).rows.map((r) => r.property_id);
+    const step = async (label, sql, args) => { const r = await client.query(sql, args); del[label] = r.rowCount; };
+    await step('valuation_inputs', 'DELETE FROM mb.valuation_inputs WHERE user_id = $1', [uid]);
+    await step('object_snapshots', 'DELETE FROM mb.object_snapshots WHERE user_id = $1', [uid]);
+    await step('potenzial_abrufe', 'DELETE FROM mb.potenzial_abrufe WHERE user_id = $1', [uid]);
+    await step('market_reports',   'DELETE FROM mb.market_reports   WHERE user_id = $1', [uid]);
+    if (pids.length) {
+      /* nur Objekte, auf die nichts anderes mehr zeigt */
+      const frei = (await client.query(
+        `SELECT p.id, p.address_id FROM mb.properties p WHERE p.id = ANY($1::int[])
+           AND NOT EXISTS (SELECT 1 FROM mb.market_reports m WHERE m.property_id = p.id)
+           AND NOT EXISTS (SELECT 1 FROM mb.object_snapshots s WHERE s.property_id = p.id)
+           AND NOT EXISTS (SELECT 1 FROM mb.valuation_inputs v WHERE v.property_id = p.id)`, [pids]
+      )).rows;
+      const fp = frei.map((r) => r.id);
+      const adr = frei.map((r) => r.address_id).filter((x) => x != null);
+      if (fp.length) {
+        await step('valuation_results', 'DELETE FROM mb.valuation_results WHERE property_id = ANY($1::int[])', [fp]);
+        await step('deal_scores',       'DELETE FROM mb.deal_scores       WHERE property_id = ANY($1::int[])', [fp]);
+        await step('micro_locations',   'DELETE FROM mb.micro_locations   WHERE property_id = ANY($1::int[])', [fp]);
+        await step('properties',        'DELETE FROM mb.properties        WHERE id = ANY($1::int[])', [fp]);
+      }
+      if (adr.length) {
+        await step('addresses', `DELETE FROM mb.addresses a WHERE a.id = ANY($1::int[])
+          AND NOT EXISTS (SELECT 1 FROM mb.properties p WHERE p.address_id = a.id)`, [adr]);
+      }
+    }
+    await client.query('COMMIT');
+    console.log('[mb] Konto ' + uid.slice(0, 8) + '… geloescht:', JSON.stringify(del));
+    res.json({ deleted: true, rows: del });
+  } catch (e) {
+    try { await client.query('ROLLBACK'); } catch (x) {}
+    console.error('[mb] Konto loeschen:', e.message);
+    res.status(500).json({ error: 'loeschen fehlgeschlagen', message: e.message });
+  } finally { client.release(); }
+});
+
 router.delete('/reports/:id', async (req, res) => {
   /* v1769: war parseInt(). users.id ist eine UUID — parseInt stuempelt
      sie zu ihrem Ziffernpraefix oder zu NaN, und dann sucht die Abfrage

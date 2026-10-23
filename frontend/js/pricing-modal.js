@@ -1249,6 +1249,9 @@
        in einer aelteren Ansicht —, ist 1 richtig. */
     var menge = Math.max(1, parseInt(el.dataset.menge, 10) || 1);
     var origText = el.textContent;
+    /* v2933 · Widerrufsverzicht (§ 356 Abs. 5 BGB) vor dem Checkout */
+    var _wv = (window.DpWiderruf && typeof DpWiderruf.einholen === 'function') ? await DpWiderruf.einholen('Kontingent kaufen') : null;
+    if (!_wv) return;
     el.style.pointerEvents = 'none';
     el.textContent = 'Wird gestartet…';
     try {
@@ -1260,7 +1263,7 @@
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + token
         },
-        body: JSON.stringify({ pack_id: packId, menge: menge })
+        body: JSON.stringify({ pack_id: packId, menge: menge, widerruf_verzicht: true, widerruf_version: _wv.widerruf_version })
       });
       var data = null;
       try { data = await r.json(); } catch (e) {}

@@ -133,6 +133,14 @@ router.post('/checkout', userAuth, async (req, res) => {
      Der Zweig steht VOR den Kerosin-Packs, weil die SKUs sich nicht
      ueberschneiden und der alte Weg sonst mit `invalid_pack` abbraeche —
      genau das tat er bis v1183 bei jedem einzelnen Kaufversuch. */
+  /* v2933 · ohne ausdruecklichen Widerrufsverzicht (§ 356 Abs. 5 BGB) kein Checkout */
+  try {
+    await require('../services/consentService').widerrufVerzichtPruefen(req, { kauf: 'kontingent', pack: pack_id || null, menge: menge || null });
+  } catch (e) {
+    if (e.code === 'widerruf_verzicht_fehlt') return res.status(400).json({ error: e.code, message: e.message });
+    return res.status(500).json({ error: 'consent_fehler', message: e.message });
+  }
+
   if (bewertungsKatalog.istBewertungsSku(pack_id)) {
     return _checkoutBewertung(req, res, db, pack_id, menge);
   }

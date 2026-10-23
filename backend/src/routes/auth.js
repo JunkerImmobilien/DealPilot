@@ -383,7 +383,19 @@ router.delete('/me', authenticate, async (req, res, next) => {
       });
     }
 
-    await userService.deleteUser(userId);
+    /* v2933 · vollstaendig: Abo kuendigen, Marktbericht-Daten, Tickets, dann
+       der Nutzer (services/kontoLoeschen.js). Scheitert die Kuendigung, bleibt
+       das Konto - und der Nutzer bekommt das gesagt. */
+    let bericht;
+    try {
+      bericht = await require('../services/kontoLoeschen').loeschen(userId, me && me.email);
+    } catch (e) {
+      console.error('[v2933] Konto loeschen abgebrochen:', e.message);
+      return res.status(502).json({
+        error: 'Das Konto wurde nicht gelöscht: ' + e.message + ' Bitte schreib an support@dealpilot.immo.'
+      });
+    }
+    console.log('[v2933] Konto geloescht:', String(userId).slice(0, 8), JSON.stringify(bericht));
     res.json({ ok: true, deleted: true });
   } catch (err) { next(err); }
 });

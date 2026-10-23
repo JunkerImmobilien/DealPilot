@@ -380,6 +380,7 @@ app.use('/api/v1/tax-periods', require('./routes/taxPeriods'));  // V259-02: Ste
 // V194: Admin-Dashboard
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/credits', creditsRoutes);  // V197
+app.use('/api/v1/consent', require('./routes/consent'));  // v2933 - Zustimmungen mit Nachweis
 app.use('/api/v1/api-keys', require('./routes/apiKeys'));  // mand v807-api-keys
 /* v2071 · Die Rechenkerne als Schnittstelle: Restnutzungsdauer (im Image)
    und Verkehrswert (im Marktbericht-Dienst). Eigener Namensraum, damit
@@ -515,6 +516,20 @@ async function start() {
         if (r1.rowCount || r2.rowCount) {
           console.log('[sec-retention] geloescht:', r1.rowCount, 'Beobachtungen (>90 Tage),',
                       r2.rowCount, 'Entscheidungen (>3 Jahre)');
+        }
+        /* v2933 · Die Datenschutzerklaerung verspricht "IP nach 30 Tagen
+           anonymisiert" - einen Lauf dafuer gab es nicht (Bestandsaufnahme
+           23.10.2026). Die Zeilen bleiben, nur die Adresse faellt weg;
+           fehlgeschlagene Admin-Anmeldungen ganz nach 30 Tagen. Zustimmungen
+           (consent_log) nach 3 Jahren. */
+        const r3 = await db.query(`UPDATE audit_log SET ip_address = NULL WHERE ip_address IS NOT NULL AND created_at < NOW() - INTERVAL '30 days'`);
+        const r4 = await db.query(`UPDATE admin_audit_log SET ip = NULL WHERE ip IS NOT NULL AND created_at < NOW() - INTERVAL '30 days'`);
+        const r5 = await db.query(`DELETE FROM admin_login_attempts WHERE created_at < NOW() - INTERVAL '30 days'`);
+        const r6 = await db.query(`UPDATE auth_failures SET last_attempt_ip = NULL WHERE last_attempt_ip IS NOT NULL AND last_attempt_at < NOW() - INTERVAL '30 days'`);
+        const r7 = await require('./services/consentService').aufraeumen();
+        if (r3.rowCount || r4.rowCount || r5.rowCount || r6.rowCount || r7) {
+          console.log('[ip-retention] IP entfernt:', r3.rowCount + r4.rowCount + r6.rowCount,
+                      '· Admin-Anmeldeversuche geloescht:', r5.rowCount, '· Zustimmungen >3 Jahre:', r7);
         }
       } catch (e) {
         console.error('[sec-retention] Lauf-Fehler:', e.message);
