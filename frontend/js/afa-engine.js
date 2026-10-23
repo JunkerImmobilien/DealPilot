@@ -35,13 +35,19 @@
    * @param {number} jahre - wie viele Jahre vorausrechnen
    * @returns {number[]} Array mit Werten pro Jahr
    */
-  function linearSeries(ahk, satzPct, jahre) {
+  /* v2891 · ersterAnteil (0 < f <= 1): das Anschaffungsjahr zaehlt nur
+     monatsanteilig (§ 7 Abs. 1 Satz 4 EStG). Der gekuerzte Teil geht nicht
+     verloren - die Reihe laeuft weiter, bis der Restbuchwert null ist, das
+     letzte Jahr holt ihn nach. Bis v2890 wurde Jahr 1 erst NACH der Reihe
+     gezwoelftelt, und der Rest fehlte am Ende. */
+  function linearSeries(ahk, satzPct, jahre, ersterAnteil) {
     var jahresBetrag = ahk * (satzPct / 100);
+    var f1 = (ersterAnteil > 0 && ersterAnteil < 1) ? ersterAnteil : 1;
     var out = [];
     var restbuch = ahk;
     for (var i = 0; i < jahre; i++) {
       // Im letzten Jahr ggf. nur Restbuchwert (kann nicht mehr abschreiben als noch da ist)
-      var abschreibung = Math.min(jahresBetrag, restbuch);
+      var abschreibung = Math.min(jahresBetrag * (i === 0 ? f1 : 1), restbuch);
       out.push(abschreibung);
       restbuch -= abschreibung;
       if (restbuch < 0.01) restbuch = 0;
@@ -77,21 +83,25 @@
        Beispiel AHK 400.000: alt Wechsel Jahr 11 auf 12.000/J, neu Jahr 14 auf 10.264/J. */
     var gndJahre = 100 / linearFallback;
     var linFix = 0;
+    /* v2891: Anschaffungsjahr monatsanteilig, Jahr 2 dann vom RICHTIGEN
+       Restwert (AHK 400.000, Kauf 01.10.: Jahr 1 5.000, Jahr 2 19.750 -
+       bis v2890 19.000, weil Jahr 1 erst nachtraeglich gekuerzt wurde). */
+    var f1 = (opts.ersterAnteil > 0 && opts.ersterAnteil < 1) ? opts.ersterAnteil : 1;
 
     for (var i = 0; i < jahre; i++) {
-      var degBetrag = restbuch * rateDeg;
-      var restND = Math.max(1, gndJahre - i);
+      var degBetrag = restbuch * rateDeg * (i === 0 ? f1 : 1);
+      var restND = Math.max(1, gndJahre - (i === 0 ? 0 : (i - 1 + f1)));
       var linBetrag = restbuch / restND;
 
       var betrag;
-      if (wechsel && !inLinearPhase && linBetrag > degBetrag && restbuch > 0) {
+      if (wechsel && !inLinearPhase && linBetrag * (i === 0 ? f1 : 1) > degBetrag && restbuch > 0) {   /* v2891: im Teiljahr beide gekuerzt vergleichen */
         inLinearPhase = true;
         wechselJahr = i + 1;
         linFix = linBetrag;          /* ab hier linear: fester Betrag bis zum Ende der Rest-ND */
       }
 
       if (inLinearPhase) {
-        betrag = Math.min(linFix, restbuch);
+        betrag = Math.min(linFix * (i === 0 ? f1 : 1), restbuch);
       } else {
         betrag = Math.min(degBetrag, restbuch);
       }
@@ -177,13 +187,14 @@
     if (methode === 'degressiv' || methode === 'degressiv_wechsel') {
       var deg = degressivSeries(ahk, satz, jahre, {
         wechsel: methode === 'degressiv_wechsel',
-        linearFallback: linearFallback
+        linearFallback: linearFallback,
+        ersterAnteil: params.ersterAnteil   /* v2891 */
       });
       normal = deg.series;
       wechselJahr = deg.wechselJahr;
       restbuch = deg.restbuchAmEnde;
     } else {
-      normal = linearSeries(ahk, satz, jahre);
+      normal = linearSeries(ahk, satz, jahre, params.ersterAnteil);   /* v2891 */
       restbuch = ahk - normal.reduce(function (s, x) { return s + x; }, 0);
     }
 

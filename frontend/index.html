@@ -1708,12 +1708,12 @@ label.dp-required.qc-required::after {
               <div class="san-tax-years" id="san_tax_years_wrap">
                 <label>Verteilung über <button type="button" class="dp-tip" data-tip-id="tab2.san_taxoption" tabindex="-1" aria-label="Hilfe zu Sanierungs-Steueroption"></button></label>
                 <select id="san_tax_years" oninput="calc()">
-                  <option value="auto" selected>Automatisch (15%-Regel)</option>
+                  <option value="auto" selected>Automatisch (15-%-Regel: sofort oder über die Nutzungsdauer)</option>
                   <option value="1">1 Jahr (sofort)</option>
                   <option value="2">2 Jahre</option>
                   <option value="3">3 Jahre</option>
                   <option value="4">4 Jahre</option>
-                  <option value="5">5 Jahre (Standard §82b)</option>
+                  <option value="5">5 Jahre (§ 82b EStDV)</option>
                   <option value="50">Über AfA-Nutzungsdauer (anschaffungsnahe HK)</option>
                 </select>
               </div>
@@ -2132,7 +2132,7 @@ label.dp-required.qc-required::after {
   </details>
   <div class="card" id="tax-personal-card" style="margin-top:14px">
     <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-user"/></svg></span>Persönliche Steuer</div>
-    <p class="hint">Diese Werte fließen in alle Steuer-Berechnungen ein. Der Grenzsteuersatz wird automatisch aus dem zvE nach §32a EStG (Tarif 2026) berechnet — manuelles Übersteuern möglich.</p>
+    <p class="hint">Diese Werte fließen in alle Steuer-Berechnungen ein. Der Grenzsteuersatz wird automatisch aus dem zvE nach § 32a EStG (Tarif 2026) berechnet, mit Solidaritätszuschlag und Kirchensteuer — manuelles Übersteuern möglich.</p>
     <div class="g2">
       <div class="zve-banner" style="grid-column:1/-1;background:color-mix(in srgb, var(--gold) 6%, transparent);border:1px solid color-mix(in srgb, var(--gold) 25%, transparent);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:start;gap:12px;font-family:var(--font-main,'IBM Plex Sans',sans-serif)">
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--gold,#C9A84C);flex-shrink:0;margin-top:1px" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.5" fill="currentColor"/></svg>
@@ -2144,6 +2144,10 @@ label.dp-required.qc-required::after {
 </div>
 <div class="f"><label>Zu versteuerndes Einkommen (zvE) vor Immobilie / Jahr <button type="button" class="dp-tip" data-tip-id="tab4.zve" tabindex="-1" aria-label="Hilfe zu zvE"></button></label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="if(window.DealPilotZvE)DealPilotZvE.onObjectInput(this.value);calc()"></div></div>
       <div class="f"><label>Persönl. Grenzsteuersatz (%) <button type="button" class="dp-tip" data-tip-id="tab4.grenzsteuersatz" tabindex="-1" aria-label="Hilfe zu tab4.grenzsteuersatz"></button></label><div class="iw"><input id="grenz" type="text" inputmode="decimal" placeholder="40,45" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
+      <!-- v2891: Veranlagung und Kirchensteuer gehoeren zum zvE (Marcel 23.10.2026). Gespeichert im Investmentprofil, nicht am Objekt - ein Wert fuer alle Objekte. -->
+      <div class="f"><label for="st_splitting">Veranlagung</label><select id="st_splitting" onchange="if(window.DpSteuerAngaben)DpSteuerAngaben.aendern()"><option value="0">Einzelveranlagung (Grundtabelle)</option><option value="1">Zusammenveranlagung (Splitting)</option></select></div>
+      <div class="f"><label for="st_kist">Kirchensteuer</label><select id="st_kist" onchange="if(window.DpSteuerAngaben)DpSteuerAngaben.aendern()"><option value="0">keine</option><option value="8">8 % (Bayern, Baden-Württemberg)</option><option value="9">9 % (übrige Länder)</option></select></div>
+      <div class="hint" style="grid-column:1/-1;margin-top:-4px">Das zvE ist die Größe <b>vor</b> dem Tarif. Bei Zusammenveranlagung trägst du das gemeinsame zvE ein; DealPilot wendet darauf den Splittingtarif an (§ 32a Abs. 5 EStG). Solidaritätszuschlag und Kirchensteuer rechnet DealPilot auf die Einkommensteuer obendrauf.</div>
     </div>
     <div class="f checkbox-row">
       <label class="cb-label" title="Wenn aktiv, wird der Grenzsteuersatz automatisch aus deinem zvE nach §32a EStG (Tarif 2026) berechnet.">
@@ -2153,7 +2157,7 @@ label.dp-required.qc-required::after {
     </div>
     <hr class="dvd">
     <div class="g2">
-      <div class="f"><label>EStG (vor Immobilie) / Jahr</label><div class="cf" id="estg_view">—</div><span class="hint">Wird nach §32a aus zvE berechnet</span></div>
+      <div class="f"><label>Steuer vor Immobilie / Jahr</label><div class="cf" id="estg_view">—</div><span class="hint">Einkommensteuer nach § 32a aus dem zvE, mit Soli und Kirchensteuer</span></div>
       <div class="f"><label>Hilfreiche Links</label>
         <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
           <a class="btn btn-outline btn-sm" href="https://www.elster.de/" target="_blank" rel="noopener" style="flex:1 1 100px;min-width:100px;text-align:center">↗ ELSTER</a>
@@ -3631,7 +3635,7 @@ label.dp-required.qc-required::after {
 <script src="js/dp-qr.js?v=v2180"></script>
 <script src="js/hausgeld-engine.js?v=v2191a"></script>
 <script src="js/deal-kpis.js?v=v2261"></script>
-<script src="js/afa-engine.js?v=v1878"></script>
+<script src="js/afa-engine.js?v=v2891"></script>
 <script src="js/irr-engine.js?v=v1260"></script>
 <!-- v1312: Erbbaurecht - Rechenkern (rein) + DOM-Schicht -->
 <script src="js/erbbau-engine.js?v=v2180"></script>
@@ -3641,7 +3645,7 @@ label.dp-required.qc-required::after {
   <script src="js/tax-periods.js?v=841"></script>
   <script src="js/tax-periods-sync.js?v=1"></script>
   <script src="js/zve-smart.js?v=1"></script>
-  <script src="js/wk-aggregator.js?v=2"></script>
+  <script src="js/wk-aggregator.js?v=v2891"></script>
   <!-- V276.2-no-sidebar-widget: wk-dashboard entfernt - Inhalt jetzt im Steuermodul -->
   <script src="js/all-objects-views.js?v=v2422"></script>
   <script src="js/tour-sidebar.js?v=v1696"></script>
@@ -3649,14 +3653,14 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v2890"></script>
+  <script src="js/calc.js?v=v2891"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v2852"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v2890"></script>
-<script src="js/steuer-verlauf.js?v=v2890"></script>
+<script src="js/tax.js?v=v2891"></script>
+<script src="js/steuer-verlauf.js?v=v2891"></script>
 <script src="js/config.js?v=v2630"></script>
   <script src="js/legal-links.js?v=v1885" defer></script>
   <script src="js/upgrade-cta.js?v=176" defer></script>
@@ -3689,7 +3693,7 @@ label.dp-required.qc-required::after {
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=878"></script>
 <script src="js/anlage-v-2025.js?v=v1258"></script>
-<script src="js/werbungskosten-pdf.js?v=v1225c"></script>
+<script src="js/werbungskosten-pdf.js?v=v2891"></script>
 <script src="js/gesellschaft-abschluss.js?v=v1235b"></script>
 <script src="js/charts.js?v=166"></script>
 <script src="js/market-rates.js?v=v2247d"></script>
@@ -3763,7 +3767,7 @@ label.dp-required.qc-required::after {
   <script src="js/tour-engine.js?v=v2251"></script>
   <script src="js/tour-content.js?v=v2205a"></script>
   <!-- v1740 � Grund-Setup VOR dem Rundgang (Aussehen, Stammdaten, Rechenwerte) -->
-  <script src="js/onboarding.js?v=v2554b"></script>
+  <script src="js/onboarding.js?v=v2891"></script>
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=777e"></script>
   <script src="js/email-change.js?v=774"></script><!-- v774-change-email -->
@@ -3776,7 +3780,7 @@ label.dp-required.qc-required::after {
 <!-- v2060: breite Tabellen werden auf dem Handy zu Karten (zentral, alle Ansichten) -->
 <script src="js/tabellen-karten.js?v=v2466a"></script>
 <script src="js/portfolio-export.js?v=v2180"></script>
-<script src="js/deal-action.js?v=v2269"></script>
+<script src="js/deal-action.js?v=v2891"></script>
 <script src="js/gutachten-org.js?v=v1448b"></script>
 <script src="js/afa-eigen.js?v=v1871"></script>
 <script src="js/deal-action-readycheck.js?v=v2080"></script>
@@ -3800,13 +3804,13 @@ label.dp-required.qc-required::after {
 <script src="js/selbstauskunft.js?v=W40"></script>
 <!-- V63.77: RND-Modul (Restnutzungsdauer) — Reihenfolge wichtig: gnd → bte → calc → pdf → ui -->
 <script src="js/rnd-gnd-table.js?v=v1426"></script>
-<script src="js/rnd-calc.js?v=v2275"></script>
+<script src="js/rnd-calc.js?v=v2891"></script>
 <script src="js/rnd-wizard.js?v=v2283a"></script>
 <script src="js/free-lock.js?v=v2180"></script><!-- v495-gate -->
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
-<script src="js/investment-profile.js?v=v2261"></script>
+<script src="js/investment-profile.js?v=v2891"></script>
 <script src="js/bwk-profil.js?v=v2211"></script>
-<script src="js/dashboard.js?v=v2410"></script>
+<script src="js/dashboard.js?v=v2891"></script>
 <script src="js/portfolio-strategie.js?v=v1935c"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
 <script src="js/portfolio-spiegel.js?v=v1802"></script><!-- v1793: liest portfolioPayload() und legt es fuer den Bot ab - rechnet NICHTS -->
 
@@ -3819,7 +3823,7 @@ label.dp-required.qc-required::after {
   <script src="js/object-actions.js?v=v2841"></script>
   <script src="js/dpsh-score-hero.js?v=v2822a"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v1183"></script>
-  <script src="js/voice-import.js?v=v2430"></script>
+  <script src="js/voice-import.js?v=v2891"></script>
   <!-- v1895: der sichtbare Vermerk an jedem pauschal angesetzten
        Bewirtschaftungsposten. Liest nur `_dp_herkunft`, rechnet nichts. -->
   <script src="js/bwk-vermerk.js?v=v1895b"></script>

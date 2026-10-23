@@ -315,6 +315,16 @@ window.DealPilotInvestmentProfile = (function() {
       '<h3 class="ip-section">Steuer</h3>',
       '<div class="ip-grid">',
         field('ip_grenzsteuersatz', 'Persönlicher Grenzsteuersatz', p.grenzsteuersatz, '%', 'Vorbelegung 40,45 %. Gilt für Objekte im Privatvermögen, solange im Reiter Steuer kein zu versteuerndes Einkommen steht — mit Einkommen rechnet DealPilot den Satz selbst aus.'),
+        /* v2891: dieselben zwei Angaben wie unter dem zvE im Tab Steuern, derselbe Speicher */
+        '<div class="ip-field"><label for="ip_splitting">Veranlagung</label><div class="ip-field-row"><select id="ip_splitting">' +
+          '<option value="0"' + ((p.splitting === true || p.splitting === 'true') ? '' : ' selected') + '>Einzelveranlagung</option>' +
+          '<option value="1"' + ((p.splitting === true || p.splitting === 'true') ? ' selected' : '') + '>Zusammenveranlagung (Splitting)</option></select></div>' +
+          '<div class="ip-hint">Bei Zusammenveranlagung das gemeinsame zvE eintragen; DealPilot rechnet den Splittingtarif (§ 32a Abs. 5 EStG).</div></div>',
+        '<div class="ip-field"><label for="ip_kirchensteuer">Kirchensteuer</label><div class="ip-field-row"><select id="ip_kirchensteuer">' +
+          [['0','keine'],['8','8 % (BY, BW)'],['9','9 % (übrige Länder)']].map(function (o) {
+            return '<option value="' + o[0] + '"' + (String(parseInt(p.kirchensteuer, 10) || 0) === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
+          }).join('') + '</select></div>' +
+          '<div class="ip-hint">Soli und Kirchensteuer stehen auf der Einkommensteuer; die Kirchensteuer mindert als Sonderausgabe das zvE.</div></div>',
       '</div>',
       /* v2211 · Marcel: „wir können ja auch unseren Steuersatz unter Mandanten angeben ... dorthin verlinken".
          Gemessen: Mandanten führt den Satz nur für GESELLSCHAFTEN (effRate: KSt + GewSt);
@@ -413,6 +423,8 @@ window.DealPilotInvestmentProfile = (function() {
       min_cashflow_vor_st:    v('ip_min_cashflow_vor_st'),
       max_ltv:                v('ip_max_ltv'),
       grenzsteuersatz:        v('ip_grenzsteuersatz'),
+      splitting:              (function(){ var e=document.getElementById('ip_splitting'); return e ? (e.value === '1') : null; })(),   /* v2891 */
+      kirchensteuer:          (function(){ var e=document.getElementById('ip_kirchensteuer'); return e ? (parseInt(e.value, 10) || 0) : null; })(),
       notar_pct:              v('ip_notar_pct'),          /* v2261 */
       grundbuch_pct:          v('ip_grundbuch_pct'),
       sonstige_nk_pct:        v('ip_sonstige_nk_pct'),

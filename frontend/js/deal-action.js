@@ -378,7 +378,7 @@ window.DealPilotDealAction = (function() {
 
     // Vergleichs-Rechnung
     var grenz = (typeof Tax !== 'undefined' && Tax.calcGrenzsteuersatz)
-      ? Tax.calcGrenzsteuersatz(60000) : 0.42;
+      ? ((typeof window._dpZveFuerJahr === 'function' && Tax.grenzsatzGesamt) ? Tax.grenzsatzGesamt(window._dpZveFuerJahr().zve) : Tax.calcGrenzsteuersatz(60000)) : 0.42;
     var rndCmp;
     try {
       rndCmp = DealPilotRND.calcAfaVergleich({
@@ -459,7 +459,7 @@ window.DealPilotDealAction = (function() {
     var mehrAfaJahr = diffBasis * afaSatz / 100;
     var grenz = grenz_input ? grenz_input / 100
               : (typeof Tax !== 'undefined' && Tax.calcGrenzsteuersatz)
-                ? Tax.calcGrenzsteuersatz(60000) : 0.42;
+                ? ((typeof window._dpZveFuerJahr === 'function' && Tax.grenzsatzGesamt) ? Tax.grenzsatzGesamt(window._dpZveFuerJahr().zve) : Tax.calcGrenzsteuersatz(60000)) : 0.42;
     var mehrSteuerJahr = mehrAfaJahr * grenz;
     var mehrSteuer50J = mehrSteuerJahr * 50;
 

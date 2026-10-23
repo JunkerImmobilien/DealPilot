@@ -545,8 +545,8 @@ window.DealPilotOnboarding = (function () {
         + 'Er ist immer höher als der Durchschnitt und ist die richtige Größe, '
         + 'wenn man wissen will, was eine zusätzliche Einnahme oder eine '
         + 'Abschreibung wirklich bringt. Vorbelegt mit 40,45 % — das ist der '
-        + 'Satz eines Alleinstehenden mit rund 60.000 € zu versteuerndem '
-        + 'Einkommen inklusive Solidaritätszuschlag.')
+        + 'Satz eines Alleinstehenden mit rund 66.000 € zu versteuerndem '
+        + 'Einkommen (Einkommensteuer; Soli fällt dort noch nicht an).')
       + '</div>'
       /* ══ v1750 · WAS DER RECHNER TUT, UND WO DIE ZAHL STEHT ══════════
          Marcel: „Bei der Steuer, was macht der genau? … Man sollte nur genau
@@ -563,9 +563,10 @@ window.DealPilotOnboarding = (function () {
       +   'und misst, wie viel Steuer auf den <i>nächsten</i> Euro entfällt — '
       +   'zuzüglich Solidaritätszuschlag und, wenn angegeben, Kirchensteuer. '
       +   'Genau diesen Satz trägt DealPilot dann oben ein.</p>'
-      +   '<div class="dpo-raster dpo-raster-3">'
+      +   '<div class="dpo-raster dpo-raster-2">'
       +     _num('dpo_zve', 'Zu versteuerndes Einkommen', '', '€ im Jahr')
-      +     _sel('dpo_kirche', 'Kirchensteuer', [['0','keine'],['8','8 % (BY, BW)'],['9','9 % (übrige)']], '0')
+      +     _sel('dpo_veranl', 'Veranlagung', [['0','einzeln'],['1','zusammen (Splitting)']], (profil('splitting', false) === true ? '1' : '0'))
+      +     _sel('dpo_kirche', 'Kirchensteuer', [['0','keine'],['8','8 % (BY, BW)'],['9','9 % (übrige)']], String(profil('kirchensteuer', 0) || 0))
       +     '<div class="dpo-f"><label>&nbsp;</label><button type="button" class="dpo-r-btn" id="dpo-rechnen">Ausrechnen</button></div>'
       +   '</div>'
       +   '<div class="dpo-r-erg" id="dpo-r-erg"></div>'
@@ -814,17 +815,22 @@ window.DealPilotOnboarding = (function () {
 
      Die Kirchensteuer kommt oben drauf: sie ist ein Prozentsatz DER
      Einkommensteuer, keine eigene Tariffrage. */
-  function _grenzsatz(zve, kirchePct) {
+  /* v2891 · DER SATZ DER GANZEN LAST aus tax.js (Tax.grenzsatzGesamt):
+     Einkommensteuer (Grund- oder Splittingtabelle), Solidaritaetszuschlag mit
+     Freigrenze und Milderungszone, Kirchensteuer MIT Sonderausgabenabzug.
+     Hier stand Grenzsatz × (1 + Kirchensteuer) - ohne Soli, obwohl der Text
+     ihn versprach, und ohne den Abzug (42 % und 9 % ergaben 45,78 % statt
+     rund 44,1 %). */
+  function _grenzsatz(zve, kirchePct, splitting) {
     if (!(zve > 0)) return null;
     var grenz = null;
     try {
-      if (window.Tax && typeof Tax.calcGrenzsteuersatz === 'function') {
-        grenz = Tax.calcGrenzsteuersatz(zve);
+      if (window.Tax && typeof Tax.grenzsatzGesamt === 'function') {
+        grenz = Tax.grenzsatzGesamt(zve, undefined, { splitting: !!splitting, kist: Number(kirchePct) || 0 });
       }
     } catch (e) { grenz = null; }
     if (grenz == null || !isFinite(grenz)) return null;
-    var kirche = grenz * (Number(kirchePct) || 0) / 100;
-    return Math.round((grenz + kirche) * 10000) / 100;   /* in % */
+    return Math.round(grenz * 10000) / 100;   /* in % */
   }
 
   /* ══ Modal ════════════════════════════════════════════════════════ */
@@ -952,7 +958,7 @@ window.DealPilotOnboarding = (function () {
     var k = (el('dpo_kirche') || {}).value || '0';
     var erg = el('dpo-r-erg');
     if (!erg) return;
-    var g = _grenzsatz(zve, k);
+    var g = _grenzsatz(zve, k, ((el('dpo_veranl') || {}).value === '1'));
     if (g == null) {
       erg.innerHTML = '<span class="dpo-r-fehl">'
         + (zve > 0 ? 'Der Steuerrechner ist gerade nicht geladen — trag den Satz bitte direkt ein.'
@@ -1059,6 +1065,20 @@ window.DealPilotOnboarding = (function () {
     if (_schritt === 3) {
       var g = _zahl('dpo_grenz');
       if (g != null) profilSchreiben({ grenzsteuersatz: g });
+      /* v2891: Veranlagung und Kirchensteuer in DENSELBEN Speicher wie die
+         Steuerangaben im Tab Steuern - ein Wert, kein zweiter. */
+      var _ve = el('dpo_veranl'), _ki = el('dpo_kirche');
+      try {
+        var P = window.DealPilotInvestmentProfile;
+        if (P && P.load && P.save) {
+          var akt = P.load() || {};
+          if (_ve) akt.splitting = (_ve.value === '1');
+          if (_ki) akt.kirchensteuer = parseInt(_ki.value, 10) || 0;
+          P.save(akt);
+        }
+      } catch (e) {}
+      var _zv = _zahl('dpo_zve');
+      if (_zv != null && _zv > 0 && window.DealPilotZvE && DealPilotZvE.setCurrent) DealPilotZvE.setCurrent(_zv);
     }
     if (_schritt === 4) {
       var t = _profile().filter(function (x) { return x.id === _wahl.typ; })[0];

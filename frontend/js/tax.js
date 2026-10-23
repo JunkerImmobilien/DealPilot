@@ -140,7 +140,12 @@ var Tax = (function() {
       /* Zone 4: 0,42 * x - c */
       z4bis: 277825, z4satz: 0.42, z4c: 11135.63,
       /* Zone 5: 0,45 * x - c */
-      z5satz: 0.45, z5c: 19470.38
+      z5satz: 0.45, z5c: 19470.38,
+      /* v2891: Freigrenze des Solidaritaetszuschlags (§ 3 Abs. 3 SolZG,
+         gesetze-im-internet.de, abgerufen 23.10.2026): 20.350 EUR
+         Einkommensteuer, bei Zusammenveranlagung (§ 32a Abs. 5) 40.700 EUR.
+         Steht am Tarif, weil sie mit ihm jaehrlich wandert. */
+      soliFreigrenze: 20350
     }
   };
 
@@ -249,21 +254,124 @@ var Tax = (function() {
    *   taxDelta = positive means more tax due
    *   refund = positive means money back from Finanzamt
    */
-  function calcImmoTaxImpact(baseIncome, immoResult) {
+  /* ═══ v2891 · DIE STEUERLAST, NICHT NUR DIE EINKOMMENSTEUER ═════════════
+     Marcel 23.10.2026: Splitting, Soli und Kirchensteuer gehoeren in die
+     Steuerwirkung. Das zvE enthaelt keins davon - es ist die Groesse VOR
+     dem Tarif. Splitting ist eine Tarifregel auf das zvE (§ 32a Abs. 5),
+     Soli und Kirchensteuer stehen auf der Einkommensteuer.
+
+     Gemessen vor v2891 (Pruefbericht 23.10.): ein Ehepaar mit 80.000 EUR
+     gemeinsamem zvE und 10.000 EUR Verlust bekam 4.200 EUR Entlastung
+     statt 3.078 (+36 %); bei 90.000 EUR (Einzel) und 9 % Kirchensteuer
+     fehlten 878 EUR.
+
+     `opt` = { splitting: bool, kist: 0 | 0.08 | 0.09 }. Fehlt es, gilt die
+     Angabe unter den Steuerangaben (`optionen()`); ein Aufrufer, der einen
+     fremden Fall rechnet (Pruefskript), gibt es ausdruecklich mit. */
+  function optionen(opt) {
+    if (opt && typeof opt === 'object') {
+      return { splitting: !!opt.splitting, kist: _kistSatz(opt.kist) };
+    }
+    var p = {};
+    try {
+      if (typeof window !== 'undefined' && window.DealPilotInvestmentProfile
+          && typeof DealPilotInvestmentProfile.load === 'function') {
+        p = DealPilotInvestmentProfile.load() || {};
+      }
+    } catch (e) { p = {}; }
+    return { splitting: p.splitting === true || p.splitting === 'true',
+             kist: _kistSatz(p.kirchensteuer) };
+  }
+  /* 8 und 9 (Prozent) wie 0,08 und 0,09 - alles andere ist „keine". */
+  function _kistSatz(k) {
+    var n = parseFloat(String(k == null ? '' : k).replace(',', '.'));
+    if (!isFinite(n) || n <= 0) return 0;
+    if (n >= 1) n = n / 100;
+    return (Math.abs(n - 0.08) < 1e-6 || Math.abs(n - 0.09) < 1e-6) ? n : 0;
+  }
+
+  /* Tarifliche Einkommensteuer: Grundtabelle oder Splitting (§ 32a Abs. 5:
+     das Zweifache der Steuer auf die Haelfte des gemeinsamen zvE). */
+  function estTarif(zvE, jahr, splitting) {
+    var x = Math.max(0, Number(zvE) || 0);
+    return splitting ? 2 * calcEStG(x / 2, jahr) : calcEStG(x, jahr);
+  }
+
+  /* § 4 SolZG: 5,5 % der Einkommensteuer, hoechstens 11,9 % des Betrags
+     ueber der Freigrenze (Milderungszone); Bruchteile eines Cents entfallen. */
+  function soli(est, jahr, splitting) {
+    var fg = (tarifFuer(jahr).tarif.soliFreigrenze || 20350) * (splitting ? 2 : 1);
+    if (!(est > fg)) return 0;
+    return Math.floor(Math.min(0.055 * est, 0.119 * (est - fg)) * 100) / 100;
+  }
+
+  /* Die ganze Last auf ein zvE: ESt + Soli + Kirchensteuer.
+     KIRCHENSTEUER ALS SONDERAUSGABE (§ 10 Abs. 1 Nr. 4 EStG): die gezahlte
+     Kirchensteuer mindert das zvE. Gerechnet wird der Gleichgewichtsfall -
+     die im Jahr gezahlte Kirchensteuer ist die des Jahres (K = k · ESt(zvE − K)),
+     iterativ geloest; nach drei Schritten aendert sich nichts mehr (der
+     Faktor k · Grenzsatz liegt unter 0,05). Exakt statt Faustformel, weil
+     dieselbe Funktion auch die Differenz zweier Lasten liefert und eine
+     Naeherung dort keine Kuerzung mehr waere. Kinderfreibetraege kennt
+     DealPilot nicht; Soli und Kirchensteuer stehen deshalb auf der
+     tariflichen Einkommensteuer. */
+  function steuerLast(zvE, jahr, opt) {
+    var o = optionen(opt);
+    var x = Math.max(0, Math.floor(Number(zvE) || 0));
+    var K = 0, E;
+    if (o.kist > 0) {
+      for (var i = 0; i < 6; i++) {
+        E = estTarif(Math.max(0, x - K), jahr, o.splitting);
+        var Kn = o.kist * E;
+        if (Math.abs(Kn - K) < 0.01) { K = Kn; break; }
+        K = Kn;
+      }
+    }
+    E = estTarif(Math.max(0, x - Math.floor(K)), jahr, o.splitting);
+    K = o.kist > 0 ? Math.floor(o.kist * E * 100) / 100 : 0;
+    var S = soli(E, jahr, o.splitting);
+    return { est: E, soli: S, kist: K, gesamt: E + S + K,
+             splitting: o.splitting, kistSatz: o.kist };
+  }
+
+  /* Grenzsatz der GANZEN Last, abgeleitet statt geschaetzt:
+       ESt-Grenzsatz g (beim Splitting der der halben Basis),
+       Soli s' = 0 unter der Freigrenze, 11,9 % in der Milderungszone, sonst 5,5 %,
+       Kirchensteuer mit Sonderausgabenabzug:  g · (1 + s' + k) / (1 + k · g). */
+  function grenzsatzGesamt(zvE, jahr, opt) {
+    var o = optionen(opt);
+    var L = steuerLast(zvE, jahr, o);
+    var basis = Math.max(0, Math.floor(Number(zvE) || 0) - Math.floor(L.kist));
+    var g = o.splitting ? calcGrenzsteuersatz(basis / 2, jahr) : calcGrenzsteuersatz(basis, jahr);
+    var fg = (tarifFuer(jahr).tarif.soliFreigrenze || 20350) * (o.splitting ? 2 : 1);
+    var s = 0;
+    if (L.est > fg) s = (0.119 * (L.est - fg) < 0.055 * L.est) ? 0.119 : 0.055;
+    return g * (1 + s + o.kist) / (1 + o.kist * g);
+  }
+
+  function calcImmoTaxImpact(baseIncome, immoResult, jahr, opt) {
+    var o = optionen(opt);
     var newZvE = baseIncome + immoResult;
     if (newZvE < 0) newZvE = 0;
-    var taxBefore = calcEStG(baseIncome);
-    var taxAfter = calcEStG(newZvE);
+    var vor = steuerLast(baseIncome, jahr, o);
+    var nach = steuerLast(newZvE, jahr, o);
+    var taxBefore = vor.gesamt;
+    var taxAfter = nach.gesamt;
     var taxDelta = taxAfter - taxBefore;
     return {
-      taxBefore: taxBefore,
+      taxBefore: taxBefore,      /* v2891: ESt + Soli + Kirchensteuer */
       taxAfter: taxAfter,
       taxDelta: taxDelta,        // < 0 = Erstattung, > 0 = Nachzahlung
       refund: -taxDelta,         // > 0 = Erstattung
-      grenzsteuersatzBefore: calcGrenzsteuersatz(baseIncome),
-      grenzsteuersatzAfter: calcGrenzsteuersatz(newZvE),
-      avgBefore: calcDurchschnittssteuersatz(baseIncome),
-      avgAfter: calcDurchschnittssteuersatz(newZvE)
+      vor: vor, nach: nach,      /* v2891: die Aufteilung je Steuerart */
+      splitting: o.splitting, kistSatz: o.kist,
+      /* v2891: Verlust, der das Einkommen uebersteigt - wirkt erst ueber
+         den Verlustvortrag (§ 10d), hier nicht eingerechnet */
+      verlustUeberhang: (baseIncome + immoResult < 0) ? -(baseIncome + immoResult) : 0,
+      grenzsteuersatzBefore: grenzsatzGesamt(baseIncome, jahr, o),
+      grenzsteuersatzAfter: grenzsatzGesamt(newZvE, jahr, o),
+      avgBefore: baseIncome > 0 ? taxBefore / baseIncome : 0,
+      avgAfter: newZvE > 0 ? taxAfter / newZvE : 0
     };
   }
 
@@ -277,7 +385,13 @@ var Tax = (function() {
     tarifInfo: tarifInfo,   /* v1364: welcher Jahrgang gilt gerade? */
     calcGrenzsteuersatz: calcGrenzsteuersatz,
     calcDurchschnittssteuersatz: calcDurchschnittssteuersatz,
-    calcImmoTaxImpact: calcImmoTaxImpact
+    calcImmoTaxImpact: calcImmoTaxImpact,
+    /* v2891 */
+    optionen: optionen,
+    estTarif: estTarif,
+    soli: soli,
+    steuerLast: steuerLast,
+    grenzsatzGesamt: grenzsatzGesamt
   };
 })();
 
@@ -397,6 +511,11 @@ function _getBestandLossesForYear(displayYear) {
       _curHalterId = String((_hEl && _hEl.value) || 'privat');
     } catch (_) { _curHalterId = 'privat'; }
     var _curSphaere = _sphVon(_curHalterId);
+    /* v2891: Rang dieses Objekts in der Anlage-Reihenfolge, -1 = nicht gelistet */
+    var _curRang = -1;
+    all.forEach(function (o) {
+      if (o && currentId && o.id === currentId && typeof o.rang === 'number') _curRang = o.rang;
+    });
     // Year-Key als String
     var yearKey = String(displayYear);
     all.forEach(function(obj) {
@@ -424,7 +543,15 @@ function _getBestandLossesForYear(displayYear) {
       if (!refDate) return;
       var refDateStr = String(refDate).substring(0, 10);
       // Bedingung 1: anderes Kaufdatum < mein Kaufdatum
-      if (currentObjKaufdat && refDateStr >= currentObjKaufdat) return;
+      /* v2891 · GLEICHES KAUFDATUM: es entscheidet die Reihenfolge der
+         Anlage (`rang`), dieselbe Ordnung wie die Steuerkette im Cockpit.
+         Bis v2890 schlossen sich zwei Objekte desselben Tages gegenseitig
+         aus - jedes rechnete auf der vollen Basis, die Summe der Boxen lag
+         ueber der Kette. Steht dieses Objekt (noch) nicht in der Liste, gilt
+         es als das juengste. */
+      if (currentObjKaufdat && refDateStr > currentObjKaufdat) return;
+      if (currentObjKaufdat && refDateStr === currentObjKaufdat
+          && _curRang >= 0 && !(typeof obj.rang === 'number' && obj.rang < _curRang)) return;
       // Bedingung 2: anderes Kaufjahr <= displayYear
       var refYear = parseInt(refDateStr.substring(0, 4), 10);
       if (!refYear || refYear > displayYear) return;
@@ -484,6 +611,7 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
 
   var box = document.getElementById('tax-result-box');
   if (!box) return;
+  try { if (window.DpSteuerAngaben) DpSteuerAngaben.zeigen(); } catch (_eSA) {}   /* v2891 */
 
   // V270: Persistiere ausgewähltes Jahr (Klick auf Steuerverlauf-Card)
   if (typeof yearOverride === 'number' && yearOverride > 1900) {
@@ -675,12 +803,26 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
       '<div class="tax-item"><div class="tax-label">zvE ohne Immobilie (mit aktuellem Bestand)</div><div class="tax-val">' + fE(baseIncome, 0) + '</div></div>' +
       /* ─── RECHTS: zvE mit Immobilie ─── */
       '<div class="tax-item"><div class="tax-label">zvE mit dieser Immobilie</div><div class="tax-val">' + fE(baseIncome + totals.ergebnis, 0) + '</div></div>' +
-      /* ─── LINKS: EStG ohne ─── */
-      '<div class="tax-item"><div class="tax-label">ESt ohne Immo</div><div class="tax-val">' + fE(impact.taxBefore, 0) + '</div></div>' +
-      /* ─── RECHTS: EStG mit ─── */
-      '<div class="tax-item"><div class="tax-label">ESt mit Immo</div><div class="tax-val">' + fE(impact.taxAfter, 0) + '</div></div>' +
+      /* ─── LINKS/RECHTS: Steuerlast ohne/mit (v2891: ESt + Soli + Kirchensteuer) ─── */
+      (function () {
+        function _auf(L) {
+          if (!L) return '';
+          return 'Einkommensteuer ' + fE(L.est, 0) + ' · Solidaritätszuschlag ' + fE(L.soli, 0)
+            + (L.kistSatz > 0 ? ' · Kirchensteuer ' + Math.round(L.kistSatz * 100) + ' % ' + fE(L.kist, 0) : ' · keine Kirchensteuer')
+            + (L.splitting ? ' · Zusammenveranlagung (Splitting)' : ' · Einzelveranlagung');
+        }
+        return '<div class="tax-item"><div class="tax-label">Steuer ohne Immo <span class="tax-info" title="' + _auf(impact.vor) + '">ⓘ</span></div><div class="tax-val">' + fE(impact.taxBefore, 0) + '</div></div>'
+          + '<div class="tax-item"><div class="tax-label">Steuer mit Immo <span class="tax-info" title="' + _auf(impact.nach) + '">ⓘ</span></div><div class="tax-val">' + fE(impact.taxAfter, 0) + '</div></div>';
+      })() +
       /* ─── VOLLE BREITE: Erstattung/Nachzahlung ─── */
       '<div class="tax-item tax-result" style="grid-column:1/-1"><div class="tax-label">' + refundLabel + ' (jährlich)</div><div class="tax-val" style="color:' + refundColor + ';font-size:20px">' + (impact.refund >= 0 ? '+' : '') + fE(refundAbs, 0) + '</div></div>' +
+      /* v2891: Verlustvortrag sichtbar machen - genutzt aus Vorjahren, oder neu entstanden */
+      ((impact.vortragGenutzt > 0 || impact.verlustUeberhang > 0)
+        ? '<div class="tax-item" style="grid-column:1/-1;opacity:.92"><div class="tax-label">Verlustvortrag (§ 10d EStG)</div><div class="tax-val" style="font-size:12.5px;font-weight:400;line-height:1.45">'
+          + (impact.vortragGenutzt > 0 ? 'Aus den Vorjahren verrechnet: ' + fE(impact.vortragGenutzt, 0) + '. ' : '')
+          + (impact.verlustUeberhang > 0 ? 'Der Verlust übersteigt das Einkommen um ' + fE(impact.verlustUeberhang, 0) + ' — dieser Teil wird ins Folgejahr vorgetragen (ein Rücktrag ins Vorjahr ist nicht gerechnet).' : '')
+          + '</div></div>'
+        : '') +
       /* ─── LINKS: Grenzsteuersatz ─── */
       '<div class="tax-item"><div class="tax-label">Grenzsteuersatz aktuell</div><div class="tax-val">' + (impact.grenzsteuersatzAfter * 100).toFixed(1).replace('.', ',') + ' %</div></div>' +
       /* ─── RECHTS: Durchschnittssteuersatz ─── */
@@ -690,7 +832,18 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
   /* mand v805: GmbH/UG -> Koerperschaftsteuer-Ansicht statt ESt/Erstattung */
   if (_mandCorp && _mandRate != null) {
     var _erg = totals.ergebnis;
-    var _kst = Math.max(0, _erg) * _mandRate;
+    /* v2891: KSt dieses Objekts nach Verlustvortrag aus seinen Vorjahren */
+    var _kstR = (function () {
+      var reihe = [];
+      for (var _ki = 0; _ki < yearIdx && State.cfRows && _ki < State.cfRows.length; _ki++) {
+        var _kr = State.cfRows[_ki];
+        if (_kr && typeof _kr.cal === 'number') reihe.push({ jahr: _kr.cal, erg: _vvRoh(_kr.cal, _ki).ergebnis });
+      }
+      reihe.push({ jahr: displayYear, erg: _erg });
+      return _kstMitVortrag(reihe, _mandRate);
+    })();
+    var _kstJ = _kstR[_kstR.length - 1];
+    var _kst = _kstJ.kst;
     var _ergCol = _erg >= 0 ? 'var(--gold-d)' : 'var(--green)';
     var _rateTxt = (_mandRate * 100).toFixed(1).replace('.', ',') + ' %';
     box.innerHTML =
@@ -702,7 +855,8 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
         '<div class="tax-item tax-highlight" style="grid-column:1/-1"><div class="tax-label">Beitrag zum GmbH-Ergebnis (' + displayYear + ')</div><div class="tax-val" style="color:' + _ergCol + '">' + fE(_erg, 0, true) + '</div></div>' +
         '<div class="tax-item"><div class="tax-label">K\u00f6rperschaftsteuer-Satz</div><div class="tax-val">' + _rateTxt + '</div></div>' +
         '<div class="tax-item tax-result"><div class="tax-label">K\u00f6rperschaftsteuer (dieses Objekt)</div><div class="tax-val" style="color:' + (_erg >= 0 ? 'var(--red)' : 'var(--green)') + ';font-size:20px">' + (_erg >= 0 ? '\u2212' + fE(_kst, 0) : '0 \u20ac') + '</div></div>' +
-        (_erg < 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Verlust</div><div class="tax-val" style="color:var(--green)">keine Erstattung \u00b7 Verlustvortrag ins Folgejahr</div></div>' : '') +
+        (_erg < 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Verlust</div><div class="tax-val" style="color:var(--green)">keine Erstattung \u00b7 Verlustvortrag ins Folgejahr (Stand ' + fE(_kstJ.vortragNach, 0) + ')</div></div>' : '') +
+        (_kstJ.genutzt > 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Verlustvortrag verrechnet (\u00a7 10d EStG)</div><div class="tax-val" style="color:var(--green)">' + fE(_kstJ.genutzt, 0) + ' aus den Vorjahren \u00b7 Rest ' + fE(_kstJ.vortragNach, 0) + '</div></div>' : '') +
         (function(){  /* v813-3c: echte Mandanten-Steuerakte (KSt ueber alle Objekte der Gesellschaft) */
           try {
             var _curId = (window._currentObjId || (window.State && State.currentObjectId) || window._currentObjKey || null);
@@ -722,7 +876,25 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
               _sum += _vv; _n++;
             });
             if (!_curInList) { _sum += _erg; _n++; }
-            var _kstGes = Math.max(0, _sum) * _mandRate;
+            /* v2891: KSt der Gesellschaft nach Verlustvortrag - die Summen
+               aller Vorjahre aus den gespeicherten Jahresergebnissen. */
+            var _jahre = {};
+            _all.forEach(function (o) {
+              if (!o || (o.halter || 'privat') !== _curHalter || o.id === _curId) return;
+              Object.keys(o.wk_per_year || {}).forEach(function (k) {
+                var j = parseInt(k, 10), w = Number(o.wk_per_year[k]);
+                if (j < displayYear && isFinite(w)) _jahre[j] = (_jahre[j] || 0) + w;
+              });
+            });
+            for (var _ki2 = 0; _ki2 < yearIdx && _ki2 < State.cfRows.length; _ki2++) {
+              var _cj = State.cfRows[_ki2] && State.cfRows[_ki2].cal;
+              if (typeof _cj === 'number' && _cj < displayYear) _jahre[_cj] = (_jahre[_cj] || 0) + _vvRoh(_cj, _ki2).ergebnis;
+            }
+            var _reiheG = Object.keys(_jahre).map(Number).sort(function (a, b) { return a - b; })
+              .map(function (j) { return { jahr: j, erg: _jahre[j] }; });
+            _reiheG.push({ jahr: displayYear, erg: _sum });
+            var _kG = _kstMitVortrag(_reiheG, _mandRate);
+            var _kstGes = _kG[_kG.length - 1].kst;
             var _sumCol = _sum >= 0 ? 'var(--gold-d)' : 'var(--green)';
             return '<div class="tax-item" style="grid-column:1/-1;background:#140f06;border-color:var(--gold-d)">'
                  +   '<div class="tax-label" style="color:var(--gold-h)">Mandanten-Steuerakte &middot; ' + (_mandName || 'Gesellschaft') + ' (' + _n + ' Objekt' + (_n === 1 ? '' : 'e') + ', ' + displayYear + ')</div>'
@@ -848,9 +1020,13 @@ function renderTaxTimeline() {
   //               Jetzt nutzt der Verlauf _computeYearTotal() — die einzige Quelle der Wahrheit.
   if (typeof _computeYearTotal !== 'function') return;
 
-  var years = State.cfRows.slice(0, 15);  // first 15 years
+  /* v2891 · GESPEICHERT WIRD DIE GANZE HALTEDAUER, GEZEIGT WERDEN 15 KARTEN.
+     Bis v2890 gingen nur die ersten 15 Jahre ins Jahresergebnis: ab dem 16.
+     Jahr fehlte ein Vorobjekt in der Saldierung jedes spaeter gekauften
+     (Am Markt 9, Kauf 2024, fuehrte nur 2024-2026). */
+  var years = State.cfRows.slice();
 
-  var timeline = years.map(function(r, i) {
+  var timelineVoll = years.map(function(r, i) {
     var totals = _computeYearTotal(r.cal, i);
     return {
       year: r.cal,
@@ -861,6 +1037,7 @@ function renderTaxTimeline() {
       refund: totals.refund
     };
   });
+  var timeline = timelineVoll.slice(0, 15);   /* die Karten */
 
   /* v2890 · DIE REIHE WIRD GESPEICHERT, BEVOR EIN ZWEIG ZURUECKKEHRT.
      Der GmbH/UG-Zweig unten endet mit return - bis v2889 VOR dieser Stelle.
@@ -869,12 +1046,12 @@ function renderTaxTimeline() {
      Gesellschaft (gemessen auf Staging: Hoelderlinstr. 1 trug die Reihe von
      Musterstrasse 12, Am Markt 9 die von Westerfeldstr. 140). Die Reihe
      traegt jetzt die Kennung ihres Objekts. */
-  State.taxTimeline = timeline;
+  State.taxTimeline = timelineVoll;
   State.taxTimelineKey = window._currentObjKey || null;
   try {
-    if (window._currentObjKey && Array.isArray(timeline) && typeof window._scheduleTaxSnapshotPost === 'function') {
+    if (window._currentObjKey && Array.isArray(timelineVoll) && typeof window._scheduleTaxSnapshotPost === 'function') {
       var _wkSnap = {};
-      timeline.forEach(function(t) {
+      timelineVoll.forEach(function(t) {
         if (t && typeof t.year === 'number' && typeof t.immoResult === 'number') {
           _wkSnap[String(t.year)] = Math.round(t.immoResult);
         }
@@ -902,8 +1079,10 @@ function renderTaxTimeline() {
     var _activeY = State._taxDisplayYear || new Date().getFullYear();
     var chtml = '<div class="tax-tl-grid">';
     var sumKst = 0;
-    timeline.forEach(function(t){
-      var kst = Math.max(0, t.immoResult) * _tlRate;
+    /* v2891: KSt je Jahr nach Verlustvortrag aus den Vorjahren */
+    var _kstTl = _kstMitVortrag(timeline.map(function (t) { return { jahr: t.year, erg: t.immoResult }; }), _tlRate);
+    timeline.forEach(function(t, _ti){
+      var kst = _kstTl[_ti].kst;
       sumKst += kst;
       var hasKst = kst > 0.5;
       var color = hasKst ? 'var(--red)' : 'var(--green)';
@@ -992,11 +1171,12 @@ window._dpZveErsatz = function () {
   try { g = parseDe((document.getElementById('grenz') || {}).value); } catch (e) {}
   if (!(g > 0)) return 65891;
   var ziel = g / 100, lo = 12000, hi = 280000;
-  if (Tax.calcGrenzsteuersatz(hi) < ziel) return hi;
-  if (Tax.calcGrenzsteuersatz(lo) > ziel) return lo;
+  /* v2891: der eingestellte Satz ist die GANZE Last (wie die Automatik) */
+  if (Tax.grenzsatzGesamt(hi) < ziel) return hi;
+  if (Tax.grenzsatzGesamt(lo) > ziel) return lo;
   for (var i = 0; i < 40; i++) {
     var m = (lo + hi) / 2;
-    if (Tax.calcGrenzsteuersatz(m) < ziel) lo = m; else hi = m;
+    if (Tax.grenzsatzGesamt(m) < ziel) lo = m; else hi = m;
   }
   return Math.round(hi);
 };
@@ -1124,7 +1304,11 @@ function _computeAutoForYear(yearIdx, year) {
   } else if (sanYearsChoice === 'auto') {
     // Automatik: 15%-Regel (netto gegen die Grenze, abgezogen wird brutto)
     sanAnschaffungsnah = san_netto > sanGrenze15;
-    sanLaufzeit = sanAnschaffungsnah ? afa_nutzungsdauer : 5;
+    /* v2891: unter der Grenze ist der SOFORTABZUG der gesetzliche Normalfall
+       (§ 11 Abs. 2 EStG). Die Verteilung auf 2-5 Jahre (§ 82b EStDV) ist ein
+       Wahlrecht und steht in der Auswahl daneben - bis v2890 verteilte die
+       Automatik stillschweigend auf 5 Jahre. */
+    sanLaufzeit = sanAnschaffungsnah ? afa_nutzungsdauer : 1;
     sanAfaJaehrlich = san_inp / sanLaufzeit;
   } else if (sanYearsChoice === '50') {
     // Manuell: anschaffungsnah, also Gebäude-AfA-Nutzungsdauer
@@ -1327,7 +1511,75 @@ function _getEffectiveValue(year, field, autoVal) {
    Fassung davon waere genau der Fehler, den der Kommentar bei
    _renderSteuerwirkung verbietet.
    OHNE `vorgabe` ist das Verhalten bitgleich zu vorher. */
-function _computeYearTotal(year, yearIdx, vorgabe) {
+/* ═══ v2891 · VERLUSTVORTRAG (§ 10d EStG), NUR VORTRAG ══════════════════
+   Uebersteigt der Verlust eines Jahres das Einkommen, wurde der Rest bis
+   v2890 still verworfen (zvE auf 0 gekappt). Jetzt wandert er ins naechste
+   Jahr und mindert dort das zvE, bis er aufgebraucht ist. Den Ruecktrag ins
+   Vorjahr rechnet DealPilot nicht - er setzt eine Veranlagung voraus, die
+   vor dem Objekt liegt; der Rest steht dann vollstaendig im Vortrag, und
+   die Box sagt das. Die Mindestbesteuerung (1 Mio. EUR, darueber 60/70 %)
+   greift bei Privatanlegern praktisch nie und bleibt aussen vor.
+
+   Je Jahr wird die Reihe ab dem ersten Jahr durchlaufen. Damit das nicht
+   quadratisch teuer wird, merkt sich `_vvMerk` jedes Rohergebnis bis zum
+   Ende der laufenden Aufgabe (Microtask) - danach ist der Merker leer, und
+   eine Eingabe des Nutzers rechnet immer frisch. */
+/* v2891 · KOERPERSCHAFTSTEUER MIT VERLUSTVORTRAG (§ 8 Abs. 1 KStG i. V. m.
+   § 10d EStG). Bis v2890 stand je Jahr max(0, Ergebnis) × Satz: ein Verlust
+   im Jahr 1 minderte die Steuer im Jahr 2 nicht, die KSt spaeterer Jahre lag
+   zu hoch. Mindestbesteuerung: bis 1 Mio. EUR voll verrechenbar, darueber
+   70 % (VZ 2024-2027, Wachstumschancengesetz), sonst 60 %. Derselbe Satz
+   gilt hier fuer den Gewerbesteueranteil des Halter-Satzes - § 10a GewStG
+   verrechnet nach demselben Muster (dort 60 %); bei Objekten dieser
+   Groessenordnung wird die Millionengrenze nicht erreicht. */
+function _kstMitVortrag(reihe, rate) {
+  var vortrag = 0, aus = [];
+  (reihe || []).forEach(function (r) {
+    var erg = Number(r.erg) || 0, genutzt = 0, bem = 0;
+    if (erg < 0) { vortrag += -erg; }
+    else if (erg > 0) {
+      var quote = (r.jahr >= 2024 && r.jahr <= 2027) ? 0.70 : 0.60;
+      var grenze = Math.min(erg, 1000000) + Math.max(0, erg - 1000000) * quote;
+      genutzt = Math.min(vortrag, grenze);
+      vortrag -= genutzt;
+      bem = erg - genutzt;
+    }
+    aus.push({ jahr: r.jahr, erg: erg, genutzt: genutzt, bemessung: bem,
+               kst: bem * (rate || 0), vortragNach: vortrag });
+  });
+  return aus;
+}
+window._dpKstMitVortrag = _kstMitVortrag;
+
+var _vvMerk = null;
+function _vvRoh(year, idx) {
+  if (!_vvMerk) {
+    _vvMerk = {};
+    try { Promise.resolve().then(function () { _vvMerk = null; }); } catch (e) { _vvMerk = null; }
+  }
+  var k = year + '|' + idx;
+  if (_vvMerk && _vvMerk[k]) return _vvMerk[k];
+  var t = _computeYearTotal(year, idx, undefined, true);
+  var r = { ergebnis: t.ergebnis, basis: t.zve };
+  if (_vvMerk) _vvMerk[k] = r;
+  return r;
+}
+function _dpVerlustvortragBis(yearIdx) {
+  if (!(yearIdx > 0) || !State || !Array.isArray(State.cfRows)) return 0;
+  var vortrag = 0;
+  for (var i = 0; i < yearIdx && i < State.cfRows.length; i++) {
+    var row = State.cfRows[i];
+    if (!row || typeof row.cal !== 'number') continue;
+    var r = _vvRoh(row.cal, i);
+    var gesamt = r.basis + r.ergebnis;
+    if (gesamt < 0) vortrag += -gesamt;
+    else if (vortrag > 0) vortrag -= Math.min(vortrag, gesamt);
+  }
+  return vortrag;
+}
+window._dpVerlustvortragBis = _dpVerlustvortragBis;
+
+function _computeYearTotal(year, yearIdx, vorgabe, ohneVortrag) {
   var auto = vorgabe ? {} : _computeAutoForYear(yearIdx, year);
   var fields = [
     'schuldzinsen', 'kontofuehrung', 'bereitstellung', 'notar_grundschuld',
@@ -1396,7 +1648,14 @@ function _computeYearTotal(year, yearIdx, vorgabe) {
   var _zveOhneBestand = _basis.zve;
   var _saldo = vorgabe ? 0 : _basis.saldo;
   var baseIncome = vorgabe ? _basis.zve : _basis.basis;
-  var impact = Tax.calcImmoTaxImpact(baseIncome, ergebnis);
+  /* v2891: Steuerlast des Jahres (Splitting, Soli, Kirchensteuer aus den
+     Steuerangaben) und ein Verlustvortrag aus den Vorjahren dieses Objekts. */
+  var _vortrag = (vorgabe || ohneVortrag) ? 0 : _dpVerlustvortragBis(yearIdx);
+  var _genutzt = 0;
+  if (_vortrag > 0) _genutzt = Math.min(_vortrag, Math.max(0, baseIncome + ergebnis));
+  var impact = Tax.calcImmoTaxImpact(baseIncome, ergebnis - _genutzt, year);
+  impact.vortragGenutzt = _genutzt;
+  impact.vortragVorhanden = _vortrag;
 
   return {
     auto: auto,
@@ -1965,7 +2224,7 @@ function _grenzAutoNachziehen(mitToast) {
   if (auto.checked) {
     var zve = parseDe((document.getElementById('zve') || {}).value) || 0;
     if (zve > 0) {
-      var gss = Tax.calcGrenzsteuersatz(zve) * 100;
+      var gss = Tax.grenzsatzGesamt(zve) * 100;   /* v2891: inkl. Soli, Kirchensteuer, Splitting */
       var neu = gss.toFixed(2);
       var geaendert = (String(grenzInput.value).replace(',', '.') !== neu);
       grenzInput.value = neu;
@@ -2114,6 +2373,48 @@ window._dpSteuerBasis = function (jahr) {
   if (!(b > 0)) b = 0;
   return { zve: z.zve, saldo: s, basis: b, source: z.source, quelle: z.quelle };
 };
+
+/* ═══ v2891 · STEUERANGABEN: VERANLAGUNG UND KIRCHENSTEUER ════════════════
+ * Marcel 23.10.2026: „kommt es mit unter die Steuerangaben, da wo man auch
+ * sein zvE angibt?" - ja. Die beiden Auswahlfelder stehen im Tab Steuern
+ * unter dem zvE (#st_splitting, #st_kist), im Investmentprofil und im
+ * Einrichtungsfenster. Gespeichert wird an EINER Stelle: im Investmentprofil
+ * (`splitting`, `kirchensteuer`), dort, wo auch das zvE liegt. Am Objekt
+ * steht nichts davon - es ist eine Angabe ueber den Steuerpflichtigen, nicht
+ * ueber die Immobilie. */
+window.DpSteuerAngaben = (function () {
+  function _prof() {
+    try { return (window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.load()) || {}; }
+    catch (e) { return {}; }
+  }
+  function zeigen() {
+    var p = _prof();
+    var a = document.getElementById('st_splitting');
+    var b = document.getElementById('st_kist');
+    if (a) a.value = (p.splitting === true || p.splitting === 'true') ? '1' : '0';
+    if (b) b.value = String(parseInt(p.kirchensteuer, 10) === 8 ? 8 : (parseInt(p.kirchensteuer, 10) === 9 ? 9 : 0));
+  }
+  function speichern(splitting, kist) {
+    try {
+      var P = window.DealPilotInvestmentProfile;
+      if (!P || !P.load || !P.save) return false;
+      var akt = P.load() || {};
+      akt.splitting = !!splitting;
+      akt.kirchensteuer = (kist === 8 || kist === 9) ? kist : 0;
+      return P.save(akt);
+    } catch (e) { return false; }
+  }
+  function aendern() {
+    var a = document.getElementById('st_splitting');
+    var b = document.getElementById('st_kist');
+    speichern(a && a.value === '1', b ? (parseInt(b.value, 10) || 0) : 0);
+    try { if (typeof _grenzAutoNachziehen === 'function') _grenzAutoNachziehen(false); } catch (e) {}
+    if (typeof calcNow === 'function') calcNow(); else if (typeof calc === 'function') calc();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', zeigen);
+  else setTimeout(zeigen, 0);
+  return { zeigen: zeigen, speichern: speichern, aendern: aendern };
+})();
 
 // Hook zvE input to update Grenz when auto is on
 document.addEventListener('DOMContentLoaded', function() {
