@@ -16,9 +16,9 @@
 
 (function() {
 
-  var PDFJS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-  var PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-  var TESSERACT_URL = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.0.4/dist/tesseract.min.js';
+  var PDFJS_URL = '/vendor/cdn/pdf.js/3.11.174/pdf.min.js';
+  var PDFJS_WORKER = '/vendor/cdn/pdf.js/3.11.174/pdf.worker.min.js';
+  var TESSERACT_URL = '/vendor/cdn/tesseract.js/5.0.5/tesseract.min.js';
   var _pdfjsLoaded = false;
   var _tesseractLoaded = false;
 
@@ -77,7 +77,7 @@
 
     var totalPages = Math.min(pdf.numPages, 25);
     var allText = [];
-    var worker = await window.Tesseract.createWorker('deu', 1);
+    var worker = await window.Tesseract.createWorker('deu', 1, { workerPath: '/vendor/cdn/tesseract.js/5.0.5/worker.min.js', corePath: '/vendor/cdn/tesseract-core/5.0.0', langPath: '/vendor/cdn/tessdata/deu/4.0.0_best_int' });   /* v2932 · selbst gehostet, kein CDN */
 
     try {
       for (var i = 1; i <= totalPages; i++) {

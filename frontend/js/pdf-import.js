@@ -14,8 +14,8 @@
 
 (function() {
 
-  var PDFJS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-  var PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  var PDFJS_URL = '/vendor/cdn/pdf.js/3.11.174/pdf.min.js';
+  var PDFJS_WORKER = '/vendor/cdn/pdf.js/3.11.174/pdf.worker.min.js';
   var _pdfjsLoaded = false;
   var _onDoneCallback = null;
   var _pdfiSkipReview = false;  /* v417: QC-Review im iframe -> Parent-Pick-Tabelle ueberspringen */
@@ -188,7 +188,7 @@
   }
 
   // V196: tesseract.js Loader (CDN, ~3 MB) — wird nur bei OCR-Bedarf geholt
-  var TESSERACT_URL = 'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.5/tesseract.min.js';
+  var TESSERACT_URL = '/vendor/cdn/tesseract.js/5.0.5/tesseract.min.js';
   function _loadTesseract() {
     return new Promise(function(resolve, reject) {
       if (window.Tesseract) return resolve();
@@ -216,7 +216,7 @@
 
     // Tesseract-Worker erstellen (deutsche Sprache)
     if (statusFn) statusFn('OCR-Engine wird initialisiert (~3 MB)…');
-    var worker = await window.Tesseract.createWorker('deu', 1, {
+    var worker = await window.Tesseract.createWorker('deu', 1, { workerPath: '/vendor/cdn/tesseract.js/5.0.5/worker.min.js', corePath: '/vendor/cdn/tesseract-core/5.0.0', langPath: '/vendor/cdn/tessdata/deu/4.0.0_best_int',   /* v2932 · selbst gehostet, kein CDN */
       logger: function(m) {
         // m.status: 'recognizing text', m.progress: 0..1
         if (m && m.status === 'recognizing text' && statusFn) {

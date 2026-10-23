@@ -12,8 +12,8 @@
 (function () {
   'use strict';
 
-  var PDFJS_URL    = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-  var PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  var PDFJS_URL    = '/vendor/cdn/pdf.js/3.11.174/pdf.min.js';
+  var PDFJS_WORKER = '/vendor/cdn/pdf.js/3.11.174/pdf.worker.min.js';
   var MAX_BELEGE   = 40;   // je Lauf; darüber -> zweiter Lauf (1 weiteres L)
   var MAX_PAGES    = 30;   // Seiten pro PDF (jede Seite = 1 Vision-Call, backend-seitig aggregiert)
   var _pdfjsLoaded = false;
@@ -452,7 +452,7 @@
     if (window.XLSX) return Promise.resolve();
     return new Promise(function (res, rej) {
       var s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.src = '/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js';
       s.onload = function () { window.XLSX ? res() : rej(new Error('xlsx')); };
       s.onerror = function () { rej(new Error('xlsx Ladefehler')); };
       document.head.appendChild(s);

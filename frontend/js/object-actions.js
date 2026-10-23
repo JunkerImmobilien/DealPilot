@@ -1596,8 +1596,8 @@
     return new Promise(function (resolve, reject) {
       if (window.pdfjsLib) { resolve(window.pdfjsLib); return; }
       var sc = document.createElement('script');
-      sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-      sc.onload = function () { try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; } catch (e) {} resolve(window.pdfjsLib); };
+      sc.src = '/vendor/cdn/pdf.js/3.11.174/pdf.min.js';
+      sc.onload = function () { try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = '/vendor/cdn/pdf.js/3.11.174/pdf.worker.min.js'; } catch (e) {} resolve(window.pdfjsLib); };
       sc.onerror = function () { reject(new Error('pdf.js konnte nicht geladen werden')); };
       document.head.appendChild(sc);
     });
@@ -1606,7 +1606,7 @@
     return new Promise(function (resolve, reject) {
       if (window.Tesseract) { resolve(); return; }
       var sc = document.createElement('script');
-      sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.5/tesseract.min.js';
+      sc.src = '/vendor/cdn/tesseract.js/5.0.5/tesseract.min.js';
       sc.onload = function () { window.Tesseract ? resolve() : reject(new Error('Tesseract n/a')); };
       sc.onerror = function () { reject(new Error('tesseract.js konnte nicht geladen werden')); };
       document.head.appendChild(sc);
@@ -1627,7 +1627,7 @@
     var pdf = await window.pdfjsLib.getDocument({ data: ab }).promise;
     var maxPages = Math.min(pdf.numPages, 6);
     if (statusCb) statusCb('OCR-Engine lädt …');
-    var worker = await window.Tesseract.createWorker('deu', 1, { logger: function (m) { if (m && m.status === 'recognizing text' && statusCb) statusCb('OCR ' + Math.round((m.progress || 0) * 100) + ' %'); } });
+    var worker = await window.Tesseract.createWorker('deu', 1, { workerPath: '/vendor/cdn/tesseract.js/5.0.5/worker.min.js', corePath: '/vendor/cdn/tesseract-core/5.0.0', langPath: '/vendor/cdn/tessdata/deu/4.0.0_best_int', /* v2932 */ logger: function (m) { if (m && m.status === 'recognizing text' && statusCb) statusCb('OCR ' + Math.round((m.progress || 0) * 100) + ' %'); } });
     var all = [];
     try {
       for (var i = 1; i <= maxPages; i++) {
