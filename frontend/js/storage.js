@@ -995,8 +995,14 @@ async function saveObj(opts) {
             var v = totals.values;
             return {
               year: t.year,
-              base_income: parseDe((document.getElementById('zve') || {}).value) || (typeof window._dpZveErsatz === 'function' ? window._dpZveErsatz() : 65891),   /* v2239 */
-              marginal_tax_rate: parseDe((document.getElementById('grenz') || {}).value) / 100 || null,
+              /* v2892: base_income ist das zvE, mit dem das Jahr GERECHNET wurde
+                 (Steuerzeitraum des Jahres, sonst letzter frueherer, sonst Feld) -
+                 bis hier stand das Feld zvE; gemessen an Westerfeldstr. 140: Mappe
+                 90.000, gerechnet mit 68.000 aus dem Zeitraum 2026. */
+              base_income: (totals && totals.zveOhneBestand > 0) ? totals.zveOhneBestand : (parseDe((document.getElementById('zve') || {}).value) || (typeof window._dpZveErsatz === 'function' ? window._dpZveErsatz() : 65891)),   /* v2239 */
+              /* v2892: Grenzsatz der ganzen Last auf die Basis des Jahres (zvE + Saldo
+                 frueherer Objekte), mit der Veranlagung dieses Jahres */
+              marginal_tax_rate: (typeof Tax !== 'undefined' && Tax.grenzsatzGesamt && totals && totals.zve >= 0) ? Math.round(Tax.grenzsatzGesamt(totals.zve, t.year) * 10000) / 10000 : (parseDe((document.getElementById('grenz') || {}).value) / 100 || null),
               einnahmen_vv: t.einnahmen,
               schuldzinsen: v.schuldzinsen || 0,
               bewirtschaftung: (v.nk_n_umlf || 0) + (v.betr_sonst || 0),
