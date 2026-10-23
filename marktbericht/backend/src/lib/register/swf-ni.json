@@ -5787,7 +5787,7 @@
       "raeumlich": "Bad Pyrmont, Stadt",
       "lage_dokument": "Bad Pyrmont",
       "lage_parameterwert": "0.88",
-      "hinweis": "Der Kalkulator führt die Lagen „Hameln“, „Bad Pyrmont“, „Kleinstädte“ und „Dörfer“ (Tabelle „Umrechnungskoeffizienten für abweichende Lagen“: 1,00 / 0,88 / 0,88 / 0,84). Zugeordnet sind nur die beiden Lagen, die eine Gemeinde beim Namen nennen. Ob Ortschaften dieser Städte als „Dörfer“ gelten, sagt der Kalkulator nicht. v2888: gilt nur noch in der Gemarkung Pyrmont.",
+      "hinweis": "Der Kalkulator führt die Lagen „Hameln“, „Bad Pyrmont“, „Kleinstädte“ und „Dörfer“ (Tabelle „Umrechnungskoeffizienten für abweichende Lagen“: 1,00 / 0,88 / 0,88 / 0,84). Zugeordnet sind nur die beiden Lagen, die eine Gemeinde beim Namen nennen. Ob Ortschaften dieser Städte als „Dörfer“ gelten, sagt der Kalkulator nicht. v2888: gilt nur noch in der Gemarkung Pyrmont; v2893: dazu Holzhausen und Oesdorf.",
       "lage": "Bad Pyrmont",
       "zuordnung": {
         "art": "gemarkung",
@@ -5806,12 +5806,12 @@
           {
             "gemarkung": "Holzhausen",
             "gemarkungsnr": "035802",
-            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+            "lageklasse": "Bad Pyrmont"
           },
           {
             "gemarkung": "Oesdorf",
             "gemarkungsnr": "035804",
-            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+            "lageklasse": "Bad Pyrmont"
           },
           {
             "gemarkung": "Löwensen",
@@ -5849,7 +5849,7 @@
             "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
           }
         ],
-        "hinweis": "Der Kalkulator nennt die Lage „Bad Pyrmont“, ohne zu sagen, ob die Ortschaften der Stadt dazugehören oder als „Dörfer“ gelten. Zugeordnet ist deshalb nur die Gemarkung, die den Namen trägt (Pyrmont, 035803); 10 weitere Gemarkungen der Stadt sind als „Ortsteile der Stadt Bad Pyrmont“ gesperrt. Eine Gemarkung, die hier nicht steht, bekommt keinen Faktor."
+        "hinweis": "Der Kalkulator nennt die Lage „Bad Pyrmont“, ohne zu sagen, ob die Ortschaften der Stadt dazugehören oder als „Dörfer“ gelten. Zugeordnet ist deshalb nur die Gemarkung, die den Namen trägt (Pyrmont, 035803); 10 weitere Gemarkungen der Stadt sind als „Ortsteile der Stadt Bad Pyrmont“ gesperrt. Eine Gemarkung, die hier nicht steht, bekommt keinen Faktor. Holzhausen (035802) und Oesdorf (035804) sind städtisch bebaut und gelten als Lage „Bad Pyrmont“ (Entscheidung Marcel Junker, DESAG-Sachverständiger, 23.10.2026, v2893)."
       }
     },
     "belege": [
@@ -5867,11 +5867,11 @@
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
     "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhm/dash",
-    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-gemarkung",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-gemarkung+v2893-stadtlage",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
-    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert. Gilt nur in der Gemarkung Pyrmont (035803); für die übrigen Gemarkungen der Stadt ist der Faktor gesperrt.",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert. Gilt in den Gemarkungen Pyrmont (035803), Holzhausen (035802) und Oesdorf (035804); für die übrigen Gemarkungen der Stadt ist der Faktor gesperrt.",
     "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Hameln-Pyrmont, Lage Bad Pyrmont"
   },
   {
@@ -5905,12 +5905,12 @@
           {
             "gemarkung": "Holzhausen",
             "gemarkungsnr": "035802",
-            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+            "lageklasse": "Bad Pyrmont"
           },
           {
             "gemarkung": "Oesdorf",
             "gemarkungsnr": "035804",
-            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+            "lageklasse": "Bad Pyrmont"
           },
           {
             "gemarkung": "Löwensen",
@@ -5948,7 +5948,7 @@
             "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
           }
         ],
-        "hinweis": "Der Kalkulator nennt die Lage „Bad Pyrmont“, ohne zu sagen, ob die Ortschaften der Stadt dazugehören oder als „Dörfer“ gelten. Zugeordnet ist deshalb nur die Gemarkung, die den Namen trägt (Pyrmont, 035803); 10 weitere Gemarkungen der Stadt sind als „Ortsteile der Stadt Bad Pyrmont“ gesperrt. Eine Gemarkung, die hier nicht steht, bekommt keinen Faktor."
+        "hinweis": "Der Kalkulator nennt die Lage „Bad Pyrmont“, ohne zu sagen, ob die Ortschaften der Stadt dazugehören oder als „Dörfer“ gelten. Zugeordnet ist deshalb nur die Gemarkung, die den Namen trägt (Pyrmont, 035803); 10 weitere Gemarkungen der Stadt sind als „Ortsteile der Stadt Bad Pyrmont“ gesperrt. Eine Gemarkung, die hier nicht steht, bekommt keinen Faktor. Holzhausen (035802) und Oesdorf (035804) sind städtisch bebaut und gelten als Lage „Bad Pyrmont“ (Entscheidung Marcel Junker, DESAG-Sachverständiger, 23.10.2026, v2893)."
       },
       "raeumlich": "Bad Pyrmont, Stadt"
     },
