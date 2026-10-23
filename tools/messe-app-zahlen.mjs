@@ -86,13 +86,38 @@ const _alle = git('ls-files').split('\n').filter(Boolean);
 const _zeilen = (liste) => liste.reduce((a, f) => { try { return a + fs.readFileSync(path.join(WURZEL, f), 'utf8').split('\n').length; } catch (e) { return a; } }, 0);
 const registerzeilen = _zeilen(_alle.filter((f) => /\.json$/.test(f) && /register/.test(f)));
 const dokuzeilen = _zeilen(_alle.filter((f) => /\.md$/.test(f)));
+/* v2941 · AMTLICHE DATEN (Marcel 23.10.2026: „die Gutachter-Sachen, amtliche Daten,
+   Bodenrichtwerte … alles was Zahlen sind"). Gelesen auf Staging (gleicher Stand wie Prod,
+   nur SELECT); ohne Verbindung bleiben die Werte der letzten Datei stehen. */
+let amtlich = null;
+try {
+  const sql = "select 'zensus_werte', count(*) from mb.zensus_werte union all select 'zensus_gemeinden', count(distinct ags) from mb.zensus_werte"
+    + " union all select 'makro_werte', count(*) from mb.makro_werte union all select 'makro_gebiete', count(distinct ags) from mb.makro_werte"
+    + " union all select 'wert_parameter', count(*) from mb.wert_parameter union all select 'register_db', count(*) from mb.param_modell"
+    + " union all select 'gaa_dokumente', count(*) from mb.gaa_documents";
+  const roh = execSync('ssh -o ConnectTimeout=8 root@116.203.214.11 "docker exec dealpilot-mb-db psql -U mb -d marktbericht -At -c \\"' + sql + '\\""', { encoding: 'utf8', timeout: 60000 });
+  amtlich = {};
+  roh.split('\n').filter(Boolean).forEach((z) => { const [k, v] = z.split('|'); amtlich[k] = Number(v); });
+  const h = JSON.parse(execSync('curl -s --max-time 15 https://app.staging.dealpilot.immo/api/v1/marktbericht/health', { encoding: 'utf8' }));
+  amtlich.boris_systeme = (h.boris_laender || []).filter((x) => x.code !== 'borisd_wms').length;
+  amtlich.boris_laender = (h.boris_laender || []).filter((x) => !/^borisd/.test(x.code)).length;
+} catch (e) {
+  try { const alt = fs.readFileSync(path.join(WURZEL, 'frontend/messe-schleife/app-zahlen.js'), 'utf8'); const m = alt.match(/"amtlich": (\{[^}]*\})/); amtlich = m ? JSON.parse(m[1]) : null; } catch (x) {}
+  console.log('amtliche Daten: Server nicht erreichbar, alte Werte (' + e.message.slice(0, 60) + ')');
+}
+try {
+  const kg = JSON.parse(fs.readFileSync(path.join(WURZEL, 'frontend/js/data/kappungsgrenzen.json'), 'utf8')).laender;
+  amtlich = amtlich || {};
+  amtlich.mietrecht_gemeinden = Object.values(kg).reduce((a, x) => a + (Array.isArray(x.gemeinden) ? x.gemeinden.length : 0), 0);
+  amtlich.mietrecht_laender = Object.values(kg).filter((x) => Array.isArray(x.gemeinden) && x.gemeinden.length).length;
+} catch (e) {}
 const gesetze = Object.keys(para).map((g) => ({ gesetz: g, paragrafen: para[g].size }))
   .sort((a, b) => b.paragrafen - a.paragrafen);
 const out = {
   stand: heute,
   zeilen: Z.zeilen, dateien: Z.dateien, je_bereich: Z.je_bereich,
   funktionen: Z.funktionen, klassen: Z.klassen, module: Z.module, schnittstellen: Z.schnittstellen,
-  registerzeilen, dokuzeilen,
+  registerzeilen, dokuzeilen, amtlich,
   tabellen: tabellen.size, migrationen, felder, pruefer, commits, versionen,
   erster_commit: erster, tage, videos, rechenkerne: kerne,
   gesetze, paragrafen: gesetze.reduce((a, g) => a + g.paragrafen, 0)
@@ -101,6 +126,7 @@ const ziel = path.join(WURZEL, 'frontend/messe-schleife/app-zahlen.js');
 fs.writeFileSync(ziel, '/* app-zahlen.js · erzeugt von tools/messe-app-zahlen.mjs am ' + heute
   + ' - NICHT von Hand ändern, neu erzeugen. */\nwindow.DPS_APP = ' + JSON.stringify(out, null, 1) + ';\n');
 console.log('Codezeilen ' + out.zeilen.toLocaleString('de-DE') + ' in ' + out.dateien + ' Dateien ' + JSON.stringify(out.je_bereich));
+console.log('amtlich ' + JSON.stringify(out.amtlich));
 console.log('Module ' + out.module + ' · Registerdaten ' + out.registerzeilen + ' Zeilen · Doku ' + out.dokuzeilen + ' Zeilen');
 console.log('Funktionen ' + out.funktionen + ' · Klassen ' + out.klassen + ' · Schnittstellen ' + out.schnittstellen + ' · Tabellen ' + out.tabellen + ' · Migrationen ' + out.migrationen);
 console.log('Felder ' + out.felder + ' · Prüfwerkzeuge ' + out.pruefer + ' · Commits ' + out.commits + ' · Versionen ' + out.versionen + ' · seit ' + out.erster_commit + ' (' + out.tage + ' Tage) · Videos ' + out.videos + ' · Kerne ' + out.rechenkerne);
