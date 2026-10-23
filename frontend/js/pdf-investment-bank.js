@@ -1665,7 +1665,9 @@
       function liste(titel, arr) {
         if (!arr || !arr.length || !an(titel)) return;
         kopfzeile(titel);
-        arr.slice(0, KURZ ? 3 : 8).forEach(function (t) { punkt(klar(t), { groesse: 8.4, farbe: 60, zeile: 4.4 }); });
+        /* v2930 · Kurzfassung je zwei Punkte: gemessen an Westerfeld rutschten mit drei
+           Punkten je Liste vier Zeilen und der Modellhinweis auf eine fuenfte Seite */
+        arr.slice(0, KURZ ? 2 : 8).forEach(function (t) { punkt(klar(t), { groesse: 8.4, farbe: 60, zeile: 4.4 }); });
         y += 2;
       }
       if (ai) {

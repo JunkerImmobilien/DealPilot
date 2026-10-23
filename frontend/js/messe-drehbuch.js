@@ -4027,7 +4027,7 @@
         kegelHoch(true);
         await zeige(function () { return q('#dp-pdf-wahl .dpw-liste'); }, 8);
         var W = (window.DealPilotPdfWahl && DealPilotPdfWahl.wahlen) || [];
-        await b2oZeile(s, 'Drei Fassungen', W.map(function (w) { return '<b>' + w.titel + '</b> (' + w.fuer.split(' · ')[0] + ')'; }).join(', ') + '. Der Inhalt ist derselbe.');
+        await b2oZeile(s, W.length === 4 ? 'Vier Fassungen' : W.length + ' Fassungen', W.map(function (w) { return '<b>' + w.titel + '</b> (' + w.fuer.split(' · ')[0] + ')'; }).join(', ') + '. Die Kurzfassung bündelt das Wesentliche, die übrigen tragen den vollen Inhalt.');
         var x = q('#dp-pdf-wahl'); if (x && x.parentNode) x.parentNode.removeChild(x);
         kegelHoch(false);
       },
