@@ -80,7 +80,7 @@
 (function (global) {
   if (global.DpWertZielbild) return;
 
-  var VERSION = 'v2840';
+  var VERSION = 'v2910';
   var MERKER = 'dp_pa_si_ansicht';
   var _hist = { key: null, laedt: null, eintrag: null };
 
@@ -417,7 +417,25 @@
       '@media (max-width:640px){.dp-wz-kacheln{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-wz-k .w{font-size:15.5px}.dp-wz-k{padding:8px 10px}'
         + '#card-wert-zielbild .dp-wz-t th,#card-wert-zielbild .dp-wz-t td{padding:6px 4px;font-size:11.5px}#card-wert-zielbild .dp-wz-t td:first-child{min-width:92px}'
         + '#card-wert-zielbild .dp-wz-t th{font-size:9px;letter-spacing:.03em}}',
-      '@media (max-width:420px){.dp-wz-k.wert{grid-column:1 / -1}}'
+      '@media (max-width:420px){.dp-wz-k.wert{grid-column:1 / -1}}',
+      /* v2910 · Genau auf dem Handy (Marcel 23.10.2026: „Handy-Ansicht bauen“). Gemessen bei 390 px:
+         Parkstr. 9 3.903 px, davon Stufentafel 995, Ankauf gegen Bestand 784, zwei Pilot-Karten 866.
+         Jeder Block klappt ≤ 640 px zu (Kopf mit Titel), lange Absätze stehen hinter „weiterlesen“,
+         die Kartenzeilen der Tafeln sind enger. Am Schreibtisch ändert sich nichts: dort ist der
+         Kopf unsichtbar und jeder Block offen. */
+      '.dp-si-bk,.dp-si-mehr{display:none}',
+      '@media (max-width:640px){'
+        + '[data-dp-si-modus] .dp-si-bk{display:flex;align-items:center;gap:8px;width:100%;text-align:left;font:600 12.5px/1.3 Inter,system-ui,sans-serif;color:#2A2727;background:#fff;border:1px solid #E6DCC2;border-radius:10px;padding:11px 12px;min-height:44px;cursor:pointer;margin:0 0 8px}'
+        + '[data-dp-si-modus] .dp-si-bk small{display:block;font:400 11px/1.35 Inter,sans-serif;color:#6B645A;margin-top:2px}'
+        + '[data-dp-si-modus] .dp-si-bk i{margin-left:auto;font-style:normal;font:600 11px Inter,sans-serif;color:var(--wl-b8932f, #b8932f);white-space:nowrap}'
+        + '[data-dp-si-block][data-zu="1"]>.dp-si-bi{display:none}'
+        + '[data-dp-si-block][data-zu="0"]>.dp-si-bk{border-color:var(--wl-c9a84c, #C9A84C)}'
+        + '[data-dp-si-modus] p.dp-si-lang:not(.offen){display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}'
+        + '[data-dp-si-modus] .dp-si-mehr{display:inline-block;font:600 12px Inter,sans-serif;border:0;background:none;color:var(--wl-b8932f, #b8932f);padding:6px 0;min-height:32px;cursor:pointer;text-decoration:underline}'
+        + '[data-dp-si-modus] table.dptk tbody td{padding:1px 0 !important;font-size:12px !important;line-height:1.35 !important}'
+        + '[data-dp-si-modus] table.dptk tbody td:first-child{padding-bottom:4px !important;margin-bottom:2px}'
+        + '[data-dp-si-modus] table.abw-tafel td,[data-dp-si-modus] table.abw-tafel th{padding-top:5px !important;padding-bottom:5px !important}'
+        + '}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -501,7 +519,35 @@
       + '<button type="button" class="btn-clean" data-dp-si-knopf="genau" aria-pressed="' + (m === 'genau') + '">Genau</button></div>'
       + '<span class="dp-si-hin" data-dp-si-teil="einfach">Das Wichtigste auf einen Blick</span><span class="dp-si-hin" data-dp-si-teil="genau">Alle Zahlen, Eingaben und Abgleiche</span></div>'
       + '<div data-dp-si-teil="einfach"><div class="dp-pa-card" data-dp-si-einfach="' + (opts.mitAnkauf ? 'a' : '') + '">' + e + '</div></div>'
-      + '<div data-dp-si-teil="genau">' + nav + genauHtml + '</div></div>';
+      + '<div data-dp-si-teil="genau">' + nav + klappbar(genauHtml) + '</div></div>';
+  }
+  /* v2910 · jeden Block der Genau-Ansicht in einen Klappkasten legen (wirksam nur ≤ 640 px, siehe stil()).
+     Der Inhalt bleibt unverändert im DOM - nur zugeklappt; die Sprungleiste öffnet den Block, in dem ihr
+     Ziel liegt. Titel: die Überschrift des Blocks (.dp-pa-sec, .abw-kopf). */
+  function klappbar(html) {
+    try {
+      var box = document.createElement('div'); box.innerHTML = html;
+      var bloecke = [].filter.call(box.children, function (c) { return c.tagName !== 'STYLE' && c.tagName !== 'SCRIPT' && (c.textContent || '').trim(); });
+      if (bloecke.length < 1) return html;
+      [].forEach.call(box.querySelectorAll('p.dp-pa-p'), function (p) {
+        if ((p.textContent || '').length < 260) return;
+        p.classList.add('dp-si-lang');
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'dp-si-mehr btn-clean'; b.setAttribute('data-dp-si-mehr', '1'); b.textContent = 'weiterlesen';
+        p.parentNode.insertBefore(b, p.nextSibling);
+      });
+      bloecke.forEach(function (c, i) {
+        var kopfEl = c.querySelector('.dp-pa-sec, .abw-kopf, h4, h3');
+        var titel = kopfEl ? (kopfEl.textContent || '').replace(/\s+/g, ' ').trim() : '';
+        if (!titel) titel = 'Abschnitt ' + (i + 1);
+        if (titel.length > 70) titel = titel.slice(0, 68) + ' …';
+        var sec = document.createElement('section'); sec.setAttribute('data-dp-si-block', '1'); sec.setAttribute('data-zu', '1');
+        var k = document.createElement('button'); k.type = 'button'; k.className = 'dp-si-bk btn-clean'; k.setAttribute('data-dp-si-klapp', '1'); k.setAttribute('aria-expanded', 'false');
+        k.innerHTML = '<span>' + esc(titel) + '</span><i>aufklappen</i>';
+        var inn = document.createElement('div'); inn.className = 'dp-si-bi';
+        c.parentNode.insertBefore(sec, c); inn.appendChild(c); sec.appendChild(k); sec.appendChild(inn);
+      });
+      return box.innerHTML;
+    } catch (e) { return html; }
   }
   function einfachNeu() {
     var h = document.querySelectorAll('[data-dp-si-einfach]');
@@ -646,8 +692,20 @@
 
   /* ── Verdrahtung ──────────────────────────────────────────────────────── */
   document.addEventListener('click', function (ev) {
-    var t = ev.target && ev.target.closest ? ev.target.closest('[data-dp-si-knopf],[data-dp-si-sprung],[data-dp-wz-erkl],[data-target-sec="s6"]') : null;
+    var t = ev.target && ev.target.closest ? ev.target.closest('[data-dp-si-knopf],[data-dp-si-sprung],[data-dp-wz-erkl],[data-target-sec="s6"],[data-dp-si-klapp],[data-dp-si-mehr]') : null;
     if (!t) return;
+    if (t.hasAttribute('data-dp-si-klapp')) {   /* v2910 */
+      var bl = t.closest('[data-dp-si-block]'); if (!bl) return;
+      var auf = bl.getAttribute('data-zu') === '1';
+      bl.setAttribute('data-zu', auf ? '0' : '1'); t.setAttribute('aria-expanded', String(auf));
+      var ii = t.querySelector('i'); if (ii) ii.textContent = auf ? 'zuklappen' : 'aufklappen';
+      return;
+    }
+    if (t.hasAttribute('data-dp-si-mehr')) {   /* v2910 */
+      var pp = t.previousElementSibling; if (!pp) return;
+      var offen = pp.classList.toggle('offen'); t.textContent = offen ? 'weniger' : 'weiterlesen';
+      return;
+    }
     if (t.hasAttribute('data-dp-si-knopf')) {
       var m = t.getAttribute('data-dp-si-knopf') === 'genau' ? 'genau' : 'einfach';
       try { localStorage.setItem(MERKER, m); } catch (e) {}
@@ -661,7 +719,12 @@
     }
     if (t.hasAttribute('data-dp-si-sprung')) {
       var wr = t.closest('[data-dp-si-modus]'), ziel = wr ? wr.querySelector(t.getAttribute('data-dp-si-sprung')) : null;
-      if (ziel) { var k = ziel.closest('.dp-pa-card, .abw-tafel-host') || ziel; try { k.scrollIntoView({ block: 'start', behavior: 'auto' }); } catch (e) {} }
+      if (ziel) {
+        /* v2910 · zugeklappten Block erst öffnen - in einen versteckten Block springt kein scrollIntoView */
+        var blz = ziel.closest('[data-dp-si-block]');
+        if (blz && blz.getAttribute('data-zu') === '1') { var kb = blz.querySelector(':scope > [data-dp-si-klapp]'); if (kb) kb.click(); }
+        var k = ziel.closest('.dp-pa-card, .abw-tafel-host') || ziel; try { k.scrollIntoView({ block: 'start', behavior: 'auto' }); } catch (e) {}
+      }
       return;
     }
     if (t.hasAttribute('data-dp-wz-erkl')) {
