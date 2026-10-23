@@ -512,3 +512,14 @@ body.laeuft.maus{cursor:default}
 .dps-menue-fuss{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:16px 22px}
 .dps-menue-fuss .dps-ja{background:var(--g);color:var(--obs);border-color:var(--g)}
 .dps-menue-hilfe{padding:0 22px 16px;font:12px "JetBrains Mono",monospace;color:var(--matt)}
+/* v2937a · Tafel mittig, Instrumente groesser, Bereiche als Legende unter dem Balken */
+.az-t{justify-content:center;padding:0 100px 120px}
+.az-oben{grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:80px}
+.az-instr{gap:34px 28px}
+.az-iz b{font-size:46px}.az-iz span{font-size:14px}
+.az-bahn span{display:none}
+.az-leg{margin-top:16px;display:flex;flex-wrap:wrap;gap:10px 26px;font:500 19px Inter,sans-serif;color:var(--text)}
+.az-leg span{display:inline-flex;align-items:center;gap:9px}
+.az-leg i{width:14px;height:14px;border-radius:4px;background:var(--runway)}
+.az-leg span:nth-child(2) i{filter:brightness(.82)}.az-leg span:nth-child(3) i{filter:brightness(.66)}.az-leg span:nth-child(4) i{filter:brightness(.52)}
+.az-leg b{color:var(--creme);font-weight:700;font-variant-numeric:tabular-nums}

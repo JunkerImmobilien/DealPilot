@@ -145,7 +145,8 @@
       + (A.registerzeilen ? '<div class="az-unter az-daten">dazu <b data-az="' + A.registerzeilen + '">0</b> Zeilen amtliche Registerdaten · <b data-az="' + (A.dokuzeilen || 0) + '">0</b> Zeilen Dokumentation</div>' : '')
       + '<div class="az-bahn">';
     teile.forEach(function (t, i) { h += '<i style="--w:' + (100 * B[t[0]] / summe).toFixed(2) + '%;--d:' + (0.4 + i * 0.35) + 's"><span>' + t[1] + '<b>' + zahl(B[t[0]]) + '</b></span></i>'; });
-    h += '</div></div><div class="az-instr">';
+    h += '</div><div class="az-leg">' + teile.map(function (t) { return '<span><i></i>' + t[1] + ' <b>' + zahl(B[t[0]]) + '</b></span>'; }).join('') + '</div>';
+    h += '</div><div class="az-instr">';
     instr.forEach(function (x, i) {
       h += '<div class="az-i" style="--d:' + (0.2 + i * 0.12) + 's"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="az-ring0" cx="60" cy="60" r="50"/><circle class="az-ring" cx="60" cy="60" r="50"/>'
         + '<g class="az-ticks">' + Array.apply(null, Array(24)).map(function (_, k) { return '<line x1="60" y1="6" x2="60" y2="' + (k % 6 ? 11 : 15) + '" transform="rotate(' + (k * 15) + ' 60 60)"/>'; }).join('') + '</g></svg>'
