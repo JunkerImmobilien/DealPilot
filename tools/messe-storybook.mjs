@@ -30,8 +30,8 @@ const STORYS = [
     zeigen: ['Reiter Kennzahlen: Score-Ring und die fünf Kategorien', 'Reiter Pilot-Analyse: Urteil, Stärken, Risiken, Verhandlungsempfehlung', 'Deal-Aktion › PDF › Bankfassung oder Kurzfassung wählen', 'im PDF: Finanzierung, Belastungsprobe, Annahmen'],
     satz: 'Was du sonst einen Abend lang in Excel zusammenbaust, liegt hier mit einem Klick als Investment Case vor – jedes Mal mit den aktuellen Zahlen.' },
   { seq: '2026-1056', titel: 'Vom Ankauf zum Zielbild', thema: 'Bestand · Soll/Ist · Zielbild · Modernisierungspunkte',
-    geschichte: 'Altbau von 1905 mit fünf Wohnungen, gekauft und jetzt im Bestand. Die Mieten liegen schon über dem marktüblichen Band – mehr Miete bringt hier keinen Wert. Den Wert bringen die Maßnahmen: Bäder, Böden, Elektrik und Dämmung modernisieren das Haus nach Anlage 2 ImmoWertV und verlängern die Restnutzungsdauer.',
-    zeigen: ['oben der Umschalter Ist · heute | Soll · Ankauf-Stand', 'Pilot-Analyse › Ankauf · Bestand · Zielbild: drei Ertragswerte nebeneinander', 'Zielbild: Modernisierungspunkte und die längere Restnutzungsdauer', 'Wertzuwachs nach Kosten: lohnen sich die Maßnahmen?'],
+    geschichte: 'Altbau von 1905 mit fünf Wohnungen, gekauft für 780.000 € – der Verkehrswert liegt bei 487.000 €. Darum steht der LTV auf den Verkehrswert über 130 %: genau das, was die Bank sieht, und genau das, wovor die Pilot-Analyse vor dem Kauf gewarnt hätte. Jetzt im Bestand zeigt DealPilot den Weg: Die Mieten liegen schon über dem marktüblichen Band, mehr Miete bringt keinen Wert. Den Wert bringen die Maßnahmen – Bäder, Böden, Elektrik und Dämmung modernisieren das Haus nach Anlage 2 ImmoWertV und verlängern die Restnutzungsdauer.',
+    zeigen: ['Kennzahlen: LTV auf den Verkehrswert - was die Bank sieht', 'oben der Umschalter Ist · heute | Soll · Ankauf-Stand', 'Pilot-Analyse › Ankauf · Bestand · Zielbild: drei Ertragswerte nebeneinander', 'Zielbild: Modernisierungspunkte und die längere Restnutzungsdauer', 'Wertzuwachs nach Kosten: lohnen sich die Maßnahmen?'],
     satz: 'DealPilot friert den Ankauf ein – du siehst jederzeit, ob dein Objekt besser oder schlechter läuft als geplant, und was die Sanierung wirklich bringt.', zielbild: true },
   { seq: '2026-1052', titel: 'So sieht ein gutes Geschäft aus', thema: 'DealScore · Lageklasse A',
     geschichte: 'Zwölf Wohnungen in Leipzig, Lageklasse A, sauber finanziert. Das Gegenstück zum Lindenhof: Score „Gut“, DSCR über 1,3, positiver Cashflow vor und nach Steuern.',
@@ -152,7 +152,7 @@ function seite(s) {
   }
   h += '<div class="zwei"><div class="box"><div class="box-k">So zeigst du es</div><ol>' + s.zeigen.map((z) => '<li>' + esc(z) + '</li>').join('') + '</ol></div>'
     + '<div class="box gold"><div class="box-k">Der Satz für den Besucher</div><p>„' + esc(s.satz) + '“</p></div></div>';
-  h += '<div class="notiz"><div class="box-k">Notizen am Stand</div>' + '<i></i>'.repeat(s.zielbild || s.paar ? 4 : 7) + '</div>';
+  if (!s.zielbild) h += '<div class="notiz"><div class="box-k">Notizen am Stand</div>' + '<i></i>'.repeat(s.paar ? 3 : 6) + '</div>';   /* Zielbild-Seite ist voll */
   return h + '<div class="fuss">DealPilot · Messe-Storybook · Demo-Konto info@junker-immobilien.io · Zahlen vom ' + datum(A.stand) + '</div></section>';
 }
 
@@ -225,7 +225,7 @@ h2{font:700 17pt/1.2 'Space Grotesk',sans-serif;margin:1mm 0 3mm}
 .vgl th,.ueb th{font:700 7.2pt 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:#8a7a50}
 .ueb td small{color:#8c8578}
 .ueb{font-size:8.6pt}.ueb th,.ueb td{padding:1.3mm 2mm}
-.notiz{position:absolute;left:17mm;right:17mm;bottom:19mm;border:1px solid #e7e1d4;border-radius:3mm;padding:3.5mm 5mm 2mm;background:#fff}
+.notiz{position:static;margin-top:5mm;border:1px solid #e7e1d4;border-radius:3mm;padding:3.5mm 5mm 2mm;background:#fff}
 .notiz .box-k{margin-bottom:0}
 .notiz i{display:block;height:8.5mm;border-bottom:1px solid #eee6d4}
 .pille{display:inline-block;padding:.6mm 2.2mm;border-radius:2mm;background:var(--f);color:#fff;font:700 7.5pt 'JetBrains Mono',monospace;white-space:nowrap}
