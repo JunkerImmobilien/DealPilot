@@ -559,6 +559,11 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                GAG Oldenburg-Cloppenburg je Gemeinde (Gemeindekoeffizient), Sperren mit Weg fuer
                                die Kalkulatoren der GAG Aurich und Lueneburg. */
                             'swf-ni-nom-2026.json', 'swf-ni-ol-2026.json', 'swf-ni-sperren-2026.json',
+                            /* v2887: GAG Sulingen-Verden aus den Dashboards ohne Blatt "Berechnung"
+                               (ernte-sv.mjs): Stuhr, Syke, Weyhe je Gemeinde (EFH, ZFH, RH), uebriger LK
+                               Diepholz EFH/ZFH, LK Nienburg und Heidekreis RH; Sperren mit Weg fuer Verden RH
+                               (Bremer Umland ohne Ortsliste) und Nienburg-Land EFH. */
+                            'swf-ni-sv-2026.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
