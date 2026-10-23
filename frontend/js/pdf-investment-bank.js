@@ -969,22 +969,22 @@
     zeile('Finanzierung gesamt', eur((d1 || 0) + (d2 || 0)), { summe: true });
     zeile('Beleihungsauslauf (LTV)', pct(K.ltv, 1) + (S.ltv_basis_label ? '  ·  auf ' + S.ltv_basis_label : ''));
     var bindEl = el('r-bindend');
-    if (!KURZ && bindEl && bindEl.textContent.trim() && bindEl.textContent.trim() !== '-') zeile('Zinsbindung bis', bindEl.textContent.trim());
+    if (bindEl && bindEl.textContent.trim() && bindEl.textContent.trim() !== '-') zeile('Zinsbindung bis', bindEl.textContent.trim());
     zeile('Restschuld am Ende der Zinsbindung', eur(S.rs));
     /* v2830 · aus dem Investment-PDF: Finanzierungsstruktur in einem Satz und der
        Wertpuffer gegen einen angegebenen Verkehrswert (dieselben Felder wie pdf.js). */
     var _strukt = aussetzung ? (d2an ? 'Tilgungsaussetzung + Bausparvertrag + Zusatzdarlehen' : 'Tilgungsaussetzung mit Bausparvertrag')
       : (d2an ? 'Annuitätendarlehen + Zusatzdarlehen' : 'Annuitätendarlehen (Zins und Tilgung)');
-    if (!KURZ) zeile('Finanzierungsstruktur', _strukt, { klein: true });
+    zeile('Finanzierungsstruktur', _strukt, { klein: true });   /* v2940 · auch in der Kurzfassung */
     var _svw = num('svwert');
-    if (_svw && !KURZ) {
+    if (_svw) {   /* v2940 · auch in der Kurzfassung */
       zeile('Verkehrswert (Angabe, § 194 BauGB)', eur(_svw));
       zeile('Sofortiger Wertpuffer gegenüber dem Kaufpreis', (da(K.wp_kpi) !== null && K.wp_kpi > 0 ? '+ ' : '') + eur(K.wp_kpi), { fett: true });
     }
     y += 1;
 
     /* Bausparvertrag - nur beim Tilgungsaussetzungsdarlehen. */
-    if (aussetzung && !KURZ) {
+    if (aussetzung) {   /* v2940 · Bausparvertrag auch in der Kurzfassung: ohne ihn sieht die Bank ein Darlehen ohne Tilgung */
       platz(46);
       abschnitt('Bausparvertrag (Tilgungsersatz)');
       if (txt('bspar_inst')) zeile('Bausparkasse', txt('bspar_inst'));
@@ -1027,7 +1027,6 @@
     var SC = null;
     try { if (window.DealScore && typeof window.DealScore.computeFromKpis === 'function') SC = window.DealScore.computeFromKpis(K); } catch (e) {}
     /* v2900b · Kurzfassung: acht Kacheln (zwei Reihen) - mit zwoelf rutschte das Raster auf S. 2 */
-    var KURZ_RASTER = ['Bruttomietrendite', 'Nettomietrendite', 'Cashflow vor Steuern', 'DSCR', 'LTV', 'EK-Rendite', 'Interner Zinsfuß (IRR)', 'Deal Score'];
     raster([
       ['Bruttomietrendite', pct(K.bmy, 2), 'auf Kaufpreis'],
       ['Nettomietrendite', pct(K.nmy, 2), 'auf Gesamtinvest.'],
@@ -1041,7 +1040,7 @@
       ['Equity Multiple', da(K.em) === null ? '-' : fmt(K.em, 1) + 'x', 'über die Haltedauer'],
       ['Wertpuffer / Equity', eur(K.wp_kpi), 'heute'],
       ['Deal Score', (SC && SC.score) ? fmt(SC.score, 0) + ' / 100' : '-', (SC && SC.label) ? SC.label : '']
-    ].filter(function (k) { return !KURZ || KURZ_RASTER.indexOf(k[0]) >= 0; }), { titel: 'Kennzahlen' });
+    ], { titel: 'Kennzahlen' });   /* v2940 · Kurzfassung mit allen zwölf Kennzahlen (Marcel: bis sechs Seiten) */
     if (SC && SC.interpretation && !KURZ) {
       platz(16);
       absatz('Einordnung: ' + String(SC.interpretation).replace(/\s+/g, ' '), { groesse: 8.4, farbe: 70, zeile: 4.4 });
@@ -1667,7 +1666,7 @@
         kopfzeile(titel);
         /* v2930 · Kurzfassung je zwei Punkte: gemessen an Westerfeld rutschten mit drei
            Punkten je Liste vier Zeilen und der Modellhinweis auf eine fuenfte Seite */
-        arr.slice(0, KURZ ? 2 : 8).forEach(function (t) { punkt(klar(t), { groesse: 8.4, farbe: 60, zeile: 4.4 }); });
+        arr.slice(0, KURZ ? 3 : 8).forEach(function (t) { punkt(klar(t), { groesse: 8.4, farbe: 60, zeile: 4.4 }); });
         y += 2;
       }
       if (ai) {
@@ -1868,16 +1867,16 @@
     platz(KURZ ? 70 : 70, 'Annahmen und Hinweise', (adr || 'Objekt'));
     abschnitt('Annahmen');
     zeile('Mietentwicklung', typeof window._dpPdfMiete === 'function' ? window._dpPdfMiete().text : (num('mietstg') !== null ? pct(num('mietstg'), 1) : '-'));   /* v2832: der Modus, der rechnet */
-    if (!KURZ) zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '-');
+    zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '-');
     zeile('Wertsteigerung p. a.', num('wertstg') !== null ? pct(num('wertstg'), 1) : '-');
     zeile('Betrachtungszeitraum', S.btj ? fmt(S.btj) + ' Jahre' : '-');
-    if (num('leerstand') !== null && !KURZ) zeile('Kalkulierter Leerstand p. a.', pct(num('leerstand'), 1));
+    if (num('leerstand') !== null) zeile('Kalkulierter Leerstand p. a.', pct(num('leerstand'), 1));
     zeile('Anschlusszins / Anschlusstilgung (Annahme)', [pct(num('anschl_z'), 2), pct(num('anschl_t'), 2)].join('  ·  '));
-    if (!KURZ) zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '-');
-    if (!KURZ) zeile('Gebäudeanteil am Kaufpreis', num('geb_ant') !== null ? pct(num('geb_ant'), 0) : '-');
-    if (!KURZ) zeile('AfA-Satz Gebäude', num('afa_satz') !== null ? pct(num('afa_satz'), 2) : (txt('afa_satz') || '-'));
-    if (!KURZ) zeile('Grunderwerbsteuer (Land)', num('gest_p') !== null ? pct(num('gest_p'), 2) : '-');
-    if (num('exit_bmy') !== null && !KURZ) zeile('Exit-Rendite (Verkaufsszenario)', pct(num('exit_bmy'), 1));
+    zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '-');
+    zeile('Gebäudeanteil am Kaufpreis', num('geb_ant') !== null ? pct(num('geb_ant'), 0) : '-');
+    zeile('AfA-Satz Gebäude', num('afa_satz') !== null ? pct(num('afa_satz'), 2) : (txt('afa_satz') || '-'));
+    zeile('Grunderwerbsteuer (Land)', num('gest_p') !== null ? pct(num('gest_p'), 2) : '-');
+    if (num('exit_bmy') !== null) zeile('Exit-Rendite (Verkaufsszenario)', pct(num('exit_bmy'), 1));
     if (da(S.wert_basis) !== null && S.wert_basis !== kp) zeile('Wert-Anker der Wertsteigerung', (num('svwert') ? 'Verkehrswert' : 'Bankbewertung') + '  ·  ' + eur(S.wert_basis));   /* v2830 */
     if (K.d1IsAussetzung) zeile('Darlehenstyp', 'Tilgungsaussetzung mit Bausparvertrag');
     if (num('bspar_rate')) zeile('Bausparrate / Monat', eur(num('bspar_rate')));
