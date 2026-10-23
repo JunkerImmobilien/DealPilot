@@ -43,14 +43,17 @@ function _prompt(t) {
     '  "art": eins von "fehler" | "bedienfrage" | "wunsch" | "abrechnung" | "sonstiges"',
     '  "genau_genug": true, wenn ein Entwickler den FEHLER ohne Rueckfrage nachstellen kann: es ist klar,',
     '      WO (Reiter/Funktion), WAS getan wurde (Schritte), was ERWARTET wurde und was STATTDESSEN passierte.',
-    '      Bilder und ein angehaengtes Objekt helfen. Bei art != "fehler" immer false.',
+    '      Bilder und ein angehaengtes Objekt helfen, sind aber KEINE Voraussetzung: nennt der Text Ort, Schritte,',
+    '      Erwartung und Ergebnis, ist er genau genug. Bei art != "fehler" immer false.',
     '  "titel": hoechstens 80 Zeichen, sachlich, OHNE Namen, Anschriften, E-Mail-Adressen',
     '  "beschreibung": fuer den Entwickler, gegliedert in "Wo:", "Schritte:", "Erwartet:", "Tatsaechlich:",',
     '      "Hinweise:" - OHNE Namen, Anschriften, E-Mail-Adressen, Telefonnummern (durch [Kunde]/[Adresse] ersetzen)',
     '  "fehlt": Liste, was fuer das Nachstellen fehlt (leer, wenn genau_genug)',
     '  "fragen": 1 bis 4 konkrete Rueckfragen an den Kunden in der Du-Form, nur wenn art="fehler" und',
     '      genau_genug=false; freundlich, kurz, jede Frage beantwortbar ohne Fachwissen; z. B. nach dem Reiter,',
-    '      den Schritten, der erwarteten Zahl, einem Bildschirmfoto',
+    '      den Schritten, der erwarteten Zahl, einem Bildschirmfoto. Frage NIE nach etwas, das der Text schon',
+    '      sagt, und zweifle die Eingaben des Kunden nicht an ("hast du richtig eingegeben?" ist verboten).',
+    '  "beschreibung" ist ein TEXT (String), kein Objekt.',
     '  "prioritaet": "hoch" (Daten falsch/verloren, Rechnung falsch, Zahlung, nichts geht), "mittel", "niedrig"',
     '',
     'Kategorie im Formular: ' + (t.category || '-'),
@@ -93,7 +96,10 @@ async function einstufen(ticketId) {
   let text = t.text || '';
   try { text = require('./schwaerzen').schwaerze(text).text; } catch (e) {}
   const openai = require('./openaiService');
-  const model = process.env.SUPPORT_MODEL || process.env.COPILOT_MODEL || 'gpt-5.6-luna';
+  /* v2935a · nicht COPILOT_MODEL: gemessen am 23.10.2026 stufte gpt-4o-mini eine
+     Meldung mit Ort, Schritten, Erwartung und Ergebnis als "nicht genau genug" ein
+     und fragte den Kunden, ob er richtig eingegeben habe. */
+  const model = process.env.SUPPORT_MODEL || 'gpt-4.1';
   const res = await openai.callOpenAI(_prompt({
     category: t.category, objekt: t.objekt, bilder: t.bilder,
     diagnose: _diagnoseOhnePerson(t.diagnose), text: text
@@ -109,7 +115,16 @@ async function einstufen(ticketId) {
     modell: res.model || model
   };
   const titel = String(e.titel || '').slice(0, 120) || null;
-  const beschreibung = String(e.beschreibung || '').slice(0, 4000) || null;
+  /* v2935a · manche Modelle liefern die Gliederung als Objekt {Wo, Schritte, ...} -
+     gemessen stand dann "[object Object]" im Backlog. */
+  let _b = e.beschreibung;
+  if (_b && typeof _b === 'object') {
+    _b = Object.keys(_b).map(function (k) {
+      const v = _b[k];
+      return k.replace(/:$/, '') + ': ' + (Array.isArray(v) ? '\n  - ' + v.join('\n  - ') : String(v));
+    }).join('\n');
+  }
+  const beschreibung = String(_b || '').slice(0, 4000) || null;
   let backlog = null, entwurf = null, rfStatus = null;
   if (art === 'fehler' && genau) backlog = 'offen';
   if (art === 'fehler' && !genau) { entwurf = _rueckfrageText(einstufung.fragen); rfStatus = entwurf ? 'entwurf' : null; }
