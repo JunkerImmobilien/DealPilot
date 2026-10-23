@@ -525,4 +525,4 @@ body.laeuft.maus{cursor:default}
 .az-leg b{color:var(--creme);font-weight:700;font-variant-numeric:tabular-nums}
 /* v2941a · lange Zahlen im Instrument kleiner, Beschriftung darf trennen */
 .az-iz b.lang{font-size:33px;letter-spacing:-.03em}
-.az-iz span{hyphens:manual;overflow-wrap:anywhere}
+.az-iz span{hyphens:manual;overflow-wrap:normal;font-size:12px;letter-spacing:.03em}
