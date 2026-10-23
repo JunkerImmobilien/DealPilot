@@ -911,7 +911,7 @@
        ein Hochformat wurde auf 2,5 : 1 geschnitten und zeigte einen Streifen.
        Abgeschnitten wird hoechstens ein Drittel der Hoehe (Ziel 2,5 : 1),
        Hoehe hoechstens 74 mm, mittig - wie das Deckblatt des Investment-PDFs. */
-    if (fotos.length) {
+    if (fotos.length && !KURZ) {   /* v2900a · Kurzfassung ohne Titelbild, sonst rutschen die Kennzahlen auf S. 2 */
       var _r0 = fotos[0].w / fotos[0].h, _fr = _r0 < 2.5 ? Math.min(2.5, _r0 / 0.65) : 2.5, _fh = Math.min(KURZ ? 46 : 74, CW / _fr), _fw = _fh * _fr;
       bild(fotos[0], L + (CW - _fw) / 2, y, _fw, _fh, true); y += _fh + 6;
     }
@@ -969,15 +969,15 @@
     zeile('Finanzierung gesamt', eur((d1 || 0) + (d2 || 0)), { summe: true });
     zeile('Beleihungsauslauf (LTV)', pct(K.ltv, 1) + (S.ltv_basis_label ? '  ·  auf ' + S.ltv_basis_label : ''));
     var bindEl = el('r-bindend');
-    if (bindEl && bindEl.textContent.trim() && bindEl.textContent.trim() !== '-') zeile('Zinsbindung bis', bindEl.textContent.trim());
+    if (!KURZ && bindEl && bindEl.textContent.trim() && bindEl.textContent.trim() !== '-') zeile('Zinsbindung bis', bindEl.textContent.trim());
     zeile('Restschuld am Ende der Zinsbindung', eur(S.rs));
     /* v2830 · aus dem Investment-PDF: Finanzierungsstruktur in einem Satz und der
        Wertpuffer gegen einen angegebenen Verkehrswert (dieselben Felder wie pdf.js). */
     var _strukt = aussetzung ? (d2an ? 'Tilgungsaussetzung + Bausparvertrag + Zusatzdarlehen' : 'Tilgungsaussetzung mit Bausparvertrag')
       : (d2an ? 'Annuitätendarlehen + Zusatzdarlehen' : 'Annuitätendarlehen (Zins und Tilgung)');
-    zeile('Finanzierungsstruktur', _strukt, { klein: true });
+    if (!KURZ) zeile('Finanzierungsstruktur', _strukt, { klein: true });
     var _svw = num('svwert');
-    if (_svw) {
+    if (_svw && !KURZ) {
       zeile('Verkehrswert (Angabe, § 194 BauGB)', eur(_svw));
       zeile('Sofortiger Wertpuffer gegenüber dem Kaufpreis', (da(K.wp_kpi) !== null && K.wp_kpi > 0 ? '+ ' : '') + eur(K.wp_kpi), { fett: true });
     }
@@ -1610,20 +1610,20 @@
       var jj = CD.years || rows.map(function (r) { return r.cal || r.y; });
       var sw = window.DealPilotSchwellen ? DealPilotSchwellen.get() : { dscrGruen: 1.2, dscrGelb: 1.0 };
       var dez = function (v, n) { return Number(v).toLocaleString('de-DE', { minimumFractionDigits: n, maximumFractionDigits: n }); };
-      var kh = kurz ? 22 : 34;
-      platz(kurz ? 100 : 150, 'Bank-Cockpit', (adr || 'Objekt') + ' · DSCR und LTV im Verlauf');
-      abschnitt('Schuldendienstdeckung (DSCR) im Verlauf');
+      var kh = kurz ? 18 : 34;
+      platz(kurz ? 80 : 150, 'Bank-Cockpit', (adr || 'Objekt') + ' · DSCR und LTV im Verlauf');
+      abschnitt(kurz ? 'DSCR und LTV im Verlauf' : 'Schuldendienstdeckung (DSCR) im Verlauf');
       /* v2900 · CD.dscrToday = State.kpis.dscr, das erste volle Jahr */
-      kachelReihe([['DSCR Jahr 1', dez(CD.dscrToday, 2), 'erstes volles Jahr'], ['DSCR Ende Zinsbindung', dez(CD.dscrEzb, 2), CD.bindj ? 'Jahr ' + CD.bindj : ''], ['DSCR Ende', dez(CD.dscrEnd, 2), 'Betrachtungsende']]);
+      if (!kurz) kachelReihe([['DSCR Jahr 1', dez(CD.dscrToday, 2), 'erstes volles Jahr'], ['DSCR Ende Zinsbindung', dez(CD.dscrEzb, 2), CD.bindj ? 'Jahr ' + CD.bindj : ''], ['DSCR Ende', dez(CD.dscrEnd, 2), 'Betrachtungsende']]);
       y += 3;
       kurve([{ name: 'DSCR', werte: CD.dscrArr.map(Number), gold: true }], jj,
         { hoehe: kh, min: 0, fmt: function (v) { return dez(v, 2); }, schwellen: [
           { wert: sw.dscrGruen, text: 'solide ab ' + dez(sw.dscrGruen, 2), farbe: [63, 165, 108] },
           { wert: sw.dscrGelb, text: 'Deckung ' + dez(sw.dscrGelb, 2), farbe: [184, 98, 92] }] });
-      platz(kurz ? 50 : 70);
-      abschnitt('Beleihungsauslauf (LTV) im Verlauf');
-      kachelReihe([['LTV heute', pct(CD.ltvToday, 1), ''], ['LTV Ende Zinsbindung', pct(CD.ltvEzb, 1), CD.bindj ? 'Jahr ' + CD.bindj : ''], ['LTV Ende', pct(CD.ltvEnd, 1), 'Betrachtungsende']]);
-      y += 3;
+      platz(kurz ? 36 : 70);
+      if (!kurz) abschnitt('Beleihungsauslauf (LTV) im Verlauf');
+      if (!kurz) kachelReihe([['LTV heute', pct(CD.ltvToday, 1), ''], ['LTV Ende Zinsbindung', pct(CD.ltvEzb, 1), CD.bindj ? 'Jahr ' + CD.bindj : ''], ['LTV Ende', pct(CD.ltvEnd, 1), 'Betrachtungsende']]);
+      if (!kurz) y += 3;
       kurve([{ name: 'LTV in %', werte: CD.ltvArr.map(Number) }], jj,
         { hoehe: kh, min: 0, fmt: function (v) { return dez(v, 0) + ' %'; } });
     }
@@ -1694,7 +1694,9 @@
         if (offBeg && !KURZ) block('Kaufpreis-Offerte', offBeg);
         if (ai.empfehlung_begruendung && !KURZ) block('Empfehlung', ai.empfehlung_begruendung);
         if (ai.fazit || ai.summary) {
-          absatz(klar(ai.fazit || ai.summary), { groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
+          var _fz = klar(ai.fazit || ai.summary);
+          if (KURZ && _fz.length > 600) { var _ende = _fz.slice(0, 600).lastIndexOf('. '); _fz = _ende > 200 ? _fz.slice(0, _ende + 1) : _fz.slice(0, 600) + ' ...'; }
+          absatz(_fz, { groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
         }
       } else {
         absatz(String(aiText).replace(/\s+/g, ' ').slice(0, KURZ ? 900 : 2400), { groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
@@ -1854,7 +1856,7 @@
     /* v1470: gemessen - mit 48 mm blieb EINE Annahmen-Zeile allein auf der
        letzten Seite stehen. Der Block braucht rund 70 mm; passt er nicht,
        beginnt er geschlossen auf der naechsten Seite. */
-    platz(70, 'Annahmen und Hinweise', (adr || 'Objekt'));
+    platz(KURZ ? 46 : 70, 'Annahmen und Hinweise', (adr || 'Objekt'));
     abschnitt('Annahmen');
     zeile('Mietentwicklung', typeof window._dpPdfMiete === 'function' ? window._dpPdfMiete().text : (num('mietstg') !== null ? pct(num('mietstg'), 1) : '-'));   /* v2832: der Modus, der rechnet */
     zeile('Kostensteigerung p. a.', num('kostenstg') !== null ? pct(num('kostenstg'), 1) : '-');
@@ -1863,10 +1865,10 @@
     if (num('leerstand') !== null) zeile('Kalkulierter Leerstand p. a.', pct(num('leerstand'), 1));
     zeile('Anschlusszins / Anschlusstilgung (Annahme)', [pct(num('anschl_z'), 2), pct(num('anschl_t'), 2)].join('  ·  '));
     zeile('Persönlicher Grenzsteuersatz', num('grenz') !== null ? pct(num('grenz'), 2) : '-');
-    zeile('Gebäudeanteil am Kaufpreis', num('geb_ant') !== null ? pct(num('geb_ant'), 0) : '-');
-    zeile('AfA-Satz Gebäude', num('afa_satz') !== null ? pct(num('afa_satz'), 2) : (txt('afa_satz') || '-'));
-    zeile('Grunderwerbsteuer (Land)', num('gest_p') !== null ? pct(num('gest_p'), 2) : '-');
-    if (num('exit_bmy') !== null) zeile('Exit-Rendite (Verkaufsszenario)', pct(num('exit_bmy'), 1));
+    if (!KURZ) zeile('Gebäudeanteil am Kaufpreis', num('geb_ant') !== null ? pct(num('geb_ant'), 0) : '-');
+    if (!KURZ) zeile('AfA-Satz Gebäude', num('afa_satz') !== null ? pct(num('afa_satz'), 2) : (txt('afa_satz') || '-'));
+    if (!KURZ) zeile('Grunderwerbsteuer (Land)', num('gest_p') !== null ? pct(num('gest_p'), 2) : '-');
+    if (num('exit_bmy') !== null && !KURZ) zeile('Exit-Rendite (Verkaufsszenario)', pct(num('exit_bmy'), 1));
     if (da(S.wert_basis) !== null && S.wert_basis !== kp) zeile('Wert-Anker der Wertsteigerung', (num('svwert') ? 'Verkehrswert' : 'Bankbewertung') + '  ·  ' + eur(S.wert_basis));   /* v2830 */
     if (K.d1IsAussetzung) zeile('Darlehenstyp', 'Tilgungsaussetzung mit Bausparvertrag');
     if (num('bspar_rate')) zeile('Bausparrate / Monat', eur(num('bspar_rate')));
