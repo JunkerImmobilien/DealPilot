@@ -523,3 +523,6 @@ body.laeuft.maus{cursor:default}
 .az-leg i{width:14px;height:14px;border-radius:4px;background:var(--runway)}
 .az-leg span:nth-child(2) i{filter:brightness(.82)}.az-leg span:nth-child(3) i{filter:brightness(.66)}.az-leg span:nth-child(4) i{filter:brightness(.52)}
 .az-leg b{color:var(--creme);font-weight:700;font-variant-numeric:tabular-nums}
+/* v2941a · lange Zahlen im Instrument kleiner, Beschriftung darf trennen */
+.az-iz b.lang{font-size:33px;letter-spacing:-.03em}
+.az-iz span{hyphens:manual;overflow-wrap:anywhere}

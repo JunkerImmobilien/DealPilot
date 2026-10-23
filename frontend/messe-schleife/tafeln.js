@@ -150,7 +150,7 @@
     instr.forEach(function (x, i) {
       h += '<div class="az-i" style="--d:' + (0.2 + i * 0.12) + 's"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="az-ring0" cx="60" cy="60" r="50"/><circle class="az-ring" cx="60" cy="60" r="50"/>'
         + '<g class="az-ticks">' + Array.apply(null, Array(24)).map(function (_, k) { return '<line x1="60" y1="6" x2="60" y2="' + (k % 6 ? 11 : 15) + '" transform="rotate(' + (k * 15) + ' 60 60)"/>'; }).join('') + '</g></svg>'
-        + '<div class="az-iz"><b data-az="' + x[0] + '">0</b><span>' + esc(x[1]) + '</span></div></div>';
+        + '<div class="az-iz"><b data-az="' + x[0] + '"' + (String(zahl(x[0])).length > 6 ? ' class="lang"' : '') + '>0</b><span>' + esc(x[1]) + '</span></div></div>';   /* v2941a · lange Zahlen kleiner */
     });
     h += '</div></div>';
     var g = (A.gesetze || []).map(function (x) { return '<span><b>' + esc(x.gesetz) + '</b> ' + x.paragrafen + (x.gesetz === 'DSGVO' ? ' Art.' : ' §§') + '</span>'; }).join('');
@@ -166,8 +166,8 @@
     var R = window.DPS_REGISTER && window.DPS_REGISTER.kopf;
     var summe = (M.zensus_werte || 0) + (M.makro_werte || 0) + (M.register_db || 0) + (M.wert_parameter || 0);
     var instr = [
-      [M.zensus_werte, 'Zensus-Werte'], [M.makro_werte, 'Makro-Werte'], [M.register_db, 'amtliche Registerwerte'], [R ? R.ausschuesse : null, 'Gutachterausschüsse'],
-      [M.boris_systeme, 'Bodenrichtwert-Systeme live'], [M.wert_parameter, 'Wertparameter'], [M.mietrecht_gemeinden, 'Gemeinden mit Mietrechts-VO'], [R ? R.irw_tabellen : null, 'Tabellen Immobilienrichtwert']
+      [M.zensus_werte, 'Zensus-Werte'], [M.makro_werte, 'Makro-Werte'], [M.register_db, 'amtliche Registerwerte'], [R ? R.ausschuesse : null, 'Gutachter­ausschüsse'],
+      [M.boris_systeme, 'Bodenrichtwert-Systeme live'], [M.wert_parameter, 'Wertparameter'], [M.mietrecht_gemeinden, 'Gemeinden mit Mietrechts-VO'], [R ? R.irw_tabellen : null, 'Tabellen Immobilien­richtwert']
     ].filter(function (x) { return x[0] != null && x[0] > 0; });
     var h = '<div class="rg-t az-t" data-az-sek="' + (sek || 16) + '"><div class="az-oben"><div class="az-links">'
       + '<div class="rt-kick">Amtliche Daten an Bord · Stand ' + datum(A.stand) + '</div>'
@@ -179,7 +179,7 @@
     instr.forEach(function (x, i) {
       h += '<div class="az-i" style="--d:' + (0.2 + i * 0.12) + 's"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="az-ring0" cx="60" cy="60" r="50"/><circle class="az-ring" cx="60" cy="60" r="50"/>'
         + '<g class="az-ticks">' + Array.apply(null, Array(24)).map(function (_, k) { return '<line x1="60" y1="6" x2="60" y2="' + (k % 6 ? 11 : 15) + '" transform="rotate(' + (k * 15) + ' 60 60)"/>'; }).join('') + '</g></svg>'
-        + '<div class="az-iz"><b data-az="' + x[0] + '">0</b><span>' + esc(x[1]) + '</span></div></div>';
+        + '<div class="az-iz"><b data-az="' + x[0] + '"' + (String(zahl(x[0])).length > 6 ? ' class="lang"' : '') + '>0</b><span>' + esc(x[1]) + '</span></div></div>';   /* v2941a · lange Zahlen kleiner */
     });
     h += '</div></div>';
     var quellen = ['Gutachterausschüsse der Länder', 'Zensus 2022', 'Statistische Ämter', 'BORIS', 'ImmoWertV 2021', 'ImmoWertA', 'BelWertV', 'GrEStG der Länder', 'Kappungsgrenzen-VO', 'Mietpreisbremse-VO'];
