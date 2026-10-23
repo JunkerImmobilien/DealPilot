@@ -1009,8 +1009,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bssz/dash#lage=Barum%2C%20Beddingen%2C%20Beinum%2C%20Bleckenstedt%2C%20Calbecht%2C%20Dr%C3%BCtt",
-    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bssz#lage=Barum%2C%20Beddingen%2C%20Beinum%2C%20Bleckenstedt%2C%20Calbecht%2C%20Dr%C3%BCtt",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -1211,8 +1211,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bssz/dash",
-    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bssz",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -1413,8 +1413,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bssz/dash#lage=Gebhardshagen%2C%20Lebenstedt%2C%20Salzgitter-Bad%20und%20Thiede",
-    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bssz#lage=Gebhardshagen%2C%20Lebenstedt%2C%20Salzgitter-Bad%20und%20Thiede",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -2582,8 +2582,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bshe/dash#lage=S%C3%BCdkreis%2C%20Sch%C3%B6ningen%2C%20B%C3%BCddenstedt",
-    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bshe#lage=S%C3%BCdkreis%2C%20Sch%C3%B6ningen%2C%20B%C3%BCddenstedt",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -2774,8 +2774,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bshe/dash",
-    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bshe",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -2966,8 +2966,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bshe/dash#lage=Lehre%2C%20Velpke",
-    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bshe#lage=Lehre%2C%20Velpke",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -3990,8 +3990,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bspe/dash#lage=Hohenhameln%2C%20Ilsede%2C%20Lahstedt%2C%20Lengede",
-    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bspe#lage=Hohenhameln%2C%20Ilsede%2C%20Lahstedt%2C%20Lengede",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -4186,8 +4186,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bspe/dash#lage=Edemissen",
-    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bspe#lage=Edemissen",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -4382,8 +4382,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bspe/dash",
-    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bspe",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -4578,8 +4578,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_bspe/dash#lage=Peine",
-    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_bspe#lage=Peine",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -5264,7 +5264,85 @@
       "raeumlich": "Hameln, Stadt",
       "lage_dokument": "Hameln",
       "lage_parameterwert": "1",
-      "hinweis": "Der Kalkulator führt die Lagen „Hameln“, „Bad Pyrmont“, „Kleinstädte“ und „Dörfer“ (Tabelle „Umrechnungskoeffizienten für abweichende Lagen“: 1,00 / 0,88 / 0,88 / 0,84). Zugeordnet sind nur die beiden Lagen, die eine Gemeinde beim Namen nennen. Ob Ortschaften dieser Städte als „Dörfer“ gelten, sagt der Kalkulator nicht."
+      "hinweis": "Der Kalkulator führt die Lagen „Hameln“, „Bad Pyrmont“, „Kleinstädte“ und „Dörfer“ (Tabelle „Umrechnungskoeffizienten für abweichende Lagen“: 1,00 / 0,88 / 0,88 / 0,84). Zugeordnet sind nur die beiden Lagen, die eine Gemeinde beim Namen nennen. Ob Ortschaften dieser Städte als „Dörfer“ gelten, sagt der Kalkulator nicht. v2888: gilt nur noch in der Gemarkung Hameln.",
+      "lage": "Hameln",
+      "zuordnung": {
+        "art": "gemarkung",
+        "quelle": "BORIS-D, WMS https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte (GetFeatureInfo, Felder „Gemarkungsnummer“ und „Gemarkungsname“), Rasterabfrage über das Stadtgebiet im Abstand von rund 650 m am 23.10.2026",
+        "tabelle": [
+          {
+            "gemarkung": "Hameln",
+            "gemarkungsnr": "034960",
+            "lageklasse": "Hameln"
+          },
+          {
+            "gemarkung": "Haverbeck",
+            "gemarkungsnr": "034738",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Wehrbergen",
+            "gemarkungsnr": "034739",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Halvestorf",
+            "gemarkungsnr": "034740",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Welliehausen",
+            "gemarkungsnr": "034956",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Holtensen",
+            "gemarkungsnr": "034957",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Unsen",
+            "gemarkungsnr": "034958",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Groß Hilligsfeld",
+            "gemarkungsnr": "034959",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Rohrsen Hn",
+            "gemarkungsnr": "034961",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Klein Hilligsfeld",
+            "gemarkungsnr": "034962",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Afferde",
+            "gemarkungsnr": "034963",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Klein Berkel",
+            "gemarkungsnr": "034964",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Hastenbeck",
+            "gemarkungsnr": "034965",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Tündern",
+            "gemarkungsnr": "034966",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          }
+        ],
+        "hinweis": "Der Kalkulator nennt die Lage „Hameln“, ohne zu sagen, ob die Ortschaften der Stadt dazugehören oder als „Dörfer“ gelten. Zugeordnet ist deshalb nur die Gemarkung, die den Namen trägt (Hameln, 034960); 13 weitere Gemarkungen der Stadt sind als „Ortschaften der Stadt Hameln“ gesperrt. Eine Gemarkung, die hier nicht steht, bekommt keinen Faktor."
+      }
     },
     "belege": [
       "Kalkulator 2026_sw_efh_hmhhm (Tableau Public, Profil ogagmd2026), Datenbasis 01.10.2025, Stichprobe 387 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,21 aus.",
@@ -5281,12 +5359,131 @@
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
     "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhm/dash",
-    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-gemarkung",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
-    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert. Gilt nur in der Gemarkung Hameln (034960); für die übrigen Gemarkungen der Stadt ist der Faktor gesperrt.",
     "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Hameln-Pyrmont, Lage Hameln"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03252006",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont, Hameln, Stadt, Ortschaften der Stadt Hameln",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart_bez": null,
+    "formel": null,
+    "korrekturen": [],
+    "modellansaetze": null,
+    "geltungsbereich": {
+      "lage": "Ortschaften der Stadt Hameln",
+      "zuordnung": {
+        "art": "gemarkung",
+        "quelle": "BORIS-D, WMS https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte (GetFeatureInfo, Felder „Gemarkungsnummer“ und „Gemarkungsname“), Rasterabfrage über das Stadtgebiet im Abstand von rund 650 m am 23.10.2026",
+        "tabelle": [
+          {
+            "gemarkung": "Hameln",
+            "gemarkungsnr": "034960",
+            "lageklasse": "Hameln"
+          },
+          {
+            "gemarkung": "Haverbeck",
+            "gemarkungsnr": "034738",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Wehrbergen",
+            "gemarkungsnr": "034739",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Halvestorf",
+            "gemarkungsnr": "034740",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Welliehausen",
+            "gemarkungsnr": "034956",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Holtensen",
+            "gemarkungsnr": "034957",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Unsen",
+            "gemarkungsnr": "034958",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Groß Hilligsfeld",
+            "gemarkungsnr": "034959",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Rohrsen Hn",
+            "gemarkungsnr": "034961",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Klein Hilligsfeld",
+            "gemarkungsnr": "034962",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Afferde",
+            "gemarkungsnr": "034963",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Klein Berkel",
+            "gemarkungsnr": "034964",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Hastenbeck",
+            "gemarkungsnr": "034965",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          },
+          {
+            "gemarkung": "Tündern",
+            "gemarkungsnr": "034966",
+            "lageklasse": "Ortschaften der Stadt Hameln"
+          }
+        ],
+        "hinweis": "Der Kalkulator nennt die Lage „Hameln“, ohne zu sagen, ob die Ortschaften der Stadt dazugehören oder als „Dörfer“ gelten. Zugeordnet ist deshalb nur die Gemarkung, die den Namen trägt (Hameln, 034960); 13 weitere Gemarkungen der Stadt sind als „Ortschaften der Stadt Hameln“ gesperrt. Eine Gemarkung, die hier nicht steht, bekommt keinen Faktor."
+      },
+      "raeumlich": "Hameln, Stadt"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Kalkulator 2026_sw_efh_hmhhm (Tableau Public, Profil ogagmd2026), Parameter „Lage“ [Hameln, Bad Pyrmont, Kleinstädte, Dörfer], Blatt „tabweiterelage“; Modellbeschreibung https://www.gag.niedersachsen.de/download/225531/hmh_2026_sw_modellbeschreibung.pdf (ohne Ortsliste); gelesen 23.10.2026"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": null,
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "berichtsjahr": 2026,
+    "modellversion": null,
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_hmhhm#lage=Ortschaften%20der%20Stadt%20Hameln",
+    "quelle_parser": "v2888-hand",
+    "quellenvermerk": null,
+    "lizenz": "kein Wert - Lizenz nicht einschlägig",
+    "fundstelle": "Kalkulator 2026_sw_efh_hmhhm, Blatt „tabweiterelage“",
+    "auflagen": [
+      "KEIN Nachbarkreis und kein Landesmittel."
+    ],
+    "zugang": "kostenfrei",
+    "warum_kein_wert": "Der Kalkulator 2026_sw_efh_hmhhm (Gutachterausschuss Hameln-Hannover, freistehende Ein- und Zweifamilienhäuser, Landkreis Hameln-Pyrmont, frei abrufbar) staffelt den Sachwertfaktor nach den Lagen „Hameln“ 1,00, „Bad Pyrmont“ 0,88, „Kleinstädte“ 0,88 und „Dörfer“ 0,84 (Blatt „Umrechnungskoeffizienten für abweichende Lagen“). Ob die Ortschaften der Stadt Hameln (Gemarkungen Haverbeck, Wehrbergen, Halvestorf, Welliehausen, Holtensen, Unsen, Groß Hilligsfeld, Rohrsen Hn, Klein Hilligsfeld, Afferde, Klein Berkel, Hastenbeck, Tündern) zur Lage „Hameln“ oder zu „Dörfer“ gehören, sagen weder der Kalkulator noch seine Modellbeschreibung; der Unterschied beträgt Hameln 1,00 gegen Dörfer 0,84 — bis zu 16 Prozent. Für die Gemarkung Hameln steht ein Wert. WEG ZUR QUELLE: Kalkulator unter dem Link, Lage dort selbst wählen; den Faktor als eigene Angabe eintragen.",
+    "unvollstaendig_grund": "Der Kalkulator 2026_sw_efh_hmhhm (Gutachterausschuss Hameln-Hannover, freistehende Ein- und Zweifamilienhäuser, Landkreis Hameln-Pyrmont, frei abrufbar) staffelt den Sachwertfaktor nach den Lagen „Hameln“ 1,00, „Bad Pyrmont“ 0,88, „Kleinstädte“ 0,88 und „Dörfer“ 0,84 (Blatt „Umrechnungskoeffizienten für abweichende Lagen“). Ob die Ortschaften der Stadt Hameln (Gemarkungen Haverbeck, Wehrbergen, Halvestorf, Welliehausen, Holtensen, Unsen, Groß Hilligsfeld, Rohrsen Hn, Klein Hilligsfeld, Afferde, Klein Berkel, Hastenbeck, Tündern) zur Lage „Hameln“ oder zu „Dörfer“ gehören, sagen weder der Kalkulator noch seine Modellbeschreibung; der Unterschied beträgt Hameln 1,00 gegen Dörfer 0,84 — bis zu 16 Prozent. Für die Gemarkung Hameln steht ein Wert. WEG ZUR QUELLE: Kalkulator unter dem Link, Lage dort selbst wählen; den Faktor als eigene Angabe eintragen.",
+    "vollstaendig": false
   },
   {
     "land_code": "NI",
@@ -5449,8 +5646,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhm/dash",
-    "quelle_parser": "v1612-WREZ+v2883-kopie",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_hmhhm",
+    "quelle_parser": "v1612-WREZ+v2883-kopie+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -5590,7 +5787,70 @@
       "raeumlich": "Bad Pyrmont, Stadt",
       "lage_dokument": "Bad Pyrmont",
       "lage_parameterwert": "0.88",
-      "hinweis": "Der Kalkulator führt die Lagen „Hameln“, „Bad Pyrmont“, „Kleinstädte“ und „Dörfer“ (Tabelle „Umrechnungskoeffizienten für abweichende Lagen“: 1,00 / 0,88 / 0,88 / 0,84). Zugeordnet sind nur die beiden Lagen, die eine Gemeinde beim Namen nennen. Ob Ortschaften dieser Städte als „Dörfer“ gelten, sagt der Kalkulator nicht."
+      "hinweis": "Der Kalkulator führt die Lagen „Hameln“, „Bad Pyrmont“, „Kleinstädte“ und „Dörfer“ (Tabelle „Umrechnungskoeffizienten für abweichende Lagen“: 1,00 / 0,88 / 0,88 / 0,84). Zugeordnet sind nur die beiden Lagen, die eine Gemeinde beim Namen nennen. Ob Ortschaften dieser Städte als „Dörfer“ gelten, sagt der Kalkulator nicht. v2888: gilt nur noch in der Gemarkung Pyrmont.",
+      "lage": "Bad Pyrmont",
+      "zuordnung": {
+        "art": "gemarkung",
+        "quelle": "BORIS-D, WMS https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte (GetFeatureInfo, Felder „Gemarkungsnummer“ und „Gemarkungsname“), Rasterabfrage über das Stadtgebiet im Abstand von rund 650 m am 23.10.2026",
+        "tabelle": [
+          {
+            "gemarkung": "Pyrmont",
+            "gemarkungsnr": "035803",
+            "lageklasse": "Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Hagen",
+            "gemarkungsnr": "035801",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Holzhausen",
+            "gemarkungsnr": "035802",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Oesdorf",
+            "gemarkungsnr": "035804",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Löwensen",
+            "gemarkungsnr": "035805",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Thal",
+            "gemarkungsnr": "035806",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Kleinenberg",
+            "gemarkungsnr": "035807",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Großenberg",
+            "gemarkungsnr": "035808",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Eichenborn",
+            "gemarkungsnr": "035809",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Baarsen",
+            "gemarkungsnr": "035810",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Neersen",
+            "gemarkungsnr": "035901",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          }
+        ],
+        "hinweis": "Der Kalkulator nennt die Lage „Bad Pyrmont“, ohne zu sagen, ob die Ortschaften der Stadt dazugehören oder als „Dörfer“ gelten. Zugeordnet ist deshalb nur die Gemarkung, die den Namen trägt (Pyrmont, 035803); 10 weitere Gemarkungen der Stadt sind als „Ortsteile der Stadt Bad Pyrmont“ gesperrt. Eine Gemarkung, die hier nicht steht, bekommt keinen Faktor."
+      }
     },
     "belege": [
       "Kalkulator 2026_sw_efh_hmhhm (Tableau Public, Profil ogagmd2026), Datenbasis 01.10.2025, Stichprobe 387 Kauffälle. 54 von 54 Stützpunkten belegt; der Ausschuss weist an der Standardstellung den Faktor 1,21 aus.",
@@ -5607,12 +5867,116 @@
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
     "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhm/dash",
-    "quelle_parser": "v1612-WREZ+v2883-WLAGE",
+    "quelle_parser": "v1612-WREZ+v2883-WLAGE+v2888-gemarkung",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
-    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert.",
+    "auflagen": "Die Faktoren gelten nur für einen vorläufigen Sachwert nach dem Modell der niedersächsischen Gutachterausschüsse (NHK 2010, Brutto-Grundfläche, lineare Alterswertminderung, GND 80 Jahre). ZUSÄTZLICH: die Umrechnung für abweichende Merkmale konnte nicht gelesen werden — für ein Objekt, das von der Abtaststellung abweicht, ist der Faktor insoweit unkorrigiert. Gilt nur in der Gemarkung Pyrmont (035803); für die übrigen Gemarkungen der Stadt ist der Faktor gesperrt.",
     "fundstelle": "Grundstücksmarktinformationen 2026, Sachwertfaktor, Kalkulatoren für Landkreis Hameln-Pyrmont, Lage Bad Pyrmont"
+  },
+  {
+    "land_code": "NI",
+    "ags": "03252003",
+    "ebene": "gemeinde",
+    "gebiet_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont, Bad Pyrmont, Stadt, Ortsteile der Stadt Bad Pyrmont",
+    "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont",
+    "kennzahl": "sachwertfaktor",
+    "zweig": "ezfh",
+    "objektart_bez": null,
+    "formel": null,
+    "korrekturen": [],
+    "modellansaetze": null,
+    "geltungsbereich": {
+      "lage": "Ortsteile der Stadt Bad Pyrmont",
+      "zuordnung": {
+        "art": "gemarkung",
+        "quelle": "BORIS-D, WMS https://www.wms.nrw.de/boris/wms_de_bodenrichtwerte (GetFeatureInfo, Felder „Gemarkungsnummer“ und „Gemarkungsname“), Rasterabfrage über das Stadtgebiet im Abstand von rund 650 m am 23.10.2026",
+        "tabelle": [
+          {
+            "gemarkung": "Pyrmont",
+            "gemarkungsnr": "035803",
+            "lageklasse": "Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Hagen",
+            "gemarkungsnr": "035801",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Holzhausen",
+            "gemarkungsnr": "035802",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Oesdorf",
+            "gemarkungsnr": "035804",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Löwensen",
+            "gemarkungsnr": "035805",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Thal",
+            "gemarkungsnr": "035806",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Kleinenberg",
+            "gemarkungsnr": "035807",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Großenberg",
+            "gemarkungsnr": "035808",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Eichenborn",
+            "gemarkungsnr": "035809",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Baarsen",
+            "gemarkungsnr": "035810",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          },
+          {
+            "gemarkung": "Neersen",
+            "gemarkungsnr": "035901",
+            "lageklasse": "Ortsteile der Stadt Bad Pyrmont"
+          }
+        ],
+        "hinweis": "Der Kalkulator nennt die Lage „Bad Pyrmont“, ohne zu sagen, ob die Ortschaften der Stadt dazugehören oder als „Dörfer“ gelten. Zugeordnet ist deshalb nur die Gemarkung, die den Namen trägt (Pyrmont, 035803); 10 weitere Gemarkungen der Stadt sind als „Ortsteile der Stadt Bad Pyrmont“ gesperrt. Eine Gemarkung, die hier nicht steht, bekommt keinen Faktor."
+      },
+      "raeumlich": "Bad Pyrmont, Stadt"
+    },
+    "belege": [
+      {
+        "art": "amtliche Veröffentlichung",
+        "fundstelle": "Kalkulator 2026_sw_efh_hmhhm (Tableau Public, Profil ogagmd2026), Parameter „Lage“ [Hameln, Bad Pyrmont, Kleinstädte, Dörfer], Blatt „tabweiterelage“; Modellbeschreibung https://www.gag.niedersachsen.de/download/225531/hmh_2026_sw_modellbeschreibung.pdf (ohne Ortsliste); gelesen 23.10.2026"
+      }
+    ],
+    "stufe": "A",
+    "stufe_grund": null,
+    "fallzahl": null,
+    "streuung": null,
+    "stichtag": null,
+    "berichtsjahr": 2026,
+    "modellversion": null,
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/einundzweifamilienhaeuser/2026_sw_efh_hmhhm#lage=Ortsteile%20der%20Stadt%20Bad%20Pyrmont",
+    "quelle_parser": "v2888-hand",
+    "quellenvermerk": null,
+    "lizenz": "kein Wert - Lizenz nicht einschlägig",
+    "fundstelle": "Kalkulator 2026_sw_efh_hmhhm, Blatt „tabweiterelage“",
+    "auflagen": [
+      "KEIN Nachbarkreis und kein Landesmittel."
+    ],
+    "zugang": "kostenfrei",
+    "warum_kein_wert": "Der Kalkulator 2026_sw_efh_hmhhm (Gutachterausschuss Hameln-Hannover, freistehende Ein- und Zweifamilienhäuser, Landkreis Hameln-Pyrmont, frei abrufbar) staffelt den Sachwertfaktor nach den Lagen „Hameln“ 1,00, „Bad Pyrmont“ 0,88, „Kleinstädte“ 0,88 und „Dörfer“ 0,84 (Blatt „Umrechnungskoeffizienten für abweichende Lagen“). Ob die Ortsteile der Stadt Bad Pyrmont (Gemarkungen Hagen, Holzhausen, Oesdorf, Löwensen, Thal, Kleinenberg, Großenberg, Eichenborn, Baarsen, Neersen) zur Lage „Bad Pyrmont“ oder zu „Dörfer“ gehören, sagen weder der Kalkulator noch seine Modellbeschreibung; der Unterschied beträgt Bad Pyrmont 0,88 gegen Dörfer 0,84 — rund 5 Prozent. Für die Gemarkung Pyrmont steht ein Wert. WEG ZUR QUELLE: Kalkulator unter dem Link, Lage dort selbst wählen; den Faktor als eigene Angabe eintragen.",
+    "unvollstaendig_grund": "Der Kalkulator 2026_sw_efh_hmhhm (Gutachterausschuss Hameln-Hannover, freistehende Ein- und Zweifamilienhäuser, Landkreis Hameln-Pyrmont, frei abrufbar) staffelt den Sachwertfaktor nach den Lagen „Hameln“ 1,00, „Bad Pyrmont“ 0,88, „Kleinstädte“ 0,88 und „Dörfer“ 0,84 (Blatt „Umrechnungskoeffizienten für abweichende Lagen“). Ob die Ortsteile der Stadt Bad Pyrmont (Gemarkungen Hagen, Holzhausen, Oesdorf, Löwensen, Thal, Kleinenberg, Großenberg, Eichenborn, Baarsen, Neersen) zur Lage „Bad Pyrmont“ oder zu „Dörfer“ gehören, sagen weder der Kalkulator noch seine Modellbeschreibung; der Unterschied beträgt Bad Pyrmont 0,88 gegen Dörfer 0,84 — rund 5 Prozent. Für die Gemarkung Pyrmont steht ein Wert. WEG ZUR QUELLE: Kalkulator unter dem Link, Lage dort selbst wählen; den Faktor als eigene Angabe eintragen.",
+    "vollstaendig": false
   },
   {
     "land_code": "NI",
@@ -5775,8 +6139,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhm/dash",
-    "quelle_parser": "v1612-WREZ+v2883-kopie",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_hmhhm",
+    "quelle_parser": "v1612-WREZ+v2883-kopie+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -5942,8 +6306,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_hmhhm/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_hmhhm",
+    "quelle_parser": "v1612-WREZ+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -7109,8 +7473,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_ott_ohz/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_ott_ohz",
+    "quelle_parser": "v1612-WREZ+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -7783,8 +8147,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_ott_std/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_ott_std",
+    "quelle_parser": "v1612-WREZ+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -8439,8 +8803,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_osmep_osmepnoh/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_osmep_osmepnoh",
+    "quelle_parser": "v1612-WREZ+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
@@ -8693,8 +9057,8 @@
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "modellversion": "GMB 2026",
-    "quelle_url": "https://public.tableau.com/views/2026_sw_efh_osmep_osmeposla/dash",
-    "quelle_parser": "v1612-WREZ",
+    "quelle_url": "https://www.gag.niedersachsen.de/grundstuecksmarktinformationen/2026/Sachwertfaktor/reihenhausdoppelhaushaelfte/2026_sw_rh_osmep_osmeposla",
+    "quelle_parser": "v1612-WREZ+v2888-url",
     "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte Niedersachsen 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
     "lizenz": "dl-de/by-2-0",
     "verwendung": "produkt",
