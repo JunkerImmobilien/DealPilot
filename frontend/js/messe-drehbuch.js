@@ -4004,6 +4004,37 @@
     o.innerHTML = '<iframe title="PDF" style="width:100%;height:100%;border:0" src="' + u + '#page=' + n + '&toolbar=0&navpanes=0&view=FitH' + (oben ? ',' + oben : '') + '"></iframe>';
     await warte(4000);
   }
+  /* v2940 · SEITE NACH UEBERSCHRIFT, NICHT NACH NUMMER. Gemessen bei der Neuaufnahme
+     23.10.2026: die Bankfassung hat inzwischen 11 statt 8 Seiten - Szene 8 zeigte die
+     Exit-Seite unter „Belastungsprobe", Szene 9 „Wertpotenzial" unter „Annahmen".
+     Die Textbausteine des PDFs (_r19.tok) stehen in Seitenreihenfolge; jede Seite endet
+     mit ihrer Fusszeile „Seite n von m". Gesucht wird die erste Seite, auf der ein
+     Baustein auf das Muster passt; ohne Treffer gilt die alte Nummer. */
+  function r19SeiteVon(muster, ersatz) {
+    var T = _r19.tok || [], seite = 1;
+    for (var i = 0; i < T.length; i++) {
+      var m = /Seite (\d+) von \d+/.exec(T[i]);
+      if (m) { seite = Number(m[1]) + 1; continue; }
+      if (muster.test(T[i])) return seite;
+    }
+    return ersatz;
+  }
+  /* v2940b · und die STELLE auf der Seite. Gemessen in der zweiten Aufnahme: die Kopie hat
+     11 Seiten, VERMOEGENSAUFBAU und ANNAHMEN stehen weiter unten - gezeigt wurde nur der
+     Seitenkopf. jsPDF schreibt „x y Td (Text) Tj", y von unten, A4 = 841,89 pt. r19Seite()
+     will den Abstand von oben in pt x 4/3 (v2276e); 24 pt Luft ueber der Ueberschrift. */
+  function r19Stelle(muster, ersatzSeite) {
+    var tx = _r19.roh || '', re = /([\d.]+) ([\d.]+) Td\s*\(([^()]{1,80})\) Tj/g, m, seite = 1;
+    while ((m = re.exec(tx))) {
+      var f = /Seite (\d+) von \d+/.exec(m[3]);
+      if (f) { seite = Number(f[1]) + 1; continue; }
+      if (muster.test(m[3])) {
+        var vonOben = 841.89 - Number(m[2]);
+        return { seite: seite, oben: vonOben > 120 ? Math.round((vonOben - 24) * 4 / 3) : 0 };
+      }
+    }
+    return { seite: r19SeiteVon(muster, ersatzSeite), oben: 0 };
+  }
   function r19K() { return (window.State && State.kpis) || {}; }
   function r19Pz(n, st) { return n == null || !isFinite(n) ? '–' : de(n, st == null ? 2 : st) + ' %'; }
   DREHBUECHER['reihe-bankpdf'] = {
@@ -4041,7 +4072,7 @@
         await r6Ende(zb);
         if (!bank) { await b2oZeile(s, 'Die Bankfassung', 'Hier entsteht das PDF.'); return; }
         _r19.bank = bank;
-        try { var tx = await bank.text(), mm = /Seite 1 von (\d+)/.exec(tx); _r19.seiten = mm ? Number(mm[1]) : null; _r19.tok = (tx.match(/\(([^()]{1,80})\) Tj/g) || []).map(function (x) { return x.slice(1, -4); }); DPM_REIHE.pdf19 = { bytes: bank.size, seiten: _r19.seiten, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8) }; } catch (e) {}
+        try { var tx = await bank.text(), mm = /Seite 1 von (\d+)/.exec(tx); _r19.roh = tx; _r19.seiten = mm ? Number(mm[1]) : null; _r19.tok = (tx.match(/\(([^()]{1,80})\) Tj/g) || []).map(function (x) { return x.slice(1, -4); }); DPM_REIHE.pdf19 = { bytes: bank.size, seiten: _r19.seiten, namen: (tx.match(RH_PDF_NAMEN) || []).slice(0, 8) }; } catch (e) {}
         zeige(null); kegelHoch(true);
         await r19Seite(bank, 1);
         await b2oZeile(s, 'Oben: deine Marke', 'Kopf mit Logo — mit Whitelabel steht hier deins, nicht unseres. Darunter Objekt, Foto und Stand.');
@@ -4065,7 +4096,7 @@
       },
       async function (s) {   /* 7 · Vermögen und Exit */
         if (!_r19.bank) return;
-        await r19Seite(_r19.bank, 6);
+        var _st7 = r19Stelle(/^VERM.{1,3}GENSAUFBAU/, 6); await r19Seite(_r19.bank, _st7.seite, _st7.oben);   /* v2940 */
         var K = r19K();
         /* aus dem PDF gelesen, nicht aus den Kennzahlen: der Exit dort rechnet mit eigener Haltedauer */
         var T = _r19.tok || [], iw = T.indexOf('Angenommene Wertsteigerung p. a.'), ws = iw >= 0 ? T[iw + 1] : null;
@@ -4073,12 +4104,12 @@
       },
       async function (s) {   /* 8 · Belastungsprobe */
         if (!_r19.bank) return;
-        await r19Seite(_r19.bank, 7);
+        var _st8 = r19Stelle(/^BELASTUNGSPROBE/, 7); await r19Seite(_r19.bank, _st8.seite, _st8.oben);   /* v2940 */
         await b2oZeile(s, 'Die Belastungsprobe', 'Der DSCR, wenn der Zins steigt oder die Miete fällt — genau die Frage, die jede Bank stellt. Die Antwort steht schon drin.');
       },
       async function (s) {   /* 9 · Annahmen */
         if (!_r19.bank) return;
-        await r19Seite(_r19.bank, 8);
+        var _st9 = r19Stelle(/^ANNAHMEN$/, 8); await r19Seite(_r19.bank, _st9.seite, _st9.oben);   /* v2940 */
         await b2oZeile(s, 'Annahmen und Hinweise', 'Mietsteigerung, Kostensteigerung, Wertentwicklung: jede Annahme steht offen da. Was fehlt, ist ein Strich — keine Null.');
       },
       async function (s) {   /* 10 · was die Bank bekommt */
@@ -4340,7 +4371,7 @@
         await r6Ende(zb);
         await zeige(r10cKarte, 8);
         var E = r10cErgebnis();
-        await b2oZeile(s, 'Am Scheitel gehalten', '<b>' + (E.spanne || '–') + ' Jahre</b>. Hinter der Gesamtnutzungsdauer rechnet die Anlage 2 nicht weiter — DealPilot hält den Wert am Tiefpunkt der Kurve, statt ihn wieder steigen zu lassen.');
+        await b2oZeile(s, 'Alter höchstens die GND', '<b>' + (E.spanne || '–') + ' Jahre</b>. Ist das Haus älter als seine Gesamtnutzungsdauer, setzt DealPilot wie die ImmoWertA als Alter die Gesamtnutzungsdauer an.');   /* v2939 · bis v2938 „Am Scheitel gehalten" */
         var p = function () { return q('#rnd-pruefpflicht'); };
         var x = p(); if (x) x.scrollIntoView({ block: 'center' });
         await warte(500);

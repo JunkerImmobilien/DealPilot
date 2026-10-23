@@ -40,9 +40,11 @@
     schalter = Q.get('gewinnspiel') === '1';
     try { sessionStorage.setItem('dps_gewinnspiel', Q.get('gewinnspiel')); } catch (e) { /* ohne Speicher */ }
   }
-  function gewollt() { return schalter != null ? schalter : !!(G && G.an); }
+  /* messe-schleife-6 · Vorrang: Taste G (dieses Fenster) > Menue (einstellungen.js) > gewinnspiel.js */
+  var EIN = window.DPS_EINST || null;
+  function gewollt() { return schalter != null ? schalter : (EIN ? !!EIN.get('gewinnspiel') : !!(G && G.an)); }
   function gwAktiv() { return gewollt() && bildOk === true; }
-  function gwSekunden() { return Math.max(3, Number(G && G.sekunden) || 15); }
+  function gwSekunden() { return Math.max(3, Number(EIN ? EIN.get('gewinnspiel_sek') : (G && G.sekunden)) || 15); }
   function hinweis(t) {
     var h = document.createElement('div'); h.className = 'dps-hinweis'; h.textContent = t;
     document.body.appendChild(h);
@@ -53,6 +55,7 @@
     if (e.key !== 'g' && e.key !== 'G') return;
     schalter = !gewollt();
     try { sessionStorage.setItem('dps_gewinnspiel', schalter ? '1' : '0'); } catch (x) { /* ohne Speicher */ }
+    if (EIN) EIN.set('gewinnspiel', schalter);   /* messe-schleife-6 · auch im Menue */
     hinweis('Gewinnspiel-Tafel ' + (schalter ? 'AN' : 'AUS') + (schalter && bildOk === false ? ' — Bild fehlt' : ''));
   });
 
@@ -120,8 +123,100 @@
     return h;
   }
 
+  /* ── DealPilot in Zahlen (v2937) ─────────────────────────────────────────
+     Zahlen aus app-zahlen.js (window.DPS_APP), erzeugt von tools/messe-app-zahlen.mjs
+     aus dem Repo - nie von Hand. Amtliche Werte aus register-stand.js. Die Zahlen
+     zaehlen beim Einblenden hoch (Beobachter unten), die Instrumente fuellen sich. */
+  function appHtml(weiter, sek) {
+    var A = window.DPS_APP; if (!A || !A.zeilen) return null;
+    var R = window.DPS_REGISTER && window.DPS_REGISTER.kopf;
+    var B = A.je_bereich || {};
+    var teile = [['frontend', 'App im Browser'], ['backend', 'Server'], ['marktbericht', 'Wertermittlung'], ['werkzeuge', 'Prüfwerkzeuge']]
+      .filter(function (t) { return B[t[0]] > 0; });
+    var summe = teile.reduce(function (a, t) { return a + B[t[0]]; }, 0) || 1;
+    var instr = [
+      [A.module, 'Module'], [A.funktionen, 'Funktionen'], [A.schnittstellen, 'Schnittstellen'], [A.tabellen, 'Datenbank-Tabellen'], [A.felder, 'Eingabefelder'],
+      [R ? R.werte_gesamt : null, 'amtliche Werte'], [A.paragrafen, 'Paragrafen aus ' + (A.gesetze || []).length + ' Gesetzen'], [A.pruefer, 'Prüfwerkzeuge']
+    ].filter(function (x) { return x[0] != null && x[0] > 0; });
+    var h = '<div class="rg-t az-t" data-az-sek="' + (sek || 16) + '"><div class="az-oben"><div class="az-links">'
+      + '<div class="rt-kick">DealPilot in Zahlen · Stand ' + datum(A.stand) + '</div>'
+      + '<div class="az-gross"><b class="gold" data-az="' + A.zeilen + '">0</b><span>Zeilen eigener Code</span></div>'
+      + '<div class="az-unter">in <b data-az="' + A.dateien + '">0</b> Dateien · <b data-az="' + A.tage + '">0</b> Tage · <b data-az="' + A.versionen + '">0</b> Versionen · <b data-az="' + A.commits + '">0</b> Commits</div>'
+      + (A.registerzeilen ? '<div class="az-unter az-daten">dazu <b data-az="' + A.registerzeilen + '">0</b> Zeilen amtliche Registerdaten · <b data-az="' + (A.dokuzeilen || 0) + '">0</b> Zeilen Dokumentation</div>' : '')
+      + '<div class="az-bahn">';
+    teile.forEach(function (t, i) { h += '<i style="--w:' + (100 * B[t[0]] / summe).toFixed(2) + '%;--d:' + (0.4 + i * 0.35) + 's"><span>' + t[1] + '<b>' + zahl(B[t[0]]) + '</b></span></i>'; });
+    h += '</div><div class="az-leg">' + teile.map(function (t) { return '<span><i></i>' + t[1] + ' <b>' + zahl(B[t[0]]) + '</b></span>'; }).join('') + '</div>';
+    h += '</div><div class="az-instr">';
+    instr.forEach(function (x, i) {
+      h += '<div class="az-i" style="--d:' + (0.2 + i * 0.12) + 's"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="az-ring0" cx="60" cy="60" r="50"/><circle class="az-ring" cx="60" cy="60" r="50"/>'
+        + '<g class="az-ticks">' + Array.apply(null, Array(24)).map(function (_, k) { return '<line x1="60" y1="6" x2="60" y2="' + (k % 6 ? 11 : 15) + '" transform="rotate(' + (k * 15) + ' 60 60)"/>'; }).join('') + '</g></svg>'
+        + '<div class="az-iz"><b data-az="' + x[0] + '"' + (String(zahl(x[0])).length > 6 ? ' class="lang"' : '') + '>0</b><span>' + esc(x[1]) + '</span></div></div>';   /* v2941a · lange Zahlen kleiner */
+    });
+    h += '</div></div>';
+    var g = (A.gesetze || []).map(function (x) { return '<span><b>' + esc(x.gesetz) + '</b> ' + x.paragrafen + (x.gesetz === 'DSGVO' ? ' Art.' : ' §§') + '</span>'; }).join('');
+    if (g) h += '<div class="az-band"><div class="az-band-k">Gesetze an Bord</div><div class="az-lauf"><div>' + g + g + '</div></div></div>';
+    return h + (weiter ? '<div class="rg-weiter">' + weiter + '</div>' : '') + '</div>';
+  }
+  /* ── v2941 · Amtliche Daten an Bord ─────────────────────────────────────
+     Marcel 23.10.2026: „die Gutachter-Sachen, amtliche Daten, Bodenrichtwerte …
+     alles was Zahlen sind". Zahlen aus app-zahlen.js (amtlich), gemessen in der
+     Marktbericht-Datenbank; Ausschuesse und Tabellen aus register-stand.js. */
+  function amtlichHtml(weiter, sek) {
+    var A = window.DPS_APP, M = A && A.amtlich; if (!M) return null;
+    var R = window.DPS_REGISTER && window.DPS_REGISTER.kopf;
+    var summe = (M.zensus_werte || 0) + (M.makro_werte || 0) + (M.register_db || 0) + (M.wert_parameter || 0);
+    var instr = [
+      [M.zensus_werte, 'Zensus-Werte'], [M.makro_werte, 'Makro-Werte'], [M.register_db, 'amtliche Registerwerte'], [R ? R.ausschuesse : null, 'Gutachter­ausschüsse'],
+      [M.boris_systeme, 'Bodenrichtwert-Systeme live'], [M.wert_parameter, 'Wertparameter'], [M.mietrecht_gemeinden, 'Gemeinden mit Mietrechts-VO'], [R ? R.irw_tabellen : null, 'Tabellen Immobilien­richtwert']
+    ].filter(function (x) { return x[0] != null && x[0] > 0; });
+    var h = '<div class="rg-t az-t" data-az-sek="' + (sek || 16) + '"><div class="az-oben"><div class="az-links">'
+      + '<div class="rt-kick">Amtliche Daten an Bord · Stand ' + datum(A.stand) + '</div>'
+      + '<div class="az-gross"><b class="gold" data-az="' + summe + '">0</b><span>amtliche Datenpunkte</span></div>'
+      + '<div class="az-unter">Zensus für <b data-az="' + (M.zensus_gemeinden || 0) + '">0</b> Gemeinden · Makrodaten für <b data-az="' + (M.makro_gebiete || 0) + '">0</b> Gebiete</div>'
+      + '<div class="az-unter az-daten">Bodenrichtwerte live aus <b>' + (M.boris_laender || 0) + '</b> Landesportalen und BORIS-D · <b>' + (M.gaa_dokumente || 0) + '</b> amtliche Marktberichte ausgewertet · Mietrecht in <b>' + (M.mietrecht_laender || 0) + '</b> Ländern</div>'
+      + '<div class="az-unter az-daten">Liegenschaftszins · Sachwertfaktor · Umrechnungskoeffizienten · Bodenrichtwert · Immobilienrichtwert · NHK 2010 · Anlage 2 ImmoWertV — jede Zahl mit Quelle, Jahrgang und Lizenz.</div>'
+      + '</div><div class="az-instr">';
+    instr.forEach(function (x, i) {
+      h += '<div class="az-i" style="--d:' + (0.2 + i * 0.12) + 's"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="az-ring0" cx="60" cy="60" r="50"/><circle class="az-ring" cx="60" cy="60" r="50"/>'
+        + '<g class="az-ticks">' + Array.apply(null, Array(24)).map(function (_, k) { return '<line x1="60" y1="6" x2="60" y2="' + (k % 6 ? 11 : 15) + '" transform="rotate(' + (k * 15) + ' 60 60)"/>'; }).join('') + '</g></svg>'
+        + '<div class="az-iz"><b data-az="' + x[0] + '"' + (String(zahl(x[0])).length > 6 ? ' class="lang"' : '') + '>0</b><span>' + esc(x[1]) + '</span></div></div>';   /* v2941a · lange Zahlen kleiner */
+    });
+    h += '</div></div>';
+    var quellen = ['Gutachterausschüsse der Länder', 'Zensus 2022', 'Statistische Ämter', 'BORIS', 'ImmoWertV 2021', 'ImmoWertA', 'BelWertV', 'GrEStG der Länder', 'Kappungsgrenzen-VO', 'Mietpreisbremse-VO'];
+    h += '<div class="az-band"><div class="az-band-k">Quellen an Bord</div><div class="az-lauf"><div>' + quellen.concat(quellen).map(function (q) { return '<span><b>' + esc(q) + '</b></span>'; }).join('') + '</div></div></div>';
+    return h + (weiter ? '<div class="rg-weiter">' + weiter + '</div>' : '') + '</div>';
+  }
+  /* Hochzaehlen beim Einblenden: jede neue .az-t wird einmal animiert */
+  function zaehle(root) {
+    var els = root.querySelectorAll('[data-az]'), t0 = performance.now(), dauer = 2200;
+    (function schritt(t) {
+      var p = Math.min(1, (t - t0) / dauer), e = 1 - Math.pow(1 - p, 3);
+      for (var i = 0; i < els.length; i++) els[i].textContent = zahl(Math.round(Number(els[i].getAttribute('data-az')) * e));
+      if (p < 1) requestAnimationFrame(schritt);
+    })(t0);
+    setTimeout(function () { root.classList.add('an'); }, 30);
+  }
+  try {
+    new MutationObserver(function (ms) {
+      ms.forEach(function (m) { m.addedNodes && Array.prototype.forEach.call(m.addedNodes, function (n) {
+        if (n.nodeType !== 1) return;
+        var t = n.classList && n.classList.contains('az-t') ? n : (n.querySelector && n.querySelector('.az-t'));
+        if (t && !t.__az) { t.__az = true; zaehle(t); }
+      }); });
+    }).observe(document.documentElement, { childList: true, subtree: true });
+  } catch (e) { fehler('az: ' + e.message); }
+
   window.DPSTafeln = {
     gewinnspiel: { aktiv: gwAktiv, sekunden: gwSekunden, html: gewinnspielHtml, url: G && G.url },
-    register: { da: function () { return !!(window.DPS_REGISTER && window.DPS_REGISTER.kopf); }, html: registerHtml, sekunden: 14 }
+    register: { da: function () { return !!(window.DPS_REGISTER && window.DPS_REGISTER.kopf) && !(EIN && EIN.get('register') === false); }, html: registerHtml, sekunden: 14,
+      nach: function () { return Math.max(1, Number(EIN && EIN.get('register_nach')) || 10); } },
+    /* v2937 · DealPilot in Zahlen */
+    app: { da: function () { return !!(window.DPS_APP && window.DPS_APP.zeilen) && !(EIN && EIN.get('app') === false); }, html: appHtml,
+      sekunden: function () { return Math.max(6, Number(EIN && EIN.get('app_sek')) || 16); },
+      nach: function () { return Math.max(1, Number(EIN && EIN.get('app_nach')) || 5); } },
+    aufruf: { an: function () { return !(EIN && EIN.get('aufruf') === false); } },
+    /* v2941 · Amtliche Daten an Bord - laeuft direkt nach „DealPilot in Zahlen", gleicher Schalter */
+    amtlich: { da: function () { return !!(window.DPS_APP && window.DPS_APP.amtlich) && !(EIN && EIN.get('app') === false); }, html: amtlichHtml,
+      sekunden: function () { return Math.max(6, Number(EIN && EIN.get('app_sek')) || 16); } }
   };
 })();

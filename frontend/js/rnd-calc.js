@@ -275,19 +275,15 @@
        9 Punkte -> 34,3 J, 0 Punkte -> 11,75 J). Deckel 70/90 % und die
        Untergrenze RND_MIN bleiben. Kennzeichnung bleibt: sachverstaendig
        zu wuerdigen. */
-      const scheitel = k.b * gnd / (2 * k.a);
-      alterFormel = Math.min(alter, scheitel);
+      /* v2939 · Alter hoechstens GND (ImmoWertA zu Anlage 2, II.5), Marcel 23.10.2026.
+         Bis v2938 bis zum Scheitel fortgefuehrt und dort gehalten (GND 80, 0 P: 11,75 statt 12,0 J). */
+      alterFormel = gnd;
       rohwert = (k.a * alterFormel * alterFormel / gnd) - (k.b * alterFormel) + (k.c * gnd);
       rnd = Math.min(Math.max(0, rohwert), kappe);
       grenze = 'plateau';
       hinweis = 'Das Alter (' + alter + ' Jahre) erreicht oder überschreitet die Gesamtnutzungsdauer ('
-              + gnd + ' Jahre); Anlage 2 regelt diesen Fall nicht. '
-              + (alter > scheitel
-                  ? 'Die Kurve wird auf ihrem Tiefpunkt gehalten (Scheitel bei Alter ' + round2(scheitel)
-                    + ' Jahren) und nicht über den wieder steigenden Ast fortgerechnet. '
-                  : 'Die Kurve ist bis zu ihrem Tiefpunkt (Alter ' + round2(scheitel)
-                    + ' Jahre) fortgeführt und wird dahinter gehalten. ')
-              + 'Die Restnutzungsdauer ist sachverständig zu würdigen.';
+              + gnd + ' Jahre). Nach der ImmoWertA (zu Anlage 2) wird als Alter höchstens die '
+              + 'Gesamtnutzungsdauer angesetzt. Die Restnutzungsdauer ist sachverständig zu würdigen.';
     } else if (relAlter < k.rel) {
       rnd = Math.max(0, gnd - alter); anwendbar = false; grenze = 'unter_schwelle';
       hinweis = 'Relatives Alter ' + round2(relAlter) + ' % liegt unter der Schwelle von '

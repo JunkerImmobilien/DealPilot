@@ -571,7 +571,7 @@
     html += '<a data-q="?idee=alle"' + (ALLE ? ' class="an"' : '') + '><b>A</b>Alle im Wechsel</a><a data-q="auswahl"><b>Esc</b>Zur Auswahl</a>';
     l.innerHTML = html; document.body.appendChild(l);
     var t = null;
-    function zeig() { document.body.classList.add('maus'); clearTimeout(t); t = setTimeout(function () { document.body.classList.remove('maus'); }, 3000); }
+    function zeig() { if (window.DPS_EINST && DPS_EINST.get('leiste') === false) return; document.body.classList.add('maus'); clearTimeout(t); t = setTimeout(function () { document.body.classList.remove('maus'); }, 3000); }
     addEventListener('mousemove', zeig);
     l.addEventListener('click', function (e) {
       var a = e.target.closest('a'); if (!a) return; e.preventDefault();
@@ -593,6 +593,9 @@
     skaliere(); addEventListener('resize', skaliere);
     /* messe-schleife-4: ohne Parameter startet der Rundgang (Marcel 21.10.2026), die Auswahl unter ?idee=auswahl */
     var idee = Q.get('idee');
+    /* messe-schleife-6 · ohne ?idee= gilt der Startkanal aus dem Menü (einstellungen.js) */
+    if (!idee && window.DPS_EINST && DPS_EINST.get('start') && DPS_EINST.get('start') !== 'rundgang') idee = DPS_EINST.get('start');
+    if (idee === 'auswahl') { wahl(); return; }
     if (idee === 'videothek' && window.DealPilotVideothek) {
       document.title = 'DealPilot · Videothek';
       document.body.classList.add('laeuft');

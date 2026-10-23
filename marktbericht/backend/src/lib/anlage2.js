@@ -153,25 +153,29 @@ export function restnutzungsdauer({ gnd, alter, punkte = 0, kernsaniert = false 
      9 Punkte -> 34,3 J, 0 Punkte -> 11,75 J). Deckel 70/90 % und die
      Untergrenze RND_MIN bleiben. Kennzeichnung bleibt: sachverstaendig
      zu wuerdigen. */
+  /* v2939 · ALTER HOECHSTENS GND (ImmoWertA zu Anlage 2, II.5) - Marcel 23.10.2026:
+     „wenn das so ist, kannst du auf die ImmoWertA-Regel umstellen". Bis v2938 lief die
+     Kurve bis zu ihrem Scheitel (Alter = b*GND/(2a), bei jeder Punktzahl hinter der GND)
+     und wurde dort gehalten - GND 80, 0 Punkte: 11,75 statt 12,0 J. Die ImmoWertA setzt
+     als Alter hoechstens die GND an; die Kurve wird also AN DER GND gehalten. Monoton und
+     stetig bleibt es (bis zur GND faellt die Parabel bei jeder Punktzahl). Die drei
+     Gutachten in tools/rnd-pruefung/ liegen alle unter der GND und bleiben unberuehrt. */
   if (A >= G) {
-    const scheitel = t.b * G / (2 * t.a);
-    const Af = Math.min(A, scheitel);
+    const Af = G;
     let rnd = (t.a * Af * Af) / G - t.b * Af + t.c * G;
     const deckel = (kernsaniert ? 0.90 : 0.70) * G;
     if (rnd > deckel) rnd = deckel;
     if (rnd < 0) rnd = 0;
-    const s1 = Math.round(scheitel * 10) / 10;
     return { rnd: Math.round(rnd * 10) / 10,
-             weg: 'Formel Anlage 2, auf dem Scheitel gehalten (Alter ' + s1 + ' J.)',
+             weg: 'Formel Anlage 2, Alter auf die GND begrenzt (' + G + ' J., ImmoWertA zu Anlage 2)',
              grad: grad(p), punkte: p,
              relatives_alter: Math.round(relAlter * 10) / 10,
              grund: 'plateau',
              hinweis: 'Das Alter (' + A + ' Jahre) erreicht oder '
-               + 'überschreitet die Gesamtnutzungsdauer (' + G + ' Jahre); '
-               + 'Anlage 2 regelt diesen Fall nicht. Die Kurve wird auf ihrem '
-               + 'Tiefpunkt (Scheitel bei Alter ' + s1 + ' Jahren) gehalten, '
-               + 'nicht über den wieder steigenden Ast fortgerechnet. Die '
-               + 'Restnutzungsdauer ist sachverständig zu würdigen.' };
+               + 'überschreitet die Gesamtnutzungsdauer (' + G + ' Jahre). '
+               + 'Nach der ImmoWertA (zu Anlage 2) wird als Alter höchstens die '
+               + 'Gesamtnutzungsdauer angesetzt. Die Restnutzungsdauer ist '
+               + 'sachverständig zu würdigen.' };
   }
 
   let rnd;

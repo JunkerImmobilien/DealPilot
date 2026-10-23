@@ -291,11 +291,16 @@
       vergleich_text: 'Ertragswert ' + (T ? 'Zielbild' : 'nach Erhöhung') + ' − heute − Maßnahmen',
       text: alt ? alt + '.' : (zw >= 0 ? 'Die Maßnahmen bringen mehr Ertragswert, als sie kosten.' : 'Die Maßnahmen kosten mehr, als sie an Ertragswert bringen.') });
     /* Marktpreisindikation heute - aus dem Marktbericht, sonst aus der Stufe Bestand; immer mit Abschlag */
-    var mw = W ? W.marktpreisindikation.mitte : B.marktpreisindikation;
-    var ab = W ? W.abschlag_pct : B.mpi_abschlag_pct;
-    var ohne = W ? (W.ohne_abschlag ? W.ohne_abschlag.mitte : null) : B.mpi_ohne_abschlag;
+    /* v2936 · ZUERST DIE STUFE BESTAND. Bis v2935 gewann der gespeicherte Marktbericht -
+       gemessen Parkstr. 9: Kachel 487.000 € „ohne Abschlag" (Bericht vom Oktober, noch ohne
+       Abschlag gerechnet), die Stufen darunter 375.000 € nach 5,8 % Abschlag. Zwei
+       Marktpreisindikationen auf derselben Seite. Der Bericht ist nur noch Rueckfall. */
+    var _bOk = B && B.marktpreisindikation != null;
+    var mw = _bOk ? B.marktpreisindikation : (W ? W.marktpreisindikation.mitte : null);
+    var ab = _bOk ? B.mpi_abschlag_pct : (W ? W.abschlag_pct : null);
+    var ohne = _bOk ? B.mpi_ohne_abschlag : (W ? (W.ohne_abschlag ? W.ohne_abschlag.mitte : null) : null);
     if (mw != null) {
-      var kp = W ? W.kaufpreis : null;
+      var kp = W ? W.kaufpreis : kaufpreis();
       K.push({ schluessel: 'mpi', titel: 'Marktpreisindikation heute', wert: mw, wert_text: eur(mw),
         vergleich_text: (ab > 0 ? 'nach ' + dez(ab, 1) + ' % Abschlag' : 'ohne Abschlag') + (ohne != null && ab > 0 ? ' · ohne ' + eur(ohne) : ''),
         text: 'Aus Angebotspreisen am Ort; der Abschlag holt sie auf gezahlte Kaufpreise' + (kp != null ? '. Dein Kaufpreis ' + eur(kp) + ' liegt ' + dez(Math.abs((kp - mw) / mw * 100), 1) + ' % ' + (kp < mw ? 'darunter' : 'darüber') : '') + '.' });

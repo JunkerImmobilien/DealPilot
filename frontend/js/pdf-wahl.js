@@ -61,7 +61,7 @@
   var WAHLEN = [
     { id: 'bank', titel: 'Bankfassung', unter: 'Weisses Papier, Kennzahlen als Tabelle',
       fuer: 'Bank · Finanzierung · Steuerberater', hell: true, art: 'bank' },
-    { id: 'kurz', titel: 'Kurzfassung', unter: 'Rund vier Seiten, weisses Papier',
+    { id: 'kurz', titel: 'Kurzfassung', unter: 'Fünf bis sechs Seiten, weisses Papier',
       fuer: 'Erstkontakt · Bank · Investor', hell: true, art: 'kurz' },
     { id: 'hell', titel: 'Investment-PDF · hell', unter: 'Volles Dokument, helles Deckblatt',
       fuer: 'Miteigentümer · Partner · Ausdruck', hell: true, art: 'voll' },
