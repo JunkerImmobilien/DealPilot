@@ -1,7 +1,7 @@
 {
- "stand": "2026-10-22",
- "saetze": 10713,
- "dateien": 101,
+ "stand": "2026-10-23",
+ "saetze": 10836,
+ "dateien": 104,
  "befunde": {
   "berlin.json": {},
   "bodenpreise-nrw.json": {},
@@ -103,7 +103,7 @@
    "modellansaetze.baupreisindex fehlt als Zahl": 36
   },
   "swf-he.json": {
-   "modellansaetze.baupreisindex fehlt als Zahl": 19,
+   "modellansaetze.baupreisindex fehlt als Zahl": 15,
    "modellansaetze.gnd_jahre fehlt als Zahl": 2
   },
   "swf-hh-2026-sperren.json": {},
@@ -112,11 +112,14 @@
    "modellansaetze.gnd_jahre fehlt als Zahl": 7,
    "modellansaetze.baupreisindex fehlt als Zahl": 7
   },
+  "swf-ni-nom-2026.json": {},
+  "swf-ni-ol-2026.json": {},
   "swf-ni-sh-rp-sl-2026.json": {
    "stichtag fehlt": 4,
    "modellansaetze.gnd_jahre fehlt als Zahl": 4,
    "modellansaetze.baupreisindex fehlt als Zahl": 4
   },
+  "swf-ni-sperren-2026.json": {},
   "swf-ni.json": {},
   "swf-nrw.json": {
    "stichtag fehlt": 19,
@@ -137,7 +140,7 @@
    "modellansaetze.gnd_jahre fehlt als Zahl": 3
   },
   "swf-nw-he-2026-block4.json": {
-   "modellansaetze.baupreisindex fehlt als Zahl": 25,
+   "modellansaetze.baupreisindex fehlt als Zahl": 21,
    "modellansaetze.gnd_jahre fehlt als Zahl": 5
   },
   "swf-rp.json": {
