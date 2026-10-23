@@ -168,7 +168,8 @@ function bestandsBasis(basis, wl) {
     }
     if (!(qm > 0)) return null;
     return { wfl, ist, ist_qm: istQm, qm, herkunft, roh: herkunft === 'ist_im_band' ? ist : qm * wfl * 12,   /* v2541 · im Band die Vertragsmiete */
-             kappe: band && band.oben_qm > 0 ? band.oben_qm * wfl * 12 : Infinity };
+             kappe: band && band.oben_qm > 0 ? band.oben_qm * wfl * 12 : Infinity,
+             band, markt };   /* v2936 · fuer die Bandregel der Stufenmiete */
   });
   const summeRoh = zeilen.reduce((a, z) => a + (z ? z.roh : 0), 0);
   if (!(summeRoh > 0) || !(rB > 0)) return null;
@@ -202,7 +203,19 @@ function stufenMiete(z, w, s) {
   if (m == null || !(m > z.ist)) return z.basis;           /* keine Anhebung -> Basis */
   /* leer: max(Basis, Stufenmiete); vermietet: die Mehrmiete gegen die eigene gepruefte Miete */
   const bezug = z.herkunft === 'leer_marktueblich' ? z.basis : z.roh;
-  return z.basis + Math.max(0, Math.min(m, z.kappe) - bezug);
+  /* v2936 · DIESELBE BANDREGEL WIE IM BESTAND (E1, v2600). Bis v2935 kappte die
+     Stufe an der oberen Bandkante, der Bestand setzt ueber dem Band aber den
+     Anker (die marktuebliche Miete) an. Gemessen Parkstr. 9: alle fuenf Wohnungen
+     ueber dem Band (6,41-9,50 €/m², Band 3,71-5,57, Anker 4,64) - die Mieterhoehung
+     hob jede auf die Kante 5,57 und ergab 186.000 statt 159.000 € Ertragswert,
+     ohne dass eine marktuebliche Miete stieg. Jetzt: die Stufenmiete je m² laeuft
+     durch mieteNachBand - im Band zaehlt sie, ausserhalb gilt der Anker. */
+  let stufeRoh = Math.min(m, z.kappe);
+  if (z.wfl > 0 && (z.band || z.markt)) {
+    const r = mieteNachBand(r2(m / 12 / z.wfl), z.band, z.markt);
+    stufeRoh = r.fuehrt ? m : (Number(r.qm) > 0 ? r.qm * z.wfl * 12 : stufeRoh);
+  }
+  return z.basis + Math.max(0, stufeRoh - bezug);
 }
 
 function eineStufe(basis, ref, basisKern, miete, plus, kosten) {
@@ -615,8 +628,9 @@ export const PotenzialService = {
         markt_qm: zahl(basis.markt_qm),
         hinweis: 'Alle Stufen bauen auf der Miete des Bestands auf: je Wohnung die Ist-Miete im Band der Marktüblichkeit'
           + (basis.miete_band ? ' (' + pctQm(basis.miete_band.unten_qm) + ' bis ' + pctQm(basis.miete_band.oben_qm) + ')' : '')
-          + ', darunter oder darüber die Bandkante' + (leer ? ', leere Wohnungen mit dem Teil des Bestands-Rohertrags, der danach bleibt (höchstens die marktübliche Miete)' : '')
-          + '. Mieterhöhung und Zielbild rechnen die Mehrmiete der Wohnung hinzu, oberhalb des Bandes nichts.',
+          + ', darunter oder darüber die marktübliche Miete' + (zahl(basis.markt_qm) ? ' (' + pctQm(zahl(basis.markt_qm)) + ')' : '')
+          + (leer ? ', leere Wohnungen mit dem Teil des Bestands-Rohertrags, der danach bleibt (höchstens die marktübliche Miete)' : '')
+          + '. Mieterhöhung und Zielbild rechnen die Mehrmiete der Wohnung hinzu, soweit die neue Miete im Band liegt; außerhalb gilt auch dort die marktübliche Miete.',   /* v2936 · bis v2935 stand hier "die Bandkante" (vor v2600) */
       };
     }
 
