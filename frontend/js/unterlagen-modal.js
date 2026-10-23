@@ -472,9 +472,37 @@
     try {
       var r = await _api('/amt', {
         method: 'POST',
+        timeout: 30000,
         body: { art: art, plz: o.plz, ort: o.ort, strasse: o.strasse,
                 erzwingen: Boolean(_amtJeArt[art]) }
       });
+      /* v2920 · Dauert die Recherche länger als ~10 s, antwortet der
+         Server mit einem Auftrag statt zu warten (vorher brach
+         Auth.apiCall nach 15 s mit „Anfrage-Timeout" ab, während der
+         Server weiterrechnete). Hier wird nachgefragt, bis das Ergebnis
+         da ist — höchstens vier Minuten. */
+      if (r && r.laeuft && r.auftrag) {
+        var t0 = Date.now(), fehlversuche = 0;
+        while (r && r.laeuft) {
+          if (Date.now() - t0 > 240000) {
+            if (ziel) ziel.innerHTML = '<span style="color:var(--warn,#D8954C)">'
+              + 'Die Recherche dauert ungewöhnlich lange. Sie läuft auf dem Server '
+              + 'weiter — öffne die Unterlagen in ein paar Minuten noch einmal, '
+              + 'dann steht das Ergebnis hier.</span>';
+            return;
+          }
+          await new Promise(function (ok) { setTimeout(ok, 3000); });
+          if (ziel) ziel.innerHTML = 'Recherche auf den amtlichen Seiten läuft … '
+            + Math.round((Date.now() - t0) / 1000 + 10) + ' s';
+          try {
+            r = await _api('/amt/auftrag/' + encodeURIComponent(r.auftrag), { timeout: 15000 });
+            fehlversuche = 0;
+          } catch (e2) {
+            if (/liegt nicht mehr vor/.test(e2.message || '')) throw e2;
+            if (++fehlversuche >= 4) throw e2;
+          }
+        }
+      }
       if (!r.gefunden) {
         if (ziel) ziel.innerHTML = '<span style="color:var(--bad,#D8564C)">'
           + _esc(r.grund || 'nicht gefunden') + '</span>';
@@ -488,8 +516,15 @@
           : (r.amt.beleg_ok ? '✓ Amt ermittelt und belegt' : '⚠ Amt ermittelt, Adresse nicht belegt'));
       }
     } catch (e) {
+      /* v2920 · Nie die Technik-Meldung zeigen („Server antwortet nicht
+         rechtzeitig") — der Nutzer kann damit nichts anfangen. */
+      var msg = String((e && e.message) || e || '');
+      if (/Anfrage-Timeout|nicht erreichbar/i.test(msg)) {
+        msg = 'Die Verbindung zum Server ist abgerissen. Die Recherche läuft dort '
+          + 'gegebenenfalls weiter — öffne die Unterlagen gleich noch einmal.';
+      }
       if (ziel) ziel.innerHTML = '<span style="color:var(--bad,#D8564C)">'
-        + _esc(e.message || e) + '</span>';
+        + _esc(msg) + '</span>';
     } finally { _laeuft[art] = false; }
   }
 

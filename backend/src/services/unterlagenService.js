@@ -349,6 +349,70 @@ function istLokal(url) {
   } catch (e) { return true; }
 }
 
+/* ══ v2920 · EIN HOST, DER NICHT ANTWORTET, WIRD NICHT ZWEIMAL GEFRAGT ══
+ *
+ * Gemessen am 23.10.2026 vom Staging-Server: www.justiz.nrw.de und
+ * www.justiz.nrw nehmen keine TCP-Verbindung an (connect timeout), die
+ * Gerichtsseiten www.ag-<ort>.nrw.de antworten in 0,1 s. Die Websuche
+ * nennt für das Grundbuch aber fast immer justiz.nrw.de als Quelle — jede
+ * Recherche wartete dort 12 s (Quellseite) plus 8 s (weitere Seiten).
+ * Ein Host, der mit Zeitüberschreitung oder Verbindungsfehler ausfiel,
+ * wird 30 Minuten übersprungen. Eine Seite, die mit HTTP 404 antwortet,
+ * ist erreichbar und wird NICHT gesperrt. */
+const _hostAus = new Map();
+const HOST_SPERRE_MS = 30 * 60 * 1000;
+function _host(url) { try { return new URL(url).hostname.toLowerCase(); } catch (e) { return ''; } }
+function hostGesperrt(url) {
+  const t = _hostAus.get(_host(url));
+  return Boolean(t && t > Date.now());
+}
+function hostAusfallMerken(url, e) {
+  const code = String((e && e.cause && e.cause.code) || '');
+  const name = String((e && e.name) || '');
+  if (name === 'TimeoutError' || name === 'AbortError'
+      || /ETIMEDOUT|ECONNREFUSED|ECONNRESET|ENOTFOUND|EAI_AGAIN|UND_ERR_CONNECT/.test(code)) {
+    const h = _host(url);
+    if (h) _hostAus.set(h, Date.now() + HOST_SPERRE_MS);
+  }
+}
+
+/* ══ v2920 · DIE EIGENE SEITE DES AMTS MITLESEN ════════════════════════
+ *
+ * Die Websuche nennt die Adresse oft richtig (poststelle@ag-bielefeld.nrw.de)
+ * und als Quelle eine Landesseite, die vom Server aus nicht erreichbar ist —
+ * dann blieb die Adresse „nicht belegt", obwohl sie wörtlich auf der Seite
+ * des Gerichts steht. Gelesen werden deshalb zusätzlich die Startseite der
+ * Domain der Adresse und, bei den Gerichten in NRW (www.ag-/lg-/olg-<ort>.
+ * nrw.de, alle nach demselben Baukasten), die Kontaktseite mit dem
+ * E-Mail-Hinweis. Ein Fund dort ist ein Beleg auf einer amtlichen Seite
+ * derselben Behörde, nicht auf der Quellseite — `belegSeiten` nennt die
+ * Seite, auf der er stand. */
+function eigeneSeitenDerAdresse(email) {
+  const m = _s(email).toLowerCase().match(/@([a-z0-9.-]+\.[a-z]{2,})$/);
+  if (!m) return [];
+  const dom = m[1];
+  if (istGewerblich('https://' + dom + '/')) return [];
+  const basis = 'https://' + (dom.startsWith('www.') ? dom : 'www.' + dom);
+  const out = [basis + '/'];
+  if (/^(ag|lg|olg)-[a-z0-9-]+\.nrw\.de$/.test(dom)) {
+    out.unshift(basis + '/kontakt/email_hinweis/index.php', basis + '/kontakt/index.php');
+  }
+  return out;
+}
+
+/* ══ v2920 · DIE GEBÜHR DES GRUNDBUCHAUSDRUCKS STEHT IM GESETZ ══════════
+ *
+ * Sie kam bisher aus der Websuche und lautete mal „10 €", mal „email",
+ * mal gar nichts. Sie ist bundesweit gleich: GNotKG KV Nr. 17000
+ * (Ausdruck 10 €) und 17001 (amtlicher Ausdruck 20 €). */
+const GRUNDBUCH_GEBUEHR = 'Ausdruck 10 €, amtlicher (beglaubigter) Ausdruck 20 € '
+  + '(GNotKG KV 17000/17001).';
+/* Gilt auch für Sätze, die vor v2920 mit der Gebühr aus der Websuche
+   abgelegt wurden — gelesen wird immer die Zahl aus dem Gesetz. */
+function gebuehrNachGesetz(a) {
+  return (a && a.art === 'grundbuch') ? Object.assign({}, a, { gebuehr: GRUNDBUCH_GEBUEHR }) : a;
+}
+
 /* ══ v2440 · GEMEINDEWEITE SAETZE ═══════════════════════════════════════
  *
  * `gemeinde_schluessel` ist „PLZ-Ort". Eine Großstadt hat dreißig
@@ -680,6 +744,9 @@ async function belegPruefen(email, quelleUrl) {
   /* v2440 · keine internen Adressen (siehe istLokal) */
   if (istLokal(quelleUrl)) return { ok: false, grund: 'die Quelle ist keine öffentliche Adresse' };
   let text = '';
+  if (hostGesperrt(quelleUrl)) {
+    return { ok: false, grund: 'Quelle nicht erreichbar (Server antwortet seit Kurzem nicht, übersprungen)' };
+  }
   try {
     const a = await fetch(quelleUrl, {
       redirect: 'follow',
@@ -689,6 +756,7 @@ async function belegPruefen(email, quelleUrl) {
     if (!a.ok) return { ok: false, grund: 'Quelle antwortete mit HTTP ' + a.status };
     text = (await a.text()).toLowerCase();
   } catch (e) {
+    hostAusfallMerken(quelleUrl, e);
     return { ok: false, grund: 'Quelle nicht erreichbar: ' + (e.message || e) };
   }
   /* ══ v2151 · VOLLSTAENDIG VERGLEICHEN, NICHT IN TEILEN ═══════════════
@@ -744,7 +812,7 @@ async function belegPruefen(email, quelleUrl) {
  */
 async function belegSeiten(email, urls) {
   const seiten = [...new Set((urls || []).map(_link).filter(Boolean))]
-    .filter(function (u) { return !istGewerblich(u) && !istLokal(u); })
+    .filter(function (u) { return !istGewerblich(u) && !istLokal(u) && !hostGesperrt(u); })
     .slice(0, 6);
   if (!seiten.length) return { bestaetigt: false, alle: [], alternativen: [], pro_seite: [], texte: {} };
   /* v2440 · Der lesbare Text je Seite, fuer die Namenspruefung in
@@ -766,7 +834,7 @@ async function belegSeiten(email, urls) {
       const roh = (await a.text()).slice(0, 2e6);
       texte[url] = seitenText(roh);
       return mailsAufSeite(roh);
-    } catch (e) { return []; }
+    } catch (e) { hostAusfallMerken(url, e); return []; }
   }));
   const alle = [...new Set(funde.flat())];
   const adr = _s(email).toLowerCase();
@@ -1045,13 +1113,13 @@ async function amtHolen(userId, art, ort, opts = {}) {
       `SELECT * FROM unterlagen_aemter WHERE gemeinde_schluessel = $1 AND art = $2`,
       [schluessel, art]);
     if (vorhanden.rows.length) {
-      return { gefunden: true, aus_register: true, amt: vorhanden.rows[0] };
+      return { gefunden: true, aus_register: true, amt: gebuehrNachGesetz(vorhanden.rows[0]) };
     }
     /* v2440 · Danach der gemeindeweite Satz — nur im passenden
        PLZ-Leitbereich (siehe gemeindeweitFuer). */
     const weit = await gemeindeweitFuer(ort.plz, ort.ort, art);
     if (weit.length) {
-      return { gefunden: true, aus_register: true, gemeindeweit: true, amt: weit[0] };
+      return { gefunden: true, aus_register: true, gemeindeweit: true, amt: gebuehrNachGesetz(weit[0]) };
     }
   }
 
@@ -1087,6 +1155,7 @@ async function amtHolen(userId, art, ort, opts = {}) {
       _beleg_quelle: alt.quelle_url || null
     };
   }
+  if (art === 'grundbuch') gefunden.gebuehr = GRUNDBUCH_GEBUEHR;
 
   const beleg = await belegPruefen(gefunden.email, gefunden._beleg_quelle || gefunden.quelle_url);
 
@@ -1118,7 +1187,7 @@ async function amtHolen(userId, art, ort, opts = {}) {
        weiteren): die Namenspruefung der Ansprechpersonen braucht ihren
        Text, und ohne sie stand die Quellseite nie in pro_seite. */
     const bq = gefunden._beleg_quelle || gefunden.quelle_url;
-    const weitere = [bq, gefunden.quelle_url].concat(gefunden.seiten || [])
+    const weitere = [bq].concat(eigeneSeitenDerAdresse(gefunden.email), [gefunden.quelle_url], gefunden.seiten || [])
       .filter(function (u, i, l) { return u && l.indexOf(u) === i; });
     if (gefunden.email && weitere.length) {
       belegDetail = await belegSeiten(gefunden.email, weitere);
@@ -1310,7 +1379,8 @@ async function aemterFuer(plz, ort) {
   let weit = [];
   try { weit = await gemeindeweitFuer(plz, ort); } catch (e) { weit = []; }
   return r.rows.concat(weit.filter(function (a) { return !da[a.art]; })
-    .map(function (a) { return Object.assign({}, a, { gemeindeweit: true }); }));
+    .map(function (a) { return Object.assign({}, a, { gemeindeweit: true }); }))
+    .map(gebuehrNachGesetz);
 }
 
 /* ═══ v2470 · DER VORGANG: ENTWURF ABLEGEN, STATUS SETZEN ════════════════
