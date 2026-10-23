@@ -407,7 +407,7 @@ function collectData() {
       + State.kpis._fuer + ', geladen ist ' + window._currentObjKey);
     /* Was schon am Objekt steht, bleibt — es ist aelter, aber es gehoert
        diesem Objekt. Ueberschrieben wird nur mit einer passenden Rechnung. */
-    ['_kpis_bmy','_kpis_cf_ns','_kpis_cf_vs','_kpis_dscr','_kpis_ltv','_kpis_bwk_y',
+    ['_kpis_bmy','_kpis_cf_ns','_kpis_cf_vs','_kpis_dscr','_kpis_ltv','_kpis_bwk_y','_kpis_miete_j','_kpis_nmy',
      /* v1898: die zwei neuen Bewirtschaftungs-Kennzahlen gehoeren in DIESE
         Rettungsliste. Sie steht hier, weil collectData() ein frisches {} aus
         der FIELDS-Whitelist baut und das Backend `data` als VOLLEN Ersatz
@@ -424,6 +424,12 @@ function collectData() {
     d._kpis_cf_vs = State.kpis.cf_op;  /* v487-cfvs: CF vor Steuer (Jahr) fuers Cockpit */
     d._kpis_dscr = State.kpis.dscr;
     d._kpis_ltv = State.kpis.ltv;       // V110: LTV mitspeichern für Sidebar-Toggle DSCR↔LTV
+    /* v2931 · Jahresmiete und Nettomietrendite: ankauf.js (KENNZAHLEN), die
+       Kartenrueckseite (doppelkarte.js) und der Portfolio-Export lesen beide
+       Felder, geschrieben hat sie niemand - gemessen 23.10.2026, im Ankauf-
+       Vergleich fehlten die zwei Zeilen still. */
+    if (State.kpis.nkm_j != null && isFinite(State.kpis.nkm_j)) d._kpis_miete_j = State.kpis.nkm_j;
+    if (State.kpis.nmy != null && isFinite(State.kpis.nmy)) d._kpis_nmy = State.kpis.nmy;
     d._kpis_bwk_y = (State.kpis && State.kpis.bwk != null) ? Math.abs(State.kpis.bwk) : 0; /*v899b-bwk: volle BWK Gesamt/Jahr (State.kpis.bwk) statt Y1-anteilig*/
     /* ── v1898 · DIE BEWIRTSCHAFTUNG, DIE DAS COCKPIT BRAUCHT ──────────────
      *
@@ -766,6 +772,8 @@ function loadData(d) {
       _o351._kpis_cf_vs = State.kpis.cf_op;  /* v487-cfvs */
       _o351._kpis_dscr = State.kpis.dscr;
       _o351._kpis_ltv  = State.kpis.ltv;
+      if (State.kpis.nkm_j != null && isFinite(State.kpis.nkm_j)) _o351._kpis_miete_j = State.kpis.nkm_j;   /* v2931 */
+      if (State.kpis.nmy != null && isFinite(State.kpis.nmy)) _o351._kpis_nmy = State.kpis.nmy;
       if (typeof DealScore !== 'undefined' && typeof DealScore.compute === 'function') {
         var _dp351 = DealScore.compute();
         if (_dp351 && _dp351.score) _o351._dealpilot_score = Math.round(_dp351.score);

@@ -57,8 +57,20 @@ if (!A || typeof A.abweichungFuer !== 'function') {
 }
 console.log('Modul geladen: ' + Object.keys(A).length + ' Exporte');
 melde(typeof A.abweichung === 'function', 'abweichung() gibt es weiterhin');
-melde(Array.isArray(A.KENNZAHLEN) && A.KENNZAHLEN.length === 9,
-  'KENNZAHLEN hat 9 Eintraege (ist: ' + (A.KENNZAHLEN || []).length + ')');
+/* v2931 · seit v2160/v2216e sind es 18 (Steuerwirkung, Miete je m², Leere
+   Einheiten, Kosten, Instandhaltung, Zins, CF v. St., Gebaeudeanteil, AfA). */
+melde(Array.isArray(A.KENNZAHLEN) && A.KENNZAHLEN.length === 18,
+  'KENNZAHLEN hat 18 Eintraege (ist: ' + (A.KENNZAHLEN || []).length + ')');
+
+/* v2931 · Drei Kennzahlen werden in _kurzfassung() ABGELEITET, nicht gelesen -
+   sie bewegen sich nur ueber ihre Quellfelder. Bis v2930 setzte der Pruefer
+   sie direkt und meldete 5 Schein-Fehler. */
+const ABGELEITET = {
+  _steuerwirkung: (o, w) => { o._kpis_cf_vs = 0; o._kpis_cf_ns = w; },
+  _nkm_qm: (o, w) => { o.nkm = w * 100; o.wfl = 100; },
+  _leer_einheiten: (o, w) => { o._mfh = { einheiten: Array.from({ length: 100 }, (_, i) => ({ status: i < w ? 'leer' : 'vermietet' })) }; }
+};
+function mitWert(o, schluessel, w) { if (ABGELEITET[schluessel]) ABGELEITET[schluessel](o, w); else o[schluessel] = w; return o; }
 
 /* ── 1 · Kein Ankauf-Stand heisst null, nicht Absturz ─────────────── */
 console.log('\n=== 1 · Objekte ohne Ankauf-Stand ===');
@@ -79,8 +91,8 @@ for (const k of A.KENNZAHLEN) {
   const kurz = {};
   /* Alle anderen gleich halten, damit nur EINE Kennzahl sich bewegt */
   for (const kk of A.KENNZAHLEN) { basis[kk.schluessel] = 50; kurz[kk.schluessel] = 50; }
-  const hoch = Object.assign({}, basis, { [k.schluessel]: 60, _ankauf: { kurz: Object.assign({}, kurz), stichtag: '2024-01-01' } });
-  const tief = Object.assign({}, basis, { [k.schluessel]: 40, _ankauf: { kurz: Object.assign({}, kurz), stichtag: '2024-01-01' } });
+  const hoch = mitWert(Object.assign({}, basis, { _ankauf: { kurz: Object.assign({}, kurz), stichtag: '2024-01-01' } }), k.schluessel, 60);
+  const tief = mitWert(Object.assign({}, basis, { _ankauf: { kurz: Object.assign({}, kurz), stichtag: '2024-01-01' } }), k.schluessel, 40);
   const rH = A.abweichungFuer(hoch), rT = A.abweichungFuer(tief);
   const zH = (rH.zeilen || []).find((z) => z.wort === k.wort);
   const zT = (rT.zeilen || []).find((z) => z.wort === k.wort);
@@ -98,7 +110,10 @@ for (const k of A.KENNZAHLEN) {
 console.log('\n=== 3 · Die zwei UMGEKEHRTEN, einzeln benannt ===');
 const umgekehrt = A.KENNZAHLEN.filter((k) => k.besser === 'kleiner').map((k) => k.wort);
 console.log('    ' + umgekehrt.join(', '));
-melde(umgekehrt.length === 2, 'genau zwei Kennzahlen sind "kleiner ist besser" (ist: ' + umgekehrt.length + ')');
+/* v2931 · sechs, seit v2216e: Kaufpreis, LTV, Leere Einheiten, Kosten, Instandhaltung, Zins */
+const SOLL_UMGEKEHRT = ['Kaufpreis', 'LTV', 'Leere Einheiten', 'Nicht umlagefähige Kosten p. a.', 'Instandhaltung p. a.', 'Zinssatz'];
+melde(umgekehrt.length === SOLL_UMGEKEHRT.length && SOLL_UMGEKEHRT.every((w) => umgekehrt.includes(w)),
+  'genau diese sechs sind "kleiner ist besser": ' + SOLL_UMGEKEHRT.join(', ') + ' (ist: ' + umgekehrt.length + ')');
 melde(umgekehrt.includes('Kaufpreis'), 'Kaufpreis ist dabei');
 melde(umgekehrt.includes('LTV'), 'LTV ist dabei');
 

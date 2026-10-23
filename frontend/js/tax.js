@@ -27,6 +27,13 @@
   window._scheduleTaxSnapshotPost = function(wkPerYear) {
     if (!window._currentObjKey || !window.Auth || typeof window.Auth.apiCall !== 'function') return;
     if (!wkPerYear || typeof wkPerYear !== 'object') return;
+    /* v2931 · In der Soll-Ansicht (Ankauf-Stand) rechnet die App mit dem
+       eingefrorenen Datensatz. Gemessen 23.10.2026: auch dort ging der POST
+       raus, und die Jahresergebnisse des ANKAUFS standen als Bestand auf dem
+       Server - fuer die Verlustverrechnung der anderen Objekte und das
+       Cockpit, bis jemand zurueck auf Ist schaltet. Die Ansicht ist nur
+       Anzeige; geschrieben wird nur das Ist. */
+    try { if (window.DealPilotAnkaufAnsicht && DealPilotAnkaufAnsicht.aktiv()) return; } catch (e) {}
     var key = window._currentObjKey;
     if (_timer && _pendingKey && _pendingKey !== key) {
       clearTimeout(_timer); _timer = null;
