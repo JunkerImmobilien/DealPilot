@@ -4004,6 +4004,21 @@
     o.innerHTML = '<iframe title="PDF" style="width:100%;height:100%;border:0" src="' + u + '#page=' + n + '&toolbar=0&navpanes=0&view=FitH' + (oben ? ',' + oben : '') + '"></iframe>';
     await warte(4000);
   }
+  /* v2940 · SEITE NACH UEBERSCHRIFT, NICHT NACH NUMMER. Gemessen bei der Neuaufnahme
+     23.10.2026: die Bankfassung hat inzwischen 11 statt 8 Seiten - Szene 8 zeigte die
+     Exit-Seite unter „Belastungsprobe", Szene 9 „Wertpotenzial" unter „Annahmen".
+     Die Textbausteine des PDFs (_r19.tok) stehen in Seitenreihenfolge; jede Seite endet
+     mit ihrer Fusszeile „Seite n von m". Gesucht wird die erste Seite, auf der ein
+     Baustein auf das Muster passt; ohne Treffer gilt die alte Nummer. */
+  function r19SeiteVon(muster, ersatz) {
+    var T = _r19.tok || [], seite = 1;
+    for (var i = 0; i < T.length; i++) {
+      var m = /Seite (\d+) von \d+/.exec(T[i]);
+      if (m) { seite = Number(m[1]) + 1; continue; }
+      if (muster.test(T[i])) return seite;
+    }
+    return ersatz;
+  }
   function r19K() { return (window.State && State.kpis) || {}; }
   function r19Pz(n, st) { return n == null || !isFinite(n) ? '–' : de(n, st == null ? 2 : st) + ' %'; }
   DREHBUECHER['reihe-bankpdf'] = {
@@ -4065,7 +4080,7 @@
       },
       async function (s) {   /* 7 · Vermögen und Exit */
         if (!_r19.bank) return;
-        await r19Seite(_r19.bank, 6);
+        await r19Seite(_r19.bank, r19SeiteVon(/^VERM.{1,3}GENSAUFBAU/, 6));   /* v2940 */
         var K = r19K();
         /* aus dem PDF gelesen, nicht aus den Kennzahlen: der Exit dort rechnet mit eigener Haltedauer */
         var T = _r19.tok || [], iw = T.indexOf('Angenommene Wertsteigerung p. a.'), ws = iw >= 0 ? T[iw + 1] : null;
@@ -4073,12 +4088,12 @@
       },
       async function (s) {   /* 8 · Belastungsprobe */
         if (!_r19.bank) return;
-        await r19Seite(_r19.bank, 7);
+        await r19Seite(_r19.bank, r19SeiteVon(/^BELASTUNGSPROBE/, 7));   /* v2940 */
         await b2oZeile(s, 'Die Belastungsprobe', 'Der DSCR, wenn der Zins steigt oder die Miete fällt — genau die Frage, die jede Bank stellt. Die Antwort steht schon drin.');
       },
       async function (s) {   /* 9 · Annahmen */
         if (!_r19.bank) return;
-        await r19Seite(_r19.bank, 8);
+        await r19Seite(_r19.bank, r19SeiteVon(/^ANNAHMEN$/, 8));   /* v2940 */
         await b2oZeile(s, 'Annahmen und Hinweise', 'Mietsteigerung, Kostensteigerung, Wertentwicklung: jede Annahme steht offen da. Was fehlt, ist ein Strich — keine Null.');
       },
       async function (s) {   /* 10 · was die Bank bekommt */

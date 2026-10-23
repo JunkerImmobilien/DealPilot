@@ -1887,7 +1887,7 @@
       + '(Mietentwicklung, Bewirtschaftungskosten, Zins und Tilgung). Sie sind eine Kalkulation, kein '
       + 'Wertgutachten nach § 194 BauGB und keine Anlage- oder Finanzierungsberatung. Der LTV bezieht sich auf '
       + (S.ltv_basis_label || 'die angegebene Bezugsgröße') + '.';
-    if (KURZ) hinweis += ' Kurzfassung: die Bankfassung enthält zusätzlich die Bewirtschaftung im Einzelnen, die drei Finanzierungsphasen, den Cashflow je Jahr, die Mieterliste, das Wertpotenzial je Wohnung, die Diagramme, die Belastungsprobe und den Vermögenszuwachs im Detail.';
+    if (KURZ) hinweis += ' Kurzfassung: die Bankfassung enthält zusätzlich die Bewirtschaftung im Einzelnen, die drei Finanzierungsphasen, den Cashflow je Jahr, die Mieterliste, das Wertpotenzial je Wohnung, die Diagramme, die Belastungsprobe und den Vermögenszuwachs im Detail. Finanzierung, Kennzahlen und Annahmen stehen hier vollständig.';   /* v2940 */
     absatz(hinweis, KURZ ? { groesse: 7.4, farbe: 90, zeile: 3.7 } : { groesse: 8.4, farbe: 60, zeile: 4.4 });   /* v2530 */
     }
 
