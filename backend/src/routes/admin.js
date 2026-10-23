@@ -1428,6 +1428,31 @@ router.post('/tickets/:id/reply', requireAdmin, _tkUpload, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+/* ── v2935 · Support-Einstufung, Fehler-Backlog, Rueckfrage ────────────── */
+router.get('/fehler-backlog', requireAdmin, async (req, res) => {
+  try { res.json({ eintraege: await require('../services/supportEinstufung').backlogListe(req.query.status || 'offen') }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.post('/tickets/:id/einstufen', requireAdmin, async (req, res) => {
+  try { res.json(await require('../services/supportEinstufung').einstufen(req.params.id)); }
+  catch (e) { res.status(502).json({ error: 'Einstufung fehlgeschlagen: ' + e.message }); }
+});
+router.post('/tickets/:id/fehler-backlog', requireAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const r = await require('../services/supportEinstufung').backlogSetzen(req.params.id, b.status === '' ? null : b.status, b.commit);
+    if (r.error) return res.status(400).json(r);
+    res.json(r);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.post('/tickets/:id/rueckfrage-verwerfen', requireAdmin, async (req, res) => {
+  try {
+    const { query } = require('../db/pool');
+    await query(`UPDATE support_tickets SET rueckfrage_status = 'verworfen' WHERE id = $1 AND rueckfrage_status = 'entwurf'`, [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 router.post('/tickets/:id/status', requireAdmin, async (req, res) => {
   try {
     const r = await supportService.setStatus({ ticketId: req.params.id, status: (req.body && req.body.status) });
