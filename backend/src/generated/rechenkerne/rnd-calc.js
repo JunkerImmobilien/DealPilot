@@ -892,6 +892,12 @@
   function estimateGrenzsteuersatz(zve) {
     const z = Number(zve) || 0;
     let satz;
+    /* v2891: der Satz der ganzen Last aus tax.js (Soli mit Freigrenze und
+       Milderungszone, Kirchensteuer, Splitting aus den Steuerangaben) - hier
+       stand Soli pauschal ab 96.000 EUR zvE. */
+    if (typeof Tax !== 'undefined' && Tax && typeof Tax.grenzsatzGesamt === 'function') {
+      return Tax.grenzsatzGesamt(z);
+    }
     if (typeof Tax !== 'undefined' && Tax && typeof Tax.calcGrenzsteuersatz === 'function') {
       satz = Tax.calcGrenzsteuersatz(z);
     } else {
