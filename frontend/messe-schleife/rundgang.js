@@ -88,10 +88,11 @@
     gewinn1:   { art: 'gewinnspiel', dauer: 15 },
     gewinn2:   { art: 'gewinnspiel', dauer: 15 },
     /* v2937 · DealPilot in Zahlen (tafeln.js, Daten aus app-zahlen.js) */
-    app:       { art: 'app', dauer: 16 }
+    app:       { art: 'app', dauer: 16 },
+    amtlich:   { art: 'amtlich', dauer: 16 }   /* v2941 */
   };
   var FOLGE = ['T:start', 'quickcheck', 'immometrica', 'T:gewinn1', 'mfh', 'T:bewerten', 'marktbericht', 'T:register', 'score', 'pilot',
-    'T:aufruf1', 'finanzierung', 'bank', 'T:gewinn2', 'steuer', 'T:wachsen', 'zielbild', 'portfolio', 'T:app', 'telegram', 'T:aufruf2'];
+    'T:aufruf1', 'finanzierung', 'bank', 'T:gewinn2', 'steuer', 'T:wachsen', 'zielbild', 'portfolio', 'T:app', 'T:amtlich', 'telegram', 'T:aufruf2'];
 
   /* Schritte: Tafel oder ein Ausschnitt (Stück) eines Abschnitts. */
   var SCHRITTE = [];
@@ -202,6 +203,7 @@
     if (t.art === 'register') return T && T.register.da() ? T.register.html(null) : null;
     if (t.art === 'gewinnspiel') return T && T.gewinnspiel.aktiv() ? T.gewinnspiel.html(null, T.gewinnspiel.sekunden() / RATE) : null;
     if (t.art === 'app') return T && T.app && T.app.da() ? T.app.html(null, T.app.sekunden() / RATE) : null;
+    if (t.art === 'amtlich') return T && T.amtlich && T.amtlich.da() ? T.amtlich.html(null, T.amtlich.sekunden() / RATE) : null;
     if (t.art === 'aufruf' && T && T.aufruf && !T.aufruf.an()) return null;
     var weiter = t.weiter ? '<div class="rg-weiter">Als Nächstes · <b>' + BLOECKE[t.weiter] + '</b></div>' : '';
     if (t.art === 'marke') return '<div class="rg-t rg-t-marke"><div class="rg-bahn"><span class="rg-flieger">' + FLIEGER + '</span></div>'
@@ -286,7 +288,7 @@
           log('tafel', s.id);
           zeigeTafel(s.t, html);
           if (!vorbereitet) { var j = naechstesStueck(i); if (j >= 0) vorbereiten(j); }
-          var dauer = s.t.art === 'gewinnspiel' ? window.DPSTafeln.gewinnspiel.sekunden() : (s.t.art === 'app' ? window.DPSTafeln.app.sekunden() : s.t.dauer);
+          var dauer = s.t.art === 'gewinnspiel' ? window.DPSTafeln.gewinnspiel.sekunden() : (s.t.art === 'app' ? window.DPSTafeln.app.sekunden() : (s.t.art === 'amtlich' ? window.DPSTafeln.amtlich.sekunden() : s.t.dauer));
           var t0 = performance.now(), ende = t0 + dauer * 1000 / RATE;
           while (performance.now() < ende && !naechsterSprung) await warte(100);
           naechsterSprung = false;

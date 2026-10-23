@@ -157,6 +157,35 @@
     if (g) h += '<div class="az-band"><div class="az-band-k">Gesetze an Bord</div><div class="az-lauf"><div>' + g + g + '</div></div></div>';
     return h + (weiter ? '<div class="rg-weiter">' + weiter + '</div>' : '') + '</div>';
   }
+  /* ── v2941 · Amtliche Daten an Bord ─────────────────────────────────────
+     Marcel 23.10.2026: „die Gutachter-Sachen, amtliche Daten, Bodenrichtwerte …
+     alles was Zahlen sind". Zahlen aus app-zahlen.js (amtlich), gemessen in der
+     Marktbericht-Datenbank; Ausschuesse und Tabellen aus register-stand.js. */
+  function amtlichHtml(weiter, sek) {
+    var A = window.DPS_APP, M = A && A.amtlich; if (!M) return null;
+    var R = window.DPS_REGISTER && window.DPS_REGISTER.kopf;
+    var summe = (M.zensus_werte || 0) + (M.makro_werte || 0) + (M.register_db || 0) + (M.wert_parameter || 0);
+    var instr = [
+      [M.zensus_werte, 'Zensus-Werte'], [M.makro_werte, 'Makro-Werte'], [M.register_db, 'amtliche Registerwerte'], [R ? R.ausschuesse : null, 'Gutachterausschüsse'],
+      [M.boris_systeme, 'Bodenrichtwert-Systeme live'], [M.wert_parameter, 'Wertparameter'], [M.mietrecht_gemeinden, 'Gemeinden mit Mietrechts-VO'], [R ? R.irw_tabellen : null, 'Tabellen Immobilienrichtwert']
+    ].filter(function (x) { return x[0] != null && x[0] > 0; });
+    var h = '<div class="rg-t az-t" data-az-sek="' + (sek || 16) + '"><div class="az-oben"><div class="az-links">'
+      + '<div class="rt-kick">Amtliche Daten an Bord · Stand ' + datum(A.stand) + '</div>'
+      + '<div class="az-gross"><b class="gold" data-az="' + summe + '">0</b><span>amtliche Datenpunkte</span></div>'
+      + '<div class="az-unter">Zensus für <b data-az="' + (M.zensus_gemeinden || 0) + '">0</b> Gemeinden · Makrodaten für <b data-az="' + (M.makro_gebiete || 0) + '">0</b> Gebiete</div>'
+      + '<div class="az-unter az-daten">Bodenrichtwerte live aus <b>' + (M.boris_laender || 0) + '</b> Landesportalen und BORIS-D · <b>' + (M.gaa_dokumente || 0) + '</b> amtliche Marktberichte ausgewertet · Mietrecht in <b>' + (M.mietrecht_laender || 0) + '</b> Ländern</div>'
+      + '<div class="az-unter az-daten">Liegenschaftszins · Sachwertfaktor · Umrechnungskoeffizienten · Bodenrichtwert · Immobilienrichtwert · NHK 2010 · Anlage 2 ImmoWertV — jede Zahl mit Quelle, Jahrgang und Lizenz.</div>'
+      + '</div><div class="az-instr">';
+    instr.forEach(function (x, i) {
+      h += '<div class="az-i" style="--d:' + (0.2 + i * 0.12) + 's"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="az-ring0" cx="60" cy="60" r="50"/><circle class="az-ring" cx="60" cy="60" r="50"/>'
+        + '<g class="az-ticks">' + Array.apply(null, Array(24)).map(function (_, k) { return '<line x1="60" y1="6" x2="60" y2="' + (k % 6 ? 11 : 15) + '" transform="rotate(' + (k * 15) + ' 60 60)"/>'; }).join('') + '</g></svg>'
+        + '<div class="az-iz"><b data-az="' + x[0] + '">0</b><span>' + esc(x[1]) + '</span></div></div>';
+    });
+    h += '</div></div>';
+    var quellen = ['Gutachterausschüsse der Länder', 'Zensus 2022', 'Statistische Ämter', 'BORIS', 'ImmoWertV 2021', 'ImmoWertA', 'BelWertV', 'GrEStG der Länder', 'Kappungsgrenzen-VO', 'Mietpreisbremse-VO'];
+    h += '<div class="az-band"><div class="az-band-k">Quellen an Bord</div><div class="az-lauf"><div>' + quellen.concat(quellen).map(function (q) { return '<span><b>' + esc(q) + '</b></span>'; }).join('') + '</div></div></div>';
+    return h + (weiter ? '<div class="rg-weiter">' + weiter + '</div>' : '') + '</div>';
+  }
   /* Hochzaehlen beim Einblenden: jede neue .az-t wird einmal animiert */
   function zaehle(root) {
     var els = root.querySelectorAll('[data-az]'), t0 = performance.now(), dauer = 2200;
@@ -185,6 +214,9 @@
     app: { da: function () { return !!(window.DPS_APP && window.DPS_APP.zeilen) && !(EIN && EIN.get('app') === false); }, html: appHtml,
       sekunden: function () { return Math.max(6, Number(EIN && EIN.get('app_sek')) || 16); },
       nach: function () { return Math.max(1, Number(EIN && EIN.get('app_nach')) || 5); } },
-    aufruf: { an: function () { return !(EIN && EIN.get('aufruf') === false); } }
+    aufruf: { an: function () { return !(EIN && EIN.get('aufruf') === false); } },
+    /* v2941 · Amtliche Daten an Bord - laeuft direkt nach „DealPilot in Zahlen", gleicher Schalter */
+    amtlich: { da: function () { return !!(window.DPS_APP && window.DPS_APP.amtlich) && !(EIN && EIN.get('app') === false); }, html: amtlichHtml,
+      sekunden: function () { return Math.max(6, Number(EIN && EIN.get('app_sek')) || 16); } }
   };
 })();

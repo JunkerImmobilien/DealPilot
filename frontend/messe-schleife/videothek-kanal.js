@@ -212,7 +212,8 @@
         /* messe-schleife-6 · Abstaende und Schalter aus dem Menue (einstellungen.js) */
         var regNach = T && T.register.nach ? T.register.nach() : REGISTER_NACH, regDa = false;
         if ((i + 1) % regNach === 0 && i + 1 < V.length && T && T.register.da()) { regDa = true; await tafel('register', T.register.html(null), T.register.sekunden); }
-        if (!regDa && T && T.app && T.app.da() && (i + 1) % T.app.nach() === 0 && i + 1 < V.length) { var sa = T.app.sekunden(); await tafel('app', T.app.html(null, sa / TRATE), sa); }
+        if (!regDa && T && T.app && T.app.da() && (i + 1) % T.app.nach() === 0 && i + 1 < V.length) { var sa = T.app.sekunden(); await tafel('app', T.app.html(null, sa / TRATE), sa);
+          if (T.amtlich && T.amtlich.da()) await tafel('amtlich', T.amtlich.html(null, sa / TRATE), sa); }   /* v2941 */
         if (T && T.gewinnspiel.aktiv()) { var s = T.gewinnspiel.sekunden(); await tafel('gewinnspiel', T.gewinnspiel.html(n === 0 ? null : weiterZeile(n), s / TRATE), s); }
         else if (n !== 0 && !(T && T.aufruf && !T.aufruf.an())) await tafel('aufruf', aufrufHtml(n), 6);
       }
