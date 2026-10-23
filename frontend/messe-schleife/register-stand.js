@@ -1,17 +1,17 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-10-22T15:13:29.559Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-10-23T06:56:46.459Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_REGISTER = {
- "stand": "2026-10-22",
- "erzeugt": "2026-10-22T15:13:29.559Z",
- "register_commit": "fbd53554",
+ "stand": "2026-10-23",
+ "erzeugt": "2026-10-23T06:56:46.459Z",
+ "register_commit": "c4025690",
  "register_lokal_geaendert": false,
  "quelle": "registerDeckung() · lib/register_deckung.js, ohne Datenbank (wie Admin „Register & Ernte\")",
- "dateien": 101,
- "saetze": 10713,
+ "dateien": 104,
+ "saetze": 10836,
  "kopf": {
-  "werte_gesamt": 4543,
+  "werte_gesamt": 4640,
   "lzs": 2487,
-  "swf": 627,
+  "swf": 724,
   "uk_flaeche": 159,
   "uk_wgfz": 115,
   "uk": 274,
@@ -23,11 +23,11 @@ window.DPS_REGISTER = {
   "laender_gesamt": 16
  },
  "herkunft": {
-  "werte": 4543,
-  "mit_ausschuss": 4543,
-  "mit_jahrgang": 4543,
-  "mit_quelle": 4543,
-  "mit_seite": 4542
+  "werte": 4640,
+  "mit_ausschuss": 4640,
+  "mit_jahrgang": 4640,
+  "mit_quelle": 4640,
+  "mit_seite": 4639
  },
  "jahrgaenge": [
   2018,
@@ -80,14 +80,14 @@ window.DPS_REGISTER = {
   },
   "NI": {
    "name": "Niedersachsen",
-   "werte": 433,
+   "werte": 530,
    "lzs": {
     "w": 302,
     "anteil": 0.78
    },
    "swf": {
-    "w": 39,
-    "anteil": 1
+    "w": 136,
+    "anteil": 0.84
    },
    "uk_flaeche": {
     "w": 84,
@@ -97,7 +97,7 @@ window.DPS_REGISTER = {
     "w": 0,
     "anteil": 0
    },
-   "anteil4": 0.72,
+   "anteil4": 0.74,
    "erfasst": true
   },
   "HB": {
