@@ -1640,7 +1640,8 @@
     var pilotAn = true;
     try { if (window.DealPilotPdfWahl && typeof window.DealPilotPdfWahl.pilotAn === 'function') pilotAn = window.DealPilotPdfWahl.pilotAn(); } catch (e) { pilotAn = true; }
     if ((ai || aiText) && pilotAn) {
-      if (KURZ) neueSeite('Pilot-Analyse', (adr || 'Objekt') + ' · Kurzfassung');
+      /* v2900c · nicht immer neue Seite: gemessen standen die Annahmen sonst allein auf S. 4 */
+      if (KURZ) platz(120, 'Pilot-Analyse', (adr || 'Objekt') + ' · Kurzfassung');
       platz(60, 'Pilot-Analyse', (adr || 'Objekt'));
       abschnitt('Pilot-Analyse');   /* v2555a: Produktname statt KI-Investment-Analyse */
       /* v2830 · die Abschnitte der Pilot-Analyse wie im Investment-PDF
