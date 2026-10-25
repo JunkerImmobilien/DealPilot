@@ -1155,9 +1155,11 @@ function buildPrompt(payload, opts) {
         L.push('- ZENSUS 2022: fuer diesen Kreis liegen KEINE Zensus-Werte vor. Nenne keine Zensus-Zahl'
           + ' und schreibe keine recherchierte Leerstands- oder Eigentuemerquote als Zensuswert.');
       }
-      if (a.gross_yield_pct != null) L.push('- Bruttorendite laut Bericht: ' + fmtNum(a.gross_yield_pct, 1).replace('.', ',') + ' %');
+      /* v2947 (N78.5) · eindeutig benannt: die Rendite des Berichts rechnet ohne Zusatzeinnahmen,
+         sein Score ist eine eigene Bewertung - nicht der DealPilot-Score (85 gegen 78 am Westerfeld). */
+      if (a.gross_yield_pct != null) L.push('- Bruttomietrendite laut Marktbericht (ohne Zusatzeinnahmen): ' + fmtNum(a.gross_yield_pct, 1).replace('.', ',') + ' %');
       if (a.rent_multiplier != null) L.push('- Kaufpreisfaktor laut Bericht: ' + fmtNum(a.rent_multiplier, 1).replace('.', ','));
-      if (a.deal_score != null) L.push('- Deal-Score laut Bericht: ' + a.deal_score);
+      if (a.deal_score != null) L.push('- Score laut Marktbericht (eigene Bewertung des Berichts, NICHT der DealPilot-Score und nicht der Investor Deal Score): ' + a.deal_score);
 
       /* ══ v2150 · DIE WERTERMITTLUNG STUFE 3 GEHT MIT ═══════════════════
 
@@ -1994,6 +1996,26 @@ function _offerteDeckeln(a, payload) {
     o.begruendung = (o.begruendung ? o.begruendung + ' ' : '')
       + '(Vom Modell vorgeschlagen waren ' + Math.round(wert).toLocaleString('de-DE') + ' € — über dem Angebotspreis; '
       + 'eine Offerte liegt höchstens beim Kaufpreis.)';
+    /* v2947 (N78.1) · Mail und Verhandlungstext tragen dieselbe falsche Zahl.
+       Die Mail wird NICHT umgeschrieben, sondern weggelassen: sie leitet die
+       Preisvorstellung im Fliesstext her ("... und biete daher 910.000 € an"),
+       ein Ersetzen des Betrags liesse die Herleitung stehen, die zu ihm fuehrt,
+       und verfehlt jede andere Schreibweise ("910 T€", "0,91 Mio."). Eine
+       fehlende Mail ist sichtbar, eine stimmige mit falscher Begruendung nicht.
+       Die Anzeige liest `offerte_mail_entfallen` (ui.js). */
+    if (a.offerte_mail) {
+      a.offerte_mail = null;
+      a.offerte_mail_entfallen = 'Keine Mail: das Modell schlug '
+        + Math.round(wert).toLocaleString('de-DE') + ' € vor, über dem Kaufpreis von '
+        + Math.round(kp).toLocaleString('de-DE') + ' €. Die Herleitung der Mail stützte sich auf diesen Betrag.';
+    }
+    if (a.verhandlungsempfehlung) {
+      a.verhandlungsempfehlung = 'Hinweis: Der vom Modell genannte Zielpreis von '
+        + Math.round(wert).toLocaleString('de-DE') + ' € liegt über dem Kaufpreis von '
+        + Math.round(kp).toLocaleString('de-DE') + ' € und gilt nicht; Preisangaben über dem Kaufpreis '
+        + 'im folgenden Text bitte nicht verwenden. ' + String(a.verhandlungsempfehlung);
+    }
+    a.offerte_gedeckelt = { vorschlag: Math.round(wert), kaufpreis: Math.round(kp) };
     try { console.warn('[analyze] Offerte gedeckelt: ' + wert + ' -> ' + kp); } catch (e) {}
   } catch (e) {}
   return a;

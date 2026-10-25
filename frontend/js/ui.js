@@ -1706,6 +1706,8 @@ function _lageZeilen(a) {
 
 function _quelleZeile(q) {
   var roh = '' + (q == null ? '' : q);
+  /* v2947 (N78.3) · eine Portalquelle heisst „Aktueller Marktdurchschnitt", ohne Link */
+  if (_DP_PORTAL_HOST.test(roh) || /\bScout\s?24\b/i.test(roh)) return '<span>Aktueller Marktdurchschnitt (Angebotsdaten)</span>';
   var m = roh.match(/https?:\/\/\S+/);
   if (!m) return _esc(roh);
   var url = _urlSauber(m[0].replace(/[),.;]+$/, ''));   /* Satzzeichen am Ende */
@@ -1755,8 +1757,25 @@ function _linkify(escaped) {
   });
   return out;
 }
+/* v2947 (N78.3) · KEIN PORTALNAME NACH AUSSEN (Marcel 14.10.2026: „bitte auch keine
+   Quelle wie ImmobilienScout angeben"). Der Prompt verbietet es seit v2500, gespeicherte
+   Analysen davor tragen die Namen noch: gemessen 25.10.2026 an Westerfeldstr. 140 in
+   Lage & Markt „laut Immowelt/Scout24", „(Scout24, Stand 04/2024)" und die Quellen
+   immobilienscout24.de, wohnungsboerse.net. Dieselbe Liste wie das Backend
+   (openaiService.js _neutral, v2500), dazu „Scout24" allein und Kleinanzeigen. */
+var _DP_PORTAL_HOST = /(immobilienscout|immoscout|scout24|immowelt|immonet|immoportal|wohnungsboerse|wohnungsbörse|homeday|meinestadt|miete-aktuell|mietspiegel\.(com|net|org)|wohnpreis\.de|kleinanzeigen|ebay\.|ohne-makler|immopreise|wohnungsmarkt24|sprengnetter|pricehubble)/i;
+function _ohnePortal(s) {
+  if (s == null) return s;
+  return String(s)
+    .replace(/(\(\s*)?\bhttps?:\/\/\S+/gi, function (u) { return _DP_PORTAL_HOST.test(u) ? '' : u; })
+    .replace(/\b(ImmobilienScout\s?24|Immobilien\s?Scout\s?24|ImmoScout\s?24|ImmoScout|Scout\s?24|Immowelt|Immonet|immoportal|Wohnungsb(oe|ö)rse(\.net)?|Homeday|meinestadt(\.de)?|miete-aktuell(\.de)?|mietspiegel\.(com|net|org)|wohnpreis(\.de)?|Kleinanzeigen)(\.de)?(\s*(\/|,|und|&)\s*(ImmobilienScout\s?24|ImmoScout\s?24|ImmoScout|Scout\s?24|Immowelt|Immonet|Wohnungsb(oe|ö)rse|Kleinanzeigen)(\.de)?)*(?![\wäöü])/gi, 'aktueller Marktdurchschnitt')
+    .replace(/\b(laut|gemäß|nach|von|aus|bei) aktueller Marktdurchschnitt/g, '$1 aktuellem Marktdurchschnitt')
+    .replace(/\b(Sprengnetter|PriceHubble)\b/gi, 'unabhängiger Bewertungspartner')
+    .replace(/ {2,}/g, ' ');
+}
+try { window._dpOhnePortal = _ohnePortal; } catch (e) {}   /* pdf.js, pdf-investment-bank.js */
 function _escClean(s) {
-  return _linkify(_esc(_stripMd(s)));
+  return _linkify(_esc(_stripMd(_ohnePortal(s))));
 }
 
 /* v584-rail BEGIN */
@@ -1862,8 +1881,19 @@ function _renderAIServerAnalysis(a) {
         p(a.gesamtbewertung || a.fazit_kurz) + p(a.empfehlung_begruendung) + '</div>';
   if (has(a.investmentbewertung))
     pB += '<div class="dp-pa-card">' + sec('', I.deal, 'INVESTMENTBEWERTUNG') + p(a.investmentbewertung) + '</div>';
-  if (has(a.score_vergleich))
-    pB += '<div class="dp-pa-card">' + sec('', I.deal, 'SCORE-VERGLEICH') + p(a.score_vergleich) + '</div>';
+  if (has(a.score_vergleich)) {
+    /* v2947 (N78.5) · GLEICHER NAME, ANDERE ZAHL. Gemessen 25.10.2026 an Westerfeldstr. 140:
+       DealPilot-Score 78 (DealScore-Kern), Objektkarte 73 (Investor Deal Score, DealScore2),
+       Marktbericht 85 (eigene Bewertung des Berichts). Drei Rechnungen - die Zeile nennt sie
+       mit dem heutigen Stand, damit 78/74 im Text nicht neben einer 73 auf der Karte stehen. */
+    var _scH = [];
+    try { var _d1 = DealScore.computeFromKpis(State.kpis); _d1 = _d1 && typeof _d1 === 'object' ? _d1.score : _d1; if (isFinite(_d1)) _scH.push('DealPilot-Score ' + Math.round(_d1)); } catch (e) {}
+    try { if (window.DealScore2 && typeof window._buildDeal2FromState === 'function') { var _d2 = window.DealScore2.compute(window._buildDeal2FromState()); if (_d2 && isFinite(_d2.score)) _scH.push('Investor Deal Score ' + Math.round(_d2.score) + ' (steht auf der Objektkarte)'); } } catch (e) {}
+    pB += '<div class="dp-pa-card">' + sec('', I.deal, 'SCORE-VERGLEICH') + p(a.score_vergleich)
+      + (_scH.length ? '<div class="dp-pa-fuss">Heute: ' + _scH.join(' · ') + '. Die Zahlen im Text sind der Stand der Analyse. '
+        + 'Der Score im Marktbericht ist eine eigene Bewertung des Berichts und heißt dort „Score laut Marktbericht“.</div>' : '')
+      + '</div>';
+  }
   if (a.investor_fit && typeof a.investor_fit === 'object') {
     var f = a.investor_fit;
     pB += '<div class="dp-pa-card">' + sec('', I.deal, 'INVESTOR-FIT') + '<div class="dp-pa-fit">';
@@ -1976,7 +2006,8 @@ function _renderAIServerAnalysis(a) {
   }
   if (Array.isArray(a.quellen) && a.quellen.length) {
     pL += '<div class="dp-pa-card">' + sec('', I.loc, 'QUELLEN') + '<ul class="dp-pa-src">' +
-      a.quellen.map(function (q) { return '<li>' + _quelleZeile(q) + '</li>'; }).join('') +
+      a.quellen.map(function (q) { return '<li>' + _quelleZeile(q) + '</li>'; })
+        .filter(function (x, i, arr) { return arr.indexOf(x) === i; }).join('') +   /* v2947 · mehrere Portale = ein Eintrag */
       '</ul></div>';
   }
 
@@ -2009,7 +2040,11 @@ function _renderAIServerAnalysis(a) {
       pV += '<div class="dp-pa-kv"><strong>Argumente f\u00fcr die Verhandlung:</strong></div>' + list(kp.argumente);
     pV += '</div>';
   }
-  if (_offUeber && a.offerte_mail && typeof a.offerte_mail === 'object') {
+  if (!_offUeber && !a.offerte_mail && has(a.offerte_mail_entfallen)) {
+    /* v2947 (N78.1) · das Backend hat gedeckelt und die Mail weggelassen */
+    pV += '<div class="dp-pa-card dp-pa-offmail">' + sec('', I.deal, 'OFFERTE ALS E-MAIL')
+      + '<em class="dp-pa-empty">' + _esc(a.offerte_mail_entfallen) + ' Nach einem neuen Abruf steht sie hier.</em></div>';
+  } else if (_offUeber && a.offerte_mail && typeof a.offerte_mail === 'object') {
     pV += '<div class="dp-pa-card dp-pa-offmail">' + sec('', I.deal, 'OFFERTE ALS E-MAIL')
       + '<em class="dp-pa-empty">Keine Mail: die Offerte dieser Analyse liegt über dem Kaufpreis (siehe oben). Nach einem neuen Abruf steht sie hier.</em></div>';
   } else if (a.offerte_mail && typeof a.offerte_mail === 'object') {
@@ -2069,13 +2104,13 @@ function _renderAIServerAnalysis(a) {
       if (v === null || v === undefined || !isFinite(v)) return '\u2013';
       if (e === 'eur') return Math.round(v).toLocaleString('de-DE') + ' \u20ac';
       if (e === 'eurqm') return v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' \u20ac/m\u00b2';   /* v2216e */
-      if (e === 'stk') return String(Math.round(v));
+      if (e === 'stk' || e === 'score') return String(Math.round(v));   /* v2947 */
       if (e === 'pct') return v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' %';
       return v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
     function d(z) {
       var vz = z.diff > 0 ? '+' : '';
-      if (z.einheit === 'stk') return vz + Math.round(z.diff);   /* v2216h */
+      if (z.einheit === 'stk' || z.einheit === 'score') return vz + Math.round(z.diff);   /* v2216h */
       if (z.einheit === 'eurqm') return vz + f(z.diff, 'zahl') + ' \u20ac/m\u00b2';
       if (z.einheit === 'eur') return vz + Math.round(z.diff).toLocaleString('de-DE') + ' \u20ac';
       if (z.einheit === 'pct') return vz + f(z.diff, 'zahl') + ' %-Punkte';
@@ -3079,15 +3114,22 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
 (function () {
   'use strict';
   var METRICS = [
-    { key: 'market_value', label: 'Marktpreisindikation (nach Abschlag)',   color: '#C9A84C', fmt: function (v) { return _dpVEur(v) + ' \u20ac'; } },
+    /* v2947 (N78.2) \u00b7 \u201enach Abschlag" fuehrt nur Berichte MIT Abschlag. Berichte vor v2367
+       trugen das Angebotsniveau; im selben Zug verglichen ergab das 1.055.000 -> 820.000 \u20ac
+       \u201e-22,3 %" (Westerfeldstr. 140), eine Methodenaenderung, kein Preissturz. Ueber alle
+       Berichte vergleichbar ist die Zeile \u201eohne Abschlag". */
+    { key: 'mpi_nach_abschlag', label: 'Marktpreisindikation nach Abschlag',   color: '#C9A84C', fmt: function (v) { return _dpVEur(v) + ' \u20ac'; } },
     /* v2842 · ohne Abschlag und der Abschlag selbst - sonst sieht der Wechsel auf den Abschlag (v2367) aus wie ein Preissturz */
     { key: 'mpi_ohne_abschlag', label: 'Marktpreisindikation ohne Abschlag', color: '#b8932f', fmt: function (v) { return _dpVEur(v) + ' \u20ac'; } },
     { key: 'abschlag_pct', label: 'Abschlag auf Angebotspreise', color: '#8b8678', fmt: function (v) { return v > 0 ? _dpVNum(v, 1) + ' %' : 'kein'; } },
-    { key: 'deal_score',   label: 'DealPilot-Score', color: '#3FA56C', fmt: function (v) { return Math.round(v) + ' / 100'; } },
+    /* v2947 (N78.5) · Bericht-Werte heissen nach ihrer Herkunft: der Score des Berichts ist nicht
+       der DealPilot-Score des Objekts (85 gegen 78), die Rendite des Berichts rechnet ohne
+       Zusatzeinnahmen (7,03 % gegen 7,23 % mit 1.080 €). */
+    { key: 'deal_score',   label: 'Score laut Marktbericht', color: '#3FA56C', fmt: function (v) { return Math.round(v) + ' / 100'; } },
     { key: 'micro_score',  label: 'Lage (Mikro)', color: '#9b6fd4', fmt: function (v) { return Math.round(v) + ' / 100'; } },
     { key: 'macro_score',  label: 'Lage (Makro)', color: '#5a7fd4', fmt: function (v) { return Math.round(v) + ' / 100'; } },
     { key: 'price_cagr_pct', label: 'Markt (Wertentw.)', color: '#c98a2f', fmt: function (v) { return _dpVNum(v, 1) + ' %'; } },
-    { key: 'gross_yield_pct', label: 'Bruttorendite', color: '#3f8ea5', fmt: function (v) { return _dpVNum(v, 1) + ' %'; } },
+    { key: 'gross_yield_pct', label: 'Bruttomietrendite laut Marktbericht (ohne Zusatzeinnahmen)', color: '#3f8ea5', fmt: function (v) { return _dpVNum(v, 1) + ' %'; } },
     { key: 'rent_multiplier', label: 'Faktor', color: '#8a8f5a', fmt: function (v) { return _dpVNum(v, 1) + '\u00d7'; } }
   ];
 
@@ -3117,7 +3159,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
   function _dpVActiveMetrics(hist) {
     return METRICS.filter(function (m) {
       var n = 0; hist.forEach(function (h) { if (h[m.key] != null && isFinite(Number(h[m.key]))) n++; });
-      return n >= 2;
+      return n >= (m.key === 'mpi_nach_abschlag' ? 1 : 2);   /* v2947 · der neueste Wert nach Abschlag bleibt sichtbar */
     });
   }
 
@@ -3143,10 +3185,14 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
     var head = '<tr><th>Kennzahl</th>' + hist.map(function (h, i) { return '<th>' + (i + 1) + '. \u00b7 ' + _dpVDate(h.created_at) + '</th>'; }).join('') + '<th class="dpv-dcol">\u0394 gesamt</th></tr>';
     var body = mets.map(function (m) {
       var cells = hist.map(function (h) { return '<td class="dpv-val">' + (h[m.key] != null ? m.fmt(Number(h[m.key])) : '\u2013') + '</td>'; }).join('');
-      var a = Number(hist[0][m.key]), b = Number(hist[hist.length - 1][m.key]);
-      var pct = (a && isFinite(a)) ? ((b - a) / Math.abs(a) * 100) : 0;
+      /* v2947 \u00b7 \u0394 vom ersten bis zum letzten VORHANDENEN Wert, nicht von Bericht 1 */
+      var _vh = hist.filter(function (h) { return h[m.key] != null && isFinite(Number(h[m.key])); });
+      var a = _vh.length ? Number(_vh[0][m.key]) : NaN, b = _vh.length ? Number(_vh[_vh.length - 1][m.key]) : NaN;
+      var pct = (a && isFinite(a) && isFinite(b)) ? ((b - a) / Math.abs(a) * 100) : 0;
       var cls = pct > 0.5 ? 'up' : pct < -0.5 ? 'down' : 'flat', arr = pct > 0.5 ? '\u25b2' : pct < -0.5 ? '\u25bc' : '\u2013';
-      return '<tr data-mrow="' + m.key + '"><td><span class="dpv-mdot" style="background:' + m.color + '"></span>' + m.label + '</td>' + cells + '<td class="dpv-dcol dpv-delta ' + cls + '">' + arr + ' ' + (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%</td></tr>';
+      var _dz = _vh.length < 2 ? '\u2013' : (arr + ' ' + (pct >= 0 ? '+' : '') + _dpVNum(pct, 1) + ' %'
+        + (_vh.length < hist.length ? '<br><span style="font-size:10px;opacity:.7">Bericht ' + (hist.indexOf(_vh[0]) + 1) + '\u2013' + (hist.indexOf(_vh[_vh.length - 1]) + 1) + '</span>' : ''));
+      return '<tr data-mrow="' + m.key + '"><td><span class="dpv-mdot" style="background:' + m.color + '"></span>' + m.label + '</td>' + cells + '<td class="dpv-dcol dpv-delta ' + cls + '">' + _dz + '</td></tr>';
     }).join('');
     return '' +
       window._dpVerlaufAbgleich(hist) +
@@ -3179,7 +3225,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
     var cv = root.querySelector('.dpv-canvas');
     var light = _dpVIsLight(root.querySelector('.dpv-card') || root);
     root.classList.toggle('dpv-light', light); root.classList.toggle('dpv-dark', !light);
-    function idx(m, h) { var base = Number(hist[0][m.key]); return (base && isFinite(base)) ? (Number(h[m.key]) / base * 100) : 100; }
+    function idx(m, h) { var _b0 = hist.filter(function (x) { return x[m.key] != null && isFinite(Number(x[m.key])); })[0]; var base = _b0 ? Number(_b0[m.key]) : NaN; return (base && isFinite(base)) ? (Number(h[m.key]) / base * 100) : 100; }
     function wireChips(chart) {
       root.querySelectorAll('.dpv-chip').forEach(function (ch, i) {
         ch.addEventListener('click', function () {
@@ -3212,7 +3258,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
           padding: 11, cornerRadius: 8, usePointStyle: true, titleFont: { size: 12, weight: '700' }, bodyFont: { size: 12, weight: '500' },
           callbacks: { label: function (ctx) { var m = mets[ctx.datasetIndex], h = hist[ctx.dataIndex];
             var abs = (h && h[m.key] != null) ? m.fmt(Number(h[m.key])) : '\u2013';
-            return ' ' + m.label + ': ' + abs + ' \u00b7 Index ' + (ctx.parsed.y != null ? ctx.parsed.y.toFixed(1) : '\u2013'); } } } },
+            return ' ' + m.label + ': ' + abs + ' \u00b7 Index ' + (ctx.parsed.y != null ? _dpVNum(ctx.parsed.y, 1) : '\u2013'); } } } },
         scales: { x: { grid: { color: gridCol, drawBorder: false }, ticks: { color: axisCol, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } },
                   y: { grid: { color: gridCol, drawBorder: false }, ticks: { color: axisCol },
                        title: { display: true, text: 'Index (1. Bericht = 100)', color: axisCol, font: { size: 10 } } } },
@@ -3232,7 +3278,8 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
   var VTXT_FELDER = ['market_value', 'market_value_low', 'market_value_high', 'median_sqm',
     'deal_score', 'micro_score', 'macro_score', 'price_cagr_pct', 'gross_yield_pct', 'rent_multiplier',
     'confidence', 'comparable_group', 'living_area', 'build_year', 'sachwert_eur', 'ertragswert_eur',
-    'lzs_pct', 'lzs_stufe', 'fuehrend', 'bevoelkerung_trend_pct'];
+    'lzs_pct', 'lzs_stufe', 'fuehrend', 'bevoelkerung_trend_pct',
+    'mpi_ohne_abschlag', 'abschlag_pct'];   /* v2947 · sonst liest der Text den Abschlag als Preissturz */
   function _dpVerlaufKiText(hist, mets, out) {
     if (typeof Auth === 'undefined' || !Auth.apiCall) { out.innerHTML = ''; return; }
     var objKey = window._currentObjKey || '';
@@ -3308,6 +3355,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
           var ab = h.angebot_abschlag_pct != null && h.angebot_abschlag_pct !== '' ? Number(h.angebot_abschlag_pct) : null;
           h.abschlag_pct = ab != null && isFinite(ab) ? ab : 0;
           h.mpi_ohne_abschlag = h.market_value_roh != null ? Number(h.market_value_roh) : (!(ab > 0) ? Number(h.market_value) : null);
+          h.mpi_nach_abschlag = ab > 0 ? Number(h.market_value) : null;   /* v2947 (N78.2) */
         });
         try { if (window.DpWertvergleich) window.DpWertvergleich.fuellen(hist); } catch (e) {}   /* v2810 */
         var abHtml = _dpAbrufeHtml(abrufe);
@@ -3359,12 +3407,16 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
     try {
       var loc = document.getElementById('dp-pa-loc');
       if (!loc || loc.querySelector('.dpv-locdev')) return;
-      var mw0 = Number(hist[0].market_value), mw1 = Number(hist[hist.length - 1].market_value);
+      /* v2947 (N78.2) \u00b7 der Trend laeuft ueber den Wert OHNE Abschlag - der ist ueber alle
+         Berichte gleichartig. Fehlt er an einem Ende, steht kein Trend (kein Mischvergleich). */
+      var _vg = hist.filter(function (h) { return h.mpi_ohne_abschlag != null && isFinite(h.mpi_ohne_abschlag); });
+      if (_vg.length < 2) return;
+      var mw0 = Number(_vg[0].mpi_ohne_abschlag), mw1 = Number(_vg[_vg.length - 1].mpi_ohne_abschlag);
       var pct = (mw0 && isFinite(mw0)) ? ((mw1 - mw0) / mw0 * 100) : 0;
-      var trend = Math.abs(pct) < 0.5 ? 'stabil' : (pct > 0 ? '+' + pct.toFixed(1) + '%' : pct.toFixed(1) + '%');
+      var trend = Math.abs(pct) < 0.5 ? 'stabil' : ((pct > 0 ? '+' : '') + _dpVNum(pct, 1) + ' %');
       var note = document.createElement('div'); note.className = 'dpv-locdev';
       note.style.cssText = 'margin-top:12px;padding:11px 14px;border-radius:11px;background:rgba(201,168,76,.09);border:1px solid rgba(201,168,76,.32);font-size:12.5px;line-height:1.5';
-      note.innerHTML = '<b>Entwicklung \u00fcber ' + hist.length + ' Marktberichte:</b> Marktwert ' + _dpVEur(mw0) + ' \u2192 ' + _dpVEur(mw1) + ' \u20ac (' + trend + '). ' +
+      note.innerHTML = '<b>Entwicklung \u00fcber ' + _vg.length + ' Marktberichte:</b> Marktpreisindikation ohne Abschlag auf Angebotspreise ' + _dpVEur(mw0) + ' \u2192 ' + _dpVEur(mw1) + ' \u20ac (' + trend + '). ' +
         'Vollst\u00e4ndiger Verlauf im Unterreiter \u201eWert & Marktpreis\u201c.';
       loc.appendChild(note);
     } catch (e) {}

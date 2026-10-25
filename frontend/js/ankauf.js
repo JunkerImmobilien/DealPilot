@@ -65,7 +65,7 @@
     { schluessel: '_kpis_dscr',     wort: 'DSCR',               einheit: 'zahl', besser: 'groesser' },
     { schluessel: '_kpis_cf_ns',    wort: 'Cashflow n. Steuer', einheit: 'eur',  besser: 'groesser' },
     { schluessel: '_kpis_ltv',      wort: 'LTV',                einheit: 'pct',  besser: 'kleiner' },
-    { schluessel: '_ds2_score',     wort: 'DealScore',          einheit: 'zahl', besser: 'groesser' },
+    { schluessel: '_ds2_score',     wort: 'DealScore',          einheit: 'score', besser: 'groesser' },
     /* v2160 · N62.6 — die Steuerwirkung p. a. = Cashflow nach minus vor
        Steuer (positiv = Erstattung). ABGELEITET aus zwei gespeicherten
        Kennzahlen, nicht neu gerechnet; alte Ankauf-Staende bekommen sie

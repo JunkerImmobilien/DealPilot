@@ -98,7 +98,30 @@
     /* ── Wie sich die Werte zusammensetzen ── */
     var e = [];
     var mpi = 'Die <b>Marktpreisindikation</b> kommt aus den Angebotspreisen vergleichbarer Objekte';
-    if (zahl(h.median_sqm) != null && zahl(h.living_area) != null) mpi += ': im Mittel ' + Math.round(h.median_sqm).toLocaleString('de-DE') + ' €/m² × ' + Math.round(h.living_area).toLocaleString('de-DE') + ' m²';
+    /* v2947 (N78.4) · „im Mittel 2.165 €/m² × 390 m²" ergab 844.350 €, die Mitte ohne Abschlag
+       stand bei 960.000 € (Westerfeldstr. 140). Dazwischen liegen die Objektfaktoren des Berichts
+       (Lage, Zustand/Qualität/Modernisierung, Ausstattung, Energie, Etage, Leerstand; hier × 1,05)
+       und 73.615 € Stellplätze/Mehrfläche. Die Rechnung steht nur noch, wenn sie aus den
+       gelieferten Faktoren auf den Wert aufgeht (±1 %); sonst ohne Multiplikation. */
+    var _med = zahl(h.median_sqm), _wfl = zahl(h.living_area), _fk = h.mpi_faktoren;
+    if (typeof _fk === 'string') { try { _fk = JSON.parse(_fk); } catch (e) { _fk = null; } }
+    if (_med != null && _wfl != null) {
+      var _basis = _med * _wfl, _ziel = mitAb ? roh : mw, _rechnung = null;
+      if (_fk && typeof _fk === 'object') {
+        var _F = ['location_factor', 'object_adjustment', 'amenity_factor', 'energy_factor', 'floor_factor', 'vacancy_factor']
+          .reduce(function (p, k) { var f = zahl(_fk[k]); return p * (f != null ? f : 1); }, 1);
+        var _add = (zahl(_fk.parking_value_eur) || 0) + (zahl(_fk.land_excess_value_eur) || 0) + (zahl(_fk.kostenabzug_eur) || 0);
+        var _soll = _basis * _F + _add;
+        if (_ziel != null && Math.abs(_soll - _ziel) <= 0.01 * _ziel) {
+          _rechnung = ': Median ' + Math.round(_med).toLocaleString('de-DE') + ' €/m² × ' + Math.round(_wfl).toLocaleString('de-DE') + ' m² = ' + eur(_basis)
+            + (Math.abs(_F - 1) >= 0.0005 ? ', angepasst an Lage und Objekt (Zustand, Ausstattung, Energie u. a.) mit dem Faktor ' + pct(_F, 3) + ' = ' + eur(_basis * _F) : '')
+            + (_add ? ', ' + (_add > 0 ? 'zuzüglich ' : 'abzüglich ') + eur(Math.abs(_add)) + ' für Stellplätze, Mehrfläche und besondere Merkmale' : '')
+            + ' — gerundet ' + eur(_ziel) + (mitAb ? ' vor Abschlag' : '');
+        }
+      }
+      mpi += _rechnung || (': Median ' + Math.round(_med).toLocaleString('de-DE') + ' €/m² der Angebote, auf ' + Math.round(_wfl).toLocaleString('de-DE')
+        + ' m² bezogen und an Lage und Objekt angepasst');
+    }
     mpi += '. Die untere und obere Zahl sind die Bandbreite, in der vergleichbare Angebote liegen.';
     if (mitAb) {
       mpi += ' Angebotspreise liegen über dem, was am Ende tatsächlich bezahlt wird. Deshalb sind <b>' + pct(ab) + ' %</b> abgezogen ('
@@ -111,6 +134,20 @@
       var ewt = 'Der <b>Ertragswert</b> fragt, was die Miete trägt: Jahresrohertrag' + (ro != null ? ' ' + eur(ro) : '')
         + ' abzüglich Bewirtschaftungskosten, kapitalisiert mit dem Liegenschaftszins' + (zahl(h.lzs_pct) != null ? ' von ' + pct(h.lzs_pct, 2) + ' %' : '')
         + (h.lzs_stufe ? ' (Stufe ' + esc(h.lzs_stufe) + ')' : '') + ' über die Restnutzungsdauer, dazu der Bodenwert.';
+      /* v2947 (N78.6) · zwei Rohertraege fuer dasselbe Haus: der Bericht setzt Stellplaetze
+         marktueblich an (Westerfeld 4 × 30 € = 1.440 €, Rohertrag 39.780 €), die Kalkulation
+         rechnet mit der eingetragenen Zusatzeinnahme (1.080 €, 39.420 €). Benannt, nicht angeglichen:
+         der Ertragswert verlangt den marktueblichen Ertrag (§ 31 ImmoWertV), die Kalkulation den Ist-Ertrag. */
+      try {
+        var _K = window.State && State.kpis, _nkmJ = _K ? zahl(_K.nkm_j) : null, _zeJ = _K ? zahl(_K.ze_j) : null;
+        var _sp = (Array.isArray(h.ertrag_weg) ? h.ertrag_weg : []).filter(function (z) { return /^Stellpl/i.test(String(z.pos || '')); })[0];
+        if (ro != null && _nkmJ != null && Math.abs(_nkmJ - ro) >= 1) {
+          ewt += ' Der Rohertrag des Berichts (' + eur(ro) + ') weicht von der Jahresmiete der Kalkulation (' + eur(_nkmJ)
+            + (_zeJ ? ', darin ' + eur(_zeJ) + ' Zusatzeinnahmen' : '') + ') ab'
+            + (_sp ? ': der Bericht setzt die ' + esc(String(_sp.pos).replace(/^Stellplätze\s*/i, 'Stellplätze ')) + ' mit ' + eur(_sp.wert) + ' marktüblich an' : '')
+            + '. Der Ertragswert rechnet mit dem marktüblichen Ertrag, die Kalkulation mit dem tatsächlichen.';
+        }
+      } catch (e2) {}
       if (zahl(h.ew_miete_ist_qm) != null && zahl(h.ew_miete_vergleich_qm) != null)
         ewt += ' Deine Ist-Miete liegt bei ' + pct(h.ew_miete_ist_qm, 2) + ' €/m², die Vergleichsmiete bei ' + pct(h.ew_miete_vergleich_qm, 2) + ' €/m²'
           + (h.ew_miete_stufe ? ' (' + esc(h.ew_miete_stufe) + ')' : '') + '.';

@@ -1649,7 +1649,11 @@
          Stärken und Risiken - Gesamtbewertung und Bankargumente fehlten in
          der Fassung, die an die Bank geht. */
       var an = function (t) { try { return typeof window._dpPdfSectionOn !== 'function' || window._dpPdfSectionOn(t); } catch (e) { return true; } };
-      var klar = function (t) { return sauber(String(t == null ? '' : t).replace(/\*+/g, '')); };
+      var klar = function (t) {
+        var s = String(t == null ? '' : t);
+        try { if (typeof window._dpOhnePortal === 'function') s = window._dpOhnePortal(s); } catch (e) {}   /* v2947 (N78.3) · kein Portalname im PDF */
+        return sauber(s.replace(/\*+/g, ''));
+      };
       function kopfzeile(t) {
         if (y > TEXT_UNTEN - 14) { doc.addPage(); kopf(_titel, _unter || 'Fortsetzung'); }
         doc.setFont('helvetica', 'bold'); doc.setFontSize(8.8); doc.setTextColor(26, 26, 26);
