@@ -142,9 +142,12 @@ Gut "beide Sicherungen gepruefet (Kopf gelesen, nicht nur gelistet)"
 
 # ---- 3. Gold-Audit ----------------------------------------------------
 Schritt "Gold-Audit auf Staging"
-$audit = ssh $STAGING_HOST "cd /opt/dealpilot && python3 tools/gold-audit.py /opt/dealpilot/frontend 2>&1 | tail -3"
+# 25.10.2026: geprueft wird der Rueckgabewert, nicht ein Satz - unter der
+# Basislinie meldet der Audit "[OK] Unter der Basislinie", nicht
+# "Kein neues Hartgold", und der Rollout brach bei gruenem Audit ab.
+$audit = ssh $STAGING_HOST "cd /opt/dealpilot && python3 tools/gold-audit.py /opt/dealpilot/frontend > /tmp/gold-rollout.txt 2>&1; echo AUDIT_RC=`$?; tail -4 /tmp/gold-rollout.txt"
 $audit | ForEach-Object { Write-Host "     $_" }
-if (($audit -join "`n") -notmatch 'Kein neues Hartgold') {
+if (($audit -join "`n") -notmatch 'AUDIT_RC=0') {
   Schlecht "Gold-Audit nicht sauber - Rollout abgebrochen."
   exit 1
 }
