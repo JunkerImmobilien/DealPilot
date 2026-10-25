@@ -2543,6 +2543,9 @@
   function setProjYears(y){ _projYears=y;
     var box=$('dp-proj-years'); if(box){box.querySelectorAll('button').forEach(function(b){b.classList.toggle('active',+b.dataset.y===y);});}
     renderProjTable(); buildCharts();
+    /* v2953c · die Einfach-Kachel „Entwicklung · Eigenkapital" rechnet mit _projYears,
+       wurde beim Umschalten aber nicht neu gezeichnet - gemessen: 30 J. gewaehlt, Kachel blieb 2045 */
+    try { renderEinfach(); } catch (e) {}
   }
   /* ════ KANBAN + KARTEN ════ */
   function objImg(o){
