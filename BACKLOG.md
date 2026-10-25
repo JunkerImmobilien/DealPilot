@@ -40,8 +40,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 Erledigt in v2952–v2955a (25.10.2026, s. Journal): Parkstr. 9 (Ankauf-Sanierung im Bestand kein Stau, Modernisierung eingetragen), zweiter und dritter Pilot-Lauf abgenommen (Prüfregel e), Bewertung je Objekt im Cockpit, alle 10 Bestandsobjekte mit Bericht Stufe 3, Kaufpreise der Demo angeglichen, Messe-Storybook neu, Zeitraum 10/20/30 zieht überall mit, Co-Pilot-Limits 10/20/50/100, Migration (3 h) raus. Optik (gekürzte Achse, Einfach als Standard) bleibt so. Rest:
 - **Endgültig löschen (Marcel selbst):** Westerfeldstr. 140 Kopie `c5a78c89` (Kürzel E2E) und Am Markt 9 privat `cea958eb` stehen auf „Verloren“ — aus dem Bestand raus, aber noch da. Behalten: `ae155d38` (Spot/Videos) und `ec2d0f32` (VV-GmbH).
-- **Spracheingabe aufs Co-Pilot-Limit:** Vorschlag 1 Spracheingabe = 1 Frage (ab 2 Minuten Aufnahme 2) — Entscheidung Marcel.
-- **Prod-Rollout v2944–v2955a:** Backend und mb-backend neu bauen, vorher beide DBs sichern.
+- **Spracheingabe:** seit v2956 je angefangene 2 Minuten eine Frage (Prod 25.10.) — Abnahme mit echter Aufnahme durch Marcel; Live-Vorschau (`transcribe-chunk`) und `voice-stream` zählen nicht.
 
 ### N78 · Pilot-Analyse durchgesehen (25.10.2026) — Rest nach v2946
 
