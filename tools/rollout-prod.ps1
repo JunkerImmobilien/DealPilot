@@ -126,6 +126,10 @@ zcat /root/backups/haupt-$stempel.sql.gz | head -2
 echo '--- Kopf der MB-DB ---'
 zcat /root/backups/mb-$stempel.sql.gz | head -2
 "@
+# 25.10.2026: die .ps1 liegt mit CRLF auf der Platte - jedes `r landete im
+# Dateinamen auf dem Server ("haupt-....sql.gz\r"), die Kopfpruefung fand
+# nichts und brach ab. Fuer bash nur LF.
+$sicherBefehl = $sicherBefehl -replace "`r", ''
 $sicherung = ssh $PROD_HOST $sicherBefehl 2>&1
 $sicherung | ForEach-Object { Write-Host "     $_" }
 
