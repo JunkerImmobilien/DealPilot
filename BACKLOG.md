@@ -36,6 +36,23 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N78 · Pilot-Analyse durchgesehen (25.10.2026) — Rest nach v2946
+
+Gemessen an Westerfeldstr. 140 (Staging, Analyse vom 13.10., Bericht vom 20.10.).
+Erledigt in v2944–v2946: Wert & Zielbild beim Vermögenszuwachs mit Brücke,
+Wert-Anker aus dem Marktbericht, Zielbild als Plan-Zeile, Hinweis auf neueren
+Bericht, Offerte über Kaufpreis gesperrt, Steuerverlauf mit allen Verlustjahren,
+Steuerverlauf und „Ankauf gegen Bestand" aus dem heutigen Stand.
+
+Offen, nach Schwere:
+1. **Backend** `_offerteDeckeln` (openaiService.js ~1982) deckelt nur `kaufpreis_offerte.empfohlen`, nicht `offerte_mail.text` und `verhandlungsempfehlung` (die Anzeige sperrt seit v2946, der Text bleibt falsch).
+2. **Verlauf „Marktpreisindikation (nach Abschlag)"** (`ui.js` ~3048, Trend ~3330): Berichte 1–3 hatten keinen Abschlag → Trend 1.055.000 → 820.000 € „−22,3 %“ vergleicht Ungleiches; `toFixed` mit englischem Punkt.
+3. **Portalnamen nach außen** in Lage & Markt (Quellenliste `ui.js` ~1952/1963): „immobilienscout24.de“, „Immowelt/Scout24“ — Regel 14.10.2026 „keine Quelle nach außen“.
+4. **Satz in Wert & Marktpreis** (`wertvergleich.js:101`): „im Mittel 2.165 €/m² × 390 m²“ = 844.350 €, Mitte ohne Abschlag aber 886.385 € (Faktor ~1,05 unbenannt); „im Mittel“ ist der Median.
+5. **Gleiche Namen, andere Zahlen:** Bruttomietrendite 7,0 % (Bericht, ohne Zusatzeinnahmen) gegen 7,23 % (App, mit 1.080 €); „DealPilot-Score“ 85 (Bericht) / 78 (Kern) / 73 (Karte).
+6. Kosmetik: DealScore „74,00 → 73,00“ (`ui.js` ~2041/2049, Einheit score fehlt im Formatierer); Ankauf-Cashflow „—“ obwohl im Ankauf-Stand; Rohertrag 39.780 gegen 39.420 €.
+7. Nebenbefund Steuer (Vermutung, prüfen): 2025 Steuer 0 € bei V+V +4.663 €; 2026 33 %, 2027 47 % effektiv; § 7b „Neubau/EH40“ bei Baujahr 1967 angehakt.
+
 ### N77 · Kappungsgrenzen HE und BW — Wiedervorlage (20.10.2026)
 
 Marcel 20.10.2026: „vor dem 25.11. prüfen, ob Hessen verlängert". Beide Nachfolge-Verordnungen sind am 20.10. nur **Entwurf in der Anhörung**, nichts verkündet. Belege stehen in `frontend/js/data/kappungsgrenzen.json` unter `unsicher_grund`.
