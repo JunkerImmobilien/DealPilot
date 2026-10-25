@@ -1768,6 +1768,20 @@ window._dpPaTab = function (id, btn) {
     for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('active', tabs[i] === btn);
     var pans = wrap.querySelectorAll('.dp-pa-panel');
     for (var j = 0; j < pans.length; j++) pans[j].classList.toggle('active', pans[j].id === 'dp-pa-' + id);
+    /* v2946 · Steuerverlauf und „Ankauf gegen Bestand" wurden beim RENDERN der Analyse
+       gebaut - oft bevor das Objekt fertig gerechnet war. Gemessen an Westerfeldstr. 140:
+       Steuern ab Wendepunkt -109.865 € hier gegen -92.983 € im Reiter Steuer; Genau
+       zeigte 15 Kennzahlen und Steuerwirkung -130 €, Einfach 16 und 0 €. Beim Oeffnen
+       eines Unterreiters wird beides aus dem heutigen Stand neu gebaut. */
+    try { if (window.DpSteuerVerlauf) window.DpSteuerVerlauf.mountAll(); } catch (e2) {}
+    if (id === 'si' && typeof window._dpPaSollIstNeu === 'function') {
+      var altH = wrap.querySelector('.abw-tafel-host');
+      if (altH) {
+        var tmp = document.createElement('div'); tmp.innerHTML = window._dpPaSollIstNeu();
+        var neuH = tmp.querySelector('.abw-tafel-host');
+        if (neuH) altH.parentNode.replaceChild(neuH, altH);
+      }
+    }
   } catch (e) {}
 };
 
@@ -1970,16 +1984,35 @@ function _renderAIServerAnalysis(a) {
   var pV = sec('', I.deal, 'VERHANDLUNG & OFFERTE');
   if (has(a.verhandlungsempfehlung))
     pV += '<div class="dp-pa-card">' + sec('', I.deal, 'VERHANDLUNGSEMPFEHLUNG') + p(a.verhandlungsempfehlung) + '</div>';
+  /* v2946 · DIE OFFERTE LIEGT NIE UEBER DEM KAUFPREIS - auch nicht in der Anzeige.
+     Die Deckelung im Backend (openaiService.js _offerteDeckeln, v2264) greift nur beim
+     Erzeugen. Gemessen 25.10.2026 an Westerfeldstr. 140 (Analyse vom 13.10.): Offerte
+     910.000 € bei 545.000 € Kaufpreis, dazu eine fertige Mail „biete … 910.000 € an".
+     Hier wird gegen den HEUTIGEN Kaufpreis geprueft; liegt die Offerte darueber,
+     erscheint sie nicht als Zahl und die Mail wird nicht angeboten. */
+  var _offUeber = null;
+  try {
+    var _offKp = Number((window.State && State.kpis && State.kpis.kp) || (document.getElementById('kp') || {}).value);
+    var _offRoh = a.kaufpreis_offerte && a.kaufpreis_offerte.empfohlen != null ? String(a.kaufpreis_offerte.empfohlen) : '';
+    var _offW = parseFloat(_offRoh.replace(/[^0-9.,]/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'));
+    if (_offKp > 0 && isFinite(_offW) && _offW > _offKp) _offUeber = { wert: _offW, kp: _offKp };
+  } catch (e) { _offUeber = null; }
   if (a.kaufpreis_offerte && typeof a.kaufpreis_offerte === 'object') {
     var kp = a.kaufpreis_offerte;
     pV += '<div class="dp-pa-card dp-pa-offerte">' + sec('', I.deal, 'KAUFPREIS-OFFERTE');
-    if (kp.empfohlen)   pV += '<div class="dp-pa-price">' + _escClean(kp.empfohlen) + '</div>';
+    if (_offUeber) pV += '<div class="dp-pa-stand dp-pa-stand-alt" style="margin:6px 0 10px"><b>Diese Offerte gilt nicht:</b> Die Analyse schlug '
+      + Math.round(_offUeber.wert).toLocaleString('de-DE') + ' € vor, das liegt über dem Kaufpreis von '
+      + Math.round(_offUeber.kp).toLocaleString('de-DE') + ' €. Eine Offerte liegt höchstens beim Kaufpreis. Bitte die Pilot-Analyse neu abrufen.</div>';
+    else if (kp.empfohlen) pV += '<div class="dp-pa-price">' + _escClean(kp.empfohlen) + '</div>';
     if (kp.begruendung) pV += p(kp.begruendung);
     if (Array.isArray(kp.argumente) && kp.argumente.length)
       pV += '<div class="dp-pa-kv"><strong>Argumente f\u00fcr die Verhandlung:</strong></div>' + list(kp.argumente);
     pV += '</div>';
   }
-  if (a.offerte_mail && typeof a.offerte_mail === 'object') {
+  if (_offUeber && a.offerte_mail && typeof a.offerte_mail === 'object') {
+    pV += '<div class="dp-pa-card dp-pa-offmail">' + sec('', I.deal, 'OFFERTE ALS E-MAIL')
+      + '<em class="dp-pa-empty">Keine Mail: die Offerte dieser Analyse liegt über dem Kaufpreis (siehe oben). Nach einem neuen Abruf steht sie hier.</em></div>';
+  } else if (a.offerte_mail && typeof a.offerte_mail === 'object') {
     var om = a.offerte_mail;
     var omRaw = (om.text || '');
     pV += '<div class="dp-pa-card dp-pa-offmail">' + sec('', I.deal, 'OFFERTE ALS E-MAIL') +
@@ -2105,6 +2138,7 @@ function _renderAIServerAnalysis(a) {
       + '</div></div>';
   }
   var _siHtml = _sollIstHtml();
+  window._dpPaSollIstNeu = _sollIstHtml;   /* v2946 · fuer den Neuaufbau beim Oeffnen des Unterreiters */
   /* v2430 · Ankauf · Bestand · Zielbild: die Tafel aus DpPotenzial (rechnet keinen
      Ertragswert selbst - der kommt aus dem Marktbericht-Dienst) und der Absatz des
      Piloten (potenzial_text). Ohne Soll-Miete und Zielbild bleibt es beim Abgleich. */

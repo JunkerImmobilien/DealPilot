@@ -55,12 +55,20 @@
     }
     return ev.filter(function (e) { return R.some(function (r) { return r.jahr === e[0]; }); });
   }
+  /* v2946 · Wendepunkt = ab hier DAUERHAFT positiv. Bis v2945 galt der erste Uebergang
+     ins Positive - gemessen an Westerfeldstr. 140: 2025-2027 positiv, 2028-2030 Verlust
+     (-8.538 / -7.887 / -7.463 €), trotzdem stand dort „keine Verlustjahre, vom ersten
+     Jahr an positiv, Erstattungen 0 €". Jetzt zaehlen alle Verlustjahre vor dem
+     Wendepunkt, auch wenn ein positives Jahr davor lag. */
   function auswerten(R) {
     var w = -1;
-    for (var i = 0; i < R.length; i++) { if (R[i].erg > 0 && (i === 0 || R[i - 1].erg <= 0)) { w = i; break; } }
-    var erst = 0, steuer = 0;
-    R.forEach(function (r, i) { if (w > 0 && i < w) erst += Math.max(0, r.steuer); if (w >= 0 && i >= w) steuer += Math.min(0, r.steuer); });
-    return { wende: w, jahr: w >= 0 ? R[w].jahr : null, erstattung: erst, steuer: steuer };
+    for (var i = R.length - 1; i >= 0; i--) { if (R[i].erg > 0) w = i; else break; }
+    var erst = 0, steuer = 0, verluste = 0;
+    R.forEach(function (r, i) {
+      if (w < 0 || i < w) { if (r.erg <= 0) verluste++; erst += Math.max(0, r.steuer); }
+      if (w >= 0 && i >= w) steuer += Math.min(0, r.steuer);
+    });
+    return { wende: w, jahr: w >= 0 ? R[w].jahr : null, erstattung: erst, steuer: steuer, verluste: verluste };
   }
 
   function stilEinhaengen() {
@@ -102,7 +110,7 @@
     stilEinhaengen();
     var A = auswerten(R), E = ereignisse(R), w = A.wende, n = R.length;
     var zahlen = [
-      ['Steuerlich positiv ab', A.jahr ? String(A.jahr) : 'nicht im Zeitraum', w === 0 ? 'vom ersten Jahr an' : (w > 0 ? 'nach ' + w + ' Verlustjahr' + (w === 1 ? '' : 'en') : R[0].jahr + '–' + R[n - 1].jahr), C.marke],
+      ['Steuerlich positiv ab', A.jahr ? String(A.jahr) : 'nicht im Zeitraum', w === 0 ? 'vom ersten Jahr an' : (w > 0 ? 'nach ' + A.verluste + ' Verlustjahr' + (A.verluste === 1 ? '' : 'en') : R[0].jahr + '–' + R[n - 1].jahr), C.marke],
       ['Erstattungen bis dahin', w > 0 ? sgn(A.erstattung) : '0 €', w > 0 ? R[0].jahr + '–' + R[w - 1].jahr : 'keine Verlustjahre', C.verlust],
       ['Steuern ab dem Wendepunkt', w >= 0 ? eur(A.steuer) : '0 €', w >= 0 ? R[w].jahr + '–' + R[n - 1].jahr : '—', C.gewinn],
       ['Ergebnis V+V im letzten Jahr', sgn(R[n - 1].erg), String(R[n - 1].jahr), '#E6DCC2']
