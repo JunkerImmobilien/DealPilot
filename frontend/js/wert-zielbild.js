@@ -223,8 +223,8 @@
      mit drin sind in der Auswertung". Gelesen wird nur, was am Objekt liegt. */
   function zielbildGrund(d) {
     var p = d && d._potenzial, z = p && p.zusammenfassung, S = z && z.stufen;
-    if (!p || !p.ergebnis) return { code: 'kein_lauf', text: 'Noch kein Potenzial-Lauf: Soll-Miete und Zielbild sind im Objekt nicht erfasst oder nie gerechnet.' };
-    if (!z || !S || !S.bestand) return { code: 'ohne_stufen', text: 'Der Lauf ist gespeichert, aber ohne Stufen (älterer Stand) – im Objekt neu rechnen.' };
+    if (!p || !p.ergebnis) return { code: 'kein_lauf', text: 'Noch nicht erfasst: Im Objekt sind weder Soll-Miete noch Zielbild eingetragen (Bewertung › Mieterhöhung und Zielbild).' };
+    if (!z || !S || !S.bestand) return { code: 'ohne_stufen', text: 'Die Berechnung ist älter und hat noch keine Stufen – im Objekt einmal neu rechnen.' };
     if (!S.mieterhoehung && !S.zielbild) return { code: 'ohne_ziel', text: 'Weder Soll-Miete noch Zielbild eingetragen – es gibt nichts zu vergleichen.' };
     if (z.ertragswert_gesperrt) return { code: 'stufe3', text: 'Ertragswert je Stufe nur mit DealPilot Stufe 3 – Miete und Maßnahmen zählen, der Wert nicht.' };
     var T = S.zielbild || S.mieterhoehung;

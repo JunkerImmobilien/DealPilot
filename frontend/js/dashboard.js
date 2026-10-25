@@ -895,7 +895,7 @@
     if (!_detailsLoaded) { host.innerHTML = '<div class="dp-chart-loading" style="height:60px"><span class="dp-spin"></span>Zielbild wird geladen…</div>'; return; }
     var arr = detailArr();
     var A = _zielbildAgg(arr);
-    if (!A) { host.innerHTML = '<div class="zb-leer">Das Potenzial-Modul ist nicht geladen.</div>'; return; }
+    if (!A) { host.innerHTML = '<div class="zb-leer">Der Vergleich ist gerade nicht verfügbar – Seite neu laden.</div>'; return; }
     var E=_fE, EK=_fEK, VZ=_fVZ, P=_fP, dat=_fDat;
     var nMit = A.mit.length;
     var kopfZahl = '<b>' + A.nZiel + ' von ' + A.n + '</b> mit Zielbild'
@@ -906,7 +906,7 @@
     var gruendeHtml = gruende.length ? '<div class="zb-gr"><div class="zb-gr-t">Nicht oder nur teilweise enthalten · mit Grund</div>'
       + gruende.map(function(x){ return '<div class="zb-gr-row"><span class="zb-gr-n">'+esc(x.name)+'</span><span class="zb-gr-g">'+esc(x.grund||'')+'</span>'+knopf(x.key)+'</div>'; }).join('')
       + '</div>' : '';
-    var neuHtml = '<div class="zb-neu"><b>Neu rechnen:</b> Der Vergleich liest die Läufe, die am Objekt gespeichert sind'
+    var neuHtml = '<div class="zb-neu"><b>Neu rechnen:</b> Der Vergleich liest die Berechnungen, die am Objekt gespeichert sind'
       + (A.staende.length ? ' (Stand ' + (A.staende[0] === A.staende[A.staende.length-1] ? dat(A.staende[0]) : dat(A.staende[0]) + ' bis ' + dat(A.staende[A.staende.length-1])) + ')' : '')
       + '. <b>„neu rechnen ↻“</b> an jedem Objekt öffnet es, rechnet die Ertragswerte je Stufe <b>kostenlos</b> neu (kein Kontingent) und speichert; danach das Cockpit wieder öffnen. Dasselbe geschieht im Objekt unter <i>Bewertung › Wert &amp; Zielbild</i>. Kostenpflichtig (ein Kontingent) ist nur ein neuer Marktbericht.</div>';
     if (!nMit) {
@@ -919,7 +919,7 @@
     var bmyB = A.kpMit > 0 ? A.mieteB / A.kpMit * 100 : null, bmyZ = (A.kpMit + A.kosten) > 0 ? A.mieteZ / (A.kpMit + A.kosten) * 100 : null;
 
     function tile(l, v, sub, ton, erkl){ return '<div class="zb-tile"><span class="zb-l">'+esc(l)+'</span><span class="zb-v'+(ton?' zb-'+ton:'')+'">'+v+'</span><span class="zb-s">'+sub+'</span>'+(erkl?'<span class="zb-te">'+erkl+'</span>':'')+'</div>'; }
-    var tiles = tile('Kaltmiete im Jahr', EK(A.mieteB)+' <i>→</i> '+EK(A.mieteZ), VZ(mehrZ)+' · '+P(A.mieteB?mehrZ/A.mieteB*100:null), 'pos', 'Summe der Wohnungsmieten laut Potenzial-Modul, heute und in der höchsten Stufe.')
+    var tiles = tile('Kaltmiete im Jahr', EK(A.mieteB)+' <i>→</i> '+EK(A.mieteZ), VZ(mehrZ)+' · '+P(A.mieteB?mehrZ/A.mieteB*100:null), 'pos', 'Summe der Wohnungsmieten aus „Mieterhöhung und Zielbild“ der Objekte – heute und in der höchsten eingetragenen Stufe.')
       + tile('Bruttomietrendite', _fPr(bmyB,2)+' <i>→</i> '+_fPr(bmyZ,2), 'Miete / Kaufpreis · im Zielbild / (Kaufpreis + Maßnahmen)', bmyZ>=bmyB?'pos':'neg', 'Über dieselben ' + nMit + ' Objekte, Kaufpreise ' + EK(A.kpMit) + '.')
       + tile('Maßnahmen', EK(A.kosten), A.kosten ? 'bis zum Zielbild, ohne Finanzierung' : 'keine eingetragen', null, 'Kosten aus den Maßnahmen je Wohnung und Haus.')
       + (A.ewN ? tile('Wertzuwachs nach Kosten', VZ(A.zuw), 'Ertragswert ' + EK(A.ewB) + ' → ' + EK(A.ewZ) + ' − Maßnahmen', A.zuw>=0?'pos':'neg', 'Über ' + A.ewN + ' Objekt' + (A.ewN===1?'':'e') + ' mit gerechnetem Ertragswert.')
@@ -946,7 +946,7 @@
       var pz = e.mB ? ((e.mZ - e.mB) / e.mB * 100) : null;
       var w = pz != null ? Math.max(pz, 0) / maxP * 100 : 0;
       return '<div class="zb-o">'
-        + '<div class="zb-o-n" title="'+esc(e.name)+'">'+esc(e.name)+'<small>'+(e.top==='zielbild'?'Zielbild':'nur Mieterhöhung')+(e.stand?' · Lauf '+dat(e.stand):'')+'</small></div>'
+        + '<div class="zb-o-n" title="'+esc(e.name)+'">'+esc(e.name)+'<small>'+(e.top==='zielbild'?'Zielbild':'nur Mieterhöhung')+(e.stand?' · gerechnet am '+dat(e.stand):'')+'</small></div>'
         + '<div class="zb-o-g"><span class="zb-o-bar"><span style="width:'+w.toFixed(2)+'%"></span></span>'
         +   '<span class="zb-o-m">'+EK(e.mB)+' → '+EK(e.mZ)+' <b>'+P(pz)+'</b></span>'
         +   (e.ewB != null && e.ewZ === e.ewB && e.mZ > e.mB ? '<small class="zb-o-hin">Mehrmiete liegt über der marktüblichen Miete – im Ertragswert nicht angesetzt</small>' : '') + '</div>'
@@ -961,7 +961,7 @@
     /* Basis-Abgleich mit Kachel 02 (Marcel: „das muss ja auch valide sein") */
     var abgl = '<div class="zb-abgl"><div class="zb-gr-t">Abgleich mit den Kennzahlen oben</div>'
       + '<p>Die Kennzahlen in Abschnitt 02 rechnen über <b>alle ' + A.n + ' Objekte</b>, dieser Vergleich nur über die <b>' + nMit + ' mit Angaben</b>. '
-      + 'Für diese ' + nMit + ' Objekte steht in den Objektdaten eine Jahresmiete von ' + E(A.mieteObjMit) + ' (wie Kachel 02: Kaltmiete plus Zusatzeinnahmen); das Potenzial-Modul rechnet mit ' + E(A.mieteB)
+      + 'Für diese ' + nMit + ' Objekte steht in den Objektdaten eine Jahresmiete von ' + E(A.mieteObjMit) + ' (wie Kachel 02: Kaltmiete plus Zusatzeinnahmen); dieser Vergleich rechnet mit ' + E(A.mieteB)
       + ' – nur die Wohnungsmieten je Einheit' + (Math.abs(A.mieteObjMit - A.mieteB) >= 1 ? ', Unterschied ' + VZ(A.mieteB - A.mieteObjMit) + ' (Stellplätze, Zusatzeinnahmen, abweichende Einheitenmieten)' : '') + '.</p></div>';
 
     var t = _zbSaetze(A);   /* v2951b: dieselben Saetze gehen an den Portfolio-Piloten */
@@ -1006,7 +1006,11 @@
       + z('+ Nebenkosten', EK(G.nk), '', 'Grunderwerbsteuer, Notar, Makler')
       + (Math.abs(G.sonst) >= 1 ? z('+ Sanierung, Inventar u. a.', EK(G.sonst), '', 'Rest bis zur Gesamtinvestition') : '')
       + z('= Gesamtinvestition', EK(s.gi), 'gb-sum', 'wie Kachel „Investition“')
-      + z('davon Darlehen', EK(s.darl), 'gb-sub') + z('davon Eigenkapital eingesetzt', EK(s.ek), 'gb-sub')
+      /* v2951d · gemessen: Darlehen 5.926.980 + Eigenkapital 2.077.954 = 8.004.934 € - nicht
+         ganz die Gesamtinvestition 8.010.198 €. „davon" haette eine Summe behauptet, die
+         nicht aufgeht; die Luecke wird genannt statt verschwiegen. */
+      + z('finanziert mit Darlehen', EK(s.darl), 'gb-sub') + z('und Eigenkapital (laut Objekten)', EK(s.ek), 'gb-sub')
+      + (Math.abs(s.gi - s.darl - s.ek) >= 1 ? z((s.gi - s.darl - s.ek > 0 ? 'nicht zugeordnet' : 'mehr finanziert als investiert'), _fE(Math.abs(s.gi - s.darl - s.ek)), 'gb-sub', 'Darlehen + Eigenkapital je Objekt ≠ Gesamtinvestition – Reiter Finanzierung prüfen') : '')
       + '<p class="cp-erkl">Das Geld, das in die Objekte geflossen ist. Nebenkosten sind bezahlt, aber kein Vermögenswert – sie stecken in keinem Wert unten.</p></div>';
     var b2 = '<div class="gb-k"><div class="gb-t"><span>2</span>Was es heute in der Bilanz ist</div>'
       + z('Objektwerte (Wertansatz Kaufpreis)', EK(H.wert), '', H.objs.length + ' Objekte')
@@ -1014,11 +1018,11 @@
       + z('= Eigenkapital im Bestand', EK(H.ek), 'gb-sum', 'Quote ' + _fPr(H.wert ? H.ek / H.wert * 100 : null))
       + '<p class="cp-erkl">Die Vermögensbilanz in Abschnitt 06 geht immer auf: Eigenkapital ist, was nach Abzug der Schulden vom Wert übrig bleibt. Als Wert steht der Kaufpreis – nicht die Gesamtinvestition (Nebenkosten zählen nicht) und kein Gutachten.</p></div>';
     var b3 = '<div class="gb-k"><div class="gb-t"><span>3</span>Was es nach Bewertung ist</div>'
-      + (A.ewN ? z('Ertragswert Bestand', EK(A.ewB), '', A.ewN + ' von ' + G.n + ' Objekten mit Lauf')
+      + (A.ewN ? z('Ertragswert Bestand', EK(A.ewB), '', A.ewN + ' von ' + G.n + ' Objekten mit Berechnung')
           + z('Kaufpreise derselben Objekte', EK(A.kpEw), 'gb-sub')
-          + z('Abstand', _fP(A.kpEw ? (A.ewB / A.kpEw - 1) * 100 : null), 'gb-sum', 'Ertragswert gegen Kaufpreis') : z('Ertragswert', 'noch keiner', '', 'kein Objekt mit Lauf'))
+          + z('Abstand', _fP(A.kpEw ? (A.ewB / A.kpEw - 1) * 100 : null), 'gb-sum', 'Ertragswert gegen Kaufpreis') : z('Ertragswert', 'noch keiner', '', 'kein Objekt berechnet'))
       + (A.mpiN ? z('Marktpreisindikation', EK(A.mpiB), '', A.mpiN + ' Objekte · Angebote nach Abschlag') + z('Abstand zu deren Kaufpreisen', _fP(A.kpMpi ? (A.mpiB / A.kpMpi - 1) * 100 : null), 'gb-sub') : '')
-      + '<p class="cp-erkl">Bewertet sind nur Objekte mit gespeichertem Lauf – deshalb der Vergleich mit den Kaufpreisen <b>derselben</b> Objekte, nicht mit 8,01 Mio. Die ' + (G.n - (A.ewN||0)) + ' übrigen stehen mit Grund im Abschnitt 03.</p></div>';
+      + '<p class="cp-erkl">Bewertet sind nur Objekte mit gespeicherter Berechnung – deshalb der Vergleich mit den Kaufpreisen <b>derselben</b> Objekte, nicht mit der Gesamtinvestition von ' + EK(s.gi) + '. Die ' + (G.n - (A.ewN||0)) + ' übrigen stehen mit Grund im Abschnitt 03. Der Ertragswert ist der Wert aus den Mieten nach ImmoWertV, die Marktpreisindikation der Wert aus Angebotspreisen vergleichbarer Objekte, abzüglich des üblichen Verhandlungsabschlags.</p></div>';
     host.innerHTML = '<div class="gb-wrap"><div class="gb-kopf"><b>Gesamtbewertung</b> · wie Gesamtinvestition, Bilanz und Bewertung zusammenhängen'
       + (imAnkauf ? ' <span class="gb-hin">Kacheln oben im Ankauf-Stand – die Bilanz rechnet mit heute</span>' : '') + '</div>'
       + '<div class="gb-grid">' + b1 + b2 + b3 + '</div></div>';
@@ -1058,7 +1062,8 @@
     K.push(k('Miete · im Monat', _fE(s.mieteM), 'pos', 'Bruttomietrendite ' + _fPr(s.brutto, 2),
       'Netto kalt über alle Objekte, ' + _fE(s.mieteJ) + ' im Jahr. Die Rendite setzt die Jahresmiete ins Verhältnis zur Summe der Kaufpreise.', 'kennzahlen'));
     K.push(k('Cashflow · vor Steuer im Monat', _fE(s.cfVsM), s.cfVsM>=0?'pos':'neg', 'nach Steuer ' + _fE(s.cfNsM) + ' im Monat',
-      'Was nach Bewirtschaftung, Zins und Tilgung übrig bleibt' + (s.dscr != null ? '; die Miete deckt den Kapitaldienst ' + s.dscr.toFixed(2).replace('.', ',') + '-fach' : '') + '.', 'kennzahlen'));
+      'Was nach Bewirtschaftung, Zins und Tilgung übrig bleibt' + (s.dscr != null ? '; die Miete deckt Zins und Tilgung ' + s.dscr.toFixed(2).replace('.', ',') + '-fach' : '') + '.'
+        + (s.cfNsM > s.cfVsM ? ' Nach Steuer bleibt mehr, weil Abschreibung und Zinsen deine Steuer senken.' : ''), 'kennzahlen'));
     if (A.mit && A.mit.length) {
       var mz = A.mieteZ - A.mieteB;
       K.push(k('Zielbild · mehr Miete im Jahr', _fVZ(mz), 'pos', A.nZiel + ' von ' + A.n + ' mit Zielbild' + (A.nMh ? ', ' + A.nMh + ' nur Mieterhöhung' : ''),
