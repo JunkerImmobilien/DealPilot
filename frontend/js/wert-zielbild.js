@@ -181,6 +181,42 @@
     return D;
   }
 
+  /* ── Mehrertrag und Wertzuwachs nach Kosten je Stufe ──────────────────
+     v2950 · EINE Stelle für beide Ableitungen: das offene Objekt (zielDaten)
+     und das gespeicherte (zielbildFuer, Portfolio-Cockpit) nehmen dieselbe. */
+  function mehrUndZuwachs(st) {
+    var B = st.bestand || {}, mehr = {}, zuw = {};
+    ['mieterhoehung', 'zielbild'].forEach(function (k) {
+      if (!st[k]) { mehr[k] = null; zuw[k] = null; return; }
+      mehr[k] = st[k].miete_jahr != null && B.miete_jahr != null ? st[k].miete_jahr - B.miete_jahr : null;
+      zuw[k] = st[k].ertragswert != null && B.ertragswert != null ? st[k].ertragswert - B.ertragswert - (st[k].kosten || 0) : null;
+    });
+    return { mehr: mehr, zuw: zuw };
+  }
+
+  /* ── v2950 · Zielbild eines GESPEICHERTEN Objekts (Portfolio-Cockpit) ──
+     Vorbild DealPilotAnkauf.abweichungFuer(daten): eine Funktion auf dem
+     Datensatz, nicht auf dem offenen Formular. Gelesen wird, was potenzial.js
+     beim letzten Lauf am Objekt abgelegt hat (`_potenzial.zusammenfassung`,
+     storage.js) - gerechnet wird nichts neu. Ob der Lauf noch zum heutigen
+     Formular passt (Prüfwert), lässt sich ohne offenes Formular nicht sagen;
+     deshalb reist sein Datum mit (`stand`). null ohne Mieterhöhung/Zielbild. */
+  function zielbildFuer(d) {
+    var p = d && d._potenzial, z = p && p.zusammenfassung, S = z && z.stufen;
+    if (!S || !S.bestand || (!S.mieterhoehung && !S.zielbild)) return null;
+    var st = {};
+    ['bestand', 'mieterhoehung', 'zielbild'].forEach(function (k) {
+      var s = S[k]; if (!s) return;
+      st[k] = { miete_jahr: zahl(s.kaltmiete_jahr), kosten: zahl(s.kosten) || 0,
+        ertragswert: z.ertragswert_gesperrt ? null : zahl(s.ertragswert), jahr: zahl(s.jahr) };
+    });
+    var mz = mehrUndZuwachs(st);
+    var topK = st.zielbild ? 'zielbild' : 'mieterhoehung';
+    return { stand: (p.stand || z.stand || '').slice(0, 10) || null, art: z.art || null, stufen: st, top: topK,
+      mehrertrag_jahr: mz.mehr, wertzuwachs_nach_kosten: mz.zuw, ertragswert_gesperrt: !!z.ertragswert_gesperrt,
+      kennzeichnung: z.kennzeichnung || null };
+  }
+
   /* ── Ist · Mieterhöhung · Zielbild (DpPotenzial) ─────────────────────── */
   function zielDaten() {
     var PZ = global.DpPotenzial; if (!PZ || typeof PZ.modell !== 'function') return null;
@@ -203,13 +239,7 @@
         /* v2842 · Abschlag und Wert ohne Abschlag; Sanierungsstau der Stufe (v2854) */
         mpi_abschlag_pct: zahl(w.mpi_abschlag_pct), mpi_ohne_abschlag: zahl(w.mpi_ohne_abschlag), sanierungsstau: w.sanierungsstau || null };
     });
-    var B = st.bestand;
-    var mehr = {}, zuw = {};
-    ['mieterhoehung', 'zielbild'].forEach(function (k) {
-      if (!st[k]) { mehr[k] = null; zuw[k] = null; return; }
-      mehr[k] = st[k].miete_jahr != null && B.miete_jahr != null ? st[k].miete_jahr - B.miete_jahr : null;
-      zuw[k] = st[k].ertragswert != null && B.ertragswert != null ? st[k].ertragswert - B.ertragswert - (st[k].kosten || 0) : null;
-    });
+    var mz = mehrUndZuwachs(st), mehr = mz.mehr, zuw = mz.zuw;
     return {
       kennzeichnung: PZ.KENNZEICHNUNG || 'Die Ertragswerte nach Mieterhöhung und im Zielbild sind ein Ausblick: Sie unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand.',
       art: m.art || null, spalten: spalten,
@@ -805,5 +835,5 @@
      statt aus einem zweiten Abruf (pdf-wert-zielbild.js daten()) */
   function bericht() { return (_hist.key && _hist.key === key()) ? _hist.eintrag : null; }
   global.DpWertZielbild = { VERSION: VERSION, daten: daten, laden: laden, bericht: bericht, karte: karte, potenzialHost: potenzialHost,
-    einfachHtml: einfachHtml, reiterHtml: reiterHtml, _wertDaten: wertDaten };
+    einfachHtml: einfachHtml, reiterHtml: reiterHtml, _wertDaten: wertDaten, zielbildFuer: zielbildFuer };
 })(window);
