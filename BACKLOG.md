@@ -50,119 +50,33 @@ Marcel 20.10.2026: „vor dem 25.11. prüfen, ob Hessen verlängert". Beide Nach
 3. **Alte `_mb_state`-Schnappschüsse** tragen keinen Abschlag; die Karte zeigt Angebotsniveau, bis neu abgerufen wird. Bewusst nicht nachgerechnet (Abruf kostet Kontingent).
 4. **Regel seit 14.10.:** nach außen keine Quellennamen (auch nicht ImmobilienScout). Quelle, Stand und Link des Abschlags nur intern in `config.js angebotAbschlagMarkt`.
 
-### N74 · DealPilot-Marktbewertung: Abschlag auf Angebotspreise — ERLEDIGT 14.10.2026 (v2237: Einstellung, Ø Markt 5,8 %, im Urteil)
-> 14.10.2026: Die Spanne der DealPilot-Marktbewertung beruht auf Angebotspreisen. ImmoScout24/Sprengnetter (ETW, bundesweit, 12/2025): Kaufpreise 5,8 % unter Angebot (Mitte 2025: 6,8 %; Köln 9,2 %, Hamburg 7,8 %, Leipzig 0 %). Hamburger Studie: 6,7 %. Im Messe-Video wird der Abschlag nur im Text gezeigt (6 %, Ø 189.000 € → rund 178.000 €). Offen: soll die App den Abschlag selbst abziehen oder ausweisen (pauschal, regional, mit Quelle)?
-
-### N75 · Pilot-Analyse kennt den Marktwert nicht — ERLEDIGT 14.10.2026 (v2237: `markt` im Aufruf, zwei Sichten im Prompt)
-> 14.10.2026, Rundgang-Wohnung (Kaufpreis 139.000 €, DealPilot Ø 189.000 €, realistisch ~178.000 €): Die Analyse sagt nur „kein Kauf, höchstens 117.086 €" (Zielrendite C-Lage). Den Wertpuffer gegenüber dem Marktwert erwähnt sie nicht. Zu prüfen: geht `_mb_state` (Marktwert/Spanne) in `/ai/quickcheck-analyse` mit? Marcel: „nicht in meiner Lageklasse, aber mega, weil direkte Wertsteigerung möglich".
-
-### N73 · Quick-Check-Score gegen Investor Deal Score — ENTSCHIEDEN 14.10.2026: bleibt getrennt
-> Marcel: Der Investor Deal Score bleibt gesondert, weil er mehr Kennzahlen hat, deutlich genauere Aussagen trifft und die Lage eingeht. Quick-Check = DealScore (gemessen gleich), DS2 eigenständig.
-> Gemessen 14.10.2026 (Testobjekt Musterweg 7, Bielefeld, Staging): Quick-Check 46 = Objekt-DealScore 46 (alle Teilwerte gleich). Der Investor Deal Score (DS2, 24 Kennzahlen inkl. Lage/Markt) zeigt am selben Objekt 63. Zwei Zahlen für dasselbe Objekt. Offen: welcher Score wo führt, oder ob DS2 im Quick-Check mitgezeigt bzw. angeglichen wird.
-
 ### N72 · Quick-Check: DealPilot-Marktwert erreicht den Score nicht — offen, Entscheidung Marcel
 > Gefunden beim Messe-Drehbuch (v2222). `QcApp.registerDpmb` füllt `_avmResults` (Potenzial-Teilscore, Pro/Contra „Preis vs. Marktwert"). Der einzige Aufruf steht in `frontend/js/dealpilot-mb-qc.js:298` hinter dem `return` aus v832c und nutzt `global.QcApp`, das als `const` nicht am window hängt.
 > Gemessen: Potenzial 30 bei Marktwert 199–351 T€ und Kaufpreis 139 T€. Eine Korrektur ändert Quick-Check-Scores, deshalb erst nach Freigabe.
 
-### N71 · Marcel 14.10.2026 (achte Runde) — erledigt bis auf Abnahmen (`v2218g`–`v2219c`)
-> Geführte Eingabe randlos · Dokumente im PDF-Import · Sprache direkt Freisprechen · Sprechkatalog ergänzt, Grenze 320 · Messe-Drehbuch Parkstraße · **Datenfehler Soll-Ansicht behoben (v2219a), Parkstraße wiederhergestellt**.
-1. ~~Prod-Rollout v2219a~~ **erledigt 14.10.2026**, Prod-Rollout (19) `b11f88b4`.
-2. **Offen:** Marcel nimmt Drehbuch 1 ab (`?messe=parkstrasse`), danach Drehbücher 2–10.
+### N71 · Marcel 14.10.2026 (achte Runde) — Rest: Abnahme (Erledigtes s. Fertig)
 
-### N70 · Marcel 14.10.2026 (siebte Runde) — erledigt bis auf Abnahmen (`v2218a`–`v2218f`)
-> Pilot-Analyse Parkstraße neu · Atlas am Handy gemessen und repariert · Pilot erst nach Anmeldung · Mikrofon neben Senden (WhatsApp) · Handy-Menü nach der ersten Aktion wieder klickbar.
+- **Offen:** Marcel nimmt Drehbuch 1 ab (`?messe=parkstrasse`), danach Drehbücher 2–10.
+
+### N70 · Marcel 14.10.2026 (siebte Runde) — Rest: Abnahmen (Erledigtes s. Fertig)
+
 1. **Offen:** Halten zum Sprechen auf echtem Handy abnehmen.
-2. **Offen:** Marktbericht Parkstraße neu (482.000 € Marktwert gegen 780.000 € Kaufpreis) — Kontingent, Marcels Entscheidung.
+2. **Offen:** Marktbericht Parkstraße neu (482.000 € Marktwert gegen 780.000 € Kaufpreis) — Kontingent, Entscheidung Marcel offen.
 3. **Offen:** Messe-Videos — Vorschlag liegt bei Marcel.
 
-### N69 · Marcel 14.10.2026 (sechste Runde) — erledigt bis auf Abnahmen
-> Pilot-Analyse beim Ankauf gegenübergestellt, Soll/Ist nur im Bestand, Marktbericht ab erstem Bericht (`v2217`/`v2217b`) · Dokumente in der Datenaufnahme mit Abgleich, Abweichungen beim Exposé-Import (`v2217`–`v2217d`) · geführte Eingabe nach dem Quick-Check frei (`v2217c`) · Bot `soll_ist_lesen`, UUID- und Tilgungsfehler (`v2217a`) · Gesamt-Atlas in der App mit Telegram-Bot (`v2218`).
-1. **Offen:** Pilot-Analyse Parkstraße neu abrufen (veraltet, DSCR 0,30) — Marcels Entscheidung, kostet Kontingent.
+### N69 · Marcel 14.10.2026 (sechste Runde) — Rest (Erledigtes s. Fertig)
+
+1. **Offen:** Pilot-Analyse Parkstraße neu abrufen (veraltet, DSCR 0,30) — kostet Kontingent, Entscheidung Marcel offen.
 2. **Offen:** Gesamt-Atlas am Handy messen.
-3. **Offen:** Prod-Rollout v2217–v2218 (braucht Freigabe; Rebuild backend).
 
-### N68 · Marcel 14.10.2026 (fünfte Runde)
-> **Stand 14.10.2026:** 1 erledigt (`v2216j`), 3 erledigt (`v2216j`/`v2216k`), 2: Marcel wählte „Start wie heute, alles drauf, dann der Gesamtablauf" → `design/Vorschläge/prozessatlas/atlas-gesamt.html` — **wartet auf Abnahme, dann Übernahme in `prozess-atlas.js`**. Prod-Rollout (18) `471bd747` erledigt.
-1. **Soll/Ist gehört in die Pilot-Analyse (Reiter Ist/Soll), nicht in den Tab Objekt** — die Tafel „Bestand gegen Ankauf" (`#dp-abweichung`, seit v2034) dort raus.
-2. **Prozessatlas cooler und animierter:** Unterkarten; Spracheingabe visualisieren; Import aus PDF visualisieren; sehr detailliert, wie die Prozesse in allen Bereichen funktionieren; die zugehörigen Daten; den Nutzen, der herauskommt; am Schluss, wie alles zusammenspielt. Schlüssig, mit Wow-Effekt für den Kunden. **5–6 Ideen fertig machen** (Demo-first, `design/Vorschläge/`).
-3. **F1 ruft den Piloten bei Dropdown-Feldern nicht.**
+### N64 · Marcels Antworten vom 14.10.2026 — Rest: Entscheidungen zu noch offenen Punkten (Erledigtes s. Fertig)
 
-### N67 · Marcel 14.10.2026 (vierte Runde)
-0. **Prod-Rollout v2208–v2215b freigegeben** („ja du kannst ausrollen").
-1. **Handy: Aktionen → Marktbericht geht einmal, danach reagiert keine Aktion mehr.**
-2. **Handy: Knöpfe Plan und Abmelden sehr klein, Icons nicht erkennbar.**
-3. **Schließen-Knöpfe sehen komisch aus → ein vernünftiges „×".**
-4. **Handy-Kopf:** alle wichtigen Informationen drauf, aber wild angeordnet → aufräumen. In der Messkabine durchtesten.
-5. **Parkstr. 9 (2026-1056):** Nettokaltmiete anpassen, damit es eine gute Geschichte wird (Demo-Objekt).
-6. **Soll/Ist-Analyse** (Pilot-Analyse) ausbauen.
-7. **Auch in Kanzlei, Tower und Aktenmappe prüfen** (Marcel, während der Arbeit).
-8. **Desktop:** Das Aktionsmenü soll beim Auswählen eines Objekts NICHT zugehen (nur am Handy).
-9. **Anzeige → Anzeige-Option:** Auslieferungszustand ist immer **Aktenmappe mit Boardkarte**.
-10. **Löschen-/Duplizieren-Knöpfe auf den Objektkarten:** Der Rahmen drumherum ist zu groß → der Score wird abgeschnitten, der Kartenrahmen stimmt nicht mehr.
-
-> **✅ 1–10 gebaut 14.10.2026 · v2216–v2216i (Staging), gemessen in der Messkabine und am Desktop** — Einzelheiten im Journal. Dazu zwei echte Fehler: Marktbericht fehlte im Register der Hauptansichten; Ankauf-Stand teilte die Einheitenliste mit dem Formular (Plan änderte sich rückwirkend).
-> **Offen:** Punkt 0 — der Push nach `main` (Zweig `prod-rollout-18`, Stand v2215b) scheiterte am Sicherheitsfilter. Nach Marcels Auftrag den Merge mit dem neuesten Staging-Stand (v2216i) neu bauen und ausrollen.
-
-### N66 · Marcel 14.10.2026 (dritte Runde) — Messe-Geschichten, BMF, RND-Abgleich, Werbungskosten
-1. **Messe-Geschichten als Dokument ablegen** — was Marcel an jedem Demo-Objekt erklären kann.
-2. **BMF-Kaufpreisaufteilung** bei den Demo-Objekten nachziehen.
-3. **RND-Abgleich als Beispiele:** wie man die Restnutzungsdauer heben könnte, und ein Beispiel, wo es so bleibt. **Westerfeldstraße 140** als Hauptbeispiel: von wo auf wo, und was es steuerlich gebracht hat (echtes RND-Gutachten unter `Dateien/`).
-4. **Werbungskosten im Detail** bei den Demo-Objekten plausibel füllen (Fahrten, Material …) — recherchiert.
-5. Danach: Landingpage, Leistungsumfang, F&E-Seite.
-
-> **✅ 1–5 erledigt 14.10.2026 (Staging):** `design/Messe/demo-geschichten.md`, BMF bei 15 Objekten, Westerfeld als RND-Beispiel (2 % → 6,25 %, rund 1.530 €/Jahr), RND-Abgleich-Tabelle, Werbungskosten 2024–2026; Landing v2215–v2215b (Prozesskarte im Leistungsumfang, `forschung.html`). Dabei behoben: v2213/v2213b (BMF −96,6 % und `#VALUE!`, Cache), **v2214 (Steuer-Jahreswerte gingen verloren — auch auf Prod!)**.
-> **Offen:** Soll/Ist in der Pilot-Analyse ausbauen (N64), dunkleres Grün/Rot für kleine Zahlen (N64), geführte Datenaufnahme (N62.12), Prod-Rollout v2208–v2215b nach Freigabe — **v2214 dringend**.
-
-### N65 · Marcel 14.10.2026 (zweite Runde) — Antworten und Einstellungen → Standardwerte
-
-**Antworten:**
-- Chrome ist verbunden, angemeldet als info@junker-immobilien.io (dort liegen die Objekte) → **alles im Browser genau prüfen**.
-- **Datenschutz: schwärzen** („wir schauen, wie weit wir kommen").
-- **Gewerbe: recherchieren, wie es sein muss, und so umsetzen, wie es am besten ist.**
-- **Demo-Objekte: umsetzen, dass es passt** (Konto info@junker-immobilien.io).
-- **F&E-Seite: so machen**, und zwar MIT „wir arbeiten mit Steuerkanzleien zusammen" (Marcels ausdrücklicher Wunsch, gegen meinen Hinweis auf den Antrag).
-
-**Einstellungen → Standardwerte (Marcel wörtlich zusammengefasst):**
-1. Oben die Sets (DealPilot Standard, Vorsichtig, Renditeorientiert), darunter die Einzelkarten. Es ist nicht erkennbar, dass die Einzelkarten zum gewählten Set gehören → klarer darstellen.
-2. **Finanzierung:** Früher gab es eine Checkbox „Zins und Tilgung selbst eingeben" ODER „indikativen Satz ziehen" → wieder als Entweder-oder.
-3. **Bewirtschaftung:** heute nur Prozent → Umschalter **Euro / Prozent**. Prüfen, was üblich ist. Die neuen Sätze je m² aus der eigenen Datenbank (BWK-Jahrestabelle) — wie werden sie übernommen, und wie passiert das im Quick-Check?
-4. **Lageklassen:** Dort stehen Mietausfall, Bewirtschaftung nicht umlagefähig und Eigenkapital. Doppelt mit Bewirtschaftung? Abgleichen.
-5. **„Bewirtschaftung" und „Bewirtschaftung je Objektart"** stehen nebeneinander → „das kann keiner verstehen". Zusammenführen oder klar trennen.
-6. **Steuer:** Welcher Grenzsteuersatz ist der Standard? Den privaten Steuersatz gibt es unter Mandanten → dorthin verlinken.
-7. **KI-Icons auf den Karten: grundsätzlich weg.**
-8. Die Ansicht nach dem Klick auf eine Karte: schöner, einfacher, verständlicher visualisieren.
-
-> **✅ 1–8 gebaut 14.10.2026 · v2211/v2211a (`45917195`, `c1fef5c1`, Staging), im Browser geprüft** — Einzelheiten im Journal. Dazu ✅ Schwärzen v2210, ✅ Gewerbe v2210b (Rest: LZS-Zweig nach Gewerbeanteil nur als Hinweis), ✅ Rumpfjahr v2209.
-> **Offen aus N64/N65:** Demo-Objekte (Konto info@junker-immobilien.io), Landing: Leistungsumfang mit Prozesskarte + F&E-Unterseite (mit Kanzlei-Zusammenarbeit), Soll/Ist in der Pilot-Analyse ausbauen, dunkleres Grün/Rot für kleine Zahlen, geführte Datenaufnahme durchgehen.
-
-### N64 · Marcels Antworten vom 14.10.2026 — Entscheidungen zu den offenen Fragen
-
-| Punkt | Entscheidung |
-|---|---|
-| N62.8 Preise Integrationsservice / Bestandsmigration | **„auf Anfrage"** — kein Festpreis |
-| N62.15 Datenschutz | Marcel glaubt nicht, dass Kaufverträge, Grundbuch, Geburtsdaten, Fotos an OpenAI gehen, und nicht, dass Daten Dritter weitergereicht werden („außer man würde sie explizit in die Felder eintragen"). **Erst im Code nachweisen, was wirklich hinausgeht**, dann entscheiden, was in den Text gehört. |
-| N61.2 Soll/Ist in der Pilot-Analyse | **ausbauen:** genauer beschreiben, ggf. mehr Felder |
-| N62.21 Gewerbe im Ertragswert | **Nutzfläche und Nutzungsart** im passenden Reiter im Tab Objekt, nur sichtbar, wenn wirklich Gewerbe da ist; Ort in Stufe 3 suchen |
-| N62.24 Kontrast | **dunkleres Grün und Rot für kleine Zahlen erlaubt** |
-| Tour am Handy | **bleibt so** — Hauptsache sie funktioniert und wird vernünftig angezeigt |
-| Quick-Check Hausnummer | **keine Pflicht** — die Regel kam aus einem früheren Chat, nicht von Marcel |
-| „Soll/Ist-Umschalter im Quick-Check" | **erledigt**, der ist weg |
-| N62.7 Landing Leistungsumfang | ja — dazu die abgelegte **Prozesskarte** verwenden |
-| N62.9 Subpage F&E | ja — Quelle `E:\Portfolio Strategie` (Marcel gibt den Ordner frei) |
-| N62.12 Geführte Datenaufnahme | durchgehen, mit allen Stufen |
-| N62.13 Rumpfjahr | **erst prüfen**; Marcel: „wird beides anteilig gerechnet" |
-| N62.13 Regionaldatenbank | **gelöst**, dazu eine **eigene Datenbank** angelegt → muss in Projektanweisung / Wissen stehen |
-| N60.19 Demo-Objekte | Marcel fragt, was er entscheiden soll → Frage konkret stellen |
-| Einstellungen-Demo | „irgendwo eine Demo abgelegt, ich glaube für die Einstellungen" → nachsehen |
-
-Alles andere: abarbeiten.
-
-**Stand 14.10.2026:**
-- ✅ **Rumpfjahr** v2209 (`cde5c927`, Staging): ein echter Fehler. Die Zinsmonate im Jahr 1 zählten gegen das Auszahlungsjahr statt gegen das Projektionsjahr 1 (2026-1052: 1 Monat Miete gegen volle Zinsen). Fünf Fälle 5/5 gegen die echten Funktionen. Rest: Auszahlung mitten in Jahr 2 läuft dort voll.
-- ✅ **Regionaldatenbank / eigene Datenbank** im Wissen: Projektanweisung, Abschnitt „EIGENE DATENHALTUNG" (`8fcd85fa`).
-- ✅ **`store:false`** an allen 10 `/v1/responses`-Aufrufen (v2209). Echter Aufruf aus dem Container: 200, `store: false`.
-- ⚠ **Datenschutz — Marcels Annahme stimmt für den Dokument-Import NICHT:** `dokumentSchemas.js:190` verlangt beim Grundbuch `eigentuemer[{name, geburtsdatum}]`, Abt. II/III Berechtigte und Gläubiger. `:224-225` verlangt beim Kaufvertrag Verkäufer und Käufer mit Adresse. Der PDF-Text (bis 15.000 Zeichen) geht ungeschwärzt an OpenAI (`baueprompt`, `:404-411`). Beleg-Import schickt Seitenbilder (bis 30). → **Entscheidung Marcel:** Personendaten aus den Schemata streichen und vor dem Senden schwärzen, ODER im Datenschutztext nennen.
-- ⚠ **Gewerbe — größer als gedacht:** `gewerbe_jahr` setzt KEIN Aufrufer (nur `ErtragswertService.js` kennt es). Die Gewerbe-Rechnung aus v2195 lief also nie. Die MFH-Einheiten (`_mfh.einheiten[]`, Art Gewerbe, Fläche, Ist-Miete) kommen im Marktbericht gar nicht an, nur ihre Anzahl. Der Rohertrag ist `Wohnmiete €/m² × GESAMTE Fläche × 12` (`CrossCheckService.js:831`), die Gewerbefläche bekommt also den Wohnmietansatz. → **Bewertungsfrage an Marcel:** welcher Gewerbe-Rohertrag (Ist-Miete der Gewerbeeinheiten mit Hinweis, oder eigenes Feld „marktübliche Gewerbemiete €/m²")?
+- N62.8 Integrationsservice / Bestandsmigration: **„auf Anfrage“**, kein Festpreis — Bau offen.
+- N62.24 Kontrast: dunkleres Grün und Rot für kleine Zahlen erlaubt — Umsetzung offen.
+- N62.12 geführte Datenaufnahme: durchgehen, mit allen Stufen.
+- Tour am Handy bleibt so; Quick-Check-Hausnummer keine Pflicht.
+- Rumpfjahr-Rest: Auszahlung mitten in Jahr 2 läuft dort voll.
+- N60.19 Demo-Objekte: Marcel fragt, was er entscheiden soll → Frage konkret stellen.
 
 ### N62 · Marcels Paket vom 12.10.2026 (abends) — zwölf Punkte, abgeglichen
 
@@ -190,155 +104,14 @@ zehn Punkten standen überhaupt nicht drin, vier nur teilweise.**
 > Punkt, der nur in einem Chat lebt, fehlt beim nächsten Mal — deshalb
 > stehen sie hier jetzt wörtlich, bevor einer davon gebaut wird.
 
-#### N62.1 · Die Tour muss in allen vier Ansichten laufen
+#### N62.4 · Lage & Markt: Netz UND Zensus UND die Objektfelder gegenüberstellen — Rest: Abnahme (Erledigtes s. Fertig)
 
-> **✅ laut Commit gebaut: v2154 (6c7ecb51)** — im Backlog nicht abgehakt gewesen (Aufräumen 13.10.2026). Abnahme bei sichtbarem Fenster steht in N62.20.
+- Ob das Modell die Zeilen der Gegenüberstellung sinnvoll füllt, zeigt nur ein echter Analyselauf.
+- Weiter möglich (gemessen): Zensus-Nettokaltmiete je Kreis nach Baujahr (4000W-0005) und Fläche (4000W-0009), Durchschnittsmiete je Gemeinde (GEOGM4), marktaktive Leerstandsquote (4000W-0002). Zensus-Miete = Bestandsmiete zum 15.05.2022, keine Angebotsmiete.
 
-**Marcel:** *„prinzipiell möchte ich einmal, dass die Tour, die hier
-gemacht wird, wenn man sich neu anmeldet, auch bei der Aktenmappe, beim
-Tower und auch bei der Kanzleiansicht funktioniert. Das müssten wir einmal
-gegenprüfen."*
+#### N63 · Marcels Liste vom 13.10.2026 abends — Rest: Abnahme (Erledigtes s. Fertig)
 
-Ergänzt **T1** (Z. 9619), wo vier Befunde gemessen sind — dort steht
-ausdrücklich *„Kanzlei und Tower sind nicht fertig gemessen"*. Der Hänger
-in der Kanzlei (Schritt 6) ist mit `v1774` behoben, offen sind B1 (Spot
-außerhalb des Bildschirms), B2 (kein Spot) und Schritt 24.
-
-#### N62.2 · Kanzlei: der Bestand/Ankauf-Schalter gehört höher und sieht fremd aus
-
-> **✅ laut Commit gebaut: v2154 (6c7ecb51)** — Stand-Schalter über der Suche (Aufräumen 13.10.2026).
-
-**Marcel:** *„Wir haben den Buchschalter in die App gepackt bei der
-Kanzlei. Der sollte aber bitte über die Suche, also zwischen dann der
-Aktion-Button und der Suche, also ein bisschen höher, und dass die
-Ausrichtung der Elemente dort gleich ist und auch das Layout und die
-Farbe, also Bestand, Stand und Ankauf, auch der Rahmen da drum, das müsste
-jetzt ein helles Weiß bekommen, also quasi im gleichen Design. … gleiche
-Formatierung wie die Suche und auch die Schrift bei den Aktionen."*
-
-Der Schalter selbst ist `v2145`/`v2145a` (`doppelkarte.js`), die
-Platzierung in der Kanzlei stand nie im Backlog. **Optikpunkt → vor dem
-Bauen im Browser messen**, was die Suche und die Aktionsknöpfe dort
-wirklich tragen (Rahmenfarbe, Höhe, Schriftgröße, Ausrichtung).
-
-#### N62.3 · Pilot-Analyse: alles muss einfließen, und die Kategorien müssen tragen
-
-> **✅ laut Commit gebaut: v2156 (75e9c6c0)** — MFH-Felder, Rohcodes, Liegenschaftszins in der Pilot-Analyse (Aufräumen 13.10.2026).
-
-**Marcel:** *„dass wir einmal schauen, ob generell alle Daten, also auch
-aus den Mehrfamilienhäusern, aus dem Konfigurator, die Daten aus dem
-Marktbericht, wenn wir welche abgerufen haben, dass wirklich alle Felder,
-auch Finanzierung und Liegenschaftszinsen und Wertgutachten, dass auch
-wirklich alles damit einfließt und wir dort auch bei den Einzelkategorien
-Briefing, Stärken, Risiken, Lage und Markt, dass wir da wirklich
-vernünftige Auswertungen bekommen. Also das sieht jetzt schon recht gut
-aus, aber das noch vollumfänglicher, genauer."*
-
-**Stand gemessen:** MFH-Konfigurator **9 von 28 Feldern** im Prompt
-(N60.8/N60.9, `v2022`), Marktbericht-Block da, Finanzierung und Steuer da
-(`v2011`/`v2139`). **Liegenschaftszins und Wertgutachten:** die Stufe-3-
-Werte sind mit `v2150` gebaut — der Liegenschaftszins selbst (`lzs_pct`,
-Zweig, Berichtsjahr, Register-Herkunft) steht noch nicht im Prompt.
-
-#### N62.4 · Lage & Markt: Netz UND Zensus UND die Objektfelder gegenüberstellen
-
-**Marcel:** *„Bei Lage und Markt könnten wir zusätzlich einmal die
-Makrolage, Mikrolage, Mietspiegel, Preisniveau aus dem Netz beziehen, aber
-auch mit Quellen dort legen … ich meine wir fragen das bei Census ab, die
-Lage und allem, dass wir auf diese Sachen dann dort eingehen. Und wir haben
-ja auch im Objekt, das wird ja dann auch aus dem Bericht geholt, da haben
-wir ja Wertsteigerungspotenzial, Nachfrageindikatoren,
-Bevölkerungsentwicklung, Entwicklungsmöglichkeiten. Also dass wir da
-wirklich die Daten halt auch abfragen und verwerten und das auch
-gegenüberstellen nochmal mit dem Mietspiegel oder der Recherche aus dem
-Netz."*
-
-Ergänzt **N61.4**. Neu darin sind drei Dinge: die **Zensus**-Daten (der
-Marktbericht fragt sie ab), das **Preisniveau aus dem Netz mit
-Quellenangabe**, und die **Gegenüberstellung** mit den vier Objektfeldern.
-`nutzerEinschaetzung()` liefert die neun Indikatoren seit `v1851` —
-gegenübergestellt werden sie nirgends.
-
-> **✅ Teilweise erledigt 12.10.2026 · `v2157` (`ff1af46b`, `7b71224d`).**
-> Gegenüberstellung und Preisniveau mit Quelle: gebaut. Die Pilot-Analyse
-> bekommt jetzt beide Lage-Seiten des Berichts (`assessment` = aus
-> Messdaten, `nutzer_einschaetzung` = Objektfelder), die Lageklasse und die
-> vier Objektfelder, den Bevölkerungstrend und — wenn vorhanden — den
-> Zensus. Neue Aufgabe 15 mit Zielfeld `lage_gegenueberstellung` (je
-> Merkmal: Ihre Angabe · Marktbericht · Recherche mit Quelle · Urteil ·
-> Kommentar), Karte „Gegenüberstellung" im Reiter Lage & Markt, die
-> Zeilen-Quellen auch im Quellen-Reiter.
-> **Nachweis:** `prompt-lecks-pruefen` 100 Stellen, 12 neu, RC=0;
-> Kettenprobe im Container an Bericht 176 (vier Abweichungen markiert,
-> Zensus als fehlend benannt); Karte bei 390 px ohne Überlauf.
-> **Rest:** ob das Modell die Zeilen sinnvoll füllt, zeigt nur ein echter
-> Analyselauf.
->
-> **⚠ OFFEN — der Zensus selbst: die Datei ist leer.** (13.10., später: Marcel hat sich bei GENESIS-Online/Destatis angemeldet **✅ ERLEDIGT 13.10.2026 · v2161 · `e8a320a9`:** Marcels Zensus-Konto in beiden `.env`; `tools/zensus-kreise-holen.mjs` erzeugt die Datei, 400/400 Kreise mit allen drei Werten, im mb-Container nachgemessen (Herford 4,2 / 53,8 / 5,54). **Weiter möglich (gemessen):** Nettokaltmiete je Kreis nach Baujahr (4000W-0005, 11 Stufen) und Fläche (4000W-0009), Durchschnittsmiete je GEMEINDE (GEOGM4, z. B. Hiddenhausen 5,31), marktaktive Leerstandsquote (4000W-0002). Achtung fachlich: Zensus-Miete = Bestandsmiete aller Verträge zum 15.05.2022, keine Angebotsmiete. — dort gemessen 331 Statistiken, KEIN Zensus 2022, nur Mikrozensus. Der Zensus 2022 liegt NUR auf ergebnisse.zensus2022.de.) (13.10.: das Destatis-Konto in der `.env` ist die REGIONALDATENBANK — dort nur Zensus 2011; die Zensus-2022-Datenbank lehnt es ab, Code 2. Marcel legt ein Konto auf ergebnisse.zensus2022.de an → `ZENSUS_USER`/`ZENSUS_PASSWORD`)
-> `marktbericht/backend/data/zensus2022_kreise.csv` trägt nur die
-> Beispielzeile. **0 von 162 Berichten auf Staging haben Zensus-Werte**
-> (159× `kreis_nicht_in_datei`, 3× `kein_ags`). Der „Zensus-Abruf" lief
-> nie. Die Zensus-Datenbank (`ergebnisse.zensus2022.de`) liefert per
-> Schnittstelle nur mit **registriertem Konto** — Gastzugang gibt Code 15,
-> die Web-Oberfläche braucht eine Sitzung. **Braucht Marcel:** kostenloses
-> Konto anlegen; danach lässt sich die Kreisdatei (~400 Kreise:
-> Leerstandsquote, Eigentümerquote, Nettokaltmiete) aus der amtlichen
-> Quelle erzeugen statt abtippen.
-
-#### N63 · Marcels Liste vom 13.10.2026 abends (Hilfe, Einstellungen, Handy, geführte Eingabe, Sprache)
-
-> Erst ins Backlog, dann abarbeiten (Marcel: „für danach noch ein paar Sachen zum Abarbeiten, also erstmal ins Backlog damit"). Optik → **Demos zuerst**, wo Marcel es ausdrücklich sagt (Einstellungen, N63.5).
-
-**N63.1 · Hilfe: Navigation und Einstieg**
-> ✅ v2200 (13.10.2026, Staging) 1a548875 — Klon-Ursache behoben (Partner-Portal/Freigaben klonten den ersten Hilfe-Eintrag), Einstieg integriert, Hilfe öffnet dort, Pilot-Figur im Atlas-Kasten.
-- Beim Öffnen und Klicken sind „Abläufe & Pilot" **und** „Partnerportal" gleichzeitig gold unterstrichen. Es darf nur der aktive Punkt markiert sein. Ursache messen: zwei aktive Marker oder Hover-Rest?
-- „Einstieg" und „Abläufe & Pilot" überschneiden sich → **Einstieg in „Abläufe & Pilot" integrieren**.
-- Beim Öffnen der Hilfe direkt „Abläufe & Pilot" zeigen. Den Piloten-Knopf in den schwarzen Kopf neben „Atlas öffnen" stellen.
-
-**N63.2 · Hilfe: Inhalte gegen den Code abgleichen**
-> ✅ v2200/v2202/v2202a — 17 Themen, FAQ nach Ablauf, Glossar alphabetisch, 33 Korrekturen nach Prüfbericht, 5 neue Fragen, Fuß-KI raus. GrESt erledigt v2207/Prod (17): TH 5,0 seit 01/2024, HB 5,5 seit 07/2025.
-- Glossar und häufige Fragen: Stimmen alle Zahlen, die die Hilfe nennt?
-  - DSCR-Schwellen, LTV-Stufen, Pilot-Skala, Score-Stufen
-  - jede Zahl mit Beleg aus dem Code, so wie `docs/hilfe/hilfe-belege-v2189.md`
-- Mehr Fragen aufnehmen.
-- Alles in eine **vernünftige Reihenfolge** bringen (heute „relativ unsortiert").
-- Raus: der Eintrag „Frag den DealPilot-Agent" mit Webfenster und Fragen unter „Häufige Fragen". Abläufe laufen über den Piloten.
-
-**N63.3 · Hilfe-Fenster auf dem Handy**
-> ✅ v2201 — Liste → Inhalt mit Zurück-Zeile (js/modal-handy.js), in der Messkabine 390 px geprüft.
-- Marcel findet das Modal am Handy nicht gut dargestellt.
-- Umbauen wie die Einstellungen am Handy. Mit N63.4 zusammen denken.
-
-**N63.4 · Einstellungen: Sortierung und Darstellung am Handy**
-> ✅ Handy v2201/v2201a (wie Hilfe). Sortierung der Inhalte → mit N63.5 (Demo-Wahl).
-- Die Sortierung ist teilweise nicht schön.
-- Am Handy dieselbe Kritik wie bei der Hilfe.
-
-**N63.5 · Einstellungen → Standardwerte: als Karten statt Scrollliste — DEMO ZUERST**
-> ✅ v2206, Prod (16) — Marcels Wahl A (Karten) mit drei Sets gebaut (js/standardwerte-karten.js). Demo war: design/Vorschläge/standardwerte-karten-demo.html (A Karten · B Unter-Reiter · C Set zuerst). Wartet auf Marcels Wahl und die Werte der Sets.
-- Marcel: *„unübersichtlich … mit so Standardkarten arbeiten, dass man nicht so viel runterscrollen muss"*
-- Ein Reiter mit den Lageklassen (A/B/C/D), ein Reiter mit den Standardwerten, je eine kurze Erklärung.
-- **Ein Standardset auswählbar**, also ein vorbelegter Satz.
-- *„Kannst du auch gerne mal mehrere Demos fertig machen … wie das im Modal aussehen könnte."* → mehrere Varianten nach `design/Vorschläge/`, zeigen, dann bauen.
-
-**N63.6 · Handy: Bestand/Ankauf rutscht unter die Einstellungen**
-> ✅ v2203/v2203a — order:-2 hinter dem Portfolio-Knopf, dunkle Fassung; Messkabine v1b 390 px: y=136 direkt unter Portfolio (y=80).
-- Am Handy steht der Umschalter Bestand/Ankauf unter den Einstellungen statt unter „Portfolio".
-- Er ist dort gold umrahmt mit goldener Schrift, das passt nicht.
-- Zurück unter „Portfolio" und in die Formatierung der Desktop-Fassung.
-
-**N63.7 · Geführte Eingabe: Hinweis „Erklär mir das" wegklicken**
-> ✅ v2204 — × (diese Frage) + „Nicht mehr anzeigen" (Konto, user_settings hinweise), Rückweg Einstellungen → Darstellung. Im Browser geprüft.
-- Beim Öffnen steht „auf Wunsch: Erklär mir das".
-- Der Hinweis braucht ein **×** zum Schließen und **„Nicht mehr anzeigen"**, das gemerkt wird (Einstellungsspeicher, nicht nur der Browser).
-
-**N63.8 · Geführte Tour komplett durchgehen**
-> ✅ v2205/v2205a, Prod (15) — alle 39 Schritte bei 1280 und 390 gemessen (Blase im Bild; Handy bewusst mittig ohne Spot). Reiter Steuer fehlte (ergänzt, 39 Schritte); Inhalte gegen den Code korrigiert (46 Stellen: Plan-Limits 1/5/25, Score-Skala 85/70/50/35 und Gewichte, 5 Kategorien, Stress-Test 5×5, Fundorte, Logo ab Investor, Anbieternamen raus). Darstellung nur Schritt 1–2 bei 1280 geprüft (verdecktes Fenster drosselt) → Abnahme am Gerät.
-- Prüfen, ob sie überall sauber dargestellt wird: Desktop, Tablet, Handy in der Messkabine.
-- Dazu Eingabe und Lautsprecher.
-
-**N63.9 · Geführte Eingabe: Mikrofon auf kleinen Bildschirmen „halten zum Sprechen“** — Marcel (13.10. abends, präzisiert): gemeint ist das Mikrofon-Symbol der GEFÜHRTEN EINGABE und die Handy-Darstellung (Messkabine, kleine Breiten). Dort: Mikrofon gedrückt halten = zuhören, loslassen = fertig (wie WhatsApp); das Kästchen „Ich höre nichts, du kannst auch tippen“ und der Anhalten-Knopf entfallen dort. Auf großen Bildschirmen bleibt das automatische Zuhören wie heute.
-> ✅ v2204, Prod (15) — Kette in der Messkabine 390 px geprüft (künstlicher Tonstrom statt Mikrofon): Drücken nimmt auf, Loslassen schickt 53 KB WebM an /ai/extract-voice, Antwort „Keine Sprache erkannt“ (erwartet bei Ton), danach Ruhe ohne Selbst-Zuhören. Dazu mit echter Sprache (Windows-Stimme Hedda, als Testmikrofon eingespielt): Transkript wörtlich „Die Wohnfläche beträgt fünfundachtzig Quadratmeter.“, Feld wfl=85 erkannt, Co-Pilot übernimmt, danach Ruhe.
+- N63.8 Tour: Darstellung nur Schritt 1–2 bei 1280 geprüft (verdecktes Fenster drosselt) → Abnahme am Gerät.
 
 #### N62.24 · Rest aus dem Responsive-Check (13.10.2026, v2198–v2198c)
 
@@ -347,301 +120,55 @@ Gemessen in der Messkabine (11 Breiten × 9 Reiter + 8 Ansichten). Überlauf, He
 2. **Touch-Flächen unter 40 px:** vor allem die Kartenknöpfe der Objektliste (26 px) und die i-Knöpfe (18 px sichtbar, mit 44-px-Trefferfläche seit v1441 — die zählt die Messung nicht).
 3. **Nicht geprüft:** Anmeldung und Registrierung (Abmelden nötig), öffentliche Startseite (andere Domain), Bildschirmtastatur und echte Touch-Geräte, andere Rollen als Pro, leeres Konto. → Abnahme durch Marcel am Gerät.
 
-#### N62.23 · Frage an Marcel: vw-modul (Junker Gutachten-Modul V4.2)
+#### N62.22 · Neue Hilfe: Pilot auf F1/?, Prozess-Atlas — Rest (Erledigtes s. Fertig)
 
-> **✅ ENTSCHIEDEN 13.10.2026 — ignorieren.** Marcel: das Zip ist eine ältere Fassung für die Junker-Homepage; der Rechenkern der neueren Version (VW-Modul V422) ist bereits gegengeprüft und in DealPilot eingebaut. Die Homepage zieht er selbst irgendwann nach. Kein Auftrag hier.
-
-Dateien/vw-modul-v4-2-2.zip und -v4-2-5.zip (08./10.10.2026) stehen in keiner Backlog-Zeile. Inhalt (nur gelesen, README): eigenständige Web-App für Verkehrswert-, RND- und Kaufpreisaufteilungs-Gutachten mit Word-Vorlagen und PDF über LibreOffice/PHP, gedacht für die **Junker-Homepage / das Portal** (/modules/vw/), nicht für DealPilot. Nicht angefasst. **Zu klären:** gehört das in DealPilot (z. B. als Modul neben dem BMF-Rechner und dem RND-Assistenten) oder bleibt es auf der Homepage?
-
-#### N62.22 · Neue Hilfe: Pilot auf F1/?, Prozess-Atlas, Hilfe überarbeitet
-
-
-**✅ v2189–v2189f (Staging):**
-- Kapitäns-Figur (`pilot-figur.js`) in Tower und Atlas, der Atlas-Kapitän mit Koffer.
-- Ort des Piloten unter Einstellungen → Darstellung.
-- Sofort-Antwort beim Tippen, Fragen gehen automatisch an die KI.
-- Wortsuche mit Synonymen.
-- Hilfe vertieft (20 Themen, 152 Abschnitte).
-- Handy umgebaut, in der Messkabine gemessen.
-- Quick-Check-Sprung nach offenem Marktbericht behoben.
-- Freigeben liegt über den Quellen.
-
-**Offen, neu:**
-- Straße und Hausnummer im Quick-Check waren NIE Pflicht (`quickcheck-app.html:3803`, `required:false` seit V326). Marcel entscheidet. Achtung: Inserate ohne veröffentlichte Hausnummer gibt es (v1999 ImmoMetrica).
-- Fehlerverdacht aus der Hilfe-Erhebung — **✅ 14.10.2026 nachgemessen: 1–6, 8, 9 waren mit v2191 (`ad26710b`) behoben, 4 schon mit v1963. Rest in v2208 (`83283246`, Staging): 7 (Steuerregime rechnet längst, Buchhaltung „Stufe 3"/DATEV-Versprechen raus), Hilfe zitierte noch „Auto-saved". Speichern-Knopf: **entschieden 14.10.2026 — bleibt wie es ist** (Marcel: „das bleibt so wie es ist"), automatisch beim Reiter- oder Objektwechsel, kein Knopf, kein Strg+S.**
-  1. Quick-Check-Balken lesen `sub-sicherheit`/`sub-finanzierung`/`sub-effizienz`, die es nicht gibt (`quickcheck-app.html:6901/6972`).
-  2. Eigene Score-Regler wirken nur beim Profil „custom“, Starter erreichen es nicht (`dealscore.js:61-77`).
-  3. Marktbericht aus dem Reiter Objekt ohne `bwk_modus: 'normiert'` nimmt die 23-%-Pauschale (`CrossCheckService.js:971`).
-  4. Der Hinweis nach „als Verkehrswert übernehmen“ zeigt `h.market_value` statt `h.wert` (`objekt-reiter.js:953`).
-  5. Der Export schreibt `.dpkt`, der JSON-Import nimmt nur `.json` an (`storage.js:2580`).
-  6. „TOP“ in `dashboard.js:452`.
-  7. „wird in Stufe 2 aktiv“ in `mandanten.js:705`.
-  8. Kein sichtbarer Speichern-Knopf, die Anzeige sagt englisch „Auto-saved“.
-  9. Der Hinweis nach dem Wechsel in den Hintergrund sagt „unten links“, die Pille sitzt unten mittig (`mb-auftrag.js:247`).
-  10. Liegenschaftszins ohne amtlichen Wert → gesetzlicher Auffangwert § 256 BewG als Stufe D, Sachwertfaktor 1,0 vorläufig (`WertParameterService.js:434-449`). Verträgt sich das mit „kein Treffer heißt kein Wert“? Bewertungsfrage an Marcel. **Entschieden 13.10.2026: C — so lassen** („es steht ja dran und gibt eine Orientierung“).
-
-**✅ GEBAUT 13.10.2026 · v2187 Demo, v2188–v2188b · 49d5e942 / 08c00feb / fe24f5bb (Staging, Prod offen).** Marcel: „etwas total Abgefahrenes … einen kleinen animierten Piloten … über einen Hotkey“, danach „granularer, besser animiert, Wow-Effekt … der Pilot muss ein kleines Pilot-Männchen sein“.
-- `js/pilot-tower.js`: Pilot-Männchen (Kappe, Fliegerbrille, Schal), F1 überall bzw. ? außerhalb von Feldern. Er erklärt das Feld unter dem Cursor mit dem Text der Hover-Hilfe. Sofort-Treffer ohne KI aus 89 Feld-Erklärungen, Hilfe-Themen, 47 Atlas-Stationen und Aktionen. „Den Piloten fragen“ an `/ai/copilot` mit Hilfe-Auszug (`payload.hilfe`). Brücke im Quick-Check- und Marktbericht-iframe.
-- `js/prozess-atlas.js`: 7 Abläufe (Reise, Quick-Check, Netzplan Datenaufnahme, Deal bis gewonnen, Steuerjahr, Marktbericht, Scores). Klick auf eine Station klappt die Schritte auf, Eingaben und Ergebnisse fliegen ein, Gewichte wachsen; dazu „Ablauf abspielen“, „Du bist hier“ und „Hinfliegen“. `tools/prozess-atlas-pruefen.mjs`: 47/47 Belege im Code, Gewichte, Schwellen und Etappen gegen die Kerne, RC=0.
-- `help.js`: Themen „Abläufe & Pilot“ und „Bestand: Soll und Ist“. Score-Stufen 85/70/50/35 statt 80/60/40, keine Anbieternamen, „Kontingent“, Schnellstart neu.
-- v2188a: gold-audit war rot (`rgba(201,168,76,…)` färbt sich beim Mandanten nicht um) — neun Dateien auf `color-mix(… var(--wl-c9a84c …))`, RC=0.
-
-**Offen:**
 1. Sichtabnahme bei SICHTBAREM Fenster (Animationen laufen im Hintergrund-Tab nicht), Handy 390 px (Tower als Bodenblatt, Atlas einspaltig).
-2. Marcel: „im Quickcheck ist unten ein Soll/Ist-Umschalter“. Gemessen ohne geöffnetes Objekt: im Quick-Check-Dokument steht weder „Soll“ noch „Ist“. Sichtbar ist links „Stand: Bestand | Ankauf“. Welche Stelle gemeint ist, muss Marcel zeigen.
-3. Quick-Check soll die eigenen Tabellen nutzen (Makro, Zensus, Register), wo direkter Zugriff besteht — Marcel 13.10.2026. Erst messen, was der QC-Abruf heute liest.
-4. Prod nach Freigabe (Frontend + Backend-Rebuild wegen `openaiService`).
+2. Quick-Check soll die eigenen Tabellen nutzen (Makro, Zensus, Register), wo direkter Zugriff besteht — Marcel 13.10.2026. Erst messen, was der QC-Abruf heute liest.
 
-#### N62.21 · Marktbericht: Bewirtschaftungskosten im Ertragswert nicht fortgeschrieben (Bewertungsfrage an Marcel)
+#### N62.21 · Marktbericht: Bewirtschaftungskosten im Ertragswert — Rest (Erledigtes s. Fertig)
 
-> **✅ v2195 (13.10.2026): Rest erledigt.** 2022/2023 vollständig aus der amtlichen Tabelle des Oberen Gutachterausschusses Brandenburg (2022–2026, eine Seite); Gewerbe: Verwaltung 3 % und getrennter Mietausfall im Ertragswert. Offen nur: Gewerbe-Instandhaltung braucht Nutzfläche und Nutzungsart als Eingabe (heute nur gewerbe_jahr).
+- LZS-Zweig nach Gewerbeanteil steht nur als Hinweis (laut N65, Stand `v2210b`).
 
-**✅ GEBAUT 13.10.2026 · v2186 · e2ec2ed2 (Staging):** Marcel: „das soll schon passen“. Jahrestabelle BWK_JAHRE + bwkAnsaetze(jahr), Ertragswert zum Stichtag je Objektart. Offen: 2022/2023 lückenhaft, Gewerbe-Verwaltung/-Instandhaltung, Prod.
+#### N62.20 · Offen aus Marcels Liste vom 13.10.2026 — Rest (Erledigtes s. Fertig)
 
-Gemessen 13.10.2026: `marktbericht/backend/src/services/ErtragswertService.js:360–386` nimmt außerhalb des NRW-Modells `BWK_TABELLE` aus `lib/immowertv.js` UNfortgeschrieben — 230 € Verwaltung je Wohnung (275 € ETW), 9,00 €/m² Instandhaltung. Für Stichtage ab 01.01.2026 gelten nach zwei Fachquellen 367 € / 439 € / 14,40 €/m² (Faktor 1,60, siehe v2185). Die Bewirtschaftungskosten liegen damit rund 37 % zu niedrig, der Ertragswert zu hoch; der Bericht warnt selbst „nicht indexiert … vorläufig" (`geprueft: false`).
-**Zu entscheiden (Marcel):** welche BWK-Ansätze gelten — § 10 ImmoWertV verlangt die Ansätze, mit denen der Gutachterausschuss seinen Liegenschaftszins abgeleitet hat (oft die fortgeschriebenen Anlage-3-Werte seines Ableitungsjahres, teils Landesmodelle). Danach: Fortschreibung je Stichtag in `immowertv.js` (Zahl, nicht Konstante) und Abnahme am Anwendungsbeispiel.
+1. **Tour messen bei SICHTBAREM Fenster:** Ablauf nach Erstanmeldung mit Standardobjekt, Quick-Boarding-Schritt „Als Objekt speichern“ (zielt auf `#save-btn` im iframe — springt der Spot hin?).
+2. **Tour auf dem Handy:** `tour.css:348` schaltet die Hervorhebung unter 768 px ab — gewollt? Seitenleisten-Schritte zielen auf `.sb-act-accent`, am Handy heißt der Knopf `.bsheet-tile-accent`.
+3. Bewirtschaftung: Fortschreibungsfaktor 2026, Abnahme Schritt 3 mit Testkonto.
 
-#### N62.20 · Offen aus Marcels Liste vom 13.10.2026 (Rest nach v2181b)
+#### N62.19 · Pakete A → B → C — Rest: Abnahme (Erledigtes s. Fertig)
 
-1. **Tour messen bei SICHTBAREM Fenster** (Chrome war minimiert, Timer gedrosselt): Ablauf nach Erstanmeldung mit Standardobjekt, Quick-Boarding-Schritt „Als Objekt speichern" (zielt jetzt auf `#save-btn` im iframe — springt der Spot hin?).
-2. **Tour auf dem Handy:** `tour.css:348` schaltet die Hervorhebung unter 768 px ab (Blase mittig, kein Rahmen) — gewollt? Seitenleisten-Schritte zielen auf `.sb-act-accent`, auf dem Handy heißt der Knopf `.bsheet-tile-accent`.
-3. **✅ GEBAUT v2184 (Staging): Bewirtschaftung je Objektart + Standard-Set in der Erstanmeldung. Offen: Fortschreibungsfaktor 2026, Abnahme Schritt 3 mit Testkonto, Prod.** Vorher: Bewirtschaftung — DEMO steht (v2183, /bewirtschaftung-demo.html), Abnahme durch Marcel offen** (Aufteilung ETW 30 %?, Fortschreibungsfaktor VPI, Startwerte Hausgeld/BK, Speicherort am Konto). Ursprung: Standardwerte je Haustyp (heute nur ein Profil `ip_bwk_ul_pct_default` 17 % / `ip_bwk_anteil_default` 16 % der NKM, `investment-profile.js:252`, nur localStorage), Hausgeld als % mit automatischer Aufteilung (gibt es nur im Quick-Check: `qc_hg_split` 22 %), und ob die Sätze je Haustyp in die Einstellungen gehören.
-4. Umlaute: „ungewoehnlich", „aussergewoehnlich", „liess" (hausgeld-*.js).
-5. Prod-Rollout v2177–v2181b nach Freigabe (nur Frontend; Backend unverändert seit 6b).
+- Die Schwellen der 5-Stufen-Abbildung in B (Lage aus eigenen Daten) sind von Marcel abzunehmen.
 
-#### N62.19 · NÄCHSTE PAKETE A → B → C — ✅ GEBAUT 13.10.2026 v2174–v2176 (Staging, Prod offen; Schwellen B von Marcel abzunehmen) (Marcel, 13.10.2026: „Der Reihenfolge nach, aber A, B und C, alles zusammen.")
+#### N62.18 · Eigene Datenhaltung, Warteschlange, Laufzeiten — Rest (Erledigtes s. Fertig)
 
-**A · Marktbericht im Hintergrund, mit Fortschritt und Meldung.** Gemessen 13.10.:
-Stufe 3 ist aus dem Tab Objekt abrufbar (`objekt-reiter.js:693-759` → `DealPilotMB.run`,
-`dealpilot-mb.js:606`), aber nur mit Dreh-Spinner ohne Balken und ohne Schließen
-(`_mbSpinner`, `dealpilot-mb.js:583`), als EIN blockierender Request. Kein Job-System
-(`lib/limiter.js` = Semaphor im Speicher, MAX 6), keine Benachrichtigung in der App.
-Echter Schrittfortschritt existiert schon: `POST /reports/generate-stream` (NDJSON,
-`marktbericht/backend/src/routes/api.js:373`, Proxy `backend/src/routes/marktbericht.js:506`).
-Bauplan: (1) Job-Tabelle `mb.report_jobs` (Status, Schritte, Ergebnis-ID, Fehler,
-Dauer je Schritt = Laufzeiten aus N62.18 Punkt 6) + Warteschlange aus der DB statt
-im Speicher (N62.18 Punkt 5); (2) `POST /reports/jobs` startet, `GET /reports/jobs/:id`
-liefert Stand; (3) Modal mit echten Schritten und Platz in der Warteschlange, Knopf
-„im Hintergrund weiter"; (4) Meldung „Bericht fertig — öffnen" (Toast + Glocke im
-Kopf, Merker je Nutzer). **Optik: Demo-first.**
-Dazu: „Im Marktbericht öffnen" übernimmt nur den GESPEICHERTEN Stand
-(`mb-objektwahl.js:570`) — vorher speichern.
+3. **Bodenrichtwerte:** Treffer je Abfragepunkt mit Stichtag speichern, Wiederverwendung im Umkreis nur bei gleicher Zone; nach Stichtag erneuern.
+4. **GeoMap:** nur Kurzzeit-Zwischenspeicher — dauerhaftes Ablegen erst nach Klärung der Lizenz mit GeoMap (Entscheidung Marcel offen).
+5. **Warteschlange in der DB** für Marktbericht UND Pilot-Analyse (heute im Arbeitsspeicher, MAX 6, beim Neustart weg), mit Status für den Kunden.
 
-**B · Lage aus eigenen Daten + KI im Vergleich.** „Lage analysieren"
-(`ki-lage.js:7` → `/ai/lage` → `openaiService.analyzeLage:1969`) ist reine KI mit
-Websuche, Quellen ungeprüft, füllt 6 Felder (Box verspricht 8). 4 Felder lassen sich
-messen: makrolage ← `mb.makro_werte`/macroScore · mikrolage ← Geoapify-Score ·
-ds2_bevoelkerung ← Trend + Wanderung · ds2_nachfrage ← Vermarktungsdauer + Zensus-
-Leerstand. ds2_wertsteigerung nur mit vollem Bericht, ds2_entwicklung bleibt KI.
-Bauplan: Messung zuerst (mit Quelle je Feld, 5-Stufen-Abbildung festlegen), KI ergänzt
-Entwicklung + Text, Abweichung sichtbar. Achtung: die Gegenüberstellung der
-Pilot-Analyse vergleicht heute oft KI gegen Messung, nicht Nutzer gegen Messung.
+#### N62.15 · Datenschutz: KI-Datenfluss gegen die Rechtstexte — Rest (Erledigtes s. Fertig)
 
-**C · Pflichtfeld-Vertrag + Agents für die Datenpflege.** Gemessen 13.10.: Register
-62 Dateien / 4.832 Sätze; BY, SL, HB ohne Wert; kein Satz mit Baupreisindex als Zahl;
-81 LZS-Werte ohne Stichtag, 977 ohne Seite; `tools/saat-pruefen.mjs` RC=1 (49 Befunde),
-läuft nur von Hand, prüft Stichtag/Seite/GND/Index nicht. `mb.param_modell` (3.562)
-hinter den Dateien (4.832). Bauplan: Vertrag je Datensatz (Quelle, Seite, Stichtag,
-Lizenz, GND und Index als Zahl), Prüfer erzwingt ihn und hängt in `deploy-staging.ps1`;
-Agents (`.claude/agents/`): Register-Ernte (zuerst BY/SL/HB), Nachernte aus
-`mb.gaa_documents` (78 PDFs auf „neu"), Datenwächter Makro/Zensus, Ämter.
+Am 25.10.2026 per grep noch gefunden:
+- `frontend/datenschutz.html:179` nennt weiter die „OpenAI Chat Completions API“ (es ist Responses/Realtime).
+- `frontend/js/settings.js:2781/2788`: „OpenAI Ireland Ltd., KI-Lage-Analyse (auf Anfrage)“ und „Keine personenbezogenen Daten Dritter … werden übermittelt“ — stimmt nicht mehr.
+- Die rechtliche Bewertung übernimmt Marcel selbst.
 
-#### N62.18 · NÄCHSTES PAKET (Marcel, 13.10.2026: „ja mach das als nächstes Paket") — eigene Datenhaltung, Warteschlange, Laufzeiten
-> **Stand 13.10.2026:** 1, 2, 6, 7 erledigt (mb.makro_werte, mb.plz_orte — gemessen 152 ms live gegen 2 ms aus der Tabelle —, mb.laufzeiten). Offen: 3 Bodenrichtwerte ablegen (Zonengrenzen!), 4 GeoMap (Lizenzfrage an Marcel), 5 Warteschlange in der DB für Bericht und Pilot-Analyse (eigenes Paket).
+#### N62.13 · Offen aus dem 13.10.2026 (v2163–v2166) — Rest (Erledigtes s. Fertig)
 
-**Marcel:** *„können wir die kritischen Anfragen, die zeitintensiv sind, nicht in
-unsere eigene Datenbank schreiben … und gleichen sie in regelmäßigen Abständen
-ab?"* und: *„wichtig ist immer, dass wir unsere Quellen angeben."*
+1. **Modell der Pilot-Analyse** — gpt-4o-mini hält Längen nicht; Wechsel kostet (Entscheidung Marcel offen).
+2. **Neuabruf aller Pilot-Analysen** — 4/33 auf Staging erledigt; Rest nach der Modellfrage.
 
-**Grundsatz:** jeder selbst abgelegte Wert trägt Quelle, Tabelle/Endpunkt,
-Stichtag, Abrufdatum, Lizenz (Muster: `mb.zensus_werte`, v2162).
+#### N62.4b · Zensus in der Datenbank — Rest (Erledigtes s. Fertig)
 
-Bauplan, in dieser Reihenfolge:
-1. **✅ ERLEDIGT 13.10.2026 · v2172–v2172c (Staging, Prod offen)** — **Makro (N62.16):** `mb.makro_werte` + Import wie `ZensusImportService`
-   (12411-01-01-4, 82000-07-01-4 inkl. DG, AI008-1 Sp.3, AI002-1 Sp.9 je Kreis,
-   max. 10 parallel, Protokolltabelle). Monatlicher Lauf. `DestatisConnector.macro`
-   liest zuerst die Tabelle, Live-Abruf nur als Rückfall.
-2. **✅ v2197 (13.10.2026)** — **PLZ → Gemeinde/Kreis:** Tabelle aus OpenPLZ (einmal komplett, monatlich
-   abgleichen); `AgsResolver` liest sie zuerst (heute je Bericht ein Live-Abruf).
-3. **Bodenrichtwerte:** Treffer je Abfragepunkt mit Stichtag speichern,
-   Wiederverwendung im Umkreis nur bei gleicher Zone; nach Stichtag erneuern.
-4. **GeoMap:** nur Kurzzeit-Zwischenspeicher — dauerhaftes Ablegen erst nach
-   Klärung der Lizenz mit GeoMap (Marcel).
-5. **Warteschlange in der DB** für Marktbericht UND Pilot-Analyse (heute nur
-   Marktbericht, im Arbeitsspeicher, MAX 6, beim Neustart weg), mit Status für
-   den Kunden.
-6. **✅ v2197 (13.10.2026)** — **Laufzeiten mitschreiben** (Bericht, Analyse, je externer Dienst) — heute
-   wird keine Dauer gespeichert.
-7. **✅ 13.10.2026 (Sitzung v2172 ff.)** — **Lasttest** auf Staging (z. B. 20 Berichte gleichzeitig; kostet GeoMap-Abrufe
-   — vorher mit Marcel).
-OpenAI ist kein Engpass (Stufe „Launch", gpt-4.1 2 Mio. TPM).
+- Tabellengröße 430 MB (Lizenz/URL je Zeile) — vor Prod den Platz dort messen, ggf. Lizenz je Tabelle auslagern. Prod braucht Migration, Import und Sicherung vorher.
+- Einmal fehlten nach dem Seitenaufruf die Hinweise (Ladeversuch mit leerem Schlüssel), nicht nachstellbar. Optik bei 390 px nicht im Bild abgenommen.
 
-#### N62.17 · Warum bleibt data._ai hinter der Spalte ai_analysis zurück?
+#### N62.4a · Makro-Score: Ersatzwerte gelten als gemessen — Rest: Abnahme (Erledigtes s. Fertig)
 
-> **✅ v2193 (13.10.2026):** Ursache: collectData() trägt _ai aus _currentObjData mit (Stand beim Laden). Nach einer neuen Analyse ging der neue Text in die Spalte, der alte in data._ai — im Browser nachgestellt (_aiText geändert, collectData()._ai unverändert). saveObj setzt jetzt beide gleich. Alte Kopien in nicht wieder gespeicherten Objekten bleiben; der einzige Leser (dashboard.js) nimmt seit v2170b die neuere.
+- Bestehende Berichte tragen weiter den alten Score und die alte Makrolage (Bericht 176), bis sie neu berechnet werden. Ein frischer Berichtslauf ist Abnahmepunkt.
 
-Gemessen 13.10.2026: bei 4 von 8 gewonnenen Objekten trug `ai_analysis` die
-Analyse vom 13.10., `data._ai` die vom 09.10. v2170b liest beide und nimmt die
-neuere — die Ursache (welcher Speicherweg nur die Spalte schreibt) ist offen.
-Jeder andere Leser von `data._ai` sieht weiter die alte.
+#### N62.6 · Steuerliche Zusammenfassung in der Pilot-Analyse — Rest: Abnahme (Erledigtes s. Fertig)
 
-#### N62.16 · Makro-Kennzahlen vorab holen und speichern (wie der Zensus)
-
-**✅ ERLEDIGT 13.10.2026 · v2172–v2172c · `768ae809` … `8c6aa0fa` (Staging).** Je Land ein Abruf (`regionalkey "05*"`), 3 parallel (Limit 10 je Konto, abgebrochene Abrufe laufen dort 15 min weiter), Takt 12 h / 30 Tage. Bericht liest die Tabelle in 2–38 ms. Deckung gegen die 400 heutigen Kreise. Prod: Migration 017 + Rebuild, nach Freigabe.
-
-**Gemessen 13.10.2026 nach Marcels neuem Regionaldatenbank-Passwort:** die
-vier Kennzahlen (v2165) kommen an, aber die Regionaldatenbank braucht heute
-44–114 s je Tabelle, einzelne Abrufe brechen nach 180 s ab. Kein Bericht
-kann so lange warten. v2169 haelt Erfolge 30 Tage im Speicher (geht beim
-Neustart verloren) und fragt parallel. **Richtig ist:** eine Tabelle
-`mb.makro_werte` (Kreis, Kennzahl, Jahr, Wert, Quelle) und ein Hintergrundlauf,
-der die 400 Kreise einmal im Monat langsam nachzieht (max. 10 parallel —
-GENESIS-Grenze). Der Bericht liest nur noch die Tabelle.
-
-#### N62.14 · Marktbericht in Worten: bewerten, Entwicklung, Ableitung, Prognose
-
-> **✅ v2196 (13.10.2026):** Kapitel „D) Entwicklung, Ableitung & Prognose“ als vierte Gruppe. kapitelD() rechnet die Fakten (Preis-/Miet-/Bevölkerungstrend, Ableitung aus Median × Fläche, Spanne, Abstand Kaufpreis, Ertrags-/Sachwert falls da, Prognose als Modellfortschreibung über 3/5 Jahre). Echter Lauf auf Staging: Kapitel kam mit genau diesen Zahlen und der Kennzeichnung „keine Vorhersage, kein Gutachten“. Kosten: ein vierter paralleler KI-Aufruf je Bericht.
-
-**Marcel am 13.10.2026:** *„wenn wir die Pilot-Analyse anpassen, können wir
-auch den Marktbericht nicht nur grafisch darstellen, sondern vielleicht auch
-die Marktberichte bewerten und die Entwicklung beschreiben und die Ableitung
-sowie Prognose."* Heute: `ReportGenerationService` (gpt-4.1-mini, Chat
-Completions) schreibt einen Text; die Zeitreihen (Miete, Kaufpreis,
-Bevölkerung, Zensus, Makro) stehen nur als Grafik. Zu bauen: ein
-Bewertungsteil mit Entwicklung (aus den Reihen, mit Zahlen), Ableitung
-(Verfahren, Spread, Marktanpassung) und einer als Modellfortschreibung
-gekennzeichneten Prognose — mit Zielfeld je Teil (Lehre v2013b).
-
-#### N62.15 · Datenschutz: KI-Datenfluss gegen die Rechtstexte (gemessen 13.10.2026)
-
-Inventur (nur gelesen): einziger KI-Anbieter OpenAI (USA). Name/E-Mail des
-NUTZERS gehen nicht hinaus. Es gehen hinaus: Objektadresse, Halter-Name,
-Freitexte, bis 4 Fotos, Tonaufnahmen (Diktat), ganze Dokumente (Grundbuch:
-Eigentümer mit Geburtsdatum; Kaufvertrag: Käufer/Verkäufer), Ansprechpartner
-der Ämter. Keine Pseudonymisierung, `store:false` nirgends gesetzt.
-Lücken gegen die Texte: `datenschutz.html` Ziffer 6 sagt „keine
-personenbezogenen Daten Dritter" (stimmt nicht), nennt keine Fotos/Ton,
-nennt „Chat Completions" (es ist Responses/Realtime); `settings.js:2775`
-sagt „OpenAI Ireland, nur Lage-Analyse"; `sicherheit.html` verspricht „keine
-Weitergabe"; Einwilligung nur im Browser geprüft, `/api/v1/consent`
-existiert nicht (Ziffer 12 verspricht Consent-Logs); Verantwortlicher heißt
-„Junker Immobilien" statt Junker Solution. **Rechtliche Bewertung gehört zu
-einem Anwalt — hier steht nur, was der Code tut.**
-
-#### N62.13 · Offen aus dem 13.10.2026 (v2163–v2166)
-
-1. **Regionaldatenbank-Passwort erneuern** (Marcel) — sonst keine Makro-Kennzahlen (v2165 wartet darauf).
-2. **Modell der Pilot-Analyse** — gpt-4o-mini hält Längen nicht; Wechsel kostet (Marcel).
-3. **Neuabruf aller Pilot-Analysen** — 4/33 auf Staging erledigt; Rest nach der Modellfrage.
-4. **Prod-Rollout** — Merge `b62eb9d2` bereit, Push nach main braucht Marcel.
-5. Rumpfjahr: Jahr 1 im Steuerverlauf ist anteilig (2026-1052: 7.930 € Miete gegen 56.800 € Zinsen) — prüfen, ob Zinsen dort auch anteilig sein müssten.
-
-#### N62.4b · Zensus in der Datenbank — ✅ v2162–v2162c, 13.10.2026
-
-**Marcel:** *„nicht in eine Datei schreiben, sondern direkt in eine Datenbank,
-wo wir das vielleicht jährlich oder alle zwei Jahre einmal abgleichen … ich
-brauche das ja für ganz Deutschland."* Commits `65c28743`, `cae6bc16`,
-`f7bbefc0`, `708be31c`.
-
-- `mb.zensus_werte` (Migration 016): **894.880 Werte, 400 Kreise, 10.786
-  Gemeinden**, 10 Tabellen (Leerstand/Eigentum, marktaktiv, Miete gesamt/
-  Baujahr/Fläche, Leerstand Baujahr/Fläche, marktaktiv Baujahr/Fläche,
-  Leerstandsdauer). Import `npm run zensus` im mb-Container, ~2½ min,
-  Protokoll in `mb.zensus_abrufe`. Zugang per `docker exec -e ZENSUS_USER… `
-  (nicht in der compose-Datei).
-- **Abgleich:** der Zensus ist eine Stichtagserhebung (15.05.2022), neue
-  Zahlen erst mit dem nächsten Zensus. Jährlich lohnt nur das Nachziehen
-  von Korrekturen — der Import ist ein UPSERT.
-- Leser `ZensusConnector.lookupDb`: Gemeinde nur EINDEUTIG
-  (`AgsResolver.gemeindeEindeutig` — `fromPostcode` nahm die ERSTE Ortschaft),
-  Kreis daneben, Miete/Leerstand passend zu Baujahr und Größe **je Wohnung**
-  (bei MFH Fläche/Einheiten — gemessen: 852 m²/12 WE landete sonst bei
-  „200 m² und mehr").
-- Anzeige: Reiter Miete (Bestandsmiete unter Marktmiete), Investitionen
-  (Leerstand unter „Leerstand p.a." mit Abgrenzung), Marktbericht Web+PDF
-  (`_zensusZeilen()`), Pilot-Prompt (Gemeinde, Klassen, Dauer,
-  Bestandsmiete-Hinweis). prompt-lecks 108 grün.
-- **Offen:** Tabellengröße 430 MB (Lizenz/URL je Zeile) — vor Prod den Platz
-  dort messen, ggf. Lizenz je Tabelle auslagern. Einmal nach dem Seitenaufruf
-  fehlten die Hinweise (nach einem Ladeversuch mit leerem Schlüssel), nicht
-  nachstellbar. Optik bei 390 px nicht im Bild abgenommen. Prod braucht die
-  Migration, den Import und die Sicherung vorher.
-
-#### N62.4a · Makro-Score: Ersatzwerte gelten als gemessen
-
-> **✅ Erledigt 13.10.2026 · v2158 · `33bca6d9`** (Marcels Freigabe: „Den
-> Makroscore müssen wir auf jeden Fall anpassen"). `macroScore()` mittelt nur
-> noch gemessene Kennzahlen und nennt `gemessen`/`moeglich`/`fehlend`; ohne
-> jede Kennzahl `score: null` (dealScore vermerkt `makrolage` als geschätzt).
-> Die Bericht-Makrolage entsteht erst ab ZWEI gemessenen Kennzahlen. Im
-> Container nachgemessen: Bevölkerungstrend allein → 65, „aus 1 von 6".
-> **Rest:** bestehende Berichte tragen weiter den alten Score und die alte
-> Makrolage (Bericht 176); sie ändern sich erst bei Neuberechnung. Ein
-> frischer Berichtslauf ist Abnahmepunkt.
-
-
-**Gefunden am 12.10.2026 bei N62.4.** `ScoringService.macroScore()`
-(`marktbericht/backend/src/services/ScoringService.js:17`) setzt für jede
-fehlende Kennzahl einen Ersatzwert ein (`kaufkraft_idx ?? 100`,
-`arbeitslosenquote ?? 6`, `wanderungssaldo ?? 0`, Trends `?? 0`) und
-meldet trotzdem `estimated: false`. An Bericht 176 ist **nur der
-Bevölkerungsteil gemessen** (65); die anderen fünf Teilwerte sind
-Platzhalter (50/50/50/50/60), der Makro-Score 54 ist also überwiegend
-erfunden — und geht mit 20 % in den Deal-Score des Berichts.
-
-Verstößt gegen „Kein Treffer heißt kein Wert". Richtig wäre: nur
-vorhandene Kennzahlen mitteln, `estimated` setzen, sobald eine fehlt, und
-die Zahl der gemessenen Teile mitführen. **Ändert Scores bestehender
-Berichte → Marktbericht-Strang, vor dem Bauen mit Marcel abstimmen.**
-In die Pilot-Analyse gehen die Teilwerte seit `v2157` bewusst **nicht**.
-
-#### N62.5 · Ein eigener Reiter „Quellen" in der Pilot-Analyse
-
-> **ÜBERHOLT:** gebaut in v2155, danach auf Marcels Wunsch (13.10.2026: „nur unter der Pilot-Analyse fällt der Reiter Quellen weg“) in v2171 wieder herausgenommen.
-
-**Marcel:** *„Wir brauchen dann extra Reiter auch nochmal für die Quellen,
-dass wir wirklich nochmal alle Quellen, die wir gesagt, die wir angeben,
-dass wir die dort nochmal ausgeben können, dass wir auch die Quellen, die
-wir zum Beispiel ermittelt haben, wenn wir Unterlagen beim Amt anfordern,
-dass auch die dort mit eingegeben werden."*
-
-Heute stehen die KI-Quellen als Block **innerhalb** von „Lage & Markt"
-(`ui.js:1725`). Die Quellen der Ämter-Recherche (`unterlagen_aemter.
-quelle_url` und seit `v2151` `seiten.pro_seite`) sind mit der
-Pilot-Analyse **nicht verknüpft** — und die des Marktberichts
-(`quellen_nachweis`) auch nicht.
-
-#### N62.6 · Steuerliche Zusammenfassung in der Pilot-Analyse — und im Soll/Ist
-
-> **✅ Erledigt 13.10.2026 · v2160 · `8abf834b`.** Aufgabe 16 mit Zielfeld
-> `steuer_zusammenfassung` (nur aus Block STEUER + Kennzahlen, kein
-> angenommener Satz, Hinweis auf Steuerberater); mit Ankauf-Stand zusätzlich
-> `soll_ist_steuer`. Neuer Reiter **Steuer** (steht immer, alte Analysen
-> sagen, dass das Feld fehlt); die Soll/Ist-Tafel trägt den Steuer-Text.
-> `ankauf.js` führt die Kennzahl **Steuerwirkung p. a.** (cf_ns − cf_vs),
-> für alte Stände aus dem eingefrorenen Datensatz abgeleitet.
-> Prüfer `prompt-lecks-pruefen` 103 Stellen grün; Reiter im Browser mit
-> gestelltem Ergebnis gerendert. **Abnahme offen:** ein echter Analyselauf.
-
-
-**Marcel:** *„Dann bei der Pilotanalyse natürlich auch eine steuerliche
-Zusammenfassung machen. Das soll natürlich auch mit in den Soll-Ist-Abgleich
-einfließen."*
-
-Ergänzt **N60.18** (dort steht der Wunsch seit dem 08.10. als Stichwort)
-und **N61.2**. Der Prompt hat einen `## STEUER`-Block (`v2011`), aber kein
-Antwortfeld für eine Zusammenfassung — und ohne Zielfeld fällt der Auftrag
-lautlos auf den Boden.
-
-#### N62.7 · Landingpage: der Leistungsumfang gehört unter „Funktionen"
-
-**Marcel:** *„wir haben ja jetzt einmal ausgearbeitet, was DealPilot kann,
-was wir tun und allem. Vielleicht können wir das irgendwo auch noch mit auf
-die Internetseite einarbeiten. Wir haben auf der DealPilot-Seite einmal
-unter Funktionen den Leistungsumfang. Vielleicht passt das da irgendwo noch
-mit rein."*
-
-**Optik und Produkttext → Entwurf nach `design/Vorschläge/`, dann zeigen.**
+- Abnahme offen: ein echter Analyselauf.
 
 #### N62.8 · Preise: Integrationsservice und Bestandsmigration
 
@@ -656,95 +183,13 @@ wenn das gemacht werden soll."*
 > Vorher gehört geprüft, ob die beworbene Leistung Code hat (es gibt einen
 > Portfolio-Import, `portfolioExport.js`/API) oder ob sie Handarbeit ist.
 
-#### N62.9 · Subpage zum F&E-Projekt und zur Portfolio-Strategie
+#### N62.10 · Tab Steuern: das Vorjahr duplizieren — Rest: Abnahme (Erledigtes s. Fertig)
 
-**Marcel:** *„dass wir auch noch ein bisschen was kurz zu unserem
-F&E-Projekt erklären. Dass wir da vielleicht noch mal eine Subpage haben,
-wo wir ein bisschen was zur Portfolio-Strategie erklären. … Dann natürlich
-nicht sagen, wie wir es machen, weil es ein Forschungsprojekt, aber einfach
-was passieren soll. Und dass wir mit Steuerkanzleien dort zusammenarbeiten."*
+- Abnahme: Liste der wiederkehrenden Posten mit Marcel durchgehen.
 
-Quelle für den fachlichen Rahmen: **`E:\Portfolio Strategie`** (eigenes
-Repo, bescheinigtes Vorhaben **827-757-583** nach § 6 FZulG, Laufzeit
-01.01.2026–31.12.2028). **Das Verfahren selbst gehört nicht auf die
-Seite** — nur, was es leisten soll. Vorhanden ist bisher nur das
-BSFZ-Siegel auf der Landing (N14, `v1873`).
+#### N62.11 · Eine Standard-Lageklasse, und sie muss sich diktieren lassen — Rest: Abnahme (Erledigtes s. Fertig)
 
-#### N62.10 · Tab Steuern: das Vorjahr duplizieren
-
-> **✅ v2194 (13.10.2026):** Detail-Modus, neben dem Veranlagungsjahr: „⧉ Werte aus VORJAHR übernehmen“. Kopiert nur EIGENE Werte wiederkehrender Posten (Hausverwaltung, NK umlagefähig/nicht, Umlagen, Kontoführung, Steuerberater, Telefon, Porto, Fahrten, Verpflegung, Hotel, sonstige Betriebs-/Verwaltungs-/Finanzierungskosten) und nur in leere Felder. Fest, nie kopiert: Schuldzinsen, AfA, bewegliche WG, anschaffungsnah, Erhaltungsaufwand, Notar/Grundschuld, Vermittlung, Bereitstellung, Kaltmiete, Inserat, Gericht. Abnahme: Liste der wiederkehrenden Posten mit Marcel.
-
-**Marcel:** *„bei der im Tab Steuern wäre das gut, wenn wir auch immer so
-das Vorjahr duplizieren können. Manche Sachen wiederholen sich ja. So
-können dann die Sachen übernommen werden. Außer jetzt die, die fest sind.
-Also die wir eh schon rausnehmen, wie Schuldzinsen oder so, AfA."*
-
-Die Unterscheidung **wiederkehrend gegen fest** ist der Kern: Schuldzinsen
-sinken mit der Restschuld, die AfA ist je Jahr festgelegt — wer sie
-mitkopiert, trägt eine falsche Zahl in ein Steuerjahr. Vor dem Bauen
-gehört die Feldliste des Reiters durchgegangen und **je Feld entschieden**,
-ob es wiederkehrt.
-
-#### N62.11 · Eine Standard-Lageklasse, und sie muss sich diktieren lassen
-
-> **✅ Erledigt 13.10.2026 · v2159/v2159a · `8c7aa666`, `036982eb`.**
-> Standardklasse in `lage-profil.js` (`standard()`/`setzeStandard()`),
-> wählbar im Onboarding und im Investmentprofil, mit Begründung. Neuer
-> Quick-Check wird vorbelegt (nur leeres Feld), Marke „Vorgabe aus deinem
-> Profil · überschreibbar"; jede andere Wahl und JEDES Diktat löscht sie.
-> Diktat: `lageklasse` in HINTS/WL/QC_IDS/OBJ2QC, geführte Eingabe fragt
-> sie in Etappe 3 und BIETET den Standard an (`profil: 'lage'`).
-> **Nebenbefund behoben:** beide Auswahl-Schreiber (`setSelectSmart`,
-> iframe `_applyImportData`) nahmen den ersten Teilwort-Treffer — diktiertes
-> „A"/„B" landete auf „keine Angabe", „schwach" auf „Sehr schwach",
-> Energieklasse „A" auf „A+". Jetzt erst exakt, dann ungefähr, leere Option
-> nie. Im Browser am echten Code nachgemessen.
-> **Nebenbefund 2:** `qc-bridge.js` lädt `quickcheck-app.html` mit EIGENEM
-> Buster (`IFRAME_SRC`) — wer das Fenster ändert, zieht ihn mit.
-> **Abnahme offen:** Onboarding-Schritt mit der neuen Auswahl nur per Code
-> geprüft, nicht im Bild.
-
-
-**Marcel am 12.10.2026:** *„Wir haben ja im Quickcheck auch die
-Lageklassen, die man auswählen kann. Da sollten wir zusehen: Wenn wir uns
-neu anmelden, dann kommt ja ein Modal, wo wir diese Werte setzen können,
-dass wir auch einen Standard wählen können. So mit einer kleinen
-Begründung wird dann im Quickcheck als Standard gesetzt oder so. Dass wir
-aber auch die Möglichkeit haben, die zu überschreiben. Das heißt, dass wir
-auch wenn wir in der Datenaufnahme Sprache auswählen, dass wir dort auch
-die Lage angeben können und dann wird die halt einfach dementsprechend
-überschrieben. Also es wird ja sowieso alles überschrieben, was wir extra
-diktieren, dass wir darauf achten."*
-
-**Gemessen am 12.10.2026 — zwei Lücken:**
-
-| | Stand |
-|---|---|
-| Onboarding-Modal | setzt die **Ziel-Renditen** je Klasse (`.dpo-lage-f` → `DealPilotLageProfil.setze(k, 'ziel_bmr', …)`, `onboarding.js:564/723`) — **aber keine Standard-KLASSE**. Man kann nicht sagen „meine Objekte sind meistens B-Lage" |
-| Diktat | **die Lageklasse kommt im Diktat gar nicht vor** — null Treffer für `lageklasse` in `voice-import.js` und `voiceExtractService.js`. Sie lässt sich also nicht diktieren und damit auch nicht überschreiben |
-
-**Die Kette, die Marcel beschreibt:**
-
-```
-Onboarding: Standardklasse wählen (mit Begründung, warum sie zählt)
-     ↓  wird Vorbelegung
-Quick-Check: Lageklasse vorbelegt, überschreibbar
-     ↓  wird überschrieben von
-Diktat/Datenaufnahme: „B-Lage" gesagt → gewinnt
-```
-
-**Marcels Grundsatz dazu, und er gilt über die Lage hinaus:** *„es wird ja
-sowieso alles überschrieben, was wir extra diktieren."* Das Diktat ist die
-ausdrückliche Angabe des Nutzers und schlägt jede Vorbelegung. Beim Bauen
-gehört geprüft, ob das **überall** so ist — ein Diktat, das eine
-Vorbelegung nicht überschreibt, ist ein stiller Datenverlust.
-
-**Riegel beachten:** `zielBmr()` gibt `null` ohne Klasse, und
-`ZIEL_BMR_RUECKFALL = 6` greift dann (`qc-heuristik.js:217`). Eine
-Standardklasse darf diesen Riegel nicht aushebeln — sie ist eine
-**Vorbelegung**, keine Annahme. Was der Nutzer nie gesetzt hat, muss als
-Vorgabe gekennzeichnet bleiben (dieselbe Unterscheidung wie in `v2140b`
-beim Investmentprofil: „selbst gesetzt" gegen „Vorgabe, nicht gesetzt").
+- Onboarding-Schritt mit der neuen Auswahl nur per Code geprüft, nicht im Bild.
 
 #### N62.12 · Die geführte Eingabe durchgehen — Plausibilität und Vollständigkeit
 
@@ -790,87 +235,9 @@ bis N62.6 (Pilot-Analyse).
 irgendwie fehlt ist ein punkt wo ich gesagt habe …"* Genau dafür steht das
 hier. Ein Punkt, der nur in einem Chat lebt, fehlt beim nächsten Mal.
 
-#### N61.1 · Der Aussehen-Schritt: die App soll sich im Hintergrund mitändern
+#### N61.1 · Der Aussehen-Schritt: die App soll sich im Hintergrund mitändern — Rest: Abnahme (Erledigtes s. Fertig)
 
-> **✅ laut Code gebaut (Aufräumen 13.10.2026): v2096** — ein Klick auf eine Aussehen-Kachel setzt das Layout sofort um (_aussehenAnwenden → DealPilotLayout.setze), und im Schritt Aussehen ist der dunkle Schleier weg (dpo-ov-schau), weil er Hell gegen Dunkel um 60 % verfälschte. Offen nur die Sichtabnahme mit einem frischen Testkonto (ohne Objekte ist der Hintergrund leer).
-
-**Marcel:** *„wenn man nach der neuanmeldung das aussehen der app auswählen
-kann dass die bilder dort nichts sagend sind und es gut wäre wenn sich im
-hintergrund die app direkt ändert und das bild das layout besser wieder
-gibt."*
-
-**Der erste Teil ist erledigt (v1753b/c), der zweite stand nie im Punkt.**
-Der alte Eintrag **U3** fasste nur „die Bilder sagen nichts" — dass die App
-im Hintergrund *sichtbar* mitwechseln soll, fehlte dort.
-
-**Gemessen am 12.10.2026 im Code:**
-
-| | |
-|---|---|
-| Miniaturen | `onboarding.js:280` trägt `dpo-mini` — v1753b wirkt, 84 px, Kopf/Spalten/Inhalt |
-| Klick | `onboarding.js:734` ruft `_aussehenAnwenden()` → `data-dp-layout` wird **wirklich live** gesetzt |
-| Schleier | `.dpo-ov` ist `rgba(5,5,5,.34)` (`onboarding.js:1008`) — **unverändert** |
-| unter 900 px | `onboarding.js:1198` `padding:0; align-items:stretch` → der Kasten füllt den Schirm, es gibt **kein „dahinter"** |
-
-> **Der Mechanismus schaltet also schon — Marcel sieht es nur nicht.**
-> Der Schleier nimmt hellen Flächen 60 % Helligkeit und dunklen 0 %
-> (gemessen am 10.10.2026), er verfälscht damit genau den Unterschied,
-> um den die Wahl geht. Und auf dem Gerät, auf dem Marcel am häufigsten
-> arbeitet, ist von der App überhaupt nichts zu sehen.
-
-**Zu tun:** am laufenden Fenster messen, wie viel der App neben dem Kasten
-sichtbar ist, dann den Schleier über *diesem* Schritt zurücknehmen und den
-Kasten so stellen, dass die Fläche frei wird. Ein Hinweis („die App dahinter
-wechselt mit") nur dort, wo er stimmt.
-
-#### N61.2 · Soll/Ist-Abgleich in der Pilot-Analyse weiter ausbauen
-
-**Marcel:** *„dann wollten wir Soll/Ist Abgleich weiter ausbauen in der Pilot
-Analyse und auch die Lage Klassen mit einbeziehen in die Pilot analyse."*
-
-Der Reiter existiert seit **v2042** (`ui.js:_sollIstHtml()`, rechnet nicht
-selbst — `DealPilotAnkauf.abweichung()` liefert die Zeilen). Was „weiter
-ausbauen" heißt, ist offen und gehört vor dem Bauen geklärt.
-
-#### N61.3 · Lageklassen in die Pilot-Analyse UND in die Quick-Check-Bewertung
-
-> **✅ laut Code erledigt (Aufräumen 13.10.2026):** Ampel v2143, Quick-Check-Fazit mit Zielrendite der Lageklasse v2148 (qc-heuristik.js:668), Prompt der Pilot-Analyse v2157 (openaiService.js:479).
-
-**Marcel:** *„Das muss auch mit in die Bewertung im Quick Check unten weil
-der Investor ja lesen möchte und bewerten möchte ob der deal passt."*
-
-Die Lageklasse ist seit **v2143** der Maßstab der Bruttomietrendite-Ampel
-(`qc-heuristik.js`, Prüfer `tools/lageklasse-ampel-pruefen.mjs`). Offen ist,
-ob sie auch **im Prompt der Pilot-Analyse** und **im Fazit unten im
-Quick-Check** ankommt.
-
-#### N61.4 · Lage & Markt: die Werte aus den Marktberichten holen, nicht recherchieren
-
-> **✅ laut Code erledigt (Aufräumen 13.10.2026):** die fehlenden Stufe-3-Werte (Sachwert, Ertragswert, führendes Verfahren mit Grund und Rechtsgrundlage) stehen seit v2150 (c73c0c6c) im Prompt (openaiService.js:1103-1128); Mietspiegel mit Vorrang des Berichtswerts (:1569).
-
-**Marcel:** *„in der Pilot Analyse woher kommen die werte und daten im reiter
-Lage & Markt? wenn wir einen marktbericht haben oder mehrere können wir die
-Daten dafür aus den Marktberichten holen da wir diese sachen ja dort über die
-partner abholen. dann können wir auch aussagen über die entwicklung
-treffen."* Und: *„man kann die werte der KI gerne mit den daten aus der
-schnittstelle abgleichen auch wenn Stufe 3 gerechnet wurde sollte auf
-jedenfall auch der Verkehrswert mit einfließen und die Gesamtbewertung
-einfließen."*
-
-**Gemessen am 12.10.2026 — das meiste ist gebaut, eine Lücke ist echt:**
-
-| Baustein | Stand |
-|---|---|
-| Berichtsblock im Prompt | **da** seit v947-mbsource (`openaiService.js:888`), ausdrücklich „die BESTE Quelle hier, vor allem anderen nutzen" |
-| mehrere Berichte | **da** — `/marktbericht/objects/history` lädt alle, Verlauf mit Datum und Marktwert |
-| Entwicklungsaussage | **da** — Entwicklungszeile in Panel „Lage & Markt" ab zwei Berichten (`ui.js:2822`), Riegel bei unter 30 Tagen Abstand im Prompt |
-| Mietabweichung | **da** und gerechnet, nicht geschätzt (`openaiService.js:940 ff`) |
-| **Stufe-3-Werte** | **FEHLT im Prompt.** `/objects/history` liefert seit v1963/v1965/v1979 `sachwert_eur`, `ertragswert_eur`, das **führende Verfahren** mit Grund und Quelle (§ 6 Abs. 1 ImmoWertV) und beide Rechenwege — der Prompt-Bauer liest **kein einziges** dieser Felder |
-| `mietspiegel_eur_qm` | das Ausgabeschema nennt es wörtlich *„Recherchierter Wert €/m²"* (`openaiService.js:1156`) — die KI soll **recherchieren**, obwohl der Bericht eine amtliche Mietpreisübersicht trägt |
-
-> **Die Zahlen liegen in der Antwort und verlassen den Prompt-Bauer nicht.**
-> Dasselbe Muster wie v1963: der Cross-Check lag in der Zeile und hat den
-> Server nie verlassen — nur eine Ebene weiter.
+- Sichtabnahme mit einem frischen Testkonto (ohne Objekte ist der Hintergrund leer); unter 900 px füllt der Kasten den Schirm (`onboarding.js:1198`), dort gibt es kein „dahinter“.
 
 #### N61.5 · Die Demo-Objekte
 
@@ -878,39 +245,11 @@ einfließen."*
 erzählen keine Geschichte"), dort steht der Punkt mit Messung. Er hängt an
 einer Entscheidung von Marcel und ist nicht blockiert, sondern **unbeantwortet**.
 
-#### N61.6 · Das Unterlagen-Modul ergänzen — Marcel meint N51
+#### N61.6 · Das Unterlagen-Modul ergänzen — Rest (Erledigtes s. Fertig)
 
-> **✅ 20.10.2026 · v2470–v2472 (ca8ecb13, c2f2ebbe):** Telegram-Teil aus v5 („ja das wäre top"). Im Bot: `/unterlagen` oder „Unterlagen für Objekt 3 anfordern" → Objekt → je Unterlage Amt, Kanal, Gebühr, Ansprechpartner 1/2 → Nummer gibt den Anschreiben-Entwurf, „verschickt" setzt `gesendet`, „suche N/alle" ermittelt fehlende Ämter. Versand bleibt beim Nutzer. Ein Kern (`entwurfAnlegen`/`anfrageStatus` im Dienst, Web-Route nutzt ihn mit). Prüfstrecke im Container 57/0. Offen: Prod-Bot-Token gegen Staging prüfen, Kontingent für die Ämtersuche (Web wie Bot keins) — Marcel. Journal v2470–v2472.
-
-> **✅ 19.10.2026 · v2440–v2445 (5bd2ab68, 7d727070 u. a.):** Marcel fragte erneut („unterlagenapp … die 2 Ansprechpartner ausweisen“). Gemessen: Code da, aber **0 von 27 Ämtern** mit Ansprechpartner. Abgleich v6 vollständig (fehlend gebaut: zweite Adresssuche, saeubereMail, Kanal, Personenpostfach→Funktion, istLokal, Empfänger wählbar), Modal zeigt zwei Karten mit Beleg-Seite, 342 Ämter für 60 Gemeinden eingespielt → **369 Ämter, 104 mit Ansprechpartner (56 mit zwei)**. Offen: Telegram-Teil aus v5 (Entscheidung Marcel), alte PLZ-Sätze verdecken gemeindeweite. Journal v2440–v2445.
-
-> **✅ laut Code erledigt (Aufräumen 13.10.2026):** N51 ist mit v2151 (Beleg je Seite, seiten.pro_seite), v2152 (Ansprechpartner 1 und 2 je Amt, Kopie-Haken) und v2153 (Amtsweg oder zwei Ansprechpartner, Telefon) gebaut. Offen bleibt nur der Hinweis unten: vw-modul-v4-2-2/-v4-2-5.zip stehen in keiner Backlog-Zeile.
-
-**Marcel:** *„und ich hatte auch ein paket reingegeben um die unterlagen
-prüfung. steht das auch noch im backlog?"* — und auf die Rückfrage:
-*„ja ich meine das unterlagen app das müssen wir ergänzen ist ja schon
-drin. soll nur ergänzt werden bzw. bissel erweitert."*
-
-**Geklärt: es ist `unterlagen-app-v6-ansprechpartner`, also N51.** Kein
-neues Paket, kein Umbau — die offenen Schritte stehen dort unter „Zu tun"
-(KI-Auftrag um `ansprechpartner` erweitern, `proSeite` als Beleg, `kopieAn`
-im Versand). **Die Migration ist dort schon als Annahme zurückgenommen:**
-`unterlagen_aemter.seiten` ist bereits `jsonb`.
-
-> **Mein Fehlgriff bei der Suche:** ich habe nach „Unterlagen**prüfung**"
-> gegreppt und nichts gefunden, weil der Punkt „Unterlagen-**Modul**"
-> heißt. Dieselbe Falle wie immer — nach dem WEG suchen, nicht nach dem
-> Wort, das Marcel gerade benutzt.
-
-**Dabei ist eine andere Lücke aufgefallen, und die bleibt echt:**
-`Dateien/vw-modul-v4-2-2.zip`
-und `-v4-2-5.zip` (08. und 10.10.2026) stehen in **keiner Zeile** des
-Backlogs. Das ist ein Gutachten-Modul mit drei Word-Vorlagen
-(`master_vwg`, `master_rndg`, `master_kpt`), `calc-engine.js`,
-`boris-nrw-service.js`, einer `IMPORT-API.md` und drei Beispiel-PDFs
-(Verkehrswertgutachten, Nutzungsdauergutachten, Kaufpreisaufteilung).
-**Ein Paket, das im Repo liegt und im Backlog fehlt, ist verloren** — genau
-der Fall, den Marcel hier anspricht. **Noch nicht gesichtet, nur gelistet.**
+- Prod-Bot-Token gegen Staging prüfen.
+- Kontingent für die Ämtersuche (Web wie Bot heute keins) — Entscheidung Marcel offen.
+- Alte PLZ-Sätze verdecken gemeindeweite.
 
 ---
 
@@ -923,1635 +262,38 @@ Abhängigkeit, nicht seine Priorität.
 
 ---
 
-#### N60.1 · Lageklassen ermitteln und vergeben — ✅ ERLEDIGT 08.10.2026
-Marcel: „die Lageklassen kannst du selber ermitteln und vergeben, kannst
-auch im Netz nachschauen." Damit war die Sperre aus **N59** aufgehoben.
+#### N60.1 · Lageklassen ermitteln und vergeben — Rest: Gegenlesen (Erledigtes s. Fertig)
 
-**Es musste nichts erfunden und nichts nachgeschlagen werden.** Gemessen
-trugen **17 von 21 Objekten bereits Makrolage, Mikrolage UND
-Bodenrichtwert** — alles Marcels eigene Angaben. Die Klasse ist daraus
-abgeleitet, nicht geschätzt.
+- Marcel sollte die drei neutral vergebenen B\* gegenlesen: 2026-1082 (Herford, keine Lagedaten), 2026-1079 und 2026-1078 (Bad Oeynhausen, aus dem Ort bei Gleichstand).
 
-**Die Regel, nachrechenbar:**
+#### N60.2 · Messkabine-Matrix — Rest (Erledigtes s. Fertig)
 
-```
-Punkte  sehr_gut 5 · gut 4 · durchschnittlich 3 · schwach 2 · sehr_schwach 1
-P       = (Makrolage + Mikrolage) / 2
-A       wenn P >= 4,0  UND  BRW >= 500 EUR/m2
-C       wenn P <= 2,5  ODER BRW <  150 EUR/m2
-B       sonst
-```
+- **Entscheidung Marcel offen — Konsole:** (a) aus dem Umschalter nehmen (`THEMES` in `ui-varianten.js`, am 25.10.2026 noch drin, Z. 51) oder (b) fertigbauen mit eigener Textschicht (60–90 Regeln). Vorschlag: (a) jetzt, (b) später.
+- Die feineren Achsen (6 Themes × 4 Cards × 2 Surfaces = 384 Punkte) als Nachtlauf; `kartenvariante` unter einem Theme als „fremdbestimmt“ kennzeichnen.
 
-Ohne eigene Lagedaten: die **häufigste** Klasse der Objekte am selben
-Ort, bei Gleichstand das neutrale **B**. Ohne Ort: gar nichts.
+#### N60.4 · Pilot-Analyse: Datenzugriff — Rest (Erledigtes s. Fertig)
 
-| Objekt | Ort | → | Herleitung |
-|---|---|:-:|---|
-| 2026-1052 | Leipzig | **A** | P 4,0 · BRW 1.200 |
-| 2026-1054 | Detmold | **A** | P 4,5 · BRW 700 |
-| 2026-1041 | Bielefeld | B | P 3,5 · BRW 450 |
-| 2026-1053 | Bielefeld | B | P 3,5 · BRW 390 |
-| 2026-1042 | Bielefeld | B | P 3,5 · BRW 320 |
-| 2026-004 | Musterhausen | B | P 3,0 · BRW 250 |
-| 2026-1055 | Ibbenbüren | B | P 3,5 · BRW 210 |
-| 2026-1008 | Bad Oeynhausen | B | P 3,0 · BRW 200 |
-| 2026-999 | Leipzig | B | P 3,5 · BRW 160 |
-| 2026-1006 | Hiddenhausen | B | P 3,0 · BRW 150 |
-| 2026-1082 | Herford | B\* | **keine Lagedaten, kein Geschwister** — neutral |
-| 2026-1079 | Bad Oeynhausen | B\* | aus Ort (1056=C, 1008=B), Gleichstand → B |
-| 2026-1078 | Bad Oeynhausen | B\* | dito |
-| 2026-1056 | Bad Oeynhausen | **C** | P 2,0 — Mikrolage sehr schwach |
-| 2026-1051 | Castrop-Rauxel | **C** | P 2,5 **und** BRW 90 |
-| 2026-001 | Hüllhorst | **C** | BRW 90 |
-| 2026-1036 | Rinteln | **C** | BRW 80 |
-| 2026-1040/1007/1002 | Kabelsketal | **C** | BRW 130 |
-| 2026-1086 | — | — | **ohne Adresse, keine Grundlage** |
+- Kein RAG → N60.7.
+- Anzeige-Spiegel tot: `investment-profile.js:138-155` `syncAiParamsToTab()` schreibt in `#ai_strat`, `#ai_verk`, `#ai_risk`, `#ai_markt`, `#ai-param-*-display` — diese Ids gibt es in `index.html` nicht. Ändert nichts an der Analyse; abtragen, wenn das Panel ohnehin angefasst wird.
 
-Verteilung: **A 2 · B 11 · C 7 · 1 ohne**. Die mit \* markierten drei
-sind die schwächsten Ableitungen — sie stehen auf der neutralen Klasse,
-weil keine eigenen Lagedaten vorliegen. **Marcel sollte genau diese drei
-gegenlesen.**
+#### N60.5 · TEILERLEDIGT (`v2081`, `v2141`, `v2143`, `v2144`) — Rest: Abnahme am Bot, „kein Objekt gefunden“, Cashflow-Skala
 
-> **⚠ Beim Schreiben wäre fast ein Schaden entstanden.**
-> `objectService.update()` setzt `ai_analysis = aiAnalysis || null` und
-> `photos = photos || []` bei **jedem** PUT. Ein naives
-> „Feld ergänzen und speichern" hätte **jede Pilot-Analyse und jedes
-> Foto gelöscht** — lautlos. Der Lauf schickt beides deshalb zurück und
-> misst nach jedem Objekt gegen: Analyse 14.849 → 14.849, Fotos 6 → 6.
-> **Alle 20 Schreibvorgänge mit unveränderter Analyse und Fotozahl.**
+Erledigtes s. Fertig („Bot-Kennzahlen und Barkauf im Score“). Offen:
+- **Abnahme am echten Bot** mit Sachsenstraße 18 (KP 180.000, Kaltmiete 940): kommen 11.280 € / 6,27 % / 15,96 / 9,40 €/m² an? Braucht Telegram, Abnahmepunkt.
+- **„kein Objekt gefunden“** unmittelbar nachdem der Bot das Objekt selbst angelegt hatte (IMG_1554, IMG_1558/1559) — unberührt.
+- **Cashflow-Skala beim Barkauf** (−200 € → 0, 0 € → 50, +200 € → 100) misst beim Barkauf nichts. **Entscheidung Marcel offen:** ab welcher Rendite auf das eingesetzte Geld ist ein Barkauf gut? (geratene 4 % ausdrücklich zurückgenommen)
+- Bilder: `Dateien/bot/IMG_1554.PNG` … `IMG_1559.PNG`.
 
-#### N60.1b · ERLEDIGT — am 10.10.2026 nachgemessen, keine Doppelung mehr
+#### N60.4d · Fotos ausgewertet (`v2013`) — Rest: „alle Daten“
 
-> **Gemessen am Portfolio-Export vom 10.10.2026** (`Dateien/API-Export/`):
-> 13 Objekte tragen eine Pilot-Analyse, **alle 13 mit unterschiedlicher
-> Länge** — keine Gruppe gleicher Länge, also auch keine byte-gleiche.
-> Die sieben von 08.10. sind weg; `N60.5d` (Neuberechnung aller
-> Analysen) hat gewirkt, die Ursache ist seit `v2015` verriegelt
-> (`N60.5b`).
->
-> **Ein offener Punkt, der nicht mehr offen ist, kostet jedes Mal eine
-> Messung.** Nachprüfbar mit einem Lauf über
-> `objekte[].analyse` im Export.
+Foto-Auswertung erledigt, s. Fertig. Offen für Marcels „alle Daten“:
+- Die **sieben Blöcke auch für den Portfolio-Piloten** — er sieht je Objekt weiter nur 24 Zahlenfelder.
+- Das **Investmentprofil** (24 Schlüssel) liegt nur im `localStorage` und erreicht keinen Prompt.
+- **Pilot-Analyse ← Telegram:** der Bot kann sie lesen, aber nicht auslösen.
 
-<details><summary>Der Befund von damals</summary>
+#### N60.6 · Auskunft: immer Score, KPIs und eine Gesamtbewertung — Rest: Abnahme am Bot
 
-Beim Nachmessen aufgefallen (08.10.2026), Länge in Zeichen:
-
-| Länge | Objekte |
-|---:|---|
-| **14.849** | **7**: 2026-1056, 1052, 1055, 1054, 1053, 1051, 1041 |
-| **11.187** | **2**: 2026-1007, 2026-1002 |
-| 9.807 / 9.926 / 11.012 | je 1 (2026-004, 2026-999, 2026-001) |
-
-Die sieben liegen in **Bad Oeynhausen, Leipzig, Ibbenbüren, Detmold,
-Bielefeld und Castrop-Rauxel** — und tragen byte-gleich denselben Text.
-Das deckt sich mit dem alten Befund weiter unten in dieser Datei (dort
-waren es sechs). **Eine Analyse, die zu einem anderen Objekt spricht,
-ist schlimmer als keine** — und sie ist ein starker Kandidat für
-Marcels Frage aus N60.5 („erst 44, dann über 80").
-
-</details>
-
-#### N60.2 · ERLEDIGT — Werkzeug `v2085`, Matrix gefahren `v2092`–`v2092f`: Haupt-App, Quick-Check UND Marktbericht
-> ### Vier Achsen statt einer (`v2085`–`v2085b`)
->
-> **Der Befund vorher:** die Kabine konnte genau EINE Variantenachse
-> setzen (`dp_layout`). Kartenstil und Theme waren über sie nicht
-> ansteuerbar — die Attribute existieren in der App, aber die Kabine
-> kannte ihre Merker nicht.
->
-> *Ein Prüfstand, der eine Achse nicht verstellen kann, prüft sie nicht
-> — und meldet trotzdem „geprüft". Genau das hat N60.17 getan: vier
-> Ansichten protokolliert, alle beim Standard-Design.*
->
-> | Achse | Merker | kommt an? |
-> |---|---|---|
-> | Layout | `dp_layout` | **ja** |
-> | Kartenstil | `dp_karten_stil` | **ja** (`kartei` gemessen) |
-> | Objektkarte | `dp_objkarte_stil` | **ja** (`datenzeile` gemessen) |
-> | Kartenvariante | `dp_karten_variante` | gesetzt, ungeprüft |
-> | Theme | `ui_theme` **im JSON** | **nein** — siehe unten |
-> | Karten/Oberfläche | `ui_cards`, `ui_surface` **im JSON** | **nein** |
->
-> **Das Ergebnis nennt jetzt `angefordert` UND `attribute`** — was
-> gesetzt wurde und was am `<html>` wirklich hängt. Ein Merker im
-> Speicher ist kein Nachweis: das Modul kann ihn verwerfen oder an eine
-> Bedingung binden.
->
-> ### Warum drei Achsen NICHT gehen (gemessen, nicht vermutet)
->
-> `ui_theme`, `ui_cards` und `ui_surface` liegen als Felder im JSON
-> `dp_user_settings` — und das ist **servergespiegelt**. Die App lädt
-> die Einstellungen nach dem Start vom Server und schreibt denselben
-> Schlüssel. Im iframe gemessen, nach einem Lauf mit `theme: 'kontor'`:
-> dort stand `"ui_theme": ""` — der gesetzte Wert war weg.
->
-> **Vor dem Laden zu setzen ist bei einem servergespiegelten Wert
-> wirkungslos, und zwar lautlos.** Der richtige Weg steht in der Doku
-> der Kabine: nach dem Laden über die Modul-API im iframe setzen, dann
-> das Attribut lesen.
->
-> **Dass die Lücke im Ergebnis SICHTBAR ist, war der Zweck** — sie hat
-> im ersten echten Lauf meinen eigenen Fehler gemeldet (ich hatte
-> `theme` auf `dp_karten_variante` geschrieben, zwei verschiedene
-> Konzepte verwechselt). Ohne das Feld hätte die Kabine ab heute „vier
-> Achsen geprüft" gemeldet und drei geprüft.
->
-> ### DER LAUF IST GEFAHREN — 10.10.2026, `v2092`/`v2092a`
->
-> `DPM.matrix()`, **48 von 48 Punkten, Deckung 100 %**, 6 Varianten × 8
-> Geräte × 9 Reiter = **432 Reiter-Messungen** in 12 Minuten
-> (14:04–14:16 UTC). Keine Ausnahme, kein Abbruch.
->
-> **Der erste Lauf hat zuerst einen Fehler im LÄUFER gefunden** — die
-> Variante „DealPilot" war als `opt: {}` geschrieben, und `setzeMerker()`
-> setzt mit Absicht nur, was genannt ist. Also blieben `ui_theme=kontor`,
-> `ui_cards=wallet`, `kartenstil=kartei` und `objkarte=datenzeile` aus
-> vorherigen Proben **stehen**, in allen 48 Punkten. Der Lauf wurde
-> verworfen, nicht ausgewertet; jede Variante nennt seit `v2092a` den
-> **vollen** Achsensatz, und der Nachweis prüft **alle sechs** Achsen
-> statt nur `theme`. Gefunden hat es das `attribute`-Feld aus `v2085`.
->
-> ## Befund 1 — ZURÜCKGENOMMEN: es gab keinen Überlauf-Defekt
->
-> **Hier stand „Überlauf: 109 Funde auf VIER Elemente" mit
-> `div.oe-karte-gewerke` als größtem Posten (72×, 8/8 Geräte, 6/6
-> Varianten). Beides war falsch.**
->
-> **Fehler 1 — meine Auswertung.** Ich habe die Funde nach dem *ersten
-> Wort* des Textes gruppiert. `apNam()` liefert aber `div` +
-> **Leerzeichen** + Klassen, also landeten verschiedene Elemente
-> gemeinsam unter „div". Richtig sind **fünf** Elemente:
->
-> | Element | Funde | Reiter | Geräte | Faktor |
-> |---|---:|---|---:|---:|
-> | `div#dab-rail-finanzierung` | 48 | Deal-Aktion | 8/8 | 3,0× |
-> | `div.ytf-quick-wrap` | 30 | Steuer | 5/8 | 2,6× |
-> | `div#oe-karte-gewerke` | 24 | Objekt | 4/8 | 2,2× |
-> | `div.dptk-huelle` | 6 | Bewertung | 1/8 | 1,3× |
-> | `div.bc-svg-wrap` | 1 | Bewertung | 1/8 | 2,2× |
->
-> Das größte war also ein **anderes** Element, in einem **anderen**
-> Reiter.
->
-> **Fehler 2 — die Bewertung, und der ist der teurere.** Alle fünf sind
-> **gewollt gebaut**, am Quelltext nachgelesen:
->
-> | Element | Nachweis der Absicht |
-> |---|---|
-> | `dab-rail` | eigene Pfeiltasten `railScroll(id,±1)` + `scroll-snap-type:x proximity` (`deal-action-boarding.js:1429`) |
-> | `oe-karte-gewerke` | `overflow-x:auto` **mit** `-webkit-overflow-scrolling:touch` (`style.css:39008`) |
-> | `ytf-quick-wrap` | in `style.css:39561` steht **genau diese Messung** schon als Kommentar |
-> | `dptk-huelle` | von `tabellen-karten.js:249` **per JS** an das Elternelement einer Tabelle gehängt |
-> | `bc-svg-wrap` | Rahmen um ein SVG mit `min-width:680px` — „lesbar; Nutzer scrollt horizontal" steht als Kommentar daneben |
->
-> Und `apQuerScroller` sagt es in seinem **eigenen** Kommentar:
-> *„Waagerechte Scroller sind kein Fehler, aber auf dem Handy ein
-> UX-Befund — deshalb getrennt gezählt und benannt."* Ich habe sie
-> trotzdem als Mangel gemeldet.
->
-> **109 Fehlalarme begraben jeden echten Fund.** Ein Prüfer, der ruft,
-> wenn nichts ist, ist so wertlos wie einer, der schweigt, wenn etwas
-> ist — und der Fehler war diesmal nicht in der App, sondern in meinem
-> Bericht über sie.
->
-> ### Behoben: die Absicht hängt jetzt am Element (`v2092b`–`v2092e`)
->
-> Gewollte Scroller werden als **`SCHIENE`** gezählt, nicht als Mangel —
-> und zwar nur, wenn die Absicht **nachweisbar** ist. Nachweislauf nach
-> dem Umbau: **7 Schienen, 0 Mängel, 0 Messfehler**, jede Schiene mit
-> ihrem Grund benannt.
->
-> **Der Weg dorthin brauchte drei Anläufe und dann die Diagnose:**
->
-> 1. `getComputedStyle(el).webkitOverflowScrolling === "touch"` — tot,
->    Chrome kennt die Eigenschaft nicht.
-> 2. Dieselbe Eigenschaft im CSSOM suchen — auch tot. **Gemessen:**
->    11.954 Regeln durchgegangen, 45 von 48 Blättern lesbar, **null**
->    Regeln mit `overflow-scrolling` im `cssText` — bei gleichzeitig
->    **10** Regeln auf den Selektor `oe-karte-gewerke`. Der Durchlauf
->    lief also, die Eigenschaft war nicht da.
-> 3. Gegenprobe: `setProperty("-webkit-overflow-scrolling","touch")`
->    gibt `""` zurück. **Chrome verwirft sie beim Einlesen.**
->
-> Die Absicht steht in der Datei und ist im Browser in **beide**
-> Richtungen unsichtbar. Also wird sie als eigene Variable notiert, die
-> Chrome behält: **`--dpm-schiene: 1`** an der Regel, die den Scroller
-> macht (drei Stellen in `style.css`). `dab-rail` und `dptk-huelle`
-> brauchen sie nicht — ihre Absicht ist über `scroll-snap-type` bzw.
-> über den JS-Aufruf nachweisbar.
->
-> *Die Absicht hängt damit am **Element**, nicht an einer Liste im
-> Prüfer — eine Liste veraltet beim nächsten neuen Scroller, die
-> Variable wandert mit der Regel.*
->
-> Bewusst in Kauf genommen: eigene Variablen **werden vererbt**. Ein
-> Scroller *innerhalb* einer markierten Schiene gilt damit auch als
-> gewollt. Das ist die harmlosere Richtung.
->
-> `DPM.deklariertAbsichtlich(el, win)` ist mitexportiert, damit der
-> Erkenner **einzeln mit Gegenprobe** prüfbar ist (`#oe-karte-gewerke`
-> → `true`, eine andere `.card` → `false`). Genau das Fehlen dieser
-> Prüfbarkeit hat die tote Weiche zwei Fassungen lang getragen.
->
-> ## Befund 2 — Kontrast: 432 von 432 Reitern, also ALLE
->
-> | Variante | Reiter mit Mängeln | gemeldete Stellen | schlechteste |
-> |---|---:|---:|---:|
-> | DealPilot | 72/72 | 1.416 | k=1,21 |
-> | Kontor | 72/72 | 2.230 | k=1,07 |
-> | Panel | 72/72 | 2.010 | k=1,07 |
-> | Kanzlei | 72/72 | 1.726 | k=1,07 |
-> | Boarding | 72/72 | 2.254 | k=1,07 |
-> | **Konsole** | 72/72 | 1.996 | **k=1,01** |
->
-> **Die vier Alternativ-Themes sind SCHLECHTER als die Hausfassung** —
-> Boarding und Kontor mit rund 60 % mehr Stellen als DealPilot. Das ist
-> das Gegenteil dessen, was man annimmt: man prüft die Hausfassung und
-> hält die anderen für Varianten davon.
->
-> Häufigste Stellen über alle Läufe: `span.sbcm-label` (272×),
-> nacktes `span` (396×), `div.sb-lage-kopf` (60×), `div.ct.ct-pro` (32×).
->
-> > **`v2089`–`v2091` haben einen kleinen Zipfel davon erwischt.** Die
-> > dort behobenen sechs Stellen sind echt behoben — aber die Annahme,
-> > das Kontrastthema sei damit „bis auf zwei Goldtöne" erledigt, war
-> > falsch. Sie beruhte auf EINER Ansicht in EINER Variante.
->
-> ## Befund 3 — unsichtbarer Text, und die Ursache ist gefunden
->
-> `k=1,01` ist kein schwacher Kontrast, das ist **unsichtbar**.
-> Nachgestellt (Konsole, 360 px, Reiter Miete):
->
-> ```
-> span.me-incze-desc   Text rgb(40,38,38)    auf rgb(39,39,37)    k=1,01
-> span                 Text rgb(230,232,234) auf rgb(255,255,255) k=1,23
-> ```
->
-> Einmal dunkel auf dunkel, einmal fast weiß auf weiß. **Dieselbe Stelle
-> in den anderen Fassungen gemessen:**
->
-> | Fassung | Text | Grund | k |
-> |---|---|---|---:|
-> | DealPilot | `rgb(42,39,39)` | `rgb(251,248,241)` | 13,96 |
-> | Kontor | `rgb(42,39,39)` | `rgb(251,248,241)` | 13,96 |
-> | Boarding | `rgb(42,39,39)` | `rgb(251,248,241)` | 13,96 |
-> | **Konsole** | `rgb(42,39,39)` | **`rgb(39,39,37)`** | **1,01** |
->
-> **Die Textfarbe ist überall dieselbe** — die Marken-Tinte `#2A2727`.
-> Was sich ändert, ist der **Grund**. Konsole macht die Fläche dunkel und
-> lässt den Text auf der Hell-Tinte stehen.
->
-> **Die Ursache, gezählt:**
->
-> | Theme | `style.css` | `ui-varianten.css` | `layout-varianten.css` | Summe |
-> |---|---:|---:|---:|---:|
-> | Kontor | 66 | 35 | 1 | **102** |
-> | Panel | 66 | · | · | 66+ |
-> | Kanzlei | 90 | · | · | 90+ |
-> | Boarding | 66 | · | · | 66+ |
-> | **Konsole** | **0** | **13** | **0** | **13** |
->
-> **62 Sammelregeln in `style.css` listen `kontor, panel, kanzlei,
-> boarding` — und lassen `konsole` weg.** Genau in diesen Regeln stehen
-> die Textkorrekturen für die geänderten Gründe (eine davon ist die
-> `ds2-tag`-Fassung aus `v2089`). Konsole bekommt also die Flächen, aber
-> keine der Reparaturen.
->
-> Im Umschalter steht es trotzdem als sechste, voll wählbare Fassung:
-> **„Konsole · Dicht, Mono"**. Die 13 Regeln machen Dichte und Mono —
-> es ist als DICHTE-Fassung gedacht, nicht als Farbfassung, und erbt
-> deshalb Farben, die niemand für sie geprüft hat. Derselbe Fall wie
-> „Reparatur erbt ihren Anker": eine weitere Variante kam dazu, die
-> Reparaturen wurden nicht mitgezogen.
->
-> **`konsole` einfach in die 62 Selektorlisten aufzunehmen wäre falsch** —
-> die vier dort sind HELLE Fassungen („Kontor · Rein weiß"), ihre
-> Korrekturen setzen dunkle Schrift auf hellen Grund. Bei einer Fassung,
-> die Flächen abdunkelt, macht das alles schlimmer.
->
-> ### Was zu entscheiden ist (Marcel, Produkt)
->
-> **Eine Fassung, die unsichtbaren Text erzeugt, ist schlimmer als keine.**
-> Zwei Wege:
->
-> - **(a) Konsole aus dem Umschalter nehmen**, bis sie eine eigene
->   Textschicht hat. Eine Zeile in `THEMES` (`ui-varianten.js`, ~Z. 62),
->   sofort wirksam, nichts geht kaputt.
-> - **(b) Konsole fertigbauen** — eigene Textschicht für ihre
->   abgedunkelten Flächen, danach ein Matrix-Lauf nur über sie. Das ist
->   ein eigenes Paket in der Größe von 60–90 Regeln.
->
-> **Mein Vorschlag ist (a) jetzt und (b) später.** Heute kann jeder Kunde
-> die Fassung wählen und sieht dann Text, der nicht da ist.
->
-> ## Was der Läufer NICHT gefunden hat (und das ist auch ein Befund)
->
-> **32 Achsen-Abweichungen, alle dieselbe:** `kartenvariante angefordert
-> "", am <html> "v4"` — und zwar nur, wenn ein Theme gesetzt ist. Ohne
-> Theme trägt das `<html>` gar kein `data-dp-karte`. **Das Theme setzt es
-> selbst**, es ist also keine Verunreinigung, sondern eine Achse, die
-> unter einem Theme nicht frei ist. Der Nachweis kann das nicht
-> unterscheiden und meldet beides gleich — beim nächsten Ausbau gehört
-> `kartenvariante` als „fremdbestimmt" gekennzeichnet.
->
-> Kein `MESSFEHLER`, kein `ABBRUCH`, kein `KEINE REITER` in 48 Punkten.
-
-> ### Quick-Check-Matrix gefahren (11.10.2026, `v2092f`)
->
-> **48 von 48 Punkten, Deckung 100 %**, 6 Fassungen × 8 Geräte, drei
-> Minuten. Kein Querscroll, keine Schiene, kein Messfehler, kein Abbruch.
->
-> **Der Läufer konnte es vorher nicht.** Er sucht `nav.tabs button.tab`
-> und meldete bei einem Dokument ohne Reiter neunmal „KEINE REITER" —
-> statt zu messen. `quickcheck-app.html` lädt als **eigenes Dokument**
-> (Titel „DealPilot Boarding"), null Reiter, 3596 px hoch, eine
-> durchgehende Seite. *Ein Prüfstand, der eine Bauart nicht kennt, darf
-> sie nicht als Fehler melden — er misst sie einmal am Stück.* Seit
-> `v2092f` tut er das und nennt den Fall als Art `OHNE REITER`.
->
-> **Der Lauf fand etwas Wichtigeres als Kontrast — siehe N60.32.**
-
-> ### Was weiterhin fehlt
->
-> **Der Marktbericht und der Quick-Check sind NICHT dabei.** Der Läufer
-> fährt `ziel=/` und damit die Hauptanwendung; beide anderen sind
-> **eigene Dokumente im iframe** und brauchen einen eigenen Lauf mit
-> `?ziel=`. Marcel hat sie ausdrücklich genannt.
->
-> Die drei feineren Achsen (`cards`, `surface`, `kartenstil` je für sich)
-> sind gefahren worden, aber nicht als eigene Varianten ausgewertet —
-> der Lauf hielt sie auf `""`. 6 Themes × 4 Cards × 2 Surfaces wären
-> 48 Varianten und damit 384 Punkte; das ist ein Nachtlauf, kein
-> Sitzungslauf.
-
-
->
-> Die **Matrix selbst**: 9 Reiter × 8 Geräte × Varianten tatsächlich
-> fahren und protokollieren. Das Werkzeug kann es jetzt — gelaufen ist
-> es noch nicht. Und die drei JSON-Achsen brauchen den Weg über die
-> Modul-API, bevor sie in eine Matrix gehören.
-
-Marcel: „Hast du die Datenaufnahmekarten alle in der Messkabine geprüft?
-Auch den Marktbericht und alle anderen Tabs und Bereiche vollständig?
-Die App muss unter allen möglichen Designs passend auf Handy, Tablet und
-Desktop gerendert werden."
-
-**Ehrliche Antwort: nein.** Geprüft sind bisher nur der Marktbericht
-(N58) und einzelne Karten. Offen ist der systematische Durchlauf über
-**alle neun Reiter × acht Geräte × die Gestaltungsvarianten**
-(`data-dp-layout`, `data-dp-kartenstil`, `ui-theme`, Hell/Obsidian).
-
-> **Das braucht einen Läufer, keine Handarbeit.** 9 Reiter × 8 Geräte ×
-> mind. 3 Varianten = 216 Messpunkte. Der Läufer muss je Punkt nennen:
-> echter Überlauf (ohne beschnittene Elemente), `scrollWidth -
-> clientWidth`, und Kontrast der tragenden Flächen. Vorbild ist der
-> Läufer aus N58.
-
-#### N60.3 · ✅ GEBAUT 12.10.2026 (`v2136`–`v2137b`) — Erstanmeldung: 6 Stunden Gnadenfrist
-Marcel: „Bei der Erstanmeldung besteht die Möglichkeit, dass der Kunde
-direkt Zugang zur App bekommt und spätestens 6 Stunden nach
-Erstanmeldung bestätigen muss, sonst wird der Account gesperrt. Der
-Hinweis muss natürlich mit der Erstanmeldung kommen, aber so kann ein
-User direkt, ohne dass er jetzt in seine Mails gehen muss, schon was
-sehen."
-
-> ### VORMESSUNG ERLEDIGT 10.10.2026 (`v2094`) — und sie hat einen
-> ### Fehler gefunden, der heute jeden Neukunden trifft
->
-> Der Punkt verlangte: *„Vorher messen, was `email_verified` heute
-> tatsächlich blockiert."* Gemessen:
->
-> | Frage | Befund |
-> |---|---|
-> | Blockiert `email_verified_at` den Zugang? | **Nein, nichts.** |
-> | Was blockiert dann? | **`users.is_active`** |
-> | Wer setzt es auf `false`? | `registerWithVerify.js` bei der Anmeldung |
-> | Wer setzt es auf `true`? | nur der Klick auf den Bestätigungslink |
->
-> Die Spalte `email_verified_at` existiert seit Migration 003, aber **kein
-> Pfad liest sie für die Zugangsgewährung** — nur Adminlisten und die
-> Statistik. `routes/auth.js` prüft sie beim Login gar nicht; die einzigen
-> `verified`-Treffer dort sind 2FA.
->
-> **Daraus folgte ein Fehler, der nichts mit der Gnadenfrist zu tun hat
-> und sofort behoben wurde:** jeder frisch Registrierte, der sich vor dem
-> Klick anmeldet, bekam
->
-> ```
-> 403  Account is disabled
-> ```
->
-> Englisch, in einer deutschen App — und es klingt wie eine Sperre durch
-> uns. Tatsächlich fehlt nur ein Klick in einer Mail, die im Postfach
-> liegt. *Die Auskunft schickt den Nutzer in den Support statt in sein
-> Postfach.* Behoben in `v2094`, und zwar genau an der Spalte, die bisher
-> nichts tat: wer **nie** bestätigt hat, hat `email_verified_at IS NULL`.
->
-> | Lage | Kennwort | Text |
-> |---|---|---|
-> | nie bestätigt | `EMAIL_NOT_VERIFIED` | nennt die Bestätigung und das Postfach samt Spam-Ordner |
-> | wirklich deaktiviert | `ACCOUNT_DISABLED` | verweist an den Support |
->
-> **Ein zweiter Fund, der die Sache fast lautlos hätte scheitern lassen:**
-> `middleware/errors.js` reichte nur `{ error: err.message }` weiter und
-> warf `code` **weg**. Ein Kennwort am Fehler wäre nie im Frontend
-> angekommen. Jetzt wird es durchgelassen — aber nur ein ausdrückliches
-> `GROSSBUCHSTABEN_KENNWORT`, denn die PostgreSQL-Fehlercodes liegen auf
-> derselben Eigenschaft und gehören nicht nach außen.
->
-> Die Reihenfolge ist Absicht: die neue Auskunft kommt **erst nach** der
-> Passwortprüfung. Wer das Passwort nicht kennt, erfährt weiterhin nur
-> `Invalid email or password` — am lebenden Staging nachgeprüft: HTTP 401,
-> kein `code`-Feld.
->
-> **Damit steht die Grundlage, die dieser Punkt braucht:** eine
-> Gnadenfrist muss „noch nicht bestätigt" von „abgeschaltet" trennen
-> können. Ohne diese Unterscheidung war sie nicht baubar.
->
-> Bewacht von `tools/anmeldung-auskunft-pruefen.mjs` (27 Punkte, RC=0).
-> Er lädt die **echten** Dateien und ruft die **echte** `authenticate()`
-> und den **echten** `errorHandler`; ersetzt sind nur `db/pool`,
-> `authFailuresService`, `utils/password` und `config`. `node --check`
-> hätte hier nichts gefunden — die Frage war nicht, ob die Datei parst,
-> sondern ob `code` ankommt.
->
-> > **Ein Prüfpunkt bestand zuerst aus dem falschen Grund:** ich habe mit
-> > Code `23505` geprüft, ob ein Datenbankcode durchgelassen wird. Der
-> > wird aber zwei Weichen weiter oben als 409 abgefangen und erreicht
-> > die neue Zeile nie — der Test war grün und hat nichts geprüft. Jetzt
-> > prüft er mit `42P01` und hält in einer Gegenprobe fest, dass `23505`
-> > wirklich den anderen Weg nimmt.
-
-### ✅ Gebaut, Weg (a) — Marcels Wortlaut
-
-Marcel am 12.10.2026 auf die Frage: *„mach es so das es funktioniert
-und passend bedient werden kann."* Also Weg **(a)**: `is_active=true`
-ab der Sekunde der Anmeldung, die **Frist** trägt, was vorher der
-Riegel trug.
-
-| | |
-|---|---|
-| `is_active` | **TRUE** ab der Anmeldung |
-| `email_verified_at` | NULL, bis der Link geklickt wird |
-| Ablauf | `created_at` + `config.auth.verifyGnadenfristStunden` (6) |
-
-**Keine Migration für das Schema nötig** — `is_active`,
-`email_verified_at` und `created_at` gibt es alle. Aber eine für die
-**Daten**, siehe unten.
-
-### Erst gemessen: der Stempel wurde nie gesetzt
-
-Der Bestätigungsweg setzte `is_active = TRUE` — und `email_verified_at`
-blieb **NULL**. Gegen die Staging-Datenbank:
-
-```
-  4 Nutzer, 4 aktiv, 0 mit email_verified_at
-```
-
-> **Eine Spalte, die eine Unterscheidung tragen soll, muss auch
-> geschrieben werden.** `v2094` hat sie gelesen und niemand gefüllt.
-> Wer bestätigt hatte und später deaktiviert wird, hätte weiter „sieh
-> in dein Postfach" gelesen — und einen Knopf „Mail erneut senden"
-> bekommen, der ihm nichts bringt.
-
-### Die sechs Teile
-
-| | Was | Wo |
-|---|---|---|
-| 1 | Die Frist als **eine** Quelle | `config.auth.verifyGnadenfristStunden` |
-| 2 | Anmeldung aktiv + Token + `verifyDeadline` zurück | `registerWithVerify.js` |
-| 3 | Bestätigung setzt den Stempel (`COALESCE`) | `registerWithVerify.js` |
-| 4 | `POST /auth/resend-verify`, 3/Stunde, immer neutral | `registerWithVerify.js` |
-| 5 | Frist an **jeder** Anfrage und beim Login | `middleware/auth.js`, `userService.js` |
-| 6 | Band mit Restzeit und Knopf, 44 px, k = 16,18 | `frontend/js/verify-frist.js` |
-
-Zu (5): eine Frist, die nur beim Anmelden geprüft wird, läuft für eine
-offene Sitzung **nie** ab — der Token gilt sieben Tage. Und `v2136a`
-hat sie auch in den **API-Schlüssel**-Pfad gelegt: ein Zugang, der die
-Frist nicht kennt, hebt sie auf.
-
-Zu (6): die Frist wird **nicht im Browser gerechnet.** Der
-Ablaufzeitpunkt kommt vom Server — aus der Antwort der Anmeldung oder
-aus der Kopfzeile `X-DP-Verify-Deadline`, die `v2136` an jede Anfrage
-hängt. Die Uhr des Nutzers ist nicht die unsere.
-
-### ⚠ Der Fehler, den ich dabei gemacht habe
-
-**`v2136` hat auf Staging alle vier Konten ausgesperrt** — beide von
-Marcel und das Admin-Konto.
-
-```
-  info@junker-immobilien.io   is_active=t  2026-05-13  Stempel NULL
-  majunker@gmx.net            is_active=t  2026-07-14  Stempel NULL
-  junker_immobilien@gmx.de    is_active=t  2026-07-23  Stempel NULL
-  pruef-ein-125f5634@...test  is_active=t  2026-10-04  Stempel NULL
-```
-
-Frist seit Monaten abgelaufen → 403 `VERIFY_EXPIRED` an jeder Anfrage.
-
-**Das Bittere:** ich hatte den Altbestand selbst gemessen und die Zahl
-in die Commit-Botschaft geschrieben („4 Nutzer, 4 aktiv, 0 mit
-email_verified_at"). Ich habe sie als **Begründung für den Fix**
-gelesen und nicht als **Warnung für die Vergangenheit**.
-
-> **Wer eine Spalte zur Bedingung macht, muss ihren Altbestand
-> mitbringen.** Das Ergebnis war kein Schönheitsfehler, sondern eine
-> Aussperrung.
-
-Gefunden hat es die **Abnahme im Browser**, nicht der Prüfer: das Band
-zeigte bei einer Frist 4 h 12 min **in der Zukunft** „abgelaufen". Mein
-erster Gedanke war ein Fehler im Band — der Server hatte recht.
-
-Behoben in **Migration `086_verify_stempel_nachtragen.sql`**:
-`email_verified_at = created_at` für alle, die schon aktiv sind und
-keinen Stempel haben, mit der Grenze `created_at < NOW()` (wird beim
-Lauf ausgewertet; ohne sie würde die Migration jeden künftigen Nutzer
-stempeln und die Frist dauerhaft abschalten).
-
-**⚠ Diese Migration gehört zwingend zu `v2136`.** Vor einem
-Prod-Rollout muss sie mit, sonst sperrt die Frist dort genauso aus.
-
-### Nachweis, am lebenden Staging
-
-```
-  Anmeldung                 201, Token, verifyDeadline +6 h, Text deutsch
-  Zugang sofort             GET /objects -> 200
-  Kopfzeile                 x-dp-verify-deadline kommt mit
-  created_at -7 h gesetzt   derselbe Token -> 403 VERIFY_EXPIRED
-  Login nach Ablauf         403 VERIFY_EXPIRED
-  resend-verify unbekannt   200, neutraler Satz
-  resend-verify bestätigt   200, neutraler Satz, keine Mail
-  Bestätigungslink          302, danach email_verified_at = 08:50:51
-  Altkonto nach 086         Stempel da, nicht ausgesperrt
-  Testkonten                gelöscht, 4 Nutzer, 4 gestempelt, 0 Reste
-```
-
-Prüfer `tools/anmeldung-auskunft-pruefen.mjs`: von 27 auf **48 Punkte**,
-RC = 0. `userService.authenticate()` 7×, `middleware.authenticate()` 5×,
-`errorHandler()` 5× — echte Aufrufe.
-
-### Drei eigene Fehler, die der Prüfer gefunden hat
-
-1. Der `config`-Ersatz kannte nur `env`. Die neue Weiche liest
-   `auth.verifyGnadenfristStunden` — mit dem alten Ersatz ein
-   TypeError. **Gefunden, weil der Prüfer nach dem Einbau weiter grün
-   war:** die alten Tests erreichen die neue Weiche gar nicht.
-2. Meine Login-Proben gaben `plainPassword: 'p'`, der Ersatz
-   akzeptiert nur `'richtig'`. Fünf rote Punkte, alle in der Probe.
-3. Die Prüfung auf den englischen Satz las den **rohen** Dateitext —
-   also auch meinen Kommentar, der ihn zitiert. Vierte Mal dieselbe
-   Falle.
-
-Und zwei in der Browser-Abnahme: das Band verdeckte bei 360 px **drei**
-Bedienknöpfe (`v2137a` gibt dem Inhalt Platz), und die Bandhöhe wurde
-**vor** dem Text gemessen — 139 statt 195 px (`v2137b`).
-
-### Der Preis von Weg (a) — und wie er in `v2138` abgetragen wurde
-
-Hier stand: *„ein unbestätigter Zugang ist ein Zugang. Wer eine fremde
-Adresse einträgt, kann sechs Stunden arbeiten."* Das war der
-ausdrücklich benannte Preis von Weg (a).
-
-**Marcel hat am 12.10.2026 selbst die Lösung vorgeschlagen:** *„vlt
-Marktbewertung und abruf von dealpilot sachen erfordern dann die
-anmeldung und bestätigung? quasi ein kleiner zwang?"*
-
-Gebaut in **`v2138`** als `requireVerified()` in
-`backend/src/middleware/auth.js`, eingehängt an den sechs Routen, die
-**Kontingent verbrauchen**:
-
-| Route | verbraucht |
-|---|---|
-| `POST /avm/quote` | `consumeAvm` |
-| `POST /avm/sprengnetter` | `consumeAvm` |
-| `POST /avm/pricehubble` | `consumeAvm` |
-| `POST /marktbericht/reports/generate` | `consumeStufe` |
-| `POST /marktbericht/reports/generate-stream` | `consumeStufe` |
-| `POST /marktbericht/reports/from-dealpilot` | `consumeStufe` |
-
-> **Ein Zwang, der am Teuren hängt, braucht keinen Riegel am Eingang.**
-> Wer die App ansehen will, kann das sofort — genau Marcels Vorgabe.
-> Wer Kontingent verbrauchen will, bestätigt vorher seine Adresse. Der
-> Preis von Weg (a) schrumpft damit auf „sechs Stunden *sehen*", und
-> das kostet niemanden Geld.
-
-Die Sperre sitzt **in der Mittelschicht, nicht im Verbrauchspfad** —
-eine Prüfung hinter dem Abruf wäre ein Abruf, den niemand bezahlt.
-
-### Die Mail nannte die Frist nicht (`v2138`)
-
-Gemessen am ausgehenden Text: er sagte nur „Der Link ist 24 Stunden
-gültig". Von den **sechs** Stunden, nach denen `v2136` sperrt, stand
-dort kein Wort.
-
-> **Zwei Zahlen vor demselben Kunden, und keine erklärt die andere.**
-> Der Widerspruch ist nur scheinbar: der Zugang sperrt nach 6 Stunden,
-> der Link öffnet ihn 24 Stunden lang wieder. Genau das muss dastehen,
-> sonst rechnet der Kunde selbst — und rechnet falsch.
-
-Die Zahl kommt aus `config.auth.verifyGnadenfristStunden`, also aus
-demselben Feld wie die Sperre. Mitgefallen ist ein **Kerosin**-Rest in
-der HTML-Bordkarte („TANK · KEROSIN ✓" → „KONTINGENT ✓") — die
-Bestätigungsmail ist das Erste, was ein Kunde von DealPilot liest, und
-sie trug den seit `v1176` abgeschafften Begriff bis heute (N60.24).
-
-### Nachweis `v2138`, am lebenden Staging
-
-Frisches, unbestätigtes Konto:
-
-```
-  GET  /objects                        200   (sehen darf er)
-  POST /avm/quote                      403   EMAIL_NOT_VERIFIED_GATE
-  POST /avm/sprengnetter               403   EMAIL_NOT_VERIFIED_GATE
-  POST /avm/pricehubble                403   EMAIL_NOT_VERIFIED_GATE
-  POST /marktbericht/reports/generate  403   EMAIL_NOT_VERIFIED_GATE
-  Bestätigungslink geklickt            302
-  POST /avm/quote danach               400   (Eingabefehler = Sperre offen)
-  Testkonto gelöscht                   4 Nutzer, 0 Reste
-```
-
-Der Text der Sperre, wörtlich wie er rausgeht: *„Dafür müssen wir deine
-E-Mail-Adresse kennen. Bitte bestätige sie über den Link in der
-Bestätigungs-Mail – danach steht der Abruf sofort zur Verfügung."*
-
-Mailtext aus dem **laufenden Image** (nicht aus dem Repo): nennt die 6
-Stunden, erklärt den 24-Stunden-Link, sagt „du kommst also auch später
-wieder rein", kein „Kerosin" mehr in Text und HTML.
-
-Prüfer `tools/anmeldung-auskunft-pruefen.mjs`: **48 → 68 Punkte**,
-RC = 0 — Abschnitt 9 ruft die echte `requireVerified()` in vier Lagen
-auf und prüft je Route, dass sie in **derselben Zeile** wie der
-Routeneintrag steht (ein Import allein beweist nichts), Abschnitt 10
-rendert die echte Mail.
-
-### ⚠ Vier Prüferpunkte waren falsch GRÜN
-
-Mein Ersatz für `query` hing **nach** dem `require` von
-`middleware/auth.js` — und das Modul hatte `query` beim Laden schon als
-Referenz festgehalten.
-
-> **Ein Ersatz, der nach dem `require` kommt, wird nicht nur ignoriert —
-> er lässt die vorige Probe weiterantworten.** Abschnitt 7 beantwortete
-> meine Gate-Fragen mit der Zeile des letzten Tests (bestätigt), also
-> ging alles durch. Das ist schlimmer als ein Absturz, weil es grün
-> aussieht.
-
-Behoben, indem Abschnitt 9 **dieselbe** Weiche benutzt (`mwZeile`)
-statt eine zweite zu bauen.
-
-### Offen
-
-Nichts mehr an diesem Punkt. Für den Prod-Rollout gilt weiter:
-**Migration 086 muss mit `v2136` zusammen.**
-
----
-
-**Der ursprüngliche Text des Punktes, zur Nachvollziehbarkeit:**
-
-**Was noch offen ist — und es ist eine Produktentscheidung:**
-
-Der Zugang ist heute **nicht** sofort da: `is_active=false` sperrt bis zum
-Klick. Marcels Wunsch dreht das um. Zu entscheiden ist, **wie** gedreht
-wird, denn beide Wege haben einen Preis:
-
-- **(a) `is_active=true` sofort, Sperre per Frist.** Der Nutzer sieht die
-  App ohne Postfach. Preis: ein nicht bestätigter Zugang ist ein Zugang —
-  wer eine fremde Adresse einträgt, kann sechs Stunden arbeiten, und der
-  Inhaber der Adresse erfährt es nur aus der Mail.
-- **(b) `is_active=false` bleibt, ein eigenes Gnadenfrist-Merkmal gibt
-  Lesezugang.** Mehr Arbeit, aber der Riegel bleibt ein Riegel.
-
-Dazu gehört in jedem Fall: Countdown in der App, Sperre bei Ablauf,
-Entsperrung durch Bestätigung, und ein Weg „Mail erneut senden" — den
-`EMAIL_NOT_VERIFIED` jetzt ansteuerbar macht.
-
-Zu bauen: Zugang sofort, Frist 6 h ab Registrierung, sichtbarer
-Countdown/Hinweis in der App, Sperre bei Ablauf, Entsperrung durch
-Bestätigung. **Vorher messen**, was `email_verified` heute tatsächlich
-blockiert.
-
-#### N60.4 · ✅ ERLEDIGT — Teil 1 (`v2009`), Teil 2 (`v2139`), Investmentprofil (`v2140`). Rest: nur noch RAG → N60.7
-Marcel: „Auf welche Daten wird zugegriffen und wo ist das Wissen? Haben
-wir auf alles Zugriff oder können wir was besser machen?"
-
-**Die Antwort war unangenehm konkret: vier Dinge reisen seit jeher mit
-und wurden im Backend nie gelesen.** Behoben in `v2009`, im laufenden
-Container am echten `buildPrompt()` nachgewiesen (8 von 8 Blöcken).
-
-| | gesendet | gelesen | jetzt |
-|---|---|---|---|
-| **`aiOptions`** — Detailgrad, Tonalität, Fokus, **eigene Anweisungen (500 Z.)** | `ui.js:932` | **nie** (`ai.js:249` gab nur `userApiKey` weiter) | durchgereicht |
-| **`verhandlung`** — `inseriert_seit`, `tage_online` | `ui.js:886` | **nie** — das Wort kam im Dienst 1× vor, in der *Ausgabe*-Beschreibung | eigener Block |
-| **`dealpilot_marktbewertung`** .mikrolage/.makrolage/.wertentwicklung/.marktwert | `ui.js:910` | nur `.marktkontext` + `.erbbaurecht` | eigener Block |
-| **`investor_score`** .rendite/.finanzierung/.risiko/.lage | `ui.js:949` | nur `.total` | aufgeschlüsselt |
-
-> **Die Einstellung „Eigene Anweisungen" war sichtbar, einstellbar,
-> gespeichert, gesendet — und wirkungslos.** Zwanzig Zeilen weiter macht
-> `/ai/lage` es richtig. Über der `dealpilot_marktbewertung`-Zeile steht
-> sogar ein Kommentar, dass dieses Feld „im ganzen Backend KEINEN Leser"
-> hatte — er wurde zur Hälfte behoben und zur Hälfte nicht.
->
-> **Besonders teuer war Nr. 4:** das Antwortformat verlangt ein Feld
-> `score_vergleich`, das erklären soll, *welche* Zusatz-KPIs die Differenz
-> zwischen DealScore und Investor Deal Score treiben. Genau diese vier
-> Zahlen wurden geschickt und verworfen — **das Modell musste raten.**
-
-**Dazu zwei Felder aus dem Formular ergänzt:**
-
-- **Cashflow nach Steuer.** `calc.js:1969` `cf_ns = cf_op − steuer`,
-  `calc.js:1970` `cf_m = cf_op / 12`. Die Pilot-Analyse bekam **`cf_m`,
-  also VOR Steuer** — und sollte in Aufgabe 8 die Steuererstattung
-  beurteilen. Der Portfolio-Pilot bekommt beide Zahlen: **zwei
-  verschiedene Wahrheiten über dasselbe Objekt.** Jetzt stehen beide da
-  und sind **benannt**, dazu Steuerwirkung und AfA.
-- **Zinsbindung und Anschlusskondition.** Aufgabe 13 fordert eine
-  Anschlussfinanzierungs-Analyse; mitgereist war nur die Restschuld zum
-  Ende der Zinsbindung — **ohne zu wissen, wann das ist.**
-
-### ✅ TEIL 2 GEBAUT 12.10.2026 (`v2139`, `v2139a`) — und fünf der sieben Punkte waren längst erledigt
-
-**Erst nachgemessen, dann gebaut.** Von den sieben Punkten unten waren
-am 12.10.2026 fünf nicht mehr offen:
-
-| Punkt | Stand, gemessen |
-|---|---|
-| 1 · Produktwissen nur am Telegram-Agenten | **erledigt** — `services/projektwissen.js` ist EIN Lader für alle drei Piloten, gerufen in `openaiService.js:411`, `:2330`, `agentLauf.js:273`, `routes/ai.js:275` |
-| 2 · kein RAG | **weiter offen**, gehört zu N60.7 |
-| 3 · Mietvertragsfelder gibt es nicht | **erledigt** — `js/mietvertrag-objekt.js` (N60.8, `v2021`/`v2022`) |
-| 4 · Fotos werden nie ausgewertet | **erledigt** — N60.4d, `v2013` |
-| 5 · Portfolio-Pilot sieht nur 24 Zahlenfelder | **erledigt** — `v2014` hat sechs Substanzfelder ergänzt (`dashboard.js:2886-2899`: Lageklasse, Zustand, Energieklasse, Leerstand, Wohneinheiten, Bodenrichtwert) |
-| 6 · Investmentprofil erreicht keinen Prompt | **offen und bestätigt** — siehe unten |
-| 7 · Sieben unsichtbare Blöcke | **erledigt** — `v2011` baut alle sieben (`## STEUER`, `## BEWIRTSCHAFTUNG`, `## MIETENTWICKLUNGSPLAN`, `## WOHNUNGSDETAILS`, `## BODEN UND SUBSTANZ`, `## HALTER UND UEBERGANG`, `## ZUSTAND UND ENERGIE`) |
-
-> **Fünf von sieben Punkten als offen zu führen, kostet jedes Mal eine
-> Messung** — und wer einem von ihnen folgt, baut etwas zum zweiten
-> Mal. Dieselbe Lektion wie bei den Score-Stufen am 07.10.2026.
-
-### Der echte Befund: Regeln ohne Daten
-
-Punkt 7 war gebaut — aber **die Blöcke waren nicht vollständig gefüllt.**
-Neun Feldgruppen verließen den Browser und wurden von `buildPrompt()`
-nie in Text umgesetzt. Derselbe Fehlertyp wie in Teil 1 (`v2009`), nur
-an anderen Feldern.
-
-**Und der schlimmste Fall war kein stummes Feld, sondern das Gegenteil:**
-
-> Der Prompt trägt einen **16-zeiligen Regelblock** „MIETVERTRAEGE JE
-> EINHEIT", der dem Modell erklärt, wie es `vertragsart`,
-> `naechste_anpassung`, `letzte_erhoehung` und `befristet_bis` lesen
-> soll. **Die Werte standen nirgends im Prompt.** Und die Bedingung des
-> Blocks prüft `e.vertragsart` — er erschien also **genau dann, wenn
-> die Daten vorlagen**, und erklärte sie, ohne sie zu zeigen.
-
-Das ist teurer als ein fehlendes Feld. Ein stummes Feld lässt das
-Modell im Unklaren; eine Regel ohne Daten lässt es **glauben**, es habe
-sie. Und `e.art` (`wohnen|gewerbe`) sieht beim Lesen des Codes aus wie
-eine Vertragsart — die Lücke fällt dort nicht auf.
-
-### Was geschlossen ist (`v2139`), je mit Quelle
-
-| Feld | gesendet | war |
-|---|---|---|
-| `etage`, `zimmer` je Einheit | `ui.js:813-814` | stumm |
-| `vertragsart` (aus `mv_art`) | `ui.js:815` | stumm, **und erklärt** |
-| `letzte_erhoehung`, `naechste_anpassung`, `befristet_bis` | `ui.js:816-818` | stumm, **und erklärt** |
-| `zustand` je Einheit | `ui.js:825` | stumm |
-| `steuer.afa_eigen_pct` | `ui.js:897` | stumm |
-| `steuer.sanierung` (4 Angaben) | `ui.js:899-906` | stumm |
-| `steuer.sonder_afa_7b` | `ui.js:908` | stumm |
-| `steuer.erbbaurecht` | `ui.js:909-911` | stumm |
-| `mietentwicklung.umlagefaehig` | `ui.js:936` | stumm |
-| `zustand.bauteile` (8 Bauteile) | `ui.js:1031-1037` | stumm |
-| `zustand.restnutzungsdauer_berechnet` | `ui.js:1053-1061` | stumm |
-| `ankauf.kennzahlen_damals` | `ui.js:967` | stumm |
-| `ankauf.festgeschrieben_am` | `ui.js:969` | stumm |
-| `einheiten.stand` | `ui.js:837` | stumm |
-| `einheiten.flaeche_summe` | `ui.js:788` | stumm |
-
-**Drei davon sind mehr als eine Zeile im Prompt:**
-
-- **Die Sanierung.** Aufgabe 8 soll die Steuerwirkung beurteilen — und
-  ob 40.000 € Sanierung als Erhaltungsaufwand über zwei bis fünf Jahre
-  verteilt oder aktiviert werden, ändert die Steuerwirkung der ersten
-  Jahre vollständig. Das Modell hat es nicht geraten: es wusste nichts
-  davon.
-- **Die gerechnete Restnutzungsdauer** ist etwas anderes als
-  `steuer.afa_rnd_jahre`: dort steht, was der Nutzer **eingetragen**
-  hat, hier was die Bauteile **hergeben**. Ab 3 Jahren Abweichung steht
-  jetzt ein Auftrag im Prompt, **beide** mit Herkunft zu nennen und
-  keine dritte Zahl zu rechnen.
-- **`ankauf.kennzahlen_damals` lag genau dann vor, wenn der Prompt
-  „sage das, statt zu schaetzen" sagte.** Der Satz war richtig, die
-  Lage eine andere.
-
-Dazu ein **Flächenabgleich**: summieren sich die Einheiten anders auf
-als die eingetragene Wohnfläche (ab 1 m²), steht das als Befund im
-Prompt — entweder fehlt eine Einheit, oder die Gesamtfläche ist falsch.
-Beides ändert jede Kennzahl je m².
-
-### `v2139a` · Ein String zerfiel in Einzelbuchstaben
-
-`einheiten.modernisierung` ist ein Verzeichnis Gewerk → Stufe
-(`mfh-einheiten.js`, `d.gebaeude`). Gelesen wurde es mit
-`Object.keys()` — und das nimmt auch einen String an:
-`Object.keys('Dach neu')` gibt `0`…`7` zurück, `length` ist 8, die
-Bedingung also **wahr**, und im Prompt stünde `0=D, 1=a, 2=c, 3=h, …`.
-
-> **Eine Prüfung auf `length` fragt, ob etwas DA ist, nicht ob es die
-> richtige GESTALT hat.** Der Unterschied fällt erst im Ergebnis auf,
-> und dort sieht er wie ein Modellfehler aus.
-
-Gefunden, weil mein eigener Prüfauftrag versehentlich einen String
-schickte. Heute trifft es niemanden — aber es ist genau der Fehler, den
-ein Umbau am Sender eines Tages echt macht. Jetzt nach Typ
-unterschieden.
-
-### Der Prüfer — `tools/prompt-lecks-pruefen.mjs`
-
-**Der wichtigere Teil des Pakets.** Zweimal wurde dieselbe Lücke
-gefunden (`v2009`, `v2139`), beide Male durch Hinsehen. Ein Feld
-dazugeben kostet eine Zeile in `ui.js`, ein Feld **lesen** kostet eine
-zweite an anderer Stelle — und niemand merkt, wenn die zweite fehlt.
-
-Er ruft die **echte** `buildPrompt()` mit einem Auftrag, in dem jedes
-Feld einen unverwechselbaren Wert trägt, und sucht jeden im **Text**:
-
-```
-  32 Felder               je mit Quellzeile in ui.js, 32 gruen
-   4 Gegenproben          Feld weg -> Wert MUSS verschwinden (0 blind)
-   2 Typproben            String/Array zerfallen nicht mehr
-   4 Regelbloecke         nennt der Block ein Feld, steht ein Wert dazu?
-  ~94 Feldnamen im Sender  die Deckung wird mitgenannt
-```
-
-**Nicht `grep` auf den Quelltext:** ein gelesenes `payload.x` kann
-trotzdem ungedruckt bleiben, etwa in einer Bedingung, die nie wahr
-wird. Nur der Text beweist, dass es ankommt.
-
-RC = 0 — lokal, auf dem Staging-Host **und im gebauten Image** (18 von
-18 Proben, `docker exec`). Der Host-Lauf beweist die Datei, nicht das
-Image; beides zu prüfen ist die Lektion aus der Rechenkern-Spiegelung.
-
-### ⚠ ZURÜCKGENOMMEN: zwei vom Prüfer gemeldete Lecks waren meine
-
-Der erste Lauf meldete vier rote Felder. **Zwei davon gab es nicht:**
-
-- `halter.halter` heißt **`halter.name`** (`ui.js:988`) und wird
-  gelesen (`openaiService.js:481-486`).
-- Ein Feld `wohnung.stellplatz` gibt es nicht — Stellplätze stehen als
-  **`garagen`** und **`stellplaetze_aussen`** (`ui.js:976`), beide
-  gelesen (`:463-469`).
-
-> **Ein Prüfer, der einen Feldnamen erfindet, meldet ein Leck, das es
-> nicht gibt — und schickt den nächsten Leser in die falsche Datei.**
-
-Die Namen im Prüfer sind jetzt an `ui.js` ausgelesen, nicht geraten.
-Echt waren nur `einheiten.stand` und `einheiten.flaeche_summe`.
-
-### Promptlänge
-
-Eine ETW mit **allen** neuen Feldern belegt: **25.051 → 25.531
-Zeichen**, also +480 (1,9 %). Ein MFH mit zwei Einheiten und allem
-belegt kommt auf 30.765. Kein Grund zur Sorge, aber gemessen und nicht
-geschätzt.
-
-### Offen aus Teil 2
-
-1. **Kein RAG** → N60.7.
-2. **Das Investmentprofil erreicht keinen Prompt** — bestätigt am
-   12.10.2026, und es ist schlimmer als gedacht:
-
-   | | |
-   |---|---|
-   | Speicher | `localStorage`, Schlüssel `dp_investment_profile` |
-   | Schlüssel | **23**, nicht 24 (`config.js:993-1047`) |
-   | UI | Einstellungen → „Standardwerte" (`investment-profile.js:158-298`) |
-   | Leser | `main.js:38-49` (Formular-Vorbelegung), `dealscore2-ui.js`, `zve-manager.js` u. a. |
-   | in `user_settings` | **nein** — `ERLAUBT` führt nur `datenraum`, `lage_profil`, `portfolio_analyse`, `eigenes_wissen` (`userSettings.js:59`) |
-   | in einem Prompt | **nirgends** — kein Treffer in `ui.js`, `copilot.js`, `portfolio-pilot.js`, `dashboard.js` |
-
-   > **⚠ ZURÜCKGENOMMEN (noch am 12.10.2026, vor dem Bau):** hier
-   > stand „die drei Mindest-Schwellen `min_dscr`,
-   > `min_cashflow_vor_st`, `max_ltv` haben nicht einmal ein
-   > Formularfeld". **Das ist falsch.** Sie haben eins
-   > (`investment-profile.js:273-275`, Abschnitt „Persönliche
-   > Mindest-Schwellen") und werden von `saveFromForm()` gesammelt
-   > (`:347-349`). Nachgemessen, bevor etwas gebaut wurde.
-   >
-   > Richtig bleibt: sie erreichten **keinen Prompt**. Und die vier
-   > `ai_*`-Schlüssel haben wirklich kein Feld im Profil-Panel — sie
-   > werden aus dem **KI-Tab** geschrieben (`settings.js:549`,
-   > `:1558-1573`). Gepflegt und stumm.
-
-   Und `openaiService.js:785-789` verlangte wörtlich:
-
-   ```
-   5. Investor-Fit — Für wen ist der Deal geeignet?
-      - Cashflow-Investor?  - Wertsteigerungs-Investor?  - Sicherheitsorientiert?
-   ```
-
-   Die Aufgabe nennt **drei Archetypen und keine Eingabe**. Die
-   Schwellen im Prompt (`:203`, `:222`, `:774`, u. a. „LTV < 85 % und
-   DSCR >= 1,2") sind **fest verdrahtet**, nicht aus dem Profil.
-
-   **Und `settings.js:579` bietet dem Nutzer wörtlich diese Vorlage an:**
-   *„Bewerte meine Kaufentscheidung anhand meines persönlichen
-   Investmentprofils (Mindest-DSCR, Max-LTV, Mindest-Cashflow)."*
-
-   > **Ein Versprechen ohne Code.** Wer diese Vorlage anklickt, bekommt
-   > eine Antwort, die seine Schwellen nie gesehen hat — und sie sieht
-   > genauso aus wie eine, die sie kennt.
-
-   Dazu sind **die vier `ai_*`-Schlüssel tot:**
-   `investment-profile.js:138-155` schreibt in `#ai_strat`, `#ai_verk`,
-   `#ai_risk`, `#ai_markt` und `#ai-param-*-display` — **diese Ids gibt
-   es in `index.html` nicht** (0 Treffer). Der Client-Prompt, der sie
-   las, ist mit `ui.js:2010-2033` entfallen.
-
-### ✅ GEBAUT 12.10.2026 (`v2140`, `v2140b`)
-
-**Sieben von 23 Schlüsseln reisen mit** — und die Auswahl ist die
-Vorrangregel, die dieser Punkt verlangte:
-
-| | |
-|---|---|
-| mit | `min_dscr`, `min_cashflow_vor_st`, `max_ltv`, `ai_strat`, `ai_risk`, `ai_verk`, `ai_markt` |
-| ohne | die 16 übrigen: Tilgung, Zinsbindung, EK-Quote, BWK-Quoten, Mietausfall, Leerstand, Miet- und Wertsteigerung, Grenzsteuersatz, Bundesland, Notar, Makler, Hausgeld-Satz, Zins-Stufe |
-
-> **Was im Objekt steht, gilt. Das Profil liefert nur, was im Objekt
-> NICHT steht: die Schwellen des Investors und seine Haltung.**
-
-Die 16 sind **Vorbelegungen für Formularfelder** (`main.js:38-49`
-belegt daraus `tilgung`, `ek`, `bwk`, `grenz`, `mietstg`, `wertstg` …).
-Sie stehen im Auftrag schon als **Objektwert** — dort *eingetragen*
-statt *vorbelegt*. Beide zu senden wäre eine stille Doppelung: zwei
-Grenzsteuersätze für dieselbe Größe, und beim nächsten Umbau laufen sie
-auseinander.
-
-### Die Ordnung ist der eigentliche Inhalt des Blocks
-
-Ohne sie stünden **zwei Schwellen zur selben Größe** im Prompt — die
-DealPilot-Skala („solide ab DSCR 1,2", `openaiService.js:211`) und die
-persönliche („ab 1,35 kauf ich") — und das Modell wählt eine aus, ohne
-zu sagen welche. Jetzt steht da:
-
-> **Der SCORE darf das Profil nie sehen.** Dieselbe Wohnung hat für
-> jeden Nutzer denselben Score; eine Einstellung, die ihn verschiebt,
-> macht zwei Nutzer unvergleichbar. **Dieselbe Regel wie für die
-> Rechenkerne: ein Kern liest NIE Einstellungen.** Die *Analyse* darf
-> es — sie urteilt für diesen Investor.
-
-Dazu: jede Schwelle wird **einzeln** abgeprüft (gehalten / verfehlt, je
-mit **beiden** Zahlen), Widersprüche zur DealPilot-Skala werden benannt
-statt gemischt, und Aufgabe 5 verweist auf den Block statt nur drei
-Archetypen zu nennen.
-
-### ⚠ `v2140b` · Eine Vorgabe ist keine Entscheidung
-
-**Im Browser am laufenden Staging gemessen** — und es war ein Fehler in
-`v2140`, zwanzig Minuten nach dem Rollout:
-
-```
-  dp_investment_profile im Speicher :  1 Schluessel
-  get() liefert                     :  7 Werte
-    min_dscr 1.2 | min_cashflow 0 | max_ltv 90
-    ai_strat "Buy & Hold" | ai_risk "Moderat (ausgewogen)" | …
-```
-
-Das sind die **Vorgaben** aus `config.js:993-1047`, nicht Marcels
-Entscheidungen. Der Block hieß „DIESER INVESTOR (Einstellungen des
-Nutzers)".
-
-> **Eine Vorgabe als persönliche Einstellung auszugeben, behauptet eine
-> Entscheidung.** Das Modell urteilt dann gegen eine Schwelle und nennt
-> sie „seine" — und der Nutzer liest ein Maß, das er nie gesetzt hat.
-
-**Und mein eigener Satz im Prompt konnte nie greifen:** „Fehlt eine
-Schwelle hier, hat der Nutzer sie nicht gesetzt" — `get()` gibt immer
-etwas zurück. *Eine Regel, deren Bedingung nicht eintreten kann, ist
-keine Regel.*
-
-Behoben: `ui.js` schickt neben den Werten die Liste `_selbst_gesetzt`
-(aus `load()`, den **rohen** Nutzerwerten), und jede Zeile im Prompt
-trägt **„(selbst gesetzt)"** oder **„(Vorgabe, nicht gesetzt)"**. Ist
-nichts gesetzt, sagt der Prompt das ausdrücklich und nennt den Weg
-(*Einstellungen → Standardwerte*).
-
-**Gefunden hat es die Messung im Browser, nicht der Prüfer** — der
-kennt nur den Auftrag, den ich ihm gebe, und ich hatte ihm belegte
-Werte gegeben. Dasselbe Muster wie bei `v2136`, wo die Abnahme im
-Browser die Aussperrung fand.
-
-### Nachweis
-
-Prüfer `tools/prompt-lecks-pruefen.mjs`: **32 → 47 Punkte**, RC = 0,
-lokal, auf dem Staging-Host und im gebauten Image. Dazu 5 Gegenproben,
-2 Typproben, 3 Ohne-Profil- und 4 Alles-Vorgabe-Proben.
-
-Im Browser am ausgerollten Stand, **beide Lagen**:
-
-```
-  ui-Fassung                      v2140
-  A echter Zustand (Marcel)       8 Felder, selbst gesetzt []
-  B zwei Schwellen gesetzt        min_dscr 1.42, selbst gesetzt [min_dscr, strategie]
-    Vorgaben bleiben Vorgabe      max_ltv 90 NICHT in der Liste
-  localStorage zurueckgedreht     unveraendert
-```
-
-### Offen an diesem Punkt
-
-Die vier `ai_*`-Schlüssel erreichen jetzt den Prompt — **aber ihr
-Anzeige-Spiegel ist weiter tot:** `investment-profile.js:138-155`
-`syncAiParamsToTab()` schreibt in `#ai_strat`, `#ai_verk`, `#ai_risk`,
-`#ai_markt` und `#ai-param-*-display`, und **diese Ids gibt es in
-`index.html` nicht** (0 Treffer). Die Werte selbst kommen aus
-`#set_ai_*` im KI-Tab und sind gepflegt; nur das Zurückschreiben ins
-Profil-Panel greift ins Leere. Abzutragen, wenn das Panel ohnehin
-angefasst wird — es ändert heute nichts an der Analyse.
-
----
-
-**Der ursprüngliche Text von Teil 2, zur Nachvollziehbarkeit:**
-
-**NOCH OFFEN aus derselben Bestandsaufnahme — Teil 2:**
-
-1. **Das Produktwissen sitzt am falschen Ende.** `bot-wissen.md`
-   (186 Zeilen) ist **nur** am Telegram-Agenten verdrahtet
-   (`agentLauf.js:69`). Pilot-Analyse und Portfolio-Pilot sehen es
-   **nicht** — ihre Regeln stehen hartkodiert im Prompt.
-2. **Es gibt kein RAG.** Gesucht nach `embedding`, `pgvector`, `vector`,
-   `retrieval`: **0 Treffer** in `backend/src` und in allen 85
-   Migrationen. Der Datenraum speichert **nur Links**
-   (`datenraum.js:12`), serverseitig auf 200 KB gedeckelt mit dem
-   Kommentar „damit hier keine Dokumente landen". → **Grundlage für
-   N60.7.**
-3. **Mietvertragsfelder gibt es gar nicht** — kein Treffer in den 256
-   Feld-Ids. → **N60.8 ist Neubau, keine Erweiterung.**
-4. **Fotos werden nie ausgewertet** — `/analyze` ruft reinen Text.
-5. **Der Portfolio-Pilot sieht je Objekt nur 24 Zahlenfelder** — keine
-   Energieklasse, kein Zustand, kein Leerstand, keine Einheiten, keine
-   Steuer, als Ort nur `ort`. Ein Klumpenrisiko „Lage" ist damit nur auf
-   Ortsebene beantwortbar.
-6. **Das Investmentprofil (24 Schlüssel) liegt nur im `localStorage`** und
-   erreicht **keinen** Prompt — während Aufgabe 5 „Investor-Fit"
-   beurteilen soll, für wen der Deal passt.
-7. Weitere unsichtbare Blöcke: Steuerdaten, Bewirtschaftungsstruktur,
-   Mietentwicklungsplan, Wohnungsdetails, Bodenrichtwert/Sachwert,
-   RND/GND, Halter/Gesellschaft.
-
-#### N60.5 · TEILERLEDIGT 10.10.2026 (`v2081`) — Block gebaut, Abnahme am Bot offen
-> ### Stand 10.10.2026: gebaut (`v2081`), Abnahme am echten Bot offen
->
-> **Was behoben ist:**
->
-> 1. **`kennzahlen_block`** — EIN fertiger Mehrzeiler mit Adresse und
->    allen Zahlen statt einzelner Felder. Ihn kann das Modell kopieren
->    oder weglassen, aber nicht halb übernehmen. Der Hinweis dazu steht
->    jetzt **vorne**.
-> 2. **Eine echte Inkonsistenz im Werkzeug:** `miete_je_qm` rechnete mit
->    `nkm` allein, `jahreskaltmiete` und die Rendite aber mit `nkm + ze`.
->    Bei nkm 940 und ze 460 stand im selben Block *„Jahreskaltmiete
->    16.800"* (= 1.400/Monat) und *„Miete je m² 9,40"* (= 940/Monat).
->    Zwei Zahlen zur selben Miete — genau so eine Ausgabe lädt dazu ein,
->    sie „passend" neu zu formulieren. Gegenprobe jetzt konsistent:
->    `Jahresmiete/12/wfl` = `miete_je_qm`, mit und ohne `ze`.
->
-> **Warum kein weiterer Appell:** verboten war es VIERFACH —
-> `agentLauf.js:103` (*„ZAHLEN ERFINDEST DU NIE"*), Regel 2, Regel 3 und
-> der `hinweis` selbst (*„so wie sie hier stehen"*). Alle vier gebrochen.
-> Siehe [[werkzeug-schlaegt-hinweis]]: was gerechnet werden soll, darf
-> nicht formulierbar sein.
->
-> **Nachgemessen am echten Kern** — er ist unschuldig:
-> `rechenkerne.kpis({kp:180000, nkm:940, ze:0})` gibt 11.280 / 6,27 % /
-> 15,96 / 9,40 und trifft damit alle vier Sollwerte. Die Bot-Zahlen
-> passen zu **keiner gemeinsamen Miete**.
->
-> **NOCH OFFEN, zwei Dinge:**
-> - **Abnahme am echten Bot** mit genau diesem Objekt (Sachsenstraße 18,
->   KP 180.000, Miete 940). Braucht Telegram — nicht am Schreibtisch
->   prüfbar, deshalb ausdrücklich als Abnahmepunkt benannt.
-> - **Marcels dritter Punkt:** *„erst schlecht mit 44 und danach auf
->   einmal über 80"*. Davon **nicht** erklärt. Ein Score, der sich ohne
->   Eingabeänderung verdoppelt, ist ein eigener Befund — die
->   Kennzahlen-Erfindung ist dafür nur ein Kandidat, kein Nachweis.
-> - **Zweiter Befund aus den Bildern** (*„kein Objekt gefunden"*
->   unmittelbar nach dem Anlegen) ist **unberührt**.
-
-Bilder: `Dateien/bot/IMG_1554.PNG` … `IMG_1559.PNG` (Sachsenstraße 18,
-32052 Herford, ETW 100 m², Bj 1998, KP 180.000, **Kaltmiete 940 €/Monat**).
-
-**Gemessen aus EINER Bot-Antwort — vier Zahlen, vier verschiedene
-Mieten, keine davon die eingegebene:**
-
-| im Bot | entspricht Monatsmiete | eingegeben |
-|---|---:|---:|
-| Jahreskaltmiete 16.800 € | 1.400 € | **940 €** |
-| Bruttomietrendite 4,80 % | 720 € | 940 € |
-| Kaufpreisfaktor 20,8 | 721 € | 940 € |
-| Miete je m² 6,01 € | 601 € | 940 € |
-
-Richtig wäre: 940 × 12 = **11.280 €**, Rendite **6,27 %**, Faktor
-**15,96**, Miete **9,40 €/m²**.
-
-> **Das Werkzeug ist nicht schuld.** `agentWerkzeuge.js` ab Z. 1740 ruft
-> ausdrücklich `DealKpis.compute()` aus der gespiegelten
-> `deal-kpis.js` und **verbietet sich einen Rückfall auf eigene
-> Formeln** („Eine zweite Meinung über denselben Deal ist schlimmer als
-> eine fehlende Auskunft"). Zu klären ist also: wurde es gerufen, mit
-> welchen Eingaben — oder hat das Modell die Zahlen im Fließtext
-> **neu geschrieben**? Siehe [[werkzeug-schlaegt-hinweis]]: was gerechnet
-> werden soll, darf nicht formulierbar sein.
-
-**Zweiter Befund aus denselben Bildern:** zweimal „**kein Objekt
-gefunden**" für die Sachsenstraße 18 — **unmittelbar nachdem der Bot
-dieses Objekt selbst angelegt hatte** (IMG_1554 und IMG_1558/1559).
-
-> ### Nachgemessen am 10.10.2026: der Kern ist unschuldig, die Zahlen sind ERFUNDEN
->
-> `rechenkerne.kpis({ kp: 180000, nkm: 940, ze: 0 })` — der echte,
-> gespiegelte Kern, direkt gerufen:
->
-> | | Kern | Bot | Soll |
-> |---|---:|---:|---:|
-> | Jahreskaltmiete | **11.280** | 16.800 | 11.280 |
-> | Bruttomietrendite | **6,27 %** | 4,80 % | 6,27 % |
-> | Kaufpreisfaktor | **15,96** | 20,8 | 15,96 |
-> | Miete je m² | **9,40** | 6,01 | 9,40 |
->
-> **Der Kern trifft alle vier Sollwerte.** Und die Bot-Zahlen passen zu
-> **keiner gemeinsamen Miete**: 16.800 entspräche 1.400 €/Monat — damit
-> wäre die Rendite 9,33 % und der Faktor 10,71, nicht 4,80 % und 20,8.
-> Sie sind also nicht aus einer falschen Eingabe entstanden, sondern
-> **einzeln im Fliesstext geschrieben**.
->
-> Die Werkzeuge geben die Zahlen als **fertige Texte** zurück
-> (`objekt_schnellblick`: `bruttomietrendite: pct(bmr) + " = " + eur(...)`)
-> und rufen `rechenkerne.kpis()`. Es fehlt also nicht die Rechnung,
-> sondern die **Pflicht, sie wörtlich zu übernehmen**.
->
-> **Damit ist der nächste Schritt klar und liegt NICHT am Kern:**
-> 1. Im Prompt verbieten, Kennzahlen selbst zu formulieren — mit
->    derselben Schärfe wie bei `bewertung.empfehlung_text`
->    (`agentWerkzeuge.js:2429`: *„Nimm BEIDE wörtlich"*).
-> 2. Besser noch, weil ein Prompt nur bittet: die Zahlen gar nicht erst
->    einzeln ausgeben, sondern **einen fertigen Block**, den das Modell
->    nur durchreichen kann — siehe [[werkzeug-schlaegt-hinweis]]:
->    was gerechnet werden soll, darf nicht formulierbar sein.
-> 3. Gegenprobe am echten Bot mit genau diesem Objekt.
->
-> **Marcels dritter Punkt (44 → 80) wird davon nicht erklärt** und
-> bleibt offen — ein Score, der sich ohne Eingabeänderung verdoppelt,
-> ist ein eigener Befund.
-
-### ✅ Marcels dritter Punkt ist beantwortet und behoben (`v2141`, 12.10.2026)
-
-Seine Frage: *„Die Bewertung war erst schlecht mit 44 und danach auf
-einmal über 80. Warum?"*
-
-**Am echten Kern nachgerechnet** — Sachsenstr. 18, kp 180.000, nkm 940,
-dasselbe Objekt, dieselben Eingaben, **eine Annahme Unterschied:**
-
-| EK-Quote | Darlehen **angenommen** | als **Barkauf** | Sprung |
-|---|---:|---:|---|
-| 0 % | **31** KRITISCH | 72 GUT | +41 |
-| 10 % | **44** SCHWACH | 72 GUT | +28 |
-| 20 % | 58 SOLIDE | 72 GUT | +14 |
-| 30 % | 71 GUT | 72 GUT | +1 |
-
-**Die 44 ist exakt getroffen.** Es war weder ein Modellfehler noch ein
-Kernfehler, sondern ein Wechsel der Grundlage: `agentWerkzeuge.js:2029`
-leitet ein Darlehen ab, **solange kein Score gespeichert ist**
-(`darlehenAbgeleitet`). Danach gilt der gespeicherte Score — und am
-Objekt steht kein Darlehen, also rechnet DealPilot es als Barkauf.
-
-> **Die `herkunft` des Bot-Scores nannte die falsche Ursache:** „der
-> Vollbild-Score kann abweichen, weil er mehr Felder kennt". Gemessen
-> liegt es an der Annahme, nicht an den Feldern. Eine Herkunftsangabe,
-> die auf die falsche Ursache zeigt, ist schlimmer als keine — sie
-> beendet die Suche.
-
-### Der Befund dahinter — und was Marcel entschieden hat
-
-Beim Nachmessen fiel auf, dass die Lage grundsätzlicher ist.
-`_scoreLtv(0)` und `_scoreRisiko(0)` geben je **50** — der Rückfall für
-„keine Angabe". **Ein Barkauf ist aber keine fehlende Angabe, sondern
-eine Aussage.** An fünf Barkauf-Objekten mit gleichem Kaufpreis und nur
-verschiedener Miete:
-
-```
-  30 % Cashflow  immer 100  (ohne Kapitaldienst ist der Cashflow fast
-                 die ganze Nettomiete; die Skala endet bei +200 EUR)
-  15 % LTV       Platzhalter 50
-  15 % DSCR      Platzhalter 50
-```
-
-**60 % des Scores standen fest, bevor das Objekt angesehen war** —
-deshalb hieß eine Wohnung mit 0,90 % Nettorendite „SOLIDE".
-
-Drei Varianten mit Zahlen vorgelegt. **Marcel wählte „weglassen und
-umgewichten"**, mit dem Zusatz: *„das mit dem score muss aber auch beim
-quickcheck passen und auch beim investor deal score. also in der
-gesamten app."*
-
-| Objekt (Barkauf) | heute | nach `v2141` |
-|---|---|---|
-| 1.400 €/Mon · 7,24 % | 77 GUT | **88 SEHR GUT** |
-| 940 €/Mon · 4,46 % | 72 GUT | **82 GUT** |
-| 700 €/Mon · 3,02 % | 60 SOLIDE | **65 SOLIDE** |
-| 520 €/Mon · 1,93 % | 52 SOLIDE | **53 SOLIDE** |
-| 350 €/Mon · 0,90 % | 48 SCHWACH | **47 SCHWACH** |
-| **Spanne / Stufen** | 29 / 3 von 5 | **41 / 4 von 5** |
-
-**Keine Skala geändert.** Die drei bleibenden Kategorien behalten ihre
-Maßstäbe, nur ihr Anteil wächst von 70 auf 100 %. Ein neuer
-Schwellenwert wäre eine Bewertungsentscheidung; diese hier ist eine
-Sachfeststellung: eine Größe, die es nicht gibt, bekommt keine Note.
-
-**Die Gegenprobe, die zählt:** ein finanziertes Objekt bleibt bei 58 —
-mit und ohne den neuen Parameter. Eine Umgewichtung, die alte Scores
-verschiebt, wäre ein stiller Umbau jedes gespeicherten Urteils.
-
-Prüfer `tools/barkauf-score-pruefen.mjs`, RC=0, auch im gebauten Image.
-
-### ⚠ Noch offen am Investor Deal Score — Marcel vorgelegt
-
-Dort ist es **umgekehrt und schlimmer**: die 0 bestraft den Barkauf.
-
-| Finanzierungs-Kategorie | DSCR | LTV | Kategorie |
-|---|---|---|---|
-| finanziert (1,18 / 88) | 76 Pkt (Gew. 35) | 100 (Gew. 30) | **85** |
-| **Barkauf (0 / 0)** | **0 Pkt** (Gew. 35) | 85 | **49** |
-| unbekannt (null / null) | nicht angewandt | nicht angewandt | 60 |
-
-**Ein schuldenfreies Objekt bekommt die Finanzierungsnote eines
-Objekts, das seinen Kapitaldienst nicht deckt.** Der Mechanismus für
-„nicht anwendbar" ist in `dealscore2.js` schon da (`applied: false`,
-`_aggregate`) — er greift nur bei `null`, und ein Barkauf liefert `0`.
-
-**Daran hängt eine zweite Frage, und sie ist eine Bewertungsentscheidung:**
-die EK-Quote-Skala ist auf **Hebelwirkung** kalibriert
-(`[[10,100],[20,80],[30,60],[40,30]]`) — 100 % Eigenkapital bekommt
-**30 Punkte**. Lässt man DSCR und LTV weg, bleibt diese Bestrafung
-allein übrig, und die Kategorie fällt von 49 auf **30**. Deshalb nicht
-gebaut, sondern mit Zahlen vorgelegt.
-
-### Auch offen: die Cashflow-Skala beim Barkauf
-
-Sie ist auf finanzierte Objekte kalibriert (−200 € → 0, **0 € → 50**,
-+200 € → 100). Beim Barkauf ist der Cashflow fast die ganze Nettomiete,
-also **ab 200 €/Monat immer die Note 100** — auch bei der Wohnung mit
-0,90 % Rendite. Diese 30 % messen beim Barkauf nichts.
-
-Das zu heilen braucht **eine Zahl, die Marcel setzt**: ab welcher
-Rendite auf das eingesetzte Geld ist ein Barkauf gut? Ein geratener
-Wert (4 % als Mitte) ließ ein Objekt mit 6,27 % brutto auf SOLIDE
-fallen — sachlich falsch, und ausdrücklich zurückgenommen.
-
-### Und eine Idee von Marcel, gemessen aber nicht gebaut
-
-*„kann man das nicht an den Lageklassen koppeln?"* — die Lageklassen
-A/B/C mit Ziel-Bruttomietrenditen gibt es seit `v1956`
-(`lage-profil.js`, vorbelegt 3,5 / 5,0 / 7,0 %). Heute wirken sie auf
-den **Zielkaufpreis**, nicht auf den Score.
-
-Durchgerechnet, einheitentreu (Verhältnis erreicht/Ziel, beide brutto —
-die Zielrendite ist **brutto**, `_scoreRendite` bewertet **netto**; das
-zu mischen wäre ein Fehler von rund 1,5 Punkten):
-
-| Miete/Mon | brutto | heute | A (3,5 %) | B (5 %) | C (7 %) | ohne Eintrag (6 %) |
-|---|---|---|---|---|---|---|
-| 700 | 4,67 % | 34 | 100 | 58 | 12 | 31 |
-| 940 | 6,27 % | 82 | 100 | 95 | 52 | 74 |
-| 1.200 | 8,00 % | 100 | 100 | 100 | 84 | 100 |
-
-**Fachlich richtig:** dieselbe Wohnung ist in einer A-Lage eine
-Punktlandung und verfehlt in einer C-Lage ihr Ziel. Das kann die feste
-Skala nicht. **Und der Rückfall (6 %) liegt dicht an der heutigen
-Skala**, bestehende Objekte wandern also nur mäßig.
-
-**Marcels Riegel dazu:** *„falls die A, B oder C-Lage nicht eingegeben
-wurde muss ein default wert angenommen werden. nur berücksichtigen."*
-Genau so ist es in `qc-heuristik.js:222` schon gebaut
-(`ZIEL_BMR_RUECKFALL = 6`), und die Zielrendite kommt dort als
-**Parameter** in den Kern — derselben Linie wäre zu folgen.
-
-### ✅ GEBAUT 12.10.2026 (`v2143`) — Marcel: „ja mach das so das es passt"
-
-**Die Lageklasse ist der Maßstab der Bruttomietrendite-Ampel** — nicht
-des Scores. Sein „nur berücksichtigen" war der Ausweg aus dem
-Widerspruch zu `v2140`: der Score sieht die Einstellungen nie, die
-Beurteilung darf es.
-
-**Brutto, nicht netto** — und das ist gerechnet, nicht gemeint: die
-beiden Renditen haben verschiedene Nenner (`bmy` auf den Kaufpreis,
-`nmy` auf die Gesamtinvestition nach BWK), das Verhältnis schwankt
-zwischen 0,52 und 0,91. Objektgenau umgerechnet geben beide Wege
-dieselbe Note; pauschal umgerechnet verschiebt sich die Note um bis zu
-**57 Punkte** gegen Objekte mit hoher Bewirtschaftung.
-
-**Der Riegel:** ohne Klasse oder Ziel gilt die feste Skala (3 % = 0,
-7 % = 100) — nicht ein Rückfallwert. Eine vorhandene Skala schlägt eine
-erfundene Klasse.
-
-**`v2143a`:** der erste Entwurf traf bei genau 80 % des Ziels die Güte
-0,3994 gegen die Gelb-Schwelle 0,40 — ein Tausendstel entschied die
-Farbe. Die Skala beginnt jetzt bei 50 %, die Ampelwechsel liegen bei
-75 % und 97 %.
-
-Am lebenden Staging mit echten Objekten: Westerfeldstr. (B-Lage) 7,23 %
-gegen Ziel 5,0 % → grün; Am Markt (C-Lage) 5,53 % gegen 7,0 % → gelb.
-Score in allen Lagen 77. Prüfer `tools/lageklasse-ampel-pruefen.mjs`,
-RC=0.
-
----
-
-**Der ursprüngliche Stand des Punktes:**
-
-**Marcels dritter Punkt:** „Die Bewertung war erst schlecht mit 44 und
-danach auf einmal über 80. Warum?" — in diesen sechs Bildern nicht
-enthalten, aber die Zahlenbefunde oben sind ein starker Kandidat.
-
-#### N60.4c · Bidirektional — ERSTE STUFE GEBAUT (09.10.2026)
-Marcel: „Ich möchte das bidirektional haben, dass der Telegram-Bot
-Zugriff auf die Daten der Pilotanalyse und die Daten der Portfolioanalyse
-hat und andersrum genauso. … Ziel ist, dass der Telegram-Bot auf alle
-Daten und Felder zugreifen kann und auch das gesamte Wissen vom Pilot
-und Cockpit-Analyse bekommt."
-
-| Richtung | vorher | jetzt |
-|---|---|---|
-| Produktwissen → Browser-Piloten | `bot-wissen.md` hatte **einen** Leser (Telegram) | `v2010`: ein gemeinsamer Lader, **drei** Piloten |
-| App-Felder → Pilot-Analyse | 21 Rohfelder von 256 | `v2011`: **sieben Blöcke**, 46 Felder dazu |
-| Cockpit-Analyse → Telegram | **gar nicht** — sie verfiel mit dem Reiter | `v2012`: abgelegt + `portfolio_analyse_lesen` |
-| Objekt-Analyse → Telegram | `pilot_analyse_lesen` | unverändert da |
-| Alle Rohfelder → Telegram | `_ohneIntern()` gibt sie schon aus | unverändert da |
-
-Nachgewiesen im laufenden Container: Projektwissen 6.602 Zeichen im
-Prompt, alle sieben Blöcke vorhanden, Promptlänge 15.650 → **23.377**;
-22 statt 21 Werkzeuge; die Kette Cockpit → `user_settings` → Bot-Werkzeug
-einmal durchgespielt (Stand, Alter in Tagen, Score kommen an).
-
-> **`v2012a` — gefunden beim Aufräumen, nicht beim Prüfen.** Das neue
-> Werkzeug prüfte `!r.rows[0].wert`; ein zurückgesetzter Eintrag ist aber
-> `{text:null}` — ein Objekt und damit truthy. Es meldete `vorhanden:
-> true` mit `analyse: null`, der Bot hätte eine Analyse **angekündigt,
-> die es nicht gibt**. Geprüft wird jetzt der Text, nicht die Zeile.
-> **Den Zustand erzeugt der erste Lauf gar nicht** — nur das Aufräumen
-> danach.
-
-#### N60.4d · Fotos werden ausgewertet — ✅ ERLEDIGT (`v2013`, 09.10.2026)
-Marcel: „und natürlich auch Fotos bekommen zum Auswerten."
-
-Gemessen über 25 Objekte: **17 haben Fotos**, bis zu 6 Stück, einzelne
-bis **720 KB**, zusammen bis **1,8 MB** je Objekt — als
-`data:image/jpeg;base64` direkt im Objekt. Verkleinert wird jetzt im
-**Browser** (max. 768 px, JPEG 72 %, höchstens vier), also auf dem Gerät,
-das die Bilder ohnehin hat. Gemessen: 6 → 4 Bilder, 30 % kleiner, 77 ms.
-
-**Vier Fehler, jeder einzeln gemessen:**
-
-| | Befund | Folge |
-|---|---|---|
-| 1 | Ich hatte einen **zweiten Verkleinerer** gebaut — `window._dpResizeDataUrl` (`ui.js:505`) gibt es längst | Dublette, von einem Prüfer verboten |
-| 2 | Mein Zugriff las `_objPhotos`/`getPhotos()` — **beides existiert nicht**, die Fotos stehen in `imgs` | hätte **immer leer** geliefert, ohne Fehler |
-| 3 | `_callOpenAIVision` deckelt bei **`opts.maxTokens \|\| 700`** (vom Beleg-Import) | Analyse kam mit **5 statt 22** Schlüsseln, 2.731 statt 9.375 Zeichen |
-| 4 | Kein **Ausgabefeld** für den Bildeindruck | 22 Schlüssel zurück, **kein Wort** zu den Fotos |
-
-> **Zu (3):** gültiges JSON, nur weniger darin — das sieht man der Antwort
-> nicht an. **„fertig: true" war kein Nachweis.**
->
-> **Zu (4):** Ein Modell füllt die **definierten** Felder, nicht erfundene.
-> Eine Prompt-Anweisung ohne Zielfeld erzeugt gar nichts. Jetzt gibt es
-> `optischer_eindruck` — und zwar **nur**, wenn auch Fotos mitgehen; ein
-> Feld ohne Bilder lädt zum Raten ein.
-
-**Echter Lauf nach allen vier Korrekturen:** 23 Schlüssel, und der
-Eindruck beschreibt die tatsächlichen Bilder („gepflegte Fassade,
-Fenster in moderatem Zustand, Grünflächen") — **ohne** Baujahr, Fläche
-oder Wert daraus abzuleiten. Genau das verbietet die Regel im Prompt,
-und sie hält.
-
-**Noch offen für „alle Daten":**
-- **Die sieben Blöcke auch für den Portfolio-Piloten** — er sieht je
-  Objekt weiter nur 24 Zahlenfelder.
-- **Das Investmentprofil** (24 Schlüssel) liegt nur im `localStorage` und
-  erreicht keinen Prompt.
-- **Pilot-Analyse ← Telegram:** der Bot kann sie lesen, aber nicht
-  auslösen.
-
-#### N60.5b · Die Ursache der Fremdanalysen — gefunden und verriegelt (`v2015`)
-
-**Gemessen über alle Objekte:** sieben trugen byte-identisch dieselbe
-Pilot-Analyse (14.849 Zeichen), zwei weitere eine zweite (11.187).
-
-| Objekt | Kürzel | Ort | angelegt |
-|---|---|---|---|
-| 2026-1041 | **DEMO-LE1** | Bielefeld | 29.09. 05:54 |
-| 2026-1051…1056 | DEMO-HH1/BI3/DT4/IB5/LE2/BO6 | 5 Städte | 30.09. **14:46–14:49** |
-
-Alle sieben sind **DEMO-Objekte**, sechs davon in **drei Minuten**
-angelegt. Der Text spricht von „Westerfeldstraße 140, 33613 Bielefeld" —
-also von `2026-1041`. In Marcels Telegram-Bildern schlägt genau das
-durch: der Bot sagt zur Parkstraße 9 „stammt möglicherweise von einem
-anderen Objekt".
-
-**Geprüft, ob der App-Code das erzeugen kann:** `storage.js:603` setzt
-`_aiText` beim Objektwechsel auf den **eigenen** Wert, und drei weitere
-Stellen leeren ihn (`_clearFormForNewObject`, `_newObjLeeren`,
-`_resetUiAfterDelete`). Der normale Weg ist sauber.
-
-**Warum der vorhandene Wächter nicht genügte** (`v1849`): er ist eine
-**Heuristik** — „nennt der Text den Ort nirgends?" Er rät (eine echte
-Analyse ohne ausgeschriebenen Ortsnamen wird verdächtigt; eine Kopie
-zwischen zwei Objekten im selben Ort fällt durch) **und er sitzt nur im
-Telegram-Werkzeug**. Reiter Pilot-Analyse, PDF und Co-Pilot hatten gar
-keinen.
-
-> **Die Herkunft gehört an die Analyse, nicht an den Leser.** Beim
-> Erzeugen weiß der Browser genau, für welches Objekt er rechnet — diese
-> eine Zeile fehlte. Seit `v2015` trägt jede neue Analyse
-> `_fuer: { objekt_id, kuerzel, adresse, stand }`. Der Bot vergleicht
-> damit **exakt** (`fremd_sicher: true`) und fällt nur ohne Stempel auf
-> die Heuristik zurück — die sich jetzt als Vermutung kennzeichnet.
-
-**Dazu ein Prüfer:** `backend/scripts/analysen-pruefen.js` zählt es aus.
-Drei Stufen: **STEMPEL** (Beweis) · **DUBLETTE** (Befund) · **VERDACHT**
-(Heuristik). Nur der erste ist ein Beweis, und das steht in der Ausgabe.
-RC 0/1/2. Er liegt in `backend/scripts/`, **nicht** in `tools/` — am
-Dockerfile gemessen: `scripts` wird ins Image kopiert, `tools` nicht.
-
-> **Der erste Lauf meldete fünf Fehlalarme** (`v2015a`): fünf Objekte
-> `2026-999` als Dublette. Das ist das **Demo-Objekt verschiedener
-> Nutzer** samt Saat-Analyse — fünf Nutzer, fünfmal dieselbe Saat. Jetzt
-> wird je `user_id` gruppiert. **Ein Prüfer, der die Saat als Schaden
-> meldet, schickt den Leser an die falsche Stelle.**
-
-**OFFEN — braucht Marcels Entscheidung (kostet Guthaben oder löscht
-Daten):** neun Objekte tragen eine fremde Analyse
-(7 × DEMO, 2 × Kabelsketal). Zwei Wege: **neu rechnen** (9 Abrufe) oder
-**entfernen**, damit dort ehrlich „noch keine Analyse" steht.
-
-#### N60.5c · Stand und Gültigkeit — ✅ GEBAUT (`v2017`, `v2018`)
-Marcel: „wichtig, dass wir den Stand mitgeben … bei der Pilotanalyse oben
-ein Feld hin machen, und wenn sich Zahlen geändert haben da drin, sollten
-wir angeben, dass eine Aktualisierung notwendig wäre."
-
-> **`objects.updated_at` wäre der naheliegende Vergleich — und der
-> falsche.** Es ändert sich bei **jedem** Speichern: ein Haken, eine
-> Notiz, ein Foto. Die Analyse hängt aber nur an den Zahlen, über die
-> sie urteilt. **Ein Banner, das nach jedem Klick „veraltet" ruft, wird
-> nach drei Tagen weggesehen.**
-
-Deshalb ein **Fingerabdruck über 20 benannte Felder** (Kaufpreis, Miete,
-Fläche, Baujahr, Objektart, Zimmer, Zins, Tilgung, EK, Grundstück, BRW,
-MEA, Zustand, Energieklasse, Makro-, Mikrolage, Lageklasse, Hausgeld,
-Leerstand, Einheiten). Benannt, nicht nur gehasht — dadurch steht oben,
-**was** sich geändert hat, nicht nur **dass**.
-
-| | Pilot-Analyse (`v2017`) | Portfolio-Pilot (`v2018`) |
-|---|---|---|
-| grün | Zahlen unverändert | Objektzahl unverändert |
-| gold | „seitdem haben sich **Kaufpreis, Nettokaltmiete** geändert" | „18 Objekte — inzwischen sind es **21**" |
-| rot | gehört zu einem anderen Objekt | — |
-| grau | kein Stempel → **nichts behauptet** | — |
-
-> **Der graue Fall ist der wichtige:** eine Analyse ohne Abdruck als
-> „aktuell" auszugeben wäre eine Behauptung ohne Grundlage. Dort steht
-> ausdrücklich, dass es *nicht feststellbar* ist.
->
-> Beim Portfolio ist **nicht die Zeit** der Maßstab: drei Wochen ohne
-> Zukauf sind belanglos, ein Zukauf von gestern macht jede Aussage über
-> Klumpenrisiken ungültig.
-
-#### N60.5d · Neuberechnung aller Analysen — ✅ FERTIG (09.10.2026)
-Alle Objekte über den echten Bedienweg neu gerechnet. **Abnahme:**
-
-| | |
-|---|---|
-| Marcels Objekte mit Analyse | **13 von 13 korrekt gestempelt** |
-| davon mit vollem Fingerabdruck (20 Felder) | **13** |
-| fremd oder ohne Stempel | **0** |
-| Prüfer über **alle** Nutzer (17 Analysen) | **RC=0 — nichts zu melden** |
-
-Dauer 33–180 s je Objekt. Acht Objekte haben weiterhin **keine** Analyse
-— die waren vorher auch ohne und wurden nicht erfunden.
-
-> **⚠ Eigener Fehler, der Guthaben gekostet hat:** ein Läufer-Start,
-> dessen Antwort in den Zeitüberlauf lief (*„CDP timed out after
-> 45000ms"*), war **trotzdem ausgeführt**. Ich habe ihn als
-> fehlgeschlagen gelesen und über eine zweite Schiene erneut gestartet —
-> **zwei Läufer gleichzeitig**, `2026-1053` doppelt gerechnet.
-> **Der Zeitüberlauf betrifft nur den Antwortkanal, nicht die
-> Ausführung.** Seitdem: genau einmal starten, danach nur abfragen, und
-> vor einem Neustart den echten Zustand in der Datenbank messen statt
-> dem Protokoll zu glauben. **Marcel kennt den Fehler auch — tritt er
-> wieder auf, ist die Ursache selbst zu untersuchen.**
-
-#### N60.5e · ⚠ Der Kopf zeigte „kein Datum", obwohl der Stempel saß (`v2017a`)
-Beim Durchlauf aufgefallen: nach einer frisch gerechneten Analyse stand
-oben *„Diese Analyse trägt noch kein Datum"* — während `_aiAnalysis._fuer`
-korrekt auf das Objekt zeigte. Ursache war die **Reihenfolge**:
-
-```
-html = _renderAIServerAnalysis(data.analysis);   <- zuerst gerendert
-window._aiAnalysis = _analyseStempeln(...);      <- danach gestempelt
-```
-
-Der Kopf liest `a._fuer` — und das gab es beim Rendern noch nicht. Erst
-ein Neuladen zeigte den Stand. **Zwanzig Zeilen weiter unten (`runMiniAI`)
-war die Reihenfolge von Anfang an richtig herum** — zwei Wege, eine
-Sache, und nur einer stimmte.
-
-> **Gefunden hat es nicht der Prüfer, sondern der Blick auf den
-> Bildschirm nach dem Lauf.** Der Stempel war da, die Anzeige nicht.
-
-#### N60.11 · Eigenes Wissen ergänzen — ✅ BACKEND FERTIG (`v2019`)
-Marcel: „ist das irgendwo zugänglich, diese Datei? Dass man da auch was
-noch zuschreiben könnte."
-
-**Bis v2019: nein.** `bot-wissen.md` liegt im Repo und im Image — ändern
-hieß committen, ausrollen, neu starten. Der Kopf der Datei behauptet
-„Marcel kann sie selbst ändern"; das stimmt nur mit Repo-Zugang.
-
-Jetzt **zwei Quellen, sauber getrennt**:
-
-```
-PROJEKTWISSEN DEALPILOT       <- die Datei, jeder Satz am Code belegt
-ERGÄNZUNGEN DES BETREIBERS    <- frei gepflegt, user_settings
-```
-
-> **Warum getrennt und nicht eingemischt:** der erste Block trägt die
-> Zusage „das Folgende ist die **einzige** Quelle für Aussagen über das
-> Produkt". Freien Text dazwischenzumischen hieße, diese Zusage auf
-> etwas auszudehnen, das niemand gegengelesen hat. Der Ergänzungsblock
-> sagt deshalb: **widerspricht er dem Block darüber, gilt der Block
-> darüber** — und der Bot nennt den Widerspruch. Dieselbe Warnung wie im
-> Dateikopf gilt mit: **keine Zahlen, die sich ändern.**
-
-Ein Lader (`zusatzFuer`/`blockFuer` in `projektwissen.js`, 60 s
-Zwischenspeicher), drei Piloten. Dabei eine Doppelung beseitigt:
-`agentLauf` baute die Einleitung inline, und seit `v2010` steckt sie
-auch im Block — nebeneinander hätte sie zweimal im Prompt gestanden.
-
-**OFFEN: das Eingabefeld in den Einstellungen.** Der Schlüssel ist
-erlaubt und wird gelesen; die Oberfläche dazu fehlt noch.
-
-> **⚠ Eigener Fehler, der Guthaben gekostet hat:** ein Läufer-Start,
-> dessen Antwort in den Zeitüberlauf lief (*„CDP timed out after
-> 45000ms"*), war **trotzdem ausgeführt**. Ich habe ihn als
-> fehlgeschlagen gelesen und über eine zweite Schiene erneut gestartet —
-> **zwei Läufer gleichzeitig**, `2026-1053` doppelt gerechnet.
-> **Der Zeitüberlauf betrifft nur den Antwortkanal, nicht die
-> Ausführung.** Seitdem: genau einmal starten, danach nur abfragen, und
-> vor einem Neustart den echten Zustand in der Datenbank messen statt
-> dem Protokoll zu glauben.
-
-#### N60.6 · Auskunft: immer Score, KPIs und eine Gesamtbewertung — ✅ GEBAUT (`v2016`)
-**Die Werkzeuge lieferten es längst, die Regeln verlangten es nicht.**
-`objekt_kennzahlen`, `objekt_schnellblick` und `objekte_rangliste` geben
-`dealscore`, `dealscore_stufe`, `investor_deal_score` und
-`investor_stufe` zurück — genannt werden musste nichts davon. In Marcels
-Bildern sieht man es: auf „gib mir alle Daten zur Parkstr" kommt eine
-lange Feldliste **und kein Score**.
-
-> Derselbe Fehler wie bei den Fotos: **die Daten reisen mit, und ohne
-> Auftrag passiert nichts damit.** Ein Modell beantwortet die Frage, die
-> gestellt wurde — nicht die, die der Nutzer jedes Mal mitdenkt.
-
-**Regel 7k — vier Pflichten:** (a) beide Scores mit Stufe, und wenn einer
-fehlt: **warum** · (b) die zugehörigen Kennzahlen · (c) eine
-Gesamtbewertung **in Worten** · (d) den **Stand**. Ausnahme: wer
-ausdrücklich nur eine Zahl will, bekommt eine kurze Antwort — sonst wäre
-aus der Vorgabe eine Plage geworden.
-**Regel 7l:** Fragen nach Gesamtbestand, Klumpenrisiken oder „was als
-Nächstes" gehen an `portfolio_analyse_lesen` — mit Stand.
-
-#### N60.6-alt · WOHL ERLEDIGT — Regeln 7k/7l im Prompt (nachgemessen 10.10.2026)
-
-> **Gefunden:** `agentLauf.js:177-192` führt Regel **7k** mit vier
-> Pflichten (beide Scores mit Stufe, Begründung bei Fehlen, passende
-> KPIs, Gesamtbewertung in Worten, **Stand**) und eine Ausnahme für
-> Ein-Zahl-Fragen. Regel **7l** (`:194`) macht die Cockpit-Analyse
-> verpflichtend. Die Werkzeuge sind da: `pilot_analyse_lesen`
-> (`agentWerkzeuge.js:229`, registriert `:3518`) und
-> `portfolio_analyse_lesen` (`:337`, registriert `:3537`).
->
-> **Die Einschränkung, die der Code nicht widerlegt:** die Pflicht liegt
-> im **Prompt**, nicht im Code — es gibt keinen Prüfer, der eine Antwort
-> ohne Score verwirft. **N60.5 hat gezeigt, was das wert ist:** dort
-> waren vier Verbote formuliert und alle vier wurden gebrochen. Eine
-> Abnahme am echten Bot steht hier also genauso aus.
-Marcel: „Wenn ich nach wichtigen Daten frage, möchte ich immer, wenn
-verfügbar, **DealScore und Investor DealScore** sowie **alle beteiligten
-KPIs** haben und eine **textuelle Gesamtbewertung**. Der Abruf der in der
-Pilot-Analyse gegebenen Werte und Texte muss möglich sein. Wenn möglich
-auch immer den **Stand** nennen. Das Abrufen der Co-Pilot-Analyse muss
-aus Telegram möglich sein."
-
-Vier Teile: (a) Pflichtbestandteile jeder Auskunft, (b) Pilot-Analyse
-abrufbar, (c) Stand/Zeitpunkt immer dabei, (d) Co-Pilot aus Telegram.
+Regeln 7k/7l gebaut (`v2016`), s. Fertig. Offen: die Pflicht liegt nur im **Prompt**, kein Code verwirft eine Antwort ohne Score — **Abnahme am echten Bot** steht aus (vgl. N60.5: vier Verbote, alle gebrochen).
 
 #### N60.7 · Datenraum je Objekt (OneDrive · Google Drive · Nextcloud)
 Marcel: „für jedes Objekt einen Datenraum über gängige Cloudanbieter
@@ -2563,270 +305,23 @@ Nötig: OAuth je Anbieter, Ordnerbindung je Objekt, Indexierung
 (Dateiname → Kategorie), Textauszug, und ein Abrufweg für den Co-Piloten.
 **Hier entsteht die erste echte Dokumentenrecherche der App.**
 
-#### N60.8 + N60.9 + Kombinatorik — ✅ FERTIG (`v2021`, `v2022`, 09.10.2026)
-Marcel: „wenn wir auf die Wohnung klicken, dass da drin dann wieder ein
-Modal aufgeht … auch mit Bildern nochmal zusätzlich. Dann auch die
-N60.8 direkt mit abarbeiten, Mietverträge … und über eine Checkbox die
-RND der Wohnung … und dann auch die Kombinatorik dazu."
+#### N60.8-alt · Mietverträge, Minimum gebaut (`v2087`) — Rest: Marcels Fachliste
 
-**Was es schon gab:** der MFH-Konfigurator führt je Einheit **elf**
-Felder in einer Tabellenzeile. Eine Zeile ist der richtige Ort für den
-*Überblick* und der falsche für zwanzig weitere Felder. Die Tabelle
-bleibt also und bekommt **einen Knopf** je Zeile.
+Minimum (Vertragsart, Beginn, letzte Erhöhung) erledigt, s. Fertig. Offen:
+- **Entscheidung Marcel offen:** welche Felder der Fachliste (Staffel/Index mit nächstem Termin, Kaution, Befristung, Kündigungsverzicht, Gewerbe mit Laufzeit und Option) das Objektformular (ETW, EFH) braucht. Die MFH-Einheiten führen das meiste schon (`mv_kaution`, `mv_befristet_bis`, `mv_kuendigungsverzicht_bis`, `mv_naechste_anpassung`, `mv_erhoehung_art/_wert`, `mv_rhythmus_jahre`).
+- **Kappungsgrenze und Erhöhungspotenzial:** am 10.10. null Treffer; inzwischen gibt es `frontend/js/data/kappungsgrenzen.json` (vgl. N77, N60.36). Ob das die Objektebene abdeckt, am 25.10.2026 nicht nachgemessen.
 
-> **Gemessen, bevor gebaut:** die Einheit wird als **ganzes Objekt** in
-> `d._mfh.einheiten` gespeichert (`storage.js:279`). Jedes neue Feld
-> fährt automatisch mit — keine Migration, keine Feldliste.
+#### N60.9 · Wohnungen mit Detailfenster (`v2021`, `v2022`) — Rest: Augenprüfung
 
-**Das Fenster — 6 Abschnitte, 28 Felder** (am Objekt `2026-1056`
-abgenommen, 860 px breit):
+Gebaut, s. Fertig. Offen ist nur **Marcels Augenprüfung**, ob der MFH-Bereich zum umgebauten Reiter Objekt passt — kein Codemangel.
 
-| Abschnitt | Felder |
-|---|---|
-| Stammdaten | Nr, Lage, Art, Fläche, Zimmer, **Etage**, **Balkon**, **Keller**, **Stellplatz** |
-| Miete | Ist, Soll, Status, **NK-Vorauszahlung**, **Stellplatzmiete** |
-| **Mietvertrag** | **Art, Beginn, letzte Erhöhung, nächste Anpassung, Kaution, befristet bis, Kündigungsverzicht, Mieter, Notiz** |
-| Zustand | Gesamtzustand, Maßnahme, Kosten |
-| **RND** | Haken „eigene Restnutzungsdauer" + Jahre + Begründung |
-| **Bilder** | bis 6 je Wohnung |
+#### N60.10 · RND-Gutachten je Wohnung, MFH als Unterbaum — Rest
 
-**Die Vertragsarten** sind keine erfundene Liste, sondern die
-Vertragsformen des deutschen Mietrechts mit Fundstelle: unbefristet ·
-Staffel (§ 557a) · Index (§ 557b) · Zeitmiete (§ 575) ·
-Kündigungsverzicht · Gewerbe · möbliert/Kurzzeit (§ 549 Abs. 2) ·
-Werkswohnung (§ 576) · preisgebunden · Untermiete.
-
-> **Warum das zählt** — steht als Hinweis im Fenster und als Regel im
-> Prompt: **Staffel und Index tragen ihre nächste Erhöhung schon im
-> Vertrag.** Das ist ein **Termin**, kein Mieterhöhungspotenzial. Wer
-> beides gleich behandelt, **rechnet dieselbe Steigerung zweimal** —
-> einmal als Staffel, einmal als „Luft zur Marktmiete".
-
-**Die Bilder:** gemessen trägt ein Objekt bis **1,8 MB** Fotos. Je
-Wohnung unbegrenzt wäre bei zwanzig Einheiten ein Objekt, das nicht mehr
-speichert. Darum 6 je Wohnung, 1200 px, über den **vorhandenen**
-Verkleinerer. Beim **Duplizieren** einer Zeile wandern Bilder und
-Mietername **nicht** mit: eine Kopie ist eine ähnliche Wohnung, nicht
-dieselbe.
-
-**Die Kombinatorik (`v2022`):** neun der 28 Felder gehen in die
-Pilot-Analyse — nicht alle 28, denn 28 × 20 Einheiten wären 560 Werte in
-einem Prompt, der ohnehin 23.000 Zeichen hat. **Kaution, Keller, Notiz
-und der Mietername bleiben draußen**; der Mietername hat im Prompt
-nichts verloren, und ein Prüfer verbietet ihn jetzt ausdrücklich.
-
-**Abnahme am echten Objekt:** alle elf neuen Felder in der Datenbank
-nachgelesen, Pilot-Analyse (10.259 Zeichen) und Foto **unverändert**.
-
-> **⚠ `v2022a` — `ein` gab es in `buildPrompt` gar nicht.** Ich hatte
-> den Variablennamen **angenommen**; die Einheiten hängen an
-> `o.einheiten`. Der Container warf beim ersten echten Aufruf
-> `ReferenceError: ein is not defined`. **`node --check` sieht das
-> nicht** — es ist gültige Syntax, der Name fällt erst zur Laufzeit auf.
-> Genau dafür ist der Lauf im Container da.
-
-#### N60.8-alt · MINIMUM ERLEDIGT 10.10.2026 (`v2087`) — die Fachliste bleibt
-
-> ### Drei Felder auf Objektebene (`v2087`)
->
-> Marcels Minimum — **Vertragsart, Beginn, letzte Erhöhung** — steht jetzt
-> im Reiter Miete, für **jede** Objektart: `mv_art`, `mv_beginn`,
-> `mv_letzte_erhoehung`. Dieselben Feldnamen wie in `_mfh.einheiten[]`.
->
-> **Der Befund vorher:** die Wohnungen im MFH hatten das seit `v2021`,
-> die Objektebene nicht — **null** Treffer für `mv_art` in `index.html`.
-> Für eine ETW, ein EFH oder ein einzelvermietetes Objekt gab es gar
-> keine Vertragsangabe.
->
-> **Keine zweite Liste:** die elf Vertragsformen stehen in
-> `mfh-einheiten.js` (mit Fundstelle je Form) und werden seit `v2087`
-> mitexportiert; `mietvertrag-objekt.js` **liest** sie und füllt das
-> Select zur Laufzeit. Im Browser geprüft: 11 Optionen, Quelle hat 11.
->
-> **Beim MFH sagt es, was gilt:** dort führen die Einheiten ihre
-> Verträge; der Hinweis nennt, wie viele davon schon eine Art tragen,
-> und dass die Angabe am Objekt für das Haus als Ganzes gilt. Die Felder
-> bleiben bedienbar — ein MFH **kann** im Ganzen vermietet sein.
->
-> **Nachgewiesen, dass es gespeichert wird** (nicht nur sichtbar ist):
-> die drei IDs stehen in der Feldliste von `storage.js`, und
-> `collectData()` gibt sie im Browser zurück (`mv_art: "index"`,
-> Beginn, Erhöhung — 276 Felder gesamt). Ohne den Listeneintrag wären
-> sie sichtbar gewesen und beim Speichern lautlos verschwunden.
->
-> **Ein eigener Fehler, vor dem Ausrollen gefunden:** der MFH-Hinweis
-> las zuerst `window.getFormData()` — die Funktion gibt es **nicht**,
-> einziger Treffer im Repo war mein eigener Aufruf. Der Hinweis wäre
-> immer in der Fassung „ohne Einheiten" erschienen, ohne Fehler. Echte
-> Quelle ist `window._dpMfh` (`mfh-einheiten.js:45`).
->
-> ### Was offen bleibt: Marcels Fachliste
->
-> Staffel/Index mit nächstem Termin, Kappungsgrenze,
-> Mieterhöhungspotenzial zur ortsüblichen Vergleichsmiete, Kaution,
-> Befristung, Kündigungsverzicht, Gewerbe mit Laufzeit und Option. **Die
-> MFH-Einheiten führen das meiste davon schon** (`mv_kaution`,
-> `mv_befristet_bis`, `mv_kuendigungsverzicht_bis`,
-> `mv_naechste_anpassung`, `mv_erhoehung_art/_wert`,
-> `mv_rhythmus_jahre`) — auf Objektebene steht bewusst nur das Minimum,
-> das Marcel ausdrücklich verlangt hat. Welche davon ein ETW-Formular
-> braucht, ist eine Produktfrage und seine Entscheidung.
->
-> **Kappungsgrenze und Erhöhungspotenzial** gibt es nirgends (gesucht
-> nach `kappung` in `frontend/js` — null Treffer). Das hängt an N60.14
-> (VPI): ohne Indexwerte ist ein Potenzial zur Vergleichsmiete geraten.
-Marcel: „bevor wir Schnittstellen und Exporte machen. Es soll auch eine
-Angabe zu Mietverträgen gemacht werden können, also was für ein
-Mietvertrag, seit wann der besteht und wann die letzte Erhöhung gewesen
-ist. Das muss für jeden Objekttyp und auch für einzelne Wohnungen
-innerhalb eines MFH möglich sein."
-
-Mindestens: Vertragsart, Beginn, letzte Erhöhung. **Fachlich gehört
-dazu**, zur Prüfung mit Marcel: Staffel-/Indexmiete mit nächstem Termin,
-Kappungsgrenze, Mieterhöhungspotenzial zur ortsüblichen Vergleichsmiete,
-Kaution, Befristung, Kündigungsverzicht, Gewerbe mit Laufzeit und
-Option — das ist das, was den Ertragswert und die Bank interessiert.
-
-#### N60.9 · WOHL ERLEDIGT (`v2021`, `v2022`) — nachgemessen 10.10.2026
-
-> Zeilenknopf `mfh-einheiten.js:268`/`:798`, Modal `:329` mit
-> Stammdaten/Miete/Mietvertrag/Zustand/Bildern (max 6, `:325`),
-> Bewertung je Einheit `:54`/`:72`, flächengewichtete Summe `:81`,
-> Übertragung in den Reiter Objekt `:138`/`:895`.
->
-> Das separate RND-Feld je Einheit wurde in `v2023` **absichtlich
-> wieder entfernt** (`:421-435`) — die RND je Einheit kommt aus dem
-> Zustand. Offen ist nur Marcels Augenprüfung, ob der MFH-Bereich zum
-> umgebauten Reiter Objekt passt; das ist kein Codemangel.
-Marcel: „Zu den einzelnen Wohnungen sollte man auch Bilder hinterlegen
-können. Da bietet sich an, vielleicht nur eine Auflistung der einzelnen
-Wohnungen zu machen und im Detail ein In-Place-Modal zu öffnen mit
-erweiterten Daten. … Die Bewertung sollte auf jeden Fall für jede
-Wohnung möglich sein, und die Gesamtbewertung wird dann im Tab Objekt
-übertragen."
-
-**Marcel sagt selbst dazu:** „Wir haben den Tab Objekt extrem umgebaut.
-Es ist zu prüfen, ob das noch passt, und ggf. den MFH-Bereich dann
-anzupassen." → **erst messen, dann bauen.**
-
-#### N60.10 · RND-Gutachten je Wohnung, MFH als Unterbaum
-Marcel: „Prinzipiell muss es möglich sein, für jede einzelne Wohnung ein
-RND-Gutachten zu erstellen. Da könnte man zum Beispiel es so bauen, dass
-man dann im Menü ein MFH hat, und wenn das geteilt ist, kann man die
-Einheiten auch separieren und die werden dann als Unterbaum angezeigt.
-Mit Vererben und allem."
-
-> ### Die Vererbung war SCHON GEBAUT — gemessen 10.10.2026
->
-> Der Punkt sagt, ohne die Vererbungsliste werde *„jede Einheit eine
-> halbe Kopie"*. Die Liste existiert in `mfh-einheiten.js`, und sie ist
-> fachlich sauber getrennt:
->
-> | | Gewerke |
-> |---|---|
-> | **nur Gebäude** (`GEB_IDS`) | Dach, Außenwand, Leitungen, Heizung |
-> | **Einheit eigen, sonst Gebäude** (`WE_IDS`) | Fenster, Bäder, Innenausbau, Grundriss |
->
-> `punkteEinheit(e, geb)` rechnet damit und gibt sogar zurück, **wie
-> viele** Punkte geerbt wurden (`geerbt`); die Tabelle zeigt es als
-> „ganz geerbt" / „3 geerbt" / „eigen". Am echten `MOD_ELEMENTS` des
-> Kerns geprüft: **alle acht Gewerke sind genau einer Seite zugeordnet,
-> keine Überschneidung.** Die Trennung deckt sich mit § 5 WEG.
->
-> *Ein offener Punkt, der nicht mehr offen ist, kostet jedes Mal eine
-> Messung — und wer ihn baut, baut doppelt.*
->
-> ### Der echte Mangel lag woanders (`v2095`)
->
-> `rndFuer()` übergab dem Kern **vier** Felder. `calcAll` liest **zehn**:
-> `baujahr, stichtag, gnd, modPoints, gewerkeBewertung, gewerkeWeights,
-> gewerkeRestlebensdauer, schaeden, applySchadensAbschlag, kernsaniert`.
-> Die sechs ungenannten liefen still in die Vorgaben. Zwei sind teuer,
-> am **echten** Kern nachgerechnet:
->
-> | Fall (GND 80) | ohne `kernsaniert` | mit | Unterschied |
-> |---|---:|---:|---:|
-> | Bj 1975, 18 Punkte | 56,0 | 59,4 | **+3,4 Jahre** |
-> | Bj 1950, 20 Punkte | 56,0 | 56,4 | +0,4 Jahre |
-> | Bj 1960, 12 Punkte | 43,5 | 43,5 | kein |
->
-> Der Kern sagt die Ursache selbst (`rnd-calc.js:896`): ohne die Angabe
-> gilt die Kappe **0,70 statt 0,90** der GND. Und der `stichtag` war auf
-> **heute** festgenagelt — sieben Jahre Stichtagsunterschied ergeben
-> 1,7 Jahre RND.
->
-> Statt die Rangfolge ein **zweites** Mal zu schreiben, wird sie geholt:
-> `mapDealPilotObject(collectData())` — derselbe Weg, den
-> `deal-action.js:1813` nimmt. `rndBasis()` läuft **einmal je
-> Auswertung**, nicht je Einheit, weil `collectData()` das ganze
-> Formular liest. `rnd` bleibt eine Zahl (zwei Verbraucher rechnen
-> damit), die Herkunft reist als `rndInfo` daneben mit.
->
-> Bewacht von `tools/mfh-rnd-eingabe-pruefen.mjs`: 16 Punkte, **14 echte
-> `calcAll`-Läufe** gegen den geladenen Kern, RC=0.
->
-> ### Sichtbar gemacht (`v2095a`), im Browser nachgemessen
->
-> Unter der Einheitentabelle steht jetzt:
->
-> ```
-> Stichtag 10.10.2026 — heute (Verkehrswert-Stichtag) · GND 80 Jahre
-> ```
->
-> Am laufenden Assistenten abgenommen (1280 px, Objektart MFH, Bj 1960,
-> dreimal „Weiter" per echtem Klickweg bis Schritt 4).
->
-> ---
->
-> ## ⚠ EINE FACHFRAGE, die Marcel gehört — nicht mir
->
-> **Derselbe Wert wird unten per Haken angeboten als „Restnutzungsdauer
-> X Jahre in die AfA übernehmen (eigener Satz Y %)". Gerechnet ist er
-> aber mit `zweck='verkehrswert'`, also mit dem heutigen Stichtag.**
-> `mapDealPilotObject` nimmt den wirtschaftlichen Übergang nur bei
-> `zweck='afa'` — und der Kommentar im Kern sagt es selbst: *„Für
-> AfA-Gutachten ist der steuerlich relevante Betrachtungsbeginn zu
-> berücksichtigen."*
->
-> Gerechnet (Bj 1960, GND 80, 12 Punkte, 400.000 € Gebäudeanteil):
->
-> | Stichtag | RND | AfA-Satz | AfA je Jahr |
-> |---|---:|---:|---:|
-> | wirtschaftlicher Übergang 2021-09-01 | 44,62 J. | 2,24 % | 8.965 € |
-> | heute (Verkehrswert) | 43,47 J. | 2,30 % | 9.202 € |
-> | **Unterschied** | 1,15 J. | 0,06 %-Pkt. | **237 €** |
->
-> **Bemerkenswert: der spätere Stichtag gibt den höheren AfA-Satz.** Die
-> Richtung ist also nicht zugunsten des Finanzamts, sondern des
-> Steuerpflichtigen — was die Frage nicht kleiner macht, nur anders.
->
-> Zu entscheiden: rechnet der Assistent die RND für den **Verkehrswert**
-> oder für die **AfA** — oder zeigt er beide getrennt? Das ist eine
-> Bewertungsentscheidung. Bis dahin steht der Stichtag **sichtbar** da,
-> statt still zu wirken.
->
-> ## Was noch fehlt
->
-> - **Der Unterbaum im Menü.** Marcels Bild („wenn das geteilt ist, kann
->   man die Einheiten auch separieren und die werden dann als Unterbaum
->   angezeigt") ist nicht gebaut. Das Datenmodell trägt es schon:
->   `window._dpMfh` führt `{ einheiten, gebaeude, gnd, aufgeteilt,
->   sollAbJahr, stand }` — **`aufgeteilt`** ist genau sein „wenn das
->   geteilt ist".
-> - **Ein RND-Gutachten je Einheit als Dokument.** Gerechnet wird je
->   Einheit längst; was fehlt, ist die Ausgabe (PDF/Bericht) mit dem
->   Modellvermerk je Einheit.
-> - **Kernsanierung je Einheit.** Sie erbt heute vom Gebäude. Eine
->   einzelne kernsanierte Wohnung in einem sonst unsanierten Haus lässt
->   sich nicht erfassen: `istKernsaniert()` sucht den Text „kernsanier"
->   in den Werten, die MFH-Stufen heißen aber `0/h/v`. Auf den
->   Einheitendaten wäre die Funktion also **immer `false`** — sie dort
->   zu rufen hätte wie eine Prüfung ausgesehen und nie gegriffen.
-
-Kernfrage für die Umsetzung: **Vererbung**. Was gilt je Einheit eigen
-(Fläche, Zustand, Miete, Vertrag, Bilder, RND) und was erbt sie vom
-Gebäude (Baujahr, Bodenrichtwert, Grundstück, Modernisierung am Dach)?
-Ohne diese Liste wird jede Einheit eine halbe Kopie.
+Vererbung und Kern-Eingabe erledigt (`v2095`, `v2095a`), s. Fertig. Offen:
+- **Entscheidung Marcel offen:** RND je Einheit für den **Verkehrswert** (heutiger Stichtag, `zweck='verkehrswert'`) oder für die **AfA** (wirtschaftlicher Übergang) — oder beide getrennt? Beispiel Bj 1960, GND 80, 12 Punkte: 43,47 gegen 44,62 Jahre, 237 € AfA im Jahr. Bis dahin steht der Stichtag sichtbar da.
+- **Unterbaum im Menü** („wenn das geteilt ist … als Unterbaum angezeigt“) — nicht gebaut; `window._dpMfh.aufgeteilt` trägt es schon.
+- **RND-Gutachten je Einheit als Dokument** (PDF/Bericht mit Modellvermerk je Einheit).
+- **Kernsanierung je Einheit** — erbt heute vom Gebäude; `istKernsaniert()` greift auf den MFH-Stufen `0/h/v` nie.
 
 ---
 
@@ -2863,876 +358,14 @@ Zustände, die gehen nicht."*
 
 ---
 
-#### N60.20 · ERLEDIGT 10.10.2026 (`v2088`) — design/Messe/prozesskarte.html
-Marcel, 10.10.2026: *„Dafür brauche ich dann einmal eine Prozesskarte.
-Eine richtig gut aufgearbeitete Prozesskarte in dem Pilot-Stil und
-Design, wo wir einmal die Prozesse aufmalen, vielleicht irgendwo wie so
-ein Miro-Board oder dann auch so eine Prozesskette abbilden."*
-
-**Was sie zeigen soll:**
-- die Kette **Quick-Check → Ankauf → Bestand**
-- *„Wie sind denn dort die Wege und was können wir bis dahin alles
-  machen und was kommt auch dabei raus?"*
-- also je Station: **was man tun kann** und **was dabei herauskommt**
-  (Score, Marktbericht, Pilot-Analyse, Bankexport, Soll/Ist …)
-
-**Form:** im **Pilot-Stil und Design** — Obsidian, Gold, Runway,
-Luftfahrt-Bildsprache. Board-Charakter wie ein Miro-Board oder eine
-durchgezogene Prozesskette.
-
-> ### Gebaut: `design/Messe/prozesskarte.html` (`v2088`)
->
-> **Drei Bahnen, neun Stationen** — Quick-Check (Pre-Flight) · Ankauf
-> (Boarding) · Bestand (Reiseflug). Je Station steht, **was man tun kann**,
-> und darunter abgesetzt **was dabei herauskommt** — Marcels eigene Frage.
->
-> **Jede Zahl ist gemessen, nicht geschrieben:** die 8 Etappen mit Namen
-> und Zielen aus `frontend-konstanten.json`, die 3 Marktbericht-Stufen aus
-> `marktbericht.js:56`, die Schwellen 85/70/50/35 aus `score-tiers.js`,
-> die 286 Datenfelder am Portfolio-Export gezählt, die 6/13/20
-> Pflichtfelder aus `pflichtFuer()`.
->
-> **Was NICHT draufsteht:** Zahlen, die niemand gemessen hat — keine
-> Zeitersparnis in Prozent, keine Nutzerzahlen, keine Treffergenauigkeit.
-> *Eine Prozesskarte, die eine Zahl behauptet, die das Produkt nicht
-> belegt, fällt am Stand genau dem auf, der sie prüft.*
->
-> **Die Fußzeile trägt die Doktrin** in drei Sätzen: *„Kein Treffer heißt
-> kein Wert"*, *„Jede Zahl trägt ihre Herkunft"*, *„Wo die Quelle endet,
-> endet die Rechnung"*. Das ist der Unterschied, der sich nicht nachbauen
-> lässt — also gehört er auf die Karte.
->
-> Gedruckt A3 quer in einer hellen Fassung, aus **derselben** Datei —
-> damit nicht zwei Stände entstehen. Bewacht von
-> `tools/prozesskarte-pruefen.mjs` (RC=0): Tag-Bilanz, CSS-Klammern,
-> abgeschaffte Begriffe, und jede Zahl gegen ihre Quelle.
-
-**Zweck:** *„Dass wir das dem Kunden auch zeigen können."* Also ein
-Stück, das am Messestand standhält, nicht eine Skizze für intern.
-
----
-
-#### N60.21 · ERLEDIGT 10.10.2026 — Teil 1 `v2083`, Teil 2 `v2096`
-Marcel, 10.10.2026: *„Wenn sich ein User neu einloggt, dann kann er das
-Design wählen."*
-
-**(1) Vorgaben setzen**
-- **Darstellung: Aktenmappe** wird der Standard — *„Den könnte man dann
-  auch oben reinsetzen: Aktenmappe, Standard."*
-- **Objektkarte: Datenzeile**
-
-> ### Teil 1 gebaut (`v2083`)
->
-> **Drei Änderungen in `onboarding.js`:**
-> 1. **Aktenmappe steht an erster Stelle** — die Reihenfolge ist die
->    erste Empfehlung, noch vor jeder Markierung.
-> 2. Sie trägt `standard: true` und ist **vorausgewählt**. Vorher stand
->    in `_wahl.aussehen` `null`: der Nutzer musste aktiv etwas wählen,
->    bevor es weiterging. **Eine Vorgabe, die man erst setzen muss, ist
->    keine.** Die Markierung sitzt als Pille *„Standard"* in der Kachel.
-> 3. Ihre Objektkarte ist **`datenzeile`** statt `bordkarte`. Die anderen
->    drei behalten die Bordkarte — Marcels Satz von damals galt für
->    *„Aktenmappe, Kanzlei und Tower"*, und für zwei davon gilt er weiter.
->
-> Die Vorgabe steht an **einer** Stelle (`standard: true`) und wird über
-> `_aussehenStandard()` gelesen; beide Initialstellen nutzen sie.
->
-> **Ein Text, der die Einstellung nicht kannte:** dort stand hartkodiert
-> *„Objektkarten als Bordkarte"* — auch für eine Variante, die etwas
-> anderes setzt. Jetzt kommt der Name aus dem Modul, das den Stil führt.
->
-> **Geprüft, dass es auch wirkt**, nicht nur angezeigt wird:
-> `_aussehenAnwenden` ruft `DealPilotObjektkarte.setze(a.karte)`, und im
-> Browser gemessen kennt dieses Modul `datenzeile` (Name *„Datenzeile"*).
-> Der Kommentar `v1748b` daneben dokumentiert genau die Falle: dort stand
-> einmal `DealPilotKartenVariante.setze('bordkarte')` — und **dieses**
-> Modul kennt „bordkarte" nicht, es setzte still auf `""` zurück.
-
-**(2) Die Vorschaubilder taugen nicht**
-*„Da sind irgendwie so ganz komische Bilder drinne. Können wir da
-irgendwie vernünftige Bilder nehmen? Also wirklich wie die App dann
-aussehen würde?"*
-
-**Vorschlag, den Marcel selbst nennt:** *„Oder dass man dann vielleicht
-sagt: Hier, so kannst du das sehen und dann kann man das im Hintergrund
-einmal sehen, wie die App aussehen würde … Kann man das irgendwie in
-place anzeigen?"*
-
-> **Der Grund steht in seinem letzten Satz:** *„weil der Kunde weiß ja
-> vorher nicht, was er da einstellt."* Eine Vorschau, die nicht zeigt,
-> was passiert, ist keine Vorschau — sie ist eine Behauptung über das
-> Ergebnis.
-
-> ### Teil 2 gebaut (`v2096`) — und der Befund war ein anderer
->
-> **Die Vorschau in place EXISTIERT.** Ein Klick auf eine Kachel ruft
-> `_aussehenAnwenden()`, und das setzt wirklich um — am laufenden System
-> nachgemessen:
->
-> | Kachel | `data-dp-layout` | `data-dp-objkarte` |
-> |---|---|---|
-> | Aktenmappe | `v1b` | `datenzeile` |
-> | Kanzlei | `v2` | `bordkarte` |
-> | Tower | `v2b` | `bordkarte` |
-> | DealPilot | `null` | `bordkarte` |
->
-> Und `.dpo-ov` war kein deckender Vorhang, sondern ein **Schleier**:
-> `rgba(5,5,5,.34)` — die App ist dahinter zu 66 % sichtbar. Es fehlte
-> also nicht die Vorschau.
->
-> ### Der Fehler war subtiler und schlimmer
->
-> **Ein dunkler Schleier über der Wahl zwischen hell und dunkel.**
-> Gerechnet, was er mit genau den Flächen macht, um die es geht:
->
-> | Fläche | echt | unter dem Schleier | Helligkeit |
-> |---|---|---|---:|
-> | Creme `#FDFCFA` | `rgb(253,252,250)` | `rgb(169,168,167)` | **−60 %** |
-> | Weiß `#FFFFFF` | `rgb(255,255,255)` | `rgb(170,170,170)` | **−60 %** |
-> | Gold `#C9A84C` | `rgb(201,168,76)` | `rgb(134,113,52)` | −58 % |
-> | Obsidian `#050505` | `rgb(5,5,5)` | `rgb(5,5,5)` | **−0 %** |
->
-> Die hellen Fassungen verlieren 60 % ihrer Helligkeit, Obsidian keine
-> einzige. Unter dem Schleier sieht **hell grau** aus und **dunkel
-> unverändert** — die Vorschau verfälschte genau den Unterschied, den
-> der Nutzer wählen soll.
->
-> > **Eine Vorschau, die das Gewählte dunkler zeigt als es ist, ist
-> > schlimmer als keine:** sie lässt den Nutzer gegen etwas entscheiden,
-> > das er nie gesehen hat. Marcels Satz *„der Kunde weiß ja vorher
-> > nicht, was er da einstellt"* traf also zu — nur nicht aus dem Grund,
-> > den die Bilder vermuten ließen.
->
-> ### Gebaut: kein neuer Mechanismus
->
-> Im Schritt „Aussehen" fällt der Schleier weg (`.dpo-ov-schau`) und der
-> Kasten legt sich in die untere rechte Ecke. **Kein zweites iframe** —
-> das wäre eine zweite App im Speicher und ein zweiter Zustand, und die
-> Warnung oben in diesem Punkt (`_dpDispSkin` hinterlässt
-> Inline-Variablen) gilt für das Umschalten, nicht für das Hinsehen.
->
-> **Im Browser abgenommen (1280 px):**
->
-> | geprüft | Ergebnis |
-> |---|---|
-> | `.dpo-ov` Hintergrund | `rgba(0, 0, 0, 0)` — Schleier weg |
-> | optisch wirkungslos | ja (opacity 1, kein `backdrop-filter`, kein `filter`) |
-> | Kasten | 620×561 @ 644,181 — unten rechts |
-> | Kopf `896×57` verdeckt | **0 %** |
-> | Reiter `896×43` verdeckt | **0 %** |
-> | Seitenleiste `380×758` verdeckt | **0 %** |
-> | Umschaltung beobachtbar | Aktenmappe → Seitenleiste **0 px**, DealPilot → **380 px** |
->
-> Die Schicht fängt weiter Klicks ab — das soll ein Fenster auch. Hier
-> ging es um **sichtbar**, nicht um bedienbar.
->
-> **Erst ab 900 px**, denn darunter füllt der Kasten den Schirm ohnehin;
-> dort tragen die Miniaturen die Entscheidung weiter und bleiben deshalb.
-> Der Hinweis *„Die App dahinter wechselt sofort mit"* steht aus
-> demselben Grund nur ab 900 px — **ein Hinweis, der auf etwas
-> Unsichtbares zeigt, ist schlimmer als keiner.**
->
-> > **Ein Wegwerf-Prüfer für die CSS-Klammerbilanz ist dreimal
-> > gescheitert** (erst las er die ganze Datei statt des Stilblocks, dann
-> > nur 52 % der Zeilen) und hat korrekt **abgebrochen** statt grün zu
-> > werden. Der Nachweis kam aus dem Browser, wo eine kaputte Klammer
-> > sofort sichtbar wäre.
-
-**Zu prüfen, bevor gebaut wird:** die Darstellung schaltet über
-`DealPilotWhitelabel.apply()` und die Attribute am `<html>`
-(`data-dp-layout`, `data-ui-cards`, `data-dp-objkarte`, `data-ui-theme`).
-Eine Vorschau *in place* hieße, sie kurz umzuschalten und wieder
-zurück — **das ist genau der Weg, vor dem die Messkabine warnt**
-(`_dpDispSkin` hinterlässt Inline-Variablen, siehe
-`skin-messen-nur-nach-neuladen`). Also entweder sauber zurückdrehen
-oder im **iframe** vorschauen.
-
----
-
-#### N60.22 · ERLEDIGT 10.10.2026 (`v2082`) — sechs Pillen, zwei antwortet die App selbst
-Marcel, 10.10.2026: *„In der Pilotanalyse unten, wo dann halt auch der
-Co-Pilot sitzt, vielleicht noch ein paar Pillen machen, wo man
-draufklicken kann mit gewissen Standards."*
-
-**Die Frage, die er selbst formuliert** — und die der Co-Pilot heute
-nicht beantworten kann:
-
-> *„Habe ich in meinem Objekt alles angegeben oder würdest du mir
-> vorschlagen, noch Sachen anzugeben?"*
-
-Erwartete Antwort: *„Nee, du hast jetzt alle Pflichtfelder ausgefüllt,
-du hast zum Beispiel auch alle Investor-Deal-Score-Felder, alle KPIs
-ausgefüllt dafür"* — oder eben, **welche fehlen** und *„was könnte man
-noch machen, um weiter in die Tiefe zu gehen."*
-
-**Pillen, die Marcel nennt:** Soll/Ist-Abgleich · *„habe ich die volle
-Datentiefe erreicht"* · *„welche Felder fehlen"*.
-
-> **Der Zweck ist Hilfe, nicht Bericht:** *„dass der Kunde sich darüber
-> auch helfen kann, dass man quasi auch eine Hilfe da drin abbildet."*
-> Eine Pille, die nur eine Zahl nennt, erfüllt das nicht — sie muss
-> sagen, **was der nächste Schritt ist**.
-
-**Feldänderungen direkt aus dem Dialog** nennt Marcel ausdrücklich als
-nachrangig: *„ist jetzt nicht ganz so erheblich."*
-
-> ### Gebaut und im Browser abgenommen (`v2082`)
->
-> **Sechs Pillen in zwei Arten** — und darin steckt die Entscheidung:
->
-> | Art | Pillen | Verhalten |
-> |---|---|---|
-> | **Antwort** (gefüllter Punkt) | Datentiefe · Was fehlt? | die **App** antwortet sofort, kostenlos |
-> | **Frage** (grau) | Soll/Ist · Mehr Tiefe? · Risiken · Bankgespräch | setzt den Text ins Eingabefeld |
->
-> *„Welche Felder fehlen"* kann die App beantworten. Das an die KI zu
-> schicken wäre dreifach falsch: es kostet Kontingent, es dauert, und
-> die Antwort könnte daneben liegen — während der Zähler die Wahrheit
-> schon kennt. Lokale Antworten tragen deshalb die Zeile *„gemessen von
-> DealPilot · kein Kontingent verbraucht"*; sonst hält der Nutzer eine
-> gemessene Zahl für eine geschätzte.
->
-> **Keine vierte Feldliste:** die Zahlen kommen aus
-> `DealPilotReadyCheck.getData()`, also seit `v2079` auch aus
-> `pflichtFuer(stufe)`. Nachgeprüft — das Modul enthält nur `getData()`
-> und `jump()`.
->
-> **Im Browser abgenommen**, Objekt geladen, Reiter Pilot-Analyse:
-> alle 6 Pillen 76–124 × 39 px und **auf ihrem Mittelpunkt erreichbar**;
-> Klick auf *Datentiefe* erzeugt die Antwort *„20 von 22 Feldern sind
-> gefüllt (91 %). Eingabetiefe 1 ist gewählt; davon kommen 5
-> Pflichtfelder der Wertermittlung dazu … Für eine Wertermittlung nach
-> ImmoWertV braucht es Eingabetiefe 3"*; *Was fehlt?* nennt die zwei
-> offenen Felder mit **Sprung-Chips**; die Fragen-Pille setzt ihren Text
-> ins Eingabefeld. Alle Werte deckungsgleich mit `getData()`.
->
-> **Ein Nebenbeweis für `v2079`:** die zwei fehlenden Felder sind
-> **Marktfaktor** und **Marktmiete** — zwei der drei Score-Felder, die
-> der Zähler vorher nicht kannte. Ohne `v2079` hätte hier *„20 von 20,
-> 100 %"* gestanden, und der Nutzer hätte nichts davon gewusst.
->
-> **Eine Messfalle dabei, notiert:** vor dem Scrollen meldeten alle
-> Pillen `erreichbar: false` — sie lagen bei y 1380 in einem 1050 px
-> hohen Fenster, also **unter dem Falz**. `elementsFromPoint` gibt dort
-> ein leeres Array zurück. Das ist ein Artefakt, kein Befund.
->
-> **Marcels nachrangiger Punkt** (*„Feldänderungen direkt aus dem
-> Dialog … ist jetzt nicht ganz so erheblich"*) ist **nicht** gebaut —
-> die Sprung-Chips führen zum Feld, geändert wird dort.
-
-**Vor dem Bauen zu klären:** die Datentiefe-Auskunft braucht eine
-Quelle, und die darf **nicht** die dritte Feldliste werden — siehe
-N60.23. Erst dort entscheiden, wer die Pflichtfelder führt, dann hier
-davon lesen.
-
----
-
-#### N60.23 · ERLEDIGT 10.10.2026 (`v2079`) — die Staffel war gebaut, nur nicht gefragt
-Marcel, 10.10.2026: *„Wir haben jetzt auch unser Tab-Objekt umgebaut
-und haben dort drei Stufen … Unten unter Deal-Aktion haben wir dann
-Bereit für die Bank. Dort sind es aber nur 14 Grundfelder."*
-
-Sein Vorschlag: *„dass wir je nach Stufe verschiedene Grundfelder
-voraussetzen … für die Stufe sind es jetzt, sage ich mal, 14, für die
-Grundstufe sind es dann 28 und für die Stufe 3 so und so viele Felder."*
-
-**GEMESSEN am 10.10.2026** in `frontend/js/deal-action-readycheck.js`:
-
-| | Zahl | Stelle |
-|---|---|---|
-| feste Felder | **15** (nicht 14) | `FIELD_TARGETS`, Z. 23–37 |
-| objektartabhängig | **bis zu 6** | `ART_PFLICHT`, Z. 112 ff. (seit v1841) |
-| `ds2_`-Felder im Formular | **9** | `index.html` |
-
-**Zwei Befunde, die den Umbau begründen:**
-
-1. **Drei Score-Felder prüft der Readycheck überhaupt nicht:**
-   `ds2_marktfaktor`, `ds2_marktmiete`, `ds2_zustand`. Sie stehen im
-   Formular und gehen in den Investor-Deal-Score ein, zählen aber in
-   keinem Fortschrittsbalken mit.
-2. **`mietwachstum` sucht drei IDs, von denen eine nicht existiert**
-   (`ds2_mietwachstum`). Trifft keine der anderen, zählt das Feld gar
-   nicht mit — `fieldState()` gibt dann `exists:false` zurück und der
-   Zähler **überspringt es stillschweigend** (Z. 137).
-
-> **Darin steckt auch die Erklärung für Marcels „14".** Der Zähler zählt
-> nur Felder, die im DOM **vorhanden** sind. Blendet eine Stufe Felder
-> aus, sinkt die Gesamtzahl — die Anzeige sagt dann „14 von 14" und
-> meint gar nicht alle. Das ist genau der Fehler, den v1841 schon
-> einmal behoben hat: *„Eine Vollständigkeitsanzeige, die nicht alles
-> kennt, was gebraucht wird, meldet Vollständigkeit — und das ist
-> schlimmer als keine. Sie beendet die Suche."*
-
-**Deshalb: EINE Quelle, nach Stufe gestaffelt.** Nicht drei Listen
-(Readycheck, Score, Co-Pilot), sondern eine Tabelle, die je Stufe sagt,
-was gebraucht wird — `DealPilotObjektart.pflicht()` ist der Anfang, den
-v1841 schon gemacht hat. N60.22 liest von dort, statt eine vierte
-Liste anzulegen.
-
-> ### Nachgemessen: die Staffel existierte schon
->
-> `objekt-reiter.js` führt sie in **`pflichtFuer(stufe)`** und
-> exportiert sie über `window.DealPilotObjektReiter` — mit
-> `tools/objekt-vollständigkeit.mjs` als Gegenstück:
->
-> | Stufe | Pflichtfelder |
-> |---|---|
-> | 1 | **6** — Adresse, Objektart, Wohnfläche, Baujahr |
-> | 2 | **13** — dazu Kaufpreis, Miete, Zustand, Energie, Standardstufe, Zimmer (+Etage/Einheiten) |
-> | 3 | **bis 20** — dazu Grundstück, Bodenrichtwert, BGF, MEA, NHK-Typ, Garage |
->
-> Der Readycheck zählte dagegen 15 feste Felder — die des
-> **Investor-Deal-Scores**. Das ist ein anderer Zweck als die
-> Wertermittlung, deshalb bleiben beide Listen; `v2079` fragt jetzt
-> beide und nennt die Stufe in der Überschrift
-> (*„Eingabetiefe 2 (+7)"*), weil sich die Gesamtzahl mit der Pille
-> ändert.
->
-> Die drei fehlenden Score-Felder sind ergänzt. Die Beschriftungen
-> kommen aus `DealPilotObjektReiter.FELDNAMEN`, das dafür
-> mitexportiert wird — eine zweite Namensliste im Readycheck hatte
-> ich zuerst geschrieben und wieder entfernt.
-
-**Dazu Marcels Absprung:** *„und dann noch die Pillen, dass man den
-Absprung dahin hat"* — die fehlenden Felder sind heute schon klickbare
-Chips mit Tab-Sprung und Gold-Flash (Z. 14–17). Das trägt.
-
----
-
-#### N60.24 · ERLEDIGT — `v2078` reichte nicht, nachgezogen in `v2097`
-
-> ### Nachgemessen am 10.10.2026: „alle erreichbaren Texte" war zu früh
->
-> `tools/kerosin-nutztext-pruefen.mjs` (neu) liest **420 Dateien, 12,9 MB**
-> und blendet 26 % davon als Kommentar aus. Befund: **25 Treffer im**
-> **Nutztext.** *Eine Erledigt-Meldung ohne Messung hält sich nicht.*
->
-> **Die meisten sind KEIN Verstoß** — und das ist der wichtigere Teil des
-> Befundes:
->
-> | Stelle | was es ist |
-> |---|---|
-> | `_wireKerosinStrip` | Funktionsname |
-> | `/Kerosin\|\/ Monat/` | ein Filter, der den Begriff **entfernt** |
-> | `console.warn('[v1182c] Kerosin-Kasten …')` | Protokoll |
-> | `config.js` `kerosin_10`, `liter: 10` | **stillgelegte** Paketliste (v1183) |
->
-> ### Fünf Textstellen behoben (`v2097`) — und wie LIVE sie wirklich sind
->
-> Nachgemessen, nicht angenommen:
->
-> | Stelle | Zustand |
-> |---|---|
-> | `quickcheck-app.html:6405/6406` | **wirklich live** — am Server nachgelesen, Text steht neu |
-> | `credits.js:150` (API-Meldung) | **latent** — nur über den gesperrten Alt-Kauf erreichbar (503 ohne `STRIPE_PRICE_*`) |
-> | `welcomeMail.js` (8 Stellen, Kauf-Mail) | **latent** — dieselbe Sperre |
-> | `pricing-modal.js:1096/1099` | **nicht gerendert** — gehört zum stillgelegten Paket-Streifen; im geöffneten Preis-Fenster gemessen: 0× „Liter" |
-> | `kerosin-confirm-lage.js` | **tote Datei** (siehe unten) |
->
-> *Ich hatte sie im Commit „wirklich kundensichtbar" genannt. Gemessen ist
-> nur eine davon live; die anderen sind latent oder tot.* Behoben bleiben
-> sie trotzdem — latent heißt „eine Umgebungsvariable entfernt", nicht
-> „unmöglich".
->
-> Die **Luftfahrt-Bildsprache bleibt** (CLAUDE.md: abgeschafft ist der
-> Name des Guthabens, nicht das Cockpit). Cockpit, „Gute Flüge" und der
-> Boarding-Ton stehen weiter.
->
-> ### Drei Fehler im eigenen Wächter, alle behoben
->
-> - Er **löschte** Kommentare und zählte die Zeilennummern danach im
->   gekürzten Text — **jeder Verweis zeigte auf eine falsche Zeile**
->   (gemeldet `config.js:455`, dort steht eine Leerzeile). Jetzt werden
->   Kommentare **geleert**, die Länge bleibt, und er prüft selbst gegen,
->   ob die Zeile im Original denselben Begriff trägt.
-> - Er meldete **„100 % Nutztext"**, weil er nach dem Leeren die Länge
->   verglich. Jetzt zählt er die ausgeblendeten Zeichen (26 %).
-> - Er kann **Bezeichner nicht von Prosa** unterscheiden und meldete 150
->   Anbieter-Treffer. Jetzt zwei Töpfe — und die zwei bekannten
->   Fehlurteile stehen **namentlich im Bericht**, statt die Heuristik als
->   Wahrheit auszugeben.
->
-> > **Zwei `Edit`-Versuche an `quickcheck-app.html` sind gescheitert**, weil
-> > die Zeile **geschützte Leerzeichen** (U+00A0) zwischen Zahl und Einheit
-> > trägt. Der Fehler sah aus wie ein falsch kopierter Text.
-
-#### N60.33 · Drei von sechs erledigt 11.10.2026 — `v2102`, und zwei waren schon da
-
-**Marcel, 11.10.2026, aus dem anderen Chat:** *„Zur API noch ein Befund
-in der anderen Schnittstelle. Wir haben ja Bonitätswerte und auch das
-Bundesland wissen wir ja für jedes Objekt. Daher wissen wir auch, wie das
-aussieht mit der Grunderwerbsteuersatz. Dann Mietverträge, also
-Vertragsart, Beginn und letzte Erhöhung. Die Rechtsform der Gesellschaft.
-Dann auch die unter Mandanten in den Einstellungen unsere Steuersätze über
-die Jahre. Die brauchen wir ja auch, also was wir dort angegeben haben.
-Und gegebenenfalls Zeiträume eigener Nutzung für den steuerfreien Verkauf.
-Das ist ein Feld, das haben wir im DealPilot nicht. Das brauchen wir aber
-auch erst mal nicht. Das kann dann auf der Tonspur erfolgen."*
-
-| # | Was | Stand (noch zu messen) |
-|---|---|---|
-| 1 | ~~**Bonitätswerte**~~ | **war schon da:** `zve` 19/23, `grenz` 23/23, `ek` 19/23 — am echten Export gezählt |
-| 2 | ~~**Bundesland → Grunderwerbsteuersatz**~~ | **gebaut `v2102`** — siehe unten |
-| 3 | ~~**Mietverträge**~~ | **war schon da:** je Einheit 11 `mv_*`-Felder in `_mfh` (79 Einheiten). Auf Objektebene sammelt `collectData()` sie — nachgewiesen. Sie fehlen im Export nur, weil **kein Objekt sie gefüllt hat** |
-| 4 | **Rechtsform** — *Fundament gebaut `v2103`* | der **Schlüssel** (`halter`, `halter_seit`, `steuersphaere`) geht jetzt mit. Die Rechtsform selbst braucht die Mandanten auf dem Server — **eine Entscheidung, keine Migration**, siehe unten |
-| 5 | **Steuersätze über die Jahre** | dieselbe Wurzel wie 4. **Und der Wortlaut trifft nicht, was es gibt** — gemessen, siehe unten |
-| 6 | ~~Zeiträume eigener Nutzung (§ 23 EStG)~~ | **von Marcel ausdrücklich zurückgestellt**: *„das haben wir im DealPilot nicht. Das brauchen wir aber auch erst mal nicht."* |
-
-### Punkt 2 gebaut (`v2102`) — und es war fast alles schon da
-
-| Baustein | wo |
-|---|---|
-| `plz` | am Objekt, **21 von 23** belegt |
-| `gest_p` | am Objekt — aber die **Eingabe** des Nutzers |
-| die Sätze | seit `v1823` im gespiegelten `frontend-konstanten.json`: **16 Länder, 84 PLZ-Bereiche**, mit Prüfhaken auf 16 |
-
-`portfolioExport.js` **hat die Konstanten geladen und die GrESt-Daten nie
-benutzt.** Jetzt leitet er ab: `bundesland`, `bundesland_name`,
-`grest_satz_amtlich`, `grest_herkunft`.
-
-**Zwei Felder, nicht eins:** `gest_p` ist, was der Nutzer angesetzt hat,
-`grest_satz_amtlich` was das Land vorschreibt. Sie **dürfen** abweichen —
-wer einen Kaufpreisanteil für Inventar herausrechnet, zahlt auf weniger
-Steuer. *Eine zusammengelegte Zahl hätte den Unterschied verschluckt*,
-dieselbe Lehre wie bei den zwei RND-Spalten in `v2086`. Der Unterschied
-steht als `HINWEIS` im Export.
-
-**Am laufenden Staging abgenommen:** 21 von 23 Objekten tragen ein Land
-(NW 15, ST 3, SN 2, NI 1). Die zwei ohne haben **keine `plz`**, und
-`grest_herkunft` sagt genau das — *kein Treffer heißt kein Land, nie das
-nächstgelegene.*
-
-Bewacht von `tools/grest-export-pruefen.mjs`: **55 Punkte, RC=0**, lädt
-das echte Modul und ruft die echte Funktion.
-
-### ⚠ Das neue Feld hat sofort einen Datenfehler gefunden
-
-**8 von 21 Objekten weichen vom amtlichen Satz ab — und alle acht sind
-DEMO-Objekte:**
-
-| Objekt | PLZ | Land | amtlich | angesetzt |
-|---|---|---|---:|---:|
-| DEMO-HH1 | 44577 | NW | 6,5 % | **0,00 %** |
-| DEMO-LE2 | 04155 | SN | 5,5 % | **0,00 %** |
-| DEMO-BI3 | 33719 | NW | 6,5 % | **0,00 %** |
-| DEMO-DT4 | 32756 | NW | 6,5 % | **0,00 %** |
-| DEMO-IB5 | 49477 | NW | 6,5 % | **0,00 %** |
-| DEMO-LE1 | 06184 | ST | 5,0 % | 5,50 % |
-| DEMO-LE1 | 33613 | NW | 6,5 % | 5,50 % |
-| DEMO-LE1 | 33647 | NW | 6,5 % | 5,50 % |
-
-**Fünf Demo-Objekte tragen 0,00 % Grunderwerbsteuer** — bei einem echten
-Kauf unmöglich. Die drei anderen tragen pauschal 5,50 %, unabhängig vom
-Land. *Das gehört zu **N60.19** („Die Demodaten erzählen keine
-Geschichte") und ist ein DB-Eingriff, also Marcels Freigabe.*
-
-> Die abgeleitete Zahl hat sich beim **ersten** Lauf bezahlt: ohne sie
-> wäre „0 % Grunderwerbsteuer" eine Zahl geblieben, die niemand
-> hinterfragt. Eine Ableitung ist nicht nur eine Auskunft — sie ist auch
-> ein Prüfmaß für das, was schon dasteht.
-
-### Drei Korrekturen an meinen eigenen Aussagen, alle im Lauf gefunden
-
-1. Ich meldete, `DealPilotGrest.forPlz` gebe für `32609` **`null`** zurück.
-   *Falsch* — ich hatte `fromPlz` getippt. `forPlz` trifft alle zehn
-   Probe-PLZ.
-2. Ich meldete, die Tabelle liege **„nur im Frontend"**. *Falsch* —
-   `v1823` hat sie längst gespiegelt, samt Prüfhaken. Nur der Export
-   nutzte sie nicht.
-3. Mein Prüfer verlangte **„keine überlappenden PLZ-Bereiche"** und fand
-   eine. Die ist **fachlich richtig**: `04900–04938` (Elsterwerda, Bad
-   Liebenwerda, Übigau) liegt in **Brandenburg**, obwohl der 04xxx-Block
-   sonst Sachsen ist. Geprüft wird jetzt, was wirklich schiefgehen kann:
-   die **engere** Spanne muss **vor** der weiteren stehen, sonst ist sie
-   unerreichbar. Nachgemessen: `BB` auf Position 2, `SN` auf 3 — `04910`
-   gibt BB, `04109` gibt SN.
-
-   > *Ein Prüfer, der eine richtige Ausnahme als Fehler meldet, wird
-   > abgeschaltet.*
-
-> **Vier der fünf offenen Punkte sind Auslieferung, einer ist eine
-> Ableitung.** Nummer 2 ist die interessante: der Grunderwerbsteuersatz
-> steht nicht am Objekt, er **folgt** aus dem Bundesland. Eine Zahl, die
-> man ableiten kann, aber nicht mitliefert, lässt der Empfänger selbst
-> raten — und sechzehn Länder haben sechs verschiedene Sätze.
->
-> **Nummern 4 und 5 hängen beide an N60.28 Schritt 0:** `mandanten.js`
-> führt die Liste in `localStorage` (`dp_mandanten`), und im Backend gibt
-> es **null Treffer** dafür. Der Server kennt weder Namen noch Rechtsform
-> noch die Steuersätze. *Die Rechtsform ist nicht das Problem — sie ist
-> das Symptom.* Das gehört entschieden, bevor hier etwas gebaut wird:
-> eigene Tabelle `mandanten` oder ein Feld in `user_settings`.
-
----
-
-### Punkt 4 · Das Fundament steht (`v2103`) — und der Befund war ein anderer
-
-Ich hatte Punkt 4 als „blockiert durch N60.28" notiert. **Erst gemessen,
-dann gemeldet** — und dabei kam etwas anderes heraus:
-
-| | |
-|---|---|
-| `halter` an jedem Objekt | **seit Langem da** (`storage.js:174`) |
-| am Staging-Bestand | **22× `privat`, 5× ohne, 13× mit `halter_seit`** |
-| im Export genannt | **null Mal** |
-
-> **Nicht die Rechtsform fehlte, sondern der SCHLÜSSEL.** Eine
-> Mandanten-Liste hätte ohne ihn gar nichts genützt: wir hätten
-> Rechtsformen geliefert und keine Zuordnung, welches Objekt zu welcher
-> gehört. *Das Blockierte war der zweite Schritt, nicht der erste.*
-
-Neu je Objekt: `halter`, `halter_seit`, `halter_rechtsform`,
-`steuersphaere`, `halter_herkunft`.
-
-**Am laufenden Export abgenommen:** 23 Objekte, 19× `privat`, 4× ohne
-Halter. Die vier bekommen `steuersphaere: "est"` **mit dem Vermerk**
-„kein halter am Objekt — die App zeigt dafür die Vorbelegung „Privat"".
-*Kein Halter heißt nicht „keine Angabe": das `<select>` ist darauf
-vorbelegt. Beides gleichzusetzen wäre still falsch, es zu verschweigen
-auch.*
-
-#### Was hier ausdrücklich NICHT gebaut wurde
-
-`sphaere()` in `mandanten.js` ist **seit `v1404` der ausdrückliche
-EINZIGE Schiedsrichter** — eingeführt, nachdem eine zweite Fassung an
-einem Beispiel mit drei privaten und zwei GbR-Objekten **9,6 % zu viel
-ausgewiesene Entlastung** erzeugt hatte. Sie liest die Rechtsform aus den
-Mandanten-Einstellungen.
-
-Die liegen im `localStorage` (`dp_mandanten`) — im Backend **null
-Treffer**. Der Server kennt keine Rechtsform. Eine zweite Fassung hier
-wäre genau die Doppelung, die `v1404` aufgeräumt hat, **und sie würde
-raten, wo sie nichts weiß.**
-
-Deshalb bleibt `steuersphaere` `null`, wo der Server nichts weiß, und der
-`HINWEIS` verbietet dem Empfänger ausdrücklich, das als `"est"` zu
-rechnen — *das steckte eine GmbH in die Progression des Nutzers.*
-
-`privat` ist die eine Ausnahme **ohne Nachschlagen**: der Eintrag ist in
-`mandanten.js:52` fest verdrahtet, und `sphaere()` gibt dafür `"est"`
-zurück, **bevor** sie irgendetwas liest. Das ist eine Konstante, keine
-Rechnung.
-
-Bewacht von `tools/halter-export-pruefen.mjs`: **55 Punkte, RC=0**, mit
-einem Netz aus **sechs verbotenen Mustern** gegen die Doppelung
-(`isCorp`, `erw_kuerzung`, die Hebesatz-Formel, `15.825`, `regime.kst`,
-`'gbr'`), geprüft am **kommentarfreien** Text — sonst findet der Prüfer
-die Begründung, die genau diese Doppelung verbietet.
-
-> **Nicht abnehmbar auf Staging:** es gibt dort **keine einzige
-> Gesellschaft**, alle 23 Objekte sind privat. Der Zweig für eine
-> Mandanten-ID ist nur gegen die echte Funktion mit vier erfundenen IDs
-> geprüft, nicht an echten Daten. **Staging-Abnahmepunkt**, sobald es
-> einen Mandanten gibt.
-
----
-
-### ⚠ ENTSCHEIDUNG für Punkt 4 und 5 — und sie ist KEINE Migration
-
-Ich hatte „Migration, braucht Marcels Freigabe" notiert. **Nachgemessen
-ist das falsch:**
-
-```sql
-CREATE TABLE user_settings (        -- 074_nutzereinstellungen.sql
-  user_id UUID, schluessel TEXT, wert JSONB, updated_at TIMESTAMPTZ,
-  PRIMARY KEY (user_id, schluessel));
-```
-
-Ein **generischer Schlüssel→JSONB-Speicher**. Ein neuer Schlüssel ist
-eine **Zeile** in `routes/userSettings.js`:
-
-```js
-const ERLAUBT = ['datenraum','lage_profil','portfolio_analyse','eigenes_wissen'];
-```
-
-Und der Präzedenzfall steht als Begründung direkt daneben — `lage_profil`,
-**Marcels Entscheidung vom 07.10.2026** („ja auf den Server damit"), mit
-genau dem Argument, das hier auch gilt:
-
-> *„An dieser Zahl hängt eine RECHNUNG. Ein Profil, das nur auf einem
-> Gerät liegt, lässt denselben Kunden auf dem Handy ein anderes Ergebnis
-> sehen als am Schreibtisch, ohne dass er den Unterschied erklären
-> könnte."*
-
-`portfolioExport.js:443` liest heute schon drei dieser Schlüssel. Es wäre
-ein Eintrag mehr in einem Array.
-
-**Die Entscheidung ist also nicht technisch, sondern inhaltlich** — und
-deshalb Marcels: die Mandanten tragen **Steuernummer, Finanzamt,
-Handelsregister, USt-ID und Anschrift** (`mandanten.js:862`: *„gelten für
-JEDE Rechtsform"*). Heute liegen die ausschließlich in seinem Browser.
-
-> *Der Unterschied zum Datenraum und zum Lageprofil ist nicht die Technik,
-> sondern dass hier steuerliche Identifikationsdaten den Rechner
-> verlassen. Das ist keine Frage, die eine Messung beantwortet.*
-
-Dazu kommt die Doktrin im Tabellenkommentar selbst:
-
-> `user_settings` · *„Client-Daten, keine Berechnungsgrundlage. Wer etwas
-> serverseitig rechnen will, braucht eine eigene typisierte Tabelle."*
-
-Für den Export reicht Durchreichen. Sobald **der Server** mit den
-Steuersätzen rechnet, gilt der Satz und es braucht eine eigene Tabelle.
-*Das ist die Weggabelung, nicht die Migration.*
-
----
-
-### ⚠ Punkt 5: der Wortlaut trifft nicht, was es gibt
-
-Marcel sagte „**Steuersätze über die Jahre**". Gemessen gibt es unter
-Mandanten **beides getrennt**:
-
-| | Struktur | Jahresdimension |
-|---|---|---|
-| **Steuersätze** | `regime = {kst, gewst, erw_kuerzung}` | **keine** — ein Satz, zeitlos |
-| **Gesellschaftskosten** | `kosten = {"2024":{…},"2025":{…}}` | **ja**, je Jahr |
-
-Die **Jahresdimension gibt es** (`kostenJahr()`, `kostenFuer(halterId,
-jahr)`, `_kErnte()` wirft leere Jahre weg) — aber **für Kosten, nicht für
-Steuersätze.** `effRate()` rechnet mit **einem** `kst`/`gewst`-Paar,
-unabhängig vom Jahr.
-
-**Drei mögliche Lesarten, und ich rate nicht:**
-
-1. *Die Kosten je Jahr sind gemeint* → dann ist es nur Auslieferung, die
-   Struktur steht.
-2. *Die Sätze sollen je Jahr erfassbar werden* → dann ist es ein
-   **Produktumbau** am Mandanten-Formular, und die Körperschaftsteuer hat
-   sich 2008 und 2024 wirklich geändert. Fachlich hätte er recht.
-3. *Beides zusammen soll in den Export* → dann ist es Lesart 1 plus die
-   Entscheidung oben.
-
-> **Marcel ist DESAG-geprüft und weiß das besser als ich.** Lesart 2
-> wäre eine echte Lücke: ein Bestandsobjekt über zehn Jahre mit einem
-> einzigen Steuersatz zu rechnen ist eine Vereinfachung, die niemand
-> ausgewiesen bekommt. Aber ob er das meint, steht nicht im Satz — und
-> ein Umbau am Steuerteil nach Vermutung ist das Teuerste, was hier
-> passieren kann.
-
----
-
-#### N60.34 · Die Skalen-Beschriftungen der Objektkarte (`v2104`, 11.10.2026)
-
-**Entstanden aus Marcels „kontrast vorschlag so umsetzen" (11.10.2026).**
-Nach `v2101d` standen im Cockpit noch neun Gruppen unter 4,5. Die
-größte davon hat sich beim Nachmessen als etwas anderes entpuppt.
-
-### Erste Korrektur: es war nicht das Cockpit
-
-Ich hatte „115 Stellen im Cockpit bei 3,78" notiert. **`messe()` scannt
-das ganze Dokument, nicht die gemessene Fläche.** Gemessen sind es
-**161 Stellen, alle in `aside.sidebar`, keine einzige im Cockpit**:
-`.sbcm-scale span` auf den Objektkarten — 23 Karten × 7 Beschriftungen
-(„0", „1", „1,5", „2+" am DSCR-Balken, „0 %", „5 %", „10 %" an der
-Rendite).
-
-### Zweite Korrektur: die Schwelle war falsch gewählt, nicht der Ton
-
-Die Schrift ist **7,5 px**. Damit gilt **4,5** — 3,0 gilt erst ab 24 px,
-oder ab 18,66 px fett. Und genau hier stand es schwarz auf weiß im
-eigenen Blatt (`ui-varianten.css`, `v1107`):
-
-> *„Die drei Werte sind in OKLab abgesenkt, bis sie gegen die
-> Kachelfläche #FAF8F3 **auf 3,2** kommen."*
-
-Gemessen: genau **3,28**. Der Ton traf sein Ziel — **das Ziel war die
-falsche Zahl.**
-
-### Der Befund: fünf Fassungen, und die schlimmste hatte nie eine Regel
-
-| Fassung | Ton | Grund (gemessen) | k | wo |
-|---|---|---|---:|---|
-| Grundfassung | `rgba(168,162,153,.65)` | `rgb(13,11,8)` Verlauf | **3,83** | `style.css:25546` |
-| **`body.dp-chrome-hell`** | dieselbe Deckkraft | `rgb(255,255,255)` | **1,76** | **KEINE Regel** |
-| `data-ui-surface=light` | `#8f897c` | `#FAF8F3` | **3,28** | `ui-varianten.css:554`+`:606` |
-| Vorlage `kontor` | `#918d84` | `rgb(250,249,247)` **hell** | **3,14** | `ui-varianten.css:78` |
-| Vorlage `kanzlei` | `#928d84` | `rgb(251,250,247)` **hell** | **3,16** | `:145` |
-| Vorlage `boarding` | `#8d8471` | `rgb(255,255,255)` **hell** | **3,70** | `:178` |
-| Vorlage `konsole` | `#6E747C` | `rgb(20,23,27)` dunkel | **3,81** | `:211` |
-| Vorlage `panel` | `#6B7683` | `rgb(248,249,251)` **hell** | **4,39** | `:2150` |
-
-> **`v1107`/`v1107b` haben genau diesen Fehler für `data-ui-surface` und
-> für jede Vorlage behoben — und den hellen Skin übersehen.** Dort war
-> der schlechteste Wert des ganzen Durchgangs: **1,76**, praktisch
-> unsichtbar. *Die Reparatur ist mit ihrem Anker gewandert, nicht mit der
-> Fassung* — dieselbe Klasse wie `reparatur-erbt-ihren-anker`.
-
-### Gebaut (`v2104`) und am laufenden Staging abgenommen
-
-| Fassung | vorher | nachher | Ton |
-|---|---:|---:|---|
-| Grundfassung, dunkle Karte | 3,83 | **4,80** | `#817d76` |
-| `surface=light`, Kachel creme | 3,28 | **4,80** | `#726e63` |
-| heller Skin, **weiße** Karte | **1,76** | **4,83** | `#76716b` |
-| heller Skin + helle Fläche | — | **4,55** | derselbe Ton |
-
-Jede Zahl ist im Browser nachgemessen, nicht gerechnet. Der Farbton
-bleibt erhalten (Faktor auf alle drei Kanäle, kein Clipping).
-
-### Deckend statt mit Deckkraft — das ist der eigentliche Punkt
-
-Der Kartengrund ist ein **Verlauf** (`effGrund` meldet `quelle:
-"verlauf"`). Eine Deckkraft darüber ergibt **je Stelle einen anderen
-Kontrast**; eine feste Farbe nicht. Dieselbe Klasse wie `v2090`, wo bei
-vier von sechs Stellen die Deckkraft der Fehler war.
-
-### `#8f897c` musste ZWEIMAL weichen
-
-Einmal am Token `--uv-card-mut` (`:554`), einmal in der Sechser-Regel
-(`:606`), **die die Farbe direkt setzt und den Token nicht liest**. Ohne
-Vorlage greift die Regel, mit Vorlage der Token. *Nur eine zu ändern
-hätte die Hälfte der Fälle stillschweigend ausgelassen.*
-
-### Warum es zwei Regeln sein MÜSSEN
-
-Der Prüfer rechnet es aus, statt es zu behaupten: von 256 Graustufen
-trägt **keine einzige** die dunkle und die creme Karte zugleich bei 4,5.
-Auf dunklem Grund braucht der Ton eine Mindesthelligkeit, auf hellem
-eine Höchsthelligkeit — **das Fenster ist leer.**
-
-Bewacht von `tools/kartenskala-kontrast-pruefen.mjs`: **16 Punkte,
-RC=0**, liest die echten Blätter, nennt seine Deckung und prüft am
-**kommentarfreien** Text.
-
-### ⚠ ZURÜCKGENOMMEN: meine Zahlen für ALLE FÜNF Vorlagen waren geraten
-
-Ich hatte alle fünf gegen `rgb(13,11,8)` gerechnet und **drei davon für
-sauber erklärt** — kontor 5,94, kanzlei 5,96, boarding 5,31. Dann
-nachgemessen, Vorlage für Vorlage, mit eigenem Ladevorgang:
-
-| Vorlage | Grund gerechnet | Grund **gemessen** | k gerechnet | k **gemessen** |
-|---|---|---|---:|---:|
-| kontor | `rgb(13,11,8)` | `rgb(250,249,247)` | 5,94 „ok" | **3,14** |
-| kanzlei | `rgb(13,11,8)` | `rgb(251,250,247)` | 5,96 „ok" | **3,16** |
-| boarding | `rgb(13,11,8)` | `rgb(255,255,255)` | 5,31 „ok" | **3,70** |
-| konsole | `rgb(13,11,8)` | `rgb(20,23,27)` | 4,17 | **3,81** |
-| panel | `rgb(13,11,8)` | `rgb(248,249,251)` | 4,25 | **4,39** |
-
-> **Vier von fünf Vorlagen haben eine HELLE Kachel.** Meine Rechnung hat
-> für drei davon ein „ok" erzeugt, wo in Wirklichkeit 3,1 stand — *eine
-> Rechnung gegen einen angenommenen Grund ist schlimmer als keine Zahl,
-> weil sie als Freigabe gelesen wird.* Das ist Regel 1 wörtlich: Struktur
-> wird nie angenommen, immer ausgelesen.
-
-**Behoben in `v2104b`** — je Vorlage ein eigener Ton, Farbton gehalten:
-
-| Vorlage | war | ist | k |
-|---|---|---|---:|
-| kontor | `#918d84` | `#716e67` | **4,83** |
-| kanzlei | `#928d84` | `#726f67` | **4,81** |
-| boarding | `#8d8471` | `#797161` | **4,83** |
-| konsole | `#6E747C` | `#7e858e` | **4,82** |
-| panel | `#6B7683` | `#656f7c` | **4,84** |
-
-**Acht Fassungen × 161 Stellen = 1.288 Stellen**, alle über 4,5.
-
-### Der Prüfer hat sich selbst erwischt
-
-Mein erster Suchausdruck lautete „ab `data-ui-theme=NAME` die nächsten
-1200 Zeichen" und las für **konsole den Wert von panel** — dessen Block
-folgt dicht darauf. Der Prüfer meldete **3,53 für einen Ton, der dort
-gar nicht steht**, und wurde rot, *bevor* etwas ausgerollt war.
-
-> Genau dafür ist er da. Jetzt holt er erst die Blöcke der Vorlage
-> (`{…}` ohne `}` darin) und sucht **darin** — ein Suchausdruck, der
-> über die Blockgrenze läuft, misst die nächste Vorlage.
-
-### ⚠ `v2105` GEBAUT UND ZURÜCKGEROLLT — derselbe Fehler, eine Stunde später
-
-Der strukturelle Befund von oben lautete: die Kartenfläche ist eine eigene
-Achse (`--dp-obj-card`), und `dp_obj_ui` ist ein **freier Farbwähler**
-(`_dpDispObj`, Vorgabe `#F6F2E9`) — der Nutzer kann die Objektkarte auf
-jede Farbe stellen. Ein fester Ton je Vorlage kann das nicht abdecken.
-
-**Also habe ich den Ton abgeleitet.** Mit dem vorhandenen Kern, ohne
-zweiten Rechenweg: `DealPilotConfig.branding.tonFuerGrund(ton, grund,
-min)` — derselbe, den `whitelabel-override.js` für `--uv-sc-*` benutzt,
-und zwar mit genau derselben Basis `#a8a299`. Eine Stelle setzte
-`--dpuv-obj-mut`, der Rückbau räumte es ab, vier CSS-Stellen lasen es mit
-gestaffeltem Rückfall. Der Prüfer lud `config.js` in einem `vm`-Kontext
-und bestätigte 4,5 gegen neun echte Kartenfarben. **35 Punkte, RC=0.**
-
-#### Dann live gemessen, und es war schlechter als vorher
-
-Über den echten Bedienweg (`_dpDispObj('#C9A84C')`, die umhüllte
-Reglerfunktion):
-
-| Kartenfarbe gewählt | Token abgeleitet | **gemessener Grund** | k |
-|---|---|---|---:|
-| — (Vorgabe) | nicht gesetzt | `rgb(13,11,8)` | **4,80** |
-| `#C9A84C` Gold | `#403b33` | `rgb(13,11,8)` | **1,77** |
-| `#0d0b08` dunkel | `#a8a299` | `rgb(13,11,8)` | **7,76** |
-
-> **Die gewählte Kartenfarbe ist nicht der Grund, auf dem die
-> Beschriftungen liegen.** In der Grundfassung liest `.sb-card` das Token
-> `--dp-obj-card` überhaupt nicht — das tut nur `body.dp-chrome-hell`
-> (`style.css:36164`). Der Verlauf bleibt `rgb(13,11,8)`, egal was der
-> Regler sagt. Mein abgeleiteter Ton war für eine Goldfläche gerechnet
-> und lag auf Obsidian: **1,77 statt 4,80.**
-
-**`v2105` ist zurückgerollt** (`a78de89b`). Der Stand von `v2104b` ist
-gemessen und hält in allen acht Fassungen.
-
-#### Die Lehre, und sie ist dieselbe wie zwei Pakete vorher
-
-> Ich habe gegen einen **angenommenen** Grund abgeleitet — genau das, was
-> ich bei den fünf Vorlagen eine Stunde zuvor zurückgenommen hatte. Der
-> Unterschied: diesmal war die Annahme in **Code** gegossen, nicht in eine
-> Tabelle. Ein Prüfer mit 35 grünen Punkten hat sie nicht gefunden, weil
-> er die Ableitung geprüft hat und nicht den Ort, an dem sie landet.
-
-**Zwei gleiche Fehler hintereinander** — nach CLAUDE.md ist das das
-Signal, die Sitzung abzuschließen, nicht einen dritten Anlauf zu nehmen.
-
-#### Was wirklich zu messen ist, bevor hier nochmal etwas gebaut wird
-
-Nicht „welchen Ton braucht welche Vorlage", sondern:
-
-1. **Wo greift `--dp-obj-card` überhaupt?** Gemessen ist bisher nur, dass
-   es in der Grundfassung **nicht** greift. In welchen Fassungen färbt der
-   Regler die Karte wirklich — und in welchen ist er ohne Wirkung?
-2. **Ein Regler ohne Wirkung ist selbst ein Befund.** Wenn „Objektkarten"
-   im Panel in der Grundfassung nichts tut, verspricht die Oberfläche
-   etwas, das sie nicht hält. Das ist ein größerer Punkt als der Kontrast.
-3. Erst danach ist entscheidbar, ob der Ton aus der gewählten Farbe
-   abgeleitet werden darf — **und ob der Grund überhaupt vom Regler
-   abhängt.**
-
-### Nachtrag: der „Werkzeugfehler" existiert nicht
-
-Ich hatte notiert: *„`lade()` hängt im verborgenen Fenster, weil es `rAF`
-nur im iframe umlegt."* **Das ist falsch und zurückgenommen.** Die
-Messkabine benutzt `rAF` nirgends selbst (drei Treffer, alle in
-`rafErsatz`/`rafProbe` und alle auf das *Zielfenster*), und gemessen:
-
-| Lauf | Dauer | Flicken |
-|---|---:|---|
-| `lade()` Grundfassung | **5.283 ms** | keiner |
-| `lade()` kontor | **8.093 ms** | keiner |
-
-`lade()` löst über `warte(3600)` auf — eine Dauerschleife über
-`MessageChannel`, die die Hintergrund-Drosselung **absichtlich** umgeht
-(`setTimeout(…,200)` dauerte dort gemessen 12.071 ms). Das Werkzeug ist
-in Ordnung.
-
-**Die wahre Ursache meines hängenden Sechser-Laufs:** ein nach
-CDP-Zeitüberlauf noch **laufendes** `lade()` überlappte mit dem neuen
-Lauf — zwei gleichzeitige `lade()` auf einem iframe. Das steht wörtlich in
-meiner Notiz `zeitueberlauf-ist-kein-abbruch`, und ich habe es trotzdem
-getan. *Kein Backlog-Punkt, ein Bedienfehler.*
-
-### Nebenbei zwei Werkzeugfunde
-
-1. **`messe(d, win, label)` nimmt drei Argumente.** Ohne sie fällt es
-   mit `Cannot read properties of undefined (reading 'body')` — und
-   `kontrast(a, b)` nimmt zwei **Farbobjekte**, keine CSS-Strings
-   (sonst `NaN`). Steht jetzt in `messkabine-ohne-buster`.
-2. **`lade()` hängt im verborgenen Fenster.** Es legt `rAF` im *iframe*
-   um, aber nicht im **eigenen** Fenster der Messkabine — und ein
-   Hintergrundtab feuert `rAF` nie. Ein Sechser-Lauf blieb damit
-   stillschweigend stehen (`__ERG` leer nach Minuten). Nach dem Umlegen
-   von `window.requestAnimationFrame` liefen alle Läufe durch.
-   **Gehört in die Messkabine statt in jeden Aufruf** — Backlog.
+#### N60.33 · API-Export: Punkte 1–3 erledigt (`v2102`, `v2103`) — Rest: Rechtsform, Steuersätze
+
+Erledigtes s. Fertig. Offen:
+- **Punkt 4 Rechtsform — Entscheidung Marcel offen:** sollen die Mandanten (Steuernummer, Finanzamt, HR, USt-ID, Anschrift) aus `localStorage` (`dp_mandanten`) auf den Server? Technisch ein Schlüssel in `user_settings` (keine Migration); sobald der Server damit rechnet, eine eigene typisierte Tabelle. Hängt an N60.28 Schritt 0.
+- **Punkt 5 „Steuersätze über die Jahre“ — Entscheidung Marcel offen:** Kosten je Jahr (Struktur steht), Sätze je Jahr (Umbau am Mandanten-Formular) oder beides?
+- **8 von 21 Demo-Objekten** mit 0,00 % bzw. pauschal 5,50 % GrESt — gehört zu N60.19, DB-Eingriff mit Marcels Freigabe.
+- **Staging-Abnahmepunkt:** der Export-Zweig für eine Mandanten-ID, sobald es einen Mandanten gibt.
+- Punkt 6 (§ 23 EStG, Zeiträume eigener Nutzung) von Marcel zurückgestellt.
 
 ---
 
@@ -4057,696 +690,23 @@ sondern *beide nebeneinander, und die Differenz ist die Aussage.*
 
 ---
 
-#### N60.37 · Score-Ring und Aktionsknöpfe liegen aufeinander (11.10.2026)
+#### N60.38 · Welche Kartenstile das Aussehen „DealPilot“ verträgt — Rest: Auswahl einschränken
 
-**Marcel:** *„Zum Beispiel überlappt da jetzt auch noch irgendein grauer
-Bereich. Der überlappt da noch in den Ring. Dann kann man den auch nicht
-richtig lesen."*
-
-**GEMESSEN auf drei Karten, gleich:**
-
-| | senkrecht | waagerecht |
-|---|---|---|
-| Ring | 65–115 | 281–331 |
-| Aktionen | 94–116 | 289–337 |
-| **Überlappung** | **21 px** | **34–42 px** |
-
-Beim Schweben wird der Duplizieren-Knopf sichtbar: 22×22 px,
-Hintergrund `rgba(0,0,0,.6)` — dunkelgrau. Die Score-Zahl steht bei
-**79–104**, der Knopf bei **94–116**: er verdeckt die **untere Hälfte der
-Zahl**. Das ist der graue Bereich.
-
-### Die Ursache steht in zwei Kommentaren, die sich widersprechen
-
-`style.css:25602` (**V103**): *„Zurück nach rechts oben (Marcels Wunsch).
-Score-Overlay sitzt auch rechts oben, aber Aktionen bekommen z-index: 7 —
-höher als Score (4). Damit klickbar."* Und direkt darunter:
-`.sbc-score-overlay { top: 38px }` mit *„war 12 — jetzt unter den
-Action-Buttons"*.
-
-> **V103 hat die beiden bewusst ÜBEREINANDER gestapelt:** Knöpfe oben
-> (`top:6px`), Score darunter (`top:38px`). Kein Konflikt.
-
-`layout-varianten.css` (**v1943**, Marcel 07.10.2026): *„Den score und die
-schaltflaechen muessen IMMER mittig angeordnet sein."* — setzt **beide**
-auf `top:50%`.
-
-> **Zwei Dinge in derselben Spalte auf dieselbe Mitte zu setzen, muss sie
-> übereinanderlegen.** v1943 hat die Staffelung von V103 aufgehoben, ohne
-> sie zu ersetzen. Die Anweisung war nicht falsch — sie war für zwei
-> Elemente gleichzeitig nicht erfüllbar.
-
-### Was bereits behoben ist (`v2110`/`v2110a`, keine Optikentscheidung)
-
-Im Ruhezustand stand `opacity:0`, aber `pointer-events:auto` — ein
-**unsichtbarer** Duplizieren-Knopf fing die Klicks auf dem Ring ab
-(`elementsFromPoint` lieferte ihn zuoberst). Jetzt gepaart.
-
-> **Dabei habe ich mir selbst eine Regression gebaut und sie 20 Minuten
-> später gemessen:** `v2110` hängte `pointer-events:none` an die
-> Grundregel. Bei **390 px** gilt aber
-> `@media(max-width:900px) … { opacity:1 !important }` — auf Touch gibt es
-> kein Hover. Gemessen: *opacity 1, pointer-events none* — **Duplizieren
-> und Löschen waren sichtbar und tot.** Behoben in `v2110a`, bewacht von
-> `tools/deckkraft-klickbarkeit-pruefen.mjs` (12 Regeln, RC=0).
-
-### ⚠ Offen, und es ist eine Optikentscheidung
-
-Die **sichtbare** Überdeckung bleibt. Sie aufzulösen heißt, eines der
-beiden aus der Mitte zu nehmen — und genau das hat Marcel am 11.10.
-zurückgenommen (`v2109`, Kartenansicht wieder wie auf Prod).
-
-| Weg | was es bedeutet |
-|---|---|
-| (a) | Knöpfe zurück nach `top:6px` wie vor v1943 — die Staffelung von V103 wiederherstellen |
-| (b) | Score mittig lassen, Knöpfe nach links statt rechts |
-| (c) | Ring beim Schweben ausblenden, solange die Knöpfe stehen |
-| (d) | Knöpfe kleiner/versetzt, sodass sie unter dem Ring durchpassen |
-
-**Demo bauen, nicht fragen** — sobald klar ist, ob Marcel die Mitte für
-die Knöpfe behalten will.
+Standardkarte (`v2114`), Bordkarte (`v2115`) und Score-Kante (`v2116`) erledigt, s. Fertig. Offen:
+- **Entscheidung Marcel offen (Geschmack, kein Defekt mehr):** Score-Kante und Bordkarte beim Aussehen „DealPilot“ nicht mehr anbieten? Dann braucht `objektkarten-stil.js` `data-ui-theme` als Eingabe, einen Neubau der heute einmal gebauten Liste (`data-gebaut`), einen zweiten Beobachter und einen neuen Fußtext („Wirkt in allen Ansichten“ wäre falsch); Regel je Paar Aussehen × Stil.
+- **Ungemessen:** die Schienen-Fassung (`:7211`) trägt dieselbe Konstruktion wie die Bordkarte — auf einer Aktenmappen-Ansicht nachmessen.
 
 ---
 
-#### N60.38 · Welche Kartenstile das Aussehen „DealPilot" verträgt (11.10.2026)
+#### N60.39 · Die Datenaufnahme-Karte über alle Geräte — Rest: Optikfrage 1440 px
 
-**Marcel, nachdem er die Darstellung durchprobiert hat:**
-
-| Kartenstil | sein Urteil |
-|---|---|
-| **Kennzahlen** | geht |
-| **Minimal** | geht |
-| **Datenzeile** | *„geht zum Beispiel auch super, die sieht prima aus"* |
-| **Aktenreiter** | geht — **aber der Score ist runtergerutscht**, *„das hatten wir früher mal anders, das bitte wieder hochsetzen"* |
-| **Score-Kante** | *„muss da glaube ich nicht unbedingt auswählbar sein"* |
-| **Bordkarte** | *„muss jetzt auch nicht unbedingt auswählbar sein — es sei denn wir würden diesen Abriss vor das Bild optisch hinbekommen, weil das passt jetzt nicht, da läuft die Abrisskante durch das Bild"* |
-
-### Erledigt: der Score der großen Karte (`v2114`)
-
-Der Teil seiner Nachricht, der die **normale** Objektkarte betrifft, ist
-gebaut. **Aus der Versionsgeschichte geholt**, wie er es verlangt hat
-(*„Können wir irgendwie aus den früheren Versionsständen mal rausholen,
-wie wir das auf der normalen Objektkartei früher angezeigt haben?"*):
-
-```
-f843cc8d~1  — der Stand VOR v1924 „Score und Aktionen auf eine Höhe"
-
-  aside.sidebar .sb-card .sbc-actions        top:  6px   <- Knöpfe oben
-  aside.sidebar .sb-card .sbc-score-overlay  top: 38px   <- Score darunter
-```
-
-> **Und das erklärt, warum mein `v2107` ihn gestört hat:** ich hatte nur
-> den **Score** auf 38 px gesetzt und die **Knöpfe mittig gelassen**.
-> Dann liegt der Duplizieren-Knopf weiter auf dem Ring — genau der graue
-> Bereich, über den er sich danach beschwert hat. *Eine Staffelung hat
-> zwei Teile; einen davon wiederherzustellen stellt sie nicht wieder her.*
-
-Nach `v2114` gemessen, drei Karten: Knöpfe 7–29, Ring 39–89, Pille
-94–119, Band ab 123 — **0 px Überschneidung**, überall.
-
-### Zwei der drei Punkte sind erledigt (11.10.2026)
-
-**1 · Aktenreiter — war schon behoben, nur hiess er anders.**
-
-`objektkarten-stil.js:60` fuehrt ihn als Schluessel `''`:
-
-```js
-'':  { name: 'Aktenreiter', sub: 'Lasche mit Objektnummer · Standard' }
-```
-
-> **Der Aktenreiter IST die Standardkarte** — kein `data-dp-objkarte`.
-> Marcels „der Score ist runtergerutscht" galt also derselben Karte, die
-> `v2114` gerade in Ordnung gebracht hat. Gemessen: Ring 39–89, Knoepfe
-> 7–29, 0 px Ueberschneidung. *Zwei Namen fuer dieselbe Sache haetten
-> mich beinahe zweimal dasselbe bauen lassen.*
-
-**2 · Bordkarte: die Abrisskante lief durchs Bild (`v2115`).**
-
-Gemessen an **allen 21 Karten**, mit Foto wie mit Platzhalter:
-
-| | |
-|---|---|
-| `.sbc-seq` (Streifen) | 17–33 |
-| `.sbc-thumb` (Bild) | 27–91 |
-| **Kante im Bild** | **6 px, jedes Mal** |
-
-**Ursache, und sie ist strukturell:** `.sbc-seq` ist
-`position:absolute; left:0`, liegt aber **innerhalb** von `.sbc-top`
-(im Kartenaufbau steckt sie in `.sbc-top-line1`). Sie bezieht ihr
-`left:0` auf `.sbc-top`, nicht auf die Karte — und `margin-left:16px`
-schiebt **beide gemeinsam** nach rechts.
-
-> *Ein Abstand, der das auszuweichende Element mitnimmt, ist kein
-> Abstand.* Der Platz entstand links vom Streifen statt zwischen
-> Streifen und Inhalt.
-
-Korrigiert wurde der **Innenabstand**, nicht die Lage: `padding-left:
-27px` = 16 Streifen + 1 Kante + 10 Luft. Nachgemessen: **0 von 21**
-Karten, 11 px Luft.
-
-> **Nicht angefasst:** die Schienen-Fassung (`:7211`) traegt dieselbe
-> Konstruktion. Ungemessen ist nicht in Ordnung — sie gehoert auf einer
-> Aktenmappen-Ansicht nachgemessen.
-
-### ⚠ Score-Kante: der Name verspricht etwas, das der Code nicht tut
-
-Marcel war hier unsicher (*„weiß ich nicht, die muss da glaube ich nicht
-unbedingt auswählbar sein"*). **Gemessen gibt es einen Grund dafür.**
-
-Über 21 Karten zeigt die Kante genau **zwei** Farben, und sie folgen
-**nicht** dem Score:
-
-| Score | Stufe | Kante |
-|---:|---|---|
-| 79 | GUT | Gold |
-| 69 | SOLIDE | Grün |
-| 64 | SOLIDE | **Gold** |
-| 60 | SOLIDE | **Gold** |
-
-Dieselbe Stufe, verschiedene Farben. Die 8 grünen Karten sind genau die
-8 mit `deal-won`.
-
-**Die Regeln sagen es direkt** (`layout-varianten.css:8890–8905`, die
-Schreibtisch-Fassung):
-
-```css
-.sb-card .sbc-top            border-left: 3px solid Gold
-.sb-card.deal-won  .sbc-top  border-left-color: #3FA56C
-.sb-card.deal-lost .sbc-top  border-left-color: #B8625C
-.sb-card .sbc-score-overlay  display: none
-```
-
-> **Der Stil blendet den Score-Ring aus und ersetzt ihn durch einen
-> Streifen, der Gewonnen/Verloren zeigt.** Im Stil „Score-Kante" ist der
-> Score damit **gar nicht sichtbar**. Der Name im Panel lautet
-> *„Score-Kante · Farbiger Strich statt Ring"* — er verspricht den
-> Score, der Code liefert den Deal-Status.
-
-*Das ist dieselbe Klasse wie ein beworbenes Feature ohne Code: die
-Beschriftung behauptet etwas, das die Messung nicht bestätigt. Marcel hat
-es gespürt, ohne es benennen zu können — und genau deshalb lohnt das
-Nachmessen statt des Nachfragens.*
-
-> **⚠ Eine Zwischenkorrektur von mir war selbst falsch.** Ich hatte die
-> Regeln zuerst bei `:7213–7216` zitiert — die stehen aber in
-> `@media (max-width: 900px)` und gelten nur auf dem Handy. Daraus habe
-> ich geschlossen, am Schreibtisch gäbe es **gar keine** Kante, und war
-> drauf und dran, das so zu melden.
->
-> **Gefunden hat es der Kaskaden-Walker, nicht `grep`:** es gibt sehr
-> wohl Schreibtisch-Regeln (`:8890`, `:8897`, `:8901`) mit demselben
-> Inhalt. Mein Grep hatte sie weggefiltert, weil ich auf Einrückung
-> gefiltert habe.
->
-> *Der ursprüngliche Befund stimmt also — aber ich hätte ihn beinahe
-> durch eine falsche Korrektur ersetzt. „Welche Regel gewinnt, sagt nur
-> der Kaskaden-Walker" gilt auch dann, wenn man die Regel schon gefunden
-> zu haben glaubt.*
-
-### ✓ GEBAUT (`v2116`) — und es war nie eine Entscheidung
-
-**Ich hatte hier zwei Wege vorgelegt, die sich angeblich ausschließen:**
-Kante nach Score **oder** nach Status. *Das war eine ungeprüfte
-Annahme, und sie stand als Entscheidungsvorlage vor Marcel.*
-
-**Nachgemessen trägt die Karte beide Status als eigenes Band:**
-`.sbc-won-ribbon` („Won", 53×19 px, **im Stil `kante` sichtbar**, auf 8
-von 21 Karten) und `.sbc-lost-ribbon` (`storage.js:1398`/`1404`).
-
-> **Der Status stand nie nur an der Kante.** Die Umstellung kostet also
-> nichts — es war keine Abwägung, sondern Arbeit, die ich als Frage
-> getarnt hatte. *Eine Entscheidungsvorlage, deren Alternativen sich gar
-> nicht ausschließen, ist keine Vorlage, sondern eine Verzögerung.*
-
-**Gebaut und am laufenden Staging abgenommen, 21 von 21 richtig:**
-
-| Stufe | Farbe | Karten |
-|---|---|---|
-| grün | `rgb(111,203,145)` | 7 |
-| gold | `rgb(201,168,76)` | 9 |
-| rot | `rgb(221,162,158)` | 5 |
-
-**0 falsch.** Score 69 und 58 sind gewonnen und tragen trotzdem Gold,
-weil ihr Score Gold ist — und das „Won"-Band bleibt auf allen 8 Karten.
-
-Die Farben sind die **vorhandenen** aus `style.css:10311–10314`, nicht
-neue: derselbe Ton, den der Ring in dieser Stufe getragen hätte.
-Erreicht über `:has()`, weil die Stufenklasse an `.sbc-mini-score` hängt
-und nicht an der Karte; `display:none` stört nicht, `:has()` sieht den
-DOM. `deal-won`/`deal-lost` bleiben als Rückfall für Karten ohne Score.
-
-### Damit ist aus N60.38 nur noch eine Geschmacksfrage übrig
-
-Marcel wollte Score-Kante und Bordkarte aus der Auswahl nehmen — **weil
-beide nicht taugten**. Beide tun jetzt, was ihr Name sagt:
-
-| | |
-|---|---|
-| Bordkarte | `v2115` — Abrisskante aus dem Bild, 0 von 21 |
-| Score-Kante | `v2116` — zeigt den Score, 21 von 21 |
-
-**Es muss also nichts mehr entfernt werden.** Will Marcel sie trotzdem
-nicht anbieten, ist das reine Geschmackssache und kein Defekt mehr —
-dann fällt je Stil eine Zeile in `objektkarten-stil.js:59` und die Frage
-nach dem Rückfall für jemanden, der ihn schon gewählt hat.
-
-### Offen: der eine Punkt, der eine Entscheidung braucht
-
-**3 · Die Auswahl selbst einschränken.** Marcel will Score-Kante und
-Bordkarte beim Aussehen „DealPilot" **nicht mehr anbieten**.
-
-> ⚠ **Das ist kein CSS, sondern eine Auswahlregel** — und zwar eine,
-> die von zwei Achsen abhängt (Aussehen × Kartenstil).
-
-**Gemessen am 11.10.2026, was dafür nötig wäre** (`objektkarten-stil.js`,
-289 Zeilen):
-
-| | |
-|---|---|
-| Kennt es das **Layout**? | ja — `layoutAktiv()` liest `data-dp-layout` |
-| Kennt es das **Aussehen**? | **nein** — `data-ui-theme` kommt im ganzen Modul nicht vor |
-| Wird die Liste neu gebaut? | **nein** — `if (host.getAttribute('data-gebaut') === '1') return;` |
-| Beobachtet es Änderungen? | nur `attributeFilter: ['data-dp-layout']` |
-
-**Daraus folgt konkret, was eine Einschränkung kostet:**
-
-1. Das Modul braucht eine **neue Eingabe** — es weiß heute nicht, welches
-   Aussehen gilt.
-2. Die Liste wird **einmal** gebaut und nie wieder. Eine Regel, die vom
-   Aussehen abhängt, braucht das Verwerfen dieses Zwischenspeichers
-   **und** einen zweiten Beobachter auf `data-ui-theme`. Ohne das zeigt
-   das Panel nach einem Wechsel die Liste des vorherigen Aussehens.
-3. **Der Fußtext wird falsch.** Er lautet heute: *„Wirkt in allen
-   Ansichten. Ohne eigene Wahl zeigt die Aktenmappe die Bordkarte, die
-   Ansicht DealPilot den Aktenreiter."*
-
-   > Direkt darüber steht im Code die Warnung, die genau hier gilt:
-   > *„Ein Hinweis, der einen Fehler beschreibt, lässt ihn wie eine
-   > Absicht aussehen."* Ein Satz, der „wirkt in allen Ansichten" sagt,
-   > während die Liste je Ansicht anders ist, ist dieselbe Falle.
-
-4. **Der Rückfall ist da** (`v2083a`): ohne eigene Wahl zeigt die
-   Aktenmappe die Bordkarte, DealPilot den Aktenreiter. Wer einen
-   ausgeblendeten Stil gewählt hatte, fiele also auf etwas Definiertes
-   zurück — das ist der einzige Teil, der schon steht.
-
-**Und die Gegenprobe gehört dazu:****Und die Gegenprobe gehört dazu:** Marcel hat sechs Stile beurteilt,
-aber das Aussehen hat mehrere Fassungen. Was er für „DealPilot" sagt,
-gilt nicht automatisch für Kontor, Panel, Kanzlei, Boarding, Konsole.
-*Eine Auswahlregel je Paar ist etwas anderes als eine je Stil.*
+Vier Befunde und der Stil „Zeile“ erledigt, s. Fertig. Offen: bei **1440 px** ist die Zeile **132 px** hoch (Vorgabe 78, bei 1920 px 80) — nichts abgeschnitten, die Leiste bricht eine Zeile mehr um. **Optikfrage am Entwurf, Entscheidung Marcel offen.**
 
 ---
 
-#### N60.39 · Die Datenaufnahme-Karte über alle Geräte (11.10.2026) — ✅ vier Befunde behoben, einer offen
+#### N60.40 · Cockpit-Vollbild — Rest: Entscheidung Marcel
 
-Marcel am 11.10.2026, zweimal nacheinander: *„für mich passt die
-Datenaufnahme Karte immer noch nicht. Hab in der Messkabien gerade IPad
-mini auf und es ist alles verzwerrt"* und *„Dann hast du auch nicht die
-anderen Datenaufnahmekarten geprüft das musst du vollumfänglich machen."*
-
-Gefahren als Matrix: **4 Kartenstile × 12 Breiten = 48 Messungen**, jede
-am laufenden Staging im gleich-Origin-iframe. Je Lauf: Leistenmaß,
-Umbruchmodus, QR-Kasten gegen sein SVG, abgeschnittene Beschriftungen
-(`scrollWidth` gegen `clientWidth`), Elemente außerhalb der Leiste,
-Überschneidung der direkten Kinder, Knopfmaß, Kontrast Knopf/Grund und
-Text, Erreichbarkeit per `elementsFromPoint`, Touchhöhe aller Kacheln.
-
-### Behoben
-
-| | Befund (gemessen) | Paket |
-|---|---|---|
-| **1** | 1180–1440 px: vier Beschriftungen gekappt, „Sprache" auf **15 von 43 px**; QR-Kasten 39 px bei 54 px SVG | `v2119` |
-| **2** | 390 px: Abruf-Knopf 323×50 in einem weißen Stub von 325×57, **im selben Gold wie die Leiste** (k = 1,07) | `v2120` |
-| **3** | iPad mini/Pro 11: Leiste **1263 px breit in 695 px**, `overflow-x:hidden` → 568 px lautlos geklippt | `v2121` |
-| **4** | Knopf 33 px, Kacheln 34–35 px auf allen Tablet- und Querformatbreiten | `v2121a` |
-
-Dazu **`v2122`**: die fünf Deklarationsblöcke aus `v1941a`–`d`, die das
-Gegenteil tun, sind ausgetragen — nicht überschrieben.
-
-> **Keiner der vier Befunde war ein Überlauf.** Bei 1180 px war die Summe
-> der direkten Kinder *exakt* die Innenbreite: 888 von 888. Jedes Kind
-> durfte schrumpfen (`flex-shrink:1` plus `min-width:0`), also hat sich
-> die Leiste lieber unleserlich gemacht als eine zweite Zeile zu
-> beginnen. **Wer nach einem Überlauf sucht, findet hier nichts und hält
-> die Leiste für gesund.**
-
-Und der Schaden hing nicht am Fenster, sondern am **Behälter**:
-
-```
-  Fenster   Seitenleiste   Leiste
-   1024         260         1150   heil (aber Querscroller)
-   1180         380          888   kaputt
-   1280         380          856   kaputt
-   1440         380         1016   kaputt
-   1920         380         1280   heil
-```
-
-Deshalb **kein weiterer Haltepunkt**, sondern eine tragfähige Bauart:
-die Leiste und die Kachelreihen dürfen umbrechen, Kacheln, QR, Stub und
-Knopf schrumpfen nicht. Damit regelt sich jede Behälterbreite selbst,
-auch die, die es heute noch nicht gibt.
-
-### ✅ ERLEDIGT 12.10.2026 (`v2133`, `v2133a`) — der Stil wirkt
-
-Eine Zeile in `karten-stil.js`, an die **ausdrückliche** Wahl gehängt:
-
-```js
-document.body.classList.toggle('dp-pfzeile', aktuell === 'zeile');
-```
-
-Nur bei `aktuell === 'zeile'` — nicht bei jedem Stil, sonst wäre der
-Fehler von `v1702d` zurück. Dasselbe im QuickBoarding-iframe, das ein
-eigenes Dokument ist und keine Body-Klasse erbt.
-
-**Abnahme: 2 Stile × 10 Breiten.** Marke gesetzt, **35 von 44 Regeln
-treffen**, und:
-
-```
-  KAPP 0 · RAUS 0 · ZUBREIT 0 · QUER 0 · Textkontrast überall >= 4,5
-
-  Breite   Vorgabe              Zeile
-   360     360x445  Knopf 50    360x334  Knopf 29 -> 44
-   390     357x445  Knopf 50    357x334  Knopf 29 -> 44
-   430     397x445  Knopf 50    430x334  Knopf 29 -> 44
-   768     695x383  Knopf 44    695x253  Knopf 44
-  1024     703x248  Knopf 44    703x203  Knopf 44
-  1180     888x137  Knopf 44    888x136  Knopf 44
-```
-
-Die Leiste wird **111 px flacher** — genau das, was der Entwurf
-verspricht („Eine Leiste, 55 px").
-
-**`v2133a`:** der Entwurf brachte einen **29-px-Knopf** mit, weil seine
-Regel `min-height:0` setzt. Das war richtig — der Kommentar erklärt,
-dass der 50-px-Knopf die Zeile auf 76 statt 54 px trieb. Nur gab es
-damals `v2121a` noch nicht. Jetzt 44 px bis 900 px, darüber bleibt die
-Zeile kompakt.
-
-### ⚠ Zwei Korrekturen an eigenen Zahlen
-
-**„53 Regeln" war ein `grep -c` auf den STRING.** Gezählt sind es
-**33 Regelblöcke mit 40 Selektoren** in der Datei und **44 Regeln** im
-laufenden Dokument (die Medien-Varianten zählen dort einzeln), davon
-treffen **35**. *Zählen ist keine Messung.*
-
-**„rendert auf das Pixel genau wie die Vorgabe" war zu stark.** Schon
-vor `v2133` gab es Unterschiede (1280 px: 156 gegen 166). Richtig ist:
-**praktisch gleich** — der Unterschied kam aus `dp-neue-karte-stil`,
-nicht aus den 44 Regeln.
-
-### Offen und benannt
-
-Bei **1440 px** ist die Zeile **132 px** hoch, die Vorgabe 78; bei
-1920 px sind es 80. Nichts abgeschnitten, nichts draußen — die Leiste
-bricht dort eine Zeile mehr um. **Optikfrage am Entwurf, kein Defekt.**
-
-**Gemessen, nicht vermutet:**
-
-```
-  53 Regeln hängen an  body.dp-pfzeile   (datenaufnahme.css)
-   0 Stellen im ganzen Repo setzen diese Klasse
-```
-
-Und am laufenden Staging gegengeprüft: mit `data-dp-kartenstil="zeile"`
-am `<html>` — das Attribut **wird** gesetzt — rendert die Leiste auf
-jedem der zwölf Maße **auf das Pixel genau wie die Vorgabe** (360 px:
-327×445 gegen 327×445; 1180 px: 888×166 gegen 888×166).
-
-> **Ein Entwurf, der in der Liste steht und nichts tut, ist schlimmer
-> als einer, der fehlt.** Marcel wählt ihn, sieht keine Änderung und
-> hält die Darstellung für kaputt — dieselbe Form wie bei den
-> Farbreglern in N60.35.
-
-Die Ursache steht in der Datei selbst, bei `v1702d`: die 50 Regeln
-hingen an `body.dp-neue-karte` — einer Marke, die *jedes* Layout setzt —
-und bekamen deshalb die Zeile aufgezwungen. Sie wurden auf
-`body.dp-pfzeile` umgehängt, *„und wird NIRGENDS gesetzt."* Das Abhängen
-war richtig. **Der zweite Schritt — sie an die ausdrückliche Wahl zu
-hängen — ist nie gekommen.**
-
-**Der kleine Weg ist eine Zeile in `karten-stil.js`:**
-
-```js
-document.body.classList.toggle('dp-pfzeile', aktuell === 'zeile');
-```
-
-Dasselbe in `rahmenNachziehen()` für das QuickBoarding-iframe — es ist
-ein eigenes Dokument und erbt die Klasse nicht.
-
-⚠ **Vor dem Bauen gehört gegengerechnet, was dabei aufwacht.** Die 53
-Regeln sind für eine Welt geschrieben, in der es `v2119`, `v2121`,
-`v2117` und die Tablet-Bänder noch nicht gab. Eine tote Regel zu beleben
-hebt ihre Spezifität von „trifft nie" auf voll — der Fall steht in den
-Notizen als `tote-regel-beleben`. Also: anschalten, **alle zwölf Maße
-neu messen**, und erst dann behalten.
-
-Und es ist eine **Optikentscheidung**: Marcel hat drei Entwürfe in der
-Liste, faktisch wirken zwei. Ob „Zeile" zurückkommt oder aus der Liste
-fällt, entscheidet er — nicht ich. Eine Demo zeigt es ihm in einem Bild.
-
----
-
-#### N60.40 · ✅ ERLEDIGT 12.10.2026 — das Cockpit-Vollbild tut NICHTS, gemessen
-
-**Gefunden in Durchgang 1 der Geräteabnahme** — 8 Geräte × 9 Reiter,
-**8.778 geprüfte Bedienelemente**, 0 unerreichbar, 0 echter Überlauf.
-Der einzige echte Fund war ein grauer Stummel:
-
-```
-  .dp-sidebar-toggle   Aktenmappe, alle Reiter
-
-    768 px    0 x 0    display:none          (v1888, Absicht)
-    901 px    2 x 20   inline-block   @248, y=7198
-   1180 px    2 x 20   inline-block   @248, y=4304
-   1440 px    2 x 20   inline-block   @248, y=4111
-   1920 px    2 x 20   inline-block   @248, y=4037
-
-    background  rgb(240,240,240)      <- Browser-Standard
-    border      1,11 px outset        <- Browser-Standard
-    svg darin   0 x 0
-```
-
-Das ist der **nackte Standardknopf** ohne eine einzige eigene Regel.
-Sein Symbol ist 0 × 0, weil das `<svg>` nur einen `viewBox` trägt. Er
-steht im Textfluss zwischen `#dashboard-main` und `#all-objects-main`,
-also 4.000–7.200 px unterhalb des Seitenanfangs.
-
-### Was er bedient
-
-`onclick="DealPilotDashboard.toggleSidebar()"` — und das schaltet
-trotz des Namens das **Cockpit-Vollbild** (`dp-dash-fullscreen`:
-Kopfzeile und Objektspalte weg, Cockpit über die ganze Breite).
-
-Mit offenem Cockpit nachgemessen (`DealPilotDashboard.open()`):
-
-| Breite | `.dp-sidebar-toggle` | `dp-show` |
-|---|---|---|
-| 390 px | `display:none` | **true** |
-| 768 px | `display:none` | **true** |
-| 1440 px | 2×20 @248,**6029** — unter dem 5.954 px hohen Cockpit | **true** |
-
-Dazu: **0** Vollbild-Knöpfe im Cockpit, **0** `.dp-dash-btn`.
-
-> **Das Cockpit-Vollbild ist gebaut und auf keiner Breite erreichbar.**
-> Auf Handy und Tablet ist sein einziger Schalter ausgeblendet, auf dem
-> Schreibtisch ist er 2 px breit und steht 6.000 px tief in der Seite.
-
-Und `dashboard.js` pflegt dafür eine Klasse, die niemand liest:
-
-```
-  dashboard.js:2494   tog.classList.add('dp-show')      beim Öffnen
-  dashboard.js:2514   tog.classList.remove('dp-show')   beim Schließen
-
-  Regeln im laufenden Dokument, die "dp-show" nennen:  0 von 11.757
-```
-
-Dieselbe Form wie bei den Farbreglern in **N60.35**: ein Schalter
-setzt, und keiner liest. Nur steht hier zusätzlich ein graues Artefakt
-im Bild. Und `style.css:32836` begründet, dass `#dp-sb-toggle` im
-Cockpit-Vollbild weicht, mit *„eigene Steuerung"* — **die es nicht
-gibt.**
-
-### Gebaut: `v2128` blendet den Stummel aus
-
-Er war auf keiner Breite ein bedienbarer Knopf, und auf Handy und
-Tablet seit `v1888` schon ausgeblendet.
-`DealPilotDashboard.toggleSidebar()` bleibt unberührt.
-
-### ✅ Keine Entscheidung nötig — der Modus ist ein Leerlauf
-
-Marcel am 12.10.2026: *„mach es so das es funktioniert und passend
-bedient werden kann."* Also habe ich zuerst gemessen, **was er tut** —
-bevor ich einen Knopf dafür baue.
-
-`toggleSidebar()` aufgerufen, Zustand davor und danach verglichen,
-Cockpit offen, zwei Breiten:
-
-```
-   390 px                      vorher          nachher
-     body-Klasse               (ohne)          dp-dash-fullscreen
-     nav.tabs                  0x0 none        0x0 none
-     aside#sidebar           359x758 flex    359x758 flex
-     header.hdr              386x93  block   386x93  block
-     .tabs-workflow-bar         0x0 none        0x0 none
-     Cockpit                 386x9200        386x9200
-     .app-wrap Spalten        390px           390px
-
-  1440 px                      vorher          nachher
-     aside#sidebar              0x0 none        0x0 none
-     header.hdr             1188x49  block  1188x49  block
-     Cockpit                1188x6019       1188x6019
-     .app-wrap Spalten       1192.01px       1192.01px
-```
-
-> **Sieben gemessene Eigenschaften, zweimal, und nicht eine ändert
-> sich.** Die Klasse wird gesetzt und von niemandem gelesen.
-
-Der Kommentar in `dashboard.js:2079` behauptet das Gegenteil:
-*„eigene Body-Klasse dp-dash-fullscreen, die per CSS dasselbe erreicht
-(Tab-Bar/Workflow-Bar/Sidebar weg)"*. **Diese CSS-Regeln gibt es
-nicht** — gegrept und im laufenden Dokument gegengeprüft: alles, was
-sie verstecken sollten, ist im Cockpit **ohnehin schon** versteckt.
-
-**Damit ist die Frage beantwortet, ohne sie zu stellen:** ein Vollbild,
-das kein Pixel bewegt, braucht keinen Schalter. `v2128` hat den
-2-Pixel-Stummel entfernt — das war die ganze Arbeit. Es ist **keine
-Funktion verloren**, denn es gab keine.
-
-> Hätte ich den Knopf gebaut, wie es naheliegend war, hätte Marcel
-> einen schönen 44-px-Schalter bekommen, der nichts tut. **Erst messen,
-> was ein Schalter schaltet, dann den Schalter bauen.**
-
-`DealPilotDashboard.toggleSidebar()` und `dp-dash-fullscreen` bleiben
-im Code: `marktbericht-view.js:189` und `ui.js:344` **lesen** die
-Klasse, um das Cockpit zu schließen. Die wird nie gesetzt, also ist der
-Zweig tot — aber harmlos, und er zu entfernen hieße, in zwei fremden
-Dateien zu schneiden.
-
-### Wenn das Cockpit doch einmal breiter werden soll
-
-Gemessen bei 1440 px: das Cockpit ist **1188 px** breit, daneben liegt
-die Layout-Schiene mit **248 px**. Ein echtes Vollbild müsste die
-Schiene ausblenden — das ist die Navigation, und Marcel hat den
-vergleichbaren Schalter in den Layouts ausdrücklich entfernen lassen
-(`layout-varianten.css:1499`). Deshalb baue ich das nicht von mir aus.
-
----
-
-### ⚠ Offen, und ausdrücklich eine Entscheidung für Marcel
-
-**Soll das Cockpit ein Vollbild bekommen, und wo gehört der Schalter
-hin?** Ich baue hier keinen, und zwar aus einem gemessenen Grund:
-
-> Für die Layouts hat Marcel genau das Gegenteil verlangt —
-> *„es gibt dort dieses Vollbild-Menü ausblenden, das müsste bei der
-> Ansicht raus"* und *„da ist auch dieses Ein- und Ausblenden oben
-> rechts, das könnte dann auch weg."* Deshalb steht in
-> `layout-varianten.css:1499`
-> `html[data-dp-layout] #dp-sb-toggle{display:none}`. Ein **neuer**
-> Vollbildknopf wäre damit eine Annahme, keine Umsetzung.
-
-Drei Wege, alle klein:
-
-| | Weg | Aufwand |
-|---|---|---|
-| **a** | gar keiner — `toggleSidebar()` und `dp-show` ausbauen | 1 Paket |
-| **b** | ein Knopf in der Cockpit-Kopfzeile, 44 × 44, Hausform | 1 Paket |
-| **c** | nur per Tastatur (z. B. `F`), ohne Fläche | 1 Paket |
-
-Bei (a) fällt auch `dp-dash-fullscreen` als Zustand weg — und damit die
-Regel in `style.css:32836`, die `#dp-sb-toggle` dort versteckt.
-
----
-
-#### N60.41 · ✅ ERLEDIGT 12.10.2026 (`v2132`, `v2132a`) — die Cockpit-Matrix klappt auf
-
-**Gefunden in Durchgang 2 der Geräteabnahme** (100 Läufe, 5 Breiten ×
-20 echte Öffner). Gemessen an `.pricing-modal-shell`:
-
-| Breite | Höhe des Fensters | Viewport | das sind |
-|---|---:|---:|---:|
-| 360 px | **10.078 px** | 757 | **13,3 Bildschirme** |
-| 390 px | 9.564 px | 757 | 12,6 Bildschirme |
-| 768 px | 4.970 px | 757 | 6,6 Bildschirme |
-| 1180 px | 3.871 px | 757 | 5,1 Bildschirme |
-
-**Es ist nicht kaputt:** das Overlay scrollt (`overflow-y:auto`), nichts
-ist abgeschnitten, nichts liegt außerhalb, und der Schließknopf sitzt
-seit `v2129` wieder oben rechts und ist erreichbar. Gemessen wurde das
-auf allen vier Breiten.
-
-> **Aber 13 Bildschirme sind keine Preisübersicht, das ist ein
-> Prospekt.** Wer auf dem Handy den Partner-Tarif unten sucht, wischt
-> dreizehn Mal — und weiß dabei nie, wie weit es noch geht.
-
-### Warum ich hier nichts gebaut habe
-
-Das ist **Geld und Produkt**, und CLAUDE.md zieht die Grenze genau da:
-*„Nachfragen nur bei: Produktion, Datenbank-Eingriffen, Geld, Preisen,
-Kündigungen"*. Welche Tarife in welcher Reihenfolge und Tiefe ein Kunde
-sieht, entscheidet Marcel — nicht mein Umbruch.
-
-### ✅ Gebaut: Weg (b), das Aufklappen
-
-Marcel am 12.10.2026: *„mach es so das es funktioniert und passend
-bedient werden kann."*
-
-Gemessen, welcher Block die Länge macht — direkte Kinder bei 390 px:
-
-```
-    243 px   .dp-header
-     24 px   .dp-container (Zeitstrahl)
-    440 px   .dp-container (Plan-Karte)
-    901 px   .dp-section
-   1674 px   .dp-feature-table-wrap   <- 45 % des Fensters
-     77 px   .dp-footer-note
-```
-
-Darin `table.mx` mit 1338 px: die vollständige Gegenüberstellung aller
-Leistungen je Plan.
-
-> **Eine Vergleichstabelle vergleicht nur, wenn man zwei Spalten
-> gleichzeitig sieht.** Auf dem Handy sieht man eine — und wischt für
-> die zweite so weit, dass die erste nicht mehr erinnert wird.
-
-**Preise, Pläne, Reihenfolge und Knöpfe sind unberührt.** Zugeklappt
-ist nur die Tabelle; Titel und Unterzeile bleiben sichtbar, sie sind
-die Beschriftung der Falte. Über 900 px passiert gar nichts, und eine
-zweite Regel hebt eine stehengebliebene Falte auf, falls jemand schmal
-öffnet und dann dreht.
-
-Der Knopf trägt `aria-expanded`, seine Beschriftung wechselt mit dem
-Zustand, 44 px Trefferfläche, Hausform Obsidian mit Goldschrift
-(Textkontrast gemessen **10,54**).
-
-**`v2132a`:** die Falte hing als **fünfter** Aufruf in einem
-`setTimeout` hinter vier anderen. Stürzt einer, läuft sie nicht — und
-man sieht keinen Fehler, nur einen fehlenden Knopf. Jetzt eigener Takt,
-eigenes `try/catch`.
-
-> **Ein eigener Messfehler dazu:** die erste Abnahme meldete „kein
-> Falte-Knopf" bei 768 px. Mit 2400 ms statt 2200 war er da. Es war
-> **Zeitverhalten, nicht die Breite** — `openPricingModal` nimmt den
-> asynchronen Weg, solange die Pakete noch laden.
-
-### Die drei Wege, die zur Wahl standen
-
-
-| | Weg | was der Kunde merkt |
-|---|---|---|
-| **a** | **Reiter** über den Tarifgruppen (Abos · Kontingente · Partner) | eine Gruppe auf einmal, Wischweg ~1–2 Bildschirme |
-| **b** | **Aufklappen**: je Tarif Titel + Preis + CTA sichtbar, Leistungsliste zugeklappt | Überblick zuerst, Details auf Wunsch |
-| **c** | **Vergleichstabelle quer** statt Karten untereinander | eine Schiene, bekannt vom Gewerke-Kasten |
-
-Marcels Prüfauftrag nennt genau diese Form: *„Wenn Informationen mobil
-nicht gleichzeitig dargestellt werden können, verwende sinnvoll
-aufgebaute Listen, Detailansichten, aufklappbare Bereiche oder
-alternative Layouts."* **(b)** entspricht dem am genauesten und ist der
-kleinste Eingriff — er ändert keine Reihenfolge und keinen Preis.
-
-> Zur Einordnung: dieselbe Datei trägt **6 von 521** `font-size`-Werten
-> unter 11 px, ist also nicht das Hauptproblem bei der Lesbarkeit. Die
-> Länge ist es.
+Stummel entfernt (`v2128`), s. Fertig. **Entscheidung Marcel offen:** soll das Cockpit ein Vollbild bekommen? (a) keins — `toggleSidebar()`, `dp-show` und `dp-dash-fullscreen` ausbauen (samt Regel `style.css:32836`); (b) Knopf 44 × 44 in der Cockpit-Kopfzeile; (c) nur per Tastatur. Für die Layouts hat Marcel den vergleichbaren Schalter entfernen lassen (`layout-varianten.css:1499`); ein echtes Vollbild müsste die 248-px-Schiene ausblenden.
 
 ---
 
@@ -4879,388 +839,30 @@ nächste Durchgang ihn wieder ein.
 
 #### N60.32 · Der Quick-Check ignoriert das gewählte Design — und hat eigene Kontrastfehler
 
-**Gemessen am 11.10.2026** beim Quick-Check-Matrix-Lauf (48 Punkte).
+**Rest** (Messung und `v2100` s. Fertig):
+- **Entscheidung Marcel offen:** soll der Quick-Check der gewählten Darstellung folgen (`ui-varianten.js`, `layout-varianten.js`, `karten-stil.js`, `objektkarten-stil.js` nachladen, dann ganze Matrix) oder bewusst eigene Fassung? Gemessen 25.10.2026: `quickcheck-app.html` lädt die Varianten weiter nicht.
+- Quick-Check-Kontraste (eigenes Dokument, `style.css` nicht geladen): Gold auf Gold k 1,68, `button.btn.primary` 2,53, `span.hint` 3,06. 7-px-Text im Boarding-Pass `#qb-bp` bewusst nicht angefasst.
+- Marktbericht: goldene Textfarben (`#E8CC7A` 1,42/1,53, `#C9A84C` 1,97) im `data-mb-theme=„light“`-Block nach dem Weg aus N60.29 (Weg a/c) mitziehen.
+- **Entscheidung Marcel offen:** Warnfarbe `#e8b84f` (k 1,84 auf Weiß) — abdunkeln würde sie zu Oliv.
 
-### Befund 1 — die gewählte Darstellung kommt dort nicht an
+#### N60.25 · Drei tote Gutschrift-Pfade (Texte erledigt, s. Fertig)
 
-**40 von 48 Punkten meldeten:** `theme angefordert "kontor", am <html> ""`.
-Ich habe also **eine Fassung sechsmal gemessen**, nicht sechs.
-
-Am Dokument nachgelesen: `quickcheck-app.html` lädt **nur zwei**
-Gestaltungsmodule —
-
-| geladen | fehlt |
-|---|---|
-| `whitelabel-override.js` | `ui-varianten.js` (→ `data-ui-theme`, `-cards`, `-surface`) |
-| `qc-whitelabel.js` | `layout-varianten.js` (→ `data-dp-layout`) |
-| | `karten-stil.js`, `objektkarten-stil.js` |
-
-`data-ui-theme` und `data-dp-layout` kommen in der Datei **0×** vor, und
-am `<html>` des Quick-Checks hängt nichts davon.
-
-> **Die MARKENschicht ist bewusst verdrahtet, die VARIANTENschicht nicht.**
-> Jemand hat also an das iframe gedacht — und die Hälfte angeschlossen.
-> Ein Kunde, der „Kontor · Rein weiß" wählt, bekommt eine weiße App mit
-> einem dunklen Quick-Check darin.
-
-**Das ist eine Produktentscheidung, keine Messfrage:** entweder der
-Quick-Check folgt der Wahl (vier Module nachladen — und dann einmal die
-ganze Matrix darüber, denn vier Gestaltungsattribute gleichzeitig haben
-sich in dieser App schon einmal gegenseitig erschlagen), oder er hat
-bewusst seine eigene, kompakte Fassung. **Ich habe nichts nachgeladen.**
-
-### Befund 2 — eigene Kontrastfehler, 16 Stellen bei 390 px
-
-| Stellen | k | Text auf Grund | wo |
-|---:|---:|---|---|
-| 5× | **1,68** | `#9a7f33` auf `#C9A84C` — **Gold auf Gold** | `span`, 11 px |
-| 2× | 2,53 | Weiß auf `rgb(193,159,66)` | `button.btn.primary` |
-| 1× | 2,56 | `rgb(154,147,144)` auf `rgb(240,236,228)` | `save-btn` |
-| 10× | 3,06 | `rgb(148,147,147)` auf Weiß | `span.hint` |
-| 7× | 3,49 | `rgb(107,100,90)` auf Obsidian | `div.l`, **7 px** |
-
-**Zwei davon sind mehr als zu wenig Kontrast:**
-- **Gold auf Gold** bei 1,68 ist praktisch unsichtbar.
-- **7 px** ist unter jeder lesbaren Größe, unabhängig vom Kontrast.
-
-> **`span.hint` steht hier bei 3,06, obwohl `v2090` genau diese Familie
-> in der Haupt-App auf 4,84–5,22 gehoben hat.** Das Dokument hat seine
-> eigene Kopie — `datenaufnahme.css` und `avsec-streifen.css` sind die
-> einzigen Stylesheets, `style.css` ist dort nicht geladen. *Ein iframe
-> erbt nichts*, und eine Korrektur in `style.css` erreicht es nie.
-
-### Befund 3 — der Marktbericht: Layout hält, aber helles Gold auf hellem Grund
-
-**Eigener Lauf, 8 Geräte, 11.10.2026:** 8 von 8 Punkten, Deckung 100 %.
-**Kein Querscroll, keine Schiene, kein Messfehler** — das Layout hält auf
-allen acht Geräten, von iPhone SE bis Desktop breit.
-
-**19 Kontraststellen bei 390 px, schlechteste `k=1,42`:**
-
-| Stellen | k | Text auf Grund | wo |
-|---:|---:|---|---|
-| 2× | **1,42** | `#E8CC7A` auf `rgb(247,243,230)` | `b`, 11,5 px |
-| 1× | **1,53** | `#E8CC7A` auf `rgb(253,252,248)` | `h4`, 13 px |
-| 3× | 1,66 | `rgb(200,200,208)` auf Weiß | `b`, 12,5 px |
-| 4× | 1,97–2,29 | `#C9A84C` auf Creme/Weiß | `span.mbst-kero`, `precPct` |
-
-### Die Ursache ist benannt, nicht geraten
-
-Mit dem Kaskaden-Walker im Dokument gefragt — **eine** Regel setzt die
-Farbe, ohne Inline-Stil:
-
-```css
-.mbst h4 { color: var(--wl-e8cc7a, #E8CC7A) }   /* inline im Dokument */
-```
-
-Das ist das **helle** Gold — gemacht für Obsidian. Und der Marktbericht
-ist **immer hell**: `marktbericht-view.js:mbTheme()` gibt seit `v895e`
-unverändert `'light'` zurück („Marktbericht immer hell").
-
-> **Der `html[data-mb-theme="light"]`-Block überschreibt die Hintergründe
-> mit über zehn `!important`-Regeln — aber nicht die goldenen
-> Textfarben.** Die Hell-Fassung wurde nachgerüstet, die Goldtöne nicht
-> mitgezogen. Genau der Fall „eine Farbe gilt nur zu ihrem Grund": beim
-> Umbau wandert die Fläche mit, die Beziehung nicht.
-
-**Zwei Korrekturen an meiner eigenen Messung, beide während des Laufs:**
-
-- Ich habe gemeldet, `?theme=` werde **gar nicht gelesen**. *Falsch.* Die
-  Seite liest ihn (`index.html:734`), akzeptiert aber nur `light` und
-  `dark`. Ich hatte `obsidian` übergeben — ein Wert aus dem Vokabular der
-  Haupt-App, den sie nicht kennt. `mbTheme()` schickt immer `light`, und
-  das kommt an.
-- `<html data-bg="obsidian">` steht **hart im Markup** (`index.html:2`),
-  und **keine einzige Regel liest es** — es kommt im Dokument genau
-  einmal vor, im Tag selbst. Ein totes Attribut, das behauptet, die Seite
-  sei dunkel. *Es hat mich zuerst in die falsche Richtung geschickt.*
-
-### Was ohne Entscheidung ging, ist behoben (`v2100`)
-
-Von den 19 Stellen sind **18** übrig. Behoben ist die eine, die **keine**
-Farbfrage war:
-
-`wertermittlung.js:908` trug `<b style="color:#c8c8d0">` — ein helles
-Grau für dunklen Grund, **inline** gesetzt, auf einer Seite die seit
-`v895e` immer hell ist. **Kontrast 1,66.** Weil die Farbe inline steht,
-konnte der `data-mb-theme="light"`-Block sie nie erreichen.
-
-Genommen ist die **eigene Variable des Dokuments** (`--txt`, im
-light-Block `#2a2727`) — kein neu erfundener Ton: es ist ein Name in
-Fettschrift, also gilt die Textfarbe. **14,8 auf Weiß.** Nachgemessen:
-`#c8c8d0` kommt im Dokument **0×** vor.
-
-**Die Inline-Farben der Datei, gezählt und gerechnet:**
-
-| Ton | × | k auf Weiß | |
-|---|---:|---:|---|
-| `#c8c8d0` | 1 | 1,66 | **behoben** |
-| `#e8b84f` | 1 | **1,84** | Statusfarbe — siehe unten |
-| `#8a8a93` | 4 | 3,42 | fällt, aber lesbar |
-| `#8a8378` | 2 | 3,75 | fällt, aber lesbar |
-| `#7a7a84` | 1 | 4,25 | knapp |
-
-**`#e8b84f` nicht angefasst, mit Rechnung:** um auf Weiß 4,5 zu halten,
-müsste die Warnfarbe um **43 %** abgedunkelt werden und würde zu
-`#84692d` — einem Oliv. *Bei einer Statusfarbe verliert das das Signal.*
-Das ist eine Entscheidung, keine Rechnung.
-
-**Die drei verbleibenden unlesbaren Stellen (k < 2,0) sind ALLE Gold:**
-`#E8CC7A` auf Creme (1,42 / 1,53) und `#C9A84C` (1,97). **Kein**
-vorhandenes Marken-Gold erreicht auf Weiß 4,5 — `#b8932f` kommt auf 2,8,
-`#9a7f33` auf 3,47. Deshalb geht es hier nicht weiter ohne N60.29.
-
-> Die Doktrin ist klar — *Gold ist der Akzent, nicht die Textfarbe.* Der
-> WEG dorthin ist Marcels Wahl zwischen (a), (b) und (c) aus N60.17. Ich
-> habe keinen davon für ihn genommen.
-
-**Nicht angefasst:** der 7-px-Text im Quick-Check sitzt in `#qb-bp`, dem
-**Boarding-Pass**. Winzige Mono-Beschriftungen sind dort Teil der
-Bildsprache — das zu vergrößern wäre eine Gestaltungsänderung, keine
-Fehlerbehebung.
-
-**Gehört in dieselbe Entscheidung wie N60.17/N60.29** (welcher Goldton auf
-hellem Grund). Der Fix ist hier ein Block Regeln im
-`data-mb-theme="light"`-Abschnitt — die goldenen Textfarben mitziehen, so
-wie es die Hintergründe schon tun.
-
-**Hängt an der Kontrast-Entscheidung aus N60.17/N60.29** — derselbe Weg
-sollte hier gelten, sonst sehen Haupt-App und Quick-Check wieder
-verschieden aus.
-
-#### N60.25 · Texte ERLEDIGT 10.10.2026 (`v2077`) — drei tote Gutschrift-Pfade bleiben offen
-**Marcels Regel, von ihm am 10.10.2026 noch einmal bestätigt:** selbst
-dazugekauftes Kontingent verfällt nicht, monatlich zugeteiltes verfällt.
-
-**GEMESSEN am 10.10.2026 — der Code tut genau das, alle drei Punkte
-erfüllt:**
-
-| Regel | Stand | Nachweis |
-|---|---|---|
-| Gekauftes verfällt nicht | **erfüllt** | `aiCreditsService.js:405-426` Kauf → `*_bank`; alle Bank-Schreiber nur ±1/+n; kein `expires_at` |
-| Monatliches verfällt | **erfüllt** | `_monatsReset` setzt nur `*_used = 0`, kein Übertrag (`:226-232`); der Monatsrest wird gerechnet (`limit − used`, `:261`), nie gespeichert |
-| Verbrauchsreihenfolge | **Monat → Testphase → Gekauftes** | `:337` / `:343` / `:350`, Log-Quellen `monthly`/`trial`/`bonus` |
-
-> **Die Reihenfolge ist die richtige und soll so bleiben:** zuerst wird
-> verbraucht, was ohnehin verfällt. Gekauftes liegt zuletzt — es
-> verliert nie an Wert, also hat es keine Eile.
-
-**Falsch sind die TEXTE.** Drei Stellen behaupten die vor v1296
-geltende Regel, eine davon im laufenden Betrieb sichtbar:
-
-| Stelle | Behauptung |
-|---|---|
-| **`frontend/js/ai-credits.js:183-184`** | **„Nicht genutzte Bewertungen verfallen nicht."** — live im Tooltip-Panel (gerendert über `:232`) |
-| `frontend/landing/fragen.html:154` | „…sie bleiben auf dem Konto, solange das Abo läuft." |
-| `aiCreditsService.js:2-14` + `:308-313` | Dateikopf nennt noch „Bonus-Credits zuerst" und den Übertrag in die Bank |
-
-> **Der zweite Renderer in derselben Datei ist schon korrigiert**
-> (`ai-credits.js:318-320`) — es steht also beides im selben File, und
-> welcher greift, hängt am Weg. Genau deshalb ist es nie aufgefallen.
-
-**Das ist eine Zusage an den Kunden, die das Produkt nicht einhält** —
-und sie steht im Panel, das er beim Nachsehen seines Guthabens öffnet.
-Vor dem nächsten Prod-Rollout zu beheben. Korrekt sind dagegen
-`leistungsumfang.html:1084`, `landing/index.html:451,497`,
-`pricing-plugin.js:206` und `config.js:245-247` — der Wortlaut dort ist
-die Vorlage.
-
-**Drei tote Gutschrift-Pfade, dabei mitgemessen:**
-- `routes/admin.js:1088-1094` schreibt `bonus_credits` — die Spalte ist
-  seit v1183 stillgelegt und wird von `consumeArt`/`getStatus` **nicht
-  gelesen**. Eine Admin-Gutschrift erzeugt also **kein nutzbares
-  Guthaben**. Dasselbe gilt für `aiCreditsService.addBonus()` (`:515`).
-- `services/creditPackWebhook.js:78-85` bucht ebenfalls auf
-  `bonus_credits`. Erreichbar über `POST /credits/checkout` mit einer
-  Nicht-Bewertungs-SKU (`routes/credits.js:135-142` leitet nur
-  Bewertungs-SKUs um). **Ein Kauf über eine Alt-SKU wäre bezahlt und
-  ohne Wirkung.** Das Frontend ruft heute nur Bewertungs-SKUs.
+- `routes/admin.js:1088-1094` und `aiCreditsService.addBonus()` schreiben `bonus_credits` — die Spalte ist seit v1183 stillgelegt, `consumeArt`/`getStatus` lesen sie nicht: eine Admin-Gutschrift erzeugt **kein nutzbares Guthaben**. Am 25.10.2026 steht der INSERT noch in `admin.js:1089`.
+- `services/creditPackWebhook.js:78-85` bucht ebenfalls auf `bonus_credits`, erreichbar über `POST /credits/checkout` mit einer Nicht-Bewertungs-SKU — ein Kauf über eine Alt-SKU wäre bezahlt und ohne Wirkung.
 
 ---
 
-#### N60.26 · ERLEDIGT 10.10.2026 (`v2076`, `v2076a`) — der 422 war ein Feldname
-**GEMESSEN am 10.10.2026** mit gültigem Schlüssel am Objekt `2026-001`:
+#### N60.27 · BFH IX R 7/12 — fachliche Frage (Zitat entfernt, s. Fertig)
 
-```
-422 · "Keine Koordinaten – Adresse nicht geokodierbar und
-       keine lat/lon angegeben."
-```
-
-**Nicht die Daten sind schuld.** Die Adresse im Datensatz ist
-vollständig (`str` „Hermannstraße", `hnr` „9", `plz` „32609", `ort`
-„Hüllhorst"), und **kein** Objekt im Portfolio-Export führt
-Koordinaten — Felder dafür gibt es gar nicht.
-
-> **Eine eigene Falle beim Messen, damit sie nicht zweimal kostet:** ein
-> grep nach `/lat|lon/i` über die Feldnamen meldet zwei Treffer —
-> `inv_stellplatz` und `stellplatz_miete_monat`. Beides sind
-> Zufallstreffer im Wort „Stellplatz". **Es gibt kein Koordinatenfeld.**
-
-**Zu prüfen, in dieser Reihenfolge:**
-1. Was `routes/rechenkerne.js` weitergibt: heute
-   `Object.assign({}, body, …)`, also `{ objekt: {…} }` **verschachtelt**.
-   Erwartet `/reports/from-dealpilot` die Adressfelder flach? Die echten
-   Aufrufer sind `frontend/js/dealpilot-mb.js:603` und
-   `dealpilot-mb-qc.js:321` — **deren Nutzlast abschreiben, nicht raten.**
-2. Ob der Geokodierer im mb-Dienst erreichbar und konfiguriert ist.
-3. `lat`/`lon` als optionale Eingabe durchreichen, damit ein Aufrufer
-   mit eigenen Koordinaten nicht am Geokodierer hängt.
-
-`/rechenkerne/rnd` (200 in 103 ms) und der Portfolio-Export (200,
-655 KB) sind davon **nicht** betroffen.
-
-> ### Behoben, zwei Ursachen hintereinander
->
-> **1 · Das Feld heisst `object`, nicht `objekt`.** Der Endpunkt reichte
-> `body` durch, also deutsch. Die Adresse war vollstaendig im Datensatz
-> und kam nie an — die Meldung nannte das Symptom (keine Koordinaten),
-> nicht die Ursache (kein Feld). Abgeschrieben von
-> `frontend/js/dealpilot-mb.js:603`; `inputs()` (Z. 170) schickt
-> **`objektart` UND `objart`** — der Dienst liest `objektart`, der
-> Datensatz fuehrt `objart`. Wer nur durchreicht, verliert sie still.
->
-> **2 · Die Stufe gehoert in `overrides`.** Danach kam HTTP 200, aber als
-> **Stufe 1**: *`nicht_im_umfang: true`* — Boden-, Ertrags- und Sachwert
-> fehlten. Dieselbe Falle traegt `routes/marktbericht.js:376` schon als
-> Vermerk (*v1435: der Bericht hielt sich fuer Stufe 1*). Eine Stufe am
-> falschen Ort wird nicht abgelehnt, sondern durch die Vorgabe ersetzt —
-> der Bericht sieht vollstaendig aus, nur ohne die drei Verfahren.
->
-> **Gegengetestet**, Objekt 2026-001, HTTP 200 in 49 s:
-> `cross_check.available: true` mit `sachwert`, `ertragswert`
-> (Reinertrag 7.726 EUR/a, Liegenschaftszins 2,56 % Stufe E),
-> `bodenwert` **40.338 EUR** (die in CLAUDE.md nachgerechnete Zahl),
-> dazu `quellen_nachweis`, `verfahrenswahl`, `amtliche_miete`.
->
-> **Und der Beleg, dass die Eingabe-Reparatur durchtraegt:** der
-> Sachwert vermerkt *"Restnutzungsdauer nach Anlage 2 ImmoWertV bei
-> einer Gesamtnutzungsdauer von 80 Jahren, aus 11
-> Modernisierungspunkten"* — RND 41,7. Vor `v2073` waeren es 0 Punkte
-> und GND 70 gewesen.
->
-> **Ein Aufruf kostet 0,73 EUR GeoMap** (Restguthaben 227,39 EUR,
-> gemessen 10.10.2026); ein schon bezahlter Bericht kostet 0. Das
-> gehoert in die Bepreisung der Rechenkern-Schnittstelle.
+**Entscheidung Marcel offen:** Ist IX R 7/12 für Schadensabschläge auf die RND einschlägig? Wenn ja: mit geprüftem Leitsatz an der Stelle zitieren, die es trägt (Zulässigkeit, nicht Höhe). Wenn nein: die Abschläge bleiben Modellansatz und brauchen einen Modellvermerk, sobald sie in einem Gutachten erscheinen (§ 10 ImmoWertV).
 
 ---
 
-#### N60.27 · BFH IX R 7/12 ist ungeprüft — Leitsatz oder Zitat weg
-Gemeldet vom zweiten Chat am 10.10.2026: *„`rnd-calc.js` zitiert BFH
-IX R 7/12 beim Schadenskatalog. Im Register steht das Urteil als
-‚offen‘, der Leitsatz ist nicht geprüft."*
+#### N60.28 · Die Rechtsform der aufnehmenden Gesellschaft fehlt im Export (Server-Teil erledigt, s. Fertig)
 
-**Nachgemessen am 10.10.2026:** Das Zitat stand **nur im Kommentar**
-(`rnd-calc.js:117`) und in **keinem Nutztext** — es erschien also in
-keinem Gutachten und keiner Oberfläche. In `v2080` ist es dort
-entfernt und durch die ehrliche Herkunft ersetzt: die Abschläge sind
-sachverständige Orientierungswerte dieses Hauses.
-
-> **Das Risiko war nie der Kunde, sondern der nächste Entwickler.**
-> Kein BFH-Urteil nennt 5 % für einen feuchten Keller oder 25 % für
-> Tragwerksmängel. Wer ein Aktenzeichen danebenstehen sieht, hält die
-> Zahlen für belegt und prüft sie nicht nach — dieselbe Falle, die
-> Marcel am Gutachten kritisiert hat: dort stand „Anlage 1 ImmoWertV"
-> unter einer GND, die aus **Anlage 22 BewG** kam.
-
-**Offen bleibt die fachliche Frage**, und die gehört Marcel:
-1. Ist **IX R 7/12** für Schadensabschläge auf die Restnutzungsdauer
-   überhaupt einschlägig? Der Leitsatz ist nicht geprüft.
-2. Wenn ja: mit Leitsatz zitieren und **an der Stelle, die es trägt** —
-   also bei der Zulässigkeit der Berücksichtigung, nicht bei der Höhe.
-3. Wenn nein: die Abschläge bleiben Modellansatz und brauchen einen
-   Modellvermerk, sobald sie in einem Gutachten erscheinen (§ 10
-   ImmoWertV, Modellkonformität).
-
-**Bewacht:** `tools/rnd-eingabe-pruefen.mjs` Abschnitt 10 prüft, dass
-kein Aktenzeichen neben der Katalog-Zeile steht und keines im
-Nutztext landet.
-
----
-
-#### N60.28 · Die Rechtsform der aufnehmenden Gesellschaft fehlt im Datensatz
-Marcel am 10.10.2026, aus dem zweiten Chat: *„Die Rechtsform der
-aufnehmenden Gesellschaft fehlt im Datensatz."*
-
-**GEMESSEN am Export vom 10.10.2026:**
-
-| | Befund |
-|---|---|
-| `daten.halter` | trägt bei **19 von 23** Objekten den Wert `"privat"` — sonst nichts |
-| Mandanten-Block | **gibt es nicht** im Export (kein Schlüssel zu Mandant/Halter/Gesellschaft) |
-| Überführungsfelder | vorhanden, aber leer: `ueberf_preis`, `ueberf_restschuld`, `ueberf_rest_zins`, `verkehrswert_ueberf`, `gesellschafterdarlehen`, `halter_seit`, `ueberf_ende` |
-
-**Die Rechtsform existiert — nur nicht am Objekt.** Sie hängt am
-**Mandanten**: `DealPilotMandanten` führt `rechtsform` mit `isCorp()`
-und `rfLabel()` (`dashboard.js:2591`, `:2607`). Das Objekt speichert in
-`halter` nur, WER hält — nicht, in welcher Form.
-
-> **Warum das mehr ist als ein fehlendes Feld:** die Rechtsform
-> entscheidet, WELCHE Steuer gilt — Körperschaftsteuer bei einer
-> Kapitalgesellschaft, Einkommensteuer beim Privatmann. Der Kommentar in
-> `dashboard.js:1169` sagt es selbst: *„die Rechtsform sagt, WELCHE
-> Steuer gilt; der Tarif sagt nur, wie hoch"*. Ein Empfänger des
-> Exports, der nur `halter: "privat"` sieht, kann eine Überführung in
-> eine GmbH nicht von einer in eine GbR unterscheiden — und rechnet
-> beide gleich.
-
-**Zu tun, in dieser Reihenfolge:**
-> ### Vormessung erledigt 10.10.2026 — und sie ändert die Reihenfolge
->
-> **Schritt 3 war: „prüfen, ob `halter` eine Kennung oder Freitext ist".
-> Antwort: eine KENNUNG.** `mandanten.js:117` baut das Select als
-> `<option value="m.id">m.name</option>` aus der Mandantenliste; nur
-> `'privat'` ist ein Festwert ohne Mandanten. Dass es eine ID ist, hat
-> die App schon einmal teuer gelernt: bis `v1234` zeigten die
-> Objektkarten `mmtlt8yq2fq` statt eines Namens
-> (`storage.js:1324`).
->
-> ### Aber: die Mandanten liegen NUR im Browser
->
-> `mandanten.js:14` → `LS_KEY = 'dp_mandanten'`, gelesen und geschrieben
-> über `localStorage` (`:60`, `:72`). **Im Backend: null Treffer** für
-> `dp_mandanten` (gesucht in ganz `backend/src/`). Der Server kennt die
-> Mandanten also nicht — weder ihren Namen noch ihre Rechtsform.
->
-> **Damit ist Schritt 1 („den Mandanten mitexportieren") so nicht
-> machbar:** `portfolioExport.js` läuft serverseitig und kann nichts
-> ausgeben, was nur im Browser des Nutzers steht.
->
-> ### Die Reihenfolge ist deshalb eine andere
->
-> **0. Zuerst müssen die Mandanten auf den Server.** Das ist der
->    eigentliche Punkt und eine Entscheidung für Marcel:
->    - eigene Tabelle `mandanten` (sauber, Migration, Mehrgeräte-fähig), oder
->    - ein Feld in `user_settings` (billig, aber eine Liste in einem
->      JSON-Feld — dieselbe Bauart, die bei `ui_theme` heute schon
->      Probleme macht, siehe N60.2).
->
->    **Daran hängt mehr als die Rechtsform:** eine Mandantenliste im
->    `localStorage` ist auf einem zweiten Gerät leer. Wer dort ein
->    Objekt öffnet, sieht `halter` als unbekannte ID — der Fall, den
->    `v1234` behandelt, tritt dann wieder ein.
->
-> **1. Danach** der Block `mandanten` neben `objekte`, mit `rechtsform`,
->    `rfLabel`, `isCorp`; `daten.halter` verweist darauf.
-> **2. Danach** `lexikon.strukturen` und `docs/api-einrichtung.md`.
->
-> *Die Rechtsform ist nicht das Problem — sie ist das Symptom. Das
-> Problem ist, dass die Mandanten den Server nie erreicht haben.*
-
-1. Den **Mandanten mitexportieren**, nicht die Rechtsform ans Objekt
-   kopieren: Name, `rechtsform`, `rfLabel`, `isCorp`. Sonst entsteht die
-   vierte Stelle, an der dieselbe Angabe steht — vgl. `N60.23`.
-2. Am besten als eigener Block `mandanten` neben `objekte`, und
-   `daten.halter` verweist darauf. Der Export führt sein Lexikon schon
-   mit (`lexikon.strukturen`); dort gehört der Verweis beschrieben.
-3. **Vorher prüfen**, ob `halter` eine Mandanten-**Kennung** oder nur
-   ein Freitext ist — bei `"privat"` ist das nicht entscheidbar. Ohne
-   belastbaren Verweis bringt ein Mandanten-Block nichts.
-4. `docs/api-einrichtung.md` nachziehen.
-
-**Nicht vergessen:** die Betreiberform von DealPilot selbst ist
-**Einzelunternehmen** (Junker Solution, Kleinunternehmer § 19 UStG) —
-das ist eine andere Sache als die Rechtsform eines Mandanten und darf
-nicht vermischt werden.
+- `portfolioExport.js` `halterFuer()` liefert für eine Mandanten-ID weiter `rechtsform: null` mit dem Vermerk „liegt im localStorage“ — der Vermerk ist seit `v2212a` überholt. Zu tun: Block `mandanten` neben `objekte` (Name, `rechtsform`, `rfLabel`, `isCorp`) aus `user_settings.mandanten`, `daten.halter` verweist darauf; keine zweite Fassung von `sphaere()`.
+- Danach `lexikon.strukturen` und `docs/api-einrichtung.md` nachziehen.
+- Betreiberform von DealPilot (Einzelunternehmen) nicht mit der Rechtsform eines Mandanten vermischen.
 
 ---
 
@@ -5326,299 +928,13 @@ und ihre Sprache.**
 
 ---
 
-#### N60.12 · GEBAUT — am 10.10.2026 nachgemessen (der Text sagte „Entscheidung offen")
+#### N60.13 · Export je Objekt und PDF-Wege (Portfolio-Export und Excel erledigt, s. Fertig)
 
-> **Gemessen am 10.10.2026:** die Bauart, die dieser Punkt empfiehlt
-> (*„kein zweites Objekt, sondern ein eingefrorener Stand IM Objekt"*),
-> steht vollständig — vier Module, alle in `index.html` geladen:
->
-> | Datei | Zeilen | was darin steht |
-> |---|---:|---|
-> | `ankauf.js` | 400 | `festschreiben()`, `korrigieren()` mit Historie, `abweichung()`, `vonSelbst()` (automatisch bei „gewonnen", v2041) |
-> | `doppelkarte.js` | 398 | `drehen()`, Knopf nur bei vorhandenem Ankauf-Stand, Alle-auf-einmal |
-> | `abweichung.js` | 134 | die Abweichungstafel |
-> | `ankauf-ansicht.js` | 293 | Ankauf-Ansicht mit Schreibsperre und Sperrzähler |
->
-> Ausgelöst wird es am Status (`deal-action.js:2452`), serverseitig
-> liefert `objectService.js:50` schon `ankauf_kurz`/`ankauf_stichtag`.
->
-> **Ein Punkt, der sich selbst als blockiert ausweist, kostet jedes Mal
-> eine Messung** — und schlimmer: er lädt dazu ein, etwas ein zweites
-> Mal zu bauen. Der aktuelle Stand steht in **N60.16**, das später
-> geschrieben wurde und die vier echten Restlücken nennt.
-Marcel: „Später habe ich dieses Objekt dann gewonnen, dann würde ich das
-auf gewonnen setzen und dann möchte ich das ja weiter abgleichen … dass
-dieses Objekt dann erst mal als Soll festgelegt wird und wir dann ein
-Ist-Objekt duplizieren können." Und: „wäre es auch cool, wenn man so eine
-Doppelkarte hat … dort kann man immer zwischen Soll und Ist wechseln und
-die dreht sich dann quasi um."
-
-**Konzept als Dokument abgelegt (09.10.2026):**
-https://claude.ai/artifact/FdseTiFq1wK6ECrwHEAxGJ
-
-**Gemessen, bevor etwas gebaut wird:**
-- `duplicateObj()` (`frontend/js/ui.js:54`) gibt es schon — sie nullt
-  `_currentObjKey`/`_currentObjSeq` und speichert unter neuer Nummer.
-  **Die Kopie trägt keinen Rückverweis.** Zwei Objekte an einer Adresse,
-  und nichts im System kann sie vergleichen.
-- `setStatus('open'|'won'|'lost')` (`deal-action.js:2300`) ist der
-  richtige Auslöser und sitzt schon da.
-- `.sb-card` ist das am stärksten überschriebene Element der App: **245
-  Stellen** in `style.css`, **45 mit `!important`**, vier benannte
-  Kartenstile (`ampel`, `datenzeile`, `kennzahlen`, `minimal`), dazu die
-  eingeklappte Leiste (44 × 44 px). Der Dreh-Rahmen kommt **um** die
-  Karte, nicht in sie. Die Rückseite baut dieselbe `_renderRichCard()`
-  (`js/storage.js:1310`) mit anderen Zahlen — gleiche Struktur, gleiche
-  Höhe, keine springende Liste.
-- Auf dem Handy gibt es keinen Hover: `.sbc-actions` (`style.css:4982`)
-  erscheint dort nie. Der Dreh-Knopf muss dauerhaft sichtbar sein.
-- **Die Wörter kollidieren.** 19 Stellen Soll-Miete, 29 Ist-Miete, dazu
-  `istSoll()` (`mfh-einheiten.js:915`). „Die Ist-Miete im Soll-Objekt"
-  kann niemand lesen. Vorschlag im Konzept: **Ankauf · Bestand ·
-  Abweichung**.
-
-**Empfehlung: kein zweites Objekt, sondern ein eingefrorener Ankauf-Stand
-IM Objekt.** Begründung im Dokument; der kurze Grund steht in CLAUDE.md
-schon einmal teuer beschrieben (zwei gleichnamige Dateien nebeneinander
-haben nicht gefehlt, sie haben sich widersprochen) — und die sieben
-identischen Pilot-Analysen aus **N60.1b** kamen von Dubletten.
-
-**BLOCKIERT:** sechs Entscheidungen liegen bei Marcel (Bauart, Wörter,
-Stichtag, nachfragen oder automatisch, auch ohne „gewonnen" einfrierbar,
-nachträglich korrigierbar). Sie stehen im Dokument als Haken.
-
----
-
-#### N60.13 · EXCEL ERLEDIGT 10.10.2026 (`v2086`) — PDF-Wege offen
-
-> ### Sechs Spalten mehr im Excel-Export (`v2086`)
->
-> Gemessen: der Export führte **38** Spalten, darunter schon Lageklasse,
-> Marktwert, Marktberichte, Erster_Bericht, Wertentwicklung_Pct,
-> Ankauf_Stand, Lastenwechsel, Einheiten_Indexmiete. Es fehlten sechs,
-> jetzt ergänzt: `RND_Jahre`, `RND_Verfahren`, `RND_Stand`,
-> `AfA_RND_angesetzt`, `Vertragsart`, `Ankauf_Stichtag`.
->
-> **Zwei RND-Spalten, nicht eine:** `_rnd` ist, was der Kern gerechnet
-> hat; `afa_rnd_jahre` ist, was der Nutzer angesetzt hat. Weichen sie ab,
-> ist das ein Befund — eine zusammengerechnete Spalte hätte ihn
-> verschluckt.
->
-> ### Der Punkt führte die JSON-Sicherung falsch als Lücke
->
-> Gesucht wurde in `import-export-modal.js`, `pdf.js`,
-> `pdf-investment-bank.js` — je null Treffer. **Die DealPilot-Sicherung
-> liegt aber in `storage.js:2214`** (`exportSingleObjectJson`) und ruft
-> `_dpSicherungsPaket` → `/objects/portfolio-export`. Sie trägt die
-> neuen Felder damit **schon** — Marktberichtsverlauf, `_mfh`, `_ankauf`,
-> `_rnd`, Lexikon.
->
-> *Ein Negativbefund in drei Dateien ist keiner, wenn der Export in
-> einer vierten liegt.*
->
-> ### `afa_rnd_jahre` nachgemessen (11.10.2026) — die Sorge ist ausgeräumt
->
-> Der Punkt nannte `afa_rnd_jahre` als etwas, das `deal-action.js:2052`
-> „bewusst leer lässt — eine Entscheidung, kein Versehen, die aber jede
-> Auswertung am Feld unterläuft."
->
-> **Die Entscheidung ist richtig und steht im Code begründet:**
-> `afa_rnd_jahre` ist die **Eingabe des Nutzers** und kann eine andere
-> Zahl tragen — etwa aus einem echten Gutachten. *Ein Vorschlag, der
-> sich selbst einsetzt, ist keiner.* Das Gerechnete steht daneben in
-> `_rnd`, mit Herkunft. Deshalb **zwei** Spalten im Export, nicht eine.
->
-> **Am echten Export über 23 Objekte gemessen:**
->
-> | | Objekte |
-> |---|---:|
-> | mit gerechneter RND (`_rnd.rnd_jahre`) | **0** |
-> | mit angesetzter RND (`afa_rnd_jahre`) | **0** |
-> | mit beiden | 0 |
-> | mit keiner | **23** |
->
-> **Beide Spalten sind heute leer — und die Leitung ist trotzdem heil.**
-> Nachgewiesen am laufenden System: ein gesetztes `window._dpRnd` taucht
-> in `collectData()` als `_rnd` auf und verschwindet wieder, wenn der
-> Merker `null` wird. Es hat schlicht noch niemand die RND-Strecke
-> gefahren **und gespeichert**.
->
-> > *Wer den Export prüft und zwei leere Spalten sieht, schließt auf
-> > einen Defekt.* Die Messung unterscheidet die beiden Fälle: „nie
-> > benutzt" sieht aus wie „kaputt", und nur ein Durchstich trennt sie.
-> > Der Durchstich ist gemacht, die Spalten tragen.
->
-> **Damit bleibt an diesem Punkt nur noch eine Produktfrage offen** —
-> welche Spalten ein Bankexport tragen soll (siehe darunter). Das ist
-> keine Messfrage: eine Bank bekommt nicht alles, und was sie bekommt,
-> entscheidet der, der die Unterlage verantwortet.
-
-> **Offen:** die PDF-Wege (Investment-PDF, Bankexport). Dort stehen
-> ausgewählte Spalten, und welche davon ein Bankexport tragen soll, ist
-> eine Produktfrage. Ebenso `afa_rnd_jahre`, das `deal-action.js:2052`
-> bewusst leer lässt — eine Entscheidung, kein Versehen, die aber jede
-> Auswertung am Feld unterläuft.
-
-**Nachgemessen 10.10.2026 am echten Export (22 Objekte) und am echten
-Piloten-Payload (Abruf abgefangen, kein Kerosin).** Marcels Fragen:
-Stufe 3, Wohnungskonfigurator, Mietverhältnis, RND, Zustandsfelder,
-BMF, Bodenrichtwert, Liegenschaftszins, Sachwert, Reiter Steuer.
-
-| | Export | Pilot-Analyse / Cockpit |
-|---|---|---|
-| Felder je Datensatz | **286** (273–281 belegt) | 18 Blöcke |
-| Wohnungen (`_mfh`) | **vollständig je Einheit** — nr, lage, art, wfl, zimmer, **ist/soll-Miete**, **status (Mietverhältnis)**, zustand, massnahme, kosten | zusammengefasst (Anzahl, Fläche, Schnitt, Miete) |
-| Stufe 3 / Sanierung | `san`, `san_ust`, `modernis`, `san_tax_years`, `san_tax_active` | **seit `v2067a`** |
-| Zustand / Gewerke | 22 Felder (8× `mod_*`, `ausst_*`, `qual_*`, `standardstufe`) | **seit `v2067` alle acht Bauteile einzeln** |
-| Bodenrichtwert + Stichtag | ✔ | ✔ |
-| Liegenschaftszins, Sachwertfaktor | ✔ | ✔ (leer, wo ungepflegt) |
-| BMF-Gebäudeanteil `geb_ant` | ✔ 22/22 | ✔ |
-| Reiter Steuer | ✔ | ✔ + **§ 7b und Erbpacht seit `v2067a`** |
-
-**Von 291 Formularfeldern fehlen 37 im Export** — 23 Schalter und
-Regler, 14 Bedien- oder Anzeigefelder (Suchfelder, PDF-Auswahlen, die
-**Euro**-Anzeigen der Kaufnebenkosten; die Prozentwerte `makler_p`,
-`notar_p`, `gba_p`, `gest_p`, `ji_p` sind drin). **Kein echtes
-Datenfeld fehlt.**
-
-**`v2066`: das Lexikon erklärte die Strukturen mit Unterstrich nicht.**
-Es führte 225 Felder — alle aus dem *Formular*. `_mfh`, `_ankauf` und
-sämtliche `_kpis_*` waren keines davon, obwohl sie die Erklärung am
-dringendsten brauchen. Jetzt steht unter `lexikon.strukturen`, was
-`ist`/`soll` (Monatsmieten) und `status` (Mietverhältnis) bedeuten.
-
-**Drei Lücken bleiben, gemessen und nicht behoben:**
-- **Das RND-Ergebnis fehlt überall.** Der Wizard liest `mod_*`/`ausst_*`
-  und *zeigt* die Restnutzungsdauer, schreibt sie aber nicht zurück:
-  `afa_rnd_jahre` ist bei **0 von 22** Objekten belegt.
-- **Die BMF-Detailrechnung bleibt im Modal.** Zurück ins Objekt kommt
-  nur `geb_ant`; Boden-, Ertrags- und Sachwert der Kaufpreisaufteilung
-  nicht.
-- **Die Wohnungen reisen zusammengefasst zum Piloten** — Status und
-  Zustand je Wohnung sieht er nicht.
-
-> **Ein Fehler in meinem eigenen Zusatz, vor dem Ausrollen gefunden**
-> (`v2067b`): ich übersetzte `"0"/"h"/"v"` in Klartext — das sind die
-> Stufen des *MFH-Konfigurators*. Die Objektfelder tragen **fünf**
-> Klartextstufen („Keine/Nie", „> 20 Jahre", „10 - 20 Jahre",
-> „5 - 10 Jahre", „< 5 Jahre"). Zwei Schreibweisen für dieselbe Sache,
-> und wer sie verwechselt, merkt es nicht.
-
-**TEILWEISE ERLEDIGT 09.10.2026 (`v2043`, `v2043c`) — der
-Portfolio-Export steht.** Neuer Endpunkt `GET /objects/portfolio-export`
-und der Menüeintrag *Aktionen → Ausgeben → Portfolio komplett*. Er gibt
-zwei Dateien aus einem Abruf: **JSON** (alles) und **CSV** (das, womit
-man rechnet).
-
-Am echten Abruf nachgemessen: 22 Objekte, 607 KB, je Objekt 279 Felder
-(`_thumb` entfernt), Pilot-Analyse aufgelöst samt Stempel, Ankauf-Stand,
-Lageklasse, Status.
-
-**Das Wissen geht mit** — das war Marcels Bedingung:
-
-| | |
-|---|---|
-| `lexikon.felder` | 225 Feld-Ids mit Beschriftung, Art und Auswahloptionen |
-| `lexikon.objektarten` | 11 Arten mit ihren Pflichtfeldern |
-| `lexikon.score_stufen` | die Schwellen 85/70/50/35 mit Worten |
-| `lexikon.hinweise` | 10 Einheiten-Fallen (EUR nicht Cent, `nkm` ist Monatsmiete, DSCR ist kein Prozent …) |
-| `wissen.projekt` | `bot-wissen.md`, 8.462 Zeichen |
-| `wissen.eigenes` | Marcels eigene Ergänzung, **einmal** |
-
-> **Ein Lexikon, das man nicht nachschlagen kann, ist ein
-> Inhaltsverzeichnis.** Im ersten Wurf kam `lexikon.felder` als LISTE
-> an (Schlüssel 0, 1, 2) — `felder.kp` ging ins Leere. Behoben in
-> `v2043c`: jetzt `felder.kp = { kind, label }`.
-
-**Noch offen:** die Exporte JE OBJEKT (PDF, Bankexport, xlsx/docx,
-`pdf-import`, `voice-import`) tragen die neuen Felder noch nicht. Die
-Tabelle unten gilt weiter — und die Abnahme bleibt die: **Marcel
-bekommt die Dateien und sagt, ob er damit arbeiten kann.**
-
-Marcel: „Wenn es da nichts gibt, dass wir die Exportdatei nochmal
-überarbeiten und die Schnittstelle, dann müssen wir das auf jeden Fall
-damit reinnehmen, ganz am Ende, dass alle Daten übergeben werden, dass
-wir das nicht vergessen."
-
-**Gemessen am 09.10.2026: er hat recht, es gibt keinen solchen Punkt.**
-Das Einzige ist der Rahmen unter **N4**: *„Feld-IDs bleiben alle
-bestehen"* — das schützt die **alten** Felder vor dem Reiter-Umbau und
-sagt **nichts** über die neuen. Ein Feld, das niemand in den Export
-einträgt, fällt lautlos heraus; genau das ist diese Woche zweimal
-passiert (vier stille Nutzlast-Verluste in `_buildAIPayload()`, und die
-Waise `rnd_eigen` in `v2023a`).
-
-**Dieser Punkt kommt bewusst ganz zum Schluss** — erst wenn die Felder
-stehen, sonst wird er zweimal gemacht.
-
-**Was durch muss (Stand 09.10.2026, fortschreiben):**
-
-| Woher | Felder |
-|---|---|
-| N59/N60.1 | `lageklasse` je Objekt (A/B/C/D), Herkunft und Datum |
-| N60.8/.9 (`v2021`/`v2022`) | je Einheit: Mietvertragsart (11 Arten mit § ), `mv_seit`, letzte Erhöhung, Kündigungsverzicht bis, Erhöhungstermin und -höhe, Staffel-/Indexstufen, Bilder je Wohnung, Zustand je Einheit |
-| N60.9 | `mv_in_mietentwicklung` — der Haken, der die Wohnung in die Mietentwicklung einrechnet |
-| `v2024`/`v2025` | Mietentwicklungs-**Modus** (`prog`/`detail`/`einheiten`) und die Herkunftszeile, inkl. **Indexmiete-Annahme** |
-| N60.11 (`v2019`) | `user_settings.eigenes_wissen` — gehört **nicht** in den Objektexport, aber in die Datensicherung |
-| N60.12 | Ankauf-Stand und Abweichung, falls gebaut |
-| N60.4/.4c | Stempel `_fuer` (`objekt_id`, `kuerzel`, `adresse`, `stand`, `abdruck`) an der Analyse |
-
-**Nachgetragen 09.10.2026 — Marcel will nicht nur Felder, sondern
-Dateien:** *„auch die Datenauswertung, Pilotanalyse, also das gesamte
-Projektwissen, was zu dem Objekt ist, und dass ich damit weiterarbeiten
-kann … dazu brauche ich dann halt auch eine aktuelle Datei oder mehrere
-Dateien von verschiedenen Objekten oder vielleicht auch einen gesamten
-Bestand … dass ich damit in meiner Portfolioanalyse weiterarbeiten
-kann."*
-
-Damit kommen **zwei Dinge** dazu, die über Felder hinausgehen:
-
-**(a) Die Auswertung gehört mit in den Export, nicht nur die Eingaben.**
-
-| Was | wo es heute liegt |
-|---|---|
-| Pilot-Analyse, volles JSON | `ai_analysis` am Objekt, 22 Schlüssel |
-| Stempel | `_fuer` = `objekt_id`, `kuerzel`, `adresse`, `stand`, `abdruck` |
-| Score und KPIs | gerechnet, nicht gespeichert → beim Export mit ausrechnen |
-| Cockpit-/Portfolio-Analyse | eigener Weg, muss mit |
-| Eigenes Wissen | `user_settings.eigenes_wissen` — gilt für alle Objekte, gehört **einmal** in die Datei, nicht je Objekt |
-
-> **Die Analyse ohne ihren Stempel zu exportieren wäre schlimmer als
-> sie wegzulassen.** Ein Urteil ohne Datum und Datenstand sieht aktuell
-> aus und ist es nicht — genau der Zustand, der die sieben identischen
-> Analysen (**N60.1b**) so teuer gemacht hat.
-
-**(b) Es muss eine Datei geben, die Marcel anfassen kann.**
-
-Nicht „der Export funktioniert", sondern: **eine Datei liegt vor, sie
-ist geöffnet worden, und die Zahlen darin stimmen mit der App überein.**
-
-- **Je Objekt** eine Datei, vollständig (Eingaben + Analyse + Stempel).
-- **Ein ganzer Bestand** in einer Datei, mit dem er in seiner eigenen
-  Portfolioanalyse weiterarbeiten kann. Das ist die eigentliche
-  Bestandsdatei — sie trägt alle Objekte eines Halters.
-- Format: **beides**. JSON trägt alles und ist die Wahrheit; eine
-  Tabelle (xlsx/csv) ist das, womit er tatsächlich rechnet. Die Tabelle
-  darf nur enthalten, was auch im JSON steht — zwei Exporte, die
-  auseinanderlaufen, sind schlimmer als einer.
-- **Abnahme:** die Dateien werden erzeugt, Marcel bekommt sie, und
-  **er** sagt, ob er damit arbeiten kann. Vorher ist der Punkt nicht
-  fertig.
-
-> **Warum das nicht „nur Export" ist:** eine Datei, die 90 % trägt,
-> merkt man erst, wenn man mit ihr rechnet — dann fehlt eine Spalte,
-> und die ganze Auswertung ist Makulatur. Deshalb steht die Abnahme an
-> der Datei, nicht am Knopf.
-
-**Prüfstrecke (die Kette, nicht die Datei):** je Objektart einmal
-PDF-Export, `pdf-import`, `voice-import`, xlsx/docx, Bankexport,
-Telegram-Werkzeuge — und **nachmessen, ob der Wert ankommt**, nicht nur
-ob der Export läuft. `tools/feld-waechter.mjs` ist der Einstieg; er
-braucht die neuen IDs.
-
-> **Die Regel dahinter:** ein neues Feld ist erst fertig, wenn es
-> **eingegeben, gerechnet, angezeigt, exportiert und von der KI gelesen**
-> werden kann. Vier von fünf sind ein halbes Feld.
+- **Entscheidung Marcel offen:** welche Spalten Investment-PDF und Bankexport tragen sollen.
+- Die Exporte JE OBJEKT (PDF, Bankexport, xlsx/docx, `pdf-import`, `voice-import`) tragen die neuen Felder noch nicht (Liste „Was durch muss“ in der Git-Fassung vom 09.10.2026).
+- Lücken: BMF-Detailrechnung bleibt im Modal (nur `geb_ant` kommt zurück); Wohnungen reisen nur zusammengefasst zum Piloten.
+- Prüfstrecke je Objektart (kommt der Wert an?), Einstieg `tools/feld-waechter.mjs`.
+- **Abnahme Marcel:** er bekommt die Dateien und sagt, ob er damit arbeiten kann.
 
 ---
 
@@ -5666,1322 +982,47 @@ Entscheidung, keine technische.
 
 ---
 
-#### N60.15 · Die geführte Eingabe ist überladen — Neubau des Dialogs
-**Bild: `Dateien/geführteeingabe.png`** (09.10.2026). Marcel:
-*„Das ist ja total überladen. Also alles auf einmal. Der Kunde weiß ja
-gar nicht, was er machen soll."*
+#### N60.15 · Die geführte Eingabe ist überladen — Rest (Erledigtes s. Fertig)
 
-**Gemessen am Bild und am Code** (`frontend/js/voice-import.js`,
-**11.798 Zeilen, 669 KB** — ein einziges Modul):
-
-| Was | Befund |
-|---|---|
-| Co-Pilot-Blasen | **drei gleichzeitig** sichtbar, dazu ein vierter Block „Jetzt dran" |
-| „Damit ich den richtigen Ton treffe" | steht **zweimal** auf dem Schirm — Z. 988 **und** Z. 7078 |
-| Antwortreihe | **fünf Chips aus zwei verschiedenen Fragen** nebeneinander: Marktpreisindikation / Erweiterte MPI (ein Angebot) und Erste Immobilie / Schon ein paar gemacht / Profi (die Erfahrungsfrage) |
-| Rechte Hälfte | leeres Feld, rund die halbe Breite ungenutzt |
-| „Jetzt dran · Objekt & Größe" | klein, unten, unter den Blasen — die eigentliche Aufgabe |
-| Fußzeile | „Weiß ich nicht" (`#vi-rf-nix`, Z. 9006) · „Normal" · „Fertig — zur Übersicht" |
-| Kopfzeile | zwei Schalter: `#vi-rf-fs` **Freisprechen** (Z. 8944, vorbelegt an) und `#vi-rf-alles` **Alle Felder** (Z. 8959) |
-
-**Was gebaut wird:**
-
-1. **„Freisprechen" fällt weg.** Marcel: *„Das Freisprechen, das kann
-   raus. Es gibt immer nur alle Felder."* Der Schalter verschwindet,
-   das Zuhören bleibt — es ist dann der Normalfall, kein Modus.
-2. **Eine Nachricht, eine Antwort.** Immer **nur eine** Co-Pilot-Blase,
-   dann die Antwort dazu. Was heute als Stapel kommt, wird eine Folge.
-3. **Die Tonfrage ist eine eigene Frage**, nicht ein Anhängsel in der
-   Antwortreihe der nächsten. Eine Frage, eine Chip-Reihe.
-4. **„Jetzt dran" wandert in den Chat.** Marcel: *„Er sagt dann nach ein
-   paar Sekunden: Ach so, wir stehen jetzt immer noch im Objekt … Ich
-   bräuchte jetzt von dir Wohnfläche, Zimmer und Vollgeschosse."* Die
-   Fußzeile mit „Weiß ich nicht / Normal / Fertig — zur Übersicht"
-   entfällt; was sie konnte, sagt der Co-Pilot im Verlauf.
-5. **Mehr Platz.** Die leere rechte Hälfte und die weggefallenen
-   Fußzeilen gehen an die Felder (`Alle Felder`) und an den Verlauf.
-6. **Die Eingabetiefe kommt schrittweise** und wird erklärt, statt als
-   fertige Stufenleiste dazustehen.
-7. **Der Co-Pilot muss erklären können, was er tut.** Jede Frage soll
-   auf Nachfrage begründet werden — über die vorhandene
-   OpenAI-Schnittstelle, nicht über hinterlegte Textbausteine.
-
-**Prüfstrecke, die Marcel ausdrücklich verlangt:**
-- mehrere **Eingabetiefen**, nacheinander durchgespielt
-- mehrere **Objekte**: eines einfach, eines mit Marktpreisindikation,
-  eines mit einer tieferen Stufe
-- die **Kombinatorik** — kommt bei jeder Kombination alles an?
-- **ein Objekt mit schon vorhandenen Daten.** *„Dann aber auch, wenn
-  schon Daten drinne stehen und du anfängst, dass die Daten schon da
-  sind. Das ist wichtig."*
-- danach **Messkabine: Handy und Tablet** — ob der Verlauf dort
-  bedienbar und sauber gerendert ist
-
-> **Warum das kein Optik-Punkt ist:** ein Dialog, der alles gleichzeitig
-> zeigt, führt nicht — er listet auf. Marcel wusste nur deshalb, was zu
-> tun ist, weil er den Auftrag selbst gegeben hat. Das ist der härteste
-> Befund an dieser Stelle und er steht wörtlich im Auftrag.
-
-> **Risiko, vor dem Anfangen gemessen:** 11.798 Zeilen in einer Datei,
-> und der Dialog ist über mindestens sechs weit auseinanderliegende
-> Stellen verteilt (988, 1740, 7030, 7078, 8944, 9006). Ein Umbau in
-> Kleinstschritten wird hier unübersichtlich — das wird **ein** Paket,
-> mit Prüfstrecke vor der Auslieferung.
-
-**Stand 09.10.2026 — Punkte 1, 2, 4, 6 und 7 stehen** (v2049–v2054,
-Commits `fcc866d8`, `121020e9`, `2fbcc881`, `49ec9858`, `8d9cfb23`,
-`80216985`, `5d32215d`, alles auf Staging gemessen):
-
-| Paket | Was | Nachweis |
-|---|---|---|
-| `v2049` | Freisprechen-Schalter weg (Feld bleibt versteckt, zwei Leser), Fußzeile von drei Knöpfen auf **0 px**, „Fertig" in die Kopfzeile, die **dritte** Frage-Kopie in `#vi-rf-dran` entfernt | Fußzeile `#vi-rf-neben` gemessen 1314×**0** |
-| `v2050` | Reihenfolge: Begrüßung → Antwort → Bestätigung **und** Ansage in **einer** Blase → Frage. Markt­angebot und Vorlaufkarte wandern hinter den Einstieg | vorher 2 Blasen = 224 von 239 px vor der ersten Frage |
-| `v2050a` | Die erste Frage stand **zweimal**, eine davon **vor** der Antwort. `_rfModusSetzen` → `_rfFrageNochmal()` nur noch, wenn schon gefragt wurde (`_rf.gefragt` aus `_rfFrageAnheften`) | Verlauf: 5 Blasen → 4, abwechselnd |
-| `v2051` | Der feste Fragestreifen erscheint nur, **wenn die Frage-Blase nicht im Bild ist** (`IntersectionObserver`, Rückfall = v1619-Verhalten) | löst den Widerspruch v1619 ↔ N60.15, statt eine Seite zu opfern |
-| `v2052` | **„erklär mir das" hing nur am Chip.** Getippt ging der Satz an die freie KI-Frage — bei der *Adressfrage* kam eine **DSCR**-Erklärung. Der Co-Pilot empfiehlt diesen Satz dreimal selbst (Z. 994, 1094, 1100) | Muster gegen 24 Sätze geprüft: 14/14 gefasst, 10/10 durchgelassen |
-| `v2053` | Schalter „Alle Felder" weg — der Weg dahin (Angebot am Etappenende, Chip `tiefe`) bleibt | `vi-rf-alles` 3× → 0×, `_rfTiefeStarten` 3 → 2 Aufrufer |
-| `v2054` | **Die größte Lärmquelle:** „Das nehme ich gleich mit …" meldete auch Unverändertes (Liste wuchs mit jeder Antwort), und die Adressbestätigung kam **wortgleich** wieder, weil `_rfAdresseAntwort` `adresseGeprueft` bei *jeder* Antwort zurücksetzte | Läufer: 3. und 4. Antwort melden nur noch Neues |
-
-**Noch offen:**
-- **Punkt 3 (Tonfrage als eigene Frage)** ist nur halb: sie steht jetzt
-  allein, aber weiter als `.vi-rf-wozu`-Kasten **in** der Begrüßungsblase
-  statt als eigene Frage.
-- **Vorhandene Daten werden erkannt, aber nicht angesagt.** Gemessen am
-  09.10.2026 mit korrekt übergebenem `vorlaufFelder`-**Array** (ein
-  Objekt wäre der falsche Typ — `_rfVorbefuellt` iteriert mit `forEach`):
-  der Lauf zählt **16 statt 17** Fragen und setzt das ✓ an der
-  Wohnfläche, **sagt aber kein Wort** davon. `vorTxt` („Aus *Import*
-  stehen schon *n* Angaben") bleibt leer, also liefert `_rfVorbefuellt`
-  ein leeres Objekt. **Die Ursache ist nicht gemessen** — der Katalog
-  führt die Ids offenbar, sonst gäbe es das ✓ nicht. Genau Marcels
-  *„wenn schon Daten drinne stehen … das ist wichtig."*
-- **Bei jeder Antwort folgen weiter zwei bis drei Co-Blasen**
-  (Übernahme-Meldung, Hinweis zur Eingabetiefe, dann die Frage). Die
-  Regel „eine Nachricht, eine Antwort" gilt am Einstieg, noch nicht im
-  Lauf.
-- **Prüfstrecke unvollständig:** durchgespielt sind *Profi* und *Erste
-  Immobilie* am leeren Objekt und der Wiederkehrer mit Vorbefüllung.
-  **Nicht durchgespielt:** Marktpreisindikation, tiefere Stufe, die
-  Kombinatorik.
-
-**Messkabine 09.10.2026 — und sie hat einen Priorität-1-Fehler gefunden**
-(`v2055`–`v2059`, Commits `c4efaf4b`, `e0ec32e0`, `fa749a4b`, `18044d97`,
-`6bb056da`, `3babd58a`, `cfe09ee4`):
-
-> **Auf dem Handy war die Tonfrage nicht zu beantworten.** Alle drei
-> Chips waren verdeckt — und `_rfEinstieg` wartet auf genau diese
-> Antwort. Der Lauf hing am zweiten Bildschirm fest.
-
-Gemessen wurde nicht „sieht eng aus", sondern je Knopf: liegt er auf
-**seinem eigenen Mittelpunkt** in `elementsFromPoint` obenauf? Der erste
-Läufer meldete „3 von 3 sichtbar" — über Geometrie. Keiner war
-anklickbar.
-
-| Paket | Befund | Fix |
-|---|---|---|
-| `v2055` | `#vi-rf-mikro` (`sticky`, `bottom:44`) und `.vi-rf-zeile` (`sticky`, `bottom:0`) klebten über der Chip-Leiste, sobald `#vi-frage` scrollte (705 px Inhalt in 510 px) | Bühne darf schrumpfen, Chip-Leiste klebt mit (`bottom:130px`) |
-| `v2055a` | **Mein eigener Fehler:** die neue Untergrenze von 110 px drückte den Chat von 288 auf **66 px** | `min-height:28vh` statt fester Zahl |
-| `v2055b` | Auf 320×565 lag der dritte Chip außerhalb der scrollenden Leiste (217 px nötig, 145 da) | `max-height:min(230px,40vh)` |
-| `v2056` | **601–767 px komplett unbedienbar** (0/3 Chips, auch Eingabe und Übernehmen): die Bühne fiel auf **Höhe 0**, ihr Grid (220+180 px) quoll mit `overflow:visible` über alles | Handy-Block greift auch bei `(max-height:560px)` |
-| `v2057` | Nebenwirkung von `v2056`: Breiten-Regeln auf breiten flachen Fenstern — der Vorspann (231 px) zwang die Chips (424 px) in zwei Zeilen, der Mikrofonkasten brach um | Gegenblock nimmt nur die Breiten-Regeln zurück |
-| `v2058` | Bei 666×373 passen 191 px Bedienung nicht in 145 px Port, und **`sticky` schafft keinen Platz** | Chip-Leiste legt sich mit `z-index:7` über den Pegel |
-| `v2059` | **iPad hochkant 767×757: 1 von 3 Chips** — dieselbe Grid-Ursache, nur an der Breite | Handy-Block bis **900 px** (dort ist die Bühne ohnehin schon einspaltig, Z. 3971) |
-
-**Abnahme, 13 Größen im gleich-Origin-iframe gemessen** — je Größe:
-Chips auf eigenem Mittelpunkt, Eingabefeld, Übernehmen, seitlicher
-Überlauf, Chathöhe vor und nach der Tonwahl:
-
-| | vorher | nachher |
-|---|---|---|
-| 320×565 · 374×664 · 390×757 · 430×757 | 0–2 von 3 | **3/3** |
-| 666×373 · 843×387 · 932×427 (quer) | 0 von 3 | **3/3** |
-| 766×494 · 767×757 (Tablet) | 0–1 von 3 | **3/3** |
-| 1023 · 1180 · 1440 · 1920 | 3/3 | **3/3** (unverändert) |
-
-Chat überall 61–260 px statt 66; kein seitliches Scrollen; Eingabefeld
-und Übernehmen überall erreichbar.
-
-> **Was dabei NICHT geprüft ist, und das gehört dazu:** Farbkontraste —
-> das Browserfenster stand im Hintergrund, und die Messkabine sagt dann
-> selbst, dass nur Geometrie gilt (`getComputedStyle` friert Übergänge
-> ein). Ebenso ungeprüft: Touch-Gesten, Bildschirmtastatur,
-> Tastaturnavigation. Und **über 757 px Höhe konnte nicht gemessen
-> werden** — so hoch ist das Browserfenster.
+- Punkt 3: Tonfrage steht allein, aber als `.vi-rf-wozu`-Kasten **in** der Begrüßungsblase statt als eigene Frage.
+- Punkt 5 (mehr Platz für Felder und Verlauf) nicht als erledigt ausgewiesen.
+- Vorhandene Daten werden erkannt (✓), aber nicht angesagt: `vorTxt` bleibt leer, `_rfVorbefuellt` liefert ein leeres Objekt — Ursache nicht gemessen.
+- Im Lauf folgen je Antwort weiter zwei bis drei Co-Blasen.
+- Prüfstrecke: Marktpreisindikation, tiefere Stufe, Kombinatorik nicht durchgespielt; Kontraste, Touch, Bildschirmtastatur und Höhen über 757 px ungeprüft.
 
 ---
 
-#### N60.17 · ✅ DAS PRÜFWERKZEUG STEHT — am Code nachgemessen 12.10.2026
+#### N60.17 · Responsive-Durchgang der ganzen App — Rest (Werkzeug und erste Durchgänge s. Fertig)
 
-> Alles in `frontend/messkabine.html` (nicht in `tools/`):
->
-> ```
->   :1753  pruefeAnsicht(breite, hoehe, vorher, name, layout, extra)
->   :1512  apQuerScroller   + :1529 apQuerUngewollt (Absicht --dpm-schiene)
->   :1475  apUeberlauf      echter Ueberlauf vs. von Scrollern gefangener
->   :1792  pruefSelbsttest  prueft den Pruefer gegen eine kuenstliche Decke
->   :172   GERAETE          8 Geraete, 360 bis 1280 px
-> ```
->
-> `pruefeAnsicht` scrollt in bis zu 16 Abschnitten, misst je Abschnitt
-> verdeckte und erdrückte Elemente über `elementsFromPoint` und prüft
-> **jeden Verdacht zweimal nach** (zentriert und am Seitenanfang).
->
-> **Offen bleibt der Durchgang selbst**, nicht das Werkzeug. Und zwei
-> Breiten fehlen in `GERAETE`: **320 px und 1920 px**.
+- Marktbericht mit echt abgerufenem Bericht und `#genProgress` nur als Gerüst geprüft.
+- `GERAETE` in `messkabine.html` ohne 320 und 1920 px (Stand 12.10.2026).
+- Touch-Gesten, Bildschirmtastatur, Tastaturnavigation, Querformat, 2560 px, Höhen über 757 px.
+- Übrige Punkte des Master-Prompts: Anmeldung/Registrierung, Upload-Flächen, Lade-/Fehler-/Leerzustände, Diagramme, Kanban, Einstellungen, Dialoge.
+- 25 Breakpoints: zusammengehörige Paare auf dieselbe Grenze legen, wenn eine Datei ohnehin angefasst wird.
 
-**Der ursprüngliche Text:**
+#### N60.29 · Kontrast-Rest nach `v2101d` (Umsetzung s. Fertig)
 
-#### N60.17 · Responsive-Durchgang der ganzen App (Master-Prompt)
-
-### ✓ DATENAUFNAHME ABGEARBEITET 11.10.2026 (`v2117`–`v2117b`)
-
-**Marcel:** *„Für mich passt die Datenaufnahme-Karte immer noch nicht. Hab
-in der Messkabine gerade iPad mini auf und es ist alles verzerrt … In der
-Ansicht iPhone 14 Pro Max ist der Abrufen-Button riesig."*
-
-Er hatte in beiden Punkten recht. Zwei echte Defekte, beide gemessen:
-
-#### 1 · Drei von vier Pre-Flight-Kacheln waren auf jedem Tablet unerreichbar
-
-Bei 767 px gemessen:
-
-```
-.dp-pf-row  34-729  wrap=nowrap  4 Kinder
-  Kind 1      34-729
-  Kind 2     735-1431   <- draussen
-  Kind 3    1437-2132   <- draussen
-  Kind 4    2138-2833   <- draussen
-```
-
-`.dp-pf-scroll` trägt `overflow:hidden` — man sieht den Überlauf nicht
-einmal.
-
-> **Es war eine Lücke zwischen zwei Grenzen, kein falscher Wert.**
-> `width:100%` gilt ab 900 px abwärts, `flex-wrap:wrap` erst ab 640 px
-> abwärts. Dazwischen gilt das eine ohne das andere — und genau dort
-> liegen iPad mini (768) und iPad Pro 11″ (834).
-
-Der 900er-Block sagt seit `v1941d` „untereinander" und meint es auch; er
-hat es nur der **Reihe** nie gesagt, sondern nur der Leiste und der
-Kachel. Dazu die Tablet-Stufe aus Marcels Prompt („ein bis zwei
-Spalten"): 641–900 px zwei Spalten statt einer langen Säule.
-
-#### 2 · Der Abrufen-Knopf war eingerückt UND randvoll
-
-Bei 430 px: `.dp-pf-tile` 398×44 **@16**, `#oab-run` 356×50 **@51** —
-weder so breit wie die Kacheln noch an ihnen ausgerichtet. Ursache war
-nicht der Knopf, sondern seine Hülle `span.dp-pf-rz` mit
-`padding:0 20px` und `margin-left:14px` aus der Schreibtisch-Fassung.
-
-> **Und meine erste Korrektur griff nur zur Hälfte:** `padding` und
-> `width` wirkten, `margin-left` nicht. Der Walker fand den Grund —
-> `#oab-bar.dp-pfbar .dp-pf-qr + .dp-pf-rz` hat eine Klasse mehr und
-> gewinnt; ein Medienblock ändert daran nichts. *Eine Regel, die zur
-> Hälfte greift, ist schwerer zu sehen als eine, die gar nicht greift:
-> die Hälfte, die wirkt, sieht aus wie Erfolg.*
-
-#### Abnahme, sechs Geräte, nach den Korrekturen
-
-| Gerät | Kachel | Knopf | bündig | draußen | abgeschnitten |
-|---|---|---|---|---:|---:|
-| iPhone SE 360 | 328@16 | 326@17 | ja | 0 | 0 |
-| iPhone 14 390 | 358@16 | 356@17 | ja | 0 | 0 |
-| iPhone 14 Pro Max 430 | 398@16 | 396@17 | ja | 0 | 0 |
-| iPad mini 767 | 345@34 *(2 Sp.)* | 693@35 | ja | 0 | 0 |
-| iPad Pro 11 833 | 377@34 *(2 Sp.)* | 759@35 | ja | 0 | 0 |
-| Desktop 1180 | 102@536 | 80@1071 | *Zeilenmodus* | 0 | 0 |
-
-### ⚠ Zweimal hat mein eigenes MESSGERÄT falschen Alarm geschlagen
-
-**Erster Entwurf:** meldete vier Reiter als schwer beschädigt (Objekt,
-Steuer, Bewertung, Deal-Aktion, bis zu 129 „raus" und 64
-„abgeschnitten"). Er brach beim ersten `overflow:hidden` ab, **ohne zu
-prüfen, ob davor ein scrollbarer Kasten liegt.** Mit der Korrektur sind
-es **null**: Steuer wischt in `.ytf-quick-wrap`, Bewertung in
-`.bc-svg-wrap`.
-
-**Zweiter Entwurf:** meldete zwei `img` als „teilweise abgeschnitten".
-Sie sitzen in `.dab-bp-logo`, einem eng anliegenden Logo-Rahmen mit
-`overflow:hidden`, und gehören zu Karten in den Schienen
-`#dab-rail-finanzierung` / `#dab-rail-gutachter`. Der Prüfer erreicht die
-Schiene nie, weil er am Logo-Rahmen stehenbleibt.
-
-> *Überlauf innerhalb eines Wischkastens ist kein Befund, und ein Logo,
-> das in seinen eigenen Rahmen beschnitten wird, auch nicht.* Beide Male
-> hätte ich ohne die Gegenprobe „behoben", was nicht kaputt war.
-
-### Der strukturelle Befund dahinter
-
-Die App benutzt **25 verschiedene Breakpoints** — 900 px (95×), 720 (43×),
-768 (39×), 700 (28×), 1100 (23×), 640 (22×), 600 (21×), 1024 (21×), 760,
-800, 560, 480 …
-
-> **Bei 25 Grenzen sind Lücken wie 641–900 unvermeidlich:** eine Regel
-> auf 900 und ihr Gegenstück auf 640 lassen ein 260 px breites Band, in
-> dem die Hälfte gilt. Das ist die Ursache, nicht der Einzelfall.
-> Zusammenlegen geht nicht in einem Zug — aber jedes Paar, das
-> zusammengehört, gehört auf dieselbe Grenze.
-
-### Noch nicht geprüft (ehrlich gekennzeichnet)
-
-Gemessen sind **die Pre-Flight-Leiste und die neun Reiter der
-Datenaufnahme** auf sechs Breiten. **Nicht** geprüft: Cockpit, Portfolio,
-Alle-Objekte, Anmeldung, Dialoge, Quick-Check, Marktbericht, Querformat,
-2560 px, Tastaturnavigation.
-
-Marcel, 09.10.2026, Master-Prompt: vollständiger Responsive-, UI/UX- und
-Funktionalitätscheck über alle Ansichten und zehn Viewport-Größen, mit
-direkter Umsetzung statt Fehlerliste.
-
-**Prüfmatrix (das Ansichten-Register kennt vier):** `single` ·
-`dashboard` (Cockpit) · `all` (Alle Objekte) · `strategie`.
-Dazu die iframes **Quick-Check** und **Marktbericht** — eigene
-Dokumente, also eigene Durchgänge.
-
-**Erledigt (v2060–v2060c, Commits `c46820a3`, `10a10793`, `4b380cc7`,
-`bdcef11f`):** breite Tabellen werden auf dem Handy zu Karten.
-
-| Ansicht | geprüfte Bedienelemente | nicht erreichbar | echter Überlauf |
-|---|---:|---:|---:|
-| `single` | 298 | **0** | 0 |
-| `dashboard` | 102 | **0** | 0 |
-| `all` | 19 | **0** | 0 |
-
-**Kein funktionaler Fehler.** Was blieb, waren fünf Tabellen mit bis zu
-**2,8-fachem** Querlauf. Jetzt: bis 600 px Karten (4 Spalten +
-Schalter), 601–1200 px Tabelle ohne `min-width`, darüber unverändert.
-**Querscroller über acht Breiten von 320 bis 1920 px: 0.**
-
-`v2060a` nimmt **Eingabetabellen** aus (`#oe-gewerke` 23 Felder,
-`.ytf-table` 45) — der Kartenmodus hätte sie zerquetscht, und genau das
-hatte `v1881` schon einmal gemessen und behoben.
-
-**Nachgelegt am selben Tag (v2061–v2061b): die drei offenen Ansichten
-sind geprüft, und der Prüfer wohnt jetzt in der Messkabine.**
-
-| Dokument / Ansicht | Weg dorthin | 320 | 390 | 768 |
-|---|---|---|---|---|
-| `strategie` | `PortfolioStrategie.open()` (nicht `setMainView`) | 21 ✔ | 15 ✔ | 10 ✔ |
-| **Quick-Check** | `messkabine.html?ziel=/quickcheck-app.html` | 38 ✔ | 41 ✔ | 41 ✔ |
-| **Marktbericht** | `?ziel=/marktbericht-app/index.html` | 11 ✔ | 13 ✔ | 16 ✔ |
-
-(Zahl = geprüfte Bedienelemente, ✔ = 0 nicht erreichbar, 0 Überlauf,
-0 Querscroller.)
-
-**`DPM.pruefeAnsicht(breite, hoehe, oeffner, name)`** und
-**`DPM.pruefSelbsttest()`** stehen jetzt dauerhaft in
-`frontend/messkabine.html` — mit den vier Artefakten dokumentiert, die
-sie nicht mehr melden.
-
-> **Der Selbsttest hat sich sofort bewährt: er ist beim ersten Lauf
-> durchgefallen.** Er wählte als Testknopf einen aus dem eingeklappten
-> Seitenmenü bei **x = −286**; `elementsFromPoint` gibt dort ein leeres
-> Array, die Decke konnte nichts verdecken. Der Mangel lag in der
-> Opferwahl, nicht im Prüfer — gefunden, **bevor** eine grüne Messung
-> auf ihm aufgebaut wurde (`v2061b`). Danach: ohne Decke 0, mit Decke
-> genau 1, nach Entfernen wieder 0.
-
-**Die weiteren iframe-Zustände sind geprüft (v2062–v2063):**
-
-| Zustand | Weg dorthin | 320 | 390 | 768 |
-|---|---|---|---|---|
-| Marktbericht · Standort-Finder | `_lfSetView('finder')` | ✔ | ✔ | ✔ |
-| Marktbericht · fertiger Bericht | `#resultBody` entsperren | ✔ | ✔ | ✔ |
-| …**mit langen Texten und großen Zahlen** | Platzhalter gefüllt | ✔ | ✔ | ✔ |
-| Quick-Check · `#transfer-modal` | `.show` (Z. 2042) | ✔ | ✔ | – |
-| Quick-Check · `#api-modal` | `.show` | ✔ | ✔ | – |
-| Quick-Check · `#qc6-credit-modal` | `.show` | – | ✔ | – |
-
-Alle Modal-Boxen passen vollständig ins Bild, **alle Knöpfe treffen**.
-Der Bericht wächst mit langen Texten in die **Höhe** (1321 → 1984 px bei
-390 px Breite), nicht in die Breite: 0 Überlauf, 0 seitliches Scrollen.
-
-Zwei Dinge, die dabei **keine** Befunde waren, aber danach aussahen:
-- **`#mainTabs` im Marktbericht** hat fünf Knöpfe (PDF-Export, Dunkel,
-  Schließen …) mit **Höhe 0** — alle mit `display:none` inline und dem
-  Vermerk `v647-mb hidden`. Ausdrücklich abgeschaltet, weil die Hauptapp
-  die Leiste stellt. Deshalb führt auch **kein Knopf zum
-  Standort-Finder**; er ist nur programmatisch erreichbar.
-- **Vier „erdrückte" Knöpfe im Quick-Check** waren Knöpfe geschlossener
-  Modals. Sie tragen `display:flex` — ihr *Modal* trägt `display:none`.
-
-> **Der Prüfer hat durch beides dazugelernt** (`v2062`/`v2062a`):
-> *erdrückt ist nicht abgeschaltet* (Höhe 0 bei sichtbarem `display` ist
-> ein Befund, bei `display:none` nicht), und *das eigene `display` sagt
-> nichts über die Vorfahren* (`offsetParent === null` entscheidet).
-> `v2062b` lässt den Selbsttest sein Opfer **suchen** — am Seitenanfang
-> des Quick-Checks war von 23 Knöpfen keiner tauglich, und ein
-> Selbsttest, der sich selbst überspringt, wird nach dem dritten Mal
-> ignoriert.
-
-**Noch offen in N60.17:**
-- **Der Marktbericht mit echten Daten.** Geprüft ist das Gerüst mit
-  gefüllten Platzhaltern, nicht ein wirklich abgerufener Bericht (das
-  kostet Kerosin). `#genProgress` (Fortschritt) ist ebenfalls nur als
-  Gerüst gesehen.
-**Farbkontraste gemessen (10.10.2026, Fenster im Vordergrund — „voll
-messbar", Kabinen-Selbsttest 6/6).** `v2064` gruppiert nach **Stellen**
-statt Elemente, `v2065` erkennt Pseudoelemente als Grund.
-
-| Ansicht | Paare | Stellen | davon unter 3,0 |
-|---|---:|---:|---:|
-| Objekt (`single`) | 57 | **22** | 5 |
-| Cockpit (`dashboard`) | 120 | **38** | 19 |
-| Alle Objekte (`all`) | 20 | 7 | **0** |
-
-> **Die Stellenzahl ist die nützliche.** 57 Paare klangen nach viel und
-> waren im ersten Blick zwei Regeln — `kontrastN` allein schätzt den
-> Aufwand um das Zwanzigfache falsch.
-
-**Das Muster ist eindeutig: Gold als TEXTFARBE auf hellem Grund.**
-
-| Stelle | Schrift | Kontrast | Farbe auf Grund |
-|---|---|---:|---|
-| `span.ds2-tag` (8×) | 9 px | **2,06** | Gold `#C9A84C` auf Creme |
-| `div.card-title` (6×) | 9,5 px | **2,29** | Gold auf Weiß |
-| `span.badge` (7×) | 8,5 px | **1,71** | helles Gold auf Creme |
-| `div.sk-k-v` (2×) | 15 px | **2,23** | Gold auf Weiß |
-| `span` „Won" (8×) | 9 px | 3,73 | Weiß auf Grün `#3D9641` |
-
-Nötig wären 4,5 (bzw. 3,0 ab 24 px). **Das ist keine Geschmacksfrage
-mehr** — bei 9 px und 2,06 ist der Text nicht lesbar.
-
-> ### ERLEDIGT 10.10.2026 — `v2089` + `v2090`
->
-> **Gemessen nach dem Eingriff: von 12 Mängelgruppen (21 Elemente) sind
-> 3 Gruppen (4 Elemente) übrig** — und die drei Reste sind genau die
-> zwei Goldtöne, die Marcel entscheiden muss (siehe N60.29 darunter).
->
-> **`v2089` — das DS2-Etikett, in ZWEI Fassungen.** `.ds2-tag` trug Gold
-> auf 14 %-Gold über Weiß, k=2,06. Die zweite Fassung `.ct-pro .ds2-tag`
-> trug `#9a7f33` auf demselben Grund (k=3,47), **mit `!important`, später
-> und spezifischer** — sie hätte die Korrektur der ersten still
-> ausgehebelt. Gefunden nur, weil nach dem ersten Eingriff ALLE
-> `ds2-tag`-Regeln gegreppt wurden. Beide tragen jetzt Gold auf Tinte
-> `#1A1714`, **k=7,81**, nachgemessen an 102 Stellen über sechs Reiter
-> und fünf Chrome-Fassungen (Vorgabe plus die vier Hell-Themes, die ihre
-> eigene Fassung behalten: `#3B352D` auf `#F2EFE9`, k=10,56).
->
-> **`v2090` — bei vier von sechs Stellen war die DECKKRAFT der Fehler,
-> nicht die Farbe.** Das ist der eigentliche Befund dieses Punkts:
->
-> | Stelle | war | ist | Ursache |
-> |---|---:|---:|---|
-> | `.hint` u. 3 Geschwister | 3,52 | 4,84–5,22 | `rgba(42,39,39,.55)` |
-> | `.qc-hint-inline` | 3,21 | 4,97 | dieselbe, auf 0,50 |
-> | `.dk-seg-titel` | 3,23 | 6,1 | `color-mix(gold 55%)` |
-> | `.dk-seg` | 3,83 | 6,1 | `color-mix(gold 62%)` |
-> | `.sbc-won-ribbon` | **2,78** | 4,59 | fremdes Grün |
-> | `.dpl-schalter-k` | 3,00 | 4,56 | `#9A9287` |
->
-> **Eine Deckkraft ist eine Farbentscheidung, die niemand als solche
-> trifft.** `rgba(42,39,39,.55)` liest sich wie „die Tinte, nur leiser" —
-> gerechnet ist es `rgb(138,136,136)`. Die Absicht der Zeile („Hinweis­texte
-> nie weiß") war richtig; geprüft wurde nie, was dabei herauskommt. Beim
-> `.hint` entschied die **dunkelste** der fünf Flächen, auf denen er sitzt:
-> 0,65 besteht auf vier und fällt auf `--surface2` durch, 0,68 hält überall.
->
-> **Der Mittelwert hat das Won-Band verharmlost.** Die Kabine mittelt
-> einen Verlauf zu einer Farbe und meldete 3,73. Am **hellen Ende** steht
-> derselbe weiße Text, und dort waren es **2,78** — die schlechteste
-> Stelle der ganzen App, und die am wenigsten auffällige im Messprotokoll.
-> Das Band trug `#4CAF50 → #2e7d32`, zwei Material-Design-Grüns; das
-> Marken-Grün ist `#3FA56C`. Jetzt Marken-Grün −20 % / −46 %, beide Enden
-> einzeln nachgemessen (4,59 / 7,24). **Grün bleibt Grün** — CLAUDE.md
-> verbietet, Statusfarben zu *tokenisieren*, nicht sie lesbar zu machen.
->
-> **Ein Fehler an meinem eigenen Messgerät, der dabei auffiel:**
-> `DPM.effGrund` gibt `{r,g,b,a,quelle}` zurück, **kein `.rgb`**. Vier
-> Suchläufe lasen `eg.rgb`, bekamen `undefined` und meldeten „null
-> Elemente auf grünem Grund", während `messe()` im selben Dokument acht
-> meldete. Ich habe daraufhin **zuerst `messe()` verdächtigt** — es war
-> mein Zugriff, und die acht Bänder waren die ganze Zeit da. Ein
-> Suchlauf mit null Treffern muss sagen, wie viele Elemente er geprüft hat.
-
-#### N60.29 · ENTSCHIEDEN UND UMGESETZT 11.10.2026 (`v2101`–`v2101d`)
-
-> ### Marcels Entscheidung (11.10.2026): *„und bitte kontrast vorschlag so umsetzen."*
->
-> Gemeint ist der Vorschlag aus `frontend/kontrast-cockpit.html`:
-> **Weg (a)** für Zahlen und Tabellen, **Weg (c)** für Abzeichen.
->
-> | | Start | nach `v2101d` |
-> |---|---:|---:|
-> | Gruppen unter 4,5 | 42 | **9** |
-> | Stellen | 234 | 143 |
-> | **Gruppen unter 3,0** | **19** | **1** |
-> | schlechteste | 1,71 | **2,29** |
->
-> ### Zwei Fallen, beide VOR dem Ausrollen gefunden
->
-> **1 · Selektoren wären falsch gewesen.** Mein erster Generator legte die
-> gemessenen Träger-Selektoren mit `!important` um. Beim Gegenlesen der
-> erzeugten Regeln fiel auf: `#dashboard-main .ov-v` bekam **vier**
-> `color`-Regeln, weil dieselbe Klasse je nach Lage grün **oder** rot ist
-> — die letzte gewinnt. **Grün und Rot wären zu einer Farbe verschmolzen.**
->
-> Die Farben kommen nämlich als **Inline-Stil** aus `dashboard.js`
-> (`style="color:var(--dp-green)"`). Eine Selektorregel kann sie gar nicht
-> unterscheiden.
->
-> **2 · Die Variablen tragen beides.** `--dp-green/-gold/-red` färben Text
-> **und** füllen Balken: `catBarColor()` schreibt `background:`,
-> `tierOf()` und `colByVal()` schreiben `color:`. Ein Wechsel an der
-> Variablen hätte die Balken mitgezogen.
->
-> ### Deshalb: eigene Textvariablen
->
-> | Variable | Wert | war | ist |
-> |---|---|---:|---:|
-> | `--dp-green-txt` | `#2e784f` | 3,08 | 5,36 |
-> | `--dp-red-txt` | `#a25646` | 4,28 | 5,31 |
-> | `--dp-gold-txt` | `#7d682f` | 2,23 | 5,26 |
-> | `--dp-muted-txt` | `#6f6b63` | 2,94 | 5,17 |
-> | `--c-acc2-txt` | `#776940` | 1,71 | 4,93 |
-> | `--c-accd-txt` | `#7d682f` | 3,20 | 5,39 |
->
-> Dazu direkt abgedunkelt, weil **nachgezählt nur** als `color:` benutzt:
-> `--c-greenl` (27 Träger), `--c-redl` (54), `.gempty`, `.dp-pp-s`,
-> `.dp-pp-hint`.
->
-> **Gold geht NICHT über `--wl-c9a84c`:** der Token ist der Akzent des
-> Mandanten und gehört den Flächen.
->
-> ### Der gestaffelte Rückfall
->
-> Die Regeln im JS-Stilblock gelten **dokumentweit**, die Variablen stehen
-> nur unter `#dashboard-main`. Deshalb:
->
-> ```css
-> var(--dp-gold-txt, var(--wl-c9a84c,#C9A84C))
-> ```
->
-> Im Cockpit gilt der Textton, überall sonst bleibt das Gold — *ein
-> pauschales Abdunkeln hätte Stellen getroffen, die niemand gemessen hat.*
->
-> ### Weg (c) für die Abzeichen
->
-> `.badge`, `.shr-stub-lab` und **`.sk-art`** bekommen dunklen Grund und
-> behalten ihren Ton — wie `.ds2-tag` in `v2089`. `.sk-art` ist eine
-> **Pille** (`border-radius:999px`, Rand, Polsterung), also ein Abzeichen
-> und kein Fließtext.
->
-> ### ⚠ Dabei fiel ein Fehler im MESSGERÄT auf (`v2092g`)
->
-> `span.shr-stub-lab` trug `background: rgb(26,23,20)` — deckend, dunkel,
-> direkt am Element. `effGrund` meldete trotzdem **Weiß** und damit 1,88
-> statt rund 8.
->
-> **Ursache:** die `v2065`-Schleife fragte bis zu drei Vorfahren nach
-> einem Pseudoelement-Grund und kehrte beim ersten Treffer zurück —
-> **bevor** der eigene Hintergrund des Elements angesehen wurde.
->
-> > Physikalisch ist das verdreht: das `::before` eines Vorfahren liegt
-> > über **dessen** Hintergrund, aber **unter** dem eigenen Hintergrund des
-> > Kindes. Wer zuerst den Vorfahren fragt, malt in der falschen
-> > Reihenfolge.
->
-> **Das betraf jede Messung an einem Element mit eigenem deckenden Grund.**
-> Bei `.ds2-tag` in `v2089` kam die richtige Zahl nur heraus, weil die
-> Prüfung dort `cs.backgroundColor` selbst gelesen hat und nicht
-> `effGrund`. Nach der Korrektur meldet `effGrund` `Quelle: "eigener
-> Grund"` — und die Abzeichen sind aus der Mängelliste verschwunden.
->
-> ### Was noch fällt (alles Beinahe-Treffer)
->
-> 115× `rgb(113,108,102)` bei **3,78** — ein zusammengerechneter Wert, kein
-> Literal. Dazu 9× Gold bei 3,20, 9× Grün bei 3,01–3,08, 4× Rot bei
-> 3,69–4,18 und **eine** Stelle bei 2,29 (`div.v`). Eine weitere
-> Abdunklungsrunde, kein neuer Mechanismus.
->
-> **Nicht angefasst:** `.kc.tg .sc` und `.kc.tr .sc` — `.sc` ist die große
-> Score-Zahl und hat im `.kc-flat`-Fall bei 7,5 px andere
-> Größenverhältnisse. Das gehört gemessen, nicht mitgenommen.
-
-
-**Gemessen 10.10.2026, die letzten drei Mängelgruppen nach `v2090`:**
-
-| Token | Wert | auf | Kontrast | Stelle |
-|---|---|---|---:|---|
-| `--gold-d` | `#987b22` | Creme `#f8f4e9` | **3,68** | `summary.info-box-title`, 12,5 px |
-| `--gold-3` | `#957c38` | Weiß | **4,02** | `.ct.ct-pro` u. Geschwister, 11,5 px |
-
-Nötig sind 4,5. Die kleinste Korrektur, die hält: `--gold-d` → `#866c1e`
-(4,57), `--gold-3` → `#8b7334` (4,57). Beides ein Hauch dunkler, kein
-anderer Farbton.
-
-**Warum das nicht in `v2090` mitging:** das sind **Token**, nicht Stellen.
-Sie färben Überschriften und Kartentitel in der ganzen App, und
-`whitelabel-override.js` leitet sie beim Mandanten selbst ab
-(`_darken(akzent, 26)` für `--gold-3`). Wer sie ändert, ändert den Goldton
-überall **und** muss die Ableitung mitziehen, sonst laufen Haus und
-Mandant auseinander. Dazu kommen die `var(--wl-<hex>, #<hex>)`-Literale
-und die Basislinie des Gold-Audits.
-
-**Demo gebaut (`v2091`): `frontend/kontrast-cockpit.html`**, auf Staging
-unter `/kontrast-cockpit.html` erreichbar. Sie zeigt alle elf Toene mit
-heutigem und vorgeschlagenem Wert, einer Gegenueberstellung auf weissem
-Grund und der Begruendung je Ton.
-
-> **Beim Messen fuer die Demo kam heraus, dass der Befund GROESSER und
-> anders gelagert ist als hier beschrieben.** Im Cockpit liegen **234
-> Textstellen** unter der Schwelle, gebuendelt auf **elf Farbtoene** —
-> und **131 davon tragen eine Statusfarbe (Gruen/Rot) als Textfarbe**,
-> nur **53** tragen Gold. Ich war von einem Goldproblem ausgegangen; das
-> ist der kleinere Teil.
->
-> Die schlechtesten: `#D5BB73` auf Creme = **1,71** (10 Stellen),
-> `#5CC187` auf Weiss = **2,23** (27 Stellen, `td.pos`), `#C9A84C` auf
-> Creme = **2,23** (14 Stellen). Der groesste Einzelposten ist
-> `#D98579` auf Weiss = 2,77 mit **54 Stellen** (`td.neg`).
->
-> **Ein Fehler im Generator, den der eigene Pruefer gefangen hat:** er
-> prueft die Schwelle am UNGERUNDETEN Ton, veroeffentlicht aber den
-> gerundeten Hexwert. Drei Toene landeten dadurch auf 4,49 / 4,50 /
-> 4,51 — einer **unter** der Schwelle, die das Skript durchzusetzen
-> behauptete. Die Rundung auf acht Bit frisst bis zu einem halben
-> Prozent Leuchtkraft. Behoben, und `tools/kontrast-demo-pruefen.mjs`
-> rechnet jetzt jede Zahl der fertigen HTML unabhaengig nach: 95 Punkte,
-> 110 eigene Farbrechnungen, RC=0, Deckung 100 %.
-
-**Das ist eine Markenfrage, also Marcels.** Drei Wege:
-
-- **(a)** Die zwei Token um 7–12 % abdunkeln — kleinster Eingriff, Gold
-  bleibt Gold, wirkt überall. Ableitung in `whitelabel-override.js`
-  mitziehen, danach `gold-audit` und eine Messreihe.
-- **(b)** Nur die zwei betroffenen Stellen auf einen dunkleren Ton setzen
-  — ändert nichts anderes, erzeugt aber eine **weitere** Goldstufe neben
-  den vorhandenen. Genau so sind die vier `ds2-tag`-Fassungen entstanden.
-- **(c)** Die beiden Stellen auf dunklen Grund setzen, wie `v2089` beim
-  DS2-Etikett. Konsequent, aber es sind Überschriften, keine Pillen.
-
-**Mein Vorschlag ist (a)** — es ist die Ursache, und ein Token, das auf
-seinem eigenen Grund durchfällt, ist auch ohne diese zwei Stellen falsch.
-
-> **Entscheidung für Marcel, nicht für mich** (Optik/Marke): Gold ist
-> der **Akzent**, nicht die Textfarbe. Drei Wege, die die Marke
-> erhalten: (a) bei Tags/Pillen Gold als **Fläche** mit Obsidian-Schrift
-> — Kontrast dann ~8,9, so sind die Score-Pillen schon gebaut; (b) für
-> Fließtext ein dunkleres Gold eigens als *Textton* (das bisherige
-> „Gold dunkel" `#b8932f` reicht mit ~2,8 **nicht**); (c) die kleinen
-> Beschriftungen auf die vorhandene Textfarbe setzen und Gold nur für
-> Rahmen und Linien behalten. **Demo bauen, bevor etwas geändert wird.**
-
-**Ein Messfehler, der dabei aufflog und behoben ist:** die drei
-schwersten Cockpit-Befunde (k 1,63 / 1,70 / 1,98) waren **Score-Ringe**
-— `div.sc` trägt einen `conic-gradient` in Gold, aber `div.sc::before`
-legt einen **weißen Kern**, auf dem die Zahl steht. Echter Kontrast
-~3,1 statt 1,7. Ohne `v2065` hätte ich Score-Farben geändert, die in
-Ordnung sind.
-
-- ~~**Farbkontraste messen**~~ — erledigt (siehe oben). Offen ist die
-  **Behebung**: sie braucht Marcels Entscheidung über Gold als
-  Textfarbe, und davor eine Demo.
-- **Touch-Gesten, Bildschirmtastatur, Tastaturnavigation**, und
-  **Höhen über 757 px** (Fenstergrenze der Kabine).
-- Die übrigen Punkte des Master-Prompts: Anmeldung/Registrierung,
-  Upload-Flächen, Lade-/Fehler-/Leerzustände, Diagramme, Kanban,
-  Einstellungen.
-
-> **Das Werkzeug steht und ist der eigentliche Gewinn.** Der Läufer in
-> der Messkabine sucht den echten Scroll-Container, scrollt abschnittweise
-> durch, prüft jedes Bedienelement per `elementsFromPoint` auf fünf
-> Punkten, verifiziert jeden Verdacht zweimal (zentriert **und** am
-> Seitenanfang) und nennt seine **Deckung**. Er brauchte acht Fassungen:
-> die ersten vier meldeten ausschließlich Artefakte, und jedes davon
-> hätte zu einem Umbau an gesunder Stelle geführt.
+- Beinahe-Treffer für eine weitere Abdunklungsrunde: 115× `rgb(113,108,102)` bei 3,78, 9× Gold 3,20, 9× Grün 3,01–3,08, 4× Rot 3,69–4,18, eine Stelle `div.v` bei 2,29.
+- `.kc.tg .sc` / `.kc.tr .sc` (große Score-Zahl, `.kc-flat` bei 7,5 px) erst messen.
 
 ---
 
-#### N60.16 · ERLEDIGT — Kanban `v2084`, Cockpit `v2098`/`v2099`, Sortierung zurückgenommen
-Marcel, 09.10.2026: *„im Portfolio-Cockpit müssen wir dann natürlich
-auch schauen, dass wir den Bestand passend ergänzen können, also auch
-zwischen Ankauf und allem sinnvoll aufsplitten … Und auch die
-Kanban-Ansicht passt. Ein gewonnenes Objekt ist ja sowieso dann
-wahrscheinlich im Bestand."*
+### N59 · Lageklassen der Bestandsobjekte (08.10.2026) — Rest: Marcel trägt ein
 
-**Was es seit heute gibt** (v2030–v2042): je Objekt einen eingefrorenen
-Ankauf-Stand (`data._ankauf`), die Listenspalten `ankauf_kurz` und
-`ankauf_stichtag`, einen Modus-Dreher über der Objektliste, die
-Abweichung als Funktion (`DealPilotAnkauf.abweichung()`) und einen
-Reiter **Soll/Ist-Abgleich** in der Pilot-Analyse. Beide Piloten und der
-Telegram-Bot bekommen beide Stände im Prompt.
+- Von 21 Objekten trägt keines eine Lageklasse (gemessen 08.10.2026). A/B/C ist nicht ableitbar und verschiebt den Zielkaufpreis — **Entscheidung Marcel offen**: die 20 echten Objekte in der Übersicht zuordnen. Erledigtes s. Fertig.
 
-**Was fehlt:**
+### N58 · Marktbericht — Rest aus Marcels Meldung (08.10.2026)
 
-| Wo | Was |
-|---|---|
-| ~~Portfolio-Cockpit~~ | ~~Summen und Kennzahlen wahlweise auf **Ankauf** oder **Bestand**~~ — **erledigt `v2099`**, siehe unten |
+- Meldung „Objektdaten übernommen" samt goldener Feldliste besser gliedern (Marcel: „in Gold mit einem I dahinter, nicht so schön").
+- `.mbrep-head`/`.mbrep-body` in `marktbericht-app/index.html`: Schmalregeln auf Klassen, die das Markup nicht führt (am 25.10.2026 noch 2 Treffer in index.html, 0 in app.js).
+- Lageklassen der Bestandsobjekte: siehe N59.
+Erledigtes s. Fertig.
 
-> ### Summen auf Ankauf oder Bestand (`v2099`)
->
-> **Gerechnet wird nicht zweimal.** `_ankauf.daten` ist eine
-> **vollständige** Kopie des Datensatzes (`ankauf.js:_datensatzJetzt` —
-> alles außer `_ankauf` selbst und `_thumb`). Also läuft **dieselbe**
-> `aggStats()` einmal über die heutigen und einmal über die
-> eingefrorenen Datensätze.
->
-> > `kurz` allein hätte **nicht** gereicht: es führt neun Kennzahlen, die
-> > Summen brauchen aber auch `d1`, `d1t`, `san`, `moebl` und ein Dutzend
-> > weitere. Wer die Ankauf-Summen aus `kurz` baut, bekommt
-> > stillschweigend Nullen.
->
-> **Am laufenden Staging abgenommen** (1280 px, echter Klickweg auf die
-> Kachel):
->
-> | | Bestand | Ankauf-Stand |
-> |---|---:|---:|
-> | Objekte | 8 | **4** (4 ohne Stand) |
-> | Mieteinnahmen / Monat | 16.172 € | 8.552 € |
-> | Gesamtinvestition | 4,31 Mio € | 2,49 Mio € |
-> | Bruttomietrendite | 4,83 % | 4,55 % |
-> | Cashflow / Monat | −301 € | −1.058 € |
->
-> ### ⚠ Die beiden Spalten sind KEIN Entwicklungsvergleich
->
-> **Sie beschreiben verschiedene Objektmengen** — acht gegen vier. Dass
-> rechts 4,55 % und links 4,83 % steht, heißt **nicht**, dass das
-> Portfolio besser geworden ist: links sind vier Objekte mehr dabei.
->
-> Deshalb nennt die Kachel die Grundmenge im Untertitel („4 von 8 · 4
-> ohne Ankauf-Stand"). **Die Entwicklungsfrage beantwortet die Kachel
-> „Seit Ankauf" (`v2098`)** — die vergleicht je Objekt mit sich selbst.
-> Die Summen beantworten eine andere Frage: *was habe ich gekauft, und
-> was habe ich heute.*
->
-> ### Zwei Sperren gegen stille Nullen
->
-> - Der Schalter erscheint **nur**, wenn es Objekte mit eingefrorenem
->   Stand gibt (`schaltbar`). *Ein Schalter, der nichts tut, ist
->   schlimmer als keiner.*
-> - Steht der Modus trotzdem auf Ankauf und es gibt **keinen** Stand,
->   fällt er auf Bestand zurück, statt auf Nullen zu rechnen — *eine
->   Summe von 0 € wäre eine Behauptung.*
->
-> Die erste Kachel heißt im Ankauf-Modus auch so („Ankauf-Stand" statt
-> „Bestand"), damit die Überschrift nicht das Gegenteil dessen sagt, was
-> darunter steht.
+### N56 · ImmoMetrica — Rest (08.10.2026)
 
-| ~~Portfolio-Cockpit~~ | ~~Die **Abweichung über den ganzen Bestand**~~ — **erledigt `v2098`**, siehe unten |
-| ~~Kanban~~ | ~~Spalte **Bestand**~~ — **erledigt `v2084`**, siehe unten |
-| ~~Sortierung~~ | ~~Im Ankauf-Modus nach den **Ankaufs**-Werten sortieren~~ — **hat kein Ziel**, gemessen 10.10.2026, siehe unten |
-
-> ### Die Sortierung: der Punkt hatte keine Zielscheibe
->
-> **Gemessen am 10.10.2026.** `storage.js:4349` führt genau **vier**
-> Sortiermodi, und keiner davon liest eine Kennzahl, die sich zwischen
-> Ankauf und Bestand unterscheidet:
->
-> | Modus | liest | hat einen Ankauf-Wert? |
-> |---|---|---|
-> | `recent` „Zuletzt bearbeitet" | `updated_at` | **nein** — ein Zeitstempel, keine Kennzahl |
-> | `id` „Objekt-ID" | `seq_no` | **nein** |
-> | `kaufdat` „Kaufdatum" | `data->>kaufdat` | **nein** — per Definition in beiden Ständen gleich |
-> | `lage` „Lage (A/B/C)" | `data->>lageklasse` | **nein** — steht nicht in `KENNZAHLEN` und nicht im eingefrorenen `kurz` |
->
-> Der Ankauf-Modus dreht die **Karten** (`doppelkarte.js`) und sperrt das
-> geöffnete Objekt — die **Reihenfolge** fasst er nicht an, und es gibt
-> auch keine, die er anfassen müsste.
->
-> *Ein offener Punkt, dessen Voraussetzung nicht gilt, kostet jedes Mal
-> eine Messung — und wer ihn baut, baut gegen eine Annahme.*
->
-> **Was dahinter steckt, ist ein anderes, neues Feature:** nach einer
-> KENNZAHL sortieren (DealScore, Rendite, Kaufpreis, DSCR). Erst dann
-> entsteht die Frage „welcher Stand?" überhaupt — und dann ist sie
-> **sofort** beantwortet, weil der eingefrorene `kurz` genau diese acht
-> Felder führt: `kp`, `nkm`, `_kpis_miete_j`, `_kpis_bmy`, `_kpis_nmy`,
-> `_kpis_dscr`, `_kpis_cf_ns`, `_kpis_ltv` plus `_ds2_score`.
->
-> **Vorsicht bei zwei davon:** `KENNZAHLEN` führt `besser: 'kleiner'`
-> für **Kaufpreis** und **LTV**. Eine Sortierung „beste zuerst" muss
-> diese zwei umdrehen — dieselbe Falle, die `abweichungFuer()` in
-> `v2098` schon kapselt und die `tools/ankauf-abweichung-pruefen.mjs`
-> in 18 Fällen prüft.
-
-
-> ### „Seit Ankauf" gebaut (`v2098`) — mit EINER Rechnung
->
-> `DealPilotAnkauf.abweichung()` konnte nur das **gerade geladene**
-> Objekt: es liest `window._dpAnkauf` und `collectData()`. Die Schleife
-> steht jetzt einmal in `_vergleich()`, und beide Wege rufen sie:
->
-> | Funktion | wofür |
-> |---|---|
-> | `abweichung()` | das geladene Objekt (wie bisher) |
-> | `abweichungFuer(daten)` | ein Objekt aus der Liste (**neu**) |
->
-> **Eine zweite Fassung im Cockpit wäre hier besonders teuer:**
-> `KENNZAHLEN` führt die Richtung je Kennzahl, und bei **zwei von neun**
-> ist *kleiner* besser — **Kaufpreis** und **LTV**. Wer das nachbaut,
-> erklärt einen gestiegenen Kaufpreis zur Verbesserung.
->
-> `tools/ankauf-abweichung-pruefen.mjs` prüft deshalb jede der neun
-> Kennzahlen in **beide** Richtungen — 18 Fälle, plus die Sonderfälle:
-> **39 Punkte, RC=0**, am echten Modul geladen.
->
-> ### Das Urteil hängt am DealScore, nicht an einer erfundenen Mehrheit
->
-> Welche der neun Kennzahlen schwerer zählt, ist eine
-> **Bewertungsfrage** — der DealScore ist die Antwort, die das Produkt
-> ohnehin gibt. Die Kachel sagt das im **sichtbaren** Untertitel („am
-> DealScore"), und eine Gegenprobe im Prüfer hält fest, dass ein
-> schlechterer Kaufpreis das Urteil **nicht** dreht.
->
-> ### Am laufenden Staging gegen ECHTE Daten abgenommen
->
-> Kachel im Cockpit (1280 px): **Besser 0 · Schlechter 0 · „am DealScore ·
-> 4 von 8 mit Ankauf-Stand" · „4 unverändert"**. Nachgerechnet über
-> `GET /objects/portfolio-export` mit derselben Funktion:
->
-> ```
-> MI BK 7      Stichtag 2026-06-09   Score 52 -> 52   7 Kennzahlen, alle gleich
-> KK AM 9 VV   Stichtag 2026-01-01   Score 84 -> 84   7 Kennzahlen, alle gleich
-> DEMO-DT4     Stichtag 2024-12-23   Score 69 -> 69   7 Kennzahlen, alle gleich
-> DEMO-BO6     Stichtag 2024-12-23   Score 49 -> 49   7 Kennzahlen, alle gleich
-> ```
->
-> Die Werte sind **echt** (Kaufpreis 195.000, Miete 780) — alle gleich,
-> weil der Stand aus denselben Daten genommen wurde und sich seither
-> nichts geändert hat. *Eine Null, die man nachgerechnet hat, ist eine
-> Auskunft; eine, die man annimmt, ist keine.*
->
-> **Zwei Grundmengen, bewusst verschieden:** die Kachel sagt „4 von **8**",
-> der Export hat **23** Objekte. Das Cockpit zählt nur die gewonnenen
-> Objekte mit geladenen Details — für eine Bestandsansicht richtig, aber
-> es ist nicht dieselbe Menge. Wer die Zahl mit dem Portfolio vergleicht,
-> findet eine Abweichung, die keine ist.
->
-> **Zwei Fallen dabei vermieden:**
-> - `ctitle` gibt der Renderer **nur bei `click:true`** aus (`:533`). Mein
->   erster Entwurf legte die Methode dorthin — ein **totes Feld**.
-> - Der Prüfer brach beim ersten Lauf ab, weil `ankauf.js` sich am Ende an
->   `dp:object-ready` hängt und `window.addEventListener` fehlte. Genau das
->   ist der Unterschied zwischen `node --check` und einem echten Lauf.
->
-> **Noch offen an N60.16:** die Summen wahlweise auf Ankauf oder Bestand,
-> und die Sortierung im Ankauf-Modus nach den Ankaufs-Werten.
-
-> ### Kanban gebaut (`v2084`) — und dabei drei schwere Fehler gefunden
->
-> **Vier Spalten:** Offen · Gewonnen · **Bestand** · Verloren. Bestand
-> heißt gewonnen **und** Ankauf-Stand festgeschrieben. Im Browser
-> abgenommen: **15 · 4 · 4 · 0 = 23**.
->
-> `getStatus()` blieb unberührt — es speist auch Filter und KPIs. Würde
-> dort aus „won" „bestand", sänke die Gewinnquote, ohne dass ein Deal
-> verloren ginge. Die Kanban-Ansicht hat ihre eigene Einteilung.
->
-> **Marcels Befund aus N60.19 trifft auf diesen Datenstand nicht zu:**
-> Objekte mit Ankauf-Stand ohne „gewonnen" gibt es **null**. Umgekehrt
-> sind es vier gewonnene Deals **ohne** eingefrorenen Ankauf-Stand —
-> auch unvollständig, aber anders. Die neue Spalte macht es sichtbar,
-> ohne dass jemand danach suchen muss.
->
-> ### Die drei Fehler, die erst beim Nachmessen auffielen (`v2084a/b`)
->
-> Vier Spalten, alle mit Anzahl **0** — während die Seitenliste 23
-> Karten zeigte. Das war nicht die neue Spalte, das war **die ganze
-> Ansicht „Alle Objekte"**:
->
-> | | Fehler | Folge |
-> |---|---|---|
-> | 1 | `loadObjects()` las `data.objects`, die Antwort heißt `{items, count}` | `_objects` blieb **leer** — Karten, Liste und Kanban zeigten nichts |
-> | 2 | `getStatus()` las `obj.data._deal_won`, die Listenantwort trägt **kein `data`** (0 von 23) | jedes Objekt war **„open"**, auch die acht gewonnenen |
-> | 3 | `getKPIs()` las `o.data.kaufpreis` | *„Investitionsvolumen (gewonnen) **0 €**"* bei acht gewonnenen |
->
-> **Keiner der drei warf einen Fehler.** `res.ok` war wahr, der Rückfall
-> lieferte ein gültiges leeres Array, und eine leere Liste sieht aus wie
-> ein leeres Portfolio. Eine Null sieht aus wie ein Ergebnis.
->
-> **Nach der Reparatur im Browser gemessen:** Investitionsvolumen
-> **4.018.000 €** (gewonnen), 12.296.911 € alle Objekte, Ø 502.250 €
-> über 8 Objekte. Alle drei Werte standen vorher auf 0.
->
-> *„Gebaut und unerreichbar" hätte auch die neue Spalte getroffen — sie
-> wäre in einer Ansicht gelandet, die niemandem etwas zeigt.*
->
-> **Nebenbefund, nicht geklärt:** `ankauf_stichtag` tragen **vier**
-> Objekte, im Portfolio-Export haben **drei** einen `_ankauf`-Block.
-> Möglich ist ein Objekt mit Stichtag ohne Kurzfassung.
-
-> **Zur Sortierung, bewusst zurückgestellt:** sie ist erst messbar, wenn
-> mehr als zwei Objekte einen Ankauf-Stand haben. Eine Sortierung über
-> zwei Datenpunkte lässt sich nicht prüfen, und eine ungeprüfte
-> Sortierung ist schlimmer als keine — sie sieht richtig aus.
-
-**Eine Falle, die aus dieser Woche schon bekannt ist:** das Cockpit
-rechnet aus dem Portfolio-Spiegel, nicht aus dem Formular. Wer dort
-Ankauf-Werte zeigen will, braucht sie **im Spiegel** — sonst zeigt die
-eine Hälfte der Oberfläche etwas anderes als die andere, und niemand
-sieht, welche recht hat.
-
----
-
-### N59 · Lageklassen: keine gesetzt, und die Übersicht hatte keinen Eingang (08.10.2026)
-
-Marcel: „dass du die Objekte alle nochmal durchgehst und auch die
-Lageklassen zuordnest."
-
-**Zwei Befunde, beide gemessen:**
-
-1. **Von 21 Objekten trägt kein einziges eine Lageklasse.** Nicht eines.
-2. **Die Ansicht, in der man sie nebeneinander sähe, war nicht
-   erreichbar** — behoben in `v2008`.
-
-| | Stand |
-|---|---|
-| `window.setMainView` | **da** |
-| `window.showAllObjectsView` | **da** |
-| `#all-objects-main` | **da** |
-| `case 'view-all'` in `ui.js` | **zweimal da** |
-| Symbolkarte `all: 'folder'` | **da** |
-| `_sbActionsSyncActive` erwartet `data-act="view-all"` | **da** |
-| `.sb-iconnav-btn[data-iconnav]` | **0 Treffer** |
-| `#vw-all` / `#vw-single` | **nicht da** |
-| Seitenleiste | 13 Einträge, keiner „Alle Objekte" |
-
-Von Hand gerufen rendert sie einwandfrei: 36 Zeilen, Spalte **Lage**,
-Sortierung über alle Spalten, Portfolio-Kopf. Gebaut, angemeldet,
-funktionsfähig — es fehlte ein `<button>`.
-
-> **`ui.js:294` greift bis heute nach `.sb-iconnav-btn[data-iconnav]`.**
-> Diesen Anker gibt es im Markup **null Mal**. Eine Zeile, die ins Leere
-> greift, fällt nicht auf: `querySelector` gibt `null` zurück und der
-> Rest der Funktion läuft weiter.
-
-**Die Kette der Lageklasse ist end-to-end geprüft** (an `2026-004`,
-Testobjekt Musterhausen): Feld leer → B gewählt → gespeichert → Server
-führt `"B"` → die Objektkarte sagt nicht mehr „ohne Lageklasse" → die
-Übersicht zeigt die Pille. **Sie trägt.** `2026-004` steht jetzt auf
-**B** — das ist der Prüfstand, nicht Marcels Einschätzung.
-
-**Bewusst NICHT getan: die Lageklassen der 20 echten Objekte eintragen.**
-A/B/C ist keine ableitbare Größe — es gibt im ganzen Repo **keine**
-Herleitung aus Makro-/Mikrolage, AVM-Score oder Ort. Sie ist eine
-Strategieentscheidung und hängt an der Zielrendite (A 3,75 % · B 5,0 %).
-Eine geratene Klasse verschiebt den Zielkaufpreis jedes Objekts still.
-**Das gehört Marcel.** Mit der Übersicht sind es jetzt 21 Klicks in
-einer Liste statt 21 Objektwechsel.
-
----
-
-### N58 · Marktbericht: Karte, Liste, Tablett — und ein Buster, der seit v1877 feststand (08.10.2026)
-
-Vier Befunde von Marcel, alle im Browser auf Staging nachgestellt.
-
-**(a) „API Key required" auf der Karte** (`v2004`). Drei verschiedene
-Carto-Kacheln in drei Zoomstufen geholt: alle **HTTP 200, 2049 Byte,
-md5 `502fc5f6793fad87` — identisch**. Das Bild trägt den Aufdruck
-„API KEY REQUIRED". Carto verlangt jetzt einen Schlüssel.
-
-> **Es ist HTTP 200.** Kein `tileerror`, kein Konsoleneintrag — Leaflet
-> hat die Kachel brav gezeichnet. Ein Dienst, der seinen Ausfall mit 200
-> beantwortet, fällt nur dem auf, der hinsieht.
-
-Umgestellt auf OSM-Standard, vier Fassungen. **`tile.openstreetmap.org`
-führt weder `{s}` noch `{r}`** — beide Platzhalter mussten raus.
-
-**(b) Die Berichtsliste „kreuz und quer"** (`v2004`). Über volle Breite
-(918 px) saß jede Zeile sauber; **erst wenn ein Bericht geöffnet wird**,
-wandert das Panel in die 296-px-Spalte — und dort 455 px Inhalt auf
-318 px Platz. Eine Vorsorge war da: `@media(max-width:600px)`. Sie
-misst aber das **Fenster** (1568 px), nicht die Spalte.
-
-> **Eine Media-Query auf einer Fläche, die nicht das Fenster ist, prüft
-> die falsche Zahl.** Sie sieht richtig aus und ist tot. Ersetzt durch
-> `@container` auf der Liste selbst.
-
-**(c) Genau eine Breite war kaputt — und es war die des iPads** (`v2005`).
-Neun Breiten durchgemessen, gezählt nur echter Überlauf (was ein Vorfahr
-abschneidet, zählt nicht — Leaflet legt seine Kacheln bauartbedingt über
-den Kartenrand; ein erster Lauf meldete 213 Treffer, die keine waren):
-
-| Breite | Überläufe | Dokument scrollt |
-|---|---|---|
-| 1440 / 1200 | 0 | 0 |
-| **1024** | **196** | **160 px** |
-| 834 / 768 / 600 / 430 / 390 | 0 | 0 |
-
-Zwei Ursachen, die sich gegenseitig versteckten: `1fr` hat
-`min-width:auto` und kann nicht unter seine Inhaltsbreite schrumpfen
-(`#resultPanel` bestand auf 762 px bei 574 px Platz), und der
-Umschaltpunkt lag bei 880 px. Unter 880 griff die eine Spalte, über 1200
-war genug Platz — dazwischen lag das Loch, und darin liegt das iPad.
-`minmax(0,1fr)` stand in derselben Datei schon dreimal.
-
-**(d) ⚠ Der Buster der Marktbericht-SEITE stand seit v1877 fest**
-(`v2005a`). `frameSrc()` in `marktbericht-view.js:93` adressierte
-`/marktbericht-app/index.html?v=1877`. **Das CSS dieser Ansicht liegt
-inline in genau dieser Datei** — sie kam also samt CSS aus dem Cache.
-
-> **Alles, was seit v1877 am CSS oder Markup dieser Seite geändert
-> wurde, hat keinen Browser erreicht, der sie schon einmal geladen
-> hatte.** Gemessen: v2005 lag auf dem Server und war im iframe nicht
-> vorhanden. Der `app.js`-Buster INNERHALB der Seite half nicht — er
-> wird erst gelesen, wenn die Seite selbst neu geholt wird.
-> **Ein Buster eine Ebene zu tief wirkt nie.** Wer am CSS von
-> `marktbericht-app/index.html` etwas ändert, zieht die Zahl in
-> `marktbericht-view.js` mit hoch; ein Vermerk steht jetzt an der Zeile.
-
-**(e) Dieselbe Falle, sechs weitere Male** (`v2006`). In der Messkabine
-gefahren, acht Geräte, jeweils bis in den **geöffneten** Bericht hinein.
-Sieben sauber, das iPhone SE (360 px) meldete 20 Stellen, die schlimmste
-+34 px — benannt: `div.assess` „Makrolage durchschnittlich" u. a.,
-146 px breit. Wieder `repeat(2,1fr)`: 2 × 146 + 10 = 302 px, verfügbar
-waren 267.
-
-> **Bei 390 px ragte dasselbe nur 4 px hinaus.** Knapp daneben sieht aus
-> wie „geht gerade noch" — es ist derselbe Defekt mit weniger Hebel.
-> Deshalb nicht die eine Stelle geflickt, sondern das Muster: 10
-> Ersetzungen auf `minmax(0,1fr)` in zwei Fassungen, plus eine Spalte
-> unter 420 px. `.row` blieb — `repeat(auto-fit,minmax(160px,1fr))` hat
-> seine Untergrenze schon stehen.
-
-**Abnahme, Messkabine nach `v2006`** (je bis in den geöffneten Bericht,
-Objekt 2026-001, 33 Berichte, Karte geladen):
-
-| Gerät | px | Überlauf | Dokument scrollt |
-|---|---|---|---|
-| iPhone SE | 360 | 0 *(vorher 20)* | 0 |
-| iPhone SE 2 | 375 | 0 | 0 |
-| iPhone 14 | 390 | 0 *(vorher 8)* | 0 |
-| iPhone 14 Pro Max | 430 | 0 | 0 |
-| iPad mini | 768 | 0 | 0 |
-| iPad Pro 11" | 834 | 0 | 0 |
-| Desktop | 1180 | 0 | 0 |
-| Desktop breit | 1280 | 0 | 0 |
-
-**Noch offen aus derselben Meldung:**
-- Die Meldung „Objektdaten übernommen" samt goldener Feldliste besser
-  gliedern (Marcel: „in Gold mit einem I dahinter, nicht so schön").
-- `.mbrep-head` und `.mbrep-body` in `marktbericht-app/index.html`:
-  Schmalregeln auf zwei Klassen, die es im Markup **nicht gibt**.
-- Lageklassen für alle Bestandsobjekte zuordnen und gegenprüfen.
-
----
-
-### N57 · Eingabetiefe und Liegenschaftszins — beides erledigt (08.10.2026)
-
-**Marcels Befund zur Eingabetiefe, behoben in `v2001`:** „wenn ich oben
-mit den kleinen Kreisen wechsle, dann steht immer noch: für Stufe 3 fehlt
-noch." Gemessen in `objekt-reiter.js`: `_fehlStufe` wurde **nur** in
-`stufeAbrufen()` gesetzt. Die Kreise rufen `zielSetzen()` →
-`zielAnwenden()` + `stufen()`, und keins von beiden fasst `#oe-fehlt` an —
-die Zeile zeigte die zuletzt **abgerufene** Stufe, nicht die gewählte.
-Bei `dp:object-ready` lief sie ebenfalls nicht nach, deshalb blieb nach
-dem Löschen die Fehlliste des gelöschten Objekts stehen. Beides geht
-jetzt über eine Stelle, `fehlZeileSetzen()`.
-
-> **Die Eingabetiefe selbst wird NICHT zurückgesetzt.** Sie ist ein
-> Merker je **Nutzer**, nicht je Objekt (so dokumentiert in
-> `objekt-reiter.js`) — wer ausgiebig arbeitet, will nicht bei jedem
-> Objekt wieder auf 1 anfangen. Verwirrend war nicht die gemerkte Tiefe,
-> sondern dass die Zeile unten ihr nicht folgte. **Wenn Marcel sie doch
-> je Objekt will, ist das eine Zeile — er muss es nur sagen.**
-
-**Liegenschaftszins § 256 BewG, erledigt in `v2002`:** Marcel: „ich
-glaube, wir haben sie, aber vielleicht können wir es textuell noch ein
-bisschen besser gestalten." **Er hat recht** — am echten `lzsNach256()`
-gemessen stimmt jede Zahl seiner Tabelle (16/16 Fälle):
-EFH/ZFH/DHH/RH 2,5 · ETW 3,0 · MFH bis 6 WE 4,0 · MFH über 6 WE 4,5,
-Degression `brw 600 → 2,4 | 1400 → 1,6 | ab 1500 → 1,5`.
-
-Gefehlt hat der **Zweck**. Der Hinweis sagte nur, was der Wert *nicht*
-ist („nicht marktabgeleitet") — nicht, ob man ihn verwenden darf. Marcels
-Unterscheidung steht jetzt im Text, der nachweislich in den Bericht geht
-(`WertParameterService` als `hinweis`, `ErtragswertService` als Warnung):
-
-| Norm | Zweck |
-|---|---|
-| § 256 BewG | Grundsteuer (Bundesmodell) — die Tabelle oben |
-| § 188 BewG | Erbschaft-/Schenkungsteuer: MFH **3,5 %**; EFH/ZFH und ETW regelmäßig Vergleichswertverfahren |
-| § 21 Abs. 2 ImmoWertV | Verkehrswertgutachten: § 256 ist dort **kein** verbindlicher Auffangwert — anzusetzen ist der marktgerechte Zinssatz des Gutachterausschusses |
-
-> `§ 188 BewG` kam im ganzen Repo **nicht** vor (gemessen: 0 Treffer).
-> Eine `lzsNach188()` gibt es trotzdem nicht: sie wäre von nirgendwo
-> gerufen, also gebaut und unerreichbar. Der Rahmen steht als
-> `BEWG_RAHMEN` da, und der Hinweis wird **daraus gebaut** — wer den
-> Rahmen ändert, ändert den Text.
-
----
-
-### N56 · ImmoMetrica von Demo auf Live, und vier Fragen dazu (08.10.2026)
-
-**MARCELS ENTSCHEIDUNGEN ZU N56, 08.10.2026 — das ist keine Vorschlagsliste mehr.**
-
-**Nachtrag 08.10.2026, nach Marcels Rückmeldung „den Ortskern konnte ich
-nicht finden" — er konnte nicht, die Zeile war unerreichbar (`v2001`,
-`eee0eec1`):**
-
-- **`parseAddr` steckte die STADT in die Straße.** Der Komma-Zweig nahm
-  links immer einen Straßennamen an; ImmoMetrica schickt bei Inseraten
-  ohne veröffentlichte Anschrift aber `"Ort, Bundesland"`. Gemessen:
-  `"Herford, Nordrhein-Westfalen"` → `str="Herford"`,
-  `"32049 Herford, …"` → `str="32049 Herford"` und **PLZ leer**,
-  `"Mitte, Berlin"` → `str="Mitte"`,
-  `"Bad Oeynhausen - Nordrhein-Westfalen"` → **Ort leer**.
-  Doppelt falsch: der Bodenrichtwert suchte eine Straße, die es nicht
-  gibt, UND die Ortskern-Zeile aus `v1999` hängt an `!dp.str` und konnte
-  deshalb **nie** erscheinen. Behoben: das Bundesland wird erkannt und
-  verworfen (es gibt kein Feld dafür), die Stadtstaaten werden zu
-  `Berlin-Mitte`. 11 Adressformen geprüft, im laufenden Container
-  nachgemessen.
-- **„Weitere laden" und die Favoriten zuerst** (`v2003`). Gemessen war
-  fast alles da: die Favoriten-Pille existierte, stand aber als letzte,
-  und vorgewählt wird `sources[0]`; `req.query.page` geht im Backend
-  längst durch, `count`/`next` kommen zurück. Das Frontend fragte Seite
-  2 nie an und schrieb nur „1727 Treffer – Seite 1." Jetzt stehen die
-  Favoriten vorn und der Hinweis trägt den Knopf.
-
-**Offen aus N56:** die Rangfolge für LEERE Objekte (der Riegel aus
-`v1995` deckt nur gefüllte).
-
-**Erledigt noch am selben Tag:**
-
-| | |
-|---|---|
-| **ImmoMetrica live** | **fertig** (v1993). Es war nie das Backend: `IMMOMETRICA_MODE` war nirgends gesetzt, das Backend lief längst live. Die Demo kam aus dem Frontend, das `/api/v1/avm/health` fragte — den Schalter der **Bewertungsanbieter**. ImmoMetrica hat jetzt eine eigene Auskunft (`GET /api/v1/immometrica/health`), gemessen: `{"mode":"live"}` |
-| **Sprengnetter und PriceHubble stillgelegt** | **fertig** (v1994). Marcel: „können wir ja erstmal stilllegen … wir haben das aber trotzdem drin gelassen, weil es kann irgendwann mal sein, dass ich mit denen noch zusammenarbeite." Gemessen danach: `enabled:false`, `coming_soon:true`, **`configured:true`** — Zugangsdaten bleiben |
-
-> **⚠ Dabei fiel ein Fehler auf, der Geld gekostet hätte.** `AVM_LIVE_PROVIDERS=` zu
-> leeren schaltete bis v1994 **alle** Anbieter frei, nicht keinen (`if (!list.length)
-> return true`). Wer die Zeile leert, um stillzulegen, erreichte das Gegenteil — und an
-> beiden Anbietern hängen kostenpflichtige Abrufe mit Credit-Abzug. Jetzt wird
-> unterschieden: **gar nicht gesetzt** = alle (wie bisher), **gesetzt und leer** = keiner.
-
----
-
-**1 · DER RIEGEL: bei einem schon gefüllten Objekt sind die Import-Quellen aus**
-
-Marcel: „Wenn wir ein Objekt angelegt haben und im Objekt sind und das schon reingeladen
-ist, dann sollten wir diese Werte wie ImmoMetrica, auch Exposé, oder auch geführte
-Eingabe/Sprache **ausgrauen** … ab da ist es ja eigentlich nur noch so, dass wir den
-Marktbericht erstellen können und über DealPilot die einzelnen Stufen abrufen. Das machen
-wir halt nur, wenn noch nichts drin steht. Das wäre erstmal einfacher, dann haben wir da
-schon mal einen Riegel drin."
-
-**Das ist die einfachste Lösung des Vorrangproblems und sie kommt zuerst.** Statt eine
-Rangfolge zu bauen, die bei jedem Feld entscheidet, wird die Frage gar nicht erst
-gestellt: wer schon Daten hat, bekommt keine Quelle mehr angeboten, die sie überschreiben
-könnte.
-
-| bleibt | wird ausgegraut |
-|---|---|
-| Marktbericht | Exposé |
-| DealPilot-Stufen (1·2·3) | ImmoMetrica |
-| | Geführte Eingabe |
-| | Sprache |
-
-**Zu klären beim Bauen — und das ist die eigentliche Arbeit:** woran erkennt man „schon
-reingeladen"? Ein leeres Objekt hat Kürzel und Objektart, ein gefülltes hat Adresse,
-Fläche, Kaufpreis. Die Schranke braucht eine **gemessene** Grenze, keine gefühlte, und
-sie muss sich übersteuern lassen — sonst ist sie eine Ansage statt eines Angebots.
-
----
-
-**2 · DER ABGLEICH: passt das Inserat überhaupt zu diesem Objekt?**
-
-Marcel: „Wir können natürlich Exposé-Daten einlesen. Wir müssen aber abgleichen, ob das
-mit ImmoMetrica auch passt. Also passt dieses Objekt überhaupt dazu? Ist es die richtige
-Adresse? … wenn halt nur Ort und PLZ zur Verfügung steht, wir aber vielleicht einen
-Marktbericht oder ein Exposé schon zu diesem Objekt haben, müssen wir gucken, ob das auch
-zusammenpasst. Gegebenenfalls muss das dann über eine **Bestätigung** laufen."
-
-Es gibt dafür schon einen Ansatz: `addressWarning()` in `object-actions.js` vergleicht
-Ort, PLZ und Adresse der geladenen Dateien. **ImmoMetrica ist darin nicht enthalten** —
-es geht ja auch an der Zusammenführungstabelle vorbei.
-
-Die Fälle, die eine Bestätigung brauchen:
-- Inserat hat **nur PLZ und Ort**, das Objekt hat eine **vollständige Adresse** → passt
-  die PLZ? Wenn ja: übernehmen, aber die Adresse des Objekts **nicht** überschreiben.
-- Inserat hat eine **andere** Adresse als das Objekt → **immer** nachfragen.
-- Inserat hat eine Adresse, das Objekt noch keine → übernehmen, kein Rückfrage nötig.
-
----
-
-**3 · ✅ ENTSCHIEDEN: ohne Adresse wird der ORTSKERN genommen**
-
-Marcel: „wenn keine Adresse da ist und wir Marktbericht angeklickt haben — ich sage jetzt
-einfach mal eine Marktpreisindikation — dann brauchen wir **keine genaue Adresse zu
-fragen, sondern den Ortskern nehmen**, weil uns keine Adresse vorliegt."
-
-> **Das ist Marcels Entscheidung als DESAG-Sachverständiger und steht über meinem
-> Vorschlag**, gar keine Koordinate zu setzen. Sie ist für die **Marktpreisindikation**
-> getroffen — also für eine Einschätzung, nicht für ein Gutachten.
-
-**Was daraus folgt und beim Bauen nicht wegfallen darf:**
-- Der Ortskern ist ein **Ersatzpunkt**, kein gemessener Ort. Jeder Wert, der daraus
-  entsteht, läuft als **indikativ** mit eigenem Vermerk („Bodenrichtwert am Ortskern,
-  keine Objektadresse hinterlegt").
-- Die Grenze zur **Wertermittlung nach ImmoWertV** bleibt: dort gilt weiter *kein Treffer
-  heißt kein Wert*. Ein Ortskern-Bodenrichtwert darf keinen Verkehrswert tragen.
-- Woher kommt der Ortskern? Erst prüfen, ob die ImmoMetrica-Antwort selbst eine
-  Koordinate führt — dann ist es kein Ersatz, sondern eine Angabe. (Eigene Erntelinie
-  läuft darauf.)
-
----
-
-**4 · Die Rangfolge gilt, aber sie ist der zweite Schritt**
-
-Marcel: „Ansonsten ist die Rangfolge erstmal gut."
-
-```
-1. Marktbericht   amtliche und geprüfte Zahlen
-2. Exposé         Angaben des Verkäufers zum konkreten Objekt
-3. ImmoMetrica    Portaldaten, maschinell zusammengetragen
-4. Geführte Eingabe / Sprache
-```
-
-Zu bauen ist sie trotzdem — der Riegel aus Punkt 1 greift nur bei **gefüllten** Objekten.
-Bei einem leeren Objekt, in das nacheinander Exposé und ImmoMetrica laufen, entscheidet
-weiter die Reihenfolge, und heute gewinnt schlicht der Letzte.
-
----
-
-
-
-**Marcels Auftrag:** „kannst du mir auf staging immometrica einmal wieder von demo auf
-live umschalten? ich habe eben einen api key hinterlegt und habe wieder zugang. bitte
-schau auch nochmal nach ob wir alles aus der schnittstelle auch abfragen und verwerten
-oder ob wir es noch besser umsetzen könnten? läuft immometrika api mit den anderen
-auswahlmöglichkeiten aus unserer Datenaufnahme? ist die reihenfolge richtig gewählt? es
-muss ja immer eins das führende sein … und wie gehen wir damit um wenn keine genaue
-Adresse in der schnittstelle angegeben ist? Ortkern nehmen oder zentrum?"
-
-Dokumentation: `https://www.immometrica.com/searchapi/v1/`
-
-**Der Bestand, gemessen am 08.10.2026** (722 Zeilen über vier Dateien):
-
-| Datei | Zeilen | was sie tut |
-|---|---|---|
-| `backend/src/services/immometricaService.js` | 100 | drei Aufrufe: `getSearches`, `getResults`, `getFavorites` |
-| `backend/src/services/immometricaMapping.js` | 302 | Inserat → DealPilot-Felder, **33 Rohfelder** |
-| `backend/src/routes/immometrica.js` | 66 | Token je Nutzer, `428` wenn keiner hinterlegt |
-| `frontend/js/immometrica-import.js` | 254 | die Auswahl-Oberfläche |
-
----
-
-**1 · DER SCHALTER — und er ist eine Umgebungsvariable, kein Code**
-
-```
-IMMOMETRICA_MODE=stub   ->  Demo-Inserate, kein Live-Aufruf, kein Token
-(nicht gesetzt)         ->  Live gegen IMMOMETRICA_BASE
-```
-
-Zwei Stellen lesen sie: `immometricaService.js:8` (`_isStub()`) und
-`routes/immometrica.js:45` (gibt im Stub-Modus ein `stub-token` zurück, damit die
-`428`-Schranke nicht greift). **Beide fallen zusammen oder gar nicht.**
-
-Der Token steht **je Nutzer** in den Credentials (`creds.setCredential`), nicht in der
-Umgebung — Marcels hinterlegter Schlüssel liegt also schon richtig. Zum Umschalten muss
-nur `IMMOMETRICA_MODE` aus der Server-Umgebung verschwinden und der Container **neu
-erzeugt** werden (`--force-recreate`; `up -d` allein tauscht die Umgebung nicht).
-
-> **Danach `printenv` IM Container prüfen**, nicht die `.env` lesen — das ist die
-> Wahrheit. Und ein erster Live-Aufruf gegen `searches/` als Nachweis, nicht die
-> Abwesenheit einer Fehlermeldung.
-
----
-
-**2 · HOLEN WIR ALLES? — 33 Felder, und die Lücke ist nicht die Zahl**
-
-Das Mapping liest heute: `address_raw`, `address_zipcode`, `appartement_type`,
-`bath_rooms`, `buying_price`, `buying_price_per_sqm`, `commission_text`, `condition`,
-`construction_year`, `energy_efficiency_class`, `floor`, `floor_act`, `floor_max`,
-`heating_type`, `house_type`, `id`, `includes`, `is_private`, `living_space`,
-`maintenance`, `match`, `number_of_apartments`, `online_since`, `platforms[]`,
-`property_area`, `real_estate_type`, `rent_cold`, `rent_total`, `rented_out`, `rooms`,
-`title`.
-
-**Zu prüfen ist nicht, ob es viele sind, sondern ob die Doku mehr führt.** Der Abgleich
-läuft gegen `searchapi/v1/` und muss drei Fragen beantworten:
-- Welche Felder liefert die Schnittstelle, die wir **nicht** lesen?
-- Welche lesen wir, die es **nicht mehr** gibt? (ein Zugriff, der nie trifft, sieht aus
-  wie ein leeres Feld — siehe `feldname-nur-im-testdatensatz`)
-- Gibt es **Blätterung** über `next`? `getResults` reicht sie durch, aber niemand ruft
-  die zweite Seite ab.
-
----
-
-**3 · ⚠ DIE REIHENFOLGE — ImmoMetrica steht in GAR KEINER**
-
-Marcel fragt, ob die Reihenfolge stimmt. Gemessen: **ImmoMetrica nimmt einen ganz
-anderen Weg als alle übrigen Quellen.**
-
-Exposé und Marktbericht laufen über eine Zusammenführungstabelle (`_merged`), und dort
-gibt es genau **eine** Vorrangregel (`object-actions.js:1541`):
-
-```js
-if (_merged[id] && _merged[id].source === 'Marktbericht' && source !== 'Marktbericht') return;
-```
-
-Also: **Marktbericht schlägt alles, sonst gewinnt der zuletzt Geschriebene.** Eine
-Rangfolge gibt es nicht.
-
-ImmoMetrica geht an dieser Tabelle **vorbei**. `applyImmometrica()` schreibt direkt in
-die Felder (`object-actions.js:1646`):
-
-```js
-var el = $(id); if (!el) return;
-el.value = v;
-```
-
-Kein `emptyOnly`, kein Vergleich, kein Eintrag in `_merged`. Wer ImmoMetrica im
-Sprechlauf anhakt, **überschreibt damit alles, was vorher da war** — auch Werte aus dem
-Marktbericht, der eigentlich Vorrang hat. Und `recompute()` baut `_merged` nur aus
-Exposé- und Marktbericht-Dateien neu; ImmoMetrica kommt darin nicht vor.
-
-> **Das ist die Antwort auf Marcels Frage, und sie lautet nein.** Es gibt kein
-> führendes Verfahren, weil ImmoMetrica gar nicht am Wettbewerb teilnimmt. Der Fehler
-> fällt nur deshalb selten auf, weil die Reihenfolge im Sprechlauf ImmoMetrica meist
-> zuletzt aufruft — dann sieht „überschreibt alles" aus wie „ergänzt".
-
-**Zu tun:** ImmoMetrica über `addRow()` in dieselbe Tabelle führen, mit einem Rang. Der
-Rang ist eine **Bewertungsentscheidung** und gehört Marcel; der Vorschlag zur Abnahme:
-
-```
-1. Marktbericht   amtliche und geprüfte Zahlen
-2. Exposé         Angaben des Verkäufers zum konkreten Objekt
-3. ImmoMetrica    Portaldaten, maschinell zusammengetragen
-4. Geführte Eingabe / Sprache   was der Nutzer selbst sagt, füllt Lücken
-```
-
----
-
-**4 · KEINE GENAUE ADRESSE — heute bleibt Straße und Hausnummer einfach leer**
-
-`parseAddr()` (`immometricaMapping.js:193`) kennt drei Fälle:
-
-| Rohtext | Ergebnis |
-|---|---|
-| `Musterstr. 12, 32545 Bad Oeynhausen` | Straße, Hausnummer, PLZ, Ort — vollständig |
-| `Musterstr. 12 32545 Bad Oeynhausen` | dasselbe, ohne Komma erkannt |
-| `32545 Bad Oeynhausen - Nordrhein-Westfalen` | nur PLZ und Ort, **`str` und `hnr` bleiben leer** |
-
-Der dritte Fall ist der Regelfall bei Portalinseraten — die Adresse wird dort bewusst
-verschwiegen.
-
-**Marcels Frage ist die richtige: Ortskern oder Zentrum?** Sie ist nicht kosmetisch,
-denn an der Koordinate hängt der **Bodenrichtwert** (BORIS) und damit der Sachwert.
-
-Was dafür entschieden werden muss — und das ist eine Bewertungsfrage, keine technische:
-1. **Welcher Punkt?** Ortsmittelpunkt der Gemeinde, geometrischer Schwerpunkt der PLZ,
-   oder gar keiner.
-2. **Wie wird es gekennzeichnet?** Ein Bodenrichtwert aus einem Ersatzpunkt ist keine
-   Messung am Objekt. Die Doktrin dazu steht schon: *„Kein Treffer heißt kein Wert —
-   nie ein Nachbarkreis, nie ein Landesmittel."* Ein Ortskern-Ersatz ist genau so ein
-   Fall und müsste als **indikativ** laufen, mit eigenem Vermerk.
-3. **Was zeigt die Oberfläche?** Heute steht das Adressfeld halb leer da, ohne zu sagen,
-   dass die Quelle keine Adresse führt.
-
-> **Mein Vorschlag zur Abnahme:** keine Koordinate erfinden. Stattdessen das Inserat mit
-> „Adresse nicht veröffentlicht" kennzeichnen, PLZ und Ort übernehmen, und den
-> Bodenrichtwert **nicht** automatisch ziehen — sondern den Weg dorthin anbieten, wie es
-> die Ernte-Doktrin für fehlende Werte ohnehin vorsieht. Wer die Adresse kennt, trägt
-> sie nach, und dann rechnet alles.
-
----
+- **Rangfolge für LEERE Objekte** (Marktbericht > Exposé > ImmoMetrica > Geführte Eingabe/Sprache): `applyImmometrica()` schreibt an `_merged` vorbei direkt in die Felder, heute gewinnt der Letzte. ImmoMetrica über `addRow()` mit Rang führen.
+- Feldabgleich gegen `https://www.immometrica.com/searchapi/v1/`: welche Felder lesen wir nicht, welche gibt es nicht mehr (nicht belegt).
+Erledigtes s. Fertig.
 
 ### N55 · ⚠ Eine korrigierte Quell-URL erzeugt eine ZWEITE Zeile (08.10.2026)
 
@@ -7094,59 +1135,10 @@ ist ein Datenfehler:**
 
 ---
 
-### N52 · ⚠ DIE GRUNDERWERBSTEUER FOLGT DER ADRESSE NUR BEI NRW-NUTZERN (08.10.2026)
+### N52 · Grunderwerbsteuer nach Adresse (08.10.2026) — Rest
 
-**Marcels Auftrag:** „Für Standort und Nebenkosten sollten wir die Möglichkeit geben,
-dass er immer prüft, wo wir kaufen, also die aktuelle Adresse nehmen. Das Bundesland
-geben wir hier nur an, das ist unser Standardbundesland, wo wir sesshaft sind, aber die
-Kaufnebenkosten passen sich immer die Zusammensetzung an mit dem Standort der Adresse."
-
-**Der Weg ist gebaut und greift fast nie.** `frontend/js/grest-plz-lookup.js` (V226)
-führt alle 16 Landessätze und hängt mit `change`, `blur` und einem Lauf nach 800 ms an
-`#plz`. Die Übernahme steht aber hinter dieser Sperre:
-
-```js
-if (isNaN(cur) || Math.abs(cur - 6.5) < 0.01 || cur === 0) { … übernehmen … }
-```
-
-**6,5 ist der NRW-Satz.** Steht im Feld irgendein anderer Wert — also bei jedem Nutzer,
-dessen Standard-Bundesland nicht NRW ist — wird der Satz aus der Adresse **stillschweigend
-verworfen**. Am laufenden Stand gemessen:
-
-```
-PLZ     Land              Satz   wird uebernommen, wenn im Feld steht
-80331   Bayern            3,5    nur 0 oder 6,5
-10115   Berlin            6,0    nur 0 oder 6,5
-20095   Hamburg           5,5    nur 0 oder 6,5
-01067   Sachsen           5,5    nur 0 oder 6,5
-70173   Baden-Wuerttbg.   5,0    nur 0 oder 6,5
-32545   Nordrhein-Westf.  6,5    nur 0 oder 6,5   <- der einzige Fall, der laeuft
-```
-
-> **Das ist Geld, nicht Kosmetik.** Bayern-Vorgabe (3,5 %) und Objekt in NRW (6,5 %):
-> bei 400.000 € Kaufpreis fehlen **12.000 €** Grunderwerbsteuer. Der Cashflow, der LTV,
-> die Rendite und der Score hängen daran.
-
-> **Eine Rücknahme meiner eigenen Diagnose:** ich hatte zuerst gemeldet, die Datei werde
-> „von niemandem gerufen". Das war falsch — ich hatte nach `GrestPlz`/`grest_plz` gegrept,
-> der Global heißt `DealPilotGrest`. Er wird vom Sprechlauf genutzt
-> (`voice-import.js:3433`) und die Datei verdrahtet sich selbst. **Ein Negativbefund aus
-> dem falschen Suchbegriff ist kein Negativbefund.**
-
-**Zu tun:**
-1. Die Sperre ersetzen: übernommen wird, solange der Nutzer den Satz **für dieses Objekt**
-   nicht selbst geändert hat (`dataset.userEdited`) — nicht abhängig davon, welche Zahl
-   gerade dasteht. Der Vorgabewert aus dem Profil ist kein „selbst geändert".
-2. Der Hinweis „Aus PLZ ermittelt: Bayern 3,5 %" gibt es schon (`showGrestHint`), er wird
-   nur fast nie erreicht. Er gehört **immer** ans Feld, auch wenn der Nutzer übersteuert —
-   dann als „amtlich wäre 6,5 % (NRW), du rechnest mit 3,5 %".
-3. Makler und sonstige Nebenkosten bleiben Nutzerwerte, **je Objekt** änderbar.
-   Notar/Grundbuch bleibt Standard.
-4. In den Einstellungen muss dastehen, dass `ip_bundesland` das **Standard**-Bundesland
-   ist und die Grunderwerbsteuer der Objektadresse folgt — heute sagt die Beschriftung
-   „Bundesland (für Grunderwerbsteuer)", was das Gegenteil nahelegt.
-
----
+- Hinweis am Feld auch bei Übersteuerung („amtlich wäre 6,5 % (NRW), du rechnest mit 3,5 %") — nicht nachgemessen.
+Erledigtes s. Fertig.
 
 ### N53 · Einstellungen und Formatierungen durchgehen (08.10.2026)
 
@@ -7234,881 +1226,37 @@ nichts geschrieben.
 
 ---
 
-### N50 · Die Ernte holt die amtlichen Vergleichsfaktoren (08.10.2026) — SCHRITTE 1–4 ERLEDIGT
+### N50 · Vergleichsfaktoren — Rest (08.10.2026)
 
-**N50-STAND nach drei parallelen Erntelinien, am laufenden Container nachgemessen:**
+- **Berlin ETW**: Entscheidungsbäume, Endknoten geerntet, Split-Schwellen nicht — mit Rasterizer (`pdftoppm`/Ghostscript) auflösbar.
+- Korrekturen `gebaeudestellung`/`bauzustand` werden nicht geliefert (`korrekturen_offen`) — Zuordnung zu `haustyp`/`ds2_zustand` ist eine Entscheidung über amtliche Klassen (**Entscheidung Marcel offen**), Anzeige fehlt.
+- Weitere Länder: Augsburg (50 €), Landesbericht Saarland (75 €).
+- Drei Rücknahmen am Register: `quellen_links.js:716-723` (falscher Herausgeber SL), zwei Aussagen in `verfuegbarkeit-sl.json`.
+Erledigtes s. Fertig.
 
-```
-vorher   0 Saetze mit der Kennzahl vergleichsfaktor im ganzen Register
-jetzt    9 Saetze - 5 Werte, 4 Sperren
-```
+### N48 · Angebotspreis als Vergleichswert (08.10.2026) — Rest
 
-| Linie | Ergebnis | Nachweis |
-|---|---|---|
-| **Barnim (BB)** | 2 Werte, `ezfh` Stufe B und `rhdhh` Stufe A | beide Anwendungsbeispiele reproduziert: 3.690 × 1,05 = **3.875** und 3.580 × 1,06 × 0,99 = **3.757**, mit vollem Rechenweg |
-| **Berlin** | 3 Werte, 1 Sperre | `ezfh` gibt **3.336** — exakt der Ausgangswert des Beispiels S. 17. Alle vier `verwendung: intern` → **zurückgehalten** |
-| **Saarland** | 7 Sperren, kein Wert | Saarpfalz-Faktoren existieren, aber nur auf Antrag gegen Gebühr und ohne Erlaubnis zur Wiedergabe |
+- Angebotsbasis anbieterneutral in den Quellennachweis („Angebotsdaten aus Immobilienportalen, Median €/m², N Angebote, Stand …") — am 25.10.2026 in `CrossCheckService.js` nicht gefunden.
+Erledigtes s. Fertig.
 
-**Was gebaut wurde (v1975–v1977b):** der Registerweg ist in
-`ReportOrchestrator` verdrahtet und zählt in `CrossCheckService` als
-kaufpreisbasierte Grundlage. Barnim trägt damit ein führendes
-Vergleichswertverfahren.
+### N49 · Altlasten RND — Rest (08.10.2026)
 
-> **Die wichtigste Entscheidung steckt in der Sperre, nicht in der Verdrahtung.** Die
-> Berliner Faktoren sind amtlich — aber amtlich für die **steuerliche** Bedarfsbewertung.
-> Die Blätter sagen wörtlich: *„Die Vergleichsfaktoren ersetzen nicht eine gutachterliche
-> Ermittlung des Verkehrswertes im Sinne des § 194 BauGB."* Sie tragen
-> `verwendung: "intern"` und werden mit dem Grund `nur_steuerliche_bewertung`
-> zurückgehalten — der Satz geht aber **in den Bericht**, weil „der Ausschuss führt
-> Faktoren, gibt sie aber nur steuerlich frei" selbst die Auskunft ist, die dem Leser
-> sonst fehlt.
+- **(b)** `marktbericht/frontend/` nur zusammen mit dem Dienst entfernen (`Dockerfile`, `server.js:15-33`, `score-ketten-pruefen.mjs`).
+- **(d)** `calcVogels`, `calcRoss`, `calcParabel` in `rnd-calc.js` werden weiter in `calcAll` gerechnet (25.10.2026 noch vorhanden), Abnehmer sind seit v1970 weg.
+- **(e)** toter CSS-Block → N49e.
+Erledigtes s. Fertig.
 
-**Vier Defekte fielen dabei auf, drei davon in der eigenen Verdrahtung:**
+### N46 · Punkt-Dezimalzahlen — Rest (07.10.2026)
 
-1. **Die Sperre war toter Code.** `verwendung === 'intern'` fragte ein Feld, das die
-   Leseroutine nicht zurückgab — 23 Felder in der Antwort, `verwendung` keines davon.
-   Behoben über einen Umschlag um `vergleichsfaktor()`, damit kein künftiger Austritt
-   es vergessen kann.
-2. **Jeder Ausschuss benennt seine Achsen anders.** Barnim `brw` × `wohnflaeche`,
-   Berlin `bgf_qm` × `brw_eur_qm`. Hartverdrahtete Namen gaben `achse_x_fehlt`, was wie
-   „kein Wert" aussieht. Jetzt wird unter **jedem** im Register vorkommenden Namen
-   geliefert.
-3. **Die Bezugsgröße ist nicht immer die Wohnfläche.** Barnim rechnet €/m² Wohnfläche,
-   Berlin €/m² **Brutto-Grundfläche**. Mit der Wohnfläche multipliziert wäre der
-   Berliner Wert bei einem Haus rund 25 % daneben — und nichts hätte widersprochen.
-4. **Ein Absturz im Auswerter, der älter ist:** `IN_FAKTOR[einheit](dokument)` mit einer
-   unbekannten Einheit wirft einen `TypeError`. `einheit` kommt aus einer
-   **Registerdatei** — ein Tippfehler im Feld `liefert` hätte jeden Bericht in diesem
-   Gebiet zerlegt. Die Doktrin sagt „kein Treffer heißt kein Wert", nicht „kein Bericht".
+- Die 25 Objekte tragen noch falsch gerechnete `_kpis_*`-Schnappschüsse aus früheren Läufen; ein Lauf über den Bestand wäre ehrlicher als aufs nächste Speichern zu warten.
+- Prüfen, ob derselbe Umwandler anderswo steht (`backend/src/`, Bot-Pfad) — nicht belegt.
+Erledigtes s. Fertig.
 
-**Zwei Wächter waren gebaut und nicht aufgestellt:**
+### N45 · Datenaufnahme — kosmetischer Rest (07.10.2026)
 
-- `fehlendeSaatdateien()` gibt es seit v1778 mit dem Kommentar, die Lücke solle
-  „AUFFALLEN" — sie wurde **nirgends gerufen**. Läuft jetzt bei jedem `saat-pruefen` mit.
-- `saat-pruefen.mjs` kannte `vergleichsfaktor` gar nicht, und seine Beleg-Prüfung war
-  **seit immer falsch**: sie las `b.fundstelle` und scheiterte damit an allen 12
-  Registerdateien, die `belege` als String führen — auch an den längst abgenommenen.
-  *Ein Wächter, der auf richtige Daten rot wird, ist so schädlich wie einer, der auf
-  falsche grün wird.*
-
-**Was offen bleibt:**
-
-1. **Berlin ETW** — die neun „Tabellen" sind gezeichnete **Entscheidungsbäume**. Alle 73
-   Endknotenwerte und die Altbezirkszuordnung sind geerntet (Fallzahlprobe 9.779 = 9.779
-   ohne Rest), aber nicht, **welche Split-Schwelle zu welchem Endknoten führt** — die
-   Verbinderlinien sind von Beschriftungsfeldern zerschnitten, drei
-   Rekonstruktionsregeln ergaben drei verschiedene Kantenmengen. Mit einem **Rasterizer**
-   (`pdftoppm`, Ghostscript) in einem Durchgang auflösbar, **ohne die Ernte zu
-   wiederholen**. Der Arbeitsplatz hat keinen.
-2. **Die Korrekturen `gebaeudestellung` und `bauzustand`** werden nicht geliefert.
-   DealPilot führt `haustyp` und `ds2_zustand`; eine Zuordnung wäre eine Entscheidung
-   über amtliche Klassen. Die Leseroutine meldet sie als `korrekturen_offen` — das
-   gehört in die Anzeige.
-3. **Weitere Länder.** Augsburg (kostenpflichtig, 50 €) und der Landesbericht Saarland
-   (75 €) führen Vergleichsfaktoren laut eigener Angabe; beide nicht gelesen.
-4. **Drei belegte Rücknahmen am Register**, die noch nicht eingetragen sind:
-   `quellen_links.js:716-723` nennt für alle sechs SL-Kreise den **falschen Herausgeber**
-   (Landeshauptstadt Saarbrücken, nicht Regionalverband) und behauptet einen
-   Dateninhalt, den das Dokument nicht hat — es *verweist* nur. Dazu zwei Aussagen in
-   `verfuegbarkeit-sl.json` (die 403-Angabe und die Tabellen-Angabe), beide am Dokument
-   widerlegt.
-
----
-
-### N50 · Die Ernte holt die amtlichen Vergleichsfaktoren (08.10.2026)
-
-**Marcels Auftrag:** „Vielleicht sollten wir das mit in unseren Ernteparameter mit aufnehmen …
-dass wir die Vergleichswerte mit in unsere Datenbank legen, damit wir da auch was mit machen
-können."
-
-Das ist die Gegenseite von **N48**: seit v1971 führt das Vergleichswertverfahren nur noch mit
-kaufpreisbasierter Grundlage. Heute gibt es dafür **genau eine** Quelle im Code — eine fest
-einkodierte Tabelle für den Kreis Minden-Lübbecke (`vergleichsfaktoren_nrw.js`, AGS 05770).
-Überall sonst erscheint kein führendes Verfahren.
-
-**Gemessen am 08.10.2026 über das ganze Register (58 Dateien):**
-
-```
-2543  liegenschaftszinssatz
-1260  sachwertfaktor
- 403  bodenpreisniveau
- 386  durchschnittspreis        <- Kaufpreise, aber ausdruecklich indikativ
- 215  preisentwicklung
-  15  erbbauzinssatz
-   8  erbbaurechtskoeffizient
-   0  vergleichsfaktor          <- die Luecke
-```
-
-**Die Wege stehen schon im Register** — in den Sperrtexten, nicht als Werte. Die vier
-belegten Einstiege:
-
-| Land / Ausschuss | Befund im Register |
-|---|---|
-| **Berlin** | für **Eigentumswohnungen gibt es weder Liegenschaftszinssatz noch Sachwertfaktor** — der amtliche Vergleichsfaktor ist der **einzige** Weg. URL steht in `laender*.json` (`artikel.1377983.php` für Wohnungseigentum, `artikel.1377900.php` für EZFH) |
-| **Brandenburg** | `swf-bb.json`: „Der Bericht führt zusätzlich … Vergleichsfaktoren (Kap. 8.2.3) — beides hier noch nicht erfasst" |
-| **Saarland** | Immobilienmarktbericht des Regionalverbands Saarbrücken enthält Vergleichsfaktoren, aber **nur für den Saarpfalz-Kreis** |
-| **Bayern** | Augsburg: der kostenpflichtige Bericht (50 €, boris-bayern.de) „enthält Vertragszahlen, Liegenschaftszinssätze und Sachwertfaktoren sowie Vergleichsfaktoren (Gebäude- und Ertragsfaktoren)" |
-
-> **Berlin ist der dringendste Fall.** Dort läuft heute für jede Eigentumswohnung gar nichts:
-> kein Zinssatz, kein Sachwertfaktor, und seit v1971 auch kein Vergleichswertverfahren. Ein
-> Berliner ETW-Bericht hat damit **kein einziges amtlich getragenes Verfahren** — und das ist,
-> gemessen, die richtige Auskunft, aber eine unbefriedigende.
-
-**Zu tun:**
-1. **`vergleichsfaktor` als Kennzahl in die Saat aufnehmen.** Die Einheit ist **€/m²** (nicht
-   dimensionslos wie der Sachwertfaktor, nicht Prozent wie der Erbbaurechtskoeffizient) — die
-   Verwechslungsprobe, die `swf-bb.json` schon führt, gehört in den Saat-Prüflauf.
-2. **Berlin zuerst**, dann Brandenburg (Kap. 8.2.3), dann Saarpfalz.
-3. **Modellvermerk mitführen:** ein Vergleichsfaktor gilt nur mit seinem Normobjekt (Größe,
-   Baujahr, Ausstattung) und seinen Umrechnungskoeffizienten. Ohne die ist er nicht anwendbar —
-   derselbe Modellzwang wie beim Sachwertfaktor (§ 21 Abs. 3 / § 20 ImmoWertV).
-4. **`gutachterausschuss.js` liest ihn schon** (`vergleichsfaktor()`, Zeile ~1339, über
-   `finde('vergleichsfaktor', ags)`) und liefert heute immer `kein_ausschuss_hinterlegt`. Die
-   Funktion muss also nicht gebaut, nur gefüttert werden — und dann an
-   `CrossCheckService` verdrahtet, wo seit v1971 `_vglKaufpreise` darauf wartet.
-5. Danach am echten Objekt nachmessen: ein Berliner ETW-Bericht muss dann
-   „Vergleichswert · amtlich" zeigen, mit Quellenvermerk.
-
----
-
-### N51 · ⚠ TEILS ERLEDIGT — am Code nachgemessen 12.10.2026
-
-> **✅ Nachtrag 19.10.2026 (v2440–v2445):** jetzt auch SICHTBAR — vorher hatte kein Amt in der Datenbank Ansprechpartner. Siehe N61.6 und Journal v2440–v2445.
-
-> **✅ Nachtrag 13.10.2026:** beide offenen Dinge sind seit v2151–v2153 gebaut (Ansprechpartner 1/2 mit Beleg je Person, Belegprüfung je Seite, Kopie-Haken).
-
-> **Erledigt ist der Link-Teil:** `frontend/js/unterlagen-modal.js:294-298`
-> rendert `antrag_url` immer als Verweis, kein `else if` mehr (v1971c).
->
-> **Offen sind zwei Dinge, und das erste ist grundsätzlich:**
->
-> 1. **Ansprechpartner 1 und 2 gibt es nicht** — gesucht nach
->    `ansprechpartner`, `ap1`, `ap2` in `unterlagen-modal.js`,
->    `unterlagenService.js`, dem ganzen Backend, dem Marktbericht und in
->    `083_unterlagen_aemter.sql`: **kein Treffer.** Das Datenmodell führt
->    **genau eine Behörde** je (Gemeinde, Unterlagenart), keine
->    Personenliste — und der KI-Auftrag (`unterlagenService.js:307`)
->    fordert ein einzelnes Objekt. Das ist kein fehlendes Feld, sondern
->    eine andere Datenform.
-> 2. **Die Belegprüfung je Seite** fehlt: `belegPruefen()`
->    (`unterlagenService.js:239-261`) prüft EINE Adresse gegen EINE
->    Quellseite; `seiten` ist nur eine URL-Liste (max. 8).
->
-> Die Vorlage `unterlagen-app-v6` liegt **nicht im Repo**.
-
-**Der ursprüngliche Text:**
-
-### N51 · Unterlagen-Modul: Ansprechpartner 1 und 2 aus v6 übernehmen (08.10.2026)
-
-**Marcels Auftrag:** „im Dateien-Ordner diese Datei `unterlagen-app-v6-ansprechpartner` …
-In dem Modul gab es jetzt noch einige Verbesserungen mit den Ansprechpartnern 1 und 2 und
-teilweise gingen die Links nicht. Kannst du das noch einarbeiten bzw. abgleichen, was wir dort
-in unser Modul übernehmen können?"
-
-**Die Links sind mit v1971c schon behoben** — der Befund war messbar und klein:
-`unterlagen-modal.js` gab `antrag_url` nur als **Text** aus („nur über das Portal"), nie als
-Link, und das auch nur im `else if`-Zweig, also **ausschließlich wenn die E-Mail fehlte**. Hat
-ein Amt beides — bei Bauamt und Grundbuchamt der Normalfall — erschien der Portal-Link **gar
-nicht**. Das Backend liefert `antrag_url` seit v1833 geprüft (`unterlagenService.js:358`,
-durch `_link()`).
-
-**Was v6 gegenüber v5 bringt** (gemessen: 77 geänderte Zeilen in `server.js`, 38 in
-`public/index.html`):
-
-| Baustein | v6 |
-|---|---|
-| Datenhaltung | `ALTER TABLE behoerden ADD COLUMN ansprechpartner TEXT DEFAULT '[]'` — eine JSON-Liste je Amt |
-| KI-Auftrag | fragt die **ersten beiden** Ansprechpersonen **in der Reihenfolge der Seite**: Name, Funktion, E-Mail, Telefon. „Nur Personen, die dort wirklich stehen. Eine E-Mail nur, wenn sie dort wörtlich steht, sonst leer." |
-| Belegprüfung | `proSeite` — die gefundenen Adressen werden **je Quellseite** festgehalten, nicht nur als Gesamtmenge. Damit ist belegbar, auf welcher Seite eine Adresse steht |
-| Zusammenbau | zuerst die von der KI genannten Personen, dann **aufgefüllt** mit den persönlichen Postfächern der Quellseite (in Seitenreihenfolge), höchstens zwei; jede mit `bestaetigt` |
-| Kopie | `kopieAn` — nur **angehakte** Personen gehen ins CC, **nie** die Adresse, die ohnehin Empfänger ist (`istEmpfaenger`-Flagge verhindert das in der Oberfläche) |
-| Versand | `cc` im Mailversand, und der Protokolleintrag führt „Kopie an …" mit |
-
-> **Der Kern des Gewinns ist nicht die Person, sondern der BELEG.** v5 wusste nur, ob eine
-> Adresse irgendwo auf einer der gelesenen Seiten stand. v6 weiß, auf **welcher** — und kann
-> deshalb eine persönliche Adresse überhaupt als „belegt" ausweisen. Ohne `proSeite` wäre
-> „Ansprechpartner 1" eine Behauptung.
-
-**Zu tun:**
-1. ~~Spalte `ansprechpartner` (JSONB) — Migration, also Rebuild.~~
-
-   > **⚠ KORRIGIERT am 11.10.2026. Das war eine Annahme, keine Messung** —
-   > derselbe Fehler wie bei N60.33, wo ich „braucht eine Migration"
-   > geschrieben hatte und `user_settings` sich als generischer
-   > Schlüssel→JSONB-Speicher herausstellte.
-
-   **Am Staging nachgemessen:**
-
-   | Tabelle | | |
-   |---|---|---|
-   | `unterlagen_aemter` | 20 Spalten | **`seiten` ist bereits `jsonb`** |
-   | | | 19 von 19 Ämtern gefüllt |
-   | `unterlagen_anfragen` | 10 Spalten | alle skalar |
-
-   Inhalt von `seiten` heute:
-
-   ```json
-   ["https://…/Kataster-und-Vermessung/", "https://…/Katastervermessungen/"]
-   ```
-
-   **Und genau das ist die Spalte, die v6 braucht.** `proSeite` — vom
-   Backlog selbst als *„der Kern des Gewinns"* bezeichnet — hält fest,
-   **auf welcher** Seite eine Adresse stand. Aus
-   `["url1","url2"]` wird `[{url, adressen:[…]}, …]`:
-   **eine Formänderung innerhalb einer vorhandenen `jsonb`-Spalte,
-   keine Migration.**
-
-   > **Die wertvolle Hälfte von v6 ist damit nicht blockiert.** Blockiert
-   > war sie nur durch meinen Satz. Ein falscher Blocker kostet mehr als
-   > eine fehlende Notiz: er hält Arbeit auf, die längst erlaubt ist —
-   > dieselbe Lehre wie bei der Namensnennung im Marktbericht.
-
-   Offen bleibt die **Form**: eine eigene Spalte `ansprechpartner` wäre
-   sauberer als eine Liste in einer Spalte namens `seiten`. Das ist eine
-   Schemafrage und braucht Marcels Freigabe — aber **erst für den
-   zweiten Schritt**, nicht für den Beleg.
-> **✅ SCHRITT 1 ERLEDIGT am 12.10.2026 (`v2151`/`v2151a`) — und dabei fiel
-> ein Defekt in UNSERER Fassung auf, der größer war als die Ergänzung:**
->
-> `belegPruefen()` suchte `text.includes(adresse)` im rohen HTML. Ämter
-> schreiben ihre Adressen gegen Erntemaschinen verschleiert. **An 19
-> echten Schreibweisen gemessen verfehlte die alte Logik sieben** —
-> `[at] [dot]`, `{punkt}`, Soft-Hyphen, Zero-Width, `<wbr>`,
-> Gedankenstrich, Minuszeichen. Eine verfehlte Adresse heißt im Modal
-> „steht nicht auf der genannten Quellseite", **für eine Adresse, die
-> dort steht.** Der Nutzer bekommt eine Warnung für einen korrekten Fund.
->
-> **Und der Rückfall war zugleich zu lax:** `includes(konto) &&
-> includes(domain)` sagt „bestätigt", wenn „info" im Menü steht und die
-> Domain im Impressum. Gemessen an
-> `<nav>Info</nav><footer>stadt-xy.de</footer>` — bestätigt, ohne die
-> Adresse je gesehen zu haben. **Ein falscher Beleg ist schlimmer als
-> ein fehlender: er behauptet eine Herkunft.**
->
-> Gebaut: `mailsAufSeite()` (stellt die Seite her, liest dann echte
-> Adressen, Reihenfolge der Seite bleibt), `istPersonenpostfach()`,
-> `belegSeiten()` (bis sechs Seiten parallel, `pro_seite`).
->
-> **Die Spalte `seiten` hatte keinen Leser** — gemessen: ein grep nach
-> `.seiten` über `backend/src` und `frontend/js` findet außer dem eigenen
-> INSERT keinen Treffer. Bis zu acht amtliche Seiten lagen je Amt in der
-> Datenbank und wurden nie abgerufen. Sie trägt jetzt
-> `{liste, pro_seite, alternativen, beleg_quelle}` — **keine Migration**,
-> die Spalte ist `jsonb` und hatte keinen Leser, der brechen konnte.
->
-> **Nachweis:** `tools/beleg-leser-pruefen.mjs`, 42 Fälle, RC=0 — und
-> zwar **im Container gegen `/app/src/services/unterlagenService.js`,
-> mit „Gestellt: nichts — alle Abhängigkeiten waren echt da"**. Dazu die
-> Abnahme gegen echte Amtsseiten: Hüllhorst, Hiddenhausen,
-> Minden-Lübbecke und Bielefeld liefern je 3–4 echte Adressen aus dem
-> Impressum (`info@huellhorst.de`, `posteingang@bielefeld.de`, …), die
-> **Startseite** dagegen null — die Unterscheidung „Seite trägt keine"
-> gegen „Abruf scheitert" ist damit belegt, nicht vermutet.
-
-> **✅ SCHRITT 2 BIS 5 ERLEDIGT am 12.10.2026 (`v2152`–`v2152b`).**
-> Migration **087**: eigene Spalte `ansprechpartner jsonb NOT NULL
-> DEFAULT '[]'` — die Form, die hier unten als „sauberer" vermerkt war.
-> Sie führt **keine Bedingung** ein (anders als v2136, das mit
-> `email_verified_at` alle vier Staging-Konten aussperrte): gemessen nach
-> dem Lauf tragen alle **19** Altsätze eine leere Liste, **kein NULL**,
-> kein Satz unbrauchbar.
->
-> **Der KI-Auftrag steht wörtlich aus v6 im Prompt**, mit allen drei
-> Einschränkungen. Die dritte ist die wichtigste — *„Stehen dort keine
-> Personen, bleibt die Liste leer"*: ohne sie ist leer kein zulässiges
-> Ergebnis und das Modell **muss** etwas liefern. Dazu das Zielfeld im
-> Antwortformat, sonst fällt der Auftrag lautlos auf den Boden.
->
-> **Der Zusammenbau** (`personenAus`) nimmt zuerst, was die Recherche
-> gelesen hat, und füllt dann mit den persönlichen Postfächern der
-> Quellseite auf — in deren Reihenfolge. `bestaetigt` ist nur true, wenn
-> **wir** die Adresse auf einer selbst abgerufenen Seite gefunden haben.
-> `kopie` beginnt bei false; dafür gibt es **PUT
-> /unterlagen/amt/:id/kopie**, der ausschließlich das Häkchen setzt —
-> ein Endpunkt, über den sich die Adresse ändern ließe, hebt den Beleg
-> auf. Die angehakte Auswahl überlebt eine Neurecherche (`CASE` statt
-> `EXCLUDED`): „nichts gefunden" ist kein Grund, Bekanntes zu verwerfen.
-> Versand über `&cc=` im `mailto`, der Empfänger fällt doppelt heraus,
-> und der CC steht im **Briefkopf** — nicht erst im Mailprogramm.
->
-> **DER ABNAHMELAUF HAT EINEN FEHLER GEFUNDEN, den kein erdachter
-> Prüfauftrag gefunden hätte** (`v2152b`): auf dem echten Impressum des
-> Kreises Minden-Lübbecke galt `rechnung@invoice.minden-luebbecke.de`
-> als **persönliches** Postfach und erschien als „Ansprechpartner 2" —
-> ein Rechnungspostfach als Ansprechperson für eine Flurkartenanfrage.
-> Ursache: `/^[a-z]\.?[a-z]+$/` sollte `mweber` treffen und trifft jedes
-> Wort aus Kleinbuchstaben. Jetzt zählt **nur der Punkt** im Konto;
-> `mweber` gilt als Funktion, und das ist die sichere Seite — eine
-> Funktion, die als persönlich gilt, schickt Post an die falsche Stelle;
-> eine persönliche, die als Funktion gilt, kostet nur eine Angabe.
->
-> **Nachweise:**
-> - `tools/beleg-leser-pruefen.mjs`: **79 Fälle, RC=0**, darunter 13
->   Zusicherungen des Zusammenbaus, 5 Formproben der Spalte `seiten`,
->   6 Stellen des KI-Auftrags am **kommentarfreien** Text und 22
->   Postfacharten — **sechs davon aus echten Amtsseiten**, mit
->   Quellenvermerk im Code. Lauf auch **im Container**, dort „Gestellt:
->   nichts".
-> - **Echte Recherche** (Flurkarte 32609 Hüllhorst): richtiges Amt,
->   Adresse belegt, **null** Ansprechpartner genannt statt zwei
->   erfundener — der Riegel greift. Null falsch belegte.
-> - **Positive Seite** ohne zweiten KI-Lauf, gegen das echte Impressum:
->   4 Adressen gelesen, 1 Person zusammengebaut (`s.ohnesorge@…`,
->   `bestaetigt=true`, `kopie=false`), keine Dubletten, Empfänger nicht
->   dabei.
->
-> **Dabei eine Falle dokumentiert, die ich selbst gebaut hatte**
-> (`v2152a`): `seiten` hat jetzt **zwei Formen** — alle 19 Altsätze
-> tragen die URL-Liste (`jsonb_typeof = array`), neue das Objekt mit dem
-> Beleg. Eine Nachmigration wäre falsch (die Altsätze haben den Beleg
-> nicht, ihn zu erfinden wäre schlimmer), also gibt es `seitenLesen()`:
-> ein Leser, beide Formen, `alt: true` als ehrliche Auskunft.
->
-> **Offen und ausdrücklich nicht bewiesen:** ob das Modell bei einem Amt,
-> dessen Seite Personen **nennt**, auch welche zurückgibt. Der Lauf oben
-> traf ein Amt ohne genannte Personen — das belegt den Riegel, nicht den
-> Fund. Beim nächsten Abruf einer Bauakte mitmessen.
-
-~~**Offen bleiben Schritt 2 bis 5:**~~ **(erledigt, siehe oben)**
-
-2. Den KI-Auftrag in `unterlagenService.js` um `ansprechpartner` erweitern, **wörtlich mit der
-   Einschränkung aus v6** („nur wenn dort wörtlich steht"). Der Prompt ist die Stelle, an der
-   erfundene Namen entstehen würden.
-3. `proSeite` nachbauen: die Belegprüfung muss je Seite festhalten, was sie gefunden hat.
-4. Oberfläche: die zwei Personen anzeigen, je mit Beleg-Stand und einem Haken „in Kopie".
-5. Versand: CC setzen, Empfänger nie doppeln.
-
-> **Nicht übernehmen:** die SQLite-Eigenheiten (`db.exec("ALTER TABLE …")` im try/catch) —
-> wir haben Postgres und `schema_migrations`. Und `start.bat`/`.env.example` sind Beiwerk der
-> Standalone-App.
-
----
-
-### N48 · ⚠⚠ DER „VERGLEICHSWERT" IST EIN ANGEBOTSPREIS, DER BERICHT NENNT IHN KAUFPREIS (08.10.2026)
-
-**Marcels Frage:** „Eigentumswohnungen werden ja üblicherweise nach dem Vergleichswert
-bewertet. Und haben wir da überhaupt Vergleichswerte und sind das dann auch die
-Verkaufspreise? … Weil dann wäre es ja im Bericht nicht richtig."
-
-**Gemessen: es sind Angebotspreise.** Der ausgegebene Vergleichswert
-(`cross_check.comparison.vergleichswert_eur`) stammt zu 100 % aus **Portalinseraten**
-des Anbieters GeoMap, aggregiert als Median €/m².
-
-```
-MarketAnalysisService.js:2      „Primaerquelle: GeoMap (echte Angebotsdaten)"
-MarketAnalysisService.js:94-98  kpiCollection({ offerType, analyzedField: PREISPROQM })
-GeoMapConnector.js:83-87        onlineDateRange „(Angebote online verfuegbar)"
-GeoMapConnector.js:274          firstSeenDate — das Datum der Inserats-Einstellung
-GeoMapConnector.js:53           analyzedField TAGEONLINE — Inseratslaufzeit
-ValuationService.js:66,179      market_value.estimated aus median_per_sqm
-CrossCheckService.js:1058       vgl = valuation.market_value.estimated
-```
-
-**Der Code weiß es selbst und sagt es an drei Stellen wörtlich:**
-
-> `connectors/IrwConnector.js:13` — „**Unser bisheriger Vergleichswert stammt aus
-> Portalinseraten, das sind Angebotspreise. § 25 ImmoWertV verlangt Kaufpreise.**"
->
-> `lib/vergleichsfaktoren_nrw.js:11-13` — „**Unser führendes Verfahren stützt sich auf
-> GeoMap-Portalinserate — das sind ANGEBOTSPREISE.**"
->
-> `services/ReportOrchestrator.js:468` — „Anders als der Vergleichswert aus Inseraten
-> stammt er aus beurkundeten Kaufpreisen."
-
-**Der Widerspruch, auf den Marcel zeigt** — selbst nachgelesen, wörtlich:
-
-`lib/verfahrenswahl.js:81-90` gibt für Eigentumswohnungen `verfahren: vergleichswert`
-mit der Begründung *„Eigentumswohnungen lassen sich über den **Kaufpreis** je m²
-Wohnfläche … gut miteinander vergleichen"*, Quelle `§ 6 Abs. 1 ImmoWertV`. Der Bericht
-schreibt daraus „Führendes Verfahren: Vergleichswertverfahren"
-(`CrossCheckService.js:1094-1096`). **Die Zahl darunter ist ein Angebotspreis-Median.**
-
-**Die Offenlegung ist da, aber löchrig** — vier gemessene Lücken:
-
-1. **Der § 25-Hinweis verschwindet genau dann, wenn er am meisten täuscht.**
-   `frontend/marktbericht-app/app.js:3817-3825`: liegt ein Immobilienrichtwert vor,
-   heißt die PDF-Karte „VERGLEICHSWERT · AMTLICH" statt „MARKTPREIS AUS ANGEBOTEN",
-   und die Zeile „Angebotspreise — keine beurkundeten Kaufpreise (§ 25 ImmoWertV)"
-   fällt weg. **Die angezeigte Zahl bleibt dabei unverändert** `cc.comparison.
-   vergleichswert_eur` — der IRW fließt nirgends in `vgl` ein (nur `out.irw`,
-   `CrossCheckService.js:1066-1073`). Die Karte heißt „amtlich" und zeigt den
-   Inseratswert.
-2. **Die Bildschirm-Karte sagt es nicht.** `app.js:803`: Titel „Vergleichswert",
-   Unterzeile „führend bei Eigentumswohnungen". Der Hinweis steht nur im
-   eingeklappten Erklärtext (`app.js:588`).
-3. **Der KI-Berichtstext darf die Quelle nicht benennen.** `report_prompt.txt:9`
-   verbietet Anbieternamen (richtig, Anbieter-Neutralität) — aber damit fällt auch
-   „Angebotspreis" weg; der Text sagt nur „Vergleichsangebote".
-4. **Der PDF-Quellennachweis führt GeoMap nicht** (`CrossCheckService.js:1182-1240`
-   baut ihn nur aus Registersätzen).
-
-**Echte Kaufpreisdaten liegen da und gehen in keinen Rechenweg:**
-
-```
-386  Saetze „durchschnittspreis" (Grundstuecksmarktdaten NRW, marktdaten-nrw.json)
-       mit Vermerk „KEIN Vergleichswert nach § 24 ImmoWertV", indikativ: true,
-       im Report NICHT aufgerufen (gutachterausschuss.js:1205-1222, :1251)
-  0  Saetze „vergleichsfaktor" im Register -> finde() liefert immer kein_ausschuss
-  1  fest einkodierte Tabelle: vergleichsfaktoren_nrw.js, Kreis Minden-Luebbecke
-       (AGS 05770) aus der Kaufpreissammlung 2024 — laeuft als SEPARATES Feld
-       `amtlicher_vergleichsfaktor` NEBEN dem Vergleichswert, nicht hinein
-       (CrossCheckService.js:1146-1166 kennt nur vgl, sachwert, ertragswert)
-```
-
-> **Warum das anders wiegt als die übrigen Punkte:** bei allen anderen Befunden rechnet
-> etwas falsch. Hier rechnet alles richtig — und der Bericht **benennt die Grundlage
-> falsch**. Marcel ist DESAG-geprüft und zeichnet das. Eine Zahl, die „Vergleichswert
-> nach § 6 Abs. 1 ImmoWertV, abgeleitet über den Kaufpreis je m²" heißt und aus Inseraten
-> kommt, ist kein Rechenfehler, sondern eine falsche Herkunftsangabe — genau das, was die
-> Doktrin „jede Zahl trägt Herkunft" verhindern soll.
-
-**Marcels eigener Vorschlag ist der richtige Weg:** „Dann könnten wir ja nur angeben,
-dass wir die Vergleichswerte auf Angebotsbasis machen und nicht nach Verkaufsbasis."
-
-**Zu tun:**
-1. **Benennung überall gleichziehen.** Solange die Quelle Inserate sind, heißt die Zahl
-   nicht „Vergleichswert", sondern **Marktpreisindikation aus Angeboten**. Betrifft
-   `verfahrenswahl.js:81-90` (die Begründung nennt „Kaufpreis"), `app.js:803`
-   (Bildschirmkarte) und die Note in `CrossCheckService.js:1094`.
-2. **Lücke 1 schließen** — das ist die schärfste: „VERGLEICHSWERT · AMTLICH" darf nur
-   über einer Zahl stehen, die auch amtlich ist. Entweder den IRW wirklich einrechnen
-   oder den Titel nicht wechseln.
-3. **Angebotsbasis in den Quellennachweis**, anbieterneutral („Angebotsdaten aus
-   Immobilienportalen, Median €/m², N Angebote, Stand …").
-4. Prüfen, ob der Vergleichsfaktor Minden-Lübbecke und der IRW als **eigenes,
-   kaufpreisbasiertes Verfahren** ausgewiesen werden können — dann gibt es dort, wo die
-   Daten da sind, einen echten Vergleichswert nach § 24/25 ImmoWertV.
-
----
-
-### N49 · Altlasten in der RND-/Verkehrswertrechnung — der Rest (08.10.2026)
-
-Drei sind in **v1968** raus (`bmf-afa.js`, `bmf-data.js`, `docs/abgeloest/rnd-ui.js`)
-plus zwei tote Importe. Was bleibt, braucht eine Entscheidung oder ist nicht risikofrei:
-
-**(a) `rnd-pdf.js` (2.365 Z.) · `rnd-docx.js` (680 Z.) · `rnd-bte-katalog.js` (190
-Bauteile DIN 276-1) — unerreichbar, aber viel Fachlogik.**
-Alle drei sind per Script-Tag geladen (`index.html:3640,3642,3643`). Ihre einzigen
-Aufrufer liegen in einem **toten Teilbaum von `rnd-wizard.js`**: `finishWizard()`
-(`:576`) wird nirgends gerufen, `goNext()` endet seit V194 in
-`_submitWizardAsRequest()` — die Datei sagt es selbst (`:1545`: „KEINE Export-Buttons
-mehr"). Tot sind damit `:576-899` und `:1633-1760`, dazu doppelte Helfer (`fmtEUR`
-zweimal, `escapeHTML`/`escapeHtml` parallel) — die Narbe zweier Generationen.
-
-> **Das ist das RND-Gutachten-PDF im Layout des Original-Gutachtens.** V150 hat es
-> absichtlich abgeschaltet („nur Anfrage senden"). Ob es wiederkommt, ist eine
-> **Produktentscheidung**, nicht aus dem Code ableitbar → Marcel. Das neue Modul
-> v4.2.2 kann es (`master_rndg.docx`), was dafür spricht, es hier nicht zu pflegen.
-
-**(b) `marktbericht/frontend/` — nicht löschen, ohne den Dienst mitzuziehen.**
-Von außen unerreichbar (der Caddyfile routet nichts auf diese Wurzel), aber es ist das
-**statische Wurzelverzeichnis eines laufenden Dienstes**: `server.js:33` macht
-`express.static(FRONTEND_DIR)`, der Dockerfile kopiert es hinein. Commit `d2354624` hat
-sich schon einmal bewusst dagegen entschieden: *„Eine Leiche hinter express.static ist
-keine Leiche, sondern eine Zeitbombe."* Löschen zieht `Dockerfile`, `server.js:15-33`
-und `tools/score-ketten-pruefen.mjs` (führt sie als vierte Quelle) nach.
-
-**(c) `frontend/js/marktbewertung-card.js` + CSS — byte-identische Dublette.**
-`diff -q` gegen `frontend/marktbericht-app/marktbewertung-card.js`: identisch, beide
-9.837 Bytes. In der Hauptapp geladen (`index.html:3631`) und **nie gemountet** — kein
-`DealPilotMarktbewertung.mount()` in `frontend/js/*`. Die genutzte Kopie liegt in
-`marktbericht-app/`. Risikofrei, aber eigenes Paket.
-
-**(d) Drei Verfahren in `rnd-calc.js` ohne Abnehmer:** `calcVogels`, `calcRoss`,
-`calcParabel` werden in `calcAll` gerechnet und exportiert, aber nur von
-`rnd-pdf.js:2309-2311` (tot) und `rnd-wizard.js:744-754` (tot) gelesen. Fällt mit (a).
-
-**(e) Toter CSS-Block in `rnd-styles.css`:** `.rnd-result*` (17×), `.rnd-method*` (7×),
-`.rnd-afa*` (5×) wurden nur von der gelöschten `rnd-ui.js` ausgegeben; der v1676-Block
-(`:1324 ff.`) bedient `showResultScreen` (tot). Lebend bleibt nur
-`.rnd-wiz-result-bar`.
-
----
-
-### MARCELS ENTSCHEIDUNGEN 08.10.2026 — was damit erledigt ist
-
-| Punkt | Entscheidung | Umsetzung |
-|---|---|---|
-| **N47** RND-Untergrenze | „die RND-Untergrenze lassen wir auf 10" — nicht die 24 Jahre aus § 185 Abs. 3 Satz 6 BewG | **v1969.** Dabei fiel auf, dass die 10 gar keine Untergrenze WAR: sie wirkte nur im Schätzungs-Zweig, nicht im Anlage-2-Zweig, und hob dort nach oben. Gemessen GND 50, 1 Punkt: Alter 46 → 8,4 J., Alter 51 → 10 J. Jetzt gilt sie in beiden Zweigen, an einer Stelle |
-| **N47** zwei Kerne | der geprüfte Kern gilt | **v1966/v1969.** Beide Kerne identisch über 1.764 Fälle, dazu 13.600 Ausliefer-Fälle monoton. `tools/rnd-kerne-pruefen.mjs`, RC=0 |
-| **N48** Vergleichswert | „müssen wir auf jeden Fall umbenennen … ansonsten den Vergleichswert einfach rausnehmen. Dann geben wir den Ertragswert an oder den Sachwert oder beides … Was wir nicht haben, können wir ja nicht angeben" | **v1971.** Ohne kaufpreisbasierte Grundlage kein Vergleichswertverfahren; die Zahl heißt „Marktpreisindikation aus Angeboten"; die PDF-Karte sagt „amtlich" nur noch über einer amtlichen Zahl |
-| **N49** RND-Gutachten-PDF | „das bauen wir hier gar nicht rein … Die Leute bekommen erst mal kein RND-Gutachten" | **v1970.** `rnd-pdf.js`, `rnd-docx.js`, `rnd-bte-katalog.js` und 400 Zeilen toter Teilbaum in `rnd-wizard.js` gelöscht — rund 3.800 Zeilen |
-| Modernisierungspunkte | „das brauchst du nicht weiter anzeigen … aber dass man signalisiert bekommt: Wo ist denn die Anlage 2 und wo muss ich die aufstellen" | **v1972.** Acht Chips mit Absprung in die Gewerke-Tabelle, die leeren vorn |
-| Unterlagen-Links | „teilweise gingen die Links nicht" | **v1971c.** `antrag_url` war reiner Text und stand im `else if` — bei einem Amt mit E-Mail UND Portal erschien der Link gar nicht |
-
-**Offen geblieben und absichtlich nicht gepatcht:** N47b — 0 Punkte gelten als „nicht
-erfasst"; N49 (b) bis (e); N50 — Ernte der Vergleichsfaktoren, **Berlin zuerst**; N51 —
-Ansprechpartner aus dem Unterlagen-Modul v6.
-
----
-
-### N47 · ⚠ ZWEI ANLAGE-2-KERNE, UND EINER EXTRAPOLIERT ÜBER DIE GND (08.10.2026)
-
-**Gefunden**, als Marcel fragte, warum bei Parkstr. 9 keine Restnutzungsdauer stand. Der
-Weg dorthin ist mit **v1965** behoben (eine Ableitung statt drei). Was bleibt, ist der
-Rechenweg selbst.
-
-**Es gibt zwei Umsetzungen der Anlage 2 ImmoWertV:**
-
-```
-Backend   marktbericht/backend/src/lib/anlage2.js    (rechnet immer)
-Frontend  frontend/js/rnd-calc.js  Kern 3.1.0        (prueft drei Grenzen)
-```
-
-**Gegen beide echten Kerne gemessen, GND 80, 0 Modernisierungspunkte:**
-
-```
-Baujahr  Alter   Frontend 3.1.0        Backend anlage2.js
-  1990     36    44                    44                  gleich
-  1968     58    22,31                 22,3                gleich
-  1964     62    19,31                 19,3                gleich
-  1905    121    nicht anwendbar       33,1                ABWEICHUNG
-```
-
-Sie sind sich **überall einig außer jenseits der Gesamtnutzungsdauer**. Dort rechnet das
-Backend weiter — und die Parabel der Anlage 2 hat ihren **Scheitel bei Alter 84**
-(`b·GND/2a` = 2,625 × 80 / 2,5) und steigt danach wieder:
-
-```
-Bj 1964 (62 J. alt)  ->  19,3 Jahre RND
-Bj 1905 (121 J. alt) ->  33,1 Jahre RND     <- das aeltere Haus bekommt MEHR
-```
-
-Der Frontend-Kern verweigert das ausdrücklich und begründet es im Code: *„ohne 3. bekam
-ein Haus von 1900 mehr RND als eines von 1964."* Er ist gegen **drei unterschriebene
-Gutachten geprüft** (`tools/rnd-pruefung/rnd-gutachten-test.mjs`, 22/22). Der
-Backend-Kern hat diese Prüfung nicht.
-
-> **Heute trifft es den Sachwert, nicht nur eine Anzeige.** `CrossCheckService` rechnet
-> über `rnd-einheitlich.js` → `anlage2.js`. An Parkstr. 9 mit 8 Modernisierungspunkten
-> kommen **38,4 Jahre** heraus statt eines Befundes „Modell nicht anwendbar" — bei einem
-> 121 Jahre alten Gebäude. Der Restwertfaktor und mit ihm der Gebäudesachwert hängen
-> daran.
-
-**Zu tun:**
-1. Entscheiden, welcher Kern gilt. **Fachlich spricht alles für den Frontend-Kern** —
-   er ist gegen Gutachten geprüft und begründet seine Grenzen aus dem Verordnungstext.
-   Das ist eine **Bewertungsentscheidung, keine Code-Entscheidung** → Marcel.
-2. Danach **einen** Kern führen. `tools/rechenkerne-spiegeln.mjs` gibt es seit v1899 und
-   spiegelt Frontend → Backend; diese beiden stehen nicht darin.
-3. Prüfer, der beide Kerne über ein Raster hält (Baujahre × Punkte) und bei der ersten
-   Abweichung rot wird — sonst laufen sie wieder auseinander.
-
----
-
-### N47b · 0 Modernisierungspunkte gelten als „nicht erfasst" (08.10.2026)
-
-`rnd-einheitlich.js` prüft die Punkte mit einem Helfer, der **`> 0` verlangt**:
-
-```js
-const _num = (v) => { const n = Number(v); return Number.isFinite(n) && n > 0 ? n : null; };
-```
-
-Damit fällt **`mod_punkte: 0` auf den Zweig `kein_modernisierungsgrad`** — Anlage 2 wird
-nicht angewandt, es gilt die Schätzung.
-
-An Parkstr. 9 ist das sichtbar: die Gewerke-Tabelle meldet **„5 von 8 Bauteilen
-angegeben"** und errechnet daraus **0 von 20 Punkten**. Das ist ein **Befund** — nicht
-modernisiert — und nicht dasselbe wie „niemand hat hingesehen". Der Bericht schreibt
-aber „Es wurde kein Modernisierungsgrad erfasst."
-
-> Die Wirkung ist heute **zugunsten des Vorsichtigeren**: die Schätzung gibt 10 Jahre,
-> Anlage 2 mit 0 Punkten gäbe 33,1 (siehe N47 — und die 33,1 sind selbst fraglich).
-> **Erst N47 entscheiden, dann das hier** — sonst wird eine Zahl freigeschaltet, die
-> aus dem falschen Kern kommt.
-
-**Zu tun:** zwischen „0 Punkte erfasst" und „nichts erfasst" unterscheiden. Die
-Gewerke-Tabelle weiß, ob jemand etwas angegeben hat (`mp.angaben`); diese Zahl erreicht
-das Backend noch nicht.
-
----
-
-### N46 · Der Mapper multiplizierte Zahlen mit 10, 100 oder 1000 (07.10.2026) — BEHOBEN v1962
-
-**N46-BEHOBEN · am echten Objekt nachgemessen, derselbe Lauf vor und nach der Reparatur:**
-
-```
-vorher   Vergleich 199.000 / Sachwert 1.717.808 / Ertrag 130.000
-nachher  Vergleich 199.000 / Sachwert   138.463 / Ertrag 130.000
-```
-
-Der Sachwert liegt jetzt in derselben Größenordnung wie Vergleichs- und Ertragswert — **die
-drei Verfahren klammern sich gegenseitig ein**, statt um Faktor 8,6 auseinanderzulaufen. Genau
-der Zustand, den Marcel beschreibt: „die Wahrheit wird wohl dazwischen liegen."
-
-17 Proben gegen die echte reparierte Funktion, alle grün.
-
-**Zweiter Fund beim Aufräumen:** `mandanten.js:645` trug einen **unmaskierten** Punkt im
-regulären Ausdruck — er trifft damit jedes Zeichen, `kpN` war immer `NaN`, und der Kaufpreis
-erschien in der Mandantenliste **nie**. Gemessen mit „180000", „180.000" und „1.234,56":
-dreimal `NaN`. Ebenfalls behoben.
-
-> **Noch offen:** die 25 Objekte mit Punkt-Dezimalzahlen tragen weiterhin falsch gerechnete
-> `_kpis_*`-Schnappschüsse aus früheren Läufen. Die werden beim nächsten Speichern neu gesetzt —
-> **ein Lauf über den Bestand wäre ehrlicher als zu warten.**
-
-
-**Gefunden beim Auslösen einer Stufe-3-Wertermittlung an echten Objekten** (N44). Der Lauf
-ergab für eine **100-m²-Eigentumswohnung einen Sachwert von 1.717.808 €** — das 8,6-fache des
-Vergleichswerts (199.000 €).
-
-**Die Ursache steht in einer Zeile:** `marktbericht/backend/src/services/DealPilotObjectMapper.js:17`
-
-```js
-parseFloat(String(v).replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, ''))
-```
-
-Der **Punkt wird als Tausendertrennzeichen gelöscht**. Richtig für „1.234,56" — zerstörend für
-jeden Wert, der mit Dezimalpunkt gespeichert ist. Gegen die **echte** Funktion gemessen:
-
-```
-"64.58"   -> 6458     Faktor 100    Garagen-BGF
-"3.5"     -> 35       Faktor 10     Zinssatz 3,5 % wird zu 35 %
-"0.5"     -> 5        Faktor 10     Grundbuchamt 0,5 % wird zu 5 %
-"1.91"    -> 191      Faktor 100    Baupreisindex
-"64,58"   -> 64.58    ok            mit KOMMA stimmt es
-"950"     -> 950      ok            ganze Zahlen sind unauffaellig
-```
-
-**Tragweite, gemessen auf Staging:**
-
-```
-37   Felder laufen im Mapper durch num()
-25   Objekte tragen Punkt-Dezimalzahlen
-365  Feldwerte insgesamt betroffen
-```
-
-Betroffene Felder, die der Mapper **wirklich liest** (Schnittmenge):
-`garagen_bgf_qm` · `_kpis_dscr` (23 Objekte) · `_kpis_ltv` (22) · `_kpis_cf_ns` (14) · `bgf` ·
-`brw` · `ds2_marktmiete` · `ds2_marktfaktor`.
-
-> **Warum es so lange unentdeckt blieb:** ganze Zahlen gehen unbeschädigt durch, und Werte mit
-> KOMMA auch. Nur die Punkt-Schreibweise kippt — und die entsteht, wenn ein Wert einmal durch
-> JavaScript gelaufen ist (`String(64.58)` ergibt `"64.58"`). **Der Fehler trifft also genau die
-> Werte, die die App selbst gerechnet hat**, nicht die, die jemand eingetippt hat.
-
-> Dieselbe Sorte Fehler wie der Cent-Faktor in `projectAll` (Faktor 100, Tabelle UND Charts).
-> **Die zweite Zahl verrät die erste:** hier war es der Sachwert neben dem Vergleichswert.
-
-**Gegenprobe, dass es kein Einzelfall ist** — derselbe 100-m²-Wohnung über fünf Wochen:
-
-```
-03.09.2026   ETW      242.274 EUR    2.423 EUR/m2   <- der Wert aus CLAUDE.md
-04.10.2026   wohnung   83.720 EUR      837 EUR/m2
-07.10.2026   wohnung 1.717.808 EUR   17.178 EUR/m2  <- dieser Lauf
-```
-
-**Mehrfamilienhäuser sind nicht betroffen** (Bad Oeynhausen 427 m², Bj 1905: Vergleich 491.000 /
-Sachwert 295.000 / Ertrag 364.000 — plausibel). Es trifft die Wohnungen, weil dort die
-Garagen-BGF in den Sachwert eingeht.
-
-**Zu tun:**
-1. `num()` reparieren: ein Punkt ist nur dann Tausendertrenner, wenn danach **genau drei**
-   Ziffern stehen UND kein Komma folgt. Sonst ist er das Dezimalzeichen.
-2. **Prüfer dazu**, der beide Schreibweisen gegeneinander hält — der Fehler ist unsichtbar,
-   solange man nur ganze Zahlen testet.
-3. Prüfen, ob derselbe Umwandler anderswo steht (`backend/src/`, Bot-Pfad).
-4. Danach die drei Sachwerte oben neu rechnen und gegen die 242.274 € aus CLAUDE.md halten.
-
----
-
-### N45 · ✅ ERLEDIGT — 34 Media-Queries, am Code gezählt 12.10.2026
-
-> `frontend/css/datenaufnahme.css`, 3.241 Zeilen, **34 `@media`-Blöcke**.
-> Breakpoints: 560 · 640 · 641 · 700 · 701 · 769 · 820 · 900 · 901 ·
-> 1024 · 1100 · 1140 · 1200 · 1400 · 1401 · 1439.
->
-> **320–1920 px sind durchgehend abgedeckt**, aber nicht mit eigenen
-> Endstufen: unter 560 px gilt der 560er-Block (auch bei 320), über
-> 1439 px nur die Grundschicht. Das ist eine bewusste Lage, kein Loch —
-> wer dort eine eigene Stufe braucht, misst sie zuerst.
-
-**Der ursprüngliche Text:**
-
-### N45 · Die Datenaufnahme rendert auf keiner Gerätegröße sauber (07.10.2026)
-
-**N45-STAND 08.10.2026, 2. Durchgang — die offenen Punkte sind geklärt (v1990–v1992)**
-
-| Punkt | Stand |
-|---|---|
-| **Feldhilfe lesbar** (Marcels Bild `texte.png`) | **fertig** (v1990). Die eingekreiste Zeile von **1,36 auf 9,50 : 1**, die Überschrift von 2,29 auf 5,00. Ursache: die Sprechblase ist dunkel entworfen, ein Inline-Blatt macht sie weiß — der Fließtext hat den Wechsel mitgemacht, Titel und Aufzählung nicht |
-| **Stufen 1·2·3 lesbar** (Bild `aufnahme.png`) | **fertig** (v1990). Von **1,13 auf 14,81 : 1**. `.dp-pf-pille` trägt Creme bei 75 % Deckkraft — gemacht für die dunkle Leiste, in der hellen Karte steht Creme auf Creme. Gespiegelt von `.oe-pillen`, wo es schon gelöst war |
-| **Lampe der Auswahl grün** | **fertig** (v1991) — und sie war es schon. Verdeckt hat es die Größe: 9×9 px mit einem dunklen Ring, der bei der Größe die halbe Fläche einnimmt. Jetzt 12×12 mit grünem Schein |
-| **QR weg auf Handy und Tablet** | **fertig** (v1992), rein in CSS, Grenze 900 px. Der JS-Notnagel aus v1990 ist wieder raus |
-| **QR gerade** | **fertig** (v1992). 64×92 → **92×92**, der gezeichnete Code wächst von 54 auf 68 px, die Leiste bleibt 1280×132 wie vorher |
-
-> **Warum vier CSS-Anläufe gescheitert sind — und es stand in meiner eigenen Memory.**
-> `datenaufnahme.css` führt **62** Selektoren mit `:is(#oab-bar,#qc7-sources)`, und
-> `:is()` erbt die Spezifität seines **stärksten** Arguments — hier eine ID. Diese Regeln
-> liegen auf (1,3,2); meine lagen alle ohne ID darunter und konnten nie gewinnen.
->
-> **Mein Kaskaden-Walker hat sie nie gezeigt:** er trennt Selektorlisten an Kommas und
-> zerreißt dabei `:is(#a,#b)` in zwei ungültige Hälften; `matches()` wirft, der Fehler
-> wird gefangen, die Regel gilt als „passt nicht". Dieselbe Bauart wie der
-> Verlaufs-Ebenentrenner aus v1988: ein Regex, der Verschachtelung nicht kennt.
->
-> Die Erkennungsprobe steht in `is-erbt-id-spezifitaet` und hätte eine Minute gekostet:
-> matcht die Regel als **Ganzes**, aber keiner ihrer Komma-Teile, steckt ein `:is()`
-> dahinter.
-
-**Und warum der Kasten 64 breit und 92 hoch war:** eine ID-Regel setzt `width/height:64px`,
-eine Regel **ohne** ID setzt `min-width/min-height:92px`. Die ID gewinnt für `height` — aber
-`min-height` setzt niemand mit ID, also bleibt die 92 stehen, und **`min-height` schlägt
-`height`**. Keine der beiden Regeln ist falsch; zusammen ergeben sie einen schiefen Kasten.
-
-> **Eine Rücknahme:** ich hatte gemeldet, der QR sei „nicht quadratisch und damit nicht
-> zuverlässig scannbar". Das SVG trägt `viewBox="0 0 31 31"` und ohne `preserveAspectRatio`
-> gilt `xMidYMid meet`, das das Verhältnis **wahrt**. Gezeichnet wurde immer ein sauberes
-> Quadrat — schief war der Kasten, nicht der Code.
-
-**Noch offen aus N45:**
-1. **Der grüne Ring der Lampe.** `border-color` aus meiner Regel greift nicht, `box-shadow`
-   aus **derselben** Regel schon — auch mit ID-Spezifität. Rein kosmetisch (Füllung und
-   Schein tragen das Grün), aber unerklärt.
-2. **`span.bp "BOARDING PASS"` mit `font-size:0`** im DOM — ein Rest der entfernten
-   Bordkarte. Unsichtbar, aber für einen Screenreader vorhanden. Gehört zu N49e.
-3. **Drei `bordkarte`-Selektoren** stehen noch in `datenaufnahme.css`, seit v1953
-   unerreichbar. Ebenfalls N49e.
-
----
-
-**N45-STAND 08.10.2026 — gemessen in der Messkabine, nach v1985–v1989**
-
-| Punkt | Stand |
-|---|---|
-| **Trichter raus** | **fertig** (v1985). `STILE` führt wieder drei Entwürfe: Zeile, Kartei, Bütten. 24 CSS-Regeln entfernt, 1 leere `@media`, 2 Selektorlisten gekürzt. Das Netz für den Abrufknopf (`ertragAbraeumen`) bleibt |
-| **Bordkarte raus** | fertig seit v1953 |
-| **Lesbarkeit 390 px** | **fertig** (v1989). Null Durchfaller in allen drei Entwürfen, kleinster Kontrast 4,80 / 5,51 / 4,86 — gemessen gegen den effektiven Grund mit aufgelösten Verläufen |
-| **Knopfgrößen** | **kein Befund.** 6 Knöpfe je Entwurf, höchster 42–50 px, Schrift 13–14 px. Das ist eine Tippfläche, nicht „riesig" |
-| **Überlauf** | **kein Befund.** `offsetHeight − clientHeight − Rand = 0` in allen drei Entwürfen, auf allen drei Größen |
-| **Datenaufnahme auf dem Handy erreichbar** | **behoben** (v1987). Der Riegel `_pfScanQ` löste sich nur im rAF; ohne rAF blieb das Bodenblatt unter dem Bildrand und die ganze Datenaufnahme unerreichbar |
-| **QR weg auf Handy** | **teilweise.** Zeile und Bütten: weg (0×0). **Kartei: hängt noch** — siehe unten |
-| **QR weg auf Tablet** | **offen.** Bei 765 px greift die 640er-Regel nicht, und der QR ist dort **54×68** — ebenfalls nicht quadratisch |
-
-**OFFEN 1 · Der QR im Entwurf Kartei lässt sich mit CSS nicht verbergen.**
-Nach vier Anläufen abgebrochen (CLAUDE.md: STOPP, Diagnose, melden). Der Befund ist
-anomal und deshalb hier vollständig notiert:
-
-- Der Kasten ist **64×92**, das SVG darin **54×68** — beides nicht quadratisch. Ein QR,
-  der nicht quadratisch ist, lässt sich nicht zuverlässig scannen.
-- Ursache der Stauchung: `datenaufnahme.css` setzt `width:92px !important`, und derselbe
-  Datei-Block setzt unter `@media (max-width:900px)` ein `max-width:100% !important` auf
-  **jedes** Kind der Leiste. Die Breite wird gekappt, die Höhe bleibt.
-- **Das Unerklärte:** ein eingehängtes `#oab-pf-qr{outline:4px solid red !important;
-  display:none !important}` färbt den Rahmen rot (die Regel kommt also an) und ändert
-  `display` **nicht**. Das ist für eine gewöhnliche Deklaration unmöglich.
-- Ausgeschlossen durch Messung: kein Inline-`display` (`getAttribute("style")` trägt nur
-  das Standbild der Messkabine), genau **ein** `.dp-pf-qr` im Dokument, `isConnected`,
-  direktes Kind von `#oab-bar.dp-pfbar`, Medienabfrage greift, und ein Inline-
-  `display:none` wirkt sofort (64 px → 0 px).
-- Nächster Schritt wäre, es **nicht** über CSS zu lösen: `karten-stil.js` baut die Leiste
-  ohnehin um und könnte den QR unter 900 px aushängen. Vorher aber verstehen, warum die
-  Regel nicht greift — sonst ist es ein Notnagel auf einem unverstandenen Defekt.
-
-**OFFEN 2 · Die Grenze muss auf Tablet erweitert werden.** Marcels Freigabe nennt
-ausdrücklich „Handy-Version oder auch Tablet-Version". Die Regel aus v1989 greift nur
-unter 640 px. Bei 765 px steht der QR mit 54×68 da.
-
-**OFFEN 3 · `span.bp "BOARDING PASS"` steht mit `font-size:0` im DOM** — ein Rest der
-entfernten Bordkarte. Unsichtbar, aber für einen Screenreader vorhanden. Gehört zu N49e.
-
-> **Was die Messung dieser Runde gekostet hat, und warum sie es wert war:** die
-> Messkabine hat an drei Stellen gelogen, und ich habe zweimal darauf gebaut, bevor ich
-> sie reparierte. `effGrund` las kein `background-image` (v1986) und dann alle
-> Hintergrund-Ebenen in einen Mittelwert (v1988); `requestAnimationFrame` feuert im
-> verborgenen Dokument nicht (v1986). Auf den falschen Zahlen habe ich in v1987 eine
-> Textfarbe geändert, die nie falsch war — zurückgenommen in v1988. **Erst messen, dann
-> bauen heißt auch: erst das Messgerät, dann das Produkt.**
-
----
-
-**N45-AUFTRAG, von Marcel am 08.10.2026 geschärft:**
-
-> „Wir haben in den Darstellungen Karte im Objekt Datenaufnahme. Dort haben wir einmal
-> gesagt, dass wir den Trichter auf jeden Fall rausnehmen und die Bordkarte auch. Die
-> fallen komplett raus und es muss in unserer Messkabine passend gerendert sein und auch
-> die Formatierung auf Handy und allem … Die Buttons sollen auch nicht riesig groß sein.
-> Da kannst du dann, wenn das nicht passend dargestellt wird, den Barcode für die
-> Handy-Version oder auch Tablet-Version rausnehmen. Man sollte die Texte lesen können."
-
-**Stand der beiden Stile, gemessen:**
-
-| Stil | Stand |
-|---|---|
-| **Bordkarte** | **schon raus** — v1953 am 07.10.2026, `karten-stil.js`. Dabei die Falle vermieden, dass es ZWEI gleichnamige Stile gibt: `data-dp-kartenstil` (Datenaufnahme) und `data-dp-objkarte` (Objektliste). Die zweite ist seit v1915 Marcels Rückfall der Aktenmappe und durfte nicht mitfallen |
-| **Trichter** | **steht noch** in `STILE` (`karten-stil.js:124`). Er braucht JS, weil er rechts drei Zeilen zeigt, die es im DOM nicht gibt, und den Abrufknopf umhängt — beim Ausbau muss der Knopf an seinen gemerkten Platz zurück |
-
-**Die Prüfstrecke, die dieser Punkt verlangt:**
-
-1. **Messkabine** (`messkabine.html?ziel=/`, iframe `#f`). Responsive ist NUR im
-   gleich-Origin-iframe messbar — die Fenstergröße zu ändern wirkt nicht.
-2. **Je Gerätegröße und je verbleibendem Stil** messen, nicht nur ansehen:
-   - Überlauf: die **direkten Kinder** auflisten und ihre Summe gegen `clientWidth`
-     halten. `overflow-x:auto` und `scrollWidth` sind **kein** Befund; der Nachweis ist,
-     dass ein Balken HÖHE WEGNIMMT (`offsetHeight − clientHeight` minus Rand).
-   - **Knopfgrößen**: Marcel nennt sie ausdrücklich („nicht riesig groß"). Je Knopf
-     `getBoundingClientRect()` und gegen die Zeilenhöhe halten.
-   - **Lesbarkeit**: Kontrast gegen den EFFEKTIVEN Grund (erster Vorfahr mit Fläche,
-     Alpha ausgerechnet). Text und Grund zusammen messen — einzeln war schon einmal
-     jede Farbe richtig und der Kontrast lag bei 1,19.
-3. **Der QR-Code darf auf Handy und Tablet fallen**, wenn der Platz sonst nicht reicht —
-   Marcels ausdrückliche Freigabe. `style.css:33016` setzt ihn fest auf 54×54.
-4. **Varianten nur über den Bedienweg schalten** (Panel klicken), nie per
-   `setAttribute`: sonst fehlt das Nachziehen des Skins und Fehler bleiben unsichtbar.
-   Und den Panel-Merker danach schließen.
-5. **Prüfläufer je Reiter**, nicht einmal für alles — die Stile wirken nur an ihrem
-   Anker, und ein Attribut zu setzen ist kein Nachweis, dass eine Regel trifft.
-
-> **Warum das kein Nebenbei-Schritt ist:** sieben Listen-Kartenstile haben auf dem Handy
-> nie gewirkt, weil der Anker `.dpl-schiene` hieß und die Liste in `aside#sidebar` lag.
-> Gemessen wurde das erst, als jemand die Treffer gezählt hat statt das Attribut zu
-> setzen.
-
----
-
-
-Marcel am 07.10.2026:
-
-> „Die Datenaufnahme — da haben wir ja verschiedene Ansichten in Einstellungen unter Darstellung
-> und dann Karte im Objekt. Die werden alle **nicht passend gerendert**, wenn man auf die
-> verschiedenen iPhones oder Tablets oder Desktop-Größen umstellt. Teilweise **komplett
-> verformt** oder der **Button riesig groß**. Das musst du bitte komplett neu rendern und auch
-> anpassen auf die verschiedenen Größen, sodass alles schön dargestellt wird."
-
-**Betroffen sind die vier Datenaufnahme-Stile** (`data-dp-kartenstil`): Automatisch, Zeile,
-Kartei, Bütten, Trichter. Die Bordkarte ist seit `v1953` raus.
-
-**Was dagegen schon gemessen und in Ordnung ist** (07.10.2026, damit niemand zweimal sucht):
-
-- **Desktop 1180 px:** kein gemalter waagerechter Scrollbalken, in keinem der Stile.
-  `#oab-bar` misst 754/754, das Dokument 1179/1179.
-- **Handy 388 px:** `flex-direction: column`, sechs Zeilen untereinander, Knöpfe 324 × 44,
-  keiner unter 44 oder über 64 px.
-- **Lesbarkeit:** nach `v1954/v1954a` liegt keine Textstelle mehr unter Kontrast 4,5
-  (22 Stellen über fünf Stile gemessen).
-
-> **Das heißt: der Fehler liegt zwischen diesen beiden Breiten.** Gemessen wurde bisher bei
-> **388** und **1178** — Marcel nennt ausdrücklich „iPhones ODER TABLETS ODER Desktop-Größen".
-> Die Messkabine hat Knöpfe für 360 / 375 / 390 / 430 / 768 / 834 / 1180 / 1280; geprüft sind
-> bisher im Wesentlichen die Ränder. **Der Prüflauf muss ALLE acht Breiten × alle fünf Stile
-> abdecken — 40 Zustände.**
-
-**Was zu messen ist, je Zustand:**
-
-1. **Überlauf:** direkte Kinder der Leiste auflisten und ihre Summe gegen `clientWidth` halten.
-   Nicht am Kind messen, das überläuft — das war viermal die falsche Ebene (`v1941`).
-2. **Knopfgrößen:** `.dp-pf-tile` und `.dp-pf-launch` — Marcels „riesig groß" braucht eine Zahl.
-   Vorgabe von ihm: 44 px Mindesthöhe („ja 44 ist gut"), also ist die Obergrenze die Frage.
-3. **Verformung:** Seitenverhältnisse der Kacheln, abgeschnittener Text
-   (`scrollWidth > clientWidth` bei `overflow:hidden` ohne Ellipse).
-4. **Je Stil NEU LADEN, nicht umschalten.** Der Trichter baut die Leiste um; ein Umschalt-Lauf
-   hinterlässt einen Zwischenstand und liefert erfundene Zahlen (am 07.10.2026 genau so
-   passiert, siehe Journal (84)). Der Speicherschlüssel heißt `dp_karten_stil`.
-
-**Vorlagen:** `design/mockups/preflight-varianten-v1425.html` (die Entwürfe, aus denen die Stile
-stammen) und `Dateien/karte.png` (Marcels Bild zur Bütten-Fassung).
-
----
+- Grüner Ring der Lampe: `border-color` greift nicht, `box-shadow` derselben Regel schon — unerklärt.
+- `span.bp "BOARDING PASS"` mit `font-size:0` im DOM und `bordkarte`-Selektoren in `datenaufnahme.css` — gehört zu N49e.
+Erledigtes s. Fertig.
 
 ### N44 · Stufe 3 (Wertermittlung ImmoWertV) am echten Objekt nachsehen (07.10.2026)
 
@@ -8236,391 +1384,22 @@ Der Kern ist **N4** — alles andere hängt davon ab oder ist klein.
 
 ---
 
-### N1 (04.10.) · Das Unterlagen-Modal trägt nicht die Marke
+### N3 (04.10.) · Gemarkung aus BORIS mitfüllen — Rest
 
-Marcel: *„Das müsste einmal das Modal auch im Stil vom Deal-Piloten, also
-so wie das Einstellungsmenü oder die anderen Modals, die wir öffnen, auch
-mit dem Gold, mit dem Schwarz, mit dem Weiß. Dann kann man die Amt
-ermitteln, das kann man nicht lesen, auch das Anschreiben."*
+- Die BORIS-Antwort trägt Gemarkungsnummer und -name (siehe `boris-liefert-die-gemarkung`); das Feld beim Bodenrichtwert-Abruf mitfüllen — nicht belegt. Erledigtes s. Fertig.
 
-Gebaut in v1834 mit Inline-Stilen statt der vorhandenen Modal-Klassen.
-Zwei Mängel, beide gemeldet:
+### N4 (04.10.) · Reiter Objekt — Rest
 
-- **Gestaltung**: Obsidian `#050505`, Gold `#C9A84C`, Creme `#FDFCFA`.
-  Vorbild ist das Einstellungs-Modal. Vor dem Bauen dort auslesen, welche
-  Klassen es nutzt — nicht nachbauen.
-- **Lesbarkeit**: die Knöpfe „Amt ermitteln" und „Anschreiben" sind nicht
-  zu lesen. Vermutlich `btn-ghost` auf dunklem Grund. **Kontrast gegen den
-  effektiven Grund messen**, nicht gegen den Behälter.
+- **N4-P5** — GeoMap-Filter (Zimmer, Grundstück, Heizung): erst messen, ob die Vergleichsmenge nicht zu klein wird.
+Erledigtes s. Fertig.
 
-### N2 (04.10.) · „Alle abrufen" statt fünfmal klicken
+### N6b · Der zweite Geldweg im Browser-Co-Piloten — offen
 
-Marcel: *„man muss die ja alle einzeln abrufen. Genau, dass man da noch
-einen Button macht: alle abrufen."*
+- Die Zustimmung im Browser ist rein clientseitig (`copilot-aenderungen.js`); der geprüfte Geldweg des Telegram-Agenten (`darfKosten` + Angebot, v1821) gilt dort nicht. Browser-Chat über dieselben Werkzeuge mit Stufe `kostet` führen. Erledigtes (N6) s. Fertig.
 
-Fünf Unterlagen, fünf Klicks, je ~20 s KI-Recherche. Ein Knopf, der alle
-fünf nacheinander holt, mit Fortschritt je Zeile.
+### N7 · Pilot-Analyse — Rest
 
-> Nacheinander, nicht gleichzeitig: fünf Websuchen parallel sind für
-> dieselbe Gemeinde fünfmal dieselbe Arbeit, und die Ämter-Ernte kann
-> jeden Treffer für den nächsten nutzen.
-
-### N3 (04.10.) · Sind Gemarkung, Flur und Flurstück Pflicht?
-
-Marcel: *„ist es zwangsläufig notwendig, dass man Flur, Gemarkung und
-Flurstück eingeben muss?"*
-
-**Nein** — gemessen am Anschreiben-Erzeuger (`unterlagenService.anschreiben`):
-die Angaben sind optional, ohne sie steht die Flurzeile nicht im Brief.
-Das Amt sucht dann selbst, was länger dauert.
-
-Zu prüfen und dann im Modal klarstellen: der Text sagt heute „muss das Amt
-das Flurstück selbst heraussuchen" — das klingt nach Pflicht, ist aber nur
-ein Hinweis. **Dazu:** die BORIS-Antwort trägt Gemarkungsnummer und -name
-(41 Felder, siehe `boris-liefert-die-gemarkung`). Das Feld liesse sich beim
-Bodenrichtwert-Abruf mitfüllen.
-
-### N4 (04.10.) · DER REITER OBJEKT WIRD NEU GEORDNET — das große Stück
-
-Marcel: *„im Tab Objekt haben wir unten Wertermittlung, Marktbericht. Da
-haben wir uns irgendwie falsch verstanden. Das ist ja jede, jede, jede
-Menge, die dort angegeben werden muss an Feldern. … Wir haben auch
-besondere Bauteile, auch die Ausstattung und allem. Das haben wir doch
-oben im Tab Objekt schon drin. Auch was das für ein Haus ist, was für
-Geschosse, Unterkellerung, Dachausbildung. … Weil da haben wir zum
-Beispiel auch Keller und Abstellraum."*
-
-**Der Befund, den er beschreibt: Felder stehen doppelt.** Oben in „weitere
-Objektdetails" und unten im Wertermittlungs-Block.
-
-Was zu tun ist, in dieser Reihenfolge:
-
-1. **Die Schnittstelle vollständig abprüfen.** Marcel: *„Da musst du mal
-   gucken, wie weit die Schnittstelle das alles nutzt und auch welche
-   Felder genutzt werden und welche nicht."* Also: GeoMap und jeder weitere
-   Beteiligte. Je Feld: geht es raus, wird es verwendet, oder liegt es
-   brach? `DealPilotObjectMapper.reportInput()` ist der Ausgangspunkt — er
-   führt heute `eq_heating`, `eq_windows`, `eq_floor`, `eq_bath`,
-   `eq_guest_wc`, `eq_store_room`, `eq_walls`, `eq_roof`, `eq_elevator`.
-
-2. **Die Doppelungen auflisten.** Keller, Abstellraum, Ausstattung,
-   Geschosse, Unterkellerung, Dachausbildung — gemessen, nicht vermutet.
-
-3. **Was automatisch geht, wird nicht gefragt.** Marcel: *„Liegenschafts-
-   zinssatz und allem, die können wir ja automatisch ermitteln, genauso wie
-   den Bodenrichtwert."* Der Zinssatz kommt aus dem Register
-   (`zinssatzFuerObjekt`, Stufe A bei 10 von 17 Objekten gemessen), der
-   Bodenrichtwert aus BORIS. Beide gehören **nicht** als leeres Eingabefeld
-   in den Reiter, sondern als abgerufener Wert mit Herkunft.
-
-4. **Eine Stufe tiefer.** Marcel: *„notfalls könnten wir dort unter den
-   weiteren Objektdetails … noch eine Stufe irgendwie darunter machen …
-   Weil das wird mir hier ein bisschen zu viel."*
-
-5. **Danach neu gestalten.** Marcel: *„jetzt steigt da, glaube ich, der
-   Kunde nicht richtig durch."* → Demo-first: erst ein Entwurf in
-   `design/Vorschläge/`, dann bauen.
-
-**Das Ziel in seinen Worten:** *„dass wir alle Felder haben, dass wir alle
-Bewertungsverfahren machen können, dass wir die Schnittstelle auch
-vollumfänglich nutzen."*
-
-**Stand 04.10.2026 (v1849): Schritte 1–3 gemessen, Schritt 5 als Entwurf
-geschrieben — wartet auf Marcels Blick.** Alles in
-`design/Vorschläge/objekt-reiter-neuordnung.md`. Die drei Kernbefunde:
-
-- Vom Block „Wertermittlung (Marktbericht)" — 37 Felder — erreicht auf dem
-  Objekt-Weg **kein einziges** den Bericht; der Mapper gibt 30 Schlüssel
-  zurück, keiner davon aus diesem Block.
-- Stufe 3 (Sach-/Ertragswert) ist **aus der Haupt-App gar nicht
-  erreichbar** — jeder Aufrufer sendet Stufe 1 oder 2.
-- An GeoMap gehen aus dem Objekt **fünf** Dinge (Koordinate, Art, Fläche,
-  Baujahr, Zustand); alles andere ist fest im Code.
-
-**Entschieden 04.10.2026 (Marcel, §5.6):** Standardstufe 1–5 als eine
-Skala mit Umschlüsselung auf `quality` für Stufe 2; Lage-Indikatoren an
-den Bericht — als eigener Block `nutzer_einschaetzung` neben der
-Datenlage, nie ins gemessene `assessment`; Stufe 3 aus der Haupt-App,
-gekoppelt ans Kontingent (`wev` nur pro/partner, existiert schon); Sterne
-**umlegen**: sie gehen nicht in den Deal Score (gemessen), aber in die
-RND-Rechnung (`rnd-calc.js:683`) — dieselbe Schwelle künftig auf die
-Gewerke-Stufe. Vorlage: `design/mockups/objekt-reiter-v1850.html`.
-
-**Gebaut 04.10.2026, v1851–v1851c (Staging):** P1 Mapper, P2 Stufe 3 im
-Objekt-Weg (`DealPilotMB.run({stufe})`), P3 Automatik-Leiste, P4 Formular
-in drei Ebenen — alles in einem Paket, Feld-IDs unverändert
-(`tools/n4-umbau-index.mjs`, 873 = 873). Nachweise im Journal (14).
-Dabei gefunden und behoben: `num()` im Mapper las „2.56" als 256 (lzs_pct,
-sachwertfaktor, **mea schon vorher**).
-
-**Nachtrag v1852–v1852a (04.10.2026, Staging):** Eingabetiefe 1/2/3
-wählbar (steuert Ebene 2/3 und die Pflichtfeld-Markierung), Stufen-Knöpfe
-gestrichelt mit Fehlliste statt Abruf, Anfragen-Block mit dem
-Unterlagen-Knopf unter den Abrufen, Ebene 3 heißt „Sach- und Ertragswert
-· Stufe 3", Sachwertfaktor-Zeile nennt, was der Ausschuss führt (Lippe:
-nur EZFH). Marktbericht-App füllt ihr Formular längst aus dem Objekt
-(`mb-objektwahl.js` — mein Gegenteil-Befund war falsch, Modul entfernt).
-
-**Offen aus dem Paket:**
-- ~~**N4-P1b**~~ — **erledigt v1853 (`05d331f`)**: Web-Ansicht und PDF
-  zeigen „Ihre Einschätzung (aus DealPilot) — keine Messung" unter der
-  Datenlage, getrennt beschriftet.
-- **N4-P5** — GeoMap-Filter (Zimmer, Grundstück, Heizung) — erst messen,
-  ob die Vergleichsmenge nicht zu klein wird.
-- Empfindlichkeitstest je Mapper-Feld (ändert sich der Bericht, wenn das
-  Feld sich ändert?) steht noch aus — bisher nur Funktionslauf und ein
-  echter Stufe-1-Bericht.
-- ~~Prüfstrecke Exporte~~ — **bestanden v1855 (Journal 19)**: vier
-  Objektarten, je Voll- und Bank-PDF ohne Fehler; Import-/Export-IDs
-  vollständig. Altlasten (nicht aus dem Umbau): `nk_pct` in pdf-import.js
-  ohne Feld, `#bank-tbody` nicht mehr im Markup (CSV-Export tot, der
-  Bankexport läuft über `exportPDFBank`).
-
-### N5 (04.10.) · „BORIS abrufen" heißt nicht immer BORIS
-
-Marcel: *„Rufen wir wirklich immer bei BORIS ab oder haben wir für die 16
-Bundesländer auch andere Quellen? Weil dann brauchen wir es ja nicht
-BORIS-Abruf nennen, sondern Bodenrichtwert abrufen, ne?"*
-
-**Er hat recht, und es ist gemessen:** die Registry kennt neben den
-Landesdiensten (`nrw`, `by`, `bw`, `he`, `mv`, `sh`, `sl`, `bb`, `be`) auch
-`borisd` als bundesweiten Catch-all — für Bremen, Hamburg, Niedersachsen,
-Rheinland-Pfalz, Sachsen, Sachsen-Anhalt und Thüringen. Der Abruf an
-Hüllhorst meldete `BORIS-NRW`, der an Ibbenbüren ebenso; andere Länder
-melden andere Quellen.
-
-→ Knopf und Statuszeile auf **„Bodenrichtwert abrufen"**. Die konkrete
-Quelle steht ohnehin schon im Ergebnis („✓ … · BORIS-NRW").
-
-### N6 · Pilot-Analyse: der Marktpreis-Abruf wandert in den Co-Piloten
-
-Marcel: *„bei der Pilotanalyse, haben wir jetzt dort Marktpreis, einen
-Abruf. Also das kann da wieder raus. Wenn man dem sagt oder dort in der
-Frage beim Co-Piloten reinschreibt: Bitte ruf eine Marktpreisindikation
-ab, dann soll er das bitte machen. soll er mal sagen, es kostet was."*
-
-Der Weg steht schon: der Agent hat `marktbericht_abrufen` mit der Stufe
-`kostet`, und die Preisansage mit Angebot (v1821) ist gebaut. Zu tun:
-
-- den Abruf-Knopf aus der Pilot-Analyse entfernen
-- sicherstellen, dass der Co-Pilot im Browser denselben Weg geht wie der
-  Telegram-Bot — **einen** Geldweg, nicht zwei
-
-**Erledigt 04.10.2026, v1848 (`8bc9ed5a`), Staging:** Knopf raus
-(`dp-cp-mp` samt Listener), der Abruf steht als `__dpCpMarktpreis` dem
-Co-Piloten zur Verfügung; im ABRUFE-Katalog trägt `marktpreis` jetzt das
-Konto `avm` (vorher stand `mpi` da — das falsche Konto) und `marktbericht`
-die ehrliche Ansage „1 Marktbericht Stufe 1 (Marktpreisindikation)".
-Bewiesen im Browser: Rest 0 beim Bewertungspartner → „Dafür ist gerade kein
-Guthaben mehr da.", Rest 24 beim Marktbericht → Box mit Kosten und
-Abrufen/Doch nicht.
-
-**N6b · offen — der zweite Geldweg existiert noch.** Die Zustimmung im
-Browser-Co-Piloten ist **rein clientseitig** (`copilot-aenderungen.js`
-rechnet den Rest selbst und ruft dann die Funktion); der geprüfte Geldweg
-des Telegram-Agenten (`darfKosten` + Angebot, v1821) gilt im Browser nicht.
-Wer die Box umgeht, umgeht die Ansage. Eigenes Paket: der Browser-Chat geht
-über dieselben Werkzeuge mit Stufe `kostet` wie der Bot.
-
-### N7 · Die Pilot-Analyse gehört ins Projektwissen
-
-Marcel: *„wenn wir die Pilotanalyse gemacht haben, dass die dem
-Projektwissen zur Verfügung steht, dass der Bot, der Telegram-Bot, die auch
-abfragen kann. Also es muss dann der Pilotanalyse wie auch dem
-Portfolio-Pilot, muss es auch zur Verfügung stehen."*
-
-Heute liest `pilot-berichte.js` je Objekt nur den **jüngsten** Marktbericht
-und gibt die Verlaufslänge als Zahl weiter. Die Pilot-Analyse selbst
-(Briefing, Stärken/Risiken, Verhandlung, Bank) steht dem Agenten nicht zur
-Verfügung.
-
-→ Ein Werkzeug `pilot_analyse_lesen` nach dem Muster von
-`objekt_schnellblick`. **Der Spiegel-Weg gilt:** rechnen tut der Browser,
-der Agent liest (siehe `spiegel-statt-zweiter-rechnung`).
-
-**Erledigt 04.10.2026, v1847 (`5ca46455`) + v1849, Staging:** Werkzeug
-`pilot_analyse_lesen` (Stufe `lesen`, kostet nichts) liefert Briefing,
-Stärken, Risiken, Risikoanalyse, Szenarien, Lage, Verhandlung, Bank —
-nicht den Rohtext; ohne Analyse den fertigen Satz mit dem Weg dorthin.
-`objekt_lesen` gibt `ai_analysis`/`ai_lage_cache` nicht mehr als Feld
-heraus. Der Browser-Co-Pilot bekommt die Analyse als `pilot_analyse` in
-den Kontext. Prüfer `tools/agent-pruefung/pruef-pilot-analyse.js`.
-
-**Datenbefund dabei (kein Werkzeugfehler):** sechs Objekte des Testkontos
-tragen **byte-identisch dieselbe** Analyse — und die zur Gohliser Straße
-(Leipzig) spricht von **Bielefeld**. Seit **v1849** warnt das Werkzeug
-(`fremd_verdacht`, `so_sagen` „neu erstellen"), wenn die Analyse den Ort
-des Objekts nirgends nennt. Wie die Kopien entstanden sind (Objekt
-dupliziert? Analyse bei Adresswechsel nicht gelöscht?), ist **offen** —
-`storage.js` beim Duplizieren und beim Ändern der Adresse auf
-`ai_analysis` prüfen.
-
-### N37 · Cockpit-Grund, Sortierknöpfe und der Menüknopf (06.10.2026) — erledigt v1904/v1904a, auf Staging
-
-Marcel: „ja fertig machen, wollte ich ja so" · „auch fertig machen" · „das ‚X'
-neben Neues Objekt sieht auch nicht gut aus. Es ruft ja auch die Menüleiste
-auf. das sollte angepasst werden."
-
-**Befund 1 — der Obsidian-Grund von `#dashboard-main` existiert nicht.** Die
-Behauptung stand seit v1903a in `dashboard.js:2001` und im Journal (57), war
-aber nie gemessen. Gemessen (390 px, Aktenmappe, Cockpit offen):
-`#dashboard-main` transparent, `#dp-stage.stage.fc.fc9` `rgb(253,252,250)`,
-`.main-col` `rgb(244,242,237)`; 23 Proben über die ganze Cockpit-Höhe trafen
-**einmal** Obsidian (`.hpass` im Hero). Diagnose zurückgenommen. Der echte
-Befund: das Cockpit bringt seinen eigenen hellen Ton mit und folgt der Fläche
-nicht. Gebunden über `--page-bg` in `layout-varianten.css`, `@media
-(max-width:900px)` und nur mit `data-dp-layout` — „Heute" und Schreibtisch
-unberührt (1182 px nachgemessen: weiter `#FDFCFA`).
-
-**Befund 2 — `button.sb-sort-btn` überlappte in „Heute" weiter um 13 px.**
-v1903 hatte nur die Aussehen mit Layout-Attribut gelöst. Jetzt `gap:18px` in
-`style.css` neben der `::after`-Regel, für jede Seitenleiste unter 768 px.
-Mittenabstand 31 → 44 px, Gruppe 63,2 → 76,2 px. Schreibtisch unverändert.
-
-**Befund 3 — das „X" war kein Kreuz.** Die ±6 px in `style.css:6838` stammen
-aus der Ur-Fassung (2 px Balken + 4 px Lücke); sichtbar ist `.hdr-v61-row1`
-mit 1,5 + 3 = 4,5 px. Mitten lagen bei 29,5 / 28,0 / 26,5 statt dreimal 28,0.
-
-**Befund 4 — das „X" blieb stehen, wenn die Schublade anders zuging.**
-`closeMobileSidebarOnAction()` (`ui.js:1815`) nahm `#hdr-mobile-menu.active`
-nicht mit; dasselbe im `resize`-Handler (`main.js:382`). Ein X, das öffnet —
-genau Marcels Satz. Beide Stellen nachgezogen, über Aktionseintrag und
-Objektkarte nachgemessen.
-
-Commits `5d9c280e` (v1904), `aa3cadd8` + `a277419c` (v1904a).
-
-### N38 · „Portfolio-Strategie" räumt das Cockpit nicht ab (06.10.2026) — erledigt v1905, auf Staging
-
-**Erledigt am 06.10.2026 mit `v1905` (Commit `d3e7ff22`).** Nicht als Sonderregel
-für `#dashboard-main`, sondern als **Register der Hauptansichten** in
-`js/ui.js`: jede Vollbild-Ansicht meldet dort ihren Schließer an, und wer
-umschaltet, ruft `DealPilotAnsichten.abraeumen(ziel)`. Gemessen steht das
-Register auf `single, all, strategie, dashboard`. Der zweite Mount
-`#all-objects-main` war genauso betroffen und ist mitbehoben. Nachweis in allen
-vier Aussehen bei 390 px **und** 1180 px, zehn Wege je Lauf: die Strategie
-beginnt überall bei y = 163,3 (Handy) bzw. 168,1 (Schreibtisch), `#dashboard-main`
-und `#all-objects-main` stehen dabei auf `display:none`, `data-pst-offen` geht
-beim Verlassen sauber weg. Nebenbefund mitbehoben: `closeDashboard()` setzte
-`#s-quick` blind auf `display:''` zurück — ein Schließer, der etwas anderes
-öffnet; jetzt mit gemerktem Vorzustand.
-
-<details><summary>Der ursprüngliche Befund</summary>
-
-Gemessen am 06.10.2026, 390 px, Aktenmappe **und** „Heute", Bedienweg Menü →
-Aktionen:
-
-| Reihenfolge | `#dashboard-main` | `#portfolio-strategie` |
-|---|---|---|
-| frisch geladen → Strategie | `display:none` | y = **163**, 1915 hoch — richtig |
-| erst Cockpit → dann Strategie | `display:block`, **7.977** hoch | y = **8.096**, Scrollstand 0 |
-
-`data-pst-offen` steht in beiden Fällen auf `1`, die Sektion ist also offen —
-sie liegt nur unter einem Cockpit, das nicht abgeräumt wurde.
-`openPortfolioStrategie()` (`js/portfolio-strategie.js:175`) blendet nur
-`.sec`-Elemente aus; der Cockpit-Mount `#dashboard-main` ist keines. Umgekehrt
-räumt das Cockpit die Strategie ab, nicht andersherum. Wer im Cockpit war und
-dann auf Strategie tippt, sieht weiter das Cockpit und müsste gut 8.000 px
-scrollen. **Nicht gebaut — Marcel hat es nicht beauftragt.**
-</details>
-
-### N39 · Kartenstil „Kennzahlen": die Knopfzeile liegt auf der dritten Kachel (06.10.2026) — erledigt v1905, auf Staging
-
-**Erledigt am 06.10.2026 mit `v1905` (Commit `d3e7ff22`).** Ursache war die
-Zentrierregel `style.css:38711/38715` (v1903): sie hängt Ring und Knopfzeile an
-die MITTE der Karte. Das stimmt für die drei einzeiligen Stile — „Kennzahlen"
-ist aber zweiteilig (`.sbc-top` 43,2 + `.sbc-mini-grid` 66,6), die Mitte liegt
-dort im Raster. „Kennzahlen" fällt aus der Regel heraus und geht auf `top:6px`
-zurück; die Adresse bekommt 82 statt 72 px Innenabstand rechts.
-
-Am TEXT nachgemessen (Range-Rechtecke, nicht Elementkästen) war mehr verdeckt
-als gedacht: Löschknopf über `.sbcm-label` „BMR" 19×12 px **und Ring über
-`.sbcm-toggle-ico` „⇅" 9×14 px** — also auch ein **Bedienelement**, nicht nur
-eine Beschriftung. Nach der Änderung: keine Textüberdeckung, beide Knöpfe per
-`elementFromPoint` erreichbar, alle drei Kachel-Umschalter erreichbar, Karte
-weiter 121,8 px. Alle sieben Stile nachgemessen, keiner trägt eine Überdeckung.
-
-<details><summary>Der ursprüngliche Befund</summary>
-
-Gemessen, Aktenmappe, 390 px, Menü offen:
-
-```
-.sb-card        323 x 122  bei y = 214
-.sbc-actions     73 x  26  bei (220, 262), rechts 293
-.sbcm  (3.)      96 x  59  bei (229, 270), links 229
-.sbc-score-overlay 26 x 26 bei (300, 262)
-```
-
-Überlappung **64 px in X und 19 px in Y**; der Score-Ring liegt ebenfalls auf
-der dritten Kachel. Die Mitte der Kachel trifft noch `.sbcm-val`, der Wert ist
-also erreichbar — die Beschriftung darüber liegt unter den Knöpfen. Die 122 px
-sind richtig (das Raster trägt 67 px Inhalt, siehe `CLAUDE.md`); falsch ist
-die **Lage** der Knopfzeile. **Nicht gebaut.**
-</details>
-
-### N40 · Kartenstil „Ampel": 28 px Zeilenhöhe auf dem Finger (06.10.2026) — erledigt v1905, auf Staging
-
-**Marcel hat am 06.10.2026 entschieden:** „dann etwas höher" (Ampel) und auf
-die Rückfrage zu „Minimal" „ja klar". Beide stehen seit `v1905` auf **40,6 px**
-— 40 px ist die Schwelle des eigenen Maßstabs („unter 40 px auf dem Finger
-schwer zu treffen") und damit der kleinste Wert, der sich verteidigen lässt.
-Gemessen, 390 px, Aktenmappe:
-
-| Stil | vorher | nachher | ganz sichtbar von 20 |
-|---|---:|---:|---|
-| Ampel | 27,6 | **40,6** | 8 → **6** |
-| Minimal | 31,6 | **40,6** | 7 → **6** |
-
-> **Ehrlich dazu: der Inhalt trägt die 40 px nicht.** Beide Stile führen nur die
-> Adresse, gemessen 15,6 px; `.sbc-seq`, `.sbc-kp-row` und das Band sind dort
-> `display:none`. Die zusätzlichen 25 px sind **Trefferfläche, nicht Inhalt** —
-> hier ist das der Zweck, es soll aber nicht als Inhalt ausgegeben werden.
-
-Nur am Handy-Anker (`aside#sidebar` im `@media (max-width:900px)`-Block von
-`layout-varianten.css`). **Der Schreibtisch bleibt unberührt** — nachgemessen
-bei 1180 px: die Medienfrage ist `false` und alle 20 Karten hängen dort unter
-`.dpl-schiene`, `aside#sidebar #sb-list .sb-card` trifft null Elemente.
-
-<details><summary>Der ursprüngliche Befund</summary>
-
-Gemessen, Aktenmappe, 390 px: `.sb-card` **323 x 28**. Acht von zwanzig Karten
-ganz sichtbar — der dichteste Stil, und genau deshalb liegt die Trefferfläche
-der Karte bei 28 px. Die beiden `.sbc-btn` bleiben bewusst 26 x 26
-(`style.css:37479`, v1191); die **Zeile selbst** ist der Engpass. Zum Vergleich
-die anderen sechs: Minimal 32, Datenzeile 45, Bordkarte 44, Score-Kante 55,
-Aktenreiter 57, Kennzahlen 122. **Keine Entscheidung getroffen** — ob ein
-dichter Stil eine kleine Trefferfläche haben darf, ist Marcels Produktfrage.
-</details>
-
-### N36 · Das Portfolio-Menü der Aktenmappe auf dem Handy (06.10.2026) — erledigt v1903/v1903a, auf Staging
-
-Marcel: „Auch das kombinierte Menü finde ich nicht gut gelöst. **Standard sollte dann das
-Portfolio angezeigt werden und unten Aktionen, und dann wird das auf Knopfdruck hochgezogen**
-— quasi Aufbau wie beim Stand ‚Heute', nur halt im Layout und Design und Schriftart und
-Schriftgröße wie Aktenmappe." Dazu: „Die Karten werden dort nicht richtig dargestellt" und
-„immer noch in der Portfolio-Ansicht den Obsidian-Hintergrund mit den Partikeln".
-
-**Erledigt (`6bf9df08`, `ac4bf93a`, `878bbd0d`):** v1889 abgelöst — die Liste ist der
-Standardinhalt (318 → 484 px, scrollt in sich), der Aufklapper steht unten (0×0 → 338×44),
-das Register wird auf Knopfdruck hochgezogen; die Mechanik aus `js/ui.js` wurde nicht
-nachgebaut, sondern losgelassen. Die vier kompakten Kartenstile trugen seit v1883b
-`min-height:122px` — die Höhe der großen „Heute"-Karte — und fielen auf 45 px (Datenzeile),
-sichtbare Karten von 2 auf 6. Die Teilchen des Portfolio-Cockpits laufen in der Aktenmappe
-auf dem Handy nicht mehr. `button.sbc-btn` 20 → 26 px, `.sb-sort-btn` Mittenabstand 31 → 44 px.
-
-**Nachgemessen auf Staging** (390 px, Aktenmappe, Datenzeile, Menü offen): alle sieben
-Kartenstile greifen in der neuen Fläche und sind bedienbar, keiner ragt heraus; Register
-offen 335 × 544 ganz in der Schublade, Gruppentitel JetBrains Mono 10px/12px w700 ls1,4px wie
-in der Schiene. „Heute" (390 px) und Schreibtisch (1180 px) Zeile für Zeile unverändert,
-Partikel dort weiter deckungsgleich mit ihrem Mount. gold-audit: genau auf der Basislinie.
-Die vollständige Messreihe steht im Journal (57).
-
-**Offen:**
-- **`button.sb-sort-btn` ist nur in der Aktenmappe gelöst.** In „Heute" überlappen die beiden
-  44-px-Trefferflächen weiter um 13 px (gap 5px, Mittenabstand 31). Nicht angefasst wegen der
-  Grenze „Heute bleibt unverändert" — ein Wort von Marcel, und die Regel gilt überall unter 900 px.
-- **Der Obsidian-Grund von `#dashboard-main`** bleibt in der Aktenmappe, nur die Teilchen sind
-  weg. Die übrige Arbeitsfläche führt dort `rgb(244,242,237)`. Produktentscheidung.
-- **Marcels Abnahme im Browser** und ein Prod-Rollout.
+- Sechs Objekte des Testkontos trugen byte-identisch dieselbe Analyse (Gohliser Str. Leipzig sprach von Bielefeld). Wie die Kopien entstanden, ist offen: `storage.js` beim Duplizieren und bei Adressänderung auf `ai_analysis` prüfen. Erledigtes s. Fertig.
 
 ### N43 · Diagramme auslesen — Marcels Entscheidung steht aus (06.10.2026)
 
@@ -8714,130 +1493,20 @@ Quick-Checks nicht und habe aufgehört zu raten.
 **Für Marcel:** einmal durchklicken, 30 Sekunden. Zeigt die Box unten Einschätzung und
 Kaufempfehlung?
 
-### N41 · Aktenmappe auf dem Handy — Marcels vier Einzelpunkte (06.10.2026) — alle vier erledigt
+### N35 · Heute/Aktenmappe — Rest (06.10.2026)
 
-Marcel, wörtlich, mit der Bitte sie **einzeln** abzuarbeiten:
+- Kopf auf dem Handy 93 px gegen 57 px am Schreibtisch — kompakter? **Entscheidung Marcel offen.**
+- Marke fehlt auf dem Handy in der Aktenmappe (stand in der entfernten Schiene) — klein in die Kopfzeile? **Entscheidung Marcel offen.**
+- Kanzlei und Tower auf 390 px in derselben Tiefe nachprüfen.
+Erledigtes s. Fertig.
 
-> „Wir haben die Aktenmappe ausgewählt und wenn du auf Portfolio klickst, ist der Hintergrund
-> Obsidian. … Da muss der Hintergrund rein, wie wenn du das Aktionsmenü dann öffnest. … auch meine
-> ich die Angabe Portfolio und allem. Das ist sonst auch weiß umrahmt. Auch die Menüs sind anders.
-> Auch unten die Anmeldung ist anders mit der Pille und der Version. Das ist dann in so einem
-> leichten Grau."
+### N34 · Steuer/Bewirtschaftung — Rest (06.10.2026)
 
-**N41.1 · Der Hintergrund im Portfolio-Zustand — BEHOBEN in `v1919`**
-Je Rasterpunkt gemessen, nicht am Container. Im Aktionen-Zustand war die Schublade ein Ton, im
-Portfolio-Zustand zwei: `rgb(14,13,11)` oben und unten, dazwischen die Kartenköpfe auf
-`rgb(23,22,15)`. Neun Punkte Unterschied — zu wenig für eine Aussage, zu viel für unsichtbar.
-Jetzt durchgehend ein Ton, an sieben Rasterpunkten gegengemessen.
-
-**N41.2 · „Portfolio" weiß umrahmt — war schon erfüllt (`v1911`), nachgemessen**
-
-```
-            Schreibtisch                      Handy
-Umschalter  1,11 px rgb(230,225,214), r 10    1,11 px rgb(230,225,214), r 10
-Suchfeld    —                                 dieselben Werte
-Neu-Knopf   —                                 dieselben Werte
-```
-
-**N41.3 · Die Menüs — war schon erfüllt (`v1912`), nachgemessen**
-
-```
-            Schreibtisch                      Handy
-Rubrik      rgb(201,168,76) 10px/700          gleich · Polster 4/9/5 gleich
-Eintrag     rgb(191,183,169) 12,5px/500       gleich · Polster 7/9 gleich
-Einfassung  Polster 4/8/8, ohne Kante         gleich
-```
-
-Einzige Abweichung, bewusst: Einträge 40 px statt 29 — am Schreibtisch zielt eine Maus, auf dem
-Handy ein Finger.
-
-**N41.4 · Anmeldung in leichtem Grau — war schon erfüllt (`v1916`), nachgemessen**
-
-```
-            Schreibtisch        Handy
-Box         rgb(191,183,169)    rgb(191,183,169)
-Avatar      rgb(191,183,169)    rgb(191,183,169)
-Pille       rgb(191,183,169)    rgb(191,183,169)
-Version     rgb(110,103,92)     rgb(110,103,92)
-Wolke       rgb(191,183,169)    rgb(191,183,169)
-```
-
-> **Drei von vier Punkten waren beim Melden schon behoben, aber noch nicht bei ihm angekommen.**
-> Zwischen v1911 und v1919 liegen zehn Pakete; wer dazwischen hinsieht, sieht einen Zwischenstand.
-> Lehre für den nächsten Durchgang: nach jedem Rollout die Punkte EINZELN mit Messwert melden,
-> nicht gesammelt am Ende — dann weiß er, worauf er schaut.
-
-**Offen bleibt nichts aus N41.** Die Partikel, die Marcel beschrieb, gibt es im ganzen Dokument
-nicht (vier Canvas, alle 0 × 0); der Eindruck kam von den beiden Schwarztönen und ist mit N41.1
-weg.
-
-### N35 · Heute, Aktenmappe und die Objektkarten-Wahl (06.10.2026) — erledigt v1896–v1900, auf Staging
-
-Marcel: „Heute muss aussehen wie der DealPilot mit den Objektkarteien und allem, also
-vernünftig, mit den Obsidianen und den bewegten Partikeln im Hintergrund. Und die Aktenmappe,
-da darf überhaupt gar kein Obsidian, also kein Misch sein. … Und wenn wir Heute auswählen,
-dann konnte man ja unten auch das Aussehen der Objektkarteien verändern. Das geht natürlich
-bei Heute nicht."
-
-**Erledigt (`8737f39e`, `b1e44264`, `1db1c40a`, `4ae4cc8e`):** die bewegten Partikel liefen nie —
-`initParticles()` suchte `#dp-particles`, das im ganzen Frontend nicht vorkam, und kehrte in
-Zeile 1 um; der Canvas wird jetzt in der Routine selbst angelegt und startet mit der Fläche
-statt mit dem Datenabruf. Beim ersten echten Lauf fiel auf, dass der Pixelpuffer (946×5379) nicht
-zur Fläche (893×5703) passte — behoben in v1900 samt `ResizeObserver`. Die Objektkarten-Wahl
-(Gestalt UND Dichte) fällt in Heute weg. Die Aktenmappe trägt auf dem Handy keine eigene Schiene
-mehr, der dunkle Block oben sinkt von 238 auf 151 px (28 → 18 % der Höhe).
-
-**Nachgemessen auf Staging:** Partikel 4.546 gefüllte Bildpunkte, Puffer = Fläche; Kartenwahl in
-Heute `display:none` h=0, in der Aktenmappe `display:block` h=501; Schiene `display:none`.
-
-**Offen:**
-- **Der Kopf ist auf dem Handy 93 px gegen 57 px am Schreibtisch** — ob er kompakter werden soll,
-  ist Marcels Entscheidung.
-- **Die Marke fehlt auf dem Handy in der Aktenmappe**, weil sie in der entfernten Schiene stand.
-  Klein in die Kopfzeile zurück? Nicht geraten.
-- **Kanzlei und Tower** auf 390 px in derselben Tiefe nachprüfen (bisher nur Überlauf und
-  Abzeichen, nicht die Partikel- und Kartenfrage).
-- **Die Portfolio-Schublade auf dem Handy ist KEIN Mischzustand** (gemessen 06.10.2026, in der
-  Aktenmappe bei 388 px): sie steht auf `rgb(14,13,11)` mit Text `rgb(233,227,214)` — **exakt die
-  Werte der seitlichen Schiene am Schreibtisch** (248 px breit, dieselben zwei Farben). Dass die
-  Schublade dunkel ist, während die Arbeitsfläche daneben hell ist, ist die Anordnung der
-  Aktenmappe selbst, nicht ein durchgeschlagener Heute-Ton. **Hier ist nichts zu reparieren** —
-  wer sie heller will, trifft eine Gestaltungsentscheidung, die auch den Schreibtisch betrifft.
-- **Marcels Abnahme im Browser** und ein Prod-Rollout.
-
-### N34 · Vier Fehler in der Steuer- und Bewirtschaftungsrechnung (06.10.2026) — erledigt v1898, auf Staging
-
-Marcel: „Ja, natürlich möchte ich, dass du die Steuerkorrekturen machst. Das muss passen.
-Die [Miet]ausfallwagnis ist natürlich im Cashflow, muss aber nicht mit in die
-Werbungskosten. … Wortlaut 15 Prozent Hinweis, klar wie vorgeschlagen."
-
-**Erledigt (`3ae5c06c`, `d2a7bc83`):** der 55-%-Split lief auf die GESAMT-Bewirtschaftung
-statt auf den nicht umlagefähigen Teil (`tax.js:1208`, −242,52 €/Jahr Werbungskosten); das
-Mietausfallwagnis stand in den Werbungskosten (−225,60 €/Jahr, Cashflow unverändert); das
-Cockpit rechnete mit einer zweiten Pauschale von 20 % auf zwei nie gesetzte Feldnamen
-(`dashboard.js:758`, 0 von 20 Objekten — jetzt zwei gestempelte Kennzahlen plus Rückfall
-auf den Profilwert 16 %); `weg_r` wurde doppelt gezählt (`tax.js:261`); Fußzeile im
-15-%-Kasten mit den echten Zahlen und ausgelesener Nutzungsdauer (50/40/33 statt fest 50).
-Zahlen und Messwege im Journal (54). Damit sind zwei der sechs „fraglichen" Punkte aus
-**N18** geschlossen (BWK-Schätzung 55 %, ein zvE in der Projektion).
-
-**Offen:**
-- **Abzunehmen oder zurückzunehmen:** `kontofuehrung` 8 € und `porto` 5 € stehen jetzt auf
-  0 (−13 €/Jahr Werbungskosten) — lag im Arbeitsbaum, nicht von Marcel entschieden.
-- **12 von 20 Objekten tragen einen `steuer_snapshot`** mit den alten, zu hohen
-  Werbungskosten. Er erneuert sich beim nächsten Öffnen des Steuer-Reiters. Kein
-  Datenbankeingriff gemacht.
-- **Kein Objekt trägt die zwei neuen Kennzahlen** (0 von 20) — im Cockpit gilt bis zur
-  Neuberechnung jedes Objekts der Rückfall auf 16 %.
-- **`dashboard.js:482` und `quick-check-tab.js:87`** rufen `DealKpis.compute()` ohne
-  `bwk_nul_st` — dort rechnet die Steuerzeile weiter mit dem Wagnis.
-- **Der Telegram-Bot** rechnet seit `v1899` mit dem gespiegelten Kern (Spiegel aktuell,
-  trägt `bwk_nul_st`), gibt das Feld aber noch nicht mit. `main.js` (Pauschalen aus dem
-  Profil) ist ebenfalls `v1899`, nicht v1898.
-- **`Tax.calcImmoResult`/`calculateForObject`** und der ganze **Quick-Check-UI-Weg** haben
-  repoweit keinen Aufrufer (gemessen) — tote Wege, gehören weg, wenn sie ohnehin
-  angefasst werden.
-- **Marcels Abnahme im Browser** und ein Prod-Rollout.
+- `kontofuehrung` 8 € und `porto` 5 € stehen auf 0 — nicht von Marcel entschieden: **Entscheidung Marcel offen** (abnehmen oder zurücknehmen).
+- `dashboard.js:482` und `quick-check-tab.js:87` rufen `DealKpis.compute()` ohne `bwk_nul_st`; der Telegram-Bot gibt das Feld noch nicht mit.
+- Alte `steuer_snapshot`s (12 von 20) und fehlende neue Kennzahlen erneuern sich erst beim Öffnen.
+- `Tax.calcImmoResult`/`calculateForObject` und der Quick-Check-UI-Weg ohne Aufrufer — weg, wenn ohnehin angefasst.
+Erledigtes s. Fertig.
 
 ### N30 · Ernte Linie 7 (TH/ST/SN/MV) und die Aurich-Korrektur — v1886–v1887a, auf Prod
 
@@ -8904,23 +1573,13 @@ stürzt ab**, sobald ein Sperrsatz mit `formel: null` in der Datei liegt, und si
 `belege[0]`. **`formelwerk` kennt der Auswerter nicht** (Hamburg komplett, Magdeburg, Kiel) —
 Auswerter in Arbeit.
 
-### N29 · Aktenmappe auf dem Handy trägt die Aktenmappe (05.10.2026) — erledigt v1885–v1885c, auf Prod
+### N29 · Aktenmappe Handy — Rest
 
-141 Schienen-Regeln per Generator (`tools/schublade-regeln.mjs`) auf die Schublade geklont, Heute-Kopf
-raus, Suchfeld in eigener Zeile, Rechtliches nur noch in den Einstellungen. **Bei jeder Änderung an den
-Schienen-Regeln den Generator erneut laufen lassen** — er prüft sich selbst (Kommentarbilanz, Regelzahl).
-**Noch anzusehen:** dasselbe Muster könnte den Aktionsblock und den Nutzerblock betreffen (dort sind die
-Schienen-Regeln nach `[data-stellung]` gefiltert und bewusst nicht geklont).
+- Ansehen, ob dasselbe Muster Aktionsblock und Nutzerblock betrifft (dort sind die Schienen-Regeln nach `[data-stellung]` gefiltert und nicht geklont). Bei Änderung an den Schienen-Regeln den Generator erneut laufen lassen. Erledigtes s. Fertig.
 
-### N26 · Endabnahme Handy, alle Darstellungen (05.10.2026) — erledigt v1883–v1883b, auf Prod
+### N26 · Endabnahme Handy — Rest zum Bewerten
 
-Prüfläufer + Bilder je Reiter und je Darstellungsvariante (Heute/Aktenmappe, Hell/Dunkel, A+,
-4 Datenaufnahme-Stile, 4 Karten-Varianten, 7 Listen-Stile, Form). 19 Funde behoben, darunter:
-Listen-Stile wirkten auf dem Handy nie, Stapel/Wallet/Kompakt mit Überlagerungen, Vergleichs-
-tabellen abgeschnitten, Stress-Matrix mit Wortbrüchen, PLZ-Feld zu schmal, Vollbild-Knopf über
-dem Inhalt. **Offen/bewerten:** Heute-Kopf bei A+ mit Objekt 117 px (Zähler-Pille rutscht in
-eine eigene Zeile); Investor-Band in der Schublade bei aktiver Karte kontrastarm; Panel-Text
-„In der Kanzlei tauschen Navigation und Aktionen" (Seiten) veraltet.
+- Heute-Kopf bei A+ mit Objekt 117 px (Zähler-Pille rutscht in eigene Zeile); Investor-Band in der Schublade bei aktiver Karte kontrastarm; Panel-Text „In der Kanzlei tauschen Navigation und Aktionen" veraltet. Erledigtes s. Fertig.
 
 ### N28 · Ernte Linie 6 (BB regional 86 Werte, BE/HB Sperren) auf Staging und Prod — v1884
 
@@ -8940,14 +1599,9 @@ Spanne aus Stichprobe als Sperre oder „Anwender würdigt"? Gütersloh 2026 (Na
 tut). Olpe `berichtsjahr 2025` bei 2026-Quelle korrigieren? Velbert nur als Tabelle (Formel im
 PDF als Symbolschrift). Bergisch Gladbach braucht `baujahr_fiktiv` (Verzweigung liest Baujahr).
 
-### N24 · Handy- und Tablet-Durchgang 05.10.2026 — erledigt v1881–v1882a, auf Prod
+### N24 · Handy/Tablet — Rest zum Bewerten (nicht dringend)
 
-Gemessen 390 und 820 px, Aktenmappe: alle 9 Reiter, Menü, Akkordeon, Einstellungen, QuickBoarding,
-Marktbericht, Tour. Behoben: Gewerke-Tabelle, KPI-Tabelle (Zeilenraster), Partner-Bordkarten,
-Info-Knöpfe auf Touch (rund, 18 px), Rechtliches in der Schublade, Kopf-Kacheln in einer Zeile,
-Markteinschätzung 700–899, Marktbericht-Bordkarte. **Offen:** Marktbericht-Ansicht auf dem Handy
-hat keinen eigenen Zurück-Knopf (nur Menü/Objektwahl); die Reiterleiste zeigt am Desktop-Kabinen-
-Bildschirm einen Scrollbalken (auf Touch unsichtbar) — beides bewerten, nicht dringend.
+- Marktbericht-Ansicht auf dem Handy ohne eigenen Zurück-Knopf; Reiterleiste zeigt am Desktop-Kabinen-Bildschirm einen Scrollbalken. Erledigtes s. Fertig.
 
 ### N25 · Ernte 05.10.2026 — NRW Faktoren Block 3 (47) + Block 4 Kreise (30) + Kassel 2026, auf Staging und Prod
 
@@ -8965,22 +1619,13 @@ Staging Partner-Plan an). Heute: Bestand mit Fristen (AP 7), AP-Liste, Tabelle f
 **Nächste Schritte:** volles Objekt je Zeile (Sanierungsquote, AfA-Reihe), Investorprofil (AP 9),
 erste Versuchsreihe AP 6 mit vorab gesetzter Schwelle (< 2 % zum Referenzoptimum kleiner Bestände).
 
-### N23 · Ernte 05.10.2026 — Hessen-Zins (137), NRW-Faktoren Block 2 (69), Zins ST/TH/SH/NI (229) auf Staging und Prod
+### N23 · Ernte 05.10.2026 — Rest
 
-**Marcels Entscheidungen:** Kiel MFH (Lizenz nur nicht-kommerziell) und Aurich-Block (Werte
-widersprüchlich) sind gesperrt; ST ohne Lizenz. Freigeben = Sperre im Satz lösen, neu säen.
+- Herford/Minden-Lübbecke werden von Hand-Modulen verdeckt (Register nie erreicht); Kreissätze decken Städte mit eigenem Ausschuss; Aachen ohne Soll; Kassel SWF 2026 nachernten; negative Zinssätze (Frankfurt) lehnt der Auswerter ab. Erledigtes s. Fertig.
 
+### N20 · Aktenmappe Handy — Rest
 
-Offen: Herford/Minden-Lübbecke werden von Hand-Modulen verdeckt (Register nie erreicht);
-Kreissätze decken Städte mit eigenem Ausschuss; Aachen ohne Soll; Kassel SWF 2026 nachernten;
-negative Zinssätze (Frankfurt) lehnt der Auswerter ab. Dritte Linie ST/TH/SH/NI folgt.
-
-### N20 · Aktenmappe auf dem Handy unbrauchbar (05.10.2026) — erledigt v1879–v1880c, auf Prod; nur Heute + Aktenmappe, Standard Aktenmappe
-
-Feste Schiene 187 px über 146 px Polster deckte Menü-Knopf und Kopfzeile ab,
-Score-Leiste 808 px breit. Jetzt im Fluss, kompakt. **Offen:** die anderen
-Layouts (Kanzlei v2b, v3–v5) auf 390 px mit derselben Messkabine durchgehen;
-Marcels Blick aufs echte iPhone.
+- Die anderen Layouts (Kanzlei v2b, v3–v5) auf 390 px mit der Messkabine durchgehen; Marcels Blick aufs echte iPhone. Erledigtes s. Fertig.
 
 ### N21 · Forschungszulage: Stundennachweise (05.10.2026) — angelegt, Prüfung durch Marcel offen
 
@@ -8988,806 +1633,59 @@ Marcels Blick aufs echte iPhone.
 Januar–April von Hand, Tage ohne Commit nachtragen, 40-h-Wochen kürzen,
 unterschreiben; ab jetzt täglich fortschreiben.
 
-### N19 · Prod-Rollout v1846b → v1878 (05.10.2026) — erledigt
+### N18 · Steuer — Rest (05.10.2026)
 
-Fast-Forward über 107 Commits, Migration 084, beide Backends neu gebaut, NRW-Register
-gesät, Sicherungen `prod-*-20261005-1101-vor-v1878.sql.gz`. Prod = Staging = v1878.
+- **Abnahme:** ein § 7b-Objekt auf Staging anlegen und Cashflow-Projektion Jahr 4 → 5 (Sonder-AfA fällt weg) gegen den Reiter Steuer halten.
+- Fraglich: Soli/KiSt/Splitting, überlappende Steuerzeiträume, Sprach-Import 3 % (BWK 55 % und ein zvE in der Projektion mit N34/v1898 geschlossen).
+Erledigtes s. Fertig.
 
-### N18 · Vier Steuerfehler und das Speichern-Modal (05.10.2026) — erledigt v1878
+### N17 · Ernte-Automatik — Rest (Stand unklar, am 25.10.2026 nicht nachgemessen)
 
-Marcel: „mach das modal schlank und korrigiere die 4 steuerfehler“.
-**Erledigt (`f000302`):** AfA-Basis mit NK, Projektion mit AfA je Jahr, § 7b
-ungezwölftelt, Degressiv-Wechsel auf Restwert ÷ Rest-ND; Modal ohne Quelle/
-Konsens/AVM-Text. **Abnahme offen:** ein § 7b-Objekt auf Staging anlegen und
-Cashflow-Projektion Jahr 4 → 5 (Sonder-AfA fällt weg) gegen den Reiter Steuer
-halten. **Noch offen (fraglich):** Soli/KiSt/Splitting, BWK-Schätzung 55 %,
-ein zvE in der Projektion, überlappende Steuerzeiträume, Sprach-Import 3 %.
+- Nur NRW-LZS vollautomatisch; Vorschlag „Auto-Ernte-Vorschlag mit Freigabe" in 4 Stufen (10–17 Tage) — **Entscheidung Marcel offen** (Details Journal 37). Erledigtes s. Fertig.
 
-### N17 · Marktbericht-Übernahme, QuickBoarding-Ring, Quick-Check-Durchlauf (05.10.2026) — erledigt v1877; Modal und Steuer in N18 erledigt, Ernte-Automatik offen
+### N16 · Rest (Daten, kein Code)
 
-**Erledigt (`36511ca`):** brw, Energieklasse G/H, Zusatzeinnahmen → sonstige_jahr
-(Formular und Backend-Mapper); QuickBoarding-Score als Ring mit Pille;
-Quick-Check → „Als Objekt speichern“ sauber durchgelaufen (Testobjekt
-Teststraße 5 im Staging-Portfolio).
+- Die Pilot-Analyse der Parkstr. 9 nennt die Westerfeldstraße 140 — neu laufen lassen. Erledigtes s. Fertig.
 
-**Offen, Marcels Entscheidung (Details Journal 37):**
-- Speichern-Modal entschlacken (qc-bridge.js qcpm — „nicht anfassen“): Quelle-
-  Zeile „Konsens“ und „Keine AVM-Daten“ raus, Kopftext neu.
-- Steuer: vier Rechenfehler (AfA-Basis ohne NK; Projektion mit Jahr-1-AfA für
-  50 Jahre; § 7b gezwölftelt; Degressiv-Wechsel auf AHK statt Restwert) und
-  sechs fragliche Punkte (Soli/KiSt, BWK-Schätzung 55 %, ein zvE in der
-  Projektion, überlappende Zeiträume, Sprach-Import 3 %).
-- Ernte-Automatik: nur NRW-LZS vollautomatisch; Vorschlag „Auto-Ernte-Vorschlag
-  mit Freigabe“ in 4 Stufen (10–17 Tage).
+### N13 · Parkstr. 9 — Rest (05.10.2026)
 
-### N16 · QuickBoarding-Karte, Spanne in der Karte, Handy-Durchgang (05.10.2026) — erledigt v1875–v1876
+- „KI-Lauf" statt „Stufe 2/3" in der Verkehrswert-Übernahme — siehe N12 (25.10.2026: `objekt-reiter.js:950` gibt weiter „KI-Lauf").
+- Drei tote Quell-Links aus N12 prüfen.
+Erledigtes s. Fertig.
 
-Marcel: weiße 65 im QuickBoarding unlesbar; „Nicht enthalten …“/„So wird
-gerechnet“ raus; Spanne Unten/Ø/Oben in die Karte, Klick = übernehmen; alle
-Reiter mobil prüfen; „Deal“ in der Pre-Flight-Pille grau.
-**Erledigt (`eba95d6`–`f6b6fb8`):** alles davon, siehe Journal (36).
-**Nachtrag (`14fe802`, `a72b928`):** Karte als Raster nach Kartenbreite — eine Zeile,
-zwei Zeilen, gestapelt; Knopf „übernehmen“ entfällt (Kacheln übernehmen).
-**Offen (Daten, kein Code):** die Pilot-Analyse der Parkstr. 9 nennt die
-Westerfeldstraße 140 — neu laufen lassen.
+### N12 · Gesamtdurchgang — Rest (04.10.2026)
 
-### N15 · „Willkommen an Bord“ erschien vor der Anmeldung (05.10.2026) — erledigt v1874
+- Verkehrswert-Übernahme nennt Berichte aus dem Dialog „KI-Lauf" statt „Stufe 2/3": die Stufe steht nicht in der History-Antwort (`/marktbericht/objects/history`) — aufnehmen (MB-Backend, Rebuild), `_stufeAus()` darauf lesen.
+- Drei tote Quell-Links (Stand 04.10.): Remscheid GMB 2025 (gars.nrw, 404), Brandenburg GMB_LOS.pdf (404), Horb id=4870 (404). Register-Zahlen von damals sind überholt (s. CLAUDE.md, Stand 22.10.2026).
+Erledigtes s. Fertig.
 
-Marcel: „ich gehe auf Kostenlos starten, dann kommt das Anmeldefenster und
-dann erscheint schon ein Willkommen an Bord … das soll erst nach der
-Anmeldung kommen.“ **Erledigt (`cf6c5df`):** erststart.js wartet auf
-`dp:plan-ready` und prüft `Auth.isLoggedIn()`. Damit ist auch die offene
-Gestaltungsfrage aus N13 (Registrier-Modal mit Standardwerten dahinter)
-erledigt — es war dieselbe Karte.
+### N10 · Reiter Objekt — Rest
 
-### N14 · FuE-Siegel 2026 (BSFZ) auf der Landing (05.10.2026) — erledigt v1873/v1873a
+- Hilfetexte für die ~130 Felder ohne gepflegten Tooltip (heute Rückfall Beschriftung + Verwendung) — Redaktionsarbeit (Marcel/Fachlichkeit), kein Code. Erledigtes s. Fertig.
 
-Marcel: „zip mit bsfz siegel … auf der Landingpage ergänzen such das passende foto aus“.
-**Erledigt (`712192f`, `66bdf1c`):** SVG aus dem Zip als fünfter Eintrag im
-Vertrauensband, 64 px, Band auf fünf Spalten. Nur auf der Landing.
+### N9 · BMF/RND — Rest (Abnahme)
 
-### N13 · Parkstr. 9: Quellen, Stufen, Sachwertfaktor, Workflow (05.10.2026) — teils erledigt v1865–v1873
-
-Marcel: Unterlagen-Text und Quelle zum Grundstücksmarktbericht passen
-nicht; Texte abgekürzt; Stufen nirgends erklärt; kein Sachwertfaktor —
-ernten? Standardwert mit Hinweis? Workflow (Eingabetiefe oben, Anfragen,
-„Marktbericht abrufen" unten, Pre-Flight-Pillen) ist zu viel.
-
-**Erledigt (`c2c6b39`, `7de043f`, `904d71e`):** Leiste lesbar (Hinweis in
-eigener Zeile), Stufen-Legende A–E und 1/2/3, Zins-Zeile kennt die
-Objektart, Grundstücksmarktbericht-Eintrag aus dem Register statt
-Websuche.
-
-**Erledigt am 05.10.2026 (`79eecbd`, `fad6fb4`):** Workflow-Variante A
-gebaut (Eingabetiefe und Abruf-Box in der Pre-Flight-Karte, im Reiter nur
-der Stand). Liegenschaftszins Drei-/Mehrfamilienhäuser Kreis
-Minden-Lübbecke aus dem GMB 2025 (S. 64, 2,9 %, N 33) als Stufe A geerntet
-— die Parkstr. rechnet nicht mehr mit dem Auffangwert.
-
-**Erledigt am 05.10.2026 (`1335c67`):** Sachwertfaktor-Standard 1,0 „ohne
-Marktanpassung" mit Grund in Leiste, Bericht und PDF (Marcels
-Entscheidung); Kopf mit Pillen und Abruf-Box; lesbare Hinweise;
-DS2-Schilder; BGF-Schätzung × 1,35.
-
-**Erledigt am 05.10.2026 (v1866–v1873, bis `712192f`):** Eingabetiefe
-kompakt mit Abruf-Box als Kacheln; Marktbewertung als schmaler, gegliederter
-Streifen (Kopfblock, Spalten, Spanne neben Übernehmen; Karten/Tabelle/min
-weg), auch im QuickBoarding; Pre-Flight-Lampe grün; Steuer-Reiter
-entschlackt (kein gutachten.org, Hinweise hinter Aufklapper); BMF-Rechner
-übernimmt Modernisierungen aus dem Reiter Objekt, Lauf wird gemerkt
-(`bmf_cache`) und bei Pro still vorgerechnet — Modal nach 4 s statt 40 s.
-
-**Noch offen (klein):** „KI-Lauf“ statt „Stufe 3“ in der
-Verkehrswert-Übernahme; Register-Lücken (BY ohne LZS, HB/SL ohne SWF, drei
-tote Links). Das Registrier-Modal mit „Standardwerten“ dahinter war die
-Erststart-Karte vor der Anmeldung — erledigt in N15 (v1874).
-
-**Entschieden (Sachwertfaktor) — Rest zur Historie:**
-- **Sachwertfaktor-Standardwert.** Minden-Lübbecke leitet für MFH keinen
-  ab (nur EFH/ZFH/DHH/RH); bundesweit 8 MFH-Sätze im Register, NRW 1 —
-  für die Parkstr. nichts zu ernten. Ein Standard- oder interpolierter
-  Faktor wäre ein Nachbarkreis- oder Annahmewert (Doktrin: „nie ein
-  Nachbarkreis"). Heute: eigener Ansatz im Feld `sachwertfaktor` (Leiste
-  „eintragen"), im Bericht Stufe E „eigene Angabe". Falls gewollt: als
-  „Standard (Annahme)" klar gekennzeichnet, Stufe E, nie ohne Hinweis — und
-  welche Zahl? Das ist Marcels Bewertungsentscheidung.
-- **Workflow, Vorschlag A (empfohlen):** die Eingabetiefe lebt nur in der
-  Pre-Flight-Karte (Pillen 1/2/3 an der DealPilot-Kachel); die Abruf-Box
-  „Marktbericht abrufen" wandert als dritte Zeile in die Pre-Flight-Karte
-  (Stufe · frei · fehlt · Abrufen); im Reiter Objekt bleibt statt des
-  Kopf-Wählers eine Statuszeile „Eingabetiefe Ausgiebig (Pre-Flight) · 1
-  Angabe fehlt → zeigen"; der Block „Sach- und Ertragswert" folgt der
-  Pre-Flight-Wahl. Ein Ort zum Wählen, ein Ort zum Abrufen.
-  **Vorschlag B:** Kopf-Wähler raus, Abruf-Box bleibt unten und trägt die
-  Wahl selbst.
-- **LZS für MFH im Kreis Minden-Lübbecke:** der NRW-Datensatz (GMD CSV)
-  führt für 05770 keinen MFH-Zweig; der Wert steht nur im Bericht des
-  Ausschusses (kostenpflichtig). Ernte nur per Hand aus dem Bericht.
-
-### N12 · Gesamtdurchgang: Score-Wörter, geführte Eingabe, Handy (04.10.2026) — erledigt v1861–v1862c
-
-Marcels Auftrag: „geh alles komplett nochmal durch … Bitte geh die Geführte
-Eingabe durch … Ist das auch an die neuen Felder angepasst? läuft alles auf
-dem Handy und Tablet? … warum steht beim dealscore jetzt sowas wie top oder
-solide? … das muss überall gleich sein."
-
-**Erledigt (Commits `8e2de37` v1861, `f5518ad` v1862, `63ac7f1` v1862a,
-`e91df24` v1862b, `2c51832`/`b62ba81` v1862c):**
-- Score-Wörter: EINE Kette (`score-tiers.js`, Top/Gut/Solide/Schwach/
-  Kritisch bei 85/70/50/35) in dashboard.js, dealscore.js, dealscore2.js,
-  quick-check.js und quickcheck-app.html (dort stand 80/65 „Sehr gut").
-- Geführte Eingabe kennt die Eingabetiefe: fragt die Pflicht der Stufe
-  (pflichtFuer), schickt das ganze Objekt (DealPilotMB.inputs), bucht die
-  Stufe, die sie verspricht, zeigt die echte Berichtsform, und das Ergebnis
-  landet auf der Karte und in der Verkehrswert-Übernahme (dp:mb-ready).
-- Handy 390 px: Gewerke-Tabelle wischt statt zu klippen; alle Reiter ohne
-  Überlauf. Tablet 820 px: sauber.
-- v1863 (`0b81689`): oberste Stufe heißt „Sehr gut" statt „Top" — überall,
-  auch Bot und KI-Prompts (Marcel: „mit gut, sehr gut und dann die anderen").
-- v1864 (`4a4786e`): Bewertungs-Streifen beider Score-Karten schwarz wie
-  auf der Landingpage; Cashflow-Phasen vor/nach Steuern hell.
-
-**Offen, klein:**
-- Verkehrswert-Übernahme nennt Berichte aus dem Dialog „KI-Lauf" statt
-  „Stufe 2/3" — `ai_mode` ist für beide `openai`, die Stufe steht nicht in
-  der History-Antwort (`/marktbericht/objects/history`). Stufe in die
-  Antwort aufnehmen (MB-Backend, Rebuild) und `_stufeAus()` darauf lesen.
-- Register (gemessen 04.10.): Liegenschaftszins in 14 Ländern (BY fehlt),
-  Sachwertfaktor in 14 (HB und SL fehlen ganz). Lizenz fehlt bei BB-LZS
-  (14), BY-SWF (2), ST-LZS (1), NW-SWF (2); Vermerk fehlt NW-SWF (26).
-  Drei tote Quell-Links: Remscheid GMB 2025 (gars.nrw, 404), Brandenburg
-  GMB_LOS.pdf (404), Horb id=4870 (404). gag.niedersachsen.de antwortet
-  auf HEAD mit 400, GET 200 — kein Fehler.
-- Prod steht auf v1846b; Freigabe für den Block v1849–v1862c offen.
-
-### N11 · Kopf-Score, Kaufpreisaufteilung, Rundgang (04.10.2026) — erledigt v1859b
-
-Score-Wort aus der zentralen Kette (`ScoreTier.stufe`, fünf Stufen) und
-farbig; Belege-Scan raus; Exporte: Kaufpreisaufteilung-PDF,
-Arbeitshilfe-PDF, Original-XLSX in Reiter 2 und auf der letzten Seite;
-„PDF-Anlage erstellen" (Duplikat) weg; Vorlage ohne no-store.
-**Offen:** `dashboard.js:1283` und der Marktbericht-ScoringService führen
-noch eigene Vokabulare (CLAUDE.md-Befund) — `ScoreTier.stufe()` wäre jetzt
-der eine Ort dafür.
-
-### N10 · Reiter Objekt, dritte Runde (04.10.2026) — erledigt v1858c
-
-Abruf als Zeilen unter den Anfragen, Stufenpillen in der Pre-Flight-Kachel
-(ein Abruf statt Sprechlauf + Kachel), Hover-Hilfe an jedem Feld
-(`feld-hilfe.js`, folgt dem Tooltip-Modus; gelbe i-Knöpfe weichen),
-Quellen je Kennzahl eine Zeile, Anfragen/Abruf in voller Breite.
-**Offen:** Hilfetexte für die ~130 Felder ohne gepflegten Tooltip — heute
-zeigt der Rückfall Beschriftung + Verwendung; echte Texte sind
-Redaktionsarbeit (Marcel/Fachlichkeit), kein Code.
-
-### N9 · BMF-Rechner und RND-Assistent (04.10.2026) — erledigt v1856a
-
-AfA-Vorschau ohne Altwert und ohne Notnagel, Reiter 1 nachgesetzt, RND-Modal
-mit Vorbelegung aus dem Objekt (mod_*, Gewerke-Stufen), kein Schließen beim
-Danebenklicken, Obsidian/Gold-Kopf. Jacoby steht im BMF-Reiter 2 — nur bei
-Zins Stufe A/B. **Offen:** die Vorbelegung bis Schritt 5/6 im Browser
-durchklicken; das erste Öffnen (Markup aus dem Netz) am echten Erstkontakt
-messen.
-
-### N8 · Der Bankexport über den Bot (04.10.2026)
-
-Marcel: *„der bankexport soll auch über den bot abgefragt werden können.
-So kann man schnell eine übersicht bekommen."*
-
-**Gemessen:** der Bankexport ist `renderBankTable()` in `calc.js:3892` —
-eine Zeile je Darlehen mit Adresse, Art, m², NKM/Monat, €/m², NK/Monat,
-Bank, Darlehensart, Finanzierungsdatum, Vertragsnr., Summe, Zins, Tilgung,
-Rate, Laufzeit, Bindung bis, Restschuld aktuell/Ende, Volltilgung. CSV
-(`exportBankCSV`) liest die gerenderte Tabelle aus dem DOM.
-
-**Weg (Spiegel, kein Nachbau):** die Eingaben (`bank_inst`, `d1_vertrag`,
-`d1`, `d1z`, `d1t`, `d1_bindj`, `kaufdat`, `d2_*`) stehen in
-`objects.data`; die gerechneten Größen (Restschuld, Rate, Bindung bis)
-trägt `portfolio_spiegel.payload` je Objekt (`darlehen_eur`,
-`restschuld_eur`, `zins_prozent`, `tilgung_prozent`, `zinsbindung_bis`).
-→ Werkzeug `bank_uebersicht` (Stufe `lesen`), eine Zeile je Darlehen,
-`so_schreiben` als fertige Tabelle; fehlt der Spiegel: `so_sagen` „in
-DealPilot einmal öffnen". Restschuld **Ende** steht nicht im Spiegel —
-entweder `portfolioPayload()` um `restschuld_ende_eur` und `rate_eur_monat`
-erweitern (Browser rechnet, Spiegel trägt) oder im Bot ehrlich weglassen.
-
-**Erledigt 04.10.2026, v1853 (`d614195`):** Werkzeug `bank_uebersicht`,
-Stufe `lesen`, eine Zeile je Darlehen; Restschuld/Rate/Bindung bis aus dem
-Spiegel, sonst leer und gesagt. Prüfer `pruef-bank.js` 12/12 (SQL 17
-Darlehen = 17 Zeilen). `restschuld_ende` bleibt weg — steht nicht im
-Spiegel, ehrlich weggelassen.
-
-**Dazu Marcels Rahmen für N4 (04.10.2026):** *„dass wir die Felder dann
-auch alle passend verknüpft haben … dass unser PDF noch passt, dass wir
-passend importieren können, dass alle unsere Exporte vernünftig
-funktionieren."* → **Feld-IDs bleiben alle bestehen.** Der Umbau ordnet
-und leitet ab (Gewerke-Zeile = `eq_*` + `mod_*` + `ausst_*` nebeneinander,
-NHK-Typ = `nhk_haus/geschosse/dach` in einer Zeile, Bauteile = `btl_*` als
-Liste); PDF, pdf-import, voice-import, xlsx/docx/Bankexport lesen weiter
-dieselben IDs. Prüfstrecke vor dem Rollout: `tools/feld-waechter.mjs`,
-ein PDF-Export, ein Sprechlauf-Import, ein Bankexport je Objektart.
+- Vorbelegung bis Schritt 5/6 im Browser durchklicken; das erste Öffnen (Markup aus dem Netz) am echten Erstkontakt messen. Erledigtes s. Fertig.
 
 ---
 
 
 ## → NEU und OBERSTE PRIORITÄT: Der Copilot wird ein Agent (02.10.2026)
 
-Marcel am 02.10.2026, nach dem ersten echten Gebrauch des Telegram-Bots.
-Zwei konkrete Befunde aus der Nutzung, und daraus eine Spezifikation, die
-weit über den Bot hinausgeht: **„Das Ziel ist ein handlungsfähiger,
-kontextbezogener Immobilien-Agent und nicht lediglich ein Chatfenster über
-der bestehenden Software."**
-
-Die vollständige Spezifikation steht unten ab A-1. Davor stehen die zwei
-Fehler, die er gemeldet hat — **gemessen, mit Ursache**, denn beide sind
-nicht „fehlende Features", sondern Folgen einer Bauart, die an ihre Grenze
-gekommen ist.
-
----
-
-### Der Befund: warum die Musterweiche nicht mehr trägt
-
-Der Bot entscheidet heute über **Regex-Muster**, was eine Nachricht will
-(`telegramAbsichtService.js`). Das war für „liste" und „/neu" richtig. Für
-das, was Marcel jetzt will, ist es die falsche Bauart — und das zeigen
-seine beiden Befunde genau.
-
-#### Befund 1 · „ich sage Vermögensbilanz und dann listet er es einfach auf, aber einfache Fragen dazu kann er dann nicht beantworten"
-
-Nachgemessen am 02.10.2026 an Marcels eigenen Beispielfragen:
-
-| Satz | erkannt als | richtig wäre |
-|---|---|---|
-| „zeig mir die Vermögensbilanz" | `portfolio` | ✓ |
-| „wie hoch ist die Gesamttilgung von allen Objekten?" | **`frei`** | portfolio |
-| „was sind meine aktuellen Verbindlichkeiten bei allen Objekten?" | **`frei`** | portfolio |
-| „wie hoch ist der Gesamtwert meines **portfolios**?" | **`frei`** | portfolio |
-| „welche Objekte haben den höchsten Finanzierungsbedarf?" | **`liste`** | portfolio |
-
-Drei verschiedene Ursachen, und die dritte ist die eigentliche:
-
-1. **Das Plural-s.** `\b(portfolio)\b` trifft „portfolios" nicht — nach
-   dem „o" kommt ein „s", also keine Wortgrenze. Dieselbe Falle wie bei
-   „parkstr" in v1798, zum dritten Mal in zwei Tagen.
-2. **Die Muster streiten sich.** „welche Objekte …" steht im
-   Liste-Muster und gewinnt, obwohl die Frage aufs Portfolio zielt.
-3. **Nach einer Portfolio-Antwort bleibt der Kontext nicht.** Jede
-   Folgefrage wird von vorn eingeordnet. „und die Gesamttilgung?" hat
-   keine Chance, weil niemand sich merkt, dass eben über das Portfolio
-   geredet wurde.
-
-> Eine Musterliste kann man erweitern, bis sie Marcels fünf Beispiele
-> trifft. Beim sechsten Satz, den er sich ausdenkt, fällt sie wieder
-> durch. **Das Problem ist nicht die Liste, sondern dass es eine Liste
-> ist.**
-
-#### Befund 2 · „hat die Hälfte ignoriert … und dann ist er in diesem Schritt hängen geblieben"
-
-Zwei Ursachen, beide gemessen:
-
-4. **Der falsche Auslesemodus.** `anlegenStarten` und `aufnehmen` rufen
-   `extractFromText` mit `modus: 'antwort'`. Der ist für die Antwort auf
-   EINE Frage gebaut („Baujahr und Kaufpreis?" → „1962, 189000") und
-   deckelt bei 4.000 Zeichen. Für einen Fließtext mit zehn Angaben gibt
-   es `modus: 'inserat'` (40.000 Zeichen, eigener Prompt
-   `ZUSATZ_INSERAT`). Deshalb fiel die Hälfte heraus.
-5. **Der Anlege-Modus ist eine Falle ohne Ausgang.**
-   `telegramWebhook.js:725` fängt im Modus `anlegen` **jede** Nachricht ab
-   und schickt sie durch `aufnehmen`. Versteht `extractFromText` nichts,
-   kommt „Daraus konnte ich kein Feld lesen" — und bei der nächsten
-   Nachricht wieder. Man kommt weder weiter noch heraus, und eine
-   Zwischenfrage ist unmöglich.
-
-> Ein Zustand, aus dem nur ein Befehl herausführt, den der Nutzer nicht
-> kennt, ist kein Dialog, sondern ein Formular mit Sprechblasen — genau
-> das, was der Bot nicht sein sollte.
-
----
-
-### Was daraus folgt: die KI entscheidet, das Backend liefert
-
-Marcels eigener Schluss, und er ist richtig: **„Ich glaube, das kann man
-gut machen, indem man den Text übermittelt und dann per KI auswerten lässt
-und das in Bezug auf die Datenbank und dem Gesamtobjekt."**
-
-Also: weg von der Weiche, hin zu einem Agenten mit **Werkzeugen**. Die
-Muster bleiben nur dort, wo sie nachweislich schneller und sicher sind
-(`/neu`, `/abbrechen`, `/stop`) — alles andere entscheidet das Modell.
-
-> Die KI ist die Steuerungsebene über der Anwendung. Datenbank und Backend
-> bleiben die verlässliche Quelle für Daten und Aktionen. **Die KI darf
-> entscheiden, was getan wird — nie, was wahr ist.**
-
-**Das ist die Grenze, die jede Zeile dieses Umbaus einhalten muss:** kein
-Wert, keine Kennzahl und kein Score wird vom Modell erfunden oder
-nachgerechnet. Das Modell wählt Werkzeuge; die Werkzeuge rechnen nicht,
-sondern lesen — und wo gerechnet werden muss, rechnet der vorhandene Kern.
-
----
-
-### A-1 · Der Werkzeugkasten (Grundlage für alles Weitere)
-
-Ein Register von Werkzeugen, die das Modell aufrufen darf. Jedes Werkzeug
-hat einen Namen, eine Beschreibung, ein Eingabeschema und eine
-Berechtigungsstufe.
-
-| Werkzeug | tut | kostet |
-|---|---|---|
-| `objekte_liste` | Kurzliste mit Nummer, Adresse, Kaufpreis, Score | — |
-| `objekt_lesen` | voller Datensatz eines Objekts | — |
-| `objekt_suchen` | Adresse/Name/ID/Listennummer → Objekt | — |
-| `portfolio_lesen` | der Spiegel samt Stand | — |
-| `feld_katalog` | welche Felder es gibt, mit Auswahlwerten | — |
-| `objekt_anlegen` | legt an | — |
-| `felder_aendern` | ändert, nach Bestätigung | — |
-| `marktbericht` | Stufe 1–3 | **Guthaben** |
-| `score_lesen` | DealScore / Investor Deal Score | — |
-
-**Drei Stufen, und die mittlere ist die wichtige:**
-
-- **lesen** — läuft sofort
-- **schreiben** — läuft nach einer Bestätigung im Chat
-- **kostet** — läuft nach einer Bestätigung, in der der Preis stand
-
-> Ein Agent, der ohne Rückfrage Geld ausgibt, ist keine Erleichterung,
-> sondern ein Risiko. Die Bestätigungsregel aus v1795 gilt unverändert
-> weiter und wird vom Werkzeugregister erzwungen, nicht von der Höflichkeit
-> des Modells.
-
-### A-2 · Portfolio-Kontext an die KI (Marcels Punkt 1)
-
-Der Spiegel (`portfolio_spiegel`) geht bei **jeder** Portfolio-nahen Frage
-mit, nicht nur bei den fünf Formulierungen, die ein Muster kennt. Dazu der
-Gesprächsverlauf, damit „und die Gesamttilgung?" eine Folgefrage sein darf.
-
-**Abgeleitete Kennzahlen:** Marcel will „Gesamttilgung", „aktuelle
-Verbindlichkeiten", „höchster Finanzierungsbedarf". Zwei Wege, und sie
-schließen sich nicht aus:
-
-1. **Rechnen lassen, wo es eindeutig ist.** Die Summe der Restschulden
-   steht im Spiegel je Objekt — das Modell darf sie addieren.
-2. **Als Feld führen, wo es wiederkehrt.** „Aktuelle Verbindlichkeiten"
-   gehört in `portfolioPayload()` als benanntes Feld, nicht in jede
-   Antwort neu addiert.
-
-> Punkt 2 schlägt Punkt 1, wo immer es geht. Eine Zahl, die das Modell
-> jedes Mal neu addiert, ist jedes Mal eine neue Gelegenheit, sie anders zu
-> addieren. **Was benannt ist, wird gelesen; was gelesen wird, stimmt.**
-
-**ZU PRÜFEN, BEVOR GEBAUT WIRD:** welche der gewünschten Größen im Spiegel
-schon stehen (`restschuld_heute_eur` ist da) und welche fehlen
-(Tilgungsanteil je Jahr, Finanzierungsbedarf). Fehlende kommen in
-`dashboard.js portfolioPayload()` — **dort**, wo gerechnet wird, nicht im
-Bot.
-
-### A-3 · Objekte flexibel ansprechen (Punkt 2)
-
-Name · ID · Adresse · **Nummer aus der letzten Liste** · Gesprächskontext.
-Die Nummer funktioniert seit v1798; ID und Name fehlen noch. Die
-Zahlenfalle bleibt: „Musterstr. **12**" ist eine Hausnummer, „Nummer
-**12**" ein Listeneintrag.
-
-### A-4 · Auswahlfelder (Punkt 3)
-
-Der Feldkatalog führt die `options` bereits mit (189 Felder, 53 davon
-Auswahlfelder — `frontend-konstanten.json`). Fehlt: das Modell soll
-umgangssprachliche Angaben zuordnen („renovierungsbedürftig" ≈
-„renovierungsbedarf") und **nur bei echter Mehrdeutigkeit** fragen:
-
-> „Den Wert konnte ich dem Feld ‚Zustand' nicht eindeutig zuordnen. Zur
-> Auswahl stehen: … Welchen möchtest du?"
-
-**Nie einen ungültigen Wert schreiben.** Was nicht in den `options` steht,
-wird nicht gespeichert — das ist die Regel aus „stille Verwerfung ist der
-teure Fehler", nur andersherum: hier wird nicht still verworfen, sondern
-nachgefragt.
-
-### A-5 · Aktionen über den Agenten (Punkt 4)
-
-„Leg ein neues Objekt in der Musterstraße 12 an", „Ändere bei Objekt 17 die
-Zimmerzahl auf 5", **„Erstelle für ALLE Objekte eine
-Marktpreisindikation."**
-
-Der letzte Satz ist der heikle:
-
-> Eine Aktion über ALLE Objekte ist siebzehn Aktionen. Kostet sie Geld,
-> sind es siebzehn Abbuchungen — und die Bestätigung muss die
-> GESAMTSUMME nennen, nicht den Einzelpreis. Wer „ja" sagt, muss wissen,
-> wozu.
-
-Dazu: Teilerfolge sind der Normalfall (drei Objekte haben keine
-Wohnfläche). Der Agent meldet am Ende, was lief und was nicht — und warum.
-
-### A-6 · Intelligente Objektanlage (Punkt 5)
-
-Behebt Befund 2. Drei Dinge:
-
-- `modus: 'inserat'` für Fließtext (behebt Ursache 4)
-- Der Anlege-Modus bekommt einen **Ausgang**: Fragen zwischendurch sind
-  erlaubt, der Entwurf bleibt stehen (behebt Ursache 5)
-- Genannte Angaben werden **nie erneut gefragt** — schon gebaut
-  (`fuehrungService.luecken`), scheiterte nur am falschen Modus
-
-> „Der Prozess muss zustandsbehaftet sein. Wird die Anlage unterbrochen
-> oder werden zwischendurch andere Fragen gestellt, darf der bisherige
-> Fortschritt nicht verloren gehen." (Marcel, Punkt 5)
-
-### A-7 · Geführte Prozesse per Sprache (Punkt 6)
-
-Das KI-gestützte dynamische Formular. Baut auf A-6 auf; die
-Führungsdaten (8 Etappen, 18 Frageblöcke) liegen seit v1794 serverseitig
-vor.
-
-### A-8 · Marktberichte und Wertermittlung (Punkt 7)
-
-Vier Stufen statt zwei: Marktbericht · Marktpreisindikation · erweiterte ·
-vollständige Wertermittlung (`wev`). Geht aus der Anfrage nicht hervor,
-welche gemeint ist, **fragt der Agent** — und nennt dabei die Preise.
-
-Das Ergebnis ist mehr als eine Zahl: Marktwert bzw. Korridor, verwendete
-Objektdaten, Lage und Mikrolage, Marktdaten, Vergleichsdaten,
-wertbeeinflussende Eigenschaften, **Annahmen und Rechengrundlagen**,
-Risiken, **Quellen**.
-
-> Der letzte Punkt ist keine Zutat. Die Wertermittlungsdoktrin verlangt,
-> dass jede Zahl ihre Herkunft trägt — ein Agent, der einen Wert nennt und
-> die Quelle weglässt, verstößt gegen sie, egal wie gut er formuliert.
-
-Rückfragen zur Analyse danach ohne erneute Erklärung.
+A-1 bis A-8 gebaut und durchgetestet (v1800–v1808), Erledigtes s. Fertig. Offen:
 
 ### A-9 · E-Mail- und Aufgabenabgleich (Punkt 8)
 
-**Eigenständiges Thema, hängt an den anderen nicht.** Der Agent prüft
-**nicht nur ungelesene** Mails, sondern gleicht auch gelesene und
-abgelegte gegen offene Aufgaben ab, ordnet sie Objekt und Vorgang zu,
-legt sie ab, erledigt die Aufgabe und schreibt einen nachvollziehbaren
-Vermerk:
+Der Agent gleicht gelesene, ungelesene und abgelegte Mails gegen offene Aufgaben ab, ordnet sie Objekt und Vorgang zu, legt sie ab, erledigt die Aufgabe und schreibt einen Vermerk („Erledigt am … aufgrund der E-Mail von …, Betreff: …, vom …“).
 
-> „Erledigt am 02.10.2026 aufgrund der E-Mail von … , Betreff: … , vom …"
-
-**BLOCKIERT:** Es gibt heute keine Mail-Anbindung. Das ist ein eigener
-Bau (Zugang, Ablagestruktur, Aufgabenmodell) und gehört **nicht** in
-dieselbe Runde wie A-1 bis A-8. Siehe auch G1 (Google Drive).
-
-### A-10 · Die Verarbeitungskette (Punkt 9)
-
-```
-Eingabe → Absicht → Entitäten → Kontext laden → vorhandene Daten
-→ fehlende bestimmen → Berechnung/Aktion planen → ausführen
-→ Ergebnis prüfen → verständlich antworten
-```
-
-**Kein ungefilterter Datenbank-Dump an die KI.** Erst bestimmen, was
-gebraucht wird, dann gezielt laden. Das ist nicht nur eine Kostenfrage:
-
-> Je mehr Unwichtiges im Kontext steht, desto öfter antwortet ein Modell
-> auf das Unwichtige. Ein Dump macht den Agenten nicht klüger, sondern
-> beliebiger.
+**BLOCKIERT:** Es gibt keine Mail-Anbindung — eigener Bau (Zugang, Ablagestruktur, Aufgabenmodell). Siehe G1 (Google Drive).
 
 ---
 
-### ✓ ABGEARBEITET am 02.10.2026 — v1800 bis v1807
-
-**A-1 bis A-8 stehen und sind durchgetestet.** Was beim Testen gefunden
-wurde, steht im Rollout-Journal; hier nur der Stand.
-
-| Punkt | Stand | Commit |
-|---|---|---|
-| Befund 1+2 (Modus, Falle) | ✓ | `v1800` |
-| A-1 Werkzeugkasten (9 Werkzeuge, 3 Stufen) | ✓ | `v1801` |
-| A-2 Portfolio-Kontext + Tilgung/Verbindlichkeiten als Feld | ✓ | `v1802` |
-| A-3 Objektbezug: Nummer, UUID, Adresse, Anknüpfung | ✓ | `v1801` |
-| A-4 Auswahlfelder mit Rückfrage | ✓ | `v1807` |
-| A-5 Aktionen inkl. Sammelaktion mit Gesamtpreis | ✓ | `v1805` |
-| A-6 Anlage: alle genannten Angaben werden übernommen | ✓ | `v1806` |
-| A-7 geführte Prozesse per Sprache/Text | ✓ | `v1800` / `v1806` |
-| A-8 Berichtsstufen mit Preisansage | **teilweise** | `v1805` |
-| A-9 E-Mail-Abgleich | **BLOCKIERT** | — |
-
-**Was an A-8 noch fehlt:** die ausführliche Zusammenführung des
-Ergebnisses (Lage, Mikrolage, Vergleichsdaten, Annahmen, Quellen). Preis
-und Abruf stehen, der Berichtsinhalt wird noch nicht aufbereitet.
-
-**Prüfstrecke:** `tools/agent-pruefung/` — fünf Läufer, die im Container
-gegen das echte Konto laufen und protokollieren, WELCHE Werkzeuge der
-Agent gewählt hat.
-```
-Portfolio-Fragen (Marcels fünf)     5 von 5 über portfolio_lesen
-Zahlentreue, 3 Fragen x 4 Läufe    12 von 12 richtig
-Werkzeuge einzeln                  16 von 16 Proben
-Anlage: genannte Angaben             7 von 7 im Datensatz
-Gesamtlauf durch den Agenten         9 von 9 Proben
-```
-
-
-
-
-### Reihenfolge des Baus
-
-1. **Die zwei Befunde beheben** — Ursachen 4 und 5 (falscher Auslesemodus,
-   Anlege-Falle). Klein, sofort spürbar, unabhängig vom Rest.
-2. **A-1 Werkzeugkasten** — ohne ihn ist alles andere Spekulation.
-3. **A-2 Portfolio-Kontext** samt der fehlenden Kennzahlen in
-   `portfolioPayload()`.
-4. **A-3 / A-4** Identifikation und Auswahlfelder.
-5. **A-6 / A-7** Anlage und geführte Prozesse.
-6. **A-5** Aktionen, zuletzt die Sammelaktionen mit Gesamtpreis.
-7. **A-8** Berichtsstufen und die ausführliche Antwort.
-8. **A-9** eigenes Thema, eigener Zeitpunkt.
-
-**Getestet wird am Ende durchgehend** — Marcel: „teste es danach auch
-durch." Die Prüfstrecke läuft gegen das echte Konto mit seinen 17
-Objekten, mit Gegentests für jede Zahlenfalle.
-
-### Was dieser Umbau NICHT ändern darf
-
-- **Rechenkerne werden nicht dupliziert.** Der Spiegel bleibt der Weg zu
-  Portfolio-Zahlen, die Scores werden gelesen.
-- **Geld nur nach Bestätigung mit Preis.** Bei Sammelaktionen mit
-  Gesamtsumme.
-- **Die Adresse wird rückbestätigt.**
-- **Ein belegtes Feld wird nie still überschrieben.**
-- **Jede Zahl trägt ihre Herkunft und ihren Stand.**
-
----
 
 ## → NEU: Telegram-Bot als zweiter Zugang zur App (01.10.2026)
 
-Marcel am 01.10.2026: „Ich würde im ersten Step gerne schauen, ob wir
-vielleicht auch so einen Telegram-Bot einrichten können oder ob ein User den
-selbst einrichten kann, also dass man das in den Einstellungen irgendwo
-ergänzt und dann hat der Zugriff auf alle Objekte … und er kann auch neue
-Objekte anlegen und wir bilden quasi über diesen Telegram-Bot dieses geführte
-Anlegen durch."
-
-**Marcel am 02.10.2026 — die vollständige Anforderung.** Sie geht deutlich
-über „Objekte anlegen" hinaus, deshalb hier wörtlich zerlegt:
-
-| # | was der Bot können soll | Marcels Worte |
-|---|---|---|
-| 1 | **Fragen zu einem einzelnen Objekt** | „dass ich auf einzelne Objekte überall zugreifen kann" |
-| 2 | **Portfolio-Daten abgreifen** | „wie ist meine Vermögensbilanz, wo stehe ich in zehn Jahren, wie viele Objekte habe ich, gib mir ein paar Eckdaten" |
-| 3 | **Objekt per Sprachnachricht anlegen** | „ich würde einfach eine Audio aufnehmen und dort reinsenden mit Adresse und allen möglichen Daten und er wertet aus, ob er alles dafür zur Verfügung hat" |
-| 4 | **Lücken benennen und durchleiten** | „mir fehlen noch für die Bewertung die und die Eckdaten — und würde dann vielleicht auch so durchleiten wie bei der Schritt-für-Schritt-Anleitung" |
-| 5 | **Felder ändern** | „man kann aber auch Felder ändern" (01.10.) |
-| 6 | **Marktpreisindikation** | „man könnte daraus jetzt auch einfach eine Marktpreisindikation holen, wenn man die Sachen angibt" |
-| 7 | **Adresse IMMER rückbestätigen** | „da sollte er auf jeden Fall immer nach einer Bestätigung fragen, weil das kann ja auch sein, dass sie durch die Sprachaufzeichnung manchmal nicht richtig übermittelt wird" |
-| 8 | **Einrichtung über die Einstellungen** | „der muss über einstellungen vernünftig einzurichten sein" |
-
-**Gemessen am 02.10.2026: sieben von acht haben bereits einen Weg.** Der Bot
-ist ein **neuer Kanal auf vorhandene Fähigkeiten**, kein zweites Programm:
-
-| # | Status | wo der Weg schon liegt |
-|---|---|---|
-| 1 | **vorhanden** | `POST /api/v1/ai/copilot` ohne `kontextArt` |
-| 2 | *teilweise* | `dashboard.js:2459` `portfolioPayload()` — fertig, aber **nur im Frontend** |
-| 3 | **vorhanden** | `POST /ai/extract-voice` (Audio + Feldextraktion in einem Zug, bis ~10 Min); `POST /objects` hat **keine** Pflichtfelder |
-| 4 | *teilweise* | `voice-import.js:9124` `_rfLuecken`, `ETAPPEN`/`RFRAGEN` ab `:2682` — **Frontend-Konstanten** |
-| 5 | **vorhanden** | `<<<FELDER>>>`-Block + `heileSchablone` + `objektZuordnen` + `anwenden` |
-| 6 | **vorhanden** | `/avm/quote` (kostenlos) → `/avm/*`; oder per `<<<ABRUF>>>` mit Pflicht-Kostenansage |
-| 7 | **vorhanden** | `voice-import.js:9970` `_rfAdresseBestaetigen()` — die **einzige** Rückfrage im ganzen Sprechlauf, aus genau Marcels Grund |
-| 8 | *teilweise* | Reiter-Muster `settings.js:189/291`; zwei fertige Vorbilder für Schlüsselfelder (s. T-B6) |
-
-> Punkt 7 war schon gebaut, bevor Marcel ihn forderte — und mit derselben
-> Begründung: „eine falsch verstandene Straße macht aus vier richtigen
-> Abrufen vier falsche, und keiner davon meldet einen Fehler, denn die
-> Nachbarstadt hat auch Marktdaten." Das ist kein Zufall, sondern dieselbe
-> Erfahrung zweimal.
-
-**Zwei Dateien liegen dazu im Repo** (beide gesichtet am 01.10.2026):
-
-| Datei | was drin steht |
-|---|---|
-| `Dateien/Anleitung Google Drive und Telegram-Bot an eine eigene Node.js-App anbinden.docx` | 131 Absätze, OAuth-Weg, Long-Polling, Code-Gerüste, 9 benannte Stolperstellen |
-| `Dateien/bau-cockpit-2.2.1-komplett.zip` | 70 Einträge, Marcels laufendes Programm — die Vorlage |
-
-**Google Drive ist ein EIGENES Thema und steht hier nicht drin.** Marcel:
-„Danach gehen wir vielleicht mal das Google-Drive-Thema an. Das wäre aber ein
-extra Thema." Siehe Punkt G1 unten.
-
-### Was im Bau-Cockpit schon gebaut ist — gemessen, nicht vermutet
-
-`bau-cockpit/lib/telegram.js`, 315 Zeilen, CommonJS, **kein npm-Paket für
-Telegram** — nackter `fetch` gegen `api.telegram.org/bot<TOKEN>/…`.
-
-```
-Factory   module.exports = function ({ store, ai, copilot, saveUpload,
-                                       readFile, mail, findUpload, drive })
-Polling   loop() Z.300-310, getUpdates timeout:50, offset in der DB
-          (store.update('settings','main',{telegram:{offset}}))
-Start     start() Z.313 -> getMe; gerufen in server.js:377
-Zugang    TELEGRAM_ALLOWED (IDs ODER @Namen), isAllowed Z.17;
-          leere Liste = niemand darf; Unbekannte bekommen ihre ID zurueck
-Dialog    const convs = new Map() Z.26, chat-ID -> {hist,photos,docs,plan,...}
-          conv(chat) Z.27 mit 2-Stunden-Verfall; /neu loescht ihn
-Agent     agent(chat,input) Z.58: letzte 12 Verlaufseintraege + ctx() + bis
-          zu 3 Bilder -> ai.run({json:true,smart:true})
-Prompt    SYS Z.41-57 erzwingt {antwort, rueckfrage, frage, aktionen[]}
-          mit Whitelist TYP Z.29 (14 Aktionstypen)
-Rueckfr.  rueckfrage:true -> nur Frage zurueck (Z.74), sonst Ankreuz-
-          knoepfe planKb() Z.83 und Ausfuehrung erst nach "go" -> execute()
-Eingang   Fotos (groesste Aufloesung), Fotoalben ueber media_group_id mit
-          2500-ms-Sammeltimer Z.267-272, Sprache -> whisper-1 language=de
-          Z.274-283, PDF ueber pdf-parse Z.286
-```
-
-**Das ist genau Marcels Ablauf.** „Rueckfrage oder Aktionsliste mit
-Bestätigung" ist dasselbe Muster, das der DealPilot-Co-Pilot seit `v1764`
-fährt — Modell schlägt vor, Nutzer bestätigt, nichts passiert vorher.
-
-### T-B1 · Entscheidung zuerst: EIN Bot oder ein Bot JE Kunde
-
-**Das ist keine Programmierfrage, sondern eine Produktentscheidung** —
-Demo-first oder nachfragen. Beide Wege sind gebaut machbar, sie kosten
-Verschiedenes:
-
-| | ein DealPilot-Bot für alle | jeder Kunde legt seinen eigenen an |
-|---|---|---|
-| Kunde muss tun | `/start`, Code aus den Einstellungen schicken | bei @BotFather einen Bot anlegen, Token in die Einstellungen kopieren |
-| Token liegt | bei uns, einmal | beim Kunden, in unserer DB |
-| Polling | **eine** Instanz für alle, ein `getUpdates`-Strom | **eine Instanz JE Kunde** — 50 Kunden = 50 Polling-Schleifen |
-| Marke | „DealPilot" im Chat | der Kunde kann ihn nennen wie er will (Whitelabel!) |
-| Risiko | ein Bot-Token für alle Kunden | ein fremder Token in unserer DB ist ein Passwort (verschlüsselt ablegen) |
-
-**Die Anleitung nennt dazu eine harte Grenze:** *„nur eine Instanz darf
-pollen"* — sonst `Conflict: terminated by other getUpdates`. Bei einem Bot je
-Kunde heißt das: Webhook statt Polling, oder ein Prozess, der N Schleifen
-hält. Der Bau-Cockpit-Weg (Polling, ein Prozess) skaliert für Marcel allein,
-nicht für 50 Mandanten.
-
-> Eine Architektur, die bei einem Nutzer läuft und bei fünfzig kippt, ist
-> keine Architektur, sondern ein Prototyp mit Glück.
-
-**Vorschlag (hier stand: noch nicht entschieden):** EIN DealPilot-Bot,
-Webhook statt Polling, Verknüpfung über einen Einmal-Code aus den
-Einstellungen. Whitelabel bekommt später einen eigenen Bot je Mandant, nicht
-je Nutzer.
-
-#### ENTSCHIEDEN am 02.10.2026 — die RECHTE Spalte: jeder Kunde legt seinen eigenen an
-
-> Marcel: „aber ich möchte dass der kunde für sein objekt einen anlegen kann
-> also selber. **jeder kunde kann für sich und sein portfolio einen eigenen
-> bot anlegen.**"
-
-**Hier stand zuvor das Gegenteil** — „ein DealPilot-Bot für alle", abgeleitet
-aus seinem Satz „der muss über einstellungen vernünftig einzurichten sein".
-Das war eine Fehldeutung: ich habe „vernünftig einzurichten" als „möglichst
-wenig Arbeit für den Kunden" gelesen. Gemeint war, **dass der Kunde dort
-seinen eigenen Bot einträgt**. Die Entscheidung ist zurückgenommen.
-
-**Das Gegenargument in der Tabelle oben war keines.** Dort steht bei „jeder
-Kunde legt seinen eigenen an": *„Polling: eine Instanz JE Kunde — 50 Kunden =
-50 Polling-Schleifen"*, dazu die harte Grenze aus der Anleitung („nur eine
-Instanz darf pollen").
-
-> Das gilt für **Polling**. Mit einem Webhook fällt es ersatzlos weg: jeder
-> Bot ruft von sich aus unsere URL auf, und wir halten keine einzige
-> Schleife. Fünfzig Bots kosten dann genau so viel wie einer.
-
-Das Argument richtete sich also gegen die **Bauart des Bau-Cockpits**, nicht
-gegen Marcels Weg — ich hatte beides vermengt. Und der Vorteil, der in
-derselben Tabelle stand, blieb ungewichtet: **der Kunde darf den Bot nennen
-wie er will.** Für eine Whitelabel-SaaS ist das kein Nebenpunkt, sondern
-genau das Produkt.
-
-**Was gilt:**
-
-| | |
-|---|---|
-| Bot | **je Kunde einer**, bei @BotFather selbst angelegt |
-| Token | kommt vom Kunden, liegt **verschlüsselt** in `user_provider_credentials` (AES-256-GCM), nie im Klartext und nie in einer API-Antwort |
-| Empfang | **Webhook**, Pfad je Bot (24 Zufallsbytes) **plus** Secret-Header — zwei unabhängige Merkmale |
-| Verknüpfung | Einmal-Code **bleibt**: wer den Bot kennt, kann ihm schreiben. Der Code entscheidet, *wessen* Daten er sieht |
-| Whitelabel | fällt dadurch von selbst an — kein eigener Bau |
-
-### T-B2 · Die Kennung ist das Nadelöhr — ZUERST messen
-
-`users.id` ist eine **UUID**. `mb.market_reports.user_id` und
-`object_snapshots.user_id` sind dagegen **INTEGER** — daran scheitern die
-nutzerbezogenen Marktbericht-Wege seit `v942` still.
-
-Ein Telegram-Chat trägt eine **Zahl** (`chat.id`). Die Verknüpfung
-`telegram_chat_id ↔ users.id` braucht also eine eigene Tabelle, und der
-`chat.id` darf **nie** als `user_id` durchgehen.
-
-> Eine Kennung, die irgendwo zur Zahl wird, ist an dieser Stelle verloren.
-> Das hat uns schon einmal einen ganzen Strang gekostet.
-
-### T-B3 · Der Bot braucht keine zweite Rechenlogik
-
-**Alles, was der Bot können soll, gibt es als Endpunkt** — gemessen am
-laufenden System:
-
-| Marcels Wunsch | was es schon gibt |
-|---|---|
-| „man kann ihn zum Portfolio was fragen" | `POST /ai/copilot` mit `kontextArt: 'portfolio'` |
-| „man kann auch Felder ändern" | derselbe Endpunkt, `felder`-Katalog im Auftrag → `<<<FELDER …>>>` (v1764/v1767) |
-| „steht jetzt auf 12 Euro, du musst auf 13 ändern" | genau die Konflikt-Rückfrage aus `copilot-aenderungen.js` (`anwenden()`) |
-| „frei reinsprechen" | `POST /ai/transcribe-chunk` → `gpt-4o-mini-transcribe` *(hier stand `gpt-4o-transcribe`; der laufende Default ist seit v1169 das mini — `voiceExtractService.js:32`, Tempo)* |
-| „guckt, was noch übrig bleibt" | `POST /ai/extract-text` `{text, catalog}` → `{fields}` |
-| „geführtes Anlegen" | der Sprechlauf in `voice-import.js` führt die Fragenkette schon |
-
-**Der Bot ist damit eine ANSICHT, kein zweites Programm.** Was er braucht:
-einen Zustand je Chat (wie `convs` im Bau-Cockpit), eine Zuordnung Chat ↔
-Nutzer, und einen Weg, die Antwortblöcke (`<<<FELDER>>>`, `<<<ABRUF>>>`) in
-Telegram-Knöpfe zu übersetzen statt in HTML.
-
-> Eine zweite Rechenlogik für denselben Zweck ist der Fehler, den
-> `CLAUDE.md` unter „Rechenkerne — nie duplizieren" verbietet. Der Bot darf
-> `DealKpis.compute()` nicht nachbauen, auch nicht „nur für die Antwort".
-
-### T-B4 · Was der Bot NICHT darf
-
-- **Kostenpflichtige Abrufe ohne Bestätigung** — dieselbe Regel wie in der
-  App (`v1766`): Kosten und Restkontingent nennen, dann fragen.
-- **Dateien ungeprüft annehmen.** Das Bau-Cockpit bricht bei **48 MB** ab
-  (`fetchFile` in `lib/drive.js` Z.93); DealPilot hat `MAX_UPLOAD_MB`.
-- **Antworten über 4096 Zeichen** — Telegram-Grenze, laut Anleitung.
-- **`callback_data` über 64 Byte** — das Bau-Cockpit löst es über eine
-  flüchtige `fileMap` mit 500 Einträgen (`short(id)` Z.162) und meldet
-  „Liste abgelaufen" (Z.111). Eine UUID passt rein, zwei nicht.
-- **In Gruppen auf alles antworten.** Das Bau-Cockpit reagiert dort nur auf
-  Befehl, Mention oder Reply (Z.242-246).
-
-### T-B5 · Reihenfolge des Baus
-
-1. ~~**T-B1 entscheiden**~~ — **erledigt am 02.10.2026**: ein Bot, Webhook,
-   Einmal-Code aus den Einstellungen.
-2. Tabelle `telegram_links` (chat_id BIGINT, user_id UUID, code, bestätigt_am)
-   plus Einstellungs-Reiter mit Einmal-Code. **Migration = Rebuild.**
-3. Webhook-Endpunkt, Signaturprüfung (`X-Telegram-Bot-Api-Secret-Token`),
-   Allowlist.
-4. **Feldkatalog serverseitig** (T-B6 ①) — Voraussetzung für 5 UND 6.
-5. Fragen zum Portfolio — der kürzeste Weg zum Beweis, dass die Kette steht.
-   Braucht T-B6 ②.
-6. Felder ändern mit Konflikt-Rückfrage als Telegram-Knöpfe.
-7. Geführtes Anlegen: erst frei sprechen, dann die Lücken abfragen
-   (T-B6 ③), Adresse rückbestätigen.
-8. Abrufe mit Kostenansage.
-
-### T-B6 · Die drei echten Bauposten — alles andere ist Kanal-Arbeit
-
-Gemessen am 02.10.2026 quer durch Backend und Frontend. Sieben der acht
-Wünsche haben einen Weg (Tabelle oben); was wirklich fehlt, ist dreimal
-dasselbe Muster: **die Logik liegt im Frontend, der Bot hat kein Frontend.**
-
-**① Der Feldkatalog liest heute das DOM.**
-`copilot-aenderungen.js:52` baut `katalog()` aus `window.FIELDS` **plus dem
-DOM** — Bezeichnung, Art, select-Optionen. Ein Bot hat kein DOM, also auch
-keinen Katalog, also kann das Modell keine Feld-Id treffen. Ohne diesen
-Posten funktioniert weder „Felder ändern" noch „Lücken abfragen".
-
-**② Portfolio-Zahlen gibt es nur im Browser.**
-`dashboard.js:456` `aggStats()` und `:704` `projectAll(years)` sind die
-Quelle für Vermögensbilanz und „wo stehe ich in zehn Jahren";
-`:2459 portfolioPayload()` liest sie bereits fertig zusammen und rechnet
-selbst nichts. **Einen Backend-Weg zu Portfolio-Summen gibt es nicht.**
-
-> **Hier ist die Versuchung, und sie ist verboten.** `CLAUDE.md`:
-> „Rechenkerne — nie duplizieren." Eine zweite Vermögensbilanz im Backend
-> wäre genau der Fehler, der uns `projectAll` in Cent hat rechnen lassen —
-> jahrelang, Faktor 100, sichtbar erst als eine zweite Quelle danebenstand.
-> Der Weg ist, `dashboard.js`/`calc.js` als Node-Modul lauffähig zu machen
-> (ES5-IIFE, das geht), **nicht** nachzubauen.
-
-**③ Die Führung durchs Anlegen ist eine Frontend-Konstante.**
-`voice-import.js:2682` `ETAPPEN` (6 + 2 extra) und `:2718` `RFRAGEN` — die
-Feldreihenfolge, die Marcel mit „so durchleiten wie bei der
-Schritt-für-Schritt-Anleitung" meint. Dazu `:3045 _rfZuschnitt` (die Fragen
-richten sich nach der Objektart, `objektart-felder.js:208 pflicht()`) und
-`:9124 _rfLuecken` („was fehlt noch"). Alles vorhanden, alles im Browser.
-
-**Was dagegen fertig ist und nur angeschlossen werden muss:**
-
-| | |
-|---|---|
-| Audio | `POST /ai/extract-voice` nimmt `mime` als Parameter — Telegram liefert OGG/Opus, also reicht Download + base64 |
-| Anmeldung | `x-api-key` ist **gebaut** (`middleware/auth.js:48`, 120/min je Key, nur sha256 gespeichert). **Zwei Haken:** nur Pro-Plan, und `req.apiKey.scopes` wird gesetzt, aber an keiner gefundenen Stelle ausgewertet — ein Key hat faktisch Vollzugriff. Für einen Bot gehört das eingegrenzt. |
-| Einstellungs-Panel | `apikeys.js` ist das Vorbild: **selbst-einhängend** über einen eigenen Host-Div, kein Eingriff in `settings.js`. Für Fremdzugangsdaten ist `immometrica.js:17` das Muster (PUT/DELETE/reveal, verschlüsselt). |
-
-**Eine Zahl zum Mitnehmen:** `callback_data` eines Telegram-Knopfes fasst
-**64 Byte**. Eine UUID passt rein, zwei nicht — Knöpfe müssen also auf eine
-Sitzung zeigen, nicht auf ein Objektpaar.
+Bot gebaut (v1791–v1798: eigener Bot je Kunde, Webhook, Einmal-Code, Auskunft, Anlage, Sprachnachricht), Erledigtes s. Fertig. Offen bleibt nur G1:
 
 ### G1 · Google Drive — eigenes Thema, noch nicht angefasst
 
@@ -9827,25 +1725,7 @@ Anleitung. Das gehört beim Angehen gemessen, nicht übernommen.
 > maschinenlesbar, nur genehmigungspflichtig — das hängt an einer Mail,
 > nicht an Arbeit.
 
-### E1 · Das Register ist eingespielt — ERLEDIGT (v1751, v1751b)
-
-```
-               Zeilen   Länder   Kennzahlen
-vorher            493        1            1
-nachher         2.505       14            8
-```
-
-Ursache war `tools/register-saat.mjs` Zeile 17: eine hartverdrahtete Datei.
-2.515 geerntete Sätze lagen im Repo, 493 in der Datenbank.
-
-**Zehn Sätze bleiben draußen und das bleibt so:** Sachwertfaktoren aus
-Bochum (05911000), Dortmund (05913000), Essen (05112000) und
-Siegen-Wittgenstein (05962) haben keine `quelle_url` — und **kein einziger**
-Satz dieser vier Ausschüsse hat eine. Eine Herkunft wird nicht erfunden.
-
-**Noch nachzutragen:** 23 Sätze ohne Quellenvermerk, 11 ohne Lizenz.
-
-### E2 · `modellansaetze` ist nur zu 58,8 % gefüllt — OFFEN, wichtig
+### E2 · `modellansaetze` ist nur zu 58,8 % gefüllt — OFFEN, wichtig (Stand unklar, am 25.10.2026 nicht nachgemessen)
 
 Gemessen über alle 2.515 Sätze des Dateiregisters:
 
@@ -9900,7 +1780,7 @@ den zuständigen Ausschuss und den Link, mit dem Hinweis auf die Kosten.
 Der Status im Register gehört von `adresse-bekannt` auf
 `daten-kostenpflichtig` präzisiert.
 
-### E5 · Es wird nichts automatisch geerntet — OFFEN
+### E5 · Es wird nichts automatisch geerntet — OFFEN (Stand unklar, am 25.10.2026 nicht nachgemessen)
 
 ```
 mb.etl_runs      0 Einträge
@@ -9915,464 +1795,28 @@ der Recherche an. **Das Werkzeug dafür steht jetzt:**
 (Seiten, Zeichen, leere Seiten) — ein Latin-1-Prüfer scheitert an
 komprimierten CID-Strömen und liefert Buchstabensalat.
 
-### E6 · Nächste Kandidaten — SH erledigt (v1753)
-
-Nach Aufwand sortiert — überall erst die Quelle prüfen, dann bauen:
-
-1. **Schleswig-Holstein** — direktes Landes-PDF
-   (`gaZgMarktbericht_SH_2024.pdf`), heute 6 Sachwertfaktoren
-2. **Hamburg** — Transparenzportal mit offenem Datensatz-Katalog, heute 1
-3. **Brandenburg** — je Kreis ein PDF nach festem Muster `GMB_{KRZ}.pdf`,
-   heute 36 SWF und 0 LZS
-4. **Sachsen** — BORIS-Portal, heute 7
-5. **Niedersachsen** — Tableau-Dashboards; der Zugriff ist bekannt schwierig
-   (siehe `ni-lage-parameter`: Parameter nur per Index, nicht per URL)
-
 ---
 
 ## → OFFEN aus dem 01.10.2026, nachmittags (Setup-Fenster und die Piloten)
 
-Marcels Durchlauf durch die Erstanmeldung. **Reihenfolge wie genannt.**
+U1–U8 und U8-R erledigt (v1749–v1776), s. Fertig. Offen:
+
+#### U8-R · Greifen die Finanzierungsgrenzen WIRKLICH überall?
+
+Gemessen ist nur ein Leser (die Ampel in `dealscore2-ui.js`). Marcel: „und die müssen überall greifen“ — zu prüfen, ob Empfehlungstexte, PDF-Ausgaben und der Co-Pilot dieselbe Schwelle verwenden oder eigene Konstanten führen.
 
 ---
 
-### U1 · Der Hintergrund darf nicht so dunkel sein — ERLEDIGT (v1749)
-
-Marcel: „Der Hintergrund sollte nicht so ausgegraut sein, damit man sehen
-kann, wie sich die Optik im Hintergrund ändert."
-
-Gemessen: `.dpo-ov` hat `background:rgba(5,5,5,.82)` **und**
-`backdrop-filter:blur(4px)`. Beides zusammen macht die Ansicht dahinter
-unlesbar — genau die Ansicht, über die der Nutzer in diesem Schritt
-entscheidet.
-
-> Ein Auswahlfenster, das verdeckt, worüber es entscheiden lässt, nimmt dem
-> Nutzer die einzige Grundlage, die er hat.
-
-**Belegt am 01.10.2026 im Code** (`onboarding.js:790`):
-
-```
-.dpo-ov{ ... background:rgba(5,5,5,.34) ... }   kein backdrop-filter mehr
-```
-
-Der Kommentar daneben (`onboarding.js:783-789`) hält den alten Stand fest.
-
-**Abgenommen am laufenden Fenster, 01.10.2026** (`?setup=1`,
-`getComputedStyle` auf `.dpo-ov`):
-
-```
-background-color   rgba(5, 5, 5, 0.34)
-backdrop-filter    none
-Kasten             760 x 676 px, linke Kante bei 687
-```
-
-### U2 · Ein Klick daneben darf nicht schließen — ERLEDIGT (v1749)
-
-Marcel: „Wenn man neben das Modal klickt, soll es sich nicht schließen."
-
-**Vorsicht beim Bauen:** im Code steht KEIN Listener, der bei einem Klick auf
-den Hintergrund schließt (`onboarding.js:343` fängt nur Kacheln und Knöpfe ab,
-`_ov.remove()` steht nur in `_fertig()`). Also entweder schließt etwas
-anderes, oder der Eindruck entstand durch den „Fertig"-Weg. **Erst am
-laufenden Fenster nachstellen, dann bauen** — sonst wird ein Schutz gegen
-etwas gebaut, das es nicht gibt, und die echte Ursache bleibt.
-
-**Gebaut mit genau dieser Vorsicht** (`onboarding.js:560-565`): zwei
-Listener in der Fangphase, `mousedown` und `click`, die beide nur bei
-`ev.target === _ov` greifen — also nur auf dem Hintergrund selbst.
-
-> Der Eindruck kann auch von einem DURCHGEREICHTEN Klick auf die App
-> dahinter kommen, die dann ihrerseits etwas öffnet. Beides erledigt
-> dieselbe Zeile: der Klick stirbt am Hintergrund, statt weiterzulaufen.
-
-Das ist die ehrliche Fassung — die Ursache ist weiterhin nicht bewiesen,
-aber beide möglichen Wege sind zu.
-
-**Abgenommen am laufenden Fenster, 01.10.2026.** Klickpunkt (343, 494) —
-links neben dem Kasten; `elementFromPoint` bestätigt dort `.dpo-ov`:
-
-```
-Fenster vor dem Klick    offen
-Fenster nach dem Klick   offen        <- U2 erfuellt
-Zeugen an body/document  0 Treffer    <- der Klick wird NICHT durchgereicht
-```
-
-> Der zweite Messwert ist der wichtigere: er beweist die Vermutung, dass
-> der Eindruck von einem durchgereichten Klick kam. Dieser Weg ist jetzt
-> messbar zu — nicht nur der, den es nie gab.
-
-### U3 · Die Vorschaubilder der vier Ansichten sagen nichts — ERLEDIGT (v1753b/c)
-
-Marcel: „Die Bilder der einzelnen Designs sind nichtssagend."
-
-Heute sind es CSS-Rechtecke (`.dpo-v-v1b`, `.dpo-v-v2`, …): ein goldener
-Streifen und eine graue Fläche. Das unterscheidet Aktenmappe und Kanzlei
-faktisch nicht. **Optikfrage → Demo-first**, Entwürfe nach
-`design/Vorschläge/`.
-
-### U4 · LTV wählbar ODER frei eingebbar — ERLEDIGT (v1750)
-
-Marcel: „Den LTV sollte man auswählen können oder auch frei eingeben, zum
-Beispiel 100 % Finanzierung gibt es ja auch."
-
-Heute kommt der LTV **ausschließlich** aus der Investortyp-Karte (80/90/95),
-ist nirgends sichtbar und nicht änderbar.
-
-### U5 · Checkbox „automatisch ziehen", sonst selbst angeben — ERLEDIGT (v1750, Marktzins)
-
-Marcel: „Man sollte eine Checkbox haben, ob er sich den automatisch ziehen
-soll, und wenn nicht, dass man einen angeben kann."
-
-**Zweideutig und vor dem Bauen zu klären:** „den" kann der LTV sein (dann:
-automatisch aus der Eigenkapitalquote, denn LTV = 100 − EK) oder der
-Marktzins (dafür gibt es `indicative-zins.js`). **Die Lösung deckt beides ab:**
-je ein Feld mit Häkchen „automatisch" — LTV aus der EK-Quote, Zins aus der
-Abfrage. Ohne Häkchen wird das Feld frei.
-
-### U6 · Erklärungen an jedes Feld — ERLEDIGT (v1750, Finanzierung)
-
-Marcel: „Es müssen Erklärungen, so Infofelder dran. Was ist zum Beispiel DSCR
-und wo setzen wir Standardwerte und erklären beim Tooltip warum."
-
-Zwei Dinge, nicht eines: **was die Größe ist** und **warum genau dieser
-Vorschlagswert steht**. Der zweite Teil ist der wichtigere — er macht aus
-einer Zahl, die vom Himmel fällt, eine nachvollziehbare Empfehlung.
-
-### U7 · Steuer erklären — ERLEDIGT (v1750); Gehaltsrechner von Marcel gestrichen
-
-Marcel: „Bei der Steuer, was macht der genau? Können wir auch Gehaltsrechner
-anbieten, irgendwas wie als Unterpunkt, falls man sein zvE nicht kennt? Dann
-können wir das daraus berechnen."
-
-Der Rechner nimmt heute das **zu versteuernde Einkommen** und liefert über
-`Tax.calcGrenzsteuersatz()` den Grenzsteuersatz. Wer sein zvE nicht kennt —
-und das sind die meisten Angestellten — kommt nicht weiter.
-
-> **Doktrin beachten:** vom Bruttolohn zum zvE führt kein exakter Weg ohne
-> Werbungskosten, Vorsorgeaufwand und Freibeträge. Ein Rechner, der so tut,
-> erfindet eine Zahl. Entweder die Abzüge werden abgefragt, oder das Ergebnis
-> trägt sichtbar den Vermerk „Schätzung".
-
-### U8 · Die Investortypen sind die DealScore-Profile — ERLEDIGT (v1749, v1770)
-
-Marcel: „Die Investorentypen sind nicht die, die wir im DealPilot als Profile
-für den Investor DealScore hinterlegt haben."
-
-**v1749 hat die Liste richtig gemacht:** `_profile()` liest
-`DealScore2.getPresets()` — eine Quelle, keine Pflegeliste. Kommt dort ein
-siebtes Profil dazu, steht es von allein im Setup. Und `setActivePreset()`
-wird gerufen, der Score rechnet also mit dem gewählten Profil.
-
-**v1770 hat den Rest gefunden, und er war der schlimmere Teil.** Gemessen am
-02.10.2026 am laufenden System:
-
-```
-DealScore2.getPresets()    6 Profile
-                           balanced · conservative · optimistic ·
-                           lage · cashflow · sicherheit
-Default im Setup           "ausgewogen"
-in der Liste enthalten     NEIN
-```
-
-`_profile().filter(x => x.id === "ausgewogen")` ergibt `undefined`, `if (t)`
-ist falsch — **wer das Profil-Fenster ohne Klick durchlief, bekam weder
-Finanzierungsgrenzen noch ein Score-Profil.** Dazu war die Kachel
-„Ausgewogen" beim Öffnen nie markiert.
-
-> v1749 hat die Liste richtig gemacht und den Default vergessen. **Eine
-> halbe Umstellung ist schwerer zu finden als keine:** die Kacheln stimmen,
-> also sieht alles richtig aus.
-
-Behoben: `_typDefault()` holt den Default **aus** der Liste (`balanced`,
-sonst das erste) — er kann nicht mehr daneben liegen. Dazu ein Wächter an
-der Schreibstelle: ein unbekannter Schlüssel fällt nicht mehr still aus,
-sondern auf das erste Profil zurück **und meldet sich in der Konsole**.
-
-> Ein Rückfall ohne Hinweis ist eine zweite Tarnung für denselben Fehler.
-
-**Abgenommen am laufenden System:**
-
-```
-Sechs Kacheln, echte Schluessel, "Ausgewogen" markiert:
-  balanced (an) · conservative · optimistic · lage · cashflow · sicherheit
-
-Merker geloescht, OHNE Kachelklick auf "Fertig - los geht's":
-  dp_dealscore2_preset -> "balanced"      (vorher: nichts)
-  DealScore2.getActivePreset() -> balanced
-```
-
----
-
-#### U8-R · Die Frage war die richtige — ERLEDIGT (v1776)
-
-Marcel am 02.10.2026: *„Also ich weiß gar nicht, wofür du diese drei
-Finanzierungsgrenzen haben möchtest. … Ich würde dann die bestehenden
-nehmen, die wir jetzt hier haben. Die halte ich für sehr realistisch. …
-wichtig ist natürlich auch, dass man sich die selber setzen kann. Also auch
-noch mal benutzerspezifisch. Und die müssen überall greifen."*
-
-**Die Messung gibt ihm recht, und der Befund ist schwerer als die Frage:**
-
-```
-Schritt 3 "Finanzierung"   dpo_ek · dpo_ltv · dpo_dscr
-                           -> ek_quote_default, max_ltv, min_dscr
-Schritt 5 "Profil"         ueberschrieb GENAU DIESE DREI
-```
-
-**Der Nutzer gibt sie zwei Schritte vorher selbst ein** — jedes Feld mit
-einem Absatz Erklärung daneben — und das Profil warf sie weg.
-
-> Ein Fenster, das erst nach einem Wert fragt und ihn zwei Schritte später
-> selbst überschreibt, hat nicht gefragt, sondern sich erkundigt.
-
-**Die Antwort auf „wofür überhaupt?":** Die Grenzen sind die persönliche
-Kaufschwelle und sie **wirken** — `dealscore2-ui.js:286/291` zeigt sie seit
-`v1356` als eigene Ampel neben dem Score. Ein Objekt kann 82 Punkte holen
-und trotzdem unter dem Mindest-DSCR liegen; deshalb stehen sie NEBEN dem
-Score, nicht darin.
-
-**Selbst setzbar sind sie an zwei Stellen** (beide gemessen):
-
-| Ort | Felder |
-|---|---|
-| Setup, Schritt „Finanzierung" | `dpo_dscr` · `dpo_ltv` · `dpo_ek` |
-| Einstellungen › Investmentprofil | `ip_min_dscr` · `ip_max_ltv` · `ip_ek_quote_default` |
-
-**Behoben in v1776:** das Profil schreibt nur noch `ai_risk` und ruft
-`setActivePreset()`. Die Zahlen auf der Kachel tragen jetzt das Wort
-**„typisch:"** — sie sagen, was für dieses Profil üblich ist, und
-beschließen nichts. Der Einleitungstext nennt beides ausdrücklich.
-
-**Abgenommen am laufenden System:**
-
-```
-eigene Werte gesetzt       min_dscr 1,44 · max_ltv 77 · ek 23
-Profil "Sicherheit" gewaehlt   (dessen typische Werte: 1,40 / 75 / 25)
-
-danach:  min_dscr 1,44 · max_ltv 77 · ek 23      unveraendert
-         dp_dealscore2_preset = "sicherheit"     gesetzt
-         ai_risk = "Konservativ (sicherheitsorientiert)"
-```
-
-#### Noch offen: greifen sie WIRKLICH überall?
-
-Gemessen ist **ein** Leser: die Ampel in `dealscore2-ui.js`. Marcel sagt
-„und die müssen überall greifen" — zu prüfen bleibt, ob Empfehlungstexte,
-PDF-Ausgaben und der Co-Pilot dieselbe Schwelle verwenden oder eigene
-Konstanten führen.
-
-> Ein Feld ohne Leser sieht aus wie ein Feld. Ein Feld mit EINEM Leser sieht
-> aus wie eine Einstellung, die überall gilt.
----
 
 ## → NEU: Die beiden Piloten sollen sprechen können (01.10.2026)
 
-Ein großes Paket, Marcels Worte zuerst:
+V1–V7 gebaut (v1760–v1769c), Erledigtes s. Fertig. Offen:
 
-> „Bei der Pilot-Analyse für das einzelne Objekt, aber auch beim Portfolio-
-> Piloten, dass man per Sprache etwas diktieren kann. Wenn man Änderungen beim
-> Objekt hat oder etwas hinzufügen möchte, dann kann ich das Objekt sagen und
-> die Änderungen, und er füllt die Felder aus oder ergänzt sie."
-
-### V1 · Diktat in beiden Piloten — ERLEDIGT (v1760-v1764b: Co-Pilot und Portfolio-Pilot)
-
-Pilot-Analyse (Einzelobjekt) und Portfolio-Pilot bekommen einen Sprechweg.
-**Vorher messen, was es schon gibt:** `voice-import.js` trägt den Sprechlauf
-und die „Geführte Eingabe" (v1746). Ein zweiter Weg daneben läuft auseinander,
-sobald einer gepflegt wird — das steht so schon über der Ausgabeliste in
-`layout-varianten.js`.
-
-### V2 · Objekt benennen und Felder ergänzen — ERLEDIGT (v1767b)
-
-> **Hier stand „ERLEDIGT (v1762, Zuordnung über die Seitenliste)". Das war
-> nur halb richtig** und ist am 01.10.2026 ausdrücklich zurückgenommen:
-> v1762 hing die Zuordnung an einem Muster (`istAenderungsansage`), das
-> eine ZAHL im Satz verlangte — Marcels „Zustand auf stark
-> renovierungsbedürftig" fiel durch. Das Muster ist mit `v1767` weg;
-> die Zuordnung sitzt jetzt in `objektZuordnen()` und läuft erst, wenn
-> das Modell wirklich eine Änderung vorgeschlagen hat.
->
-> **Gemessen mit `tools/pruef-objektzuordnung.mjs`:** 21 von 21 Fällen
-> richtig, Deckung 9 von 9 Objekten. Marcels Satz trifft die
-> Musterstraße 12 mit 5:1 statt mit 2:2 — der frühere Gleichstand hätte
-> am falschen Objekt geändert.
-
-„Ich kann das Objekt sagen und die Änderungen." Also: Objektzuordnung per
-Sprache, dann Felder füllen.
-
-### V3 (01.10.) · V5 · V7 — GEMESSEN: im Kern schon vorhanden
-
-Am 01.10.2026 am laufenden System gemessen, BEVOR gebaut wurde:
-
-```
-window.FIELDS                 221 Felder · 213 im DOM · 192 Eingaben
-VoiceImport._konfliktZeigen   „das Feld ist schon gefüllt"      → V3
-VoiceImport._gleicherWert     erkennt, wenn sich nichts ändert  → V3
-VoiceImport._ueberspringen    der Weg daran vorbei              → V3
-VoiceImport._kontingent       Kosten und Restguthaben           → V5
-buildFullCatalog()            liest aus window.FIELDS           → V7
-```
-
-> **V7 ist strukturell erfüllt**, nicht nur zufällig: der Feldkatalog
-> entsteht aus `window.FIELDS`, nicht aus einer gepflegten Liste im
-> Sprachmodul. Ein neues Feld steht damit von allein darin — genau das,
-> was Marcel verlangt hat („jedes Feld, was wir noch anlegen").
-
-**Zu tun bleibt die Abnahme**, nicht der Bau: je ein echter Sprechlauf
-gegen ein belegtes Feld (sagt er, was drinsteht?), gegen ein leeres, und
-einer mit Blick auf die Kostenansage.
-
-### V3 (01.10.) · Belegte Felder nicht still überschreiben — ERLEDIGT (v1764, v1767b)
-
-Marcel: „Wenn die Felder bereits gefüllt sind, gibt er an, was drin steht, und
-ich muss bestätigen, ob übersprungen wird."
-
-> Das ist dieselbe Regel wie „eine generierte Tabelle darf nie einen
-> Handeintrag überschreiben". Hier gilt sie für jedes einzelne Feld.
-
-### V4 · Marktbericht und Wertermittlung per Sprache auslösen — ERLEDIGT (v1766)
-
-Auch **für alle Objekte** auf einmal.
-
-### V5 · Kosten und Restkontingent ansagen — ERLEDIGT (v1766)
-
-Marcel: „Er sagt dann, was es kostet und wie viel Kontingent wir noch haben."
-**Geld → nie raten.** Die Zahlen kommen aus dem Plan und dem Kerosin-Stand,
-nicht aus einer Konstanten im Sprechmodul.
-
-**Befund (01.10.2026, am laufenden Konto gemessen):** `cost` ist in
-`ai_credits_log` **immer 1** (`aiCreditsService.js:363`). Verschieden sind
-nicht die Preise, sondern die **Guthabenarten** — `mpi` (Stufe 1),
-`mpi_plus` (Stufe 2), `wev` (Wertermittlung/Bericht). Am Testkonto über
-`GET /ai/credits`: mpi 36 frei, mpi_plus 9, wev 10.
-
-Der Stand reist **mit dem Auftrag** ans Modell (`body.abrufe`), es rechnet
-ihn nicht aus. Bei Guthaben 0 hängt es keinen Block an. Die Rückfrage nennt
-„Kostet 1 Abruf · danach noch N frei" und bietet *Abrufen* / *Doch nicht*.
-
-> Bei Geld wird nicht geschätzt. Lieber keine Zahl als eine erfundene — das
-> gilt für einen Kontostand genauso wie für einen Liegenschaftszinssatz.
-
-### V6 · Beide Piloten holen die Berichte und gleichen ab — ERLEDIGT (v1769–v1769c)
-
-Marcel: „Wichtig ist auch, dass sich beide Piloten immer auch zum Objekt bei
-der Pilot-Analyse oder dem ganzen Bestand beim Portfolio-Piloten den
-Marktbericht oder die Berichte holen und alles abgleichen."
-
-**Der Weg war seit `v942` zu.** `users.id` ist eine UUID,
-`mb.*.user_id` war INTEGER, und fünf Routen machten `parseInt()` daraus —
-alle fünf antworteten einem echten Nutzer mit **HTTP 400**. Im Frontend sah
-das aus wie „noch keine Marktberichte", also wie ein leeres Fach.
-
-**Marcels Freigabe am 02.10.2026: „ja mach die migration."**
-
-#### Was gemacht wurde
-
-| | |
-|---|---|
-| `migrations/015_user_id_text.sql` | `user_id` auf TEXT in beiden Tabellen. Nur der Typ — die alten Zahlen bleiben als Text stehen, die fünf Indizes baut Postgres selbst neu. |
-| `api.js` | die fünf `parseInt` auf `_uidAus(req)`. Diese Funktion prüft auf **Unbedenklichkeit** statt auf Zahligkeit und ist seit `v1601` gebaut — an diesen fünf Stellen wurde sie nur nicht gerufen. |
-| `tools/mb-uid-zuordnen.mjs` | ordnet die Altzeilen zurück. **Beweist zuerst die Eindeutigkeit der Ziffernpräfixe** und bricht sonst ab. |
-| `js/pilot-berichte.js` | holt die Berichte und bereitet sie für den Auftrag auf. |
-
-#### Gemessen am laufenden System
-
-```
-Migration:   [migrate] apply 015_user_id_text.sql ... OK
-             market_reports : text · object_snapshots : text
-             5 Indizes auf user_id, alle da
-
-Zuordnung:   alle 5 Praefixe eindeutig (2, 9, 6, 1, 833654)
-             202 Zeilen umgeschrieben (je 72+22+7 in beiden Tabellen)
-             122 Zeilen · 101 mit UUID · 21 ohne Kennung
-             Keine gestuemmelte Kennung mehr uebrig.
-
-Routen:      /objects               200   21 Objekte          (vorher 400)
-             /objects/history       200   72 Berichte         (vorher 400)
-             /objects/history?ref=  200   28 zu einem Objekt  (vorher 400)
-             /reports/one?id=1      200   data + report_md 6478 Zeichen
-```
-
-**Der sichtbare Schaden ist weg:** das Marktbericht-Band im Boarding zeigt
-wieder **28 Zeilen** mit Kürzel, Adresse, Datum und Marktwert statt „Noch
-keine Marktberichte für dieses Objekt".
-
-#### Wie es jetzt arbeitet
-
-**Eine Route, zwei Fragen:** `/objects/history` ohne `ref` liefert den ganzen
-Bestand (Portfolio-Pilot), mit `ref` ein Objekt (Co-Pilot). **Ein** Abruf,
-nicht einer je Objekt.
-
-**Der Abruf wartet nicht vor jeder Frage.** Marcels Kritik an `v1760` gilt
-weiter — „der braucht jetzt relativ lange". Der Stand liegt in einem
-Zwischenspeicher und frischt sich bei `dp:object-ready` auf, nicht beim
-Fragen. Ein leerer Speicher heißt „noch nicht geholt": dann reist nichts mit,
-und das Modell behauptet auch nichts.
-
-**Je Objekt geht nur der JÜNGSTE Bericht mit.** 28 Läufe am selben Objekt
-sind keine 28 Aussagen, sondern eine mit 27 Vorstufen — die Zahl steht als
-`verlauf_laeufe` dabei.
-
-**Abgleichen heißt benennen, nicht rechnen.** Nachgemessen mit einer echten
-Frage:
-
-```
-„Was sagt der Marktbericht zum Wert dieses Objekts, und passt das zu
- meiner Kalkulation?"
-
-  -> „... zeigt einen Marktwert von 182.000 EUR, mit einer Spanne von
-      146.000 EUR bis 224.000 EUR (Bericht-ID 132). Dein Kaufpreis von
-      210.000 EUR liegt ueber dem Marktwert und innerhalb der Spanne.
-      Die Differenz zum Marktwert betraegt 28.000 EUR. ... Bruttorendite
-      laut Bericht 6,6 %."
-```
-
-Beide Zahlen, beide mit Herkunft, **keine dritte**. Der Prompt verbietet ein
-Mittel ausdrücklich und im Portfolio auch eine Summe über die
-Berichts-Marktwerte — die Vermögensbilanz ist die Summe und rechnet anders.
-
-> Zwei Zahlen zur selben Größe sind kein Widerspruch, solange beide ihre
-> Herkunft tragen. Eine dritte, gemittelte wäre einer.
-
-#### Ein Nachlauf: `v1769c`
-
-Auf „wie viele meiner Objekte haben einen Marktbericht" antwortete der
-Portfolio-Pilot **„8"**. Im Auftrag stand `objekte_mit_bericht: 21`, und
-alle 21 Sätze trugen einen Marktwert (in der Liste selbst nachgemessen).
-**Das Modell hat gezählt statt zu lesen und sich verzählt.** Für die
-Vermögensbilanz steht die Regel seit `v1704` im Prompt, für die Berichte
-fehlte sie.
-
-> Eine Zahl, die im Auftrag steht, soll gelesen werden, nicht nachgezählt.
-> Wer zählt, kann sich verzählen — und das Ergebnis sieht genauso aus wie
-> ein gelesenes.
-
-Danach: *„Von deinen 21 Objekten haben 21 einen Marktbericht."*
-
-#### Offen bleibt
-
-**Die 21 Zeilen ohne Kennung** (`user_id IS NULL`) bleiben stehen — sie
-haben nie eine getragen, und eine erfundene Zuordnung wäre schlimmer als
-keine. Sie tauchen in keiner nutzerbezogenen Liste auf.
-
-**Für Produktion ist das noch nicht ausgerollt.** Die Migration läuft beim
-nächsten Prod-Rollout mit; `mb-uid-zuordnen.mjs` muss dort **eigens**
-gestartet werden und prüft die Eindeutigkeit erneut — auf Prod kann sie
-anders liegen. Siehe P1.
-### V7 · Jedes Feld muss erreichbar sein, auch künftige
-
-Marcel: „Jedes Feld, was wir haben und was wir noch anlegen, muss dort rein
-und erreichbar sein."
-
-**Das ist die Architekturvorgabe des ganzen Pakets:** keine gepflegte Liste
-von Feldnamen im Sprechmodul, sondern eine, die aus der Feldbeschreibung der
-App entsteht. Sonst fehlt jedes neue Feld still — und niemand merkt es.
-
-> Genau diese Falle ist bei `/bmf/aufteilung` schon einmal zugeschnappt:
-> unbekannte Eingabefelder wurden kommentarlos übersprungen, 5 von 12,
-> `warnings` leer.
+- **V3/V5/V7 · Abnahme:** je ein echter Sprechlauf gegen ein belegtes Feld (sagt er, was drinsteht?), gegen ein leeres, und einer mit Blick auf die Kostenansage.
+- **V6 · Prod:** `tools/mb-uid-zuordnen.mjs` muss auf Prod eigens laufen (prüft die Eindeutigkeit dort neu) — nicht belegt, ob das beim Prod-Rollout geschehen ist. Die 21 Zeilen ohne Kennung bleiben bewusst stehen.
 
 ---
+
 
 ## → OFFEN aus dem 01.10.2026 (Rundgang, Erstanmeldung, BMF-Ausgabe)
 
@@ -10380,416 +1824,16 @@ Marcels Durchgang am 01.10.2026. **Reihenfolge wie von ihm genannt.**
 Zwei Punkte sind beim Aufschreiben schon gefallen (T3, T4) — sie stehen
 trotzdem hier, damit die Abnahme nachvollziehbar bleibt.
 
-### T1 · Die Tour in jeder Ansicht — GEMESSEN (02.10.2026), vier Befunde
+### T1 · Die Tour in jeder Ansicht — Rest (Hänger behoben v1774/v1779/v1780, s. Fertig)
 
-**Die Blockade ist weg.** Marcel hat das Chrome-Fenster nach vorne geholt;
-gemessen vorher und nachher:
-
-```
-Fenster hinten    1.000 ms angefordert -> 19.612 ms   Faktor 19,6
-Fenster vorne     1.000 ms angefordert ->  1.097 ms   Faktor 1,1
-```
-
-#### Vier Befunde, drei davon in JEDER Ansicht gleich
-
-**B1 · Der Spot liegt außerhalb des Bildschirms** (Schritt 4, 5, 6 —
-Quick-Boarding Score, Boarding-Pass, Als Objekt speichern):
-
-```
-Spot      l 420 · t 63 · w 1296 · h 2216
-Fenster                            h  988
-Spot-Mitte y = 1171   ->  liegt 183 px UNTER dem sichtbaren Bereich
-```
-
-Der Rahmen ist mehr als doppelt so hoch wie das Fenster. Der Nutzer sieht
-eine Blase, die auf etwas zeigt, das er nicht sehen kann. Alle drei Schritte
-tragen `subTargets` — der Spot fällt offenbar auf den Container
-(`#qc-tab-host, #s-quick`) zurück, statt das Unterziel zu treffen.
-
-**B2 · Gar kein Spot** (Schritt 22, 23, 24 — Investor Deal Score,
-Bewertungs-Cockpit, Stress-Test, alle Tab `s6`): `.dp-tour-spotlight` ist
-nicht vorhanden. Die Blase erscheint, markiert aber nichts.
-
-**B3 · In der Kanzlei-Ansicht (`v2`) HÄNGT die Tour bei Schritt 6.**
-Gegengeprüft mit dem echten Knopf, nicht nur mit `next()`:
-
-```
-Titel vor dem Klick    "Als Objekt speichern"
-echter "Weiter"-Knopf  geklickt  ->  Titel unveraendert
-DpTour.next()          gerufen   ->  Titel unveraendert
-```
-
-**Ein Nutzer käme dort nicht mehr weiter** — außer über „Tour überspringen".
-In Tower (`v2b`) und Aktenmappe (`v1b`) läuft derselbe Schritt durch.
-
-**B4 · Die Tour hat Verzweigungen.** Schritt 3 (`qb-intro`), 35 und 36
-tragen `choices` mit `goto`. Der durchlaufene Pfad hängt davon ab, was der
-Nutzer wählt:
-
-```
-gefahrener Pfad (jeweils erste Wahl):
-  1 · 2 · 4 · 5 · 6 · 22 · 23 · 24 · 34 · 35 · 36    = 11 von 38
-```
-
-> **Die 38 Schritte sind ein Vorrat, kein Weg.** Wer „38 Schritte geprüft"
-> meldet, hat entweder mehrere Pfade gefahren oder nicht gemessen, was er
-> prüft. Der zweite Zweig jeder Verzweigung ist noch ungeprüft.
-
-#### Ergebnis je Ansicht
-
-| Ansicht | gemessen | ok | Spot außerhalb | kein Spot | hängt |
-|---|---:|---:|---:|---:|---|
-| Tower (`v2b`) | 11 | 5 | 3 | 3 | — |
-| Aktenmappe (`v1b`) | 11 | 5 | 3 | 3 | — |
-| Kanzlei (`v2`) | 6 | — | 3 | — | **bei Schritt 6** |
-| Standard (Heute) | offen | | | | |
-
-**B1 und B2 sind in Tower und Aktenmappe identisch** — sie hängen also an
-den Schritten selbst, nicht am Layout. Nur B3 ist ansichtsabhängig.
-
-#### Vier Anläufe für den Läufer — drei davon maßen sich selbst
-
-> Ein Prüfer, der sein Prüfobjekt nicht kennt, misst sich selbst. Das ist
-> an einem Tag dreimal passiert, und jedes Mal sah das Ergebnis wie ein
-> Befund aus.
-
-| Anlauf | Ergebnis | was wirklich los war |
-|---|---|---|
-| 1 | „3 von 38 ok" | `goto()` sprang auf eine **beendete** Tour — danach gab es gar keinen Spot mehr |
-| 2 | „4 von 38 ok" | lief nach **eigenem Index**; die Tour verzweigt und überspringt, Titel in der Blase passte bei 3 von 6 Proben nicht |
-| 3 | „53× hängt" | taktete blind mit 1.400 ms und rief `next()`, **während die Blase noch wechselte** — die Tour sprang dadurch von 2 auf 5 |
-| 4 | tragfähig | wartet auf den **Titelwechsel**, liest den aktuellen Schritt aus der Blase, bedient Verzweigungen, misst per `elementsFromPoint`, was unter dem Spot liegt |
-
-Erst Anlauf 4 prüft auch, **ob die Tour überhaupt noch offen ist** — ohne
-das meldet ein Läufer nach einem Abbruch lauter Fehler, die seine eigenen
-sind.
-
-#### Nachtrag 02.10.2026 · Standardansicht und zweiter Zweig gemessen
-
-**B5 · In der STANDARDANSICHT hängt die Tour schon bei Schritt 3.** Das ist
-die Ansicht, die ein neuer Kunde als erstes sieht.
-
-```
-Titel         "Neues Objekt? Quick-Boarding!"  (Schritt 3, die Verzweigung)
-
-Zweig A  Knopf "Quick-Boarding Schritt fuer Schritt ansehen"  -> nichts
-Zweig B  Knopf "Ueberspringen - weiter zur PRE-FLIGHT-Karte"  -> nichts
-direkt   DpTour.goto("qb-score")                              -> nichts
-
-JavaScript-Fehler dabei: keine.
-```
-
-**Damit ist auch der zweite Zweig geprüft** — beide führen ins Leere.
-
-#### Die Ursache steht in der Konsole, und sie erklärt B1 bis B5
-
-```
-[DpTour V239] Element nicht gefunden:
-   #sb-actions-accordion .sb-act-accent[onclick*="quickcheck"] ... (Step 3)
-   #obj-action-bar, .obj-action-bar  (Step 8, 10, 12, 13, 14, 16)
-   #obj-action-bar, .tab[data-target-sec="s0"]  (Step 17)
-   .tab[data-target-sec="s0"]  (Step 18)
-   #bc-stress  (Step 25)
-```
-
-**Nachgemessen, und das ist der Punkt:**
-
-```
-Schritt 3 Ziel      1 im DOM, 0 sichtbar
-das Akkordeon       1 im DOM, 0 sichtbar
-Schritt 8-18 Ziel   1 im DOM, 0 sichtbar
-Schritt 25 Ziel     1 im DOM, 0 sichtbar
-Tab s0              1 im DOM, 0 sichtbar
-```
-
-**Alle Ziele sind da — und keines ist sichtbar.** Die Tour-Engine meldet
-„Element nicht gefunden", obwohl sie es findet; was fehlt, ist die
-Sichtbarkeit.
-
-> Genau dieser Fehler steht weiter oben in diesem Punkt schon einmal: am
-> 30.09. hatte ich „36 von 37 Zielen" gemeldet, weil ich `querySelector`
-> gegen null geprüft hatte statt gegen die Sichtbarkeit. **Die Tour-Engine
-> macht denselben Fehler** — nur meldet sie ihn als „nicht gefunden" und
-> bleibt dann stehen.
-
-**Das Bild sagt es am deutlichsten:** bei Schritt 26 („Stress-Test") steht
-die Blase über einer **vollständig leeren Fläche**. Die Tour erklärt etwas,
-das auf dem Bildschirm nicht existiert.
-
-#### Ergebnis je Ansicht — vollständig
-
-| Ansicht | gemessen | ok | Spot außerhalb | kein Spot | hängt bei |
-|---|---:|---:|---:|---:|---|
-| Tower (`v2b`) | 11 | 5 | 3 | 3 | — |
-| Aktenmappe (`v1b`) | 11 | 5 | 3 | 3 | — |
-| Kanzlei (`v2`) | 6 | — | 3 | — | **Schritt 6** |
-| Standard (Heute) | 3 | 2 | — | — | **Schritt 3** |
-
-**Die Standardansicht ist der schwerste Fall:** dort kommt ein neuer Kunde
-über Schritt 3 nicht hinaus, und das ist der erste Rundgang, den er sieht.
-
-#### BEHOBEN in v1774 — die Ursache war ein `querySelector`
-
-Marcel am 02.10.2026: „tour hänger suchen und lösen."
-
-`_findElementWithRetry` nahm `document.querySelector(selectors[i])` — **einen**
-Treffer je Teilselektor. Ist ausgerechnet der erste unsichtbar, gab die Suche
-auf, obwohl ein späterer Treffer desselben Selektors sichtbar war:
-
-```
-  var el = document.querySelector(selectors[i]);
-  if (el && _isVisible(el)) return resolve(el);      // <- gibt auf
-```
-
-Jetzt `querySelectorAll` und der erste **sichtbare**.
-
-> **Genau dieser Fehler steht in diesem Punkt schon einmal — als meiner.**
-> Am 30.09. hatte ich „36 von 37 Zielen in allen vier Ansichten" gemeldet,
-> weil ich `querySelector` gegen null geprüft hatte statt gegen die
-> Sichtbarkeit. Die Tour-Engine machte denselben Fehler, nur meldete sie ihn
-> als „Element nicht gefunden" — und wer dem folgte, suchte einen Tippfehler
-> im Selektor statt eine zugeklappte Schiene.
-
-**Die Meldung sagt jetzt, was wirklich los ist:** statt „Element nicht
-gefunden" nennt sie die Zahl der Treffer im DOM und dass keiner davon
-sichtbar ist.
-
-**Nachgemessen am laufenden System, frisch geladen (`v1774`):**
-
-```
-Standardansicht - vorher Haenger bei Schritt 3, jetzt:
-
-   3.0 s  Willkommen bei DealPilot
-   4.8 s  Objekt auswaehlen
-   9.9 s  Neues Objekt? Quick-Boarding!      <- hier stand sie 42 s still
-  13.9 s  Quick-Boarding Score
-  17.9 s  Boarding-Pass
-  20.8 s  Als Objekt speichern
-  24.0 s  PRE-FLIGHT - dein Daten-Cockpit
-  27.2 s  Import aus Exposes & Marktberichten
-
-Kanzlei (v2) - vorher Haenger bei Schritt 6: laeuft ebenfalls durch.
-```
-
-**Beide vorher hängenden Stellen laufen.** Vor v1774 bewegten dort weder der
-echte „Weiter"-Knopf noch beide Zweige der Verzweigung noch `DpTour.goto()`
-etwas — 42 Sekunden lang beobachtet.
-
-#### Was damit NOCH NICHT belegt ist
-
-- **Nicht alle 38 Schritte in allen vier Ansichten.** Belegt ist, dass die
-  beiden Hänger weg sind und die Tour über sie hinwegläuft.
-- **B1 (Spot außerhalb des Bildschirms)** bei den drei Quick-Boarding-
-  Schritten ist davon unberührt — der Spot ist 2.216 px hoch bei 988 px
-  Fenster. Das ist eine eigene Ursache (Unterziel gegen Container).
-- **B2 (kein Spot)** bei Investor Deal Score, Bewertungs-Cockpit und
-  Stress-Test — ebenfalls offen.
-
-#### Vollprüfung — GEMESSEN (02.10.2026), vier Läufe, ein Muster
-
-Das Werkzeug liegt als `frontend/dev/tour-pruefer.js` im Repo und trägt
-**acht Lehren** im Dateikopf — so viele Anläufe hat es gebraucht, und sieben
-davon maßen den Prüfer statt die Tour.
-
-Entscheidend war zuletzt ein **Protokoll im Läufer**: je Schritt hält er
-fest, welchen Knopf er greift und ob der Klick ankam.
-
-> Ein Prüfer, der nicht protokolliert, was er TUT, liefert bei einem
-> Fehlschlag nur die Hälfte des Befundes.
-
-##### Das Ergebnis
-
-| Lauf | Schritte | ok | kein Spot | Spot fremd |
-|---|---:|---:|---:|---:|
-| Standard (Heute) / A | 12 | 9 | 3 | — |
-| Standard (Heute) / B | 10 | 7 | 3 | — |
-| Aktenmappe / A | 11 | 8 | 3 | — |
-| Aktenmappe / B | 12 | 8 | 3 | 1 |
-
-**In allen vier Läufen sind es dieselben drei Schritte**, und alle drei
-liegen im Tab `s6`:
-
-```
-22  Investor Deal Score
-23  Bewertungs-Cockpit
-24  Stress-Test
-```
-
-##### Und das Protokoll sagt, was dort passiert
-
-```
-22 KEIN_SPOT  s6  Investor Deal Score
-   blase_frisch : true          die Blase ist da und frisch geholt
-   next_knopf   : true          der "Weiter"-Knopf existiert
-   gewaehlt     : "next"        er wurde geklickt
-   titel_danach : "Investor Deal Score"
-   bewegt       : FALSE         nach 900 ms hat sich nichts getan
-```
-
-**Der Knopf ist da, der Klick geht raus — und 900 ms später steht die Tour
-noch auf demselben Schritt.** Dass sie danach doch weiterkommt (alle vier
-Läufe erreichen ihr Ende), passt zur Elementsuche: sie versucht es **20 ×
-300 ms = bis zu 6 Sekunden**, bevor der Auto-Skip greift.
-
-> Für den Nutzer sind das drei Blasen hintereinander, die nichts markieren
-> und je sechs Sekunden stehen. Von außen sieht das aus wie ein Hänger —
-> die Tour arbeitet nur ergebnislos.
-
-##### Was zu entscheiden ist
-
-**1 · Die drei `s6`-Schritte.** Ihre Ziele (`#bc-stress` und Nachbarn) sind
-im DOM, aber nicht sichtbar — das Bewertungs-Cockpit ist zugeklappt oder der
-Tab nicht offen. Zwei Wege:
-
-| | |
-|---|---|
-| **a** | Die Engine öffnet den Bereich, bevor sie sucht (wie `_expandSidebarActionsIfCollapsed()` es für das Aktionen-Akkordeon tut) |
-| **b** | Die drei Schritte entfallen, wenn ihr Ziel nicht sichtbar ist — die Tour wird kürzer, läuft aber flüssig |
-
-**2 · Die Wartezeit.** 20 Versuche × 300 ms sind für ein Ziel gedacht, das
-gleich erscheint. Für eines, das gar nicht kommt, sind es sechs verlorene
-Sekunden. Ein früherer Abbruch (etwa nach 1,5 s) macht die Tour spürbar
-flüssiger und kostet nur dort etwas, wo ein Bereich wirklich langsam lädt.
-
-##### Marcels Entscheidung: „b" — UMGESETZT in v1779
-
-Schritte, deren Ziel nicht sichtbar ist, halten die Tour nicht mehr auf.
-Die Wartezeiten der Elementsuche:
-
-```
-allgemein   2,0 -> 1,1 s
-s-quick     6,0 -> 2,0 s     (iframe, rendert wirklich nach)
-s8          4,5 -> 2,0 s     (Cockpit baut nach)
-```
-
-Die zwei Sekunden decken das Nachladen **gemessen** ab; die sechs waren für
-den langsamsten *denkbaren* Fall gewählt, nicht für den gemessenen.
-
-**Nachgemessen am laufenden System, frisch geladen:**
-
-```
-Standard (Heute) / Zweig A     36 Schritte · Tour beendet · 100 s
-   ok 35 · kein Spot 1
-   24  Stress-Test [s6]
-```
-
-**35 von 36.** Vorher waren es drei Schritte ohne Markierung (22, 23, 24) —
-jetzt nur noch einer. Die Tour erreicht dabei Schritte, die in keinem
-früheren Lauf vorkamen (z. B. „DealScore 0–100").
-
-##### Schritt 24 · nachgegangen, EIN Fund gelöst, einer offen (v1780–v1782b)
-
-Marcel: „bitte schritt 24 nachgehen und lösen."
-
-**Der Weg dahin führte zu einem Fehler, der jeden Nutzer trifft.** Gemessen:
-
-```
-bc-equity     1 Kind, 702 px      gerendert
-bc-cockpit    1 Kind, 628 px      gerendert
-bc-waterfall  0 Kinder, 0 px      <- stuerzt ab
-bc-stress     0 Kinder, 0 px      <- wird nie erreicht
-
-BankCharts.renderWaterfall(host, State)
-  -> ReferenceError: tilgEffektivBrutto is not defined
-```
-
-`tilgEffektivBrutto` wird in zwei Fußzeilen gelesen und **nirgends gesetzt**.
-Weil `_renderAll()` die vier Charts nacheinander rendert, riss der Waterfall
-den Stress-Test mit. Von Hand aufgerufen rendert `renderStressMatrix`
-einwandfrei (883 px) — **er war nie kaputt, er kam nur nie an die Reihe.**
-
-> Vier Dinge in einer Reihe: der erste Fehler kostet alle, die danach
-> kommen. Und der Schaden sieht aus wie vier Fehler.
-
-**Vier Zeilen höher steht derselbe Fehler schon einmal** („V63.90 BUG-FIX:
-endRow war undefiniert"). Dieselbe Funktion, dieselbe Fehlerklasse.
-
-Behoben in `v1780`: die Größe ist `tilgEffektiv + eigenanteil` — so sagt es
-der Fußzeilentext selbst, und es ist gegengeprüft (`tilg_durch_einnahmen
-20.209 + tilg_eigenanteil 3.254 = 23.463 = tilgung_kum`). Dazu stehen die
-vier Aufrufe jetzt **einzeln**: ein Chart, der stirbt, zeigt seinen Fehler im
-eigenen Behälter.
-
-**Ergebnis: alle vier Charts rendern** (702 · 628 · 707 · 883 px).
-
-##### Schritt 24 selbst bleibt offen — nach vier Anläufen
-
-| Versuch | Ergebnis |
-|---|---|
-| `v1780` Charts entkoppelt | Schritt 24 hat **einen** Spot (vorher keinen) — er liegt außerhalb |
-| `v1781` auf Scroll-Ende warten | **Denkfehler, zurückgenommen:** „zweimal gleich" trifft auch die Ruhe VOR dem Start |
-| `v1781b` sofort statt smooth | unverändert — und gemessen, dass das Scrollen für sich wirkt (7.598 → 99) |
-| `v1782` Spot nachziehen | **schlechter, zurückgenommen:** 2 Fehler statt 1, Schritt 6 fiel mit raus |
-
-> Eine Korrektur, die einen Fehler behebt und einen neuen macht, ist keine
-> Korrektur.
-
-**Was dabei gemessen und festgehalten ist:** `_applySubHl` läuft 420 ms
-nach dem Setzen des Spots und scrollt **noch einmal** (für das Unterziel).
-Der Spot bleibt stehen, das Bild wandert. Das Nachziehen an dieser Stelle
-hat andere Schritte zerstört — die richtige Lösung sitzt vermutlich darin,
-das Unterziel schon beim ERSTEN Scrollen zu berücksichtigen, statt zweimal
-zu scrollen. Das ist ein eigener Umbau.
-
-**Stand: 35 von 36 Schritten sitzen.** Schritt 24 ist der einzige Fehler.
-
-##### Was sonst noch offen ist
-
-- **Kanzlei und Tower** sind nicht fertig gemessen: der Läufer blieb dort
-  bei Schritt 1, **obwohl derselbe Knopf von Hand sofort wirkt.** Prüfer-,
-  kein App-Problem.
+- **Schritt 24 (Stress-Test, Tab `s6`):** Spot liegt außerhalb — `_applySubHl` scrollt 420 ms nach dem Spot ein zweites Mal für das Unterziel. Vermutete Lösung: Unterziel schon beim ersten Scrollen berücksichtigen (eigener Umbau; v1781 und v1782 zurückgenommen).
+- **B1:** Spot der Quick-Boarding-Schritte 4–6 war 2.216 px hoch bei 988 px Fenster (Unterziel gegen Container) — seit v1779 nicht eigens nachgemessen.
 - **Schritt 37 und 38** erreicht kein Zweig in der Standardansicht.
-### T2 · Beim Ansichtswechsel standardmäßig die Bordkarte — ERLEDIGT (v1748b)
+- **Kanzlei und Tower** nie vollständig mit dem Läufer gemessen (Prüferproblem); seit v2154 klappt die Tour dort die Schiene auf.
 
-Marcel: „dass wir am Anfang, wenn man sich anmeldet, die Ansichten wählen
-kann, dass wir aber standardmäßig einfach unter der Darstellung immer die
-Bordkarten erstmal auswählen."
+### T4 · Demo-Objekt für die Tour vorhalten — Rest: Abnahme (Bau s. Fertig)
 
-Zu prüfen: setzt das Setup aus `onboarding.js` die Bordkarte für Aktenmappe,
-Kanzlei und Tower wirklich — und gilt das auch, wenn der Nutzer die Ansicht
-SPÄTER unter Darstellung wechselt? Der zweite Fall ist der, den er meint.
-
-### T3 · Schritt 1 zeigt auf die Aktionen statt auf die Objekte — ERLEDIGT
-
-Marcel: „Dann müsste halt vorher einmal auf Portfolio geklickt werden."
-Siehe v1747b/v1747c, unten unter Fertig.
-
-### T4 · Demo-Objekt für die Tour vorhalten — ERLEDIGT, aber Abnahme offen
-
-Marcel: „Wir haben ja auch Demo-Objekte, die bei der Erstanmeldung
-entstanden sind. Vielleicht können wir die im Hintergrund komplett immer
-speichern, auch wenn der Kunde das Objekt löscht."
-
-Gebaut als `POST /objects/demo-rundgang` (v1747/v1747d) — der Datensatz
-liegt ohnehin in `backend/src/db/demo-object.json` und wird nie gelöscht, es
-brauchte nur einen Weg dorthin. Am Endpunkt nachgemessen: 129 Felder, 1
-Foto, 9.926 Zeichen KI-Analyse, freie Objektnummer.
-
-**BLOCKIERT ist nur die Abnahme des Pfads selbst:** der Fall „Nutzer hat
-KEIN Objekt" liess sich am Konto mit 17 Objekten nicht herstellen. Karten
-per CSS zu verbergen reicht nicht — `_ensureObjectLoaded` kehrt vorher an
-`#hdr-obj` zurück. Gehört an einem frischen Konto abgenommen.
-
-### T5 · Tower: „Kaufpreisaufteilung" öffnet immer dasselbe PDF — ERLEDIGT (v1748)
-
-Marcel: „Im Tower, wenn ich auf Kaufpreisaufteilung klicke, öffnet sich
-immer noch die Kaufpreisaufteilung. Da haben wir ja mehrere PDFs … vielleicht
-zu sagen: Welches wolltest du denn haben? Oder wir nennen das nicht
-Kaufpreisaufteilung, sondern BMF-Rechner … und dass wir dann ein Modal
-kriegen, wo wir es aussuchen können."
-
-Zwei Sachen in einem: **der Name** (Kaufpreisaufteilung ist das Ergebnis,
-nicht das Werkzeug) und **die Auswahl**. Vorlage ist die Fassungswahl, die
-beim Investment-PDF schon steht (`pdf-wahl.js`, v1744).
-
-### T6 · Pre-Flight-Karte: der QR-Schritt markiert den Boardingpass — ERLEDIGT (v1748)
-
-Marcel: „Wenn wir die Preflight-Card vorstellen, dass der QR-Code, wenn wir
-dazu den Text machen, dann markiert er vorne den Boardingpass. Das ist
-natürlich vollkommen falsch. Dann muss er den QR-Code markieren."
-
-Ein falscher Anker, kein Layoutfehler. Der QR-Code braucht einen eigenen
-Selektor — und der muss in allen vier Ansichten greifen.
+**BLOCKIERT:** Abnahme des Pfads „Nutzer hat KEIN Objekt“ — am Konto mit 17 Objekten nicht herstellbar (`_ensureObjectLoaded` kehrt vorher an `#hdr-obj` zurück). Gehört an einem frischen Konto abgenommen.
 
 ### T7 · Erstanmeldung: Einstellungen müssen ankommen UND wiederfindbar sein
 
@@ -10873,226 +1917,6 @@ stehen vermutlich im zweiten Dokument
 
 ## → OFFEN aus dem 29.09.2026 (Preise, Prod, Modul, RND)
 
-### N1 (29.09.) · ✅ ERLEDIGT — Marcel hat den Preis gesenkt (nachgemessen 12.10.2026)
-
-> **Marcel am 12.10.2026: „also wir haben das doch schon auf 4 euro
-> oder? schau nochmal nach."** Er hat recht, und der Eintrag unten war
-> veraltet.
->
-> Am **echten Katalog auf Prod** nachgerechnet (`ladeKatalog()` im
-> laufenden Container, nicht `config.js`):
->
-> ```
->   Einzelpreise      mpi 0,90   mpi_plus 1,90   wev 3,90
->
->   nachkauf_starter   4,00 EUR   5x mpi          Einzelwert  4,50   -0,50  Vorteil
->   nachkauf_investor  8,75 EUR   5/5/0           Einzelwert 14,00   -5,25  Vorteil
->   nachkauf_pro      12,50 EUR   5/5/5           Einzelwert 33,50  -21,00  Vorteil
-> ```
->
-> **Alle drei Pakete sind jetzt guenstiger als der Einzelkauf.** Der
-> Starter traegt eine NEUE Preis-ID (`price_1UKupB…` statt
-> `price_1UCzxM…`) — es wurde also ein neuer Stripe-Preis angelegt, der
-> alte nicht geaendert.
->
-> **Die Ursache im Code besteht fort und ist kein Defekt:**
-> `config.js:521` leitet den Paketpreis weiter als Monatsbeitrag ÷ 4 ab.
-> Solange der Stripe-Preis gilt (und er gilt — der Katalog kommt von
-> dort), ist das ohne Wirkung. Die Waechterfunktion
-> `_preisplausibilitaet()` bleibt und meldet den naechsten Fall.
-
-**Der ursprüngliche Befund, zur Nachvollziehbarkeit:**
-
-### N1 · Starter-Nachkauf ist teurer als der Einzelkauf — ENTSCHEIDUNG OFFEN
-
-Gemessen am **echten Stripe-Katalog** (`GET /credits/bewertungen`),
-nicht an `config.js`:
-
-| Paket | Stripe | Inhalt | Einzelwert | |
-|---|---|---|---|---|
-| `nachkauf_investor` | 8,75 € | 5/5/0 | 14,00 € | −5,25 € |
-| `nachkauf_pro` | 12,50 € | 5/5/5 | 33,50 € | −21,00 € |
-| **`nachkauf_starter`** | **5,00 €** | 5/0/0 | 4,50 € | **+0,50 €** |
-
-Anzeige und Stripe stimmen überein — **kein Anzeigefehler**. Ursache:
-`config.js:521` leitet den Paketpreis als Monatsbeitrag ÷ 4 ab und
-ignoriert, woraus das Kontingent besteht; beim Starter ist es nur die
-billigste Art.
-
-Seit v1673 meldet `_preisplausibilitaet()` in `bewertungsKatalog.js`
-den Fall beim Laden (`unplausibel: {aufschlag_cents: 50}`).
-
-**BLOCKIERT:** Der Betrag steht in Stripe (`price_1UCzxM…`,
-`dp_nachkauf_starter`), nicht im Code. Zwei Wege, beide brauchen
-Marcels Entscheidung:
-1. Stripe-Preis senken (z. B. 5,00 → 4,00 €)
-2. Starter-Kontingent aufwerten (z. B. +1 × `mpi_plus` → Einzelwert
-   6,40 €)
-
-Der Stripe-Konnektor braucht dafür eine neue Anmeldung per `/mcp`.
-
-### N2 (29.09.) · ✅ ERLEDIGT 12.10.2026 — mit dem Prod-Rollout v1951–v2144
-
-> **Der blockierende Satz war: „Der Prod-Pull wurde von der
-> Arbeitsumgebung abgewiesen."** Am 12.10.2026 ist der Rollout gefahren
-> worden (Merge `74841228`), und damit sind beide Stücke live.
->
-> Auf dem laufenden Prod nachgemessen:
->
-> ```
->   0c6cda6 v1669   bmfService.js traegt die Meldung (4 Treffer)
->   cc28127 v1673   _preisplausibilitaet in bewertungsKatalog.js (2)
->   beide Commits   Vorfahr von origin/main
-> ```
->
-> Die Preis-Plausibilität meldet den Starter-Aufschlag beim
-> **Katalog-Abruf**, nicht beim Start — deshalb steht nichts im
-> Startlog, und das ist kein Befund.
-
-**Der ursprüngliche Text:**
-
-### N2 · Zwei Backend-Fixes liegen auf `main`, der Prod-Pull fehlt
-
-`main` trägt seit `cc28127`:
-- `0c6cda6` v1669 — BMF-Aufteilung meldet unbekannte Eingabefelder
-- `cc28127` v1673 — Preis-Plausibilität
-
-Beide Sicherungen liegen und wurden **angesehen**:
-`/root/backups/prod-haupt-20260929-0634.sql.gz` (11 M) und
-`prod-mb-20260929-0634.sql.gz` (717 K).
-
-**BLOCKIERT:** Der Prod-Pull wurde von der Arbeitsumgebung abgewiesen
-(„Out-of-Place Publication"). Es fehlt genau:
-
-```
-cd /opt/dealpilot && git pull --ff-only origin main
-docker compose -f docker-compose.prod.yml up -d --build backend
-```
-
-Zwei Backend-Dateien, **keine Migration, kein Frontend**.
-`tools/rollout-prod.ps1` ist hier das falsche Werkzeug: es MERGED
-staging → main und brächte alle 346 Commits samt Migrationen mit.
-
-### N3 (29.09.) · Ein halber Cherry-Pick hing auf `main` — ERLEDIGT, war ein Duplikat
-
-Beim Wechsel auf `main` meldete git einen seit einer früheren Sitzung
-stehengebliebenen Sequencer-Zustand:
-
-```
-pick a2a96fd v1536/v1537: Partner 49 -> 99 EUR, drei Mandanten-Plaetze
-```
-
-**Nichts war angewendet** (kein `CHERRY_PICK_HEAD`, `git diff` leer).
-Mit `--quit` beendet, **nicht** fortgeführt — eine Preisänderung gehört
-nicht nebenbei auf den Produktionszweig.
-
-**Nachgemessen am 29.09.2026 — es gab nichts zu entscheiden.** Der
-Commit liegt **bereits auf `main`**:
-
-| gemessen | Befund |
-|---|---|
-| `git log --oneline main --grep="v1536"` | `a2a96fd` — von `main` aus erreichbar |
-| `git ls-tree -r main` | `backend/migrations/075_partner_preis_v1536.sql` liegt dort |
-| Stripe live, `dp_plan_partner_monthly` | **9.900 Cent**, `dp_version: v1536`, `inklusiv_mandanten: 3` |
-| Prod-Landing | `<h4>Warum 99 € und nicht 49 €</h4>` |
-
-Der Sequencer-Eintrag war ein **zweiter Anlauf auf einen Commit, der
-schon drauf war** — deshalb war auch nichts angewendet. Anzeige und
-Abbuchung stimmen überein; das Gegenstück zum Starter-Fall (N1) besteht
-hier **nicht**.
-
-> **Die Lehre ist die Reihenfolge:** Ich habe den hängenden Sequencer
-> als offene Entscheidung gemeldet, ohne vorher zu prüfen, ob sein
-> Inhalt längst am Ziel ist. Ein `--grep` auf dem Zielzweig hätte die
-> Frage in zehn Sekunden erledigt. **Erst messen, ob es die Aufgabe
-> noch gibt, dann fragen.**
-
-### N4 (29.09.) · Import-Modul v1.1.0 — erste Dokumentart angebunden (v1677)
-
-> **Zurückgenommen, 29.09.2026:** Unten stand „**Im Repo existiert keine
-> Gegenstelle**". Das ist falsch. Ich hatte nach den *Dateinamen des
-> Moduls* gesucht (`import.js`, `import_service.py`) statt nach der
-> *Funktion*. Die Gegenstelle ist **`frontend/js/pdf-import.js`** (V38,
-> 1.391 Zeilen): pdf.js → `POST /ai/extract-expose` → OpenAI →
-> Strukturdaten. **Dieselbe Architektur wie das Modul**, nur für ein
-> Dokument statt für einen Ordner. Marcel hatte recht — „das Modul, das
-> wir bereits integriert haben" gibt es.
->
-> In meiner eigenen Merkdatei steht „ich hab es nicht gefunden" ist
-> nicht „es gibt es nicht". Genau das ist hier passiert.
-
-**Damit ist klar, was „das Update einspielen" heißt:** nicht FastAPI
-nach Express portieren, sondern **die Dokumentarten nachziehen, die das
-Modul kann und wir nicht**.
-
-Das Modul klassifiziert zehn Arten (`import_service.py:47-99`) und hat
-Extraktions-Prompts für acht — `grundbuch`, `kataster`, `kaufvertrag`,
-`weg_protokoll`, `boris`, `vwg_vorgutachten`, `rndg`, `marktbericht`.
-**`kpt` wird klassifiziert, aber nicht extrahiert** — der Prompt fehlt.
-Deshalb kann „die Rechnung aus dem Modul nehmen" nicht gehen: sie ist
-dort nicht.
-
-**Angebunden (v1677): das Restnutzungsdauergutachten.**
-`POST /api/v1/ai/extract-rndg`, Schema wörtlich aus
-`EXTRAKTIONS_PROMPTS['rndg']`. Am Container gemessen:
-
-| Prüfung | Ergebnis |
-|---|---|
-| Neun Felder aus einem RNDG-Text | **alle korrekt** (Bj 1962, GND 80, 4 Punkte, Verfahren „Punktraster") |
-| Kette gegen unseren Kern | Gutachten **25 J.** / `calcPunktraster` **25,51 J.** — 2 % |
-| Negativtest ohne Baujahr/GND | `rechenbar: false`, `fehlende_pflichtfelder: ["baujahr","gnd_jahre"]` |
-
-Der Negativtest ist der wichtige: **`rnd_jahre` aus dem Gutachten wird
-gelesen, aber nie übernommen.** Gerechnet wird mit `rnd-calc.js`, die
-Gutachtenzahl ist der Vergleichswert. Und fehlende Pflichtangaben werden
-benannt statt still mit Standardwerten überbrückt — der Fehler, der bei
-der Kaufpreisaufteilung (v1669) eine um Faktor 2,9 falsche, plausibel
-aussehende Antwort erzeugt hat.
-
-**Offen — die nächsten Dokumentarten**, jede nach demselben Muster
-(Schema aus dem Modul, Rechnung bei uns): `grundbuch`, `kataster`,
-`kaufvertrag`, `weg_protokoll`. Dazu fehlt dem Endpunkt noch ein
-Aufrufer im Frontend; `pdf-import.js` ist die Stelle.
-
-**Nicht übernommen und bewusst so:** der Ordner-Upload, die SSE-Anzeige,
-der OCR-Zweig und `IMPORT_SESSIONS` (in-memory, übersteht keinen
-Neustart). Der OpenAI-Schlüssel des Moduls liegt im `localStorage` und
-geht per `X-OpenAI-Key`-Header vom Browser — unser Weg über den
-Server-Key mit `extractLimiter` bleibt.
-
-### N4-alt · Der ursprüngliche Befund (überholt, s. o.)
-
-`Dateien/dealpilot-import-v1_1_0.zip` (6 Dateien, ~55 KB). Geprüft am
-29.09.2026:
-
-- **Im Repo existiert keine Gegenstelle** — kein `import.js`,
-  `import_service.py`, `api_server_import_extensions.py`. Die v1.0.0
-  war laut README ein CLI-MVP und kam nie ins Git.
-- **Der Backend-Teil passt nicht zum Stack:** Python/FastAPI gegen
-  unser Node/Express. `import_service.py` und
-  `api_server_import_extensions.py` müssten portiert werden.
-- OCR-Fallback braucht `tesseract-ocr-deu` + `poppler-utils` im Image.
-- Der OpenAI-Schlüssel liegt im `localStorage` und geht per
-  `X-OpenAI-Key`-Header vom Browser — vor Produktion zu klären.
-- `IMPORT_SESSIONS` ist in-memory, übersteht keinen Neustart.
-
-**Und zur Kernfrage:** Das Modul enthält **keine**
-Kaufpreisaufteilungs-Rechnung. Es *klassifiziert* ein KPT-Dokument,
-hat aber weder Extraktions-Prompt noch Konsolidierungs-Zweig dafür —
-eine Lücke im Modul. „Die Rechnung aus dem Modul nehmen" geht mit
-dieser Fassung nicht.
-
-**Andockstelle**, falls integriert wird: der Import-Hub
-(`js/import-export-modal.js:113`), heute nur Excel + Backup.
-
-**Die Rechen-Andockstelle ist jetzt dokumentiert:**
-`docs/kaufpreisaufteilung/SCHNITTSTELLE.md` (v1675) — Feldnamen,
-Antwortformat, `warnings`, und die Gegenrechnung am echten Gutachten.
-Damit ist Marcels Ziel („falls ich mal ein Update einspiele, passt
-alles") von der Modul-Seite entkoppelt: **ein Modul muss die Rechnung
-nicht mitbringen, nur die Eingaben füllen und `POST /bmf/aufteilung`
-rufen.** Die Rechnung bleibt an der amtlichen Vorlage.
-
 ### N5 (29.09.) · RND-Verfahrenswahl — BEWERTUNGSFRAGE für Marcel
 
 `rnd-calc.js:419-433` wählt **immer die technische Alterswertminderung**,
@@ -11145,22 +1969,7 @@ sieht.
 Der Tag ist ausgerollt und nachgemessen (Journal-Einträge 5 bis 12 in
 `claude/projektanweisung-hauptapp.md`). Was **nicht** fertig ist:
 
-### P1 · Produktion nachziehen — Marcel: „prod machen wir später"
-
-Staging liegt seit `9a3f147` wieder vor Prod. Dazwischen liegen unter
-anderem v1635–v1645: die fünf Layouts, die Datenaufnahme-Zeile, die
-Erststart-Karte, die Export-Rückfrage, die Checkliste beim Anlegen,
-`umgebung.js` für die Landing-Ziele.
-
-**Vor dem Merge:**
-- Beide Datenbanken sichern **und ansehen** (`ls -lh` plus `zcat … | head -2`).
-- `git diff --name-only origin/main..staging | grep -i migration` — beim
-  letzten Mal leer, muss aber jedes Mal neu gefragt werden.
-- Backend-Rebuild nicht vergessen, wenn `backend/src/**` dabei ist.
-  **Am 26.09. hatte ich genau das zuerst übersehen** und behauptet, es
-  sei kein Backend-Code dabei; es waren fünf Dateien.
-
-### P2 · Die Reihenhaus-Gitter der NI-Ernte hängen — DIAGNOSE OFFEN
+### P2 · Die Reihenhaus-Gitter der NI-Ernte hängen — DIAGNOSE OFFEN (Stand unklar, am 25.10.2026 nicht nachgemessen)
 
 **Stand: 11 von 17 Gebieten vollständig, 6 ausgefallen.** Und darin
 steckt ein Muster, das noch niemand erklärt hat:
@@ -11255,111 +2064,25 @@ Die fehlende KPI-Angabe ist behoben (v1654d: `.sc-pill-sub` stand auf
 > getrennt. **Das ist eine Produktentscheidung** — vor dem Bauen mit
 > Marcel klären, ob die Kennzahlenzeile die echten Werte tragen soll.
 
-### P3b · ✅ ERLEDIGT — am Code nachgemessen 12.10.2026
-
-> Beide Regeln stehen, jede mit Messprotokoll im Kommentar:
-> `frontend/css/hell-varianten.css:157-159` blendet `#dp-kv-panel` unter
-> 900 px aus (v1652c), `frontend/css/layout-varianten.css:1418-1420`
-> dasselbe für `.dpl-schalter` (v1652d). Dazu `layout-varianten.css:2356`
-> — die Leiste wandert auch auf dem Schreibtisch nach rechts, weil sie
-> dort über dem Nutzerblock lag.
->
-> Der Punkt bleibt als **Merkposten** stehen: er beschreibt das Muster,
-> nicht die Arbeit. Ein drittes festes Fenster hätte dasselbe Problem.
-
-**Der ursprüngliche Text:**
-
-### P3b · Zwei Werkzeugfenster, die auf dem Handy im Weg standen
-
-Am 28.09. mit `elementsFromPoint` bei 390 px gemessen: `#dp-kv-panel`
-(aus `hell-varianten.js`) und `.dpl-schalter` (aus
-`layout-varianten.js`) lagen beide `position:fixed` über der
-Datenaufnahme; drei von vier Quellkacheln und der Abrufknopf waren nicht
-zu drücken. **Beide sind seit v1652c/d unter 900 px ausgeblendet.**
-
-> Zu bedenken, wenn irgendwann ein DRITTES Werkzeugfenster entsteht:
-> beide Fälle sahen auf dem Schreibtisch völlig unauffällig aus.
-> **Ein festes Fenster gehört vor dem Ausrollen einmal bei 390 px
-> gegen `elementsFromPoint` gehalten** — sichtbar ist nicht bedienbar.
-
-
 ### P4 · Kleinere Reste
 
-- **Ein leeres Testobjekt** liegt in Marcels Staging-Portfolio (beim
-  Nachweis der Checkliste entstanden). Kann weg — seine Liste.
-- **Marcels eigenes Profil:** seine E-Mail steht im **Namensfeld**, eine
-  PDF-E-Mail ist nicht gesetzt. Seine Daten.
-- **Handy-Layout der fünf Varianten** ist gebaut und gemessen, aber nur
-  an drei Breiten (1024 / 834 / 390) und nur in v1, v2, v4. v3 und v5
-  fehlen in der Messreihe.
-- ~~**`verfuegbarkeit-by.json`** wird von keinem Ausgabeweg gelesen~~ —
-  **überholt, am 02.10.2026 nachgemessen.** Die Auskunft steht: für sieben
-  Stichproben aus allen sechs Wegweiser-Ländern liefert
-  `quelleFuer(ags)` → `quellenSatz()` eine vollständige Antwort.
-
-  ```
-  Ebersberg (BY, kein Sachwertfaktor im Register):
-
-    stelle   Gutachterausschuss ... Landkreis Ebersberg
-    url      gutachterausschuesse-bayern.de/marktberichte-bayern/
-    zugang   kostenfrei
-    hinweis  "Die Uebersicht sagt nur, OB Daten vorliegen - nicht fuer
-             welche Objektart oder welchen Stichtag ..."
-  ```
-
-  `AUSSCHUSS_QUELLEN` führt 120 Einträge und deckt genau die sechs
-  Wegweiser-Länder ab (AGS-Präfixe 01 · 04 · 08 · 09 · 10 · 13).
-
-  **Was bleibt, ist eine Kopie:** `BY_AUSSCHUSS_DATEN` in
-  `quellen_links.js` ist aus `verfuegbarkeit-by.json` ABGELEITET und
-  eingefroren (96 Kreise, Stand 25.09.). Ändert sich die Registerdatei,
-  ändert sich die Tabelle nicht mit.
-
-  > Zwei Listen mit demselben Inhalt laufen auseinander, sobald eine
-  > gepflegt wird. Hier ist es noch keine, weil beide stillstehen.
-
-- ~~**`mb.market_reports.user_id` ist INTEGER**~~ — **ERLEDIGT (v1769).**
-  Migration `015_user_id_text.sql` gelaufen, 202 Zeilen zugeordnet, alle
-  fünf Routen antworten (vorher HTTP 400). Siehe V6.
+- **Ein leeres Testobjekt** liegt in Marcels Staging-Portfolio (beim Nachweis der Checkliste entstanden). Kann weg — seine Liste.
+- **Marcels eigenes Profil:** seine E-Mail steht im **Namensfeld**, eine PDF-E-Mail ist nicht gesetzt. Seine Daten.
+- **Kopie statt Quelle:** `BY_AUSSCHUSS_DATEN` in `quellen_links.js` ist aus `verfuegbarkeit-by.json` abgeleitet und eingefroren (96 Kreise, Stand 25.09.) — ändert sich die Registerdatei, ändert sich die Tabelle nicht mit.
 
 ---
 
-
 ## → HIER WEITERMACHEN: Marcels Backlog v22 vom 18.09.2026
 
-Volltext mit allen Unterpunkten: **`Dateien/dealpilot_backlog_v22.md`** —
-dort steht, was genau verlangt ist. Hier steht der **Stand**. Marcels
-Reihenfolge: (1) Prod · (2) Bugs und klar abgegrenzte UX · (3) Konzepte
-MFH/Ist-Soll/Bewertung · (4) Schnittstellen · (5) Design/PDF/Theme ·
-(6) QA 19 · (7) Mobile-QA 20. **Konzeptpunkte (6, 21, 22 und die
-Vorschlagsteile von 5, 16, 17, 18) liefern zuerst ein Dokument in
-`design/Vorschläge/` — gebaut wird erst nach Marcels Auswahl.**
-Leitplanke aus v22: **das bestehende Investment-PDF bleibt erhalten.**
+Volltext: **`Dateien/dealpilot_backlog_v22.md`**. Erledigtes s. Fertig. Offen:
 
-| # | Punkt | Art | Stand / Bezug |
-|---|---|---|---|
-| 1 | Aktuelle Version auf PROD, Smoke-Test | Rollout | **ERLEDIGT 18.09.2026** — staging vollständig nach main (`006a630`), Quellenregister beidseitig abgeglichen, v1428; main = staging = beide Server (`f5802de`). Smoke: 170/170 Assets 200, Migrationen 071–074, Löhner-Sachwert auf Prod grün. Journal 18.09. (1) und (2). |
-| 2 | Finanzierung: erst EK, Option „EK = Kaufnebenkosten", Darlehen = KP + NK + Sanierung − EK, editierbar, Herleitung zeigen | Bau | **ERLEDIGT v1433** (`2da26e5`) — Eigenkapital zuerst, Haken „EK = Kaufnebenkosten", Darlehen = KP + NK + Sanierung − EK rechnet sich zurück und bleibt editierbar, Herleitung unter dem Darlehen. (Zeile war nicht nachgezogen, 19.09.2026 korrigiert.) |
-| 3 | Partnernetzwerk: automatische Rotation aus | Bau | **ERLEDIGT v1429** (`90b80e7`) — 10-s-Rotation samt Timer entfernt, Blättern nur von Hand. Staging-Abnahme im Browser offen (Erweiterung nicht verbunden). |
-| 4 | Partnernetzwerk erscheint beim ersten Öffnen von Deal-Aktionen nicht (nach F5 schon) | Bug | **ERLEDIGT v1429** (`90b80e7`) — Ursache: geladen wurde GENAU EINMAL beim Seitenstart (`deal-action-bootstrap.js`, DOMContentLoaded); scheiterte der Abruf (noch nicht angemeldet, Netz, 15-s-Timeout), blieb der Bereich bis F5 leer. Jetzt Nachladen beim Öffnen des Reiters und bei `dp:plan-ready`, solange kein Abruf gelungen ist. Staging-Abnahme im Browser offen. |
-| 5 | MFH + hohe Sanierung: LTV > 400 % — Nenner prüfen, Kaufpreis / Ist-Wert / Wert nach Sanierung trennen | Analyse → Vorschlag | **ERLEDIGT v1445** (`a6fbf3f`) — Marcel: „was würdest du vorschlagen?" → umgesetzt: ab Sanierung ≥ 15 % KP gilt Sanierungsfinanzierung; neues Feld „Wert nach Sanierung"; LTC und LTV nach Sanierung als Zeile im Ergebnis; Score bewertet dann LTV nach Sanierung (sonst LTC) statt LTV gegen Kaufpreis; EK-Balken = EK ÷ GI (nie negativ). Im Browser: Value-Add LTC 96,1 %, mit Wert 1,25 Mio. LTV nach Sanierung 80,0 %. |
-| 6 | Ist-/Soll-Modell + erweiterter MFH-Konfigurator (Einheiten) | Konzept | **KOMPLETT ERLEDIGT v1448 / v1451 / v1454 / v1457–v1459** — Einheitenliste; Maßnahmen je Einheit; Kennzahlen Ist gegen Soll; **vier Schritte** im Modal mit Bewertung je Einheit nach **Anlage 2 ImmoWertV** (Rechnung aus `DealPilotRND`), Dach/Außenwand/Leitungen/Heizung gelten fürs Haus, Fenster/Bäder/Innenausbau/Grundriss **erbt** jede Wohnung; Ergebnis flächengewichtet in `mod_punkte` und in die AfA. **v1457:** Soll-Miete als **Sprung in der Mietentwicklung** ab wählbarem Jahr (`MietEntwicklung.factor`, damit calc, Cashflow und Exit dieselbe Kurve sehen) — gemessen Faktor Jahr 3: 1,093 → 1,391 (× 1,2727). **v1458:** Bank-PDF mit **Mieterliste, Zustand je Einheit und Ist/Soll** (Seite 3, im Seitenstrom nachgelesen). **v1459:** Frage „in Wohnungseigentum aufgeteilt (WEG)". |
-| 7 | Marktbericht: Stufen sauber trennen — **Marktpreisindikation ohne Sach-/Ertragswert** | Bau | **ERLEDIGT v1435** (`f271a44`) — Befund: die Stufe steuerte nur Preis und Felder; Sach-/Ertragswert liefen auf jeder Stufe in Web, PDF und KI-Text. Jetzt sperrt der Rechenkern Boden-, Ertrags- und Sachwert unter Stufe 3 VOR dem Payload (alle Ausgabewege, auch API; Quellennachweis fällt mit). Proxy schickt die **abgerechnete** Stufe; auf dem Objektweg fehlte sie ganz (abgerechnet 2, Bericht hielt sich für 1). Miteigentumsanteil wieder Angabe der Stufe 3 (v1201 hatte ihn nur wegen des Ertragswerts vorgezogen). Gemessen auf Staging am Rechenkern: Stufe 1/2 gesperrt, MPI unverändert 318.000 €, Stufe 3 rechnet. **Offen:** vollständiger Stufe-3-Bericht im Browser; „Fallback-Werte je Stufe transparent" gehört zu Punkt 18. |
-| 8 | Bruttofläche (BGF DIN 277) automatisch ableiten, typabhängig, überschreibbar, Annahme zeigen | Bau | **ERLEDIGT v1434 + v1446** (`ff5c028`) — Quelle geholt: **SW-RL-Entwurf 25.10.2011, Anlage 1 (NHK 2010), „Merkmale der NHK-Objekte" BGF/Wohnfläche** je Haustyp (1,4 bis 3,8) und MFH 4.1–4.3 je Standardstufe (1,8 bis 2,5). Der alte Faktor 1,55 stammt aus BewG Anl. 24 II und gilt dort für Wohnungseigentum — nur noch gekennzeichneter Rückfall ohne Gebäudetyp. Plausibel am Gutachten Löhner: Typ 1.31, Tabelle 1,5, gemessen 1,49. MFH mit Typ und Stufe bekommen jetzt eine Näherung. |
-| 9 | Sprechlauf: Zustandswechsel, Barge-in, schlechte Verbindung (Latenz/Jitter/Reconnect), Mobile | Bau + Test | **TEIL 1 ERLEDIGT v1440** (`076bd35`) — Befund: der Sprechlauf **spricht nicht** (Antworten als Sprechblasen), also kein Barge-in im eigentlichen Sinn; das Mikro läuft durchgehend. Behoben: Server wies Antworten unter 10 Zeichen ab („ja", „1990" → „nicht verstanden"); OpenAI-Aufrufe ohne Zeitgrenze (Browser wartete bis 120 s) → 45 s; AudioContext blieb auf dem Handy „suspended" (Pegel 0, ewiges Warten) → resume beim Start und im Wächter; Antwort auf verlassene Frage ließ „einen Moment" stehen. **Offen:** Verbindungsqualität messen/anzeigen, Überlappung Tippen/Sprechen, iOS-Aufnahmeformat (nur webm), Handy-Layout < 560 px. Baut auf Block C (C14) und D auf. Teil 2 **BLOCKIERT:** braucht Messungen im Browser (Kaskade, Handy-Breite, Mikrofon) — die Chrome-Erweiterung war am 18.09. nicht verbunden. **19.09.2026:** iOS-Format geprüft — kein Fehler im Code: der Sprechlauf gibt ohne webm KEIN Format vor, Safari wählt mp4, `extFromMime` im Backend erkennt mp4. Am iPhone abzunehmen (Staging-Abnahmepunkt). |
-| 10 | Einstellungen: Wechsel auf Hell geht nicht / hält nicht | Bug | **ERLEDIGT v1431** (`7973054`) — Namenskonflikt: `main.js` deklariert seit v1257 eine globale `function _dpProfil` (Standardwerte) und überschrieb damit `window._dpProfil` aus `settings.js` (der Schalter). Der Knopf „Hell" las still einen Wert. Umbenannt in `_dpProfilWert`; in Node nachgestellt (vorher `undefined`, nachher Schalter). Scan nach weiteren Konflikten: 9 Funde, keiner sonst echt. Persistenz: `dp_user_settings` übersteht Neuladen und Abmelden. FALLEN.md-Eintrag. |
-| 11 | Investment-PDF: **zusätzliche** helle Bank-Fassung, Vorbild Anschaffungskosten/Finanzamt-Dokument | Bau | **ERLEDIGT v1436, ausgebaut v1460–v1462e** — helle Bankfassung `exportPDFBank` neben dem bisherigen Investment-PDF. **20.09.2026 (Marcel):** sie trägt jetzt ALLE Blöcke des alten PDFs in der ruhigen Gestaltung — Deal Score mit Einordnung, Objektfotos (Titelbild und Galerie), Ertragsrechnung, Bewirtschaftung, Steuerwirkung, drei Phasen, Zinsänderungsrisiko, Cashflow-Jahre, Vermögensaufbau als Kurve, Einheiten beim MFH, Annahmen. Abschnitte fließen, Raster und Überschriften bleiben zusammen. |
-| 12 | Deal-Aktionen „Ready für die Bank" heller und seriöser | Design | **ERLEDIGT v1443** (`1566107`) — Marcels Wahl „weiß": das Cockpit „Bereit für die Bank" ist eine weiße Karte (vorher schwarzer Radialverlauf), Grün dunkler für Lesbarkeit, Ringfarben per CSS. Im Browser angesehen. |
-| 13 | Deal-Score + Investor-Score hell/dunkel, folgt der globalen Einstellung | Design | **ERLEDIGT v1443b/c** (`109387a`) — Marcels Wahl „hell weiß": beide Score-Bordkarten (`dpsh-score-hero.js`, vorher #1b1815 auch im hellen Profil) und die Donut-Mitte im Kopf sind auf den hellen Vorlagen weiß; folgen der globalen Einstellung, kein eigener Schalter. Im Browser gemessen und angesehen. |
-| 14 | Quick Check „Abrufen" und Objekt-Pre-Flight-Karte: Flugzeug-Symbol raus | Bau | **ERLEDIGT v1430** (`ca21cc0`, `f1f83a5`) — drei Knöpfe (QC-HTML, QC-Neuaufbau nach „Neuer Vorgang", Pre-Flight im Objekt-Tab). Das Symbol der Quick-Boarding-Karte bleibt (andere Funktion). QC-Cache-Buster erst mit v1432 nachgezogen. |
-| 15 | Quick Check: Marktwert kommt bei „Marktbewertung D-Pilot + Exposé" nicht an | Bug | **ERLEDIGT v1432** (`f9d7533`) — Ursache: der Orchestrator wartete auf den Exposé-Import nur **60 s**; dauert der Import länger, lief DealPilot mit leeren Feldern los und brach still ab, das später übernommene Exposé fand keinen Abruf mehr. Jetzt 15 min wie bei Sprache, und dpmb hält an, wenn PLZ/Ort fehlen. Andere Kombinationen im Code geprüft (ph/spr halten an, voice 15 min, ImmoMetrica meldet beim Schließen, KI ohne Pflichtfelder). **Am echten Exposé abzunehmen.** |
-| 16 | Sprechlauf: Fragen je Objektart (MFH: Einheiten statt Zimmer) — Fragenbaum, gleiche Logik wie Tab Objekt | Analyse → Bau | **ERLEDIGT v1437** (`47042b7`) — Befund: der Sprechlauf hatte KEINE Typlogik (MFH bekam Zimmer, jedes Haus den Miteigentumsanteil, das MFH nie die Wohneinheiten); drei getrennte Typlogiken im Haus. Jetzt schneidet `_rfNachArt` jeden Block nach **derselben** Tabelle zu, die im Objekt-Tab Felder schaltet (`DealPilotObjektart.passt/pflicht`); Texte je Art; Feinheiten und Sendung an den Marktbericht filtern mit. Mapper übernimmt jetzt Wohneinheiten. Prüflauf ETW/EFH/MFH/Büro/unbekannt grün. **Rest:** Ist-Miete je Einheit, Leerstand-Ist, Gewerbeanteil gehören in den MFH-Konfigurator (Punkt 6). |
-| 17 | Objektzustand: Sterne → verbale Skala, ggf. Komponenten; API-Mapping, Altbestand lesbar | Analyse → Vorschlag | **ERLEDIGT v1444** (`ec4278a`) — „das Beste": Rechenkern kannte `neubau`/`stark_sanierungsbeduerftig` nicht (still Faktor 1,0) → 1,08/0,82; Mapper gab Ausstattung nicht als `quality` weiter → Qualitätsfaktor griff nie; DealPilot-Karte schickt jetzt Zustand, Ausstattung, Energie, Modernisierung, Grundstück, Einheiten, eq_*; Sterne 3/4/5 = Gepflegt/Modernisiert/Neuwertig. Auf Staging gemessen: Zustand 0,82, Qualität 1,06. |
-| 18 | Marktbewertung: Input-/Schnittstellen-Audit (GeoMap, Zensus, alle Anbieter) — haben/senden/könnten/zurück/verwendet | Audit | **AUDIT STEHT + 5 Fehler behoben** (v1437/v1438, `29ef2e4`): Quick Check schickte Baujahr als `bj` (kam nie an); Ausstattung als `heating/…` statt `eq_*` (fiel im Rechenkern weg, auf Staging nachgemessen); IRW las `construction_year` statt `build_year`; Aufzug `'Ja'`; Mapper ohne Wohneinheiten. Tabelle haben/senden/könnten/zurück im selben Dokument wie 17. Größter offener Hebel: die DealPilot-Karte schickt 8 Felder, der Mapper versteht das ganze Objekt — Entscheidung mit 17. **19.09.2026:** Hebel mit Punkt 17 gezogen (v1444: Karte schickt Zustand, Ausstattung, Energie, Modernisierung, Grundstück, Einheiten, eq_*) — **erledigt**. |
-| 19 | Abschluss-QA Marktbericht, Bewertung, gesamte App — Übersicht getestet/gefunden/behoben/offen/Entscheidung | QA | **TEIL 1 ERLEDIGT** — Kennzahlen am echten `DealKpis` mit fünf Testobjekten (ETW, EFH, MFH, Value-Add, Vollfinanzierung): `design/Vorschläge/qa-19-kennzahlen.md`. Befunde: EK-Anzeige `100 − LTV` wird negativ (nicht nur bei Sanierung, auch bei 110 %-Finanzierung), EK-Rendite 0 % bei EK 0 statt „nicht bestimmbar". **Teil 2 im Browser:** beide Rechenkerne am echten Objekt verglichen — 5 von 6 Kennzahlen gleich, **EK-Rendite zweifach definiert** (calc.js nach Steuern 20,58 %, DealKpis vor Steuern 29,65 %; Quick Check bewertet deshalb anders als die Haupt-App — **Entscheidung Marcel**). Konsistenz Eingabe → Kennzahlen/Score geprüft, sauber. **Offen:** Marktbericht je Stufe als Dokument (kostet Kerosin — nur mit Freigabe). **19.09.2026:** EK-Rendite entschieden und umgesetzt (v1442, vor Steuern in beiden Kernen); Marktbericht je Stufe erzeugt (Berichte 131/132) — **erledigt**. EK = 0 geprüft: Anzeige „∞" und beide Scores behandeln den Fall bereits (`_evalEkRendite`, `vollfinanzierung_*`). |
-| 20 | Responsive/Mobile/Tablet-QA der ganzen App inkl. Sprechlauf | QA | **TEIL 1 ERLEDIGT v1441/v1441b** (`f2eb599`) — Messkabine (iframe, geladenes Objekt) in **390×844, 844×390, 820×1180**: alle 9 Reiter, 11 Einstellungsreiter, Quick Check, Marktbericht. Befunde behoben: Knopf „Finanzamt-PDF" ragte 47 px aus dem Bild (nowrap), Stresstest-Etikett abgeschnitten (min-width 350), **Hilfe-Knöpfe (71 Stück) nur in der 18-px-Mitte treffbar** — `overflow:hidden` schnitt die 44-px-Trefferfläche ab, mit elementFromPoint nachgemessen, jetzt ringsum 15 px. Danach: **null** Überläufe in allen drei Größen. Nachgezogen: v1441c Ausstattungsfelder am Handy einspaltig (146 → 303 px, Text passt), v1441d „beheben"-Knöpfe 64×30 treffbar ohne Nachbarzeile zu überdecken (`19e399c`). **Offen:** Sprechlauf am Gerät (Mikrofon — nicht in der Kabine prüfbar); (zurückgenommen: ein „beheben"-Knopf schien überdeckt — er lag nur horizontal außerhalb der scrollbaren Kartenleiste, nachgemessen treffbar); lange Optionstexte in Investition (`san_ust`, 39 Zeichen). **19.09.2026:** `san_ust`-Optionen gekürzt (v1452, `b5a8271`). Rest: Sprechlauf am Gerät. |
-| 21 | Light Mode Redesign für Steuerkanzleien — 5–6 Layout-Konzepte, **nichts implementieren** vor Auswahl | Konzept | **GEBAUT v1449–v1449d + v1455** (Marcels Wahl „Hybrid") — helles Profil: kompakte Objektliste (300 px), rechts ab 1500 px eine Aktionsspalte (Bankunterlagen, beide Investment-PDFs, Marktbericht, Finanzamt-PDF). **v1455 (20.09.2026):** unten in der Spalte stehen **Investor Deal Score** (Zahl, Stufe, Balken) und die Kennzahlen aus dem Kopf (Vollständigkeit, Pflichtfelder, Bruttorendite, DSCR, Cashflow); der Kopf lässt Score und Vollständigkeit im hellen Profil **dauerhaft** weg. Gemessen: Objektwechsel sauber (kein fremder Score mehr, v1455c), keine Überschneidung mit der Fußzeile (v1455b). |
-| 22 | Steuern: AfA manuell, RND ermitteln/übernehmen über den **vorhandenen** Kern, Vererbung Objekt → Gebäude → Einheit, RND-Gutachten auslösen | Konzept | **ERLEDIGT v1447 + v1450** (`d17e85e`, `0dab26e`) — Auftragsweg direkt an Gutachten.org mit Bestätigung. Steuer-Tab: neue Wahl „Eigener Satz (§ 7 Abs. 4 Satz 2 EStG)“ — RND eintragen ergibt 100 ÷ RND, oder Satz direkt, Grundlage als Pflichtnotiz; Knöpfe RND ermitteln (vorhandener Wizard), letzte Ermittlung übernehmen, Gutachten anfragen, entfernen; gespeichert je Objekt. Im Browser: RND 34 → 2,94 %, AfA 3.319 → 4.879 €/Jahr, Rücknahme stellt 2,0 % wieder her. **Offen:** Vererbung Objekt → Gebäude → Einheit (hängt an Punkt 6 Stufe 3). |
+- **3/4 Partnernetzwerk** (`v1429`): Staging-Abnahme im Browser.
+- **7 Marktbericht-Stufen** (`v1435`): vollständiger Stufe-3-Bericht im Browser.
+- **9 Sprechlauf Teil 2 — BLOCKIERT** (Messung im Browser/am Gerät): Verbindungsqualität messen/anzeigen, Überlappung Tippen/Sprechen, Handy-Layout < 560 px; iOS-Aufnahme (mp4) am iPhone abnehmen.
+- **15 Quick Check Marktwert** (`v1432`): am echten Exposé abnehmen.
+- **16 Rest:** Ist-Miete je Einheit, Leerstand-Ist, Gewerbeanteil im MFH-Konfigurator prüfen.
+- **20 Mobile-QA Rest:** Sprechlauf am Gerät (Mikrofon).
+- **22 Rest:** Vererbung Objekt → Gebäude → Einheit.
 
 ---
 
@@ -11371,143 +2094,45 @@ Erkenntnisse für die anderen beiden liefert.
 
 ---
 
-### A · Audit „Aktionen / Einstellungen" — alle Reiter
+### A · Audit „Aktionen / Einstellungen" — alle Reiter — Rest
 
-Marcel: *„geh das einmal komplett durch, mach da mal einen Audit, überleg
-dir mal: können wir es besser sortieren, können wir es übersichtlicher
-machen?"*
+Erledigtes (A1–A6, A8) s. Fertig. Offen:
 
-**Er will vor dem Löschen gefragt werden:** *„Sachen, die überflüssig sind,
-könnten wir rausschmeißen. Müsstest du aber vorher einmal sagen."*
-
-| # | Punkt | Stand |
-|---|---|---|
-| A1 | Alle Reiter unter Aktionen/Einstellungen durchgehen: Formatierung, Anordnung, Doppeltes | **DURCHGEGANGEN, elf Reiter gemessen.** Größenverhältnis: Rechtliches 7.722 Zeichen (reiner Lesetext, null Bedienelemente) · Profil & Anzeige 3.933 / 14 Blöcke / 3.038 px · Co-Pilot 2.322 · Datenraum 1.819 · Plan 1.198 · Account 1.185 · Mandanten 642 · Deal Score (voll geladen 2.019 px) · Kontakt 333 · **Externe Anbieter 380 Zeichen für einen einzigen Anbieter.** Befunde als Liste unter A6. |
-| A2 | **Co-Pilot-Bereich**: greift das überhaupt? | **BEANTWORTET: ja, durchgehend.** Detailgrad, Tonalität, Fokusbereiche und eigene Anweisung werden gelesen (ds2-ai, ki-lage, ki-miete, ui) und landen im Prompt (openaiService:749-753 und 805-826). Nichts davon ist überflüssig. |
-| A3 | **Bewertungsprofile Deal Score** | **ERLEDIGT v1352.** Der Vorschlag „Einfluss zeigen statt beschreiben" ist gebaut: jede Profilkarte trägt jetzt einen Balken aus den fünf echten Hauptgewichten, die zwei stärksten Treiber in Zahlen und — wo vorhanden — die Schärfe der Schwellen. `getPresets()` leitet beides bei jedem Aufruf frisch ab, damit keine zweite Liste entsteht. Beispiel Lage-Fokus: Lage 40 % · Rendite 20 %. Konservativ: ▲ strenger, 8 % Bruttorendite für 80 Punkte statt 7 %. |
-| A4 | **Deal Score Quick Check**: Farbe, Form, Formatierung stimmen nicht | **ERLEDIGT v1350–v1353.** v1350 Serifenschrift im Formular raus (`.ds-pane-title` Cormorant 22 px → DM Sans 15 px), Labelspalte 130 → 172 px. v1352 die sechs Profilkarten waren 161 und 143 px hoch — Ursache war ein einziger 122-Zeichen-Text, der eine vierte Zeile brauchte. v1352b die Schärfe-Pille darf umbrechen statt abzuschneiden. v1353 **der Kasten im Kasten**: `.ds2-settings-body-inline` war auf 480 px gedeckelt bei 2.019 px Inhalt — man sah nicht einmal ein Viertel. |
-| A5 | **Datenraum** und **externe Anbieter**: passt das noch? | **ERLEDIGT v1375.** Die Verknüpfungen liegen jetzt im Konto (Tabelle `user_settings`, Schlüssel `datenraum`). Die Regel: **Server gewinnt, aber nie gegen Leere** — ein leeres Konto darf einen gefüllten Browser niemals überschreiben, das wäre Datenverlust durch Synchronisierung. Beide Richtungen gemessen: localStorage geleert → Link kommt zurück; Server leer, Browser gefüllt → der lokale Stand bleibt. Der Datenschutz-Hinweis im Reiter sagte „Links liegen nur in deinem Browser (localStorage)" — das stimmt nicht mehr und ist mitgeändert. **Vorbefund:** Datenraum inhaltlich vollständig, aber `dp_datenraum_v141` lag **nur im localStorage** — Gerätewechsel kostet alle Verknüpfungen, und aus diesem Bereich gehen Bank-Anfragen raus. Gehört zu Block B. Externe Anbieter: zwei Regelverstöße behoben (v1354) — `ae/oe/ue` im Nutztext und die namentliche Nennung von PriceHubble. Der Reiter selbst trägt **einen** Anbieter; Zusammenlegung steht unter A6 zur Entscheidung. |
-| A6 | Vorschlag: bessere Sortierung, weniger Reiter, was raus kann — **erst fragen, dann löschen** | **ERLEDIGT v1355 — Marcel hat am 13.09.2026 alle vier Empfehlungen übernommen.** „Profil & Anzeige" (3.933 z / 3.038 px / 14 Blöcke) ist geteilt in **Standardwerte** (1.971 z / 5 Blöcke, ändern Zahlen) und **Darstellung** (1.961 z / 9 Blöcke, ändern keine Zahl) — fast exakt halbiert. **„Externe Anbieter"** ist kein eigener Reiter mehr, der Inhalt steht unter Account & Sicherheit, wo Zugangsdaten hingehören. **„Rechtliches"** bleibt als Reiter (Pflichtangaben müssen auffindbar sein) und steht bereits am Ende. **Elf Reiter sind zehn geworden, keiner mehr über 3.000 px.** |
-| A7 | Co-Pilot / KI: was können wir zusätzlich einbringen? | **offen — gehört sachlich zu Block C** (Sprechlauf → Investment-Co-Pilot) und wird dort mitbeantwortet. Eine getrennte Antwort hier würde zwei Konzepte nebeneinander erzeugen. |
-| A8 | **Drei Felder ohne Leser** | **ERLEDIGT v1356–v1357c.** Marcel hat sich fürs Anschließen entschieden. Die drei Grenzen stehen jetzt als Ampel im Deal-Score-Panel — neben dem Score, nicht im Score: ein Objekt kann 82 Punkte holen und trotzdem unter seinem Mindest-DSCR liegen. Abgenommen an zwei echten Objekten (DSCR 1,83 · CF 494 € · LTV 83,9 % und 1,37 · 86 € · 70,5 %) und neun Trockentest-Fällen. Vier Korrekturen beim Nachmessen: Spanne gehört zur Kennzahl statt in eine Formel, die Ampel darf nicht auf die 70-Prozent-Schwelle warten, zwei verschiedene Hintergründe, und zweimal die Null-Falle — zuletzt in meiner eigenen Reparatur (`State.kpis.d_total` gibt es nicht). |
-| A9 | **Anbieter-Neutralität** | **ZURÜCKGESTELLT — Marcels Entscheidung vom 13.09.2026:** „die anbieter können so bleiben. ich werde später pricehubble und sprengnetter eh ausblenden. das machen wir aber später." Die sechs Fundstellen (PRE-FLIGHT-Logos, Quick-Check-Kacheln, Meldung, `provider`/`source` in den Daten, KI-Prompt) bleiben unverändert; in den Einstellungen ist die Nennung mit v1354 bereits entfernt. Wenn die beiden Anbieter ausgeblendet werden, erledigt sich der Punkt von selbst. |
+- **A7** Co-Pilot/KI: was zusätzlich einbringen — wird in Block C mitbeantwortet.
+- **A9** Anbieter-Neutralität: **zurückgestellt** (Marcel 13.09.2026: PriceHubble und Sprengnetter werden später ausgeblendet).
 
 ---
 
-### B · Schutz gegen Auslesen, Scraping und Nachbau
+### B · Schutz gegen Auslesen, Scraping und Nachbau — Rest
 
-Zwanzig Unterpunkte aus Marcels Auftrag. **Der Kern ist nicht
-Bot-Erkennung, sondern:** *„unabhängig vom verwendeten Werkzeug erkennen, ob
-ein Account versucht, die Anwendung automatisiert, systematisch oder in
-ungewöhnlichem Umfang auszulesen."*
+Erledigtes s. Fertig. Offen:
 
-| # | Punkt | Stand |
-|---|---|---|
-| B1 | **Bestandsaufnahme**: welche Berechnungen, Formeln, Gewichtungen, Schwellen laufen heute im Browser? | **ERLEDIGT 13.09.2026 — vollständig im Journal.** Kurzfassung: 157 JS-Dateien, 5,3 MB, **kein Bundler, keine Minifizierung**, 158 Script-Tags als Quelltext inklusive aller Kommentare. Die fünf teuersten Stellen: (1) `dealscore2.js` 933 Z. — 5 Hauptgewichte, 24 Sub-Gewichte, 13 Schwellenkurven, LTV×DSCR-Regel, 6 Anlegerprofile; (2) `ui.js` Z. 547–625 — der vollständige Analyse-Prompt mit verbindlicher Bewertungsskala und Anti-Halluzinations-Regeln; (3) `tax.js`+`afa-engine.js`+`calc.js` — § 32a EStG mit Originalkoeffizienten, AfA §7b, 15-%-Grenze, BSV-Mechanik, **serverseitig gar nicht vorhanden**; (4) das Sachverständigen-Paket `bmf-data.js`/`bmf-afa.js`/`rnd-*` ~1.490 Z., darin die aus zwei Gutachten rückwärts abgeleitete RND-Formel; (5) `config.js` — alle Hausannahmen, Bankmargen je Bonitätsstufe, komplette Plan- und Kontingentmatrix. **Querschnittsbefund: drei Score-Engines und drei ESt-Tarife als unabhängige Duplikate** — eine Verlagerung muss alle Kopien erfassen, sonst bleibt das Modell über die übersehene rekonstruierbar. **Positiv: das Geld ist geschützt** (Kontingente in `middleware/planLimits.js` serverseitig), das Wissen nicht. |
-| B2 | Sensible Rechenlogik ins Backend verschieben, soweit technisch möglich | **ABGESCHLOSSEN — v1360 bis v1365b.** Geliefert ohne jede Einschränkung: **v1360** Analyse-Prompt raus (167 Zeilen), Direktweg zu OpenAI zu. **v1361** zweiter § 32a-Tarif entfernt. **v1362/v1363** acht Score-Berechnungen je Eingabe auf zwei. **v1364** Tarif zentral, jahresbezogen, amtlich belegt für 2026. **v1365/b** der Rückfall im Quick-Check greift jetzt und ist als Ersatzrechnung gekennzeichnet. **Marcels Entscheidung am 13.09.2026 zur Verlagerung des Deal Scores selbst: „dann lassen wir das raus. ist ja auch nicht hoch komplex."** Die Gewichtsmatrix bleibt damit bewusst im Browser — der Schutz wäre nur mit einer Serverrunde je Eingabe zu haben, und der Score ist den Preis nicht wert. |
-| B3 | Anomalie-Erkennung je Account | **GRUNDLAGE STEHT — v1366/v1367.** Die Zählung hängt am Konto (600 pro Fenster statt 100 nach IP), Überschreitungen landen in `security_events` statt im flüchtigen Container-Log. Zwei Kennzahlen, beide mit Maßstab in derselben Antwort: **Vielfalt** (Endpunktgruppen) und **Streuung** (Variationskoeffizient der Abstände) — Normalnutzung 12 / 5,13, ein Skript ein bis zwei / nahe null. Abgenommen: 108 Anfragen gegen Limit 100 ergaben 9 × 429 und neun Ereignisse, Stufe stieg ab dem fünften von `hinweis` auf `auffaellig`. **Offen:** Parametervariation, parallele Sitzungen, und der Lauf, der die Kennzahlen regelmäßig auswertet statt nur auf Abruf. |
-| B4 | Risikostufen NORMAL → AUFFÄLLIG → WARNUNG → HOHES RISIKO → EINGESCHRÄNKT → GESPERRT → MANUELL FREIGEGEBEN | **ERLEDIGT v1369.** Marcels Entscheidung vom 13.09.2026 zieht die Trennlinie mitten hinein: **die ersten vier werden berechnet, die letzten drei gesetzt.** Das System sperrt nie selbst — es stuft ein und meldet. Eine Stufe steigt nur bei **Muster UND Menge** (hohes_risiko ab 50 Überschreitungen bei Vielfalt ≤ 2 und Streuung ≤ 1,0; warnung ab 20 bei ≤ 3 / ≤ 1,5; auffaellig ab 5). `streuung === null` heißt „zu wenig Daten" und darf nie eine höhere Stufe rechtfertigen. Kein Statusfeld — der Zustand ergibt sich aus der jüngsten Entscheidung in der append-only-Chronik. Der ganze Kreislauf abgenommen: berechnet → eingeschränkt → freigegeben, mit Begründungspflicht. |
-| B5 | Erste Warnstufe: sichtbare Meldung + serverseitiges Sicherheitsereignis | **ERLEDIGT v1370.** Das Ereignis schreibt das Backend seit v1367; die sichtbare Meldung fehlte — bei HTTP 429 warf `Auth.apiCall` einen Fehler, und ob der ankam, hing vom Aufrufer ab. Jetzt ein zentraler Handler nach dem Muster des 401-Handlers (V156). **Der Ton ist die eigentliche Arbeit:** kein Vorwurf, keine Drohung, kein Hinweis auf Folgen, die es nicht gibt — das System sperrt niemanden von selbst. „Es passiert nichts weiter — deinem Konto entsteht kein Nachteil." Erscheint **einmal**, nicht zehnmal: bei vollem Kontingent laufen oft zehn Anfragen gleichzeitig ins Limit. |
-| B6 | Zweite Stufe: schärfere Limits, Cooldown, Teilsperre | **IM RAHMEN VON MARCELS ENTSCHEIDUNG ERLEDIGT (v1371).** Seine Vorgabe vom 13.09.2026 war „nie automatisch sperren" — damit entfällt die automatische Teilsperre bewusst. Was bleibt und gebaut ist: die Limits selbst sind über `security_config` einstellbar (`limit_konto`, `limit_anonym`), und das Fenster wirkt als Cooldown (429 mit `retry_after_s`). Eine Verschärfung setzt ein Mensch, über die Konfiguration oder über die Einschränkung in der Fallakte. |
-| B7 | Automatische Sperre, Stufen und Dauer **im Admin konfigurierbar** | **TEILWEISE — bewusst.** Die Stufen und Schwellen sind konfigurierbar (v1371, B17). Die **automatische Sperre** entfällt nach Marcels Entscheidung: das System sperrt nie selbst. Eine Dauer für etwas, das nicht automatisch passiert, wäre eine leere Einstellung. |
-| B8 | Adminbenachrichtigung bei allen wichtigen Ereignissen | **ERLEDIGT v1370.** Zwei Anlässe: berechnete Stufe erreicht WARNUNG oder HOHES RISIKO (Ruhefenster 6 h je Konto), oder ein Mensch hat eingeschränkt/gesperrt (ohne Ruhefenster). **„Auffällig" ausdrücklich nicht** — diese Stufe erreicht jeder, der einmal zu schnell klickt, und eine Mail dafür wäre nach drei Tagen Tapete. Geprüft wird **nur an den Schwellen** (20. und 50. Überschreitung): bei jeder nachzurechnen kostete zweitausend Abfragen bei tausend Anfragen. Der Mailtext nennt Zahlen mit Maßstab und sagt ausdrücklich, dass nichts gesperrt wurde. **Der Versandweg selbst ist ungetestet** — er ist derselbe wie bei `creditAlert.js` (v554, in Betrieb); eine Probemail löse ich nicht ungefragt aus. |
-| B9 | Admin-Bereich „Sicherheit / Missbrauchserkennung" mit Filtern und Fallakte | **ERLEDIGT v1368.** Drei Endpunkte: `/security/events` (Liste mit Filtern nach Stufe, Art, Zeitraum, Suche), `/security/auffaellig` (verdichtet je Konto), `/security/fall/:id` (Fallakte, B19). **Kein Sperrknopf** — ein Knopf neben einer Zahl verführt dazu, die Zahl für ein Urteil zu halten; wer sperren will, tut das in der Nutzerverwaltung. Die Rangliste sortiert nach Zählung, nicht nach Score. Der Hinweiskasten steht **vor** den Zahlen, und jede Kennzahl trägt ihren Maßstab im selben Kasten. Abgenommen über die SQL-Abfragen an der echten Datenbank — die Admin-Anmeldung kann ich nicht durchführen, **die Ansicht selbst muss Marcel einmal öffnen.** |
-| B10 | Audit Trail, append-only, nicht über das Admin-Interface editierbar | **ERLEDIGT v1367.** `security_events` (Migration 071) hat bewusst **keine** `updated_at`-Spalte und keinen Änderungsweg im Code. Wer einen Fall bearbeitet, schreibt ein neues Ereignis dagegen — Bearbeitungsspuren stehen damit in derselben Chronologie wie das, was sie bewerten. Enthält bewusst keinen Risikoscore, keine Inhalte (Pfad ohne Parameter) und keine Gerätemerkmale. |
-| B11 | Rollen OWNER/ADMIN/DEVELOPER/SUPPORT/USER + `security_exempt` | **ERLEDIGT v1371** (Migration 072). Die Rollenliste ist erweitert, `admin` und `user` bleiben gültig, damit der Bestand unverändert weiterläuft. `security_exempt` ist eine **eigene Spalte**, keine Rolle — ein Testkonto kann ein normaler `user` sein und trotzdem befreit. **Befreit vom Limit, NICHT vom Protokoll:** die Ereignisse werden weiterhin geschrieben und tragen den Vermerk `ausnahme`. Begründung ist Pflicht, das Setzen schreibt selbst ein Ereignis. |
-| B12 | Manuelle Entsperrung, Fehlalarm-Kennzeichnung, Fall abschließen | **ERLEDIGT v1369.** „Manuell freigegeben" hebt jede Einschränkung auf; danach gilt wieder der berechnete Wert, mit Vermerk wer und wann. Aufgehoben wird durch einen **neuen Eintrag**, nicht durch Löschen — die Tabelle ist append-only, eine Korrektur ist eine Zeile, kein Radiergummi. Jede Entscheidung verlangt eine Begründung, die in der Akte stehen bleibt. |
-| B13 | AGB: Abschnitt gegen Scraping, Bots, LLM-Rekonstruktion, Reverse Engineering | **ENTWURF STEHT v1373.** Neuer Abschnitt VII.(6) — eingefügt als **Unterpunkt**, damit die Nummerierung der Hauptabschnitte unverändert bleibt (geprüft: I–XIII). Untersagt sind Scraper, systematisches Abrufen zur Modellrekonstruktion, Nutzung als Trainingsmaterial und Reverse Engineering (§ 69e UrhG bleibt unberührt). **Ausdrücklich erlaubt bleibt** die normale, auch intensive Nutzung. |
-| B14 | **Vertragsstrafe 25.000 €** | **ENTWURF STEHT v1373 — sichtbar als Entwurf gekennzeichnet** (rote Marke, farbiger Kasten). **B2C/B2B getrennt:** gegenüber Unternehmern eine Ermessensklausel nach § 315 BGB mit 25.000 € als **Obergrenze der Bemessung** statt als Festbetrag; gegenüber Verbrauchern **keine** Vertragsstrafe (§ 309 Nr. 6 BGB). **Kein Automatismus, ausdrücklich im Text.** Die bekannten Streitpunkte stehen für die anwaltliche Prüfung im Dokument. |
-| B15 | Datenschutzerklärung: Zweck, Daten, Aufbewahrung, Rechtsgrundlage, Löschkonzept | **ERLEDIGT v1373.** Abschnitt 13a, Nummerierung unberührt (13 → 13a → 14). Alle Pflichtangaben geprüft. Er beschreibt genau, was Migration 071 speichert — **und ausdrücklich, was nicht**: keine Inhalte, keine Browserkennung, keine Gerätemerkmale. Art. 22 DSGVO adressiert. **Das Löschkonzept läuft auch:** täglicher Lauf, 90 Tage für Beobachtungen, 3 Jahre für Entscheidungen (§ 195 BGB). |
-| B16 | API-Endpunkte: Auth, Autorisierung, serverseitige Validierung, Rate-Limits, Logging | **Rate-Limits erledigt v1366.** Account- statt IP-basiert (600 eingeloggt / 100 anonym), IPv6 auf /64 gekürzt, Überschreitungen protokolliert. **Der doppelte `skip` ist weg** — er machte die Ausnahme aus v395 (Commit `94e4f6f`, 01.06.2026) seit über drei Monaten wirkungslos, weil in JavaScript die zweite gleichnamige Eigenschaft gewinnt. Abgenommen an der laufenden Maschine: mit Token Limit 600/Rest 583, ohne Token 100/Rest 92 — zwei getrennte Zähler. **Offen:** CSP fehlt weiterhin, serverseitige Validierung nicht durchgehend geprüft. |
-| B17 | Konfigurationsbereich im Admin für alle Schwellen | **ERLEDIGT v1371** (Migration 073). Eine Zeile, kein Satz von Einzelwerten: die Schwellen sind ein zusammenhängendes Modell, und der `CHECK` erzwingt, dass sie aufeinander aufbauen — gemessen: `UPDATE ... warnung_ab = 90` wird abgelehnt, die Werte bleiben. Lesen darf jeder Admin, ändern nur `owner`. Fällt die Tabelle aus, gelten die eingebauten Werte. |
-| B18 | Fehlalarmschutz: Nutzungshistorie und Accounttyp berücksichtigen, Eskalation statt Sofortsperre | **ERLEDIGT — durchgängig eingebaut, nicht nachträglich.** Eine Stufe steigt nur bei **Muster UND Menge** (v1369); „zu wenig Daten" rechtfertigt nie eine höhere Stufe; Rollen und Ausnahmen sind berücksichtigt (v1371); es gibt **keine Sofortsperre**, weil es gar keine automatische Sperre gibt. Der Test dazu ist der wichtigste im ganzen Satz (v1372): 60 Überschreitungen über 12 Endpunktgruppen dürfen **nicht** als hohes Risiko gelten. |
-| B19 | Fallakte zur Beweissicherung, chronologisch | **ERLEDIGT v1368.** `/security/fall/:userId` liefert Nutzerdaten, die vollständige Chronik (30 Tage, bis 500 Einträge) und die zwei Kennzahlen der letzten 24 h — jede mit ihrem Vergleichswert aus echter Nutzung. Die Ansicht hat einen Rücksprung und trägt den Satz „Diese Akte sammelt Beobachtungen. Die Bewertung trifft ein Mensch." |
-| B20 | Tests: Normalnutzung, jede Eskalationsstufe, Adminausnahme, Entsperrung, Audit-Log, Fehlalarm | **ERLEDIGT v1372 — 14 Tests, alle grün.** Der `tests/`-Ordner fehlte ganz; `package.json` zeigte auf ein Verzeichnis, das es nicht gab. **Der Fehlalarm-Test ist der wichtigste:** 60 Überschreitungen über 12 Endpunktgruppen in unregelmäßigen Abständen dürfen **nicht** als hohes Risiko gelten. Zwei Eigenschaften werden direkt am Schema geprüft statt am Verhalten — `security_events` hat keine Spalte zum Ändern, append-only ist damit Struktur statt Absicht. |
-| B21 | **Direktweg zu OpenAI aus dem Browser** | **ERLEDIGT v1374.** Der Weg in `ui.js` fiel mit v1360, der im Quick-Check jetzt auch. Der Prompt steht im Backend (`/ai/quickcheck-analyse`), der Quick-Check schickt die Anfrage per `postMessage` an einen **eigenen Vermittler** (`qc-ai-bridge.js`) — `qc-bridge.js` bleibt unberührt. Der Vermittler prüft die Herkunft der Nachricht; der Nutzerschlüssel geht nicht durch die Brücke. Abgenommen ohne KI-Credits: eine unvollständige Anfrage wird mit `kp_oder_nkm_fehlt` (400) abgelehnt — die Kette trägt an jeder Stelle. |
-| B22 | **Drei Grundfreibeträge im Code** | **ERLEDIGT v1364.** Alle drei Stellen ziehen jetzt aus einer Jahrestabelle in `tax.js`. Der Tarif 2026 stammt aus der amtlichen Fassung (§ 32a Abs. 1 EStG, gesetze-im-internet.de, abgerufen 13.09.2026): Grundfreibetrag **12.348**, Zonen bis 17.799 / 69.878 / 277.825 mit den Koeffizienten 914,51 · 173,10 / 2.397 / 1.034,87 · 11.135,63 · 19.470,38. **Eine Suchmaschine lieferte zuvor falsche Zahlen** (954,80 statt 914,51) — die Primärquelle gewinnt. Gegengeprüft über die Stetigkeit an allen vier Zonengrenzen (Stufe 0–1 €, reine Rundung), dazu 42 %/45 % Grenzbelastung und die Abrundung nach Satz 5. `tarifInfo()` sagt, welcher Jahrgang gerade rechnet. Wirkung: bei zvE 60.000 sinkt die Steuer von 14.680 auf **14.233 €** — der alte Tarif war drei Jahre alt. |
+- **B3** Parametervariation, parallele Sitzungen, regelmäßiger Auswertungslauf der Kennzahlen.
+- **B8** Versandweg der Adminmail ungetestet (Probemail nur auf Anforderung).
+- **B9** Admin-Ansicht „Sicherheit" muss Marcel einmal öffnen.
+- **B16** CSP fehlt; serverseitige Validierung nicht durchgehend geprüft.
 
-**Zwei Leitplanken aus Marcels eigenem Auftrag, die beim Bauen gelten:**
-bestehende Funktionen dürfen nicht beschädigt werden, und ein technischer
-Risikoscore ist **kein** rechtlich bewiesener Verstoß.
+Leitplanken: bestehende Funktionen nicht beschädigen; ein Risikoscore ist kein bewiesener Verstoß.
 
 ---
 
-### C · Vom Sprechlauf zum Investment-Co-Piloten
+### C · Vom Sprechlauf zum Investment-Co-Piloten — Rest
 
-Marcels Grundprinzip: *„Nicht mehr: Formular per Sprache ausfüllen.
-Sondern: Ein intelligenter Investment-Co-Pilot kennt Objekt, Dokumente,
-Daten und aktuellen Bearbeitungsstand."*
+Erledigtes s. Fertig. Offen:
 
-| # | Punkt | Stand |
-|---|---|---|
-| C1 | Kontextbezogene Begrüßung: was liegt vor, was wurde erkannt, was rechnet schon, was fehlt | **ERLEDIGT v1115.** Marcels Ansage vom 14.09.: „Hey, ich bin dein Co-Pilot … bist du das erste Mal hier? Soll ich dir das kurz erklären? … Was ist man für ein Investor? Einsteiger? Profi?" **Drei Teile gab es schon** — den Ton in drei Stufen (v1378), die Marktpreisindikation per Sprache (v1318), die grüne Kennzeichnung bekannter Angaben samt Adressbestätigung (v1293/v1308). **Es fehlte der Weg dorthin:** der Ton stand als Knopf in der Nebenleiste, wer ihn nicht fand, bekam ein Leben lang Normal. Jetzt stellt sich der Co-Pilot beim ersten Mal vor und fragt EINMAL nach der Erfahrung (Erste Immobilie / Schon ein paar / Profi); die Antwort setzt den vorhandenen Ton und steht in `dp_rf_erfahrung`. Für Einsteiger folgt eine Ablauferklärung in vier Schritten. |
-| C11 | **Erklärung auf Abruf an jeder Frage** *(Marcels Ansage vom 14.09.)* | **ERLEDIGT v1115.** Knopf „Erklär mir das" an jeder Frage zeigt denselben Wozu-Satz, den der Lernmodus von selbst zeigt — ohne den Ton umzustellen. Wo kein Satz hinterlegt ist, antwortet der Co-Pilot über denselben Weg wie bei jeder freien Frage (`/ai/copilot-frage`), statt eine zweite Erklärquelle aufzumachen. Im Lernmodus erscheint der Knopf nicht: dort wäre er eine Dopplung. |
-| C12 | **Abnahme im Browser** *(Punkt 1 und 3 erledigt 14.09.2026, v1119e)* | Im Browser gemessen (stummer MediaStream statt Mikrofon): (1) die Erfahrungsfrage erscheint beim ersten Öffnen und danach nie wieder — ERLEDIGT; (3) „Bitte mach die erweiterte Marktpreisindikation" löst aus, wird gemerkt, die Knöpfe verschwinden — ERLEDIGT. **Offen bleibt (2):** zeigt ein BESTEHENDES Objekt seine bekannten Angaben grün und fragt trotzdem die Adresse ab? Die Adressprüfung greift (gemessen an einem neuen Objekt), die Grün-Kennzeichnung ist an einem bestehenden Objekt noch nicht nachgemessen. |
-| C13 | **Der Sprechlauf zeigt, wo er steht** *(erledigt 14.09.2026, v1119–v1119e)* | Marcels Paket vom 14.09.: Kodierungsleichen im Nutztext behoben (vier verlorene `\u`-Escapes, dazu vierzehn Umschriften „Erklaer"/„Groesse"/„Uebersicht"); Fortschritt im Kopf (Etappe, Frage x von y, Balken); zwei getrennte Signale am Rahmen — `data-zustand` pulst gold bei einer offenen Entscheidung, `data-hoert` leuchtet grün, solange aufgenommen wird; die Doppelzeile über den Knöpfen zusammengelegt („Soll ich das jetzt für dich abrufen?", passend zur Art der Knöpfe); „Nein, überspringen" als Knopf und als Satz; der Marktbericht wird angekündigt; **„Hol mir die Postleitzahl von Herford" wird verstanden** (Imperativ am Satzanfang zählt als Frage). |
-| C14 | **Der Sprechlauf hört nicht mehr auf zuzuhören** *(gebaut 14.09.2026, v1121; Ernstfall noch offen)* | Marcels Befund: „manchmal hat er einfach abgebrochen und nicht mehr aufgenommen." Ursache: `_fsHoeren(true)` steht an DREISSIG Stellen — jede ist eine Gelegenheit, es zu vergessen. Jetzt prüft ein Wächter alle drei Sekunden, ob zugehört werden müsste, und holt den Wiederanlauf nach. **Gemessen:** im Normalbetrieb 17 Sekunden durchgehend aktiv, kein Doppelstart — er stört also nicht. **Offen:** ob er im echten Abbruchfall greift, zeigt erst ein Lauf, in dem der Abbruch auftritt. Wenn Marcel es wieder erlebt: `VoiceImport._fsStand()` in der Konsole zeigt `phase` und `recState`. |
-| C15 | **Erweiterte Marktpreisindikation läuft nebenher** *(erledigt 14.09.2026, v1121)* | Marcel: „das macht er erst am Schluss, dass er sagt: ach ja, das dauert jetzt länger. Das kann ja schon parallel laufen." Ursache war ein FESTER Zeitpunkt (Ende Etappe 4) statt einer Bedingung. Jetzt startet sie, sobald Ort, Wohnfläche, Baujahr, Zustand und Bodenrichtwert stehen. **Gemessen mit abgefangenem Abruf:** nach Wohnfläche und Baujahr kein Abruf, nach dem Zustand kein Abruf, nach dem Bodenrichtwert genau EINER (Stufe 2). Am Ende steht dazu, was aus der Indikation eingeflossen ist. |
-| C16 | **Beide Scores mit ihren Kennzahlen** *(erledigt 14.09.2026, v1121)* | Marcel wollte sie „ungefähr so wie im Tab Bewertungen". Score 1 zeigte die Kennzahlen schon; Score 2 zeigte nur „Rendite 72 / 100". Jetzt steht je Kategorie das Gewicht und die Zahl der belegten Kennzahlen, darunter Stärken und Schwächen. Alles lag im Ergebnis und wurde nur nicht gelesen. |
+- **C3** Exkurse und Rückkehr in den Prozess. **C4** Reihenfolge Datenbank → Dokumente → Angaben → erst dann fragen.
+- **C6** permanenter Prozesskontext · **C8** Änderungen per Sprache mit Nachziehen · **C9** strukturiert speichern für die Pilot-Analyse · **C10** Abschluss „Objekt speichern und anlegen".
+- **C12 (2)** Grün-Kennzeichnung an einem BESTEHENDEN Objekt nachmessen.
+- **C14** greift der Hörwächter im echten Abbruchfall? (`VoiceImport._fsStand()`).
 
-| C2 | Zwei Begleitmodi: **Lernmodus** (erklärt wozu) und **Investor-Modus** (kompakt), jederzeit wechselbar | **ERLEDIGT v1378 / v1378b.** Der Ton war im Backend festgeschrieben („zwei bis vier Sätze"); es gab keinen Parameter, über den das Frontend etwas anderes hätte anfordern können. Jetzt drei Stufen (Lernmodus · Normal · Investor-Modus), umschaltbar per Knopf in der Nebenleiste und per Sprache („ausführlicher" / „kürzer" / „normal"), gemerkt in `dp_rf_modus`. Der Ton ändert **nur** Länge und Tiefe der Auskunft sowie den Wozu-Satz unter der Frage — nie, welche Fragen kommen oder was gerechnet wird. **Gemessen:** dieselbe DSCR-Frage ergibt 666 Zeichen / 5 Sätze im Lernmodus gegen 206 / 1 im Investor-Modus. Die 16 Wozu-Sätze sind kein Lexikon: sie sagen, was die Angabe *in dieser Software* bewirkt. |
-| C3 | Sprache als vollwertige Bedienform: Rückfragen, Korrekturen, Exkurse — und danach zurück in den Prozess | **Teilweise erledigt v1358** — Marcels Screenshots `fehler 2/4.png`: „Investmentthese habe ich keine" galt als Nicht-Verstehen, „Keine Maklerprovision" nach einem Befehl fiel weg. Beides behoben: `RF_NEIN_HINTEN` erkennt die Verneinung **hinter** dem Thema (nur wenn der Satz das gefragte Thema nennt), `RF_NULLANGABE` lässt eine Null-Angabe ohne Ziffer durch. Der Rest von C3 (Exkurse, Rückkehr in den Prozess) bleibt offen. |
-| C4 | Vor jeder Frage prüfen: **Datenbank → Dokumente → bisherige Angaben → erst dann fragen** | **Teilweise erledigt v1359** — `fehler3.png`: nach „1,5 % Wertsteigerung" fragte die nächste Frage wieder nach „Wertsteigerung". **Gemessen: keine Doppelfrage**, sondern zwei Felder mit fast gleichem Namen (`wertstg` = Zahl für die Prognose, `ds2_wertsteigerung` = Lageeinschätzung für den Score). Der Co-Pilot sagt den Unterschied jetzt, wenn die Zahl schon steht. Die eigentliche Reihenfolge Datenbank → Dokumente → Angaben bleibt offen. |
-| C5 | Steuersatz / zu versteuerndes Einkommen: vorschlagen, bestätigen lassen, Überspringen erlauben und später zurückkommen | **ERLEDIGT v1377 / v1377b.** Vorschlagen und Bestätigen gab es schon (`_pvSteuer`). Neu sind die zwei fehlenden Hälften: **Zurückkommen** — was übersprungen wurde, wird vor dem Abschluss einmal angeboten (`_rf.weg` wurde bis dahin nur als „–" gezeichnet und nie wieder gelesen). Ein Angebot, keine zweite Pflichtrunde; wer wieder überspringt, überspringt endgültig; was inzwischen einen Wert hat, fällt raus. Und **zvE** — stand in der Feldbeschreibung, aber in keinem Block. Jetzt `eins: ['grenz','zve']`: eines von beiden genügt, und wer sein Einkommen nennt, bekommt den Satz über `Tax.calcGrenzsteuersatz` ausgerechnet (80.000 € → 42 %, Tarif 2026), mit der Herkunft „aus deinem zvE berechnet". |
-| C6 | Permanenter Prozesskontext statt starrem Fragebogen | offen |
-| C7 | Datenherkunft sichtbar (Exposé / Marktbericht / berechnet / abgeleitet / selbst angegeben) + Konflikte nachfragen | **ERLEDIGT v1376–v1376d.** Die Herkunft war schon sichtbar; die **Konfliktrückfrage fehlte** — und das war die teuerste Lücke im ganzen Block. `_rfSetzen` brach bei einem belegten Feld still ab, während die Blase darunter „340 €/m² — amtlicher Bodenrichtwert" zeigte. Der Nutzer sah eine Zahl, die in kein Feld ging; gerechnet wurde mit seinen 300. Jetzt stehen beide Werte nebeneinander, beide mit Herkunft, und er entscheidet. **Drei Dinge, die erst der echte Lauf zeigte:** der Widerspruch gehört zum *Feld*, nicht zur Frage (der Fragewechsel hätte ihn weggeräumt); die Antwort muss *vor* der Feldauswertung geprüft werden (sonst erreicht „bleib bei meiner Angabe" sie nie); und eine *nackte* Zahl darf nicht entscheiden — wer auf die Kaufpreisfrage „215000" sagt, beantwortet die Frage. Sieben Fälle gemessen. |
-| C8 | Änderungen jederzeit per Sprache, abhängige Berechnungen ziehen nach | offen |
-| C9 | Alles strukturiert speichern — die **Pilot-Analyse** greift darauf zu | offen |
-| C10 | Abschluss: Zusammenfassung + „Objekt speichern und anlegen" | offen |
-
-**Vieles davon steht schon** (v1315 Kontext, v1324 Ort/Markt, v1325
-Auskunft nutzen, v1327 Satz mit Befehl und Angabe, v1331 Färbung). Der
-erste Schritt ist deshalb eine **Bestandsaufnahme: was von C1–C10 läuft
-bereits, was fehlt wirklich.** Ohne sie wird ein zweiter Sprechlauf neben
-den ersten gebaut.
+Erster Schritt bleibt eine Bestandsaufnahme, was von C1–C10 schon läuft.
 
 ---
-
----
-
 
 ### S · STEUERTHEMATIK — Prüfung, Belege, DATEV **[NEU 15.09.2026]**
 
 Marcels Auftrag: OCR für Belege im Tab Steuern, DATEV-Import und -Export,
 Rechenwege prüfen, Trennung privat/Gesellschaft gegenprüfen.
-
----
-
-#### S1 · Die Prüfung — bestanden, mit EINEM Befund
-
-**Gefahren am 15.09.2026 im Container, mit dem echten `tax.js` und dem echten
-`dashboard.js`** (kein Nachbau): 8 Objekte, 4 Halter, 3 Steuerregime, zvE
-90.000 €.
-
-| Topf | Regime | Objekte | Summe | Gegenprobe |
-|---|---|---:|---:|---|
-| Privat | ESt § 32a | 3 (ETW/EFH/MFH) | 24.592 € | = echte Portfoliowirkung |
-| Junker GbR | ESt, transparent | 2 | 4.620 € | = echte Portfoliowirkung |
-| GmbH | KSt 29,83 % | 2 | −4.474 € | auf +15.000 € Gewinn |
-| UG | KSt 29,83 % | 1 | 0 € | Verlust → **keine Erstattung** |
-
-**Alle Prüfungen bestanden:** vier getrennte Töpfe, kein Objekt im falschen,
-Basis nie negativ, Kapitalgesellschaften ohne Wirkung je Objekt, Sortierung
-nach Kaufdatum, Summe je ESt-Topf cent-genau gleich der echten
-Portfoliowirkung.
-
-**Die Trennung ist durchgängig gebaut** — an fünf Stellen gegengelesen:
-
-| Stelle | Trennung |
-|---|---|
-| Tab Steuern | Halter-Regime, KSt statt ESt (v805) |
-| Bestandssaldierung | nach Halter (v1400) |
-| Cockpit Abschnitt 05 | ein Topf je Halter (v1400) |
-| Steuer-Mappe | `_steuerRegime()`, Anlage V nur für privat |
-| Jahresabschluss | eigener Abschnitt 09, nur GmbH/UG |
-
-> Marcels Frage „bei dem einen Jahresabschluss machen, bei dem anderen nicht" —
-> **ja.** Abschnitt 08 ist Anlage V (§ 21 EStG, Privatvermögen), Abschnitt 09
-> Bilanz und GuV (§ 8 Abs. 2 KStG, Kapitalgesellschaft). Zwei Dokumente für
-> zwei Steuerarten, nicht zwei Fassungen desselben.
 
 ---
 
@@ -11842,60 +2467,6 @@ seit dem 30.08. am Marktbericht gearbeitet (v1332–v1341, Marcels Liste vom
 Erbbaurechtskoeffizienten. Der Rechenkern und die Ernte sind unberührt.
 
 ---
-## Marktbericht: Marcels Liste vom 12.09.2026 — ERLEDIGT bis auf zwei Reste
-
-Alles auf Staging, `b307c50` bis `343ed2b`. Einzelheiten im Journal der
-Projektanweisung unter **v1332–v1337**.
-
-| Punkt | Stand |
-|---|---|
-| Adresse wurde vom letzten Objekt überschrieben | **fertig** v1333–v1333d — gemessen: eigene Eingabe hielt 476 ms, dann ersetzt. Zwei Netzrunden zwischen Laden und Füllen |
-| Bericht landete unter dem alten Objekt | **fertig** v1333 — `_mbwRef` folgt jetzt der Adresse |
-| Wohneinheiten blockierten den Bericht | **fertig** v1333 — bei ETW/EFH/DHH/RH/GAR sichtbar mit 1 vorbelegt, Label sagte fälschlich „nur MFH“ |
-| Feldbeschreibungen und „wo bekomme ich das her“ | **fertig** v1334 — 33 Texte mit `woher`, ⓘ hängen sich selbst an, Vorschau beim Drüberfahren |
-| Geschosse / Etagen / Vollgeschosse | **fertig** v1334 — Etage = Lage der Wohnung, Vollgeschoss nach LBO, Dachboden ausdrücklich NIE |
-| „1×MPI, 1×MPI+, 1×WEV“ | **fertig** v1335 — dahinter steht jetzt „noch N frei“ aus `/ai/credits` |
-| Eingabefelder fluchten nicht | **fertig** v1336–v1336c — Grid statt Flex-50 %, Labelhöhen je Rasterzeile angeglichen |
-| Tablet und Handy | **geprüft** — 390/600/768/900/1024 px: alle Rasterzeilen fluchten, kein Überlauf |
-| Alterswertminderung „wie kommt die zustande?“ | **fertig** v1332 (nachgerechnet, korrekt) + v1337 (Rechenweg und RND-Herkunft stehen jetzt im Bericht) |
-
-**Beide Reste erledigt (12.09.2026 abends):**
-
-1. **Sachwertfaktoren Braunschweig-Wolfsburg** — **beantwortet, nicht offen.** **[ZURUECKGENOMMEN am 13.09.2026: das galt fuer den Jahrgang 2025. Fuer 2026 gibt es sie — Kalkulator `2026_sw_rh_bswf`, Datenbasis 01.01.2026. Siehe E2-NI im Workstream D.]**
-   Der Grundstücksmarktbericht 2025 sagt auf S. 34 wörtlich: „Zu diesem Thema
-   gibt es keine zusätzlichen regionalen Auswertungen des Gutachterausschusses
-   Braunschweig-Wolfsburg.“ Es gibt sie nicht. Der Faktor 1,20–1,22 aus dem
-   Kalkulator stammt aus einem anderen Modell als dem des örtlichen Ausschusses.
-   **Stattdessen nachgetragen:** Erbbaurechtskoeffizienten für sieben Gebiete
-   (`v1339`, Wolfenbüttel 0,81 aus 30 Kauffällen), geprüft gegen das
-   abgedruckte Anwendungsbeispiel — 500.000 × 0,79 = 395.000 €, zeichengleich.
-
-2. **Durchgehender Lauf** — **gefahren**, zweimal (Berichte 116 und 117). Er hat
-   genau das gefunden, wovor die Einzelprüfungen blind waren: `_num` verwarf
-   jede negative Zahl, und `bog_eur` hat deshalb nie funktioniert (`v1338d`).
-
----
-
-## Gutachten-Durchgang — alles geschlossen (12.09.2026 nachts)
-
-1. **`zweigWaehlen()`: Ursache gefunden und behoben (`v1341`).** In der
-   Uebersetzungstabelle standen an zwanzig Stellen **Backspace-Zeichen**
-   statt Wortgrenzen. Damit erkannte sie KEINE der Kurzformen, die unsere
-   Oberflaeche liefert (EFH, ETW, MFH, RH, DHH). Gemessen: Potsdam lieferte
-   vorher keinen Sachwertfaktor, jetzt 1,06 — der Wert lag die ganze Zeit im
-   Register. Betraf jede Kennzahl, die ueber diese Tabelle laeuft.
-   Lehre in `FALLEN.md` 140.
-
-2. **Erbbaurechtskoeffizient haengt in der Bewertung (`v1342`).** Liegt
-   einer vor, wird er ausgewiesen und die Formel nach Paragraf 50 daneben
-   gestellt; ab 10 % Abstand sagt der Bericht, dass das begruendet gehoert.
-   Anwendungsbeispiel des Ausschusses zeichengleich, Pruefwert 41277 haelt.
-
-3. **Optik: erledigt.** Marcel hat **Variante B** gewaehlt. Gebaut in
-   `v1340`–`v1340d`.
-
----
-
 ### 1 · Zwei Wünsche aus dem 10.09., die noch offen sind
 
 **„Die KI muss alles raushören und nachfragen."** Teilweise da: seit `v1290`
@@ -11952,16 +2523,6 @@ gesprochen hat, ist die Reihe da.
 Die Zahlen dahinter: mini kostet die Hälfte (3,00 statt 6,00 USD je Mio
 Audio-Token) und ist 37 % schneller (1864 ms gegen 2944 ms). Der Wechsel senkt
 die Kosten einer Aufnahme um rund 40 % — bei 4 Minuten von ≈ 1,7 auf ≈ 0,9 Cent.
-
-### 4 · Der Sprechlauf gehört auf Produktion
-
-**`v1273`–`v1310d` liegen auf Staging.** Prod steht auf
-`a21fe9c` — der Co-Pilot, die Etappen, beide Scores, BORIS-Abruf und
-Marktpreisindikation im Hintergrund sind für keinen Kunden erreichbar.
-
-**Das braucht Marcels ausdrückliche Freigabe** (Produktion, und der Rollout
-berührt einen Backend-Endpunkt: `/ai/copilot-frage`). Vorher wie immer
-sichern — beide Datenbanken, `dealpilot-mb-db` mit eigenem `pg_dump`.
 
 ### 5 · Der Gold-Altbestand
 
@@ -12038,47 +2599,14 @@ Meldung, nicht der Ausweg.
 **BLOCKIERT:** wartet auf Marcels Wahl aus der Demo. Geld und Optik —
 das entscheidet er.
 
-### 9 · Der Sprechlauf: Marcels Auftrag vom 11.09. — ABGEARBEITET
+### 9 · Der Sprechlauf: Marcels Auftrag vom 11.09. — Rest
 
-Die Rückmeldung zu den Bildern `fragen.png`, `sanierung.png`,
-`dealscore2.png`, `entwicklung.png` ist gebaut (`v1306`–`v1306d`), und die
-fünf Punkte darunter sind es ebenfalls (`v1307`–`v1308c`). **Offen bleiben
-nur zwei Läufe gegen echte Daten**, beide unten vermerkt.
+Erledigtes s. Fertig. Offen sind zwei Läufe gegen echte Daten:
 
-**a) Den Marktbericht auswerten** — **FERTIG in `v1307`**. Kernfunktion gemessen (Berichtstext → `wachsend` · `mittel` · `mittel` · `begrenzt`); der volle Lauf mit einer echten erweiterten Marktpreisindikation kostet Kontingent und steht noch aus.
-*„Diese Sachen wie Entwicklung, also Bevölkerung, Nachfrage,
-Wertsteigerung, Entwicklungsmöglichkeiten, das kriegen wir ja bei der
-erweiterten Marktpreisindikation ausgewertet im Marktbericht. Also du
-kannst den kompletten Marktbericht dann auch auswerten und auch die Sachen
-übernehmen."*
+- **a)** voller Lauf mit einer echten erweiterten Marktpreisindikation (kostet Kontingent).
+- **d)** Lauf gegen ein echtes ImmoMetrica-Testobjekt.
 
-Danach der Vorschlag im Dialog: *„Aus der erweiterten Marktpreisindikation
-habe ich entnehmen können, dass die und die Werte so und so angenommen
-sind, sollen wir die auch so übernehmen?"* — bestätigbar per Sprache oder
-Text.
-
-**b) Auswahlfelder anklickbar** — **FERTIG in `v1307`**. Gemessen bei
-„Zustand & Energieausweis": 24 Knöpfe in 4 Gruppen, zwei Klicks, und der
-Dialog ging selbstständig zur nächsten Frage. Gilt für jede Frage mit
-Auswahlfeldern, auch Qualität und Zustand.
-
-**c) Die Pre-Flight-Kombination** — **FERTIG in `v1308`**, gemessen: 8 Angaben übernommen, Liste zum Nachsehen, Stufenwahl, 14 statt 16 Fragen. Marktbewertung + Exposé /
-Marktbericht + Sprache zusammen: erst die Quellen lesen, dann sagen *„ich
-habe schon einige Werte aus dem Marktbericht und dem Exposé gelesen"*, dann
-**nur** Adresse und Übernahme bestätigen lassen — und danach ausschließlich
-die fehlenden Felder fragen. Der Bericht gehört ins Objekt, die
-Marktpreisindikation unter die Pre-Flight-Karte wie sonst auch.
-
-**d) ImmoMetrica** — **FERTIG in `v1308`**: läuft durch dieselbe Kette (`import → immometrica → voice`), `VORLAUF_NAME` kennt es, die Vorlaufkarte zeigt seine Werte. Ein Lauf gegen ein echtes ImmoMetrica-Testobjekt steht noch aus.
-
-**e) Fehlende Straße → Ortszentrum** — **FERTIG in `v1308`**, gemessen: Angebot erscheint, Klick und Sprache führen zum Ziel, Herkunft trägt „Näherung". *„Da fehlt manchmal zum
-Beispiel die Straße. Da könnten wir auch den Vorschlag machen, ob wir
-vielleicht einfach das Zentrum dann annehmen."* Bei bekanntem Ort ohne
-Straße also anbieten, mit dem Zentrum zu rechnen.
-
-**Marcels Maßstab dazu:** *„hier jetzt nochmal ganz genau drauf achten. Das
-muss wirklich hundertprozentig werden. Und der muss sehr schlau reagieren
-können, also im gesamten Kontext."*
+Marcels Maßstab: „Das muss wirklich hundertprozentig werden."
 
 ### 10 · Was uns eine Bewertung im Einkauf kostet — ungeführt
 
@@ -12098,7 +2626,7 @@ zeigt — an **einer** Stelle, so wie die Verkaufspreise in `config.js`.
 
 **BLOCKIERT:** braucht Marcels Vertragszahlen.
 
-### 11 · Vor dem Prod-Rollout: wem nimmt der Verfall etwas?
+### 11 · Vor dem Prod-Rollout: wem nimmt der Verfall etwas? (Stand unklar, am 25.10.2026 nicht nachgemessen)
 
 `v1296` dreht die Regel um — das Monatskontingent verfällt, nur Gekauftes
 bleibt. Auf Staging ist das ohne Folgen (Testkonten). **Auf Produktion ist
@@ -12122,1528 +2650,64 @@ freigeben.
 
 ---
 
-## → Erledigt am 11.09.2026, fünfter Teil (`v1300`–`v1303`)
-
-| Marcels Punkt | Stand |
-|---|---|
-| Verlauf scrollt „manchmal" nicht ans Ende | **fertig** — dreimal ans Ende (sofort, nächstes Bild, nach 260 ms); wer selbst hochgescrollt hat, bleibt oben |
-| Balken mit den Abruf-Knöpfen zu hoch | **fertig** — statt einem Erklärabsatz je Aktion EINE Zeile, die dem Zeiger folgt; `vi-rf-dran` 107 px statt ~180 |
-| Mikrofon- und Tippzeile flacher | **fertig** — 53→49, 43→36, 33→28; Klickflächen bleiben über 36 px |
-| Modal größer | **fertig** — 94→97 vh, 1240→1360 px; Modal 929→958 px |
-| „Was schon steht" auch beim freien Erzählen | **fertig** — geteilte Ansicht, Spalte 320×512 px, 16 Zeilen in 5 Etappen, gefüllt aus Formular und Auswertung |
-| Sprachaufzeichnung so breit wie der geführte Sprechlauf | **fertig** — Wahlseite 760 px, Aufnahme 1360 px; die Breitenregel lag im Block, den der freie Weg nie lädt |
-| Schwarzes Feld rechts, Eingabefenster nach „Übernehmen" weg | **fertig** — die Spalte blieb stehen, wenn das Aufnahmefenster ging (mein Fehler aus v1300b); `_recAus`/`_recAn` räumen jetzt als Paar |
-| Beide Sprachaufzeichnungen auf Tablet und Handy | **fertig** — im iframe gemessen: der geführte Weg brach erst bei 720 px um und war auf dem Tablet zweispaltig (Gespräch 330, Liste 340); jetzt beide bei 900 px |
-| Nach der Adresse unten nichts anklickbar, kein Scrollen (`sp2.png`) | **fertig** — `_rfHost` hängte den Dialog neben `vi-rec` und damit IN meine neue Bühne; die Flex-Kette braucht ein direktes Kind von `.oabi-body` |
-| „ja stimmt" wurde nicht als Bestätigung erkannt | **fertig** — `RF_JA` verlangte, dass der Satz MIT dem Ja endet; jetzt prüft `_istZustimmung`, ob der Satz nur aus Zustimmungswörtern besteht — 13 Formen erkannt, 7 Grenzfälle korrekt abgelehnt |
-
-**Commits** `f757dee`, `aeffda1`, `9fca4b8`, `122360f`, `63446bf`, `de73ebc`, `d17c5d3`, `f632c9b`, `696145f`. Gold-Audit RC=0.
-
-**Hinweis:** Marcel hat ein neues Bild angekündigt, das nicht im Repo
-angekommen ist — das neueste bleibt `design/mockups/sprechlauf3.png` vom
-10.09. Gearbeitet wurde nach seiner Beschreibung und eigenen Messungen im
-laufenden Dialog.
-
 ## → Erledigt am 11.09.2026, vierter Teil (`v1297`–`v1299b`)
 
-| Marcels Punkt | Stand |
-|---|---|
-| Was nimmt GeoMap je Marktbericht? | **beantwortet** — aus 184 echten Läufen: MPI 0,10 € · erweiterte 0,38 € · Wertermittlung 0,51 €. Über die Hälfte der Berichte kostet gar nichts (Cache). Gegen 0,90 / 1,90 / 3,90 € Verkauf trägt die Marge in jedem Fall |
-| „5-5-5 ist nicht schön, nennt die Pakete besser" | **fertig** — Kurzstrecke · Mittelstrecke · Langstrecke, Inhalte als lesbare Zeilen; in den Einstellungen alle drei statt nur dem eigenen |
-| „Menge ändern ändert nicht die Anzahl" | **fertig** — bei Menge 3 zeigt die Langstrecke 15/15/15 zu 37,50 € |
-| Markt-Angebot bleibt offen nach der Wahl | **fertig** — beide Knöpfe verschwinden, gemessen |
-| „aus den Einstellungen übernehmen oder kann genauso bleiben" | **fertig** — sieben Formulierungen geprüft, alle erkannt; fehlt ein Vorschlag, wird das gesagt statt „nichts entnommen" |
-| Pillen mit den Schlagwörtern hinter den Fragen | **fertig** — mit grünem Haken für Felder, die schon stehen |
-| Deal Score / Investor Deal Score schlecht zu sehen | **fertig** — Score-Blasen auf volle Breite (waren auf 82 % eingerückt), Karte mit Schatten |
-| „alles kleiner, Eingabefeld größer" | **fertig** — Kopf 120 → 75 px, Bühne 367 → 428 px |
-| Liste komplett sehen | **fertig** — mehr Höhe plus Kante an der Unterkante; sie scrollte übrigens schon immer |
-| „soll verstehen, auch wenn es nicht zur Frage passt" | **fertig** — Katalog reicht die nächsten Blöcke mit (Deckel 24); gemessen: „Hermannstraße 9 … 100 Quadratmeter, Baujahr 1962" trägt Objektart, Fläche und Baujahr ein, die Fragen danach entfallen |
+Erledigtes s. Fertig. Offen aus dieser Runde (Stand unklar, am 25.10.2026 nicht nachgemessen):
 
-**Commits** `3b3fc0c`, `e45a06a`, `4525bdb`, `c262a93`. Gold-Audit RC=0.
-
-### Offen aus dieser Runde
-
-- **Die Score-Karte im echten Durchlauf nachmessen.** Die Breiten-Korrektur
-  ist gebaut, aber nur die Regel ist geprüft — es braucht eine
-  vollständige Etappe 2, bis die Karte erscheint.
-- **„Ich höre nichts"** habe ich als Layout-Punkt gelesen (alles kleiner,
-  Eingabefeld größer). Falls Marcel damit das **Mikrofon** meinte, ist das
-  ein eigener Befund und noch offen.
-
-## → Erledigt am 11.09.2026, dritter Teil (`v1296`–`v1296f`)
-
-| Marcels Vorgabe | Stand |
-|---|---|
-| Die Preise für die Bewertungspartner raus | **fertig** — `avm_a`/`avm_b` aus Angebot und Katalog; gemessen: `avm_a` → HTTP 400 `invalid_pack`, beide Bänke auf Staging 0 |
-| Der Kunde wählt selbst, wie viele er nachkauft | **fertig** — Mengenwähler an Nachkauf-Karte und jeder Einzelzeile, in beiden Oberflächen; Deckel 25, gekappt statt abgelehnt |
-| Plan-Bewertungen verfallen am Monatsende | **fertig** — `_monatsReset` überträgt nichts mehr; gemessen am abgesetzten SQL, `_bank` kommt darin nicht vor |
-| Nur selbst Nachgekauftes bleibt dauerhaft | **fertig** — Verbrauchsreihenfolge Monat → Testphase → Bank passte bereits; sieben Textstellen nachgezogen |
-
-**Vier Befunde fielen beim Bauen heraus** und sind mitbehoben: der Einzelkauf
-verschwand beim Segmentwechsel; seine CSS-Regeln hingen am falschen Anker
-(seit `v1294` nackte Divs); der ganze Kaufblock stand im toten Zweig und war
-für zahlende Kunden unerreichbar; der Webhook-Rückfall multiplizierte die
-Menge nicht. Einzelheiten im Rollout-Journal.
-
-**Commits** `784ec2d`, `2bacff6`, `883da9a`, `2905a55`, `208b244`, `233112c`.
-Gold-Audit RC=0.
-
-## → Erledigt am 11.09.2026, zweiter Teil (`v1294`–`v1295`)
-
-| Marcels Wunsch | Stand |
-|---|---|
-| Landing-Pläne durchgehen, ob sie passen | **fertig** — Pläne stimmen; die Nachkauf-Sektion trug alte Zahlen |
-| Wie ist der Nachkauf gestaffelt? | **beantwortet** — je Plan das eigene Kontingent noch einmal, für ein Viertel des Monatsbeitrags: Starter `5·0·0` → 5,00 €, Investor `5·5·0` → 8,75 €, Pro `5·5·5` → 12,50 € |
-| Alte Bewertungspreise unter „Plan wechseln" raus | **fertig** — sie kauften nichts: `paket_kurz` → **HTTP 400 `invalid_pack`**, gemessen gegen den laufenden Checkout |
-| Vielleicht Bewertungspakete anbieten | **fertig** — Nachkauf **und** Einzelkauf (0,90 bis 9,90 €); der Einzelkauf lief seit `v1183`, hing aber hinter `if (creditPacks.length > 0)` und war unsichtbar |
-| Kappungsgrenze prüfen — „liegt man schon oben?" | **fertig** (`v1295`) — das Mietpotenzial wird geteilt in *im laufenden Vertrag* und *erst bei Neuvermietung*; gerechnet mit 20 %, die 15 % stehen als Hinweis daneben |
-
-**Nachgemessen:** das „Plan wechseln"-Modal zeigt **null** alte Preise, drei
-Nachkauf-Segmente, fünf Einzelkauf-Zeilen. Der Mietspielraum rechnet am
-Testobjekt Hüllhorst (490 € Ist, 782 € Markt, 100 m²) **98 € im Vertrag +
-194 € bei Neuvermietung = 292 €** — die volle Lücke.
-
-**Commits** `39995bf`, `902c74a`, `ecffdbb`, `cd1e78c`.
-
-## → Erledigt in der Nacht (`v1293`–`v1293c`) — die Pre-Flight-Kette
-
-| Marcels Wunsch | Stand |
-|---|---|
-| Exposé/Marktbericht **zuerst**, dann Sprache | **fertig** — `import` → `immometrica` → `voice` → AVM (war „voice-first" seit `v503`) |
-| Die extrahierten Daten im Sprechlauf **mitnehmen** | **fertig** — das Überspringen gab es schon, jetzt sagt der Co-Pilot es auch: „Aus Exposé / Marktbericht stehen schon 9 Angaben" |
-| Nur noch **fehlende** Sachen fragen | **fertig** — gemessen 13 statt 16 Fragen, Etappe 1 von vier auf eine |
-| Marktbewertung **im Sprechlauf**, Stufe wählbar | **fertig** — „Du hast die Marktbewertung mit ausgewählt — welche Stufe?" mit *Einfach* / *Erweitert* und Kontingentzahl |
-| Nicht zweimal abrufen | **fertig** — `done({marktGeholt})`, die Kette überspringt ihren Abruf |
-
-## → Erledigt am 10.09.2026, spät (`v1291`–`v1292d`)
-
-| Marcels Wunsch | Stand |
-|---|---|
-| Offene Fragen und Abrufe **unten** und sichtbar | **fertig** — feste Aktionsleiste zwischen Verlauf und Mikrofon; ein Ort für alle Entscheidungen |
-| **Adresse bestätigen** und Rückfrage stellen | **fertig** — mit Bundesland und Grunderwerbsteuersatz; die einzige Rückfrage im Dialog |
-| Makro-/Mikrolage **einzeln abrufen**, auch Bevölkerung | **fertig** — `/ai/lage` liefert sechs Dimensionen mit Quelle, Enums Feld für Feld gegengeprüft |
-| **Break-even** nennen | **fertig** — über `IrrEngine.breakEven`, mit benannten Annahmen |
-| **Marktmieten abgleichen**, Mietpotenzial, Steigerung | **fertig** — €/m² gegen Markt, in €/Monat und Jahr, mit Herkunft |
-| **Mietvertrag**, Index, Kappungsgrenze, Modernisierung | **fertig** — als Anhaltspunkte, ausdrücklich keine Rechtsberatung |
-| **Upside auf den Deal Score** | **fertig** — gerechnete Hebel in Staffeln, kleinster wirksamer Schritt |
-| Score **animiert und leuchtend** | **fertig** — Hochzählen, Balken, Leuchten ab Stufe GUT, Pulsieren ab TOP |
-| KI hört alles raus und fragt nach | **teilweise** — siehe Punkt 1 |
-| Deal-Aktion-Werte einbeziehen | **teilweise** — Break-even ja, IRR und Exit nein; siehe Punkt 1 |
-
-## → Erledigt am 10.09.2026
-
-**Marcels Plan vom Abend des 10.09. ist vollständig umgesetzt** (`v1288`,
-`v1288b`, `v1289`, `v1289b` — Commits `28ff503`, `fdba8aa`, `224382a`, `99e4308`):
-
-| | Punkt aus dem Plan | Stand |
-|---|---|---|
-| 1 | Feinheiten feiner aufgliedern | **fertig** — `v1289`/`v1289b`, nach Karten-Überschrift statt nach Formularreihenfolge; 18 statt 29 Fragen, 54 statt 93 Felder |
-| 2 | Makro-/Mikrolage: die Skalen abfragen | **fertig** — die Stufen stehen in der Frage, gelesen aus dem `<select>` |
-| 3 | Alles für den Deal Score 2 abfragen | **fertig** — Etappe 3 und 4 decken das Datenmodell ab, der Halt zeigt „17 von 24 Kennzahlen belegt" |
-| 4 | Statt fragen: abrufen | **fertig** — BORIS, Grunderwerbsteuer aus der PLZ, Lagewerte aus der Marktpreisindikation |
-| 5 | Lange Abrufe früh anstoßen | **fertig** — gefragt nach der Adresse, gestartet am Ende der Basis, geliefert mitten im Gespräch |
-| — | Deal Score als Zwischenstand | **fertig** — Halt nach Etappe 2 |
-| — | Deal Score 2 / Pilotanalyse-Einschätzung | **fertig** — Halt nach Etappe 3 |
-| — | Nebenkosten nachfragen, Einstellungen oder Pauschale | **fertig** — drei Quellen, jede benannt |
-| — | Miete, Mietentwicklung, Sanierung | **fertig** — Etappe 3 und 4 |
-| — | Fragen zur Wohnung stellen dürfen | **fertig** — jederzeit im Dialog und am Abschluss; der Kontext trägt jetzt Klartext samt Kennzahlen |
-| — | Herkunft abgerufener Werte | **fertig** — je Feld in der Übernahme-Tabelle |
-
-**Der Vorbehalt aus dem Backlog ist eingelöst:** keine abgerufene Zahl steht
-mehr als „Sprachaufzeichnung" in der Tabelle.
-
----
+- Die Score-Karte im echten Durchlauf nachmessen (nur die Breitenregel ist geprüft, es braucht eine volle Etappe 2).
+- „Ich höre nichts" wurde als Layout-Punkt gelesen — falls das Mikrofon gemeint war, ist das ein eigener offener Befund.
 
 ## → Frühere Notizen (Stand 09.09.2026)
 
-**Stand:** lokal = GitHub = Staging auf `v1287`. **Produktion auf `a21fe9c`**.
+Erledigtes s. Fertig. Reste (Stand unklar, am 25.10.2026 nicht nachgemessen):
 
-### Erledigt am 09.09.2026
-
-**Zwei Objekte beim Anlegen** — **gefunden und behoben (`v1268`).** Der
-Fehler war nicht der Anlegeweg, sondern der Sicherungs-Save davor: er
-startete für das geladene Objekt, verlor während seines `await` den
-Kontext an `newObj` und legte danach ein leeres NEUES Objekt an, statt das
-alte zu aktualisieren. Reproduziert, behoben, nachgemessen — Einzelheiten
-im Journal der Projektanweisung.
-
-### Was aus Marcels Liste noch offen ist
-
-| | Punkt | Stand |
-|---|---|---|
-| 1 | Sprechlauf: kommen alle Felder an | **geprüft** — 16/17, der eine Fehler (Möblierung) ist mit `v1262` behoben |
-| 2 | Bodenrichtwert automatisch nach Adresse | **fertig** — `v1263` Automatik, `v1264` der kaputte KI-Abruf repariert, `v1265` **amtlicher BORIS-Wert zuerst** (11 von 11 Ländern live), Schätzung nur als Rückfall |
-| 3 | Pillen unterschiedlich lang einblenden | **fertig** — `v1272`, Standzeit je Platz (6,5–15 s), der Kranz dreht durch alle offenen Angaben |
-| 4 | Kontextbezug im Sprechlauf prüfen | **teilweise** — Hausgeld-Aufteilung und Inventar sitzen, weitere Fälle offen |
-| 5 | Chatbot-Dialog statt Monolog, mit Demo | **fertig** — `v1273` fragt nach, was fehlt; `v1275` bringt die Wahl beim Öffnen („Ich erzähle frei" / „Frag mich durch") und den geführten Weg |
-| 6 | Bild „Ansicht": Objekt anlegen links über der Suche | **fertig** — `v1266`, Knopf unter dem Logo im Stil des Logo-Kastens |
-| 7 | IRR/Break-Even „passend in Auswertung" einordnen | **teilweise** — sie stehen in den Kennzahlen-Kacheln (Reiter Bewertung); Portfolio-Cockpit noch nicht |
-
-**Zuletzt fertig: `v1268`–`v1270d`.** Der Doppel-Anlage-Fehler ist gefunden
-und behoben (ein Klick legte zwei Objekte an, weil der Sicherungs-Save nach
-seinem `await` einen leergeräumten Kontext vorfand). Dazu: der amtliche
-BORIS-Abruf hat endlich einen Knopf, neben „Objekt anlegen" stehen jetzt
-Quick-Check und Marktbericht als Zeichen, die Postleitzahl füllt den Ort
-und das Straßenfeld schlägt Straßen vor. 15 Testnutzer und zwei
-Karteileichen sind aus der Staging-Datenbank raus. Nachweis im Journal der
-Projektanweisung.
-
-### Was jetzt Marcels Entscheidung braucht
-
-1. **`OPENAI_TRANSCRIBE_MODEL` — entschieden am 09.09.2026: das mini.**
-   Marcels Wort: „das mini bleibt erstmal". **Achtung, es blieb nicht** —
-   gemessen mit `printenv` IM Container lief auf **beiden** Servern das
-   große `gpt-4o-transcribe`. Auf **Staging jetzt umgestellt** (auch
-   `OPENAI_REALTIME_MODEL`), nachgemessen im Container. **Auf Prod steht
-   weiter das große** — dafür fehlt die Freigabe. Die alte Begründung:
-   Seit die Preise stehen, ist die Tragweite messbar: im warmen Zustand
-   (Prompt-Zwischenspeicher greift) ist die **Transkription mit 80 % der
-   größte Kostenposten**. Das mini kostet **die Hälfte** (3,00 statt 6,00
-   USD je Mio Audio-Token) und ist **37 % schneller** (1864 ms gegen
-   2944 ms). Der Wechsel senkt die Kosten einer Aufnahme um rund 40 %:
-   bei 4 Minuten von ≈ 1,7 auf ≈ 0,9 Cent.
-
-   **Über die Qualität ist damit nichts gesagt.** Dieselbe Datei ergab bei
-   zwei Läufen desselben Modells zwei verschiedene Ortsnamen —
-   Transkription ist nicht deterministisch. Wer das entscheiden will,
-   braucht eine Messreihe mit echten Diktaten, keinen Einzellauf. **Das
-   wäre der nächste sinnvolle Schritt**, und Marcels Sprechlauf liefert
-   das Material dafür.
-
-2. **Wenn die Kosten weiter runter sollen: den Feldkatalog kürzen.** Von
-   rund 6.200 Eingabe-Token der Auswertung sind über 6.000 der Katalog und
-   nur ~165 das Gesagte. Der Zwischenspeicher senkt das bereits auf ein
-   Viertel; darüber hinaus hilft nur ein kleinerer Katalog. **Die
-   Sprechdauer ist es nicht** — sie kostet fast nichts.
-
-4. **Der Gold-Altbestand.** 468 Fundstellen sind jetzt als Basislinie
-   eingefroren, der Wächter meldet nur noch Neues. Abgetragen wird, wenn
-   eine Datei ohnehin angefasst wird. Vor dem ersten echten
-   Whitelabel-Kunden gehören `pricing-modal.js` (53),
-   `reseller-portal.js` (43) und `qc-bridge.js` (39) gezielt nachgezogen.
-
-### Was aus der Sprechlauf-Liste noch offen ist
-
-Marcels sechs Punkte, Stand nach `v1259d`:
-
-| | Punkt | Stand |
-|---|---|---|
-| 1 | Kerosin-Modal vor der Aufnahme weg | **fertig** |
-| 2 | Ein Orbit statt fünf Tabs, Grünes verschwindet | **fertig** |
-| 3 | Doppelt auf Plausibilität prüfen | **zurückgestellt** — Marcels Wunsch vom 08.09. Der Code liegt vollständig da, `OPENAI_VOICE_VERIFY=1` schaltet ihn an |
-| 4 | Freitextfelder als Fragen | **fertig** |
-| 5 | Sprechdauer auf 4 Minuten | **fertig** |
-| 6 | Was kostet die Sprachaufzeichnung | **fertig** — alle Preise recherchiert und hinterlegt, Zwischenspeicher eingerechnet |
-
-**Die Antwort auf Punkt 6, kurz:** eine Aufnahme kostet **0,56 Cent**
-gemessen (45 s Diktat, warmer Zwischenspeicher), hochgerechnet **rund
-1,7 Cent** bei den neuen 4 Minuten. Mit dem kleinen
-Transkriptionsmodell wären es **0,9 Cent**. Ansehen mit `?kosten=1` an
-der Adresse.
+- Kontextbezug im Sprechlauf: Hausgeld-Aufteilung und Inventar sitzen, weitere Fälle offen.
+- Kosten weiter senken: Feldkatalog kürzen (über 6.000 von ~6.200 Eingabe-Token sind Katalog).
+- Transkriptionsmodell auf Prod, IRR/Break-Even im Portfolio-Cockpit, Gold-Altbestand, doppelte Plausibilitätsprüfung — s. Punkte 3, 7, 5, 6 oben.
 
 ---
 
 ## → ARCHIV: Übergabe 07.09.2026, abends
 
-**Stand:** lokal = GitHub = Staging auf `784380a`, **Produktion auf
-`9ff1190`**. **`v1215`–`v1253` sind live** — die Preisrunde ist
-durch, in der Anzeige wie in Stripe. Nichts wartet auf einen Rollout.
+Erledigtes s. Fertig. Reste (Stand unklar, am 25.10.2026 nicht nachgemessen):
 
-**Zuletzt fertig: `v1242a–e` — die KI-Mietrecherche.** Sie nennt jetzt
-**alle** benutzten Quellen statt einer, prüft **zuerst**, ob es für den Ort
-einen **amtlichen** Mietspiegel gibt, und sagt ausdrücklich, wenn es keinen
-gibt. Eine Portal-Preisstatistik wird weder als amtlich ausgezeichnet noch
-„Mietspiegel" genannt — nach §§ 558c/558d BGB ist sie keiner. URLs werden
-vor der Anzeige angeklopft; was nicht antwortet, verliert den Link und
-behält sein Etikett. Nachweis und die fünf Zwischenschritte stehen im
-Journal der Projektanweisung, die vier neuen Fallen in `FALLEN.md`.
-
-> **Zurückgenommen:** „mehrere Quellen kosten Kerosin" war als Gegenargument
-> falsch. Kerosin ist seit `v1176`/`v1183` ausgebaut — wörtlich in
-> `backend/src/routes/ai.js`. Ich hatte die Abschaffung selbst dokumentiert
-> und danach dagegen argumentiert.
-
-**Marcels Entscheidung vom 07.09.:** das Free-Limit von einer KI-Analyse pro
-Monat (`Paywall.gate('ai_calls')` in `ki-miete.js:13`, `ki-lage.js:13`,
-`ui.js:673`) **bleibt**. Das ist kein Kerosin, sondern der Upgrade-Anreiz.
-
-**Und auf Prod liegen Marcels Daten.** Der Staging-Nutzer
-`info@junker-immobilien.io` ist auf Prod ins Konto gleicher Mailadresse
-gespiegelt: 7 Objekte, 95 Steuersätze, 6 Steuer-Momentaufnahmen, 3
-Steuerperioden, 5 Bewertungen — plus die Gesellschaft „Test UG (v1226)" aus
-dem `localStorage`. Gegenprobe über `md5` beidseitig gleich. Nachweis,
-Backups, Auslassungen und beide Befunde stehen im Journal der
-Projektanweisung.
-
-**Die Spiegelung ist im Ergebnis belegt, nicht nur in den Bytes.** Marcel hat
-sich angemeldet; danach auf **beiden** Umgebungen dieselbe Bilanz gerechnet
-(ohne PDF, über `_gaDaten()`/`_gaRechnen()`): **Summe Aktiva = Summe Passiva =
-430.309,21 €**, Differenz **0**, Verrechnungskonto −284.287,21 €,
-Jahresfehlbetrag −21.705,17 € — auf den Cent gleich.
-
-> **Achtung, eine alte Prüfzahl ist damit hinfällig:** in der
-> Projektanweisung steht zu `v1227` „Bilanzsumme 687.059 €". Heute sind es
-> 430.309,21 €, in beiden Umgebungen. Das Objekt hat sich seither nicht
-> geändert — die Differenz kommt aus den **Stammdaten der Test UG im
-> `localStorage`**, deren alter Zustand nirgends festgehalten ist.
-> **Reproduzierbar ist, dass die Bilanz aufgeht, nicht die 687.059 €.**
-
-> ### ✓ Stripe ist fertig — Sandbox und Live
->
-> **Die Preisrunde ist auf Produktion live.** Acht Preise im Hauptkonto
-> angelegt (219 / 34,99 / 384 / 49,99 / 549 und die drei Nachkauf-Preise
-> 5,00 / 8,75 / 12,50), Coupon `ERSTFLUG15` mit 15 %, neun alte
-> stillgelegt, `plans` auf Prod nachgezogen. Dasselbe in der Sandbox.
-> Alle Preis-IDs stehen im Journal der Projektanweisung.
->
-> **`v1246d` kam noch dazu:** der Kauf wäre trotz korrekter Stripe-Preise
-> mit HTTP 400 gescheitert, weil `istBewertungsSku()` die neue
-> SKU-Familie `nachkauf_*` nicht kannte. Auf beiden Umgebungen behoben
-> und im laufenden Prod-Backend gegengeprüft.
->
-> **Offen und Marcels Entscheidung — die Test-Umgebung.** Es sind **zwei**
-> Stripe-Konten, nicht drei: das Hauptkonto erscheint in der Liste zweimal
-> (live und sein Testmodus), dazu die separate Sandbox, die Staging nutzt.
-> Der **Testmodus des Hauptkontos** ist tatsächlich verwaist — zwölf
-> Preise, **keiner mit `lookup_key`**, der Code kann ihn gar nicht
-> bedienen. **Löschen lässt er sich nicht**, ein Testmodus gehört zum
-> Konto. Möglich wäre, die zwölf verwaisten Preise dort zu archivieren;
-> das räumt das Dashboard auf und ist umkehrbar. **Noch nicht getan.**
-
-> ### Der Testbericht ist durch
->
-> **Alle Anmerkungen aus `design/mockups/Anmerkungen.docx` sind
-> abgearbeitet** — `v1240` bis `v1253`. Die letzte offene, „warum so viele
-> Details für eine erste Renditeeinschätzung", wurde als `v1254` gebaut,
-> im Browser vorgeführt und von **Marcel verworfen**; zurückgenommen mit
-> `cd1a942`, Buster mit `v1255` vorwärts. Er war nie auf Prod.
->
-> Die Demo bleibt unter `design/Vorschläge/eingabemodus-demo.html` mit dem
-> Vermerk „gebaut und verworfen" stehen — samt der Messungen (238
-> Eingabefelder, davon 14 Pflicht; der Umbau hätte 261 auf 82 sichtbare
-> Felder gebracht, ohne einen einzigen Wert zu verlieren).
-
-> ### Der erste Griff jetzt — in dieser Reihenfolge
->
-> **Nichts wartet auf einen Rollout.** `v1215`–`v1242e` sind live, Prod
-> steht auf `4ae353a`.
->
-> **1 · Ein Sprechlauf am Gerät.** Den kann nur Marcel machen, und **ein
-> einziger Lauf nimmt vier Änderungen ab**: `v1168` (Häkchen
-> `san_tax_active`), `v1169` (Stichwort-Fenster), `v1169`/`v1170` (Tempo —
-> und ob die Zuordnung noch stimmt) und `v1231` (Sanierungsbedarf diktieren:
-> „Dach neu, fünfzehntausend"). **Der Tempo-Punkt ist der wichtigste:** nicht
-> nur ob es schneller ist, sondern ob die Zahlen noch im richtigen Feld
-> landen.
->
-> **2 · Weiter im Testbericht. Die Blöcke D, E, F und G sind
-> abgeschlossen** (`v1240` Soll-Miete, `v1241` KI-Knopf, `v1242a–e`
-> Quellen, `v1243` Häkchen und Steuer-Hinweis, `v1244` Kapitaldeckung,
-> `v1245` BWK-Quote). Drei Punkte aus G waren schon erledigt: die
-> Sonder-AfA-Erklärung steht vor der Checkbox, zvE ist im Label
-> ausgeschrieben, und die vertauschte Markteinordnung hat `v1178`
-> behoben. Als Nächstes die Blöcke **B, C, H, J**.
-> **Das läuft ohne Rückfrage.**
->
-> **Drei Entscheidungen liegen bei Marcel und blockieren nichts:**
-> - **Die 8 Objekte ohne Grundbuchamt-Prozentsatz** stehen weiter auf 0 €.
->   Nachtragen verschiebt ihre Renditen und Scores — das macht niemand
->   ungefragt.
-> - **Der Gold-Audit steht rot** — 468 Fundstellen, RC=1, während
->   `CLAUDE.md` „RC=0 ist sauber" als Rollout-Tor führt. Schließen oder Regel
->   umschreiben?
-> - **Die Objektart kennt kein Zweifamilienhaus.** `Zweifamilienhaus` fällt
->   auf `EFH`, das Testobjekt Löhner Str. 278 ist eines. **Bewertungsfrage.**
->
-> **Und ein zweiter Befund aus `v1244`, der Marcel gehört:** die
-> **8 Objekte mit Deckungslücke**. Bei `2026-001` fehlen 20.400 € — die
-> Erwerbsnebenkosten sind weder finanziert noch als Eigenkapital
-> eingetragen. Die neue Zeile zeigt es jetzt bei jedem Objekt an; ob die
-> Zahlen nachgetragen werden, verschiebt Renditen und Scores und
-> **entscheidet Marcel**. (Das ist derselbe Kreis wie die 8 Objekte ohne
-> Grundbuchamt-Prozentsatz — vermutlich dieselbe Ursache.)
->
-> **Aus `v1245` neu und Marcels Entscheidung:** ob Mietausfall- und
-> BWK-Quoten als **Profileinstellung je Lage** hinterlegbar sein sollen
-> („für Profil Investition C-Lage nimm Mietausfall immer 3 %, für A-Lage
-> 1 %"). Das ist ein Produktbaustein, kein Textfehler — die Quote selbst
-> hat mit `v1245` erst einmal den fehlenden Kontext bekommen.
->
-> **Ein Nebenbefund wartet auf eine Entscheidung:** `calc.js:2165–2186`
-> schreibt bei jedem Lauf in `cr-wk-other` und `cr-zve-ohne`. **Beide gibt
-> es in keiner HTML-Datei und im DOM nicht.** Der V258-07-Hook ist eine
-> Anzeige ohne Anzeige — entweder die Zeile „Werbungskosten der anderen
-> Objekte" wirklich bauen oder den Hook entfernen. **Produktfrage.**
->
-> **Eine fachliche Frage steht offen:** ob und wie der **Zustand** in die
-> KI-Marktmiete eingehen soll. Marcels Anmerkung war „für den Zustand zu
-> hoch". Das ist Bewertungsfachlichkeit — hier wird nicht geraten.
->
-> **Zwei Aufräumarbeiten warten auf ein Ja:** `business`/`enterprise` in der
-> Prod-Datenbank (B11) und die **§ 7b-Spalte in `tax_records`** (Eingriff in
-> die Datenbank).
->
-> **Nichts hängt halbfertig.** Kein Rebuild offen, keine Migration offen,
-> Arbeitsverzeichnis sauber.
-
-> ### Was auf Prod bewusst NICHT gespiegelt wurde
->
-> Share-Links (110 Stück, 55 MB, 98 davon auf gelöschte Objekte zeigend),
-> Kerosin-Guthaben und Verbrauchszähler, die Zugangsdaten des
-> Bewertungspartners, das Abo (beide Seiten Pro/aktiv) und das abgeschaltete
-> TOTP-Geheimnis. Begründung je Punkt im Journal.
-
-Marcels Frage: *„wie müssen wir wohnungen und häuser dann in einer gmbh oder
-ug angeben? … was ist wenn mehrere objekte in einer gesellschaft sind. können
-wir das zuordnen? dann wäre die Bilanz super und die GuV."* — **Alles gebaut,
-alles auf Staging gemessen.**
-
-| | was | Version | Nachweis |
-|---|---|---|---|
-| 1 | **Kosten der Gesellschaft**, je Jahr, fünf Arten | `v1226` | Jahreswechsel hält den Entwurf, leere Jahre werden verworfen, `kostenFuer()` liefert `erfasst:false` statt einer Null |
-| 2 | **GuV** nach § 275 Abs. 2 HGB | `v1227` | 30.004 € Umsatz, −24.000 € Personal, Ergebnis −21.078 € |
-| 3 | **Bilanz** nach § 266 HGB mit Verrechnungskonto | `v1227` | Summe Aktiva = Summe Passiva = 687.059 €, in zwei unabhängigen Läufen |
-| 4 | **Ausschüttungszeile** im Steuer-Tab | `v1228` | 2.238 € Ergebnis → 1.387 € beim Gesellschafter, Gesamtbelastung 38,0 % |
-
-Bedienung: **Cockpit, Abschnitt 08 „Jahresabschluss"** — Gesellschaft und
-Geschäftsjahr wählen, Knopf drücken. Vier Seiten: Deckblatt, GuV, Bilanz,
-Anlagenspiegel. Der Knopf ist über den echten Bedienweg geprüft.
-
-### Der Befund, der alles trägt: eine Bilanz muss aufgehen
-
-DealPilot kennt nicht jede Geldbewegung — Einlagen, Kautionen, den Zeitpunkt
-von Steuerzahlungen, die laufenden Bankbewegungen. Die Differenz wird **nicht
-still auf eine Position aufgeschlagen**, bis es passt, sondern als eigene Zeile
-ausgewiesen: **Verrechnungskonto Gesellschafter**, mit einem Kasten daneben,
-der sagt, was darin steckt.
-
-**Der Posten ist dabei ein Messgerät für fehlende Stammdaten** — gemessen:
-
-| Stammdaten | Verrechnungskonto |
-|---|---|
-| ohne Stammkapital, Bank, Gesellschafterdarlehen | **363.180 €** |
-| mit allen dreien | **77.180 €** |
-
-Deshalb sagt der Kasten seit `v1227c` **welche** Angabe fehlt, statt den Leser
-raten zu lassen.
-
-### Die Gegenprobe hat zwei Fehler gefunden, bevor sie in eine Bilanz kamen
-
-Die Restschuld steht im gespeicherten Steuersatz **nicht** — geprüft an allen
-45 Feldern. Sie musste also gerechnet werden, und damit war sie ein zweiter
-Wahrheitsanspruch neben `calc.js`. **Also wurde sie gegen den Rechenkern
-geprüft**, und die Probe hat sofort zwei Fehler gezeigt:
-
-1. **`d1_vertrag` ist kein Datum.** Das Feld ist ein Textfeld und trug am
-   geprüften Objekt `4711` — eine Vertrags**nummer**. Mein Rückfall auf den
-   wirtschaftlichen Übergang griff erst bei einem *leeren* Wert, also nie.
-   Ohne Startdatum rechnete die Formel null Monate und damit **null Tilgung**:
-   die Restschuld stand über fünfzehn Jahre konstant auf 132.000 €.
-2. **`_gaNum('3.5')` ergab 35.** Mein eigener Parser hielt den Punkt für einen
-   Tausendertrenner — aus 3,5 % Zins wurden 35 %. Die App hat mit `parseDe()`
-   längst die richtige Funktion. **Auch das Lesen einer Zahl ist ein
-   Rechenkern, den man nicht dupliziert.**
-
-Nach der Korrektur: Jahr 1 exakt, nach zehn Jahren 0,35 % Abweichung. **Das
-Ergebnis der Probe steht im PDF** — und wenn keine möglich war, steht dort
-„gerechnet, aber nicht geprüft" statt einer stillen Zusicherung.
-
-### Fachliche Entscheidungen, die im Code begründet stehen
-
-- **`anschaffungsnah` gehört zu den Abschreibungen**, nicht zum
-  Erhaltungsaufwand: gemessen in `tax.js:1025` trägt das Feld bereits den auf
-  die Gebäude-Nutzungsdauer verteilten Jahresbetrag. Entsprechend erhöhen
-  aktivierte anschaffungsnahe Herstellkosten die Anschaffungskosten in der
-  Bilanz — sonst fällt der Buchwert um eine Abschreibung, deren Grundlage fehlt.
-- **Bei Verlust heißt es Jahresfehlbetrag**, nicht Jahresüberschuss (`v1227c`).
-- **Die zweite Steuerebene** rechnet die volle Ausschüttung, weil nur so der
-  Vergleich mit dem privaten Halten ehrlich ist — und sagt daneben, dass bei
-  Thesaurierung weiter 15,825 % gelten.
-
-### Auf Staging steht Testmaterial, das Marcel gehört
-
-Damit der Weg überhaupt prüfbar war, wurden auf Staging angelegt:
-
-- **Mandant „Test UG (v1226)"** mit Steuernummer, Handelsregister, Stammkapital
-  25.000 €, Bank 15.000 €, Gesellschafterdarlehen 300.000 € und Kosten der
-  Gesellschaft für 2026.
-- Das Objekt **„Am Markt 9 Kabelsketal" trägt jetzt diese UG als Halter** —
-  das ist eine echte, gespeicherte Änderung an Marcels Staging-Daten.
-
-**Beides steht absichtlich noch da**, damit Marcel den Jahresabschluss selbst
-ansehen kann. Der Halter ist am Objekt in einem Klick zurückzustellen.
-
-### Was noch offen ist
-
-- **Prod-Rollout** von `v1215`…`v1228` — wartet auf Marcels „ja".
-- **Eigene Spalte für die § 7b-Sonder-AfA** in `tax_records` (Datenbankeingriff).
-- **Fünf Fragen für den Steuerberater** stehen im Prüfbefund — vor allem:
-  reicht ihm diese Form, oder braucht seine Kanzleisoftware einen
-  DATEV-Buchungsstapel?
-
----
-
-## → ARCHIV: Übergabe 03.09.2026, erster Teil: Steuer-Mappe und Anlage V
-
-**Stand damals:** Staging auf `952c601`, Produktion auf `8269465`.
-**Seit dem 04.09. ist alles davon auf Prod** — siehe der Block ganz oben.
-
-**Marcels Paket vom 03.09. ist abgearbeitet — alle vier Punkte, in seiner
-Reihenfolge.** Jeder auf Staging gemessen, nicht behauptet.
-
-| | was | Version | Nachweis auf Staging |
-|---|---|---|---|
-| 1 | Anlage-V-Zeilennummern im Steuer-Tab, **unter** dem Info-Feld | `v1222`/`v1222b` | alle 25 Info-Zeichen tragen den Block, null Konsolenfehler |
-| 2 | Anlage V beim **Einzel**-PDF zuwählbar | `v1223` | Haken an: 2 Seiten statt 1; „Alle Jahre": 31 statt 16 |
-| 3 | Steuer-Mappe für **privat und überführt** | `v1224`/`v1224b` | gemischte Mappe (6 privat, 1 in eine UG überführt, 2 mit Halterwechsel) läuft fehlerfrei; reine Privatmappe unverändert |
-| 4 | **§ 7b** getrennt von der linearen AfA | `v1225`…`v1225c` | mit § 7b: Zeile 35 = 6.000, Zeile 38 = 5.000, Summe 11.000 unverändert; ohne: eine Zeile |
-
-### Der Befund, der sich durch alle vier zieht
-
-**Vier von sechs Fehlern in dieser Runde waren Widersprüche, keine
-Rechenfehler** — zwei Aussagen über dieselbe Sache auf demselben Blatt:
-
-- Die Schlussseite sagte „Zu **jedem** Objekt liegt eine Anlage-V-Zuordnung
-  bei" und zwei Zeilen darunter, für welches Objekt bewusst keine beiliegt.
-- Zeile 38 wurde oben gedruckt und stand unten unter „Formularzeilen, die
-  DealPilot **nicht** führt".
-- Der Kopf trug „Anlage V · § 21 EStG", während auf demselben Blatt Zahlen
-  einer GmbH standen.
-- `_mappeHalter()` zählte die Halter über **alle** Objekte des Kontos aus
-  der Listenantwort, während Sortierung, Gliederung und Regime aus `stamm`
-  lasen. **Eine Angabe aus zwei Quellen** — das Deckblatt konnte einen Halter
-  melden, der in der Mappe nicht vorkommt.
-
-Ein Dokument, das sich selbst widerspricht, ist schlimmer als eins mit einer
-Lücke: die Lücke sieht man.
-
-### Zwei Regeln, die richtig waren und trotzdem nichts geliefert haben
-
-**`v1222b` und `v1223`.** Die Regel „gibt es für das Jahr keine abgeschriebene
-Zuordnung, erscheint keine Zeilennummer" ist fachlich richtig. Gemessen
-heißt sie: **es erscheint nie eine.** Das Steuerformular rechnet ab dem
-Kaufjahr — bei allen Testobjekten 2026 aufwärts —, abgeschrieben ist die
-Anlage V **2025**, und die Anlage V 2026 ist im September 2026 noch gar
-nicht veröffentlicht. Marcel kann sie nicht nachliefern.
-
-Der Einwand gegen einen Rückfall auf das Vorjahr war der **fehlende
-Vorbehalt**, nicht der Rückfall. Also steht der Vorbehalt jetzt auf dem Blatt
-selbst: rotes Band über der ersten Zahl, Formularjahr im Kopf, Wiederholung
-im Fuß. Im Tooltip dasselbe als ACHTUNG-Zeile.
-
-### Was dabei fachlich neu ist
-
-**`_steuerRegime(halterId)`** trennt die drei Fälle, die DealPilot kennt:
-
-| Rechtsform | Anlage V? | warum |
-|---|---|---|
-| privat | ja | § 21 EStG |
-| GbR | ja | zur gesonderten und einheitlichen Feststellung |
-| GmbH / UG | **nein** | § 8 Abs. 2 KStG — nur Einkünfte aus Gewerbebetrieb |
-
-Für ein Objekt der GmbH war die alte Anlage-V-Seite nicht ein Formfehler,
-sondern **die falsche Einkunftsart**. Die Seite entfällt jetzt nicht
-stillschweigend: die Schlussseite sagt, für welche Objekte und warum.
-
-**`_ueberfVermerk()`** bringt die Überführung aufs Blatt: Stichtag, und dass
-die AfA-Bemessungsgrundlage der **Verkehrswert zum Stichtag** ist, nicht der
-Kaufpreis. Im Jahr des Wechsels sind beide Seiten Rumpfjahre — das sagt das
-Blatt, weil die Summe sonst wie eine Jahressumme aussieht und keine ist.
-
-### Der eine Punkt, der Freigabe braucht
-
-**Eine eigene Spalte für die § 7b-Sonder-AfA in `tax_records`.** `tax.js`
-addiert lineare AfA und § 7b zu einem Feld, der gespeicherte Satz hat nur
-eine Spalte. Für das **geöffnete** Objekt ist die Aufteilung seit `v1225`
-bekannt und wird getrennt gedruckt; für einen **gespeicherten** Satz in der
-Mappe nicht — dort steht stattdessen der ausdrückliche Hinweis, dass ein
-§ 7b-Anteil aus Zeile 35 abzuziehen und in Zeile 38 einzutragen wäre.
-**Das ist ehrlich, aber nicht vollständig.** Die vollständige Lösung ist ein
-Datenbankeingriff (Migration + Rebuild) und wartet auf Marcels Freigabe.
-
-### Eine Falschdiagnose, die hier stehen bleiben soll
-
-Ich habe während dieser Runde behauptet, **jsPDF drucke weder das
-Euro-Zeichen noch Gedankenstriche** — belegt mit einem Auszug aus dem
-Seitenstrom, in dem „17.957 €" als „17.957 " ankam. **Falsch.** Dort steht
-Byte `128`, das € in WinAnsi; mein Extraktor stellte 0x80–0x9F als
-unsichtbar dar. Dasselbe für `—` (151) und `–` (150). **Mein Werkzeug hat
-gelogen, nicht das PDF.**
-
-Echt ist nur der schon bekannte Befund aus `v1221b`: Zeichen **außerhalb**
-WinAnsi (`→ ≥ ✓`) kippen die ganze Zeichenkette nach UTF-16 und machen sie
-unlesbar. Geprüft: **in keinem PDF-Erzeuger steht so ein Zeichen in
-Nutztext** — die Treffer in `pdf.js` sind Kommentare und eine
-`console.log`-Zeile.
-
-> Beim Messen an einem PDF-Seitenstrom **immer WinAnsi 0x80–0x9F
-> zurückübersetzen**, sonst misst man sein eigenes Werkzeug. Das ist in
-> dieser Sitzung das vierte Mal, dass ein Prüfwerkzeug einen Fehler
-> erfunden hat.
+- **Entscheidung Marcel offen:** zwölf verwaiste Preise im Testmodus des Stripe-Hauptkontos archivieren; die 8 Objekte ohne Grundbuchamt-Prozentsatz bzw. mit Deckungslücke (`2026-001`: 20.400 €) nachtragen; Mietausfall-/BWK-Quoten als Profileinstellung je Lage; Zustand in der KI-Marktmiete („für den Zustand zu hoch").
+- `calc.js` schreibt in `cr-wk-other`/`cr-zve-ohne`, die es im DOM nicht gibt (V258-07): Zeile bauen oder Hook entfernen — Produktfrage.
+- `business`/`enterprise` in der Prod-Datenbank (B11) — wartet auf ein Ja.
+- Fünf Fragen an den Steuerberater (reicht die Form, oder braucht er einen DATEV-Buchungsstapel?).
+- Testmaterial auf Staging: Mandant „Test UG (v1226)" als Halter von „Am Markt 9 Kabelsketal".
+- Sprechlauf am Gerät für `v1168`/`v1169`/`v1170`/`v1231` (Tempo und Feldzuordnung).
 
 ---
 
 ## → ARCHIV: Übergabe 02.09.2026, nach dem Prod-Rollout
 
-**Stand:** lokal = GitHub = Staging auf `3d334e9`. **Produktion auf `39aa598`** — es fehlt `v1205` (Backend, braucht `mb-backend`-Rebuild).
+Erledigtes s. Fertig. Reste (Stand unklar, am 25.10.2026 nicht nachgemessen):
 
-**Nichts hängt halbfertig.** Keine Migration offen, kein Rebuild offen.
-
-> ### Prod-Rollout 02.09.2026, zweiter — `v1203`/`v1204` sind live
->
-> **Ausgerollt auf Marcels „ja nachziehen".** Produktion steht auf
-> `6047036`, gleichauf mit Staging. Reines Frontend, **kein Rebuild, keine
-> Migration.**
->
-> Sicherungen vorher: `dealpilot_db-vor-v1204-20260902-1348.sql` (12 MB)
-> und `marktbericht-vor-v1204-20260902-1348.sql` (14 MB).
->
-> **Auf `app.dealpilot.immo` abgenommen:** `app.js?v=1204` ·
-> `marktbericht-view.js?v=1204` · die Stufenauswahl steht, Stufe 1
-> vorgewählt, sieben Reiter, **null Konsolenfehler.** Und die Score-Kette
-> gegen die Haupt-App geprüft — zehn Proben einschließlich aller
-> Grenzwerte, **alle identisch**:
->
-> ```
-> 95 Top · 85 Top · 84 Gut · 70 Gut · 69 Solide
-> 50 Solide · 49 Schwach · 35 Schwach · 34 Kritisch · 0 Kritisch
-> ```
->
-> `CLAUDE.md` trägt auf Prod die korrigierte Kette.
->
-> ### Prod-Rollout 02.09.2026 — `v1198`–`v1202` sind live
->
-> **Ausgerollt auf Marcels „passt"** nach seinem eigenen Durchgang auf
-> Staging. Produktion steht auf `8f2832c`.
->
-> **Sicherungen vorher:**
-> `/root/backups/dealpilot_db-vor-v1202-20260902-1321.sql` (12 MB) und
-> `marktbericht-vor-v1202-20260902-1321.sql` (14 MB — die Marktbericht-DB
-> steht in keinem Skript und wurde einzeln gezogen).
->
-> **`mb-backend` gerebuildet** (`v1198` ist Backend). Im Container
-> nachgemessen: `CrossCheckService.js:486` trägt die neue Form
-> `const bwErgebnis = p.bodenwert` — der stille Rückfall ist weg; die
-> alte Form steht nur noch im Kommentar darüber (Z. 450).
-> `ErtragswertService.js` trägt den Hinweis mit echten Umlauten.
-> Keine Fehler im Log.
->
-> **Auf `app.dealpilot.immo` abgenommen:** `app.js?v=1202` ·
-> `mb-stufen.js?v=1202` · `wertermittlung.js?v=1201` · die Stufenauswahl
-> steht („Was soll der Bericht leisten?" / „Tiefe wählen — der Preis
-> richtet sich danach, nicht nach den Angaben"), Stufe 1 ist vorgewählt,
-> das `mea`-Feld steht im ersten Block, sieben Reiter, **null
-> Konsolenfehler.**
->
-> **Keine Migration.** Lokal = GitHub = Staging = Produktion auf `8f2832c`.
-
-> ### Der Gelddefekt ist behoben und live
->
-> `v1194` fand, dass **`credits-modal.js` den Kaufweg kaperte**: die Datei
-> setzt am Ende `window._buyCreditPack` und wird in `index.html` **nach**
-> `js/settings.js` geladen (3252 vs. 3151). Der spätere Setzer gewinnt.
-> Jedes **„Dazubuchen"/„Kaufen"** in Einstellungen → Plan führte damit in
-> den alten **Kerosin-Laden** (10/28/90/160 Liter zu 2/5/15/25 €) statt zu
-> Stripe. Das Backend kennt die `kerosin_*`-SKUs weiterhin, und
-> `creditPackWebhook.js` bucht sie auf `bonus_credits` — die Spalte, die
-> `aiCreditsService` seit `v1183` nicht mehr liest. **Geld rein, nichts
-> raus.**
->
-> **Auf Prod abgenommen:** `_buyCreditPack` ist die Stripe-Fassung,
-> `CreditsModal.open` führt aufs Preis-Modal, null Konsolenfehler.
-> Sicherungen: `/root/backups/dealpilot_db-vor-v1194-…` (12 MB) und
-> `-vor-v1195-…`, je mit der Marktbericht-DB (14 MB), die in keinem Skript
-> steht.
-
-### Was in dieser Sitzung passiert ist
-
-| | was | Nachweis |
-|---|---|---|
-| `v1191` `8902e87` | Löschknopf fraß den Aufklapp-Pfeil | Pfeil 22/22 px erreichbar |
-| `v1192` `8aa9857` | Score-Ring lag unter den Aktionsknöpfen | alle vier Kartenmodi |
-| `v1193` `cd68aa0` | Marktbericht-Ampel rechnete in Kerosin | kein `\d+ L` im Seitentext |
-| `v1194` `b026689` | **Die Währung stand auf dem Geldweg** — 6 Dateien | im laufenden System ausgelesen |
-| `v1194b` `954a669` | iframe-Cache-Buster hätte die Hälfte verschluckt | `wertermittlung.js?v=1194` kommt an |
-| **Prod** `a4ae78d` | `v1191`–`v1194b` live | beide DBs gesichert, abgenommen |
-| `v1195` `69dee08` | **„5 L bei Marktwert" statisch im Band** | Rahmen **und** iframe messen null |
-| **Prod** `30a10b1` | `v1195` live | Band-Text auf Prod gegengelesen |
-| `v1195b` `b5438b4` | Ein Kommentar in `index.html` widersprach dem Code daneben | nur Kommentar |
-| `v1196` `59a87d2` | **Reiter 6 und 7 waren leer — 18 px, null Felder** | siehe unten |
-| `v1196b` `005a084` | **Mein eigener Knopf klickte ein totes Element** | 0 → 12 Felder über den echten Bedienweg |
-| — | **Der Marktbericht-Abruf ist gefahren** | siehe unten |
-
-**Marcels Entscheidungen:** „a ja, b nein" (Score-Ring) · Prod-Rollout
-freigegeben · echter Abruf-Test freigegeben · „weiter" = durchziehen ohne
-Rückfragen.
-
-### Der Abruf-Test ist durch — die Abrechnung stimmt
-
-Testobjekt `2026-004 · Bäckerstr. 7 Musterhausen`, erreichte Stufe 2:
-
-| | |
-|---|---|
-| Angekündigt | Ampel `1 × MPI+`, Knopf „1 Erweiterte Marktpreisindikation" |
-| Kontingent | MPI+ **10 → 9**, MPI und WEV unberührt |
-| Log | `marktbericht:full` · `cost 1` · `source 'monthly'` · `{"art":"mpi_plus","wert_stufe":2}` |
-| Spalten | `mpi_plus_used` 0 → 1, **Bank unverändert** — erst der Monat, dann die Bank |
-| Zweiter Lauf | Stufe 1+2 `{anzahl: 0}`, „ohne Aufpreis"; Stufe 3 `{anzahl: 1, art:'wev'}` — **volle** WEV, keine Differenz |
-
-**Der Bestätigungsdialog ist ein natives `window.confirm()`**
-(`marktbericht-app/app.js:330`) und blockiert den gesamten Renderer samt
-Browser-Erweiterung — Screenshot, JS und Tastendrücke liefen alle in den
-Timeout. **Beim Prüfen nicht blind drücken.**
-
-**Der `402`-Pfad ist halb bewiesen.** Serverseitig gelesen (zwei Stellen,
-`k.rest < 1` → `402` mit ausgeschriebener Meldung), frontendseitig
-**gemessen**: das Kaufangebot aus `v1187` rendert mit **Live-Preis aus
-Stripe** (1,90 €, aus `/credits/bewertungen`, neun SKUs). **Was fehlt:**
-dass der Server den 402 unter echten Bedingungen schickt — dafür müsste
-eine Art auf 0 gesetzt werden, und **der Datenbank-Eingriff wurde von der
-Umgebung blockiert.**
-
-### Der oberste offene Punkt: 1 · Marktbericht neu gestalten
-
-> ### ABGESCHLOSSEN am 03.09.2026 — bis auf eine Entscheidung
->
-> **a)** Feldmarkierung: gebaut (`v1199`/`v1201`/`v1202`), im laufenden
-> System nachgewiesen — sechs markierte Felder, Marken für alle drei Stufen,
-> Randfarbe `rgb(201,168,76)`. Der Backlog-Eintrag war veraltet und hat den
-> Punkt offen gehalten; die tote rote CSS-Regel dahinter ist mit `v1213` weg.
-> **b)** Score-Konvention für fehlende Teilwerte: **liegt bei Marcel** —
-> eine Bewertungsfrage, siehe unten.
-> **c)** Ergebnis-Teil: vollständig geprüft. Bodenwert, beide Rechenwege,
-> Vergleichspreise und Verfahrenswahl Zeile für Zeile nachgerechnet
-> (`v1210`, `v1212`).
-> **d)** PDF-Bericht: durchgesehen und umgebaut — `v1206` bis `v1213`.
->
-> **Was dabei herauskam, in einem Satz:** von den elf Befunden dieser Runde
-> war **kein einziger ein Rechenfehler**. Alle elf waren Fälle derselben
-> Art — eine Zahl stand da und rechnete nicht (4,89 €/m²), oder sie rechnete
-> und stand nicht da (828 m² Hinterland), oder eine Auswahl gab sich als
-> Gesamtheit aus (10 von 42 Vergleichen), oder eine Warnung wurde erkannt
-> und nicht weitergereicht (Kaltmiete 1,00 €/m²).
-> **Die Maschine rechnet richtig. Sie hat nur nicht immer gesagt, was sie
-> tut.**
->
-> **Nicht umnummeriert.** Aus 1–8 wird nicht 1–7: die Historie unten zeigt,
-> dass jede Umnummerierung eine eigene Erklärung gebraucht hat. Punkt 1
-> bleibt Punkt 1 und trägt diesen Vermerk.
-
-
-**Der Wizard ist jetzt strukturell UND inhaltlich durchgegangen, und der
-Ergebnis-Teil ist erstmals angesehen.** Was dabei herauskam, steht unter
-Fertig (`v1196`, `v1196b`, `v1197`). Kurzfassung:
-
-- Reiter 6 und 7 waren leer und sahen aus wie ein Defekt → Hinweis mit Text
-  aus der Ampel (`v1196`).
-- Die bedingte Pflicht-Logik in Reiter 6/7 **stimmt** (gemessen: jedes
-  gesternte Feld hat einen gefüllten Auslöser).
-- Der Ergebnis-Teil rechnete „unbekannt" als „schlecht" → `v1197`.
-- Die Abrechnungskette ist end-to-end belegt, inklusive „ohne Aufpreis".
-
-**Wo weitergemacht wird — drei benannte Baustellen:**
-
-**a) Pflichtangaben sind in den Reitern markiert — erledigt, der Eintrag war
-veraltet.** Hier stand bis zum 03.09.2026: *„`address`/`ptype`/`area`/`year`
-… tragen keinen Marker … die CSS-Regel `.wm-f.fehlt` existiert, aber die
-Klasse `fehlt` wird nirgends gesetzt — gebaut und nie verdrahtet. Vorschlag,
-noch nicht gebaut."* **Das beschreibt den Stand vor `v1199`.** Gemessen:
-`mb-stufen.js` markiert seit `v1199`/`v1201`/`v1202` jedes offene Feld aller
-Stufen bis zur gewählten mit `mbst-fehltfeld` und hängt eine Zeile
-„fehlt für <Stufe>" ans Feld — in **Gold**, also Marcels Variante B.
-
-> Die alte Regel `.wm-f.fehlt` war **rot** — die Farbe der Variante, die
-> Marcel *nicht* gewählt hat. Sie ist mit `v1213` entfernt, an ihrer Stelle
-> steht die Begründung im Code. **Eine tote Regel in der Farbe der
-> verworfenen Variante ist die schlechteste Sorte Leiche: sie sieht aus, als
-> müsste man sie nur noch anschließen** — und genau so hat sie wochenlang
-> diesen Backlog-Punkt offen gehalten.
-
-**b) Die Konvention für fehlende Score-Teilwerte gehört entschieden.**
-`v1197` setzt „unbekannt" auf den **neutralen** Wert und nennt ihn im UI
-„geschätzt". Die Alternative wäre, den Teilwert **wegzulassen und die
-übrigen Gewichte hochzunormieren** — fachlich ebenso vertretbar und fällt
-anders aus. Im Code steht bewusst die Konvention, die die Datei ohnehin
-dokumentiert. **Das ist eine Bewertungsfrage, also Marcels.**
-
-**c) Der Ergebnis-Teil ist weitgehend geprüft.** Nachgerechnet am frischen
-Bericht 83 (Stufe 3, 03.09.2026), Zeile für Zeile: **Bodenwert**,
-**Sachwert-Rechenweg** und **Ertragswert-Rechenweg** stimmen durchgängig,
-die BWK-Quote steht auf dem gesamten Rohertrag, nur der rentierliche
-Bodenwert wird verzinst. Der eine Befund daraus ist gebaut (`v1210`, siehe
-Fertig): die Hinterlandfläche rechnete mit und stand in keiner
-Stammdatenzeile. Der **PDF-Export** ist mit `v1206`–`v1210` durch.
-
-**Damit ist 1c abgearbeitet.** Auch die **Vergleichspreise** und
-„**Wertverfahren im Vergleich**" sind geprüft (`v1212`, siehe Fertig): die
-Verfahrenswahl ist fachlich sauber — nicht gemittelt, führendes Verfahren
-mit Begründung und Quelle. Bei den Vergleichspreisen fielen drei Befunde an,
-alle behoben.
-
-**d) Der PDF-Bericht ist durchgesehen und mehrfach umgebaut — erledigt.**
-Marcel hat den eigenen Export zweimal gelesen, ich ihn zweimal ausgelesen.
-Gebaut: 03 und 04 zu einer Sektion (`v1206`) · 01 entschlackt und ein
-Waisen-Umbruch behoben (`v1207`) · die Lage zu einem Kapitel gebündelt
-(`v1208`) · die Textvorgabe „jede Zahl genau einmal" (`v1209`, an einem
-echten Bericht abgenommen) · Hinterlandfläche in den Stammdaten (`v1210`) ·
-die Plausibilitätswarnungen erreichen Bericht und PDF (`v1211`) · die
-Vergleichstabelle nennt ihre Auswahl (`v1212`). **„195.000" steht 4× im
-Dokument statt 10×**, das Inhaltsverzeichnis führt 10 Abschnitte statt 13.
-
-**Offen und bei Marcel — nur noch eines:**
-
-1. **„Aussagekraft: Mittel · 59 %"** steht in 01 unter dem Score-Ring **und**
-   vollständig als Block in 03. Die kurze Zeile in 01 bezieht sich auf den
-   Score, der Block in 03 auf den Marktwert — zwei Aussagen mit demselben
-   Wortlaut und derselben Zahl. Ob das eine Dopplung ist oder zwei richtige
-   Angaben, ist eine Produktfrage.
-
-> **Zwei Punkte, die hier standen, sind erledigt:** die **Gliederung**
-> (Marcel wählte Stufe 1, gebaut als `v1208`) und der **Fließtext des
-> KI-Berichts** (`v1209`, am echten Bericht 85 abgenommen: Abschnitt C nennt
-> keine Zahl aus A mehr).
->
-> **Die Mietfrage war eine falsche Prämisse — meine.** Der Ertragswert
-> rechnet längst mit 7,67 €/m², nicht mit 4,89. Die A/B/C-Frage ist
-> zurückgenommen; siehe Journal zu `v1207`.
-
-**Positiv aufgefallen und nicht angetastet:** die Verfahren kennzeichnen
-sich selbst — „SACHWERT 268.172 € · **vorläufig · ohne Sachwertfaktor,
-kein Marktwert**" mit einem „warum vorläufig?"-Aufklapper. Und die
-Herkunftsvermerke sind da: „bwk-quote: 27 % (**Stufe A**)",
-„wertparameter: LZS 2,2 % (**Stufe A**)". Das ist genau die Disziplin, die
-`CLAUDE.md` verlangt.
-
-### Was sonst offen liegt und nicht vergessen werden darf
-
-> **Nur noch echte Offenposten.** Bis zum 02.09.2026 standen hier auch fünf
-> längst erledigte Zeilen (Selbstsprung, `v1198`, Bewertungsskala,
-> Feldmarkierung, Deploy-Skript). **Eine Liste offener Punkte, in der die
-> Hälfte fertig ist, wird nicht mehr gelesen.** Alles Erledigte steht unter
-> Fertig.
-
-**Entscheidungen, die bei Marcel liegen**
-
-
-- **Die Score-Konvention für fehlende Teilwerte** (`v1197`): neutral
-  ersetzen — so gebaut — oder den Teilwert weglassen und die übrigen
-  Gewichte hochnormieren.
-- **Anbieter-Neutralität:** `CLAUDE.md` verlangt, Sprengnetter und
-  PriceHubble nie namentlich nach außen zu nennen. **Im Boarding-Pass stehen
-  beide mit Logo.**
-- **„Solide" steht zweimal nebeneinander** — klein im Ring, groß als
-  Überschrift. Ein Einzeiler in beide Richtungen.
-
-**Beweise, die noch fehlen**
-
-
-
-- **Der `402`-Pfad ist nicht end-to-end bewiesen.** Serverseitig gelesen,
-  frontendseitig gemessen; der Beweis unter echten Bedingungen braucht einen
-  `UPDATE ai_credits_user` auf Staging — **der DB-Eingriff wurde von der
-  Umgebung blockiert.**
-- **Ein echter Kauf ist auf dem reparierten Weg nie durchgelaufen.** Der Weg
-  ist ausgelesen, der Türsteher greift ohne Netzaufruf — eine Stripe-Sitzung
-  wurde nie gestartet.
-- **Die Spracheingabe wartet auf einen echten Sprechlauf am Gerät**
-  (`v1168`/`v1169`/`v1170`).
-- **Eine echte Erinnerungsmail ist noch nie rausgegangen.**
-
-**Bestand, der ansteht**
-
-- **`gold-audit.py` liefert RC=1** — 463 harte Gold-Literale in 55 Dateien.
-  Bestand, nicht aus dieser Sitzung. **Entweder die 463 abarbeiten oder die
-  Regel in `CLAUDE.md` präzisieren** („RC=0 ist sauber" stimmt seit Längerem
-  nicht).
+- **Entscheidung Marcel offen:** Score-Konvention für fehlende Teilwerte (`v1197`: neutral ersetzen — so gebaut — oder weglassen und hochnormieren).
+- **Entscheidung Marcel offen:** „Aussagekraft: Mittel · 59 %" steht in 01 (Score) und 03 (Marktwert) — Dopplung oder zwei Angaben?
+- **Entscheidung Marcel offen:** „Solide" zweimal nebeneinander (Ring und Überschrift).
+- 402-Pfad unter echten Bedingungen nicht end-to-end bewiesen; ein echter Kauf auf dem reparierten Weg nie durchgelaufen.
+- Eine echte Erinnerungsmail ist noch nie rausgegangen.
 
 ## → ARCHIV: Übergabe 2026-08-31, nach dem Prod-Rollout
 
-**Stand:** lokal = GitHub = Staging = **Produktion** auf `28f8ab1`.
-Migrationen **69** auf beiden Servern. **Nichts hängt halbfertig.**
-
-**Zweiter Prod-Rollout am 01.09. gegen 02:35** — `v1189` (Admin-Route),
-`v1190`/`v1190b` (flache Kopfleiste). Keine neue Migration, zwei
-Backend-Dateien, Rebuild gelaufen. Backup vorher:
-`/root/backups/dealpilot_db-vor-v1190-20260901-0233.sql` (12 MB,
-60 Tabellen). **Abgenommen auf `app.dealpilot.immo`:** nur noch eine
-`start-pro-trial`-Route · `gewaehreTestpaket` kennt `erneuern` · Preise
-unverändert (1999 / 7999) · null Fehler im Log · bei 820 px startet die
-Leiste eingeklappt, die Kurzfassung „83 · Gut" steht in Grün
-(`rgb(94,217,146)`) und verschwindet beim Aufklappen · bei 1400 px
-bleibt alles ausgeklappt.
-
-**Produktion ist am 31.08.2026 gegen 21:40 ausgerollt worden** — der
-erste Rollout seit dem 14.08., 58 Commits. Preise live: Starter 19,99 ·
-Investor 39,99 · Pro 79,99 · Partner 99. Backups beider Datenbanken
-liegen unter `/root/backups/*-vor-v1186-20260831-2135.sql` (12 MB
-Haupt-DB, 14 MB Marktbericht-DB, beide auf Inhalt geprüft).
-
-> **Die sieben zahlenden Bestandskunden zahlen unverändert weiter.**
-> Ihre Stripe-Abos hängen an der alten Price-ID; eine Preisänderung in
-> `plans` betrifft nur Neuabschlüsse. Sie **sehen** aber ab sofort die
-> neuen, niedrigeren Preise. Marcels Entscheidung: Rollout jetzt,
-> Ansprache bei Nachfrage.
-
-**Punkt 1 und 2 der letzten Übergabe sind erledigt** (v1184), und die
-Testphase ist auf Marcels Entscheidung hin umgebaut (v1185).
-
-**Zur Abnahme auf Staging:** ein neues Konto läuft jetzt vier Wochen als
-Pro und trägt ein einmaliges Paket aus 5 Marktpreisindikationen, 3
-erweiterten und 1 Wertermittlung, das mit der Testphase verfällt. Zwei
-Erinnerungsmails (Halbzeit, kurz vor Ablauf) hängen am täglichen
-Retention-Lauf. Sie sind mit abgefangenem Versand geprüft — **eine
-echte Mail ist noch nie rausgegangen.** Das ist der eine Punkt, den
-nur ein Blick ins Postfach abschließt.
-
-### v1189 (01.09., `c411ba4`) — zwei Routen auf einem Pfad, die gefährliche gewann
-
-`routes/admin.js` registrierte `/users/:id/start-pro-trial` **zweimal**.
-Express nimmt die erste — also lief seit v811b die alte, und die neue,
-ausdrücklich als deren Ersatz gebaute, war unerreichbar. Von außen nicht
-zu sehen: derselbe Pfad, dieselbe Antwortform.
-
-**Was die alte tat:**
-
-```sql
-UPDATE subscriptions SET status='canceled' … WHERE status IN ('active','trialing')
-```
-
-Sie kündigte **jedes aktive Abo**, bevor sie ihren Pseudo-Trial als
-`subscriptions`-Zeile anlegte. Bei einem zahlenden Kunden: die App sieht
-ihn als Testnutzer, **Stripe bucht unverändert weiter**, und nach Ablauf
-des Tests fällt er auf Free — während er zahlt. Ein Admin, der jemandem
-etwas Gutes tun wollte, hätte ihm sein Abo genommen.
-
-**Gemessen, bevor etwas geändert wurde:** `admin_audit_log` führt auf
-beiden Servern **null** Einträge mit `user.pro_trial`, keine
-Pseudo-Trials, keine fälschlich gekündigten Abos. **Die Falle war
-scharf, aber nie ausgelöst** — nichts zu reparieren.
-
-**Geprüft (Container, echter HTTP-Weg mit `X-Admin-Token`):** Abo bleibt
-`starter/active` · `plan_trials` 21 Tage · Testpaket 5/3/1 kommt an ·
-effektiver Plan bleibt `starter`, weil bezahlt die Testphase schlägt ·
-Audit-Eintrag mit Paket.
-
-> **Ein Umweg im Prüflauf, der eine Lehre trägt:** Der erste Anlauf
-> meldete „Audit: KEIN EINTRAG", und das sah nach einem Produktfehler
-> aus. Es war meiner: `admin_audit_log.admin_user_id` zeigt auf
-> **`admin_users`**, nicht auf `users` — ich hatte das Token mit einer
-> `users`-ID signiert, und der Fremdschlüssel schlug zu. **Ein Prüfaufbau,
-> der einen Nebenweg nachbaut statt ihn zu benutzen, misst sich selbst.**
-
-### v1187 / v1188 (01.09., `5b688e3` + `063b202`) — **auf Prod nachgezogen**
-
-**Abgenommen auf `app.dealpilot.immo`:** der Kostenhinweis lautet
-„Kosten: 1 Marktpreisindikation" (kein Kerosin, kein Differenz-
-Versprechen), das Kaufangebot bei leerem Kontingent zeigt „Eine
-Wertermittlung nach ImmoWertV kaufen · 3,90 €" — der Betrag kommt aus
-dem **Live**-Stripe-Konto, was nebenbei beweist, dass
-`/credits/bewertungen` dort trägt. Alle zehn v1188-Dateien geladen,
-keine Konsolenfehler. Reines Frontend, kein Rebuild nötig.
-
-**Nach dem Rollout gesucht, was der Kunde jetzt wirklich liest.** Vier
-Stellen sprachen weiter von Kerosin — der Währung, die v1183 abgeschafft
-hat und die seit dem Rollout auch live weg ist. v1183 hatte „kein
-Kerosin mehr im sichtbaren Text" gemeldet und im Browser gegengelesen:
-**offenbar nur in der Haupt-App, nicht in der Marktbericht-App und nicht
-in den Fehlerpfaden.**
-
-**Der teuerste Text stand im Bestätigungsdialog des Marktberichts**, den
-der Kunde vor jedem kostenpflichtigen Abruf abnicken muss:
-
-> *„Kosten: 5 L Kerosin … Wurde für dieses Objekt schon eine niedrigere
-> Stufe bezahlt, wird nur die Differenz abgebucht."*
-
-**Beides falsch.** Gemessen in `routes/marktbericht.js:100` gibt
-`_faelligeStufe()` entweder **0** zurück (schon bezahlt, kostet nichts)
-oder die **volle** Stufe. Eine Differenz gibt es seit v1183 nicht mehr —
-wer von Stufe 1 auf 3 vertieft, zahlt eine ganze Wertermittlung. **Ein
-Preisversprechen, das der Server nicht einlöst.**
-
-**Zwei weitere Texte warnten vor Kosten, die es nicht gibt:** der
-Beleg-Import ist seit v1183 im Plan enthalten (`ai.js:1058`, nur noch
-`logExtract`), der Hinweis nannte „1 L Kerosin". Ein Kostenhinweis vor
-einer kostenlosen Funktion hält Nutzer davon ab, sie zu benutzen.
-
-**Dazu der letzte offene Schritt des Preismodells** (Punkt 1, Schritt 5):
-der **Einzelkauf am gesperrten Knopf**. Ein leeres Kontingent endete in
-„Keine Wertermittlung mehr frei." — Punkt, keine Fortsetzung, vor einem
-fertig ausgefüllten Formular. Jetzt bietet die 402 genau die fehlende
-Bewertung an, mit Preis aus `/credits/bewertungen` (also aus Stripe,
-statt als fünfte Kopie derselben Zahlen im Quelltext). Die Weiterleitung
-geht auf `window.top` — die Seite läuft im iframe, und Stripe verweigert
-die Anzeige im Rahmen.
-
-**v1188 — Umlaute, 17 Stellen.** Marcels Hinweis galt der Mail, gilt
-aber überall. Vier der 17 hatte ich in v1187 selbst frisch eingebaut.
-
-> **Was dabei NICHT angefasst wurde, und das ist der Punkt:** zwischen
-> dem Nutztext stehen **Datenschlüssel derselben Schreibweise** —
-> `erhoeht:` in `ki-miete.js`, `me_anz`/`me_int`/`me_pct` in
-> `voice-import.js`, `weitere_maengel` als `data-state`,
-> `prognose_naechstes_jahr_pct`. **Wer die mitkorrigiert, zerstört
-> gespeicherte Objekte.** Bei `voice-import.js` wurden nur die Labels
-> geändert, die Schlüssel stehen unverändert daneben — im Diff
-> gegengelesen.
-
-**`kerosin-confirm-lage.js` bleibt unangetastet** — die Datei wird
-nirgends geladen und nirgends gerufen. In diesem Projekt wurde einmal
-eine vermeintliche Leiche zu Unrecht gelöscht.
-
-### Der Rollout — was passiert ist, und zwei Korrekturen
-
-**Ausgeführt:** Backups → `staging` per Fast-Forward nach `main` →
-`git pull` auf Prod → Backend neu gebaut (Migrationen 064–069 liefen
-beim Start) → Preisabgleich → Abnahme im Browser.
-
-**Nachgewiesen:** `plans` trägt die neuen Live-IDs · der Webhook löst
-alle vier auf (`price_1UAMox…` → starter/monthly usw.) · der
-Bewertungs-Katalog findet alle neun Posten im Live-Konto · Landing und
-App zeigen 19,99 / 39,99 / 79,99 und die Testphase · keine
-Konsolenfehler.
-
-#### Korrektur 1 — meine Fehldiagnose zu Migration 065
-
-Ich hatte gemeldet, 065 schreibe Sandbox-Preis-IDs auf Prod und breche
-damit die Zahlung. **Das war falsch.** 065 hat einen Riegel, den ich
-übersehen hatte, weil mein `grep` genau diese Zeile nicht traf:
-
-```sql
-SELECT COALESCE(stripe_price_monthly_id,'') LIKE '%KEjyPDo0wo%' INTO ist_sandbox …
-IF NOT COALESCE(ist_sandbox, FALSE) THEN RAISE NOTICE '065: kein Sandbox-Konto…'; RETURN;
-```
-
-Auf einem Live-Konto tut sie **nichts**. Die Lehre gilt trotzdem, nur
-andersherum: **weil 065 auf Prod nichts tut, gab es überhaupt keinen
-Mechanismus, der die neuen Live-Preise einträgt.** Ohne den Abgleich
-(v1186) stünde Prod jetzt mit Anzeige 19,99 € und Abbuchung 29 € da —
-dieselbe Drei-Stellen-Falle, nur aus der anderen Richtung. **Ein
-Sicherheitsriegel, der eine Migration in einer Umgebung stilllegt,
-hinterlässt dort eine Lücke, die jemand anders füllen muss.**
-
-#### Korrektur 2 — die Portal-Konfiguration führt gar keine Preise
-
-Der alte Zettel warnte: *„Die Live-Portal-Konfiguration führt noch
-29/59/99 €."* **Gemessen stimmt das nicht.** Die Default-Konfiguration
-`bpc_1TqTylGefFev8arzlMDFfCOz` hat **kein `products`-Feld** — weder
-live noch in der Sandbox. Es gibt dort keine Preisliste, die veralten
-könnte; der Kunde sieht im Portal Rechnungen, Zahlungsmittel und
-Kündigung, aber keine Plan-Auswahl. `createPortalSession()` übergibt
-keine `configuration`, nimmt also genau diese. **Nicht angefasst** —
-ein Eingriff in eine Geld-Konfiguration ohne Not wäre falsch.
-
-> **Von den „drei Stellen" waren es also zwei:** `config.js` (Anzeige)
-> und `plans` (Abbuchung). Beide stimmen jetzt überein. Wenn Kunden im
-> Portal ihren Plan selbst wechseln können sollen, muss dort erst eine
-> Produktliste angelegt werden — das ist eine offene Produktfrage, keine
-> Rollout-Aufgabe.
-
-
-### v1185 (31.08., `dac26aa` … `37b03f5`) — vier Wochen Pro, mit Testpaket
-
-**Marcels Vorschlag:** neue Nutzer bekommen vier Wochen alle Funktionen
-aus Pro, dazu zwei Erinnerungsmails, und die Cockpit-Matrix soll es
-zeigen. **Zwei Drittel standen schon** — beim Messen kam heraus:
-
-| gefunden | Zustand vorher |
-|---|---|
-| `plan_trials` + Auto-Grant (TR7) | **7 Tage Pro ab Registrierung, gab es längst** |
-| `retentionService` | täglicher Lauf, Vorlagen, Idempotenz — **aber `listExpiring()` sucht über `subscriptions`, und ein Testnutzer hat dort keine Zeile** |
-| Kontingent im Trial | **bewusst Free-Niveau** („Kerosin wird nicht verschenkt") — der Testnutzer sah Pro, hatte 1 Indikation im Monat und **null Wertermittlungen** |
-| Trial-Vergabe | stand **zweimal** im Code, mit eigener Tagezahl je Kopie |
-| Nachkauf im Trial | gesperrt — `credits.js` las den Plan roh und sah jeden Testnutzer als `free` |
-
-**Die Entscheidung, die Geld betraf, hat Marcel getroffen:** ein
-**einmaliges** Paket (5 · 3 · 1) für das ganze Fenster, das mit der
-Testphase verfällt — nicht das Monatskontingent eines Pro.
-
-> **Warum das die teure Variante gewesen wäre, und es ist gemessen:**
-> Ungenutztes Monatskontingent wandert beim Monatswechsel in die Bank,
-> und **die Bank verfällt nie**. In vier Wochen liegt fast immer ein
-> Monatswechsel. Ein Testnutzer, der nichts tut, hätte danach als
-> Free-Nutzer **dauerhaft bis zu 15 Wertermittlungen auf Vorrat** gehabt
-> — und je nach Anmeldedatum zwei Monatskontingente statt einem.
-
-**Entwarnung bei den Fremdkosten:** die teuren Partner-Abrufe (5,90 /
-9,90 €) hängen an `avm_a`/`avm_b` und sind vom Monatskontingent
-getrennt. Auch ein Testnutzer muss sie kaufen. Was die Testphase
-verschenkt, ist eigene Rechenzeit.
-
-**Gebaut:** Migration 068 (eigener Topf `testphase_*` + `testphase_bis`,
-verfällt, wandert nie in die Bank) · `consumeArt()` zieht in der
-Reihenfolge ab, in der etwas verfällt (Monat → Testphase → Bank) ·
-Migration 069 + dritte Retention-Stufe mit zwei Vorlagen · eine einzige
-Vergabefunktion `userService.gewaehreTestphase()` · Nachkauf über den
-**effektiven** Plan · Matrix, Feature-Tabelle, Free-Karte und Landing.
-
-**Drei Nachbesserungen kamen erst beim Nachmessen im Browser** — alle
-drei derselbe Fehlertyp, *zwei Texte für dieselbe Aussage*:
-
-- `v1185b` Datum: `toLocaleDateString('de-DE')` liefert „12.9.2026" ohne
-  führende Null. Die Auslauf-Mail hatte das seit v799.
-- `v1185c` Die Boarding-Pass-Karte filtert seit v1176 **alles mit
-  „/ Monat" aus der Feature-Liste**, weil die Kontingentzeile separat
-  darübersteht. Die neue Testphasen-Zeile fiel genau in diesen Filter
-  und war auf der Karte unsichtbar.
-- `v1185d`/`e` Der Fußtext behauptete weiter „verfällt nicht", während
-  die Zellen darüber schon „5 aus der Testphase" zeigten.
-
-**Nachweis (Container + Browser):** 28 Tage vergeben · Paket 5/3/1 ·
-Wertermittlung für einen Testnutzer erstmals nutzbar (vorher 0) ·
-Reihenfolge Monat → Testphase belegt · zweite Wertermittlung abgelehnt ·
-nach Ablauf Töpfe leer, **gekaufte 2 WEV unberührt**, nichts in die Bank
-gewandert · zweite Vergabe abgelehnt · Erinnerungen: 2 von 3 Kandidaten
-(der Zahler fällt raus), richtige Stufe je Restlaufzeit, keine offenen
-Platzhalter, zweiter Lauf schickt nichts nach · Browser: Matrix, Karte,
-Landing und Kontingent-Box.
-
-**Offen:** eine echte Mail ist nie rausgegangen (Versand im Prüflauf
-abgefangen). Und: `routes/admin.js` registriert **zweimal** denselben
-Pfad `/users/:id/start-pro-trial` (Zeile 1475 und 1495) — Express nimmt
-die erste, also den alten `subscriptions`-Weg, nicht den
-`plan_trials`-Weg. Der Admin-Trial vergibt damit **kein** Testpaket.
-Nicht angefasst, weil außerhalb des Auftrags.
-
-### v1184 (31.08., `78280ec` + `65370f3`) — der Kauf kommt an
-
-**Punkt 1 war nicht ein Defekt, sondern drei.** Der Zettel nannte nur den
-Webhook. Gemessen wurde die ganze Kette, und sie riss schon im Browser:
-
-| Stelle | was passierte |
-|---|---|
-| `settings.js:_buyCreditPack` | suchte `paket_kurz` in `aiCreditPackages` — der Liter-Liste, die v1183 stillgelegt hat. **Kein Netzwerkaufruf, nur „Credit-Pack nicht gefunden".** |
-| `POST /credits/checkout` | kannte nur `kerosin_*` und die Alt-Packs → **400 `invalid_pack`** |
-| `stripeWebhook.js` | kannte nur `type=credit_pack` → hätte in `bonus_credits` geschrieben, den Topf, den 066 stillgelegt hat |
-
-**Befund:** wer nur den gemeldeten Punkt repariert, baut zwei Drittel
-einer Kette. Der Knopf hätte danach immer noch nichts getan.
-
-**Gebaut:** `services/bewertungsKatalog.js` (löst die neun Posten zur
-Laufzeit über ihren `lookup_key` auf — keine Price-ID im Code, sie wäre
-je Umgebung immer in einer falsch), `services/bewertungWebhook.js`
-(bucht über `addKontingent()`, Menge aus den **Line Items**, nicht aus
-unseren eigenen Metadaten), Weiche in `credits.js` und
-`stripeWebhook.js`, `GET /credits/bewertungen`.
-
-**Scheitert die Gutschrift, wird geworfen, nicht geloggt.** Der Anspruch
-geht zurück auf `pending`, Stripe stellt erneut zu. Der alte
-Credit-Pack-Zweig verschluckt den Fehler — hier wäre das ein bezahlter
-Kauf ohne Ware.
-
-### v1184b — der Monatsübertrag beschenkte jeden neuen Nutzer
-
-**Punkt 2 hat beim Prüfen einen Fehler ausgeworfen, der nicht gesucht
-war.** Ein frisch angelegter Pro-Nutzer stand **vor jedem Kauf** auf
-`mpi=5 mpi_plus=5 wev=5` in der Bank — sein volles Monatskontingent,
-zusätzlich zum Monatskontingent. Der erste Monat wäre doppelt gewesen.
-
-**Ursache:** `_carryOver()` überspringt nur, wenn `kontingent_carry_at`
-im laufenden Monat liegt. Bei `NULL` läuft er durch. Migration 066 hat
-die damals bestehenden Zeilen gesetzt, der Spalte aber **keinen DEFAULT**
-gegeben — und `_ensureCurrentPeriod()` legt neue Zeilen mit
-`INSERT (user_id)` an.
-
-> **Eine Datenmigration heilt den Bestand, nicht die Zukunft.** Wer
-> Zeilen per `UPDATE` nachzieht, muss fragen, wer die nächste Zeile
-> anlegt. Migration 067 setzt den DEFAULT, der Riegel in `_carryOver()`
-> bleibt zusätzlich — Prod hat 067 noch nicht.
-
-**Nachweis (Container, gegen die Sandbox):** Katalog neun Posten ·
-`/credits/checkout` liefert echte Sitzungen statt 400 (`paket_gross`
-3990 ct → 15/10/3; `mpi` 90 ct → 1) · Webhook bucht 5/5/5 → 20/15/8,
-Doppellauf bucht nicht noch einmal · Übertrag: 2 von 5 verbraucht → 3
-wandern, `used` auf 0, Deckel bei 15 hält, 40 Gekaufte bleiben
-ungekürzt · Browser: `settings.js?v=v1184`, Türsteher findet alle SKUs,
-Knopf endet auf `checkout.stripe.com` mit 7,90 € / 5 · 2 · 0.
-
-**Auf Staging stehen zwei Prüfnutzer** (`v1184-pruef@dealpilot.test`,
-`v1184-carry@dealpilot.test`, beide Pro). Die zwei unbezahlten
-Test-Sitzungen auf Marcels Konto sind wieder entfernt.
-
-**Eine Produktfrage bleibt offen — sie ist Geld, deshalb nicht geraten:**
-**Darf ein Free-Nutzer einzelne Bewertungen kaufen?** Heute nicht: der
-Bewertungs-Weg übernimmt die Sperre des Kerosin-Kaufs unverändert
-(`upgrade_required` ab Free). Das passt zur alten Begründung „Kerosin nur
-ab Starter", aber nicht unbedingt zu v1176 („der Knopf, an dem gerade
-eine Bewertung fehlt, verkauft genau diese eine"). Ein Free-Nutzer hat
-eine Marktpreisindikation im Monat und sieht danach eine Wand.
-
-### Erledigt in der Runde davor — Stripe steht, Migrationen laufen
-
-**Der Konnektor funktioniert.** Lesen und Schreiben, Test und Live. Drei
-Kontexte meldet er: `acct_1TWXFdGefFev8arz` (Haupt, live + test) und
-`acct_1TWXFqKEjyPDo0wo` (Sandbox, nur test).
-
-> **Gemessen, und es ist der Punkt, an dem man sich sonst vertut:**
-> **Staging rechnet gegen die Sandbox `acct_1TWXFqKEjyPDo0wo`**, nicht
-> gegen das Hauptkonto. Nachweis: `sk_test`, und die Seat-Preis-IDs in der
-> `.env` tragen das Kürzel `KEjyPDo0wo`. Wer im Hauptkonto Test-Preise
-> anlegt, legt sie im falschen Konto an — dort liegen bereits welche aus
-> einer früheren Sitzung, die **nichts** erreichen.
-
-**19 Objekte in der Sandbox angelegt** (Produkte wiederverwendet, Preise
-neu — Stripe-Preise werden nie geändert; die alten bleiben aktiv, damit
-laufende Test-Abos nicht ins Leere zeigen):
-
-| Was | monatlich | jährlich |
-|---|---|---|
-| Starter | `price_1UADtaKEjyPDo0woWc7P2BpP` 19,99 | `price_1UADteKEjyPDo0woJ4PSCR07` 199 |
-| Investor | `price_1UADtSKEjyPDo0wofNZrGqv7` 39,99 | `price_1UADtTKEjyPDo0wopW2KaUWB` 399 |
-| Pro | `price_1UADtUKEjyPDo0woUb9HGnH9` 79,99 | `price_1UADtUKEjyPDo0wo9lIM0Jss` 799 |
-| Partner | `price_1UADtjKEjyPDo0wojizmUVQe` 99 | `price_1UADtnKEjyPDo0wos33wfja3` 990 |
-| Seat (Volume 24/19/15) | `price_1UADttKEjyPDo0woyrz1dd2t` | `price_1UADtyKEjyPDo0woHp82HVWE` |
-
-Die neun Einmalkäufe tragen **`lookup_key`** und gehören deshalb **nicht**
-hartverdrahtet in Code oder Migration — zur Laufzeit über den Schlüssel
-auflösen, dann stimmt jede Umgebung von selbst:
-`dp_paket_kurz` 7,90 · `dp_paket_mittel` 19,90 · `dp_paket_gross` 39,90 ·
-`dp_paket_max` 69,90 · `dp_einzeln_mpi` 0,90 · `dp_einzeln_mpi_plus` 1,90 ·
-`dp_einzeln_wev` 3,90 · `dp_einzeln_avm_a` 5,90 · `dp_einzeln_avm_b` 9,90.
-
-**Migration 064 und 065 sind ausgeführt.** `plans` führt jetzt 1999/3999/
-7999/9900, die sechs Kontingent-Spalten stehen, und **drei Bestandsnutzer**
-haben ihr Bonus-Guthaben nach `mpi_bank` übertragen bekommen.
-
-**Kettenprüfung bestanden** — vier echte Checkout-Sitzungen aus dem
-Container, mit dem Schlüssel der App: Starter 1999 · Pro-Jahr 79900 ·
-`paket_gross` 3990 · **Partner + 12 Seats = 32700**. Die letzte Zahl ist
-der Beweis, dass die Volume-Staffel greift: 9900 + 12 × 1900, weil 12 in
-Stufe 2 fällt. Der Plans-Endpunkt liefert die neuen Beträge vorn an.
-
-### Der Defekt, der dabei herausfiel — und die Falle dahinter
-
-`plans.partner` trug auf **Staging** die **Live**-IDs
-`price_1TtM0CGefFev8arz…`, während Staging mit `sk_test` läuft. Ein
-Partner-Checkout konnte dort nie funktionieren; Stripe kennt eine
-Live-Preis-ID unter einem Test-Schlüssel nicht.
-
-**Ursache: Migration `061_partner_stripe_live.sql` schreibt die Live-IDs
-bedingungslos in JEDE Datenbank.** Migrationen laufen auf Staging *und*
-Prod — eine hartverdrahtete ID ist deshalb immer in einer der beiden
-Umgebungen falsch.
-
-`065` macht es anders, und das ist das Muster für jede weitere:
-**sie hängt an der Umgebung, nicht am Zeilenzustand** — sie greift nur,
-wenn die `starter`-Zeile eine Sandbox-ID (`…KEjyPDo0wo…`) trägt. Auf
-Produktion passiert nichts.
-
-### Die Live-Preise sind angelegt (31.08.2026, auf Marcels „ja")
-
-Dieselben 19 Objekte in `acct_1TWXFdGefFev8arz` **livemode**. Produkte
-wiederverwendet, Preise neu; die alten bleiben aktiv, damit laufende Abos
-nicht ins Leere zeigen. **Es wurde niemandem etwas berechnet** — ein neuer
-Preis ändert an bestehenden Abonnements nichts.
-
-| Was | monatlich | jährlich |
-|---|---|---|
-| Starter | `price_1UAMoxGefFev8arzxhNJKezR` | `price_1UAMp2GefFev8arzUOV1rcLo` |
-| Investor | `price_1UAMp7GefFev8arzPddgtbMM` | `price_1UAMpBGefFev8arzs3KC4CqW` |
-| Pro | `price_1UAMpGGefFev8arzroVRW3vZ` | `price_1UAMpKGefFev8arzcbN6CqZh` |
-| Partner | `price_1UAMpPGefFev8arzbrdeoAyp` | `price_1UAMpUGefFev8arz4r7m3Zdn` |
-| Seat (24/19/15) | `price_1UAMpaGefFev8arz1LjirhgR` | `price_1UAMpfGefFev8arzabgaK2pD` |
-
-Neue Live-Produkte: `prod_VAiGIq7PExYzY5` (Bewertungs-Paket),
-`prod_VAiG7Wp5IH4LAM` (Bewertung · einzeln).
-
-### Die Falle aus 061 ist strukturell geschlossen: `lookup_key`
-
-**Beim Vorbereiten von 066 fiel auf, dass eine ID-Migration gar nicht
-sicher zu schreiben ist.** Die Seeds (003/008/014) schreiben **nie** eine
-Stripe-ID — bei einer frischen Datenbank stehen die Spalten auf `NULL`.
-Es gibt also keinen verlässlichen Zustand in der Zeile, an dem eine
-Migration die Umgebung erkennen könnte. Jede Bedingung wäre geraten
-gewesen — genau der Fehler, den 061 gemacht hat.
-
-**Deshalb tragen jetzt alle 19 Preise in BEIDEN Konten denselben
-`lookup_key`:**
-
-```
-dp_plan_starter_monthly   dp_plan_starter_yearly
-dp_plan_investor_monthly  dp_plan_investor_yearly
-dp_plan_pro_monthly       dp_plan_pro_yearly
-dp_plan_partner_monthly   dp_plan_partner_yearly
-dp_seat_monthly           dp_seat_yearly
-dp_paket_kurz · dp_paket_mittel · dp_paket_gross · dp_paket_max
-dp_einzeln_mpi · dp_einzeln_mpi_plus · dp_einzeln_wev
-dp_einzeln_avm_a · dp_einzeln_avm_b
-```
-
-**Der Schlüssel ist umgebungsblind.** Wer mit dem Sandbox-Schlüssel danach
-fragt, bekommt die Sandbox-Preise; wer mit dem Live-Schlüssel fragt, die
-Live-Preise. Keine Migration muss mehr wissen, wo sie läuft.
-
-**Nachgewiesen** aus dem Container mit dem Schlüssel der App:
-**19 von 19 aufgelöst**, alle Beträge korrekt (`stripe.prices.list
-{lookup_keys}` — Achtung, **höchstens 10 Schlüssel je Abfrage**, sonst 400).
-
-### Der Durchstich im Browser (31.08.) — vier Befunde, drei behoben
-
-Gemessen auf `app.staging.dealpilot.immo`, angemeldet als Marcel, Plan
-**Partner**. Die App liegt **nicht** auf `staging.dealpilot.io` — die
-Domains stehen in der `.env` als `APP_DOMAIN`/`LANDING_DOMAIN`.
-
-**1 · Das Stripe-Kundenportal führte eine eigene, alte Preisliste. BEHOBEN.**
-Der Knopf „Plan wechseln" führt nicht in einen Checkout, sondern ins
-Stripe-Kundenportal — und das bot **29 / 59 / 99 €** an, während die App
-19,99 / 39,99 / 79,99 zeigte. Wer gewechselt hätte, hätte den alten Preis
-gebucht.
-
-> **Die Portal-Preisliste hängt an der Billing-Portal-Konfiguration
-> (`bpc_…`), nicht an den Produkten.** Sie war überhaupt nicht gesetzt
-> (`features.subscription_update.products` war leer) und kam aus einer
-> unsichtbaren Dashboard-Voreinstellung. Jetzt explizit gesetzt — damit ist
-> sie auslesbar und steuerbar. Nachgemessen im Portal: monatlich 19,99 /
-> 39,99, jährlich **199 / 399 / 799**. Pro steht weiter auf 99, weil Stripe
-> für die *laufende* Position immer den gebuchten Preis zeigt.
-
-**Für Produktion gilt dasselbe und ist noch offen** — die Live-Portal-
-Konfiguration führt weiter 29/59/99. Sie darf erst mit dem Prod-Rollout
-umgestellt werden, sonst zeigt die alte Prod-App 29 € und das Portal 19,99.
-
-**2 · Jeder zahlende Kunde sah „0 € / Monat". BEHOBEN (`v1182`).**
-Die Karte „DEIN AKTUELLER PLAN" sagte *„Partner · 0 € / Monat · 10
-KI-Credits einmalig · 1 Objekt"* — während Stripe 99,00 € abrechnete.
-Keine Preisfrage, sondern zwei Namensformen: `settings.js` las
-`plan.name` / `plan.priceMonthly` / `plan.maxObjects`, die Pläne führen
-aber `label` / `price_monthly_eur` / `limits.objects`. **Kein einziger Plan
-hatte je einen der drei gelesenen Schlüssel** — der Block ist seit v234.1
-nie eingesprungen, und es betraf Starter, Investor und Pro genauso.
-Gedeckt wurde es davon, dass der Planname auf den großgeschriebenen
-Schlüssel zurückfällt und deshalb richtig aussah.
-Jetzt: *„Partner · 99 € / Monat · 5 Bewertungen / Monat · Unbegrenzte
-Objekte"*.
-
-**3 · Der Kerosin-Kasten stand dauerhaft auf „Lädt…". BEHOBEN (`v1182c`).**
-Ein halber Umzug: das Markup mit `#set-ai-credits-host` wird seit
-v611-kerosin im **Plan**-Reiter gebaut, der Füller hing weiter an
-`pane === 'api'`. `v1182b` nahm `'plan'` auf und änderte **nichts** —
-weil das Markup **nach** dieser Stelle eingesetzt wird. Erst
-`setTimeout(40)` griff, wie es der DealScore-Zweig seit V63.21 tut.
-Dazu ein `catch`: ohne das endete jeder Fehlschlag wieder unsichtbar in
-„Lädt…".
-
-**4 · Der Plan-Wechsler kennt Partner nicht.** OFFEN.
-Er bietet Free / Starter / Investor / Pro. Ein Partner findet dort weder
-seinen eigenen Plan noch einen Weg heraus. Ursache ist beabsichtigt
-(`plans.partner` steht auf `is_public=false`, `is_listed=false`), die
-Folge ist es nicht.
-
-**Dazu zwei kleinere Beobachtungen:**
-- `/api-keys/ensure` antwortet einem **Partner** mit *„API-Keys erfordern
-  einen aktiven Pro-Plan"*. Genau die `PRO_FAMILIE`-Falle, vor der
-  `config.js:594-606` warnt — hier ist sie noch nicht angewandt.
-- **Chrome füllt `#set_user_name` bei jedem Öffnen der Einstellungen mit
-  der E-Mail**, und die Maske hat Auto-Save. Ich habe es jedes Mal geleert;
-  das Feld braucht ein `autocomplete="off"`.
-
-> **Messfalle, zweimal getreten, damit sie nicht ein drittes Mal kostet:**
-> Die Reiter sind `.st-tab[data-tab="plan"]` mit `onclick="_swSet(this)"`.
-> `[data-pane="plan"]` ist die **Inhaltsfläche** — ein Klick darauf schaltet
-> nichts um und lässt eine Prüfung fälschlich scheitern.
-> **Und im verborgenen Tab feuert `requestAnimationFrame` nie:** der
-> ERSTFLUG-Rabatt rollt den Monatspreis per rAF herunter, also blieb bei mir
-> 19,99 statt 16,79 stehen. **Kein Defekt — nicht messbar.** In einem
-> sichtbaren Fenster müssen dort **16,79 / 33,59 / 67,19** stehen; das ist
-> mit eigenen Augen zu prüfen. Der Jahrespreis rechnet nachweislich richtig
-> (199 → 167,16).
-
-### Der Rest, und er ist Code, nicht Stripe
-
-`subscription.js:138` liest den Preis noch aus `plan.stripe_price_monthly_id`.
-**Solange das so ist, braucht Prod seine Spalten von Hand** — Stripe allein
-reicht nicht. Zwei Wege, und der zweite ist der richtige:
-
-1. **Sofort-Weg** (eine Zeile SQL auf Prod, wenn Marcel umstellen will):
-   ```sql
-   UPDATE plans SET stripe_price_monthly_id='price_1UAMoxGefFev8arzxhNJKezR',
-                    stripe_price_yearly_id ='price_1UAMp2GefFev8arzUOV1rcLo',
-                    stripe_price_id_monthly='price_1UAMoxGefFev8arzxhNJKezR',
-                    stripe_price_id_yearly ='price_1UAMp2GefFev8arzUOV1rcLo'
-    WHERE id='starter';   -- analog investor/pro/partner, IDs siehe Tabelle
-   ```
-2. **Richtiger Weg:** `subscription.js` löst über den `lookup_key` auf, die
-   DB-Spalte wird nur noch Rückfall. Dann ist das Thema für immer erledigt
-   und `061`/`065` können irgendwann weg.
-
-> **Die Warnung steht weiter:** `064` setzt die neuen **Beträge**. Läuft sie
-> auf Prod, bevor die Preis-IDs dort umgestellt sind, wirbt die Seite mit
-> 19,99 € und bucht 29 € ab. **064 und die ID-Umstellung gehören auf Prod in
-> denselben Arbeitsgang.**
-
-### Der Kontingent-Zähler ist gebaut (v1183, 31.08.) — Kerosin ist weg
-
-**Der größte offene Punkt ist erledigt.** Gezählt wird je Leistungsart,
-nicht mehr in einem gemeinsamen Litertank. Migration **066** ist
-ausgeführt, Stand der Migrationen ist **66**.
-
-| Stufe | heißt jetzt | kostete |
-|---|---|---|
-| 1 | **MPI** · Marktpreisindikation | 2 L |
-| 2 | **MPI+** · Erweiterte Marktpreisindikation | 5 L |
-| 3 | **WEV** · Wertermittlung nach ImmoWertV | 12 L |
-
-**Marcels Entscheidung dazu:** die acht kleinen KI-Hilfen (Sprache,
-Beleg, Bodenrichtwert, BMF, DS2-Vorschlag, Lage, Anreicherung, Analyse)
-plus der Verlaufstext sind **im Plan enthalten** und kosten nichts mehr.
-Eine Währung, drei Bewertungen.
-
-**Marktwert-Abrufe haben jetzt einen eigenen Bestand.** Sie kosteten 40
-bzw. 20 L — bei fünf Bewertungen im Monat wäre ein einziger Abruf das
-Achtfache des Kontingents gewesen. Die Zahlen stammten aus der Zeit, als
-100 L im Pro-Plan lagen. Im Preismodell v1176 sind sie Einzelposten
-(5,90 / 9,90 €), also gehören sie nicht in den Monatstopf.
-
-> **Die Falle, die diese Umstellung überall gelegt hat, und sie ist
-> allgemein:** `getStatus()` liefert `total_remaining` nicht mehr — und
-> **`undefined < 1` ist `false`**. Jede der sieben 402-Sperren hätte
-> danach lautlos nie mehr gegriffen, die Leistung wäre erbracht und nie
-> bezahlt worden. Dieselbe Form im Demo-Deckel (`NaN > 200` ist auch
-> `false`) und beim Co-Pilot-Tageslimit, das über das Literlimit
-> abgeleitet wurde und jeden still auf `free` gesetzt hätte.
-> **Wer ein Feld aus einer Antwort entfernt, muss jeden Vergleich
-> darauf suchen — ein toter Vergleich schlägt nicht fehl, er wird wahr
-> oder falsch.** Deshalb sind die Sperren ausdrücklich entfernt und
-> `consume()`/`addBonus()` antworten mit einem harten Nein statt mit
-> einer stillen Null.
-
-**Was in der Oberfläche anders ist**
-- Die **Tankanzeige oben rechts ist weg.** Die Pille zeigt `48 · 5 · 5`
-  in derselben Schreibweise wie die Pakete; beim Überfahren klappt ein
-  Panel auf mit Name, Monatsanteil, Gespartem und Rest je Art.
-- **Der Nachkauf war wirklich widersprüchlich, nicht nur unübersichtlich:**
-  die Kachelleiste stand als vier feste Knöpfe im HTML und trug noch
-  „10 L / 2 €", während die Karte darunter längst aus `DATA` kam und
-  „15 · 10 · 3 / 39,90 €" zeigte. Zwei Listen für dieselbe Sache. Die
-  Kacheln werden jetzt aus `DATA` gebaut.
-- Landing, `leistungsumfang.html` und `assets/pricing-plugin.js` sind
-  **alle drei** nachgezogen — derselbe Text lag dreifach im Haus.
-
-**Nachgewiesen:** Funktionslauf im Container — `consumeStufe(3)` zieht
-nur `wev` ab, `mpi` bleibt unberührt; unbekannte Art wird abgelehnt;
-stillgelegtes `consume()` antwortet mit Nein und schreibt eine Warnung;
-`addKontingent({wev:3})` schreibt gut. Im Browser: Pille, Panel,
-Kontingent-Box, Nachkauf-Streifen und Landing gegengelesen — **kein
-„Kerosin", „Liter" oder „Pilot-Anfrage" mehr im sichtbaren Text.**
-
-**Nebenbefund, unabhängig vom Auftrag:** die Landing nannte
-**PriceHubble und Sprengnetter namentlich**. CLAUDE.md verbietet das
-ausdrücklich — jetzt „unabhängige Bewertungspartner". Im **Pre-Flight-
-Streifen der App** stehen die beiden Logos weiterhin; das ist die
-Anbieter-Auswahl und war nicht Teil dieses Auftrags.
-
-### Was an diesem Umbau noch offen ist
-
-1. **Der Kauf schreibt noch nichts gut.** `addKontingent()` steht und ist
-   geprüft, aber der Stripe-Webhook ruft es noch nicht auf — er kannte
-   bisher nur Liter. Bis das hängt, füllt ein Kauf das Kontingent nicht.
-2. **Der Monatsübertrag ist ungetestet**, weil dafür ein Monatswechsel
-   nötig ist. Die Funktion ist idempotent gebaut (`kontingent_carry_at`)
-   und lässt sich vorziehen, indem man den Merker auf den Vormonat setzt.
-3. Die alten Liter-Felder (`bonus_credits`, `PLAN_LIMITS`,
-   `AI_CREDIT_PACKAGES`) stehen **bewusst** noch da — sie sind der
-   Nachweis für Bestandskunden und für v1125 die Grundlage, aus alten
-   Log-Zeilen die bezahlte Stufe zurückzurechnen.
-
-
-### Was in dieser Runde fertig wurde
-
-`v1173`–`v1179`, sechs Rollouts: Wallet-Abstände · freier Farbwähler ·
-Fassung C mit Farbton-Regler · alle Preise und Kontingente · Stufen-Wording ·
-Co-Pilot-Grenze · Bankexport-Leck · vertauschte Preis-Einordnung · fünf
-Kleinigkeiten aus dem Testbericht. Dazu vier Vorschlagsdokumente in
-`design/Vorschläge/` und der Testbericht als Punkt 7 im Backlog.
+Erledigtes s. Fertig. Reste (Stand unklar, am 25.10.2026 nicht nachgemessen):
+
+- Echte Erinnerungsmail der Testphase (Halbzeit/Ablauf) ist nie rausgegangen — Blick ins Postfach.
+- Der Plan-Wechsler kennt Partner nicht (`is_public=false`) — ein Partner findet weder seinen Plan noch einen Weg heraus.
+- `#set_user_name` braucht `autocomplete="off"` (Chrome füllt die E-Mail, Auto-Save) — am 25.10.2026 im Markup von `settings.js` noch ohne.
+- ERSTFLUG-Preise 16,79 / 33,59 / 67,19 im sichtbaren Fenster mit eigenen Augen prüfen (rAF läuft im verborgenen Tab nicht).
+- **Entscheidung Marcel offen (Geld):** darf ein Free-Nutzer einzelne Bewertungen kaufen? Plan-Wechsel im Stripe-Portal (bräuchte eine Produktliste)?
 
 ---
 
 ## → Hier weitermachen (Übergabe 2026-08-13)
 
-**Stand:** lokal = GitHub = Staging auf demselben Commit, Zweig `staging`,
-Arbeitsverzeichnis sauber. Der Parallelstrang hat am 13.08. `v1084`/`v1084a`
-ausgerollt (Ausschuss-Register, Sachwertfaktoren) — beides ist im Repo.
+Erledigtes s. Fertig. Reste (Stand unklar, am 25.10.2026 nicht nachgemessen):
 
-> **Der Prüfbefehl nach jedem Deploy liest den ZWEIG mit, nicht nur den Hash:**
-> ```
-> ssh root@116.203.214.11 'cd /opt/dealpilot && git rev-parse --abbrev-ref HEAD && git rev-parse --short HEAD'
-> ```
-> Erwartet wird `staging` **und** der eben gepushte Hash. Am 12.08. stand der
-> Server auf `main`, und fünf Pakete waren dadurch stundenlang nicht live,
-> obwohl jeder Deploy „Erfolg" meldete. Details in `FALLEN.md` Punkt 1.
-
-### An diesem Tag ausgeliefert
-
-| | |
-|---|---|
-| `v1155` | Darstellungs-Panel färbte sich mit der gewählten Farbe mit |
-| `v1156`/`b`/`c` | Grundfarbe unter aktiver Vorlage sichtbar gesperrt (Marcels Weg B) |
-| `v1157`/`b` | Der Whitelabel-Sweeper verwarf jede Nutzeränderung am Body-Inline-Stil |
-| `v1158`/`b` | Reiter tragen im hellen Modus die Tinte des Aktionen-Menüs |
-| `v1159` | Im Stapelmodus löste die **Pfeilmitte Löschen aus** |
-| `v1160` | Gate zugezogen: `market_data_fields` + `live_market_rates` bei Free auf `false` |
-| `v1161` + DB | `business`/`enterprise` gelöscht — erst vier Code-Stellen, dann die Zeilen |
-| `v1162`/`b` | **Hell/Dunkel als zwei Profile** unter „Profil & Anzeige" — hell ist `kanzlei`, kein Skin |
-| `v1163` | **Plan-Prüfmodus** — der Override wirkte nie, jetzt herabstufend. Punkt 6 wird fahrbar |
-| `v1164` | Objektnummer im Kopf: Kontrast 3,7/3,9 → **5,2/5,4** über `--uv-marke-dd` |
-| `v1165` | Garagenfeld: der **Platzhalter widersprach der Feldhilfe** |
-| `v1166` | Hinweis am Garagenfeld, wenn MEA **und** Garagenfläche gesetzt sind |
-| `v1167` | Profil-Schalter: **je Profil eigene Werte** + Markierung beim Öffnen |
-| `v1168` + Rebuild | **Checkboxen per Sprache** — vier Stellen, jede hätte still versagt |
-| `v1169` + Rebuild | Spracheingabe: **Diarisierung raus**, **Stichwort-Fenster** (9 statt 30+) |
-| `v1170` + Rebuild | **Verifikations-Pass aus** — Marcels Entscheidung, zwei Modelle statt vier |
-
-**Erledigte Backlog-Punkte:** 5 (vollständig), 6 (Werkzeug + Befunde), 9,
-10 (soweit ohne fachliche Entscheidung möglich), 7 (Rest 1).
-
-**Vier Prüfergebnisse ohne Umbau — weil es schon gebaut war:**
-die **sieben Pro-Tage** (`TR7-trial`, ab Registrierung, Objekte bleiben nach
-Tag 7 erreichbar) · die **Restlaufzeit-Anzeige** in der Plan-Pille · der
-**volle Sprach-Katalog** (`buildFullCatalog`, v519) · **B3 entwarnt** — kein
-abgefragter Feature-Schlüssel fehlt in den Plänen.
-
-> **Die Lehre dieser Runde, sechsmal bezahlt:** sechsmal „das gibt es nicht"
-> gesagt, sechsmal gab es das. Zählstand und Gegenmittel in `FALLEN.md`
-> Punkt 11. **Vor jedem „das fehlt": nach einem zweiten Weg suchen** — einer
-> `*Full*`-Variante, einem Fallback-Zweig, einer zweiten Liste.
-
-Dazu: Plan-Prüflauf mit Befundliste (Punkt 6), Backlog aufgeräumt und
-fortlaufend nummeriert, `claude/projektanweisung-hauptapp.md` mit Marcels Abendfassung
-zusammengeführt und nach **jedem** Rollout fortgeschrieben.
-
-### Der nächste Schritt ist vorbereitet, nicht angefangen
-
-**Erledigt seit dem 13.08. — der Absatz bleibt als Beleg der Entscheidung
-stehen.** Der Punkt hieß damals 5 und ist mit `v1162`/`v1167` ausgeliefert.
-
-**Punkt 5 (Hell und Dunkel als zwei Profile)** hatte seinen Entwurf:
-`design/Vorschläge/hell-dunkel-zwei-profile.html` — anklickbar, mit dem
-Schalter wie er in den Einstellungen aussähe, beiden Fassungen nebeneinander
-und **allen drei offenen Fragen beantwortet** (je Profil eigene Werte über
-`brand_display`; das kleine Logo = die kompakte Wortmarke aus `v1086`; der
-Schalter ändert **niemals Farben**, die gehören dem Partner).
-
-**Vor dem Bauen zwei Fallen, die im Entwurf stehen und teuer bezahlt sind:**
-1. Der Wechsel muss über den **Bedienweg** laufen — ein Klick löst
-   `skinNachziehen()` aus, ein `setAttribute` nicht.
-2. **`_dpDispSkin` setzt `ui_theme` auf leer**, wenn die aktive Vorlage der
-   neuen Helligkeit widerspricht. Das Profil muss die Vorlage deshalb
-   **nach** dem Skin setzen, nicht davor — sonst löscht der Skin sie sofort
-   wieder.
-
-**Was Marcel noch offen hat** (nicht von mir zu entscheiden):
-- **Punkt 3** (damals 1), Teil B: wie wird der Score flacher — braucht ein
-  Bild. Dazu der Befund, dass die Score-Zeile erst **ab 70 %
-  Datenvollständigkeit** erscheint (`calc.js:205`).
-- ~~**Punkt 4**: welcher Art soll die erweiterte Akzent-Palette sein.~~
-  **Beantwortet am 30.08.** — Fassung C, `v1175`. Siehe „Fertig".
-- ~~**Punkt 11** (Wallet): welche Angaben gehören auf die Karte.~~ **Beantwortet
-  am 14.08.** („alles, was auch im Standard drauf ist") und mit `v1173`
-  ausgeliefert — nachgezählt, es fehlt nichts. Siehe „Fertig".
-
-**Prüfstrecken auf Staging:**
-- `PRUEF_ZFH Löhner Str. 278` (`3fbb754c`) — **EFH**, Stufe 3 bezahlt.
-  **Achtung:** die bezahlte Stufe gilt nur für das Konto, das gezahlt hat
-  (`info@junker-immobilien.io`) — unter einem anderen Konto kostet derselbe
-  Bericht voll.
-- `Hermannstraße 9 Hüllhorst` (`07d89138`) — ETW, Stufe 3 bezahlt.
+- **Entscheidung Marcel offen:** Punkt 3 (damals 1) Teil B — wie wird der Score flacher; braucht ein Bild. Die Score-Zeile erscheint erst ab 70 % Datenvollständigkeit (`calc.js:205`).
+- Prüfstrecken auf Staging: `PRUEF_ZFH Löhner Str. 278` (`3fbb754c`, EFH, Stufe 3 bezahlt) und `Hermannstraße 9 Hüllhorst` (`07d89138`, ETW, Stufe 3 bezahlt) — die bezahlte Stufe gilt nur für `info@junker-immobilien.io`.
 
 ## Offen
 
@@ -13678,58 +2742,12 @@ Zu tun wären dann:
 
 
 
-### MARCELS ANTWORTEN VOM 2026-08-14 — hier steht, was jetzt gebaut werden darf
+### MARCELS ANTWORTEN VOM 2026-08-14 — Rest: Score flacher
 
-**Vier Entscheidungen sind gefallen und eine Auskunft ist da.** Damit sind
-vier Punkte entblockiert. Der nächste Durchgang fängt hier an.
+- **Offen nur noch 4 · Score flacher (damals Punkt 1B):** Marcels Rückfrage „welches Score Bild?“ — gemeint ist eine Vorgabe, wie die Score-Zeile in der Kopfleiste flacher aussehen soll. Vorher messen: die Zeile erscheint erst ab 70 % Datenvollständigkeit (`js/calc.js:205`); ein Objekt über der Schwelle laden, echte Höhe messen, dann fragen.
+- Garagenfeld, Akzentfarbe, Wallet und Speichern-Modal sind erledigt, s. Fertig.
 
-**1 · Garagenfeld (Punkt 10) → WOHNUNGSBEZOGEN. Weg A.**
-Damit ist **nichts mehr zu bauen** — `v1165` (Platzhalter) und `v1166`
-(Hinweis) setzen genau das um. `lib/nhk2010.js` bleibt unangetastet, es
-kommt **keine** MEA-Kürzung ins Feld. **Punkt 10 ist erledigt.**
-
-**2 · Akzentfarbe (Punkt 4) → beides, und die Standardtöne wärmer.**
-Wörtlich: *„freie farbwöhler und paar standard direkt als auswahl so wie
-jetzt nur etwas wärmere töne"*.
-- Der **freie Farbwähler bleibt**.
-- Die **Schnellauswahl bleibt in ihrer heutigen Form** — nur die Töne
-  werden **wärmer**.
-- **Nicht** die Anzahl ist das Thema, sondern der **Ton**. Vor dem Bauen die
-  heutigen Standardwerte auslesen und die wärmeren daneben zeigen — das ist
-  eine Optikfrage, also **Demo bauen, nicht raten**.
-- **Achtung Whitelabel:** die Vorschläge sind Nutzerwerte, keine Marke. Sie
-  dürfen **nicht** als `--wl-`Token gesetzt werden, sonst färbt der Sweeper
-  sie mit (`v1157`-Falle).
-
-**3 · Wallet (Punkt 11) → alles, was auch auf der Standardkarte steht.**
-Wörtlich: *„es muss alles drauf auch im standard drauf ist"*.
-Damit ist die Frage nach den Kartenangaben beantwortet: **kein eigener
-Umfang**, die Wallet-Fassung trägt denselben Satz wie `.sb-card`. Zu bauen
-ist also nur der **Abstand** zwischen Objektbild, Kaufpreis und „privat" —
-der ursprüngliche Befund — **ohne** dabei etwas wegzulassen.
-Die gemessene Struktur der Standardkarte steht in `CLAUDE.md`.
-
-**4 · Score flacher (Punkt 1B) → Rückfrage von Marcel: „welches Score Bild?"**
-**Meine Formulierung war schuld.** Gemeint ist **kein Bild einer Datei**,
-sondern eine **Vorgabe, wie die Score-Zeile in der Kopfleiste flacher
-aussehen soll** — sie ist die auffälligste Fläche der App, deshalb wurde
-dort nie geraten.
-**Bevor Marcel danach gefragt wird, gehört gemessen:** die Score-Zeile
-erscheint erst **ab 70 % Datenvollständigkeit** (`js/calc.js:205`), darunter
-steht nur ein Hinweisbanner. Das Prüfobjekt lag darunter — **die 251 px des
-Entwurfs sind nie nachgemessen worden.** Erst ein Objekt über der Schwelle
-laden, echte Höhe messen, **dann** fragen. Womöglich erübrigt sich die Frage.
-
-**5 · Das Speichern-Modal (Punkt 7, Rest 2) → es GIBT eines.**
-Wörtlich: *„Button ‚als Objekt speichern' im Quickboarding da geht ein Modal
-auf"*. **Mein Befund „es gibt keins" war falsch** — ich hatte nur
-`qcSaveAsObject()` in `quick-check.js` gelesen und dort keins gefunden. Der
-Weg läuft über `qc-bridge.js:172 _handleSave()` → `window.qcSaveAsObject()`;
-**das Modal muss davor oder darin liegen.** Erst den echten Klickweg im
-Browser verfolgen, dann die Auflistung dort ergänzen — **nicht** ein zweites
-Modal danebenbauen.
-
-### OFFENE ABNAHME — Spracheingabe, ein Sprechlauf am Gerät
+### OFFENE ABNAHME — Spracheingabe, ein Sprechlauf am Gerät (Stand unklar, am 25.10.2026 nicht nachgemessen)
 
 **Marcel macht das später, der Punkt bleibt bis dahin stehen.** Drei
 Änderungen warten auf genau einen echten Sprechlauf, weil sie ohne Mikrofon
@@ -13784,998 +2802,25 @@ entfällt — nicht raten.
 > 5 → **4**, Steuer-Mappe 6 → **5**, Cockpit 7 → **6**, Sachwertfaktor
 > 8 → **7**, Objektnummer 9 → **8**.
 
-1. **Marktbericht neu gestalten.**
-   **Entwurf steht: `design/Vorschläge/marktbericht-wizard.html`**
-   (2026-08-11, anklickbar, im Browser durchgeprüft).
+1. **Marktbericht neu gestalten.** — Rest (Wizard, Meilenstein-Ampel, Geldfragen, Handy-Fassung und PDF-Vermerke erledigt, s. Fertig)
 
-   > ### ERLEDIGT am 04.09.2026 — die Messung, die hier verlangt wurde
-   >
-   > Unten stand: *„aus dem, was das Backend tatsächlich braucht, nicht aus
-   > dem Bauchgefühl. Solange das nicht gemessen ist, ist jeder
-   > Freischaltzustand geraten."* **Gemessen — und der Befund lag eine Ebene
-   > tiefer** (`v1229`/`v1229b`/`v1229c`, `cd930a1` · `d994e0f` · `456a7aa`).
-   >
-   > **`ptype` und `baustatus` waren Auswahlfelder ohne leere erste Option**
-   > und standen ohne Zutun auf `ETW` bzw. `bestand`. Alle anderen öffnen mit
-   > „– keine Angabe –". Eine Pflicht, die nie leer sein kann, wird nie
-   > eingefordert — deshalb fiel auch nicht auf, dass Ampel (`BEDARF`) und
-   > Knopf (`VERFAHREN.pflicht`) den Baustatus auf **verschiedenen Stufen**
-   > führten.
-   >
-   > Fachlich zählt vor allem `ptype`: daran hängt `istWohnung()`. Ein von
-   > Hand erfasstes Haus lief still als Eigentumswohnung, **und damit
-   > erschien das Sachwertverfahren gar nicht erst** — mit der plausibel
-   > klingenden Begründung „bei Eigentumswohnung nicht anwendbar".
-   >
-   > Dazu zwei Funde beim Nachmessen: der `.dpkt`-Import setzte die Objektart
-   > **nie** (er schrieb `'haus'`/`'wohnung'` in ein Feld, das diese Werte
-   > nicht kennt — `selectedIndex -1`), und danach zog die Ampel nicht nach,
-   > weil skriptgesteuertes Füllen kein `change` feuert.
-   >
-   > **Der Rest dieses Punktes bleibt offen:** der überarbeitete Entwurf zur
-   > Meilenstein-Führung und die beiden Geldfragen. Was jetzt gemessen ist,
-   > ist die **Grundlage** dafür — welche Angabe zu welcher Stufe gehört,
-   > steht seit `v1229` an einer Stelle statt an zwei.
+   - **Hinweistext beim eigenen Sachwertfaktor:** `WertParameterService.js` gibt bei eigener Angabe weiter `hinweis: ''` (am 25.10.2026 gegrept, Z. 800). Vorher den Anzeigeweg bauen — die Karte zeigt `sachwertfaktor_hinweis` nur bei `sw.available && !sw.marktangepasst` (`app.js`), bei wirksamem eigenen Faktor also nirgends.
+   - **Abgleich eigene ↔ amtliche Angabe** — eigenes Vorhaben, hängt daran, dass `mb.valuation_inputs` überhaupt beschrieben wird.
+   - Randbedingungen: Pflichtfelder je Stufe nur in `BEDARF` (`mb-stufen.js`), keine zweite Liste; `payload()` in `wertermittlung.js` bleibt die Sammelstelle.
 
-   > ### Ist-Zustand aufgenommen am 01.09.2026 — der Wizard IST gebaut
-   >
-   > **Der Satz „Entwurf steht" darüber ist überholt und stand hier viel zu
-   > lange.** Gemessen auf Staging: `frontend/marktbericht-app/mb-wizard.js`
-   > (615 Zeilen, `v1127` → `v1172`) ist geladen und aktiv, die App zeigt
-   > **sieben Reiter** (Übersicht · Objekt · Zustand · Ausstattung ·
-   > Gebäude & Außen · Wertermittlung · Zusatzwerte) und darüber die
-   > Meilenstein-Ampel mit „fehlt: …" je Stufe. Der Weg Übersicht → Wizard →
-   > Ergebnis existiert.
-   >
-   > **Wer nur den Kopf dieses Punktes liest, hält ein fertiges Feature für
-   > einen Entwurf** — und baut es womöglich ein zweites Mal. Die
-   > ERLEDIGT-Vermerke weiter unten (`v1149`–`v1154`) sagen es, aber sie
-   > stehen 100 Zeilen tiefer.
-   >
-   > **Und die Meilenstein-Mechanik trägt** — im selben Durchgang am
-   > Testobjekt Hüllhorst (ETW, 165 m², Bj 1968) nachgemessen: mit
-   > Adresse · Art · Fläche · Baujahr springt die Ampel auf Stufe 1 und der
-   > Knopf auf „Marktbericht erstellen · 1 Marktpreisindikation"; mit
-   > Zustand und Qualität auf Stufe 2 und „· 1 Erweiterte
-   > Marktpreisindikation". Genau das, was Marcel wollte: **kein Vorab-Klick,
-   > die Stufe ergibt sich aus den Angaben, und der Knopf ist nie tot.**
+2. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner** — Rest (Prüflauf, Durchklicken, B7, B8, B9, B15 erledigt, s. Fertig)
 
-   ### `v1193` (01.09., `cd68aa0`) — die Ampel rechnete noch in Kerosin
+   - **B3/B12/B13:** was in der Plan-Zeile der DB fehlt, ist für jeden `false` — der `config.js`-Rückfall ist tot (`hasCachedFeature` liefert nie `null`). Tote/doppelte Schlüssel `export_pdf`, `bank_pdf_premium`, `bank_pdf_normal` aufräumen oder jeden Schlüssel in jedem Plan explizit führen.
+   - **B5:** `pricing-modal.js` führt die 31-zeilige Matrix zweimal (Escapes / echte Zeichen).
+   - **B10:** die Testphase (28 Tage Pro) ist auf Prod noch nie gelaufen — beim ersten echten Neukunden prüfen.
+   - **B11:** `business`/`enterprise` stehen auf Prod noch in `plans` (auf `business` nur das Demokonto `demo@dealpilot.local`) — DB-Eingriff, Freigabe Marcel.
+   - **B14:** `beleg-import.js` fragt `DealPilotConfig.hasFeature` (gibt es nicht) → kein Frontend-Gate, nur Backend-403 (am 25.10.2026 noch so).
+   - **Backend-Durchsetzung** gesperrter Funktionen per Hand-Aufruf ist nicht gemessen.
 
-   **Beim Aufnehmen des Ist-Zustands gefunden.** Die Ampel zeigte
-   **„2 L / 5 L / 12 L"** und der Knopf „Marktbericht erstellen · 12 L" —
-   Kerosin, das `v1183` abgeschafft hat und das seit dem Prod-Rollout auch
-   live weg ist. Das ist wörtlich der Befund des Testers aus
-   `Anmerkungen.docx`: *„Zweite Währung sollte unbedingt raus. Wirkt
-   undurchsichtig."*
+3. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding** — Rest (Katalog, Checkboxen, Speichern-Modal und Sanierungsbedarf erledigt, s. Fertig)
 
-   **Der Server war längst umgestellt.** `GET /marktbericht/stufenpreis`
-   liefert seit `v1183` das Feld `kosten` mit `{anzahl, art}` je Stufe und
-   sagt im Kommentar (`routes/marktbericht.js:277`) wörtlich: *„`preise`/
-   `faellig` bleiben als Liter-Felder stehen, bis der letzte alte Aufrufer
-   weg ist; sie dürfen nichts mehr steuern."* **`mb-stufen.js` WAR dieser
-   letzte Aufrufer** — er las `faellig` und zeigte Liter.
-
-   | | vorher | jetzt |
-   |---|---|---|
-   | Ampel | `2 L` · `5 L` · `12 L` | **`1 × MPI` · `1 × MPI+` · `1 × WEV`** |
-   | Knopf bei Stufe 2 | `· 5 L` | **`· 1 Erweiterte Marktpreisindikation`** |
-
-   Die Kürzel MPI / MPI+ / WEV sind **kein neues Vokabular** — sie füllen
-   schon die Kontingent-Box des Nutzers (`ai-credits.js:32`). In der Ampel
-   steht das Kürzel, weil der ausgeschriebene Name in derselben Zeile links
-   steht; am Knopf, wo links nichts steht, wird ausgeschrieben — Wort für
-   Wort wie im Bestätigungsdialog aus `v1187`.
-
-   **Dazu ist ein Preisversprechen verschwunden, das der Server nicht
-   einlöst:** *„eine höhere Stufe kostet nur die Differenz."* Genau diesen
-   Satz hat `v1187` aus dem Bestätigungsdialog entfernt, weil
-   `_faelligeStufe()` seit `v1183` entweder **0** liefert oder die **volle**
-   Stufe. In der Ampel stand er noch. Jetzt: *„diese Tiefe kostet dich nichts
-   mehr. Eine höhere Stufe wird voll berechnet."*
-
-   > **`v1187` hat vier Kerosin-Stellen gesucht und behoben — diese war
-   > nicht dabei.** Der Grund ist lehrreich: gesucht wurde nach dem **Wort**
-   > „Kerosin". Hier stand nur `p + ' L'`, zusammengesetzt aus einer
-   > Variablen und einem Buchstaben. **Eine Währung versteckt sich in ihrer
-   > Einheit, nicht in ihrem Namen.** Wer Reste sucht, muss nach der
-   > Einheit greppen und die Oberfläche ansehen — nicht nur nach dem Begriff.
-
-   **Nachgemessen auf Staging** (frisch geladen, `mb-stufen.js?v=1193`):
-   kein einziges `\d+ L` mehr im gesamten Seitentext, kein
-   Differenz-Versprechen, Ampel und Knopf wie in der Tabelle.
-
-   ### ENTBLOCKIERT — Marcels Vorgaben vom 2026-08-12
-
-   Die beiden Geldfragen, auf denen der Punkt blockiert war, sind
-   beantwortet: **abgerechnet wird beim Erzeugen, Vertiefen kostet nur die
-   Differenz.** Dazu drei neue Vorgaben: Felder klar pro Stufe abgrenzen
-   samt Zusatzfeldern · manuelle Parameter erst vermerken, bis ein Abgleich
-   möglich ist · die Preisindikation steht im PDF drei- bis viermal.
-
-   **Alles vier ist gemessen und steht in
-   `design/Vorschläge/marktbericht-stufen-und-herkunft.md`.** Kurzfassung:
-
-   - **Die Abrechnung ist schon so gebaut** (v1125/v1126) **und jetzt
-     nachgewiesen** (siehe Fertig, ohne Kerosin): Auskunft und Abbuchung
-     rechnen dieselbe Formel, und im Log steht ein echter Vorgang mit
-     **7 L = 12 − 5** für eine Vertiefung von Stufe 2 auf 3. Vollpreise
-     2 / 5 / 12 L, der Browser rechnet die Ermäßigung nicht selbst.
-     **ERLEDIGT: die Formel stand an zwei Stellen** — `v1154` führt sie in
-     `_aufpreis(stufe, bezahlt)` zusammen, Verhalten bewiesen unverändert
-     über alle 12 Kombinationen (siehe Fertig).
-   - **Pflichtfelder je Stufe stehen als eine Quelle** in `BEDARF`
-     (`mb-stufen.js`): Stufe 1 `address` `ptype` `area` `year` · Stufe 2
-     `baustatus` `cond` `quality` · Stufe 3 `plot` `units` und
-     objektartabhängig `mea` bzw. `standardstufe`+`nhkHaus`. **Keine zweite
-     Liste anlegen** — der frühere `FEHLT_TEXT` war genau das und lief
-     auseinander (v1126d).
-   - **22 Zusatzfelder hängen an der Objektart.** Sie sind im Entwurf nach
-     Gruppen aufgeschlüsselt. Drei Fallen: `ptype` gehört in die
-     Auslöserliste (v1119-WAUS), Felder mit `wenn:`-Bedingung erscheinen
-     **nur nach echter Nutzereingabe**, und `_angestrebt` in `mb-stufen.js`
-     ist eine **Untergrenze** — wer daran rührt, macht Stufe 3 wieder
-     unerreichbar (v1126c).
-   - **ERLEDIGT: die Preisindikation im PDF** — `v1149`, siehe Fertig.
-
-   ### Herkunft der manuellen Parameter — FEHLDIAGNOSE, ausdrücklich zurückgenommen
-
-   **Ich hatte gemeldet, ein manuell eingegebener Sachwertfaktor trage keine
-   Herkunft. Das ist falsch.** Die Rücknahme im Einzelnen, weil der Weg
-   wichtiger ist als der Irrtum:
-
-   Belegt war nur **eine** Stelle: in `CrossCheckService.js` hängen die sieben
-   `sachwertfaktor_*`-Felder (`_grund`, `_hinweis`, `_stuetzstellen`,
-   `_ausschuss`, `_tabellenwert`, `_korrekturen`) am Tabellenzweig, und der
-   wird bei eigenem Wert übersprungen. **Das stimmt — trägt aber die
-   Schlussfolgerung nicht.** Die Herkunft läuft über einen anderen Weg:
-
-   ```
-   WertParameterService.sachwertfaktor({nutzerwert})
-     -> { wert, stufe: 'E', quelle: 'eigene Angabe' }
-   nhk2010.js:897
-     -> out.sachwertfaktor = { wert, stufe, quelle }
-   app.js:592 ff. (Karte "Sachwert")
-     -> "marktangepasst · Faktor 1,15 · Stufe E"
-   ```
-
-   Dasselbe beim Liegenschaftszins: `ReportOrchestrator.js:404` reicht
-   `nutzerwert: ref.lzs_pct` durch, der Service antwortet mit `stufe: 'E'`,
-   `quelle: 'eigene Angabe'` **und** dem Hinweis „Liegenschaftszinssatz
-   manuell gesetzt. Für das Dossier bitte die Herkunft angeben
-   (Grundstücksmarktbericht, Jahr)." Die Ausgabe führt ihn über
-   `kern.lzs.stufe`. Meine Aussage „das Formular sendet keine Stufe, also ist
-   sie null" war falsch — **die Stufe entsteht im Backend, nicht im
-   Formular.**
-
-   Dazu gibt es `STUFEN_ETIKETT` (A–E) in `WertParameterService.js`, wo
-   **E = „eigene Angabe · vom Nutzer gesetzt · indikativ"** definiert ist.
-   Hergestellt hat das `v1144` — der Commit-Titel sagt es wörtlich: „Der
-   Sachwertfaktor wurde nie angewandt — falscher Feldname an zwei Stellen."
-
-   **Marcels Vorgabe ist damit im Kern schon erfüllt gewesen.** Es blieben
-   zwei kleine Lücken:
-
-   1. **ERLEDIGT — die Stufe fehlte im PDF** (`v1150`/`v1150b`, `e33ea05`,
-      siehe Fertig). Dabei kam ein **zweiter, größerer Fehler** heraus: die
-      Fußnote druckte die **Konstante** `assumptions.sachwertfaktor` = 1,0,
-      nicht den angewandten Faktor. Am Prüfobjekt stand „Sachwertfaktor 1"
-      im Dossier, gerechnet wurde mit **0,925**.
-   2. **Offen, aber kleiner als gedacht — der Hinweistext beim
-      Sachwertfaktor.** Der LZS gibt bei manueller Eingabe „bitte die
-      Herkunft angeben (Grundstücksmarktbericht, Jahr)", der Sachwertfaktor
-      gibt `hinweis: ''` (`WertParameterService.js:473`).
-      **Vor dem Bauen beachten — der Anzeigeweg fehlt:** die Karte zeigt
-      `sachwertfaktor_hinweis` nur unter der Bedingung
-      `sw.available && !sw.marktangepasst` (`app.js:612`). Bei einem
-      **wirksamen** eigenen Faktor ist `marktangepasst = true`, der Hinweis
-      erschiene also **nirgends**. Und in `CrossCheckService.js:245` hängt
-      `sachwertfaktor_hinweis` ohnehin nur am Tabellenweg. Ein Hinweis, den
-      niemand sieht, ist keine Verbesserung — **erst den Weg bauen, dann den
-      Text.** Der eigentliche Vermerk („Stufe E · eigene Angabe") steht seit
-      `v1150` im Dossier, damit ist Marcels Anliegen abgedeckt.
-
-   Der eigentliche **Abgleich** eigene ↔ amtliche Angabe bleibt ein eigenes
-   Vorhaben und hängt daran, dass `mb.valuation_inputs` überhaupt beschrieben
-   wird — heute passiert das nicht.
-
-   > **Die Lehre steht als Punkt 9 in `FALLEN.md`:** „Das fehlt" ist die
-   > teuerste Vermutung. Vom **Verbraucher** her suchen (wer zeigt den Wert
-   > an?), nach dem **Vokabular** greppen (`STUFEN_ETIKETT`, `'E'`) und die
-   > **Commit-Historie** nach dem Thema fragen (`git log -S`) — jedes davon
-   > hätte den Irrtum in einer Minute beendet.
-
-   ### Marcels Entscheidung vom 2026-08-11 — sie ersetzt die vom 2026-08-10
-
-   „Nummer 1 und dein Vorschlag" — also **Idee 1 (Wizard mit Reitern)**,
-   kombiniert mit **Idee 2 (lebende Vorschau)** und **Idee 6 (sichtbarer
-   Zweig)**, wie empfohlen. Wörtlich dazu:
-
-   - **Die drei Stufen sollen vereint werden**, nicht vorher abgefragt:
-     einfache Bewertung, erweiterte Marktpreisindikation und genaue
-     Wertermittlung in **einem** Weg.
-   - **Es soll übersichtlich sein.**
-   - **Am Schluss das Ergebnis wie jetzt.**
-   - **Die Übersicht bleibt vollständig:** Objekte einlesen, die Tabelle
-     der vorhandenen Marktberichte, und ein angelegtes Objekt direkt
-     auswählen. „Das ist ja quasi die Übersicht."
-
-   **Damit ist die Festlegung vom 2026-08-10 überholt** — dort hieß es noch
-   „nur die genaue Wertermittlung bekommt einen Wizard, Stufe 1 und 2
-   bleiben". Jetzt ist es **ein** Weg für alle drei.
-
-   ### Wie die Stufen vereint werden
-
-   Als **drei Meilensteine auf einem Weg** statt als Frage vorweg. Man kann
-   an jedem stehenbleiben und erzeugen:
-
-   | Meilenstein | erreicht nach | heute |
-   |---|---|---|
-   | Einschätzung | Schritt 1 | Stufe 1 · 2 L |
-   | Marktpreisindikation | Schritt 2 | Stufe 2 · 5 L |
-   | Wertermittlung | Schritt 4 | Stufe 3 · 12 L |
-
-   **Niemand muss vorher wissen, was er braucht** — und wer bei
-   „Einschätzung" anfängt, sieht am Balken, dass zwei Angaben mehr die
-   Spanne halbieren.
-
-   **Die Objektart steht in Schritt 1 und nirgends sonst**, weil
-   `istWohnung()` über **20 der 42 Felder** entscheidet. Ein Wizard, der
-   sie später fragt, müsste alles dahinter neu aufbauen.
-
-   ### Im Browser durchgeprüft
-
-   Übersicht → Wizard → Ergebnis → zurück. Zweig gemessen: **ETW ergibt
-   vier Reiter** (Feinjustierung entfällt), **Haus fünf**; `mea` ist beim
-   Haus weg. Folgefelder: `hinterlandFlaeche=828` bringt `hinterlandRent`
-   und `hinterlandWert`, **und der getippte Wert bleibt erhalten** — die
-   Fokusfalle beim Neuzeichnen ist im Entwurf schon gelöst. Kein Querlauf,
-   keine Konsolenfehler.
-
-   ~~**BLOCKIERT auf zwei Fragen, beide betreffen Geld:**~~
-   **BEIDE VON MARCEL BEANTWORTET (2026-08-13) UND GEBAUT — `v1154`.**
-   1. ~~**Wann wird abgerechnet**, wenn die Stufe sich erst am Ende ergibt?~~
-      → **Beim Erzeugen**, nach erreichter Stufe. Umgesetzt.
-   2. ~~**Darf man später vertiefen**, und was kostet das?~~
-      → **Ja, und es kostet nur die Differenz.** Umgesetzt in
-      `_aufpreis(stufe, bezahlt)`, `backend/src/routes/marktbericht.js`,
-      zwei Aufrufer.
-
-   *(Der Blockade-Vermerk stand noch, obwohl die Antworten am selben Tag kamen
-   und gebaut wurden. **Eine veraltete Blockade ist teurer als gar keine** —
-   sie führt dazu, dass eine beantwortete Frage ein zweites Mal gestellt wird.
-   Beim Abhaken einer Entscheidung immer auch den Blockade-Vermerk suchen.)*
-
-   **Was vor dem Entwurf gemessen sein muss:** welche Felder voneinander
-   abhängen. `garagenStufe` und `hinterlandRent` erscheinen nur nach echter
-   Nutzereingabe und werden bei programmatischem Setzen **nicht**
-   nachgezeichnet — ein Wizard, der das übersieht, verliert Eingaben.
-
-   **Zwei feste Randbedingungen:** die Marktbericht-App ist **immer hell**
-   und lädt `whitelabel-override.js` **nicht** (Farbe läuft über
-   `mb-whitelabel.js`). Und `payload()` in `wertermittlung.js` bleibt die
-   Sammelstelle — **eine neue Oberfläche darf die Feldnamen nicht ändern**,
-   sonst hängt der Rechenkern daran.
-
-   ---
-
-   ### Nachlese aus Marcels Durchsicht des Entwurfs, 2026-08-11
-
-   Drei Befunde am Entwurf `marktbericht-wizard.html`, dazu eine
-   Verständnisfrage, die den Ablauf betrifft — **die ist die wichtigste.**
-
-   1. **ERLEDIGT — die Schrittleiste ist zu schmal** (`v1151`, `7c716ab`,
-      siehe Fertig). Gemessen statt geschätzt: die sieben Marken brauchen
-      **902 px**, ihr Behälter stand bei **jeder** Fensterbreite auf
-      **760 px** — auch bei 1920, wo `.panel` 1300 px breit ist. Der Platz
-      war da; die Leiste begrenzte sich selbst und brach in zwei Zeilen um.
-      Ursache war ein Sammelselektor aus `v1128`, der die Leiste mit den
-      Formularzeilen zusammen auf 760 px setzte. Jetzt eigene Grenze
-      960 px → **eine Zeile ab 1024 px**.
-
-   2. **ERLEDIGT — der Erzeugen-Knopf war bei Stufe 1 gesperrt** (`v1152`,
-      `d17edac`, siehe Fertig). Die zweite Ursache ist gefunden: `ab` und
-      `genauerAb` bedeuten Verschiedenes. Ertrags- und Sachwert stehen auf
-      `ab: 1`, weil sie immer mitrechnen („nur mit Pauschalen", v1018) — ihre
-      Pflichtfelder `plot`/`units` brauchen sie erst bei `genauerAb: 3`.
-      `knopfSperren()` prüfte gegen `ab`, also verlangte Stufe 1 die Angaben
-      von Stufe 3. Nachgewiesen in beide Richtungen: bei Stufe 1 jetzt
-      klickbar mit „· 2 L", bei Stufe 3 weiterhin gesperrt.
-      **Auch die Reihenfolge der Reiter ist geprüft und stimmt:** Stufe-1-
-      Felder liegen in Reiter 2, Stufe-2-Felder in Reiter 3, Stufe-3-Felder
-      in Reiter 5 — kein Pflichtfeld der Einschätzung steckt in einem
-      späteren Schritt.
-
-      *Der historische Befund, der zur ersten Ursache führte, bleibt hier
-      stehen, weil seine Lehren gelten:*
-
-      **Der frühere Wortlaut:** „das muss ja irgendwie möglich sein."
-      **Das ist der Kern des ganzen
-      Meilenstein-Gedankens** — wer bei „Einschätzung" stehenbleiben will,
-      muss dort auch erzeugen können. Steht der Knopf still, ist der Wizard
-      wieder ein Pflichtdurchlauf und die Vereinigung der drei Stufen
-      wertlos.
-
-      **Eine Ursache ist gefunden und behoben (2026-08-11, `v1136c`) —
-      wahrscheinlich nicht die einzige.** Beim Durchmessen der Kette für
-      den Objekt-Reiter gemessen: `mapCond()` in `mb-objektwahl.js` ordnete
-      den Zustand **„gut"** keiner einzigen Option des Berichtsfeldes zu und
-      ergab `null`. Der Zustand ist Pflicht für die Marktpreisindikation,
-      und `erreicht()` in `mb-stufen.js` ist eine **Kaskade** — ohne Stufe 2
-      ist Stufe 3 unerreichbar. Der **häufigste Zustandswert überhaupt**
-      hat den Bericht also gesperrt, und die Ampel zeigte an Stufe 3
-      „fehlt: " **ohne Inhalt**, weil dort tatsächlich nichts fehlte.
-
-      Zwei Lehren für den Wizard:
-      - **Eine Stufe kann vollständig sein und trotzdem gesperrt** — weil
-        eine frühere es nicht ist. Die Beschriftung muss den **wirklichen**
-        Grund nennen, nicht die leere Liste der eigenen Stufe.
-      - **Beide Optionslisten gehören gegeneinander geprüft**, nicht per
-        Heuristik verknüpft. Die alte Fassung verglich fünf
-        Anfangsbuchstaben, und „sanie" steckt auch in
-        „sanierungsbedürftig" — **„stark sanierungsbedürftig" kam als
-        „saniert" an**, ein Fehler mit falschem Vorzeichen.
-
-   3. **Es muss auf dem Handy funktionieren.** Seit `v1118` landen echte
-      Nutzer bei 390 px in der normalen Ansicht. Eine siebenteilige
-      Schrittleiste nebeneinander und ein Handy schließen sich aus — der
-      Entwurf braucht **zwei** Darstellungen derselben Führung, nicht eine
-      gequetschte.
-
-      **ERLEDIGT — Fassung C ist gebaut** (`v1153`/`v1153b`, `7fb691f`, siehe
-      Fertig). Marcels Wahl aus der Demo. Bei 390 px trägt die Führung jetzt
-      **55 px statt 188 px**; ab 1024 px stehen die sieben Marken unverändert
-      in einer Zeile. Alle drei Verhaltensregeln über den Bedienweg geprüft.
-
-      *Die Demo bleibt als Beleg der Entscheidung stehen:*
-      `design/Vorschläge/marktbericht-schrittleiste-handy.html` (2026-08-12,
-      anklickbar, echte 390-px-Rahmen). Drei Fassungen mit gemessenen Höhen:
-
-      | | Höhe | spart | Sprung zu jedem Schritt |
-      |---|---|---|---|
-      | heute | 188 px | — | ja |
-      | **A** Schritt 3 von 7 + Balken | ~62 px | 126 px | **nein** |
-      | **B** Blätterleiste mit Punkten | ~72 px | 116 px | nur über Punkte |
-      | **C** Klappleiste ★ | **50 px** zu | **138 px** | **ja** |
-
-      **Empfehlung C**, weil sie die einzige ist, die **nichts wegnimmt**: der
-      direkte Sprung bleibt, zugeklappt braucht sie weniger als A, und sie
-      zeigt **dieselbe** Führung wie der große Schirm — nur eingeklappt. Dazu
-      ist das Muster im Haus bekannt: die Kompakt-Karte der Sidebar ist
-      genau das („eine schmale Zeile zum Aufklappen", v1092/v1094).
-      **Vorschlag für die Schwelle: unter 900 px** — dieselbe, an der die App
-      auf den Drawer umschaltet. Dann gibt es zwei Fassungen und keine dritte
-      Zwischenform.
-
-      **Jetzt vermessen (2026-08-12, nach `v1151`):** bei 390 px ist der
-      Behälter 305 px breit, die Leiste bricht auf **vier Zeilen** um
-      (Oberkanten 422/469/516/563) — also rund **188 px, bevor eine einzige
-      Angabe zu sehen ist**. **Kein Überlauf, nichts beschnitten, alle
-      sieben Marken erreichbar** — es ist kein Defekt, sondern eine
-      Platzfrage. Ab 1024 px steht die Leiste in einer Zeile, unter 1024 px
-      in zwei, auf dem Handy in vier.
-
-      **Damit ist die Aufgabe scharf umrissen:** gesucht ist eine zweite
-      Darstellung für schmale Schirme, die weniger als 188 px braucht — etwa
-      „Schritt 3 von 7" mit Titel und Fortschrittsbalken statt sieben
-      Marken. **Das ist Gestaltung, keine Reparatur → Demo-first**, Ablage
-      in `design/Vorschläge/`.
-
-   **Und die Aufgabe, die über allen dreien steht: den Ablauf einmal
-   vollständig durchspielen.** Marcel: „das muss ja Sinn machen, auch von
-   der Reihenfolge her." Zu klären ist damit nicht die Optik, sondern die
-   **Freischaltlogik**:
-
-   - **Welche Felder machen welchen Meilenstein voll?** Für jede der drei
-     Stufen die Pflichtangaben benennen — aus dem, was das Backend
-     tatsächlich braucht, nicht aus dem Bauchgefühl. Solange das nicht
-     gemessen ist, ist jeder Freischaltzustand geraten.
-   - **Der Knopf zeigt, was er gerade erzeugt.** Beschriftung und Preis
-     wandern mit dem erreichten Meilenstein mit. Er ist **nie** tot,
-     solange mindestens die Einschätzung vollständig ist.
-   - **Die Reihenfolge der sieben Schritte muss den Meilensteinen folgen.**
-     Wenn Schritt 1 die Einschätzung trägt und Schritt 2 die
-     Marktpreisindikation, darf kein Pflichtfeld der Einschätzung in
-     Schritt 5 stehen. Genau das ist zu prüfen — und es ist der
-     wahrscheinlichste Grund dafür, dass der Knopf still bleibt.
-   - **Die Objektart bleibt in Schritt 1.** `istWohnung()` entscheidet über
-     20 der 42 Felder; sie später zu fragen hieße, alles dahinter neu
-     aufzubauen.
-
-   **Das gehört in den überarbeiteten Entwurf, nicht in den Code** — erst
-   die Führung durchspielen und zeigen, dann bauen. Die beiden offenen
-   Geldfragen oben (wann wird abgerechnet, was kostet das Vertiefen)
-   hängen unmittelbar daran: sie lassen sich erst beantworten, wenn
-   feststeht, wann ein Meilenstein als erreicht gilt.
-
-2. **Alle Pläne einmal durchtesten: Starter, Investor, Pro, Partner**
-
-   **Prüflauf, kein Umbau.** Ergebnis ist eine Befundliste.
-
-   **Der Grund, warum das überfällig ist, steckt im Aufbau:** die Plangrenzen
-   stehen an **drei Stellen von Hand** — `config.js` (das Gate),
-   `pricing-modal.js` (zwei Matrizen) und `landing/index.html`. Drei
-   Wahrheiten, die nur so lange übereinstimmen, wie jemand sie pflegt.
-   **Der Abgleich gegen die Landingpage, den Marcel verlangt, ist genau der
-   richtige Maßstab** — sie ist das, was der Kunde gelesen hat, bevor er
-   bezahlt hat.
-
-   **Was gemessen wird:**
-
-   | | |
-   |---|---|
-   | **Gate gegen Versprechen** | jede Grenze aus `config.js` gegen die Landing-Tabelle, Zeile für Zeile |
-   | **DB gegen Datei** | `hasFeature` fragt **zuerst die Datenbank** (`Sub.hasCachedFeature`) und `config.js` nur bei `null` — beide Wege prüfen, sie können auseinanderlaufen |
-   | **Unbekannte Schlüssel** | ein Schlüssel, den niemand kennt, ist **für jeden false, auch für Pro**. Ein Tippfehler sperrt also still den teuersten Plan |
-   | **Partner** | ist ein **Pro-Klon** plus `reseller`, `reseller_whitelabel`, `custom_logo` |
-   | **Bekanntes Leck** | der Bankexport blockt nur `starter` — **Free rutscht mit Wasserzeichen durch.** Stand als offene Entscheidung, ist nie gefallen |
-
-   **Dazu Marcels Frage zum Starter: sieben Tage voller Pro-Status.** Er
-   meint, das sei so umgestellt worden. **Ich kann das nicht bestätigen** — in
-   meinen Unterlagen steht es nicht, und ich schreibe es nicht als Tatsache
-   auf. **Erst messen, ob es überhaupt eingebaut ist**, dann die zweite Frage
-   stellen: beibehalten oder anders lösen. Wenn es drinsteht, gehört
-   mitgeprüft, **was nach Tag 7 passiert** — Objekte, die unter Pro angelegt
-   wurden, dürfen nicht unerreichbar werden.
-
-   ### PRÜFLAUF DURCHGEFÜHRT (2026-08-13) — die Befundliste
-
-   Alle drei Wahrheiten ausgelesen und gegeneinander gehalten: `config.js`
-   (Gate, 4 Plan-Blöcke, 33 Schlüssel), `pricing-modal.js` (Matrix) und
-   `landing/index.html` (Cockpit-Matrix, 31 Zeilen).
-
-   **Zuerst die gute Nachricht:** die drei Matrizen sind bei den geprüften
-   Zeilen **deckungsgleich** — 31 Zeilen, gleiche Reihenfolge, gleiche Werte.
-   Die befürchtete Drift zwischen Landing und Modal gibt es an dieser Stelle
-   **nicht**.
-
-   #### B1 · Free bekommt zwei Funktionen, die die Landing ihm nicht verspricht
-
-   | Schlüssel | `config.js` free | Landing + Modal (Free) |
-   |---|---|---|
-   | `live_market_rates` | **true** | **„–"** (also nein) |
-   | `market_data_fields` | **true** | **„gesperrt\*"** |
-
-   Die Fußnote der Landing ist dabei eindeutig: *„Marktdatenfelder in Free &
-   Starter als Vorschau gesperrt, ab Investor freigeschaltet."*
-   **Kein Kundenschaden, aber das Gate ist offener als das Versprechen.**
-   Zu entscheiden ist, welche Seite recht hat — das ist Marcels Sache, nicht
-   meine: entweder das Gate zuziehen oder die Matrix ehrlich machen.
-
-   #### B2 · `bank_pdf_premium` ist ein toter Schlüssel
-
-   Er steht **nur** im Starter-Block, dort auf `false`, und fehlt bei free,
-   investor **und pro**. Ein fehlender Schlüssel ist `undefined` und damit
-   false — **das Feature ist für niemanden verfügbar, auch nicht für Pro.**
-   In keiner der drei Matrizen kommt er vor, es gibt also kein
-   Verkaufsversprechen dazu. Vermutlich ein Überrest; **vor dem Löschen
-   prüfen, ob ihn jemand abfragt** (`grep -rn "bank_pdf_premium"`).
-
-   #### B3 · Dreizehn Schlüssel verlassen sich auf „undefined = false"
-
-   `ai_analysis`, `ai_market_analysis`, `api_access`, `bank_pdf_premium`,
-   `bankexport`, `custom_imports`, `deal_score_v2`, `investment_thesis_ai`,
-   `migration_service`, `premium_pdf_layouts`, `priority_support`,
-   `theme_palette`, `track_record_custom_cover` stehen **nicht in jedem
-   Plan**. Heute ist das folgenlos, weil `undefined` wie `false` wirkt —
-   **aber genau daran hing W41** (`bmf_advanced` stand in keinem Plan und war
-   dadurch für Pro gesperrt). **Ein Tippfehler in einem Schlüsselnamen ist in
-   dieser Bauweise unsichtbar.** Empfehlung: jeden Schlüssel in jedem Plan
-   explizit führen, dann fällt ein Tippfehler beim Lesen auf.
-
-   #### B4 · Zwei „Free kann mehr als Starter"-Fälle sind KEIN Fehler
-
-   `track_record_pdf` (free true, starter false) und
-   `custom_finance_models` (free true, starter false) sahen nach einem
-   Preisfehler aus. Die Matrix erklärt beide: **Free = „Wasserzeichen" bzw.
-   „alle Modelle als Demo"** — Free sieht alles als Vorschau, Starter zahlt
-   und bekommt dafür echte, aber begrenzte Funktionen. **Absicht, nicht
-   Defekt.** Zurückgenommen, bevor daraus ein Befund wurde.
-
-   #### B5 · `pricing-modal.js` führt die Matrix zweimal
-
-   Einmal ab Z. 261 mit `\uXXXX`-Escapes, einmal ab Z. 505 mit echten
-   Zeichen — **dieselben 31 Zeilen, zwei Fassungen.** Heute inhaltsgleich
-   (geprüft an den kritischen Zeilen), aber es ist dieselbe Doppelung, die im
-   Marktbericht dreimal auseinandergelaufen ist. **Eigener kleiner Punkt.**
-
-   #### Nicht geprüft, ehrlich benannt
-
-   - **`hasFeature` fragt zuerst die Datenbank** (`Sub.hasCachedFeature`),
-     `config.js` nur bei `null`. **Der DB-Weg ist nicht gemessen** — dafür
-     braucht es je Plan ein echtes Konto. Das ist der zweite Teil des Punkts
-     und bleibt offen.
-   - **Partner** steht in `config.js` gar nicht; er ist ein Pro-Klon
-     (`reseller-portal.js:552`) plus `reseller`, `reseller_whitelabel`,
-     `custom_logo`. Auch das ist am Konto zu prüfen, nicht im Code.
-
-   *(Zwei eigene Fehlbefunde aus diesem Lauf, damit sie nicht wiederkehren:
-   die Landing schien „Pro = 8 Objekte" und einen Spaltenkopf „?Investor" zu
-   führen. Beides waren **Kodierungsartefakte meiner Konsolenausgabe** —
-   roh stehen dort `∞` und `★`. Bei Matrizen mit Sonderzeichen die Rohzelle
-   lesen, nicht die aufbereitete Ausgabe.)*
-
-   ### NACHTRAG (2026-08-13): der DB-Weg ist gemessen — und B1 war zu weit gegriffen
-
-   Der Punkt verlangte, **beide** Wege zu prüfen. Der DB-Weg ist jetzt
-   gelesen (`plans.features`, jsonb, Staging):
-
-   | Plan | `market_data_fields` | `live_market_rates` | Schlüssel |
-   |---|---|---|---|
-   | free | **false** | **false** | 34 |
-   | starter | false | false | 34 |
-   | investor | true | true | 34 |
-   | pro | true | true | 35 |
-   | partner | true | true | 37 |
-   | **business** | *(fehlt)* | *(fehlt)* | **10** |
-   | **enterprise** | *(fehlt)* | *(fehlt)* | **13** |
-
-   **B1 ist damit zu korrigieren, und zwar zu meinen Lasten:** Ich hatte
-   geschrieben, „Free bekommt zwei Funktionen, die die Landing ihm nicht
-   verspricht". Richtig ist: **die Datenbank führte für Free längst `false`**,
-   und die DB ist laut `config.js:568` die Quelle der Wahrheit — `config.js`
-   ist nur der **Fallback**, solange `Sub.hasCachedFeature` noch `null`
-   liefert. Für einen echten Free-Nutzer war das Gate also zu.
-
-   **Was `v1160` dann wirklich behebt:** das **Startfenster**. Zwischen
-   Seitenaufbau und DB-Antwort greift der Fallback, und dort stand `true`.
-   In diesem Moment sah ein Free-Nutzer Felder, die ihm nicht zustehen.
-   Das Fenster ist jetzt zu. **Kleiner als der Befund klang, aber echt** —
-   und die drei Wahrheiten sagen jetzt dasselbe, was für sich zählt.
-
-   #### B6 · `business` und `enterprise` sind unvollständige Plan-Datensätze
-
-   Sie führen **10 bzw. 13 Schlüssel** statt 34. Alles, was fehlt, ist für
-   sie `false` — dieselbe W41-Mechanik. Beide sind in der Landing und im
-   pricing-modal **nicht** aufgeführt, also vermutlich nicht verkauft.
-   **Vor dem Aufräumen prüfen, ob ein Konto darauf läuft:**
-   `select id, plan_id from subscriptions where plan_id in ('business','enterprise');`
-   Ist niemand darauf, gehören die Zeilen weg oder auf 34 Schlüssel gebracht.
-
-   #### Was weiterhin offen ist
-
-   ~~Der **Plan-Override greift nicht**~~ — **geklärt und behoben, `v1163`,
-   `a4107d0`** (siehe „Fertig"). Er war nicht tot, sondern stand hinten in der
-   Reihenfolge: `getCurrentPlanKey()` fragte zuerst `Sub.getCurrentSync()`.
-   **Jetzt ist er ein Prüfmodus, der nur herabstuft** — `dp_plan_override` auf
-   `free`/`starter`/`investor`/`pro` setzen, neu laden, durchklicken;
-   `localStorage.removeItem('dp_plan_override')` hebt ihn auf.
-
-   **Damit ist der Prüflauf jetzt fahrbar.** Was noch aussteht, ist das
-   Durchklicken selbst — Oberfläche für Oberfläche, je Stufe:
-
-   - [ ] `free` — sieht der Nutzer die Sperren an den richtigen Stellen?
-   - [ ] `starter` — Marcels Frage nach den **sieben Pro-Tagen ist
-         beantwortet** (siehe „Fertig", `TR7-trial`): sie sind eingebaut, aber
-         **nicht am Starter — automatisch ab Registrierung** für jeden neuen
-         Nutzer. Nach Tag 7 wird **kein Objekt unerreichbar**; das Limit hängt
-         nur am Anlegen. **Ich hatte das bestritten, das war falsch.**
-   - [ ] `investor`
-   - [ ] `pro`
-   - [ ] `partner` — der Prüfmodus kann ihn **nicht** simulieren (nur nach
-         unten). Er ist der echte Plan des Prüfkontos, also ohnehin sichtbar.
-
-   **Zwei Grenzen, die beim Durchklicken gelten:** der Prüfmodus zeigt das
-   **Frontend-Gate**, nicht die Backend-Durchsetzung — und er liest den
-   `config.js`-Fallback, nicht die DB-Zeile des simulierten Plans.
-
-   ### DURCHKLICKEN ERLEDIGT (04.09.2026) — vier Stufen gemessen
-
-   Prüfmodus `dp_plan_override` je Stufe gesetzt, neu geladen, `hasFeature()`
-   ausgelesen. **Der Prüfmodus wurde danach wieder entfernt**, echter Plan
-   `pro` bestätigt.
-
-   | Schlüssel | free | starter | investor | pro |
-   |---|---|---|---|---|
-   | `full_calc` · `steuer_modul` · `ai_analysis_tab` | ✔ | ✔ | ✔ | ✔ |
-   | `track_record_pdf` | **✔** | – | ✔ | ✔ |
-   | `deal_score_v2` | **✔** (`demo`) | – | ✔ | ✔ |
-   | `marktreport` · `ai_analysis` · `excel_import` | – | ✔ | ✔ | ✔ |
-   | `bankexport` · `market_data_fields` · `live_market_rates` · `werbungskosten_pdf` | – | – | ✔ | ✔ |
-   | `export_csv` · `theme_palette` · `bmf_advanced` | – | – | – | ✔ |
-
-   **Objektgrenzen:** 1 · 5 · 25 · ∞ — **deckungsgleich mit der Landing**
-   („Objekte 1 5 25 ∞"). `export_csv` nur bei Pro — die Landing sagt
-   „Rohdatenexport (CSV / XLSX) – – – ✓", also ebenfalls deckungsgleich.
-
-   #### B7 · Der Track-Record ist Free versprochen und ihm verwehrt
-
-   **Die Landing verspricht:** `Track-Record-PDF · Free = „Wasserzeichen" ·
-   Starter = – · Investor ✔ · Pro ✔`.
-
-   | Quelle | free |
-   |---|---|
-   | Landing | **Wasserzeichen** (also ja, eingeschränkt) |
-   | `config.js` | `true` |
-   | **Datenbank, beide Umgebungen** | **`false`** |
-
-   Die Datenbank ist die Quelle der Wahrheit (`config.js:568`), und
-   `track_record_pdf` ist ein **echtes Gate** (`subscription.js:848`,
-   `deal-action-pdf-gate.js:54`). **Ein echter Free-Nutzer bekommt das PDF
-   also nicht, obwohl die Preisseite es ihm zusagt.**
-
-   Dass es ein Versehen ist und keine Absicht, sagt die Datenbank selbst:
-   `free.watermark = true`. Das Wasserzeichen ist für Free vorgesehen — nur
-   die Tür davor ist zu.
-
-   **Zwei Nebenwirkungen:** im Startfenster vor der DB-Antwort greift der
-   `config.js`-Fallback und zeigt den Knopf offen (dieselbe Mechanik wie
-   `v1160`). Und **der Prüfmodus meldet für Free `true`** — wer damit prüft,
-   bescheinigt Free eine Funktion, die es nicht hat. **Der erste Fall, in dem
-   die bekannte Grenze des Prüfmodus zu einem falschen Bestanden führt.**
-
-   **Zu entscheiden ist, welche Seite recht hat — das ist Marcels Sache:**
-   Datenbank auf `true` (Versprechen einlösen) oder Landing ehrlich machen.
-   Es ist ein Preisversprechen, deshalb wird hier nichts geändert.
-
-   #### B8 · Das Bankexport-Leck ist zu — der alte Befund gilt nicht mehr
-
-   Oben stand als bekanntes Leck: *„der Bankexport blockt nur `starter` —
-   Free rutscht mit Wasserzeichen durch."* **Gemessen: er blockt beide.**
-   Der Schlüssel, der die Oberfläche wirklich sperrt, ist `bank_pdf_a3`
-   (`subscription.js:852`), nicht `bankexport` — und er steht für free
-   **und** starter auf `false`. `bmf_calc_export` genauso. **Punkt erledigt.**
-
-   #### B9 · Die Testphase dauert 28 Tage, nicht 7 — drei Stellen sagten es falsch
-
-   Die Landing wirbt mit *„Die ersten 4 Wochen ✔ Pro"*. Der Code gibt genau
-   das: `TESTPHASE_TAGE = 28` (`aiCreditsService.js:63`), und
-   `gewaehreTestphase()` holt die Zahl von dort statt sie zu tippen.
-   **Versprechen und Gate stimmen überein.**
-
-   Falsch waren die **Beschreibungen**: zwei Kommentare im Backend
-   (`userService.js:32`, `subscriptionService.js:79`) sagten „7 Tage", und
-   dieser Backlog sagte es auch. Der Name `TR7` stammt aus der ersten
-   Fassung; `v1185` hat die Zahl auf 28 gezogen, die Kommentare nicht.
-   **Kommentare korrigiert** (nur Kommentare, kein Verhalten — geht mit dem
-   nächsten Backend-Bau mit).
-
-   > An echten Daten gegengeprüft: `plan_trials` auf Staging führt 17 Zeilen,
-   > Spanne 2 bis **28** Tage (die 2 ist eine Handvergabe über
-   > `admin.js:1505`).
-
-   #### B10 · Die Testphase ist auf Produktion noch nie gelaufen
-
-   `plan_trials` ist auf Prod **leer**. Das ist kein Defekt: der neueste
-   Prod-Nutzer hat sich am **06.08.2026** registriert, die Testphase kam mit
-   `v1185` am **31.08.** **Seither hat sich niemand neu angemeldet.** Die vier
-   Wochen Pro sind also auf Staging belegt und in Produktion **ungeprüft** —
-   das gehört gewusst, bevor der erste echte Kunde kommt.
-
-   #### B11 · `business` und `enterprise` liegen noch auf Prod (B6 halb erledigt)
-
-   Auf **Staging sind sie weg** — die `plans`-Tabelle führt fünf Zeilen. Auf
-   **Prod stehen sie noch**, mit 11 bzw. 13 Schlüsseln statt 34 bis 37.
-
-   Die Bedingung von B6 („vor dem Aufräumen prüfen, ob ein Konto darauf
-   läuft") ist geprüft: **auf `business` läuft genau eine Subscription, und
-   zwar `demo@dealpilot.local`** — ein deaktiviertes Demokonto mit Laufzeit
-   bis 2126. **Kein echter Kunde ist betroffen.** Was diesem Plan gegenüber
-   Pro fehlt, sind 27 Schlüssel, alle still `false`.
-
-   #### B12 · Tote und doppelt benannte Schlüssel
-
-   | Schlüssel | Befund |
-   |---|---|
-   | `export_pdf` | steht in `config.js` in **jedem** Plan — **niemand fragt ihn ab**. Die Datenbank führt stattdessen `pdf_export`, und das ist ein **Verbrauchszähler** (`Sub.trackUsage('pdf_export')`), kein Gate. Zwei Namen, zwei Bedeutungen, ein Topf |
-   | `bank_pdf_premium` | in `config.js` nur bei `starter` (`false`), sonst nirgends — **die Datenbank gibt ihn Pro auf `true`**. Datei und DB widersprechen sich bei einem Schlüssel, den niemand abfragt. Harmlos heute, eine Falle, sobald ihn jemand abfragt |
-   | `bank_pdf_normal` | `config.js` `true` für **alle** Pläne, DB für free `false` — niemand fragt ihn ab |
-
-   #### Was weiterhin offen bleibt
-
-   - [ ] **`partner` ist nicht begehbar.** Der Prüfmodus stuft nur herab, und
-         das Staging-Konto ist `pro`. Auf Prod trägt `majunker@gmx.net` den
-         Partner-Plan — dort ginge es, aber nur nach Anmeldung durch Marcel.
-   - [ ] **Die Backend-Durchsetzung ist nicht gemessen.** Alles hier ist das
-         Frontend-Gate. Ob das Backend eine gesperrte Funktion auch abweist,
-         wenn man den Aufruf von Hand schickt, ist eine eigene Prüfung.
-
-   ### NACHTRAG (04.09.2026): Partner ist begangen, B7 ist entschieden — und darunter lag mehr
-
-   Marcel hat sich auf Prod als Partner angemeldet, damit die letzte Stufe
-   messbar wurde. Aus dem Durchgang sind **drei** Dinge geworden.
-
-   #### B7 ist erledigt — Marcels Entscheidung: „free bekommt das Wasserzeichen"
-
-   `plans.features->track_record_pdf` für `free` auf **`true`** gesetzt, in
-   **beiden** Umgebungen, je eine Zeile (`UPDATE 1`). Vorher gesichert:
-   `/root/backups/plans-vor-trackrecord-20260904-0731.sql`.
-
-   **Vorher geprüft, dass Free damit nicht das volle Produkt bekommt:**
-   `track-record.js:24` lässt Free ausdrücklich durch („Free hat es mit
-   Wasserzeichen, Starter gar nicht"), und das Wasserzeichen hängt seit
-   `TR7` an `jsPDF.prototype.save` selbst — jeder PDF-Weg wird gestempelt,
-   nicht nur die drei, die es früher einzeln taten. Die Stempel-Entscheidung
-   liest `limits.watermark`, und das steht für Free auf `true`.
-   **Am laufenden System gegengelesen:** `GET /plans` liefert für free jetzt
-   `track_record_pdf: true` und `watermark: true`.
-
-   #### Partner: ein vollständiger Obermenge von Pro, nachgezählt
-
-   Gegen die Datenbank gehalten, Schlüssel für Schlüssel: **es gibt keinen
-   einzigen, den Pro hat und Partner nicht** — und keinen mit abweichendem
-   Wert. Dazu `reseller`, `reseller_whitelabel`, `custom_logo` auf `true`,
-   Wasserzeichen aus, Objekte unbegrenzt. **Der „Pro-Klon plus drei" stimmt.**
-
-   #### B13 · Der `config.js`-Rückfall ist tot — und niemand hat es gemerkt
-
-   `hasFeature()` fragt die Datenbank und greift **nur bei `null`** auf
-   `config.js` zurück (`config.js:728`). Gemessen am laufenden Partner-Konto:
-
-   ```
-   Sub.hasCachedFeature('gibt_es_nicht_xyz')  ->  false     (nicht null!)
-   ```
-
-   **`hasCachedFeature` liefert nie `null`, sobald das Abo geladen ist.**
-   Damit ist der Zweig darunter unerreichbar: **was in der Plan-Zeile der
-   Datenbank fehlt, ist für jeden `false` — auch für Partner.** Das ist die
-   W41-Mechanik eine Ebene höher, und `config.js` kann sie nicht mehr
-   abfangen.
-
-   Betroffen sind heute drei Schlüssel, die `config.js` vergibt und die
-   Datenbank nicht kennt:
-
-   | Schlüssel | Wirkung |
-   |---|---|
-   | `export_pdf` | **keine** — niemand fragt ihn ab (B12) |
-   | `theme_palette` | **keine** — die Palette hängt an `isProOrAbove()`, der `hasFeature`-Zweig darunter ist der dokumentierte „später, wenn das Backend es kennt"-Fall |
-   | `beleg_import` | siehe B14 |
-
-   #### B14 · Der Beleg-Import hat gar kein Frontend-Gate
-
-   `beleg-import.js:65` fragt `window.DealPilotConfig.hasFeature(...)` —
-   **diese Funktion gibt es nicht.** Der Einstieg heißt
-   `DealPilotConfig.pricing.hasFeature` bzw. `Plan.can()`. Die Bedingung
-   `typeof … === 'function'` ist also **nie** wahr, und die Funktion fällt in
-   ihren eigenen Rückfall: `return true; // im Zweifel entscheidet das
-   Backend (403)`.
-
-   **Kein Loch** — das Backend sperrt wirklich (`ai.js:1052`, free/starter →
-   403). Aber der Schlüssel `beleg_import` steuert im Frontend **nichts**,
-   und ein Free-Nutzer sieht die Oberfläche, statt eine saubere Sperre zu
-   bekommen.
-
-   #### B15 · Die Testphase erreichte zwei Backend-Gates nicht — BEHOBEN mit `v1230`
-
-   `getEffectivePlan()` liest `plan_trials` mit; sechs Stellen benutzten sie.
-   **Zwei Routen lasen die Tabelle `subscriptions` direkt:**
-
-   | Stelle | Folge in der Testphase |
-   |---|---|
-   | `ai.js:1049` — KI-Beleg-Import | Plan als `free` gelesen → **403** |
-   | `avm.js:60` — `modeForUser` | Plan `free` → **Stub statt Live-Bewertung** |
-
-   Beim AVM wog es doppelt: `v1185` gibt der Testphase ein **eigenes
-   Bewertungspaket**, damit der Testnutzer prüfen kann, wofür er zahlen soll.
-   Das Paket wurde vergeben, dieser Schalter nicht umgestellt — **sie hätten
-   es auf Stub-Werte verbraucht.**
-
-   > ### Der erste Befund war zu weit gegriffen — Korrektur zu meinen Lasten
-   >
-   > Ich hatte geschrieben, **acht** Nutzer seien betroffen. **Es sind fünf.**
-   > Der Funktionslauf nach dem Neubau hat es gezeigt: die anderen drei haben
-   > neben dem Test ein **bezahltes `starter`-Abo**, und da sagen beide Wege
-   > `starter` — denn **ein bezahltes Abo schlägt die Testphase**. Das steht
-   > als Abweichung 1 im Kommentar von `getEffectivePlan` und ist Absicht:
-   > sonst sähe ein Reseller-Mandant vier Wochen Pro und würde danach
-   > sichtbar herabgestuft.
-   >
-   > **Ich hatte die Zahl aus der Datenbank gezählt, nicht aus dem Verhalten.**
-   > Die Mechanik stimmte, der Umfang nicht.
-
-   **Der Funktionslauf im Container**, gegen zwei echte Testphasen-Nutzer:
-
-   | Fall | alter Weg | neuer Weg |
-   |---|---|---|
-   | Test, **keine** Subscription | `free` → 403, Stub | **`pro`** → offen, **live**, `trial:true`, 25 Tage übrig |
-   | Test **+ bezahltes `starter`** | `starter` → 403 | `starter` → 403 — **richtig so** |
-
-   **Nicht angefasst:** `_planKey` und `_getPlanLimit` in `aiCreditsService`
-   lesen weiter die rohe Subscription. Dass die Testphase **kein Kerosin**
-   verschenkt, ist Absicht (Abweichung 3). Nachgesehen, bevor angefasst —
-   es sah aus wie derselbe Fehler und war das Gegenteil.
-
-   Fällt `getEffectivePlan()` aus, gilt weiter `free` — **im Zweifel
-   gesperrt, nicht im Zweifel offen.** Der `db/pool`-Import in `avm.js` war
-   danach unbenutzt und ist mitgefallen.
-
-
-3. **Spracheingabe soll alle Felder füllen — Pre-Flight und QuickBoarding**
-
-   > **GRÖSSTENTEILS SCHON GEBAUT — Befund vom 2026-08-13, siehe „Fertig".**
-   > `buildFullCatalog()` (v519) gibt **alle** `window.FIELDS` an die
-   > Auswertung; `risiken`, `thesis` und `notizen` sind füllbar, und
-   > Prompt-Regel 8 sortiert den Rest nach `notizen`. **Die Chip-Wolke ist
-   > kuratiert, der Auswertekatalog ist es nicht** — wer auf die Chips sieht,
-   > hält die Anzeige für den Umfang.
-   >
-   > **ALLE DREI RESTE SIND ERLEDIGT — 03.09.2026.** Sie standen hier so:
-   > 1. ~~**Checkboxen** werden in beiden Katalogbauern übersprungen.~~
-   >    **ERLEDIGT — der Eintrag war veraltet, und dahinter lag ein echter
-   >    Defekt.** `buildFullCatalog()` gibt Checkboxen seit `v1168` als
-   >    `kind:'bool'` weiter; dass `buildCatalog()` (die Chip-Wolke) sie
-   >    ausspart, ist Absicht. Beim Nachprüfen der Kette fiel auf:
-   >    `applyQcPending()` hatte **keinen** `bool`-Zweig, obwohl darüber
-   >    „gleiche Schreiblogik wie applyMerged" steht — ein diktiertes Häkchen
-   >    fiel dort auf `setInput()` durch, wurde **nicht gesetzt und trotzdem
-   >    gezählt**. Betroffen: `san_tax_active`, die einzige Checkbox in den
-   >    203 Feldern — eine Steuerposition. Behoben mit `v1214`
-   >    (`_wertSchreiben()` als eine Schreiblogik für beide Wege), am
-   >    laufenden System belegt: alte Logik `checked:false`, neuer Weg
-   >    `checked:true` mit gefeuertem `change`.
-   > 2. ~~**Das Modal beim „Als Objekt speichern"** — gemessen: es gibt
-   >    keines.~~ **ERLEDIGT am 03.09.2026 — es gibt eines, nur woanders.**
-   >    Marcel wusste selbst nicht mehr, was gemeint war („keine Ahnung was
-   >    du genau willst"), also den Code gelesen statt weiter zu fragen.
-   >    Die Kette: im Quick-Check importiert man per Sprache oder Exposé →
-   >    `applyMergedQc()` teilt die Werte in `qcData` (die `qc_`-Felder,
-   >    gehen in den iframe) und `pendingList` (der Rest) → die Liste geht
-   >    per `postMessage` an den iframe und wird beim Speichern gezeigt
-   >    („Save-Transfer", `qc-bridge.js:322`) → `applyQcPending()` schreibt
-   >    sie ins Vollobjekt. **Das ist genau die Auflistung „was kommt
-   >    zusätzlich mit".**
-   >
-   >    Und die Sorge dahinter ist gemessen ausgeräumt: **es geht nichts
-   >    verloren.** Von 21 `qc_`-Feldern stehen 16 im Snapshot von
-   >    `qcSaveAsObject()`; die fünf übrigen werden **separat** verarbeitet —
-   >    `qc_hg` als Hausgeld (monatlich × 12, mit Split aufgeteilt,
-   >    `quick-check.js:1928`), `qc_str`/`qc_hnr`/`qc_ort` werden zu
-   >    `qc_adresse` zusammengesetzt (`:206`). Der Snapshot ist nicht
-   >    lückenhaft, er ist nur nicht die einzige Station.
-   >
-   >    **Nichts zu bauen.** Ein zweites Modal neben das vorhandene zu
-   >    setzen wäre genau der Fehler, den der alte Eintrag befürchtet hat.
-   > 3. ~~Ob die Einsortierung in der Praxis trifft — Abnahmepunkt, nur
-   >    durch einen echten Sprechlauf zu klären.~~ **ERLEDIGT am
-   >    03.09.2026:** Marcel hat den Sprechlauf gemacht — *„sprechlauf auch
-   >    ok"*. Damit ist auch der `bool`-Zweig aus `v1214` am echten Weg
-   >    abgenommen, nicht nur im Laborlauf.
-   > **Damit ist Punkt 3 abgeschlossen.** Er wurde nie als Neubau angefasst —
-   > zwei der drei „Reste" waren veraltete Einträge, der dritte ein echter
-   > Defekt (`v1214`), und einer ist von Marcel am Gerät abgenommen.
-
-   Der inhaltlich größte Punkt der Runde. **Zwei Oberflächen, ein
-   Rechenweg.**
-
-   ### Was Marcel will
-
-   - **In der Pre-Flight-Karte** („Top-Objekt") sollen per Sprache **alle**
-     Felder befüllbar sein, die es in Objekt, Investition, Miete,
-     Finanzierung, Bewirtschaftung und Steuer gibt.
-   - **Genanntes einsortieren, nicht wegwerfen:** Risiken und Mängel gehören
-     unter **bekannte Risiken**, ein genanntes Vorhaben unter
-     **Investitionsthese**.
-   - **Der Rest wird ein ordentlicher Text** unter **zusätzliche Notizen** —
-     alles, was sich nicht auswerten ließ, statt es zu verlieren.
-   - **Im QuickBoarding gibt es weniger Felder** — aber **dieselbe
-     Rechenlogik im Hintergrund.**
-   - **Beim „Als Objekt speichern"** öffnet sich ohnehin ein kleines Modal.
-     Dort soll stehen: *es gibt weitere Werte, die mit übernommen werden* —
-     **mit Auflistung**, und mit den Texten der Zusammenfassung.
-
-   ### Was davon schon steht — und was das für den Punkt heißt
-
-   **Die Doppelstruktur existiert bereits**, das ist die gute Nachricht:
-   `buildCatalog` ist die kuratierte Liste für den Orbit, `buildFullCatalog`
-   nimmt **alle** `window.FIELDS` für die Auswertung. Im QuickCheck-Kontext
-   wird auf `QC_IDS` gefiltert. Der Weg „wenig Felder vorn, volle Auswertung
-   hinten" ist also **angelegt** — es geht nicht um einen Neubau, sondern um
-   Vollständigkeit und um das, was der Nutzer davon sieht.
-
-   **Deshalb ist der erste Schritt eine Zählung, kein Entwurf:** wie viele
-   Felder kennt `buildFullCatalog` heute, wie viele stehen in den sechs
-   Reitern, **und welche fehlen?** Erst diese Differenz macht den Punkt
-   bezifferbar.
-
-   **Drei Dinge, die dabei zu klären sind:**
-
-   1. **Freitext ist etwas anderes als ein Feld.** Risiken, These und Notizen
-      sind Prosa; die Zuordnung „das war ein Mangel" trifft das Modell, nicht
-      ein Muster. Das ist der Teil, der wirklich neu ist.
-   2. **Nichts stillschweigend verwerfen.** Marcels Kernsatz ist „eigentlich
-      soll alles vernünftig ausgewertet werden" — der Auffangtext unter
-      Notizen ist die Zusicherung, dass nichts verschwindet. **Er ist Teil
-      des Punktes, kein Beiwerk.**
-   3. **Kerosin.** Eine längere Auswertung über alle Felder kostet mehr als
-      die heutige. Ob das den Preis ändert, ist eine Geldfrage → Marcel.
-
-   **Das Übernahme-Modal im QuickBoarding ist der sichtbarste Teil** und
-   gleichzeitig der billigste: es zeigt, was ohnehin schon übertragen wird.
-   Wenn dort steht, was alles mitkommt, versteht der Nutzer zum ersten Mal,
-   was die Spracheingabe geleistet hat.
-
-   **→ Zählung zuerst, dann Demo des Modals, dann bauen.**
-
-   ### DIE ZÄHLUNG IST DA (04.09.2026) — der Punkt ist bezifferbar
-
-   Am laufenden System auf Staging gemessen, mit **geladenem Objekt**
-   (`2026-001`), damit alle Reiter gebaut sind — sonst zählt man die
-   Abwesenheit von Reitern statt die Abwesenheit von Feldern.
-
-   | | Anzahl |
-   |---|---|
-   | `window.FIELDS` — was die Auswertung kennt | **203** |
-   | davon im DOM vorhanden | 195 |
-   | **in `FIELDS`, aber ohne Formularfeld** | **8** (4 davon `ai_*`, also **4 echte**) |
-   | Formularfelder im DOM (ohne UI-Präfixe) | **235** |
-   | **im Formular, aber NICHT in `FIELDS`** | **60** |
-   | davon reine Bedienelemente | 27 |
-   | **davon echte Datenfelder** | **33** |
-
-   #### Die 33, gruppiert — und zwei davon tun fachlich weh
-
-   | Block | Felder | Bewertung |
-   |---|---|---|
-   | **Sanierungsbedarf je Gewerk** — `fesh_f/e/s/h/d/b/k/o` je Häkchen + Kosten, plus `sanbedarf_toggle` | **17** | **Der schwerste Verlust.** „Dach neu, dreißigtausend" ist genau das, was man vor Ort diktiert — und es trifft kein Feld. In `FIELDS` steht dazu **nichts**, kein Sammelfeld, kein Ersatz |
-   | **§ 7b Sonder-AfA** — `afa_sonder7b_aktiv/eh40/baukosten/vermietung/neubau` | **5** | Nicht diktierbar. Hängt am offenen Backlog-Punkt „§ 7b-Spalte in `tax_records`" |
-   | **Erwerbsnebenkosten in Euro** — `makler_e`, `notar_e`, `gba_e`, `gest_e`, `ji_e` | 5 | **Kein echter Verlust:** die Prozentfelder `makler_p` … `ji_p` **sind** in `FIELDS`. Wer „Courtage 7.140 Euro" sagt, trifft trotzdem nichts |
-   | **Zweite Finanzierung und Schalter** — `d2_vertrag`, `d2_bspar`, `d2_enable`, `d2_anschl_enable`, `d1_anschl_enable`, `inv_tax_active`, `inv_tax_years`, `me_inc_ze`, `ek_inkl_nk`, `mand_ueberf_cb`, `inv_detail_toggle`, `grenz_auto` | 12 | Die **Beträge** der zweiten Finanzierung und des Inventars sind in `FIELDS` (`d2`, `d2z`, `d2t`, `inv_kueche` …). Es fehlen die **Schalter**, die sie sichtbar machen — ein diktierter Betrag landet also in einem Feld, dessen Block zu ist |
-
-   #### Der Nebenbefund: vier Einträge in `FIELDS` haben gar kein Feld
-
-   `bspar_zuteil`, `mietspiegel`, `erwerbsart`, `anbietertyp` stehen in
-   `FIELDS`, aber `id="…"` gibt es dazu **nirgends** in `index.html`.
-   `storage.js` liest und schreibt sie, ein Eingabefeld existiert nicht.
-   `buildFullCatalog` wirft sie über `if (!el) return;` still hinaus — **das
-   ist hier richtig**, aber es heißt: `FIELDS` ist keine verlässliche Liste
-   dessen, was der Nutzer eingeben kann.
-
-   > **Und daraus folgt eine Falle für diese Zählung selbst:** `buildFullCatalog`
-   > überspringt jedes Feld, dessen DOM-Element im Moment des Aufrufs fehlt.
-   > **Wer ohne geladenes Objekt zählt, misst zu wenig** — und merkt es nicht,
-   > weil nichts protokolliert wird.
-
-   #### Was das für den Punkt heißt
-
-   **Der Umbau ist kleiner als gedacht.** Es geht nicht um „alle 203 Felder
-   auswerten" — das tut `buildFullCatalog` schon. Es geht um **33 Felder, die
-   nie in `FIELDS` gelandet sind**, und davon sind **17 ein einziger Block**:
-   der Sanierungsbedarf.
-
-   ### GEBAUT — `v1231` (04.09.2026, `fa5f91f`): der Sanierungsbedarf ist diktierbar
-
-   Marcels Freigabe: „ja bau das."
-
-   > **Vorher gemessen, und es hat den Entwurf umgeworfen — mein Vorschlag
-   > war falsch.** Ich hatte geschrieben: „die 17 Feldnamen in `FIELDS`
-   > aufnehmen". Gemessen: **die Kachelwerte werden gar nicht gespeichert.**
-   > Im Datensatz steht nur `san`, die Summe — und `'san'` steht längst in
-   > `FIELDS`, ist also **schon heute diktierbar**. Die Beträge im Formular
-   > (Fenster 8.000, Dach 15.000 …) sind `value="…"` im HTML, also
-   > **Richtwerte, keine Objektdaten**.
-   >
-   > Der Block ist ein **Rechner**: anhaken, Betrag anpassen, „In
-   > Sanierungskosten übernehmen" drücken. Hätte ich die 17 Felder in
-   > `FIELDS` aufgenommen, wäre ein zweiter Speicherweg für Werte entstanden,
-   > die keiner sein sollen — genau die Falle, vor der `WM_FIELDS` warnt.
-
-   **Gebaut wurde deshalb:**
-
-   1. `sanKatalog()` gibt die 17 Einträge **nur an den Auswertungs-Katalog**,
-      nicht an die Speicherliste. Häkchen als `bool`, Kosten als `num`, je
-      mit eigener Beschriftung und Hinweis. Nur was im DOM steht.
-   2. `_sanNachziehen()` nach `applyMerged()`: Schalter auf, `updateFESH()`
-      rechnen lassen, Summe nach `san` — **aber nur, wenn `san` leer ist.**
-      Steht dort etwas von Hand, bleibt es stehen und der Nutzer liest es im
-      Toast. Der Übernahme-Knopf ist im Haus ausdrücklich; ihn still zu
-      drücken darf keine Eingabe überschreiben.
-   3. Die Summe wird **nicht nachgerechnet** (`v1227b`-Lehre) — gelesen wird
-      hinterher das Feld.
-
-   **Auf Staging belegt:** die Kette real durchgespielt — Dach 15.000 +
-   Heizung 12.000 → Anzeige „27.000 €" → `san` = 27000. Objekt danach
-   zurückgestellt, in der Datenbank gegengelesen.
-
-   > **Abnahmepunkt, ehrlich benannt:** der Auslöser — ein echter Sprechlauf,
-   > bei dem das Modell „Dach neu, fünfzehntausend" zuordnet — **ist nicht
-   > geprüft.** `buildFullCatalog()` und `_sanNachziehen()` sind modul-intern
-   > und von außen nicht aufrufbar. Geprüft ist alles, woran sie hängen.
-   > Gehört zum selben Stapel wie `v1168`/`v1169`/`v1170`.
-
-   **→ Danach offen:** die restlichen 16 Datenfelder aus der Zählung — fünf
-   § 7b, fünf Erwerbsnebenkosten in Euro (deren Prozentfelder aber gehen)
-   und die Schalter der zweiten Finanzierung.
-
+   - **16 Datenfelder noch nicht im Auswertekatalog:** fünf § 7b (`afa_sonder7b_*`), fünf Erwerbsnebenkosten in Euro (`makler_e` … `ji_e`; die Prozentfelder gehen) und die Schalter der zweiten Finanzierung (`d2_*`, `d1_anschl_enable`, `inv_tax_*` …).
+   - **Abnahme `v1231`:** ein echter Sprechlauf, bei dem „Dach neu, fünfzehntausend“ dem Sanierungsbedarf zugeordnet wird — nicht geprüft.
 
 ---
 
@@ -15062,91 +3107,11 @@ entfällt — nicht raten.
      interessiert zuerst der **Bestand** und was er prüft. *„Verloren würde
      ich vielleicht rausnehmen."*
 
-5. **Steuer-Mappe: ein Finanzamt-PDF über alle Objekte, dazu die Anlage-V-Zuordnung.**
-   **Marcels Auftrag vom 2026-08-30.** Heute gibt es das Finanzamt-PDF nur je
-   Objekt (Tab Steuer). Gewünscht: dieselbe Sache **über alle Objekte**, mit
-   Auswahl und Veranlagungsjahr. Dazu die Frage, ob sich die **Anlage V direkt
-   befüllen** lässt.
+5. **Steuer-Mappe: ein Finanzamt-PDF über alle Objekte, dazu die Anlage-V-Zuordnung.** — Rest (Mappe, Anlage-V-Ansicht, 66-%-Warnung, Halter-Gliederung und § 7b erledigt, s. Fertig)
 
-   **Vorschlag steht: `design/Vorschläge/steuer-sammelpdf-anlage-v.html`.**
-
-   ### Gemessen im Browser und im Code
-
-   - **Das Portfolio-Cockpit hat keinen einzigen Export-Knopf.** Abschnitte:
-     Portfolio Score · Kennzahlen · Objekte · Geteilte Objekte · Projektion &
-     Verlauf · Gesamt-Projektion. Kein PDF, kein CSV.
-   - **Das heutige PDF ist inhaltlich schon eine Anlage-V-Zuarbeit** — Kopf
-     „Anlage V · § 21 EStG", sechs Abschnitte, Einnahmen in Kaltmiete und
-     Umlagen getrennt, Ergebnis, Steuerwirkung. **Es fehlen nur die
-     Zeilennummern.**
-   - **Der entscheidende Fund:** `GET /tax-records?from=&to=`
-     (`routes/taxRecords.js:72`) liefert **alle Steuersätze eines Nutzers über
-     alle Objekte**, nach Jahr gefiltert. Ein Satz trägt **jedes Feld**, das
-     das PDF druckt. **Das Sammel-PDF braucht also keine neue Datenhaltung und
-     kein Nachladen der Objekte** — es ist eine Schleife über vorhandene Sätze
-     und die vorhandene Seitenfunktion `_renderWerbungskostenPage`.
-   - **Einstellungen → Mandanten** ist der richtige Ort für den Halter-Filter:
-     dort hängt das Steuerregime (Privat über zvE, mit Steuerzeiträumen), und
-     „GuV/Bilanz-Export" ist dort schon als *in Vorbereitung* angekündigt.
-
-   ### Anlage V — drei Wege, einer geht
-
-   | | | |
-   |---|---|---|
-   | **A · Zuordnungsblatt** | unsere Zahlen mit der amtlichen Zeilennummer daneben | **geht sofort** |
-   | **B · amtliches PDF befüllen** | Formularfelder setzen | machbar, Feldnamen ändern sich jährlich |
-   | **C · an ELSTER übermitteln** | Einreichung | nach meinem Kenntnisstand nur über das zertifizierte ERiC-Modul — **nichts, was ich ohne eigene Prüfung zusagen würde** |
-
-   **Empfehlung: Weg A**, als Teil der Mappe. 90 % des Nutzens für 5 % des
-   Aufwands, und er kann nichts falsch übermitteln.
-
-   > **Die Zeilennummern werden NICHT geraten.** Sie ändern sich je
-   > Veranlagungsjahr. Die Zuordnung wird je Jahr aus dem **amtlichen
-   > Formular** abgeschrieben, versioniert abgelegt und dagegen geprüft — und
-   > ohne hinterlegte Zuordnung erscheint das Blatt **nicht**, statt mit den
-   > Zahlen des Vorjahres zu raten. Dasselbe Prinzip wie bei der
-   > Wertermittlung.
-
-   ### Was in den Daten fehlt
-
-   Finanzamt · Steuer-Identifikationsnummer (etwas anderes als die vorhandene
-   Steuernummer) · Einheitswert-Aktenzeichen · **Eigentumsanteil der Person**
-   (nicht zu verwechseln mit `mea`, dem Miteigentumsanteil am
-   Gemeinschaftseigentum) · verbilligte Überlassung · Ferienwohnung.
-
-   > **Ein Nebenfund mit eigenem Wert:** die **66-%-Grenze** des § 21 Abs. 2
-   > EStG ist dieselbe Art Falle wie die 15-%-Grenze, für die es schon einen
-   > Live-Balken gibt. **DealPilot kennt Ist-Miete und Marktmiete bereits** —
-   > es könnte von selbst warnen. Kleine Rechnung, große Wirkung.
-
-   ### Marcels Entscheidungen vom 30.08.
-
-   1. **Getrennt je Halter** — bestätigt. Die Auswahl gehört ins
-      **Portfolio-Cockpit**, zusammen mit Jahr und Objektauswahl.
-   2. **Die Anlage V soll kommen**, und zwar so: *„auch die jetzige schon die
-      Nummern angeben, oder zwischen den Ansichten umschalten — Anlage V und
-      die, die wir jetzt haben, mit den Nummern der Anlage V drauf. Sollte
-      nur vollständig sein."*
-
-   **Damit ist der Zuschnitt klar: ein Umschalter, zwei Ansichten, eine
-   Datenbasis.**
-
-   | Ansicht | was sie zeigt | für wen |
-   |---|---|---|
-   | **Aufstellung** (heute) | sechs Abschnitte nach Kostenart, mit Bemerkungen | den Eigentümer, der verstehen will, wo das Geld hingeht |
-   | **Anlage V** (neu) | dieselben Zahlen, sortiert nach den Zeilen des amtlichen Formulars | den, der es abtippt oder zum Steuerberater gibt |
-
-   **„Sollte nur vollständig sein" ist die eigentliche Anforderung** — und
-   die schärfste. Eine Anlage-V-Ansicht, in der eine Position fehlt, ist
-   schlimmer als keine: sie sieht aus wie eine fertige Erklärung.
-   **Konsequenz:** jede Zeile des Formulars, die wir nicht befüllen können,
-   erscheint **sichtbar leer mit Grund** („keine Angabe erfasst"), nicht
-   stillschweigend gar nicht. Dasselbe Prinzip wie im Marktbericht.
-
-   > **Die Zeilennummern werden weiterhin NICHT geraten** — sie ändern sich
-   > je Veranlagungsjahr und werden aus dem amtlichen Formular
-   > abgeschrieben, versioniert abgelegt und dagegen geprüft. Ohne
-   > hinterlegte Zuordnung erscheint der Umschalter für dieses Jahr nicht.
+   - **Halter-Filter und Objektauswahl** in der Oberfläche des Cockpits: der Export kann sie (`opts.objectIds` in `werbungskosten-pdf.js`), die Bedienung fehlt (am 25.10.2026 gegrept).
+   - **Fünf °-Zuordnungen** (Bereitstellungszinsen → 48, Vermittlungsprovision Darlehen → 51, sonstige Finanzierungskosten → 51, Steuerberatung → 82, anschaffungsnahe HK → 35) von Marcel oder dem Steuerberater prüfen; die AfA auf bewegliche Wirtschaftsgüter hat keine eigene Zeile.
+   - Fehlende Stammdaten laut Messung vom 30.08.: Finanzamt, Steuer-ID, Einheitswert-Aktenzeichen, Eigentumsanteil der Person, verbilligte Überlassung, Ferienwohnung.
 
 6. **Portfolio-Cockpit: die Kennzahlen, die der Tester vermisst.**
    Ebenfalls aus `design/mockups/Anmerkungen.docx`, aber ein eigener Punkt —
@@ -15175,125 +3140,9 @@ entfällt — nicht raten.
    > **Erst entscheiden, ob das zum USP werden soll**, dann bauen. Hängt
    > unmittelbar an der USP-Frage aus Punkt 8.
 
-7. **Der Sachwertfaktor fehlt für alle Kreise außer zweien — ein
-   Datenvorhaben, kein Defekt.**
+7. **Sachwertfaktor: Rückmeldung bei wirkungslosem eigenen Wert** — Rest (die Ernte selbst ist erledigt, s. Fertig; Weiterpflege unter „MARKTBERICHT / ERNTE — Workstream (D)“)
 
-   > ## 🔒 AUSGELAGERT — Marcel bearbeitet diesen Punkt an anderer Stelle
-   > **Stand 2026-08-14.** Hier wird daran **nicht** gearbeitet.
-   >
-   > **Der Text bleibt trotzdem stehen** — die Vorarbeit ist gemessen und
-   > präzisiert, und ein gelöschter Punkt wird irgendwann von vorn
-   > angefangen. Wer hier weitermachen will, fragt vorher bei Marcel nach
-   > dem dortigen Stand.
-   >
-   > **Warum das hier so ausdrücklich steht:** In dieser Runde ist schon
-   > einmal ein Commit aus einem parallelen Chat auf dem Server gelandet und
-   > hätte fast Arbeit verworfen. Zwei Stellen am selben Punkt sind genau
-   > diese Falle — siehe `FALLEN.md` Punkt 1.
-
-   > **Am 2026-08-12 präzisiert.** Hinterlegt sind **zwei** Kreise als
-   > eigene Module: **Minden-Lübbecke** (`05770`,
-   > `lib/sachwertfaktoren_nrw.js`) und **Herford** (`05758`,
-   > `lib/sachwertfaktoren_herford.js`), aufgelöst über
-   > `lib/gutachterausschuss.js`. Dass sie wirken, ist inzwischen belegt —
-   > siehe Punkt 2, dort kam 0,925 Stufe A aus dem Herforder Bericht.
-   >
-   > **Für jeden weiteren Kreis braucht es den Grundstücksmarktbericht
-   > selbst**, nicht Code: die Sachwertfaktor-Matrix wird je Ausschuss
-   > abgeleitet und ist ausdrücklich **nicht übertragbar** (§ 10
-   > ImmoWertV, der Modulcode sagt das auch so). Ein Objekt außerhalb der
-   > beiden Kreise bekommt korrekt `anderer_ausschuss` und bleibt beim
-   > vorläufigen Sachwert — das ist die Regel „kein Treffer heißt kein
-   > Wert", nicht ein Fehler.
-   >
-   > **Zu entscheiden ist deshalb zuerst, welche Kreise überhaupt
-   > gebraucht werden** — danach ist es Fleißarbeit je Kreis, keine
-   > Programmieraufgabe. Marcel gibt vor, welche.
-
-   > **Am 2026-08-12 nachgemessen und in einem Punkt korrigiert.** Die
-   > Überschrift hieß hier zuerst „…deshalb bleibt **jeder** Sachwert ein
-   > vorläufiger". Das war zu pauschal und hätte die Suche in die falsche
-   > Richtung geschickt. **Für Eigentumswohnungen gäbe es auch mit voller
-   > Ernte keinen Faktor** — der Gutachterausschuss leitet Sachwertfaktoren
-   > nur für Ein- und Zweifamilien-, Doppel- und Reihenhäuser ab
-   > (Abschnitt 5.1.4). Der Erntebefund unten bleibt richtig, er trifft
-   > aber **die Häuser**, nicht das Prüfobjekt.
-   >
-   > **Der Einstiegspunkt von gestern ist damit abgearbeitet:** Ein Faktor
-   > war sogar schon gepflegt — **1,15 stand im Feld** und kam als
-   > `sachwertfaktor: 1.15` sauber im Payload an. Der Bericht verwirft ihn
-   > trotzdem, mit Begründung im Antwortobjekt
-   > (`sachwertfaktor_grund: "objektart_nicht_abgeleitet"`). Der Sachwert
-   > blieb bei 268.172 €. **Das ist richtig so** — ein Sachwertfaktor auf
-   > eine ETW angewandt wäre ein Modellbruch.
-   >
-   > **Offen bleibt daraus ein eigener Punkt:** Der gepflegte Wert wird
-   > *stillschweigend* verworfen. Wer 1,15 einträgt, bekommt keinerlei
-   > Rückmeldung, dass die Angabe für diese Objektart wirkungslos ist —
-   > siehe Punkt 2.
-   >
-   > **Der Nachweis der Kette steht damit noch aus** und braucht ein
-   > **EFH oder ZFH**. Auf Staging bietet sich `Löhner Str. 278`
-   > (32120 Hiddenhausen, ZFH) an — das zweite Testobjekt aus `CLAUDE.md`.
-   > Dort greift die Objektart, und dort schlägt dann auch die leere Ernte
-   > durch.
-
-   Gemessen am 2026-08-12 in `mb.wert_parameter`:
-
-   | Typ | Einträge |
-   |---|---|
-   | `lzs` | 530 |
-   | `rnd` | 523 |
-   | `miete_qm` | 522 |
-   | `bwk_pct` | 495 |
-   | `gnd` | 494 |
-   | **`sachwertfaktor`** | **0** |
-
-   **Die Abfragekette ist in Ordnung** — `WertParameterService.sachwertfaktor()`
-   nimmt zuerst eine eigene Angabe (Stufe E), sonst den amtlichen Wert aus
-   der Tabelle. Sie zieht also einen, sobald einer da ist. Es ist nur
-   keiner da: als einziger Parametertyp wurde er nie mitgeerntet.
-
-   **Folge:** Der Sachwert bleibt der **vorläufige** nach § 35 ImmoWertV,
-   die Marktanpassung nach § 21 Abs. 3 / § 39 unterbleibt. Am Prüfobjekt
-   Hüllhorst stehen deshalb 268.172 € gegen Vergleichswert 192.000 € und
-   Ertragswert 191.339 € — ein Abstand von 40 %, der **allein** aus dem
-   fehlenden Faktor stammt: 191.500 / 268.172 = **0,71**, für die Lage und
-   Baujahr 1962 ein völlig üblicher Wert. Der Bericht kennzeichnet es
-   korrekt („ohne Sachwertfaktor — Herstellungskosten, kein Marktwert"),
-   aber wer nur die drei Zahlen sieht, hält eine für falsch.
-
-   **Zu tun:** Sachwertfaktoren in die Ernte aufnehmen. Sie stehen in
-   denselben Grundstücksmarktberichten wie der Liegenschaftszinssatz —
-   `WNHK-1` sagt dazu „die Ernte liefert beides oder keines", und
-   tatsächlich liefert sie nur eines. **Zugriff nur über
-   `lib/gutachterausschuss.js`** (CLAUDE.md), nie ein Modul direkt.
-
-   ### → Hier weitermachen
-
-   **Der Nachweis der Abfragekette braucht ein Haus, keine Wohnung.**
-   Vorschlag: **`Löhner Str. 278`, 32120 Hiddenhausen (ZFH)** — das zweite
-   Testobjekt aus `CLAUDE.md`, mit bekanntem Verkehrswert 350.094,36 €.
-
-   1. Objekt im Marktbericht wählen, Stufe 3, **Sachwertfaktor eintragen**
-      — **Marcel gibt den Wert vor**, er ist der Sachverständige.
-   2. Bericht ziehen und drei Dinge messen:
-      - Wandert der Sachwert vom vorläufigen auf den marktangepassten Wert?
-      - Trägt die Karte **„marktangepasst · Faktor x"** statt „vorläufig ·
-        ohne Sachwertfaktor" (die Unterzeile gibt es seit `v1143`)?
-      - Steht die Herkunft als **Stufe E, „eigene Angabe"** dabei — so wie
-        der Liegenschaftszinssatz es tut?
-   3. Läuft das durch, ist die Kette bewiesen und der Punkt reduziert sich
-      auf die **Ernte**.
-
-   **Vorher prüfen, was der Abruf kostet.** Für `07d89138` (Hüllhorst) war
-   Stufe 3 bezahlt und jeder weitere Lauf stand auf 0 L; für ein anderes
-   Objekt gilt das **nicht** — `stufenpreis` fragen und Marcel den Preis
-   nennen, bevor Kerosin fließt.
-
-   **Der Abruf blockiert unter Automation**, solange `window.confirm` nicht
-   ersetzt ist (`marktbericht-app/app.js:224`, Kostenhinweis v647-cost) —
-   siehe `FALLEN.md`.
+   - Ein eigener Sachwertfaktor bei einer ETW wird mit `sachwertfaktor_grund: "objektart_nicht_abgeleitet"` still verworfen — der Nutzer bekommt keine Rückmeldung, dass die Angabe wirkungslos ist (Stand unklar, am 25.10.2026 nicht nachgemessen).
 
 8. **Der Objektnummer fehlt auf cremefarbenem Grund der Kontrast.**
    Gemessen beim `v1113`-Abnahmelauf, Standard-Gold: `hdr-obj-num` steht
@@ -15393,34 +3242,6 @@ entfällt — nicht raten.
    ist ein Eingriff gerechtfertigt — und dann über `tonFuerGrund()` gegen
    den *überlagerten* Grund, nicht gegen Weiß.
 
-> ### Vier Punkte sind seit dem 30.08. zu — hier stehen nur noch die Zeiger
->
-> **Alle Nummern in diesem Block sind die ALTEN**, aus der Zählung vor dem
-> 30.08. — sie sind fertig, also wandern sie nicht mit.
->
-> **Punkt 5 (Hell und Dunkel als zwei Profile) ist erledigt** — `v1162`/
-> `v1162b` und `v1167`, beide Reste zu. Der Text stand nur noch als Hinweis
-> in „Offen" und ist dort entfernt; der volle Befund steht unter „Fertig".
->
-> **Punkt 4 (Akzentfarbe) ist erledigt** — `v1174` (freier Farbwähler) und
-> `v1175` (Fassung C + Farbton-Regler). Marcel hat aus
-> `design/Vorschläge/akzent-waermer.html` **Fassung C** gewählt; die
-> Schnellauswahl ist damit die kuratierte warme Liste, alles Kühle kommt
-> über Regler oder Farbkasten. Der Später-Punkt „Mindestkontrast-Regel"
-> ist **keine Voraussetzung mehr** — sie steht seit `v1109`.
->
-> **Punkt 11 (Wallet-Abstände) ist erledigt** — `v1173`/`v1173b`. Der
-> Kartenbereich war mit Punkt 4 verklammert; beide sind jetzt zu.
->
-> **Der alte Punkt 10 (Sachwert und Miteigentumsanteil) ist erledigt** —
-> Marcel hat am 14.08. **Weg A** entschieden (Garagenfeld bleibt
-> wohnungsbezogen), `v1165` und `v1166` setzen genau das um.
->
-> **Die Nummern sind dadurch lückig** (1, 2, 3, 5, 6, 7, 8, 9, 10). Sie
-> werden **beim nächsten Aufräumen** durchgezählt, nicht nebenbei: die
-> Punkte verweisen quer aufeinander, und ein halb gezogenes Umnummerieren
-> ist schlimmer als eine Lücke.
-
 ## Später
 
 
@@ -15446,41 +3267,6 @@ entfällt — nicht raten.
   nur lesen, nicht zurücksetzen. **Erst messen, welche Regler betroffen sind,
   dann alle in einem Paket umstellen** — nicht sechs Einzelfixes.
 
-
-- **ERLEDIGT (v1157) — der Tab-Text-Regler hielt keinen Akzentwechsel aus.**
-  Halber Erfolg aus `v1155` (Backlog-Punkt 6), ehrlich benannt.
-
-  **Was behoben ist:** Der Regler war doppelt tot. Gemessen mit dem
-  Kaskaden-Walker über **alle** Stylesheets: seine Leser-Regel hing an
-  `body.dp-chrome-hell` (im Obsidian-Modus also niemand), und **elf** Regeln
-  setzen `color: var(--gold …)` auf `nav.tabs .tab`, **zehn mit
-  `!important`**. Ein Token allein verliert dagegen immer. (Mein `grep` fand
-  sie nicht — sie stehen in Kommalisten. Nur der Kaskaden-Blick im Browser
-  zeigte sie.) `v1155` setzt deshalb `body.dp-tabtext-an` und eine Regel mit
-  Spezifität **(0,6,4)** gegen die stärkste Gegenregel (0,5,2), am Dateiende.
-  **Nachgemessen: direkt nach dem Laden wirkt der Regler** — Tab-Text ging von
-  rgb(201,168,76) auf **rgb(255,0,0)**.
-
-  **Was offen ist:** Nach einem **Akzentwechsel** steht am Body-Inline-Stil
-  `--dp-tab-text: <Akzentwert>` statt des Nutzerwerts, und der Regler wirkt
-  nicht mehr. Meine Regel **gewinnt** weiterhin (per Walker bestätigt: 604,
-  `!important`, letzte Reihe) — sie liest nur einen überschriebenen Wert.
-
-  **Was schon ausgeschlossen ist:** Es sind **nicht** die drei bekannten
-  Setter. `grep` findet nur `_dpDispTabText`, den Boot-Block und die
-  Reset-Liste; ein Patch auf `CSSStyleDeclaration.setProperty` fing beim
-  Akzentwechsel **keinen** fremden Aufruf. Daraus folgt: der Setzer schreibt
-  **nicht** über `setProperty`, sondern über `style.cssText` oder
-  `setAttribute('style', …)` — dort greift der Patch nicht.
-
-  **Nächster Schritt, konkret:** `whitelabel-override.js` hat einen `sweep()`
-  mit `attributeFilter: ['style', …]`, der genau so arbeiten könnte. Also
-  `style.cssText` und `setAttribute` patchen (nicht `setProperty`) und den
-  Akzentwechsel wiederholen. **Erst wenn der Setzer benannt ist, wird
-  gebaut** — nach drei Anläufen an dieser Stelle war STOPP richtig.
-
-  **Kein Schaden im Auslieferungszustand:** ohne Nutzerwert wird weder Klasse
-  noch Token gesetzt, alles bleibt bitgenau wie vorher (nachgemessen).
 
 - **Punkt 5 (Grundfarbe) braucht eine Entscheidung, kein Patch.**
   Gemessen: **ohne Vorlage wirkt die Grundfarbe** (Sidebar rgb(11,18,32),
@@ -15776,267 +3562,25 @@ Saatdatei und meldet Zahlen, die es im Betrieb nicht gibt.
 
 ### A · SOFORT
 
-#### A1 — v1097 einspielen — **ERLEDIGT 13.09.2026** (`d8d8247`)
+#### A1 — v1097 einspielen — Rest: Test 2 (Erledigtes s. Fertig)
 
-> **Eingespielt, ins Repo zurückgeholt, `mb-backend` gebaut.** Der Klicktest
-> ist gefahren: bei ETW fordert die Ampel jetzt Bruttogrundfläche und
-> Standardstufe ein, bei EFH nicht — beide Kettenglieder belegt.
-> **Test 2 (Bericht mit Sachwert) bleibt offen**, er braucht einen echten
-> Berichtslauf. Einzelheiten im Marktbericht-Journal unter v1097.
->
-> Die Prüfstrecke fiel zuerst an einem Punkt durch, der **kein Fehler des
-> Pakets** war: sie prüfte den `app.js`-Buster gegen den Wert vom 30.08.
-> (`1154b`), während dort heute `1229c` steht. Gemessen: der Patch fasst
-> `app.js` nicht an. Die Prüfung vergleicht jetzt gegen das Original statt
-> gegen eine Konstante.
-
-**Der ursprüngliche Auftrag, zur Nachvollziehbarkeit:**
-
-**Sachwert für Eigentumswohnungen und Mehrfamilienhäuser freigeben.**
-ZIP liegt unter `Dateien/uebergabe-claude-code-20260908.zip` → Ordner `v1097/`.
-
-Der Rechenkern rechnet ETW/MFH **seit v1047**, die NHK-Zeilen 4.1–4.3 stehen
-**seit v1068** in `lib/nhk2010.js`. Die Oberfläche sperrte es trotzdem
-(`wertermittlung.js`, `nichtWenn: istWohnung()` — Regel aus v955). `nichtWenn`
-übersprang zusätzlich die **Pflichtfeldsammlung**, deshalb hat die Ampel BGF
-und Standardstufe nie eingefordert. Dieselbe alte Regel stand auch im
-**Prompt der KI-Zweitmeinung**.
-
-**Vorprüfung — die Anker müssen noch da sein** (Paket ist gegen `370545f`
-gebaut, `wertermittlung.js` gehört dem Parallel-Strang):
-
-```
-cd /opt/dealpilot
-grep -n "nichtGrund: 'bei Eigentumswohnung nicht anwendbar'" frontend/marktbericht-app/wertermittlung.js || echo "ANKER WEG - Paket neu bauen"
-grep -n "Das Sachwertverfahren ist fuer Eigentumswohnungen nicht anwendbar" marktbericht/backend/src/services/KiGegenrechnungService.js || echo "ANKER WEG - Paket neu bauen"
-```
-
-Fehlt ein Anker: **nicht zurechtbiegen, neu bauen.** `apply.sh` bricht selbst
-ab, ohne eine Zieldatei anzufassen.
-
-**Einspielen:** `bash /tmp/v1097/apply.sh`, dann `mb-backend` rebuilden
-(`KiGegenrechnungService.js` ist Backend). **`backend` braucht keinen Rebuild**,
-keine Migration. Danach **Strg+F5**.
-
-**Abnahme — hier steht oder fällt der Befund:**
-
-| Test | erwartet |
-|---|---|
-| ETW Stufe 3, BGF + Standardstufe **leer** | „✓ rechnet — genauer mit: Bruttogrundfläche, Standardstufe". Kein rotes Kreuz, Knopf aktiv |
-| dieselbe ETW, **beide gefüllt** | im Bericht **erscheint ein Sachwert** |
-| Hüllhorst (ETW, 2 WE) | 305.937 / 348.687 € · 2,56 % · RND 49,6 J. — unverändert |
-| Löhner Str. 278 (ZFH) | SWF 0,889 Stufe A · 290.391 € — unverändert |
-
-**Kommt im zweiten Test kein Sachwert: Befund ausdrücklich zurücknehmen, neu
-diagnostizieren, nicht nachpatchen.**
-
----
-
-#### A2 — Quellenblock im Bericht — **ERLEDIGT 13.09.2026** (`609dc9c`, v1107)
-
-> **Der Quellennachweis steht jetzt im Bericht** — am Ende der
-> Wertermittlung, im PDF und auf dem Bildschirm. Das Backend sammelt die
-> Vermerke der **tatsaechlich verwendeten** Registersaetze in
-> `cross_check.quellen_nachweis`, entdoppelt ueber den Vermerkstext: fuehrt
-> derselbe Ausschuss Zins UND Sachwertfaktor, steht er einmal da, mit
-> beiden Kennzahlen.
->
-> **Nicht in der Fussnote**, weil v1150b dort auf 26 Zeichen kuerzt — eine
-> abgeschnittene Namensnennung ist keine.
->
-> Gemessen an einem echten CrossCheck-Lauf (Prignitz, EFH Bj 1975, Faktor
-> 0,9043 Stufe A): der Nachweis traegt Vermerk, Lizenz `dl-de/by-2-0`,
-> Kennzahl und Link auf den Bericht.
->
-> **Dazu v1106:** der Quellenlink steht jetzt auch beim SACHWERTFAKTOR, wie
-> Marcel es am 13.09. verlangt hatte („bei den Liegenschaftszinsen und
-> Sachwertfaktoren"). Der Zins hatte ihn seit v1099, der Faktor nicht —
-> das Backend lieferte ihn seither, es las nur niemand.
-
-**Der urspruengliche Auftrag, zur Nachvollziehbarkeit:**
-
-
-
-**Aurich (41 Kreisschlüssel) und Potsdam/Uckermark (5) stehen unter
-`dl-de/by-2-0` — Namensnennung ist Pflicht.** Der Vermerk hängt an jedem
-Registerdatensatz im Feld `quellenvermerk` und **fehlt im Bericht**. Solange
-das so ist, dürfen diese Zahlen in keinen Kundenbericht.
-
-Entschärfend: Marcels eigener Markt ist OWL und NRW, dort gilt `zero-2-0`.
-**Der Deckel wird mit jeder Ernte teurer.**
-
-**Zusammen bauen mit der Kunden-Verlinkung** (derselbe Bauplatz, Block 04,
-Abschnitt „Das Quellenregister"): wo kein Wert vorliegt, nennt der Bericht den
-zuständigen Ausschuss und verlinkt seine Quelle; ist sie kostenpflichtig, sagt
-er das und verlinkt den Bezugsweg.
-
-Drei Dinge, die dabei schiefgehen können:
-
-- **`app.js` gehört dem Parallel-Strang** — vor dem Patch frisch ziehen
-- **v1150b kürzt Quellenangaben in der Fußnote auf 26 Zeichen.** Der
-  `by-2-0`-Vermerk ist deutlich länger → **eigener Quellenblock am
-  Berichtsende**, nicht die Fußnote
-- **Nur die Ausschüsse nennen, deren Zahl wirklich in DIESEM Bericht steckt.**
-  Eine Namensnennung für einen Ausschuss, der nicht vorkommt, ist genauso
-  falsch wie eine fehlende
+- **Test 2 offen:** dieselbe ETW mit Bruttogrundfläche und Standardstufe gefüllt → im Bericht muss ein Sachwert erscheinen. Braucht einen echten Berichtslauf (Marktbericht-Journal unter v1097). Kommt kein Sachwert: Befund ausdrücklich zurücknehmen, neu diagnostizieren.
 
 ---
 
 ### B · RECHENKERN
 
-#### B1 — v1098 · Modellvermerk-Leser
+#### B1 — v1098 · Modellvermerk-Leser — Rest (① und ② teils erledigt, s. Fertig)
 
-Drei Stellen, an denen heute **still gegen ein anderes Modell** gerechnet wird.
-Ein Paket, weil sie dieselbe Prüfstrecke teilen.
+- **② Rest:** Baupreisindex als Zahl zum jeweiligen Stichtag statt Konstante 1,91 — für Stichtage in der Vergangenheit rechnet die Konstante zwangsläufig falsch. Sätze ohne Bezugszeitpunkt bleiben Sperre.
+- **③ NRW-Bewirtschaftungskosten** sind stichtagsabhängig (AGVGA, Ausgangswerte 01.01.2002, Fortschreibung über den VPI); das hinterlegte Paar gilt nur für den 01.01.2015.
+- **④ Baujahrsschranke** eines Sachwertfaktors (Vorpommern-Rügen ab Bj. 1990, Brandenburg ab 1984): `vorbedingungen` im Modell, Meldung `ausserhalb_der_stichprobe` statt stumm zu rechnen. Vorher messen, welche Rezepte die Schranke nur im Hinweistext tragen.
+- Hüllhorst- und Löhner-Sollwerte gegen das Gutachten neu abnehmen.
 
-**① `GND_JAHRE = 80` ist hart verdrahtet** (`CrossCheckService.js` Z. 24).
-**Bonn** rechnet Drei- und Mehrfamilienhäuser mit **GND 60**,
-Hameln-Hannover 70/60/50 je Gebäudeart, Otterndorf 70. Wer diesen Zinssatz mit
-GND 80 kapitalisiert, verletzt **§ 10 ImmoWertV**. *Die richtige Zahl steht
-längst im Registerdatensatz unter `modellansaetze` — sie wird nur nicht
-gelesen.* **Der schwerste stille Fehler im System, und er wächst mit jeder
-Ernte.**
+#### B1b — Steuerliche Portfolio-Betrachtung — Rest (Erledigtes s. Fertig, v1397)
 
-**② `BAUPREISINDEX = 2.02` hat keinen Stichtagsbezug** (Z. 22). Das
-Berechnungsbeispiel des **GMB Dortmund 2026** rechnet mit **1,906** zum
-01.01.2026 — rund **6 % Abweichung**. Bei einem Stichtag in der Vergangenheit
-rechnet eine Konstante zwangsläufig falsch.
-
-**③ NRW-Bewirtschaftungskosten sind stichtagsabhängig.** Das AGVGA-Modell
-druckt Ausgangswerte zum 01.01.2002 ab und schreibt sie über den VPI fort:
-230 × 106,7/87,5 = **280** · 275 × 106,7/87,5 = **335** — beide abgedruckten
-Werte treffen. Das hinterlegte Paar gilt nur für den 01.01.2015.
-
-**④ Ein Sachwertfaktor kennt seine Baujahrsschranke nicht.**
-*Neu am 14.09.2026, bei der MV-Ernte gemessen.* **Vorpommern-Rügen** leitet
-seine Faktoren ausdrücklich **nur aus Baujahren ab 1990** ab — ein großer Teil
-des vorpommerschen Bestands ist älter. **Brandenburg** hat denselben Fall
-(„Baujahre ab 1984"). Das Register kennt `gueltig`/`geltungsbereich` nur **je
-Achse oder Term**; eine Vorbedingung auf einem Feld, das gar keine Achse ist
-(Baujahr, Restnutzungsdauer, Modernisierungsgrad), gibt es nicht.
-
-Der Bestand löst das heute im **Hinweistext** — der Faktor wird geliefert, die
-Warnung steht daneben. Das ist dieselbe Klasse wie ① bis ③: gerechnet wird
-gegen ein Modell, für das der Wert nicht abgeleitet wurde, und niemand muss es
-merken. Zu bauen wäre eine Vorbedingungsliste im Modell, etwa
-
-```json
-"vorbedingungen": [{ "feld": "baujahr", "von": 1990,
-                     "grund": "Die Stichprobe umfasst nur Baujahre ab 1990." }]
-```
-
-die vor der Auswertung greift und `ausserhalb_der_stichprobe` meldet, statt
-stumm zu rechnen. **Betrifft mindestens MV-13073 und die Brandenburger Sätze**
-— vor dem Bau zu messen, welche Rezepte eine solche Schranke im Hinweistext
-tragen, statt sie zu schätzen.
-
-**Achtung, gleiche Klasse wie v1075:** Punkt ① schaltet einen Zweig frei, der
-heute nie läuft. Der gehört im `apply.sh` **echt ausgeführt**.
-**Und die Regressionswerte Hüllhorst und Löhner Straße ändern sich** — sie
-müssen **gegen das Gutachten** neu abgenommen werden, nicht gegen die alten
-Sollwerte.
-
-#### B1b — Steuerliche Portfolio-Betrachtung ✅ **GEBAUT 14.09.2026 (v1397)**
-
-**Marcels Frage, zum zweiten Mal gestellt:** „warum steht das noch drin?
-wollten wir das nicht ändern?"
-
-**Er hatte recht — und die Messung hat mehr gefunden als die Frage vermutete.**
-
-##### Der eigentliche Befund: zwei Stellen, zwei Antworten
-
-Der Hinweistext behauptete, die Objekte verschöben sich gegenseitig nicht die
-Progression. **Das stimmte seit V276 nur noch zur Hälfte:**
-
-| Stelle | rechnete | Beleg |
-|---|---|---|
-| `tax.js` (Tab Steuern) | **saldiert** — `baseIncome + _bestandInfo.sum`, dann `calcImmoTaxImpact` | `tax.js:541` |
-| `calc.js` (Cashflow, KPI, Cockpit) | **nicht saldiert** — `_estDelta` gegen das rohe zvE-Feld | `calc.js`, Kommentar V258-07 |
-
-In `calc.js` stand der Grund wörtlich im Code: *„Effektives zvE ohne Immobilie
-+ WK anderer Objekte **(nur Display)** … Eigentliche Steuerberechnung weiterhin
-auf K.zve_immo basiert."* Die Zahl wurde ermittelt, angezeigt — und nicht
-gerechnet.
-
-**Damit wies dieselbe App für dasselbe Objekt zwei verschiedene
-Steuerwirkungen aus**, und die Summe im Portfolio-Cockpit hing an der
-ungenaueren von beiden.
-
-##### Was gebaut wurde
-
-`window._dpBestandSaldo(jahr)` in `tax.js` ist jetzt **der eine Weg**. Er liegt
-dort, weil dort der Kaufdatums-Filter sitzt (V280: nur Objekte, die vor dem
-eigenen gekauft wurden und im Bezugsjahr bestanden). `calc.js` ruft ihn in
-`_estDelta` auf und rechnet die Tarifdifferenz gegen die **gesenkte** Basis.
-
-> **Warum nicht `getWKForOtherObjects`:** die zweite Aggregator-Funktion
-> filtert **nicht** nach Kaufdatum. Mit ihr käme im Cashflow eine andere Zahl
-> heraus als im Tab Steuern — die nächste stille Dublette.
-
-**Rückfall 0, wenn der Aggregator-Cache noch nicht geladen ist.** Lieber
-unverändert als halb saldiert: eine Zahl, die je nach Ladezustand springt, ist
-schlimmer als eine bekannt konservative.
-
-##### Nachgemessen gegen den echten `tax.js`-Tarif (8 Fälle, alle treffen)
-
-Die Summe der Einzelbetrachtungen ist jetzt **cent-genau** die echte
-Portfoliozahl — die Teleskopsumme geht auf:
-
-| zvE | Objekte | alt (getrennt) | neu (saldiert) | wahr | alt war |
-|---|---|---:|---:|---:|---:|
-| 80.000 € | −25.000 / −20.000 | 18.348 € | 16.794 € | 16.794 € | +9,25 % |
-| 80.000 € | 3 × −15.000 | 18.777 € | 16.794 € | 16.794 € | +11,81 % |
-| 60.000 € | 2 × −20.000 | 14.048 € | 12.663 € | 12.663 € | +10,94 % |
-| 120.000 € | 2 × −30.000 | 25.200 € | 25.031 € | 25.031 € | +0,68 % |
-| 150.000 € | 2 × −40.000 | 33.600 € | 33.600 € | 33.600 € | — |
-| **45.000 €** | **−30.000 / −25.000** | **15.665 €** | **8.835 €** | **8.835 €** | **+77,31 %** |
-| 80.000 € | +12.000 / −20.000 | 3.191 € | 3.360 € | 3.360 € | −5,03 % |
-| 80.000 € | ein Objekt −25.000 | 10.117 € | 10.117 € | 10.117 € | — |
-
-> **Zwei Fälle, die der alte Befund nicht kannte.** Übersteigen die Verluste
-> das zvE, lag die alte Rechnung **77 % zu hoch** — weit jenseits der
-> 9 bis 12 %, die bis dahin als Spanne galten. Und bei **gemischten**
-> Ergebnissen (ein Überschuss, ein Verlust) ging der Fehler in die **andere**
-> Richtung: −5 %. Die Aussage „der Fehler geht immer in dieselbe Richtung"
-> galt nur für reine Verlustportfolios.
->
-> **Ein einzelnes Objekt ändert sich nicht** — der Normalfall bleibt, wie er
-> war.
-
-##### Zwei Nebenfunde im Cockpit, im selben Zug behoben
-
-- **`var ZVE_BASE=78000`** war im Cockpit hart verdrahtet: die Modellprojektion
-  rechnete ihre gesamte Steuerwirkung für **jeden** Nutzer gegen 78.000 €,
-  unabhängig vom Profil. Jetzt `DealPilotZvE.getForYear(jahr)` — das kennt
-  sogar die **Historie**, also verschiedene Einkommen in verschiedenen Jahren.
-  Genau das braucht eine Projektion über fünfzehn Jahre. 78.000 bleibt letzter
-  Rückfall.
-- **`vuvY1`** summierte `_kpis_vuv` — ein Feld, das **nirgends im Frontend
-  gesetzt wird**. Die Summe war immer 0, verwendet wurde sie nie. Entfernt.
-
-##### Was offen bleibt
-
-1. **Die Aufteilung ist eine Konvention, die Summe ist es nicht.** Gewählt ist
-   **Weg A** (Stapel nach Kaufzeitpunkt) — weil `tax.js` ihn seit V276 bereits
-   fuhr und der Tab Steuern damit maßgeblich war. Das früher gekaufte Objekt
-   bekommt die erste, wirksamere Stufe. Das steht jetzt so im Hinweistext.
-2. **Die Forward-Betrachtung über Jahre** ist damit *nicht* erledigt. Der
-   Saldo wird je Bezugsjahr geholt (`wk_per_year` trägt die Zeitachse), aber
-   eine durchgerechnete Jahresreihe über alle Objekte gibt es nur in der
-   Modellprojektion des Cockpits — und die rechnet mit Näherungen
-   (`ASSUMP`), nicht mit der echten `calc.js`-Pipeline.
-3. **Verlustverrechnungsbeschränkungen** (§ 15a, § 15b, § 10d EStG) bleiben
-   ausdrücklich außen vor. Dafür braucht es die Steuerbescheide der Vorjahre;
-   das ist Steuerberatung, nicht Kalkulation.
-
-##### Wo es sichtbar ist
-
-`frontend/index.html`, Karte `#tax-flow-hint` — der Abschnitt heißt jetzt
-„Wie die Objekte zusammen gerechnet werden" statt „Und was DealPilot dabei
-nicht tut". Dazu im Progressionshinweis (`#prog-hinweis`) ein Satz, der die
-verschobene Ausgangsbasis beziffert, sobald sie verschoben ist — sonst stünde
-dort eine Zahl, die im Tab Steuern nirgends auftaucht.
-
+- **Forward-Betrachtung über Jahre:** eine durchgerechnete Jahresreihe über alle Objekte gibt es nur in der Modellprojektion des Cockpits, mit Näherungen (`ASSUMP`) statt der echten `calc.js`-Pipeline.
+- Bewusst außen vor: Verlustverrechnungsbeschränkungen (§ 15a, § 15b, § 10d EStG) — braucht die Steuerbescheide der Vorjahre, ist Steuerberatung.
 
 #### B1c — Der Löhner-Sollwert und die Software gehen auseinander **[NEU 14.09.2026]**
 
@@ -16113,157 +3657,21 @@ Gutachten der schwerste formale Mangel. Braucht eine mb-Migration.
 
 ### C · REGISTER UND QUELLENREGISTER
 
-### C1 · ✅ ERLEDIGT — am Code nachgemessen 12.10.2026
+#### C2 — Kunden-Verlinkung — Rest (Erledigtes s. Fertig)
 
-> `marktbericht/backend/migrations/006_harvest.sql:40` legt
-> `mb.gaa_documents` an (Fremdschlüssel auf `gaa_sources`, Unique auf
-> `url`, Arbeitsindex auf `(status, lauf_typ)`), erweitert um Preis,
-> Bestell-URL und Prüfstand in `007_quellenregister.sql:14-30`.
->
-> **Und sie wird benutzt:** geschrieben in `HarvestService.js:171`,
-> gelesen in `routes/api.js:179` (die Dokumentzahl je Quelle, die im
-> Admin erscheint) und in `HarvestService.js:441` (Statusstatistik).
+- Link je **Ausschuss aus der Datenbank** (`mb.gaa_sources`/`gaa_documents`, C1) statt aus der Konstante `quellen_links.js` — keine zweite Wahrheit neben C1.
+- Die drei Texte für die drei Fälle (kein Wert / kostenpflichtig / vorhanden) sind erst in einer Fassung formuliert.
+- Regeln bleiben: nicht suggerieren, dass DealPilot den Wert liefert · kein Betrag ohne Beleg · nur die Landingseite verlinken, nie das Jahrgangs-PDF.
 
-**Der ursprüngliche Text:**
+#### C3 — Admin-View „Ausschuss-Register“ — Rest: Reiter „Bestand“ (Erledigtes s. Fertig)
 
-#### C1 — Quellenregister in der Datenbank *(Marcels Vorgabe vom 13.09.)*
+- Ansicht der Registersätze selbst, read-only, filterbar nach Land / Kennzahl / Ausschuss / Berichtsjahr. Stand 12.10.2026: `register/stand` nur im mb-Container (`api.js:61`), im Haupt-Backend nicht durchgeschleift. Ob v2591 („Register & Ernte“) das inzwischen abdeckt, ist nicht nachgemessen.
+- Quellen-Filter „nächste Prüfung fällig“ und „Jahrgang verfügbar > Jahrgang im Register“ (Arbeitsansicht der jährlichen Nachernte).
+- Fallen: Admin-API-Wrapper ohne `call()` · eigener SVG-Helfer statt Chart.js · `var(--text)` löst im Admin dunkel auf · Daten in der mb-DB, Weg über den Proxy (bewusst entscheiden).
 
-**Ziel:** Für jeden Ausschuss steht in der Datenbank, **woher** die Zahl kommt —
-Link, Jahrgang, Lizenz, Stichtag, Seite, Kosten. Nicht als Notiz in Markdown,
-sondern als Zeile, die man abfragen und **jährlich abarbeiten** kann.
+#### C4 — Sachwertfaktoren ins Register — Rest: Reihenfolge umdrehen (Erledigtes s. Fertig)
 
-**Es gibt den Anfang schon:** `mb.gaa_sources` → `mb.gaa_documents`,
-**67 Dokumente, alle `status = neu`, nie extrahiert.** Der `sha256` darin ist
-der eigentliche Wert: ändert ein Ausschuss seinen Bericht, ändert sich der
-Hash, und das Dokument fällt automatisch zurück in die Warteschlange.
-**Erst diese Tabellen lesen, bevor etwas Neues gebaut wird** —
-*bevor ein zweites Werkzeug gebaut wird, nachsehen, ob es das erste schon gibt.*
-
-Spezifikation (Felder, Statuswerte, Jahresablauf): Block 04, Abschnitt
-„Das Quellenregister".
-
-**Erstbefüllung ist eine Übertragung, keine neue Recherche** — die vollständige
-Landkarte liegt in `claude/abdeckung-laender-kreise-20260814.md` und
-`claude/laender-lizenzlage-20260813.md`, nur im falschen Format.
-
-#### C2 — Kunden-Verlinkung — **GRUNDLAGE STEHT (v1099, 13.09.2026)**
-
-> **Gebaut auf Marcels Vorgabe:** *„gib im Marktbericht bei den
-> Liegenschaftszinsen und Sachwertfaktoren den Link an, wenn der Kunde die
-> Adresse eingegeben hat. Dann kann er selber die Werte holen oder kaufen."*
->
-> `marktbericht/backend/src/lib/quellen_links.js` führt **alle sechzehn
-> Bundesländer** — Stelle, Portal-URL, Zugang (kostenfrei / teils
-> kostenpflichtig). Ein Registersatz gewinnt gegen die Landestabelle, weil er
-> den zuständigen Ausschuss namentlich kennt.
->
-> **Der Link hängt an jeder Antwort, nicht nur an der leeren:** wo kein Wert
-> ist, *ist* er die Auskunft; wo einer ist, belegt er ihn. Gemessen an vier
-> Orten, davon drei ohne eigenen Wert (München, Dresden, Hamburg).
->
-> **Was noch fehlt:** (1) die Anzeige auf dem **Bildschirm** — im PDF steht
-> sie, in der Web-Ansicht noch nicht. (2) Der Link je **Ausschuss** statt je
-> Land, wo wir keinen Registersatz haben — das ist C1, das Quellenregister in
-> der Datenbank. (3) Die drei Texte für die drei Fälle (kein Wert /
-> kostenpflichtig / vorhanden) sind erst in einer Fassung formuliert.
-
-**Der ursprüngliche Auftrag:**
-
-Baut auf C1 auf, wird mit **A2** zusammen ausgeliefert (derselbe Quellenblock
-am Berichtsende). Drei Fälle, drei Texte — Wortlaut in Block 04.
-
-Vier Regeln, nicht verhandelbar:
-- Der Link darf **nicht suggerieren**, dass DealPilot den Wert liefert
-- **Kein Betrag ohne Beleg** (RLP: 150 € gegen 28 € — unbestätigt, also nur
-  „kostenpflichtig")
-- **Nur die Landingseite verlinken, nie das Jahrgangs-PDF** — Deep-Links
-  brechen jährlich, ein toter Link im Kundenbericht ist schlimmer als keiner
-- **Der Link kommt aus der Datenbank**, nicht aus einer Frontend-Konstante —
-  sonst gibt es eine zweite Wahrheit neben C1
-
-### C3 · ⚠ TEILS — und der alte Satz war falsch (nachgemessen 12.10.2026)
-
-> **Hier stand: „Heute gibt es dafür im Admin nichts. Kein View, keine
-> Route." Das stimmt nicht.**
->
-> ```
->   View    frontend/admin/index.html:384  <section id="view-marktzinsen">
->           „Marktzinsen & Gutachterausschuss-Daten"
->   UI      frontend/admin/js/admin-marktzinsen.js
->           quellenTabelle() :117-156 (Land · Ausschuss · Zugang)
->           Werte mit „Seite / Zitat aus dem Bericht" :384
->   Route   backend/src/routes/admin.js:1968 -> _mbCall GET /harvest/status
->           -> marktbericht routes/api.js:170-194 (quellen, werte, namen)
-> ```
->
-> **Was wirklich fehlt, ist der zweite Reiter „Bestand":** die Ansicht
-> der Registersätze selbst, filterbar nach Land, Kennzahl, Ausschuss und
-> Berichtsjahr. Belege für den Negativbefund: `register/stand` existiert
-> nur im mb-Container (`api.js:61`) und ist im Haupt-Backend **nicht
-> durchgeschleift** (kein Treffer in `admin.js`); `kennzahl` und
-> `Berichtsjahr` kommen in `admin-marktzinsen.js` **nicht vor**.
-
-**Der ursprüngliche Text:**
-
-#### C3 — Admin-View „Ausschuss-Register"
-
-**Heute gibt es dafür im Admin nichts.** Kein View, keine Route. Der einzige
-Weg an den Bestand führt über `docker exec … psql` oder den
-`register/stand`-Endpunkt im Container.
-
-Zwei Reiter, **beide zuerst read-only** (ein Schreibzugriff wäre ein zweiter
-Weg neben dem Erntewerkzeug):
-
-- **Bestand** — was im Register liegt, filterbar nach Land / Kennzahl /
-  Ausschuss / Berichtsjahr
-- **Quellen** — die Landkarte aus C1, mit Filtern „nächste Prüfung fällig" und
-  „Jahrgang verfügbar > Jahrgang im Register". **Das ist die Arbeitsansicht für
-  die jährliche Nachernte**
-
-Drei Fallen (alle schon einmal bezahlt): der Admin-API-Wrapper exportiert
-**kein `call()`** · Admin-Charts sind ein eigener SVG-Helfer, nicht Chart.js ·
-`var(--text)` löst im Admin **dunkel** auf → feste helle Töne.
-Und: **die Daten liegen in der mb-DB, der Admin hängt am Haupt-Backend** — der
-Weg führt über den Proxy, und `qstrUser()` ist dort der falsche Pfad.
-**Das gehört bewusst entschieden, nicht nebenbei.** Details in Block 04.
-
-### C4 · ⚠ TEILS — das Register rechnet, aber die Module gewinnen zuerst
-
-> Am Code nachgemessen (12.10.2026),
-> `marktbericht/backend/src/lib/gutachterausschuss.js:689-698`:
->
-> ```js
->   export function sachwertfaktor(o) {
->     const a = zustaendig(ags);
->     if (a) { … r.herkunft = 'modul'; return r; }     <- Modul zuerst
->     const ausRegister = ausRegisterRechnen(o, ags);   <- Register danach
-> ```
->
-> **Der Registerweg ist vollständig gebaut** — `ausRegisterRechnen()`
-> (`:506 ff.`) siebt Ebenen, löst Lageklassen auf, wählt Zweig und
-> Baujahrgruppe und rechnet über `swf_modelle.auswerten()`, mit
-> `herkunft: 'register'` und Modellvermerk. Lüdenscheid, Höxter und der
-> Märkische Kreis liegen im Register.
->
-> **Nicht vollzogen ist der letzte Schritt von C4:** „`sachwertfaktor()`
-> auf das Register umstellen, die zwei Module als Rückfall". Im Code ist
-> es umgekehrt — für Minden-Lübbecke (AGS 05770) und Herford (05758)
-> wird das Register **nie** gefragt.
-
-**Der ursprüngliche Text:**
-
-#### C4 — Sachwertfaktoren ins Register
-
-`swf_modelle.js` rechnet 36 Prüfungen richtig, aber `gutachterausschuss.js`
-nutzt für Sachwertfaktoren weiter die zwei **handgeschriebenen Module**
-(Minden-Lübbecke, Herford — sie tragen Umrechnungskoeffizienten und Gartenland,
-die das Register noch nicht abbildet).
-
-Reihenfolge: **Lüdenscheid zuerst** (`potenz`) — und dabei die Kaskade nutzen,
-sonst kollidiert es mit dem Märkischen Kreis unter `05962`. Dann Höxter und
-Märkischer Kreis (Rohdaten in `out/swf_roh.json`). Zuletzt
-`gutachterausschuss.sachwertfaktor()` auf das Register umstellen, Rückgabeform
-unverändert, die zwei Module als Rückfall stehen lassen.
+- `sachwertfaktor()` fragt weiter zuerst die handgeschriebenen Module (`gutachterausschuss.js:722 ff.`, am 25.10.2026 per grep gesehen): für Minden-Lübbecke (05770) und Herford (05758) wird das Register nie gefragt. Ziel: Register zuerst, Rückgabeform unverändert, die zwei Module (Umrechnungskoeffizienten, Gartenland) als Rückfall.
 
 #### C5 — Ersatzebenen C1 + C2 *(Marcels Entscheidung vom 30.08.)*
 
@@ -16380,231 +3788,11 @@ an sieben Ausschüssen belegt).
 > `quellen_links.js`; der Kunde bekommt dort den Weg statt einer Leerstelle.
 
 
-### E2-NI · NIEDERSACHSEN — der Zugang ist offen, die Lizenz trägt
+### E2-NI · NIEDERSACHSEN — Rest (Erledigtes s. Fertig)
 
-**Gemessen am 13.09.2026**, ausgelöst durch Marcels Link auf
-`gag.niedersachsen.de` (er hat dort tags zuvor Werte für ein Gutachten geholt).
-
-#### Zwei Rücknahmen
-
-> **① Hier stand: „Niedersachsen-Sachwertfaktoren liegen hinter
-> Tableau-Dashboards, nicht im PDF → F2 (LGLN-Anfrage)".**
-> Das erste stimmt, das zweite nicht: **eine Anfrage ist nicht nötig.** Die
-> Grundstücksmarktdaten stehen unter **`dl-de/by-2-0`** — kommerzielle
-> Verwertung ausdrücklich erlaubt, Namensnennung Pflicht. Gemessen an der
-> eigenen Nutzungsbedingungsseite des Landes (`nutzungsbedingungen-197313`).
->
-> Der geforderte Quellenvermerk lautet wörtlich:
-> ```
-> © Oberer Gutachterausschuss für Grundstückswerte Niedersachsen <Jahr>,
-> dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0),
-> https://immobilienmarkt.niedersachsen.de
-> ```
-> Zusätzlich zur Quellenangabe **ist die Internetadresse anzugeben** — das ist
-> eine eigene Auflage neben der Namensnennung. Gleiche Klasse wie Aurich und
-> Potsdam/Uckermark, also **A2 gilt auch hier**: ohne Quellenblock im Bericht
-> darf keine dieser Zahlen zum Kunden.
-
-> **② Hier stand (Liste vom 12.09.): „Sachwertfaktoren Braunschweig-Wolfsburg
-> — beantwortet, nicht offen. Es gibt sie nicht."**
-> Belegt war das mit dem Grundstücksmarktbericht **2025**, S. 34: „Zu diesem
-> Thema gibt es keine zusätzlichen regionalen Auswertungen." **Für den
-> Jahrgang 2026 gibt es sie.** Der Kalkulator `2026_sw_rh_bswf` ist genau
-> das: Sachwertfaktoren Braunschweig-Wolfsburg, Reihenhaus/Doppelhaushälfte,
-> Datenbasis 01.01.2026, veröffentlicht 02.03.2026.
->
-> Der alte Satz war zum Zeitpunkt seiner Prüfung richtig. **Eine Aussage über
-> einen Jahrgang ist keine Aussage über die Zahl.** Das gehört als Regel in
-> jede Quellenzeile: nicht „gibt es nicht", sondern „gibt es im Jahrgang X
-> nicht".
-
-#### Was Niedersachsen anbietet (Jahrgang 2026, gemessen)
-
-**Beide Zielkennzahlen der Ernte, landesweit, in einem einheitlichen System:**
-
-| Kennzahl | Teilmärkte |
-|---|---|
-| **Liegenschaftszinssätze** | Büro · Eigentumswohnungen · Ein-/Zweifamilienhäuser · Mehrfamilienhaus · regional · Reihenhaus/DHH · Wohn-Geschäft · weitere — **8** |
-| **Sachwertfaktoren** | Ein-/Zweifamilienhäuser · Höfe · Reihenhaus/DHH · Wochenendhäuser — **4** |
-
-Dazu im selben System: Umrechnungskoeffizienten, Vergleichsfaktoren,
-Bodenwerte, Erbbaurecht, Indexreihen, mittlere Preise, Transaktionen.
-
-**Namenssystematik der Dashboards:** `<jahr>_<kennzahl>_<objektart>_<gebiet>`
-— `2026_sw_rh_bswf` (Sachwert · Reihenhaus · Braunschweig-Wolfsburg),
-`2026_lizi_mfh_nds` (Liegenschaftszins · Mehrfamilienhaus · **landesweit**).
-Die Ausschusswahl läuft über Navigations-Dashboards (`2026_sw_navi_*`).
-
-#### Was ein Dashboard liefert
-
-Kein statischer Wert, sondern ein **Kalkulator** mit fünf Eingängen und drei
-Korrekturkurven:
-
-```
-Eingang    Wertermittlungsstichtag · Bodenrichtwert [€/m²] ·
-           vorläufiger Sachwert [€] · Wohnfläche [m²] ·
-           Restnutzungsdauer [Jahre] · Standardstufe
-Ausgabe    Sachwertfaktor + Standardabweichung
-Kurven     Umrechnungskoeffizienten für abweichende Wohnfläche (0,95–1,10),
-           Restnutzungsdauer (0,80–1,00) und Standardstufe (0,80–1,20)
-Rahmen     Stichprobenübersicht mit Min/Max/Median je Merkmal
-```
-
-Für BSWF/Reihenhaus gemessen: BRW 20–310 €/m² · Wohnfläche 53–200 m² ·
-Standardstufe 1,4–4,5 · RND 12–80 J. · vorläufiger Sachwert 36.482–589.913 € ·
-Kaufzeitpunkte 11/2022 bis 11/2025.
-
-**Das ist dieselbe Bauform wie Höxter** (`matrix_interp` plus
-Stufenkorrekturen) — das Rezeptformat trägt es also bereits.
-
-#### Der Modellvermerk liegt bei, als PDF
-
-Je Ausschuss verlinkt das Dashboard eine Modellbeschreibung, z. B.
-`gag.niedersachsen.de/download/225530/bs_2026_sw_modellbeschreibung.pdf`.
-Mit `pdftotext -layout` vollständig lesbar. Sie nennt alles, was § 10
-ImmoWertV verlangt:
-
-```
-Verfahren          multiple Regression aus Kauffalluntersuchungen
-Gesamtnutzungsdauer  80 Jahre
-Alterswertminderung  linear (§ 38 ImmoWertV)
-Herstellungskosten   NHK 2010, Anlage 4 ImmoWertV, BPI Basis 2021=100
-Modernisierungsgrad  Nds. Erlass vom 16.01.2024, abweichend von ImmoWertA
-Bodenwert            BRW × Fläche × Umrechnungskoeffizient, nur rentierlich
-Außenanlagen         pauschal 5.000–20.000 €, Garagen 3.000–12.000 €
-Genauigkeitsmaß      Standardabweichung aus den Residuen, je Funktion konstant
-Selektion            ohne überdurchschnittliche Baumängel
-```
-
-**Kein Anwendungsbeispiel mit Zahlen.** Der Prüfmaßstab ist deshalb hier
-**der Kalkulator selbst**: eine Eingabe, die wir ihm geben, muss unser
-Register zeichengleich zurückgeben. Das ist ein anderer, aber gleichwertiger
-Prüfstand — und er gehört so dokumentiert, damit niemand ihn später für eine
-selbst gerechnete Zahl hält.
-
-#### Woran es hängt: der Datenabruf
-
-Drei Wege geprüft, keiner trägt allein:
-
-| Weg | Ergebnis |
-|---|---|
-| `…/dash.csv` und Varianten | HTTP 302 ins Leere |
-| Profil-API (`ogagmd2026`) | 404 — die alten Public-Endpunkte sind zu |
-| URL-Parameter (`?Sach=…&Brw=…`) | Werte **kommen an** (BRW, Sachwert, Standardstufe), aber Ergebnis und Diagramme bleiben leer — es fehlt die Teilmarkt-/Gebietsauswahl, die das Navigations-Dashboard setzt |
-| `tsConfigContainer` im HTML | leer, die Session wird per JS erzeugt — Bootstrap müsste nachgebaut werden |
-
-**Was bleibt:** der **Herunterladen**-Knopf im Dashboard selbst (Tableau
-bietet Daten als Crosstab an) — offiziell vorgesehen und von der Lizenz
-gedeckt. Er ist der nächste Schritt, gehört aber **einmal sauber gebaut**
-statt nebenbei: wenn er trägt, sind beide Kennzahlen für ein ganzes
-Bundesland erreichbar.
-
-**Aufwand-Einschätzung:** Niedersachsen führt heute **48 Registersätze**. Das
-System oben deckt beide Kennzahlen über alle Ausschüsse. Kein anderes
-Bundesland bietet so viel hinter einer einzigen, freien Lizenz — Hamburg
-eingeschlossen.
-
-
-##### Das Modell ist entschlüsselt — gemessen am Dashboard
-
-**Die Bauform steht fest:**
-
-```
-Sachwertfaktor = Grundwert(vorläufiger Sachwert, Bodenrichtwert-Band)
-                 × k_Wohnfläche × k_Restnutzungsdauer × k_Standardstufe
-```
-
-Das Dashboard sagt es selbst: *„Die Diagramme beziehen sich auf ein
-**Normobjekt**. Vom Normobjekt abweichende Merkmale bewirken folgende
-Änderungen der Sachwertfaktoren."*
-
-**Das Normobjekt (BSWF/Reihenhaus):** Wohnfläche **120 m²** ·
-Restnutzungsdauer **40 Jahre** · Standardstufe **2,5** — genau die Werte, bei
-denen alle drei Korrekturkurven auf 1,00 stehen.
-
-**Die drei Korrekturkurven, vollständig abgelesen (23 Stützpunkte):**
-
-| Wohnfläche | 60 | 80 | 100 | 120 | 140 | 160 | 180 | 190 | 200 m² |
-|---|---|---|---|---|---|---|---|---|---|
-| Koeffizient | 0,95 | 0,97 | 0,98 | **1,00** | 1,02 | 1,03 | 1,05 | 1,06 | 1,07 |
-
-| Restnutzungsdauer | 15 | 25 | 35 | 45 | 55 | 65 | 75 J. |
-|---|---|---|---|---|---|---|---|
-| Koeffizient | 0,72 | 0,87 | 0,96 | 1,03 | 1,08 | 1,12 | 1,16 |
-
-| Standardstufe | 1,5 | 2,0 | 2,5 | 3,0 | 3,5 | 4,0 | 4,5 |
-|---|---|---|---|---|---|---|---|
-| Koeffizient | 0,81 | 0,92 | **1,00** | 1,07 | 1,12 | 1,17 | 1,21 |
-
-**Die Grundwert-Kurve** hat vier Bänder (Bodenrichtwert 40 · 130 · 200 ·
-280 €/m²) über den vorläufigen Sachwert von 100.000 bis 550.000 €. Sie ist
-fallend und konvex; die Stützpunkte liegen in 50.000er-Schritten. **Diese
-Werte fehlen noch** — sie sind der einzige Rest.
-
-##### Zwei Abrufwege funktionieren, beide gemessen
-
-| Weg | Bedienung | Beleg |
-|---|---|---|
-| **Kalkulator** | fünf Eingabefelder befüllen, Faktor ablesen | BRW 130 · 250.000 € · Normobjekt → **0,90 ± 0,21** |
-| **Tooltip** | auf einen Kurvenpunkt zeigen | BRW 200 · 250.000 € → **0,97** |
-
-Der Tooltip nennt alle drei Größen im Klartext und ist damit die genauere
-Quelle — er liest den Stützpunkt, statt ihn aus der Grafik zu schätzen.
-
-**Der Prüfstand für Niedersachsen steht damit fest:** eine Eingabe in den
-Kalkulator, eine Antwort aus unserem Register — beide müssen zeichengleich
-sein. Das ersetzt das fehlende Anwendungsbeispiel vollwertig, weil beide
-Seiten dieselbe amtliche Quelle befragen.
-
-##### Was schon gemessen ist
-
-**Stichprobe: 213 Kauffälle** (erscheint erst, wenn beide Pflichtfelder
-gesetzt sind — vorher steht die Zahl nirgends).
-
-Drei Stützpunkte der Grundkurve, aus dem Kalkulator bzw. dem Tooltip:
-
-| Bodenrichtwert | vorläufiger Sachwert | Sachwertfaktor | Weg |
-|---|---|---|---|
-| 40 €/m² | 100.000 € | **1,33** ± 0,21 | Kalkulator |
-| 130 €/m² | 250.000 € | **0,90** ± 0,21 | Kalkulator |
-| 200 €/m² | 250.000 € | **0,97** | Tooltip |
-
-Alle drei am Normobjekt (120 m² · 40 J. · Stufe 2,5). Die Standardabweichung
-ist **±0,21 und konstant** — die Modellbeschreibung sagt genau das: sie wird
-aus den Residuen ermittelt und hat je Funktion einen festen Wert.
-
-> **Warum hier Schluss war (13.09.2026):** Der Versuch, die Kurve in einer
-> Serie abzufragen, ist dreimal an einem Renderer-Timeout gescheitert —
-> `Page.captureScreenshot` bricht nach 30 s ab, während Tableau neu rechnet.
-> Das Fenster ließ sich auch nicht vergrößern (869 × 258 px sichtbar), und
-> der Ergebniswert steht **nicht** im Accessibility-Baum, sondern ist ins
-> Canvas gezeichnet — er ist nur über ein Bild lesbar.
->
-> **Der Einzelabruf funktioniert zuverlässig, die Serie nicht.** Für einen
-> konkreten Gutachtenfall ist der Weg also brauchbar (Marcel hat ihn gestern
-> genau so benutzt); für die Ernte von 40 Stützpunkten × 12 Teilmärkten ×
-> n Ausschüssen ist er es nicht.
-
-##### Was der nächste Durchgang braucht
-
-
-**Vierzig Messungen** (4 Bänder × 10 Stützpunkte) für einen Teilmarkt eines
-Ausschusses — per Tooltip, je Punkt ein Zeigen und ein Ablesen. Das ist für
-einen Einzelfall vertretbar und für die Fläche zu viel. **Vorher lohnt ein
-Versuch am Herunterladen-Knopf** (Tableau bietet „Daten" als Kreuztabelle);
-trägt er, fällt die Handarbeit weg.
-
-**Die Reihenfolge, wenn es losgeht:**
-1. Ein Teilmarkt eines Ausschusses vollständig — Braunschweig-Wolfsburg,
-   Reihenhaus/DHH, weil Marcel dort gerade arbeitet
-2. Rezept schreiben (Form: Grundkurve je Band + drei Korrekturkurven —
-   dieselbe Bauform wie Höxter, `matrix_interp` plus Stufenkorrekturen)
-3. Gegen den Kalkulator prüfen, mindestens an fünf Punkten, darunter zwei
-   außerhalb der Stützstellen (die Interpolation ist der fehleranfällige Teil)
-4. Erst dann der nächste Ausschuss
-
-**Nicht vergessen:** der Quellenvermerk gehört in denselben Arbeitsgang
-(A2). Ohne ihn darf keine dieser Zahlen in einen Kundenbericht.
+- Nachernte 2027 nach `tools/swf-register/ernter/vizql/README.md` (Abschnitt „Die Nachernte 2027“).
+- Deckung je Ausschuss und Teilmarkt (8 Liegenschaftszins-, 4 Sachwertfaktor-Teilmärkte) gegen das Register messen, nicht annehmen. Prüfstand ist der Kalkulator selbst: Eingabe dort = Antwort aus dem Register, zeichengleich.
+- Messbefunde vom 13.09. (Normobjekt 120 m² · RND 40 · Stufe 2,5, drei Korrekturkurven, Stützpunkte) in `claude/ernte-20260913.md`.
 
 #### E3 — Die Regeln, die bei jeder Ernte gelten
 
@@ -16790,6 +3978,755 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+### Technische RND wieder wie im Gutachten — vier Gewerke-Stufen — 23.10.2026 (`v2943`, `20aecba1`, `ee12638d`)
+
+Die technische Restnutzungsdauer rechnet wieder mit vier Gewerke-Stufen wie im Gutachten: veraltet −½ ·
+standard (zeitgemäß, ursprünglich) neutral · erneuert +½ · gehoben +1. Damit trifft Am Markt 18 wieder
+**26,00** und Am Markt 9 **22,00** Jahre — die RND-Gutachten-Abweichung Am Markt 18 ist geschlossen.
+`ee12638d`: Prüfsummen der gespiegelten Rechenkerne nachgezogen.
+
+### Bank-PDF-Video: die Seite wechselt mit dem Kapitelband — 23.10.2026 (`v2942`, `f3ebff18`)
+
+Die neue Seite lädt unsichtbar und erscheint erst mit dem Kapitelband — kein Seitensprung mehr im
+Bank-PDF-Video. Im selben Zug die Sprecher-Fassung von Modul 19 neu gesetzt und neu aufgenommen.
+
+### Prod-Rollout 67 — 23.10.2026 (`60320081`)
+
+Zielbild-RND nach Anlage 2, Stufen mit derselben Bandregel, ImmoWertA Alter höchstens GND, Kurzfassung bis
+6 Seiten, Messe-Tafeln und Menü, Storybook.
+
+### DealPilot-Marktbewertung: Abschlag auf Angebotspreise — 14.10.2026 (`v2237`, `dd8ac14b`) (früher N74)
+
+Die Spanne der DealPilot-Marktbewertung beruht auf Angebotspreisen. Gebaut: Abschlag als Einstellung, Ø Markt 5,8 % (Kaufpreise ETW bundesweit 12/2025 unter Angebot), im Urteil ausgewiesen. Quelle, Stand und Link nur intern in `config.js angebotAbschlagMarkt`.
+
+### Pilot-Analyse kennt den Marktwert — 14.10.2026 (`v2237`, `dd8ac14b`) (früher N75)
+
+Befund am Rundgang-Objekt (Kaufpreis 139.000 €, DealPilot Ø 189.000 €): die Analyse nannte nur die Zielrendite-Obergrenze, nicht den Wertpuffer. Behoben: `markt` (Marktwert/Spanne) geht im Aufruf mit, der Prompt führt zwei Sichten (Rendite der Lageklasse und Marktwert).
+
+### Quick-Check-Score gegen Investor Deal Score — entschieden 14.10.2026: bleibt getrennt (früher N73)
+
+Gemessen am Testobjekt Musterweg 7, Bielefeld: Quick-Check 46 = Objekt-DealScore 46 (alle Teilwerte gleich), Investor Deal Score (DS2, 24 Kennzahlen inkl. Lage/Markt) 63. Marcel: DS2 bleibt gesondert, weil er mehr Kennzahlen hat, genauer ist und die Lage eingeht.
+
+### Marcel 14.10.2026, achte Runde — 14.10.2026 (`v2218g`–`v2219c`, Prod-Rollout (19) `b11f88b4`) (früher N71)
+
+Geführte Eingabe randlos, Dokumente im PDF-Import, Sprache direkt Freisprechen, Sprechkatalog ergänzt (Grenze 320), Messe-Drehbuch Parkstraße. Datenfehler der Soll-Ansicht behoben (`v2219a`), Parkstraße wiederhergestellt. Auf Prod ausgerollt.
+
+### Marcel 14.10.2026, siebte Runde — 14.10.2026 (`v2218a`–`v2218f`) (früher N70)
+
+Pilot-Analyse Parkstraße neu, Atlas am Handy gemessen und repariert, Pilot erst nach Anmeldung, Mikrofon neben Senden (wie WhatsApp), Handy-Menü nach der ersten Aktion wieder klickbar.
+
+### Marcel 14.10.2026, sechste Runde — 14.10.2026 (`v2217`–`v2218`) (früher N69)
+
+Pilot-Analyse beim Ankauf gegenübergestellt, Soll/Ist nur im Bestand, Marktbericht ab erstem Bericht (`v2217`/`v2217b`); Dokumente in der Datenaufnahme mit Abgleich, Abweichungen beim Exposé-Import (`v2217`–`v2217d`); geführte Eingabe nach dem Quick-Check frei (`v2217c`); Bot `soll_ist_lesen`, UUID- und Tilgungsfehler (`v2217a`); Gesamt-Atlas in der App mit Telegram-Bot (`v2218`). Prod-Rollout v2217–v2218: `v2218` liegt auf `main` (git, 25.10.2026).
+
+### Marcel 14.10.2026, fünfte Runde — 14.10.2026 (`v2216j`/`v2216k`, `v2218`, Prod-Rollout (18) `471bd747`) (früher N68)
+
+1 Soll/Ist aus dem Tab Objekt in die Pilot-Analyse (`v2216j`), 3 F1 ruft den Piloten auch bei Dropdown-Feldern (`v2216j`/`v2216k`). 2 Prozessatlas: Marcels Wahl „Start wie heute, alles drauf, dann der Gesamtablauf“ (`design/Vorschläge/prozessatlas/atlas-gesamt.html`), als Gesamt-Atlas in die App übernommen mit `v2218` (laut N69). Messung des Atlas am Handy steht in N69.
+
+### Marcel 14.10.2026, vierte Runde — 14.10.2026 (`v2216`–`v2216i`) (früher N67)
+
+Zehn Punkte gebaut und in der Messkabine und am Desktop gemessen: Handy-Aktionen nach Marktbericht wieder bedienbar, Plan-/Abmelden-Knöpfe, „×“-Schließen, Handy-Kopf aufgeräumt, Parkstr. 9 als Demo-Geschichte, Soll/Ist-Analyse ausgebaut, Kanzlei/Tower/Aktenmappe geprüft, Aktionsmenü am Desktop bleibt offen, Auslieferungszustand Aktenmappe mit Boardkarte, Rahmen der Löschen-/Duplizieren-Knöpfe. Zwei echte Fehler dabei: Marktbericht fehlte im Register der Hauptansichten; Ankauf-Stand teilte die Einheitenliste mit dem Formular. Prod: `v2216i` liegt auf `main` (git, 25.10.2026).
+
+### Marcel 14.10.2026, dritte Runde: Messe-Geschichten, BMF, RND-Abgleich, Werbungskosten — 14.10.2026 (`v2213`–`v2215b`) (früher N66)
+
+`design/Messe/demo-geschichten.md`, BMF-Kaufpreisaufteilung bei 15 Demo-Objekten, Westerfeldstraße 140 als RND-Beispiel (2 % → 6,25 %, rund 1.530 €/Jahr), RND-Abgleich-Tabelle, Werbungskosten 2024–2026; Landing `v2215`–`v2215b` (Prozesskarte im Leistungsumfang, `forschung.html`). Dabei behoben: `v2213`/`v2213b` (BMF −96,6 % und `#VALUE!`), `v2214` (Steuer-Jahreswerte gingen verloren, auch auf Prod). Prod: `v2214` und `v2215b` liegen auf `main` (git, 25.10.2026). Die übrigen dort genannten offenen Punkte stehen unter N62.12 und N62.24.
+
+### Marcel 14.10.2026, zweite Runde: Einstellungen → Standardwerte — 14.10.2026 (`v2211`/`v2211a`, `45917195`, `c1fef5c1`) (früher N65)
+
+Acht Punkte gebaut und im Browser geprüft: Sets über den Einzelkarten mit erkennbarer Zugehörigkeit, Finanzierung wieder als Entweder-oder (selbst eingeben / indikativer Satz), Bewirtschaftung Euro/Prozent, Lageklassen gegen Bewirtschaftung abgeglichen, Bewirtschaftung je Objektart zusammengeführt, Grenzsteuersatz mit Verweis auf Mandanten, KI-Icons auf den Karten weg, Detailansicht vereinfacht. Dazu Schwärzen (`v2210`), Gewerbe im Ertragswert (`v2210b`, Rest: LZS-Zweig nach Gewerbeanteil nur als Hinweis), Rumpfjahr (`v2209`). Antworten Marcels: Datenschutz schwärzen, Gewerbe recherchieren und umsetzen, Demo-Objekte passend machen, F&E-Seite mit Kanzlei-Zusammenarbeit. Prod: `v2211a` liegt auf `main`.
+
+### Marcels Antworten vom 14.10.2026 — umgesetzt 14.10.2026 (`v2209`, `cde5c927`; `v2210`, `v2210b`) (früher N64)
+
+Rumpfjahr: echter Fehler, die Zinsmonate im Jahr 1 zählten gegen das Auszahlungsjahr statt gegen Projektionsjahr 1 (2026-1052: 1 Monat Miete gegen volle Zinsen), fünf Fälle 5/5 gegen die echten Funktionen. `store:false` an allen 10 `/v1/responses`-Aufrufen, aus dem Container mit 200 nachgewiesen. Regionaldatenbank/eigene Datenbank in der Projektanweisung („EIGENE DATENHALTUNG“, `8fcd85fa`). Datenschutz: Marcels Annahme stimmte für den Dokument-Import nicht (Grundbuch/Kaufvertrag mit Personendaten an OpenAI) → Schwärzen gebaut (`v2210`). Gewerbe: `gewerbe_jahr` setzte kein Aufrufer, Gewerbefläche bekam den Wohnmietansatz → Gewerbe im Ertragswert getrennt nach Nutzung (`v2210b`). Soll/Ist-Umschalter im Quick-Check ist weg; Landing-Leistungsumfang und F&E-Seite gebaut (`v2215`–`v2215b`).
+
+### Tour in Aktenmappe, Tower und Kanzlei — 12.10.2026 (`v2154`, `6c7ecb51`) (früher N62.1)
+
+Marcel: die Tour nach der Neuanmeldung muss auch in Aktenmappe, Tower und Kanzlei laufen. Laut Commit gebaut; der Hänger in der Kanzlei (Schritt 6) war schon mit `v1774` behoben. Die Abnahme bei sichtbarem Fenster steht in N62.20.
+
+### Kanzlei: Bestand/Ankauf-Schalter über der Suche — 12.10.2026 (`v2154`, `6c7ecb51`) (früher N62.2)
+
+Der Stand-Schalter (`v2145`/`v2145a`, `doppelkarte.js`) sitzt in der Kanzlei jetzt zwischen Aktionsknopf und Suche, in derselben Formatierung wie die Suche.
+
+### Pilot-Analyse: alle Daten fließen ein — 12.10.2026 (`v2156`, `75e9c6c0`) (früher N62.3)
+
+Vorher gemessen: MFH-Konfigurator nur 9 von 28 Feldern im Prompt, Liegenschaftszins (`lzs_pct`, Zweig, Berichtsjahr, Register-Herkunft) fehlte. Gebaut: MFH-Felder, Rohcodes und Liegenschaftszins in der Pilot-Analyse; die Stufe-3-Werte stehen seit `v2150`.
+
+### Lage & Markt: Netz, Zensus und Objektfelder gegenübergestellt — 12./13.10.2026 (`v2157`, `ff1af46b`/`7b71224d`; `v2161`, `e8a320a9`) (früher N62.4)
+
+`v2157`: die Pilot-Analyse bekommt beide Lage-Seiten des Berichts (`assessment`, `nutzer_einschaetzung`), Lageklasse, die vier Objektfelder, Bevölkerungstrend und Zensus; Aufgabe 15 mit Zielfeld `lage_gegenueberstellung`, Karte „Gegenüberstellung“ im Reiter Lage & Markt. Nachweis: `prompt-lecks-pruefen` 100 Stellen RC=0, Kettenprobe an Bericht 176, Karte bei 390 px ohne Überlauf. Befund Zensus: die Kreisdatei trug nur die Beispielzeile, 0 von 162 Berichten mit Zensus-Werten; `v2161` erzeugt sie mit Marcels Zensus-Konto aus der amtlichen Quelle (400/400 Kreise, Herford 4,2 / 53,8 / 5,54 im mb-Container nachgemessen).
+
+### Marcels Liste vom 13.10.2026 abends: Hilfe, Einstellungen, Handy, geführte Eingabe, Sprache — 13.10.2026 (`v2200`–`v2206`) (früher N63)
+
+Hilfe: Klon-Ursache behoben (Partner-Portal/Freigaben klonten den ersten Eintrag), Einstieg in „Abläufe & Pilot“ integriert (`v2200`, `1a548875`); Inhalte gegen den Code (17 Themen, 33 Korrekturen, GrESt TH/HB `v2207`); Hilfe und Einstellungen am Handy als Liste → Inhalt (`v2201`/`v2201a`, 390 px). Standardwerte als Karten mit drei Sets, Marcels Wahl A (`v2206`). Bestand/Ankauf am Handy unter Portfolio (`v2203`/`v2203a`, y=136). Hinweis „Erklär mir das“ mit × und „Nicht mehr anzeigen“ am Konto (`v2204`). Tour: 39 Schritte bei 1280 und 390 gemessen, Reiter Steuer ergänzt, 46 Inhaltsstellen korrigiert (`v2205`/`v2205a`). Mikrofon „halten zum Sprechen“ in der geführten Eingabe, Kette mit echter Sprache nachgewiesen (wfl=85) (`v2204`).
+
+### vw-modul (Junker Gutachten-Modul V4.2) — entschieden 13.10.2026: ignorieren (früher N62.23)
+
+`Dateien/vw-modul-v4-2-2.zip` und `-v4-2-5.zip` sind laut Marcel eine ältere Fassung für die Junker-Homepage; der Rechenkern der neueren Version (VW-Modul V422) ist gegengeprüft und in DealPilot eingebaut. Kein Auftrag.
+
+### Neue Hilfe: Pilot auf F1/?, Prozess-Atlas, Hilfe überarbeitet — 13./14.10.2026 (`v2187`–`v2189f`, `v2191`, `v2208`) (früher N62.22)
+
+Pilot-Männchen (`pilot-tower.js`) auf F1 bzw. ?, Sofort-Treffer aus 89 Feld-Erklärungen, Atlas mit 7 Abläufen (`prozess-atlas.js`, Prüfer 47/47 Belege RC=0), Hilfe vertieft (20 Themen, 152 Abschnitte), gold-audit-Befund `rgba(201,168,76,…)` in neun Dateien behoben (`v2188a`). Fehlerverdacht aus der Hilfe-Erhebung nachgemessen: 1–6, 8, 9 mit `v2191` (`ad26710b`), 4 schon mit `v1963`, Rest mit `v2208`. Entschieden: Speichern bleibt automatisch ohne Knopf; § 256 BewG als Stufe D bleibt („es steht ja dran“); Quick-Check-Hausnummer keine Pflicht; der Soll/Ist-Umschalter im Quick-Check ist weg (N64). Prod: `v2188b` liegt auf `main`.
+
+### Marktbericht: Bewirtschaftungskosten im Ertragswert zum Stichtag fortgeschrieben — 13./14.10.2026 (`v2186`, `e2ec2ed2`; `v2195`; `v2210b`, `3fccd761`) (früher N62.21)
+
+Befund: `ErtragswertService.js:360–386` nahm außerhalb des NRW-Modells `BWK_TABELLE` unfortgeschrieben (230 €/275 €/9,00 €/m² statt 367 €/439 €/14,40 €/m² ab 01.01.2026), BWK rund 37 % zu niedrig. Marcel: „das soll schon passen“. Gebaut: Jahrestabelle `BWK_JAHRE` + `bwkAnsaetze(jahr)` je Objektart (`v2186`); 2022/2023 aus der amtlichen Tabelle des Oberen Gutachterausschusses Brandenburg, Gewerbe-Verwaltung 3 % und getrennter Mietausfall (`v2195`); Gewerbe getrennt nach Nutzung (`v2210b`). Prod: `v2195` und `v2210b` liegen auf `main`.
+
+### Bewirtschaftung je Objektart und Standard-Set in der Erstanmeldung — 13.10.2026 (`v2183` Demo, `v2184`, `c4585d64`) (früher N62.20)
+
+Vorher nur ein Profil (`ip_bwk_ul_pct_default` 17 %, `ip_bwk_anteil_default` 16 % der NKM, nur localStorage). Gebaut: Bewirtschaftung je Objektart und Standard-Set in der Erstanmeldung. Umlaut-Reste in `hausgeld-*.js` sind weg (grep 25.10.2026: 0 Treffer). Prod-Rollout v2177–v2181b: der Stand liegt auf `main`.
+
+### Pakete A → B → C: Marktbericht im Hintergrund, Lage aus eigenen Daten, Pflichtfeld-Vertrag + Agents — 13.10.2026 (`v2174`–`v2176`, `3263df3f`, `03a1cff7`, `66236e26`) (früher N62.19)
+
+A: Marktbericht im Hintergrund mit Fortschritt und Meldung (vorher ein blockierender Request mit Dreh-Spinner). B: Lage aus eigenen Daten (Makro, Geoapify, Trend/Wanderung, Vermarktungsdauer/Zensus-Leerstand) mit KI im Vergleich. C: Pflichtfeld-Vertrag je Registersatz mit Prüfer in `deploy-staging.ps1` und Agents für die Datenpflege (`.claude/agents/`). Vorher gemessen: Register 62 Dateien / 4.832 Sätze, `saat-pruefen.mjs` RC=1 (49 Befunde), nur von Hand. Prod: `v2176` liegt auf `main`.
+
+### Eigene Datenhaltung: Makro, PLZ, Laufzeiten, Lasttest — 13.10.2026 (`v2172`–`v2172c`, `768ae809`; `v2197`, `c74eb3a5`) (früher N62.18)
+
+`mb.makro_werte` mit Import wie `ZensusImportService`, `DestatisConnector.macro` liest zuerst die Tabelle (`v2172`); `mb.plz_orte` aus OpenPLZ, `AgsResolver` liest sie zuerst — gemessen 152 ms live gegen 2 ms aus der Tabelle; `mb.laufzeiten` schreibt Dauer je Bericht/Analyse/Dienst mit (`v2197`); Lasttest auf Staging (Sitzung v2172 ff.). Grundsatz: jeder abgelegte Wert trägt Quelle, Endpunkt, Stichtag, Abrufdatum, Lizenz.
+
+### data._ai bleibt hinter der Spalte ai_analysis zurück — 13.10.2026 (`v2193`, `ae640c48`) (früher N62.17)
+
+Gemessen: bei 4 von 8 gewonnenen Objekten trug `ai_analysis` die Analyse vom 13.10., `data._ai` die vom 09.10. Ursache: `collectData()` trägt `_ai` aus `_currentObjData` mit (Stand beim Laden), im Browser nachgestellt. `saveObj` setzt jetzt beide gleich; der einzige Leser (`dashboard.js`) nimmt seit `v2170b` die neuere.
+
+### Makro-Kennzahlen vorab holen und speichern — 13.10.2026 (`v2172`–`v2172c`, `768ae809` … `8c6aa0fa`) (früher N62.16)
+
+Befund: die Regionaldatenbank brauchte 44–114 s je Tabelle, einzelne Abrufe brachen nach 180 s ab. Gebaut: `mb.makro_werte`, je Land ein Abruf (`regionalkey 05*`), 3 parallel, Takt 12 h / 30 Tage; der Bericht liest die Tabelle in 2–38 ms. Prod: `v2172c` liegt auf `main`.
+
+### Marktbericht in Worten: Entwicklung, Ableitung, Prognose — 13.10.2026 (`v2196`, `f8a42348`) (früher N62.14)
+
+Kapitel „D) Entwicklung, Ableitung & Prognose“ als vierte Gruppe; `kapitelD()` rechnet die Fakten (Preis-/Miet-/Bevölkerungstrend, Ableitung aus Median × Fläche, Spanne, Abstand Kaufpreis, Ertrags-/Sachwert, Prognose als Modellfortschreibung über 3/5 Jahre). Echter Lauf auf Staging: Kapitel kam mit genau diesen Zahlen und der Kennzeichnung „keine Vorhersage, kein Gutachten“. Kosten: ein vierter paralleler KI-Aufruf je Bericht.
+
+### Datenschutz: KI-Datenfluss gegen die Rechtstexte — 13./14.10.2026 (`v2209`, `v2210`); rechtliche Prüfung übernimmt Marcel selbst (25.10.2026) (früher N62.15)
+
+Inventur 13.10.2026: einziger KI-Anbieter OpenAI; hinaus gingen Objektadresse, Halter, Freitexte, Fotos, Ton, ganze Dokumente (Grundbuch mit Geburtsdatum, Kaufvertrag), ohne `store:false`. Gebaut: `store:false` an allen 10 `/v1/responses`-Aufrufen (`v2209`), Schwärzen vor dem Senden (`v2210`). `datenschutz.html` beschreibt Schwärzung, Bilder ungeschwärzt und `store:false`; `/api/v1/consent` existiert (`backend/src/routes/consent.js`).
+
+### Offen aus dem 13.10.2026 (v2163–v2166): Regionaldatenbank, Prod, Rumpfjahr — 14.10.2026 (`v2209`, `36e5ef86`) (früher N62.13)
+
+Regionaldatenbank gelöst, dazu eine eigene Datenbank angelegt (N64). Prod-Rollout erfolgt. Rumpfjahr geprüft: echter Fehler, Zinsmonate in Jahr 1 zählten gegen das Auszahlungsjahr (`v2209`).
+
+### Zensus in der Datenbank — 13.10.2026 (`v2162`–`v2162c`, `65c28743`, `cae6bc16`, `f7bbefc0`, `708be31c`) (früher N62.4b)
+
+`mb.zensus_werte` (Migration 016): 894.880 Werte, 400 Kreise, 10.786 Gemeinden, 10 Tabellen; Import `npm run zensus` (~2½ min, UPSERT, Protokoll `mb.zensus_abrufe`). `ZensusConnector.lookupDb` nimmt die Gemeinde nur eindeutig und Miete/Leerstand je Wohnung (gemessen: 852 m²/12 WE landete sonst bei „200 m² und mehr“). Anzeige in Miete, Investitionen, Marktbericht Web+PDF und Pilot-Prompt; prompt-lecks 108 grün.
+
+### Makro-Score: Ersatzwerte galten als gemessen — 13.10.2026 (`v2158`, `33bca6d9`) (früher N62.4a)
+
+Befund: `ScoringService.macroScore()` setzte für fehlende Kennzahlen Ersatzwerte ein und meldete `estimated: false`; an Bericht 176 war nur der Bevölkerungsteil gemessen, der Makro-Score 54 überwiegend erfunden. Jetzt mittelt er nur gemessene Kennzahlen und nennt `gemessen`/`moeglich`/`fehlend`, ohne Kennzahl `score: null`; die Bericht-Makrolage erst ab zwei gemessenen. Im Container: Bevölkerungstrend allein → 65, „aus 1 von 6“.
+
+### Eigener Reiter „Quellen“ in der Pilot-Analyse — überholt 13.10.2026 (`v2155`, `af75d07d`; `v2171`, `c17cf41d`) (früher N62.5)
+
+Gebaut in `v2155`, auf Marcels Wunsch („nur unter der Pilot-Analyse fällt der Reiter Quellen weg“) in `v2171` wieder herausgenommen.
+
+### Steuerliche Zusammenfassung in der Pilot-Analyse und im Soll/Ist — 13.10.2026 (`v2160`, `8abf834b`) (früher N62.6)
+
+Vorher: `## STEUER`-Block im Prompt, aber kein Antwortfeld. Gebaut: Aufgabe 16 mit Zielfeld `steuer_zusammenfassung`, mit Ankauf-Stand zusätzlich `soll_ist_steuer`; Reiter Steuer; `ankauf.js` führt die Kennzahl Steuerwirkung p. a. (cf_ns − cf_vs). `prompt-lecks-pruefen` 103 Stellen grün, Reiter im Browser mit gestelltem Ergebnis gerendert.
+
+### Landingpage: Leistungsumfang unter „Funktionen“ — 14.10.2026 (`v2215`–`v2215b`, `c09b503d` … `8cc8cf0a`) (früher N62.7)
+
+Marcels Entscheidung (N64): ja, mit der abgelegten Prozesskarte. Gebaut als Prozesskarte im Leistungsumfang der Landing (laut N66).
+
+### Subpage zum F&E-Projekt und zur Portfolio-Strategie — 14.10.2026 (`v2215`–`v2215b`) (früher N62.9)
+
+`frontend/landing/forschung.html` gebaut (laut N66), mit dem Hinweis auf die Zusammenarbeit mit Steuerkanzleien (Marcels ausdrücklicher Wunsch, N65). Das Verfahren selbst steht nicht auf der Seite, nur was es leisten soll.
+
+### Tab Steuern: Werte aus dem Vorjahr übernehmen — 13.10.2026 (`v2194`, `d4bf5647`) (früher N62.10)
+
+Im Detail-Modus neben dem Veranlagungsjahr: „⧉ Werte aus VORJAHR übernehmen“. Kopiert nur eigene Werte wiederkehrender Posten und nur in leere Felder; nie kopiert werden feste Posten wie Schuldzinsen, AfA, bewegliche WG, anschaffungsnah, Erhaltungsaufwand, Kaltmiete.
+
+### Standard-Lageklasse, diktierbar — 13.10.2026 (`v2159`/`v2159a`, `8c7aa666`, `036982eb`) (früher N62.11)
+
+Vorher gemessen: das Onboarding setzte nur Ziel-Renditen je Klasse, keine Standardklasse; `lageklasse` kam im Diktat gar nicht vor. Gebaut: Standardklasse in `lage-profil.js` (`standard()`/`setzeStandard()`), wählbar im Onboarding und im Investmentprofil; neuer Quick-Check wird vorbelegt (Marke „Vorgabe aus deinem Profil · überschreibbar“), jede andere Wahl und jedes Diktat löscht sie; geführte Eingabe fragt sie in Etappe 3. Nebenbefund behoben: beide Auswahl-Schreiber nahmen den ersten Teilwort-Treffer (diktiertes „A“/„B“ landete auf „keine Angabe“).
+
+### Aussehen-Schritt: die App ändert sich im Hintergrund mit — 10.10.2026 (`v2096`, `6266495f`) (früher N61.1)
+
+Befund: der Mechanismus schaltete schon (`_aussehenAnwenden()` setzt `data-dp-layout` live), aber der Schleier `.dpo-ov` nahm hellen Flächen 60 % Helligkeit und verfälschte genau den Unterschied. Im Schritt Aussehen ist der Schleier jetzt weg (`dpo-ov-schau`).
+
+### Soll/Ist-Abgleich in der Pilot-Analyse ausgebaut — 14.10.2026 (`v2216`–`v2216i`) (früher N61.2)
+
+Marcels Entscheidung (N64): ausbauen, genauer beschreiben, ggf. mehr Felder. Gebaut als Punkt 6 der vierten Runde vom 14.10.2026 (N67, „Soll/Ist-Analyse (Pilot-Analyse) ausbauen“); dazu Soll/Ist aus dem Tab Objekt in die Pilot-Analyse (`v2216j`, N68) und Steuer im Soll/Ist (`v2160`).
+
+### Lageklassen in Pilot-Analyse und Quick-Check-Bewertung — 12./13.10.2026 (`v2143`, `v2148`, `v2157`) (früher N61.3)
+
+Laut Code: Ampel der Bruttomietrendite nach Lageklasse (`v2143`), Quick-Check-Fazit mit Zielrendite der Lageklasse (`v2148`, `qc-heuristik.js:668`), Prompt der Pilot-Analyse (`v2157`, `openaiService.js:479`).
+
+### Lage & Markt: Werte aus den Marktberichten statt Recherche — 12.10.2026 (`v2150`, `c73c0c6c`) (früher N61.4)
+
+Befund: `/objects/history` lieferte seit `v1963`/`v1965`/`v1979` Sachwert, Ertragswert und das führende Verfahren, der Prompt-Bauer las keines dieser Felder; `mietspiegel_eur_qm` sollte die KI recherchieren. Seit `v2150` stehen die Stufe-3-Werte im Prompt (`openaiService.js:1103-1128`), der Mietspiegel nimmt vorrangig den Berichtswert (`:1569`).
+
+### Unterlagen-Modul ergänzt (N51) — 12.10.–20.10.2026 (`v2151`–`v2153`; `v2440`–`v2445`, `5bd2ab68`, `7d727070`; `v2470`–`v2472`, `ca8ecb13`, `c2f2ebbe`) (früher N61.6)
+
+`v2151`–`v2153`: Beleg je Seite (`seiten.pro_seite`), Ansprechpartner 1 und 2 je Amt, Kopie-Haken, Amtsweg oder zwei Ansprechpartner. 19.10.: gemessen 0 von 27 Ämtern mit Ansprechpartner; Abgleich v6 vollständig, Modal mit zwei Karten und Beleg-Seite, 342 Ämter für 60 Gemeinden eingespielt → 369 Ämter, 104 mit Ansprechpartner (56 mit zwei). 20.10.: Telegram-Teil (`/unterlagen`, Anschreiben-Entwurf, „verschickt“, „suche N/alle“), ein Kern für Web und Bot, Prüfstrecke im Container 57/0. vw-modul-Zips: entschieden ignorieren (13.10.2026).
+
+### Lageklassen ermitteln und vergeben — 08.10.2026 (früher N60.1)
+
+17 von 21 Objekten trugen bereits Makrolage, Mikrolage und Bodenrichtwert (Marcels Angaben); die Klasse ist daraus abgeleitet: P = (Makro + Mikro)/2, A bei P ≥ 4,0 und BRW ≥ 500, C bei P ≤ 2,5 oder BRW < 150, sonst B; ohne Lagedaten die häufigste Klasse am Ort, bei Gleichstand B. Verteilung A 2 · B 11 · C 7 · 1 ohne. Beim Schreiben gemessen: `objectService.update()` hätte bei jedem PUT Analyse und Fotos gelöscht — alle 20 Schreibvorgänge mit unveränderter Analyse und Fotozahl.
+
+### Doppelte Pilot-Analysen — nachgemessen 10.10.2026, keine Doppelung mehr (früher N60.1b)
+
+Am 08.10.2026 trugen sieben Objekte byte-gleich denselben Text (14.849 Zeichen). Am Portfolio-Export vom 10.10.2026 (`Dateien/API-Export/`): 13 Objekte mit Pilot-Analyse, alle 13 mit unterschiedlicher Länge. Die Neuberechnung (N60.5d) hat gewirkt, die Ursache ist seit `v2015` verriegelt (N60.5b).
+
+### Messkabine: Matrix über Haupt-App, Quick-Check und Marktbericht — 10./11.10.2026 (`v2085`–`v2085b`, `29ce302f`; `v2092`–`v2092f`, `b3bf99b5` … `7a642ff4`) (früher N60.2)
+
+Die Kabine setzt jetzt vier Achsen und nennt `angefordert` und `attribute`; `ui_theme`/`ui_cards`/`ui_surface` sind servergespiegelt und vor dem Laden wirkungslos. Matrix 48/48 Punkte, 432 Reiter-Messungen. Befund 1 (Überlauf) zurückgenommen: alle fünf Scroller gewollt, seit `v2092b`–`v2092e` als SCHIENE gezählt (`--dpm-schiene: 1`), 7 Schienen, 0 Mängel. Befund 2: Kontrast in 432 von 432 Reitern, Alternativ-Themes schlechter als die Hausfassung. Befund 3: Konsole erzeugt unsichtbaren Text (k=1,01), Ursache: 62 Sammelregeln in `style.css` lassen `konsole` weg. Quick-Check-Matrix 48/48 (`v2092f`, Art `OHNE REITER`).
+
+### Erstanmeldung: 6 Stunden Gnadenfrist — 12.10.2026 (`v2094`, `0bbc37af`; `v2136`–`v2137b`, `91b5179a` … `23c22cc2`; `v2138`, `cc3bf354`) (früher N60.3)
+
+Vormessung: `email_verified_at` blockierte nichts, `is_active` sperrte bis zum Klick; jeder frisch Registrierte bekam „403 Account is disabled“ (behoben `v2094`, `EMAIL_NOT_VERIFIED` gegen `ACCOUNT_DISABLED`). Weg (a) gebaut: `is_active=true` ab Anmeldung, Frist aus `config.auth.verifyGnadenfristStunden` an jeder Anfrage und beim Login, Band mit Restzeit, `POST /auth/resend-verify`. Eigener Fehler: `v2136` sperrte alle vier Staging-Konten aus (Stempel nie gesetzt) → Migration `086_verify_stempel_nachtragen.sql`. `v2138`: `requireVerified()` an den sechs Kontingent-Routen, Mail nennt die 6 Stunden. Prüfer `anmeldung-auskunft-pruefen.mjs` 68 Punkte RC=0. Prod: `v2136`/`v2138` liegen auf `main`.
+
+### Pilot-Analyse: Datenzugriff und Investmentprofil — 08.–12.10.2026 (`v2009`, `033d46f6`; `v2139`/`v2139a`, `24f79752`; `v2140`/`v2140b`, `bd1e8831`, `8306cfb1`) (früher N60.4)
+
+Teil 1 (`v2009`): vier Felder reisten mit und wurden nie gelesen (`aiOptions`, `verhandlung`, `dealpilot_marktbewertung`, `investor_score`), dazu Cashflow nach Steuer und Zinsbindung; am echten `buildPrompt()` 8/8 Blöcke. Teil 2 (`v2139`): fünf der sieben Punkte waren schon erledigt; 15 stumme Feldgruppen geschlossen, darunter der Regelblock „MIETVERTRAEGE JE EINHEIT“ ohne Werte; `v2139a` String zerfiel in Einzelbuchstaben. Prüfer `tools/prompt-lecks-pruefen.mjs`. Investmentprofil (`v2140`): sieben von 23 Schlüsseln reisen mit (Schwellen und Haltung), der Score sieht das Profil nie; `v2140b` kennzeichnet „(selbst gesetzt)“ gegen „(Vorgabe, nicht gesetzt)“, im Browser gefunden. Prüfer 47 Punkte RC=0, lokal, Host und Image.
+
+### Bot-Kennzahlen und Barkauf im Score — 10.–12.10.2026 (`v2081` `3dcf991c`, `v2141` `ed8be81f`, `v2143` `b3b50996`, `v2144` `c85b06cd`) (früher N60.5)
+
+Der Bot schrieb Kennzahlen frei in den Fließtext (vier Zahlen, vier verschiedene Mieten); der gespiegelte Kern `rechenkerne.kpis()` traf alle vier Sollwerte. `v2081`: ein fertiger `kennzahlen_block`, `miete_je_qm` jetzt konsistent mit `nkm + ze`. Marcels „44 → 80“ war ein Wechsel der Grundlage (abgeleitetes Darlehen, danach Barkauf). `v2141`: Barkauf ohne LTV/DSCR, umgewichtet (Marcels Wahl), finanziertes Objekt unverändert 58, Prüfer `tools/barkauf-score-pruefen.mjs`. `v2143`: Lageklasse als Maßstab der Bruttomietrendite-Ampel, Prüfer `tools/lageklasse-ampel-pruefen.mjs`. `v2144`: auch der Investor Deal Score lässt DSCR/LTV beim Barkauf weg (49 → 67, finanziert bleibt 85).
+
+### Telegram-Bot und Piloten bidirektional, erste Stufe — 09.10.2026 (`v2010` `df19131d`, `v2011` `dce90fcc`, `v2012` `fe24c5cc`, `v2012a` `58ef3135`) (früher N60.4c)
+
+Produktwissen (`bot-wissen.md`) mit einem gemeinsamen Lader für drei Piloten (`v2010`), sieben Feldblöcke (+46 Felder) in der Pilot-Analyse (`v2011`), Cockpit-Analyse abgelegt und im Bot über `portfolio_analyse_lesen` (`v2012`). Im Container nachgewiesen: Prompt 15.650 → 23.377 Zeichen, 22 Werkzeuge. `v2012a`: ein zurückgesetzter Eintrag `{text:null}` meldete `vorhanden: true` — geprüft wird jetzt der Text. Die Reste für „alle Daten“ stehen unter N60.4d.
+
+### Fotos werden vom Piloten ausgewertet — 09.10.2026 (`v2013`, `b8d3b824`) (früher N60.4d)
+
+Verkleinert wird im Browser über den vorhandenen `window._dpResizeDataUrl` (max. 768 px, JPEG 72 %, höchstens vier; gemessen 6 → 4 Bilder, 30 % kleiner). Vier Fehler einzeln gemessen und behoben: eigener zweiter Verkleinerer, falscher Zugriff (die Fotos stehen in `imgs`), Deckel `maxTokens || 700` (5 statt 22 Schlüssel), fehlendes Ausgabefeld — jetzt `optischer_eindruck`, nur wenn Fotos mitgehen. Echter Lauf: 23 Schlüssel, der Eindruck beschreibt die tatsächlichen Bilder.
+
+### Fremdanalysen: Herkunftsstempel an der Analyse — 09.10.2026 (`v2015`, `7207c80e`) (früher N60.5b)
+
+Sieben Demo-Objekte trugen byte-identisch dieselbe Pilot-Analyse, zwei weitere eine zweite. Der Wächter aus `v1849` war eine Heuristik und saß nur im Telegram-Werkzeug. Seit `v2015` trägt jede neue Analyse `_fuer: {objekt_id, kuerzel, adresse, stand}`, der Bot vergleicht exakt (`fremd_sicher`). Prüfer `backend/scripts/analysen-pruefen.js` (STEMPEL · DUBLETTE · VERDACHT; `v2015a`: je `user_id` gruppiert). Die offene Wahl „neu rechnen oder entfernen“ erledigte die Neuberechnung aller Analysen am 09.10.2026 (0 fremd, Prüfer über alle Nutzer RC=0).
+
+### Stand und Gültigkeit der Analysen — 09.10.2026 (`v2017` `20fa16ff`, `v2018` `eed10f0f`) (früher N60.5c)
+
+Statt `objects.updated_at` (ändert sich bei jedem Speichern) ein Fingerabdruck über 20 benannte Felder — der Kopf nennt, **was** sich geändert hat. Pilot-Analyse grün / gold / rot (anderes Objekt) / grau (kein Stempel, nichts behauptet); der Portfolio-Pilot vergleicht die Objektzahl statt der Zeit.
+
+### Neuberechnung aller Analysen — 09.10.2026 (früher N60.5d)
+
+Alle Objekte über den echten Bedienweg neu gerechnet: 13 von 13 korrekt gestempelt, alle mit vollem Fingerabdruck, 0 fremd oder ohne Stempel; Prüfer über alle Nutzer (17 Analysen) RC=0. Eigener Fehler: ein Läuferstart nach CDP-Zeitüberlauf lief trotzdem, ein zweiter Start rechnete `2026-1053` doppelt — der Zeitüberlauf betrifft nur den Antwortkanal.
+
+### Kopf der Pilot-Analyse zeigte „kein Datum“ trotz Stempel — 09.10.2026 (`v2017a`, `0f4efaa6`) (früher N60.5e)
+
+Ursache war die Reihenfolge: `_renderAIServerAnalysis()` lief vor `_analyseStempeln()`, der Kopf las `a._fuer` noch nicht; in `runMiniAI` stimmte sie von Anfang an. Gefunden am Bildschirm nach dem Lauf, nicht vom Prüfer.
+
+### Eigenes Wissen dem Projektwissen hinzufügen — 09.10.2026 (`v2019` `0091fb68`, `v2020` `ac12352f`) (früher N60.11)
+
+Zwei getrennte Blöcke im Prompt: PROJEKTWISSEN (die Datei, am Code belegt) und ERGÄNZUNGEN DES BETREIBERS (`user_settings`, Schlüssel `eigenes_wissen`); bei Widerspruch gilt der Projektblock, der Bot nennt ihn. Ein Lader (`zusatzFuer`/`blockFuer` in `projektwissen.js`, 60 s Zwischenspeicher) für drei Piloten, die doppelte Einleitung in `agentLauf` beseitigt. Das im Punkt noch offene Eingabefeld in den Einstellungen kam mit `v2020` (`settings.js`).
+
+### Bot-Auskunft mit Score, KPIs, Gesamtbewertung und Stand — 09.10.2026 (`v2016`, `a7fd3eea`) (früher N60.6)
+
+Die Werkzeuge lieferten `dealscore`, `investor_deal_score` und ihre Stufen längst, die Regeln verlangten sie nicht. Regel 7k: beide Scores mit Stufe (bei Fehlen warum), die Kennzahlen, eine Gesamtbewertung in Worten, der Stand; Ausnahme für Ein-Zahl-Fragen. Regel 7l: Bestandsfragen an `portfolio_analyse_lesen`. Nachgemessen 10.10.2026 in `agentLauf.js:177-194`, Werkzeuge `pilot_analyse_lesen`/`portfolio_analyse_lesen` registriert.
+
+### Wohnungsfenster im MFH-Konfigurator und Kombinatorik — 09.10.2026 (`v2021` `fe1c15c9`, `v2022` `222e8469`) (früher N60.8)
+
+Je Einheit ein Knopf in der Tabellenzeile und ein Fenster mit 6 Abschnitten / 28 Feldern (Stammdaten, Miete, Mietvertrag mit den Vertragsformen des BGB samt Fundstelle, Zustand, RND, bis 6 Bilder), gespeichert ohne Migration in `d._mfh.einheiten`. Beim Duplizieren wandern Bilder und Mietername nicht mit. `v2022`: neun Felder gehen in die Pilot-Analyse, Mietername per Prüfer ausgeschlossen. `v2022a`: `ReferenceError: ein is not defined` erst im Container gefunden. Abgenommen am Objekt `2026-1056`.
+
+### Mietvertragsangaben auf Objektebene — 10.10.2026 (`v2087`, `be96a337`) (früher N60.8-alt)
+
+`mv_art`, `mv_beginn`, `mv_letzte_erhoehung` im Reiter Miete für jede Objektart, dieselben Feldnamen wie in `_mfh.einheiten[]`. Die elf Vertragsformen liest `mietvertrag-objekt.js` aus `mfh-einheiten.js` (keine zweite Liste, 11 Optionen im Browser). Gespeichert nachgewiesen: Feldliste in `storage.js`, `collectData()` gibt sie zurück. Eigener Fehler vor dem Ausrollen: `window.getFormData()` gibt es nicht, Quelle ist `window._dpMfh`.
+
+### Wohnungsliste mit Detailfenster und Bewertung je Einheit — nachgemessen 10.10.2026 (`v2021`, `v2022`) (früher N60.9)
+
+Zeilenknopf und Fenster in `mfh-einheiten.js` (Stammdaten, Miete, Mietvertrag, Zustand, Bilder bis 6), Bewertung je Einheit, flächengewichtete Summe und Übertragung in den Reiter Objekt. Das eigene RND-Feld je Einheit wurde in `v2023` (`fbbde015`) absichtlich wieder entfernt — die RND je Einheit kommt aus dem Zustand.
+
+### MFH-Einheiten: Vererbung geprüft, RND-Eingabe vollständig — 10.10.2026 (`v2095` `de38c850`, `v2095a` `fd7cc765`) (früher N60.10)
+
+Die Vererbungsliste war schon gebaut (`GEB_IDS`/`WE_IDS` in `mfh-einheiten.js`, alle acht Gewerke genau einer Seite zugeordnet, deckungsgleich mit § 5 WEG). Echter Mangel: `rndFuer()` gab dem Kern 4 von 10 Feldern (ohne `kernsaniert` bis +3,4 Jahre, Stichtag fest auf heute). Jetzt über `mapDealPilotObject(collectData())` wie `deal-action.js`; Prüfer `tools/mfh-rnd-eingabe-pruefen.mjs` (14 echte `calcAll`-Läufe, RC=0). `v2095a`: Stichtag und GND stehen sichtbar unter der Einheitentabelle.
+
+### Prozesskarte für die Messe — 10.10.2026 (`v2088`, `77fccc39`) (früher N60.20)
+
+`design/Messe/prozesskarte.html` im Pilot-Stil: drei Bahnen (Quick-Check · Ankauf · Bestand), neun Stationen, je Station was man tun kann und was dabei herauskommt. Jede Zahl aus ihrer Quelle gemessen (Etappen, Marktbericht-Stufen, Score-Schwellen, Exportfelder, Pflichtfelder), keine unbelegten Zahlen; helle A3-Druckfassung aus derselben Datei. Prüfer `tools/prozesskarte-pruefen.mjs` RC=0.
+
+### Onboarding: Aktenmappe als Standard, Vorschau in place — 10.10.2026 (`v2083` `ce37b14d`, `v2096` `6266495f`) (früher N60.21)
+
+Teil 1: Aktenmappe an erster Stelle, `standard: true` und vorausgewählt, ihre Objektkarte `datenzeile`; der Kartenname kommt aus dem Modul statt hartkodiert. Teil 2: die Vorschau in place existierte schon, aber ein dunkler Schleier `rgba(5,5,5,.34)` nahm den hellen Fassungen 60 % Helligkeit und Obsidian keine. Im Schritt „Aussehen“ fällt er weg (`.dpo-ov-schau`), der Kasten liegt unten rechts, ab 900 px; im Browser bei 1280 px abgenommen (Kopf, Reiter, Seitenleiste 0 % verdeckt).
+
+### Pillen am Co-Piloten — 10.10.2026 (`v2082`, `f0239c38`) (früher N60.22)
+
+Sechs Pillen: zwei beantwortet die App selbst und kostenlos (Datentiefe, Was fehlt? — aus `DealPilotReadyCheck.getData()`, mit Sprung-Chips), vier setzen eine Frage ins Eingabefeld. Im Browser abgenommen: alle erreichbar, Werte deckungsgleich mit `getData()`. Nicht gebaut: Feldänderungen direkt aus dem Dialog — von Marcel als nachrangig benannt.
+
+### Pflichtfelder je Eingabetiefe im Readycheck — 10.10.2026 (`v2079`, `c1a858ee`) (früher N60.23)
+
+Die Staffel existierte schon (`pflichtFuer(stufe)` in `objekt-reiter.js`: 6 / 13 / bis 20). Der Readycheck zählte 15 feste Felder des Investor-Deal-Scores, übersprang nicht vorhandene IDs still und kannte drei Score-Felder nicht (`ds2_marktfaktor`, `ds2_marktmiete`, `ds2_zustand`). `v2079` fragt beide Listen, nennt die Stufe in der Überschrift und nimmt die Beschriftungen aus `DealPilotObjektReiter.FELDNAMEN`.
+
+### „Kerosin“ aus dem Nutztext — 10.10.2026 (`v2078` `02ddf862`, `v2097` `ca81ab09`) (früher N60.24)
+
+Neuer Wächter `tools/kerosin-nutztext-pruefen.mjs` (420 Dateien, 12,9 MB): 25 Treffer, die meisten Funktionsnamen, Filter, Protokoll oder die stillgelegte Paketliste. Fünf Textstellen behoben — live nur `quickcheck-app.html`, `credits.js`/`welcomeMail.js` latent, `pricing-modal.js` nicht gerendert, `kerosin-confirm-lage.js` tot. Drei Fehler im Wächter behoben (Zeilennummern, Nutztext-Anteil, Bezeichner gegen Prosa).
+
+### API-Export: Bonität, Grunderwerbsteuer, Mietverträge, Halter — 11.10.2026 (`v2102` `026907e4`, `v2103` `07ab9b7a`) (früher N60.33)
+
+Bonitätswerte und Mietvertragsfelder waren schon da (am echten Export gezählt). `v2102`: `portfolioExport.js` leitet aus der PLZ `bundesland`, `grest_satz_amtlich` und `grest_herkunft` ab, getrennt von der Eingabe `gest_p`; 21 von 23 Objekten mit Land, Prüfer `tools/grest-export-pruefen.mjs` (55 Punkte). `v2103`: je Objekt `halter`, `halter_seit`, `halter_rechtsform`, `steuersphaere`, `halter_herkunft`; `steuersphaere` bleibt `null`, wo der Server nichts weiß (`sphaere()` bleibt einziger Schiedsrichter), Prüfer `tools/halter-export-pruefen.mjs` (55 Punkte).
+
+### Kontrast der Skalen-Beschriftungen auf der Objektkarte — 11.10.2026 (`v2104` `b43b1903`, `v2104b` `2737b2d3`; `v2105` `3c6ac65c` zurückgerollt mit `a78de89b`) (früher N60.34)
+
+161 Stellen `.sbcm-scale span` (7,5 px, Schwelle 4,5) lagen zwischen 1,76 (heller Skin ohne Regel) und 4,39. `v2104`: deckende Töne statt Deckkraft (der Grund ist ein Verlauf), `v2104b`: jede Vorlage einzeln nachgemessen, eigener Ton je Vorlage — 8 Fassungen × 161 Stellen über 4,5, Prüfer `tools/kartenskala-kontrast-pruefen.mjs`. `v2105` (Ton aus dem Farbregler abgeleitet) war live schlechter (1,77) und ist zurückgerollt; die Frage, wo der Regler überhaupt greift, ging in N60.35 über. Der vermutete `lade()`-Werkzeugfehler wurde gemessen und zurückgenommen.
+
+### Score-Ring und Aktionsknöpfe überlappten — 11.10.2026 (`v2110` `5d69a5b9`, `v2110a` `170ca71a`, `v2114` `1beec3ec`) (früher N60.37)
+
+Ursache: `v1943` setzte Score und Knöpfe beide auf `top:50%` und hob die Staffelung aus V103 auf (21–42 px Überlappung). `v2110`/`v2110a`: der unsichtbare Knopf fängt keine Klicks mehr, auf Touch bleiben Duplizieren/Löschen bedienbar; Prüfer `tools/deckkraft-klickbarkeit-pruefen.mjs`. Die sichtbare Überdeckung löste `v2114` (Staffelung aus `f843cc8d~1`: Knöpfe `top:6px`, Score `38px`) — 0 px Überschneidung auf drei Karten (vgl. N60.38).
+
+### Kartenstile: Standardkarte, Bordkarte, Score-Kante — 11.10.2026 (`v2114` `1beec3ec`, `v2115` `914c0d28`, `v2116` `410e550d`) (früher N60.38)
+
+`v2114`: Staffelung der Standardkarte aus der Versionsgeschichte zurück (Knöpfe 7–29, Ring 39–89, 0 px Überschneidung); der „Aktenreiter“ ist diese Standardkarte (Schlüssel `''`). `v2115`: die Abrisskante lief 6 px durchs Bild, weil `margin-left` Streifen und Inhalt gemeinsam schob — jetzt `padding-left:27px`, 0 von 21 Karten. `v2116`: die Score-Kante zeigte den Deal-Status statt des Scores; jetzt Farbe nach Score-Stufe über `:has()`, 21 von 21 richtig, der Status bleibt im „Won“-Band.
+
+### Datenaufnahme-Karte über alle Geräte — 11.–12.10.2026 (`v2119`+`v2120` `75cffa10`, `v2121`+`v2122` `4514fda8`, `v2121a`, `v2133` `77fda9bb`, `v2133a` `5c26d4be`) (früher N60.39)
+
+Matrix 4 Stile × 12 Breiten. Behoben: gekappte Beschriftungen und QR bei 1180–1440 px (`v2119`), Gold-auf-Gold-Knopf bei 390 px (`v2120`), 1263 px breite Leiste auf dem iPad lautlos geklippt (`v2121`), Knopf und Kacheln unter 44 px (`v2121a`), Gegenregeln aus `v1941a–d` ausgetragen (`v2122`). Ursache war kein Überlauf, sondern schrumpfende Kinder — jetzt Umbruch statt Schrumpfen. Der Stil „Zeile“ wirkte nie (`body.dp-pfzeile` nirgends gesetzt): `v2133` hängt die Klasse an die ausdrückliche Wahl, auch im QuickBoarding-iframe; `v2133a` Knopf 44 px. Abnahme 2 Stile × 10 Breiten: KAPP/RAUS/ZUBREIT/QUER 0, Textkontrast überall ≥ 4,5.
+
+### Cockpit-Vollbild-Stummel entfernt — 12.10.2026 (`v2128`, `1e6c35e4`) (früher N60.40)
+
+Geräteabnahme Durchgang 1 (8 Geräte × 9 Reiter, 8.778 Bedienelemente): einziger echter Fund ein 2 × 20 px großer Standardknopf `.dp-sidebar-toggle`, 4.000–7.200 px tief in der Seite. Er schaltete `dp-dash-fullscreen`, das gemessen kein Pixel bewegt (sieben Eigenschaften, zwei Breiten); `dp-show` liest keine Regel. `v2128` blendet ihn aus — keine Funktion verloren, denn es gab keine.
+
+### Preisfenster: Vergleichstabelle auf dem Handy zugeklappt — 12.10.2026 (`v2132` `5be70125`, `v2132a` `77fda9bb`) (früher N60.41)
+
+Das Preisfenster war bei 360 px 10.078 px hoch (13,3 Bildschirme), 45 % davon die Vergleichstabelle. Weg (b) nach Marcels „mach es so das es funktioniert“: unter 900 px ist nur die Tabelle zugeklappt, Preise, Pläne, Reihenfolge und Knöpfe unberührt; Knopf mit `aria-expanded`, 44 px, Textkontrast 10,54. `v2132a`: die Falte läuft im eigenen Takt mit `try/catch` statt als fünfter Aufruf in einem `setTimeout`.
+
+### Marktbericht: helles Grau inline auf hellem Grund — 11.10.2026 (`v2100`, `f25c55e1`) (früher N60.32)
+
+Quick-Check-Matrix (48 Punkte) und Marktbericht-Lauf (8 Geräte, Layout hält, kein Querscroll) gemessen. Behoben, was keine Farbentscheidung war: `wertermittlung.js:908` trug `<b style=„color:#c8c8d0“>` (k 1,66) auf der seit `v895e` immer hellen Seite; jetzt die Dokumentvariable `--txt` (k 14,8). Ursache der übrigen Stellen benannt: `.mbst h4` setzt helles Gold `#E8CC7A`, der `data-mb-theme=„light“`-Block zieht die Hintergründe um, die goldenen Textfarben nicht.
+
+### Kontingent-Regel: Texte richtiggestellt — 10.10.2026 (`v2077`, `a463c7a1`; `v2077a`, `033cc402`) (früher N60.25)
+
+Regel (Marcel 10.10.2026): Gekauftes verfällt nicht, Monatliches verfällt; Verbrauch Monat → Testphase → Gekauftes. Am Code gemessen: `aiCreditsService.js` tut genau das. Falsch waren die Texte — `ai-credits.js:183-184` versprach live im Tooltip „Nicht genutzte Bewertungen verfallen nicht“, dazu `landing/fragen.html:154` und der Dateikopf von `aiCreditsService.js`. In `v2077` korrigiert.
+
+### Rechenkern-Schnittstelle Marktbericht: der 422 war ein Feldname — 10.10.2026 (`v2076`, `3f50e749`; `v2076a`, `2f6c3571`) (früher N60.26)
+
+`/reports/from-dealpilot` meldete „Keine Koordinaten“, obwohl die Adresse vollständig war. Zwei Ursachen hintereinander: das Feld heißt `object`, nicht `objekt` (abgeschrieben von `dealpilot-mb.js:603`; `objektart` und `objart` beide schicken), und die Wertstufe gehört in `overrides`, sonst rechnet der Bericht still als Stufe 1 ohne Boden-, Ertrags- und Sachwert. Gegengetestet an `2026-001`: HTTP 200, `cross_check.available: true`, Bodenwert 40.338 EUR, RND 41,7 aus 11 Modernisierungspunkten. Ein Aufruf kostet 0,73 EUR GeoMap (für die Bepreisung).
+
+### BFH IX R 7/12 aus dem Schadenskatalog entfernt — 10.10.2026 (`v2080`, `c1a858ee`) (früher N60.27)
+
+Das Zitat stand nur im Kommentar `rnd-calc.js:117`, in keinem Nutztext. Entfernt und durch die ehrliche Herkunft ersetzt (sachverständige Orientierungswerte des Hauses). Bewacht von `tools/rnd-eingabe-pruefen.mjs` Abschnitt 10.
+
+### Mandanten am Konto statt nur im Browser — 14.10.2026 (`v2212a`, `943cb64b`) (früher N60.28)
+
+Vormessung 10.10.2026: `halter` ist eine Mandanten-KENNUNG (`mandanten.js:117`), die Mandanten samt Rechtsform lagen aber nur im `localStorage` (`dp_mandanten`), der Server kannte sie nicht. Gemessen 14.10.2026: in Marcels Konto kannte der Browser nur „Privat“, zwei Gesellschaftsobjekte fielen auf „Privat“ zurück. Seit `v2212a` liegen die Mandanten in `user_settings` (`/user-settings/mandanten`).
+
+### Ankauf-Stand im Objekt statt Soll-Duplikat — 09.10.2026 (`v2030`–`v2043`), nachgemessen 10.10.2026 (früher N60.12)
+
+Marcels Wunsch (gewonnenes Objekt als Soll festhalten, Doppelkarte Soll/Ist) gebaut als eingefrorener Ankauf-Stand IM Objekt, nicht als zweites Objekt: `ankauf.js` (`festschreiben()`, `korrigieren()` mit Historie, `abweichung()`, `vonSelbst()` bei „gewonnen“, v2041), `doppelkarte.js`, `abweichung.js`, `ankauf-ansicht.js`, alle in `index.html` geladen; Auslöser am Status (`deal-action.js:2452`), `objectService.js:50` liefert `ankauf_kurz`/`ankauf_stichtag`. Die als BLOCKIERT geführten sechs Entscheidungen waren damit durch den Bau überholt. Konzept: https://claude.ai/artifact/FdseTiFq1wK6ECrwHEAxGJ
+
+### Portfolio-Export und Excel-Spalten — 09.10.2026 (`v2043`, `22c7742e`; `v2043c`) und 10.10.2026 (`v2066`, `v2067`–`v2067b`, `v2086`, `3fb9ebc4`) (früher N60.13)
+
+`GET /objects/portfolio-export` plus Menüeintrag „Portfolio komplett“: JSON (alles) und CSV aus einem Abruf, mit Lexikon (`felder` seit `v2043c` nachschlagbar, `strukturen` seit `v2066`), Pilot-Analyse samt Stempel, eigenem Wissen einmal. Gemessen: 286 Felder je Datensatz, von 291 Formularfeldern fehlen nur Schalter/Anzeigefelder, kein echtes Datenfeld. `v2086`: sechs Spalten mehr im Excel (`RND_Jahre`, `RND_Verfahren`, `RND_Stand`, `AfA_RND_angesetzt`, `Vertragsart`, `Ankauf_Stichtag`). Die JSON-Sicherung (`storage.js:2214`) trägt die neuen Felder schon. `afa_rnd_jahre` bleibt bewusst Nutzereingabe neben `_rnd` (11.10.2026, Leitung per Durchstich belegt).
+
+### Geführte Eingabe entschlackt und auf allen Größen bedienbar — 09.10.2026 (`v2049`–`v2054`, `v2055`–`v2059`) (früher N60.15)
+
+Punkte 1, 2, 4, 6, 7 aus Marcels Auftrag (`Dateien/geführteeingabe.png`): Freisprechen- und „Alle Felder“-Schalter weg, Fußzeile auf 0 px, eine Blase je Schritt am Einstieg, doppelte erste Frage beseitigt, „erklär mir das“ auch getippt, Übernahme-Meldung nur noch für Neues (Commits `fcc866d8`, `121020e9`, `2fbcc881`, `49ec9858`, `8d9cfb23`, `80216985`, `5d32215d`). Messkabine fand einen Priorität-1-Fehler: auf dem Handy war die Tonfrage nicht zu beantworten (Chips verdeckt, 601–767 px komplett unbedienbar); behoben in `v2055`–`v2059` (`c4efaf4b` … `cfe09ee4`), Abnahme 13 Größen je Chip auf eigenem Mittelpunkt 3/3.
+
+### Responsive-Durchgang: Prüfwerkzeug, Tabellen, iframes, Datenaufnahme, erste Kontrastrunde — 09.–11.10.2026 (`v2060`–`v2065`, `v2089`, `v2090`, `v2117`–`v2117b`) (früher N60.17)
+
+`DPM.pruefeAnsicht` und `DPM.pruefSelbsttest` dauerhaft in `frontend/messkabine.html` (prüft jedes Bedienelement per `elementsFromPoint`, jeden Verdacht zweimal). Breite Tabellen auf dem Handy als Karten (`v2060`–`v2060c`, `c46820a3` …), Querscroller 320–1920 px: 0; `single`, `dashboard`, `all`, `strategie`, Quick-Check und Marktbericht samt Modals ohne unerreichbares Element. Datenaufnahme (`v2117`, `008c0c64`): drei von vier Pre-Flight-Kacheln waren auf Tablets unerreichbar (Lücke zwischen 900- und 640-px-Grenze), Abrufen-Knopf eingerückt; Abnahme auf sechs Geräten. Kontraste: `.ds2-tag` k 2,06 → 7,81 (`v2089`), bei vier von sechs Stellen war die Deckkraft der Fehler (`v2090`).
+
+### Kontrast: Gold und Statusfarben als Textfarbe — entschieden und umgesetzt 11.10.2026 (`v2101`, `477ba39c` … `v2101d`, `1a7d09a3`) (früher N60.29)
+
+Marcel 11.10.2026: „kontrast vorschlag so umsetzen“ — Weg (a) für Zahlen/Tabellen, Weg (c) für Abzeichen, nach Demo `frontend/kontrast-cockpit.html` (`v2091`, geprüft von `tools/kontrast-demo-pruefen.mjs`). Eigene Textvariablen (`--dp-green-txt`, `--dp-red-txt`, `--dp-gold-txt`, `--dp-muted-txt`, `--c-acc2-txt`, `--c-accd-txt`) statt Umfärben der Variablen, die auch Balken füllen; Gold nicht über `--wl-c9a84c`. Gruppen unter 3,0: 19 → 1, schlechteste 1,71 → 2,29. Dabei Messgerät-Fehler in `effGrund` behoben (`v2092g`: Vorfahren-Pseudoelement vor eigenem Grund gefragt).
+
+### Bestand im Cockpit und im Kanban — 10./11.10.2026 (`v2084`, `e7acb12e`; `v2098`, `59a4ab7f`; `v2099`, `437d8ad2`) (früher N60.16)
+
+Kanban mit Spalte Bestand (gewonnen und Ankauf-Stand), abgenommen 15 · 4 · 4 · 0 = 23; dabei drei stille Fehler behoben (`v2084a/b`: `loadObjects()` las `data.objects` statt `items`, `getStatus()`/`getKPIs()` lasen `data` aus der Listenantwort — Investitionsvolumen stand auf 0 statt 4.018.000 €). Kachel „Seit Ankauf“ mit EINER Rechnung (`abweichungFuer()`, `tools/ankauf-abweichung-pruefen.mjs` 39 Punkte). Summen wahlweise auf Ankauf oder Bestand über dieselbe `aggStats()`, mit Sperren gegen stille Nullen. Sortierung im Ankauf-Modus zurückgenommen: keiner der vier Sortiermodi liest eine Kennzahl mit Ankauf-Wert (gemessen 10.10.2026). Nebenbefund ungeklärt: 4 Objekte mit `ankauf_stichtag`, 3 mit `_ankauf`-Block.
+
+### Objektübersicht wieder erreichbar, Lageklassen-Kette geprüft — 08.10.2026 (`v2008`, `ba015bc9`) (früher N59)
+
+Die Ansicht „Alle Objekte" war gebaut, aber ohne Eingang (es fehlte ein `<button>`; `ui.js:294` greift nach `.sb-iconnav-btn[data-iconnav]`, das es nicht gibt). Eingang zurück; die Kette der Lageklasse end-to-end an `2026-004` geprüft (Feld → Server `"B"` → Karte → Pille in der Übersicht).
+
+### Marktbericht: Karte, Berichtsliste, iPad-Breite und Seiten-Buster — 08.10.2026 (`v2004`–`v2006`, `f6832d85`/`05a631b3`/`c445296b`) (früher N58)
+
+Carto-Kacheln lieferten HTTP 200 mit „API KEY REQUIRED" → OSM-Standard. Berichtsliste per `@container` statt Fenster-Media-Query. 1024 px (iPad) hatte 196 Überläufe: `1fr` → `minmax(0,1fr)` (10 Ersetzungen) und Umschaltpunkt. Der Buster der Marktbericht-Seite (`marktbericht-view.js`) stand seit v1877 fest, das inline-CSS kam aus dem Cache. Messkabine nach v2006: acht Geräte 360–1280 px, 0 Überläufe.
+
+### Eingabetiefe-Fehlzeile und Liegenschaftszins § 256 BewG — 08.10.2026 (`v2001`, `v2002`) (früher N57)
+
+`#oe-fehlt` folgte nur `stufeAbrufen()`, nicht den Kreisen und nicht `dp:object-ready` → eine Stelle `fehlZeileSetzen()` (v2001). § 256-Hinweis um den Zweck ergänzt (§ 256 Grundsteuer, § 188 Erbschaft/Schenkung MFH 3,5 %, § 21 Abs. 2 ImmoWertV Verkehrswert); Text wird aus `BEWG_RAHMEN` gebaut, alle 16 Fälle von `lzsNach256()` stimmen (v2002, `64cff5af`).
+
+### ImmoMetrica live, Anbieter stillgelegt, Riegel, Adressabgleich, Ortskern — 08.10.2026 (`v1993`–`v2003`) (früher N56)
+
+ImmoMetrica-Demo kam aus dem Frontend (fragte `/avm/health`), eigene Auskunft `/immometrica/health` → `live` (v1993, `cfdf7d5c`). Sprengnetter/PriceHubble `enabled:false`, Zugangsdaten bleiben; leeres `AVM_LIVE_PROVIDERS=` schaltete bis dahin alle frei, jetzt keinen (v1994, `da01fa8b`). Riegel: gefülltes Objekt bekommt keine Importquelle mehr (v1995, `9a749733`). Ortskern ohne Adresse (Marcels Entscheidung, v1999), Adressabgleich mit Rückfrage nur bei echtem Widerspruch (v2000, `8bf6ef62`), `parseAddr` steckte die Stadt in die Straße (v2001), „Weitere laden" und Favoriten zuerst (v2003, `eee0eec1`).
+
+### Grunderwerbsteuer folgt der Objektadresse — 15.10.2026 (`v2261`/`v2261a`, `3dcec6c5`/`d6ef4230`) (früher N52)
+
+Die Sperre „nur bei 0 oder 6,5" ist ersetzt: übernommen wird, solange der Nutzer nicht selbst editiert hat (`dataset.userEdited`); Vorgabe ist der Satz des Profil-Bundeslands, ein von der Automatik gesetzter Satz folgt einem PLZ-Wechsel. Haken „Grunderwerbsteuer automatisch nach Bundesland" in den Einstellungen; Nebenkosten getrennt aus dem Investmentprofil.
+
+### Amtliche Vergleichsfaktoren im Register — 08.10.2026 (`v1975`–`v1977b`) (früher N50)
+
+Kennzahl `vergleichsfaktor` in der Saat; 9 Sätze (Barnim 2 Werte mit reproduzierten Anwendungsbeispielen, Berlin 3 Werte `verwendung: intern` zurückgehalten + 1 Sperre, Saarland 7 Sperren). Registerweg in `ReportOrchestrator`/`CrossCheckService` verdrahtet. Dabei behoben: Sperre war toter Code (`verwendung` nicht zurückgegeben), Achsennamen je Ausschuss, Bezugsgröße BGF statt Wohnfläche (Berlin), `TypeError` bei unbekannter Einheit; `fehlendeSaatdateien()` und die Beleg-Prüfung in `saat-pruefen.mjs` repariert.
+
+### Unterlagen-Modul: Ansprechpartner 1 und 2 aus v6, Belegprüfung je Seite — 12.10.2026 (`v2151`–`v2153`, `8786a4ad`; sichtbar `v2440`–`v2445`) (früher N51)
+
+Link-Teil schon v1971c (`antrag_url` stand im `else if`). v2151: `belegPruefen()` verfehlte 7 von 19 verschleierten Schreibweisen und bestätigte zu lax → `mailsAufSeite()`, `belegSeiten()` mit `pro_seite` in der vorhandenen `jsonb`-Spalte `seiten`. v2152: Migration 087 `ansprechpartner jsonb`, KI-Auftrag wörtlich aus v6, Zusammenbau `personenAus`, `PUT /unterlagen/amt/:id/kopie`, CC im mailto; Rechnungspostfach galt als Person (v2152b). Nachweis `tools/beleg-leser-pruefen.mjs` 79 Fälle RC=0, auch im Container. Sichtbar seit v2440–v2445 (N61.6).
+
+### „Vergleichswert" aus Angeboten umbenannt — 08.10.2026 (`v1971`) (früher N48)
+
+Gemessen: der Vergleichswert war zu 100 % ein Median aus Portalinseraten. Marcels Entscheidung: ohne kaufpreisbasierte Grundlage kein Vergleichswertverfahren; die Zahl heißt „Marktpreisindikation aus Angeboten", die PDF-Karte sagt „amtlich" nur über einer amtlichen Zahl. Kaufpreisbasierte Vergleichsfaktoren seit N50 (v1975–v1977b).
+
+### RND-Altlasten: RND-Gutachten-PDF und Dublette raus — 08.10.2026 (`v1970`, `b679b9e4`; `v1974`, `ea971e68`) (früher N49)
+
+Marcels Entscheidung „die Leute bekommen erst mal kein RND-Gutachten": `rnd-pdf.js`, `rnd-docx.js`, `rnd-bte-katalog.js` und der tote Teilbaum in `rnd-wizard.js` gelöscht, rund 3.800 Zeilen (v1970). `marktbewertung-card.js`/`.css` der Hauptapp raus (v1974) — die CSS war keine reine Dublette, ihr Block aber unerreichbar.
+
+### Marcels Entscheidungen vom 08.10.2026 umgesetzt — 08.10.2026 (`v1969`–`v1972`, `v1971c`)
+
+RND-Untergrenze 10 in beiden Zweigen (v1969); der geprüfte Anlage-2-Kern gilt (v1966/v1969); Vergleichswert ohne Kaufpreisgrundlage raus bzw. umbenannt (v1971); RND-Gutachten-PDF raus (v1970); Modernisierungspunkte als acht Chips mit Absprung (v1972); Unterlagen-Portal-Link (v1971c). Die damals offen gebliebenen Punkte stehen bei N47b, N49, N50, N51.
+
+### Zwei Anlage-2-Kerne gleichgezogen — 08.10.2026 (`v1966`/`v1969`, `bcf4663a`) (früher N47)
+
+Das Backend (`anlage2.js`) rechnete jenseits der GND weiter (Bj 1905 bekam mehr RND als Bj 1964). Marcels Entscheidung: der gegen Gutachten geprüfte Kern gilt. Beide Kerne identisch über 1.764 Fälle, dazu 13.600 Ausliefer-Fälle monoton; Wächter `tools/rnd-kerne-pruefen.mjs`, RC=0.
+
+### 0 Modernisierungspunkte sind eine Antwort — 08.10.2026 (`v1973`, `2f32b56b`) (früher N47b)
+
+`_num()` in `rnd-einheitlich.js` verlangte `> 0`, `mod_punkte: 0` fiel auf „kein Modernisierungsgrad". Seit v1973 unterscheidet der Kern über `mod_angaben` zwischen „0 Punkte erfasst" und „nichts erfasst".
+
+### Mapper multiplizierte Punkt-Dezimalzahlen mit 10/100/1000 — 07.10.2026 (`v1962`, `99bc7f66`) (früher N46)
+
+`num()` in `DealPilotObjectMapper.js` löschte jeden Punkt als Tausendertrenner („3.5" → 35, „64.58" → 6458); betroffen 25 Objekte, 365 Feldwerte. Am echten Objekt: Sachwert 1.717.808 → 138.463 €, 17 Proben grün. Nebenbei `mandanten.js:645` (unmaskierter Punkt, Kaufpreis immer `NaN`) behoben.
+
+### Datenaufnahme auf allen Gerätegrößen — 08.10.2026 (`v1985`–`v1992`) (früher N45)
+
+Trichter raus (v1985), Bordkarte seit v1953; Datenaufnahme auf dem Handy wieder erreichbar (v1987, `_pfScanQ` löste sich nur im rAF); Lesbarkeit 390 px ohne Durchfaller (v1989); Feldhilfe 1,36 → 9,50 : 1 und Stufen-Pillen 1,13 → 14,81 : 1 (v1990); Lampe 12×12 (v1991); QR weg unter 900 px rein in CSS, Kasten 92×92 (v1992). Ursache der gescheiterten Anläufe: 62 Selektoren mit `:is(#oab-bar,#qc7-sources)` erben ID-Spezifität. Am 12.10.2026 gezählt: 34 `@media`-Blöcke, 320–1920 px abgedeckt.
+
+### Unterlagen-Modal trägt die Marke — 04.10.2026 (`v1843`, `6aa6184f`) (früher N1)
+
+Modal im DealPilot-Stil; „Amt ermitteln" und „Anschreiben" standen weiß auf Creme (Kontrast 1,00), jetzt lesbar.
+
+### Unterlagen: „Alle abrufen" — 04.10.2026 (`v1843`, `6aa6184f`) (früher N2)
+
+Knopf „Alle abrufen" im Unterlagen-Modal (`DealPilotUnterlagen.alleAbrufen()`), holt die Unterlagen nacheinander.
+
+### Gemarkung, Flur, Flurstück als optional ausgewiesen — 04.10.2026 (`v1843`, `6aa6184f`) (früher N3)
+
+Gemessen: die Angaben sind optional. Der Satz „muss das Amt … selbst heraussuchen" klang nach Pflicht; jetzt steht „Optional:" mit Hinweis, wo man sie findet.
+
+### Reiter Objekt neu geordnet — 04.10.2026 (`v1851`–`v1855`) (früher N4)
+
+Schritte 1–3 gemessen (37 Felder des Wertermittlungs-Blocks erreichten den Bericht nicht; Stufe 3 aus der Haupt-App unerreichbar), Marcels Entscheidungen §5.6 vom 04.10.2026. Gebaut v1851–v1851c: Mapper, Stufe 3 im Objekt-Weg, Automatik-Leiste, Formular in drei Ebenen, Feld-IDs unverändert (873 = 873); Eingabetiefe 1/2/3 (v1852); „Ihre Einschätzung" im Bericht (v1853, `05d331f`); Prüfstrecke Exporte bestanden (v1855). Empfindlichkeitstest je Mapper-Feld seit `tools/objekt-mapper-pruefen.mjs` (v2148).
+
+### „BORIS abrufen" heißt „Bodenrichtwert abrufen" — 04.10.2026 (`v1842`, `dda02b31`) (früher N5)
+
+Die Registry kennt neben den Landesdiensten `borisd` als bundesweiten Catch-all; Knopf und Statuszeile heißen jetzt „Bodenrichtwert abrufen", die konkrete Quelle steht im Ergebnis.
+
+### Pilot-Analyse: Marktpreis-Abruf in den Co-Piloten — 04.10.2026 (`v1848`, `8bc9ed5a`) (früher N6)
+
+Knopf `dp-cp-mp` raus, Abruf als `__dpCpMarktpreis` beim Co-Piloten; `marktpreis` bucht jetzt Konto `avm` (vorher falsch `mpi`). Im Browser bewiesen: Rest 0 → „kein Guthaben mehr", Rest 24 → Box mit Kosten.
+
+### Pilot-Analyse im Projektwissen — 04.10.2026 (`v1847`, `5ca46455`; `v1849`) (früher N7)
+
+Werkzeug `pilot_analyse_lesen` (Stufe `lesen`) liefert Briefing, Stärken, Risiken, Szenarien, Lage, Verhandlung, Bank; `objekt_lesen` gibt `ai_analysis` nicht mehr roh heraus; Browser-Co-Pilot bekommt `pilot_analyse`. Prüfer `tools/agent-pruefung/pruef-pilot-analyse.js`. Seit v1849 Warnung `fremd_verdacht`, wenn die Analyse den Ort des Objekts nicht nennt.
+
+### Cockpit-Grund, Sortierknöpfe und Menüknopf — 06.10.2026 (`v1904`/`v1904a`, `5d9c280e`, `aa3cadd8`, `a277419c`) (früher N37)
+
+Der behauptete Obsidian-Grund von `#dashboard-main` existierte nicht (zurückgenommen); Cockpit an `--page-bg` gebunden. `button.sb-sort-btn` in „Heute" 13 px Überlappung → `gap:18px`. Das „X" des Menüknopfs neu vermessen und beim Schließen der Schublade mitgenommen (`closeMobileSidebarOnAction()`, `resize`-Handler).
+
+### „Portfolio-Strategie" räumt das Cockpit ab — 06.10.2026 (`v1905`, `d3e7ff22`) (früher N38)
+
+Register der Hauptansichten in `js/ui.js` (`DealPilotAnsichten.abraeumen`), `#all-objects-main` mitbehoben; `closeDashboard()` setzte `#s-quick` blind zurück. Nachgemessen in vier Aussehen bei 390 und 1180 px.
+
+### Kartenstil „Kennzahlen": Knopfzeile nicht mehr über der dritten Kachel — 06.10.2026 (`v1905`, `d3e7ff22`) (früher N39)
+
+Die Zentrierregel (v1903) hing Ring und Knopfzeile an die Kartenmitte, die bei „Kennzahlen" im Raster liegt; „Kennzahlen" geht auf `top:6px`. Am Text nachgemessen: keine Überdeckung mehr, alle Umschalter per `elementFromPoint` erreichbar.
+
+### Kartenstil „Ampel" und „Minimal": 40,6 px Zeilenhöhe — 06.10.2026 (`v1905`, `d3e7ff22`) (früher N40)
+
+Marcels Entscheidung „etwas höher": beide Stile von 27,6/31,6 auf 40,6 px, nur am Handy-Anker; Schreibtisch bei 1180 px unverändert nachgemessen.
+
+### Portfolio-Menü der Aktenmappe auf dem Handy — 06.10.2026 (`v1903`/`v1903a`, `6bf9df08`, `ac4bf93a`, `878bbd0d`) (früher N36)
+
+Liste als Standardinhalt (318 → 484 px), Aufklapper unten, Register auf Knopfdruck; kompakte Kartenstile 122 → 45 px, Partikel in der Aktenmappe aus. Die zwei damals offenen Punkte (Sortierknöpfe in „Heute", Grund von `#dashboard-main`) sind mit v1904 (N37) gelöst; die Commits liegen auf `main`. Eine eigene Abnahme Marcels ist nicht vermerkt.
+
+### Aktenmappe auf dem Handy — Marcels vier Einzelpunkte — 06.10.2026 (`v1919`, `016ec49a`) (früher N41)
+
+Hintergrund im Portfolio-Zustand durchgehend ein Ton (v1919, sieben Rasterpunkte); „Portfolio" umrahmt (v1911), Menüs (v1912) und Anmeldung in Grau (v1916) waren schon erfüllt und nachgemessen.
+
+### Heute, Aktenmappe und die Objektkarten-Wahl — 06.10.2026 (`v1896`–`v1900`, `8737f39e`, `b1e44264`, `1db1c40a`, `4ae4cc8e`) (früher N35)
+
+Partikel liefen nie (`#dp-particles` fehlte), Canvas wird jetzt selbst angelegt, Puffer = Fläche mit `ResizeObserver` (v1900). Objektkarten-Wahl fällt in „Heute" weg; Aktenmappe ohne eigene Schiene, dunkler Block 238 → 151 px. Commits liegen auf `main`.
+
+### Vier Fehler in Steuer- und Bewirtschaftungsrechnung — 06.10.2026 (`v1898`, `3ae5c06c`, `d2a7bc83`) (früher N34)
+
+55-%-Split lief auf die Gesamt-Bewirtschaftung (`tax.js:1208`), Mietausfallwagnis stand in den Werbungskosten, Cockpit rechnete mit zweiter 20-%-Pauschale auf nie gesetzte Feldnamen (`dashboard.js:758`), `weg_r` doppelt gezählt (`tax.js:261`); 15-%-Kasten mit echten Zahlen. Commits liegen auf `main`.
+
+### Aktenmappe auf dem Handy trägt die Aktenmappe — 05.10.2026 (`v1885`–`v1885c`, `50b3d16e`) (früher N29)
+
+141 Schienen-Regeln per Generator `tools/schublade-regeln.mjs` auf die Schublade geklont, Heute-Kopf raus, Suchfeld in eigener Zeile, Rechtliches nur in den Einstellungen. Auf Prod.
+
+### Endabnahme Handy, alle Darstellungen — 05.10.2026 (`v1883`–`v1883b`, `3db5e88f`) (früher N26)
+
+Prüfläufer und Bilder je Reiter und Darstellungsvariante; 19 Funde behoben (Listen-Stile wirkten auf dem Handy nie, Überlagerungen, abgeschnittene Tabellen, Wortbrüche, PLZ-Feld, Vollbild-Knopf). Auf Prod.
+
+### Handy- und Tablet-Durchgang — 05.10.2026 (`v1881`–`v1882a`, `60201faa`) (früher N24)
+
+390 und 820 px, alle 9 Reiter: Gewerke-Tabelle, KPI-Tabelle, Partner-Bordkarten, Info-Knöpfe auf Touch, Rechtliches in der Schublade, Kopf-Kacheln, Markteinschätzung 700–899, Marktbericht-Bordkarte behoben. Auf Prod.
+
+### Ernte Hessen-Zins, NRW-Faktoren Block 2, Zins ST/TH/SH/NI — 05.10.2026 (früher N23)
+
+Hessen-Zins (137), NRW-Faktoren Block 2 (69), Zins ST/TH/SH/NI (229) auf Staging und Prod. Marcels Entscheidungen umgesetzt: Kiel MFH (nur nicht-kommerziell) und Aurich-Block gesperrt, ST ohne Lizenz.
+
+### Aktenmappe auf dem Handy brauchbar — 05.10.2026 (`v1879`–`v1880c`, `3a448510`) (früher N20)
+
+Feste Schiene 187 px deckte Menü-Knopf und Kopfzeile, Score-Leiste 808 px breit — jetzt im Fluss, kompakt; nur Heute + Aktenmappe, Standard Aktenmappe. Auf Prod.
+
+### Prod-Rollout v1846b → v1878 — 05.10.2026 (früher N19)
+
+Fast-Forward über 107 Commits, Migration 084, beide Backends neu gebaut, NRW-Register gesät, Sicherungen `prod-*-20261005-1101-vor-v1878.sql.gz`. Prod = Staging = v1878.
+
+### Vier Steuerfehler und das Speichern-Modal — 05.10.2026 (`v1878`, `f000302`) (früher N18)
+
+AfA-Basis mit NK, Projektion mit AfA je Jahr, § 7b ungezwölftelt, Degressiv-Wechsel auf Restwert ÷ Rest-ND; Speichern-Modal ohne Quelle/Konsens/AVM-Text.
+
+### Marktbericht-Übernahme, QuickBoarding-Ring, Quick-Check-Durchlauf — 05.10.2026 (`v1877`, `36511ca`) (früher N17)
+
+brw, Energieklasse G/H, Zusatzeinnahmen → `sonstige_jahr` (Formular und Backend-Mapper); QuickBoarding-Score als Ring mit Pille; Quick-Check → „Als Objekt speichern" durchgelaufen. Speichern-Modal und Steuerfehler mit N18 (v1878) erledigt.
+
+### QuickBoarding-Karte, Spanne in der Karte, Handy-Durchgang — 05.10.2026 (`v1875`–`v1876`, `eba95d6`–`f6b6fb8`, `14fe802`, `a72b928`) (früher N16)
+
+Weiße 65 lesbar, „Nicht enthalten …"/„So wird gerechnet" raus, Spanne Unten/Ø/Oben in der Karte (Klick übernimmt), Karte als Raster nach Kartenbreite, „Deal" in der Pre-Flight-Pille; alle Reiter mobil geprüft (Journal 36).
+
+### „Willkommen an Bord" erst nach der Anmeldung — 05.10.2026 (`v1874`, `cf6c5df`) (früher N15)
+
+`erststart.js` wartet auf `dp:plan-ready` und prüft `Auth.isLoggedIn()`; damit auch die Gestaltungsfrage aus N13 (Registrier-Modal mit Standardwerten) erledigt — es war dieselbe Karte.
+
+### FuE-Siegel 2026 (BSFZ) auf der Landing — 05.10.2026 (`v1873`/`v1873a`, `712192f`, `66bdf1c`) (früher N14)
+
+SVG aus dem Zip als fünfter Eintrag im Vertrauensband, 64 px, Band auf fünf Spalten; nur auf der Landing.
+
+### Parkstr. 9: Quellen, Stufen, Sachwertfaktor, Workflow — 05.10.2026 (`v1865`–`v1873`) (früher N13)
+
+Leiste lesbar, Stufen-Legende A–E und 1/2/3, Zins-Zeile kennt die Objektart, GMB-Eintrag aus dem Register (`c2c6b39`, `7de043f`, `904d71e`). Workflow-Variante A gebaut, LZS MFH Minden-Lübbecke aus GMB 2025 S. 64 (2,9 %, N 33) als Stufe A (`79eecbd`, `fad6fb4`). Sachwertfaktor-Standard 1,0 „ohne Marktanpassung" mit Grund (Marcels Entscheidung, `1335c67`). Eingabetiefe kompakt, Marktbewertung als Streifen, BMF-Rechner mit `bmf_cache` (bis `712192f`).
+
+### Gesamtdurchgang: Score-Wörter, geführte Eingabe, Handy — 04.10.2026 (`v1861`–`v1864`, `8e2de37`, `f5518ad`, `63ac7f1`, `e91df24`, `2c51832`, `b62ba81`, `0b81689`, `4a4786e`) (früher N12)
+
+Eine Score-Kette in `score-tiers.js` überall; geführte Eingabe kennt die Eingabetiefe (pflichtFuer, ganzes Objekt, gebuchte Stufe, `dp:mb-ready`); Handy 390 px und Tablet 820 px sauber; oberste Stufe „Sehr gut" (v1863); Bewertungs-Streifen schwarz (v1864). Prod-Freigabe für v1849–v1862c mit N19 (Prod = v1878) erledigt.
+
+### Kopf-Score, Kaufpreisaufteilung, Rundgang — 04.10.2026 (`v1859b`, `003995c2`) (früher N11)
+
+Score-Wort aus `ScoreTier.stufe` (fünf Stufen) und farbig; Belege-Scan raus; Exporte Kaufpreisaufteilung-PDF, Arbeitshilfe-PDF, Original-XLSX; Duplikat „PDF-Anlage erstellen" weg. Der offene Rest ist laut CLAUDE.md erledigt: `dashboard.js` liest `ScoreTier.stufe()` seit v1861, das `ScoringService`-Rating wird seit v1203 nicht mehr angezeigt.
+
+### Reiter Objekt, dritte Runde — 04.10.2026 (`v1858c`, `1fd90778`) (früher N10)
+
+Abruf als Zeilen unter den Anfragen, Stufenpillen in der Pre-Flight-Kachel, Hover-Hilfe an jedem Feld (`feld-hilfe.js`), Quellen je Kennzahl eine Zeile, Anfragen/Abruf in voller Breite.
+
+### BMF-Rechner und RND-Assistent — 04.10.2026 (`v1856a`, `a3cf6421`) (früher N9)
+
+AfA-Vorschau ohne Altwert und Notnagel, RND-Modal mit Vorbelegung aus dem Objekt (mod_*, Gewerke-Stufen), kein Schließen beim Danebenklicken, Obsidian/Gold-Kopf; Jacoby im BMF-Reiter 2 nur bei Zins Stufe A/B.
+
+### Bankexport über den Bot — 04.10.2026 (`v1853`, `d614195`) (früher N8)
+
+Werkzeug `bank_uebersicht` (Stufe `lesen`), eine Zeile je Darlehen; Restschuld/Rate/Bindung bis aus `portfolio_spiegel`, sonst leer und gesagt; `restschuld_ende` ehrlich weggelassen. Prüfer `pruef-bank.js` 12/12 (17 Darlehen = 17 Zeilen). Marcels Rahmen für N4 (Feld-IDs bleiben, PDF/Import/Exporte lesen dieselben IDs) ist mit v1851 umgesetzt (873 = 873).
+
+### Der Copilot wird ein Agent (A-1 bis A-8) — 02.10.2026 (`v1800`–`v1808`, `2e4c3bea`, `c52aff86`, `18700abf`, `a99acf5d`)
+
+Regex-Weiche (`telegramAbsichtService.js`) durch einen Agenten mit Werkzeugen ersetzt: 9 Werkzeuge in 3 Stufen (lesen / schreiben nach Bestätigung / kostet nach Bestätigung mit Preis). Befunde aus der Nutzung behoben: falscher Auslesemodus (`antwort` statt `inserat`, 4.000-Zeichen-Deckel) und Anlege-Modus ohne Ausgang (v1800). Portfolio-Kontext mit Tilgung/Verbindlichkeiten als Feld (v1802), Objektbezug, Auswahlfelder mit Rückfrage (v1807), Sammelaktionen mit Gesamtpreis (v1805). A-8 (v1808): Stufe 3 fiel still auf Stufe 1 zurück, der Schnellmodus übersprang den Bericht — jetzt reicht das Werkzeug `bericht_text` samt Quellen weiter. Prüfstrecke `tools/agent-pruefung/`: 5/5 Portfolio-Fragen, 12/12 Zahlentreue, 16/16 Werkzeugproben, 7/7 Anlage, 9/9 Gesamtlauf.
+
+### Telegram-Bot als zweiter Zugang zur App — 02.10.2026 (`v1791`–`v1798`, `e1c0bb68`, `165c8122`, `c7792565`, `e87650e3`, `f0bc9e03`)
+
+Entscheidung T-B1 (Marcel 02.10.2026): jeder Kunde legt seinen EIGENEN Bot bei @BotFather an (v1792, die frühere Fehldeutung „ein Bot für alle“ zurückgenommen); Token verschlüsselt, Empfang per Webhook mit Pfad je Bot plus Secret-Header, Verknüpfung über Einmal-Code (Migrationen 076–082). Der Bot rechnet keine eigene Zahl (v1793), legt Objekte an (v1794), nimmt Sprachnachrichten (v1794b) und merkt sich den Gesprächskontext (v1798). T-B6: `req.apiKey.scopes` wird seit v1796 ausgewertet (`middleware/auth.js:122`).
+
+### Register in die Datenbank eingespielt — 01.10.2026 (`v1751`, `v1751b`, `306c9c58`, `c07c3600`) (früher E1)
+
+Ursache: `tools/register-saat.mjs` Z. 17 las eine hartverdrahtete Datei — 2.515 geerntete Sätze im Repo, 493 in der Datenbank. Danach 2.505 Zeilen, 14 Länder, 8 Kennzahlen. Zehn SWF-Sätze (Bochum, Dortmund, Essen, Siegen-Wittgenstein) bleiben bewusst draußen: keine `quelle_url`.
+
+### Ernte-Kandidaten SH, HH, BB, SN, NI — 01.10.2026 (`v1753`, `a9fc37c1`) und Folgeernten (früher E6)
+
+SH geerntet in v1753. Die übrigen Kandidaten liegen inzwischen im Register (u. a. `hamburg.json`, `swf-hh.json`, `lzs-bb.json`, `swf-bb.json`, `nachernte-2026-10b-sn.json`, `swf-ni-*.json`, NI-Ernter v2886); laut Messung 22.10.2026 (`tools/messe-schleife-daten.mjs`) 15 Länder mit Wert.
+
+### Setup-Fenster: U1–U8 und U8-R — 01./02.10.2026 (`v1749`, `v1750`, `v1753b/c`, `v1770`, `v1776`; `e22e64fa`, `c9483f8e`, `23d16523`, `28b11073`, `539a31e4`)
+
+U1: `.dpo-ov` auf `rgba(5,5,5,.34)` ohne `backdrop-filter` (abgenommen per `getComputedStyle`). U2: Klick auf den Hintergrund stirbt am Overlay (Fangphase, `ev.target === _ov`), 0 Zeugen an body/document. U3: Vorschaubilder zeigen die Aufteilung. U4–U7: LTV frei, Häkchen „automatisch“ für LTV/Marktzins, Erklärungen an jedem Feld, Steuer erklärt (Gehaltsrechner von Marcel gestrichen). U8: Investortypen lesen `DealScore2.getPresets()`; v1770 behob den toten Default-Schlüssel „ausgewogen“ (`_typDefault()`). U8-R (v1776): das Profil überschrieb `min_dscr`/`max_ltv`/`ek_quote_default` aus Schritt 3 — schreibt jetzt nur `ai_risk` und das Preset; abgenommen mit 1,44 / 77 / 23 unverändert.
+
+### Beide Piloten sprechen (V1–V7) — 01./02.10.2026 (`v1760`–`v1769c`; `bda9f34f`, `2ea9ed83`, `66d717c0`, `e544bd42`, `af5c8ac6`, `6d59404c`)
+
+Diktat in Co-Pilot und Portfolio-Pilot (v1760–v1764b); Objektzuordnung per `objektZuordnen()` statt Zahl-Muster (v1767b, `tools/pruef-objektzuordnung.mjs` 21/21); belegte Felder nicht still überschrieben (v1764, v1767b); Abrufe per Sprache mit Kosten- und Restkontingent-Ansage aus `body.abrufe` (v1766). V6: `users.id` UUID gegen INTEGER in `mb.*` — Migration `015_user_id_text.sql`, fünf `parseInt` auf `_uidAus(req)`, 202 Zeilen per `tools/mb-uid-zuordnen.mjs` zugeordnet, Routen 200 statt 400 (v1769); Berichte reisen mit (v1769b), gezählte Zahlen werden gelesen statt nachgezählt (v1769c). V7 strukturell erfüllt: Katalog entsteht aus `window.FIELDS`.
+
+### Tour-Hänger in Standard- und Kanzlei-Ansicht — 02.10.2026 (`v1774`, `v1779`, `v1780`; `887d8ba2`, `0aae0179`, `2e483d8d`) (früher T1)
+
+Ursache: `_findElementWithRetry` nahm per `querySelector` nur den ERSTEN Treffer; war der unsichtbar, gab die Suche auf (Hänger bei Schritt 3 Standard, Schritt 6 Kanzlei) — jetzt `querySelectorAll` und der erste sichtbare (v1774). Marcels Entscheidung „b“: Schritte ohne sichtbares Ziel halten die Tour nicht auf, Wartezeiten 2,0→1,1 s bzw. 6,0→2,0 s (v1779): 35 von 36 Schritten. v1780: `tilgEffektivBrutto` war undefiniert und riss Waterfall und Stress-Test mit; Charts jetzt einzeln gerendert (702 · 628 · 707 · 883 px). Prüfwerkzeug `frontend/dev/tour-pruefer.js`.
+
+### Bordkarte als Standard beim Ansichtswechsel; Tour-Schritt 1 auf die Objekte — 01.10.2026 (`v1748b`, `0c0e9870`; `v1747b`, `v1747c`, `1ed3abcc`, `2f51741e`) (früher T2)
+
+T2: die Bordkarte kam nie an — falsches Modul (v1748b). T3: Schritt 1 zeigte auf die Aktionen statt auf die Objekte; die Schiene wird vor dem Schritt aufgeklappt, Anker ist die geklippte Hülle (v1747b/c).
+
+### Demo-Objekt für die Tour — 01.10.2026 (`v1747`, `v1747d`, `f500a587`) (früher T4)
+
+`POST /objects/demo-rundgang` legt den Datensatz aus `backend/src/db/demo-object.json` (wird nie gelöscht) mit freier Objektnummer an. Am Endpunkt gemessen: 129 Felder, 1 Foto, 9.926 Zeichen KI-Analyse.
+
+### Tower: Kaufpreisaufteilung fragt nach der Fassung; QR-Schritt markiert den QR-Code — 01.10.2026 (`v1748`, `0540b424`) (früher T5)
+
+T5: der Knopf öffnete immer dasselbe PDF — jetzt Auswahl nach dem Vorbild `pdf-wahl.js` (v1744). T6: der Pre-Flight-Schritt zum QR-Code hatte einen falschen Anker und markierte den Boardingpass — eigener Selektor für den QR-Code.
+
+### Starter-Nachkauf günstiger als der Einzelkauf — nachgemessen 12.10.2026 (`v1673`, `cc281272`) (früher N1)
+
+Befund 29.09.: `nachkauf_starter` kostete 5,00 € für 5× mpi (Einzelwert 4,50 €); Ursache `config.js:521` (Monatsbeitrag ÷ 4). Marcel hat in Stripe einen neuen Preis angelegt (`price_1UKupB…`, 4,00 €); am echten Katalog auf Prod nachgerechnet: alle drei Pakete günstiger als der Einzelkauf (−0,50 / −5,25 / −21,00 €). `_preisplausibilitaet()` (v1673) bleibt als Wächter.
+
+### Zwei Backend-Fixes auf Prod — 12.10.2026 (Prod-Rollout v1951–v2144, Merge `74841228`) (früher N2)
+
+`0c6cda6` v1669 (BMF-Aufteilung meldet unbekannte Eingabefelder) und `cc28127` v1673 (Preis-Plausibilität) waren auf `main`, der Prod-Pull am 29.09. von der Arbeitsumgebung abgewiesen. Mit dem Rollout live; auf Prod nachgemessen (4 bzw. 2 Treffer, beide Commits Vorfahr von `origin/main`).
+
+### Hängender Cherry-Pick auf `main` war ein Duplikat — 29.09.2026 (früher N3)
+
+Sequencer-Zustand `pick a2a96fd` (v1536/v1537, Partner 99 €) mit `--quit` beendet. Gemessen: `a2a96fd` liegt bereits auf `main`, Migration `075_partner_preis_v1536.sql` dort, Stripe live 9.900 Cent, Prod-Landing „Warum 99 € und nicht 49 €“. Lehre: erst messen, ob es die Aufgabe noch gibt, dann fragen.
+
+### Import-Modul v1.1.0: Dokumentarten angebunden — 29.09.2026 (`v1677`, `fe466152`; `v1678`, `c3d55b5e`) (früher N4)
+
+Gegenstelle ist `frontend/js/pdf-import.js` (der Befund „keine Gegenstelle“ wurde zurückgenommen). v1677: `POST /ai/extract-rndg`, neun Felder korrekt, Gutachten 25 J. gegen `calcPunktraster` 25,51 J.; `rnd_jahre` wird gelesen, nie übernommen. v1678: `dokumentSchemas.js` mit Schemata aus dem Modul (plus eigener `kpt`-Prompt mit den Feldnamen von `/bmf/aufteilung`), `POST /ai/extract-dokument`, `frontend/js/dokument-import.js` als Karte im Import-Hub — neun Arten, Wertgrenzen je Schema, fehlende Pflichtangaben benannt. Rechen-Schnittstelle dokumentiert in `docs/kaufpreisaufteilung/SCHNITTSTELLE.md` (v1675). Bewusst nicht übernommen: Ordner-Upload, SSE, OCR-Zweig, `IMPORT_SESSIONS`, Browser-OpenAI-Key.
+
+### Produktion nachgezogen (Stand 26.09.) — 12.10.2026 (Prod-Rollout v1951–v2144, Merge `74841228`) (früher P1)
+
+Der Stand v1635–v1645 (fünf Layouts, Datenaufnahme-Zeile, Erststart-Karte, Export-Rückfrage, Checkliste, `umgebung.js`) kam mit dem Prod-Rollout vom 12.10.2026 (s. N2). Checkliste vor jedem Merge bleibt: beide Datenbanken sichern und ansehen, Migrationen per `git diff --name-only origin/main..staging` prüfen, Backend-Rebuild bei `backend/src/**`.
+
+### Zwei Werkzeugfenster standen auf dem Handy im Weg — 28.09.2026 (`v1652c`, `v1652d`; `c25c83bc`, `b1e54dd5`), am Code nachgemessen 12.10.2026 (früher P3b)
+
+Bei 390 px per `elementsFromPoint` gemessen: `#dp-kv-panel` und `.dpl-schalter` lagen `position:fixed` über der Datenaufnahme, drei von vier Quellkacheln und der Abrufknopf waren nicht zu drücken. Beide unter 900 px ausgeblendet (`hell-varianten.css:157-159`, `layout-varianten.css:1418-1420`), dazu `layout-varianten.css:2356`. Merkposten: ein festes Fenster vor dem Ausrollen einmal bei 390 px gegen `elementsFromPoint` halten — sichtbar ist nicht bedienbar.
+
+### Kleinere Reste vom 26.09.: BY-Verfügbarkeit und `mb.market_reports.user_id` — 02.10.2026 (`v1769`, `e544bd42`) (früher P4)
+
+`verfuegbarkeit-by.json` wird gelesen: `quelleFuer(ags)` → `quellenSatz()` liefert für sieben Stichproben aus allen sechs Wegweiser-Ländern eine vollständige Antwort (`AUSSCHUSS_QUELLEN` 120 Einträge). `mb.market_reports.user_id` auf TEXT (Migration 015, 202 Zeilen zugeordnet, s. Piloten V6). Die Handy-Messreihe für v3/v5 ist gegenstandslos, seit die Layouts am 28.09. auf zwei reduziert wurden (s. P3).
+
+### Marcels Backlog v22 vom 18.09.2026 — Punkte 1–22 bis auf Reste — 18.–20.09.2026 (`v1428`–`v1462e`)
+
+Prod-Rollout mit Smoke-Test (`006a630`, `f5802de`), Finanzierung EK zuerst (`v1433`, `2da26e5`), Partnernetzwerk ohne Rotation und mit Nachladen (`v1429`, `90b80e7`), Sanierungsfinanzierung mit LTC/LTV nach Sanierung (`v1445`, `a6fbf3f`), Ist-/Soll-Modell und MFH-Konfigurator (`v1448`–`v1459`), Stufentrennung im Marktbericht (`v1435`, `f271a44`), BGF nach NHK 2010 (`v1434`/`v1446`, `ff5c028`), Sprechlauf Teil 1 (`v1440`, `076bd35`), Hell-Schalter-Namenskonflikt (`v1431`, `7973054`), helle Bank-PDF-Fassung (`v1436`, `v1460`–`v1462e`), weiße Bank-/Score-Karten (`v1443`–`v1443c`), Flugzeug-Symbol raus (`v1430`), QC-Marktwert-Timeout 60 s → 15 min (`v1432`, `f9d7533`), Fragen je Objektart (`v1437`, `47042b7`), verbale Zustandsskala (`v1444`, `ec4278a`), Schnittstellen-Audit mit 5 Fehlern (`v1437`/`v1438`, `29ef2e4`), QA 19 inkl. EK-Rendite-Entscheidung (`v1442`), Mobile-QA Teil 1 (`v1441`–`v1441d`, `v1452`), Hybrid-Hellprofil (`v1449`–`v1455c`), eigener AfA-Satz mit RND (`v1447`/`v1450`, `d17e85e`, `0dab26e`). Einzelbefunde und Messungen im Journal der Projektanweisung (18.–20.09.2026).
+
+### Audit Aktionen/Einstellungen (Block A) — 13.09.2026 (`v1350`–`v1357c`, `v1375`)
+
+Elf Reiter gemessen; Co-Pilot-Einstellungen landen nachweislich im Prompt. Bewertungsprofile zeigen ihren Einfluss als Balken (`v1352`), Deal-Score-Formular und Kasten-im-Kasten behoben (`v1350`–`v1353`), Datenraum-Links im Konto statt nur im localStorage (`v1375`, Server gewinnt nie gegen Leere), Reiter neu sortiert (Marcel übernahm alle vier Empfehlungen, elf → zehn Reiter, `v1355`), drei Felder ohne Leser als Ampel angeschlossen (`v1356`–`v1357c`).
+
+### Schutz gegen Auslesen und Nachbau (Block B) — 13.09.2026 (`v1360`–`v1374`)
+
+Bestandsaufnahme der Browser-Rechenlogik (B1); Analyse-Prompt, zweiter § 32a-Tarif und Direktweg zu OpenAI ins Backend (`v1360`–`v1365b`, `v1374`; Deal Score bleibt nach Marcels Entscheidung im Browser); Rate-Limits je Konto mit `security_events` (`v1366`/`v1367`, Migration 071, append-only); Risikostufen berechnet/gesetzt, nie automatische Sperre (`v1369`); Warnmeldung und Adminmail (`v1370`); Admin-Bereich mit Fallakte (`v1368`); Rollen und `security_exempt`, Schwellen konfigurierbar (`v1371`, Migrationen 072/073); 14 Tests grün (`v1372`); Datenschutz 13a mit Löschlauf (`v1373`); Tarif 2026 amtlich (`v1364`). AGB-Abschnitt VII.(6) und Vertragsstrafe als Entwurf (`v1373`) — anwaltliche Prüfung übernimmt Marcel selbst (25.10.2026).
+
+### Sprechlauf → Co-Pilot (Block C), erledigte Teile — 13.–14.09.2026 (`v1358`–`v1378b`, `v1115`–`v1121`)
+
+Kontextbezogene Begrüßung mit Erfahrungsfrage und „Erklär mir das" (C1, C11), Fortschritt und Signale im Kopf (C13, `v1119`–`v1119e`), Hörwächter (C14, `v1121`), Marktpreisindikation startet nach Bedingung statt Zeitpunkt (C15), beide Scores mit Kennzahlen (C16), drei Begleittöne (C2, `v1378`/`v1378b`), Steuersatz/zvE vorschlagen und zurückkommen (C5, `v1377`/`v1377b`), Konfliktrückfrage bei belegtem Feld (C7, `v1376`–`v1376d`), Verneinung hinter dem Thema (C3 teilweise, `v1358`), `wertstg`/`ds2_wertsteigerung` unterschieden (C4 teilweise, `v1359`).
+
+### Steuerprüfung: Trennung privat/Gesellschaft — 15.09.2026 (früher S1)
+
+Im Container mit echtem `tax.js` und `dashboard.js` gefahren: 8 Objekte, 4 Halter, 3 Steuerregime, zvE 90.000 €. Vier getrennte Töpfe, Summe je ESt-Topf cent-genau gleich der echten Portfoliowirkung, Kapitalgesellschaften ohne Wirkung je Objekt. Trennung an fünf Stellen gegengelesen (Tab Steuern v805, Bestandssaldierung und Cockpit v1400, Steuer-Mappe, Jahresabschluss). Einziger Befund: GbR-Topf (S2, offen).
+
+### Marktbericht: Marcels Liste vom 12.09.2026 — 12.09.2026 (`v1332`–`v1339`, `b307c50`…`343ed2b`)
+
+Adresse wurde vom letzten Objekt überschrieben und Bericht landete am alten Objekt (`v1333`–`v1333d`), Wohneinheiten-Sperre, Feldbeschreibungen mit „woher" (`v1334`), Kontingent-Rest an der Ampel (`v1335`), Raster fluchtet (`v1336`–`v1336c`), Alterswertminderung mit Rechenweg (`v1332`/`v1337`). Beide Reste erledigt: Erbbaurechtskoeffizienten für sieben Gebiete (`v1339`, Anwendungsbeispiel zeichengleich); durchgehender Lauf (Berichte 116/117) fand `_num` verwarf negative Zahlen (`v1338d`). SWF Braunschweig-Wolfsburg 2026 s. Workstream D (E2-NI).
+
+### Gutachten-Durchgang — 12.09.2026 nachts (`v1340`–`v1342`)
+
+`zweigWaehlen()` erkannte wegen Backspace-Zeichen statt Wortgrenzen keine Kurzform (EFH, ETW, MFH, RH, DHH) — Potsdam liefert jetzt SWF 1,06 (`v1341`, FALLEN.md 140). Erbbaurechtskoeffizient in der Bewertung mit Formel nach § 50 daneben (`v1342`, Prüfwert 41277). Optik Variante B (`v1340`–`v1340d`).
+
+### Sprechlauf auf Produktion — 18.09.2026 (`006a630`, `f5802de`)
+
+`v1273`–`v1310d` lagen nur auf Staging. Mit dem Rollout vom 18.09.2026 (Backlog v22, Punkt 1) ging staging vollständig nach main, main = staging = beide Server; Smoke-Test 170/170 Assets.
+
+### Sprechlauf: Marcels Auftrag vom 11.09.2026 — 11.09.2026 (`v1306`–`v1308c`)
+
+Rückmeldung zu den Bildern gebaut (`v1306`–`v1306d`). Marktbericht wird ausgewertet (`v1307`, Berichtstext → `wachsend`·`mittel`·`mittel`·`begrenzt`), Auswahlfelder anklickbar (`v1307`, 24 Knöpfe in 4 Gruppen), Pre-Flight-Kombination liest erst die Quellen (`v1308`, 8 Angaben übernommen, 14 statt 16 Fragen), ImmoMetrica in derselben Kette, fehlende Straße → Ortszentrum mit Herkunft „Näherung" (`v1308`).
+
+### Sprechlauf-Feinschliff, fünfter Teil — 11.09.2026 (`v1300`–`v1303`)
+
+Verlauf scrollt sicher ans Ende, Abruf-Balken eine Zeile (107 statt ~180 px), Mikrofon-/Tippzeile flacher, Modal 97 vh/1360 px, „Was schon steht" auch beim freien Erzählen, Breitenregel für die freie Aufnahme, Spalte räumt mit dem Aufnahmefenster (`_recAus`/`_recAn`), Tablet/Handy-Umbruch bei 900 px, Dialog wieder direktes Kind von `.oabi-body`, „ja stimmt" als Zustimmung (`_istZustimmung`). Commits `f757dee` … `696145f`, Gold-Audit RC=0.
+
+### Sprechlauf und Pakete, vierter Teil — 11.09.2026 (`v1297`–`v1299b`, `3b3fc0c`, `e45a06a`, `4525bdb`, `c262a93`)
+
+GeoMap-Kosten aus 184 Läufen (MPI 0,10 € · erweitert 0,38 € · Wertermittlung 0,51 €), Pakete Kurz-/Mittel-/Langstrecke, Menge ändert die Anzahl, Markt-Angebot schließt nach der Wahl, „aus den Einstellungen übernehmen" in sieben Formen erkannt, Schlagwort-Pillen mit Haken, Score-Blasen volle Breite, Kopf 120 → 75 px, Katalog reicht die nächsten Blöcke mit (Deckel 24). Gold-Audit RC=0.
+
+### Kontingent-Regeln, dritter Teil — 11.09.2026 (`v1296`–`v1296f`, `784ec2d` … `233112c`)
+
+Bewertungspartner-Preise raus (`avm_a` → 400 `invalid_pack`), Mengenwähler mit Deckel 25, Plan-Bewertungen verfallen am Monatsende (`_monatsReset` überträgt nichts mehr), nur Nachgekauftes bleibt. Mitbehoben: Einzelkauf verschwand beim Segmentwechsel, CSS am falschen Anker, Kaufblock im toten Zweig, Webhook-Rückfall multiplizierte die Menge nicht. Gold-Audit RC=0.
+
+### Landing-Pläne und Nachkauf, zweiter Teil — 11.09.2026 (`v1294`–`v1295`, `39995bf`, `902c74a`, `ecffdbb`, `cd1e78c`)
+
+Nachkauf-Sektion der Landing trug alte Zahlen; Staffel je Plan ein Viertel des Monatsbeitrags; alte Bewertungspreise unter „Plan wechseln" raus (kauften nichts, 400 `invalid_pack`); Einzelkauf sichtbar gemacht (hing hinter `creditPacks.length > 0`); Mietpotenzial geteilt in laufenden Vertrag und Neuvermietung (`v1295`, Hüllhorst 98 + 194 = 292 €).
+
+### Pre-Flight-Kette — Nacht zum 11.09.2026 (`v1293`–`v1293c`)
+
+Reihenfolge `import` → `immometrica` → `voice` → AVM (war voice-first seit `v503`); extrahierte Angaben werden genannt und übersprungen (13 statt 16 Fragen); Marktbewertung im Sprechlauf mit Stufenwahl; kein Doppelabruf (`done({marktGeholt})`).
+
+### Sprechlauf-Aktionsleiste und Abrufe — 10.09.2026 spät (`v1291`–`v1292d`)
+
+Feste Aktionsleiste für alle Entscheidungen, Adressbestätigung mit Bundesland und GrESt-Satz, Makro-/Mikrolage einzeln über `/ai/lage`, Break-even über `IrrEngine.breakEven`, Marktmietenabgleich, Mietvertrags-Anhaltspunkte, Upside-Hebel auf den Deal Score, animierter Score. „KI hört alles raus" und „Deal-Aktion-Werte" nur teilweise — Rest steht unter Punkt 1.
+
+### Marcels Plan vom Abend des 10.09. — 10.09.2026 (`v1288`–`v1289b`, `28ff503`, `fdba8aa`, `224382a`, `99e4308`)
+
+Feinheiten nach Karten-Überschrift (18 statt 29 Fragen, 54 statt 93 Felder), Lage-Skalen aus dem `<select>`, Deal-Score-2-Abdeckung, Abrufen statt Fragen (BORIS, GrESt, Lagewerte), lange Abrufe früh angestoßen, Zwischenstände der Scores, Nebenkosten aus drei Quellen, Herkunft je Feld in der Übernahme-Tabelle.
+
+### Notizen vom 09.09.2026 — 09.09.2026 (`v1259d`–`v1287`)
+
+Doppel-Anlage beim Anlegen behoben (`v1268`, Sicherungs-Save verlor nach `await` den Kontext). Sprechlauf-Felder 16/17 (Möblierung `v1262`), Bodenrichtwert automatisch mit amtlichem BORIS zuerst (`v1263`–`v1265`), Pillen-Standzeiten (`v1272`), Dialog statt Monolog (`v1273`/`v1275`), Objekt anlegen über der Suche (`v1266`), 15 Testnutzer aus Staging entfernt. Sprechlauf-Liste nach `v1259d`: Kerosin-Modal weg, ein Orbit, Freitextfelder als Fragen, 4 Minuten, Kosten je Aufnahme (0,56 ct gemessen). Transkription auf Staging auf mini umgestellt (Marcel 09.09.2026).
+
+### Übergabe 07.09.2026: Mietrecherche, Stripe-Preisrunde, Jahresabschluss — 07.09.2026 (`v1215`–`v1253`, `v1258`)
+
+KI-Mietrecherche nennt alle Quellen und prüft zuerst den amtlichen Mietspiegel (`v1242a–e`); Preisrunde live in Anzeige und Stripe, Coupon `ERSTFLUG15`, `istBewertungsSku()` kennt `nachkauf_*` (`v1246d`); Testbericht `Anmerkungen.docx` abgearbeitet (`v1240`–`v1253`, `v1254` verworfen); Marcels Staging-Daten auf Prod gespiegelt, Bilanz beidseitig 430.309,21 € ohne Differenz. Kosten der Gesellschaft, GuV § 275, Bilanz § 266 mit Verrechnungskonto, Ausschüttungszeile (`v1226`–`v1228`); Gegenprobe fand `d1_vertrag` ist kein Datum und `_gaNum('3.5')` = 35. Seither belegt erledigt: Prod-Rollout `v1215`–`v1253` (Stand-Zeile), § 7b-Spalte in `tax_records` (`v1258`, `0b5f0755`, Migration 070), Zweifamilienhaus als Objektart (`v1427`/`v1427b`), Gold-Audit gegen Basislinie (`v1259`). Free-Limit einer KI-Analyse im Monat bleibt (Marcel 07.09.2026).
+
+### Steuer-Mappe und Anlage V — 03.09.2026 (`v1222`–`v1225c`; § 7b-Spalte `v1258`, `0b5f0755`)
+
+Anlage-V-Zeilennummern unter dem Info-Feld (`v1222`/`v1222b`, mit Vorjahres-Vorbehalt auf dem Blatt), Anlage V beim Einzel-PDF zuwählbar (`v1223`), Steuer-Mappe für privat und überführt (`v1224`/`v1224b`, `_steuerRegime()`, `_ueberfVermerk()`), § 7b getrennt von der linearen AfA (`v1225`…`v1225c`). Befund: vier von sechs Fehlern waren Widersprüche auf demselben Blatt. Zurückgenommene Falschdiagnose: jsPDF druckt € und Gedankenstriche (WinAnsi 0x80–0x9F). Seit 04.09. auf Prod; die offene § 7b-Spalte in `tax_records` kam mit Migration 070 (`v1258`).
+
+### Übergabe 02.09.2026: Prod-Rollouts, Gelddefekt, Marktbericht neu gestaltet — 02.–03.09.2026 (`v1191`–`v1213`)
+
+Prod-Rollouts `v1198`–`v1202` (`8f2832c`) und `v1203`/`v1204` (`6047036`) mit Sicherungen beider DBs, Score-Kette an zehn Proben identisch. `credits-modal.js` kaperte `_buyCreditPack` in den alten Kerosin-Laden (`v1194`, live). Einzelfixes `v1191`–`v1196b` (Löschknopf, Score-Ring, Kerosin-Ampel, iframe-Buster, leere Reiter 6/7). Abruf-Test: Abrechnung MPI+ 10 → 9, Monat vor Bank. Marktbericht-Punkt 1 abgeschlossen 03.09.2026: Feldmarkierung (`v1199`/`v1201`/`v1202`, tote rote Regel weg `v1213`), Ergebnis-Teil nachgerechnet (`v1210`, `v1212`), PDF umgebaut (`v1206`–`v1213`); Gold-Audit seither gegen Basislinie (`v1259`).
+
+### Übergabe 31.08.2026: Prod-Rollout, Testphase, Stripe, Kontingent-Zähler — 31.08.–01.09.2026 (`v1173`–`v1190b`)
+
+Prod-Rollout 31.08. (58 Commits, Preise 19,99/39,99/79,99/99, Migrationen 064–069) und 01.09. (`v1189`, `c411ba4`: doppelte Route `start-pro-trial` kündigte jedes aktive Abo, nie ausgelöst; `v1190`/`v1190b`). Kostenhinweise ohne Kerosin und Einzelkauf an der 402 (`v1187`/`v1188`, `5b688e3`, `063b202`). Vier Wochen Pro mit Testpaket 5·3·1 (`v1185`, Migrationen 068/069). Kaufkette über `lookup_key` (`v1184`, `78280ec`, `65370f3`), Monatsübertrag-DEFAULT (`v1184b`, Migration 067), Preis-IDs aus Stripe statt Migration (`v1186`, `fc5e7b39`). Kontingent je Leistungsart statt Liter (`v1183`, Migration 066). Plan-Karte 0 € (`v1182`), Kontingent-Kasten „Lädt…" (`v1182c`). API-Keys für Partner: `apiKeys.js` führt partner TRUE.
+
+### Übergabe 13.08.2026 — 13.08.2026 (`v1155`–`v1170`)
+
+Darstellungs-Panel, Grundfarbe unter Vorlage gesperrt, Whitelabel-Sweeper, Reiter-Tinte (`v1155`–`v1158b`), Pfeilmitte löste Löschen aus (`v1159`), Free-Gate zugezogen (`v1160`), `business`/`enterprise` gelöscht (`v1161`), Hell/Dunkel als zwei Profile (`v1162`/`v1167`), Plan-Prüfmodus (`v1163`), Kontrast Objektnummer (`v1164`), Garagenfeld (`v1165`/`v1166`), Checkboxen per Sprache, Stichwort-Fenster, Verifikations-Pass aus (`v1168`–`v1170`). Akzent-Palette Fassung C (`v1175`, 30.08.) und Wallet-Angaben (`v1173`) seither beantwortet.
+
+### Marcels Antworten vom 14.08.2026: Garagenfeld, Akzentfarbe, Wallet, Speichern-Modal — 14.08.–03.09.2026 (`v1165`/`v1166`, `v1173`–`v1175`)
+
+Garagenfeld bleibt wohnungsbezogen (Weg A), umgesetzt mit `v1165` (`b9e78513`) und `v1166`, `lib/nhk2010.js` unangetastet. Akzentfarbe: freier Wähler `v1174` (`8e95bf57`), wärmere Schnellauswahl Fassung C plus Farbton-Regler `v1175` (`3f4a6cc2`). Wallet-Abstände Bild/Kaufpreis/„privat“ `v1173`/`v1173b` (`01313067`). Das Speichern-Modal im QuickBoarding gibt es bereits (Save-Transfer über `qc-bridge.js`), am 03.09.2026 im Code nachgelesen — nichts zu bauen.
+
+### Marktbericht-Wizard mit Meilenstein-Ampel — 11.08.–04.09.2026 (`v1149`–`v1154`, `v1193`, `v1229`)
+
+Wizard mit sieben Reitern (`mb-wizard.js`) und Meilenstein-Ampel gebaut, am 01.09.2026 am Testobjekt Hüllhorst nachgemessen: die Stufe ergibt sich aus den Angaben, der Knopf ist nie tot. Geldfragen beantwortet (abgerechnet beim Erzeugen, Vertiefen kostet die Differenz) und in `_aufpreis()` zusammengeführt (`v1154`, `99a14db8`). Schrittleiste einzeilig ab 1024 px (`v1151`), Knopf bei Stufe 1 frei (`v1152`), Handy-Klappleiste Fassung C (`v1153`), Stufe und angewandter Faktor im PDF (`v1149`, `v1150`), Ampel ohne Liter (`v1193`, `cd68aa0`). `ptype`/`baustatus` hatten keine leere Option und liefen still als ETW/Bestand — behoben `v1229`–`v1229c` (`cd930a1a`).
+
+### Plan-Prüflauf Free bis Partner — 13.08.–04.09.2026 (`v1160`, `v1163`, `v1230`)
+
+`config.js`, `pricing-modal.js`, Landing und die DB-Zeilen (`plans.features`) gegeneinander gehalten, alle Stufen per Prüfmodus durchgeklickt, Partner von Marcel auf Prod begangen (vollständige Obermenge von Pro). Startfenster-Leck zu (`v1160`, `d0aedab2`), Plan-Override als Prüfmodus nur nach unten (`v1163`, `a4107d01`). B7: Free bekommt den Track-Record mit Wasserzeichen (Marcels Entscheidung 04.09., DB in beiden Umgebungen). B8: Bankexport blockt free und starter. B9: Testphase dauert 28 Tage, Kommentare korrigiert. B15: Testphase erreicht KI-Beleg-Import und AVM (`v1230`, `795813aa`) — fünf, nicht acht Nutzer betroffen.
+
+### Spracheingabe füllt alle Felder: Häkchen und Sanierungsbedarf — 03.–04.09.2026 (`v1214`, `v1231`)
+
+`buildFullCatalog()` gibt alle 203 `window.FIELDS` an die Auswertung; Risiken, These und Notizen sind füllbar. `applyQcPending()` hatte keinen `bool`-Zweig — `san_tax_active` wurde gezählt, nie gesetzt; behoben `v1214` (`a4956f0a`), Sprechlauf von Marcel am 03.09. abgenommen. Speichern-Modal existiert (Save-Transfer), nichts zu bauen. Zählung 04.09.: 33 Formularfelder fehlten in `FIELDS`, 17 davon Sanierungsbedarf — `sanKatalog()` + `_sanNachziehen()` (`v1231`, `fa5f91fd`), auf Staging Dach 15.000 + Heizung 12.000 → `san` = 27000.
+
+### Steuer-Mappe über alle Objekte mit Anlage-V-Ansicht — 03.09.2026 (`v1215`–`v1225`, `0948a6f1`)
+
+Ein PDF über alle Objekte aus `GET /tax-records`, Knopf als Abschnitt 07 im Portfolio-Cockpit (`v1215`). 66-%-Grenze § 21 Abs. 2 EStG als Live-Warnung im Steuer-Tab (`v1216`, `fa2fdf0a`). Anlage-V-Zeilen aus dem amtlichen Formular abgeschrieben, versioniert in `anlage-v-2025.js` (`v1217`/`v1218`, `49462839`), elf von zwölf Lücken zugeordnet (`v1219`, `d7228f77`). Zeilennummern im Steuer-Tab (`v1222`), Anlage V beim Einzel-PDF (`v1223`), Mappe für privat und überführt (`v1224`), § 7b getrennt von der linearen AfA (`v1225`).
+
+### Sachwertfaktoren geerntet — Stand 22.10.2026 (Workstream D)
+
+Am 12.08.2026 führte `mb.wert_parameter` 0 Sachwertfaktoren; hinterlegt waren nur Minden-Lübbecke und Herford als Module. Laut CLAUDE.md (gemessen mit `tools/messe-schleife-daten.mjs`, 22.10.2026) führt das Register 627 SWF-Werte über 199 Ausschüsse, `mb.param_modell` hält auf Staging und Prod je 4.503 Werte. Der Punkt war ein reines Datenvorhaben; die Weiterpflege läuft unter „MARKTBERICHT / ERNTE — Workstream (D)“.
+
+### Zeiger auf die erledigten Alt-Punkte 4, 5, 10 und 11 (Zählung vor dem 30.08.) — 30.08.2026
+
+Hell und Dunkel als zwei Profile (`v1162`/`v1162b`, `v1167`), Akzentfarbe (`v1174`, `v1175` — Fassung C), Wallet-Abstände (`v1173`/`v1173b`) und Sachwert/Miteigentumsanteil (Weg A, `v1165`/`v1166`) sind erledigt; die vollen Befunde stehen bereits unter „Fertig“. Der Zeigerblock in „Offen“ entfällt.
+
+### Tab-Text-Regler überlebt den Akzentwechsel — 13.08.2026 (`v1157`, `c2d7e9b2`)
+
+Ursache: der Sweeper in `whitelabel-override.js` spielte bei jedem Akzentwechsel die gemerkten Originale des Body-Inline-Stils zurück und verwarf damit `--dp-tab-text`. v1155 hatte den doppelt toten Regler bereits wirksam gemacht (`body.dp-tabtext-an`, Regel (0,6,4) gegen elf Gegenregeln; nachgemessen rgb(201,168,76) → rgb(255,0,0)); v1157 schreibt den Wert in ein eigenes `<style>`-Element statt an `body.style`. Der strukturelle Befund für die übrigen Regler steht unter „Später“ (Sweeper-Falle).
+
+### ETW/MFH-Sachwert freigegeben (v1097 eingespielt) — 13.09.2026 (`v1097`, `d8d82477`) (früher A1)
+
+Die Oberfläche sperrte den Sachwert für ETW/MFH (`nichtWenn: istWohnung()`, Regel aus v955), obwohl der Kern ihn seit v1047 rechnet; `nichtWenn` übersprang auch die Pflichtfeldsammlung, und dieselbe Regel stand im Prompt der KI-Zweitmeinung. Eingespielt, `mb-backend` gebaut; Klicktest: bei ETW fordert die Ampel Bruttogrundfläche und Standardstufe ein, bei EFH nicht. Die Prüfstrecke vergleicht den `app.js`-Buster jetzt gegen das Original statt gegen eine Konstante.
+
+### Quellennachweis im Bericht — 13.09.2026 (`v1107`, `609dc9c6`) (früher A2)
+
+`CrossCheckService` sammelt die Vermerke der tatsächlich verwendeten Registersätze entdoppelt in `cross_check.quellen_nachweis`; eigener Block am Ende der Wertermittlung in PDF und Web-Ansicht, bewusst nicht in der Fußnote (v1150b kürzt dort auf 26 Zeichen). Gemessen an einem CrossCheck-Lauf Prignitz (EFH Bj 1975, Faktor 0,9043 Stufe A): Vermerk, Lizenz `dl-de/by-2-0`, Kennzahl und Link. Dazu v1106 (`f275bd8b`): der Quellenlink steht auch beim Sachwertfaktor.
+
+### Modellvermerk-Leser: GND aus dem Modell, Baupreisindex korrigiert — 12.09.–22.10.2026 (`v1338`, `303d3e93`; `v1407`, `1596d6a8`; `v2720`, `60192dd0`) (früher B1)
+
+GND: `CrossCheckService` liest die Gesamtnutzungsdauer aus `modellansaetze.gnd_jahre` (Leser kennt alle drei Feldnamen) und leitet die RND im Modellrahmen neu ab (v1338); nachgemessen 15.09.2026: Offenbach, Bad Homburg, Oberursel 70, Frankfurt 80. Baupreisindex: Konstante 2,02 → 1,91 (v1407; Hamburg 1,911, Dortmund 1,906; Sachwert rund 5,8 % niedriger). v2720 (Entscheidung Marcel 22.10.2026): Faktor mit Index-Bezug zum Kaufzeitpunkt gilt als Wert (`baupreisindex_bezug: 'kaufzeitpunkt'`).
+
+### Steuerliche Portfolio-Betrachtung an beiden Stellen saldiert — 14.09.2026 (`v1397`, `5dbe9db1`) (früher B1b)
+
+Befund: `tax.js` saldierte die Bestandsobjekte, `calc.js` (`_estDelta`, „nur Display“) nicht — dieselbe App wies zwei Steuerwirkungen aus. Gebaut: `window._dpBestandSaldo(jahr)` in `tax.js` als einziger Weg (mit Kaufdatums-Filter), `calc.js` rechnet gegen die gesenkte Basis; Rückfall 0 ohne geladenen Cache. Nachgemessen am echten `tax.js`-Tarif, 8 Fälle cent-genau (alter Fehler bis +77 % bei Verlusten über dem zvE, −5 % bei gemischten Ergebnissen). Nebenbei `ZVE_BASE=78000` im Cockpit durch `DealPilotZvE.getForYear()` ersetzt und das tote `vuvY1` entfernt; Aufteilung nach Kaufzeitpunkt (Weg A) steht im Hinweistext `#tax-flow-hint`.
+
+### Quellenregister in der Datenbank — am Code nachgemessen 12.10.2026 (früher C1)
+
+`marktbericht/backend/migrations/006_harvest.sql:40` legt `mb.gaa_documents` an (Fremdschlüssel auf `gaa_sources`, Unique auf `url`, Index auf `(status, lauf_typ)`), `007_quellenregister.sql:14-30` ergänzt Preis, Bestell-URL und Prüfstand. Benutzt: geschrieben in `HarvestService.js:171`, gelesen in `routes/api.js:179` (Dokumentzahl je Quelle im Admin) und `HarvestService.js:441` (Statusstatistik).
+
+### Kunden-Verlinkung zur Quelle — 13.09.2026 (`v1099`, `95250024`; `v1099b`, `ecd2c00f`) (früher C2)
+
+`marktbericht/backend/src/lib/quellen_links.js` führt alle 16 Länder (Stelle, Portal-URL, Zugang); ein Registersatz gewinnt gegen die Landestabelle. Der Link hängt an jeder Antwort, gemessen an vier Orten (München, Dresden, Hamburg ohne eigenen Wert). Seit v1099b steht er auch auf dem Bildschirm, seit v1106 auch beim Sachwertfaktor, seit v1118b gibt es die Ausschuss-Ebene (`AUSSCHUSS_QUELLEN`, Pflichtfeld `warum_kein_wert`).
+
+### Admin-Ansicht zum Ausschuss-Register: Quellen-Teil vorhanden — nachgemessen 12.10.2026 (dazu `v2591`, `c284407e`) (früher C3)
+
+Der alte Satz „im Admin nichts, kein View, keine Route“ war falsch: `frontend/admin/index.html` `#view-marktzinsen` („Marktzinsen & Gutachterausschuss-Daten“), `admin-marktzinsen.js` `quellenTabelle()` (Land · Ausschuss · Zugang, Seite/Zitat aus dem Bericht), Route `backend/src/routes/admin.js` → `_mbCall GET /harvest/status`. Seit v2591 (21.10.2026) zusätzlich der Reiter „Register & Ernte“: Deckung je Land und Kennzahl, Kaufliste, Ernte-Eingang.
+
+### Sachwertfaktoren im Register rechenbar — nachgemessen 12.10.2026 (früher C4)
+
+`ausRegisterRechnen()` in `marktbericht/backend/src/lib/gutachterausschuss.js` ist vollständig gebaut: siebt Ebenen, löst Lageklassen auf, wählt Zweig und Baujahrgruppe, rechnet über `swf_modelle.auswerten()` mit `herkunft: 'register'` und Modellvermerk. Lüdenscheid, Höxter und der Märkische Kreis liegen im Register.
+
+### Niedersachsen: Lizenz geklärt, Abrufweg gelöst, Ernter im Repo — 13.09.–23.10.2026 (`v2886`, `6a3e7c86`) (früher E2-NI)
+
+Die Grundstücksmarktdaten stehen unter `dl-de/by-2-0` (kommerzielle Verwertung erlaubt, Vermerk mit Internetadresse) — eine LGLN-Anfrage ist nicht nötig. Am 13.09. Landkreis Wolfenbüttel als erster Ausschuss (URL-Parameter plus 7 s Warten); der Einzelabruf trug, die Serie scheiterte am Renderer-Timeout. Gelöst über eine VizQL-Sitzung ohne Browser: Ernter unter `tools/swf-register/ernter/vizql/` mit README für die Nachernte 2027 (v2886). Im Register u. a. `swf-ni.json` (Braunschweig-Wolfsburg), `swf-ni-nom-2026.json` (Northeim, v2881), NI-Sperren mit Weg (v2884) und der MFH-Liegenschaftszins nach dem OGA-Landesmodell (v2830, 40 Kreise, 796 Gemeinden). Modell- und Kurvenbefunde vom 13.09. stehen in `claude/ernte-20260913.md`.
 
 ### Alle Anlage-V-Zeilen zugeordnet, Halterangaben aufs PDF — `v1220`/`v1221`, 03.09.2026
 
