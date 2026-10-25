@@ -172,7 +172,10 @@ Getaggt wird **nur auf Staging**.
 Host-Node ist 18, Container-Node 22.
 
 **Zwei Datenbanken:**
-- `dealpilot-postgres` (Haupt-DB), Migrationstabelle `schema_migrations`
+- `dealpilot-postgres` (Haupt-DB), Migrationstabelle `schema_migrations`.
+  **Datenbank `dealpilot_db`, Nutzer `dealpilot`** — Sicherung:
+  `docker exec dealpilot-postgres pg_dump -U dealpilot -d dealpilot_db | gzip > /root/backups/haupt-$(date +%Y%m%d-%H%M).sql.gz`
+  (am 25.10.2026 ergab `pg_dump -U dealpilot dealpilot` eine 20-Byte-Sicherung — ansehen!)
 - `dealpilot-mb-db` (Marktbericht, Schema `mb.`), Migrationstabelle
   `public._mb_migrations` — führt **Dateinamen**, keine Versionsnummern.
   **Steht in keinem Backup-Skript** → vor jedem Eingriff eigener `pg_dump`:
