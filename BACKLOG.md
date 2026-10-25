@@ -44,14 +44,10 @@ Wert-Anker aus dem Marktbericht, Zielbild als Plan-Zeile, Hinweis auf neueren
 Bericht, Offerte über Kaufpreis gesperrt, Steuerverlauf mit allen Verlustjahren,
 Steuerverlauf und „Ankauf gegen Bestand" aus dem heutigen Stand.
 
-Offen, nach Schwere:
-1. **Backend** `_offerteDeckeln` (openaiService.js ~1982) deckelt nur `kaufpreis_offerte.empfohlen`, nicht `offerte_mail.text` und `verhandlungsempfehlung` (die Anzeige sperrt seit v2946, der Text bleibt falsch).
-2. **Verlauf „Marktpreisindikation (nach Abschlag)"** (`ui.js` ~3048, Trend ~3330): Berichte 1–3 hatten keinen Abschlag → Trend 1.055.000 → 820.000 € „−22,3 %“ vergleicht Ungleiches; `toFixed` mit englischem Punkt.
-3. **Portalnamen nach außen** in Lage & Markt (Quellenliste `ui.js` ~1952/1963): „immobilienscout24.de“, „Immowelt/Scout24“ — Regel 14.10.2026 „keine Quelle nach außen“.
-4. **Satz in Wert & Marktpreis** (`wertvergleich.js:101`): „im Mittel 2.165 €/m² × 390 m²“ = 844.350 €, Mitte ohne Abschlag aber 886.385 € (Faktor ~1,05 unbenannt); „im Mittel“ ist der Median.
-5. **Gleiche Namen, andere Zahlen:** Bruttomietrendite 7,0 % (Bericht, ohne Zusatzeinnahmen) gegen 7,23 % (App, mit 1.080 €); „DealPilot-Score“ 85 (Bericht) / 78 (Kern) / 73 (Karte).
-6. Kosmetik: DealScore „74,00 → 73,00“ (`ui.js` ~2041/2049, Einheit score fehlt im Formatierer); Ankauf-Cashflow „—“ obwohl im Ankauf-Stand; Rohertrag 39.780 gegen 39.420 €.
-7. Nebenbefund Steuer (Vermutung, prüfen): 2025 Steuer 0 € bei V+V +4.663 €; 2026 33 %, 2027 47 % effektiv; § 7b „Neubau/EH40“ bei Baujahr 1967 angehakt.
+Punkte 1–6 erledigt in v2947/v2947a (25.10.2026, `cb9043be`, `fde07f9b`, s. Fertig). Rest:
+- **Entscheidung Marcel:** Steuerzeiträume 2025–2027 stehen auf Einzelveranlagung (`splitting: false`, keine KiSt). Gemessen: 2025 zvE 68.000 − 65.820 Vorobjekte = 2.180 € → Steuer 0 (unter Grundfreibetrag); 2026 zvE 41.195 € → +1.655 € auf +5.025 € (33 %, Grenzsatz Zone 3); 2027 zvE 103.506 € → +2.418 € auf +5.144 € (47 % = 42 % ESt + Soli-Milderungszone). Rechnerisch plausibel — stimmt die Veranlagungsart?
+- **§ 7b „angehakt“ nicht nachstellbar:** alle fünf § 7b-Felder sind im Objekt UND im Ankauf-Stand `false`, die Analyse vom 13.10. erwähnt § 7b nicht. Wo es zu sehen war, bitte zeigen (Bild).
+- Verlauf: Zeile „Abschlag auf Angebotspreise“ zeigt Δ „+0,0 %“ (0 → 15,9 %) — Prozent einer Null ist keine Aussage, kosmetisch.
 
 ### N77 · Kappungsgrenzen HE und BW — Wiedervorlage (20.10.2026)
 
@@ -3995,6 +3991,17 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+### N78 · Pilot-Analyse durchgesehen — Punkte 1–6 — 25.10.2026 (`v2947`, `cb9043be`; `v2947a`, `fde07f9b`)
+
+Gemessen an Westerfeldstr. 140 (Staging). (1) `_offerteDeckeln`: Offerte über KP → `offerte_mail` entfällt
+mit Grund (`offerte_mail_entfallen`), Vermerk vor `verhandlungsempfehlung`. (2) Verlauf: „nach Abschlag“ nur
+Berichte 4–10 (+3,1 %), Trend in Lage & Markt ohne Abschlag 1.055.000 → 960.000 € (−9,0 %) statt −22,3 %.
+(3) Portalnamen in Lage & Markt und beiden PDFs → „aktueller Marktdurchschnitt“. (4) Satz: Median 2.165 × 390
+= 844.350 €, Ausstattung × 1,02, Energie × 1,03 = 887.074 €, + 73.615 € → 960.000 € (mb `mpi_faktoren`).
+(5) „Score laut Marktbericht“, „Bruttomietrendite laut Marktbericht (ohne Zusatzeinnahmen)“, Score-Vergleich
+mit DealPilot-Score 78 und Investor Deal Score 73 (Karte). (6) DealScore 74 → 73 statt 74,00 → 73,00;
+Ankauf-Cashflow 677 € statt „—“; Rohertrag 39.780 (Stellplätze marktüblich 1.440 €) gegen 39.420 € erklärt.
 
 ### Technische RND wieder wie im Gutachten — vier Gewerke-Stufen — 23.10.2026 (`v2943`, `20aecba1`, `ee12638d`)
 
