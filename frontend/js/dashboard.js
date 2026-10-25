@@ -1022,7 +1022,7 @@
       var grund = null;
       if (ew == null) grund = !(o._key in _mbHist) ? 'wird geladen …'
         : (!h ? 'Noch kein Marktbericht – im Objekt unter Bewertung abrufen.'
-          : 'Marktbericht ohne Ertragswert (Stufe 1) – mit Stufe 3 abrufen.');
+          : 'Der Marktbericht weist keinen Ertragswert aus – Stufe 1, oder es fehlt eine Pflichtangabe (z. B. Grundstücksfläche); der Grund steht im Bericht.');
       return { key: o._key, name: _objName(o), kp: _kpEuro(o), ew: ew, mpi: mpi,
         ewQuelle: ew == null ? null : (e && e.ewB != null ? 'Zielbild-Lauf' : 'Marktbericht'),
         stand: h && h.created_at ? _fDat(h.created_at) : '', grund: grund };
