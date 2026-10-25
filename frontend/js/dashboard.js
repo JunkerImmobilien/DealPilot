@@ -882,6 +882,11 @@
       t.push('Der Ertragswert steigt über ' + A.ewN + ' Objekt' + (A.ewN===1?'':'e') + ' von ' + E(A.ewB) + ' auf ' + E(A.ewZ)
         + '; nach Abzug der Maßnahmen bleibt ' + (A.zuw >= 0 ? 'ein Wertzuwachs von ' + E(A.zuw) + ' – die Maßnahmen bringen mehr Ertragswert, als sie kosten.'
           : 'ein Minus von ' + E(-A.zuw) + ' – die Maßnahmen kosten mehr, als sie an Ertragswert bringen.'));
+      /* v2953b · zweiter Pilot-Lauf las den Abstand als Anteil („21,8 % der Kaufpreise … Überbewertung") -
+         der Satz steht jetzt fertig da, mit Richtung in Worten */
+      if (A.kpEw) { var _abK = (A.ewB / A.kpEw - 1) * 100;
+        t.push('Der Ertragswert im Bestand dieser Objekte liegt ' + _fPr(Math.abs(_abK),1) + (_abK >= 0 ? ' über' : ' unter') + ' ihren Kaufpreisen (' + E(A.ewB) + ' gegen ' + E(A.kpEw) + ')'
+          + (_abK >= 0 ? ' – gemessen an den Mieten wurde günstiger gekauft, als die Objekte heute wert sind.' : ' – gemessen an den Mieten wurde teurer gekauft, als die Objekte heute wert sind.')); }
       var mitZ = A.mit.filter(function(e){ return e.zuw != null; }).sort(function(a,b){ return b.zuw - a.zuw; });
       if (mitZ.length > 1 && mitZ[0].zuw > 0) t.push('Den größten Beitrag liefert ' + mitZ[0].name + ' mit ' + VZ(mitZ[0].zuw) + '.');
       var neg = mitZ.filter(function(e){ return e.zuw < 0; });

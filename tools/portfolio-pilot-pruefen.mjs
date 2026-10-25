@@ -25,6 +25,9 @@ console.log(JSON.stringify(r,null,1));
 // Gegenprobe: ein korrekter Text darf keinen Befund ergeben
 const gut='Die Kaltmiete steigt um 34.000 € oder 12,2 % durch die Mieterhöhung. Insgesamt sind es 38.388 € oder 13,7 %. Der Ertragswert im Bestand liegt 2,2 % über den Kaufpreisen derselben Objekte. Der Mehrwert beträgt 524.000 €, der Wertzuwachs nach Kosten 157.500 €. Bei Gohliser Str. 42 Leipzig kosten die Maßnahmen mehr, als sie an Wert bringen.';
 const g=P._zahlenPruefen(gut,ctx); console.log('GEGENPROBE', JSON.stringify(g));
-process.exitCode = (r.bedeutung.length>=4 && g.bedeutung.length===0 && g.nicht_gefunden.length===0) ? 0 : 1;
+// v2953b · zweiter Lauf 25.10.2026 (woertlich, Zahl auf diesen Kontext umgestellt): Abstand als Anteil gelesen
+const lauf2 = 'Der Ertragswert im Bestand entspricht 2,2 % der Kaufpreise der Objekte, während der Kaufpreis im Vergleich zum Ertragswert negativ ist, was auf eine Überbewertung hinweist.';
+const r2=P._zahlenPruefen(lauf2,ctx); console.log('LAUF2', JSON.stringify(r2.bedeutung));
+process.exitCode = (r.bedeutung.length>=4 && r2.bedeutung.length>=2 && g.bedeutung.length===0 && g.nicht_gefunden.length===0) ? 0 : 1;
 
-console.log(process.exitCode ? "ROT" : "SAUBER — 4 Zuordnungsfehler des ersten Laufs erkannt, Gegenprobe ohne Befund");
+console.log(process.exitCode ? "ROT" : "SAUBER — 4 Zuordnungsfehler des ersten Laufs und der Anteil-Fehler des zweiten erkannt, Gegenprobe ohne Befund");

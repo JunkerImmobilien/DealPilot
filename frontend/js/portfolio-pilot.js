@@ -520,6 +520,20 @@
         if (tr.length && !tr.some(function (x) { return (x > 0) === oben; }))
           out.push('„' + m3[0] + '“ – die Richtung stimmt nicht (laut Daten ' + tr.map(function (x) { return (x > 0 ? '+' : '') + String(x).replace('.', ','); }).join(' / ') + ' %)');
       }
+      /* (e) v2953b · Abstand als Anteil gelesen: „21,8 % der Kaufpreise" bei +21,8 % Abstand,
+         dazu „negativ"/„Überbewertung" im selben Satz bei positivem Abstand (zweiter Lauf 25.10.2026) */
+      var re4 = /(\d+(?:,\d+)?)\s?(?:%|Prozent)\s+(der|des|von)\b/gi, m4;
+      while ((m4 = re4.exec(satz))) {
+        var pv4 = _num(m4[1]);
+        var tr4 = vorz.filter(function (x) { return Math.abs(Math.abs(x) - pv4) <= 0.05; });
+        if (tr4.length) out.push('„' + m4[0] + ' …“ – das ist ein Abstand (' + tr4.map(function (x) { return (x > 0 ? '+' : '') + String(x).replace('.', ','); }).join(' / ') + ' %), kein Anteil');
+      }
+      vorz.forEach(function (x) {
+        var s = String(Math.abs(x)).replace('.', ',');
+        if (satz.indexOf(s) < 0) return;
+        if (x > 0 && /negativ|überbewert|zu teuer/i.test(satz)) out.push('„' + s + ' %“ mit „negativ/Überbewertung“ – laut Daten liegt der Wert über dem Kaufpreis (+' + s + ' %)');
+        if (x < 0 && /unterbewert|günstiger gekauft|Schnäppchen/i.test(satz)) out.push('„' + s + ' %“ – laut Daten liegt der Wert unter dem Kaufpreis (' + String(x).replace('.', ',') + ' %)');
+      });
       /* (d) Namen bei „mehr kosten, als …" */
       if (/kost\w*\s+mehr|mehr\s+kost/i.test(satz)) {
         var teurer = Z.massnahmen_teurer_als_wert || [];
