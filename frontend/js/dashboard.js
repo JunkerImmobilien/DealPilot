@@ -995,9 +995,58 @@
     var sonst = s.gi - s.kp - nk;
     return { s: s, H: H, A: A, nk: nk, sonst: sonst, n: arr.length };
   }
+  /* v2953 · BEWERTUNG JE OBJEKT. Marcel 25.10.2026: „Ist das wirklich passend
+     mit den Kaufpreisen? … hier steht nur acht von zwölf Objekten … es muss
+     ersichtlicher sein, wenn Objekte fehlen." Bis v2952 kam der Ertragswert NUR
+     aus dem Zielbild-Lauf - ein Objekt ohne Soll-Miete fehlte, auch wenn sein
+     Marktbericht einen Ertragswert hat. Jetzt: Zielbild-Lauf, sonst der letzte
+     Marktbericht (GET, kein Kontingent). Marktpreisindikation genauso. */
+  var _mbHist = {}, _mbHistLaedt = null;
+  function _mbHistLaden(arr){
+    var fehlt = arr.map(function(o){ return o._key; }).filter(function(k){ return k && !(k in _mbHist); });
+    if (!fehlt.length || _mbHistLaedt || !window.Auth || typeof Auth.apiCall !== 'function') return;
+    _mbHistLaedt = Promise.all(fehlt.map(function(k){
+      return Auth.apiCall('/marktbericht/objects/history?key=' + encodeURIComponent('dp:' + k), { method: 'GET' }).then(function(j){
+        var l = null;
+        ((j && j.history) || []).forEach(function(h){ if (h && h.market_value != null && (!l || new Date(h.created_at) >= new Date(l.created_at))) l = h; });
+        _mbHist[k] = l || false;
+      }, function(){ _mbHist[k] = false; });
+    })).then(function(){ _mbHistLaedt = null; renderGesamtbew(); });
+  }
+  function _bewertungJeObjekt(arr, A){
+    var zb = {}; ((A && A.mit) || []).forEach(function(e){ zb[e.key] = e; });
+    return arr.map(function(o){
+      var h = _mbHist[o._key] || null, e = zb[o._key] || null;
+      var ew = e && e.ewB != null ? e.ewB : (h && num(h.ertragswert_eur) > 0 ? num(h.ertragswert_eur) : null);
+      var mpi = e && e.mpiB != null ? e.mpiB : (h && num(h.market_value) > 0 ? num(h.market_value) : null);
+      var grund = null;
+      if (ew == null) grund = !(o._key in _mbHist) ? 'wird geladen …'
+        : (!h ? 'Noch kein Marktbericht – im Objekt unter Bewertung abrufen.'
+          : 'Marktbericht ohne Ertragswert (Stufe 1) – mit Stufe 3 abrufen.');
+      return { key: o._key, name: _objName(o), kp: _kpEuro(o), ew: ew, mpi: mpi,
+        ewQuelle: ew == null ? null : (e && e.ewB != null ? 'Zielbild-Lauf' : 'Marktbericht'),
+        stand: h && h.created_at ? _fDat(h.created_at) : '', grund: grund };
+    });
+  }
+  function _bewertungTabelle(B){
+    var P = function(a, b){ return a != null && b > 0 ? _fP((a / b - 1) * 100) : '–'; };
+    var ton = function(a, b){ return a != null && b > 0 ? (a >= b ? ' gb-pos' : ' gb-neg') : ''; };
+    var rows = B.map(function(x){
+      return '<tr' + (x.ew == null ? ' class="gb-fehlt"' : '') + '><td>' + esc(x.name) + (x.grund ? '<small>' + esc(x.grund)
+          + ' <button type="button" class="zb-btn" onclick="DealPilotDashboard.zumZielbild(\'' + esc(x.key) + '\')">Im Objekt öffnen ›</button></small>' : '') + '</td>'
+        + '<td>' + _fE(x.kp) + '</td>'
+        + '<td>' + (x.mpi != null ? _fE(x.mpi) + '<small class="' + ton(x.mpi, x.kp) + '">' + P(x.mpi, x.kp) + '</small>' : '–') + '</td>'
+        + '<td>' + (x.ew != null ? _fE(x.ew) + '<small class="' + ton(x.ew, x.kp) + '">' + P(x.ew, x.kp) + '</small>' : '<b class="gb-neg">fehlt</b>') + '</td>'
+        + '<td>' + esc(x.stand || '') + '</td></tr>';
+    }).join('');
+    return '<details class="gb-tab"' + (B.some(function(x){ return x.ew == null; }) ? ' open' : '') + '><summary>Bewertung je Objekt – Kaufpreis, Marktpreisindikation, Ertragswert</summary>'
+      + '<div class="gb-tab-scroll"><table><thead><tr><th>Objekt</th><th>Kaufpreis</th><th>Marktpreisindikation</th><th>Ertragswert</th><th>Bericht vom</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
+      + '<p class="cp-erkl">Prozent = Abstand zum Kaufpreis. Ertragswert aus dem Zielbild-Lauf des Objekts, sonst aus dem letzten Marktbericht. Werte so, wie der Bericht sie ausweist – nichts nachträglich verändert.</p></details>';
+  }
   function renderGesamtbew(){
     var host = $('dp-gesamtbew'); if (!host || !_detailsLoaded) return;
     var arr = detailArr(); if (!arr.length) { host.innerHTML = ''; return; }
+    _mbHistLaden(arr);
     var G = _gesamtDaten(arr), s = G.s, H = G.H, A = G.A, EK = _fEK;
     var imAnkauf = s.stand && s.stand.modus === 'ankauf';
     function z(l, v, cls, sub){ return '<div class="gb-z'+(cls?' '+cls:'')+'"><span class="gb-l">'+l+(sub?'<small>'+sub+'</small>':'')+'</span><span class="gb-v">'+v+'</span></div>'; }
@@ -1017,15 +1066,23 @@
       + z('− Restschuld heute', EK(H.rest), '', 'aus Darlehen ' + EK(s.darl) + ' nach Tilgung')
       + z('= Eigenkapital im Bestand', EK(H.ek), 'gb-sum', 'Quote ' + _fPr(H.wert ? H.ek / H.wert * 100 : null))
       + '<p class="cp-erkl">Die Vermögensbilanz in Abschnitt 06 geht immer auf: Eigenkapital ist, was nach Abzug der Schulden vom Wert übrig bleibt. Als Wert steht der Kaufpreis – nicht die Gesamtinvestition (Nebenkosten zählen nicht) und kein Gutachten.</p></div>';
+    /* v2953 · je Objekt: Zielbild-Lauf, sonst Marktbericht (_bewertungJeObjekt) */
+    var BW = _bewertungJeObjekt(arr, A);
+    var mitEw = BW.filter(function(x){ return x.ew != null; }), mitMpi = BW.filter(function(x){ return x.mpi != null; });
+    var sum = function(L, f){ return L.reduce(function(t, x){ return t + (x[f] || 0); }, 0); };
+    var ewS = sum(mitEw, 'ew'), kpEwS = sum(mitEw, 'kp'), mpiS = sum(mitMpi, 'mpi'), kpMpiS = sum(mitMpi, 'kp');
+    var ohneEw = BW.filter(function(x){ return x.ew == null; });
     var b3 = '<div class="gb-k"><div class="gb-t"><span>3</span>Was es nach Bewertung ist</div>'
-      + (A.ewN ? z('Ertragswert Bestand', EK(A.ewB), '', A.ewN + ' von ' + G.n + ' Objekten mit Berechnung')
-          + z('Kaufpreise derselben Objekte', EK(A.kpEw), 'gb-sub')
-          + z('Abstand', _fP(A.kpEw ? (A.ewB / A.kpEw - 1) * 100 : null), 'gb-sum', 'Ertragswert gegen Kaufpreis') : z('Ertragswert', 'noch keiner', '', 'kein Objekt berechnet'))
-      + (A.mpiN ? z('Marktpreisindikation', EK(A.mpiB), '', A.mpiN + ' Objekte · Angebote nach Abschlag') + z('Abstand zu deren Kaufpreisen', _fP(A.kpMpi ? (A.mpiB / A.kpMpi - 1) * 100 : null), 'gb-sub') : '')
-      + '<p class="cp-erkl">Bewertet sind nur Objekte mit gespeicherter Berechnung – deshalb der Vergleich mit den Kaufpreisen <b>derselben</b> Objekte, nicht mit der Gesamtinvestition von ' + EK(s.gi) + '. Die ' + (G.n - (A.ewN||0)) + ' übrigen stehen mit Grund im Abschnitt 03. Der Ertragswert ist der Wert aus den Mieten nach ImmoWertV, die Marktpreisindikation der Wert aus Angebotspreisen vergleichbarer Objekte, abzüglich des üblichen Verhandlungsabschlags.</p></div>';
+      + (mitEw.length ? z('Ertragswert Bestand', EK(ewS), '', mitEw.length + ' von ' + G.n + ' Objekten')
+          + z('Kaufpreise derselben Objekte', EK(kpEwS), 'gb-sub')
+          + z('Abstand', _fP(kpEwS ? (ewS / kpEwS - 1) * 100 : null), 'gb-sum', 'Ertragswert gegen Kaufpreis') : z('Ertragswert', 'noch keiner', '', 'kein Objekt berechnet'))
+      + (mitMpi.length ? z('Marktpreisindikation', EK(mpiS), '', mitMpi.length + ' von ' + G.n + ' Objekten · Angebote nach Abschlag') + z('Abstand zu deren Kaufpreisen', _fP(kpMpiS ? (mpiS / kpMpiS - 1) * 100 : null), 'gb-sub') : '')
+      + (ohneEw.length ? '<div class="gb-fehlt-box"><b>' + ohneEw.length + ' von ' + G.n + ' Objekten ohne Ertragswert</b> – nicht in der Summe: '
+          + ohneEw.map(function(x){ return esc(x.name); }).join(' · ') + '. Gründe in der Tabelle unten.</div>' : '')
+      + '<p class="cp-erkl">Verglichen wird mit den Kaufpreisen <b>derselben</b> Objekte, nicht mit der Gesamtinvestition von ' + EK(s.gi) + '. Der Ertragswert ist der Wert aus den Mieten nach ImmoWertV, die Marktpreisindikation der Wert aus Angebotspreisen vergleichbarer Objekte, abzüglich des üblichen Verhandlungsabschlags.</p></div>';
     host.innerHTML = '<div class="gb-wrap"><div class="gb-kopf"><b>Gesamtbewertung</b> · wie Gesamtinvestition, Bilanz und Bewertung zusammenhängen'
       + (imAnkauf ? ' <span class="gb-hin">Kacheln oben im Ankauf-Stand – die Bilanz rechnet mit heute</span>' : '') + '</div>'
-      + '<div class="gb-grid">' + b1 + b2 + b3 + '</div></div>';
+      + '<div class="gb-grid">' + b1 + b2 + b3 + '</div>' + _bewertungTabelle(BW) + '</div>';
   }
 
   /* ════ v2951 · EINFACH | GENAU ════
