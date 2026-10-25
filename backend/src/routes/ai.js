@@ -1049,10 +1049,21 @@ router.post('/extract-voice', authenticate, dialogLimiter, async (req, res, next
          enthalten. Frueher stand hier ein 402 gegen den Litertank. */
     }
 
+    /* v2956 · gesprochene Zeit aufs Co-Pilot-Tageslimit (s. _spracheRechnen) */
+    let _sp = null;
+    if (!userApiKey) {
+      _sp = await _spracheRechnen(req.user.id, _spracheSekunden(req.body));
+      if (!_sp.ok) {
+        return res.status(429).json({ error: 'copilot_rate_limited',
+          message: 'Co-Pilot-Tageslimit erreicht (' + _sp.limit + ' am Tag). Spracheingaben zählen mit – je angefangene 2 Minuten eine Frage. Morgen wieder verfügbar.' });
+      }
+    }
+
     const result = await voiceExtractService.extractFromAudio(audio, mime, catalog, {
       apiKey: config.openai.apiKey,
       userApiKey: userApiKey
     });
+    if (_sp) _spracheBuchen(_sp);
 
     /* v1259: Protokollieren, nicht abbuchen — diese KI-Hilfe ist im Plan
        enthalten (v1183). Der Aufruf stand hier ZWEIMAL hintereinander: einmal
@@ -1835,6 +1846,38 @@ async function _copilotLimit(uid) {
     const st = await aiCreditsService.getStatus(uid);
     return COPILOT_PLAN_LIMITS[st && st.plan] || COPILOT_PLAN_LIMITS.free;
   } catch (e) { return COPILOT_PLAN_LIMITS.free; }
+}
+/* v2956 · SPRACHEINGABE ZAEHLT AUFS CO-PILOT-TAGESLIMIT (Marcel 25.10.2026:
+   „ja so umsetzen"). Umwandlung in Text plus Auslesen kostet je Aufnahme etwa
+   so viel wie eine bis zwei Co-Pilot-Antworten. Gezaehlt wird die GESPROCHENE
+   Zeit: je angefangene 2 Minuten am Tag eine Frage. Eine Aufnahme bis 2 Minuten
+   kostet also 1; die vielen kurzen Antworten eines Sprechlaufs (je 3-10 s)
+   kosten zusammen, nicht jede einzeln - sonst waere ein einziger Sprechlauf
+   (30-40 Antworten) mehr als das ganze Starter-Limit.
+   Derselbe Zaehler wie der Co-Pilot (_cpDaily), kein zweiter. Eigener Schluessel = frei. */
+const SPRACHE_BLOCK_S = 120;
+const _spDaily = new Map(); // key: userId:YYYY-MM-DD -> gesprochene Sekunden
+function _spracheSekunden(body) {
+  const b64 = String((body && body.audio) || '');
+  const bytes = b64.length * 0.75;
+  /* Untergrenze aus der Dateigroesse (hoechstens 256 kbit/s), damit 0 Sekunden nicht durchgeht;
+     ohne Angabe vom Browser: 32 kbit/s angenommen */
+  const min = Math.max(1, Math.round(bytes / 32000));
+  const d = Number(body && body.dauer_s);
+  if (Number.isFinite(d) && d > 0) return Math.min(600, Math.max(min, Math.round(d)));
+  return Math.min(600, Math.max(min, Math.round(bytes / 4000)));
+}
+async function _spracheRechnen(uid, sek) {
+  const limit = await _copilotLimit(uid);
+  const key = _cpKey(uid);
+  const vor = _spDaily.get(key) || 0, nach = vor + sek;
+  const neu = Math.ceil(nach / SPRACHE_BLOCK_S) - Math.ceil(vor / SPRACHE_BLOCK_S);
+  const used = _cpDaily.get(key) || 0;
+  return { ok: !(neu > 0 && used + neu > limit), limit: limit, key: key, nach: nach, neu: neu, used: used };
+}
+function _spracheBuchen(r) {
+  _spDaily.set(r.key, r.nach);
+  if (r.neu > 0) _cpDaily.set(r.key, (_cpDaily.get(r.key) || 0) + r.neu);
 }
 router.post('/copilot', authenticate, async (req, res, next) => {
   try {
