@@ -114,7 +114,11 @@
         var _soll = _basis * _F + _add;
         if (_ziel != null && Math.abs(_soll - _ziel) <= 0.01 * _ziel) {
           _rechnung = ': Median ' + Math.round(_med).toLocaleString('de-DE') + ' €/m² × ' + Math.round(_wfl).toLocaleString('de-DE') + ' m² = ' + eur(_basis)
-            + (Math.abs(_F - 1) >= 0.0005 ? ', angepasst an Lage und Objekt (Zustand, Ausstattung, Energie u. a.) mit dem Faktor ' + pct(_F, 3) + ' = ' + eur(_basis * _F) : '')
+            + (Math.abs(_F - 1) >= 0.0005 ? ', angepasst an das Objekt ('
+                + [['location_factor', 'Lage'], ['object_adjustment', 'Zustand/Qualität/Modernisierung'], ['amenity_factor', 'Ausstattung'], ['energy_factor', 'Energie'], ['floor_factor', 'Etage'], ['vacancy_factor', 'Leerstand']]
+                    .filter(function (p) { var f = zahl(_fk[p[0]]); return f != null && Math.abs(f - 1) >= 0.0005; })
+                    .map(function (p) { return p[1] + ' × ' + pct(zahl(_fk[p[0]]), 2); }).join(', ')
+                + ') = ' + eur(_basis * _F) : '')
             + (_add ? ', ' + (_add > 0 ? 'zuzüglich ' : 'abzüglich ') + eur(Math.abs(_add)) + ' für Stellplätze, Mehrfläche und besondere Merkmale' : '')
             + ' — gerundet ' + eur(_ziel) + (mitAb ? ' vor Abschlag' : '');
         }
