@@ -1158,10 +1158,10 @@ label.dp-required.qc-required::after {
                      nie - fetchBoris() war nur ueber die Automatik (v1265)
                      und ueber DealPilotBrw.fetchBoris() erreichbar. -->
                 <button type="button" class="btn-brw" id="brw-boris-btn" onclick="DealPilotBrw.fetchBoris()" title="Bodenrichtwert direkt abrufen — gratis (Open Data)">
-                  <span class="btn-brw-icon">📍</span> Bodenrichtwert abrufen
+                  <span class="btn-brw-icon"><svg class="h-icon" width="16" height="16"><use href="#i-pin"/></svg></span> Bodenrichtwert abrufen
                 </button>
                 <button type="button" class="btn-brw" id="brw-portal-btn" onclick="DealPilotBrw.openBoris()" title="Öffnet das Bodenrichtwert-Portal des Bundeslandes (nach Adresse)"><!-- v2949: hiess „BORIS-Portal", die Länder nennen ihre Portale verschieden -->
-                  <span class="btn-brw-icon">🔗</span> <span data-brw-portal-name>Bodenrichtwert-Portal</span>
+                  <span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span> <span data-brw-portal-name>Bodenrichtwert-Portal</span>
                 </button>
                 <button type="button" class="btn-brw" id="brw-ai-btn" onclick="DealPilotBrw.askAi()" title="DealPilot schätzt den Bodenrichtwert anhand der Adresse — bitte trotzdem auf BORIS verifizieren">
                   <span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg></span> Bodenrichtwert schätzen
@@ -3735,7 +3735,7 @@ label.dp-required.qc-required::after {
 <script src="js/import-export-modal.js?v=v1678"></script>
 <script src="js/quick-check.js?v=v2546a"></script>
 <script src="js/qc-bridge.js?v=qc-v2780b"></script>
-<script src="js/bodenrichtwert.js?v=v2949"></script>
+<script src="js/bodenrichtwert.js?v=v2952"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/objekt-reiter.js?v=v2557"></script>
@@ -3796,7 +3796,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktwert-abschlag.js?v=v2672a"></script><!-- v2237 · Abschlag auf Angebotspreise -->
 <script src="js/wertvergleich.js?v=v2947a"></script><!-- v2810 · Pilot-Analyse: Marktpreisindikation, Ertrags- und Sachwert gegenuebergestellt -->
 <script src="js/wert-zielbild.js?v=v2951d"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
-<script src="js/dealpilot-mb.js?v=v2820"></script>
+<script src="js/dealpilot-mb.js?v=v2952"></script>
 <script src="js/mb-auftrag.js?v=v2191"></script>
   <script src="js/marktbericht-view.js?v=v2823a"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->

@@ -257,7 +257,7 @@
       } else if (plz && ort) {
         hint += ' — suche: ' + plz + ' ' + ort;
       }
-      toast('🔗 ' + hint);
+      toast(hint);
     }
 
     if (w) { try { w.opener = null; w.location.href = target.url; } catch (e) { window.open(target.url, '_blank', 'noopener,noreferrer'); } }
@@ -292,7 +292,7 @@
       return;
     }
 
-    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-brw-icon">⏳</span> KI sucht…'; }
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span> KI sucht…'; }
     _setStatus('Anfrage läuft…', '');
     
     try {
@@ -337,7 +337,7 @@
       _clearResult();
       if (typeof toast === 'function') toast('⚠ ' + (err.message || 'KI-Fehler'));
     } finally {
-      if (btn) { btn.disabled = false; btn.innerHTML = '<span class="btn-brw-icon">✨</span> KI versuchen'; }
+      if (btn) { btn.disabled = false; btn.innerHTML = '<span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z"/></svg></span> KI versuchen'; }
     }
   }
 
@@ -428,7 +428,7 @@
     // BORIS-Verify-Button
     html += '<div class="brw-ki-actions">';
     html += '<button type="button" class="brw-ki-verify-btn" onclick="DealPilotBrw.openBoris()">';
-    html += '🔗 Auf BORIS verifizieren';
+    html += '<svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg> Auf BORIS verifizieren';
     html += '</button>';
     html += '</div>';
     
@@ -775,7 +775,7 @@
      * Verhalten, und das ist immer noch besser als kein Wert. */
     var plz = _val('plz'), ort = _val('ort');
     var str = [_val('str'), _val('hnr')].filter(Boolean).join(' ');
-    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-brw-icon">⏳</span> Abruf …'; }
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span> Abruf …'; }
     _setStatus('Bodenrichtwert wird abgerufen …', '');
     try {
       var r = await borisHolen({ plz: plz, ort: ort, str: str });
@@ -826,7 +826,7 @@
       _setStatus('⚠ ' + (err.message || 'BORIS-Fehler'), 'err');
       if (typeof toast === 'function') toast('⚠ ' + (err.message || 'BORIS-Fehler'));
     } finally {
-      if (btn) { btn.innerHTML = '<span class="btn-brw-icon">📍</span> Bodenrichtwert abrufen'; _refreshBorisBtn(); }
+      if (btn) { btn.innerHTML = '<span class="btn-brw-icon"><svg class="h-icon" width="16" height="16"><use href="#i-pin"/></svg></span> Bodenrichtwert abrufen'; _refreshBorisBtn(); }
     }
   }
   (function _wireBoris(){

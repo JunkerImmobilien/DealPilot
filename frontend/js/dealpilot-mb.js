@@ -177,6 +177,8 @@ if (!window._wlc) {
        ImmoWertV) nach der Marktanpassung abgezogen. `san_ust` sagt, ob
        der Betrag brutto oder netto eingetragen ist. */
     'san', 'san_ust',
+    /* v2952 · Kaufdatum: ab zwölf Monaten Bestand gilt die Ankauf-Sanierung als ausgeführt (Mapper bomAus) */
+    'kaufdat',
     /* v2660 · E7: Etagen im Gebaeude (Umrechnung des Immobilienrichtwerts); E2: Restlaufzeit der Mietabweichung am Einzelobjekt */
     'etagen_ges', 'mv_befristet_bis', 'mv_kuendigungsverzicht_bis', 'mv_abw_jahre'];
   function inputs() {
