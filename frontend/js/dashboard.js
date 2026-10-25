@@ -1411,14 +1411,28 @@
     }
 
     /* 3) Eigenkapital-Entwicklung: gestapelte Flaeche, Oberkante = Objektwert */
-    var _eqAxes = axes(); _eqAxes.y.stacked = true;
+    var _eqAxes = axes(); _eqAxes.y.stacked = true; _eqAxes.y.beginAtZero = true; _eqAxes.y.min = 0;
+    /* v2950a: Endwerte als Klartext am rechten Rand - Objektwert oben, EK in der Mitte
+       seines Bandes, Restschuld in ihrem. _endLabel() schrieb den EK-Wert an die
+       Oberkante (= Objektwert) - gestapelt las sich das wie der falsche Wert. */
+    var _eqLabel = { id:'dpVbEqLabel', afterDatasetsDraw:function(chart){
+      var c=chart.ctx, y=chart.scales.y, ca=chart.chartArea, L=PR.length-1; if(L<0) return;
+      var r=PR[L].rest, e=PR[L].eq, w=r+e;
+      var T=[['Objektwert '+yfmt(w)+' \u20ac', y.getPixelForValue(w)-9, axisCol],
+             ['EK '+yfmt(e)+' \u20ac', y.getPixelForValue(r+e/2), GOLD_LO],
+             ['Restschuld '+yfmt(r)+' \u20ac', y.getPixelForValue(r/2), axisCol]];
+      c.save(); c.font='600 10px JetBrains Mono, monospace'; c.textBaseline='middle'; c.textAlign='right';
+      T.forEach(function(t){ var yy=Math.max(ca.top+7,Math.min(ca.bottom-7,t[1])); var tw=c.measureText(t[0]).width;
+        c.fillStyle=isDark()?'rgba(12,11,9,.82)':'rgba(255,255,255,.88)'; c.fillRect(ca.right-tw-10,yy-8,tw+8,16);
+        c.fillStyle=t[2]; c.fillText(t[0],ca.right-6,yy); });
+      c.restore(); } };
     mk('dpc-vb-eq',{type:'line',data:{labels:labels,datasets:[
       {label:'Restschuld',data:PR.map(function(r){return Math.round(r.rest);}),borderColor:DEBT,backgroundColor:DEBT_FILL,fill:'origin',tension:.3,pointRadius:0,borderWidth:1.6,stack:'v'},
       {label:'Eigenkapital',data:PR.map(function(r){return Math.round(r.eq);}),borderColor:GOLD,backgroundColor:_wlrgba(.30),fill:'-1',tension:.3,pointRadius:0,borderWidth:2.4,stack:'v'}
     ]},options:{scales:_eqAxes,plugins:{legend:{display:true},tooltip:{callbacks:{
       label:function(c){ return ' '+c.dataset.label+': '+EURF(c.parsed.y)+' €'; },
       footer:function(items){ var s=0; items.forEach(function(i){ s+=i.parsed.y; }); return 'Objektwert: '+EURF(s)+' €'; }
-    }}}},plugins:[_endLabel()]});
+    }}}},plugins:[_eqLabel]});
 
     /* 4) Woraus das Vermoegen waechst: je Jahr Tilgung + Wertaenderung + CF n. St. */
     var _wAxes = axes(); _wAxes.x.stacked = true; _wAxes.y.stacked = true;
@@ -1437,7 +1451,7 @@
       var mx=0; objs.forEach(function(x){ mx=Math.max(mx,x.wert,x.rest); }); mx=mx||1;
       var rows=objs.slice().sort(function(a,b){ return b.wert-a.wert; }).map(function(x){
         var ekP=Math.max(x.ek,0)/mx*100, rsP=Math.min(x.rest,x.wert)/mx*100, ueb=Math.max(x.rest-x.wert,0)/mx*100;
-        return '<div class="vb-o"><div class="vb-on" title="'+esc(x.name)+'">'+esc(x.name)+'<small>'+esc(x.ort)+' · '+PZ(H.wert>0?x.wert/H.wert*100:null)+' des Portfolios</small></div>'
+        return '<div class="vb-o"><div class="vb-on" title="'+esc(x.name)+'">'+esc(x.name)+'<small>'+esc(x.ort)+' · '+PZ(H.wert>0?x.wert/H.wert*100:null)+'</small></div>'
           + '<div class="vb-ob"><span style="width:'+rsP.toFixed(2)+'%;background:'+DEBT+'"></span><span style="width:'+ekP.toFixed(2)+'%;background:'+GOLD+'"></span>'
           + (ueb>0?'<span class="vb-ueb" style="width:'+ueb.toFixed(2)+'%"></span>':'')+'</div>'
           + '<div class="vb-ov">'+MK(x.wert)+'<small class="'+(x.ek>=0?'vb-pos':'vb-neg')+'">EK '+MK(x.ek)+'</small></div></div>';
