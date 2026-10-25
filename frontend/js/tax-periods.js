@@ -221,7 +221,7 @@
       <div style="background:#fff;border-radius:14px;max-width:920px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.25);max-height:calc(100vh - 80px);overflow-y:auto">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
           <div>
-            <div style="font-size:18px;font-weight:600;color:var(--ch,#2A2727)">📅 Steuerzeiträume verwalten</div>
+            <div style="font-size:18px;font-weight:600;color:var(--ch,#2A2727)"><svg width="18" height="18" aria-hidden="true" style="vertical-align:-3px;margin-right:6px;color:var(--wl-c9a84c, #C9A84C)"><use href="#i-calendar"/></svg>Steuerzeiträume verwalten</div>
             <div style="font-size:12.5px;color:var(--muted,#7A7370);margin-top:3px">Zu versteuerndes Einkommen (zvE) verlaufsbasiert pflegen. Wird automatisch je nach Kaufdatum/wirtschaftlichem Übergang einem Objekt zugeordnet.</div>
           </div>
           <button onclick="DealPilotTaxPeriods.closeModal()" style="padding:8px 12px;background:transparent;border:none;color:var(--muted,#7A7370);font-size:20px;cursor:pointer">✕</button>

@@ -55,7 +55,7 @@
   function wert(v, einheit) {
     /* v2216e · neue Einheiten aus ankauf.js */
     if (einheit === 'eurqm') return zahl(v, 2) + ' €/m²';
-    if (einheit === 'stk') return (v === null || v === undefined || !isFinite(v)) ? '–' : String(Math.round(v));
+    if (einheit === 'stk' || einheit === 'score') return (v === null || v === undefined || !isFinite(v)) ? '–' : String(Math.round(v));
     return einheit === 'eur' ? eur(v) : einheit === 'pct' ? pct(v) : zahl(v);
   }
 
@@ -63,7 +63,7 @@
      man die Richtung ohne Nachdenken sieht. */
   function diffText(z) {
     var vz = z.diff > 0 ? '+' : '';
-    if (z.einheit === 'stk') return vz + Math.round(z.diff);   /* v2216h: Einheiten sind ganze Zahlen */
+    if (z.einheit === 'stk' || z.einheit === 'score') return vz + Math.round(z.diff);   /* v2216h: Einheiten sind ganze Zahlen */
     if (z.einheit === 'eurqm') return vz + zahl(z.diff, 2) + ' €/m²';
     if (z.einheit === 'eur') return vz + Math.round(z.diff).toLocaleString('de-DE') + ' €';
     if (z.einheit === 'pct') return vz + zahl(z.diff, 2) + ' %-Punkte';

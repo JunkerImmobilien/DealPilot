@@ -230,6 +230,7 @@ window.DealPilotConfig = (function() {
       sort_order: 1,
       limits: {
         objects:       1,
+        copilot_tag:   10,      /* v2955 · Co-Pilot-Antworten am Tag - Spiegel von routes/ai.js COPILOT_PLAN_LIMITS */
         max_saves:     3,        // V63: Max-Speicherungen
         ai_credits:    2,        // v1176: war 1 — das Backend gibt 2 (aiCreditsService PLAN_LIMITS)
         photos_per_obj: 3,
@@ -309,6 +310,7 @@ window.DealPilotConfig = (function() {
       sort_order: 2,
       limits: {
         objects:       5,
+        copilot_tag:   20,      /* v2955 · Co-Pilot-Antworten am Tag - Spiegel von routes/ai.js COPILOT_PLAN_LIMITS */
         max_saves:     -1,                // unbegrenzt
         ai_credits:    10,                // v1176: war 5 — das Backend gibt 10
         photos_per_obj: 6,
@@ -361,6 +363,7 @@ window.DealPilotConfig = (function() {
       highlight: true,                    // Bestseller-Badge
       limits: {
         objects:       25,
+        copilot_tag:   50,      /* v2955 · Co-Pilot-Antworten am Tag - Spiegel von routes/ai.js COPILOT_PLAN_LIMITS */
         max_saves:     -1,
         ai_credits:    40,                // STILLGELEGT v1183 — siehe kontingent
         photos_per_obj: 10,
@@ -407,6 +410,7 @@ window.DealPilotConfig = (function() {
       sort_order: 4,
       limits: {
         objects:       -1,                // Unbegrenzt
+        copilot_tag:   100,     /* v2955 · Co-Pilot-Antworten am Tag - Spiegel von routes/ai.js COPILOT_PLAN_LIMITS */
         max_saves:     -1,
         ai_credits:    100,               // STILLGELEGT v1183 — siehe kontingent
         photos_per_obj: 30,
@@ -445,7 +449,6 @@ window.DealPilotConfig = (function() {
         ai_market_analysis:         true,     // V63.82
         custom_finance_models:      true,     // V63.82: personalisierte Zinsmodelle
         custom_imports:             true,     // V63.82: CSV/JSON Import
-        migration_service:          true,     // 3h Setup
         mietspiegel_vergleich:      'auto'
       },
       stripe_price_id_monthly: null,

@@ -80,7 +80,7 @@
 (function (global) {
   if (global.DpWertZielbild) return;
 
-  var VERSION = 'v2910';
+  var VERSION = 'v2945';
   var MERKER = 'dp_pa_si_ansicht';
   var _hist = { key: null, laedt: null, eintrag: null };
 
@@ -117,6 +117,9 @@
         var letzt = null;
         ((j && j.history) || []).forEach(function (h) { if (h && h.market_value != null && (!letzt || new Date(h.created_at) >= new Date(letzt.created_at))) letzt = h; });
         _hist.eintrag = letzt; _hist.laedt = null;
+        /* v2945 · der Anker der Wertsteigerung (calc.js wert_basis) kann am Bericht haengen -
+           ohne Verkehrswert im Formular nach dem Laden einmal neu rechnen */
+        try { var S = global.State || {}; if (letzt && S.wert_basis_quelle && S.wert_basis_quelle !== 'verkehrswert' && typeof global.calc === 'function') global.calc(); } catch (e) {}
         return daten();
       }, function () { _hist.laedt = null; return daten(); });
     return _hist.laedt;
@@ -178,6 +181,58 @@
     return D;
   }
 
+  /* ── Mehrertrag und Wertzuwachs nach Kosten je Stufe ──────────────────
+     v2950 · EINE Stelle für beide Ableitungen: das offene Objekt (zielDaten)
+     und das gespeicherte (zielbildFuer, Portfolio-Cockpit) nehmen dieselbe. */
+  function mehrUndZuwachs(st) {
+    var B = st.bestand || {}, mehr = {}, zuw = {};
+    ['mieterhoehung', 'zielbild'].forEach(function (k) {
+      if (!st[k]) { mehr[k] = null; zuw[k] = null; return; }
+      mehr[k] = st[k].miete_jahr != null && B.miete_jahr != null ? st[k].miete_jahr - B.miete_jahr : null;
+      zuw[k] = st[k].ertragswert != null && B.ertragswert != null ? st[k].ertragswert - B.ertragswert - (st[k].kosten || 0) : null;
+    });
+    return { mehr: mehr, zuw: zuw };
+  }
+
+  /* ── v2950 · Zielbild eines GESPEICHERTEN Objekts (Portfolio-Cockpit) ──
+     Vorbild DealPilotAnkauf.abweichungFuer(daten): eine Funktion auf dem
+     Datensatz, nicht auf dem offenen Formular. Gelesen wird, was potenzial.js
+     beim letzten Lauf am Objekt abgelegt hat (`_potenzial.zusammenfassung`,
+     storage.js) - gerechnet wird nichts neu. Ob der Lauf noch zum heutigen
+     Formular passt (Prüfwert), lässt sich ohne offenes Formular nicht sagen;
+     deshalb reist sein Datum mit (`stand`). null ohne Mieterhöhung/Zielbild. */
+  function zielbildFuer(d) {
+    var p = d && d._potenzial, z = p && p.zusammenfassung, S = z && z.stufen;
+    if (!S || !S.bestand || (!S.mieterhoehung && !S.zielbild)) return null;
+    var st = {};
+    ['bestand', 'mieterhoehung', 'zielbild'].forEach(function (k) {
+      var s = S[k]; if (!s) return;
+      st[k] = { miete_jahr: zahl(s.kaltmiete_jahr), kosten: zahl(s.kosten) || 0,
+        ertragswert: z.ertragswert_gesperrt ? null : zahl(s.ertragswert), jahr: zahl(s.jahr),
+        marktpreisindikation: zahl(s.marktpreisindikation_angebote), rnd: zahl(s.rnd) };   /* v2951 */
+    });
+    var mz = mehrUndZuwachs(st);
+    var topK = st.zielbild ? 'zielbild' : 'mieterhoehung';
+    return { stand: (p.stand || z.stand || '').slice(0, 10) || null, art: z.art || null, stufen: st, top: topK,
+      mehrertrag_jahr: mz.mehr, wertzuwachs_nach_kosten: mz.zuw, ertragswert_gesperrt: !!z.ertragswert_gesperrt,
+      kennzeichnung: z.kennzeichnung || null };
+  }
+
+  /* ── v2951 · WARUM ein gespeichertes Objekt im Portfolio-Vergleich fehlt
+     oder nur teilweise zählt. Marcel 25.10.2026: „warum gewisse Objekte nicht
+     mit drin sind in der Auswertung". Gelesen wird nur, was am Objekt liegt. */
+  function zielbildGrund(d) {
+    var p = d && d._potenzial, z = p && p.zusammenfassung, S = z && z.stufen;
+    if (!p || !p.ergebnis) return { code: 'kein_lauf', text: 'Noch nicht erfasst: Im Objekt sind weder Soll-Miete noch Zielbild eingetragen (Bewertung › Mieterhöhung und Zielbild).' };
+    if (!z || !S || !S.bestand) return { code: 'ohne_stufen', text: 'Die Berechnung ist älter und hat noch keine Stufen – im Objekt einmal neu rechnen.' };
+    if (!S.mieterhoehung && !S.zielbild) return { code: 'ohne_ziel', text: 'Weder Soll-Miete noch Zielbild eingetragen – es gibt nichts zu vergleichen.' };
+    if (z.ertragswert_gesperrt) return { code: 'stufe3', text: 'Ertragswert je Stufe nur mit DealPilot Stufe 3 – Miete und Maßnahmen zählen, der Wert nicht.' };
+    var T = S.zielbild || S.mieterhoehung;
+    if (S.bestand.ertragswert == null || T.ertragswert == null) return { code: 'ohne_ew', text: 'Ertragswert noch nicht gerechnet – im Objekt unter Bewertung kostenlos rechnen.' };
+    if (!S.zielbild) return { code: 'nur_mh', text: 'Nur Mieterhöhung erfasst, kein Zielbild – zählt mit der Mieterhöhung als höchster Stufe.' };
+    return null;
+  }
+
   /* ── Ist · Mieterhöhung · Zielbild (DpPotenzial) ─────────────────────── */
   function zielDaten() {
     var PZ = global.DpPotenzial; if (!PZ || typeof PZ.modell !== 'function') return null;
@@ -200,13 +255,7 @@
         /* v2842 · Abschlag und Wert ohne Abschlag; Sanierungsstau der Stufe (v2854) */
         mpi_abschlag_pct: zahl(w.mpi_abschlag_pct), mpi_ohne_abschlag: zahl(w.mpi_ohne_abschlag), sanierungsstau: w.sanierungsstau || null };
     });
-    var B = st.bestand;
-    var mehr = {}, zuw = {};
-    ['mieterhoehung', 'zielbild'].forEach(function (k) {
-      if (!st[k]) { mehr[k] = null; zuw[k] = null; return; }
-      mehr[k] = st[k].miete_jahr != null && B.miete_jahr != null ? st[k].miete_jahr - B.miete_jahr : null;
-      zuw[k] = st[k].ertragswert != null && B.ertragswert != null ? st[k].ertragswert - B.ertragswert - (st[k].kosten || 0) : null;
-    });
+    var mz = mehrUndZuwachs(st), mehr = mz.mehr, zuw = mz.zuw;
     return {
       kennzeichnung: PZ.KENNZEICHNUNG || 'Die Ertragswerte nach Mieterhöhung und im Zielbild sind ein Ausblick: Sie unterstellen, dass die höhere Miete erzielt bzw. die Maßnahmen umgesetzt sind. Sie sind kein Verkehrswert nach § 194 BauGB zum heutigen Stichtag. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand.',
       art: m.art || null, spalten: spalten,
@@ -387,6 +436,9 @@
       '.dp-wz-ausblick{font:400 11.5px/1.5 Inter,sans-serif;color:#4a4436;background:#FBF6E9;border-left:3px solid var(--wl-c9a84c, #C9A84C);padding:6px 10px;margin:8px 0 10px}',
       '.dp-wz-klar{font:400 13px/1.6 Inter,system-ui,sans-serif;color:#2A2727;margin:0 0 10px;max-width:80ch}',
       '.dp-wz-klar b.dp-wz-pos{color:#2f7d55}.dp-wz-klar b.dp-wz-neg{color:#B8625C}',
+      /* v2944 · Brücke zum Vermögenszuwachs */
+      '.dp-wz-bruecke{border-left:3px solid var(--wl-c9a84c, #C9A84C);background:#FBF6E9;border-radius:0 8px 8px 0;padding:10px 14px;margin:0 0 4px}',
+      '.dp-wz-bruecke p{font:400 13px/1.6 Inter,system-ui,sans-serif;color:#2A2727;margin:0 0 6px;max-width:90ch}.dp-wz-bruecke p:last-child{margin:0}',
       '.dp-wz-mehr{font:600 12px Inter,sans-serif;border:1px solid #E6DCC2;border-radius:8px;background:#fff;color:#2A2727;padding:6px 12px;cursor:pointer}',
       '.dp-wz-kenn{font:400 11px/1.5 Inter,sans-serif;color:#6B645A;margin:8px 0 0}',
       /* Segment im Tab Bewertung */
@@ -620,7 +672,60 @@
         + (Z.ertragswert_quelle === 'abruf' ? '<p class="dp-wz-quelle">Ertragswerte je Stufe aus dem Abruf „Marktpreise" vom ' + esc(Z.ertragswert_abruf_datum || '') + (Z.ertragswert_veraltet ? '; die Angaben haben sich seitdem geändert' : '') + '.</p>' : '')
         + '<p class="dp-wz-quelle">' + esc(Z.kurz_ausblick) + ' Der Score rechnet ebenfalls mit dem Bestand.</p>';
     }
-    return h;
+    return h + brueckeHtml(D);
+  }
+  /* v2944 · Brücke zum Vermögenszuwachs (Marcel 25.10.2026: „wenn das verschiedene
+     Betrachtungsweisen sind, müssen wir das erklären?"). Gemessen an Westerfeldstr. 140:
+     hier Ertragswert 740.000 € und Zielbild +23.000 € nach Kosten, darunter schreibt der
+     Vermögenszuwachs 567.000 € (Feld Verkehrswert) mit 2 % fort - drei Zahlen für „heute",
+     und keine Zeile sagte, warum. Diese Brücke RECHNET NICHTS: sie liest State.wert_basis,
+     State.wstg und State._vz (calc.js) und nennt den Unterschied. */
+  function brueckeHtml(D) {
+    var S = global.State || {}, VZ = S._vz || null;
+    var basis = zahl(S.wert_basis), wstg = zahl(S.wstg);
+    if (!VZ || basis == null || basis <= 0) return '';
+    var anker = { verkehrswert: 'dem Verkehrswert aus dem Reiter Objekt', marktbericht: 'dem ' + (S.wert_basis_text || 'Wert aus dem Marktbericht'),
+      bankbewertung: 'der Bankbewertung', kaufpreis: 'dem Kaufpreis' }[S.wert_basis_quelle] || 'dem Wert von heute';
+    var jahre = zahl(VZ.btj);
+    var t = '<div class="dp-wz-h">Und der Vermögenszuwachs?</div><div class="dp-wz-bruecke">'
+      + '<p><b>Zwei Fragen, zwei Rechnungen.</b> Diese Karte fragt: <i>Was ist das Objekt heute wert, und was nach den Maßnahmen?</i> '
+      + 'Der Vermögenszuwachs direkt darunter fragt: <i>Was baust du in ' + esc(jahre != null ? jahre : '') + ' Jahren auf?</i> '
+      + 'Er beginnt bei ' + esc(anker) + ' (' + esc(eur(basis)) + '), schreibt ihn mit ' + esc(dez(wstg != null ? wstg * 100 : null, 1)) + ' % im Jahr fort '
+      + 'und zählt Tilgung, Cashflow und Steuer dazu.</p>';
+    var Z = D.zielbild, W = D.wert;
+    var zw = Z && Z.wertzuwachs_nach_kosten ? zahl(Z.wertzuwachs_nach_kosten.zielbild) : null;
+    if (zw != null) t += '<p><b>Das Zielbild steckt dort nicht drin.</b> Setzt du die Maßnahmen um, kämen ' + esc(eurVz(zw)) + ' Wertzuwachs nach Kosten hinzu (Ertragswert Zielbild − heute − Maßnahmen). Die Mieten im Vermögenszuwachs steigen nur mit der allgemeinen Mietsteigerung.</p>';
+    var ew = W && W.ertragswert ? zahl(W.ertragswert.wert) : null;
+    if (ew != null && Math.abs(ew - basis) / basis > 0.05) {
+      var d = (ew - basis) / basis * 100;
+      t += '<p><b>Anderer Ausgangswert.</b> Der Ertragswert hier (' + esc(eur(ew)) + ') liegt ' + esc(dez(Math.abs(d), 1)) + ' % ' + (d > 0 ? 'über' : 'unter') + ' dem Ausgangswert des Vermögenszuwachses. '
+        + (S.wert_basis_quelle === 'verkehrswert' ? 'Ein eingetragener Verkehrswert im Reiter Objekt hat Vorrang vor dem Marktbericht.' : '') + '</p>';
+    }
+    return t + '</div>';
+  }
+  /* v2945 · Zielbild als Plan-Zeile im Vermögenszuwachs (Marcel 25.10.2026: „ja, wenn das
+     Sinn macht"). Die Summe aus calc.js (State._vz.verm_zuwachs) bleibt UNVERÄNDERT - an ihr
+     hängen Equity Multiple, Bank-Wasserfall und beide PDFs. Hier steht nur eine zweite,
+     klar als Plan markierte Summe darunter, zum Anhaken, je Objekt gemerkt. */
+  function vzZielbild(D) {
+    var karteVz = document.getElementById('card-vermoegen-zuwachs'), ges = document.getElementById('vz-gesamt');
+    var alt = document.getElementById('vz-zielbild-host');
+    var Z = D && D.zielbild, zw = Z && Z.wertzuwachs_nach_kosten ? zahl(Z.wertzuwachs_nach_kosten.zielbild) : null;
+    var VZ = (global.State || {})._vz, summe = VZ ? zahl(VZ.verm_zuwachs) : null;
+    if (!karteVz || !ges || zw == null || summe == null) { if (alt) alt.remove(); return; }
+    var mk = 'dp_vz_zielbild:' + (key() || ''), an = false;
+    try { an = localStorage.getItem(mk) === '1'; } catch (e) {}
+    var host = alt || document.createElement('div'); host.id = 'vz-zielbild-host';
+    var zeileGes = ges.closest('.kv');
+    if (!alt && zeileGes) zeileGes.parentNode.insertBefore(host, zeileGes.nextSibling);
+    var jahr = Z.jahre && Z.jahre.zielbild ? ' ' + Z.jahre.zielbild : '';
+    host.innerHTML = '<label class="kv" style="cursor:pointer"><span><input type="checkbox" data-dp-vz-ziel="1"' + (an ? ' checked' : '') + ' style="margin:0 6px 0 0;vertical-align:-2px">'
+      + 'Zielbild' + esc(jahr) + ' einrechnen <span class="cf-hint">(Plan · Ertragswert Zielbild − heute − Maßnahmen)</span></span>'
+      + '<span class="kv-v ' + (zw >= 0 ? 'c-green' : 'c-red') + '">' + esc(eurVz(zw)) + '</span></label>'
+      + (an ? '<div class="kv kv-result"><span><b>Netto-Vermögenszuwachs mit Zielbild</b> <span class="cf-hint">(Plan; Wertzuwachs zum heutigen Stand, ohne Fortschreibung, ohne Finanzierung der Maßnahmen und ohne Mehrmiete im Cashflow)</span></span>'
+        + '<span class="kv-v c-gold">' + esc(eurVz(summe + zw)) + '</span></div>' : '');
+    var cb = host.querySelector('[data-dp-vz-ziel]');
+    cb.addEventListener('change', function () { try { localStorage.setItem(mk, cb.checked ? '1' : '0'); } catch (e) {} vzZielbild(daten()); });
   }
   function potenzialHost() {
     var c = document.getElementById('card-wert-zielbild') || _karte; if (!c) return null;
@@ -638,36 +743,24 @@
      Segment bei 1.440 × 900 auf y 768. dpsh-score-hero.js zeichnet den Mount per innerHTML
      neu - der Beobachter setzt die Karte danach wieder an ihren Platz (dieselbe Karte,
      kein Neubau). Ohne Score-Karte: vor der Kennzahlen-Bewertung. */
-  var _karte = null, _mo = null, _moZiel = null;
+  /* v2944 · Platz (Marcel 25.10.2026): „Wert & Zielbild zwischen DealScore und Investor
+     DealScore würde ich eher bei Vermögenszuwachs hinpacken." Die Karte steht jetzt
+     unmittelbar VOR #card-vermoegen-zuwachs (statisches HTML in s6, wird von keinem
+     Renderer neu gezeichnet - der Beobachter auf #dpsh-mount aus v2841 entfällt).
+     Ohne die Vermögenszuwachs-Karte: vor der Kennzahlen-Bewertung, sonst ans Ende. */
+  var _karte = null;
   function platz(c) {
     var sec = document.getElementById('s6'); if (!sec || !c) return;
-    var m = document.getElementById('dpsh-mount');
-    var p1 = m ? m.querySelector(':scope > .dpsh-pass') : null;
-    if (p1) {
-      if (p1.nextElementSibling !== c) m.insertBefore(c, p1.nextSibling);
-      c.style.margin = '0';
-    } else {
-      c.style.margin = '';
-      var kpi = document.getElementById('kpi-eval-card');
-      var ziel = (m && m.parentNode === sec) ? m.nextSibling : (kpi && kpi.parentNode === sec ? kpi : null);
-      if (ziel) { if (ziel !== c && c.nextSibling !== ziel) sec.insertBefore(c, ziel); } else if (c.parentNode !== sec) sec.appendChild(c);
-    }
-    if (m && _moZiel !== m && typeof MutationObserver === 'function') {
-      if (_mo) _mo.disconnect();
-      _moZiel = m;
-      _mo = new MutationObserver(function () {
-        if (!_karte) return;
-        var q = _moZiel.querySelector(':scope > .dpsh-pass');
-        if (!_karte.isConnected || (q && q.nextElementSibling !== _karte)) platz(_karte);
-      });
-      _mo.observe(m, { childList: true });
-    }
+    c.style.margin = '';
+    var ziel = document.getElementById('card-vermoegen-zuwachs') || document.getElementById('kpi-eval-card');
+    if (ziel && sec.contains(ziel)) { if (c.nextElementSibling !== ziel) ziel.parentNode.insertBefore(c, ziel); }
+    else if (c.parentNode !== sec) sec.appendChild(c);
   }
   function karte() {
     var sec = document.getElementById('s6'); if (!sec) return;
     var c = document.getElementById('card-wert-zielbild') || _karte;
     var D = daten();
-    if (!D) { if (c) c.remove(); _karte = null; return; }
+    if (!D) { if (c) c.remove(); _karte = null; vzZielbild(null); return; }
     stil();
     if (!c) {
       c = document.createElement('div'); c.className = 'card'; c.id = 'card-wert-zielbild';
@@ -682,6 +775,7 @@
     _karte = c;
     platz(c);
     c.querySelector('[data-dp-wz-oben]').innerHTML = segmentOben(D);
+    vzZielbild(D);
     c.querySelector('.dp-wz-kz').hidden = !D.zielbild;
     var det2 = c.querySelector('details.dp-wz-det');
     det2.hidden = !D.zielbild;
@@ -757,5 +851,5 @@
      statt aus einem zweiten Abruf (pdf-wert-zielbild.js daten()) */
   function bericht() { return (_hist.key && _hist.key === key()) ? _hist.eintrag : null; }
   global.DpWertZielbild = { VERSION: VERSION, daten: daten, laden: laden, bericht: bericht, karte: karte, potenzialHost: potenzialHost,
-    einfachHtml: einfachHtml, reiterHtml: reiterHtml, _wertDaten: wertDaten };
+    einfachHtml: einfachHtml, reiterHtml: reiterHtml, _wertDaten: wertDaten, zielbildFuer: zielbildFuer, zielbildGrund: zielbildGrund };
 })(window);

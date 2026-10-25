@@ -1819,7 +1819,8 @@ router.post('/enrich-market-fields', authenticate, extractLimiter, async (req, r
  *   monthly_limit 2->free(10) 10->starter(50) 40->investor(150) 100->pro(300)
  * Body: { message, history:[{role,content}], context:{...}, allowWeb:bool, userApiKey? }
  */
-const COPILOT_PLAN_LIMITS = { free: 10, starter: 50, investor: 150, pro: 300, partner: 300 };
+/* v2955 · Marcel 25.10.2026: Starter 20, Investor 50, Pro 100 (vorher 50/150/300). Spiegel: config.js limits.copilot_tag */
+const COPILOT_PLAN_LIMITS = { free: 10, starter: 20, investor: 50, pro: 100, partner: 100 };
 /* STILLGELEGT v1183 — die Ableitung ueber das Monatslimit in Litern. */
 const _COPILOT_BY_MONTHLY = { 2: 10, 10: 50, 40: 150, 100: 300 };
 const _cpDaily = new Map(); // key: userId:YYYY-MM-DD -> count

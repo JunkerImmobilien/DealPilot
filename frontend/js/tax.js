@@ -1942,7 +1942,12 @@ function _renderDetailForm(years) {
     {
       title: '5.0 AfA Gebäude',
       rows: [
-        { f: 'afa', l: 'AfA-Betrag (linear 2%)' }
+        /* v2948 · der Satz kommt aus dem Objekt (#afa_satz) - stand fest „linear 2%",
+           gemessen an Westerfeldstr. 140: 5.609 € bei 6,25 % (Marcel 25.10.2026) */
+        { f: 'afa', l: (function () {
+          var s = parseFloat(String((document.getElementById('afa_satz') || {}).value || '').replace(',', '.'));
+          return 'AfA-Betrag (linear ' + (s > 0 ? s.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' %' : '') + ')';
+        })() }
       ]
     },
     {

@@ -1451,6 +1451,13 @@ async function renderSaved(opts) {
     name = name.replace(/\s*\(Kopie\)/gi, '').trim();
     var parts = name.split(/\s+/);
     if (parts.length <= 2) return { street: name, city: '' };
+    /* v2952 · Ort aus mehreren Woertern: hinter der Hausnummer trennen, nicht
+       vor dem letzten Wort ("Parkstr. 9 Bad Oeynhausen" zeigte "Parkstr. 9 Bad, Oeynhausen") */
+    for (var i = parts.length - 2; i >= 1; i--) {
+      if (/^\d+[a-z]?([-\/]\d+[a-z]?)?$/i.test(parts[i])) {
+        return { street: parts.slice(0, i + 1).join(' '), city: parts.slice(i + 1).join(' ') };
+      }
+    }
     var city = parts.pop();
     return { street: parts.join(' '), city: city };
   }

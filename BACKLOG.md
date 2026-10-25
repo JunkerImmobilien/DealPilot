@@ -36,6 +36,26 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N79 · Portfolio-Cockpit Runde 2 (25.10.2026) — Rest nach v2955a
+
+Erledigt in v2952–v2955a (25.10.2026, s. Journal): Parkstr. 9 (Ankauf-Sanierung im Bestand kein Stau, Modernisierung eingetragen), zweiter und dritter Pilot-Lauf abgenommen (Prüfregel e), Bewertung je Objekt im Cockpit, alle 10 Bestandsobjekte mit Bericht Stufe 3, Kaufpreise der Demo angeglichen, Messe-Storybook neu, Zeitraum 10/20/30 zieht überall mit, Co-Pilot-Limits 10/20/50/100, Migration (3 h) raus. Optik (gekürzte Achse, Einfach als Standard) bleibt so. Rest:
+- **Endgültig löschen (Marcel selbst):** Westerfeldstr. 140 Kopie `c5a78c89` (Kürzel E2E) und Am Markt 9 privat `cea958eb` stehen auf „Verloren“ — aus dem Bestand raus, aber noch da. Behalten: `ae155d38` (Spot/Videos) und `ec2d0f32` (VV-GmbH).
+- **Spracheingabe aufs Co-Pilot-Limit:** Vorschlag 1 Spracheingabe = 1 Frage (ab 2 Minuten Aufnahme 2) — Entscheidung Marcel.
+- **Prod-Rollout v2944–v2955a:** Backend und mb-backend neu bauen, vorher beide DBs sichern.
+
+### N78 · Pilot-Analyse durchgesehen (25.10.2026) — Rest nach v2946
+
+Gemessen an Westerfeldstr. 140 (Staging, Analyse vom 13.10., Bericht vom 20.10.).
+Erledigt in v2944–v2946: Wert & Zielbild beim Vermögenszuwachs mit Brücke,
+Wert-Anker aus dem Marktbericht, Zielbild als Plan-Zeile, Hinweis auf neueren
+Bericht, Offerte über Kaufpreis gesperrt, Steuerverlauf mit allen Verlustjahren,
+Steuerverlauf und „Ankauf gegen Bestand" aus dem heutigen Stand.
+
+Punkte 1–6 erledigt in v2947/v2947a (25.10.2026, `cb9043be`, `fde07f9b`, s. Fertig). Rest:
+- **Entscheidung Marcel:** Steuerzeiträume 2025–2027 stehen auf Einzelveranlagung (`splitting: false`, keine KiSt). Gemessen: 2025 zvE 68.000 − 65.820 Vorobjekte = 2.180 € → Steuer 0 (unter Grundfreibetrag); 2026 zvE 41.195 € → +1.655 € auf +5.025 € (33 %, Grenzsatz Zone 3); 2027 zvE 103.506 € → +2.418 € auf +5.144 € (47 % = 42 % ESt + Soli-Milderungszone). Rechnerisch plausibel — stimmt die Veranlagungsart?
+- **§ 7b „angehakt“ nicht nachstellbar:** alle fünf § 7b-Felder sind im Objekt UND im Ankauf-Stand `false`, die Analyse vom 13.10. erwähnt § 7b nicht. Wo es zu sehen war, bitte zeigen (Bild).
+- Verlauf: Zeile „Abschlag auf Angebotspreise“ zeigt Δ „+0,0 %“ (0 → 15,9 %) — Prozent einer Null ist keine Aussage, kosmetisch.
+
 ### N77 · Kappungsgrenzen HE und BW — Wiedervorlage (20.10.2026)
 
 Marcel 20.10.2026: „vor dem 25.11. prüfen, ob Hessen verlängert". Beide Nachfolge-Verordnungen sind am 20.10. nur **Entwurf in der Anhörung**, nichts verkündet. Belege stehen in `frontend/js/data/kappungsgrenzen.json` unter `unsicher_grund`.
@@ -3978,6 +3998,17 @@ Damit es niemand für gemessen hält:
 ---
 
 ## Fertig
+
+### N78 · Pilot-Analyse durchgesehen — Punkte 1–6 — 25.10.2026 (`v2947`, `cb9043be`; `v2947a`, `fde07f9b`)
+
+Gemessen an Westerfeldstr. 140 (Staging). (1) `_offerteDeckeln`: Offerte über KP → `offerte_mail` entfällt
+mit Grund (`offerte_mail_entfallen`), Vermerk vor `verhandlungsempfehlung`. (2) Verlauf: „nach Abschlag“ nur
+Berichte 4–10 (+3,1 %), Trend in Lage & Markt ohne Abschlag 1.055.000 → 960.000 € (−9,0 %) statt −22,3 %.
+(3) Portalnamen in Lage & Markt und beiden PDFs → „aktueller Marktdurchschnitt“. (4) Satz: Median 2.165 × 390
+= 844.350 €, Ausstattung × 1,02, Energie × 1,03 = 887.074 €, + 73.615 € → 960.000 € (mb `mpi_faktoren`).
+(5) „Score laut Marktbericht“, „Bruttomietrendite laut Marktbericht (ohne Zusatzeinnahmen)“, Score-Vergleich
+mit DealPilot-Score 78 und Investor Deal Score 73 (Karte). (6) DealScore 74 → 73 statt 74,00 → 73,00;
+Ankauf-Cashflow 677 € statt „—“; Rohertrag 39.780 (Stellplätze marktüblich 1.440 €) gegen 39.420 € erklärt.
 
 ### Technische RND wieder wie im Gutachten — vier Gewerke-Stufen — 23.10.2026 (`v2943`, `20aecba1`, `ee12638d`)
 

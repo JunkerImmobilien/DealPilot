@@ -89,7 +89,9 @@
     /* Das Cockpit-Markup baut `ensureMarkup()`; erst danach gibt es
        `#dp-stage`. Ohne die Buehne haengen wir an den Behaelter selbst -
        dann steht der Pilot zwar unten, aber er steht. */
-    var ziel = host.querySelector('#dp-stage') || host;
+    /* v2951 · Marcel: „dort, wo die Auswertung steht, den Portfolio-Piloten
+       hinpacken" - das Cockpit legt dafuer #dp-pp-slot hinter Bestand & Zielbild an. */
+    var ziel = host.querySelector('#dp-pp-slot') || host.querySelector('#dp-stage') || host;
 
     var box = document.createElement('section');
     box.id = 'dp-pp';
@@ -103,8 +105,11 @@
         '</div>' +
         '<label class="dp-pp-web" title="Erlaubt dem Portfolio-Piloten, für aktuelle Marktdaten im Web zu recherchieren">' +
           '<input type="checkbox" id="dp-pp-web"><span>Web-Recherche</span></label>' +
+        '<button type="button" class="dp-pp-go dp-pp-zb" id="dp-pp-zb">Bestand &amp; Zielbild erklären</button>' +
         '<button type="button" class="dp-pp-go" id="dp-pp-go">Portfolio-Analyse starten</button>' +
       '</div>' +
+      /* v2955 · der Hinweis „KI-Text · kein Kontingent … 10 bis 300 Antworten“ ist raus (Marcel
+         25.10.2026); das Limit steht jetzt je Plan unter Einstellungen › Plan und auf der Preisseite. */
       /* v2018 - der Stand der letzten Analyse. Wird nach dem Aufbau
          gefuellt (standZeigen); leer ist er unsichtbar. */
       '<div class="dp-pp-stand" id="dp-pp-stand" style="display:none"></div>' +
@@ -135,6 +140,8 @@
     if (w) w.addEventListener('change', function () { allowWeb = this.checked; });
     var g = el('dp-pp-go');
     if (g) g.addEventListener('click', analyse);
+    var zb = el('dp-pp-zb');
+    if (zb) zb.addEventListener('click', zielbildErklaeren);   /* v2951 */
     /* Ein Horcher am Behaelter statt vier an den Knoepfen - die Chips
        werden nie neu gebaut, aber ein Horcher je Knopf waere trotzdem
        vier Stellen, an denen man einen vergessen kann. */
@@ -202,13 +209,13 @@
      schlimmer als keine. */
   /* v2170: erst die Objekte frisch laden (DealPilotDashboard.frisch), dann
      senden - sonst rechnet der Pilot mit dem Stand vom Seitenaufruf. */
-  function senden(nachricht, sichtbar, istAnalyse) {
+  function senden(nachricht, sichtbar, istAnalyse, opts) {
     if (laeuft) return;
     var D = window.DealPilotDashboard;
     var p = (D && typeof D.frisch === 'function') ? D.frisch() : null;
-    Promise.resolve(p).catch(function () {}).then(function () { _senden(nachricht, sichtbar, istAnalyse); });
+    Promise.resolve(p).catch(function () {}).then(function () { _senden(nachricht, sichtbar, istAnalyse, opts); });
   }
-  function _senden(nachricht, sichtbar, istAnalyse) {
+  function _senden(nachricht, sichtbar, istAnalyse, opts) {
     if (laeuft) return;
     var ctx = kontext();
 
@@ -223,7 +230,8 @@
     }
 
     laeuft = true;
-    var gknopf = el('dp-pp-go'), sknopf = el('dp-pp-send');
+    var gknopf = el('dp-pp-go'), sknopf = el('dp-pp-send'), zknopf = el('dp-pp-zb');
+    if (zknopf) zknopf.disabled = true;
     if (gknopf) gknopf.disabled = true;
     if (sknopf) sknopf.disabled = true;
 
@@ -290,6 +298,8 @@
       } catch (e) {}
       if (reply) addMsg('assistant', reply);
       history.push({ role: 'assistant', content: reply });
+      /* v2951 · Zahlenpruefung gegen die mitgegebenen Zahlen (Vorbild lib/ki_text_pruefung.js) */
+      if (opts && opts.pruefen && reply) { try { var pr = zahlenPruefen(reply, ctx); window.__dpPpPruefung = pr; pruefungZeigen(pr); } catch (e) {} }
       /* v2012 - die ANALYSE (nicht jede Rueckfrage) wird abgelegt,
          damit der Telegram-Bot sie abrufen kann. Marcel: "Das Abrufen
          der Co-Pilot-Analyse muss aus Telegram moeglich sein."
@@ -308,7 +318,8 @@
       addMsg('assistant', '⚠ ' + m);
     }).then(function () {
       laeuft = false;
-      var a = el('dp-pp-go'), b = el('dp-pp-send');
+      var a = el('dp-pp-go'), b = el('dp-pp-send'), zb2 = el('dp-pp-zb');
+      if (zb2) zb2.disabled = false;
       if (a) a.disabled = false;
       if (b) b.disabled = false;
     });
@@ -363,8 +374,12 @@
      Dieselbe Haltung wie bei der Pilot-Analyse (v2017): gemessen
      wird, woran die Aussage haengt - nicht das naechstliegende
      Datum. */
+  var _standVersuch = 0;
   function standZeigen() {
     var host = el('dp-pp-stand'); if (!host) return;
+    /* v2951: beim Einhaengen sind die Objekte oft noch nicht geladen - die Zaehlung
+       ergab 0 und die Zeile meldete "inzwischen sind es 0". Dann spaeter noch einmal. */
+    try { var _c0 = kontext(); if ((!_c0 || !_c0.anzahl_objekte) && _standVersuch++ < 6) { setTimeout(standZeigen, 2500); return; } } catch (e) {}
     Auth.apiCall('/user-settings/portfolio_analyse').then(function (r) {
       var w = r && r.wert;
       if (!w || !w.text) { host.style.display = 'none'; return; }
@@ -387,6 +402,158 @@
       host.innerHTML = txt;
       host.style.display = '';
     }).catch(function () { host.style.display = 'none'; });
+  }
+
+  /* ── v2951 · BESTAND & ZIELBILD ERKLAEREN ───────────────────────────
+     Marcel 25.10.2026: „dass der die Auswertung für Bestand und Zielbild neu
+     macht, aber auch eine ausführliche Beschreibung dazu". Die Zahlen stehen
+     fertig im Kontext (context.bestand_zielbild, DealPilotDashboard
+     ._zbPayload) - der Pilot erklaert, er rechnet nicht. */
+  var AUFTRAG_ZB = [
+    'Erkläre mir die Auswertung BESTAND & ZIELBILD meines Portfolios ausführlich und verständlich.',
+    'Grundlage ist ausschließlich context.bestand_zielbild (inklusive gesamtbewertung). Alle Summen, Differenzen und Prozente stehen dort FERTIG - übernimm sie wörtlich, rechne NICHT selbst und runde nicht anders.',
+    'context.bestand_zielbild.fakten sind geprüfte Sätze: baue auf ihnen auf und gib jeder Zahl GENAU die Bedeutung, die sie dort hat (ein Prozentwert gehört nur zu dem Betrag, neben dem er dort steht; „Mehrwert“ ist nicht „Wertzuwachs nach Kosten“). Welche Objekte mehr kosten, als sie bringen, steht in massnahmen_teurer_als_wert - nenne nur diese. Bei „über/unter“ gilt das Vorzeichen des Prozentfelds.',
+    'Schreibe ausführlich: je Abschnitt drei bis fünf Sätze, Beträge mit €, Prozente mit Komma.',
+    'Gliedere so:',
+    '1. Was verglichen wird - Bestand, Mieterhöhung, Zielbild, und über wie viele Objekte (mit/ohne Zielbild, ohne Angaben). Nenne jedes nicht enthaltene Objekt mit seinem Grund.',
+    '2. Die Miete - von Bestand über Mieterhöhung zum Zielbild, mit den Beträgen und dem Prozentwert; warum die Miete laut Objektdaten (kaltmiete_laut_objektdaten_derselben_objekte) davon abweicht.',
+    '3. Maßnahmen und Rendite - Kosten der Maßnahmen und die Bruttomietrendite vorher/nachher.',
+    '4. Der Wert - Ertragswert Bestand, Zielbild, nach Kosten, Wertzuwachs nach Kosten; und wie sich der Ertragswert Bestand zu den Kaufpreisen DERSELBEN Objekte verhält.',
+    '5. Die Objekte einzeln - welches trägt am meisten bei, wo kosten die Maßnahmen mehr, als sie an Wert bringen (mit Namen und Zahlen aus je_objekt).',
+    '6. Wie das zur Gesamtinvestition und zur Vermögensbilanz passt - Kaufpreise, Nebenkosten, Gesamtinvestition, Objektwerte, Restschuld, Eigenkapital (gesamtbewertung) - und warum die Mengen verschieden sind.',
+    '7. Was ich tun sollte - welche Läufe veraltet sind (laeufe_stand), welche Objekte ergänzt werden sollten, und wie neu gerechnet wird (neu_rechnen).',
+    'Schließe mit dem Satz aus kennzeichnung. Keine Markdown-Überschriften, Zwischenzeilen mit Nummer sind gut.'
+  ].join('\n');
+  function zielbildErklaeren() {
+    history = [];
+    var log = el('dp-pp-log');
+    if (log) log.innerHTML = '';
+    senden(AUFTRAG_ZB, 'Bestand & Zielbild erklären', false, { pruefen: true });
+  }
+
+  /* Zahlenpruefung: jede Betrags- (€, Mio) und Prozentangabe im Text muss
+     einer Zahl im mitgegebenen Kontext entsprechen (Rundung: 0,6 % bzw. 1 €,
+     Prozent 0,1 Punkte). Was nicht passt, wird genannt - nicht gestrichen. */
+  function _zahlenAus(o, out) {
+    if (o == null) return out;
+    if (typeof o === 'number' && isFinite(o)) { out.push(o); return out; }
+    if (Array.isArray(o)) { o.forEach(function (x) { _zahlenAus(x, out); }); return out; }
+    if (typeof o === 'object') { Object.keys(o).forEach(function (k) { _zahlenAus(o[k], out); }); }
+    return out;
+  }
+  function zahlenPruefen(text, ctx) {
+    var bekannt = _zahlenAus(ctx, []);
+    var re = /([+\u2212\-]?\s?\d{1,3}(?:\.\d{3})*(?:,\d+)?|[+\u2212\-]?\s?\d+(?:,\d+)?)\s?(Mio\.?\s?(?:€|EUR|Euro)|€|EUR|Euro|%|Prozent)/g;
+    var m, gepr = [], fehl = [];
+    while ((m = re.exec(text))) {
+      var roh = m[1].replace(/\s/g, '').replace('\u2212', '-');
+      var v = parseFloat(roh.replace(/\./g, '').replace(',', '.'));
+      if (!isFinite(v)) continue;
+      var einh = m[2];
+      var istP = /%|Prozent/.test(einh);
+      if (/Mio/.test(einh)) v = v * 1e6;
+      var a = Math.abs(v);
+      var ok = bekannt.some(function (c) {
+        var b = Math.abs(c);
+        if (istP) return Math.abs(a - b) <= 0.1 + 1e-9;
+        return Math.abs(a - b) <= Math.max(1, b * (/Mio/.test(einh) ? 0.006 : 0.0005));
+      });
+      if (!istP && a < 100) ok = true;   /* Kleinbeträge (€/m²) nicht werten */
+      gepr.push(m[0]);
+      if (!ok) fehl.push(m[0].trim());
+    }
+    var bedeutung = []; try { bedeutung = _bedeutungPruefen(text, ctx); } catch (e) {}
+    return { geprueft: gepr.length, gefunden: gepr.length - fehl.length, nicht_gefunden: fehl, bedeutung: bedeutung };
+  }
+  /* v2951b · ZUORDNUNG STATT NUR VORKOMMEN. Gemessen am ersten Lauf (25.10.2026):
+     alle Zahlen standen in den Daten - aber „34.000 € oder 13,7 %" (13,7 % gehört zu
+     38.388 €), „Wertzuwachs nach Kosten von 524.000 €" (das ist der Mehrwert),
+     „2,2 % unter den Kaufpreisen" (es ist darüber) und „Bäckerstr. 7 kostet mehr, als
+     sie bringt" (laut Daten nicht). Geprüft wird deshalb auch:
+       (a) Begriff -> Betrag: der erste Betrag nach einem festen Begriff im selben Satz
+       (b) Betrag -> Prozent: ein Prozent direkt hinter einem Teilbetrag muss sein eigener sein
+       (c) Richtung: „x % über/unter" gegen das Vorzeichen des Prozentfelds
+       (d) Namen in Sätzen „mehr kosten, als …" gegen massnahmen_teurer_als_wert */
+  function _num(s) { return parseFloat(String(s).replace(/\s/g, '').replace('\u2212', '-').replace(/\./g, '').replace(',', '.')); }
+  function _betragAus(m) { var v = _num(m[1]); return /Mio/.test(m[2] || '') ? v * 1e6 : v; }
+  function _bedeutungPruefen(text, ctx) {
+    var Z = ctx && ctx.bestand_zielbild; if (!Z) return [];
+    var EW = Z.ertragswert || {}, GB = Z.gesamtbewertung || {}, KM = Z.kaltmiete_jahr || {}, JO = Z.je_objekt || [];
+    var out = [];
+    var gleich = function (a, b, mio) { return a != null && b != null && Math.abs(Math.abs(a) - Math.abs(b)) <= Math.max(1, Math.abs(b) * (mio ? 0.006 : 0.0005)); };
+    /* Satzende nur vor einem Grossbuchstaben und nicht nach "str."/"Nr." - sonst zerfaellt "Bäckerstr. 7 Musterhausen" */
+    var saetze = text.split(/(?<!(?:str|Str|Nr|ca|bzw|vgl|Abs))[.!?]\s+(?=[A-ZÄÖÜ])|\n+/);
+    var BETRAG = /([+\u2212\-]?\s?\d{1,3}(?:\.\d{3})*(?:,\d+)?|\d+(?:,\d+)?)\s?(Mio\.?\s?(?:€|EUR|Euro)|€|EUR|Euro)/;
+    var BEGRIFFE = [
+      { re: /Wertzuwachs nach Kosten/i, soll: [EW.wertzuwachs_nach_kosten].concat(JO.map(function (o) { return o.wertzuwachs_nach_kosten; })), name: 'Wertzuwachs nach Kosten' },
+      { re: /Mehrwert/i, soll: [EW.mehrwert], name: 'Mehrwert' },
+      { re: /Gesamtinvestition/i, soll: [GB.gesamtinvestition], name: 'Gesamtinvestition' },
+      { re: /Nebenkosten/i, soll: [GB.nebenkosten], name: 'Nebenkosten' },
+      { re: /Restschuld/i, soll: [GB.restschuld_heute], name: 'Restschuld' }
+    ];
+    saetze.forEach(function (satz) {
+      BEGRIFFE.forEach(function (B) {
+        var m = B.re.exec(satz); if (!m) return;
+        var rest = satz.slice(m.index + m[0].length, m.index + m[0].length + 90);
+        var b = BETRAG.exec(rest); if (!b) return;
+        var v = _betragAus(b);
+        if (!B.soll.some(function (x) { return gleich(v, x, /Mio/.test(b[2])); }))
+          out.push('„' + B.name + ' … ' + b[0].trim() + '“ – laut Daten ' + B.soll.filter(function (x) { return x != null; }).slice(0, 1).map(function (x) { return Math.round(x).toLocaleString('de-DE') + ' €'; }).join(''));
+      });
+      /* (b) Betrag, dann Prozent */
+      var re2 = /([+\u2212\-]?\s?\d{1,3}(?:\.\d{3})*(?:,\d+)?)\s?(?:€|EUR|Euro)[^.%€]{0,25}?(\d+(?:,\d+)?)\s?(?:%|Prozent)/g, m2;
+      var paare = [[KM.mehr_gesamt, KM.mehr_gesamt_prozent], [KM.mehr_durch_mieterhoehung, KM.mehr_durch_mieterhoehung_prozent], [KM.mehr_durch_umbau_neuvermietung, KM.mehr_durch_umbau_neuvermietung_prozent]]
+        .concat(JO.map(function (o) { return [o.mehr_miete, o.mehr_miete_prozent]; }));
+      while ((m2 = re2.exec(satz))) {
+        var bv = _num(m2[1]), pv = _num(m2[2]);
+        var P = paare.filter(function (p) { return gleich(bv, p[0]); });
+        if (P.length && !P.some(function (p) { return p[1] != null && Math.abs(Math.abs(p[1]) - pv) <= 0.1; }))
+          out.push('„' + m2[0].trim() + '“ – der Prozentwert gehört nicht zu diesem Betrag (' + P.map(function (p) { return String(p[1]).replace('.', ',') + ' %'; }).join(' / ') + ')');
+      }
+      /* (c) Richtung */
+      var re3 = /(\d+(?:,\d+)?)\s?(?:%|Prozent)\s+(über|unter|höher|niedriger|oberhalb|unterhalb)/gi, m3;
+      var vorz = [EW.ertragswert_bestand_gegen_kaufpreis_prozent, EW.kaufpreis_gegen_ertragswert_bestand_prozent, Z.marktpreisindikation_bestand && Z.marktpreisindikation_bestand.gegen_kaufpreis_prozent].filter(function (x) { return x != null; });
+      while ((m3 = re3.exec(satz))) {
+        var pv3 = _num(m3[1]), oben = /über|höher|oberhalb/i.test(m3[2]);
+        var tr = vorz.filter(function (x) { return Math.abs(Math.abs(x) - pv3) <= 0.05; });
+        if (tr.length && !tr.some(function (x) { return (x > 0) === oben; }))
+          out.push('„' + m3[0] + '“ – die Richtung stimmt nicht (laut Daten ' + tr.map(function (x) { return (x > 0 ? '+' : '') + String(x).replace('.', ','); }).join(' / ') + ' %)');
+      }
+      /* (e) v2953b · Abstand als Anteil gelesen: „21,8 % der Kaufpreise" bei +21,8 % Abstand,
+         dazu „negativ"/„Überbewertung" im selben Satz bei positivem Abstand (zweiter Lauf 25.10.2026) */
+      var re4 = /(\d+(?:,\d+)?)\s?(?:%|Prozent)\s+(der|des|von)\b/gi, m4;
+      while ((m4 = re4.exec(satz))) {
+        var pv4 = _num(m4[1]);
+        var tr4 = vorz.filter(function (x) { return Math.abs(Math.abs(x) - pv4) <= 0.05; });
+        if (tr4.length) out.push('„' + m4[0] + ' …“ – das ist ein Abstand (' + tr4.map(function (x) { return (x > 0 ? '+' : '') + String(x).replace('.', ','); }).join(' / ') + ' %), kein Anteil');
+      }
+      vorz.forEach(function (x) {
+        var s = String(Math.abs(x)).replace('.', ',');
+        if (satz.indexOf(s) < 0) return;
+        if (x > 0 && /negativ|überbewert|zu teuer/i.test(satz)) out.push('„' + s + ' %“ mit „negativ/Überbewertung“ – laut Daten liegt der Wert über dem Kaufpreis (+' + s + ' %)');
+        if (x < 0 && /unterbewert|günstiger gekauft|Schnäppchen/i.test(satz)) out.push('„' + s + ' %“ – laut Daten liegt der Wert unter dem Kaufpreis (' + String(x).replace('.', ',') + ' %)');
+      });
+      /* (d) Namen bei „mehr kosten, als …" */
+      if (/kost\w*\s+mehr|mehr\s+kost/i.test(satz)) {
+        var teurer = Z.massnahmen_teurer_als_wert || [];
+        JO.forEach(function (o) {
+          var kurz = String(o.name || '').split(/\s+/).slice(0, 2).join(' ');
+          if (kurz && satz.indexOf(kurz) >= 0 && teurer.indexOf(o.name) < 0)
+            out.push('„' + kurz + '“ – laut Daten bringen die Maßnahmen dort nicht weniger, als sie kosten');
+        });
+      }
+    });
+    return out.filter(function (x, i, a) { return a.indexOf(x) === i; });
+  }
+  function pruefungZeigen(pr) {
+    var log = el('dp-pp-log'); if (!log || !pr) return;
+    var d = document.createElement('div');
+    var bd = pr.bedeutung || [];
+    d.className = 'dp-pp-pruef' + (pr.nicht_gefunden.length || bd.length ? ' dp-pp-pruef-warn' : '');
+    d.innerHTML = '<b>Zahlenprüfung:</b> ' + pr.gefunden + ' von ' + pr.geprueft + ' Beträgen und Prozenten stehen so in den Zahlen des Cockpits.'
+      + (pr.nicht_gefunden.length ? ' Nicht gefunden: ' + esc(pr.nicht_gefunden.slice(0, 8).join(' · ')) + ' – diese Angaben bitte gegen die Tabellen oben prüfen.' : '')
+      + (bd.length ? '<br><b>Zuordnung geprüft – ' + bd.length + ' Stelle' + (bd.length === 1 ? '' : 'n') + ' widerspricht den Zahlen:</b><br>' + bd.slice(0, 8).map(function (x) { return '· ' + esc(x); }).join('<br>') + '<br>Maßgeblich sind die Zahlen der Auswertung oben.' : (pr.geprueft ? ' Zuordnung von Begriffen, Prozenten, Richtung und Objekten: ohne Widerspruch.' : ''));
+    log.appendChild(d);
   }
 
   function analyse() {
@@ -422,5 +589,6 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', beobachten);
   else beobachten();
 
-  window.DealPilotPortfolioPilot = { mount: mount, analyse: analyse, _kontext: kontext };
+  window.DealPilotPortfolioPilot = { mount: mount, analyse: analyse, _kontext: kontext,
+    zielbildErklaeren: zielbildErklaeren, _zahlenPruefen: zahlenPruefen };   /* v2951 */
 })();

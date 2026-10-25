@@ -29,7 +29,8 @@
            Woche fuenf. */
         '4 Wochen Pro — mit 5 · 3 · 1 Bewertungen',
         'danach 1 Marktpreisindikation / Monat' /* v1176-kontingent */,
-        'Alle PDFs mit Wasserzeichen'
+        'Alle PDFs mit Wasserzeichen',
+        '10 Co-Pilot-Fragen am Tag'
       ],
       not_included: null,
       result: 'Sie sehen die volle Tiefe von DealPilot — und entscheiden danach, ob Sie upgraden.',
@@ -49,7 +50,8 @@
         'Werbungskosten-Modul vollständig',
         'Mietspiegel-Vergleich (manuell)',
         'Manuelle Marktzinsen',
-        '5 Marktpreisindikationen / Monat' /* v1176-kontingent */
+        '5 Marktpreisindikationen / Monat', /* v1176-kontingent */
+        '20 Co-Pilot-Fragen am Tag'
       ],
       not_included: [
         'Investor Deal Score (24 KPIs)',
@@ -77,7 +79,8 @@
         'Live-Marktzinsen',
         'Mietspiegel — Auto-Vergleich',
         'BMF-Rechner & Export',
-        '5 Marktpreisindikationen + 5 erweiterte / Monat' /* v1176-kontingent */
+        '5 Marktpreisindikationen + 5 erweiterte / Monat', /* v1176-kontingent */
+        '50 Co-Pilot-Fragen am Tag'
       ],
       not_included: null,
       result: 'Sie investieren wie ein institutioneller Investor — mit allen KPIs, die Banken und Steuerberater erwarten.',
@@ -86,7 +89,7 @@
     },
     {
       key: 'pro', letter: 'P', label: 'Pro', tag: 'Profis · Sachverständige', title: 'Pro',
-      lead: 'Für Investoren, Sachverständige und Vermögensverwalter. Unbegrenzte Objekte, Premium-PDF-Layouts, Custom Track-Record Cover und Migration & Setup-Service inklusive.',
+      lead: 'Für Investoren, Sachverständige und Vermögensverwalter. Unbegrenzte Objekte, Premium-PDF-Layouts, Custom Track-Record Cover und 100 Co-Pilot-Fragen am Tag.',
       price_monthly: 49.99, price_yearly: 549,  /* v1246: Preisrunde 07.09.2026 */
       features: [
         'Unbegrenzte Objekte',
@@ -96,7 +99,7 @@
         'BMF-Rechner & Export',
         'Priorisierter Support',
         '5 Marktpreisindikationen, 5 erweiterte, 5 Wertermittlungen / Monat', /* v1176-kontingent */
-        'Migration & Einrichtungsservice (bis 3 h) inkl.'
+        '100 Co-Pilot-Fragen am Tag'
       ],
       not_included: null,
       result: 'Sie skalieren Ihre Analyse-Kapazität — und können DealPilot direkt im Kundengespräch einsetzen.',
@@ -697,7 +700,7 @@
       ['DealPilot Score (5 Faktoren)','\u2713','\u2713','\u2713','\u2713'],
       ['Investor Deal Score (24 KPIs)','Demo','\u2013','\u2713','\u2713'],
       ['Boarding (Schnellpr\u00fcfung)','\u2713','\u2713','\u2713','\u2713'],
-      ['Co-Pilot (KI-Chat)','5 Fragen','5 Fragen','✓','✓'],
+      ['Co-Pilot (KI-Fragen am Tag)','10','20','50','100'],
       ['Pilot-Analyse (KI)','vereinfacht','vereinfacht','Vollversion','Vollversion'],
       ['Pilot-Lagebewertung (KI)','\u2013','\u2713','\u2713','\u2713'],
       ['DealPilot Marktreport','\u2013','\u2713','\u2713','\u2713'],
@@ -722,8 +725,7 @@
       ['Expos\u00e9-Import','\u2713','\u2713','\u2713','\u2713'],
       ['Marktbericht-Import','\u2713','\u2713','\u2713','\u2713'],
       ['Excel-Import','\u2013','\u2713','\u2713','\u2713'],
-      ['API-Zugang','\u2013','\u2013','\u2013','\u2713'],
-      ['Migration &amp; Setup-Service','\u2013','\u2013','\u2013','\u2713 (3 h)']
+      ['API-Zugang','\u2013','\u2013','\u2013','\u2713']
     ];
     var h = '<div class="mx-wrap"><table class="mx"><thead><tr>' +
       '<th class="ft">Funktion</th><th>Free</th><th>Starter</th>' +
@@ -1075,7 +1077,7 @@
         ['DealPilot Score (5 Faktoren)',         '✓', '✓', '✓', '✓'],
         ['Investor Deal Score (24 KPIs)',        'Demo', '–', '✓', '✓'],
         ['Quick-Check (Schnellbewertung)',       '✓', '✓', '✓', '✓'],
-        ['Co-Pilot (KI-Chat)',                   '5 Fragen', '5 Fragen', '✓', '✓'],
+        ['Co-Pilot (KI-Fragen am Tag)',          '10', '20', '50', '100'],
         ['Pilot-Analyse (KI)',                   'vereinfacht', 'vereinfacht', 'Vollversion', 'Vollversion'],
         ['Pilot-Lagebewertung (KI)',             '–', '✓', '✓', '✓'],
         ['DealPilot Marktreport',                '–', '✓', '✓', '✓'],
@@ -1110,8 +1112,7 @@
         ['Excel-Import',                         '–', '✓', '✓', '✓']
       ]},
       { cat: 'Service & Integration', items: [
-        ['API-Zugang',                           '–', '–', '–', '✓'],
-        ['Migration & Setup-Service',            '–', '–', '–', '✓ (3 h)']
+        ['API-Zugang',                           '–', '–', '–', '✓']
       ]}
     ];
 

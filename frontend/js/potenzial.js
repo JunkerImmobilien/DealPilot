@@ -584,6 +584,12 @@
     try { st = AK && AK.stand ? AK.stand() : null; } catch (e) {}
     var k = st && st.kurz ? st.kurz : null;
     if (!k) return null;
+    /* v2947 (N78.6) · die Kurzfassung des Ankauf-Stands fuehrt nicht jede Kennzahl
+       (Westerfeldstr. 140: kein _kpis_cf_vs, die Spalte zeigte „—"), der volle Stand
+       in `daten` schon (8.119 € p. a.). Fehlendes von dort, nichts neu gerechnet. */
+    var d = st.daten || {};
+    k = Object.assign({}, d, k);
+    ['_kpis_cf_vs', '_kpis_bmy', '_kpis_dscr', '_nkm_qm', 'nkm'].forEach(function (s) { if (k[s] == null && d[s] != null) k[s] = d[s]; });
     var nkm = zahl(k.nkm);
     return { stichtag: st.stichtag || null, miete_j: nkm ? nkm * 12 : null, miete_qm: zahl(k._nkm_qm) || null,
       bmy: k._kpis_bmy != null ? Number(k._kpis_bmy) : null, dscr: k._kpis_dscr != null ? Number(k._kpis_dscr) : null,

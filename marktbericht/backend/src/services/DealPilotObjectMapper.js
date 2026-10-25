@@ -151,6 +151,14 @@ function bomAus(d) {
   }
   const san = num(pick(d, ['san', 'sanierungskosten']));
   if (!(san > 0)) return { bom_eur: null, bom_grund: null, bom_quelle: null };
+  /* v2952 · Liegt der Kauf mindestens zwölf Monate zurück, ist das Objekt im
+     Bestand und die Sanierung aus dem Ankauf gilt als ausgeführt: sie ist
+     Investition, kein offener Stau mehr. Gemessen an Parkstr. 9 (Cockpit):
+     137.000 € Ankauf-Sanierung drückten den Ertragswert heute auf 161.000 €. */
+  const kd = Date.parse(String(pick(d, ['kaufdat', 'kaufdatum']) || ''));
+  if (Number.isFinite(kd) && Date.now() - kd >= 365 * 864e5) {
+    return { bom_eur: null, bom_grund: null, bom_quelle: null };
+  }
   const ust = String(pick(d, ['san_ust']) || '').toLowerCase();
   const art = ust === 'netto' ? 'netto' : (ust === 'brutto' ? 'brutto' : null);
   return {

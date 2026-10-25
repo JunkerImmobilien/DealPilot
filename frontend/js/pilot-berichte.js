@@ -51,9 +51,11 @@
       marktwert_von_eur: z(h.market_value_low),
       marktwert_bis_eur: z(h.market_value_high),
       median_eur_qm: z(h.median_sqm),
-      bruttorendite_prozent: z(h.gross_yield_pct),
+      /* v2947 (N78.5) · eindeutige Namen: die Rendite des Berichts rechnet ohne
+         Zusatzeinnahmen, der Score des Berichts ist nicht der DealPilot-Score */
+      bruttorendite_ohne_zusatzeinnahmen_prozent: z(h.gross_yield_pct),
       mietmultiplikator: z(h.rent_multiplier),
-      deal_score: z(h.deal_score),
+      score_laut_marktbericht: z(h.deal_score),
       mikro_score: z(h.micro_score),
       makro_score: z(h.macro_score),
       preis_cagr_prozent: z(h.price_cagr_pct),

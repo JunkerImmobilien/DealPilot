@@ -903,6 +903,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   function clean(s) {
     if (s == null) return '';
     var t = '' + s;
+    try { if (typeof window._dpOhnePortal === 'function') t = window._dpOhnePortal(t); } catch (e) {}   /* v2947 (N78.3) · kein Portalname im PDF */
     if (typeof stripMd === 'function') t = stripMd(t);
     return t.replace(/\*+/g, '').trim();
   }

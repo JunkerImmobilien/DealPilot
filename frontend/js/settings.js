@@ -1942,6 +1942,8 @@ function _v234_1RenderPlanStatusHeader() {
         } else if (objekte) {
           metaParts.push(objekte + ' Objekte');
         }
+        /* v2955a · auch zahlende Kunden sehen ihr Co-Pilot-Tageslimit (config.js limits.copilot_tag) */
+        if (lim.copilot_tag > 0) metaParts.push(lim.copilot_tag + ' Co-Pilot-Fragen am Tag');
         if (metaParts.length) planMeta = metaParts.join(' · ');
       }
     }
@@ -2246,6 +2248,8 @@ function _renderPlanPane() {
     } else {
       html += '<li>' + l.ai_credits + ' Pilot-Analyse einmalig</li>';
     }
+    /* v2955 · Co-Pilot-Tageslimit je Plan (config.js limits.copilot_tag) */
+    if (l.copilot_tag > 0) html += '<li><strong>' + l.copilot_tag + '</strong> Co-Pilot-Fragen am Tag</li>';
     // Wasserzeichen
     html += '<li>PDF ' + (l.watermark ? '<em>mit Wasserzeichen</em>' : '<strong>ohne Wasserzeichen</strong>') + '</li>';
     /* v1246 · Hier stand „Max. 3 Speicherungen". Marcel: „Da kann ich mir

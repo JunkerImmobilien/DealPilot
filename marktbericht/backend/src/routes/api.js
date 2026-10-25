@@ -692,6 +692,11 @@ router.get('/objects/history', async (req, res) => {
               (data->'valuation'->'market_value'->'angebot_abschlag'->'roh'->>'high')::numeric AS market_value_roh_high,
               (data->'valuation'->'market_value'->'angebot_abschlag'->>'nicht_abgeschlagen_eur')::numeric AS abschlag_nicht_eur,
               data->'valuation'->'market_value'->'angebot_abschlag'->>'kurz' AS angebot_abschlag_kurz,
+              /* v2947 . N78.4 - die Objektfaktoren zwischen Median x Flaeche und dem Wert ohne
+                 Abschlag. Gemessen Westerfeldstr. 140: 2.165 x 390 = 844.350, ohne Abschlag
+                 960.000, davon 73.615 nicht aus Angeboten; der Rest stand unbenannt.
+                 Keine Backticks hier. */
+              data->'valuation'->'factors' AS mpi_faktoren,
               data->'cross_check'->'ertragswert'->>'bezeichnung' AS ertragswert_bezeichnung,
               (data->'cross_check'->'ertragswert'->'lzs_spanne'->>'ertragswert_von_eur')::numeric AS ertragswert_von_eur,
               (data->'cross_check'->'ertragswert'->'lzs_spanne'->>'ertragswert_bis_eur')::numeric AS ertragswert_bis_eur,
