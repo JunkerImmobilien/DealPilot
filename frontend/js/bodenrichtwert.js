@@ -128,13 +128,16 @@
     'BW':    { name: 'Baden-Württemberg', url: 'https://www.gutachterausschuesse-bw.de/borisbw/' },
     'BY':    { name: 'Bayern',            url: 'https://www.boris-bayern.de/' },
     'BE':    { name: 'Berlin',            url: 'https://fbinter.stadt-berlin.de/boris/' },
-    'BB':    { name: 'Brandenburg',       url: 'https://service.brandenburg.de/lis/list.php?page=boris_brb' },
+    /* v2949 · Links am 25.10.2026 einzeln abgerufen: Brandenburg landete auf einer
+       allgemeinen Serviceseite, Bremen und Hamburg antworteten gar nicht, BORIS-Plus
+       gab 404. Ersetzt durch die heute erreichbaren Landesportale. */
+    'BB':    { name: 'Brandenburg',       url: 'https://boris.brandenburg.de/' },
     'BB-BE': { name: 'Berlin/Brandenburg',url: 'https://fbinter.stadt-berlin.de/boris/' },
-    'HB':    { name: 'Bremen',            url: 'https://www.boris.bremen.de/' },
-    'HH':    { name: 'Hamburg',           url: 'https://www.boris-hamburg.de/boris/' },
-    'HH-SH': { name: 'Hamburg/SH',        url: 'https://www.boris-hamburg.de/boris/' },
-    'HE':    { name: 'Hessen',            url: 'https://www.gutachterausschuss.hessen.de/' },
-    'HE-NI': { name: 'Hessen/Niedersachsen', url: 'https://www.gutachterausschuss.hessen.de/' },
+    'HB':    { name: 'Bremen',            url: 'https://www.gutachterausschuss.bremen.de/' },
+    'HH':    { name: 'Hamburg',           url: 'https://geoportal-hamburg.de/boris/' },
+    'HH-SH': { name: 'Hamburg/SH',        url: 'https://geoportal-hamburg.de/boris/' },
+    'HE':    { name: 'Hessen',            url: 'https://www.boris.hessen.de/' },
+    'HE-NI': { name: 'Hessen/Niedersachsen', url: 'https://www.boris.hessen.de/' },
     'MV':    { name: 'Mecklenburg-Vorpommern', url: 'https://www.geoportal-mv.de/portal/' },
     'NI':    { name: 'Niedersachsen',     url: 'https://immobilienmarkt.niedersachsen.de/' },
     'HB-NI': { name: 'Bremen/Niedersachsen', url: 'https://immobilienmarkt.niedersachsen.de/' },
@@ -148,15 +151,17 @@
     'SL':    { name: 'Saarland',          url: 'https://geoportal.saarland.de/' },
     'SL-RP': { name: 'Saarland/RLP',      url: 'https://geoportal.saarland.de/' },
     'SN':    { name: 'Sachsen',           url: 'https://www.boris.sachsen.de/' },
-    'ST':    { name: 'Sachsen-Anhalt',    url: 'https://www.lvermgeo.sachsen-anhalt.de/' },
+    /* Geodatenportal = laut Faltblatt des LVermGeo der Bezugsweg fuer Bodenrichtwerte;
+       am 25.10.2026 war die ganze Landesseite mit HTTP 500 nicht erreichbar */
+    'ST':    { name: 'Sachsen-Anhalt',    url: 'https://www.geodatenportal.sachsen-anhalt.de/' },
     'SH':    { name: 'Schleswig-Holstein',url: 'https://danord.gdi-sh.de/' },
     'TH':    { name: 'Thüringen',         url: 'https://www.geoportal-th.de/' }
   };
 
   // Fallback: BORIS-Plus deutschlandweit
   var BORIS_FALLBACK = {
-    name: 'Deutschland (BORIS-Plus)',
-    url:  'https://www.bodenrichtwerte-boris.de/borisplus/?lang=de'
+    name: 'Deutschland (BORIS-D)',
+    url:  'https://www.bodenrichtwerte-boris.de/boris-d/?lang=de'
   };
 
   // ── DOM-Helpers ──────────────────────────────────────────────
@@ -182,16 +187,71 @@
   }
 
   // ── BORIS-Link öffnen ────────────────────────────────────────
-  function openBoris() {
+  /* v2949 · Marcel 25.10.2026: „Dort soll immer das Portal geöffnet werden … auch für
+     Bayern, Baden-Württemberg, Hessen, Sachsen. Das ist ja dann nicht immer das
+     BORIS-Portal" - und „wenn wir die Adresse eingegeben haben, dass dann der passende
+     Link hinterlegt ist". Die PLZ allein kennt an den Landesgrenzen nur Mischcodes
+     (z. B. 89xxx = Ulm/BW oder Neu-Ulm/BY). Dann fragt der Knopf die Geokodierung,
+     die das Land mitliefert (gemessen: Neu-Ulm → Bayern, Münsterplatz Ulm →
+     Baden-Württemberg). Das Ergebnis wird je Adresse gemerkt. */
+  var LAND_AUS_NAME = { 'Baden-Württemberg': 'BW', 'Bayern': 'BY', 'Berlin': 'BE', 'Brandenburg': 'BB', 'Bremen': 'HB',
+    'Hamburg': 'HH', 'Hessen': 'HE', 'Mecklenburg-Vorpommern': 'MV', 'Niedersachsen': 'NI', 'Nordrhein-Westfalen': 'NRW',
+    'Rheinland-Pfalz': 'RP', 'Saarland': 'SL', 'Sachsen': 'SN', 'Sachsen-Anhalt': 'ST', 'Schleswig-Holstein': 'SH', 'Thüringen': 'TH' };
+  var _portalLand = { adr: null, code: null };
+  function _portalAdresse() { return [_val('str'), _val('hnr'), _val('plz'), _val('ort')].join('|'); }
+  /** Land aus der PLZ, nur wenn eindeutig; sonst das gemerkte Ergebnis der Geokodierung. */
+  function _portalCode() {
+    var bl = _plzToBundesland(_val('plz'));
+    if (bl && bl.indexOf('-') < 0) return bl;
+    if (_portalLand.adr === _portalAdresse() && _portalLand.code) return _portalLand.code;
+    return null;
+  }
+  async function _portalCodeHolen() {
+    var c = _portalCode(); if (c) return c;
+    var plz = _val('plz'), ort = _val('ort'), str = [_val('str'), _val('hnr')].filter(Boolean).join(' ');
+    var addr = [str, (plz + ' ' + ort).trim()].filter(Boolean).join(', ');
+    if (!addr || !_token()) return null;
+    try {
+      var g = await fetch(_apiBase() + '/marktbericht/geocode?address=' + encodeURIComponent(addr), { headers: { 'Authorization': 'Bearer ' + _token() } });
+      var gd = await g.json().catch(function () { return null; });
+      var st = gd && gd.components && gd.components.state;
+      var code = st && LAND_AUS_NAME[st] ? LAND_AUS_NAME[st] : null;
+      /* andere PLZ in der Antwort = anderer Ort (v2374), dann lieber kein Land */
+      var gp = gd && gd.components && gd.components.postcode ? String(gd.components.postcode) : '';
+      if (gp && /^\d{5}$/.test(plz) && gp !== plz) code = null;
+      _portalLand = { adr: _portalAdresse(), code: code };
+      return code;
+    } catch (e) { return null; }
+  }
+  function _portalZiel(code) { return code && BORIS_URLS[code] ? BORIS_URLS[code] : BORIS_FALLBACK; }
+  /** Beschriftung des Knopfs: „Bodenrichtwert-Portal Bayern" - ohne bekanntes Land nur „Bodenrichtwert-Portal". */
+  function portalBeschriften() {
+    var n = document.querySelector('[data-brw-portal-name]'); if (!n) return;
+    var code = _portalCode();
+    n.textContent = 'Bodenrichtwert-Portal' + (code && BORIS_URLS[code] ? ' ' + BORIS_URLS[code].name : '');
+    var b = n.closest('button'); if (b) b.title = code ? 'Öffnet das Bodenrichtwert-Portal von ' + BORIS_URLS[code].name : 'Öffnet das Bodenrichtwert-Portal des Bundeslandes (nach Adresse)';
+    /* Grenz-PLZ mit vollständiger Adresse: das Land im Hintergrund holen (einmal je Adresse) */
+    if (!code && _val('plz') && _val('ort') && _portalLand.adr !== _portalAdresse()) {
+      clearTimeout(_portalT);
+      _portalT = setTimeout(function () { _portalCodeHolen().then(function (c) { if (c) portalBeschriften(); }); }, 900);
+    }
+  }
+  var _portalT = null;
+
+  async function openBoris() {
     var plz = _val('plz');
     var ort = _val('ort');
     var str = _val('str');
-    
-    var bl = _plzToBundesland(plz);
-    var target = bl && BORIS_URLS[bl] ? BORIS_URLS[bl] : BORIS_FALLBACK;
-    
+    var code = _portalCode();
+    /* Fenster SOFORT öffnen (sonst blockt der Browser das Popup nach dem await),
+       das Ziel kommt nach, sobald das Land feststeht */
+    var w = code ? null : window.open('about:blank', '_blank');
+    if (!code) code = await _portalCodeHolen();
+    var target = _portalZiel(code);
+    portalBeschriften();
+
     if (typeof toast === 'function') {
-      var hint = 'BORIS ' + target.name;
+      var hint = 'Bodenrichtwert-Portal ' + target.name;
       if (str && plz && ort) {
         hint += ' — suche: ' + str + ', ' + plz + ' ' + ort;
       } else if (plz && ort) {
@@ -199,9 +259,15 @@
       }
       toast('🔗 ' + hint);
     }
-    
-    window.open(target.url, '_blank', 'noopener,noreferrer');
+
+    if (w) { try { w.opener = null; w.location.href = target.url; } catch (e) { window.open(target.url, '_blank', 'noopener,noreferrer'); } }
+    else window.open(target.url, '_blank', 'noopener,noreferrer');
   }
+  ['plz', 'ort', 'str', 'hnr'].forEach(function (id) {
+    document.addEventListener('input', function (ev) { if (ev.target && ev.target.id === id) { portalBeschriften(); } }, true);
+  });
+  window.addEventListener('dp:object-ready', function () { setTimeout(portalBeschriften, 300); });
+  setTimeout(portalBeschriften, 1500);
 
   // ── KI-Anfrage ───────────────────────────────────────────────
   async function askAi() {
@@ -941,6 +1007,7 @@
 
   window.DealPilotBrw = {
     openBoris: openBoris,
+    portalBeschriften: portalBeschriften,
     fetchBoris: fetchBoris,
     borisHolen: borisHolen,          /* v1288: der reine Abruf, ohne DOM */
     verfuegbarFuerPlz: borisAvailableForPlz,

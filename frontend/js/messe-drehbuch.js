@@ -4540,9 +4540,9 @@
         await b2oZeile(s, 'Aus BORIS', '<b>' + (wert('brw') || '–') + ' €/m²</b>' + (st ? ' — ' + st.replace(/^✓\s*/, '') : '') + (vor && vor !== wert('brw') ? ' (vorher ' + vor + ')' : '') + '.');
       },
       async function (s) {   /* 4 · das Portal */
-        var p = function () { return [].filter.call(document.querySelectorAll('.btn-brw'), function (x) { return x.offsetWidth && /BORIS-Portal/.test(x.textContent); })[0] || null; };
+        var p = function () { return [].filter.call(document.querySelectorAll('.btn-brw'), function (x) { return x.offsetWidth && /Bodenrichtwert-Portal|BORIS-Portal/.test(x.textContent); })[0] || null; };
         await zeige(p, 10);
-        await b2oZeile(s, 'Zum Nachsehen', 'Der Knopf daneben öffnet das <b>BORIS-Portal</b> des Bundeslands — mit Karte, Zone und Stichtag.');
+        await b2oZeile(s, 'Zum Nachsehen', 'Der Knopf daneben öffnet das <b>Bodenrichtwert-Portal</b> des Bundeslands — mit Karte, Zone und Stichtag.');
       },
       async function (s) {   /* 5 · Unterlagen beim Amt */
         reiter('s8'); await warte(1200);

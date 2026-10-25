@@ -228,7 +228,7 @@
         },
         {
           h: 'Steuerzeiträume: zvE im Zeitverlauf',
-          body: 'Dein Einkommen ändert sich — etwa nach einer Lohnerhöhung. Dafür gibt es Steuerzeiträume.\n\nSo geht\'s:\n1. Im Reiter Steuer auf <strong>📅 Steuerzeiträume verwalten →</strong> klicken. Du landest in den Einstellungen unter <strong>Mandanten</strong> bei deinem privaten Halter.\n2. Unter „Neuen Zeitraum hinzufügen“ <strong>Gültig von</strong>, <strong>Gültig bis (leer = laufend)</strong>, <strong>zvE / Jahr (€)</strong>, einen <strong>Grund</strong> und optional eine Notiz eintragen.\n3. <strong>Hinzufügen</strong>.\n\nÜberschneidet sich der neue Zeitraum mit einem bestehenden, zeigt DealPilot den Konflikt. Du kannst abbrechen oder „Trotzdem als neuen Zeitraum anlegen“.\n\nFür jedes Steuerjahr nimmt die Rechnung das zvE des Zeitraums, der zur Jahresmitte gilt. Liegt keiner vor, gilt das zvE aus dem Reiter Steuer.'
+          body: 'Dein Einkommen ändert sich — etwa nach einer Lohnerhöhung. Dafür gibt es Steuerzeiträume.\n\nSo geht\'s:\n1. Im Reiter Steuer auf <strong>Steuerzeiträume verwalten →</strong> klicken. Du landest in den Einstellungen unter <strong>Mandanten</strong> bei deinem privaten Halter.\n2. Unter „Neuen Zeitraum hinzufügen“ <strong>Gültig von</strong>, <strong>Gültig bis (leer = laufend)</strong>, <strong>zvE / Jahr (€)</strong>, einen <strong>Grund</strong> und optional eine Notiz eintragen.\n3. <strong>Hinzufügen</strong>.\n\nÜberschneidet sich der neue Zeitraum mit einem bestehenden, zeigt DealPilot den Konflikt. Du kannst abbrechen oder „Trotzdem als neuen Zeitraum anlegen“.\n\nFür jedes Steuerjahr nimmt die Rechnung das zvE des Zeitraums, der zur Jahresmitte gilt. Liegt keiner vor, gilt das zvE aus dem Reiter Steuer.'
         },
         {
           h: 'AfA-Satz, Gebäudeanteil und § 7b',
@@ -651,7 +651,7 @@
         },
         {
           h: 'Wie lege ich einen Steuerzeitraum an?',
-          body: 'Ein Steuerzeitraum hält dein zu versteuerndes Einkommen (zvE) für eine Zeitspanne fest — etwa vor und nach einer Lohnerhöhung.\n\n<strong>So geht\'s:</strong>\n1. Im Reiter Steuer auf „📅 Steuerzeiträume verwalten →“ klicken. Es öffnet sich Einstellungen → Mandanten, dein privater Halter.\n2. Unter „Neuen Zeitraum hinzufügen“: „Gültig von“, „Gültig bis (leer = laufend)“, „zvE / Jahr (€)“, „Grund“ und „Notiz (optional)“ ausfüllen.\n3. „Hinzufügen“ klicken.\n\nÜberschneidet sich der Zeitraum mit einem bestehenden, fragt DealPilot nach. Je Objekt wird der passende Zeitraum über den „Wirtsch. Übergang“ zugeordnet — ein zvE, das du selbst ins Objekt geschrieben hast, bleibt stehen. Ändern mit „Bearb.“, löschen mit „×“.'
+          body: 'Ein Steuerzeitraum hält dein zu versteuerndes Einkommen (zvE) für eine Zeitspanne fest — etwa vor und nach einer Lohnerhöhung.\n\n<strong>So geht\'s:</strong>\n1. Im Reiter Steuer auf „Steuerzeiträume verwalten →“ klicken. Es öffnet sich Einstellungen → Mandanten, dein privater Halter.\n2. Unter „Neuen Zeitraum hinzufügen“: „Gültig von“, „Gültig bis (leer = laufend)“, „zvE / Jahr (€)“, „Grund“ und „Notiz (optional)“ ausfüllen.\n3. „Hinzufügen“ klicken.\n\nÜberschneidet sich der Zeitraum mit einem bestehenden, fragt DealPilot nach. Je Objekt wird der passende Zeitraum über den „Wirtsch. Übergang“ zugeordnet — ein zvE, das du selbst ins Objekt geschrieben hast, bleibt stehen. Ändern mit „Bearb.“, löschen mit „×“.'
         },
         {
           h: 'Kann ich die Steuerwerte aus dem Vorjahr übernehmen?',

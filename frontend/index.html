@@ -1160,8 +1160,8 @@ label.dp-required.qc-required::after {
                 <button type="button" class="btn-brw" id="brw-boris-btn" onclick="DealPilotBrw.fetchBoris()" title="Bodenrichtwert direkt abrufen — gratis (Open Data)">
                   <span class="btn-brw-icon">📍</span> Bodenrichtwert abrufen
                 </button>
-                <button type="button" class="btn-brw" onclick="DealPilotBrw.openBoris()" title="Öffnet BORIS-Portal des passenden Bundeslandes">
-                  <span class="btn-brw-icon">🔗</span> BORIS-Portal
+                <button type="button" class="btn-brw" id="brw-portal-btn" onclick="DealPilotBrw.openBoris()" title="Öffnet das Bodenrichtwert-Portal des Bundeslandes (nach Adresse)"><!-- v2949: hiess „BORIS-Portal", die Länder nennen ihre Portale verschieden -->
+                  <span class="btn-brw-icon">🔗</span> <span data-brw-portal-name>Bodenrichtwert-Portal</span>
                 </button>
                 <button type="button" class="btn-brw" id="brw-ai-btn" onclick="DealPilotBrw.askAi()" title="DealPilot schätzt den Bodenrichtwert anhand der Adresse — bitte trotzdem auf BORIS verifizieren">
                   <span class="btn-brw-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg></span> Bodenrichtwert schätzen
@@ -2136,7 +2136,7 @@ label.dp-required.qc-required::after {
   <div style="flex:1;font-size:12.5px;line-height:1.5">
     <strong style="font-weight:600">Dein zvE wird zentral im Profil gespeichert.</strong>
     Änderungen hier werden in dein Profil übernommen. Für historische Jahre (z.B. vor einer Lohnerhöhung) kannst du im Profil eigene Einträge hinterlegen. <!-- V258-01 -->
-    <a href="#" class="v842-tax-link" onclick="window._v842OpenTaxPeriods();return false" style="color:var(--gold,#C9A84C);font-weight:600;text-decoration:underline;margin-left:4px">📅 Steuerzeiträume verwalten →</a> <!-- v842-tax-redirect --> <!-- V259-06 --> <!-- v1118b: Klasse nur als Angriffspunkt fuer die 44-px-Regel -->
+    <a href="#" class="v842-tax-link" onclick="window._v842OpenTaxPeriods();return false" style="color:var(--gold,#C9A84C);font-weight:600;text-decoration:underline;margin-left:4px"><svg width="13" height="13" aria-hidden="true" style="vertical-align:-2px;margin-right:4px"><use href="#i-calendar"/></svg>Steuerzeiträume verwalten →</a><!-- v2949: Emoji 📅 (unter Windows blaues Kästchen) durch das Kalender-Symbol des Icon-Satzes ersetzt --> <!-- v842-tax-redirect --> <!-- V259-06 --> <!-- v1118b: Klasse nur als Angriffspunkt fuer die 44-px-Regel -->
   </div>
 </div>
 <div class="f"><label>Zu versteuerndes Einkommen (zvE) vor Immobilie / Jahr <button type="button" class="dp-tip" data-tip-id="tab4.zve" tabindex="-1" aria-label="Hilfe zu zvE"></button></label><div class="iw"><span class="pfx">€</span><input id="zve" type="text" inputmode="decimal" placeholder="60000" class="trl" oninput="if(window.DealPilotZvE)DealPilotZvE.onObjectInput(this.value);calc()"></div></div>
@@ -3641,7 +3641,7 @@ label.dp-required.qc-required::after {
 <script src="js/erbbau-ui.js?v=v1312"></script>
   <script src="js/afa-ui.js?v=v1439"></script>
   <script src="js/zve-manager.js?v=v2180"></script>
-  <script src="js/tax-periods.js?v=v2892a"></script>
+  <script src="js/tax-periods.js?v=v2949"></script>
   <script src="js/tax-periods-sync.js?v=1"></script>
   <script src="js/zve-smart.js?v=1"></script>
   <script src="js/wk-aggregator.js?v=v2891"></script>
@@ -3735,7 +3735,7 @@ label.dp-required.qc-required::after {
 <script src="js/import-export-modal.js?v=v1678"></script>
 <script src="js/quick-check.js?v=v2546a"></script>
 <script src="js/qc-bridge.js?v=qc-v2780b"></script>
-<script src="js/bodenrichtwert.js?v=v2592"></script>
+<script src="js/bodenrichtwert.js?v=v2949"></script>
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
 <script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/objekt-reiter.js?v=v2557"></script>
@@ -3753,12 +3753,12 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v2833"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v2870"></script>
+<script src="js/help.js?v=v2949"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v2410"></script>
 <script src="js/prozess-atlas-gesamt.js?v=v2218f"></script>
-<script src="js/messe-drehbuch.js?v=v2942"></script>
+<script src="js/messe-drehbuch.js?v=v2949"></script>
 <script src="js/hinweise.js?v=v2204"></script>
 <script src="js/pilot-tower.js?v=v2252"></script>
   <script src="js/dp-band-fix.js?v=1117"></script> <!-- v863-band-fix, v1117: 32/15 -->
