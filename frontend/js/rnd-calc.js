@@ -108,10 +108,21 @@
     { id: 'grundriss',    label: 'Wesentliche Veränderung Grundriss',    weight: 15 }
   ];
 
+  /* v2943 · VIER STUFEN, nicht drei. Die Gutachten (25DG02661, 25DG06644,
+     Kap. 5.3.2) meinen mit „aktueller Standard" ein ERNEUERTES Gewerk
+     (Am Markt 18: technische Ausstattung, Sanierung vor 5-10 Jahren) und
+     mit „niedrig / veraltet" ein ursprüngliches (> 20 Jahre). Die App
+     fragte „entspricht heutigen Anforderungen" - darunter fiel auch das
+     ursprüngliche, aber zeitgemäße Bauteil. Das bleibt neutral
+     (`standard`, Marcels Festlegung 1 vom 10.10.2026: es wirkt über die
+     Punkte nach Anlage 2); das erneuerte bekommt die eigene Stufe
+     `erneuert`. Die Kennung `standard` behält ihre Wirkung seit v2074,
+     damit gespeicherte Bewertungen nicht still umrechnen. */
   const GRADE = {
-    veraltet: { id: 'veraltet', label: 'niedrig / veraltet' },
-    standard: { id: 'standard', label: 'aktueller Standard' },
-    gehoben:  { id: 'gehoben',  label: 'zukunftsorientiert / gehoben' }
+    veraltet: { id: 'veraltet', label: 'niedrig / veraltet', hinweis: 'ursprünglich, nicht mehr zeitgemäß' },
+    standard: { id: 'standard', label: 'zeitgemäß, ursprünglich', hinweis: 'nie erneuert, entspricht aber heutigen Anforderungen' },
+    erneuert: { id: 'erneuert', label: 'aktueller Standard (erneuert)', hinweis: 'in den letzten rund 20 Jahren erneuert' },
+    gehoben:  { id: 'gehoben',  label: 'zukunftsorientiert / gehoben', hinweis: 'erneuert und über dem heutigen Standard' }
   };
 
   /* ── Schadens-Katalog mit orientierenden RND-Abschlägen ──────────────
@@ -348,6 +359,9 @@
    *   zeitgemaess (standard): NEUTRAL        → siehe unten
    *   gehoben:   RND-Basis × Anteil/100 / 2  → maessiger AUFSCHLAG
    *
+   *   (Stand v2074 bis v2942 - seit v2943 gilt wieder die Formel der
+   *   Gutachten mit vier Stufen, siehe den Block direkt ueber calcTechnisch.)
+   *
    * ── v2074 · ZEITGEMAESSHEIT IST KEIN AUFSCHLAG ──────────────────────
    *
    * HIER STAND "Aktueller Standard: AUFSCHLAG (NICHT neutral!)" mit
@@ -392,9 +406,31 @@
    * bewertete Gewerke werden jetzt gezaehlt und in `unbewertet_pct`
    * ausgewiesen; sie wirken neutral, behaupten aber nichts.
    */
+  /*
+   * ── v2943 · ZURÜCK ZUM RECHENWEG DER GUTACHTEN ───────────────────────
+   * v2074 hatte den Aufschlag für „aktueller Standard" gestrichen und
+   * `gehoben` halbiert. Die Ursache war richtig gemessen (ein 28 Jahre
+   * altes, nie modernisiertes Haus kam auf 78 von 80 Jahren), lag aber
+   * in der BEDEUTUNG der Stufe, nicht in der Formel: „aktueller Standard"
+   * heißt im Gutachten ERNEUERT. Nachgerechnet am 23.10.2026:
+   *
+   *   Am Markt 18 (25DG02661): 40 - 40x85%/2 + 40x15%/2 = 26,00  Gutachten 26,00
+   *   Am Markt 9  (25DG06644): 44 - 44x100%/2           = 22,00  Gutachten 22,00
+   *
+   * Seit v2074 kam Am Markt 18 auf 23. Jetzt wieder die Formel des
+   * Gutachtens - mit vier Stufen (siehe GRADE):
+   *
+   *   veraltet:  - Basis x Anteil / 2
+   *   standard:  0  (zeitgemäß, ursprünglich - v2074, Festlegung 1)
+   *   erneuert:  + Basis x Anteil / 2   (Gutachten: „aktueller Standard")
+   *   gehoben:   + Basis x Anteil       (Gutachten: volle Gewichtung)
+   *
+   * Der 0,90-Deckel und „nicht bewertet ist nicht zeitgemäß" aus v2074
+   * bleiben. Prüfer: tools/rnd-pruefung/rnd-gutachten-test.mjs.
+   */
   function calcTechnisch(alter, gnd, gewerkeBewertung, gewerkeWeights, gewerkeRestlebensdauer) {
     const weights = gewerkeWeights || {};
-    let pctVeraltet = 0, pctStandard = 0, pctGehoben = 0, pctUnbewertet = 0, totalWeight = 0;
+    let pctVeraltet = 0, pctStandard = 0, pctErneuert = 0, pctGehoben = 0, pctUnbewertet = 0, totalWeight = 0;
 
     // Gewerke mit ihren prozentualen Anteilen aufaddieren (wie im Original-Gutachten Kap. 5.3.2)
     GEWERKE.forEach(function (g) {
@@ -402,6 +438,7 @@
       totalWeight += w;
       const grad = (gewerkeBewertung && gewerkeBewertung[g.id]) || null;
       if (grad === 'veraltet') pctVeraltet += w;
+      else if (grad === 'erneuert') pctErneuert += w;
       else if (grad === 'gehoben') pctGehoben += w;
       else if (grad === 'standard') pctStandard += w;
       else pctUnbewertet += w;   /* v2074: nicht bewertet, nicht "zeitgemaess" */
@@ -411,6 +448,7 @@
     if (totalWeight > 0 && totalWeight !== 100) {
       pctVeraltet   = (pctVeraltet   / totalWeight) * 100;
       pctStandard   = (pctStandard   / totalWeight) * 100;
+      pctErneuert   = (pctErneuert   / totalWeight) * 100;
       pctGehoben    = (pctGehoben    / totalWeight) * 100;
       pctUnbewertet = (pctUnbewertet / totalWeight) * 100;
     }
@@ -418,13 +456,13 @@
     // Lineare Basis (= Regelfallformel: GND - Alter)
     const rndBasis = Math.max(0, gnd - alter);
 
-    /* v2074: zeitgemaess wirkt neutral (siehe Kopf), gehoben mit halber
-       Gewichtung, veraltet zieht ab. */
+    /* v2943: Formel der Gutachten (siehe oben); zeitgemäß-ursprünglich neutral. */
     const abzugVeraltet     = rndBasis * pctVeraltet / 100 / 2;
     const aufschlagStandard = 0;
-    const aufschlagGehoben  = rndBasis * pctGehoben  / 100 / 2;
+    const aufschlagErneuert = rndBasis * pctErneuert / 100 / 2;
+    const aufschlagGehoben  = rndBasis * pctGehoben  / 100;
 
-    let rnd = rndBasis - abzugVeraltet + aufschlagStandard + aufschlagGehoben;
+    let rnd = rndBasis - abzugVeraltet + aufschlagStandard + aufschlagErneuert + aufschlagGehoben;
     /* v2074: Obergrenze 0,90 x GND - was eine Kernsanierung nach
        Anlage 2 nicht erreicht, erreicht ein Gebaeude ohne sie nicht. */
     const technischMax = gnd * 0.90;
@@ -450,6 +488,7 @@
 
     // Formel im Gutachter-Format (1:1 wie im Original):
     const formula = fmtNum2(rndBasis) + ' Jahre - ' + fmtNum2(abzugVeraltet) + ' Jahre + '
+                  + fmtNum2(aufschlagErneuert) + ' Jahre + '
                   + fmtNum2(aufschlagGehoben) + ' Jahre = ' + fmtNum2(rnd) + ' Jahre'
                   + (gedeckelt ? ' (gedeckelt auf 0,90 x GND = ' + fmtNum2(technischMax) + ')' : '');
 
@@ -462,16 +501,18 @@
       gedeckelt_auf_90_prozent: gedeckelt,
       anteil_veraltet_pct: round2(pctVeraltet),
       anteil_standard_pct: round2(pctStandard),
+      anteil_erneuert_pct: round2(pctErneuert),
       anteil_gehoben_pct: round2(pctGehoben),
       rnd_basis_linear: round2(rndBasis),
       abzug_veraltet: round2(abzugVeraltet),
       aufschlag_standard: round2(aufschlagStandard),
+      aufschlag_erneuert: round2(aufschlagErneuert),
       aufschlag_gehoben: round2(aufschlagGehoben),
       alterswertminderung_pct: round2(awm),
       restnutzungsdauer: round2(rnd),
       bte_plausibilitaet: btePlausibilitaet,
       formula: formula,
-      formula_short: 'RND = (G-A) - V/2 + S/2 + G',
+      formula_short: 'RND = (G-A) - V/2 + E/2 + Geh',
       result_text: 'Technische RND: ' + round2(rnd) + ' Jahre (' + round2(awm) + '% AWM)'
     };
   }
@@ -1063,7 +1104,7 @@
    * Mapping:
    *   rate_X = 1-2 → 'veraltet'
    *   rate_X = 3   → 'standard'
-   *   rate_X = 4-5 → 'gehoben'
+   *   rate_X = 4 → 'erneuert', 5 → 'gehoben' (v2943)
    *   ds2_zustand = 'gut' / 'mittel' / 'schlecht' beeinflusst nicht-gerateten Gewerke
    *   ds2_energie F/G/H → Schaden 'energetisch_kritisch'
    *
@@ -1086,7 +1127,8 @@
       if (isNaN(n) || n === 0) return null;
       if (n <= 2) return 'veraltet';
       if (n === 3) return 'standard';
-      return 'gehoben';
+      /* v2943: gut = erneuert (halber Aufschlag wie bis v2942), nur sehr gut = gehoben */
+      return n === 4 ? 'erneuert' : 'gehoben';
     }
 
     /* ── v2080 · DIE VERGLEICHSWERTE PASSTEN ZU KEINER ECHTEN OPTION ────
@@ -1126,7 +1168,8 @@
       const z = String(zustand).toLowerCase();
       /* Die echten Optionen des Formulars, zuerst geprüft. */
       if (z.indexOf('sanierungsbed') >= 0 || z.indexOf('renovierungsbed') >= 0) return 'veraltet';
-      if (z.indexOf('kernsaniert') >= 0 || z.indexOf('neubau') >= 0) return 'gehoben';
+      /* v2943: kernsaniert/Neubau = erneuert (aktueller Standard), nicht gehoben */
+      if (z.indexOf('kernsaniert') >= 0 || z.indexOf('neubau') >= 0) return 'erneuert';
       if (z.indexOf('normal') >= 0 || z.indexOf('gut') >= 0) return 'standard';
       /* Altdatensätze und freie Eingaben. */
       if (z.indexOf('schlecht') >= 0 || z.indexOf('veraltet') >= 0
@@ -1137,13 +1180,13 @@
     }
 
     // Energieklassen-Mapping (konservativ):
-    //   A/A+ → 'gehoben' (energetisch top, Heizung/Dämmung modern)
+    //   A/A+ → 'erneuert' (energetisch top, Heizung/Dämmung modern; v2943: nicht 'gehoben')
     //   B/C/D → 'standard' (zeitgemäß)
     //   E → 'standard' (durchschnittlich, kein Veraltetheitssignal)
     //   F/G/H → 'veraltet' + Schaden-Eintrag
     function energieToGrad(energie) {
       const e = String(energie || '').toUpperCase().trim();
-      if (e === 'A' || e === 'A+') return 'gehoben';
+      if (e === 'A' || e === 'A+') return 'erneuert';
       if (e === 'B' || e === 'C' || e === 'D' || e === 'E') return null; // neutral
       if (e === 'F' || e === 'G' || e === 'H') return 'veraltet';
       return null;
@@ -1163,7 +1206,7 @@
     const gradKueche   = rateToGrad(d.rate_kueche); // küche kein direktes Gewerk — mit Bädern
     
     // Mehrheits-Heuristik für unbewertete Gewerke
-    const counter = { veraltet: 0, standard: 0, gehoben: 0 };
+    const counter = { veraltet: 0, standard: 0, erneuert: 0, gehoben: 0 };   /* v2943: erneuert */
     [gradBaeder, gradFenster, gradBoden, gradKueche].forEach(function (g) {
       if (g) counter[g]++;
     });

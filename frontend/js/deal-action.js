@@ -325,7 +325,7 @@ window.DealPilotDealAction = (function() {
         ? DealPilotRND_GND.suggestFromObjectType(objektTyp) : 'mfh';
       var gnd = (typeof DealPilotRND_GND !== 'undefined' && DealPilotRND_GND.getDefault)
         ? DealPilotRND_GND.getDefault(typId) : 80;
-      var gewerke = sanstand <= 2 ? { fenster: 'gehoben', dach: 'gehoben', heizung: 'gehoben' }
+      var gewerke = sanstand <= 2 ? { fenster: 'erneuert', dach: 'erneuert', heizung: 'erneuert' }   /* v2943: saniert = erneuert */
                   : sanstand === 3 ? { fenster: 'standard', dach: 'standard', heizung: 'standard' }
                   : { fenster: 'veraltet', dach: 'veraltet', heizung: 'veraltet' };
 

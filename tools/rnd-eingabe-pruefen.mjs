@@ -108,7 +108,12 @@ for (const bj of [1930, 1900]) {
   console.log('  Bj ' + bj + ' (Alter ' + (2026 - bj) + '): final=' + rr.final_rnd
     + ' | gesperrt=' + rr.pruefung.uebernahme_gesperrt
     + ' | grund=' + rr.pruefung.grund);
-  if (rr.final_rnd !== 0) { fehler++; console.log('    FEHLT: sollte 0 sein (keine Extrapolation)'); }
+  /* v2943 · HIER STAND „sollte 0 sein (keine Extrapolation)" - rot seit v2939 (ImmoWertA II.5:
+     als Alter gilt höchstens die GND). Mit Punkten rechnet Anlage 2 jetzt AN der GND, nicht
+     dahinter: dasselbe Ergebnis wie ein Haus mit Alter = GND, unabhängig davon, wie viel älter. */
+  const amRand = RND.calcAll({ baujahr: 2026 - 80, stichtag: '2026-10-10', gnd: 80, modPoints: 11,
+    gewerkeBewertung: {}, schaeden: [] });
+  if (rr.final_rnd !== amRand.final_rnd) { fehler++; console.log('    FEHLT: sollte ' + amRand.final_rnd + ' sein wie bei Alter = GND (keine Extrapolation)'); }
   if (!rr.pruefung.erforderlich) { fehler++; console.log('    FEHLT: Pruefung muss erforderlich sein'); }
   if (!rr.pruefung.uebernahme_gesperrt) { fehler++; console.log('    FEHLT: Uebernahme muss gesperrt sein'); }
 }
@@ -264,7 +269,7 @@ for (const [feld, wert] of [['plz', 32609], ['ort', 123], ['str', 5], ['hnr', 9]
 /* b) Der Zustands-Rueckfall muss die ECHTEN Formular-Optionen treffen.
       Vorher ergaben alle fuenf "standard" - das Feld war wirkungslos. */
 const ECHTE_ZUSTAENDE = [
-  ['Neubau / kernsaniert', 'gehoben'],
+  ['Neubau / kernsaniert', 'erneuert'],   /* v2943: Gutachten „aktueller Standard" = erneuert */
   ['Guter Zustand', 'standard'],
   ['Normaler Zustand', 'standard'],
   ['Renovierungsbedürftig', 'veraltet'],

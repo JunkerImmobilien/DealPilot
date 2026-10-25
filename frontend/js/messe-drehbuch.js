@@ -4001,8 +4001,15 @@
     var u = blob.__url || (blob.__url = URL.createObjectURL(blob)); if (_r19.url.indexOf(u) < 0) _r19.url.push(u);
     var o = el('dpm-pdf');
     o.style.cssText = 'position:fixed;left:4%;right:4%;top:3%;bottom:4%;z-index:100002;background:#2b2b2b;border:2px solid ' + G + ';border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)';
-    o.innerHTML = '<iframe title="PDF" style="width:100%;height:100%;border:0" src="' + u + '#page=' + n + '&toolbar=0&navpanes=0&view=FitH' + (oben ? ',' + oben : '') + '"></iframe>';
+    /* v2942 · die neue Seite lädt UNSICHTBAR über der alten und wird erst nach der Ladezeit
+       eingeblendet - direkt vor dem nächsten Kapitelband. Gemessen in Aufnahme v2941b: die
+       Seite sprang sonst ~4 s vor dem Band, weil warte(4000) NACH dem Wechsel lief. */
+    var alt = [].slice.call(o.querySelectorAll('iframe')), f = document.createElement('iframe');
+    f.title = 'PDF'; f.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;opacity:' + (alt.length ? 0 : 1);
+    f.src = u + '#page=' + n + '&toolbar=0&navpanes=0&view=FitH' + (oben ? ',' + oben : '');
+    o.appendChild(f);
     await warte(4000);
+    f.style.opacity = 1; alt.forEach(function (x) { if (x.parentNode) x.parentNode.removeChild(x); });
   }
   /* v2940 · SEITE NACH UEBERSCHRIFT, NICHT NACH NUMMER. Gemessen bei der Neuaufnahme
      23.10.2026: die Bankfassung hat inzwischen 11 statt 8 Seiten - Szene 8 zeigte die

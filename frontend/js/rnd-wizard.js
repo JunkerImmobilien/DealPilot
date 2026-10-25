@@ -1101,8 +1101,11 @@
 
     let html = '<div class="rnd-wiz-info-box">'
       + '<strong>Wie ist der aktuelle Zustand jedes Gewerks?</strong><br>'
-      + '„niedrig/veraltet" = nicht zeitgemäß · „aktueller Standard" = entspricht heutigen '
-      + 'Anforderungen · „zukunftsorientiert/gehoben" = übersteigt aktuellen Standard.'
+      /* v2943 · vier Stufen wie im Gutachten (Kap. 5.3.2): „aktueller Standard" heißt dort ERNEUERT.
+         Ursprünglich, aber zeitgemäß bleibt neutral und zählt über die Modernisierungspunkte. */
+      + '„veraltet" = ursprünglich, nicht mehr zeitgemäß (Abzug) · „zeitgemäß" = nie erneuert, '
+      + 'entspricht aber heutigen Anforderungen (neutral) · „erneuert" = aktueller Standard, in den '
+      + 'letzten rund 20 Jahren erneuert (Aufschlag) · „gehoben" = erneuert und über dem heutigen Standard.'
       + '</div>';
 
     html += '<table class="rnd-wiz-gewerke-tab">'
@@ -1110,7 +1113,8 @@
       + '<th>Gewerk</th>'
       + '<th>Gewicht</th>'
       + '<th>veraltet</th>'
-      + '<th>Standard</th>'
+      + '<th>zeitgemäß</th>'
+      + '<th>erneuert</th>'
       + '<th>gehoben</th>'
       + '</tr></thead><tbody>';
 
@@ -1122,7 +1126,7 @@
       html += '<tr>'
         + '<td>' + label + '</td>'
         + '<td class="center">' + w + '%</td>'
-        + ['veraltet', 'standard', 'gehoben'].map(function (grad) {
+        + ['veraltet', 'standard', 'erneuert', 'gehoben'].map(function (grad) {
             return '<td class="center"><input type="radio" name="gw_' + id + '" value="' + grad
               + '"' + (cur === grad ? ' checked' : '') + ' data-gewerk="' + id + '"></td>';
           }).join('')
