@@ -89,7 +89,9 @@
     /* Das Cockpit-Markup baut `ensureMarkup()`; erst danach gibt es
        `#dp-stage`. Ohne die Buehne haengen wir an den Behaelter selbst -
        dann steht der Pilot zwar unten, aber er steht. */
-    var ziel = host.querySelector('#dp-stage') || host;
+    /* v2951 · Marcel: „dort, wo die Auswertung steht, den Portfolio-Piloten
+       hinpacken" - das Cockpit legt dafuer #dp-pp-slot hinter Bestand & Zielbild an. */
+    var ziel = host.querySelector('#dp-pp-slot') || host.querySelector('#dp-stage') || host;
 
     var box = document.createElement('section');
     box.id = 'dp-pp';
@@ -103,8 +105,12 @@
         '</div>' +
         '<label class="dp-pp-web" title="Erlaubt dem Portfolio-Piloten, für aktuelle Marktdaten im Web zu recherchieren">' +
           '<input type="checkbox" id="dp-pp-web"><span>Web-Recherche</span></label>' +
+        '<button type="button" class="dp-pp-go dp-pp-zb" id="dp-pp-zb">Bestand &amp; Zielbild erklären</button>' +
         '<button type="button" class="dp-pp-go" id="dp-pp-go">Portfolio-Analyse starten</button>' +
       '</div>' +
+      /* v2951 · was ein Lauf kostet, VOR dem Klick: /ai/copilot zieht kein Kontingent,
+         zaehlt aber zum Tageslimit des Co-Piloten (routes/ai.js COPILOT_PLAN_LIMITS). */
+      '<div class="dp-pp-kosten">KI-Text · kostet <b>kein Kontingent</b>, zählt zum Tageslimit des Co-Piloten (je nach Tarif 10 bis 300 Antworten am Tag). Der Pilot rechnet nicht selbst – er erklärt die Zahlen des Cockpits; jede Betrags- und Prozentangabe wird danach gegen diese Zahlen geprüft.</div>' +
       /* v2018 - der Stand der letzten Analyse. Wird nach dem Aufbau
          gefuellt (standZeigen); leer ist er unsichtbar. */
       '<div class="dp-pp-stand" id="dp-pp-stand" style="display:none"></div>' +
@@ -135,6 +141,8 @@
     if (w) w.addEventListener('change', function () { allowWeb = this.checked; });
     var g = el('dp-pp-go');
     if (g) g.addEventListener('click', analyse);
+    var zb = el('dp-pp-zb');
+    if (zb) zb.addEventListener('click', zielbildErklaeren);   /* v2951 */
     /* Ein Horcher am Behaelter statt vier an den Knoepfen - die Chips
        werden nie neu gebaut, aber ein Horcher je Knopf waere trotzdem
        vier Stellen, an denen man einen vergessen kann. */
@@ -202,13 +210,13 @@
      schlimmer als keine. */
   /* v2170: erst die Objekte frisch laden (DealPilotDashboard.frisch), dann
      senden - sonst rechnet der Pilot mit dem Stand vom Seitenaufruf. */
-  function senden(nachricht, sichtbar, istAnalyse) {
+  function senden(nachricht, sichtbar, istAnalyse, opts) {
     if (laeuft) return;
     var D = window.DealPilotDashboard;
     var p = (D && typeof D.frisch === 'function') ? D.frisch() : null;
-    Promise.resolve(p).catch(function () {}).then(function () { _senden(nachricht, sichtbar, istAnalyse); });
+    Promise.resolve(p).catch(function () {}).then(function () { _senden(nachricht, sichtbar, istAnalyse, opts); });
   }
-  function _senden(nachricht, sichtbar, istAnalyse) {
+  function _senden(nachricht, sichtbar, istAnalyse, opts) {
     if (laeuft) return;
     var ctx = kontext();
 
@@ -223,7 +231,8 @@
     }
 
     laeuft = true;
-    var gknopf = el('dp-pp-go'), sknopf = el('dp-pp-send');
+    var gknopf = el('dp-pp-go'), sknopf = el('dp-pp-send'), zknopf = el('dp-pp-zb');
+    if (zknopf) zknopf.disabled = true;
     if (gknopf) gknopf.disabled = true;
     if (sknopf) sknopf.disabled = true;
 
@@ -290,6 +299,8 @@
       } catch (e) {}
       if (reply) addMsg('assistant', reply);
       history.push({ role: 'assistant', content: reply });
+      /* v2951 · Zahlenpruefung gegen die mitgegebenen Zahlen (Vorbild lib/ki_text_pruefung.js) */
+      if (opts && opts.pruefen && reply) { try { var pr = zahlenPruefen(reply, ctx); window.__dpPpPruefung = pr; pruefungZeigen(pr); } catch (e) {} }
       /* v2012 - die ANALYSE (nicht jede Rueckfrage) wird abgelegt,
          damit der Telegram-Bot sie abrufen kann. Marcel: "Das Abrufen
          der Co-Pilot-Analyse muss aus Telegram moeglich sein."
@@ -308,7 +319,8 @@
       addMsg('assistant', '⚠ ' + m);
     }).then(function () {
       laeuft = false;
-      var a = el('dp-pp-go'), b = el('dp-pp-send');
+      var a = el('dp-pp-go'), b = el('dp-pp-send'), zb2 = el('dp-pp-zb');
+      if (zb2) zb2.disabled = false;
       if (a) a.disabled = false;
       if (b) b.disabled = false;
     });
@@ -389,6 +401,73 @@
     }).catch(function () { host.style.display = 'none'; });
   }
 
+  /* ── v2951 · BESTAND & ZIELBILD ERKLAEREN ───────────────────────────
+     Marcel 25.10.2026: „dass der die Auswertung für Bestand und Zielbild neu
+     macht, aber auch eine ausführliche Beschreibung dazu". Die Zahlen stehen
+     fertig im Kontext (context.bestand_zielbild, DealPilotDashboard
+     ._zbPayload) - der Pilot erklaert, er rechnet nicht. */
+  var AUFTRAG_ZB = [
+    'Erkläre mir die Auswertung BESTAND & ZIELBILD meines Portfolios ausführlich und verständlich.',
+    'Grundlage ist ausschließlich context.bestand_zielbild (inklusive gesamtbewertung). Alle Summen, Differenzen und Prozente stehen dort FERTIG - übernimm sie wörtlich, rechne NICHT selbst und runde nicht anders.',
+    'Gliedere so:',
+    '1. Was verglichen wird - Bestand, Mieterhöhung, Zielbild, und über wie viele Objekte (mit/ohne Zielbild, ohne Angaben). Nenne jedes nicht enthaltene Objekt mit seinem Grund.',
+    '2. Die Miete - von Bestand über Mieterhöhung zum Zielbild, mit den Beträgen und dem Prozentwert; warum die Miete laut Objektdaten (kaltmiete_laut_objektdaten_derselben_objekte) davon abweicht.',
+    '3. Maßnahmen und Rendite - Kosten der Maßnahmen und die Bruttomietrendite vorher/nachher.',
+    '4. Der Wert - Ertragswert Bestand, Zielbild, nach Kosten, Wertzuwachs nach Kosten; und wie sich der Ertragswert Bestand zu den Kaufpreisen DERSELBEN Objekte verhält.',
+    '5. Die Objekte einzeln - welches trägt am meisten bei, wo kosten die Maßnahmen mehr, als sie an Wert bringen (mit Namen und Zahlen aus je_objekt).',
+    '6. Wie das zur Gesamtinvestition und zur Vermögensbilanz passt - Kaufpreise, Nebenkosten, Gesamtinvestition, Objektwerte, Restschuld, Eigenkapital (gesamtbewertung) - und warum die Mengen verschieden sind.',
+    '7. Was ich tun sollte - welche Läufe veraltet sind (laeufe_stand), welche Objekte ergänzt werden sollten, und wie neu gerechnet wird (neu_rechnen).',
+    'Schließe mit dem Satz aus kennzeichnung. Keine Markdown-Überschriften, Zwischenzeilen mit Nummer sind gut.'
+  ].join('\n');
+  function zielbildErklaeren() {
+    history = [];
+    var log = el('dp-pp-log');
+    if (log) log.innerHTML = '';
+    senden(AUFTRAG_ZB, 'Bestand & Zielbild erklären', false, { pruefen: true });
+  }
+
+  /* Zahlenpruefung: jede Betrags- (€, Mio) und Prozentangabe im Text muss
+     einer Zahl im mitgegebenen Kontext entsprechen (Rundung: 0,6 % bzw. 1 €,
+     Prozent 0,1 Punkte). Was nicht passt, wird genannt - nicht gestrichen. */
+  function _zahlenAus(o, out) {
+    if (o == null) return out;
+    if (typeof o === 'number' && isFinite(o)) { out.push(o); return out; }
+    if (Array.isArray(o)) { o.forEach(function (x) { _zahlenAus(x, out); }); return out; }
+    if (typeof o === 'object') { Object.keys(o).forEach(function (k) { _zahlenAus(o[k], out); }); }
+    return out;
+  }
+  function zahlenPruefen(text, ctx) {
+    var bekannt = _zahlenAus(ctx, []);
+    var re = /([+\u2212\-]?\s?\d{1,3}(?:\.\d{3})*(?:,\d+)?|[+\u2212\-]?\s?\d+(?:,\d+)?)\s?(Mio\.?\s?(?:€|Euro)|€|Euro|%|Prozent)/g;
+    var m, gepr = [], fehl = [];
+    while ((m = re.exec(text))) {
+      var roh = m[1].replace(/\s/g, '').replace('\u2212', '-');
+      var v = parseFloat(roh.replace(/\./g, '').replace(',', '.'));
+      if (!isFinite(v)) continue;
+      var einh = m[2];
+      var istP = /%|Prozent/.test(einh);
+      if (/Mio/.test(einh)) v = v * 1e6;
+      var a = Math.abs(v);
+      var ok = bekannt.some(function (c) {
+        var b = Math.abs(c);
+        if (istP) return Math.abs(a - b) <= 0.1 + 1e-9;
+        return Math.abs(a - b) <= Math.max(1, b * (/Mio/.test(einh) ? 0.006 : 0.0005));
+      });
+      if (!istP && a < 100) ok = true;   /* Kleinbeträge (€/m²) nicht werten */
+      gepr.push(m[0]);
+      if (!ok) fehl.push(m[0].trim());
+    }
+    return { geprueft: gepr.length, gefunden: gepr.length - fehl.length, nicht_gefunden: fehl };
+  }
+  function pruefungZeigen(pr) {
+    var log = el('dp-pp-log'); if (!log || !pr) return;
+    var d = document.createElement('div');
+    d.className = 'dp-pp-pruef' + (pr.nicht_gefunden.length ? ' dp-pp-pruef-warn' : '');
+    d.innerHTML = '<b>Zahlenprüfung:</b> ' + pr.gefunden + ' von ' + pr.geprueft + ' Beträgen und Prozenten stehen so in den Zahlen des Cockpits.'
+      + (pr.nicht_gefunden.length ? ' Nicht gefunden: ' + esc(pr.nicht_gefunden.slice(0, 8).join(' · ')) + ' – diese Angaben bitte gegen die Tabellen oben prüfen.' : '');
+    log.appendChild(d);
+  }
+
   function analyse() {
     history = [];
     var log = el('dp-pp-log');
@@ -422,5 +501,6 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', beobachten);
   else beobachten();
 
-  window.DealPilotPortfolioPilot = { mount: mount, analyse: analyse, _kontext: kontext };
+  window.DealPilotPortfolioPilot = { mount: mount, analyse: analyse, _kontext: kontext,
+    zielbildErklaeren: zielbildErklaeren, _zahlenPruefen: zahlenPruefen };   /* v2951 */
 })();

@@ -208,13 +208,29 @@
     ['bestand', 'mieterhoehung', 'zielbild'].forEach(function (k) {
       var s = S[k]; if (!s) return;
       st[k] = { miete_jahr: zahl(s.kaltmiete_jahr), kosten: zahl(s.kosten) || 0,
-        ertragswert: z.ertragswert_gesperrt ? null : zahl(s.ertragswert), jahr: zahl(s.jahr) };
+        ertragswert: z.ertragswert_gesperrt ? null : zahl(s.ertragswert), jahr: zahl(s.jahr),
+        marktpreisindikation: zahl(s.marktpreisindikation_angebote), rnd: zahl(s.rnd) };   /* v2951 */
     });
     var mz = mehrUndZuwachs(st);
     var topK = st.zielbild ? 'zielbild' : 'mieterhoehung';
     return { stand: (p.stand || z.stand || '').slice(0, 10) || null, art: z.art || null, stufen: st, top: topK,
       mehrertrag_jahr: mz.mehr, wertzuwachs_nach_kosten: mz.zuw, ertragswert_gesperrt: !!z.ertragswert_gesperrt,
       kennzeichnung: z.kennzeichnung || null };
+  }
+
+  /* ── v2951 · WARUM ein gespeichertes Objekt im Portfolio-Vergleich fehlt
+     oder nur teilweise zählt. Marcel 25.10.2026: „warum gewisse Objekte nicht
+     mit drin sind in der Auswertung". Gelesen wird nur, was am Objekt liegt. */
+  function zielbildGrund(d) {
+    var p = d && d._potenzial, z = p && p.zusammenfassung, S = z && z.stufen;
+    if (!p || !p.ergebnis) return { code: 'kein_lauf', text: 'Noch kein Potenzial-Lauf: Soll-Miete und Zielbild sind im Objekt nicht erfasst oder nie gerechnet.' };
+    if (!z || !S || !S.bestand) return { code: 'ohne_stufen', text: 'Der Lauf ist gespeichert, aber ohne Stufen (älterer Stand) – im Objekt neu rechnen.' };
+    if (!S.mieterhoehung && !S.zielbild) return { code: 'ohne_ziel', text: 'Weder Soll-Miete noch Zielbild eingetragen – es gibt nichts zu vergleichen.' };
+    if (z.ertragswert_gesperrt) return { code: 'stufe3', text: 'Ertragswert je Stufe nur mit DealPilot Stufe 3 – Miete und Maßnahmen zählen, der Wert nicht.' };
+    var T = S.zielbild || S.mieterhoehung;
+    if (S.bestand.ertragswert == null || T.ertragswert == null) return { code: 'ohne_ew', text: 'Ertragswert noch nicht gerechnet – im Objekt unter Bewertung kostenlos rechnen.' };
+    if (!S.zielbild) return { code: 'nur_mh', text: 'Nur Mieterhöhung erfasst, kein Zielbild – zählt mit der Mieterhöhung als höchster Stufe.' };
+    return null;
   }
 
   /* ── Ist · Mieterhöhung · Zielbild (DpPotenzial) ─────────────────────── */
@@ -835,5 +851,5 @@
      statt aus einem zweiten Abruf (pdf-wert-zielbild.js daten()) */
   function bericht() { return (_hist.key && _hist.key === key()) ? _hist.eintrag : null; }
   global.DpWertZielbild = { VERSION: VERSION, daten: daten, laden: laden, bericht: bericht, karte: karte, potenzialHost: potenzialHost,
-    einfachHtml: einfachHtml, reiterHtml: reiterHtml, _wertDaten: wertDaten, zielbildFuer: zielbildFuer };
+    einfachHtml: einfachHtml, reiterHtml: reiterHtml, _wertDaten: wertDaten, zielbildFuer: zielbildFuer, zielbildGrund: zielbildGrund };
 })(window);
