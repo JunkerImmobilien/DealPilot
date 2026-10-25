@@ -1942,6 +1942,8 @@ function _v234_1RenderPlanStatusHeader() {
         } else if (objekte) {
           metaParts.push(objekte + ' Objekte');
         }
+        /* v2955a · auch zahlende Kunden sehen ihr Co-Pilot-Tageslimit (config.js limits.copilot_tag) */
+        if (lim.copilot_tag > 0) metaParts.push(lim.copilot_tag + ' Co-Pilot-Fragen am Tag');
         if (metaParts.length) planMeta = metaParts.join(' · ');
       }
     }
