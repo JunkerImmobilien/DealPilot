@@ -3379,7 +3379,7 @@ label.dp-required.qc-required::after {
     <!-- V63.58: Wenn Tilgungsaussetzung mit BSV — Sparguthaben separat ausweisen,
          damit User es nicht mit"freiem Cashflow" verwechselt -->
     <div class="kv" id="vz-bspar-row" style="display:none"><span>+ Bausparguthaben aufgebaut <span class="cf-hint">(Sparbeitrag · gebunden im Bausparvertrag)</span></span><span class="kv-v c-green" id="vz-bspar">—</span></div>
-    <div class="kv"><span>+ Wertsteigerung <span class="cf-hint">(Marktwert minus Kaufpreis)</span></span><span class="kv-v c-green" id="vz-wert">—</span></div>
+    <div class="kv"><span>+ Wertsteigerung <span class="cf-hint">(Wert nach den Jahren minus Wert heute)</span></span><!-- v2944: stand „Marktwert minus Kaufpreis" - gerechnet wird ab wert_basis (Verkehrswert > Bankbewertung > Kaufpreis), calc.js:2368 --><span class="kv-v c-green" id="vz-wert">—</span></div>
     <div class="kv kv-result"><span><b>Netto-Vermögenszuwachs <span class="cf-hint">(Tilgung-vom-Mieter + CF-Überschuss + Steuervorteil + Wertsteigerung)</span></b></span><span class="kv-v c-gold" id="vz-gesamt">—</span></div>
     <div class="kv"><span>Equity Multiple <span class="cf-hint">(Netto-Vermögenszuwachs / eingesetztes EK)</span></span><span class="kv-v c-gold" id="vz-em">—</span></div>
 
@@ -3795,7 +3795,7 @@ label.dp-required.qc-required::after {
 <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte, klickbar = übernehmen -->
 <script src="js/marktwert-abschlag.js?v=v2672a"></script><!-- v2237 · Abschlag auf Angebotspreise -->
 <script src="js/wertvergleich.js?v=v2842"></script><!-- v2810 · Pilot-Analyse: Marktpreisindikation, Ertrags- und Sachwert gegenuebergestellt -->
-<script src="js/wert-zielbild.js?v=v2936"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
+<script src="js/wert-zielbild.js?v=v2944"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
 <script src="js/dealpilot-mb.js?v=v2820"></script>
 <script src="js/mb-auftrag.js?v=v2191"></script>
   <script src="js/marktbericht-view.js?v=v2823a"></script>

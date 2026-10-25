@@ -80,7 +80,7 @@
 (function (global) {
   if (global.DpWertZielbild) return;
 
-  var VERSION = 'v2910';
+  var VERSION = 'v2944';
   var MERKER = 'dp_pa_si_ansicht';
   var _hist = { key: null, laedt: null, eintrag: null };
 
@@ -387,6 +387,9 @@
       '.dp-wz-ausblick{font:400 11.5px/1.5 Inter,sans-serif;color:#4a4436;background:#FBF6E9;border-left:3px solid var(--wl-c9a84c, #C9A84C);padding:6px 10px;margin:8px 0 10px}',
       '.dp-wz-klar{font:400 13px/1.6 Inter,system-ui,sans-serif;color:#2A2727;margin:0 0 10px;max-width:80ch}',
       '.dp-wz-klar b.dp-wz-pos{color:#2f7d55}.dp-wz-klar b.dp-wz-neg{color:#B8625C}',
+      /* v2944 · Brücke zum Vermögenszuwachs */
+      '.dp-wz-bruecke{border-left:3px solid var(--wl-c9a84c, #C9A84C);background:#FBF6E9;border-radius:0 8px 8px 0;padding:10px 14px;margin:0 0 4px}',
+      '.dp-wz-bruecke p{font:400 13px/1.6 Inter,system-ui,sans-serif;color:#2A2727;margin:0 0 6px;max-width:90ch}.dp-wz-bruecke p:last-child{margin:0}',
       '.dp-wz-mehr{font:600 12px Inter,sans-serif;border:1px solid #E6DCC2;border-radius:8px;background:#fff;color:#2A2727;padding:6px 12px;cursor:pointer}',
       '.dp-wz-kenn{font:400 11px/1.5 Inter,sans-serif;color:#6B645A;margin:8px 0 0}',
       /* Segment im Tab Bewertung */
@@ -620,7 +623,36 @@
         + (Z.ertragswert_quelle === 'abruf' ? '<p class="dp-wz-quelle">Ertragswerte je Stufe aus dem Abruf „Marktpreise" vom ' + esc(Z.ertragswert_abruf_datum || '') + (Z.ertragswert_veraltet ? '; die Angaben haben sich seitdem geändert' : '') + '.</p>' : '')
         + '<p class="dp-wz-quelle">' + esc(Z.kurz_ausblick) + ' Der Score rechnet ebenfalls mit dem Bestand.</p>';
     }
-    return h;
+    return h + brueckeHtml(D);
+  }
+  /* v2944 · Brücke zum Vermögenszuwachs (Marcel 25.10.2026: „wenn das verschiedene
+     Betrachtungsweisen sind, müssen wir das erklären?"). Gemessen an Westerfeldstr. 140:
+     hier Ertragswert 740.000 € und Zielbild +23.000 € nach Kosten, darunter schreibt der
+     Vermögenszuwachs 567.000 € (Feld Verkehrswert) mit 2 % fort - drei Zahlen für „heute",
+     und keine Zeile sagte, warum. Diese Brücke RECHNET NICHTS: sie liest State.wert_basis,
+     State.wstg und State._vz (calc.js) und nennt den Unterschied. */
+  function brueckeHtml(D) {
+    var S = global.State || {}, VZ = S._vz || null;
+    var basis = zahl(S.wert_basis), wstg = zahl(S.wstg);
+    if (!VZ || basis == null || basis <= 0) return '';
+    var kp = kaufpreis(), svw = zahl((document.getElementById('svwert') || {}).value);
+    var anker = (svw != null && svw > 0) ? 'dem Verkehrswert aus dem Reiter Objekt' : (kp != null && Math.abs(basis - kp) < 1 ? 'dem Kaufpreis' : 'der Bankbewertung');
+    var jahre = zahl(VZ.btj);
+    var t = '<div class="dp-wz-h">Und der Vermögenszuwachs?</div><div class="dp-wz-bruecke">'
+      + '<p><b>Zwei Fragen, zwei Rechnungen.</b> Diese Karte fragt: <i>Was ist das Objekt heute wert, und was nach den Maßnahmen?</i> '
+      + 'Der Vermögenszuwachs direkt darunter fragt: <i>Was baust du in ' + esc(jahre != null ? jahre : '') + ' Jahren auf?</i> '
+      + 'Er beginnt bei ' + esc(anker) + ' (' + esc(eur(basis)) + '), schreibt ihn mit ' + esc(dez(wstg != null ? wstg * 100 : null, 1)) + ' % im Jahr fort '
+      + 'und zählt Tilgung, Cashflow und Steuer dazu.</p>';
+    var Z = D.zielbild, W = D.wert;
+    var zw = Z && Z.wertzuwachs_nach_kosten ? zahl(Z.wertzuwachs_nach_kosten.zielbild) : null;
+    if (zw != null) t += '<p><b>Das Zielbild steckt dort nicht drin.</b> Setzt du die Maßnahmen um, kämen ' + esc(eurVz(zw)) + ' Wertzuwachs nach Kosten hinzu (Ertragswert Zielbild − heute − Maßnahmen). Die Mieten im Vermögenszuwachs steigen nur mit der allgemeinen Mietsteigerung.</p>';
+    var ew = W && W.ertragswert ? zahl(W.ertragswert.wert) : null;
+    if (ew != null && Math.abs(ew - basis) / basis > 0.05) {
+      var d = (ew - basis) / basis * 100;
+      t += '<p><b>Anderer Ausgangswert.</b> Der Ertragswert hier (' + esc(eur(ew)) + ') liegt ' + esc(dez(Math.abs(d), 1)) + ' % ' + (d > 0 ? 'über' : 'unter') + ' dem Ausgangswert des Vermögenszuwachses. '
+        + 'Der Vermögenszuwachs rechnet nur mit dem, was im Reiter Objekt als Verkehrswert oder Bankbewertung steht.</p>';
+    }
+    return t + '</div>';
   }
   function potenzialHost() {
     var c = document.getElementById('card-wert-zielbild') || _karte; if (!c) return null;
@@ -638,30 +670,18 @@
      Segment bei 1.440 × 900 auf y 768. dpsh-score-hero.js zeichnet den Mount per innerHTML
      neu - der Beobachter setzt die Karte danach wieder an ihren Platz (dieselbe Karte,
      kein Neubau). Ohne Score-Karte: vor der Kennzahlen-Bewertung. */
-  var _karte = null, _mo = null, _moZiel = null;
+  /* v2944 · Platz (Marcel 25.10.2026): „Wert & Zielbild zwischen DealScore und Investor
+     DealScore würde ich eher bei Vermögenszuwachs hinpacken." Die Karte steht jetzt
+     unmittelbar VOR #card-vermoegen-zuwachs (statisches HTML in s6, wird von keinem
+     Renderer neu gezeichnet - der Beobachter auf #dpsh-mount aus v2841 entfällt).
+     Ohne die Vermögenszuwachs-Karte: vor der Kennzahlen-Bewertung, sonst ans Ende. */
+  var _karte = null;
   function platz(c) {
     var sec = document.getElementById('s6'); if (!sec || !c) return;
-    var m = document.getElementById('dpsh-mount');
-    var p1 = m ? m.querySelector(':scope > .dpsh-pass') : null;
-    if (p1) {
-      if (p1.nextElementSibling !== c) m.insertBefore(c, p1.nextSibling);
-      c.style.margin = '0';
-    } else {
-      c.style.margin = '';
-      var kpi = document.getElementById('kpi-eval-card');
-      var ziel = (m && m.parentNode === sec) ? m.nextSibling : (kpi && kpi.parentNode === sec ? kpi : null);
-      if (ziel) { if (ziel !== c && c.nextSibling !== ziel) sec.insertBefore(c, ziel); } else if (c.parentNode !== sec) sec.appendChild(c);
-    }
-    if (m && _moZiel !== m && typeof MutationObserver === 'function') {
-      if (_mo) _mo.disconnect();
-      _moZiel = m;
-      _mo = new MutationObserver(function () {
-        if (!_karte) return;
-        var q = _moZiel.querySelector(':scope > .dpsh-pass');
-        if (!_karte.isConnected || (q && q.nextElementSibling !== _karte)) platz(_karte);
-      });
-      _mo.observe(m, { childList: true });
-    }
+    c.style.margin = '';
+    var ziel = document.getElementById('card-vermoegen-zuwachs') || document.getElementById('kpi-eval-card');
+    if (ziel && sec.contains(ziel)) { if (c.nextElementSibling !== ziel) ziel.parentNode.insertBefore(c, ziel); }
+    else if (c.parentNode !== sec) sec.appendChild(c);
   }
   function karte() {
     var sec = document.getElementById('s6'); if (!sec) return;
