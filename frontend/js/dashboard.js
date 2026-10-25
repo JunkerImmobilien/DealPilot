@@ -981,7 +981,7 @@
       + abgl + gruendeHtml + neuHtml
       + '<div class="zb-ausw"><div class="zb-ausw-t">Auswertung</div>' + t.map(function(s){ return '<p>' + esc(s) + '</p>'; }).join('')
       +   '<div class="zb-ausw-pp"><button type="button" class="zb-btn zb-btn-gold" onclick="DealPilotDashboard.pilotZielbild()">Vom Portfolio-Piloten ausführlich erklären lassen ›</button>'
-      +   '<span>KI-Text · kein Kontingent, zählt zum Tageslimit des Co-Piloten</span></div></div>'
+      +   '</div></div>'   /* v2955 · KI-Hinweistext raus (Marcel 25.10.2026) */
       + '<div class="zb-fuss">' + esc(KZ) + '</div>'
       + '</div>';
   }

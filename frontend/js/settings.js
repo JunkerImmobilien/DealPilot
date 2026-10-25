@@ -2246,6 +2246,8 @@ function _renderPlanPane() {
     } else {
       html += '<li>' + l.ai_credits + ' Pilot-Analyse einmalig</li>';
     }
+    /* v2955 · Co-Pilot-Tageslimit je Plan (config.js limits.copilot_tag) */
+    if (l.copilot_tag > 0) html += '<li><strong>' + l.copilot_tag + '</strong> Co-Pilot-Fragen am Tag</li>';
     // Wasserzeichen
     html += '<li>PDF ' + (l.watermark ? '<em>mit Wasserzeichen</em>' : '<strong>ohne Wasserzeichen</strong>') + '</li>';
     /* v1246 · Hier stand „Max. 3 Speicherungen". Marcel: „Da kann ich mir

@@ -92,7 +92,7 @@
     },
     {
       key: 'pro', letter: 'P', label: 'Pro', tag: 'Profis · Sachverständige', title: 'Pro',
-      lead: 'Für Investoren, Sachverständige und Vermögensverwalter. Unbegrenzte Objekte, Premium-PDF-Layouts, Custom Track-Record Cover und Migration & Setup-Service inklusive.',
+      lead: 'Für Investoren, Sachverständige und Vermögensverwalter. Unbegrenzte Objekte, Premium-PDF-Layouts, Custom Track-Record Cover und 100 Co-Pilot-Fragen am Tag.',
       price_monthly: 49.99, price_yearly: 549,  /* v1246 */
       features: [
         'Unbegrenzte Objekte',
@@ -102,7 +102,7 @@
         'BMF-Rechner & Export',
         'Priorisierter Support',
         '5 Marktpreisindikationen + 5 erweiterte + 5 Wertermittlungen / Monat',
-        'Migration & Einrichtungsservice (bis 3 h) inkl.'
+        '100 Co-Pilot-Fragen am Tag'
       ],
       not_included: null,
       result: 'Sie skalieren Ihre Analyse-Kapazität — und können DealPilot direkt im Kundengespräch einsetzen.',

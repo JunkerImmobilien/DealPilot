@@ -108,9 +108,8 @@
         '<button type="button" class="dp-pp-go dp-pp-zb" id="dp-pp-zb">Bestand &amp; Zielbild erklären</button>' +
         '<button type="button" class="dp-pp-go" id="dp-pp-go">Portfolio-Analyse starten</button>' +
       '</div>' +
-      /* v2951 · was ein Lauf kostet, VOR dem Klick: /ai/copilot zieht kein Kontingent,
-         zaehlt aber zum Tageslimit des Co-Piloten (routes/ai.js COPILOT_PLAN_LIMITS). */
-      '<div class="dp-pp-kosten">KI-Text · kostet <b>kein Kontingent</b>, zählt zum Tageslimit des Co-Piloten (je nach Tarif 10 bis 300 Antworten am Tag). Der Pilot rechnet nicht selbst – er erklärt die Zahlen des Cockpits; jede Betrags- und Prozentangabe wird danach gegen diese Zahlen geprüft.</div>' +
+      /* v2955 · der Hinweis „KI-Text · kein Kontingent … 10 bis 300 Antworten“ ist raus (Marcel
+         25.10.2026); das Limit steht jetzt je Plan unter Einstellungen › Plan und auf der Preisseite. */
       /* v2018 - der Stand der letzten Analyse. Wird nach dem Aufbau
          gefuellt (standZeigen); leer ist er unsichtbar. */
       '<div class="dp-pp-stand" id="dp-pp-stand" style="display:none"></div>' +
