@@ -2086,7 +2086,7 @@
     try { var tok = localStorage.getItem(TOKEN_KEY); if (tok) headers['Authorization'] = 'Bearer ' + tok; } catch (e) {}
     return fetch('/api/v1/ai/extract-voice', {
       method: 'POST', headers: headers,
-      body: JSON.stringify({ audio: audioB64, mime: mime, catalog: catalog }),
+      body: JSON.stringify({ audio: audioB64, mime: mime, catalog: catalog, dauer_s: Math.round(st.elapsed || 0) }),   /* v2956 · fuer das Co-Pilot-Tageslimit */
       signal: ctrl ? ctrl.signal : undefined
     }).then(function (res) {
       if (to) clearTimeout(to);
@@ -2688,6 +2688,9 @@
        keine Fehlermeldung, einfach weiter zuhoeren. */
     if (_fs.sprechMs < FS_MIN_SPRECH_MS) { _fsHoeren(true); return; }
     var eintrag = _rf && _rf.offen[_rf.i];
+    /* v2956 · gesprochene Sekunden fuer das Co-Pilot-Tageslimit (routes/ai.js extract-voice);
+       jetzt merken - _fsHoeren() stellt die Uhr gleich zurueck */
+    var _dauerS = Math.round((_fs.sprechMs || 0) / 1000);
 
     /* v1290: Geschnitten wird mit requestData(), NICHT mit stop(). Der
        Recorder laeuft weiter — damit bleibt der Kopf gueltig und der
@@ -2713,7 +2716,7 @@
       blobToB64(blob).then(function (b64) {
         return Auth.apiCall('/ai/extract-voice', {
           method: 'POST',
-          body: { audio: b64, mime: blob.type, catalog: _rfKatalog(eintrag, _rf.catalog), kontext: _rfKontext() }
+          body: { audio: b64, mime: blob.type, catalog: _rfKatalog(eintrag, _rf.catalog), kontext: _rfKontext(), dauer_s: _dauerS }
         });
       }).then(function (r) {
         _fs.laeuft--;

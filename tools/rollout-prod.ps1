@@ -126,6 +126,10 @@ zcat /root/backups/haupt-$stempel.sql.gz | head -2
 echo '--- Kopf der MB-DB ---'
 zcat /root/backups/mb-$stempel.sql.gz | head -2
 "@
+# 25.10.2026: die .ps1 liegt mit CRLF auf der Platte - jedes `r landete im
+# Dateinamen auf dem Server ("haupt-....sql.gz\r"), die Kopfpruefung fand
+# nichts und brach ab. Fuer bash nur LF.
+$sicherBefehl = $sicherBefehl -replace "`r", ''
 $sicherung = ssh $PROD_HOST $sicherBefehl 2>&1
 $sicherung | ForEach-Object { Write-Host "     $_" }
 
@@ -138,9 +142,12 @@ Gut "beide Sicherungen gepruefet (Kopf gelesen, nicht nur gelistet)"
 
 # ---- 3. Gold-Audit ----------------------------------------------------
 Schritt "Gold-Audit auf Staging"
-$audit = ssh $STAGING_HOST "cd /opt/dealpilot && python3 tools/gold-audit.py /opt/dealpilot/frontend 2>&1 | tail -3"
+# 25.10.2026: geprueft wird der Rueckgabewert, nicht ein Satz - unter der
+# Basislinie meldet der Audit "[OK] Unter der Basislinie", nicht
+# "Kein neues Hartgold", und der Rollout brach bei gruenem Audit ab.
+$audit = ssh $STAGING_HOST "cd /opt/dealpilot && python3 tools/gold-audit.py /opt/dealpilot/frontend > /tmp/gold-rollout.txt 2>&1; echo AUDIT_RC=`$?; tail -4 /tmp/gold-rollout.txt"
 $audit | ForEach-Object { Write-Host "     $_" }
-if (($audit -join "`n") -notmatch 'Kein neues Hartgold') {
+if (($audit -join "`n") -notmatch 'AUDIT_RC=0') {
   Schlecht "Gold-Audit nicht sauber - Rollout abgebrochen."
   exit 1
 }
