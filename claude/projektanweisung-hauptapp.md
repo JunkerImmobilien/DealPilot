@@ -401,6 +401,25 @@ entfernt (v848).
 **Portfolio-Cockpit:** `dashboard.js`/`.css` v750k, Mount `dashboard-main`,
 Creme `#FDFCFA`, CSS-Idempotenz-Marker exakt.
 
+**Portfolio-Cockpit seit v2951–v2953 (25.10.2026):** Umschalter **Einfach |
+Genau** (Merker `dp_cockpit_ansicht`, Einfach = sechs Kernkacheln). Bestand =
+`_deal_won` und nicht `_deal_lost` — „Verloren“ nimmt ein Objekt aus dem
+Cockpit, ohne es zu löschen (Löschen ist endgültig, kein Papierkorb).
+**Gesamtbewertung** in drei Spalten (investiert · Bilanz · nach Bewertung) plus
+Tabelle **„Bewertung je Objekt“**: Kaufpreis, Marktpreisindikation, Ertragswert
+mit Abstand zum Kaufpreis; Ertragswert/MPI aus dem Zielbild-Lauf
+(`_potenzial`), sonst aus dem letzten Marktbericht (`GET
+/marktbericht/objects/history`, kein Kontingent). Fehlende Objekte: rote Box
+mit Namen und Grund. **Projektionszeitraum 10/20/30:** Kopfleiste,
+`dpc-vb-eq`, `dpc-vb-quellen`, `dpc-proj-mix`, Tabelle und Einfach-Kachel
+ziehen mit (`setProjYears` → `renderProjTable`, `buildCharts`,
+`renderEinfach`); die „Vermögensbilanz heute“ bleibt absichtlich heute.
+**Portfolio-Pilot** unter der Auswertung („Bestand & Zielbild erklären“): die
+KI bekommt fertige Faktensätze, danach prüft `portfolio-pilot.js` jede Zahl
+UND ihre Zuordnung (Begriff→Betrag, Betrag→Prozent, Richtung, Namen, Abstand
+als Anteil gelesen) — `tools/portfolio-pilot-pruefen.mjs` hält die echten
+Fehler der Läufe 1 und 2 als Testfälle (RC 0).
+
 **Schließen-X im schwarzen Band (v843):** `dp-band-close` im
 `dp-modal-topband` (Settings + Hilfe), CSS-Marker `v843-band-close`.
 
@@ -1612,6 +1631,19 @@ versuchen, statt Feldnamen von `getStatus` zu raten (402 = Feldnamen).
 ---
 ---
 
+### Ankauf-Sanierung im Bestand ist kein Sanierungsstau (v2952, 25.10.2026)
+
+Das Feld `san` (Reiter Investition) geht über `DealPilotObjectMapper.bomAus`
+als besonderes objektspezifisches Grundstücksmerkmal (§ 8 Abs. 3 ImmoWertV)
+in den Bericht — für eine **Ankaufsprüfung** richtig. Liegt das **Kaufdatum
+mindestens 12 Monate zurück**, gilt die Sanierung als ausgeführt und wird
+**nicht** mehr abgezogen (`kaufdat` reist dafür seit v2952 mit). Gemessen an
+Parkstr. 9: 137.000 € drückten den Ertragswert im Bestand auf 161.000 €.
+**Die ausgeführte Sanierung gehört dann in die acht Modernisierungsfelder**
+(Anlage 2) — beim MFH mit Quelle „aus den acht Feldern“ (`mod_quelle =
+felder`), sonst gelten die Punkte der Einheiten. Parkstr. 9 nach Eintrag:
+8 Punkte, RND 12 → 32 J., Ertragswert 425.000 €.
+
 # TEIL IV — MARKE, ARCHITEKTUR, GELD, DATEN, SERVER
 
 ## PRODUKT
@@ -1737,9 +1769,38 @@ window.addEventListener('dp:plan-ready', e => e.detail.plan);
 `getCurrentPlanKey()` darf NIE wortlos auf `'free'` fallen; `dp_last_plan` ist
 der Merker.
 
-**Pläne:** Free · Starter 29 € · Investor 59 € ★ · Pro 99 €.
-**Kerosin-Pakete:** 10 L / 2 € · 28 L / 5 € · 90 L / 15 € (beliebt) ·
-160 L / 25 €.
+**Pläne (Stand 25.10.2026, `config.js` PRICING):** Free · Starter 19,99 € ·
+Investor 34,99 € ★ · Pro 49,99 € · Partner 99 € (Pro-Klon). Kerosin/Liter gibt
+es seit v1176 nicht mehr — es heißt **Kontingent** (Bewertungen je Monat):
+Marktpreisindikation 1/5/5/5, erweiterte –/–/5/5, Wertermittlung –/–/–/5
+(Free/Starter/Investor/Pro).
+
+**Co-Pilot-Tageslimit (seit v2955, Marcel 25.10.2026):** Free **10** · Starter
+**20** · Investor **50** · Pro **100** · Partner **100** Antworten am Tag
+(vorher 10/50/150/300/300). Quelle der Wahrheit ist
+`backend/src/routes/ai.js` `COPILOT_PLAN_LIMITS` (Zähler `_cpDaily` im
+Speicher, je Nutzer und Tag; Browser, Portfolio-Pilot und Telegram-Bot teilen
+ihn über `copilotKontingent.verbrauchen`). Gespiegelt — **bei jeder Änderung
+alle vier nachziehen:** `config.js` `limits.copilot_tag` (Einstellungen ›
+Plan, auch der Kopf zahlender Kunden), `pricing-modal.js` (beide Matrizen
+und die Planlisten), `landing/index.html` (Zeile „Co-Pilot: N Fragen am Tag“
+je Plan). Kein Kontingent, kein Geld — nur das Tageslimit.
+
+**Spracheingabe zählt mit (v2956):** je angefangene **2 Minuten gesprochene
+Zeit am Tag eine Frage** (`_spracheRechnen`/`_spracheBuchen` in
+`/ai/extract-voice`, derselbe Zähler). Bewusst NICHT „je Aufnahme“: der
+geführte Sprechlauf schickt 30–40 kurze Antworten und hätte sonst das
+Starter-Limit allein verbraucht. Dauer kommt vom Browser (`dauer_s`), mit
+Untergrenze aus der Dateigröße; abgezogen wird erst nach erfolgreicher
+Auswertung; eigener API-Schlüssel ist frei. **Nicht** gezählt:
+`transcribe-chunk` (Live-Vorschau schickt den wachsenden Mitschnitt mehrfach)
+und `voice-stream`.
+
+**Abgeschafft:** „Migration & Einrichtung (bis 3 h)“ bei Pro (Marcel
+25.10.2026: „haben wir schon lange nicht mehr“) — aus Preisfenster, Landing,
+`config.js` (`migration_service`) entfernt. Der KI-Hinweistext „kein
+Kontingent, zählt zum Tageslimit … 10 bis 300“ im Cockpit/Portfolio-Pilot ist
+raus.
 
 ---
 
@@ -2544,6 +2605,22 @@ bereits gelöschte mb-Berichte NICHT wieder her.**
 
 ---
 
+### Produktion per `tools/rollout-prod.ps1 -Freigabe` (Stand 25.10.2026)
+
+`-Freigabe` nur, wenn Marcel den Rollout ausdrücklich genannt hat. Das Skript
+sichert beide Prod-DBs und liest ihre Köpfe, lässt den Gold-Audit auf Staging
+laufen, merged `staging → main`, zieht auf Prod, baut `backend` und
+`mb-backend` und misst nach. **Zwei Fehler am 25.10. behoben:** (1) die
+Sicherungsbefehle kamen mit `\r` an (die .ps1 liegt mit CRLF auf der Platte) —
+Dateinamen auf dem Server mit unsichtbarem `\r`, Kopfprüfung fand nichts;
+jetzt `-replace "`r"` vor dem ssh. (2) der Gold-Audit wurde am Satz „Kein neues
+Hartgold“ gemessen, unter der Basislinie steht aber „[OK] Unter der
+Basislinie“ — jetzt am Rückgabewert (`AUDIT_RC=0`). Meldet der Audit
+„unter der Basislinie“: `--basislinie-schreiben` auf Staging, Datei
+zurückholen, committen (der Deckel darf sinken, 25.10.: 438 → 429).
+Sicherungsreste mit `\r` im Namen vom 25.10. (`…-1649`) liegen noch in
+`/root/backups/` — harmlos.
+
 ## CHRONIK — DIE ROLLBACK-KETTE
 
 **Marktbericht-Strang (neueste zuerst):**
@@ -2591,6 +2668,27 @@ Stripe LIVE seit 15.07. · Caddyfile repo-gepflegt ·
 ---
 
 ## OFFENE PUNKTE
+
+**Demo-Konto info@ — Staging und Prod laufen seit 25.10.2026 auseinander.**
+Am 23.10. wurden die 17 Demo-Objekte per ID nach Prod gespiegelt. Am 25.10.
+nur auf **Staging** geändert (mit Marcels Freigabe): Kaufpreise Parkstr. 9
+395.000 (vorher 780.000), Bismarckstr. 27 850.000 (1,15 Mio), Hölderlinstr. 1
+125.000 (139.000), Bäckerstr. 7 165.000 (195.000) und nach 32423 Minden;
+Darlehen im selben Verhältnis, EK = Gesamtinvestition − Darlehen; Parkstr. 9
+Modernisierung eingetragen; Musterstraße 12 Grundstück 1.200 m²; Westerfeld-
+Kopie `c5a78c89` („E2E“) und Am Markt 9 privat `cea958eb` auf „Verloren“
+(endgültig löschen macht Marcel). Behalten: Westerfeld `ae155d38`
+(Spot/Videos), Am Markt 9 VV-GmbH `ec2d0f32`. Soll Prod für die Messe
+denselben Stand zeigen, muss wieder gespiegelt werden (vorher sichern).
+
+**Messe-Material (Messe Leipzig 31.10.–01.11.2026):** Storybook aus
+`tools/messe-storybook.mjs` → `Dateien/Messe/DealPilot Messe-Storybook.pdf`
+(23 Seiten: Pitch, Rundgang in fünf Akten Finden → Prüfen → Bewerten → Halten
+→ Überblick, Portfolio-Cockpit, „Lohnt sich, was ich vorhabe?“, je Objekt eine
+Seite). Alle Zahlen aus der Staging-DB und `mb.object_snapshots`, nichts von
+Hand — **nach jeder Änderung an den Demo-Objekten neu laufen lassen.**
+Werbespot v13 (90 s) mit Marcels Stimmklon: `Dateien/Messe/Videos/
+dealpilot-spot-immocation-v13-*.mp4`.
 
 ### Sofort — Abnahme des letzten Rollouts
 
