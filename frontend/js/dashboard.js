@@ -863,6 +863,33 @@
       + '</div>'+rows+'</div>';
   }
 
+  /* v2951b · Die Auswertung als Saetze - EINE Stelle fuer die Anzeige und fuer die
+     Fakten des Portfolio-Piloten (gemessen 25.10.2026: der Pilot ordnete ohne sie
+     „13,7 %" den 34.000 € zu und nannte den Mehrwert „Wertzuwachs nach Kosten"). */
+  function _zbSaetze(A){
+    var E=_fE, VZ=_fVZ, P=_fP, nMit=A.mit.length, mehrM=A.mieteM-A.mieteB, mehrZ=A.mieteZ-A.mieteB;
+    var bmyB = A.kpMit > 0 ? A.mieteB / A.kpMit * 100 : null, bmyZ = (A.kpMit + A.kosten) > 0 ? A.mieteZ / (A.kpMit + A.kosten) * 100 : null;
+    /* Auswertung: fest formulierte Sätze, nur aus den Summen oben */
+    var t = [];
+    t.push('Für ' + nMit + ' von ' + A.n + ' Objekten liegen Angaben zu Mieterhöhung oder Zielbild vor (' + A.nZiel + ' mit Zielbild'
+      + (A.nMh ? ', ' + A.nMh + ' nur mit Mieterhöhung' : '') + ').'
+      + (A.ohne.length ? ' Nicht enthalten: ' + A.ohne.map(function(x){ return x.name; }).join(', ') + ' – die Gründe stehen oben.' : ''));
+    t.push('Über diese Objekte steigt die Kaltmiete von ' + E(A.mieteB) + ' auf ' + E(A.mieteZ) + ' im Jahr (' + VZ(mehrZ) + ', ' + P(A.mieteB?mehrZ/A.mieteB*100:null) + ')'
+      + (mehrZ > 0 ? '; davon ' + E(mehrM) + ' ohne Mieterwechsel, ' + E(A.mieteZ - A.mieteM) + ' nach Umbau oder Neuvermietung.' : '.'));
+    t.push(A.kosten ? 'Eingeplant sind Maßnahmen von ' + E(A.kosten) + (A.kostenM ? ', davon ' + E(A.kostenM) + ' schon für die Mieterhöhung' : '') + '. Die Bruttomietrendite geht damit von ' + _fPr(bmyB,2) + ' auf ' + _fPr(bmyZ,2) + '.'
+      : 'Maßnahmen sind keine eingetragen – es steigt nur die Miete.');
+    if (A.ewN) {
+      t.push('Der Ertragswert steigt über ' + A.ewN + ' Objekt' + (A.ewN===1?'':'e') + ' von ' + E(A.ewB) + ' auf ' + E(A.ewZ)
+        + '; nach Abzug der Maßnahmen bleibt ' + (A.zuw >= 0 ? 'ein Wertzuwachs von ' + E(A.zuw) + ' – die Maßnahmen bringen mehr Ertragswert, als sie kosten.'
+          : 'ein Minus von ' + E(-A.zuw) + ' – die Maßnahmen kosten mehr, als sie an Ertragswert bringen.'));
+      var mitZ = A.mit.filter(function(e){ return e.zuw != null; }).sort(function(a,b){ return b.zuw - a.zuw; });
+      if (mitZ.length > 1 && mitZ[0].zuw > 0) t.push('Den größten Beitrag liefert ' + mitZ[0].name + ' mit ' + VZ(mitZ[0].zuw) + '.');
+      var neg = mitZ.filter(function(e){ return e.zuw < 0; });
+      if (neg.length) t.push('Bei ' + neg.map(function(e){ return e.name; }).join(', ') + ' kosten die Maßnahmen mehr, als sie an Ertragswert bringen.');
+    }
+
+    return t;
+  }
   function renderZielbild(){
     var host = $('dp-zielbild'); if (!host) return;
     if (!_detailsLoaded) { host.innerHTML = '<div class="dp-chart-loading" style="height:60px"><span class="dp-spin"></span>Zielbild wird geladen…</div>'; return; }
@@ -937,24 +964,7 @@
       + 'Für diese ' + nMit + ' Objekte steht in den Objektdaten eine Jahresmiete von ' + E(A.mieteObjMit) + ' (wie Kachel 02: Kaltmiete plus Zusatzeinnahmen); das Potenzial-Modul rechnet mit ' + E(A.mieteB)
       + ' – nur die Wohnungsmieten je Einheit' + (Math.abs(A.mieteObjMit - A.mieteB) >= 1 ? ', Unterschied ' + VZ(A.mieteB - A.mieteObjMit) + ' (Stellplätze, Zusatzeinnahmen, abweichende Einheitenmieten)' : '') + '.</p></div>';
 
-    /* Auswertung: fest formulierte Sätze, nur aus den Summen oben */
-    var t = [];
-    t.push('Für ' + nMit + ' von ' + A.n + ' Objekten liegen Angaben zu Mieterhöhung oder Zielbild vor (' + A.nZiel + ' mit Zielbild'
-      + (A.nMh ? ', ' + A.nMh + ' nur mit Mieterhöhung' : '') + ').'
-      + (A.ohne.length ? ' Nicht enthalten: ' + A.ohne.map(function(x){ return x.name; }).join(', ') + ' – die Gründe stehen oben.' : ''));
-    t.push('Über diese Objekte steigt die Kaltmiete von ' + E(A.mieteB) + ' auf ' + E(A.mieteZ) + ' im Jahr (' + VZ(mehrZ) + ', ' + P(A.mieteB?mehrZ/A.mieteB*100:null) + ')'
-      + (mehrZ > 0 ? '; davon ' + E(mehrM) + ' ohne Mieterwechsel, ' + E(A.mieteZ - A.mieteM) + ' nach Umbau oder Neuvermietung.' : '.'));
-    t.push(A.kosten ? 'Eingeplant sind Maßnahmen von ' + E(A.kosten) + (A.kostenM ? ', davon ' + E(A.kostenM) + ' schon für die Mieterhöhung' : '') + '. Die Bruttomietrendite geht damit von ' + _fPr(bmyB,2) + ' auf ' + _fPr(bmyZ,2) + '.'
-      : 'Maßnahmen sind keine eingetragen – es steigt nur die Miete.');
-    if (A.ewN) {
-      t.push('Der Ertragswert steigt über ' + A.ewN + ' Objekt' + (A.ewN===1?'':'e') + ' von ' + E(A.ewB) + ' auf ' + E(A.ewZ)
-        + '; nach Abzug der Maßnahmen bleibt ' + (A.zuw >= 0 ? 'ein Wertzuwachs von ' + E(A.zuw) + ' – die Maßnahmen bringen mehr Ertragswert, als sie kosten.'
-          : 'ein Minus von ' + E(-A.zuw) + ' – die Maßnahmen kosten mehr, als sie an Ertragswert bringen.'));
-      var mitZ = A.mit.filter(function(e){ return e.zuw != null; }).sort(function(a,b){ return b.zuw - a.zuw; });
-      if (mitZ.length > 1 && mitZ[0].zuw > 0) t.push('Den größten Beitrag liefert ' + mitZ[0].name + ' mit ' + VZ(mitZ[0].zuw) + '.');
-      var neg = mitZ.filter(function(e){ return e.zuw < 0; });
-      if (neg.length) t.push('Bei ' + neg.map(function(e){ return e.name; }).join(', ') + ' kosten die Maßnahmen mehr, als sie an Ertragswert bringen.');
-    }
+    var t = _zbSaetze(A);   /* v2951b: dieselben Saetze gehen an den Portfolio-Piloten */
 
     host.innerHTML = '<div class="zb-card">'
       + '<div class="zb-head"><div class="zb-zahl">' + kopfZahl + '</div><span class="zb-kz" title="' + esc(KZ) + '">Potenzialwert · Plan, kein Verkehrswert</span></div>'
@@ -1131,11 +1141,17 @@
     var mehrZ = A.mieteZ - A.mieteB;
     return {
       kennzeichnung: 'Potenzialwert / Plan, kein Verkehrswert. Maßgeblich für den heutigen Wert ist der Ertragswert im Bestand.',
+      fakten: _zbSaetze(A),
+      massnahmen_teurer_als_wert: A.mit.filter(function(e){ return e.zuw != null && e.zuw < 0; }).map(function(e){ return e.name; }),
+      massnahmen_lohnen_sich: A.mit.filter(function(e){ return e.zuw != null && e.zuw > 0; }).map(function(e){ return e.name; }),
       objekte_gesamt: A.n, objekte_mit_angaben: A.mit.length, mit_zielbild: A.nZiel, nur_mieterhoehung: A.nMh,
       objekte_mit_ertragswert: A.ewN,
       kaltmiete_jahr: { bestand: r(A.mieteB), nach_mieterhoehung: r(A.mieteM), zielbild: r(A.mieteZ),
         mehr_durch_mieterhoehung: r(A.mieteM - A.mieteB), mehr_durch_umbau_neuvermietung: r(A.mieteZ - A.mieteM),
-        mehr_gesamt: r(mehrZ), mehr_gesamt_prozent: r1(A.mieteB ? mehrZ / A.mieteB * 100 : null) },
+        mehr_gesamt: r(mehrZ), mehr_gesamt_prozent: r1(A.mieteB ? mehrZ / A.mieteB * 100 : null),
+        mehr_durch_mieterhoehung_prozent: r1(A.mieteB ? (A.mieteM - A.mieteB) / A.mieteB * 100 : null),
+        mehr_durch_umbau_neuvermietung_prozent: r1(A.mieteB ? (A.mieteZ - A.mieteM) / A.mieteB * 100 : null) },
+      abweichung_objektdaten_grund: 'Die Objektdaten fuehren Kaltmiete plus Zusatzeinnahmen (Stellplaetze u. a.); das Potenzial-Modul rechnet nur die Wohnungsmieten je Einheit.',
       kaltmiete_laut_objektdaten_derselben_objekte: r(A.mieteObjMit),
       kaufpreise_derselben_objekte: r(A.kpMit),
       bruttomietrendite_prozent: { bestand: r2(A.kpMit ? A.mieteB / A.kpMit * 100 : null), zielbild_auf_kaufpreis_plus_massnahmen: r2((A.kpMit + A.kosten) ? A.mieteZ / (A.kpMit + A.kosten) * 100 : null) },

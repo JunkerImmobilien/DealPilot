@@ -413,6 +413,8 @@
   var AUFTRAG_ZB = [
     'Erkläre mir die Auswertung BESTAND & ZIELBILD meines Portfolios ausführlich und verständlich.',
     'Grundlage ist ausschließlich context.bestand_zielbild (inklusive gesamtbewertung). Alle Summen, Differenzen und Prozente stehen dort FERTIG - übernimm sie wörtlich, rechne NICHT selbst und runde nicht anders.',
+    'context.bestand_zielbild.fakten sind geprüfte Sätze: baue auf ihnen auf und gib jeder Zahl GENAU die Bedeutung, die sie dort hat (ein Prozentwert gehört nur zu dem Betrag, neben dem er dort steht; „Mehrwert“ ist nicht „Wertzuwachs nach Kosten“). Welche Objekte mehr kosten, als sie bringen, steht in massnahmen_teurer_als_wert - nenne nur diese. Bei „über/unter“ gilt das Vorzeichen des Prozentfelds.',
+    'Schreibe ausführlich: je Abschnitt drei bis fünf Sätze, Beträge mit €, Prozente mit Komma.',
     'Gliedere so:',
     '1. Was verglichen wird - Bestand, Mieterhöhung, Zielbild, und über wie viele Objekte (mit/ohne Zielbild, ohne Angaben). Nenne jedes nicht enthaltene Objekt mit seinem Grund.',
     '2. Die Miete - von Bestand über Mieterhöhung zum Zielbild, mit den Beträgen und dem Prozentwert; warum die Miete laut Objektdaten (kaltmiete_laut_objektdaten_derselben_objekte) davon abweicht.',
@@ -442,7 +444,7 @@
   }
   function zahlenPruefen(text, ctx) {
     var bekannt = _zahlenAus(ctx, []);
-    var re = /([+\u2212\-]?\s?\d{1,3}(?:\.\d{3})*(?:,\d+)?|[+\u2212\-]?\s?\d+(?:,\d+)?)\s?(Mio\.?\s?(?:€|Euro)|€|Euro|%|Prozent)/g;
+    var re = /([+\u2212\-]?\s?\d{1,3}(?:\.\d{3})*(?:,\d+)?|[+\u2212\-]?\s?\d+(?:,\d+)?)\s?(Mio\.?\s?(?:€|EUR|Euro)|€|EUR|Euro|%|Prozent)/g;
     var m, gepr = [], fehl = [];
     while ((m = re.exec(text))) {
       var roh = m[1].replace(/\s/g, '').replace('\u2212', '-');
@@ -461,14 +463,83 @@
       gepr.push(m[0]);
       if (!ok) fehl.push(m[0].trim());
     }
-    return { geprueft: gepr.length, gefunden: gepr.length - fehl.length, nicht_gefunden: fehl };
+    var bedeutung = []; try { bedeutung = _bedeutungPruefen(text, ctx); } catch (e) {}
+    return { geprueft: gepr.length, gefunden: gepr.length - fehl.length, nicht_gefunden: fehl, bedeutung: bedeutung };
+  }
+  /* v2951b · ZUORDNUNG STATT NUR VORKOMMEN. Gemessen am ersten Lauf (25.10.2026):
+     alle Zahlen standen in den Daten - aber „34.000 € oder 13,7 %" (13,7 % gehört zu
+     38.388 €), „Wertzuwachs nach Kosten von 524.000 €" (das ist der Mehrwert),
+     „2,2 % unter den Kaufpreisen" (es ist darüber) und „Bäckerstr. 7 kostet mehr, als
+     sie bringt" (laut Daten nicht). Geprüft wird deshalb auch:
+       (a) Begriff -> Betrag: der erste Betrag nach einem festen Begriff im selben Satz
+       (b) Betrag -> Prozent: ein Prozent direkt hinter einem Teilbetrag muss sein eigener sein
+       (c) Richtung: „x % über/unter" gegen das Vorzeichen des Prozentfelds
+       (d) Namen in Sätzen „mehr kosten, als …" gegen massnahmen_teurer_als_wert */
+  function _num(s) { return parseFloat(String(s).replace(/\s/g, '').replace('\u2212', '-').replace(/\./g, '').replace(',', '.')); }
+  function _betragAus(m) { var v = _num(m[1]); return /Mio/.test(m[2] || '') ? v * 1e6 : v; }
+  function _bedeutungPruefen(text, ctx) {
+    var Z = ctx && ctx.bestand_zielbild; if (!Z) return [];
+    var EW = Z.ertragswert || {}, GB = Z.gesamtbewertung || {}, KM = Z.kaltmiete_jahr || {}, JO = Z.je_objekt || [];
+    var out = [];
+    var gleich = function (a, b, mio) { return a != null && b != null && Math.abs(Math.abs(a) - Math.abs(b)) <= Math.max(1, Math.abs(b) * (mio ? 0.006 : 0.0005)); };
+    /* Satzende nur vor einem Grossbuchstaben und nicht nach "str."/"Nr." - sonst zerfaellt "Bäckerstr. 7 Musterhausen" */
+    var saetze = text.split(/(?<!(?:str|Str|Nr|ca|bzw|vgl|Abs))[.!?]\s+(?=[A-ZÄÖÜ])|\n+/);
+    var BETRAG = /([+\u2212\-]?\s?\d{1,3}(?:\.\d{3})*(?:,\d+)?|\d+(?:,\d+)?)\s?(Mio\.?\s?(?:€|EUR|Euro)|€|EUR|Euro)/;
+    var BEGRIFFE = [
+      { re: /Wertzuwachs nach Kosten/i, soll: [EW.wertzuwachs_nach_kosten].concat(JO.map(function (o) { return o.wertzuwachs_nach_kosten; })), name: 'Wertzuwachs nach Kosten' },
+      { re: /Mehrwert/i, soll: [EW.mehrwert], name: 'Mehrwert' },
+      { re: /Gesamtinvestition/i, soll: [GB.gesamtinvestition], name: 'Gesamtinvestition' },
+      { re: /Nebenkosten/i, soll: [GB.nebenkosten], name: 'Nebenkosten' },
+      { re: /Restschuld/i, soll: [GB.restschuld_heute], name: 'Restschuld' }
+    ];
+    saetze.forEach(function (satz) {
+      BEGRIFFE.forEach(function (B) {
+        var m = B.re.exec(satz); if (!m) return;
+        var rest = satz.slice(m.index + m[0].length, m.index + m[0].length + 90);
+        var b = BETRAG.exec(rest); if (!b) return;
+        var v = _betragAus(b);
+        if (!B.soll.some(function (x) { return gleich(v, x, /Mio/.test(b[2])); }))
+          out.push('„' + B.name + ' … ' + b[0].trim() + '“ – laut Daten ' + B.soll.filter(function (x) { return x != null; }).slice(0, 1).map(function (x) { return Math.round(x).toLocaleString('de-DE') + ' €'; }).join(''));
+      });
+      /* (b) Betrag, dann Prozent */
+      var re2 = /([+\u2212\-]?\s?\d{1,3}(?:\.\d{3})*(?:,\d+)?)\s?(?:€|EUR|Euro)[^.%€]{0,25}?(\d+(?:,\d+)?)\s?(?:%|Prozent)/g, m2;
+      var paare = [[KM.mehr_gesamt, KM.mehr_gesamt_prozent], [KM.mehr_durch_mieterhoehung, KM.mehr_durch_mieterhoehung_prozent], [KM.mehr_durch_umbau_neuvermietung, KM.mehr_durch_umbau_neuvermietung_prozent]]
+        .concat(JO.map(function (o) { return [o.mehr_miete, o.mehr_miete_prozent]; }));
+      while ((m2 = re2.exec(satz))) {
+        var bv = _num(m2[1]), pv = _num(m2[2]);
+        var P = paare.filter(function (p) { return gleich(bv, p[0]); });
+        if (P.length && !P.some(function (p) { return p[1] != null && Math.abs(Math.abs(p[1]) - pv) <= 0.1; }))
+          out.push('„' + m2[0].trim() + '“ – der Prozentwert gehört nicht zu diesem Betrag (' + P.map(function (p) { return String(p[1]).replace('.', ',') + ' %'; }).join(' / ') + ')');
+      }
+      /* (c) Richtung */
+      var re3 = /(\d+(?:,\d+)?)\s?(?:%|Prozent)\s+(über|unter|höher|niedriger|oberhalb|unterhalb)/gi, m3;
+      var vorz = [EW.ertragswert_bestand_gegen_kaufpreis_prozent, EW.kaufpreis_gegen_ertragswert_bestand_prozent, Z.marktpreisindikation_bestand && Z.marktpreisindikation_bestand.gegen_kaufpreis_prozent].filter(function (x) { return x != null; });
+      while ((m3 = re3.exec(satz))) {
+        var pv3 = _num(m3[1]), oben = /über|höher|oberhalb/i.test(m3[2]);
+        var tr = vorz.filter(function (x) { return Math.abs(Math.abs(x) - pv3) <= 0.05; });
+        if (tr.length && !tr.some(function (x) { return (x > 0) === oben; }))
+          out.push('„' + m3[0] + '“ – die Richtung stimmt nicht (laut Daten ' + tr.map(function (x) { return (x > 0 ? '+' : '') + String(x).replace('.', ','); }).join(' / ') + ' %)');
+      }
+      /* (d) Namen bei „mehr kosten, als …" */
+      if (/kost\w*\s+mehr|mehr\s+kost/i.test(satz)) {
+        var teurer = Z.massnahmen_teurer_als_wert || [];
+        JO.forEach(function (o) {
+          var kurz = String(o.name || '').split(/\s+/).slice(0, 2).join(' ');
+          if (kurz && satz.indexOf(kurz) >= 0 && teurer.indexOf(o.name) < 0)
+            out.push('„' + kurz + '“ – laut Daten bringen die Maßnahmen dort nicht weniger, als sie kosten');
+        });
+      }
+    });
+    return out.filter(function (x, i, a) { return a.indexOf(x) === i; });
   }
   function pruefungZeigen(pr) {
     var log = el('dp-pp-log'); if (!log || !pr) return;
     var d = document.createElement('div');
-    d.className = 'dp-pp-pruef' + (pr.nicht_gefunden.length ? ' dp-pp-pruef-warn' : '');
+    var bd = pr.bedeutung || [];
+    d.className = 'dp-pp-pruef' + (pr.nicht_gefunden.length || bd.length ? ' dp-pp-pruef-warn' : '');
     d.innerHTML = '<b>Zahlenprüfung:</b> ' + pr.gefunden + ' von ' + pr.geprueft + ' Beträgen und Prozenten stehen so in den Zahlen des Cockpits.'
-      + (pr.nicht_gefunden.length ? ' Nicht gefunden: ' + esc(pr.nicht_gefunden.slice(0, 8).join(' · ')) + ' – diese Angaben bitte gegen die Tabellen oben prüfen.' : '');
+      + (pr.nicht_gefunden.length ? ' Nicht gefunden: ' + esc(pr.nicht_gefunden.slice(0, 8).join(' · ')) + ' – diese Angaben bitte gegen die Tabellen oben prüfen.' : '')
+      + (bd.length ? '<br><b>Zuordnung geprüft – ' + bd.length + ' Stelle' + (bd.length === 1 ? '' : 'n') + ' widerspricht den Zahlen:</b><br>' + bd.slice(0, 8).map(function (x) { return '· ' + esc(x); }).join('<br>') + '<br>Maßgeblich sind die Zahlen der Auswertung oben.' : (pr.geprueft ? ' Zuordnung von Begriffen, Prozenten, Richtung und Objekten: ohne Widerspruch.' : ''));
     log.appendChild(d);
   }
 
