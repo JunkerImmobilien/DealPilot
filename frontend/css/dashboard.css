@@ -993,7 +993,7 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
   border-color:var(--gold);color:#EDE7DA;background:#221F17;
 }
 
-/* PP v2101b · WEG (c) FUER DIE ABZEICHEN PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+/* PP v2101b ï¿½ WEG (c) FUER DIE ABZEICHEN PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
    Marcels Vorschlag trennt: Weg (a) fuer Zahlen und Tabellen, Weg (c)
    fuer Abzeichen. Ein Abzeichen ist eine Pille, keine Zahl in einer
    Spalte - dort traegt der dunkle Grund die Marke weiter, statt den Ton
@@ -1208,7 +1208,6 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
 #dashboard-main .cp-chev::before{content:"";position:absolute;left:7px;top:6px;width:6px;height:6px;border-right:2px solid var(--wl-e8cc7a, #E8CC7A);border-bottom:2px solid var(--wl-e8cc7a, #E8CC7A);transform:rotate(45deg);transition:transform .15s}
 #dashboard-main .cp-sek.cp-zu .cp-chev::before{transform:rotate(-45deg);left:6px;top:7px}
 #dashboard-main .cp-sek.cp-zu>:not(:first-child){display:none!important}
-#dashboard-main .cp-sek>.sl .cp-objsel+.cp-chev,#dashboard-main .cp-sek>.sl .rule+.cp-chev{margin-left:8px}
 
 /* Gesamtbewertung */
 #dashboard-main #dp-gesamtbew{margin-top:13px}
@@ -1283,3 +1282,5 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
   #dashboard-main .pj-box{height:280px}
   #dashboard-main .proj .ph{flex-wrap:wrap}
 }
+#dashboard-main .zb-neu-btn{margin-top:4px;border:0;background:none;color:var(--c-accd-txt);font:600 10.5px Inter,system-ui,sans-serif;cursor:pointer;padding:2px 0;text-decoration:underline;min-height:24px}
+#dashboard-main .zb-o-hin{display:block;font:400 10px/1.35 Inter,system-ui,sans-serif;color:var(--c-pmut);margin-top:3px;white-space:normal}

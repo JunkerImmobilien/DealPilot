@@ -813,12 +813,24 @@
      er braucht das offene Formular - er rechnet aus den Einheiten im Objekt.
      wert-zielbild.js stoesst ihn beim Oeffnen der Karte selbst an (autoRechnen);
      gespeichert wird er mit dem naechsten Sichern des Objekts. */
-  function zumZielbild(key){
+  /* v2951 · `neu`: den Lauf erzwingen und das Objekt danach sichern - der Weg,
+     den Marcel „immer wieder neu antriggern" will. Kostenlos (s. o.). Der Reiter wird
+     ueber seinen Knopf gewaehlt (data-target-sec="s6"), nicht ueber eine Nummer:
+     switchTab(6) traf gemessen die Pilot-Analyse. */
+  function zumZielbild(key, neu){
     if (!key || typeof window.loadSaved !== 'function') return;
     Promise.resolve(window.loadSaved(key)).then(function(){
       setTimeout(function(){
-        try { if (typeof window.switchTab === 'function') window.switchTab(6); } catch (e) {}
+        try { var t = document.querySelector('nav.tabs .tab[data-target-sec="s6"]'); if (t) t.click(); } catch (e) {}
         setTimeout(function(){ var c = document.getElementById('card-wert-zielbild'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 700);
+        if (neu && window.DpPotenzial && typeof DpPotenzial.rechnen === 'function') {
+          setTimeout(function(){
+            Promise.resolve(DpPotenzial.rechnen({ erzwingen: true })).then(function(){
+              if (window._currentObjKey === key && typeof window.saveObj === 'function') { try { window.saveObj(); } catch (e) {} }
+              _details = {}; _detailsLoaded = false;   /* das Cockpit liest beim naechsten Oeffnen frisch */
+            });
+          }, 1800);
+        }
       }, 500);
     });
   }
@@ -869,7 +881,7 @@
       + '</div>' : '';
     var neuHtml = '<div class="zb-neu"><b>Neu rechnen:</b> Der Vergleich liest die Läufe, die am Objekt gespeichert sind'
       + (A.staende.length ? ' (Stand ' + (A.staende[0] === A.staende[A.staende.length-1] ? dat(A.staende[0]) : dat(A.staende[0]) + ' bis ' + dat(A.staende[A.staende.length-1])) + ')' : '')
-      + '. Ein neuer Lauf entsteht im Objekt unter <i>Bewertung › Wert &amp; Zielbild</i>: beim Öffnen rechnet DealPilot die Ertragswerte je Stufe <b>kostenlos</b> neu (kein Kontingent), gespeichert wird mit dem Objekt. Kostenpflichtig (ein Kontingent) ist nur ein neuer Marktbericht.</div>';
+      + '. <b>„neu rechnen ↻“</b> an jedem Objekt öffnet es, rechnet die Ertragswerte je Stufe <b>kostenlos</b> neu (kein Kontingent) und speichert; danach das Cockpit wieder öffnen. Dasselbe geschieht im Objekt unter <i>Bewertung › Wert &amp; Zielbild</i>. Kostenpflichtig (ein Kontingent) ist nur ein neuer Marktbericht.</div>';
     if (!nMit) {
       host.innerHTML = '<div class="zb-card"><div class="zb-zahl">' + kopfZahl + '</div>'
         + '<p class="zb-text">Für keines der ' + A.n + ' Objekte sind Mieterhöhung oder Zielbild erfasst. Eintragen lässt es sich im Objekt unter Bewertung › Mieterhöhung und Zielbild.</p>' + gruendeHtml + neuHtml + '</div>';
@@ -909,11 +921,13 @@
       return '<div class="zb-o">'
         + '<div class="zb-o-n" title="'+esc(e.name)+'">'+esc(e.name)+'<small>'+(e.top==='zielbild'?'Zielbild':'nur Mieterhöhung')+(e.stand?' · Lauf '+dat(e.stand):'')+'</small></div>'
         + '<div class="zb-o-g"><span class="zb-o-bar"><span style="width:'+w.toFixed(2)+'%"></span></span>'
-        +   '<span class="zb-o-m">'+EK(e.mB)+' → '+EK(e.mZ)+' <b>'+P(pz)+'</b></span></div>'
+        +   '<span class="zb-o-m">'+EK(e.mB)+' → '+EK(e.mZ)+' <b>'+P(pz)+'</b></span>'
+        +   (e.ewB != null && e.ewZ === e.ewB && e.mZ > e.mB ? '<small class="zb-o-hin">Mehrmiete liegt über der marktüblichen Miete – im Ertragswert nicht angesetzt</small>' : '') + '</div>'
         + '<div class="zb-o-w"><span class="zb-o-wl">Wertzuwachs n. K.</span><span class="'+(e.zuw==null?'':(e.zuw>=0?'zb-pos':'zb-neg'))+'">'
         +   (e.zuw==null ? (e.gesperrt ? 'mit Stufe 3' : 'nicht gerechnet') : VZ(e.zuw)) + '</span>'
         +   (e.ewB != null && e.ewZ != null ? '<small>EW '+EK(e.ewB)+' → '+EK(e.ewZ)+'</small>' : '')
-        +   (e.kosten ? '<small>Maßnahmen '+EK(e.kosten)+'</small>' : '<small>ohne Maßnahmen</small>') + '</div>'
+        +   (e.kosten ? '<small>Maßnahmen '+EK(e.kosten)+'</small>' : '<small>ohne Maßnahmen</small>')
+        +   '<button type="button" class="zb-neu-btn" title="Öffnet das Objekt, rechnet die Ertragswerte je Stufe neu (kostenlos, kein Kontingent) und speichert" onclick="DealPilotDashboard.zumZielbild(\''+esc(e.key)+'\',true)">neu rechnen \u21bb</button></div>'
         + '</div>';
     }).join('');
 
@@ -927,7 +941,7 @@
     var t = [];
     t.push('Für ' + nMit + ' von ' + A.n + ' Objekten liegen Angaben zu Mieterhöhung oder Zielbild vor (' + A.nZiel + ' mit Zielbild'
       + (A.nMh ? ', ' + A.nMh + ' nur mit Mieterhöhung' : '') + ').'
-      + (A.ohne.length ? ' Nicht enthalten: ' + A.ohne.map(function(x){ return x.name; }).join(', ') + ' – die Gründe stehen unten.' : ''));
+      + (A.ohne.length ? ' Nicht enthalten: ' + A.ohne.map(function(x){ return x.name; }).join(', ') + ' – die Gründe stehen oben.' : ''));
     t.push('Über diese Objekte steigt die Kaltmiete von ' + E(A.mieteB) + ' auf ' + E(A.mieteZ) + ' im Jahr (' + VZ(mehrZ) + ', ' + P(A.mieteB?mehrZ/A.mieteB*100:null) + ')'
       + (mehrZ > 0 ? '; davon ' + E(mehrM) + ' ohne Mieterwechsel, ' + E(A.mieteZ - A.mieteM) + ' nach Umbau oder Neuvermietung.' : '.'));
     t.push(A.kosten ? 'Eingeplant sind Maßnahmen von ' + E(A.kosten) + (A.kostenM ? ', davon ' + E(A.kostenM) + ' schon für die Mieterhöhung' : '') + '. Die Bruttomietrendite geht damit von ' + _fPr(bmyB,2) + ' auf ' + _fPr(bmyZ,2) + '.'
@@ -1038,7 +1052,7 @@
     if (A.mit && A.mit.length) {
       var mz = A.mieteZ - A.mieteB;
       K.push(k('Zielbild · mehr Miete im Jahr', _fVZ(mz), 'pos', A.nZiel + ' von ' + A.n + ' mit Zielbild' + (A.nMh ? ', ' + A.nMh + ' nur Mieterhöhung' : ''),
-        'Wenn Mieterhöhung und Zielbild umgesetzt sind' + (A.ewN ? '; nach Abzug von ' + _fEK(A.ewKosten) + ' Maßnahmen bleiben ' + _fVZ(A.zuw) + ' Ertragswert (Ausblick, kein Verkehrswert)' : '') + '.', 'zielbild'));
+        'Wenn Mieterhöhung und Zielbild umgesetzt sind' + (A.ewN ? '; nach Abzug von ' + _fEK(A.ewKosten) + ' Maßnahmen bleibt beim Ertragswert ein Zuwachs von ' + _fEK(A.zuw) + ' (Ausblick, kein Verkehrswert)' : '') + '.', 'zielbild'));
     } else {
       K.push(k('Zielbild', 'noch keins', null, A.n + ' Objekte ohne Angaben', 'Soll-Miete und Zielbild trägst du im Objekt unter Bewertung ein – dann rechnet DealPilot den Ausblick.', 'zielbild'));
     }
@@ -1725,7 +1739,7 @@
                  title:{ display:true, text:'Restschuld · Eigenkapital (€)', color:axisCol, font:{size:10} } };
       mk('dpc-proj-mix',{type:'bar',data:{labels:labels,datasets:[
         {type:'bar',label:'Miete',data:PR.map(function(r){return Math.round(r.miete);}),backgroundColor:_wlrgba(.28),borderRadius:2,yAxisID:'y',order:4},
-        {type:'line',label:'Cashflow vor Steuer',data:PR.map(function(r){return Math.round(r.cfVor);}),borderColor:GOLD_LO,backgroundColor:GOLD_LO,pointRadius:0,borderWidth:2,tension:.3,yAxisID:'y',order:1},
+        {type:'line',label:'Cashflow vor Steuer',data:PR.map(function(r){return Math.round(r.cfVor);}),borderColor:'#7A7370',backgroundColor:'#7A7370',pointRadius:0,borderWidth:2,tension:.3,yAxisID:'y',order:1},
         {type:'line',label:'Cashflow nach Steuer',data:PR.map(function(r){return Math.round(r.cfNach);}),borderColor:'#3FA56C',backgroundColor:'#3FA56C',borderDash:[5,4],pointRadius:0,borderWidth:2,tension:.3,yAxisID:'y',order:1},
         {type:'line',label:'Restschuld',data:PR.map(function(r){return Math.round(r.rest);}),borderColor:DEBT,backgroundColor:DEBT,pointRadius:0,borderWidth:2,tension:.3,yAxisID:'y2',order:2},
         {type:'line',label:'Eigenkapital',data:PR.map(function(r){return Math.round(r.eq);}),borderColor:GOLD,backgroundColor:GOLD,pointRadius:0,borderWidth:2.6,tension:.3,yAxisID:'y2',order:2}

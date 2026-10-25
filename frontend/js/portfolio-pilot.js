@@ -375,8 +375,12 @@
      Dieselbe Haltung wie bei der Pilot-Analyse (v2017): gemessen
      wird, woran die Aussage haengt - nicht das naechstliegende
      Datum. */
+  var _standVersuch = 0;
   function standZeigen() {
     var host = el('dp-pp-stand'); if (!host) return;
+    /* v2951: beim Einhaengen sind die Objekte oft noch nicht geladen - die Zaehlung
+       ergab 0 und die Zeile meldete "inzwischen sind es 0". Dann spaeter noch einmal. */
+    try { var _c0 = kontext(); if ((!_c0 || !_c0.anzahl_objekte) && _standVersuch++ < 6) { setTimeout(standZeigen, 2500); return; } } catch (e) {}
     Auth.apiCall('/user-settings/portfolio_analyse').then(function (r) {
       var w = r && r.wert;
       if (!w || !w.text) { host.style.display = 'none'; return; }
