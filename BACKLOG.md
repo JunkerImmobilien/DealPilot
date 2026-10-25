@@ -36,6 +36,14 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N79 · Portfolio-Cockpit Runde 2 (25.10.2026) — Rest nach v2951c
+
+Gebaut in v2950–v2951c (Einfach|Genau, Gesamtbewertung, Gründe, Pilot an der Auswertung, Einklappen, Projektion als Chart). Rest:
+- **Westerfeldstr. 140 doppelt — NICHT gelöscht:** Löschen ist endgültig (`DELETE FROM objects`, kein Papierkorb; help.js sagt es auch). Behalten werden muss `ae155d38-c0ea-462b-8b69-253e9eb311a8` (Spot/Videos). Marcel entscheidet: die andere Kopie selbst löschen oder auf „Verloren“ setzen (bleibt erhalten, fällt aus dem Cockpit).
+- **Parkstr. 9 — Eingaben NICHT geändert:** Ertragswert Bestand 161.000 € ist im Modell richtig gerechnet (≈ 298.000 € Ertragswert − 137.000 € Sanierungsstau aus Feld `san` als boG; Miete auf die marktübliche 4,64 €/m² gekappt, weil die Ist-Mieten 7,00–9,50 €/m² über dem Band 3,71–5,57 €/m² liegen; RND 12 nach Anlage 2 bei Bj 1905 und 0 Punkten). Lauf am 25.10. neu geholt, gleiches Ergebnis. Entscheidung Marcel: Demo-Mieten oder Sanierungskosten anpassen? (Objekt steht im Video „parkstrasse_2026-10-14“.)
+- **Portfolio-Pilot, zweiter Lauf:** der erste Lauf hatte 4 Zuordnungsfehler (jetzt vom Prüfer erkannt, `tools/portfolio-pilot-pruefen.mjs`). Prompt mit Fakten-Sätzen ist gebaut, aber noch nicht mit einem echten Lauf abgenommen (freigegeben war ein Lauf).
+- Optik zur Abnahme: Brücken mit gekürzter Achse (Bruchkante + „Achse ab …“), Einfach als Standard.
+
 ### N78 · Pilot-Analyse durchgesehen (25.10.2026) — Rest nach v2946
 
 Gemessen an Westerfeldstr. 140 (Staging, Analyse vom 13.10., Bericht vom 20.10.).

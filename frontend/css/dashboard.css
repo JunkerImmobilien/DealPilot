@@ -1284,3 +1284,4 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
 }
 #dashboard-main .zb-neu-btn{margin-top:4px;border:0;background:none;color:var(--c-accd-txt);font:600 10.5px Inter,system-ui,sans-serif;cursor:pointer;padding:2px 0;text-decoration:underline;min-height:24px}
 #dashboard-main .zb-o-hin{display:block;font:400 10px/1.35 Inter,system-ui,sans-serif;color:var(--c-pmut);margin-top:3px;white-space:normal}
+#dashboard-main .proj.pj-chart-an .dptk-schalter{display:none!important}   /* v2951c: Spalten-Schalter der Tabellen-Karten gehoert zur Tabelle */
