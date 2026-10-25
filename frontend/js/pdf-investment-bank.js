@@ -1877,7 +1877,7 @@
     zeile('AfA-Satz Gebäude', num('afa_satz') !== null ? pct(num('afa_satz'), 2) : (txt('afa_satz') || '-'));
     zeile('Grunderwerbsteuer (Land)', num('gest_p') !== null ? pct(num('gest_p'), 2) : '-');
     if (num('exit_bmy') !== null) zeile('Exit-Rendite (Verkaufsszenario)', pct(num('exit_bmy'), 1));
-    if (da(S.wert_basis) !== null && S.wert_basis !== kp) zeile('Wert-Anker der Wertsteigerung', (num('svwert') ? 'Verkehrswert' : 'Bankbewertung') + '  ·  ' + eur(S.wert_basis));   /* v2830 */
+    if (da(S.wert_basis) !== null && S.wert_basis !== kp) zeile('Wert-Anker der Wertsteigerung', (S.wert_basis_text || (num('svwert') ? 'Verkehrswert' : 'Bankbewertung')) + '  ·  ' + eur(S.wert_basis));   /* v2830 */
     if (K.d1IsAussetzung) zeile('Darlehenstyp', 'Tilgungsaussetzung mit Bausparvertrag');
     if (num('bspar_rate')) zeile('Bausparrate / Monat', eur(num('bspar_rate')));
     y += 2;

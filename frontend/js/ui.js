@@ -1772,6 +1772,22 @@ window._dpPaTab = function (id, btn) {
 };
 
 /* v2171: _dpQuellenAemter() (v2155) ist mit dem Quellen-Reiter gefallen. */
+/* v2945 · Satz fuer den Kopf der Pilot-Analyse, wenn der letzte Marktbericht
+   NACH der Analyse entstand (Quelle: DpWertZielbild.bericht(), dieselbe
+   Historie wie im Tab Bewertung). Leer, wenn kein neuerer Bericht bekannt ist. */
+function _paMbNeuer(stand) {
+  try {
+    var b = window.DpWertZielbild && window.DpWertZielbild.bericht ? window.DpWertZielbild.bericht() : null;
+    if (!b || !b.created_at) return '';
+    var d = new Date(b.created_at);
+    if (isNaN(d) || d <= stand) return '';
+    var mw = Number(b.market_value);
+    return '<span data-dp-pa-mb="1">Seitdem gibt es einen <b>neueren Marktbericht vom ' + d.toLocaleDateString('de-DE') + '</b>'
+      + (b.market_value != null && isFinite(mw) ? ' (Marktpreisindikation ' + Math.round(mw).toLocaleString('de-DE') + ' €)' : '')
+      + ' — Werte aus dem Bericht in den Texten unten stammen aus dem älteren Stand.</span>';
+  } catch (e) { return ''; }
+}
+
 function _renderAIServerAnalysis(a) {
   /* v584-rail */
   a = a || {};
@@ -2186,7 +2202,26 @@ function _renderAIServerAnalysis(a) {
          _text = '<b>Stand ' + _datum + '</b>' + (_tage ? ' (vor ' + _tage + ' Tagen)' : '')
                + ' \u2014 ob sich die Zahlen seitdem ge\u00e4ndert haben, ist nicht feststellbar.';
        }
-       _kopf = '<div class="dp-pa-stand dp-pa-stand-' + _klasse + '">' + _text + '</div>';
+       /* v2945 · NEUERER MARKTBERICHT. Der Abdruck oben sieht nur Formularfelder.
+          Gemessen an Westerfeldstr. 140: Analyse vom 13.10. zitiert im Reiter
+          Lage & Markt den Bericht vom 04.10. (Marktwert 1.055.000 €, damals ohne
+          Angebotsabschlag), der aktuelle Bericht vom 20.10. sagt 820.000 € - und
+          der Kopf meldete nur „Zimmer, Eigenkapital, Wohneinheiten". */
+       if (!_fremd && !isNaN(_d)) {
+         var _mbH = _paMbNeuer(_d);
+         if (_mbH) {
+           if (_klasse === 'ok') _text = '<b>Stand ' + _datum + '</b>' + (_tage ? ' (vor ' + _tage + ' Tagen)' : '') + '.';
+           if (_klasse !== 'fremd') _klasse = 'alt';
+           _text += ' ' + _mbH;
+         } else if (window.DpWertZielbild && window.DpWertZielbild.laden && !(window.DpWertZielbild.bericht && window.DpWertZielbild.bericht())) {
+           /* Bericht noch nicht geladen: nachladen und den Satz anhaengen */
+           try { window.DpWertZielbild.laden().then(function () {
+             var h = _paMbNeuer(_d), el = document.querySelector('.dp-pa-stand[data-dp-pa-stand]');
+             if (h && el && !el.querySelector('[data-dp-pa-mb]')) { el.insertAdjacentHTML('beforeend', ' ' + h); el.className = 'dp-pa-stand dp-pa-stand-alt'; }
+           }); } catch (e) {}
+         }
+       }
+       _kopf = '<div class="dp-pa-stand dp-pa-stand-' + _klasse + '" data-dp-pa-stand="1">' + _text + '</div>';
      } else {
        /* v2017 - ALTE Analysen ohne Stempel. Hier wird NICHTS behauptet:
           "aktuell" waere eine Aussage ohne Grundlage. */

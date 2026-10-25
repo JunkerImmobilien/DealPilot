@@ -80,7 +80,7 @@
 (function (global) {
   if (global.DpWertZielbild) return;
 
-  var VERSION = 'v2944';
+  var VERSION = 'v2945';
   var MERKER = 'dp_pa_si_ansicht';
   var _hist = { key: null, laedt: null, eintrag: null };
 
@@ -117,6 +117,9 @@
         var letzt = null;
         ((j && j.history) || []).forEach(function (h) { if (h && h.market_value != null && (!letzt || new Date(h.created_at) >= new Date(letzt.created_at))) letzt = h; });
         _hist.eintrag = letzt; _hist.laedt = null;
+        /* v2945 · der Anker der Wertsteigerung (calc.js wert_basis) kann am Bericht haengen -
+           ohne Verkehrswert im Formular nach dem Laden einmal neu rechnen */
+        try { var S = global.State || {}; if (letzt && S.wert_basis_quelle && S.wert_basis_quelle !== 'verkehrswert' && typeof global.calc === 'function') global.calc(); } catch (e) {}
         return daten();
       }, function () { _hist.laedt = null; return daten(); });
     return _hist.laedt;
@@ -635,8 +638,8 @@
     var S = global.State || {}, VZ = S._vz || null;
     var basis = zahl(S.wert_basis), wstg = zahl(S.wstg);
     if (!VZ || basis == null || basis <= 0) return '';
-    var kp = kaufpreis(), svw = zahl((document.getElementById('svwert') || {}).value);
-    var anker = (svw != null && svw > 0) ? 'dem Verkehrswert aus dem Reiter Objekt' : (kp != null && Math.abs(basis - kp) < 1 ? 'dem Kaufpreis' : 'der Bankbewertung');
+    var anker = { verkehrswert: 'dem Verkehrswert aus dem Reiter Objekt', marktbericht: 'dem ' + (S.wert_basis_text || 'Wert aus dem Marktbericht'),
+      bankbewertung: 'der Bankbewertung', kaufpreis: 'dem Kaufpreis' }[S.wert_basis_quelle] || 'dem Wert von heute';
     var jahre = zahl(VZ.btj);
     var t = '<div class="dp-wz-h">Und der Vermögenszuwachs?</div><div class="dp-wz-bruecke">'
       + '<p><b>Zwei Fragen, zwei Rechnungen.</b> Diese Karte fragt: <i>Was ist das Objekt heute wert, und was nach den Maßnahmen?</i> '
@@ -650,9 +653,33 @@
     if (ew != null && Math.abs(ew - basis) / basis > 0.05) {
       var d = (ew - basis) / basis * 100;
       t += '<p><b>Anderer Ausgangswert.</b> Der Ertragswert hier (' + esc(eur(ew)) + ') liegt ' + esc(dez(Math.abs(d), 1)) + ' % ' + (d > 0 ? 'über' : 'unter') + ' dem Ausgangswert des Vermögenszuwachses. '
-        + 'Der Vermögenszuwachs rechnet nur mit dem, was im Reiter Objekt als Verkehrswert oder Bankbewertung steht.</p>';
+        + (S.wert_basis_quelle === 'verkehrswert' ? 'Ein eingetragener Verkehrswert im Reiter Objekt hat Vorrang vor dem Marktbericht.' : '') + '</p>';
     }
     return t + '</div>';
+  }
+  /* v2945 · Zielbild als Plan-Zeile im Vermögenszuwachs (Marcel 25.10.2026: „ja, wenn das
+     Sinn macht"). Die Summe aus calc.js (State._vz.verm_zuwachs) bleibt UNVERÄNDERT - an ihr
+     hängen Equity Multiple, Bank-Wasserfall und beide PDFs. Hier steht nur eine zweite,
+     klar als Plan markierte Summe darunter, zum Anhaken, je Objekt gemerkt. */
+  function vzZielbild(D) {
+    var karteVz = document.getElementById('card-vermoegen-zuwachs'), ges = document.getElementById('vz-gesamt');
+    var alt = document.getElementById('vz-zielbild-host');
+    var Z = D && D.zielbild, zw = Z && Z.wertzuwachs_nach_kosten ? zahl(Z.wertzuwachs_nach_kosten.zielbild) : null;
+    var VZ = (global.State || {})._vz, summe = VZ ? zahl(VZ.verm_zuwachs) : null;
+    if (!karteVz || !ges || zw == null || summe == null) { if (alt) alt.remove(); return; }
+    var mk = 'dp_vz_zielbild:' + (key() || ''), an = false;
+    try { an = localStorage.getItem(mk) === '1'; } catch (e) {}
+    var host = alt || document.createElement('div'); host.id = 'vz-zielbild-host';
+    var zeileGes = ges.closest('.kv');
+    if (!alt && zeileGes) zeileGes.parentNode.insertBefore(host, zeileGes.nextSibling);
+    var jahr = Z.jahre && Z.jahre.zielbild ? ' ' + Z.jahre.zielbild : '';
+    host.innerHTML = '<label class="kv" style="cursor:pointer"><span><input type="checkbox" data-dp-vz-ziel="1"' + (an ? ' checked' : '') + ' style="margin:0 6px 0 0;vertical-align:-2px">'
+      + 'Zielbild' + esc(jahr) + ' einrechnen <span class="cf-hint">(Plan · Ertragswert Zielbild − heute − Maßnahmen)</span></span>'
+      + '<span class="kv-v ' + (zw >= 0 ? 'c-green' : 'c-red') + '">' + esc(eurVz(zw)) + '</span></label>'
+      + (an ? '<div class="kv kv-result"><span><b>Netto-Vermögenszuwachs mit Zielbild</b> <span class="cf-hint">(Plan; Wertzuwachs zum heutigen Stand, ohne Fortschreibung, ohne Finanzierung der Maßnahmen und ohne Mehrmiete im Cashflow)</span></span>'
+        + '<span class="kv-v c-gold">' + esc(eurVz(summe + zw)) + '</span></div>' : '');
+    var cb = host.querySelector('[data-dp-vz-ziel]');
+    cb.addEventListener('change', function () { try { localStorage.setItem(mk, cb.checked ? '1' : '0'); } catch (e) {} vzZielbild(daten()); });
   }
   function potenzialHost() {
     var c = document.getElementById('card-wert-zielbild') || _karte; if (!c) return null;
@@ -687,7 +714,7 @@
     var sec = document.getElementById('s6'); if (!sec) return;
     var c = document.getElementById('card-wert-zielbild') || _karte;
     var D = daten();
-    if (!D) { if (c) c.remove(); _karte = null; return; }
+    if (!D) { if (c) c.remove(); _karte = null; vzZielbild(null); return; }
     stil();
     if (!c) {
       c = document.createElement('div'); c.className = 'card'; c.id = 'card-wert-zielbild';
@@ -702,6 +729,7 @@
     _karte = c;
     platz(c);
     c.querySelector('[data-dp-wz-oben]').innerHTML = segmentOben(D);
+    vzZielbild(D);
     c.querySelector('.dp-wz-kz').hidden = !D.zielbild;
     var det2 = c.querySelector('details.dp-wz-det');
     det2.hidden = !D.zielbild;

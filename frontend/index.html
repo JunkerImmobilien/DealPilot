@@ -3411,13 +3411,13 @@ label.dp-required.qc-required::after {
         <span class="cf-hint" style="font-weight:400">klick zum Aufklappen</span>
       </summary>
       <div style="margin-top:6px;padding:12px 14px;background:var(--surface);border-radius:8px;border:1px solid rgba(63,165,108,.30)">
-        <div class="kv" style="font-size:.86em"><span>Wert-Anker (Heute) <span class="cf-hint">(Verkehrswert / Bankbewertung / Kaufpreis)</span></span><span class="kv-v" id="vz-info-kp">—</span></div>
+        <div class="kv" style="font-size:.86em"><span>Wert-Anker (Heute) <span class="cf-hint" id="vz-info-kp-quelle">(Verkehrswert / Marktbericht / Bankbewertung / Kaufpreis)</span></span><span class="kv-v" id="vz-info-kp">—</span></div>
         <div class="kv" style="font-size:.86em"><span>× Wertsteigerungs-Annahme p.a. <span class="cf-hint">(aus Tab Annahmen)</span></span><span class="kv-v" id="vz-info-wstg">—</span></div>
         <div class="kv" style="font-size:.86em"><span>Wachstumsfaktor <span class="cf-hint">(1 + p.a.)<sup id="vz-info-jahre-pow">10</sup></span></span><span class="kv-v" id="vz-info-faktor">—</span></div>
         <div class="kv" style="font-size:.86em"><span>= Marktwert nach <span id="vz-jahre5">10</span> Jahren</span><span class="kv-v" id="vz-info-endwert">—</span></div>
         <div class="kv" style="font-size:.86em"><span>– Wert-Anker (Heute)</span><span class="kv-v c-red" id="vz-info-kp2">—</span></div>
         <div class="kv kv-result" style="font-size:.9em"><span><b>= Wertsteigerung</b></span><span class="kv-v c-green" id="vz-info-wstgkum">—</span></div>
-        <div class="hint" style="font-size:.78em;margin-top:6px">Formel: <code>Wertsteigerung = Wert-Anker × ((1 + p.a.)<sup>Jahre</sup> − 1)</code><br>Wert-Anker ist der Verkehrswert wenn vorhanden, sonst die Bankbewertung wenn höher als der Kaufpreis, sonst der Kaufpreis selbst.<br>Standard-Annahme: 1,5 % p.a. (in den Annahmen änderbar). Konservative Werte für stabile Lagen: 0–2 %, Wachstumsregionen 2–4 %.</div>
+        <div class="hint" style="font-size:.78em;margin-top:6px">Formel: <code>Wertsteigerung = Wert-Anker × ((1 + p.a.)<sup>Jahre</sup> − 1)</code><br>Wert-Anker ist der Verkehrswert wenn vorhanden, sonst der führende Wert des letzten Marktberichts (Ertrags-, Sach- oder Vergleichswert, nie ein vorläufiger), sonst die Bankbewertung wenn höher als der Kaufpreis, sonst der Kaufpreis selbst.<br>Standard-Annahme: 1,5 % p.a. (in den Annahmen änderbar). Konservative Werte für stabile Lagen: 0–2 %, Wachstumsregionen 2–4 %.</div>
       </div>
     </details>
   </div>
@@ -3621,7 +3621,7 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-anlage-bmf.js?v=v1634c"></script>
 <script src="js/pdf-blocksatz.js?v=v2830a"></script><!-- v2830 · Blocksatz fuer alle PDFs -->
 <script src="js/pdf-wert-zielbild.js?v=v2900"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
-<script src="js/pdf-investment-bank.js?v=v2940a"></script>
+<script src="js/pdf-investment-bank.js?v=v2945"></script>
 <script src="js/bmf-modal.js?v=v2269"></script>
 <script src="js/bmf-modal-v292.js?v=v2269"></script>
 <script src="js/bmf-bodenabschlag.js?v=v2943"></script>
@@ -3652,7 +3652,7 @@ label.dp-required.qc-required::after {
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
-  <script src="js/calc.js?v=v2891"></script>
+  <script src="js/calc.js?v=v2945"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
@@ -3703,7 +3703,7 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=100"></script>
 <script src="js/v10.js?v=v2254"></script>
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
-<script src="js/ui.js?v=v2842"></script>
+<script src="js/ui.js?v=v2945"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
 <script src="js/storage.js?v=v2931"></script>
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
@@ -3795,7 +3795,7 @@ label.dp-required.qc-required::after {
 <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte, klickbar = übernehmen -->
 <script src="js/marktwert-abschlag.js?v=v2672a"></script><!-- v2237 · Abschlag auf Angebotspreise -->
 <script src="js/wertvergleich.js?v=v2842"></script><!-- v2810 · Pilot-Analyse: Marktpreisindikation, Ertrags- und Sachwert gegenuebergestellt -->
-<script src="js/wert-zielbild.js?v=v2944"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
+<script src="js/wert-zielbild.js?v=v2945"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
 <script src="js/dealpilot-mb.js?v=v2820"></script>
 <script src="js/mb-auftrag.js?v=v2191"></script>
   <script src="js/marktbericht-view.js?v=v2823a"></script>

@@ -1200,15 +1200,39 @@ function _calcImmediate(){
      bewertet nach BelWertV und setzt beim Erbbaurecht ihren eigenen
      Abschlag, aber was hier eingetippt wird, ist der Wert VOR Abschlag. */
   if (_erbAbzug > 0 && _bankval > 0) _bankval = Math.max(0, _bankval - _erbAbzug);
-  var wert_basis;
+  /* v2945 · Marcel 25.10.2026 zum Ausgangswert: „je nach dem was er hat."
+     Neue zweite Stufe: der FUEHRENDE Wert des letzten Marktberichts (Ertrags-,
+     Sach- oder Vergleichswert, wie dort gewaehlt) - aber nur, wenn er nicht
+     vorlaeufig ist (Sachwert ohne Sachwertfaktor rechnet halb, CLAUDE.md).
+     Nie die Marktpreisindikation: die kommt aus Angebotspreisen.
+     Reihenfolge: Verkehrswert > Marktbericht (fuehrend) > Bankbewertung (> KP) > Kaufpreis.
+     Der Bericht wird asynchron geladen (DpWertZielbild.laden); wert-zielbild.js
+     ruft calc() nach dem Laden erneut, wenn sich der Anker dadurch aendert. */
+  var _mbAnker = null;
+  try {
+    /* _wertDaten statt daten(): daten() zieht das Zielbild (DpPotenzial) mit - hier nur der Bericht, ohne Rueckweg in calc() */
+    var _wzB = window.DpWertZielbild && window.DpWertZielbild.bericht ? window.DpWertZielbild.bericht() : null;
+    var _wzW = _wzB && window.DpWertZielbild._wertDaten ? window.DpWertZielbild._wertDaten(_wzB) : null;
+    if (_wzW && _wzW.fuehrend) {
+      var _fv = _wzW[_wzW.fuehrend];
+      if (_fv && _fv.wert > 0 && !_fv.vorlaeufig) _mbAnker = { wert: Math.max(0, _fv.wert - _erbAbzug), art: _wzW.fuehrend, datum: _wzW.bericht_datum };
+    }
+  } catch (_e) { _mbAnker = null; }
+  var wert_basis, _wbQuelle;
   if (svw > 0) {
-    wert_basis = svw;
+    wert_basis = svw; _wbQuelle = 'verkehrswert';
+  } else if (_mbAnker && _mbAnker.wert > 0) {
+    wert_basis = _mbAnker.wert; _wbQuelle = 'marktbericht';
   } else if (_bankval > kp) {
-    wert_basis = _bankval;
+    wert_basis = _bankval; _wbQuelle = 'bankbewertung';
   } else {
-    wert_basis = kp;
+    wert_basis = kp; _wbQuelle = 'kaufpreis';
   }
   State.wert_basis = wert_basis;
+  State.wert_basis_quelle = _wbQuelle;
+  State.wert_basis_text = _wbQuelle === 'verkehrswert' ? 'Verkehrswert (Reiter Objekt)'
+    : _wbQuelle === 'marktbericht' ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' }[_mbAnker.art] || 'Wert') + ' aus dem Marktbericht'
+    : _wbQuelle === 'bankbewertung' ? 'Bankbewertung' : 'Kaufpreis';
   var gs_a=v('gsfl')*(v('mea')/100);
   st('gs_ant',gs_a.toFixed(2)+' m²');st('bodenwert',fE(gs_a*v('brw')));
   var nkm=v('nkm'),ze=v('ze'),uf=v('umlagef');
@@ -2943,6 +2967,7 @@ function _calcImmediate(){
   var wstg_pct = wstg * 100;
   var wstg_factor = Math.pow(1 + wstg, btj);
   st('vz-info-kp', fE(wert_basis, 0));
+  st('vz-info-kp-quelle', '(' + (State.wert_basis_text || 'Kaufpreis') + ')');   /* v2945 */
   st('vz-info-wstg', wstg_pct.toFixed(2).replace('.', ',') + ' %');
   st('vz-info-faktor', wstg_factor.toFixed(4).replace('.', ','));
   st('vz-info-endwert', fE(wert_endjahr, 0));
